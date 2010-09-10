@@ -1,0 +1,36 @@
+<script src="scripts/client.js" language="javascript"></script>
+<script src="../neosys/scripts/neosys.js" language="javascript"></script>
+<script>
+
+var gnosavelocation=true
+
+function backup_start()
+{
+ db.request='BACKUP'
+ if (!db.send()) return alert(db.response)
+ 
+ alert(db.response+'\r\rPlease wait more than sufficient time for it to finish and check the log')
+ 
+}
+
+</script>
+<div align="center">
+	<h2>Backup</h2>
+	<h3>
+		<P>
+			Important Notice:
+		</P>
+		<p>
+			This "backup" is NOT a full and proper backup of your NEOSYS system.<br>
+			It is an internal consistency check and copy of the NEOSYS database.</p>
+		<p>
+			A full and proper backup of your data will be an automatic daily complete copy 
+			of the<br>
+			NEOSYS software and data with periodic off-site storage. All to be setup, 
+			monitored,<br>
+			and guaranteed by your own technical support staff.
+		</p>
+	</h3>
+	<BUTTON onclick="backup_start()">Start Backup</BUTTON>
+	</p>
+</div>
