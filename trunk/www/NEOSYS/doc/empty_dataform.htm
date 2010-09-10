@@ -1,0 +1,70 @@
+<html>
+	<head>
+		<!- The following short script must be included first to define a few variables 
+		that determine how the form is to be processed.>
+		<script>
+		
+			//The name of a neosys dictionary object that defines the user interface
+			// must be specified in the global variable "gdatafilename"
+			//
+			//The actual dictionary name will be "dict_YOURFORMNAME"
+			//
+			var gdatafilename='YOURFORMNAME'
+			
+			//If the data entered is to be returned to another window then then
+			// window must be called as a modal dialog window.
+			//
+			//If the data entered are to be processed on the server then this
+			// window must not be called as a modal dialog window and the name
+			// of the program to be called on the server must be specified
+			// in the global variable called "gmodule"
+			var gmodule='YOURMODULENAME'
+						
+		</script>
+		<!- The following script inclusion must be specified second in order to enable 
+		neosys functionality.>
+		<script language="javascript" src="../neosys/scripts/client.js"></script>
+		<!- The following script must be written third in order to define in detail the 
+		dictionary that causes all the required user interface details for each field 
+		on the form. The dictionary for a data form MUST NOT define any fields as field 
+		number zero.>
+		<script>
+			function dict_YOURFORMNAME()
+			{
+
+			//returns an array representing the form's dictionary
+			
+			var dict=[]//of dictrecs
+			var din=-1
+			var di
+			 
+			di=dict[++din]=dictrec('YOUR_FIELD_NAME_1','F',1)
+			 
+			di=dict[++din]=dictrec('YOUR_FIELD_NAME_2','F',2)
+			  
+			return dict
+			 
+			}
+		</script>
+		<title>YOUR_FORM_NAME Form</title>
+	</head>
+	<body>
+		<div align="center">
+			<h1>YOUR_FORM_NAME Form</h1>
+			<div id="formbuttons"></div>
+			<table class="neosystable" border="1">
+				<thead></thead>
+				<tbody>
+					<tr>
+						<td>Your Field 1</td>
+						<td><input datafld="YOUR_FIELD_NAME_1"></td>
+					</tr>
+					<tr>
+						<td>Your Field 2</td>
+						<td><input datafld="YOUR_FIELD_NAME_2"></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</body>
+</html>

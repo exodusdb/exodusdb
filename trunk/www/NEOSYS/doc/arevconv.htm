@@ -1,0 +1,99 @@
+<html>
+<body>
+<H3>INSTALLATION</H3>
+<p>Some draft information how to get NEOSYS Ajax implementation going in AREV backend</p>
+<OL>
+	<LI>
+		Install the NEOSYS server routine into your runtime. I have to make an 
+		installation procedure for this. I imagine it will be a case of attaching a 
+		subdirectory containing most BP programs (but possibly some other files eg 
+		security tables) and cataloging all my subroutines.<BR>
+		Note that the standard Revelation MSG routine in SYSOBJ will have to be 
+		replaced by a NEOSYS version that will return messages to the web interface 
+		instead of simply displaying them on the screen.<BR>
+	NEOSYS currently relies on using @USER0 TO @USER4 so if you use these in your 
+	routines you will have to eliminate them or ask NEOSYS to change it. NEOSYS.NET 
+	also uses labelled commons called SYSTEM and GENERAL
+	<LI>
+	Install the NEOSYS.NET folder in a directory parallel to your IMC and AREV 
+	directories and add it as a virtual directory to your web server. If you do not 
+	want to use a web server you can also simply open the HTML web pages via a 
+	shared folder or mapped drive.
+	<LI>
+	Create a folder in NEOSYS.NET for your applications web pages. You can create 
+	separate folders for each module of your application as desired.
+	<LI>
+		Start one or more copies of your application (on the server preferably) and 
+		start the NEOSYS listening routine by running the command "NET".</LI></OL>
+<H3>CONVERSION/DEVELOPMENT</H3>
+<H4>Conversion of forms from templates to HTML pages (both tiles and collector 
+	forms):</H4>
+<EM>
+	<P>Partially Automated routine.</P>
+	<P>
+</EM>Syntax: <STRONG>WINDOW2HTM windowfilename windowkey outputpathandfilename</STRONG></P>
+<P></EM>It is possible to reduce the initial grunt work of creating forms to HTML 
+	by using a NEOSYS&nbsp;template to HTML&nbsp;program&nbsp;in AREV. This 
+	currently results in a top down form with prompts on the left, data entry in 
+	the middle and help comments on the right. This can be edited into any look you 
+	like using an HTML editor of your choice. It might be possible to modify the 
+	conversion program to produce HTML that looks exactly like the DOS entry form 
+	but this would perhaps not exploit the new flexibility available in HTML forms. 
+	The conversion routine does not convert everything automatically ... especially 
+	it does not translate popup, pre and post routines from R/Basic to jscript. You 
+	will have to do manual work to convert these features.</P>
+<P><EM>Manually</EM> Create a web page in NEOSYS.NET for each template that you 
+	have. The web page will have three main sections. The dictionary and routines 
+	section can either be stored in the main web page or stored in separate files 
+	and included using any and all standard HTML programming methods and tricks. 
+	The three main logical sections of the new HTML forms are as follows:</P>
+<UL>
+	<LI>
+	Standard HTML layout of the form ... using any HTML layout you like without 
+	restriction.
+	<LI>
+	Dictionary of the form in jscript form. See examples for this. A dictionary is 
+	a jscript array of dictitems Each dictitem may have lots of properties 
+	representing all the field properties found in a template by pressing Shift+F6 
+	in paint plus many others. The formula for symbolic items is also stored as a 
+	jscript routine in the dictionary.
+	<LI>
+		Routines written in jscript representing the F2, PRE and POST routines of each 
+		field. Also pre,post and replace routines for READ, WRITE, DELETE etc.
+	</LI>
+</UL>
+<H4>Conversion of menus</H4>
+<P><EM>Mostly automated routine</EM></P>
+<P>Syntax: <STRONG>MENU2HTM menufilename menukey</STRONG></P>
+<P>Handles M, W, S, E and X codes</P>
+<P>Outputs a MENU.HTM into the NEOSYS.NET directory containing the main menu AND 
+	all subsidiary menus.</P>
+<P>Also&nbsp;converts all WINDOW templates found in the menus converted.</P>
+<P>Any S or E or X commands in the menu need converting of the subroutine and 
+	programs from R/Basic to jScript.</P>
+<H4>Conversion of R/LIST</H4>
+<P>A collector window to collect the report parameters must be converted (see 
+	conversion of forms from templates above)</P>
+<P>An XXXXXPROXY program must be written according to a skeleton example. XXXXX is 
+	defined in the client form as the global variable gmodule. Eg ACCOUNTSPROXY is 
+	a program that will handle a variety of requests from the client depending on 
+	the exact command.</P>
+<P>The XXXXXPROXY program will receive the contents of the form or just a simple 
+	command from a jscript&nbsp;and produce an output .HTM file. NEOSYS support 
+	functions provide the path and name of the file.</P>
+<P>A NEOSYS replacement of the standard RLIST program can output to the required 
+	.HTM file given from standard queries.</P>
+<P>By default on saving any collector window. The contents of the window will be 
+	passed to the XXXXXPROXY program on the server and any output from XXXXXPROXY 
+	will be displayed on the client. If there is any error discovered then an error 
+	message will display, the user can correct their data on the collector window 
+	and resubmit.</P>
+<H4>Conversion of custom updates/printouts</H4>
+<P>The must first be converted to output to .HTM files. Preferably they should 
+	output native HTML however you can simply continue to output fixed font reports 
+	and wrap this in HTML tags.</P>
+
+<p>© 2004 NEOSYS Software Ltd. All Rights Reserved.</p>
+
+</body>
+</html>

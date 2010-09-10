@@ -1,0 +1,546 @@
+<meta name="vs_showGrid" content="False">
+<H2>Client side general stuff not related to forms
+</H2>
+<P>These constants, methods, functions and objects are available in the client side 
+	htm forms by inserting a common neosys script as follows:</P>
+<P>&lt;script src="..\NEOSYS\scripts\client.js"&gt;&lt;/script&gt;</P>
+<P>Many user interface forms will also include special databound and nondatabound 
+	forms however it is possible to do all your own interactions with the server 
+	and this is appropriate for some simple interactions without forms at all.</P>
+<H2>Constants</H2>
+<P><EM>rm,fm,vm,sm,tm,stm</EM> are global variable containing the standard field 
+	separators (characters 255-250)</P>
+<P><EM>gusername</EM> - the name of the logged in user</P>
+<P><EM>gdataset</EM> - the name of the database in use ... or DEFAULT</P>
+<P><EM>gsystem</EM> - the name of the application in use ... or DEFAULT</P>
+<P><EM>gparameters</EM> - an object containing the properties on the URL</P>
+<P>eg if <A href="http://myserver/myapplication/forms/myform.htm?myparameter1=111&amp;myparameter2=222">
+		http://myserver/myapplication/forms/myform.htm?myparameter1=111&amp;myparameter2=222</A><BR>
+	<BR>
+	then gparameters have two properties:</P>
+<P>gparameters.myparameter1=111<BR>
+	gparameters.myparameter2=222</P>
+<P>gparameters will also have a copy of all properties passed into a window via 
+	dialogArguments</P>
+<H2>Functions</H2>
+<H3>function neosyssecurity(taskname)</H3>
+<P></P>
+Returns true if current user (in gusername) is allowed to do the task or false 
+if not&nbsp;and gmsg will hold a suitable message to explain the failure.
+<P>Security table is automatically loaded into gtasks from the server if not 
+	present</P>
+<P></P>
+<H3>function neosysnote(msg)</H3>
+<P></P>
+<P>Gives&nbsp;the user a&nbsp;message and returns true</P>
+<H3>function neosyswarning(msg)</H3>
+<P></P>
+<P>Gives&nbsp;the user&nbsp;a&nbsp;message with a yellow warning icon and returns 
+	true</P>
+<P></P>
+<H3>function neosysinvalid(msg)</H3>
+<P></P>
+<P>Gives&nbsp;the user a&nbsp;message with a red&nbsp;stop&nbsp;icon and returns 
+	false</P>
+<H3>function neosysinput(question,text,texthidden)</H3>
+<P>Returns a string input by the user or false if user cancels</P>
+<P><STRONG>text</STRONG> is the optional default input</P>
+<P><STRONG>texthidden</STRONG> is true or false (default)</P>
+<H2>
+	<H3>function neosysokcancel(question,defaultbutton)
+	</H3>
+</H2>
+<P>returns 1 if user presses OK or 0 if they press Cancel</P>
+<H2>
+	<H3>function neosysyesno(question,defaultbutton)</H3>
+</H2>
+<P>returns true if user presses&nbsp;Yes or false if they press No. defaultbutton 
+	is optional and 1 for Yes, 2 for No.</P>
+<H2>
+	<H3>function neosysyesnocancel(question, defaultbutton, yesbuttontitle, 
+		nobuttontitle, cancelbuttontitle)</H3>
+</H2>
+<P>Returns 1 if they press the Yes button, 2 if they press the No button and 0 if 
+	they press Cancel</P>
+<H2>
+	<H3>function neosysdecide(question,data,cols,returncoln,defaultreply,many,inverted)</H3>
+</H2>
+<P>pops up a table for the user to select row(s) or value(s) from</P>
+<P>data and cols are [[]] or [] or revstr or a;1:b;2 string</P>
+<P>data cells .text property will be used if present</P>
+<P>returncoln '' means return row number(s) - 1 based</P>
+<P>returncoln means column number or property name in data</P>
+<P>(data columns are usually numeric and 0 based)</P>
+<P>defaultreply=if returncoln then cell(s) of returncoln otherwise 1 based rown(s)</P>
+<P>the data might be a db request string prefixed with '@'
+</P>
+<H3>function neosysfilepopup(filename,cols,coln,sortselectionclause,many)</H3>
+<P>given a filename, sort/selection statement and column names pops up a table for 
+	the user to select row(s) or value(s)</P>
+<P><STRONG>many</STRONG> if true will allow the user to select more than one item</P>
+<H3>
+	<H3>function neosyssetdropdown(element,request,colarray,selectedvalues,xyz)</H3>
+	<H3>function neosysgetdropdown(element,mode)</H3>
+</H3>
+<H2>
+	<H3>function neosyssetexpression(elementsorelementid, attributename, expression)</H3>
+</H2>
+<P>can be used to set the display property of elements to a suitable expression
+</P>
+<H3>function neosyssetcookie(glogincode,key, value,subkey)</H3>
+<P>useful function to manage cookies</P>
+<P>subkey is optional</P>
+<H3>function neosysgetcookie(glogincode,key,subkey)</H3>
+<P>useful function to manage cookies</P>
+<P>subkey is optional</P>
+<H2>
+	<H3>function neosysenabledandvisible(element)</H3>
+</H2>
+<P>returns whether an element is enabled and visible
+</P>
+<H2>
+	<H3>function neosysxml2obj(xmltext)</H3>
+</H2>
+<P>returns neosys&nbsp;general purpose data object given an xml&nbsp;text string</P>
+<H2>
+	<H3>function neosysobj2xml(obj)
+	</H3>
+</H2>
+<P>returns an xml&nbsp;text string&nbsp; given a neosys&nbsp;general purpose data 
+	object</P>
+<H2>Methods</H2>
+<P></P>
+<H3>array.neosysread(filename,key,fieldno)</H3>
+<P>reads a record from the server into an array</P>
+<P></P>
+looks in the cache if active
+<P></P>
+<H3>array.neosysxlate(filename,fieldno,mode)</H3>
+<P></P>
+returns an array of records from the server given an array of keys
+<P></P>
+<H3>string.neosysxlate(filename,fieldno,mode)</H3>
+<P>uses a string as a key to get a field or record from the server</P>
+<P></P>
+<P></P>
+<P>fieldno can be zero&nbsp;to get the the whole record</P>
+<P></P>
+<P>mode can be SUM in order to add up multivalues
+</P>
+<P></P>
+<P>mode can be C to return the key if the record is not found
+</P>
+<H2>Objects</H2>
+<P></P>
+<H3>neosysdblink</H3>
+<P>This is the basic&nbsp;object used&nbsp;to send and receive&nbsp;requests, 
+	responses and&nbsp;data&nbsp;to and from&nbsp;the server.</P>
+<P>With the exception of the DATASETS&nbsp;request, there must be an active 
+	unoccupied&nbsp;database&nbsp;process serving the specified dataset. The server 
+	can be configured to&nbsp;create&nbsp;automatically new processes&nbsp;but 
+	there will be a noticable delay.</P>
+<H4>Properties</H4>
+<P></P>
+<P>neosysdblink.request - request string to be sent to the server<BR>
+</P>
+<P></P>
+<P>neosysdblink.response - returned from the server
+</P>
+<P></P>
+<P>neosysdblink.data - returned from the server
+</P>
+<P></P>
+<H4>Methods</H4>
+<P></P>
+<P>neosysdblink.send(datastring)
+</P>
+<P>neosysdblink.login(username,password,dataset,system)</P>
+<P>see also function dblogout()</P>
+<H4>Example JavaScript</H4>
+<BLOCKQUOTE dir="ltr" style="MARGIN-RIGHT: 0px">
+	<P>var neosysdblink1=new neosysdblink()<BR>
+		neosysdblink1.request="TEST"<BR>
+		if (!neosysdblink1("DUMMYDATA")) return neosysinvalid(db.response)<BR>
+		alert(neosysdblink1.data)
+	</P>
+</BLOCKQUOTE>
+<H4>Request format</H4>
+<P>A request property must be one&nbsp;the following&nbsp;list of standard list of 
+	keywords followed by a few parameters separated by CR characters.</P>
+<P>The EXECUTE request, after its fixed parameters, can be followed by any 
+	parameters you like but it is is usual to transfer large amount of data or 
+	non-data bound forms in the data parameter.</P>
+<P>For the application programmer the main requests from the client side are:</P>
+<UL>
+	<LI>
+	READ - returns a record
+	<LI>
+	SELECT - returns an array of records and columns
+	<LI>
+	GETINDEXVALUES&nbsp; - returns a list of values in an index
+	<LI>
+		EXECUTE - runs a named procedure on the server passing and receiving parameters 
+		and data</LI></UL>
+<H5>
+	<H4>List of valid requests</H4>
+	EXECUTE modulename parameter1 parameter2 parameter3 etc</H5>
+<P>This is commonly used for:</P>
+<P>1.&nbsp;Special validations that require interaction with the server</P>
+<P>2. Special requests for information from the server</P>
+<P>3. To process non-data bound forms&nbsp;to:</P>
+<UL>
+	<LI>
+	Obtain&nbsp;reports
+	<LI>
+	Produce documents such as invoices that require files to be updated as well
+	<LI>
+		Periodic file maintenance tasks</LI></UL>
+<P>The default procedure for a NON databound form when the user clicks OK is to 
+	EXECUTE a named program on the server with the contents of the&nbsp;form being 
+	passed as a typical FM separated record as a parameter. No programming on the 
+	client side is required but the program on the server side has to be written of 
+	course. Many times this module can call existing legacy programs which only 
+	need to be modified to a) accept input from parameters and not the user 
+	interface and b) output the results in a file and not on the server screen.</P>
+<H5>READ&nbsp;filename key</H5>
+<P>Returns a record from the database or an error if it does not exist. The record 
+	is received in the db.data propery.</P>
+<P>The realfilename and the name of the custom postread routine is obtained by 
+	calling a custom routine similar to READU below.</P>
+<P>User must&nbsp;have authority to do the&nbsp;"realfilename ACCESS" task.</P>
+<H5>READU&nbsp;filename key lockdurationinmins readenvironment</H5>
+<P>Reading records for update is done automatically in data bound forms and rarely 
+	used in client side application code.</P>
+<P>Locks and returns a record from the database with a sessionid (to be later used 
+	on any WRITE/WRITEU/RELOCK requests). If the record does not exist then the 
+	record is still locked and an empty record is returned.</P>
+<P>lockdurationinmins is optional and defaults to 10 mins</P>
+<P>The realfilename and the name of the custom postread routine is obtained by 
+	calling a custom routine:<BR>
+	SUBROUTINE LISTEN3(filename,request,realfilename,triggers)<BR>
+	where request=READ or READU and realfilename and triggers are returned<BR>
+	triggers&lt;3&gt; is the name of the postread subroutine if any eg 
+	filename.SUBS<BR>
+	triggers&lt;4&gt; is the parameter of the postread subroutine if any eg 
+	'POSTREAD'<BR>
+	No preread&nbsp;routine is available currently.</P>
+<P>The user must&nbsp;have authority to do the&nbsp;"realfilename ACCESS" task and 
+	either the "realfilename UPDATE" task if the record exists, or the 
+	"realfilename CREATE" task if the record does not exist.</P>
+<P><EM>readenvironment</EM> is optional and can be used to provide additional 
+	information eg the prefix of&nbsp;a new multipartkey with a sequential number.</P>
+<P>If the key to be read is empty or starts or ends with '*' or contains '**' then 
+	a routine is called to get the next sequential key with the following 
+	environment: WLOCKED,@ID, @RECORD,DATAFILE,SRC.FILE<BR>
+	key=CALL GENERAL.SUBS('DEF.SK.':readenvironment)</P>
+<P>Postread environment:</P>
+<P>SUBROUTINE postreadroutinename(postreadparameter)<BR>
+	$INSERT INCLUDE,AREV.COMMON<BR>
+	<BR>
+	SRC.FILE<BR>
+	DATAFILE<BR>
+	@RECORD ...&nbsp;CAN be modified<BR>
+	@ID ...&nbsp;CANNOT be modified<BR>
+	@DICT<BR>
+	@USERNAME<BR>
+	WLOCKED set to <EM>sessionid</EM> ... clear to "unlock" record but not cancel<BR>
+	MSG can be set to something to cancel the read<BR>
+	RESET can be set to 5 or greater to cancel the read<BR>
+	VALID can be set to 0 to cancel the read</P>
+<H5>WRITE filename key sessionid<BR>
+	WRITEU filename key sessionid</H5>
+<P>Writing&nbsp;is done automatically for data bound forms and rarely used in 
+	client side application code.</P>
+<P>Writes a record&nbsp;to the database&nbsp;given a still valid sessionid provided 
+	by&nbsp;a previous READU or LOCK&nbsp;request.</P>
+<P>WRITEU leaves the record locked with the same sessionid whereas WRITE 
+	automatically unlocks it after calling the custom postwrite routine if any.</P>
+<P>The record data is passed in the neosysdblink.send(data) parameter.</P>
+<P>There are no security checks as the <EM>sessionid </EM>indicates that security 
+	was checked already on READU<BR>
+	(but not LOCK!!!)</P>
+<P>The realfilename and the name of the custom pre and postwrite routines 
+	are&nbsp;obtained by calling a custom routine:<BR>
+	SUBROUTINE LISTEN3(filename,request,realfilename,triggers)<BR>
+	where request=WRITE or WRITEU and realfilename and triggers are returned<BR>
+	triggers&lt;1&gt; is the name of the prewrite subroutine if any eg 
+	filename.SUBS<BR>
+	triggers&lt;2&gt; is the parameter of the prewrite subroutine if any eg 
+	'PREWRITE'<BR>
+	triggers&lt;3&gt; is the name of the postwrite subroutine if any eg 
+	filename.SUBS<BR>
+	triggers&lt;4&gt; is the parameter of the postwrite subroutine if any eg 
+	'POSTWRITE'</P>
+<P>Pre/Postwrite environment:<BR>
+	<BR>
+	SUBROUTINE pre/postwriteroutinename(pre/postwriteparameter)<BR>
+	$INSERT INCLUDE,AREV.COMMON<BR>
+	<BR>
+	SRC.FILE<BR>
+	DATAFILE<BR>
+	@RECORD ...&nbsp;CAN be modified in prewrite<BR>
+	@ID ...&nbsp;CAN&nbsp;be modified in prewrite <EM>but prewrite must NOT unlock the 
+		old key OR lock the new key<BR>
+	</EM>@DICT<BR>
+	@USERNAME<BR>
+	WLOCKED set to <EM>sessionid</EM> ... clear to "unlock" record but not cancel<BR>
+	SAVE.REC=true&nbsp; ... indicates we are in WRITE or WRITEU<BR>
+	DELETE.REC= false ... indicates we are not in DELETE<BR>
+	VALID can be set to 0 in prewrite to cancel the write<BR>
+	MSG can be set to indicate errors/notes/warnings in pre/postwrite routines</P>
+<H5>DELETE&nbsp;filename key sessionid</H5>
+<P>Deleting&nbsp;is done automatically for data bound forms and rarely used in 
+	client side application code.</P>
+<P>Deletes a&nbsp;record from the database&nbsp;given a still valid sessionid 
+	provided by&nbsp;a previous READU or LOCK&nbsp;requests.</P>
+<P>The realfilename and the name of the custom pre and postdelete routines 
+	are&nbsp;obtained by calling a custom routine:<BR>
+	SUBROUTINE LISTEN3(filename,request,realfilename,triggers)<BR>
+	where request=DELETE and realfilename and triggers are returned<BR>
+	triggers&lt;1&gt; is the name of the predelete subroutine if any eg 
+	filename.SUBS<BR>
+	triggers&lt;2&gt; is the parameter of the predelete subroutine if any eg 
+	'PREDELETE'<BR>
+	triggers&lt;3&gt; is the name of the postdelete subroutine if any eg 
+	filename.SUBS<BR>
+	triggers&lt;4&gt; is the parameter of the postdelete subroutine if any eg 
+	'POSTDELETE'</P>
+<P>User must&nbsp;have authority to do the&nbsp;"realfilename DELETE" task.</P>
+<P>Pre/Postdelete environment:</P>
+<P>SUBROUTINE pre/postdeleteroutinename(pre/postdeleteparameter)<BR>
+	$INSERT INCLUDE,AREV.COMMON</P>
+<P>SRC.FILE<BR>
+	DATAFILE<BR>
+	@RECORD ...&nbsp;CAN be modified in predelete but will not have much effect<BR>
+	@ID ...&nbsp;CANNOT be modified<BR>
+	@DICT<BR>
+	@USERNAME<BR>
+	WLOCKED set to <EM>sessionid</EM> ... clear to "unlock" record but not cancel 
+	DO NOT UNLOCK<BR>
+	SAVE.REC=true&nbsp; ... indicates we are not in WRITE or WRITEU<BR>
+	DELETE.REC=false ... indicates we are in DELETE<BR>
+	VALID can be set to 0 in predelete to cancel the delete<BR>
+	MSG can be set to indicate errors/notes/warnings in pre/postdelete routines</P>
+<H5>LOCK filename key dummy lockdurationinmins</H5>
+<P>
+	Locking is done automatically for data bound forms and rarely used in client 
+	side application code.</P>
+<P>Returns a sessionid if the record can be locked otherwise fails.</P>
+<P>lockdurationinmins is optional and defaults to 10 mins</P>
+<H5>RELOCK filename key&nbsp;sessionid lockdurationinmins</H5>
+<P>Relocking is done automatically for data bound forms and rarely used in client 
+	side application code.</P>
+<P>Extends the lock on the record for another period of time.</P>
+<P>The lock will remain in place for lockdurationinmins.</P>
+<P><EM>sessionid</EM> must match be a valid&nbsp; <EM>sessionid</EM> provided from 
+	a previous&nbsp;LOCK or READU request</P>
+<P><EM>lockdurationinmins</EM> is optional and defaults to 10 mins</P>
+<H5>UNLOCK filename key sessionid</H5>
+<P>Unlocking is done automatically for data bound forms and rarely used in client 
+	side application code.</P>
+<P>Releases the record to be locked by other processes or users.</P>
+<P><EM>sessionid</EM> must match be a valid&nbsp;<EM>sessionid</EM> provided from a 
+	previous&nbsp;LOCK or READU request</P>
+<H5>SELECT filename sortselect dictids options</H5>
+<P>Selects columns and rows from a file and returns it as a table in db.data</P>
+<P>The user must&nbsp;have authority to do the&nbsp;"realfilename ACCESS" and 
+	"realfilename LIST" tasks.</P>
+<P>sortselect is an optional&nbsp;typical select statement like "WITH CATEGORY_CODE 
+	'X' BY LOCATION"</P>
+<P>dictids is a space separated list of column ids to be returned</P>
+<P>options can be "XML" in which case the data is returned formatted as XML 
+	otherwise field marks and record marks are used as column and record 
+	separators.</P>
+<H5>GETINDEXVALUES filename fieldname prefix sortby xmlflag</H5>
+<P>Returns a string of the currently indexed values for&nbsp;given file and field</P>
+<P>User must&nbsp;be authorised to for&nbsp;the "filename ACCESS" and "filename 
+	LIST" tasks</P>
+<P>The user must&nbsp;have authority to do the&nbsp;"realfilename ACCESS" and 
+	"realfilename LIST" tasks.</P>
+<P><EM>fieldname</EM>&nbsp;must be an existing indexed field for the given file</P>
+<P><EM>prefix</EM> is an optional string to filter and remove from returned values</P>
+<P><EM>sortby</EM> must be blank for no order, or be one of&nbsp;AR,AL,DR,DL for 
+	Ascending/Descending/Left/Right Justified</P>
+<P><EM>xmlflag</EM> can be "XML" and the values will be returned as an XML 
+	delimited string.</P>
+<H5>DATASETS</H5>
+<P>This is used in the standard default.htm login form and rarely&nbsp;used 
+	in&nbsp;client user interface&nbsp;programming.</P>
+<P>Returns a string representing the available databases .. no username or password 
+	required.</P>
+<P>No active database process required.</P>
+<H5>LOGIN dataset username password</H5>
+<P>This is used in the standard default.htm login form and rarely needed&nbsp;in 
+	client user interface programming although custom login programs, see below, 
+	are commonly written for the server side application.</P>
+<P>Verifies that the <EM>username</EM> and <EM>password</EM> are valid for the 
+	specified dataset and sets a cookie called NEOSYS4 using 
+	neosyssetcookie(glogincode,'NEOSYS2',db.data).</P>
+<P>On the server&nbsp;a custom database procedure called LOGIN.NET&nbsp;is run, if 
+	available,&nbsp;to provide the text of the cookie&nbsp;or cancel the login if 
+	required.</P>
+<P>Example Basic Source Code:<BR>
+	SUBROUTINE&nbsp;LOGIN.NET(datasetcode,username,cookie,message) *the purpose of 
+	this routine is to:<BR>
+	*1. allow customised security routines depending on the username<BR>
+	*2. enable customised post login messages to be displayed<BR>
+	*3. enable&nbsp;a customised&nbsp;environment&nbsp;users by setting a cookie<BR>
+	*<BR>
+	*username and password have been validated&nbsp;already<BR>
+	*cookie must be set otherwise the login will be<BR>
+	*cancelled and the message displayed instead. *datasetcode and username 
+	variables may be used<BR>
+	*to determine the contents of the cookie<BR>
+	&nbsp;cookie='aaa=111&amp;bbb=222&amp;ccc=333'<BR>
+	*
+	<BR>
+	*message, if set,&nbsp;will be displayed to the user<BR>
+	*regardless of the success or failure of the login<BR>
+	&nbsp;message=''<BR>
+	&nbsp;RETURN</P>
+<H5>RESTART</H5>
+<P>Terminates all database processes but allows additional processes to be started 
+	if autostart has been configured.</P>
+<H5>STOPDB</H5>
+<P>Terminates all database processes and stops additional processes being started.</P>
+<H2>Object</H2>
+<P></P>
+<H3>neosysdatasource</H3>
+<P>For NEOSYS forms the main form data is automatically&nbsp;available as the 
+	global variable <STRONG>gds. </STRONG>You&nbsp;may create your own <EM>neosys_obj_source</EM>
+	objects if you wish but the <EM>neosysrecord</EM> object is&nbsp;simpler to 
+	use.&nbsp;The very simple <EM>array.neosysread() </EM>method can be used to 
+	obtain records from the server in a simple array object.</P>
+<P>This object represents a record with fields and multivalues like @RECORD but 
+	contains methods&nbsp;extract values (equivalent to&nbsp;VARX= 
+	@RECORD&lt;1,1&gt; or VARX=OREC&lt;1,1&gt;) and&nbsp;replace values (equivalent 
+	to @RECORD&lt;1,1&gt;="XXX"). It also contains methods to insert and delete 
+	multivalued rows.</P>
+<P>This object's data extraction and data replacement methods require and return 
+	data in internal format only. The setvalue() and getvalue() functions can be 
+	used to retrieve and update data in external format.</P>
+<P>Any updates to the object automatically update on the screen. Any dependent 
+	calculated fields are automatically reevaluated. Any conversions to external 
+	format are handled automatically.</P>
+<H4>Properties</H4>
+<H4>gds.dict</H4>
+<P>A neosys dictionary object</P>
+<H4>gds.isnewrecord</H4>
+<P>true if the record is bound to a datafile and a new record is being entered, 
+	otherwise false</P>
+<H4>gds.data</H4>
+<P><EM>data</EM> is an object that represents a typical&nbsp;record.&nbsp;Ordinary 
+	fields are represented as&nbsp;named properties.&nbsp;Multivalued field 
+	sets&nbsp;are stored as group objects named like "group1".&nbsp;All associated 
+	multivalues are held in&nbsp;a separate numbered group.</P>
+<P>data is held in internal format</P>
+<H6>field object</H6>
+<P>A&nbsp;field object contains the value of the field, the original value of the 
+	field if changed and&nbsp;a DHTML element if it is bound to the DHTML form.</P>
+<P>gds.data[fieldname].text<BR>
+	gds.data[fieldname].oldtext<BR>
+	gds.data[fieldname].element</P>
+<H6>group object</H6>
+<P>A&nbsp;group object represents a set of parallel multivalues as&nbsp;an array of 
+	data objects (see above)</P>
+<P>gds.data['group'+groupno][recordn][fieldname]</P>
+<H4>Methods</H4>
+<H5>gds.setrecord(dictid,rowno,value)</H5>
+<P>This method is very frequently used&nbsp;in&nbsp;client user interface 
+	programming to update form or record fields automatically.</P>
+<P><EM>dictid</EM> must be the name of an F type item</P>
+<P><EM>rowno</EM> is ignored&nbsp;if dictid is not multivalued, or must be&nbsp;a 
+	zero based number of the multivalue&nbsp;to update, or&nbsp;null in which 
+	case&nbsp;all existing&nbsp;multivalues are cleared and value must be an array 
+	of&nbsp;new values.</P>
+<P><EM>value </EM>must a value, or array of values if the dictionary item is 
+	multivalued and rownno is null</P>
+<P>Setting data to "" clears the "defaulted" property.</P>
+<H5>
+	<H5>gds.calcx(fieldname,rowno,oldtext)</H5>
+</H5>
+<P>This method is very frequently used&nbsp;in&nbsp;client user interface 
+	programming to obtain the value(s)&nbsp;of other&nbsp;record fields.</P>
+<P><EM>dictid </EM>must be the name of a item in gds.dict</P>
+<P><EM>rowno </EM>is relevent for multivalued dictionary items only and may be 
+	undefined and the value of grecn will be used or null to return an array of all 
+	values.</P>
+<P>returns&nbsp;the internal format value&nbsp;of the field.&nbsp;For multivalued 
+	dictionary items it returns an array of values. NB .. returns an array of one 
+	element for multivalued items even when returning one row only.</P>
+<P><EM>oldtext </EM>if true then returns&nbsp;the original value of the field 
+	before any user edits or programmatic updates.</P>
+<H5>gds.recalcx(fieldname,rowno)</H5>
+<P>Like gds.calcx() but for S type fields reevaluates the functioncode and can 
+	therefore be used to obtain the values of S type fields that are not (or not 
+	yet) bound to HTML.</P>
+<H5>
+	<H5>gds.setdefaulted(fieldname,rowno,trueorfalse)</H5>
+</H5>
+<P>This method is sometimes used in&nbsp;client user interface programming to 
+	force&nbsp;a field to default again or to not default.</P>
+<H5>gds.insertrow(groupno,rowno)</H5>
+<P>Inserts a blank row at the given zero based row number. The existing row and 
+	following rows are moved to make room.</P>
+<P>This method is performed automatically by neosys forms and is&nbsp;not often 
+	used in&nbsp;client user interface programming</P>
+<H5>gds.appendrow(mode,group,row)</H5>
+<P>Adds a new row at the end of a given group given an existing row.</P>
+<P>This method is performed automatically by neosys forms and is&nbsp;not often 
+	used in&nbsp;client user interface programming</P>
+<P><EM>mode </EM>"copy" means blank those items with the dictionary item marked as 
+	copyable "false" instead of copying them.</P>
+<H5>gds.addrow(groupno)</H5>
+<P>Adds a blank row at the end of a given group.</P>
+<P>This method is performed automatically by neosys forms and is&nbsp;not often 
+	used in&nbsp;client user interface programming</P>
+<H5>gds.blankrow(groupno,rowno)</H5>
+<H5></H5>
+<P>Blanks a given row of a given group</P>
+<P>This method is performed automatically by neosys forms and is not often used 
+	in&nbsp;client user interface programming</P>
+<H5>gds.deleterow(groupno,fromrowno,torown)</H5>
+<P>Deletes specified row(s) from a specified group.</P>
+<P>This method is performed automatically by neosys forms and is&nbsp;not often 
+	used in client user interface programming.</P>
+<P><EM>groupno</EM> group numbers are 1 based</P>
+<P><EM>fromrowno</EM> the first zero based row number to be deleted</P>
+<P><EM>torowno </EM>optional, to delete more than one row. the last zero based rown 
+	number to be deleted</P>
+<H5>gds.updaterow(mode,fromrow,torow)</H5>
+<P>This method can be used to copy rows from one record to another.</P>
+<P>This method is performed automatically by neosys forms and is&nbsp;not often 
+	used in client user interface programming.</P>
+<P><EM>mode </EM>"copy" means blank those items marked as copyable "false", 
+	otherwise all fields are copied</P>
+<P><EM>fromrow</EM>&nbsp; the row to copy from eg (gds.data['group1'][999])</P>
+<P><EM>torow</EM>&nbsp; the row to copy&nbsp;to eg (gds.data['group1'][999]</P>
+<P>Note: This method does not rebind the row to the HTML form so 
+	.rebind&nbsp;should be specifically called afterwards.</P>
+<H5>gds.rebind(newdataobject,olddataobject,forced)</H5>
+<P>This method is often used to bind a row after it has been copied from somewhere 
+	else eg .updaterow. It is also used to refresh records on screen 
+	after&nbsp;they have been modified by pre/post write routines on the server.</P>
+<P>This method is performed automatically by neosys forms and is&nbsp;not often 
+	used in client user interface programming.</P>
+<P><EM>newdataobject </EM>a new data object (can be a row)</P>
+<P><EM>olddataobject </EM>optional old data object (can be a row)</P>
+<P><EM>forced </EM>true to rebind even if the data values remain the same, 
+	otherwise not (only applies if olddataobject is present)</P>
+<H5>gds.load(generalrecordobject)</H5>
+<P>This method is performed automatically by neosys forms and is&nbsp;not often 
+	used in&nbsp;client user interface programming</P>
+<P>Loads and binds a general record object to the form.</P>
+<H5>gds.bind(newdataobject,olddataobject,rowno)</H5>
+<P>This method is performed automatically by neosys forms and is&nbsp;not often 
+	used in&nbsp;client user interface programming</P>
+<P><EM>newdataobject </EM>a new data object (can be a row)</P>
+<P><EM>olddataobject </EM>optional old data object (can be a row)</P>
+<P><EM>rowno </EM>if non-zero then speeds up binding by not updating HTML with 
+	blank values (assumes that the second and subsequent lines are blank as they 
+	are copied from the first row)</P>
+<H5>function gds_evaluate(functionobject)</H5>
+<H5>function gds_getcells(dbelementordbelementid,recn)</H5>
+<H5>function gds_setrecord2(cells,values)</H5>
+<p>
+    © 2004 NEOSYS Software Ltd. All Rights Reserved.</p>
