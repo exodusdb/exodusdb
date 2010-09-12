@@ -5,7 +5,7 @@
 #ifndef DEBUG
 #define TRACING 0
 #else
-#define TRACING 5
+#define TRACING 2
 #endif
 
 #include <iostream>
@@ -189,7 +189,7 @@ int MVipc(const int environmentn, var& pgconnparams)
 		return false;
 	}
 	else
-#if TRACING >= 1
+#if TRACING >= 3
 		wprintf(L"MVipc() CreateNamedPipe %s succeeded\n", lpszPipename);
 #endif 
    // Call the subroutine to connect to the new client
@@ -208,12 +208,12 @@ int MVipc(const int environmentn, var& pgconnparams)
 	//scoped so that the scoped_lock is automatically released after the notification
 	{
 		boost::mutex::scoped_lock lock(global_ipcmutex);
-#if TRACING >= 1
+#if TRACING >= 3
 		std::cout<<L"MVipc() Notifying that pipe has been opened\n";
 #endif
 		//TODO make sure notifies CORRECT parent thread by using an array of ipcmutexes and tss_environmentn
 		global_ipccondition.notify_one();
-#if TRACING >= 1
+#if TRACING >= 3
 		std::wcout<<L"MVipc() Notified that pipe has been opened\n";
 #endif
 	}

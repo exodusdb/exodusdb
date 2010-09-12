@@ -187,8 +187,8 @@ inline MvEnvironment& getmvenvironment()
 var var::call(const wchar_t* libraryname, const char* functionname) const
 {
 
-	//very detailed dynamic linking in windows and linux
-	//http://www.securityfocus.com/infocus/1872
+	//very detailed dynamic linking in windows and linux 2006
+	//http://www.symantec.com/connect/articles/dynamic-linking-linux-and-windows-part-one
 
 	if (wcslen(libraryname)==0)
 	{

@@ -29,6 +29,9 @@
 #include <stdio.h>
 #pragma comment(lib, "version.lib")  // for "VerQueryValue"
 
+//Avoid warning C4748: /GS can not protect parameters and local variables from local buffer overrun because optimizations are disabled
+#pragma warning (disable: 4748)
+
 #include "StackWalker.h"
 
 
