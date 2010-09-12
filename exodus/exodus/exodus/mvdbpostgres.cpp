@@ -37,7 +37,7 @@ THE SOFTWARE.
 #ifndef DEBUG
 #define TRACING 0
 #else
-#define TRACING 5
+#define TRACING 2
 #endif
 
 #if defined _MSC_VER // || defined __CYGWIN__ || defined __MINGW32__

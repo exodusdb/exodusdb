@@ -27,7 +27,7 @@ using namespace std;
 #ifndef DEBUG
 #define TRACING 0
 #else
-#define TRACING 5
+#define TRACING 2
 #endif
 namespace exodus {
 
@@ -188,12 +188,12 @@ int MVipc(const int environmentn, var& pgconnparams)
 	//scoped so that the scoped_lock is automatically released after the notification
 	{
 		boost::mutex::scoped_lock lock(global_ipcmutex);
-		#if TRACING >= 1
+		#if TRACING >= 3
 			wcout<<L"MVipc() Notifying that pipe has been opened\n";
 		#endif
 		//TODO make sure notifies CORRECT parent thread by using an array of ipcmutexes and tss_environmentn
 		global_ipccondition.notify_one();
-		#if TRACING >= 1
+		#if TRACING >= 3
 			wcout<<L"MVipc() Notified that pipe has been opened\n";
 		#endif
 	}
