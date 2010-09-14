@@ -289,6 +289,9 @@ public:
 	//ctor for int
 	var(const int int1);
 
+	//ctor for long long
+	var(const long long longlong1);
+
 	//ctor for double
 	var(const double double1);
 
@@ -878,7 +881,7 @@ private:
 	//all mutable because asking for a string can create it from an integer and vice versa
 	mutable std::wstring var_mvstr;
 	mutable wchar_t var_mvtype;
-	mutable int var_mvint;
+	mutable long long var_mvint;
 	mutable double var_mvdbl;
 
 	void createString() const;

@@ -228,8 +228,9 @@ std::string stringfromUTF32(const UTF32* sourcestart, const int sourcelength)
 	{
 		delete targetbuffer;
 		//std::cout<<" UTF32>>8ERROR ";
-		std::cerr<<"UTF Conversion Error - UTF32 TO UTF8"<<std::endl;
-		throw MVException("UTF Conversion Error - UTF32 TO UTF8");
+		std::cerr<<"UTF Conversion Error - UTF32 TO UTF8 "<< conversionresult<<std::endl;
+		//throw MVException("UTF Conversion Error - UTF32 TO UTF8");
+		throw 1;//MVException("");
 	}
 	std::string result((char*)targetbuffer,targetbufferptr-targetbuffer);
 
