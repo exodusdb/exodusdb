@@ -488,7 +488,7 @@ ConversionResult ConvertUTF32toUTF8 (
 	} else if (ch <= UNI_MAX_LEGAL_UTF32) {  bytesToWrite = 4;
 	} else {			    bytesToWrite = 3;
 					    ch = UNI_REPLACEMENT_CHAR;
-					    result = sourceIllegal;
+					    //exodus   result = sourceIllegal2;
 	}
 	
 	target += bytesToWrite;

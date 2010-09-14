@@ -226,6 +226,22 @@ var::var(const int int1) :
 	//var_mvint=int1;
 }
 
+//ctor for long long
+//use initializers since cannot fail
+var::var(const long long longlong1) :
+	var_mvtype(pimpl::MVTYPE_INT),
+	var_mvint(longlong1)
+{
+	//impossible to fail
+	//THISIS(L"var::var(const long long longlong1)")
+
+	//not a pointer anymore for speed
+	//priv=new pimpl;
+
+	//var_mvtype=pimpl::MVTYPE_INT;
+	//var_mvint=longlong1;
+}
+
 //ctor for double
 //use initializers since cannot fail
 var::var(const double double1) :

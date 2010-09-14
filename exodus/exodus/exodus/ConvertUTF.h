@@ -89,7 +89,15 @@
     bit mask & shift operations.
 ------------------------------------------------------------------------ */
 
-typedef unsigned long	UTF32;	/* at least 32 bits */
+//exodus
+//typedef unsigned long	UTF32;	/* at least 32 bits */
+#ifdef _MSC_VER
+#define uint32 unsigned long
+#else
+#include <stdint.h>
+#endif
+typedef uint32_t	UTF32;	/* at least 32 bits */
+
 typedef unsigned short	UTF16;	/* at least 16 bits */
 typedef unsigned char	UTF8;	/* typically 8 bits */
 typedef unsigned char	Boolean; /* 0 or 1 */
@@ -105,7 +113,9 @@ typedef enum {
 	conversionOK, 		/* conversion successful */
 	sourceExhausted,	/* partial character in source, but hit end */
 	targetExhausted,	/* insuff. room in target for conversion */
-	sourceIllegal		/* source sequence is illegal/malformed */
+	sourceIllegal,		/* source sequence is illegal/malformed */
+	sourceIllegal2,		/* source sequence is illegal/malformed */
+	sourceIllegal3		/* source sequence is illegal/malformed */
 } ConversionResult;
 
 typedef enum {

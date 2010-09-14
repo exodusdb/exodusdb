@@ -125,7 +125,7 @@ var backtrace()
 	for(int i = 0; i < size; i++)
 	{
 		//#pragma warning (disable: 4311)
-		internaladdresses^=" " ^ var((int)addresses[i]).oconv("MX");
+		internaladdresses^=" " ^ var((long long) addresses[i]).oconv("MX");
 #ifdef TRACING
 		printf("%d: %X\n", i, (int)addresses[i]);
 		printf("%s\n", strings[i]);
