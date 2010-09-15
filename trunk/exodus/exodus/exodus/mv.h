@@ -135,6 +135,9 @@ and therefore causes a non-numeric error if you include a non-numeric value in a
 #define or ||
 #endif
 
+//http://www.viva64.com/content/articles/64-bit-development/?f=20_issues_of_porting_C++_code_on_the_64-bit_platform.html
+typedef long long mvint_t;
+
 namespace exodus {
 
 //annoyingly FM as L'\xFE' doesnt work because prevents "AAA" FM "BBB"
@@ -881,7 +884,7 @@ private:
 	//all mutable because asking for a string can create it from an integer and vice versa
 	mutable std::wstring var_mvstr;
 	mutable wchar_t var_mvtype;
-	mutable long long var_mvint;
+	mutable mvint_t var_mvint;
 	mutable double var_mvdbl;
 
 	void createString() const;

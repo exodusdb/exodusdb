@@ -1,4 +1,3 @@
-﻿
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "service", "service\service\service.vcproj", "{B19DD029-0A13-42AA-940B-E6AA8B420B52}"
@@ -13,7 +12,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "exodus", "exodus\exodus\exo
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pgexodus", "exodus\pgexodus\pgexodus\pgexodus.vcproj", "{E5B50A75-57BB-41E4-8BBD-B2D58D80155C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pgexodus", "exodus\pgexodus\src\pgexodus.vcproj", "{E5B50A75-57BB-41E4-8BBD-B2D58D80155C}"
 	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"

@@ -40,6 +40,8 @@ THE SOFTWARE.
 #define TRACING 2
 #endif
 
+#include "MurmurHash2_64.h"
+
 #if defined _MSC_VER // || defined __CYGWIN__ || defined __MINGW32__
 	#define WIN32_LEAN_AND_MEAN
 	#include <windows.h>
@@ -62,6 +64,8 @@ THE SOFTWARE.
 #include <cstring>//for strcmp strlen
 
 #include <boost/thread/tss.hpp>
+//http://beta.boost.org/doc/libs/1_41_0/doc/html/unordered.html
+#include <boost/unordered_set.hpp>
 
 //see exports.txt for a list of all PQ functions
 //#include <postgresql/libpq-fe.h>//in postgres/include
@@ -110,6 +114,7 @@ bool startipc();
 #define BYTEAOID 17;
 #define TEXTOID 25;
 
+typedef boost::unordered_set<uint64_t> LockTable;
 
 //this is not threadsafe
 //PGconn     *thread_pgconn;
@@ -117,6 +122,7 @@ bool startipc();
 boost::thread_specific_ptr<PGconn> tss_pgconns;
 boost::thread_specific_ptr<var> tss_pgconnparams;
 boost::thread_specific_ptr<bool> tss_ipcstarted;
+boost::thread_specific_ptr<LockTable> tss_locktables;
 
 //this is not thread safe since it is at global scope
 //var _STATUS;
@@ -289,6 +295,7 @@ bool var::connect(const var& conninfo)
 	//save the connection in thread specific storage
 	tss_pgconns.reset(pgconn);
 	tss_pgconnparams.reset(new var(conninfo2));
+	tss_locktables.reset(new LockTable());
 
 	//setup a thread to service callbacks from the database backend
 	if (!tss_ipcstarted.get())
@@ -348,6 +355,7 @@ bool var::disconnect()
 	PQfinish(thread_pgconn);
 
 	tss_pgconns.release();
+	tss_locktables.release();
 
 	var_mvstr=L"";
 	var_mvint=0;
@@ -470,7 +478,6 @@ bool var::read(const var& filehandle,const var& key)
 	paramLengths[0]=int(key2.length());
 	paramFormats[0]=1;
 
-
 	var sql=L"SELECT data FROM " PGDATAFILEPREFIX ^ filehandle ^ L" WHERE key = $1";
 
     PGconn* thread_pgconn=(PGconn*) connection();
@@ -515,20 +522,138 @@ bool var::read(const var& filehandle,const var& key)
 
 bool var::lock(const var& key) const
 {
+	//on postgres, repeated locks for the same thing (from the same connection) succeed and stack up
+	//they need the same number of unlocks (from the same connection) before other connections
+	//can take the lock
+	//unlock returns true if a lock (your lock) was released and false if you dont have the lock
+	
 	THISIS(L"bool var::lock(const var& key) const")
 	THISISDEFINED()
 	ISSTRING(key)
 
-	//TODO
-	exodus::errputln(L"lock() not implemented yet");
-	return true;
+    const char* paramValues[1];
+    int         paramLengths[1];
+    int         paramFormats[1];
+	//uint32_t    binaryIntVal;
+
+	std::wstring fileandkey=var_mvstr;
+	fileandkey.append(L" ");
+	fileandkey.append(key.var_mvstr);
+
+	//TODO .. provide endian identical version
+	//required if and when exodus processes connect to postgres on a DIFFERENT host
+	//although currently (Sep2010) use of symbolic dictionaries requires exodus to be on the SAME host
+	uint64_t hash64=MurmurHash64(fileandkey.data(),fileandkey.length()*sizeof(wchar_t),0);
+
+	//check if already lock in current connection
+	LockTable* locktable=tss_locktables.get();
+	if (locktable)
+	{
+		//if already in local lock table then dont lock on database
+		//since postgres stacks up multiple locks
+		//whereas multivalue databases dont
+		if (((*locktable).find(hash64))!=(*locktable).end())
+			//TODO indicate in some global variable "OWN LOCK"
+			return false;
+		//register that it is locked
+		(*locktable).insert(hash64);
+	}
+
+	paramValues[0]=(char*)&hash64;
+	paramLengths[0]=sizeof(uint64_t);
+	paramFormats[0]=1;
+
+	char* sql="SELECT PG_TRY_ADVISORY_LOCK($1)";
+
+    PGconn* thread_pgconn=(PGconn*) connection();
+	DEBUG_LOG_SQL1
+	PGresult* result = PQexecParams(thread_pgconn,
+    					//TODO: parameterise filename
+                       sql,
+                       1,       /* one param */
+                       NULL,    /* let the backend deduce param type */
+                       paramValues,
+					   paramLengths,
+					   paramFormats,
+                       1);      /* ask for binary results */
+
+	if (PQresultStatus(result) != PGRES_TUPLES_OK || PQntuples(result) != 1)
+ 	{
+		PQclear(result);
+		throw MVException(L"lock(" ^ (*this) ^ L", " ^ key ^ L")\n" ^ var(PQerrorMessage(thread_pgconn)));
+		return false;
+	}
+
+	//*this=wstringfromUTF8((UTF8*)PQgetvalue(result, 0, 0), PQgetlength(result, 0, 0));
+
+	//std::wstring temp=wstringfromUTF8((UTF8*)PQgetvalue(result, 0, 0), PQgetlength(result, 0, 0));
+
+	bool lockedok= *PQgetvalue(result, 0, 0)!=0;
+
+	PQclear(result);
+
+	return lockedok;
 }
 
 void var::unlock(const var& key) const
 {
+
 	THISIS(L"void var::unlock(const var& key) const")
 	THISISDEFINED()
 	ISSTRING(key)
+
+    const char* paramValues[1];
+    int         paramLengths[1];
+    int         paramFormats[1];
+
+	std::wstring fileandkey=var_mvstr;
+	fileandkey.append(L" ");
+	fileandkey.append(key.var_mvstr);
+
+	//TODO .. provide endian identical version
+	//required if and when exodus processes connect to postgres on a DIFFERENT host
+	//although currently (Sep2010) use of symbolic dictionaries requires exodus to be on the SAME host
+	uint64_t hash64=MurmurHash64(fileandkey.data(),fileandkey.length()*sizeof(wchar_t),0);
+
+	//remove from local current connection locktable
+	LockTable* locktable=tss_locktables.get();
+	if (locktable)
+	{
+		//if not in local locktable then no need to unlock on database
+		if (((*locktable).find(hash64))==(*locktable).end())
+			return;
+		//register that it is unlocked
+		(*locktable).erase(hash64);
+	}
+
+	paramValues[0]=(char*)&hash64;
+	paramLengths[0]=sizeof(uint64_t);
+	paramFormats[0]=1;
+
+	char* sql="SELECT PG_ADVISORY_UNLOCK($1)";
+
+    PGconn* thread_pgconn=(PGconn*) connection();
+	DEBUG_LOG_SQL1
+	PGresult* result = PQexecParams(thread_pgconn,
+    					//TODO: parameterise filename
+                       sql,
+                       1,       /* one param */
+                       NULL,    /* let the backend deduce param type */
+                       paramValues,
+					   paramLengths,
+					   paramFormats,
+                       1);      /* ask for binary results */
+
+	if (PQresultStatus(result) != PGRES_TUPLES_OK || PQntuples(result) != 1)
+ 	{
+		PQclear(result);
+		throw MVException(L"unlock(" ^ (*this) ^ L", " ^ key ^ L")\n" ^ var(PQerrorMessage(thread_pgconn)));
+		return;
+	}
+
+	//bool unlockedok= *PQgetvalue(result, 0, 0)!=0;
+
+	PQclear(result);
 
 	return;
 }
@@ -537,7 +662,47 @@ void var::unlockall() const
 {
 	THISIS(L"void var::unlockall() const")
 
+    const char* paramValues[1];
+    int         paramLengths[1];
+    int         paramFormats[1];
+
+	//check if any locks
+	LockTable* locktable=tss_locktables.get();
+	if (locktable)
+	{
+		//if local lock table is empty then dont unlock all database
+		if ((*locktable).begin()==(*locktable).end())
+			//TODO indicate in some global variable "OWN LOCK"
+			return;
+		//register that it is locked
+		(*locktable).clear();
+	}
+
+	char* sql="SELECT PG_ADVISORY_UNLOCK_ALL()";
+
+    PGconn* thread_pgconn=(PGconn*) connection();
+	DEBUG_LOG_SQL
+	PGresult* result = PQexecParams(thread_pgconn,
+    					//TODO: parameterise filename
+                       sql,
+                       0,       /* zero params */
+                       NULL,    /* let the backend deduce param type */
+                       paramValues,
+					   paramLengths,
+					   paramFormats,
+                       0);      /* ask for no results */
+
+	if (PQresultStatus(result) != PGRES_TUPLES_OK || PQntuples(result) != 1)
+ 	{
+		PQclear(result);
+		throw MVException(L"unlockall()\n" ^ var(PQerrorMessage(thread_pgconn)));
+		return;
+	}
+
+	PQclear(result);
+
 	return;
+
 }
 
 
