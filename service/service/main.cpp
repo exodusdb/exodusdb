@@ -21,7 +21,6 @@ using namespace std;
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/tss.hpp>
-#include <boost/thread/tss.hpp>
 
 //used to prevent threads overlapping cout operations
 boost::mutex io_mutex;

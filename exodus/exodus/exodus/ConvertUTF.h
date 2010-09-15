@@ -92,7 +92,7 @@
 //exodus
 //typedef unsigned long	UTF32;	/* at least 32 bits */
 #ifdef _MSC_VER
-#define uint32 unsigned long
+#define uint32_t unsigned long
 #else
 #include <stdint.h>
 #endif

@@ -191,6 +191,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MurmurHash2_64.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\mv.cpp"
 				>
 			</File>
@@ -390,6 +394,10 @@
 			</File>
 			<File
 				RelativePath=".\gettimeofday.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MurmurHash2_64.h"
 				>
 			</File>
 			<File

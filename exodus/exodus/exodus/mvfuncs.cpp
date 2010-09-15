@@ -20,7 +20,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-
+//for high performance exodus library code
+//prevent implicit conversion from cstr to wstring
+//so code must be like var x=L"xyz" instead of just "xyz"
+//to perhaps prevent conversion at runtime to the var wstring
+//optimising compilers may make this 
 #define MV_NO_NARROW
 
 //C4530: C++ exception handler used, but unwind semantics are not enabled. 
@@ -213,7 +217,8 @@ var var::round(const int ndecimals) const
 	{
 		if (not ndecimals)
 			return var_mvint;
-		result=var_mvint;
+		//loss of precision if var_mvint is long long
+		result=int(var_mvint);
 	}
 	else
 		result=var_mvdbl;
@@ -277,7 +282,8 @@ int var::toInt() const
 	THISIS(L"int var::toInt() const")
 	THISISNUMERIC()
 
-	return (var_mvtype&pimpl::MVTYPE_INT) ? var_mvint : int(var_mvdbl);
+	//loss of precision if var_mvint is long long
+	return (var_mvtype&pimpl::MVTYPE_INT) ? int(var_mvint) : int(var_mvdbl);
 }
 
 double var::toDouble() const
@@ -305,7 +311,8 @@ void var::createString() const
 
 		//int - create string from int
 		case pimpl::MVTYPE_INT:
-			var_mvstr=intToString(var_mvint);
+			//loss of precision if var_mvint is long long
+			var_mvstr=intToString(int(var_mvint));
 			break;
 
 		//dbl - create string from dbl
@@ -742,7 +749,7 @@ var& var::exchange(var& var2)
 
 	//intermediary copies of var2
 	int mvtypex=var2.var_mvtype;
-	int mvintx=var2.var_mvint;
+	mvint_t mvintx=var2.var_mvint;
 	double mvdblx=var2.var_mvdbl;
 
 	//do string first since it is the largest and most likely to fail

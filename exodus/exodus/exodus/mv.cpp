@@ -335,7 +335,7 @@ var::operator int() const
 	{
 		//prioritise int since conversion to int perhaps more likely to be an int already
 		if (var_mvtype&pimpl::MVTYPE_INT)
-			return var_mvint;
+			return (int) var_mvint;
 		if (var_mvtype&pimpl::MVTYPE_DBL)
 			return int(var_mvdbl);
 		if (var_mvtype&pimpl::MVTYPE_NAN)

@@ -710,11 +710,21 @@ var Server::processrequest()
 
 	//analyse the input file
 	connection = L"";
-	if (env.USER0.extract(1) == L"VERSION 2") {
-		//remote_addr remote_host https
-		connection = env.USER0.field(FM, 1, 4);
-		env.USER0 = env.USER0.field(FM, 5, 99999);
-	}
+	var nconnectionfields;
+	if (env.USER0.extract(1) == L"VERSION 3") {
+		nconnectionfields=env.USER0.extract(2)-1;
+		env.USER0.eraser(2);
+	} else if (env.USER0.extract(1) == L"VERSION 2")
+		nconnectionfields=4;
+	else
+		nconnectionfields=0;
+
+	//remote_addr remote_host https
+	connection = env.USER0.field(FM, 1, nconnectionfields);
+	if (connection.extract(1)==L"::1")
+		connection.replacer(2,0,0,L"127.0.0.1");
+	env.USER0 = env.USER0.field(FM, nconnectionfields+1, 99999);
+
 	connection.converter(FM, VM);
 	env.SYSTEM.replacer(40, 0, 0, connection);
 

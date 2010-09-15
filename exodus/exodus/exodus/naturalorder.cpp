@@ -45,6 +45,7 @@ with this inconvenience.
     int aInt = *(int*)&A;
     // Make aInt lexicographically ordered as a twos-complement int     (or 0x8000000000000000 for double)
     if (aInt < 0)
+	  //nb 0x800000000000000000LL on 64bit
       aInt = 0x80000000 - aInt;
 
 Compiler issues

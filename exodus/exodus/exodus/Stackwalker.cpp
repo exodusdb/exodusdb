@@ -161,6 +161,7 @@ DWORD64
 #define SYMOPT_AUTO_PUBLICS             0x00010000
 #define SYMOPT_NO_IMAGE_SEARCH          0x00020000
 #define SYMOPT_SECURE                   0x00040000
+//maybe 0x800000000000000000LL on 64bit?
 #define SYMOPT_DEBUG                    0x80000000
 #define UNDNAME_COMPLETE                 (0x0000)  // Enable full undecoration
 #define UNDNAME_NAME_ONLY                (0x1000)  // Crack only the name for primary declaration;
