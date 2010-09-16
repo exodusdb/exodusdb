@@ -65,7 +65,22 @@ THE SOFTWARE.
 
 #include <boost/thread/tss.hpp>
 //http://beta.boost.org/doc/libs/1_41_0/doc/html/unordered.html
-#include <boost/unordered_set.hpp>
+
+#define HAVE_TR1
+#include "config.h"
+#ifdef  HAVE_CXX0X
+#  include <unordered_set>
+#  define UNORDEREDSET std::unordered_set
+#elif defined(HAVE_TR1)
+#  include <tr1/unordered_set>
+#  define UNORDEREDSET std::tr1::unordered_set
+#elif 1
+#  include <boost/unordered_set.hpp>
+#  define UNORDEREDSET boost::unordered_set
+#else
+#  include <set>
+#  define UNORDEREDSET std::set
+#endif
 
 //see exports.txt for a list of all PQ functions
 //#include <postgresql/libpq-fe.h>//in postgres/include
@@ -114,7 +129,9 @@ bool startipc();
 #define BYTEAOID 17;
 #define TEXTOID 25;
 
-typedef boost::unordered_set<uint64_t> LockTable;
+//typedef boost::unordered_set<uint64_t> LockTable;
+typedef UNORDEREDSET<uint64_t> LockTable;
+//typedef tr1::unordered_set<uint64_t> LockTable;
 
 //this is not threadsafe
 //PGconn     *thread_pgconn;
