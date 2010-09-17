@@ -54,7 +54,7 @@ program()
 
 		//set EXODUS_PATH used by compile to find LIB and INCLUDE paths
 		var exoduspath=exodusbinpath;
-		if (exoduspath.field2(_SLASH,-1)=='bin')
+		if (exoduspath.field2(_SLASH,-1)=="bin")
 			exoduspath=field(exoduspath,_SLASH,1,dcount(exoduspath,_SLASH)-1);
 		if (exoduspath and not ossetenv("EXODUS_PATH",exoduspath))
 			errput("Couldnt set EXODUS_PATH environment variable");
