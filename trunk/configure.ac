@@ -6,6 +6,7 @@ AC_INIT(exodus_all, 9.6, steve.bush@neosys.com)
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_AUX_DIR(config)
 AM_INIT_AUTOMAKE
+AC_CONFIG_MACRO_DIR([m4])
 
 # Checks for programs.
 AC_PROG_LIBTOOL
