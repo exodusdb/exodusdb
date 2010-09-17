@@ -10,6 +10,8 @@
 
 #include "MurmurHash2_64.h"
 
+#ifdef MURMUR64_64
+
 uint64_t MurmurHash64A ( const void * key, int len, unsigned int seed )
 {
 	const uint64_t m = 0xc6a4a7935bd1e995;
@@ -53,6 +55,7 @@ uint64_t MurmurHash64A ( const void * key, int len, unsigned int seed )
 	return h;
 } 
 
+#else
 
 // 64-bit hash for 32-bit platforms
 
@@ -106,3 +109,5 @@ uint64_t MurmurHash64B ( const void * key, int len, unsigned int seed )
 
 	return h;
 } 
+
+#endif

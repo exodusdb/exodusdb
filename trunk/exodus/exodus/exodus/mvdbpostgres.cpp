@@ -66,20 +66,26 @@ THE SOFTWARE.
 #include <boost/thread/tss.hpp>
 //http://beta.boost.org/doc/libs/1_41_0/doc/html/unordered.html
 
-#define HAVE_TR1
+//#define HAVE_TR1
+#ifdef HAVE_CONFIG_H
 #include "config.h"
 #ifdef  HAVE_CXX0X
 #  include <unordered_set>
-#  define UNORDEREDSET std::unordered_set
+#  define UNORDEREDSET std::unordered_set<uint64_t>
+
 #elif defined(HAVE_TR1)
 #  include <tr1/unordered_set>
-#  define UNORDEREDSET std::tr1::unordered_set
-#elif 1
+#  define UNORDEREDSET std::tr1::unordered_set<uint64_t>
+
+#elif HAVE_BOOST_UNORDERED_SET
 #  include <boost/unordered_set.hpp>
-#  define UNORDEREDSET boost::unordered_set
+#  define UNORDEREDSET boost::unordered_set<uint64_t>
+
 #else
-#  include <set>
-#  define UNORDEREDSET std::set
+#define USE_MAP_FOR_UNORDERED
+#  include <map>
+#  define UNORDEREDSET std::map<uint64_t,int>
+#endif
 #endif
 
 //see exports.txt for a list of all PQ functions
@@ -129,8 +135,9 @@ bool startipc();
 #define BYTEAOID 17;
 #define TEXTOID 25;
 
-//typedef boost::unordered_set<uint64_t> LockTable;
-typedef UNORDEREDSET<uint64_t> LockTable;
+//typedef boost::unordered_set<uint64_t> LockTable; 
+//typedef UNORDEREDSET<uint64_t> LockTable;
+typedef UNORDEREDSET LockTable;
 //typedef tr1::unordered_set<uint64_t> LockTable;
 
 //this is not threadsafe
@@ -573,7 +580,12 @@ bool var::lock(const var& key) const
 			//TODO indicate in some global variable "OWN LOCK"
 			return false;
 		//register that it is locked
+#ifdef USE_MAP_FOR_UNORDERED
+		std::pair<const uint64_t,int> lock(hash64,0);
+		(*locktable).insert(lock);
+#else
 		(*locktable).insert(hash64);
+#endif
 	}
 
 	paramValues[0]=(char*)&hash64;
