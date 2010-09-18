@@ -418,7 +418,7 @@ bool var::osread(const var& osfilename)
 
 	//NB tellg and seekp goes by bytes regardless of normal/wide stream
 
-	int bytesize;
+	unsigned int bytesize;
     bytesize = myfile.tellg();
 
 	if (bytesize>0)
@@ -532,16 +532,18 @@ var& var::osbread(const var& osfilehandle, const int startoffset, const int size
 
 	if (size<=0) return *this;
 	//use ate to position at end so tellg below can determine file size
-	std::wifstream myfile;
+	//std::wifstream myfile;
+	std::ifstream myfile;
         //myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
 
 	myfile.open(osfilehandle.tostring().c_str(), std::ios::binary | std::ios::ate);
 	if (!myfile)
 		return *this;
 //NB all file sizes are in bytes NOT characters despite this being a wide character fstream
-	int maxsize = myfile.tellg();
-	int readsize=maxsize-startoffset*sizeof(wchar_t);
-	if (readsize>size*2) readsize=size*sizeof(wchar_t);
+	unsigned int maxsize = myfile.tellg();
+	//int readsize=maxsize-startoffset*sizeof(wchar_t);
+	//if (readsize>size*2) readsize=size*sizeof(wchar_t);
+	unsigned int readsize=maxsize-startoffset;
 
 	if (readsize<=0)
 	{
@@ -550,19 +552,27 @@ var& var::osbread(const var& osfilehandle, const int startoffset, const int size
 	}
 
 	//new
-	wchar_t* memblock;
-	memblock = new wchar_t [readsize/sizeof(wchar_t)];
+	//wchar_t* memblock;
+	//memblock = new wchar_t [readsize/sizeof(wchar_t)];
+	char* memblock;
+	memblock = new char [readsize];
 	if (memblock==0)
 	{//TODO NEED TO THROW HERE
 		myfile.close();
 		return *this;
 	}
 
-	myfile.seekg (startoffset/sizeof(wchar_t), std::ios::beg);
-//	myfile.read (memblock, readsize);
+	//myfile.seekg (startoffset/sizeof(wchar_t), std::ios::beg);
+	myfile.seekg (startoffset, std::ios::beg);
+	myfile.read (memblock, readsize);
 	myfile.close();
 
-	var_mvstr=std::wstring(memblock,readsize/sizeof(wchar_t));
+	//var_mvstr=std::wstring(memblock,readsize/sizeof(wchar_t));
+
+	//for now dont accept UTF8 in order to avoid failure if non-utf characters
+	//var_mvstr=wstringfromUTF8((UTF8*) memblock, (unsigned int) bytesize);
+	std::string tempstr=std::string(memblock, readsize);
+	var_mvstr=std::wstring(tempstr.begin(),tempstr.end());
 
 	//delete
 	delete[] memblock;

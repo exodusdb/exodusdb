@@ -69,15 +69,19 @@ THE SOFTWARE.
 //#define HAVE_TR1
 #ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif
 #ifdef  HAVE_CXX0X
 #  include <unordered_set>
 #  define UNORDEREDSET std::unordered_set<uint64_t>
 
+//expect bug here since centos5.3 32bit has tr1 but not with an unordered set
 #elif defined(HAVE_TR1)
 #  include <tr1/unordered_set>
 #  define UNORDEREDSET std::tr1::unordered_set<uint64_t>
 
-#elif HAVE_BOOST_UNORDERED_SET
+//assume we have a recent boost on windows
+//boost 1.33 doesnt seem to have unordered set
+#elif defined(HAVE_BOOST_UNORDERED_SET) || defined(_MSC_VER)
 #  include <boost/unordered_set.hpp>
 #  define UNORDEREDSET boost::unordered_set<uint64_t>
 
@@ -85,7 +89,6 @@ THE SOFTWARE.
 #define USE_MAP_FOR_UNORDERED
 #  include <map>
 #  define UNORDEREDSET std::map<uint64_t,int>
-#endif
 #endif
 
 //see exports.txt for a list of all PQ functions

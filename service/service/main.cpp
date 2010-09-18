@@ -610,9 +610,20 @@ MT'h' 63306 17h35
 //	var().debug();
 //	var xx=xx.substr(1,1);
 
-	var xyz="x";
-	xyz.oswrite("x");
-	xyz.osread("x");
+#define on ,
+#define from ,
+
+	var tempfilename="tempfile";
+	oswrite("123" on tempfilename);
+	var tempdata;
+	if (!osread(tempdata from tempfilename))
+		abort("Failed to osread after oswrite");
+	if (tempdata!="123")
+		abort("Failed to osread after oswrite");
+	osdelete(tempfilename);
+	if (osfile(tempfilename))
+		abort("Failed to osdelete tempfile");
+
 //	var().stop();
 
 // cannot connectlocal in main and thread until pipes are numbered
@@ -664,42 +675,38 @@ MT'h' 63306 17h35
 
 //	var().connectlocal("");
 
-	var().createfile("DICT.JOBS");
-	var().createfile("JOBS");
+	var filenames2="JOBS";
+	filenames2^=FM^"PRODUCTION.ORDERS";
+	filenames2^=FM^"PRODUCTION.INVOICES";
+	filenames2^=FM^"COMPANIES";
+	filenames2^=FM^"BRANDS";
+	filenames2^=FM^"CLIENTS";
+	filenames2^=FM^"VEHICLES";
+	filenames2^=FM^"SUPPLIERS";
+	filenames2^=FM^"CURRENCIES";
+	filenames2^=FM^"MARKETS";
+	filenames2^=FM^"ADS";
 
-	var().createfile("DICT.PRODUCTION.ORDERS");
-	var().createfile("PRODUCTION.ORDERS");
+	write("F"^FM^0^FM^"Currency Code"^FM^FM^FM^FM^FM^FM^"L"^"10","DICT_CURRENCIES","CURRENCY_CODE");
+	write("F"^FM^1^FM^"Currency Name"^FM^FM^FM^FM^FM^FM^"T"^"20","DICT_CURRENCIES","CURRENCY_NAME");
+	write("F"^FM^1^FM^"Market Code"^FM^FM^FM^FM^FM^FM^"L"^"10","DICT_MARKETS","CODE");
+	write("F"^FM^1^FM^"Market Name"^FM^FM^FM^FM^FM^FM^"T"^"20","DICT_MARKETS","NAME");
 
-	var().createfile("DICT.PRODUCTION.INVOICES");
-	var().createfile("PRODUCTION.INVOICES");
-
-	var().createfile("DICT.COMPANIES");
-	var().createfile("COMPANIES");
-
-	var().createfile("DICT.BRANDS");
-	var().createfile("BRANDS");
-
-	var().createfile("DICT.CLIENTS");
-	var().createfile("CLIENTS");
-
-	var().createfile("DICT.VEHICLES");
-	var().createfile("VEHICLES");
-
-	var().createfile("DICT.SUPPLIERS");
-	var().createfile("SUPPLIERS");
-
-	var().createfile("DICT.CURRENCIES");
-	var().createfile("CURRENCIES");
-
-    if (!var().open("DICT.MARKETS"))
-		var().createfile("DICT.MARKETS");
-
-    if (!var().open("MARKETS"))
-		var().createfile("MARKETS");
-
-    if (!var().open("DICT.ADS"))
-		var().createfile("DICT.ADS");
-
+	println();
+	var nfiles=dcount(filenames2,FM);
+	for (int ii=1;ii<=nfiles;++ii) {
+		var filename=filenames2.extract(ii);
+		print(filename);
+		if (!var().open(filename))
+			var().createfile(filename);
+		else
+			print(", data ok");
+		if (!var().open("DICT."^filename))
+			var().createfile("DICT."^filename);
+		else
+			print(", dict ok");
+		println();
+	}
 //	var("x:y:z:").dcount(":").outputln();
 //	var().stop();
 
