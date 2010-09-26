@@ -780,7 +780,7 @@ public:
 	var iconv(const var& substr) const;
 
 	//STRING FUNCTIONS THAT USE THE HIGH END SEPARATORS
-	void var::matparse(varray& varray1) const;
+	void matparse(varray& varray1) const;
 	//following is implemented on the varray class now
 	//varray matunparse();
 	//

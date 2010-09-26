@@ -45,6 +45,7 @@ program() {
 	var objfileextension;
 	var binfileextension;
 	var libfileextension;
+	var libfileprefix="";
 
 	//hard coded compiler options at the moment
 	//assume msvc (cl) on windows and g++ otherwise
@@ -76,11 +77,11 @@ program() {
 		outputoption=" -o ";
 		//optimiser unfortunately prevents backtrace
 		//basicoptions^="-O1";
-		binoptions=" -g";
+		binoptions=" -g -L./ -lfunc1 -Wl,-rpath,./";
 		//binoptions=" -fPIC";
 
 		//make a shared library
-		liboptions=" -shared";
+		liboptions=" -fPIC -shared";
 		//soname?
 
 		//target directories
@@ -91,6 +92,7 @@ program() {
 		objfileextension=".out";
 		binfileextension="";
 		libfileextension=".so";
+		libfileprefix="lib";
 
 		installcmd="mv";
 	}
@@ -400,8 +402,14 @@ program() {
 			outputdir=bindir;
 			compileoptions=binoptions;
 		}else{
-			binfilename^=binfileextension;
+			//binfilename^=binfileextension;
+			binfilename^=libfileextension;
 			objfilename^=libfileextension;
+			if (libfileprefix)
+			{
+				binfilename=libfileprefix^binfilename;
+				objfilename=libfileprefix^objfilename;
+			}
 			outputdir=libdir;
 			compileoptions=liboptions;
 		}
@@ -513,8 +521,15 @@ program() {
 				//}
 				
 				//copy the obj file to the output directory
-				if (installcmd) {
-					var cmd=installcmd^" " ^ objfilename ^ " " ^ outputdir ^ binfilename;
+				if (isprogram and installcmd) {
+					var cmd;
+					if (not osdir(outputdir)) {
+						cmd="mkdir " ^ outputdir;
+						if (verbose)
+							println(cmd);
+						osshell(cmd);
+					}
+					cmd=installcmd^" " ^ objfilename ^ " " ^ outputdir ^ binfilename;
 					if (verbose)
 						println(cmd);
 					osshell(cmd);
