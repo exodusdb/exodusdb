@@ -111,8 +111,8 @@ int var::localeAwareCompare(const std::wstring& str1, const std::wstring& str2) 
 
 	int comparison;
 	comparison=CompareStringW(GetUserDefaultLCID(), 0,
-		(TCHAR*)str1.data(), str1.length(),
-		(TCHAR*)str2.data(), str2.length());
+		(TCHAR*)str1.data(), int(str1.length()),
+		(TCHAR*)str2.data(), int(str2.length()));
 	switch (comparison) {
 	case CSTR_LESS_THAN:
 		return -1;

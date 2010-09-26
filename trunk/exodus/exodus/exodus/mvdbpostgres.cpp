@@ -20,6 +20,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+//in case of migration to db2 or mysql here is a very detailed comparison in 2006
+//http://www.ibm.com/developerworks/data/library/techarticle/dm-0606khatri/
+
 //http://www.postgresql.org/docs/8.3/static/libpq-envars.html
 //PGHOST/PGHOSTADDR
 //PGPORT
@@ -570,7 +573,7 @@ bool var::lock(const var& key) const
 	//TODO .. provide endian identical version
 	//required if and when exodus processes connect to postgres on a DIFFERENT host
 	//although currently (Sep2010) use of symbolic dictionaries requires exodus to be on the SAME host
-	uint64_t hash64=MurmurHash64(fileandkey.data(),fileandkey.length()*sizeof(wchar_t),0);
+	uint64_t hash64=MurmurHash64(fileandkey.data(),int(fileandkey.length()*sizeof(wchar_t)),0);
 
 	//check if already lock in current connection
 	LockTable* locktable=tss_locktables.get();
@@ -645,7 +648,7 @@ void var::unlock(const var& key) const
 	//TODO .. provide endian identical version
 	//required if and when exodus processes connect to postgres on a DIFFERENT host
 	//although currently (Sep2010) use of symbolic dictionaries requires exodus to be on the SAME host
-	uint64_t hash64=MurmurHash64(fileandkey.data(),fileandkey.length()*sizeof(wchar_t),0);
+	uint64_t hash64=MurmurHash64(fileandkey.data(),int(fileandkey.length()*sizeof(wchar_t)),0);
 
 	//remove from local current connection locktable
 	LockTable* locktable=tss_locktables.get();

@@ -51,12 +51,41 @@ int main(int exodus__argc, char *exodus__argv[]) \
 } \
 void main2(int exodus__argc, char *exodus__argv[])
 
-//allow pseudo pick syntax
-#define sentence() _SENTENCE
-#define subroutine void
-#define function var
+//ease c++ compliant declaration of function arguments eg. "function xyz(in arg1, out arg2)"
 #define in const var&
 #define out var&
+
+//allow pseudo pick syntax
+#define sentence() _SENTENCE
+
+//work out if any functions are being exported or imported
+//used in function and subroutine macros
+#if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
+#	if defined _DLL || defined _SO
+#		ifdef __GNUC__
+#			define EXODUSMACRO_IMPORTEXPORT __attribute__((dllexport))
+#		else
+#			define EXODUSMACRO_IMPORTEXPORT __declspec(dllexport) // Note: actually gcc seems to also support this syntax.
+#		endif
+#	else
+#		ifdef __GNUC__
+#			define EXODUSMACRO_IMPORTEXPORT __attribute__((dllimport))
+#		else
+#			define EXODUSMACRO_IMPORTEXPORT __declspec(dllimport) // Note: actually gcc seems to also support this syntax.
+#		endif
+#	endif
+#else
+#	if __GNUC__ >= 4
+		//use g++ -fvisibility=hidden to make all hidden except those marked DLL_PUBLIC ie "default"
+#		define EXODUSMACRO_IMPORTEXPORT __attribute__ ((visibility("default")))
+#	else
+#		define EXODUSMACRO_IMPORTEXPORT
+#	endif
+#endif
+
+//allow simplified syntax eg "function xyz(in arg1, out arg2) { ..."
+#define subroutine EXODUSMACRO_IMPORTEXPORT void
+#define function EXODUSMACRO_IMPORTEXPORT var
 
 //forcibly redefine "eq" even if already previously defined in some other library like iostream
 //to generate a compilation error so that the issue can be corrected (see heading) and the "eq" keyword remain available

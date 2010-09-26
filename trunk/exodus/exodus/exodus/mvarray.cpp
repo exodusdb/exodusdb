@@ -145,6 +145,15 @@ varray& varray::operator=(const varray& mva1)
 	return *this;
 }
 
+var varray::matunparse() const
+{
+	var output;
+	int arraysize=rows_*cols_+1;
+	for (int ii=1;ii<=arraysize;++ii)
+		output^=data_[ii];
+	return output;
+}
+
 }//of namespace exodus
 
 #endif
