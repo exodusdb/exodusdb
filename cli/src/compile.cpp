@@ -130,6 +130,12 @@ program() {
 			var searched=searchvars ^ " environment variables";
 			var searchdirs="";
 
+			//Visual Studio future?
+			searchdirs^=FM ^ "\\Program Files\\Microsoft Visual Studio 11.0\\Common7\\Tools\\";
+
+			//Visual Studio 2010?
+			searchdirs^=FM ^ "\\Program Files\\Microsoft Visual Studio 10.0\\Common7\\Tools\\";
+
 			//Visual Studio 2008 (Paid and Express)
 			searchdirs^=FM ^ "\\Program Files\\Microsoft Visual Studio 9.0\\Common7\\Tools\\";
 
@@ -298,6 +304,7 @@ program() {
 		}
 
 		linkoptions=" /link exodus.lib";
+
 		if (not verbose)
 			linkoptions^=" /nologo";
 
@@ -310,7 +317,7 @@ program() {
 		binoptions="";
 
 		//make a dll
-		liboptions="";
+		liboptions="/LD /DLL /D \"DLL\"";
 		//soname?
 
 		//target directories
@@ -319,7 +326,7 @@ program() {
 
 		//target extensions
 		objfileextension=".exe";
-		binfileextension="exe";
+		binfileextension=".exe";
 		libfileextension=".dll";
 
 		//installcmd="copy /y";
@@ -381,7 +388,8 @@ program() {
 
 		//determine if program or subroutine/function
 		var isprogram=index(text,"int main(") or index(text, "program()");
-		
+		if (debugging)
+			isprogram.outputln("Is Program:");
 		var outputdir;
 		var compileoptions;
 		var binfilename=filebase;
@@ -398,36 +406,54 @@ program() {
 			compileoptions=liboptions;
 		}
 
-		//work out libraries to include depending on included headers
-		text.converter("\n\r",FM^FM);
-		var line;
-		var charn=1;
-		var libnames="";
-		var delimiter=0;
-		do {
-			line=text.remove(charn,delimiter).trim();
+		//and, for subroutines and functions, create header file (even if compilation not successful)
+		var crlf="\r\n";
+		var headertext="";
+		converter(text,"\r\n",FM^FM);
+		var nlines=dcount(text,FM);
+		varray text2(nlines);
+		text.matparse(text2);
+		for (int ln=1;ln<=nlines;++ln) {
+			var line=trimf(text2(ln));
 			var word1=line.field(" ",1);
+			if (not(isprogram) and word1 eq "function" or word1 eq "subroutine") {
+				headertext^=crlf^line.field("{",1)^";";
+			}
 			if (word1 eq "#include") {
 				var word2=line.field(" ",2);
 				if (word2.substr(1,1)==DQ) {
 					word2=word2.substr(2,word2.len()-2);
 					if (word2.substr(-2,2) eq ".h")
 						word2.splicer(-2,2,"");
-					libnames^=FM^word2;
+					//libnames^=" "^word2;
+					if (compiler=="cl")
+						linkoptions^=" "^word2^".lib";
 				}
 			}
-		} while (delimiter);
-		libnames.substrer(2).swapper(FM,", ");
-		if (verbose)
-			libnames.outputln("Libraries:");
+		}
+		if (headertext) {
+			headertext.splicer(1,0,"#ifndef "^ucase(filebase)^"_H"^crlf);
+			headertext^=crlf^"#endif"^crlf;
+			var headerfilename=filebase^".h";
+			oswrite(headertext,headerfilename);
+		}
+
+		if (debugging) {
+			binfileextension.outputln("Bin file extension");
+			objfileextension.outputln("Obj file extension");
+			binfilename.outputln("Binary file:");
+			objfilename.outputln("Object file:");
+			outputdir.outputln("Output directory:");
+			compileoptions.outputln("Compile options:");
+		}
 
 		//record the current bin file update timestamp
 		var oldobjfileinfo=osfile(objfilename);
 		
 		//build the compiler command
-		var compilecmd=compiler ^ " " ^ srcfilename ^ basicoptions ^ compileoptions;
+		var compilecmd=compiler ^ " " ^ srcfilename ^ " " ^ basicoptions ^ " " ^ compileoptions;
 		if (outputoption)
-			compilecmd^= outputoption ^ objfilename;
+			compilecmd^= " " ^ outputoption ^ " " ^ objfilename;
 		compilecmd ^= linkoptions;
 		//capture the output
 		//compilecmd ^= " 2>&1 | tee " ^ srcfilename ^ ".err~";

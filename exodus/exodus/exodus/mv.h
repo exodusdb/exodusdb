@@ -53,13 +53,13 @@ THE SOFTWARE.
 #		ifdef __GNUC__
 #			define DLL_PUBLIC __attribute__((dllexport))
 #		else
-#			define DLL_PUBLIC __declspec(dllexport) // Note: actually gcc seems to also supports this syntax.
+#			define DLL_PUBLIC __declspec(dllexport) // Note: actually gcc seems to also support this syntax.
 #		endif
 #	else
 #		ifdef __GNUC__
 #			define DLL_PUBLIC __attribute__((dllimport))
 #		else
-#			define DLL_PUBLIC __declspec(dllimport) // Note: actually gcc seems to also supports this syntax.
+#			define DLL_PUBLIC __declspec(dllimport) // Note: actually gcc seems to also support this syntax.
 #		endif
 #	endif
 #	define DLL_LOCAL
@@ -124,7 +124,7 @@ and therefore causes a non-numeric error if you include a non-numeric value in a
 
 //#include <boost/thread/tss.hpp>
 
-//stupid MS language "extensions" disable some standard C++ keywords ... restore them
+//questionable MS language "extensions" disable some standard C++ keywords ... restore them
 //http://members.ozemail.com.au/~geoffch/samples/programming/msvc/cl/options/z$e.htm
 //complete list of c/c++ keywords is
 //and, and_eq, bitand, bitor, compl, not, not_eq, or, or_eq, xor and xor_eq
@@ -189,6 +189,8 @@ namespace exodus {
 
 //TODO ensure locale doesnt produce like 123.456,78
 std::wstring intToString(int int1);
+
+class varray;
 
 //TODO ensure locale doesnt produce like 123.456,78
 std::wstring dblToString(double double1);
@@ -765,6 +767,8 @@ public:
 	//var.s(start,length) substring
 	var substr(const int startx) const;
 	var substr(const int startx,const int length) const;
+	//TODO index needs to be reimplemented as ...
+	//var index(const var& substr,const int occurence=1) const;
 	var index(const var& substr,const int startchar1=1) const;
 	var field(const var& substrx,const int fieldnx,const int nfieldsx=1) const;
 	var field2(const var& substrx,const int fieldnx,const int nfieldsx=1) const;
@@ -776,10 +780,10 @@ public:
 	var iconv(const var& substr) const;
 
 	//STRING FUNCTIONS THAT USE THE HIGH END SEPARATORS
-	/*
-	var* matparse(const var& mvstr);
-	var matunparse();
-	*/
+	void var::matparse(varray& varray1) const;
+	//following is implemented on the varray class now
+	//varray matunparse();
+	//
 	//return a substr from any starting character
 	//stops at the next character FF-F8, updating the starting character
 	//and indicates the delimiter found (1-8) or 0 if off end of string
@@ -1062,6 +1066,8 @@ public:
 	varray(int rows, int cols=1);
 
 	bool resize(int rows, int cols=1);
+
+	var matunparse() const;
 
 	// subscript operators often come in pairs
 	var& operator() (int row, int col=1);

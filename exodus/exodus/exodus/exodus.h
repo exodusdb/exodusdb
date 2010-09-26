@@ -37,7 +37,7 @@ THE SOFTWARE.
 
 //it usually poor practice to "pollute" the global space of the header user
 //but in this case the header user is an exodus application programmer
-//who will generally not be using any other includes and can skip the namespace line.
+//may not be using any other includes
 //to avoid pollution, simply directly include the above headers as desired instead.
 using namespace exodus;
 

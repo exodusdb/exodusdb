@@ -35,7 +35,41 @@ THE SOFTWARE.
 namespace exodus
 {
 
-//includes field,field2,locate,extract,erase,replace,insert,substr,splice,remove
+//includes matparse,field,field2,locate,extract,erase,replace,insert,substr,splice,remove
+
+//////////
+//MATPARSE
+//////////
+
+//var.matparse(varray1)
+void var::matparse(varray& varray1) const
+{
+	THISIS(L"void var::matparse(varray& varray1) const")
+	THISISSTRING()
+
+	//find the starting position of the field or return L""
+	std::wstring::size_type start_pos=0;
+	int fieldn=1;
+	for (;;)
+	{
+		std::wstring::size_type next_pos;
+		next_pos=var_mvstr.find(FM_,start_pos);
+		//past of of string?
+		if (next_pos==std::wstring::npos)
+		{
+			varray1(fieldn)=L"";
+			return;
+		}
+		varray1(fieldn)=var_mvstr.substr(start_pos,next_pos-start_pos);
+		start_pos=next_pos+1;
+		fieldn++;
+	}
+
+}
+
+///////////////////////////////////////////
+//FIELD
+///////////////////////////////////////////
 
 var var::field2(const var& sep, const int fieldno, const int nfields) const
 {
@@ -44,10 +78,6 @@ var var::field2(const var& sep, const int fieldno, const int nfields) const
 
 	return field(sep, count(sep) + 1 + fieldno + 1, nfields);
 }
-
-///////////////////////////////////////////
-//FIELD
-///////////////////////////////////////////
 
 //FIELD(x,y,z)
 //var.field(substr,fieldn,nfields)
