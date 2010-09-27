@@ -774,10 +774,10 @@ public:
 	var field2(const var& substrx,const int fieldnx,const int nfieldsx=1) const;
 
 	//I/O CONVERSION
-	var oconv(const wchar_t* conversion) const;
+	var oconv(const wchar_t* convstr) const;
 	var oconv(const var& convstr) const;
-	var iconv(const wchar_t* conversion) const;
-	var iconv(const var& substr) const;
+	var iconv(const wchar_t* convstr) const;
+	var iconv(const var& convstr) const;
 
 	//STRING FUNCTIONS THAT USE THE HIGH END SEPARATORS
 	void matparse(varray& varray1) const;

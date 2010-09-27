@@ -478,6 +478,6 @@ Before disconnecting from a client, you must wait for a signal indicating the cl
 
 */
 
-}//of namespace neo
+}//of namespace
 
 #endif //EXODUS_IPC_WINPIPES
