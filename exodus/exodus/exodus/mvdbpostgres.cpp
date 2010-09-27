@@ -573,7 +573,7 @@ bool var::lock(const var& key) const
 	//TODO .. provide endian identical version
 	//required if and when exodus processes connect to postgres on a DIFFERENT host
 	//although currently (Sep2010) use of symbolic dictionaries requires exodus to be on the SAME host
-	uint64_t hash64=MurmurHash64(fileandkey.data(),int(fileandkey.length()*sizeof(wchar_t)),0);
+	uint64_t hash64=MurmurHash64((wchar_t*)fileandkey.data(),int(fileandkey.length()*sizeof(wchar_t)),0);
 
 	//check if already lock in current connection
 	LockTable* locktable=tss_locktables.get();
@@ -648,7 +648,7 @@ void var::unlock(const var& key) const
 	//TODO .. provide endian identical version
 	//required if and when exodus processes connect to postgres on a DIFFERENT host
 	//although currently (Sep2010) use of symbolic dictionaries requires exodus to be on the SAME host
-	uint64_t hash64=MurmurHash64(fileandkey.data(),int(fileandkey.length()*sizeof(wchar_t)),0);
+	uint64_t hash64=MurmurHash64((wchar_t*)fileandkey.data(),int(fileandkey.length()*sizeof(wchar_t)),0);
 
 	//remove from local current connection locktable
 	LockTable* locktable=tss_locktables.get();
