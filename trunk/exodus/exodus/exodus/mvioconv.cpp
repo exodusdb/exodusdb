@@ -41,25 +41,36 @@ using namespace std;
 namespace exodus
 {
 
-var var::iconv(const var& conversion) const
+var var::iconv(const var& convstr) const
 {
-	THISIS(L"var var::iconv(const var& conversion) const")
-	ISSTRING(conversion)
+	THISIS(L"var var::iconv(const var& convstr) const")
+	ISSTRING(convstr)
 
-	return iconv(conversion.towstring().c_str());
+	return iconv(convstr.towstring().c_str());
 }
 
-//fast version for common programming example where conversion is provided as a hard coded string
-var var::iconv(const wchar_t* conversion) const
+/**
+converts from external format to internal depending on conversion
+ 
+@param convstr
+A string containing a conversion instruction
+
+@return
+The result in internal format
+
+@example
+skjdhvlskdj hvsjd hvksdh v
+*/
+var var::iconv(const wchar_t* convstr) const
 {
-	THISIS(L"var var::iconv(const wchar_t* conversion) const")
+	THISIS(L"var var::iconv(const wchar_t* convstr) const")
 	THISISSTRING()
 
 	//empty string in, empty string out
 	if (var_mvtype&pimpl::MVTYPE_STR && var_mvstr.length()==0)
 		return L"";
 
-	if (conversion==L"MT")
+	if (convstr==L"MT")
 	{
 		var hours=field(L":",1);
 		if (!hours.isnum()) return *this;
@@ -79,7 +90,7 @@ var var::iconv(const wchar_t* conversion) const
 	var terminator;
 	var output = L"";
 
-	const wchar_t* conversionchar=conversion;
+	const wchar_t* conversionchar=convstr;
 
 	//check first character
 	switch (*conversionchar)
@@ -96,7 +107,7 @@ var var::iconv(const wchar_t* conversion) const
 				if (part.var_mvtype&pimpl::MVTYPE_STR && part.var_mvstr.length()==0)
 					{}
 				else
-					output ^= part.iconv_D(conversion);
+					output ^= part.iconv_D(convstr);
 
 				if (!terminator)
 					break;
@@ -122,7 +133,7 @@ var var::iconv(const wchar_t* conversion) const
 				if (part.var_mvtype&pimpl::MVTYPE_STR && part.var_mvstr.length()==0)
 					{}
 
-				//do conversion on a number
+				//do convstr on a number
 				else
 				{
 
@@ -134,12 +145,12 @@ var var::iconv(const wchar_t* conversion) const
 						case L'C':
 
 throw MVException(L"iconv(MD/MC) not implemented yet");
-//							output ^= part.iconv_MD_MC(conversion);
+//							output ^= part.iconv_MD_MC(convstr);
 							break;
 
 						//MT
 						case L'T':
-							output ^= part.iconv_MT(conversion);
+							output ^= part.iconv_MT(convstr);
 							break;
 
 						//MX number to hex (not string to hex)
@@ -170,7 +181,7 @@ throw MVNotImplemented(L"iconv('MX')");
 				return L"";
 
 			//check second character
-			switch (conversion[1])
+			switch (convstr[1])
 			{
 				//[NUMBER
 				case L'N':
@@ -178,7 +189,7 @@ throw MVNotImplemented(L"iconv('MX')");
 					//if (!isnum())
 					//	return *this;
 
-					//return oconv_MD_MC(conversion);
+					//return oconv_MD_MC(convstr);
 					//TODO workout options after [NUMBER,
 					return *this;
 					break;
@@ -211,13 +222,13 @@ throw MVNotImplemented(L"iconv('MX')");
 			return iconv_HEX(HEX_IO_RATIO);
 			break;
 
-		//empty conversion string - no conversion
+		//empty convstr string - no conversion
 		case L'\0':
 			return (*this);
 	}
 
 	//TODO implement
-	std::wcout<<L"iconv "<<conversion<< L" not implemented yet "<<std::endl;
+	std::wcout<<L"iconv "<<convstr<< L" not implemented yet "<<std::endl;
 
 	return *this;
 

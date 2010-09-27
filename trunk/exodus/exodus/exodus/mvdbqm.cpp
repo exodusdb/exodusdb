@@ -451,5 +451,5 @@ var var::xlate(const var& filename,const var& fieldno, const var& mode) const
 	return newmv;
 }
 
-} // namespace neosys
+} // namespace
 */
