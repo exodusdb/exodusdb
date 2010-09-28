@@ -429,6 +429,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\mvlink.h"
+				>
+			</File>
+			<File
 				RelativePath=".\mvutf.h"
 				>
 			</File>

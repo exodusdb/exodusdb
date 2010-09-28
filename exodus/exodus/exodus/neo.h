@@ -87,6 +87,7 @@ DLL files may be explicitly loaded at run-time, a process referred to simply as 
 //warning C4190: 'XXX' has C-linkage specified, but returns UDT 'YYY' which is incompatible with C
 #pragma warning (disable: 4190)
 
+//this is not needed since it is automatically generated if missing
 BOOL APIENTRY DllMain(HANDLE hModule, DWORD dwReason, LPVOID lpReserved){return TRUE;};
 
 extern "C"

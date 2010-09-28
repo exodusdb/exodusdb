@@ -22,7 +22,7 @@ THE SOFTWARE.
 
 
 //dont define to allow narrow since these are the narrow definitions
-//#define MV_NO_NARROW
+#define MV_NO_NARROW
 
 //C4530: C++ exception handler used, but unwind semantics are not enabled. 
 #pragma warning (disable: 4530)
@@ -62,7 +62,7 @@ var::var(const char* cstr1)
 	if (cstr1==0)
 	{
 		THISIS(L"var::var(const char* cstr1)")
-		throw MVInvalidPointer("Null pointer in var(const char*)");
+		throw MVInvalidPointer(L"Null pointer in var(const char*)");
 	}
 
 	std::string str1=cstr1;

@@ -697,10 +697,6 @@ void var::unlockall() const
 {
 	THISIS(L"void var::unlockall() const")
 
-    const char* paramValues[1];
-    int         paramLengths[1];
-    int         paramFormats[1];
-
 	//check if any locks
 	LockTable* locktable=tss_locktables.get();
 	if (locktable)
@@ -713,29 +709,22 @@ void var::unlockall() const
 		(*locktable).clear();
 	}
 
-	char* sql="SELECT PG_ADVISORY_UNLOCK_ALL()";
+	var sql="SELECT PG_ADVISORY_UNLOCK_ALL()";
 
-    PGconn* thread_pgconn=(PGconn*) connection();
-	DEBUG_LOG_SQL
-	PGresult* result = PQexecParams(thread_pgconn,
-    					//TODO: parameterise filename
-                       sql,
-                       0,       /* zero params */
-                       NULL,    /* let the backend deduce param type */
-                       paramValues,
-					   paramLengths,
-					   paramFormats,
-                       0);      /* ask for no results */
-
+	//execute command or return empty string
+	PGresultptr result;
+	if (!pqexec(sql,result))
+		return;
+/*
 	if (PQresultStatus(result) != PGRES_TUPLES_OK || PQntuples(result) != 1)
  	{
 		PQclear(result);
+	    PGconn* thread_pgconn=(PGconn*) connection();
 		throw MVException(L"unlockall()\n" ^ var(PQerrorMessage(thread_pgconn)));
 		return;
 	}
-
+*/
 	PQclear(result);
-
 	return;
 
 }
@@ -2177,6 +2166,7 @@ var var::listindexes(const var& filename) const
 	return indexnames;
 }
 
+//used for sql commands that require no parameters
 //returns 1 for success and PGresult points to result WHICH MUST BE PQclear(result)'ed
 //returns 0 for failure
 int pqexec(const var& sql, PGresultptr& pgresult)

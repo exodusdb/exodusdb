@@ -114,31 +114,6 @@ bool var::load(const var& libraryname) const
 		library_t plibrary;
 		if ((plibrary=(library_t) dlopen(libraryname.tostring().c_str(), RTLD_NOW))==0)
 		{
-			/* not needed since path is searched anyway
-			//if just a filename then look in path
-			if (not var(libraryname).index(_SLASH))
-			{
-				var paths;
-				paths.osgetenv(L"PATH");
-#if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
-#else
-				convert(L":",L";",paths)
-#endif
-				var npaths=paths.dcount(L";");
-				for (int pathn=1;pathn<=npaths;++pathn)
-				{
-					var path=paths.field(L";",pathn).trimf().trimb();
-					if (path.substr(-1,1) != _SLASH)
-						path^=_SLASH;
-					if ((path^libraryname).osfile())
-						(path^libraryname).outputln(L"PATH=");
-					if ((plibrary=(library_t) dlopen((path^libraryname).tostring().c_str(), RTLD_NOW))!=0)
-						break;
-				}
-			}
-
-			if (plibrary==0)
-			*/
 			{
 				//throw L"Unable to load " ^ libraryname ^ L".dll";
 				return false;

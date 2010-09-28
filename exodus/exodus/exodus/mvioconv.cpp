@@ -58,8 +58,6 @@ A string containing a conversion instruction
 @return
 The result in internal format
 
-@example
-skjdhvlskdj hvsjd hvksdh v
 */
 var var::iconv(const wchar_t* convstr) const
 {
