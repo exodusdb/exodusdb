@@ -13,6 +13,8 @@ program() {
 	
 	var command=_COMMAND;
 
+	var loadtimelinking=false;
+
 	//extract options
 	var verbose=index(_OPTIONS,"V");
 	var debugging=index(_OPTIONS,"B");
@@ -417,6 +419,8 @@ program() {
 		//and, for subroutines and functions, create header file (even if compilation not successful)
 		var crlf="\r\n";
 		var headertext="";
+		var deftext="";
+		var defordinal=0;
 		converter(text,"\r\n",FM^FM);
 		var nlines=dcount(text,FM);
 		varray text2(nlines);
@@ -424,10 +428,66 @@ program() {
 		for (int ln=1;ln<=nlines;++ln) {
 			var line=trimf(text2(ln));
 			var word1=line.field(" ",1);
+
+			//for external subroutines (dll/so libraries), build up .h and .def text
 			if (not(isprogram) and word1 eq "function" or word1 eq "subroutine") {
-				headertext^=crlf^line.field("{",1)^";";
+
+				//extract out the function declaration in including arguments
+				//eg "function xyz(in arg1, out arg2)"
+				var funcdecl=line.field("{",1);
+
+				var funcname=funcdecl.field(" ",2).field("(",1);
+
+				++defordinal;
+				deftext^=crlf^" "^funcname^" @"^defordinal;
+
+				if (loadtimelinking)
+				{
+					headertext^=crlf^funcdecl^";";
+				}
+				else
+				{
+					var libname=filebase;
+					var funcreturn=(word1=="function")?"var":"void";
+					var funcreturnvoid=(word1=="function")?0:1;
+					var funcargs=funcdecl.field("(",2).field(")",1);
+
+					//work out the function arguments without declaratives
+					//to be inserted in the calling brackets.
+					var funcargs2=funcargs;
+					int nargs=dcount(funcargs,",");
+					for (int argn=1;argn<=nargs;++argn)
+						fieldstorer(funcargs2,',',argn,1,field(funcargs,',',argn).field2(" ",-1));
+
+					headertext^=crlf;
+					headertext^="#define EXODUSLIBNAME "^libname^crlf;
+					headertext^="#define EXODUSFUNCNAME "^funcname^crlf;
+					headertext^="#define EXODUSFUNCRETURN "^funcreturn^crlf;
+					headertext^="#define EXODUSFUNCARGS "^funcargs^crlf;
+					headertext^="#define EXODUSFUNCARGS2 "^funcargs2^crlf;
+					headertext^="#define EXODUSFUNCTORCLASSNAME ExodusFunctor_"^funcname^crlf;
+					headertext^="#define EXODUSFUNCTYPE ExodusDynamic_"^funcname^crlf;
+					headertext^="#define EXODUSLIBNAMEQQ "^libname.quote()^crlf;
+					headertext^="#define EXODUSFUNCNAMEQQ "^funcname.quote()^crlf;
+					//headertext^="#define EXODUSCLASSNAME Exodus_Functor_Class_"^funcname^crlf;
+					headertext^="#define EXODUSFUNCRETURNVOID "^funcreturnvoid^crlf;
+					headertext^="#include <exodus/mvlink.h>"^crlf;
+					headertext^="#undef EXODUSLIBNAME"^crlf;
+					headertext^="#undef EXODUSFUNCNAME"^crlf;
+					headertext^="#undef EXODUSFUNCRETURN"^crlf;
+					headertext^="#undef EXODUSFUNCARGS"^crlf;
+					headertext^="#undef EXODUSFUNCARGS2"^crlf;
+					headertext^="#undef EXODUSFUNCTORCLASSNAME"^crlf;
+					headertext^="#undef EXODUSFUNCTYPE"^crlf;
+					headertext^="#undef EXODUSLIBNAMEQQ"^crlf;
+					headertext^="#undef EXODUSFUNCNAMEQQ"^crlf;
+					headertext^="#undef EXODUSCLASSNAME"^crlf;
+					headertext^="#undef EXODUSFUNCRETURNVOID"^crlf;
+				}
 			}
-			if (word1 eq "#include") {
+
+			//build up list of libraries required by linker
+			if (loadtimelinking and word1 eq "#include") {
 				var word2=line.field(" ",2);
 				if (word2.substr(1,1)==DQ) {
 					word2=word2.substr(2,word2.len()-2);
@@ -440,10 +500,25 @@ program() {
 			}
 		}
 		if (headertext) {
-			headertext.splicer(1,0,"#ifndef "^ucase(filebase)^"_H"^crlf);
+			headertext.splicer(1,0,"#ifndef "^ucase(filebase)^"_H");
 			headertext^=crlf^"#endif"^crlf;
 			var headerfilename=filebase^".h";
 			oswrite(headertext,headerfilename);
+		}
+
+		//add .def file to linker so that functions get exported without "c++ name decoration"
+		//then the runtime loader dlsym() can find the functions by their original (undecorated) name
+		//http://wyw.dcweb.cn/stdcall.htm
+		//CL can accept a DEF file on the command line, and it simply passes the file name to LINK
+        // cl /LD testdll.obj testdll.def
+        //will become
+        // link /out:testdll.dll /dll /implib:testdll.lib /def:testdll.def testdll.obj
+		if (deftext) {
+			deftext.splicer(1,0,"LIBRARY "^filebase^crlf^"EXPORTS");
+			var deffilename=filebase^".def";
+			oswrite(deftext,deffilename);
+			if (compiler=="cl")
+				linkoptions^=" /def:"^filebase^".def";
 		}
 
 		if (debugging) {

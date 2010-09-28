@@ -90,13 +90,15 @@ THE SOFTWARE.
 //#ifdef _DEBUG
 //forced now that pimpl isnt private OR even a pointer!
 #if 1
-	//only required for debugging can be commented out in production code
+	//IF was private pointer then only required for debugging
+	//and couldcan be commented out in production code
 #	include <exodus/mvimpl.h>
 #else
 	class pimpl;
 #endif
 
 /*		gcc	msc
+was for 32bit (needs revising after int became long long (64bit/8byte even in 32bit impl)
 sizeof
 char:	1	1
 wchar_t:4	2
@@ -220,6 +222,7 @@ std::wstring dblToString(double double1);
 //explanation 3.
 
 //the destructor is public non-virtual (supposedly to save space)
+//TODO check sizeof var with virtual destructor
 //since this class has no virtual functions it should still be save to derive from it and do delete()
 //http://www.parashift.com/c++-faq-lite/virtual-functions.html#faq-20.7
 class DLL_PUBLIC var

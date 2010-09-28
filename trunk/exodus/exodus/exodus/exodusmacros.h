@@ -86,6 +86,7 @@ void main2(int exodus__argc, char *exodus__argv[])
 //allow simplified syntax eg "function xyz(in arg1, out arg2) { ..."
 #define subroutine EXODUSMACRO_IMPORTEXPORT void
 #define function EXODUSMACRO_IMPORTEXPORT var
+#define call
 
 //forcibly redefine "eq" even if already previously defined in some other library like iostream
 //to generate a compilation error so that the issue can be corrected (see heading) and the "eq" keyword remain available
