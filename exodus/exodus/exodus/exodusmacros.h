@@ -91,10 +91,10 @@ void main2(int exodus__argc, char *exodus__argv[])
 #else
 #	if __GNUC__ >= 4
 		//use g++ -fvisibility=hidden to make all hidden except those marked DLL_PUBLIC ie "default"
-#		define EXODUSMACRO_IMPORTEXPORT __attribute__ ((visibility("default")))
-#		define DLL_LOCAL  __attribute__ ((visibility("hidden")))
+#		define EXODUSMACRO_IMPORTEXPORT EXODUS_EXTERN_C __attribute__ ((visibility("default")))
+#		define DLL_LOCAL __attribute__ ((visibility("hidden")))
 #	else
-#		define EXODUSMACRO_IMPORTEXPORT
+#		define EXODUSMACRO_IMPORTEXPORT EXODUS_EXTERN_C
 #		define DLL_LOCAL
 #	endif
 #endif

@@ -613,6 +613,8 @@ program() {
 					if (verbose)
 						println(cmd);
 					//osshell(cmd);
+					if (osfile(outputdir^binfilename) and osfile(objfilename))
+						osdelete(outputdir^binfilename);
 					if (!oscopy(objfilename,outputdir ^ binfilename))
 						println("ERROR: Failed "^cmd);
 				}
