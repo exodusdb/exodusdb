@@ -709,7 +709,7 @@ void var::unlockall() const
 		(*locktable).clear();
 	}
 
-	var sql="SELECT PG_ADVISORY_UNLOCK_ALL()";
+	var sql=L"SELECT PG_ADVISORY_UNLOCK_ALL()";
 
 	//execute command or return empty string
 	PGresultptr result;

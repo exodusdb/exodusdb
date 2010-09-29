@@ -5,8 +5,10 @@
 # undef function
 # include "windows.h"
 # define function _save_function_
+# define EXODUSLIBEXT ".dll"
 #else
 # include <dlfcn.h>
+# define EXODUSLIBEXT ".so"
 #endif
 
 // declare DLL/SO function type
@@ -83,14 +85,17 @@ L".dll/so");
  bool openlib()
  {
         //open the library or return 0
-        _plibrary=(library_t) dlopen(_libraryname.c_str(), RTLD_NOW);
+//        println(_libraryname+EXODUSLIBEXT);
+        _plibrary=(library_t)
+		 dlopen((_libraryname+EXODUSLIBEXT).c_str(), RTLD_NOW);
         return _plibrary!=NULL;
  }
 
  bool openfunc()
  {
         //find the function and return true/false
-        _pfunction = (EXODUSFUNCTYPE) dlsym(_plibrary, _functionname.c_str());
+        _pfunction = (EXODUSFUNCTYPE)
+		dlsym(_plibrary, _functionname.c_str());
         return _pfunction!=NULL;
  }
 

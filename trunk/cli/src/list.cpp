@@ -83,6 +83,11 @@ function esctoexit()
 	return false;
 }
 
+#undef subroutine
+#define subroutine void
+#undef function
+#define function var
+
 class list
 {
 

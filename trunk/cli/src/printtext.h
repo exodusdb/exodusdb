@@ -30,30 +30,30 @@ class printtext
 
 public:
 
-subroutine init(MvEnvironment* env_)
+void init(MvEnvironment* env_)
 {
 	env=env_;
 }
 
-subroutine printnext(out bodyln, out pagen)
+void printnext(out bodyln, out pagen)
 {
 	bodyln = 999;
 	pagen = 0;
 	return;
 }
 
-subroutine setheadfoot(in newhead, in newfoot)
+void setheadfoot(in newhead, in newfoot)
 {
 	head=newhead;
 	foot=newfoot;
 }
 
-subroutine close()
+void close()
 {
 	printfile.osclose();
 }
 
-subroutine printtx(out tx)
+void printtx(out tx)
 {
 print(tx);
 	if (printptr.unassigned())
@@ -203,7 +203,7 @@ print(tx);
 
 private:
 
-subroutine printtx2(out tx)
+void printtx2(out tx)
 {
 	if (html) {
 		if (not printptr) {
@@ -235,25 +235,25 @@ subroutine printtx2(out tx)
 	return;
 }
 
-subroutine gethtml(in mode, out letterhead, in companycode)
+void gethtml(in mode, out letterhead, in companycode)
 {
 	letterhead="";
 	return;
 }
 
-subroutine readcss(out css)
+void readcss(out css)
 {
 	css="";
 	return;
 }
 
-subroutine getmark(in mode, in html, out printtxmark)
+void getmark(in mode, in html, out printtxmark)
 {
 	printtxmark="";
 	return;
 }
 
-subroutine convoptions(out temp)
+void convoptions(out temp)
 {
 	temp.swapper(SQ^SQ, "^%^");
 
@@ -310,7 +310,7 @@ subroutine convoptions(out temp)
 	return;
 }
 
-subroutine getheadfoot(out head, out foot, out nbodylns)
+void getheadfoot(out head, out foot, out nbodylns)
 {
 
 	headx = head;
