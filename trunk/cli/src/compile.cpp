@@ -82,6 +82,10 @@ program() {
 		binoptions=" -g -L./ -lfunc1 -Wl,-rpath,./";
 		//binoptions=" -fPIC";
 
+#if __GNUC__ >= 4
+		//use g++ -fvisibility=hidden to make all hidden except those marked DLL_PUBLIC ie "default"
+		binoptions^=" -Wl,-fvisibility=hidden";
+#endif
 		//make a shared library
 		liboptions=" -fPIC -shared";
 		//soname?
@@ -517,8 +521,8 @@ program() {
 			deftext.splicer(1,0,"LIBRARY "^filebase^crlf^"EXPORTS");
 			var deffilename=filebase^".def";
 			oswrite(deftext,deffilename);
-			if (compiler=="cl")
-				linkoptions^=" /def:"^filebase^".def";
+			//if (compiler=="cl")
+			//	linkoptions^=" /def:"^filebase^".def";
 		}
 
 		if (debugging) {
