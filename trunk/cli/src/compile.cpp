@@ -601,17 +601,20 @@ program() {
 				
 				//copy the obj file to the output directory
 				if (isprogram and installcmd) {
-					var cmd;
 					if (not osdir(outputdir)) {
-						cmd="mkdir " ^ outputdir;
+						var cmd="mkdir " ^ outputdir;
 						if (verbose)
 							println(cmd);
-						osshell(cmd);
+						//osshell(cmd);
+						if (!osmkdir(outputdir))
+							println("ERROR: Failed "^cmd);
 					}
-					cmd=installcmd^" " ^ objfilename ^ " " ^ outputdir ^ binfilename;
+					var cmd=installcmd^" " ^ objfilename ^ " " ^ outputdir ^ binfilename;
 					if (verbose)
 						println(cmd);
-					osshell(cmd);
+					//osshell(cmd);
+					if (!oscopy(objfilename,outputdir ^ binfilename))
+						println("ERROR: Failed "^cmd);
 				}
 			}
 		}//compilation

@@ -72,6 +72,8 @@ void main2(int exodus__argc, char *exodus__argv[])
 
 //work out if any functions are being exported or imported
 //used in function and subroutine macros
+//also perhaps need to avoid "gnu export all" performance issue
+//http://gcc.gnu.org/wiki/Visibility
 #if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
 #	if defined _DLL || defined _SO
 #		ifdef __GNUC__
