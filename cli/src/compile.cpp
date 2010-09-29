@@ -74,21 +74,22 @@ program() {
 			linkoptions=" -lexodus";
 
 		//enable function names in backtrace
-		basicoptions^=" -rdynamic";
+		basicoptions^=" -g -rdynamic";
 
 		outputoption=" -o ";
 		//optimiser unfortunately prevents backtrace
 		//basicoptions^="-O1";
-		binoptions=" -g -L./ -lfunc1 -Wl,-rpath,./";
+		binoptions="";
+		//binoptions=" -g -L./ -lfunc1 -Wl,-rpath,./";
 		//binoptions=" -fPIC";
 
-#if __GNUC__ >= 4
-		//use g++ -fvisibility=hidden to make all hidden except those marked DLL_PUBLIC ie "default"
-		binoptions^=" -Wl,-fvisibility=hidden";
-#endif
 		//make a shared library
 		liboptions=" -fPIC -shared";
 		//soname?
+#if __GNUC__ >= 4
+		//use g++ -fvisibility=hidden to make all hidden except those marked DLL_PUBLIC ie "default"
+		liboptions^=" -Wl,-fvisibility=hidden";
+#endif
 
 		//target directories
 		bindir="~/bin";
@@ -340,6 +341,9 @@ program() {
 		//installcmd="copy /y";
 		installcmd="";
 	}
+
+	swapper(bindir,"~",osgetenv("HOME"));
+	swapper(libdir,"~",osgetenv("HOME"));
 
 	if (bindir.substr(-1) ne _SLASH)
 		bindir ^= _SLASH;
