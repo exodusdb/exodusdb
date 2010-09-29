@@ -619,7 +619,7 @@ bool var::oscopy(const var& to_osfilename) const
 	THISIS(L"bool var::oscopy(const var& to_osfilename) const")
 	THISISSTRING()
 	ISSTRING(to_osfilename)
-		
+	
     //boostfs::wpath frompathx(toTstring((*this)).c_str());
     //boostfs::wpath topathx(toTstring(to_osfilename).c_str());
     boostfs::path frompathx((*this).tostring().c_str());
