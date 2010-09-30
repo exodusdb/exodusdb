@@ -41,6 +41,11 @@ program()
 
 		//prefer user binaries then exodus binaries before all else
 		ossetenv("PATH","~/bin:/var/lib/exodus/bin:"^osgetenv("PATH"));
+		
+		
+print("LD_LIBRARY_PATH","~/lib:"^osgetenv("LD_LIBRARY_PATH"));
+		ossetenv("LD_LIBRARY_PATH","~/lib:"^osgetenv("LD_LIBRARY_PATH"));
+
 
 		//enable core dumps
 		osshell("ulimit -c unlimited");
