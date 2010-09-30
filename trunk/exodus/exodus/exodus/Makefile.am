@@ -7,7 +7,7 @@ SUBDIRS =
 #some header files
 h_sources = exodus.h exodusmacros.h mvenvironment.h mv.h mvlibs.h \
 exodusfuncs.h mvexceptions.h mvimpl.h mvutf.h mvipc.h mvconfig.h \
-mvlink.h
+mvlink.h mvfunctor.h
 
 #some more headers
 buildonly_h_sources = ConvertUTF.h NullCodecvt.h TConvert.h gettimeofday.h neo.h mvconfig.h MurmuHash2_64.h
@@ -15,7 +15,9 @@ buildonly_h_sources = ConvertUTF.h NullCodecvt.h TConvert.h gettimeofday.h neo.h
 #source files
 cc_sources = ConvertUTF.c howto.cpp mvarray.cpp mvdatetime.cpp  mvdebug.cpp mvfuncs.cpp mvioconv.cpp mvlibs.cpp mvos.cpp \
 mvutf.cpp naturalorder.cpp gettimeofday.cpp mv2.cpp mv.cpp mvdbpostgres.cpp mvenvironment.cpp mvglobalfuncs.cpp  \
-mvipc.cpp mvmv.cpp mvunicode.cpp mvipc_boost.cpp mvipc_posix.cpp mvipc_ms.cpp mvposix.cpp MurmurHash2_64.cpp
+mvipc.cpp mvmv.cpp mvunicode.cpp mvipc_boost.cpp mvipc_posix.cpp \
+mvipc_ms.cpp mvposix.cpp MurmurHash2_64.cpp \
+mvfunctor.cpp
 
 #where to install the libraries include headers
 library_includedir=$(includedir)/$(GENERIC_LIBRARY_NAME)-$(GENERIC_API_VERSION)/$(GENERIC_LIBRARY_NAME)
