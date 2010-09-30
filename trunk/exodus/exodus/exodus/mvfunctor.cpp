@@ -42,7 +42,8 @@ typedef HINSTANCE library_t;
 #else
 # include <dlfcn.h>
   typedef void* library_t;
-# define EXODUSLIBPREFIX "lib"+
+# define EXODUSLIBPREFIX "~/lib/lib"+
+//# define EXODUSLIBPREFIX "./lib"+
 #endif
 
 #include <exodus/mv.h>
@@ -70,7 +71,7 @@ void ExodusFunctorBase::checkload()
 
 	//find the library or fail
 	if (not openlib())
-		throw MVException(L"Unable to load " ^ var(_libraryfilename) ^ L".dll/so");
+		throw MVException(L"Unable to load " ^ var(_libraryfilename));
 
 	//find the function or fail
 	if (not openfunc())
@@ -89,7 +90,12 @@ bool ExodusFunctorBase::openlib()
 #ifdef dlerror
 	dlerror();
 #endif
+	//TODO optimise with std::string instead of var
 	_libraryfilename=EXODUSLIBPREFIX _libraryname+EXODUSLIBEXT;
+	var home;
+	home.osgetenv(L"HOME");
+_libraryfilename=var(_libraryfilename).swap(L"~",home).tostring();
+
 	_plibrary=(void*) dlopen(_libraryfilename.c_str(),RTLD_NOW);
 
 #ifdef dlerror

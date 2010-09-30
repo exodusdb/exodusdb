@@ -604,7 +604,7 @@ program() {
 				//}
 				
 				//copy the obj file to the output directory
-				if (isprogram and installcmd) {
+				if (installcmd) {
 					if (not osdir(outputdir)) {
 						var cmd="mkdir " ^ outputdir;
 						if (verbose)
