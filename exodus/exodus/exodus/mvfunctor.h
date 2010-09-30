@@ -99,6 +99,7 @@ void* _pfunction;
 
 std::string _libraryname;
 std::string _functionname;
+std::string _libraryfilename;
 
 void checkload();
 bool openlib();
