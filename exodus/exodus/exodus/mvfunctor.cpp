@@ -38,9 +38,11 @@ typedef HINSTANCE library_t;
 # define dlsym(arg1,arg2)  GetProcAddress(arg1,arg2)
 //note: MS FreeLibrary returns non-zero for success and 0 for failure
 # define dlclose(arg1) FreeLibrary(arg1)
+# define EXODUSLIBPREFIX
 #else
 # include <dlfcn.h>
   typedef void* library_t;
+# define EXODUSLIBPREFIX "lib"+
 #endif
 
 #include <exodus/mv.h>
@@ -84,17 +86,20 @@ bool ExodusFunctorBase::openlib()
 	//open the library or return 0
 	//        println(_libraryname+EXODUSLIBEXT);
 	//dlopen arg2 is ignored by macro on windows
+
 #ifdef dlerror
 	dlerror();
 #endif
 
-	_plibrary=(void*) dlopen((_libraryname+EXODUSLIBEXT).c_str(), RTLD_NOW);
+	_plibrary=(void*) dlopen((EXODUSLIBPREFIX _libraryname+EXODUSLIBEXT).c_str(), 
+RTLD_NOW);
 
 #ifdef dlerror
-    const char *dlsym_error = dlerror();
-    if (dlsym_error)
+	const char *dlsym_error = dlerror();
+	if (dlsym_error)
 		var(dlsym_error).outputln();
 #endif
+
 	return _plibrary!=NULL;
 }
 
@@ -102,7 +107,18 @@ bool ExodusFunctorBase::openfunc()
 {
 	//find the function and return true/false
 	//_pfunction = (EXODUSFUNCTYPE) dlsym(_plibrary, _functionname.c_str());
+
+#ifdef dlerror
+	dlerror();
+#endif
 	_pfunction = (void*) dlsym((library_t) _plibrary, _functionname.c_str());
+
+#ifdef dlerror
+	const char *dlsym_error = dlerror();
+	if (dlsym_error)
+		var(dlsym_error).outputln();
+#endif
+
 	return _pfunction!=NULL;
 }
 

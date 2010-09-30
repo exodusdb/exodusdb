@@ -94,8 +94,8 @@ protected:
 
 //use void* to speed compilation of exodus applications on windows by avoiding
 //inclusion of windows.h here. In the implementation cast to HINSTANCE and 
-(void*) _plibrary;
-(void*) _pfunction;
+void* _plibrary;
+void* _pfunction;
 
 std::string _libraryname;
 std::string _functionname;
