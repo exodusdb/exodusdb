@@ -627,6 +627,7 @@ bool var::oscopy(const var& to_osfilename) const
     try
     {
 		//will not overwrite so this is redundant
+		//option to overwrite is not in initial versions of boost copy_file
 		if (boostfs::exists(topathx)) return false;
 
 		boostfs::copy_file(frompathx, topathx);
@@ -672,9 +673,9 @@ var var::osfile() const
 	//get a handle and return L"" if doesnt exist or isnt a regular file
     try
     {
-	//boost 1.33 throws an error with files containing ~ or $ chars but 1.38 doesnt
-	//boostfs::wpath pathx(toTstring((*this)).c_str());
-	boostfs::path pathx((*this).tostring().c_str());
+		//boost 1.33 throws an error with files containing ~ or $ chars but 1.38 doesnt
+		//boostfs::wpath pathx(toTstring((*this)).c_str());
+		boostfs::path pathx((*this).tostring().c_str());
 
         if (!boostfs::exists(pathx)) return L"";
         //is_regular is only in boost > 1.34
@@ -706,9 +707,9 @@ bool var::osmkdir() const
     try
     {
 
-	//boost 1.33 throws an error with files containing ~ or $ chars but 1.38 doesnt
-	//boostfs::wpath pathx(toTstring((*this)).c_str());
-	boostfs::path pathx((*this).tostring().c_str());
+		//boost 1.33 throws an error with files containing ~ or $ chars but 1.38 doesnt
+		//boostfs::wpath pathx(toTstring((*this)).c_str());
+		boostfs::path pathx((*this).tostring().c_str());
 
 		if (boostfs::exists(pathx)) return false;
 		boostfs::create_directories(pathx);
@@ -729,9 +730,9 @@ bool var::osrmdir(bool evenifnotempty) const
     try
     {
 
-	//boost 1.33 throws an error with files containing ~ or $ chars but 1.38 doesnt
-	//boostfs::wpath pathx(toTstring((*this)).c_str());
-	boostfs::path pathx((*this).tostring().c_str());
+		//boost 1.33 throws an error with files containing ~ or $ chars but 1.38 doesnt
+		//boostfs::wpath pathx(toTstring((*this)).c_str());
+		boostfs::path pathx((*this).tostring().c_str());
 
         if (!boostfs::exists(pathx)) return false;
         if (!boostfs::is_directory(pathx)) return false;
@@ -759,8 +760,8 @@ var var::osdir() const
     try
     {
 
-	//boost 1.33 throws an error with files containing ~ or $ chars but 1.38 doesnt
-	boostfs::path pathx((*this).tostring().c_str());
+		//boost 1.33 throws an error with files containing ~ or $ chars but 1.38 doesnt
+		boostfs::path pathx((*this).tostring().c_str());
 
         if (!boostfs::exists(pathx)) return L"";
         if (!boostfs::is_directory(pathx)) return L"";

@@ -279,6 +279,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\mvfunctor.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\mvglobalfuncs.cpp"
 				>
 			</File>
@@ -417,6 +421,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\mvfunctor.h"
+				>
+			</File>
+			<File
 				RelativePath=".\mvimpl.h"
 				>
 			</File>
@@ -430,6 +438,10 @@
 			</File>
 			<File
 				RelativePath=".\mvlink.h"
+				>
+			</File>
+			<File
+				RelativePath=".\mvlink2.h"
 				>
 			</File>
 			<File
