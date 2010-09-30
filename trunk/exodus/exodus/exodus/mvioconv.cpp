@@ -20,7 +20,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-
 #define MV_NO_NARROW
 
 //C4530: C++ exception handler used, but unwind semantics are not enabled. 
