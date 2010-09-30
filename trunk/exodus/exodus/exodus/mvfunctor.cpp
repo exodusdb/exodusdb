@@ -70,36 +70,33 @@ void ExodusFunctorBase::checkload()
 
 	//find the library or fail
 	if (not openlib())
-		throw MVException(L"Unable to load " ^ var(_libraryname) ^ L".dll/so");
+		throw MVException(L"Unable to load " ^ var(_libraryfilename) ^ L".dll/so");
 
 	//find the function or fail
 	if (not openfunc())
 		throw MVException(L"Unable to find "
 		^ var(_functionname)
 		^ L" in "
-		^ var(_libraryname)
+		^ var(_libraryfilename)
 		^ L".dll/so");
 }
 
 bool ExodusFunctorBase::openlib()
 {
 	//open the library or return 0
-	//        println(_libraryname+EXODUSLIBEXT);
 	//dlopen arg2 is ignored by macro on windows
 
 #ifdef dlerror
 	dlerror();
 #endif
-
-	_plibrary=(void*) dlopen((EXODUSLIBPREFIX _libraryname+EXODUSLIBEXT).c_str(), 
-RTLD_NOW);
+	_libraryfilename=EXODUSLIBPREFIX _libraryname+EXODUSLIBEXT;
+	_plibrary=(void*) dlopen(_libraryfilename.c_str(),RTLD_NOW);
 
 #ifdef dlerror
-	const char *dlsym_error = dlerror();
+	const char* dlsym_error = dlerror();
 	if (dlsym_error)
 		var(dlsym_error).outputln();
 #endif
-
 	return _plibrary!=NULL;
 }
 
@@ -114,11 +111,10 @@ bool ExodusFunctorBase::openfunc()
 	_pfunction = (void*) dlsym((library_t) _plibrary, _functionname.c_str());
 
 #ifdef dlerror
-	const char *dlsym_error = dlerror();
+	const char* dlsym_error = dlerror();
 	if (dlsym_error)
 		var(dlsym_error).outputln();
 #endif
-
 	return _pfunction!=NULL;
 }
 
