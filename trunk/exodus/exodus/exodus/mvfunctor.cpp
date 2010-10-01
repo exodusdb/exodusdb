@@ -46,6 +46,9 @@ typedef HINSTANCE library_t;
 //# define EXODUSLIBPREFIX "./lib"+
 #endif
 
+//needed for getenv
+#include <stdlib.h>
+
 #include <exodus/mv.h>
 #include <exodus/mvfunctor.h>
 
@@ -78,8 +81,7 @@ void ExodusFunctorBase::checkload()
 		throw MVException(L"Unable to find "
 		^ var(_functionname)
 		^ L" in "
-		^ var(_libraryfilename)
-		^ L".dll/so");
+		^ var(_libraryfilename));
 }
 
 bool ExodusFunctorBase::openlib()
@@ -90,11 +92,22 @@ bool ExodusFunctorBase::openlib()
 #ifdef dlerror
 	dlerror();
 #endif
+
 	//TODO optimise with std::string instead of var
+	/*
 	_libraryfilename=EXODUSLIBPREFIX _libraryname+EXODUSLIBEXT;
 	var home;
 	home.osgetenv(L"HOME");
-_libraryfilename=var(_libraryfilename).swap(L"~",home).tostring();
+	_libraryfilename=var(_libraryfilename).swap(L"~",home).tostring();
+	*/
+	//#include <stdlib.h>
+	_libraryfilename=EXODUSLIBPREFIX _libraryname+EXODUSLIBEXT;
+	if (_libraryfilename[0]=='~')
+		#pragma warning (disable: 4996)
+		//env string is copied into string so following getenv usage is safe
+		_libraryfilename.replace(0,1, getenv("HOME"));
+
+	//var(_libraryfilename).outputln();
 
 	_plibrary=(void*) dlopen(_libraryfilename.c_str(),RTLD_NOW);
 
@@ -103,6 +116,7 @@ _libraryfilename=var(_libraryfilename).swap(L"~",home).tostring();
 	if (dlsym_error)
 		var(dlsym_error).outputln();
 #endif
+
 	return _plibrary!=NULL;
 }
 
@@ -114,6 +128,9 @@ bool ExodusFunctorBase::openfunc()
 #ifdef dlerror
 	dlerror();
 #endif
+
+	//var(_libraryfilename)^L" "^var(_functionname).outputln();
+
 	_pfunction = (void*) dlsym((library_t) _plibrary, _functionname.c_str());
 
 #ifdef dlerror

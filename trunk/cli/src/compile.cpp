@@ -1,3 +1,13 @@
+
+//.def file is one way on msvc to force library function names to be "undecorated"
+// and therefore usable in on demand library loading
+//Declaring functions with extern "C" is the other way and seems less complicated
+//but msvc warns that functions defined with extern c cannot return var
+//nevertheless, returning vars seems to work in practice and .def files seem
+//more complicated so for now use extern "C" and not .def files
+#define EXODUS_EXPORT_USING_DEF 0
+#define EXODUS_FUNCTOR_MAXNARGS 20
+
 #include <exodus/exodus.h>
 
 function getparam(in result, in paramname, out paramvalue)
@@ -13,7 +23,10 @@ program() {
 	
 	var command=_COMMAND;
 
+	//we use on demand/jit linking using dlopen/dlsym
 	var loadtimelinking=false;
+
+	var usedeffile=false;
 
 	//extract options
 	var verbose=index(_OPTIONS,"V");
@@ -302,6 +315,8 @@ program() {
 
 		//basic compiler options
 		basicoptions=" /EHsc /W3 /Zi /TP /D \"_CONSOLE\"";
+		//to capture output after macro expansion
+		//basicoptions^=" /E";
 
 		//exodus library
 		if (debugging)
@@ -427,17 +442,21 @@ program() {
 		//and, for subroutines and functions, create header file (even if compilation not successful)
 		var crlf="\r\n";
 		var headertext="";
-		var deftext="";
-		var defordinal=0;
 		converter(text,"\r\n",FM^FM);
 		var nlines=dcount(text,FM);
 		varray text2(nlines);
 		text.matparse(text2);
+
+#if EXODUS_EXPORT_USING_DEF
+		var deftext="";
+		var defordinal=0;
+#endif
 		for (int ln=1;ln<=nlines;++ln) {
 			var line=trimf(text2(ln));
 			var word1=line.field(" ",1);
 
-			//for external subroutines (dll/so libraries), build up .h and .def text
+			//for external subroutines (dll/so libraries), build up .h
+			// and maybe .def file text
 			if (not(isprogram) and word1 eq "function" or word1 eq "subroutine") {
 
 				//extract out the function declaration in including arguments
@@ -446,9 +465,10 @@ program() {
 
 				var funcname=funcdecl.field(" ",2).field("(",1);
 
+#if EXODUS_EXPORT_USING_DEF
 				++defordinal;
 				deftext^=crlf^" "^funcname^" @"^defordinal;
-
+#endif
 				if (loadtimelinking)
 				{
 					headertext^=crlf^funcdecl^";";
@@ -458,43 +478,60 @@ program() {
 					var libname=filebase;
 					var funcreturn=(word1=="function")?"var":"void";
 					var funcreturnvoid=(word1=="function")?0:1;
-					var funcargs=funcdecl.field("(",2).field(")",1);
+					var funcargsdecl=funcdecl.field("(",2).field(")",1);
 
 					//work out the function arguments without declaratives
 					//to be inserted in the calling brackets.
-					var funcargs2=funcargs;
-					int nargs=dcount(funcargs,",");
+					var funcargs="";
+					var funcargstype="";
+					int nargs=dcount(funcargsdecl,",");
 					for (int argn=1;argn<=nargs;++argn)
-						fieldstorer(funcargs2,',',argn,1,field(funcargs,',',argn).field2(" ",-1));
+					{
+						var funcarg=field(funcargsdecl,',',argn).trim();
 
-					headertext^=crlf;
-					headertext^="#define EXODUSLIBNAME "^libname^crlf;
-					headertext^="#define EXODUSFUNCNAME "^funcname^crlf;
-					headertext^="#define EXODUSFUNCRETURN "^funcreturn^crlf;
-					headertext^="#define EXODUSFUNCARGS "^funcargs^crlf;
-					headertext^="#define EXODUSFUNCARGS2 "^funcargs2^crlf;
-					headertext^="#define EXODUSFUNCTORCLASSNAME ExodusFunctor_"^funcname^crlf;
-					headertext^="#define EXODUSFUNCTYPE ExodusDynamic_"^funcname^crlf;
-					headertext^="#define EXODUSLIBNAMEQQ "^libname.quote()^crlf;
-					headertext^="#define EXODUSFUNCNAMEQQ "^funcname.quote()^crlf;
-					//headertext^="#define EXODUSCLASSNAME Exodus_Functor_Class_"^funcname^crlf;
-					headertext^="#define EXODUSFUNCRETURNVOID "^funcreturnvoid^crlf;
-					headertext^="#include <exodus/mvlink.h>"^crlf;
-					headertext^="#undef EXODUSLIBNAME"^crlf;
-					headertext^="#undef EXODUSFUNCNAME"^crlf;
-					headertext^="#undef EXODUSFUNCRETURN"^crlf;
-					headertext^="#undef EXODUSFUNCARGS"^crlf;
-					headertext^="#undef EXODUSFUNCARGS2"^crlf;
-					headertext^="#undef EXODUSFUNCTORCLASSNAME"^crlf;
-					headertext^="#undef EXODUSFUNCTYPE"^crlf;
-					headertext^="#undef EXODUSLIBNAMEQQ"^crlf;
-					headertext^="#undef EXODUSFUNCNAMEQQ"^crlf;
-					headertext^="#undef EXODUSCLASSNAME"^crlf;
-					headertext^="#undef EXODUSFUNCRETURNVOID"^crlf;
+						//assume the last word (by spaces) is the variable name
+						fieldstorer(funcargs,',',argn,1,funcarg.field2(" ",-1));
+
+						//assume everything except the last word (by spaces) is the variable type
+						//wrap it in brackets otherwise when filling in missing parameters
+						//the syntax could be wrong/fail to compile eg "const var&()" v. "(const var&)()"
+						var argtype=field(funcarg," ",1,dcount(funcarg," ")-1);
+						fieldstorer(funcargstype,',',argn,1,argtype);
+					}
+
+					var usepredefinedfunctor=nargs<=EXODUS_FUNCTOR_MAXNARGS;
+					if (usepredefinedfunctor)
+					{
+						//example output for a subroutine with 1 argument of "in" (const var&)
+						//ending of s1 and S1 indicates subroutine of one argument
+						//#include "xmvfunctors1.h"
+						//ExodusFunctorS1<in> func2("func2","func2");
+
+						var functype=funcreturnvoid?"s":"f";
+						headertext^=crlf;
+						headertext^="#include <exodus/xfunctor"^functype^nargs^".h>"^crlf;
+						headertext^="ExodusFunctor"^functype.ucase()^nargs^"<"^funcargstype^"> ";
+						headertext^=funcname^"("^libname.quote()^","^funcname.quote()^");";
+
+					} else {
+						headertext^=crlf;
+						headertext^="#define EXODUSLIBNAME "^libname.quote()^crlf;
+						headertext^="#define EXODUSFUNCNAME "^funcname.quote()^crlf;
+						headertext^="#define EXODUSFUNCNAME0 "^funcname^crlf;
+						headertext^="#define EXODUSFUNCRETURN "^funcreturn^crlf;
+						headertext^="#define EXODUSFUNCRETURNVOID "^funcreturnvoid^crlf;
+						headertext^="#define EXODUSfuncargsdecl "^funcargsdecl^crlf;
+						headertext^="#define EXODUSfuncargs "^funcargs^crlf;
+						headertext^="#define EXODUSFUNCTORCLASSNAME ExodusFunctor_"^funcname^crlf;
+						headertext^="#define EXODUSFUNCTYPE ExodusDynamic_"^funcname^crlf;
+						//headertext^="#define EXODUSCLASSNAME Exodus_Functor_Class_"^funcname^crlf;
+						headertext^="#include <exodus/mvlink.h>"^crlf;
+						//undefs are automatic at the end of mvlink.h to allow multiple inclusion
+					}
 				}
 			}
 
-			//build up list of libraries required by linker
+			//build up list of loadtime libraries required by linker
 			if (loadtimelinking and word1 eq "#include") {
 				var word2=line.field(" ",2);
 				if (word2.substr(1,1)==DQ) {
@@ -514,6 +551,7 @@ program() {
 			oswrite(headertext,headerfilename);
 		}
 
+#if EXODUS_EXPORT_USING_DEF
 		//add .def file to linker so that functions get exported without "c++ name decoration"
 		//then the runtime loader dlsym() can find the functions by their original (undecorated) name
 		//http://wyw.dcweb.cn/stdcall.htm
@@ -525,9 +563,10 @@ program() {
 			deftext.splicer(1,0,"LIBRARY "^filebase^crlf^"EXPORTS");
 			var deffilename=filebase^".def";
 			oswrite(deftext,deffilename);
-			//if (compiler=="cl")
-			//	linkoptions^=" /def:"^filebase^".def";
+			if (compiler=="cl" and usedeffile)
+				linkoptions^=" /def:"^filebase^".def";
 		}
+#endif
 
 		if (debugging) {
 			binfileextension.outputln("Bin file extension");

@@ -107,32 +107,6 @@ bool openfunc();
 
 };
 
-/*
-#define EXODUSFUNCNAME subr3
-#define EXODUSLIBNAME lib1
-#define EXODUSFUNCNAME subr3
-#define EXODUSFUNCRETURN void
-#define EXODUSFUNCARGS in arg1
-#define EXODUSFUNCARGS2 arg1
-#define EXODUSFUNCTORCLASSNAME ExodusFunctor_subr3
-#define EXODUSFUNCTYPE ExodusDynamic_subr3
-#define EXODUSLIBNAMEQQ "lib1"
-#define EXODUSFUNCNAMEQQ "subr3"
-#define EXODUSFUNCRETURNVOID 1
-#include <exodus/mvlink.h>
-#undef EXODUSLIBNAME
-#undef EXODUSFUNCNAME
-#undef EXODUSFUNCRETURN
-#undef EXODUSFUNCARGS
-#undef EXODUSFUNCARGS2
-#undef EXODUSFUNCTORCLASSNAME
-#undef EXODUSFUNCTYPE
-#undef EXODUSLIBNAMEQQ
-#undef EXODUSFUNCNAMEQQ
-#undef EXODUSCLASSNAME
-#undef EXODUSFUNCRETURNVOID
-*/
-
 }//namespace exodus
 
 #endif //MVFUNCTOR_H

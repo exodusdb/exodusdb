@@ -34,7 +34,6 @@ program()
 	//	println("Warning: Cannot find libpq.dll to connect to postgres");
 
 	var command=_SENTENCE.field(" ",2,999999);
-
 	var shell;
 	if (_SLASH eq "/" and shell.osgetenv("SHELL"))
 	{
