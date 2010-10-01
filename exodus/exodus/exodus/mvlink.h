@@ -30,29 +30,16 @@ like a function/subroutine
 
 NB this header is generated AUTOMATICALLY by the command "compile lib1"
 
-#define EXODUSFUNCNAME subr3
-#define EXODUSLIBNAME lib1
+#define EXODUSLIBNAME "lib1"
+#define EXODUSFUNCNAME "subr3"
 #define EXODUSFUNCNAME subr3
 #define EXODUSFUNCRETURN void
+#define EXODUSFUNCRETURNVOID 1
 #define EXODUSFUNCARGS in arg1
 #define EXODUSFUNCARGS2 arg1
 #define EXODUSFUNCTORCLASSNAME ExodusFunctor_subr3
 #define EXODUSFUNCTYPE ExodusDynamic_subr3
-#define EXODUSLIBNAMEQQ "lib1"
-#define EXODUSFUNCNAMEQQ "subr3"
-#define EXODUSFUNCRETURNVOID 1
 #include <exodus/mvlink.h>
-#undef EXODUSLIBNAME
-#undef EXODUSFUNCNAME
-#undef EXODUSFUNCRETURN
-#undef EXODUSFUNCARGS
-#undef EXODUSFUNCARGS2
-#undef EXODUSFUNCTORCLASSNAME
-#undef EXODUSFUNCTYPE
-#undef EXODUSLIBNAMEQQ
-#undef EXODUSFUNCNAMEQQ
-#undef EXODUSCLASSNAME
-#undef EXODUSFUNCRETURNVOID
 
 */
 
@@ -62,11 +49,14 @@ NB this header is generated AUTOMATICALLY by the command "compile lib1"
 
 #include "mvfunctor.h"
 
+//mostly not template so dont require that parameter
+#ifndef EXODUSFUNCTORTEMPLATE
+#define EXODUSFUNCTORTEMPLATE
+#endif
+
 namespace exodus {
 
-// declare DLL/SO function type
-typedef EXODUSFUNCRETURN (*EXODUSFUNCTYPE)(EXODUSFUNCARGS);
-
+EXODUSFUNCTORTEMPLATE
 class EXODUSFUNCTORCLASSNAME : private ExodusFunctorBase
 {
 public:
@@ -78,6 +68,10 @@ public:
  EXODUSFUNCRETURN operator() (EXODUSFUNCARGS)
  {
 	checkload();
+
+	// declare DLL/SO function type EXODUSFUNCTYPE
+	typedef EXODUSFUNCRETURN (*EXODUSFUNCTYPE)(EXODUSFUNCARGS);
+
 #if EXODUSFUNCRETURNVOID == 1
 	((EXODUSFUNCTYPE) _pfunction)(EXODUSFUNCARGS2);
 	return;
@@ -89,9 +83,24 @@ public:
 };
 
 
+//if not building a template
 //define a functor object so the function can be called like aaa=func1(a,b,c)
 //with automatic just in  time loading of the shared library (dll/so etc)
 //ExodusFunctor_func1 func1("lib1","func1");
-EXODUSFUNCTORCLASSNAME EXODUSFUNCNAME(EXODUSLIBNAMEQQ,EXODUSFUNCNAMEQQ);
+#ifdef EXODUSLIBNAME
+EXODUSFUNCTORCLASSNAME EXODUSFUNCNAME0(EXODUSLIBNAME,EXODUSFUNCNAME);
+#endif
+
+#undef EXODUSFUNCTORTEMPLATE
+#undef EXODUSLIBNAME
+#undef EXODUSFUNCNAME
+#undef EXODUSFUNCNAME0
+#undef EXODUSFUNCRETURN
+#undef EXODUSFUNCRETURNVOID
+#undef EXODUSFUNCARGS
+#undef EXODUSFUNCARGS2
+#undef EXODUSFUNCTORCLASSNAME
+#undef EXODUSFUNCTYPE
+#undef EXODUSCLASSNAME
 
 }//namespace exodus
