@@ -133,7 +133,14 @@ void var::abort(const var& text) const
 bool var::assigned() const
 {
 	THISIS(L"bool var::assigned() const")
-	THISISDEFINED()
+
+	//treat undefined as unassigned
+	//undefined is a state where we are USING the variable before its contructor has been called!
+	//which is possible (in syntax like var xx.osread()?)
+	//and also when passing default variables to functions in the functors on gcc
+	//THISISDEFINED()
+	if (!this||(*this).var_mvtype&mvtypemask)
+		return false;
 
 	return var_mvtype!=pimpl::MVTYPE_UNA;
 }
@@ -141,7 +148,11 @@ bool var::assigned() const
 bool var::unassigned() const
 {
 	THISIS(L"bool var::unassigned() const")
-	THISISDEFINED()
+
+	//see explanation above in assigned
+	//THISISDEFINED()
+	if (!this||!((*this).var_mvtype&mvtypemask))
+		return true;
 
 	return !var_mvtype;
 }

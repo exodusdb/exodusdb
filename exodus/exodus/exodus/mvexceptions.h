@@ -68,10 +68,8 @@ THE SOFTWARE.
 	if (!VARNAME.isnum()) \
 	throw MVNonNumeric(var(functionname) ^ L" : " ^ var(#VARNAME) ^ L" is " ^ VARNAME.substr(1,20).quote()); \
 
-
-
 #define THISISDEFINED() \
-	if ((*this).var_mvtype&mvtypemask) \
+	if (!this||(*this).var_mvtype&mvtypemask) \
 		throw MVUndefined(L"var in " ^ var(functionname)); \
 
 //includes isdefined
