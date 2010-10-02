@@ -374,6 +374,10 @@
 				RelativePath=".\Stackwalker.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\xfunctorf0.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="include"
