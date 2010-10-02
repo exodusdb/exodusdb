@@ -48,6 +48,9 @@ subroutine genfunctor(in mode, in nargs) {
     templatedecl^=", class T"^argn;
   }
   var head2=head;
+  if (nargs==0)
+   head2.swapper("\ntemplate<","//NB we generate a class with an unused template argument!\ntemplate<");
+  else
    head2.swapper("<class T1>","<"^templatedecl.substr(3)^">");
   if (mode=="subroutine")
    head2.swapper("Subroutine1","S"^nargs);

@@ -483,7 +483,8 @@ program() {
 					//work out the function arguments without declaratives
 					//to be inserted in the calling brackets.
 					var funcargs="";
-					var funcargstype="";
+					//default to one template argument for functors with zero arguments
+					var funcargstype="int";
 					int nargs=dcount(funcargsdecl,",");
 					for (int argn=1;argn<=nargs;++argn)
 					{
