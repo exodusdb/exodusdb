@@ -460,6 +460,14 @@
 				RelativePath=".\TConvert.h"
 				>
 			</File>
+		</Filter>
+		<Filter
+			Name="include2"
+			>
+			<File
+				RelativePath=".\genfunctors.cpp"
+				>
+			</File>
 			<File
 				RelativePath=".\xfunctorf0.h"
 				>
@@ -628,12 +636,6 @@
 				RelativePath=".\xfunctors9.h"
 				>
 			</File>
-		</Filter>
-		<Filter
-			Name="Resource Files"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
-			>
 		</Filter>
 		<File
 			RelativePath=".\LICENCE.TXT"

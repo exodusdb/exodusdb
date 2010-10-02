@@ -105,8 +105,8 @@ subroutine genfunctor(in mode, in nargs) {
 }
 
 //change to program to run as command line
-//program() {
-subroutine genfunctors() {
+program() {
+//subroutine genfunctors() {
 
  for (int nargs=0;nargs<=EXODUS_FUNCTOR_MAXNARGS;++nargs) {
   genfunctor("function",nargs);
