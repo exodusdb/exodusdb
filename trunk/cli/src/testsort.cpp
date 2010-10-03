@@ -34,6 +34,11 @@ program()
 
 	//written with pick style "global function" syntax instead of OO style "method calls"
 
+	if (not var().connect()) {
+		println("Cannot connect to database. Please check configuration");
+		stop();
+	}
+
 	var filename="test_clients";
 	var dictfilename="dict_" ^ filename;
 
