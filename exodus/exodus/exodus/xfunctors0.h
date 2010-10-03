@@ -5,7 +5,8 @@
 
 #include <exodus/mvfunctor.h>
 
-template<>
+//NB we generate a class with an unused template argument
+template<class T1>
 class ExodusFunctorS0 : private ExodusFunctorBase
 {
 public:
