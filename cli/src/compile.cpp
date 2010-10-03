@@ -490,6 +490,10 @@ program() {
 					{
 						var funcarg=field(funcargsdecl,',',argn).trim();
 
+						//remove any default arguments (after =)
+						//TODO verify this is ok with <exodus/mvlink.h> method below
+						funcarg=field(funcarg,"=",1).trim();
+
 						//assume the last word (by spaces) is the variable name
 						fieldstorer(funcargs,',',argn,1,funcarg.field2(" ",-1));
 
@@ -509,10 +513,20 @@ program() {
 						//ExodusFunctorS1<in> func2("func2","func2");
 
 						var functype=funcreturnvoid?"s":"f";
-						headertext^=crlf;
-						headertext^="#include <exodus/xfunctor"^functype^nargs^".h>"^crlf;
-						headertext^="ExodusFunctor"^functype.ucase()^nargs^"<"^funcargstype^"> ";
-						headertext^=funcname^"("^libname.quote()^","^funcname.quote()^");";
+
+						var funcdecl="ExodusFunctor"^functype.ucase()^nargs^"<"^funcargstype^"> ";
+						funcdecl^=funcname^"("^libname.quote()^","^funcname.quote()^");";
+
+						//dont include more than once in the header file
+						//function might appear more than once if declared and defined separately
+						if (not index(headertext,funcdecl)) {
+							headertext^=crlf;
+							headertext^=crlf;
+							var includefunctor="#include <exodus/xfunctor"^functype^nargs^".h>"^crlf;
+							if (not index(headertext,includefunctor))
+								headertext^=includefunctor;
+							headertext^=funcdecl;
+						}
 
 					} else {
 						headertext^=crlf;
