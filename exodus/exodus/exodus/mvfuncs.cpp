@@ -151,7 +151,7 @@ bool var::unassigned() const
 
 	//see explanation above in assigned
 	//THISISDEFINED()
-	if (!this||!((*this).var_mvtype&mvtypemask))
+	if (!this||((*this).var_mvtype&mvtypemask))
 		return true;
 
 	return !var_mvtype;

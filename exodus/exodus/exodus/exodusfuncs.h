@@ -83,9 +83,10 @@ DLL_PUBLIC void setcursor(const var& cursor);
 DLL_PUBLIC var getprompt();
 DLL_PUBLIC void setprompt(const var& prompt);
 
-DLL_PUBLIC var inputln();
-DLL_PUBLIC var inputln(const var& prompt=L"");
-DLL_PUBLIC var input(const var& n);
+DLL_PUBLIC var input();
+DLL_PUBLIC void input(var& instr);
+DLL_PUBLIC void input(const var& prompt, var& instr);
+DLL_PUBLIC void inputn(var& instr, const var& n);
 
 DLL_PUBLIC var len(const var& mv1);
 DLL_PUBLIC var length(const var& mv1);

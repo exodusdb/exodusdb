@@ -32,8 +32,8 @@ THE SOFTWARE.
 #include <exodus/mvenvironment.h>
 
 //always last to avoid conflicting definitions
-#include <exodus/exodusfuncs.h>
 #include <exodus/exodusmacros.h>
+#include <exodus/exodusfuncs.h>
 
 //it usually poor practice to "pollute" the global space of the header user
 //but in this case the header user is an exodus application programmer

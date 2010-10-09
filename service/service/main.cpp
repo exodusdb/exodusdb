@@ -168,28 +168,50 @@ private:
 
 program()
 {
+	/*
+	var inpz=input();
 
+	var inpx;
+	input(inpx);
+
+	var inpy;
+	input("prompt",inpy);
+
+	var inpq;
+	inputn(inpq,5);
+	*/
+
+	//ossetenv("EXODUS_PORT",5433);
+	//if (not connect("port=5433"))
+	//	stop("Cannot connect!");
+
+	oconv(1234,"MD20P").outputln();
 	assert(var(10000).oconv("DY0")=="");
 
-	createfile("dict_test_symbolics");
+	if (not var().open("dict_test_symbolics"))
+		createfile("dict_test_symbolics");
 	write("F"^FM^0^FM^"ID","dict_test_symbolics","ID");
 	write("S"^FM^FM^"Col1","dict_test_symbolics","SYMCOL1");
 
-	createfile("test_symbolics");
+	if (not var().open("test_symbolics"))
+		createfile("test_symbolics");
 	write(1000^FM^2000,"test_symbolics","3000");
 
-	//select("select test_symbolics with SYMCOL1 = 3000 or with ID = 3000");
-	select("select test_symbolics with SYMCOL1 = 124");
-
-	var key1;
-	if (!readnext(key1))
-		println("no 124");
+	if (select("select test_symbolics with SYMCOL1 = 3000 or with ID = 3000")) {
+	//if (select("select test_symbolics with SYMCOL1 = 124")) {
+		var key1;
+		if (not readnext(key1))
+			println("no 124");
+		var xrec;
+		if (not xrec.read("test_symbolics",key1))
+			println(key1, " missing"); 
+	}
 
 	assert(var("a")<var("B"));
-	oconv(1000,"MD80").outputln();
+	assert(var(1000).oconv("MD80").outputln("1000 MD80->")=="1000.00000000");
 	assert(var("31 JAN 2008").iconv("D")=="14641");
 
-	assert(var("1/31/2008").iconv("D")=="14641");
+	assert(var("1/31/2008").iconv("D")==14641);
 	assert(var("2008/1/31").iconv("DS")=="14641");
 
 	assert(var("JAN/31/2008").iconv("D")=="14641");
@@ -206,10 +228,10 @@ program()
 	assert(var("30/2/2008").iconv("DE")=="");
 	assert(var("1/31/2008").iconv("DE")=="");
 
-/*
-	select("select test_alphanum with f1 between 20 and 21");
+	//select("select test_alphanum with f1 between 20 and 21");
 	println(oconv(10.1,"MD20"));
 
+	/*
 	var alphanum1="Flat 10a";
 	var alphanum2="Flat 2b";
 	//Flat 2b is before Flat 10a
@@ -394,8 +416,7 @@ while trying to match the argument list '(exodus::var, bool)'
 	space(-11);
 	var("x").str(-7);
 
-	/*
-	//catch a runtime error
+	//test catching MVexceptions
 	try {
 		//runtime errors
 		var x1=x1^=1;
@@ -406,7 +427,6 @@ while trying to match the argument list '(exodus::var, bool)'
 	catch (MVException except) {
 		print(except.description);
 	}
-	*/
 
 	var x9;
 //	if (var xx==x) {};
@@ -541,9 +561,10 @@ MT'h' 63306 17h35
 
 	var hexx=oconv(FM ^ L"\x0035","HEX");
 	hexx=oconv(FM,"HEX");
-	println(osdir("/"));
 
-	osmkdir("xxxy");
+	println(osdir("/"));
+	osrmdir("xxxyzz");
+	osmkdir("xxxyzz");
 	osrmdir("xxxy");
 	println(var("/xyz/aaa").osmkdir());
 	println(var("/xyz").osrmdir());

@@ -322,19 +322,26 @@ void DLL_PUBLIC setprompt(const var& prompt)
 	prompt.setprompt();
 }
 
-DLL_PUBLIC bool inputln(var& inputfield)
+DLL_PUBLIC var input()
 {
-	return inputfield.inputln();
+	var temp;
+	temp.inputln();
+	return temp;
 }
 
-DLL_PUBLIC bool inputln(const var& prompt, var& inputfield)
+DLL_PUBLIC void input(var& inputfield)
 {
-	return inputfield.inputln(prompt);
+	inputfield.inputln();
 }
 
-DLL_PUBLIC bool input(var& inputfield, const var& n)
+DLL_PUBLIC void input(const var& prompt, var& inputfield)
 {
-	return inputfield.input(n);
+	inputfield.inputln(prompt);
+}
+
+DLL_PUBLIC void inputn(var& inputfield, const var& n)
+{
+	inputfield.input(n);
 }
 
 DLL_PUBLIC var len(const var& var1)

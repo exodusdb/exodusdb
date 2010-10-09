@@ -227,9 +227,15 @@ bool msvc_PQconnectdb(PGconn** pgconn, const std::string& conninfo)
 bool var::connect(const var& conninfo)
 {
 	THISIS(L"bool var::connect(const var& conninfo)")
+	var defaultconninfo=L"host=127.0.0.1 port=5432 dbname=exodus user=exodus password=somesillysecret connect_timeout=10";
+	//priority is
+	//1) given parameters or last connection parameters
+	//2) individual environment parameters
+	//3) environment connection string
+	//4) config file parameters
+	//5) default parameters
 
 	//nb dont log/trace or otherwise output the full connection info without HIDING the password
-	var defaultconninfo=L"host=127.0.0.1 port=5432 dbname=exodus user=exodus password=somesillysecret connect_timeout=10";
 	THISISDEFINED()
 	ISSTRING(conninfo)
 
@@ -241,27 +247,56 @@ bool var::connect(const var& conninfo)
 	//if no conninfo details provided then use last connection details if any
 	if (!conninfo && tss_pgconnparams.get())
 		conninfo2==*tss_pgconnparams.get();
-
+	
 	//otherwise search for details from exodus config file
-	if (!conninfo2)
+	//if incomplete connection parameters provided
+	if (not conninfo2.index(L"host=") or 
+		not conninfo2.index(L"port=") or
+		not conninfo2.index(L"dbname=") or
+		not conninfo2.index(L"user=") or
+		not conninfo2.index(L"password=")
+		)
 	{
-		if (not conninfo2.osgetenv(L"EXODUS_CONNECTION"))
-		{
-			var configfilename=L"";
-			var home;
-			if (home.osgetenv(L"HOME"))
-				configfilename=home^L"/.exodus";
-			else {
-				home.osgetenv(L"USERPROFILE");
-				configfilename^=home^L"\\.exodus";
-			}
-			if (not conninfo2.osread(configfilename))
-			{
-				//try to connect without info using libpq defaults (pg config files and env vars)
-				//exodus::errputln(L"connect() config missing. Please login.");
-				//return false;
-			}
-		}
+
+		//discover any configuration file parameters
+		//TODO parse config properly instead of just changing \n\r to spaces!
+		var configfilename=L"";
+		var home="";
+		if (home.osgetenv(L"HOME"))
+			configfilename=home^_SLASH^L".exodus";
+		else if (home.osgetenv(L"USERPROFILE"))
+			configfilename^=home^_SLASH^L".exodus";
+		var configconn=L"";
+		if (!configconn.osread(configfilename))
+			configconn.osread(L".exodus");
+
+		//discover any configuration in the environment
+		var envconn=L"";
+		var temp;
+		if (temp.osgetenv(L"EXODUS_CONNECTION"))
+			envconn^=L" "^temp;
+
+		//specific variable are appended ie override
+		if (temp.osgetenv(L"EXODUS_HOST"))
+			envconn^=L" host="^temp;
+
+		if (temp.osgetenv(L"EXODUS_PORT"))
+			envconn^=L" port="^temp;
+
+		if (temp.osgetenv(L"EXODUS_USER"))
+			envconn^=L" user="^temp;
+
+		if (temp.osgetenv(L"EXODUS_DBNAME"))
+			envconn^=L" dbname="^temp;
+
+		if (temp.osgetenv(L"EXODUS_PASSWORD"))
+			envconn^=L" password="^temp;
+
+		if (temp.osgetenv(L"EXODUS_TIMEOUT"))
+			envconn^=L" connect_timeout="^temp;
+
+		conninfo2=defaultconninfo^L" "^configconn^L" "^envconn^L" "^conninfo2;
+
 	}
  
 	//disconnect any previous connection
@@ -298,8 +333,9 @@ bool var::connect(const var& conninfo)
 	{
 		#if TRACING >= 2
 			exodus::errputln(L"var::connect() Connection to database failed: " ^ var(PQerrorMessage(pgconn)));
-			if (not conninfo2)
-				exodus::errputln(L"var::connect() Postgres login configuration missing or incorrect. Please login.");
+			//if (not conninfo2)
+				exodus::errputln(L"var::connect() Postgres connection configuration missing or incorrect. Please login.");
+;
 		#endif
 		PQfinish(pgconn);
 		return false;
@@ -362,7 +398,8 @@ void* var::connection() const
 		{
 			//handle failure to connect here to avoid error handling on every connection
 			//calling process can always use connect() or try/catch
-			throw MVDBException(L"connection(): Cannot connect. Please login");
+			//throw MVDBException(L"connection(): Cannot connect. Please login");
+			return NULL;
 		}
 		//get the new connection
 		thread_pgconn=tss_pgconns.get();
@@ -438,6 +475,8 @@ bool var::open(const var& dictcode,const var& filename)
     sql^= L" WHERE key = $1";
 
     PGconn* thread_pgconn=(PGconn*) connection();
+	if (!thread_pgconn)
+		return false;
 	DEBUG_LOG_SQL1
 	PGresult* result = PQexecParams(thread_pgconn,
     					//TODO: parameterise filename
@@ -453,7 +492,9 @@ bool var::open(const var& dictcode,const var& filename)
     {
 		PQclear(result);
 		#if TRACING >= 2
-	        exodus::errputln(L"OPEN failed: " ^ var(PQerrorMessage(thread_pgconn)));
+			var errmsg=PQerrorMessage(thread_pgconn);
+			if (!errmsg.index(L"does not exist"))
+		        exodus::errputln(L"OPEN failed: " ^ errmsg);
         #endif
         return false;
     }
@@ -511,6 +552,8 @@ bool var::read(const var& filehandle,const var& key)
 	var sql=L"SELECT data FROM " PGDATAFILEPREFIX ^ filehandle ^ L" WHERE key = $1";
 
     PGconn* thread_pgconn=(PGconn*) connection();
+	if (!thread_pgconn)
+		return false;
 	DEBUG_LOG_SQL1
 	PGresult* result = PQexecParams(thread_pgconn,
     					//TODO: parameterise filename
@@ -601,6 +644,8 @@ bool var::lock(const var& key) const
 	char* sql="SELECT PG_TRY_ADVISORY_LOCK($1)";
 
     PGconn* thread_pgconn=(PGconn*) connection();
+	if (!thread_pgconn)
+		return false;
 	DEBUG_LOG_SQL1
 	PGresult* result = PQexecParams(thread_pgconn,
     					//TODO: parameterise filename
@@ -668,6 +713,8 @@ void var::unlock(const var& key) const
 	char* sql="SELECT PG_ADVISORY_UNLOCK($1)";
 
     PGconn* thread_pgconn=(PGconn*) connection();
+	if (!thread_pgconn)
+		return;
 	DEBUG_LOG_SQL1
 	PGresult* result = PQexecParams(thread_pgconn,
     					//TODO: parameterise filename
@@ -710,25 +757,27 @@ void var::unlockall() const
 	}
 
 	var sql=L"SELECT PG_ADVISORY_UNLOCK_ALL()";
-
-	//execute command or return empty string
-	PGresultptr result;
-	if (!pqexec(sql,result))
-		return;
-/*
-	if (PQresultStatus(result) != PGRES_TUPLES_OK || PQntuples(result) != 1)
- 	{
-		PQclear(result);
-	    PGconn* thread_pgconn=(PGconn*) connection();
-		throw MVException(L"unlockall()\n" ^ var(PQerrorMessage(thread_pgconn)));
-		return;
-	}
-*/
-	PQclear(result);
-	return;
+	sql.sqlexec();
 
 }
 
+//returns success or failure but no data
+bool var::sqlexec() const
+{
+	THISIS(L"bool var::sqlexec() const")
+	THISISSTRING()
+
+	//check/establish connection
+	if (!connection())
+		return false;
+
+	PGresultptr result;
+	if (!pqexec(*this,result))
+		return false;
+	PQclear(result);
+	return true;
+
+}
 
 bool var::writev(const var& filehandle,const var& key,const int fieldn) const
 {
@@ -886,6 +935,8 @@ bool var::write(const var& filehandle, const var& key) const
 	sql = L"UPDATE " PGDATAFILEPREFIX ^ filehandle ^ L" SET data = $2 WHERE key = $1";
 
 	PGconn* thread_pgconn=(PGconn*) connection();
+	if (!thread_pgconn)
+		return false;
 	DEBUG_LOG_SQL1
     PGresult* result = PQexecParams(thread_pgconn,
     					//TODO: parameterise filename
@@ -974,6 +1025,8 @@ bool var::updaterecord(const var& filehandle,const var& key) const
 	var sql = L"UPDATE " PGDATAFILEPREFIX ^ filehandle ^ L" SET data = $2 WHERE key = $1";
 
 	PGconn* thread_pgconn=(PGconn*) connection();
+	if (!thread_pgconn)
+		return false;
 	DEBUG_LOG_SQL1
     PGresult* result = PQexecParams(thread_pgconn,
 		//TODO: parameterise filename
@@ -1034,6 +1087,8 @@ bool var::insertrecord(const var& filehandle,const var& key) const
 	var sql = L"INSERT INTO " PGDATAFILEPREFIX ^ filehandle ^ L" (key,data) values( $1 , $2)";
 
 	PGconn* thread_pgconn=(PGconn*) connection();
+	if (!thread_pgconn)
+		return false;
 	DEBUG_LOG_SQL1
 	PGresult* result = PQexecParams(thread_pgconn,
 		//TODO: parameterise filename
@@ -1086,6 +1141,8 @@ bool var::deleterecord(const var& key) const
 	var sql=L"DELETE FROM " PGDATAFILEPREFIX ^ var_mvstr ^ L" WHERE KEY = $1";
 
 	PGconn* thread_pgconn=(PGconn*) connection();
+	if (!thread_pgconn)
+		return false;
 	DEBUG_LOG_SQL1
     PGresult* result = PQexecParams(thread_pgconn,
 		sql.tostring().c_str(),
@@ -1172,15 +1229,8 @@ bool var::begin() const
 
 	//begin a transaction
 	var sql=L"BEGIN";
-
-	//execute the sql
-	connection();
-	PGresultptr result;
-	if (!pqexec(sql,result))
-		return false;
-
-	PQclear(result);
-	return true;
+	return sql.sqlexec();
+	
 }
 
 bool var::rollback() const
@@ -1192,15 +1242,7 @@ bool var::rollback() const
 
 	// Rollback a transaction
 	var sql=L"BEGIN";
-
-	//execute the sql
-	connection();
-	PGresultptr result;
-	if (!pqexec(sql,result))
-		return false;
-
-	PQclear(result);
-	return true;
+	return sql.sqlexec();
 
 }
 
@@ -1213,16 +1255,7 @@ bool var::end() const
 
 	//end (commit) a transaction
 	var sql=L"END";
-
-	//execute the sql
-	connection();
-	PGresultptr result;
-	if (!pqexec(sql,result))
-		return false;
-
-	PQclear(result);
-	return true;
-
+	return sql.sqlexec();
 }
 
 bool var::createfile(const var& filename, const var& options)
@@ -1241,14 +1274,7 @@ bool var::createfile(const var& filename, const var& options)
 	sql ^= L" TABLE " PGDATAFILEPREFIX ^ filename.convert(L".",L"_");
 	sql ^= L" (key bytea primary key, data bytea)";
 
-	//execute the sql
-	connection();
-	PGresultptr pgresult;
-	if (!pqexec(sql,pgresult))
-		return false;
-
-	PQclear(pgresult);
-	return true;
+	return sql.sqlexec();
 
 }
 
@@ -1258,16 +1284,7 @@ bool var::deletefile() const
 	THISISSTRING()
 
 	var sql = L"DROP TABLE " PGDATAFILEPREFIX ^ *this;
-
-	//execute the sql
-	connection();
-	PGresultptr pgresult;
-	if (!pqexec(sql,pgresult))
-		return false;
-
-	PQclear(pgresult);
-	return true;
-
+	return sql.sqlexec();
 }
 
 bool var::clearfile() const
@@ -1276,15 +1293,7 @@ bool var::clearfile() const
 	THISISSTRING()
 
 	var sql = L"DELETE FROM " PGDATAFILEPREFIX ^ *this;
-
-	//execute the sql
-	connection();
-	PGresultptr pgresult;
-	if (!pqexec(sql,pgresult))
-		return false;
-
-	PQclear(pgresult);
-	return true;
+	return sql.sqlexec();
 }
 
 inline void unquoter(var& string)
@@ -1828,13 +1837,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	if (!begin())
 		return false;
 
-	//execute the sql
-	connection();
-	PGresultptr pgresult;
-	if (!pqexec(sql,pgresult))
+	if (!sql.sqlexec())
 		return false;
-
-	PQclear(pgresult);
 
 	//allow select to be an assignment where filename becomes the cursor name
 	//if actual file is in the sortselectclause
@@ -1858,13 +1862,8 @@ void var::clearselect() const
     if (var_mvtype)
 		sql ^= *this;
 
-	//execute the sql
-	connection();
-	PGresultptr result;
-	if (!pqexec(sql,result))
+	if (!sql.sqlexec())
 		return;
-
-	PQclear(result);
 
 	// end the transaction
 	end();
@@ -1884,21 +1883,19 @@ bool readnextx(const std::wstring& cursor, PGresultptr& pgresult)
     var sql=L"FETCH NEXT in CURSOR1_" ^ cursor;
 
 	//execute the sql
+	//cant use sqlexec here because it results data
+	//sqlexec();
 	if (!pqexec(sql,pgresult))
 		return false;
 
-    //close cursor if no more
+	//close cursor if no more
 	if (PQntuples(pgresult) < 1)
 	{
 		PQclear(pgresult);
 
 		// close the cursor - we don't bother to check for errors
 		var sql=L"CLOSE CURSOR1_" ^ cursor;
-
-		//execute the sql
-		if (pqexec(sql,pgresult))
-			PQclear(pgresult);
-
+		sql.sqlexec();
 		return false;
 
 	}
@@ -1920,7 +1917,7 @@ bool var::readnext(var& key, var& valuen) const
 	THISIS(L"bool var::readnext(var& key, var& valuen) const")
 	THISISSTRING()
 
-	connection();
+	PGconn* thread_pgconn=(PGconn*) connection();
 	PGresultptr pgresult;
 	if (!readnextx(var_mvstr, pgresult))
 	{
@@ -1928,13 +1925,31 @@ bool var::readnext(var& key, var& valuen) const
 		end();
 		return false;
 	}
+/* abortive code to handle unescaping returned hex/escape data
+	//avoid the need for this by calling pqexecparams flagged for binary
+	//even in the case where there are no parameters and pqexec could be used.
 
+	//eg 90001 is 9.0.1
+	int pgserverversion=PQserverVersion(thread_pgconn);
+	if (pgserverversion>=90001) {
+		var(pgserverversion).outputln();
+		//unsigned char *PQunescapeBytea(const unsigned char *from, size_t *to_length);
+		size_t to_length;
+		unsigned char* unescaped = PQunescapeBytea((const unsigned char*) PQgetvalue(pgresult, 0, 0),
+			&to_length);
+		if (*unescaped)
+			key=wstringfromUTF8((UTF8*)unescaped, to_length);
+		PQfreemem(unescaped);
+		PQclear(pgresult);
+		return true;
+	}
+*/
 	//get the key from the first and only column
 	//char* data = PQgetvalue(result, 0, 0);
 	//int datalen = PQgetlength(result, 0, 0);
 	//key=std::string(data,datalen);
 	key=wstringfromUTF8((UTF8*)PQgetvalue(pgresult, 0, 0), PQgetlength(pgresult, 0, 0));
-
+//key.output(L"key=").len().outputln(L" len=");
 	//TODO implement order by multivalue
 	valuen = 0;
 
@@ -2038,14 +2053,7 @@ bool var::createindex(const var& fieldname, const var& dictfile) const
 	sql^=dictexpression;
 	sql^=L")";
 
-	//execute the command
-	connection();
-	PGresultptr result;
-	if (!pqexec(sql,result))
-		return false;
-
-	PQclear(result);
-	return true;
+	return (sql.sqlexec());
 
 }
 
@@ -2058,15 +2066,7 @@ bool var::deleteindex(const var& fieldname) const
 	//var filename=*this;
 	var sql=L"drop index index__" ^ *this ^ L"__" ^ fieldname;
 
-	//execute the sql
-	connection();
-	PGresultptr result;
-	if (!pqexec(sql,result))
-		return false;
-
-	PQclear(result);
-	return true;
-	
+	return sql.sqlexec();
 }
 
 /*
@@ -2092,7 +2092,7 @@ var var::listfiles() const
 	var sql=L"SELECT table_name FROM information_schema.tables WHERE table_type = 'BASE TABLE' AND table_schema NOT IN ('pg_catalog', 'information_schema'); ";
 
 	//execute command or return empty string
-	connection();
+	//connection();
 	PGresultptr result;
 	if (!pqexec(sql,result))
 		return L"";
@@ -2135,7 +2135,7 @@ var var::listindexes(const var& filename) const
 		 L");";
 
 	//execute command or return empty string
-	connection();
+	//connection();
 	PGresultptr result;
 	if (!pqexec(sql,result))
 		return L"";
@@ -2173,19 +2173,38 @@ int pqexec(const var& sql, PGresultptr& pgresult)
 {
 	int retcode = 1;
 
-	//get the current thread connection
 	PGconn* thread_pgconn=tss_pgconns.get();
 	if (!thread_pgconn)
-		throw MVDBException(L"pqexec missing tss connection");
+		return 0;
+	DEBUG_LOG_SQL1
 
 	//will contain any result IF successful
 	//MUST do PQclear(local_result) after using it;
 	PGresult *local_result;
 
+	/* dont use PQexec because is cannot be told to return binary results
+	 and use PQexecParams with zero parameters instead
 	//execute the command
 	DEBUG_LOG_SQL
 	local_result = PQexec(thread_pgconn, sql.tostring().c_str());
 	pgresult = local_result;
+	*/
+
+	//no parameters
+    const char* paramValues[1];
+    int         paramLengths[1];
+    int         paramFormats[1];
+
+    //PGresult*
+	local_result = PQexecParams(thread_pgconn,
+		sql.tostring().c_str(),
+		0,       /* zero params */
+		NULL,    /* let the backend deduce param type */
+		paramValues,
+		paramLengths,
+		paramFormats,
+		1);      /* ask for binary results */
+	pgresult=local_result;
 
 	if (!local_result) {
 		#if TRACING >=1

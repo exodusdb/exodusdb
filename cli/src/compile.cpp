@@ -10,6 +10,9 @@
 
 #include <exodus/exodus.h>
 
+//#include <exodus/xfunctorf0.h>
+//ExodusFunctorF0<int> xyz;
+
 function getparam(in result, in paramname, out paramvalue)
 {
 	var posn=index(result.ucase(),"\n"^paramname.ucase()^"=");
@@ -20,7 +23,7 @@ function getparam(in result, in paramname, out paramvalue)
 }
 
 program() {
-	
+
 	var command=_COMMAND;
 
 	//we use on demand/jit linking using dlopen/dlsym
@@ -312,19 +315,84 @@ program() {
 			println("\nLIB=",lib);
 		}
 		compiler="cl";
+		basicoptions="";
+		//complete compiler options
+		//http://msdn.microsoft.com/en-us/library/fwkeyyhe%28v=VS.80%29.aspx
 
 		//basic compiler options
-		basicoptions=" /EHsc /W3 /Zi /TP /D \"_CONSOLE\"";
+		//"MSVC requires exception handling (eg compile with /EHsc or EHa?) for delayed dll loading detection" this is required to avoid loading the postgres dll unless and until required
+		//"If /EH is not specified, the compiler will catch structured and C++ exceptions, but will not destroy C++ objects that will go out of scope as a result of the exception."
+		//"Under /EHs, catch(...) will only catch C++ exceptions. Access violations and System.Exception exceptions will not be caught."
+		//c tells the compiler to assume that extern C functions never throw a C++ exception"
+		//however exceptions from exodus functions which are declared external "C" still seem to work
+		//maybe could remove the c option
+		//basicoptions=" /EHsc";
+		basicoptions^=" /EHsc";
+
+		//"Enables all warnings, including warnings that are disabled by default."
+		basicoptions^=" /W3";
+		//basicoptions^=" /Wall";
+		//Enables one-line diagnostics for error and warning messages when compiling C++ source code from the command line.
+		basicoptions^=" /WL";
+
+		//Generates complete debugging information.
+		//needed for backtrace
+		basicoptions^=" /Zi";
+
+		//Specifies a C++ source file.
+		basicoptions^=" /TP";
+
+		//define compiling for console application
+		basicoptions^=" /D \"_CONSOLE\"";
 		//to capture output after macro expansion
 		//basicoptions^=" /E";
+
+		//Uses the __cdecl calling convention (x86 only ie 32bit).
+		///Gd, the default setting, specifies the __cdecl calling convention
+		//for all functions except C++ member functions and functions
+		//marked __stdcall or __fastcall.
+		basicoptions^=" /Gd";
 
 		//exodus library
 		if (debugging)
 		{
-			basicoptions^=" /O2 /GL /FD /MD /D \"NDEBUG\"";
+			//Creates a debug multithreaded DLL using MSVCRTD.lib.
+			basicoptions^=" /MDd";
+
+			//Disables optimization.
+			basicoptions^=" /Od";
+
+			//Enables whole program optimization.
+			basicoptions^=" /GL";
+
+			//renames program database?
+			basicoptions^=" /FD";
+
+			//macro used in exodus in some places to provide additional information eg mvdbpostgres
+			basicoptions^=" /D \"DEBUG\"";
+
+			//Enables run-time error checking.
+			basicoptions^=" /RTC1";
+
 		} else
 		{
-			basicoptions^=" /Od /GF /Gm /Gd /RTC1 /MDd /D \"DEBUG\"";
+			//Creates a multithreaded DLL using MSVCRT.lib.
+			//basicoptions^=" /MD";
+			//needed for backtrace
+			//Creates a debug multithreaded DLL using MSVCRTD.lib.
+			basicoptions^=" /MDd";
+
+			//Creates fast code.
+			basicoptions^=" /O2";
+
+			//Enable string pooling
+			basicoptions^=" /GF";
+
+			//Enables minimal rebuild.
+			basicoptions^=" /Gm";
+
+			//turn off asserts
+			basicoptions^=" /D \"NDEBUG\"";
 		}
 
 		linkoptions=" /link exodus.lib";

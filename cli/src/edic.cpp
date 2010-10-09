@@ -15,6 +15,10 @@ program()
 	if (not editor)
 		editor.osgetenv("EDITOR");
 
+	//enable edit at first error for crimson editor
+	if (editor.lcase().index("cedt") and not editor.index("$") )
+		editor^=" /L:$LINENO '$FILENAME'";
+
 	//otherwise on windows try to locate CYGWIN nano or vi
 	if (not editor and _SLASH=="\\")
 	{
@@ -34,8 +38,7 @@ program()
 			cygwinpath^=_SLASH;
 		//editor=cygwinpath^"bash --login -i -c \"/bin/";
 		editor=cygwinpath;
-		if (osfile(cygwinpath^"nano.exe") or osfile("nano.exe"))
-		{
+		if (osfile(cygwinpath^"nano.exe") or osfile("nano.exe")) {
 			editor="nano $LINENO'$FILENAME'";
 			if (osfile(cygwinpath^"nano.exe"))
 				editor.splicer(1,0,cygwinpath);
@@ -111,6 +114,8 @@ program()
 		if (not index(filename,"."))
 			filename^=".cpp";
 
+		var iscompilable=filename.field2(".",-1).substr(1,1).lcase() ne "h";
+
 		//make absolute in case EDITOR changes current working directory
 		var editcmd=editor;
 		if (editcmd.index("$ABSOLUTEFILENAME"))
@@ -122,7 +127,7 @@ program()
 
 		//prepare a skeleton exodus cpp file
 		var newfile=false;
-		if (not osfile(filename)) {
+		if (iscompilable and !osfile(filename)) {
 			newfile=true;
 			var blankfile="";
 			blankfile^="#include <exodus/exodus.h>\n";
@@ -171,7 +176,9 @@ program()
 	
 			//if the file hasnt been updated
 			var fileinfo2=osfile(filename);
-			if (fileinfo2 == fileinfo) {
+			if (fileinfo2 ne fileinfo)
+				newfile=false;
+			else {
 				//delete the skeleton
 				if (newfile)
 					osdelete(filename);
@@ -184,6 +191,9 @@ program()
 				osshell("clear");
 			//else
 			//	osshell("cls");
+
+			if (not iscompilable)
+				break;
 
 			//build the compiler command
 			var compiler="compile";
