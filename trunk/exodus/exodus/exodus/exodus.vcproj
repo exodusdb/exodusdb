@@ -466,7 +466,7 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="include2"
+			Name="xfunctorXN.h"
 			>
 			<File
 				RelativePath=".\genfunctors.cpp"

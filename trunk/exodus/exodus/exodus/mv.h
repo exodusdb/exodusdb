@@ -193,6 +193,7 @@ namespace exodus {
 std::wstring intToString(int int1);
 
 class varray;
+class var__extractreplace;
 
 //TODO ensure locale doesnt produce like 123.456,78
 std::wstring dblToString(double double1);
@@ -221,6 +222,12 @@ std::wstring dblToString(double double1);
 //each main thread gets a supporting thread the first time it does a SELECT
 //explanation 3.
 
+/*TODO check if the following guidance is followed in class var
+Conversion never applies to this for member functions, and this extends to operators. If the operator was instead example operator + (example, example) in the global namespace, it would compile (or if pass-by-const-ref was used).
+
+As a result, symmetric operators like + and - are generally implemented as non-members, whereas the compound assignment operators like += and -= are implemented as members (they also change data, meaning they should be members). And, since you want to avoid code duplication, the symmetric operators can be implemented in terms of the compound assignment ones (as in your code example, although convention recommends making the temporary inside the function).
+*/
+
 //the destructor is public non-virtual (supposedly to save space)
 //TODO check sizeof var with virtual destructor
 //since this class has no virtual functions it should still be save to derive from it and do delete()
@@ -235,10 +242,6 @@ public:
 	//protected to prevent deriving from var since wish to save space and not provide virtual destructor
 	//http://www.gotw.ca/publications/mill18.htm
 	~var();
-
-	bool assigned() const;
-
-	bool unassigned() const;
 
 	//CONVERSIONS
 	/////////////
@@ -376,6 +379,29 @@ public:
 	//in a lot of compilation failures due to "ambiguous overload"
 	//unfortunately there is no "explicit" keyword as for constructors - coming in C++0X
 	//operator wchar_t() const;
+
+	/* extract and replace using operator() not implemented yet
+
+	//extract using () int int int
+	//instead of
+	//xyz=abc.extract(1,2,3);
+	//you can do just (sadly no way to use pick/mv angle brackets like "abc<1,2,3>"
+	//and [] brackets would only allow one dimension eg abc[1]
+
+	there is a problem that c++ doesnt call different methods depending on LHS/RHS
+	the same problem exists for operator[] see http://codepad.org/wZzgpCjA
+	An idea is that var::operator() will produce a "specialvar" that will
+	perform extract if a var is wanted or a replace if assignment is done
+	but it hasnt been established if it is possible to make the specialvar behave like a normal var
+	in all situation eg would the following work?
+	var1(1,2,3).outputln();
+	also the creation and deletion of the temp object may hit performance.
+	One alternative would be to use () only for extraction (and [] only for replacement of fields?)
+
+	//dynamic array extract/replace eg: abc=xyz(1,2,3) and xyz(1,2,3)="abc";
+	var__extractreplace operator() (int fieldn, int valuen=0, int subvaluen=0) const;
+	var__extractreplace operator() (int fieldn, int valuen=0, int subvaluen=0);
+	*/
 
 	//UNARY OPERATORS
 	/////////////////
@@ -590,7 +616,7 @@ public:
 	void ossleep(const int milliseconds) const;
 	var ostime() const;
 
-	//OS FILE I/O
+	//SYSTEM FILE/DIRECTORY OPERATIONS
 	bool osopen(const var& osfilename);
 	var& osbread(const var& filehandle, const int startoffset, const int length);
 	void osbwrite(const var& filehandle, const int startoffset) const;
@@ -637,11 +663,10 @@ public:
 	void breakon() const;
 	void breakoff() const;
 
-	//OS CONSOLE I/O
+	//STANDARD OUTPUT
 	const var& output() const;
 	const var& outputln() const;
 	const var& outputtab() const;
-
 	const var& output(const var& var1) const;
 	const var& outputln(const var& var1) const;
 	const var& outputtab(const var& var1) const;
@@ -660,6 +685,7 @@ public:
 
 	const var& put(std::ostream& ostream1) const;
 
+	//CURSOR
 	var at(const int columnorcode) const;
 	var at(const int column,const int row) const;
 	var getcursor() const;
@@ -667,6 +693,7 @@ public:
 	var getprompt() const;
 	void setprompt() const;
 
+	//STANDARD INPUT
 	bool inputln();
 	bool inputln(const var& prompt);
 	bool input(const var& n);
@@ -682,6 +709,8 @@ public:
 	//friend bool operator <<(const var&);
 
 	//VARIABLE CONTROL
+	bool assigned() const;
+	bool unassigned() const;
 	var& transfer(var& mv2);
 	var& exchange(var& mv2);
 	var addressof() const;
@@ -764,6 +793,7 @@ public:
 	var trimf(const var trimchar) const;
 	var trimb(const var trimchar) const;
 	var fieldstore(const var& sepchar,const int fieldn,const int nfields,const var& replacement) const;
+	var hash() const;
 
 	//STRING EXTRACTION
 	//[x,y]
@@ -875,8 +905,7 @@ public:
 	var calculate() const;
 	var xlate(const var& filename,const var& fieldno, const wchar_t* mode) const;
 	var xlate(const var& filename,const var& fieldno, const var& mode) const;
-
-	var hash() const;
+	bool var::sqlexec() const;
 
 	//bool selftest() const;
 
@@ -1072,9 +1101,12 @@ public:
 
 	var matunparse() const;
 
-	// subscript operators often come in pairs
+	// parenthesis operators often come in pairs
+	//following is called REGARDLESS of LHS/RHS
 	var& operator() (int row, int col=1);
-	var operator() (int row, int col=1) const;
+	//following const version is called if we do () on a varray which was defined as const xx
+	//probably will never be used
+	var& operator() (int row, int col=1) const;
 
 	varray& init(const var& mv1);
 
@@ -1098,6 +1130,47 @@ private:
 	var* data_;
 
 }; //of class "varray"
+
+/*
+class DLL_PUBLIC var__extractreplace : private var
+{
+
+public:
+
+var__extractreplace(in var1, int fieldn, int valuen, int subvaluen)
+	:
+	_var1(var1),
+	_fieldn(fieldn),
+	_valuen(valuen),
+	_subvaluen(subvaluen)
+	;
+
+	//destructor to (NOT VIRTUAL to save space since not expected to be a base class)
+	//protected to prevent deriving from var since wish to save space and not provide virtual destructor
+	//http://www.gotw.ca/publications/mill18.htm
+	~var__extractreplace();
+
+	//automatic conversion to var
+	//must be on the RHS so do an extract
+	operator var() const;
+
+	//assignment
+	//must be on the LHS so do the replacement
+	var operator= (const var& var1);
+
+private:
+
+	// Disable copy constructor (why?)
+	// Copy constructor
+	var__extractreplace(const var__extractreplace& m);
+
+	var& _var1
+	int _fieldn;
+	int _valuen;
+	int _subvaluen;
+
+}; //of class var__extractreplace
+*/
 
 //must be after class declaration
 static const var IM = L"\xFF";

@@ -54,6 +54,14 @@ typedef HINSTANCE library_t;
 
 namespace exodus {
 
+/*
+//default constructor
+ExodusFunctorBase::ExodusFunctorBase()
+	: _plibrary(NULL),
+	_pfunction(NULL)
+{}
+*/
+
 ExodusFunctorBase::ExodusFunctorBase(const std::string libname,const std::string funcname)
 	: _libraryname(libname),
 	_functionname(funcname),

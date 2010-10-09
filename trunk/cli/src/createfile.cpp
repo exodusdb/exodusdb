@@ -3,19 +3,28 @@
 program()
 {
 
-        var filename=_COMMAND.extract(2);
+        var filenames=_COMMAND.field(FM,2,999999);
         var silent=index(ucase(_OPTIONS),"S");
 
-        if (createfile(filename)) {
-                if (not silent)
-                        print("Created ");
-        }else{
-                if (not silent)
-                        print("Cannot create ");
-        }
-        if (not silent)
-                println(filename);
+		if (not filenames)
+			stop("Syntax is createfile filename filename ...\ndict files are named dict_filename");
 
+		var nfiles=dcount(filenames,FM);
+		for (var filen=1;filen<=nfiles;++filen) {
+
+			var filename=filenames.extract(filen);
+
+			if (createfile(filename)) {
+					if (not silent)
+							print("Created ");
+			}else{
+					if (not silent)
+							print("Cannot create ");
+			}
+			if (not silent)
+					println(filename);
+
+		}
 }
 
 

@@ -74,7 +74,7 @@ namespace boostfs = boost::filesystem;
 //#include "exodus/NullCodecvt.h"//used to prevent wifstream and wofstream widening/narrowing binary input/output to/from internal wchar_t
 
 //traditional Unix file I/O interface declared in <fcntl.h>
-// (under Unix and Linux) or <io.h> (Windows)
+// (under Unix and Linux) or <out.h> (Windows)
 
 //FindFile family of Win32 SDK functions such as
 // FindFirstFileEx, FindNextFile and CloseFind

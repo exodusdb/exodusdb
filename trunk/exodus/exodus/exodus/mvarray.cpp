@@ -85,8 +85,8 @@ bool varray::resize(int rows, int cols)
   return true;
 }
 
-//setting
-//setting and getting is IDENTICAL except for var/var& return value
+//the same () function is called regardless of being on LHS or RHS
+//second version is IDENTICAL except for lack of const (used only on "const varray")
 var& varray::operator() (int row, int col)
 {
 
@@ -105,9 +105,7 @@ var& varray::operator() (int row, int col)
 	return data_[cols_*(row-1) + col];
 }
 
-//getting
-//setting and getting is IDENTICAL except for var/var& return value
-var varray::operator() (int row, int col) const
+var& varray::operator() (int row, int col) const
 {
 
 	//check bounds

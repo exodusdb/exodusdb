@@ -35,7 +35,7 @@ void init(MvEnvironment* env_)
 	env=env_;
 }
 
-void printnext(out bodyln, out pagen)
+void printnext(io bodyln, io pagen)
 {
 	bodyln = 999;
 	pagen = 0;
@@ -53,7 +53,7 @@ void close()
 	printfile.osclose();
 }
 
-void printtx(out tx)
+void printtx(io tx)
 {
 print(tx);
 	if (printptr.unassigned())
@@ -107,7 +107,7 @@ print(tx);
 
 		if (letterhead.unassigned()) {
 			if (html)
-				gethtml("HEAD", letterhead, "");
+				gosub gethtml("HEAD", letterhead, "");
 			else
 				letterhead = "";
 		}
@@ -122,7 +122,7 @@ print(tx);
 			bottomline = "";
 			if (html)
 				bottomline ^= "</tbody></table>";
-			getmark("OWN", html, printtxmark);
+			gosub getmark("OWN", html, printtxmark);
 			bottomline ^= printtxmark;
 		}
 
@@ -133,7 +133,7 @@ print(tx);
 		if (foot.unassigned())
 			foot = "";
 
-		getheadfoot(head,foot,nbodylns);
+		gosub getheadfoot(head,foot,nbodylns);
 
 	}
 
@@ -152,7 +152,7 @@ print(tx);
 			return;
 		}
 
-		getheadfoot(head, foot, nbodylns);
+		gosub getheadfoot(head, foot, nbodylns);
 
 		realpagen += 1;
 		pagen += 1;
@@ -203,13 +203,13 @@ print(tx);
 
 private:
 
-void printtx2(out tx)
+void printtx2(io tx)
 {
 	if (html) {
 		if (not printptr) {
 
 			var css;
-			readcss(css);
+			gosub readcss(css);
 
 			if (style.unassigned())
 				style = "";
@@ -235,25 +235,25 @@ void printtx2(out tx)
 	return;
 }
 
-void gethtml(in mode, out letterhead, in companycode)
+void gethtml(in mode, io letterhead, in companycode)
 {
 	letterhead="";
 	return;
 }
 
-void readcss(out css)
+void readcss(io css)
 {
 	css="";
 	return;
 }
 
-void getmark(in mode, in html, out printtxmark)
+void getmark(in mode, in html, io printtxmark)
 {
 	printtxmark="";
 	return;
 }
 
-void convoptions(out temp)
+void convoptions(io temp)
 {
 	temp.swapper(SQ^SQ, "^%^");
 
@@ -310,7 +310,7 @@ void convoptions(out temp)
 	return;
 }
 
-void getheadfoot(out head, out foot, out nbodylns)
+void getheadfoot(io head, io foot, io nbodylns)
 {
 
 	headx = head;

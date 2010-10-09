@@ -2,23 +2,24 @@
 //Exodus Copyright (c) 2009 Stephen Bush
 //Licence http://www.opensource.org/licenses/mit-license.php
 
-this is written using Exodus but is NOT a good example. it is an initial attempt to implement a substantial classic pick program using a c++ class. It was mostly automatically de/transcompiled from it's AREV parent and therefore uses OO flavour method calling.
+this is written using Exodus but although extensive is NOT a good example of exodus programming style.
+It was the first attempt to implement a substantial classic pick program using a c++ class. It was mostly automatically transliterated from it's AREV parent and therefore uses OO flavour method calling.
 
-currently it uses some C++ style programming that will later be hidden to minimise the knowledge required by exodus application programmers
+Currently it uses some C++ style programming that will later be hidden to minimise the knowledge required by exodus application programmers
 
-the entry point is short program at the bottom of the code which creates an instance of the class/program and calls its entry point. the environment setup will be done automatically by exodus soon
+The entry point is short program at the bottom of the code which creates an instance of the class/program and calls its entry point. the environment setup will be done automatically by exodus soon
 
-from the point of view of a pick programmer a c++ class can be viewed as a classic pick program with program wide accessible variables being (the class data) and internal subroutines (the class methods).
+From the point of view of a pick programmer a c++ class can be viewed as a classic pick program with program wide accessible variables being (the class data) and internal subroutines (the class methods).
 
-a c++ class consists of a set of class variables and a set of methods (subroutines). all the subroutines have access to all the class variables.
+A c++ class consists of a set of class variables and a set of methods (subroutines). all the subroutines have access to all the class variables.
 
-unlike pick basic, c++ methods (subroutines) can have their own private variables, be called with a list of parameters, and return values in 
+Unlike pick basic, c++ methods (subroutines) can have their own private variables, be called with a list of parameters, and return values in 
 
-so in summary c++ methods can be used like internal and external subroutines with common variables.
+So, in summary, c++ methods can be used like internal and external subroutines with common variables.
 
-if all the variables are defined as class variables then a c++ class is essentially identical to a class pick program with subroutines
+If all the variables are defined as class variables then a c++ class is essentially identical to a class pick program with subroutines
 
-one way to think of it is as if a c++ class allows common variables and external subroutines but all can be witten in a single file.
+One way to think of it is as if a c++ class allows common variables and external subroutines but all can be witten in a single file.
 
 */
 
@@ -28,6 +29,8 @@ usage
 list ads brand_code brand_name with brand_code \"XYZ\"
 
 NB if using from shells like bash then quotes must be prefixed by \
+
+Type just list by itself to get a summary of its syntax
 
 */
 
@@ -83,6 +86,8 @@ function esctoexit()
 	return false;
 }
 
+//this is not proper exodus style programming
+//but for now allows subroutine/function within class
 #undef subroutine
 #define subroutine void
 #undef function
@@ -156,6 +161,7 @@ class list
 //	var scol;
 //	var icol;
 
+	//TODO should be replaced by varray now that it is available
 	static const int maxncols=500;
 	static const int maxncols2=500;
 	var colname[maxncols2];//TODO:var colname(maxncols);
@@ -213,7 +219,7 @@ list(MvEnvironment& env_) : env(env_)
 	
 }
 
-void operator() () {
+subroutine operator() () {
 
 	//@sentence='LIST 10 SCHEDULES BY VEHICLE_CODE with vehicle_code "kjh kjh" VEHICLE_NAME BREAK-ON VEHICLE_CODE BREAK-ON VEHICLE_CODE TOTAL PRICE (SX)'
 	//@sentence='list markets code name'
@@ -414,7 +420,7 @@ NO-BASE
 nextphrase:
 ///////////
 
-	gosub_getword();
+	gosub getword();
 	if (word eq "")
 		goto x1exit;
 
@@ -426,7 +432,7 @@ phraseinit:
 			ss ^= "S";
 		ss ^= "SELECT";
 //filename:
-		gosub_getword();
+		gosub getword();
 		if (!word) {
 			mssg("FILE NAME IS REQUIRED");
 			var().stop();
@@ -436,13 +442,13 @@ phraseinit:
 		if (word.match("\\d+","r")) {
 			maxnrecs = word;
 			ss ^= " " ^ maxnrecs;
-			gosub_getword();
+			gosub getword();
 		}
 
 		//get the file name
 		filename = word;
 		if (word eq "DICT") {
-			gosub_getword();
+			gosub getword();
 			filename = "dict_" ^ word;
 		}
 		if (filename.substr(1, 5) eq "dict_") {
@@ -473,7 +479,7 @@ phraseinit:
 				break;
 
 			keylist = 1;
-			gosub_getword();
+			gosub getword();
 			if (word eq "")
 				//goto exitloop;
 				break;
@@ -482,7 +488,7 @@ phraseinit:
 //exitloop:
 
 	}else if (word eq "GETLIST") {
-		gosub_getword();
+		gosub getword();
 		var("GETLIST " ^ word).perform();
 
 	}else if (word eq "AND" or word eq "OR") {
@@ -493,7 +499,7 @@ phraseinit:
 
 	}else if (word eq "BY" or word eq "BY-DSND") {
 		ss ^= " " ^ word;
-		gosub_getword();
+		gosub getword();
 		ss ^= " " ^ word;
 
 	}else if (word eq "WITH NOT" or word eq "WITH" or word eq "WITHOUT" or word eq "LIMIT") {
@@ -503,12 +509,12 @@ phraseinit:
 		if (limit)
 			nlimits += 1;
 
-		gosub_getword();
+		gosub getword();
 
 		//NO/EVERY
 		if (word eq "NOT" or word eq "NO" or word eq "EVERY") {
 			ss ^= " " ^ word;
-			gosub_getword();
+			gosub getword();
 		}
 
 		//field or NO
@@ -519,13 +525,13 @@ phraseinit:
 		//negate next comparision
 		if (var("NOT,NE,<>").extract(1).locateusing(nextword, ",", xx)) {
 			nextword = "NOT";
-			gosub_getword();
+			gosub getword();
 			ss ^= " " ^ word;
 		}
 
 		//comparision
 		if (var("MATCH,EQ,NE,GT,LT,GE,LE,[,],[]").locateusing(nextword, ",", xx)) {
-			gosub_getword();
+			gosub getword();
 			ss ^= " " ^ word;
 			if (limit)
 				limits.replacer(2, nlimits, 0, word);
@@ -534,13 +540,13 @@ phraseinit:
 		//with x between y and z
 		//with x from y to z
 		if (nextword eq "BETWEEN" or nextword eq "FROM") {
-			gosub_getword();
+			gosub getword();
 			ss ^= " " ^ word;
-			gosub_getword();
+			gosub getword();
 			ss ^= " " ^ word;
-			gosub_getword();
+			gosub getword();
 			ss ^= " " ^ word;
-			gosub_getword();
+			gosub getword();
 			ss ^= " " ^ word;
 
 		}else{
@@ -552,7 +558,7 @@ phraseinit:
 				if (!(nextword not_eq "" and (nextword.isnum() or nextword.substr(1, 1) eq DQ or nextword.substr(1, 1) eq SQ)))
 					break;
 
-				gosub_getword();
+				gosub getword();
 				ss ^= " " ^ word;
 				if (limit) {
 					if ((DQ ^ SQ).index(word.substr(1, 1), 1)) {
@@ -575,7 +581,7 @@ phraseinit:
 
 	}else if (word eq "GRAND-TOTAL") {
 		//zzz throw away the grand total options for the time being
-		gosub_getword();
+		gosub getword();
 		gtotreq = 1;
 
 	}else if (word eq "NO-BASE") {
@@ -602,7 +608,7 @@ phraseinit:
 		totalflag = 1;
 
 	}else if (word eq "USING") {
-		gosub_getword();
+		gosub getword();
 		dictfilename = word;
 		if (!(env.DICT.open("DICT", dictfilename))) {
 			fsmsg();
@@ -611,7 +617,7 @@ phraseinit:
 
 	}else if (word eq "HEADING") {
 
-		gosub_getword();
+		gosub getword();
 		head = word;
 		if (html) {
 			head.swapper("Page \'P\'", "");
@@ -621,7 +627,7 @@ phraseinit:
 		head.splicer(-1, 1, "");
 
 	}else if (word eq "FOOTING") {
-		gosub_getword();
+		gosub getword();
 		foot = word;
 		foot.splicer(1, 1, "");
 		foot.splicer(-1, 1, "");
@@ -633,7 +639,7 @@ phraseinit:
 			mssg("JUSTLEN/JL must follow a column name");
 			var().stop();
 		}
-		gosub_getword();
+		gosub getword();
 		word.splicer(1, 1, "");
 		word.splicer(-1, 1, "");
 		coldict[int(coln)].replacer(9, 0, 0, word.substr(1, 1));
@@ -643,7 +649,7 @@ phraseinit:
 		//colhead
 
 	}else if (word eq "COLHEAD") {
-		gosub_getword();
+		gosub getword();
 		//skip if detsupp2 and column is being skipped
 		if (!(coldict[coln].unassigned())) {
 			word.splicer(1, 1, "");
@@ -653,7 +659,7 @@ phraseinit:
 		}
 
 	}else if (word eq "OCONV") {
-		gosub_getword();
+		gosub getword();
 		word.splicer(1, 1, "");
 		word.splicer(-1, 1, "");
 		if (html)
@@ -683,8 +689,8 @@ phraseinit:
 			if (detsupp eq 2) {
 				//if (var("JL,JUSTLEN,CH,COL,HEAD,OC,OCONV").locateusing(nextword, ",", xx)) {
 				if (var("JUSTLEN,COLHEAD,OCONV").locateusing(nextword, ",", xx)) {
-					gosub_getword();
-					gosub_getword();
+					gosub getword();
+					gosub getword();
 				}
 				if (!(totalflag or breakonflag))
 					goto dictrecexit;
@@ -747,7 +753,7 @@ phraseinit:
 				coldict[coln].replacer(13, 0, 0, 1);
 				breakonflag = 0;
 				if (nextword.substr(1, 1) eq DQ) {
-					gosub_getword();
+					gosub getword();
 					//zzz break options
 					if (word.index("B", 1))
 						pagebreakcoln = coln;
@@ -757,7 +763,7 @@ phraseinit:
 		}
 
 	} else if (word eq "IGNOREWORD") {
-		gosub_getword();
+		gosub getword();
 		ignorewords.replacer(1, -1, 0, word);
 
 	//@LPTR word is skipped if not located in VOC/DICT.VOC
@@ -771,7 +777,7 @@ phraseinit:
 		msg2(tt, "RCE", word, word);
 		if (word eq var().chr(27))
 			var().stop();
-		gosub_getwordexit();
+		gosub getwordexit();
 		goto phraseinit;
 
 	}
@@ -1184,7 +1190,7 @@ function process_all_records()
 	breakleveln = nbreaks;
 	if (not gtotsupp and (not pagebreakcoln or gtotreq))
  		breakleveln += 1;
-	gosub_printbreaks();
+	gosub printbreaks();
 
 	bodyln = 1;
 
@@ -1277,7 +1283,7 @@ subroutine process_one_record()
 		breakleveln = leveln;
 	}
 
-	gosub_printbreaks();
+	gosub printbreaks();
 
 	//oldbreakvalue.init(breakvalue);
 	oldbreakvalue=breakvalue;
@@ -1313,7 +1319,7 @@ subroutine process_one_record()
 							if (colname[coln] eq "DATEGRID") {
 								str1 = icol[coln];
 								str2 = breaktotal(coln,1);
-								gosub_addstr();
+								gosub addstr();
 								breaktotal(coln,1) = str3;
 							}
 						}
@@ -1411,12 +1417,12 @@ subroutine process_one_record()
 }
 
 ////////////////////
-void gosub_getword()
+subroutine getword()
 ////////////////////
 {
 	while (true) {
 
-		gosub_getword2();
+		gosub getword2();
 
 		if (word.length()) {
 			if (ignorewords.locateusing(word, VM, xx))
@@ -1432,7 +1438,7 @@ void gosub_getword()
 		var storecharn = charn;
 		var storeword = word;
 		var storedictrec = dictrec;
-		gosub_getword2();
+		gosub getword2();
 		nextword = word;
 		word = storeword;
 		dictrec = storedictrec;
@@ -1452,7 +1458,7 @@ void gosub_getword()
 }
 
 /////////////////////
-void gosub_getword2()
+subroutine getword2()
 /////////////////////
 {
 
@@ -1516,11 +1522,11 @@ void gosub_getword2()
 
 	}
 
-	gosub_getwordexit();
+	gosub getwordexit();
 }
 
 ////////////////////////
-void gosub_getwordexit()
+subroutine getwordexit()
 ////////////////////////
 {
 
@@ -1533,7 +1539,7 @@ void gosub_getwordexit()
 			charn = startcharn - 1;
 			wordn -= 1;
 			//goto getword2;
-			gosub_getword2();
+			gosub getword2();
 			return;
 		}
 	}else{
@@ -1575,7 +1581,7 @@ void gosub_getwordexit()
 }
 
 ////////////////////////
-void gosub_printbreaks()
+subroutine printbreaks()
 ////////////////////////
 {
 
@@ -1646,7 +1652,7 @@ void gosub_printbreaks()
 							} else {
 				 				str1 = cell;
 			 					str2 = breaktotal(coln,leveln + 1);
-								gosub_addstr();
+								gosub addstr();
 								breaktotal(coln,leveln + 1) = str3;
 							}
 						}
@@ -1781,9 +1787,9 @@ void gosub_printbreaks()
 	return;
 }
 
-/////////////////////////
-subroutine gosub_addstr()
-/////////////////////////
+///////////////////
+subroutine addstr()
+///////////////////
 {
 
 	str3 = str2;

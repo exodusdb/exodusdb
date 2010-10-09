@@ -86,6 +86,9 @@ class DLL_PUBLIC ExodusFunctorBase
 
 public:
 
+ExodusFunctorBase::ExodusFunctorBase();
+
+//constructor to provide library and function names immediately
 ExodusFunctorBase(const std::string libname,const std::string funcname);
 
 virtual ~ExodusFunctorBase();
@@ -93,7 +96,14 @@ virtual ~ExodusFunctorBase();
 protected:
 
 //use void* to speed compilation of exodus applications on windows by avoiding
-//inclusion of windows.h here. In the implementation cast to HINSTANCE and 
+//inclusion of windows.h here BUT SEE ...
+//Can I convert a pointer-to-function to a void*? NO!
+//http://www.parashift.com/c++-faq-lite/pointers-to-members.html#faq-33.11
+//In the implementation cast to HINSTANCE and 
+//conversion between function pointer and void* is not legal c++ and only works
+//on architectures that have data and functions in the same address space
+//since void* is pointer to data space and function is pointer to function space
+//(having said that ... posix dlsym returns a void* for the address of the function!)
 void* _plibrary;
 void* _pfunction;
 

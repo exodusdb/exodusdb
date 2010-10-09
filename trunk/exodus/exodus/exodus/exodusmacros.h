@@ -23,6 +23,14 @@ THE SOFTWARE.
 #ifndef EXODUSMACROS_H
 #define EXODUSMACROS_H 1
 
+//this file provides a few macros to make exodus application programming
+//look simpler. sadly, in c++, macros cannot be declared within namespaces
+//and pollute the global namespace. However it is considered so useful to
+//hide c++ syntax from the application programmer that we put them in this
+//header file.
+//you can program without exodus macros cause conflict then you can
+//include m.h directly
+
 #include <exodus/mv.h>
 
 //please include <exodus> AFTER <iostream> etc. For example:
@@ -50,10 +58,6 @@ int main(int exodus__argc, char *exodus__argv[]) \
 	main2(exodus__argc, exodus__argv); \
 } \
 void main2(int exodus__argc, char *exodus__argv[])
-
-//ease c++ compliant declaration of function arguments eg. "function xyz(in arg1, out arg2)"
-#define in const var&
-#define out var&
 
 //allow pseudo pick syntax
 #define sentence() _SENTENCE
@@ -102,7 +106,25 @@ void main2(int exodus__argc, char *exodus__argv[])
 //allow simplified syntax eg "function xyz(in arg1, out arg2) { ..."
 #define subroutine EXODUSMACRO_IMPORTEXPORT void
 #define function EXODUSMACRO_IMPORTEXPORT var
+//throw away words
+//call xyz() ... is just xyz()  (external function)
+//gosub xyz() ... is just xyz() (local function)
 #define call
+#define gosub
+
+//simplify declaration of function/subroutine arguments
+//eg. allow "function xyz(in arg1, out arg2)"
+//instead of "function xyz(const var& arg1, var& arg2)"
+//NB out parameters must be variables not constants
+//so the above function *cannot* be called with a string or number for the 2nd argument
+//abc=xyz(100,200);//wont compile
+//Can be declared in exodus namespace which is useful since "in" and "out" could easily
+//occur in other libraries.
+namespace exodus {
+typedef const var& in;
+typedef var& io;
+typedef var& out;
+}
 
 //forcibly redefine "eq" even if already previously defined in some other library like iostream
 //to generate a compilation error so that the issue can be corrected (see heading) and the "eq" keyword remain available
