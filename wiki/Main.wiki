@@ -1,3 +1,9 @@
 #Main Page
 
 wiki is currently at http://devwiki.neosys.com and might be moved here.
+
+=== Program Reference ===
+
+[Traditional] Syntax
+
+[OO] Syntax
