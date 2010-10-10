@@ -8,7 +8,7 @@ using Exodus OO syntax becomes:
 or
   println(xx.extract(6).field("/",2).oconv("D2"));
 
-Many people find the OO method of chaining operations left to right with the parameters next to their function name, to be more readable. In the classic multivalue basic example above, the "OCONV" is quite far away from its parameter 'D2' so requiring quite a lot of mental parsing.
+Many people find the OO method of chaining operations from left to right, and with the parameters next to their function name, to be very readable. In the classic multivalue basic example above, the "OCONV" is quite far away from its parameter 'D2' so requiring quite a lot of mental parsing.
 
 The .extract(6) instead of `<6>` is rather ugly and it might be changed. Likewise outputln() might become something shorter and sweeter.
 
