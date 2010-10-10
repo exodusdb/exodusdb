@@ -97,10 +97,7 @@ var& varray::operator() (int row, int col)
 		throw MVArrayIndexOutOfBounds(L"col:" ^ var(col) ^ L" > " ^ cols_);
 
 	if (row ==0 || col == 0 )
-	{
-		row=0;
-		col=0;
-	}
+		return data_[0];
 
 	return data_[cols_*(row-1) + col];
 }
