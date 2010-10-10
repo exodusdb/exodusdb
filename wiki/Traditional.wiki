@@ -13,7 +13,7 @@ For example the efficient modify in-place string conversion
 
  CONVERT "x" TO "y" IN ZZ
 
-is now represented by ...
+is now represented in Exodus by ...
 
  converter(cc,aa,bb);
 
@@ -21,7 +21,7 @@ Traditional multivalue basic did not provide a full set of in-place string modif
 
 Exodus provides a complete set of in-place string modification functions with the characteristic ending -er for example fieldstore() returns a new string whereas fieldstorer() modifies the string in-place.
 
-==== Key to Function Types ====
+==== Function Types ====
 
 ||TYPE	||FUNCTION TYPE||
 ||var=	||traditional functions that return values||
@@ -33,7 +33,7 @@ Exodus provides a complete set of in-place string modification functions with th
 
 ||io|| Parameters that may provide and/or return data. Must be variables not raw data like 1 or "X"||
 ||out|| Parameters that return data. Must be variables not raw data like 1 or "X"||
-||blank||The default. Parameters that provide data to the function.||
+||blank||The default. Parameters that provide data to the function. Can be variables or raw data like 1 or "X"||
 
 Optional Parameters
 
