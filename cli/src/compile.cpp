@@ -41,11 +41,11 @@ program() {
 	var nfiles=dcount(filenames,FM);
 	if (not filenames)
 		abort("Syntax is compile filename ... {options}");
-	
+
 	if (osgetenv("EXODUS_DEBUG"))
 		debugging=true;
 
-	//source extensions	
+	//source extensions
 	var src_extensions="cpp cxx cc";
 	var inc_extensions="h hpp hxx";
 	var noncompilable_extensions=inc_extensions^ " out so o";
@@ -434,7 +434,7 @@ program() {
 		libdir ^= _SLASH;
 
 	for (var fileno=1;fileno<=nfiles;++fileno) {
-	
+
 		var text="";
 		var filebase;
 
@@ -444,16 +444,16 @@ program() {
 			continue;
 
 		//println("--- ",srcfilename, " ---");
-		
+
 		//check/add the default file extension
 		var fileext=srcfilename.field2(".",-1).lcase();
 		if (src_extensions.locateusing(fileext," ")) {
 			filebase=srcfilename.splice(-len(fileext)-1,999999,"");
-		
+
 		//skip non-compilable files
 		} else if (noncompilable_extensions.locateusing(fileext," ")) {
 			//errputln(srcfilename^" "^fileext^" is not compilable");
-			continue;		
+			continue;
 
 		//skip backup files
 		} else if (fileext.substr(-1,1)=="~") {
@@ -463,16 +463,15 @@ program() {
 		} else if (osfile(srcfilename^"."^default_extension)) {
 			filebase=srcfilename;
 			srcfilename^="."^default_extension;
-						
+
 		//silently skip files that exist with the wrong header
 		} else if (osfile(srcfilename) or osdir(srcfilename)) {
 			continue;
-			
 		//add the default extension
 		} else {
 			filebase=srcfilename;
 			srcfilename^="."^default_extension;
-		
+
 		}
 		//get file text
 		println(srcfilename);
@@ -525,7 +524,7 @@ program() {
 
 			//for external subroutines (dll/so libraries), build up .h
 			// and maybe .def file text
-			if (not(isprogram) and word1 eq "function" or word1 eq "subroutine") {
+			if (not(isprogram) and ( word1 eq "function" or word1 eq "subroutine") ) {
 
 				//extract out the function declaration in including arguments
 				//eg "function xyz(in arg1, out arg2)"
@@ -662,7 +661,7 @@ program() {
 
 		//record the current bin file update timestamp
 		var oldobjfileinfo=osfile(objfilename);
-		
+
 		//build the compiler command
 		var compilecmd=compiler ^ " " ^ srcfilename ^ " " ^ basicoptions ^ " " ^ compileoptions;
 		if (outputoption)
@@ -683,7 +682,7 @@ program() {
 		if (verbose or debugging)
 			println(compilecmd);
 		osshell(compilecmd);
-		
+
 		//handle compiler output
 		var compileroutput;
 		var startatlineno;
@@ -699,7 +698,7 @@ program() {
 				continue;
 			}
 		}
-		   
+
 		//get new objfile info or continue
 		var newobjfileinfo=osfile(objfilename);
 		if (not objfilename) {
@@ -707,8 +706,8 @@ program() {
 				var().input(1);
 				continue;
 		}
-		
-		//if new objfile			
+
+		//if new objfile
 		if (newobjfileinfo not_eq oldobjfileinfo) {
 			if (newobjfileinfo) {
 
@@ -718,13 +717,13 @@ program() {
 				//                                      osshell("mkdir " ^ outputdir);
 				//                                      println("Created " ^ outputdir);
 				//                              }
-				
+
 				//var outputfilename=filename;
 				//if (isprogram) {
         			//	//remove the .out file type ending
         			//	outputfilename=outputfilename.field(".",1,outputfilename.count("."));
 				//}
-				
+
 				//copy the obj file to the output directory
 				if (installcmd) {
 					if (not osdir(outputdir)) {
@@ -735,14 +734,15 @@ program() {
 						if (!osmkdir(outputdir))
 							println("ERROR: Failed "^cmd);
 					}
-					var cmd=installcmd^" " ^ objfilename ^ " " ^ outputdir ^ binfilename;
+					var outputpathandfile=outputdir^field2(binfilename,_SLASH,-1);
+					var cmd=installcmd^" " ^ objfilename ^ " " ^ outputpathandfile;
 					if (verbose)
 						println(cmd);
 					//osshell(cmd);
-					if (osfile(outputdir^binfilename) and osfile(objfilename))
-						osdelete(outputdir^binfilename);
-					if (!oscopy(objfilename,outputdir ^ binfilename))
-						println("ERROR: Failed "^cmd);
+					if (osfile(outputpathandfile) and osfile(objfilename))
+						osdelete(outputpathandfile);
+					if (!oscopy(objfilename,outputpathandfile))
+						println("ERROR: Failed to "^cmd);
 				}
 			}
 		}//compilation

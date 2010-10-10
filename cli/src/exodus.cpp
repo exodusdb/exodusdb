@@ -28,6 +28,8 @@ program()
 	println("Exodus Copyright (c) 2009 Stephen Bush");
 	println("http://www.opensource.org/licenses/mit-license.php");
 
+	var verbose=_OPTIONS.index("V");
+
 	var exodusbinpath=field(_EXECPATH,_SLASH,1,dcount(_EXECPATH,_SLASH)-1);
 
 	//if (not var().load("libpq.dll"))
@@ -38,19 +40,29 @@ program()
 	if (_SLASH eq "/" and shell.osgetenv("SHELL"))
 	{
 
+		var home=osgetenv("HOME");
+		var path=osgetenv("PATH");
+		var libp=osgetenv("LD_LIBRARY_PATH");
+
 		//prefer user binaries then exodus binaries before all else
-		ossetenv("PATH","~/bin:/var/lib/exodus/bin:"^osgetenv("PATH"));
-		
-		
-print("LD_LIBRARY_PATH","~/lib:"^osgetenv("LD_LIBRARY_PATH"));
-		ossetenv("LD_LIBRARY_PATH","~/lib:"^osgetenv("LD_LIBRARY_PATH"));
+		ossetenv("PATH",home^"/bin:/var/lib/exodus/bin:"^path);
+
+//print("LD_LIBRARY_PATH","~/lib:"^osgetenv("LD_LIBRARY_PATH"));
+		ossetenv("LD_LIBRARY_PATH",home^"/lib:"^libp);
 
 
 		//enable core dumps
 		osshell("ulimit -c unlimited");
 
+		if (verbose) {
+			osgetenv("HOME").outputln("HOME=");
+			osgetenv("PATH").outputln("PATH=");
+			osgetenv("LD_LIBRARY_PATH").outputln("LD_LIBRARY_PATH=");
+		}
+
 		//execute command or enter exodus shell
-		osshell("env PS1='exodus [\\u@\\h \\W]\\$ '  "^(command?command:shell));
+		if (not osshell("env PS1='exodus [\\u@\\h \\W]\\$ '  "^(command?command:shell)))
+			osshell(command?command:shell);
 
 	}
 	else if (_SLASH eq "\\" and shell.osgetenv("ComSpec"))

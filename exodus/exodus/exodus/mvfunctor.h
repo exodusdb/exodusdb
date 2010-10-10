@@ -86,7 +86,7 @@ class DLL_PUBLIC ExodusFunctorBase
 
 public:
 
-ExodusFunctorBase::ExodusFunctorBase();
+ExodusFunctorBase();
 
 //constructor to provide library and function names immediately
 ExodusFunctorBase(const std::string libname,const std::string funcname);
