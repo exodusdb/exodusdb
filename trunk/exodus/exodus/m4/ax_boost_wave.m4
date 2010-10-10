@@ -1,5 +1,5 @@
 # ===========================================================================
-#             http://autoconf-archive.cryp.to/ax_boost_wave.html
+#       http://www.gnu.org/software/autoconf-archive/ax_boost_wave.html
 # ===========================================================================
 #
 # SYNOPSIS
@@ -27,7 +27,10 @@
 #
 #   Copying and distribution of this file, with or without modification, are
 #   permitted in any medium without royalty provided the copyright notice
-#   and this notice are preserved.
+#   and this notice are preserved. This file is offered as-is, without any
+#   warranty.
+
+#serial 13
 
 AC_DEFUN([AX_BOOST_WAVE],
 [
@@ -43,7 +46,7 @@ AC_DEFUN([AX_BOOST_WAVE],
             ax_boost_user_wave_lib=""
         else
 		    want_boost="yes"
-        	ax_boost_user_wave_lib="$withval"
+		ax_boost_user_wave_lib="$withval"
 		fi
         ],
         [want_boost="yes"]
@@ -67,9 +70,9 @@ AC_DEFUN([AX_BOOST_WAVE],
         AC_CACHE_CHECK(whether the Boost::Wave library is available,
 					   ax_cv_boost_wave,
         [AC_LANG_PUSH([C++])
-			 AC_COMPILE_IFELSE(AC_LANG_PROGRAM([[@%:@include <boost/wave.hpp>
+			 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[@%:@include <boost/wave.hpp>
 												]],
-                                   [[boost::wave::token_category r; return 0;]]),
+                                   [[boost::wave::token_category r; return 0;]])],
                    ax_cv_boost_wave=yes, ax_cv_boost_wave=no)
          AC_LANG_POP([C++])
 		])
@@ -78,19 +81,19 @@ AC_DEFUN([AX_BOOST_WAVE],
 			AC_DEFINE(HAVE_BOOST_WAVE,,[define if the Boost::Wave library is available])
             BOOSTLIBDIR=`echo $BOOST_LDFLAGS | sed -e 's/@<:@^\/@:>@*//'`
             if test "x$ax_boost_user_wave_lib" = "x"; then
-                for libextension in `ls $BOOSTLIBDIR/libboost_wave*.{so,dylib,a}* 2>/dev/null | sed 's,.*/,,' | sed -e 's;^lib\(boost_wave.*\)\.so.*$;\1;' -e 's;^lib\(boost_wave.*\)\.a*$;\1;' -e 's;^lib\(boost_wave.*\)\.dylib$;\1;'` ; do
+                for libextension in `ls $BOOSTLIBDIR/libboost_wave*.so* $BOOSTLIBDIR/libboost_wave*.a* $BOOSTLIBDIR/libboost_wave*.dylib* 2>/dev/null | sed 's,.*/,,' | sed -e 's;^lib\(boost_wave.*\)\.so.*$;\1;' -e 's;^lib\(boost_wave.*\)\.a*$;\1;' -e 's;^lib\(boost_wave.*\)\.dylib$;\1;'` ; do
                      ax_lib=${libextension}
 				    AC_CHECK_LIB($ax_lib, exit,
                                  [BOOST_WAVE_LIB="-l$ax_lib"; AC_SUBST(BOOST_WAVE_LIB) link_wave="yes"; break],
                                  [link_wave="no"])
-  				done
+				done
                 if test "x$link_wave" != "xyes"; then
                 for libextension in `ls $BOOSTLIBDIR/boost_wave*.{dll,a}* 2>/dev/null | sed 's,.*/,,' | sed -e 's;^\(boost_wave.*\)\.dll.*$;\1;' -e 's;^\(boost_wave.*\)\.a*$;\1;'` ; do
                      ax_lib=${libextension}
 				    AC_CHECK_LIB($ax_lib, exit,
                                  [BOOST_WAVE_LIB="-l$ax_lib"; AC_SUBST(BOOST_WAVE_LIB) link_wave="yes"; break],
                                  [link_wave="no"])
-  				done
+				done
                 fi
 
             else
@@ -99,6 +102,9 @@ AC_DEFUN([AX_BOOST_WAVE],
                                    [BOOST_WAVE_LIB="-l$ax_lib"; AC_SUBST(BOOST_WAVE_LIB) link_wave="yes"; break],
                                    [link_wave="no"])
                done
+            fi
+            if test "x$ax_lib" = "x"; then
+                AC_MSG_ERROR(Could not find a version of the library!)
             fi
 			if test "x$link_wave" != "xyes"; then
 				AC_MSG_ERROR(Could not link against $ax_lib !)
@@ -114,7 +120,7 @@ AC_DEFUN([AX_BOOST_WAVE],
 
 
 		CPPFLAGS="$CPPFLAGS_SAVED"
-           	LDFLAGS="$LDFLAGS_SAVED"
+		LDFLAGS="$LDFLAGS_SAVED"
 		LIBS="$LIBS_SAVED"
 
 	fi
