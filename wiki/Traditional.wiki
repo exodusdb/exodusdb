@@ -46,21 +46,19 @@ Optional Parameters
 
 ==== Complete List of Functions ====
 
-||TYPE	||FUNCTION||
 Environment
 ||var=	||osgetenv(name)||
 ||if	||osgetenv(name, OUT value)||
 ||if	||ossetenv(name, value)||
-Status
-||if	||assigned(mv1)||
-||if	||unassigned(mv1)||
+
 Time/Date/Sleep
 ||var=	||date()||
 ||var=	||time()||
 ||var=	||timedate()||
 ||cmd	||ossleep(milliseconds)||
 ||var=	||ostime()||
-File and Directory
+
+System File and Directory
 ||if	||osopen(filename, OUT filehandle)||
 ||cmd	||osclose(filehandle)||
 ||var=	||osbread(filehandle, startoffset, length)||
@@ -82,6 +80,7 @@ File and Directory
 ||var=	||oscwd()||
 ||var=	||oscwd(dirname)||
 ||cmd	||osflush()||
+
 Program Control
 ||var=	||suspend(command)||
 ||var=	||osshell(command)||
@@ -92,10 +91,16 @@ Program Control
 ||var=	||chain(command)||
 ||var=	||logoff()||
 ||cmd	||debug()||
+
+Status
+||if    ||assigned(mv1)||
+||if    ||unassigned(mv1)||
+
 Console Output
 ||cmd	||print(mv1)||
 ||cmd	||println(mv1="")||
 ||cmd	||printtab(mv1="")||
+
 Cursor
 ||var=	||at(columnorcode)||
 ||var=	||at(column, row)||
@@ -103,14 +108,17 @@ Cursor
 ||cmd	||setcursor(cursor)||
 ||var=	||getprompt()||
 ||cmd	||setprompt(prompt)||
+
 Console Input
-||var=	||inputln()||
-||var=	||inputln(prompt="")||
-||var=	||input(n)||
+||var=	||input()||
+||var=	||input(prompt, OUT inpstr)||
+||var=	||inputn(n)||
+
 Numbers
 ||var=    ||rnd(number)||
 ||cmd    ||initrnd(seednumber)||
 ||var=    ||mod(dividend, divisor)||
+
 Strings
 ||var=	||len(mv1)||
 ||var=	||length(mv1)||
@@ -159,11 +167,13 @@ Strings
 ||var=	||index(instring, substr, startchar1=1)||
 ||var=	||field(instring, substrx, fieldnx, nfieldsx=1)||
 ||var=	||field2(instring, substrx, fieldnx, nfieldsx=1)||
+
 ICONV/OCONV
 ||var=	||oconv(instring, conversion)||
 ||var=	||oconv(instring, conversion)||
 ||var=	||iconv(instring, conversion)||
 ||var=	||iconv(instring, conversion)||
+
 Database
 ||if	||connect(connectionstring="")||
 ||if	||disconnect()||
@@ -177,6 +187,7 @@ Database
 ||if	||begin()||
 ||if	||rollback()||
 ||if	||end()||
+
 Files and Records
 ||if	||lock(filehandle, key)||
 ||cmd	||unlock(filehandle, key)||
@@ -190,6 +201,7 @@ Files and Records
 ||if	||deleterecord(filehandle, key)||
 ||if	||updaterecord(record, filehandle, key)||
 ||if	||insertrecord(record, filehandle, key)||
+
 Record Selection
 ||if	||select(sortselectclause="")||
 ||cmd	||clearselect()||
@@ -197,10 +209,12 @@ Record Selection
 ||if	||readnext(OUT key, OUT valueno)||
 ||if	||selectrecord(sortselectclause="")||
 ||if	||readnextrecord(OUT key, OUT record)||
+
 Dictionary
 ||var=	||calculate(fieldname)||
 ||var=	||xlate(filename, key, fieldno, mode)||
 ||var=	||xlate(filename, key, fieldno, mode)||
+
 Dynamic Arrays
 ||var=	||remove(fromstr, OUT startx, OUT delimiterno)||
 ||var=	||replace(instring, fieldno, valueno, subvalueno, replacement)||
