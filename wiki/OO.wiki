@@ -18,6 +18,7 @@ Time/Date/Sleep
 ||var=	||var.timedate()||
 ||cmd	||var.ossleep(milliseconds)||
 ||var=	||var.ostime()||
+
 System File/Directory
 ||if	||var.osopen(osfilename)||
 ||cmd2	||var.osbread(filehandle, startoffset, length)||
@@ -39,6 +40,7 @@ System File/Directory
 ||var=	||var.oscwd()||
 ||var=	||var.oscwd(path)||
 ||cmd	||var.osflush()||
+
 Program Control
 ||if	||var.load(libraryname)||
 ||var=	||var.call(libraryname, functionname)||
@@ -57,6 +59,7 @@ Program Control
 ||var=	||var.debug()||
 ||cmd	||var.breakon()||
 ||cmd	||var.breakoff()||
+
 Standard Output
 ||cmd2	||var.output()||
 ||cmd2	||var.outputln()||
@@ -73,6 +76,7 @@ Standard Output
 ||cmd2	||var.errput(var1)||
 ||cmd2	||var.errputln(var1)||
 ||cmd2	||var.put(std::ostream &ostream1)||
+
 Cursor
 ||var=	||var.at(columnorcode)||
 ||var=	||var.at(column, row)||
@@ -80,11 +84,13 @@ Cursor
 ||cmd	||var.setcursor()||
 ||var=	||var.getprompt()||
 ||cmd	||var.setprompt()||
+
 Standard Input
-||if	||var.inputln()||
-||if	||var.inputln(prompt)||
-||if	||var.input(n)||
+||if	||var.input()||
+||if	||var.input(prompt)||
+||if	||var.inputn(n)||
 ||if	||var.eof()||
+
 Variable Control
 ||if	||var.assigned()||
 ||if	||var.unassigned()||
@@ -93,6 +99,7 @@ Variable Control
 ||var=	||var.addressof()||
 ||cmd	||var.clear()||
 ||cmd	||var.clearcommon()||
+
 Numeric
 ||var=	||var.bitnot()||
 ||var=	||var.abs()||
@@ -109,11 +116,13 @@ Numeric
 ||var=	||var.integer()||
 ||var=	||var.floor()||
 ||var=	||var.round(ndecimals=0)||
+
 String Creation
 ||var=	||var.chr()||
 ||var=	||var.chr(num)||
 ||var=	||var.str(num)||
 ||var=	||var.space()||
+
 String Info
 ||if	||var.match(matchstr, options="")||
 ||var=	||var.seq()||
@@ -124,6 +133,7 @@ String Info
 ||	||data()||
 ||if	||var.isnum()||
 ||if	||var.isalpha()||
+
 String Manipulation
 ||cmd2	||var.converter(fromchars, tochars)||
 ||cmd2	||var.swapper(fromstr, tostr, options="")||
@@ -142,6 +152,7 @@ String Manipulation
 ||cmd2	||var.fieldstorer(sepchar, fieldn, nfields, replacement)||
 ||cmd2	||var.substrer(startx)||
 ||cmd2	||var.substrer(startx, length)||
+
 String Filter
 ||var=	||var.convert(fromchars, tochars)||
 ||var=	||var.swap(fromstr, tostr, options="")||
@@ -159,15 +170,18 @@ String Filter
 ||var=	||var.trimb(trimchar)||
 ||var=	||var.fieldstore(sepchar, fieldn, nfields, replacement)||
 ||var=	||var.hash()||
+
 String Extraction
 ||var=	||var.substr(startx)||
 ||var=	||var.substr(startx, length)||
 ||var=	||var.index(substr, startchar1=1)||
 ||var=	||var.field(substrx, fieldnx, nfieldsx=1)||
 ||var=	||var.field2(substrx, fieldnx, nfieldsx=1)||
+
 ICONV/OCONV
 ||var=	||var.oconv(convstr)||
 ||var=	||var.iconv(convstr)||
+
 Dynamic Array
 ||cmd	||var.matparse(OUT varray1)||
 ||var=	||var.lower()||
@@ -190,6 +204,7 @@ Dynamic Array
 ||if	||var.locateusing(target, usingchar, OUT setting, fieldn=0, valuen=0, subvaluen=0)||
 ||if	||var.locateusing(target, usingchar)||
 ||var=	||var.sum(sepchar=VM_)||
+
 Database
 ||if	||var.connect(connectioninfo="")||
 ||if	||var.disconnect()||
@@ -203,7 +218,8 @@ Database
 ||if	||var.createindex(fieldname, dictfile="")||
 ||if	||var.deleteindex(fieldname)||
 ||var=	||var.listindexes(filename)||
-Database Files and Records
+
+Files and Records
 ||if	||var.open(dbfilename)||
 ||if	||var.open(dict, dbfilename)||
 ||cmd	||var.close()||
@@ -228,7 +244,6 @@ Dictionary
 ||var=	||var.calculate()||
 ||var=	||var.xlate(filename, fieldno, mode)||
 ||var=	||var.xlate(filename, fieldno, mode)||
-
 
 The following is not very informative and might be removed
 
