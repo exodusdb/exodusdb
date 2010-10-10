@@ -29,9 +29,11 @@ Exodus provides a complete set of in-place string modification functions with th
 ||cmd	||traditional commands with no outputs||
 ||cmd2	||traditional commands that had parameters on the left hand side of the = assigments (or -er functions)||
 
-==== Key to Parameters ====
+==== Parameters Types ====
 
-Parameters marked OUT are designed to return values. Depending on the function they may also provide input.
+||io|| Parameters that may provide and/or return data. Must be variables not raw data like 1 or "X"||
+||out|| Parameters that return data. Must be variables not raw data like 1 or "X"||
+||blank||The default. Parameters that provide data to the function.||
 
 Optional Parameters
 
@@ -48,7 +50,7 @@ Optional Parameters
 
 Environment
 ||var=	||osgetenv(name)||
-||if	||osgetenv(name, OUT value)||
+||if	||osgetenv(name, out value)||
 ||if	||ossetenv(name, value)||
 
 Time/Date/Sleep
@@ -59,12 +61,12 @@ Time/Date/Sleep
 ||var=	||ostime()||
 
 System File and Directory
-||if	||osopen(filename, OUT filehandle)||
+||if	||osopen(filename, out filehandle)||
 ||cmd	||osclose(filehandle)||
 ||var=	||osbread(filehandle, startoffset, length)||
-||cmd	||osbread(OUT data, filehandle, startoffset, length)||
+||cmd	||osbread(out data, filehandle, startoffset, length)||
 ||cmd	||osbwrite(data, filehandle, startoffset)||
-||if	||osread(OUT data, osfilename)||
+||if	||osread(out data, osfilename)||
 ||var=	||osread(osfilename)||
 ||if	||oswrite(data, osfilename)||
 ||if	||osdelete(osfilename)||
@@ -111,7 +113,7 @@ Cursor
 
 Console Input
 ||var=	||input()||
-||var=	||input(prompt, OUT inpstr)||
+||var=	||input(prompt, out inpstr)||
 ||var=	||inputn(n)||
 
 Numbers
@@ -122,37 +124,37 @@ Numbers
 Strings
 ||var=	||len(mv1)||
 ||var=	||length(mv1)||
-||cmd2 	||converter(OUT instring, fromchars, tochars)||
+||cmd2 	||converter(io instring, fromchars, tochars)||
 ||var=	||convert(instring, fromchars, tochars)||
-||cmd2 	||swapper(OUT instring, fromchars, tochars, options="")||
+||cmd2 	||swapper(io instring, fromchars, tochars, options="")||
 ||var=	||swap(instring, fromchars, tochars, options="")||
 ||var=	||ucase(instring)||
-||cmd2 	||lcaser(OUT instring)||
+||cmd2 	||lcaser(io instring)||
 ||var=	||lcase(instring)||
-||cmd2 	||inverter(OUT instring)||
+||cmd2 	||inverter(io instring)||
 ||var=	||invert(instring)||
-||cmd2 	||lowerer(OUT instring)||
+||cmd2 	||lowerer(io instring)||
 ||var=	||lower(instring)||
-||cmd2 	||raiser(OUT instring)||
+||cmd2 	||raiser(io instring)||
 ||var=	||raise(instring)||
-||cmd2 	||splicer(OUT instring, start1, length, str)||
+||cmd2 	||splicer(io instring, start1, length, str)||
 ||var=	||splice(instring, start1, length, str)||
-||cmd2 	||quoter(OUT instring)||
+||cmd2 	||quoter(io instring)||
 ||var=	||quote(instring)||
-||cmd2 	||fieldstorer(OUT instring, sepchar, fieldn, nfields, replacement)||
+||cmd2 	||fieldstorer(io instring, sepchar, fieldn, nfields, replacement)||
 ||var=	||fieldstore(instring, sepchar, fieldn, nfields, replacement)||
-||cmd2 	||trimmer(OUT instring, trimchar=" ")||
+||cmd2 	||trimmer(io instring, trimchar=" ")||
 ||var=	||trim(instring, trimchar=" ")||
-||cmd2 	||trimmerf(OUT instring, trimchar=" ")||
+||cmd2 	||trimmerf(io instring, trimchar=" ")||
 ||var=	||trimf(instring, trimchar=" ")||
-||cmd2 	||trimmerb(OUT instring, trimchar=" ")||
+||cmd2 	||trimmerb(io instring, trimchar=" ")||
 ||var=	||trimb(instring, trimchar=" ")||
-||cmd2 	||trimmer(OUT instring, trimchar)||
+||cmd2 	||trimmer(io instring, trimchar)||
 ||var=	||trim(instring, trimchar)||
-||cmd2 	||trimmerf(OUT instring, trimchar)||
+||cmd2 	||trimmerf(io instring, trimchar)||
 ||var=	||trimf(instring, trimchar)||
 ||var=	||crop(instring)||
-||var=	||cropper(OUT instring)||
+||var=	||cropper(io instring)||
 ||var=	||chr(integer)||
 ||if	||match(instring, matchstr, options="")||
 ||var=	||seq(char1)||
@@ -162,8 +164,8 @@ Strings
 ||var=	||count(instring, substrx)||
 ||var=	||substr(instring, startx)||
 ||var=	||substr(instring, startx, length)||
-||var=	||substrer(OUT instring, startx)||
-||var=	||substrer(OUT instring, startx, length)||
+||var=	||substrer(io instring, startx)||
+||var=	||substrer(io instring, startx, length)||
 ||var=	||index(instring, substr, startchar1=1)||
 ||var=	||field(instring, substrx, fieldnx, nfieldsx=1)||
 ||var=	||field2(instring, substrx, fieldnx, nfieldsx=1)||
@@ -192,10 +194,10 @@ Files and Records
 ||if	||lock(filehandle, key)||
 ||cmd	||unlock(filehandle, key)||
 ||cmd	||unlockall()||
-||if	||open(filename, OUT filehandle)||
-||if	||open(dictdata, filename, OUT filehandle)||
-||if	||read(OUT record, filehandle, key)||
-||if	||readv(OUT record, filehandle, key, fieldnumber)||
+||if	||open(filename, out filehandle)||
+||if	||open(dictdata, filename, out filehandle)||
+||if	||read(out record, filehandle, key)||
+||if	||readv(out record, filehandle, key, fieldnumber)||
 ||if	||write(record, filehandle, key)||
 ||if	||writev(record, filehandle, key, fieldn)||
 ||if	||deleterecord(filehandle, key)||
@@ -205,10 +207,10 @@ Files and Records
 Record Selection
 ||if	||select(sortselectclause="")||
 ||cmd	||clearselect()||
-||if	||readnext(OUT key)||
-||if	||readnext(OUT key, OUT valueno)||
+||if	||readnext(out key)||
+||if	||readnext(out key, out valueno)||
 ||if	||selectrecord(sortselectclause="")||
-||if	||readnextrecord(OUT key, OUT record)||
+||if	||readnextrecord(out key, out record)||
 
 Dictionary
 ||var=	||calculate(fieldname)||
@@ -216,16 +218,16 @@ Dictionary
 ||var=	||xlate(filename, key, fieldno, mode)||
 
 Dynamic Arrays
-||var=	||remove(fromstr, OUT startx, OUT delimiterno)||
+||var=	||remove(fromstr, io startx, out delimiterno)||
 ||var=	||replace(instring, fieldno, valueno, subvalueno, replacement)||
 ||var=	||extract(instring, fieldno=0, valueno=0, subvalueno=0)||
 ||var=	||insert(instring, fieldno, valueno, subvalueno, insertion)||
 ||var=	||erase(instring, fieldno, valueno=0, subvalueno=0)||
-||cmd2 	||replacer(OUT instring, fieldno, valueno, subvalueno, replacement)||
-||cmd2 	||inserter(OUT instring, fieldno, valueno, subvalueno, insertion)||
-||cmd2 	||eraser(OUT instring, fieldno, valueno=0, subvalueno=0)||
-||if	||locate(instring, target, OUT setting, fieldn=0, valuen=0)||
-||if	||locateby(instring, target, ordercode, OUT setting, fieldn=0, valuen=0)||
-||if	||locateusing(instring, target, usingchar, OUT setting, fieldn=0, valuen=0, subvaluen=0)||
+||cmd2 	||replacer(out instring, fieldno, valueno, subvalueno, replacement)||
+||cmd2 	||inserter(io instring, fieldno, valueno, subvalueno, insertion)||
+||cmd2 	||eraser(io instring, fieldno, valueno=0, subvalueno=0)||
+||if	||locate(instring, target, out setting, fieldn=0, valuen=0)||
+||if	||locateby(instring, target, ordercode, out setting, fieldn=0, valuen=0)||
+||if	||locateusing(instring, target, usingchar, out setting, fieldn=0, valuen=0, subvaluen=0)||
 ||if	||locateusing(instring, target, usingchar)||
 ||var=	||sum(instring, sepchar=VM_)||
