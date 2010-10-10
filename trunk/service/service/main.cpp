@@ -188,12 +188,13 @@ program()
 	oconv(1234,"MD20P").outputln();
 	assert(var(10000).oconv("DY0")=="");
 
-	if (not var().open("dict_test_symbolics"))
+	var temp;
+	if (not open("dict_test_symbolics",temp))
 		createfile("dict_test_symbolics");
 	write("F"^FM^0^FM^"ID","dict_test_symbolics","ID");
 	write("S"^FM^FM^"Col1","dict_test_symbolics","SYMCOL1");
 
-	if (not var().open("test_symbolics"))
+	if (not open("test_symbolics",temp))
 		createfile("test_symbolics");
 	write(1000^FM^2000,"test_symbolics","3000");
 
@@ -303,13 +304,35 @@ program()
 	//try{unass+1;}
 	//catch(...){};
 
-	//using c arrays;
+	//using mv dimensioned arrays
+	//mv dimensioned arrays have a zero element that is
+	//used in case either or both of the indexes are zero
+	varray arr1(3), arr2(3,3);
+	arr1(0)=0;
+	arr1(0,0)=0;
+	for (int ii=1; ii<=3; ++ii) {
+		arr1(ii)=ii;
+		for (int jj=1; jj<=3; ++jj)
+			arr2(ii,jj)=ii*3+jj;
+	}
+	assert(arr1(0) eq "0");
+	assert(arr1(0,0) eq "0");
+	for (int ii=1; ii<=3; ++ii) {
+		assert(arr1(ii) eq ii);
+		for (int jj=1; jj<=3; ++jj)
+			assert(arr2(ii,jj) eq ii*3+jj);
+	}
+
+	//using c arrays UNSAFE! USE STL VECTOR INSTEAD;
 	var arrxxx[10];
+
+	//can use int but not var for indexing c arrays
 	int intx=0;
-	arrxxx[intx++]="x";
+	arrxxx[intx]="x";
 	var varx=0;
 	//following will not compile on MSVC (g++ is ok) due to "ambiguous" due to using var for index element
-	//arrxxx[varx++]="y";
+	//arrxxx[varx]="y";
+	arrxxx[int(varx)]="y";
 
 	//bool cannot be used numerically ON MSVC (unlike in pick)
 	//could change all logical ops to return var or find a way to allow void* pointer to promote to bool
@@ -317,7 +340,7 @@ program()
 	var log1="xx";
 	var log2="x";
 	//following will not compile now that all exodus logical operators return bool instead of var
-	//if (log1==log2^log1) {}
+	//if (log1 eq log2^log1) {}
 /*
 in.cpp(181) : error C2666: 'exodus::operator ^' : 7 overloads have similar conversions
 could be 'exodus::var exodus::operator +(const int,const exodus::var &)' [found using argument-dependent lookup]
@@ -338,7 +361,7 @@ while trying to match the argument list '(exodus::var, bool)'
 	println(_SENTENCE);
 	var("xyz").substr(4,1).outputln();
 
-	//TODO ensure isnum converts very large ints to FLOATS
+	//TODO ensure isnum converts ints larger that the maximum int to FLOATS
 
 	var subs="xyz";
 	println(subs.substr(-1));

@@ -6,7 +6,7 @@ dnl Initialization macros.
 dnl --------------------------------
 
 AC_INIT
-AC_PREREQ(2.62)
+AC_PREREQ(2.68)
 AC_CONFIG_SRCDIR([exodus/mv.cpp])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR(m4)
@@ -19,12 +19,12 @@ dnl -----------------------------------------------
 GENERIC_LIBRARY_NAME=exodus
 
 #release versioning
-GENERIC_MAJOR_VERSION=9
-GENERIC_MINOR_VERSION=6
+GENERIC_MAJOR_VERSION=10
+GENERIC_MINOR_VERSION=10
 GENERIC_MICRO_VERSION=0
 
 #API version (often = GENERIC_MAJOR_VERSION.GENERIC_MINOR_VERSION)
-GENERIC_API_VERSION=9.6
+GENERIC_API_VERSION=10.10
 AC_SUBST(GENERIC_API_VERSION)
 
 #shared library versioning
@@ -123,13 +123,13 @@ dnl Generates Makefile's, configuration files and scripts
 dnl -----------------------------------------------
 
 AC_CONFIG_FILES([Makefile \
-          exodus-9.6.pc \
+          exodus-10.10.pc \
           exodus/Makefile 
 ])
 AC_OUTPUT
 
 echo
-echo "You have configured the Exodus library"
+echo "Congrats. You have configured the Exodus library"
 echo
 echo "If you have root privileges then type 'make && make install'"
 echo "otherwise type 'make && sudo make install'"

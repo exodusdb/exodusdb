@@ -179,7 +179,7 @@
 	</References>
 	<Files>
 		<File
-			RelativePath=".\exodus_cli.cpp"
+			RelativePath=".\exodus.cpp"
 			>
 		</File>
 	</Files>
