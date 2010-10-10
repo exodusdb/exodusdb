@@ -15,9 +15,28 @@ program()
 	if (not editor)
 		editor.osgetenv("EDITOR");
 
+	//TODO simplify this editor finding code
+
 	//enable edit at first error for crimson editor
 	if (editor.lcase().index("cedt") and not editor.index("$") )
 		editor^=" /L:$LINENO '$FILENAME'";
+
+	//look for nano.exe next to edic.exe
+	if (not editor and _SLASH=="\\") {
+		var nanopath=_EXECPATH.swap("edic","nano");
+		if (nanopath.osfile())
+			editor="nano $LINENO'$FILENAME'";
+	}
+
+	//look for nano in parent bin
+	if (not editor and _SLASH=="\\") {
+		var nanopath="..\\bin\\nano.exe";
+		if (nanopath.osfile())
+			editor="nano $LINENO'$FILENAME'";
+	}
+
+	if (editor.index("nano"))
+		linenopattern="+$LINENO ";
 
 	//otherwise on windows try to locate CYGWIN nano or vi
 	if (not editor and _SLASH=="\\")
