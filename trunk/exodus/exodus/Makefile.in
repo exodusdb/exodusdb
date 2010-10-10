@@ -37,7 +37,7 @@ host_triplet = @host@
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
-	$(srcdir)/exodus-9.6.pc.in $(top_srcdir)/configure AUTHORS \
+	$(srcdir)/exodus-10.10.pc.in $(top_srcdir)/configure AUTHORS \
 	COPYING ChangeLog INSTALL NEWS config/config.guess \
 	config/config.sub config/depcomp config/install-sh \
 	config/ltmain.sh config/missing
@@ -57,7 +57,7 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = config.h
-CONFIG_CLEAN_FILES = exodus-9.6.pc
+CONFIG_CLEAN_FILES = exodus-10.10.pc
 CONFIG_CLEAN_VPATH_FILES =
 SOURCES =
 DIST_SOURCES =
@@ -332,7 +332,7 @@ $(srcdir)/config.h.in:  $(am__configure_deps)
 
 distclean-hdr:
 	-rm -f config.h stamp-h1
-exodus-9.6.pc: $(top_builddir)/config.status $(srcdir)/exodus-9.6.pc.in
+exodus-10.10.pc: $(top_builddir)/config.status $(srcdir)/exodus-10.10.pc.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 
 mostlyclean-libtool:
