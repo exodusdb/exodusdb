@@ -1,0 +1,217 @@
+=== Traditional Multivalue Functions and Statements (non-OO) ===
+
+These functions are designed to simulate traditional multivalue function and statement syntax as far as possible.
+
+  * Traditional functions are rendered as functions.
+  * Traditional statements are also rendered as functions.
+
+==== In-place string modifier functions ("-er" functions) ====
+
+Most of the functions will be obvious to traditional multivalue programmers with the exception of the functions ending -ER for example trimmer(). All the "er" functions are designed to modify strings IN PLACE instead of returning new strings. The correspond to the old string modifier STATEMENTS instead of the old string functions.
+
+For example the efficient modify in-place string conversion
+
+ CONVERT "x" TO "y" IN ZZ
+
+is now represented by ...
+
+ converter(cc,aa,bb);
+
+Traditional multivalue basic did not provide a full set of in-place string modification functions leading to inefficiencies for example traditional multivalue basic has a TRIM() function which would return a new string but no TRIM X statement which would modify the string in-place which is often far faster.
+
+Exodus provides a complete set of in-place string modification functions with the characteristic ending -er for example fieldstore() returns a new string whereas fieldstorer() modifies the string in-place.
+
+==== Key to Function Types ====
+
+||TYPE	||FUNCTION TYPE||
+||var=	||traditional functions that return values||
+||if	||traditional conditional statements that started with if or ended with then or else (or could have)||
+||cmd	||traditional commands with no outputs||
+||cmd2	||traditional commands that had parameters on the left hand side of the = assigments (or -er functions)||
+
+==== Key to Parameters ====
+
+Parameters marked OUT are designed to return values. Depending on the function they may also provide input.
+
+Optional Parameters
+
+||Key	||Default||
+||=""	||""||
+||=" "	||" "||
+||="."	||"."||
+||=1	||1 ||
+||=0	||0||
+||=true	||true||
+||=false	||false||
+
+==== Complete List of Functions ====
+
+||TYPE	||FUNCTION||
+Environment
+||var=	||osgetenv(name)||
+||if	||osgetenv(name, OUT value)||
+||if	||ossetenv(name, value)||
+Status
+||if	||assigned(mv1)||
+||if	||unassigned(mv1)||
+Time/Date/Sleep
+||var=	||date()||
+||var=	||time()||
+||var=	||timedate()||
+||cmd	||ossleep(milliseconds)||
+||var=	||ostime()||
+File and Directory
+||if	||osopen(filename, OUT filehandle)||
+||cmd	||osclose(filehandle)||
+||var=	||osbread(filehandle, startoffset, length)||
+||cmd	||osbread(OUT data, filehandle, startoffset, length)||
+||cmd	||osbwrite(data, filehandle, startoffset)||
+||if	||osread(OUT data, osfilename)||
+||var=	||osread(osfilename)||
+||if	||oswrite(data, osfilename)||
+||if	||osdelete(osfilename)||
+||if	||osrename(oldosfilename, newosfilename)||
+||if	||oscopy(fromosdir_or_filename, newosdir_or_filename)||
+||var=	||oslist(path=".", wildcard="", mode=0)||
+||var=	||oslistf(path=".", wildcard="")||
+||var=	||oslistd(path=".", wildcard="")||
+||var=	||osfile(filename)||
+||var=	||osdir(filename)||
+||if	||osmkdir(dirname)||
+||if	||osrmdir(dirname, evenifnotempty=false)||
+||var=	||oscwd()||
+||var=	||oscwd(dirname)||
+||cmd	||osflush()||
+Program Control
+||var=	||suspend(command)||
+||var=	||osshell(command)||
+||cmd	||stop(text="")||
+||cmd	||abort(text)||
+||var=	||perform(command)||
+||var=	||execute(command)||
+||var=	||chain(command)||
+||var=	||logoff()||
+||cmd	||debug()||
+Console Output
+||cmd	||print(mv1)||
+||cmd	||println(mv1="")||
+||cmd	||printtab(mv1="")||
+Cursor
+||var=	||at(columnorcode)||
+||var=	||at(column, row)||
+||var=	||getcursor()||
+||cmd	||setcursor(cursor)||
+||var=	||getprompt()||
+||cmd	||setprompt(prompt)||
+Console Input
+||var=	||inputln()||
+||var=	||inputln(prompt="")||
+||var=	||input(n)||
+Numbers
+||var=    ||rnd(number)||
+||cmd    ||initrnd(seednumber)||
+||var=    ||mod(dividend, divisor)||
+Strings
+||var=	||len(mv1)||
+||var=	||length(mv1)||
+||cmd2 	||converter(OUT instring, fromchars, tochars)||
+||var=	||convert(instring, fromchars, tochars)||
+||cmd2 	||swapper(OUT instring, fromchars, tochars, options="")||
+||var=	||swap(instring, fromchars, tochars, options="")||
+||var=	||ucase(instring)||
+||cmd2 	||lcaser(OUT instring)||
+||var=	||lcase(instring)||
+||cmd2 	||inverter(OUT instring)||
+||var=	||invert(instring)||
+||cmd2 	||lowerer(OUT instring)||
+||var=	||lower(instring)||
+||cmd2 	||raiser(OUT instring)||
+||var=	||raise(instring)||
+||cmd2 	||splicer(OUT instring, start1, length, str)||
+||var=	||splice(instring, start1, length, str)||
+||cmd2 	||quoter(OUT instring)||
+||var=	||quote(instring)||
+||cmd2 	||fieldstorer(OUT instring, sepchar, fieldn, nfields, replacement)||
+||var=	||fieldstore(instring, sepchar, fieldn, nfields, replacement)||
+||cmd2 	||trimmer(OUT instring, trimchar=" ")||
+||var=	||trim(instring, trimchar=" ")||
+||cmd2 	||trimmerf(OUT instring, trimchar=" ")||
+||var=	||trimf(instring, trimchar=" ")||
+||cmd2 	||trimmerb(OUT instring, trimchar=" ")||
+||var=	||trimb(instring, trimchar=" ")||
+||cmd2 	||trimmer(OUT instring, trimchar)||
+||var=	||trim(instring, trimchar)||
+||cmd2 	||trimmerf(OUT instring, trimchar)||
+||var=	||trimf(instring, trimchar)||
+||var=	||crop(instring)||
+||var=	||cropper(OUT instring)||
+||var=	||chr(integer)||
+||if	||match(instring, matchstr, options="")||
+||var=	||seq(char1)||
+||var=	||str(instring, number)||
+||var=	||space(number)||
+||var=	||dcount(instring, substrx)||
+||var=	||count(instring, substrx)||
+||var=	||substr(instring, startx)||
+||var=	||substr(instring, startx, length)||
+||var=	||substrer(OUT instring, startx)||
+||var=	||substrer(OUT instring, startx, length)||
+||var=	||index(instring, substr, startchar1=1)||
+||var=	||field(instring, substrx, fieldnx, nfieldsx=1)||
+||var=	||field2(instring, substrx, fieldnx, nfieldsx=1)||
+ICONV/OCONV
+||var=	||oconv(instring, conversion)||
+||var=	||oconv(instring, conversion)||
+||var=	||iconv(instring, conversion)||
+||var=	||iconv(instring, conversion)||
+Database
+||if	||connect(connectionstring="")||
+||if	||disconnect()||
+||if	||createfile(filename, options="")||
+||if	||deletefile(filename)||
+||if	||clearfile(filename)||
+||var=	||listfiles()||
+||if	||createindex(filename, fieldname, dictfilename="")||
+||if	||deleteindex(filename, fieldname)||
+||var=	||listindexes(filename)||
+||if	||begin()||
+||if	||rollback()||
+||if	||end()||
+Files and Records
+||if	||lock(filehandle, key)||
+||cmd	||unlock(filehandle, key)||
+||cmd	||unlockall()||
+||if	||open(filename, OUT filehandle)||
+||if	||open(dictdata, filename, OUT filehandle)||
+||if	||read(OUT record, filehandle, key)||
+||if	||readv(OUT record, filehandle, key, fieldnumber)||
+||if	||write(record, filehandle, key)||
+||if	||writev(record, filehandle, key, fieldn)||
+||if	||deleterecord(filehandle, key)||
+||if	||updaterecord(record, filehandle, key)||
+||if	||insertrecord(record, filehandle, key)||
+Record Selection
+||if	||select(sortselectclause="")||
+||cmd	||clearselect()||
+||if	||readnext(OUT key)||
+||if	||readnext(OUT key, OUT valueno)||
+||if	||selectrecord(sortselectclause="")||
+||if	||readnextrecord(OUT key, OUT record)||
+Dictionary
+||var=	||calculate(fieldname)||
+||var=	||xlate(filename, key, fieldno, mode)||
+||var=	||xlate(filename, key, fieldno, mode)||
+Dynamic Arrays
+||var=	||remove(fromstr, OUT startx, OUT delimiterno)||
+||var=	||replace(instring, fieldno, valueno, subvalueno, replacement)||
+||var=	||extract(instring, fieldno=0, valueno=0, subvalueno=0)||
+||var=	||insert(instring, fieldno, valueno, subvalueno, insertion)||
+||var=	||erase(instring, fieldno, valueno=0, subvalueno=0)||
+||cmd2 	||replacer(OUT instring, fieldno, valueno, subvalueno, replacement)||
+||cmd2 	||inserter(OUT instring, fieldno, valueno, subvalueno, insertion)||
+||cmd2 	||eraser(OUT instring, fieldno, valueno=0, subvalueno=0)||
+||if	||locate(instring, target, OUT setting, fieldn=0, valuen=0)||
+||if	||locateby(instring, target, ordercode, OUT setting, fieldn=0, valuen=0)||
+||if	||locateusing(instring, target, usingchar, OUT setting, fieldn=0, valuen=0, subvaluen=0)||
+||if	||locateusing(instring, target, usingchar)||
+||var=	||sum(instring, sepchar=VM_)||
