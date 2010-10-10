@@ -261,7 +261,7 @@ bool var::connect(const var& conninfo)
 		//discover any configuration file parameters
 		//TODO parse config properly instead of just changing \n\r to spaces!
 		var configfilename=L"";
-		var home="";
+		var home=L"";
 		if (home.osgetenv(L"HOME"))
 			configfilename=home^_SLASH^L".exodus";
 		else if (home.osgetenv(L"USERPROFILE"))
@@ -641,7 +641,7 @@ bool var::lock(const var& key) const
 	paramLengths[0]=sizeof(uint64_t);
 	paramFormats[0]=1;
 
-	char* sql="SELECT PG_TRY_ADVISORY_LOCK($1)";
+	const char* sql="SELECT PG_TRY_ADVISORY_LOCK($1)";
 
     PGconn* thread_pgconn=(PGconn*) connection();
 	if (!thread_pgconn)
@@ -710,7 +710,7 @@ void var::unlock(const var& key) const
 	paramLengths[0]=sizeof(uint64_t);
 	paramFormats[0]=1;
 
-	char* sql="SELECT PG_ADVISORY_UNLOCK($1)";
+	const char* sql="SELECT PG_ADVISORY_UNLOCK($1)";
 
     PGconn* thread_pgconn=(PGconn*) connection();
 	if (!thread_pgconn)

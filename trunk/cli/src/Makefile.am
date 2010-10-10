@@ -1,7 +1,7 @@
 AM_LDFLAGS=-lexodus -L../../exodus/exodus/exodus/.libs
 AM_CXXFLAGS=-I../../exodus/exodus
 
-bin_PROGRAMS=compile createfile createindex delete deletefile deleteindex edit edic exodus_cli \
+bin_PROGRAMS=compile createfile createindex delete deletefile deleteindex edit edic exodus \
 list listfiles listindexes testsort
 
 compile_SOURCES=compile.cpp
@@ -12,7 +12,7 @@ deletefile_SOURCES=deletefile.cpp
 deleteindex_SOURCES=deleteindex.cpp
 edit_SOURCES=edit.cpp
 edic_SOURCES=edic.cpp
-exodus_cli_SOURCES=exodus_cli.cpp
+exodus_SOURCES=exodus.cpp
 list_SOURCES=list.cpp printtext.h
 listfiles_SOURCES=listfiles.cpp
 listindexes_SOURCES=listindexes.cpp

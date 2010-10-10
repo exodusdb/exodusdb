@@ -611,7 +611,7 @@ DLL_PUBLIC var field(const var& instring, const var& substrx,const int fieldnx,c
 
 DLL_PUBLIC var field2(const var& instring, const var& substrx,const int fieldnx,const int nfieldsx)
 {
-	return instring.field(substrx, fieldnx,nfieldsx);
+	return instring.field2(substrx, fieldnx,nfieldsx);
 }
 
 DLL_PUBLIC var oconv(const var& instring, const wchar_t* conversion)

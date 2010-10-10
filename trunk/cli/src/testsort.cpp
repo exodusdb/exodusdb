@@ -108,6 +108,8 @@ program()
 		
 		//check we can read the record back
 		var rec2;
+		dictfile.outputln("dictfile");
+		key.outputln("key");
 		if (read(rec2,dictfile, key)) {
 			if (rec2 ne rec) {
 				println("record differs?!");
