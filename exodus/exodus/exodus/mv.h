@@ -23,8 +23,12 @@ THE SOFTWARE.
 #ifndef MV_H
 #define MV_H 1
 
-#define EXODUS_RELEASE L"9.6"
-#define EXODUS_PATCH L"9.6.1"
+#define EXODUS_RELEASE L"10.10"
+#define EXODUS_PATCH L"10.10.0"
+
+//if installing with autotools then for latest version of boost and other installation macro
+//download the snapshot from here
+//http://git.savannah.gnu.org/gitweb/?p=autoconf-archive.git;a=tree;f=m4
 
 //http://stackoverflow.com/questions/538134/exporting-functions-from-a-dll-with-dllexport
 //Using dllimport and dllexport in C++ Classes
