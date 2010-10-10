@@ -109,7 +109,6 @@ AC_C_RESTRICT
 AC_TYPE_SIZE_T
 AC_TYPE_UINT32_T
 AC_FUNC_STRCOLL
-AC_PROG_RANLIB
 AC_TYPE_SIGNAL
 
 # Checks for library functions.
@@ -129,7 +128,7 @@ AC_CONFIG_FILES([Makefile \
 AC_OUTPUT
 
 echo
-echo "Congrats. You have configured the Exodus library"
+echo "You have configured the Exodus library"
 echo
 echo "If you have root privileges then type 'make && make install'"
 echo "otherwise type 'make && sudo make install'"

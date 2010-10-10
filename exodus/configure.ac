@@ -1,8 +1,8 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.62)
-AC_INIT(exodus, 9.6, steve.bush@neosys.com)
+AC_PREREQ(2.68)
+AC_INIT(exodus, 10.10, steve.bush@neosys.com)
 AC_CONFIG_HEADERS([config.h])
 #AC_CONFIG_MACRO_DIR(m4)
 AC_CONFIG_AUX_DIR(config)
