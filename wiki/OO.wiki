@@ -12,6 +12,33 @@ Many people find the OO method of chaining operations from left to right, and wi
 
 The .extract(6) instead of `<6>` is rather ugly and it might be changed. Likewise outputln() might become something shorter and sweeter.
 
+==== Function Types ====
+
+||TYPE	||FUNCTION TYPE||
+||var=	||traditional functions that return values||
+||if	||traditional conditional statements that started with if or ended with then or else (or could have)||
+||cmd	||traditional commands with no outputs||
+||cmd2	||traditional commands that had parameters on the left hand side of the = assigments (or -er functions)||
+
+==== Parameters Types ====
+
+||io|| Parameters that may provide and/or return data. Must be variables not raw data like 1 or "X"||
+||out|| Parameters that return data. Must be variables not raw data like 1 or "X"||
+||blank||The default. Parameters that provide data to the function. Can be variables or raw data like 1 or "X"||
+
+Optional Parameters
+
+||Key	||Default||
+||=""	||""||
+||=" "	||" "||
+||="."	||"."||
+||=1	||1 ||
+||=0	||0||
+||=true	||true||
+||=false	||false||
+
+==== Complete List of Functions ====
+
 Time/Date/Sleep
 ||var=	||var.date()||
 ||var=	||var.time()||
