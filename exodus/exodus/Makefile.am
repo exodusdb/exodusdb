@@ -1,6 +1,7 @@
 ## top directory
 
-ACLOCAL_AMFLAGS = -I m4
+#error if in, warning if out
+#ACLOCAL_AMFLAGS = -I m4
 
 #Build in these directories:
 SUBDIRS= $(GENERIC_LIBRARY_NAME)
