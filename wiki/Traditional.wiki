@@ -31,6 +31,7 @@ Exodus provides a complete set of in-place string modification functions with th
 
 ==== Parameters Types ====
 
+||in|| Parameters that provide data to the function. Can be variables or raw data like 1 or "X"||
 ||io|| Parameters that may provide and/or return data. Must be variables not raw data like 1 or "X"||
 ||out|| Parameters that return data. Must be variables not raw data like 1 or "X"||
 ||blank||The default. Parameters that provide data to the function. Can be variables or raw data like 1 or "X"||
