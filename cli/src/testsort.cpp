@@ -71,7 +71,6 @@ program()
 	var dictfile;
 	if (not open(dictfilename, dictfile)) {
 		createfile(dictfilename);
-		if (not open(dictfilename, file)) {
 			println("Cannot open dictionary ", dictfilename);
 			stop();
 		}
