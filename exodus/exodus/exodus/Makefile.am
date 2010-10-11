@@ -20,7 +20,7 @@ xfunctors8.h xfunctors9.h
 
 
 #some more headers
-buildonly_h_sources = ConvertUTF.h NullCodecvt.h TConvert.h gettimeofday.h neo.h mvconfig.h MurmuHash2_64.h
+buildonly_h_sources = ConvertUTF.h NullCodecvt.h TConvert.h gettimeofday.h neo.h mvconfig.h MurmurHash2_64.h
 
 #source files
 cc_sources = ConvertUTF.c howto.cpp mvarray.cpp mvdatetime.cpp  mvdebug.cpp mvfuncs.cpp mvioconv.cpp mvlibs.cpp mvos.cpp \
