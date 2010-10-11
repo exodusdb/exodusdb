@@ -910,6 +910,7 @@ public:
 	var xlate(const var& filename,const var& fieldno, const wchar_t* mode) const;
 	var xlate(const var& filename,const var& fieldno, const var& mode) const;
 	bool sqlexec() const;
+	bool sqlexec(var& errmsg) const;
 
 	//bool selftest() const;
 

@@ -331,12 +331,12 @@ bool var::connect(const var& conninfo)
 
 	if (PQstatus(pgconn) != CONNECTION_OK)
 	{
-		#if TRACING >= 2
+//		#if TRACING >= 2
 			exodus::errputln(L"var::connect() Connection to database failed: " ^ var(PQerrorMessage(pgconn)));
 			//if (not conninfo2)
 				exodus::errputln(L"var::connect() Postgres connection configuration missing or incorrect. Please login.");
 ;
-		#endif
+//		#endif
 		PQfinish(pgconn);
 		return false;
 	}
@@ -764,17 +764,50 @@ void var::unlockall() const
 //returns success or failure but no data
 bool var::sqlexec() const
 {
-	THISIS(L"bool var::sqlexec() const")
+	var errmsg;
+	return sqlexec(errmsg);
+}
+
+//returns success or failure but no data
+bool var::sqlexec(var& errormsg) const
+{
+	THISIS(L"bool var::sqlexec(var& errmsg) const")
 	THISISSTRING()
 
+	/* dont use pqexec here since it cannot execute multiple commands
 	//check/establish connection
 	if (!connection())
 		return false;
 
 	PGresultptr result;
-	if (!pqexec(*this,result))
+	if (!pqexec(*this,result)) {
+		PGconn* thread_pgconn=(PGconn*) connection();
+		errormsg=var(PQerrorMessage(thread_pgconn));
 		return false;
+	}
 	PQclear(result);
+	return true;
+	*/
+
+	PGconn* thread_pgconn=tss_pgconns.get();
+	if (!thread_pgconn)
+		return 0;
+	DEBUG_LOG_SQL1
+
+	//will contain any result IF successful
+	//MUST do PQclear(local_result) after using it;
+	PGresult* pgresult;
+
+	//NB PQexec cannot be told to return binary results
+	//but it can execute multiple commands
+	//whereas PQexecParams is the opposite
+	DEBUG_LOG_SQL
+	pgresult = PQexec(thread_pgconn, (*this).tostring().c_str());
+	if (!pgresult) {
+		errormsg=var(PQerrorMessage(thread_pgconn));
+		return false;
+	}
+	PQclear(pgresult);
 	return true;
 
 }
