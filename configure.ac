@@ -25,10 +25,10 @@ AC_CONFIG_SUBDIRS([exodus
                    cli])
 AC_OUTPUT
 
-dnl
-dnl Congrats. You have configured:
-dnl 1. Exodus Library
-dnl 2. Exodus Postgres Plugin
-dnl 3. Exodus CLI
-dnl
-dnl Type 'make && sudo make install'
+echo
+echo Congrats. You have configured:
+echo 1. Exodus Library
+echo 2. Exodus Postgres Plugin
+echo 3. Exodus CLI
+echo
+echo Type 'make && sudo make install'

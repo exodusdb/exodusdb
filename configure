@@ -13611,3 +13611,10 @@ $as_echo "$as_me: WARNING: unrecognized options: $ac_unrecognized_opts" >&2;}
 fi
 
 
+echo
+echo Congrats. You have configured:
+echo 1. Exodus Library
+echo 2. Exodus Postgres Plugin
+echo 3. Exodus CLI
+echo
+echo Type 'make && sudo make install'

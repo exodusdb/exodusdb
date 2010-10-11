@@ -143,7 +143,6 @@ program()
 
 			filename=oscwd()^_SLASH^filename;
 		}
-
 		//prepare a skeleton exodus cpp file
 		var newfile=false;
 		if (iscompilable and !osfile(filename)) {
@@ -155,7 +154,7 @@ program()
 			blankfile^="\tprint(\"Hello World!\");\n";
 			blankfile^="}\n";
 			if (_SLASH ne "/")
-				blankfile.swapper("\n","\r\n"),
+				blankfile.swapper("\n","\r\n");
 			oswrite(blankfile,filename);
 			startatlineno="4,9";
 			//startatlineno="";

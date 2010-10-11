@@ -127,7 +127,7 @@ AC_CONFIG_FILES([Makefile \
 ])
 AC_OUTPUT
 
-dnl
-dnl Congrats. You have configured pgexodus.
-dnl
-dnl Type 'make && sudo make install'
+echo
+echo Congrats. You have configured pgexodus.
+echo
+echo Type 'make && sudo make install'
