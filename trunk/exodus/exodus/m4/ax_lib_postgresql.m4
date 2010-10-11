@@ -1,5 +1,5 @@
 # ===========================================================================
-#           http://autoconf-archive.cryp.to/ax_lib_postgresql.html
+#     http://www.gnu.org/software/autoconf-archive/ax_lib_postgresql.html
 # ===========================================================================
 #
 # SYNOPSIS
@@ -41,12 +41,15 @@
 #
 #   Copying and distribution of this file, with or without modification, are
 #   permitted in any medium without royalty provided the copyright notice
-#   and this notice are preserved.
+#   and this notice are preserved. This file is offered as-is, without any
+#   warranty.
+
+#serial 9
 
 AC_DEFUN([AX_LIB_POSTGRESQL],
 [
     AC_ARG_WITH([postgresql],
-        AC_HELP_STRING([--with-postgresql=@<:@ARG@:>@],
+        AS_HELP_STRING([--with-postgresql=@<:@ARG@:>@],
             [use PostgreSQL library @<:@default=yes@:>@, optionally specify path to pg_config]
         ),
         [
@@ -85,7 +88,7 @@ AC_DEFUN([AX_LIB_POSTGRESQL],
         if test "$PG_CONFIG" != "no"; then
             AC_MSG_CHECKING([for PostgreSQL libraries])
 
-            POSTGRESQL_CFLAGS="-I`$PG_CONFIG --includedir` -I`$PG_CONFIG --includedir-server`"
+            POSTGRESQL_CFLAGS="-I`$PG_CONFIG --includedir`"
             POSTGRESQL_LDFLAGS="-L`$PG_CONFIG --libdir` -lpq"
 
             POSTGRESQL_VERSION=`$PG_CONFIG --version | sed -e 's#PostgreSQL ##'`

@@ -6,7 +6,7 @@ dnl Initialization macros.
 dnl --------------------------------
 
 AC_INIT
-AC_PREREQ(2.68)
+AC_PREREQ(2.67)
 AC_CONFIG_SRCDIR([exodus/mv.cpp])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR(m4)
@@ -127,8 +127,7 @@ AC_CONFIG_FILES([Makefile \
 ])
 AC_OUTPUT
 
-echo
-echo "You have configured the Exodus library"
-echo
-echo "If you have root privileges then type 'make && make install'"
-echo "otherwise type 'make && sudo make install'"
+dnl
+dnl Congrats. You have configured the Exodus library
+dnl
+dnl Type 'make && sudo make install'

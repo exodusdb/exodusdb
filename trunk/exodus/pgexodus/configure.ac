@@ -1,6 +1,6 @@
 # Process this file with autoreconf or autoconf to produce a configure script.
 
-AC_PREREQ(2.62)
+AC_PREREQ(2.67)
 
 dnl --------------------------------
 dnl Initialization macros.
@@ -127,8 +127,7 @@ AC_CONFIG_FILES([Makefile \
 ])
 AC_OUTPUT
 
-echo
-echo "You have configured pgexodus."
-echo
-echo "If you have root privileges then type 'make && make install'"
-echo "otherwise type 'make && sudo make install'"
+dnl
+dnl Congrats. You have configured pgexodus.
+dnl
+dnl Type 'make && sudo make install'
