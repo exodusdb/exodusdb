@@ -109,7 +109,7 @@ program()
 		//check we can read the record back
 		var rec2;
 		dictfile.outputln("dictfile");
-		key.outputln("key");
+		//key.outputln("key");
 		if (read(rec2,dictfile, key)) {
 			if (rec2 ne rec) {
 				println("record differs?!");
@@ -174,6 +174,7 @@ program()
 		deletefile(dictfile);
 	}
 	
-	println("\nJust type 'list' (without the quotes) to see it's syntax");
+	println("\nJust type 'list' (without the quotes) to see the syntax of list");
 	println("or list dict_"^ filename^ " to see the dictionary");
+	println("Type edic cli/srv/testsort to see or edit/recompile this program.");
 }

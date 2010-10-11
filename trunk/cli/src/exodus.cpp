@@ -61,7 +61,7 @@ program()
 		}
 
 		//execute command or enter exodus shell
-		if (not osshell("env PS1='exodus [\\u@\\h \\W]\\$ '  "^(command?command:shell)))
+		//if (not osshell("env PS1='exodus [\\u@\\h \\W]\\$ '  "^(command?command:shell)))
 			osshell(command?command:shell);
 
 	}
