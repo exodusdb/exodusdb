@@ -17,4 +17,4 @@ list_SOURCES=list.cpp printtext.h
 listfiles_SOURCES=listfiles.cpp
 listindexes_SOURCES=listindexes.cpp
 testsort_SOURCES=testsort.cpp
-configexodus_SOURCE=configexodus.cpp
+configexodus_SOURCES=configexodus.cpp

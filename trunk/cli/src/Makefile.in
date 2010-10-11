@@ -36,7 +36,7 @@ bin_PROGRAMS = compile$(EXEEXT) createfile$(EXEEXT) \
 	createindex$(EXEEXT) delete$(EXEEXT) deletefile$(EXEEXT) \
 	deleteindex$(EXEEXT) edit$(EXEEXT) edic$(EXEEXT) \
 	exodus$(EXEEXT) list$(EXEEXT) listfiles$(EXEEXT) \
-	listindexes$(EXEEXT) testsort$(EXEEXT)
+	listindexes$(EXEEXT) testsort$(EXEEXT) configexodus$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in compile
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -52,6 +52,9 @@ PROGRAMS = $(bin_PROGRAMS)
 am_compile_OBJECTS = compile.$(OBJEXT)
 compile_OBJECTS = $(am_compile_OBJECTS)
 compile_LDADD = $(LDADD)
+am_configexodus_OBJECTS = configexodus.$(OBJEXT)
+configexodus_OBJECTS = $(am_configexodus_OBJECTS)
+configexodus_LDADD = $(LDADD)
 am_createfile_OBJECTS = createfile.$(OBJEXT)
 createfile_OBJECTS = $(am_createfile_OBJECTS)
 createfile_LDADD = $(LDADD)
@@ -101,16 +104,18 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(compile_SOURCES) $(createfile_SOURCES) \
-	$(createindex_SOURCES) $(delete_SOURCES) $(deletefile_SOURCES) \
-	$(deleteindex_SOURCES) $(edic_SOURCES) $(edit_SOURCES) \
-	$(exodus_SOURCES) $(list_SOURCES) $(listfiles_SOURCES) \
-	$(listindexes_SOURCES) $(testsort_SOURCES)
-DIST_SOURCES = $(compile_SOURCES) $(createfile_SOURCES) \
-	$(createindex_SOURCES) $(delete_SOURCES) $(deletefile_SOURCES) \
-	$(deleteindex_SOURCES) $(edic_SOURCES) $(edit_SOURCES) \
-	$(exodus_SOURCES) $(list_SOURCES) $(listfiles_SOURCES) \
-	$(listindexes_SOURCES) $(testsort_SOURCES)
+SOURCES = $(compile_SOURCES) $(configexodus_SOURCES) \
+	$(createfile_SOURCES) $(createindex_SOURCES) $(delete_SOURCES) \
+	$(deletefile_SOURCES) $(deleteindex_SOURCES) $(edic_SOURCES) \
+	$(edit_SOURCES) $(exodus_SOURCES) $(list_SOURCES) \
+	$(listfiles_SOURCES) $(listindexes_SOURCES) \
+	$(testsort_SOURCES)
+DIST_SOURCES = $(compile_SOURCES) $(configexodus_SOURCES) \
+	$(createfile_SOURCES) $(createindex_SOURCES) $(delete_SOURCES) \
+	$(deletefile_SOURCES) $(deleteindex_SOURCES) $(edic_SOURCES) \
+	$(edit_SOURCES) $(exodus_SOURCES) $(list_SOURCES) \
+	$(listfiles_SOURCES) $(listindexes_SOURCES) \
+	$(testsort_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -219,6 +224,7 @@ list_SOURCES = list.cpp printtext.h
 listfiles_SOURCES = listfiles.cpp
 listindexes_SOURCES = listindexes.cpp
 testsort_SOURCES = testsort.cpp
+configexodus_SOURCES = configexodus.cpp
 all: all-am
 
 .SUFFIXES:
@@ -293,6 +299,9 @@ clean-binPROGRAMS:
 compile$(EXEEXT): $(compile_OBJECTS) $(compile_DEPENDENCIES) 
 	@rm -f compile$(EXEEXT)
 	$(CXXLINK) $(compile_OBJECTS) $(compile_LDADD) $(LIBS)
+configexodus$(EXEEXT): $(configexodus_OBJECTS) $(configexodus_DEPENDENCIES) 
+	@rm -f configexodus$(EXEEXT)
+	$(CXXLINK) $(configexodus_OBJECTS) $(configexodus_LDADD) $(LIBS)
 createfile$(EXEEXT): $(createfile_OBJECTS) $(createfile_DEPENDENCIES) 
 	@rm -f createfile$(EXEEXT)
 	$(CXXLINK) $(createfile_OBJECTS) $(createfile_LDADD) $(LIBS)
@@ -337,6 +346,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/compile.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/configexodus.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/createfile.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/createindex.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/delete.Po@am__quote@

@@ -127,7 +127,7 @@ AC_CONFIG_FILES([Makefile \
 ])
 AC_OUTPUT
 
-dnl
-dnl Congrats. You have configured the Exodus library
-dnl
-dnl Type 'make && sudo make install'
+echo 
+echo Congrats. You have configured the Exodus library
+echo
+echo Type 'make && sudo make install'

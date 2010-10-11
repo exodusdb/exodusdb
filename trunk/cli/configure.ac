@@ -34,7 +34,6 @@ AC_CONFIG_FILES([Makefile \
 AC_OUTPUT
 
 echo
-echo "You have configured the Exodus CLI components"
+echo "Congrats. You have configured the Exodus CLI components"
 echo
-echo "If you have root privileges then type 'make && make install'"
-echo "otherwise type 'make && sudo make install'"
+echo "Type 'make && sudo make install'"
