@@ -32,10 +32,12 @@ function input_connection_config() {
   connection^=" port="^port;
   connection^=" user="^user;
 
-  println(connection);
+  connection^=" dbname=template1";
+
+  println("\n",connection,"\n");
   connection^=" password="^pass;
 
-  print("Attempting to connect ... ");
+  print(oconv("Attempting to connect ... ","L#33"));
   if (connect(connection)) {
    println("done!");
    break;
@@ -55,7 +57,8 @@ function runsomesql(in sql) {
 
  var errmsg;
  if (not sql.sqlexec(errmsg)) {
-  println("\nSQL " ^ errmsg ^ sql);
+  //println("\nSQL " ^ errmsg ^ sql);
+  println("\nSQL " ^ errmsg);
   return false;
  }
    
@@ -64,7 +67,7 @@ function runsomesql(in sql) {
   
 }
 
-function register_pgexodus_postgres_plugin() {
+function add_pgexodus_postgres_plugin() {
 
  var sql=
  "CREATE OR REPLACE FUNCTION exodus_call(bytea, bytea, bytea, bytea, bytea, int4, int4) RETURNS bytea AS 'pgexodus', 'exodus_call' LANGUAGE C IMMUTABLE;\n"
@@ -83,14 +86,14 @@ function register_pgexodus_postgres_plugin() {
 function create_dbuser(in dbusername, in dbuserpass) {
 
  var sql=
- "CREATE ROLE %dbusername% LOGIN"
- " PASSWORD '%dbuserpass%'"
+ "CREATE ROLE $dbusername$ LOGIN"
+ " PASSWORD '$dbuserpass$'"
  " CREATEDB"
  //"  CREATEROLE"
  ";" ;
  
- swapper(sql,"%dbusername%",dbusername);
- swapper(sql,"%dbuserpass%",dbuserpass);
+ swapper(sql,"$dbusername$",dbusername);
+ swapper(sql,"$dbuserpass$",dbuserpass);
  
  return runsomesql(sql);
 }
@@ -98,13 +101,13 @@ function create_dbuser(in dbusername, in dbuserpass) {
 function create_db(in dbname, in dbusername) {
 
  var sql=
- "CREATE DATABASE %dbname%"
+ "CREATE DATABASE $dbname$"
  " WITH ENCODING='UTF8'"
- " OWNER=$dbusername%"
+ " OWNER=$dbusername$"
  ";" ;
  
- swapper(sql,"%dbname%",dbname);
- swapper(sql,"%dbusername%",dbusername);
+ swapper(sql,"$dbname$",dbname);
+ swapper(sql,"$dbusername$",dbusername);
   
  return runsomesql(sql);
 }
@@ -116,21 +119,27 @@ program() {
  if (not input_connection_config())
   stop("Stopping. Cannot continue without a working connection.");
 
- print("Registering pgexodus postgres plugin ... ");
- if (not register_pgexodus_postgres_plugin())
+ print(oconv("Add pgexodus postgres plugin ... ","L#33"));
+ if (not add_pgexodus_postgres_plugin())
   stop("Stopping. Not enough privileges");
+
+
+ print(oconv("Detaching from template1 database ... ","L#33"));
+ if (not connect("dbname=postgres")) {
+  stop("Stopping. Cannot connect to postgres database");
+ }
 
  //for now exodus a default database to play in with a non-secret password
  var dbusername="exodus";
  var dbname="exodus";
  var dbuserpass="somesillysecret";
  
- print("Creating user ", dbusername, " ... ");
+ print(("Creating user "^ dbusername^ " ... ").oconv("L#33"));
  if (not create_dbuser(dbusername,dbuserpass))
   //stop();
   println("Error: Could not create user ",dbusername);
   
- print("Creating database ", dbname, " ... ");
+ print(("Creating database "^ dbname^ " ... ").oconv("L#33"));
  if (not create_db(dbname,dbusername))
   //stop();
   println("Error: Could not create database ",dbname);
