@@ -25,108 +25,101 @@ THE SOFTWARE.
 program()
 {
 
-	printl("Exodus Copyright (c) 2009 Stephen Bush");
-	printl("http://www.opensource.org/licenses/mit-license.php");
+        printl("Exodus Copyright (c) 2009 Stephen Bush");
+        printl("http://www.opensource.org/licenses/mit-license.php");
 
-	var verbose=_OPTIONS.index("V");
+        var verbose=_OPTIONS.index("V");
 
-	var exodusbinpath=field(_EXECPATH,_SLASH,1,dcount(_EXECPATH,_SLASH)-1);
+        var exodusbinpath=field(_EXECPATH,_SLASH,1,dcount(_EXECPATH,_SLASH)-1);
 
-	//if (not var().load("libpq.dll"))
-	//	printl("Warning: Cannot find libpq.dll to connect to postgres");
+        //if (not var().load("libpq.dll"))
+        //	printl("Warning: Cannot find libpq.dll to connect to postgres");
 
-	var command=_SENTENCE.field(" ",2,999999);
-	var shell;
-	if (_SLASH eq "/" and shell.osgetenv("SHELL"))
-	{
+        var command=_SENTENCE.field(" ",2,999999);
+        var shell;
+        if (_SLASH eq "/" and shell.osgetenv("SHELL")) {
 
-		var home=osgetenv("HOME");
-		var path=osgetenv("PATH");
-		var libp=osgetenv("LD_LIBRARY_PATH");
+                var home=osgetenv("HOME");
+                var path=osgetenv("PATH");
+                var libp=osgetenv("LD_LIBRARY_PATH");
 
-		//prefer user binaries then exodus binaries before all else
-		ossetenv("PATH",home^"/bin:/var/lib/exodus/bin:"^path);
+                //prefer user binaries then exodus binaries before all else
+                ossetenv("PATH",home^"/bin:/var/lib/exodus/bin:"^path);
 
 //print("LD_LIBRARY_PATH","~/lib:"^osgetenv("LD_LIBRARY_PATH"));
-		ossetenv("LD_LIBRARY_PATH",home^"/lib:"^libp);
+                ossetenv("LD_LIBRARY_PATH",home^"/lib:"^libp);
 
 
-		//enable core dumps
-		osshell("ulimit -c unlimited");
+                //enable core dumps
+                osshell("ulimit -c unlimited");
 
-		if (verbose) {
-			osgetenv("HOME").outputl("HOME=");
-			osgetenv("PATH").outputl("PATH=");
-			osgetenv("LD_LIBRARY_PATH").outputl("LD_LIBRARY_PATH=");
-		}
+                if (verbose) {
+                        osgetenv("HOME").outputl("HOME=");
+                        osgetenv("PATH").outputl("PATH=");
+                        osgetenv("LD_LIBRARY_PATH").outputl("LD_LIBRARY_PATH=");
+                }
 
-		//execute command or enter exodus shell
-		//if (not osshell("env PS1='exodus [\\u@\\h \\W]\\$ '  "^(command?command:shell)))
-			osshell(command?command:shell);
+                //execute command or enter exodus shell
+                //if (not osshell("env PS1='exodus [\\u@\\h \\W]\\$ '  "^(command?command:shell)))
+                osshell(command?command:shell);
 
-	}
-	else if (_SLASH eq "\\" and shell.osgetenv("ComSpec"))
-	{
+        } else if (_SLASH eq "\\" and shell.osgetenv("ComSpec")) {
 
-		//set EXODUS_PATH used by compile to find LIB and INCLUDE paths
-		var exoduspath=exodusbinpath;
-		if (exoduspath.field2(_SLASH,-1)=="bin")
-			exoduspath=field(exoduspath,_SLASH,1,dcount(exoduspath,_SLASH)-1);
-		if (exoduspath and not ossetenv("EXODUS_PATH",exoduspath))
-			errput("Couldnt set EXODUS_PATH environment variable");
+                //set EXODUS_PATH used by compile to find LIB and INCLUDE paths
+                var exoduspath=exodusbinpath;
+                if (exoduspath.field2(_SLASH,-1)=="bin")
+                        exoduspath=field(exoduspath,_SLASH,1,dcount(exoduspath,_SLASH)-1);
+                if (exoduspath and not ossetenv("EXODUS_PATH",exoduspath))
+                        errput("Couldnt set EXODUS_PATH environment variable");
 
-		//add exodus bin to path
-		if (not ossetenv("PATH",(exodusbinpath^";"^osgetenv("PATH"))))
-			errput("Couldnt set PATH environment variable");
+                //add exodus bin to path
+                if (not ossetenv("PATH",(exodusbinpath^";"^osgetenv("PATH"))))
+                        errput("Couldnt set PATH environment variable");
 
-		//set INCLUDE path
-		//prefix path to exodus.h to INCLUDE environment variable
-		//1. ..\include folder parallel to path of executable
-		//2. build source folder of exodus
-		//3. EXODUS_INCLUDE envvar
-		var exodusincludepath=exodusbinpath^"\\..\\include";
-		if (!osdir(exodusincludepath))
-			exodusincludepath=exodusbinpath^"\\..\\exodus\\exodus";
-		if (!osfile(exodusincludepath^"\\exodus\\exodus.h"))
-		{
-			exodusincludepath=osgetenv("EXODUS_INCLUDE");
-			if (!osfile(exodusincludepath^"\\exodus.h"))
-			{
-				errput("Couldnt find exodus include path (exodus.h)");
-				exodusincludepath="";
-			}
-		}
-		if (not ossetenv("EXODUS_INCLUDE",exodusincludepath))
-			errput("Couldnt set EXODUS_INCLUDE environment variable");
-		if (exodusincludepath and not ossetenv("INCLUDE",(exodusincludepath^";"^osgetenv("INCLUDE"))))
-			errput("Couldnt set INCLUDE environment variable");
+                //set INCLUDE path
+                //prefix path to exodus.h to INCLUDE environment variable
+                //1. ..\include folder parallel to path of executable
+                //2. build source folder of exodus
+                //3. EXODUS_INCLUDE envvar
+                var exodusincludepath=exodusbinpath^"\\..\\include";
+                if (!osdir(exodusincludepath))
+                        exodusincludepath=exodusbinpath^"\\..\\exodus\\exodus";
+                if (!osfile(exodusincludepath^"\\exodus\\exodus.h")) {
+                        exodusincludepath=osgetenv("EXODUS_INCLUDE");
+                        if (!osfile(exodusincludepath^"\\exodus.h")) {
+                                errput("Couldnt find exodus include path (exodus.h)");
+                                exodusincludepath="";
+                        }
+                }
+                if (not ossetenv("EXODUS_INCLUDE",exodusincludepath))
+                        errput("Couldnt set EXODUS_INCLUDE environment variable");
+                if (exodusincludepath and not ossetenv("INCLUDE",(exodusincludepath^";"^osgetenv("INCLUDE"))))
+                        errput("Couldnt set INCLUDE environment variable");
 
-		//set LIB path
-		//prefix path to exodus.lib to LIB environment variable
-		//1. path of executable
-		//2. ..\lib folder parallel to path of executable
-		//3. EXODUS_LIB envvar
-		var exoduslibpath=exodusbinpath;
-		if (!osfile(exoduslibpath^"\\exodus.lib"))
-			exoduslibpath=exodusbinpath^"\\..\\lib";
-		if (!osfile(exoduslibpath^"\\exodus.lib"))
-			exoduslibpath=osgetenv("EXODUS_LIB");
-		if (!osfile(exoduslibpath^"\\exodus.lib"))
-		{
-			exoduslibpath=osgetenv("EXODUS_LIB");
-			if (!osfile(exoduslibpath^"\\exodus.lib"))
-			{
-				errput("Couldnt find exodus include path (exodus.h)");
-				exoduslibpath="";
-			}
-		}
-		if (not ossetenv("EXODUS_LIB",exoduslibpath))
-			errput("Couldnt set EXODUS_LIB environment variable");
-		if (exoduslibpath and not ossetenv("LIB",(exoduslibpath^";"^osgetenv("LIB"))))
-			errput("Couldnt set LIB environment variable");
+                //set LIB path
+                //prefix path to exodus.lib to LIB environment variable
+                //1. path of executable
+                //2. ..\lib folder parallel to path of executable
+                //3. EXODUS_LIB envvar
+                var exoduslibpath=exodusbinpath;
+                if (!osfile(exoduslibpath^"\\exodus.lib"))
+                        exoduslibpath=exodusbinpath^"\\..\\lib";
+                if (!osfile(exoduslibpath^"\\exodus.lib"))
+                        exoduslibpath=osgetenv("EXODUS_LIB");
+                if (!osfile(exoduslibpath^"\\exodus.lib")) {
+                        exoduslibpath=osgetenv("EXODUS_LIB");
+                        if (!osfile(exoduslibpath^"\\exodus.lib")) {
+                                errput("Couldnt find exodus include path (exodus.h)");
+                                exoduslibpath="";
+                        }
+                }
+                if (not ossetenv("EXODUS_LIB",exoduslibpath))
+                        errput("Couldnt set EXODUS_LIB environment variable");
+                if (exoduslibpath and not ossetenv("LIB",(exoduslibpath^";"^osgetenv("LIB"))))
+                        errput("Couldnt set LIB environment variable");
 
-		osshell((command?command:shell));
-	} else
-		stop("Cannot find SHELL or ComSpec in environment");
+                osshell((command?command:shell));
+        } else
+                stop("Cannot find SHELL or ComSpec in environment");
 
 }
