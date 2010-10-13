@@ -70,7 +70,7 @@ program() {
 	if (_SLASH=="/")
 	{
 		if (verbose)
-			println("Posix environment detected. Assuming standard C++ compiler g++");
+			printl("Posix environment detected. Assuming standard C++ compiler g++");
 
 		compiler="g++";
 
@@ -122,7 +122,7 @@ program() {
 	else
 	{
 		if (verbose)
-			println("Windows environment detected. Finding C++ compiler.");
+			printl("Windows environment detected. Finding C++ compiler.");
 
 		//get current environment
 		var path=osgetenv("PATH");
@@ -132,7 +132,7 @@ program() {
 		//locate MS Visual Studio by environment variable or current disk or C:
 		var searchvars="CC VS90COMNTOOLS VS80COMNTOOLS VS70COMNTOOLS";
 		if (verbose)
-			searchvars.outputln("Searching Environment Variables : " ^ searchvars);
+			searchvars.outputl("Searching Environment Variables : " ^ searchvars);
 
 		var msvs;
 		for (var ii=1;;++ii)
@@ -142,7 +142,7 @@ program() {
 				break;
 			msvs=osgetenv(envname);
 			if (verbose)
-				msvs.outputln(envname^" is ");
+				msvs.outputl(envname^" is ");
 			if (msvs)
 				break;
 		}
@@ -150,7 +150,7 @@ program() {
 		if (not msvs)
 		{
 			if (verbose)
-				println("Searching standard directories");
+				printl("Searching standard directories");
 
 			var searched=searchvars ^ " environment variables";
 			var searchdirs="";
@@ -203,15 +203,15 @@ program() {
 			var script="call " ^ (msvs ^ "vsvars32").quote();
 			script^="\nset";
 			if (verbose)
-				println("Calling scriptscript");
+				printl("Calling scriptscript");
 			oswrite(script,tempfilenamebase^".cmd");
 			osshell(tempfilenamebase ^ ".cmd > " ^ tempfilenamebase ^ ".$$$");
 			var result;
 			if (osread(result, tempfilenamebase^".$$$"))
 			{
 				//if (verbose)
-				//	println(result);
-				//println(result);
+				//	printl(result);
+				//printl(result);
 				result.converter("\r","\n");
 				var value;
 				if (getparam(result,"PATH",value))
@@ -223,9 +223,9 @@ program() {
 				/*
 				if (verbose)
 				{
-					println("\nPATH=",path);
-					println("\nINCLUDE=",include);
-					println("\nLIB=",lib);
+					printl("\nPATH=",path);
+					printl("\nINCLUDE=",include);
+					printl("\nLIB=",lib);
 				}
 				*/
 
@@ -235,7 +235,7 @@ program() {
 		}
 
 		if (verbose)
-			println("Searching for Exodus for include and lib directories");
+			printl("Searching for Exodus for include and lib directories");
 
 		//locate Exodus by executable path, environment variable or current disk or C:
 		var ndeep=dcount(_EXECPATH,_SLASH);
@@ -270,7 +270,7 @@ program() {
 			{
 				//exodusbin=_EXECPATH;
 				searched^="\n" ^ exoduspath;
-				println("Searching for Exodus",searched);
+				printl("Searching for Exodus",searched);
 				abort("Cannot find Exodus. Set environment variable EXODUS_PATH to exodus directory and restart Exodus");
 			}
 		}
@@ -303,16 +303,16 @@ program() {
 
 		//set the new environment
 		if (not ossetenv("PATH",path))
-			println("Failed to set PATH environment variable");
+			printl("Failed to set PATH environment variable");
 		if (not ossetenv("INCLUDE",include))
-			println("Failed to set INCLUDE  environment variable");
+			printl("Failed to set INCLUDE  environment variable");
 		if (not ossetenv("LIB",lib))
-			println("Failed to set BIN environment variable");
+			printl("Failed to set BIN environment variable");
 		if (verbose)
 		{
-			println("\nPATH=",path);
-			println("\nINCLUDE=",include);
-			println("\nLIB=",lib);
+			printl("\nPATH=",path);
+			printl("\nINCLUDE=",include);
+			printl("\nLIB=",lib);
 		}
 		compiler="cl";
 		basicoptions="";
@@ -443,7 +443,7 @@ program() {
 		if (not srcfilename)
 			continue;
 
-		//println("--- ",srcfilename, " ---");
+		//printl("--- ",srcfilename, " ---");
 
 		//check/add the default file extension
 		var fileext=srcfilename.field2(".",-1).lcase();
@@ -474,16 +474,16 @@ program() {
 
 		}
 		//get file text
-		println(srcfilename);
+		printl(srcfilename);
 		if (not text and not text.osread(srcfilename)) {
-			errputln(srcfilename^" doesnt exist");
+			errputl(srcfilename^" doesnt exist");
 			continue;
 		}
 
 		//determine if program or subroutine/function
 		var isprogram=index(text,"int main(") or index(text, "program()");
 		if (debugging)
-			isprogram.outputln("Is Program:");
+			isprogram.outputl("Is Program:");
 		var outputdir;
 		var compileoptions;
 		var binfilename=filebase;
@@ -651,12 +651,12 @@ program() {
 #endif
 
 		if (debugging) {
-			binfileextension.outputln("Bin file extension");
-			objfileextension.outputln("Obj file extension");
-			binfilename.outputln("Binary file:");
-			objfilename.outputln("Object file:");
-			outputdir.outputln("Output directory:");
-			compileoptions.outputln("Compile options:");
+			binfileextension.outputl("Bin file extension");
+			objfileextension.outputl("Obj file extension");
+			binfilename.outputl("Binary file:");
+			objfilename.outputl("Object file:");
+			outputdir.outputl("Output directory:");
+			compileoptions.outputl("Compile options:");
 		}
 
 		//record the current bin file update timestamp
@@ -680,14 +680,14 @@ program() {
 		//call the compiler
 		///////////////////
 		if (verbose or debugging)
-			println(compilecmd);
+			printl(compilecmd);
 		osshell(compilecmd);
 
 		//handle compiler output
 		var compileroutput;
 		var startatlineno;
 		if (osread(compileroutput,compileoutputfilename)){
-			outputln(compileroutput);
+			outputl(compileroutput);
 			osdelete(compileoutputfilename);
 			var charn=index(compileroutput, ": error:");
 			if (charn) {
@@ -715,7 +715,7 @@ program() {
 				//osdir isnt working as expected
 				//                              if (!outputdir.oslistf()) {
 				//                                      osshell("mkdir " ^ outputdir);
-				//                                      println("Created " ^ outputdir);
+				//                                      printl("Created " ^ outputdir);
 				//                              }
 
 				//var outputfilename=filename;
@@ -729,20 +729,20 @@ program() {
 					if (not osdir(outputdir)) {
 						var cmd="mkdir " ^ outputdir;
 						if (verbose)
-							println(cmd);
+							printl(cmd);
 						//osshell(cmd);
 						if (!osmkdir(outputdir))
-							println("ERROR: Failed "^cmd);
+							printl("ERROR: Failed "^cmd);
 					}
 					var outputpathandfile=outputdir^field2(binfilename,_SLASH,-1);
 					var cmd=installcmd^" " ^ objfilename ^ " " ^ outputpathandfile;
 					if (verbose)
-						println(cmd);
+						printl(cmd);
 					//osshell(cmd);
 					if (osfile(outputpathandfile) and osfile(objfilename))
 						osdelete(outputpathandfile);
 					if (!oscopy(objfilename,outputpathandfile))
-						println("ERROR: Failed to "^cmd);
+						printl("ERROR: Failed to "^cmd);
 				}
 			}
 		}//compilation

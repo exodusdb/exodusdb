@@ -90,12 +90,12 @@ program()
 		{
 			var nanorctemplatefilename=_EXECPATH.field(_SLASH,1,dcount(_EXECPATH,_SLASH)-1) ^ _SLASH ^ "nanorc";
 			if (oscopy(nanorctemplatefilename,nanorcfilename)) {
-				println("Copied " ^ nanorctemplatefilename.quote() ^ " to " ^ nanorcfilename.quote());
-				var ().inputln("Note: nano c++ syntax highlighting has been installed. Press Enter ... ");
+				printl("Copied " ^ nanorctemplatefilename.quote() ^ " to " ^ nanorcfilename.quote());
+				var ().input("Note: nano c++ syntax highlighting has been installed. Press Enter ... ");
 			} else {
-				errputln("Could not copy " ^ nanorctemplatefilename.quote() ^ " to " ^ nanorcfilename.quote());
+				errputl("Could not copy " ^ nanorctemplatefilename.quote() ^ " to " ^ nanorcfilename.quote());
 				if (not osfile(nanorctemplatefilename))
-					errputln("nano syntax highlighting file is missing.");
+					errputl("nano syntax highlighting file is missing.");
 			}
 		}
 	}
@@ -105,13 +105,13 @@ program()
 			editor="nano ";
 		else
 			editor="notepad";
-		println("Environment EDITOR not set. Using " ^ editor);
+		printl("Environment EDITOR not set. Using " ^ editor);
 	}
 	//editor="vi";
 	editor.swapper("nano ", "nano --const --nowrap --autoindent --suspend ");
 
 	if (editor.index("nano"))
-		println("http://www.nano-editor.org/dist/v2.1/nano.html");
+		printl("http://www.nano-editor.org/dist/v2.1/nano.html");
 
 	//configure nano syntax highlighting
 
@@ -189,7 +189,7 @@ program()
 
 			//call the editor
 			if (verbose)
-				println(editcmd);
+				printl(editcmd);
 			osshell(editcmd);
 	
 			//if the file hasnt been updated
@@ -226,11 +226,11 @@ program()
 
 			//call the compiler			
 			if (verbose)
-				println(compilecmd);
+				printl(compilecmd);
 			osshell(compilecmd);
 
 			//var tt;
-			//tt.inputln("Press Enter ...");
+			//tt.inputl("Press Enter ...");
 
 			//if any errors then loop back to edit again
 			var errors;
@@ -246,9 +246,9 @@ program()
 				if (charn=index(errors, ": error:")) {
 					startatlineno=errors.substr(charn-9,9);
 
-					//println(startatlineno);
+					//printl(startatlineno);
 					startatlineno=startatlineno.field2(":",2);
-					//println(startatlineno);
+					//printl(startatlineno);
 				//msvc style error lines
 				//test.cpp(6) : error C2143: syntax error : missing ';' before '}'
 				} else if (charn=index(errors,") : error ")) {

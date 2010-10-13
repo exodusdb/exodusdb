@@ -243,14 +243,14 @@ void DLL_PUBLIC print(const var& var1)
 	var1.output();
 }
 
-void DLL_PUBLIC println(const var& var1)
+void DLL_PUBLIC printl(const var& var1)
 {
-	var1.outputln();
+	var1.outputl();
 }
 
-void DLL_PUBLIC printtab(const var& var1)
+void DLL_PUBLIC printt(const var& var1)
 {
-	var1.outputtab();
+	var1.outputt();
 }
 
 
@@ -259,14 +259,14 @@ void DLL_PUBLIC output(const var& var1)
 	var1.output();
 }
 
-void DLL_PUBLIC outputln(const var& var1)
+void DLL_PUBLIC outputl(const var& var1)
 {
-	var1.outputln();
+	var1.outputl();
 }
 
-void DLL_PUBLIC outputtab(const var& var1)
+void DLL_PUBLIC outputt(const var& var1)
 {
-	var1.outputtab();
+	var1.outputt();
 }
 
 
@@ -275,9 +275,9 @@ void DLL_PUBLIC errput(const var& var1)
 	var1.errput();
 }
 
-void DLL_PUBLIC errputln(const var& var1)
+void DLL_PUBLIC errputl(const var& var1)
 {
-	var1.errputln();
+	var1.errputl();
 }
 
 
@@ -286,9 +286,9 @@ void DLL_PUBLIC logput(const var& var1)
 	var1.logput();
 }
 
-void DLL_PUBLIC logputln(const var& var1)
+void DLL_PUBLIC logputl(const var& var1)
 {
-	var1.logputln();
+	var1.logputl();
 }
 
 
@@ -325,23 +325,23 @@ void DLL_PUBLIC setprompt(const var& prompt)
 DLL_PUBLIC var input()
 {
 	var temp;
-	temp.inputln();
+	temp.input();
 	return temp;
 }
 
 DLL_PUBLIC void input(var& inputfield)
 {
-	inputfield.inputln();
+	inputfield.input();
 }
 
 DLL_PUBLIC void input(const var& prompt, var& inputfield)
 {
-	inputfield.inputln(prompt);
+	inputfield.input(prompt);
 }
 
-DLL_PUBLIC void inputn(var& inputfield, const var& n)
+DLL_PUBLIC void inputn(var& inputfield, const int nchars)
 {
-	inputfield.input(n);
+	inputfield.input(L"", nchars);
 }
 
 DLL_PUBLIC var len(const var& var1)

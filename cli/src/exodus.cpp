@@ -25,15 +25,15 @@ THE SOFTWARE.
 program()
 {
 
-	println("Exodus Copyright (c) 2009 Stephen Bush");
-	println("http://www.opensource.org/licenses/mit-license.php");
+	printl("Exodus Copyright (c) 2009 Stephen Bush");
+	printl("http://www.opensource.org/licenses/mit-license.php");
 
 	var verbose=_OPTIONS.index("V");
 
 	var exodusbinpath=field(_EXECPATH,_SLASH,1,dcount(_EXECPATH,_SLASH)-1);
 
 	//if (not var().load("libpq.dll"))
-	//	println("Warning: Cannot find libpq.dll to connect to postgres");
+	//	printl("Warning: Cannot find libpq.dll to connect to postgres");
 
 	var command=_SENTENCE.field(" ",2,999999);
 	var shell;
@@ -55,9 +55,9 @@ program()
 		osshell("ulimit -c unlimited");
 
 		if (verbose) {
-			osgetenv("HOME").outputln("HOME=");
-			osgetenv("PATH").outputln("PATH=");
-			osgetenv("LD_LIBRARY_PATH").outputln("LD_LIBRARY_PATH=");
+			osgetenv("HOME").outputl("HOME=");
+			osgetenv("PATH").outputl("PATH=");
+			osgetenv("LD_LIBRARY_PATH").outputl("LD_LIBRARY_PATH=");
 		}
 
 		//execute command or enter exodus shell

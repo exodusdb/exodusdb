@@ -107,8 +107,8 @@ THE SOFTWARE.
 #include <exodus/mvexceptions.h>
 
 #if TRACING >= 5
-	#define DEBUG_LOG_SQL exodus::errputln(L"SQL:" ^ sql);
-	#define DEBUG_LOG_SQL1 exodus::errputln(L"SQL:" ^ sql.swap(L"$1",var(paramValues[0])));
+	#define DEBUG_LOG_SQL exodus::errputl(L"SQL:" ^ sql);
+	#define DEBUG_LOG_SQL1 exodus::errputl(L"SQL:" ^ sql.swap(L"$1",var(paramValues[0])));
 #else
 	#define DEBUG_LOG_SQL
 	#define DEBUG_LOG_SQL1
@@ -227,6 +227,7 @@ bool msvc_PQconnectdb(PGconn** pgconn, const std::string& conninfo)
 bool var::connect(const var& conninfo)
 {
 	THISIS(L"bool var::connect(const var& conninfo)")
+	//the idea is for exodus to have access to one standard database without secret password
 	var defaultconninfo=L"host=127.0.0.1 port=5432 dbname=exodus user=exodus password=somesillysecret connect_timeout=10";
 	//priority is
 	//1) given parameters or last connection parameters
@@ -268,7 +269,7 @@ bool var::connect(const var& conninfo)
 			configfilename^=home^_SLASH^L".exodus";
 		var configconn=L"";
 		if (!configconn.osread(configfilename))
-			configconn.osread(L".exodus");
+			configconn.osread(".exodus");
 
 		//discover any configuration in the environment
 		var envconn=L"";
@@ -313,7 +314,7 @@ bool var::connect(const var& conninfo)
 			//#if TRACING >= 1
 				var libname=L"libpq.dll";
 				//var libname=L"libpq.so";
-				exodus::errputln(L"var::connect() Cannot load shared library " ^ libname ^ L". Verify configuration PATH contains postgres's \\bin.");
+				exodus::errputl(L"var::connect() Cannot load shared library " ^ libname ^ L". Verify configuration PATH contains postgres's \\bin.");
 			//#endif
 			return false;
 		};
@@ -332,16 +333,16 @@ bool var::connect(const var& conninfo)
 	if (PQstatus(pgconn) != CONNECTION_OK)
 	{
 //		#if TRACING >= 2
-			exodus::errputln(L"var::connect() Connection to database failed: " ^ var(PQerrorMessage(pgconn)));
+			exodus::errputl(L"var::connect() Connection to database failed: " ^ var(PQerrorMessage(pgconn)));
 			//if (not conninfo2)
-				exodus::errputln(L"var::connect() Postgres connection configuration missing or incorrect. Please login.");
+				exodus::errputl(L"var::connect() Postgres connection configuration missing or incorrect. Please login.");
 ;
 //		#endif
 		PQfinish(pgconn);
 		return false;
 	}
 	#if TRACING >= 3
-		exodus::logputln(L"var::connect() Connection to database succeeded.");
+		exodus::logputl(L"var::connect() Connection to database succeeded.");
 	#endif
 
 	//abort if multithreading and it is not supported
@@ -367,7 +368,7 @@ bool var::connect(const var& conninfo)
 	if (!tss_ipcstarted.get())
 	{
 		#if TRACING >= 3
-			exodus::outputln(L"Starting IPC");
+			exodus::outputl(L"Starting IPC");
 		#endif
 		startipc();
 	}
@@ -414,7 +415,7 @@ bool var::disconnect()
 	THISISDEFINED()
 
 	#if TRACING >= 3
-		exodus::errputln(L"var::disconnect() Closing connection");
+		exodus::errputl(L"var::disconnect() Closing connection");
 	#endif
 
 	PGconn* thread_pgconn=tss_pgconns.get();
@@ -494,7 +495,7 @@ bool var::open(const var& dictcode,const var& filename)
 		#if TRACING >= 2
 			var errmsg=PQerrorMessage(thread_pgconn);
 			if (!errmsg.index(L"does not exist"))
-		        exodus::errputln(L"OPEN failed: " ^ errmsg);
+		        exodus::errputl(L"OPEN failed: " ^ errmsg);
         #endif
         return false;
     }
@@ -581,7 +582,7 @@ bool var::read(const var& filehandle,const var& key)
 	if (PQntuples(result) > 1)
  	{
 		PQclear(result);
-		exodus::errputln(L"var::read() SELECT returned more than one record");
+		exodus::errputl(L"var::read() SELECT returned more than one record");
 		return false;
 	}
 
@@ -769,7 +770,7 @@ bool var::sqlexec() const
 }
 
 //returns success or failure but no data
-bool var::sqlexec(var& errormsg) const
+bool var::sqlexec(var& errmsg) const
 {
 	THISIS(L"bool var::sqlexec(var& errmsg) const")
 	THISISSTRING()
@@ -804,9 +805,16 @@ bool var::sqlexec(var& errormsg) const
 	DEBUG_LOG_SQL
 	pgresult = PQexec(thread_pgconn, (*this).tostring().c_str());
 	if (!pgresult) {
-		errormsg=var(PQerrorMessage(thread_pgconn));
+		errmsg=var(PQerrorMessage(thread_pgconn));
 		return false;
 	}
+	if (PQresultStatus(pgresult) != PGRES_COMMAND_OK)
+    {
+        errmsg=var(PQerrorMessage(thread_pgconn));
+		PQclear(pgresult);
+        return false;
+    }
+	errmsg=var(PQntuples(pgresult));
 	PQclear(pgresult);
 	return true;
 
@@ -983,7 +991,7 @@ bool var::write(const var& filehandle, const var& key) const
 	if (PQresultStatus(result) != PGRES_COMMAND_OK)
 	{
 		PQclear(result);
-        exodus::errputln(L"var::write() failed: " ^ var(PQntuples(result)) ^ L" " ^ var(PQerrorMessage(thread_pgconn)));
+        exodus::errputl(L"var::write() failed: " ^ var(PQntuples(result)) ^ L" " ^ var(PQerrorMessage(thread_pgconn)));
 		return false;
 	}
 
@@ -1011,7 +1019,7 @@ bool var::write(const var& filehandle, const var& key) const
 	if (PQresultStatus(result) != PGRES_COMMAND_OK)
     {
 		PQclear(result);
-        exodus::errputln(L"var::write() INSERT failed: " ^ var(PQntuples(result)) ^ L" " ^ var(PQerrorMessage(thread_pgconn)));
+        exodus::errputl(L"var::write() INSERT failed: " ^ var(PQntuples(result)) ^ L" " ^ var(PQerrorMessage(thread_pgconn)));
         return false;
     }
 
@@ -1073,7 +1081,7 @@ bool var::updaterecord(const var& filehandle,const var& key) const
 	if (PQresultStatus(result) != PGRES_COMMAND_OK)
 	{
 		PQclear(result);
-		exodus::errputln(L"var::update failed: " ^ var(PQntuples(result)) ^ L" " ^ var(PQerrorMessage(thread_pgconn)));
+		exodus::errputl(L"var::update failed: " ^ var(PQntuples(result)) ^ L" " ^ var(PQerrorMessage(thread_pgconn)));
 		return false;
 	}
 
@@ -1135,7 +1143,7 @@ bool var::insertrecord(const var& filehandle,const var& key) const
 
 	if (PQresultStatus(result) != PGRES_COMMAND_OK)
     {
-		exodus::errputln(L"var::insertrecord INSERT failed: " ^ var(PQntuples(result)) ^ L" " ^ var(PQerrorMessage(thread_pgconn)));
+		exodus::errputl(L"var::insertrecord INSERT failed: " ^ var(PQntuples(result)) ^ L" " ^ var(PQerrorMessage(thread_pgconn)));
         PQclear(result);
         return false;
     }
@@ -1188,7 +1196,7 @@ bool var::deleterecord(const var& key) const
 
 	if (PQresultStatus(result) != PGRES_COMMAND_OK)
     {
-		exodus::errputln(L"var::deleterecord failed: " ^ var(PQntuples(result)) ^ L" " ^ var(PQerrorMessage(thread_pgconn)));
+		exodus::errputl(L"var::deleterecord failed: " ^ var(PQntuples(result)) ^ L" " ^ var(PQerrorMessage(thread_pgconn)));
         PQclear(result);
         return false;
     }
@@ -1864,7 +1872,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	if (maxnrecs)
 		sql ^= L" LIMIT " ^ maxnrecs;
 
-//outputln(sql);
+//outputl(sql);
 
 	//Start a transaction block because postgres select requires to be inside one
 	if (!begin())
@@ -1965,7 +1973,7 @@ bool var::readnext(var& key, var& valuen) const
 	//eg 90001 is 9.0.1
 	int pgserverversion=PQserverVersion(thread_pgconn);
 	if (pgserverversion>=90001) {
-		var(pgserverversion).outputln();
+		var(pgserverversion).outputl();
 		//unsigned char *PQunescapeBytea(const unsigned char *from, size_t *to_length);
 		size_t to_length;
 		unsigned char* unescaped = PQunescapeBytea((const unsigned char*) PQgetvalue(pgresult, 0, 0),
@@ -1982,7 +1990,7 @@ bool var::readnext(var& key, var& valuen) const
 	//int datalen = PQgetlength(result, 0, 0);
 	//key=std::string(data,datalen);
 	key=wstringfromUTF8((UTF8*)PQgetvalue(pgresult, 0, 0), PQgetlength(pgresult, 0, 0));
-//key.output(L"key=").len().outputln(L" len=");
+//key.output(L"key=").len().outputl(L" len=");
 	//TODO implement order by multivalue
 	valuen = 0;
 
@@ -2241,7 +2249,7 @@ int pqexec(const var& sql, PGresultptr& pgresult)
 
 	if (!local_result) {
 		#if TRACING >=1
-			exodus::errputln(L"PQexec command failed, no error code: ");
+			exodus::errputl(L"PQexec command failed, no error code: ");
 		#endif
 		retcode = 0;
 	} else {
@@ -2252,25 +2260,25 @@ int pqexec(const var& sql, PGresultptr& pgresult)
 				const char *str_res;
 				str_res = PQcmdTuples(local_result);
 				if (strlen(str_res) > 0) {
-					exodus::logputln(L"Command executed OK, " ^ var(str_res) ^ L" rows.");
+					exodus::logputl(L"Command executed OK, " ^ var(str_res) ^ L" rows.");
 				} else {
-					exodus::logputln(L"Command executed OK, 0 rows.");
+					exodus::logputl(L"Command executed OK, 0 rows.");
 				}
 			#endif
 			break;
 		case PGRES_TUPLES_OK:
 			#if TRACING >= 3
-				exodus::logputln(L"Select executed OK, " ^ var(PQntuples(local_result)) ^ L" rows found.");
+				exodus::logputl(L"Select executed OK, " ^ var(PQntuples(local_result)) ^ L" rows found.");
 			#endif
 			break;
 		case PGRES_NONFATAL_ERROR:
 			#if TRACING >= 2
-				exodus::errputln(L"SQL non-fatal error code " ^ var(PQresStatus(PQresultStatus(local_result))) ^ L", " ^ var(PQresultErrorMessage(local_result)));
+				exodus::errputl(L"SQL non-fatal error code " ^ var(PQresStatus(PQresultStatus(local_result))) ^ L", " ^ var(PQresultErrorMessage(local_result)));
 			#endif
 			break;
 		default:
 			#if TRACING >= 1
-			exodus::errputln(var(PQresStatus(PQresultStatus(local_result))) ^ L": " ^ var(PQresultErrorMessage(local_result)));
+			exodus::errputl(var(PQresStatus(PQresultStatus(local_result))) ^ L": " ^ var(PQresultErrorMessage(local_result)));
 			#endif
 			PQclear(local_result);
 			retcode = 0;

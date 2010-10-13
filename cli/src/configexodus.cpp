@@ -34,12 +34,12 @@ function input_connection_config() {
 
   connection^=" dbname=template1";
 
-  println("\n",connection,"\n");
+  printl("\n",connection,"\n");
   connection^=" password="^pass;
 
   print(oconv("Attempting to connect ... ","L#33"));
   if (connect(connection)) {
-   println("done!");
+   printl("done!");
    break;
   }
 
@@ -57,12 +57,12 @@ function runsomesql(in sql) {
 
  var errmsg;
  if (not sql.sqlexec(errmsg)) {
-  //println("\nSQL " ^ errmsg ^ sql);
-  println("\nSQL " ^ errmsg);
+  //printl("\nSQL " ^ errmsg ^ sql);
+  printl("\nSQL " ^ errmsg);
   return false;
  }
    
- println("done!");
+ printl("done!");
  return true;
   
 }
@@ -114,7 +114,7 @@ function create_db(in dbname, in dbusername) {
 
 program() {
 
- println("-- Exodus Postgres Configuration ---");
+ printl("-- Exodus Postgres Configuration ---");
  
  if (not input_connection_config())
   stop("Stopping. Cannot continue without a working connection.");
@@ -124,7 +124,7 @@ program() {
   stop("Stopping. Not enough privileges");
 
 
- print(oconv("Detaching from template1 database ... ","L#33"));
+ printl(oconv("Detaching from template1 database ... ","L#33"));
  if (not connect("dbname=postgres")) {
   stop("Stopping. Cannot connect to postgres database");
  }
@@ -137,11 +137,11 @@ program() {
  print(("Creating user "^ dbusername^ " ... ").oconv("L#33"));
  if (not create_dbuser(dbusername,dbuserpass))
   //stop();
-  println("Error: Could not create user ",dbusername);
+  printl("Error: Could not create user ",dbusername);
   
  print(("Creating database "^ dbname^ " ... ").oconv("L#33"));
  if (not create_db(dbname,dbusername))
   //stop();
-  println("Error: Could not create database ",dbname);
+  printl("Error: Could not create database ",dbname);
  
 }

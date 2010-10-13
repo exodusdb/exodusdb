@@ -54,22 +54,25 @@ bool var::eof() const
 	return (std::cin.eof());
 }
 
-bool var::inputln(const var& prompt)
+//for nchars, use int instead of var to trigger error at point of calling not here
+bool var::input(const var& prompt, const int nchars)
 {
-	THISIS(L"bool var::inputln(const var& prompt)")
+	THISIS(L"bool var::inputl(const var& prompt, const int nchars")
 	THISISDEFINED()
 	ISSTRING(prompt)
+
+	//TODO implement nchars including -1
 
 	if (prompt.length()) {
 		prompt.output();
 		std::cout<<std::flush;
 	}
-	return inputln();
+	return input();
 }
 
-bool var::inputln()
+bool var::input()
 {
-	THISIS(L"bool var::inputln()")
+	THISIS(L"bool var::inputl()")
 	THISISDEFINED()
 
 	std::string tempstr;
@@ -98,25 +101,13 @@ bool var::inputln()
 	return true;
 }
 
-bool var::input(const var& nchars)
-{
-	THISIS(L"bool var::input(const var& nchars)")
-	THISISDEFINED()
-	ISNUMERIC(nchars)
-
-	//TODO implement nchars including -1
-	inputln();
-
-	return (*this).toBool();
-}
-
 void var::stop(const var& text) const
 {
 	THISIS(L"void var::stop(const var& text) const")
 	ISDEFINED(text)
 
 	if (text != L"")
-	text.outputln();
+	text.outputl();
 	exit(0);
 }
 
@@ -126,7 +117,7 @@ void var::abort(const var& text) const
 	ISDEFINED(text)
 
 	if (text != L"")
-	text.outputln();
+	text.outputl();
 	exit(1);
 }
 
@@ -1196,14 +1187,14 @@ const var& var::output() const
 	return put(std::cout);
 }
 
-const var& var::outputln() const
+const var& var::outputl() const
 {
 	put(std::cout);
 	std::cout << std::endl;
 	return *this;
 }
 
-const var& var::outputtab() const
+const var& var::outputt() const
 {
 	put(std::cout);
 	std::cout << '\t';
@@ -1217,7 +1208,7 @@ const var& var::output(const var& str) const
 	return put(std::cout);
 }
 
-const var& var::outputln(const var& str) const
+const var& var::outputl(const var& str) const
 {
 	str.put(std::cout);
 	put(std::cout);
@@ -1225,7 +1216,7 @@ const var& var::outputln(const var& str) const
 	return *this;
 }
 
-const var& var::outputtab(const var& str) const
+const var& var::outputt(const var& str) const
 {
 	str.put(std::cout);
 	std::cout << "\t";
@@ -1241,7 +1232,7 @@ const var& var::errput() const
 	return put(std::cerr);
 }
 
-const var& var::errputln() const
+const var& var::errputl() const
 {
 	put(std::cerr);
 	std::cerr << std::endl;
@@ -1254,7 +1245,7 @@ const var& var::errput(const var& str) const
 	return put(std::cerr);
 }
 
-const var& var::errputln(const var& str) const
+const var& var::errputl(const var& str) const
 {
 	str.put(std::cerr);
 	put(std::cerr);
@@ -1269,7 +1260,7 @@ const var& var::logput() const
 	return put(std::clog);
 }
 
-const var& var::logputln() const
+const var& var::logputl() const
 {
 	put(std::clog);
 	std::clog << std::endl;
@@ -1283,7 +1274,7 @@ const var& var::logput(const var& str) const
 	return put(std::clog);
 }
 
-const var& var::logputln(const var& str) const
+const var& var::logputl(const var& str) const
 {
 	str.put(std::clog);
 	put(std::clog);

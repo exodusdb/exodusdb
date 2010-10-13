@@ -62,7 +62,6 @@ namespace exodus {
 
 //DESTRUCTOR
 /////////////
-
 var::~var()
 {
 	//not a pimpl style pointer anymore for speed
@@ -80,7 +79,8 @@ var::~var()
 //////////////
 
 //default ctor to allow definition unassigned "var mv";
-var::var() : var_mvtype(pimpl::MVTYPE_UNA)
+var::var()
+: var_mvtype(pimpl::MVTYPE_UNA)
 {
 	//WARNING neither initialisers nor constructors are called in the following case !!!
 	//var xxx=xxx.somefunction()
@@ -125,20 +125,12 @@ var::var(const var& copiedvar)
 }
 
 //ctor for wchar_t
-//use initializers since cannot fail (except cannot seem to init wstring from wchar_t)
-var::var(const wchar_t char1) : var_mvtype(pimpl::MVTYPE_STR)
+//would just use initializers since cannot fail
+//(except cannot seem to init wstring from wchar_t!)
+var::var(const wchar_t char1)
+: var_mvtype(pimpl::MVTYPE_STR)
 {
-	//impossible to fail
-	//THISIS(L"var::var(const wchar_t char1)")
-
-	//not a pointer anymore for speed
-	//priv=new pimpl;
-
-	//required when wrapped in priv structure - now done in initializer
-	//var_mvtype=pimpl::MVTYPE_STR;
-	//cannot seem to create wstring from wchar_t in initializer
-	var_mvstr=char1;
-	
+	var_mvstr=char1;	
 }
 
 //ctor for wide c_str
@@ -161,102 +153,52 @@ var::var(const wchar_t* cstr1)
 }
 
 //ctor for std::wstring
-//use initializers since cannot fail
-var::var(const std::wstring& str1) :
+//just use initializers since cannot fail
+var::var(const std::wstring& str1)
+	:
 	var_mvtype(pimpl::MVTYPE_STR),
 	var_mvstr(str1)
-{
-	//impossible to fail
-	//THISIS(L"var::var(const std::wstring& str1)")
-
-	//not a pointer anymore for speed
-	//priv=new pimpl;
-
-	//required when wrapped in priv structure - now done in initializer
-	//var_mvtype=pimpl::MVTYPE_STR;
-	//var_mvstr=str1;
-}
+{}
 
 //ctor for std::string
-//use initializers since cannot fail
-var::var(const std::string& str1) :
+//just use initializers since cannot fail
+var::var(const std::string& str1)
+	:
 	var_mvtype(pimpl::MVTYPE_STR),
 	var_mvstr(wstringfromUTF8((UTF8*)str1.data(),(int)str1.length()))
-{
-	//impossible to fail
-	//THISIS(L"var::var(const std::string& str1)")
-
-	//not a pointer anymore for speed
-	//priv=new pimpl;
-
-	//var_mvtype=pimpl::MVTYPE_STR;
-	////var_mvstr=std::wstring(str1.begin(),str1.end());
-	//var_mvstr=wstringfromUTF8((UTF8*)str1.data(),(int)str1.length());
-}
+{}
 
 //ctor for bool
-//use initializers since cannot fail
-var::var(const bool bool1) :
+//just use initializers since cannot fail
+var::var(const bool bool1)
+	:
 	var_mvtype(pimpl::MVTYPE_INT),
 	var_mvint(bool1)
-{
-	//impossible to fail
-	//THISIS(L"var::var(const bool bool1)")
-
-	//not a pointer anymore for speed
-	//priv=new pimpl;
-
-	//var_mvtype=pimpl::MVTYPE_INT;
-	//var_mvint=int1;
-}
+{}
 
 //ctor for int
-//use initializers since cannot fail
-var::var(const int int1) :
+//just use initializers since cannot fail
+var::var(const int int1)
+	:
 	var_mvtype(pimpl::MVTYPE_INT),
 	var_mvint(int1)
-{
-	//impossible to fail
-	//THISIS(L"var::var(const int int1)")
-
-	//not a pointer anymore for speed
-	//priv=new pimpl;
-
-	//var_mvtype=pimpl::MVTYPE_INT;
-	//var_mvint=int1;
-}
+{}
 
 //ctor for long long
-//use initializers since cannot fail
-var::var(const long long longlong1) :
+//just use initializers since cannot fail
+var::var(const long long longlong1)
+	:
 	var_mvtype(pimpl::MVTYPE_INT),
 	var_mvint(longlong1)
-{
-	//impossible to fail
-	//THISIS(L"var::var(const long long longlong1)")
-
-	//not a pointer anymore for speed
-	//priv=new pimpl;
-
-	//var_mvtype=pimpl::MVTYPE_INT;
-	//var_mvint=longlong1;
-}
+{}
 
 //ctor for double
-//use initializers since cannot fail
-var::var(const double double1) :
+//just use initializers since cannot fail
+var::var(const double double1)
+	:
 	var_mvtype(pimpl::MVTYPE_DBL),
 	var_mvdbl(double1)
-{
-	//impossible to fail
-	//THISIS(L"var::var(const double double1)")
-
-	//not a pointer anymore for speed
-	//priv=new pimpl;
-
-	//var_mvtype=pimpl::MVTYPE_DBL;
-	//var_mvdbl=double1;
-}
+{}
 
 //EXPLICIT AND AUTOMATIC CONVERSIONS
 ////////////////////////////////////
@@ -273,7 +215,6 @@ var::var(const double double1) :
 //	return var_mvstr;
 //}
 
-//necessary to allow var to be used standalone in "if (xxx)" but see mv.h for discussion of using void* instead of bool
 var::operator void*() const
 {
 	THISIS(L"var::operator void*() const")
@@ -285,35 +226,6 @@ var::operator void*() const
 	THISISDEFINED()
 
 	return (void*) toBool();
-	/*
-	//identical code in void* and bool except returns void* and bool respectively
-	do
-	{
-
-		//doubles are true unless zero
-		//check double first dbl on guess that tests will be most often on financial numbers
-		if (var_mvtype&pimpl::MVTYPE_DBL)
-			return (void*)(var_mvdbl!=0);
-
-		//ints are true except for zero
-		if (var_mvtype&pimpl::MVTYPE_INT)
-			return (void*)(var_mvint!=0);
-
-		//non-numeric strings are true unless zero length
-		if (var_mvtype&pimpl::MVTYPE_NAN)
-			return (void*)(var_mvstr.length()!=0);
-
-		if (!(var_mvtype))
-		{
-			THISISASSIGNED()
-			throw MVUnassigned(L"void*(var)");
-		}
-
-		//must be string - try to convert to numeric and do all tests again
-		isnum();
-
-	} while (true);
-*/
 }
 
 //supposed to be replaced with automatic void() and made explicit but just seems to force int conversion during "if (var)"
@@ -325,7 +237,13 @@ var::operator bool() const
 }
 //#endif
 
-//necessary to allow conversion to int in many functions like extract(x,y,z)
+/*
+var::operator const char*() const
+{
+	return tostring().c_str();
+}
+*/
+
 var::operator int() const
 {
 	THISIS(L"var::operator int() const")
@@ -393,18 +311,15 @@ var::operator size_t() const
 }
 */
 
-//convert to c_str may or may not be necessary in order to do wcout<<var
-//NB not needed because we overide the << operator itself
-//and causes a problem with unwanted conversions to strings
-//maybe should throw an error is 0x00 present in the string
-//allow the use of any cstring function
-//var::operator const wchar_t*()
-//{
-//	if (var_mvtype&mvtypemask)
-//		throw MVUndefined(L"const wchar_t*()");
-//	wcout<<L"CONVERT: operator const wchar_t*() returns '"<<var_mvstr.c_str()<<L"'\n";
-//	return var_mvstr.c_str();
-//}
+/*
+var::operator const wchar_t*()
+{
+	if (var_mvtype&mvtypemask)
+		throw MVUndefined(L"const wchar_t*()");
+	wcout<<L"CONVERT: operator const wchar_t*() returns '"<<var_mvstr.c_str()<<L"'\n";
+	return var_mvstr.c_str();
+}
+*/
 
 //UNARY OPERATORS
 /////////////////
@@ -1551,7 +1466,7 @@ std::wstring dblToString(double double1)
 MVException::MVException(const var& description_) : description(description_)
 {
 	std::wcerr << L"MVException:" << description <<std::endl;
-	backtrace().convert(FM,L"\n").outputln();
+	backtrace().convert(FM,L"\n").outputl();
 }
 
 MVUnassigned		::MVUnassigned		(const var& var1)	: MVException(L"MVUnassigned:"				^ var1	){}

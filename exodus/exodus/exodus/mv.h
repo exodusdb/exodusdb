@@ -27,7 +27,7 @@ THE SOFTWARE.
 #define EXODUS_PATCH L"10.10.0"
 
 //if installing with autotools then for latest version of boost and other installation macro
-//download the snapshot from here
+//download the snapshot from here. AX_BOOST_DATE_TIME etc
 //http://git.savannah.gnu.org/gitweb/?p=autoconf-archive.git;a=tree;f=m4
 
 //http://stackoverflow.com/questions/538134/exporting-functions-from-a-dll-with-dllexport
@@ -276,7 +276,7 @@ public:
 	//ctor for wchar_t*
 	var(const wchar_t* cstr1);
 
-	//ctor for memory block
+	//ctor for block of wchar_t
 	var(const wchar_t* cstr1, const size_t int1);
 
 	//ctor for char to create
@@ -324,6 +324,9 @@ public:
 	//automatic conversion to int would be nice to avoid large numbers of specialised function calls
 	//I think like var::extract(int, int, int);
 
+	//automatic conversion to int
+	//necessary to allow conversion to int in many functions like extract(x,y,z)
+
 	//if you uncomment this then also uncomment the definition in var.cpp
 	//uncommented to allow simpler functions
 	//NB const probably determines priority of choice between automatic conversion
@@ -341,6 +344,7 @@ public:
 	//why this is working here now is probably because of non-portable compiler characteristics or lack of source examples
 	//Note: The boost::shared_ptr class support an implicit conversion to bool which is free from unintended conversion to arithmetic types. 
 	// http://www.informit.com/guides/content.aspx?g=cplusplus&seqNum=297
+	//necessary to allow var to be used standalone in "if (xxx)" but see mv.h for discussion of using void* instead of bool
 	operator void*() const;
 
 //this stops using var as indexes of arrays on msvc since msvc converts bool and int ambiguous to index number
@@ -355,6 +359,21 @@ public:
 	//this is fortunate because "shortcircuiting" of && and || doesnt happen when overloaded
 
 	//operator size_t() const;
+
+	//Perhaps should NOT allow automatic convertion to char* since it assumes a conversion to utf8
+	//and cannot hold char(0) perhaps and force people to use
+	//something like .utf8() or .tostring().c_char()
+	//This was added to allow the arguments of osread type functions which need cstrings to be cstrings
+	//so that calls with fixed filenames etc dont require a conversion to var and back again
+	//The other solution would be to declare a parallel set of function with var arguments
+	//operator const char*() const;
+
+	//convert to c_str may or may not be necessary in order to do wcout<<var
+	//NB not needed because we overide the << operator itself
+	//and causes a problem with unwanted conversions to strings
+	//maybe should throw an error is 0x00 present in the string
+	//allow the use of any cstring function
+	//var::operator const wchar_t*();
 
 	//EXPLICIT CONVERSIONS TO
 	/////////////////////////
@@ -398,7 +417,7 @@ public:
 	perform extract if a var is wanted or a replace if assignment is done
 	but it hasnt been established if it is possible to make the specialvar behave like a normal var
 	in all situation eg would the following work?
-	var1(1,2,3).outputln();
+	var1(1,2,3).outputl();
 	also the creation and deletion of the temp object may hit performance.
 	One alternative would be to use () only for extraction (and [] only for replacement of fields?)
 
@@ -621,11 +640,12 @@ public:
 	var ostime() const;
 
 	//SYSTEM FILE/DIRECTORY OPERATIONS
+	//TODO cache osfilehandles somehow (use var_mvint?)
 	bool osopen(const var& osfilename);
 	var& osbread(const var& filehandle, const int startoffset, const int length);
 	void osbwrite(const var& filehandle, const int startoffset) const;
 	void osclose() const;
-	bool osread(const var&);
+	bool osread(const var& osfilename);
 	bool oswrite(const var& osfilename) const;
 	bool osdelete() const;
 	bool osdelete(const var& osfilename) const;
@@ -642,6 +662,14 @@ public:
 	var oscwd() const;
 	var oscwd(const var& path) const;
 	void osflush() const;
+
+	//TODO add performance enhancing char* argumented versions of many os functions
+	//to avoid unnecessary conversion to and from var format
+	//same again but this time allowing native strings without needing automatic conversion of var->char*
+	//this is to only to avoid convertion too and from var
+	//but will usage of hard coded filenames etc really be in fast loops
+	//and performance related? perhaps only provide 
+	bool osread(const char* osfilename);
 
 	//libraries and subroutines/functions
 	bool load(const var& libraryname) const;
@@ -669,23 +697,23 @@ public:
 
 	//STANDARD OUTPUT
 	const var& output() const;
-	const var& outputln() const;
-	const var& outputtab() const;
+	const var& outputl() const;
+	const var& outputt() const;
 	const var& output(const var& var1) const;
-	const var& outputln(const var& var1) const;
-	const var& outputtab(const var& var1) const;
+	const var& outputl(const var& var1) const;
+	const var& outputt(const var& var1) const;
 
 	const var& logput() const;
-	const var& logputln() const;
+	const var& logputl() const;
 
 	const var& logput(const var& var1) const;
-	const var& logputln(const var& var1) const;
+	const var& logputl(const var& var1) const;
 
 	const var& errput() const;
-	const var& errputln() const;
+	const var& errputl() const;
 
 	const var& errput(const var& var1) const;
-	const var& errputln(const var& var1) const;
+	const var& errputl(const var& var1) const;
 
 	const var& put(std::ostream& ostream1) const;
 
@@ -698,9 +726,8 @@ public:
 	void setprompt() const;
 
 	//STANDARD INPUT
-	bool inputln();
-	bool inputln(const var& prompt);
-	bool input(const var& n);
+	bool input();
+	bool input(const var& prompt, const int int1=0);
 	bool eof() const;
 
 #if defined __MINGW32__
@@ -1245,14 +1272,14 @@ DLL_PUBLIC
 exodus::var _SENTENCE;
 
 void DLL_PUBLIC output(const var& mv1);
-void DLL_PUBLIC outputln(const var& mv1=L"");
-void DLL_PUBLIC outputtab(const var& mv1=L"");
+void DLL_PUBLIC outputl(const var& mv1=L"");
+void DLL_PUBLIC outputt(const var& mv1=L"");
 
 void DLL_PUBLIC errput(const var& mv1);
-void DLL_PUBLIC errputln(const var& mv1=L"");
+void DLL_PUBLIC errputl(const var& mv1=L"");
 
 void DLL_PUBLIC logput(const var& mv1);
-void DLL_PUBLIC logputln(const var& mv1=L"");
+void DLL_PUBLIC logputl(const var& mv1=L"");
 
 var DLL_PUBLIC backtrace();
 

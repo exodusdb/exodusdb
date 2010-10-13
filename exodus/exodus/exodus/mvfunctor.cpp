@@ -115,14 +115,14 @@ bool ExodusFunctorBase::openlib()
 		//env string is copied into string so following getenv usage is safe
 		_libraryfilename.replace(0,1, getenv("HOME"));
 
-	//var(_libraryfilename).outputln();
+	//var(_libraryfilename).outputl();
 
 	_plibrary=(void*) dlopen(_libraryfilename.c_str(),RTLD_NOW);
 
 #ifdef dlerror
 	const char* dlsym_error = dlerror();
 	if (dlsym_error)
-		var(dlsym_error).outputln();
+		var(dlsym_error).outputl();
 #endif
 
 	return _plibrary!=NULL;
@@ -137,14 +137,14 @@ bool ExodusFunctorBase::openfunc()
 	dlerror();
 #endif
 
-	//var(_libraryfilename)^L" "^var(_functionname).outputln();
+	//var(_libraryfilename)^L" "^var(_functionname).outputl();
 
 	_pfunction = (void*) dlsym((library_t) _plibrary, _functionname.c_str());
 
 #ifdef dlerror
 	const char* dlsym_error = dlerror();
 	if (dlsym_error)
-		var(dlsym_error).outputln();
+		var(dlsym_error).outputl();
 #endif
 	return _pfunction!=NULL;
 }

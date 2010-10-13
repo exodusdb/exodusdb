@@ -51,24 +51,24 @@ subroutine addunits(in newunits, out totunits)
 
 subroutine mssg(in msg)
 {
-	println(msg);
+	printl(msg);
 }
 
 subroutine fsmsg()
 {
-	println("fsmsg():");
+	printl("fsmsg():");
 }
 
 subroutine msg2(in msg, in options, out buffer, in params)
 {
-	println(msg, " ", options, " ", params);
+	printl(msg, " ", options, " ", params);
 	if (options.index("R"))
 		stop("msg2()");
 }
 
 subroutine perf(in cmd)
 {
-	println("perf: " ^ cmd);
+	printl("perf: " ^ cmd);
 }
 
 function openfile(in filename, out file)
@@ -354,7 +354,7 @@ NO-BASE
 					dictrec.swapper(" |","|");
 				var key=field(dictrec,"|",1);
 				var rec=field(dictrec,"|",2,9999);
-				//println(key ^ ": " ^ rec);
+				//printl(key ^ ": " ^ rec);
 				write(rec.convert("|",FM), dictvoc, key);
 			}
 		}

@@ -22,7 +22,7 @@ program()
 							print("Cannot create ");
 			}
 			if (not silent)
-					println(filename);
+					printl(filename);
 
 		}
 }

@@ -20,7 +20,7 @@ we decide that "subr3" will be in a library (ie a single compilable file/record)
 
 #include <exodus/exodus.h>
 subroutine subr3(in var1) {
-	println("lib1/subr3 says "^var1);
+	printl("lib1/subr3 says "^var1);
 }
 
 ==== lib1.h ====
