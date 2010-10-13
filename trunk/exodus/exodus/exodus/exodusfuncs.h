@@ -64,7 +64,9 @@ DLL_PUBLIC var oscwd(const var& dirname);
 DLL_PUBLIC void osflush();
 DLL_PUBLIC var suspend(const var& command);
 DLL_PUBLIC var osshell(const var& command);
-DLL_PUBLIC var osshell(const var& command, var& output);
+DLL_PUBLIC var osshellread(const var& command);
+DLL_PUBLIC void osshellread(var& readstr, const var& command);
+DLL_PUBLIC void osshellwrite(const var& writestr, const var& command);
 DLL_PUBLIC void stop(const var& text=L"");
 DLL_PUBLIC void abort(const var& text);//dont confuse with abort() which is standard c/c++
 DLL_PUBLIC var perform(const var& command);

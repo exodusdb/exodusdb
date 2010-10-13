@@ -682,7 +682,8 @@ public:
 	//OS PROCESSING
 	var suspend() const;
 	var osshell() const;
-	var osshell(var& output) const;
+	var osshellread() const;
+	var osshellwrite(const var& writestr) const;
 	bool osgetenv(const var& name);
 	bool ossetenv(const var& name) const;
 	void stop(const var& text=L"") const;

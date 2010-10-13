@@ -345,22 +345,17 @@ var var::osshell() const
 	int shellresult=system(tostring().c_str());
 	breakon();
 
-	return var(shellresult);
+	return shellresult;
 }
 
-var var::osshell(var& output) const
+var var::osshellread() const
 {
-	THISIS(L"var var::osshell(var& output) const")
+	THISIS(L"var var::osshellread() const")
 	//will be checked again by tostring()
 	//but put it here so any unassigned error shows in osshell
 	THISISSTRING()
 
-	//breakoff();
-	//use dummy to avoid warning in gcc4 "warning: ignoring return value of int system(const char*), declared with attribute warn_unused_result"
-	//int dummy=system(tostring().c_str());
-	//breakon();
-
-	output=L"";
+	var output=L"";
 
 	//"r" means read
 	std::FILE *cmd=popen(tostring().c_str(), "r");
@@ -376,10 +371,32 @@ var var::osshell(var& output) const
 		std::string str1=cstr1;
 		output.var_mvstr+=std::wstring(str1.begin(),str1.end());
 	}
-	pclose(cmd);
 
-	//sadly no way to determine return code of program when using popen so treat like success always.
-    return 0;
+	//we are going to throw away the process termination status
+	//because we are going to return the output text
+	int result=pclose(cmd);
+
+    return output;
+
+}
+
+var var::osshellwrite(const var& writestr) const
+{
+	THISIS(L"var var::osshellwrite(const var& writestr) const")
+	//will be checked again by tostring()
+	//but put it here so any unassigned error shows in osshell
+	THISISSTRING()
+	ISSTRING(writestr)
+
+	//"w" means read
+	std::FILE *cmd=popen(tostring().c_str(), "w");
+	//return a code to indicate program failure. but can this ever happen?
+	if (cmd==NULL)
+		return 1;
+	fputs(writestr.tostring().c_str(),cmd);
+
+	//return the process termination status (pity cant do this for read too)
+	return pclose(cmd);
 
 }
 
