@@ -64,6 +64,12 @@ namespace boostfs = boost::filesystem;
 #include <cstdlib> //for getenv and setenv/putenv
 //#include <stdio.h> //for getenv
 
+//oshell capturing output needs posix popen
+#if defined(_MSC_VER) && !defined(popen)
+#define popen _popen
+#define pclose _pclose
+#endif
+
 #define MV_NO_NARROW
 
 #include <exodus/mvimpl.h>
@@ -331,14 +337,50 @@ bool var::ossetenv(const var& envvarname) const
 var var::osshell() const
 {
 	THISIS(L"var var::osshell() const")
+	//will be checked again by tostring()
+	//but put it here so any unassigned error shows in osshell
 	THISISSTRING()
 
 	breakoff();
-	//use dummy to avoid warning in gcc4 "warning: ignoring return value of int system(const char*), declared with attribute warn_unused_result"
-	int dummy=system(tostring().c_str());
+	int shellresult=system(tostring().c_str());
 	breakon();
 
-	return L"";
+	return var(shellresult);
+}
+
+var var::osshell(var& output) const
+{
+	THISIS(L"var var::osshell(var& output) const")
+	//will be checked again by tostring()
+	//but put it here so any unassigned error shows in osshell
+	THISISSTRING()
+
+	//breakoff();
+	//use dummy to avoid warning in gcc4 "warning: ignoring return value of int system(const char*), declared with attribute warn_unused_result"
+	//int dummy=system(tostring().c_str());
+	//breakon();
+
+	output=L"";
+
+	//"r" means read
+	std::FILE *cmd=popen(tostring().c_str(), "r");
+	//return a code to indicate program failure. but can this ever happen?
+	if (cmd==NULL)
+		return 1;
+	//TODO buffer overflow check
+    char cstr1[1024]={0x0};
+	while (std::fgets(cstr1, sizeof(cstr1), cmd) !=NULL) {
+		//std::printf("%s\n", result);
+		//cannot trust that standard input is convertable from utf8
+		//output.var_mvstr+=wstringfromUTF8((const UTF8*)result,strlen(result));
+		std::string str1=cstr1;
+		output.var_mvstr+=std::wstring(str1.begin(),str1.end());
+	}
+	pclose(cmd);
+
+	//sadly no way to determine return code of program when using popen so treat like success always.
+    return 0;
+
 }
 
 var var::suspend() const
