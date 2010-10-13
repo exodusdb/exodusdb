@@ -66,9 +66,9 @@ public:
 		//printf(szText);
 
 		//printf("fgets:%s", path);
-		exodus::var line=exodus::var(szText).convert("\x0d\x0a","");//.outputln("path=");
-		exodus::var filename=line.field(":",1,2);//.outputln("filename=");
-		exodus::var lineno=filename.field2(" ",-1);//.outputln("lineno=");
+		exodus::var line=exodus::var(szText).convert("\x0d\x0a","");//.outputl("path=");
+		exodus::var filename=line.field(":",1,2);//.outputl("filename=");
+		exodus::var lineno=filename.field2(" ",-1);//.outputl("lineno=");
 		filename.splicer(-(lineno.length()+1),999999,"");
 		lineno.substrer(2,lineno.length()-2);
 		if (filename.index("stackwalker.cpp")||filename.index("debug.cpp")||filename.index("crtexe.c"))
@@ -83,7 +83,7 @@ public:
 				if (linetext.index("backtrace("))
 					return;
 			}
-			//outputln(linetext);
+			//outputl(linetext);
 			returnlines^=exodus::FM^linetext;
 		}
 
@@ -103,7 +103,7 @@ var backtrace()
 {
 
 #ifdef _MSC_VER
-	//logputln("backtrace() not implemented on windows yet");
+	//logputl("backtrace() not implemented on windows yet");
 	//var().abort("");
 	MyStackWalker sw;
 	sw.ShowCallstack();
@@ -143,7 +143,7 @@ var backtrace()
 		binaryfilename="`which " ^ binaryfilename ^ "`";
 	var oscmd="addr2line -e " ^ binaryfilename.quote() ^ " " ^ internaladdresses;
 
-	//oscmd.outputln();
+	//oscmd.outputl();
 
 #ifdef TRACING
 	printf("_EXECPATH = %s\n",_EXECPATH.tostring().c_str());
@@ -168,9 +168,9 @@ var backtrace()
 #ifdef TRACING
 		printf("fgets:%s", path);
 #endif
-		var path2=var(path).convert("\x0d\x0a","");//.outputln("path=");
-		var filename=path2.field(":",1);//.outputln("filename=");
-		var lineno=path2.field(":",2);//.outputln("lineno=");
+		var path2=var(path).convert("\x0d\x0a","");//.outputl("path=");
+		var filename=path2.field(":",1);//.outputl("filename=");
+		var lineno=path2.field(":",2);//.outputl("lineno=");
 		if (lineno)		
 		{
 			var linetext=filename ^ ":" ^ lineno;
@@ -179,7 +179,7 @@ var backtrace()
 			{
 				linetext^=": " ^ filetext.field("\x0A",lineno).trimf(" \t");
 			}
-			//outputln(linetext);
+			//outputl(linetext);
 			returnlines^=FM^linetext;
 		}
 	}
@@ -200,7 +200,7 @@ void SIGINT_handler (int sig)
 	signal(sig, SIG_IGN);
 
 	//duplicated in init and B
-	backtrace().convert(FM,"\n").outputln();
+	backtrace().convert(FM,"\n").outputl();
 
 	for (;;)
 	{
@@ -209,7 +209,7 @@ void SIGINT_handler (int sig)
 
 		output("? ");
 		var cmd;
-		if (! cmd.inputln())
+		if (! cmd.input())
 		continue;
 		var cmd1=cmd.substr(1,1).ucase();
 
@@ -223,7 +223,7 @@ void SIGINT_handler (int sig)
 		else if (cmd1=="B")
 
 			//duplicated in init and B
-			backtrace().convert(FM,"\n").outputln();
+			backtrace().convert(FM,"\n").outputl();
 
 	}
 

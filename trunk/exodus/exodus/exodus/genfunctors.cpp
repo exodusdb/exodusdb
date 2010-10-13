@@ -102,7 +102,7 @@ subroutine genfunctor(in mode, in nargs) {
  text^=foot;
 
  var outputfilename="xfunctor"^mode.substr(1,1)^nargs^".h";
- println(outputfilename);
+ printl(outputfilename);
  oswrite(text,outputfilename);
  
 }

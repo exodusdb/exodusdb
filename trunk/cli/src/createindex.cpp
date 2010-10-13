@@ -18,7 +18,7 @@ program()
                         print("Cannot create ");
         }
         if (not silent)
-                println(filename ^ " " ^ fieldname ^ " index");
+                printl(filename ^ " " ^ fieldname ^ " index");
 
 }
 

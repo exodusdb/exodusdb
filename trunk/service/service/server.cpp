@@ -4,7 +4,7 @@
 
 //#include "mvroutine.h"
 
-//TODO replace wcout<< with println to remove dependency on <iostream>
+//TODO replace wcout<< with printl to remove dependency on <iostream>
 
 namespace exodus {
 
@@ -35,7 +35,7 @@ var Server::run()
 	origsentence = env.SENTENCE;
 
 	//open 'messages' to messages else return 999999
-//	env.SYSTEM.println();
+//	env.SYSTEM.printl();
 
 	datasetcode = env.SYSTEM.extract(17);
 	if (datasetcode == L"")
@@ -482,7 +482,7 @@ stopper:
 			if (charx == env.INTCONST.extract(1)) {
 				env.msg2(L"You have pressed the [Esc]  key to exit|press again to confirm|", L"UB", buffer, L"");
 				while (true) {
-					reply.inputln(-1);
+					reply.input(-1);
 				//BREAK;
 				if (reply) break;;
 				}//loop;
@@ -2652,7 +2652,7 @@ void Server::gosub_getbakpars()
 	if (!bakpars.read(env.DEFINITIONS, L"BACKUP"))
 		bakpars = L"";
 	var tt;
-	if (tt.osread(L"BACKUP.CFG")) {
+	if (tt.osread("BACKUP.CFG")) {
 		for (int ii = 1; ii <= 99; ii++) {
 			if (tt.extract(ii))
 				bakpars.replacer(ii, 0, 0, tt.extract(ii));

@@ -73,8 +73,8 @@ DLL_PUBLIC var logoff();
 DLL_PUBLIC void debug();
 
 void print(const var& mv1);
-void println(const var& mv1=L"");
-void printtab(const var& mv1=L"");
+void printl(const var& mv1=L"");
+void printt(const var& mv1=L"");
 
 DLL_PUBLIC var at(const int columnorcode);
 DLL_PUBLIC var at(const var& column, const var& row);
@@ -223,60 +223,60 @@ void print(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg
 { print(arg1); print(arg2); print(arg3); print(arg4); print(arg5); print(arg6); print(arg7); print(arg8); print(arg9); print(arg10);}
 
 template<class T1, class T2>
-void printtab(T1 arg1, T2 arg2)
-{ print(arg1); printtab(arg2);}
+void printt(T1 arg1, T2 arg2)
+{ print(arg1); printt(arg2);}
 template<class T1, class T2, class T3>
-void printtab(T1 arg1, T2 arg2, T3 arg3)
-{ print(arg1); print(arg2); printtab(arg3);}
+void printt(T1 arg1, T2 arg2, T3 arg3)
+{ print(arg1); print(arg2); printt(arg3);}
 template<class T1, class T2, class T3, class T4>
-void printtab(T1 arg1, T2 arg2, T3 arg3, T4 arg4)
-{ print(arg1); print(arg2); print(arg3); printtab(arg4);}
+void printt(T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+{ print(arg1); print(arg2); print(arg3); printt(arg4);}
 template<class T1, class T2, class T3, class T4, class T5>
-void printtab(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
-{ print(arg1); print(arg2); print(arg3); print(arg4); printtab(arg5);}
+void printt(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
+{ print(arg1); print(arg2); print(arg3); print(arg4); printt(arg5);}
 template<class T1, class T2, class T3, class T4, class T5, class T6>
-void printtab(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
-{ print(arg1); print(arg2); print(arg3); print(arg4); print(arg5); printtab(arg6);}
+void printt(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
+{ print(arg1); print(arg2); print(arg3); print(arg4); print(arg5); printt(arg6);}
 template<class T1, class T2, class T3, class T4, class T5, class T6, class T7>
-void printtab(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
-{ print(arg1); print(arg2); print(arg3); print(arg4); print(arg5); print(arg6); printtab(arg7);}
+void printt(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
+{ print(arg1); print(arg2); print(arg3); print(arg4); print(arg5); print(arg6); printt(arg7);}
 template<class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
-void printtab(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8)
-{ print(arg1); print(arg2); print(arg3); print(arg4); print(arg5); print(arg6); print(arg7); printtab(arg8);}
+void printt(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8)
+{ print(arg1); print(arg2); print(arg3); print(arg4); print(arg5); print(arg6); print(arg7); printt(arg8);}
 template<class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
-void printtab(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9)
-{ print(arg1); print(arg2); print(arg3); print(arg4); print(arg5); print(arg6); print(arg7); print(arg8); printtab(arg9); }
+void printt(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9)
+{ print(arg1); print(arg2); print(arg3); print(arg4); print(arg5); print(arg6); print(arg7); print(arg8); printt(arg9); }
 template<class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10>
-void printtab(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9, T10 arg10)
-{ print(arg1); print(arg2); print(arg3); print(arg4); print(arg5); print(arg6); print(arg7); print(arg8); print(arg9); printtab(arg10);}
+void printt(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9, T10 arg10)
+{ print(arg1); print(arg2); print(arg3); print(arg4); print(arg5); print(arg6); print(arg7); print(arg8); print(arg9); printt(arg10);}
 
 template<class T1, class T2>
-void println(T1 arg1, T2 arg2)
-{ print(arg1); println(arg2);}
+void printl(T1 arg1, T2 arg2)
+{ print(arg1); printl(arg2);}
 template<class T1, class T2, class T3>
-void println(T1 arg1, T2 arg2, T3 arg3)
-{ print(arg1); print(arg2); println(arg3);}
+void printl(T1 arg1, T2 arg2, T3 arg3)
+{ print(arg1); print(arg2); printl(arg3);}
 template<class T1, class T2, class T3, class T4>
-void println(T1 arg1, T2 arg2, T3 arg3, T4 arg4)
-{ print(arg1); print(arg2); print(arg3); println(arg4);}
+void printl(T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+{ print(arg1); print(arg2); print(arg3); printl(arg4);}
 template<class T1, class T2, class T3, class T4, class T5>
-void println(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
-{ print(arg1); print(arg2); print(arg3); print(arg4); println(arg5);}
+void printl(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
+{ print(arg1); print(arg2); print(arg3); print(arg4); printl(arg5);}
 template<class T1, class T2, class T3, class T4, class T5, class T6>
-void println(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
-{ print(arg1); print(arg2); print(arg3); print(arg4); print(arg5); println(arg6);}
+void printl(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
+{ print(arg1); print(arg2); print(arg3); print(arg4); print(arg5); printl(arg6);}
 template<class T1, class T2, class T3, class T4, class T5, class T6, class T7>
-void println(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
-{ print(arg1); print(arg2); print(arg3); print(arg4); print(arg5); print(arg6); println(arg7);}
+void printl(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
+{ print(arg1); print(arg2); print(arg3); print(arg4); print(arg5); print(arg6); printl(arg7);}
 template<class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
-void println(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8)
-{ print(arg1); print(arg2); print(arg3); print(arg4); print(arg5); print(arg6); print(arg7); println(arg8);}
+void printl(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8)
+{ print(arg1); print(arg2); print(arg3); print(arg4); print(arg5); print(arg6); print(arg7); printl(arg8);}
 template<class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
-void println(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9)
-{ print(arg1); print(arg2); print(arg3); print(arg4); print(arg5); print(arg6); print(arg7); print(arg8); println(arg9); }
+void printl(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9)
+{ print(arg1); print(arg2); print(arg3); print(arg4); print(arg5); print(arg6); print(arg7); print(arg8); printl(arg9); }
 template<class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10>
-void println(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9, T10 arg10)
-{ print(arg1); print(arg2); print(arg3); print(arg4); print(arg5); print(arg6); print(arg7); print(arg8); print(arg9); println(arg10);}
+void printl(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9, T10 arg10)
+{ print(arg1); print(arg2); print(arg3); print(arg4); print(arg5); print(arg6); print(arg7); print(arg8); print(arg9); printl(arg10);}
 
 }//namespace exodus
 

@@ -21,7 +21,7 @@ program()
 							print("Cannot delete ");
 			}
 			if (not silent)
-					println(filename);
+					printl(filename);
 		}
 
 }

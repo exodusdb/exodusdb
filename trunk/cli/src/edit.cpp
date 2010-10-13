@@ -66,7 +66,7 @@ program()
 
 	//fire up the editor
 	var editcmd=editor ^ " " ^ temposfilename.quote();
-	println(editcmd);
+	printl(editcmd);
 	osshell(editor ^ " " ^ temposfilename);
 
 	//if the file has been updated
@@ -91,7 +91,7 @@ program()
 		if (record2 ne record) {
 
 			//print("Ok to update? ");
-			//var reply=inputln();
+			//var reply=inputl();
 			var reply="Y";
 
 			//keep trying to update - perhaps futilely
@@ -99,12 +99,12 @@ program()
 			while(ucase(reply).substr(1,1) eq "Y" and true) {
 
 				if (write(record2,file,key)) {
-					println(filename^" written "^key);
+					printl(filename^" written "^key);
 					osdelete(temposfilename);
 					break;
 				}
 				var temp;
-				temp.inputln();
+				temp.input();
 
 			}
 		}

@@ -27,7 +27,7 @@ program()
 			{
 				clearfile(file);
 				if (not silent)
-					println("All records deleted");
+					printl("All records deleted");
 				stop();
 			}
 
@@ -35,10 +35,10 @@ program()
 				++ndeleted;
 			else
 				if (not silent)
-					println(quote(itemid)^" does not exist.");
+					printl(quote(itemid)^" does not exist.");
 		} while (sep);
 
 		if (not silent)
-			println(ndeleted^" record(s) deleted.");
+			printl(ndeleted^" record(s) deleted.");
 }
 

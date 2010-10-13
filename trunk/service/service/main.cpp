@@ -168,6 +168,8 @@ private:
 
 program()
 {
+	var xx;
+	xx.osread(xx);
 	/*
 	var inpz=input();
 
@@ -185,7 +187,11 @@ program()
 	//if (not connect("port=5433"))
 	//	stop("Cannot connect!");
 
-	oconv(1234,"MD20P").outputln();
+	var errmsg;
+	if (not var("CREATE DATABASE exodus WITH ENCODING='UTF8' OWNER=exodus;").sqlexec(errmsg))
+		printl();
+
+	oconv(1234,"MD20P").outputl();
 	assert(var(10000).oconv("DY0")=="");
 
 	var temp;
@@ -202,14 +208,14 @@ program()
 	//if (select("select test_symbolics with SYMCOL1 = 124")) {
 		var key1;
 		if (not readnext(key1))
-			println("no 124");
+			printl("no 124");
 		var xrec;
 		if (not xrec.read("test_symbolics",key1))
-			println(key1, " missing"); 
+			printl(key1, " missing"); 
 	}
 
 	assert(var("a")<var("B"));
-	assert(var(1000).oconv("MD80").outputln("1000 MD80->")=="1000.00000000");
+	assert(var(1000).oconv("MD80").outputl("1000 MD80->")=="1000.00000000");
 	assert(var("31 JAN 2008").iconv("D")=="14641");
 
 	assert(var("1/31/2008").iconv("D")==14641);
@@ -230,7 +236,7 @@ program()
 	assert(var("1/31/2008").iconv("DE")=="");
 
 	//select("select test_alphanum with f1 between 20 and 21");
-	println(oconv(10.1,"MD20"));
+	printl(oconv(10.1,"MD20"));
 
 	/*
 	var alphanum1="Flat 10a";
@@ -293,7 +299,7 @@ program()
 		for (int partn=0;partn<sizeof(chars);++partn)
 			//var(chars[partn]).oconv("HEX").output();
 			std::cout << std::hex << int(chars[partn]) << " " ;
-		println();
+		printl();
 	}
 
 	std::wcout<< var("xyz");
@@ -352,64 +358,64 @@ or 'built-in C++ operator+(unsigned int, bool)'
 or 'built-in C++ operator+(bool, bool)'
 while trying to match the argument list '(exodus::var, bool)'
 */
-
+	
 	//neither will the following
 	//var log3=count(log1,"x")+(log1 ne "");
 	//just convert it to the better
 	var log4=dcount(log1,"x");
 
-	println(_SENTENCE);
-	var("xyz").substr(4,1).outputln();
+	printl(_SENTENCE);
+	var("xyz").substr(4,1).outputl();
 
 	//TODO ensure isnum converts ints larger that the maximum int to FLOATS
 
 	var subs="xyz";
-	println(subs.substr(-1));
+	printl(subs.substr(-1));
 
-	assert(oconv("a","L#3").outputln()=="a  ");
-	assert(oconv("abc","L#3").outputln()=="abc");
-	assert(oconv("abcd","L#3").outputln()=="abc");
-	assert(oconv("a"^FM^"abc"^FM^"abcd","L#3").outputln()==("a  "^FM^"abc"^FM^"abc"));
+	assert(oconv("a","L#3").outputl()=="a  ");
+	assert(oconv("abc","L#3").outputl()=="abc");
+	assert(oconv("abcd","L#3").outputl()=="abc");
+	assert(oconv("a"^FM^"abc"^FM^"abcd","L#3").outputl()==("a  "^FM^"abc"^FM^"abc"));
 
-	assert(oconv("a","R#3").outputln()=="  a");
-	assert(oconv("abc","R#3").outputln()=="abc");
-	assert(oconv("abcd","R#3").outputln()=="bcd");
-	assert(oconv("a"^FM^"abc"^FM^"abcd","R#3").outputln()==("  a"^FM^"abc"^FM^"bcd"));
+	assert(oconv("a","R#3").outputl()=="  a");
+	assert(oconv("abc","R#3").outputl()=="abc");
+	assert(oconv("abcd","R#3").outputl()=="bcd");
+	assert(oconv("a"^FM^"abc"^FM^"abcd","R#3").outputl()==("  a"^FM^"abc"^FM^"bcd"));
 
-	assert(oconv("a","T#3").outputln()=="a  ");
-	assert(oconv("abc","T#3").outputln()=="abc");
-	assert(oconv("abcd","T#3").outputln()==("abc"^TM^"d  "));
-	assert(oconv("a"^FM^"abc"^FM^"abcd","T#3").outputln()==("a  "^FM^"abc"^FM^"abc"^TM^"d  "));
+	assert(oconv("a","T#3").outputl()=="a  ");
+	assert(oconv("abc","T#3").outputl()=="abc");
+	assert(oconv("abcd","T#3").outputl()==("abc"^TM^"d  "));
+	assert(oconv("a"^FM^"abc"^FM^"abcd","T#3").outputl()==("a  "^FM^"abc"^FM^"abc"^TM^"d  "));
 
-	assert(oconv("a","L(0)#3").outputln()=="a00");
-	assert(oconv("a","R(0)#3").outputln()=="00a");
-	assert(oconv("a","T(0)#3").outputln()=="a00");
-	assert(oconv("abcd","T(0)#3").outputln()==("abc"^TM^"d00"));
+	assert(oconv("a","L(0)#3").outputl()=="a00");
+	assert(oconv("a","R(0)#3").outputl()=="00a");
+	assert(oconv("a","T(0)#3").outputl()=="a00");
+	assert(oconv("abcd","T(0)#3").outputl()==("abc"^TM^"d00"));
 
 	initrnd(999);
-	assert(rnd(999).outputln()==777);
-	assert(iconv("23 59 59","MT").outputln()==86399);
-	assert(iconv("xx11yy12zz13P","MT").outputln()==83533);
-	assert(iconv("24 00 00","MT").outputln()=="");
+	assert(rnd(999).outputl()==777);
+	assert(iconv("23 59 59","MT").outputl()==86399);
+	assert(iconv("xx11yy12zz13P","MT").outputl()==83533);
+	assert(iconv("24 00 00","MT").outputl()=="");
 
 	//http://www.regular-expressions.info/examples.html
-	assert(swap("Steve Bush Bash bish","B.","Ru","ri").outputln()=="Steve Rush Rush Rush");
+	assert(swap("Steve Bush Bash bish","B.","Ru","ri").outputl()=="Steve Rush Rush Rush");
 	//correct for utf16 windows
 	if (sizeof(wchar_t)==2)
 	{
-		assert(oconv("Aa019KK","HEX").outputln()=="00410061003000310039004B004B");
-		assert(var("00410061003000310039004B004B").iconv("HEX").outputln()=="Aa019KK");
+		assert(oconv("Aa019KK","HEX").outputl()=="00410061003000310039004B004B");
+		assert(var("00410061003000310039004B004B").iconv("HEX").outputl()=="Aa019KK");
 
 		//doesnt accept FMs etc yet
-		//assert(var("FF"^FM^"00").iconv("HEX").outputln()==("00FF"^FM^"00FF"));
-		assert(var("FF"^FM^"00").iconv("HEX").oconv("HEX").outputln()=="");
+		//assert(var("FF"^FM^"00").iconv("HEX").outputl()==("00FF"^FM^"00FF"));
+		assert(var("FF"^FM^"00").iconv("HEX").oconv("HEX").outputl()=="");
 		//anything invalid returns empty string
-		assert(var("XF").iconv("HEX").oconv("HEX").outputln()=="");
+		assert(var("XF").iconv("HEX").oconv("HEX").outputl()=="");
 	}
 
 	var time1=var("10:10:10").iconv("MT");
-	assert(var("abcabdef").trim("abef").outputln()=="cbd");
-	assert(var("abcabdef").trimf("abef").trimb("abef").outputln()=="cabd");
+	assert(var("abcabdef").trim("abef").outputl()=="cbd");
+	assert(var("abcabdef").trimf("abef").trimb("abef").outputl()=="cabd");
 
 	var temp3="c";
 	var temp2("c");
@@ -457,26 +463,26 @@ while trying to match the argument list '(exodus::var, bool)'
 	var filehandle;
 /*
 	try {
-		println(filehandle);
+		printl(filehandle);
 	}
 	catch (MVException except) {
-		except.description.outputln();
+		except.description.outputl();
 	}
 */
 	osopen("/ADECOMT.TXT",filehandle);
-	oconv(0,"D5").outputln();
+	oconv(0,"D5").outputl();
 	//check empty conversion
-	oconv("xxx","").outputln("xxx = ");
+	oconv("xxx","").outputl("xxx = ");
 	assert(oconv("xxx","")=="xxx");
 
-	oconv("",				"MX").outputln(" = ");
-	oconv(" ",				"MX").outputln("  = ");
-	oconv(0,				"MX").outputln("0 = ");
-	oconv(-0,				"MX").outputln("0 = ");
-	oconv("X",				"MX").outputln("X = ");
-	oconv("-1.5",			"MX").outputln("FFFFFFFFFFFFFFFE = ");
-	oconv("1.5",			"MX").outputln("2 = ");
-	oconv("20" ^ FM ^ 255,	"MX").outputln("14" ^FM^ "FF = ");
+	oconv("",				"MX").outputl(" = ");
+	oconv(" ",				"MX").outputl("  = ");
+	oconv(0,				"MX").outputl("0 = ");
+	oconv(-0,				"MX").outputl("0 = ");
+	oconv("X",				"MX").outputl("X = ");
+	oconv("-1.5",			"MX").outputl("FFFFFFFFFFFFFFFE = ");
+	oconv("1.5",			"MX").outputl("2 = ");
+	oconv("20" ^ FM ^ 255,	"MX").outputl("14" ^FM^ "FF = ");
 
 	assert(oconv("","MX")=="");
 	assert(oconv(" ","MX")==" ");
@@ -489,11 +495,11 @@ while trying to match the argument list '(exodus::var, bool)'
 	assert(oconv("1.5","MX")=="2");
 	assert(oconv("20" ^ FM ^ 255,"MX")==("14" ^FM^ "FF"));
 
-	oconv("","D").outputln(" = ");
-	oconv("X","D").outputln("X = ");
-	oconv("-1.5","D").outputln("29 DEC 1967 = ");
-	oconv("1.5","D").outputln("01 JAN 1968 = ");
-	oconv("1.5" ^ FM ^ -1.5,"D").outputln("01 JAN 1968 FM 29 DEC 1967 = ");
+	oconv("","D").outputl(" = ");
+	oconv("X","D").outputl("X = ");
+	oconv("-1.5","D").outputl("29 DEC 1967 = ");
+	oconv("1.5","D").outputl("01 JAN 1968 = ");
+	oconv("1.5" ^ FM ^ -1.5,"D").outputl("01 JAN 1968 FM 29 DEC 1967 = ");
 
 	assert(oconv("","D")=="");
 	assert(oconv("X","D")=="X");
@@ -524,7 +530,7 @@ while trying to match the argument list '(exodus::var, bool)'
 	assert(oconv(9649,"DQ")=="2");
 	assert(oconv(9649,"DJ")=="152");
 	var feb29_2004=13209;//iconv("29 FEB 2004","D");
-	oconv(feb29_2004,"DL").outputln();
+	oconv(feb29_2004,"DL").outputl();
 	assert(oconv(feb29_2004,"DL")=="29");
 
 	assert(oconv(10939,"D")=="12 DEC 1997");
@@ -540,17 +546,17 @@ while trying to match the argument list '(exodus::var, bool)'
 	assert(oconv(10939,"DY")=="1997");
 	assert(oconv(10939,"DQ")=="4");
 
-	oconv(31653,"MT").outputln();
+	oconv(31653,"MT").outputl();
 
 	assert(oconv(31653,"MT")=="08:47");
 	assert(oconv(63306,"MT")=="17:35");
-	println(oconv(0,"MTH"));
+	printl(oconv(0,"MTH"));
 	assert(oconv(0,"MTH")=="12:00AM");
 	assert(oconv(31653,"MT")=="08:47");
 	assert(oconv(63306,"MTH")=="05:35PM");
 	assert(oconv(31653,"MTS")=="08:47:33");
 	assert(oconv(63306,"MTS")=="17:35:06");
-	println(oconv(63306,"MTHS"));
+	printl(oconv(63306,"MTHS"));
 	assert(oconv(63306,"MTHS")=="05:35:06PM");
 	assert(oconv(63306,"MTS")=="17:35:06");
 	assert(oconv(63306,"MTS.")=="17.35.06");
@@ -573,54 +579,54 @@ MTHS 63306 05:35:06pm
 MTS. 63306 17:35:06
 MT'h' 63306 17h35
 */
-	println(time().oconv("MT"));
-	println(time().oconv("MTH"));
-	println(time().oconv("MTS"));
-	println(time().oconv("MTSH"));
-	println(time().oconv("MTx"));
-	println(time().oconv("MTHx"));
-	println(time().oconv("MTSx"));
-	println(time().oconv("MTSHx"));
+	printl(time().oconv("MT"));
+	printl(time().oconv("MTH"));
+	printl(time().oconv("MTS"));
+	printl(time().oconv("MTSH"));
+	printl(time().oconv("MTx"));
+	printl(time().oconv("MTHx"));
+	printl(time().oconv("MTSx"));
+	printl(time().oconv("MTSHx"));
 
 	var hexx=oconv(FM ^ L"\x0035","HEX");
 	hexx=oconv(FM,"HEX");
 
-	println(osdir("/"));
+	printl(osdir("/"));
 	osrmdir("xxxyzz");
 	osmkdir("xxxyzz");
 	osrmdir("xxxy");
-	println(var("/xyz/aaa").osmkdir());
-	println(var("/xyz").osrmdir());
-	outputln(osrename("/xyz","/xyzz"));
-	println(var("/xyzz").osrmdir(true));
+	printl(var("/xyz/aaa").osmkdir());
+	printl(var("/xyz").osrmdir());
+	outputl(osrename("/xyz","/xyzz"));
+	printl(var("/xyzz").osrmdir(true));
 
-	println(osdir("c:\\config.sys"));
+	printl(osdir("c:\\config.sys"));
 
-	outputln(oscopy("/adagency7.exe","/adagency777.exe"));
-	outputln(osrename("/adagency777.exe","/adagency888.exe"));
+	outputl(oscopy("/adagency7.exe","/adagency777.exe"));
+	outputl(osrename("/adagency777.exe","/adagency888.exe"));
 
 	var x;
 	var y;
 	x="0";
 	y=date();
-	date().oconv("D").outputln();
+	date().oconv("D").outputl();
 
-	time().oconv("MTS").outputln();
-	timedate().outputln();
+	time().oconv("MTS").outputl();
+	timedate().outputl();
 	//assert( not (x > y) );
 
-	var(1000).oconv("MD20P,").outputln();
+	var(1000).oconv("MD20P,").outputl();
 
-	println(var("0")<var(".5"));
+	printl(var("0")<var(".5"));
 	var ss;
-	println("sizeof");
-	println("char:   ",(int)sizeof(char));
-	println("wchar_t:",(int)sizeof(wchar_t));
-	println("string: ",(int)sizeof(string));
-	println("wstring:",(int)sizeof(wstring));
-	println("int:    ",(int)sizeof(int));
-	println("double: ",(int)sizeof(double));
-	println("var:    ",(int)sizeof(var));
+	printl("sizeof");
+	printl("char:   ",(int)sizeof(char));
+	printl("wchar_t:",(int)sizeof(wchar_t));
+	printl("string: ",(int)sizeof(string));
+	printl("wstring:",(int)sizeof(wstring));
+	printl("int:    ",(int)sizeof(int));
+	printl("double: ",(int)sizeof(double));
+	printl("var:    ",(int)sizeof(var));
 
 	var tconv=FM.oconv("T#20");
 	tconv="xxxxx/xxxxx xxx" ^ FM ^ "xx";
@@ -642,7 +648,7 @@ MT'h' 63306 17h35
 //  xx.inverter();
 
 	var dividend=100;
-	println(mod(dividend,30));
+	printl(mod(dividend,30));
 
 	var env=osgetenv("");
 	osgetenv("PATH");
@@ -736,7 +742,7 @@ MT'h' 63306 17h35
 	write("F"^FM^1^FM^"Market Code"^FM^FM^FM^FM^FM^FM^"L"^"10","DICT_MARKETS","CODE");
 	write("F"^FM^1^FM^"Market Name"^FM^FM^FM^FM^FM^FM^"T"^"20","DICT_MARKETS","NAME");
 
-	println();
+	printl();
 	var nfiles=dcount(filenames2,FM);
 	for (int ii=1;ii<=nfiles;++ii) {
 		var filename=filenames2.extract(ii);
@@ -749,9 +755,9 @@ MT'h' 63306 17h35
 			var().createfile("DICT."^filename);
 		else
 			print(", dict ok");
-		println();
+		printl();
 	}
-//	var("x:y:z:").dcount(":").outputln();
+//	var("x:y:z:").dcount(":").outputl();
 //	var().stop();
 
 	var ads;
@@ -767,13 +773,13 @@ MT'h' 63306 17h35
 	dictrec.replacer(2,0,0,"3");
 	dictrec.replacer(3,0,0,"Brand Code");
 	if (not dictrec.write("DICT_ADS","BRAND_CODE"))
-		println("cannot write brand_code dict");
-	println("Creating ADS BRAND_CODE Index");
+		printl("cannot write brand_code dict");
+	printl("Creating ADS BRAND_CODE Index");
 	if (not ads.createindex("BRAND_CODE"))
-		println("Index creation failed");
-	println("Deleting ADS BRAND_CODE Index");
+		printl("Index creation failed");
+	printl("Deleting ADS BRAND_CODE Index");
 	if (not ads.deleteindex("BRAND_CODE"))
-		println("Index deletion failed");
+		printl("Index deletion failed");
 
 	if (!var().open("CHANGELOG"))
 								var().createfile("CHANGELOG");
@@ -854,11 +860,11 @@ MT'h' 63306 17h35
 	exit(0);
 	*/
 	
-	println("Starting ",NTHREADS," threads");
+	printl("Starting ",NTHREADS," threads");
 	boost::thread_group threads;
 	for (var ii = 0; ii < NTHREADS; ++ii)
 	{
-		outputln("Creating thread " ^ ii);
+		outputl("Creating thread " ^ ii);
 		//start from environment number 1 so that main thread has its own environment
 		threads.create_thread(MVThread(ii+1));
 	}

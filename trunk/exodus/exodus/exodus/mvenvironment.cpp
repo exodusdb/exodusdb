@@ -520,7 +520,7 @@ damaged:
 			msg.swapper(L"%3%", params.extract(3));
 			//force esc if too many messages
 			if (this->USER4.length() > 8000) {
-				msg.outputln();
+				msg.outputl();
 				// response=wchar_t(27)
 				// return
 				var().stop();
@@ -540,7 +540,7 @@ msgrti:
 				msg.output();
 				var(L" ...").output();
 			}else{
-				var(L"done").outputln();
+				var(L"done").outputl();
 			}
 			return;
 		}
@@ -779,7 +779,7 @@ var MvEnvironment::decide (const var& questionx, const var& optionsx, var& reply
 		std::wcout << optionn<< L". "<< options.extract(optionn) << std::endl;
 
 inp:
-	reply.inputln();
+	reply.input();
 	if (reply == L"" || reply >= 1 || reply <= noptions) {
 		return reply;
 	}else{
@@ -1239,7 +1239,7 @@ void MvEnvironment::sysmsg(const var& msg0)
 	if (!bakpars.read(this->DEFINITIONS, L"BACKUP"))
 		bakpars = L"";
 	//dos backup.cfg overrides
-	if (tt.osread(L"BACKUP.CFG")) {
+	if (tt.osread("BACKUP.CFG")) {
 		for (int ii = 1; ii <= 99; ii++) {
 			if (tt.extract(ii))
 				bakpars.replacer(ii, 0, 0, tt.extract(ii));
@@ -1275,7 +1275,7 @@ void MvEnvironment::sysmsg(const var& msg0)
 	body.replacer(-1, 0, 0, L"Message=" ^ FM ^ msg);
 	temp = this->USER1;
 	temp.converter(RM ^ FM ^ VM ^ SVM ^ TM ^ STM, L"`^]}\\~");
-	if (ver.osread(L"general\\version.dat"))
+	if (ver.osread("general\\version.dat"))
 		body.replacer(-1, 0, 0, L"NEOSYS Ver:" ^ ver.extract(1));
 	body.replacer(-1, 0, 0, L"@Id=" ^ this->ID);
 	body.replacer(-1, 0, 0, L"Data=" ^ temp);
@@ -1334,7 +1334,7 @@ var MvEnvironment::sendmail(const var& toaddress0, const var& subject, const var
 	}
 
 	//global override
-	params2.osread(L"SMTP.CFG");
+	params2.osread("SMTP.CFG");
 	//cut off after end of file character
 	params2 = params2.field(var().chr(26), 1, 1);
 	params2.swapper(L"\r\n", L"\r");

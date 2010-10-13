@@ -494,7 +494,7 @@ var var::oconv_D(const wchar_t* conversion) const
 		ss.width(yeardigits);
 		ss << yearstring;
 	}
-//outputln(var(ss.str()).quote());
+//outputl(var(ss.str()).quote());
 	return ss.str();
 
 }

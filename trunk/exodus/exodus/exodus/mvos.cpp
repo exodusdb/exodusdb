@@ -123,7 +123,7 @@ random_base_generator_type* get_random_base_generator()
 
 		//seed to the os clock (secs since unix epoch)
 		//Caveat: std::time(0) is not a very good truly-random seed.
-		//logputln(L"Seeding random number generator to system clock");
+		//logputl(L"Seeding random number generator to system clock");
 		(*threads_random_base_generator).seed(static_cast<unsigned int>(std::time(0)));
 		//(*thread_base_generator).seed(static_cast<unsigned int>(var().ostime().toInt()));
 
@@ -163,7 +163,7 @@ void var::initrnd() const
 	random_base_generator_type* threads_random_base_generator=get_random_base_generator();
 
 	//set the new seed
-	//logputln(L"Seeding random number generator to " ^ (*this));
+	//logputl(L"Seeding random number generator to " ^ (*this));
 	(*threads_random_base_generator).seed(static_cast<unsigned int>( (*this).toInt() ));
 }
 
@@ -378,7 +378,7 @@ bool var::osopen(const var& osfilename)
 
 	std::fstream myfile;
 	//	myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
-//var(int(sizeof(myfile))).outputln(L"filesize");
+//var(int(sizeof(myfile))).outputl(L"filesize");
 
 	myfile.open(osfilename.tostring().c_str(), std::ios::out |std::ios::in | std::ios::binary);
 	if (!myfile) return false;
@@ -401,8 +401,17 @@ bool var::osopen(const var& osfilename)
 bool var::osread(const var& osfilename)
 {
 	THISIS(L"bool var::osread(const var& osfilename)")
-	THISISDEFINED()
+	//will be checked by nested osread
+	//THISISDEFINED()
 	ISSTRING(osfilename)
+	return osread(osfilename.tostring().c_str());
+}
+
+bool var::osread(const char* osfilename)
+{
+	THISIS(L"bool var::osread(const var& osfilename)")
+	THISISDEFINED()
+	//ISSTRING(osfilename)
 
 	var_mvstr=L"";
 	var_mvtype=pimpl::MVTYPE_STR;
@@ -412,7 +421,8 @@ bool var::osread(const var& osfilename)
 	//myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
 
 	//ios:ate to go to the end to find the size in the next statement with tellg
-	myfile.open(osfilename.tostring().c_str(), std::ios::binary | std::ios::ate );
+	//myfile.open(osfilename.tostring().c_str(), std::ios::binary | std::ios::ate );
+	myfile.open(osfilename, std::ios::binary | std::ios::ate );
 	if (!myfile)
 		return false;
 
