@@ -61,11 +61,11 @@ std::string var::tostring() const
 	//allow for max 4 bytes per single utf8 byte (utf16 max bytes is four)
 	if (sizeof(wchar_t)==4)
 	{
-		return stringfromUTF32((UTF32*)((*this).towstring().data()), (*this).length());
+		return stringfromUTF32((UTF32*)((*this).towstring().data()), (*this).length().toInt());
 	}
 	else if (sizeof(wchar_t)==2)
 	{
-		return stringfromUTF16((UTF16*)( (*this).towstring().data() ), (*this).length());
+		return stringfromUTF16((UTF16*)( (*this).towstring().data() ), (*this).length().toInt());
 	}
 	else if (sizeof(wchar_t)==1)
 	{
@@ -105,7 +105,7 @@ std::string toUTF8(const std::wstring& wstr1)
 
 }
 
-std::wstring wstringfromUTF8(const UTF8* sourcestart, const int sourcelength)
+std::wstring wstringfromUTF8(const UTF8* sourcestart, const size_t sourcelength)
 {
 
 //ConversionResult ConvertUTF8toUTF16 (
@@ -170,7 +170,7 @@ std::wstring wstringfromUTF8(const UTF8* sourcestart, const int sourcelength)
 
 }
 
-std::string stringfromUTF16(const UTF16* sourcestart, const int sourcelength)
+std::string stringfromUTF16(const UTF16* sourcestart, const size_t sourcelength)
 {
 
 	//TODO improve efficiency by avoiding new/copy/delete
@@ -204,7 +204,7 @@ std::string stringfromUTF16(const UTF16* sourcestart, const int sourcelength)
 	return result;
 }
 
-std::string stringfromUTF32(const UTF32* sourcestart, const int sourcelength)
+std::string stringfromUTF32(const UTF32* sourcestart, const size_t sourcelength)
 {
 
 	//TODO improve efficiency by avoiding new/copy/delete

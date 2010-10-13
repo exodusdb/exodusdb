@@ -202,6 +202,11 @@ DLL_PUBLIC var osshell(const var& command)
 	return command.osshell();
 }
 
+DLL_PUBLIC var osshell(const var& command, var& output)
+{
+	return command.osshell(output);
+}
+
 void DLL_PUBLIC stop(const var& text)
 {
 	text.stop(text);

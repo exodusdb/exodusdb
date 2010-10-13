@@ -30,9 +30,9 @@ namespace exodus
 {
 
 std::string toUTF8(const std::wstring& wstr1);
-std::wstring wstringfromUTF8(const UTF8* sourcestart, const int sourcelength);
-std::string stringfromUTF16(const UTF16* sourcestart, const int sourcelength);
-std::string stringfromUTF32(const UTF32* sourcestart, const int sourcelength);
+std::wstring wstringfromUTF8(const UTF8* sourcestart, const size_t sourcelength);
+std::string stringfromUTF16(const UTF16* sourcestart, const size_t sourcelength);
+std::string stringfromUTF32(const UTF32* sourcestart, const size_t sourcelength);
 
 }//of namespace exodus
 

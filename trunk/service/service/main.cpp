@@ -169,7 +169,8 @@ private:
 program()
 {
 	var xx;
-	xx.osread(xx);
+	osshell("dir",xx);
+	//xx.osread(xx);
 	/*
 	var inpz=input();
 
