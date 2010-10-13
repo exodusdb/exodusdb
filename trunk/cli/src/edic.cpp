@@ -126,8 +126,10 @@ program()
                 else
                         startatlineno="";
 
+
                 if (not index(filename,"."))
                         filename^=".cpp";
+
 
                 var iscompilable=filename.field2(".",-1).substr(1,1).lcase() ne "h";
 
@@ -150,7 +152,8 @@ program()
                         blankfile^="}\n";
                         if (_SLASH ne "/")
                                 blankfile.swapper("\n","\r\n");
-                        oswrite(blankfile,filename);
+			if (not oswrite(blankfile,filename))
+				stop("Cannot create "^filename^". Invalid file name, or no rights here.");
                         startatlineno="4,9";
                         //startatlineno="";
                 }
