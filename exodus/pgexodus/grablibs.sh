@@ -20,7 +20,9 @@ BASEDIR=${SCRIPT_DIR}/pkglib
 #TODO check actual architecture using file or select serial();
 
 #use file pg_config to see what architectures are supported in the binary
-#select serial(); in postgres tell you what version is actually in use
+#combined with environment variable HOSTTYPE you should be able to work
+#out what version is in use but select serial(); in postgres tell you for sure
+#"PostgreSQL 9.0.1 on x86_64-apple-darwin, compiled by GCC i686-apple-darwin10-gcc-4.2.1 (GCC) 4.2.1 (Apple Inc. build 5664), 64-bit"
 
 #i386 i586 i686 are all 32 bit
 
