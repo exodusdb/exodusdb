@@ -197,7 +197,7 @@ program()
                         var script="call " ^ (msvs ^ "vsvars32").quote();
                         script^="\nset";
                         if (verbose)
-                                printl("Calling scriptscript");
+                                printl("Calling script ", script);
                         oswrite(script,tempfilenamebase^".cmd");
                         osshell(tempfilenamebase ^ ".cmd > " ^ tempfilenamebase ^ ".$$$");
                         var result;
@@ -230,18 +230,27 @@ program()
                 if (verbose)
                         printl("Searching for Exodus for include and lib directories");
 
-                //locate Exodus by executable path, environment variable or current disk or C:
+                //locate EXODUS_PATH by executable path, environment variable or current disk or C:
+				//EXODUS_PATH is the parent directory of bin and include etc.
+				//compile needs to locate the include and lib directories
+
                 var ndeep=dcount(_EXECPATH,_SLASH);
                 var exoduspath="";
+				//first guess is the parent directory of the executing command
+				//on the grounds that compile.exe is in EXODUS_PATH/bin
                 if (ndeep>2)
                         exoduspath=_EXECPATH.field(_SLASH,1,ndeep-2);
                 var searched="";
-                if (not exoduspath or not (osfile(exoduspath^_SLASH^"bin\\exodus.dll") or osfile(exoduspath^_SLASH^"exodus.dll"))) {
+
+				//check if EXODUS_PATH\bin\exodus.dll exists
+				if (not exoduspath or not (osfile(exoduspath^_SLASH^"bin\\exodus.dll") or osfile(exoduspath^_SLASH^"exodus.dll"))) {
                         if (exoduspath)
                                 searched^="\n"^exoduspath;
                         exoduspath=osgetenv("EXODUS_PATH");
-                        if (not exoduspath) {
-                                searched^="\nEXODUS_PATH environment variable";
+                        if (exoduspath)
+                                searched^="\nEXODUS_PATH is "^exoduspath;
+						else {
+                                searched^="\nEXODUS_PATH environment variable is not set";
                                 exoduspath=L"\\Program Files\\exodus\\" EXODUS_RELEASE L"\\";
                                 if (not osdir(exoduspath)) {
                                         searched^="\n" ^ exoduspath;

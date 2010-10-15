@@ -343,7 +343,7 @@ FunctionEnd
 
 
 
-!define debugorrelease "debug"
+!define debugorrelease "release"
 
 ;--------------------------------
 ;Include Modern UI
@@ -353,8 +353,8 @@ FunctionEnd
 ;--------------------------------
 ;General
 
-  Name "Exodus 10.10"
-  Outfile "exodus-10.10.exe"
+  Name "Exodus 10.10.2"
+  Outfile "exodus-10.10.2.exe"
 
   ;Default installation folder
   InstallDir "$PROGRAMFILES\exodus\10.10"
@@ -407,6 +407,14 @@ Section "All" SecAll
   ;File release\libeay32.dll
   ;File release\ssleay32.dll
   ;File release\libintl-8.dll
+
+  ;vc2005 should autodownloaded
+  ;redist for vs2005 msvcp80.dll but not msvcp80d.dll
+  ;http://download.microsoft.com/download/d/3/4/d342efa6-3266-4157-a2ec-5174867be706/vcredist_x86.exe
+  File "C:\Program Files\Microsoft Visual Studio 8\VC\redist\x86\Microsoft.VC80.CRT\msvcp80.dll"
+
+  ;vc2005 debug
+  ;File "C:\Program Files\Microsoft Visual Studio 8\VC\redist\Debug_NonRedist\x86\Microsoft.VC80.DebugCRT\msvcp80d.dll"
 
   ;dont do exodus.dll since we may want the debug version - below
   File /x exodus.dll release\*.dll
