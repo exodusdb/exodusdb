@@ -2,7 +2,9 @@
     <shortName>exodus</shortName>
     <fullName>Exodus Multivalue Database</fullName>
     <version>10.10</version>
+    <readmeFile>README</readmeFile>
     <licenseFile>COPYING</licenseFile>
+    <leftImage>exodus.png</leftImage>
     <preBuildActionList>
         <locate>
             <command>gg++</command>
@@ -17,6 +19,13 @@
             <insertAt>end</insertAt>
             <path>~/bin</path>
         </addDirectoryToPath>
+        <runProgram>
+            <explanation>InstallingPlugin</explanation>
+            <program>${installdir}/lib/inslibs.sh</program>
+            <programArguments></programArguments>
+            <progressText>Searching for PostgreSQL - to install Exodus Plugin</progressText>
+            <workingDirectory>${installdir}/lib</workingDirectory>
+        </runProgram>
     </postInstallationActionList>
     <enableRollback>1</enableRollback>
     <enableTimestamp>1</enableTimestamp>
@@ -70,6 +79,14 @@
                     <destination>${installdir}</destination>
                     <name>programfilesosx</name>
                     <platforms>osx</platforms>
+                    <distributionFileList>
+                        <distributionFile>
+                            <origin>cli/src/exodus</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>cli/src/configexodus</origin>
+                        </distributionFile>
+                    </distributionFileList>
                     <shortcutList>
                         <shortcut>
                             <comment>edit, compile, createfile, list etc.</comment>
@@ -77,7 +94,7 @@
                             <icon></icon>
                             <name>Exodus Console</name>
                             <path></path>
-                            <platforms>all</platforms>
+                            <platforms>osx</platforms>
                             <runAsAdmin>0</runAsAdmin>
                             <runInTerminal>0</runInTerminal>
                             <windowsExec></windowsExec>
@@ -158,31 +175,44 @@
                     <platforms>osx</platforms>
                     <distributionFileList>
                         <distributionFile>
-                            <origin>../../../usr/local/lib/libexodus-10.10.0.dylib</origin>
+                            <origin>exodus/exodus/exodus/.libs/libexodus-10.10.0.dylib</origin>
                         </distributionFile>
                         <distributionFile>
-                            <origin>../../../usr/local/lib/libexodus.dylib</origin>
+                            <origin>exodus/exodus/exodus/.libs/libexodus.dylib</origin>
                         </distributionFile>
                         <distributionFile>
-                            <origin>../../../usr/local/lib/libexodus.a</origin>
+                            <origin>exodus/exodus/exodus/.libs/libexodus.a</origin>
                         </distributionFile>
                         <distributionFile>
-                            <origin>../../../usr/local/lib/libexodus.la</origin>
+                            <origin>exodus/exodus/exodus/.libs/libexodus.la</origin>
                         </distributionFile>
                     </distributionFileList>
                 </folder>
                 <folder>
                     <description>Mac OS X include</description>
-                    <destination>/usr/local/include/</destination>
+                    <destination>/usr/local/include/exodus</destination>
                     <name>include</name>
                     <platforms>osx</platforms>
                     <distributionFileList>
                         <distributionDirectory>
-                            <origin>../../../usr/local/include/exodus</origin>
+                            <allowWildcards>1</allowWildcards>
+                            <includeFiles>*/exodus*.h;*/mv*.h;*/xfunc*.h</includeFiles>
+                            <origin>exodus/exodus/exodus/*</origin>
                         </distributionDirectory>
+                    </distributionFileList>
+                </folder>
+                <folder>
+                    <description>pgexodus</description>
+                    <destination>${installdir}/lib</destination>
+                    <name>pgexodus</name>
+                    <platforms>all</platforms>
+                    <distributionFileList>
                         <distributionDirectory>
-                            <origin>../../../usr/local/include/exodus-10.10/exodus</origin>
+                            <origin>exodus/pgexodus/pkglib</origin>
                         </distributionDirectory>
+                        <distributionFile>
+                            <origin>exodus/pgexodus/inslibs.sh</origin>
+                        </distributionFile>
                     </distributionFileList>
                 </folder>
             </folderList>
