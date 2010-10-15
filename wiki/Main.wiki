@@ -1,6 +1,6 @@
 #Main Page
 
-wiki is currently at http://devwiki.neosys.com and might be moved here.
+!!!!!!!!!!!!!!!!!!!!!! the main wiki is currently at http://devwiki.neosys.com and might be moved here.
 
 === Program Reference ===
 
