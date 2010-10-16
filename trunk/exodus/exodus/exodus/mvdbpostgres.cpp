@@ -775,11 +775,14 @@ bool var::sqlexec(var& errmsg) const
 	THISIS(L"bool var::sqlexec(var& errmsg) const")
 	THISISSTRING()
 
-	/* dont use pqexec here since it cannot execute multiple commands
 	//check/establish connection
 	if (!connection())
+	{
+		errmsg=L"Error: sqlexec failed to connect to database";
 		return false;
+	}
 
+	/* dont use pqexec here since it cannot execute multiple commands
 	PGresultptr result;
 	if (!pqexec(*this,result)) {
 		PGconn* thread_pgconn=(PGconn*) connection();
@@ -792,7 +795,11 @@ bool var::sqlexec(var& errmsg) const
 
 	PGconn* thread_pgconn=tss_pgconns.get();
 	if (!thread_pgconn)
+	{
+		errmsg=L"Error: sqlexec cannot find thread database connection";
 		return 0;
+	}
+
 	DEBUG_LOG_SQL1
 
 	//will contain any result IF successful
