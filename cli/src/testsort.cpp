@@ -174,5 +174,5 @@ program()
 
         printl("\nJust type 'list' (without the quotes) to see the syntax of list");
         printl("or list dict_"^ filename^ " to see the dictionary");
-        printl("Type edic cli/srv/testsort to see or edit/recompile this program.");
+        printl("Type edic cli/src/testsort to see or edit/recompile this program.");
 }
