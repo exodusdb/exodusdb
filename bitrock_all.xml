@@ -1,7 +1,7 @@
 <project>
     <shortName>exodus</shortName>
     <fullName>Exodus Multivalue Database</fullName>
-    <version>10.10</version>
+    <version>10.10.3</version>
     <readmeFile>README</readmeFile>
     <licenseFile>COPYING</licenseFile>
     <leftImage>exodus.png</leftImage>
@@ -31,7 +31,7 @@
     <enableTimestamp>1</enableTimestamp>
     <requireInstallationByRootUser>1</requireInstallationByRootUser>
     <saveRelativePaths>1</saveRelativePaths>
-    <vendor>Exodus</vendor>
+    <vendor>Exodus Project</vendor>
     <componentList>
         <component>
             <name>default</name>
