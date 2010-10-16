@@ -14,7 +14,7 @@
 #include <iostream>
 #include <vector>
 
-using namespace std;
+//using namespace std;
 
 //BOOST thread library minimal examples http://www.ddj.com/dept/cpp/184401518
 //and boost\boost_1_34_0\libs\thread\example
@@ -30,8 +30,10 @@ boost::mutex io_mutex;
 // wcout<<"xyz";
 //}
 
-#include <exodus/mv.h>
+//#include <exodus/mv.h>
+#include <exodus/exodus.h>
 #include "server.h"
+
 
 DLL_PUBLIC
 boost::thread_specific_ptr<int> tss_environmentns;
@@ -75,17 +77,14 @@ bool init_thread(const int environmentn)
 		//and init it
 		if (!env.init(environmentn))
 			return false;
-cout<<"111";
+
 		//create a new window common for the thread
 		//the window structure needs access to the environment so it is part of the contruction
         //tss_wins.reset(new MvWindow(env));
 		global_wins[environmentn]=new MvWindow(env);
-cout<<"222";
 
         mvlibs.set("DEFINITIONS",new Definition);
-cout<<"333";
         mvlibs.set("MARKETS",new Market);		
-cout<<"444";
 
 		return true;
 
@@ -100,7 +99,7 @@ public:
 	MVThread(int environmentn) : environmentn(environmentn)
 	{
 		boost::mutex::scoped_lock lock(io_mutex);
-		wcout<<"MVThread::ctor "<<environmentn<<endl;
+		exodus::printl("MVThread::ctor ",environmentn);
 
 		setenvironmentn(environmentn);
 	}
@@ -109,7 +108,7 @@ public:
 	virtual ~MVThread()
 	{
 		boost::mutex::scoped_lock lock(io_mutex);
-		wcout<<"MVThread::dtor "<<environmentn<<endl;
+		printl("MVThread::dtor ",environmentn);
 	}
 
     //MvLib
@@ -119,7 +118,7 @@ public:
 
 		{
 			boost::mutex::scoped_lock lock(io_mutex);
-			wcout<<"MVThread::operator() start "<<environmentn<<endl;
+			printl("MVThread::operator() start ",environmentn);
 		}
 
 		init_thread(environmentn);
@@ -142,13 +141,13 @@ public:
 
 			//ensure single threaded cout
 			//boost::mutex::scoped_lock lock(io_mutex);
-			//cout << "thread=" << environmentn << ": i=" << i << " " << endl;
+			printl("thread=",environmentn,": i=", i," ");
 
 		}
         */
 		{
 			boost::mutex::scoped_lock lock(io_mutex);
-			wcout<<"MVThread::operator() stop "<<environmentn<<endl;
+			printl("MVThread::operator() stop ", environmentn);
 		}
 	};
 
@@ -164,10 +163,21 @@ class MVConnection
 private:
 };
 
-#include <exodus/exodus.h>
-
 program()
 {
+	sin(30).outputl("sin(30.0)=");
+	exodus::cos(30.0).outputl("cos(30.0)=");
+	exodus::tan(30.0).outputl("tan(30.0)=");
+	exodus::atan(30.0).outputl("atan(30.0)=");
+
+	exodus::abs(30.0).outputl("abs(30.0)=");
+	exodus::abs(-30.0).outputl("abs(-30.0)=");
+	exodus::pwr(10,3).outputl("pwr(10,3)=");
+	exodus::exp(1).outputl("exp(1)=");
+	exodus::loge(1).outputl("loge(1)=");
+	exodus::loge(10).outputl("loge(10)=");
+	exodus::sqrt(100).outputl("sqrt(100)=");
+
 	var xx=osshellread("dir");
 	//xx.osread(xx);
 	/*
@@ -302,7 +312,7 @@ program()
 		printl();
 	}
 
-	std::wcout<< var("xyz");
+	var("xyz").outputl());
 	//var steve;steve.input(1);
 
 	//catching errors - doesnt work now that backtrace aborts (to prevent system crashes ... maybe better solution is to trap in main()
@@ -622,8 +632,8 @@ MT'h' 63306 17h35
 	printl("sizeof");
 	printl("char:   ",(int)sizeof(char));
 	printl("wchar_t:",(int)sizeof(wchar_t));
-	printl("string: ",(int)sizeof(string));
-	printl("wstring:",(int)sizeof(wstring));
+	printl("string: ",(int)sizeof(std::string));
+	printl("wstring:",(int)sizeof(std::wstring));
 	printl("int:    ",(int)sizeof(int));
 	printl("double: ",(int)sizeof(double));
 	printl("var:    ",(int)sizeof(var));
@@ -715,7 +725,7 @@ MT'h' 63306 17h35
 	var().end();
 
 	stopped=var().ostime();
-	wcout<<(stopped-started)/nn*1000000;
+	printl((stopped-started)/nn*1000000);
 
 	wcin>>nn;
 
@@ -806,21 +816,20 @@ MT'h' 63306 17h35
 	int ii=0;
 //	cin>>ii;
 	var record;
-	wcout<<"readnexting:"<<endl;
+	printl("readnexting:");
 	if (ads.selectrecord("SELECT ADS")) {
 		while (ii<3&&ads.readnextrecord(key,record))
 		{
 			++ii;
 			if (!(ii%10000))
-				wcout<<ii<<" ";
-				wcout<<key<<endl;
+				printl(" ",key);
 			if (record.lcase().index("QWEQWE"))
-				wcout<<"?";
+				print("?");
 
 		}
 	}
 
-	wcout<<L"Press Enter to start threads ... ";
+	print("Press Enter to start threads ... ");
 	//cin.get();
 
 	/*

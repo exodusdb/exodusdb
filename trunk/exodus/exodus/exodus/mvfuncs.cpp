@@ -34,6 +34,12 @@ THE SOFTWARE.
 #include <cmath> //for floor
 #include <cstdlib>//for exit
 
+#ifndef M_PI
+//#define M_PI 3.14159265358979323846f
+#define M_PI 3.14159265
+//2643383279502884197169399375105820974944592307816406286208998f;
+#endif
+
 #include <exodus/mvimpl.h>
 #include <exodus/mv.h>
 #include <exodus/mvutf.h>
@@ -1435,21 +1441,122 @@ var var::abs() const
 	throw MVException(L"abs(unknown mvtype=" ^ var(var_mvtype) ^ L")");
 }
 
+/*
+	var sqrt() const;
+	var loge() const;
+*/
+
+var var::sin() const
+{
+	THISIS(L"var var::sin() const")
+	THISISNUMERIC()
+
+	if (var_mvtype&pimpl::MVTYPE_DBL)
+		return std::sin(var_mvdbl*M_PI/180);
+
+//	if (var_mvtype&pimpl::MVTYPE_INT)
+		return std::sin(double(var_mvint)*M_PI/180);
+
+	throw MVException(L"sin(unknown mvtype=" ^ var(var_mvtype) ^ L")");
+}
+
+var var::cos() const
+{
+	THISIS(L"var var::cos() const")
+	THISISNUMERIC()
+
+	if (var_mvtype&pimpl::MVTYPE_DBL)
+		return std::cos(var_mvdbl*M_PI/180);
+
+//	if (var_mvtype&pimpl::MVTYPE_INT)
+		return std::cos(double(var_mvint)*M_PI/180);
+
+	throw MVException(L"cos(unknown mvtype=" ^ var(var_mvtype) ^ L")");
+}
+
+var var::tan() const
+{
+	THISIS(L"var var::tan() const")
+	THISISNUMERIC()
+
+	if (var_mvtype&pimpl::MVTYPE_DBL)
+		return std::tan(var_mvdbl*M_PI/180);
+
+//	if (var_mvtype&pimpl::MVTYPE_INT)
+		return std::tan(double(var_mvint)*M_PI/180);
+
+	throw MVException(L"tan(unknown mvtype=" ^ var(var_mvtype) ^ L")");
+}
+
+var var::atan() const
+{
+	THISIS(L"var var::atan() const")
+	THISISNUMERIC()
+
+	if (var_mvtype&pimpl::MVTYPE_DBL)
+		return std::atan(var_mvdbl*M_PI/180);
+
+//	if (var_mvtype&pimpl::MVTYPE_INT)
+		return std::atan(double(var_mvint)*M_PI/180);
+
+	throw MVException(L"sin(unknown mvtype=" ^ var(var_mvtype) ^ L")");
+}
+
+var var::loge() const
+{
+	THISIS(L"var var::loge() const")
+	THISISNUMERIC()
+
+	if (var_mvtype&pimpl::MVTYPE_DBL)
+		return std::log(var_mvdbl);
+
+//	if (var_mvtype&pimpl::MVTYPE_INT)
+		return std::log(double(var_mvint));
+
+	throw MVException(L"loge(unknown mvtype=" ^ var(var_mvtype) ^ L")");
+}
+
+var var::sqrt() const
+{
+	THISIS(L"var var::sqrt() const")
+	THISISNUMERIC()
+
+	if (var_mvtype&pimpl::MVTYPE_DBL)
+		return std::sqrt(var_mvdbl);
+
+//	if (var_mvtype&pimpl::MVTYPE_INT)
+		return std::sqrt(double(var_mvint));
+
+	throw MVException(L"sqrt(unknown mvtype=" ^ var(var_mvtype) ^ L")");
+}
+
 var var::pwr(const var& exponent) const
 {
 	THISIS(L"var var::pwr(const var& exponent) const")
 	THISISNUMERIC()
 	ISNUMERIC(exponent)
 
-	if (var_mvtype&pimpl::MVTYPE_INT)
-	{
-		return pow(double(var_mvint),exponent.toDouble());
-	}
 	if (var_mvtype&pimpl::MVTYPE_DBL)
-	{
-		return pow(double(var_mvdbl),exponent.toDouble());
-	}
+		return std::pow(var_mvdbl,exponent.toDouble());
+
+//	if (var_mvtype&pimpl::MVTYPE_INT)
+		return std::pow(double(var_mvint),exponent.toDouble());
+
 	throw MVException(L"pow(unknown mvtype=" ^ var(var_mvtype) ^ L")");
+}
+
+var var::exp() const
+{
+	THISIS(L"var var::exp() const")
+	THISISNUMERIC()
+
+	if (var_mvtype&pimpl::MVTYPE_DBL)
+		return std::exp(var_mvdbl);
+
+//	if (var_mvtype&pimpl::MVTYPE_INT)
+		return std::exp(double(var_mvint));
+
+	throw MVException(L"exp(unknown mvtype=" ^ var(var_mvtype) ^ L")");
 }
 
 var var::at(const int column) const

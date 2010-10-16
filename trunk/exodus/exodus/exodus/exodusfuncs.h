@@ -79,6 +79,28 @@ void print(const var& mv1);
 void printl(const var& mv1=L"");
 void printt(const var& mv1=L"");
 
+	//MATH/BOOLEAN
+DLL_PUBLIC var abs(const var& num1);
+DLL_PUBLIC var pwr(const var& base, const var& exponent);
+DLL_PUBLIC var exp(const var& power);
+DLL_PUBLIC var sqrt(const var& num1);
+DLL_PUBLIC var sin(const var& degrees);
+DLL_PUBLIC var cos(const var& degrees);
+DLL_PUBLIC var tan(const var& degrees);
+DLL_PUBLIC var atan(const var& degrees);
+DLL_PUBLIC var loge(const var& num1);
+//integer() represents pick int() because int() is reserved word in c/c++
+//Note that integer like pick int() is the same as floor()
+//whereas the usual c/c++ int() simply take the next integer nearest 0 (ie cuts of any fractional decimal places)
+//to get the usual c/c++ effect use toInt() (although toInt() returns an int instead of a var like normal exodus functions)
+DLL_PUBLIC var integer(const var& num1);
+DLL_PUBLIC var floor(const var& num1);
+DLL_PUBLIC var round(const var& num1, const int ndecimals=0);
+
+DLL_PUBLIC var rnd(const int number);
+DLL_PUBLIC void initrnd(const int seednumber);
+DLL_PUBLIC var mod(const var& dividend, const int divisor);
+
 DLL_PUBLIC var at(const int columnorcode);
 DLL_PUBLIC var at(const var& column, const var& row);
 DLL_PUBLIC var getcursor();
@@ -132,9 +154,6 @@ DLL_PUBLIC var chr(const int integer);
 DLL_PUBLIC bool match(const var& instring, const var& matchstr, const var& options=L"");
 DLL_PUBLIC var seq(const var& char1);
 DLL_PUBLIC var str(const var& instring, const int number);
-DLL_PUBLIC var rnd(const int number);
-DLL_PUBLIC void initrnd(const int seednumber);
-DLL_PUBLIC var mod(const var& dividend, const int divisor);
 DLL_PUBLIC var space(const int number);
 DLL_PUBLIC var dcount(const var& instring, const var& substrx);
 DLL_PUBLIC var count(const var& instring, const var& substrx);

@@ -574,6 +574,71 @@ DLL_PUBLIC var str(const var& instring, const int number)
 	return instring.str(number);
 }
 
+	//MATH/BOOLEAN
+DLL_PUBLIC var abs(const var& num1)
+{
+	return num1.abs();
+}
+
+DLL_PUBLIC var pwr(const var& base, const var& exponent)
+{
+	return base.pwr(exponent);
+}
+
+DLL_PUBLIC var exp(const var& exponent)
+{
+	return exponent.exp();
+}
+
+DLL_PUBLIC var sqrt(const var& num1)
+{
+	return num1.sqrt();
+}
+
+DLL_PUBLIC var sin(const var& degrees)
+{
+	return degrees.sin();
+}
+
+DLL_PUBLIC var cos(const var& degrees)
+{
+	return degrees.cos();
+}
+
+DLL_PUBLIC var tan(const var& degrees)
+{
+	return degrees.tan();
+}
+
+DLL_PUBLIC var atan(const var& degrees)
+{
+	return degrees.atan();
+}
+
+DLL_PUBLIC var loge(const var& num1)
+{
+	return num1.loge();
+}
+
+//integer() represents pick int() because int() is reserved word in c/c++
+//Note that integer like pick int() is the same as floor()
+//whereas the usual c/c++ int() simply take the next integer nearest 0 (ie cuts of any fractional decimal places)
+//to get the usual c/c++ effect use toInt() (although toInt() returns an int instead of a var like normal exodus functions)
+DLL_PUBLIC var integer(const var& num1)
+{
+	return num1.integer();
+}
+
+DLL_PUBLIC var floor(const var& num1)
+{
+	return num1.floor();
+}
+
+DLL_PUBLIC var round(const var& num1, const int ndecimals=0)
+{
+	return num1.round(ndecimals);
+}
+
 DLL_PUBLIC var rnd(const int number)
 {
 	return var(number).rnd();
