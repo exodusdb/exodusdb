@@ -1,3 +1,5 @@
+;initial code is just standard nsis macros that doesnt need to be changed or understood
+;exodus build instructions at at the bottom, or search for exodus
 
 /**
  *  EnvVarUpdate.nsh
@@ -340,7 +342,7 @@ FunctionEnd
 
 
 
-
+;Here starts Exodus
 
 
 !define debugorrelease "release"
@@ -353,10 +355,8 @@ FunctionEnd
 ;--------------------------------
 ;General
 
-  Name "Exodus 10.10.2"
-  Outfile "exodus-10.10.2.exe"
-
-  ;Default installation folder
+  Name "Exodus 10.10.3"
+  Outfile "exodus-10.10.3.exe"
   InstallDir "$PROGRAMFILES\exodus\10.10"
   
   ;Get installation folder from registry if available
@@ -457,11 +457,14 @@ Section "All" SecAll
   ;example of recursive with excludes
   ;File /r /x neosys*.pdb /x imc*.* neosys.net\*.*
 
+  ;append PATH to the binaries in system environment
   ;make available to all users
+  ;dont risk prepending because could overwrite system commands
   ;http://nsis.sourceforge.net/Path_Manipulation
   ;Push $INSTDIR
   ;Call AddToPath
-  ${EnvVarUpdate} $0 "PATH" "P" "HKLM" "$INSTDIR\bin"
+  ;${EnvVarUpdate} $0 "PATH" "P" "HKLM" "$INSTDIR\bin"
+  ${EnvVarUpdate} $0 "PATH" "A" "HKLM" "$INSTDIR\bin"
 
   ;Store installation folder
   WriteRegStr HKCU "Software\exodus\10.10" "" $INSTDIR
@@ -543,6 +546,7 @@ Section "Uninstall"
 
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Exodus-10.10"
 
+  ;remove the path to binaries
   ${un.EnvVarUpdate} $0 "PATH" "R" "HKLM" "$INSTDIR\bin"
 
 SectionEnd
