@@ -17,6 +17,7 @@ function input_connection_config()
         var host="127.0.0.1";
         var port="5432";
         var user="postgres";
+		var connection="";
 
         do {
 
@@ -29,7 +30,6 @@ function input_connection_config()
                 getinput("Postgres admin user",user);
                 getinput("Postgres admin password",pass);
 
-                var connection;
                 connection = "host="^host;
                 connection^=" port="^port;
                 connection^=" user="^user;
@@ -51,7 +51,7 @@ function input_connection_config()
 
         } while (true);
 
-        return true;
+        return connection;
 
 }
 
@@ -123,18 +123,20 @@ program()
 
         printl("-- Exodus Postgres Configuration ---");
 
-        if (not input_connection_config())
+        var connstr=input_connection_config();
+		if (not connstr)
                 stop("Stopping. Cannot continue without a working connection.");
 
         print(oconv("Add pgexodus postgres plugin ... ","L#33"));
         if (not add_pgexodus_postgres_plugin())
                 stop("Stopping. Not enough privileges");
 
-
         printl(oconv("Detaching from template1 database ... ","L#33"));
-        if (not connect("dbname=postgres")) {
+		disconnect();
+
+		//reconnect with postgres master database
+        if (not connect(connstr.swap("template1","postgres")^" dbname=postgres"))
                 stop("Stopping. Cannot connect to postgres database");
-        }
 
 //for now exodus a default database to play in with a non-secret password
         var dbusername="exodus";
@@ -151,4 +153,6 @@ program()
                 //stop();
                 printl("Error: Could not create database ",dbname);
 
+		print("Press Enter ... ");
+		input();
 }

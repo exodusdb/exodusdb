@@ -759,7 +759,7 @@ public:
 	var pwr(const var& exponent) const;
 	var rnd() const;
 	void initrnd() const;
-	var exponent() const;
+	var exp() const;
 	var sqrt() const;
 	var sin() const;
 	var cos() const;
