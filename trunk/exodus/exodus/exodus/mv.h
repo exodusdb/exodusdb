@@ -799,7 +799,7 @@ public:
 	var& unquoter();
 	var& ucaser();
 	var& lcaser();
-	var& inverter();
+	//var& inverter();
 	var& trimmer(const wchar_t* trimchar=L" ");
 	var& trimmerf(const wchar_t* trimchar=L" ");
 	var& trimmerb(const wchar_t* trimchar=L" ");
@@ -818,7 +818,7 @@ public:
 	var unquote() const;
 	var ucase() const;
 	var lcase() const;
-	var invert() const;
+	//var invert() const;
 	var trim(const wchar_t* trimchar=L" ") const;
 	var trimf(const wchar_t* trimchar=L" ") const;
 	var trimb(const wchar_t* trimchar=L" ") const;

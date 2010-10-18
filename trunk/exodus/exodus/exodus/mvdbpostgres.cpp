@@ -325,6 +325,9 @@ bool var::connect(const var& conninfo)
 		if (PQstatus(pgconn) == CONNECTION_OK || conninfo2)
 			break;
 
+		//required even if connect fails according to docs
+		PQfinish(pgconn);
+
 		//try again with default conninfo
 		conninfo2=defaultconninfo;
 
@@ -332,13 +335,15 @@ bool var::connect(const var& conninfo)
 
 	if (PQstatus(pgconn) != CONNECTION_OK)
 	{
+		//required even if connect fails according to docs
+		PQfinish(pgconn);
+
 //		#if TRACING >= 2
 			exodus::errputl(L"var::connect() Connection to database failed: " ^ var(PQerrorMessage(pgconn)));
 			//if (not conninfo2)
 				exodus::errputl(L"var::connect() Postgres connection configuration missing or incorrect. Please login.");
 ;
 //		#endif
-		PQfinish(pgconn);
 		return false;
 	}
 	#if TRACING >= 3

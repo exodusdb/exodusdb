@@ -1,5 +1,32 @@
 #include <exodus/exodus.h>
 
+
+/*
+template1 is the default database that is used to create all new databases.
+
+Annoyingly we cannot simply do the following
+1. add pgexodus functions to template1
+2. create user and database
+
+because opening the template1 one database cannot be closed
+in time for it to be copied to create the new database
+so we do this instead
+
+1. create user and database
+2. add pgexodus functions to database
+3. add pgexodus functions to template1 (for all future database creations)
+*/
+
+//get the first definition of each parameter
+subroutine getparam(in config, in name, out value)
+{
+	var pos=index(config,name);
+	if (!pos)
+		return;
+	value=config.substr(pos).field(" ",1).field("=",2,999999999);
+	return;
+}
+
 subroutine getinput(in prompt, io data)
 {
         var text=prompt ^ " (" ^ data ^ ")";
@@ -11,13 +38,15 @@ subroutine getinput(in prompt, io data)
                 data=result;
 }
 
-function input_connection_config()
+function input_adminconn(in oldconn, out serverconn)
 {
 
         var host="127.0.0.1";
         var port="5432";
         var user="postgres";
-		var connection="";
+		var adminconn="";
+        getparam(oldconn,"host",host);
+        getparam(oldconn,"port",port);
 
         do {
 
@@ -30,17 +59,17 @@ function input_connection_config()
                 getinput("Postgres admin user",user);
                 getinput("Postgres admin password",pass);
 
-                connection = "host="^host;
-                connection^=" port="^port;
-                connection^=" user="^user;
+                adminconn = "host="^host;
+                adminconn^=" port="^port;
+                adminconn^=" user="^user;
 
-                connection^=" dbname=template1";
+                adminconn^=" dbname=postgres";
 
-                printl("\n",connection,"\n");
-                connection^=" password="^pass;
+                printl("\n",adminconn,"\n");
+                adminconn^=" password="^pass;
 
-                print(oconv("Attempting to connect ... ","L#33"));
-                if (connect(connection)) {
+                print(oconv("Attempting to connect ... ","L#40"));
+                if (connect(adminconn)) {
                         printl("done!");
                         break;
                 }
@@ -51,7 +80,10 @@ function input_connection_config()
 
         } while (true);
 
-        return connection;
+        serverconn="host="^host;
+        serverconn^=" port="^port;
+
+        return adminconn;
 
 }
 
@@ -121,37 +153,117 @@ function create_db(in dbname, in dbusername)
 program()
 {
 
+        printl("Exodus Copyright (c) 2009 Stephen John Bush");
+        printl("Licence: http://www.opensource.org/licenses/mit-license.php");
+
+        //get existing/defaults
+
+        //first from the command
+		var oldconn=field(sentence()," ",2,999999999);
+
+        //second from environment
+		//TODO should be per parameter
+        var temp;
+        if (temp.osgetenv(L"EXODUS_CONNECTION"))
+                oldconn^=" "^temp;
+
+        //third from config file
+		//should be same logic in mvdbpostgres and configexodus
+		var configfilename="";
+		if (_SLASH eq "\\")
+			configfilename=osgetenv("USERPROFILE")^_SLASH^".exodus";
+		else
+			configfilename=osgetenv("HOME")^_SLASH^".exodus";
+        if (temp.osread(configfilename))
+                oldconn^=" "^temp;
+
+        //finally from hard-coded
+        oldconn^=" host=127.0.0.1 port=5432 dbname=exodus user=exodus password=somesillysecret connect_timeout=10";
+        oldconn.converter("\x0d\x0a","  ");
+
         printl("-- Exodus Postgres Configuration ---");
 
-        var connstr=input_connection_config();
-		if (not connstr)
+        printl(var("Input options and connect to postgres").oconv("L#40"));
+		var serverconn;
+        var adminconn=input_adminconn(oldconn,serverconn);
+		if (not adminconn)
                 stop("Stopping. Cannot continue without a working connection.");
 
-        print(oconv("Add pgexodus postgres plugin ... ","L#33"));
-        if (not add_pgexodus_postgres_plugin())
-                stop("Stopping. Not enough privileges");
+		var connecttimeout="10";
+        getparam(oldconn,"connect_timeout",connecttimeout);
 
-        printl(oconv("Detaching from template1 database ... ","L#33"));
-		disconnect();
-
-		//reconnect with postgres master database
-        if (not connect(connstr.swap("template1","postgres")^" dbname=postgres"))
-                stop("Stopping. Cannot connect to postgres database");
-
-//for now exodus a default database to play in with a non-secret password
+		//for now exodus a default database to play in with a non-secret password
         var dbusername="exodus";
         var dbname="exodus";
         var dbuserpass="somesillysecret";
 
-        print(("Creating user "^ dbusername^ " ... ").oconv("L#33"));
+		getparam(oldconn,"dbname",dbname);
+		getparam(oldconn,"user",dbusername);
+        getparam(oldconn,"password",dbuserpass);
+
+        getinput("New database code",dbname);
+        getinput("New user code",dbusername);
+        getinput("New user password",dbuserpass);
+
+        print(("Creating new user "^ dbusername^ " ... ").oconv("L#40"));
         if (not create_dbuser(dbusername,dbuserpass))
                 //stop();
                 printl("Error: Could not create user ",dbusername);
 
-        print(("Creating database "^ dbname^ " ... ").oconv("L#33"));
+        print(("Creating new database "^ dbname^ " ... ").oconv("L#40"));
         if (not create_db(dbname,dbusername))
                 //stop();
                 printl("Error: Could not create database ",dbname);
+
+        print(oconv("Detaching from postgres database ... ","L#40"));
+		disconnect();
+		printl("done!");
+
+        print(var("Connecting to new database ... ").oconv("L#40"));
+		var connstr2=adminconn^" dbname="^dbname;
+		//^" user="^dbusername^" password="^dbuserpass;
+        if (not connect(connstr2))
+                stop("Stopping. Cannot connect to new database");
+		printl("done!");
+
+        print(oconv("Adding pgexodus postgres plugin ... ","L#40"));
+        if (not add_pgexodus_postgres_plugin())
+                stop("Stopping. Not enough privileges");
+
+		print(oconv("Detaching from new database ... ","L#40"));
+		disconnect();
+		printl("done!");
+
+        print(var("Connecting to template1 database ... ").oconv("L#40"));
+		var connstr3=adminconn^" dbname=template1";
+        if (not connect(connstr3))
+                stop("Stopping. Cannot connect to template1 database");
+		printl("done!");
+
+        print(oconv("Add pgexodus postgres plugin ... ","L#40"));
+        if (not add_pgexodus_postgres_plugin())
+                stop("Stopping. Not enough privileges");
+
+        print(oconv("Detaching from template1 database ... ","L#40"));
+		disconnect();
+		printl("done!");
+
+		//ask to save configuration
+		var saveconfig="Y";
+		while (true) {
+
+			getinput("Save user configuration in .exodus",saveconfig);
+			if (not saveconfig.substr(1,1).ucase().index("Y"))
+				break;
+
+			var("Saving user configuration in .exodus").oconv("L#40").output();
+			var userconn=serverconn^" dbname="^dbname^" user="^dbusername^" password="^dbuserpass;
+			if (oswrite(userconn,configfilename)) {
+				printl("done!");
+				break;
+			}
+			printl("Cannot update ",configfilename," Maybe you dont have sufficient rights");
+		}
 
 		print("Press Enter ... ");
 		input();

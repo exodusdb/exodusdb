@@ -286,7 +286,7 @@ public:
 
                 */
 
-                var options=_OPTIONS;
+                var options=_OPTIONS.ucase();
 
                 //declare function get.cursor,put.cursor
 
