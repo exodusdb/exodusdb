@@ -34,7 +34,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 bin_PROGRAMS = compile$(EXEEXT) createfile$(EXEEXT) \
 	createindex$(EXEEXT) delete$(EXEEXT) deletefile$(EXEEXT) \
-	deleteindex$(EXEEXT) edit$(EXEEXT) edic$(EXEEXT) \
+	deleteindex$(EXEEXT) edir$(EXEEXT) edic$(EXEEXT) \
 	exodus$(EXEEXT) list$(EXEEXT) listfiles$(EXEEXT) \
 	listindexes$(EXEEXT) testsort$(EXEEXT) configexodus$(EXEEXT)
 subdir = src
@@ -73,9 +73,9 @@ deleteindex_LDADD = $(LDADD)
 am_edic_OBJECTS = edic.$(OBJEXT)
 edic_OBJECTS = $(am_edic_OBJECTS)
 edic_LDADD = $(LDADD)
-am_edit_OBJECTS = edit.$(OBJEXT)
-edit_OBJECTS = $(am_edit_OBJECTS)
-edit_LDADD = $(LDADD)
+am_edir_OBJECTS = edir.$(OBJEXT)
+edir_OBJECTS = $(am_edir_OBJECTS)
+edir_LDADD = $(LDADD)
 am_exodus_OBJECTS = exodus.$(OBJEXT)
 exodus_OBJECTS = $(am_exodus_OBJECTS)
 exodus_LDADD = $(LDADD)
@@ -107,13 +107,13 @@ LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(compile_SOURCES) $(configexodus_SOURCES) \
 	$(createfile_SOURCES) $(createindex_SOURCES) $(delete_SOURCES) \
 	$(deletefile_SOURCES) $(deleteindex_SOURCES) $(edic_SOURCES) \
-	$(edit_SOURCES) $(exodus_SOURCES) $(list_SOURCES) \
+	$(edir_SOURCES) $(exodus_SOURCES) $(list_SOURCES) \
 	$(listfiles_SOURCES) $(listindexes_SOURCES) \
 	$(testsort_SOURCES)
 DIST_SOURCES = $(compile_SOURCES) $(configexodus_SOURCES) \
 	$(createfile_SOURCES) $(createindex_SOURCES) $(delete_SOURCES) \
 	$(deletefile_SOURCES) $(deleteindex_SOURCES) $(edic_SOURCES) \
-	$(edit_SOURCES) $(exodus_SOURCES) $(list_SOURCES) \
+	$(edir_SOURCES) $(exodus_SOURCES) $(list_SOURCES) \
 	$(listfiles_SOURCES) $(listindexes_SOURCES) \
 	$(testsort_SOURCES)
 ETAGS = etags
@@ -217,7 +217,7 @@ createindex_SOURCES = createindex.cpp
 delete_SOURCES = delete.cpp
 deletefile_SOURCES = deletefile.cpp
 deleteindex_SOURCES = deleteindex.cpp
-edit_SOURCES = edit.cpp
+edir_SOURCES = edir.cpp
 edic_SOURCES = edic.cpp
 exodus_SOURCES = exodus.cpp
 list_SOURCES = list.cpp printtext.h
@@ -320,9 +320,9 @@ deleteindex$(EXEEXT): $(deleteindex_OBJECTS) $(deleteindex_DEPENDENCIES)
 edic$(EXEEXT): $(edic_OBJECTS) $(edic_DEPENDENCIES) 
 	@rm -f edic$(EXEEXT)
 	$(CXXLINK) $(edic_OBJECTS) $(edic_LDADD) $(LIBS)
-edit$(EXEEXT): $(edit_OBJECTS) $(edit_DEPENDENCIES) 
-	@rm -f edit$(EXEEXT)
-	$(CXXLINK) $(edit_OBJECTS) $(edit_LDADD) $(LIBS)
+edir$(EXEEXT): $(edir_OBJECTS) $(edir_DEPENDENCIES) 
+	@rm -f edir$(EXEEXT)
+	$(CXXLINK) $(edir_OBJECTS) $(edir_LDADD) $(LIBS)
 exodus$(EXEEXT): $(exodus_OBJECTS) $(exodus_DEPENDENCIES) 
 	@rm -f exodus$(EXEEXT)
 	$(CXXLINK) $(exodus_OBJECTS) $(exodus_LDADD) $(LIBS)
@@ -353,7 +353,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/deletefile.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/deleteindex.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/edic.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/edit.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/edir.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exodus.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/list.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/listfiles.Po@am__quote@
