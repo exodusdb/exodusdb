@@ -1,3 +1,10 @@
+#!/bin/bash
+
+EXODUS_MAJOR_VERSION=10
+EXODUS_MINOR_VERSION=10.10
+EXODUS_MICRO_VERSION=10.10.5
+EXODUS_BUILD_VERSION=10.10.5.0
+
 #/Applications/BitRock*/bin/Builder.app/Contents/MacOS/installbuilder.sh --help
 #
 #Usage:
@@ -19,11 +26,6 @@
 # --project <project>            Open specified project for editing
 
 #TODO let these be set by command line or environment variables
-
-EXODUS_MAJOR_VERSION=10
-EXODUS_MINOR_VERSION=10.10
-EXODUS_MICRO_VERSION=10.10.4
-EXODUS_BUILD_VERSION=10.10.4.0
 
 /Applications/BitRock*/bin/Builder.app/Contents/MacOS/installbuilder.sh \
  build \
