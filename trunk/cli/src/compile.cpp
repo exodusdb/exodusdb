@@ -82,9 +82,9 @@ program()
                 //basicoptions^=" -fshort-wchar";
 
                 //exodus library
-                if (debugging)
-                        linkoptions=" -lexodus-gd";
-                else
+                //if (debugging)
+                //        linkoptions=" -lexodus-gd";
+                //else
                         linkoptions=" -lexodus";
 
                 //enable function names in backtrace
