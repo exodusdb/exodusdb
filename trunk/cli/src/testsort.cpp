@@ -91,7 +91,7 @@ program()
 
         printl("\nWrite the dictionary records to the dictionary");
 
-        var nrecs=count(dictrecs, FM)+1;
+        var nrecs=dcount(dictrecs, FM);
         for (var recn = 1; recn <= nrecs; recn++) {
                 var dictrec=extract(dictrecs, recn);
                 var key=field(dictrec, "|", 1);
@@ -110,9 +110,8 @@ program()
                 dictfile.outputl("dictfile");
                 //key.outputl("key");
                 if (read(rec2,dictfile, key)) {
-                        if (rec2 ne rec) {
+                        if (rec2 ne rec) 
                                 printl("record differs?!");
-                        }
                 } else
                         printl("Cant read ", key, " back");
         }
@@ -137,7 +136,7 @@ program()
 
         printl("\nWrite the data records to the data file");
 
-        nrecs=count(recs, FM)+1;
+        nrecs=dcount(recs, FM);
         for (var recn = 1; recn <= nrecs; recn++) {
                 var rec=extract(recs, recn);
                 var key=field(rec, "|", 1);
