@@ -5,17 +5,24 @@ program()
         //hard coded editor at the moment
         //http://www.nano-editor.org/docs.php
         var editor="nano";
-
+//restrict to editing records for now
+//#define ALLOW_EDIC
+#ifdef ALLOW_EDIC
         if (dcount(_COMMAND,FM)<3) {
+#else
+        if (dcount(_COMMAND,FM)<2) {
+#endif
 
                 //quit if arguments
                 if (dcount(_COMMAND,FM)<2)
-                        abort(
-                                "Syntax is:\n"
-                                "edit databasefilename key\n"
-                                "or\n"
-                                "edit osfilename"
-                        );
+					abort(
+						"Syntax is:"
+                        "\nedit databasefilename key ..."
+#ifdef ALLOW_EDIC
+                        "\nor"
+                        "\nedit osfilename"
+#endif
+					);
 
                 //switch to edic if only one argument
                 osshell(_COMMAND.replace(1,0,0,"edic").convert(FM," "));
@@ -54,7 +61,7 @@ program()
 
         //put the record on a temp file in order to edit it
         var temposfilename=filename^ "~" ^ key;
-        var invalidfilechars=L"\"\'Â£$%^&*(){}[]:;#<>?,./\\|";
+        var invalidfilechars=L"\"\'£$%^&*(){}[]:;#<>?,./\\|";
         temposfilename.converter(invalidfilechars,str("-",len(invalidfilechars)));
         temposfilename^=".tmp";
         oswrite(record,temposfilename);

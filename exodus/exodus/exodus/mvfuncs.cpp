@@ -580,6 +580,7 @@ var& var::lcaser()
 	return *this;
 }
 
+/*
 var var::invert() const
 {
 	THISIS(L"var var::invert() const")
@@ -601,7 +602,7 @@ var& var::inverter()
     return *this;
 
 }
-
+*/
 
 var var::seq() const
 {
@@ -1260,7 +1261,8 @@ const var& var::errputl(const var& str) const
 }
 
 
-
+//clog is unbuffered version of cerr?
+// 3>xyz.log captures nothing on windows
 const var& var::logput() const
 {
 	return put(std::clog);

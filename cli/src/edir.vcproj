@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="edit"
-	ProjectGUID="{D24873BA-8217-4EA8-B1DE-7F9470E67097}"
-	RootNamespace="edit"
+	Name="edir"
+	ProjectGUID="{E97CCEAD-11F1-4CEE-B52D-10D7429AE622}"
+	RootNamespace="edir"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -176,7 +176,7 @@
 	</References>
 	<Files>
 		<File
-			RelativePath=".\edit.cpp"
+			RelativePath=".\edir.cpp"
 			>
 		</File>
 	</Files>

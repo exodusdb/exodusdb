@@ -162,7 +162,7 @@ program()
         printl("\nList the file using ", quote(cmd));
         osshell(cmd);
 
-        cmd="list "^ dictfilename^ " id-supp";
+        cmd="list "^ dictfilename;
         printl("\nList the dict using ", quote(cmd));
         osshell(cmd);
 

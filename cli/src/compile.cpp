@@ -6,6 +6,7 @@
 //nevertheless, returning vars seems to work in practice and .def files seem
 //more complicated so for now use extern "C" and not .def files
 #define EXODUS_EXPORT_USING_DEF 0
+
 #define EXODUS_FUNCTOR_MAXNARGS 20
 
 #include <exodus/exodus.h>
@@ -33,18 +34,15 @@ program()
         var usedeffile=false;
 
         //extract options
-        var verbose=index(_OPTIONS,"V");
-        var debugging=index(_OPTIONS,"B");
+        var verbose=index(_OPTIONS.ucase(),"V");
+        var debugging=not index(_OPTIONS.ucase(),"O");
 //	verbose=1;
 
         //extract filenames
         var filenames=field(command,FM,2,999999999);
         var nfiles=dcount(filenames,FM);
         if (not filenames)
-                abort("Syntax is compile filename ... {options}");
-
-        if (osgetenv("EXODUS_DEBUG"))
-                debugging=true;
+                abort("Syntax is compile filename ... {options}\nOptions are O=Optimise V=Verbose");
 
         //source extensions
         var src_extensions="cpp cxx cc";
@@ -357,9 +355,6 @@ program()
                         //Disables optimization.
                         basicoptions^=" /Od";
 
-                        //Enables whole program optimization.
-                        basicoptions^=" /GL";
-
                         //renames program database?
                         basicoptions^=" /FD";
 
@@ -369,21 +364,24 @@ program()
                         //Enables run-time error checking.
                         basicoptions^=" /RTC1";
 
+                        //Enables minimal rebuild.
+                        basicoptions^=" /Gm";
+
                 } else {
                         //Creates a multithreaded DLL using MSVCRT.lib.
                         //basicoptions^=" /MD";
                         //needed for backtrace
                         //Creates a debug multithreaded DLL using MSVCRTD.lib.
-                        basicoptions^=" /MDd";
+                        basicoptions^=" /MD";
 
                         //Creates fast code.
-                        basicoptions^=" /O2";
+                        //basicoptions^=" /O2";
 
                         //Enable string pooling
                         basicoptions^=" /GF";
 
-                        //Enables minimal rebuild.
-                        basicoptions^=" /Gm";
+                        //Enables whole program optimization.
+                        //basicoptions^=" /GL";
 
                         //turn off asserts
                         basicoptions^=" /D \"NDEBUG\"";
@@ -406,18 +404,26 @@ program()
                 liboptions="/LD /DLL /D \"DLL\"";
                 //soname?
 
-                //target directories
-                bindir="~/bin";
-                libdir="~/lib";
-
                 //target extensions
                 objfileextension=".exe";
                 binfileextension=".exe";
                 libfileextension=".dll";
 
-                //installcmd="copy /y";
-                installcmd="";
-        }
+                //target directories
+
+				var homedir=osgetenv("USERPROFILE");
+				if (homedir) {
+					bindir=homedir^"\\Application Data\\Exodus";
+					libdir=bindir;
+					installcmd="copy /y";
+				} else {
+	                bindir="";
+		            libdir="";
+	                installcmd="";
+				}
+
+
+		}
 
         swapper(bindir,"~",osgetenv("HOME"));
         swapper(libdir,"~",osgetenv("HOME"));
@@ -476,7 +482,7 @@ program()
 
                 //determine if program or subroutine/function
                 var isprogram=index(text,"int main(") or index(text, "program()");
-                if (debugging)
+                if (verbose)
                         isprogram.outputl("Is Program:");
                 var outputdir;
                 var compileoptions;
@@ -638,7 +644,7 @@ program()
                 }
 #endif
 
-                if (debugging) {
+                if (verbose) {
                         binfileextension.outputl("Bin file extension");
                         objfileextension.outputl("Obj file extension");
                         binfilename.outputl("Binary file:");
@@ -647,8 +653,22 @@ program()
                         compileoptions.outputl("Compile options:");
                 }
 
-                //record the current bin file update timestamp
-                var oldobjfileinfo=osfile(objfilename);
+				//record the current bin file update timestamp so we can 
+				//later detect if compiler produces anything to be installed
+				var oldobjfileinfo=osfile(objfilename);
+
+				//check object code can be produced.
+ 				if (oldobjfileinfo) {
+					if (osopen(objfilename,objfilename))
+						osclose(objfilename);
+					else {
+						print("Error: ",objfilename, " cannot be updated. Insufficient rights");
+						if (_SLASH eq "\\")
+							print(" or cannot compile programs while in use");
+						printl(".");
+						continue;
+					}
+				}
 
                 //build the compiler command
                 var compilecmd=compiler ^ " " ^ srcfilename ^ " " ^ basicoptions ^ " " ^ compileoptions;
@@ -667,7 +687,7 @@ program()
 
                 //call the compiler
                 ///////////////////
-                if (verbose or debugging)
+                if (verbose)
                         printl(compilecmd);
                 osshell(compilecmd);
 
@@ -722,8 +742,22 @@ program()
                                                 if (!osmkdir(outputdir))
                                                         printl("ERROR: Failed "^cmd);
                                         }
+
+										//check can install file
                                         var outputpathandfile=outputdir^field2(binfilename,_SLASH,-1);
-                                        var cmd=installcmd^" " ^ objfilename ^ " " ^ outputpathandfile;
+										if (osfile(outputpathandfile)) {
+											if (osopen(outputpathandfile,outputpathandfile))
+												osclose(outputpathandfile);
+											else {
+												print("Error: ",outputpathandfile, " cannot be updated. Insufficient rights");
+												if (_SLASH eq "\\")
+													print(" or cannot install/catalog program while in use");
+												printl(".");
+												continue;
+											}
+										}
+
+										var cmd=installcmd^" " ^ objfilename ^ " " ^ outputpathandfile;
                                         if (verbose)
                                                 printl(cmd);
                                         //osshell(cmd);
@@ -731,6 +765,11 @@ program()
                                                 osdelete(outputpathandfile);
                                         if (!oscopy(objfilename,outputpathandfile))
                                                 printl("ERROR: Failed to "^cmd);
+
+										//try to copy ms manifest
+										//so that the program can be run from anywhere?
+										if (_SLASH eq "\\"  and not oscopy(objfilename^".manifest",outputpathandfile^".manifest"))
+										{}//printl("ERROR: Failed to "^cmd);
                                 }
                         }
                 }//compilation

@@ -72,8 +72,18 @@ program()
                 if (exoduspath and not ossetenv("EXODUS_PATH",exoduspath))
                         errput("Couldnt set EXODUS_PATH environment variable");
 
-                //add exodus bin to path
-                if (not ossetenv("PATH",(exodusbinpath^";"^osgetenv("PATH"))))
+				var currpath=osgetenv("PATH");
+
+                //PREFIX exodus bin to path
+				var newpath=exodusbinpath^";"^currpath;
+
+				//APPEND user's Exodus binaries path (from compile/catalog)
+				var homedir=osgetenv("USERPROFILE");
+				if (homedir)
+					newpath^=";"^homedir^"\\Application Data\\Exodus";
+
+				//update path
+                if (not ossetenv("PATH",newpath))
                         errput("Couldnt set PATH environment variable");
 
                 //set INCLUDE path

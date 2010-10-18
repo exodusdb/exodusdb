@@ -355,8 +355,8 @@ FunctionEnd
 ;--------------------------------
 ;General
 
-  Name "Exodus 10.10.4"
-  Outfile "exodus-10.10.4.exe"
+  Name "Exodus 10.10.5"
+  Outfile "exodus-10.10.5.exe"
   InstallDir "$PROGRAMFILES\exodus\10.10"
   
   ;Get installation folder from registry if available
@@ -424,19 +424,20 @@ Section "All" SecAll
   File ${DebugOrRelease}\*.exe
   File ${DebugOrRelease}\exodus.dll
 
-  File /oname=pgexodus-8.dll release\pgexodus-8.dll
-  File /oname=pgexodus-9.dll release\pgexodus.dll
-
   SetOutPath "$INSTDIR\lib"
 
   File ${DebugOrRelease}\exodus.exp
   File ${DebugOrRelease}\exodus.lib
   ;File ${DebugOrRelease}\exodus.pdb
 
+  File /oname=pgexodus-8.dll release\pgexodus-8.dll
+  File /oname=pgexodus-9.dll release\pgexodus.dll
+
   SetOutPath "$INSTDIR\include\exodus"
 
   File exodus\exodus\exodus\mv*.h
   File exodus\exodus\exodus\exodus*.h
+  File exodus\exodus\exodus\xfunctor*.h
 
   SetOutPath "$INSTDIR\projects"
 
@@ -447,8 +448,9 @@ Section "All" SecAll
   File cli\src\deletefile.cpp
   File cli\src\deleteindex.cpp
   File cli\src\edic.cpp
-  File cli\src\edit.cpp
+  File cli\src\edir.cpp
   File cli\src\list.cpp
+  File cli\src\printtext.h
   File cli\src\listfiles.cpp
   File cli\src\listindexes.cpp
   File cli\src\testsort.cpp
@@ -465,12 +467,15 @@ Section "All" SecAll
   ;Call AddToPath
   ;${EnvVarUpdate} $0 "PATH" "P" "HKLM" "$INSTDIR\bin"
   ${EnvVarUpdate} $0 "PATH" "A" "HKLM" "$INSTDIR\bin"
+  ;cannot see to add %APPDATA% in local machine path so have to do for current user only :(
+  ${EnvVarUpdate} $0 "PATH" "A" "HKCU" "$APPDATA\Exodus"
 
   ;Store installation folder
   WriteRegStr HKCU "Software\exodus\10.10" "" $INSTDIR
   
   createDirectory "$SMPROGRAMS\Exodus-10.10"
   createShortCut "$SMPROGRAMS\Exodus-10.10\Exodus Console.lnk" "$INSTDIR\bin\exodus.exe"
+  createShortCut "$SMPROGRAMS\Exodus-10.10\Exodus Config.lnk" "$INSTDIR\bin\configexodus.exe"
 
   ;Create uninstaller
   WriteUninstaller "$INSTDIR\Uninstall.exe"
@@ -507,10 +512,12 @@ Section "Uninstall"
   RMDir "$INSTDIR\bin"
 
   Delete "$INSTDIR\lib\exodus.*"
+  Delete "$INSTDIR\lib\pgexodus*.*"
   RMDir "$INSTDIR\lib"
 
   Delete "$INSTDIR\include\exodus\mv*.h"
   Delete "$INSTDIR\include\exodus\exodus*.h"
+  Delete "$INSTDIR\include\exodus\xfunctor*.h"
   RMDir "$INSTDIR\include\exodus"
   RMDir "$INSTDIR\include"
 
@@ -521,8 +528,9 @@ Section "Uninstall"
   Delete "$INSTDIR\projects\deletefile.cpp"
   Delete "$INSTDIR\projects\deleteindex.cpp"
   Delete "$INSTDIR\projects\edic.cpp"
-  Delete "$INSTDIR\projects\edit.cpp"
+  Delete "$INSTDIR\projects\edir.cpp"
   Delete "$INSTDIR\projects\list.cpp"
+  Delete "$INSTDIR\projects\printtext.h"
   Delete "$INSTDIR\projects\listfiles.cpp"
   Delete "$INSTDIR\projects\listindexes.cpp"
   Delete "$INSTDIR\projects\testsort.cpp"
@@ -542,11 +550,13 @@ Section "Uninstall"
   delete "$SMPROGRAMS\Exodus-10.10\Uninstall Exodus.lnk"
 
   delete "$SMPROGRAMS\Exodus-10.10\Exodus Console.lnk"
+  delete "$SMPROGRAMS\Exodus-10.10\Exodus Config.lnk"
   RMDir "$SMPROGRAMS\Exodus-10.10"
 
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Exodus-10.10"
 
-  ;remove the path to binaries
+  ;remove the path to binaries HKLM=Local Machine and HKCU=Current User
   ${un.EnvVarUpdate} $0 "PATH" "R" "HKLM" "$INSTDIR\bin"
+  ${un.EnvVarUpdate} $0 "PATH" "R" "HKCU" "$APPDATA\Exodus"
 
 SectionEnd

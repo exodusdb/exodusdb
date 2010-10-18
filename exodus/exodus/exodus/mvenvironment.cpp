@@ -143,6 +143,7 @@ bool MvEnvironment::init(const var& threadno)
 	}
 	//std::wcout<<L"OK"<<std::endl;
 
+	/* arev's byte/character bit inverter not available for now
 	//std::wcout<<L"Reading Security ... "<<std::flush;
 	if (!this->SECURITY.read(this->DEFINITIONS,L"SECURITY"))
 	{
@@ -152,6 +153,7 @@ bool MvEnvironment::init(const var& threadno)
 	}
 	this->SECURITY=this->SECURITY.invert();
 //	std::wcout<<L"OK"<<std::endl;
+	*/
 
 	//std::wcout<<L"Opening VOC ... "<<std::flush;
 	var vocfilename=L"VOC";
@@ -1103,7 +1105,7 @@ void MvEnvironment::readuserprivs()
 	//if definitions then
 	if (!this->SECURITY.read(this->DEFINITIONS, L"SECURITY"))
 		this->SECURITY = L"";
-	this->SECURITY = this->SECURITY.invert();
+	//this->SECURITY = this->SECURITY.invert();
 	// end
 	// end
 	return;
@@ -1116,7 +1118,7 @@ void MvEnvironment::writeuserprivs()
 	//if definitions then
 	//put back in case called from fileman due to no datasets
 	//if definitions then
-	this->SECURITY.invert().write(this->DEFINITIONS, L"SECURITY");
+	//this->SECURITY.invert().write(this->DEFINITIONS, L"SECURITY");
 	// end
 	// end
 	return;

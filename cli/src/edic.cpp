@@ -130,7 +130,6 @@ program()
                 if (not index(filename,"."))
                         filename^=".cpp";
 
-
                 var iscompilable=filename.field2(".",-1).substr(1,1).lcase() ne "h";
 
                 //make absolute in case EDITOR changes current working directory
@@ -143,12 +142,16 @@ program()
                 //prepare a skeleton exodus cpp file
                 var newfile=false;
                 if (iscompilable and !osfile(filename)) {
+
+						var basefilename=field2(filename,_SLASH,-1);
+						basefilename=field(basefilename,".",dcount(basefilename,".")-1);
+
                         newfile=true;
                         var blankfile="";
                         blankfile^="#include <exodus/exodus.h>\n";
                         blankfile^="\n";
                         blankfile^="program() {\n";
-                        blankfile^="\tprint(\"Hello World!\");\n";
+                        blankfile^="\tprintl(\""^basefilename^" says 'Hello World!'\");\n";
                         blankfile^="}\n";
                         if (_SLASH ne "/")
                                 blankfile.swapper("\n","\r\n");
