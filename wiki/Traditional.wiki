@@ -101,7 +101,7 @@ Status
 
 Console Output
 ||cmd	||print(mv1)||
-||cmd	||println(mv1="")||
+||cmd	||printl(mv1="")||
 ||cmd	||printtab(mv1="")||
 
 Cursor
