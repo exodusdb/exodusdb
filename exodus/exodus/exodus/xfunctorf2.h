@@ -16,21 +16,21 @@ public:
  {
 	checkload();
 	typedef var (*ExodusDynamic)(T1 arg1, T2 arg2);
-	return  ((ExodusDynamic) _pfunction)(T1(), T2());
+	return  ((ExodusDynamic) pfunction_)(T1(), T2());
  }
 
  var operator() (T1 arg1)
  {
 	checkload();
 	typedef var (*ExodusDynamic)(T1 arg1, T2 arg2);
-	return  ((ExodusDynamic) _pfunction)(arg1, T2());
+	return  ((ExodusDynamic) pfunction_)(arg1, T2());
  }
 
  var operator() (T1 arg1, T2 arg2)
  {
 	checkload();
 	typedef var (*ExodusDynamic)(T1 arg1, T2 arg2);
-	return  ((ExodusDynamic) _pfunction)(arg1, arg2);
+	return  ((ExodusDynamic) pfunction_)(arg1, arg2);
  }
 
 };

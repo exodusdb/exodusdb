@@ -148,16 +148,33 @@ program()
 
                         newfile=true;
                         var blankfile="";
-                        blankfile^="#include <exodus/exodus.h>\n";
-                        blankfile^="\n";
-                        blankfile^="program() {\n";
-                        blankfile^="\tprintl(\""^basefilename^" says 'Hello World!'\");\n";
-                        blankfile^="}\n";
+
+						if (true) {
+							blankfile^="#include <exodus/program.h>\n";
+							blankfile^="\n";
+							blankfile^="programinit()\n";
+							blankfile^="\n";
+							blankfile^="function main() {\n";
+							blankfile^="\tprintl(\""^basefilename^" says 'Hello World!'\");\n";
+							blankfile^="\treturn 0;\n";
+							blankfile^="}\n";
+							blankfile^="\n";
+							blankfile^="programexit()\n";
+	                        startatlineno="6,9";
+						} else {
+							blankfile^="#include <exodus/exodus.h>\n";
+							blankfile^="\n";
+							blankfile^="program() {\n";
+							blankfile^="\tprintl(\""^basefilename^" says 'Hello World!'\");\n";
+							blankfile^="}\n";
+	                        startatlineno="4,9";
+						}
+
                         if (_SLASH ne "/")
                                 blankfile.swapper("\n","\r\n");
 			if (not oswrite(blankfile,filename))
 				stop("Cannot create "^filename^". Invalid file name, or no rights here.");
-                        startatlineno="4,9";
+                  //      startatlineno="4,9";
                         //startatlineno="";
                 }
 

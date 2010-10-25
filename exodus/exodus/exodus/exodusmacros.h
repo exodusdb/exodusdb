@@ -32,6 +32,7 @@ THE SOFTWARE.
 //include m.h directly
 
 #include <exodus/mv.h>
+#include <exodus/mvfunctor.h>
 
 //please include <exodus> AFTER <iostream> etc. For example:
 // #include <iostream>
@@ -106,11 +107,20 @@ void main2(int exodus__argc, char *exodus__argv[])
 //allow simplified syntax eg "function xyz(in arg1, out arg2) { ..."
 #define subroutine EXODUSMACRO_IMPORTEXPORT void
 #define function EXODUSMACRO_IMPORTEXPORT var
+
 //throw away words
 //call xyz() ... is just xyz()  (external function)
 //gosub xyz() ... is just xyz() (local function)
 #define call
 #define gosub
+
+#define classinit() \
+class ExodusProgram : public ExodusProgramBase {
+
+#define classexit() \
+public: \
+ExodusProgram(MvEnvironment& inmv):ExodusProgramBase(inmv){} \
+}; \
 
 //simplify declaration of function/subroutine arguments
 //eg. allow "function xyz(in arg1, out arg2)"

@@ -523,7 +523,7 @@ var var::oconv_MT(const wchar_t* conversion) const
 	if (*conversionchar)
 	{
 
-		//third character may be an H to indicate 12 hour clock with AM/PM
+		//third character may be an H to indicate AM/PM
 		if (*conversionchar==L'H')
 		{
 			twelvehour=true;
@@ -558,9 +558,9 @@ var var::oconv_MT(const wchar_t* conversion) const
 	bool am=false;
 	if (twelvehour)
 	{
-			if (hours>=12)
+			if (hours>=13)
 					hours-=12;
-			else
+			else if (hours<12)
 			{
 					am=true;
 					//zero hour is 12am in 12 hour clock

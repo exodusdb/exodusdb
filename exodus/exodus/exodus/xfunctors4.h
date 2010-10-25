@@ -16,7 +16,7 @@ public:
  {
 	checkload();
 	typedef void (*ExodusDynamic)(T1 arg1, T2 arg2, T3 arg3, T4 arg4);
-	 ((ExodusDynamic) _pfunction)(T1(), T2(), T3(), T4());
+	 ((ExodusDynamic) pfunction_)(T1(), T2(), T3(), T4());
 	return;
  }
 
@@ -24,7 +24,7 @@ public:
  {
 	checkload();
 	typedef void (*ExodusDynamic)(T1 arg1, T2 arg2, T3 arg3, T4 arg4);
-	 ((ExodusDynamic) _pfunction)(arg1, T2(), T3(), T4());
+	 ((ExodusDynamic) pfunction_)(arg1, T2(), T3(), T4());
 	return;
  }
 
@@ -32,7 +32,7 @@ public:
  {
 	checkload();
 	typedef void (*ExodusDynamic)(T1 arg1, T2 arg2, T3 arg3, T4 arg4);
-	 ((ExodusDynamic) _pfunction)(arg1, arg2, T3(), T4());
+	 ((ExodusDynamic) pfunction_)(arg1, arg2, T3(), T4());
 	return;
  }
 
@@ -40,7 +40,7 @@ public:
  {
 	checkload();
 	typedef void (*ExodusDynamic)(T1 arg1, T2 arg2, T3 arg3, T4 arg4);
-	 ((ExodusDynamic) _pfunction)(arg1, arg2, arg3, T4());
+	 ((ExodusDynamic) pfunction_)(arg1, arg2, arg3, T4());
 	return;
  }
 
@@ -48,7 +48,7 @@ public:
  {
 	checkload();
 	typedef void (*ExodusDynamic)(T1 arg1, T2 arg2, T3 arg3, T4 arg4);
-	 ((ExodusDynamic) _pfunction)(arg1, arg2, arg3, arg4);
+	 ((ExodusDynamic) pfunction_)(arg1, arg2, arg3, arg4);
 	return;
  }
 

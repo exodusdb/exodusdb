@@ -1,9 +1,24 @@
-#include <exodus/exodus.h>
+#include <exodus/program.h>
 
- const var EXODUS_FUNCTOR_MAXNARGS=20;
+ var EXODUS_FUNCTOR_MAXNARGS=20;
+
+programinit()
+
  //var outfilename="genfunctors.h";
+ var head, body, foot;
+
+function main() {
+
+ for (int nargs=0;nargs<=EXODUS_FUNCTOR_MAXNARGS;++nargs) {
+  genfunctor("function",nargs);
+  genfunctor("subroutine",nargs);
+ }
+ return 0;
+}
  
- var head=
+subroutine init() {
+
+ head=
  "#ifndef ExodusFunctorSubroutine1_H\n"
  "#define ExodusFunctorSubroutine1_H\n"
  "\n"
@@ -19,20 +34,23 @@
  "	: ExodusFunctorBase(libname,funcname){}\n"
  "\n";
  
- var body=
+ body=
  " VOIDORVAR operator() (T1 arg1)\n"
  " {\n"
  "	checkload();\n"
  "	typedef VOIDORVAR (*ExodusDynamic)(T1 arg1);\n"
- "	FUNCTIONRETURN ((ExodusDynamic) _pfunction)(arg1);\n"
+ "	FUNCTIONRETURN ((ExodusDynamic) pfunction_)(arg1);\n"
  "SUBROUTINERETURN"
  " }\n"
  "\n";
  
- var foot=
+ foot=
  "};\n"
  "#endif\n"
- ; 
+ ;
+
+}
+
 /*
 * output one templated class to implementing a functor
 * mode: [in] is "function" (default) or "subroutine"
@@ -107,13 +125,4 @@ subroutine genfunctor(in mode, in nargs) {
  
 }
 
-//change to program to run as command line
-program() {
-//subroutine genfunctors() {
-
- for (int nargs=0;nargs<=EXODUS_FUNCTOR_MAXNARGS;++nargs) {
-  genfunctor("function",nargs);
-  genfunctor("subroutine",nargs);
- }
- 
-}
+programexit()

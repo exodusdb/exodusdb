@@ -435,18 +435,27 @@ bool var::osopen(const var& osfilename)
 		osfilename.createString();
 	}
 
-	std::fstream myfile;
+	std::fstream *pfstream=new std::fstream;
 	//	myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
 //var(int(sizeof(myfile))).outputl(L"filesize");
-
-	myfile.open(osfilename.tostring().c_str(), std::ios::out |std::ios::in | std::ios::binary);
-	if (!myfile) return false;
+	//if (osfilename.var_mvtype&pimpl::MVTYPE_INT)
+	//	myfile=(std::fstream) var_mvint;
+	//else
+	{
+		(*pfstream).open(osfilename.tostring().c_str(), std::ios::out |std::ios::in | std::ios::binary);
+		if (!(*pfstream)) {
+			delete pfstream;
+			return false;
+		}
+//		var_mvint=(mvint_t) myfile;
+	}
 
 	var_mvstr=osfilename.var_mvstr;
 	var_mvtype=pimpl::MVTYPE_STR;
 
 	//TODO for now reopen file on every access
-	myfile.close();
+	(*pfstream).close();
+	delete pfstream;
 
 	return true;
 }

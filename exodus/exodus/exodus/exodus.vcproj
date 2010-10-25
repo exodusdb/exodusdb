@@ -405,6 +405,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\library.h"
+				>
+			</File>
+			<File
 				RelativePath=".\MurmurHash2_64.h"
 				>
 			</File>
@@ -454,6 +458,10 @@
 			</File>
 			<File
 				RelativePath=".\NullCodecvt.h"
+				>
+			</File>
+			<File
+				RelativePath=".\program.h"
 				>
 			</File>
 			<File

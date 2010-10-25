@@ -379,14 +379,14 @@ DLL_PUBLIC var length(const var& var1)
 	return var1.length();
 }
 
-DLL_PUBLIC var& converter(var& instring, const var& fromchars, const var& tochars)
+DLL_PUBLIC var& converter(var& instring, const var& oldchars, const var& newchars)
 {
-	return instring.converter(fromchars,tochars);
+	return instring.converter(oldchars,newchars);
 }
 
-DLL_PUBLIC var convert(const var& instring, const var& fromchars, const var& tochars)
+DLL_PUBLIC var convert(const var& instring, const var& oldchars, const var& newchars)
 {
-	return instring.convert(fromchars,tochars);
+	return instring.convert(oldchars,newchars);
 }
 
 DLL_PUBLIC var& swapper(var& instring, const var& from, const var& to, const var& options=L"")
@@ -651,9 +651,14 @@ void DLL_PUBLIC initrnd(const int seednumber)
 	var(seednumber).initrnd();
 }
 
+DLL_PUBLIC var mod(const var& dividend, const var& divisor)
+{
+	return dividend.mod(divisor);
+}
+
 DLL_PUBLIC var mod(const var& dividend, const int divisor)
 {
-	return dividend % divisor;
+	return dividend.mod(divisor);
 }
 
 DLL_PUBLIC var space(const int number)

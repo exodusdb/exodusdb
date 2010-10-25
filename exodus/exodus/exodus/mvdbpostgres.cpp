@@ -335,15 +335,15 @@ bool var::connect(const var& conninfo)
 
 	if (PQstatus(pgconn) != CONNECTION_OK)
 	{
-		//required even if connect fails according to docs
-		PQfinish(pgconn);
-
 //		#if TRACING >= 2
 			exodus::errputl(L"var::connect() Connection to database failed: " ^ var(PQerrorMessage(pgconn)));
 			//if (not conninfo2)
 				exodus::errputl(L"var::connect() Postgres connection configuration missing or incorrect. Please login.");
 ;
 //		#endif
+		//required even if connect fails according to docs
+		PQfinish(pgconn);
+
 		return false;
 	}
 	#if TRACING >= 3
@@ -834,7 +834,7 @@ bool var::sqlexec(var& errmsg) const
 
 bool var::writev(const var& filehandle,const var& key,const int fieldn) const
 {
-	if (fieldn<=1)
+	if (fieldn<=0)
 		return write(filehandle, key);
 
 	THISIS(L"bool var::writev(const var& filehandle,const var& key,const int fieldn) const")
