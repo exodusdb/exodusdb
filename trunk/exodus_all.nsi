@@ -437,6 +437,8 @@ Section "All" SecAll
 
   File exodus\exodus\exodus\mv*.h
   File exodus\exodus\exodus\exodus*.h
+  File exodus\exodus\exodus\program.h
+  File exodus\exodus\exodus\library.h
   File exodus\exodus\exodus\xfunctor*.h
 
   SetOutPath "$INSTDIR\projects"
@@ -517,6 +519,8 @@ Section "Uninstall"
 
   Delete "$INSTDIR\include\exodus\mv*.h"
   Delete "$INSTDIR\include\exodus\exodus*.h"
+  Delete "$INSTDIR\include\exodus\program.h"
+  Delete "$INSTDIR\include\exodus\library.h"
   Delete "$INSTDIR\include\exodus\xfunctor*.h"
   RMDir "$INSTDIR\include\exodus"
   RMDir "$INSTDIR\include"
