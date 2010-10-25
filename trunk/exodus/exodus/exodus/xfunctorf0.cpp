@@ -48,7 +48,7 @@ var ExodusFunctorF0::operator() ()
  {
 	checkload();
 	typedef var (*ExodusDynamic)();
-	return  ((ExodusDynamic) _pfunction)();
+	return  ((ExodusDynamic) pfunction_)();
  }
 
 }//namespace exodus

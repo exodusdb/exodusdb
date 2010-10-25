@@ -100,6 +100,7 @@ DLL_PUBLIC var round(const var& num1, const int ndecimals=0);
 DLL_PUBLIC var rnd(const int number);
 DLL_PUBLIC void initrnd(const int seednumber);
 DLL_PUBLIC var mod(const var& dividend, const int divisor);
+DLL_PUBLIC var mod(const var& dividend, const var& divisor);
 
 DLL_PUBLIC var at(const int columnorcode);
 DLL_PUBLIC var at(const var& column, const var& row);
@@ -115,10 +116,10 @@ DLL_PUBLIC void inputn(var& instr, const var& n);
 
 DLL_PUBLIC var len(const var& mv1);
 DLL_PUBLIC var length(const var& mv1);
-DLL_PUBLIC var& converter(var& instring, const var& fromchars, const var& tochars);
-DLL_PUBLIC var convert(const var& instring, const var& fromchars, const var& tochars);
-DLL_PUBLIC var& swapper(var& instring, const var& fromchars, const var& tochars, const var& options=L"");
-DLL_PUBLIC var swap(const var& instring, const var& fromchars, const var& tochars, const var& options=L"");
+DLL_PUBLIC var& converter(var& instring, const var& oldchars, const var& newchars);
+DLL_PUBLIC var convert(const var& instring, const var& oldchars, const var& newchars);
+DLL_PUBLIC var& swapper(var& instring, const var& oldstr, const var& newstr, const var& options=L"");
+DLL_PUBLIC var swap(const var& instring, const var& oldstr, const var& newstr, const var& options=L"");
 DLL_PUBLIC var& ucaser(var& instring);
 DLL_PUBLIC var ucase(const var& instring);
 DLL_PUBLIC var& lcaser(var& instring);

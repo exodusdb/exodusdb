@@ -172,7 +172,7 @@ var MvWindow::securitysubs(const var& mode)
 
 		if (!env.SECURITY.read(env.DEFINITIONS, L"SECURITY"))
 			env.SECURITY = L"";
-		env.SECURITY.inverter();
+		//env.SECURITY.inverter();
 
 		securitysubs_cleartemp(env.RECORD);
 
@@ -343,7 +343,8 @@ var MvWindow::securitysubs(const var& mode)
 
 		//save orec (after removing stuff) for prewrite
 		if (wlocked)
-			env.RECORD.invert().write(env.DEFINITIONS, L"SECURITY.OREC");
+			//env.RECORD.invert().write(env.DEFINITIONS, L"SECURITY.OREC");
+			env.RECORD.write(env.DEFINITIONS, L"SECURITY.OREC");
 
 	}else if (mode == L"SAVE") {
 
@@ -357,13 +358,13 @@ var MvWindow::securitysubs(const var& mode)
 			if (!((registerx[7]).read(env.DEFINITIONS, L"SECURITY")))
 				return invalid(L"SECURITY missing from env.DEFINITIONS");
 
-			registerx[7].inverter();
+			//registerx[7].inverter();
 
 			//simulate orec
 			if (!orec.read(env.DEFINITIONS, L"SECURITY.OREC"))
 				return invalid(L"SECURITY.OREC is missing from DEFINITIONS");
 
-			orec.inverter();
+			//orec.inverter();
 
 			//safety check
 			if (orec.extract(20) not_eq registerx[8] or orec.extract(21) not_eq registerx[9]) {
@@ -506,7 +507,8 @@ var MvWindow::securitysubs(const var& mode)
 		env.RECORD.cropper();
 		//dont save record in noninteractive mode as we are in prewrite stage
 		if (interactive and env.RECORD)
-			env.RECORD.invert().write(env.DEFINITIONS, L"SECURITY");
+			//env.RECORD.invert().write(env.DEFINITIONS, L"SECURITY");
+			env.RECORD.write(env.DEFINITIONS, L"SECURITY");
 		env.SECURITY = env.RECORD;
 
 		var users;
@@ -595,7 +597,7 @@ var MvWindow::securitysubs(const var& mode)
 		if (!interactive) {
 
 			//prepare to write the inverted record in noninteractive mode
-			env.RECORD.inverter();
+			//env.RECORD.inverter();
 
 			//remove the temp file
 			env.DEFINITIONS.deleterecord(L"SECURITY.OREC");

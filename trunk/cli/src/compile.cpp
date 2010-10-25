@@ -415,7 +415,8 @@ program()
 				if (homedir) {
 					bindir=homedir^"\\Application Data\\Exodus";
 					libdir=bindir;
-					installcmd="copy /y";
+					//installcmd="copy /y";
+					installcmd="copy";
 				} else {
 	                bindir="";
 		            libdir="";
@@ -481,7 +482,10 @@ program()
                 }
 
                 //determine if program or subroutine/function
-                var isprogram=index(text,"int main(") or index(text, "program()");
+                var isprogram=
+					index(text,"<exodus/program.h>")
+					or index(text,"int main(")
+					or index(text, "program()");
                 if (verbose)
                         isprogram.outputl("Is Program:");
                 var outputdir;
@@ -517,12 +521,18 @@ program()
                 var deftext="";
                 var defordinal=0;
 #endif
-                for (int ln=1; ln<=nlines; ++ln) {
+				//detect libraryinit
+				var useclassmemberfunctions=false;
+
+				for (int ln=1; ln<=nlines; ++ln) {
                         var line=trimf(text2(ln));
                         var word1=line.field(" ",1);
 
                         //for external subroutines (dll/so libraries), build up .h
                         // and maybe .def file text
+						if (not isprogram and word1.substr(1,11) eq "libraryinit")
+							useclassmemberfunctions=true;
+
                         if (not(isprogram) and ( word1 eq "function" or word1 eq "subroutine") ) {
 
                                 //extract out the function declaration in including arguments
@@ -541,20 +551,48 @@ program()
                                         var libname=filebase;
                                         var funcreturn=(word1=="function")?"var":"void";
                                         var funcreturnvoid=(word1=="function")?0:1;
-                                        var funcargsdecl=funcdecl.field("(",2).field(")",1);
+                                        var funcargsdecl=funcdecl.field("(",2,999999);
+                                        //funcargsdecl=funcargsdecl.field(")",1);
+										int level=0;
+										int charn;
+										for (charn=1;charn<=len(funcargsdecl);++charn) {
+											var ch=funcargsdecl.substr(charn,1);
+											if (ch eq ")") {
+												if (level eq 0)
+													break;
+												--level;
+											} else if (ch eq "(")
+												++level;
+										}
+										funcargsdecl.substrer(1,charn-1);
 
                                         //work out the function arguments without declaratives
                                         //to be inserted in the calling brackets.
                                         var funcargs="";
                                         //default to one template argument for functors with zero arguments
-                                        var funcargstype="int";
+
+										var nodefaults=index(funcargsdecl,"=") eq 0;
+										var funcargsdecl2=funcargsdecl;
+
+										var funcargstype="int";
+
                                         int nargs=dcount(funcargsdecl,",");
                                         for (int argn=1; argn<=nargs; ++argn) {
                                                 var funcarg=field(funcargsdecl,',',argn).trim();
 
                                                 //remove any default arguments (after =)
                                                 //TODO verify this is ok with <exodus/mvlink.h> method below
+
                                                 funcarg=field(funcarg,"=",1).trim();
+
+												//default all if all are var (in io out)
+												if (nodefaults) {
+													if (var("in io out").locateusing(funcarg.field(" ",1)," "))
+														fieldstorer(funcargsdecl2,",",argn,1,funcarg^"=var()");
+													else
+														//reset to original if anything except in io out
+														funcargsdecl2=funcargsdecl;
+												}
 
                                                 //assume the last word (by spaces) is the variable name
                                                 fieldstorer(funcargs,',',argn,1,funcarg.field2(" ",-1));
@@ -566,8 +604,35 @@ program()
                                                 fieldstorer(funcargstype,',',argn,1,argtype);
                                         }
 
+//new method using member functions to call external functions with mv environment
+var inclusion=
+"\nExodusFunctorBase efb_funcx;"
+"\nvar funcx(in arg1=var(), out arg2=var(), out arg3=var())"
+"\n{"
+"\n if (efb_funcx.pmemberfunction_==NULL)"
+"\n  efb_funcx.init(\"funcx\",\"exodusprogrambasecreatedelete\",mv);"
+"\n"
+"\n //define a function that calls the shared library object member function"
+"\n typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(in,out,out);"
+"\n"
+"\n return CALLMEMBERFUNCTION(*(efb_funcx.pobject_),"
+"\n ((pExodusProgramBaseMemberFunction) (efb_funcx.pmemberfunction_)))"
+"\n  (arg1,arg2,arg3);"
+"\n}";
+
+										swapper(inclusion,"funcx",libname);
+										//swapper(example,"exodusprogrambasecreatedelete",funcname);
+										swapper(inclusion,"in arg1=var(), out arg2=var(), out arg3=var()",funcargsdecl2);
+										swapper(inclusion,"in,out,out",funcargstype);
+										swapper(inclusion,"arg1,arg2,arg3",funcargs);
+
                                         var usepredefinedfunctor=nargs<=EXODUS_FUNCTOR_MAXNARGS;
-                                        if (usepredefinedfunctor) {
+										if (useclassmemberfunctions) {
+											if (funcname eq "main")
+														headertext^=inclusion;
+										}
+
+                                        else if (usepredefinedfunctor) {
                                                 //example output for a subroutine with 1 argument of "in" (const var&)
                                                 //ending of s1 and S1 indicates subroutine of one argument
                                                 //#include "xmvfunctors1.h"
@@ -621,7 +686,8 @@ program()
                         }
                 }
                 if (headertext) {
-                        headertext.splicer(1,0,"#ifndef "^ucase(filebase)^"_H");
+                        headertext.splicer(1,0,"#define EXODUSDLFUNC_"^ucase(filebase)^"_H");
+                        headertext.splicer(1,0,"#ifndef EXODUSDLFUNC_"^ucase(filebase)^"_H"^crlf);
                         headertext^=crlf^"#endif"^crlf;
                         var headerfilename=filebase^".h";
                         oswrite(headertext,headerfilename);
@@ -664,7 +730,7 @@ program()
 					else {
 						print("Error: ",objfilename, " cannot be updated. Insufficient rights");
 						if (_SLASH eq "\\")
-							print(" or cannot compile programs while in use");
+							print(" or cannot compile programs while in use or blocked by anti-virus/anti-malware");
 						printl(".");
 						continue;
 					}
@@ -751,7 +817,7 @@ program()
 											else {
 												print("Error: ",outputpathandfile, " cannot be updated. Insufficient rights");
 												if (_SLASH eq "\\")
-													print(" or cannot install/catalog program while in use");
+													print(" or cannot install/catalog program while in use or blocked by antivirus/antimalware");
 												printl(".");
 												continue;
 											}

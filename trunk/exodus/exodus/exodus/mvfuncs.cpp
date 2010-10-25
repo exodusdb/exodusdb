@@ -964,20 +964,20 @@ var& var::raiser()
 	return *this;
 }
 
-var var::convert(const var& fromchars,const var& tochars) const
+var var::convert(const var& oldchars,const var& newchars) const
 {
-	THISIS(L"var var::convert(const var& fromchars,const var& tochars) const")
+	THISIS(L"var var::convert(const var& oldchars,const var& newchars) const")
 	THISISSTRING()
 
-	return var(*this).converter(fromchars,tochars);
+	return var(*this).converter(oldchars,newchars);
 }
 
-var& var::converter(const var& fromchars,const var& tochars)
+var& var::converter(const var& oldchars,const var& newchars)
 {
-	THISIS(L"var& var::converter(const var& fromchars,const var& tochars)")
+	THISIS(L"var& var::converter(const var& oldchars,const var& newchars)")
 	THISISSTRING()
-	ISSTRING(fromchars)
-	ISSTRING(tochars)
+	ISSTRING(oldchars)
+	ISSTRING(newchars)
 
 	std::wstring::size_type
 	pos=std::wstring::npos;
@@ -985,15 +985,15 @@ var& var::converter(const var& fromchars,const var& tochars)
 	while (true)
 	{
 		//locate (backwards) any of the from characters
-		pos=var_mvstr.find_last_of(fromchars.var_mvstr,pos);
+		pos=var_mvstr.find_last_of(oldchars.var_mvstr,pos);
 
 		if (pos==std::wstring::npos) break;
 
 		//find which from character we have found
-		int fromcharn=int(fromchars.var_mvstr.find(var_mvstr[pos]));
+		int fromcharn=int(oldchars.var_mvstr.find(var_mvstr[pos]));
 
-		if (fromcharn<int(tochars.var_mvstr.length()))
-		 var_mvstr.replace(pos,1,tochars.var_mvstr.substr(fromcharn,1));
+		if (fromcharn<int(newchars.var_mvstr.length()))
+		 var_mvstr.replace(pos,1,newchars.var_mvstr.substr(fromcharn,1));
 		else
 		 var_mvstr.erase(pos,1);
 
@@ -1441,6 +1441,90 @@ var var::abs() const
 		return std::floor(var_mvdbl);
 	}
 	throw MVException(L"abs(unknown mvtype=" ^ var(var_mvtype) ^ L")");
+}
+
+var var::mod(const var& divisor) const
+{
+	THISIS(L"var var::mod(const var& divisor) const")
+	THISISNUMERIC()
+	ISNUMERIC(divisor)
+
+	if (var_mvtype&pimpl::MVTYPE_INT)
+	{
+		if (divisor.var_mvtype&pimpl::MVTYPE_INT)
+		{
+			if ((var_mvint<0 && divisor.var_mvint>=0) || (divisor.var_mvint<0 && var_mvint>=0))
+				//multivalue version of mod
+				return (var_mvint%divisor.var_mvint)+divisor.var_mvint;
+			else
+				return var_mvint%divisor.var_mvint;
+		}
+		else
+		{
+
+			var_mvdbl=double(var_mvint);
+			//following would cache the double value but is it worth it?
+			//var_mvtype=var_mvtype&pimpl::MVTYPE_DBL;
+
+			if ((var_mvint<0 && divisor.var_mvdbl>=0) || (divisor.var_mvdbl<0 && var_mvint>=0))
+				//multivalue version of mod
+				return fmod(var_mvdbl,divisor.var_mvdbl)+divisor.var_mvdbl;
+			else
+				return fmod(var_mvdbl,divisor.var_mvdbl);
+		}
+	}
+	else
+	{
+		if (divisor.var_mvtype&pimpl::MVTYPE_INT)
+		{
+			divisor.var_mvdbl=double(divisor.var_mvint);
+			//following would cache the double value but is it worth it?
+			//divisor.var_mvtype=divisor.var_mvtype&pimpl::MVTYPE_DBL;
+
+			if ((var_mvdbl<0 && divisor.var_mvint>=0) || (divisor.var_mvint<0 && var_mvdbl>=0))
+				//multivalue version of mod
+				return fmod(var_mvdbl,divisor.var_mvdbl)+divisor.var_mvdbl;
+			else
+				return fmod(var_mvdbl,divisor.var_mvdbl);
+		}
+		else
+		{
+			//return fmod(double(var_mvint),divisor.var_mvdbl);
+			if ((var_mvdbl<0 && divisor.var_mvdbl>=0) || (divisor.var_mvdbl<0 && var_mvdbl>=0))
+				//multivalue version of mod
+				return fmod(var_mvdbl,divisor.var_mvdbl)+divisor.var_mvdbl;
+			else
+				return fmod(var_mvdbl,divisor.var_mvdbl);
+		}
+	}
+	//throw MVException(L"abs(unknown mvtype=" ^ var(var_mvtype) ^ L")");
+}
+
+var var::mod(const int divisor) const
+{
+	THISIS(L"var var::mod(const int divisor) const")
+	THISISNUMERIC()
+
+	if (var_mvtype&pimpl::MVTYPE_INT)
+	{
+			if ((var_mvint<0 && divisor>=0) || (divisor<0 && var_mvint>=0))
+				//multivalue version of mod
+				return (var_mvint%divisor)+divisor;
+			else
+				return var_mvint%divisor;
+	}
+	else
+	{
+			if ((var_mvdbl<0 && divisor>=0) || (divisor<0 && var_mvdbl>=0))
+			{
+				//multivalue version of mod
+				double divisor2=double(divisor);
+				return fmod(var_mvdbl,divisor2)+divisor2;
+			}
+			else
+				return fmod(var_mvdbl,double(divisor));
+	}
+	//throw MVException(L"abs(unknown mvtype=" ^ var(var_mvtype) ^ L")");
 }
 
 /*

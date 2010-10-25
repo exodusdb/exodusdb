@@ -79,7 +79,52 @@ That way you can forget the new exodus concept of "library" which is not a tradi
 # define EXODUSLIBEXT ".so"
 #endif
 
+#include <exodus/mvenvironment.h>
+
+//good programming practice
+//http://www.parashift.com/c++-faq-lite/pointers-to-members.html#faq-33.6
+// currently not used because a pure virtual function "entry" is used instead
+#define CALLMEMBERFUNCTION(object,ptrToMember)  ((object).*(ptrToMember)) 
+
 namespace exodus {
+//using namespace exodus;
+
+class ExodusProgramBase
+{
+public:
+	ExodusProgramBase(exodus::MvEnvironment& inmv)
+		:mv(inmv)
+		{};
+	//virtual var main();
+	virtual ~ExodusProgramBase(){};
+	//mv.xyz is going to be used a lot by exodus programmers for exodus "global variables"
+	//it is member data so it is global to the class/object and not global to the program
+	//so it is threadsafe
+	//eg mv.RECORD mv.DICT
+	MvEnvironment& mv;
+};
+
+//pExodusProgramBase - pointer to exodus program type
+typedef ExodusProgramBase* pExodusProgramBase;
+
+//pExodusProgramBaseMemberFunction - pointer to exodus program member function
+typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)();
+
+/*
+//pExodusProgram - pointer to exodus program type
+class ExodusProgram;
+typedef ExodusProgram* pExodusProgram;
+//pExodusProgramMemberFunction - pointer to exodus program member function
+typedef var (ExodusProgram::*pExodusProgramMemberFunction)();
+*/
+
+//ExodusProgramCreateDeleteFunction - pointer to global function that creates and deletes exodus programs
+typedef void (*ExodusProgramBaseCreateDeleteFunction)
+(
+	pExodusProgramBase&,
+	exodus::MvEnvironment&,
+	pExodusProgramBaseMemberFunction&
+);
 
 class DLL_PUBLIC ExodusFunctorBase
 {
@@ -89,11 +134,16 @@ public:
 ExodusFunctorBase();
 
 //constructor to provide library and function names immediately
-ExodusFunctorBase(const std::string libname,const std::string funcname);
+ExodusFunctorBase(const std::string libname,
+				  const std::string funcname);
 
+/*
+//constructor to provide library and function names immediately
+ExodusFunctorBase(const std::string libname,const std::string funcname);
+*/
+
+//destructors of base classes must be virtual (if derived classes are going to be new/deleted?)
 virtual ~ExodusFunctorBase();
-//private:
-protected:
 
 //use void* to speed compilation of exodus applications on windows by avoiding
 //inclusion of windows.h here BUT SEE ...
@@ -104,16 +154,26 @@ protected:
 //on architectures that have data and functions in the same address space
 //since void* is pointer to data space and function is pointer to function space
 //(having said that ... posix dlsym returns a void* for the address of the function!)
-void* _plibrary;
-void* _pfunction;
+//void* pfunction_;
 
-std::string _libraryname;
-std::string _functionname;
-std::string _libraryfilename;
+public:
+	bool init(const char* libraryname, const char* functionname, MvEnvironment& mv);
+	pExodusProgramBase pobject_;
+	pExodusProgramBaseMemberFunction pmemberfunction_;
 
-void checkload();
-bool openlib();
-bool openfunc();
+private:
+	MvEnvironment* mv_;
+	void* plibrary_;
+	std::string libraryname_;
+	std::string functionname_;
+	std::string libraryfilename_;
+
+	bool openlib();
+	bool openfunc();
+
+protected:
+	bool checkload();
+	ExodusProgramBaseCreateDeleteFunction pfunction_;
 
 };
 

@@ -165,7 +165,13 @@ private:
 
 program()
 {
-	sin(30).outputl("sin(30.0)=");
+
+	var tempfile;
+	if (osopen("\\testsort.cpp",tempfile))
+		printl("opened");
+	else
+		printl("not opened");
+	exodus::sin(30).outputl("sin(30.0)=");
 	exodus::cos(30.0).outputl("cos(30.0)=");
 	exodus::tan(30.0).outputl("tan(30.0)=");
 	exodus::atan(30.0).outputl("atan(30.0)=");
@@ -197,9 +203,21 @@ program()
 	//if (not connect("port=5433"))
 	//	stop("Cannot connect!");
 
+	//check floating point modulo
+	assert(mod(2.3,var(1.499)).round(3).outputl()==0.801);
+	assert(mod(-2.3,var(-1.499)).round(3).outputl()==-0.801);
+	//following is what c++ fmod does (a rather mathematical concept)
+	//assert(mod(-2.3,var(1.499)).round(3).outputl()==-0.801);
+	//assert(mod(2.3,var(-1.499)).round(3).outputl()==0.801);
+	//but arev and qm ensure that the result is somewhere from 0 up to or down to
+	//(but not including) the divisor
+	//method is ... do the fmod and if the result is not the same sign as the divisor, add the divisor
+	assert(mod(-2.3,var(1.499)).round(3).outputl()==0.698);
+	assert(mod(2.3,var(-1.499)).round(3).outputl()==-0.698);
+
 	var errmsg;
 	if (not var("CREATE DATABASE exodus WITH ENCODING='UTF8' OWNER=exodus;").sqlexec(errmsg))
-		printl();
+		errmsg.outputl();
 
 	oconv(1234,"MD20P").outputl();
 	assert(var(10000).oconv("DY0")=="");
@@ -209,6 +227,8 @@ program()
 		createfile("dict_test_symbolics");
 	write("F"^FM^0^FM^"ID","dict_test_symbolics","ID");
 	write("S"^FM^FM^"Col1","dict_test_symbolics","SYMCOL1");
+
+	writev("F","dict_test_symbolics","ID",1);
 
 	if (not open("test_symbolics",temp))
 		createfile("test_symbolics");
@@ -312,7 +332,7 @@ program()
 		printl();
 	}
 
-	var("xyz").outputl());
+	var("xyz").outputl();
 	//var steve;steve.input(1);
 
 	//catching errors - doesnt work now that backtrace aborts (to prevent system crashes ... maybe better solution is to trap in main()
@@ -555,6 +575,15 @@ while trying to match the argument list '(exodus::var, bool)'
 	assert(oconv(10939,"DWA")=="FRIDAY");
 	assert(oconv(10939,"DY")=="1997");
 	assert(oconv(10939,"DQ")=="4");
+
+	for (int ii=1; ii<100; ++ii) {
+		var time=rnd(500000).mod(18600).outputl();
+		time.oconv("MTH").iconv("MTH").outputl();
+		assert(time.oconv("MTH").iconv("MTH") eq time);
+	}
+
+	oconv(46622,"MTH").outputl("oconv 46622 MTH is" );
+	assert(oconv(46622,"MTH")=="12:57PM");
 
 	oconv(31653,"MT").outputl();
 

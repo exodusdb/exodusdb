@@ -193,7 +193,7 @@ preventupdate:
 			}
 
 			//encrypt the mark
-			env.RECORD.replacer(1, 0, 0, (env.RECORD.extract(1)).invert());
+			//env.RECORD.replacer(1, 0, 0, (env.RECORD.extract(1)).invert());
 
 		}
 
@@ -279,7 +279,7 @@ void Definition::gosub_postreadfix()
 	////////////
 	if (env.ID == "AGENCY.PARAMS") {
 
-		env.RECORD.replacer(1, 0, 0, (env.RECORD.extract(1)).invert());
+		//env.RECORD.replacer(1, 0, 0, (env.RECORD.extract(1)).invert());
 
 		if (env.RECORD.extract(55) == "")
 			env.RECORD.replacer(55, 0, 0, "Budget");

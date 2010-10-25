@@ -642,8 +642,8 @@ public:
 	//SYSTEM FILE/DIRECTORY OPERATIONS
 	//TODO cache osfilehandles somehow (use var_mvint?)
 	bool osopen(const var& osfilename);
-	var& osbread(const var& filehandle, const int startoffset, const int length);
-	void osbwrite(const var& filehandle, const int startoffset) const;
+	var& osbread(const var& osfilehandle, const int startoffset, const int length);
+	void osbwrite(const var& osfilehandle, const int startoffset) const;
 	void osclose() const;
 	bool osread(const var& osfilename);
 	bool oswrite(const var& osfilename) const;
@@ -701,6 +701,7 @@ public:
 	const var& output() const;
 	const var& outputl() const;
 	const var& outputt() const;
+
 	const var& output(const var& var1) const;
 	const var& outputl(const var& var1) const;
 	const var& outputt(const var& var1) const;
@@ -733,10 +734,10 @@ public:
 	bool eof() const;
 
 #if defined __MINGW32__
-        DLL_PUBLIC friend std::istream& operator >> (std::istream& istream1, var& var1);
+	DLL_PUBLIC friend std::istream& operator >> (std::istream& istream1, var& var1);
 	DLL_PUBLIC friend  std::ostream& operator << (std::ostream& ostream1, const var& var1);
 #else
-        DLL_PUBLIC friend std::wistream& operator >> (std::wistream& wistream1, var& var1);
+	DLL_PUBLIC friend std::wistream& operator >> (std::wistream& wistream1, var& var1);
 	DLL_PUBLIC friend  std::wostream& operator << (std::wostream& wostream1, const var& var1);
 #endif
 	//friend bool operator <<(const var&);
@@ -756,6 +757,8 @@ public:
 
 	//MATH/BOOLEAN
 	var abs() const;
+	var mod(const var& divisor) const;
+	var mod(const int divisor) const;
 	var pwr(const var& exponent) const;
 	var rnd() const;
 	void initrnd() const;
@@ -792,8 +795,8 @@ public:
 	bool isalpha() const;
 
 	//STRING MANIPULATIONS (all return var& and are not const)
-	var& converter(const var& fromchars,const var& tochars);
-	var& swapper(const var& fromstr,const var& tostr,const var& options=L"");
+	var& converter(const var& oldchars,const var& newchars);
+	var& swapper(const var& oldstr,const var& newstr,const var& options=L"");
 	var& splicer(const int start1,const int length,const var& str);
 	var& quoter();
 	var& unquoter();
@@ -811,8 +814,8 @@ public:
 	var& substrer(const int startx,const int length);
 
 	//STRING FILTERS
-	var convert(const var& fromchars,const var& tochars) const;
-	var swap(const var& fromstr,const var& tostr,const var& options=L"") const;
+	var convert(const var& oldchars,const var& newchars) const;
+	var swap(const var& oldstr,const var& newstr,const var& options=L"") const;
 	var splice(const int start1,const int length,const var& str) const;
 	var quote() const;
 	var unquote() const;

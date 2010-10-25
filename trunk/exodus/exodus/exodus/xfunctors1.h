@@ -16,7 +16,7 @@ public:
  {
 	checkload();
 	typedef void (*ExodusDynamic)(T1 arg1);
-	 ((ExodusDynamic) _pfunction)(T1());
+	 ((ExodusDynamic) pfunction_)(T1());
 	return;
  }
 
@@ -24,7 +24,7 @@ public:
  {
 	checkload();
 	typedef void (*ExodusDynamic)(T1 arg1);
-	 ((ExodusDynamic) _pfunction)(arg1);
+	 ((ExodusDynamic) pfunction_)(arg1);
 	return;
  }
 

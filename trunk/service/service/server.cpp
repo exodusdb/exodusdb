@@ -2605,7 +2605,7 @@ void Server::gosub_getsecurity()
 		//return;
         env.SECURITY=L"";
 	}
-	env.SECURITY.inverter();
+	//env.SECURITY.inverter();
 	return;
 
 }

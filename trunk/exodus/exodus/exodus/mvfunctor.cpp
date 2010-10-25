@@ -54,42 +54,107 @@ typedef HINSTANCE library_t;
 
 namespace exodus {
 
+//using namespace exodus;
+
 /*
 //default constructor
 ExodusFunctorBase::ExodusFunctorBase()
-	: _plibrary(NULL),
-	_pfunction(NULL)
+	: plibrary_(NULL),
+	pfunction_(NULL)
 {}
 */
 
+/*
 ExodusFunctorBase::ExodusFunctorBase(const std::string libname,const std::string funcname)
-	: _libraryname(libname),
-	_functionname(funcname),
-	_plibrary(NULL),
-	_pfunction(NULL)
+	: libraryname_(libname),
+	functionname_(funcname),
+	plibrary_(NULL),
+	pfunction_(NULL)
+{}
+*/
+
+bool ExodusFunctorBase::init(const char* libraryname, const char* functionname, MvEnvironment& mv)
+{
+	libraryname_=libraryname;
+	functionname_=functionname;
+	mv_=&mv;
+	checkload();
+
+	//call a function in the library to create one of its "exodus program" objects
+	//nb we MUST call the same library to delete it
+	//so that the same memory management routine is called to create and delete it.
+	//pfunction_ return a pobject_ if pobject_ is passed in NULL (using mv as an init argument)
+	// or deletes a pobject_ if not
+
+	//generate an error here to debug
+//	pobject_->main();
+
+	pfunction_(pobject_,*mv_,pmemberfunction_);
+	//pobject_->main();
+	//((*pobject_).*(pmemberfunction_))();
+	//CALLMEMBERFUNCTION(*pobject_,pmemberfunctibon_)();
+	if (pobject_==NULL||pmemberfunction_==NULL)
+		return false;
+
+	return true;
+}
+
+ExodusFunctorBase::ExodusFunctorBase()
+:
+//TODO optimise by only initialise one and detect usage on that only
+plibrary_(NULL),
+pfunction_(NULL),
+pobject_(NULL),
+pmemberfunction_(NULL)
+{};
+
+  ExodusFunctorBase::ExodusFunctorBase(
+	const std::string libname,
+	const std::string funcname)
+	:
+	libraryname_(libname),
+	functionname_(funcname),
+	//mv_(mv),
+	plibrary_(NULL),
+	pfunction_(NULL),
+	pobject_(NULL),
+	pmemberfunction_(NULL)
 {}
 
 ExodusFunctorBase::~ExodusFunctorBase()
 {
-	if (_plibrary!=0)
-		dlclose((library_t) _plibrary);
+	//the library must be called to delete the object that it created
+	if (pobject_!=NULL)
+		pfunction_(pobject_,*mv_,pmemberfunction_);
+
+	//close the connection
+	if (plibrary_!=NULL)
+		dlclose((library_t) plibrary_);
 }
 
-void ExodusFunctorBase::checkload()
+bool ExodusFunctorBase::checkload()
 {
-	if (_plibrary!=0)
-		return;
+	if (plibrary_!=0)
+		true;
 
 	//find the library or fail
 	if (not openlib())
-		throw MVException(L"Unable to load " ^ var(_libraryfilename));
+	{
+		throw MVException(L"Unable to load " ^ var(libraryfilename_));
+		return false;
+	}
 
 	//find the function or fail
 	if (not openfunc())
+	{
 		throw MVException(L"Unable to find "
-		^ var(_functionname)
+		^ var(functionname_)
 		^ L" in "
-		^ var(_libraryfilename));
+		^ var(libraryfilename_));
+		return false;
+	}
+
+	return true;
 }
 
 bool ExodusFunctorBase::openlib()
@@ -103,21 +168,21 @@ bool ExodusFunctorBase::openlib()
 
 	//TODO optimise with std::string instead of var
 	/*
-	_libraryfilename=EXODUSLIBPREFIX _libraryname+EXODUSLIBEXT;
+	libraryfilename_=EXODUSLIBPREFIX libraryname_+EXODUSLIBEXT;
 	var home;
 	home.osgetenv(L"HOME");
-	_libraryfilename=var(_libraryfilename).swap(L"~",home).tostring();
+	libraryfilename_=var(libraryfilename_).swap(L"~",home).tostring();
 	*/
 	//#include <stdlib.h>
-	_libraryfilename=EXODUSLIBPREFIX _libraryname+EXODUSLIBEXT;
-	if (_libraryfilename[0]=='~')
+	libraryfilename_=EXODUSLIBPREFIX libraryname_+EXODUSLIBEXT;
+	if (libraryfilename_[0]=='~')
 		#pragma warning (disable: 4996)
 		//env string is copied into string so following getenv usage is safe
-		_libraryfilename.replace(0,1, getenv("HOME"));
+		libraryfilename_.replace(0,1, getenv("HOME"));
 
-	//var(_libraryfilename).outputl();
+	//var(libraryfilename_).outputl();
 
-	_plibrary=(void*) dlopen(_libraryfilename.c_str(),RTLD_NOW);
+	plibrary_=(void*) dlopen(libraryfilename_.c_str(),RTLD_NOW);
 
 #ifdef dlerror
 	const char* dlsym_error = dlerror();
@@ -125,28 +190,31 @@ bool ExodusFunctorBase::openlib()
 		var(dlsym_error).outputl();
 #endif
 
-	return _plibrary!=NULL;
+	return plibrary_!=NULL;
 }
 
 bool ExodusFunctorBase::openfunc()
 {
 	//find the function and return true/false
-	//_pfunction = (EXODUSFUNCTYPE) dlsym(_plibrary, _functionname.c_str());
+	//pfunction_ = (EXODUSFUNCTYPE) dlsym(plibrary_, functionname_.c_str());
 
 #ifdef dlerror
 	dlerror();
 #endif
 
-	//var(_libraryfilename)^L" "^var(_functionname).outputl();
+	//var(libraryfilename_)^L" "^var(functionname_).outputl();
 
-	_pfunction = (void*) dlsym((library_t) _plibrary, _functionname.c_str());
+	//pfunction_ = (void*) dlsym((library_t) plibrary_, functionname_.c_str());
+	pfunction_ = (ExodusProgramBaseCreateDeleteFunction)
+		dlsym((library_t) plibrary_, functionname_.c_str());
 
 #ifdef dlerror
 	const char* dlsym_error = dlerror();
 	if (dlsym_error)
 		var(dlsym_error).outputl();
 #endif
-	return _pfunction!=NULL;
+	return pfunction_!=NULL;
+
 }
 
 }//namespace exodus
