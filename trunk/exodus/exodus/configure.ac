@@ -92,6 +92,7 @@ AX_BOOST_REGEX
 #AX_BOOST_SYSTEM
 AX_BOOST_THREAD
 
+echo checking for PostgreSQL libraries 8.1+
 AX_LIB_POSTGRESQL([8.1.0])
 
 #icu only required in boost at the moment
