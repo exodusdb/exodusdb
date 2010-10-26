@@ -34,5 +34,7 @@ extern "C" DLL_PUBLIC void exodusprogrambasecreatedelete( \
 			pexodusprogrambase=new ExodusProgram(mv); \
 			pmemberfunction=(pExodusProgramBaseMemberFunction) &ExodusProgram::main; \
 		} \
-        return; \
+		return; \
 }
+//purpose of the above is to either return a new exodusprogram object
+//and a pointer to its main function - or to delete an exodusprogram object
