@@ -575,6 +575,8 @@ program()
 										var funcargsdecl2=funcargsdecl;
 
 										var funcargstype="int";
+										if (useclassmemberfunctions)
+											funcargstype="";
 
                                         int nargs=dcount(funcargsdecl,",");
                                         for (int argn=1; argn<=nargs; ++argn) {

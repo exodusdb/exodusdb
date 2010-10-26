@@ -146,10 +146,40 @@ program()
 						var basefilename=field2(filename,_SLASH,-1);
 						basefilename=field(basefilename,".",dcount(basefilename,".")-1);
 
+						var progtype;
+						var question="1=Normal Program, 2=External Subroutine or Function";
+						//question^="\n3=main(), 4=simple so/dll\n";
+						question^="\n"^basefilename.quote()^" does not exist. Create what? (1-2) ";
+						while (true) {
+							progtype.input(question);
+							if (progtype eq 2)
+								progtype="classlib";
+							else if (progtype eq 3)
+								progtype="main";
+							else if (progtype eq 4)
+								progtype="mainlib";
+							else if (progtype eq 1)
+								progtype="class";
+							else
+								stop();
+							break;
+						}
+
                         newfile=true;
                         var blankfile="";
-
-						if (true) {
+						if (progtype eq "main" or progtype eq "mainlib") {
+	                        startatlineno="4,9";
+							blankfile^="#include <exodus/exodus.h>\n";
+							blankfile^="\n";
+							blankfile^="program() {\n";
+							blankfile^="\tprintl(\""^basefilename^" says 'Hello World!'\");\n";
+							if (progtype eq "mainlib")
+								blankfile^="\treturn 0;\n";
+							blankfile^="}\n";
+							if (progtype eq "mainlib")
+								blankfile.swapper("program()","function "^basefilename^"()");
+						} else if (progtype eq "class" or progtype eq "classlib") {
+	                        startatlineno="6,9";
 							blankfile^="#include <exodus/program.h>\n";
 							blankfile^="\n";
 							blankfile^="programinit()\n";
@@ -158,20 +188,18 @@ program()
 							blankfile^="\tprintl(\""^basefilename^" says 'Hello World!'\");\n";
 							blankfile^="\treturn 0;\n";
 							blankfile^="}\n";
+							blankfile^="\nprogramexit()";
 							blankfile^="\n";
-							blankfile^="programexit()\n";
-	                        startatlineno="6,9";
-						} else {
-							blankfile^="#include <exodus/exodus.h>\n";
-							blankfile^="\n";
-							blankfile^="program() {\n";
-							blankfile^="\tprintl(\""^basefilename^" says 'Hello World!'\");\n";
-							blankfile^="}\n";
-	                        startatlineno="4,9";
+
+							if (progtype eq "classlib")
+								blankfile.swapper("program","library");
 						}
 
-                        if (_SLASH ne "/")
+						if (blankfile.substr(1,1) ne "\n")
+							blankfile^="\n";
+						if (_SLASH ne "/")
                                 blankfile.swapper("\n","\r\n");
+
 			if (not oswrite(blankfile,filename))
 				stop("Cannot create "^filename^". Invalid file name, or no rights here.");
                   //      startatlineno="4,9";
