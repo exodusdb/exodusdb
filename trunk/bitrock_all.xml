@@ -1,7 +1,7 @@
 <project>
     <shortName>exodus</shortName>
     <fullName>Exodus Multivalue Database</fullName>
-    <version>10.10.3</version>
+    <version>10.10.6</version>
     <readmeFile>README</readmeFile>
     <licenseFile>COPYING</licenseFile>
     <leftImage>exodus.png</leftImage>
@@ -146,7 +146,7 @@
                             <origin>cli/src/exodus</origin>
                         </distributionFile>
                         <distributionFile>
-                            <origin>cli/src/edit</origin>
+                            <origin>cli/src/edir</origin>
                         </distributionFile>
                         <distributionFile>
                             <origin>cli/src/deleteindex</origin>
@@ -196,7 +196,7 @@
                     <distributionFileList>
                         <distributionDirectory>
                             <allowWildcards>1</allowWildcards>
-                            <includeFiles>*/exodus*.h;*/mv*.h;*/xfunc*.h</includeFiles>
+                            <includeFiles>*/exodus*.h;*/mv*.h;*/xfunc*.h;*/program.h;*/library.h</includeFiles>
                             <origin>exodus/exodus/exodus/*</origin>
                         </distributionDirectory>
                     </distributionFileList>
