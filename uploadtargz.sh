@@ -17,7 +17,7 @@
 #                        to the file
 
 ./googlecode_upload.py \
- -s "Builder for Linux etc. ./configure make && sudo make install" \
+ -s "Builder for Linux etc. ./configure && make && sudo make install" \
  -p "exodusdb" \
  -u "neosys.com@gmail.com" \
  -w "${GOOGLECODE_PASS}" \

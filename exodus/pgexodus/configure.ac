@@ -92,6 +92,7 @@ dnl ---------------------------------------
 
 #NB patch for postgres SERVER in m4/ax_lib_postgresql.m4
 #            POSTGRESQL_CFLAGS="-I`$PG_CONFIG --includedir` -I`$PG_CONFIG --includedir-server`"
+echo checking for PostgreSQL libraries 8.1+
 AX_LIB_POSTGRESQL([8.1.0])
 
 libdir=`pg_config --pkglibdir`
