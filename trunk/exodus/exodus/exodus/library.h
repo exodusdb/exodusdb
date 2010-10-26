@@ -24,7 +24,8 @@ classexit() \
 extern "C" DLL_PUBLIC void exodusprogrambasecreatedelete( \
                         pExodusProgramBase& pexodusprogrambase, \
                         MvEnvironment& mv, \
-						pExodusProgramBaseMemberFunction& pmemberfunction) \
+						pExodusProgramBaseMemberFunction& \
+						 pmemberfunction) \
 { \
 	if (pexodusprogrambase) {\
 			delete pexodusprogrambase; \
@@ -32,7 +33,6 @@ extern "C" DLL_PUBLIC void exodusprogrambasecreatedelete( \
 	} else { \
 			pexodusprogrambase=new ExodusProgram(mv); \
 			pmemberfunction=(pExodusProgramBaseMemberFunction) &ExodusProgram::main; \
-			CALLMEMBERFUNCTION(*pexodusprogrambase,pmemberfunction); \
 		} \
         return; \
 }
