@@ -83,7 +83,6 @@ That way you can forget the new exodus concept of "library" which is not a tradi
 
 //good programming practice
 //http://www.parashift.com/c++-faq-lite/pointers-to-members.html#faq-33.6
-// currently not used because a pure virtual function "entry" is used instead
 #define CALLMEMBERFUNCTION(object,ptrToMember)  ((object).*(ptrToMember)) 
 
 namespace exodus {
@@ -143,6 +142,7 @@ ExodusFunctorBase(const std::string libname,const std::string funcname);
 */
 
 //destructors of base classes must be virtual (if derived classes are going to be new/deleted?)
+//otherwise the destructor of the derived class is not called when it should be
 virtual ~ExodusFunctorBase();
 
 //use void* to speed compilation of exodus applications on windows by avoiding
