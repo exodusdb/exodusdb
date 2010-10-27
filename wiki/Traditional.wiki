@@ -5,7 +5,7 @@ These functions are designed to simulate traditional multivalue function and sta
   * Traditional functions are rendered as functions.
   * Traditional statements are also rendered as functions.
 
-==== In-place string modifier functions ("-er" functions) ====
+==== String Commands ====
 
 Most of the functions will be obvious to traditional multivalue programmers with the exception of the functions ending -ER for example trimmer(). All the "er" functions are designed to modify strings IN PLACE instead of returning new strings. The correspond to the old string modifier STATEMENTS instead of the old string functions.
 
