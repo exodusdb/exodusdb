@@ -61,7 +61,7 @@ Time/Date/Sleep
 ||cmd	||ossleep(milliseconds)||
 ||var=	||ostime()||
 
-System File and Directory
+System File
 ||if	||osopen(filename, out filehandle)||
 ||cmd	||osclose(filehandle)||
 ||var=	||osbread(filehandle, startoffset, length)||
@@ -73,6 +73,9 @@ System File and Directory
 ||if	||osdelete(osfilename)||
 ||if	||osrename(oldosfilename, newosfilename)||
 ||if	||oscopy(fromosdir_or_filename, newosdir_or_filename)||
+||cmd	||osflush()||
+
+System Directory
 ||var=	||oslist(path=".", wildcard="", mode=0)||
 ||var=	||oslistf(path=".", wildcard="")||
 ||var=	||oslistd(path=".", wildcard="")||
@@ -82,7 +85,6 @@ System File and Directory
 ||if	||osrmdir(dirname, evenifnotempty=false)||
 ||var=	||oscwd()||
 ||var=	||oscwd(dirname)||
-||cmd	||osflush()||
 
 Program Control
 ||var=	||suspend(command)||
