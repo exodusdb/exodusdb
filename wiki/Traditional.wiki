@@ -2,24 +2,24 @@
 
 These functions are designed to simulate traditional multivalue function and statement syntax as far as possible.
 
-  * Traditional functions are rendered as functions.
-  * Traditional statements are also rendered as functions.
+  * Traditional functions are rendered as Exodus functions.
+  * Traditional statements are also rendered as Exodus subroutines.
 
 ==== String Commands ====
 
-Most of the functions will be obvious to traditional multivalue programmers with the exception of the functions ending -ER for example trimmer(). All the "er" functions are designed to modify strings IN PLACE instead of returning new strings. The correspond to the old string modifier STATEMENTS instead of the old string functions.
+It will be obvious to traditional multivalue programmers how to use most of Exodus's subroutines and functions except those ending in "-er" for example trimmer(). All Exodus's "-er" statements are designed to modify strings IN PLACE instead of returning new strings and therefore correspond to the old multivalue string manipulation commands.
 
-For example the efficient modify in-place string conversion
+For example, the efficient classic multivalue "modify in-place" string conversion command:
 
- CONVERT "x" TO "y" IN ZZ
+ CONVERT 'ab' TO 'cd' IN ZZ
 
-is now represented in Exodus by ...
+is now represented in Exodus by:
 
- converter(cc,aa,bb);
+ converter(zz,"ab","cd");
 
-Traditional multivalue basic did not provide a full set of in-place string modification functions leading to inefficiencies for example traditional multivalue basic has a TRIM() function which would return a new string but no TRIM X statement which would modify the string in-place which is often far faster.
+Traditional multivalue basic did not provide a full set of in-place string modification commands leading to inefficiencies. For example, traditional multivalue basic has a TRIM() function which returns a new string but no TRIM X statement which would modify the string in-place which in many cases is far faster.
 
-Exodus provides a complete set of in-place string modification functions with the characteristic ending -er for example fieldstore() returns a new string whereas fieldstorer() modifies the string in-place.
+Exodus provides a complete set of in-place string modification "command functions" with the characteristic ending "-er". For example Exodus's fieldstorer() modifies the string in-place whereas fieldstore() returns a new string which is commonly .
 
 ==== Function Types ====
 
