@@ -7,7 +7,7 @@ These functions are designed to simulate traditional multivalue function and sta
 
 ==== String Commands ====
 
-It will be obvious to traditional multivalue programmers how to use most of Exodus's subroutines and functions except those ending in "-er" for example trimmer(). All Exodus's "-er" statements are designed to modify strings IN PLACE instead of returning new strings and therefore correspond to the old multivalue string manipulation commands.
+The use of most of Exodus's subroutines and functions will be obvious to traditional multivalue programmers except those ending in "-er" for example "converter()". All Exodus's "-er" statements are designed to modify strings IN PLACE instead of returning new strings. They therefore correspond to the old multivalue string manipulation commands.
 
 For example, the efficient classic multivalue "modify in-place" string conversion command:
 
