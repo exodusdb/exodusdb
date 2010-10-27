@@ -3,7 +3,7 @@
 These functions are designed to simulate traditional multivalue function and statement syntax as far as possible. Roughly speaking,
 
   * Traditional functions are rendered as Exodus functions.
-  * Traditional statements are also as Exodus subroutines.
+  * Traditional statements are as Exodus subroutines.
 
 ==== String Commands ====
 
