@@ -1,6 +1,6 @@
 === Traditional Multivalue Functions and Statements (non-OO) ===
 
-These functions are designed to simulate traditional multivalue function and statement syntax as far as possible. Roughly speaking,
+Exodus has a set of functions and subroutines that clone traditional multivalue function and statement behaviour and retain their syntax as far as possible.
 
   * Traditional functions are rendered as Exodus functions.
   * Traditional statements are as Exodus subroutines.
