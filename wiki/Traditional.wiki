@@ -17,9 +17,9 @@ is now represented in Exodus by:
 
  converter(zz,"ab","cd");
 
-Traditional multivalue basic did not provide a full set of in-place string modification commands leading to inefficiencies. For example, traditional multivalue basic has a TRIM() function which returns a new string but no TRIM X statement which would modify the string in-place which in many cases is far faster.
+Traditional multivalue basic did not provide a full set of in-place string modification commands leading to inefficiencies. For example, traditional multivalue basic has a TRIM() function which returns a new string. However there was no TRIM X statement which would modify the string in-place which in many cases would be much faster.
 
-Exodus provides a complete set of in-place string modification "command functions" with the characteristic ending "-er". For example Exodus's fieldstorer() modifies the string in-place whereas fieldstore() returns a new string which is commonly .
+To solve this problem, Exodus provides a complete set of in-place string modification "command functions" with the characteristic ending "-er". For example Exodus's fieldstorer() modifies the string in-place whereas fieldstore() returns a new string which is commonly .
 
 ==== Function Types ====
 
