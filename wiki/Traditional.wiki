@@ -3,7 +3,7 @@
 Exodus has a set of functions and subroutines that clone traditional multivalue function and statement behaviour and retain their syntax as far as possible.
 
   * Traditional functions are rendered as Exodus functions.
-  * Traditional statements are as Exodus subroutines.
+  * Traditional statements are rendered as Exodus subroutines.
 
 ==== String Commands ====
 
