@@ -130,13 +130,13 @@ String Construction
 String Info/Search
 ||var=  ||count(instring, substrx)||
 ||var=  ||dcount(instring, substrx)||
+||var=  ||index(instring, substr, startchar1=1)||
 ||var=  ||len(mv1)||
 ||var=  ||length(mv1)||
 ||if    ||match(instring, matchstr, options="")||
-||var=    ||seq(char1)||
-||var=    ||index(instring, substr, startchar1=1)||
+||var=  ||seq(char1)||
 
-String Filter
+String Functions
 ||var=	||convert(instring, fromchars, tochars)||
 ||var=  ||crop(instring)||
 ||var=  ||field(instring, substrx, fieldnx, nfieldsx=1)||
@@ -154,7 +154,7 @@ String Filter
 ||var=  ||trimf(instring, trimchar=" ")||
 ||var=	||ucase(instring)||
 
-String Mutation
+String Commands
 ||cmd2  ||converter(io instring, fromchars, tochars)||
 ||var=  ||cropper(io instring)||
 ||cmd2  ||fieldstorer(io instring, sepchar, fieldn, nfields, replacement)||
@@ -218,17 +218,19 @@ Dictionary
 ||var=	||xlate(filename, key, fieldno, mode)||
 ||var=	||xlate(filename, key, fieldno, mode)||
 
-Dynamic Arrays
-||var=	||remove(fromstr, io startx, out delimiterno)||
+Dynamic Array Functions
 ||var=	||replace(instring, fieldno, valueno, subvalueno, replacement)||
 ||var=	||extract(instring, fieldno=0, valueno=0, subvalueno=0)||
-||var=	||insert(instring, fieldno, valueno, subvalueno, insertion)||
 ||var=	||erase(instring, fieldno, valueno=0, subvalueno=0)||
-||cmd2 	||replacer(out instring, fieldno, valueno, subvalueno, replacement)||
-||cmd2 	||inserter(io instring, fieldno, valueno, subvalueno, insertion)||
-||cmd2 	||eraser(io instring, fieldno, valueno=0, subvalueno=0)||
+||var=  ||insert(instring, fieldno, valueno, subvalueno, insertion)||
 ||if	||locate(instring, target, out setting, fieldn=0, valuen=0)||
 ||if	||locateby(instring, target, ordercode, out setting, fieldn=0, valuen=0)||
 ||if	||locateusing(instring, target, usingchar, out setting, fieldn=0, valuen=0, subvaluen=0)||
 ||if	||locateusing(instring, target, usingchar)||
+||var=  ||remove(fromstr, io startx, out delimiterno)||
 ||var=	||sum(instring, sepchar=VM_)||
+
+Dynamic Array Commands
+||cmd2 	||replacer(out instring, fieldno, valueno, subvalueno, replacement)||
+||cmd2 	||inserter(io instring, fieldno, valueno, subvalueno, insertion)||
+||cmd2 	||eraser(io instring, fieldno, valueno=0, subvalueno=0)||
