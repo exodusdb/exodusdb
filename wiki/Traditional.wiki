@@ -102,7 +102,7 @@ Status
 Console Output
 ||cmd	||print(mv1)||
 ||cmd	||printl(mv1="")||
-||cmd	||printtab(mv1="")||
+||cmd	||printt(mv1="")||
 
 Cursor
 ||var=	||at(columnorcode)||
@@ -122,54 +122,54 @@ Numbers
 ||cmd    ||initrnd(seednumber)||
 ||var=    ||mod(dividend, divisor)||
 
-Strings
-||var=	||len(mv1)||
-||var=	||length(mv1)||
-||cmd2 	||converter(io instring, fromchars, tochars)||
+String Construction
+||var=  ||chr(integer)||
+||var=    ||str(instring, number)||
+||var=    ||space(number)||
+
+String Info/Search
+||var=  ||count(instring, substrx)||
+||var=  ||dcount(instring, substrx)||
+||var=  ||len(mv1)||
+||var=  ||length(mv1)||
+||if    ||match(instring, matchstr, options="")||
+||var=    ||seq(char1)||
+||var=    ||index(instring, substr, startchar1=1)||
+
+String Filter
 ||var=	||convert(instring, fromchars, tochars)||
-||cmd2 	||swapper(io instring, fromchars, tochars, options="")||
-||var=	||swap(instring, fromchars, tochars, options="")||
-||var=	||ucase(instring)||
-||cmd2 	||lcaser(io instring)||
+||var=  ||crop(instring)||
+||var=  ||field(instring, substrx, fieldnx, nfieldsx=1)||
+||var=  ||field2(instring, substrx, fieldnx, nfieldsx=1)||
+||var=  ||fieldstore(instring, sepchar, fieldn, nfields, replacement)||
 ||var=	||lcase(instring)||
-||cmd2 	||inverter(io instring)||
-||var=	||invert(instring)||
-||cmd2 	||lowerer(io instring)||
 ||var=	||lower(instring)||
-||cmd2 	||raiser(io instring)||
-||var=	||raise(instring)||
-||cmd2 	||splicer(io instring, start1, length, str)||
-||var=	||splice(instring, start1, length, str)||
-||cmd2 	||quoter(io instring)||
-||var=	||quote(instring)||
-||cmd2 	||fieldstorer(io instring, sepchar, fieldn, nfields, replacement)||
-||var=	||fieldstore(instring, sepchar, fieldn, nfields, replacement)||
-||cmd2 	||trimmer(io instring, trimchar=" ")||
-||var=	||trim(instring, trimchar=" ")||
-||cmd2 	||trimmerf(io instring, trimchar=" ")||
-||var=	||trimf(instring, trimchar=" ")||
-||cmd2 	||trimmerb(io instring, trimchar=" ")||
-||var=	||trimb(instring, trimchar=" ")||
-||cmd2 	||trimmer(io instring, trimchar)||
-||var=	||trim(instring, trimchar)||
-||cmd2 	||trimmerf(io instring, trimchar)||
-||var=	||trimf(instring, trimchar)||
-||var=	||crop(instring)||
-||var=	||cropper(io instring)||
-||var=	||chr(integer)||
-||if	||match(instring, matchstr, options="")||
-||var=	||seq(char1)||
-||var=	||str(instring, number)||
-||var=	||space(number)||
-||var=	||dcount(instring, substrx)||
-||var=	||count(instring, substrx)||
+||var=  ||raise(instring)||
+||var=  ||splice(instring, start1, length, str)||
 ||var=	||substr(instring, startx)||
 ||var=	||substr(instring, startx, length)||
-||var=	||substrer(io instring, startx)||
-||var=	||substrer(io instring, startx, length)||
-||var=	||index(instring, substr, startchar1=1)||
-||var=	||field(instring, substrx, fieldnx, nfieldsx=1)||
-||var=	||field2(instring, substrx, fieldnx, nfieldsx=1)||
+||var=	||swap(instring, fromchars, tochars, options="")||
+||var=  ||trim(instring, trimchar=" ")||
+||var=  ||trimb(instring, trimchar=" ")||
+||var=  ||trimf(instring, trimchar=" ")||
+||var=	||ucase(instring)||
+
+String Mutation
+||cmd2  ||converter(io instring, fromchars, tochars)||
+||var=  ||cropper(io instring)||
+||cmd2  ||fieldstorer(io instring, sepchar, fieldn, nfields, replacement)||
+||cmd2  ||lcaser(io instring)||
+||cmd2  ||lowerer(io instring)||
+||cmd2  ||quoter(io instring)||
+||cmd2  ||raiser(io instring)||
+||cmd2  ||splicer(io instring, start1, length, str)||
+||var=  ||substrer(io instring, startx)||
+||var=  ||substrer(io instring, startx, length)||
+||cmd2  ||swapper(io instring, fromchars, tochars, options="")||
+||cmd2  ||trimmer(io instring, trimchar=" ")||
+||cmd2  ||trimmerb(io instring, trimchar=" ")||
+||cmd2  ||trimmerf(io instring, trimchar=" ")||
+||var=  ||ucaser(io instring)||
 
 ICONV/OCONV
 ||var=	||oconv(instring, conversion)||
