@@ -127,7 +127,7 @@ var Server::run()
 	nrequests = env.SYSTEM.extract(35) + 0;
 	//if tracing then
 	std::wcout << L"NEOSYS.NET SERVICE "<< env.SYSTEM.extract(24);
-	std::wcout << L" STARTED "<< var().timedate() << std::endl;
+	std::wcout << L" STARTED "<< var().datetime() << std::endl;
 	std::wcout << std::endl;
 
 	std::wcout << L"Station  : "<< env.STATION<<std::endl;
@@ -1205,7 +1205,7 @@ void Server::gosub_requestexit()
 		env.USER3 = L"Error: No response";
 
 	if (env.USER3.index(L"ERROR NO:", 1))
-		env.log(L"Server", env.USER3);
+		env.logger(L"Server", env.USER3);
 
 	env.USERNAME=Serverusername;
 	env.STATION=Serverstation;
@@ -1657,7 +1657,7 @@ keyx=L"";
 			//simulate environment for postread
 			win.srcfile = file;
 			win.datafile = filename;
-			if (!env.DICT.open(L"DICT", win.datafile)) {
+			if (!env.DICT.open(L"dict_"^win.datafile)) {
 				env.USER3 = L"Server::gosub_process() DICT." ^ win.datafile ^ L" file cannot be opened";
 				gosub_formatresponse();
 				if (sessionid)
@@ -1811,7 +1811,7 @@ keyx=L"";
 			return;
 		}
 
-		if (!env.DICT.open(L"DICT", win.datafile)) {
+		if (!env.DICT.open(L"dict_"^win.datafile)) {
 			env.USER3 = (L"DICT." ^ win.datafile).quote() ^ L" file is not available";
 			return;
 		}

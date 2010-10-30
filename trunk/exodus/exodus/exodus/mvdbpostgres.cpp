@@ -442,16 +442,8 @@ bool var::disconnect()
 
 bool var::open(const var& filename)
 {
-	THISIS(L"bool var::open(const var& filename)")
-
-	return open(L"",filename);
-}
-
-bool var::open(const var& dictcode,const var& filename)
-{
 	THISIS(L"bool var::open(const var& dictcode,const var& filename)")
 	THISISDEFINED()
-	ISSTRING(dictcode)
 	ISSTRING(filename)
 
     //dumb version of read to see if file exists
@@ -471,14 +463,7 @@ bool var::open(const var& dictcode,const var& filename)
     paramFormats[0] = 1;//binary
 
 	//TODO optimise by doing something other than SELECT * where key = ""?
-	var sql=L"SELECT key FROM " PGDATAFILEPREFIX;
-    if (dictcode.ucase()==L"DICT")
-        sql^=L"dict_";
-    else if (dictcode)
-        sql^=dictcode;
-    if (filename) sql^=filename.convert(L".",L"_");
-    else sql^=filename;
-    sql^= L" WHERE key = $1";
+	var sql=L"SELECT key FROM "^filename.convert(L".",L"_")^L" WHERE key = $1";
 
     PGconn* thread_pgconn=(PGconn*) connection();
 	if (!thread_pgconn)
@@ -509,7 +494,6 @@ bool var::open(const var& dictcode,const var& filename)
 
 	//save the filename
 	var_mvstr=L"";
-	if (dictcode.ucase()==L"DICT") var_mvstr=PGDATAFILEPREFIX L"dict_";
 	//var_mvstr+=filename.var_mvstr;
 	var_mvstr+=filename.convert(L". ",L"__").towstring();
 	var_mvtype=pimpl::MVTYPE_STR;
@@ -1390,13 +1374,15 @@ var getdictexpression(const var& mainfilename, const var& filename, const var& d
 	if (!actualdictfile)
 	{
 		var dictfilename;
-		if (mainfilename.substr(1,5).ucase() == L"DICT_")
+		if (mainfilename.substr(1,5)== L"dict_")
 			dictfilename=L"dict_voc";
 		else
 			dictfilename=L"dict_"^mainfilename;
 		if (!actualdictfile.open(dictfilename))
 		{
-			throw MVDBException(L"getdictexpression() cannot open " ^ dictfilename.quote());
+			//throw MVDBException(L"getdictexpression() cannot open " ^ dictfilename.quote());
+			exodus::errputl(L"getdictexpression() cannot open " ^ dictfilename.quote());
+			return L"";
 		}
 	}
 	//given a file and dictionary id
@@ -1410,7 +1396,11 @@ var getdictexpression(const var& mainfilename, const var& filename, const var& d
 			if (fieldname==L"@ID")
 				dictrec = L"F" ^ FM ^ L"0" ^ FM ^ L"Ref" ^ FM ^ FM ^ FM ^ FM ^ FM ^ FM ^ L"L" ^ FM ^ 15;
 			else
-				throw MVDBException(L"getdictexpression() cannot read " ^ fieldname.quote() ^ L" from " ^ actualdictfile.quote());
+			{
+				//throw MVDBException(L"getdictexpression() cannot read " ^ fieldname.quote() ^ L" from " ^ actualdictfile.quote());
+				exodus::errputl(L"getdictexpression() cannot read " ^ fieldname.quote() ^ L" from " ^ actualdictfile.quote());
+				return L"";
+			}
 		}
 	}
     var sqlexpression;
@@ -1494,7 +1484,9 @@ var getdictexpression(const var& mainfilename, const var& filename, const var& d
 				}
 				else
 				{
-					throw  MVDBException(L"getdictexpression() " ^ filename.quote() ^ L" " ^ fieldname.quote() ^ L" - INVALID DICTIONARY EXPRESSION - " ^ dictrec.extract(8).quote());
+					//throw  MVDBException(L"getdictexpression() " ^ filename.quote() ^ L" " ^ fieldname.quote() ^ L" - INVALID DICTIONARY EXPRESSION - " ^ dictrec.extract(8).quote());
+					exodus::errputl(L"getdictexpression() " ^ filename.quote() ^ L" " ^ fieldname.quote() ^ L" - INVALID DICTIONARY EXPRESSION - " ^ dictrec.extract(8).quote());
+					return L"";
 				}
 
 				//add the join
@@ -1515,7 +1507,9 @@ var getdictexpression(const var& mainfilename, const var& filename, const var& d
 	else
 	{
 		//throw  filename ^ L" " ^ fieldname ^ L" - INVALID DICTIONARY ITEM";
-		throw  MVDBException(L"getdictexpression(" ^ filename.quote() ^ L", " ^ fieldname.quote() ^ L") invalid dictionary type " ^ dicttype.quote());
+		//throw  MVDBException(L"getdictexpression(" ^ filename.quote() ^ L", " ^ fieldname.quote() ^ L") invalid dictionary type " ^ dicttype.quote());
+		exodus::errputl(L"getdictexpression(" ^ filename.quote() ^ L", " ^ fieldname.quote() ^ L") invalid dictionary type " ^ dicttype.quote());
+		return L"";
 	}
     return sqlexpression;
 }
@@ -1711,8 +1705,12 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
         else if (word1==L"USING")
         {
 			var dictfilename=getword(remainingsortselectclause);
-			if (!dictfile.open(L"DICT",dictfilename))
-				throw MVDBException(L"select() dict_" ^ dictfilename ^ L" file cannot be opened");
+			if (!dictfile.open(L"dict_"^dictfilename))
+			{
+				//throw MVDBException(L"select() dict_" ^ dictfilename ^ L" file cannot be opened");
+				exodus::errputl(L"select() dict_" ^ dictfilename ^ L" file cannot be opened");
+				return L"";
+			}
         }
         else if (word1==L"BY" || word1==L"BY-DSND")
         {
@@ -1808,7 +1806,11 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 				//get, check, discard AND
 				word2=getword(remainingsortselectclause);
 				if (word2 != L"AND")
-					throw MVDBException(L"SELECT STATEMENT SYNTAX IS 'BETWEEN x *AND* y'");
+				{
+					//throw MVDBException(L"SELECT STATEMENT SYNTAX IS 'BETWEEN x *AND* y'");
+					exodus::errputl(L"SELECT STATEMENT SYNTAX IS 'BETWEEN x *AND* y'");
+					return L"";
+				}
 
 				whereclause ^= L" AND ";
 
@@ -2145,7 +2147,7 @@ var var::listfiles() const
 	var sql=L"SELECT table_name FROM information_schema.tables WHERE table_type = 'BASE TABLE' AND table_schema NOT IN ('pg_catalog', 'information_schema'); ";
 
 	//execute command or return empty string
-	//connection();
+	connection();
 	PGresultptr result;
 	if (!pqexec(sql,result))
 		return L"";
@@ -2188,7 +2190,7 @@ var var::listindexes(const var& filename) const
 		 L");";
 
 	//execute command or return empty string
-	//connection();
+	connection();
 	PGresultptr result;
 	if (!pqexec(sql,result))
 		return L"";

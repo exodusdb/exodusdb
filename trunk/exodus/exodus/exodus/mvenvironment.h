@@ -151,7 +151,7 @@ public:
 	bool authorised(const var& task);
 	void readuserprivs();
 	void writeuserprivs();
-	void log(const var& programname, const var& logtext);
+	void logger(const var& programname, const var& logtext);
 	var singular(const var& pluralnoun);
 	void flushindex(const var& filename);
 	void sysmsg(const var& msg);

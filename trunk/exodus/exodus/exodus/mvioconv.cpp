@@ -33,7 +33,10 @@ THE SOFTWARE.
 #include <exodus/mv.h>
 #include <exodus/mvexceptions.h>
 
-#define HEX_IO_RATIO sizeof(wchar_t)*2
+//for now all hex is output as 8 hex digits per internal character
+//actually on win32 where sizeof wchar is 2 (bytes) we could do only 4
+//#define HEX_IO_RATIO sizeof(wchar_t)*2
+#define HEX_IO_RATIO 8
 
 using namespace std;
 
@@ -912,6 +915,8 @@ var var::iconv_MT(const wchar_t* conversion) const
 	//PM
 	if (inttime<43200&&(*this).index(L"P"))
 		inttime+=43200;
+	else if (inttime>43200&&(*this).index(L"A"))
+		inttime-=43200;
 
 	return inttime;
 

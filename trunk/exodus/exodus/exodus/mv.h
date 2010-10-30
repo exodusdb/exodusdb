@@ -167,6 +167,20 @@ namespace exodus {
 #define _DQ_ L"\""
 #define _SQ_ L"\'"
 
+#define _IM_ L"\xFF"
+#define _RM_ L"\xFF"
+//#define _FM_ L"\376"
+#define _FM_ L"\xFE"
+#define _AM_ L"\xFE"
+#define _VM_ L"\xFD"
+#define _SM_ L"\xFC"
+#define _SVM_ L"\xFC"
+#define _TM_ L"\xFB"
+#define _STM_ L"\xFA"
+#define _SSTM_ L"\xF9"
+#define _DQ_ L"\""
+#define _SQ_ L"\'"
+
 //these macros (with trailing _) are wchar versions of the pick delimiters
 #define IM_ L'\xFF'
 #define RM_ L'\xFF'
@@ -425,6 +439,9 @@ public:
 	var__extractreplace operator() (int fieldn, int valuen=0, int subvaluen=0) const;
 	var__extractreplace operator() (int fieldn, int valuen=0, int subvaluen=0);
 	*/
+	var operator() (int fieldn, int valuen=0, int subvaluen=0) const;
+	//dont declare this so we force use of the above which returns a temporary on the RHS
+	//var& operator() (int fieldn, int valuen=0, int subvaluen=0);
 
 	//UNARY OPERATORS
 	/////////////////
@@ -635,7 +652,7 @@ public:
 	//OS TIME/DATE
 	var date() const;
 	var time() const;
-	var timedate() const;
+	var datetime() const;
 	void ossleep(const int milliseconds) const;
 	var ostime() const;
 
@@ -874,13 +891,25 @@ public:
 	//var& remover(var& startx,var& length) const;
 
 	var replace(const int fieldn,const int valuen,const int subvaluen,const var& replacement) const;
-	var extract(const int fieldn,const int valuen=0,const int subvaluen=0) const;
+	var replace(const int fieldn,const int valuen,const var& replacement) const;
+	var replace(const int fieldn,const var& replacement) const;
+
 	var insert(const int fieldn,const int valuen,const int subvaluen,const var& insertion) const;
+	var insert(const int fieldn,const int valuen,const var& insertion) const;
+	var insert(const int fieldn,const var& insertion) const;
+
 	var erase(const int fieldn, const int valuen=0, const int subvaluen=0) const;
+	var extract(const int fieldn,const int valuen=0,const int subvaluen=0) const;
 
 	//mutable versions update and return source
 	var& replacer(const int fieldn,const int valuen,const int subvaluen,const var& replacement);
+	var& replacer(const int fieldn,const int valuen,const var& replacement);
+	var& replacer(const int fieldn,const var& replacement);
+
 	var& inserter(const int fieldn,const int valuen,const int subvaluen,const var& insertion);
+	var& inserter(const int fieldn,const int valuen,const var& insertion);
+	var& inserter(const int fieldn,const var& insertion);
+
 	var& eraser(const int fieldn, const int valuen=0, const int subvaluen=0);
 	//-er version could be extract and erase in one go
 	//var& extracter(int fieldn,int valuen=0,int subvaluen=0) const;
@@ -914,7 +943,6 @@ public:
 	var listindexes(const var& filename) const;
 
 	bool open(const var& dbfilename);
-	bool open(const var& dict,const var& dbfilename);
 	void close();
 
 	bool select(const var& sortselectclause = L"") const;
@@ -1139,11 +1167,14 @@ public:
 	var matunparse() const;
 
 	// parenthesis operators often come in pairs
-	//following is called REGARDLESS of LHS/RHS
 	var& operator() (int row, int col=1);
+
 	//following const version is called if we do () on a varray which was defined as const xx
-	//probably will never be used
 	var& operator() (int row, int col=1) const;
+
+	//Q: why is this commented out?
+	//A: we dont want to COPY vars out of an array when using it in rhs expression
+	//var operator() (int row, int col=1) const;
 
 	varray& init(const var& mv1);
 
@@ -1301,6 +1332,7 @@ void DLL_PUBLIC setenvironmentn(const int environmentn);
 
 int DLL_PUBLIC getenvironmentn();
 var DLL_PUBLIC getprocessn();
+var DLL_PUBLIC getexecpath();
 
 }//namespace exodus
 

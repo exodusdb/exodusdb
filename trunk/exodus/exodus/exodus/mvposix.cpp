@@ -12,6 +12,11 @@ var getprocessn()
 	return var((int) getpid());
 }
 
+var getexecpath()
+{
+	return "";
+}
+
 }//of namespace exodus
 
 #endif

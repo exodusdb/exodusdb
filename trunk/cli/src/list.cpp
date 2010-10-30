@@ -387,7 +387,7 @@ public:
                 gtotreq = "";
                 nobase = "";
 
-                if (!(openfile("DICT.VOC", dictvoc)))
+                if (!(openfile("DICT_VOC", dictvoc)))
                         //stop("Cannot open DICT.VOC");
                         dictvoc="";
 
@@ -449,12 +449,12 @@ phraseinit:
                                 gosub getword();
                                 filename = "dict_" ^ word;
                         }
-                        if (filename.substr(1, 5) eq "dict_") {
+                        if (filename.substr(1, 5).lcase() eq "dict_") {
                                 dictfilename = "VOC";
                         } else {
                                 dictfilename = filename;
                         }
-                        if (not env.DICT.open("DICT", dictfilename))
+                        if (not env.DICT.open("dict_"^dictfilename))
                                 env.DICT = dictvoc;
                         ss ^= " " ^ word;
 
@@ -608,7 +608,7 @@ phraseinit:
                 } else if (word eq "USING") {
                         gosub getword();
                         dictfilename = word;
-                        if (!(env.DICT.open("DICT", dictfilename))) {
+                        if (!(env.DICT.open("dict_"^dictfilename))) {
                                 fsmsg();
                                 var().stop();
                         }

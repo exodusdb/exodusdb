@@ -30,7 +30,13 @@ program()
 
         var verbose=_OPTIONS.index("V");
 
+		if (verbose)
+			_EXECPATH.outputl("Executable:");
+
         var exodusbinpath=field(_EXECPATH,_SLASH,1,dcount(_EXECPATH,_SLASH)-1);
+
+		if (verbose)
+			exodusbinpath.outputl("Path:");
 
         //if (not var().load("libpq.dll"))
         //	printl("Warning: Cannot find libpq.dll to connect to postgres");
@@ -92,12 +98,17 @@ program()
                 //2. build source folder of exodus
                 //3. EXODUS_INCLUDE envvar
                 var exodusincludepath=exodusbinpath^"\\..\\include";
-                if (!osdir(exodusincludepath))
-                        exodusincludepath=exodusbinpath^"\\..\\exodus\\exodus";
+				var searched=exodusincludepath;
+				if (!osdir(exodusincludepath)) {
+					exodusincludepath=exodusbinpath^"\\..\\exodus\\exodus";
+					searched.replacer(-1,exodusincludepath);
+				}
                 if (!osfile(exodusincludepath^"\\exodus\\exodus.h")) {
                         exodusincludepath=osgetenv("EXODUS_INCLUDE");
+						searched.replacer(-1,exodusincludepath);
                         if (!osfile(exodusincludepath^"\\exodus.h")) {
-                                errput("Couldnt find exodus include path (exodus.h)");
+                                errputl("Couldnt find exodus include path (exodus.h)");
+								errputl(searched.swap(FM,"\n"));
                                 exodusincludepath="";
                         }
                 }

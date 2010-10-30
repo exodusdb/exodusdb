@@ -109,7 +109,7 @@ var var::time() const
 	return int(localtimeofdaynow.hours()*3600+localtimeofdaynow.minutes()*60+localtimeofdaynow.seconds());
 }
 
-var var::timedate() const
+var var::datetime() const
 {
 	//output the current "HH:MM:SS  DD MMM YYYY" without quotes but note the double space
 

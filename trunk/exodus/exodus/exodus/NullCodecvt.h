@@ -1,4 +1,3 @@
-/* not used in exodus currently
 
 //from http://www.codeproject.com/vcpp/stl/upgradingstlappstounicode.asp
 
@@ -70,4 +69,3 @@ protected:
 
 #endif //NULLCODECVT_H
 
-*/

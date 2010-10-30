@@ -49,9 +49,9 @@ DLL_PUBLIC var time()
 	return var().time();
 }
 
-DLL_PUBLIC var timedate()
+DLL_PUBLIC var datetime()
 {
-	return var().timedate();
+	return var().datetime();
 }
 
 void DLL_PUBLIC ossleep(const int milliseconds)
@@ -471,6 +471,16 @@ DLL_PUBLIC var quote(const var& instring)
 	return instring.quote();
 }
 
+DLL_PUBLIC var& unquoter(var& instring)
+{
+	return instring.unquoter();
+}
+
+DLL_PUBLIC var unquote(const var& instring)
+{
+	return instring.unquote();
+}
+
 DLL_PUBLIC var& fieldstorer(var& instring, const var& sepchar,const int fieldn, const int nfields,const var& replacement)
 {
 	return instring.fieldstorer(sepchar, fieldn, nfields, replacement);
@@ -491,64 +501,64 @@ DLL_PUBLIC var cropper(var& instring)
 	return instring.cropper();
 }
 
-DLL_PUBLIC var& trimmer(var& instring, const wchar_t* trimchar)
+DLL_PUBLIC var& trimmer(var& instring, const wchar_t* trimchars)
 {
-	return instring.trimmer(trimchar);
+	return instring.trimmer(trimchars);
 }
 
-DLL_PUBLIC var trim(const var& instring, const wchar_t* trimchar)
+DLL_PUBLIC var trim(const var& instring, const wchar_t* trimchars)
 {
-	return instring.trim(trimchar);
+	return instring.trim(trimchars);
 }
 
-DLL_PUBLIC var& trimmerf(var& instring, const wchar_t* trimchar)
+DLL_PUBLIC var& trimmerf(var& instring, const wchar_t* trimchars)
 {
-	return instring.trimmerf(trimchar);
+	return instring.trimmerf(trimchars);
 }
 
-DLL_PUBLIC var trimf(const var& instring, const wchar_t* trimchar)
+DLL_PUBLIC var trimf(const var& instring, const wchar_t* trimchars)
 {
-	return instring.trimf(trimchar);
+	return instring.trimf(trimchars);
 }
 
-DLL_PUBLIC var& trimmerb(var& instring, const wchar_t* trimchar)
+DLL_PUBLIC var& trimmerb(var& instring, const wchar_t* trimchars)
 {
-	return instring.trimmerb(trimchar);
+	return instring.trimmerb(trimchars);
 }
 
-DLL_PUBLIC var trimb(const var& instring, const wchar_t* trimchar)
+DLL_PUBLIC var trimb(const var& instring, const wchar_t* trimchars)
 {
-	return instring.trimb(trimchar);
+	return instring.trimb(trimchars);
 }
 
-DLL_PUBLIC var& trimmer(var& instring, const var trimchar)
+DLL_PUBLIC var& trimmer(var& instring, const var trimchars)
 {
-	return instring.trimmer(trimchar);
+	return instring.trimmer(trimchars);
 }
 
-DLL_PUBLIC var trim(const var& instring, const var trimchar)
+DLL_PUBLIC var trim(const var& instring, const var trimchars)
 {
-	return instring.trim(trimchar);
+	return instring.trim(trimchars);
 }
 
-DLL_PUBLIC var& trimmerf(var& instring, const var trimchar)
+DLL_PUBLIC var& trimmerf(var& instring, const var trimchars)
 {
-	return instring.trimmerf(trimchar);
+	return instring.trimmerf(trimchars);
 }
 
-DLL_PUBLIC var trimf(const var& instring, const var trimchar)
+DLL_PUBLIC var trimf(const var& instring, const var trimchars)
 {
-	return instring.trimf(trimchar);
+	return instring.trimf(trimchars);
 }
 
-DLL_PUBLIC var& trimmerb(var& instring, const var trimchar)
+DLL_PUBLIC var& trimmerb(var& instring, const var trimchars)
 {
-	return instring.trimmerb(trimchar);
+	return instring.trimmerb(trimchars);
 }
 
-DLL_PUBLIC var trimb(const var& instring, const var trimchar)
+DLL_PUBLIC var trimb(const var& instring, const var trimchars)
 {
-	return instring.trimb(trimchar);
+	return instring.trimb(trimchars);
 }
 
 DLL_PUBLIC var chr(const var& integer)
@@ -806,14 +816,6 @@ DLL_PUBLIC bool open(const var& filename, var& filehandle)
 	return filehandle.open(filename);
 }
 
-DLL_PUBLIC bool open(const var& dictdata, const var& filename, var& filehandle)
-{
-	if (dictdata==L"DICT")
-		return filehandle.open(dictdata,filename);
-	else
-		return filehandle.open(filename);
-}
-
 DLL_PUBLIC bool read(var& record, const var& filehandle, const var& key)
 {
 	return record.read(filehandle,key);
@@ -901,44 +903,82 @@ DLL_PUBLIC var remove(const var& fromstr, var& startx, var& delimiterno)
 	return fromstr.remove(startx,delimiterno);
 }
 
-//TODO (sb) provide versions of the following that accept ints+vars in all the various combinations or a template
-//to optimise away the unnecessary int->var conversion
-DLL_PUBLIC var replace(const var& instring, const var& fieldno, const var& valueno, const var& subvalueno, const var& replacement)
+DLL_PUBLIC var replace(const var& instring, const int fieldno, const int valueno, const int subvalueno, const var& replacement)
 {
 	return instring.replace(fieldno, valueno, subvalueno, replacement);
 }
 
-DLL_PUBLIC var extract(const var& instring, const var& fieldno, const var& valueno, const var& subvalueno)
+DLL_PUBLIC var replace(const var& instring, const int fieldno, const int valueno, const var& replacement)
+{
+	return instring.replace(fieldno, valueno, 0, replacement);
+}
+
+DLL_PUBLIC var replace(const var& instring, const int fieldno, const var& replacement)
+{
+	return instring.replace(fieldno, 0, 0, replacement);
+}
+
+DLL_PUBLIC var extract(const var& instring, const int fieldno, const int valueno, const int subvalueno)
 {
 	return instring.extract(fieldno, valueno, subvalueno);
 }
 
-DLL_PUBLIC var insert(const var& instring, const var& fieldno, const var& valueno, const var& subvalueno, const var& insertion)
+DLL_PUBLIC var insert(const var& instring, const int fieldno, const int valueno, const int subvalueno, const var& insertion)
 {
 	return instring.insert(fieldno, valueno, subvalueno, insertion);
 }
 
-DLL_PUBLIC var erase(const var& instring, const var& fieldno, const var& valueno, const var& subvalueno)
+DLL_PUBLIC var insert(const var& instring, const int fieldno, const int valueno, const var& insertion)
+{
+	return instring.insert(fieldno, valueno, 0, insertion);
+}
+
+DLL_PUBLIC var insert(const var& instring, const int fieldno, const var& insertion)
+{
+	return instring.insert(fieldno, 0, 0, insertion);
+}
+
+DLL_PUBLIC var erase(const var& instring, const int fieldno, const int valueno, const int subvalueno)
 {
 	return instring.erase(fieldno, valueno, subvalueno);
 }
 
-DLL_PUBLIC var& replacer(var& instring, const var& fieldno, const var& valueno, const var& subvalueno, const var& replacement)
+DLL_PUBLIC var& replacer(var& instring, const int fieldno, const int valueno, const int subvalueno, const var& replacement)
 {
 	return instring.replacer(fieldno, valueno, subvalueno, replacement);
 }
 
-DLL_PUBLIC var& inserter(var& instring, const var& fieldno, const var& valueno, const var& subvalueno, const var& insertion)
+DLL_PUBLIC var& replacer(var& instring, const int fieldno, const int valueno, const var& replacement)
+{
+	return instring.replacer(fieldno, valueno, 0, replacement);
+}
+
+DLL_PUBLIC var& replacer(var& instring, const int fieldno, const var& replacement)
+{
+	return instring.replacer(fieldno, 0, 0, replacement);
+}
+
+DLL_PUBLIC var& inserter(var& instring, const int fieldno, const int valueno, const int subvalueno, const var& insertion)
 {
 	return instring.inserter(fieldno, valueno, subvalueno, insertion);
 }
 
-DLL_PUBLIC var& eraser(var& instring, const var& fieldno, const var& valueno, const var& subvalueno)
+DLL_PUBLIC var& inserter(var& instring, const int fieldno, const int valueno, const var& insertion)
+{
+	return instring.inserter(fieldno, valueno, 0, insertion);
+}
+
+DLL_PUBLIC var& inserter(var& instring, const int fieldno, const var& insertion)
+{
+	return instring.inserter(fieldno, 0, 0, insertion);
+}
+
+DLL_PUBLIC var& eraser(var& instring, const int fieldno, const int valueno, const int subvalueno)
 {
 	return instring.eraser(fieldno, valueno, subvalueno);
 }
 
-DLL_PUBLIC bool locate(const var& target, const var& instring, var& setting, const int fieldn,const int valuen)
+DLL_PUBLIC bool locate(const var& target, const var& instring, var& setting, const int fieldn, const int valuen)
 {
 	return instring.locate(target,setting,fieldn,valuen);
 }
@@ -1038,7 +1078,12 @@ int exodus_main(int exodus__argc, char *exodus__argv[])
 	//install_signals();
 	var().breakon();
 
-	_EXECPATH=exodus__argv[0];
+	_EXECPATH=getexecpath();
+	if (not _EXECPATH) {
+		_EXECPATH=exodus__argv[0];
+		if (not _EXECPATH.index(_SLASH))
+			_EXECPATH.splicer(1,0,oscwd()^_SLASH);
+	}
 	//"see getting path to current executable" above
 	//or use "which _EXECPATH somehow like in mvdebug.cpp
 	//if (not _EXECPATH.index(_SLASH) && not _EXECPATH.index(":"))

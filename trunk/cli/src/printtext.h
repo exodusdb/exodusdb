@@ -268,7 +268,7 @@ private:
                         for (var ii = 1; ii <= optionchars.length(); ii++) {
                                 var optionchar = optionchars.substr(ii, 1);
                                 if (optionchar == "T") {
-                                        newoptions ^= timedate();
+                                        newoptions ^= datetime();
 
                                 } else if (optionchar == "D") {
                                         newoptions ^= (var().date()).oconv("[DATE,*]");
