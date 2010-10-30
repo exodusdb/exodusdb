@@ -779,8 +779,6 @@ var& var::osbread(const var& osfilehandle, const int startoffset, const int size
 	unsigned int readsize=size;
 	if (readfrom+readsize>maxsize)
 		readsize=maxsize-readfrom;
-	if (readsize>4000000)
-		var xx="xx";
 
 	//nothing to read
 	if (readsize<=0)
