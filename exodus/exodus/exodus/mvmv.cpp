@@ -743,6 +743,18 @@ bool var::locateat(const std::wstring& target,size_t start_pos,size_t end_pos,co
 //EXTRACT
 ///////////////////////////////////////////
 
+var var::operator() (int fieldn, int valuen, int subvaluen) const
+{
+	return extract(fieldn,valuen,subvaluen);
+}
+
+/*
+var& var::operator() (int fieldn, int valuen, int subvaluen)
+{
+	return extract(fieldn,valuen,subvaluen);
+}
+*/
+
 //extract int int int
 //NB declared with value=0 and subvalue=0
 var var::extract(const int argfieldn, const int argvaluen, const int argsubvaluen) const
@@ -1027,6 +1039,38 @@ var var::replace(const int fieldn,const int valuen,const int subvaluen,const var
 	return var(*this).replacer(fieldn,valuen,subvaluen,replacement);
 }
 
+var var::replace(const int fieldn,const int valuen,const var& replacement) const
+{
+	THISIS(L"var var::replace(const int fieldn,const int valuen,const var& replacement) const")
+	THISISSTRING()
+
+	return var(*this).replacer(fieldn,valuen,0,replacement);
+}
+
+var var::replace(const int fieldn,const var& replacement) const
+{
+	THISIS(L"var var::replace(const int fieldn,const var& replacement) const")
+	THISISSTRING()
+
+	return var(*this).replacer(fieldn,0,0,replacement);
+}
+
+var& var::replacer(const int fieldn,const int valuen,const var& replacement)
+{
+	THISIS(L"var var::replacer(const int fieldn,const int valuen,const var& replacement")
+	THISISSTRING()
+
+	return replacer(fieldn,valuen,0,replacement);
+}
+
+var& var::replacer(const int fieldn,const var& replacement)
+{
+	THISIS(L"var var::replacer(const int fieldn,const var& replacement)")
+	THISISSTRING()
+
+	return replacer(fieldn,0,0,replacement);
+}
+
 var& var::replacer(int fieldn,int valuen,int subvaluen,const var& replacement)
 {
 	THISIS(L"var& var::replacer(int fieldn,int valuen,int subvaluen,const var& replacement)")
@@ -1205,6 +1249,22 @@ var var::insert(const int fieldn,const int valuen,const int subvaluen,const var&
 
 	var newmv=*this;
 	return newmv.inserter(fieldn,valuen,subvaluen,insertion);
+}
+
+var& var::inserter(const int fieldn,const int valuen,const var& insertion)
+{
+	THISIS(L"var var::inserter(const int fieldn,const int valuen,const var& insertion")
+	THISISSTRING()
+
+	return inserter(fieldn,valuen,0,insertion);
+}
+
+var& var::inserter(const int fieldn,const var& insertion)
+{
+	THISIS(L"var var::inserter(const int fieldn,const var& insertion")
+	THISISSTRING()
+
+	return inserter(fieldn,0,0,insertion);
 }
 
 var& var::inserter(const int fieldn,const int valuen,const int subvaluen,const var& insertion)

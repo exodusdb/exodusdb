@@ -4,4 +4,3 @@ program()
 {
         printl(listfiles().convert(FM,"\n"));
 }
-

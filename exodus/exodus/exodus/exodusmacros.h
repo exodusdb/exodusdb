@@ -149,7 +149,7 @@ typedef var& out;
 
 #define _IM "\xFF"
 #define _RM "\xFF"
-#define _FM "\xFE"
+#define _FM "\uFE"
 #define _AM "\xFE"
 #define _VM "\xFD"
 #define _SM "\xFC"

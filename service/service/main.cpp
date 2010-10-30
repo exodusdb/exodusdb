@@ -163,8 +163,97 @@ class MVConnection
 private:
 };
 
+function xyz(in xyzz)
+{
+	xyzz(2,2,2).outputl();
+	return 1;
+}
+
+function accrest() {
+        var infilename="\\tapex";//=field(sentence()," ",2);
+        var infile;
+        if (not osopen(infilename,infile))
+                abort("Cant read "^infilename);
+
+        var fms=FM^VM^SM^TM^STM^SSTM;
+        var visibles="^]\???";
+        var EOL="\n\r";
+        var offset=0;
+        var blocksize=50000;
+        while (true) {
+                var block=osbread(infile,offset,blocksize);
+ //printl(offset," ",len(block));
+                if (not len(block))
+                        break;
+                offset+=blocksize;
+                converter(block,fms,visibles);
+                swapper(block,IM,EOL);
+                print(block);
+				var xx;
+                inputn(xx,1);
+        }
+        return 0;
+}
+
 program()
 {
+
+#define MVRECORD var mvrecord
+
+	MVRECORD;
+
+	//accrest();
+
+	initrnd(999);
+	for (int ii=1; ii<1000; ++ii) {
+		var time=rnd(500000).mod(86400);
+//		time.outputl("Internal=")
+//			.oconv("MTHS").outputl("oconv=")
+//			.iconv("MTHS").outputl("iconv=");
+//		assert(time.oconv("MTHS").iconv("MTHS") eq time);
+//		assert(time.oconv("MTS").iconv("MTS") eq time);
+	}
+	var tempinp;
+//	input("Press Enter ...",tempinp);
+	//ensure lower case sorts before uppercase (despite "A" \x41 is less than "a" \x61)
+	var a="a";
+	var A="A";
+	assert(a<A);
+
+	var da1="aa"^FM^"b1"^VM^"b2"^SM^"b22"^FM^"cc";
+	xyz(da1);
+
+	//extraction
+	da1(2).outputl();//this extracts field 2
+	da1(2,2).outputl();//this extracts field 2, value 2
+	da1(2,2,2).outputl();//this extracts field 2, value 2, subvalue 2
+
+	//this wont work
+	replace(da1,3,"x").outputl();//or this
+	replace(da1,3,3,"x").outputl();//or this
+	replace(da1,3,3,3,"x").outputl();//or this
+	insert(da1,3,"x").outputl();//or this
+	insert(da1,3,3,"x").outputl();//or this
+	insert(da1,3,3,3,"x").outputl();//or this
+
+	//replacement
+	da1(2)="x";//sadly this compile and runs without error but does nothing!
+
+	da1.replacer(3,"x");//this is the right way to do it. replace field2
+	da1.replacer(3,3,"x");//this is the right way to do it. replace field2
+	da1.replacer(3,3,3,"x");//this is the right way to do it. replace field2
+
+	da1.inserter(3,"x");//this is the right way to do it. replace field2
+	da1.inserter(3,3,"x");//this is the right way to do it. replace field2
+	da1.inserter(3,3,3,"x");//this is the right way to do it. replace field2
+
+	replacer(da1,3,"x").outputl();//or this
+	replacer(da1,3,3,"x").outputl();//or this
+	replacer(da1,3,3,3,"x").outputl();//or this
+
+	inserter(da1,3,"x").outputl();//or this
+	inserter(da1,3,3,"x").outputl();//or this
+	inserter(da1,3,3,3,"x").outputl();//or this
 
 	var tempfile;
 	if (osopen("\\testsort.cpp",tempfile))
@@ -433,8 +522,8 @@ while trying to match the argument list '(exodus::var, bool)'
 	//correct for utf16 windows
 	if (sizeof(wchar_t)==2)
 	{
-		assert(oconv("Aa019KK","HEX").outputl()=="00410061003000310039004B004B");
-		assert(var("00410061003000310039004B004B").iconv("HEX").outputl()=="Aa019KK");
+		assert(oconv("Aa019KK","HEX").outputl()=="00000041000000610000003000000031000000390000004B0000004B");
+		assert(var("00000041000000610000003000000031000000390000004B0000004B").iconv("HEX").outputl()=="Aa019KK");
 
 		//doesnt accept FMs etc yet
 		//assert(var("FF"^FM^"00").iconv("HEX").outputl()==("00FF"^FM^"00FF"));
@@ -577,9 +666,10 @@ while trying to match the argument list '(exodus::var, bool)'
 	assert(oconv(10939,"DQ")=="4");
 
 	for (int ii=1; ii<100; ++ii) {
-		var time=rnd(500000).mod(18600).outputl();
-		time.oconv("MTH").iconv("MTH").outputl();
-		assert(time.oconv("MTH").iconv("MTH") eq time);
+		var time=rnd(500000).mod(86400).outputl("Internal=");
+		time=rnd(500000).mod(18600).outputl();
+		time.oconv("MTHS").outputl("oconv=").iconv("MTHS").outputl("iconv=");
+		assert(time.oconv("MTHS").iconv("MTHS") eq time);
 	}
 
 	oconv(46622,"MTH").outputl("oconv 46622 MTH is" );
@@ -651,7 +741,7 @@ MT'h' 63306 17h35
 	date().oconv("D").outputl();
 
 	time().oconv("MTS").outputl();
-	timedate().outputl();
+	datetime().outputl();
 	//assert( not (x > y) );
 
 	var(1000).oconv("MD20P,").outputl();

@@ -38,7 +38,7 @@ DLL_PUBLIC bool assigned(const var& mv1);
 DLL_PUBLIC bool unassigned(const var& mv1);
 DLL_PUBLIC var date();
 DLL_PUBLIC var time();
-DLL_PUBLIC var timedate();
+DLL_PUBLIC var datetime();
 DLL_PUBLIC void ossleep(const int milliseconds);
 DLL_PUBLIC var ostime();
 DLL_PUBLIC bool osopen(const var& filename, var& filehandle);
@@ -110,9 +110,9 @@ DLL_PUBLIC var getprompt();
 DLL_PUBLIC void setprompt(const var& prompt);
 
 DLL_PUBLIC var input();
-DLL_PUBLIC void input(var& instr);
-DLL_PUBLIC void input(const var& prompt, var& instr);
-DLL_PUBLIC void inputn(var& instr, const var& n);
+DLL_PUBLIC void input(var& intostr);
+DLL_PUBLIC void input(const var& prompt, var& intostr);
+DLL_PUBLIC void inputn(var& intostr, const int nchars);
 
 DLL_PUBLIC var len(const var& mv1);
 DLL_PUBLIC var length(const var& mv1);
@@ -139,20 +139,22 @@ DLL_PUBLIC var& splicer(var& instring, const int start1,const int length,const v
 DLL_PUBLIC var splice(const var& instring, const int start1,const int length,const var& str);
 DLL_PUBLIC var& quoter(var& instring);
 DLL_PUBLIC var quote(const var& instring);
+DLL_PUBLIC var& unquoter(var& instring);
+DLL_PUBLIC var unquote(const var& instring);
 DLL_PUBLIC var& fieldstorer(var& instring, const var& sepchar,const int fieldn, const int nfields,const var& replacement);
 DLL_PUBLIC var fieldstore(const var& instring, const var& sepchar,const int fieldn, const int nfields,const var& replacement);
-DLL_PUBLIC var& trimmer(var& instring, const wchar_t* trimchar=L" ");
-DLL_PUBLIC var trim(const var& instring, const wchar_t* trimchar=L" ");
-DLL_PUBLIC var& trimmerf(var& instring, const wchar_t* trimchar=L" ");
-DLL_PUBLIC var trimf(const var& instring, const wchar_t* trimchar=L" ");
-DLL_PUBLIC var& trimmerb(var& instring, const wchar_t* trimchar=L" ");
-DLL_PUBLIC var trimb(const var& instring, const wchar_t* trimchar=L" ");
-DLL_PUBLIC var& trimmer(var& instring, const var trimchar);
-DLL_PUBLIC var trim(const var& instring, const var trimchar);
-DLL_PUBLIC var& trimmerf(var& instring, const var trimchar);
-DLL_PUBLIC var trimf(const var& instring, const var trimchar);
-DLL_PUBLIC var& trimmerb(var& instring, const var trimchar);
-DLL_PUBLIC var trimb(const var& instring, const var trimchar);
+DLL_PUBLIC var& trimmer(var& instring, const wchar_t* trimchars=L" ");
+DLL_PUBLIC var trim(const var& instring, const wchar_t* trimchars=L" ");
+DLL_PUBLIC var& trimmerf(var& instring, const wchar_t* trimchars=L" ");
+DLL_PUBLIC var trimf(const var& instring, const wchar_t* trimchars=L" ");
+DLL_PUBLIC var& trimmerb(var& instring, const wchar_t* trimchars=L" ");
+DLL_PUBLIC var trimb(const var& instring, const wchar_t* trimchars=L" ");
+DLL_PUBLIC var& trimmer(var& instring, const var trimchars);
+DLL_PUBLIC var trim(const var& instring, const var trimchars);
+DLL_PUBLIC var& trimmerf(var& instring, const var trimchars);
+DLL_PUBLIC var trimf(const var& instring, const var trimchars);
+DLL_PUBLIC var& trimmerb(var& instring, const var trimchars);
+DLL_PUBLIC var trimb(const var& instring, const var trimchars);
 DLL_PUBLIC var crop(const var& instring);
 DLL_PUBLIC var cropper(var& instring);
 DLL_PUBLIC var chr(const var& integer);
@@ -208,13 +210,28 @@ DLL_PUBLIC var calculate(const var& fieldname);
 DLL_PUBLIC var xlate(const var& filename, const var& key, const var& fieldno, const wchar_t* mode);
 DLL_PUBLIC var xlate(const var& filename, const var& key, const var& fieldno, const var& mode);
 DLL_PUBLIC var remove(const var& fromstr, var& startx, var& delimiterno);
-DLL_PUBLIC var replace(const var& instring, const var& fieldno, const var& valueno, const var& subvalueno, const var& replacement);
-DLL_PUBLIC var extract(const var& instring, const var& fieldno=0, const var& valueno=0, const var& subvalueno=0);
-DLL_PUBLIC var insert(const var& instring, const var& fieldno, const var& valueno, const var& subvalueno, const var& insertion);
-DLL_PUBLIC var erase(const var& instring, const var& fieldno, const var& valueno=0, const var& subvalueno=0);
-DLL_PUBLIC var& replacer(var& instring, const var& fieldno, const var& valueno, const var& subvalueno, const var& replacement);
-DLL_PUBLIC var& inserter(var& instring, const var& fieldno, const var& valueno, const var& subvalueno, const var& insertion);
-DLL_PUBLIC var& eraser(var& instring, const var& fieldno, const var& valueno=0, const var& subvalueno=0);
+
+DLL_PUBLIC var replace(const var& instring, const int fieldno, const int valueno, const int subvalueno, const var& replacement);
+DLL_PUBLIC var replace(const var& instring, const int fieldno, const int valueno, const var& replacement);
+DLL_PUBLIC var replace(const var& instring, const int fieldno, const var& replacement);
+
+DLL_PUBLIC var extract(const var& instring, const int fieldno=0, const int valueno=0, const int subvalueno=0);
+
+DLL_PUBLIC var insert(const var& instring, const int fieldno, const int valueno, const int subvalueno, const var& insertion);
+DLL_PUBLIC var insert(const var& instring, const int fieldno, const int valueno, const var& insertion);
+DLL_PUBLIC var insert(const var& instring, const int fieldno, const var& insertion);
+
+DLL_PUBLIC var erase(const var& instring, const int fieldno, const int valueno=0, const int subvalueno=0);
+
+DLL_PUBLIC var& replacer(var& instring, const int fieldno, const int valueno, const int subvalueno, const var& replacement);
+DLL_PUBLIC var& replacer(var& instring, const int fieldno, const int valueno, const var& replacement);
+DLL_PUBLIC var& replacer(var& instring, const int fieldno, const var& replacement);
+
+DLL_PUBLIC var& inserter(var& instring, const int fieldno, const int valueno, const int subvalueno, const var& insertion);
+DLL_PUBLIC var& inserter(var& instring, const int fieldno, const int valueno, const var& insertion);
+DLL_PUBLIC var& inserter(var& instring, const int fieldno, const var& insertion);
+
+DLL_PUBLIC var& eraser(var& instring, const int fieldno, const int valueno=0, const int subvalueno=0);
 DLL_PUBLIC bool locate(const var& instring, const var& target, var& setting, const int fieldn=0,const int valuen=0);
 DLL_PUBLIC bool locateby(const var& instring, const var& target, const wchar_t* ordercode, var& setting, const int fieldn=0,const int valuen=0);
 DLL_PUBLIC bool locateby(const var& instring, const var& target, const var& ordercode, var& setting, const int fieldn=0,const int valuen=0);

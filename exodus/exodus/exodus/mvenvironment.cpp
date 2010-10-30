@@ -668,34 +668,24 @@ void MvEnvironment::setprivilege(const var& var1) {
 
 bool MvEnvironment::openfile(const var& filename0, var& file) const
 {
-	var filename=filename0;
 	if (filename0.unassigned())
 		throw MVException(L"filename0");
-	var filename1;
-	var filename2;
+	var filename=filename0;
 	var xx;
-	//jbase
+	
 	var nomsg = filename.substr(1, 1) == L"*";
 	if (nomsg)
 		filename.splicer(1, 1, L"");
-	if (filename.substr(1, 4) == L"DICT") {
-		filename1 = L"DICT";
-		filename2 = filename.substr(6, 9999);
-	}else{
-		filename1 = L"";
-		filename2 = filename;
-	}
 open:
-	if (file.open(filename1, filename2)) {
+	if (file.open(filename)) {
 
-		//for jbase
 		if (!(this->FILES.locateusing(filename, FM, xx)))
 			this->FILES.replacer(-1, 0, 0, filename);
 
 		return 1;
 	}else{
-		if (filename2 == L"VOC") {
-			filename2 = L"MD";
+		if (filename == L"VOC") {
+			filename = L"MD";
 			goto open;
 		}
 		if (!nomsg) {
@@ -712,7 +702,6 @@ bool MvEnvironment::openfile2(const var& filename, var& file, const var& similar
 {
 
 	var reply;
-	//jbase linemark
 	//if (autocreate.unassigned())
 	//	autocreate = 1;
 	var firsttry = 1;
@@ -956,8 +945,6 @@ bool MvEnvironment::authorised(const var& task0, var& msg, const var& defaultloc
 	var keys;
 	var temp;//num
 
-	//jbase
-
 	//if @username='neosys' or @username='steve' then call msg(task:'')
 
 	if (task.substr(1, 1) == L" ")
@@ -1125,7 +1112,7 @@ void MvEnvironment::writeuserprivs()
 
 }
 
-void MvEnvironment::log(const var& programname0, const var& text0)
+void MvEnvironment::logger(const var& programname0, const var& text0)
 {
 
 	var log;
@@ -1175,7 +1162,6 @@ getlogkey:
 var MvEnvironment::singular(const var& pluralnoun)
 {
 
-	//jbase linemark
 	var temp = pluralnoun;
 
 	if (temp.substr(-2, 2) == L"ES") {
@@ -1234,7 +1220,7 @@ void MvEnvironment::sysmsg(const var& msg0)
 	var msg = msg0;
 
 	//log the system message first in case sendmail fails
-	log(L"SYSMSG", msg);
+	logger(L"SYSMSG", msg);
 
 	//get backup parameters
 	var bakpars;
@@ -1412,7 +1398,7 @@ var MvEnvironment::sendmail(const var& toaddress0, const var& subject, const var
 	errormsg.converter(TM, FM);
 
 	if ((errormsg.extract(1)).trim() != L"OK") {
-		log(L"SENDMAIL", errormsg);
+		logger(L"SENDMAIL", errormsg);
 		return 0;
 	}
 
@@ -1477,7 +1463,7 @@ var MvEnvironment::loginnet(const var& dataset, const var& username, var& cookie
 	var usern;
 	var menun;
 	var xx;
-	//jbase
+
 	//this is a custom login routine called from listen2
 	cookie = L"";
 	var menus;

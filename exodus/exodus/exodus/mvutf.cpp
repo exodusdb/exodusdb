@@ -105,6 +105,20 @@ std::string toUTF8(const std::wstring& wstr1)
 
 }
 
+//if there was a way to insert nullcodecvt into character traits maybe could use
+//wstring(string.begin(),string.end() but would this offer any advantage?
+//http://stackoverflow.com/questions/1357374/locale-dependent-ordering-for-stdstring
+std::wstring wstringfromchars(const char* sourcestart, const size_t sourcelength)
+{
+	std::wstring wstr1;
+	wstr1.resize(sourcelength);
+	const char* sourceptr=sourcestart;
+	for (size_t charn=0; charn<sourcelength; ++charn) {
+		wstr1[charn]=int((unsigned char)(*(sourceptr++)));
+	}
+	return wstr1;
+}
+
 std::wstring wstringfromUTF8(const UTF8* sourcestart, const size_t sourcelength)
 {
 

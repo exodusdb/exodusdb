@@ -93,8 +93,116 @@ boost::once_flag exodus_once_flag=BOOST_ONCE_INIT;
 void exodus_once_func()
 {
 	//so wcscoll() sorts a<B etc instead of character number wise where B<a
+	//wcscoll currently only used on non-pc/non-mac ... see var::localeAwareCompare
+	//so has no effect on those platform for < <= etc
+	//only en_US.utf-8 seems to be widely available on all platforms
+	//.utf8 causes a utf-8 to wchar conversion when converting string to wstring by iterators .begin() .end()
+	//and we want to be able to control conversion more accurately than an automatic conversion
+	//en_US is missing from Ubuntu. en_IN is available on Ubuntu and Centos but not MacOSX
 	setlocale (LC_COLLATE, "en_US.utf-8");
 }
+
+/* Ubuntu 8.04 locale -a
+default installation seems to be only one language - in this installation en
+C
+en_AG
+en_AU.utf8
+en_BW.utf8
+en_CA.utf8
+en_DK.utf8
+en_GB.utf8
+en_HK.utf8
+en_IE.utf8
+en_IN
+en_NG
+en_NZ.utf8
+en_PH.utf8
+en_SG.utf8
+en_US.utf8
+en_ZA.utf8
+en_ZW.utf8
+POSIX
+*/
+
+/* mac osx 10.6 locale -a|grep en_
++many other languages
+en_AU
+en_AU.ISO8859-1
+en_AU.ISO8859-15
+en_AU.US-ASCII
+en_AU.UTF-8
+en_CA
+en_CA.ISO8859-1
+en_CA.ISO8859-15
+en_CA.US-ASCII
+en_CA.UTF-8
+en_GB
+en_GB.ISO8859-1
+en_GB.ISO8859-15
+en_GB.US-ASCII
+en_GB.UTF-8
+en_IE
+en_IE.UTF-8
+en_NZ
+en_NZ.ISO8859-1
+en_NZ.ISO8859-15
+en_NZ.US-ASCII
+en_NZ.UTF-8
+en_US
+en_US.ISO8859-1
+en_US.ISO8859-15
+en_US.US-ASCII
+en_US.UTF-8
+*/
+
+/* centos 5.5 locale -a|grep en_
++many other languages
+en_AU
+en_AU.iso88591
+en_AU.utf8
+en_BW
+en_BW.iso88591
+en_BW.utf8
+en_CA
+en_CA.iso88591
+en_CA.utf8
+en_DK
+en_DK.iso88591
+en_DK.utf8
+en_GB
+en_GB.iso88591
+en_GB.iso885915
+en_GB.utf8
+en_HK
+en_HK.iso88591
+en_HK.utf8
+en_IE
+en_IE@euro
+en_IE.iso88591
+en_IE.iso885915@euro
+en_IE.utf8
+en_IN
+en_IN.utf8
+en_NZ
+en_NZ.iso88591
+en_NZ.utf8
+en_PH
+en_PH.iso88591
+en_PH.utf8
+en_SG
+en_SG.iso88591
+en_SG.utf8
+en_US
+en_US.iso88591
+en_US.iso885915
+en_US.utf8
+en_ZA
+en_ZA.iso88591
+en_ZA.utf8
+en_ZW
+en_ZW.iso88591
+en_ZW.utf8
+*/
 
 class ExodusOnce
 {
@@ -130,7 +238,7 @@ random_base_generator_type* get_random_base_generator()
 		//seed to the os clock (secs since unix epoch)
 		//Caveat: std::time(0) is not a very good truly-random seed.
 		//logputl(L"Seeding random number generator to system clock");
-		(*threads_random_base_generator).seed(static_cast<unsigned int>(std::time(0)));
+		(*threads_random_base_generator).seed(static_cast<unsigned int>(std::time(0)+2375472354));
 		//(*thread_base_generator).seed(static_cast<unsigned int>(var().ostime().toInt()));
 
 	}
@@ -436,12 +544,18 @@ bool var::osopen(const var& osfilename)
 	}
 
 	std::fstream *pfstream=new std::fstream;
+
+	//what is the purpose of the following?
+	//to prevent locale conversion if writing narrow string to wide stream or vice versa
+	//imbue BEFORE opening
 	//	myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
 //var(int(sizeof(myfile))).outputl(L"filesize");
 	//if (osfilename.var_mvtype&pimpl::MVTYPE_INT)
 	//	myfile=(std::fstream) var_mvint;
 	//else
+
 	{
+		//binary!
 		(*pfstream).open(osfilename.tostring().c_str(), std::ios::out |std::ios::in | std::ios::binary);
 		if (!(*pfstream)) {
 			delete pfstream;
@@ -486,10 +600,15 @@ bool var::osread(const char* osfilename)
 
 	//std::wifstream myfile;
 	std::ifstream myfile;
+
+	//what is the purpose of the following?
+	//to prevent locale conversion if writing narrow string to wide stream or vice versa
+	//imbue BEFORE opening
 	//myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
 
 	//ios:ate to go to the end to find the size in the next statement with tellg
 	//myfile.open(osfilename.tostring().c_str(), std::ios::binary | std::ios::ate );
+	//binary!
 	myfile.open(osfilename, std::ios::binary | std::ios::ate );
 	if (!myfile)
 		return false;
@@ -536,8 +655,13 @@ bool var::oswrite(const var& osfilename) const
 	ISSTRING(osfilename)
 
 	std::ofstream myfile;
+
+	//what is the purpose of the following?
+	//to prevent locale conversion if writing narrow string to wide stream or vice versa
+	//imbue BEFORE opening
 	//myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
 
+	//binary!
 	myfile.open(osfilename.tostring().c_str(), std::ios::trunc | std::ios::out | std::ios::binary);
 	if (!myfile)
 	 return false;
@@ -567,10 +691,13 @@ void var::osbwrite(const var& osfilehandle, const int startoffset) const
 	//TODO buffer the fileopen ... is ate needed here?
 	//using wfstream instead of wofstream so that we can seek to the end of the file?
 	std::wofstream myfile;
-	//what is the purpose of the following?
-        //to prevent locale conversion but for binary?
-        //myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
 
+	//what is the purpose of the following?
+	//to prevent locale conversion if writing narrow string to wide stream or vice versa
+	//imbue BEFORE opening
+    //myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
+
+	//binary!
 	myfile.open(osfilehandle.tostring().c_str(), std::ios::out | std::ios::in | std::ios::binary | std::ios::ate);
 	if (!myfile)
 		return;
@@ -609,11 +736,19 @@ var& var::osbread(const var& osfilehandle, const int startoffset, const int size
 	var_mvtype=pimpl::MVTYPE_STR;
 
 	if (size<=0) return *this;
-	//use ate to position at end so tellg below can determine file size
+
+	//avoiding wifstream due to non-availability on some platforms (mingw for starters)
+	//and to allow full control over narrow/wide character conversion
 	//std::wifstream myfile;
 	std::ifstream myfile;
-        //myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
 
+	//what is the purpose of the following?
+	//to prevent locale conversion if writing narrow string to wide stream or vice versa
+	//imbue BEFORE opening
+	//myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
+
+	//binary!
+	//use ::ate to position at end so tellg below can determine file size
 	myfile.open(osfilehandle.tostring().c_str(), std::ios::binary | std::ios::ate);
 	if (!myfile)
 		return *this;
@@ -621,8 +756,33 @@ var& var::osbread(const var& osfilehandle, const int startoffset, const int size
 	unsigned int maxsize = myfile.tellg();
 	//int readsize=maxsize-startoffset*sizeof(wchar_t);
 	//if (readsize>size*2) readsize=size*sizeof(wchar_t);
-	unsigned int readsize=maxsize-startoffset;
+	//unsigned int readsize=maxsize-startoffset;
+	//unsigned int readsize=maxsize-startoffset;
 
+	//reading beyond end of file
+	if (startoffset>=0 && (unsigned int)startoffset>=maxsize)
+	{
+		myfile.close();
+		return *this;
+	}
+
+	//allow negative offset to read from the back of the file
+	unsigned int readfrom=startoffset;
+	if (readfrom<0) {
+		readfrom+=maxsize;
+		//but not so negative that it reads from before the beginning of the file
+		if (readfrom<0)
+			readfrom=0;
+	}
+
+	//limit reading up to end of file although probably happens automatically
+	unsigned int readsize=size;
+	if (readfrom+readsize>maxsize)
+		readsize=maxsize-readfrom;
+	if (readsize>4000000)
+		var xx="xx";
+
+	//nothing to read
 	if (readsize<=0)
 	{
 		myfile.close();
@@ -649,8 +809,13 @@ var& var::osbread(const var& osfilehandle, const int startoffset, const int size
 
 	//for now dont accept UTF8 in order to avoid failure if non-utf characters
 	//var_mvstr=wstringfromUTF8((UTF8*) memblock, (unsigned int) bytesize);
-	std::string tempstr=std::string(memblock, readsize);
-	var_mvstr=std::wstring(tempstr.begin(),tempstr.end());
+	//
+	//following doesnt work in binary if locale ends in utf8 etc.
+	//but we need a locale for string collation on linux and there isnt a common non-utf8 one
+	//std::string tempstr=std::string(memblock, readsize);
+	//following does a conversion depending on the locale
+	//var_mvstr=std::wstring(tempstr.begin(),tempstr.end());
+	var_mvstr=wstringfromchars(memblock, readsize);
 
 	//delete
 	delete[] memblock;
@@ -680,6 +845,7 @@ bool var::osrename(const var& newosfilename) const
 	//prevent overwrite of existing file
 	//ACQUIRE
 	std::wifstream myfile;
+	//binary?
 	myfile.open(newosfilename.tostring().c_str(), std::ios::binary );
 	if (myfile)
 	{
@@ -993,7 +1159,7 @@ var var::oscwd() const
 	//http://www.boost.org/doc/libs/1_38_0/libs/filesystem/doc/reference.html#Attribute-functions
 	std::string currentpath=boost::filesystem::current_path().string();
 
-	return currentpath;
+	return var(currentpath).convert(L"/",_SLASH);
 
 /*
 	//http://www.boost.org/libs/filesystem/doc/tr2_proposal.html#Class-template-basic_path

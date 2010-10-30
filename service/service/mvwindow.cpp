@@ -874,7 +874,7 @@ void MvWindow::select2(const var& filenamex, const var& linkfilename2, const var
 		goto exit;
 	}
 
-	if (!env.DICT.open(L"DICT", dictfilename)) {
+	if (!env.DICT.open(L"dict_"^dictfilename)) {
 		response = L"Error: " ^ ((L"DICT." ^ filename).quote()) ^ L" file is not available";
 		goto exit;
 	}

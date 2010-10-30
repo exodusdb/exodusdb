@@ -55,7 +55,7 @@ var Definition::operator() (const var& mode)
 
 nochequeformat:
 					if (!(temp.read(win.srcfile, "CHEQUEDESIGN*ZZZ999"))) {
-						if (temp.open("ALANGUAGE", "")) {
+						if (temp.open("ALANGUAGE")) {
 							if (!(env.RECORD.read(temp, "VOUCHERS**CHEQUE")))
 								env.RECORD = "";
 						}
@@ -145,7 +145,7 @@ preventupdate:
 
 				//if neosys then save the default as neosys programs default
 				if (env.USERNAME == "NEOSYS") {
-					if (temp.open("ALANGUAGE", ""))
+					if (temp.open("ALANGUAGE"))
 						env.RECORD.write(temp, "VOUCHERS**CHEQUE");
 				}
 
@@ -168,7 +168,7 @@ preventupdate:
 		//field 10 in documents and definitions xxx*analdesign means the same
 		if (env.ID.field("*", 2, 1) == "ANALDESIGN" and env.USERNAME == "NEOSYS" and env.RECORD.extract(10)) {
 			var reports;
-			if (reports.open("REPORTS", "")) {
+			if (reports.open("REPORTS")) {
 				var key = env.ID;
 				key.swapper("*", "%2A");
 				key = "DEFINITIONS*" ^ key;
@@ -251,7 +251,7 @@ preventupdate:
 		//on upgrading clients
 		if (env.ID.field("*", 2, 1) == "ANALDESIGN" and env.USERNAME == "NEOSYS" and env.RECORD.extract(10)) {
 			var reports;
-			if (reports.open("REPORTS", "")) {
+			if (reports.open("REPORTS")) {
 				var key = env.ID;
 				key.swapper("*", "%2A");
 				key = "DEFINITIONS*" ^ key;
