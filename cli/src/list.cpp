@@ -2,26 +2,19 @@
 //Exodus Copyright (c) 2009 Stephen Bush
 //Licence http://www.opensource.org/licenses/mit-license.php
 
-this is written using Exodus but although extensive is NOT a good example of exodus programming style.
-It was the first attempt to implement a substantial classic pick program using a c++ class. It was mostly automatically transliterated from it's mv parent program and therefore uses OO flavour method calling.
+This is a complete ACCESS/ENGLISH/LIST replacement that can output in DOS or HTML format.
 
-Currently it uses some C++ style programming that will later be hidden to minimise the knowledge required by exodus application programmers
+It is a good example of a substantial program written in Exodus's reincarnation of Multivalue Basic. The original Pick Basic version was in heavy production usage for more years.
 
-The entry point is short program at the bottom of the code which creates an instance of the class/program and calls its entry point. the environment setup will be done automatically by exodus soon
+It is written using Exodus OO flavour syntax not traditional flavour.
 
-From the point of view of a pick programmer a c++ class can be viewed as a classic pick program with program wide accessible variables being (the class data) and internal subroutines (the class methods).
+Traditional:
 
-A c++ class consists of a set of class variables and a set of methods (subroutines). all the subroutines have access to all the class variables.
+ print(oconv(date(),"D"));
 
-Unlike pick basic, c++ methods (subroutines) can have their own private variables, be called with a list of parameters, and return values in
+OO flavour - does exactly the same thing:
 
-So, in summary, c++ methods can be used like internal and external subroutines with common variables.
-
-If all the variables are defined as class variables then a c++ class is essentially identical to a class pick program with subroutines
-
-One way to think of it is as if a c++ class allows common variables and external subroutines but all can be witten in a single file.
-
-*/
+ date().oconv("D").print();
 
 /*
 usage
@@ -49,8 +42,8 @@ Type just list by itself to get a summary of its syntax
 printtext printer1;
 
 //NB FOLLOWING SECTION is only declaration and optional *simple* initialisation of global variables.
-//All programming proper is to be done inside the main or other functions and subroutines
-//AFTER the programinit() line
+//In Exodus, all programming proper is to be done inside the main or other functions and subroutines
+//AFTER the "programinit()" line which can be found below.
 
 var datafile;
 
@@ -104,9 +97,7 @@ var nbsp;
 var dictvoc;
 var decimalchar;
 
-//if exodus's redim becomes (in effect) non-destructive
-//(possible because c++ strings are generally implemented as reference counted, copy on write)
-//then this abitrary restriction could be eased
+//when exodus gets a non-destructive redim then this max columns restriction will be removed
 #define maxncols 1000
 dim colname(maxncols);
 dim coldict(maxncols);
@@ -117,7 +108,7 @@ dim scol(maxncols);
 dim icol(maxncols);
 dim wcol(maxncols);
 
-//the following will be redim'ed  to the required size later
+//the following will be redim'ed  to the required size further down
 //once the number of BREAK-ON statements is determined
 dim breakcount;
 dim breaktotal;
@@ -155,7 +146,10 @@ var char3;
 programinit()
 
 //all programs must have a "function main()" that returns an integer - usually 0 to indicate success.
+
+/////////////////
 function main() {
+/////////////////
 
 	quotes=DQ^SQ;
 
@@ -265,7 +259,7 @@ function main() {
 		nbsp = "";
 	}
 
-	//automatically create dict_voc so you can list dictionaries
+	//automatically create dict_voc if it is not present so you can list dictionaries
 	if (not open("DICT_VOC",dictvoc)) {
 		createfile("DICT_VOC");
 		if (open("DICT_VOC",dictvoc)) {
