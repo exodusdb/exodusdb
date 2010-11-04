@@ -1012,7 +1012,7 @@ private:
 
 	int localeAwareCompare(const std::wstring& str1, const std::wstring& str2) const;
 
-	friend dim;
+	friend class dim;
 
 }; //of class "var"
 
