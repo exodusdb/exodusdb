@@ -4,17 +4,21 @@
 
 This is a complete ACCESS/ENGLISH/LIST replacement that can output in DOS or HTML format.
 
-It is a good example of a substantial program written in Exodus's reincarnation of Multivalue Basic. The original Pick Basic version was in heavy production usage for more years.
+It is a good example of a substantial program written in Exodus's reincarnation of Multivalue Basic. The original Pick Basic version was in heavy production usage for many years.
 
 It is written using Exodus OO flavour syntax not traditional flavour.
 
-Traditional:
+Traditional - honed by usage over the decades:
 
  print(oconv(date(),"D"));
 
-OO flavour - does exactly the same thing:
+OO flavour - does exactly the same thing but is perhaps easier to read from left to right in one pass:
 
  date().oconv("D").print();
+
+Hybrid:
+
+ print(date().oconv("D"));
 
 /*
 usage
@@ -94,7 +98,7 @@ var td;
 var tdx;
 var tt;
 var nbsp;
-var dictvoc;
+var dictmd;
 var decimalchar;
 
 //when exodus gets a non-destructive redim then this max columns restriction will be removed
@@ -260,9 +264,9 @@ function main() {
 	}
 
 	//automatically create dict_voc if it is not present so you can list dictionaries
-	if (not open("DICT_VOC",dictvoc)) {
+	if (not open("DICT_VOC",dictmd)) {
 		createfile("DICT_VOC");
-		if (open("DICT_VOC",dictvoc)) {
+		if (open("DICT_VOC",dictmd)) {
 
 			//prepare some dictionary records
 			var dictrecs = "";
@@ -287,7 +291,7 @@ function main() {
 				var key=field(dictrec,"|",1);
 				var rec=field(dictrec,"|",2,9999);
 				//printl(key ^ ": " ^ rec);
-				write(rec.convert("|",FM), dictvoc, key);
+				write(rec.convert("|",FM), dictmd, key);
 			}
 		}
 	}
@@ -321,9 +325,9 @@ function main() {
 	gtotreq = "";
 	nobase = "";
 
-	if (!(open("DICT_VOC", dictvoc)))
-		//stop("Cannot open DICT.VOC");
-		dictvoc="";
+	if (!(open("DICT_VOC", dictmd)))
+		//stop("Cannot open DICT.MD");
+		dictmd="";
 
 	coln = 0;
 	head = "";
@@ -385,12 +389,12 @@ phraseinit:
 		filename = word;               // new
 
 		if (filename.substr(1, 5).lcase() eq "dict_") {
-			dictfilename = "VOC";
+			dictfilename = "MD";
 		} else {
 			dictfilename = filename;
 		}
 		if (not mv.DICT.open("dict_"^dictfilename))
-			mv.DICT = dictvoc;
+			mv.DICT = dictmd;
 		ss ^= " " ^ word;
 
 		//get any specific keys
@@ -682,7 +686,7 @@ phraseinit:
 		gosub getword();
 		ignorewords.replacer(1, -1, 0, word);
 
-		//@LPTR word is skipped if not located in VOC/DICT.VOC
+		//@LPTR word is skipped if not located in MD/DICT.MD
 	} else if (word eq "@LPTR") {
 
 	} else {
@@ -742,7 +746,7 @@ x1exit:
 		//set column 1 @ID
 		colname(1) = "@" "ID";
 		if (not mv.DICT or not coldict(1).read(mv.DICT, "@" "ID")) {
-			if (not dictvoc or not coldict(1).read(dictvoc, "@" "ID"))
+			if (not dictmd or not coldict(1).read(dictmd, "@" "ID"))
 				coldict(1) = "F" ^ FM ^ "0" ^ FM ^ "Ref" ^ FM ^ FM ^ FM ^ FM ^ FM ^ FM ^ "L" ^ FM ^ 15;
 		}
 		if (html) {
@@ -1459,7 +1463,7 @@ subroutine getwordexit()
 		}
 	} else {
 		dictrec = "";
-		if (dictvoc and dictrec.read(dictvoc, word)) {
+		if (dictmd and dictrec.read(dictmd, word)) {
 			if (dictrec.extract(1) eq "RLIST") {
 				if (dictrec.extract(4))
 					word = dictrec.extract(4);
