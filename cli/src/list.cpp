@@ -978,7 +978,7 @@ x1exit:
 		//if interactive else
 		mssg("No records found");
 
-		abort();
+		abort("");
 
 		if (html) {
 			tx ^= "</tbody></table>";
