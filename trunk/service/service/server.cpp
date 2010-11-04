@@ -127,7 +127,7 @@ var Server::run()
 	nrequests = env.SYSTEM.extract(35) + 0;
 	//if tracing then
 	std::wcout << L"NEOSYS.NET SERVICE "<< env.SYSTEM.extract(24);
-	std::wcout << L" STARTED "<< var().datetime() << std::endl;
+	std::wcout << L" STARTED "<< var().timedate() << std::endl;
 	std::wcout << std::endl;
 
 	std::wcout << L"Station  : "<< env.STATION<<std::endl;

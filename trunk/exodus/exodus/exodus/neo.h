@@ -20,8 +20,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef NEO_H
-#define NEO_H 1
+#ifndef EXO_H
+#define EXO_H 1
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -99,4 +99,4 @@ extern "C"
 
 #define libraryexit }
 
-#endif //NEO_H
+#endif //EXO_H

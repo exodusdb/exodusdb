@@ -109,14 +109,15 @@ var var::time() const
 	return int(localtimeofdaynow.hours()*3600+localtimeofdaynow.minutes()*60+localtimeofdaynow.seconds());
 }
 
-var var::datetime() const
+var var::timedate() const
 {
 	//output the current "HH:MM:SS  DD MMM YYYY" without quotes but note the double space
 
 	//TODO make this rely on a single timestamp instead of time and date
 	//to avoid the slight chance of time and date being called different sides of midnight
-	return time().oconv_MT(L"MTS") ^ L"  " ^ date().oconv_D(L"D");
+	return time().oconv_MT(L"MTS") ^ L" " ^ date().oconv_D(L"D");
 }
+
 var var::ostime() const
 {
 	//return decimal seconds since midnight up to micro or nano second accuracy

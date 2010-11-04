@@ -22,7 +22,7 @@ THE SOFTWARE.
 
 
 //ensure the global libs are defined
-#define NEO_MVLIBS_CPP
+#define EXO_MVLIBS_CPP
 
 #define MV_NO_NARROW
 
@@ -126,7 +126,7 @@ bool var::load(const var& libraryname) const
 	//cannot use *this because load is marked const
 	//*this="xx";
 	//identical in copy ctor and load and call
-	var_mvtype=libraryname.var_mvtype;
+	var_mvtyp=libraryname.var_mvtyp;
 	var_mvstr=libraryname.var_mvstr;
 	var_mvint=libraryname.var_mvint;
 	var_mvdbl=libraryname.var_mvdbl;
@@ -194,7 +194,7 @@ var var::call(const wchar_t* libraryname, const char* functionname) const
 	//*this="xx";
 	//identical in copy ctor and load and call
 	var var1=libraryname;
-	var_mvtype=var1.var_mvtype;
+	var_mvtyp=var1.var_mvtyp;
 	var_mvstr=var1.var_mvstr;
 	var_mvint=var1.var_mvint;
 	var_mvdbl=var1.var_mvdbl;
@@ -227,7 +227,7 @@ var var::call(const wchar_t* libraryname, const char* functionname) const
 	//*this="xx";
 	//identical in copy ctor and load and call
 	var1.fieldstorer(L"*",2,1,var(functionname));
-	var_mvtype=var1.var_mvtype;
+	var_mvtyp=var1.var_mvtyp;
 
 	// Call function.u
 	return dictfunction(getmvenvironment());

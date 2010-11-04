@@ -38,25 +38,27 @@ THE SOFTWARE.
 
 namespace exodus {
 
-//was declared private to prevent it being called but somehow still "varray xyz();" still compiles although with a warning
+//was declared private to prevent it being called but somehow still "dim xyz();" still compiles although with a warning
 //now public to allow usage in class variables
-varray::varray()
-   : rows_ (1)
-   , cols_ (1)
+dim::dim()
+   : nrows_ (1)
+   , ncols_ (1)
+   , initialised_(false)
    //data_ <--initialized below (after the 'if/throw' statement)
 {
  //throw MVArrayDimensionedZero();
- data_ = new var[rows_ * cols_ + 1];
+ data_ = new var[nrows_ * ncols_ + 1];
 }
 
-varray::~varray()
+dim::~dim()
 {
 	delete[] data_;
 }
 
-varray::varray(int rows, int cols)
-   : rows_ (rows)
-   , cols_ (cols)
+dim::dim(int rows, int cols)
+   : nrows_ (rows)
+   , ncols_ (cols)
+   , initialised_(true)
    //data_ <--initialized below (after the 'if/throw' statement)
 {
   if (rows == 0 || cols == 0)
@@ -64,12 +66,12 @@ varray::varray(int rows, int cols)
   data_ = new var[rows * cols + 1];
 }
 
-bool varray::resize(int rows, int cols)
+bool dim::redim(int rows, int cols)
 {
+
   if (rows == 0 || cols == 0)
     throw MVArrayDimensionedZero();
-  rows_=rows;
-  cols_=cols;
+
   //how exception safe is this?
 
   //create new data first
@@ -77,75 +79,149 @@ bool varray::resize(int rows, int cols)
   newdata = new var[rows * cols + 1];
 
   //only then delete the old data
-  delete[] data_;
+  if (initialised_)
+	  delete[] data_;
 
   //and point to the new data
-  data_ = newdata;
+  initialised_=true;
+  data_ =  newdata;
+
+  nrows_=rows;
+  ncols_=cols;
 
   return true;
+
 }
 
 //the same () function is called regardless of being on LHS or RHS
-//second version is IDENTICAL except for lack of const (used only on "const varray")
-var& varray::operator() (int row, int col)
+//second version is IDENTICAL except for lack of const (used only on "const dim")
+var& dim::operator() (int rowno, int colno)
 {
 
 	//check bounds
-	if (row > rows_)
-		throw MVArrayIndexOutOfBounds(L"row:" ^ var(row) ^ L" > " ^ rows_);
-	if (col > cols_)
-		throw MVArrayIndexOutOfBounds(L"col:" ^ var(col) ^ L" > " ^ cols_);
+	if (rowno > nrows_)
+		throw MVArrayIndexOutOfBounds(L"row:" ^ var(rowno) ^ L" > " ^ nrows_);
+	if (colno > ncols_)
+		throw MVArrayIndexOutOfBounds(L"col:" ^ var(colno) ^ L" > " ^ ncols_);
 
-	if (row ==0 || col == 0 )
+	if (rowno ==0 || colno == 0 )
 		return data_[0];
 
-	return data_[cols_*(row-1) + col];
+	return data_[ncols_*(rowno-1) + colno];
 }
 
-var& varray::operator() (int row, int col) const
+var& dim::operator() (int rowno, int colno) const
 {
 
 	//check bounds
-	if (row > rows_)
-		throw MVArrayIndexOutOfBounds(L"row:" ^ var(row) ^ L" > " ^ rows_);
-	if (col > cols_)
-		throw MVArrayIndexOutOfBounds(L"col:" ^ var(col) ^ L" > " ^ cols_);
+	if (rowno > nrows_)
+		throw MVArrayIndexOutOfBounds(L"row:" ^ var(rowno) ^ L" > " ^ nrows_);
+	if (colno > ncols_)
+		throw MVArrayIndexOutOfBounds(L"col:" ^ var(colno) ^ L" > " ^ ncols_);
 
-	if (row ==0 || col == 0 )
+	if (rowno ==0 || colno == 0 )
 	{
-		row=0;
-		col=0;
+		return (data_)[0];
 	}
 
-	return data_[cols_*(row-1) + col];
+	return data_[ncols_*(rowno-1) + colno];
 
 }
 
-varray& varray::init(const var& var1)
+dim& dim::init(const var& var1)
 {
-	int arraysize=rows_*cols_+1;
+	if (!initialised_)
+		throw MVArrayNotDimensioned();
+	int arraysize=nrows_*ncols_+1;
 	for (int ii=0;ii<arraysize;ii++)
 		data_[ii]=var1;
 	return *this;
 }
 
-varray& varray::operator=(const varray& mva1)
+dim& dim::operator=(const dim& dim2)
 {
-	int arraysize=rows_*cols_+1;
-	int arraysize2=mva1.rows_*mva1.cols_+1;
-	if (arraysize2<arraysize)
-		arraysize=arraysize2;
-	for (int ii=0;ii<arraysize;ii++)
-		data_[ii]=mva1.data_[ii];
+
+	//cannot copy an undimensioned array
+	if (!dim2.initialised_)
+		throw MVArrayNotDimensioned();
+
+	//can copy to an undimensioned array (duplicates the dimensions)
+	if (!initialised_)
+	{
+		(*this).redim(dim2.nrows_,dim2.ncols_);
+
+		//fast copy without rows and cols
+		int ncells=nrows_*ncols_+1;
+		for (int celln=0;celln<ncells;++celln)
+				(data_[celln]).clone(dim2.data_[celln]);
+		return *this;
+
+	}
+
+	//element 0,0 is extra in the 1 based world of mv dimensioned arrays
+	(data_[0]).clone(dim2.data_[0]);
+
+	int maxrown=dim2.nrows_;
+	int maxcoln=dim2.ncols_;
+	for (int rown=0;rown<nrows_;++rown)
+	{
+		int index=rown*ncols_;
+		for (int coln=1;coln<=ncols_;++coln)
+		{
+			++index;
+			if (rown<maxrown&&coln<maxcoln)
+			{
+				int fromindex=rown*maxcoln+1;
+				(data_[index]).clone(dim2.data_[fromindex]);
+			}
+			else data_[index]=L"";
+		}
+
+	}
+
 	return *this;
 }
 
-var varray::matunparse() const
+dim& dim::operator=(const var& var1)
 {
-	var output;
-	int arraysize=rows_*cols_+1;
-	for (int ii=1;ii<=arraysize;++ii)
+	if (!initialised_)
+		throw MVArrayNotDimensioned();
+	init(var1);
+	return *this;
+}
+
+dim& dim::operator=(const int int1)
+{
+	if (!initialised_)
+		throw MVArrayNotDimensioned();
+	init(int1);
+	return *this;
+}
+
+dim& dim::operator=(const double dbl1)
+{
+	if (!initialised_)
+		throw MVArrayNotDimensioned();
+	init(dbl1);
+	return *this;
+}
+
+var dim::unparse() const
+{
+	if (!initialised_)
+		throw MVArrayNotDimensioned();
+	int arraysize=nrows_*ncols_;
+	if (!arraysize)
+		return L"";
+
+	var output=data_[1];
+
+	for (int ii=2;ii<=arraysize;++ii)
+	{
+		output.var_mvstr.push_back(FM_);
 		output^=data_[ii];
+	}
+
 	return output;
 }
 

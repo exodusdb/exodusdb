@@ -210,7 +210,7 @@ namespace exodus {
 //TODO ensure locale doesnt produce like 123.456,78
 std::wstring intToString(int int1);
 
-class varray;
+class dim;
 class var__extractreplace;
 
 //TODO ensure locale doesnt produce like 123.456,78
@@ -652,7 +652,7 @@ public:
 	//OS TIME/DATE
 	var date() const;
 	var time() const;
-	var datetime() const;
+	var timedate() const;
 	void ossleep(const int milliseconds) const;
 	var ostime() const;
 
@@ -762,8 +762,9 @@ public:
 	//VARIABLE CONTROL
 	bool assigned() const;
 	bool unassigned() const;
-	var& transfer(var& mv2);
-	var& exchange(var& mv2);
+	var& transfer(var& var2);
+	var& exchange(var& var2);
+	var& clone(var& var2);
 	var addressof() const;
 	void clear();
 	void clearcommon();
@@ -805,6 +806,7 @@ public:
 	var seq() const;
 	var dcount(const var& substrx) const;
 	var count(const var& substrx) const;
+	var count(const wchar_t charx) const;
 	var length() const;
 	var len() const;
 	const wchar_t* data() const;
@@ -853,9 +855,8 @@ public:
 	//var.s(start,length) substring
 	var substr(const int startx) const;
 	var substr(const int startx,const int length) const;
-	//TODO index needs to be reimplemented as ...
-	//var index(const var& substr,const int occurence=1) const;
-	var index(const var& substr,const int startchar1=1) const;
+	var index(const var& substr,const int occurrenceno=1) const;
+	var index2(const var& substr,const int startchar1=1) const;
 	var field(const var& substrx,const int fieldnx,const int nfieldsx=1) const;
 	var field2(const var& substrx,const int fieldnx,const int nfieldsx=1) const;
 
@@ -866,15 +867,12 @@ public:
 	var iconv(const var& convstr) const;
 
 	//STRING FUNCTIONS THAT USE THE HIGH END SEPARATORS
-	void matparse(varray& varray1) const;
-	//following is implemented on the varray class now
-	//varray matunparse();
-	//
 	//return a substr from any starting character
 	//stops at the next character FF-F8, updating the starting character
 	//and indicates the delimiter found (1-8) or 0 if off end of string
 	//NB parameters are not const
 	//?return the starting position of a substr starting at character nn or 0 if not found
+
 	var lower() const;
 	var raise() const;
 	var crop() const;
@@ -984,7 +982,7 @@ private:
 	//was in pimpl
 	//all mutable because asking for a string can create it from an integer and vice versa
 	mutable std::wstring var_mvstr;
-	mutable wchar_t var_mvtype;
+	mutable wchar_t var_mvtyp;
 	mutable mvint_t var_mvint;
 	mutable double var_mvdbl;
 
@@ -1013,6 +1011,8 @@ private:
 	bool locateat(const std::wstring& target,size_t start_pos,size_t end_pos,const wchar_t order,const var& usingchar,var& setting)const;
 
 	int localeAwareCompare(const std::wstring& str1, const std::wstring& str2) const;
+
+	friend dim;
 
 }; //of class "var"
 
@@ -1155,49 +1155,66 @@ DLL_PUBLIC var operator^(const double double1,const var&    mv2     );
 //wistream& operator >> (wistream& i,var mv1);
 //#endif //allow use of cin>>var
 
-class DLL_PUBLIC varray
+class DLL_PUBLIC dim
 {
 
 public:
 
-	varray(int rows, int cols=1);
+	dim(int nrows, int ncols=1);
 
-	bool resize(int rows, int cols=1);
+	bool redim(int nrows, int ncols=1);
 
-	var matunparse() const;
+	var unparse() const;
 
 	// parenthesis operators often come in pairs
-	var& operator() (int row, int col=1);
+	var& operator() (int rowno, int colno=1);
 
-	//following const version is called if we do () on a varray which was defined as const xx
-	var& operator() (int row, int col=1) const;
+	//following const version is called if we do () on a dim which was defined as const xx
+	var& operator() (int rowno, int colno=1) const;
 
 	//Q: why is this commented out?
 	//A: we dont want to COPY vars out of an array when using it in rhs expression
 	//var operator() (int row, int col=1) const;
 
-	varray& init(const var& mv1);
-
 	//destructor to (NOT VIRTUAL to save space since not expected to be a base class)
 	//protected to prevent deriving from var since wish to save space and not provide virtual destructor
 	//http://www.gotw.ca/publications/mill18.htm
-	~varray();
+	~dim();
 
-	varray& operator = (const varray& mva1);
+	dim& operator = (const dim& dim1);
+
+	//=var
+	//The assignment operator should always return a reference to *this.
+	//cant be (const var& mv1) because seems to cause a problem with var1=var2 in function parameters
+	//unfortunately causes problem of passing var by value and thereby unnecessary contruction
+	//see also ^= etc
+	dim& operator = (const var& var1);
+	dim& operator = (const int int1);
+	dim& operator = (const double dbl1);
 
 	//allow default contruction for class variables later resized in class methods
-	varray();
+	dim();
+
+	//return the number of fields
+	var parse(const var& var1);
+
+	//following is implemented on the dim class now
+	//dim dimarray2();
+	//
 
 private:
 
 	// Disable copy constructor (why?)
 	// Copy constructor
-	varray(const varray& m);
+	dim(const dim& m);
 
-	int rows_, cols_;
+	dim& init(const var& var1);
+
+	int nrows_, ncols_;
 	var* data_;
+	bool initialised_;
 
-}; //of class "varray"
+}; //of class "dim"
 
 /*
 class DLL_PUBLIC var__extractreplace : private var
@@ -1269,14 +1286,14 @@ const var _LOWER_CASE=L"abcdefghijklmnopqrstuvwxyz";
 const var _UPPER_CASE=L"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 //this is not thread safe since it is at global scope and should be per thread
-#ifndef NEO_MV_CPP
+#ifndef EXO_MV_CPP
 extern
 #else
 #endif
 DLL_PUBLIC
 var _STATUS;
 
-#ifndef NEO_MV_CPP
+#ifndef EXO_MV_CPP
 extern
 #else
 #endif
@@ -1285,14 +1302,14 @@ exodus::var _EXECPATH;
 
 //FM separated words or quoted phrases from command line. quote marks are retained.
 //trailing options in () or {} are stripped off and available in _OPTIONS
-#ifndef NEO_MV_CPP
+#ifndef EXO_MV_CPP
 extern
 #else
 #endif
 DLL_PUBLIC
 exodus::var _COMMAND;
 
-#ifndef NEO_MV_CPP
+#ifndef EXO_MV_CPP
 extern
 #else
 #endif
@@ -1300,7 +1317,7 @@ DLL_PUBLIC
 exodus::var _OPTIONS;
 
 //deprecated and replaced by _COMMAND and _OPTIONS
-#ifndef NEO_MV_CPP
+#ifndef EXO_MV_CPP
 extern
 #else
 #endif

@@ -56,7 +56,17 @@ void main2(int exodus__argc, char *exodus__argv[]); \
 int main(int exodus__argc, char *exodus__argv[]) \
 { \
 	exodus_main(exodus__argc, exodus__argv); \
-	main2(exodus__argc, exodus__argv); \
+	try \
+    { \
+		main2(exodus__argc, exodus__argv); \
+	} \
+	catch (MVException except) \
+    { \
+		printl(except.description); \
+		print("Aborting. Press Enter"); \
+		input(); \
+		stop(0); \
+	} \
 } \
 void main2(int exodus__argc, char *exodus__argv[])
 
@@ -119,7 +129,15 @@ class ExodusProgram : public ExodusProgramBase {
 
 #define classexit() \
 public: \
-ExodusProgram(MvEnvironment& inmv):ExodusProgramBase(inmv){} \
+	ExodusProgram(MvEnvironment& inmv):ExodusProgramBase(inmv){} \
+}; \
+
+#define xclassinit(CLASSNAME) \
+class CLASSNAME##_ExodusProgram : public ExodusProgramBase {
+
+#define xclassexit(CLASSNAME) \
+public: \
+	CLASSNAME##_ExodusProgram(MvEnvironment& inmv):ExodusProgramBase(inmv){} \
 }; \
 
 //simplify declaration of function/subroutine arguments

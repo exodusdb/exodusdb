@@ -31,12 +31,25 @@ var main2(int exodus__argc, char *exodus__argv[]); \
 int main(int exodus__argc, char *exodus__argv[]) \
 { \
         exodus_main(exodus__argc, exodus__argv); \
-        return main2(exodus__argc, exodus__argv); \
+		try \
+		{ \
+	        return main2(exodus__argc, exodus__argv); \
+		} \
+		catch (MVException except) \
+		{ \
+			printl(except.description); \
+			print("Aborting. Press Enter"); \
+			input(); \
+			stop(0); \
+		} \
 } \
 var main2(int exodus__argc, char *exodus__argv[]) \
  \
 { \
+int environmentn=0; \
 MvEnvironment mv; \
+global_environments.resize(6); \
+global_environments[environmentn]=&mv; \
 ExodusProgram exodusprogram1(mv); \
 return exodusprogram1.main(); \
 }

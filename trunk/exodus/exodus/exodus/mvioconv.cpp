@@ -33,11 +33,7 @@ THE SOFTWARE.
 #include <exodus/mv.h>
 #include <exodus/mvexceptions.h>
 
-//for now all hex is output as 8 hex digits per internal character
-//actually on win32 where sizeof wchar is 2 (bytes) we could do only 4
-//#define HEX_IO_RATIO sizeof(wchar_t)*2
-#define HEX_IO_RATIO 8
-
+static const int HEX_PER_WCHAR=sizeof(wchar_t)*2;
 using namespace std;
 
 namespace exodus
@@ -67,7 +63,7 @@ var var::iconv(const wchar_t* convstr) const
 	THISISSTRING()
 
 	//empty string in, empty string out
-	if (var_mvtype&pimpl::MVTYPE_STR && var_mvstr.length()==0)
+	if (var_mvtyp&pimpl::MVTYPE_STR && var_mvstr.length()==0)
 		return L"";
 
 	if (convstr==L"MT")
@@ -104,7 +100,7 @@ var var::iconv(const wchar_t* convstr) const
 				part=remove(charn, terminator);
 				//if len(part) or terminator then
 
-				if (part.var_mvtype&pimpl::MVTYPE_STR && part.var_mvstr.length()==0)
+				if (part.var_mvtyp&pimpl::MVTYPE_STR && part.var_mvstr.length()==0)
 					{}
 				else
 					output ^= part.iconv_D(convstr);
@@ -130,7 +126,7 @@ var var::iconv(const wchar_t* convstr) const
 				//if len(part) or terminator then
 
 				//null string
-				if (part.var_mvtype&pimpl::MVTYPE_STR && part.var_mvstr.length()==0)
+				if (part.var_mvtyp&pimpl::MVTYPE_STR && part.var_mvstr.length()==0)
 					{}
 
 				//do convstr on a number
@@ -177,7 +173,7 @@ throw MVNotImplemented(L"iconv('MX')");
 		case L'[':
 
 			//empty string in, empty string out
-			if (var_mvtype&pimpl::MVTYPE_STR && var_mvstr.length()==0)
+			if (var_mvtyp&pimpl::MVTYPE_STR && var_mvstr.length()==0)
 				return L"";
 
 			//check second character
@@ -215,11 +211,37 @@ throw MVNotImplemented(L"iconv('MX')");
 		//HEX
 		case L'H':
 			//empty string in, empty string out
-			if (var_mvtype&pimpl::MVTYPE_STR && var_mvstr.length()==0)
+			if (var_mvtyp&pimpl::MVTYPE_STR && var_mvstr.length()==0)
 				return L"";
 
 //TODO allow high end separators in without conversion (instead of failing as non-hex digits)
-			return iconv_HEX(HEX_IO_RATIO);
+
+			//check 2nd character is E, 3rd character is X and next character is null, or a digit
+			if ((*(++conversionchar)=='E') && (*(++conversionchar)=='X'))
+			{
+				//point to one character after HEX
+				++conversionchar;
+
+				switch (*conversionchar)
+				{
+					case L'\0':
+						return iconv_HEX(HEX_PER_WCHAR);
+						break;
+					case L'2':
+						return iconv_HEX(2);
+						break;
+					case L'4':
+						return iconv_HEX(4);
+						break;
+					case L'8':
+						return iconv_HEX(8);
+						break;
+				}
+
+				//return oconv_HEX(HEX_IO_RATIO);
+				break;
+			}
+
 			break;
 
 		//empty convstr string - no conversion
@@ -637,7 +659,7 @@ var var::oconv(const wchar_t* conversion) const
 				part=remove(charn, terminator);
 				//if len(part) or terminator then
 
-				if (part.var_mvtype&pimpl::MVTYPE_STR && part.var_mvstr.length()==0)
+				if (part.var_mvtyp&pimpl::MVTYPE_STR && part.var_mvstr.length()==0)
 					{}
 				else if (!part.isnum())
 					output ^= part;
@@ -665,7 +687,7 @@ var var::oconv(const wchar_t* conversion) const
 				//if len(part) or terminator then
 
 				//null string
-				if (part.var_mvtype&pimpl::MVTYPE_STR && part.var_mvstr.length()==0)
+				if (part.var_mvtyp&pimpl::MVTYPE_STR && part.var_mvstr.length()==0)
 					{}
 
 				//non-numeric are left unconverted
@@ -716,7 +738,7 @@ var var::oconv(const wchar_t* conversion) const
 		case L'[':
 
 			//empty string in, empty string out
-			if (var_mvtype&pimpl::MVTYPE_STR && var_mvstr.length()==0)
+			if (var_mvtyp&pimpl::MVTYPE_STR && var_mvstr.length()==0)
 				return L"";
 
 			//check second character
@@ -765,11 +787,37 @@ var var::oconv(const wchar_t* conversion) const
 
 		//HEX (unlike arev it converts high separator characters)
 		case L'H':
+
 			//empty string in, empty string out
-			if (var_mvtype&pimpl::MVTYPE_STR && var_mvstr.length()==0)
+			if (var_mvtyp&pimpl::MVTYPE_STR && var_mvstr.length()==0)
 				return L"";
 
-			return oconv_HEX(HEX_IO_RATIO);
+			//check 2nd character is E, 3rd character is X and next character is null, or a digit
+			if ((*(++conversionchar)=='E') && (*(++conversionchar)=='X'))
+			{
+				//point to one character after HEX
+				++conversionchar;
+
+				switch (*conversionchar)
+				{
+					case L'\0':
+						return oconv_HEX(HEX_PER_WCHAR);
+						break;
+					case L'2':
+						return oconv_HEX(2);
+						break;
+					case L'4':
+						return oconv_HEX(4);
+						break;
+					case L'8':
+						return oconv_HEX(8);
+						break;
+				}
+
+				//return oconv_HEX(HEX_IO_RATIO);
+				break;
+			}
+
 			break;
 
 		//empty conversion string - no conversion

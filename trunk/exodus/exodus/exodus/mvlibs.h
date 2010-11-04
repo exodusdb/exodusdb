@@ -52,7 +52,7 @@ typedef std::map<std::wstring,MvLib*> MvLibMap;
 #define NTHREADMVLIBS 99
 
 //global_mvlibs is used as a thread specific collection of MapOfMVCommands (see above)
-#ifdef NEO_MVLIBS_CPP
+#ifdef EXO_MVLIBS_CPP
 	//plus 1 to allow for main thread to have its own
 	std::vector<MvLibMap> global_mvlibmaps(NTHREADMVLIBS+1);
 #else
@@ -61,7 +61,7 @@ typedef std::map<std::wstring,MvLib*> MvLibMap;
 
 /*
 class MvEnvironment;
-#ifdef NEO_MVENVIRONMENT_CPP
+#ifdef EXO_MVENVIRONMENT_CPP
 	//plus 1 to allow for main thread to have its own
 	std::vector<MvEnvironment*> global_environments(NTHREADS+1);
 #else
@@ -100,7 +100,7 @@ private:
 };
 
 //global_mvlibs is used as a thread specific collection of MapOfMVCommands (see above)
-#ifndef NEO_MVLIBS_CPP
+#ifndef EXO_MVLIBS_CPP
 extern
 #endif
 DLL_PUBLIC

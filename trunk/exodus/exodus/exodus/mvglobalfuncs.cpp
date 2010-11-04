@@ -49,9 +49,9 @@ DLL_PUBLIC var time()
 	return var().time();
 }
 
-DLL_PUBLIC var datetime()
+DLL_PUBLIC var timedate()
 {
-	return var().datetime();
+	return var().timedate();
 }
 
 void DLL_PUBLIC ossleep(const int milliseconds)
@@ -561,6 +561,16 @@ DLL_PUBLIC var trimb(const var& instring, const var trimchars)
 	return instring.trimb(trimchars);
 }
 
+DLL_PUBLIC var matparse(const var& dynarray, dim& intodimarray)
+{
+	return intodimarray.parse(dynarray);
+}
+
+DLL_PUBLIC var matunparse(const dim& dimarray)
+{
+	return dimarray.unparse();
+}
+
 DLL_PUBLIC var chr(const var& integer)
 {
 	return var().chr(integer);
@@ -706,9 +716,14 @@ DLL_PUBLIC var substrer(var& instring, const int startx,const int length)
 	return instring.substrer(startx, length);
 }
 
-DLL_PUBLIC var index(const var& instring, const var& substr,const int startchar1)
+DLL_PUBLIC var index(const var& instring, const var& substr,const int occurrenceno)
 {
-	return instring.index(substr, startchar1);
+	return instring.index(substr, occurrenceno);
+}
+
+DLL_PUBLIC var index2(const var& instring, const var& substr,const int startcharno)
+{
+	return instring.index2(substr, startcharno);
 }
 
 DLL_PUBLIC var field(const var& instring, const var& substrx,const int fieldnx,const int nfieldsx)
@@ -1139,4 +1154,3 @@ int exodus_main(int exodus__argc, char *exodus__argv[])
 
 
 }// of namespace exodus
-

@@ -34,7 +34,7 @@ THE SOFTWARE.
 
 #define MV_NO_NARROW
 
-#define NEO_MV_CPP //indicates globals are to be defined (omit extern keyword)
+#define EXO_MV_CPP //indicates globals are to be defined (omit extern keyword)
 #include <exodus/mv.h>
 #include <exodus/mvimpl.h>
 #include <exodus/mvutf.h>
@@ -72,7 +72,7 @@ var::~var()
 	//this could be removed in production code perhaps
 	//set all unused bits to 1 to ease detection of usage of uninitialised variables (bad c++ syntax like var x=x+1;
 	//set all used bits to 0 to increase chance of detecting unassigned variables
-	var_mvtype=(wchar_t)0xFFFFFFF0;
+	var_mvtyp=(wchar_t)0xFFFFFFF0;
 }
 
 //CONSTRUCTORS
@@ -80,15 +80,16 @@ var::~var()
 
 //default ctor to allow definition unassigned "var mv";
 var::var()
-: var_mvtype(pimpl::MVTYPE_UNA)
+: var_mvtyp(pimpl::MVTYPE_UNA)
 {
+	//int xyz=3;
 	//WARNING neither initialisers nor constructors are called in the following case !!!
 	//var xxx=xxx.somefunction()
 	//known as "undefined usage of uninitialised variable";
 	//and not even a compiler warning in msvc8 or g++4.1.2
 
 	//so the following test is put everywhere to protect against this type of accidental programming
-	//if (var_mvtype&mvtypemask)
+	//if (var_mvtyp&mvtypemask)
 	//	throw MVUndefined(L"funcname()");
 	//should really ensure a magic number and not just HOPE for some binary digits above bottom four 0-15 decimal 1111binary
 	//this could be removed in production code perhaps
@@ -100,7 +101,7 @@ var::var()
 
 	//moved here from pimpl ctor
 	//moved up to initializer
-	//var_mvtype=pimpl::MVTYPE_UNA;
+	//var_mvtyp=pimpl::MVTYPE_UNA;
 
 }
 
@@ -118,7 +119,7 @@ var::var(const var& copiedvar)
 	//priv=new pimpl;
 
 	//identical in copy ctor and load and call
-	var_mvtype=copiedvar.var_mvtype;
+	var_mvtyp=copiedvar.var_mvtyp;
 	var_mvstr=copiedvar.var_mvstr;
 	var_mvint=copiedvar.var_mvint;
 	var_mvdbl=copiedvar.var_mvdbl;
@@ -128,7 +129,7 @@ var::var(const var& copiedvar)
 //would just use initializers since cannot fail
 //(except cannot seem to init wstring from wchar_t!)
 var::var(const wchar_t char1)
-: var_mvtype(pimpl::MVTYPE_STR)
+: var_mvtyp(pimpl::MVTYPE_STR)
 {
 	var_mvstr=char1;	
 }
@@ -149,14 +150,14 @@ var::var(const wchar_t* cstr1)
 	}
 
 	var_mvstr=cstr1;
-	var_mvtype=pimpl::MVTYPE_STR;
+	var_mvtyp=pimpl::MVTYPE_STR;
 }
 
 //ctor for std::wstring
 //just use initializers since cannot fail
 var::var(const std::wstring& str1)
 	:
-	var_mvtype(pimpl::MVTYPE_STR),
+	var_mvtyp(pimpl::MVTYPE_STR),
 	var_mvstr(str1)
 {}
 
@@ -164,7 +165,7 @@ var::var(const std::wstring& str1)
 //just use initializers since cannot fail
 var::var(const std::string& str1)
 	:
-	var_mvtype(pimpl::MVTYPE_STR),
+	var_mvtyp(pimpl::MVTYPE_STR),
 	var_mvstr(wstringfromUTF8((UTF8*)str1.data(),(int)str1.length()))
 {}
 
@@ -172,7 +173,7 @@ var::var(const std::string& str1)
 //just use initializers since cannot fail
 var::var(const bool bool1)
 	:
-	var_mvtype(pimpl::MVTYPE_INT),
+	var_mvtyp(pimpl::MVTYPE_INT),
 	var_mvint(bool1)
 {}
 
@@ -180,7 +181,7 @@ var::var(const bool bool1)
 //just use initializers since cannot fail
 var::var(const int int1)
 	:
-	var_mvtype(pimpl::MVTYPE_INT),
+	var_mvtyp(pimpl::MVTYPE_INT),
 	var_mvint(int1)
 {}
 
@@ -188,7 +189,7 @@ var::var(const int int1)
 //just use initializers since cannot fail
 var::var(const long long longlong1)
 	:
-	var_mvtype(pimpl::MVTYPE_INT),
+	var_mvtyp(pimpl::MVTYPE_INT),
 	var_mvint(longlong1)
 {}
 
@@ -196,7 +197,7 @@ var::var(const long long longlong1)
 //just use initializers since cannot fail
 var::var(const double double1)
 	:
-	var_mvtype(pimpl::MVTYPE_DBL),
+	var_mvtyp(pimpl::MVTYPE_DBL),
 	var_mvdbl(double1)
 {}
 
@@ -252,13 +253,13 @@ var::operator int() const
 	do
 	{
 		//prioritise int since conversion to int perhaps more likely to be an int already
-		if (var_mvtype&pimpl::MVTYPE_INT)
+		if (var_mvtyp&pimpl::MVTYPE_INT)
 			return (int) var_mvint;
-		if (var_mvtype&pimpl::MVTYPE_DBL)
+		if (var_mvtyp&pimpl::MVTYPE_DBL)
 			return int(var_mvdbl);
-		if (var_mvtype&pimpl::MVTYPE_NAN)
+		if (var_mvtyp&pimpl::MVTYPE_NAN)
 			throw MVNonNumeric(L"int(" ^ substr(1,20) ^ L")");
-		if (!(var_mvtype))
+		if (!(var_mvtyp))
 		{
 			THISISASSIGNED()
 			throw MVUnassigned(L"int(var)");
@@ -282,13 +283,13 @@ var::operator unsigned int() const
 	do
 	{
 		//prioritise int since conversion to int perhaps more likely to be an int already
-		if (var_mvtype&pimpl::MVTYPE_INT)
+		if (var_mvtyp&pimpl::MVTYPE_INT)
 			return var_mvint;
-		if (var_mvtype&pimpl::MVTYPE_DBL)
+		if (var_mvtyp&pimpl::MVTYPE_DBL)
 			return int(var_mvdbl);
-		if (var_mvtype&pimpl::MVTYPE_NAN)
+		if (var_mvtyp&pimpl::MVTYPE_NAN)
 			throw MVNonNumeric(L"int(" ^ substr(1,20) ^ L")");
-		if (!(var_mvtype))
+		if (!(var_mvtyp))
 		{
 			THISISASSIGNED()
 			throw MVUnassigned(L"int(var)");
@@ -314,7 +315,7 @@ var::operator size_t() const
 /*
 var::operator const wchar_t*()
 {
-	if (var_mvtype&mvtypemask)
+	if (var_mvtyp&mvtypemask)
 		throw MVUndefined(L"const wchar_t*()");
 	wcout<<L"CONVERT: operator const wchar_t*() returns '"<<var_mvstr.c_str()<<L"'\n";
 	return var_mvstr.c_str();
@@ -343,7 +344,7 @@ var& var::operator = (const var& rhs)
 	var_mvstr=rhs.var_mvstr;
 	var_mvdbl=rhs.var_mvdbl;
 	var_mvint=rhs.var_mvint;
-	var_mvtype=rhs.var_mvtype;
+	var_mvtyp=rhs.var_mvtyp;
 
 	return *this;
 
@@ -360,7 +361,7 @@ var& var::operator = (const int int1)
 	//THISISDEFINED()
 
 	var_mvint=int1;
-	var_mvtype=pimpl::MVTYPE_INT;
+	var_mvtyp=pimpl::MVTYPE_INT;
 
 	return *this;
 }
@@ -376,7 +377,7 @@ var& var::operator = (const double double1)
 	//THISISDEFINED()
 
 	var_mvdbl=double1;
-	var_mvtype=pimpl::MVTYPE_DBL;
+	var_mvtyp=pimpl::MVTYPE_DBL;
 
 	return *this;
 }
@@ -394,7 +395,7 @@ var& var::operator = (const wchar_t char2)
 	THISISDEFINED()
 
 	var_mvstr=char2;
-	var_mvtype=pimpl::MVTYPE_STR;
+	var_mvtyp=pimpl::MVTYPE_STR;
 
 	return *this;
 }
@@ -411,7 +412,7 @@ var& var::operator = (const wchar_t* char2)
 	THISISDEFINED()
 	
 	var_mvstr=char2;
-	var_mvtype=pimpl::MVTYPE_STR;
+	var_mvtyp=pimpl::MVTYPE_STR;
 
 	return *this;
 }
@@ -428,7 +429,7 @@ var& var::operator = (const std::wstring string2)
 	//slows down all string settings so consider NOT CHECKING in production code
 	THISISDEFINED()
 	var_mvstr=string2;
-	var_mvtype=pimpl::MVTYPE_STR;
+	var_mvtyp=pimpl::MVTYPE_STR;
 
 	return *this;
 }
@@ -446,7 +447,7 @@ var& var::operator ^=(const var& rhs)
 	var_mvstr+=rhs.towstring();
 
 	//reset to unknown string (clear int/dbl/nan flags)
-	var_mvtype=pimpl::MVTYPE_STR;
+	var_mvtyp=pimpl::MVTYPE_STR;
 
 	return *this;
 }
@@ -462,7 +463,7 @@ var& var::operator ^= (const int int1)
 	var_mvstr+=intToString(int1);
 
 	//reset to unknown string (clear int/dbl/nan flags)
-	var_mvtype=pimpl::MVTYPE_STR;
+	var_mvtyp=pimpl::MVTYPE_STR;
 
 	return *this;
 }
@@ -478,7 +479,7 @@ var& var::operator ^= (const double double1)
 	var_mvstr+=dblToString(double1);
 
 	//reset to unknown string (clear int/dbl/nan flags)
-	var_mvtype=pimpl::MVTYPE_STR;
+	var_mvtyp=pimpl::MVTYPE_STR;
 
 	return *this;
 }
@@ -494,7 +495,7 @@ var& var::operator ^= (const wchar_t char1)
 	var_mvstr+=char1;
 
 	//reset to unknown string (clear int/dbl/nan flags)
-	var_mvtype=pimpl::MVTYPE_STR;
+	var_mvtyp=pimpl::MVTYPE_STR;
 
 	return *this;
 }
@@ -511,7 +512,7 @@ var& var::operator ^= (const wchar_t* char1)
 	var_mvstr+=char1;
 
 	//reset to unknown string (clear int/dbl/nan flags)
-	var_mvtype=pimpl::MVTYPE_STR;
+	var_mvtyp=pimpl::MVTYPE_STR;
 
 	return *this;
 }
@@ -527,7 +528,7 @@ var& var::operator ^= (const std::wstring string1)
 	var_mvstr+=string1;
 
 	//reset to unknown string (clear int/dbl/nan flags)
-	var_mvtype=pimpl::MVTYPE_STR;
+	var_mvtyp=pimpl::MVTYPE_STR;
 
 	return *this;
 }
@@ -544,17 +545,17 @@ var var::operator ++ (int)
 	THISISDEFINED()
 
 tryagain:
-	if (var_mvtype&pimpl::MVTYPE_INT)
+	if (var_mvtyp&pimpl::MVTYPE_INT)
 		var_mvint++;
-	else if (var_mvtype&pimpl::MVTYPE_DBL)
+	else if (var_mvtyp&pimpl::MVTYPE_DBL)
 		var_mvdbl++;
-	else if (var_mvtype&pimpl::MVTYPE_STR)
+	else if (var_mvtyp&pimpl::MVTYPE_STR)
 	{
 		//try to convert to numeric
 		if (isnum())
 		{
 			//turn off string flag because it is about to be obsoleted;
-			var_mvtype=var_mvtype^pimpl::MVTYPE_STR;
+			var_mvtyp=var_mvtyp^pimpl::MVTYPE_STR;
 			goto tryagain;
 		}
 
@@ -581,20 +582,20 @@ var var::operator -- (int)
 	//full check done below to avoid double checking number type
 	THISISDEFINED()
 
-	if (var_mvtype&mvtypemask)
+	if (var_mvtyp&mvtypemask)
 		throw MVUndefined(L"var--");
 tryagain:
-	if (var_mvtype&pimpl::MVTYPE_INT)
+	if (var_mvtyp&pimpl::MVTYPE_INT)
 		var_mvint--;
-	else if (var_mvtype&pimpl::MVTYPE_DBL)
+	else if (var_mvtyp&pimpl::MVTYPE_DBL)
 		var_mvdbl--;
-	else if (var_mvtype&pimpl::MVTYPE_STR)
+	else if (var_mvtyp&pimpl::MVTYPE_STR)
 	{
 		//try to convert to numeric
 		if (isnum())
 		{
 			//NB turn off string flag because it is about to be obsoleted;
-			var_mvtype=var_mvtype^pimpl::MVTYPE_STR;
+			var_mvtyp=var_mvtyp^pimpl::MVTYPE_STR;
 			goto tryagain;
 		}
 
@@ -622,17 +623,17 @@ var& var::operator ++ ()
 	THISISDEFINED()
 
 tryagain:
-	if (var_mvtype&pimpl::MVTYPE_INT)
+	if (var_mvtyp&pimpl::MVTYPE_INT)
 		var_mvint++;
-	else if (var_mvtype&pimpl::MVTYPE_DBL)
+	else if (var_mvtyp&pimpl::MVTYPE_DBL)
 		var_mvdbl++;
-	else if (var_mvtype&pimpl::MVTYPE_STR)
+	else if (var_mvtyp&pimpl::MVTYPE_STR)
 	{
 		//try to convert to numeric
 		if (isnum())
 		{
 			//NB turn off string flag because it is about to be obsoleted;
-			var_mvtype=var_mvtype^pimpl::MVTYPE_STR;
+			var_mvtyp=var_mvtyp^pimpl::MVTYPE_STR;
 			goto tryagain;
 		}
 
@@ -660,17 +661,17 @@ var& var::operator -- ()
 	THISISDEFINED()
 
 tryagain:
-	if (var_mvtype&pimpl::MVTYPE_INT)
+	if (var_mvtyp&pimpl::MVTYPE_INT)
 		var_mvint--;
-	else if (var_mvtype&pimpl::MVTYPE_DBL)
+	else if (var_mvtyp&pimpl::MVTYPE_DBL)
 		var_mvdbl--;
-	else if (var_mvtype&pimpl::MVTYPE_STR)
+	else if (var_mvtyp&pimpl::MVTYPE_STR)
 	{
 		//try to convert to numeric
 		if (isnum())
 		{
 			//NB turn off string flag because it is about to be obsoleted;
-			var_mvtype=var_mvtype^pimpl::MVTYPE_STR;
+			var_mvtyp=var_mvtyp^pimpl::MVTYPE_STR;
 			goto tryagain;
 		}
 
@@ -694,25 +695,25 @@ var& var::operator += (const var& rhs)
 tryagain:
 
 	//int target
-	if (var_mvtype&pimpl::MVTYPE_INT)
+	if (var_mvtyp&pimpl::MVTYPE_INT)
 	{
 		//int source
-		if (rhs.var_mvtype&pimpl::MVTYPE_INT)
+		if (rhs.var_mvtyp&pimpl::MVTYPE_INT)
 		{
 			var_mvint+=rhs.var_mvint;
 			return *this;
 		}
 		//dbl source, convert target to dbl
 		var_mvdbl=var_mvint+rhs.var_mvdbl;
-		var_mvtype=pimpl::MVTYPE_DBL;
+		var_mvtyp=pimpl::MVTYPE_DBL;
 		return *this;
 	}
 
 	//dbl target
-	else if (var_mvtype&pimpl::MVTYPE_DBL)
+	else if (var_mvtyp&pimpl::MVTYPE_DBL)
 	{
 		//+= int or dbl from source
-		var_mvdbl+=(rhs.var_mvtype&pimpl::MVTYPE_INT)?rhs.var_mvint:rhs.var_mvdbl;
+		var_mvdbl+=(rhs.var_mvtyp&pimpl::MVTYPE_INT)?rhs.var_mvint:rhs.var_mvdbl;
 		return *this;
 	}
 
@@ -720,11 +721,11 @@ tryagain:
 	//convert strings to number is cached and only needs to be done once
 
 	//nan (dont bother with this here because it is exceptional and will be caught below anyway
-	//else if (var_mvtype&pimpl::MVTYPE_NAN)
+	//else if (var_mvtyp&pimpl::MVTYPE_NAN)
 	//	throw MVNonNumeric(L"var::+= " ^ *this);
 
 	//unassigned
-	else if (!(var_mvtype))
+	else if (!(var_mvtyp))
 	{
 		//throw MVUnassigned(L"+=");
 		THISISNUMERIC()
@@ -737,7 +738,7 @@ tryagain:
 		//faster but less safe to do it here instead of at the point of updating
 		//since increment and decrement probably mostly not on strings
 		//xor
-		var_mvtype=var_mvtype^pimpl::MVTYPE_STR;
+		var_mvtyp=var_mvtyp^pimpl::MVTYPE_STR;
 		goto tryagain;
 	}
 
@@ -755,25 +756,25 @@ var& var::operator -= (const var& rhs)
 tryagain:
 
 	//int target
-	if (var_mvtype&pimpl::MVTYPE_INT)
+	if (var_mvtyp&pimpl::MVTYPE_INT)
 	{
 		//int source
-		if (rhs.var_mvtype&pimpl::MVTYPE_INT)
+		if (rhs.var_mvtyp&pimpl::MVTYPE_INT)
 		{
 			var_mvint-=rhs.var_mvint;
 			return *this;
 		}
 		//dbl source, convert target to dbl
 		var_mvdbl=var_mvint-rhs.var_mvdbl;
-		var_mvtype=pimpl::MVTYPE_DBL;
+		var_mvtyp=pimpl::MVTYPE_DBL;
 		return *this;
 	}
 
 	//dbl target
-	else if (var_mvtype&pimpl::MVTYPE_DBL)
+	else if (var_mvtyp&pimpl::MVTYPE_DBL)
 	{
 		//-= int or dbl from source
-		var_mvdbl-=(rhs.var_mvtype&pimpl::MVTYPE_INT)?rhs.var_mvint:rhs.var_mvdbl;
+		var_mvdbl-=(rhs.var_mvtyp&pimpl::MVTYPE_INT)?rhs.var_mvint:rhs.var_mvdbl;
 		return *this;
 	}
 
@@ -781,11 +782,11 @@ tryagain:
 	//convert strings to number is cached and only needs to be done once
 
 	//nan (dont bother with this here because it is exceptional and will be caught below anyway
-	//else if (var_mvtype&pimpl::MVTYPE_NAN)
+	//else if (var_mvtyp&pimpl::MVTYPE_NAN)
 	//	throw MVNonNumeric(L"var::-= " ^ *this);
 
 	//unassigned
-	else if (!(var_mvtype))
+	else if (!(var_mvtyp))
 	{
 		//throw MVUnassigned(L"-=");
 		THISISNUMERIC()
@@ -797,7 +798,7 @@ tryagain:
 		// NB TODO turn off string flag because it is about to be obsoleted;
 		//faster but less safe to do it here instead of at the point of updating
 		//since increment and decrement probably mostly not on strings
-		var_mvtype=var_mvtype^pimpl::MVTYPE_STR;
+		var_mvtyp=var_mvtyp^pimpl::MVTYPE_STR;
 		goto tryagain;
 	}
 
@@ -816,9 +817,9 @@ DLL_PUBLIC bool MVeq(const var& lhs,const var& rhs)
 	//NB empty string is always less than anything except another empty string
 
 	//1. both empty or identical strings returns eq. one empty results false
-	if (lhs.var_mvtype&pimpl::MVTYPE_STR)
+	if (lhs.var_mvtyp&pimpl::MVTYPE_STR)
 	{
-		if (rhs.var_mvtype&pimpl::MVTYPE_STR)
+		if (rhs.var_mvtyp&pimpl::MVTYPE_STR)
 		{
 			//we have two strings
 			//if they are both the same (including both empty) then eq is true
@@ -841,7 +842,7 @@ DLL_PUBLIC bool MVeq(const var& lhs,const var& rhs)
 			//(after checking that rhs is actually assigned)
 			if (lhs.var_mvstr.length()==0)
 			{
-				if (!rhs.var_mvtype)
+				if (!rhs.var_mvtyp)
 				{
 					//throw MVUnassigned(L"eq(rhs)");
 					ISASSIGNED(rhs)
@@ -856,9 +857,9 @@ DLL_PUBLIC bool MVeq(const var& lhs,const var& rhs)
 	{
 		//if lhs isnt a string and rhs is an empty string then return eq false
 		//(after checking that lhs is actually assigned)
-		if ((rhs.var_mvtype&pimpl::MVTYPE_STR) && (rhs.var_mvstr.length()==0))
+		if ((rhs.var_mvtyp&pimpl::MVTYPE_STR) && (rhs.var_mvstr.length()==0))
 		{
-			if (!lhs.var_mvtype)
+			if (!lhs.var_mvtyp)
 			{
 				//throw MVUnassigned(L"eq(lhs)");
 				ISASSIGNED(lhs)
@@ -872,16 +873,16 @@ DLL_PUBLIC bool MVeq(const var& lhs,const var& rhs)
 	//2. both numerical strings
 	if (lhs.isnum()&&rhs.isnum())
 	{
-		if (lhs.var_mvtype&pimpl::MVTYPE_INT)
+		if (lhs.var_mvtyp&pimpl::MVTYPE_INT)
 		{
-			if (rhs.var_mvtype&pimpl::MVTYPE_INT)
+			if (rhs.var_mvtyp&pimpl::MVTYPE_INT)
 				//different from MVlt
 				return (lhs.var_mvint==rhs.var_mvint);
 			else
 				//different from MVlt
 				return (lhs.var_mvint==rhs.var_mvdbl);
 		}
-		if (rhs.var_mvtype&pimpl::MVTYPE_INT)
+		if (rhs.var_mvtyp&pimpl::MVTYPE_INT)
 			//different from MVlt
 			return (lhs.var_mvdbl==rhs.var_mvint);
 		else
@@ -890,9 +891,9 @@ DLL_PUBLIC bool MVeq(const var& lhs,const var& rhs)
 	}
 
 	//3. either non-numerical strings
-	if (!(lhs.var_mvtype&pimpl::MVTYPE_STR))
+	if (!(lhs.var_mvtyp&pimpl::MVTYPE_STR))
 		lhs.createString();
-	if (!(rhs.var_mvtype&pimpl::MVTYPE_STR))
+	if (!(rhs.var_mvtyp&pimpl::MVTYPE_STR))
 		rhs.createString();
 	//different from MVlt
 	return lhs.var_mvstr==rhs.var_mvstr;
@@ -909,9 +910,9 @@ DLL_PUBLIC bool MVlt(const var& lhs,const var& rhs)
 	//NB empty string is always less than anything except another empty string
 
 	//1. both empty or identical strings returns eq. one empty results false
-	if (lhs.var_mvtype&pimpl::MVTYPE_STR)
+	if (lhs.var_mvtyp&pimpl::MVTYPE_STR)
 	{
-		if (rhs.var_mvtype&pimpl::MVTYPE_STR)
+		if (rhs.var_mvtyp&pimpl::MVTYPE_STR)
 		{
 			//we have two strings
 			//if they are both the same (including both empty) then eq is true
@@ -934,7 +935,7 @@ DLL_PUBLIC bool MVlt(const var& lhs,const var& rhs)
 			//after checking that rhs is actually assigned
 			if (lhs.var_mvstr.length()==0)
 			{
-				if (!rhs.var_mvtype)
+				if (!rhs.var_mvtyp)
 				{
 					//throw MVUnassigned(L"eq(rhs)");
 					ISASSIGNED(rhs)
@@ -949,9 +950,9 @@ DLL_PUBLIC bool MVlt(const var& lhs,const var& rhs)
 	{
 		//if lhs isnt a string and rhs is an empty string then return eq false
 		//after checking that lhs is actually assigned
-		if ((rhs.var_mvtype&pimpl::MVTYPE_STR) && (rhs.var_mvstr.length()==0))
+		if ((rhs.var_mvtyp&pimpl::MVTYPE_STR) && (rhs.var_mvstr.length()==0))
 		{
-			if (!lhs.var_mvtype)
+			if (!lhs.var_mvtyp)
 			{
 				//throw MVUnassigned(L"eq(lhs)");
 				ISASSIGNED(lhs)
@@ -965,16 +966,16 @@ DLL_PUBLIC bool MVlt(const var& lhs,const var& rhs)
 	//2. both numerical strings
 	if (lhs.isnum()&&rhs.isnum())
 	{
-		if (lhs.var_mvtype&pimpl::MVTYPE_INT)
+		if (lhs.var_mvtyp&pimpl::MVTYPE_INT)
 		{
-			if (rhs.var_mvtype&pimpl::MVTYPE_INT)
+			if (rhs.var_mvtyp&pimpl::MVTYPE_INT)
 				//different from MVeq
 				return (lhs.var_mvint<rhs.var_mvint);
 			else
 				//different from MVeq
 				return (double(lhs.var_mvint)<rhs.var_mvdbl);
 		}
-		if (rhs.var_mvtype&pimpl::MVTYPE_INT)
+		if (rhs.var_mvtyp&pimpl::MVTYPE_INT)
 			//different from MVeq
 			return (lhs.var_mvdbl<rhs.var_mvint);
 		else
@@ -983,9 +984,9 @@ DLL_PUBLIC bool MVlt(const var& lhs,const var& rhs)
 	}
 
 	//3. either or both non-numerical strings
-	if (!(lhs.var_mvtype&pimpl::MVTYPE_STR))
+	if (!(lhs.var_mvtyp&pimpl::MVTYPE_STR))
 		lhs.createString();
-	if (!(rhs.var_mvtype&pimpl::MVTYPE_STR))
+	if (!(rhs.var_mvtyp&pimpl::MVTYPE_STR))
 		rhs.createString();
 	//different from MVeq
 	//return lhs.var_mvstr<rhs.var_mvstr;
@@ -1003,7 +1004,7 @@ DLL_PUBLIC bool MVlt(const var& lhs,const int int2)
 	//NB empty string is always less than anything except another empty string
 
 	//1. both empty or identical strings returns eq. one empty results false
-	if (lhs.var_mvtype&pimpl::MVTYPE_STR)
+	if (lhs.var_mvtyp&pimpl::MVTYPE_STR)
 	{
 		//if rhs isnt a string and lhs is empty then eq is false
 		//after checking that rhs is actually assigned
@@ -1017,11 +1018,11 @@ DLL_PUBLIC bool MVlt(const var& lhs,const int int2)
 	//2. both numerical strings
 	do
 	{
-		if (lhs.var_mvtype&pimpl::MVTYPE_INT)
+		if (lhs.var_mvtyp&pimpl::MVTYPE_INT)
 				//different from MVeq
 				return (lhs.var_mvint<int2);
 
-		if (lhs.var_mvtype&pimpl::MVTYPE_DBL)
+		if (lhs.var_mvtyp&pimpl::MVTYPE_DBL)
 			//different from MVeq
 			return (lhs.var_mvdbl<int2);
 	}
@@ -1029,7 +1030,7 @@ DLL_PUBLIC bool MVlt(const var& lhs,const int int2)
 	while (lhs.isnum());
 
 	//3. either or both non-numerical strings
-	if (!(lhs.var_mvtype&pimpl::MVTYPE_STR))
+	if (!(lhs.var_mvtyp&pimpl::MVTYPE_STR))
 	{
 		//lhs.createString();
 		ISSTRING(lhs)
@@ -1049,7 +1050,7 @@ DLL_PUBLIC bool MVlt(const int int1,const var& rhs)
 	//NB empty string is always less than anything except another empty string
 
 	//1. both empty or identical strings returns eq. one empty results false
-	if (rhs.var_mvtype&pimpl::MVTYPE_STR)
+	if (rhs.var_mvtyp&pimpl::MVTYPE_STR)
 	{
 		if (rhs.var_mvstr.length()==0)
 			//SAME as MVeq
@@ -1060,10 +1061,10 @@ DLL_PUBLIC bool MVlt(const int int1,const var& rhs)
 	//2. both numerical strings
 	do
 	{
-		if (rhs.var_mvtype&pimpl::MVTYPE_INT)
+		if (rhs.var_mvtyp&pimpl::MVTYPE_INT)
 			//different from MVeq
 			return (int1<rhs.var_mvint);
-		if (rhs.var_mvtype&pimpl::MVTYPE_DBL)
+		if (rhs.var_mvtyp&pimpl::MVTYPE_DBL)
 			//different from MVeq
 			return (int1<rhs.var_mvdbl);
 	}
@@ -1071,7 +1072,7 @@ DLL_PUBLIC bool MVlt(const int int1,const var& rhs)
 	while (rhs.isnum());
 
 	//3. either or both non-numerical strings
-	if (!(rhs.var_mvtype&pimpl::MVTYPE_STR))
+	if (!(rhs.var_mvtyp&pimpl::MVTYPE_STR))
 	{
 		//lhs.createString();
 		ISSTRING(rhs)
@@ -1141,15 +1142,15 @@ DLL_PUBLIC var operator +(const var& var1)
 	do
 	{
 		//int
-		if (var1.var_mvtype&pimpl::MVTYPE_INT)
+		if (var1.var_mvtyp&pimpl::MVTYPE_INT)
 			return var1.var_mvint;
 
 		//dbl
-		if (var1.var_mvtype&pimpl::MVTYPE_DBL)
+		if (var1.var_mvtyp&pimpl::MVTYPE_DBL)
 			return var1.var_mvdbl;
 
 		//unassigned
-		if (!var1.var_mvtype)
+		if (!var1.var_mvtyp)
 		{
 			ISASSIGNED(var1)
 			throw MVUnassigned(L"+()");
@@ -1174,15 +1175,15 @@ DLL_PUBLIC var operator -(const var& var1)
 	do
 	{
 		//int
-		if (var1.var_mvtype&pimpl::MVTYPE_INT)
+		if (var1.var_mvtyp&pimpl::MVTYPE_INT)
 			return -var1.var_mvint;
 
 		//dbl
-		if (var1.var_mvtype&pimpl::MVTYPE_DBL)
+		if (var1.var_mvtyp&pimpl::MVTYPE_DBL)
 			return -var1.var_mvdbl;
 
 		//unassigned
-		if (!var1.var_mvtype)
+		if (!var1.var_mvtyp)
 		{
 			ISASSIGNED(var1)
 			throw MVUnassigned(L"+()");
@@ -1216,13 +1217,13 @@ var MVadd(const var& lhs,const var& rhs)
 	ISNUMERIC(lhs)
 	ISNUMERIC(rhs)
 
-	if (lhs.var_mvtype&pimpl::MVTYPE_INT)
-		if (rhs.var_mvtype&pimpl::MVTYPE_INT)
+	if (lhs.var_mvtyp&pimpl::MVTYPE_INT)
+		if (rhs.var_mvtyp&pimpl::MVTYPE_INT)
 			return lhs.var_mvint + rhs.var_mvint;//only this returns an int, the following both return doubles
 		else
-			return	lhs.var_mvint + ((rhs.var_mvtype&pimpl::MVTYPE_INT) ? rhs.var_mvint : rhs.var_mvdbl);
+			return	lhs.var_mvint + ((rhs.var_mvtyp&pimpl::MVTYPE_INT) ? rhs.var_mvint : rhs.var_mvdbl);
 	else
-		return	lhs.var_mvdbl + ((rhs.var_mvtype&pimpl::MVTYPE_INT) ? rhs.var_mvint : rhs.var_mvdbl);
+		return	lhs.var_mvdbl + ((rhs.var_mvtyp&pimpl::MVTYPE_INT) ? rhs.var_mvint : rhs.var_mvdbl);
 }
 
 var MVsub(const var& lhs,const var& rhs)
@@ -1231,13 +1232,13 @@ var MVsub(const var& lhs,const var& rhs)
 	ISNUMERIC(lhs)
 	ISNUMERIC(rhs)
 
-	if (lhs.var_mvtype&pimpl::MVTYPE_INT)
-		if (rhs.var_mvtype&pimpl::MVTYPE_INT)
+	if (lhs.var_mvtyp&pimpl::MVTYPE_INT)
+		if (rhs.var_mvtyp&pimpl::MVTYPE_INT)
 			return lhs.var_mvint - rhs.var_mvint;//only this returns an int, the following both return doubles
 		else
-			return	lhs.var_mvint - ((rhs.var_mvtype&pimpl::MVTYPE_INT) ? rhs.var_mvint : rhs.var_mvdbl);
+			return	lhs.var_mvint - ((rhs.var_mvtyp&pimpl::MVTYPE_INT) ? rhs.var_mvint : rhs.var_mvdbl);
 	else
-		return	lhs.var_mvdbl - ((rhs.var_mvtype&pimpl::MVTYPE_INT) ? rhs.var_mvint : rhs.var_mvdbl);
+		return	lhs.var_mvdbl - ((rhs.var_mvtyp&pimpl::MVTYPE_INT) ? rhs.var_mvint : rhs.var_mvdbl);
 }
 
 var MVmul(const var& lhs,const var& rhs)
@@ -1246,13 +1247,13 @@ var MVmul(const var& lhs,const var& rhs)
 	ISNUMERIC(lhs)
 	ISNUMERIC(rhs)
 
-	if (lhs.var_mvtype&pimpl::MVTYPE_INT)
-		if (rhs.var_mvtype&pimpl::MVTYPE_INT)
+	if (lhs.var_mvtyp&pimpl::MVTYPE_INT)
+		if (rhs.var_mvtyp&pimpl::MVTYPE_INT)
 			return lhs.var_mvint * rhs.var_mvint;//only this returns an int, the following both return doubles
 		else
-			return	lhs.var_mvint * ((rhs.var_mvtype&pimpl::MVTYPE_INT) ? rhs.var_mvint : rhs.var_mvdbl);
+			return	lhs.var_mvint * ((rhs.var_mvtyp&pimpl::MVTYPE_INT) ? rhs.var_mvint : rhs.var_mvdbl);
 	else
-		return	lhs.var_mvdbl * ((rhs.var_mvtype&pimpl::MVTYPE_INT) ? rhs.var_mvint : rhs.var_mvdbl);
+		return	lhs.var_mvdbl * ((rhs.var_mvtyp&pimpl::MVTYPE_INT) ? rhs.var_mvint : rhs.var_mvdbl);
 }
 
 var MVdiv(const var& lhs,const var& rhs)
@@ -1263,11 +1264,11 @@ var MVdiv(const var& lhs,const var& rhs)
 
 	//always returns a double
 
-	double bottom=(rhs.var_mvtype&pimpl::MVTYPE_INT) ? double(rhs.var_mvint) : rhs.var_mvdbl;
+	double bottom=(rhs.var_mvtyp&pimpl::MVTYPE_INT) ? double(rhs.var_mvint) : rhs.var_mvdbl;
 	if (!bottom)
 		throw MVDivideByZero(L"div('" ^ lhs.substr(1,20) ^ L"', '" ^ rhs.substr(1,20) ^ L"')");
 
-	double top=(lhs.var_mvtype&pimpl::MVTYPE_INT) ? double(lhs.var_mvint) : lhs.var_mvdbl;
+	double top=(lhs.var_mvtyp&pimpl::MVTYPE_INT) ? double(lhs.var_mvint) : lhs.var_mvdbl;
 	return top/bottom;
 }
 
@@ -1278,18 +1279,18 @@ var MVmod(const var& lhs,const var& rhs)
 	ISNUMERIC(rhs)
 
 	//integer version;
-	if (lhs.var_mvtype&pimpl::MVTYPE_INT && rhs.var_mvtype&pimpl::MVTYPE_INT)
+	if (lhs.var_mvtyp&pimpl::MVTYPE_INT && rhs.var_mvtyp&pimpl::MVTYPE_INT)
 	{
 		if (!rhs.var_mvint)
 			throw MVDivideByZero(L"div('" ^ lhs.substr(1,20) ^ L"', '" ^ rhs.substr(1,20) ^ L"')");
 		return lhs.var_mvint%rhs.var_mvint;
 	}
 
-	double bottom=(rhs.var_mvtype&pimpl::MVTYPE_INT) ? double(rhs.var_mvint) : rhs.var_mvdbl;
+	double bottom=(rhs.var_mvtyp&pimpl::MVTYPE_INT) ? double(rhs.var_mvint) : rhs.var_mvdbl;
 	if (!bottom)
 		throw MVDivideByZero(L"div('" ^ lhs.substr(1,20) ^ L"', '" ^ rhs.substr(1,20) ^ L"')");
 
-	double top=(lhs.var_mvtype&pimpl::MVTYPE_INT) ? double(lhs.var_mvint) : lhs.var_mvdbl;
+	double top=(lhs.var_mvtyp&pimpl::MVTYPE_INT) ? double(lhs.var_mvint) : lhs.var_mvdbl;
 	return neosysmodulus(top,bottom);
 }
 
@@ -1375,7 +1376,7 @@ std::istream& operator >> (std::istream& istream1,var& var1)
 	std::string tempstr;
 	istream1 >> std::noskipws >> tempstr;
 
-	var1.var_mvtype=pimpl::MVTYPE_STR;
+	var1.var_mvtyp=pimpl::MVTYPE_STR;
 	var1.var_mvstr=wstringfromUTF8((UTF8*)tempstr.data(),(int)tempstr.length());
 	return istream1;
 }
@@ -1401,7 +1402,7 @@ std::wistream& operator >> (std::wistream& wistream1,var& var1)
 	THISIS(L"std::wistream& operator >> (std::wistream& wistream1,var& var1)")
 	ISDEFINED(var1)
 
-	var1.var_mvtype=pimpl::MVTYPE_STR;
+	var1.var_mvtyp=pimpl::MVTYPE_STR;
 	wistream1 >> std::noskipws >> var1.var_mvstr;
 	return wistream1;
 }
@@ -1482,5 +1483,6 @@ MVAbort				::MVAbort			(const var& var1)	: MVException(L"MVAbort"							){}
 
 MVArrayDimensionedZero	::MVArrayDimensionedZero	()					: MVException(L"MVArrayDimensionedZero:"			){}
 MVArrayIndexOutOfBounds	::MVArrayIndexOutOfBounds	(const var& var1)	: MVException(L"MVArrayIndexOutOfBounds:"	^ var1	){}
+MVArrayNotDimensioned	::MVArrayNotDimensioned	()	: MVException(L"MVArrayNotDimensioned"){}
 
 } // namespace exodus

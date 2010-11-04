@@ -35,17 +35,21 @@ THE SOFTWARE.
 namespace exodus
 {
 
-//includes matparse,field,field2,locate,extract,erase,replace,insert,substr,splice,remove
+//includes dim::matparse
 
-//////////
-//MATPARSE
-//////////
+//and var::field,field2,locate,extract,erase,replace,insert,substr,splice,remove
 
-//var.matparse(varray1)
-void var::matparse(varray& varray1) const
+///////
+//PARSE
+///////
+
+//var.matparse(dimarray2)
+var dim::parse(const var& var1)
 {
-	THISIS(L"void var::matparse(varray& varray1) const")
-	THISISSTRING()
+	THISIS(L"var dim::parse(const var& var1)")
+	//ISSTRING(var1)
+
+	(*this).redim(var1.count(FM_)+1);
 
 	//find the starting position of the field or return L""
 	std::wstring::size_type start_pos=0;
@@ -53,18 +57,19 @@ void var::matparse(varray& varray1) const
 	for (;;)
 	{
 		std::wstring::size_type next_pos;
-		next_pos=var_mvstr.find(FM_,start_pos);
+		next_pos=var1.var_mvstr.find(FM_,start_pos);
+
+		data_[fieldn]=var1.var_mvstr.substr(start_pos,next_pos-start_pos);
+
 		//past of of string?
 		if (next_pos==std::wstring::npos)
-		{
-			varray1(fieldn)=L"";
-			return;
-		}
-		varray1(fieldn)=var_mvstr.substr(start_pos,next_pos-start_pos);
+			break;
+
 		start_pos=next_pos+1;
 		fieldn++;
 	}
 
+	return fieldn;
 }
 
 ///////////////////////////////////////////
@@ -748,6 +753,12 @@ var var::operator() (int fieldn, int valuen, int subvaluen) const
 	return extract(fieldn,valuen,subvaluen);
 }
 
+/* sadly no way to get a different operator() function called when on the left hand side of assign
+   therefore not possible to create syntax like "xyz(1,2)="xx";" to REPLACE fields, values and subvalues
+   so operator() is defined only for the more common xyz=extract(1,2,3); i.e. on the right hand side.
+   http://codepad.org/MzzhlRkb
+*/
+
 /*
 var& var::operator() (int fieldn, int valuen, int subvaluen)
 {
@@ -893,7 +904,7 @@ var& var::eraser(int fieldn,int valuen,int subvaluen)
 		//functionmode return var(L"");//var(var1);
 		//proceduremode
 		var_mvstr=L"";
-		var_mvtype=1;
+		var_mvtyp=1;
 		return *this;
 	}
 
@@ -1083,7 +1094,7 @@ var& var::replacer(int fieldn,int valuen,int subvaluen,const var& replacement)
 		//functionmode return var(replacement);
 		//proceduremode
 		var_mvstr=replacement.var_mvstr;
-		var_mvtype=pimpl::MVTYPE_STR;
+		var_mvtyp=pimpl::MVTYPE_STR;
 		return *this;
 	}
 
@@ -1487,7 +1498,7 @@ var& var::substrer(const int startx,const int length)
 	if (max==0)
 	{
 		var_mvstr=L"";
-		var_mvtype=pimpl::MVTYPE_INTSTR;
+		var_mvtyp=pimpl::MVTYPE_INTSTR;
 		var_mvint=0;
 		return *this;
 	}
@@ -1500,7 +1511,7 @@ var& var::substrer(const int startx,const int length)
 		if (length==0)
 		{
 			var_mvstr=L"";
-			var_mvtype=pimpl::MVTYPE_INTSTR;
+			var_mvtyp=pimpl::MVTYPE_INTSTR;
 			var_mvint=0;
 			return *this;
 		}
@@ -1511,7 +1522,7 @@ var& var::substrer(const int startx,const int length)
 			if (start==0)
 			{
 				var_mvstr=L"";
-				var_mvtype=pimpl::MVTYPE_INTSTR;
+				var_mvtyp=pimpl::MVTYPE_INTSTR;
 				var_mvint=0;
 				return *this;
 			}
@@ -1519,7 +1530,7 @@ var& var::substrer(const int startx,const int length)
 			if (start<1)
 			{
 				var_mvstr=L"";
-				var_mvtype=pimpl::MVTYPE_INTSTR;
+				var_mvtyp=pimpl::MVTYPE_INTSTR;
 				var_mvint=0;
 				return *this;
 			}
@@ -1537,7 +1548,7 @@ var& var::substrer(const int startx,const int length)
 			result+=var_mvstr[ii-1];
 
 		var_mvstr=result;
-		var_mvtype=pimpl::MVTYPE_STR;
+		var_mvtyp=pimpl::MVTYPE_STR;
 		return *this;
 
 	}
@@ -1556,7 +1567,7 @@ var& var::substrer(const int startx,const int length)
 	else if (start>max)
 	{
 		var_mvstr=L"";
-		var_mvtype=pimpl::MVTYPE_INTSTR;
+		var_mvtyp=pimpl::MVTYPE_INTSTR;
 		var_mvint=0;
 		return *this;
 	}
@@ -1566,7 +1577,7 @@ var& var::substrer(const int startx,const int length)
 
 	//TODO use erase for speed instead of copying whole string
 	var_mvstr=var_mvstr.substr(start-1,stop-start);
-	var_mvtype=pimpl::MVTYPE_STR;
+	var_mvtyp=pimpl::MVTYPE_STR;
 
 	return *this;
 

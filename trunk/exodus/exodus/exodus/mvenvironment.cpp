@@ -20,7 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#define NEO_MVENVIRONMENT_CPP
+#define EXO_MVENVIRONMENT_CPP
 
 //C4530: C++ exception handler used, but unwind semantics are not enabled. 
 #pragma warning (disable: 4530)
@@ -110,12 +110,12 @@ bool MvEnvironment::init(const var& threadno)
 	//mvprocess
 	var definitionsfilename=L"DEFINITIONS";
 
-	this->USERNAME=L"NEOSYS";
-	this->ACCOUNT=L"ADAGENCY";
-	this->STATION=L"NEOSYS";
+	this->USERNAME=L"";
+	this->ACCOUNT=L"";
+	this->STATION=L"";
 	this->ROLLOUTFILE=L"~"^threadno^L".$$$";
 	this->THREADNO=threadno;
-	this->SYSTEM.replacer(17,0,0,L"02BP");
+	this->SYSTEM.replacer(17,0,0,L"");
 
 	//openqm connection
 	//std::wcout<<L"Connecting DB ... "<<std::flush;

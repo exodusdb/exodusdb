@@ -6,7 +6,7 @@ This header file is used to generate functors for functions and subroutines that
 arguments that cannot be represented by vars eg ("inarray" arguments)
 
 For example, the following function cannot be handled by the standard exodus functor
-because it contains a varray which cannot be converted to a var.
+because it contains a dim which cannot be converted to a var.
 
 function xyz(in arg1,inarray arg2)
 
