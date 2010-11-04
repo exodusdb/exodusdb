@@ -86,7 +86,7 @@ bool var::input()
 	if (std::cin.eof())
 	{
 		var_mvstr=L"";
-		var_mvtype=pimpl::MVTYPE_STR;
+		var_mvtyp=pimpl::MVTYPE_STR;
 		return false;
 	}
 
@@ -96,13 +96,13 @@ bool var::input()
 	if (std::cin.eof())
 	{
 		var_mvstr=L"";
-		var_mvtype=pimpl::MVTYPE_STR;
+		var_mvtyp=pimpl::MVTYPE_STR;
 		return false;
 	}
 
 	//convert from utf8 to internal format - utf16 or utf32 depending on platform
 	var_mvstr=wstringfromUTF8((UTF8*)tempstr.data(),(int)tempstr.length());
-	var_mvtype=pimpl::MVTYPE_STR;
+	var_mvtyp=pimpl::MVTYPE_STR;
 
 	return true;
 }
@@ -136,10 +136,10 @@ bool var::assigned() const
 	//which is possible (in syntax like var xx.osread()?)
 	//and also when passing default variables to functions in the functors on gcc
 	//THISISDEFINED()
-	if (!this||(*this).var_mvtype&mvtypemask)
+	if (!this||(*this).var_mvtyp&mvtypemask)
 		return false;
 
-	return var_mvtype!=pimpl::MVTYPE_UNA;
+	return var_mvtyp!=pimpl::MVTYPE_UNA;
 }
 
 bool var::unassigned() const
@@ -148,10 +148,10 @@ bool var::unassigned() const
 
 	//see explanation above in assigned
 	//THISISDEFINED()
-	if (!this||((*this).var_mvtype&mvtypemask))
+	if (!this||((*this).var_mvtyp&mvtypemask))
 		return true;
 
-	return !var_mvtype;
+	return !var_mvtyp;
 }
 
 //pick int() is actually the same as floor. using integer() instead of int() because int is a reserved word in c/c++ for int datatype
@@ -172,7 +172,7 @@ var var::integer() const
 	 1.0=1
 	*/
 
-	if (var_mvtype&pimpl::MVTYPE_INT)
+	if (var_mvtyp&pimpl::MVTYPE_INT)
 		return var_mvint;
 
 	//could save the integer conversion here but would require mentality to save BOTH int and double
@@ -189,7 +189,7 @@ var var::floor() const
 	THISIS(L"var var::floor() const")
 	THISISNUMERIC()
 
-	if (var_mvtype&pimpl::MVTYPE_INT)
+	if (var_mvtyp&pimpl::MVTYPE_INT)
 		return var_mvint;
 
 	//could save the integer conversion here but would require mentality to save BOTH int and double
@@ -221,7 +221,7 @@ var var::round(const int ndecimals) const
 	THISISNUMERIC()
 
 	double result;
-	if (var_mvtype&pimpl::MVTYPE_INT)
+	if (var_mvtyp&pimpl::MVTYPE_INT)
 	{
 		if (not ndecimals)
 			return var_mvint;
@@ -261,18 +261,18 @@ bool var::toBool() const
 	{
 		//doubles are true unless zero
 		//check double first dbl on guess that tests will be most often on financial numbers
-		if (var_mvtype&pimpl::MVTYPE_DBL)
+		if (var_mvtyp&pimpl::MVTYPE_DBL)
 			return (bool)(var_mvdbl!=0);
 
 		//ints are true except for zero
-		if (var_mvtype&pimpl::MVTYPE_INT)
+		if (var_mvtyp&pimpl::MVTYPE_INT)
 			return (bool)(var_mvint!=0);
 
 		//non-numeric strings are true unless zero length
-		if (var_mvtype&pimpl::MVTYPE_NAN)
+		if (var_mvtyp&pimpl::MVTYPE_NAN)
 			return (bool)(var_mvstr.length()!=0);
 
-		if (!(var_mvtype))
+		if (!(var_mvtyp))
 		{
 			THISISASSIGNED()
 			throw MVUnassigned(L"toBool()");
@@ -291,7 +291,7 @@ int var::toInt() const
 	THISISNUMERIC()
 
 	//loss of precision if var_mvint is long long
-	return (var_mvtype&pimpl::MVTYPE_INT) ? int(var_mvint) : int(var_mvdbl);
+	return (var_mvtyp&pimpl::MVTYPE_INT) ? int(var_mvint) : int(var_mvdbl);
 }
 
 double var::toDouble() const
@@ -299,7 +299,7 @@ double var::toDouble() const
 	THISIS(L"double var::toDouble() const")
 	THISISNUMERIC()
 
-	return (var_mvtype&pimpl::MVTYPE_INT) ? double(var_mvint) : var_mvdbl;
+	return (var_mvtyp&pimpl::MVTYPE_INT) ? double(var_mvint) : var_mvdbl;
 }
 
 void var::createString() const
@@ -309,7 +309,7 @@ void var::createString() const
 	//to avoid wasting time doing multiple calls to ISDEFINED
 	THISISDEFINED()
 
-	switch (var_mvtype)
+	switch (var_mvtyp)
 	{
 		//skip this test for speed and only call the function if required
 		//str already. no action required
@@ -335,7 +335,7 @@ void var::createString() const
 		default:
 			//arrives here only after int or dbl has been converted to string
 			//add the "string available" bit flag using the "bitor equals" operator
-			var_mvtype|=pimpl::MVTYPE_STR;
+			var_mvtyp|=pimpl::MVTYPE_STR;
 	}
 
 }
@@ -738,13 +738,28 @@ var& var::transfer(var& var2)
 	ISDEFINED(var2)
 
 	var_mvstr.swap(var2.var_mvstr);
-	var2.var_mvtype=var_mvtype;
+	var2.var_mvtyp=var_mvtyp;
 	var2.var_mvint=var_mvint;
 	var2.var_mvdbl=var_mvdbl;
 
 	var_mvstr=L"";
 	var_mvint=0;
-	var_mvtype=pimpl::MVTYPE_INTSTR;
+	var_mvtyp=pimpl::MVTYPE_INTSTR;
+
+	return var2;
+}
+
+var& var::clone(var& var2)
+{
+	THISIS(L"var& var::clone(var& var2)")
+	//clone even unassigned vars (but not uninitialised ones)
+	THISISDEFINED()
+	ISDEFINED(var2)
+
+	var_mvtyp=var2.var_mvtyp;
+	var_mvstr=var2.var_mvstr;
+	var_mvint=var2.var_mvint;
+	var_mvdbl=var2.var_mvdbl;
 
 	return var2;
 }
@@ -757,7 +772,7 @@ var& var::exchange(var& var2)
 	ISDEFINED(var2)
 
 	//intermediary copies of var2
-	int mvtypex=var2.var_mvtype;
+	int mvtypex=var2.var_mvtyp;
 	mvint_t mvintx=var2.var_mvint;
 	double mvdblx=var2.var_mvdbl;
 
@@ -765,12 +780,12 @@ var& var::exchange(var& var2)
 	var_mvstr.swap(var2.var_mvstr);
 
 	//copy mv to var2
-	var2.var_mvtype=var_mvtype;
+	var2.var_mvtyp=var_mvtyp;
 	var2.var_mvint=var_mvint;
 	var2.var_mvdbl=var_mvdbl;
 
 	//copy intermediaries to mv
-	var_mvtype=mvtypex;
+	var_mvtyp=mvtypex;
 	var_mvint=mvintx;
 	var_mvdbl=mvdblx;
 
@@ -1031,16 +1046,16 @@ bool var::isnum(void) const
 	THISISDEFINED()
 
 	//is numeric already
-	if (var_mvtype&pimpl::MVTYPE_INTDBL)
+	if (var_mvtyp&pimpl::MVTYPE_INTDBL)
 		return true;
 
 	//is known not numeric already
 	//maybe put this first if comparison operations on strings are more frequent than numeric operations on numbers
-	if (var_mvtype&pimpl::MVTYPE_NAN)
+	if (var_mvtyp&pimpl::MVTYPE_NAN)
 		return false;
 
 	//not assigned error
-	if (!var_mvtype)
+	if (!var_mvtyp)
 		throw MVUnassigned(L"isnum()");
 
 	//if not a number and not unassigned then it is an unknown string
@@ -1085,14 +1100,14 @@ bool var::isnum(void) const
 					//if (ii) goto nan;
 					if (ii)
 					{
-						var_mvtype=pimpl::MVTYPE_NANSTR;
+						var_mvtyp=pimpl::MVTYPE_NANSTR;
 						return false;
 					}
 					break;
 
 				//any other character mean non-numeric
 				default:
-					var_mvtype=pimpl::MVTYPE_NANSTR;
+					var_mvtyp=pimpl::MVTYPE_NANSTR;
 					return false;
 			}
 		}
@@ -1118,13 +1133,13 @@ bool var::isnum(void) const
 		if (var_mvstr.length())
 		// goto nan;
 		{
-			var_mvtype=pimpl::MVTYPE_NANSTR;
+			var_mvtyp=pimpl::MVTYPE_NANSTR;
 			return false;
 		}
 
 		//zero length string is integer 0
 		var_mvint=0;
-		var_mvtype=pimpl::MVTYPE_INTSTR;
+		var_mvtyp=pimpl::MVTYPE_INTSTR;
 		return true;
 
 	}
@@ -1147,7 +1162,7 @@ bool var::isnum(void) const
 
 		std::string result(var_mvstr.begin(),var_mvstr.end());
 		var_mvdbl=atof(result.c_str());
-		var_mvtype=pimpl::MVTYPE_DBLSTR;
+		var_mvtyp=pimpl::MVTYPE_DBLSTR;
 	}
 	else
 	{
@@ -1157,7 +1172,7 @@ bool var::isnum(void) const
 		std::string result(var_mvstr.begin(),var_mvstr.end());
 		//var_mvdbl=atof(result.c_str());
 		var_mvint=atoi(result.c_str());
-		var_mvtype=pimpl::MVTYPE_INTSTR;
+		var_mvtyp=pimpl::MVTYPE_INTSTR;
 	}
 
 	//indicate isNumeric
@@ -1225,10 +1240,10 @@ const var& var::outputl(const var& str) const
 
 const var& var::outputt(const var& str) const
 {
+	std::cout << "\t";
 	str.put(std::cout);
 	std::cout << "\t";
 	put(std::cout);
-	std::cout << "\t";
 	return *this;
 }
 
@@ -1339,9 +1354,29 @@ var var::count(const var& substrx) const
 
 }
 
-var var::index(const var& substrx,const int startchar1) const
+var var::count(const wchar_t charx) const
 {
-	THISIS(L"var var::index(const var& substrx,const int startchar1) const")
+	THISIS(L"var var::count(const char charx) const")
+	THISISSTRING()
+
+	//find the starting position of the field or return L""
+	std::wstring::size_type start_pos=0;
+	int fieldn=0;
+	while (true)
+	{
+		start_pos=var_mvstr.find_first_of(charx, start_pos);
+		//past of of string?
+		if (start_pos==std::wstring::npos)
+			return fieldn;
+		start_pos++;
+		fieldn++;
+	}
+
+}
+
+var var::index2(const var& substrx,const int startchar1) const
+{
+	THISIS(L"var var::index2(const var& substrx,const int startchar1) const")
 	THISISSTRING()
 	ISSTRING(substrx)
 	
@@ -1358,6 +1393,48 @@ var var::index(const var& substrx,const int startchar1) const
 	if (start_pos==std::wstring::npos) return var(0);
 
 	return var((int)start_pos+1);
+
+}
+
+var var::index(const var& substrx,const int occurrenceno) const
+{
+	THISIS(L"var var::index(const var& substrx,const int occurrenceno) const")
+	THISISSTRING()
+	ISSTRING(substrx)
+	
+	//convert to a string for .find
+	std::wstring substr=substrx.var_mvstr;
+	if (substr==L"")
+		return var(0);
+
+	std::wstring::size_type start_pos=0;
+
+	//negative and 0th occurrence mean the first
+	int countdown=occurrenceno>=1?occurrenceno:1;
+
+	for (;;)
+	{
+
+		//find the starting position of the field or return L""
+		start_pos=var_mvstr.find(substr,start_pos);
+
+		//past of of string?
+		if (start_pos==std::wstring::npos)
+			return 0;
+
+		--countdown;
+
+		//found the right occurrence
+		if (countdown==0)
+			return ((int)start_pos+1);
+
+		//skip to character after substr (not just next character)
+		start_pos+=substr.length();
+
+	}
+
+	//should never get here
+	return 0;
 
 }
 
@@ -1430,17 +1507,17 @@ var var::abs() const
 	THISIS(L"var var::abs() const")
 	THISISNUMERIC()
 
-	if (var_mvtype&pimpl::MVTYPE_INT)
+	if (var_mvtyp&pimpl::MVTYPE_INT)
 	{
 		if (var_mvint<0) return -var_mvint;
 		return var_mvint;
 	}
-	if (var_mvtype&pimpl::MVTYPE_DBL)
+	if (var_mvtyp&pimpl::MVTYPE_DBL)
 	{
 		if (var_mvdbl<0) return -var_mvdbl;
 		return std::floor(var_mvdbl);
 	}
-	throw MVException(L"abs(unknown mvtype=" ^ var(var_mvtype) ^ L")");
+	throw MVException(L"abs(unknown mvtype=" ^ var(var_mvtyp) ^ L")");
 }
 
 var var::mod(const var& divisor) const
@@ -1449,9 +1526,9 @@ var var::mod(const var& divisor) const
 	THISISNUMERIC()
 	ISNUMERIC(divisor)
 
-	if (var_mvtype&pimpl::MVTYPE_INT)
+	if (var_mvtyp&pimpl::MVTYPE_INT)
 	{
-		if (divisor.var_mvtype&pimpl::MVTYPE_INT)
+		if (divisor.var_mvtyp&pimpl::MVTYPE_INT)
 		{
 			if ((var_mvint<0 && divisor.var_mvint>=0) || (divisor.var_mvint<0 && var_mvint>=0))
 				//multivalue version of mod
@@ -1464,7 +1541,7 @@ var var::mod(const var& divisor) const
 
 			var_mvdbl=double(var_mvint);
 			//following would cache the double value but is it worth it?
-			//var_mvtype=var_mvtype&pimpl::MVTYPE_DBL;
+			//var_mvtyp=var_mvtyp&pimpl::MVTYPE_DBL;
 
 			if ((var_mvint<0 && divisor.var_mvdbl>=0) || (divisor.var_mvdbl<0 && var_mvint>=0))
 				//multivalue version of mod
@@ -1475,11 +1552,11 @@ var var::mod(const var& divisor) const
 	}
 	else
 	{
-		if (divisor.var_mvtype&pimpl::MVTYPE_INT)
+		if (divisor.var_mvtyp&pimpl::MVTYPE_INT)
 		{
 			divisor.var_mvdbl=double(divisor.var_mvint);
 			//following would cache the double value but is it worth it?
-			//divisor.var_mvtype=divisor.var_mvtype&pimpl::MVTYPE_DBL;
+			//divisor.var_mvtyp=divisor.var_mvtyp&pimpl::MVTYPE_DBL;
 
 			if ((var_mvdbl<0 && divisor.var_mvint>=0) || (divisor.var_mvint<0 && var_mvdbl>=0))
 				//multivalue version of mod
@@ -1497,7 +1574,7 @@ var var::mod(const var& divisor) const
 				return fmod(var_mvdbl,divisor.var_mvdbl);
 		}
 	}
-	//throw MVException(L"abs(unknown mvtype=" ^ var(var_mvtype) ^ L")");
+	//throw MVException(L"abs(unknown mvtype=" ^ var(var_mvtyp) ^ L")");
 }
 
 var var::mod(const int divisor) const
@@ -1505,7 +1582,7 @@ var var::mod(const int divisor) const
 	THISIS(L"var var::mod(const int divisor) const")
 	THISISNUMERIC()
 
-	if (var_mvtype&pimpl::MVTYPE_INT)
+	if (var_mvtyp&pimpl::MVTYPE_INT)
 	{
 			if ((var_mvint<0 && divisor>=0) || (divisor<0 && var_mvint>=0))
 				//multivalue version of mod
@@ -1524,7 +1601,7 @@ var var::mod(const int divisor) const
 			else
 				return fmod(var_mvdbl,double(divisor));
 	}
-	//throw MVException(L"abs(unknown mvtype=" ^ var(var_mvtype) ^ L")");
+	//throw MVException(L"abs(unknown mvtype=" ^ var(var_mvtyp) ^ L")");
 }
 
 /*
@@ -1537,13 +1614,13 @@ var var::sin() const
 	THISIS(L"var var::sin() const")
 	THISISNUMERIC()
 
-	if (var_mvtype&pimpl::MVTYPE_DBL)
+	if (var_mvtyp&pimpl::MVTYPE_DBL)
 		return std::sin(var_mvdbl*M_PI/180);
 
-//	if (var_mvtype&pimpl::MVTYPE_INT)
+//	if (var_mvtyp&pimpl::MVTYPE_INT)
 		return std::sin(double(var_mvint)*M_PI/180);
 
-	throw MVException(L"sin(unknown mvtype=" ^ var(var_mvtype) ^ L")");
+	throw MVException(L"sin(unknown mvtype=" ^ var(var_mvtyp) ^ L")");
 }
 
 var var::cos() const
@@ -1551,13 +1628,13 @@ var var::cos() const
 	THISIS(L"var var::cos() const")
 	THISISNUMERIC()
 
-	if (var_mvtype&pimpl::MVTYPE_DBL)
+	if (var_mvtyp&pimpl::MVTYPE_DBL)
 		return std::cos(var_mvdbl*M_PI/180);
 
-//	if (var_mvtype&pimpl::MVTYPE_INT)
+//	if (var_mvtyp&pimpl::MVTYPE_INT)
 		return std::cos(double(var_mvint)*M_PI/180);
 
-	throw MVException(L"cos(unknown mvtype=" ^ var(var_mvtype) ^ L")");
+	throw MVException(L"cos(unknown mvtype=" ^ var(var_mvtyp) ^ L")");
 }
 
 var var::tan() const
@@ -1565,13 +1642,13 @@ var var::tan() const
 	THISIS(L"var var::tan() const")
 	THISISNUMERIC()
 
-	if (var_mvtype&pimpl::MVTYPE_DBL)
+	if (var_mvtyp&pimpl::MVTYPE_DBL)
 		return std::tan(var_mvdbl*M_PI/180);
 
-//	if (var_mvtype&pimpl::MVTYPE_INT)
+//	if (var_mvtyp&pimpl::MVTYPE_INT)
 		return std::tan(double(var_mvint)*M_PI/180);
 
-	throw MVException(L"tan(unknown mvtype=" ^ var(var_mvtype) ^ L")");
+	throw MVException(L"tan(unknown mvtype=" ^ var(var_mvtyp) ^ L")");
 }
 
 var var::atan() const
@@ -1579,13 +1656,13 @@ var var::atan() const
 	THISIS(L"var var::atan() const")
 	THISISNUMERIC()
 
-	if (var_mvtype&pimpl::MVTYPE_DBL)
+	if (var_mvtyp&pimpl::MVTYPE_DBL)
 		return std::atan(var_mvdbl*M_PI/180);
 
-//	if (var_mvtype&pimpl::MVTYPE_INT)
+//	if (var_mvtyp&pimpl::MVTYPE_INT)
 		return std::atan(double(var_mvint)*M_PI/180);
 
-	throw MVException(L"sin(unknown mvtype=" ^ var(var_mvtype) ^ L")");
+	throw MVException(L"sin(unknown mvtype=" ^ var(var_mvtyp) ^ L")");
 }
 
 var var::loge() const
@@ -1593,13 +1670,13 @@ var var::loge() const
 	THISIS(L"var var::loge() const")
 	THISISNUMERIC()
 
-	if (var_mvtype&pimpl::MVTYPE_DBL)
+	if (var_mvtyp&pimpl::MVTYPE_DBL)
 		return std::log(var_mvdbl);
 
-//	if (var_mvtype&pimpl::MVTYPE_INT)
+//	if (var_mvtyp&pimpl::MVTYPE_INT)
 		return std::log(double(var_mvint));
 
-	throw MVException(L"loge(unknown mvtype=" ^ var(var_mvtype) ^ L")");
+	throw MVException(L"loge(unknown mvtype=" ^ var(var_mvtyp) ^ L")");
 }
 
 var var::sqrt() const
@@ -1607,13 +1684,13 @@ var var::sqrt() const
 	THISIS(L"var var::sqrt() const")
 	THISISNUMERIC()
 
-	if (var_mvtype&pimpl::MVTYPE_DBL)
+	if (var_mvtyp&pimpl::MVTYPE_DBL)
 		return std::sqrt(var_mvdbl);
 
-//	if (var_mvtype&pimpl::MVTYPE_INT)
+//	if (var_mvtyp&pimpl::MVTYPE_INT)
 		return std::sqrt(double(var_mvint));
 
-	throw MVException(L"sqrt(unknown mvtype=" ^ var(var_mvtype) ^ L")");
+	throw MVException(L"sqrt(unknown mvtype=" ^ var(var_mvtyp) ^ L")");
 }
 
 var var::pwr(const var& exponent) const
@@ -1622,13 +1699,13 @@ var var::pwr(const var& exponent) const
 	THISISNUMERIC()
 	ISNUMERIC(exponent)
 
-	if (var_mvtype&pimpl::MVTYPE_DBL)
+	if (var_mvtyp&pimpl::MVTYPE_DBL)
 		return std::pow(var_mvdbl,exponent.toDouble());
 
-//	if (var_mvtype&pimpl::MVTYPE_INT)
+//	if (var_mvtyp&pimpl::MVTYPE_INT)
 		return std::pow(double(var_mvint),exponent.toDouble());
 
-	throw MVException(L"pow(unknown mvtype=" ^ var(var_mvtype) ^ L")");
+	throw MVException(L"pow(unknown mvtype=" ^ var(var_mvtyp) ^ L")");
 }
 
 var var::exp() const
@@ -1636,13 +1713,13 @@ var var::exp() const
 	THISIS(L"var var::exp() const")
 	THISISNUMERIC()
 
-	if (var_mvtype&pimpl::MVTYPE_DBL)
+	if (var_mvtyp&pimpl::MVTYPE_DBL)
 		return std::exp(var_mvdbl);
 
-//	if (var_mvtype&pimpl::MVTYPE_INT)
+//	if (var_mvtyp&pimpl::MVTYPE_INT)
 		return std::exp(double(var_mvint));
 
-	throw MVException(L"exp(unknown mvtype=" ^ var(var_mvtype) ^ L")");
+	throw MVException(L"exp(unknown mvtype=" ^ var(var_mvtyp) ^ L")");
 }
 
 var var::at(const int column) const

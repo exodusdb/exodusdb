@@ -38,7 +38,7 @@ DLL_PUBLIC bool assigned(const var& mv1);
 DLL_PUBLIC bool unassigned(const var& mv1);
 DLL_PUBLIC var date();
 DLL_PUBLIC var time();
-DLL_PUBLIC var datetime();
+DLL_PUBLIC var timedate();
 DLL_PUBLIC void ossleep(const int milliseconds);
 DLL_PUBLIC var ostime();
 DLL_PUBLIC bool osopen(const var& filename, var& filehandle);
@@ -169,7 +169,8 @@ DLL_PUBLIC var substr(const var& instring, const int startx);
 DLL_PUBLIC var substr(const var& instring, const int startx,const int length);
 DLL_PUBLIC var substrer(var& instring, const int startx);
 DLL_PUBLIC var substrer(var& instring, const int startx,const int length);
-DLL_PUBLIC var index(const var& instring, const var& substr,const int startchar1=1);
+DLL_PUBLIC var index(const var& instring, const var& substr,const int occurrenceno=1);
+DLL_PUBLIC var index2(const var& instring, const var& substr,const int startcharno=1);
 DLL_PUBLIC var field(const var& instring, const var& substrx,const int fieldnx,const int nfieldsx=1);
 DLL_PUBLIC var field2(const var& instring, const var& substrx,const int fieldnx,const int nfieldsx=1);
 DLL_PUBLIC var oconv(const var& instring, const wchar_t* conversion);
@@ -210,6 +211,9 @@ DLL_PUBLIC var calculate(const var& fieldname);
 DLL_PUBLIC var xlate(const var& filename, const var& key, const var& fieldno, const wchar_t* mode);
 DLL_PUBLIC var xlate(const var& filename, const var& key, const var& fieldno, const var& mode);
 DLL_PUBLIC var remove(const var& fromstr, var& startx, var& delimiterno);
+
+DLL_PUBLIC var matparse(const var& dynarray, dim& intodimarray);
+DLL_PUBLIC var matunparse(const dim& dimarray);
 
 DLL_PUBLIC var replace(const var& instring, const int fieldno, const int valueno, const int subvalueno, const var& replacement);
 DLL_PUBLIC var replace(const var& instring, const int fieldno, const int valueno, const var& replacement);
@@ -269,31 +273,31 @@ void print(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg
 
 template<class T1, class T2>
 void printt(T1 arg1, T2 arg2)
-{ print(arg1); printt(arg2);}
+{ printt(arg1); printt(arg2);}
 template<class T1, class T2, class T3>
 void printt(T1 arg1, T2 arg2, T3 arg3)
-{ print(arg1); print(arg2); printt(arg3);}
+{ printt(arg1); printt(arg2); printt(arg3);}
 template<class T1, class T2, class T3, class T4>
 void printt(T1 arg1, T2 arg2, T3 arg3, T4 arg4)
-{ print(arg1); print(arg2); print(arg3); printt(arg4);}
+{ printt(arg1); printt(arg2); printt(arg3); printt(arg4);}
 template<class T1, class T2, class T3, class T4, class T5>
 void printt(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
-{ print(arg1); print(arg2); print(arg3); print(arg4); printt(arg5);}
+{ printt(arg1); printt(arg2); printt(arg3); printt(arg4); printt(arg5);}
 template<class T1, class T2, class T3, class T4, class T5, class T6>
 void printt(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
-{ print(arg1); print(arg2); print(arg3); print(arg4); print(arg5); printt(arg6);}
+{ printt(arg1); printt(arg2); printt(arg3); printt(arg4); printt(arg5); printt(arg6);}
 template<class T1, class T2, class T3, class T4, class T5, class T6, class T7>
 void printt(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
-{ print(arg1); print(arg2); print(arg3); print(arg4); print(arg5); print(arg6); printt(arg7);}
+{ printt(arg1); printt(arg2); printt(arg3); printt(arg4); printt(arg5); printt(arg6); printt(arg7);}
 template<class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
 void printt(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8)
-{ print(arg1); print(arg2); print(arg3); print(arg4); print(arg5); print(arg6); print(arg7); printt(arg8);}
+{ printt(arg1); printt(arg2); printt(arg3); printt(arg4); printt(arg5); printt(arg6); printt(arg7); printt(arg8);}
 template<class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 void printt(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9)
-{ print(arg1); print(arg2); print(arg3); print(arg4); print(arg5); print(arg6); print(arg7); print(arg8); printt(arg9); }
+{ printt(arg1); printt(arg2); printt(arg3); printt(arg4); printt(arg5); printt(arg6); printt(arg7); printt(arg8); printt(arg9); }
 template<class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10>
 void printt(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9, T10 arg10)
-{ print(arg1); print(arg2); print(arg3); print(arg4); print(arg5); print(arg6); print(arg7); print(arg8); print(arg9); printt(arg10);}
+{ printt(arg1); printt(arg2); printt(arg3); printt(arg4); printt(arg5); printt(arg6); printt(arg7); printt(arg8); printt(arg9); printt(arg10);}
 
 template<class T1, class T2>
 void printl(T1 arg1, T2 arg2)

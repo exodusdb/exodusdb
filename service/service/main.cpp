@@ -40,7 +40,7 @@ boost::thread_specific_ptr<int> tss_environmentns;
 
 using namespace exodus;
 
-#include <exodus/mvenvironment.h>
+//#include <exodus/mvenvironment.h>
 #include "mvwindow.h"
 
 #include "Definition.h"
@@ -198,9 +198,63 @@ function accrest() {
 program()
 {
 
-#define MVRECORD var mvrecord
+	var spac1="  xxx  xxx  ";
+	trimmer(spac1).quote().outputl();
 
-	MVRECORD;
+	timedate().outputl();
+
+	dim a9;
+	var a10;
+	matparse("xx"^FM^"bb",a9).outputl();
+	var a11=matunparse(a9).outputl();
+
+	var r[2];
+
+	dim a7(2,3);
+
+	for (int ii=1;ii<=2;++ii)
+		for (int jj=1;jj<=3;++jj)
+			a7(ii,jj)=ii^var(".")^jj;
+
+	dim a8(4,5);
+	for (int ii=1;ii<=4;++ii)
+		for (int jj=1;jj<=5;++jj)
+			a8(ii,jj)=ii^var(".")^jj;
+
+	a8=2.2;
+
+	for (int ii=1;ii<=4;++ii) {
+		for (int jj=1;jj<=5;++jj)
+			a8(ii,jj).outputt("=");
+		printl();
+	}
+
+	a8=a7;
+
+	for (int ii=1;ii<=4;++ii) {
+		for (int jj=1;jj<=5;++jj)
+			a8(ii,jj).outputt("=");
+		printl();
+	}
+
+	var nfields=a7.parse("xx"^FM^"bb");
+	a7(1).outputl();
+	a7(2).outputl();
+	a7.unparse().outputl();
+
+	dim arrx(2,2),arry;
+	arrx(1,1)="xx";
+	arrx(1,1).outputl("arrx(1,1)=");
+	arrx(1,2)=arrx(1,1);
+	arrx(1,2).outputl("arrx(1,2)=");
+	arry=arrx;
+	arry(1,1).outputl();
+
+	var aa1,aa2,aa3,aa4;
+	aa1=aa2=aa3="aa";
+	aa1.outputl();
+	aa2.outputl();
+	aa3.outputl();
 
 	//accrest();
 
@@ -432,7 +486,7 @@ program()
 	//using mv dimensioned arrays
 	//mv dimensioned arrays have a zero element that is
 	//used in case either or both of the indexes are zero
-	varray arr1(3), arr2(3,3);
+	dim arr1(3), arr2(3,3);
 	arr1(0)=0;
 	arr1(0,0)=0;
 	for (int ii=1; ii<=3; ++ii) {
@@ -448,7 +502,8 @@ program()
 			assert(arr2(ii,jj) eq ii*3+jj);
 	}
 
-	//using c arrays UNSAFE! USE STL VECTOR INSTEAD;
+/* 
+	//using c arrays UNSAFE! USE exodus dim INSTEAD;
 	var arrxxx[10];
 
 	//can use int but not var for indexing c arrays
@@ -458,7 +513,7 @@ program()
 	//following will not compile on MSVC (g++ is ok) due to "ambiguous" due to using var for index element
 	//arrxxx[varx]="y";
 	arrxxx[int(varx)]="y";
-
+*/
 	//bool cannot be used numerically ON MSVC (unlike in pick)
 	//could change all logical ops to return var or find a way to allow void* pointer to promote to bool
 	//or perhaps add bool to the list of automatic constructors?
@@ -519,18 +574,33 @@ while trying to match the argument list '(exodus::var, bool)'
 
 	//http://www.regular-expressions.info/examples.html
 	assert(swap("Steve Bush Bash bish","B.","Ru","ri").outputl()=="Steve Rush Rush Rush");
-	//correct for utf16 windows
+
 	if (sizeof(wchar_t)==2)
 	{
-		assert(oconv("Aa019KK","HEX").outputl()=="00000041000000610000003000000031000000390000004B0000004B");
-		assert(var("00000041000000610000003000000031000000390000004B0000004B").iconv("HEX").outputl()=="Aa019KK");
+		//ucs-16 "fake utf16" on windows
+		assert(oconv("Aa019KK","HEX").outputl()=="00410061003000310039004B004B");
+		assert(var("00410061003000310039004B004B").iconv("HEX").outputl()=="Aa019KK");
 
-		//doesnt accept FMs etc yet
-		//assert(var("FF"^FM^"00").iconv("HEX").outputl()==("00FF"^FM^"00FF"));
-		assert(var("FF"^FM^"00").iconv("HEX").oconv("HEX").outputl()=="");
-		//anything invalid returns empty string
-		assert(var("XF").iconv("HEX").oconv("HEX").outputl()=="");
 	}
+	else if (sizeof(wchar_t)==4)
+	{
+		assert(oconv("Aa019KK","HEX").outputl()=="00000041000000610000003000000031000000390000004B0000004B");
+		assert(var("00000041000000610000003000000031000000390000004B0000004B").iconv("HEX2").outputl()=="Aa019KK");
+
+	} 
+
+	assert(oconv("Aa019KK","HEX2").outputl()=="41613031394B4B");
+	assert(oconv("Aa019KK","HEX4").outputl()=="00410061003000310039004B004B");
+	assert(oconv("Aa019KK","HEX8").outputl()=="00000041000000610000003000000031000000390000004B0000004B");
+	assert(var("41613031394B4B").iconv("HEX2").outputl()=="Aa019KK");
+	assert(var("00410061003000310039004B004B").iconv("HEX4").outputl()=="Aa019KK");
+	assert(var("00000041000000610000003000000031000000390000004B0000004B").iconv("HEX8").outputl()=="Aa019KK");
+
+	//doesnt accept FMs etc yet
+	//assert(var("FF"^FM^"00").iconv("HEX").outputl()==("00FF"^FM^"00FF"));
+	assert(var("FF"^FM^"00").iconv("HEX2").oconv("HEX2").outputl()=="");
+	//anything invalid returns empty string
+	assert(var("XF").iconv("HEX").oconv("HEX").outputl()=="");
 
 	var time1=var("10:10:10").iconv("MT");
 	assert(var("abcabdef").trim("abef").outputl()=="cbd");
@@ -564,6 +634,8 @@ while trying to match the argument list '(exodus::var, bool)'
 	space(-11);
 	var("x").str(-7);
 
+	var xyz;
+	xyz=xyz;
 	//test catching MVexceptions
 	try {
 		//runtime errors
@@ -741,7 +813,7 @@ MT'h' 63306 17h35
 	date().oconv("D").outputl();
 
 	time().oconv("MTS").outputl();
-	datetime().outputl();
+	timedate().outputl();
 	//assert( not (x > y) );
 
 	var(1000).oconv("MD20P,").outputl();
@@ -763,8 +835,8 @@ MT'h' 63306 17h35
 
 	var exp="(\\d{4}[- ]){3}\\d{4}";
 	var res=var("1247-1234-1234-1234").match(exp,"r");
-	varray aaa(10);
-	aaa.resize(20,30);
+	dim aaa(10);
+	aaa.redim(20,30);
 
 	var sentence=sentence();
 

@@ -403,12 +403,12 @@ bool var::osgetenv(const var& envvarname)
 	if (cvalue==0)
 	{
 		var_mvstr=L"";
-		var_mvtype=pimpl::MVTYPE_STR;
+		var_mvtyp=pimpl::MVTYPE_STR;
 		return false;
 	}
 	else
 		*this=var(cvalue);
-	var_mvtype=pimpl::MVTYPE_STR;
+	var_mvtyp=pimpl::MVTYPE_STR;
 	return true;
 }
 
@@ -536,9 +536,9 @@ bool var::osopen(const var& osfilename)
 
 	//TODO buffer filehandles to prevent continual reopening
 
-	if (!(osfilename.var_mvtype&pimpl::MVTYPE_STR))
+	if (!(osfilename.var_mvtyp&pimpl::MVTYPE_STR))
 	{
-		if (!osfilename.var_mvtype)
+		if (!osfilename.var_mvtyp)
 			throw MVUnassigned(L"osopen(osfilename)");
 		osfilename.createString();
 	}
@@ -550,7 +550,7 @@ bool var::osopen(const var& osfilename)
 	//imbue BEFORE opening
 	//	myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
 //var(int(sizeof(myfile))).outputl(L"filesize");
-	//if (osfilename.var_mvtype&pimpl::MVTYPE_INT)
+	//if (osfilename.var_mvtyp&pimpl::MVTYPE_INT)
 	//	myfile=(std::fstream) var_mvint;
 	//else
 
@@ -565,7 +565,7 @@ bool var::osopen(const var& osfilename)
 	}
 
 	var_mvstr=osfilename.var_mvstr;
-	var_mvtype=pimpl::MVTYPE_STR;
+	var_mvtyp=pimpl::MVTYPE_STR;
 
 	//TODO for now reopen file on every access
 	(*pfstream).close();
@@ -596,7 +596,7 @@ bool var::osread(const char* osfilename)
 	//ISSTRING(osfilename)
 
 	var_mvstr=L"";
-	var_mvtype=pimpl::MVTYPE_STR;
+	var_mvtyp=pimpl::MVTYPE_STR;
 
 	//std::wifstream myfile;
 	std::ifstream myfile;
@@ -733,7 +733,7 @@ var& var::osbread(const var& osfilehandle, const int startoffset, const int size
 	//TODO buffer filehandles to prevent continual reopening
 
 	var_mvstr=L"";
-	var_mvtype=pimpl::MVTYPE_STR;
+	var_mvtyp=pimpl::MVTYPE_STR;
 
 	if (size<=0) return *this;
 
@@ -818,7 +818,7 @@ var& var::osbread(const var& osfilehandle, const int startoffset, const int size
 	//delete
 	delete[] memblock;
 
-//	var_mvtype=pimpl::MVTYPE_STR;
+//	var_mvtyp=pimpl::MVTYPE_STR;
 
 	return *this;
 

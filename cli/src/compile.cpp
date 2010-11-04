@@ -513,9 +513,8 @@ program()
                 var crlf="\r\n";
                 var headertext="";
                 converter(text,"\r\n",FM^FM);
-                var nlines=dcount(text,FM);
-                varray text2(nlines);
-                text.matparse(text2);
+                dim text2;
+                var nlines=matparse(text,text2);
 
 #if EXODUS_EXPORT_USING_DEF
                 var deftext="";

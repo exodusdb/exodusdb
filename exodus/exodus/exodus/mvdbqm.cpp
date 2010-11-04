@@ -83,7 +83,7 @@ bool var::connectlocal(const var& accountname)
 
 	var_mvint=QMGetSession();
 	var_mvstr=intToString(var_mvint);
-	var_mvtype='3';
+	var_mvtyp='3';
 
 	return true;
 }
@@ -145,7 +145,7 @@ bool var::connect(const var& address, const var& port, const var& user, const va
 
 	var_mvint=QMGetSession();
 	var_mvstr=intToString(var_mvint);
-	var_mvtype='3';
+	var_mvtyp='3';
 
 	return true;
 }
@@ -154,7 +154,7 @@ bool var::disconnect()
 {
 	var_mvstr=L"";
 	var_mvint=0;
-	var_mvtype=L'3';
+	var_mvtyp=L'3';
 	QMDisconnect();
 
 	return true;
@@ -198,7 +198,7 @@ bool var::open(const var& dictcode,const var& filename)
 
 	var_mvint=fileno;
 	var_mvstr=intToString(fileno);
-	var_mvtype='3';
+	var_mvtyp='3';
 
 	return true;
 
@@ -206,7 +206,7 @@ bool var::open(const var& dictcode,const var& filename)
 
 void var::close()
 {
-	if (var_mvtype!='0')
+	if (var_mvtyp!='0')
 		QMClose(var_mvint);
 }
 
@@ -247,7 +247,7 @@ bool var::read(const var& fileno,const var& key)
 
 	var_mvstr=wstringfromUTF8((const UTF8*)crecord,int(strlen(crecord)));
 	var_mvint=0;
-	var_mvtype='1';
+	var_mvtyp='1';
 
 	QMFree(crecord);
 
@@ -426,7 +426,7 @@ var var::xlate(const var& filename,const var& fieldno, const var& mode) const
 	{
 		newmv.var_mvstr=var_mvstr;
 		newmv.var_mvint=var_mvint;
-		newmv.var_mvtype=var_mvtype;
+		newmv.var_mvtyp=var_mvtyp;
 	}
 
 	//open the file

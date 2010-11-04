@@ -43,21 +43,21 @@ THE SOFTWARE.
 //Unhandled exception at 0x0065892c in service.exe: 0xC0000005: Access violation writing location 0xcccccccc.
 
 #define ISDEFINED(VARNAME) \
-	if (VARNAME.var_mvtype&mvtypemask) \
+	if (VARNAME.var_mvtyp&mvtypemask) \
 	throw MVUndefined(var(#VARNAME) ^ L" in " ^ var(functionname)); \
 
 //includes isdefined
 #define ISASSIGNED(VARNAME) \
 	ISDEFINED(VARNAME) \
-	if (!VARNAME.var_mvtype) \
+	if (!VARNAME.var_mvtyp) \
 	throw MVUnassigned(var(#VARNAME) ^ L" in " ^ var(functionname)); \
 
 //includes isdefined directly and checks assigned if not string
 #define ISSTRING(VARNAME) \
 	ISDEFINED(VARNAME) \
-	if (!(VARNAME.var_mvtype&pimpl::MVTYPE_STR)) \
+	if (!(VARNAME.var_mvtyp&pimpl::MVTYPE_STR)) \
 	{ \
-		if (!VARNAME.var_mvtype) \
+		if (!VARNAME.var_mvtyp) \
 		throw MVUnassigned(var(#VARNAME) ^ L" in " ^ var(functionname)); \
 		VARNAME.createString(); \
 	}; \
@@ -69,21 +69,21 @@ THE SOFTWARE.
 	throw MVNonNumeric(var(functionname) ^ L" : " ^ var(#VARNAME) ^ L" is " ^ VARNAME.substr(1,20).quote()); \
 
 #define THISISDEFINED() \
-	if (!this||(*this).var_mvtype&mvtypemask) \
+	if (!this||(*this).var_mvtyp&mvtypemask) \
 		throw MVUndefined(L"var in " ^ var(functionname)); \
 
 //includes isdefined
 #define THISISASSIGNED() \
 	THISISDEFINED() \
-	if (!(*this).var_mvtype) \
+	if (!(*this).var_mvtyp) \
 		throw MVUnassigned(L"var in " ^ var(functionname)); \
 
 //includes isdefined directly and checks assigned if not string
 #define THISISSTRING() \
 	THISISDEFINED() \
-	if (!((*this).var_mvtype&pimpl::MVTYPE_STR)) \
+	if (!((*this).var_mvtyp&pimpl::MVTYPE_STR)) \
 	{ \
-		if (!(*this).var_mvtype) \
+		if (!(*this).var_mvtyp) \
 			throw MVUnassigned(L"var in " ^ var(functionname)); \
 		(*this).createString(); \
 	}; \
@@ -167,6 +167,12 @@ class MVArrayIndexOutOfBounds: public MVException
 {
 	public:
 	MVArrayIndexOutOfBounds(const var& mv1);
+};
+
+class MVArrayNotDimensioned: public MVException
+{
+	public:
+	MVArrayNotDimensioned();
 };
 
 }//namespace exodus

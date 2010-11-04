@@ -1,50 +1,17 @@
-#include <exodus/exodus.h>
+#include <exodus/program.h>
 
-//for the sake of multivalue gurus new to exodus/C++ this is written
+//for the sake of multivalue gurus new to exodus programming this is written
 //with multivalue-mimicking "everything is a global function" syntax
-//instead of exodus's native OO-style "objects and methods" syntax
+//instead of exodus's OO-style syntax "xxx.yyy().zzz()"
 
 var filename="myclients";
 
-subroutine sortselect(in file, in sortselectcmd)
-{
+programinit()
 
-        printl("\nSSELECT the data - ", sortselectcmd);
+function main() {
 
-        if (!select(sortselectcmd)) {
-                printl("Cannot sselect");
-                stop();
-        }
-
-        printl("Read the data");
-
-        var record;
-        var key;
-
-        //could also use the readnextrecord() function here
-        // if we had used the new selectrecord() function above
-        while (readnext(key)) {
-
-                if (not read(record, file, key)) {
-                        printl(key, " missing from file");
-                        continue;
-                }
-                print(key, ": ");
-                printl(convert(record, FM, "|"));
-
-        }
-
-        return;
-
-}
-
-program()
-{
-
-        if (not connect()) {
-                printl("Cannot connect to database. Please check configuration");
-                stop();
-        }
+        if (not connect())
+                abort("Cannot connect to database. Please check configuration");
 
         var dictfilename="dict_"^ filename;
 
@@ -53,17 +20,15 @@ program()
         if (cleanup) {
                 deletefile(filename);
                 deletefile(dictfilename);
-        }
+		}
 
         printl("\nOpen or create test file ", filename);
 
         var file;
         if (not open(filename, file)) {
                 createfile(filename);
-                if (not open(filename, file)) {
-                        printl("Cannot open ", filename);
-                        stop();
-                }
+                if (not open(filename, file))
+                        abort("Cannot open "^filename);
         }
 
         printl("\nOpen or create the test files dictionary ", dictfilename);
@@ -71,10 +36,8 @@ program()
         var dictfile;
         if (not open(dictfilename, dictfile)) {
                 createfile(dictfilename);
-                if (not open(dictfilename, dictfile)) {
-                        printl("Cannot open dictionary ", dictfilename);
-                        stop();
-                }
+                if (not open(dictfilename, dictfile))
+                        abort("Cannot open dictionary "^ dictfilename);
         }
 
         printl("\nPrepare some dictionary records");
@@ -174,4 +137,37 @@ program()
         printl("\nJust type 'list' (without the quotes) to see the syntax of list");
         printl("or list dict_"^ filename^ " to see the dictionary");
         printl("Type edic cli/src/testsort to see or edit/recompile this program.");
+
+		return 0;
 }
+
+subroutine sortselect(in file, in sortselectcmd) {
+
+        printl("\nSSELECT the data - ", sortselectcmd);
+
+        if (!select(sortselectcmd)) {
+                printl("Cannot sselect");
+                return;
+        }
+
+        printl("Read the data");
+
+        var record;
+        var key;
+
+        //could also use the readnextrecord() function here
+        // if we had used the new selectrecord() function above
+        while (readnext(key)) {
+
+                if (not read(record, file, key)) {
+                        printl(key, " missing from file");
+                        continue;
+                }
+                print(key, ": ");
+                printl(convert(record, FM, "|"));
+
+        }
+
+}
+
+programexit()

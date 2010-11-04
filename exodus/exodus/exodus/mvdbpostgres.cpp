@@ -240,7 +240,7 @@ bool var::connect(const var& conninfo)
 	THISISDEFINED()
 	ISSTRING(conninfo)
 
-	var_mvtype=pimpl::MVTYPE_UNA;
+	var_mvtyp=pimpl::MVTYPE_UNA;
 
 	//find connection details
 	var conninfo2=conninfo;
@@ -434,7 +434,7 @@ bool var::disconnect()
 	var_mvint=0;
 
 	//make unassigned()
-	var_mvtype=pimpl::MVTYPE_UNA;
+	var_mvtyp=pimpl::MVTYPE_UNA;
 
 	return true;
 
@@ -496,7 +496,7 @@ bool var::open(const var& filename)
 	var_mvstr=L"";
 	//var_mvstr+=filename.var_mvstr;
 	var_mvstr+=filename.convert(L". ",L"__").towstring();
-	var_mvtype=pimpl::MVTYPE_STR;
+	var_mvtyp=pimpl::MVTYPE_STR;
 
 	return true;
 
@@ -507,7 +507,7 @@ void var::close()
 	THISIS(L"void var::close()")
 	THISISSTRING()
 /*TODO
-	if (var_mvtype!=MVTYPE_UNA) QMClose(var_mvint);
+	if (var_mvtyp!=MVTYPE_UNA) QMClose(var_mvint);
 */
 }
 
@@ -846,9 +846,9 @@ bool var::writev(const var& filehandle,const var& key,const int fieldn) const
 bool var::write(const var& filehandle,const var& key) const
 {
 
-	if (!var_mvtype) throw MVUnassigned(L"write()");
-	if (!filehandle.var_mvtype) throw MVUnassigned(L"write(filehandle)");
-	if (!key.var_mvtype) throw MVUnassigned(L"write(key)");
+	if (!var_mvtyp) throw MVUnassigned(L"write()");
+	if (!filehandle.var_mvtyp) throw MVUnassigned(L"write(filehandle)");
+	if (!key.var_mvtyp) throw MVUnassigned(L"write(key)");
 
 	if (key==0)
 	{
@@ -1623,19 +1623,19 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	//private unchecked
 
 	//?allow undefined usage like var xyz=xyz.select();
-	if (var_mvtype&mvtypemask)
+	if (var_mvtyp&mvtypemask)
 	{
 		//throw MVUndefined(L"selectx()");
 		var_mvstr=L"";
-		var_mvtype=pimpl::MVTYPE_STR;
+		var_mvtyp=pimpl::MVTYPE_STR;
 	}
 
-	if (!(var_mvtype&pimpl::MVTYPE_STR))
+	if (!(var_mvtyp&pimpl::MVTYPE_STR))
 	{
-		if (!var_mvtype)
+		if (!var_mvtyp)
 		{
 			var_mvstr=L"";
-			var_mvtype=pimpl::MVTYPE_STR;
+			var_mvtyp=pimpl::MVTYPE_STR;
 		}
 		else
 			createString();
@@ -1903,7 +1903,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		//(*this)=actualfilename;
 		//changed to allow select to be const so allowing file vars to be passed as const ("in") function parameters
 		var_mvstr=actualfilename.var_mvstr;
-		var_mvtype=pimpl::MVTYPE_STR;
+		var_mvtyp=pimpl::MVTYPE_STR;
 	}
 	return true;
 }
@@ -1914,7 +1914,7 @@ void var::clearselect() const
 	THISISSTRING()
 
     var sql=L"CLOSE CURSOR1_";
-    if (var_mvtype)
+    if (var_mvtyp)
 		sql ^= *this;
 
 	if (!sql.sqlexec())
@@ -1962,11 +1962,11 @@ bool readnextx(const std::wstring& cursor, PGresultptr& pgresult)
 bool var::readnext(var& key, var& valuen) const
 {
 	//?allow undefined usage like var xyz=xyz.readnext();
-	if (var_mvtype&mvtypemask)
+	if (var_mvtyp&mvtypemask)
 	{
 		//throw MVUndefined(L"selectx()");
 		var_mvstr=L"";
-		var_mvtype=pimpl::MVTYPE_STR;
+		var_mvtyp=pimpl::MVTYPE_STR;
 	}
 
 	THISIS(L"bool var::readnext(var& key, var& valuen) const")
@@ -2041,11 +2041,11 @@ bool var::readnextrecord(var& key, var& record) const
 {
 
 	//?allow undefined usage like var xyz=xyz.readnext();
-	if (var_mvtype&mvtypemask || !var_mvtype)
+	if (var_mvtyp&mvtypemask || !var_mvtyp)
 	{
 		//throw MVUndefined(L"selectx()");
 		var_mvstr=L"";
-		var_mvtype=pimpl::MVTYPE_STR;
+		var_mvtyp=pimpl::MVTYPE_STR;
 	}
 
 	THISIS(L"bool var::readnextrecord(var& key, var& record) const")

@@ -36,7 +36,7 @@ namespace exodus {
 //ctor for char
 //use initializers since cannot fail (but could find how to init the char1)
 var::var(const char char1):
-	var_mvtype(pimpl::MVTYPE_STR)
+	var_mvtyp(pimpl::MVTYPE_STR)
 	//,var_mvstr(const_cast<wchar_t>char1)
 {
 	//cannot fail
@@ -45,7 +45,7 @@ var::var(const char char1):
 	//not a pointer anymore for speed
 	//priv=new pimpl;
 
-	//var_mvtype=pimpl::MVTYPE_STR;
+	//var_mvtyp=pimpl::MVTYPE_STR;
 	wchar_t widechar=char1;
 	var_mvstr=widechar;
 }
@@ -70,7 +70,7 @@ var::var(const char* cstr1)
 	//therefore requires manual conversion of any c strings from other sources eg operating system
 	var_mvstr=std::wstring(str1.begin(),str1.end());
 
-	var_mvtype=pimpl::MVTYPE_STR;
+	var_mvtyp=pimpl::MVTYPE_STR;
 }
 
 //ctor for memory block
@@ -81,10 +81,10 @@ var::var(const char* cstr1, const size_t int1)
 	//THISIS(L"var::var(const char* cstr1, const size_t int1)")
 
 	//TODO optimise and UTF conversion
-	//var_mvtype=pimpl::MVTYPE_STR;
+	//var_mvtyp=pimpl::MVTYPE_STR;
 	std::string cstr2(cstr1,int1);
 	var_mvstr=std::wstring(cstr2.begin(),cstr2.end());
-	var_mvtype=pimpl::MVTYPE_STR;
+	var_mvtyp=pimpl::MVTYPE_STR;
 }
 
 //comparisons with narrow characters
