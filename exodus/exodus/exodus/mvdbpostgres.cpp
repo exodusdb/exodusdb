@@ -38,22 +38,22 @@ THE SOFTWARE.
 //MSVC requires exception handling (eg compile with /EHsc or EHa?) for delayed dll loading detection
 
 #ifndef DEBUG
-#define TRACING 0
+# define TRACING 0
 #else
-#define TRACING 2
+# define TRACING 2
 #endif
 
 #include "MurmurHash2_64.h"
 
 #if defined _MSC_VER // || defined __CYGWIN__ || defined __MINGW32__
-	#define WIN32_LEAN_AND_MEAN
-	#include <windows.h>
-	#include <DelayImp.h>
-	//doesnt seem to work, add them to visual studio project delayload section using semicolons or special linker options
+# define WIN32_LEAN_AND_MEAN
+# include <windows.h>
+# include <DelayImp.h>
+ //doesnt seem to work, add them to visual studio project delayload section using semicolons or special linker options
 	//#pragma comment(linker, "/DelayLoad:libpq.dll")
 #else
-	//#define __try try
-	//#define __except catch
+//# define __try try
+//# define __except catch
 #endif
 
 #pragma warning (disable: 4150)
@@ -87,9 +87,8 @@ THE SOFTWARE.
 #elif defined(HAVE_BOOST_UNORDERED_SET) || defined(_MSC_VER)
 #  include <boost/unordered_set.hpp>
 #  define UNORDEREDSET boost::unordered_set<uint64_t>
-
 #else
-#define USE_MAP_FOR_UNORDERED
+#  define USE_MAP_FOR_UNORDERED
 #  include <map>
 #  define UNORDEREDSET std::map<uint64_t,int>
 #endif
