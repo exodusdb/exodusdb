@@ -4,21 +4,22 @@
 
 This is a complete ACCESS/ENGLISH/LIST replacement that can output in DOS or HTML format.
 
-It is a good example of a substantial program written in Exodus's reincarnation of Multivalue Basic. The original Pick Basic version was in heavy production usage for many years.
+It is an attempt to show a substantial program written in Exodus's reincarnation of Multivalue Basic.
+The original Pick Basic version was in heavy production usage for many years.
 
 It is written using Exodus OO flavour syntax not traditional flavour.
 
-Traditional - honed by usage over the decades:
+Traditional - honed by usage over the decades. function names on the left and parameters on the right.
 
- print(oconv(date(),"D"));
+	printl(oconv(field(extract(xx,6),"/",2),"D2"));
 
 OO flavour - does exactly the same thing but is perhaps easier to read from left to right in one pass:
 
- date().oconv("D").print();
+    xx.extract(6).field("/",2).oconv("D2").outputl(); 
 
 Hybrid:
 
- print(date().oconv("D"));
+    printl(xx.extract(6).field("/",2).oconv("D2")); 
 
 /*
 usage
@@ -254,7 +255,7 @@ function main() {
 		nbsp = "&nbsp;";
 		tt = mv.SYSTEM.extract(2);
 		tt.swapper(".txt", ".htm");
-		mv.SYSTEM.replacer(2, 0, 0, tt);
+		mv.SYSTEM.replacer(2, tt);
 	} else {
 		tr = "";
 		trx = crlf;
@@ -263,10 +264,10 @@ function main() {
 		nbsp = "";
 	}
 
-	//automatically create dict_voc if it is not present so you can list dictionaries
-	if (not open("DICT_VOC",dictmd)) {
-		createfile("DICT_VOC");
-		if (open("DICT_VOC",dictmd)) {
+	//automatically create dict_md if it is not present so you can list dictionaries
+	if (not open("DICT_MD",dictmd)) {
+		createfile("DICT_MD");
+		if (open("DICT_MD",dictmd)) {
 
 			//prepare some dictionary records
 			var dictrecs = "";
@@ -325,8 +326,8 @@ function main() {
 	gtotreq = "";
 	nobase = "";
 
-	if (!(open("DICT_VOC", dictmd)))
-		//stop("Cannot open DICT.MD");
+	if (!(open("DICT_MD", dictmd)))
+		//stop("Cannot open DICT_MD");
 		dictmd="";
 
 	coln = 0;
@@ -446,7 +447,7 @@ phraseinit:
 		//field or NO
 		ss ^= " " ^ word;
 		if (limit)
-			limits.replacer(1, nlimits, 0, word);
+			limits.replacer(1, nlimits, word);
 
 		//negate next comparision
 		if (var("NOT,NE,<>").extract(1).locateusing(nextword, ",", xx)) {
@@ -460,7 +461,7 @@ phraseinit:
 			gosub getword();
 			ss ^= " " ^ word;
 			if (limit)
-				limits.replacer(2, nlimits, 0, word);
+				limits.replacer(2, nlimits, word);
 		}
 
 		//with x between y and z
@@ -563,9 +564,9 @@ phraseinit:
 		gosub getword();
 		word.splicer(1, 1, "");
 		word.splicer(-1, 1, "");
-		coldict(int(coln)).replacer(9, 0, 0, word.substr(1, 1));
-		coldict(coln).replacer(10, 0, 0, word.substr(3, 9999));
-		coldict(coln).replacer(11, 0, 0, word);
+		coldict(int(coln)).replacer(9, word.substr(1, 1));
+		coldict(coln).replacer(10, word.substr(3, 9999));
+		coldict(coln).replacer(11, word);
 
 	//colhead
 	} else if (word eq "COLHEAD") {
@@ -575,7 +576,7 @@ phraseinit:
 			word.splicer(1, 1, "");
 			word.splicer(-1, 1, "");
 			word.converter("|", VM);
-			coldict(coln).replacer(3, 0, 0, word);
+			coldict(coln).replacer(3, word);
 		}
 
 	} else if (word eq "OCONV") {
@@ -584,7 +585,7 @@ phraseinit:
 		word.splicer(-1, 1, "");
 		if (html)
 			word.swapper("[DATE]", "[DATE,*]");
-		coldict(coln).replacer(7, 0, 0, word);
+		coldict(coln).replacer(7, word);
 
 	} else if (word eq "ID-SUPP") {
 		idsupp = 1;
@@ -603,7 +604,7 @@ phraseinit:
 
 			//pick A equ F
 			if (dictrec.extract(1) eq "A")
-				dictrec.replacer(1, 0, 0, "F");
+				dictrec.replacer(1, "F");
 
 			//suppress untotalled columns if doing detsupp2
 			if (detsupp eq 2) {
@@ -625,7 +626,7 @@ phraseinit:
 				tt = dictrec.extract(3, ii);
 				var f10=dictrec.extract(10);
 				if (f10=="" or f10 and tt.length() > f10)
-					dictrec.replacer(10, 0, 0, tt.length());
+					dictrec.replacer(10, tt.length());
 			};//ii;
 
 			if (detsupp < 2) {
@@ -633,17 +634,17 @@ phraseinit:
 					tt = " id=\"BHEAD\"";
 					if (detsupp)
 						tt ^= " style=\"display:none\"";
-					dictrec.replacer(14, 0, 0, tt);
+					dictrec.replacer(14, tt);
 				}
 			}
 
 			//total required ?
 			if (totalflag) {
 				totalflag = 0;
-				dictrec.replacer(12, 0, 0, 1);
+				dictrec.replacer(12, 1);
 				anytotals = 1;
 			} else {
-				dictrec.replacer(12, 0, 0, 0);
+				dictrec.replacer(12, 0);
 			}
 
 			if (html) {
@@ -651,9 +652,9 @@ phraseinit:
 				tt.swapper("[DATE]", "[DATE,*]");
 				if (tt eq "[DATE,4]")
 					tt = "[DATE,4*]";
-				dictrec.replacer(7, 0, 0, tt);
+				dictrec.replacer(7, tt);
 				if (tt eq "[DATE,*]")
-					dictrec.replacer(9, 0, 0, "R");
+					dictrec.replacer(9, "R");
 			}
 			coldict(coln) = dictrec;
 
@@ -665,26 +666,26 @@ phraseinit:
 				if (tt)
 					tt ^= "#" ^ coldict(coln).extract(10);
 			}
-			coldict(coln).replacer(11, 0, 0, tt);
+			coldict(coln).replacer(11, tt);
 
 			//this could be a break-on column and have break-on options
 			//if coln=breakcolns<1> then
 			if (breakonflag) {
-				coldict(coln).replacer(13, 0, 0, 1);
+				coldict(coln).replacer(13, 1);
 				breakonflag = 0;
 				if (nextword.substr(1, 1) eq DQ) {
 					gosub getword();
 					//zzz break options
 					if (word.index("B", 1))
 						pagebreakcoln = coln;
-					breakoptions.replacer(1, 0, 0, word);
+					breakoptions.replacer(1, word);
 				}
 			}
 		}
 
 	} else if (word eq "IGNOREWORD") {
 		gosub getword();
-		ignorewords.replacer(1, -1, 0, word);
+		ignorewords.replacer(1, -1, word);
 
 		//@LPTR word is skipped if not located in MD/DICT.MD
 	} else if (word eq "@LPTR") {
@@ -754,11 +755,11 @@ x1exit:
 		} else {
 			tt = coldict(1).extract(9) ^ "#" ^ coldict(1).extract(10);
 		}
-		coldict(1).replacer(11, 0, 0, tt);
+		coldict(1).replacer(11, tt);
 
 		//increment the list of breaking columns by one as well
 		for (var breakn = 1; breakn <= nbreaks; breakn++)
-			breakcolns.replacer(breakn, 0, 0, breakcolns.extract(breakn) + 1);
+			breakcolns.replacer(breakn, breakcolns.extract(breakn) + 1);
 		pagebreakcoln += 1;
 
 	}
@@ -824,7 +825,7 @@ x1exit:
 
 		//suppress drilldown if no totals or breakdown
 		if (not anytotals or not nbreaks)
-			coldict(coln).replacer(14, 0, 0, "");
+			coldict(coln).replacer(14, "");
 
 		if (wcol(coln)) {
 			if (html) {
@@ -836,10 +837,10 @@ x1exit:
 				if (!usecols)
 					tt ^= coldict(coln).extract(14);
 				tt ^= ">" ^ coldict(coln).extract(3) ^ "</th>";
-				colheading.replacer(coln2, 0, 0, tt);
+				colheading.replacer(coln2, tt);
 
 				colheading.swapper(VM, "<br />");
-				coltags.replacer(-1, 0, 0, "<col");
+				coltags.replacer(-1, "<col");
 				var align = coldict(coln).extract(9);
 				if (align eq "R") {
 					//if index(coldict(coln)<7>,'[NUMBER',1) then
@@ -858,7 +859,7 @@ x1exit:
 				coltags ^= " />";
 			} else {
 				for (var ii = 1; ii <= 9; ++ii)
-					colheading.replacer(ii, 0, 0, colheading.extract(ii) ^ (coldict(coln).extract(3, ii)).oconv(coldict(coln).extract(11)) ^ " ");
+					colheading.replacer(ii, colheading.extract(ii) ^ (coldict(coln).extract(3, ii)).oconv(coldict(coln).extract(11)) ^ " ");
 			}
 		}
 	}
