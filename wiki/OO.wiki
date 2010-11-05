@@ -238,7 +238,7 @@ Database
 ||if	||var.disconnect()||
 ||if	||var.begintrans()||
 ||if	||var.rollbacktrans()||
-||if	||var.endtrans()||
+||if	||var.committrans()||
 ||if	||var.createfile(filename, options="")||
 ||if	||var.deletefile()||
 ||if	||var.clearfile()||
