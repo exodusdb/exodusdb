@@ -236,9 +236,9 @@ Dynamic Array
 Database
 ||if	||var.connect(connectioninfo="")||
 ||if	||var.disconnect()||
-||if	||var.begin()||
-||if	||var.rollback()||
-||if	||var.end()||
+||if	||var.begintrans()||
+||if	||var.rollbacktrans()||
+||if	||var.endtrans()||
 ||if	||var.createfile(filename, options="")||
 ||if	||var.deletefile()||
 ||if	||var.clearfile()||
