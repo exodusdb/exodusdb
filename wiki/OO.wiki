@@ -236,6 +236,8 @@ Dynamic Array
 Database
 ||if	||var.connect(connectioninfo="")||
 ||if	||var.disconnect()||
+||if	||var.createdb(dbname, errmsg)||
+||if	||var.deletedb(dbname, errmsg)||
 ||if	||var.begintrans()||
 ||if	||var.rollbacktrans()||
 ||if	||var.committrans()||
