@@ -10,7 +10,8 @@ DLL_PUBLIC ExodusProgramBase::ExodusProgramBase(MvEnvironment& inmv)
 DLL_PUBLIC ExodusProgramBase::~ExodusProgramBase()
 {};
 
-inline
+//inline causes error on gcc but not msvc when compilng user programs like list
+//"undefined function"
 DLL_PUBLIC var ExodusProgramBase::calculate(const var& dictid) const
 {
 	return mv.calculate(dictid);

@@ -213,7 +213,7 @@ int MVipc(const int environmentn, var& pgconnparams)
 		#endif
 	}
 
-	respondToRequests(sock,socketpath);
+	respondToRequests(sock,socketpath,exodusfunctorbase);
 	
 	std::cout << "stopped responding to socket " << socketpath << std::endl;
 

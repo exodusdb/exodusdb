@@ -77,7 +77,7 @@ am__objects_2 = ConvertUTF.lo howto.lo mvarray.lo mvdatetime.lo \
 	naturalorder.lo gettimeofday.lo mv2.lo mv.lo mvdbpostgres.lo \
 	mvenvironment.lo mvglobalfuncs.lo mvipc.lo mvmv.lo \
 	mvunicode.lo mvipc_boost.lo mvipc_posix.lo mvipc_ms.lo \
-	mvposix.lo MurmurHash2_64.lo mvfunctor.lo
+	mvposix.lo MurmurHash2_64.lo mvfunctor.lo mvprogram.lo
 am_libexodus_la_OBJECTS = $(am__objects_1) $(am__objects_2) \
 	$(am__objects_1)
 libexodus_la_OBJECTS = $(am_libexodus_la_OBJECTS)
@@ -294,7 +294,7 @@ SUBDIRS =
 #some header files
 h_sources = exodus.h exodusmacros.h mvenvironment.h mv.h mvlibs.h \
 exodusfuncs.h mvexceptions.h mvimpl.h mvutf.h mvipc.h mvconfig.h \
-mvlink.h mvfunctor.h program.h library.h\
+mvlink.h mvfunctor.h program.h library.h mvprogram.h\
 xfunctorf0.h xfunctorf1.h xfunctorf10.h xfunctorf11.h xfunctorf12.h \
 xfunctorf13.h xfunctorf14.h xfunctorf15.h xfunctorf16.h xfunctorf17.h \
 xfunctorf18.h xfunctorf19.h xfunctorf2.h xfunctorf20.h xfunctorf3.h \
@@ -314,7 +314,7 @@ cc_sources = ConvertUTF.c howto.cpp mvarray.cpp mvdatetime.cpp  mvdebug.cpp mvfu
 mvutf.cpp naturalorder.cpp gettimeofday.cpp mv2.cpp mv.cpp mvdbpostgres.cpp mvenvironment.cpp mvglobalfuncs.cpp  \
 mvipc.cpp mvmv.cpp mvunicode.cpp mvipc_boost.cpp mvipc_posix.cpp \
 mvipc_ms.cpp mvposix.cpp MurmurHash2_64.cpp \
-mvfunctor.cpp
+mvfunctor.cpp mvprogram.cpp
 
 
 #where to install the libraries include headers
@@ -445,6 +445,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mvmv.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mvos.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mvposix.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mvprogram.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mvunicode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mvutf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/naturalorder.Plo@am__quote@
