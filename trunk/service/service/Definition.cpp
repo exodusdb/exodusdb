@@ -1,4 +1,7 @@
 /* Copyright (c) 2007 Stephen John Bush - see LICENCE.TXT*/
+//to be converted to external subroutines
+#if 0
+
 #include "Definition.h"
 
 namespace exodus
@@ -329,3 +332,4 @@ void Definition::gosub_postreadfix()
 } // /:~
 
 }
+#endif

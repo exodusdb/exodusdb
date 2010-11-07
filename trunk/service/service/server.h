@@ -17,19 +17,19 @@ class Server
 	var nblocks;
 
 	//would be faster if not a pointer but would require a version of MVProcessdefs to be
-	//like mv._USERNAME not env._username
+	//like mv._USERNAME not mv._username
 
 public:
 
     //constructor
-//    Server():env(*global_environments[getenvironmentn()]), win(*tss_wins.get()){}
+//    Server():mv(*global_environments[getenvironmentn()]), win(*tss_wins.get()){}
     Server():
-	  env(*global_environments[getenvironmentn()])
+	  mv(*global_environments[getenvironmentn()])
 		  ,win(*global_wins[getenvironmentn()]
 	  ){}
 
     //holder for pseudo global variables to do with thread
-    MvEnvironment& env;
+    MvEnvironment& mv;
 
     //holder for pseudo global variables to do with MvLibs
     MvWindow& win;
@@ -163,7 +163,7 @@ private:
 	var outblocksize;
 	var Serverversion;
 	var origsentence;
-	var voc;
+	var md;
 	var halt;
 	var timex;
 	var breaktime;

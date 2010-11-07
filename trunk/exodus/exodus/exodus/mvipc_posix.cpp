@@ -19,6 +19,7 @@ using namespace std;
 
 #define EXODUS_IPC_EXTERN extern
 #include <exodus/mvipc.h>
+#include <exodus/mvfunctor.h>
 
 //#define BUFSIZE 1048576
 //cant be bigger than process stacksize .. this LIMITS boost messaging
@@ -31,7 +32,7 @@ using namespace std;
 #endif
 namespace exodus {
 
-void respondToRequests(int sock, const std::string& socketpath)
+void respondToRequests(int sock, const std::string& socketpath, ExodusFunctorBase& exodusfunctorbase)
 {
 
 	unsigned int priority;
@@ -98,7 +99,7 @@ void respondToRequests(int sock, const std::string& socketpath)
 		#endif
 		
 		//determine a response
-		getResponseToRequest(chRequest,request_size,0,response);
+		getResponseToRequest(chRequest,request_size,0,response,exodusfunctorbase);
 
 		//send a response
 		if (write(sock2,response.data(),response.length())<0)
@@ -142,7 +143,21 @@ int MVipc(const int environmentn, var& pgconnparams)
 	//AFTER opening the database connection
 	setenvironmentn(environmentn);
 	var processn=getprocessn();
-		
+
+	//this is a dict library caller
+	//TODO check if possible to have no environment;
+	//*COPY in mvipc_posix.cpp mvipc_boost.cpp mvipc_win.cpp
+	MvEnvironment standalone_mv;
+	MvEnvironment* mv=global_environments[environmentn];
+	if (not mv)
+	{
+#if TRACING >= 2
+		std::clog<<"MVipc() Using a standalone MvEnvironment"<<std::endl;
+#endif
+		mv=&standalone_mv;
+	}
+	ExodusFunctorBase exodusfunctorbase(*mv);
+
 	/*create the socket directory*/
 	std::string socketdir="/tmp/exodus";
 	if (!var(socketdir).osdir())

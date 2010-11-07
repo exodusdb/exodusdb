@@ -53,23 +53,23 @@ var dim::parse(const var& var1)
 
 	//find the starting position of the field or return L""
 	std::wstring::size_type start_pos=0;
-	int fieldn=1;
+	int fieldno=1;
 	for (;;)
 	{
 		std::wstring::size_type next_pos;
 		next_pos=var1.var_mvstr.find(FM_,start_pos);
 
-		data_[fieldn]=var1.var_mvstr.substr(start_pos,next_pos-start_pos);
+		data_[fieldno]=var1.var_mvstr.substr(start_pos,next_pos-start_pos);
 
 		//past of of string?
 		if (next_pos==std::wstring::npos)
 			break;
 
 		start_pos=next_pos+1;
-		fieldn++;
+		fieldno++;
 	}
 
-	return fieldn;
+	return fieldno;
 }
 
 ///////////////////////////////////////////
@@ -85,7 +85,7 @@ var var::field2(const var& sep, const int fieldno, const int nfields) const
 }
 
 //FIELD(x,y,z)
-//var.field(substr,fieldn,nfields)
+//var.field(substr,fieldno,nfields)
 var var::field(const var& substrx,const int fieldnx,const int nfieldsx) const
 {
 	THISIS(L"var var::field(const var& substrx,const int fieldnx,const int nfieldsx) const")
@@ -96,7 +96,7 @@ var var::field(const var& substrx,const int fieldnx,const int nfieldsx) const
 	if (substr==L"")
 		return var(L"");
 
-	int fieldn=fieldnx>0?fieldnx:1;
+	int fieldno=fieldnx>0?fieldnx:1;
 	int nfields=nfieldsx>0?nfieldsx:1;
 
 	//FIND FIELD
@@ -104,7 +104,7 @@ var var::field(const var& substrx,const int fieldnx,const int nfieldsx) const
 	//find the starting position of the field or return L""
 	std::wstring::size_type start_pos=0;
 	int fieldn2=1;
-	while (fieldn2<fieldn)
+	while (fieldn2<fieldno)
 	{
 		start_pos=var_mvstr.find(substr,start_pos);
 		//past of of string?
@@ -116,7 +116,7 @@ var var::field(const var& substrx,const int fieldnx,const int nfieldsx) const
 
 	//find the end of the field (or string)
 	std::wstring::size_type end_pos=start_pos;
-	int pastfieldn=fieldn+nfields;
+	int pastfieldn=fieldno+nfields;
 	while (fieldn2<pastfieldn)
 	{
 		end_pos=var_mvstr.find(substr,end_pos);
@@ -136,7 +136,7 @@ var var::field(const var& substrx,const int fieldnx,const int nfieldsx) const
 ///////////////////////////////////////////
 
 //FIELDSTORE(x,y,z)
-//var.fieldstore(substr,fieldn,nfields,replacement)
+//var.fieldstore(substr,fieldno,nfields,replacement)
 var var::fieldstore(const var& sepchar,const int fieldnx,const int nfieldsx, const var& replacementx) const
 {
 	THISIS(L"var var::fieldstore(const var& sepchar,const int fieldnx,const int nfieldsx, const var& replacementx) const")
@@ -159,7 +159,7 @@ var& var::fieldstorer(const var& sepchar0,const int fieldnx,const int nfieldsx, 
 		return *this;
 	}
 
-	int fieldn=fieldnx>0?fieldnx:1;
+	int fieldno=fieldnx>0?fieldnx:1;
 
 	int nfields=nfieldsx>0?nfieldsx:-nfieldsx;
 
@@ -191,7 +191,7 @@ var& var::fieldstorer(const var& sepchar0,const int fieldnx,const int nfieldsx, 
 	//find the starting position of the field or return L""
 	std::wstring::size_type start_pos=0;
 	int fieldn2=1;
-	while (fieldn2<fieldn)
+	while (fieldn2<fieldno)
 	{
 		start_pos=var_mvstr.find(sepchar,start_pos);
 		//past of of string?
@@ -201,7 +201,7 @@ var& var::fieldstorer(const var& sepchar0,const int fieldnx,const int nfieldsx, 
 			{
 				var_mvstr+=sepchar;
 				fieldn2++;
-			} while (fieldn2<fieldn);
+			} while (fieldn2<fieldno);
 			var_mvstr+=replacement.var_mvstr;
 			return *this;
 		}
@@ -211,7 +211,7 @@ var& var::fieldstorer(const var& sepchar0,const int fieldnx,const int nfieldsx, 
 
 	//find the end of the field (or string)
 	std::wstring::size_type end_pos=start_pos;
-	int pastfieldn=fieldn+nfields;
+	int pastfieldn=fieldno+nfields;
 	while (fieldn2<pastfieldn)
 	{
 		end_pos=var_mvstr.find(sepchar,end_pos);
@@ -238,22 +238,22 @@ var& var::fieldstorer(const var& sepchar0,const int fieldnx,const int nfieldsx, 
 //LOCATE
 ///////////////////////////////////////////
 
-bool var::locate(const var& target, var& setting, const int fieldn/*=0*/,const int valuen/*=0*/) const
+bool var::locate(const var& target, var& setting, const int fieldno/*=0*/,const int valueno/*=0*/) const
 {
-	THISIS(L"bool var::locate(const var& target, var& setting, const int fieldn/*=0*/,const int valuen/*=0*/) const")
+	THISIS(L"bool var::locate(const var& target, var& setting, const int fieldno/*=0*/,const int valueno/*=0*/) const")
 	THISISSTRING()
 	ISSTRING(target)
 	ISDEFINED(setting)
 
 	wchar_t usingchar;
-	if (valuen!=0) usingchar=SM_;
-	else if (fieldn!=0) usingchar=VM_;
+	if (valueno!=0) usingchar=SM_;
+	else if (fieldno!=0) usingchar=VM_;
 	else usingchar=FM_;
-	//if (fieldn<=0) *usingchar=FM_;
-	//else if (valuen<=0) *usingchar=VM_;
+	//if (fieldno<=0) *usingchar=FM_;
+	//else if (valueno<=0) *usingchar=VM_;
 	//else *usingchar=SM_;
 
-	return locatex(target.var_mvstr,0,usingchar,setting,fieldn,valuen,0);
+	return locatex(target.var_mvstr,0,usingchar,setting,fieldno,valueno,0);
 }
 
 ///////////////////////////////////////////
@@ -261,19 +261,19 @@ bool var::locate(const var& target, var& setting, const int fieldn/*=0*/,const i
 ///////////////////////////////////////////
 
 //this version caters for the rare syntax where the order is given as a variable
-bool var::locateby(const var& target,const var& ordercode, var& setting, const int fieldn/*=0*/, const int valuen/*=0*/)const
+bool var::locateby(const var& target,const var& ordercode, var& setting, const int fieldno/*=0*/, const int valueno/*=0*/)const
 {
-	THISIS(L"bool var::locateby(const var& target,const var& ordercode, var& setting, const int fieldn/*=0*/, const int valuen/*=0*/)const")
+	THISIS(L"bool var::locateby(const var& target,const var& ordercode, var& setting, const int fieldno/*=0*/, const int valueno/*=0*/)const")
 	ISSTRING(ordercode)
 
-	return locateby(target,ordercode.tostring().c_str(), setting, fieldn, valuen);
+	return locateby(target,ordercode.tostring().c_str(), setting, fieldno, valueno);
 }
 
 //specialised const wchar_t version of ordercode for speed of usual syntax where ordermode is given as string
 //it avoids the conversion from string to var and back again
-bool var::locateby(const var& target,const char* ordercode, var& setting, const int fieldn/*=0*/, const int valuen/*=0*/) const
+bool var::locateby(const var& target,const char* ordercode, var& setting, const int fieldno/*=0*/, const int valueno/*=0*/) const
 {
-	THISIS(L"bool var::locateby(const var& target,const char* ordercode, var& setting, const int fieldn/*=0*/, const int valuen/*=0*/) const")
+	THISIS(L"bool var::locateby(const var& target,const char* ordercode, var& setting, const int fieldno/*=0*/, const int valueno/*=0*/) const")
 	THISISSTRING()
 	ISSTRING(target)
 	ISDEFINED(setting)
@@ -287,11 +287,11 @@ bool var::locateby(const var& target,const char* ordercode, var& setting, const 
 	//if field number is given then locate in values of that field
 	//otherwise locate in fields of the string
 	wchar_t usingchar;
-	if (valuen!=0) usingchar=SM_;
-	else if (fieldn!=0) usingchar=VM_;
+	if (valueno!=0) usingchar=SM_;
+	else if (fieldno!=0) usingchar=VM_;
 	else usingchar=FM_;
-	//if (fieldn<=0) usingchar=FM_;
-	//else if (valuen<=0) usingchar=VM_;
+	//if (fieldno<=0) usingchar=FM_;
+	//else if (valueno<=0) usingchar=VM_;
 	//else usingchar=SM_;
 
 	char ordermode;
@@ -311,7 +311,7 @@ bool var::locateby(const var& target,const char* ordercode, var& setting, const 
 		//add two and divide by two to get the order no AL=1 AR=2 DL=3 DR=4
 		ordermode=(ordermode+2)>>1;
 	}
-	return locatex(target.var_mvstr,ordermode,usingchar,setting,fieldn,valuen,0);
+	return locatex(target.var_mvstr,ordermode,usingchar,setting,fieldno,valueno,0);
 }
 
 ///////////////////////////////////////////
@@ -330,39 +330,39 @@ bool var::locateusing(const var& target,const var& usingchar) const
 	return locatex(target.var_mvstr,0,usingchar.var_mvstr.c_str()[0],setting,0,0,0);
 }
 
-bool var::locateusing(const var& target,const var& usingchar, var& setting, const int fieldn/*=0*/,const int valuen/*=0*/, const int subvaluen/*=0*/) const
+bool var::locateusing(const var& target,const var& usingchar, var& setting, const int fieldno/*=0*/,const int valueno/*=0*/, const int subvalueno/*=0*/) const
 {
-	THISIS(L"bool var::locateusing(const var& target,const var& usingchar, var& setting, const int fieldn/*=0*/,const int valuen/*=0*/, const int subvaluen/*=0*/) const")
+	THISIS(L"bool var::locateusing(const var& target,const var& usingchar, var& setting, const int fieldno/*=0*/,const int valueno/*=0*/, const int subvalueno/*=0*/) const")
 	THISISSTRING()
 	ISSTRING(target)
 	ISSTRING(usingchar)
 	ISDEFINED(setting)
 
-	return locatex(target.var_mvstr,0,usingchar.var_mvstr.c_str()[0],setting,fieldn,valuen,subvaluen);
+	return locatex(target.var_mvstr,0,usingchar.var_mvstr.c_str()[0],setting,fieldno,valueno,subvalueno);
 
 }
 
 //locate within extraction
-bool var::locatex(const std::wstring& target,const char ordercode,const wchar_t usingchar,var& setting, int fieldn,int valuen,const int subvaluen) const
+bool var::locatex(const std::wstring& target,const char ordercode,const wchar_t usingchar,var& setting, int fieldno,int valueno,const int subvalueno) const
 {
 	//private - assume everything is defined/assigned correctly
 
 	//any negatives at all returns ""
 	//done inline since unusual
-	//if (fieldn<0||valuen<0||subvaluen<0) return var(L"")
+	//if (fieldno<0||valueno<0||subvalueno<0) return var(L"")
 
 	//zero means all, negative return L""
-	//if (fieldn<=0)     (but locate x<0> using VM should work too
-	if (fieldn<=0)
+	//if (fieldno<=0)     (but locate x<0> using VM should work too
+	if (fieldno<=0)
 	{
 		//locate negative field number always returns false and setting 1
-		if (fieldn<0)
+		if (fieldno<0)
 		{
 			setting=1;
 			return !target.length();
 		}
 
-		if (valuen||subvaluen) fieldn=1; else
+		if (valueno||subvalueno) fieldno=1; else
 		{
 			return locateat(target,(size_t) 0,var_mvstr.length(),ordercode,usingchar,setting);
 		}
@@ -371,13 +371,13 @@ bool var::locatex(const std::wstring& target,const char ordercode,const wchar_t 
 	//find the starting position of the field or return L""
 	std::wstring::size_type start_pos=0;
 	int fieldn2=1;
-	while (fieldn2<fieldn)
+	while (fieldn2<fieldno)
 	{
 		start_pos=var_mvstr.find(FM_,start_pos);
 		//past of of string?
 		if (start_pos==std::wstring::npos)
 		{
-			//if (valuen||subvaluen) setting=1;
+			//if (valueno||subvalueno) setting=1;
 			//else setting=fieldn2+1;
 			setting=1;
 			return !target.length();
@@ -400,27 +400,27 @@ bool var::locatex(const std::wstring& target,const char ordercode,const wchar_t 
 	}
 
 	//zero means all, negative return L""
-	if (valuen<=0)
+	if (valueno<=0)
 	{
-		if (valuen<0)
+		if (valueno<0)
 		{
 			setting=1;
 			return !target.length();
 		}
-		if (subvaluen) valuen=1; else
+		if (subvalueno) valueno=1; else
 			return locateat(target,start_pos,field_end_pos,ordercode,usingchar,setting);
 	}
 
 	//find the starting position of the value or return L""
 	//using start_pos and end_pos of
 	int valuen2=1;
-	while (valuen2<valuen)
+	while (valuen2<valueno)
 	{
 		start_pos=var_mvstr.find( VM_ ,start_pos);
 		//past end of string?
 		if (start_pos==std::wstring::npos)
 		{
-			//if (subvaluen) setting=1;
+			//if (subvalueno) setting=1;
 			//else setting=valuen2+1;
 			setting=1;
 			return !target.length();
@@ -451,9 +451,9 @@ bool var::locatex(const std::wstring& target,const char ordercode,const wchar_t 
 	}
 
 	//zero means all, negative means ""
-	if (subvaluen==0)
+	if (subvalueno==0)
 		return locateat(target,start_pos,value_end_pos,ordercode,usingchar,setting);
-	if (subvaluen<0)
+	if (subvalueno<0)
 	{
 		setting=1;
 		return !target.length();
@@ -462,7 +462,7 @@ bool var::locatex(const std::wstring& target,const char ordercode,const wchar_t 
 	//find the starting position of the subvalue or return L""
 	//using start_pos and end_pos of
 	int subvaluen2=1;
-	while (subvaluen2<subvaluen)
+	while (subvaluen2<subvalueno)
 	{
 		start_pos=var_mvstr.find( SM_ ,start_pos);
 		//past end of string?
@@ -748,9 +748,9 @@ bool var::locateat(const std::wstring& target,size_t start_pos,size_t end_pos,co
 //EXTRACT
 ///////////////////////////////////////////
 
-var var::operator() (int fieldn, int valuen, int subvaluen) const
+var var::operator() (int fieldno, int valueno, int subvalueno) const
 {
-	return extract(fieldn,valuen,subvaluen);
+	return extract(fieldno,valueno,subvalueno);
 }
 
 /* sadly no way to get a different operator() function called when on the left hand side of assign
@@ -760,9 +760,9 @@ var var::operator() (int fieldn, int valuen, int subvaluen) const
 */
 
 /*
-var& var::operator() (int fieldn, int valuen, int subvaluen)
+var& var::operator() (int fieldno, int valueno, int subvalueno)
 {
-	return extract(fieldn,valuen,subvaluen);
+	return extract(fieldno,valueno,subvalueno);
 }
 */
 
@@ -775,20 +775,20 @@ var var::extract(const int argfieldn, const int argvaluen, const int argsubvalue
 
 	//any negatives at all returns ""
 	//done inline since unusual
-	//if (fieldn<0||valuen<0||subvaluen<0) return var(L"")
+	//if (fieldno<0||valueno<0||subvalueno<0) return var(L"")
 
 	//FIND FIELD
 
-	int fieldn=argfieldn;
-	int valuen=argvaluen;
-	int subvaluen=argsubvaluen;
+	int fieldno=argfieldn;
+	int valueno=argvaluen;
+	int subvalueno=argsubvaluen;
 	//zero means all, negative return L""
-	if (fieldn<=0)
+	if (fieldno<=0)
 	{
-		if (fieldn<0)
+		if (fieldno<0)
 			return var(L"");
-		if (valuen||subvaluen)
-			fieldn=1;
+		if (valueno||subvalueno)
+			fieldno=1;
 		else
 			return var(var_mvstr);
 	}
@@ -796,7 +796,7 @@ var var::extract(const int argfieldn, const int argvaluen, const int argsubvalue
 	//find the starting position of the field or return L""
 	std::wstring::size_type start_pos=0;
 	int fieldn2=1;
-	while (fieldn2<fieldn)
+	while (fieldn2<fieldno)
 	{
 		start_pos=var_mvstr.find(FM_,start_pos);
 		//past of of string?
@@ -814,12 +814,12 @@ var var::extract(const int argfieldn, const int argvaluen, const int argsubvalue
 	//FIND VALUE
 
 	//zero means all, negative return L""
-	if (valuen<=0)
+	if (valueno<=0)
 	{
-		if (valuen<0)
+		if (valueno<0)
 			return var(L"");
-		if (subvaluen)
-			valuen=1;
+		if (subvalueno)
+			valueno=1;
 		else
 			return var(var_mvstr.substr(start_pos,field_end_pos-start_pos));
 	}
@@ -827,7 +827,7 @@ var var::extract(const int argfieldn, const int argvaluen, const int argsubvalue
 	//find the starting position of the value or return L""
 	//using start_pos and end_pos of
 	int valuen2=1;
-	while (valuen2<valuen)
+	while (valuen2<valueno)
 	{
 		start_pos=var_mvstr.find( VM_ ,start_pos);
 		//past end of string?
@@ -849,15 +849,15 @@ var var::extract(const int argfieldn, const int argvaluen, const int argsubvalue
 	//FIND SUBVALUE
 
 	//zero means all, negative means ""
-	if (subvaluen==0)
+	if (subvalueno==0)
 		return var(var_mvstr.substr(start_pos,value_end_pos-start_pos));
-	if (subvaluen<0)
+	if (subvalueno<0)
 		return var(L"");
 
 	//find the starting position of the subvalue or return L""
 	//using start_pos and end_pos of
 	int subvaluen2=1;
-	while (subvaluen2<subvaluen)
+	while (subvaluen2<subvalueno)
 	{
 		start_pos=var_mvstr.find( SM_ ,start_pos);
 		//past end of string?
@@ -881,26 +881,26 @@ var var::extract(const int argfieldn, const int argvaluen, const int argsubvalue
 }
 
 /////////////////////////////////////////////////
-//ERASE int fieldn, int valuen=0, int subvaluen=0
+//ERASE int fieldno, int valueno=0, int subvalueno=0
 /////////////////////////////////////////////////
 
 
-var var::erase(const int fieldn,const int valuen,const int subvaluen) const
+var var::erase(const int fieldno,const int valueno,const int subvalueno) const
 {
-	THISIS(L"var var::erase(const int fieldn,const int valuen,const int subvaluen) const")
+	THISIS(L"var var::erase(const int fieldno,const int valueno,const int subvalueno) const")
 	THISISSTRING()
 
 	var newmv=*this;
-	return newmv.eraser(fieldn,valuen,subvaluen);
+	return newmv.eraser(fieldno,valueno,subvalueno);
 }
 
-var& var::eraser(int fieldn,int valuen,int subvaluen)
+var& var::eraser(int fieldno,int valueno,int subvalueno)
 {
-	THISIS(L"var& var::eraser(int fieldn,int valuen,int subvaluen)")
+	THISIS(L"var& var::eraser(int fieldno,int valueno,int subvalueno)")
 	THISISSTRING()
 
 	//return L"" if replacing 0,0,0
-	if (fieldn==0&&valuen==0&&subvaluen==0){
+	if (fieldno==0&&valueno==0&&subvalueno==0){
 		//functionmode return var(L"");//var(var1);
 		//proceduremode
 		var_mvstr=L"";
@@ -913,7 +913,7 @@ var& var::eraser(int fieldn,int valuen,int subvaluen)
 	std::wstring::size_type field_end_pos;
 
 	//negative means return all
-	if (fieldn<0)
+	if (fieldno<0)
 	{
 		return *this;
 	}
@@ -922,7 +922,7 @@ var& var::eraser(int fieldn,int valuen,int subvaluen)
 
 		//find the starting position of the field or append enough FM_ to satisfy
 		int fieldn2=1;
-		while (fieldn2<fieldn)
+		while (fieldn2<fieldno)
 		{
 			start_pos=var_mvstr.find(FM_,start_pos);
 			//past of of string?
@@ -951,14 +951,14 @@ var& var::eraser(int fieldn,int valuen,int subvaluen)
 	////////////// FIND VALUE ///////////////////
 	std::wstring::size_type value_end_pos;
 
-	//zero means all, negative means append one mv ... regardless of subvaluen
-	if (valuen<0)
+	//zero means all, negative means append one mv ... regardless of subvalueno
+	if (valueno<0)
 	{
 		return *this;
 	}
-	else if (valuen==0&&subvaluen==0)
+	else if (valueno==0&&subvalueno==0)
 	{
-		if (fieldn>1) start_pos--;
+		if (fieldno>1) start_pos--;
 		else if (field_end_pos<var_mvstr.length()) field_end_pos++;
 		var_mvstr.erase(start_pos,field_end_pos-start_pos);
 		return *this;
@@ -969,7 +969,7 @@ var& var::eraser(int fieldn,int valuen,int subvaluen)
 
 		//find the starting position of the value or insert enough VM_ to satisfy
 		int valuen2=1;
-		while (valuen2<valuen)
+		while (valuen2<valueno)
 		{
 			start_pos=var_mvstr.find(VM_,start_pos);
 			//past end of string or field?
@@ -991,14 +991,14 @@ var& var::eraser(int fieldn,int valuen,int subvaluen)
 	////////// FIND SUBVALUE  //////////////////////
 	std::wstring::size_type subvalue_end_pos;
 
-	//zero means all, negative means append one sv ... regardless of subvaluen
-	if (subvaluen<0)
+	//zero means all, negative means append one sv ... regardless of subvalueno
+	if (subvalueno<0)
 	{
 		return *this;
 	}
-	else if (subvaluen==0)
+	else if (subvalueno==0)
 	{
-		if (valuen>1) start_pos--;
+		if (valueno>1) start_pos--;
 		else if (value_end_pos<field_end_pos) value_end_pos++;
 		var_mvstr.erase(start_pos,value_end_pos-start_pos);
 		return *this;
@@ -1008,7 +1008,7 @@ var& var::eraser(int fieldn,int valuen,int subvaluen)
 	{
 		//find the starting position of the subvalue or insert enough SM_ to satisfy
 		int subvaluen2=1;
-		while (subvaluen2<subvaluen)
+		while (subvaluen2<subvalueno)
 		{
 			start_pos=var_mvstr.find(SM_,start_pos);
 			//past end of string or value
@@ -1028,7 +1028,7 @@ var& var::eraser(int fieldn,int valuen,int subvaluen)
 	}
 //wcout<<start_pos<<L" "<<subvalue_end_pos<<L" "<<subvalue_end_pos-start_pos<<endl;
 
-	if (subvaluen>1) start_pos--;
+	if (subvalueno>1) start_pos--;
 	else if(subvalue_end_pos<value_end_pos) subvalue_end_pos++;
 	var_mvstr.erase(start_pos,subvalue_end_pos-start_pos);
 
@@ -1042,54 +1042,54 @@ var& var::eraser(int fieldn,int valuen,int subvaluen)
 //REPLACE int int int var
 ///////////////////////////////////////////
 
-var var::replace(const int fieldn,const int valuen,const int subvaluen,const var& replacement) const
+var var::replace(const int fieldno,const int valueno,const int subvalueno,const var& replacement) const
 {
-	THISIS(L"var var::replace(const int fieldn,const int valuen,const int subvaluen,const var& replacement) const")
+	THISIS(L"var var::replace(const int fieldno,const int valueno,const int subvalueno,const var& replacement) const")
 	THISISSTRING()
 
-	return var(*this).replacer(fieldn,valuen,subvaluen,replacement);
+	return var(*this).replacer(fieldno,valueno,subvalueno,replacement);
 }
 
-var var::replace(const int fieldn,const int valuen,const var& replacement) const
+var var::replace(const int fieldno,const int valueno,const var& replacement) const
 {
-	THISIS(L"var var::replace(const int fieldn,const int valuen,const var& replacement) const")
+	THISIS(L"var var::replace(const int fieldno,const int valueno,const var& replacement) const")
 	THISISSTRING()
 
-	return var(*this).replacer(fieldn,valuen,0,replacement);
+	return var(*this).replacer(fieldno,valueno,0,replacement);
 }
 
-var var::replace(const int fieldn,const var& replacement) const
+var var::replace(const int fieldno,const var& replacement) const
 {
-	THISIS(L"var var::replace(const int fieldn,const var& replacement) const")
+	THISIS(L"var var::replace(const int fieldno,const var& replacement) const")
 	THISISSTRING()
 
-	return var(*this).replacer(fieldn,0,0,replacement);
+	return var(*this).replacer(fieldno,0,0,replacement);
 }
 
-var& var::replacer(const int fieldn,const int valuen,const var& replacement)
+var& var::replacer(const int fieldno,const int valueno,const var& replacement)
 {
-	THISIS(L"var var::replacer(const int fieldn,const int valuen,const var& replacement")
+	THISIS(L"var var::replacer(const int fieldno,const int valueno,const var& replacement")
 	THISISSTRING()
 
-	return replacer(fieldn,valuen,0,replacement);
+	return replacer(fieldno,valueno,0,replacement);
 }
 
-var& var::replacer(const int fieldn,const var& replacement)
+var& var::replacer(const int fieldno,const var& replacement)
 {
-	THISIS(L"var var::replacer(const int fieldn,const var& replacement)")
+	THISIS(L"var var::replacer(const int fieldno,const var& replacement)")
 	THISISSTRING()
 
-	return replacer(fieldn,0,0,replacement);
+	return replacer(fieldno,0,0,replacement);
 }
 
-var& var::replacer(int fieldn,int valuen,int subvaluen,const var& replacement)
+var& var::replacer(int fieldno,int valueno,int subvalueno,const var& replacement)
 {
-	THISIS(L"var& var::replacer(int fieldn,int valuen,int subvaluen,const var& replacement)")
+	THISIS(L"var& var::replacer(int fieldno,int valueno,int subvalueno,const var& replacement)")
 	THISISSTRING()
 	ISSTRING(replacement)
 
 	//return whole thing if replace 0,0,0
-	if (fieldn==0&&valuen==0&&subvaluen==0)
+	if (fieldno==0&&valueno==0&&subvalueno==0)
 	{
 		//functionmode return var(replacement);
 		//proceduremode
@@ -1103,7 +1103,7 @@ var& var::replacer(int fieldn,int valuen,int subvaluen,const var& replacement)
 	std::wstring::size_type field_end_pos;
 
 	//negative means append
-	if (fieldn<0)
+	if (fieldno<0)
 	{
 		//append a FM_ only if there is existing data
 		if (var_mvstr.length()!=0) var_mvstr+=FM_;
@@ -1115,15 +1115,15 @@ var& var::replacer(int fieldn,int valuen,int subvaluen,const var& replacement)
 
 		//find the starting position of the field or append enough FM_ to satisfy
 		int fieldn2=1;
-		while (fieldn2<fieldn)
+		while (fieldn2<fieldno)
 		{
 			start_pos=var_mvstr.find(FM_,start_pos);
 			//past of of string?
 			if (start_pos==std::wstring::npos)
 			{
-				var_mvstr.append(fieldn-fieldn2,FM_);
+				var_mvstr.append(fieldno-fieldn2,FM_);
 				//start_pos=var_mvstr.length();
-				//fieldn2=fieldn
+				//fieldn2=fieldno
 				break;
 			}
 			start_pos++;
@@ -1147,8 +1147,8 @@ var& var::replacer(int fieldn,int valuen,int subvaluen,const var& replacement)
 	////////////// FIND VALUE ///////////////////
 	std::wstring::size_type value_end_pos;
 
-	//zero means all, negative means append one mv ... regardless of subvaluen
-	if (valuen<0)
+	//zero means all, negative means append one mv ... regardless of subvalueno
+	if (valueno<0)
 	{
 		if (field_end_pos-start_pos>0)
 		{
@@ -1158,7 +1158,7 @@ var& var::replacer(int fieldn,int valuen,int subvaluen,const var& replacement)
 		start_pos=field_end_pos;
 		value_end_pos=field_end_pos;
 	}
-	else if (valuen==0&&subvaluen==0)
+	else if (valueno==0&&subvalueno==0)
 	{
 		var_mvstr.replace(start_pos,field_end_pos-start_pos,replacement.var_mvstr);
 		return *this;
@@ -1169,16 +1169,16 @@ var& var::replacer(int fieldn,int valuen,int subvaluen,const var& replacement)
 
 		//find the starting position of the value or insert enough VM_ to satisfy
 		int valuen2=1;
-		while (valuen2<valuen)
+		while (valuen2<valueno)
 		{
 			start_pos=var_mvstr.find(VM_,start_pos);
 			//past end of string or field?
 			if (start_pos>=field_end_pos||start_pos==std::wstring::npos)
 			{
 				start_pos=field_end_pos;
-				//var_mvstr.insert(field_end_pos,std::wstring(valuen-valuen2,VM_));
-				var_mvstr.insert(field_end_pos,valuen-valuen2,VM_);
-				field_end_pos+=valuen-valuen2;
+				//var_mvstr.insert(field_end_pos,std::wstring(valueno-valuen2,VM_));
+				var_mvstr.insert(field_end_pos,valueno-valuen2,VM_);
+				field_end_pos+=valueno-valuen2;
 				start_pos=field_end_pos;
 				break;
 			}
@@ -1196,8 +1196,8 @@ var& var::replacer(int fieldn,int valuen,int subvaluen,const var& replacement)
 	////////// FIND SUBVALUE  //////////////////////
 	std::wstring::size_type subvalue_end_pos;
 
-	//zero means all, negative means append one sv ... regardless of subvaluen
-	if (subvaluen<0)
+	//zero means all, negative means append one sv ... regardless of subvalueno
+	if (subvalueno<0)
 	{
 		if (value_end_pos-start_pos>0)
 		{
@@ -1207,7 +1207,7 @@ var& var::replacer(int fieldn,int valuen,int subvaluen,const var& replacement)
 		start_pos=value_end_pos;
 		subvalue_end_pos=value_end_pos;
 	}
-	else if (subvaluen==0)
+	else if (subvalueno==0)
 	{
 		var_mvstr.replace(start_pos,value_end_pos-start_pos,replacement.var_mvstr);
 		return *this;
@@ -1217,16 +1217,16 @@ var& var::replacer(int fieldn,int valuen,int subvaluen,const var& replacement)
 	{
 		//find the starting position of the subvalue or insert enough SM_ to satisfy
 		int subvaluen2=1;
-		while (subvaluen2<subvaluen)
+		while (subvaluen2<subvalueno)
 		{
 			start_pos=var_mvstr.find(SM_,start_pos);
 			//past end of string or value
 			if (start_pos>=value_end_pos||start_pos==std::wstring::npos)
 			{
 				start_pos=value_end_pos;
-				//var_mvstr.insert(value_end_pos,std::wstring(subvaluen-subvaluen2,SM_));
-				var_mvstr.insert(value_end_pos,subvaluen-subvaluen2,SM_);
-				value_end_pos+=subvaluen-subvaluen2;
+				//var_mvstr.insert(value_end_pos,std::wstring(subvalueno-subvaluen2,SM_));
+				var_mvstr.insert(value_end_pos,subvalueno-subvaluen2,SM_);
+				value_end_pos+=subvalueno-subvaluen2;
 				start_pos=value_end_pos;
 				break;
 			}
@@ -1253,39 +1253,39 @@ var& var::replacer(int fieldn,int valuen,int subvaluen,const var& replacement)
 //INSERT int int int var
 ///////////////////////////////////////////
 
-var var::insert(const int fieldn,const int valuen,const int subvaluen,const var& insertion) const
+var var::insert(const int fieldno,const int valueno,const int subvalueno,const var& insertion) const
 {
-	THISIS(L"var var::insert(const int fieldn,const int valuen,const int subvaluen,const var& insertion) const")
+	THISIS(L"var var::insert(const int fieldno,const int valueno,const int subvalueno,const var& insertion) const")
 	THISISSTRING()
 
 	var newmv=*this;
-	return newmv.inserter(fieldn,valuen,subvaluen,insertion);
+	return newmv.inserter(fieldno,valueno,subvalueno,insertion);
 }
 
-var& var::inserter(const int fieldn,const int valuen,const var& insertion)
+var& var::inserter(const int fieldno,const int valueno,const var& insertion)
 {
-	THISIS(L"var var::inserter(const int fieldn,const int valuen,const var& insertion")
+	THISIS(L"var var::inserter(const int fieldno,const int valueno,const var& insertion")
 	THISISSTRING()
 
-	return inserter(fieldn,valuen,0,insertion);
+	return inserter(fieldno,valueno,0,insertion);
 }
 
-var& var::inserter(const int fieldn,const var& insertion)
+var& var::inserter(const int fieldno,const var& insertion)
 {
-	THISIS(L"var var::inserter(const int fieldn,const var& insertion")
+	THISIS(L"var var::inserter(const int fieldno,const var& insertion")
 	THISISSTRING()
 
-	return inserter(fieldn,0,0,insertion);
+	return inserter(fieldno,0,0,insertion);
 }
 
-var& var::inserter(const int fieldn,const int valuen,const int subvaluen,const var& insertion)
+var& var::inserter(const int fieldno,const int valueno,const int subvalueno,const var& insertion)
 {
-	THISIS(L"var& var::inserter(const int fieldn,const int valuen,const int subvaluen,const var& insertion)")
+	THISIS(L"var& var::inserter(const int fieldno,const int valueno,const int subvalueno,const var& insertion)")
 	THISISSTRING()
 	ISSTRING(insertion)
 
 	//return whole thing if replace 0,0,0
-	if (fieldn==0&&valuen==0&&subvaluen==0)
+	if (fieldno==0&&valueno==0&&subvalueno==0)
 	{
 		var_mvstr.insert(0,insertion.var_mvstr+FM_);
 		return *this;
@@ -1298,7 +1298,7 @@ var& var::inserter(const int fieldn,const int valuen,const int subvaluen,const v
 	int pad=false;
 
 	//negative means append
-	if (fieldn<0)
+	if (fieldno<0)
 	{
 		//append a FM_ only if there is existing data
 		if (var_mvstr.length()!=0) var_mvstr+=FM_;
@@ -1311,16 +1311,16 @@ var& var::inserter(const int fieldn,const int valuen,const int subvaluen,const v
 
 		//find the starting position of the field or append enough FM_ to satisfy
 		int fieldn2=1;
-		while (fieldn2<fieldn)
+		while (fieldn2<fieldno)
 		{
 			start_pos=var_mvstr.find(FM_,start_pos);
 			//past of of string?
 			if (start_pos==std::wstring::npos)
 			{
 				pad=true;
-				 var_mvstr.append(fieldn-fieldn2,FM_);
+				 var_mvstr.append(fieldno-fieldn2,FM_);
 				//start_pos=var_mvstr.length();
-				//fieldn2=fieldn
+				//fieldn2=fieldno
 				break;
 			}
 			start_pos++;
@@ -1344,8 +1344,8 @@ var& var::inserter(const int fieldn,const int valuen,const int subvaluen,const v
 	////////////// FIND VALUE ///////////////////
 	std::wstring::size_type value_end_pos;
 
-	//zero means all, negative means append one mv ... regardless of subvaluen
-	if (valuen<0)
+	//zero means all, negative means append one mv ... regardless of subvalueno
+	if (valueno<0)
 	{
 		if (field_end_pos-start_pos>0)
 		{
@@ -1356,7 +1356,7 @@ var& var::inserter(const int fieldn,const int valuen,const int subvaluen,const v
 		value_end_pos=field_end_pos;
 		pad=true;
 	}
-	else if (valuen==0&&subvaluen==0)
+	else if (valueno==0&&subvalueno==0)
 	{
 		if (!pad) var_mvstr.insert(start_pos,_FM_);
 		var_mvstr.insert(start_pos,insertion.var_mvstr);
@@ -1368,7 +1368,7 @@ var& var::inserter(const int fieldn,const int valuen,const int subvaluen,const v
 
 		//find the starting position of the value or insert enough VM_ to satisfy
 		int valuen2=1;
-		while (valuen2<valuen)
+		while (valuen2<valueno)
 		{
 			start_pos=var_mvstr.find(VM_,start_pos);
 			//past end of string or field?
@@ -1376,9 +1376,9 @@ var& var::inserter(const int fieldn,const int valuen,const int subvaluen,const v
 			{
 				pad=true;
 				start_pos=field_end_pos;
-				//var_mvstr.insert(field_end_pos,std::wstring(valuen-valuen2,VM_));
-				var_mvstr.insert(field_end_pos,valuen-valuen2,VM_);
-				field_end_pos+=valuen-valuen2;
+				//var_mvstr.insert(field_end_pos,std::wstring(valueno-valuen2,VM_));
+				var_mvstr.insert(field_end_pos,valueno-valuen2,VM_);
+				field_end_pos+=valueno-valuen2;
 				start_pos=field_end_pos;
 				break;
 			}
@@ -1396,8 +1396,8 @@ var& var::inserter(const int fieldn,const int valuen,const int subvaluen,const v
 	////////// FIND SUBVALUE  //////////////////////
 	std::wstring::size_type subvalue_end_pos;
 
-	//zero means all, negative means append one sv ... regardless of subvaluen
-	if (subvaluen<0)
+	//zero means all, negative means append one sv ... regardless of subvalueno
+	if (subvalueno<0)
 	{
 		if (value_end_pos-start_pos>0)
 		{
@@ -1408,9 +1408,9 @@ var& var::inserter(const int fieldn,const int valuen,const int subvaluen,const v
 		subvalue_end_pos=value_end_pos;
 		pad=true;
 	}
-	else if (subvaluen==0)
+	else if (subvalueno==0)
 	{
-		if (!pad&&(start_pos<field_end_pos||valuen>1)) var_mvstr.insert(start_pos,_VM_);
+		if (!pad&&(start_pos<field_end_pos||valueno>1)) var_mvstr.insert(start_pos,_VM_);
 		var_mvstr.insert(start_pos,insertion.var_mvstr);
 		return *this;
 
@@ -1419,7 +1419,7 @@ var& var::inserter(const int fieldn,const int valuen,const int subvaluen,const v
 	{
 		//find the starting position of the subvalue or insert enough SM_ to satisfy
 		int subvaluen2=1;
-		while (subvaluen2<subvaluen)
+		while (subvaluen2<subvalueno)
 		{
 			start_pos=var_mvstr.find(SM_,start_pos);
 			//past end of string or value
@@ -1427,9 +1427,9 @@ var& var::inserter(const int fieldn,const int valuen,const int subvaluen,const v
 			{
 				pad=true;
 				start_pos=value_end_pos;
-				//var_mvstr.insert(value_end_pos,std::wstring(subvaluen-subvaluen2,SM_));
-				var_mvstr.insert(value_end_pos,subvaluen-subvaluen2,SM_);
-				value_end_pos+=subvaluen-subvaluen2;
+				//var_mvstr.insert(value_end_pos,std::wstring(subvalueno-subvaluen2,SM_));
+				var_mvstr.insert(value_end_pos,subvalueno-subvaluen2,SM_);
+				value_end_pos+=subvalueno-subvaluen2;
 				start_pos=value_end_pos;
 				break;
 			}
@@ -1444,7 +1444,7 @@ var& var::inserter(const int fieldn,const int valuen,const int subvaluen,const v
 
 	}
 
-	if (!pad&&(start_pos<value_end_pos||subvaluen>1)) var_mvstr.insert(start_pos,_SM_);
+	if (!pad&&(start_pos<value_end_pos||subvalueno>1)) var_mvstr.insert(start_pos,_SM_);
 	var_mvstr.insert(start_pos,insertion.var_mvstr);
 
 	return *this;
@@ -1580,6 +1580,53 @@ var& var::substrer(const int startx,const int length)
 	var_mvtyp=pimpl::MVTYPE_STR;
 
 	return *this;
+
+}
+
+//[x]
+//var.c(charno) character
+var var::operator[](const int charno) const
+{
+	THISIS(L"var var::operator[](const int charno) const")
+	THISISSTRING()
+
+	int nchars=int(var_mvstr.length());
+
+	//beyond end of string return ""
+	//get this test out of the way first since it only has to be done later on anyway
+	if (charno>nchars)
+		return L"";
+
+	//within string return the character
+	//handle positive indexing first for speed on the assumption
+	//that it is commoner than negative indexing
+	if (charno>0)
+		return var_mvstr[charno-1];
+
+	//character 0 return the first character or "" if none
+	//have to get this special case out of the way first
+	//despite it being unusual
+	//since it only has to be done later anyway
+	if (charno==0)
+		if (nchars)
+			return var_mvstr[0];
+		else
+			return L"";
+
+	//have to check this later so check it now
+	if (!nchars)
+		return L"";
+
+	//convert negative index to positive index
+	int charno2=nchars+charno;
+
+	//if index is now 0 or positive then return the character
+	if (charno2>=0)
+		return var_mvstr[charno2];//no need for -1 here
+
+	//otherwise so negative as to point before beginning of string
+	//and rule is to return the first character in that case
+	return var_mvstr[0];
 
 }
 

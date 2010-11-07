@@ -31,9 +31,9 @@ boost::mutex io_mutex;
 //}
 
 //#include <exodus/mv.h>
-#include <exodus/exodus.h>
+//#include <exodus/exodus.h>
+#include <exodus/program.h>
 #include "server.h"
-
 
 DLL_PUBLIC
 boost::thread_specific_ptr<int> tss_environmentns;
@@ -43,8 +43,8 @@ using namespace exodus;
 //#include <exodus/mvenvironment.h>
 #include "mvwindow.h"
 
-#include "Definition.h"
-#include "Market.h"
+//#include "Definition.h"
+//#include "Market.h"
 
 /*
 http://www.postgresql.org/docs/8.2/interactive/libpq-pgpass.html
@@ -83,8 +83,8 @@ bool init_thread(const int environmentn)
         //tss_wins.reset(new MvWindow(env));
 		global_wins[environmentn]=new MvWindow(env);
 
-        mvlibs.set("DEFINITIONS",new Definition);
-        mvlibs.set("MARKETS",new Market);		
+        //mvlibs.set("DEFINITIONS",new Definition);
+        //mvlibs.set("MARKETS",new Market);		
 
 		return true;
 
@@ -163,6 +163,9 @@ class MVConnection
 private:
 };
 
+//programinit()
+class ExodusProgram : public ExodusProgramBase {
+
 function xyz(in xyzz)
 {
 	xyzz(2,2,2).outputl();
@@ -195,8 +198,87 @@ function accrest() {
         return 0;
 }
 
-program()
+//program()
+
+function main()
 {
+
+	//_DBTRACE=true;
+
+	//accessing individual characters by index 1=first -1=last etc.
+	var a="abc";
+	printl(a[1]);	//a = first character
+	printl(a[2]);	//b = second character
+	printl(a[4]);	//"" = if access after last character
+	printl(a[-1]);	//c = last character
+	printl(a[-2]);	//b = last but one character
+	printl(a[-9]);	//a = first character if too negative
+	printl(a[0]);	//a = zero is the same as too negative
+
+	//replacing a section of a string:
+	//given start character number, number of characters to replace and a replacement string
+	//(this is equivalent to the following classic mv basic syntax
+	//but the simple [x,y] syntax is not available in curly bracket languages)
+	//tempstr[2,3]='abc'
+
+	//replacing a section of a string - method 1
+	a="abcde";
+	splicer(a,3,2,"xx");
+	printl(a);              //abxxe
+
+	//replacing a section of a string - method 2
+	a="abcde";
+	a.splicer(-2,-3,"xx");
+	printl(a);              //axxe ... both start and length can be negative
+
+	//replacing a section of a string - method 3 – but may be slower
+	a="abcde";
+	a=splice(a,-2,-3,"xx");
+	printl(a);              //axxe ... both start and length can be negative
+
+	//replacing a section of a string - method 4 – but may be slower
+	a="abcde";
+	a=a.splice(-2,-3,"xx");
+	printl(a);              //axxe ... both start and length can be negative
+
+	var tempstr2="ab";
+	for (var ii=-3; ii<=3; ++ii)
+		tempstr2[ii].quote().output(" ["^ii^"]=");
+	tempstr2="";
+	printl();
+	for (var ii=-3; ii<=3; ++ii)
+		tempstr2[ii].quote().output(" ["^ii^"]=");
+
+	var errmsg;
+	//if (not createdb("steve",errmsg))
+	//	errmsg.outputl();
+	//if (not deletedb("steve",errmsg))
+	//	errmsg.outputl();
+
+	deletefile("USERS2");
+	deletefile("dict_USERS2");
+
+	createfile("USERS2");
+	createfile("DICT_USERS2");
+
+	write("S"^FM^FM^"Age"^FM^FM^FM^FM^FM^FM^"R"^FM^"10","DICT_USERS2","AGE");
+	write("S"^FM^FM^"Days"^FM^FM^FM^FM^FM^FM^"R"^FM^"10","DICT_USERS2","DAYS");
+
+	write("1","USERS2","1");
+	write("2","USERS2","2");
+
+	if (not selectrecord("SELECT USERS2 WITH AGE GE 0 AND WITH DAYS GE 0"))
+		printl("Failed to Select");
+
+	DICT="dict_USERS";
+	while (readnextrecord(RECORD,ID))
+	{
+		printl("ID=",ID);
+		printl("RECORD=",RECORD);
+
+		printl("AGE=",calculate("AGE"));
+		printl("DAYS=",calculate("DAYS"));
+	}
 
 	var spac1="  xxx  xxx  ";
 	trimmer(spac1).quote().outputl();
@@ -270,7 +352,7 @@ program()
 	var tempinp;
 //	input("Press Enter ...",tempinp);
 	//ensure lower case sorts before uppercase (despite "A" \x41 is less than "a" \x61)
-	var a="a";
+	a="a";
 	var A="A";
 	assert(a<A);
 
@@ -357,10 +439,6 @@ program()
 	//method is ... do the fmod and if the result is not the same sign as the divisor, add the divisor
 	assert(mod(-2.3,var(1.499)).round(3).outputl()==0.698);
 	assert(mod(2.3,var(-1.499)).round(3).outputl()==-0.698);
-
-	var errmsg;
-	if (not var("CREATE DATABASE exodus WITH ENCODING='UTF8' OWNER=exodus;").sqlexec(errmsg))
-		errmsg.outputl();
 
 	oconv(1234,"MD20P").outputl();
 	assert(var(10000).oconv("DY0")=="");
@@ -635,7 +713,7 @@ while trying to match the argument list '(exodus::var, bool)'
 	var("x").str(-7);
 
 	var xyz;
-	xyz=xyz;
+	//xyz=xyz;
 	//test catching MVexceptions
 	try {
 		//runtime errors
@@ -962,7 +1040,7 @@ MT'h' 63306 17h35
 //	var().stop();
 
 	var ads;
-    if (!ads.open("ADS"))
+	if (!ads.open("ADS"))
 	{
 		var().createfile("ADS");
 		if (!ads.open("ADS"))
@@ -970,9 +1048,9 @@ MT'h' 63306 17h35
 	}
 
 	var dictrec="";
-	dictrec.replacer(1,0,0,"F");
-	dictrec.replacer(2,0,0,"3");
-	dictrec.replacer(3,0,0,"Brand Code");
+	dictrec.replacer(1,"F");
+	dictrec.replacer(2,"3");
+	dictrec.replacer(3,"Brand Code");
 	if (not dictrec.write("DICT_ADS","BRAND_CODE"))
 		printl("cannot write brand_code dict");
 	printl("Creating ADS BRAND_CODE Index");
@@ -984,9 +1062,9 @@ MT'h' 63306 17h35
 
 	if (!var().open("CHANGELOG"))
 								var().createfile("CHANGELOG");
-   if (!var().open("LOCKS"))
+	if (!var().open("LOCKS"))
 								var().createfile("LOCKS");
-    if (!var().open("USERS"))
+	if (!var().open("USERS"))
 								var().createfile("USERS");
     if (!var().open("ACCESSIBLE_COLUMNS"))
 								var().createfile("ACCESSIBLE_COLUMNS");
@@ -1002,7 +1080,7 @@ MT'h' 63306 17h35
 //	var().selectrecord("ADS");
 //	var("").select("SCHEDULES","WITH AUTHORISED");
 //	var("").select("SCHEDULES","");
-	MvLibs mvlibs;
+	//MvLibs mvlibs;
 	var key;
 	int ii=0;
 //	cin>>ii;
@@ -1072,4 +1150,7 @@ MT'h' 63306 17h35
 
     stop("Shutting down ...");
     
+	return 0;
 }
+
+programexit()

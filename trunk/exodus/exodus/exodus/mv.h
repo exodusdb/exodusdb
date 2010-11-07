@@ -436,12 +436,15 @@ public:
 	One alternative would be to use () only for extraction (and [] only for replacement of fields?)
 
 	//dynamic array extract/replace eg: abc=xyz(1,2,3) and xyz(1,2,3)="abc";
-	var__extractreplace operator() (int fieldn, int valuen=0, int subvaluen=0) const;
-	var__extractreplace operator() (int fieldn, int valuen=0, int subvaluen=0);
+	var__extractreplace operator() (int fieldno, int valueno=0, int subvalueno=0) const;
+	var__extractreplace operator() (int fieldno, int valueno=0, int subvalueno=0);
 	*/
-	var operator() (int fieldn, int valuen=0, int subvaluen=0) const;
+	var operator() (int fieldno, int valueno=0, int subvalueno=0) const;
 	//dont declare this so we force use of the above which returns a temporary on the RHS
-	//var& operator() (int fieldn, int valuen=0, int subvaluen=0);
+	//var& operator() (int fieldno, int valueno=0, int subvalueno=0);
+
+	//extract a character first=1 last=-1 etc
+	var operator[] (int charno) const;
 
 	//UNARY OPERATORS
 	/////////////////
@@ -828,7 +831,7 @@ public:
 	var& trimmer(const var trimchar);
 	var& trimmerf(const var trimchar);
 	var& trimmerb(const var trimchar);
-	var& fieldstorer(const var& sepchar,const int fieldn, const int nfields,const var& replacement);
+	var& fieldstorer(const var& sepchar,const int fieldno, const int nfields,const var& replacement);
 	var& substrer(const int startx);
 	var& substrer(const int startx,const int length);
 
@@ -847,7 +850,7 @@ public:
 	var trim(const var trimchar) const;
 	var trimf(const var trimchar) const;
 	var trimb(const var trimchar) const;
-	var fieldstore(const var& sepchar,const int fieldn,const int nfields,const var& replacement) const;
+	var fieldstore(const var& sepchar,const int fieldno,const int nfields,const var& replacement) const;
 	var hash() const;
 
 	//STRING EXTRACTION
@@ -888,37 +891,37 @@ public:
 	//-er version to update too?
 	//var& remover(var& startx,var& length) const;
 
-	var replace(const int fieldn,const int valuen,const int subvaluen,const var& replacement) const;
-	var replace(const int fieldn,const int valuen,const var& replacement) const;
-	var replace(const int fieldn,const var& replacement) const;
+	var replace(const int fieldno,const int valueno,const int subvalueno,const var& replacement) const;
+	var replace(const int fieldno,const int valueno,const var& replacement) const;
+	var replace(const int fieldno,const var& replacement) const;
 
-	var insert(const int fieldn,const int valuen,const int subvaluen,const var& insertion) const;
-	var insert(const int fieldn,const int valuen,const var& insertion) const;
-	var insert(const int fieldn,const var& insertion) const;
+	var insert(const int fieldno,const int valueno,const int subvalueno,const var& insertion) const;
+	var insert(const int fieldno,const int valueno,const var& insertion) const;
+	var insert(const int fieldno,const var& insertion) const;
 
-	var erase(const int fieldn, const int valuen=0, const int subvaluen=0) const;
-	var extract(const int fieldn,const int valuen=0,const int subvaluen=0) const;
+	var erase(const int fieldno, const int valueno=0, const int subvalueno=0) const;
+	var extract(const int fieldno,const int valueno=0,const int subvalueno=0) const;
 
 	//mutable versions update and return source
-	var& replacer(const int fieldn,const int valuen,const int subvaluen,const var& replacement);
-	var& replacer(const int fieldn,const int valuen,const var& replacement);
-	var& replacer(const int fieldn,const var& replacement);
+	var& replacer(const int fieldno,const int valueno,const int subvalueno,const var& replacement);
+	var& replacer(const int fieldno,const int valueno,const var& replacement);
+	var& replacer(const int fieldno,const var& replacement);
 
-	var& inserter(const int fieldn,const int valuen,const int subvaluen,const var& insertion);
-	var& inserter(const int fieldn,const int valuen,const var& insertion);
-	var& inserter(const int fieldn,const var& insertion);
+	var& inserter(const int fieldno,const int valueno,const int subvalueno,const var& insertion);
+	var& inserter(const int fieldno,const int valueno,const var& insertion);
+	var& inserter(const int fieldno,const var& insertion);
 
-	var& eraser(const int fieldn, const int valuen=0, const int subvaluen=0);
+	var& eraser(const int fieldno, const int valueno=0, const int subvalueno=0);
 	//-er version could be extract and erase in one go
-	//var& extracter(int fieldn,int valuen=0,int subvaluen=0) const;
+	//var& extracter(int fieldno,int valueno=0,int subvalueno=0) const;
 
 	//should these be like extract, replace, insert, delete
-	//locate(fieldn, valuen, subvaluen,target,setting,by=L"")
-	bool locate(const var& target, var& setting, const int fieldn=0,const int valuen=0) const;
+	//locate(fieldno, valueno, subvalueno,target,setting,by=L"")
+	bool locate(const var& target, var& setting, const int fieldno=0,const int valueno=0) const;
 	//passing BY as a string for speed
-	bool locateby(const var& target, const char* ordercode, var& setting, const int fieldn=0,const int valuen=0) const;
-	bool locateby(const var& target, const var& ordercode, var& setting, const int fieldn=0,const int valuen=0) const;
-	bool locateusing(const var& target, const var& usingchar, var& setting, const int fieldn=0, const int valuen=0, const int subvaluen=0) const;
+	bool locateby(const var& target, const char* ordercode, var& setting, const int fieldno=0,const int valueno=0) const;
+	bool locateby(const var& target, const var& ordercode, var& setting, const int fieldno=0,const int valueno=0) const;
+	bool locateusing(const var& target, const var& usingchar, var& setting, const int fieldno=0, const int valueno=0, const int subvalueno=0) const;
 	bool locateusing(const var& target, const var& usingchar) const;
 
 	var sum(const var& sepchar=VM_) const;
@@ -927,9 +930,14 @@ public:
 	bool connect(const var& connectioninfo=L"");
 	bool disconnect();
 
-	bool begin() const;
-	bool rollback() const;
-	bool end() const;
+	bool begintrans() const;
+	bool rollbacktrans() const;
+	bool committrans() const;
+
+	bool createdb(const var& dbname) const;
+	bool deletedb(const var& dbname) const;
+	bool createdb(const var& dbname, var& errmsg) const;
+	bool deletedb(const var& dbname, var& errmsg) const;
 
 	bool createfile(const var& filename,const var& options=L"");
 	bool deletefile() const;
@@ -956,17 +964,19 @@ public:
 	void unlockall() const;
 
 	bool read(const var& filehandle, const var& key);
-	bool readv(const var& filehandle, const var& key, const int fieldn);
+	bool readv(const var& filehandle, const var& key, const int fieldno);
 	bool write(const var& filehandle,const var& key) const;
-	bool writev(const var& filehandle,const var& key,const int fieldn) const;
+	bool writev(const var& filehandle,const var& key,const int fieldno) const;
 	bool deleterecord(const var& key) const;
-
 	bool updaterecord(const var& file,const var& key) const;
 	bool insertrecord(const var& file,const var& key) const;
 
+	/* MvEnvironment function now
 	var calculate() const;
+*/
 	var xlate(const var& filename,const var& fieldno, const wchar_t* mode) const;
 	var xlate(const var& filename,const var& fieldno, const var& mode) const;
+
 	bool sqlexec() const;
 	bool sqlexec(var& errmsg) const;
 
@@ -1006,7 +1016,7 @@ private:
 
 	//bool locatex(std::wstring locatestring,)
 	//locate within extraction
-	bool locatex(const std::wstring& target,const char ordercode,const wchar_t usingchar,var& setting, int fieldn=0,int valuen=0,const int subvaluen=0) const;
+	bool locatex(const std::wstring& target,const char ordercode,const wchar_t usingchar,var& setting, int fieldno=0,int valueno=0,const int subvalueno=0) const;
 	//hardcore std::wstring locate function given a section of a std::wstring and all parameters
 	bool locateat(const std::wstring& target,size_t start_pos,size_t end_pos,const wchar_t order,const var& usingchar,var& setting)const;
 
@@ -1222,12 +1232,12 @@ class DLL_PUBLIC var__extractreplace : private var
 
 public:
 
-var__extractreplace(in var1, int fieldn, int valuen, int subvaluen)
+var__extractreplace(in var1, int fieldno, int valueno, int subvalueno)
 	:
 	_var1(var1),
-	_fieldn(fieldn),
-	_valuen(valuen),
-	_subvaluen(subvaluen)
+	_fieldn(fieldno),
+	_valuen(valueno),
+	_subvaluen(subvalueno)
 	;
 
 	//destructor to (NOT VIRTUAL to save space since not expected to be a base class)
@@ -1298,6 +1308,13 @@ extern
 #else
 #endif
 DLL_PUBLIC
+int _DBTRACE;
+
+#ifndef EXO_MV_CPP
+extern
+#else
+#endif
+DLL_PUBLIC
 exodus::var _EXECPATH;
 
 //FM separated words or quoted phrases from command line. quote marks are retained.
@@ -1353,6 +1370,6 @@ var DLL_PUBLIC getexecpath();
 
 }//namespace exodus
 
-#include <exodus/mvlibs.h>
+//#include <exodus/mvlibs.h>
 
 #endif //MV_H

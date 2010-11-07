@@ -10,7 +10,9 @@
 #include <libpq-fe.h>//in postgres/include
 
 #include <exodus/mv.h>
+#include <exodus/mvenvironment.h>
 #include <exodus/mvutf.h>
+#include <exodus/mvfunctor.h>
 
 namespace exodus
 {
@@ -32,7 +34,7 @@ inline std::wstring fromutf8(const char* start, const int length)
 //this function is started as a thread by startipc()
 int MVipc(const int environmentn, var& pgconnparams);
 
-void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsechars, std::string& response);
+void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsechars, std::string& response, ExodusFunctorBase& exodusfunctorbase);
 
 }
 

@@ -1,4 +1,6 @@
 /*
+WARNING this documentation is from BEFORE adding enabling call of objects in external libraries
+using programinit/exit and libraryinit/exit.
 
 Traditionally, mv functions and subroutines are implemented as separately compilable units
 and there is only one function or subroutine per compilation unit (file/record).
@@ -79,7 +81,13 @@ That way you can forget the new exodus concept of "library" which is not a tradi
 # define EXODUSLIBEXT ".so"
 #endif
 
-#include <exodus/mvenvironment.h>
+#include <exodus/mv.h>
+
+//MvEnvironment and ExodusProgramBase are forward declared classes (see below)
+//because they only exist as pointers or references in mvfunctor.
+//and MvEnvironment contains an actual ExodusFunctorBase
+//#include <exodus/mvenvironment.h>
+//#include <exodus/mvprogram.h>
 
 //good programming practice
 //http://www.parashift.com/c++-faq-lite/pointers-to-members.html#faq-33.6
@@ -88,20 +96,8 @@ That way you can forget the new exodus concept of "library" which is not a tradi
 namespace exodus {
 //using namespace exodus;
 
-class ExodusProgramBase
-{
-public:
-	ExodusProgramBase(exodus::MvEnvironment& inmv)
-		:mv(inmv)
-		{};
-	//virtual var main();
-	virtual ~ExodusProgramBase(){};
-	//mv.xyz is going to be used a lot by exodus programmers for exodus "global variables"
-	//it is member data so it is global to the class/object and not global to the program
-	//so it is threadsafe
-	//eg mv.RECORD mv.DICT
-	MvEnvironment& mv;
-};
+class ExodusProgramBase;
+class MvEnvironment;
 
 //pExodusProgramBase - pointer to exodus program type
 typedef ExodusProgramBase* pExodusProgramBase;
@@ -121,7 +117,7 @@ typedef var (ExodusProgram::*pExodusProgramMemberFunction)();
 typedef void (*ExodusProgramBaseCreateDeleteFunction)
 (
 	pExodusProgramBase&,
-	exodus::MvEnvironment&,
+	MvEnvironment&,
 	pExodusProgramBaseMemberFunction&
 );
 
@@ -135,6 +131,11 @@ ExodusFunctorBase();
 //constructor to provide library and function names immediately
 ExodusFunctorBase(const std::string libname,
 				  const std::string funcname);
+
+//constructor to provide environment immediately
+ExodusFunctorBase(MvEnvironment& mv);
+
+void ExodusFunctorBase::calldict();
 
 /*
 //constructor to provide library and function names immediately
@@ -157,18 +158,22 @@ virtual ~ExodusFunctorBase();
 //void* pfunction_;
 
 public:
+	bool init(const char* libraryname, const char* functionname);
 	bool init(const char* libraryname, const char* functionname, MvEnvironment& mv);
 	pExodusProgramBase pobject_;
 	pExodusProgramBaseMemberFunction pmemberfunction_;
 
+	//only public for rather hacked mvipc getResponseToRequest()
+	mutable MvEnvironment* mv_;
+
 private:
-	MvEnvironment* mv_;
 	void* plibrary_;
 	std::string libraryname_;
 	std::string functionname_;
 	std::string libraryfilename_;
 
 	bool openlib();
+	void closelib();
 	bool openfunc();
 
 protected:

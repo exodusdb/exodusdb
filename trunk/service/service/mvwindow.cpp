@@ -2,7 +2,7 @@
 #define NEO_MVWINDOW_CPP
 #include <iostream>
 #include "mvwindow.h"
-#include "Market.h"
+//#include "Market.h"
 
 //using namespace std;
 
@@ -13,7 +13,7 @@ bool MvWindow::security(const var& mode)
 {
 	/////////
 	//valid=1 move down
-	var op = env.singular(datafile);
+	var op = mv.singular(datafile);
 	//if op[-3,3]='ies' then op[-3,3]='y'
 	//if op[-1,1]='s' then op[-1,1]=''
 	//op:=' file'
@@ -33,7 +33,7 @@ bool MvWindow::security2(const var& mode, const var& op0)
 	}
 	if (mode.index(L"INIT", 1)) {
 		var msg;
-		if (!(env.authorised(op ^ L" ACCESS" ^ op2, msg, L"")))
+		if (!(mv.authorised(op ^ L" ACCESS" ^ op2, msg, L"")))
 			return invalid(msg);
 
 	}else if (mode.index(L"READ", 1) || mode.index(L"WRITE", 1)) {
@@ -49,7 +49,7 @@ bool MvWindow::security2(const var& mode, const var& op0)
 		var msg;
 		if (!(
             
-            env.authorised
+            mv.authorised
             
             (op ^ op2, msg, L""))) {
 			if (orec == L"" || !wlocked) {
@@ -57,14 +57,14 @@ bool MvWindow::security2(const var& mode, const var& op0)
 				reset = 5;
 			}
 			if (wlocked) {
-				env.unlockrecord(datafile, srcfile, env.ID);
+				mv.unlockrecord(datafile, srcfile, ID);
 				wlocked = 0;
 			}
 		}
 
 	}else if (mode.index(L"DELETE", 1)) {
 		var msg;
-		if (!(env.authorised(op ^ L" DELETE" ^ op2, msg, L"")))
+		if (!(mv.authorised(op ^ L" DELETE" ^ op2, msg, L"")))
 			return invalid(msg);
 
 	}else if (1) {
@@ -77,7 +77,7 @@ bool MvWindow::security3(const var& op, const var& op2)
 {
 	var op2b=op2.assigned()?op2:L"";
 	var msg;
-	if (!(env.authorised(op ^ op2b, msg, L"")))
+	if (!(mv.authorised(op ^ op2b, msg, L"")))
 		return invalid(msg);
 
 	return true;
@@ -103,7 +103,7 @@ bool MvWindow::invalid(const var& msg)
 			reset = 1;
 	}
 	if (!msg) return true;
-	env.note(msg);
+	mv.note(msg);
 	return false;
 }
 
@@ -112,7 +112,7 @@ var MvWindow::securitysubs(const var& mode)
 
 	std::wcout<<L"MVMvWindow::securitysubs(const var& mode)"<<L" "<<mode<<std::endl;
 
-	var interactive = ! env.SYSTEM.extract(33);
+	var interactive = ! mv.SYSTEM.extract(33);
 
 	if (mode == L"SETUP") {
 
@@ -138,55 +138,55 @@ var MvWindow::securitysubs(const var& mode)
 
 		//check allowed access
 		var msg;
-		if (!(env.authorised(datafilename ^ L" ACCESS", msg, defaultlock))) {
+		if (!(mv.authorised(datafilename ^ L" ACCESS", msg, defaultlock))) {
 			return invalid(msg);
 		}
 
 		if (templatex == L"SECURITY") {
 
 			//check guest status
-			if (env.SYSTEM.extract(21)) {
+			if (mv.SYSTEM.extract(21)) {
 				return invalid(L"YOU ARE A TEMPORARY GUEST|YOU CANNOT ACCESS AUTHORISATION");
 			}
 
 			//check supervisor status
-			registerx[4] = env.authorised(L"AUTHORISATION UPDATE LOWER GROUPS", msg, L"");
-			registerx[5] = env.authorised(L"AUTHORISATION UPDATE HIGHER GROUPS", msg, L"");
+			registerx[4] = mv.authorised(L"AUTHORISATION UPDATE LOWER GROUPS", msg, L"");
+			registerx[5] = mv.authorised(L"AUTHORISATION UPDATE HIGHER GROUPS", msg, L"");
 
 		}
 
 		//if logged in as account then same as logged in as neosys
-		if (var(L"012").index(env.PRIVILEGE, 1)) {
+		if (var(L"012").index(mv.PRIVILEGE, 1)) {
 			registerx[6] = L"NEOSYS";
 		}else{
-			registerx[6] = env.USERNAME;
+			registerx[6] = USERNAME;
 		}
 
 		//check security
-		if (env.authorised(datafilename ^ L" UPDATE", msg, defaultlock)) {
+		if (mv.authorised(datafilename ^ L" UPDATE", msg, defaultlock)) {
 		}else{
 			if (!interactive)
 				wlocked = 0;
 
 		}
 
-		if (!env.SECURITY.read(env.DEFINITIONS, L"SECURITY"))
-			env.SECURITY = L"";
-		//env.SECURITY.inverter();
+		if (!mv.SECURITY.read(mv.DEFINITIONS, L"SECURITY"))
+			mv.SECURITY = L"";
+		//mv.SECURITY.inverter();
 
-		securitysubs_cleartemp(env.RECORD);
+		securitysubs_cleartemp(RECORD);
 
 		//never send the passwords to browser
 		//(restored in prewrite except for new passwords)
 		if (!interactive)
-			env.RECORD.replacer(4, 0, 0, L"");
+			RECORD.replacer(4, 0, 0, L"");
 
 		//sort the tasks
-//TODO		sortarray(env.SECURITY, L"10" ^ VM ^ L"11");
+//TODO		sortarray(mv.SECURITY, L"10" ^ VM ^ L"11");
 
-		registerx[7] = env.SECURITY;
+		registerx[7] = mv.SECURITY;
 
-		env.RECORD = env.SECURITY;
+		RECORD = mv.SECURITY;
 
 		//@record<9>=curruser
 
@@ -196,15 +196,15 @@ var MvWindow::securitysubs(const var& mode)
 
 		//delete disallowed tasks (except all master type user to see all tasks)
 		if (!(registerx[5] and registerx[4])) {
-			var tasks = env.RECORD.extract(10);
-			var locks = env.RECORD.extract(11);
+			var tasks = RECORD.extract(10);
+			var locks = RECORD.extract(11);
 			var ntasks = tasks.dcount(VM);
 			for (int taskn = ntasks; taskn >= 1; taskn--) {
 				var task = tasks.extract(1, taskn);
 				var temp = (task.substr(1, 10) == L"DOCUMENT: ") ? L"#" : L"";
-				if (!(env.authorised(L"!" ^ temp ^ task, msg, L""))) {
-					env.RECORD.eraser(10, taskn, 0);
-					env.RECORD.eraser(11, taskn, 0);
+				if (!(mv.authorised(L"!" ^ temp ^ task, msg, L""))) {
+					RECORD.eraser(10, taskn, 0);
+					RECORD.eraser(11, taskn, 0);
 				}
 			};//taskn;
 		}
@@ -212,12 +212,12 @@ var MvWindow::securitysubs(const var& mode)
 		//hide higher/lower users
 		if (not (registerx[6]).index(L"NEOSYS", 1)) {
 
-			var usercodes = env.RECORD.extract(1);
+			var usercodes = RECORD.extract(1);
 			var nusers = usercodes.dcount(VM);
 
 			var usern;
-			if (!(usercodes.locateusing(env.USERNAME, VM, usern)))
-				return invalid(env.USERNAME ^ L" user not in in authorisation file");
+			if (!(usercodes.locateusing(USERNAME, VM, usern)))
+				return invalid(USERNAME ^ L" user not in in authorisation file");
 
 			//hide higher users
 			if (registerx[5]) {
@@ -226,7 +226,7 @@ var MvWindow::securitysubs(const var& mode)
 				registerx[8] = usern;
 				while (true) {
 				//BREAK;
-				if (!(registerx[8] > 1 and env.RECORD.extract(2, registerx[8] - 1) == L"")) break;;
+				if (!(registerx[8] > 1 and RECORD.extract(2, registerx[8] - 1) == L"")) break;;
 					registerx[8] -= 1;
 				}//loop;
 			}
@@ -238,7 +238,7 @@ var MvWindow::securitysubs(const var& mode)
 				registerx[9] = usern;
 				while (true) {
 				//BREAK;
-				if (!(registerx[9] < nusers and env.RECORD.extract(1, registerx[9] + 1) not_eq L"---")) break;;
+				if (!(registerx[9] < nusers and RECORD.extract(1, registerx[9] + 1) not_eq L"---")) break;;
 					registerx[9] += 1;
 				}//loop;
 			}
@@ -252,19 +252,19 @@ var MvWindow::securitysubs(const var& mode)
 				if (!interactive) {
 
 					//save hidden users for remote client in field 23
-					var temp = (env.RECORD.extract(1)).field(VM, 1, registerx[8]);
-					temp ^= VM ^ (env.RECORD.extract(1)).field(VM, registerx[9] + 1, 9999);
+					var temp = (RECORD.extract(1)).field(VM, 1, registerx[8]);
+					temp ^= VM ^ (RECORD.extract(1)).field(VM, registerx[9] + 1, 9999);
 					temp.converter(VM, L",");
-					env.RECORD.replacer(23, 0, 0, temp);
+					RECORD.replacer(23, 0, 0, temp);
 
 					//save hidden keys for remote client in field 23
 
-					var visiblekeys = (env.RECORD.extract(2)).field(VM, registerx[8], nn);
+					var visiblekeys = (RECORD.extract(2)).field(VM, registerx[8], nn);
 					visiblekeys.converter(L",", VM);
 					visiblekeys.trimmer(VM);
 
-					var invisiblekeys = (env.RECORD.extract(2)).field(VM, 1, registerx[8]);
-					invisiblekeys ^= VM ^ (env.RECORD.extract(2)).field(VM, registerx[9] + 1, 9999);
+					var invisiblekeys = (RECORD.extract(2)).field(VM, 1, registerx[8]);
+					invisiblekeys ^= VM ^ (RECORD.extract(2)).field(VM, registerx[9] + 1, 9999);
 					invisiblekeys.converter(L",", VM);
 					invisiblekeys.trimmer(VM);
 
@@ -282,13 +282,13 @@ var MvWindow::securitysubs(const var& mode)
 						otherkeys.splicer(1, 1, L"");
 						otherkeys.converter(VM, L",");
 					}
-					env.RECORD.replacer(24, 0, 0, otherkeys);
+					RECORD.replacer(24, 0, 0, otherkeys);
 
 				}
 
 				//delete higher and lower users if not allowed
 				for (int fn = 1; fn <= 8; fn++)
-					env.RECORD.replacer(fn, 0, 0, (env.RECORD.extract(fn)).field(VM, registerx[8], nn));
+					RECORD.replacer(fn, 0, 0, (RECORD.extract(fn)).field(VM, registerx[8], nn));
 
 			}else{
 				registerx[8] = L"";
@@ -299,27 +299,27 @@ var MvWindow::securitysubs(const var& mode)
 
 		//get the local passwords from the system file for users that exist there
 /*
-		var usercodes = env.RECORD.extract(1);
+		var usercodes = RECORD.extract(1);
 		var nusers = usercodes.count(VM) + (usercodes not_eq L"");
 		for (int usern = 1; usern <= nusers; usern++) {
 			var user = usercodes.extract(1, usern);
-			var sysrec = env.RECORD.extract(4, usern, 2);
+			var sysrec = RECORD.extract(4, usern, 2);
 			var sysrec2;
-			if (sysrec2.read(env.DEFINITIONS, user)) {
+			if (sysrec2.read(mv.DEFINITIONS, user)) {
 				sysrec2.converter(FM ^ VM ^ SVM, TM ^ STM ^ L"ù");
 				if (sysrec2 not_eq sysrec)
-					env.RECORD.replacer(4, usern, 0, L"<hidden>" ^ SVM ^ sysrec2);
+					RECORD.replacer(4, usern, 0, L"<hidden>" ^ SVM ^ sysrec2);
 			}
 		};//usern;
 */
 
-		env.RECORD.replacer(20, 0, 0, registerx[8]);
-		env.RECORD.replacer(21, 0, 0, registerx[9]);
+		RECORD.replacer(20, 0, 0, registerx[8]);
+		RECORD.replacer(21, 0, 0, registerx[9]);
 
 		//pass possible menus to remote client
 		var datax = L"";
 		var menufilename;
-		if (env.ACCOUNT == L"ADAGENCY") {
+		if (ACCOUNT == L"ADAGENCY") {
 			menufilename = L"ADMENUS";
 		}else{
 			menufilename = L"MENUS";
@@ -332,36 +332,36 @@ var MvWindow::securitysubs(const var& mode)
 			return invalid(response);
 		}
 		datax.converter(FM ^ VM, VM ^ SVM);
-		env.RECORD.replacer(22, 0, 0, datax);
+		RECORD.replacer(22, 0, 0, datax);
 
 		//group separators act as data in intranet client forcing menu and passwords
 		for (int fn = 1; fn <= 2; fn++) {
-			var temp = env.RECORD.extract(fn);
+			var temp = RECORD.extract(fn);
 			temp.swapper(L"---", L"");
-			env.RECORD.replacer(fn, 0, 0, temp);
+			RECORD.replacer(fn, 0, 0, temp);
 		};//fn;
 
 		//save orec (after removing stuff) for prewrite
 		if (wlocked)
-			//env.RECORD.invert().write(env.DEFINITIONS, L"SECURITY.OREC");
-			env.RECORD.write(env.DEFINITIONS, L"SECURITY.OREC");
+			//RECORD.invert().write(mv.DEFINITIONS, L"SECURITY.OREC");
+			RECORD.write(mv.DEFINITIONS, L"SECURITY.OREC");
 
 	}else if (mode == L"SAVE") {
 
 		//called as prewrite in noninteractive mode
 
 		//get/clear temporary storage
-		registerx[8] = env.RECORD.extract(20);
-		registerx[9] = env.RECORD.extract(21);
+		registerx[8] = RECORD.extract(20);
+		registerx[9] = RECORD.extract(21);
 
 		if (!interactive) {
-			if (!((registerx[7]).read(env.DEFINITIONS, L"SECURITY")))
-				return invalid(L"SECURITY missing from env.DEFINITIONS");
+			if (!((registerx[7]).read(mv.DEFINITIONS, L"SECURITY")))
+				return invalid(L"SECURITY missing from mv.DEFINITIONS");
 
 			//registerx[7].inverter();
 
 			//simulate orec
-			if (!orec.read(env.DEFINITIONS, L"SECURITY.OREC"))
+			if (!orec.read(mv.DEFINITIONS, L"SECURITY.OREC"))
 				return invalid(L"SECURITY.OREC is missing from DEFINITIONS");
 
 			//orec.inverter();
@@ -370,8 +370,8 @@ var MvWindow::securitysubs(const var& mode)
 			if (orec.extract(20) not_eq registerx[8] or orec.extract(21) not_eq registerx[9]) {
 
 				//trace
-				orec.write(env.DEFINITIONS, L"SECURITY.OREC.BAD");
-				env.RECORD.write(env.DEFINITIONS, L"SECURITY.REC.BAD");
+				orec.write(mv.DEFINITIONS, L"SECURITY.OREC.BAD");
+				RECORD.write(mv.DEFINITIONS, L"SECURITY.REC.BAD");
 
 				return invalid(L"INTERNAL ERROR REC 20 AND 21 DO NOT AGREE WITH .OREC");
 			}
@@ -391,20 +391,20 @@ var MvWindow::securitysubs(const var& mode)
 
 		}
 
-		securitysubs_cleartemp(env.RECORD);
+		securitysubs_cleartemp(RECORD);
 
 		if (not ( interactive or templatex == L"SECURITY") ) {
 
 			//check all users have names/passwords
-			var usercodes = env.RECORD.extract(1);
+			var usercodes = RECORD.extract(1);
 			var nusers = usercodes.dcount(VM);
 			for (int usern = 1; usern <= nusers; usern++) {
 
 				//recover password
 				if (!interactive) {
 
-					var newpassword = env.RECORD.extract(4, usern);
-					var usercode = env.RECORD.extract(1, usern);
+					var newpassword = RECORD.extract(4, usern);
+					var usercode = RECORD.extract(1, usern);
 
 					if (newpassword) {
 						securitysubs_changepassx(newpassword, usercode, usern);
@@ -413,19 +413,19 @@ var MvWindow::securitysubs(const var& mode)
 						var oldusern;
 						if (registerx[7].locateusing(usercode, VM, oldusern)) {
 							var oldpassword = registerx[7].extract(4, oldusern);
-							env.RECORD.replacer(4, usern, 0, oldpassword);
+							RECORD.replacer(4, usern, 0, oldpassword);
 						}
 					}
 
 				}
 
-				if (!(env.RECORD.extract(4, usern))) {
-					var username = env.RECORD.extract(1, usern);
+				if (!(RECORD.extract(4, usern))) {
+					var username = RECORD.extract(1, usern);
 					if (!username) {
 						//msg='user name is missing in line ':usern
 						//return invalid(msg)
 						username = L"---";
-						env.RECORD.replacer(4, usern, 0, username);
+						RECORD.replacer(4, usern, 0, username);
 					}
 					if (!(username.index(L"---", 1) or username == L"BACKUP"))
 						return invalid(username.quote() ^ L"|You must first give a password to this user");
@@ -433,23 +433,23 @@ var MvWindow::securitysubs(const var& mode)
 			};//usern;
 
 			//mark empty users and keys with "---" to assist identification of groups
-			nusers = (env.RECORD.extract(1)).dcount(VM);
+			nusers = (RECORD.extract(1)).dcount(VM);
 			for (int usern = 1; usern <= nusers; usern++) {
-				var temp = env.RECORD.extract(1, usern);
+				var temp = RECORD.extract(1, usern);
 				if (temp == L"" or temp.index(L"---", 1)) {
-					env.RECORD.replacer(1, usern, 0, L"---");
-					env.RECORD.replacer(2, usern, 0, L"---");
+					RECORD.replacer(1, usern, 0, L"---");
+					RECORD.replacer(2, usern, 0, L"---");
 				}
 			};//usern;
 
 			//put back any hidden users
 			if (registerx[8]) {
 				int nn = registerx[9] - registerx[8] + 1;
-				var nvms = (env.RECORD.extract(1)).count(VM);
+				var nvms = (RECORD.extract(1)).count(VM);
 				for (int fn = 1; fn <= 8; fn++) {
-					var temp = env.RECORD.extract(fn);
+					var temp = RECORD.extract(fn);
 					temp ^= VM.str(nvms - temp.count(VM));
-					env.RECORD.replacer(fn, 0, 0, (registerx[7].extract(fn)).fieldstore(VM, registerx[8], -nn, temp));
+					RECORD.replacer(fn, 0, 0, (registerx[7].extract(fn)).fieldstore(VM, registerx[8], -nn, temp));
 				};//fn;
 			}
 
@@ -469,9 +469,9 @@ var MvWindow::securitysubs(const var& mode)
 						//@record=insert(@record,10,newtaskn,0,task)
 						//@record=insert(@record,11,newtaskn,0,lockx)
 
-						if (!(env.RECORD.locateby(task, L"AL", newtaskn, 10 ))) {
-							env.RECORD.inserter(10, newtaskn, 0, task);
-							env.RECORD.inserter(11, newtaskn, 0, lockx);
+						if (!(RECORD.locateby(task, L"AL", newtaskn, 10 ))) {
+							RECORD.inserter(10, newtaskn, 0, task);
+							RECORD.inserter(11, newtaskn, 0, lockx);
 						}
 
 					}
@@ -497,25 +497,25 @@ var MvWindow::securitysubs(const var& mode)
 	*/
 		//backup copy one per day
 		var temp;
-		if (temp.read(env.DEFINITIONS, L"SECURITY")) {
+		if (temp.read(mv.DEFINITIONS, L"SECURITY")) {
 			var xx;
-			if (!(xx.read(env.DEFINITIONS, L"SECURITY." ^ var().date())))
-				temp.write(env.DEFINITIONS, L"SECURITY." ^ var().date());
+			if (!(xx.read(mv.DEFINITIONS, L"SECURITY." ^ var().date())))
+				temp.write(mv.DEFINITIONS, L"SECURITY." ^ var().date());
 			temp = L"";
 		}
 
-		env.RECORD.cropper();
+		RECORD.cropper();
 		//dont save record in noninteractive mode as we are in prewrite stage
-		if (interactive and env.RECORD)
-			//env.RECORD.invert().write(env.DEFINITIONS, L"SECURITY");
-			env.RECORD.write(env.DEFINITIONS, L"SECURITY");
-		env.SECURITY = env.RECORD;
+		if (interactive and RECORD)
+			//RECORD.invert().write(mv.DEFINITIONS, L"SECURITY");
+			RECORD.write(mv.DEFINITIONS, L"SECURITY");
+		mv.SECURITY = RECORD;
 
 		var users;
 		if (!users.open(L"USERS"))
 			users = L"";
 		//update users in the central system file if they exist there (direct login)
-		var usercodes = env.RECORD.extract(1);
+		var usercodes = RECORD.extract(1);
 		//oswrite usercodes on 'x'
 		var nusers = usercodes.dcount(VM);
 		for (int usern = 1; usern <= nusers; usern++) {
@@ -524,7 +524,7 @@ var MvWindow::securitysubs(const var& mode)
 			if (!(usercode.index(L"---", 1))) {
 
 				//get the original and current system records
-				var sysrec = env.RECORD.extract(4, usern, 2);
+				var sysrec = RECORD.extract(4, usern, 2);
 				//o=old
 				var ousern;
 				var osysrec;
@@ -544,7 +544,7 @@ var MvWindow::securitysubs(const var& mode)
 					var origuserrec = userrec;
 
 					//determine the user department
-					var deptcode = env.getuserdept(usercode).trim();
+					var deptcode = mv.getuserdept(usercode).trim();
 					deptcode.converter(L"0123456789", L"");
 
 					//update the user record
@@ -564,10 +564,10 @@ var MvWindow::securitysubs(const var& mode)
 				// end
 
 				//update the central system file if user already exists there
-				if (sysrec and sysrec not_eq osysrec and usercode not_eq env.ACCOUNT) {
+				if (sysrec and sysrec not_eq osysrec and usercode not_eq ACCOUNT) {
 					sysrec.converter(TM ^ STM ^ SSTM, FM ^ VM ^ SVM);
-					if (temp.read(env.DEFINITIONS, usercode))
-						sysrec.write(env.DEFINITIONS, usercode);
+					if (temp.read(mv.DEFINITIONS, usercode))
+						sysrec.write(mv.DEFINITIONS, usercode);
 				}
 
 			}
@@ -580,13 +580,13 @@ var MvWindow::securitysubs(const var& mode)
 			var usercode = usercodes.extract(1, usern);
 			if (!(usercode.index(L"---", 1))) {
 				if (usercode and not usercode.index(L"NEOSYS", 1)) {
-					if (!(env.RECORD.locateusing(usercode, VM, temp, 1))) {
+					if (!(RECORD.locateusing(usercode, VM, temp, 1))) {
 						if (users) {
 							users.deleterecord(usercode);
 						}
-						if (temp.read(env.DEFINITIONS, usercode)) {
+						if (temp.read(mv.DEFINITIONS, usercode)) {
 							if (temp.extract(1) == L"USER") {
-								(env.DEFINITIONS).deleterecord(usercode);
+								(mv.DEFINITIONS).deleterecord(usercode);
 							}
 						}
 					}
@@ -597,10 +597,10 @@ var MvWindow::securitysubs(const var& mode)
 		if (!interactive) {
 
 			//prepare to write the inverted record in noninteractive mode
-			//env.RECORD.inverter();
+			//RECORD.inverter();
 
 			//remove the temp file
-			env.DEFINITIONS.deleterecord(L"SECURITY.OREC");
+			mv.DEFINITIONS.deleterecord(L"SECURITY.OREC");
 
 		}
 
@@ -609,20 +609,20 @@ var MvWindow::securitysubs(const var& mode)
 		var disallowed = mode.field(L".", 2, 1) == L"NOT";
 		var username = mode.field(L".", 3, 1);
 
-		var origuser = env.USERNAME;
+		var origuser = USERNAME;
 		if (username)
-			env.USERNAME=username;
+			USERNAME=username;
 
 		var tasks2 = L"";
 		var locks2 = L"";
-		var tasks = env.SECURITY.extract(10);
-		var locks = env.SECURITY.extract(11);
+		var tasks = mv.SECURITY.extract(10);
+		var locks = mv.SECURITY.extract(11);
 		var ntasks = tasks.count(VM) + 1;
 		var lasttask = L"";
 		for (int taskn = 1; taskn <= ntasks; taskn++) {
 			var task = tasks.extract(1, taskn);
 			var ok;
-			if (env.authorised(task))
+			if (mv.authorised(task))
 				ok = 1;
 			else
 				ok = 0;
@@ -658,13 +658,13 @@ var MvWindow::securitysubs(const var& mode)
 		locks2.splicer(1, 1, L"");
 		//transfer tasks2 to @ans
 
-		env.ANS = tasks2;
+		ANS = tasks2;
 		tasks2 = L"";
 		if (!disallowed)
-			env.ANS ^= FM ^ locks2;
+			ANS ^= FM ^ locks2;
 
 		if (username)
-			env.USERNAME=origuser;
+			USERNAME=origuser;
 
 	}else if (1) {
 		return invalid(mode.quote() ^ L" invalid mode in SECURITY.SUBS");
@@ -676,14 +676,14 @@ var MvWindow::securitysubs(const var& mode)
 void MvWindow::securitysubs_changepassx(const var& newpassword, const var& usercode, const var& usern)
 {
 
-	var datax = env.RECORD.extract(4, usern);
+	var datax = RECORD.extract(4, usern);
 	var sysrec = datax.extract(1, 1, 2);
 	sysrec.converter(TM ^ STM ^ SSTM, FM ^ VM ^ SVM);
 /*
 	if (!sysrec) {
 		if (!sysrec.read(systemfile(), user)) {
 			sysrec = L"USER";
-			sysrec.replacer(2, 0, 0, env.ACCOUNT);
+			sysrec.replacer(2, 0, 0, ACCOUNT);
 			sysrec.replacer(5, 0, 0, L"NEOSYS");
 		}
 	}
@@ -710,28 +710,28 @@ void MvWindow::securitysubs_changepassx(const var& newpassword, const var& userc
 		sysrec.replacer(1, 0, 0, passwordfn == 7 ? L"USER" : L"ACCOUNT");
 	}
 	if (!(sysrec.extract(2)))
-		sysrec.replacer(2, 0, 0, env.ACCOUNT);
+		sysrec.replacer(2, 0, 0, ACCOUNT);
 	if (!(sysrec.extract(5)))
 		sysrec.replacer(5, 0, 0, L"NEOSYS");
 	if (!sysrec.extract(lastfn))
 		sysrec.replacer(lastfn, 0, 0, L"xxxxx");
 
 	//store the encrypted new password
-	var encryptx = env.encrypt2(newpassword);
+	var encryptx = mv.encrypt2(newpassword);
 	//gosub_makepass();
 	sysrec.replacer(passwordfn, 0, 0, encryptx);
 
-	encryptx = env.encrypt2(usercode ^ FM ^ sysrec.field(FM, 2, lastfn - 2));
+	encryptx = mv.encrypt2(usercode ^ FM ^ sysrec.field(FM, 2, lastfn - 2));
 	//gosub_makepass();
 	sysrec.replacer(lastfn, 0, 0, encryptx);
 
-	encryptx = env.encrypt2(usercode ^ FM ^ sysrec.field(FM, 2, lastfn - 2));
+	encryptx = mv.encrypt2(usercode ^ FM ^ sysrec.field(FM, 2, lastfn - 2));
 	//gosub_makepass();
 	sysrec.replacer(lastfn, 0, 0, encryptx);
 
 	//store the new password and system record
 	sysrec.converter(FM ^ VM ^ SVM, TM ^ STM ^ SSTM);
-	env.RECORD.replacer(4, usern, 2, sysrec);
+	RECORD.replacer(4, usern, 2, sysrec);
 
 
 	valid = 1;
@@ -770,7 +770,7 @@ void MvWindow::select2(const var& filenamex, const var& linkfilename2, const var
 	var savevalid;
 	var dictfilename;
 	var linkfile2;
-	var dictvoc;
+	var dictmd;
 	var realfilename;
 	var triggers;
 	var ndictids;
@@ -806,21 +806,21 @@ void MvWindow::select2(const var& filenamex, const var& linkfilename2, const var
 	//crlf2=''
     var sortselect=sortselect0.swap(L"%SELECTLIST%", L"");
 	var useactivelist = sortselect.index(L"%SELECTLIST%", 1);
-	if (not env.LISTACTIVE)
+	if (not LISTACTIVE)
 		useactivelist = 0;
 
 	if (!useactivelist)
 //TODO:		pushselect(0, v69, v70, v71);
 
-	env.RECORD.transfer(storer);
-	env.ID.transfer(storeid);
-	env.DICT.transfer(storedict);
-	env.MV.transfer(storemv);
+	RECORD.transfer(storer);
+	ID.transfer(storeid);
+	DICT.transfer(storedict);
+	MV.transfer(storemv);
 
 	srcfile.transfer(savesrcfile);
 	datafile.transfer(savedatafile);
 	wlocked.transfer(savewlocked);
-	env.USER4.transfer(savemsg);
+	USER4.transfer(savemsg);
 	resetx.transfer(savereset);
 	valid.transfer(savevalid);
 
@@ -874,20 +874,22 @@ void MvWindow::select2(const var& filenamex, const var& linkfilename2, const var
 		goto exit;
 	}
 
-	if (!env.DICT.open(L"dict_"^dictfilename)) {
+	if (!DICT.open(L"dict_"^dictfilename)) {
 		response = L"Error: " ^ ((L"DICT." ^ filename).quote()) ^ L" file is not available";
 		goto exit;
 	}
 
-	//if (!env.openfile(L"DICT.VOC", dictvoc))
-		dictvoc = L"";
+	//if (!mv.openfile(L"DICT.MD", dictmd))
+		dictmd = L"";
 
 	library="";
+/* reimplement as external function
 	if (!library.load(filename))
 	{
 		//throw L"MvWindow::select2() " ^ filename ^ L" unknown filename";
 	}
-	
+*/
+
 	//check/get dict recs
 
 	if (dictids not_eq L"RECORD") {
@@ -900,8 +902,8 @@ void MvWindow::select2(const var& filenamex, const var& linkfilename2, const var
 		for (int dictidn = 1; dictidn <= ndictids; dictidn++) {
 			var dictid = dictids.extract(dictidn);
 			var dictrec;
-			if (!dictrec.read(env.DICT, dictid)) {
-				if (!dictvoc||!dictrec.read(dictvoc, dictid)) {
+			if (!dictrec.read(DICT, dictid)) {
+				if (!dictmd||!dictrec.read(dictmd, dictid)) {
 					if (dictid == L"ID") {
 						dictrec=var(L"F" _VM_ L"0" _VM_ L"No" _VM_ L"" _VM_ L"" _VM_ L"" _VM_ L"" _VM_ L"" _VM_ L"L" _VM_ L"15" _VM_ L"").raise();
 					}else{
@@ -929,7 +931,7 @@ void MvWindow::select2(const var& filenamex, const var& linkfilename2, const var
 	if (xml and linkfilename2) {
 		//tx:='<xml id=':quote(lcase(filename)):'>':crlf
 		tx ^= L"<records>" ^ crlf2;
-		env.osbwritex(tx, linkfile2, linkfilename2, dataptr);
+		mv.osbwritex(tx, linkfile2, linkfilename2, dataptr);
 	}
 	dataptr += tx.length();
 
@@ -940,18 +942,18 @@ void MvWindow::select2(const var& filenamex, const var& linkfilename2, const var
 
 	//if filename='jobs' or filename='companies' then
 
-	if (xx.read(env.DICT, L"env.authorised")) {
-		if (!(sortselect.index(L" WITH env.authorised", 1))) {
+	if (xx.read(DICT, L"mv.authorised")) {
+		if (!(sortselect.index(L" WITH mv.authorised", 1))) {
 			if (var(L" " ^ sortselect).index(L" WITH ", 1))
 				sortselect ^= L" AND";
-			sortselect ^= L" WITH env.authorised";
+			sortselect ^= L" WITH mv.authorised";
 		}
 	}
 
 	//if not sorted then try use %records% if present and <200 chars
 	records = L"";
-	//if @list.active or index(' ':sortselect,' by ',1) or index(sortselect,'with env.authorised',1) else
-	if (!(env.LISTACTIVE or var(L" " ^ sortselect).index(L" BY ", 1))) {
+	//if @list.active or index(' ':sortselect,' by ',1) or index(sortselect,'with mv.authorised',1) else
+	if (!(LISTACTIVE or var(L" " ^ sortselect).index(L" BY ", 1))) {
 		if (records.read(file, L"%RECORDS%")) {
 			if (records.length() < 200) {
 				records.swapper(FM, L"\" \"");
@@ -962,16 +964,16 @@ void MvWindow::select2(const var& filenamex, const var& linkfilename2, const var
 
 	//if @list.active else call safeselect(cmd:' ':sortselect:' (s)')
 	//oswrite cmd:' ':sortselect on 'x'
-//TODO:	if (not env.LISTACTIVE or sortselect)
+//TODO:	if (not LISTACTIVE or sortselect)
 //		safeselect(cmd ^ L" " ^ sortselect ^ L" (S)");
     filename.select();
 
 	//handle invalid cmd
 	//r18.1 is normal 'no records found' message
-	if (env.USER4 and not env.USER4.index(L"R18.1", 1)) {
-		if (env.USER4.field(L" ", 1, 1) == L"W156")
-			env.USER4 = (env.USER4.field(L" ", 2, 1)).quote() ^ L" is not in the dictionary.||" ^ cmd ^ L" " ^ sortselect;
-		response = env.USER4;
+	if (USER4 and not USER4.index(L"R18.1", 1)) {
+		if (USER4.field(L" ", 1, 1) == L"W156")
+			USER4 = (USER4.field(L" ", 2, 1)).quote() ^ L" is not in the dictionary.||" ^ cmd ^ L" " ^ sortselect;
+		response = USER4;
 		goto exit;
 	}
 
@@ -988,16 +990,16 @@ void MvWindow::select2(const var& filenamex, const var& linkfilename2, const var
 	//read each record and add the required columns to the selectresult
 selectnext:
 
-	if (var(L"").readnext(env.ID,env.MV)) {
+	if (var(L"").readnext(ID,MV)) {
 
-		if (env.RECORD.read(file, env.ID)) {
+		if (RECORD.read(file, ID)) {
 
 			//filter out unwanted multivalues that the stupid rev sortselect leaves in
 			if (limitfields) {
 				var nlimitfields = limitfields.count(VM) + 1;
 				var value, reqvalue, limitcheck;
 				for (int limitfieldn = 1; limitfieldn <= nlimitfields; limitfieldn++) {
-					value = var(limitfields.extract(1, limitfieldn)).calculate();
+					value = calculate(var(limitfields.extract(1, limitfieldn)));
 					reqvalue = limitvalues.extract(1, limitfieldn);
 					limitcheck = limitchecks.extract(1, limitfieldn);
 					if (limitcheck == L"EQ") {
@@ -1009,7 +1011,7 @@ selectnext:
 							goto selectnext;
 
 					}else if (1) {
-						env.mssg(limitcheck.quote() ^ L" invalid limitcheck in select2");
+						mv.mssg(limitcheck.quote() ^ L" invalid limitcheck in select2");
 						goto exit;
 					}
 				};//limitfieldn;
@@ -1023,31 +1025,32 @@ selectnext:
 				if (library) {
 
 					//simulate window environment for postread
-					orec = env.RECORD;
+					orec = RECORD;
 					wlocked = 1;
-					env.USER4 = L"";
+					USER4 = L"";
 					resetx = 0;
 
                     //dictlib(L"POSTREAD");
+/* reimplement as external function
 					library.call(filename,"POSTREAD");
-
-					env.DATA = L"";
+*/
+					mv.DATA = L"";
 
 					//call trimexcessmarks(iodat)
 
 					//postread can request abort by setting msg or reset>=5
-					if (resetx >= 5 or env.USER4)
+					if (resetx >= 5 or USER4)
 						goto selectnext;
 
 				}
 
 				//prevent reading passwords postread and postwrite
-				if (filename == L"DEFINITIONS" and env.ID == L"SECURITY")
-					env.RECORD.replacer(4, 0, 0, L"");
+				if (filename == L"DEFINITIONS" and ID == L"SECURITY")
+					RECORD.replacer(4, 0, 0, L"");
 
-				env.RECORD.transfer(row);
+				RECORD.transfer(row);
 
-				var prefix = env.ID ^ FM;
+				var prefix = ID ^ FM;
 
 				if (dataptr)
 					prefix.splicer(1, 0, RM);
@@ -1064,23 +1067,24 @@ selectnext:
 //TODO:calculate					var cell = var(dictid).calculate();
                     if (dictid==L"ID")
 id:
-                        cell=env.ID;
+                        cell=ID;
 					else if (dictrecs.extract(dictidn,1)=="F")
 					{
 						var fn=dictrecs.extract(dictidn,2);
 						if (!fn) goto id;
 						var vn=dictrecs.extract(dictidn,4).substr(1,1)==L"M";
 						if (vn)
-							vn=env.MV;
+							vn=MV;
 						else
 							vn=0;
-						cell=env.RECORD.extract(fn,vn);
+						cell=RECORD.extract(fn,vn);
 					}
 					else
 					{
 						//cell = dictlib(dictid);
-						cell=library.call(dictid);
-						//cell=env.ANS;
+/* reimplement as external function
+cell=library.call(dictid);
+*/						//cell=ANS;
 					}
 					if (oconvsx.extract(dictidn))
 						cell = cell.oconv(oconvsx.extract(dictidn));
@@ -1118,7 +1122,7 @@ id:
 			}
 
 			if (linkfilename2) {
-				env.osbwritex(row, linkfile2, linkfilename2, dataptr);
+				mv.osbwritex(row, linkfile2, linkfilename2, dataptr);
 
 			}else{
 				datax ^= row;
@@ -1134,7 +1138,7 @@ id:
 
 	if (xml and linkfilename2) {
 		var tt = L"</records>";
-		env.osbwritex(tt, linkfile2, linkfilename2, dataptr);
+		mv.osbwritex(tt, linkfile2, linkfilename2, dataptr);
 	}
 
 	if (linkfilename2) {
@@ -1147,20 +1151,26 @@ exit:
 	savesrcfile.transfer(srcfile);
 	savedatafile.transfer(datafile);
 	savewlocked.transfer(wlocked);
-	savemsg.transfer(env.USER4);
+	savemsg.transfer(USER4);
 	savereset.transfer(resetx);
 	savevalid.transfer(valid);
 
-	storer.transfer(env.RECORD);
-	storeid.transfer(env.ID);
-	storedict.transfer(env.DICT);
-	storemv.transfer(env.MV);
+	storer.transfer(RECORD);
+	storeid.transfer(ID);
+	storedict.transfer(DICT);
+	storemv.transfer(MV);
 
 //TODO:	if (!useactivelist)
 //		popselect(0, v69, v70, v71);
 
 	return;
 
+}
+
+inline
+var MvWindow::calculate(const var& dictid) const
+{
+	return mv.calculate(dictid);
 }
 
 }
