@@ -12,6 +12,9 @@ public:
  ExodusFunctorF6(const std::string libname,const std::string funcname)
 	: ExodusFunctorBase(libname,funcname){}
 
+// ExodusFunctorF6()
+//	: ExodusFunctorBase(){}
+
  var operator() ()
  {
 	checkload();

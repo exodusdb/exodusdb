@@ -32,7 +32,11 @@ subroutine init() {
  "public:\n"
  " ExodusFunctorSubroutine1(const std::string libname,const std::string funcname)\n"
  "	: ExodusFunctorBase(libname,funcname){}\n"
- "\n";
+ "\n"
+ //" ExodusFunctorSubroutine1()\n"
+ //"	: ExodusFunctorBase(){}\n"
+ "\n"
+ ;
  
  body=
  " VOIDORVAR operator() (T1 arg1)\n"

@@ -14,8 +14,8 @@ var Server::run()
 
 	renaming = 1;
 	portno = 5700;
-	if (env.SYSTEM.extract(38))
-		portno += env.SYSTEM.extract(38) - 1;
+	if (mv.SYSTEM.extract(38))
+		portno += mv.SYSTEM.extract(38) - 1;
 
 	onalertsecs = renaming ? 0 : 1;
 
@@ -32,12 +32,12 @@ var Server::run()
 	outblocksize = (maxstringsize / 3).floor();
 
 	Serverversion = L"";
-	origsentence = env.SENTENCE;
+	origsentence = SENTENCE;
 
 	//open 'messages' to messages else return 999999
-//	env.SYSTEM.printl();
+//	mv.SYSTEM.printl();
 
-	datasetcode = env.SYSTEM.extract(17);
+	datasetcode = mv.SYSTEM.extract(17);
 	if (datasetcode == L"")
 		datasetcode = L"DEFAULT";
 
@@ -63,7 +63,7 @@ var Server::run()
 	//discover the server name
 	//servername=field(getdrivepath(drive()[1,2])[3,9999],'\',1)
 	servername = L"";
-	onserver = servername == L"" || env.STATION.trim() == servername;
+	onserver = servername == L"" || mv.STATION.trim() == servername;
 
 	//should be less than 25 unless waiting.exe modified to update the server flag
 	waitfor = 1;
@@ -84,7 +84,7 @@ var Server::run()
 	gosub_getbakpars();
 
 	//if @username='neosys.net' then system<33>=1
-	origbatchmode = env.SYSTEM.extract(33);
+	origbatchmode = mv.SYSTEM.extract(33);
 
 	//webpath=field(origsentence,' ',3)
 	webpath = neopath ^ L"data/";
@@ -93,8 +93,8 @@ var Server::run()
 	webpath.converter(L"/\\",_SLASH^_SLASH);
 	if (webpath.substr(-1, 1) != _SLASH)
 		webpath ^= _SLASH;
-	if (!voc.open(L"VOC")) {
-		env.mssg(L"CANNOT OPEN VOC FILE");
+	if (!md.open(L"MD")) {
+		mv.mssg(L"CANNOT OPEN MD FILE");
 		return 999999;
 	}
 
@@ -105,12 +105,12 @@ var Server::run()
 
 	gosub_deleteoldfiles(inpath,L"^.*$");
 
-	Serverusername = env.USERNAME;
-	Serverstation = env.STATION;
+	Serverusername = USERNAME;
+	Serverstation = mv.STATION;
 
 	//savescreen(origscrn, origattr);
 
-//	std::wcout << env.AW.extract(30);
+//	std::wcout << mv.AW.extract(30);
 
 	//tracing=(@username='neosys' or trim(@station)='sbcp1800')
 	//tracing=(not(index(origsentence,'auto',1)))
@@ -121,16 +121,16 @@ var Server::run()
 	tracing = 1;
 
 	//ensure unique sorttempfile
-	//if (!(sysvar(L"SET", 192, 102, L"R" ^ var(L"0000" ^ env.SYSTEM.extract(24)).substr(-5, 5) ^ L".SFX")))
+	//if (!(sysvar(L"SET", 192, 102, L"R" ^ var(L"0000" ^ mv.SYSTEM.extract(24)).substr(-5, 5) ^ L".SFX")))
 	//	{}
 
-	nrequests = env.SYSTEM.extract(35) + 0;
+	nrequests = mv.SYSTEM.extract(35) + 0;
 	//if tracing then
-	std::wcout << L"NEOSYS.NET SERVICE "<< env.SYSTEM.extract(24);
+	std::wcout << L"NEOSYS.NET SERVICE "<< mv.SYSTEM.extract(24);
 	std::wcout << L" STARTED "<< var().timedate() << std::endl;
 	std::wcout << std::endl;
 
-	std::wcout << L"Station  : "<< env.STATION<<std::endl;
+	std::wcout << L"Station  : "<< mv.STATION<<std::endl;
     std::wcout << L"Drive : "<< var().oscwd() << std::endl;
 
 	std::wcout << L"Server   : "<< servername<<std::endl;
@@ -156,22 +156,22 @@ var Server::run()
 	//
 	// end
 
-	origprivilege = env.PRIVILEGE;
-	//env.setprivilege(L"");
+	origprivilege = mv.PRIVILEGE;
+	//mv.setprivilege(L"");
 
 	request1 = L"";
 
 	//image=''
 
 
-	if (!(env.openfile2(L"LOCKS", locks, L"LISTS", 1))) {
-		env.mssg(L"CANNOT OPEN LOCKS FILE");
+	if (!(mv.openfile2(L"LOCKS", locks, L"LISTS", 1))) {
+		mv.mssg(L"CANNOT OPEN LOCKS FILE");
 		return L"";
 	}
 
 	relistlocks = 1;
 
-	timeoutsecs = env.SYSTEM.extract(33, 5);
+	timeoutsecs = mv.SYSTEM.extract(33, 5);
 	if (!timeoutsecs.isnum())
 		timeoutsecs = L"";
 	//if timeoutsecs='' then timeoutsecs=20*60;*ie 20 minutes
@@ -194,7 +194,7 @@ var Server::run()
 		(logpath ^ datasetcode).osmkdir();
 	}
 	var datex = (var().date()).oconv(L"D2.");
-	logfilename = logpath ^ datasetcode ^ _SLASH ^ datex.substr(-2, 2) ^ datex.substr(1, 2) ^ datex.substr(4, 2) ^ var(L"00" ^ env.SYSTEM.extract(24)).substr(-2, 2);
+	logfilename = logpath ^ datasetcode ^ _SLASH ^ datex.substr(-2, 2) ^ datex.substr(1, 2) ^ datex.substr(4, 2) ^ var(L"00" ^ mv.SYSTEM.extract(24)).substr(-2, 2);
 	logfilename ^= L".xml";
 
 	if (logfile.osopen(logfilename)) {
@@ -213,12 +213,12 @@ var Server::run()
 			logx ^= L"<?xml-stylesheet type=\'text/xsl\' href=\'.\\loglist.xsl\'?>" ^ (var().chr(13) ^ var().chr(10));
 			//logx:="<?xml-stylesheet type='text/xsl'?>":crlf
 			logx ^= L"<Log";
-			logx ^= L" Process=" ^ env.SYSTEM.extract(24).quote();
+			logx ^= L" Process=" ^ mv.SYSTEM.extract(24).quote();
 			logx ^= L" Dataset=" ^ datasetcode.quote();
 			logx ^= L">";
 			gosub_writelogx2();
 
-			env.osbwritex(L"</Log>", logfile, logfilename, logptr);
+			mv.osbwritex(L"</Log>", logfile, logfilename, logptr);
 
 		}else{
 			std::wcout << L"CANNOT OPEN LOG FILE "<< logfilename << std::endl;
@@ -229,19 +229,19 @@ var Server::run()
 	linkfilename1 = L"";
 	replyfilename = L"";
 
-	env.TCLSTACK = env.TCLSTACK.field(FM, 1, 10);
+	mv.TCLSTACK = mv.TCLSTACK.field(FM, 1, 10);
 	//<arev>
 	var(L"RESET").execute();
 	//</arev>
 
 	if (tracing)
 		std::wcout << var(L"-").str(79) << std::endl;
-	env.RECORD = L"";
-	env.ID = L"";
-	env.USER0 = L"";
-	env.USER1 = L"";
-	env.USER3 = L"";
-	env.USER4 = L"";
+	RECORD = L"";
+	ID = L"";
+	USER0 = L"";
+	USER1 = L"";
+	USER3 = L"";
+	USER4 = L"";
 	//garbagecollect;
 
 	//linkfilename1=''
@@ -249,9 +249,9 @@ var Server::run()
 	//force into interactive mode for deb ugging
 	//if tracing then
 	if (1) {
-		env.SYSTEM.replacer(33, 0, 0, 1);
+		mv.SYSTEM.replacer(33, 0, 0, 1);
 	}else{
-		env.SYSTEM.replacer(33, 0, 0, L"");
+		mv.SYSTEM.replacer(33, 0, 0, L"");
 	}
 	//end else
 	// end
@@ -259,8 +259,8 @@ var Server::run()
 	//force into server mode - suppress interactive messages
 	batchmode = origbatchmode;
 	if (batchmode == L"") {
-		batchmode = env.SYSTEM.extract(33);
-		env.SYSTEM.replacer(33, 0, 0, L"1");
+		batchmode = mv.SYSTEM.extract(33);
+		mv.SYSTEM.replacer(33, 0, 0, L"1");
 	}
 	// if trim(@station)='sb_compaq' and @username='neosys' then system<33>=''
 
@@ -284,7 +284,7 @@ var Server::requestloop()
 	breaktime = L"X";
 
 	//call getstationid(stationid)
-	//if env.lockrecord('messages',messages,stationid,'','') else null
+	//if mv.lockrecord('messages',messages,stationid,'','') else null
 	//indicate that we are active
 //		messaging(L"CHECK");
 
@@ -302,13 +302,13 @@ var Server::serviceloop()
 		gosub_deleteoldfiles(inpath,L".*\\.4$");
 
 		//if tracing then
-	std::wcout << env.at(0);
+	std::wcout << mv.at(0);
 	std::wcout << (var().time()).oconv(L"MTS");
-	std::wcout << L" " << env.SYSTEM.extract(17);
-	std::wcout << L" " << env.ROLLOUTFILE.field2(L"\\", -1).field(L".", 1, 1);
+	std::wcout << L" " << mv.SYSTEM.extract(17);
+	std::wcout << L" " << mv.ROLLOUTFILE.field2(L"\\", -1).field(L".", 1, 1);
 	std::wcout << L" " << nrequests;
 	std::wcout << L" " << onalert.oconv(L"MD10P");
-	std::wcout << L" Listening ..."<< env.at(-4)<<std::endl;
+	std::wcout << L" Listening ..."<< mv.at(-4)<<std::endl;
 
 	//end else
 	// print @(25,@crthigh/2-1):
@@ -320,10 +320,10 @@ var Server::serviceloop()
 
 	//prevent sleep in esc.to.exit
 	timenow=var().ostime();
-	env.SYSTEM.replacer(25, 0, 0, timenow);
-	env.SYSTEM.replacer(26, 0, 0, timenow);
+	mv.SYSTEM.replacer(25, 0, 0, timenow);
+	mv.SYSTEM.replacer(26, 0, 0, timenow);
 
-	if (env.esctoexit())
+	if (mv.esctoexit())
 		return false;
 
 	//look for db stoppers in program directory
@@ -331,11 +331,11 @@ var Server::serviceloop()
 		var filename = (globalend ^ VM ^ neopath ^ datasetcode ^ L".END").extract(1, filen);
 		if (filename.osfile()) {
 
-			if (env.USER1.osread(filename)) {
+			if (USER1.osread(filename)) {
 
-				env.USER1.converter(var().chr(13) ^ var().chr(10), FM);
+				USER1.converter(var().chr(13) ^ var().chr(10), FM);
 
-				if (env.USER1.extract(1) == L"") {
+				if (USER1.extract(1) == L"") {
 stopper:
 						request1 = L"STOPDB";
 					return false;
@@ -343,7 +343,7 @@ stopper:
 
 				var datetime = (var().date() ^ L"." ^ (var().time()).oconv(L"R(0)#5")) + 0;
 
-				var stopdatetime = (env.USER1.substr(1, 10)).iconv(L"D") ^ L"." ^ (env.USER1.substr(11, 10)).iconv(L"MT");
+				var stopdatetime = (USER1.substr(1, 10)).iconv(L"D") ^ L"." ^ (USER1.substr(11, 10)).iconv(L"MT");
 				if (stopdatetime.isnum()) {
 					if (datetime <= stopdatetime + 0)
 						goto stopper;
@@ -360,7 +360,7 @@ stopper:
 	gosub_flagserveractive();
 
 	if (renaming) {
-		linkfilename1 = inpath ^ env.ROLLOUTFILE.field2(L"\\", -1);
+		linkfilename1 = inpath ^ mv.ROLLOUTFILE.field2(L"\\", -1);
 		var ext=linkfilename1.field2(L".",-1);
 		linkfilename1.splicer(-ext.length(),99999,L"0");
 		while (true)
@@ -462,8 +462,8 @@ stopper:
 		//check for upgrade to Server
 
 		//switch into interactive mode to check for operator input
-		var s33 = env.SYSTEM.extract(33);
-		env.SYSTEM.replacer(33, 0, 0, L"");
+		var s33 = mv.SYSTEM.extract(33);
+		mv.SYSTEM.replacer(33, 0, 0, L"");
 
 		//check for esc key to exit
 		//if esc.to.exit() then return 999999
@@ -479,17 +479,17 @@ stopper:
 			charx = charx.substr(1, 1).ucase();
 
 			//esc
-			if (charx == env.INTCONST.extract(1)) {
-				env.msg2(L"You have pressed the [Esc]  key to exit|press again to confirm|", L"UB", buffer, L"");
+			if (charx == mv.INTCONST.extract(1)) {
+				mv.msg2(L"You have pressed the [Esc]  key to exit|press again to confirm|", L"UB", buffer, L"");
 				while (true) {
 					reply.input(-1);
 				//BREAK;
 				if (reply) break;;
 				}//loop;
-//				env.msg2(L"", L"DB", buffer, L"");
-				if (reply == env.INTCONST.extract(1))
+//				mv.msg2(L"", L"DB", buffer, L"");
+				if (reply == mv.INTCONST.extract(1))
 					return false;
-				if (reply == env.INTCONST.extract(7))
+				if (reply == mv.INTCONST.extract(7))
 					charx = reply;
 			}
 
@@ -500,12 +500,12 @@ stopper:
 			}
 
 			//f5
-			if (charx == env.PRIORITYINT.extract(2))
+			if (charx == mv.PRIORITYINT.extract(2))
 				var(L"").execute();
 
 			//f10
-			if (charx == env.INTCONST.extract(7))
-				var(L"RUNMENU " ^ env.ENVIRONSET.extract(37)).execute();
+			if (charx == mv.INTCONST.extract(7))
+				var(L"RUNMENU " ^ mv.ENVIRONSET.extract(37)).execute();
 
 			if (charx != L"") {
 
@@ -518,7 +518,7 @@ stopper:
 			}
 
 			//switch back to not interactive mode
-			env.SYSTEM.replacer(33, 0, 0, s33);
+			mv.SYSTEM.replacer(33, 0, 0, s33);
 
 			gosub_getbakpars();
 
@@ -536,15 +536,15 @@ stopper:
 						var(L"OFF").perform();
 
 					lastbakattemptdate = var().date();
-					lastbakattemptdate.writev(env.DEFINITIONS, L"BACKUP", 1);
+					lastbakattemptdate.writev(mv.DEFINITIONS, L"BACKUP", 1);
 
-					env.USER4 = L"";
+					USER4 = L"";
 					var(L"FILEMAN BACKUP " ^ datasetcode ^ L" " ^ bakdisk ^ L" SYSTEM").perform();
 
 					//quit and indicate to calling program that a backup has been done
 					//if tracing else
-					env.PSEUDO = L"BACKUP";
-					if (env.USER4)
+					mv.PSEUDO = L"BACKUP";
+					if (USER4)
 						return false;
 					// end
 
@@ -563,11 +563,11 @@ stopper:
 var Server::processlink()
 {
 	nrequests += 1;
-	env.SYSTEM.replacer(35,0,0,nrequests);
+	mv.SYSTEM.replacer(35,0,0,nrequests);
 
 	//get the earliest time possible for the log
 	requeststarttime=var().ostime();
-	env.SYSTEM.replacer(25, 0, 0, requeststarttime);
+	mv.SYSTEM.replacer(25, 0, 0, requeststarttime);
 
 	gosub_gettimeouttime();
 
@@ -580,7 +580,7 @@ var Server::processlink()
 
 		//lock it to prevent other Servers from processing it
 		//unlock locks,'request*':linkfilename1
-		if (!(env.lockrecord(L"", locks, L"REQUEST*" ^ linkfilename1))) {
+		if (!(mv.lockrecord(L"", locks, L"REQUEST*" ^ linkfilename1))) {
 			if (tracing)
 			{
 				std::wcout<< L"CANNOT LOCK LOCKS,";
@@ -605,10 +605,10 @@ var Server::processlink()
 		//timex=time()+2
 readlink1:
 			//osbread request from linkfile1 at 0 length 256*256-4
-		env.USER0.osbread(linkfile1, 0, 256 * 256 - 4);
+		USER0.osbread(linkfile1, 0, 256 * 256 - 4);
 
 		//if cannot read it then try again
-		if (env.USER0 == L"" && var().time() == timex) {
+		if (USER0 == L"" && var().time() == timex) {
 			var().osflush();
 			//qqq
 			var().ossleep(100);
@@ -619,29 +619,29 @@ readlink1:
 		}
 
 		//hack to remove UTF16 BOM mark
-		if (env.USER0.substr(1,1)==L"\uFEFF") env.USER0.splicer(1,1,L"");
+		if (USER0.substr(1,1)==L"\uFEFF") USER0.splicer(1,1,L"");
 
 //TODO check ALL CHARACTERS are converted F8-FF and on all input/output
 		//cleanup the input file
 		//convert '&' to fm in request
-		env.USER0.converter(var().chr(13) ^ var().chr(10), FM);
-		env.USER0.swapper(L"\\\\", L"\\");
-		env.USER0.swapper(L"\\r", FM);
-        env.USER0.trimmerb(FM);
-		env.USER0.swapper(L"%FF", RM);
-		env.USER0.swapper(L"%FE", FM);
-		env.USER0.swapper(L"%FD", VM);
-		env.USER0.swapper(L"%FC", SVM);
-		env.USER0.swapper(L"%FB", TM);
-		env.USER0.swapper(L"%FA", STM);
-		env.USER0.swapper(L"%F9", SSTM);
+		USER0.converter(var().chr(13) ^ var().chr(10), FM);
+		USER0.swapper(L"\\\\", L"\\");
+		USER0.swapper(L"\\r", FM);
+        USER0.trimmerb(FM);
+		USER0.swapper(L"%FF", RM);
+		USER0.swapper(L"%FE", FM);
+		USER0.swapper(L"%FD", VM);
+		USER0.swapper(L"%FC", SVM);
+		USER0.swapper(L"%FB", TM);
+		USER0.swapper(L"%FA", STM);
+		USER0.swapper(L"%F9", SSTM);
 
-		replyfilename = env.USER0.extract(1).ucase();
-		env.USER0.eraser(1, 0, 0);
+		replyfilename = USER0.extract(1).ucase();
+		USER0.eraser(1, 0, 0);
 
 		//lock the replyfilename to prevent other Servers from processing it
 		//unlock locks,'request*':replyfilename
-		if (!(env.lockrecord(L"", locks, L"REQUEST*" ^ replyfilename))) {
+		if (!(mv.lockrecord(L"", locks, L"REQUEST*" ^ replyfilename))) {
 			if (tracing)
 				std::wcout << L"CANNOT LOCK LOCKS," << (L"REQUEST*" ^ replyfilename).quote() << std::endl;
 			continue;//goto nextlinkfile;
@@ -689,7 +689,7 @@ var Server::processrequest()
 	//print @(0):@(-4):time() 'mts':' ':count(program.stack(),fm):
 	//print @(0):@(-4):time() 'mts':' ':field2(linkfilename1,'\',-1):' ':field2(replyfilename,'\',-1):
 	//print @(0):@(-4):time() 'mts':' ':field2(replyfilename,'\',-1):
-	std::wcout << env.at(0)<< env.at(-4)<< (var().time()).oconv(L"MTS")<< L" ";
+	std::wcout << mv.at(0)<< mv.at(-4)<< (var().time()).oconv(L"MTS")<< L" ";
 	//end else
 	// print @(25,@crthigh/2+1):
 	// print ('processing request : ':nrequests) 'c#30':
@@ -697,10 +697,10 @@ var Server::processrequest()
 
 	//clear out buffers just to be sure
 	//request=''
-	env.USER1 = L"";
-	//env.USER3=''
-	env.USER3 = L"Error: Response not set in Server.";
-	env.USER4 = L"";
+	USER1 = L"";
+	//USER3=''
+	USER3 = L"Error: Response not set in Server.";
+	USER4 = L"";
 
 	//only go on alert if we actually get the request
 	//to avoid multiple processes going on alert for only one request
@@ -710,53 +710,53 @@ var Server::processrequest()
 
 	//analyse the input file
 	connection = L"";
-	if (env.USER0.extract(1) == L"VERSION 2") {
+	if (USER0.extract(1) == L"VERSION 2") {
 		//remote_addr remote_host https
-		connection = env.USER0.field(FM, 1, 4);
-		env.USER0 = env.USER0.field(FM, 5, 99999);
+		connection = USER0.field(FM, 1, 4);
+		USER0 = USER0.field(FM, 5, 99999);
 	}
 	connection.converter(FM, VM);
-	env.SYSTEM.replacer(40, 0, 0, connection);
+	mv.SYSTEM.replacer(40, 0, 0, connection);
 
-	dataset = env.USER0.extract(1).ucase();
-	username = env.USER0.extract(2).ucase();
-	password = env.USER0.extract(3).ucase();
+	dataset = USER0.extract(1).ucase();
+	username = USER0.extract(2).ucase();
+	password = USER0.extract(3).ucase();
 	firstrequestfieldn = 4;
-	request1 = env.USER0.extract(firstrequestfieldn);
+	request1 = USER0.extract(firstrequestfieldn);
 
 	if (request1 == L"CACHE") {
-		env.USER0.eraser(firstrequestfieldn, 0, 0);
-		request1 = env.USER0.extract(firstrequestfieldn);
+		USER0.eraser(firstrequestfieldn, 0, 0);
+		request1 = USER0.extract(firstrequestfieldn);
 	}
 	request1 = request1.ucase();
 	//convert @lower.case to @upper.case in request
-	request2 = env.USER0.extract(5);
-	request3 = env.USER0.extract(6);
-	request4 = env.USER0.extract(7);
-	request5 = env.USER0.extract(8);
+	request2 = USER0.extract(5);
+	request3 = USER0.extract(6);
+	request4 = USER0.extract(7);
+	request5 = USER0.extract(8);
 
     //remove dataset and password
-    env.USER0 = env.USER0.field(FM, firstrequestfieldn, 99999);
+    USER0 = USER0.field(FM, firstrequestfieldn, 99999);
 	if (logfilename!=L"") {
 
 		var datex = var().date();
 		timex = requeststarttime;
 
 		var tt = var().chr(13) ^ var().chr(10) ^ L"<Message ";
-		tt ^= L" Date=" ^ env.xmlquote(datex.oconv(L"D"));
-		tt ^= L" Time=" ^ env.xmlquote(timex.oconv(L"MTS"));
-		tt ^= L" DateTime=" ^ env.xmlquote(datex.oconv(L"DJ-") ^ L"T" ^ timex.oconv(L"MTS") ^ L"." ^ timex.field(L".", 2, 1));
-		tt ^= L" User=" ^ env.xmlquote(username);
-		tt ^= L" File=" ^ env.xmlquote(replyfilename.field2(L"\\", -1));
+		tt ^= L" Date=" ^ mv.xmlquote(datex.oconv(L"D"));
+		tt ^= L" Time=" ^ mv.xmlquote(timex.oconv(L"MTS"));
+		tt ^= L" DateTime=" ^ mv.xmlquote(datex.oconv(L"DJ-") ^ L"T" ^ timex.oconv(L"MTS") ^ L"." ^ timex.field(L".", 2, 1));
+		tt ^= L" User=" ^ mv.xmlquote(username);
+		tt ^= L" File=" ^ mv.xmlquote(replyfilename.field2(L"\\", -1));
 		//remote_addr remote_host https
-		tt ^= L" IP_NO=" ^ env.xmlquote(connection.extract(1, 2));
-		tt ^= L" Host=" ^ env.xmlquote(connection.extract(1, 3));
-		tt ^= L" HTTPS=" ^ env.xmlquote(connection.extract(1, 4));
+		tt ^= L" IP_NO=" ^ mv.xmlquote(connection.extract(1, 2));
+		tt ^= L" Host=" ^ mv.xmlquote(connection.extract(1, 3));
+		tt ^= L" HTTPS=" ^ mv.xmlquote(connection.extract(1, 4));
 		tt ^= L">" ^ (var().chr(13) ^ var().chr(10));
 
 		tt ^= L"<Request ";
 
-		logx = env.USER0;
+		logx = USER0;
 		gosub_convlogx();
 		logx.converter(L"^", FM);
 		logx.replacer(1, 0, 0, request1);
@@ -779,7 +779,7 @@ var Server::processrequest()
 		tt.transfer(logx);
 		gosub_writelogx2();
 
-		env.osbwritex(L"<DataIn>", logfile, logfilename, logptr);
+		mv.osbwritex(L"<DataIn>", logfile, logfilename, logptr);
 
 	}
 
@@ -793,7 +793,7 @@ var Server::processrequest()
 
 	//print the request (hide dataset and password)
 	if (tracing) {
-        var tt = username ^ L" " ^ env.USER0;
+        var tt = username ^ L" " ^ USER0;
 //		tt.replace(firstrequestfieldn - 1, 0, 0, L"");
 //		tt.replace(firstrequestfieldn - 3, 0, 0, L"");
 		tt.convert(FM, L" ");
@@ -831,7 +831,7 @@ var Server::processrequest()
 
 	//save the response file name
 	//so that if Server fails then net the calling program can still respond
-	env.PRIORITYINT.replacer(100, 0, 0, linkfilename3);
+	mv.PRIORITYINT.replacer(100, 0, 0, linkfilename3);
 
 	var linkfile2size = linkfilename2.osfile().extract(1);
 	if (linkfile2size > maxstringsize) {
@@ -845,7 +845,7 @@ var Server::processrequest()
 			for (int blockn = 1; blockn <= nblocks; blockn++) {
 
 				//osbread datx(blockn) from linkfilename2 at ((blockn-1)*inblocksize) length inblocksize
-				env.osbreadx(datx[blockn], linkfile2, linkfilename2, (blockn - 1) * inblocksize, inblocksize);
+				mv.osbreadx(datx[blockn], linkfile2, linkfilename2, (blockn - 1) * inblocksize, inblocksize);
 
 				//BREAK;
 				if (!((datx[blockn]).length())) break;;
@@ -903,15 +903,15 @@ var Server::processrequest()
 
 			//check max iodat size <= maxstringsize
 			if (lendata > maxstringsize) {
-				env.USER1 = L"";
-				env.USER3 = L"Error: Maximum record size of 64Kb exceeded in Server";
+				USER1 = L"";
+				USER3 = L"Error: Maximum record size of 64Kb exceeded in Server";
 				Serverfailure = 1;
 
 				//otherwise join the blocks
 			}else{
-				env.USER1 = L"";
+				USER1 = L"";
 				for (int blockn = 1; blockn <= nblocks; blockn++) {
-					env.USER1 ^= datx[blockn];
+					USER1 ^= datx[blockn];
 					datx[blockn] = L"";
 				};//blockn;
 			}
@@ -920,15 +920,15 @@ var Server::processrequest()
 			}else{
 cannotopenlinkfile2:
 				Serverfailure = 1;
-				env.USER1 = L"";
-			env.USER3 = L"Error: Server cannot open " ^ linkfilename2;
+				USER1 = L"";
+			USER3 = L"Error: Server cannot open " ^ linkfilename2;
 		}
 
 	}else{
 
 		if (!linkfile2size) {
 
-			env.USER1 = L"";
+			USER1 = L"";
 
 		}else{
 
@@ -936,11 +936,11 @@ cannotopenlinkfile2:
 				goto cannotopenlinkfile2;
 
 			//osread iodat from linkfilename2 else goto cannotopenlinkfile2
-			env.osbreadx(env.USER1, linkfile2, linkfilename2, 0, maxstringsize);
+			mv.osbreadx(USER1, linkfile2, linkfilename2, 0, maxstringsize);
 
 			//hack to remove UTF16 BOM mark
-			if (env.USER1.substr(1,1)==L"\uFEFF")
-				env.USER1.splicer(1,1,L"");
+			if (USER1.substr(1,1)==L"\uFEFF")
+				USER1.splicer(1,1,L"");
 
 			//unescape
 			//for ii=0 to 255
@@ -954,16 +954,16 @@ cannotopenlinkfile2:
 					logptr += 8;
 				}
 
-				logx = env.USER1;
+				logx = USER1;
 				gosub_writelogx();
 			}
 
 			for (int ii = 0; ii <= 36; ii++)
-				env.USER1.swapper(hexx[ii], var().chr(ii));
+				USER1.swapper(hexx[ii], var().chr(ii));
 			for (int ii = 38; ii <= 255; ii++)
-				env.USER1.swapper(hexx[ii], var().chr(ii));
+				USER1.swapper(hexx[ii], var().chr(ii));
 			//unescape %25 to % LAST!
-			env.USER1.swapper(hexx[37], var().chr(37));
+			USER1.swapper(hexx[37], var().chr(37));
 
 			// next i
 
@@ -974,7 +974,7 @@ cannotopenlinkfile2:
 	if (linkfile2.osopen(linkfilename2)) {
 		linkfile2.osclose();
 		linkfilename2.osdelete();
-		//osread _USER3 from linkfilename3 else env.USER3=''
+		//osread _USER3 from linkfilename3 else USER3=''
 	}
 
 	if (logfilename!=L"") {
@@ -998,7 +998,7 @@ cannotopenlinkfile2:
 	//and assume that identity if ok
 	gosub_validate();
 
-	env.SYSTEM.replacer(2, 0, 0, linkfilename2);
+	mv.SYSTEM.replacer(2, 0, 0, linkfilename2);
 
 	//get the current program stack
 //	var stack = programstack(nostack);
@@ -1011,13 +1011,13 @@ cannotopenlinkfile2:
 //	catch (MVException& mvexception)
 	catch (std::wstring& message)
 	{
-		env.USER3 = message;
+		USER3 = message;
 		//gosub_properunlock();
 		gosub_formatresponse();
 	}
 	catch (var& message)
 	{
-		env.USER3 = message;
+		USER3 = message;
 		//gosub_properunlock();
 		gosub_formatresponse();
 	}
@@ -1031,10 +1031,10 @@ cannotopenlinkfile2:
 	if (halt)
 		return false;
 
-	if (request1 == L"STOPDB" && env.USER3 == L"OK")
+	if (request1 == L"STOPDB" && USER3 == L"OK")
 		return false;
 
-	if (request1 == L"RESTART" && env.USER3 == L"OK")
+	if (request1 == L"RESTART" && USER3 == L"OK")
 		return false;
 
 	return true;
@@ -1044,24 +1044,24 @@ cannotopenlinkfile2:
 void Server::gosub_login()
 {
 
-	env.USER1 = L"";
-	env.USER4 = L"";
+	USER1 = L"";
+	USER4 = L"";
 
 	//custom login routine
 	//returns iodat (cookie string "x=1&y=2" etc and optional comment)
-	//if (xx.read(voc, L"LOGIN.NET")) {
-		env.USER1 = L"";
-		env.USER4 = L"";
-		env.loginnet(dataset, username, env.USER1, env.USER4);
-		if (env.USER1 == L"") {
-			env.USER3 = env.USER4;
+	//if (xx.read(md, L"LOGIN.NET")) {
+		USER1 = L"";
+		USER4 = L"";
+		mv.loginnet(dataset, username, USER1, USER4);
+		if (USER1 == L"") {
+			USER3 = USER4;
 			return;
 		}
 	//}
 
-	if (!(env.USER1))
-		env.USER1 = L"X=X";
-	env.USER3 = var(L"OK " ^ env.USER4).trim();
+	if (!(USER1))
+		USER1 = L"X=X";
+	USER3 = var(L"OK " ^ USER4).trim();
 
 	//record the last login per user
 	var users;
@@ -1074,7 +1074,7 @@ void Server::gosub_login()
 			//save current login
 			var datetime = var().date() ^ L"." ^ (var().time()).oconv(L"R(0)#5");
 			userrec.replacer(13, 0, 0, datetime);
-			userrec.replacer(14, 0, 0, env.SYSTEM.extract(40, 2));
+			userrec.replacer(14, 0, 0, mv.SYSTEM.extract(40, 2));
 			userrec.write(users, username);
 		}
 	}
@@ -1087,18 +1087,18 @@ void Server::gosub_validate()
 	invaliduser = L"Error: Invalid username and/or password";
 
 	//encrypt the passwors and check it
-	var encrypt0 = env.encrypt2(password ^ L"");
+	var encrypt0 = mv.encrypt2(password ^ L"");
 	var usern;
 	var systemrec;
 	var tt;
 	var connections;
 
     if (username==L"NEOSYS") goto userok;
-	else if (env.SECURITY.locate(username, usern, 1)) {
-		if (encrypt0 == (env.SECURITY.extract(4, usern, 2)).field(TM, 7, 1)) {
+	else if (mv.SECURITY.locate(username, usern, 1)) {
+		if (encrypt0 == (mv.SECURITY.extract(4, usern, 2)).field(TM, 7, 1)) {
 
 			//determine allowed connections
-			connections = env.SECURITY.extract(6, usern);
+			connections = mv.SECURITY.extract(6, usern);
 
 			//skip old integer sleep times
 			if (connections.match(L"1N0N"))
@@ -1107,21 +1107,21 @@ void Server::gosub_validate()
 			if (!connections) {
 
 				//look for ip numbers in following users of the same group
-				int nn = (env.SECURITY.extract(6)).count(VM) + 1;
+				int nn = (mv.SECURITY.extract(6)).count(VM) + 1;
 				for (int ii = usern + 1; ii <= nn; ii++) {
-					connections = env.SECURITY.extract(6, ii);
+					connections = mv.SECURITY.extract(6, ii);
 
 					//skip old integer sleep times
 					if (connections.match(L"1N0N"))
 						connections = L"";
 
 				//BREAK;
-				if (!(!connections && env.SECURITY.extract(1, ii + 1) != L"---")) break;;
+				if (!(!connections && mv.SECURITY.extract(1, ii + 1) != L"---")) break;;
 				};//ii;
 
 				//otherwise use system default
 				if (!connections)
-					connections = env.SYSTEM.extract(39);
+					connections = mv.SYSTEM.extract(39);
 
 				//otherwise use traditional private ip ranges
 				//cannot implement this until check existing clients installations
@@ -1153,7 +1153,7 @@ void Server::gosub_validate()
 
 				//buffer it (space prevents reassement even if none)
 				//trailing space also means wildcards have been converted
-				env.SECURITY.replacer(6, usern, 0, connections ^ L" ");
+				mv.SECURITY.replacer(6, usern, 0, connections ^ L" ");
 			}
 
 			//check if allowed to connect from xxx
@@ -1173,18 +1173,18 @@ void Server::gosub_validate()
 				}
 
 userok:
-				env.USERNAME=username;
+				USERNAME=username;
 				tt = connection.extract(1, 2);
 				if (connection.extract(1, 3) != tt)
 					tt ^= L"_" ^ connection.extract(1, 3);
 			tt.converter(L". ", L"_");
-			env.STATION=tt;
+			mv.STATION=tt;
 			invaliduser = L"";
 		}
 	}else{
 
 		//check revelation system file
-		if (systemrec.read(env.DEFINITIONS, L"SYSUSER*"^username)) {
+		if (systemrec.read(mv.DEFINITIONS, L"SYSUSER*"^username)) {
 			//if systemrec<7>=encrypt0 and (speed<1.5 or mode='sleep') then ok=1
 			if (systemrec.extract(7) == encrypt0)
 				goto userok;
@@ -1201,21 +1201,21 @@ void Server::gosub_requestexit()
 
 	var().unlockall();
 
-	if (env.USER3 == L"")
-		env.USER3 = L"Error: No response";
+	if (USER3 == L"")
+		USER3 = L"Error: No response";
 
-	if (env.USER3.index(L"ERROR NO:", 1))
-		env.logger(L"Server", env.USER3);
+	if (USER3.index(L"ERROR NO:", 1))
+		mv.logger(L"Server", USER3);
 
-	env.USERNAME=Serverusername;
-	env.STATION=Serverstation;
+	USERNAME=Serverusername;
+	mv.STATION=Serverstation;
 
-	//if env.USER3[1,6].ucase()='ERROR:' then iodat=''
+	//if USER3[1,6].ucase()='ERROR:' then iodat=''
 
 	//have to call it here as well :(
 	requeststoptime=var().ostime();
 
-	var rawresponse = env.USER3;
+	var rawresponse = USER3;
 	rawresponse.converter(var().chr(13) ^ var().chr(10), L"|");
 
 	if (logfilename!=L"") {
@@ -1227,7 +1227,7 @@ void Server::gosub_requestexit()
 		gosub_writelogx2();
 
 		//convert non ascii to hexcode
-		logx = env.USER3;
+		logx = USER3;
 		//escape % to %25 FIRST!
 		logx.swapper(L"%", L"%25");
 		//for (int ii = 128; ii <= 255; ii++)
@@ -1238,16 +1238,16 @@ void Server::gosub_requestexit()
 		gosub_writelogx();
 
 		logx = L"</Response>" ^ (var().chr(13) ^ var().chr(10));
-		iodatlen = env.USER1.length();
+		iodatlen = USER1.length();
 		if (iodatlen)
 			logx ^= L"<DataOut>";
 		gosub_writelogx2();
 
 	}
 
-	if (env.USER1 == L"%DIRECTOUTPUT%") {
+	if (USER1 == L"%DIRECTOUTPUT%") {
 
-		logx = env.USER1;
+		logx = USER1;
 		logx.swapper(L"%", L"%25");
 		gosub_writelogx();
 
@@ -1262,8 +1262,8 @@ void Server::gosub_requestexit()
 //			datx.initarray(L"");
 			var ptr = 0;
 			for (int blockn = 1; blockn <= nblocks; blockn++) {
-				var blk = env.USER1.substr(1, outblocksize);
-				env.USER1.splicer(1, outblocksize, L"");
+				var blk = USER1.substr(1, outblocksize);
+				USER1.splicer(1, outblocksize, L"");
 			//BREAK;
 			if (!blk.length()) break;;
 
@@ -1275,12 +1275,12 @@ void Server::gosub_requestexit()
 				for (int ii = 249; ii <= 255; ii++) {
 					blk.swapper(var().chr(ii), hexx[int(ii)]);
 					//should not be done per block but is code economic
-					env.USER3.swapper(var().chr(ii), hexx[int(ii)]);
+					USER3.swapper(var().chr(ii), hexx[int(ii)]);
 				};//ii;
 
 				//write BEFORE converting control characters
 				//since writing restores 10-17 back up to F8-FF
-				env.osbwritex(blk, linkfile2, linkfilename2, ptr);
+				mv.osbwritex(blk, linkfile2, linkfilename2, ptr);
 				ptr += blk.length();
 
 				//encode control characters to show in log
@@ -1288,7 +1288,7 @@ void Server::gosub_requestexit()
 				for (int ii = 0; ii <= 31; ii++) {
 					blk.swapper(var().chr(ii), hexx[int(ii)]);
 					//should not be done per block but is code economic
-					env.USER3.swapper(var().chr(ii), hexx[int(ii)]);
+					USER3.swapper(var().chr(ii), hexx[int(ii)]);
 				};//ii;
 
 				if (logfilename!=L"") {
@@ -1304,7 +1304,7 @@ void Server::gosub_requestexit()
 
 		}else{
 
-			env.USER3 = L"ERROR: Server cannot create temp " ^ linkfilename2;
+			USER3 = L"ERROR: Server cannot create temp " ^ linkfilename2;
 
 		}
 
@@ -1319,18 +1319,18 @@ void Server::gosub_requestexit()
 		if (iodatlen)
 			tt ^= L"</DataOut>";
 		tt ^= L"</Message>" ^ (var().chr(13) ^ var().chr(10));
-		env.osbwritex(tt, logfile, logfilename, logptr);
+		mv.osbwritex(tt, logfile, logfilename, logptr);
 		logptr += tt.length();
 
-		env.osbwritex(L"</Log>", logfile, logfilename, logptr);
+		mv.osbwritex(L"</Log>", logfile, logfilename, logptr);
 
 	}
 
-	//swap '|' with wchar_t(13) in env.USER3
-	//swap fm with wchar_t(13) in env.USER3
+	//swap '|' with wchar_t(13) in USER3
+	//swap fm with wchar_t(13) in USER3
 
 	//write the response
-	env.oswritex(env.USER3, linkfilename3);
+	mv.oswritex(USER3, linkfilename3);
 
 	//trace responded
 	requeststoptime=var().ostime();
@@ -1367,12 +1367,12 @@ void Server::gosub_exit()
 
 	//get into interactive mode
 	//system<33>=origbatchmode
-	env.SYSTEM.replacer(33, 0, 0, L"");
-	env.PRIVILEGE=origprivilege;
+	mv.SYSTEM.replacer(33, 0, 0, L"");
+	mv.PRIVILEGE=origprivilege;
 
 	if (request1 == L"RESTART") {
 		//chain 'Server'
-		env.SYSTEM.replacer(35, 0, 0, nrequests);
+		mv.SYSTEM.replacer(35, 0, 0, nrequests);
 		//msg='restart'
 		//stop
 
@@ -1389,7 +1389,7 @@ void Server::gosub_exit()
 	}
 
 	//msg is @user4
-	env.USER4 = L"TERMINATED OK";
+	USER4 = L"TERMINATED OK";
 
 	var().stop();
 
@@ -1406,19 +1406,19 @@ void Server::gosub_process()
 
 	//invalid username or password or connection
 	}else if (invaliduser!=L"") {
-		env.USER1 = L"";
-		env.USER3 = invaliduser;
-//call oswrite(username:fm:password:fm:encrypt0:fm:env.SECURITY,date()[-3,3]:time():'.$$$')
+		USER1 = L"";
+		USER3 = invaliduser;
+//call oswrite(username:fm:password:fm:encrypt0:fm:mv.SECURITY,date()[-3,3]:time():'.$$$')
 		//if no request then possibly some failure in file sharing
 
-	}else if (env.USER0 == L"") {
-		env.USER1 = L"";
-		env.USER3 = L"Error: No request";
+	}else if (USER0 == L"") {
+		USER1 = L"";
+		USER3 = L"Error: No request";
 
 	//empty loopback to test connection (no username or password required)
 	}else if (request1 == L"TEST") {
 		//iodat='' if they pass iodat, pass it back
-		env.USER3 = L"OK";
+		USER3 = L"OK";
 
 	//check if can login
 	}else if (request1 == L"LOGIN") {
@@ -1446,7 +1446,7 @@ void Server::gosub_process()
 		lockdurationinmins = request5;
 
 		gosub_lock();
-		sessionid.transfer(env.USER1);
+		sessionid.transfer(USER1);
 
 	}else if (request1 == L"UNLOCK") {
 
@@ -1462,7 +1462,7 @@ void Server::gosub_process()
 
 		withlock = request1 == L"READU";
 		updatenotallowed = L"";
-		env.USER1 = L"";
+		USER1 = L"";
 		sessionid = L"";
 
 		filename = request2;
@@ -1476,24 +1476,25 @@ void Server::gosub_process()
 			win.registerx[ii]=L"";
 
 		var library=L"";
+/*TODO reimplement as simple external function
 		if (!library.load(filename))
 			{};//throw MVException("MVCipc() library.load() " ^ filename.quote() ^ L" unknown filename");
-
+*/
         newfilename=L"";
         //if (library) newfilename=library.call(L"GETALIAS");
 
 		//disallow read/write to unknown files
 		if (false&&newfilename == L"") {
-			env.USER3 = request1 ^ L" " ^ filename.quote() ^ L" is not allowed";
+			USER3 = request1 ^ L" " ^ filename.quote() ^ L" is not allowed";
 			return;
 		}
 		if (newfilename == L"") newfilename = filename;
         
-		filename2 = env.singular(newfilename);
+		filename2 = mv.singular(newfilename);
 		filename2.converter(L".", L" ");
 		//if security(filename2:' access',msg0,'') else
 		// if security('#':filename2:' access ':quote(keyx),msg2,'') else
-		// transfer msg0 to env.USER3
+		// transfer msg0 to USER3
 		// gosub formatresponse
 		// return
 		// end
@@ -1503,13 +1504,13 @@ void Server::gosub_process()
 		//security check - cannot lock so cannot write or delete
 		if (withlock) {
 			//if 1 then
-			if (env.authorised(filename2 ^ L" UPDATE", updatenotallowed, L""))
+			if (mv.authorised(filename2 ^ L" UPDATE", updatenotallowed, L""))
 				{}
-			if (env.authorised(filename2 ^ L" CREATE", createnotallowed, L""))
+			if (mv.authorised(filename2 ^ L" CREATE", createnotallowed, L""))
 				{}
 			//if updatenotallowed and createnotallowed then
-			// env.USER3='error: sorry, you are not authorised to create or update records in the ':lcase(filename):' file.'
-			// *env.USER3='error: lock not authorised'
+			// USER3='error: sorry, you are not authorised to create or update records in the ':lcase(filename):' file.'
+			// *USER3='error: lock not authorised'
 			// gosub formatresponse
 			// return
 			// end
@@ -1522,10 +1523,12 @@ void Server::gosub_process()
 		}
 
         if (library) {
-			keyx.transfer(env.ID);
+			keyx.transfer(ID);
+/*TODO reimplement as simple external function
 			library.call(L"PREREAD");
-			env.DATA = L"";
-			env.ID.transfer(keyx);
+*/
+			mv.DATA = L"";
+			ID.transfer(keyx);
 		}
 
 		var autokey = 0;
@@ -1533,7 +1536,7 @@ void Server::gosub_process()
 
 			//must provide a key unless locking
 			if (!withlock) {
-				env.USER3 = L"Error: NEOSYS.NET Key missing and not READU";
+				USER3 = L"Error: NEOSYS.NET Key missing and not READU";
 					gosub_formatresponse();
 					return;
 				}
@@ -1542,8 +1545,8 @@ getnextkey:
 
 				//setup environment for def.sk
 			win.wlocked = 0;
-			env.RECORD = L"";
-			env.ID = keyx;
+			RECORD = L"";
+			ID = keyx;
 			win.datafile = filename;
 			win.srcfile = file;
 
@@ -1552,7 +1555,7 @@ getnextkey:
 keyx=L"";
 
 			if (keyx == L"") {
-				env.USER3 = L"Error: Next number was not produced" ^ FM ^ env.USER4;
+				USER3 = L"Error: Next number was not produced" ^ FM ^ USER4;
 				gosub_formatresponse();
 				return;
 			}
@@ -1566,25 +1569,25 @@ keyx=L"";
 			//lockduration is the number of minutes to automatic lock expiry
 			//lockdurationinmins=request4
 			lockdurationinmins = 10;
-			env.USER3 = L"";
+			USER3 = L"";
 
 			gosub_lock();
 
 			//if cannot lock then get next key
-			if (env.USER3 == L"NOT OK" && autokey)
+			if (USER3 == L"NOT OK" && autokey)
 				goto getnextkey;
 
 			//cannot do this because should return the record but without a lock
 			//even if a lock requested
-			//if env.USER3 then
+			//if USER3 then
 			// gosub formatresponse
 			// return
 			// end
 		}
 
-		env.FILEERRORMODE = 1;
-		env.FILEERROR = L"";
-		if (env.USER1.read(file, keyx)) {
+		mv.FILEERRORMODE = 1;
+		mv.FILEERROR = L"";
+		if (USER1.read(file, keyx)) {
 
 			//if record already on file somehow then get next key
 			if (autokey)
@@ -1595,7 +1598,7 @@ keyx=L"";
 				if (sessionid)
 					gosub_unlock();
 				// *do this after unlock which sets response to ok
-				//env.USER3=updatenotallowed
+				//USER3=updatenotallowed
 				//gosub formatresponse
 				//return
 				lockauthorised = 0;
@@ -1603,16 +1606,16 @@ keyx=L"";
 			}
 
 			if (withlock && sessionid == L"") {
-				env.USER3 = L"Error: CANNOT LOCK RECORD";
+				USER3 = L"Error: CANNOT LOCK RECORD";
 			}else{
-				env.USER3 = L"OK";
+				USER3 = L"OK";
 			}
 			if (sessionid)
-				env.USER3 ^= L" SESSIONID " ^ sessionid;
+				USER3 ^= L" SESSIONID " ^ sessionid;
 		}else{
 			//if @file.error<1>='100' then
 			//no file error for jbase
-			if (!env.FILEERROR || env.FILEERROR.extract(1) == L"100") {
+			if (!mv.FILEERROR || mv.FILEERROR.extract(1) == L"100") {
 
 				//prevent create
 				if (withlock) {
@@ -1620,25 +1623,25 @@ keyx=L"";
 						if (sessionid)
 							gosub_unlock();
 						//do this after unlock which sets response to ok
-						env.USER3 = createnotallowed;
+						USER3 = createnotallowed;
 						gosub_formatresponse();
 						return;
 					}
 				}
 
-				//env.USER3='error: ':quote(keyx):' does not exist in the ':quote(newfilename):' file'
-				env.USER1 = L"";
-				env.USER3 = L"Error: NO RECORD";
+				//USER3='error: ':quote(keyx):' does not exist in the ':quote(newfilename):' file'
+				USER1 = L"";
+				USER3 = L"Error: NO RECORD";
 				if (sessionid)
-					env.USER3 ^= L" SESSIONID " ^ sessionid;
+					USER3 ^= L" SESSIONID " ^ sessionid;
 
 				//response/@user3/recordkey may be used in postread
 				if (autokey) {
-					//env.USER3:=' recordkey ':keyx
+					//USER3:=' recordkey ':keyx
 					var tt = keyx;
 					//horrible cludge to allow space in recordkey to be understood in client.htm
 					tt.swapper(L" ", L"{20}");
-					env.USER3 ^= L" RECORDKEY " ^ tt;
+					USER3 ^= L" RECORDKEY " ^ tt;
 				}
 
 			}else{
@@ -1648,7 +1651,7 @@ keyx=L"";
 
 		if (withlock) {
 			if (!lockauthorised)
-				env.USER3 ^= L" LOCK NOT AUTHORISED";
+				USER3 ^= L" LOCK NOT AUTHORISED";
 		}
 
 		//postread (something similar also in select2)
@@ -1657,54 +1660,55 @@ keyx=L"";
 			//simulate environment for postread
 			win.srcfile = file;
 			win.datafile = filename;
-			if (!env.DICT.open(L"dict_"^win.datafile)) {
-				env.USER3 = L"Server::gosub_process() DICT." ^ win.datafile ^ L" file cannot be opened";
+			if (!DICT.open(L"dict_"^win.datafile)) {
+				USER3 = L"Server::gosub_process() DICT." ^ win.datafile ^ L" file cannot be opened";
 				gosub_formatresponse();
 				if (sessionid)
 					gosub_unlock();
 				return;
 			}
-			keyx.transfer(env.ID);
-			env.USER1.transfer(env.RECORD);
-			win.orec = env.RECORD;
+			keyx.transfer(ID);
+			USER1.transfer(RECORD);
+			win.orec = RECORD;
 			win.wlocked = sessionid;
-			var origresponse = env.USER3;
+			var origresponse = USER3;
 			//_USER3=''
-			env.USER4 = L"";
+			USER4 = L"";
 			var resetx = 0;
-
+/*TODO reimplement as simple external function
 			library.call(L"POSTREAD");
-			env.DATA = L"";
+*/
+			mv.DATA = L"";
 
 //restore this programs environment
-			env.RECORD.transfer(env.USER1);
-			env.ID.transfer(keyx);
+			RECORD.transfer(USER1);
+			ID.transfer(keyx);
 
-			env.USER1.cropper();
+			USER1.cropper();
 
 			//postread can request abort by setting msg or resetx>=5
-			if (resetx >= 5 || env.USER4) {
+			if (resetx >= 5 || USER4) {
 				if (withlock) {
 					gosub_unlock();
 					//win.wlocked=0
 				}
 				//if msg then msg='error: ':msg
-				env.USER3 = env.USER4;
-				if (env.USER3 == L"")
-					env.USER3 = L"ACCESS REFUSED";
-				env.USER1 = L"";
+				USER3 = USER4;
+				if (USER3 == L"")
+					USER3 = L"ACCESS REFUSED";
+				USER1 = L"";
 				gosub_formatresponse();
-				//env.USER3='error: ':env.USER3
+				//USER3='error: ':USER3
 			}else{
-				env.USER3 = origresponse;
+				USER3 = origresponse;
 				//postread may have provided a record where non-was found
 				//only if it unlocks it as well! otherwise
 				//removal of no record will cause failure in client
-				if (!win.wlocked && env.USER1) {
-					env.USER3.swapper(L"Error: NO RECORD", L"");
-					env.USER3.trimmerb();
-					if (env.USER3 == L"")
-						env.USER3 = L"OK";
+				if (!win.wlocked && USER1) {
+					USER3.swapper(L"Error: NO RECORD", L"");
+					USER3.trimmerb();
+					if (USER3 == L"")
+						USER3 = L"OK";
 				}
 
 			}
@@ -1714,17 +1718,17 @@ keyx=L"";
 			//but make sure
 			if (sessionid && !win.wlocked) {
 
-				var storeresponse = env.USER3;
+				var storeresponse = USER3;
 				gosub_unlock();
-				env.USER3 = storeresponse;
+				USER3 = storeresponse;
 
 				//remove session id
-				var tt = env.USER3.index(L"SESSIONID", 1);
+				var tt = USER3.index(L"SESSIONID", 1);
 				if (tt) {
-					env.USER3.splicer(tt, var(L"SESSIONID " ^ sessionid).length(), L"");
-					env.USER3.trimmerb();
-					if (env.USER3 == L"")
-						env.USER3 = L"OK";
+					USER3.splicer(tt, var(L"SESSIONID " ^ sessionid).length(), L"");
+					USER3.trimmerb();
+					if (USER3 == L"")
+						USER3 = L"OK";
 				}
 
 			}
@@ -1733,17 +1737,17 @@ keyx=L"";
 			//otherwise delete button will be enabled and deleting a record
 			//that does not exist is disallowed but lock will be unlocked
 			//if iodat then
-			// env.USER3='ok'
-			// if sessionid then env.USER3:=' sessionid ':sessionid
+			// USER3='ok'
+			// if sessionid then USER3:=' sessionid ':sessionid
 			// end
 
 		}
 
 		//prevent reading passwords postread and postwrite
 		if (filename == L"DEFINITIONS" && keyx == L"SECURITY")
-			env.USER1.replacer(4, 0, 0, L"");
+			USER1.replacer(4, 0, 0, L"");
 
-		env.USER1.cropper();
+		USER1.cropper();
 
 	}else if (request1 == L"WRITEU" || request1 == L"DELETE" || request1 == L"WRITE") {
 
@@ -1761,19 +1765,21 @@ keyx=L"";
 //		}
 //		else
 		var library="";
+/*TODO reimplement as simple external function
 		if (!library.load(filename))
 			{};
-        newfilename=L"";
+*/
+       newfilename=L"";
         //if (library) newfilename=library.call(L"GETALIAS");
 
 		//disallow read/write to unknown files
 		if (false&&newfilename == L"") {
-			env.USER3 = request1 ^ L" " ^ filename.quote() ^ L" is not allowed";
+			USER3 = request1 ^ L" " ^ filename.quote() ^ L" is not allowed";
 			return;
 		}
 		if (newfilename == L"") newfilename = filename;
 
-		filename2 = env.singular(newfilename);
+		filename2 = mv.singular(newfilename);
 		filename2.converter(L".", L" ");
 
 		//double check allowed access to file
@@ -1781,7 +1787,7 @@ keyx=L"";
 
 		//if security(filename2:' access',msg0,'') else
 		// if security('#':filename2:' access ':quote(keyx),msg2,'') else
-		// transfer msg0 to env.USER3
+		// transfer msg0 to USER3
 		// gosub formatresponse
 		// return
 		// end
@@ -1793,9 +1799,9 @@ keyx=L"";
 		for (int ii=0;ii<10;ii++)
 			win.registerx[ii]=L"";
 
-		env.ID = keyx;
+		ID = keyx;
 		//@record=iodat
-		env.USER1.transfer(env.RECORD);
+		USER1.transfer(RECORD);
 		win.datafile = filename;
 		//not really needed because pre/post code should assume that it is win.wlocked
 		//but some code does not know that (eg postread called from postwrite)
@@ -1804,24 +1810,24 @@ keyx=L"";
 		win.deleterec = (request1 == L"DELETE");
 
 		//trim excess field and value marks
-		env.RECORD.cropper();
+		RECORD.cropper();
 
 		if (!win.srcfile.open(win.datafile)) {
-			env.USER3 = win.datafile.quote() ^ L" file is not available";
+			USER3 = win.datafile.quote() ^ L" file is not available";
 			return;
 		}
 
-		if (!env.DICT.open(L"dict_"^win.datafile)) {
-			env.USER3 = (L"DICT." ^ win.datafile).quote() ^ L" file is not available";
+		if (!DICT.open(L"dict_"^win.datafile)) {
+			USER3 = (L"DICT." ^ win.datafile).quote() ^ L" file is not available";
 			return;
 		}
 
 		//make sure that the record is already locked to the user
-		lockkey = filename ^ L"*" ^ env.ID;
+		lockkey = filename ^ L"*" ^ ID;
 		if (!lockx.read(locks, lockkey))
 			lockx = FM ^ FM ^ FM ^ FM ^ L"NO LOCK RECORD";
 		if (sessionid != lockx.extract(5)) {
-			env.USER3 = L"Somebody has updated this record." _VM_ L"Your update cannot be applied." L"" _VM_ L"The session id does not agree " ^ lockx.extract(5).quote();
+			USER3 = L"Somebody has updated this record." _VM_ L"Your update cannot be applied." L"" _VM_ L"The session id does not agree " ^ lockx.extract(5).quote();
 			gosub_formatresponse();
 			return;
 		}
@@ -1835,7 +1841,7 @@ keyx=L"";
 		if (!win.valid)
 			return;
 
-		if (!win.orec.read(win.srcfile, env.ID))
+		if (!win.orec.read(win.srcfile, ID))
 			win.orec = L"";
 
 		//trim excess field and value marks
@@ -1855,9 +1861,9 @@ keyx=L"";
 				if (dictrec.read(allcols, filename ^ L"*DATE_TIME")) {
 					var datetimefn = dictrec.extract(2);
 					var olddatetime = win.orec.extract(datetimefn);
-					var newdatetime = env.RECORD.extract(datetimefn);
+					var newdatetime = RECORD.extract(datetimefn);
 					if (olddatetime && olddatetime != newdatetime) {
-						env.USER3 = L"Somebody else has updated this record." _VM_ L"Your update cannot be applied." L"" _VM_ L"The time stamp does not agree";
+						USER3 = L"Somebody else has updated this record." _VM_ L"Your update cannot be applied." L"" _VM_ L"The time stamp does not agree";
 						gosub_formatresponse();
 						gosub_properunlock();
 						return;
@@ -1872,9 +1878,9 @@ keyx=L"";
 		if (request1 == L"WRITEU" || request1 == L"WRITE") {
 
 			//prevent writing an empty record
-			if (env.RECORD == L"") {
+			if (RECORD == L"") {
 emptyrecorderror:
-					env.USER3 = L"Write empty data record is disallowed.";
+					USER3 = L"Write empty data record is disallowed.";
 				gosub_properunlock();
 				gosub_formatresponse();
 				return;
@@ -1894,13 +1900,15 @@ emptyrecorderror:
 			//custom prewrite processing
 			if (library) {
 				//call @updatesubs('prewrite')
+/*TODO reimplement as simple external function
 				library.call(L"PREWRITE");
-				env.DATA = L"";
+*/
+				mv.DATA = L"";
 			}
 
 			if (!win.valid) {
 				gosub_properunlock();
-				env.USER3 = env.USER4;
+				USER3 = USER4;
 				gosub_formatresponse();
 				return;
 			}
@@ -1911,18 +1919,18 @@ emptyrecorderror:
 			//remove the lock file record
 			//and actually the unlock will fail if it cannot true lock the record
 			//daybook.subs4 unlocks and it works fine and will leave lock hanging if it does not
-			if (env.ID != keyx) {
+			if (ID != keyx) {
 
 				gosub_unlock();
 				gosub_properunlock();
 
-				keyx = env.ID;
+				keyx = ID;
 
 				//cannot place a lock file entry if the prewrite has locked the new key
 				file.unlock( keyx);
 
 				gosub_lock();
-				if (env.USER3 != L"OK")
+				if (USER3 != L"OK")
 					return;
 
 				gosub_properlock();
@@ -1931,51 +1939,53 @@ emptyrecorderror:
 
 			}
 
-			env.RECORD.cropper();
+			RECORD.cropper();
 
 			//check for empty record again in case updatesubs screwed up
-			if (env.RECORD == L"")
+			if (RECORD == L"")
 				goto emptyrecorderror;
 
 			//failsafe in case prewrite unlocks key?
 			//gosub properlock
 
-			env.RECORD.write(win.srcfile, keyx);
+			RECORD.write(win.srcfile, keyx);
 
 			//custom post write processing
 			if (library) {
 				postroutine = 1;
+/*TODO reimplement as simple external function
 				library.call(L"POSTWRITE");
-				env.DATA = L"";
+*/
+				mv.DATA = L"";
 			}
 
 			//send back revised data or nothing
 			//nb data is now '' to save space so always send back data unless @record is cleared
-			if (env.RECORD == env.USER1) {
-				env.USER1 = L"";
+			if (RECORD == USER1) {
+				USER1 = L"";
 			}else{
-				env.USER1 = env.RECORD;
+				USER1 = RECORD;
 			}
 
 			//prevent reading passwords postread and postwrite
 			if (filename == L"DEFINITIONS" && keyx == L"SECURITY")
-				env.USER1.replacer(4, 0, 0, L"");
+				USER1.replacer(4, 0, 0, L"");
 
 		}else if (request1 == L"DELETE") {
 
 			//ensure that deletion works on the orig record
-			env.RECORD = win.orec;
+			RECORD = win.orec;
 
 			//prevent deleting if record does not exist
-			if (env.RECORD == L"") {
-				env.USER3 = L"Cannot delete because " ^ keyx.quote() ^ L" does not exist in the " ^ newfilename.quote() ^ L" file";
+			if (RECORD == L"") {
+				USER3 = L"Cannot delete because " ^ keyx.quote() ^ L" does not exist in the " ^ newfilename.quote() ^ L" file";
 				gosub_formatresponse();
 				return;
 			}
 
 			//check allowed to delete
 			//if security(filename2:' delete',msg,'') else
-			// env.USER3=msg
+			// USER3=msg
 			// gosub formatresponse
 			// return
 			// end
@@ -1984,12 +1994,14 @@ emptyrecorderror:
 			//custom predelete processing
 			if (library) {
 				//call @updatesubs('predelete')
+/*TODO reimplement as simple external function
 				library.call(L"PREDELETE");
-				env.DATA = L"";
+*/
+				mv.DATA = L"";
 			}
 			if (!win.valid) {
 				gosub_properunlock();
-				env.USER3 = env.USER4;
+				USER3 = USER4;
 				gosub_formatresponse();
 				return;
 			}
@@ -1999,12 +2011,14 @@ emptyrecorderror:
 			//custom post delete processing
 			if (library) {
 				postroutine = 1;
+/*TODO reimplement as simple external function
 				library.call(L"POSTDELETE");
-				env.DATA = L"";
+*/
+				mv.DATA = L"";
 			}
 
 			//send back no iodat
-			env.USER1 = L"";
+			USER1 = L"";
 
 			}
 
@@ -2023,50 +2037,50 @@ emptyrecorderror:
 
 		//even postwrite/postdelete can now set invalid (to indicate invalid mode etc)
 		if (win.valid) {
-			env.USER3 = L"OK";
+			USER3 = L"OK";
 		}else{
-			env.USER3 = L"Error:";
+			USER3 = L"Error:";
 		}
 
 		if (request1 != L"DELETE") {
-			var tt = env.ID;
-			//env.USER3:=' recordkey ':@id
+			var tt = ID;
+			//USER3:=' recordkey ':@id
 			//horrible cludge to allow space in recordkey to be understood in client.htm
 			tt.swapper(L" ", L"{20}");
-			env.USER3 ^= L" RECORDKEY " ^ tt;
+			USER3 ^= L" RECORDKEY " ^ tt;
 			if (sessionid)
-				env.USER3 ^= L" SESSIONID " ^ sessionid;
+				USER3 ^= L" SESSIONID " ^ sessionid;
 		}
 
 		//pre and post routines can return warnings/notes in msg
 
-		if (env.USER4)
-			env.USER3 ^= L" " ^ env.USER4;
+		if (USER4)
+			USER3 ^= L" " ^ USER4;
 
 		gosub_formatresponse();
 
 		//if postroutine else call flush.index(filename)
-		env.flushindex(filename);
+		mv.flushindex(filename);
 
 		//execute a request
 
 	}else if (request1 == L"EXECUTE") {
 
 		//check request is a win.valid program
-		var voccmd = request2;
-		if (voccmd == L"") {
+		var mdcmd = request2;
+		if (mdcmd == L"") {
 //badproxy:
-			env.USER3 = L"Error: " ^ voccmd.quote() ^ L" proxy is not available";
+			USER3 = L"Error: " ^ mdcmd.quote() ^ L" proxy is not available";
 			return;
 		}
-		voccmd ^= L"PROXY";
-//		if (!xx.read(voc, voccmd))
+		mdcmd ^= L"PROXY";
+//		if (!xx.read(md, mdcmd))
 //			goto badproxy;
-//		routineexists=routines.count(voccmd.towstring());
+//		routineexists=routines.count(mdcmd.towstring());
 //		MVRoutine *routine;
 //		if (!routineexists)
 //			goto badproxy;
-//		routine=routines[voccmd.towstring()];
+//		routine=routines[mdcmd.towstring()];
 		//newfilename=routine->execute(L"GETALIAS");
 
 		//provide an output file for the program to be executed
@@ -2082,94 +2096,94 @@ emptyrecorderror:
 		//t=printfilename[-1,'b.']
 		tt = printfilename.field2(L".", -1);
 		printfilename.splicer(-tt.length(), tt.length(), L"htm");
-		env.SYSTEM.replacer(2, 0, 0, printfilename);
+		mv.SYSTEM.replacer(2, 0, 0, printfilename);
 		if (tracing)
 			std::wcout << L"Waiting for output ... ";
 
 		//switch to server mode and html output
-		var s6 = env.SYSTEM.extract(6);
-		var s7 = env.SYSTEM.extract(7);
-		var s11 = env.SYSTEM.extract(11);
-		env.SYSTEM.replacer(6, 0, 0, 1);
-		env.SYSTEM.replacer(7, 0, 0, 1);
-		env.SYSTEM.replacer(11, 0, 0, 1);
+		var s6 = mv.SYSTEM.extract(6);
+		var s7 = mv.SYSTEM.extract(7);
+		var s11 = mv.SYSTEM.extract(11);
+		mv.SYSTEM.replacer(6, 0, 0, 1);
+		mv.SYSTEM.replacer(7, 0, 0, 1);
+		mv.SYSTEM.replacer(11, 0, 0, 1);
 
 		//execute the program
 		//print timedate2():' starting ':indata[1,60]
-		//call env.msg2('processing remote request','ub',buffer,'')
-		env.USER3 = L"OK";
+		//call mv.msg2('processing remote request','ub',buffer,'')
+		USER3 = L"OK";
 		win.valid = 1;
-		env.USER4 = L"";
-		//call @voccmd(field(request,fm,3,99999),iodat,_USER3)
+		USER4 = L"";
+		//call @mdcmd(field(request,fm,3,99999),iodat,_USER3)
 		//request, iodat and response are now passed and returned in @user0,1 and 3
 		//other messages are passed back in @user4
 		//execute instead of call prevents program crashes from crashing Server
-		env.USER0 = env.USER0.field(FM, firstrequestfieldn + 2, 99999);
+		USER0 = USER0.field(FM, firstrequestfieldn + 2, 99999);
 
 		//pass the output file in linkfilename2
 		//not good method, pass in system?
-		if (var(L"LIST" _VM_ L"SELECTBATCHES").locate(env.USER0.extract(1),xx,1))
-			env.USER1 = linkfilename2;
-		if ((env.USER0.extract(1)).substr(1, 4) == L"VAL.")
-			env.USER1 = linkfilename2;
+		if (var(L"LIST" _VM_ L"SELECTBATCHES").locate(USER0.extract(1),xx,1))
+			USER1 = linkfilename2;
+		if ((USER0.extract(1)).substr(1, 4) == L"VAL.")
+			USER1 = linkfilename2;
 
 		//TODO
-		//voccmd.execute();
-//		routine->execute(voccmd);
-		//call @voccmd
+		//mdcmd.execute();
+//		routine->execute(mdcmd);
+		//call @mdcmd
 		//send errors to neosys
-//		env.USER4="NOT IMPLEMENTED YET:\rEXECUTE " ^ voccmd ^ "\r" ^ env.USER0;
+//		USER4="NOT IMPLEMENTED YET:\rEXECUTE " ^ mdcmd ^ "\r" ^ USER0;
 
 		//discard any stored input
-		env.DATA = L"";
+		mv.DATA = L"";
 
-		//call env.msg2('','db',buffer,'')
+		//call mv.msg2('','db',buffer,'')
 		//print timedate2():' finished ':indata[1,60]
 
 		//detect memory corruption?
 		//@user4='r18.6'
-		if (env.USER4.index(L"R18.6", 1)) {
+		if (USER4.index(L"R18.6", 1)) {
 			//oswriterequest on 'r186.$1'
 			//oswriteiodat on 'r186.$2'
 			//oswriteresponse on 'r186.$3'
 			//oswritemsg on 'r186.$4'
 			halt = 1;
-			env.USER4.replacer(-1, 0, 0, L"Corrupt temporary file. Restart Needed.");
-			env.USER4.replacer(-1, 0, 0, L"NEOSYS.NET TERMINATED");
+			USER4.replacer(-1, 0, 0, L"Corrupt temporary file. Restart Needed.");
+			USER4.replacer(-1, 0, 0, L"NEOSYS.NET TERMINATED");
 		}
 
 		//send errors to neosys
-		if (env.USER4.index(L"An internal error", 1))
-			env.sysmsg(env.USER4);
+		if (USER4.index(L"An internal error", 1))
+			mv.sysmsg(USER4);
 
 		//convert error message
-		if (env.USER4.index(L"INDEX.REDUCER", 1))
-			env.USER4 = L"Please select fewer records";
+		if (USER4.index(L"INDEX.REDUCER", 1))
+			USER4 = L"Please select fewer records";
 
-		env.USER4.cropper();
-		env.USER3.cropper();
+		USER4.cropper();
+		USER3.cropper();
 
-		if (env.USER4) {
-			env.USER1 = L"";
-			env.USER3 = L"Error: " ^ env.USER4;
+		if (USER4) {
+			USER1 = L"";
+			USER3 = L"Error: " ^ USER4;
 			gosub_formatresponse();
 		}
 
-		if (env.USER3 == L"") {
-			env.USER3 = L"Error: No OK from " ^ voccmd ^ L" " ^ env.USER0;
+		if (USER3 == L"") {
+			USER3 = L"Error: No OK from " ^ mdcmd ^ L" " ^ USER0;
 			gosub_formatresponse();
 		}
 
 		//switch off server mode
-		env.SYSTEM.replacer(6, 0, 0, s6);
-		env.SYSTEM.replacer(7, 0, 0, s7);
-		env.SYSTEM.replacer(11, 0, 0, s11);
+		mv.SYSTEM.replacer(6, 0, 0, s6);
+		mv.SYSTEM.replacer(7, 0, 0, s7);
+		mv.SYSTEM.replacer(11, 0, 0, s11);
 
 		//get the printfilename in case the print program changed it
-		printfilename = env.SYSTEM.extract(2);
+		printfilename = mv.SYSTEM.extract(2);
 		if (tracing) {
 			//print ' got it'
-			std::wcout << env.at(0)<< env.at(-4);
+			std::wcout << mv.at(0)<< mv.at(-4);
 		}
 
 		//make sure that the output file is closed
@@ -2179,7 +2193,7 @@ emptyrecorderror:
 	}else if (request1 == L"STOPDB") {
 
 		if (globalend.osfile()) {
-			env.USER3 = L"Error: Database already stopped/stopping";
+			USER3 = L"Error: Database already stopped/stopping";
 
 		}else{
 
@@ -2188,14 +2202,14 @@ emptyrecorderror:
 			timex = var().time();
 			while (true) {
 			//BREAK;
-			if (!(env.otherusers(L"").extract(1) && (var().time() - timex).abs() < 30)) break;;
+			if (!(mv.otherusers(L"").extract(1) && (var().time() - timex).abs() < 30)) break;;
 				var().ossleep(1000);
 			}//loop;
 
-			env.USER1 = L"";
+			USER1 = L"";
 
-			if (env.otherusers(L"").extract(1)) {
-				env.USER3 = L"Error: Could not terminate " ^ env.otherusers(L"") ^ L" users|" ^ env.otherdatasetusers(L"*");
+			if (mv.otherusers(L"").extract(1)) {
+				USER3 = L"Error: Could not terminate " ^ mv.otherusers(L"") ^ L" users|" ^ mv.otherdatasetusers(L"*");
 				globalend.osdelete();
 			}else{
 				var(L"NET STOP NEOSYSSERVICE").osshell();
@@ -2204,14 +2218,14 @@ emptyrecorderror:
 					globalend.osdelete();
 					var(L"NET START NEOSYSSERVICE").osshell();
 				}
-				env.USER3 = L"OK";
+				USER3 = L"OK";
 			}
 
 		}
 
 	}else if (request1 == L"RESTART") {
-		env.USER1 = L"";
-		env.USER3 = L"OK";
+		USER1 = L"";
+		USER3 = L"OK";
 
 	}else if (request1 == L"BACKUP") {
 		gosub_getbakpars();
@@ -2220,38 +2234,38 @@ emptyrecorderror:
 		(inpath ^ serverflagfilename).osdelete();
 
 		//backup will respond to user itself if it starts
-		env.USER4 = L"";
+		USER4 = L"";
 		var(L"FILEMAN BACKUP " ^ datasetcode ^ L" " ^ bakdisk).perform();
 
 		//if backup has already responded to user
 		//then quit and indicate to calling program that a backup has been done
 		//user will be emailed
-		if (env.SYSTEM.extract(2) == L"") {
-			env.PSEUDO = L"BACKUP2";
-			if (env.USER4)
+		if (mv.SYSTEM.extract(2) == L"") {
+			mv.PSEUDO = L"BACKUP2";
+			if (USER4)
 				var().stop();
 		}
 
 		//note: if backup did not respond already then the requestexit will
 		//respond as usual with the error message from backup
-		env.USER1 = L"";
+		USER1 = L"";
 
 	}else if (request1 == L"VERSION") {
-		env.USER1 = L"";
-		env.USER3 = L"UNKNOWN VERSION";
+		USER1 = L"";
+		USER3 = L"UNKNOWN VERSION";
 
 	}else if (request1 == L"INSTALL") {
-		env.DATA ^= var().chr(13);
+		mv.DATA ^= var().chr(13);
 		if (request2 == L"")
-			request2 = env.ACCOUNT;
+			request2 = ACCOUNT;
 		(L"INSTALL " ^ request2 ^ L" I !:").execute();
-		env.USER3 = env.USER4;
+		USER3 = USER4;
 
 		//or give an error message
 
 	}else if (1) {
-		env.USER1 = L"";
-		env.USER3 = L"Error: " ^ env.USER0.field(FM, 4, 9999).quote() ^ L" unknown request";
+		USER1 = L"";
+		USER3 = L"Error: " ^ USER0.field(FM, 4, 9999).quote() ^ L" unknown request";
 	}
 
 	return;
@@ -2260,10 +2274,10 @@ emptyrecorderror:
 
 void Server::gosub_geterrorresponse()
 {
-	var fileerror = env.FILEERROR;
-	env.USER3 = L"Error: FS" ^ fileerror.extract(1, 1).xlate(L"SYS.MESSAGES", 11, L"X");
-	env.USER3.swapper(L"%1%", env.handlefilename(fileerror.extract(2, 1)));
-	env.USER3.swapper(L"%2%", fileerror.extract(2, 2));
+	var fileerror = mv.FILEERROR;
+	USER3 = L"Error: FS" ^ fileerror.extract(1, 1).xlate(L"SYS.MESSAGES", 11, L"X");
+	USER3.swapper(L"%1%", mv.handlefilename(fileerror.extract(2, 1)));
+	USER3.swapper(L"%2%", fileerror.extract(2, 2));
 	gosub_formatresponse();
 	return;
 
@@ -2273,16 +2287,16 @@ void Server::gosub_formatresponse()
 {
 
 	//trim everything after <esc> (why?)
-	var tt = env.USER3.index(L"<ESC>", 1);
+	var tt = USER3.index(L"<ESC>", 1);
 	if (tt)
-		env.USER3 = env.USER3.substr(1, tt - 1);
+		USER3 = USER3.substr(1, tt - 1);
 
 	//cannot remove since these may be proper codepage letters
-	env.USER3.converter(L"|", FM);
-	env.USER3.converter(VM, FM);
-	if (env.USER3.substr(1, 1) == FM)
-		env.USER3.splicer(1, 1, L"");
-	env.USER3.swapper(FM, var().chr(13) ^ var().chr(10));
+	USER3.converter(L"|", FM);
+	USER3.converter(VM, FM);
+	if (USER3.substr(1, 1) == FM)
+		USER3.splicer(1, 1, L"");
+	USER3.swapper(FM, var().chr(13) ^ var().chr(10));
 
 	return;
 
@@ -2372,11 +2386,11 @@ void Server::gosub_properlock()
 	//</arev>
 
 	//dont pass the filename because that causes persistent lock checking
-	//in jbase version of env.lockrecord()
-	if (!(env.lockrecord(L"", srcfile2, keyx))) {
-		if (env.STATUS != 1) {
+	//in jbase version of mv.lockrecord()
+	if (!(mv.lockrecord(L"", srcfile2, keyx))) {
+		if (mv.STATUS != 1) {
 			win.valid = 0;
-			env.USER3 = L"Error: " ^ keyx.quote() ^ L" CANNOT BE WRITTEN BECAUSE IT IS LOCKED ELSEWHERE";
+			USER3 = L"Error: " ^ keyx.quote() ^ L" CANNOT BE WRITTEN BECAUSE IT IS LOCKED ELSEWHERE";
 		}
 	}
 
@@ -2437,18 +2451,18 @@ void Server::gosub_lock()
 		return;
 	}
 
-	env.USER3 = L"";
+	USER3 = L"";
 	if (request1 == L"RELOCK") {
 		gosub_lockit();
 	}else{
-		if (env.lockrecord(filename, file, keyx)) {
+		if (mv.lockrecord(filename, file, keyx)) {
 			state = 1;
 		}else{
 			state = 0;
 		}
 	}
 	if (!state) {
-		env.USER3 = L"NOT OK";
+		USER3 = L"NOT OK";
 		return;
 	}
 
@@ -2461,7 +2475,7 @@ void Server::gosub_lock()
 
 			//fail if other lock has not timed out
 			if (lockrec.extract(1) > ostimenow) {
-				env.USER3 = L"NOT OK";
+				USER3 = L"NOT OK";
 				goto lockexit;
 			}
 
@@ -2477,7 +2491,7 @@ void Server::gosub_lock()
 
 		if (request1 == L"RELOCK") {
 			//nb the word "expired" is a key word used in _formtriggers.htm
-			env.USER3 = L"Error: Your lock expired and somebody else updated";
+			USER3 = L"Error: Your lock expired and somebody else updated";
 			goto lockexit;
 		}
 
@@ -2485,7 +2499,7 @@ void Server::gosub_lock()
 
 	}
 
-	env.USER3 = L"OK";
+	USER3 = L"OK";
 
 	//convert minutes to fraction of one day (windows time format)
 	lockduration = lockdurationinmins / (24 * 60);
@@ -2494,15 +2508,15 @@ void Server::gosub_lock()
 	lockrec = L"";
 	lockrec.replacer(1, 0, 0, lockduration + ostimenow);
 	lockrec.replacer(2, 0, 0, ostimenow);
-	lockrec.replacer(3, 0, 0, connection ? connection.extract(1, 2): env.STATION);
-	lockrec.replacer(4, 0, 0, env.USERNAME);
+	lockrec.replacer(3, 0, 0, connection ? connection.extract(1, 2): mv.STATION);
+	lockrec.replacer(4, 0, 0, USERNAME);
 	lockrec.replacer(5, 0, 0, newsessionid);
-	env.FILEERRORMODE = 1;
-	env.FILEERROR = L"";
-	env.USER3 = L"OK";
+	mv.FILEERRORMODE = 1;
+	mv.FILEERROR = L"";
+	USER3 = L"OK";
 	lockrec.write(locks, lockkey);
-	if (env.FILEERROR) {
-		env.mssg(L"CANNOT WRITE LOCKS RECORD " ^ lockkey);
+	if (mv.FILEERROR) {
+		mv.mssg(L"CANNOT WRITE LOCKS RECORD " ^ lockkey);
 		gosub_geterrorresponse();
 	}
 	relistlocks = 1;
@@ -2525,7 +2539,7 @@ lockexit:
 void Server::gosub_badfile()
 {
 	////////
-	env.USER3 = L"Error: " ^ filename.quote() ^ L" file does not exist";
+	USER3 = L"Error: " ^ filename.quote() ^ L" file does not exist";
 	return;
 }
 
@@ -2544,21 +2558,21 @@ void Server::gosub_unlock()
 	if (!state) {
 		//zzz perhaps should try again a few times in case somebody else
 		//is trying to lock but failing because of our remote lock
-		env.USER3 = L"Error: Somebody else has locked the record";
+		USER3 = L"Error: Somebody else has locked the record";
 		return;
 	}
 
 	//get the current lock else return ok
 	lockkey = filename ^ L"*" ^ keyx;
-	env.FILEERRORMODE = 1;
-	env.FILEERROR = L"";
+	mv.FILEERRORMODE = 1;
+	mv.FILEERROR = L"";
 	if (!lockrec.read(locks, lockkey))
 		lockrec = L"";
 	if (!lockrec) {
-		if (env.FILEERROR.extract(1) == 100) {
+		if (mv.FILEERROR.extract(1) == 100) {
 			//lock is missing but ignore it
 			//because we are unlocking anyway
-			env.USER3 = L"OK";
+			USER3 = L"OK";
 		}else{
 			gosub_geterrorresponse();
 		}
@@ -2569,23 +2583,23 @@ void Server::gosub_unlock()
 	if (!(sessionid == lockrec.extract(5))) {
 
 		//cannot unlock because the lock belongs to somebody else
-		env.USER3 = L"Error: Cannot unlock - ";
+		USER3 = L"Error: Cannot unlock - ";
 		if (sessionid == L"") {
-			env.USER3 ^= L"missing session id";
+			USER3 ^= L"missing session id";
 		}else{
-			env.USER3 ^= L"wrong session id";
+			USER3 ^= L"wrong session id";
 		}
 
 		goto unlockexit;
 	}
 
 	//delete the lock
-	env.FILEERRORMODE = 1;
-	env.FILEERROR = L"";
-	env.USER3 = L"OK";
+	mv.FILEERRORMODE = 1;
+	mv.FILEERROR = L"";
+	USER3 = L"OK";
 	locks.deleterecord(lockkey);
-	if (env.FILEERROR) {
-		env.mssg(L"CANNOT DELETE LOCK KEY " ^ lockkey);
+	if (mv.FILEERROR) {
+		mv.mssg(L"CANNOT DELETE LOCK KEY " ^ lockkey);
 		gosub_geterrorresponse();
 	}
 	relistlocks = 1;
@@ -2599,13 +2613,13 @@ unlockexit:
 }
 void Server::gosub_getsecurity()
 {
-	if (!env.SECURITY.read(env.DEFINITIONS, L"SECURITY"))
+	if (!mv.SECURITY.read(mv.DEFINITIONS, L"SECURITY"))
 	{
 		//std::wcout<<L"CANNOT READ SECURITY"<<std::endl;
 		//return;
-        env.SECURITY=L"";
+        mv.SECURITY=L"";
 	}
-	//env.SECURITY.inverter();
+	//mv.SECURITY.inverter();
 	return;
 
 }
@@ -2649,7 +2663,7 @@ void Server::gosub_getbakpars()
 
 	//determine if backup required
 	var bakpars;
-	if (!bakpars.read(env.DEFINITIONS, L"BACKUP"))
+	if (!bakpars.read(mv.DEFINITIONS, L"BACKUP"))
 		bakpars = L"";
 	var tt;
 	if (tt.osread("BACKUP.CFG")) {
@@ -2667,9 +2681,9 @@ void Server::gosub_getbakpars()
 	var testdata = 0;
 	if (datasetcode.substr(-4, 4) == L"TEST")
 		testdata = 1;
-	if (env.SYSTEM.extract(23).ucase().index(L"TRAINING", 1))
+	if (mv.SYSTEM.extract(23).ucase().index(L"TRAINING", 1))
 		testdata = 1;
-	if (env.SYSTEM.extract(23).ucase().index(L"TESTING", 1))
+	if (mv.SYSTEM.extract(23).ucase().index(L"TESTING", 1))
 		testdata = 1;
 	if (bakpars.locate(datasetcode, xx, 8))
 		testdata = 1;
@@ -2749,7 +2763,7 @@ void Server::gosub_writelogx()
 
 void Server::gosub_writelogx2()
 {
-	env.osbwritex(logx, logfile, logfilename, logptr);
+	mv.osbwritex(logx, logfile, logfilename, logptr);
 	logptr += logx.length();
 	logx = L"";
 	return;
@@ -2757,7 +2771,7 @@ void Server::gosub_writelogx2()
 
 void Server::gosub_writelogx3()
 {
-	env.osbwritex(logx, logfile, logfilename, logptr);
+	mv.osbwritex(logx, logfile, logfilename, logptr);
 	logx = L"";
 	return;
 }
@@ -2765,17 +2779,17 @@ void Server::gosub_writelogx3()
 
 bool Server::filesecurity(const var& secmode)
 {
-	if (env.authorised(filename2 ^ L" " ^ secmode, msg0, L"")) {
+	if (mv.authorised(filename2 ^ L" " ^ secmode, msg0, L"")) {
 		positive = L"";
 	}else{
 		positive = L"#";
 	}
 	var msgx=L"";
-	if (!(env.authorised(positive ^ filename2 ^ L" " ^ secmode ^ L" " ^ keyx.quote(), msgx, L""))) {
+	if (!(mv.authorised(positive ^ filename2 ^ L" " ^ secmode ^ L" " ^ keyx.quote(), msgx, L""))) {
 		if (positive) {
-			msg0.transfer(env.USER3);
+			msg0.transfer(USER3);
 		}else{
-			msgx.transfer(env.USER3);
+			msgx.transfer(USER3);
 		}
 		gosub_formatresponse();
 		return 0;
@@ -2795,22 +2809,22 @@ void Server::gosub_respond()
 	//responsefilename[-len(t),len(t)]='3'
 
 	//linkfilename3
-	responsefilename = env.PRIORITYINT.extract(100);
+	responsefilename = mv.PRIORITYINT.extract(100);
 	if (!responsefilename)
 		return;
 
 	//detach the calling process
-	env.USER3 = request2;
-	env.USER3.converter(VM ^ VM, FM ^ FM);
-	env.USER3.swapper(FM, L"\r\n");
+	USER3 = request2;
+	USER3.converter(VM ^ VM, FM ^ FM);
+	USER3.swapper(FM, L"\r\n");
 
-	env.USER3.oswrite(responsefilename);
+	USER3.oswrite(responsefilename);
 	//osclose responsefilename
 
 	var().ossleep(2000);
 
 	//indicate that response has been made
-	env.SYSTEM.replacer(2, 0, 0, L"");
+	mv.SYSTEM.replacer(2, 0, 0, L"");
 
 	return;
 
@@ -2831,7 +2845,7 @@ void Server::getindexvalues()
 	_USER1 = L"";
 	if (sortby) {
 		if (!(var(L"AL" _VM_ "AR" _VM_ "DL" _VM_ "DR").locate(sortby, xx))) {
-			env.USER3 = L"Invalid sortby " ^ sortby.quote() ^ L" in Server,GETINDEXVALUES";
+			USER3 = L"Invalid sortby " ^ sortby.quote() ^ L" in Server,GETINDEXVALUES";
 			return;
 		}
 	}
@@ -2844,38 +2858,38 @@ void Server::getindexvalues()
 		temp = L"JOURNAL";
 
 	temp.convert(L".", L" ");
-	temp = env.singular(temp);
-	if (!(env.authorised(temp ^ L" ACCESS", env.USER4, L""))) {
-		env.USER3 = env.USER4;
+	temp = mv.singular(temp);
+	if (!(mv.authorised(temp ^ L" ACCESS", USER4, L""))) {
+		USER3 = USER4;
 		return;
 	}
-	if (!(env.authorised(temp ^ L" LIST", env.USER4, L""))) {
-		env.USER3 = env.USER4;
+	if (!(mv.authorised(temp ^ L" LIST", USER4, L""))) {
+		USER3 = USER4;
 		return;
 	}
 
 	collectixvals(filename, fieldname, prefix);
-	env.PSEUDO.transfer(env.USER1);
-	if (env.USER1.substr(1, 1) == FM)
-		env.USER1.splicer(1, 1, L"");
-	env.USER3 = L"OK";
+	mv.PSEUDO.transfer(USER1);
+	if (USER1.substr(1, 1) == FM)
+		USER1.splicer(1, 1, L"");
+	USER3 = L"OK";
 
-	if (sortby && env.USER1) {
-		env.USER1.convert(FM, env.RM);
-		env.USER1 ^= env.RM;
-		v119(L"S", L"", sortby.substr(1, 1), sortby.substr(2, 1), env.USER1, flag);
-		env.USER1.convert(env.RM, FM);
-		env.USER1.splicer(-1, 1, L"");
+	if (sortby && USER1) {
+		USER1.convert(FM, mv.RM);
+		USER1 ^= mv.RM;
+		v119(L"S", L"", sortby.substr(1, 1), sortby.substr(2, 1), USER1, flag);
+		USER1.convert(mv.RM, FM);
+		USER1.splicer(-1, 1, L"");
 	}
 
-	if (env.USER0.index(L"XML", 1)) {
-		if (env.USER1) {
-			env.USER1.swap(FM, L"</" ^ fieldname ^ L">" "</record>" ^ (var().chr(13) ^ var().chr(10)) ^ L"<record><" ^ fieldname ^ L">");
-			env.USER1.splicer(1, 0, L"<record><" ^ fieldname ^ L">");
-			env.USER1 ^= L"</" ^ fieldname ^ L">" "</record>";
+	if (USER0.index(L"XML", 1)) {
+		if (USER1) {
+			USER1.swap(FM, L"</" ^ fieldname ^ L">" "</record>" ^ (var().chr(13) ^ var().chr(10)) ^ L"<record><" ^ fieldname ^ L">");
+			USER1.splicer(1, 0, L"<record><" ^ fieldname ^ L">");
+			USER1 ^= L"</" ^ fieldname ^ L">" "</record>";
 		}
-		env.USER1.splicer(1, 0, L"<records>");
-		env.USER1 ^= L"</records>";
+		USER1.splicer(1, 0, L"<records>");
+		USER1 ^= L"</records>";
 	}else{
 		//convert fm to vm in iodat
 	}
@@ -2889,7 +2903,7 @@ void Server::getindexvalues()
 
 void Server::select()
 {
-	//env.USER1=''
+	//USER1=''
 
 //TODO
 //	var().clearselect();
@@ -2902,7 +2916,7 @@ void Server::select()
 
 	var file;
 	if (!file.open(filename)) {
-        env.USER3 = L"Server::select " ^ filename.quote() ^ L" cannot open file";
+        USER3 = L"Server::select " ^ filename.quote() ^ L" cannot open file";
 		return;
 	}
 
@@ -2910,38 +2924,38 @@ void Server::select()
 	if (!(var(L"MENUS" _VM_ L"ADMENUS").locate(filename, xx))) {
 		var temp = filename;
 		temp.convert(L".", L" ");
-		temp = env.singular(temp);
-		if (!(env.authorised(temp ^ L" ACCESS", env.USER4, L""))) {
+		temp = mv.singular(temp);
+		if (!(mv.authorised(temp ^ L" ACCESS", USER4, L""))) {
 			var msgx=L"";
-			if (!(env.authorised(L"!#" ^ temp ^ L" ACCESS PARTIAL", msgx, L""))) {
-				env.USER3 = env.USER4;
+			if (!(mv.authorised(L"!#" ^ temp ^ L" ACCESS PARTIAL", msgx, L""))) {
+				USER3 = USER4;
 				return;
 			}
 		}
-		env.USER4 = L"";
+		USER4 = L"";
 	}
 
 	//any data passed to select is assumed to be a selectlist
 
-	if (env.USER1) {
+	if (USER1) {
 //TODO:
-env.USER3=L"GeneralProxy: MAKELIST not implemented yet";
+USER3=L"GeneralProxy: MAKELIST not implemented yet";
 return;
-//		makelist(L"", env.USER1, L"", L"");
+//		makelist(L"", USER1, L"", L"");
 		sortselect ^= L"%SELECTLIST%";
-		env.USER1 = L"";
+		USER1 = L"";
 	}
 
 //TODO:
-//env.USER3="GeneralProxy: SELECT2 not implemented yet";
+//USER3="GeneralProxy: SELECT2 not implemented yet";
 //return;
-	win.select2(filename0, env.SYSTEM.extract(2), sortselect, dictids, options, env.USER1, env.USER3, L"", L"", L"");
+	win.select2(filename0, mv.SYSTEM.extract(2), sortselect, dictids, options, USER1, USER3, L"", L"", L"");
 
-	if (env.USER4) {
-		env.USER3 = env.USER4.extract(1).trim(FM);
+	if (USER4) {
+		USER3 = USER4.extract(1).trim(FM);
 	}else{
-		env.USER1 = L"%DIRECTOUTPUT%";
-		//env.USER3='ok'
+		USER1 = L"%DIRECTOUTPUT%";
+		//USER3='ok'
 	}
 
 	return;

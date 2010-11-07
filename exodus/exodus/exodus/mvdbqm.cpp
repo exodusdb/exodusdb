@@ -210,13 +210,13 @@ void var::close()
 		QMClose(var_mvint);
 }
 
-bool var::readv(const var& fileno,const var& key,const int fieldn)
+bool var::readv(const var& fileno,const var& key,const int fieldno)
 {
 
 	if (!read(fileno,key))
 		return false;
 
-	var_mvstr=extract(fieldn).towstring();
+	var_mvstr=extract(fieldno).towstring();
 
 	return true;
 }
@@ -341,7 +341,7 @@ void var::unlockall() const
 	return;
 }
 
-bool var::writev(const var& fileno,const var& key,const int fieldn) const
+bool var::writev(const var& fileno,const var& key,const int fieldno) const
 {
 	assert(assigned());
 
@@ -350,7 +350,7 @@ bool var::writev(const var& fileno,const var& key,const int fieldn) const
 	if (!record.read(fileno,key)) record="";
 
 	//and update it
-	record.replacer(fieldn,0,0,var_mvstr);
+	record.replacer(fieldno,0,0,var_mvstr);
 
 	//write it back
 	record.write(fileno,key);

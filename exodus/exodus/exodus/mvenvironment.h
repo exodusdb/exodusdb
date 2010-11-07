@@ -29,6 +29,7 @@ THE SOFTWARE.
 #define eq ==
 
 #include <exodus/mv.h>
+#include <exodus/mvfunctor.h>
 
 namespace exodus
 {
@@ -64,15 +65,17 @@ public:
 	var DICT;
 	var MV;
 	var ANS;
-	var PSEUDO;
-	
+	var LISTACTIVE;
+
 	var USERNAME;
-	var SENTENCE;
-	var DATA;
 	var ACCOUNT;
+	var SENTENCE;
+
+	var DATA;
+	var PSEUDO;
+
 	var UPPERCASE;
 	var LOWERCASE;
-	var LISTACTIVE;
 	
 	var CRTHIGH;
 	var CRTWIDE;
@@ -109,7 +112,11 @@ public:
 	var SESSION;
 	var SYSTEM;
 	var THREADNO;
-	
+
+	//given dictid reads dictrec from DICT file and extracts from RECORD/ID or calls library called dict+DICT function dictid
+	//not const so we can mess with the library?
+	var calculate(const var& dictid);
+
 	var otherusers(const var& param);
 	var otherdatasetusers(const var& param);
 	
@@ -175,6 +182,14 @@ public:
 	
     //was MVDB
 	var getuserdept(const var& usercode);
+
+private:
+
+	//used by calculate to call dict libraries
+	mutable ExodusFunctorBase exodusfunctorbase_;
+	//TODO cache many not just one
+	mutable var cache_dictid_;
+	mutable var cache_dictrec_;
 
 };
 

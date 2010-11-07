@@ -1,4 +1,4 @@
-/* Copyright (c) 2007 Stephen John Bush - see LICENCE.TXT*/
+/*Copyright (c) 2007 Stephen John Bush - see LICENCE.TXT*/
 #if 0
 
 #include <vector>

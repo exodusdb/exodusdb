@@ -481,14 +481,14 @@ DLL_PUBLIC var unquote(const var& instring)
 	return instring.unquote();
 }
 
-DLL_PUBLIC var& fieldstorer(var& instring, const var& sepchar,const int fieldn, const int nfields,const var& replacement)
+DLL_PUBLIC var& fieldstorer(var& instring, const var& sepchar,const int fieldno, const int nfields,const var& replacement)
 {
-	return instring.fieldstorer(sepchar, fieldn, nfields, replacement);
+	return instring.fieldstorer(sepchar, fieldno, nfields, replacement);
 }
 
-DLL_PUBLIC var fieldstore(const var& instring, const var& sepchar,const int fieldn, const int nfields,const var& replacement)
+DLL_PUBLIC var fieldstore(const var& instring, const var& sepchar,const int fieldno, const int nfields,const var& replacement)
 {
-	return instring.fieldstore(sepchar, fieldn, nfields, replacement);
+	return instring.fieldstore(sepchar, fieldno, nfields, replacement);
 }
 
 DLL_PUBLIC var crop(const var& instring)
@@ -768,6 +768,26 @@ DLL_PUBLIC bool disconnect()
 }
 
 
+DLL_PUBLIC bool createdb(const var& dbname)
+{
+	return var().createdb(dbname);
+}
+
+DLL_PUBLIC bool deletedb(const var& dbname)
+{
+	return var().deletedb(dbname);
+}
+
+DLL_PUBLIC bool createdb(const var& dbname, var& errmsg)
+{
+	return var().createdb(dbname, errmsg);
+}
+
+DLL_PUBLIC bool deletedb(const var& dbname, var& errmsg)
+{
+	return var().deletedb(dbname, errmsg);
+}
+
 DLL_PUBLIC bool createfile(const var& filename,const var& options)
 {
 	return var().createfile(filename, options);
@@ -794,19 +814,19 @@ DLL_PUBLIC bool clearfile(const var& filename)
 }
 
 
-DLL_PUBLIC bool begin()
+DLL_PUBLIC bool begintrans()
 {
-	return var().begin();
+	return var().begintrans();
 }
 
-DLL_PUBLIC bool rollback()
+DLL_PUBLIC bool rollbacktrans()
 {
-	return var().rollback();
+	return var().rollbacktrans();
 }
 
-DLL_PUBLIC bool end()
+DLL_PUBLIC bool committrans()
 {
-	return var().end();
+	return var().committrans();
 }
 
 
@@ -846,9 +866,9 @@ DLL_PUBLIC bool write(const var& record, const var& filehandle,const var& key)
 	return record.write(filehandle, key);
 }
 
-DLL_PUBLIC bool writev(const var& record, const var& filehandle,const var& key,const int fieldn)
+DLL_PUBLIC bool writev(const var& record, const var& filehandle,const var& key,const int fieldno)
 {
-	return record.writev(filehandle, key, fieldn);
+	return record.writev(filehandle, key, fieldno);
 }
 
 DLL_PUBLIC bool deleterecord(const var& filehandle, const var& key)
@@ -897,11 +917,12 @@ DLL_PUBLIC bool readnextrecord(var& key, var& record)
 	return var("default").readnextrecord(key, record);
 }
 
-
+/* done in ExodusProgramBase and MvEnvironment now
 DLL_PUBLIC var calculate(const var& fieldname)
 {
 	return fieldname.calculate();
 }
+*/
 
 DLL_PUBLIC var xlate(const var& filename, const var& key, const var& fieldno, const wchar_t* mode)
 {
@@ -993,26 +1014,26 @@ DLL_PUBLIC var& eraser(var& instring, const int fieldno, const int valueno, cons
 	return instring.eraser(fieldno, valueno, subvalueno);
 }
 
-DLL_PUBLIC bool locate(const var& target, const var& instring, var& setting, const int fieldn, const int valuen)
+DLL_PUBLIC bool locate(const var& target, const var& instring, var& setting, const int fieldno, const int valueno)
 {
-	return instring.locate(target,setting,fieldn,valuen);
+	return instring.locate(target,setting,fieldno,valueno);
 }
 
-DLL_PUBLIC bool locateby(const var& target, const var& instring, const wchar_t* ordercode, var& setting, const int fieldn,const int 
-valuen)
+DLL_PUBLIC bool locateby(const var& target, const var& instring, const wchar_t* ordercode, var& setting, const int fieldno,const int 
+valueno)
 {
-	return instring.locateby(target,ordercode,setting,fieldn,valuen);
+	return instring.locateby(target,ordercode,setting,fieldno,valueno);
 }
 
-DLL_PUBLIC bool locateby(const var& target, const var& instring, const var& ordercode, var& setting, const int fieldn,const int valuen)
+DLL_PUBLIC bool locateby(const var& target, const var& instring, const var& ordercode, var& setting, const int fieldno,const int valueno)
 {
-	return instring.locateby(target,ordercode,setting,fieldn,valuen);
+	return instring.locateby(target,ordercode,setting,fieldno,valueno);
 }
 
-DLL_PUBLIC bool locateusing(const var& target, const var& instring, const var& usingchar, var& setting, const int fieldn, const int 
-valuen, const int subvaluen)
+DLL_PUBLIC bool locateusing(const var& target, const var& instring, const var& usingchar, var& setting, const int fieldno, const int 
+valueno, const int subvalueno)
 {
-	return instring.locateusing(target, usingchar, setting, fieldn, valuen, subvaluen);
+	return instring.locateusing(target, usingchar, setting, fieldno, valueno, subvalueno);
 }
 
 DLL_PUBLIC bool locateusing(const var& target, const var& instring, const var& usingchar)
@@ -1111,6 +1132,7 @@ int exodus_main(int exodus__argc, char *exodus__argv[])
 	_SENTENCE="";
 	_COMMAND="";
 	_OPTIONS="";
+	_DBTRACE=false;
 
 	//reconstructs complete original sentence unfortunately quote marks will have been lost unless escaped
 	//needs to go after various exodus definitions

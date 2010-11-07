@@ -1341,15 +1341,15 @@ var var::count(const var& substrx) const
 
 	//find the starting position of the field or return L""
 	std::wstring::size_type start_pos=0;
-	int fieldn=0;
+	int fieldno=0;
 	while (true)
 	{
 		start_pos=var_mvstr.find(substr,start_pos);
 		//past of of string?
 		if (start_pos==std::wstring::npos)
-			return fieldn;
+			return fieldno;
 		start_pos++;
-		fieldn++;
+		fieldno++;
 	}
 
 }
@@ -1361,15 +1361,15 @@ var var::count(const wchar_t charx) const
 
 	//find the starting position of the field or return L""
 	std::wstring::size_type start_pos=0;
-	int fieldn=0;
+	int fieldno=0;
 	while (true)
 	{
 		start_pos=var_mvstr.find_first_of(charx, start_pos);
 		//past of of string?
 		if (start_pos==std::wstring::npos)
-			return fieldn;
+			return fieldno;
 		start_pos++;
-		fieldn++;
+		fieldno++;
 	}
 
 }

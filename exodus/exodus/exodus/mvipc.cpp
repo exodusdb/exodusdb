@@ -49,6 +49,10 @@ THE SOFTWARE.
 #include <exodus/mvenvironment.h>
 #include <exodus/mvexceptions.h>
 
+//using namespace exodus;
+//#include <exodus/xfunctorf6.h>
+#include <exodus/mvfunctor.h>
+
 DLL_PUBLIC
 boost::thread_specific_ptr<int> tss_environmentns;
 
@@ -102,21 +106,26 @@ bool startipc()
 	//TODO put a timeout in case the pipe doesnt open
 
 	#if TRACING > 0
-		std::wcout<<L"startipc() Waiting for pipe to be opened\n";
+		std::wclog<<L"startipc() Waiting for pipe to be opened\n";
 	#endif
 
 	global_ipccondition.wait(lock);
 
 	#if TRACING > 0
-		std::wcout<<L"startipc() Waited for pipe to be opened\n";
+		std::wclog<<L"startipc() Waited for pipe to be opened\n";
 	#endif
 
 	return true;
 
 }
 
-void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsechars, std::string& response)
+void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsechars, std::string& response, ExodusFunctorBase& exodusfunctorbase)
 {
+
+	//TODO make independent of int size and byte ordering
+	//otherwise we are restricted to accessing servers
+	//with the same int size and byte ordering
+	//MAYBE implement a 1 byte header to communicate version, int size and byte ordering
 
 	//get a pointer to the beginning of request
 	//NB not wchar_t*
@@ -131,70 +140,90 @@ void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsec
 	int totlength=**plength;
 	prequest+=sizeof(int);
 	
-	var reply=L"NEOSYS_IPC_ERROR: ";
+	//var reply=L"NEOSYS_IPC_ERROR: ";
+	response="NEOSYS_IPC_ERROR: ";
 
 	//check it agrees with the number of bytes read from the pipe and fail if it doesnt
 	if (request_size<=0)
 	{
-		reply=L"";
+		response="";
 		#if TRACING >= 2
-			std::wcout<<L"*";
+			std::wclog<<L"*";
 		#endif
 	}
 	else if (totlength!=request_size)
 	{
-		reply^=L" Only ";
-		reply^=int(request_size);
-		reply^=L" bytes read. Should be ";
-		reply^=totlength;
-		std::wcout<<reply<<std::endl;
-
+		var reply=response^L" Only "^int(request_size)^L" bytes read. Should be "^totlength;
+		std::wcerr<<reply<<std::endl;
+		response=reply.tostring();
+		return;
 	}
 
+	else if (!exodusfunctorbase.mv_)
+	{
+		var reply=response^L" MvEnvironment is not initialised";
+		std::wcerr<<reply<<std::endl;
+		response=reply.tostring();
+		return;
+	}
 	else
 	{
 		#if TRACING >= 2
-			std::wcout<<L".";
+			std::wclog<<L".";
 		#endif
 		//extract the remainder of the fields in the request
 
 		//filename
-		var filename=fromutf8(prequest+sizeof(int),**plength);
+//TODO find a way to pass filename into mv of dictionary routine
+//		var filename=fromutf8(prequest+sizeof(int),**plength);
+		std::string str_libname(prequest+sizeof(int),**plength);
+		//TODO deduplicate code to contruct library name duplicated in ::calculate and mvipc
+		str_libname.insert(0,"dict_");
 		prequest+=*prequest+sizeof(int);
 
 		//dict key
-		var dictkey=fromutf8(prequest+sizeof(int),**plength);
+//TODO find a way to pass dictkey into mv of dictionary routine
+//		var dictkey=fromutf8(prequest+sizeof(int),**plength);
+		std::string str_funcname(prequest+sizeof(int),**plength);
 		prequest+=*prequest+sizeof(int);
 
-		//record key
-		var datakey=fromutf8(prequest+sizeof(int),**plength);
+		//record key into mv ID
+		//var datakey=fromutf8(prequest+sizeof(int),**plength);
+		//NB if you no longer access mv_ directly here
+		//then make mv_ private in ExodusFunctorBase
+		exodusfunctorbase.mv_->ID=fromutf8(prequest+sizeof(int),**plength);
 		prequest+=*prequest+sizeof(int);
 
-		//record data
-		var data=fromutf8(prequest+sizeof(int),**plength);
+		//record data into mv RECORD
+		//var data=fromutf8(prequest+sizeof(int),**plength);
+		exodusfunctorbase.mv_->RECORD=fromutf8(prequest+sizeof(int),**plength);
 		prequest+=*prequest+sizeof(int);
 
-		//valuen
-		var valueno=int(**plength);
+		//valueno into mv MV
+		//var valueno=int(**plength);
+		exodusfunctorbase.mv_->MV=int(**plength);
 		prequest+=sizeof(int);
 
-		//subvaluen
-		var subvalueno=int(**plength);
+		//subvalueno
+//TODO is this really required? if so, find a way to pass it into mv of dictionary routine
+//		var subvalueno=int(**plength);
 		prequest+=sizeof(int);
 
 		#if TRACING >= 3
-			std::wcout<<L"MVipc()";
-			std::wcout<<L"\ntotal bytes:"<<totlength;
-			std::wcout<<L"\nbytes read: "<<request_size;
-			std::wcout<<L"\ndictkey:    "<<dictkey;
-			std::wcout<<L"\ndatakey:    "<<datakey;
-			std::wcout<<L"\ndata:       "<<data;
-			std::wcout<<L"\nvalueno:    "<<valueno;
-			std::wcout<<L"\nsubvalue:   "<<subvalueno<<std::endl;
+			std::wclog<<L"MVipc()";
+			std::wclog<<L"\ntotal bytes:"<<totlength;
+			std::wclog<<L"\nbytes read: "<<request_size;
+			std::wclog<<L"\nfilename:   "<<str_libname;
+			std::wclog<<L"\ndictkey:    "<<str_funcname;
+			std::wclog<<L"\ndatakey:    "<<exodusfunctorbase.mv_->ID;
+			std::wclog<<L"\ndata:       "<<exodusfunctorbase.mv_->RECORD;
+			std::wclog<<L"\nvalueno:    "<<exodusfunctorbase.mv_->MV;
+//			std::wclog<<L"\nsubvalue:   "<<subvalueno;
+			std::wclog<<std::endl;
 		#endif
 
+/* old way
 		//call the relevent dictionary function to calculate the result
-
 		var library;
 		if (!library.load(filename))
 		{
@@ -203,18 +232,68 @@ void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsec
 		}
 		else
 			reply=library.call(filename,dictkey);
+*/
+		if (not exodusfunctorbase.init(str_libname.c_str(),str_funcname.c_str()))
+		{
+			var reply=response^L"Cannot find Library "^str_libname^L", or function "^str_funcname^L" is not present";
+			std::wcerr<<reply<<std::endl;
+			response=reply.tostring();
+			return;
+		}
+		else
+		{
+
+			try
+			{
+				/*old method where dictionary function was a program object using programinit programexit
+				//define a function that calls the shared library object member function
+				typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)();
+				var reply=CALLMEMBERFUNCTION(*(exodusfunctorbase.pobject_),
+					((pExodusProgramBaseMemberFunction) (exodusfunctorbase.pmemberfunction_)))
+					();
+					//(filename,dictkey,datakey,data,valueno,subvalueno);
+				response=reply.tostring();
+				*/
+
+				//typedef var (*ExodusDynamic)(MvEnvironment& mvx);
+				//((ExodusDynamic) exodusfunctorbase.pfunction_)(exodusfunctorbase.mv_);
+				exodusfunctorbase.calldict();
+
+				//dictionary subroutines return return in mv ANS.
+				response=exodusfunctorbase.mv_->ANS.tostring();
+
+				//optionally limit the number of bytes of the reply sent
+				int nresponsebytes=(int)response.length();
+				if (maxresponsechars&&nresponsebytes>maxresponsechars)
+				{
+					var reply=var(L"NEOSYS_IPC_ERROR: Response bytes) " ^ var(nresponsebytes) ^ L" too many for ipc buffer bytes " ^ var(maxresponsechars))^ " while calling "^str_libname^", "^str_funcname;
+					std::wcerr<<reply<<std::endl;
+					response=reply.tostring();
+					return;
+				}
+
+				return;
+
+			}
+			catch (MVException mve)
+			{
+				var reply=response^"ERROR: Calling "^str_libname^", "^str_funcname^L". ERROR: "^mve.description;
+				std::wcerr<<reply<<std::endl;
+				response=reply.tostring();
+				return;
+			}
+			catch (...)
+			{
+				var reply=response^"ERROR: Calling "^str_libname^", "^str_funcname;
+				std::wcerr<<reply<<std::endl;
+				response=reply.tostring();
+				return;
+			}
+		}
 
 	}
 
-	//optionally limit the number of bytes of the reply sent
-	response=reply.tostring();
-	int nresponsebytes=(int)response.length();
-	if (maxresponsechars&&nresponsebytes>maxresponsechars)
-	{
-		reply=var(L"NEOSYS_IPC_ERROR: Response bytes) " ^ var(nresponsebytes) ^ L" too many for ipc buffer bytes " ^ var(maxresponsechars));
-		response=reply.tostring();
-	}
-
+	//shouldnt get here, but if by mistake we do then response is set to an error string.
 	return;
 
 }

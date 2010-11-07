@@ -32,6 +32,8 @@ THE SOFTWARE.
 //PGPASSFILE defaults to ~/.pgpass
 //PGSERVICE in pg_service.conf in PGSYSCONFDIR
 
+//TODO sql quoting of all parameters like dbname filename etc to prevent sql injection.
+
 //0=silent, 1=errors, 2=warnings, 3=results, 4=tracing, 5=debugging
 //0=silent, 1=errors, 2=warnings, 3=failures, 4=successes, 5=debugging ?
 
@@ -105,13 +107,13 @@ THE SOFTWARE.
 #include <exodus/mvutf.h>
 #include <exodus/mvexceptions.h>
 
-#if TRACING >= 5
-	#define DEBUG_LOG_SQL exodus::errputl(L"SQL:" ^ sql);
-	#define DEBUG_LOG_SQL1 exodus::errputl(L"SQL:" ^ sql.swap(L"$1",var(paramValues[0])));
-#else
-	#define DEBUG_LOG_SQL
-	#define DEBUG_LOG_SQL1
-#endif
+//#if TRACING >= 5
+#define DEBUG_LOG_SQL if (_DBTRACE) {exodus::errputl(L"SQL:" ^ var(sql));}
+#define DEBUG_LOG_SQL1 if (_DBTRACE) {exodus::errputl(L"SQL:" ^ var(sql).swap(L"$1",var(paramValues[0])));}
+//#else
+//#define DEBUG_LOG_SQL
+//#define DEBUG_LOG_SQL1
+//#endif
 
 namespace exodus {
 
@@ -360,9 +362,6 @@ bool var::connect(const var& conninfo)
 
 	*this=1;
 
-	//need to set PQnoticeReceiver to suppress NOTICES like when creating files
-	//PQsetErrorVerbosity(pgconn, PQERRORS_TERSE);
-
 	//save the connection in thread specific storage
 	tss_pgconns.reset(pgconn);
 	tss_pgconnparams.reset(new var(conninfo2));
@@ -377,7 +376,17 @@ bool var::connect(const var& conninfo)
 		startipc();
 	}
 
-	 return true;
+	//doesnt work
+	//need to set PQnoticeReceiver to suppress NOTICES like when creating files
+	//PQsetErrorVerbosity(pgconn, PQERRORS_TERSE);
+
+	//but this does
+	//this turns off the notice when creating tables with a primary key
+	var sql=L"SET client_min_messages = WARNING";
+
+	sql.sqlexec();
+
+	return true;
 
 }
 
@@ -510,13 +519,13 @@ void var::close()
 */
 }
 
-bool var::readv(const var& filehandle, const var& key, const int fieldn)
+bool var::readv(const var& filehandle, const var& key, const int fieldno)
 {
-	THISIS(L"bool var::readv(const var& filehandle, const var& key, const int fieldn)")
+	THISIS(L"bool var::readv(const var& filehandle, const var& key, const int fieldno)")
 
 	if (!read(filehandle,key))
 		return false;
-	var_mvstr=extract(fieldn).var_mvstr;
+	var_mvstr=extract(fieldno).var_mvstr;
 	return true;
 }
 
@@ -746,6 +755,7 @@ void var::unlockall() const
 	}
 
 	var sql=L"SELECT PG_ADVISORY_UNLOCK_ALL()";
+
 	sql.sqlexec();
 
 }
@@ -788,7 +798,8 @@ bool var::sqlexec(var& errmsg) const
 		return 0;
 	}
 
-	DEBUG_LOG_SQL1
+	//DEBUG_LOG_SQL
+	if (_DBTRACE) {exodus::errputl(L"SQL:" ^ *this);}
 
 	//will contain any result IF successful
 	//MUST do PQclear(local_result) after using it;
@@ -797,7 +808,6 @@ bool var::sqlexec(var& errmsg) const
 	//NB PQexec cannot be told to return binary results
 	//but it can execute multiple commands
 	//whereas PQexecParams is the opposite
-	DEBUG_LOG_SQL
 	pgresult = PQexec(thread_pgconn, (*this).tostring().c_str());
 	if (!pgresult) {
 		errmsg=var(PQerrorMessage(thread_pgconn));
@@ -806,6 +816,7 @@ bool var::sqlexec(var& errmsg) const
 	if (PQresultStatus(pgresult) != PGRES_COMMAND_OK)
     {
         errmsg=var(PQerrorMessage(thread_pgconn));
+		//std::wcerr<<errmsg<<std::endl;
 		PQclear(pgresult);
         return false;
     }
@@ -815,12 +826,12 @@ bool var::sqlexec(var& errmsg) const
 
 }
 
-bool var::writev(const var& filehandle,const var& key,const int fieldn) const
+bool var::writev(const var& filehandle,const var& key,const int fieldno) const
 {
-	if (fieldn<=0)
+	if (fieldno<=0)
 		return write(filehandle, key);
 
-	THISIS(L"bool var::writev(const var& filehandle,const var& key,const int fieldn) const")
+	THISIS(L"bool var::writev(const var& filehandle,const var& key,const int fieldno) const")
 	//will be duplicated in read and write but do here to present the correct function name on error
 	THISISSTRING()
 	ISSTRING(filehandle)
@@ -832,7 +843,7 @@ bool var::writev(const var& filehandle,const var& key,const int fieldn) const
 		record=L"";
 
 	//replace the field
-	record.replacer(fieldn,0,0,var_mvstr);
+	record.replacer(fieldno,0,0,var_mvstr);
 
 	//write it back
 	record.write(filehandle,key);
@@ -938,6 +949,8 @@ bool var::write(const var& filehandle,const var& key) const
 }
 */
 
+//there is no "update if present or insert if not" command in postgres
+//sql2003 "merge" http://en.wikipedia.org/wiki/Upsert
 bool var::write(const var& filehandle, const var& key) const
 {
 	THISIS(L"bool var::write(const var& filehandle, const var& key) const")
@@ -1256,42 +1269,85 @@ var var::xlate(const var& filename,const var& fieldno, const wchar_t* mode) cons
 	return record;
 }
 
-bool var::begin() const
+bool var::begintrans() const
 {
-	THISIS(L"bool var::begin() const")
+	THISIS(L"bool var::begintrans() const")
 
 	// *this is not used
 	THISISDEFINED()
 
 	//begin a transaction
 	var sql=L"BEGIN";
+
 	return sql.sqlexec();
 	
 }
 
-bool var::rollback() const
+bool var::rollbacktrans() const
 {
-	THISIS(L"bool var::rollback() const")
+	THISIS(L"bool var::rollbacktrans() const")
 
 	// *this is not used
 	THISISDEFINED()
 
 	// Rollback a transaction
 	var sql=L"BEGIN";
+
 	return sql.sqlexec();
 
 }
 
-bool var::end() const
+bool var::committrans() const
 {
-	THISIS(L"bool var::end() const")
+	THISIS(L"bool var::committrans() const")
 
 	// *this is not used
 	THISISDEFINED()
 
 	//end (commit) a transaction
 	var sql=L"END";
+
 	return sql.sqlexec();
+}
+
+bool var::createdb(const var& dbname) const
+{
+	var errmsg;
+	return createdb(dbname,errmsg);
+}
+
+bool var::deletedb(const var& dbname) const
+{
+	var errmsg;
+	return deletedb(dbname,errmsg);
+}
+
+bool var::createdb(const var& dbname, var& errmsg) const
+{
+	THISIS(L"bool var::createdb(const var& dbname, var& errmsg)")
+	// *this is not used
+	THISISDEFINED()
+	ISSTRING(dbname)
+
+	var sql = L"CREATE DATABASE "^dbname.convert(L". ",L"__");
+	sql^=L" WITH ENCODING='UTF8' ";
+	//sql^=" OWNER=exodus";
+
+	return sql.sqlexec(errmsg);
+
+}
+
+bool var::deletedb(const var& dbname, var& errmsg) const
+{
+	THISIS(L"bool var::deletedb(const var& dbname, var& errmsg)")
+	// *this is not used
+	THISISDEFINED()
+	ISSTRING(dbname)
+
+	var sql = L"DROP DATABASE "^dbname.convert(L". ",L"__");
+
+	return sql.sqlexec(errmsg);
+
 }
 
 bool var::createfile(const var& filename, const var& options)
@@ -1320,6 +1376,7 @@ bool var::deletefile() const
 	THISISSTRING()
 
 	var sql = L"DROP TABLE " PGDATAFILEPREFIX ^ *this;
+
 	return sql.sqlexec();
 }
 
@@ -1329,6 +1386,7 @@ bool var::clearfile() const
 	THISISSTRING()
 
 	var sql = L"DELETE FROM " PGDATAFILEPREFIX ^ *this;
+
 	return sql.sqlexec();
 }
 
@@ -1366,7 +1424,7 @@ inline var fileexpression(const var& mainfilename, const var& filename, const va
 	//return "coalesce(L" ^ expression ^", ''::bytea)";
 }
 
-var getdictexpression(const var& mainfilename, const var& filename, const var& dictfile, const var& fieldname, var& joins, bool forsort_or_select_or_index=false)
+var getdictexpression(const var& mainfilename, const var& filename, const var& dictfilename, const var& dictfile, const var& fieldname, var& joins, bool forsort_or_select_or_index=false)
 {
 
 	var actualdictfile=dictfile;
@@ -1374,7 +1432,7 @@ var getdictexpression(const var& mainfilename, const var& filename, const var& d
 	{
 		var dictfilename;
 		if (mainfilename.substr(1,5)== L"dict_")
-			dictfilename=L"dict_voc";
+			dictfilename=L"dict_md";
 		else
 			dictfilename=L"dict_"^mainfilename;
 		if (!actualdictfile.open(dictfilename))
@@ -1390,7 +1448,7 @@ var getdictexpression(const var& mainfilename, const var& filename, const var& d
     var dictrec;
     if (!dictrec.read(actualdictfile,fieldname))
 	{
-		if (not dictrec.read(L"dict_voc", fieldname))
+		if (not dictrec.read(L"dict_md", fieldname))
 		{
 			if (fieldname==L"@ID")
 				dictrec = L"F" ^ FM ^ L"0" ^ FM ^ L"Ref" ^ FM ^ FM ^ FM ^ FM ^ FM ^ FM ^ L"L" ^ FM ^ 15;
@@ -1428,14 +1486,14 @@ var getdictexpression(const var& mainfilename, const var& filename, const var& d
 			sqlexpression=L"exodus_extract_sort(" ^  params;
 
 		else if (conversion==L"[NUMBER,0]" || dictrec.extract(11)==L"0N" || dictrec.extract(11).substr(1,3)==L"0N_")
-    		sqlexpression=L"cast( exodus_extract_text(" ^ params ^ L" as integer)";
+			sqlexpression=L"cast( exodus_extract_text(" ^ params ^ L" as integer)";
 		else if (conversion.substr(1,2)==L"MD" || conversion.substr(1,7)==L"[NUMBER" || dictrec.extract(12)==L"FLOAT" || dictrec.extract(11).index(L"0N"))
 				sqlexpression=L"cast( exodus_extract_text(" ^ params ^ L" as float)";
 		else
 			sqlexpression=L"exodus_extract_text(" ^ params;
-    }
-    else if (dicttype==L"S")
-    {
+	}
+	else if (dicttype==L"S")
+	{
 		var functionx=dictrec.extract(8).trim().ucase();
 		if (functionx.substr(1,11)==L"@ANS=XLATE(")
 		{
@@ -1462,7 +1520,7 @@ var getdictexpression(const var& mainfilename, const var& filename, const var& d
 					var dictxlatetofile=xlatetofilename;
 			        //if (!dictxlatetofile.open(L"DICT",xlatetofilename))
 					//	throw MVDBException(L"getdictexpression() DICT" ^ xlatetofilename ^ L" file cannot be opened");
-					todictexpression=getdictexpression(filename,xlatetofilename, dictxlatetofile, xlatetofieldname, joins,forsort_or_select_or_index);
+					todictexpression=getdictexpression(filename,xlatetofilename, dictxlatetofile, dictxlatetofile, xlatetofieldname, joins,forsort_or_select_or_index);
 				}
 
 				//determine the join details
@@ -1479,7 +1537,7 @@ var getdictexpression(const var& mainfilename, const var& filename, const var& d
 				else if (xlatefromfieldname.substr(1,1)==L"{")
 				{
 					xlatefromfieldname=xlatefromfieldname.substr(2).splicer(-1,1,L"");
-					fromdictexpression=getdictexpression(filename,filename, dictfile, xlatefromfieldname, joins);
+					fromdictexpression=getdictexpression(filename, filename, dictfilename, dictfile, xlatefromfieldname, joins);
 				}
 				else
 				{
@@ -1499,7 +1557,7 @@ var getdictexpression(const var& mainfilename, const var& filename, const var& d
 		else
 		{
 			sqlexpression=L"'" ^ fieldname ^ L"'";
-			sqlexpression=L"exodus_call('exodusservice-" ^ getprocessn() ^ L"." ^ getenvironmentn() ^ L"'::bytea, '" ^ filename ^ L"'::bytea, '" ^ fieldname ^ L"'::bytea, "^ filename ^ L".key, " ^ filename ^ L".data,0,0)";
+			sqlexpression=L"exodus_call('exodusservice-" ^ getprocessn() ^ L"." ^ getenvironmentn() ^ L"'::bytea, '" ^ dictfilename ^ L"'::bytea, '" ^ fieldname ^ L"'::bytea, "^ filename ^ L".key, " ^ filename ^ L".data,0,0)";
 			//TODO apply naturalorder conversion by passing forsort_or_select_or_index option to exodus_call
 		}
 	}
@@ -1644,6 +1702,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	//clearselect();
 
 	var actualfilename=L"";
+	var dictfilename=L"";
 	var actualfieldnames=fieldnames;
 	var dictfile=L"";
 	var keycodes=L"";
@@ -1677,6 +1736,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		}
 
 		actualfilename=word;
+		dictfilename=word;
 
     }
 
@@ -1686,6 +1746,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		if (!assigned())
 			throw MVUnassigned(L"select() unassigned filehandle and sort/select clause doesnt start \"SELECT filename\"");
 		actualfilename=*this;
+		dictfilename=*this;
 	}
 
     while (remainingsortselectclause.length())
@@ -1700,10 +1761,10 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
                 keycodes ^= FM;
             keycodes ^= word1;
             continue;
-        }
-        else if (word1==L"USING")
-        {
-			var dictfilename=getword(remainingsortselectclause);
+		}
+		else if (word1==L"USING")
+		{
+			dictfilename=getword(remainingsortselectclause);
 			if (!dictfile.open(L"dict_"^dictfilename))
 			{
 				//throw MVDBException(L"select() dict_" ^ dictfilename ^ L" file cannot be opened");
@@ -1715,7 +1776,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
         {
             if (orderclause)
                 orderclause^=L", ";
-            var dictexpression=getdictexpression(actualfilename,actualfilename,dictfile,getword(remainingsortselectclause),joins,true);
+            var dictexpression=getdictexpression(actualfilename,actualfilename,dictfilename,dictfile,getword(remainingsortselectclause),joins,true);
             orderclause ^= dictexpression;
             if (word1==L"BY-DSND")
                 orderclause^=L" DESC";
@@ -1730,7 +1791,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 
 			//add the dictionary id
             var word2=getword(remainingsortselectclause);
-			var dictexpression=getdictexpression(actualfilename,actualfilename,dictfile,word2,joins,true);
+			var dictexpression=getdictexpression(actualfilename,actualfilename,dictfilename,dictfile,word2,joins,true);
 			var usingnaturalorder=dictexpression.index(L"exodus_extract_sort");
             whereclause ^= L" " ^ dictexpression;
 
@@ -1888,7 +1949,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 //outputl(sql);
 
 	//Start a transaction block because postgres select requires to be inside one
-	if (!begin())
+	if (!begintrans())
 		return false;
 
 	if (!sql.sqlexec())
@@ -1920,7 +1981,7 @@ void var::clearselect() const
 		return;
 
 	// end the transaction
-	end();
+	committrans();
 
 	return;
 
@@ -1928,8 +1989,8 @@ void var::clearselect() const
 
 bool var::readnext(var& key) const
 {
-	var valuen;
-	return readnext(key, valuen);
+	var valueno;
+	return readnext(key, valueno);
 }
 
 bool readnextx(const std::wstring& cursor, PGresultptr& pgresult)
@@ -1937,8 +1998,9 @@ bool readnextx(const std::wstring& cursor, PGresultptr& pgresult)
     var sql=L"FETCH NEXT in CURSOR1_" ^ cursor;
 
 	//execute the sql
-	//cant use sqlexec here because it results data
+	//cant use sqlexec here because it returns data
 	//sqlexec();
+
 	if (!pqexec(sql,pgresult))
 		return false;
 
@@ -1949,6 +2011,7 @@ bool readnextx(const std::wstring& cursor, PGresultptr& pgresult)
 
 		// close the cursor - we don't bother to check for errors
 		var sql=L"CLOSE CURSOR1_" ^ cursor;
+
 		sql.sqlexec();
 		return false;
 
@@ -1958,7 +2021,7 @@ bool readnextx(const std::wstring& cursor, PGresultptr& pgresult)
 
 }
 
-bool var::readnext(var& key, var& valuen) const
+bool var::readnext(var& key, var& valueno) const
 {
 	//?allow undefined usage like var xyz=xyz.readnext();
 	if (var_mvtyp&mvtypemask)
@@ -1968,7 +2031,7 @@ bool var::readnext(var& key, var& valuen) const
 		var_mvtyp=pimpl::MVTYPE_STR;
 	}
 
-	THISIS(L"bool var::readnext(var& key, var& valuen) const")
+	THISIS(L"bool var::readnext(var& key, var& valueno) const")
 	THISISSTRING()
 
 	PGconn* thread_pgconn=(PGconn*) connection();
@@ -1976,7 +2039,7 @@ bool var::readnext(var& key, var& valuen) const
 	if (!readnextx(var_mvstr, pgresult))
 	{
 		// end the transaction and quit
-		end();
+		committrans();
 		return false;
 	}
 /* abortive code to handle unescaping returned hex/escape data
@@ -2005,7 +2068,7 @@ bool var::readnext(var& key, var& valuen) const
 	key=wstringfromUTF8((UTF8*)PQgetvalue(pgresult, 0, 0), PQgetlength(pgresult, 0, 0));
 //key.output(L"key=").len().outputl(L" len=");
 	//TODO implement order by multivalue
-	valuen = 0;
+	valueno = 0;
 
 	PQclear(pgresult);
 
@@ -2030,12 +2093,6 @@ bool var::readnext(var& key, var& valuen) const
 
 }
 
-//TODO
-var var::calculate() const
-{
-	return L"";
-}
-
 bool var::readnextrecord(var& key, var& record) const
 {
 
@@ -2057,7 +2114,7 @@ bool var::readnextrecord(var& key, var& record) const
 	if (!readnextx(var_mvstr, pgresult))
 	{
 		// end the transaction
-		end();
+		committrans();
 		return false;
 	}
 
@@ -2100,14 +2157,14 @@ bool var::createindex(const var& fieldname, const var& dictfile) const
 
 	//throws if cannot find dict file or record
 	var joins=L"";//throw away - cant index on joined fields at the moment
-	var dictexpression=getdictexpression(filename,filename,actualdictfile,fieldname,joins,true);
+	var dictexpression=getdictexpression(filename,filename,actualdictfile,actualdictfile,fieldname,joins,true);
 
 	var sql=L"create index index__" ^ filename ^ L"__" ^ fieldname ^ L" on " ^ filename;
 	sql^=L" (";
 	sql^=dictexpression;
 	sql^=L")";
 
-	return (sql.sqlexec());
+	return sql.sqlexec();
 
 }
 
@@ -2227,10 +2284,11 @@ int pqexec(const var& sql, PGresultptr& pgresult)
 {
 	int retcode = 1;
 
+	DEBUG_LOG_SQL
+
 	PGconn* thread_pgconn=tss_pgconns.get();
 	if (!thread_pgconn)
 		return 0;
-	DEBUG_LOG_SQL1
 
 	//will contain any result IF successful
 	//MUST do PQclear(local_result) after using it;
@@ -2239,7 +2297,6 @@ int pqexec(const var& sql, PGresultptr& pgresult)
 	/* dont use PQexec because is cannot be told to return binary results
 	 and use PQexecParams with zero parameters instead
 	//execute the command
-	DEBUG_LOG_SQL
 	local_result = PQexec(thread_pgconn, sql.tostring().c_str());
 	pgresult = local_result;
 	*/

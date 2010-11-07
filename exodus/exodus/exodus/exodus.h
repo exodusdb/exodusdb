@@ -29,8 +29,9 @@ THE SOFTWARE.
 
 //must be before exodus macros and functions otherwise lots of errors
 //from standard libararies which are included here
-#include <exodus/mvenvironment.h>
 #include <exodus/mvfunctor.h>
+#include <exodus/mvenvironment.h>
+#include <exodus/mvprogram.h>
 
 //always last to avoid conflicting definitions
 #include <exodus/exodusmacros.h>

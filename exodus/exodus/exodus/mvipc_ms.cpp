@@ -48,6 +48,9 @@
 #define PIPE_TIMEOUT 5000
 #define BUFSIZE 1048576
  
+using namespace exodus;
+//#include <exodus/xfunctorf6.h>
+
 namespace exodus
 {
 
@@ -83,7 +86,8 @@ int MVipc(const int environmentn, var& pgconnparams)
 	//clone the postgres connection because the parent thread is running a select with it
 	if (!var().connect(pgconnparams))
 	{
-		throw var(L"MVipc Cannot connect additional thread to postgres");
+		//throw var(L"MVipc Cannot connect additional thread to postgres");
+		var(L"MVipc Cannot connect additional thread to postgres").errputl();
 		return false;
 	}
 	//TODO prevent or handle SELECT in dictionary functions
@@ -91,7 +95,23 @@ int MVipc(const int environmentn, var& pgconnparams)
 	//set the threads environment number (same as and provided by the parent thread)
 	//AFTER opening the database connection
 	setenvironmentn(environmentn);
-	
+
+	//TODO now that MvEnv has a calculate function, perhaps we should pass in an mv not an exodusfunctorbase
+	//it would however mess up RECORD, ID etc. but that is probably expected
+	//this is a dict library caller
+	//TODO check if possible to have no environment;
+	//*COPY in mvipc_posix.cpp mvipc_boost.cpp mvipc_win.cpp
+	MvEnvironment standalone_mv;
+	MvEnvironment* mv=global_environments[environmentn];
+	if (not mv)
+	{
+#if TRACING >= 2
+		std::clog<<"MVipc() Using a standalone MvEnvironment "<<environmentn<<std::endl;
+#endif
+		mv=&standalone_mv;
+	}
+	ExodusFunctorBase exodusfunctorbase(*mv);
+
 	//"\\\\.\\pipe\\exoduspipexyz"
 	//strings of MS tchars
 	//typedef basic_string<TCHAR> tstring;
@@ -159,7 +179,7 @@ int MVipc(const int environmentn, var& pgconnparams)
 
       if (hEvents[i] == NULL) 
       {
-		  wprintf(L"MVipc() CreateEvent failed. WIN32 Error: %d.\n", GetLastError()); 
+		 wprintf(L"MVipc() CreateEvent failed. WIN32 Error: %d.\n", GetLastError()); 
          return false;
       }
  
@@ -339,7 +359,7 @@ wprintf(L"---------------------------------\nMVipc() read  %d bytes from pipe\n"
 				 return 0;
 			 }
 
-			getResponseToRequest((char*)Pipe[i].chRequest, (size_t) Pipe[i].cbRead, BUFSIZ*sizeof(TCHAR), response);
+			getResponseToRequest((char*)Pipe[i].chRequest, (size_t) Pipe[i].cbRead, BUFSIZ*sizeof(TCHAR), response, exodusfunctorbase);
 	/*
 			//bytes to write to pipe
 			memcpy(pipe->chReply,reply.towstring().data(),nbytes);

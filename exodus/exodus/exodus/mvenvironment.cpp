@@ -20,11 +20,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#define EXO_MVENVIRONMENT_CPP
 
 //C4530: C++ exception handler used, but unwind semantics are not enabled. 
 #pragma warning (disable: 4530)
 
+#define EXO_MVENVIRONMENT_CPP
 #include <exodus/mvenvironment.h>
 
 //avoid this unless absolutely necessary then possible to move this file out of exodus var library
@@ -117,6 +117,9 @@ bool MvEnvironment::init(const var& threadno)
 	this->THREADNO=threadno;
 	this->SYSTEM.replacer(17,0,0,L"");
 
+	cache_dictid_="";
+	this->DICT="";
+
 	//openqm connection
 	//std::wcout<<L"Connecting DB ... "<<std::flush;
 	//if (!this->SESSION.connect(L"127.0.0.1","4243","steve","stetempp","QMSYS"))
@@ -155,14 +158,14 @@ bool MvEnvironment::init(const var& threadno)
 //	std::wcout<<L"OK"<<std::endl;
 	*/
 
-	//std::wcout<<L"Opening VOC ... "<<std::flush;
-	var vocfilename=L"VOC";
-	var voc;
-	if (!voc.open(vocfilename))
+	//std::wcout<<L"Opening MD ... "<<std::flush;
+	var mdfilename=L"MD";
+	var md;
+	if (!md.open(mdfilename))
 	{
-    		if (!voc.createfile(vocfilename)||!voc.open(vocfilename))
+    		if (!md.createfile(mdfilename)||!md.open(mdfilename))
 		{
-			std::wcerr<<L"Cannot create "<<vocfilename<<std::endl;
+			std::wcerr<<L"Cannot create "<<mdfilename<<std::endl;
 			return false;
 		}
 	}
@@ -184,6 +187,77 @@ bool MvEnvironment::init(const var& threadno)
 	//std::wcout<<L"MvEnvironment::init: completed "<<std::endl;
 
 	return true;
+
+}
+
+var MvEnvironment::calculate(const var& dictid)
+{
+	//THISIS(L"var MvEnvironment::calculate(const var& dictid)")
+	//ISSTRING(dictid)
+
+	//return ID^L"*"^dictid;
+
+	//wire up the the library linker to have the current mvenvironment
+	if (!exodusfunctorbase_.mv_)
+		exodusfunctorbase_.mv_=this;
+
+	//get the dictionary record so we know how to extract the correct field or call the right library
+	bool newlibfunc;
+	if (cache_dictid_!=dictid)
+	{
+		newlibfunc=true;
+		if (not DICT)
+			throw MVException(L"calculate("^dictid^L") DICT file variable has not been set");
+		if (not cache_dictrec_.read(DICT,dictid))
+			throw MVException(L"calculate("^dictid^L") dictionary record not in DICT "^DICT.quote());
+		cache_dictid_=dictid;
+	}
+	else
+		newlibfunc=false;
+
+	var dicttype=cache_dictrec_(1);
+
+	//F type dictionaries
+	if (dicttype==L"F")
+	{
+
+		//check field number is numeric
+		var fieldno=cache_dictrec_(2);
+		if (!fieldno.isnum())
+			return L"";
+
+		//field no > 0
+		if (fieldno)
+			return RECORD(fieldno,MV);
+
+		//field no 0
+		else
+		{
+			var keypart=cache_dictrec_(5);
+			if (keypart&&keypart.isnum())
+				return ID.field(L"*",keypart);
+			else
+				return ID;
+
+		}
+	}
+	else if (dicttype==L"S")
+	{
+		//TODO deduplicate various exodusfunctorbase code spread around calculate mvipc* etc
+		if (newlibfunc)
+		{
+			std::string str_libname=DICT.tostring();
+			std::string str_funcname=dictid.tostring();
+			if (!exodusfunctorbase_.init(str_libname.c_str(),str_funcname.c_str()))
+				throw MVException(L"calculate() Cannot find Library "^str_libname^L", or function "^str_funcname^L" is not present");
+		}
+
+		exodusfunctorbase_.calldict();
+		return ANS;
+	}
+
+	throw MVException(L"calculate("^dictid^L") "^DICT^L" Invalid dictionary type "^dicttype.quote());
+	return L"";
 
 }
 
@@ -684,7 +758,7 @@ open:
 
 		return 1;
 	}else{
-		if (filename == L"VOC") {
+		if (filename == L"MD") {
 			filename = L"MD";
 			goto open;
 		}

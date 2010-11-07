@@ -355,6 +355,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\mvprogram.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\mvunicode.cpp"
 				>
 			</File>
@@ -450,6 +454,10 @@
 			</File>
 			<File
 				RelativePath=".\mvlink.h"
+				>
+			</File>
+			<File
+				RelativePath=".\mvprogram.h"
 				>
 			</File>
 			<File

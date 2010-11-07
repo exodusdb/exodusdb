@@ -188,9 +188,9 @@ drop FUNCTION neo_extract_datetime(bytea, int4, int4, int4) cascade;
 	text *input;\
 	int32 outstart;\
 	int32 outlen;\
-	int32 fieldn;\
-	int32 valuen;\
-	int32 subvaluen;\
+	int32 fieldno;\
+	int32 valueno;\
+	int32 subvalueno;\
 	if (PG_ARGISNULL(0))\
 	{\
 		outstart=0;\
@@ -200,10 +200,10 @@ drop FUNCTION neo_extract_datetime(bytea, int4, int4, int4) cascade;
 	{\
 		/*get a pointer to the first parameter (0)*/\
 		input = PG_GETARG_TEXT_P(0);\
-		fieldn = PG_GETARG_INT32(1);\
-		valuen = PG_GETARG_INT32(2);\
-		subvaluen = PG_GETARG_INT32(3);\
-		extract(VARDATA(input), VARSIZE(input)-VARHDRSZ, fieldn, valuen, subvaluen, &outstart, &outlen);\
+		fieldno = PG_GETARG_INT32(1);\
+		valueno = PG_GETARG_INT32(2);\
+		subvalueno = PG_GETARG_INT32(3);\
+		extract(VARDATA(input), VARSIZE(input)-VARHDRSZ, fieldno, valueno, subvalueno, &outstart, &outlen);\
 	}\
 
 //extern "C" {
@@ -211,7 +211,7 @@ drop FUNCTION neo_extract_datetime(bytea, int4, int4, int4) cascade;
 //bool callexodus(const char* serverid, const char* request, const int nrequestbytes, const char* response, int& nresponsebytes);
 bool callexodus(const char* serverid, const char* request, const int nrequestbytes, const char* response, int* nresponsebytes);
 
-void extract(char * instring, int inlength, int fieldn, int valuen, int subvaluen, int* outstart, int* outlength);
+void extract(char * instring, int inlength, int fieldno, int valueno, int subvalueno, int* outstart, int* outlength);
 
 #define FM_ '\xFE'
 #define VM_ '\xFD'
@@ -246,8 +246,8 @@ exodus_call(PG_FUNCTION_ARGS)
 	bytea *dictkey = PG_GETARG_BYTEA_P(2);
 	bytea *datakey = PG_GETARG_BYTEA_P(3);
 	bytea *data = PG_GETARG_BYTEA_P(4);
-	int32 valuen = PG_GETARG_INT32(5);
-	int32 subvaluen = PG_GETARG_INT32(6);
+	int32 valueno = PG_GETARG_INT32(5);
+	int32 subvalueno = PG_GETARG_INT32(6);
 
 	char* prequest;
 	char* appendpoint;
@@ -268,7 +268,7 @@ exodus_call(PG_FUNCTION_ARGS)
 	nrequestbytes+=sizeof(int)+VARSIZE(datakey)-VARHDRSZ;
 	//length and data
 	nrequestbytes+=sizeof(int)+VARSIZE(data)-VARHDRSZ;
-	//valuen and subvaluen
+	//valueno and subvalueno
 	nrequestbytes+=sizeof(int)*2;
 
 	//acquire space for pipedata
@@ -318,9 +318,9 @@ exodus_call(PG_FUNCTION_ARGS)
 
 	//datakey
 	memcpy((void *) (appendpoint)	// destination
-		   ,(void *) VARDATA(datakey)	// starting from
-		   ,VARSIZE(datakey)-VARHDRSZ	// how many bytes
-		   );
+			,(void *) VARDATA(datakey)	// starting from
+			,VARSIZE(datakey)-VARHDRSZ	// how many bytes
+			);
 	appendpoint+=VARSIZE(datakey)-VARHDRSZ;
 
 	//length of data
@@ -336,13 +336,13 @@ exodus_call(PG_FUNCTION_ARGS)
 	appendpoint+=VARSIZE(data)-VARHDRSZ;
 
 	//value number
-	//*appendpoint=(int)(valuen);
-	**lengthpoint=(int)(valuen);
+	//*appendpoint=(int)(valueno);
+	**lengthpoint=(int)(valueno);
 	appendpoint+=sizeof(int);
 
 	//subvalue number
-	//*appendpoint=(int)(subvaluen);
-	**lengthpoint=(int)(subvaluen);
+	//*appendpoint=(int)(subvalueno);
+	**lengthpoint=(int)(subvalueno);
 	appendpoint+=sizeof(int);
 
 	//failsafe check is correct total length
@@ -373,7 +373,7 @@ exodus_call(PG_FUNCTION_ARGS)
 		PG_RETURN_NULL();
 	}
 	
-	//extract(VARDATA(input), VARSIZE(input)-VARHDRSZ, fieldn, valuen, subvaluen, &outstart, &outlen);
+	//extract(VARDATA(input), VARSIZE(input)-VARHDRSZ, fieldno, valueno, subvalueno, &outstart, &outlen);
 
 	//elog(WARNING, "exodus_call: palloc'ing");
 	//prepare a new output
@@ -410,9 +410,9 @@ exodus_extract_bytea(PG_FUNCTION_ARGS)
 
 	int32 outstart;
 	int32 outlen;
-	int32 fieldn;
-	int32 valuen;
-	int32 subvaluen;
+	int32 fieldno;
+	int32 valueno;
+	int32 subvalueno;
 
 	bytea* input;
 	bytea* output;
@@ -420,13 +420,13 @@ exodus_extract_bytea(PG_FUNCTION_ARGS)
 	//get a pointer to the first parameter (0)
 	input = PG_GETARG_BYTEA_P(0);
 
-	fieldn = PG_GETARG_INT32(1);
+	fieldno = PG_GETARG_INT32(1);
 	
-	valuen = PG_GETARG_INT32(2);
+	valueno = PG_GETARG_INT32(2);
 
-	subvaluen = PG_GETARG_INT32(3);
+	subvalueno = PG_GETARG_INT32(3);
 
-	extract(VARDATA(input), VARSIZE(input)-VARHDRSZ, fieldn, valuen, subvaluen, &outstart, &outlen);
+	extract(VARDATA(input), VARSIZE(input)-VARHDRSZ, fieldno, valueno, subvalueno, &outstart, &outlen);
 
 
 	//prepare a new output
@@ -470,10 +470,10 @@ exodus_extract_text(PG_FUNCTION_ARGS)
 	{
 		//get a pointer to the first parameter (0)
 		input = PG_GETARG_TEXT_P(0);
-		fieldn = PG_GETARG_INT32(1);
-		valuen = PG_GETARG_INT32(2);
-		subvaluen = PG_GETARG_INT32(3);
-		extract(VARDATA(input), VARSIZE(input)-VARHDRSZ, fieldn, valuen, subvaluen, &outstart, &outlen);
+		fieldno = PG_GETARG_INT32(1);
+		valueno = PG_GETARG_INT32(2);
+		subvalueno = PG_GETARG_INT32(3);
+		extract(VARDATA(input), VARSIZE(input)-VARHDRSZ, fieldno, valueno, subvalueno, &outstart, &outlen);
 	}
 */
 //PG_RETURN_NULL();

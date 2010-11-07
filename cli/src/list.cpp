@@ -240,11 +240,10 @@ function main() {
 	//use <COL> for hiding non-totalled cols in det-supp (slow)
 	usecols = 0;
 
-	if (mv.USER2.substr(2, 1) eq "C") {
+	if (USER2.substr(2, 1) eq "C")
 		decimalchar = ",";
-	} else {
+	else
 		decimalchar = ".";
-	}
 
 	html = index(options,"H");
 	if (html) {
@@ -309,7 +308,7 @@ function main() {
 	if (!thcolor)
 		thcolor = "#FFFF80";
 
-	mv.DICT = "";
+	DICT = "";
 	maxnrecs = "";
 	keylist = "";
 
@@ -389,13 +388,13 @@ phraseinit:
 		}
 		filename = word;               // new
 
-		if (filename.substr(1, 5).lcase() eq "dict_") {
+		if (filename.substr(1, 5).lcase() eq "dict_")
 			dictfilename = "MD";
-		} else {
+		else
 			dictfilename = filename;
-		}
-		if (not mv.DICT.open("dict_"^dictfilename))
-			mv.DICT = dictmd;
+
+		if (not DICT.open("dict_"^dictfilename))
+			DICT = dictmd;
 		ss ^= " " ^ word;
 
 		//get any specific keys
@@ -533,7 +532,7 @@ phraseinit:
 	} else if (word eq "USING") {
 		gosub getword();
 		dictfilename = word;
-		if (!(mv.DICT.open("dict_"^dictfilename))) {
+		if (!(DICT.open("dict_"^dictfilename))) {
 			fsmsg();
 			abort("");
 		}
@@ -643,9 +642,8 @@ phraseinit:
 				totalflag = 0;
 				dictrec.replacer(12, 1);
 				anytotals = 1;
-			} else {
+			} else
 				dictrec.replacer(12, 0);
-			}
 
 			if (html) {
 				tt = dictrec.extract(7);
@@ -659,9 +657,9 @@ phraseinit:
 			coldict(coln) = dictrec;
 
 			//store the format in a convenient place
-			if (html) {
+			if (html)
 				tt = "";
-			} else {
+			else {
 				tt = coldict(coln).extract(9);
 				if (tt)
 					tt ^= "#" ^ coldict(coln).extract(10);
@@ -717,9 +715,9 @@ x1exit:
 	//if no columns selected then try to use default @crt or @lptr group item
 	if (!(coln or crtx)) {
 		word = "@LPTR";
-		if (mv.DICT and not xx.read(mv.DICT, word)) {
+		if (DICT and not xx.read(DICT, word)) {
 			word = "@CRT";
-			if (not xx.read(mv.DICT, word))
+			if (not xx.read(DICT, word))
 				word = "";
 		}
 		if (word) {
@@ -746,15 +744,15 @@ x1exit:
 
 		//set column 1 @ID
 		colname(1) = "@" "ID";
-		if (not mv.DICT or not coldict(1).read(mv.DICT, "@" "ID")) {
+		if (not DICT or not coldict(1).read(DICT, "@" "ID")) {
 			if (not dictmd or not coldict(1).read(dictmd, "@" "ID"))
 				coldict(1) = "F" ^ FM ^ "0" ^ FM ^ "Ref" ^ FM ^ FM ^ FM ^ FM ^ FM ^ FM ^ "L" ^ FM ^ 15;
 		}
-		if (html) {
+		if (html)
 			tt = "";
-		} else {
+		else
 			tt = coldict(1).extract(9) ^ "#" ^ coldict(1).extract(10);
-		}
+
 		coldict(1).replacer(11, tt);
 
 		//increment the list of breaking columns by one as well
@@ -774,6 +772,7 @@ x1exit:
 
 	if (breakcolns.substr(-1, 1) eq FM)
 		breakcolns.splicer(-1, 1, "");
+
 	if (breakoptions.substr(-1, 1) eq FM)
 		breakoptions.splicer(-1, 1, "");
 
@@ -850,10 +849,10 @@ x1exit:
 					//coltags:=' align="right"'
 					coltags ^= " style=\"text-align:right\"";
 					// end
-				} else if (align eq "T") {
+				} else if (align eq "T")
 					//coltags:=' align="left"'
 					coltags ^= " style=\"text-align:left\"";
-				}
+
 				if (usecols)
 					coltags ^= coldict(coln).extract(14);
 				coltags ^= " />";
@@ -868,14 +867,17 @@ x1exit:
 	//unless the keyword NO-BASE is present in which case replace with blank
 	//this is useful if all the columns are base and no need to see the currency
 
+	//c language family conditional assign is fairly commonly understood
+	//and arguably quite readable if the alternatives are simple
+	//compare to (if (nobase) ... " a little below
 	tt = html ? "" : "C#6";
+
 	var t2 = company.extract(3);
 	if (t2) {
-		if (nobase) {
+		if (nobase)
 			t2 = "";
-		} else {
+		else
 			t2 = "(" ^ t2 ^ ")";
-		}
 		colheading.swapper("(Base)", t2.oconv(tt));
 		colheading.swapper("%BASE%", company.extract(3));
 	}
@@ -885,7 +887,7 @@ x1exit:
 
 		tt = "";
 
-		getmark("CLIENT", html, clientmark);
+		call getmark("CLIENT", html, clientmark);
 		tt ^= clientmark;
 
 		tt ^= "<table border=\"1\" cellspacing=\"0\" cellpadding=\"2\"";
@@ -905,15 +907,8 @@ x1exit:
 		//allow for single quotes
 		colheading.swapper(SQ, "\'\'");
 
-	} else {
-		while (true) {
-
-			///BREAK;
-			if (!(colheading and var(" " ^ FM).index(colheading.substr(-1, 1), 1)))
-				break;
-			colheading.splicer(-1, 1, "");
-		}//loop;
-	}
+	} else
+		colheading.trimmerb(" "^FM);
 
 	//heading options
 
@@ -966,7 +961,7 @@ x1exit:
 		selectedok=filename.select(ss);
 
 	} else {
-		if (mv.LISTACTIVE)
+		if (LISTACTIVE)
 			selectedok=true;
 		else
 			selectedok=srcfile.select(ss);
@@ -975,7 +970,7 @@ x1exit:
 	if (not selectedok) {
 		//call msg2('','DB',buffer,'')
 		//if interactive else
-		mssg("No records found");
+		call mssg("No records found");
 
 		abort("");
 
@@ -988,7 +983,7 @@ x1exit:
 	} else {
 		recn = "";
 		lastid = "%EXODUS_%%%%%_NONE%";
-		process_all_records();
+		gosub process_all_records();
 	}
 
 //x2bexit:
@@ -1006,7 +1001,7 @@ x1exit:
 }
 
 //////////////////////////////
-function process_all_records()
+subroutine process_all_records()
 //////////////////////////////
 {
 
@@ -1020,9 +1015,9 @@ function process_all_records()
 				tx ^= "</tbody></table>";
 			tx ^= "*** incomplete - interrupted ***";
 			printer1.printtx(tx);
-			var().clearselect();
+			clearselect();
 			//goto x2bexit;
-			return false;
+			return;
 		}
 
 		//limit number of records (allow one more to avoid double closing since nrecs limited in select clause as well
@@ -1032,12 +1027,12 @@ function process_all_records()
 		//readnext key
 		mv.FILEERRORMODE = 1;
 		mv.FILEERROR = "";
-		if (not filename.readnext(mv.ID, mv.MV)) {
+		if (not filename.readnext(ID, MV)) {
 
 			mv.FILEERRORMODE = 0;
 			/* treat all errors as just "no more records"
 			if (_STATUS) {
-			tx = "*** Fatal Error " ^ mv.FILEERROR.extract(1) ^ " reading record " ^ mv.ID ^ " ***";
+			tx = "*** Fatal Error " ^ mv.FILEERROR.extract(1) ^ " reading record " ^ ID ^ " ***";
 			printer1.printtx(tx);
 			abort("");
 			}
@@ -1047,33 +1042,33 @@ function process_all_records()
 			abort("");
 			}
 			if (mv.FILEERROR and mv.FILEERROR.extract(1) not_eq 111) {
-			tx = "*** Error " ^ mv.FILEERROR.extract(1) ^ " reading record " ^ mv.ID ^ " ***";
+			tx = "*** Error " ^ mv.FILEERROR.extract(1) ^ " reading record " ^ ID ^ " ***";
 			printer1.printtx(tx);
 			readerr += 1;
 			abort("");
 			}
 			*/
 
-			return true;
+			return;
 		}
 
 		//skip record keys starting with "%" (control records)
-		if (mv.ID.substr(1, 1) eq "%")
+		if (ID.substr(1, 1) eq "%")
 			continue;
 
 		//read the actual record (TODO sb modify select statement to return the actual columns required)
 		//or skip if disappeared
-		if (!(mv.RECORD.read(srcfile, mv.ID)))
+		if (!(RECORD.read(srcfile, ID)))
 			continue;
 
 		//designed to filter multivalues which are not selected properly
 		//unless sorted "by"
 		if (limits) {
-			var nfns = mv.RECORD.count(FM) + 1;
+			var nfns = RECORD.count(FM) + 1;
 			//find maximum var number
 			var nvars = 1;
 			for (var fn = 1; fn <= nfns; fn++) {
-				temp = mv.RECORD.extract(fn);
+				temp = RECORD.extract(fn);
 				if (temp.length()) {
 					temp = temp.count(VM) + 1;
 					if (temp > nvars)
@@ -1082,7 +1077,7 @@ function process_all_records()
 			};//fn;
 			//for each limit pass through record deleting all unwanted multivalues
 			for (var limitn = 1; limitn <= nlimits; limitn++) {
-				var limitvals = var(limits.extract(1, limitn)).calculate();
+				var limitvals = calculate(var(limits.extract(1, limitn)));
 				for (var varx = nvars; varx >= 1; varx--) {
 					temp = limitvals.extract(1, varx);
 					if (temp eq "")
@@ -1090,9 +1085,9 @@ function process_all_records()
 					//locate temp in (limits<3,limitn>)<1,1> using sm setting x else
 					if (!(limits.extract(3, limitn).locateusing(temp, SVM, xx))) {
 						for (var fn = 1; fn <= nfns; fn++) {
-							var varalues = mv.RECORD.extract(fn);
+							var varalues = RECORD.extract(fn);
 							if (varalues.count(VM))
-								mv.RECORD.eraser(fn, varx, 0);
+								RECORD.eraser(fn, varx, 0);
 						};//fn;
 					}
 				};//varx;
@@ -1102,7 +1097,7 @@ function process_all_records()
 		recn += 1;
 
 		//process/output one record
-		process_one_record();
+		gosub process_one_record();
 
 	}//readnext
 
@@ -1126,7 +1121,7 @@ function process_all_records()
 	if (!detsupp)
 		tx ^= "<script type=\"text/javascript\"><!--" ^ FM ^ " togglendisplayed+=" ^ nblocks ^ FM ^ "--></script>";
 
-	return true;
+	return;
 }
 
 ///////////////////////////////
@@ -1134,6 +1129,7 @@ subroutine process_one_record()
 ///////////////////////////////
 {
 
+	//visible progress indicator
 	//var().getcursor();
 	//if (not mv.SYSTEM.extract(33)) {
 	//	print(mv.AW.extract(30), var().cursor(36, mv.CRTHIGH / 2));
@@ -1163,14 +1159,14 @@ subroutine process_one_record()
 		if (dictrec.extract(1) eq "F") {
 			fieldno=dictrec.extract(2);
 			if (not fieldno) {
-				cell=mv.ID;
+				cell=ID;
 				keypart=dictrec.extract(6);
 				if (keypart)
 					cell=cell.field(L'.',keypart);
 			} else
-				cell=mv.RECORD.extract(fieldno);
+				cell=RECORD.extract(fieldno);
 		} else {
-			cell="";
+			cell=calculate(colname(coln));
 		}
 
 		mcol(coln)=cell;
@@ -1451,7 +1447,7 @@ subroutine getwordexit()
 {
 
 	//standardise
-	if (mv.DICT ne "" and dictrec.read(mv.DICT, word)) {
+	if (DICT ne "" and dictrec.read(DICT, word)) {
 		if (dictrec.extract(1) eq "G") {
 			tt = dictrec.extract(3);
 			tt.converter(VM, " ");
@@ -1779,7 +1775,7 @@ function esctoexit()
 //all exodus programs need to finish up with "programexit"
 //in MV terms, this simply corresponds to the final END statement of a program except that it is mandatory.
 //in OO terms, this
-//1. defines a contructor that sets up the "mv" exodus global variable that provides mv.RECORD etc.
+//1. defines a contructor that sets up the "mv" exodus global variable that provides RECORD etc.
 //2. closes the class that programinit opened
 //3. sets up the required global main() function that will instantiate the class run its main() function
 

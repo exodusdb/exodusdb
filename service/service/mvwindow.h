@@ -3,8 +3,8 @@
 #define MVWINDOW_H_
 
 #include <vector>
-#include <exodus/mv.h>
-#include <exodus/mvenvironment.h>
+#include <exodus/exodus.h>
+//#include <exodus/mvenvironment.h>
 
 namespace exodus
 {
@@ -21,7 +21,7 @@ class MvWindow
 {
 public:
 
-    MvWindow(MvEnvironment& env): env(env)
+    MvWindow(MvEnvironment& mv): mv(mv)
     {
         //std::wcout<<L"ctor MvWindow::MvWindow(MvEnvironment& mv1)"<<std::endl;
     }
@@ -31,7 +31,7 @@ public:
         //std::wcout<<L"dtor MvWindow::MvWindow(MvEnvironment& mv1)"<<std::endl;
     }
 
-    MvEnvironment& env;
+    MvEnvironment& mv;
 
 	var srcfile;
 	var srcdict;
@@ -166,6 +166,8 @@ public:
 	var unkeys;
 	var labelcnt;
 	var registerx[10];
+
+	var calculate(const var& dictid) const;
 
     bool security(const var& mode);
     bool security2(const var& mode, const var& op0);

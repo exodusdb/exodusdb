@@ -20,6 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+/* to be replaced by ordinary external functions and subroutines
 
 //ensure the global libs are defined
 #define EXO_MVLIBS_CPP
@@ -236,3 +237,5 @@ var var::call(const wchar_t* libraryname, const char* functionname) const
 }
 
 } //of namespace exodus
+
+*/

@@ -1,4 +1,6 @@
 /* Copyright (c) 2007 Stephen John Bush - see LICENCE.TXT*/
+//to be converted to external subroutines
+#if 0
 //#include <windows.h>
 #include "Market.h"
 using namespace exodus;
@@ -193,3 +195,4 @@ L386:
 
 } // /:~
 */
+#endif

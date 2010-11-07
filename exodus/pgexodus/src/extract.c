@@ -13,7 +13,7 @@ extern "C" {
 //#define VM_ 'y'
 //#define SM_ 'z'
 
-void extract(char * instring, int inlength, int fieldn, int valuen, int subvaluen, int* outstart, int* outlength)
+void extract(char * instring, int inlength, int fieldno, int valueno, int subvalueno, int* outstart, int* outlength)
 {
 	int start_pos;
 	int fieldn2;
@@ -27,7 +27,7 @@ void extract(char * instring, int inlength, int fieldn, int valuen, int subvalue
 	
 	//any negatives at all returns "" but since this is unexpected
 	//do it inline instead of special case to avoid wasting time
-	//if (fieldn<0||valuen<0||subvaluen<0) return;
+	//if (fieldno<0||valueno<0||subvalueno<0) return;
 	
 	//FIND FIELD
 
@@ -36,10 +36,10 @@ void extract(char * instring, int inlength, int fieldn, int valuen, int subvalue
 	*outlength=0;
 
 	//zero means all, negative return ""
-	if (fieldn<=0)
+	if (fieldno<=0)
 	{
-		if (fieldn<0) return;
-		if (valuen||subvaluen) fieldn=1; else
+		if (fieldno<0) return;
+		if (valueno||subvalueno) fieldno=1; else
 		{
 			*outlength=inlength;
 			return;
@@ -50,7 +50,7 @@ void extract(char * instring, int inlength, int fieldn, int valuen, int subvalue
 	start_pos=0;
 	fieldn2=1;
 
-	while (fieldn2<fieldn)
+	while (fieldn2<fieldno)
 	{
 		for (;start_pos<inlength && instring[start_pos] != FM_ ; start_pos++){};
 		//past of of string?
@@ -66,10 +66,10 @@ void extract(char * instring, int inlength, int fieldn, int valuen, int subvalue
 	//FIND VALUE
 	
 	//zero means all, negative return ""
-	if (valuen<=0)
+	if (valueno<=0)
 	{
-		if (valuen<0) return;
-		if (subvaluen) valuen=1; else
+		if (valueno<0) return;
+		if (subvalueno) valueno=1; else
 		{
 			*outstart=start_pos;
 			*outlength=field_end_pos-start_pos;
@@ -80,7 +80,7 @@ void extract(char * instring, int inlength, int fieldn, int valuen, int subvalue
 	//find the starting position of the value or return ""
 	//using start_pos and end_pos of 
 	valuen2=1;
-	while (valuen2<valuen)
+	while (valuen2<valueno)
 	{
 		for (start_pos=start_pos;start_pos<inlength&&instring[start_pos]!=VM_;start_pos++){};
 		//past end of string?
@@ -99,9 +99,9 @@ void extract(char * instring, int inlength, int fieldn, int valuen, int subvalue
 	//FIND SUBVALUE
 	
 	//zero means all, negative means ""
-	if (subvaluen<=0)
+	if (subvalueno<=0)
 	{
-		if (subvaluen<0) return;
+		if (subvalueno<0) return;
 		*outstart=start_pos;
 		*outlength=value_end_pos-start_pos;
 	}
@@ -109,7 +109,7 @@ void extract(char * instring, int inlength, int fieldn, int valuen, int subvalue
 	//find the starting position of the subvalue or return ""
 	//using start_pos and end_pos of 
 	subvaluen2=1;
-	while (subvaluen2<subvaluen)
+	while (subvaluen2<subvalueno)
 	{
 		for (start_pos=start_pos;start_pos<field_end_pos&&instring[start_pos]!=SM_;start_pos++){};
 		//past end of string?
