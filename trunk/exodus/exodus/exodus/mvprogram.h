@@ -21,4 +21,4 @@ public:
 };
 
 }
-#endif MVPROGRAM_H
+#endif //MVPROGRAM_H

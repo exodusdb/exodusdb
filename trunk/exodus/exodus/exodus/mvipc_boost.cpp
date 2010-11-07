@@ -183,7 +183,7 @@ int MVipc(const int environmentn, var& pgconnparams)
 				#endif
 			}
 
-			respondToRequests(request_queue,response_queue);
+			respondToRequests(request_queue,response_queue,exodusfunctorbase);
 			
 			std::clog << "finished responding to queue " << requestqueuename<<std::endl;
 
