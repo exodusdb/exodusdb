@@ -206,4 +206,8 @@ typedef var& out;
 #define USER3 mv.USER3
 #define USER4 mv.USER4
 
+//there is a calculate in ExodusProgramBase which calls mv.calculate
+//but simple external functions are functions not based on ExodusFunctionBase
+#define calculate mv.calculate
+
 #endif //EXODUSMACROS_H

@@ -21,6 +21,19 @@ Hybrid:
 
     printl(xx.extract(6).field("/",2).oconv("D2")); 
 
+Comments about style:
+
+	1. Decided to stick with wordier "xx.extract(99)" instead exodus's "xx(99)" for now because
+		a. Exodus lack of xx<99> syntax makes it harder to understand what xx(99) means
+		*especially* because list also makes liberal use of dim arrays which have the same round brackets
+		b. It makes LIST marginally more portable into languages like java which are slightly less flexible syntaxwise
+	2. Using "int" instead of "var" for "for loop" index variables despite the fact that int doesnt always behave
+		precisely like pick integers, speed is important in this program and C++ allows us access to raw power when we need it.
+	3. Note the familiar "goto" statement which considerably eases porting of mv basic to Exodus.
+		Since the "goto" is banished from almost all other languages Exodus this can be a major point scorer for Exodus.
+		Note that Exodus's "goto" cannot jump over "var" statements or into/out of subroutines some code refactoring
+		may be still be required during porting.
+	
 /*
 usage
 
@@ -240,7 +253,7 @@ function main() {
 	//use <COL> for hiding non-totalled cols in det-supp (slow)
 	usecols = 0;
 
-	if (USER2.substr(2, 1) eq "C")
+	if (USER2[2] eq "C")
 		decimalchar = ",";
 	else
 		decimalchar = ".";
@@ -273,9 +286,9 @@ function main() {
 			dictrecs  =      "@ID   |F|0 |Id     |S|||||L|10";
 			dictrecs ^= FM ^ "TYPE  |F|1 |Type   |S|||||L|4";
 			dictrecs ^= FM ^ "FMC   |F|2 |Field  |S|||||R|3";
-			dictrecs ^= FM ^ "PART  |F|5 |Part   |S|||||R|2";
 			dictrecs ^= FM ^ "TITLE |F|3 |Title  |M|||||T|20";
 			dictrecs ^= FM ^ "SM    |F|4 |SM     |S|||||L|1";
+			dictrecs ^= FM ^ "PART  |F|5 |Part   |S|||||R|2";
 			dictrecs ^= FM ^ "CONV  |F|7 |Convert|S|||||T|20";
 			dictrecs ^= FM ^ "JUST  |F|9 |Justify|S|||||L|3";
 			dictrecs ^= FM ^ "LENGTH|F|10|Length |S|||||R|10";
@@ -283,7 +296,7 @@ function main() {
 			dictrecs ^= FM ^ "@CRT  |G|  |TYPE FMC PART TITLE SM CONV JUST LENGTH MASTER";
 
 			//write the dictionary records to the dictionary
-			var nrecs=count(dictrecs,FM)+1;
+			var nrecs=dictrecs.dcount(FM);
 			for (var recn = 1; recn <= nrecs; recn++) {
 				var dictrec=dictrecs.extract(recn);
 				while (dictrec.index(" |"))
@@ -303,9 +316,9 @@ function main() {
 	var thcolor = mv.SYSTEM.extract(46, 1);
 	var tdcolor = mv.SYSTEM.extract(46, 2);
 	var reportfont = mv.SYSTEM.extract(46, 3);
-	if (!tdcolor)
+	if (not tdcolor)
 		tdcolor = "#FFFFC0";
-	if (!thcolor)
+	if (not thcolor)
 		thcolor = "#FFFF80";
 
 	DICT = "";
@@ -325,7 +338,7 @@ function main() {
 	gtotreq = "";
 	nobase = "";
 
-	if (!(open("DICT_MD", dictmd)))
+	if (not open("DICT_MD", dictmd))
 		//stop("Cannot open DICT_MD");
 		dictmd="";
 
@@ -370,7 +383,7 @@ phraseinit:
 		ss ^= "SELECT";
 		//filename:
 		gosub getword();
-		if (!word)
+		if (not word)
 			abort("FILE NAME IS REQUIRED");
 
 		//limit number of records
@@ -401,7 +414,7 @@ phraseinit:
 		while (true) {
 
 			///BREAK;
-			if (!(nextword.isnum() or nextword.substr(1, 1) eq SQ or nextword.substr(1, 1) eq DQ))
+			if (not (nextword.isnum() or nextword[1] eq SQ or nextword[1] eq DQ))
 				break;
 
 			keylist = 1;
@@ -481,18 +494,16 @@ phraseinit:
 			while (true) {
 
 				///BREAK;
-				if (!(nextword not_eq "" and (nextword.isnum() or nextword.substr(1, 1) eq DQ or nextword.substr(1, 1) eq SQ)))
+				if ( not (nextword ne "" and (nextword.isnum() or nextword[1] eq DQ or nextword[1] eq SQ)))
 					break;
 
 				gosub getword();
 				ss ^= " " ^ word;
 				if (limit) {
-					if ((DQ ^ SQ).index(word.substr(1, 1), 1)) {
-						if (word.substr(1, 1) eq word.substr(-1, 1))
-							word = word.substr(2, word.length() - 2);
-					}
+					word.unquoter();
 					if (word eq "")
 						word = "\"\"";
+					//append a subvalue
 					limits.replacer(3, nlimits, -1, word);
 				}
 			}//loop;
@@ -532,7 +543,7 @@ phraseinit:
 	} else if (word eq "USING") {
 		gosub getword();
 		dictfilename = word;
-		if (!(DICT.open("dict_"^dictfilename))) {
+		if (not DICT.open("dict_"^dictfilename)) {
 			fsmsg();
 			abort("");
 		}
@@ -556,24 +567,23 @@ phraseinit:
 
 	//justlen
 	} else if (word eq "JUSTLEN") {
-		if (!coln) {
+		if (not coln) {
 			mssg("JUSTLEN/JL must follow a column name");
 			abort("");
 		}
 		gosub getword();
 		word.splicer(1, 1, "");
 		word.splicer(-1, 1, "");
-		coldict(int(coln)).replacer(9, word.substr(1, 1));
-		coldict(coln).replacer(10, word.substr(3, 9999));
+		coldict(int(coln)).replacer(9, word[1]);
+		coldict(coln).replacer(10, word[3]);
 		coldict(coln).replacer(11, word);
 
 	//colhead
 	} else if (word eq "COLHEAD") {
 		gosub getword();
 		//skip if detsupp2 and column is being skipped
-		if (!(coldict(coln).unassigned())) {
-			word.splicer(1, 1, "");
-			word.splicer(-1, 1, "");
+		if (coldict(coln).assigned()) {
+			word.unquoter();
 			word.converter("|", VM);
 			coldict(coln).replacer(3, word);
 		}
@@ -612,7 +622,7 @@ phraseinit:
 					gosub getword();
 					gosub getword();
 				}
-				if (!(totalflag or breakonflag))
+				if (not (totalflag or breakonflag))
 					goto dictrecexit;
 			}
 
@@ -620,7 +630,7 @@ phraseinit:
 			colname(coln) = word;
 
 			//increase column width if column title needs it
-			nn = (dictrec.extract(3)).count(VM) + 1;
+			nn = (dictrec.extract(3)).dcount(VM);
 			for (var ii = 1; ii <= nn; ii++) {
 				tt = dictrec.extract(3, ii);
 				var f10=dictrec.extract(10);
@@ -629,7 +639,7 @@ phraseinit:
 			};//ii;
 
 			if (detsupp < 2) {
-				if (!(totalflag or breakonflag)) {
+				if (not (totalflag or breakonflag)) {
 					tt = " id=\"BHEAD\"";
 					if (detsupp)
 						tt ^= " style=\"display:none\"";
@@ -671,7 +681,7 @@ phraseinit:
 			if (breakonflag) {
 				coldict(coln).replacer(13, 1);
 				breakonflag = 0;
-				if (nextword.substr(1, 1) eq DQ) {
+				if (nextword[1] eq DQ) {
 					gosub getword();
 					//zzz break options
 					if (word.index("B", 1))
@@ -713,7 +723,7 @@ dictrecexit:
 x1exit:
 ///////
 	//if no columns selected then try to use default @crt or @lptr group item
-	if (!(coln or crtx)) {
+	if (not (coln or crtx)) {
 		word = "@LPTR";
 		if (DICT and not xx.read(DICT, word)) {
 			word = "@CRT";
@@ -732,7 +742,7 @@ x1exit:
 	ncols = coln;
 
 	//insert the @id column
-	if (!idsupp) {
+	if (not idsupp) {
 
 		ncols += 1;
 
@@ -770,14 +780,14 @@ x1exit:
 		wcol(coln)=tt;
 	}
 
-	if (breakcolns.substr(-1, 1) eq FM)
+	if (breakcolns[-1] eq FM)
 		breakcolns.splicer(-1, 1, "");
 
-	if (breakoptions.substr(-1, 1) eq FM)
+	if (breakoptions[-1] eq FM)
 		breakoptions.splicer(-1, 1, "");
 
 	//make underline and column title underline
-	if (!html) {
+	if (not html) {
 		underline = "";
 		colunderline = "";
 		for (int coln = 1; coln <= ncols; coln++) {
@@ -803,7 +813,7 @@ x1exit:
 	if (filename.unassigned()||not filename)
 		stop("Filename not specified");
 
-	if (!(open(filename, srcfile)))
+	if (not open(filename, srcfile))
 		stop("Cannot open file " ^ filename);
 
 	//reserve breaks and set all to ""
@@ -833,7 +843,7 @@ x1exit:
 				//t='<th bgcolor=':thcolor
 				tt = "<th style=\"background-color:" ^ thcolor ^ DQ;
 				//if detsupp=1 then t:=coldict(coln)<14>
-				if (!usecols)
+				if (not usecols)
 					tt ^= coldict(coln).extract(14);
 				tt ^= ">" ^ coldict(coln).extract(3) ^ "</th>";
 				colheading.replacer(coln2, tt);
@@ -887,7 +897,7 @@ x1exit:
 
 		tt = "";
 
-		call getmark("CLIENT", html, clientmark);
+		gosub getmark("CLIENT", html, clientmark);
 		tt ^= clientmark;
 
 		tt ^= "<table border=\"1\" cellspacing=\"0\" cellpadding=\"2\"";
@@ -940,10 +950,10 @@ x1exit:
 
 	if (dblspc)
 		head ^= FM;
-	if (!html)
+	if (not html)
 		head ^= FM ^ colunderline;
 	head ^= FM ^ colheading;
-	if (!html)
+	if (not html)
 		head ^= FM ^ colunderline;
 	if (dblspc)
 		head ^= FM;
@@ -968,17 +978,17 @@ x1exit:
 	}
 
 	if (not selectedok) {
-		//call msg2('','DB',buffer,'')
-		//if interactive else
 		call mssg("No records found");
 
 		abort("");
 
-		if (html) {
+/*
+		if (html)
 			tx ^= "</tbody></table>";
-		}
+
 		tx ^= "No records listed";
 		printer1.printtx(tx);
+*/
 
 	} else {
 		recn = "";
@@ -1041,7 +1051,7 @@ subroutine process_all_records()
 			printer1.printtx(tx);
 			abort("");
 			}
-			if (mv.FILEERROR and mv.FILEERROR.extract(1) not_eq 111) {
+			if (mv.FILEERROR and mv.FILEERROR.extract(1) ne 111) {
 			tx = "*** Error " ^ mv.FILEERROR.extract(1) ^ " reading record " ^ ID ^ " ***";
 			printer1.printtx(tx);
 			readerr += 1;
@@ -1053,37 +1063,40 @@ subroutine process_all_records()
 		}
 
 		//skip record keys starting with "%" (control records)
-		if (ID.substr(1, 1) eq "%")
+		if (ID[1] eq "%")
 			continue;
 
 		//read the actual record (TODO sb modify select statement to return the actual columns required)
 		//or skip if disappeared
-		if (!(RECORD.read(srcfile, ID)))
+		if (not RECORD.read(srcfile, ID))
 			continue;
 
 		//designed to filter multivalues which are not selected properly
 		//unless sorted "by"
 		if (limits) {
-			var nfns = RECORD.count(FM) + 1;
+			var nfns = RECORD.dcount(FM);
 			//find maximum var number
 			var nvars = 1;
 			for (var fn = 1; fn <= nfns; fn++) {
 				temp = RECORD.extract(fn);
 				if (temp.length()) {
-					temp = temp.count(VM) + 1;
+					temp = temp.dcount(VM);
 					if (temp > nvars)
 						nvars = temp;
 				}
 			};//fn;
 			//for each limit pass through record deleting all unwanted multivalues
 			for (var limitn = 1; limitn <= nlimits; limitn++) {
+
+				//calculate() accesses data via dictionary keys
 				var limitvals = calculate(var(limits.extract(1, limitn)));
+
 				for (var varx = nvars; varx >= 1; varx--) {
 					temp = limitvals.extract(1, varx);
 					if (temp eq "")
 						temp = "\"\"";
 					//locate temp in (limits<3,limitn>)<1,1> using sm setting x else
-					if (!(limits.extract(3, limitn).locateusing(temp, SVM, xx))) {
+					if (not limits.extract(3, limitn).locateusing(temp, SVM, xx)) {
 						for (var fn = 1; fn <= nfns; fn++) {
 							var varalues = RECORD.extract(fn);
 							if (varalues.count(VM))
@@ -1113,12 +1126,12 @@ subroutine process_all_records()
 	if (html)
 		tx ^= "<p style=\"text-align:center\">";
 	tx ^= FM ^ recn + 0 ^ " record";
-	if (recn not_eq 1)
+	if (recn ne 1)
 		tx ^= "s";
 	if (html)
 		tx ^= "</p>";
 
-	if (!detsupp)
+	if (not detsupp)
 		tx ^= "<script type=\"text/javascript\"><!--" ^ FM ^ " togglendisplayed+=" ^ nblocks ^ FM ^ "--></script>";
 
 	return;
@@ -1145,29 +1158,9 @@ subroutine process_one_record()
 
 	//get the data from the record into an array of columns
 	for (int coln = 1; coln <= ncols; coln++) {
-		// @var=0
-		//if (coldict(coln).extract(9) eq "T" and not html) {
-		//	mcol(coln) = (var(colname(coln)).calculate()).oconv(coldict(coln).extract(11));
-		//call note(coln:'/':m.col(coln):'/':coldict(coln)<11>)
-		//call note(@record<coldict(coln)<2>)
-		//}else{
 
-		//calculate doesnt work (just yet)
-		//mcol(coln) = var(colname(coln)).calculate();
-
-		dictrec=coldict(coln);
-		if (dictrec.extract(1) eq "F") {
-			fieldno=dictrec.extract(2);
-			if (not fieldno) {
-				cell=ID;
-				keypart=dictrec.extract(6);
-				if (keypart)
-					cell=cell.field(L'.',keypart);
-			} else
-				cell=RECORD.extract(fieldno);
-		} else {
-			cell=calculate(colname(coln));
-		}
+		//calculate() accesses data via dictionary keys
+		cell=calculate(colname(coln));
 
 		mcol(coln)=cell;
 
@@ -1177,7 +1170,7 @@ subroutine process_one_record()
 		pcol(coln) = 1;
 		ccol(coln) = 7;
 		scol(coln) = mcol(coln);
-	};//coln;
+	}//coln;
 
 	//break subtotals
 
@@ -1188,12 +1181,12 @@ subroutine process_one_record()
 		breakleveln = nbreaks;
 	} else {
 		int coln;
-		var leveln;
+		int leveln;//used after loop so cant declare in the "for" statement
 		for (leveln = nbreaks; leveln >= 1; leveln--) {
 			coln = breakcolns.extract(leveln);
 
 			///BREAK;
-			if (scol(coln) not_eq breakvalue(coln))
+			if (scol(coln) ne breakvalue(coln))
 				break;
 
 		};//leveln;
@@ -1213,7 +1206,13 @@ subroutine process_one_record()
 		newmarklevel = 0;
 		for (int coln = 1; coln <= ncols; coln++) {
 			if (ccol(coln) >= previousmarklevel) {
+
+				//"remove" is a rarely used pick function that extracts text from a given character
+				//number up to the next pick field, value, subvalue or other separator character.
+				//It doesnt actually "remove" any text but it does also move the pointer up
+				//ready for the next extraction and tells you what the next separator character is
 				icol(coln)=mcol(coln).remove(pcol(coln), ccol(coln));
+
 				scol(coln) = icol(coln);
 			}
 			if (ccol(coln) > newmarklevel)
@@ -1283,7 +1282,7 @@ subroutine process_one_record()
 
 					//prevent html folding of numbers on minus sign
 					if (html) {
-						if (tt.substr(1, 1) eq "-") {
+						if (tt[1] eq "-") {
 							if (oconvx.substr(1, 7) eq "[NUMBER")
 								tt = "<nobr>" ^ tt ^ "</nobr>";
 						}
@@ -1294,7 +1293,7 @@ subroutine process_one_record()
 				if (wcol(coln)) {
 
 					//non-html format to fixed with with spaces
-					if (!html)
+					if (not html)
 						tt = tt.oconv(coldict(coln).extract(11));
 
 					//html blank is nbsp
@@ -1364,10 +1363,10 @@ subroutine getword()
 
 	// call note(quote(word):' ':quote(nextword))
 
-	if (not quotes.index(word.substr(1,1)))
+	if (not quotes.index(word[1]))
 		word.ucaser();
 
-	if (not quotes.index(nextword.substr(1,1)))
+	if (not quotes.index(nextword[1]))
 		nextword.ucaser();
 
 	return;
@@ -1392,7 +1391,7 @@ subroutine getword2()
 		while (true) {
 
 			///BREAK;
-			if (!(sentencex.substr(charn, 1) eq " "))
+			if (sentencex[charn] ne " ")
 				break;
 			charn += 1;
 			if (charn > sentencex.length())
@@ -1400,7 +1399,7 @@ subroutine getword2()
 		}//loop;
 
 		startcharn = charn;
-		var charx = sentencex.substr(charn, 1);
+		var charx = sentencex[charn];
 
 		if (var(SQ ^ DQ).index(charx, 1)) {
 			searchchar = charx;
@@ -1411,7 +1410,7 @@ subroutine getword2()
 
 		while (true) {
 			charn += 1;
-			charx = sentencex.substr(charn, 1);
+			charx = sentencex[charn];
 
 			///BREAK;
 			if (charx eq "" or charx eq searchchar)
@@ -1420,7 +1419,7 @@ subroutine getword2()
 			word ^= charx;
 		}
 
-		if (searchchar not_eq " ") {
+		if (searchchar ne " ") {
 			word ^= searchchar;
 			charn += 1;
 		} else {
@@ -1429,7 +1428,7 @@ subroutine getword2()
 		}
 
 		//options
-		if (word.substr(1, 1) eq "(" and word.substr(-1, 1) eq ")") {
+		if (word[1] eq "(" and word[-1] eq ")") {
 			var commandoptions = word;
 			continue;
 		}
@@ -1501,7 +1500,7 @@ subroutine printbreaks()
 ////////////////////////
 {
 
-	if (!breakleveln)
+	if (not breakleveln)
 		return;
 
 	var newhead = "";
@@ -1523,16 +1522,16 @@ subroutine printbreaks()
 		var lastblockn = blockn;
 		blockn = 0;
 		if (detsupp) {
-			if (tx and tx.substr(-1, 1) not_eq FM)
+			if (tx and tx[-1] ne FM)
 				tx ^= FM;
 			if (leveln > 1 and not html)
 				tx ^= underline ^ FM;
 		} else {
-			if (!html) {
+			if (not html) {
 				//underline2=if breakleveln>=nbreaks then bar else underline
 				underline2 = (leveln eq 1) ? (underline) : (bar);
-				if (!((tx.substr(-2, 2)).index("-", 1))) {
-					if (tx.substr(-1, 1) not_eq FM)
+				if (not tx.substr(-2, 2).index("-", 1)) {
+					if (tx[-1] ne FM)
 						tx ^= FM;
 					tx ^= underline2;
 				}
@@ -1561,7 +1560,7 @@ subroutine printbreaks()
 					if (cell) {
 						if (html) {
 							//breaktotal(coln,leveln+1)+=cell
-							addunits(cell, breaktotal(coln,leveln + 1));
+							gosub addunits(cell, breaktotal(coln,leveln + 1));
 						} else {
 							if ((breaktotal(coln,leveln + 1)).isnum() and cell.isnum()) {
 								breaktotal(coln,leveln + 1) += cell;
@@ -1631,13 +1630,13 @@ subroutine printbreaks()
 			}
 
 			if (wcol(coln)) {
-				if (!html) {
+				if (not html) {
 					cell = cell.substr(1, wcol(coln));
 					cell = cell.oconv(coldict(coln).extract(11));
 					tx ^= cell ^ tdx;
 				} else {
 					tx ^= "<td";
-					if (!usecols)
+					if (not usecols)
 						tx ^= coldict(coln).extract(14);
 					if (coldict(coln).extract(9) eq "R")
 						tx ^= " style=\"text-align:right\"";
@@ -1656,7 +1655,7 @@ subroutine printbreaks()
 			if (leveln > 1 and not html)
 				tx ^= FM ^ underline;
 		} else {
-			if (!html)
+			if (not html)
 				tx ^= FM ^ underline2;
 		}
 
@@ -1677,8 +1676,8 @@ subroutine printbreaks()
 	//if recn>1 then
 	//if only one record found then avoid skipping printing totals for det-supp
 	if (detsupp < 2 or recn > 1) {
-		if (!html) {
-			if (!anytotals)
+		if (not html) {
+			if (not anytotals)
 				tx = bar;
 		}
 
@@ -1709,9 +1708,9 @@ subroutine addstr()
 	if (str3.length() < str1.length())
 		str3 ^= space(str1.length() - str2.length());
 	for (var ii = 1; ii <= str1.length(); ii++) {
-		var char1 = str1.substr(ii, 1).trim();
-		if (char1 not_eq "") {
-			var char2 = str3.substr(ii, 1);
+		var char1 = str1[ii].trim();
+		if (char1 ne "") {
+			var char2 = str3[ii];
 			if (char2 eq " ") {
 				str3.splicer(ii, 1, char1);
 			} else {
@@ -1721,9 +1720,8 @@ subroutine addstr()
 					char3 = char1 + char2;
 					if (char3 > 9)
 						char3 = "*";
-				} else {
+				} else
 					char3 = char1;
-				}
 				str3.splicer(ii, 1, char3);
 			}
 		}

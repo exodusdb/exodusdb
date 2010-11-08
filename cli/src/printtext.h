@@ -209,7 +209,7 @@ private:
 				if (style)
 					css.swapper("</style>", style ^ "</style>");
 				var htmltitle = (headx.extract(1)).field("\'", 1, 1);
-				if (htmltitle.substr(1, 1) == "<")
+				if (htmltitle[1] == "<")
 					htmltitle = (htmltitle.field(">", 2, 1)).field("<", 1, 1);
 				tx.splicer(1, 0, "<html><head><title>" ^ htmltitle ^ "</title>" ^ FM ^ css ^ "</head><body style=\"background-color:#ffffff\"><div style=\"text-align:center\">" ^ (var().chr(13) ^ var().chr(10)));
 				tx.splicer(1, 0, "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">");

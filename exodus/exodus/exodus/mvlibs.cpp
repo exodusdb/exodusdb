@@ -1,3 +1,5 @@
+//functionality replaced by mvfunctor - scheduled for deletion
+#if 0
 /*
 Copyright (c) 2009 Stephen John Bush
 
@@ -239,3 +241,4 @@ var var::call(const wchar_t* libraryname, const char* functionname) const
 } //of namespace exodus
 
 */
+#endif

@@ -255,19 +255,19 @@ function main()
 	//if (not deletedb("steve",errmsg))
 	//	errmsg.outputl();
 
-	deletefile("USERS2");
-	deletefile("dict_USERS2");
+	deletefile("USERS");
+	deletefile("dict_USERS");
 
-	createfile("USERS2");
-	createfile("DICT_USERS2");
+	createfile("USERS");
+	createfile("DICT_USERS");
 
-	write("S"^FM^FM^"Age"^FM^FM^FM^FM^FM^FM^"R"^FM^"10","DICT_USERS2","AGE");
-	write("S"^FM^FM^"Days"^FM^FM^FM^FM^FM^FM^"R"^FM^"10","DICT_USERS2","DAYS");
+	write("S"^FM^FM^"Age in Days"^FM^FM^FM^FM^FM^FM^"R"^FM^"10","DICT_USERS","AGE_IN_DAYS");
+	write("S"^FM^FM^"Age in Years"^FM^FM^FM^FM^FM^FM^"R"^FM^"10","DICT_USERS","AGE_IN_YEARS");
 
-	write("1","USERS2","1");
-	write("2","USERS2","2");
+	write("1","USERS","1");
+	write("2","USERS","2");
 
-	if (not selectrecord("SELECT USERS2 WITH AGE GE 0 AND WITH DAYS GE 0"))
+	if (not selectrecord("SELECT USERS WITH AGE_IN_DAYS GE 0 AND WITH AGE_IN_YEARS GE 0"))
 		printl("Failed to Select");
 
 	DICT="dict_USERS";
@@ -276,8 +276,8 @@ function main()
 		printl("ID=",ID);
 		printl("RECORD=",RECORD);
 
-		printl("AGE=",calculate("AGE"));
-		printl("DAYS=",calculate("DAYS"));
+		printl("AGE IN DAYS=",calculate("AGE_IN_DAYS"));
+		printl("AGE IN YEARS=",calculate("AGE_IN_YEARS"));
 	}
 
 	var spac1="  xxx  xxx  ";

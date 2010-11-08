@@ -120,6 +120,9 @@ bool MvEnvironment::init(const var& threadno)
 	cache_dictid_="";
 	this->DICT="";
 
+	//skip connecting to database and move that to another init if necessary.
+	return true;
+
 	//openqm connection
 	//std::wcout<<L"Connecting DB ... "<<std::flush;
 	//if (!this->SESSION.connect(L"127.0.0.1","4243","steve","stetempp","QMSYS"))
@@ -351,7 +354,7 @@ var MvEnvironment::capitalise(const var& str0, const var& mode0, const var& word
 		string2 = str0;
 		//convert @upper.case to @lower.case in string2
 		int nn = string2.length();
-		var numx = var(L"1234567890").index(string2.substr(1, 1), 1);
+		var numx = var(L"1234567890").index(string2[1], 1);
 		var cap = 1;
 		var wordseps;
 		var inquotes = 0;
@@ -747,7 +750,7 @@ bool MvEnvironment::openfile(const var& filename0, var& file) const
 	var filename=filename0;
 	var xx;
 	
-	var nomsg = filename.substr(1, 1) == L"*";
+	var nomsg = filename[1] == L"*";
 	if (nomsg)
 		filename.splicer(1, 1, L"");
 open:
@@ -1021,7 +1024,7 @@ bool MvEnvironment::authorised(const var& task0, var& msg, const var& defaultloc
 
 	//if @username='neosys' or @username='steve' then call msg(task:'')
 
-	if (task.substr(1, 1) == L" ")
+	if (task[1] == L" ")
 		mssg(task.quote());
 	//each task may have many "locks", each users may have many "keys"
 	//a user must have keys to all the locks in order to pass
@@ -1044,21 +1047,21 @@ bool MvEnvironment::authorised(const var& task0, var& msg, const var& defaultloc
 		return 1;
 	}
 
-	noadd = task.substr(1, 1) == L"!";
+	noadd = task[1] == L"!";
 	if (noadd)
 		task.splicer(1, 1, L"");
 	//if noadd else noadd=((task[-1,1]='"') and (len(userprivs)<10000))
 	if (!noadd) {
 		var lenuserprivs = this->SECURITY.length();
-		noadd = task.substr(-1, 1) == DQ || lenuserprivs > 48000;
+		noadd = task[-1] == DQ || lenuserprivs > 48000;
 	}
-	positive = task.substr(1, 1) == L"#";
+	positive = task[1] == L"#";
 	if (positive)
 		task.splicer(1, 1, L"");
 
 	//? as first character of task (after positive) means
 	//security is being used as a configuration and user neosys has no special privs
-	if (task.substr(1, 1) == L"?") {
+	if (task[1] == L"?") {
 		isneosys = 0;
 		task.splicer(1, 1, L"");
 	}else{
@@ -1261,7 +1264,7 @@ var MvEnvironment::singular(const var& pluralnoun)
 
 	}else{
 
-		if (temp.substr(-1, 1) == L"S") {
+		if (temp[-1] == L"S") {
 			//analysis, dos
 			if (temp.substr(-2, 2) != L"IS" && temp.substr(-2, 2) != L"OS")
 				temp.splicer(-1, 1, L"");
@@ -1490,7 +1493,7 @@ var MvEnvironment::encrypt2(const var& encrypt0) const
 	while (true) {
 	//BREAK;
 	if (!(encrypt != L"")) break;;
-		encryptkey = (encryptkey % 390001) * (encrypt.substr(1, 1)).seq() + 1;
+		encryptkey = (encryptkey % 390001) * (encrypt[1]).seq() + 1;
 		encrypt.splicer(1, 1, L"");
 	}//loop;
 

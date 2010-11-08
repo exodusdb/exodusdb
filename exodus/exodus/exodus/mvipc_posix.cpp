@@ -155,6 +155,7 @@ int MVipc(const int environmentn, var& pgconnparams)
 		std::clog<<"MVipc() Using a standalone MvEnvironment"<<std::endl;
 #endif
 		mv=&standalone_mv;
+		mv->init(environmentn);
 	}
 	ExodusFunctorBase exodusfunctorbase(*mv);
 

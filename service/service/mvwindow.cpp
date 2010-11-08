@@ -1167,10 +1167,4 @@ exit:
 
 }
 
-inline
-var MvWindow::calculate(const var& dictid) const
-{
-	return mv.calculate(dictid);
-}
-
 }
