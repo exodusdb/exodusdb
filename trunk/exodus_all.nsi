@@ -355,8 +355,8 @@ FunctionEnd
 ;--------------------------------
 ;General
 
-  Name "Exodus 10.10.9"
-  Outfile "exodus-10.10.9.exe"
+  Name "Exodus 10.10.11"
+  Outfile "exodus-10.10.11.exe"
   InstallDir "$PROGRAMFILES\exodus\10.10"
   
   ;Get installation folder from registry if available
@@ -438,6 +438,8 @@ Section "All" SecAll
   File exodus\exodus\exodus\mv*.h
   File exodus\exodus\exodus\exodus*.h
   File exodus\exodus\exodus\program.h
+  File exodus\exodus\exodus\mvprogram.h
+  File exodus\exodus\exodus\dict.h
   File exodus\exodus\exodus\library.h
   File exodus\exodus\exodus\xfunctor*.h
 
@@ -520,6 +522,8 @@ Section "Uninstall"
   Delete "$INSTDIR\include\exodus\mv*.h"
   Delete "$INSTDIR\include\exodus\exodus*.h"
   Delete "$INSTDIR\include\exodus\program.h"
+  Delete "$INSTDIR\include\exodus\dict.h"
+  Delete "$INSTDIR\include\exodus\mvprogram.h"
   Delete "$INSTDIR\include\exodus\library.h"
   Delete "$INSTDIR\include\exodus\xfunctor*.h"
   RMDir "$INSTDIR\include\exodus"

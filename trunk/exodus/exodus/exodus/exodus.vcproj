@@ -397,6 +397,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\dict.h"
+				>
+			</File>
+			<File
 				RelativePath=".\exodus.h"
 				>
 			</File>

@@ -126,9 +126,14 @@ int MVipc(const int environmentn, var& pgconnparams)
 	//*COPY in mvipc_posix.cpp mvipc_boost.cpp mvipc_win.cpp
 	MvEnvironment standalone_mv;
 	MvEnvironment* mv=global_environments[environmentn];
+	if (not mv)
+	{
 #if TRACING >= 2
 		std::clog<<"MVipc() Using a standalone MvEnvironment"<<std::endl;
 #endif
+		mv=&standalone_mv;
+		mv->init(environmentn);
+	}
 	ExodusFunctorBase exodusfunctorbase(*mv);
 	
 	//"\\\\.\\pipe\\exoduspipexyz"

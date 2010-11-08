@@ -663,12 +663,14 @@ var& var::unquoter()
 	if (!len)
 		return *this;
 
+	wchar_t char0=var_mvstr[0];
+
 	//no change if not starting " or '
-	if (var_mvstr[0]!='\"' && var_mvstr[0]!='\'')
+	if (char0!=L'\"' && char0!=L'\'')
 		return *this;
 
 	//no change if terminating character ne starting character
-	if (var_mvstr[len-1]!=var_mvstr[0])
+	if (var_mvstr[len-1]!=char0)
 		return *this;
 
 	//erase first (and last character if more than one)

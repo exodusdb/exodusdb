@@ -2471,7 +2471,7 @@ nextdict:
 
 		//sql^=crlf;
 
-		var ismv = dict.extract(4).substr(1, 1) == "M";
+		var ismv = dict.extract(4)[1] == "M";
 		if (ismv) {
 			anyvar = 1;
 			extractvarno = "lineno";
@@ -2501,7 +2501,7 @@ nextdict:
 		if (conversion.substr(1, 9) == "[DATETIME") {
 			expression.swapper("exodus_extract_text(", "exodus_extract_datetime(");
 
-		}else if (conversion.substr(1, 1) == "D" or conversion.substr(1, 5) == "[DATE") {
+		}else if (conversion[1] == "D" or conversion.substr(1, 5) == "[DATE") {
 			//expression[1,0]="date '1967-12-31' + cast("
 			//expression:=' as integer)'
 			expression.swapper("exodus_extract_text(", "exodus_extract_date(");
@@ -2546,7 +2546,7 @@ nextdict:
 
 	if (nsvs) {
 		sql.trimmerb();
-		if (sql.substr(-1, 1) == ",")
+		if (sql[-1] == ",")
 			sql.splicer(-1, 1, "");
 	}else{
 		sql ^= " *";
@@ -2554,7 +2554,7 @@ nextdict:
 
 	if (nvars) {
 		sql2.trimmerb();
-		if (sql2.substr(-1, 1) == ",")
+		if (sql2[-1] == ",")
 			sql2.splicer(-1, 1, "");
 	}
 

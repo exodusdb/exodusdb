@@ -1,3 +1,5 @@
+//functionality replaced by mvfunctor - scheduled for deletion
+#if 0
 /*
 
 NOTE: Do *not* add #ifndef header protector since this file is designed to be included more than once
@@ -104,3 +106,4 @@ EXODUSFUNCTORCLASSNAME EXODUSFUNCNAME0(EXODUSLIBNAME,EXODUSFUNCNAME);
 #undef EXODUSCLASSNAME
 
 }//namespace exodus
+#endif

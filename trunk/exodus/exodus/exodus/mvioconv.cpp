@@ -261,7 +261,7 @@ var var::oconv_T(const var& format) const
 
 	//expecting only "T#99" with no mask at the moment
 
-	var just = (format.field(L"#", 1, 1)).substr(1, 1);
+	var just = (format.field(L"#", 1, 1))[1];
 
 	var width2 = format.field(L"#", 2, 1);
 
@@ -557,7 +557,7 @@ var var::oconv_LR(const var& format) const
 	//and implement full mask options eg L#2-#3-#4 etc
 
 	var varwidth = format.field(L"#", 2, 1);
-	var just = (format.field(L"#", 1, 1)).substr(1, 1);
+	var just = (format.field(L"#", 1, 1))[1];
 
 	if (!varwidth.isnum())
 		return *this;

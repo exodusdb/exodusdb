@@ -1,3 +1,5 @@
+//functionality replaced by mvfunctor - scheduled for deletion
+#if 0
 /*
 Copyright (c) 2009 Stephen John Bush
 
@@ -109,3 +111,4 @@ MvLibs mvlibs;
 } //namespace exodus
 
 #endif /*MVLIBS_H*/
+#endif

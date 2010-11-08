@@ -167,7 +167,7 @@ public:
 	var labelcnt;
 	var registerx[10];
 
-	var calculate(const var& dictid) const;
+	//var calculate(const var& dictid) const;
 
     bool security(const var& mode);
     bool security2(const var& mode, const var& op0);
