@@ -1297,7 +1297,7 @@ const var SLASH = L"/";
 //perhaps make a version of ucase/lcase that
 //receives an MvEnvironment in the parameters.
 //CF LOWERCASE which is
-const var _LOWER_CASE=L"abcdefghijklmnopqrstuvwxyz";
+const var LOWER_CASE=L"abcdefghijklmnopqrstuvwxyz";
 const var _UPPER_CASE=L"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 #ifndef EXO_MV_CPP
