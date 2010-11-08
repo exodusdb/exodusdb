@@ -1352,6 +1352,14 @@ DLL_PUBLIC exodus::var SENTENCE=L"";
 #endif
 */
 
+//this is left a global copy for backtrace to get at it
+#ifndef EXO_MV_CPP
+extern
+DLL_PUBLIC exodus::var EXECPATH2;
+#else
+DLL_PUBLIC exodus::var EXECPATH2=L"";
+#endif
+
 void DLL_PUBLIC output(const var& mv1);
 void DLL_PUBLIC outputl(const var& mv1=L"");
 void DLL_PUBLIC outputt(const var& mv1=L"");
