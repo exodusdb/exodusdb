@@ -108,8 +108,8 @@ THE SOFTWARE.
 #include <exodus/mvexceptions.h>
 
 //#if TRACING >= 5
-#define DEBUG_LOG_SQL if (_DBTRACE) {exodus::errputl(L"SQL:" ^ var(sql));}
-#define DEBUG_LOG_SQL1 if (_DBTRACE) {exodus::errputl(L"SQL:" ^ var(sql).swap(L"$1",var(paramValues[0])));}
+#define DEBUG_LOG_SQL if (DBTRACE) {exodus::errputl(L"SQL:" ^ var(sql));}
+#define DEBUG_LOG_SQL1 if (DBTRACE) {exodus::errputl(L"SQL:" ^ var(sql).swap(L"$1",var(paramValues[0])));}
 //#else
 //#define DEBUG_LOG_SQL
 //#define DEBUG_LOG_SQL1
@@ -265,9 +265,9 @@ bool var::connect(const var& conninfo)
 		var configfilename=L"";
 		var home=L"";
 		if (home.osgetenv(L"HOME"))
-			configfilename=home^_SLASH^L".exodus";
+			configfilename=home^SLASH^L".exodus";
 		else if (home.osgetenv(L"USERPROFILE"))
-			configfilename^=home^_SLASH^L".exodus";
+			configfilename^=home^SLASH^L".exodus";
 		var configconn=L"";
 		if (!configconn.osread(configfilename))
 			configconn.osread(".exodus");
@@ -799,7 +799,7 @@ bool var::sqlexec(var& errmsg) const
 	}
 
 	//DEBUG_LOG_SQL
-	if (_DBTRACE) {exodus::errputl(L"SQL:" ^ *this);}
+	if (DBTRACE) {exodus::errputl(L"SQL:" ^ *this);}
 
 	//will contain any result IF successful
 	//MUST do PQclear(local_result) after using it;

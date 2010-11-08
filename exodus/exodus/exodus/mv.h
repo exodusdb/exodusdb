@@ -1270,21 +1270,26 @@ private:
 //must be after class declaration
 static const var IM = L"\xFF";
 static const var RM = L"\xFF";
+
 static const var AM = L"\xFE";
 static const var FM = L"\xFE";
+
 static const var VM = L"\xFD";
+
 static const var SM = L"\xFC";
 static const var SVM = L"\xFC";
+
 static const var TM = L"\xFB";
 static const var STM = L"\xFA";
 static const var SSTM = L"\xF9";
+
 static const var DQ = L"\"";
 static const var SQ = L"'";
 
 #if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
-const var _SLASH = L"\\";
+const var SLASH = L"\\";
 #else
-const var _SLASH = L"/";
+const var SLASH = L"/";
 #endif
 
 //being global const means that ucase() and lcase()
@@ -1295,51 +1300,57 @@ const var _SLASH = L"/";
 const var _LOWER_CASE=L"abcdefghijklmnopqrstuvwxyz";
 const var _UPPER_CASE=L"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-//this is not thread safe since it is at global scope and should be per thread
 #ifndef EXO_MV_CPP
 extern
+DLL_PUBLIC int DBTRACE;
 #else
+DLL_PUBLIC int DBTRACE=false;
 #endif
-DLL_PUBLIC
-var _STATUS;
+
+//following are all not thread safe since they are at global scope and not const
+//perhaps they should be moved on to MvEnvironment mv
+//and disallow their use except in ExodusPrograms ie not in plain functions
+//dict functions have mv provided by arguments
+/*
 
 #ifndef EXO_MV_CPP
 extern
+DLL_PUBLIC var _STATUS;
 #else
+DLL_PUBLIC var _STATUS=L"";
 #endif
-DLL_PUBLIC
-int _DBTRACE;
 
 #ifndef EXO_MV_CPP
 extern
+DLL_PUBLIC exodus::var EXECPATH;
 #else
+DLL_PUBLIC exodus::var EXECPATH=L"";
 #endif
-DLL_PUBLIC
-exodus::var _EXECPATH;
 
 //FM separated words or quoted phrases from command line. quote marks are retained.
-//trailing options in () or {} are stripped off and available in _OPTIONS
+//trailing options in () or {} are stripped off and available in OPTIONS
 #ifndef EXO_MV_CPP
 extern
+DLL_PUBLIC exodus::var COMMAND;
 #else
+DLL_PUBLIC exodus::var COMMAND="";
 #endif
-DLL_PUBLIC
-exodus::var _COMMAND;
 
 #ifndef EXO_MV_CPP
 extern
+DLL_PUBLIC exodus::var OPTIONS;
 #else
+DLL_PUBLIC exodus::var OPTIONS=L"";
 #endif
-DLL_PUBLIC
-exodus::var _OPTIONS;
 
-//deprecated and replaced by _COMMAND and _OPTIONS
+//see also COMMAND and OPTIONS
 #ifndef EXO_MV_CPP
 extern
+DLL_PUBLIC exodus::var SENTENCE;
 #else
+DLL_PUBLIC exodus::var SENTENCE=L"";
 #endif
-DLL_PUBLIC
-exodus::var _SENTENCE;
+*/
 
 void DLL_PUBLIC output(const var& mv1);
 void DLL_PUBLIC outputl(const var& mv1=L"");

@@ -3,12 +3,12 @@
 program()
 {
 
-        var filename=_COMMAND.extract(2);
+        var filename=COMMAND.extract(2);
 
-        var itemids=erase(_COMMAND,1,0,0);
+        var itemids=erase(COMMAND,1,0,0);
         eraser(itemids,1,0,0);
 
-        var silent=index(ucase(_OPTIONS),"S");
+        var silent=index(ucase(OPTIONS),"S");
 
         if (not filename or not itemids)
                 abort("Syntax is 'delete filename itemid ... (S=Silent)'");

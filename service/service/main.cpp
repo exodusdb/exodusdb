@@ -616,7 +616,7 @@ while trying to match the argument list '(exodus::var, bool)'
 	//just convert it to the better
 	var log4=dcount(log1,"x");
 
-	printl(_SENTENCE);
+	printl(SENTENCE);
 	var("xyz").substr(4,1).outputl();
 
 	//TODO ensure isnum converts ints larger that the maximum int to FLOATS

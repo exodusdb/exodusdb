@@ -3,8 +3,8 @@
 program()
 {
 
-        var filenames=_COMMAND.field(FM,2,999999);
-        var silent=index(ucase(_OPTIONS),"S");
+        var filenames=COMMAND.field(FM,2,999999);
+        var silent=index(ucase(OPTIONS),"S");
 
         if (not filenames)
                 stop("Syntax is createfile filename filename ...\ndict files are named dict_filename");

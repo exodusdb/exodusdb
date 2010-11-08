@@ -164,16 +164,16 @@ program()
         //second from environment
 		//TODO should be per parameter
         var temp;
-        if (temp.osgetenv(L"EXODUS_CONNECTION"))
+        if (temp.osgetenv("EXODUS_CONNECTION"))
                 oldconn^=" "^temp;
 
         //third from config file
 		//should be same logic in mvdbpostgres and configexodus
 		var configfilename="";
-		if (_SLASH eq "\\")
-			configfilename=osgetenv("USERPROFILE")^_SLASH^".exodus";
+		if (SLASH eq "\\")
+			configfilename=osgetenv("USERPROFILE")^SLASH^".exodus";
 		else
-			configfilename=osgetenv("HOME")^_SLASH^".exodus";
+			configfilename=osgetenv("HOME")^SLASH^".exodus";
         if (temp.osread(configfilename))
                 oldconn^=" "^temp;
 

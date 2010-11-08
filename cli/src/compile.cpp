@@ -26,7 +26,7 @@ function getparam(in result, in paramname, out paramvalue)
 program()
 {
 
-        var command=_COMMAND;
+        var command=COMMAND;
 
         //we use on demand/jit linking using dlopen/dlsym
         var loadtimelinking=false;
@@ -34,8 +34,8 @@ program()
         var usedeffile=false;
 
         //extract options
-        var verbose=index(_OPTIONS.ucase(),"V");
-        var debugging=not index(_OPTIONS.ucase(),"O");
+        var verbose=index(OPTIONS.ucase(),"V");
+        var debugging=not index(OPTIONS.ucase(),"O");
 //	verbose=1;
 
         //extract filenames
@@ -66,7 +66,7 @@ program()
 
         //hard coded compiler options at the moment
         //assume msvc (cl) on windows and g++ otherwise
-        if (_SLASH=="/") {
+        if (SLASH=="/") {
                 if (verbose)
                         printl("Posix environment detected. Assuming standard C++ compiler g++");
 
@@ -188,8 +188,8 @@ program()
 
                 //call VSvars32 to get the path, include and lib
                 if (msvs) {
-                        if (msvs.substr(-1) ne _SLASH)
-                                msvs^=_SLASH;
+                        if (msvs.substr(-1) ne SLASH)
+                                msvs^=SLASH;
                         //get lib/path/include from batch file
                         var tempfilenamebase="comp$" ^rnd(99999999);
                         var script="call " ^ (msvs ^ "vsvars32").quote();
@@ -232,16 +232,16 @@ program()
 				//EXODUS_PATH is the parent directory of bin and include etc.
 				//compile needs to locate the include and lib directories
 
-                var ndeep=dcount(_EXECPATH,_SLASH);
+                var ndeep=dcount(EXECPATH,SLASH);
                 var exoduspath="";
 				//first guess is the parent directory of the executing command
 				//on the grounds that compile.exe is in EXODUS_PATH/bin
                 if (ndeep>2)
-                        exoduspath=_EXECPATH.field(_SLASH,1,ndeep-2);
+                        exoduspath=EXECPATH.field(SLASH,1,ndeep-2);
                 var searched="";
 
 				//check if EXODUS_PATH\bin\exodus.dll exists
-				if (not exoduspath or not (osfile(exoduspath^_SLASH^"bin\\exodus.dll") or osfile(exoduspath^_SLASH^"exodus.dll"))) {
+				if (not exoduspath or not (osfile(exoduspath^SLASH^"bin\\exodus.dll") or osfile(exoduspath^SLASH^"exodus.dll"))) {
                         if (exoduspath)
                                 searched^="\n"^exoduspath;
                         exoduspath=osgetenv("EXODUS_PATH");
@@ -256,14 +256,14 @@ program()
                                 }
                         }
                 }
-                if (exoduspath.substr(-1,1) ne _SLASH)
-                        exoduspath^=_SLASH;
+                if (exoduspath.substr(-1,1) ne SLASH)
+                        exoduspath^=SLASH;
                 var exodusbin=exoduspath;
                 if (not osfile(exodusbin^"exodus.dll")) {
                         searched^="\n" ^ exoduspath;
                         exodusbin=exoduspath^"bin\\";
                         if (not osfile(exodusbin^"exodus.dll")) {
-                                //exodusbin=_EXECPATH;
+                                //exodusbin=EXECPATH;
                                 searched^="\n" ^ exoduspath;
                                 printl("Searching for Exodus",searched);
                                 abort("Cannot find Exodus. Set environment variable EXODUS_PATH to exodus directory and restart Exodus");
@@ -429,10 +429,10 @@ program()
         swapper(bindir,"~",osgetenv("HOME"));
         swapper(libdir,"~",osgetenv("HOME"));
 
-        if (bindir.substr(-1) ne _SLASH)
-                bindir ^= _SLASH;
-        if (libdir.substr(-1)!=_SLASH)
-                libdir ^= _SLASH;
+        if (bindir.substr(-1) ne SLASH)
+                bindir ^= SLASH;
+        if (libdir.substr(-1)!=SLASH)
+                libdir ^= SLASH;
 
         for (var fileno=1; fileno<=nfiles; ++fileno) {
 
@@ -730,7 +730,7 @@ var inclusion=
 						osclose(objfilename);
 					else {
 						print("Error: ",objfilename, " cannot be updated. Insufficient rights");
-						if (_SLASH eq "\\")
+						if (SLASH eq "\\")
 							print(" or cannot compile programs while in use or blocked by anti-virus/anti-malware");
 						printl(".");
 						continue;
@@ -747,7 +747,7 @@ var inclusion=
                 //no tee on windows so cannot monitor output at the moment until implement popen() call it osopen(cmd)?
                 //similar tie syntax but different order
                 var compileoutputfilename=srcfilename ^ ".~";
-                if (_SLASH eq "/")
+                if (SLASH eq "/")
                         compilecmd ^= " 2>&1 | tee " ^ compileoutputfilename.quote();
                 else
                         compilecmd ^= " > " ^ compileoutputfilename.quote() ^ " 2>&1";
@@ -811,13 +811,13 @@ var inclusion=
                                         }
 
 										//check can install file
-                                        var outputpathandfile=outputdir^field2(binfilename,_SLASH,-1);
+                                        var outputpathandfile=outputdir^field2(binfilename,SLASH,-1);
 										if (osfile(outputpathandfile)) {
 											if (osopen(outputpathandfile,outputpathandfile))
 												osclose(outputpathandfile);
 											else {
 												print("Error: ",outputpathandfile, " cannot be updated. Insufficient rights");
-												if (_SLASH eq "\\")
+												if (SLASH eq "\\")
 													print(" or cannot install/catalog program while in use or blocked by antivirus/antimalware");
 												printl(".");
 												continue;
@@ -835,7 +835,7 @@ var inclusion=
 
 										//try to copy ms manifest
 										//so that the program can be run from anywhere?
-										if (_SLASH eq "\\"  and not oscopy(objfilename^".manifest",outputpathandfile^".manifest"))
+										if (SLASH eq "\\"  and not oscopy(objfilename^".manifest",outputpathandfile^".manifest"))
 										{}//printl("ERROR: Failed to "^cmd);
                                 }
                         }

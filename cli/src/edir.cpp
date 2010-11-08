@@ -8,13 +8,13 @@ program()
 //restrict to editing records for now
 //#define ALLOW_EDIC
 #ifdef ALLOW_EDIC
-        if (dcount(_COMMAND,FM)<3) {
+        if (dcount(COMMAND,FM)<3) {
 #else
-        if (dcount(_COMMAND,FM)<2) {
+        if (dcount(COMMAND,FM)<2) {
 #endif
 
                 //quit if arguments
-                if (dcount(_COMMAND,FM)<2)
+                if (dcount(COMMAND,FM)<2)
 					abort(
 						"Syntax is:"
                         "\nedit databasefilename key ..."
@@ -25,12 +25,12 @@ program()
 					);
 
                 //switch to edic if only one argument
-                osshell(_COMMAND.replace(1,0,0,"edic").convert(FM," "));
+                osshell(COMMAND.replace(1,0,0,"edic").convert(FM," "));
                 stop();
         }
 
-        var filename=_COMMAND.extract(2);
-        var key=_COMMAND.extract(3);
+        var filename=COMMAND.extract(2);
+        var key=COMMAND.extract(3);
 
         //connect to the database
         if (not connect())

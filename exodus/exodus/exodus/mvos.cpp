@@ -1157,7 +1157,7 @@ var var::oscwd() const
 	//http://www.boost.org/doc/libs/1_38_0/libs/filesystem/doc/reference.html#Attribute-functions
 	std::string currentpath=boost::filesystem::current_path().string();
 
-	return var(currentpath).convert(L"/",_SLASH);
+	return var(currentpath).convert(L"/",SLASH);
 
 /*
 	//http://www.boost.org/libs/filesystem/doc/tr2_proposal.html#Class-template-basic_path

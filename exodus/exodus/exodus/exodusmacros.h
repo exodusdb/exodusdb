@@ -47,7 +47,7 @@ THE SOFTWARE.
 // #define eq ==
 //(regrettably eq is defined in global namespace in some libraries)
 
-//capture global _SENTENCE in wrapper function exodus_main
+//capture global SENTENCE in wrapper function exodus_main
 //main calls main2 so that opening { is required after program() macro
 //TODO get exodus_main to call main2 directly - need to pass it a function pointer
 //int exodus_main(int exodus__argc, char *exodus__argv[]); 
@@ -55,18 +55,14 @@ THE SOFTWARE.
 void main2(int exodus__argc, char *exodus__argv[], MvEnvironment& mv); \
 int main(int exodus__argc, char *exodus__argv[]) \
 { \
-	exodus_main(exodus__argc, exodus__argv); \
-	global_environments.resize(6); \
-	int environmentn=0; \
 	MvEnvironment mv; \
-	mv.init(environmentn); \
-	global_environments[environmentn]=&mv; \
+	exodus_main(exodus__argc, exodus__argv, mv); \
 	try \
-    { \
+	{ \
 		main2(exodus__argc, exodus__argv, mv); \
 	} \
 	catch (MVException except) \
-    { \
+	{ \
 		printl(except.description); \
 		print("Aborting. Press Enter"); \
 		input(); \
@@ -76,7 +72,7 @@ int main(int exodus__argc, char *exodus__argv[]) \
 void main2(int exodus__argc, char *exodus__argv[], MvEnvironment& mv)
 
 //allow pseudo pick syntax
-#define sentence() _SENTENCE
+#define sentence() SENTENCE
 
 //for dll/so determine how functions are to be exported without name mangling
 #ifndef EXODUS_LINK_MAPORDEF
@@ -205,6 +201,10 @@ typedef var& out;
 #define USER2 mv.USER2
 #define USER3 mv.USER3
 #define USER4 mv.USER4
+
+#define EXECPATH mv.EXECPATH
+#define COMMAND mv.COMMAND
+#define OPTIONS mv.OPTIONS
 
 //there is a calculate in ExodusProgramBase which calls mv.calculate
 //but simple external functions are functions not based on ExodusFunctionBase

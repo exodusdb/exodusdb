@@ -90,7 +90,11 @@ public:
 	mutable var USER2;
 	mutable var USER3;
 	mutable var USER4;
-	
+
+	var EXECPATH;
+	var COMMAND;
+	var OPTIONS;
+
 	mutable var AW;
 	var ENVIRONSET;
 	mutable var EW;

@@ -5,10 +5,10 @@ program()
 
         //check command syntax
         //edit filename
-        if (dcount(_COMMAND,FM)<2)
+        if (dcount(COMMAND,FM)<2)
                 abort("Syntax is 'edit osfilename'");
 
-        var verbose=_OPTIONS.ucase().index("V");
+        var verbose=OPTIONS.ucase().index("V");
 
         var editor=osgetenv("VISUAL");
         var linenopattern="$LINENO ";
@@ -22,14 +22,14 @@ program()
                 editor^=" /L:$LINENO '$FILENAME'";
 
         //look for nano.exe next to edic.exe
-        if (not editor and _SLASH=="\\") {
-                var nanopath=_EXECPATH.swap("edic","nano");
+        if (not editor and SLASH=="\\") {
+                var nanopath=EXECPATH.swap("edic","nano");
                 if (nanopath.osfile())
                         editor="nano $LINENO'$FILENAME'";
         }
 
         //look for nano in parent bin
-        if (not editor and _SLASH=="\\") {
+        if (not editor and SLASH=="\\") {
                 var nanopath="..\\bin\\nano.exe";
                 if (nanopath.osfile())
                         editor="nano $LINENO'$FILENAME'";
@@ -39,7 +39,7 @@ program()
                 linenopattern="+$LINENO ";
 
         //otherwise on windows try to locate CYGWIN nano or vi
-        if (not editor and _SLASH=="\\") {
+        if (not editor and SLASH=="\\") {
                 //from environment variable
                 var cygwinpath=osgetenv("CYGWIN_BIN");
                 //else from current disk
@@ -52,8 +52,8 @@ program()
                 if (not osdir(cygwinpath))
                         cygwinpath="";
 
-                if (cygwinpath and cygwinpath.substr(-1) ne _SLASH)
-                        cygwinpath^=_SLASH;
+                if (cygwinpath and cygwinpath.substr(-1) ne SLASH)
+                        cygwinpath^=SLASH;
                 //editor=cygwinpath^"bash --login -i -c \"/bin/";
                 editor=cygwinpath;
                 if (osfile(cygwinpath^"nano.exe") or osfile("nano.exe")) {
@@ -78,15 +78,15 @@ program()
                 //C:\Documents and Settings\USERNAME\.nanorc  ($HOMEDRIVE$HOMEPATH)
                 var nanorcfilename;
                 if (cygwinpath) {
-                        nanorcfilename=cygwinpath.field(_SLASH,1,dcount(cygwinpath,_SLASH)-2) ^ _SLASH ^ "etc" ^ _SLASH ^ "nanorc";
+                        nanorcfilename=cygwinpath.field(SLASH,1,dcount(cygwinpath,SLASH)-2) ^ SLASH ^ "etc" ^ SLASH ^ "nanorc";
                 } else {
                         nanorcfilename=osgetenv("HOMEDRIVE") ^ osgetenv("HOMEPATH");
-                        if (nanorcfilename.substr(-1) ne _SLASH)
-                                nanorcfilename^=_SLASH;
+                        if (nanorcfilename.substr(-1) ne SLASH)
+                                nanorcfilename^=SLASH;
                         nanorcfilename^=".nanorc";
                 }
                 if (not osfile(nanorcfilename)) {
-                        var nanorctemplatefilename=_EXECPATH.field(_SLASH,1,dcount(_EXECPATH,_SLASH)-1) ^ _SLASH ^ "nanorc";
+                        var nanorctemplatefilename=EXECPATH.field(SLASH,1,dcount(EXECPATH,SLASH)-1) ^ SLASH ^ "nanorc";
                         if (oscopy(nanorctemplatefilename,nanorcfilename)) {
                                 printl("Copied " ^ nanorctemplatefilename.quote() ^ " to " ^ nanorcfilename.quote());
                                 var ().input("Note: nano c++ syntax highlighting has been installed. Press Enter ... ");
@@ -98,7 +98,7 @@ program()
                 }
         }
         if (not editor) {
-                if (_SLASH=="/")
+                if (SLASH=="/")
                         editor="nano ";
                 else
                         editor="notepad";
@@ -112,7 +112,7 @@ program()
 
         //configure nano syntax highlighting
 
-        var filenames=field(_COMMAND,FM,2,99999);
+        var filenames=field(COMMAND,FM,2,99999);
         var nfiles=dcount(filenames,FM);
         var filen=0;
         while (filen<nfiles) {
@@ -137,13 +137,13 @@ program()
                 if (editcmd.index("$ABSOLUTEFILENAME")) {
                         editcmd.swapper("$ABSOLUTEFILENAME","$FILENAME");
 
-                        filename=oscwd()^_SLASH^filename;
+                        filename=oscwd()^SLASH^filename;
                 }
                 //prepare a skeleton exodus cpp file
                 var newfile=false;
                 if (iscompilable and !osfile(filename)) {
 
-						var basefilename=field2(filename,_SLASH,-1);
+						var basefilename=field2(filename,SLASH,-1);
 						basefilename=field(basefilename,".",dcount(basefilename,".")-1);
 
 						var progtype;
@@ -197,7 +197,7 @@ program()
 
 						if (blankfile.substr(1,1) ne "\n")
 							blankfile^="\n";
-						if (_SLASH ne "/")
+						if (SLASH ne "/")
                                 blankfile.swapper("\n","\r\n");
 
 			if (not oswrite(blankfile,filename))
@@ -249,7 +249,7 @@ program()
                         }
 
                         //clear the screen (should be cls on win)
-                        if (_SLASH eq "/")
+                        if (SLASH eq "/")
                                 osshell("clear");
                         //else
                         //	osshell("cls");
@@ -263,7 +263,7 @@ program()
                         var compilecmd=compiler ^ " " ^ filename.quote() ^ compileoptions;
                         //capture the output
                         var compileoutputfilename=filename ^ ".2";
-                        if (_SLASH eq "/")
+                        if (SLASH eq "/")
                                 compilecmd ^= " 2>&1 | tee " ^ compileoutputfilename.quote();
                         else
                                 compilecmd ^= " > " ^ compileoutputfilename.quote() ^ " 2>&1";
@@ -281,7 +281,7 @@ program()
                         if (osread(errors,compileoutputfilename)) {
                                 osdelete(compileoutputfilename);
 
-                                if (_SLASH ne "/")
+                                if (SLASH ne "/")
                                         print(errors);
 
                                 startatlineno="";

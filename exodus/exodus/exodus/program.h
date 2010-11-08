@@ -27,30 +27,20 @@ classinit()
 
 #define programexit() \
 classexit() \
-var main2(int exodus__argc, char *exodus__argv[], MvEnvironment& mv); \
 int main(int exodus__argc, char *exodus__argv[]) \
 { \
-		exodus_main(exodus__argc, exodus__argv); \
-		global_environments.resize(6); \
-		int environmentn=0; \
-		MvEnvironment mv; \
-		mv.init(environmentn); \
-		global_environments[environmentn]=&mv; \
-		try \
-		{ \
-			return main2(exodus__argc, exodus__argv, mv); \
-		} \
-		catch (MVException except) \
-		{ \
-			printl(except.description); \
-			print("Aborting. Press Enter"); \
-			input(); \
-			stop(0); \
-		} \
-} \
-var main2(int exodus__argc, char *exodus__argv[], MvEnvironment& mv) \
- \
-{ \
-ExodusProgram exodusprogram1(mv); \
-return exodusprogram1.main(); \
+	MvEnvironment mv; \
+	exodus_main(exodus__argc, exodus__argv, mv); \
+	try \
+	{ \
+		ExodusProgram exodusprogram1(mv); \
+		return exodusprogram1.main(); \
+	} \
+	catch (MVException except) \
+	{ \
+		printl(except.description); \
+		print("Aborting. Press Enter"); \
+		input(); \
+		stop(0); \
+	} \
 }

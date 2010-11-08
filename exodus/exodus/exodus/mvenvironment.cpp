@@ -108,7 +108,6 @@ bool MvEnvironment::init(const var& threadno)
 {
 	//std::wcout<<L"MvEnvironment::init("<<threadno<<L")"<<std::endl;
 	//mvprocess
-	var definitionsfilename=L"DEFINITIONS";
 
 	this->USERNAME=L"";
 	this->ACCOUNT=L"";
@@ -119,75 +118,6 @@ bool MvEnvironment::init(const var& threadno)
 
 	cache_dictid_="";
 	this->DICT="";
-
-	//skip connecting to database and move that to another init if necessary.
-	return true;
-
-	//openqm connection
-	//std::wcout<<L"Connecting DB ... "<<std::flush;
-	//if (!this->SESSION.connect(L"127.0.0.1","4243","steve","stetempp","QMSYS"))
-	//{
-	//	std::wcout<<L"couldn't connect to QMSYS"<<std::endl;
-	//	return false;
-	//}
-	//std::wcout<<L"OK"<<std::endl;
-	var conninfo="";//L"host=localhost port=5432 dbname=exodus user=exodus password=somesillysecret connect_timeout=10";
-	if (!this->SESSION.connect(conninfo))
-	{
-		std::wcerr<<L"MvEnvironment::init: Couldn't connect to local database"<<std::endl;
-		return false;
-	}
-
-	//std::wcout<<L"Opening Definitions ... "<<std::flush;
-	if (!this->DEFINITIONS.open(definitionsfilename))
-	{
-		if (!this->DEFINITIONS.createfile(definitionsfilename)||!this->DEFINITIONS.open(definitionsfilename))
-		{
-			std::wcerr<<L"Cannot create "<<definitionsfilename<<std::endl;
-			return false;
-        	}
-	}
-	//std::wcout<<L"OK"<<std::endl;
-
-	/* arev's byte/character bit inverter not available for now
-	//std::wcout<<L"Reading Security ... "<<std::flush;
-	if (!this->SECURITY.read(this->DEFINITIONS,L"SECURITY"))
-	{
-		//std::wcout<<L"Cannot read SECURITY"<<std::endl;
-		//return false;
-		this->SECURITY=L"";
-	}
-	this->SECURITY=this->SECURITY.invert();
-//	std::wcout<<L"OK"<<std::endl;
-	*/
-
-	//std::wcout<<L"Opening MD ... "<<std::flush;
-	var mdfilename=L"MD";
-	var md;
-	if (!md.open(mdfilename))
-	{
-    		if (!md.createfile(mdfilename)||!md.open(mdfilename))
-		{
-			std::wcerr<<L"Cannot create "<<mdfilename<<std::endl;
-			return false;
-		}
-	}
-	//std::wcout<<L"OK"<<std::endl;
-
-	//std::wcout<<L"Opening MENUS ... "<<std::flush;
-	var menufilename=L"MENUS";
-	var menus;
-	if (!menus.open(menufilename))
-	{
-		if (!menus.createfile(menufilename)||!menus.open(menufilename))
-		{
-			std::wcerr<<L"Cannot create "<<menufilename<<std::endl;
-			return false;
-		}
-	}
-	//std::wcout<<L"OK"<<std::endl;
-
-	//std::wcout<<L"MvEnvironment::init: completed "<<std::endl;
 
 	return true;
 
