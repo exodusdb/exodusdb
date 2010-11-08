@@ -75,7 +75,7 @@ public:
 			return;
 		if (lineno.isnum()&&lineno)
 		{
-			exodus::var linetext=filename.field2(exodus::_SLASH,-1) ^ ":" ^ lineno;
+			exodus::var linetext=filename.field2(exodus::SLASH,-1) ^ ":" ^ lineno;
 			exodus::var filetext;
 			if (filetext.osread(filename))
 			{
@@ -138,7 +138,7 @@ var backtrace()
 	//int status;
 	char path[1024];
 
-	var binaryfilename=_EXECPATH.field(" ",1);
+	var binaryfilename=EXECPATH.field(" ",1);
 	if (binaryfilename == binaryfilename.convert("/\\:",""))
 		binaryfilename="`which " ^ binaryfilename ^ "`";
 	var oscmd="addr2line -e " ^ binaryfilename.quote() ^ " " ^ internaladdresses;
@@ -146,7 +146,7 @@ var backtrace()
 	//oscmd.outputl();
 
 #ifdef TRACING
-	printf("_EXECPATH = %s\n",_EXECPATH.tostring().c_str());
+	printf("EXECPATH = %s\n",EXECPATH.tostring().c_str());
 	printf("executing %s\n",oscmd.tostring().c_str());
 #endif
 	/* Open the command for reading. */

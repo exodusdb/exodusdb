@@ -26,6 +26,7 @@ THE SOFTWARE.
 #pragma warning (disable: 4530)
 
 #include <exodus/mv.h>
+#include <exodus/mvenvironment.h>
 
 namespace exodus {
 
@@ -1107,32 +1108,36 @@ return bytes;
 */
 
 DLL_PUBLIC
-int exodus_main(int exodus__argc, char *exodus__argv[])
+int exodus_main(int exodus__argc, char *exodus__argv[], MvEnvironment& mv)
 {
 
 	//signal/interrupt handlers
 	//install_signals();
 	var().breakon();
 
-	_EXECPATH=getexecpath();
-	if (not _EXECPATH) {
-		_EXECPATH=exodus__argv[0];
-		if (not _EXECPATH.index(_SLASH))
-			_EXECPATH.splicer(1,0,oscwd()^_SLASH);
+	global_environments.resize(6);
+	int environmentn=0;
+	mv.init(environmentn);
+	global_environments[environmentn]=&mv;
+
+	mv.EXECPATH=getexecpath();
+	if (not mv.EXECPATH) {
+		mv.EXECPATH=exodus__argv[0];
+		if (not mv.EXECPATH.index(SLASH))
+			mv.EXECPATH.splicer(1,0,oscwd()^SLASH);
 	}
 	//"see getting path to current executable" above
-	//or use "which _EXECPATH somehow like in mvdebug.cpp
-	//if (not _EXECPATH.index(_SLASH) && not _EXECPATH.index(":"))
+	//or use "which EXECPATH somehow like in mvdebug.cpp
+	//if (not EXECPATH.index(SLASH) && not EXECPATH.index(":"))
 	//{
-	//	_EXECPATH.splicer(0,0,oscwd()^_SLASH);
-	//	if (_SLASH==L"\\")
-	//		_EXECPATH.converter(L"/",L"\\");
+	//	EXECPATH.splicer(0,0,oscwd()^SLASH);
+	//	if (SLASH==L"\\")
+	//		EXECPATH.converter(L"/",L"\\");
 	//}
 
-	_SENTENCE="";
-	_COMMAND="";
-	_OPTIONS="";
-	_DBTRACE=false;
+	mv.SENTENCE="";
+	mv.COMMAND="";
+	mv.OPTIONS="";
 
 	//reconstructs complete original sentence unfortunately quote marks will have been lost unless escaped
 	//needs to go after various exodus definitions
@@ -1141,30 +1146,30 @@ int exodus_main(int exodus__argc, char *exodus__argv[])
 		var word=exodus__argv[ii];
 		if (ii == 0)
 		{
-			word=word.field2(_SLASH,-1);
+			word=word.field2(SLASH,-1);
 			//remove trailing ".exe"
 			if (word.lcase().substr(-4) == ".exe")
 				word.splicer(-4,4,"");
 		} else
-			_SENTENCE^=" ";
+			mv.SENTENCE^=" ";
 
 		//put back quotes if any spaces
 		if (word.index(" "))
 			word.quoter();
 
-		_SENTENCE^=word;
-		_COMMAND^=FM^word;
+		mv.SENTENCE^=word;
+		mv.COMMAND^=FM^word;
 	}
-	_COMMAND.splicer(1,1,"");
+	mv.COMMAND.splicer(1,1,"");
 
 	//options are in either (XXX) or {XXX} at the end of the command.
-	var lastchar=_COMMAND.substr(-1);
+	var lastchar=mv.COMMAND.substr(-1);
 	if (lastchar==")")
-		_OPTIONS=_COMMAND.field2("(",-1);
+		mv.OPTIONS=mv.COMMAND.field2("(",-1);
 	else if (lastchar=="}")
-		_OPTIONS=_COMMAND.field2("{",-1);
-	if (_OPTIONS)
-		_COMMAND.splicer(-(len(_OPTIONS)+2),len(_OPTIONS)+2, "");
+		mv.OPTIONS=mv.COMMAND.field2("{",-1);
+	if (mv.OPTIONS)
+		mv.COMMAND.splicer(-(len(mv.OPTIONS)+2),len(mv.OPTIONS)+2, "");
 
 	//would have to passed in as a function pointer
 	//main2(exodus__argc, exodus__argv);

@@ -27,12 +27,12 @@ program()
         printl("Exodus Copyright (c) 2009 Stephen Bush");
         printl("http://www.opensource.org/licenses/mit-license.php");
 
-        var verbose=_OPTIONS.index("V");
+        var verbose=OPTIONS.index("V");
 
 		if (verbose)
-			_EXECPATH.outputl("Executable:");
+			EXECPATH.outputl("Executable:");
 
-        var exodusbinpath=field(_EXECPATH,_SLASH,1,dcount(_EXECPATH,_SLASH)-1);
+        var exodusbinpath=field(EXECPATH,SLASH,1,dcount(EXECPATH,SLASH)-1);
 
 		if (verbose)
 			exodusbinpath.outputl("Path:");
@@ -40,9 +40,9 @@ program()
         //if (not var().load("libpq.dll"))
         //	printl("Warning: Cannot find libpq.dll to connect to postgres");
 
-        var command=_SENTENCE.field(" ",2,999999);
+        var command=SENTENCE.field(" ",2,999999);
         var shell;
-        if (_SLASH eq "/" and shell.osgetenv("SHELL")) {
+        if (SLASH eq "/" and shell.osgetenv("SHELL")) {
 
                 var home=osgetenv("HOME");
                 var path=osgetenv("PATH");
@@ -68,12 +68,12 @@ program()
                 //if (not osshell("env PS1='exodus [\\u@\\h \\W]\\$ '  "^(command?command:shell)))
                 osshell(command?command:shell);
 
-        } else if (_SLASH eq "\\" and shell.osgetenv("ComSpec")) {
+        } else if (SLASH eq "\\" and shell.osgetenv("ComSpec")) {
 
                 //set EXODUS_PATH used by compile to find LIB and INCLUDE paths
                 var exoduspath=exodusbinpath;
-                if (exoduspath.field2(_SLASH,-1)=="bin")
-                        exoduspath=field(exoduspath,_SLASH,1,dcount(exoduspath,_SLASH)-1);
+                if (exoduspath.field2(SLASH,-1)=="bin")
+                        exoduspath=field(exoduspath,SLASH,1,dcount(exoduspath,SLASH)-1);
                 if (exoduspath and not ossetenv("EXODUS_PATH",exoduspath))
                         errput("Couldnt set EXODUS_PATH environment variable");
 

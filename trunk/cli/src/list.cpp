@@ -56,7 +56,7 @@ Type just list by itself to get a summary of its syntax
 //and initialise them within any function.
 
 //TODO maybe implement printtext as normal exodus internal or external subroutine
-//although it is a good example how to do real OO programming in Exodus.
+//although it is a good example how you can use objects in Exodus.
 #include "printtext.h"
 printtext printer1;
 
@@ -66,46 +66,60 @@ printtext printer1;
 
 var datafile;
 
-var quotes;
-var company;
+var quotes=DQ^SQ;
+var crlf="\r\n";
+
+//some identifying name (from environment?)
+var company="";
 
 var wordn;
-var sentencex;
-var ignorewords;
+//var sentencex=COMMAND;//only const exodus system variables can be used before programinit()
+var sentencex="";
+var ignorewords="";
 var html;
 var tx;
 var ncols;
 var breakleveln;
-var breakcolns;
-var blockn;
-var nblocks;
+var breakcolns="";
+var blockn=0;
+var nblocks=0;
 var orighead;
-var detsupp;
-var nbreaks;
-var anytotals;
+var detsupp="";
+var nbreaks=0;
+var anytotals=0;
 var recn;
 var bodyln;
-var head;
-var foot;
-var breakoptions;
-var pagebreakcoln;
-var usecols;
+
+var breakoptions="";
+var pagebreakcoln="";
+var topmargin = 0;
+var totalflag = 0;
+var breakonflag = 0;
+
+//use <COL> for hiding non-totalled cols in det-supp (slow)
+var	usecols = 0;
+
 var startcharn;
 var newmarklevel;
 var previousmarklevel;
 var lastid;
-var crtx;
-var idsupp;
-var dblspc;
-var maxnrecs;
-var keylist;
-var gtotsupp;
-var gtotreq;
-var nobase;
-var limits;
-var nlimits;
-var crlf;
-int coln;
+var crtx="";
+
+var idsupp="";
+var dblspc="";
+var maxnrecs=0;
+var keylist="";
+var gtotsupp="";
+var gtotreq="";
+var nobase="";
+
+var limits="";
+var nlimits=0;
+
+int coln=0;
+
+var head = "";
+var foot = "";
 
 var tr;
 var trx;
@@ -171,21 +185,12 @@ programinit()
 function main() {
 /////////////////
 
-	quotes=DQ^SQ;
-
-	//some identifying name (from environment?)
-	company="";
-
-	crlf="\r\n";
-
 	printer1.init(&mv);
 
 	//@sentence='LIST 10 SCHEDULES BY VEHICLE_CODE with vehicle_code "kjh kjh" VEHICLE_NAME BREAK-ON VEHICLE_CODE BREAK-ON VEHICLE_CODE TOTAL PRICE (SX)'
 	//@sentence='list markets code name'
 
-	sentencex = _COMMAND.convert(FM," ");
-
-	if (dcount(_COMMAND,FM)==1)
+	if (dcount(COMMAND,FM)==1)
 		abort(
 		"Syntax is :"
 		"\nlist {n} (filename) {fieldnames} {selectionclause} {orderclause} {modifiers} (options)"
@@ -245,20 +250,17 @@ function main() {
 
 	*/
 
-	var options=_OPTIONS.ucase();
+	sentencex=COMMAND.convert(FM," ");
+	var options=OPTIONS.ucase();
 
 	//declare function get.cursor,put.cursor
-
-	nblocks = 0;
-	blockn = 0;
-
-	//use <COL> for hiding non-totalled cols in det-supp (slow)
-	usecols = 0;
 
 	if (USER2[2] eq "C")
 		decimalchar = ",";
 	else
 		decimalchar = ".";
+
+	DICT = "";
 
 	html = index(options,"H");
 	if (html) {
@@ -323,44 +325,15 @@ function main() {
 	if (not thcolor)
 		thcolor = "#FFFF80";
 
-	DICT = "";
-	maxnrecs = "";
-	keylist = "";
-
-	crtx = "";
-	idsupp = "";
-	dblspc = "";
-	detsupp = 0;
 	if (sentencex.index(" DET-SUPP", 1))
 		detsupp = 1;
 	if (sentencex.index(" DET-SUPP2", 1))
 		detsupp = 2;
-	maxnrecs = "";
-	gtotsupp = "";
-	gtotreq = "";
-	nobase = "";
 
 	if (not open("DICT_MD", dictmd))
 		//stop("Cannot open DICT_MD");
 		dictmd="";
 
-	coln = 0;
-	head = "";
-	foot = "";
-	nbreaks = 0;
-	breakcolns = "";
-	breakoptions = "";
-	pagebreakcoln = "";
-
-	var topmargin = 0;
-	var totalflag = 0;
-	var breakonflag = 0;
-	anytotals = 0;
-
-	limits = "";
-	nlimits = 0;
-
-	ignorewords = "";
 
 //initphrase:
 /////////////
@@ -402,6 +375,8 @@ phraseinit:
 			word = "dict_" ^ word;    // changed
 		}
 		filename = word;               // new
+		if (not srcfile.open(filename))
+			abort(filename^" file does not exist");
 
 		if (filename.substr(1, 5).lcase() eq "dict_")
 			dictfilename = "MD";
@@ -814,10 +789,10 @@ x1exit:
 	tx = "";
 
 	if (filename.unassigned()||not filename)
-		stop("Filename not specified");
+		abort("Filename not specified");
 
 	if (not open(filename, srcfile))
-		stop("Cannot open file " ^ filename);
+		abort("Cannot open file " ^ filename);
 
 	//reserve breaks and set all to ""
 	breakcount.redim(nbreaks + 1);
@@ -1418,7 +1393,7 @@ subroutine getword2()
 		startcharn = charn;
 		var charx = sentencex[charn];
 
-		if (var(SQ ^ DQ).index(charx, 1)) {
+		if (quotes.index(charx, 1)) {
 			searchchar = charx;
 		} else {
 			searchchar = " ";

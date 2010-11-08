@@ -37,6 +37,72 @@ var Server::run()
 	//open 'messages' to messages else return 999999
 //	mv.SYSTEM.printl();
 
+	//openqm connection
+	//std::wcout<<L"Connecting DB ... "<<std::flush;
+	//if (!this->SESSION.connect(L"127.0.0.1","4243","steve","stetempp","QMSYS"))
+	//{
+	//	std::wcout<<L"couldn't connect to QMSYS"<<std::endl;
+	//	return false;
+	//}
+	//std::wcout<<L"OK"<<std::endl;
+	var conninfo="";//L"host=localhost port=5432 dbname=exodus user=exodus password=somesillysecret connect_timeout=10";
+	if (!mv.SESSION.connect(conninfo))
+	{
+		std::wcerr<<L"MvEnvironment::init: Couldn't connect to local database"<<std::endl;
+		return false;
+	}
+
+	//std::wcout<<L"Opening Definitions ... "<<std::flush;
+	var definitionsfilename=L"DEFINITIONS";
+	if (!mv.DEFINITIONS.open(definitionsfilename))
+	{
+		if (!mv.DEFINITIONS.createfile(definitionsfilename)||!mv.DEFINITIONS.open(definitionsfilename))
+		{
+			std::wcerr<<L"Cannot create "<<definitionsfilename<<std::endl;
+			return false;
+        	}
+	}
+	//std::wcout<<L"OK"<<std::endl;
+
+	/* arev's byte/character bit inverter not available for now
+	//std::wcout<<L"Reading Security ... "<<std::flush;
+	if (!mv.SECURITY.read(mv.DEFINITIONS,L"SECURITY"))
+	{
+		//std::wcout<<L"Cannot read SECURITY"<<std::endl;
+		//return false;
+		mv.SECURITY=L"";
+	}
+	mv.SECURITY=mv.SECURITY.invert();
+//	std::wcout<<L"OK"<<std::endl;
+	*/
+
+	//std::wcout<<L"Opening MD ... "<<std::flush;
+	var mdfilename=L"MD";
+	var md;
+	if (!md.open(mdfilename))
+	{
+    		if (!md.createfile(mdfilename)||!md.open(mdfilename))
+		{
+			std::wcerr<<L"Cannot create "<<mdfilename<<std::endl;
+			return false;
+		}
+	}
+	//std::wcout<<L"OK"<<std::endl;
+
+	//std::wcout<<L"Opening MENUS ... "<<std::flush;
+	var menufilename=L"MENUS";
+	var menus;
+	if (!menus.open(menufilename))
+	{
+		if (!menus.createfile(menufilename)||!menus.open(menufilename))
+		{
+			std::wcerr<<L"Cannot create "<<menufilename<<std::endl;
+			return false;
+		}
+	}
+	//std::wcout<<L"OK"<<std::endl;
+
+	//std::wcout<<L"MvEnvironment::init: completed "<<std::endl;
 	datasetcode = mv.SYSTEM.extract(17);
 	if (datasetcode == L"")
 		datasetcode = L"DEFAULT";
@@ -47,7 +113,7 @@ var Server::run()
 	neopath = L"/cygdrive/d/neosys/neosys/";
 #endif
 
-    neopath.converter(L"/\\",_SLASH^_SLASH);
+    neopath.converter(L"/\\",SLASH^SLASH);
 	globalend = neopath ^ L"GLOBAL.END";
 	if (!allcols.open(L"ACCESSIBLE_COLUMNS"))
 		allcols = L"";
@@ -90,15 +156,15 @@ var Server::run()
 	webpath = neopath ^ L"data/";
 	if (!webpath)
 		webpath = L"../data/";
-	webpath.converter(L"/\\",_SLASH^_SLASH);
-	if (webpath.substr(-1, 1) != _SLASH)
-		webpath ^= _SLASH;
+	webpath.converter(L"/\\",SLASH ^ SLASH);
+	if (webpath.substr(-1, 1) ne SLASH)
+		webpath ^= SLASH;
 	if (!md.open(L"MD")) {
 		mv.mssg(L"CANNOT OPEN MD FILE");
 		return 999999;
 	}
 
-	inpath = webpath ^ datasetcode ^ _SLASH;
+	inpath = webpath ^ datasetcode ^ SLASH;
 
 	//set time before calling deleteoldfiles which is time sensitive
 	//call settime(webpath[1,2])
@@ -186,7 +252,7 @@ var Server::run()
 	//open a log file
 	logfilename = L"";
 	logpath = neopath ^ L"/LOGS/";
-	logpath.converter(L"/\\",_SLASH^_SLASH);
+	logpath.converter(L"/\\",SLASH^SLASH);
 	if (var().oslistf(logpath ^ datasetcode)==L"")
 	{
 		if (var().oslist(logpath)==L"")
@@ -194,7 +260,7 @@ var Server::run()
 		(logpath ^ datasetcode).osmkdir();
 	}
 	var datex = (var().date()).oconv(L"D2.");
-	logfilename = logpath ^ datasetcode ^ _SLASH ^ datex.substr(-2, 2) ^ datex.substr(1, 2) ^ datex.substr(4, 2) ^ var(L"00" ^ mv.SYSTEM.extract(24)).substr(-2, 2);
+	logfilename = logpath ^ datasetcode ^ SLASH ^ datex.substr(-2, 2) ^ datex.substr(1, 2) ^ datex.substr(4, 2) ^ var(L"00" ^ mv.SYSTEM.extract(24)).substr(-2, 2);
 	logfilename ^= L".xml";
 
 	if (logfile.osopen(logfilename)) {
@@ -812,20 +878,20 @@ var Server::processrequest()
 	linkfilename2 = replyfilename.splice(-1, 1, 2);
 	
 	//should be made into a MvLib
-	linkfilename2.swapper(L"/\\",_SLASH^_SLASH);
+	linkfilename2.swapper(L"/\\",SLASH^SLASH);
 	//if (linkfilename2.index(L":"))
 	//{
-	//	linkfilename2.swapper(L":",_SLASH);
+	//	linkfilename2.swapper(L":",SLASH);
 	//	linkfilename2="/cygdrive/"^linkfilename2;
 	//}
 
 	linkfilename3 = replyfilename.splice(-1, 1, 3);
 	
 	//should be made into a MvLib
-	linkfilename3.swapper(L"/\\",_SLASH^_SLASH);
+	linkfilename3.swapper(L"/\\",SLASH^SLASH);
 	//if (linkfilename3.index(L":"))
 	//{
-	//	linkfilename3.swapper(L":",_SLASH);
+	//	linkfilename3.swapper(L":",SLASH);
 	//	linkfilename3="/cygdrive/"^linkfilename3;
 	//}
 

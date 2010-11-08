@@ -3,9 +3,9 @@
 program()
 {
 
-        var filename=_COMMAND.extract(2);
-        var fieldname=_COMMAND.extract(3);
-        var silent=index(ucase(_OPTIONS),"S");
+        var filename=COMMAND.extract(2);
+        var fieldname=COMMAND.extract(3);
+        var silent=index(ucase(OPTIONS),"S");
 
         if (not filename or not fieldname)
                 abort("Syntax is 'deleteindex filename fieldname (S=Silent)'");
