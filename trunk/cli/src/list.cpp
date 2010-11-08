@@ -118,6 +118,7 @@ var decimalchar;
 //when exodus gets a non-destructive redim then this max columns restriction will be removed
 #define maxncols 1000
 dim colname(maxncols);
+//dim colfile(maxncols);
 dim coldict(maxncols);
 dim mcol(maxncols);
 dim pcol(maxncols);
@@ -603,6 +604,7 @@ phraseinit:
 		dblspc = 1;
 
 	} else if (dictrec) {
+
 		if (var("FSDIA").index(dictrec.extract(1), 1)) {
 
 			var nn;
@@ -1159,8 +1161,22 @@ subroutine process_one_record()
 	//get the data from the record into an array of columns
 	for (int coln = 1; coln <= ncols; coln++) {
 
+		//dont call calculate except for S items because some F items
+		//are constructed and/or exist in dict_md
+		dictrec=coldict(coln);
+		if (dictrec.extract(1) eq "F") {
+			fieldno=dictrec.extract(2);
+			if (not fieldno) {
+				cell=ID;
+				keypart=dictrec.extract(6);
+				if (keypart)
+					cell=cell.field(L'.',keypart);
+			} else
+				cell=RECORD.extract(fieldno);
+
 		//calculate() accesses data via dictionary keys
-		cell=calculate(colname(coln));
+		} else 
+			cell=calculate(colname(coln));
 
 		mcol(coln)=cell;
 
