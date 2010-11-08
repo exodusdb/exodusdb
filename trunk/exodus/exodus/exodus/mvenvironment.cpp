@@ -48,7 +48,7 @@ MvEnvironment::MvEnvironment()
 	this->USERNAME=L"";
 	this->ACCOUNT=L"";
 	this->AW=L"";
-	this->LOWERCASE=_LOWER_CASE;
+	this->LOWERCASE=LOWER_CASE;
 	this->UPPERCASE=_UPPER_CASE;
 	this->SYSTEM=L"";
 	this->SENTENCE=L"";
