@@ -355,8 +355,8 @@ FunctionEnd
 ;--------------------------------
 ;General
 
-  Name "Exodus 10.10.11"
-  Outfile "exodus-10.10.11.exe"
+  Name "Exodus 10.10.12"
+  Outfile "exodus-10.10.12.exe"
   InstallDir "$PROGRAMFILES\exodus\10.10"
   
   ;Get installation folder from registry if available

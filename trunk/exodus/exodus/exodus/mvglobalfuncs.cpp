@@ -1134,6 +1134,8 @@ int exodus_main(int exodus__argc, char *exodus__argv[], MvEnvironment& mv)
 	//	if (SLASH==L"\\")
 	//		EXECPATH.converter(L"/",L"\\");
 	//}
+	//leave a copy where backtrace can get at it
+	EXECPATH2=mv.EXECPATH;
 
 	mv.SENTENCE="";
 	mv.COMMAND="";
