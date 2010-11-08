@@ -30,8 +30,8 @@ Comments about style:
 	2. Using "int" instead of "var" for "for loop" index variables despite the fact that int doesnt always behave
 		precisely like pick integers, speed is important in this program and C++ allows us access to raw power when we need it.
 	3. Note the familiar "goto" statement which considerably eases porting of mv basic to Exodus.
-		Since the "goto" is banished from almost all other languages Exodus this can be a major point scorer for Exodus.
-		Note that Exodus's "goto" cannot jump over "var" statements or into/out of subroutines some code refactoring
+		This can be a major point scorer for Exodus because "goto" is banished from almost all other languages.
+		Exodus's "goto" cannot jump over "var" statements or into/out of subroutines some code refactoring
 		may be still be required during porting.
 	
 /*
@@ -55,7 +55,8 @@ Type just list by itself to get a summary of its syntax
 //Multithreaded programs should declare globals after the programinit() line
 //and initialise them within any function.
 
-//TODO implement printtext as normal exodus internal or external subroutine
+//TODO maybe implement printtext as normal exodus internal or external subroutine
+//although it is a good example how to do real OO programming in Exodus.
 #include "printtext.h"
 printtext printer1;
 
