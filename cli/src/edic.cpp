@@ -6,7 +6,7 @@ program()
         //check command syntax
         //edit filename
         if (dcount(COMMAND,FM)<2)
-                abort("Syntax is 'edit osfilename'");
+                abort("Syntax is 'edic osfilename'");
 
         var verbose=OPTIONS.ucase().index("V");
 

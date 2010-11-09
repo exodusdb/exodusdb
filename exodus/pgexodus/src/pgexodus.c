@@ -173,14 +173,14 @@ AS 'pgexodus', 'exodus_extract_datetime' LANGUAGE C IMMUTABLE STRICT;
 
 TO REMOVE THE ABOVE DO THE FOLLOWING AS POSTGRES SUPERUSER CONNECTED TO EXODUS DATABASE
 
-drop FUNCTION neo_call(bytea, bytea, bytea, bytea, bytea, int4, int4) cascade;
-drop FUNCTION neo_extract_bytea(bytea, int4, int4, int4) cascade;
-drop FUNCTION neo_extract_text(bytea, int4, int4, int4) cascade;
-drop FUNCTION neo_extract_sort(bytea, int4, int4, int4) cascade;
-drop FUNCTION neo_extract_text2(bytea, int4, int4, int4) cascade;
-drop FUNCTION neo_extract_date(bytea, int4, int4, int4) cascade;
-drop FUNCTION neo_extract_time(bytea, int4, int4, int4) cascade;
-drop FUNCTION neo_extract_datetime(bytea, int4, int4, int4) cascade;
+drop FUNCTION exodus_call(bytea, bytea, bytea, bytea, bytea, int4, int4) cascade;
+drop FUNCTION exodus_extract_bytea(bytea, int4, int4, int4) cascade;
+drop FUNCTION exodus_extract_text(bytea, int4, int4, int4) cascade;
+drop FUNCTION exodus_extract_sort(bytea, int4, int4, int4) cascade;
+drop FUNCTION exodus_extract_text2(bytea, int4, int4, int4) cascade;
+drop FUNCTION exodus_extract_date(bytea, int4, int4, int4) cascade;
+drop FUNCTION exodus_extract_time(bytea, int4, int4, int4) cascade;
+drop FUNCTION exodus_extract_datetime(bytea, int4, int4, int4) cascade;
 
 */
 
