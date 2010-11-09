@@ -433,7 +433,8 @@ bool var::disconnect()
 
 	PGconn* thread_pgconn=tss_pgconns.get();
 
-	PQfinish(thread_pgconn);
+	if (thread_pgconn)
+		PQfinish(thread_pgconn);
 
 	tss_pgconns.release();
 	tss_locktables.release();
