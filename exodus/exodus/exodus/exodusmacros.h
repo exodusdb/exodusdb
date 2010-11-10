@@ -119,10 +119,6 @@ void main2(int exodus__argc, char *exodus__argv[], MvEnvironment& mv)
 #define subroutine EXODUSMACRO_IMPORTEXPORT void
 #define function EXODUSMACRO_IMPORTEXPORT var
 
-//repeat subroutine details just in case we use dict in a library
-//because library functions are redefined to be plain member functions i.e. without EXODUS_IMPORTEXPORT
-#define dict(DICTID) EXODUSMACRO_IMPORTEXPORT void DICTID (MvEnvironment& mv)
-
 //throw away words
 //call xyz() ... is just xyz()  (external function)
 //gosub xyz() ... is just xyz() (local function)
@@ -134,7 +130,7 @@ class ExodusProgram : public ExodusProgramBase {
 
 #define classexit() \
 public: \
-	ExodusProgram(MvEnvironment& inmv):ExodusProgramBase(inmv){} \
+	ExodusProgram(MvEnvironment& mv):ExodusProgramBase(mv){} \
 }; \
 
 //possible version to allow multiple named "exodus classes"
@@ -144,7 +140,7 @@ class CLASSNAME##_ExodusProgram : public ExodusProgramBase {
 
 #define xclassexit(CLASSNAME) \
 public: \
-	CLASSNAME##_ExodusProgram(MvEnvironment& inmv):ExodusProgramBase(inmv){} \
+	CLASSNAME##_ExodusProgram(MvEnvironment& mv):ExodusProgramBase(mv){} \
 }; \
 
 //simplify declaration of function/subroutine arguments

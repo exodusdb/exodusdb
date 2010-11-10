@@ -184,7 +184,7 @@ programinit()
 /////////////////
 function main() {
 /////////////////
-
+USER0="";
 	printer1.init(&mv);
 
 	//@sentence='LIST 10 SCHEDULES BY VEHICLE_CODE with vehicle_code "kjh kjh" VEHICLE_NAME BREAK-ON VEHICLE_CODE BREAK-ON VEHICLE_CODE TOTAL PRICE (SX)'

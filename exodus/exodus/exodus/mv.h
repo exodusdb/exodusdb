@@ -241,7 +241,7 @@ std::wstring dblToString(double double1);
 //explanation 3.
 
 /*TODO check if the following guidance is followed in class var
-Conversion never applies to this for member functions, and this extends to operators. If the operator was instead example operator + (example, example) in the global namespace, it would compile (or if pass-by-const-ref was used).
+Conversion never applies to this for member functions, and this extends to operators. If the operator was instead example operator+ (example, example) in the global namespace, it would compile (or if pass-by-const-ref was used).
 
 As a result, symmetric operators like + and - are generally implemented as non-members, whereas the compound assignment operators like += and -= are implemented as members (they also change data, meaning they should be members). And, since you want to avoid code duplication, the symmetric operators can be implemented in terms of the compound assignment ones (as in your code example, although convention recommends making the temporary inside the function).
 */
@@ -454,60 +454,60 @@ public:
 	//cant be (const var& mv1) because seems to cause a problem with var1=var2 in function parameters
 	//unfortunately causes problem of passing var by value and thereby unnecessary contruction
 	//see also ^= etc
-	var& operator =(const var& mv1);
+	var& operator=(const var& mv1);
 
 	//=int
-	var& operator = (const int int1);
+	var& operator= (const int int1);
 
 	//=double
-	var& operator = (const double double1);
+	var& operator= (const double double1);
 
 	//=wchar_t
-	var& operator = (const wchar_t char2);
+	var& operator= (const wchar_t char2);
 
 	//=wchar_t*
-	var& operator = (const wchar_t* char2);
+	var& operator= (const wchar_t* char2);
 
 	//=string
-	var& operator = (const std::wstring string2);
+	var& operator= (const std::wstring string2);
 
 	//=var
-	var& operator ^=(const var& mv1);
+	var& operator^=(const var& mv1);
 
 	//=int
-	var& operator ^= (const int int1);
+	var& operator^= (const int int1);
 
 	//=double
-	var& operator ^= (const double double1);
+	var& operator^= (const double double1);
 
 	//=wchar_t
-	var& operator ^= (const wchar_t char2);
+	var& operator^= (const wchar_t char2);
 
 	//=wchar_t*
-	var& operator ^= (const wchar_t* char2);
+	var& operator^= (const wchar_t* char2);
 
 	//=string
-	var& operator ^= (const std::wstring string2);
+	var& operator^= (const std::wstring string2);
 
     /*
     //postfix returning void so cannot be used in expressions (avoid unreadable programs)
-	void operator ++ (int);
-	void operator -- (int);
+	void operator++ (int);
+	void operator-- (int);
 
     //TODO: since preventing pre and postfix in expressions then force only use of prefix version since it is faster
 
     //prefix returning void so cannot be used in expressions (avoid unreadable programs)
-	void operator ++ ();
-	void operator -- ();
+	void operator++ ();
+	void operator-- ();
     */
 
     //postfix
-	var operator ++ (int);
-	var operator -- (int);
+	var operator++ (int);
+	var operator-- (int);
 
     //prefix
-	var& operator ++ ();
-	var& operator -- ();
+	var& operator++ ();
+	var& operator-- ();
 
     //+=var
 	var& operator+= (const var& mv1);
@@ -528,129 +528,148 @@ public:
 	DLL_PUBLIC friend  bool MVlt(const var&,const int);
 	DLL_PUBLIC friend  bool MVlt(const int,const var&);
 
-	DLL_PUBLIC friend  var operator + (const var&,const var&);
-	DLL_PUBLIC friend  var operator + (const var&,const wchar_t*);
-	DLL_PUBLIC friend  var operator + (const var&,const int);
-	DLL_PUBLIC friend  var operator + (const var&,const double);
-	DLL_PUBLIC friend  var operator + (const wchar_t*,const var&);
-	DLL_PUBLIC friend  var operator + (const int,const var&);
-	DLL_PUBLIC friend  var operator + (const double,const var&);
+	DLL_PUBLIC friend  var operator+ (const var&,const var&);
+	DLL_PUBLIC friend  var operator+ (const var&,const wchar_t*);
+	DLL_PUBLIC friend  var operator+ (const var&,const int);
+	DLL_PUBLIC friend  var operator+ (const var&,const double);
+	DLL_PUBLIC friend  var operator+ (const var&,const bool);
+	DLL_PUBLIC friend  var operator+ (const wchar_t*,const var&);
+	DLL_PUBLIC friend  var operator+ (const int,const var&);
+	DLL_PUBLIC friend  var operator+ (const double,const var&);
+	DLL_PUBLIC friend  var operator+ (const bool,const var&);
 
-	DLL_PUBLIC friend  var operator - (const var&,const var&);
-	DLL_PUBLIC friend  var operator - (const var&,const wchar_t*);
-	DLL_PUBLIC friend  var operator - (const var&,const int);
-	DLL_PUBLIC friend  var operator - (const var&,const double);
-	DLL_PUBLIC friend  var operator - (const wchar_t*,const var&);
-	DLL_PUBLIC friend  var operator - (const int,const var&);
-	DLL_PUBLIC friend  var operator - (const double,const var&);
+	DLL_PUBLIC friend  var operator- (const var&,const var&);
+	DLL_PUBLIC friend  var operator- (const var&,const wchar_t*);
+	DLL_PUBLIC friend  var operator- (const var&,const int);
+	DLL_PUBLIC friend  var operator- (const var&,const double);
+	DLL_PUBLIC friend  var operator- (const var&,const bool);
+	DLL_PUBLIC friend  var operator- (const wchar_t*,const var&);
+	DLL_PUBLIC friend  var operator- (const int,const var&);
+	DLL_PUBLIC friend  var operator- (const double,const var&);
+	DLL_PUBLIC friend  var operator- (const bool,const var&);
 
-	DLL_PUBLIC friend  var operator * (const var&,const var&);
-	DLL_PUBLIC friend  var operator * (const var&,const wchar_t*);
-	DLL_PUBLIC friend  var operator * (const var&,const int);
-	DLL_PUBLIC friend  var operator * (const var&,const double);
-	DLL_PUBLIC friend  var operator * (const wchar_t*,const var&);
-	DLL_PUBLIC friend  var operator * (const int,const var&);
-	DLL_PUBLIC friend  var operator * (const double,const var&);
+	DLL_PUBLIC friend  var operator* (const var&,const var&);
+	DLL_PUBLIC friend  var operator* (const var&,const wchar_t*);
+	DLL_PUBLIC friend  var operator* (const var&,const int);
+	DLL_PUBLIC friend  var operator* (const var&,const double);
+	DLL_PUBLIC friend  var operator* (const var&,const bool);
+	DLL_PUBLIC friend  var operator* (const wchar_t*,const var&);
+	DLL_PUBLIC friend  var operator* (const int,const var&);
+	DLL_PUBLIC friend  var operator* (const double,const var&);
+	DLL_PUBLIC friend  var operator* (const bool,const var&);
 
-	DLL_PUBLIC friend  var operator / (const var&,const var&);
-	DLL_PUBLIC friend  var operator / (const var&,const wchar_t*);
-	DLL_PUBLIC friend  var operator / (const var&,const int);
-	DLL_PUBLIC friend  var operator / (const var&,const double);
-	DLL_PUBLIC friend  var operator / (const wchar_t*,const var&);
-	DLL_PUBLIC friend  var operator / (const int,const var&);
-	DLL_PUBLIC friend  var operator / (const double,const var&);
+	DLL_PUBLIC friend  var operator/ (const var&,const var&);
+	DLL_PUBLIC friend  var operator/ (const var&,const wchar_t*);
+	DLL_PUBLIC friend  var operator/ (const var&,const int);
+	DLL_PUBLIC friend  var operator/ (const var&,const double);
+	//disallow divide by boolean to prevent possible runtime divide by zero
+	//DLL_PUBLIC friend  var operator/ (const var&,const bool);
+	DLL_PUBLIC friend  var operator/ (const wchar_t*,const var&);
+	DLL_PUBLIC friend  var operator/ (const int,const var&);
+	DLL_PUBLIC friend  var operator/ (const double,const var&);
+	DLL_PUBLIC friend  var operator/ (const bool,const var&);
 
-	DLL_PUBLIC friend  var operator % (const var&,const var&);
-	DLL_PUBLIC friend  var operator % (const var&,const wchar_t*);
-	DLL_PUBLIC friend  var operator % (const var&,const int);
-	DLL_PUBLIC friend  var operator % (const var&,const double);
-	DLL_PUBLIC friend  var operator % (const wchar_t*,const var&);
-	DLL_PUBLIC friend  var operator % (const int,const var&);
-	DLL_PUBLIC friend  var operator % (const double,const var&);
+	DLL_PUBLIC friend  var operator% (const var&,const var&);
+	DLL_PUBLIC friend  var operator% (const var&,const wchar_t*);
+	DLL_PUBLIC friend  var operator% (const var&,const int);
+	DLL_PUBLIC friend  var operator% (const var&,const double);
+	//disallow divide by boolean to prevent possible runtime divide by zero
+	//DLL_PUBLIC friend  var operator/ (const var&,const bool);
+	DLL_PUBLIC friend  var operator% (const var&,const bool);
+	DLL_PUBLIC friend  var operator% (const wchar_t*,const var&);
+	DLL_PUBLIC friend  var operator% (const int,const var&);
+	DLL_PUBLIC friend  var operator% (const double,const var&);
+	DLL_PUBLIC friend  var operator% (const bool,const var&);
 
-	DLL_PUBLIC friend  var operator ^ (const var&,const var&);
-	DLL_PUBLIC friend  var operator ^ (const var&,const wchar_t*);
-	DLL_PUBLIC friend  var operator ^ (const var&,const int);
-	DLL_PUBLIC friend  var operator ^ (const var&,const double);
-	DLL_PUBLIC friend  var operator ^ (const wchar_t*,const var&);
-	DLL_PUBLIC friend  var operator ^ (const int,const var&);
-	DLL_PUBLIC friend  var operator ^ (const double,const var&);
+	//NB do NOT allow concat with bool or vice versa - find reason why
+	DLL_PUBLIC friend  var operator^ (const var&,const var&);
+	DLL_PUBLIC friend  var operator^ (const var&,const wchar_t*);
+	DLL_PUBLIC friend  var operator^ (const var&,const int);
+	DLL_PUBLIC friend  var operator^ (const var&,const double);
+	DLL_PUBLIC friend  var operator^ (const wchar_t*,const var&);
+	DLL_PUBLIC friend  var operator^ (const int,const var&);
+	DLL_PUBLIC friend  var operator^ (const double,const var&);
 
-	DLL_PUBLIC friend  bool operator < (const var&,const var&);
-	DLL_PUBLIC friend  bool operator < (const var&,const wchar_t*);
-	DLL_PUBLIC friend  bool operator < (const var&,const int);
-	DLL_PUBLIC friend  bool operator < (const var&,const double);
-	DLL_PUBLIC friend  bool operator < (const wchar_t*,const var&);
-	DLL_PUBLIC friend  bool operator < (const int,const var&);
-	DLL_PUBLIC friend  bool operator < (const double,const var&);
+	DLL_PUBLIC friend  bool operator< (const var&,const var&);
+	DLL_PUBLIC friend  bool operator< (const var&,const wchar_t*);
+	DLL_PUBLIC friend  bool operator< (const var&,const int);
+	DLL_PUBLIC friend  bool operator< (const var&,const double);
+	DLL_PUBLIC friend  bool operator< (const wchar_t*,const var&);
+	DLL_PUBLIC friend  bool operator< (const int,const var&);
+	DLL_PUBLIC friend  bool operator< (const double,const var&);
 //#ifndef MV_NO_NARROW
-	DLL_PUBLIC friend  bool operator < (const var&,const char*);
-	DLL_PUBLIC friend  bool operator < (const char*,const var&);
+	DLL_PUBLIC friend  bool operator< (const var&,const char*);
+	DLL_PUBLIC friend  bool operator< (const char*,const var&);
 //#endif
 
-	DLL_PUBLIC friend  bool operator <=(const var&,const var&);
-	DLL_PUBLIC friend  bool operator <=(const var&,const wchar_t*);
-	DLL_PUBLIC friend  bool operator <=(const var&,const int);
-	DLL_PUBLIC friend  bool operator <=(const var&,const double);
-	DLL_PUBLIC friend  bool operator <=(const wchar_t*,const var&);
-	DLL_PUBLIC friend  bool operator <=(const int,const var&);
-	DLL_PUBLIC friend  bool operator <=(const double,const var&);
+	DLL_PUBLIC friend  bool operator<= (const var&,const var&);
+	DLL_PUBLIC friend  bool operator<= (const var&,const wchar_t*);
+	DLL_PUBLIC friend  bool operator<= (const var&,const int);
+	DLL_PUBLIC friend  bool operator<= (const var&,const double);
+	DLL_PUBLIC friend  bool operator<= (const wchar_t*,const var&);
+	DLL_PUBLIC friend  bool operator<= (const int,const var&);
+	DLL_PUBLIC friend  bool operator<= (const double,const var&);
 //#ifndef MV_NO_NARROW
-	DLL_PUBLIC friend  bool operator <= (const var&,const char*);
-	DLL_PUBLIC friend  bool operator <= (const char*,const var&);
+	DLL_PUBLIC friend  bool operator<= (const var&,const char*);
+	DLL_PUBLIC friend  bool operator<= (const char*,const var&);
 //#endif
 
-	DLL_PUBLIC friend  bool operator > (const var&,const var&);
-	DLL_PUBLIC friend  bool operator > (const var&,const wchar_t*);
-	DLL_PUBLIC friend  bool operator > (const var&,const int);
-	DLL_PUBLIC friend  bool operator > (const var&,const double);
-	DLL_PUBLIC friend  bool operator > (const wchar_t*,const var&);
-	DLL_PUBLIC friend  bool operator > (const int,const var&);
-	DLL_PUBLIC friend  bool operator > (const double,const var&);
+	DLL_PUBLIC friend  bool operator> (const var&,const var&);
+	DLL_PUBLIC friend  bool operator> (const var&,const wchar_t*);
+	DLL_PUBLIC friend  bool operator> (const var&,const int);
+	DLL_PUBLIC friend  bool operator> (const var&,const double);
+	DLL_PUBLIC friend  bool operator> (const wchar_t*,const var&);
+	DLL_PUBLIC friend  bool operator> (const int,const var&);
+	DLL_PUBLIC friend  bool operator> (const double,const var&);
 //#ifndef MV_NO_NARROW
-	DLL_PUBLIC friend  bool operator > (const var&,const char*);
-	DLL_PUBLIC friend  bool operator > (const char*,const var&);
+	DLL_PUBLIC friend  bool operator> (const var&,const char*);
+	DLL_PUBLIC friend  bool operator> (const char*,const var&);
 //#endif
 
-	DLL_PUBLIC friend  bool operator >=(const var&,const var&);
-	DLL_PUBLIC friend  bool operator >=(const var&,const wchar_t*);
-	DLL_PUBLIC friend  bool operator >=(const var&,const int);
-	DLL_PUBLIC friend  bool operator >=(const var&,const double);
-	DLL_PUBLIC friend  bool operator >=(const wchar_t*,const var&);
-	DLL_PUBLIC friend  bool operator >=(const int,const var&);
-	DLL_PUBLIC friend  bool operator >=(const double,const var&);
+	DLL_PUBLIC friend  bool operator>= (const var&,const var&);
+	DLL_PUBLIC friend  bool operator>= (const var&,const wchar_t*);
+	DLL_PUBLIC friend  bool operator>= (const var&,const int);
+	DLL_PUBLIC friend  bool operator>= (const var&,const double);
+	DLL_PUBLIC friend  bool operator>= (const wchar_t*,const var&);
+	DLL_PUBLIC friend  bool operator>= (const int,const var&);
+	DLL_PUBLIC friend  bool operator>= (const double,const var&);
 //#ifndef MV_NO_NARROW
-	DLL_PUBLIC friend  bool operator >=(const var&,const char*);
-	DLL_PUBLIC friend  bool operator >=(const char*,const var&);
+	DLL_PUBLIC friend  bool operator>= (const var&,const char*);
+	DLL_PUBLIC friend  bool operator>= (const char*,const var&);
 //#endif
 
-	DLL_PUBLIC friend  bool operator ==(const var&,const var&);
-	DLL_PUBLIC friend  bool operator ==(const var&,const wchar_t*);
-	DLL_PUBLIC friend  bool operator ==(const var&,const int);
-	DLL_PUBLIC friend  bool operator ==(const var&,const double);
-	DLL_PUBLIC friend  bool operator ==(const wchar_t*,const var&);
-	DLL_PUBLIC friend  bool operator ==(const int,const var&);
-	DLL_PUBLIC friend  bool operator ==(const double,const var&);
+	DLL_PUBLIC friend  bool operator== (const var&,const var&);
+	DLL_PUBLIC friend  bool operator== (const var&,const wchar_t*);
+	DLL_PUBLIC friend  bool operator== (const var&,const int);
+	DLL_PUBLIC friend  bool operator== (const var&,const double);
+	DLL_PUBLIC friend  bool operator== (const var&,const bool);
+	DLL_PUBLIC friend  bool operator== (const wchar_t*,const var&);
+	DLL_PUBLIC friend  bool operator== (const int,const var&);
+	DLL_PUBLIC friend  bool operator== (const double,const var&);
+	DLL_PUBLIC friend  bool operator== (const bool,const var&);
 //#ifndef MV_NO_NARROW
-	DLL_PUBLIC friend  bool operator ==(const var&,const char*);
-	DLL_PUBLIC friend  bool operator ==(const char*,const var&);
+	DLL_PUBLIC friend  bool operator== (const var&,const char*);
+	DLL_PUBLIC friend  bool operator== (const char*,const var&);
 //#endif
 
-	DLL_PUBLIC friend  bool operator !=(const var&,const var&);
-	DLL_PUBLIC friend  bool operator !=(const var&,const wchar_t*);
-	DLL_PUBLIC friend  bool operator !=(const var&,const int);
-	DLL_PUBLIC friend  bool operator !=(const var&,const double);
-	DLL_PUBLIC friend  bool operator !=(const wchar_t*,const var&);
-	DLL_PUBLIC friend  bool operator !=(const int,const var&);
-	DLL_PUBLIC friend  bool operator !=(const double,const var&);
+	DLL_PUBLIC friend  bool operator!= (const var&,const var&);
+	DLL_PUBLIC friend  bool operator!= (const var&,const wchar_t*);
+	DLL_PUBLIC friend  bool operator!= (const var&,const int);
+	DLL_PUBLIC friend  bool operator!= (const var&,const double);
+	DLL_PUBLIC friend  bool operator!= (const var&,const bool);
+	DLL_PUBLIC friend  bool operator!= (const wchar_t*,const var&);
+	DLL_PUBLIC friend  bool operator!= (const int,const var&);
+	DLL_PUBLIC friend  bool operator!= (const double,const var&);
+	DLL_PUBLIC friend  bool operator!= (const bool,const var&);
 //#ifndef MV_NO_NARROW
-	DLL_PUBLIC friend  bool operator !=(const var&,const char*);
-	DLL_PUBLIC friend  bool operator !=(const char*,const var&);
+	DLL_PUBLIC friend  bool operator!= (const var&,const char*);
+	DLL_PUBLIC friend  bool operator!= (const char*,const var&);
 //#endif
 
-	DLL_PUBLIC friend  var operator +(const var&);
-	DLL_PUBLIC friend  var operator -(const var&);
-	DLL_PUBLIC friend  bool operator !(const var&);
+	//unary operators +var -var !var
+	DLL_PUBLIC friend  var operator+ (const var&);
+	DLL_PUBLIC friend  var operator- (const var&);
+	DLL_PUBLIC friend  bool operator! (const var&);
 
 	//OS TIME/DATE
 	var date() const;
@@ -754,13 +773,13 @@ public:
 	bool eof() const;
 
 #if defined __MINGW32__
-	DLL_PUBLIC friend std::istream& operator >> (std::istream& istream1, var& var1);
-	DLL_PUBLIC friend  std::ostream& operator << (std::ostream& ostream1, const var& var1);
+	DLL_PUBLIC friend std::istream& operator>> (std::istream& istream1, var& var1);
+	DLL_PUBLIC friend  std::ostream& operator<< (std::ostream& ostream1, const var& var1);
 #else
-	DLL_PUBLIC friend std::wistream& operator >> (std::wistream& wistream1, var& var1);
-	DLL_PUBLIC friend  std::wostream& operator << (std::wostream& wostream1, const var& var1);
+	DLL_PUBLIC friend std::wistream& operator>> (std::wistream& wistream1, var& var1);
+	DLL_PUBLIC friend  std::wostream& operator<< (std::wostream& wostream1, const var& var1);
 #endif
-	//friend bool operator <<(const var&);
+	//friend bool operator<<(const var&);
 
 	//VARIABLE CONTROL
 	bool assigned() const;
@@ -1033,63 +1052,67 @@ DLL_PUBLIC bool MVlt(const var& mv1,const int int2);
 DLL_PUBLIC bool MVlt(const int int1,const var& mv2);
 
 //== and !=
-DLL_PUBLIC bool operator ==(const var&    mv1    ,const var&    mv2     );
-DLL_PUBLIC bool operator ==(const var&    mv1    ,const wchar_t*  char2   );
-DLL_PUBLIC bool operator ==(const var&    mv1    ,const int    int2    );
-DLL_PUBLIC bool operator ==(const var&    mv1    ,const double double2 );
-DLL_PUBLIC bool operator ==(const wchar_t*  char1  ,const var&    mv2     );
-DLL_PUBLIC bool operator ==(const int    int1   ,const var&    mv2     );
-DLL_PUBLIC bool operator ==(const double double1,const var&    mv2     );
+DLL_PUBLIC bool operator== (const var&    mv1    ,const var&    mv2     );
+DLL_PUBLIC bool operator== (const var&    mv1    ,const wchar_t*  char2   );
+DLL_PUBLIC bool operator== (const var&    mv1    ,const int    int2    );
+DLL_PUBLIC bool operator== (const var&    mv1    ,const double double2 );
+DLL_PUBLIC bool operator== (const var&    mv1    ,const bool bool2 );
+DLL_PUBLIC bool operator== (const wchar_t*  char1  ,const var&    mv2     );
+DLL_PUBLIC bool operator== (const int     int1   ,const var&    mv2     );
+DLL_PUBLIC bool operator== (const double  double1,const var&    mv2     );
+DLL_PUBLIC bool operator== (const bool    bool1  ,const var&    mv2     );
 
-DLL_PUBLIC bool operator !=(const var&    mv1    ,const var&    mv2     );
-DLL_PUBLIC bool operator !=(const var&    mv1    ,const wchar_t*  char2   );
-DLL_PUBLIC bool operator !=(const var&    mv1    ,const int    int2    );
-DLL_PUBLIC bool operator !=(const var&    mv1    ,const double double2 );
-DLL_PUBLIC bool operator !=(const wchar_t*  char1  ,const var&    mv2     );
-DLL_PUBLIC bool operator !=(const int    int1   ,const var&    mv2     );
-DLL_PUBLIC bool operator !=(const double double1,const var&    mv2     );
+DLL_PUBLIC bool operator!= (const var&    mv1    ,const var&    mv2     );
+DLL_PUBLIC bool operator!= (const var&    mv1    ,const wchar_t*  char2   );
+DLL_PUBLIC bool operator!= (const var&    mv1    ,const int    int2    );
+DLL_PUBLIC bool operator!= (const var&    mv1    ,const double double2 );
+DLL_PUBLIC bool operator!= (const var&    mv1    ,const bool   bool2 );
+DLL_PUBLIC bool operator!= (const wchar_t*  char1  ,const var&    mv2     );
+DLL_PUBLIC bool operator!= (const int    int1   ,const var&    mv2     );
+DLL_PUBLIC bool operator!= (const double double1,const var&    mv2     );
+DLL_PUBLIC bool operator!= (const bool bool1    ,const var&    mv2     );
 
 //< <= > >=
-DLL_PUBLIC bool operator < (const var&    mv1    ,const var&    mv2     );
-DLL_PUBLIC bool operator < (const var&    mv1    ,const wchar_t*  char2   );
-DLL_PUBLIC bool operator < (const var&    mv1    ,const int    int2    );
-DLL_PUBLIC bool operator < (const var&    mv1    ,const double double2 );
-DLL_PUBLIC bool operator < (const wchar_t*  char1  ,const var&    mv2     );
-DLL_PUBLIC bool operator < (const int    int1   ,const var&    mv2     );
-DLL_PUBLIC bool operator < (const double double1,const var&    mv2     );
+DLL_PUBLIC bool operator< (const var&    mv1    ,const var&    mv2     );
+DLL_PUBLIC bool operator< (const var&    mv1    ,const wchar_t*  char2   );
+DLL_PUBLIC bool operator< (const var&    mv1    ,const int    int2    );
+DLL_PUBLIC bool operator< (const var&    mv1    ,const double double2 );
+DLL_PUBLIC bool operator< (const wchar_t*  char1  ,const var&    mv2     );
+DLL_PUBLIC bool operator< (const int    int1   ,const var&    mv2     );
+DLL_PUBLIC bool operator< (const double double1,const var&    mv2     );
 
-DLL_PUBLIC bool operator >=(const var&    mv1    ,const var&    mv2     );
-DLL_PUBLIC bool operator >=(const var&    mv1    ,const wchar_t*  char2   );
-DLL_PUBLIC bool operator >=(const var&    mv1    ,const int    int2    );
-DLL_PUBLIC bool operator >=(const var&    mv1    ,const double double2 );
-DLL_PUBLIC bool operator >=(const wchar_t*  char1  ,const var&    mv2     );
-DLL_PUBLIC bool operator >=(const int    int1   ,const var&    mv2     );
-DLL_PUBLIC bool operator >=(const double double1,const var&    mv2     );
+DLL_PUBLIC bool operator>= (const var&    mv1    ,const var&    mv2     );
+DLL_PUBLIC bool operator>= (const var&    mv1    ,const wchar_t*  char2   );
+DLL_PUBLIC bool operator>= (const var&    mv1    ,const int    int2    );
+DLL_PUBLIC bool operator>= (const var&    mv1    ,const double double2 );
+DLL_PUBLIC bool operator>= (const wchar_t*  char1  ,const var&    mv2     );
+DLL_PUBLIC bool operator>= (const int    int1   ,const var&    mv2     );
+DLL_PUBLIC bool operator>= (const double double1,const var&    mv2     );
 
-DLL_PUBLIC bool operator > (const var&    mv1    ,const var&    mv2     );
-DLL_PUBLIC bool operator > (const var&    mv1    ,const wchar_t*  char2   );
-DLL_PUBLIC bool operator > (const var&    mv1    ,const int    int2    );
-DLL_PUBLIC bool operator > (const var&    mv1    ,const double double2 );
-DLL_PUBLIC bool operator > (const wchar_t*  char1  ,const var&    mv2     );
-DLL_PUBLIC bool operator > (const int    int1   ,const var&    mv2     );
-DLL_PUBLIC bool operator > (const double double1,const var&    mv2     );
+DLL_PUBLIC bool operator> (const var&    mv1    ,const var&    mv2     );
+DLL_PUBLIC bool operator> (const var&    mv1    ,const wchar_t*  char2   );
+DLL_PUBLIC bool operator> (const var&    mv1    ,const int    int2    );
+DLL_PUBLIC bool operator> (const var&    mv1    ,const double double2 );
+DLL_PUBLIC bool operator> (const wchar_t*  char1  ,const var&    mv2     );
+DLL_PUBLIC bool operator> (const int    int1   ,const var&    mv2     );
+DLL_PUBLIC bool operator> (const double double1,const var&    mv2     );
 
-DLL_PUBLIC bool operator <=(const var&    mv1    ,const var&    mv2     );
-DLL_PUBLIC bool operator <=(const var&    mv1    ,const wchar_t*  char2   );
-DLL_PUBLIC bool operator <=(const var&    mv1    ,const int    int2    );
-DLL_PUBLIC bool operator <=(const var&    mv1    ,const double double2 );
-DLL_PUBLIC bool operator <=(const wchar_t*  char1  ,const var&    mv2     );
-DLL_PUBLIC bool operator <=(const int    int1   ,const var&    mv2     );
-DLL_PUBLIC bool operator <=(const double double1,const var&    mv2     );
+DLL_PUBLIC bool operator<= (const var&    mv1    ,const var&    mv2     );
+DLL_PUBLIC bool operator<= (const var&    mv1    ,const wchar_t*  char2   );
+DLL_PUBLIC bool operator<= (const var&    mv1    ,const int    int2    );
+DLL_PUBLIC bool operator<= (const var&    mv1    ,const double double2 );
+DLL_PUBLIC bool operator<= (const wchar_t*  char1  ,const var&    mv2     );
+DLL_PUBLIC bool operator<= (const int    int1   ,const var&    mv2     );
+DLL_PUBLIC bool operator<= (const double double1,const var&    mv2     );
 
 //+var
-DLL_PUBLIC var operator+(const var& mv1);
+DLL_PUBLIC var operator+ (const var& mv1);
 
 //-var
-DLL_PUBLIC var operator-(const var& mv1);
+DLL_PUBLIC var operator- (const var& mv1);
 
 //!var
-DLL_PUBLIC bool operator!(const var& mv1);
+DLL_PUBLIC bool operator! (const var& mv1);
 
 DLL_PUBLIC var MVadd(const var& mv1,const var& mv2);
 
@@ -1104,45 +1127,65 @@ DLL_PUBLIC var MVmod(const var& mv1,const var& mv2);
 //var^var reassign logical xor to be std::wstring concatenate!!!
 DLL_PUBLIC var MVcat(const var& mv1,const var& mv2);
 
-DLL_PUBLIC var operator+(const var&    mv1    ,const var&    mv2     );
-DLL_PUBLIC var operator+(const var&    mv1    ,const wchar_t*  char2   );
-DLL_PUBLIC var operator+(const var&    mv1    ,const int    int2    );
-DLL_PUBLIC var operator+(const var&    mv1    ,const double double2 );
-DLL_PUBLIC var operator+(const wchar_t*  char1  ,const var&    mv2     );
-DLL_PUBLIC var operator+(const int    int1   ,const var&    mv2     );
-DLL_PUBLIC var operator+(const double double1,const var&    mv2     );
+DLL_PUBLIC var operator+ (const var&    mv1    ,const var&    mv2     );
+DLL_PUBLIC var operator+ (const var&    mv1    ,const wchar_t*  char2   );
+DLL_PUBLIC var operator+ (const var&    mv1    ,const int    int2    );
+DLL_PUBLIC var operator+ (const var&    mv1    ,const double double2 );
+DLL_PUBLIC var operator+ (const var&    mv1    ,const bool bool1 );
+DLL_PUBLIC var operator+ (const wchar_t*  char1  ,const var&    mv2     );
+DLL_PUBLIC var operator+ (const int    int1   ,const var&    mv2     );
+DLL_PUBLIC var operator+ (const double double1,const var&    mv2     );
+DLL_PUBLIC var operator+ (const bool    bool1 ,const var&    mv2     );
 
-DLL_PUBLIC var operator-(const var&    mv1    ,const var&    mv2     );
-DLL_PUBLIC var operator-(const var&    mv1    ,const wchar_t*  char2   );
-DLL_PUBLIC var operator-(const var&    mv1    ,const int    int2    );
-DLL_PUBLIC var operator-(const var&    mv1    ,const double double2 );
-DLL_PUBLIC var operator-(const wchar_t*  char1  ,const var&    mv2     );
-DLL_PUBLIC var operator-(const int    int1   ,const var&    mv2     );
-DLL_PUBLIC var operator-(const double double1,const var&    mv2     );
+DLL_PUBLIC var operator- (const var&    mv1    ,const var&    mv2     );
+DLL_PUBLIC var operator- (const var&    mv1    ,const wchar_t*  char2   );
+DLL_PUBLIC var operator- (const var&    mv1    ,const int    int2    );
+DLL_PUBLIC var operator- (const var&    mv1    ,const double double2 );
+DLL_PUBLIC var operator- (const wchar_t*  char1  ,const var&    mv2     );
+DLL_PUBLIC var operator- (const int    int1   ,const var&    mv2     );
+DLL_PUBLIC var operator- (const double double1,const var&    mv2     );
 
-DLL_PUBLIC var operator*(const var&    mv1    ,const var&    mv2     );
-DLL_PUBLIC var operator*(const var&    mv1    ,const wchar_t*  char2   );
-DLL_PUBLIC var operator*(const var&    mv1    ,const int    int2    );
-DLL_PUBLIC var operator*(const var&    mv1    ,const double double2 );
-DLL_PUBLIC var operator*(const wchar_t*  char1  ,const var&    mv2     );
-DLL_PUBLIC var operator*(const int    int1   ,const var&    mv2     );
-DLL_PUBLIC var operator*(const double double1,const var&    mv2     );
+DLL_PUBLIC var operator* (const var&    mv1    ,const var&    mv2     );
+DLL_PUBLIC var operator* (const var&    mv1    ,const wchar_t*  char2   );
+DLL_PUBLIC var operator* (const var&    mv1    ,const int    int2    );
+DLL_PUBLIC var operator* (const var&    mv1    ,const double double2 );
+DLL_PUBLIC var operator* (const wchar_t*  char1  ,const var&    mv2     );
+DLL_PUBLIC var operator* (const int    int1   ,const var&    mv2     );
+DLL_PUBLIC var operator* (const double double1,const var&    mv2     );
 
-DLL_PUBLIC var operator/(const var&    mv1    ,const var&    mv2     );
-DLL_PUBLIC var operator/(const var&    mv1    ,const wchar_t*  char2   );
-DLL_PUBLIC var operator/(const var&    mv1    ,const int    int2    );
-DLL_PUBLIC var operator/(const var&    mv1    ,const double double2 );
-DLL_PUBLIC var operator/(const wchar_t*  char1  ,const var&    mv2     );
-DLL_PUBLIC var operator/(const int    int1   ,const var&    mv2     );
-DLL_PUBLIC var operator/(const double double1,const var&    mv2     );
+DLL_PUBLIC var operator/ (const var&    mv1    ,const var&    mv2     );
+DLL_PUBLIC var operator/ (const var&    mv1    ,const wchar_t*  char2   );
+DLL_PUBLIC var operator/ (const var&    mv1    ,const int    int2    );
+DLL_PUBLIC var operator/ (const var&    mv1    ,const double double2 );
+DLL_PUBLIC var operator/ (const wchar_t*  char1  ,const var&    mv2     );
+DLL_PUBLIC var operator/ (const int    int1   ,const var&    mv2     );
+DLL_PUBLIC var operator/ (const double double1,const var&    mv2     );
 
-DLL_PUBLIC var operator%(const var&    mv1    ,const var&    mv2     );
-DLL_PUBLIC var operator%(const var&    mv1    ,const wchar_t*  char2   );
-DLL_PUBLIC var operator%(const var&    mv1    ,const int    int2    );
-DLL_PUBLIC var operator%(const var&    mv1    ,const double double2 );
-DLL_PUBLIC var operator%(const wchar_t*  char1  ,const var&    mv2     );
-DLL_PUBLIC var operator%(const int    int1   ,const var&    mv2     );
-DLL_PUBLIC var operator%(const double double1,const var&    mv2     );
+DLL_PUBLIC var operator% (const var&    mv1    ,const var&    mv2     );
+DLL_PUBLIC var operator% (const var&    mv1    ,const wchar_t*  char2   );
+DLL_PUBLIC var operator% (const var&    mv1    ,const int    int2    );
+DLL_PUBLIC var operator% (const var&    mv1    ,const double double2 );
+DLL_PUBLIC var operator% (const wchar_t*  char1  ,const var&    mv2     );
+DLL_PUBLIC var operator% (const int    int1   ,const var&    mv2     );
+DLL_PUBLIC var operator% (const double double1,const var&    mv2     );
+
+//NB we should probably NEVER add operator^( var& mv1, bool)
+//this is a trick to avoid a problem that exodus concat operator
+//has the wrong precedence versus the logical operators
+//a ^ b > c //we should prevent this from compiling because
+//exodus will treat this like a^(b>c) which is WRONG
+//multivalue basic requires it to be (a^b)>c
+//however c++ ^ operator has lower priority than >
+//whereas multivalue concatenate operator should have HIGHER priority than >
+//and no way to change priority of operators in c++
+//therefore to prevent silent non-standard behaviour from causing
+//insidious bugs it is better to refuse to compile a request to
+//concatenate boolean as "1" or "0" in Exodus
+//a refusal to compile can be solved explicitly by putting brackets
+//to force compiler to do the right thing multivalue wise
+//(a^b)>c
+//or, if you do want to concatenate the result of a comparison do this
+//a^var(b>c)
 
 DLL_PUBLIC var operator^(const var&    mv1    ,const var&    mv2     );
 DLL_PUBLIC var operator^(const var&    mv1    ,const wchar_t*  char2   );
@@ -1155,14 +1198,14 @@ DLL_PUBLIC var operator^(const double double1,const var&    mv2     );
 //allow use of wcout<<var
 //shouldnt this be disallowed and only output to cout with conversion to utf8 allowed?
 #if defined __MINGW32__
-	DLL_PUBLIC std::ostream& operator << (std::ostream& o,const var& mv1);
+	DLL_PUBLIC std::ostream& operator<< (std::ostream& o,const var& mv1);
 #else
-	DLL_PUBLIC std::wostream& operator << (std::wostream& o,const var& mv1);
+	DLL_PUBLIC std::wostream& operator<< (std::wostream& o,const var& mv1);
 #endif
-//ostream& operator << (ostream& o,const var& mv1);
+//ostream& operator<< (ostream& o,const var& mv1);
 
 //#ifdef false //allow use of cin>>var
-//wistream& operator >> (wistream& i,var mv1);
+//wistream& operator>> (wistream& i,var mv1);
 //#endif //allow use of cin>>var
 
 class DLL_PUBLIC dim
@@ -1191,16 +1234,16 @@ public:
 	//http://www.gotw.ca/publications/mill18.htm
 	~dim();
 
-	dim& operator = (const dim& dim1);
+	dim& operator= (const dim& dim1);
 
 	//=var
 	//The assignment operator should always return a reference to *this.
 	//cant be (const var& mv1) because seems to cause a problem with var1=var2 in function parameters
 	//unfortunately causes problem of passing var by value and thereby unnecessary contruction
 	//see also ^= etc
-	dim& operator = (const var& var1);
-	dim& operator = (const int int1);
-	dim& operator = (const double dbl1);
+	dim& operator= (const var& var1);
+	dim& operator= (const int int1);
+	dim& operator= (const double dbl1);
 
 	//allow default contruction for class variables later resized in class methods
 	dim();
@@ -1297,8 +1340,8 @@ const var SLASH = L"/";
 //perhaps make a version of ucase/lcase that
 //receives an MvEnvironment in the parameters.
 //CF LOWERCASE which is
-const var LOWER_CASE=L"abcdefghijklmnopqrstuvwxyz";
-const var _UPPER_CASE=L"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const var LOWERCASE_=L"abcdefghijklmnopqrstuvwxyz";
+const var UPPERCASE_=L"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 #ifndef EXO_MV_CPP
 extern

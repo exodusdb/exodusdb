@@ -89,7 +89,7 @@ That way you can forget the new exodus concept of "library" which is not a tradi
 //#include <exodus/mvenvironment.h>
 //#include <exodus/mvprogram.h>
 
-//good programming practice
+//good programming practice to prevent many white hairs
 //http://www.parashift.com/c++-faq-lite/pointers-to-members.html#faq-33.6
 #define CALLMEMBERFUNCTION(object,ptrToMember)  ((object).*(ptrToMember)) 
 

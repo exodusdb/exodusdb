@@ -558,7 +558,7 @@ var& var::ucaser()
 	THISISSTRING()
 
 	//TODO unicode/native conversion
-	converter(LOWER_CASE, _UPPER_CASE);
+	converter(LOWERCASE_, UPPERCASE_);
 	return *this;
 }
 
@@ -576,7 +576,7 @@ var& var::lcaser()
 	THISISSTRING()
 
 	//TODO unicode/native conversion
-	converter(_UPPER_CASE,LOWER_CASE);
+	converter(UPPERCASE_,LOWERCASE_);
 	return *this;
 }
 

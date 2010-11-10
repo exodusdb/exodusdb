@@ -40,6 +40,16 @@ DLL_PUBLIC bool unassigned(const var& var1)
 	return !var1.assigned();
 }
 
+DLL_PUBLIC var& transfer(var& fromvar, var& tovar)
+{
+	return fromvar.transfer(tovar);
+}
+
+DLL_PUBLIC var& exchange(var& var1, var& var2)
+{
+	return var1.exchange(var2);
+}
+
 DLL_PUBLIC var date()
 {
 	return var().date();
