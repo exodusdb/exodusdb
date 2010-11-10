@@ -392,7 +392,9 @@ var& var::operator = (const wchar_t char2)
 	//var undefinedassign=undefinedassign=L'X';
 	//this causes crash due to bad memory access due to setting string that doesnt exist
 	//slows down all string settings so consider NOT CHECKING in production code
-	THISISDEFINED()
+	THISISDEFINED()		//ALN:TODO: this definition kind of misleading, try to find
+						//ALN:TODO: or change name to something like: THISISNOTDEAD :)
+						//ALN:TODO: argumentation: var with mvtyp=0 is NOT defined
 
 	var_mvstr=char2;
 	var_mvtyp=pimpl::MVTYPE_STR;

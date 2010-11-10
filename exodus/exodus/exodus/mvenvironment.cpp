@@ -45,7 +45,7 @@ const var EXTERNALCHARS=_SSTM_ _STM_ _TM_ _SM_ _VM_ _FM_ _RM_;
 MvEnvironment::MvEnvironment()
 {
 
-	this->USERNAME=L"";
+	this->USERNAME=L"";		//ALN:TODO: change to :USERNAME(L"")
 	this->ACCOUNT=L"";
 	this->AW=L"";
 	this->LOWERCASE=LOWER_CASE;
@@ -104,7 +104,7 @@ MvEnvironment::~MvEnvironment()
 
 }
 
-bool MvEnvironment::init(const var& threadno)
+bool MvEnvironment::init(const var& threadno)	//ALN:TODO:change to natural int parameter (var is misleading)
 {
 	//std::wcout<<L"MvEnvironment::init("<<threadno<<L")"<<std::endl;
 	//mvprocess
@@ -116,7 +116,7 @@ bool MvEnvironment::init(const var& threadno)
 	this->THREADNO=threadno;
 	this->SYSTEM.replacer(17,0,0,L"");
 
-	cache_dictid_="";
+	cache_dictid_="";			//ALN:TODO: why we need narrow string here ? one temp var is created
 	this->DICT="";
 
 	return true;

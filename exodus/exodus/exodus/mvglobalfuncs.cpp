@@ -1137,7 +1137,7 @@ int exodus_main(int exodus__argc, char *exodus__argv[], MvEnvironment& mv)
 	//leave a copy where backtrace can get at it
 	EXECPATH2=mv.EXECPATH;
 
-	mv.SENTENCE="";
+	mv.SENTENCE="";			//ALN:TODO: hm, again, char->var-> op=(var)
 	mv.COMMAND="";
 	mv.OPTIONS="";
 
@@ -1150,7 +1150,7 @@ int exodus_main(int exodus__argc, char *exodus__argv[], MvEnvironment& mv)
 		{
 			word=word.field2(SLASH,-1);
 			//remove trailing ".exe"
-			if (word.lcase().substr(-4) == ".exe")
+			if (word.lcase().substr(-4) == ".exe")		//ALN:TODO: L"
 				word.splicer(-4,4,"");
 		} else
 			mv.SENTENCE^=" ";

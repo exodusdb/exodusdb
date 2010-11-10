@@ -48,7 +48,7 @@
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
+				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -63,7 +63,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)\exodus.exe"
-				LinkIncremental="2"
+				LinkIncremental="0"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(TargetDir)exodus_cli.pdb"
 				SubSystem="1"
@@ -173,6 +173,7 @@
 	<References>
 		<ProjectReference
 			ReferencedProjectIdentifier="{8963EB1B-97D5-47C0-BF00-8F9B828B3139}"
+			RelativePathToProject=".\exodus\exodus\exodus\exodus.vcproj"
 		/>
 	</References>
 	<Files>

@@ -1030,7 +1030,7 @@ var& var::eraser(int fieldno,int valueno,int subvalueno)
 
 	if (subvalueno>1) start_pos--;
 	else if(subvalue_end_pos<value_end_pos) subvalue_end_pos++;
-	var_mvstr.erase(start_pos,subvalue_end_pos-start_pos);
+	var_mvstr.erase(start_pos,subvalue_end_pos-start_pos);		//ALN:TODO: the statement should not have any effect, check this
 
 	return *this;
 

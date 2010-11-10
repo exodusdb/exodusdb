@@ -1,24 +1,19 @@
 /*
 Copyright (c) 2009 Stephen John Bush
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+See MIT Licence
 */
+
+//var used to hold a pointer to its private data
+//but for ease of debugging programs using var 
+//and because the classic reason for doing "pointer to implementation"
+//doesnt apply here (var is a stable library)
+//so pimpls data members have been moved to var private
+//mvstr mvtype mvint mvdbl made directly private in var
+//still holds the static constants
+//
+//Summary:
+//this class could be removed once it is confirmed by c++ gurus
+//that the above strategy is correct.
 
 #ifndef MVIMPL_H
 #define MVIMPL_H 1
@@ -28,8 +23,6 @@ THE SOFTWARE.
 namespace exodus
 {
 
-//mvstr mvtype mvint mvdbl made directly private in var
-//still holds the static constants
 class pimpl
 {
 

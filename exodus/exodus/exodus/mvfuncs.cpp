@@ -1166,8 +1166,8 @@ bool var::isnum(void) const
 		var_mvdbl=atof(result.c_str());
 		var_mvtyp=pimpl::MVTYPE_DBLSTR;
 	}
-	else
-	{
+	else		//ALN:TODO: long int wcstol (const wchar_t *restrict string, wchar_t **restrict tailptr, int base)
+	{			//ALN:TODO: ... should be OK here
 		//var_mvint=_wtoi(var_mvstr.c_str());
 		//var_mvdbl=_wtof(var_mvstr.c_str());
 		//TODO optimise
