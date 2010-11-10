@@ -202,8 +202,98 @@ function accrest() {
 
 function main()
 {
+USER0="";
+	//DBTRACE=true;
 
-	//_DBTRACE=true;
+	var ee="";
+	var e0=0;
+	var e1=1;
+	var e2=2;
+	var e3=3;
+
+	assert((e2+true) eq 3);
+	assert((e2+false) eq 2);
+	assert((true+e2) eq 3);
+	assert((false+e2) eq 2);
+
+	assert((e2-true) eq 1);
+	assert((e2-false) eq 2);
+	assert((true-e2) eq -1);
+	assert((false-e2) eq -2);
+
+	assert((e2*true) eq 2);
+	assert((e2*false) eq 0);
+	assert((true*e2) eq 2);
+	assert((false*e2) eq 0);
+
+	//assert((e2*true) eq 2);//wont compile to prevent risk of divide by zero if true is an expression
+	//assert((e2*false) eq 0);//ditto
+	assert((true/e2) eq 0.5);
+	assert((false/e2) eq 0);
+
+	//assert((e2%true) eq 2);//wont compile to prevent risk of divide by zero if true is an expression
+	//assert((e2%false) eq 0);//ditto
+	assert((true % e2) eq 1);
+	assert((false % e2) eq 0);
+
+	//the six logical comparisons >= <= > < and the lesser precedence == !=
+	//between logical results and vars are not supported by exodus
+	//because they seem useless, probably non existant in real code
+	//and because I am too lazy at this point.
+	//real code would have to be something like
+	// if (cc eq aa > bb)
+	//which due to lower precendence of == and != is actually
+	// if (cc eq (aa > bb))
+	assert((e1==true) eq true);
+	assert((e1==false) eq false);
+	assert((true==e1) eq true);
+	assert((false==e1) eq false);
+
+	assert((e1!=true) eq false);
+	assert((e1!=false) eq true);
+	assert((true!=e1) eq false);
+	assert((false!=e1) eq true);
+
+	assert((e1==true) eq 1);
+	assert((e1==false) eq 0);
+	assert((true==e1) eq 1);
+	assert((false==e1) eq 0);
+
+	assert((e1!=true) eq 0);
+	assert((e1!=false) eq 1);
+	assert((true!=e1) eq 0);
+	assert((false!=e1) eq 1);
+
+	assert((e3-(e3 eq var(0))) eq 3);
+
+	//exodus's concatenate operator ^ has the wrong priority versus logical comparison operators
+	//to avoid this causing unnoticed different operation than classic multivalue basic
+	//exodus refuses to concatenate the result of logical expressions like e2>e3
+	//printl(e1^e2>e3); //wont compile (because it would produce the wrong result)
+
+	//just add brackets to clarify and correct the precedence for exodus and it will compile
+	printl((e1^e2)>e3); //=1 ... correct result because (1^2)>3 i.e. "12">3 is true
+
+	var s1="111";
+	var s2;
+	exchange(s1,s2); //works even on unassigned variables (rather meaningless if both are unassigned though!)
+	assert(s1.unassigned());
+	assert(s2 eq "111");
+	exchange(s1,s2); //check s1 can be unassigned too
+	assert(s1 eq "111");
+	assert(s2.unassigned());
+
+	s1="1";
+	s2="2";
+	assert(exchange(s1,s2) eq "1");
+	assert(s1 eq "2");
+	assert(s2 eq "1");
+
+	s1="1";
+	s2="2";
+	assert(transfer(s1,s2) eq "1");
+	assert(s1 eq "");
+	assert(s2 eq "1");
 
 	//accessing individual characters by index 1=first -1=last etc.
 	var a="abc";

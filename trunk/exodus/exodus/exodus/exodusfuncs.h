@@ -36,6 +36,8 @@ DLL_PUBLIC bool osgetenv(const var& name, var& value);
 DLL_PUBLIC bool ossetenv(const var& name, const var& value);
 DLL_PUBLIC bool assigned(const var& mv1);
 DLL_PUBLIC bool unassigned(const var& mv1);
+DLL_PUBLIC var& transfer(var& fromvar, var& tovar);
+DLL_PUBLIC var& exchange(var& var1, var& var2);
 DLL_PUBLIC var date();
 DLL_PUBLIC var time();
 DLL_PUBLIC var timedate();

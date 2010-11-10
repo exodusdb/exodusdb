@@ -55,10 +55,9 @@ class DLL_PUBLIC MvEnvironment
 {
 public:
 
-	MvEnvironment();
 	virtual ~MvEnvironment();
     
-	bool init(const var& threadno);
+	bool init(const int threadno);
 	
 	var ID;
 	var RECORD;
@@ -85,19 +84,21 @@ public:
 	var STATION;
 	var STATUS;
 	
-	mutable var USER0;
-	mutable var USER1;
-	mutable var USER2;
-	mutable var USER3;
-	mutable var USER4;
+	//seems to fail initialisation in msvc2005 in release mode only ?!
+
+	var USER0;
+	var USER1;
+	var USER2;
+	var USER3;
+	var USER4;
 
 	var EXECPATH;
 	var COMMAND;
 	var OPTIONS;
 
-	mutable var AW;
+	var AW;
 	var ENVIRONSET;
-	mutable var EW;
+	var EW;
 	var FILEERROR;
 	var FILEERRORMODE;
 	var FLUSHNEEDED;
@@ -109,7 +110,7 @@ public:
 	
 	var TCLSTACK;
 	var VOLUMES;
-	mutable var FILES;
+	var FILES;
 	
 	var DEFINITIONS;
 	var SECURITY;

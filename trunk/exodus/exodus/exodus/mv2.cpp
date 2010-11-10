@@ -89,8 +89,8 @@ var::var(const char* cstr1, const size_t int1)
 
 //comparisons with narrow characters
 
-bool operator ==(const var&    var1    ,const char*  char2   ){return MVeq(var1,var(char2));}
-bool operator ==(const char*  char1  ,const var&    var2     ){return MVeq(var2,var(char1));}
+bool operator== (const var&    var1    ,const char*  char2   ){return MVeq(var1,var(char2));}
+bool operator== (const char*  char1  ,const var&    var2     ){return MVeq(var2,var(char1));}
 
 bool operator !=(const var&    var1    ,const char*  char2   ){return !MVeq(var1,var(char2));}
 bool operator !=(const char*  char1  ,const var&    var2     ){return !MVeq(var2,var(char1));}

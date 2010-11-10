@@ -1086,59 +1086,63 @@ DLL_PUBLIC bool MVlt(const int int1,const var& rhs)
 //SEE ALSO MV2.CPP
 
 //== and !=
-DLL_PUBLIC bool operator ==(const var&     lhs    ,const var&     rhs     ){return bool( MVeq(lhs		,rhs)          );}
-DLL_PUBLIC bool operator ==(const var&     lhs    ,const wchar_t* char2   ){return bool( MVeq(lhs		,var(char2)   ));}
-DLL_PUBLIC bool operator ==(const var&     lhs    ,const int      int2    ){return bool( MVeq(lhs		,var(int2)    ));}
-DLL_PUBLIC bool operator ==(const var&     lhs    ,const double   double2 ){return bool( MVeq(lhs		,var(double2) ));}
-DLL_PUBLIC bool operator ==(const wchar_t* char1  ,const var&     rhs     ){return bool( MVeq(rhs		,var(char1)   ));}
-DLL_PUBLIC bool operator ==(const int      int1   ,const var&     rhs     ){return bool( MVeq(rhs		,var(int1)    ));}
-DLL_PUBLIC bool operator ==(const double   double1,const var&     rhs     ){return bool( MVeq(rhs		,var(double1) ));}
+DLL_PUBLIC bool operator== (const var&     lhs    ,const var&     rhs     ){return  MVeq(lhs		,rhs          );}
+DLL_PUBLIC bool operator== (const var&     lhs    ,const wchar_t* char2   ){return  MVeq(lhs		,var(char2)   );}
+DLL_PUBLIC bool operator== (const var&     lhs    ,const int      int2    ){return  MVeq(lhs		,var(int2)    );}
+DLL_PUBLIC bool operator== (const var&     lhs    ,const double   double2 ){return  MVeq(lhs		,var(double2) );}
+DLL_PUBLIC bool operator== (const var&     lhs    ,const bool     bool2   ){return  MVeq(lhs		,var(bool2)   );}
+DLL_PUBLIC bool operator== (const wchar_t* char1  ,const var&     rhs     ){return  MVeq(rhs		,var(char1)   );}
+DLL_PUBLIC bool operator== (const int      int1   ,const var&     rhs     ){return  MVeq(rhs		,var(int1)    );}
+DLL_PUBLIC bool operator== (const double   double1,const var&     rhs     ){return  MVeq(rhs		,var(double1) );}
+DLL_PUBLIC bool operator== (const bool     bool1  ,const var&     rhs     ){return  MVeq(rhs		,var(bool1)   );}
 
-DLL_PUBLIC bool operator !=(const var&     lhs    ,const var&     rhs     ){return bool(!MVeq(lhs		,rhs)          );}
-DLL_PUBLIC bool operator !=(const var&     lhs    ,const wchar_t* char2   ){return bool(!MVeq(lhs		,var(char2)	  ));}
-DLL_PUBLIC bool operator !=(const var&     lhs    ,const int      int2    ){return bool(!MVeq(lhs		,var(int2)    ));}
-DLL_PUBLIC bool operator !=(const var&     lhs    ,const double   double2 ){return bool(!MVeq(lhs		,var(double2) ));}
-DLL_PUBLIC bool operator !=(const wchar_t* char1  ,const var&     rhs     ){return bool(!MVeq(rhs		,var(char1)   ));}
-DLL_PUBLIC bool operator !=(const int      int1   ,const var&     rhs     ){return bool(!MVeq(rhs		,var(int1)    ));}
-DLL_PUBLIC bool operator !=(const double   double1,const var&     rhs     ){return bool(!MVeq(rhs		,var(double1) ));}
+DLL_PUBLIC bool operator!= (const var&     lhs    ,const var&     rhs     ){return !MVeq(lhs		,rhs          );}
+DLL_PUBLIC bool operator!= (const var&     lhs    ,const wchar_t* char2   ){return !MVeq(lhs		,var(char2)	  );}
+DLL_PUBLIC bool operator!= (const var&     lhs    ,const int      int2    ){return !MVeq(lhs		,var(int2)    );}
+DLL_PUBLIC bool operator!= (const var&     lhs    ,const double   double2 ){return !MVeq(lhs		,var(double2) );}
+DLL_PUBLIC bool operator!= (const var&     lhs    ,const bool     bool2   ){return !MVeq(lhs		,var(bool2)   );}
+DLL_PUBLIC bool operator!= (const wchar_t* char1  ,const var&     rhs     ){return !MVeq(rhs		,var(char1)   );}
+DLL_PUBLIC bool operator!= (const int      int1   ,const var&     rhs     ){return !MVeq(rhs		,var(int1)    );}
+DLL_PUBLIC bool operator!= (const double   double1,const var&     rhs     ){return !MVeq(rhs		,var(double1) );}
+DLL_PUBLIC bool operator!= (const bool     bool1  ,const var&     rhs     ){return !MVeq(rhs		,var(bool1)   );}
 
 //< V<= > >=
-DLL_PUBLIC bool operator < (const var&     lhs    ,const var&     rhs     ){return bool( MVlt(lhs         ,rhs         ));}
-DLL_PUBLIC bool operator < (const var&     lhs    ,const wchar_t* char2   ){return bool( MVlt(lhs         ,var(char2)  ));}
-DLL_PUBLIC bool operator < (const var&     lhs    ,const int      int2    ){return      MVlt(lhs         ,int2         );}
-DLL_PUBLIC bool operator < (const var&     lhs    ,const double   double2 ){return bool( MVlt(lhs         ,var(double2)));}
-DLL_PUBLIC bool operator < (const wchar_t* char1  ,const var&     rhs     ){return bool( MVlt(var(char1)  ,rhs         ));}
-DLL_PUBLIC bool operator < (const int      int1   ,const var&     rhs     ){return      MVlt(int1        ,rhs          );}
-DLL_PUBLIC bool operator < (const double   double1,const var&     rhs     ){return bool( MVlt(var(double1),rhs         ));}
+DLL_PUBLIC bool operator<  (const var&     lhs    ,const var&     rhs     ){return  MVlt(lhs         ,rhs         );}
+DLL_PUBLIC bool operator<  (const var&     lhs    ,const wchar_t* char2   ){return  MVlt(lhs         ,var(char2)  );}
+DLL_PUBLIC bool operator<  (const var&     lhs    ,const int      int2    ){return  MVlt(lhs         ,int2        );}
+DLL_PUBLIC bool operator<  (const var&     lhs    ,const double   double2 ){return  MVlt(lhs         ,var(double2));}
+DLL_PUBLIC bool operator<  (const wchar_t* char1  ,const var&     rhs     ){return  MVlt(var(char1)  ,rhs         );}
+DLL_PUBLIC bool operator<  (const int      int1   ,const var&     rhs     ){return  MVlt(int1        ,rhs         );}
+DLL_PUBLIC bool operator<  (const double   double1,const var&     rhs     ){return  MVlt(var(double1),rhs         );}
 
-DLL_PUBLIC bool operator >=(const var&     lhs    ,const var&     rhs     ){return bool(!MVlt(lhs         ,rhs)         );}
-DLL_PUBLIC bool operator >=(const var&     lhs    ,const wchar_t* char2   ){return bool(!MVlt(lhs         ,var(char2)  ));}
-DLL_PUBLIC bool operator >=(const var&     lhs    ,const int      int2    ){return     !MVlt(lhs         ,int2         );}
-DLL_PUBLIC bool operator >=(const var&     lhs    ,const double   double2 ){return bool(!MVlt(lhs         ,var(double2)));}
-DLL_PUBLIC bool operator >=(const wchar_t* char1  ,const var&     rhs     ){return bool(!MVlt(var(char1)  ,rhs         ));}
-DLL_PUBLIC bool operator >=(const int      int1   ,const var&     rhs     ){return     !MVlt(int1        ,rhs          );}
-DLL_PUBLIC bool operator >=(const double   double1,const var&     rhs     ){return bool(!MVlt(var(double1),rhs         ));}
+DLL_PUBLIC bool operator>= (const var&     lhs    ,const var&     rhs     ){return !MVlt(lhs         ,rhs         );}
+DLL_PUBLIC bool operator>= (const var&     lhs    ,const wchar_t* char2   ){return !MVlt(lhs         ,var(char2)  );}
+DLL_PUBLIC bool operator>= (const var&     lhs    ,const int      int2    ){return !MVlt(lhs         ,int2        );}
+DLL_PUBLIC bool operator>= (const var&     lhs    ,const double   double2 ){return !MVlt(lhs         ,var(double2));}
+DLL_PUBLIC bool operator>= (const wchar_t* char1  ,const var&     rhs     ){return !MVlt(var(char1)  ,rhs         );}
+DLL_PUBLIC bool operator>= (const int      int1   ,const var&     rhs     ){return !MVlt(int1        ,rhs         );}
+DLL_PUBLIC bool operator>= (const double   double1,const var&     rhs     ){return !MVlt(var(double1),rhs         );}
 
-DLL_PUBLIC bool operator > (const var&     lhs    ,const var&     rhs     ){return bool( MVlt(rhs         ,lhs         ));}
-DLL_PUBLIC bool operator > (const var&     lhs    ,const wchar_t* char2   ){return bool( MVlt(var(char2)  ,lhs         ));}
-DLL_PUBLIC bool operator > (const var&     lhs    ,const int      int2    ){return      MVlt(int2        ,lhs          );}
-DLL_PUBLIC bool operator > (const var&     lhs    ,const double   double2 ){return bool( MVlt(var(double2),lhs         ));}
-DLL_PUBLIC bool operator > (const wchar_t* char1  ,const var&     rhs     ){return bool( MVlt(rhs         ,var(char1)  ));}
-DLL_PUBLIC bool operator > (const int      int1   ,const var&     rhs     ){return      MVlt(rhs         ,int1         );}
-DLL_PUBLIC bool operator > (const double   double1,const var&     rhs     ){return bool( MVlt(rhs         ,var(double1)));}
+DLL_PUBLIC bool operator>  (const var&     lhs    ,const var&     rhs     ){return  MVlt(rhs         ,lhs         );}
+DLL_PUBLIC bool operator>  (const var&     lhs    ,const wchar_t* char2   ){return  MVlt(var(char2)  ,lhs         );}
+DLL_PUBLIC bool operator>  (const var&     lhs    ,const int      int2    ){return  MVlt(int2        ,lhs         );}
+DLL_PUBLIC bool operator>  (const var&     lhs    ,const double   double2 ){return  MVlt(var(double2),lhs         );}
+DLL_PUBLIC bool operator>  (const wchar_t* char1  ,const var&     rhs     ){return  MVlt(rhs         ,var(char1)  );}
+DLL_PUBLIC bool operator>  (const int      int1   ,const var&     rhs     ){return  MVlt(rhs         ,int1        );}
+DLL_PUBLIC bool operator>  (const double   double1,const var&     rhs     ){return  MVlt(rhs         ,var(double1));}
 
-DLL_PUBLIC bool operator <=(const var&     lhs    ,const var&     rhs     ){return bool(!MVlt(rhs         ,lhs         ));}
-DLL_PUBLIC bool operator <=(const var&     lhs    ,const wchar_t* char2   ){return bool(!MVlt(var(char2)  ,lhs         ));}
-DLL_PUBLIC bool operator <=(const var&     lhs    ,const int      int2    ){return     !MVlt(int2        ,lhs          );}
-DLL_PUBLIC bool operator <=(const var&     lhs    ,const double   double2 ){return bool(!MVlt(var(double2),lhs         ));}
-DLL_PUBLIC bool operator <=(const wchar_t* char1  ,const var&     rhs     ){return bool(!MVlt(rhs         ,var(char1)  ));}
-DLL_PUBLIC bool operator <=(const int      int1   ,const var&     rhs     ){return     !MVlt(rhs         ,int1         );}
-DLL_PUBLIC bool operator <=(const double   double1,const var&     rhs     ){return bool(!MVlt(rhs         ,var(double1)));}
+DLL_PUBLIC bool operator<= (const var&     lhs    ,const var&     rhs     ){return !MVlt(rhs         ,lhs         );}
+DLL_PUBLIC bool operator<= (const var&     lhs    ,const wchar_t* char2   ){return !MVlt(var(char2)  ,lhs         );}
+DLL_PUBLIC bool operator<= (const var&     lhs    ,const int      int2    ){return !MVlt(int2        ,lhs         );}
+DLL_PUBLIC bool operator<= (const var&     lhs    ,const double   double2 ){return !MVlt(var(double2),lhs         );}
+DLL_PUBLIC bool operator<= (const wchar_t* char1  ,const var&     rhs     ){return !MVlt(rhs         ,var(char1)  );}
+DLL_PUBLIC bool operator<= (const int      int1   ,const var&     rhs     ){return !MVlt(rhs         ,int1        );}
+DLL_PUBLIC bool operator<= (const double   double1,const var&     rhs     ){return !MVlt(rhs         ,var(double1));}
 
 //+var
-DLL_PUBLIC var operator +(const var& var1)
+DLL_PUBLIC var operator+(const var& var1)
 {
-	THISIS(L"var operator +(const var& var1)")
+	THISIS(L"var operator+(const var& var1)")
 	ISDEFINED(var1)
 
 	do
@@ -1307,53 +1311,67 @@ var MVcat(const var& lhs,const var& rhs)
 	return lhs.var_mvstr+rhs.var_mvstr;
 }
 
-DLL_PUBLIC var operator+(const var&    lhs    ,const var&    rhs     ){return MVadd(lhs,rhs          );}
-DLL_PUBLIC var operator+(const var&    lhs    ,const wchar_t*  char2   ){return MVadd(lhs,var(char2)    );}
-DLL_PUBLIC var operator+(const var&    lhs    ,const int    int2    ){return MVadd(lhs,var(int2)     );}
-DLL_PUBLIC var operator+(const var&    lhs    ,const double double2 ){return MVadd(lhs,var(double2)  );}
-DLL_PUBLIC var operator+(const wchar_t*  char1  ,const var&    rhs     ){return MVadd(var(char1),rhs    );}
-DLL_PUBLIC var operator+(const int    int1   ,const var&    rhs     ){return MVadd(var(int1),rhs     );}
-DLL_PUBLIC var operator+(const double double1,const var&    rhs     ){return MVadd(var(double1),rhs  );}
+DLL_PUBLIC var operator+ (const var&     lhs    ,const var&     rhs     ){return MVadd(lhs         ,rhs         );}
+DLL_PUBLIC var operator+ (const var&     lhs    ,const wchar_t* char2   ){return MVadd(lhs         ,var(char2)  );}
+DLL_PUBLIC var operator+ (const var&     lhs    ,const int      int2    ){return MVadd(lhs         ,var(int2)   );}
+DLL_PUBLIC var operator+ (const var&     lhs    ,const double   double2 ){return MVadd(lhs         ,var(double2));}
+DLL_PUBLIC var operator+ (const var&     lhs    ,const bool     bool2   ){return MVadd(lhs         ,var(bool2)  );}
+DLL_PUBLIC var operator+ (const wchar_t* char1  ,const var&     rhs     ){return MVadd(var(char1)  ,rhs         );}
+DLL_PUBLIC var operator+ (const int      int1   ,const var&     rhs     ){return MVadd(var(int1)   ,rhs         );}
+DLL_PUBLIC var operator+ (const double   double1,const var&     rhs     ){return MVadd(var(double1),rhs         );}
+DLL_PUBLIC var operator+ (const bool     bool1  ,const var&     rhs     ){return MVadd(var(bool1)  ,rhs         );}
 
-DLL_PUBLIC var operator-(const var&    lhs    ,const var&    rhs     ){return MVsub(lhs,rhs         );}
-DLL_PUBLIC var operator-(const var&    lhs    ,const wchar_t*  char2   ){return MVsub(lhs,var(char2)   );}
-DLL_PUBLIC var operator-(const var&    lhs    ,const int    int2    ){return MVsub(lhs,var(int2)    );}
-DLL_PUBLIC var operator-(const var&    lhs    ,const double double2 ){return MVsub(lhs,var(double2) );}
-DLL_PUBLIC var operator-(const wchar_t*  char1  ,const var&    rhs     ){return MVsub(var(char1),rhs   );}
-DLL_PUBLIC var operator-(const int    int1   ,const var&    rhs     ){return MVsub(var(int1),rhs    );}
-DLL_PUBLIC var operator-(const double double1,const var&    rhs     ){return MVsub(var(double1),rhs );}
+DLL_PUBLIC var operator- (const var&     lhs    ,const var&     rhs     ){return MVsub(lhs         ,rhs         );}
+DLL_PUBLIC var operator- (const var&     lhs    ,const wchar_t* char2   ){return MVsub(lhs         ,var(char2)  );}
+DLL_PUBLIC var operator- (const var&     lhs    ,const int      int2    ){return MVsub(lhs         ,var(int2)   );}
+DLL_PUBLIC var operator- (const var&     lhs    ,const double   double2 ){return MVsub(lhs         ,var(double2));}
+DLL_PUBLIC var operator- (const var&     lhs    ,const bool     bool2   ){return MVsub(lhs         ,var(bool2)  );}
+DLL_PUBLIC var operator- (const wchar_t* char1  ,const var&     rhs     ){return MVsub(var(char1)  ,rhs         );}
+DLL_PUBLIC var operator- (const int      int1   ,const var&     rhs     ){return MVsub(var(int1)   ,rhs         );}
+DLL_PUBLIC var operator- (const double   double1,const var&     rhs     ){return MVsub(var(double1),rhs         );}
+DLL_PUBLIC var operator- (const bool     bool1  ,const var&     rhs     ){return MVsub(var(bool1)  ,rhs         );}
 
-DLL_PUBLIC var operator*(const var&    lhs    ,const var&    rhs     ){return MVmul(lhs,rhs          );}
-DLL_PUBLIC var operator*(const var&    lhs    ,const wchar_t*  char2   ){return MVmul(lhs,var(char2)    );}
-DLL_PUBLIC var operator*(const var&    lhs    ,const int    int2    ){return MVmul(lhs,var(int2)     );}
-DLL_PUBLIC var operator*(const var&    lhs    ,const double double2 ){return MVmul(lhs,var(double2)  );}
-DLL_PUBLIC var operator*(const wchar_t*  char1  ,const var&    rhs     ){return MVmul(var(char1),rhs    );}
-DLL_PUBLIC var operator*(const int    int1   ,const var&    rhs     ){return MVmul(var(int1),rhs     );}
-DLL_PUBLIC var operator*(const double double1,const var&    rhs     ){return MVmul(var(double1),rhs  );}
+DLL_PUBLIC var operator* (const var&     lhs    ,const var&     rhs     ){return MVmul(lhs         ,rhs         );}
+DLL_PUBLIC var operator* (const var&     lhs    ,const wchar_t* char2   ){return MVmul(lhs         ,var(char2)  );}
+DLL_PUBLIC var operator* (const var&     lhs    ,const int      int2    ){return MVmul(lhs         ,var(int2)   );}
+DLL_PUBLIC var operator* (const var&     lhs    ,const double   double2 ){return MVmul(lhs         ,var(double2));}
+DLL_PUBLIC var operator* (const var&     lhs    ,const bool     bool2   ){return MVmul(lhs         ,var(bool2)  );}
+DLL_PUBLIC var operator* (const wchar_t* char1  ,const var&     rhs     ){return MVmul(var(char1)  ,rhs         );}
+DLL_PUBLIC var operator* (const int      int1   ,const var&     rhs     ){return MVmul(var(int1)   ,rhs         );}
+DLL_PUBLIC var operator* (const double   double1,const var&     rhs     ){return MVmul(var(double1),rhs         );}
+DLL_PUBLIC var operator* (const bool     bool1  ,const var&     rhs     ){return MVmul(var(bool1)  ,rhs         );}
 
-DLL_PUBLIC var operator/(const var&    lhs    ,const var&    rhs     ){return MVdiv(lhs,rhs          );}
-DLL_PUBLIC var operator/(const var&    lhs    ,const wchar_t*  char2   ){return MVdiv(lhs,var(char2)    );}
-DLL_PUBLIC var operator/(const var&    lhs    ,const int    int2    ){return MVdiv(lhs,var(int2)     );}
-DLL_PUBLIC var operator/(const var&    lhs    ,const double double2 ){return MVdiv(lhs,var(double2)  );}
-DLL_PUBLIC var operator/(const wchar_t*  char1  ,const var&    rhs     ){return MVdiv(var(char1),rhs    );}
-DLL_PUBLIC var operator/(const int    int1   ,const var&    rhs     ){return MVdiv(var(int1),rhs     );}
-DLL_PUBLIC var operator/(const double double1,const var&    rhs     ){return MVdiv(var(double1),rhs  );}
+DLL_PUBLIC var operator/ (const var&     lhs    ,const var&     rhs     ){return MVdiv(lhs         ,rhs         );}
+DLL_PUBLIC var operator/ (const var&     lhs    ,const wchar_t* char2   ){return MVdiv(lhs         ,var(char2)  );}
+DLL_PUBLIC var operator/ (const var&     lhs    ,const int      int2    ){return MVdiv(lhs         ,var(int2)   );}
+DLL_PUBLIC var operator/ (const var&     lhs    ,const double   double2 ){return MVdiv(lhs         ,var(double2));}
+//disallow divide by boolean to prevent possible runtime divide by zero
+//DLL_PUBLIC var operator/ (const var&     lhs    ,const bool     bool2   ){return MVdiv(lhs,var(bool2)  );}
+DLL_PUBLIC var operator/ (const wchar_t* char1  ,const var&     rhs     ){return MVdiv(var(char1)  ,rhs         );}
+DLL_PUBLIC var operator/ (const int      int1   ,const var&     rhs     ){return MVdiv(var(int1)   ,rhs         );}
+DLL_PUBLIC var operator/ (const double   double1,const var&     rhs     ){return MVdiv(var(double1),rhs         );}
+DLL_PUBLIC var operator/ (const bool     bool1  ,const var&     rhs     ){return MVdiv(var(bool1)  ,rhs         );}
 
-DLL_PUBLIC var operator%(const var&    lhs    ,const var&    rhs     ){return MVmod(lhs,rhs          );}
-DLL_PUBLIC var operator%(const var&    lhs    ,const wchar_t*  char2   ){return MVmod(lhs,var(char2)    );}
-DLL_PUBLIC var operator%(const var&    lhs    ,const int    int2    ){return MVmod(lhs,var(int2)     );}
-DLL_PUBLIC var operator%(const var&    lhs    ,const double double2 ){return MVmod(lhs,var(double2)  );}
-DLL_PUBLIC var operator%(const wchar_t*  char1  ,const var&    rhs     ){return MVmod(var(char1),rhs    );}
-DLL_PUBLIC var operator%(const int    int1   ,const var&    rhs     ){return MVmod(var(int1),rhs     );}
-DLL_PUBLIC var operator%(const double double1,const var&    rhs     ){return MVmod(var(double1),rhs  );}
+DLL_PUBLIC var operator% (const var&     lhs    ,const var&     rhs     ){return MVmod(lhs         ,rhs         );}
+DLL_PUBLIC var operator% (const var&     lhs    ,const wchar_t* char2   ){return MVmod(lhs         ,var(char2)  );}
+DLL_PUBLIC var operator% (const var&     lhs    ,const int      int2    ){return MVmod(lhs         ,var(int2)   );}
+DLL_PUBLIC var operator% (const var&     lhs    ,const double   double2 ){return MVmod(lhs         ,var(double2));}
+//disallow divide by boolean to prevent possible runtime divide by zero
+//DLL_PUBLIC var operator% (const var&     lhs    ,const bool    bool2   ){return MVmod(lhs,var(bool2)  );}
+DLL_PUBLIC var operator% (const wchar_t* char1  ,const var&     rhs     ){return MVmod(var(char1)  ,rhs         );}
+DLL_PUBLIC var operator% (const int      int1   ,const var&     rhs     ){return MVmod(var(int1)   ,rhs         );}
+DLL_PUBLIC var operator% (const double   double1,const var&     rhs     ){return MVmod(var(double1),rhs         );}
+DLL_PUBLIC var operator% (const bool     bool1  ,const var&     rhs     ){return MVmod(var(bool1)  ,rhs         );}
 
-DLL_PUBLIC var operator^(const var&    lhs    ,const var&    rhs     ){return MVcat(lhs,rhs          );}
-DLL_PUBLIC var operator^(const var&    lhs    ,const wchar_t*  char2   ){return MVcat(lhs,var(char2)    );}
-DLL_PUBLIC var operator^(const var&    lhs    ,const int    int2    ){return MVcat(lhs,var(int2)     );}
-DLL_PUBLIC var operator^(const var&    lhs    ,const double double2 ){return MVcat(lhs,var(double2)  );}
-DLL_PUBLIC var operator^(const wchar_t*  char1  ,const var&    rhs     ){return MVcat(var(char1),rhs    );}
-DLL_PUBLIC var operator^(const int    int1   ,const var&    rhs     ){return MVcat(var(int1),rhs     );}
-DLL_PUBLIC var operator^(const double double1,const var&    rhs     ){return MVcat(var(double1),rhs  );}
+//NB do *NOT* support concatenate with bool or vice versa!!!
+//to avoid compiler doing wrong precendence issue between ^ and logical operators
+DLL_PUBLIC var operator^ (const var&     lhs    ,const var&     rhs     ){return MVcat(lhs         ,rhs         );}
+DLL_PUBLIC var operator^ (const var&     lhs    ,const wchar_t* char2   ){return MVcat(lhs         ,var(char2)  );}
+DLL_PUBLIC var operator^ (const var&     lhs    ,const int      int2    ){return MVcat(lhs         ,var(int2)   );}
+DLL_PUBLIC var operator^ (const var&     lhs    ,const double   double2 ){return MVcat(lhs         ,var(double2));}
+DLL_PUBLIC var operator^ (const wchar_t* char1  ,const var&     rhs     ){return MVcat(var(char1)  ,rhs         );}
+DLL_PUBLIC var operator^ (const int      int1   ,const var&     rhs     ){return MVcat(var(int1)   ,rhs         );}
+DLL_PUBLIC var operator^ (const double   double1,const var&     rhs     ){return MVcat(var(double1),rhs         );}
 
 
 #if defined __MINGW32__

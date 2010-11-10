@@ -42,33 +42,6 @@ const var EXTERNALCHARS=_SSTM_ _STM_ _TM_ _SM_ _VM_ _FM_ _RM_;
 
 //NB do not define default copy constructor and assignment in order to force
 //derived classes to implement them since they are defined in the class header
-MvEnvironment::MvEnvironment()
-{
-
-	this->USERNAME=L"";		//ALN:TODO: change to :USERNAME(L"")
-	this->ACCOUNT=L"";
-	this->AW=L"";
-	this->LOWERCASE=LOWER_CASE;
-	this->UPPERCASE=_UPPER_CASE;
-	this->SYSTEM=L"";
-	this->SENTENCE=L"";
-	this->STATION=L"";
-	this->PRIVILEGE=L"";
-	this->USER0=L"";
-	this->USER1=L"";
-	this->USER2=L"";
-	this->USER3=L"";
-	this->USER4=L"";
-	this->FILES=L"";
-	this->TCLSTACK=L"";
-	this->ROLLOUTFILE=L"";
-	this->INTCONST=L"";
-	this->PRIORITYINT=L"";
-	this->DEFINITIONS=L"";
-	this->SECURITY=L"";
-	this->LISTACTIVE=0;
-
-}
 
 //destructor
 MvEnvironment::~MvEnvironment()
@@ -104,20 +77,48 @@ MvEnvironment::~MvEnvironment()
 
 }
 
-bool MvEnvironment::init(const var& threadno)	//ALN:TODO:change to natural int parameter (var is misleading)
+bool MvEnvironment::init(const var& threadno)
 {
-	//std::wcout<<L"MvEnvironment::init("<<threadno<<L")"<<std::endl;
+	std::wcout<<L"MvEnvironment::init("<<threadno<<L")"<<std::endl;
 	//mvprocess
 
+	USER0=L"";
 	this->USERNAME=L"";
 	this->ACCOUNT=L"";
 	this->STATION=L"";
 	this->ROLLOUTFILE=L"~"^threadno^L".$$$";
 	this->THREADNO=threadno;
-	this->SYSTEM.replacer(17,0,0,L"");
+	//this->SYSTEM.replacer(17,0,0,L"");
 
-	cache_dictid_="";			//ALN:TODO: why we need narrow string here ? one temp var is created
+	cache_dictid_="";
 	this->DICT="";
+
+//	return true;
+
+	this->USERNAME=L"";
+	this->ACCOUNT=L"";
+	this->AW=L"";
+	this->LOWERCASE=LOWERCASE_;
+	this->UPPERCASE=UPPERCASE_;
+	this->SYSTEM=L"";
+	this->SENTENCE=L"";
+	this->STATION=L"";
+	this->PRIVILEGE=L"";
+	USER0=L"";
+	this->USER0=L"";
+USER0.outputl("USER0=");
+	this->USER1=L"";
+	this->USER2=L"";
+	this->USER3=L"";
+	this->USER4=L"";
+	this->FILES=L"";
+	this->TCLSTACK=L"";
+	this->ROLLOUTFILE=L"";
+	this->INTCONST=L"";
+	this->PRIORITYINT=L"";
+	this->DEFINITIONS=L"";
+	this->SECURITY=L"";
+	this->LISTACTIVE=0;
 
 	return true;
 
@@ -428,7 +429,7 @@ void MvEnvironment::mssg(const var& msg0, const var& options0, var& response, co
 
 	//suggested problem report example
 
-	//change the osfilename to a revelation file name
+	//change the osfilename to a db file name
 	if (options.index(L"[FS124]", 1))
 		goto damaged;
 	if (options.index(L"[FS125]", 1))
@@ -476,72 +477,7 @@ damaged:
 		}
 	}
 
-	//if not interactive
-	if (!interactive) {
-
-//		//option to break out of infinite loop
-//		xx.input(-1, 0);
-//		if (xx == var().chr(27)) {
-//			if (this->USERNAME == L"NEOSYS")
-//				debug();
-//			var().stop();
-//		}
-
-		//catch rev trying to get user input to correct a word
-		if (var(L"W156,W159,W600,W601").locateusing(msg, L",", xx)) {
-			var msg2 = msg.extract(1, 1, 1).xlate(L"SYSMESSAGES", 11, L"X");
-			if (msg2)
-				msg = msg2 ^ L" " ^response;
-			//must be w156 space word to be handled in select2
-			this->USER4 = msg ^ L" " ^response;
-			var().stop();
-		}
-
-		//catch rev trying to get user input to correct a word
-		//if msg='w556' then
-		// *must be w156 space word to be handled in select2
-		// @user4='w156 ':response:' invalid word'
-		// print time()
-		// return
-		// end
-
-		if (msg == L"") {
-			msg = options.extract(11);
-			options = options.extract(1);
-		}
-		var options2 = options;
-		if (options2 == L"")
-			options2 = msg.extract(1, 1, 1).xlate(L"SYS.MESSAGES", 1, L"X");
-		var options3 = options2;
-		options3.converter(L"UDWT", L"");
-		if (options3 != options2) {
-			goto msgrti;
-		}else{
-			if (!(msg.index(FM, 1) || msg.index(VM, 1))) {
-				var msg2 = msg.extract(1, 1, 1).xlate(L"SYS.MESSAGES", 11, L"X");
-				if (!(msg2))
-					msg2 = msg.extract(1, 1, 1).xlate(L"SYSMESSAGES", 11, L"X");
-				if (msg2)
-					msg = msg2;
-			}
-			msg.swapper(L"%1%", params.extract(1));
-			msg.swapper(L"%2%", params.extract(2));
-			msg.swapper(L"%3%", params.extract(3));
-			//force esc if too many messages
-			if (this->USER4.length() > 8000) {
-				msg.outputl();
-				// response=wchar_t(27)
-				// return
-				var().stop();
-			}else{
-				//@user4:=@fm:msg
-				this->USER4.replacer(-1, 0, 0, msg);
-			}
-		}
-		return;
-	}
-
-msgrti:
+//msgrti:
 
 	if (options.index(L"U", 1) || options.index(L"D", 1)) {
 		if (!interactive) {
@@ -686,8 +622,8 @@ bool MvEnvironment::openfile(const var& filename0, var& file) const
 open:
 	if (file.open(filename)) {
 
-		if (!(this->FILES.locateusing(filename, FM, xx)))
-			this->FILES.replacer(-1, 0, 0, filename);
+//		if (!(this->FILES.locateusing(filename, FM, xx)))
+//			this->FILES.replacer(-1, 0, 0, filename);
 
 		return 1;
 	}else{
