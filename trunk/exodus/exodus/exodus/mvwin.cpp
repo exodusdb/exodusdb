@@ -4,6 +4,9 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h> 
 
+//TODO check why this doesnt appear to work here
+#define MV_NO_NARROW
+
 #include <exodus/mv.h>
 
 namespace exodus {
@@ -16,19 +19,24 @@ var getprocessn()
 
 var getexecpath()
 {
+	//this might not convert windows characters to exodus characters properly but
+	//if compiled with unicode options it is probably ok since TCHAR will be wide
 
-	DWORD nSize=2048;			//ALN:TODO: true but not ideal, ... try to move to classic code
-	TCHAR filename[2048];
+	DWORD nSize=MAX_PATH;
+	TCHAR filename[MAX_PATH];
 
 	int bytes = GetModuleFileName(NULL, filename, nSize);
 	if(bytes == 0)
-		return "";
+		return L"";
 	else
 	{
+		//move to a standardised global function to allow usage
+		//by other win functions?
+		//the job here is to convert in a dumb way from win TCHAR to var wchar_t
+
 		//make a string of TCHAR
 		typedef std::basic_string<TCHAR> tstring;
-		tstring tempstr(filename,bytes);	//ALN:TODO: make this conversion as standard, or:
-											//ALN:TODO:up to explicit operator = (TCHAR)
+		tstring tempstr(filename,bytes);
 		//transfer the TCHARS into a wstring
 		std::wstring wtempstr;
 		for (unsigned int ii=0;ii<tempstr.length();++ii)

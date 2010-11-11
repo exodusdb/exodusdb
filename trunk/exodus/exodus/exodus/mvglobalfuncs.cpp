@@ -1149,7 +1149,8 @@ int exodus_main(int exodus__argc, char *exodus__argv[], MvEnvironment& mv)
 	//leave a copy where backtrace can get at it
 	EXECPATH2=mv.EXECPATH;
 
-	mv.SENTENCE=L"";			//ALN:TODO: hm, again, char->var-> op=(var) SB #define MV_NO_NARROW disallows accidental narrow now
+	mv.SENTENCE=L"";			//ALN:TODO: hm, again, char->var-> op=(var)
+	//SB #define MV_NO_NARROW disallows accidental narrow now
 	mv.COMMAND=L"";
 	mv.OPTIONS=L"";
 

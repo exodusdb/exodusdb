@@ -1168,12 +1168,21 @@ bool var::isnum(void) const
 	}
 	else		//ALN:TODO: long int wcstol (const wchar_t *restrict string, wchar_t **restrict tailptr, int base)
 	{			//ALN:TODO: ... should be OK here
+
 		//var_mvint=_wtoi(var_mvstr.c_str());
-		//var_mvdbl=_wtof(var_mvstr.c_str());
 		//TODO optimise
+
+		//change from
 		std::string result(var_mvstr.begin(),var_mvstr.end());
-		//var_mvdbl=atof(result.c_str());
 		var_mvint=atoi(result.c_str());
+
+		//change to something like this? //ALN:TODO: finish and test !
+		/*
+		wchar_t * err_char;
+		var_mvint=wcstol( result.c_str(), & err_char, 10);
+		if( 
+		*/
+
 		var_mvtyp=pimpl::MVTYPE_INTSTR;
 	}
 
