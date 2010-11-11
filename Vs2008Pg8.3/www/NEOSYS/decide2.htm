@@ -1,0 +1,967 @@
+<html>
+<head>
+    <title></title>
+
+    <script language="javascript" src="../neosys/scripts/client.js"></script>
+
+    <style>
+.hiddenrow
+{
+display:none;
+}
+</style>
+
+    <script id="clientEventHandlersJS" language="javascript">
+<!--
+
+var goriginalstyles={}
+
+ismac=navigator.appVersion.indexOf('Macintosh')>=0
+isosx=ismac&&navigator.userAgent.indexOf('MSIE 5.23')>=0
+if (isosx)
+{
+ alert('Sorry, not programmed in Mac OSX yet')
+ closeit()
+}
+
+var gsearchfor=''
+var gwindowloaded=false
+var ghidden=false
+
+//window.onload=window_onload
+function formfunctions_onload()
+{
+
+ //used in many places
+ 
+ var newwidth=wholediv.offsetWidth+75
+ if (newwidth>window.screen.availWidth) newwidth=window.screen.availWidth
+ //alert(screen.availHeight)
+ window.dialogWidth=newwidth+'px'
+ 
+ //window.dialogHeight='400px'
+ var newheight=wholediv.offsetHeight+75
+ if (newheight>window.screen.availHeight) newheight=window.screen.availHeight
+ //alert(screen.availHeight)
+ window.dialogHeight=newheight+'px'
+ 
+ //center
+ var top=(window.screen.availHeight-newheight)/2
+ window.dialogTop=top
+ var left=(window.screen.availWidth-newwidth)/2
+ window.dialogLeft=left
+
+ gwindowloaded=true
+ if (gsearchfor) searchrows(gsearchfor)
+ 
+}
+
+String.prototype.neosyssplit=function neosyssplit(seps,invert)
+{
+ 
+ var str1=this.toString()
+ if (str1=='') return []
+ 
+ //split the fields
+ var array=str1.split(seps.slice(0,1))
+ 
+ //split the values
+ if (seps.length>1)
+ {
+  //seps=seps.slice(1)
+  for (var i=0;i<array.length;i++)
+  {
+   array[i]=array[i].neosyssplit(seps.slice(1))
+  }
+ }
+ 
+ return array
+ 
+}
+
+String.prototype.neosyscapitalise=function neosyscapitalise()
+{
+ //converts BRAND_CODE to Brand code
+ var string=this.toString()
+ string=string.replace(/_/g,' ').toLowerCase()
+ string=string.slice(0,1).toUpperCase()+string.slice(1)
+ return string
+}
+
+var currentrow
+var selectedrow
+
+//window.onload=window_onload
+
+document.onkeydown=document_onkeydown
+
+function document_onkeydown()
+{
+ 
+ keycode=event.keyCode
+
+ //ctrl+Enter or single select
+ if (keycode==13&&event.ctrlKey)
+ {
+  ok.click()
+  return false
+ }
+ 
+ //F9 is old save
+ if (keycode==120)
+ {
+  ok.click()
+  return false
+ }
+ 
+ if (!currentrow) return
+ 
+ var maxrecn
+ var nextrecn=null
+ 
+ var rows
+ if (xmldatabinding) rows=table1.tBodies
+ else rows=table1.tBodies[0].childNodes
+
+ var recn
+ var nheaderrows=1
+ if (xmldatabinding)
+ {
+  maxrecn=rows.length-1
+  recn=currentrow.recordNumber-1
+ }
+ else
+ {
+  maxrecn=rows.length-1
+  recn=currentrow.rowIndex-nheaderrows
+ }
+ 
+ //page up
+ if (keycode==33)
+ {
+  if (event.ctrlKey)
+  {
+   nextrecn=0
+   while ((xmldatabinding?rows[nextrecn].rows[0].className:rows[nextrecn].className)=='hiddenrow')
+   {
+    nextrecn++
+   }
+   window.scrollTo(0,0)
+  }
+  else
+  {
+   //nextrecn=recn-10
+   //if (nextrecn<0) nextrecn=0
+   nextrecn=recn
+   for (var ii=0;ii<10;)
+   {
+    nextrecn--
+    if (nextrecn<0)
+    {
+     nextrecn=maxrecn
+     ii=9
+     window.scrollTo(0,99999)
+    }
+    if ((xmldatabinding?rows[nextrecn].rows[0].className:rows[nextrecn].className)!='hiddenrow') ii++
+   }
+  }
+ }
+ 
+ //page down
+ if (keycode==34)
+ {
+  if (event.ctrlKey)
+  {
+   nextrecn=maxrecn
+   while ((xmldatabinding?rows[nextrecn].rows[0].className:rows[nextrecn].className)=='hiddenrow')
+   {
+    nextrecn--
+   }
+   window.scrollTo(0,99999)
+  }
+  else
+  {
+   nextrecn=recn
+   for (var ii=0;ii<10;)
+   {
+    nextrecn++
+    if (nextrecn>maxrecn)
+    {
+     nextrecn=0
+     ii=9
+     window.scrollTo(0,0)
+    }
+    if ((xmldatabinding?rows[nextrecn].rows[0].className:rows[nextrecn].className)!='hiddenrow') ii++
+   }
+  }
+ }
+ 
+ if (keycode==13)
+ {
+  clickrow(currentrow)
+  //nextrecn=recn+1
+  if (!returnmany)
+  {
+   ok.click()
+   return false
+  }
+  keycode=40//simulate down arrow
+ }
+ 
+ //up down arrows
+ if (keycode==38||keycode==40)
+ {
+  var direction=keycode==38?-1:1
+  nextrecn=recn
+  while (true)
+  {
+   nextrecn+=direction
+   if (nextrecn<0) nextrecn=maxrecn
+   else if (nextrecn>maxrecn) nextrecn=0
+   if (nextrecn==0) window.scrollTo(0,0)
+   else if (nextrecn==maxrecn) window.scrollTo(0,999999)
+   if ((xmldatabinding?rows[nextrecn].rows[0].className:rows[nextrecn].className)!='hiddenrow') break
+  }
+ }
+ 
+ if (typeof gsearchfor=='undefined') gsearchfor='' 
+ var keychar=String.fromCharCode(keycode)
+ if (!event.altKey&&keychar.match(/[a-z0-9]/i))
+ {
+  windowfind()
+ }
+  
+ if (nextrecn!=null)
+ {
+ 
+  if (nextrecn<0) nextrecn=maxrecn
+  if (nextrecn>maxrecn) nextrecn=0
+  
+  if (xmldatabinding) highlightrow(rows[nextrecn].rows[0])
+  else highlightrow(rows[nextrecn])
+  
+  //conflicts with highlightrow scrollintoview
+  //if (nextrecn>(maxrecn-10)) window.scrollTo(0,99999)
+  if (nextrecn==maxrecn) window.scrollTo(0,99999)
+  if (nextrecn<10) window.scrollTo(0,0)
+  
+  event.cancelBubble=true
+  event.returnValue=false
+  return false
+ }
+
+}
+
+function windowfind()
+{
+ //var gsearchfor=keychar
+ var newsearchfor=prompt('Find what?',gsearchfor)
+ if (newsearchfor) searchrows(newsearchfor)
+}
+
+function searchrows(searchfor)
+{
+
+ //return nfound
+ var nfound=0
+
+ if (searchfor)
+ {
+  gsearchfor=searchfor
+  searchfor=searchfor.toUpperCase()
+ }
+ 
+ var rows
+ if (xmldatabinding) rows=table1.tBodies
+ else rows=table1.tBodies[0].childNodes
+
+ ghidden=false
+ 
+ for (var rown=rows.length-1;rown>=0;rown--)
+ {
+
+  var row
+  if (xmldatabinding) row=rows[rown].rows[0]
+  else row=rows[rown]
+  
+  if (!searchfor||row.innerText.toUpperCase().indexOf(searchfor,true)>=0)
+  {
+   nfound++
+   row.className=''
+  }
+  else
+  {
+   row.className='hiddenrow'
+   ghidden=true
+  }
+ }
+ 
+ if (searchfor&&!nfound&&gwindowloaded)
+ {
+  //show all rows again
+  searchrows()
+  alert(gsearchfor+' not found')
+ }
+
+ return nfound
+  
+}
+
+function rowonmouseover()
+{
+  var row=getancestor(event.srcElement,'TR')
+// if (table1.readyState=='complete')
+  highlightrow(row)
+}
+
+function highlightrow(row)
+{
+
+ if (highlighter) highlighter=null
+ 
+ //unhighlight the old current row
+ if (currentrow) currentrow.style.backgroundColor = currentrow.oldcolor
+ 
+ //highlight new current row
+ currentrow=row
+ currentrow.oldcolor=currentrow.style.backgroundColor
+ currentrow.style.backgroundColor='yellow'
+ 
+ if (event&&event.type!='mouseover') currentrow.scrollIntoView(false)
+ 
+}
+
+function rowonclick()
+{
+ var row=getancestor(event.srcElement,'TR')
+ //row=event.srcElement
+ if (!returnmany)
+ {
+  rowondblclick()
+  return false
+ }
+ clickrow(row)
+}
+
+function rowondblclick(row)
+{
+ //double click on already selected row causes the row to be deselected
+ //which is not the desired effect so reselect it
+ if (!row) row=getancestor(event.srcElement,'TR')
+ //row=event.srcElement
+ var col0=row.all("col0")
+ if (col0.innerText==' '||col0.innerText=='') clickrow(row)
+
+ ok.click()
+ 
+}
+
+function clickrow(row)
+{
+ var rown=row.recordNumber-1
+ var col0=row.all("col0")
+ var checking=(col0.innerText==' '||col0.innerText=='')
+ if ((""+table1.nchecked)=="undefined") table1.nchecked=0
+ 
+ //checking
+ if (checking)
+ {
+
+  //uncheck previous row if not selecting many
+  if (!returnmany)
+  {
+   if (selectedrow)
+   {
+    table1.nchecked--
+    selectedrow.all("col0").innerHTML='&nbsp;'
+    selectedrow.style.backgroundColor=''
+   }
+   selectedrow=row
+  }
+  
+  //increase the total number of selections
+  table1.nchecked++
+  
+  //show the current selection number
+  col0.innerText=table1.nchecked
+  
+  //force the row to remain highlighted after mouse leaves  
+  row.oldoldcolor=row.oldcolor
+  row.oldcolor="yellow"
+  
+ }
+ 
+ //unchecking
+ else
+ {
+  
+  selectedrow=null
+  
+  //decrease the total number of selections
+  table1.nchecked--
+  
+  var checkno=parseInt(col0.innerText,10)
+  col0.innerHTML="&nbsp;"
+  
+  //renumber greater numbered selection by minus one
+  var col0s=document.all("col0")
+  if (checkno<=table1.nchecked)
+  {
+   for (var i=0;i<col0s.length;i++)
+   {
+    if (col0s[i].innerText>checkno)
+     col0s[i].innerText=col0s[i].innerText-1
+   }
+  }
+  
+  //unhighlight the row (when the mouse leaves)   
+  row.oldcolor=row.oldoldcolor
+  
+ }
+ 
+}
+
+function ok_onclick()
+{
+
+ //offset one column for selection column
+ if (returncolid!==''&&returncoln!=='') returncoln++
+ 
+ var returnvalues=[]
+ var n=table1.rows.length
+ var checks=document.getElementsByName('col0')
+ n=checks.length
+ var nheaderrows=1
+ for (var i=0;i<n;i++)
+ {
+  //var checkno=table1.rows[i].all.col0.innerText
+  var checkno=checks[i].innerText
+  if (checkno!=" ")
+  {
+   var temp
+   if (returncolid==='')
+   {
+//    temp=dataobj.group1[i]
+    if (selectionns.length)
+    {
+     temp=(+selectionns[i])+1
+    }
+    else temp=i+1
+   }
+   else
+   {
+    if (returncoln==='')
+    {
+    
+     //extract from xml object
+     if (xmldatabinding) temp=xml1.firstChild.childNodes[i].getElementsByTagName(returncolid)[0].text
+     
+     //extract from data object
+     else
+     {
+      temp=grecords[i][returncolid].text
+     }
+     
+    }
+    else
+    {
+     //extract from columns
+     temp=table1.rows[i+nheaderrows].childNodes[returncoln].innerText
+    }
+   }
+   returnvalues[checkno-1]=temp
+  }
+ }
+ 
+ if (returncoln!=='')
+ {
+  if (!returnvalues[0]) returnvalues=''
+ }
+
+ if (typeof returnvalues=='object'&&!returnvalues.length) returnvalues=''
+ 
+ closeit(returnvalues) 
+ 
+}
+
+function closeit(returnvalues)
+{
+ window.returnValue=returnvalues 
+ window.close()
+}
+
+function cancel_onclick()
+{
+
+ //restore hidden lines first
+ if (ghidden)
+ {
+  searchrows()
+  return
+ }
+ 
+ closeit('')
+}
+
+//-->
+    </script>
+
+</head>
+<body>
+    <div id="wholediv">
+        <h2 align="center" id="question1">
+            Which do you want?</h2>
+        <p align="center">
+            <input title="Enter, Ctrl+Enter or F9" id="ok" name="ok" type="submit" value="OK"
+                language="javascript" onclick="return ok_onclick()" />&nbsp;<input id="cancel" title="Esc"
+                    name="cancel" type="reset" value="Cancel" language="javascript" onclick="return cancel_onclick()" />
+            <input title="Alt+P" id="button_print" accesskey="P" onclick="window.print()" class="neosysbutton" type="button"
+                value="Print" />
+            <input title="Alt+F" id="button_find" accesskey="F" onclick="windowfind()" class="neosysbutton" type="button"
+                value="Find" />
+        </p>
+        <xml id="xml1"></xml>
+        <table id="table1" datasrc="#xml1" align="center" class="NEOSYSTABLE" border="1"
+            cellspacing="0" cellpadding="1">
+            <thead>
+                <tr id="table1head1row1">
+                </tr>
+            </thead>
+            <tbody id="table1body1" style="cursor: hand">
+            </tbody>
+        </table>
+        <p>
+            &nbsp;</p>
+
+        <script>
+ 
+ var question=dialogArguments[0]
+ var data=dialogArguments[1]
+ var cols=dialogArguments[2]
+ var returncolid=dialogArguments[3]
+ var defaultreply=dialogArguments[4]
+ var returnmany=dialogArguments[5]
+ 
+ var xmldatabinding
+ var grecords
+ 
+ var returncoln=''
+ 
+ var selectionns=[]
+ 
+ init()
+
+function init()
+{
+
+ //called early to make visible
+ clientfunctions_setstyle()
+
+ //xmldatabinding=(navigator.appVersion.indexOf('Macintosh')<0&&(typeof data=='string'))
+ xmldatabinding=(navigator.appVersion.indexOf('Macintosh')<0&&(typeof data=='string')&&data.indexOf('</')>=0)
+
+ table1.onreadystatechange=table1_readystatechange
+
+ var fm2="þ"
+ var vm2="ý"
+ var fm=String.fromCharCode(254)
+ var vm=String.fromCharCode(253)
+
+ if (typeof dialogArguments=='undefined') dialogArguments=[]
+
+ //returncolid==='' or undefined means return row number(s)
+  
+
+ //question
+ if (!question) question='Which do you want?'
+ question=question.replace(/[\|\r\n]/g,'<br>')
+ question1.innerHTML=question
+ 
+ if (!xmldatabinding)
+ {
+ 
+  //data
+  //[[,,,],[,,,],[,,,]] or
+  //col1.1 vm col1.2 fm col2.1 vm col2.2 etc
+  if (!data) data=[['Yes'],['No']]
+ 
+  //convert conversion string to an array
+  if (typeof(data)=='string')
+  {
+     
+   //make sure we get at least one conversion
+   if (data=='') data=';'
+
+   //convert into an array
+   var sepchars=(data.indexOf(vm)>=0||data.indexOf(fm)>=0)?fm+vm:':;'
+   data=data.neosyssplit(sepchars)
+
+  }
+ 
+  //make sure some columns
+  else
+  {
+   if (typeof(data[0])!='object')
+   {
+    for (var i=0;i<data.length;i++) data[i]=data[i].split(';')
+   }
+  }
+ 
+  //if (typeof data=='string') data=data.split(fm)
+  // for (i=0;i<data.length;i++)
+  // {
+  //  if (typeof data[i]=='string') data[i]=data[i].split(vm2)
+  // }
+
+ }
+ 
+ //columns
+ //[[dictid,title],etc. or
+ //colid vm coltitle fm ... etc one per column
+ if (!cols)
+ {
+  var n=1
+  if (typeof data[0]=='object') n=data[0].length
+  cols=[]
+  for (var i=0;i<n;i++) cols[i]=[i,'']
+ }
+ if (typeof cols=='string')
+ {
+  if (cols.indexOf(fm2)<0&&cols.indexOf(vm2)<0)
+  {
+   cols=cols.replace(/:/gi,fm2)
+   cols=cols.replace(/;/gi,vm2)
+  }
+  cols=cols.split(fm2)
+ }
+
+ for (i=0;i<cols.length;i++) 
+ {
+  if (typeof cols[i]=='string') cols[i]=cols[i].split(vm2)
+  
+  //create col title from col code if not numeric
+  if ((typeof cols[i][1]=='undefined')&&!parseInt(cols[i][0]))
+  {
+   cols[i][1]=cols[i][0].neosyscapitalise()
+  }
+  
+  //detect return column number
+  if (i==returncolid||cols[i][0]==returncolid) returncoln=i
+  
+ }
+ var ncols=cols.length
+
+ //system error if return column is not in the list of columns
+ if (returncolid!==''&&returncoln==='')
+ {
+  //ok if in xml data
+  if (data.indexOf('<'+returncolid+'>')>=0)
+  {
+  }
+  else
+  {
+   alert('System Error in decide2.htm\r'+returncolid+' is not in the columns')
+   closeit('')
+  }
+ }
+
+ //returncolid
+ if (typeof returncolid=='undefined') returncolid=''
+
+ //return last column if returncoln>ncols
+// if (returncoln>cols.length-1) returncoln=cols.length
+
+ //var returncoln2=returncoln+1
+ 
+ //defaultreply
+ //zzz needs programming
+ 
+ //returnmany
+ //returnmany=
+
+ //1st header column is for check box
+ var oCell=document.createElement("TH")
+ oCell.innerHTML="&nbsp;"
+ table1head1row1.insertBefore(oCell,null)
+
+ //1st row column is for check box
+ var emptyrow=document.createElement('TR')
+ var oCell=document.createElement("TD")
+ oCell.id="col0"
+ if (returnmany)
+  oCell.innerHTML="&nbsp;"//<INPUT id=selection name=selection type=checkbox>"
+ else
+  oCell.innerHTML="&nbsp;"//<INPUT id=selection name=selection type=radio>"
+ emptyrow.insertBefore(oCell,null)
+ 
+ //setup the columns
+ for (i=0;i<cols.length;i++)
+ {
+ 
+  //header column
+  var oCell=document.createElement("TH")
+  oCell.style.fontWeight='bold'
+  //oCell.innerText=cols[i][1]
+  var title=cols[i][1]
+  if (typeof title=='undefined')
+  {
+   title=cols[i][0]
+   if (parseInt(title)) title=''
+   title=title.replace(/_/gi,' ')
+  }
+  oCell.innerHTML=title
+  table1head1row1.insertBefore(oCell,null)
+  
+  //row column
+  var oCell=document.createElement("TD")
+  oCell.id="col"+(i+1)
+  if (!xmldatabinding) oCell.innerText=' '//preset cell innertext with a space to fix a mac ie5 bug that eats one character
+  emptyrow.insertBefore(oCell,null)
+
+  //alignment
+  if (cols[i][3]) oCell.align=cols[i][3]
+   
+  if (xmldatabinding)
+  {  
+   var oSpan=document.createElement("SPAN")
+   oCell.insertBefore(oSpan,null)
+
+   oSpan.dataFld=cols[i][0]
+
+   emptyrow.onclick='rowonclick()'
+   emptyrow.onmouseover='rowonmouseover()'
+   emptyrow.ondblclick='rowondblclick()'
+  }
+  
+ }
+
+ //setup the rows
+ if (xmldatabinding)
+ {
+ 
+  //insert one row
+  table1body1.insertBefore(emptyrow,null)
+
+  //load the xml text
+  if (!xml1.loadXML(data))
+  {
+   alert('XML data could not be loaded in decide2. Continuing without XML\r\r'+data.slice(0,100))
+//   return
+   xmldatabinding=false
+  }
+
+ }
+ 
+ if (!xmldatabinding)
+ {
+
+  //convert dataxml to dataobj if necessary
+  var dataobj=data
+  if (typeof dataobj=='string') dataobj=neosysxml2obj(dataobj)
+ 
+  //look for group1 otherwise use main dataobj
+  grecords=dataobj.group1
+  if (typeof grecords=='undefined') grecords=dataobj
+
+  var starttime=new Date
+  var maxsecs=15
+   
+  //for each row
+  for (var rown=0;rown<grecords.length;rown++)
+  {
+
+   //break if too many rows
+   if ((new Date-starttime)>(maxsecs*1000))
+   {
+    if (!confirm('A large popup window is taking time to prepare.\r\rClick [OK] to wait or [Cancel] to see part.')) break
+    starttime=new Date
+   }
+  
+   //add a new form row
+   if (!ismac) var newrow=emptyrow.cloneNode(true)
+   else var newrow=document.createElement('TR')
+   table1body1.insertBefore(newrow,null)
+   
+   newrow.onclick=rowonclick
+   newrow.onmouseover=rowonmouseover
+   newrow.ondblclick=rowondblclick
+  
+   //put data into table row
+   var anyrowdata=false
+   //for (var coln=0;coln<cols.length;coln++)
+   for (var coln=cols.length-1;coln>=0;coln--)
+   {
+
+    var newnode
+    if (ismac)
+    {
+       
+     if (coln==0)
+     {
+      //fixes mac unclickable row problem
+      newnode=emptyrow.childNodes[coln].cloneNode(true)
+      //newnode=document.createElement('TD')//emptyrow.childNodes[coln].cloneNode(true)
+     }
+     else
+     {
+
+      newnode=document.createElement('TD')
+
+     }//coln!=0
+ 
+     if (newrow.childNodes.length)  newrow.insertBefore(newnode,newrow.childNodes[0])
+     else newrow.insertBefore(newnode)
+   
+    }//ismac
+    
+    //not ismac
+    else
+    {
+     newnode=newrow.childNodes[coln+1]
+    }
+ //   if (rown<3) alert(rown+' '+coln+' '+grecords[rown][cols[coln][0]].text)
+ 
+    var datacell=grecords[rown][cols[coln][0]]
+    var value=(typeof datacell.text=='undefined')?datacell:datacell.text
+
+    if (value) anyrowdata=true
+    
+    //date conversion
+    if (cols[coln][2]=='DATE') value=DATE(value)
+
+    //newrow.childNodes[coln+1].innerHTML=value
+   //use innerText otherwise things like <> in the data do not show
+    newnode.innerHTML=value
+   
+    //alignment
+    if (cols[coln][3]) newnode.align=cols[coln][3]
+   
+   }
+
+   //finalise, or delete the row if no data inserted
+   if (anyrowdata)
+   {
+    newrow.childNodes[0].innerText=' '
+    selectionns[selectionns.length]=rown
+   }
+   else newrow.parentNode.removeChild(newrow)
+   
+  }
+
+ }
+ 
+}
+ 
+function DATE(value)
+{
+
+ if (value=='') return ''
+  
+
+ //convert from 1=1/1/67 to text DD/MM/YYYY format
+ //result=new Date(1967,11,31+parseInt(value,10))
+ result=new Date(Date.UTC(1967,11,31+parseInt(value,10)))
+  //result.setUTCHours(0,0,0)
+ result=result.getUTCDate()+'/'+(result.getUTCMonth()+1)+'/'+result.getUTCFullYear()
+ 
+ return result
+  
+}
+
+function highlightrow1()
+{
+
+ //highlight the first row
+ if (table1.tBodies.length&&table1.tBodies[0].rows.length)
+ {
+  highlightrow(table1.tBodies[0].rows[0])
+ }
+ else
+ {
+  window.setTimeout('highlightrow1()',100)
+ }
+ return
+}
+ 
+var highlighter=''
+
+function table1_readystatechange()
+{
+
+ //if (table1.readyState=='interactive') window.setTimeout('highlightrow1()',100)
+ if (highlighter=='') highlighter=window.setTimeout('highlightrow1()',100)
+  
+ //quit if not ready
+ if (table1.readyState!='complete') return
+  
+ var rows=table1.tBodies[0].rows
+   
+ //check if no options
+ if (!rows.length)
+ {
+  alert('No options available')
+  return closeit('')
+ }
+
+ //return if only one option
+ //!!! why does binding produce multiple tbodies???
+ if (rows.length==1&&table1.tBodies.length==1)
+ {
+  rowondblclick(rows[0])
+  return
+ }
+  
+}
+ 
+//pls keep this routine synchronised in decide2.htm and scripts/client.htm
+function neosysxml2obj(xmltext)
+{
+
+ var dataobj=new Object
+ dataobj.group1=[]
+ var recn=-1
+ var currentrow
+ xml=xmltext.split('<')
+ for (var fragn=1;fragn<xml.length;fragn++)
+ {
+  var frag=xml[fragn].split('>')
+  if (frag[0].toLowerCase()!='records'&&frag[0].toLowerCase()!='/records')
+  {
+   if (frag[0].toLowerCase()=='record')
+   {
+    dataobj.group1[++recn]=currentrow=new Object
+   }
+   else
+   {
+    if (frag[0].slice(0,1)!='/')
+    {
+     //currentrow[frag[0]]=(new Object).text=frag[1]
+     var cell=new Object
+     cell.text=frag[1]
+     currentrow[frag[0]]=cell
+    }
+   }
+  }
+ }
+
+ return dataobj
+ 
+}
+
+function getancestor(startelement,ancestorTag)
+{
+
+ if (startelement==null) return(null)
+ 
+ var ancestor=startelement.parentNode
+ while (ancestor!=null && ancestor.tagName!=ancestorTag)
+ {
+  ancestor=ancestor.parentNode
+ }
+ return (ancestor)
+}
+        </script>
+
+    </div>
+</body>
+</html>

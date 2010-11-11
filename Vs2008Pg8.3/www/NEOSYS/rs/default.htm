@@ -1,0 +1,31 @@
+<HTML>
+<HEAD>
+<TITLE></TITLE>
+
+<script>
+
+function closeandreturn(result,response,data)
+{
+ window.returnValue=[result,response,data]
+ window.close()
+}
+
+function cancel()
+{
+ window.returnValue=[0,'ERROR: Cancelled','']
+ window.close()
+}
+
+</script>
+
+</HEAD>
+<BODY BGCOLOR=WHITE>
+<BR>
+<CENTER>
+NEOSYS Database Link<BR>
+<BR>
+<BUTTON onclick='cancel()' id=button1 name=button1>Cancel</BUTTON>
+</CENTER>
+<IFRAME style="DISPLAY: none" src="remote.htm"></IFRAME>
+</BODY>
+</HTML>

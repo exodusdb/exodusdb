@@ -1,0 +1,83 @@
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="global.css">
+    <title>Retry/Cancel</title>
+</head>
+<body>
+    <p>
+        &nbsp;</p>
+    <table width="100%" align="center" border="0" cellspacing="1" cellpadding="1">
+        <tr>
+            <td>
+                <big>
+                    <div id="question" align="center">
+                    </div>
+                </big>
+                <p align="center">
+
+                    <script>
+
+document.onkeypress=document_onkeypress
+question.innerText=window.dialogArguments
+
+function document_onkeypress()
+{
+
+ var key=window.event.keyCode
+
+ //Y=Yes 
+ if (key==121)
+ {
+  window.returnValue=1
+  window.close()
+ }
+ 
+ //N=No
+ if (key==110)
+ {
+  window.returnValue=2
+  window.close()
+ }
+ 
+ //Esc=Cancel
+ if (key==27)
+ {
+  window.returnValue=0
+  window.close()
+ }
+ 
+}
+
+function closeit(arg1)
+{
+ window.returnValue=arg1
+ window.close()
+}
+
+                    </script>
+
+                    &nbsp;</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p align="center">
+                    <input id="retry" onclick="closeit(1)" style="height: 24px; width: 80px" class="neosysbutton"
+                        class="neosysbutton" type="button" value="Retry">&nbsp;
+                    <input id="cancel" onclick="closeit(0)" style="height: 24px; width: 80px" class="neosysbutton"
+                        class="neosysbutton" type="button" value="Cancel">
+                </p>
+            </td>
+        </tr>
+    </table>
+
+    <script>
+retry.accessKey='R'
+cancel.accessKey='C'
+    </script>
+
+    <p align="center">
+        &nbsp;&nbsp;&nbsp;&nbsp;
+    </p>
+</body>
+</html>

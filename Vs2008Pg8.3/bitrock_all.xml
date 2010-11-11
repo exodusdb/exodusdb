@@ -1,0 +1,249 @@
+<project>
+    <shortName>exodus</shortName>
+    <fullName>Exodus Multivalue Database</fullName>
+    <version>10.10.6</version>
+    <readmeFile>README</readmeFile>
+    <licenseFile>COPYING</licenseFile>
+    <leftImage>exodus.png</leftImage>
+    <preBuildActionList>
+        <locate>
+            <command>gg++</command>
+            <customErrorMessage>Install xcode from osx install disk, utilities folder</customErrorMessage>
+            <explanation>c++ compiler needed</explanation>
+            <progressText>xcode for c++</progressText>
+            <variable></variable>
+        </locate>
+    </preBuildActionList>
+    <postInstallationActionList>
+        <addDirectoryToPath>
+            <insertAt>end</insertAt>
+            <path>~/bin</path>
+        </addDirectoryToPath>
+        <runProgram>
+            <explanation>InstallingPlugin</explanation>
+            <program>${installdir}/lib/inslibs.sh</program>
+            <programArguments></programArguments>
+            <progressText>Searching for PostgreSQL - to install Exodus Plugin</progressText>
+            <workingDirectory>${installdir}/lib</workingDirectory>
+        </runProgram>
+    </postInstallationActionList>
+    <enableRollback>1</enableRollback>
+    <enableTimestamp>1</enableTimestamp>
+    <requireInstallationByRootUser>1</requireInstallationByRootUser>
+    <saveRelativePaths>1</saveRelativePaths>
+    <vendor>Exodus Project</vendor>
+    <componentList>
+        <component>
+            <name>default</name>
+            <description>Default Component</description>
+            <canBeEdited>1</canBeEdited>
+            <selected>1</selected>
+            <show>1</show>
+            <folderList>
+                <folder>
+                    <description>Program Files</description>
+                    <destination>${installdir}</destination>
+                    <name>programfiles</name>
+                    <platforms>all</platforms>
+                    <shortcutList>
+                        <shortcut>
+                            <comment>Uninstall</comment>
+                            <exec>${installdir}/${uninstallerName}</exec>
+                            <icon></icon>
+                            <name>Uninstall ${product_fullname}</name>
+                            <path>${installdir}</path>
+                            <platforms>all</platforms>
+                            <runAsAdmin>0</runAsAdmin>
+                            <runInTerminal>0</runInTerminal>
+                            <windowsExec>${installdir}/${uninstallerName}.exe</windowsExec>
+                            <windowsExecArgs></windowsExecArgs>
+                            <windowsIcon></windowsIcon>
+                            <windowsPath>${installdir}</windowsPath>
+                        </shortcut>
+                    </shortcutList>
+                </folder>
+                <folder>
+                    <description>Program Files</description>
+                    <destination>${installdir}</destination>
+                    <name>programfileslinux</name>
+                    <platforms>linux</platforms>
+                </folder>
+                <folder>
+                    <description>Program Files</description>
+                    <destination>${installdir}</destination>
+                    <name>programfileswindows</name>
+                    <platforms>windows</platforms>
+                </folder>
+                <folder>
+                    <description>Program Files</description>
+                    <destination>${installdir}</destination>
+                    <name>programfilesosx</name>
+                    <platforms>osx</platforms>
+                    <distributionFileList>
+                        <distributionFile>
+                            <origin>cli/src/exodus</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>cli/src/configexodus</origin>
+                        </distributionFile>
+                    </distributionFileList>
+                    <shortcutList>
+                        <shortcut>
+                            <comment>edit, compile, createfile, list etc.</comment>
+                            <exec>/usr/local/bin/exodus</exec>
+                            <icon></icon>
+                            <name>Exodus Console</name>
+                            <path></path>
+                            <platforms>osx</platforms>
+                            <runAsAdmin>0</runAsAdmin>
+                            <runInTerminal>0</runInTerminal>
+                            <windowsExec></windowsExec>
+                            <windowsExecArgs></windowsExecArgs>
+                            <windowsIcon></windowsIcon>
+                            <windowsPath></windowsPath>
+                        </shortcut>
+                        <shortcut>
+                            <comment>Connection to Postgres</comment>
+                            <exec>/usr/local/bin/configexodus</exec>
+                            <icon></icon>
+                            <name>Configure Exodus</name>
+                            <path></path>
+                            <platforms>all</platforms>
+                            <runAsAdmin>0</runAsAdmin>
+                            <runInTerminal>0</runInTerminal>
+                            <windowsExec></windowsExec>
+                            <windowsExecArgs></windowsExecArgs>
+                            <windowsIcon></windowsIcon>
+                            <windowsPath></windowsPath>
+                        </shortcut>
+                    </shortcutList>
+                </folder>
+                <folder>
+                    <description>Mac OS X bin</description>
+                    <destination>/usr/local/bin</destination>
+                    <name>bin</name>
+                    <platforms>osx</platforms>
+                    <distributionFileList>
+                        <distributionFile>
+                            <origin>cli/src/configexodus</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>cli/src/edic</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>cli/src/testsort</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>cli/src/listindexes</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>cli/src/listfiles</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>cli/src/list</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>cli/src/exodus</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>cli/src/edir</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>cli/src/deleteindex</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>cli/src/deletefile</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>cli/src/delete</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>cli/src/createindex</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>cli/src/createfile</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>cli/src/compile</origin>
+                        </distributionFile>
+                    </distributionFileList>
+                </folder>
+                <folder>
+                    <description>Mac OS X lib</description>
+                    <destination>/usr/local/lib</destination>
+                    <name>lib</name>
+                    <platforms>osx</platforms>
+                    <distributionFileList>
+                        <distributionFile>
+                            <origin>exodus/exodus/exodus/.libs/libexodus-10.10.0.dylib</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>exodus/exodus/exodus/.libs/libexodus.dylib</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>exodus/exodus/exodus/.libs/libexodus.a</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>exodus/exodus/exodus/.libs/libexodus.la</origin>
+                        </distributionFile>
+                    </distributionFileList>
+                </folder>
+                <folder>
+                    <description>Mac OS X include</description>
+                    <destination>/usr/local/include/exodus</destination>
+                    <name>include</name>
+                    <platforms>osx</platforms>
+                    <distributionFileList>
+                        <distributionDirectory>
+                            <allowWildcards>1</allowWildcards>
+                            <includeFiles>*/exodus*.h;*/mv*.h;*/xfunc*.h;*/program.h;*/library.h</includeFiles>
+                            <origin>exodus/exodus/exodus/*</origin>
+                        </distributionDirectory>
+                    </distributionFileList>
+                </folder>
+                <folder>
+                    <description>pgexodus</description>
+                    <destination>${installdir}/lib</destination>
+                    <name>pgexodus</name>
+                    <platforms>all</platforms>
+                    <distributionFileList>
+                        <distributionDirectory>
+                            <origin>exodus/pgexodus/pkglib</origin>
+                        </distributionDirectory>
+                        <distributionFile>
+                            <origin>exodus/pgexodus/inslibs.sh</origin>
+                        </distributionFile>
+                    </distributionFileList>
+                </folder>
+            </folderList>
+            <startMenuShortcutList>
+                <startMenuShortcut>
+                    <comment>Uninstall ${product_fullname}</comment>
+                    <name>Uninstall ${product_fullname}</name>
+                    <runAsAdmin>0</runAsAdmin>
+                    <runInTerminal>0</runInTerminal>
+                    <windowsExec>${installdir}/${uninstallerName}.exe</windowsExec>
+                    <windowsExecArgs></windowsExecArgs>
+                    <windowsIcon></windowsIcon>
+                    <windowsPath>${installdir}/</windowsPath>
+                </startMenuShortcut>
+            </startMenuShortcutList>
+        </component>
+    </componentList>
+    <parameterList>
+        <directoryParameter>
+            <name>installdir</name>
+            <description>Installer.Parameter.installdir.description</description>
+            <explanation>Installer.Parameter.installdir.explanation</explanation>
+            <value></value>
+            <default>${platform_install_prefix}/${product_shortname}-${product_version}</default>
+            <allowEmptyValue>0</allowEmptyValue>
+            <ask>yes</ask>
+            <cliOptionName>prefix</cliOptionName>
+            <mustBeWritable>yes</mustBeWritable>
+            <mustExist>0</mustExist>
+            <width>30</width>
+        </directoryParameter>
+    </parameterList>
+</project>
+

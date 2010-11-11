@@ -1,0 +1,52 @@
+<html>
+	<head>
+		<script language="javascript" src="scripts/client.js"></script>
+		<script language="javascript" src="scripts/db.js"></script>
+		<script language="javascript" src="scripts/upload.js"></script>
+		<title>Images, Audio, Video, Documents</title>
+	</head>
+	<body>
+		<div align="center">
+			<h2>Images, Audio, Video, Documents</h2>
+			<BUTTON style="display:none" onclick="showuploadtable()" ID="button_showupload">Upload</BUTTON>
+			<form enctype="multipart/form-data" target="_parent" action="dll/upload.dll" method="post" id="form1">
+				<table id="table_upload" style="display:none">
+					<tr>
+						<td valign="top">Step 1.<br>
+							(Filename to upload)</td>
+						<td valign="top">
+							<input size="60" id="filedata" name="filedata" type="file">
+							<br>
+							<span id="audiovisualextensionselement"></span>
+						</td>
+					</tr>
+					<tr>
+						<td>Step 2.</td>
+						<td>
+							<input id="submit" onclick="return upload_onclick()" type="submit" value="Upload">
+						</td>
+					</tr>
+					<tr style="display:none">
+						<td>Step 3.</td>
+						<td><button onclick="loadimages()">Refresh</button></td>
+					</tr>
+				</table>
+				<span style="display:none">
+				<br>
+				Destination URL:
+				<input id="pathdata" name="pathdata" xtype="hidden" value="">
+				<br>
+				Destination File:
+				<input id="filename" name="filename" xtype="hidden" value="">
+				<br>
+				Response URL:
+				<input id="redirectpage" name="redirectpage" xtype="hidden" value="">
+				<br>
+			</span>
+			</form>
+			<div id="images">
+			</div>
+			<button onclick="return window.close()" title="Close window (Esc)">Close</button>
+		</div>
+	</body>
+</html>

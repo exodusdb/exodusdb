@@ -1,0 +1,611 @@
+<html>
+<head>
+    <title></title>
+
+    <script language="javascript" src="../neosys/scripts/client.js"></script>
+
+    <script id="clientEventHandlersJS" language="javascript">
+<!--
+
+ //get the stylesheet
+ //var NEOSYSlocation='../neosys/'
+ //document.writeln('<link REL="stylesheet" TYPE="text/css" HREF="'+NEOSYSlocation+'global.css">')
+
+ document.onkeydown=document_onkeydown
+
+ document.ondblclick=document_ondblclick
+
+ var goriginalstyles={}
+
+ //window.onload=window_onload
+function formfunctions_onload()
+{
+
+ var newwidth=wholediv.offsetWidth+75
+ if (newwidth>window.screen.availWidth) newwidth=window.screen.availWidth
+ //alert(screen.availHeight)
+ window.dialogWidth=newwidth+'px'
+ 
+ //window.dialogHeight='400px'
+ var newheight=wholediv.offsetHeight+75
+ if (newheight>window.screen.availHeight) newheight=window.screen.availHeight
+ //alert(screen.availHeight)
+ window.dialogHeight=newheight+'px'
+ 
+ //center
+ var top=(window.screen.availHeight-newheight)/2
+ window.dialogTop=top
+ var left=(window.screen.availWidth-newwidth)/2
+ window.dialogLeft=left
+ 
+}
+
+function document_ondblclick()
+{
+
+// var col0=row.all("col0")
+// if (col0.innerText==' '||col0.innerText=='') clickrow(row)
+
+ if (event.srcElement.id!='cancel'&&event.srcElement.type=='checkbox')
+ {
+  event.srcElement.checked=true
+ }
+ 
+ ok_onclick()
+ 
+}
+
+function document_onkeydown()
+{
+ 
+ if (typeof returnmany=='undefined') returnmany=''
+ 
+ var keycode=event.keyCode
+ window.status=keycode
+ var selections=document.getElementsByName('selection')
+ 
+ var element=event.srcElement
+ var n=element.parentNode.parentNode.rowIndex-1
+ 
+ //ctrl+enter and f9 is ok
+ if (keycode==120||(keycode==13&&event.ctrlKey))
+ {
+  ok_onclick()
+  return
+ }
+ 
+ //digits 0-9 select options 1-10
+ if (keycode>=49&&keycode<=57)
+ {
+ 
+  var optionn=keycode-48
+  if (optionn==0) optionn=10
+  selections=document.getElementsByName('selection')
+  if (optionn<=selections.length)
+  {
+   selections[optionn-1].checked=!selections[optionn-1].checked
+   if (!returnmany||selections.length==1)
+   {
+    //window.returnValue=optionn
+    //window.close()
+    ok_onclick()
+   }
+  }
+ }
+
+ //all following refers to many selections 
+ if (!returnmany) return
+ 
+ //enter
+ if (keycode==13&&!isNaN(n))
+ {
+
+  element.checked=!element.checked
+
+  checkbox_onclick(element)
+
+  event.returnValue=false
+  keycode=40
+ }
+  
+ //A=all or none
+ if (keycode==65)
+ {
+  var truefalse=!selections[0].checked
+  for (var i=0;i<selections.length;i++) selections[i].checked=truefalse
+ }
+
+ //up down arrow or page
+ if (keycode==33||keycode==34||keycode==40||keycode==38)
+ {
+  
+  var direction
+  if (keycode==34||keycode==40) direction=1
+  if (keycode==33||keycode==38) direction=-1
+  if (keycode==34)
+  {
+   if (event.ctrlKey)
+   {
+    n=selection.length-1
+   }
+   else
+   {
+    if (n==(selections.length-1)) n=0
+    else
+    {
+     n+=10
+     if (n>=(selections.length-1))n=selection.length-1
+    }
+   }
+   n--
+  }
+  if (keycode==33)
+  {
+   if (event.ctrlKey)
+   {
+    n=0
+   }
+   else
+   {
+    if (n==0) n=selections.length-1
+    else
+    {
+     n-=10
+     if (n<=0) n=0
+    }
+   }
+   n++
+  }
+  var newelement=element
+  while (true)
+  {
+  
+   n+=direction
+   if (n<0) n=selections.length-1
+   if (n>=selections.length) n=0
+   
+   newelement=selections[n]
+   
+   //skip if no other suitable elements
+   if (newelement==element) return
+
+   //skip if not visible
+   if (!newelement) return false//may not be on an element
+   if (newelement.style.visibility=='hidden') continue
+
+   if (n==0) window.scrollTo(0,0)
+   if (n==(selections.length-1)) window.scrollTo(0,999999)
+   break
+      
+  }
+  
+  newelement.focus()
+  newelement.select()
+
+ return false
+ 
+ }
+   
+ //none/delete
+ if (keycode==46)
+ {
+  for (var i=0;i<selections.length;i++) selections[i].checked=false
+ }
+ 
+}
+
+function checkbox_onclick(element)
+{
+
+ var checking=element.checked
+ var selection2=document.getElementsByName('selection')
+ var found=false
+ var level
+ for (ii=0;ii<selection2.length;ii++)
+ {
+  if (found)
+  {
+   //quit once get back to the same level
+   if (selection2[ii].parentNode.nextSibling.innerText.match(/^[\. -]*/)<=level) break
+   selection2[ii].checked=checking
+  }
+  else if (selection2[ii]==element)
+  {
+   level=selection2[ii].parentNode.nextSibling.innerText.match(/^[\. -]*/)
+   found=true
+  }
+ }
+ 
+}
+
+function radio_onmousedown(element)
+{
+ element.checked=true
+ ok_onclick()
+}
+
+function ok_onclick()
+{
+
+ //NB returns row numbers 1 based not 0 based!
+ //0 means cancelled
+ 
+ var returnvalues=[]
+ var selection2=document.getElementsByName('selection')
+ for (i=0;i<selection2.length;i++)
+ {
+	if (selection2[i].checked)
+	{
+		var returnvalue
+		if (returncolid==='')
+		{
+			returnvalue=i+1
+		}
+		else
+		{
+			returnvalue=inverted?data[returncolid][i]:data[i][returncolid]
+			if (typeof returnvalue=='object') returnvalue=returnvalue.text
+		}
+        if (!returnmany)
+        {
+         returnvalues=returnvalue
+         break
+        }
+
+		if (returnvalue) returnvalues[returnvalues.length]=returnvalue
+
+	}
+ }
+
+ if (typeof returnvalues!='object'||returnvalues.length)
+ {
+  window.returnValue=returnvalues
+ }
+ window.close()
+ 
+}
+
+function cancel_onclick()
+{
+ window.returnValue=""
+ window.close()
+}
+
+//-->
+    </script>
+
+</head>
+<body>
+    <div id="wholediv">
+        <span id="debug"></span>
+        <h2 id="question1" align="center">
+        </h2>
+        <table id="table1" align="center" class="NEOSYSTABLE" border="1" cellspacing="0"
+            cellpadding="1">
+            <thead>
+                <tr id="table1head1row1">
+                </tr>
+            </thead>
+            <tbody id="table1body1">
+            </tbody>
+        </table>
+        <p align="center">
+            <input id="ok" name="ok" type="submit" value="OK" language="javascript" onclick="return ok_onclick()">&nbsp;<input
+                id="cancel" name="cancel" type="reset" value="Cancel" language="javascript" onclick="return cancel_onclick()">
+            <input class="neosysbutton" type="button" id="button_print" onclick="window.print()" value="Print" />
+        </p>
+
+        <script>
+
+var data
+
+startup()
+
+function startup()
+{
+ var fm2="þ"
+ var vm2="ý"
+ var fm=String.fromCharCode(254)
+ var vm=String.fromCharCode(253)
+
+ if (typeof dialogArguments=='undefined') dialogArguments=[]
+
+ //called early to make visible
+ clientfunctions_setstyle()
+
+ //returncolid==='' or undefined means return row number(s)
+  
+ var question=dialogArguments[0]
+ data=dialogArguments[1]
+ var cols=dialogArguments[2]
+ returncolid=dialogArguments[3]
+ var defaultreply=dialogArguments[4]//must be an array with method neosyslocate
+ returnmany=dialogArguments[5]
+ inverted=dialogArguments[6]
+
+ //question
+ if (!question) question='Which do you want?'
+ question=question.replace(/[\|\r\n]/g,'<br>')
+ question1.innerHTML=question
+ 
+ //data
+ //[[,,,],[,,,],[,,,]] or
+ //col1.1 vm col1.2 fm col2.1 vm col2.2 etc
+ if (!data&&!cols) data=[['Yes'],['No']]
+ if (data&&typeof data=='string')
+ {
+  data=data.split(data.indexOf(fm)+1?fm:':')
+ }
+ for (i=0;i<data.length;i++)
+ {
+  if (typeof data[i]=='string')
+  {
+   data[i]=data[i].split(data[i].indexOf(vm)+1?vm:';')
+  }
+  else if (typeof data[i]=='number') data[i]=[data[i]]
+ }
+
+ //quit if no data
+ if (!data.length)
+ {
+  alert('No options available')
+  cancel_onclick()
+  return null
+ }
+ 
+ //check some options
+ if (!data.length)
+ {
+//  cancel_onclick()
+  alert('No data to select')
+  window.setTimeout('window.close()',1)
+  return false
+ }
+ 
+ //columns
+ //[[dictid,title],etc. or
+ //colid vm coltitle fm ... etc one per column
+ if (!cols)
+ {
+  cols=[]
+  for (var i=0;i<data[0].length;i++)
+  {
+   cols[i]=[i,'']
+  }
+ }
+ if (typeof cols=='string')
+ {
+  if (cols.indexOf(fm2)<0&&cols.indexOf(vm2)<0)
+  {
+   cols=cols.replace(/:/gi,fm2)
+   cols=cols.replace(/;/gi,vm2)
+  }
+  cols=cols.split(fm2)
+ }
+ for (i=0;i<cols.length;i++) 
+ {
+  if (typeof cols[i]=='string') cols[i]=cols[i].split(vm2)
+ }
+ var ncols=cols.length
+
+ //returncolid
+ if (typeof returncolid=='undefined') returncolid=''
+
+ //defaultreply
+ 
+ //returnmany
+ //returnmany=
+
+ //build the table
+ 
+ //build the column headings row
+ var firstselection
+  
+ //get a handle on the existing heading row
+ var oRow=table1head1row1
+
+ //add a column for the check box or radio button column to the column heading
+ var oCell=document.createElement("TH")
+ oCell.innerHTML="&nbsp;"
+ oRow.appendChild(oCell)
+
+ //add a column for the line number to the column heading
+ var oCell=document.createElement("TH")
+ oCell.innerHTML="&nbsp;"
+ oRow.appendChild(oCell)
+
+ //add other column headings
+ for (i=0;i<ncols;i++)
+ {
+  var oCell=document.createElement("TH")
+  oCell.style.fontWeight='bold'
+  var title=cols[i][1]
+  if (typeof title=='undefined')
+  {
+   title=cols[i][0]
+   if (!title) title=''
+   if (parseInt(title)) title=''
+   title=title.replace(/_/gi,' ')
+  }
+  oCell.innerHTML=title
+  oRow.appendChild(oCell)
+
+  //check colid is in data
+  //if ((!inverted&&typeof (data[0][cols[i][0]])=='undefined')||(inverted&&typeof (data[cols[i][0]][0])=='undefined'))
+  if ((!inverted&&typeof (data[0][cols[i][0]])=='undefined')||(inverted&&typeof (data[cols[i][0]])=='undefined'))
+  {
+//  alert(cols[i])
+   alert('popup column "'+cols[i][0]+'" not in popup data in decide.htm')
+   cancel_onclick()
+   return null
+  }
+  
+ }
+
+ //column heading row built
+ 
+ //build the table rows
+ var starttime=new Date
+ var maxsecs=15
+
+ //rows
+ var nrows=inverted?data[cols[0][0]].length:data.length
+ for (rown=0;rown<nrows;rown++)
+ {
+
+  //break if too many rows
+  if ((new Date-starttime)>(maxsecs*1000))
+  {
+   if (!confirm('A large popup window is taking time to prepare.\r\rClick [OK] to wait or [Cancel] to see part.')) break
+   starttime=new Date
+  }
+  
+  //hide checkboxes on rows with nothing to return
+  var visibilityhidden
+  if (returncolid)
+  {
+   var returnvalue=inverted?data[returncolid][rown]:data[rown][returncolid]
+   if (!returncolid)
+    returnvalue=rown+1
+   if (returnmany)
+    visibilityhidden=returnvalue?'':'onclick="checkbox_onclick(this)"'
+   else
+    visibilityhidden=returnvalue?'':'style=visibility:hidden'
+  }
+  
+  //create a new row
+  var oRow=document.createElement("TR")
+  table1body1.appendChild(oRow)
+
+  //add line number column
+  var oCell=document.createElement("TD")
+  oRow.appendChild(oCell)
+  oCell.innerHTML=rown+1 + "."
+  if (visibilityhidden) oCell.style.visibility='hidden'
+
+  //add a check box or radio button column
+  var oCellx=document.createElement("TD")
+  oRow.appendChild(oCellx)
+  
+  if (returnmany)
+  { 
+   oCellx.innerHTML='<INPUT '+visibilityhidden+' id=selection name=selection type="checkbox">'
+  }
+  else
+  {
+   var checked=''
+   if (!firstselection)
+   {
+    if (!visibilityhidden)
+    {
+     checked='checked=true'
+     firstselection=oCellx
+    }
+   }
+   oCellx.innerHTML='<INPUT '+checked+' '+visibilityhidden+' id=selection name=selection type=radio onmousedown="radio_onmousedown(this)">'
+  }
+  if (defaultreply&&returncolid===''&&defaultreply.neosyslocate(rown+1)) oCellx.firstChild.checked=true
+
+  //add the data columns for this row
+  for (coln=0;coln<ncols;coln++)
+  {
+   var oCell=document.createElement("TD")
+   oRow.appendChild(oCell)
+   
+   if (inverted)
+   {
+    value=data[cols[coln][0]][rown]
+   }
+   else
+   {
+    value=data[rown][cols[coln][0]]
+   }
+   if (typeof value=='undefined') value=''
+   else if (typeof value=='object') value=value.text
+   
+   //date conversion
+   if (cols[coln][2]=='DATE') value=DATE(value)
+   
+   //time conversion
+   if (cols[coln][2]=='TIME') value=TIME(value)
+   
+   //oCell.innerHTML=value
+   //use innerText otherwise things like <> in the data do not show
+   oCell.innerText=value
+   //if (visibilityhidden) oCell.style.fontWeight='bold'
+   
+   if (cols[coln][3]) oCell.align=cols[coln][3]
+   
+   if (defaultreply)
+   {
+    if (typeof returncolid==='')
+    {
+     if (defaultreply.neosyslocate(rown+1)) oCellx.firstChild.checked=true
+    }
+    else
+    {
+     if (coln===returncolid&&defaultreply.neosyslocate(value)) oCellx.firstChild.checked=true
+    }
+   }
+    
+  }
+ 
+  //table rows built
+
+  //table built
+    
+ }
+
+ //autoselect only one option
+ if (data.length==1)
+ {
+  if (returncolid=='')
+  {
+   var selection2=document.getElementsByName('selection')
+   selection2[0].checked=true
+  }
+  ok_onclick()
+  return null
+ }
+ 
+}//of startup()
+
+function DATE(value)
+{
+
+ if (value=='') return ''
+  
+ //convert from 1=1/1/67 to text DD/MM/YYYY format
+ //result=new Date(1967,11,31+parseInt(value,10))
+ result=new Date(Date.UTC(1967,11,31+parseInt(value,10)))
+ //result.setUTCHours(0,0,0)
+ result=result.getUTCDate()+'/'+(result.getUTCMonth()+1)+'/'+result.getUTCFullYear()
+  
+ return result
+  
+}
+
+ function TIME(value)
+ {
+
+ //blank in .. blank out
+ if (value=='') return ''
+ 
+ var secs=value%60
+ value-=secs
+ var mins=(value/60)%60
+ value-=60*mins
+ //var hours=(value/60/60)%24
+ //allow for 25 hour clock
+ var hours=(value/60/60)
+ result=('0'+hours).slice(-2)+':'+('0'+mins).slice(-2)
+ 
+ return result
+ 
+}
+
+        </script>
+
+    </div>
+</body>
+</html>

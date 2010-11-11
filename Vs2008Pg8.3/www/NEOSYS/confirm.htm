@@ -1,0 +1,324 @@
+<html>
+	<head>
+	<script>
+	var gformfontscale=1.3
+	</script>
+    <script language="javascript" src="../neosys/scripts/client.js"></script>
+		<style>
+		.statementclass
+		{
+		 xfont-size:medium
+		}
+		</style>
+			<title>Confirmation</title>
+	</head>
+	<body>
+		<div id="wholediv">
+			<P>&nbsp;</P>
+			<TABLE WIDTH="100%" ALIGN="center" BORDER="0" CELLSPACING="1" CELLPADDING="1">
+				<TR>
+					<td width="1%" align="center" valign="center"><nobr>&nbsp;&nbsp;&nbsp;<img style=display:none id="img1"></nobr>
+					</td>
+					<TD>
+							<div class=statementclass id="question" align="center"></div>
+						<P align="center">
+							&nbsp;</P>
+					</TD>
+				</TR>
+				<TR>
+				<td>&nbsp;</td>
+					<TD align="center">
+						<P id="textinputp" align="center" style="display:none">
+							<INPUT size="60" ALIGN="CENTER" id="textinput">
+						</P>
+						<P id="textinputphidden" align="center" style="display:none">
+							<INPUT type="password" size="60" ALIGN="CENTER" id="textinputhidden" NAME="textinputhidden">
+						</P>
+						<P align="center">
+							<INPUT style=display:none id="positivebutton" onclick="closeit(1)" title="F9" xstyle="HEIGHT: 24px; WIDTH: 80px" class="neosysbutton" type="button" value="Yes" tabindex="1">
+							&nbsp; <INPUT style=display:none id="negativebutton" onclick="closeit(2)" title="F8" xstyle="HEIGHT: 24px; WIDTH: 80px" class="neosysbutton" type="button" value="No" tabindex="2">
+							&nbsp; <INPUT style=display:none id="gobackbutton" onclick="closeit(0)" title="Esc" xstyle="HEIGHT: 24px; WIDTH: 80px" class="neosysbutton" type="button" value="Cancel" tabindex="3">
+						</P>
+					</TD>
+				</TR>
+			</TABLE>
+			<SCRIPT>
+
+ var gtexttagnames=/^(INPUT)|(TEXTAREA)$/
+ 
+// window.onload=formfunctions_onload
+ var gbuttons=[]
+ 
+ if (typeof dialogArguments=='undefined')
+ {
+  dialogArguments=[]
+  dialogArguments=[,,'OK',,'Cancel','xxx']
+ }
+
+ //var dialogargs=[question,defaultbuttonn,positivebutton,negativebutton,gobackbutton]
+ var questionx=dialogArguments[0]
+ var defaultbuttonn=dialogArguments[1]
+ var positivebuttonx=dialogArguments[2]
+ var negativebuttonx=dialogArguments[3]
+ var gobackbuttonx=dialogArguments[4]
+ var gtext=dialogArguments[5]
+ var gtexthidden=dialogArguments[6]
+ var gistextinput=typeof gtext!='undefined'&&gtext!=null
+ var gimagesrc=dialogArguments[7]
+
+function formfunctions_onload()
+{
+ 
+ document.onkeydown=document_onkeydown
+ 
+ //image
+ if (!gimagesrc&&(questionx.indexOf('!')+1||questionx.toLowerCase().indexOf('are you sure ')+1)) gimagesrc='warning'
+ if (!gimagesrc) gimagesrc='question'
+ if (gimagesrc)
+ {
+  if (gimagesrc=='critical')
+  {
+   gimagesrc='xpcritical.gif'
+   document.body.style.backgroundColor='FFdddd'
+  }
+  if (gimagesrc=='warning')
+  {
+   gimagesrc='xpwarning.gif'
+   //darker than usual messages to distinguish from the usual buff document background color
+   document.body.style.backgroundColor='FFFF99'
+  }
+  if (gimagesrc=='info')
+  {
+   gimagesrc='xpinfo.gif'
+   document.body.style.backgroundColor='ddFFdd'
+  }
+  if (gimagesrc=='question')
+  {
+   gimagesrc='xpquestion.gif'
+   document.body.style.backgroundColor='ddddFF'
+  }
+  if (!(gimagesrc.indexOf('/')+1+gimagesrc.indexOf('\\')+1))
+  {
+   gimagesrc='../neosys/images/'+gimagesrc
+  }
+  img1.src=gimagesrc
+  img1.style.display='inline'
+ }
+ 
+ //enable text box
+ if (gistextinput)
+ {
+  if (gtexthidden)
+  {
+   textinput.id='textinputoriginal'
+   textinputhidden.id='textinput'
+  }
+   
+  textinput.value=gtext
+  if (gtexthidden) textinputphidden.style.display='inline'
+  else textinputp.style.display='inline'
+ }
+  
+ if (!positivebuttonx&&!negativebuttonx&&!gobackbuttonx)
+ {
+  positivebuttonx='Yes'
+  negativebuttonx='No'
+  gobackbuttonx='Cancel'
+ }
+ 
+ if (typeof questionx=='undefined') questionx='OK to continue?'
+ questionx=questionx.replace(/\r\n/gi,'\r')
+ questionx=questionx.replace(/\r\r/gi,'<p class=statementclass>')
+ questionx=questionx.replace(/\r/gi,'<br class=statementclass>')
+ questionx=questionx.replace(/\n/gi,'<br class=statementclass>')
+ questionx=questionx.replace(/\xFE/gi,'<br class=statementclass>')
+ questionx=questionx.replace(/\xFD/gi,'<br class=statementclass>')
+ questionx=questionx.replace(/\|/gi,'<br class=statementclass>')
+//alert(questionx) 
+
+ questionx=question.innerHTML=questionx
+ 
+ //setup the positive button
+ if (positivebuttonx)
+ {
+  gbuttons[gbuttons.length]=positivebutton
+  positivebutton.value=positivebuttonx
+  positivebutton.style.display='inline'
+ }
+ else positivebutton.style.display='none'
+
+ //setup the negative button 
+ if (negativebuttonx)
+ {
+  gbuttons[gbuttons.length]=negativebutton
+  negativebutton.value=negativebuttonx
+  negativebutton.style.display='inline'
+ }
+ else negativebutton.style.display='none'
+
+ //setup the goback button
+ if (gobackbuttonx)
+ {
+  gbuttons[gbuttons.length]=gobackbutton
+  gobackbutton.value=gobackbuttonx
+  gobackbutton.style.display='inline'
+ }
+ else gobackbutton.style.display='none'
+
+ //check some buttons exist
+ if (gbuttons.length<0)
+ {
+  alert('Error: No buttons specified in confirm.htm')
+  closeit('')
+ }
+
+ //make sure no button is default unless specified
+ if (!defaultbuttonn)
+ {
+  if (gistextinput)
+  {
+   focusontext()
+   window.setTimeout('focusontext()',10)
+  }
+  else try{gbuttons[0].blur()}catch(e){}
+ }
+ 
+ //set the button numbers, letters and the default button
+ for (var buttonn=0;buttonn<gbuttons.length;buttonn++)
+ {
+  var button=gbuttons[buttonn]
+  
+  //set the button letter and title
+  if (!gistextinput)
+  {
+   button.neosysletter=button.value.toString().substr(0,1).toUpperCase()
+   button.title='Press '+button.neosysletter+' or '+button.title
+  }
+
+  //set the button number
+  button.neosysbuttonnumber=buttonn
+  
+  //set the default button
+  if (buttonn==defaultbuttonn-1)
+  {
+   gdefaultbutton=gbuttons[defaultbuttonn-1]
+   gdefaultbutton.focus()
+   window.setTimeout('gdefaultbutton.focus()',10)
+  }
+
+ }
+ 
+ var newwidth=wholediv.offsetWidth
+ if (newwidth>window.screen.availWidth)
+  newwidth=window.screen.availWidth
+ //alert(screen.availHeight)
+ window.dialogWidth=newwidth+'px'
+ 
+ //window.dialogHeight='400px'
+ var newheight=wholediv.offsetHeight+50
+ if (newheight>window.screen.availHeight)
+  newheight=window.screen.availHeight
+ //alert(screen.availHeight)
+ window.dialogHeight=newheight+'px'
+ 
+ //center
+ var top=(window.screen.availHeight-newheight)/2
+ window.dialogTop=top
+ var left=(window.screen.availWidth-newwidth)/2
+ window.dialogLeft=left
+}
+
+function focusontext()
+{
+ textinput.focus()
+ textinput.select()
+}
+
+function document_onkeydown()
+{
+
+ var key=window.event.keyCode
+ var letter=String.fromCharCode(key).toUpperCase()
+
+ //cursor keys on buttons
+ if (document.activeElement.type=='button')
+ {
+ 
+  //left, up means back
+  if (key==37||key==38)
+  {
+   cursor(-1)
+   return
+  }
+ 
+  //right, down means forwards
+  if (key==39||key==40)
+  {
+   cursor(1)
+   return
+  }
+  
+ }
+ 
+ //Positive=F9 or 
+ if (positivebuttonx)
+ {
+  if (key==120||letter==positivebutton.neosysletter)
+  {
+   closeit(1)
+  }
+ }
+ 
+ //Negative=F8 or 
+ if (negativebuttonx)
+ {
+  if (key==119||letter==negativebutton.neosysletter)
+  {
+   closeit(2)
+  }
+ }
+ 
+ //Go Back=Esc or
+ //(allow esc to press positivebutton if there is no negative button (like alert()))
+ if (gobackbuttonx||!negativebuttonx)
+ {
+  if (key==27||letter==gobackbutton.neosysletter)
+  {
+   closeit(0)
+  }
+ }
+ 
+ //Enter for text
+ if (key==13&&gistextinput)
+ {
+  closeit(1)
+ }
+ 
+}
+
+function cursor(arg1)
+{
+ if (document.activeElement.type!='button') return
+ var newbuttonn=(parseInt(document.activeElement.neosysbuttonnumber,10)+gbuttons.length+arg1)%gbuttons.length
+ gbuttons[newbuttonn].focus()
+}
+
+function closeit(arg1)
+{
+
+ var returnvalue
+ if (gistextinput)
+ {
+  if (arg1==1)returnvalue=textinput.value
+ }
+ else returnvalue=arg1
+ 
+ window.returnValue=returnvalue
+ //alert(returnvalue)
+ window.close()
+}
+
+			</SCRIPT>
+		</div>
+	</body>
+</html>
