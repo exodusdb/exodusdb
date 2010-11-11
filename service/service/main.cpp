@@ -202,7 +202,9 @@ function accrest() {
 
 function main()
 {
-USER0="";
+
+	var abc=abc+1;
+
 	//DBTRACE=true;
 
 	var ee="";
