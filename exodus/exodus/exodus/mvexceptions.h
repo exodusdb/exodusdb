@@ -39,6 +39,7 @@ THE SOFTWARE.
 //risk it? to enable speed since copy constuction is so frequent
 //var xyz=xyz="xxx";
 //Unhandled exception at 0x0065892c in service.exe: 0xC0000005: Access violation writing location 0xcccccccc.
+//other words ccould be ISCONSTRUCTED or ISALIVE
 #define ISDEFINED(VARNAME) \
 	if (VARNAME.var_mvtyp&mvtypemask) \
 	throw MVUndefined(var(#VARNAME) ^ L" in " ^ var(functionname)); \
@@ -65,6 +66,7 @@ THE SOFTWARE.
 	if (!VARNAME.isnum()) \
 	throw MVNonNumeric(var(functionname) ^ L" : " ^ var(#VARNAME) ^ L" is " ^ VARNAME.substr(1,20).quote()); \
 
+//see long comment on ISDEFINED
 #define THISISDEFINED() \
 	if (!this||(*this).var_mvtyp&mvtypemask) \
 		throw MVUndefined(L"var in " ^ var(functionname)); \
