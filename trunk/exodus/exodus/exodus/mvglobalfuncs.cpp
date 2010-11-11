@@ -25,6 +25,8 @@ THE SOFTWARE.
 //C4530: C++ exception handler used, but unwind semantics are not enabled. 
 #pragma warning (disable: 4530)
 
+#define MV_NO_NARROW
+
 #include <exodus/mv.h>
 #include <exodus/mvenvironment.h>
 
@@ -1132,7 +1134,7 @@ int exodus_main(int exodus__argc, char *exodus__argv[], MvEnvironment& mv)
 
 	mv.EXECPATH=getexecpath();
 	if (not mv.EXECPATH) {
-		mv.EXECPATH=exodus__argv[0];
+		mv.EXECPATH=var(exodus__argv[0]);
 		if (not mv.EXECPATH.index(SLASH))
 			mv.EXECPATH.splicer(1,0,oscwd()^SLASH);
 	}
@@ -1147,9 +1149,9 @@ int exodus_main(int exodus__argc, char *exodus__argv[], MvEnvironment& mv)
 	//leave a copy where backtrace can get at it
 	EXECPATH2=mv.EXECPATH;
 
-	mv.SENTENCE="";			//ALN:TODO: hm, again, char->var-> op=(var)
-	mv.COMMAND="";
-	mv.OPTIONS="";
+	mv.SENTENCE=L"";			//ALN:TODO: hm, again, char->var-> op=(var) SB #define MV_NO_NARROW disallows accidental narrow now
+	mv.COMMAND=L"";
+	mv.OPTIONS=L"";
 
 	//reconstructs complete original sentence unfortunately quote marks will have been lost unless escaped
 	//needs to go after various exodus definitions
@@ -1160,28 +1162,28 @@ int exodus_main(int exodus__argc, char *exodus__argv[], MvEnvironment& mv)
 		{
 			word=word.field2(SLASH,-1);
 			//remove trailing ".exe"
-			if (word.lcase().substr(-4) == ".exe")		//ALN:TODO: L"
-				word.splicer(-4,4,"");
+			if (word.lcase().substr(-4) == L".exe")
+				word.splicer(-4,4,L"");
 		} else
-			mv.SENTENCE^=" ";
+			mv.SENTENCE^=L" ";
 
 		//put back quotes if any spaces
-		if (word.index(" "))
+		if (word.index(L" "))
 			word.quoter();
 
 		mv.SENTENCE^=word;
 		mv.COMMAND^=FM^word;
 	}
-	mv.COMMAND.splicer(1,1,"");
+	mv.COMMAND.splicer(1,1,L"");
 
 	//options are in either (XXX) or {XXX} at the end of the command.
 	var lastchar=mv.COMMAND.substr(-1);
 	if (lastchar==")")
-		mv.OPTIONS=mv.COMMAND.field2("(",-1);
+		mv.OPTIONS=mv.COMMAND.field2(L"(",-1);
 	else if (lastchar=="}")
-		mv.OPTIONS=mv.COMMAND.field2("{",-1);
+		mv.OPTIONS=mv.COMMAND.field2(L"{",-1);
 	if (mv.OPTIONS)
-		mv.COMMAND.splicer(-(len(mv.OPTIONS)+2),len(mv.OPTIONS)+2, "");
+		mv.COMMAND.splicer(-(len(mv.OPTIONS)+2),len(mv.OPTIONS)+2, L"");
 
 	//would have to passed in as a function pointer
 	//main2(exodus__argc, exodus__argv);

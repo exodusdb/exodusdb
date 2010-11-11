@@ -30,10 +30,8 @@ THE SOFTWARE.
 #define THISIS(OBJECT) \
 	static const wchar_t* functionname=OBJECT;
 
-
+//TRY TO PREVENT var abc=abc+1; at runtime since compilers DONT BLOCK IT!!
 //prevent var x=f(x); of any kind since compilers dont block it but runtime behaviour is undefined
-//prevent undefined c++ behaviour from syntax like "var x=f(x);"
-//prevent var x=f(x);
 //prevent undefined c++ behaviour from syntax like "var x=f(x);"
 //risky to allow undefined behaviour
 //it produces the expected result on MSVC2005 in debugging mode at least IF there is no string to be copied
@@ -41,7 +39,6 @@ THE SOFTWARE.
 //risk it? to enable speed since copy constuction is so frequent
 //var xyz=xyz="xxx";
 //Unhandled exception at 0x0065892c in service.exe: 0xC0000005: Access violation writing location 0xcccccccc.
-
 #define ISDEFINED(VARNAME) \
 	if (VARNAME.var_mvtyp&mvtypemask) \
 	throw MVUndefined(var(#VARNAME) ^ L" in " ^ var(functionname)); \

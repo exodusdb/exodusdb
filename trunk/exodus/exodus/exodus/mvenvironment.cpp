@@ -24,6 +24,8 @@ THE SOFTWARE.
 //C4530: C++ exception handler used, but unwind semantics are not enabled. 
 #pragma warning (disable: 4530)
 
+#define MV_NO_NARROW
+
 #define EXO_MVENVIRONMENT_CPP
 #include <exodus/mvenvironment.h>
 
@@ -77,21 +79,20 @@ MvEnvironment::~MvEnvironment()
 
 }
 
-bool MvEnvironment::init(const var& threadno)
+bool MvEnvironment::init(const int threadno)
 {
-	std::wcout<<L"MvEnvironment::init("<<threadno<<L")"<<std::endl;
+	//std::wcout<<L"MvEnvironment::init("<<threadno<<L")"<<std::endl;
 	//mvprocess
 
-	USER0=L"";
 	this->USERNAME=L"";
 	this->ACCOUNT=L"";
 	this->STATION=L"";
-	this->ROLLOUTFILE=L"~"^threadno^L".$$$";
+	this->ROLLOUTFILE=L"~"^var(threadno)^L".$$$";
 	this->THREADNO=threadno;
 	//this->SYSTEM.replacer(17,0,0,L"");
 
-	cache_dictid_="";
-	this->DICT="";
+	cache_dictid_=L"";
+	this->DICT=L"";
 
 //	return true;
 
@@ -104,9 +105,8 @@ bool MvEnvironment::init(const var& threadno)
 	this->SENTENCE=L"";
 	this->STATION=L"";
 	this->PRIVILEGE=L"";
-	USER0=L"";
+
 	this->USER0=L"";
-USER0.outputl("USER0=");
 	this->USER1=L"";
 	this->USER2=L"";
 	this->USER3=L"";
