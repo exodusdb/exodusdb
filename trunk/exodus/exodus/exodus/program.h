@@ -44,3 +44,17 @@ int main(int exodus__argc, char *exodus__argv[]) \
 		stop(0); \
 	} \
 }
+
+//same as programexit but no try/catch block so can go into a debugger
+#define debugprogramexit() \
+classexit() \
+int main(int exodus__argc, char *exodus__argv[]) \
+{ \
+	MvEnvironment mv; \
+	exodus_main(exodus__argc, exodus__argv, mv); \
+	ExodusProgram exodusprogram1(mv); \
+	int result=exodusprogram1.main(); \
+	print("Press Enter"); \
+	input(); \
+	return result; \
+}

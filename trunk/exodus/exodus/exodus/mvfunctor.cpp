@@ -26,12 +26,16 @@ THE SOFTWARE.
 //makes linux dlopen, dlsym, dlclose syntax work on windows
 //http://www.planet-source-code.com/vb/scripts/ShowCode.asp?txtCodeId=746&lngWId=3
 #if defined(_WIN32) || defined(_MSC_VER) || defined(__CYGWIN__) || defined(__MINGW32__)
-# define WIN32_LEAN_AND_MEAN
-# define _save_function_ function
+
 //windows.h has function defined so temp undefine and restore afterwards
+# define _save_function_ function
 # undef function
+
+# define WIN32_LEAN_AND_MEAN
 # include "windows.h"
+
 # define function _save_function_
+
 typedef HINSTANCE library_t;
 //# define dlopen(arg1,arg2) LoadLibrary(arg1)
 # define dlopen(arg1,arg2) LoadLibraryA(arg1)

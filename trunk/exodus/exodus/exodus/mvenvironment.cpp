@@ -92,9 +92,14 @@ bool MvEnvironment::init(const int threadno)
 	//this->SYSTEM.replacer(17,0,0,L"");
 
 	cache_dictid_=L"";
-	this->DICT=L"";
 
-//	return true;
+	this->DICT=L"x";
+	//var("this->DICT=L\"\";").outputl();
+
+	this->ID=L"idx";
+	//var("this->ID=L\"idx\";").outputl();
+
+	//	return true;
 
 	this->USERNAME=L"";
 	this->ACCOUNT=L"";

@@ -251,25 +251,25 @@ exodus_call(PG_FUNCTION_ARGS)
 
 	char* prequest;
 	char* appendpoint;
-	int** lengthpoint;
+	int32** lengthpoint;
 	char serverid2[4096];
 	char* presponse;
-	int nresponsebytes;
+	int32 nresponsebytes;
 	bytea* output;
 
 	//calculate length of pipe data
 	//total length
-	int nrequestbytes=sizeof(int);
+	int32 nrequestbytes=sizeof(int32);
 	//length and tablename
-	nrequestbytes+=sizeof(int)+VARSIZE(tablename)-VARHDRSZ;
+	nrequestbytes+=sizeof(int32)+VARSIZE(tablename)-VARHDRSZ;
 	//length and dictkey
-	nrequestbytes+=sizeof(int)+VARSIZE(dictkey)-VARHDRSZ;
+	nrequestbytes+=sizeof(int32)+VARSIZE(dictkey)-VARHDRSZ;
 	//length and datakey
-	nrequestbytes+=sizeof(int)+VARSIZE(datakey)-VARHDRSZ;
+	nrequestbytes+=sizeof(int32)+VARSIZE(datakey)-VARHDRSZ;
 	//length and data
-	nrequestbytes+=sizeof(int)+VARSIZE(data)-VARHDRSZ;
+	nrequestbytes+=sizeof(int32)+VARSIZE(data)-VARHDRSZ;
 	//valueno and subvalueno
-	nrequestbytes+=sizeof(int)*2;
+	nrequestbytes+=sizeof(int32)*2;
 
 	//acquire space for pipedata
 	prequest=(char*) palloc(nrequestbytes);
@@ -280,17 +280,17 @@ exodus_call(PG_FUNCTION_ARGS)
 	appendpoint=prequest;
 
 	//pointer to enable saving of an integer (will track appendpoint)
-	lengthpoint=(int**)&appendpoint;
+	lengthpoint=(int32**)&appendpoint;
 
 	//length of whole thing
 	**lengthpoint=nrequestbytes;
-	appendpoint+=sizeof(int);
+	appendpoint+=sizeof(int32);
 //?	*lengthpoint++;
 
 	//length of tablename
-	//*appendpoint=(int)(VARSIZE(tablename)-VARHDRSZ);
-	**lengthpoint=(int)(VARSIZE(tablename)-VARHDRSZ);
-	appendpoint+=sizeof(int);
+	//*appendpoint=(int32)(VARSIZE(tablename)-VARHDRSZ);
+	**lengthpoint=(int32)(VARSIZE(tablename)-VARHDRSZ);
+	appendpoint+=sizeof(int32);
 
 	//tablename
 	memcpy((void *) (appendpoint)	// destination
@@ -300,9 +300,9 @@ exodus_call(PG_FUNCTION_ARGS)
 	appendpoint+=VARSIZE(tablename)-VARHDRSZ;
 
 	//length of dictkey
-	//*appendpoint=(int)(VARSIZE(dictkey)-VARHDRSZ);
-	**lengthpoint=(int)(VARSIZE(dictkey)-VARHDRSZ);
-	appendpoint+=sizeof(int);
+	//*appendpoint=(int32)(VARSIZE(dictkey)-VARHDRSZ);
+	**lengthpoint=(int32)(VARSIZE(dictkey)-VARHDRSZ);
+	appendpoint+=sizeof(int32);
 
 	//dictkey
 	memcpy((void *) (appendpoint)	// destination
@@ -312,9 +312,9 @@ exodus_call(PG_FUNCTION_ARGS)
 	appendpoint+=VARSIZE(dictkey)-VARHDRSZ;
 
 	//length of datakey
-	//*appendpoint=(int)(VARSIZE(datakey)-VARHDRSZ);
-	**lengthpoint=(int)(VARSIZE(datakey)-VARHDRSZ);
-	appendpoint+=sizeof(int);
+	//*appendpoint=(int32)(VARSIZE(datakey)-VARHDRSZ);
+	**lengthpoint=(int32)(VARSIZE(datakey)-VARHDRSZ);
+	appendpoint+=sizeof(int32);
 
 	//datakey
 	memcpy((void *) (appendpoint)	// destination
@@ -324,9 +324,9 @@ exodus_call(PG_FUNCTION_ARGS)
 	appendpoint+=VARSIZE(datakey)-VARHDRSZ;
 
 	//length of data
-	//*appendpoint=(int)(VARSIZE(data)-VARHDRSZ);
-	**lengthpoint=(int)(VARSIZE(data)-VARHDRSZ);
-	appendpoint+=sizeof(int);
+	//*appendpoint=(int32)(VARSIZE(data)-VARHDRSZ);
+	**lengthpoint=(int32)(VARSIZE(data)-VARHDRSZ);
+	appendpoint+=sizeof(int32);
 
 	//data
 	memcpy((void *) (appendpoint)	// destination
@@ -336,14 +336,14 @@ exodus_call(PG_FUNCTION_ARGS)
 	appendpoint+=VARSIZE(data)-VARHDRSZ;
 
 	//value number
-	//*appendpoint=(int)(valueno);
-	**lengthpoint=(int)(valueno);
-	appendpoint+=sizeof(int);
+	//*appendpoint=(int32)(valueno);
+	**lengthpoint=(int32)(valueno);
+	appendpoint+=sizeof(int32);
 
 	//subvalue number
-	//*appendpoint=(int)(subvalueno);
-	**lengthpoint=(int)(subvalueno);
-	appendpoint+=sizeof(int);
+	//*appendpoint=(int32)(subvalueno);
+	**lengthpoint=(int32)(subvalueno);
+	appendpoint+=sizeof(int32);
 
 	//failsafe check is correct total length
 	if (appendpoint-prequest-nrequestbytes)
@@ -386,7 +386,7 @@ exodus_call(PG_FUNCTION_ARGS)
 	//copy the input to the output
 	//elog(WARNING, "exodus_call: copying response to palloc'ed");
 	memcpy((void *) VARDATA(output),	// destination
-		   (void *) (int)(presponse),	// starting from
+		   (void *) (int32)(presponse),	// starting from
 		   nresponsebytes);		// how many bytes
 
 
