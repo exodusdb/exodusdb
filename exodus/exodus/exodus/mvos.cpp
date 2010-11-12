@@ -563,6 +563,17 @@ void var::osflush() const
 	return;
 }
 
+
+	//what is the purpose of the following?
+	//to prevent locale conversion if writing narrow string to wide stream or vice versa
+	//imbue BEFORE opening
+	//	myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
+//var(int(sizeof(myfile))).outputl(L"filesize");
+	//if (osfilename.var_mvtyp&pimpl::MVTYPE_INT)
+	//	myfile=(std::fstream) var_mvint;
+	//else
+
+
 bool var::osopen(const var& osfilename)
 {
 	THISIS(L"bool var::osopen(const var& osfilename)")
@@ -578,36 +589,18 @@ bool var::osopen(const var& osfilename)
 		osfilename.createString();
 	}
 
-	std::fstream *pfstream=new std::fstream;
-
-	//what is the purpose of the following?
-	//to prevent locale conversion if writing narrow string to wide stream or vice versa
-	//imbue BEFORE opening
-	//	myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
-//var(int(sizeof(myfile))).outputl(L"filesize");
-	//if (osfilename.var_mvtyp&pimpl::MVTYPE_INT)
-	//	myfile=(std::fstream) var_mvint;
-	//else
-
-	{
-		//binary!
-		(*pfstream).open(osfilename.tostring().c_str(), std::ios::out |std::ios::in | std::ios::binary);
-		if (!(*pfstream)) {
-			delete pfstream;
-			return false;
-		}
-//		var_mvint=(mvint_t) myfile;
-	}
+	std::string sfn = osfilename.tostring();
+	// avoid "fstream * pfstream = new ..." complexities
+	std::fstream fstr( sfn.c_str(), std::ios::out |std::ios::in | std::ios::binary);
+	if( ! fstr)
+		return false;
 
 	var_mvstr=osfilename.var_mvstr;
 	var_mvtyp=pimpl::MVTYPE_STR;
-
-	//TODO for now reopen file on every access
-	(*pfstream).close();
-	delete pfstream;
-
+	fstr.close();
 	return true;
 }
+
 
 //on unix or with iconv we could convert to or any character format
 //for sequential output we could use popen to progressively read and write with no seek facility
