@@ -206,7 +206,7 @@ function main()
 	assert(unquote("\"This is quoted?\"") eq "This is quoted?");
 
 	//verify that exodus catches c++ defect at runtime
-	try {
+/*	try {
 		var abc=abc+1;
 		//should never get here because above should cause a runtime undefined error
 		assert(false);
@@ -218,7 +218,7 @@ function main()
 		//should never get here because above should cause a runtime error
 		assert(false);
 	}
-
+*/
 	//this turns on tracing SQL statements to postgres
 	//DBTRACE=true;
 
@@ -500,8 +500,14 @@ function main()
 	inserter(da1,3,3,3,"x").outputl();//or this
 
 	var tempfile;
-	if (osopen("\\testsort.cpp",tempfile))
+	// This file should be in the same directory, where project file is located, like
+	//		C:\Exodus\exodusdb\service\service\testsort.cpp
+	if (osopen("testsort.cpp",tempfile))	// opening existing file
+	{
 		printl("opened");
+		var testsortbytes = osbread( tempfile, 0, 256);
+		printl("first 256 bytes of the file :\n" ^ testsortbytes);
+	}
 	else
 		printl("not opened");
 

@@ -54,18 +54,19 @@ DLL_PUBLIC
 std::string var::tostring() const
 {
 	THISIS(L"std::string var::tostring() const")
-        THISISSTRING()
+    THISISSTRING()
+	int length = ( int) var_mvstr.length();
 
 	//TODO! convert from internal UTF16/32 to external UTF8
 
 	//allow for max 4 bytes per single utf8 byte (utf16 max bytes is four)
 	if (sizeof(wchar_t)==4)
 	{
-		return stringfromUTF32((UTF32*)((*this).towstring().data()), (*this).length().toInt());
-	}
+		return stringfromUTF32((UTF32*)((*this).towstring().data()), length);	//ALN:TODO: try to move it into
+	}																			// var::toUTF8
 	else if (sizeof(wchar_t)==2)
 	{
-		return stringfromUTF16((UTF16*)( (*this).towstring().data() ), (*this).length().toInt());
+		return stringfromUTF16((UTF16*)( (*this).towstring().data() ), length);
 	}
 	else if (sizeof(wchar_t)==1)
 	{
@@ -75,8 +76,8 @@ std::string var::tostring() const
 	else
 	{
 		//std::cout<<" UTF8>>wstring ERROR ";
-		std::cerr<<"toUTF8: sizeof wchar_t must be 1, 2 or 4"<<std::endl;
-		throw MVException("toUTF8: sizeof wchar_t " ^ var(int(sizeof(wchar_t))) ^ L" must be 1, 2 or 4");
+		std::cerr<<"var::tostring(): sizeof wchar_t must be 1, 2 or 4"<<std::endl;
+		throw MVException("var::tostring(): sizeof wchar_t " ^ var(int(sizeof(wchar_t))) ^ L" must be 1, 2 or 4");
 	}
 
 }
@@ -197,7 +198,7 @@ std::string stringfromUTF16(const UTF16* sourcestart, const size_t sourcelength)
 	//actually we will probably restrict ourselves to unicode code points 0000-FFFF
 	//in order to avoid any four byte UTF16 characters
 	//in order to ensure indexing characters in UTF16 strings can be lightning fast and proper
-	UTF8* targetbuffer=new(UTF8[sourcelength*4]);
+	UTF8* targetbuffer=new UTF8[sourcelength*4];
 	UTF8* targetbufferptr=targetbuffer;
 	//TODO check if ok
 	ConversionResult conversionresult=ConvertUTF16toUTF8 (
@@ -206,14 +207,14 @@ std::string stringfromUTF16(const UTF16* sourcestart, const size_t sourcelength)
 	//TODO check if ok
 	if (conversionresult)
 	{
-		delete targetbuffer;
+		delete [] targetbuffer;
 		//std::cout<<" UTF16>>8ERROR ";
 		std::cerr<<"UTF Conversion Error - UTF16 TO UTF8"<<std::endl;
 		throw MVException("UTF Conversion Error - UTF16 TO UTF8");
 	}
 	std::string result((char*)targetbuffer,targetbufferptr-targetbuffer);
 
-	delete targetbuffer;
+	delete [] targetbuffer;
 	
 	return result;
 }
