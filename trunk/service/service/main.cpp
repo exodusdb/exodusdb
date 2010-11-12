@@ -137,7 +137,7 @@ public:
 			xx++;
 
 			//debug one thread
-			//if (i==5&&environmentn==1) i=i/(i-i);
+			//if (i eq 5&&environmentn eq 1) i=i/(i-i);
 
 			//ensure single threaded cout
 			//boost::mutex::scoped_lock lock(io_mutex);
@@ -203,8 +203,23 @@ function accrest() {
 function main()
 {
 
-	var abc=abc+1;
+	assert(unquote("\"This is quoted?\"") eq "This is quoted?");
 
+	//verify that exodus catches c++ defect at runtime
+	try {
+		var abc=abc+1;
+		//should never get here because above should cause a runtime undefined error
+		assert(false);
+	}
+	catch (MVUndefined mve) {
+		mve.description.outputl();
+	}
+	catch (...) {
+		//should never get here because above should cause a runtime error
+		assert(false);
+	}
+
+	//this turns on tracing SQL statements to postgres
 	//DBTRACE=true;
 
 	var ee="";
@@ -238,33 +253,33 @@ function main()
 	assert((true % e2) eq 1);
 	assert((false % e2) eq 0);
 
-	//the six logical comparisons >= <= > < and the lesser precedence == !=
+	//the six logical comparisons >= <= > < and the lesser precedence eq  ne
 	//between logical results and vars are not supported by exodus
 	//because they seem useless, probably non existant in real code
 	//and because I am too lazy at this point.
 	//real code would have to be something like
 	// if (cc eq aa > bb)
-	//which due to lower precendence of == and != is actually
+	//which due to lower precendence of eq and ne is actually
 	// if (cc eq (aa > bb))
-	assert((e1==true) eq true);
-	assert((e1==false) eq false);
-	assert((true==e1) eq true);
-	assert((false==e1) eq false);
+	assert((e1 eq true) eq true);
+	assert((e1 eq false) eq false);
+	assert((true eq e1) eq true);
+	assert((false eq e1) eq false);
 
 	assert((e1!=true) eq false);
 	assert((e1!=false) eq true);
 	assert((true!=e1) eq false);
 	assert((false!=e1) eq true);
 
-	assert((e1==true) eq 1);
-	assert((e1==false) eq 0);
-	assert((true==e1) eq 1);
-	assert((false==e1) eq 0);
+	assert((e1 eq true) eq 1);
+	assert((e1 eq false) eq 0);
+	assert((true eq e1) eq 1);
+	assert((false eq e1) eq 0);
 
-	assert((e1!=true) eq 0);
-	assert((e1!=false) eq 1);
-	assert((true!=e1) eq 0);
-	assert((false!=e1) eq 1);
+	assert((e1 ne true) eq 0);
+	assert((e1 ne false) eq 1);
+	assert((true ne e1) eq 0);
+	assert((false ne e1) eq 1);
 
 	assert((e3-(e3 eq var(0))) eq 3);
 
@@ -274,7 +289,7 @@ function main()
 	//printl(e1^e2>e3); //wont compile (because it would produce the wrong result)
 
 	//just add brackets to clarify and correct the precedence for exodus and it will compile
-	printl((e1^e2)>e3); //=1 ... correct result because (1^2)>3 i.e. "12">3 is true
+	assert( ((e1^e2)>e3) eq 1); //=1 ... correct result because (1^2)>3 i.e. "12">3 is true
 
 	var s1="111";
 	var s2;
@@ -299,13 +314,13 @@ function main()
 
 	//accessing individual characters by index 1=first -1=last etc.
 	var a="abc";
-	printl(a[1]);	//a = first character
-	printl(a[2]);	//b = second character
-	printl(a[4]);	//"" = if access after last character
-	printl(a[-1]);	//c = last character
-	printl(a[-2]);	//b = last but one character
-	printl(a[-9]);	//a = first character if too negative
-	printl(a[0]);	//a = zero is the same as too negative
+	assert(a[1] eq "a");	//a = first character
+	assert(a[2] eq "b");	//b = second character
+	assert(a[4] eq "");	//"" = if access after last character
+	assert(a[-1] eq "c");	//c = last character
+	assert(a[-2] eq "b");	//b = last but one character
+	assert(a[-9] eq "a");	//a = first character if too negative
+	assert(a[0] eq "a");	//a = zero is the same as too negative
 
 	//replacing a section of a string:
 	//given start character number, number of characters to replace and a replacement string
@@ -316,30 +331,33 @@ function main()
 	//replacing a section of a string - method 1
 	a="abcde";
 	splicer(a,3,2,"xx");
-	printl(a);              //abxxe
+	assert(a eq "abxxe");
 
 	//replacing a section of a string - method 2
 	a="abcde";
 	a.splicer(-2,-3,"xx");
-	printl(a);              //axxe ... both start and length can be negative
+	assert(a eq "axxe");
 
 	//replacing a section of a string - method 3 – but may be slower
 	a="abcde";
 	a=splice(a,-2,-3,"xx");
-	printl(a);              //axxe ... both start and length can be negative
+	assert(a eq "axxe");
 
 	//replacing a section of a string - method 4 – but may be slower
 	a="abcde";
 	a=a.splice(-2,-3,"xx");
-	printl(a);              //axxe ... both start and length can be negative
+	assert(a eq "axxe");
 
+	//test single character extraction
+	var expected="a" ^ FM ^ "a" ^ FM ^ "b" ^ FM ^ "a" ^ FM ^ "a" ^ FM ^ "b" ^ FM ^ "";
 	var tempstr2="ab";
 	for (var ii=-3; ii<=3; ++ii)
-		tempstr2[ii].quote().output(" ["^ii^"]=");
+		assert(tempstr2[ii] eq expected.extract(ii+4));
+
+	//test single character extraction on ""
 	tempstr2="";
-	printl();
 	for (var ii=-3; ii<=3; ++ii)
-		tempstr2[ii].quote().output(" ["^ii^"]=");
+		assert(tempstr2[ii] eq "");
 
 	var errmsg;
 	//if (not createdb("steve",errmsg))
@@ -368,8 +386,8 @@ function main()
 		printl("ID=",ID);
 		printl("RECORD=",RECORD);
 
-		printl("AGE IN DAYS=",calculate("AGE_IN_DAYS"));
-		printl("AGE IN YEARS=",calculate("AGE_IN_YEARS"));
+		//printl("AGE IN DAYS=",calculate("AGE_IN_DAYS"));
+		//printl("AGE IN YEARS=",calculate("AGE_IN_YEARS"));
 	}
 
 	var spac1="  xxx  xxx  ";
@@ -452,9 +470,9 @@ function main()
 	xyz(da1);
 
 	//extraction
-	da1(2).outputl();//this extracts field 2
-	da1(2,2).outputl();//this extracts field 2, value 2
-	da1(2,2,2).outputl();//this extracts field 2, value 2, subvalue 2
+	assert(da1(2) eq extract(da1,2));//this extracts field 2
+	assert(da1(2,2) eq extract(da1,2,2));//this extracts field 2, value 2
+	assert(da1(2,2,2) eq extract(da1,2,2,2));//this extracts field 2, value 2, subvalue 2
 
 	//this wont work
 	replace(da1,3,"x").outputl();//or this
@@ -488,7 +506,11 @@ function main()
 		printl("opened");
 	else
 		printl("not opened");
-	exodus::sin(30).outputl("sin(30.0)=");
+
+	//math.h seems to have been included in one of the boost or other special headers
+	//in this main.cpp file and that causes confusion between math.h and exodus.h sin() and other functions.
+	//we resolved the issue here by being specific about the namespace
+	exodus::sin(30.0000000001).outputl("sin(30.0)=");
 	exodus::cos(30.0).outputl("cos(30.0)=");
 	exodus::tan(30.0).outputl("tan(30.0)=");
 	exodus::atan(30.0).outputl("atan(30.0)=");
@@ -521,19 +543,19 @@ function main()
 	//	stop("Cannot connect!");
 
 	//check floating point modulo
-	assert(mod(2.3,var(1.499)).round(3).outputl()==0.801);
-	assert(mod(-2.3,var(-1.499)).round(3).outputl()==-0.801);
+	assert(mod(2.3,var(1.499)).round(3).outputl() eq 0.801);
+	assert(mod(-2.3,var(-1.499)).round(3).outputl() eq -0.801);
 	//following is what c++ fmod does (a rather mathematical concept)
-	//assert(mod(-2.3,var(1.499)).round(3).outputl()==-0.801);
-	//assert(mod(2.3,var(-1.499)).round(3).outputl()==0.801);
+	//assert(mod(-2.3,var(1.499)).round(3).outputl() eq -0.801);
+	//assert(mod(2.3,var(-1.499)).round(3).outputl() eq 0.801);
 	//but arev and qm ensure that the result is somewhere from 0 up to or down to
 	//(but not including) the divisor
 	//method is ... do the fmod and if the result is not the same sign as the divisor, add the divisor
-	assert(mod(-2.3,var(1.499)).round(3).outputl()==0.698);
-	assert(mod(2.3,var(-1.499)).round(3).outputl()==-0.698);
+	assert(mod(-2.3,var(1.499)).round(3).outputl() eq 0.698);
+	assert(mod(2.3,var(-1.499)).round(3).outputl() eq -0.698);
 
 	oconv(1234,"MD20P").outputl();
-	assert(var(10000).oconv("DY0")=="");
+	assert(var(10000).oconv("DY0") eq "");
 
 	var temp;
 	if (not open("dict_test_symbolics",temp))
@@ -558,25 +580,25 @@ function main()
 	}
 
 	assert(var("a")<var("B"));
-	assert(var(1000).oconv("MD80").outputl("1000 MD80->")=="1000.00000000");
-	assert(var("31 JAN 2008").iconv("D")=="14641");
+	assert(var(1000).oconv("MD80").outputl("1000 MD80->") eq "1000.00000000");
+	assert(var("31 JAN 2008").iconv("D") eq "14641");
 
-	assert(var("1/31/2008").iconv("D")==14641);
-	assert(var("2008/1/31").iconv("DS")=="14641");
+	assert(var("1/31/2008").iconv("D") eq 14641);
+	assert(var("2008/1/31").iconv("DS") eq "14641");
 
-	assert(var("JAN/31/2008").iconv("D")=="14641");
-	assert(var("2008/JAN/31").iconv("DS")=="14641");
+	assert(var("JAN/31/2008").iconv("D") eq "14641");
+	assert(var("2008/JAN/31").iconv("DS") eq "14641");
 
-	assert(var("31/1/2008").iconv("DE")=="14641");
-	assert(var("31 1 2008").iconv("DE")=="14641");
-	assert(var("31-1-2008").iconv("DE")=="14641");
-	assert(var("31/JAN/2008").iconv("DE")=="14641");
-	assert(var("JAN/31/2008").iconv("DE")=="14641");
-	assert(var("29 FEB 2008").iconv("D")=="14670");
+	assert(var("31/1/2008").iconv("DE") eq "14641");
+	assert(var("31 1 2008").iconv("DE") eq "14641");
+	assert(var("31-1-2008").iconv("DE") eq "14641");
+	assert(var("31/JAN/2008").iconv("DE") eq "14641");
+	assert(var("JAN/31/2008").iconv("DE") eq "14641");
+	assert(var("29 FEB 2008").iconv("D") eq "14670");
 
-	assert(var("32/1/2008").iconv("DE")=="");
-	assert(var("30/2/2008").iconv("DE")=="");
-	assert(var("1/31/2008").iconv("DE")=="");
+	assert(var("32/1/2008").iconv("DE") eq "");
+	assert(var("30/2/2008").iconv("DE") eq "");
+	assert(var("1/31/2008").iconv("DE") eq "");
 
 	//select("select test_alphanum with f1 between 20 and 21");
 	printl(oconv(10.1,"MD20"));
@@ -716,65 +738,65 @@ while trying to match the argument list '(exodus::var, bool)'
 	var subs="xyz";
 	printl(subs.substr(-1));
 
-	assert(oconv("a","L#3").outputl()=="a  ");
-	assert(oconv("abc","L#3").outputl()=="abc");
-	assert(oconv("abcd","L#3").outputl()=="abc");
-	assert(oconv("a"^FM^"abc"^FM^"abcd","L#3").outputl()==("a  "^FM^"abc"^FM^"abc"));
+	assert(oconv("a","L#3").outputl() eq "a  ");
+	assert(oconv("abc","L#3").outputl() eq "abc");
+	assert(oconv("abcd","L#3").outputl() eq "abc");
+	assert(oconv("a"^FM^"abc"^FM^"abcd","L#3").outputl() eq ("a  "^FM^"abc"^FM^"abc"));
 
-	assert(oconv("a","R#3").outputl()=="  a");
-	assert(oconv("abc","R#3").outputl()=="abc");
-	assert(oconv("abcd","R#3").outputl()=="bcd");
-	assert(oconv("a"^FM^"abc"^FM^"abcd","R#3").outputl()==("  a"^FM^"abc"^FM^"bcd"));
+	assert(oconv("a","R#3").outputl() eq "  a");
+	assert(oconv("abc","R#3").outputl() eq "abc");
+	assert(oconv("abcd","R#3").outputl() eq "bcd");
+	assert(oconv("a"^FM^"abc"^FM^"abcd","R#3").outputl() eq ("  a"^FM^"abc"^FM^"bcd"));
 
-	assert(oconv("a","T#3").outputl()=="a  ");
-	assert(oconv("abc","T#3").outputl()=="abc");
-	assert(oconv("abcd","T#3").outputl()==("abc"^TM^"d  "));
-	assert(oconv("a"^FM^"abc"^FM^"abcd","T#3").outputl()==("a  "^FM^"abc"^FM^"abc"^TM^"d  "));
+	assert(oconv("a","T#3").outputl() eq "a  ");
+	assert(oconv("abc","T#3").outputl() eq "abc");
+	assert(oconv("abcd","T#3").outputl() eq ("abc"^TM^"d  "));
+	assert(oconv("a"^FM^"abc"^FM^"abcd","T#3").outputl() eq ("a  "^FM^"abc"^FM^"abc"^TM^"d  "));
 
-	assert(oconv("a","L(0)#3").outputl()=="a00");
-	assert(oconv("a","R(0)#3").outputl()=="00a");
-	assert(oconv("a","T(0)#3").outputl()=="a00");
-	assert(oconv("abcd","T(0)#3").outputl()==("abc"^TM^"d00"));
+	assert(oconv("a","L(0)#3").outputl() eq "a00");
+	assert(oconv("a","R(0)#3").outputl() eq "00a");
+	assert(oconv("a","T(0)#3").outputl() eq "a00");
+	assert(oconv("abcd","T(0)#3").outputl() eq ("abc"^TM^"d00"));
 
 	initrnd(999);
-	assert(rnd(999).outputl()==777);
-	assert(iconv("23 59 59","MT").outputl()==86399);
-	assert(iconv("xx11yy12zz13P","MT").outputl()==83533);
-	assert(iconv("24 00 00","MT").outputl()=="");
+	assert(rnd(999).outputl() eq 777);
+	assert(iconv("23 59 59","MT").outputl() eq 86399);
+	assert(iconv("xx11yy12zz13P","MT").outputl() eq 83533);
+	assert(iconv("24 00 00","MT").outputl() eq "");
 
 	//http://www.regular-expressions.info/examples.html
-	assert(swap("Steve Bush Bash bish","B.","Ru","ri").outputl()=="Steve Rush Rush Rush");
+	assert(swap("Steve Bush Bash bish","B.","Ru","ri").outputl() eq "Steve Rush Rush Rush");
 
-	if (sizeof(wchar_t)==2)
+	if (sizeof(wchar_t) eq 2)
 	{
 		//ucs-16 "fake utf16" on windows
-		assert(oconv("Aa019KK","HEX").outputl()=="00410061003000310039004B004B");
-		assert(var("00410061003000310039004B004B").iconv("HEX").outputl()=="Aa019KK");
+		assert(oconv("Aa019KK","HEX").outputl() eq "00410061003000310039004B004B");
+		assert(var("00410061003000310039004B004B").iconv("HEX").outputl() eq "Aa019KK");
 
 	}
-	else if (sizeof(wchar_t)==4)
+	else if (sizeof(wchar_t) eq 4)
 	{
-		assert(oconv("Aa019KK","HEX").outputl()=="00000041000000610000003000000031000000390000004B0000004B");
-		assert(var("00000041000000610000003000000031000000390000004B0000004B").iconv("HEX2").outputl()=="Aa019KK");
+		assert(oconv("Aa019KK","HEX").outputl() eq "00000041000000610000003000000031000000390000004B0000004B");
+		assert(var("00000041000000610000003000000031000000390000004B0000004B").iconv("HEX2").outputl() eq "Aa019KK");
 
 	} 
 
-	assert(oconv("Aa019KK","HEX2").outputl()=="41613031394B4B");
-	assert(oconv("Aa019KK","HEX4").outputl()=="00410061003000310039004B004B");
-	assert(oconv("Aa019KK","HEX8").outputl()=="00000041000000610000003000000031000000390000004B0000004B");
-	assert(var("41613031394B4B").iconv("HEX2").outputl()=="Aa019KK");
-	assert(var("00410061003000310039004B004B").iconv("HEX4").outputl()=="Aa019KK");
-	assert(var("00000041000000610000003000000031000000390000004B0000004B").iconv("HEX8").outputl()=="Aa019KK");
+	assert(oconv("Aa019KK","HEX2").outputl() eq "41613031394B4B");
+	assert(oconv("Aa019KK","HEX4").outputl() eq "00410061003000310039004B004B");
+	assert(oconv("Aa019KK","HEX8").outputl() eq "00000041000000610000003000000031000000390000004B0000004B");
+	assert(var("41613031394B4B").iconv("HEX2").outputl() eq "Aa019KK");
+	assert(var("00410061003000310039004B004B").iconv("HEX4").outputl() eq "Aa019KK");
+	assert(var("00000041000000610000003000000031000000390000004B0000004B").iconv("HEX8").outputl() eq "Aa019KK");
 
 	//doesnt accept FMs etc yet
-	//assert(var("FF"^FM^"00").iconv("HEX").outputl()==("00FF"^FM^"00FF"));
-	assert(var("FF"^FM^"00").iconv("HEX2").oconv("HEX2").outputl()=="");
+	//assert(var("FF"^FM^"00").iconv("HEX").outputl() eq ("00FF"^FM^"00FF"));
+	assert(var("FF"^FM^"00").iconv("HEX2").oconv("HEX2").outputl() eq "");
 	//anything invalid returns empty string
-	assert(var("XF").iconv("HEX").oconv("HEX").outputl()=="");
+	assert(var("XF").iconv("HEX").oconv("HEX").outputl() eq "");
 
 	var time1=var("10:10:10").iconv("MT");
-	assert(var("abcabdef").trim("abef").outputl()=="cbd");
-	assert(var("abcabdef").trimf("abef").trimb("abef").outputl()=="cabd");
+	assert(var("abcabdef").trim("abef").outputl() eq "cbd");
+	assert(var("abcabdef").trimf("abef").trimb("abef").outputl() eq "cabd");
 
 	var temp3="c";
 	var temp2("c");
@@ -794,12 +816,12 @@ while trying to match the argument list '(exodus::var, bool)'
 	//undefined
 	//var conn1=conn1.connect();
 
-	//assert(crop(VM ^ FM)=="");
-	//assert(crop("xxx" ^ VM ^ FM)=="xxx");
-	assert(crop("aaa" ^ VM ^ FM ^ "bbb")==("aaa" ^ FM ^ "bbb"));
-	assert(crop("aaa" ^ VM ^ FM ^ "bbb")==("aaa" ^ FM ^ "bbb"));
-	assert(crop("aaa" ^ FM ^ "bbb" ^ FM ^ VM ^ SM ^ SM ^ FM ^ "ddd")==("aaa" ^ FM ^ "bbb" ^ FM ^ FM ^ "ddd"));
-	assert(crop("aaa" ^ FM ^ "bbb" ^ FM ^ VM ^ SM ^ SM ^ FM ^ RM ^ "ddd")==("aaa" ^ FM ^ "bbb" ^ RM ^ "ddd"));
+	//assert(crop(VM ^ FM) eq "");
+	//assert(crop("xxx" ^ VM ^ FM) eq "xxx");
+	assert(crop("aaa" ^ VM ^ FM ^ "bbb") eq ("aaa" ^ FM ^ "bbb"));
+	assert(crop("aaa" ^ VM ^ FM ^ "bbb") eq ("aaa" ^ FM ^ "bbb"));
+	assert(crop("aaa" ^ FM ^ "bbb" ^ FM ^ VM ^ SM ^ SM ^ FM ^ "ddd") eq ("aaa" ^ FM ^ "bbb" ^ FM ^ FM ^ "ddd"));
+	assert(crop("aaa" ^ FM ^ "bbb" ^ FM ^ VM ^ SM ^ SM ^ FM ^ RM ^ "ddd") eq ("aaa" ^ FM ^ "bbb" ^ RM ^ "ddd"));
 
 	space(-11);
 	var("x").str(-7);
@@ -819,7 +841,7 @@ while trying to match the argument list '(exodus::var, bool)'
 	}
 
 	var x9;
-//	if (var xx==x) {};
+//	if (var xx eq x) {};
 	//TODO implement some kind of a switch to turn off exit in mvexceptions
 	var filehandle;
 /*
@@ -834,7 +856,7 @@ while trying to match the argument list '(exodus::var, bool)'
 	oconv(0,"D5").outputl();
 	//check empty conversion
 	oconv("xxx","").outputl("xxx = ");
-	assert(oconv("xxx","")=="xxx");
+	assert(oconv("xxx","") eq "xxx");
 
 	oconv("",				"MX").outputl(" = ");
 	oconv(" ",				"MX").outputl("  = ");
@@ -845,98 +867,101 @@ while trying to match the argument list '(exodus::var, bool)'
 	oconv("1.5",			"MX").outputl("2 = ");
 	oconv("20" ^ FM ^ 255,	"MX").outputl("14" ^FM^ "FF = ");
 
-	assert(oconv("","MX")=="");
-	assert(oconv(" ","MX")==" ");
-	assert(oconv(0,"MX")=="0");
-	assert(oconv(-0,"MX")=="0");
-	assert(oconv("X","MX")=="X");
-	//assert(oconv("-1.5","MX")=="FFFFFFFFFFFFFFFE");
-	assert(oconv("-1.5","MX")=="FFFFFFFE");
-	assert(oconv("-1","MX")=="FFFFFFFF");
-	assert(oconv("1.5","MX")=="2");
-	assert(oconv("20" ^ FM ^ 255,"MX")==("14" ^FM^ "FF"));
+	assert(oconv("","MX") eq "");
+	assert(oconv(" ","MX") eq " ");
+	assert(oconv(0,"MX") eq "0");
+	assert(oconv(-0,"MX") eq "0");
+	assert(oconv("X","MX") eq "X");
+	//assert(oconv("-1.5","MX") eq "FFFFFFFFFFFFFFFE");
+	assert(oconv("-1.5","MX") eq "FFFFFFFE");
+	assert(oconv("-1","MX") eq "FFFFFFFF");
+	assert(oconv("1.5","MX") eq "2");
+	assert(oconv("20" ^ FM ^ 255,"MX") eq ("14" ^FM^ "FF"));
 
-	oconv("","D").outputl(" = ");
-	oconv("X","D").outputl("X = ");
-	oconv("-1.5","D").outputl("29 DEC 1967 = ");
-	oconv("1.5","D").outputl("01 JAN 1968 = ");
-	oconv("1.5" ^ FM ^ -1.5,"D").outputl("01 JAN 1968 FM 29 DEC 1967 = ");
+	assert(oconv("","D") eq "");
+	assert(oconv("X","D") eq "X");
+	assert(oconv("-1.5","D") eq "29 DEC 1967");
+	assert(oconv("1.5","D") eq "01 JAN 1968");
+	assert(oconv("1.5" ^ FM ^ -1.5,"D") eq ("01 JAN 1968"^FM^"29 DEC 1967"));
 
-	assert(oconv("","D")=="");
-	assert(oconv("X","D")=="X");
-	assert(oconv("-1.5","D")=="29 DEC 1967");
-	assert(oconv("1.5","D")=="01 JAN 1968");
-	assert(oconv("1.5" ^ FM ^ -1.5,"D")==("01 JAN 1968"^FM^"29 DEC 1967"));
-
-	assert(oconv(9649,"D")=="01 JUN 1994");
-	assert(oconv(9649,"D2")=="01 JUN 94");
-	assert(oconv(9649,"D4")=="01 JUN 1994");
-	assert(oconv(9649,"D/")=="06/01/1994");
-	assert(oconv(9649,"D ")=="06 01 1994");
-	assert(oconv(9649,"D2/")=="06/01/94");
-	assert(oconv(9649,"D2-")=="06-01-94");
-	assert(oconv(9649,"D/")=="06/01/1994");
-	assert(oconv(9649,"D/E")=="01/06/1994");
-	assert(oconv(9649,"D2 E")=="01 06 94");
-	assert(oconv(9649,"D S")=="1994 06 01");
-	assert(oconv(9649,"DM")=="6");
-	assert(oconv(9649,"DMA")=="JUNE");
-	assert(oconv(9649,"DW")=="3");
-	assert(oconv(9649,"DWA")=="WEDNESDAY");
-	assert(oconv(9649,"DY")=="1994");
-	assert(oconv(9649,"DY2")=="94");
-	assert(oconv(9649,"D2Y")=="94 JUN 01");
-	assert(oconv(9649,"D5Y")=="01994 JUN 01");
-	assert(oconv(9649,"DD")=="1");
-	assert(oconv(9649,"DQ")=="2");
-	assert(oconv(9649,"DJ")=="152");
+	assert(oconv(9649,"D") eq "01 JUN 1994");
+	assert(oconv(9649,"D2") eq "01 JUN 94");
+	assert(oconv(9649,"D4") eq "01 JUN 1994");
+	assert(oconv(9649,"D/") eq "06/01/1994");
+	assert(oconv(9649,"D ") eq "06 01 1994");
+	assert(oconv(9649,"D2/") eq "06/01/94");
+	assert(oconv(9649,"D2-") eq "06-01-94");
+	assert(oconv(9649,"D/") eq "06/01/1994");
+	assert(oconv(9649,"D/E") eq "01/06/1994");
+	assert(oconv(9649,"D2 E") eq "01 06 94");
+	assert(oconv(9649,"D S") eq "1994 06 01");
+	assert(oconv(9649,"DM") eq "6");
+	assert(oconv(9649,"DMA") eq "JUNE");
+	assert(oconv(9649,"DW") eq "3");
+	assert(oconv(9649,"DWA") eq "WEDNESDAY");
+	assert(oconv(9649,"DY") eq "1994");
+	assert(oconv(9649,"DY2") eq "94");
+	assert(oconv(9649,"D2Y") eq "94 JUN 01");
+	assert(oconv(9649,"D5Y") eq "01994 JUN 01");
+	assert(oconv(9649,"DD") eq "1");
+	assert(oconv(9649,"DQ") eq "2");
+	assert(oconv(9649,"DJ") eq "152");
 	var feb29_2004=13209;//iconv("29 FEB 2004","D");
 	oconv(feb29_2004,"DL").outputl();
-	assert(oconv(feb29_2004,"DL")=="29");
+	assert(oconv(feb29_2004,"DL") eq "29");
 
-	assert(oconv(10939,"D")=="12 DEC 1997");
-	assert(oconv(10939,"D2/")=="12/12/97");
-	assert(oconv(10939,"D2-")=="12-12-97");
-	assert(oconv(10939,"D-")=="12-12-1997");
-	assert(oconv(10939,"D2-")=="12-12-97");
-	assert(oconv(10939,"DJ")=="346");
-	assert(oconv(10939,"DM")=="12");
-	assert(oconv(10939,"DMA")=="DECEMBER");
-	assert(oconv(10939,"DW")=="5");
-	assert(oconv(10939,"DWA")=="FRIDAY");
-	assert(oconv(10939,"DY")=="1997");
-	assert(oconv(10939,"DQ")=="4");
+	assert(oconv(10939,"D") eq "12 DEC 1997");
+	assert(oconv(10939,"D2/") eq "12/12/97");
+	assert(oconv(10939,"D2-") eq "12-12-97");
+	assert(oconv(10939,"D-") eq "12-12-1997");
+	assert(oconv(10939,"D2-") eq "12-12-97");
+	assert(oconv(10939,"DJ") eq "346");
+	assert(oconv(10939,"DM") eq "12");
+	assert(oconv(10939,"DMA") eq "DECEMBER");
+	assert(oconv(10939,"DW") eq "5");
+	assert(oconv(10939,"DWA") eq "FRIDAY");
+	assert(oconv(10939,"DY") eq "1997");
+	assert(oconv(10939,"DQ") eq "4");
 
-	for (int ii=1; ii<100; ++ii) {
-		var time=rnd(500000).mod(86400).outputl("Internal=");
-		time=rnd(500000).mod(18600).outputl();
-		time.oconv("MTHS").outputl("oconv=").iconv("MTHS").outputl("iconv=");
-		assert(time.oconv("MTHS").iconv("MTHS") eq time);
+	//check times around noon and midnight round trip ok
+	for (var ii=0; ii<=61 ; ++ii)
+		//assert(var(ii).output("START=").oconv("MTHS").output(" OCONV=").iconv("MTHS").outputl(" ICONV=") eq ii);
+		assert(var(ii).oconv("MTHS").iconv("MTHS") eq ii);
+	for (var ii=43200-61; ii<=43200+61 ; ++ii)
+		assert(var(ii).oconv("MTHS").iconv("MTHS") eq ii);
+
+	//test that some random times iconv/oconv roundtrip ok
+	initrnd(1000);
+	var timex;
+	for (int ii=1; ii<1000; ++ii) {
+		timex=rnd(18600);
+//		timex.oconv("MTHS").output(" ").iconv("MTHS").outputl(" ");
+		assert(timex.oconv("MTHS").iconv("MTHS") eq timex);
 	}
 
-	oconv(46622,"MTH").outputl("oconv 46622 MTH is" );
-	assert(oconv(46622,"MTH")=="12:57PM");
+	//oconv(46622,"MTH").outputl("oconv 46622 MTH is" );
+	assert(oconv(46622,"MTH") eq "12:57PM");
 
 	oconv(31653,"MT").outputl();
 
-	assert(oconv(31653,"MT")=="08:47");
-	assert(oconv(63306,"MT")=="17:35");
+	assert(oconv(31653,"MT") eq "08:47");
+	assert(oconv(63306,"MT") eq "17:35");
 	printl(oconv(0,"MTH"));
-	assert(oconv(0,"MTH")=="12:00AM");
-	assert(oconv(31653,"MT")=="08:47");
-	assert(oconv(63306,"MTH")=="05:35PM");
-	assert(oconv(31653,"MTS")=="08:47:33");
-	assert(oconv(63306,"MTS")=="17:35:06");
+	assert(oconv(0,"MTH") eq "12:00AM");
+	assert(oconv(31653,"MT") eq "08:47");
+	assert(oconv(63306,"MTH") eq "05:35PM");
+	assert(oconv(31653,"MTS") eq "08:47:33");
+	assert(oconv(63306,"MTS") eq "17:35:06");
 	printl(oconv(63306,"MTHS"));
-	assert(oconv(63306,"MTHS")=="05:35:06PM");
-	assert(oconv(63306,"MTS")=="17:35:06");
-	assert(oconv(63306,"MTS.")=="17.35.06");
-	assert(oconv(63306,"MTh")=="17h35");
+	assert(oconv(63306,"MTHS") eq "05:35:06PM");
+	assert(oconv(63306,"MTS") eq "17:35:06");
+	assert(oconv(63306,"MTS.") eq "17.35.06");
+	assert(oconv(63306,"MTh") eq "17h35");
 
-	assert(oconv(61201,"MT")=="17:00");
-	assert(oconv(61201,"MTS")=="17:00:01");
-	assert(oconv(61201,"MTH")=="05:00PM");
-	assert(oconv(61201,"MTHS")=="05:00:01PM");
+	assert(oconv(61201,"MT") eq "17:00");
+	assert(oconv(61201,"MTS") eq "17:00:01");
+	assert(oconv(61201,"MTH") eq "05:00PM");
+	assert(oconv(61201,"MTHS") eq "05:00:01PM");
 
 /*
 MT 31653 08:47
