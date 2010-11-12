@@ -20,6 +20,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+//mvexceptions are actually in mv.h and this file should be called
+//something like mvcheckingmacros.h
+
 #ifndef MVEXCEPTIONS_H
 #define MVEXCEPTIONS_H 1
 
@@ -92,88 +95,5 @@ THE SOFTWARE.
 	THISISASSIGNED() \
 	if (!(*this).isnum()) \
 	throw MVNonNumeric(var(functionname) ^ L" : var is " ^ (*this).substr(1,20).quote()); \
-
-
-namespace exodus {
-
-class MVDivideByZero : public MVException
-{
-	public:
-	MVDivideByZero(const var& mv1);
-};
-
-class MVNonNumeric : public MVException
-{
-	public:
-	MVNonNumeric(const var& mv1);
-};
-
-class MVUnassigned : public MVException
-{
-	public:
-	MVUnassigned(const var& mv1);
-};
-
-class MVUndefined : public MVException
-{
-	public:
-	MVUndefined(const var& mv1);
-};
-
-class MVInvalidPointer : public MVException
-{
-	public:
-	MVInvalidPointer(const var& mv1);
-};
-
-class MVDBException: public MVException
-{
-	public:
-	MVDBException(const var& mv1);
-};
-
-class MVNotImplemented: public MVException
-{
-	public:
-	MVNotImplemented(const var& mv1);
-};
-
-class MVDebug: public MVException
-{
-	public:
-	MVDebug(const var& mv1=L"");
-};
-
-class MVStop: public MVException
-{
-	public:
-	MVStop(const var& mv1=L"");
-};
-
-class MVAbort: public MVException
-{
-	public:
-	MVAbort(const var& mv1=L"");
-};
-
-class MVArrayDimensionedZero: public MVException
-{
-	public:
-	MVArrayDimensionedZero();
-};
-
-class MVArrayIndexOutOfBounds: public MVException
-{
-	public:
-	MVArrayIndexOutOfBounds(const var& mv1);
-};
-
-class MVArrayNotDimensioned: public MVException
-{
-	public:
-	MVArrayNotDimensioned();
-};
-
-}//namespace exodus
 
 #endif /*MVEXCEPTIONS_H*/

@@ -34,8 +34,8 @@ DLL_PUBLIC int exodus_main(int exodus__argc, char* exodus__argv[], MvEnvironment
 DLL_PUBLIC var osgetenv(const var& name);
 DLL_PUBLIC bool osgetenv(const var& name, var& value);
 DLL_PUBLIC bool ossetenv(const var& name, const var& value);
-DLL_PUBLIC bool assigned(const var& mv1);
-DLL_PUBLIC bool unassigned(const var& mv1);
+DLL_PUBLIC bool assigned(const var& var2);
+DLL_PUBLIC bool unassigned(const var& var2);
 DLL_PUBLIC var& transfer(var& fromvar, var& tovar);
 DLL_PUBLIC var& exchange(var& var1, var& var2);
 DLL_PUBLIC var date();
@@ -77,9 +77,9 @@ DLL_PUBLIC var chain(const var& command);
 DLL_PUBLIC var logoff();
 DLL_PUBLIC void debug();
 
-void print(const var& mv1);
-void printl(const var& mv1=L"");
-void printt(const var& mv1=L"");
+void print(const var& var2);
+void printl(const var& var2=L"");
+void printt(const var& var2=L"");
 
 	//MATH/BOOLEAN
 DLL_PUBLIC var abs(const var& num1);
@@ -116,8 +116,8 @@ DLL_PUBLIC void input(var& intostr);
 DLL_PUBLIC void input(const var& prompt, var& intostr);
 DLL_PUBLIC void inputn(var& intostr, const int nchars);
 
-DLL_PUBLIC var len(const var& mv1);
-DLL_PUBLIC var length(const var& mv1);
+DLL_PUBLIC var len(const var& var2);
+DLL_PUBLIC var length(const var& var2);
 DLL_PUBLIC var& converter(var& instring, const var& oldchars, const var& newchars);
 DLL_PUBLIC var convert(const var& instring, const var& oldchars, const var& newchars);
 DLL_PUBLIC var& swapper(var& instring, const var& oldstr, const var& newstr, const var& options=L"");

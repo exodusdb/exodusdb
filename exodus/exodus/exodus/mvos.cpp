@@ -30,6 +30,8 @@ THE SOFTWARE.
 //http://www.regular-expressions.info/
 #include <boost/regex.hpp>
 
+//regex.assign("", boost::regex::extended|boost::regex_constants::icase);
+
 //TODO check all error handling
 //http://www.ibm.com/developerworks/aix/library/au-boostfs/index.html
 //catch(boost::filesystem::filesystem_error e) { 
@@ -215,6 +217,39 @@ public:
 static ExodusOnce exodus_once_static;
 
 namespace exodus{
+
+//ICONV_MT can be moved back to mvioconv.cpp if it stops using regular expressions
+//regular expressions for ICONV_MT
+var var::iconv_MT(const wchar_t* conversion) const
+{
+	//ignore everything else and just get first three groups of digits "99 99 99"
+	//remove leading and trailing non-digits and replace internal strings of non-digits with single space
+	
+	//var time=(*this).swap( L"^\\D+|\\D+$", L"", L"r").swap( L"\\D+", L" ", L"r");
+
+static boost::wregex surrounding_nondigits_regex(L"^\\D+|\\D+$",boost::regex::extended|boost::regex_constants::icase);
+static boost::wregex inner_nondigits_regex(L"\\D+",boost::regex::extended|boost::regex_constants::icase);
+var time=var(boost::regex_replace(toTstring((*this)),surrounding_nondigits_regex, L""));
+time=var(boost::regex_replace(toTstring((time)),inner_nondigits_regex, L" "));
+
+	int hours=time.field(L" ",1).toInt();
+	int mins=time.field(L" ",2).toInt();
+	int secs=time.field(L" ",3).toInt();
+
+	int inttime=hours*3600+mins*60+secs;
+
+	if (inttime>=86400)
+		return L"";
+
+	//PM
+	if (inttime<43200&&(*this).index(L"P"))
+		inttime+=43200;
+	else if (inttime>=43200&&(*this).index(L"A"))
+		inttime-=43200;
+
+	return inttime;
+
+}
 
 //BOOST RANDOM
 //http://www.boost.org/doc/libs/1_38_0/libs/random/random_demo.cpp

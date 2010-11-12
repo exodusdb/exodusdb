@@ -34,7 +34,7 @@ THE SOFTWARE.
 #include <exodus/mvexceptions.h>
 
 static const int HEX_PER_WCHAR=sizeof(wchar_t)*2;
-using namespace std;
+//using namespace std;
 
 namespace exodus
 {
@@ -847,7 +847,7 @@ var var::oconv_HEX(const int ioratio) const
 
 	std::wostringstream ss;
 	int nchars=length();
-	ss.flags ( ios::right | ios::hex | ios::uppercase);
+	ss.flags ( std::ios::right | std::ios::hex | std::ios::uppercase);
 	//ss.setbase(16) useful to set numerically instead of ios::hex
 	ss.fill('0');
 	//perhaps convert to use iterators especially to allow for variable width characters under utf16.
@@ -944,30 +944,5 @@ var var::iconv_HEX(const int ioratio) const
 
 #undef ADD_NYBBLE_OR_FAIL
 
-
-var var::iconv_MT(const wchar_t* conversion) const
-{
-	//ignore everything else and just get first three groups of digits "99 99 99"
-	//remove leading and trailing non-digits and replace internal strings of non-digits with single space
-	var time=(*this).swap( L"^\\D+|\\D+$", L"", L"r").swap( L"\\D+", L" ", L"r");
-
-	int hours=time.field(L" ",1).toInt();
-	int mins=time.field(L" ",2).toInt();
-	int secs=time.field(L" ",3).toInt();
-
-	int inttime=hours*3600+mins*60+secs;
-
-	if (inttime>=86400)
-		return L"";
-
-	//PM
-	if (inttime<43200&&(*this).index(L"P"))
-		inttime+=43200;
-	else if (inttime>43200&&(*this).index(L"A"))
-		inttime-=43200;
-
-	return inttime;
-
-}
 
 } //of namespace exodus

@@ -149,8 +149,8 @@ public:
 	var handlefilename(const var& handle) const;
 	void debug() const;
 	void fsmsg() const;
-	var sysvar(const var& mv1,const var& mv2,const var& mv3,const var& mv4);
-    void setprivilege(const var& mv1);
+	var sysvar(const var& var1,const var& var2,const var& mv3,const var& mv4);
+    void setprivilege(const var& var1);
     bool openfile(const var& filename, var& file) const;
     bool openfile2(const var& filename, var& file, const var& similarfilename, const var& autocreate=L"") const;
 	
