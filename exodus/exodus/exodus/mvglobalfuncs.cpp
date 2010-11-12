@@ -1127,9 +1127,11 @@ int exodus_main(int exodus__argc, char *exodus__argv[], MvEnvironment& mv)
 	//install_signals();
 	var().breakon();
 
+//	tss_environmentns.reset(new int(0));
 	global_environments.resize(6);
 	int environmentn=0;
 	mv.init(environmentn);
+	//mv.DICT.outputl(L"DICT=");
 	global_environments[environmentn]=&mv;
 
 	mv.EXECPATH=getexecpath();
@@ -1185,6 +1187,9 @@ int exodus_main(int exodus__argc, char *exodus__argv[], MvEnvironment& mv)
 		mv.OPTIONS=mv.COMMAND.field2(L"{",-1);
 	if (mv.OPTIONS)
 		mv.COMMAND.splicer(-(len(mv.OPTIONS)+2),len(mv.OPTIONS)+2, L"");
+
+	var temp;
+	DBTRACE=osgetenv(L"EXODUS_DBTRACE",temp);
 
 	//would have to passed in as a function pointer
 	//main2(exodus__argc, exodus__argv);

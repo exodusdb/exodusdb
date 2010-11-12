@@ -345,12 +345,14 @@ program()
                 ///Gd, the default setting, specifies the __cdecl calling convention
                 //for all functions except C++ member functions and functions
                 //marked __stdcall or __fastcall.
-                basicoptions^=" /Gd";
+//                basicoptions^=" /Gd";
 
                 //exodus library
                 if (debugging) {
                         //Creates a debug multithreaded DLL using MSVCRTD.lib.
-                        basicoptions^=" /MDd";
+//using MDd causes wierd inability to access mv.DICT and other variables in main() despite them being initialised in exodus_main()
+//                        basicoptions^=" /MDd";
+                        basicoptions^=" /MD";
 
                         //Disables optimization.
                         basicoptions^=" /Od";

@@ -366,28 +366,26 @@ function main()
 	//	errmsg.outputl();
 
 	deletefile("USERS");
-	deletefile("dict_USERS");
+	deletefile("dict_XUSERS");
 
-	createfile("USERS");
-	createfile("DICT_USERS");
+	createfile("XUSERS");
+	createfile("DICT_XUSERS");
 
-	write("S"^FM^FM^"Age in Days"^FM^FM^FM^FM^FM^FM^"R"^FM^"10","DICT_USERS","AGE_IN_DAYS");
-	write("S"^FM^FM^"Age in Years"^FM^FM^FM^FM^FM^FM^"R"^FM^"10","DICT_USERS","AGE_IN_YEARS");
+	write("S"^FM^FM^"Age in Days"^FM^FM^FM^FM^FM^FM^"R"^FM^"10","DICT_XUSERS","AGE_IN_DAYS");
+	write("S"^FM^FM^"Age in Years"^FM^FM^FM^FM^FM^FM^"R"^FM^"10","DICT_XUSERS","AGE_IN_YEARS");
 
-	write("1","USERS","1");
-	write("2","USERS","2");
+	write("1","XUSERS","1");
+	write("2","XUSERS","2");
 
-	if (not selectrecord("SELECT USERS WITH AGE_IN_DAYS GE 0 AND WITH AGE_IN_YEARS GE 0"))
+	if (not selectrecord("SELECT XUSERS WITH AGE_IN_DAYS GE 0 AND WITH AGE_IN_YEARS GE 0"))
 		printl("Failed to Select");
 
-	DICT="dict_USERS";
+	DICT="dict_XUSERS";
 	while (readnextrecord(RECORD,ID))
 	{
-		printl("ID=",ID);
-		printl("RECORD=",RECORD);
-
-		//printl("AGE IN DAYS=",calculate("AGE_IN_DAYS"));
-		//printl("AGE IN YEARS=",calculate("AGE_IN_YEARS"));
+		print("ID=",ID, " RECORD=",RECORD);
+		print(" AGE_IN_DAYS=",calculate("AGE_IN_DAYS"));
+		printl(" AGE_IN_YEARS=",calculate("AGE_IN_YEARS"));
 	}
 
 	var spac1="  xxx  xxx  ";
@@ -1161,7 +1159,8 @@ MT'h' 63306 17h35
 	{
 		var().createfile("ADS");
 		if (!ads.open("ADS"))
-			abort("Cannot create ADS");
+			printl("Cannot create ADS");
+			//abort("Cannot create ADS");
 	}
 
 	var dictrec="";

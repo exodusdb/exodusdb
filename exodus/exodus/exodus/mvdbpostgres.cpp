@@ -1994,6 +1994,7 @@ bool var::readnext(var& key) const
 	return readnext(key, valueno);
 }
 
+//NB global not member function
 bool readnextx(const std::wstring& cursor, PGresultptr& pgresult)
 {
     var sql=L"FETCH NEXT in CURSOR1_" ^ cursor;
@@ -2131,7 +2132,7 @@ bool var::readnextrecord(var& key, var& record) const
 	//record=std::string(data,datalen);
 	record=wstringfromUTF8((UTF8*)PQgetvalue(pgresult, 0, 1), PQgetlength(pgresult, 0, 1));
 
-    PQclear(pgresult);
+	PQclear(pgresult);
 
 	return true;
 
@@ -2283,7 +2284,7 @@ var var::listindexes(const var& filename) const
 //returns 0 for failure
 int pqexec(const var& sql, PGresultptr& pgresult)
 {
-	int retcode = 1;
+	int retcode = 0;
 
 	DEBUG_LOG_SQL
 
@@ -2336,25 +2337,31 @@ int pqexec(const var& sql, PGresultptr& pgresult)
 					exodus::logputl(L"Command executed OK, 0 rows.");
 				}
 			#endif
+			retcode=1;
 			break;
 		case PGRES_TUPLES_OK:
 			#if TRACING >= 3
 				exodus::logputl(L"Select executed OK, " ^ var(PQntuples(local_result)) ^ L" rows found.");
 			#endif
+			retcode=1;
 			break;
 		case PGRES_NONFATAL_ERROR:
 			#if TRACING >= 2
 				exodus::errputl(L"SQL non-fatal error code " ^ var(PQresStatus(PQresultStatus(local_result))) ^ L", " ^ var(PQresultErrorMessage(local_result)));
 			#endif
+			retcode=1;
 			break;
 		default:
 			#if TRACING >= 1
 			exodus::errputl(var(PQresStatus(PQresultStatus(local_result))) ^ L": " ^ var(PQresultErrorMessage(local_result)));
 			#endif
-			PQclear(local_result);
-			retcode = 0;
+			//this is defaulted above for safety
+			//retcode=0;
 			break;
 		}
+
+	if (!retcode)
+		PQclear(local_result);
 
 	}
 
