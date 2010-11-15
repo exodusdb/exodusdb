@@ -52,7 +52,7 @@ program()
                 if (not osdir(cygwinpath))
                         cygwinpath="";
 
-                if (cygwinpath and cygwinpath.substr(-1) ne SLASH)
+                if (cygwinpath and cygwinpath[-1] ne SLASH)
                         cygwinpath^=SLASH;
                 //editor=cygwinpath^"bash --login -i -c \"/bin/";
                 editor=cygwinpath;
@@ -81,7 +81,7 @@ program()
                         nanorcfilename=cygwinpath.field(SLASH,1,dcount(cygwinpath,SLASH)-2) ^ SLASH ^ "etc" ^ SLASH ^ "nanorc";
                 } else {
                         nanorcfilename=osgetenv("HOMEDRIVE") ^ osgetenv("HOMEPATH");
-                        if (nanorcfilename.substr(-1) ne SLASH)
+                        if (nanorcfilename[-1] ne SLASH)
                                 nanorcfilename^=SLASH;
                         nanorcfilename^=".nanorc";
                 }
