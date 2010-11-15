@@ -205,12 +205,12 @@ int MVipc(const int environmentn, var& pgconnparams)
 	{
 		boost::mutex::scoped_lock lock(global_ipcmutex);
 		#if TRACING >= 3
-			wcout<<L"MVipc() Notifying that pipe has been opened\n";
+			cout<<"MVipc() Notifying that pipe has been opened\n";
 		#endif
 		//TODO make sure notifies CORRECT parent thread by using an array of ipcmutexes and tss_environmentn
 		global_ipccondition.notify_one();
 		#if TRACING >= 3
-			wcout<<L"MVipc() Notified that pipe has been opened\n";
+			cout<<"MVipc() Notified that pipe has been opened\n";
 		#endif
 	}
 

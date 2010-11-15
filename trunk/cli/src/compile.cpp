@@ -52,7 +52,8 @@ program()
 
         var compiler;
         var basicoptions;
-        var linkoptions;
+        var linkoptions=false;
+		var manifest;
         var binoptions;
         var liboptions;
         var bindir;
@@ -341,11 +342,16 @@ program()
                 //to capture output after macro expansion
                 //basicoptions^=" /E";
 
-                //Uses the __cdecl calling convention (x86 only ie 32bit).
-                ///Gd, the default setting, specifies the __cdecl calling convention
-                //for all functions except C++ member functions and functions
-                //marked __stdcall or __fastcall.
-//                basicoptions^=" /Gd";
+				//Uses the __cdecl calling convention (x86 only ie 32bit).
+				///Gd, the default setting, specifies the __cdecl calling convention
+				//for all functions except C++ member functions and functions
+				//marked __stdcall or __fastcall.
+				basicoptions^=" /Gd";
+				
+                //Enables minimal rebuild.
+				//dont do this by default to force recompilations to cater for new versions of exodus.dll
+				//provide an options?
+				//basicoptions^=" /Gm";
 
                 //exodus library
                 if (debugging) {
@@ -365,9 +371,6 @@ program()
 
                         //Enables run-time error checking.
                         basicoptions^=" /RTC1";
-
-                        //Enables minimal rebuild.
-                        basicoptions^=" /Gm";
 
                 } else {
                         //Creates a multithreaded DLL using MSVCRT.lib.
@@ -390,6 +393,11 @@ program()
                 }
 
                 linkoptions=" /link exodus.lib";
+
+				//http://msdn.microsoft.com/en-us/library/f2c0w594%28v=VS.80%29.aspx
+				manifest=true;
+				if (not manifest)
+					linkoptions^=" /MANIFEST:NO";
 
                 if (not verbose)
                         linkoptions^=" /nologo";
@@ -835,10 +843,19 @@ var inclusion=
                                         if (!oscopy(objfilename,outputpathandfile))
                                                 printl("ERROR: Failed to "^cmd);
 
-										//try to copy ms manifest
-										//so that the program can be run from anywhere?
-										if (SLASH eq "\\"  and not oscopy(objfilename^".manifest",outputpathandfile^".manifest"))
-										{}//printl("ERROR: Failed to "^cmd);
+										//delete any manifest from early versions of compile which didnt have the
+										//MANIFEST:NO option
+										//was try to copy ms manifest so that the program can be run from anywhere?
+										if (SLASH eq "\\") {
+											if (isprogram and manifest) {
+												if (not oscopy(objfilename^".manifest",outputpathandfile^".manifest"))
+													{}//printl("ERROR: Failed to "^cmd);
+											}
+											else {
+												osdelete(objfilename^".manifest");
+												osdelete(outputpathandfile^".manifest");
+											}
+										}
                                 }
                         }
                 }//compilation

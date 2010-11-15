@@ -125,7 +125,7 @@ var Server::run()
         //hexx[ii]="%00";
 //        std::wcout<<hexx[ii]<<L" ";
     }
-    std::wcout<<L"Hex Done"<<std::endl;
+
 	//discover the server name
 	//servername=field(getdrivepath(drive()[1,2])[3,9999],'\',1)
 	servername = L"";

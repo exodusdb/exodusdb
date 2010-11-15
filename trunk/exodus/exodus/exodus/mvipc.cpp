@@ -20,7 +20,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#define TRACING 0
+#ifdef NDEBUG
+#define TRACING 1
+#else
+#define TRACING 2
+#endif
+
 
 //C4530: C++ exception handler used, but unwind semantics are not enabled. 
 //#pragma warning (disable: 4530)
@@ -105,13 +110,13 @@ bool startipc()
 	//TODO make sure notifies CORRECT thread by using array of ipcmutexes and environmentn
 	//TODO put a timeout in case the pipe doesnt open
 
-	#if TRACING > 0
+	#if TRACING > 3
 		std::wclog<<L"startipc() Waiting for pipe to be opened\n";
 	#endif
 
 	global_ipccondition.wait(lock);
 
-	#if TRACING > 0
+	#if TRACING > 3
 		std::wclog<<L"startipc() Waited for pipe to be opened\n";
 	#endif
 

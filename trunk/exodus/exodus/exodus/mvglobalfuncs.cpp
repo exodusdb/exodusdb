@@ -144,9 +144,9 @@ DLL_PUBLIC bool osdelete(const var& osfilename)
 }
 
 //if osrename x to y else
-DLL_PUBLIC bool osrename(const var& oldosfilename, const var& newosfilename)
+DLL_PUBLIC bool osrename(const var& oldosdir_or_filename, const var& newosdir_or_filename)
 {
-	return oldosfilename.osrename(newosfilename);
+	return oldosdir_or_filename.osrename(newosdir_or_filename);
 }
 
 //oscopy x to y
@@ -187,7 +187,7 @@ DLL_PUBLIC bool osmkdir(const var& dirname)
 
 DLL_PUBLIC bool osrmdir(const var& dirname, const bool evenifnotempty)
 {
-	return dirname.osrmdir();
+	return dirname.osrmdir(evenifnotempty);
 }
 
 DLL_PUBLIC var oscwd()
