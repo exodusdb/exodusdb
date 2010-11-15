@@ -40,7 +40,7 @@ THE SOFTWARE.
 //MSVC requires exception handling (eg compile with /EHsc or EHa?) for delayed dll loading detection
 
 #ifndef DEBUG
-# define TRACING 0
+# define TRACING 1
 #else
 # define TRACING 2
 #endif
@@ -108,8 +108,8 @@ THE SOFTWARE.
 #include <exodus/mvexceptions.h>
 
 //#if TRACING >= 5
-#define DEBUG_LOG_SQL if (DBTRACE) {exodus::errputl(L"SQL:" ^ var(sql));}
-#define DEBUG_LOG_SQL1 if (DBTRACE) {exodus::errputl(L"SQL:" ^ var(sql).swap(L"$1",var(paramValues[0])));}
+#define DEBUG_LOG_SQL if (DBTRACE) {exodus::logputl(L"SQL:" ^ var(sql));}
+#define DEBUG_LOG_SQL1 if (DBTRACE) {exodus::logputl(L"SQL:" ^ var(sql).swap(L"$1",L"'"^var(paramValues[0])^L"'"));}
 //#else
 //#define DEBUG_LOG_SQL
 //#define DEBUG_LOG_SQL1
@@ -171,7 +171,7 @@ boost::thread_specific_ptr<LockTable> tss_locktables;
 */
 
 typedef PGresult* 	PGresultptr;
-int pqexec(const var& sql, PGresultptr& pgresult);
+bool pqexec(const var& sql, PGresultptr& pgresult);
 
 #if defined _MSC_VER //|| defined __CYGWIN__ || defined __MINGW32__
 LONG WINAPI DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS pExcPointers) {
@@ -312,11 +312,11 @@ bool var::connect(const var& conninfo)
 #if defined _MSC_VER //|| defined __CYGWIN__ || defined __MINGW32__
 		if (not msvc_PQconnectdb(&pgconn,conninfo2.tostring()))
 		{
-			//#if TRACING >= 1
+#if TRACING >= 1
 				var libname=L"libpq.dll";
 				//var libname=L"libpq.so";
-				exodus::errputl(L"var::connect() Cannot load shared library " ^ libname ^ L". Verify configuration PATH contains postgres's \\bin.");
-			//#endif
+				exodus::errputl(L"ERROR: mvdbpostgres connect() Cannot load shared library " ^ libname ^ L". Verify configuration PATH contains postgres's \\bin.");
+#endif
 			return false;
 		};
 #else
@@ -336,12 +336,12 @@ bool var::connect(const var& conninfo)
 
 	if (PQstatus(pgconn) != CONNECTION_OK)
 	{
-//		#if TRACING >= 2
-			exodus::errputl(L"var::connect() Connection to database failed: " ^ var(PQerrorMessage(pgconn)));
+		#if TRACING >= 2
+			exodus::errputl(L"ERROR: mvdbpostgres connect() Connection to database failed: " ^ var(PQerrorMessage(pgconn)));
 			//if (not conninfo2)
-				exodus::errputl(L"var::connect() Postgres connection configuration missing or incorrect. Please login.");
+				exodus::errputl(L"ERROR: mvdbpostgres connect() Postgres connection configuration missing or incorrect. Please login.");
 ;
-//		#endif
+		#endif
 		//required even if connect fails according to docs
 		PQfinish(pgconn);
 
@@ -382,7 +382,9 @@ bool var::connect(const var& conninfo)
 
 	//but this does
 	//this turns off the notice when creating tables with a primary key
-	var sql=L"SET client_min_messages = WARNING";
+	//DEBUG5, DEBUG4, DEBUG3, DEBUG2, DEBUG1, LOG, NOTICE, WARNING, ERROR, FATAL, and PANIC
+	var sql=L"SET client_min_messages = ";
+	sql^=DBTRACE? L"LOG" : L"WARNING";
 
 	sql.sqlexec();
 
@@ -427,9 +429,9 @@ bool var::disconnect()
 
 	THISISDEFINED()
 
-	#if TRACING >= 3
-		exodus::errputl(L"var::disconnect() Closing connection");
-	#endif
+#if TRACING >= 3
+		exodus::errputl(L"ERROR: mvdbpostgres disconnect() Closing connection");
+#endif
 
 	PGconn* thread_pgconn=tss_pgconns.get();
 
@@ -458,21 +460,20 @@ bool var::open(const var& filename)
     //dumb version of read to see if file exists
     //should perhaps prepare pg parameters for repeated speed
 
-    var key=L"";
-
     const char* paramValues[1];
     int         paramLengths[1];
     int         paramFormats[1];
 //    uint32_t    binaryIntVal;
 
     /* Here is our out-of-line parameter value */
-	std::string key2=key.tostring();
-    paramValues[0] = key2.c_str();
-    paramLengths[0] = int(key2.length());
+	std::string filename2=filename.lcase().tostring();
+    paramValues[0] = filename2.c_str();
+    paramLengths[0] = int(filename2.length());
     paramFormats[0] = 1;//binary
 
-	//TODO optimise by doing something other than SELECT * where key = ""?
-	var sql=L"SELECT key FROM "^filename.convert(L".",L"_")^L" WHERE key = $1";
+	//avoid any errors because ANY errors while a transaction is in progress cause failure of the whole transaction
+	//and remember that a select initiates a transaction committed on readnext eof or clearselect
+	var sql=L"SELECT table_name FROM information_schema.tables WHERE table_schema='public' and table_name=$1";
 
     PGconn* thread_pgconn=(PGconn*) connection();
 	if (!thread_pgconn)
@@ -488,23 +489,39 @@ bool var::open(const var& filename)
 					   paramFormats,
                        1);      /* ask for binary results */
 
-    if (PQresultStatus(result) != PGRES_TUPLES_OK)
+	int resultstatus=PQresultStatus(result);
+    if (resultstatus != PGRES_TUPLES_OK)
     {
+#if TRACING >= 1
+		exodus::errputl(L"ERROR: mvdbpostgres open(" ^ filename.quote() ^ L") failed\n" ^ var(PQerrorMessage(thread_pgconn)));
+#endif
 		PQclear(result);
-		#if TRACING >= 2
-			var errmsg=PQerrorMessage(thread_pgconn);
-			if (!errmsg.index(L"does not exist"))
-		        exodus::errputl(L"OPEN failed: " ^ errmsg);
-        #endif
         return false;
     }
 
-    PQclear(result);
+	//file (table) doesnt exist
+	if (PQntuples(result) < 1)
+	{
+		PQclear(result);
+		return false;
+	}
+
+	if (PQntuples(result) > 1)
+ 	{
+		PQclear(result);
+#if TRACING >= 1
+		exodus::errputl(L"ERROR: mvdbpostgres open() SELECT returned more than one record");
+#endif
+		return false;
+	}
+
+	PQclear(result);
 
 	//save the filename
 	var_mvstr=L"";
 	//var_mvstr+=filename.var_mvstr;
-	var_mvstr+=filename.convert(L". ",L"__").towstring();
+	//var_mvstr+=filename.convert(L". ",L"__").towstring();
+	var_mvstr=filename.towstring();
 	var_mvtyp=pimpl::MVTYPE_STR;
 
 	return true;
@@ -580,7 +597,9 @@ bool var::read(const var& filehandle,const var& key)
 	if (PQntuples(result) > 1)
  	{
 		PQclear(result);
-		exodus::errputl(L"var::read() SELECT returned more than one record");
+#if TRACING >= 1
+		exodus::errputl(L"ERROR: mvdbpostgres read() SELECT returned more than one record");
+#endif
 		return false;
 	}
 
@@ -765,7 +784,10 @@ void var::unlockall() const
 bool var::sqlexec() const
 {
 	var errmsg;
-	return sqlexec(errmsg);
+	bool result=sqlexec(errmsg);
+	if (not result && DBTRACE)
+		errmsg.outputl();
+	return result;
 }
 
 //returns success or failure but no data
@@ -800,7 +822,8 @@ bool var::sqlexec(var& errmsg) const
 	}
 
 	//DEBUG_LOG_SQL
-	if (DBTRACE) {exodus::errputl(L"SQL:" ^ *this);}
+	if (DBTRACE)
+		{exodus::logputl(L"SQL:" ^ *this);}
 
 	//will contain any result IF successful
 	//MUST do PQclear(local_result) after using it;
@@ -814,7 +837,8 @@ bool var::sqlexec(var& errmsg) const
 		errmsg=var(PQerrorMessage(thread_pgconn));
 		return false;
 	}
-	if (PQresultStatus(pgresult) != PGRES_COMMAND_OK)
+	int pgresultstatus=PQresultStatus(pgresult);
+	if (pgresultstatus != PGRES_COMMAND_OK)
     {
         errmsg=var(PQerrorMessage(thread_pgconn));
 		//std::wcerr<<errmsg<<std::endl;
@@ -1000,7 +1024,9 @@ bool var::write(const var& filehandle, const var& key) const
 	if (PQresultStatus(result) != PGRES_COMMAND_OK)
 	{
 		PQclear(result);
-        exodus::errputl(L"var::write() failed: " ^ var(PQntuples(result)) ^ L" " ^ var(PQerrorMessage(thread_pgconn)));
+#if TRACING >= 1
+        exodus::errputl(L"ERROR: mvdbpostgres write() failed: " ^ var(PQntuples(result)) ^ L" " ^ var(PQerrorMessage(thread_pgconn)));
+#endif
 		return false;
 	}
 
@@ -1028,7 +1054,9 @@ bool var::write(const var& filehandle, const var& key) const
 	if (PQresultStatus(result) != PGRES_COMMAND_OK)
     {
 		PQclear(result);
-        exodus::errputl(L"var::write() INSERT failed: " ^ var(PQntuples(result)) ^ L" " ^ var(PQerrorMessage(thread_pgconn)));
+#if TRACING >= 1
+        exodus::errputl(L"ERROR: mvdbpostgres write() INSERT failed: " ^ var(PQntuples(result)) ^ L" " ^ var(PQerrorMessage(thread_pgconn)));
+#endif
         return false;
     }
 
@@ -1090,13 +1118,18 @@ bool var::updaterecord(const var& filehandle,const var& key) const
 	if (PQresultStatus(result) != PGRES_COMMAND_OK)
 	{
 		PQclear(result);
-		exodus::errputl(L"var::update failed: " ^ var(PQntuples(result)) ^ L" " ^ var(PQerrorMessage(thread_pgconn)));
+#if TRACING >= 1
+		exodus::errputl(L"ERROR: mvdbpostgres update() Failed: " ^ var(PQntuples(result)) ^ L" " ^ var(PQerrorMessage(thread_pgconn)));
+#endif
 		return false;
 	}
 
 	//if not updated 1 then fail
     if (strcmp(PQcmdTuples(result),"1") != 0)
     {
+#if TRACING >= 3
+		exodus::errputl(L"ERROR: mvdbpostgres update() Failed: " ^ var(PQntuples(result)) ^ L" " ^ var(PQerrorMessage(thread_pgconn)));
+#endif
 		PQclear(result);
  		return false;
 	}
@@ -1152,8 +1185,10 @@ bool var::insertrecord(const var& filehandle,const var& key) const
 
 	if (PQresultStatus(result) != PGRES_COMMAND_OK)
     {
-		exodus::errputl(L"var::insertrecord INSERT failed: " ^ var(PQntuples(result)) ^ L" " ^ var(PQerrorMessage(thread_pgconn)));
         PQclear(result);
+#if TRACING >= 3
+		exodus::errputl(L"ERROR: mvdbpostgres insertrecord() Failed: " ^ var(PQntuples(result)) ^ L" " ^ var(PQerrorMessage(thread_pgconn)));
+#endif
         return false;
     }
 
@@ -1205,7 +1240,9 @@ bool var::deleterecord(const var& key) const
 
 	if (PQresultStatus(result) != PGRES_COMMAND_OK)
     {
-		exodus::errputl(L"var::deleterecord failed: " ^ var(PQntuples(result)) ^ L" " ^ var(PQerrorMessage(thread_pgconn)));
+#if TRACING >= 1
+		exodus::errputl(L"ERROR: mvdbpostgres deleterecord() Failed: " ^ var(PQntuples(result)) ^ L" " ^ var(PQerrorMessage(thread_pgconn)));
+#endif
         PQclear(result);
         return false;
     }
@@ -1214,60 +1251,16 @@ bool var::deleterecord(const var& key) const
     if (strcmp(PQcmdTuples(result),"1") != 0)
     {
 		PQclear(result);
- 		return false;
+#if TRACING >= 3
+		exodus::logputl(L"var::deleterecord failed. Record does not exist "^var_mvstr);
+#endif
+		return false;
 	}
 
 
     PQclear(result);
 
 	return true;
-}
-
-var var::xlate(const var& filename,const var& fieldno, const var& mode) const
-{
-	THISIS(L"var var::xlate(const var& filename,const var& fieldno, const var& mode) const")
-	ISSTRING(mode)
-
-	return xlate(filename,fieldno,mode.towstring().c_str());
-}
-
-//TODO provide a version with int fieldno to handle the most frequent case
-// although may also support dictid (of target file) instead of fieldno
-
-var var::xlate(const var& filename,const var& fieldno, const wchar_t* mode) const
-{
-	THISIS(L"var var::xlate(const var& filename,const var& fieldno, const wchar_t* mode) const")
-	THISISSTRING()
-	ISSTRING(filename)
-	ISSTRING(fieldno)
-
-	//open the file (skip this for now since sql doesnt need "open"
-	var file;
-	var record;
-	//if (!file.open(filename))
-	//{
-	//	_STATUS=filename^L" does not exist";
-	//	record=L"";
-	//	return record;
-	//}
-	file=filename;
-
-	//read the record
-	if (!record.read(file,var_mvstr))
-	{
-		//if record doesnt exist then "", or original key if mode is "C"
-	 if (mode==L"C")
-			record=*this;
-		else
-			record=L"";
-	}
-	else
-	{
-		//extract the field or field 0 means return the whole record
-		if (fieldno)
-			record=record.extract(fieldno);
-	}
-	return record;
 }
 
 bool var::begintrans() const
@@ -1330,7 +1323,8 @@ bool var::createdb(const var& dbname, var& errmsg) const
 	THISISDEFINED()
 	ISSTRING(dbname)
 
-	var sql = L"CREATE DATABASE "^dbname.convert(L". ",L"__");
+	//var sql = L"CREATE DATABASE "^dbname.convert(L". ",L"__");
+	var sql = L"CREATE DATABASE "^dbname;
 	sql^=L" WITH ENCODING='UTF8' ";
 	//sql^=" OWNER=exodus";
 
@@ -1345,7 +1339,8 @@ bool var::deletedb(const var& dbname, var& errmsg) const
 	THISISDEFINED()
 	ISSTRING(dbname)
 
-	var sql = L"DROP DATABASE "^dbname.convert(L". ",L"__");
+	//var sql = L"DROP DATABASE "^dbname.convert(L". ",L"__");
+	var sql = L"DROP DATABASE "^dbname;
 
 	return sql.sqlexec(errmsg);
 
@@ -1364,7 +1359,8 @@ bool var::createfile(const var& filename, const var& options)
 
 	var sql = L"CREATE";
 	//if (options.ucase().index(L"TEMPORARY")) sql ^= L" TEMPORARY";
-	sql ^= L" TABLE " PGDATAFILEPREFIX ^ filename.convert(L".",L"_");
+	//sql ^= L" TABLE " PGDATAFILEPREFIX ^ filename.convert(L".",L"_");
+	sql ^= L" TABLE " PGDATAFILEPREFIX ^ filename;
 	sql ^= L" (key bytea primary key, data bytea)";
 
 	return sql.sqlexec();
@@ -1438,8 +1434,10 @@ var getdictexpression(const var& mainfilename, const var& filename, const var& d
 			dictfilename=L"dict_"^mainfilename;
 		if (!actualdictfile.open(dictfilename))
 		{
-			//throw MVDBException(L"getdictexpression() cannot open " ^ dictfilename.quote());
-			exodus::errputl(L"getdictexpression() cannot open " ^ dictfilename.quote());
+			throw MVDBException(L"getdictexpression() cannot open " ^ dictfilename.quote());
+#if TRACING >= 1
+			exodus::errputl(L"ERROR: mvdbpostgres getdictexpression() cannot open " ^ dictfilename.quote());
+#endif
 			return L"";
 		}
 	}
@@ -1455,8 +1453,10 @@ var getdictexpression(const var& mainfilename, const var& filename, const var& d
 				dictrec = L"F" ^ FM ^ L"0" ^ FM ^ L"Ref" ^ FM ^ FM ^ FM ^ FM ^ FM ^ FM ^ L"L" ^ FM ^ 15;
 			else
 			{
-				//throw MVDBException(L"getdictexpression() cannot read " ^ fieldname.quote() ^ L" from " ^ actualdictfile.quote());
-				exodus::errputl(L"getdictexpression() cannot read " ^ fieldname.quote() ^ L" from " ^ actualdictfile.quote());
+				throw MVDBException(L"getdictexpression() cannot read " ^ fieldname.quote() ^ L" from " ^ actualdictfile.quote());
+#if TRACING >= 1
+				exodus::errputl(L"ERROR: mvdbpostgres getdictexpression() cannot read " ^ fieldname.quote() ^ L" from " ^ actualdictfile.quote());
+#endif
 				return L"";
 			}
 		}
@@ -1543,7 +1543,9 @@ var getdictexpression(const var& mainfilename, const var& filename, const var& d
 				else
 				{
 					//throw  MVDBException(L"getdictexpression() " ^ filename.quote() ^ L" " ^ fieldname.quote() ^ L" - INVALID DICTIONARY EXPRESSION - " ^ dictrec.extract(8).quote());
-					exodus::errputl(L"getdictexpression() " ^ filename.quote() ^ L" " ^ fieldname.quote() ^ L" - INVALID DICTIONARY EXPRESSION - " ^ dictrec.extract(8).quote());
+#if TRACING >= 1
+					exodus::errputl(L"ERROR: mvdbpostgres getdictexpression() " ^ filename.quote() ^ L" " ^ fieldname.quote() ^ L" - INVALID DICTIONARY EXPRESSION - " ^ dictrec.extract(8).quote());
+#endif
 					return L"";
 				}
 
@@ -1566,7 +1568,9 @@ var getdictexpression(const var& mainfilename, const var& filename, const var& d
 	{
 		//throw  filename ^ L" " ^ fieldname ^ L" - INVALID DICTIONARY ITEM";
 		//throw  MVDBException(L"getdictexpression(" ^ filename.quote() ^ L", " ^ fieldname.quote() ^ L") invalid dictionary type " ^ dicttype.quote());
-		exodus::errputl(L"getdictexpression(" ^ filename.quote() ^ L", " ^ fieldname.quote() ^ L") invalid dictionary type " ^ dicttype.quote());
+#if TRACING >= 1
+		exodus::errputl(L"ERROR: mvdbpostgres getdictexpression(" ^ filename.quote() ^ L", " ^ fieldname.quote() ^ L") invalid dictionary type " ^ dicttype.quote());
+#endif
 		return L"";
 	}
     return sqlexpression;
@@ -1769,7 +1773,9 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 			if (!dictfile.open(L"dict_"^dictfilename))
 			{
 				//throw MVDBException(L"select() dict_" ^ dictfilename ^ L" file cannot be opened");
-				exodus::errputl(L"select() dict_" ^ dictfilename ^ L" file cannot be opened");
+#if TRACING >= 1
+				exodus::errputl(L"ERROR: mvdbpostgres select() dict_" ^ dictfilename ^ L" file cannot be opened");
+#endif
 				return L"";
 			}
         }
@@ -1869,7 +1875,9 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 				if (word2 != L"AND")
 				{
 					//throw MVDBException(L"SELECT STATEMENT SYNTAX IS 'BETWEEN x *AND* y'");
-					exodus::errputl(L"SELECT STATEMENT SYNTAX IS 'BETWEEN x *AND* y'");
+#if TRACING >= 1
+					exodus::errputl(L"ERROR: mvdbpostgres SELECT STATEMENT SYNTAX IS 'BETWEEN x *AND* y'");
+#endif
 					return L"";
 				}
 
@@ -2241,7 +2249,7 @@ var var::listindexes(const var& filename) const
 			L" FROM pg_index, pg_class"
 			L" WHERE";
 	if (filename)
-		sql^=L" relname = '" ^ filename ^  L"' AND ";
+		sql^=L" relname = '" ^ filename.lcase() ^  L"' AND ";
 	sql^=L" pg_class.oid=pg_index.indrelid"
 		 L" AND indisunique != 't'"
 		 L" AND indisprimary != 't'"
@@ -2267,7 +2275,7 @@ var var::listindexes(const var& filename) const
 				tt=indexname.index(L"__");
 				if (tt)
 				{
-					indexnames^=FM^indexname.substr(7,999999).swap(L"__",VM);
+					indexnames^=FM^indexname.substr(8,999999).swap(L"__",VM);
 				}
 			}
 		}
@@ -2282,19 +2290,13 @@ var var::listindexes(const var& filename) const
 //used for sql commands that require no parameters
 //returns 1 for success and PGresult points to result WHICH MUST BE PQclear(result)'ed
 //returns 0 for failure
-int pqexec(const var& sql, PGresultptr& pgresult)
+bool pqexec(const var& sql, PGresultptr& pgresult)
 {
-	int retcode = 0;
-
 	DEBUG_LOG_SQL
 
 	PGconn* thread_pgconn=tss_pgconns.get();
 	if (!thread_pgconn)
-		return 0;
-
-	//will contain any result IF successful
-	//MUST do PQclear(local_result) after using it;
-	PGresult *local_result;
+		return false;
 
 	/* dont use PQexec because is cannot be told to return binary results
 	 and use PQexecParams with zero parameters instead
@@ -2309,7 +2311,9 @@ int pqexec(const var& sql, PGresultptr& pgresult)
     int         paramFormats[1];
 
     //PGresult*
-	local_result = PQexecParams(thread_pgconn,
+	//will contain any result IF successful
+	//MUST do PQclear(local_result) after using it;
+	PGresult* local_result = PQexecParams(thread_pgconn,
 		sql.tostring().c_str(),
 		0,       /* zero params */
 		NULL,    /* let the backend deduce param type */
@@ -2317,13 +2321,16 @@ int pqexec(const var& sql, PGresultptr& pgresult)
 		paramLengths,
 		paramFormats,
 		1);      /* ask for binary results */
-	pgresult=local_result;
 
+	pgresult=local_result;
 	if (!local_result) {
+
 		#if TRACING >=1
-			exodus::errputl(L"PQexec command failed, no error code: ");
+			exodus::errputl(L"ERROR: mvdbpostgres PQexec command failed, no error code: ");
 		#endif
-		retcode = 0;
+
+		return false;
+
 	} else {
 
 		switch (PQresultStatus(local_result)) {
@@ -2337,35 +2344,45 @@ int pqexec(const var& sql, PGresultptr& pgresult)
 					exodus::logputl(L"Command executed OK, 0 rows.");
 				}
 			#endif
-			retcode=1;
-			break;
+
+			return true;
+
 		case PGRES_TUPLES_OK:
-			#if TRACING >= 3
-				exodus::logputl(L"Select executed OK, " ^ var(PQntuples(local_result)) ^ L" rows found.");
-			#endif
-			retcode=1;
-			break;
+
+#if TRACING >= 3
+			exodus::logputl(L"Select executed OK, " ^ var(PQntuples(local_result)) ^ L" rows found.");
+#endif
+
+			return true;
+
 		case PGRES_NONFATAL_ERROR:
-			#if TRACING >= 2
-				exodus::errputl(L"SQL non-fatal error code " ^ var(PQresStatus(PQresultStatus(local_result))) ^ L", " ^ var(PQresultErrorMessage(local_result)));
-			#endif
-			retcode=1;
-			break;
+
+#if TRACING >= 1
+				exodus::errputl(L"ERROR: mvdbpostgres SQL non-fatal error code " ^ var(PQresStatus(PQresultStatus(local_result))) ^ L", " ^ var(PQresultErrorMessage(local_result)));
+#endif
+
+			return true;
+
 		default:
-			#if TRACING >= 1
-			exodus::errputl(var(PQresStatus(PQresultStatus(local_result))) ^ L": " ^ var(PQresultErrorMessage(local_result)));
-			#endif
+
+#if TRACING >= 1
+			exodus::errputl(L"ERROR: mvdbpostgres "^var(PQresStatus(PQresultStatus(local_result))) ^ L": " ^ var(PQresultErrorMessage(local_result)));
+#endif
+
 			//this is defaulted above for safety
 			//retcode=0;
-			break;
+			PQclear(local_result);
+			return false;
+
 		}
 
-	if (!retcode)
-		PQclear(local_result);
+	//should never get here
+	PQclear(local_result);
 
 	}
 
-	return retcode;
+	//should never get here
+	return false;
 
 } /* pqexec */
 

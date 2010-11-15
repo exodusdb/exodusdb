@@ -218,6 +218,23 @@ static ExodusOnce exodus_once_static;
 
 namespace exodus{
 
+bool checknotabsoluterootfolder(std::wstring dirname)
+{
+	//safety - will not rename/remove top level folders
+	//cwd to top level and delete relative
+	//top level folder has only one slash either at the beginning or, on windows, like x:\ .
+	//NB copy/same code in osrmdir and osrename
+	if (dirname[0] == SLASH_
+		|| (SLASH_IS_BACKSLASH
+		&& (dirname[1] == L':')
+		&& (dirname[2] == SLASH_)))
+	{
+		std::wcout << "forced removal/renaming of top level directories by absolute path is not supported for safety. You can use cwd() and relative path." <<dirname << std::endl;
+		return false;
+	}
+	return true;
+}
+
 //ICONV_MT can be moved back to mvioconv.cpp if it stops using regular expressions
 //regular expressions for ICONV_MT
 var var::iconv_MT(const wchar_t* conversion) const
@@ -862,17 +879,17 @@ void var::osclose() const
 	return;
 }
 
-bool var::osrename(const var& newosfilename) const
+bool var::osrename(const var& newosdir_or_filename) const
 {
-	THISIS(L"bool var::osrename(const var& newosfilename) const")
+	THISIS(L"bool var::osrename(const var& newosdir_or_filename) const")
 	THISISSTRING()
-	ISSTRING(newosfilename)
+	ISSTRING(newosdir_or_filename)
 	
 	//prevent overwrite of existing file
 	//ACQUIRE
 	std::wifstream myfile;
 	//binary?
-	myfile.open(newosfilename.tostring().c_str(), std::ios::binary );
+	myfile.open(newosdir_or_filename.tostring().c_str(), std::ios::binary );
 	if (myfile)
 	{
 		//RELEASE
@@ -880,7 +897,11 @@ bool var::osrename(const var& newosfilename) const
 		return false;
 	}
 
-	return !std::rename(tostring().c_str(),newosfilename.tostring().c_str());
+	//safety
+	if (!checknotabsoluterootfolder(towstring()))
+		return false;
+
+	return !std::rename(tostring().c_str(),newosdir_or_filename.tostring().c_str());
 
 }
 
@@ -1008,7 +1029,14 @@ bool var::osrmdir(bool evenifnotempty) const
         if (!boostfs::is_directory(pathx)) return false;
 		
 		if (evenifnotempty)
+		{
+
+			//safety
+			if (!checknotabsoluterootfolder(towstring()))
+				return false;
+
 			boostfs::remove_all(pathx);
+		}
 		else
 			boostfs::remove(pathx);
 	}

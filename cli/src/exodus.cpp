@@ -26,6 +26,7 @@ program()
 {
         printl("Exodus Copyright (c) 2009 Stephen Bush");
         printl("http://www.opensource.org/licenses/mit-license.php");
+		printl("Using Library Version: ", var().version());
 
         var verbose=OPTIONS.index("V");
 
@@ -42,6 +43,8 @@ program()
 
         var command=SENTENCE.field(" ",2,999999);
         var shell;
+
+		//non-windows
         if (SLASH eq "/" and shell.osgetenv("SHELL")) {
 
                 var home=osgetenv("HOME");
@@ -66,8 +69,10 @@ program()
 
                 //execute command or enter exodus shell
                 //if (not osshell("env PS1='exodus [\\u@\\h \\W]\\$ '  "^(command?command:shell)))
+
                 osshell(command?command:shell);
 
+		//windows
         } else if (SLASH eq "\\" and shell.osgetenv("ComSpec")) {
 
                 //set EXODUS_PATH used by compile to find LIB and INCLUDE paths

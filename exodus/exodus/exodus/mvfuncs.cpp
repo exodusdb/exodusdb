@@ -40,7 +40,6 @@ THE SOFTWARE.
 //2643383279502884197169399375105820974944592307816406286208998f;
 #endif
 
-#include <exodus/mvimpl.h>
 #include <exodus/mv.h>
 #include <exodus/mvutf.h>
 #include <exodus/mvexceptions.h>
@@ -51,6 +50,11 @@ bool desynced_with_stdio=false;
 //TODO check that all string increase operations dont crash the system
 
 namespace exodus {
+
+var var::version() const
+{
+	return var(__DATE__).iconv(L"D").oconv(L"D")^L" "^var(__TIME__);
+}
 
 bool var::eof() const
 {
@@ -1668,10 +1672,10 @@ var var::atan() const
 	THISISNUMERIC()
 
 	if (var_mvtyp&pimpl::MVTYPE_DBL)
-		return std::atan(var_mvdbl*M_PI/180);
+		return std::atan(var_mvdbl)/M_PI*180;
 
 //	if (var_mvtyp&pimpl::MVTYPE_INT)
-		return std::atan(double(var_mvint)*M_PI/180);
+		return std::atan(double(var_mvint))/M_PI*180;
 
 	throw MVException(L"sin(unknown mvtype=" ^ var(var_mvtyp) ^ L")");
 }
@@ -1833,5 +1837,52 @@ void var::setprompt() const
 	return;
 }
 
+
+var var::xlate(const var& filename,const var& fieldno, const var& mode) const
+{
+	THISIS(L"var var::xlate(const var& filename,const var& fieldno, const var& mode) const")
+	ISSTRING(mode)
+
+	return xlate(filename,fieldno,mode.towstring().c_str());
+}
+
+//TODO provide a version with int fieldno to handle the most frequent case
+// although may also support dictid (of target file) instead of fieldno
+
+var var::xlate(const var& filename,const var& fieldno, const wchar_t* mode) const
+{
+	THISIS(L"var var::xlate(const var& filename,const var& fieldno, const wchar_t* mode) const")
+	THISISSTRING()
+	ISSTRING(filename)
+	ISSTRING(fieldno)
+
+	//open the file (skip this for now since sql doesnt need "open"
+	var file;
+	var record;
+	//if (!file.open(filename))
+	//{
+	//	_STATUS=filename^L" does not exist";
+	//	record=L"";
+	//	return record;
+	//}
+	file=filename;
+
+	//read the record
+	if (!record.read(file,var_mvstr))
+	{
+		//if record doesnt exist then "", or original key if mode is "C"
+	 if (mode==L"C")
+			record=*this;
+		else
+			record=L"";
+	}
+	else
+	{
+		//extract the field or field 0 means return the whole record
+		if (fieldno)
+			record=record.extract(fieldno);
+	}
+	return record;
+}
 
 } // namespace exodus

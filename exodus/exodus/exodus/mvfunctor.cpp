@@ -20,6 +20,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+#include <iostream>
+
 #define MV_NO_NARROW
 
 //portable shared/dynamic library macros
@@ -263,7 +265,13 @@ bool ExodusFunctorBase::openlib()
 		var(dlsym_error).outputl();
 #endif
 
-	return plibrary_!=NULL;
+	if (plibrary_==NULL)
+	{
+		std::cerr<<libraryfilename_<<" cannot be found or cannot be opened"<<std::endl;
+		return false;
+	}
+
+	return true;
 }
 
 bool ExodusFunctorBase::openfunc()
@@ -286,7 +294,14 @@ bool ExodusFunctorBase::openfunc()
 	if (dlsym_error)
 		var(dlsym_error).outputl();
 #endif
-	return pfunction_!=NULL;
+
+	if (pfunction_==NULL)
+	{
+		std::cerr<<functionname_<<" function cannot be found in "<<libraryfilename_<<std::endl;
+		return false;
+	}
+
+	return true;
 
 }
 

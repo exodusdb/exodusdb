@@ -688,7 +688,7 @@ public:
 	bool oswrite(const var& osfilename) const;
 	bool osdelete() const;
 	bool osdelete(const var& osfilename) const;
-	bool osrename(const var& newosfilename) const;
+	bool osrename(const var& newosdir_or_filename) const;
 	bool oscopy(const var& to_osfilename) const;
 	var oslist(const var& path=L".", const var& wildcard=L"", const int mode=0) const;
 	var oslistf(const var& path=L".", const var& wildcard=L"") const;
@@ -965,7 +965,7 @@ public:
 
 	bool createindex(const var& fieldname,const var& dictfile=L"") const;
 	bool deleteindex(const var& fieldname) const;
-	var listindexes(const var& filename) const;
+	var listindexes(const var& filename=L"") const;
 
 	bool open(const var& dbfilename);
 	void close();
@@ -1000,6 +1000,7 @@ public:
 	bool sqlexec(var& errmsg) const;
 
 	//bool selftest() const;
+	var version() const;
 
 private:
 
@@ -1330,8 +1331,12 @@ static const var SQ = L"'";
 
 #if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
 const var SLASH = L"\\";
+static const char SLASH_ = L'\\';
+#define SLASH_IS_BACKSLASH true
 #else
 const var SLASH = L"/";
+static const char SLASH_ = L'/';
+#define SLASH_IS_BACKSLASH false
 #endif
 
 //being global const means that ucase() and lcase()
