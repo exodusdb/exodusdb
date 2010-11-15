@@ -1180,7 +1180,7 @@ int exodus_main(int exodus__argc, char *exodus__argv[], MvEnvironment& mv)
 	mv.COMMAND.splicer(1,1,L"");
 
 	//options are in either (XXX) or {XXX} at the end of the command.
-	var lastchar=mv.COMMAND.substr(-1);
+	var lastchar=mv.COMMAND[-1];
 	if (lastchar==")")
 		mv.OPTIONS=mv.COMMAND.field2(L"(",-1);
 	else if (lastchar=="}")

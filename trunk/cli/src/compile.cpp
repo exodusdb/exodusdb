@@ -189,7 +189,7 @@ program()
 
                 //call VSvars32 to get the path, include and lib
                 if (msvs) {
-                        if (msvs.substr(-1) ne SLASH)
+                        if (msvs[-1] ne SLASH)
                                 msvs^=SLASH;
                         //get lib/path/include from batch file
                         var tempfilenamebase="comp$" ^rnd(99999999);
@@ -436,12 +436,12 @@ program()
 
 		}
 
-        swapper(bindir,"~",osgetenv("HOME"));
-        swapper(libdir,"~",osgetenv("HOME"));
+		swapper(bindir,"~",osgetenv("HOME"));
+		swapper(libdir,"~",osgetenv("HOME"));
 
-        if (bindir.substr(-1) ne SLASH)
+        if (bindir[-1] ne SLASH)
                 bindir ^= SLASH;
-        if (libdir.substr(-1)!=SLASH)
+        if (libdir[-1]!=SLASH)
                 libdir ^= SLASH;
 
         for (var fileno=1; fileno<=nfiles; ++fileno) {

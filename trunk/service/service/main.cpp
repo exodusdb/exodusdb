@@ -7,7 +7,6 @@
 //exodus is designed to be threadsafe (a few global variables are not threadsafe and need coordinated access)
 
 //#include <unicode/ustring.h>
-//gregory
 //"visual leak detector" debugger
 //#include <vld.h>
 
@@ -202,11 +201,66 @@ function accrest() {
 
 function main()
 {
+	//DBTRACE=true;
 
+	assert(COMMAND eq "service");
+
+	printl(var().version());
+
+	var errmsg;
+	//if (not createdb("steve",errmsg))
+	//	errmsg.outputl();
+	//if (not deletedb("steve",errmsg))
+	//	errmsg.outputl();
+
+	deletefile("XUSERS");
+	deletefile("dict_XUSERS");
+
+	createfile("XUSERS");
+	createfile("DICT_XUSERS");
+
+	write("S"^FM^FM^"Age in Days"^FM^FM^FM^FM^FM^FM^"R"^FM^"10","DICT_XUSERS","AGE_IN_DAYS");
+	write("S"^FM^FM^"Age in Years"^FM^FM^FM^FM^FM^FM^"R"^FM^"10","DICT_XUSERS","AGE_IN_YEARS");
+	write("F"^FM^1^FM^"Number"^FM^FM^FM^FM^FM^FM^"R"^FM^"10","DICT_XUSERS","NUMBER");
+
+	write("1","XUSERS","1");
+	write("2","XUSERS","2");
+	write("3","XUSERS","3");
+	write("4","XUSERS","4");
+//DBTRACE=true;
+	assert(createindex("XUSERS","NUMBER"));
+	assert(listindexes("XUSERS") eq ("xusers"^VM^"number"));
+	assert(listindexes() ne "");
+	assert(deleteindex("XUSERS","NUMBER"));
+	assert(listindexes("XUSERS") eq "");
+
+	assert(select("SELECT XUSERS WITH NUMBER BETWEEN 2 and 3"));
+	assert(readnext(ID));
+	assert(ID eq 2);
+	assert(readnext(ID));
+	assert(ID eq 3);
+	assert(not readnext(ID));
+
+//	if (not selectrecord("SELECT XUSERS WITH AGE_IN_DAYS GE 0 AND WITH AGE_IN_YEARS GE 0"))
+	if (not select("SELECT XUSERS"))
+		printl("Failed to Select");
+
+	DICT="dict_XUSERS";
+//	while (readnextrecord(RECORD,ID))
+	while (readnext(ID))
+	{
+		continue;
+		printl(ID);
+		print("ID=",ID, " RECORD=",RECORD);
+		print(" AGE_IN_DAYS=",calculate("AGE_IN_DAYS"));
+		printl(" AGE_IN_YEARS=",calculate("AGE_IN_YEARS"));
+	}
+//input();
+//stop();
 	assert(unquote("\"This is quoted?\"") eq "This is quoted?");
 
 	//verify that exodus catches c++ defect at runtime
-/*	try {
+	try {
 		var abc=abc+1;
 		//should never get here because above should cause a runtime undefined error
 		assert(false);
@@ -218,7 +272,7 @@ function main()
 		//should never get here because above should cause a runtime error
 		assert(false);
 	}
-*/
+
 	//this turns on tracing SQL statements to postgres
 	//DBTRACE=true;
 
@@ -359,44 +413,15 @@ function main()
 	for (var ii=-3; ii<=3; ++ii)
 		assert(tempstr2[ii] eq "");
 
-	var errmsg;
-	//if (not createdb("steve",errmsg))
-	//	errmsg.outputl();
-	//if (not deletedb("steve",errmsg))
-	//	errmsg.outputl();
-
-	deletefile("USERS");
-	deletefile("dict_XUSERS");
-
-	createfile("XUSERS");
-	createfile("DICT_XUSERS");
-
-	write("S"^FM^FM^"Age in Days"^FM^FM^FM^FM^FM^FM^"R"^FM^"10","DICT_XUSERS","AGE_IN_DAYS");
-	write("S"^FM^FM^"Age in Years"^FM^FM^FM^FM^FM^FM^"R"^FM^"10","DICT_XUSERS","AGE_IN_YEARS");
-
-	write("1","XUSERS","1");
-	write("2","XUSERS","2");
-
-	if (not selectrecord("SELECT XUSERS WITH AGE_IN_DAYS GE 0 AND WITH AGE_IN_YEARS GE 0"))
-		printl("Failed to Select");
-
-	DICT="dict_XUSERS";
-	while (readnextrecord(RECORD,ID))
-	{
-		print("ID=",ID, " RECORD=",RECORD);
-		print(" AGE_IN_DAYS=",calculate("AGE_IN_DAYS"));
-		printl(" AGE_IN_YEARS=",calculate("AGE_IN_YEARS"));
-	}
-
 	var spac1="  xxx  xxx  ";
-	trimmer(spac1).quote().outputl();
+	assert(trimmer(spac1) eq "xxx xxx");
 
-	timedate().outputl();
+	assert(timedate().outputl("timedate()=") ne "");
 
 	dim a9;
 	var a10;
-	matparse("xx"^FM^"bb",a9).outputl();
-	var a11=matunparse(a9).outputl();
+	assert(matparse("xx"^FM^"bb",a9) eq 2);
+	assert(matunparse(a9) eq ("xx" ^FM^ "bb"));
 
 	var r[2];
 
@@ -416,7 +441,7 @@ function main()
 	for (int ii=1;ii<=4;++ii) {
 		for (int jj=1;jj<=5;++jj)
 			a8(ii,jj).outputt("=");
-		printl();
+//		printl();
 	}
 
 	a8=a7;
@@ -424,7 +449,7 @@ function main()
 	for (int ii=1;ii<=4;++ii) {
 		for (int jj=1;jj<=5;++jj)
 			a8(ii,jj).outputt("=");
-		printl();
+//		printl();
 	}
 
 	var nfields=a7.parse("xx"^FM^"bb");
@@ -473,59 +498,76 @@ function main()
 	assert(da1(2,2,2) eq extract(da1,2,2,2));//this extracts field 2, value 2, subvalue 2
 
 	//this wont work
-	replace(da1,3,"x").outputl();//or this
-	replace(da1,3,3,"x").outputl();//or this
-	replace(da1,3,3,3,"x").outputl();//or this
-	insert(da1,3,"x").outputl();//or this
-	insert(da1,3,3,"x").outputl();//or this
-	insert(da1,3,3,3,"x").outputl();//or this
+	replace(da1,3,"x");//or this
+	replace(da1,3,3,"x");//or this
+	replace(da1,3,3,3,"x");//or this
+	insert(da1,3,"x");//or this
+	insert(da1,3,3,"x");//or this
+	insert(da1,3,3,3,"x");//or this
 
 	//replacement
 	da1(2)="x";//sadly this compile and runs without error but does nothing!
 
-	da1.replacer(3,"x");//this is the right way to do it. replace field2
-	da1.replacer(3,3,"x");//this is the right way to do it. replace field2
-	da1.replacer(3,3,3,"x");//this is the right way to do it. replace field2
+	da1="f1" ^FM^ "f2" ^FM^ "f3";
 
-	da1.inserter(3,"x");//this is the right way to do it. replace field2
-	da1.inserter(3,3,"x");//this is the right way to do it. replace field2
-	da1.inserter(3,3,3,"x");//this is the right way to do it. replace field2
+	//replace field 2 with "R2"
+	da1="";
+	assert(replacer(da1, 2, "R2") eq ( FM ^ "R2"));
 
-	replacer(da1,3,"x").outputl();//or this
-	replacer(da1,3,3,"x").outputl();//or this
-	replacer(da1,3,3,3,"x").outputl();//or this
+	//replace field 2, value 3 with "R22"
+	da1="";
+	assert(replacer(da1, 2, 3, "R23") eq ( FM ^VM^VM^ "R23"));
 
-	inserter(da1,3,"x").outputl();//or this
-	inserter(da1,3,3,"x").outputl();//or this
-	inserter(da1,3,3,3,"x").outputl();//or this
+	//replace field 2, value 3, subvalue 4 with "R234"
+	da1="";
+	assert(replacer(da1, 2, 3, 4, "R234") eq ( FM^ VM^VM^ SM^SM^SM^ "R234"));
+
+	//insert "I2" at field 2
+	da1="f1" ^FM^ "f2";
+	assert(inserter(da1, 2, "I2") eq ( "f1" ^FM^ "I2" ^FM^ "f2"));
+
+	//insert "I21" at field 2, value 1
+	da1="f1" ^FM^ "f2";
+	assert(inserter(da1, 2, 1, "I21") eq ( "f1" ^FM^ "I21" ^VM^ "f2"));
+
+	//insert "I211" at field 2, value 1, subvalue 1
+	da1="f1" ^FM^ "f2";
+	assert(inserter(da1, 2, 1, 1, "I211") eq ( "f1" ^FM^ "I211" ^SM^ "f2"));
+
+	//erase (delete) field 1
+	da1="f1" ^FM^ "f2";
+	assert(eraser(da1, 1) eq ( "f2"));
+
+	//erase (delete) field 1, value 2
+	da1="f1" ^VM^ "f1v2" ^VM^ "f1v3" ^FM^ "f2";
+	assert(eraser(da1, 1, 2) eq ("f1" ^VM^ "f1v3" ^FM^ "f2"));
+
+	//erase (delete) field 1, value 2, subvalue 2
+	da1="f1" ^VM^ "f1v2s1" ^SM^ "f1v2s2" ^SM^ "f1v2s3" ^VM^ "f1v3" ^FM^ "f2";
+	assert(eraser(da1, 1, 2, 2) eq ("f1" ^VM^ "f1v2s1" ^SM^ "f1v2s3" ^VM^ "f1v3" ^FM^ "f2"));
 
 	var tempfile;
-	// This file should be in the same directory, where project file is located, like
-	//		C:\Exodus\exodusdb\service\service\testsort.cpp
-	if (osopen("testsort.cpp",tempfile))	// opening existing file
-	{
+	if (osopen("\\testsort.cpp",tempfile))
 		printl("opened");
-		var testsortbytes = osbread( tempfile, 0, 256);
-		printl("first 256 bytes of the file :\n" ^ testsortbytes);
-	}
 	else
 		printl("not opened");
 
 	//math.h seems to have been included in one of the boost or other special headers
 	//in this main.cpp file and that causes confusion between math.h and exodus.h sin() and other functions.
 	//we resolved the issue here by being specific about the namespace
-	exodus::sin(30.0000000001).outputl("sin(30.0)=");
-	exodus::cos(30.0).outputl("cos(30.0)=");
-	exodus::tan(30.0).outputl("tan(30.0)=");
-	exodus::atan(30.0).outputl("atan(30.0)=");
+	assert( exodus::sin(30).round(8) eq 0.5);
+	assert( exodus::cos(60).round(8) eq 0.5);
+	assert( exodus::tan(45).round(8) eq 1);
+	assert( exodus::atan(1).round(6) eq 45);
 
-	exodus::abs(30.0).outputl("abs(30.0)=");
-	exodus::abs(-30.0).outputl("abs(-30.0)=");
-	exodus::pwr(10,3).outputl("pwr(10,3)=");
-	exodus::exp(1).outputl("exp(1)=");
-	exodus::loge(1).outputl("loge(1)=");
-	exodus::loge(10).outputl("loge(10)=");
-	exodus::sqrt(100).outputl("sqrt(100)=");
+	assert( exodus::abs(30.0) eq 30);
+	assert( exodus::abs(-30.0) eq 30);
+	assert( exodus::pwr(10,3) eq 1000);
+	assert( exodus::exp(1).round(9) eq 2.718281828);
+	assert( exodus::loge(1) eq 0);
+	assert( exodus::loge(2.718281828).round(9) eq 1);
+	assert( exodus::loge(10).round(9) eq 2.302585093);
+	assert( exodus::sqrt(100) eq 10);
 
 	var xx=osshellread("dir");
 	//xx.osread(xx);
@@ -582,6 +624,7 @@ function main()
 		if (not xrec.read("test_symbolics",key1))
 			printl(key1, " missing"); 
 	}
+	clearselect();
 
 	assert(var("a")<var("B"));
 	assert(var(1000).oconv("MD80").outputl("1000 MD80->") eq "1000.00000000");
@@ -657,12 +700,12 @@ function main()
 	stop();
 	*/
 
+	//investigate the bytes of a double in hex for natural sort
 	double d2=1;
 	double d3=2;
 	if (d2<d3)
 		d2=d3;
 	union {double d1; char chars[8];};
-
 	for (d1=-5;d1<=5;++d1) {
 		print(d1," ");
 		for (int partn=0;partn<sizeof(chars);++partn)
@@ -671,7 +714,6 @@ function main()
 		printl();
 	}
 
-	var("xyz").outputl();
 	//var steve;steve.input(1);
 
 	//catching errors - doesnt work now that backtrace aborts (to prevent system crashes ... maybe better solution is to trap in main()
@@ -769,38 +811,38 @@ while trying to match the argument list '(exodus::var, bool)'
 	assert(iconv("24 00 00","MT").outputl() eq "");
 
 	//http://www.regular-expressions.info/examples.html
-	assert(swap("Steve Bush Bash bish","B.","Ru","ri").outputl() eq "Steve Rush Rush Rush");
+	assert(swap("Steve Bush Bash bish","B.","Ru","ri") eq "Steve Rush Rush Rush");
 
 	if (sizeof(wchar_t) eq 2)
 	{
 		//ucs-16 "fake utf16" on windows
-		assert(oconv("Aa019KK","HEX").outputl() eq "00410061003000310039004B004B");
-		assert(var("00410061003000310039004B004B").iconv("HEX").outputl() eq "Aa019KK");
+		assert(oconv("Aa019KK","HEX") eq "00410061003000310039004B004B");
+		assert(var("00410061003000310039004B004B").iconv("HEX") eq "Aa019KK");
 
 	}
 	else if (sizeof(wchar_t) eq 4)
 	{
-		assert(oconv("Aa019KK","HEX").outputl() eq "00000041000000610000003000000031000000390000004B0000004B");
-		assert(var("00000041000000610000003000000031000000390000004B0000004B").iconv("HEX2").outputl() eq "Aa019KK");
+		assert(oconv("Aa019KK","HEX") eq "00000041000000610000003000000031000000390000004B0000004B");
+		assert(var("00000041000000610000003000000031000000390000004B0000004B").iconv("HEX2") eq "Aa019KK");
 
 	} 
 
-	assert(oconv("Aa019KK","HEX2").outputl() eq "41613031394B4B");
-	assert(oconv("Aa019KK","HEX4").outputl() eq "00410061003000310039004B004B");
-	assert(oconv("Aa019KK","HEX8").outputl() eq "00000041000000610000003000000031000000390000004B0000004B");
-	assert(var("41613031394B4B").iconv("HEX2").outputl() eq "Aa019KK");
-	assert(var("00410061003000310039004B004B").iconv("HEX4").outputl() eq "Aa019KK");
-	assert(var("00000041000000610000003000000031000000390000004B0000004B").iconv("HEX8").outputl() eq "Aa019KK");
+	assert(oconv("Aa019KK","HEX2") eq "41613031394B4B");
+	assert(oconv("Aa019KK","HEX4") eq "00410061003000310039004B004B");
+	assert(oconv("Aa019KK","HEX8") eq "00000041000000610000003000000031000000390000004B0000004B");
+	assert(var("41613031394B4B").iconv("HEX2") eq "Aa019KK");
+	assert(var("00410061003000310039004B004B").iconv("HEX4") eq "Aa019KK");
+	assert(var("00000041000000610000003000000031000000390000004B0000004B").iconv("HEX8") eq "Aa019KK");
 
 	//doesnt accept FMs etc yet
 	//assert(var("FF"^FM^"00").iconv("HEX").outputl() eq ("00FF"^FM^"00FF"));
-	assert(var("FF"^FM^"00").iconv("HEX2").oconv("HEX2").outputl() eq "");
+	assert(var("FF"^FM^"00").iconv("HEX2").oconv("HEX2") eq "");
 	//anything invalid returns empty string
-	assert(var("XF").iconv("HEX").oconv("HEX").outputl() eq "");
+	assert(var("XF").iconv("HEX").oconv("HEX") eq "");
 
 	var time1=var("10:10:10").iconv("MT");
-	assert(var("abcabdef").trim("abef").outputl() eq "cbd");
-	assert(var("abcabdef").trimf("abef").trimb("abef").outputl() eq "cabd");
+	assert(var("abcabdef").trim("abef") eq "cbd");
+	assert(var("abcabdef").trimf("abef").trimb("abef") eq "cabd");
 
 	var temp3="c";
 	var temp2("c");
@@ -862,15 +904,6 @@ while trying to match the argument list '(exodus::var, bool)'
 	oconv("xxx","").outputl("xxx = ");
 	assert(oconv("xxx","") eq "xxx");
 
-	oconv("",				"MX").outputl(" = ");
-	oconv(" ",				"MX").outputl("  = ");
-	oconv(0,				"MX").outputl("0 = ");
-	oconv(-0,				"MX").outputl("0 = ");
-	oconv("X",				"MX").outputl("X = ");
-	oconv("-1.5",			"MX").outputl("FFFFFFFFFFFFFFFE = ");
-	oconv("1.5",			"MX").outputl("2 = ");
-	oconv("20" ^ FM ^ 255,	"MX").outputl("14" ^FM^ "FF = ");
-
 	assert(oconv("","MX") eq "");
 	assert(oconv(" ","MX") eq " ");
 	assert(oconv(0,"MX") eq "0");
@@ -888,44 +921,48 @@ while trying to match the argument list '(exodus::var, bool)'
 	assert(oconv("1.5","D") eq "01 JAN 1968");
 	assert(oconv("1.5" ^ FM ^ -1.5,"D") eq ("01 JAN 1968"^FM^"29 DEC 1967"));
 
-	assert(oconv(9649,"D") eq "01 JUN 1994");
-	assert(oconv(9649,"D2") eq "01 JUN 94");
-	assert(oconv(9649,"D4") eq "01 JUN 1994");
-	assert(oconv(9649,"D/") eq "06/01/1994");
-	assert(oconv(9649,"D ") eq "06 01 1994");
-	assert(oconv(9649,"D2/") eq "06/01/94");
-	assert(oconv(9649,"D2-") eq "06-01-94");
-	assert(oconv(9649,"D/") eq "06/01/1994");
-	assert(oconv(9649,"D/E") eq "01/06/1994");
-	assert(oconv(9649,"D2 E") eq "01 06 94");
-	assert(oconv(9649,"D S") eq "1994 06 01");
-	assert(oconv(9649,"DM") eq "6");
-	assert(oconv(9649,"DMA") eq "JUNE");
-	assert(oconv(9649,"DW") eq "3");
-	assert(oconv(9649,"DWA") eq "WEDNESDAY");
-	assert(oconv(9649,"DY") eq "1994");
-	assert(oconv(9649,"DY2") eq "94");
-	assert(oconv(9649,"D2Y") eq "94 JUN 01");
-	assert(oconv(9649,"D5Y") eq "01994 JUN 01");
-	assert(oconv(9649,"DD") eq "1");
-	assert(oconv(9649,"DQ") eq "2");
-	assert(oconv(9649,"DJ") eq "152");
+	assert(oconv(14276,"D") eq "31 JAN 2007");
+	assert(oconv(14276,"D2") eq "31 JAN 07");
+	assert(oconv(14276,"D4") eq "31 JAN 2007");
+	assert(oconv(14276,"D/") eq "01/31/2007");
+	assert(oconv(14276,"D ") eq "01 31 2007");
+	assert(oconv(14276,"D2/") eq "01/31/07");
+	assert(oconv(14276,"D2-") eq "01-31-07");
+	assert(oconv(14276,"D/") eq "01/31/2007");
+	assert(oconv(14276,"D/E") eq "31/01/2007");
+	assert(oconv(14276,"D2 E") eq "31 01 07");
+	assert(oconv(14276,"D S") eq "2007 01 31");
+	assert(oconv(14276,"DM") eq "1");
+	assert(oconv(14276,"DMA") eq "JANUARY");
+	assert(oconv(14276,"DW") eq "3");
+	assert(oconv(14276,"DWA") eq "WEDNESDAY");
+	assert(oconv(14276,"DY") eq "2007");
+	assert(oconv(14276,"DY2") eq "07");
+	assert(oconv(14276,"D2Y") eq "07 JAN 31");
+	assert(oconv(14276,"D5Y") eq "02007 JAN 31");
+	assert(oconv(14276,"DD") eq "31");
+	assert(oconv(14276,"DL") eq "31");
+	assert(oconv(14276,"DQ") eq "1");
+	assert(oconv(14276,"DJ") eq "31");
+
 	var feb29_2004=13209;//iconv("29 FEB 2004","D");
 	oconv(feb29_2004,"DL").outputl();
 	assert(oconv(feb29_2004,"DL") eq "29");
 
-	assert(oconv(10939,"D") eq "12 DEC 1997");
-	assert(oconv(10939,"D2/") eq "12/12/97");
-	assert(oconv(10939,"D2-") eq "12-12-97");
-	assert(oconv(10939,"D-") eq "12-12-1997");
-	assert(oconv(10939,"D2-") eq "12-12-97");
-	assert(oconv(10939,"DJ") eq "346");
-	assert(oconv(10939,"DM") eq "12");
-	assert(oconv(10939,"DMA") eq "DECEMBER");
-	assert(oconv(10939,"DW") eq "5");
-	assert(oconv(10939,"DWA") eq "FRIDAY");
-	assert(oconv(10939,"DY") eq "1997");
-	assert(oconv(10939,"DQ") eq "4");
+	assert(oconv(14591,"D") eq "12 DEC 2007");
+	assert(oconv(14591,"D2/") eq "12/12/07");
+	assert(oconv(14591,"D2-") eq "12-12-07");
+	assert(oconv(14591,"D-") eq "12-12-2007");
+	assert(oconv(14591,"D2-") eq "12-12-07");
+	assert(oconv(14591,"DJ") eq "346");
+	assert(oconv(14591,"DM") eq "12");
+	assert(oconv(14591,"DMA") eq "DECEMBER");
+	assert(oconv(14591,"DW") eq "3");
+	assert(oconv(14591,"DWA") eq "WEDNESDAY");
+	assert(oconv(14591,"DY") eq "2007");
+	assert(oconv(14591,"DQ") eq "4");
+	assert(oconv(14591,"DD") eq "12");
+	assert(oconv(14591,"DL") eq "31");
 
 	//check times around noon and midnight round trip ok
 	for (var ii=0; ii<=61 ; ++ii)
@@ -946,8 +983,6 @@ while trying to match the argument list '(exodus::var, bool)'
 	//oconv(46622,"MTH").outputl("oconv 46622 MTH is" );
 	assert(oconv(46622,"MTH") eq "12:57PM");
 
-	oconv(31653,"MT").outputl();
-
 	assert(oconv(31653,"MT") eq "08:47");
 	assert(oconv(63306,"MT") eq "17:35");
 	printl(oconv(0,"MTH"));
@@ -967,57 +1002,106 @@ while trying to match the argument list '(exodus::var, bool)'
 	assert(oconv(61201,"MTH") eq "05:00PM");
 	assert(oconv(61201,"MTHS") eq "05:00:01PM");
 
-/*
-MT 31653 08:47
-MT 63306 17:35
-MTH 0 12:00am
-MTH 31653 08:47am
-MTH 63306 05:35pm
-MTS 31653 08:47:33
-MTS 63306 17:35:06
-MTHS 63306 05:35:06pm
-MTS. 63306 17:35:06
-MT'h' 63306 17h35
-*/
-	printl(time().oconv("MT"));
-	printl(time().oconv("MTH"));
-	printl(time().oconv("MTS"));
-	printl(time().oconv("MTSH"));
-	printl(time().oconv("MTx"));
-	printl(time().oconv("MTHx"));
-	printl(time().oconv("MTSx"));
-	printl(time().oconv("MTSHx"));
+	var time2=43261;
+	assert(time2.oconv("MT") eq "12:01");
+	assert(time2.oconv("MTH") eq "12:01PM");
+	assert(time2.oconv("MTS") eq "12:01:01");
+	assert(time2.oconv("MTSH") eq "12H01H01");
+	assert(time2.oconv("MTx") eq "12x01");
+	assert(time2.oconv("MTHx") eq "12x01PM");
+	assert(time2.oconv("MTSx") eq "12x01x01");
+	assert(time2.oconv("MTSHx") eq "12H01H01");
 
-	var hexx=oconv(FM ^ L"\x0035","HEX");
-	hexx=oconv(FM,"HEX");
+	assert(oconv(FM ^ L"\x0035","HEX4") eq "00FE0035");
+	assert(oconv(FM,"HEX4") eq "00FE");
 
-	printl(osdir("/"));
-	osrmdir("xxxyzz");
-	osmkdir("xxxyzz");
-	osrmdir("xxxy");
-	printl(var("/xyz/aaa").osmkdir());
-	printl(var("/xyz").osrmdir());
-	outputl(osrename("/xyz","/xyzz"));
-	printl(var("/xyzz").osrmdir(true));
+	printl(osdir(SLASH));
 
-	printl(osdir("c:\\config.sys"));
+	//root directories
 
-	outputl(oscopy("/adagency7.exe","/adagency777.exe"));
-	outputl(osrename("/adagency777.exe","/adagency888.exe"));
+	//check one step multilevel subfolder creation (requires boost version > ?)
+	var topdir1=SLASH^"exodus544";
+	var topdir1b=topdir1^"b";
+	var subdir2=topdir1^SLASH^"abcd";
+	var subdir2b=topdir1b^SLASH^"abcd";
+
+	//try to remove any old versions (subdir first to avoid problems)
+	osrmdir(topdir1b,true);
+	osrmdir(topdir1);
+	osrmdir(subdir2b,true);
+	osrmdir(subdir2);
+
+	assert(osmkdir(subdir2));
+
+	//check CANNOT rename multilevel root folders
+	assert(not osrename(topdir1,topdir1b));
+
+	//check CANNOT force delete root folders
+	assert(not osrmdir(topdir1,true));
+
+	//check can remove root folders one by one without force
+	assert(osrmdir(subdir2));
+	assert(osrmdir(topdir1));
+
+	//printl(osdir("c:\\config.sys"));
+
+	//relative directories ie not-root
+	var tempdir="exotemp746";
+	if (osdir(tempdir))
+		assert(osrmdir(tempdir,true));
+
+	//check mkdir
+	assert(osmkdir(tempdir));
+	assert(osdir(tempdir));
+	assert(not osmkdir(tempdir));
+
+	//check rmdir
+	assert(osrmdir(tempdir));
+	assert(not osdir(tempdir));
+
+	//check writing a 1Mb file
+	//restrict to ascii characters so size on disk=number of characters in string
+	//also restrict to size 1 2 4 8 16 etc
+	//var str1=L"1234ABC\x0160";//Note: you have to prefix strings with L if you want to put multibyte hex chars
+	var str1="1234ABCD";
+	var filesize=1024*1024;
+	assert(osmkdir(tempdir));
+	var tempfilename=tempdir^SLASH^"temp1";
+	assert(oswrite(str(str1,filesize/len(str1)),tempfilename));
+	var filedate=date();
+	assert(osfile(tempfilename));
+	var info=osfile(tempfilename).outputl();
+	assert(info.extract(1) eq filesize);
+	assert(info.extract(2) eq filedate);
+
+	//check copying to a new file
+	var tempfilename2=tempfilename^2;
+	if (osfile(tempfilename2))
+		assert(osdelete(tempfilename2));
+	assert(oscopy(tempfilename,tempfilename2));
+	assert(osfile(tempfilename2) eq info);
+
+	//check renaming
+	var tempfilename3=tempfilename^3;
+	assert(osrename(tempfilename2,tempfilename3));
+	assert(osfile(tempfilename3) eq info);
+
+	//check force delete of subdirectory
+	assert(osrmdir(tempdir,true));
 
 	var x;
 	var y;
 	x="0";
 	y=date();
-	date().oconv("D").outputl();
-
-	time().oconv("MTS").outputl();
-	timedate().outputl();
+	date().oconv("D").outputl("Date is:");
+	time().oconv("MTS").outputl("Time is:");
+	timedate().outputl("Time and Date is:");
 	//assert( not (x > y) );
 
-	var(1000).oconv("MD20P,").outputl();
+	assert(var(1000).oconv("MD20P,") eq "1,000.00");
 
-	printl(var("0")<var(".5"));
+	assert(var("0")<var(".5"));
+
 	var ss;
 	printl("sizeof");
 	printl("char:   ",(int)sizeof(char));
@@ -1032,8 +1116,11 @@ MT'h' 63306 17h35
 	tconv="xxxxx/xxxxx xxx" ^ FM ^ "xx";
 	tconv=tconv.oconv("T#8");
 
+	//test regular expression
 	var exp="(\\d{4}[- ]){3}\\d{4}";
 	var res=var("1247-1234-1234-1234").match(exp,"r");
+
+	//test redimensioning
 	dim aaa(10);
 	aaa.redim(20,30);
 
@@ -1048,7 +1135,7 @@ MT'h' 63306 17h35
 //  xx.inverter();
 
 	var dividend=100;
-	printl(mod(dividend,30));
+	assert(mod(dividend,30) eq 10);
 
 	var env=osgetenv("");
 	osgetenv("PATH");
@@ -1060,19 +1147,18 @@ MT'h' 63306 17h35
 //	var().debug();
 //	var xx=xx.substr(1,1);
 
+//experiment with some syntactic sugar
 #define on ,
 #define from ,
 
-	var tempfilename="tempfile";
-	oswrite("123" on tempfilename);
-	var tempdata;
-	if (!osread(tempdata from tempfilename))
-		abort("Failed to osread after oswrite");
-	if (tempdata!="123")
-		abort("Failed to osread after oswrite");
-	osdelete(tempfilename);
-	if (osfile(tempfilename))
-		abort("Failed to osdelete tempfile");
+	var temprecord;
+	var tempfilename0="tempfile";
+	assert(oswrite("123" on tempfilename0));
+	assert(osfile(tempfilename0));
+	assert(osread(temprecord from tempfilename0));
+	assert(temprecord eq "123");
+	assert(osdelete(tempfilename0));
+	assert(not osfile(tempfilename0));
 
 //	var().stop();
 
@@ -1126,8 +1212,8 @@ MT'h' 63306 17h35
 //	var().connectlocal("");
 
 	var filenames2="JOBS";
-	filenames2^=FM^"PRODUCTION.ORDERS";
-	filenames2^=FM^"PRODUCTION.INVOICES";
+	filenames2^=FM^"PRODUCTION_ORDERS";
+	filenames2^=FM^"PRODUCTION_INVOICES";
 	filenames2^=FM^"COMPANIES";
 	filenames2^=FM^"BRANDS";
 	filenames2^=FM^"CLIENTS";
@@ -1146,16 +1232,17 @@ MT'h' 63306 17h35
 	var nfiles=dcount(filenames2,FM);
 	for (int ii=1;ii<=nfiles;++ii) {
 		var filename=filenames2.extract(ii);
-		print(filename);
-		if (!var().open(filename))
-			var().createfile(filename);
-		else
-			print(", data ok");
-		if (!var().open("DICT."^filename))
-			var().createfile("DICT."^filename);
-		else
-			print(", dict ok");
-		printl();
+
+		if (not open(filename, tempfile)) {
+			printl("creating "^filename);
+			assert(createfile(filename));
+		}
+
+		if (not open("dict_"^filename, tempfile)) {
+			assert(createfile("dict_"^filename));
+			printl("creating dict_"^filename);
+		}
+
 	}
 //	var("x:y:z:").dcount(":").outputl();
 //	var().stop();
@@ -1174,23 +1261,26 @@ MT'h' 63306 17h35
 	dictrec.replacer(2,"3");
 	dictrec.replacer(3,"Brand Code");
 	if (not dictrec.write("DICT_ADS","BRAND_CODE"))
-		printl("cannot write brand_code dict");
-	printl("Creating ADS BRAND_CODE Index");
-	if (not ads.createindex("BRAND_CODE"))
+		printl("cannot write dict_ads, BRAND_CODE");
+	if (not ads.createindex("BRAND_CODE")) {
+//		printl("Creating ADS BRAND_CODE Index");
 		printl("Index creation failed");
-	printl("Deleting ADS BRAND_CODE Index");
-	if (not ads.deleteindex("BRAND_CODE"))
+	}
+	if (not ads.deleteindex("BRAND_CODE")) {
+		printl("Deleting ADS BRAND_CODE Index");
 		printl("Index deletion failed");
+	}
 
-	if (!var().open("CHANGELOG"))
-								var().createfile("CHANGELOG");
-	if (!var().open("LOCKS"))
-								var().createfile("LOCKS");
-	if (!var().open("USERS"))
-								var().createfile("USERS");
-    if (!var().open("ACCESSIBLE_COLUMNS"))
-								var().createfile("ACCESSIBLE_COLUMNS");
-
+//DBTRACE=1;
+	var changelog, locks, users, accessible_columns;
+	if (not open("CHANGELOG",changelog))
+								assert(createfile("CHANGELOG"));
+	if (not open("LOCKS",locks))
+								assert(createfile("LOCKS"));
+	if (not open("USERS",users))
+								assert(createfile("USERS"));
+    if (not open("ACCESSIBLECOLUMNS",accessible_columns))
+								assert(createfile("ACCESSIBLECOLUMNS"));
 	var market;
 	market.read("MARKETS","PAN");
 
@@ -1207,7 +1297,6 @@ MT'h' 63306 17h35
 	int ii=0;
 //	cin>>ii;
 	var record;
-	printl("readnexting:");
 	if (ads.selectrecord("SELECT ADS")) {
 		while (ii<3&&ads.readnextrecord(key,record))
 		{
@@ -1219,8 +1308,9 @@ MT'h' 63306 17h35
 
 		}
 	}
+	clearselect();
 
-	print("Press Enter to start threads ... ");
+	//print("Press Enter to start threads ... ");
 	//cin.get();
 
 	/*
