@@ -363,7 +363,8 @@ bool var::connect(const var& conninfo)
 	*this=1;
 
 	//save the connection in thread specific storage
-	tss_pgconns.reset(pgconn);
+	tss_pgconns.reset(pgconn);					//ALN:TODO:so we save ptr to the object
+												//	allocated during establishing the connection
 	tss_pgconnparams.reset(new var(conninfo2));
 	tss_locktables.reset(new LockTable());
 
