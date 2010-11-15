@@ -847,7 +847,7 @@ var inclusion=
 										//MANIFEST:NO option
 										//was try to copy ms manifest so that the program can be run from anywhere?
 										if (SLASH eq "\\") {
-											if (isprogram and manifest) {
+											if (true or isprogram and manifest) {
 												if (not oscopy(objfilename^".manifest",outputpathandfile^".manifest"))
 													{}//printl("ERROR: Failed to "^cmd);
 											}
