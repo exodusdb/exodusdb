@@ -93,10 +93,12 @@ bool MvEnvironment::init(const int threadno)
 
 	cache_dictid_=L"";
 
-	this->DICT=L"x";
+	this->DICT=L"";
+	//this->DICT=L"x";
 	//var("this->DICT=L\"\";").outputl();
 
-	this->ID=L"idx";
+	this->ID=L"";
+	//this->ID=L"idx";
 	//var("this->ID=L\"idx\";").outputl();
 
 	//	return true;
@@ -125,7 +127,7 @@ bool MvEnvironment::init(const int threadno)
 	this->SECURITY=L"";
 	this->LISTACTIVE=0;
 
-	this->RECORD=L"";	// to avoid RECORD(1) throw exception because var is not string
+	//this->RECORD=L"";	// to avoid RECORD(1) throw exception because var is not string
 
 	return true;
 

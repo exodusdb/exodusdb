@@ -9,5 +9,5 @@ dict(AGE_IN_DAYS) {
 }
 
 dict(AGE_IN_YEARS) {
-        ANS=calculate("AGE_IN_DAYS")/365.25;
+        ANS = calculate("AGE_IN_DAYS") / 365.25;
 }
