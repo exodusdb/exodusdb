@@ -83,24 +83,39 @@ function main()
 	assert(not readnext(ID));
 
 //	if (not selectrecord("SELECT XUSERS WITH AGE_IN_DAYS GE 0 AND WITH AGE_IN_YEARS GE 0"))
-	if (not select("SELECT XUSERS"))
+//	if (not select("SELECT XUSERS"))
+	if (not selectrecord("SELECT XUSERS"))
 		printl("Failed to Select");
 
 	DICT="dict_XUSERS";
-//	while (readnextrecord(RECORD,ID))
-	while (readnext(ID))
+	while (readnextrecord(RECORD,ID))
+//	while (readnext(ID))
 	{
-		continue;
 		printl(ID);
 		print("ID=",ID, " RECORD=",RECORD);
+
+		continue;
+//following requires dict_XUSERS to be a dictionary library something like
+//edic dict_XUSERS
+/*
+#include <exodus/dict.h>
+
+dict(AGE_IN_DAYS) {
+	ANS=date()-RECORD(1);
+}
+
+dict(AGE_IN_YEARS) {
+	ANS=calculate("AGE_IN_DAYS")/365.25;
+}
+*/
 		print(" AGE_IN_DAYS=",calculate("AGE_IN_DAYS"));
 		printl(" AGE_IN_YEARS=",calculate("AGE_IN_YEARS"));
 	}
-//input();
-//stop();
+
+
 	assert(unquote("\"This is quoted?\"") eq "This is quoted?");
 
-	//verify that exodus catches c++ defect at runtime
+	printl("Verify that exodus catches c++ defect at runtime");
 	try {
 		var abc=abc+1;
 		//should never get here because above should cause a runtime undefined error
@@ -445,7 +460,7 @@ function main()
 	assert(mod(-2.3,var(1.499)).round(3).outputl() eq 0.698);
 	assert(mod(2.3,var(-1.499)).round(3).outputl() eq -0.698);
 
-	oconv(1234,"MD20P").outputl();
+	assert(oconv(1234,"MD20P") eq "1234.00");
 	assert(var(10000).oconv("DY0") eq "");
 
 	var temp;
