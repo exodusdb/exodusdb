@@ -229,7 +229,7 @@ bool checknotabsoluterootfolder(std::wstring dirname)
 		&& (dirname[1] == L':')
 		&& (dirname[2] == SLASH_)))
 	{
-		std::wcout << "forced removal/renaming of top level directories by absolute path is not supported for safety. You can use cwd() and relative path." <<dirname << std::endl;
+		std::wcout << "Forced removal/renaming of top level directories by absolute path is not supported for safety but you can use cwd() and relative path." <<dirname << std::endl;
 		return false;
 	}
 	return true;
