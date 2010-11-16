@@ -5,7 +5,7 @@ programinit()
 
 function xyz(in xyzz)
 {
-	xyzz(2,2,2).outputl();
+	assert(xyzz(2,2,2) eq "b22");
 	return 1;
 }
 
@@ -46,7 +46,7 @@ function main()
 	 or COMMAND eq "main2"
 	 or COMMAND eq "main2.out");
 
-	printl(var().version());
+	printl("Using Exodus library version:"^var().version());
 
 	var errmsg;
 	//if (not createdb("steve",errmsg))
@@ -85,14 +85,13 @@ function main()
 //	if (not selectrecord("SELECT XUSERS WITH AGE_IN_DAYS GE 0 AND WITH AGE_IN_YEARS GE 0"))
 //	if (not select("SELECT XUSERS"))
 	if (not selectrecord("SELECT XUSERS"))
-		printl("Failed to Select");
+		assert(false and var("Failed to Select XUSERS!"));
 
 	DICT="dict_XUSERS";
 	while (readnextrecord(RECORD,ID))
 //	while (readnext(ID))
 	{
-		printl(ID);
-		print("ID=",ID, " RECORD=",RECORD);
+		printl("ID=",ID, " RECORD=",RECORD);
 
 		continue;
 //following requires dict_XUSERS to be a dictionary library something like
@@ -115,7 +114,7 @@ dict(AGE_IN_YEARS) {
 
 	assert(unquote("\"This is quoted?\"") eq "This is quoted?");
 
-	printl("Verify that exodus catches c++ defect at runtime");
+	printl("\nVerify that exodus catches c++ defect at runtime");
 	try {
 		var abc=abc+1;
 		//should never get here because above should cause a runtime undefined error
@@ -312,26 +311,24 @@ dict(AGE_IN_YEARS) {
 //		printl();
 	}
 
-	var nfields=a7.parse("xx"^FM^"bb");
-	a7(1).outputl();
-	a7(2).outputl();
-	a7.unparse().outputl();
+	assert(a7.parse("xx"^FM^"bb") eq 2);
+	assert(a7(1) eq "xx");
+	assert(a7(2) eq "bb");
+	assert(a7.unparse() eq ("xx"^FM^"bb"));
 
 	dim arrx(2,2),arry;
 	arrx(1,1)="xx";
-	arrx(1,1).outputl("arrx(1,1)=");
+	assert(arrx(1,1) eq "xx");
 	arrx(1,2)=arrx(1,1);
-	arrx(1,2).outputl("arrx(1,2)=");
+	assert(arrx(1,2) eq "xx");
 	arry=arrx;
-	arry(1,1).outputl();
+	assert(arry(1,1) eq "xx");
 
 	var aa1,aa2,aa3,aa4;
 	aa1=aa2=aa3="aa";
-	aa1.outputl();
-	aa2.outputl();
-	aa3.outputl();
-
-	//accrest();
+	assert(aa1 eq "aa");
+	assert(aa2 eq "aa");
+	assert(aa3 eq "aa");
 
 	initrnd(999);
 	for (int ii=1; ii<1000; ++ii) {
@@ -350,7 +347,7 @@ dict(AGE_IN_YEARS) {
 	assert(a<A);
 
 	var da1="aa"^FM^"b1"^VM^"b2"^SM^"b22"^FM^"cc";
-	xyz(da1);
+	gosub xyz(da1);
 
 	//extraction
 	assert(da1(2) eq extract(da1,2));//this extracts field 2
@@ -407,10 +404,8 @@ dict(AGE_IN_YEARS) {
 	assert(eraser(da1, 1, 2, 2) eq ("f1" ^VM^ "f1v2s1" ^SM^ "f1v2s3" ^VM^ "f1v3" ^FM^ "f2"));
 
 	var tempfile;
-	if (osopen("\\testsort.cpp",tempfile))
-		printl("opened");
-	else
-		printl("not opened");
+	if (osopen(SLASH^"129834192784",tempfile))
+		assert(false and var("non-existent file opened!"));
 
 	//math.h seems to have been included in one of the boost or other special headers
 	//in this main.cpp file and that causes confusion between math.h and exodus.h sin() and other functions.
@@ -449,45 +444,22 @@ dict(AGE_IN_YEARS) {
 	//	stop("Cannot connect!");
 
 	//check floating point modulo
-	assert(mod(2.3,var(1.499)).round(3).outputl() eq 0.801);
-	assert(mod(-2.3,var(-1.499)).round(3).outputl() eq -0.801);
+	assert(mod(2.3,var(1.499)).round(3) eq 0.801);
+	assert(mod(-2.3,var(-1.499)).round(3) eq -0.801);
 	//following is what c++ fmod does (a rather mathematical concept)
 	//assert(mod(-2.3,var(1.499)).round(3).outputl() eq -0.801);
 	//assert(mod(2.3,var(-1.499)).round(3).outputl() eq 0.801);
 	//but arev and qm ensure that the result is somewhere from 0 up to or down to
 	//(but not including) the divisor
 	//method is ... do the fmod and if the result is not the same sign as the divisor, add the divisor
-	assert(mod(-2.3,var(1.499)).round(3).outputl() eq 0.698);
-	assert(mod(2.3,var(-1.499)).round(3).outputl() eq -0.698);
+	assert(mod(-2.3,var(1.499)).round(3) eq 0.698);
+	assert(mod(2.3,var(-1.499)).round(3) eq -0.698);
 
 	assert(oconv(1234,"MD20P") eq "1234.00");
 	assert(var(10000).oconv("DY0") eq "");
 
-	var temp;
-	if (not open("dict_test_symbolics",temp))
-		createfile("dict_test_symbolics");
-	write("F"^FM^0^FM^"ID","dict_test_symbolics","ID");
-	write("S"^FM^FM^"Col1","dict_test_symbolics","SYMCOL1");
-
-	writev("F","dict_test_symbolics","ID",1);
-
-	if (not open("test_symbolics",temp))
-		createfile("test_symbolics");
-	write(1000^FM^2000,"test_symbolics","3000");
-
-	if (select("select test_symbolics with SYMCOL1 = 3000 or with ID = 3000")) {
-	//if (select("select test_symbolics with SYMCOL1 = 124")) {
-		var key1;
-		if (not readnext(key1))
-			printl("no 124");
-		var xrec;
-		if (not xrec.read("test_symbolics",key1))
-			printl(key1, " missing"); 
-	}
-	clearselect();
-
 	assert(var("a")<var("B"));
-	assert(var(1000).oconv("MD80").outputl("1000 MD80->") eq "1000.00000000");
+	assert(var(1000).oconv("MD80") eq "1000.00000000");
 	assert(var("31 JAN 2008").iconv("D") eq "14641");
 
 	assert(var("1/31/2008").iconv("D") eq 14641);
@@ -561,6 +533,7 @@ dict(AGE_IN_YEARS) {
 	*/
 
 	//investigate the bytes of a double in hex for natural sort
+	/*
 	double d2=1;
 	double d3=2;
 	if (d2<d3)
@@ -573,6 +546,7 @@ dict(AGE_IN_YEARS) {
 			std::cout << std::hex << int(chars[partn]) << " " ;
 		printl();
 	}
+	*/
 
 	//var steve;steve.input(1);
 
@@ -630,47 +604,48 @@ or 'built-in C++ operator+(unsigned int, bool)'
 or 'built-in C++ operator+(bool, bool)'
 while trying to match the argument list '(exodus::var, bool)'
 */
-	
+
 	//neither will the following
 	//var log3=count(log1,"x")+(log1 ne "");
 	//just convert it to the better
-	var log4=dcount(log1,"x");
+	assert(dcount(log1,"x") eq 3);
 
 	printl(SENTENCE);
-	var("xyz").substr(4,1).outputl();
+	assert(var("xyz").substr(4,1) eq "");
 
 	//TODO ensure isnum converts ints larger that the maximum int to FLOATS
 
 	var subs="xyz";
-	printl(subs.substr(-1));
+	assert(subs.substr(-1) eq "z");
+	assert(subs[-1] eq "z");
 
-	assert(oconv("a","L#3").outputl() eq "a  ");
-	assert(oconv("abc","L#3").outputl() eq "abc");
-	assert(oconv("abcd","L#3").outputl() eq "abc");
-	assert(oconv("a"^FM^"abc"^FM^"abcd","L#3").outputl() eq ("a  "^FM^"abc"^FM^"abc"));
+	assert(oconv("a","L#3") eq "a  ");
+	assert(oconv("abc","L#3") eq "abc");
+	assert(oconv("abcd","L#3") eq "abc");
+	assert(oconv("a"^FM^"abc"^FM^"abcd","L#3") eq ("a  "^FM^"abc"^FM^"abc"));
 
-	assert(oconv("a","R#3").outputl() eq "  a");
-	assert(oconv("abc","R#3").outputl() eq "abc");
-	assert(oconv("abcd","R#3").outputl() eq "bcd");
-	assert(oconv("a"^FM^"abc"^FM^"abcd","R#3").outputl() eq ("  a"^FM^"abc"^FM^"bcd"));
+	assert(oconv("a","R#3") eq "  a");
+	assert(oconv("abc","R#3") eq "abc");
+	assert(oconv("abcd","R#3") eq "bcd");
+	assert(oconv("a"^FM^"abc"^FM^"abcd","R#3") eq ("  a"^FM^"abc"^FM^"bcd"));
 
-	assert(oconv("a","T#3").outputl() eq "a  ");
-	assert(oconv("abc","T#3").outputl() eq "abc");
-	assert(oconv("abcd","T#3").outputl() eq ("abc"^TM^"d  "));
-	assert(oconv("a"^FM^"abc"^FM^"abcd","T#3").outputl() eq ("a  "^FM^"abc"^FM^"abc"^TM^"d  "));
+	assert(oconv("a","T#3") eq "a  ");
+	assert(oconv("abc","T#3") eq "abc");
+	assert(oconv("abcd","T#3") eq ("abc"^TM^"d  "));
+	assert(oconv("a"^FM^"abc"^FM^"abcd","T#3") eq ("a  "^FM^"abc"^FM^"abc"^TM^"d  "));
 
-	assert(oconv("a","L(0)#3").outputl() eq "a00");
-	assert(oconv("a","R(0)#3").outputl() eq "00a");
-	assert(oconv("a","T(0)#3").outputl() eq "a00");
-	assert(oconv("abcd","T(0)#3").outputl() eq ("abc"^TM^"d00"));
+	assert(oconv("a","L(0)#3") eq "a00");
+	assert(oconv("a","R(0)#3") eq "00a");
+	assert(oconv("a","T(0)#3") eq "a00");
+	assert(oconv("abcd","T(0)#3") eq ("abc"^TM^"d00"));
 
 	initrnd(999);
 	var rnd1=rnd(999);
 	//777 on win32, 802 on Ubuntu 10.04 64bit
 	assert(rnd1 eq 777 or rnd1 eq 802);
-	assert(iconv("23 59 59","MT").outputl() eq 86399);
-	assert(iconv("xx11yy12zz13P","MT").outputl() eq 83533);
-	assert(iconv("24 00 00","MT").outputl() eq "");
+	assert(iconv("23 59 59","MT") eq 86399);
+	assert(iconv("xx11yy12zz13P","MT") eq 83533);
+	assert(iconv("24 00 00","MT") eq "");
 
 	//http://www.regular-expressions.info/examples.html
 	assert(swap("Steve Bush Bash bish","B.","Ru","ri") eq "Steve Rush Rush Rush");
@@ -697,7 +672,7 @@ while trying to match the argument list '(exodus::var, bool)'
 	assert(var("00000041000000610000003000000031000000390000004B0000004B").iconv("HEX8") eq "Aa019KK");
 
 	//doesnt accept FMs etc yet
-	//assert(var("FF"^FM^"00").iconv("HEX").outputl() eq ("00FF"^FM^"00FF"));
+	//assert(var("FF"^FM^"00").iconv("HEX") eq ("00FF"^FM^"00FF"));
 	assert(var("FF"^FM^"00").iconv("HEX2").oconv("HEX2") eq "");
 	//anything invalid returns empty string
 	assert(var("XF").iconv("HEX").oconv("HEX") eq "");
@@ -736,7 +711,7 @@ while trying to match the argument list '(exodus::var, bool)'
 
 	var xyz;
 	//xyz=xyz;
-	printl("test catching MVexceptions");
+	printl("\nTest catching MVexceptions");
 	try {
 		//runtime errors
 		var x1=x1^=1;
@@ -824,7 +799,6 @@ while trying to match the argument list '(exodus::var, bool)'
 
 	//check times around noon and midnight round trip ok
 	for (var ii=0; ii<=61 ; ++ii)
-		//assert(var(ii).output("START=").oconv("MTHS").output(" OCONV=").iconv("MTHS").outputl(" ICONV=") eq ii);
 		assert(var(ii).oconv("MTHS").iconv("MTHS") eq ii);
 	for (var ii=43200-61; ii<=43200+61 ; ++ii)
 		assert(var(ii).oconv("MTHS").iconv("MTHS") eq ii);
