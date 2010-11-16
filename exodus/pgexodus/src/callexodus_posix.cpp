@@ -41,8 +41,8 @@ bool callexodus(const char* serverid, const char* request, const int nrequestbyt
 
 	/*prepare a socket*/
     int s;
-    int newsock;
-    int fromlen;
+    //int newsock;
+    //int fromlen;
     s = socket(AF_UNIX, SOCK_STREAM, 0);
 
 	/*connect to the socket or fail*/
@@ -72,7 +72,8 @@ bool callexodus(const char* serverid, const char* request, const int nrequestbyt
 	//return 0;
 
 	/*get response*/
-	if (read(s,response,BUFSIZE)<0)
+	//warning converting ssize_t to int
+	if ((*nresponsebytes=read(s,response,BUFSIZE))<0)
 	{
 		sprintf(response,"pgexodus failure '%d' reading socket '%s'",errno,socketpath.c_str());
 		return 0;

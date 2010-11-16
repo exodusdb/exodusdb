@@ -34,7 +34,6 @@ Comments about style:
 		Exodus's "goto" cannot jump over "var" statements or into/out of subroutines some code refactoring
 		may be still be required during porting.
 	
-/*
 usage
 
 list ads brand_code brand_name with brand_code \"XYZ\"
@@ -488,7 +487,7 @@ phraseinit:
 		}
 
 	} else if (word eq "BREAK-ON") {
-		breakcolns.splicer(1, 0, coln + 1 ^ FM);
+		breakcolns.splicer(1, 0, (coln + 1) ^ FM);
 		breakoptions.splicer(1, 0, FM);
 		nbreaks += 1;
 		breakonflag = 1;
@@ -612,7 +611,7 @@ phraseinit:
 			for (var ii = 1; ii <= nn; ii++) {
 				tt = dictrec.extract(3, ii);
 				var f10=dictrec.extract(10);
-				if (f10=="" or f10 and tt.length() > f10)
+				if (f10=="" or (f10 and tt.length() > f10))
 					dictrec.replacer(10, tt.length());
 			};//ii;
 
@@ -1103,7 +1102,7 @@ subroutine process_all_records()
 
 	if (html)
 		tx ^= "<p style=\"text-align:center\">";
-	tx ^= FM ^ recn + 0 ^ " record";
+	tx ^= FM ^ (recn + 0) ^ " record";
 	if (recn ne 1)
 		tx ^= "s";
 	if (html)
@@ -1536,7 +1535,7 @@ subroutine printbreaks()
 			tx ^= tr;
 			if (lastblockn)
 				tx ^= " style=\"cursor:pointer\" onclick=\"toggle(B" ^ lastblockn ^ ")\"";
-			if (detsupp < 2 or nbreaks > 1 and leveln > 1)
+			if (detsupp < 2 or (nbreaks > 1 and leveln > 1))
 				tx ^= " style=\"font-weight:bold\"";
 			tx ^= ">";
 		}

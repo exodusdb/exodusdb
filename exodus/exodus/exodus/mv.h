@@ -1013,9 +1013,10 @@ private:
 	//was in pimpl
 	//all mutable because asking for a string can create it from an integer and vice versa
 	mutable std::wstring var_mvstr;
-	mutable wchar_t var_mvtyp;
 	mutable mvint_t var_mvint;
 	mutable double var_mvdbl;
+	//initialise type last
+	mutable wchar_t var_mvtyp;
 
 	void createString() const;
 
@@ -1031,7 +1032,8 @@ private:
 	var oconv_HEX(const int ioratio) const;
 
 	var iconv_D(const wchar_t* conversion) const;
-	var iconv_MT(const wchar_t* conversion) const;
+	//var iconv_MT(const wchar_t* conversion) const;
+	var iconv_MT() const;
 	var iconv_MD_MC(const wchar_t* conversion) const;
 	var iconv_HEX(const int ioratio) const;
 

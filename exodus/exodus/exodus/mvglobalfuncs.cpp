@@ -230,7 +230,7 @@ DLL_PUBLIC var osshellread(const var& command)
 //for now returns nothing since popen cannot write and tell success
 DLL_PUBLIC void osshellread(var& readstr, const var& command)
 {
-	command.osshellread();
+	readstr=command.osshellread();
 }
 
 //example: osshellwrite(command,inputforcommand);
@@ -1072,7 +1072,7 @@ DLL_PUBLIC var listindexes(const var& filename)
 //one argument returns the contents
 DLL_PUBLIC var osgetenv(const var& name)
 {
-	var temp="";
+	var temp=L"";
 	temp.osgetenv(name);
 	return temp;
 }
@@ -1160,7 +1160,7 @@ int exodus_main(int exodus__argc, char *exodus__argv[], MvEnvironment& mv)
 	//needs to go after various exodus definitions
 	for (int ii=0; ii<exodus__argc; ++ii)
 	{
-		var word=exodus__argv[ii];
+		var word=var(exodus__argv[ii]);
 		if (ii == 0)
 		{
 			word=word.field2(SLASH,-1);

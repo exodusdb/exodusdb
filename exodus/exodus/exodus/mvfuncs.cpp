@@ -28,7 +28,9 @@ THE SOFTWARE.
 #define MV_NO_NARROW
 
 //C4530: C++ exception handler used, but unwind semantics are not enabled. 
+#ifdef _MSC_VER
 #pragma warning (disable: 4530)
+#endif
 
 #include <iostream> //cin and cout
 #include <cmath> //for floor
@@ -58,7 +60,7 @@ var var::version() const
 
 bool var::eof() const
 {
-	THISIS(L"bool var::eof() const")
+	//THISIS(L"bool var::eof() const")
 	//THISISDEFINED()
 
 	return (std::cin.eof());
@@ -78,6 +80,9 @@ bool var::input(const var& prompt, const int nchars)
 		std::cout<<std::flush;
 	}
 	return input();
+
+	//evade warning: unused parameter
+	if (nchars) {};
 }
 
 bool var::input()
@@ -133,7 +138,7 @@ void var::abort(const var& text) const
 
 bool var::assigned() const
 {
-	THISIS(L"bool var::assigned() const")
+	//THISIS(L"bool var::assigned() const")
 
 	//treat undefined as unassigned
 	//undefined is a state where we are USING the variable before its contructor has been called!
@@ -148,7 +153,7 @@ bool var::assigned() const
 
 bool var::unassigned() const
 {
-	THISIS(L"bool var::unassigned() const")
+	//THISIS(L"bool var::unassigned() const")
 
 	//see explanation above in assigned
 	//THISISDEFINED()
@@ -1516,11 +1521,11 @@ var var::execute() const
 
 var var::debug() const
 {
-	THISIS(L"var var::debug() const")
+	//THISIS(L"var var::debug() const")
 
 	std::cout<<"var::debug()"<<std::endl<<std::flush;
 	//"good way to break into the debugger by causing a seg fault"
-    //*(int *)0 = 0;
+    // *(int *)0 = 0;
 	//throw var(L"Debug Statement");
 	throw MVDebug();
 	return L"";
@@ -1528,7 +1533,7 @@ var var::debug() const
 
 var var::debug(const var& var1) const
 {
-	THISIS(L"var var::debug(const var& var1) const")
+	//THISIS(L"var var::debug(const var& var1) const")
 
 	std::wcout<<L"var::debug()"<<std::endl<<std::flush;
 	//good way to break into the debugger by causing a seg fault
@@ -1540,11 +1545,14 @@ var var::debug(const var& var1) const
 	#endif
 
 	return L"";
+
+	//evade warning: unused parameter var1
+	if (var1){};
 }
 
 var var::logoff() const
 {
-	THISIS(L"var var::logoff() const")
+	//THISIS(L"var var::logoff() const")
 	//THISISSTRING("var.logoff()")
 
 	std::cout<<"var::logoff not implemented yet "<<std::endl;
@@ -1773,7 +1781,7 @@ var var::exp() const
 
 var var::at(const int column) const
 {
-	THISIS(L"var var::at(const int column) const")
+	//THISIS(L"var var::at(const int column) const")
 
 	//*this is not used
 
@@ -1819,7 +1827,7 @@ var var::at(const int column) const
 
 var var::at(const int column,const int row) const
 {
-	THISIS(L"var var::at(const int column,const int row) const")
+	//THISIS(L"var var::at(const int column,const int row) const")
 
 	//*this is not used
 
@@ -1833,7 +1841,7 @@ var var::at(const int column,const int row) const
 
 var var::getcursor() const
 {
-	THISIS(L"var var::getcursor() const")
+	//THISIS(L"var var::getcursor() const")
 
 	//*this is not used
 
@@ -1905,7 +1913,11 @@ var var::xlate(const var& filename,const var& fieldno, const wchar_t* mode) cons
 	if (!record.read(file,var_mvstr))
 	{
 		//if record doesnt exist then "", or original key if mode is "C"
-	 if (mode==L"C")
+
+         //gcc warning: comparison with string literal results in unspecified behaviour
+	 //if (mode==L"C")
+
+	 if (*mode==*L"C")
 			record=*this;
 		else
 			record=L"";

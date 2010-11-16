@@ -129,9 +129,9 @@ var::var(const var& copiedvar)
 //would just use initializers since cannot fail
 //(except cannot seem to init wstring from wchar_t!)
 var::var(const wchar_t char1)
-: var_mvtyp(pimpl::MVTYPE_STR)
 {
-	var_mvstr=char1;	
+	var_mvstr=char1;
+	var_mvtyp=pimpl::MVTYPE_STR;
 }
 
 //ctor for wide c_str
@@ -145,7 +145,7 @@ var::var(const wchar_t* cstr1)
 	//protect against null pointer
 	if (cstr1==0)
 	{
-		THISIS(L"var::var(const wchar_t* cstr1)")
+		//THISIS(L"var::var(const wchar_t* cstr1)")
 		throw MVInvalidPointer(L"Null pointer in var(const char*)");
 	}
 
@@ -156,49 +156,43 @@ var::var(const wchar_t* cstr1)
 //ctor for std::wstring
 //just use initializers since cannot fail
 var::var(const std::wstring& str1)
-	:
-	var_mvtyp(pimpl::MVTYPE_STR),
-	var_mvstr(str1)
+	: var_mvstr(str1)
+	, var_mvtyp(pimpl::MVTYPE_STR)
 {}
 
 //ctor for std::string
 //just use initializers since cannot fail
 var::var(const std::string& str1)
-	:
-	var_mvtyp(pimpl::MVTYPE_STR),
-	var_mvstr(wstringfromUTF8((UTF8*)str1.data(),(int)str1.length()))
+	: var_mvstr(wstringfromUTF8((UTF8*)str1.data(),(int)str1.length()))
+	, var_mvtyp(pimpl::MVTYPE_STR)
 {}
 
 //ctor for bool
 //just use initializers since cannot fail
 var::var(const bool bool1)
-	:
-	var_mvtyp(pimpl::MVTYPE_INT),
-	var_mvint(bool1)
+	: var_mvint(bool1)
+	, var_mvtyp(pimpl::MVTYPE_INT)
 {}
 
 //ctor for int
 //just use initializers since cannot fail
 var::var(const int int1)
-	:
-	var_mvtyp(pimpl::MVTYPE_INT),
-	var_mvint(int1)
+	: var_mvint(int1)
+	, var_mvtyp(pimpl::MVTYPE_INT)
 {}
 
 //ctor for long long
 //just use initializers since cannot fail
 var::var(const long long longlong1)
-	:
-	var_mvtyp(pimpl::MVTYPE_INT),
-	var_mvint(longlong1)
+	: var_mvint(longlong1)
+	, var_mvtyp(pimpl::MVTYPE_INT)
 {}
 
 //ctor for double
 //just use initializers since cannot fail
 var::var(const double double1)
-	:
-	var_mvtyp(pimpl::MVTYPE_DBL),
-	var_mvdbl(double1)
+	: var_mvdbl(double1)
+	, var_mvtyp(pimpl::MVTYPE_DBL)
 {}
 
 //EXPLICIT AND AUTOMATIC CONVERSIONS
@@ -354,7 +348,7 @@ var& var::operator = (const var& rhs)
 //The assignment operator should always return a reference to *this.
 var& var::operator = (const int int1)
 {
-	THISIS(L"var& var::operator = (const int int1)")
+	//THISIS(L"var& var::operator = (const int int1)")
 	//protect against unlikely syntax as follows:
 	//var undefinedassign=undefinedassign=123';
 	// !!RISK NOT CHECKING TO SPEED THINGS UP SINCE SEEMS TO WORK IN MSVC AND GCC
@@ -370,7 +364,7 @@ var& var::operator = (const int int1)
 //The assignment operator should always return a reference to *this.
 var& var::operator = (const double double1)
 {
-	THISIS(L"var& var::operator = (const double double1)")
+	//THISIS(L"var& var::operator = (const double double1)")
 	//protect against unlikely syntax as follows:
 	//var undefinedassign=undefinedassign=9.9';
 	// !!RISK NOT CHECKING TO SPEED THINGS UP SINCE SEEMS TO WORK IN MSVC AND GCC
@@ -1498,8 +1492,8 @@ MVInvalidPointer	::MVInvalidPointer	(const var& var1)	: MVException(L"MVInvalidP
 MVDBException		::MVDBException		(const var& var1)	: MVException(L"MVDBException:"				^ var1	){}
 MVNotImplemented	::MVNotImplemented	(const var& var1)	: MVException(L"MVNotImplemented:"			^ var1	){}
 MVDebug				::MVDebug			(const var& var1)	: MVException(L"MVDebug"					^ var1	){}
-MVStop				::MVStop			(const var& var1)	: MVException(L"MVStop:"							){}
-MVAbort				::MVAbort			(const var& var1)	: MVException(L"MVAbort"							){}
+MVStop				::MVStop			(const var& var1)	: MVException(L"MVStop:"					^ var1 	){}
+MVAbort				::MVAbort			(const var& var1)	: MVException(L"MVAbort"					^ var1	){}
 
 MVArrayDimensionedZero	::MVArrayDimensionedZero	()					: MVException(L"MVArrayDimensionedZero:"			){}
 MVArrayIndexOutOfBounds	::MVArrayIndexOutOfBounds	(const var& var1)	: MVException(L"MVArrayIndexOutOfBounds:"	^ var1	){}

@@ -61,7 +61,7 @@ var::var(const char* cstr1)
 	//protect against null pointer
 	if (cstr1==0)
 	{
-		THISIS(L"var::var(const char* cstr1)")
+		//THISIS(L"var::var(const char* cstr1)")
 		throw MVInvalidPointer(L"Null pointer in var(const char*)");
 	}
 

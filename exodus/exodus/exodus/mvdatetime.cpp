@@ -340,7 +340,7 @@ var var::oconv_D(const wchar_t* conversion) const
 	int yeardigits=4;
 	bool yearfirst=false;
 	bool dayfirst=false;
-	bool leadingzeros=true;
+	//bool leadingzeros=true;
 	wchar_t sepchar=L' ';
 
 	//1st character must be D otherwise no conversion

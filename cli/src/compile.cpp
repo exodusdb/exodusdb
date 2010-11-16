@@ -73,8 +73,17 @@ program()
 
                 compiler="g++";
 
+/*
+http://stackoverflow.com/questions/386220/hide-defined-but-not-used-warning-with-gcc
+-Wno-unused-function
+-Wno-unused-label
+-Wno-unused-parameter i.e. function argument
+-Wno-unused-value	sadly doesnt seem to alert for unused var objects
+-Wno-unused (=all of the above)
+also versions without no-
+*/
                 //basic compiler options
-                basicoptions=" -Wall -Wextra -ansi";
+                basicoptions=" -Wall -Wextra -ansi -Wno-unused-parameter";
                 //following will result in 2 byte wchar in linux
                 //but all exodus libs also need to be in this format too
                 //leave as 4 byte for now to avoid forcing additional compilation option on exodus users
@@ -257,7 +266,7 @@ program()
                                 }
                         }
                 }
-                if (exoduspath.substr(-1,1) ne SLASH)
+                if (exoduspath[-1] ne SLASH)
                         exoduspath^=SLASH;
                 var exodusbin=exoduspath;
                 if (not osfile(exodusbin^"exodus.dll")) {
@@ -459,7 +468,7 @@ program()
                 //check/add the default file extension
                 var fileext=srcfilename.field2(".",-1).lcase();
                 if (src_extensions.locateusing(fileext," ")) {
-                        filebase=srcfilename.splice(-len(fileext)-1,999999,"");
+                        filebase=srcfilename.splice(-len(fileext)-1,"");
 
                         //skip non-compilable files
                 } else if (noncompilable_extensions.locateusing(fileext," ")) {
@@ -467,7 +476,7 @@ program()
                         continue;
 
                         //skip backup files
-                } else if (fileext.substr(-1,1)=="~") {
+                } else if (fileext[-1]=="~") {
                         continue;
 
                         //pickup default file if it exists - even if base file also exists
@@ -565,7 +574,7 @@ program()
 										int level=0;
 										int charn;
 										for (charn=1;charn<=len(funcargsdecl);++charn) {
-											var ch=funcargsdecl.substr(charn,1);
+											var ch=funcargsdecl[charn];
 											if (ch eq ")") {
 												if (level eq 0)
 													break;
@@ -686,10 +695,10 @@ var inclusion=
                         //build up list of loadtime libraries required by linker
                         if (loadtimelinking and word1 eq "#include") {
                                 var word2=line.field(" ",2);
-                                if (word2.substr(1,1)==DQ) {
+                                if (word2[1]==DQ) {
                                         word2=word2.substr(2,word2.len()-2);
                                         if (word2.substr(-2,2) eq ".h")
-                                                word2.splicer(-2,2,"");
+                                                word2.splicer(-2,"");
                                         //libnames^=" "^word2;
                                         if (compiler=="cl")
                                                 linkoptions^=" "^word2^".lib";
@@ -847,7 +856,7 @@ var inclusion=
 										//MANIFEST:NO option
 										//was try to copy ms manifest so that the program can be run from anywhere?
 										if (SLASH eq "\\") {
-											if (true or isprogram and manifest) {
+											if (true or (isprogram and manifest)) {
 												if (not oscopy(objfilename^".manifest",outputpathandfile^".manifest"))
 													{}//printl("ERROR: Failed to "^cmd);
 											}

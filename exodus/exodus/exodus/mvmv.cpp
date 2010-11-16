@@ -46,7 +46,7 @@ namespace exodus
 //var.matparse(dimarray2)
 var dim::parse(const var& var1)
 {
-	THISIS(L"var dim::parse(const var& var1)")
+	//THISIS(L"var dim::parse(const var& var1)")
 	//ISSTRING(var1)
 
 	(*this).redim(var1.count(FM_)+1);
@@ -1608,10 +1608,12 @@ var var::operator[](const int charno) const
 	//despite it being unusual
 	//since it only has to be done later anyway
 	if (charno==0)
+	{
 		if (nchars)
 			return var_mvstr[0];
 		else
 			return L"";
+	}
 
 	//have to check this later so check it now
 	if (!nchars)

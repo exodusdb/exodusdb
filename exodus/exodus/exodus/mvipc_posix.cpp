@@ -35,7 +35,7 @@ namespace exodus {
 void respondToRequests(int sock, const std::string& socketpath, ExodusFunctorBase& exodusfunctorbase)
 {
 
-	unsigned int priority;
+	//unsigned int priority;
 	socklen_t fromlen;
 
 	char chRequest[BUFSIZE];
@@ -171,7 +171,7 @@ int MVipc(const int environmentn, var& pgconnparams)
 
 
 	int sock;
-	int fromlen;
+	//int fromlen;
 	sock = socket(AF_UNIX, SOCK_STREAM, 0);
 
 	/*grant owner/group/others rw access to the socket*/

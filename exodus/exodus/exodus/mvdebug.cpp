@@ -138,7 +138,7 @@ var backtrace()
 	//int status;
 	char path[1024];
 
-	var binaryfilename=EXECPATH.field(" ",1);
+	var binaryfilename=EXECPATH2.field(" ",1);
 	if (binaryfilename == binaryfilename.convert("/\\:",""))
 		binaryfilename="`which " ^ binaryfilename ^ "`";
 	var oscmd="addr2line -e " ^ binaryfilename.quote() ^ " " ^ internaladdresses;
@@ -146,7 +146,7 @@ var backtrace()
 	//oscmd.outputl();
 
 #ifdef TRACING
-	printf("EXECPATH = %s\n",EXECPATH.tostring().c_str());
+	printf("EXECPATH = %s\n",EXECPATH2.tostring().c_str());
 	printf("executing %s\n",oscmd.tostring().c_str());
 #endif
 	/* Open the command for reading. */
