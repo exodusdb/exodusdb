@@ -201,6 +201,8 @@ function accrest() {
 
 function main()
 {
+	iconv("23 59 59","MT").outputl();
+	printl(iconv("12:00","MT"));
 
 	// cannot connectlocal in main and thread until pipes are numbered
 	tss_environmentns.reset(new int(0));

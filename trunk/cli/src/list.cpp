@@ -1727,11 +1727,17 @@ subroutine getmark(in mode, in html, out mark)
 {
 	mark="";
 	return;
+	//prevent "warning unused" until properly implemented
+	mode;
+	html;
 }
 
 subroutine addunits(in newunits, out totunits)
 {
 	return;
+	//prevent "warning unused" until properly implemented
+	newunits;
+	totunits;
 }
 
 subroutine mssg(in msg)
@@ -1744,11 +1750,15 @@ subroutine fsmsg()
 	printl("fsmsg():");
 }
 
-subroutine msg2(in msg, in options, out buffer, in params)
+subroutine msg2(in msg, in options, io buffer, in params)
 {
 	printl(msg, " ", options, " ", params);
 	if (options.index("R"))
 		stop("msg2()");
+	return;
+	//prevent "warning unused" until properly implemented
+	buffer;
+	params;
 }
 
 subroutine dicti2a(out dictrec)

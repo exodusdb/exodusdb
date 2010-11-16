@@ -87,5 +87,5 @@ bool callexodus(const char* serverid, const char* request, const int nrequestbyt
 
 }// extern "C"
 
-#endif //EXODUS_IPC_BOOST
+#endif //EXODUS_IPC_POSIX
 

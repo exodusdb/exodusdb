@@ -50,16 +50,18 @@ THE SOFTWARE.
 //capture global SENTENCE in wrapper function exodus_main
 //main calls main2 so that opening { is required after program() macro
 //TODO get exodus_main to call main2 directly - need to pass it a function pointer
-//int exodus_main(int exodus__argc, char *exodus__argv[]); 
+//sadly, passing argc argv causes gcc and -Wall -Wextra to give "warning: unused parameter ‘exodus__argc’"
+//so dont pass them ... they are included in mv SENTENCE/COMMAND/OPTION somehow anyway.
+//void main2(int exodus__argc, char *exodus__argv[], MvEnvironment& mv)
 #define program() \
-void main2(int exodus__argc, char *exodus__argv[], MvEnvironment& mv); \
+void main2(MvEnvironment& mv); \
 int main(int exodus__argc, char *exodus__argv[]) \
 { \
 	MvEnvironment mv; \
 	exodus_main(exodus__argc, exodus__argv, mv); \
 	try \
 	{ \
-		main2(exodus__argc, exodus__argv, mv); \
+		main2(mv); \
 	} \
 	catch (MVException except) \
 	{ \
@@ -69,7 +71,7 @@ int main(int exodus__argc, char *exodus__argv[]) \
 		stop(0); \
 	} \
 } \
-void main2(int exodus__argc, char *exodus__argv[], MvEnvironment& mv)
+void main2(MvEnvironment& mv)
 
 //allow pseudo pick syntax
 #define sentence() SENTENCE

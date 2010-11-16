@@ -231,6 +231,9 @@ private:
 	void gethtml(in mode, io letterhead, in companycode) {
 		letterhead="";
 		return;
+		//prevent "warning unused" until properly implemented
+		mode;
+		companycode;
 	}
 
 	void readcss(io css) {
