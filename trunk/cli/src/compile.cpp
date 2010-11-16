@@ -74,7 +74,7 @@ program()
                 compiler="g++";
 
                 //basic compiler options
-                basicoptions=" -Wall -ansi";
+                basicoptions=" -Wall -Wextra -ansi";
                 //following will result in 2 byte wchar in linux
                 //but all exodus libs also need to be in this format too
                 //leave as 4 byte for now to avoid forcing additional compilation option on exodus users

@@ -694,6 +694,14 @@ var var::splice(const int start1,const int length,const var& newstr) const
 	return var(*this).splicer(start1,length,newstr);
 }
 
+var var::splice(const int start1,const var& newstr) const
+{
+	THISIS(L"var var::splice(const int start1,const var& newstr) const")
+	THISISSTRING()
+
+	return var(*this).splicer(start1,newstr);
+}
+
 var& var::splicer(const int start1,const int length,const var& newstr)
 {
 	THISIS(L"var& var::splicer(const int start1,const int length,const var& newstr)")
@@ -731,6 +739,32 @@ var& var::splicer(const int start1,const int length,const var& newstr)
 	}
 
 	var_mvstr.replace(start1b-1,lengthb,newstr.var_mvstr);
+
+	return *this;
+
+}
+
+var& var::splicer(const int start1, const var& newstr)
+{
+	THISIS(L"var& var::splicer(const int start1, const var& newstr)")
+	THISISSTRING()
+	ISSTRING(newstr)
+
+	//prepare a new var
+	//functionmode var newmv=var(var_mvstr);
+	//proceduremode
+
+//TODO make sure start and length work like REVELATION and HANDLE NEGATIVE LENGTH!
+	int start1b;
+	if (start1>0) start1b=start1;
+	else if (start1<0)
+    {
+        start1b=int(var_mvstr.length())+start1+1;
+        if (start1b<1) start1b=1;
+    }
+	else start1b=1;
+
+	var_mvstr.replace(start1b-1,var_mvstr.length(),newstr.var_mvstr);
 
 	return *this;
 
