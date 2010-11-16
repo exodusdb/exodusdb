@@ -127,7 +127,7 @@ bool var::load(const var& libraryname) const
 
 	//save the libraryname
 	//cannot use *this because load is marked const
-	//*this="xx";
+	// *this="xx";
 	//identical in copy ctor and load and call
 	var_mvtyp=libraryname.var_mvtyp;
 	var_mvstr=libraryname.var_mvstr;
@@ -194,7 +194,7 @@ var var::call(const wchar_t* libraryname, const char* functionname) const
 
 	//save the libraryname
 	//cannot use *this because load is marked const
-	//*this="xx";
+	// *this="xx";
 	//identical in copy ctor and load and call
 	var var1=libraryname;
 	var_mvtyp=var1.var_mvtyp;
@@ -227,7 +227,7 @@ var var::call(const wchar_t* libraryname, const char* functionname) const
 
 	//save the functionname
 	//cannot use *this because load is marked const
-	//*this="xx";
+	// *this="xx";
 	//identical in copy ctor and load and call
 	var1.fieldstorer(L"*",2,1,var(functionname));
 	var_mvtyp=var1.var_mvtyp;

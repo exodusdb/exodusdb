@@ -397,7 +397,7 @@ bool var::connect(const var& conninfo)
 //(assumes accurate programming by system programmers in exodus mvdb routines)
 void* var::connection() const
 {
-	THISIS(L"void* var::connection() const")
+	//THISIS(L"void* var::connection() const")
 
 	//provides jit connection and caching
 
@@ -540,7 +540,7 @@ void var::close()
 
 bool var::readv(const var& filehandle, const var& key, const int fieldno)
 {
-	THISIS(L"bool var::readv(const var& filehandle, const var& key, const int fieldno)")
+	//THISIS(L"bool var::readv(const var& filehandle, const var& key, const int fieldno)")
 
 	if (!read(filehandle,key))
 		return false;
@@ -761,7 +761,7 @@ void var::unlock(const var& key) const
 
 void var::unlockall() const
 {
-	THISIS(L"void var::unlockall() const")
+	//THISIS(L"void var::unlockall() const")
 
 	//check if any locks
 	LockTable* locktable=tss_locktables.get();
@@ -984,12 +984,12 @@ bool var::write(const var& filehandle, const var& key) const
 	ISSTRING(filehandle)
 	ISSTRING(key)
 
-	const wchar_t* mode=L"write()";
+//	const wchar_t* mode=L"write()";
 
-    const char* paramValues[2];
-    int         paramLengths[2];
-    int         paramFormats[2];
-    //uint32_t    binaryIntVal;
+	const char* paramValues[2];
+	int         paramLengths[2];
+	int         paramFormats[2];
+	//uint32_t    binaryIntVal;
 
 	std::string key2=key.tostring();
 	std::string data2=(*this).tostring();
@@ -1082,7 +1082,7 @@ bool var::updaterecord(const var& filehandle,const var& key) const
 	ISSTRING(filehandle)
 	ISSTRING(key)
 
-	const wchar_t* mode=L"updaterecord()";
+//	const wchar_t* mode=L"updaterecord()";
 
     const char* paramValues[2];
     int         paramLengths[2];
@@ -1149,7 +1149,7 @@ bool var::insertrecord(const var& filehandle,const var& key) const
 	ISSTRING(filehandle)
 	ISSTRING(key)
 
-	const wchar_t* mode=L"insertrecord()";
+//	const wchar_t* mode=L"insertrecord()";
 
 	const char* paramValues[2];
     int         paramLengths[2];
@@ -1412,6 +1412,9 @@ inline var fileexpression(const var& mainfilename, const var& filename, const va
 {
 	var expression=filename ^ L"." ^ keyordata;
 	return expression;
+
+	//evade warning: unused parameter mainfilename
+	if (false && mainfilename) {}
 
 	//if you dont use STRICT in the postgres function declaration/definitions then NULL parameters do not abort functions
 
@@ -2045,7 +2048,7 @@ bool var::readnext(var& key, var& valueno) const
 	THISIS(L"bool var::readnext(var& key, var& valueno) const")
 	THISISSTRING()
 
-	PGconn* thread_pgconn=(PGconn*) connection();
+	//PGconn* thread_pgconn=(PGconn*) connection();
 	PGresultptr pgresult;
 	if (!readnextx(var_mvstr, pgresult))
 	{

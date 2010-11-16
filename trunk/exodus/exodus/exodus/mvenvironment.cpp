@@ -237,6 +237,9 @@ lock:
 	//should not get here
 	return 0;
 
+	//evade warning: unused parameter
+	if (filename || recordx) {}
+
 }
 
 bool MvEnvironment::unlockrecord(const var& filename, const var& file0, const var& key) const
@@ -260,6 +263,8 @@ bool MvEnvironment::unlockrecord(const var& filename, const var& file0, const va
 
 	return 1;
 
+	//evade warning: unused parameter
+	if (filename) {}
 }
 
 
@@ -308,7 +313,7 @@ var MvEnvironment::capitalise(const var& str0, const var& mode0, const var& word
 			if (inquotes) {
 				inquotes = tt != inquotes;
 			}else{
-				if (tt == DQ && string2.count(DQ) > 1 || tt == L"\'" && string2.count(L"\'") > 1) {
+				if (tt == DQ && (string2.count(DQ) > 1 || tt == L"\'") && string2.count(L"\'") > 1) {
 					inquotes = tt;
 				}else{
 					if (wordseps.index(tt, 1)) {
@@ -514,6 +519,9 @@ void MvEnvironment::msgbase(const var& msg, const var& options, const var& respo
 	std::wcout<<msg;
 	return;
 
+	//evade warning: unused parameter
+	if (options || response || params) {}
+
 }
 
 var MvEnvironment::handlefilename(const var& handle) const
@@ -598,7 +606,7 @@ void MvEnvironment::fsmsg() const
 
 }
 
-var MvEnvironment::sysvar(const var& var1,const var& var2,const var& mv3,const var& var4)
+var MvEnvironment::sysvar(const var& var1,const var& var2,const var& var3,const var& var4)
 {
 
 	std::wcout<<L"sysvar() do nothing:";
@@ -606,6 +614,8 @@ var MvEnvironment::sysvar(const var& var1,const var& var2,const var& mv3,const v
 //	cin>>reply;
 	return L"";
 
+	//evade warning: unused parameter
+	if (var1 || var2 || var3 || var4) {}
 }
 
 void MvEnvironment::setprivilege(const var& var1) {
@@ -624,7 +634,7 @@ bool MvEnvironment::openfile(const var& filename0, var& file) const
 		throw MVException(L"filename0");
 	var filename=filename0;
 	var xx;
-	
+
 	var nomsg = filename[1] == L"*";
 	if (nomsg)
 		filename.splicer(1, 1, L"");
@@ -679,6 +689,8 @@ tryagain:
 	return 0;
 
 
+	//evade warning: unused parameter
+	if (similarfilename || autocreate) {}
 }
 
 var MvEnvironment::decide(const var& question, const var& options) const
@@ -736,6 +748,10 @@ inp:
 void MvEnvironment::savescreen(var& origscrn, var& origattr) const
 {
 	std::wcout<<L"MvEnvironment::savescreen not implemented"<<std::endl;
+
+	//evade warning: unused parameter
+	if (origscrn || origattr) {}
+
 }
 
 // Checks keyboard buffer (stdin) and returns key
@@ -764,6 +780,10 @@ int MvEnvironment::keypressed(int delayusecs) const
     }
 */
     return 0;
+
+	//evade warning: unused parameter
+	if (delayusecs) {}
+
 }
 
 bool MvEnvironment::esctoexit() const
@@ -793,12 +813,18 @@ var MvEnvironment::otherusers(const var& param)
 {
 	std::wcout<<L"MvEnvironment::otherusers not implemented yet";
 	return var(L"");
+
+	//evade warning: unused parameter
+	if (param) {}
 }
 
 var MvEnvironment::otherdatasetusers(const var& param)
 {
 	std::wcout<<L"MvEnvironment::otherdatausers not implemented yet";
 	return var(L"");
+
+	//evade warning: unused parameter
+	if (param) {}
 }
 
 bool MvEnvironment::lockrecord(const var& filename, const var& file, const var& keyx) const
@@ -818,7 +844,7 @@ bool MvEnvironment::lockrecord(const var& filename, const var& file, const var& 
 	//0 fail immediately (eg looking for next batch/nextkey)
 	//9 wait for 9 seconds
 	//- wait for a default number of seconds
-	//* wait infinite number of seconds
+	// * wait infinite number of seconds
 	//if index(file,'message',1) else de bug
 	int waitsecs=waitsecs0;
 
@@ -834,6 +860,8 @@ lock:
 		return false;
 	}
 
+	//evade warning: unused parameter
+	if (filename || recordx) {}
 	return true;
 
 }
@@ -844,6 +872,9 @@ void MvEnvironment::osbreadx(var& str1, const var& filehandle, const var& filena
 	//park the high characters in the low place
 	str1.osbread(filehandle,startoffset,length).converter(EXTERNALCHARS, INTERNALCHARS);
 	return;
+
+	//evade warning: unused parameter
+	if (filename) {}
 }
 
 void MvEnvironment::oswritex(const var& str1, const var& filename) const
@@ -868,6 +899,8 @@ void MvEnvironment::osbwritex(const var& str1, const var& filehandle, const var&
 
 	return;
 
+	//evade warning: unused parameter
+	if (filename) {}
 }
 
 bool MvEnvironment::authorised(const var& task0)
@@ -915,7 +948,7 @@ bool MvEnvironment::authorised(const var& task0, var& msg, const var& defaultloc
 	task = task.trim();
 
 	msg = L"";
-	//**call note(' ':task)
+	// **call note(' ':task)
 
 	if (task.substr(1, 2) == L"..") {
 		// call note(task:'')
@@ -1410,6 +1443,9 @@ var MvEnvironment::xmlquote(const var& string0) const
 
 var MvEnvironment::loginnet(const var& dataset, const var& username, var& cookie, var& msg)
 {
+
+	//evade warning: unused parameter
+	if (false && dataset) {}
 
 	var menuid;
 	var usern;

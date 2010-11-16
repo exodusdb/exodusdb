@@ -73,8 +73,8 @@ ExodusFunctorBase::ExodusFunctorBase()
 ExodusFunctorBase::ExodusFunctorBase(MvEnvironment& mv)
 : mv_(&mv)
 , libraryname_("")
-, functionname_("")
 , plibrary_(NULL)
+, functionname_("")
 , pfunction_(NULL)
 , pobject_(NULL)
 , pmemberfunction_(NULL)
@@ -173,18 +173,18 @@ bool ExodusFunctorBase::init(const char* libraryname, const char* functionname, 
 
 ExodusFunctorBase::ExodusFunctorBase()
 //TODO optimise by only initialise one and detect usage on that only
-: plibrary_(NULL)
+: mv_(NULL)
+, plibrary_(NULL)
 , pfunction_(NULL)
 , pobject_(NULL)
 , pmemberfunction_(NULL)
-, mv_(NULL)
 {};
 
 ExodusFunctorBase::ExodusFunctorBase(const std::string libname, const std::string funcname)
-: libraryname_(libname)
-, functionname_(funcname)
-, mv_(NULL)
+: mv_(NULL)
+, libraryname_(libname)
 , plibrary_(NULL)
+, functionname_(funcname)
 , pfunction_(NULL)
 , pobject_(NULL)
 , pmemberfunction_(NULL)
@@ -210,7 +210,7 @@ ExodusFunctorBase::~ExodusFunctorBase()
 bool ExodusFunctorBase::checkload()
 {
 	if (plibrary_!=0)
-		true;
+		return true;
 
 	//find the library or fail
 	if (not openlib())

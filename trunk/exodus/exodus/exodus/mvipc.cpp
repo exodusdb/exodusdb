@@ -144,7 +144,7 @@ void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsec
 	//int totlength=int(*prequest);
 	int totlength=**plength;
 	prequest+=sizeof(int);
-	
+
 	//var reply=L"NEOSYS_IPC_ERROR: ";
 	response="NEOSYS_IPC_ERROR: ";
 
@@ -153,9 +153,12 @@ void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsec
 	{
 		response="";
 		#if TRACING >= 2
-			std::wclog<<L"*";
+			//std::wclog<<L"*";
+			std::wclog<<L"mvipc: request size is zero";
 		#endif
 	}
+
+	//TODO resolve warning: comparison between signed and unsigned integer expressions
 	else if (totlength!=request_size)
 	{
 		var reply=response^L" Only "^int(request_size)^L" bytes read. Should be "^totlength;

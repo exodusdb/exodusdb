@@ -66,19 +66,6 @@ var var::iconv(const wchar_t* convstr) const
 	if (var_mvtyp&pimpl::MVTYPE_STR && var_mvstr.length()==0)
 		return L"";
 
-	if (convstr==L"MT")
-	{
-		var hours=field(L":",1);
-		if (!hours.isnum()) return *this;
-		var mins=field(L":",2);
-		if (!mins.isnum()) return *this;
-		var secs=field(L":",3);
-		if (!secs.isnum()) return *this;
-
-		return hours*3600+mins*60+secs;
-
-	}
-
 	//REMOVE the remove logic out of the L# R# and T# here
 
 	var part;
@@ -146,7 +133,8 @@ throw MVException(L"iconv(MD/MC) not implemented yet");
 
 						//MT
 						case L'T':
-							output ^= part.iconv_MT(convstr);
+							//output ^= part.iconv_MT(convstr);
+							output ^= part.iconv_MT();
 							break;
 
 						//MX number to hex (not string to hex)
@@ -197,7 +185,8 @@ throw MVNotImplemented(L"iconv('MX')");
 
 				//[TIME
 				case L'T':
-					return iconv_MT(L"MT");
+					//return iconv_MT(L"MT");
+					return iconv_MT();
 					break;
 			}
 

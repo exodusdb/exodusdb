@@ -237,7 +237,8 @@ bool checknotabsoluterootfolder(std::wstring dirname)
 
 //ICONV_MT can be moved back to mvioconv.cpp if it stops using regular expressions
 //regular expressions for ICONV_MT
-var var::iconv_MT(const wchar_t* conversion) const
+//var var::iconv_MT(const wchar_t* conversion) const
+var var::iconv_MT() const
 {
 	//ignore everything else and just get first three groups of digits "99 99 99"
 	//remove leading and trailing non-digits and replace internal strings of non-digits with single space
@@ -534,7 +535,8 @@ var var::osshellread() const
 
 	//we are going to throw away the process termination status
 	//because we are going to return the output text
-	int result=pclose(cmd);
+	//int result=
+	pclose(cmd);
 
     return output;
 
@@ -562,7 +564,7 @@ var var::osshellwrite(const var& writestr) const
 
 var var::suspend() const
 {
-	THISIS(L"var var::suspend() const")
+	//THISIS(L"var var::suspend() const")
 
 	breakoff();
 	//use dummy to avoid warning in gcc4 "warning: ignoring return value of int system(const char*), declared with attribute warn_unused_result"
@@ -570,13 +572,16 @@ var var::suspend() const
 	breakon();
 
 	return L"";
+
+	//evade warning: unused variable 'dummy'
+	if (dummy) {};
 }
 
 void var::osflush() const
 {
-	THISIS(L"void var::osflush() const")
+	//THISIS(L"void var::osflush() const")
 
-	//wcout<<L"var::flush not implemented yet"<<endl;
+	std::wcout<<L"var::flush not implemented yet"<<std::endl;
 	return;
 }
 
@@ -812,7 +817,9 @@ var& var::osbread(const var& osfilehandle, const int startoffset, const int size
 	}
 
 	//allow negative offset to read from the back of the file
-	unsigned int readfrom=startoffset;
+	//!cannot be unsigned and allow negative
+	//unsigned int readfrom=startoffset;
+	int readfrom=startoffset;
 	if (readfrom<0) {
 		readfrom+=maxsize;
 		//but not so negative that it reads from before the beginning of the file
@@ -1087,35 +1094,37 @@ var var::oslist(const var& path, const var& spec, const int mode) const
 	THISISDEFINED()
 	ISSTRING(path)
 	ISSTRING(spec)
-	
-    //returns an fm separated list of files and/or folders
 
-    //http://www.boost.org/libs/filesystem/example/simple_ls.cpp
+	//returns an fm separated list of files and/or folders
 
-    bool filter=false;
-    //boost::wregex re;
-    boost::regex re;
-    if (spec)
-    {
-     try
-     {
-         // Set up the regular expression for case-insensitivity
-         //re.assign(toTstring(spec).c_str(), boost::regex_constants::icase);
-         re.assign(spec.tostring().c_str(), boost::regex_constants::icase);
-         filter=true;
-     }
-	 catch (boost::regex_error& e)
-     {
-         std::wcout << spec.towstring() << L" is not a valid regular expression: \""
-         << e.what() << L"\"" << std::endl;
-         return L"";
-     }
-    }
+	//http://www.boost.org/libs/filesystem/example/simple_ls.cpp
+
+	bool filter=false;
+	//boost::wregex re;
+	boost::regex re;
+	if (spec)
+	{
+		try
+		{
+			// Set up the regular expression for case-insensitivity
+			//re.assign(toTstring(spec).c_str(), boost::regex_constants::icase);
+			re.assign(spec.tostring().c_str(), boost::regex_constants::icase);
+			filter=true;
+		}
+		catch (boost::regex_error& e)
+		{
+			std::wcout << spec.towstring() << L" is not a valid regular expression: \""
+			<< e.what() << L"\"" << std::endl;
+			return L"";
+		}
+	}
 
 	bool getfiles=true;
 	bool getfolders=true;
-	if (mode==1) getfolders=false;
-	else if (mode==2) getfiles=false;
+	if (mode==1)
+		getfolders=false;
+	else if (mode==2)
+		getfiles=false;
 
 	var filelist=L"";
 
@@ -1124,7 +1133,7 @@ var var::oslist(const var& path, const var& spec, const int mode) const
 	//boostfs::wpath full_path( boostfs::initial_path<boostfs::wpath>());
     //full_path = boostfs::system_complete(boostfs::wpath( toTstring(path), boostfs::native ));
 	boostfs::path full_path( boostfs::initial_path());
-    full_path = boostfs::system_complete(boostfs::path( path.tostring().c_str(), boostfs::native ));
+	full_path = boostfs::system_complete(boostfs::path( path.tostring().c_str(), boostfs::native ));
 
 	//quit if it isnt a folder
 	if (!boostfs::is_directory(full_path))
@@ -1138,8 +1147,8 @@ var var::oslist(const var& path, const var& spec, const int mode) const
           dir_itr != end_iter;
           ++dir_itr )
     {
-      try
-      {
+	try
+	{
 
 		//dir_itr->path().leaf()  changed to dir_itr->leaf() in three places
 		//also is_directory(dir_itr->status()) changed to is_directory(*dir_itr)
@@ -1147,36 +1156,39 @@ var var::oslist(const var& path, const var& spec, const int mode) const
 		//http://www.boost.org/doc/libs/1_33_1/libs/filesystem/doc/index.htm
 
         //skip unwanted items
-		if (filter&&!boost::regex_match(dir_itr->leaf(), re)) continue;
+		if (filter&&!boost::regex_match(dir_itr->leaf(), re))
+			continue;
 
 		//using .leaf instead of .status provided in boost 1.34 .. but does it work/efficiently
-        //if ( boostfs::is_directory( dir_itr->status() ) )
-        if ( boostfs::is_directory( *dir_itr ) )
-        {
-            if (getfolders)
+        	//if ( boostfs::is_directory( dir_itr->status() ) )
+		if ( boostfs::is_directory( *dir_itr ) )
+		{
+			if (getfolders)
 				filelist^=FM ^ dir_itr->leaf();
-        }
-        //is_regular is only in boost > 1.34
-        //else if ( boostfs::is_regular( dir_itr->status() ) )
-        else// if ( boostfs::is_regular( dir_itr->status() ) )
-        {
-            if (getfiles)
+		}
+		//is_regular is only in boost > 1.34
+		//else if ( boostfs::is_regular( dir_itr->status() ) )
+		else// if ( boostfs::is_regular( dir_itr->status() ) )
+		{
+			if (getfiles)
 				filelist^=FM ^ dir_itr->leaf();
-        }
-        //else
-        //{
-        //  //++other_count;
-        //  //std::wcout << dir_itr->path().leaf() << L" [other]\n";
-        //}
+		}
+		//else
+		//{
+		//  //++other_count;
+		//  //std::wcout << dir_itr->path().leaf() << L" [other]\n";
+		//}
+      	}
+      	catch ( const std::exception & ex )
+      	{
+		//evade warning: unused variable
+		if (false) if (ex.what()) {};
 
-      }
-      catch ( const std::exception & ex )
-      {
-          ex;
-        //++err_count;
-        //std::wcout << dir_itr->path().leaf() << L" " << ex.what() << std::endl;
-      }
-	}
+		//++err_count;
+		//std::wcout << dir_itr->path().leaf() << L" " << ex.what() << std::endl;
+      	}
+
+    }
 
 	//delete first separator
 	//NB splice is 1 based

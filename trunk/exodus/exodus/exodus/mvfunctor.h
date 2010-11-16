@@ -160,25 +160,32 @@ virtual ~ExodusFunctorBase();
 public:
 	bool init(const char* libraryname, const char* functionname);
 	bool init(const char* libraryname, const char* functionname, MvEnvironment& mv);
-	pExodusProgramBase pobject_;
-	pExodusProgramBaseMemberFunction pmemberfunction_;
-
-	//only public for rather hacked mvipc getResponseToRequest()
-	mutable MvEnvironment* mv_;
 
 private:
-	void* plibrary_;
-	std::string libraryname_;
-	std::string functionname_;
-	std::string libraryfilename_;
-
 	bool openlib();
 	void closelib();
 	bool openfunc();
 
 protected:
 	bool checkload();
+
+public:
+	//only public for rather hacked mvipc getResponseToRequest()
+	mutable MvEnvironment* mv_;
+
+private:
+	std::string libraryname_;
+	std::string libraryfilename_;
+	void* plibrary_;
+
+	std::string functionname_;
+
+protected:
 	ExodusProgramBaseCreateDeleteFunction pfunction_;
+
+public:
+	pExodusProgramBase pobject_;
+	pExodusProgramBaseMemberFunction pmemberfunction_;
 
 };
 

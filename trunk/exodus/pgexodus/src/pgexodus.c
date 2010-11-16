@@ -48,7 +48,7 @@ extern "C"
 
 #include "postgres.h"
 #include "fmgr.h"
-//#include "utils/geo_decls.h"
+/*#include "utils/geo_decls.h"*/
 #include <utils/timestamp.h>
 int4 pg_atoi(char*,int4,int4);
 
@@ -184,6 +184,14 @@ drop FUNCTION exodus_extract_datetime(bytea, int4, int4, int4) cascade;
 
 */
 
+/* evade the following warnings from GETINPUTSATRTLENGTH macro
+  but it isnt clear why the warning doesnt come in all places that the macro is called
+pgexodus.c: In function 'exodus_extract_sort': (GETINPUTSTARTLENGTH)
+pgexodus.c:679: warning: 'input' may be used uninitialized in this function
+pgexodus.c: In function 'exodus_extract_text': (GETINPUTSTARTLENGTH)
+pgexodus.c:462: warning: 'input' may be used uninitialized in this function
+*/
+
 #define GETINPUTSTARTLENGTH\
 	text *input;\
 	int32 outstart;\
@@ -195,6 +203,7 @@ drop FUNCTION exodus_extract_datetime(bytea, int4, int4, int4) cascade;
 	{\
 		outstart=0;\
 		outlen=0;\
+		input=0; /* evade warning: 'input' may be used unitialized */\
 	}\
 	else\
 	{\
@@ -288,7 +297,7 @@ exodus_call(PG_FUNCTION_ARGS)
 //?	*lengthpoint++;
 
 	//length of tablename
-	//*appendpoint=(int32)(VARSIZE(tablename)-VARHDRSZ);
+	// *appendpoint=(int32)(VARSIZE(tablename)-VARHDRSZ);
 	**lengthpoint=(int32)(VARSIZE(tablename)-VARHDRSZ);
 	appendpoint+=sizeof(int32);
 
@@ -300,7 +309,7 @@ exodus_call(PG_FUNCTION_ARGS)
 	appendpoint+=VARSIZE(tablename)-VARHDRSZ;
 
 	//length of dictkey
-	//*appendpoint=(int32)(VARSIZE(dictkey)-VARHDRSZ);
+	// *appendpoint=(int32)(VARSIZE(dictkey)-VARHDRSZ);
 	**lengthpoint=(int32)(VARSIZE(dictkey)-VARHDRSZ);
 	appendpoint+=sizeof(int32);
 
@@ -312,7 +321,7 @@ exodus_call(PG_FUNCTION_ARGS)
 	appendpoint+=VARSIZE(dictkey)-VARHDRSZ;
 
 	//length of datakey
-	//*appendpoint=(int32)(VARSIZE(datakey)-VARHDRSZ);
+	// *appendpoint=(int32)(VARSIZE(datakey)-VARHDRSZ);
 	**lengthpoint=(int32)(VARSIZE(datakey)-VARHDRSZ);
 	appendpoint+=sizeof(int32);
 
@@ -324,7 +333,7 @@ exodus_call(PG_FUNCTION_ARGS)
 	appendpoint+=VARSIZE(datakey)-VARHDRSZ;
 
 	//length of data
-	//*appendpoint=(int32)(VARSIZE(data)-VARHDRSZ);
+	// *appendpoint=(int32)(VARSIZE(data)-VARHDRSZ);
 	**lengthpoint=(int32)(VARSIZE(data)-VARHDRSZ);
 	appendpoint+=sizeof(int32);
 
@@ -336,12 +345,12 @@ exodus_call(PG_FUNCTION_ARGS)
 	appendpoint+=VARSIZE(data)-VARHDRSZ;
 
 	//value number
-	//*appendpoint=(int32)(valueno);
+	// *appendpoint=(int32)(valueno);
 	**lengthpoint=(int32)(valueno);
 	appendpoint+=sizeof(int32);
 
 	//subvalue number
-	//*appendpoint=(int32)(subvalueno);
+	// *appendpoint=(int32)(subvalueno);
 	**lengthpoint=(int32)(subvalueno);
 	appendpoint+=sizeof(int32);
 
@@ -372,13 +381,13 @@ exodus_call(PG_FUNCTION_ARGS)
 		pfree(presponse);
 		PG_RETURN_NULL();
 	}
-	
+
 	//extract(VARDATA(input), VARSIZE(input)-VARHDRSZ, fieldno, valueno, subvalueno, &outstart, &outlen);
 
 	//elog(WARNING, "exodus_call: palloc'ing");
 	//prepare a new output
 	output = (bytea*) palloc(VARHDRSZ+nresponsebytes+4);
-	
+
 	//set the complete size of the output
 	//elog(WARNING, "exodus_call: initialising palloc'ed structure");
 	SET_VARSIZE(output,VARHDRSZ+nresponsebytes);
@@ -386,8 +395,9 @@ exodus_call(PG_FUNCTION_ARGS)
 	//copy the input to the output
 	//elog(WARNING, "exodus_call: copying response to palloc'ed");
 	memcpy((void *) VARDATA(output),	// destination
-		   (void *) (int32)(presponse),	// starting from
-		   nresponsebytes);		// how many bytes
+//		(void *) (int)(presponse),	// starting from
+		(void *) (presponse),		// starting from
+		nresponsebytes);		// how many bytes
 
 
 	//elog(WARNING, "exodus_call: freeing temp data");
@@ -406,7 +416,7 @@ exodus_extract_bytea(PG_FUNCTION_ARGS)
 {
 
 
-	//very similar to GETINPUTSTARTLENGTH macro but bytea instead of text
+	/*very similar to GETINPUTSTARTLENGTH macro but bytea instead of text*/
 
 	int32 outstart;
 	int32 outlen;
@@ -421,7 +431,7 @@ exodus_extract_bytea(PG_FUNCTION_ARGS)
 	input = PG_GETARG_BYTEA_P(0);
 
 	fieldno = PG_GETARG_INT32(1);
-	
+
 	valueno = PG_GETARG_INT32(2);
 
 	subvalueno = PG_GETARG_INT32(3);
@@ -570,7 +580,7 @@ exodus_extract_date(PG_FUNCTION_ARGS)
 	//pick date 0 is 31/12/1967
 	//pg date 0 is 31/12/1999
 	PG_RETURN_INT32(pickdate-11689);
-	
+
 }
 
 PG_FUNCTION_INFO_V1(exodus_extract_time);
@@ -607,7 +617,7 @@ exodus_extract_time(PG_FUNCTION_ARGS)
 
 	//convert the c str to an int
 	picktime=pg_atoi(intstr,4,'.');
-	
+
     #define SIZEOFINTERVAL 12
 	//prepare a new output
 	//text	   *output = (text *) palloc(VARSIZE(input));
@@ -655,7 +665,7 @@ exodus_extract_datetime(PG_FUNCTION_ARGS)
 	datetimestr[outlen]='\0';
 
 	//convert the c str to an double
-	
+
 #ifdef HAVE_INT64_TIMESTAMP
     //number of microseconds before or after midnight 1/1/2000?
 	pickdatetime=(long long int)(atof(datetimestr)-11689)*86400000000LL;
@@ -677,6 +687,7 @@ Datum
 exodus_extract_sort(PG_FUNCTION_ARGS)
 {
 	GETINPUTSTARTLENGTH
+
 
 /*
 	if (!outlen)
