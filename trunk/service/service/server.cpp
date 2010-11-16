@@ -596,7 +596,7 @@ stopper:
 				//override min/max times
 				//if @username='neosys' and trim(@station)='sbcp1800' then
 
-				if (charx == L"B" || bakdows.index(dow, 1) && timex > minbaktime && timex < maxbaktime) {
+				if (charx == L"B" || ( bakdows.index(dow, 1) && timex > minbaktime && timex < maxbaktime)) {
 
 					if (testdata)
 						var(L"OFF").perform();
