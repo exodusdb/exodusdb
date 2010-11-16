@@ -839,6 +839,7 @@ public:
 	var& converter(const var& oldchars,const var& newchars);
 	var& swapper(const var& oldstr,const var& newstr,const var& options=L"");
 	var& splicer(const int start1,const int length,const var& str);
+	var& splicer(const int start1,const var& str);
 	var& quoter();
 	var& unquoter();
 	var& ucaser();
@@ -858,6 +859,7 @@ public:
 	var convert(const var& oldchars,const var& newchars) const;
 	var swap(const var& oldstr,const var& newstr,const var& options=L"") const;
 	var splice(const int start1,const int length,const var& str) const;
+	var splice(const int start1,const var& str) const;
 	var quote() const;
 	var unquote() const;
 	var ucase() const;
