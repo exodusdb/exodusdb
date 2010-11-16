@@ -25,6 +25,8 @@ THE SOFTWARE.
 
 #include <iostream>
 
+#include <boost/scoped_array.hpp>
+
 #include <exodus/mv.h>
 #include <exodus/mvutf.h>
 #include <exodus/mvexceptions.h>
@@ -129,8 +131,12 @@ std::wstring wstringfromUTF8(const UTF8* sourcestart, const size_t sourcelength)
 
 	if (sizeof(wchar_t)==4)
 	{
-		UTF32* targetbuffer=new(UTF32[sourcelength]);
-		UTF32* targetbufferptr=targetbuffer;
+//ALN:ML		UTF32* targetbuffer=new(UTF32[sourcelength]);
+		boost::scoped_array<UTF32> UTF32buffer( new UTF32[sourcelength]);
+		UTF32* targetbuffer = UTF32buffer.get();
+
+		UTF32* targetbufferptr = targetbuffer;
+
 		//TODO check if ok
 		ConversionResult conversionresult=ConvertUTF8toUTF32 (
 			&sourcestart, sourcestart+sourcelength,
@@ -138,20 +144,22 @@ std::wstring wstringfromUTF8(const UTF8* sourcestart, const size_t sourcelength)
 		//TODO check if ok
 		if (conversionresult)
 		{
-			delete targetbuffer;
+//ALN:ML			delete targetbuffer;
 			std::cerr<<"UTF Conversion Error - UTF32 to wstring"<<std::endl;
 			throw MVException("UTF Conversion Error - UTF32 to wstring");
 		}
 		std::wstring result((wchar_t*)targetbuffer,targetbufferptr-targetbuffer);
 
-		delete targetbuffer;
+//ALN:ML		delete targetbuffer;
 
 		return result;
 	}
 	else if (sizeof(wchar_t)==2)
 	{
 		//allow for max 4 bytes per single utf8 byte (utf16 max bytes is four)
-		UTF16* targetbuffer=new(UTF16[sourcelength*4]);
+		boost::scoped_array<UTF16> UTF16buffer( new UTF16[sourcelength]);
+//ALN:ML		UTF16* targetbuffer=new(UTF16[sourcelength*4]);
+		UTF16* targetbuffer = UTF16buffer.get();
 		UTF16* targetbufferptr=targetbuffer;
 		//TODO check if ok
 		ConversionResult conversionresult=ConvertUTF8toUTF16 (
@@ -160,13 +168,13 @@ std::wstring wstringfromUTF8(const UTF8* sourcestart, const size_t sourcelength)
 		//TODO check if ok
 		if (conversionresult)
 		{
-			delete targetbuffer;
+//ALN:ML			delete targetbuffer;
 			std::cerr<<"UTF Conversion Error - UTF8 to wstring"<<std::endl;
 			throw MVException("UTF Conversion Error - UTF8 to wstring");
 		}
 		std::wstring result((wchar_t*)targetbuffer,targetbufferptr-targetbuffer);
 
-		delete targetbuffer;
+//ALN:ML		delete targetbuffer;
 
 		return result;
 	}
@@ -198,7 +206,10 @@ std::string stringfromUTF16(const UTF16* sourcestart, const size_t sourcelength)
 	//actually we will probably restrict ourselves to unicode code points 0000-FFFF
 	//in order to avoid any four byte UTF16 characters
 	//in order to ensure indexing characters in UTF16 strings can be lightning fast and proper
-	UTF8* targetbuffer=new UTF8[sourcelength*4];
+
+//ALN:ML	UTF8* targetbuffer=new UTF8[sourcelength*4];
+	boost::scoped_array<UTF8> UTF8buffer( new UTF8[sourcelength*4]);
+	UTF8* targetbuffer = UTF8buffer.get();
 	UTF8* targetbufferptr=targetbuffer;
 	//TODO check if ok
 	ConversionResult conversionresult=ConvertUTF16toUTF8 (
@@ -207,14 +218,14 @@ std::string stringfromUTF16(const UTF16* sourcestart, const size_t sourcelength)
 	//TODO check if ok
 	if (conversionresult)
 	{
-		delete [] targetbuffer;
+//ALN:ML		delete [] targetbuffer;
 		//std::cout<<" UTF16>>8ERROR ";
 		std::cerr<<"UTF Conversion Error - UTF16 TO UTF8"<<std::endl;
 		throw MVException("UTF Conversion Error - UTF16 TO UTF8");
 	}
 	std::string result((char*)targetbuffer,targetbufferptr-targetbuffer);
 
-	delete [] targetbuffer;
+//ALN:ML	delete [] targetbuffer;
 	
 	return result;
 }
@@ -232,7 +243,10 @@ std::string stringfromUTF32(const UTF32* sourcestart, const size_t sourcelength)
 	//actually we will probably restrict ourselves to unicode code points 0000-FFFF
 	//in order to avoid any four byte UTF16 characters
 	//in order to ensure indexing characters in UTF16 strings can be lightning fast and proper
-	UTF8* targetbuffer=new(UTF8[sourcelength*4]);
+
+//ALN:ML	UTF8* targetbuffer=new(UTF8[sourcelength*4]);
+	boost::scoped_array<UTF8> UTF8buffer( new UTF8[sourcelength*4]);
+	UTF8* targetbuffer = UTF8buffer.get();
 	UTF8* targetbufferptr=targetbuffer;
 	//TODO check if ok
 	ConversionResult conversionresult=ConvertUTF32toUTF8 (
@@ -241,7 +255,7 @@ std::string stringfromUTF32(const UTF32* sourcestart, const size_t sourcelength)
 	//TODO check if ok
 	if (conversionresult)
 	{
-		delete targetbuffer;
+//ALN:ML		delete targetbuffer;
 		//std::cout<<" UTF32>>8ERROR ";
 		std::cerr<<"UTF Conversion Error - UTF32 TO UTF8 "<< conversionresult<<std::endl;
 		//throw MVException("UTF Conversion Error - UTF32 TO UTF8");
@@ -249,7 +263,7 @@ std::string stringfromUTF32(const UTF32* sourcestart, const size_t sourcelength)
 	}
 	std::string result((char*)targetbuffer,targetbufferptr-targetbuffer);
 
-	delete targetbuffer;
+//ALN:ML	delete targetbuffer;
 	
 	return result;
 }
