@@ -125,6 +125,8 @@ bool MvEnvironment::init(const int threadno)
 	this->SECURITY=L"";
 	this->LISTACTIVE=0;
 
+	this->RECORD=L"";	// to avoid RECORD(1) throw exception because var is not string
+
 	return true;
 
 }
