@@ -20,14 +20,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-//boost wpath is only in boost 1.34 but we hardcoded path at the moment which
+//boost wpath is only in boost v1.34+ but we hardcoded path at the moment which
 //prevents unicode in osfilenames etc
 
 #ifndef MVOS_H
 #define MVOS_H
 
-//EXCELLENT
+//EXCELLENT!
 //http://www.regular-expressions.info/
+//http://www.regular-expressions.info/unicode.html 
 #include <boost/regex.hpp>
 #include <boost/scoped_array.hpp>
 
@@ -246,10 +247,12 @@ var var::iconv_MT() const
 	
 	//var time=(*this).swap( L"^\\D+|\\D+$", L"", L"r").swap( L"\\D+", L" ", L"r");
 
-static boost::wregex surrounding_nondigits_regex(L"^\\D+|\\D+$",boost::regex::extended|boost::regex_constants::icase);
-static boost::wregex inner_nondigits_regex(L"\\D+",boost::regex::extended|boost::regex_constants::icase);
-var time=var(boost::regex_replace(toTstring((*this)),surrounding_nondigits_regex, L""));
-time=var(boost::regex_replace(toTstring((time)),inner_nondigits_regex, L" "));
+	static boost::wregex surrounding_nondigits_regex(L"^\\D+|\\D+$",boost::regex::extended|boost::regex_constants::icase);
+
+	static boost::wregex inner_nondigits_regex(L"\\D+",boost::regex::extended|boost::regex_constants::icase);
+
+	var time=var(boost::regex_replace(toTstring((*this)),surrounding_nondigits_regex, L""));
+	time=var(boost::regex_replace(toTstring((time)),inner_nondigits_regex, L" "));
 
 	int hours=time.field(L" ",1).toInt();
 	int mins=time.field(L" ",2).toInt();
@@ -268,6 +271,128 @@ time=var(boost::regex_replace(toTstring((time)),inner_nondigits_regex, L" "));
 
 	return inttime;
 
+}
+
+//OCONV_MC can be moved back to mvioconv.cpp if it stops using regular expressions
+//regular expressions for ICONV_MC
+var& var::oconv_MC(const wchar_t* conversionchar)
+{
+	//conversionchar arrives pointing to 3rd character (eg A in MCA)
+
+
+	//abort if no 3rd char
+	if (*conversionchar==L'\0')
+		return (*this);
+
+	//form of unicode specific regular expressions
+	//http://www.regular-expressions.info/unicode.html
+
+	//availability of unicode regular expressions
+	//http://www.boost.org/doc/libs/1_35_0/libs/regex/doc/html/boost_regex/unicode.html
+
+	/*
+	\w=alphanumeric characters, \W all the rest
+	\d=decimal characters, \D all the rest
+
+	but there is no such code to indicate ALPHABETIC (NON_DECIMAL) characters only (i.e. \w but not \d)
+	Imagine we also had the codes \a alphabetic characters, \A all the rest
+	\a = [^\W\d] ... which is characters which are a) "NOT NON-WORD CHARACTERS" and b) "NOT DECIMAL DIGITS"
+	\A = [\W\d]  ... which is a) NON-WORD CHARACTERS and b) decimal digits
+
+	if boost has icu then \w and \d includes letters and decimal digits from all languages
+
+	123456|abcdefghi|!"$%^&* ()-+[]
+	dddddd|DDDDDDDDD|DDDDDDDDDDDDDD all characters divided into \d (decimal)		and \D (non-decimals)
+	AAAAAA|aaaaaaaaa|AAAAAAAAAAAAAA all characters divided into \a (alphabetic)		and \A (non-alphabetic)
+	wwwwww|wwwwwwwww|WWWWWWWWWWWWWW all characters divided into \w (alphanumeric)	and \W (non-alphanumeric)
+	*/
+
+	/* unicode regex extensions
+	http://userguide.icu-project.org/strings/regexp
+	http://www.regular-expressions.info/unicode.html
+	sometimes unicode extension for regular expressions have \pL for \a and [^\pL] for \A
+	Match a word character. Word characters are [\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}].
+	l=lowercase u=uppercase t=titlecase o=other Nd=decimal digit
+	\N{UNICODE CHARACTER NAME}	Match the named character.
+	\p{UNICODE PROPERTY NAME}	Match any character with the specified Unicode Property.
+	\P{UNICODE PROPERTY NAME}	Match any character not having the specified Unicode Property.
+	*/
+
+	static const boost::wregex
+		digits_regex		(L"\\d*"		,boost::regex::extended), // \d numeric
+		alpha_regex			(L"[^\\W\\d]*"	,boost::regex::extended), // \a alphabetic
+		alphanum_regex		(L"\\w*"		,boost::regex::extended), // \w alphanumeric
+		non_digits_regex	(L"[^\\d]*"		,boost::regex::extended), // \D non-numeric
+		non_alpha_regex		(L"[\\W\\d]*"	,boost::regex::extended), // \A non-alphabetic
+		non_alphanum_regex	(L"\\W*"		,boost::regex::extended); // \W non-alphanumeric
+
+	//negate if /
+	if (*conversionchar==L'/')
+	{
+		++conversionchar;
+		switch (*conversionchar)
+		{
+			// MC/N return everything except digits i.e. remove all digits 0123456789
+			case 'N':
+			{
+				var_mvstr=boost::regex_replace(toTstring((*this)),digits_regex, L"");
+				break;
+			}
+
+			// MC/A return everything except "alphabetic" i.e remove all "alphabetic"
+			case 'A':
+			{
+				var_mvstr=boost::regex_replace(toTstring((*this)),alpha_regex, L"");
+				break;
+			}
+			// MC/B return everything except "alphanumeric" remove all "alphanumeric"
+			case 'B':
+			{
+				var_mvstr=boost::regex_replace(toTstring((*this)),alphanum_regex, L"");
+				break;
+			}
+		}
+		return *this;
+	}
+
+	//http://www.boost.org/doc/libs/1_37_0/libs/regex/doc/html/boost_regex/ref/regex_replace.html
+	//boost::regex_replace
+
+	switch (*conversionchar)
+	{
+		// MCN return only digits i.e. remove all non-digits
+		case 'N':
+		{
+			var_mvstr=boost::regex_replace(toTstring((*this)),non_digits_regex, L"");
+			break;
+		}
+		// MCA return only "alphabetic" i.e. remove all "non-alphabetic"
+		case 'A':
+		{
+			var_mvstr=boost::regex_replace(toTstring((*this)),non_alpha_regex, L"");
+			break;
+		}
+		// MCB return only "alphanumeric" i.e. remove all "non-alphanumeric"
+		case 'B':
+		{
+			var_mvstr=boost::regex_replace(toTstring((*this)),non_alphanum_regex, L"");
+			break;
+		}
+		// MCL to lower case
+		case 'L':
+		{
+			lcaser();
+			break;
+		}
+		// MCU to upper case
+		case 'U':
+		{
+			ucaser();
+			break;
+		}
+	}
+
+	return *this;
 }
 
 //BOOST RANDOM
