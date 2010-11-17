@@ -29,6 +29,7 @@ THE SOFTWARE.
 //EXCELLENT
 //http://www.regular-expressions.info/
 #include <boost/regex.hpp>
+#include <boost/scoped_array.hpp>
 
 //regex.assign("", boost::regex::extended|boost::regex_constants::icase);
 
@@ -670,10 +671,10 @@ bool var::osread(const char* osfilename)
 
 	if (bytesize>0)
 	{
-
-		//new
-		char* memblock;
+/*		char* memblock;
 		memblock = new char [bytesize];
+*/
+		boost::scoped_array<char> memblock( new char [bytesize]);
    		if (memblock==0)
    		{
    			myfile.close();
@@ -681,21 +682,20 @@ bool var::osread(const char* osfilename)
    		}
 
     	myfile.seekg (0, std::ios::beg);
-    	myfile.read (memblock, (unsigned int) bytesize);
+		myfile.read (memblock.get(), (unsigned int) bytesize);
     	myfile.close();
 
 		//for now dont accept UTF8 in order to avoid failure if non-utf characters
 		//var_mvstr=wstringfromUTF8((UTF8*) memblock, (unsigned int) bytesize);
-		std::string tempstr=std::string(memblock, bytesize);
+		std::string tempstr=std::string( memblock.get(), bytesize);
+		//ALN:JFI: actually we could use std::string 'tempstr' in place of 'memblock' by hacking
+		//	.data member and reserve() or resize(), thus avoiding buffer-to-buffer-copying
+
 		var_mvstr=std::wstring(tempstr.begin(),tempstr.end());
 
-		//delete
-    	delete[] memblock;
-
+    	// scoped_array do it: delete[] memblock;
 	}
-
 	return true;
-
 }
 
 bool var::oswrite(const var& osfilename) const
@@ -842,8 +842,11 @@ var& var::osbread(const var& osfilehandle, const int startoffset, const int size
 	//new
 	//wchar_t* memblock;
 	//memblock = new wchar_t [readsize/sizeof(wchar_t)];
+/*
 	char* memblock;
 	memblock = new char [readsize];
+*/
+	boost::scoped_array<char> memblock( new char [readsize]);
 	if (memblock==0)
 	{//TODO NEED TO THROW HERE
 		myfile.close();
@@ -852,7 +855,7 @@ var& var::osbread(const var& osfilehandle, const int startoffset, const int size
 
 	//myfile.seekg (startoffset/sizeof(wchar_t), std::ios::beg);
 	myfile.seekg (startoffset, std::ios::beg);
-	myfile.read (memblock, readsize);
+	myfile.read (memblock.get(), readsize);
 	myfile.close();
 
 	//var_mvstr=std::wstring(memblock,readsize/sizeof(wchar_t));
@@ -865,15 +868,11 @@ var& var::osbread(const var& osfilehandle, const int startoffset, const int size
 	//std::string tempstr=std::string(memblock, readsize);
 	//following does a conversion depending on the locale
 	//var_mvstr=std::wstring(tempstr.begin(),tempstr.end());
-	var_mvstr=wstringfromchars(memblock, readsize);
+	var_mvstr=wstringfromchars(memblock.get(), readsize);
 
-	//delete
-	delete[] memblock;
-
+	//delete[] memblock;
 //	var_mvtyp=pimpl::MVTYPE_STR;
-
 	return *this;
-
 }
 
 void var::osclose() const
