@@ -123,12 +123,17 @@ var var::iconv(const wchar_t* convstr) const
 					//check second character
 					switch (*conversionchar)
 					{
-						//MD or MC
-						case L'D':
-						case L'C':
 
-throw MVException(L"iconv(MD/MC) not implemented yet");
-//							output ^= part.iconv_MD_MC(convstr);
+						//MD
+						case L'D':
+
+							throw MVException(L"iconv(MD) not implemented yet");
+//							output ^= part.iconv_MD(convstr);
+							break;
+
+						//MC iconv is same as oconv!
+						case L'C':
+							output ^= part.oconv_MC(conversionchar);
 							break;
 
 						//MT
@@ -139,7 +144,7 @@ throw MVException(L"iconv(MD/MC) not implemented yet");
 
 						//MX number to hex (not string to hex)
 						case L'X':
-throw MVNotImplemented(L"iconv('MX')");
+							throw MVNotImplemented(L"iconv('MX')");
 							std::wostringstream ss;
 							ss <<std::hex<<std::uppercase<<part.round().toInt();
 							output ^= ss.str();
@@ -173,7 +178,7 @@ throw MVNotImplemented(L"iconv('MX')");
 					//if (!isnum())
 					//	return *this;
 
-					//return oconv_MD_MC(convstr);
+					//return oconv_MD(convstr);
 					//TODO workout options after [NUMBER,
 					return *this;
 					break;
@@ -373,7 +378,7 @@ var var::oconv_T(const var& format) const
 
 }
 
-var var::oconv_MD_MC(const wchar_t* conversion) const
+var var::oconv_MD(const wchar_t* conversion) const
 {
 
 	//http://www.d3ref.com/index.php?token=basic.masking.function
@@ -679,6 +684,10 @@ var var::oconv(const wchar_t* conversion) const
 				if (part.var_mvtyp&pimpl::MVTYPE_STR && part.var_mvstr.length()==0)
 					{}
 
+				//MC
+				else if (*conversionchar==L'C')
+					output ^= part.oconv_MC(++conversionchar);
+
 				//non-numeric are left unconverted
 				else if (!part.isnum())
 					output ^= part;
@@ -690,12 +699,11 @@ var var::oconv(const wchar_t* conversion) const
 					//check second character
 					switch (*conversionchar)
 					{
-						//MD or MC
+						//MD
 						case L'D':
-						case L'C':
 						case L'R':
 
-							output ^= part.oconv_MD_MC(conversion);
+							output ^= part.oconv_MD(conversion);
 							break;
 
 						//MT
@@ -739,7 +747,7 @@ var var::oconv(const wchar_t* conversion) const
 					//if (!isnum())
 					//	return *this;
 
-					//return oconv_MD_MC(conversion);
+					//return oconv_MD(conversion);
 					//TODO workout options after [NUMBER,
 					return *this;
 					break;

@@ -123,6 +123,8 @@ int var::localeAwareCompare(const std::wstring& str1, const std::wstring& str2) 
 	}
 
 #elif defined(_MACOS)
+    // order strings the same way as native applications do, and also respects
+    // the "Order for sorted lists" setting in the International preferences panel
 	const CFStringRef thisString=CFStringCreateWithCharactersNoCopy(kCFAllocatorDefault,
 		reinterpret_cast<const UniChar *>(str1.data()),str1.length(),kCFAllocatorNull);
 	const CFStringRef otherString=CFStringCreateWithCharactersNoCopy(kCFAllocatorDefault,
@@ -146,62 +148,4 @@ int var::localeAwareCompare(const std::wstring& str1, const std::wstring& str2) 
 }
 
 } // namespace exodus
-
-/*
-int QString::localeAwareCompare_helper(const QChar *data1, int length1,
-                                       const QChar *data2, int length2)
-{
-    // do the right thing for null and empty
-    if (length1 == 0 || length2 == 0)
-        return ucstrcmp(data1, length1, data2, length2);
-
-#if defined(Q_OS_WIN32) || defined(Q_OS_WINCE)
-    int res;
-    QT_WA({
-        const TCHAR* s1 = (TCHAR*)data1;
-        const TCHAR* s2 = (TCHAR*)data2;
-        res = CompareStringW(GetUserDefaultLCID(), 0, s1, length1, s2, length2);
-    } , {
-        QByteArray s1 = toLocal8Bit_helper(data1, length1);
-        QByteArray s2 = toLocal8Bit_helper(data2, length2);
-        res = CompareStringA(GetUserDefaultLCID(), 0, s1.data(), s1.length(), s2.data(), s2.length());
-    });
-
-    switch (res) {
-    case CSTR_LESS_THAN:
-        return -1;
-    case CSTR_GREATER_THAN:
-        return 1;
-    default:
-        return 0;
-    }
-#elif defined (Q_OS_MAC)
-    // Use CFStringCompare for comparing strings on Mac. This makes Qt order
-    // strings the same way as native applications do, and also respects
-    // the "Order for sorted lists" setting in the International preferences
-    // panel.
-    const CFStringRef thisString =
-        CFStringCreateWithCharactersNoCopy(kCFAllocatorDefault,
-            reinterpret_cast<const UniChar *>(data1), length1, kCFAllocatorNull);
-    const CFStringRef otherString =
-		CFStringCreateWithCharactersNoCopy(kCFAllocatorDefault,
-            reinterpret_cast<const UniChar *>(data2), length2, kCFAllocatorNull);
-
-    const int result = CFStringCompare(thisString, otherString, kCFCompareLocalized);
-    CFRelease(thisString);
-    CFRelease(otherString);
-    return result;
-#elif defined(Q_OS_UNIX)
-    // declared in <string.h>
-    int delta = strcoll(toLocal8Bit_helper(data1, length1), toLocal8Bit_helper(data2, length2));
-    if (delta == 0)
-        delta = ucstrcmp(data1, length1, data2, length2);
-    return delta;
-#else
-    return ucstrcmp(data1, length1, data2, length2);
-#endif
-}
-
-*/
-
 

@@ -24,6 +24,7 @@ THE SOFTWARE.
 
 program()
 {
+
         printl("Exodus Copyright (c) 2009 Stephen Bush");
         printl("http://www.opensource.org/licenses/mit-license.php");
 		printl("Using Library Version: ", var().version());

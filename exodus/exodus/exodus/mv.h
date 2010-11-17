@@ -1024,17 +1024,19 @@ private:
 
 	void* connection() const;
 
+	//TODO check if can speed up by returning reference to converted self like MC
 	var oconv_LR(const var& format) const;
 	var oconv_T(const var& format) const;
 	var oconv_D(const wchar_t* conversion) const;
 	var oconv_MT(const wchar_t* conversion) const;
-	var oconv_MD_MC(const wchar_t* conversion) const;
+	var oconv_MD(const wchar_t* conversion) const;
+	var& oconv_MC(const wchar_t* conversion);
 	var oconv_HEX(const int ioratio) const;
 
 	var iconv_D(const wchar_t* conversion) const;
 	//var iconv_MT(const wchar_t* conversion) const;
 	var iconv_MT() const;
-	var iconv_MD_MC(const wchar_t* conversion) const;
+	var iconv_MD(const wchar_t* conversion) const;
 	var iconv_HEX(const int ioratio) const;
 
 	//bool locatex(std::wstring locatestring,)
