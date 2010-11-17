@@ -1268,6 +1268,12 @@ private:
 	dim& init(const var& var1);
 
 	int nrows_, ncols_;
+	// NOTE: trying to implement data_ as boost smart array pointer (boost::scoped_array<var> data_;)
+	// raises warning: as dim is DLL_PUBLIC, boost library should have DLL interface.
+	// Choices: 1) leave memory allocation as is (refuse from scoped_array, or
+	// 2) use pimpl metaphore with slight decrease in performance.
+	// Constructors of dim are very simple, no exception expected between 'new' and return from constructor
+	// As such, choice (1).
 	var* data_;
 	bool initialised_;
 
