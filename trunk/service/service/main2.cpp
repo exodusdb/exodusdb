@@ -93,6 +93,7 @@ function main()
 	{
 		printl("ID=",ID, " RECORD=",RECORD);
 
+//		continue;
 //following requires dict_XUSERS to be a dictionary library something like
 //edic dict_XUSERS
 /*
