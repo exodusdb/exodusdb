@@ -23,9 +23,6 @@ THE SOFTWARE.
 //boost wpath is only in boost v1.34+ but we hardcoded path at the moment which
 //prevents unicode in osfilenames etc
 
-#ifndef MVOS_H
-#define MVOS_H
-
 //EXCELLENT!
 //http://www.regular-expressions.info/
 //http://www.regular-expressions.info/unicode.html 
@@ -80,6 +77,11 @@ namespace boostfs = boost::filesystem;
 #include <exodus/mv.h>
 #include <exodus/mvutf.h>
 #include <exodus/mvexceptions.h>
+
+#ifdef CACHED_HANDLES
+#  include <cstdio>
+#  include "mvhandles.h"
+#endif
 
 //#include "exodus/NullCodecvt.h"//used to prevent wifstream and wofstream widening/narrowing binary input/output to/from internal wchar_t
 
@@ -219,7 +221,9 @@ public:
 static ExodusOnce exodus_once_static;
 
 namespace exodus{
-
+#ifdef CACHED_HANDLES
+static /*TODO: make it threadsafe/threadspecific */ MvHandlesCache h_cache;
+#endif
 bool checknotabsoluterootfolder(std::wstring dirname)
 {
 	//safety - will not rename/remove top level folders
@@ -720,8 +724,6 @@ void var::osflush() const
 	//if (osfilename.var_mvtyp&pimpl::MVTYPE_INT)
 	//	myfile=(std::fstream) var_mvint;
 	//else
-
-
 bool var::osopen(const var& osfilename)
 {
 	THISIS(L"bool var::osopen(const var& osfilename)")
@@ -748,7 +750,6 @@ bool var::osopen(const var& osfilename)
 	fstr.close();
 	return true;
 }
-
 
 //on unix or with iconv we could convert to or any character format
 //for sequential output we could use popen to progressively read and write with no seek facility
@@ -855,6 +856,55 @@ bool var::oswrite(const var& osfilename) const
 
 }
 
+#ifdef CACHED_HANDLES
+void var::osbwrite(const var& osfilehandle, const int startoffset) const
+{
+	THISIS(L"void var::osbwrite(const var& osfilehandle, const int startoffset) const")
+	THISISSTRING()
+	ISSTRING(osfilehandle)
+
+	// Open file, checking for file handle in cache table
+	FILE * h = NULL;
+	if( osfilehandle.var_mvtyp & pimpl::MVTYPE_HANDLE)
+	{
+		h = (FILE *) h_cache.get_handle( (int) osfilehandle.var_mvint);
+		if( h == NULL)		// nonvalid handle
+		{
+			osfilehandle.var_mvint = 0;
+			osfilehandle.var_mvtyp ^= pimpl::MVTYPE_HANDLE;	// clear bit
+		}
+	}
+	if( h == NULL)		// nonvalid handle
+	{
+		// we should select mode of file operations
+		// I think we need random write access to a file, which is provided by:
+		//	"w+b" mode, but this mode clears existing file
+		//	"r+b" mode, but this mode requires the file be available at the beginning
+		// Conclusion: probably we need:
+		// if( not_exist( file)
+		//	create( file)
+		// open( file, "r+b")	ALN:TODO:implement, select proper mode
+		h = fopen( osfilehandle.tostring().c_str(), "a+b");	// append, not truncate
+		if( h == NULL)		// nonvalid handle
+			return;
+//		if( h != NULL)
+		{
+			osfilehandle.var_mvint = h_cache.add_osfile( h);
+			osfilehandle.var_mvtyp = pimpl::MVTYPE_OPENED;
+		}
+	}
+
+	//ALN:TODO:implement UTF conversions
+	//to prevent locale conversion if writing narrow string to wide stream or vice versa
+	//imbue BEFORE opening
+    //myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
+
+	//NB seekp goes by bytes regardless of the fact that it is a wide stream
+	fseek( h, startoffset*sizeof(wchar_t), SEEK_SET);
+	size_t byteswritten = fwrite( var_mvstr.data(), sizeof(wchar_t), var_mvstr.length(), h);
+	//ALN:TODO:check returned value byteswritten
+}
+#else
 void var::osbwrite(const var& osfilehandle, const int startoffset) const
 {
 	THISIS(L"void var::osbwrite(const var& osfilehandle, const int startoffset) const")
@@ -898,7 +948,96 @@ void var::osbwrite(const var& osfilehandle, const int startoffset) const
 	return;
 
 }
+#endif
 
+#ifdef CACHED_HANDLES
+var& var::osbread(const var& osfilehandle, const int startoffset, const int size)
+{
+	THISIS(L"var& var::osbread(const var& osfilehandle, const int startoffset, const int size)")
+	THISISDEFINED()
+	ISSTRING(osfilehandle)
+
+	var_mvstr=L"";
+	var_mvtyp=pimpl::MVTYPE_STR;
+
+	if (size<=0) return *this;
+
+	// Open file, checking for file handle in cache table
+	FILE * h = NULL;
+	if( osfilehandle.var_mvtyp & pimpl::MVTYPE_HANDLE)
+	{
+		h = (FILE *) h_cache.get_handle( (int) osfilehandle.var_mvint);
+		if( h == NULL)		// nonvalid handle
+		{
+			osfilehandle.var_mvint = 0;
+			osfilehandle.var_mvtyp ^= pimpl::MVTYPE_HANDLE;	// clear bit
+		}
+	}
+	if( h == NULL)		// nonvalid handle
+	{
+		h = fopen( osfilehandle.tostring().c_str(), "r+b");
+		if( h == NULL)		// nonvalid handle
+			return * this;	// TODO: empty string is NOT GOOD indication of file failure
+//		if( h != NULL)
+		{
+			osfilehandle.var_mvint = h_cache.add_osfile( h);
+			osfilehandle.var_mvtyp = pimpl::MVTYPE_OPENED;
+		}
+	}
+
+//NB all file sizes are in bytes NOT characters despite this being a wide character fstream
+	//ALN:TODO: very dangerous: fix file sizes > 2GB
+	fseek( h, 0, SEEK_END);
+	unsigned long maxsize = ftell( h);
+
+	if ((unsigned long)startoffset>=maxsize)	// past EOF
+	{
+		return *this;
+	}
+
+	//allow negative offset to read from the back of the file
+	//!cannot be unsigned and allow negative
+	//unsigned int readfrom=startoffset;
+	int readfrom=startoffset;
+	if (readfrom<0) {
+		readfrom+=maxsize;
+		//but not so negative that it reads from before the beginning of the file
+		if (readfrom<0)
+			readfrom=0;
+	}
+
+	//limit reading up to end of file although probably happens automatically
+	unsigned int readsize=size;
+	if (readfrom+readsize>maxsize)
+		readsize=maxsize-readfrom;
+
+	//nothing to read
+	if (readsize<=0)
+	{
+		return *this;
+	}
+
+	//new
+	//wchar_t* memblock;
+	//memblock = new wchar_t [readsize/sizeof(wchar_t)];
+/*
+	char* memblock;
+	memblock = new char [readsize];
+*/
+	boost::scoped_array<char> memblock( new char [readsize]);
+	if (memblock==0)
+	{//TODO NEED TO THROW HERE
+		return *this;
+	}
+
+	fseek( h, startoffset, SEEK_SET);
+	size_t readbytes = fread( memblock.get(), 1, readsize, h);
+	//ALN:TODO:process read error
+	var_mvstr=wstringfromchars(memblock.get(), readsize);
+
+	return *this;
+}
+#else
 var& var::osbread(const var& osfilehandle, const int startoffset, const int size)
 {
 	THISIS(L"var& var::osbread(const var& osfilehandle, const int startoffset, const int size)")
@@ -999,7 +1138,24 @@ var& var::osbread(const var& osfilehandle, const int startoffset, const int size
 //	var_mvtyp=pimpl::MVTYPE_STR;
 	return *this;
 }
+#endif
 
+#ifdef CACHED_HANDLES
+void var::osclose() const
+{
+	THISIS(L"void var::osclose() const")
+	THISISSTRING()
+	if( var_mvtyp & pimpl::MVTYPE_HANDLE)
+	{
+		FILE * h = ( FILE *) h_cache.get_handle(( int) var_mvint);
+		fclose( h);
+		h_cache.del_handle(( int) var_mvint);
+		var_mvint = 0L;
+		var_mvtyp ^= pimpl::MVTYPE_HANDLE | pimpl::MVTYPE_INT;	//only STR bit should remains
+	}
+	// in all other cases, the files shou8ld be closed.
+}
+#else
 void var::osclose() const
 {
 	THISIS(L"void var::osclose() const")
@@ -1009,7 +1165,7 @@ void var::osclose() const
 
 	return;
 }
-
+#endif
 bool var::osrename(const var& newosdir_or_filename) const
 {
 	THISIS(L"bool var::osrename(const var& newosdir_or_filename) const")
@@ -1379,5 +1535,3 @@ void var::ossleep(const int milliseconds) const
 }
 
 }// namespace exodus
-
-#endif

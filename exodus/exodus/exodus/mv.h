@@ -112,9 +112,11 @@ int:	4	4
 double:	8	8
 var:	20	48
 */
-
+#ifdef CACHED_HANDLES
+static const unsigned int mvtypemask=0xffffff80;
+#else
 static const unsigned int mvtypemask=0xfffffff0;
-
+#endif
 /* this has been resolved somehow without removing the automatic conversion to int:
 Remove automatic conversion to int which takes precedence over the automatic conversion to bool
 and therefore causes a non-numeric error if you include a non-numeric value in an if statement like
@@ -127,6 +129,7 @@ and therefore causes a non-numeric error if you include a non-numeric value in a
 //#include <iostream>
 #include <iosfwd>
 #include <string>
+#include <vector>
 
 //#include <boost/thread/tss.hpp>
 
@@ -1276,6 +1279,13 @@ private:
 	// 2) use pimpl metaphore with slight decrease in performance.
 	// Constructors of dim are very simple, no exception expected between 'new' and return from constructor
 	// As such, choice (1).
+
+	//all redimensioning of this array (eg when copying arrays)
+	//seem to be using ::redim() to accomplish redimensioning
+	//so only the redim code is dangerous (danger in one place is manageable)
+	//we choose NOT to implement 2) above (pimpl) in order
+	//to provide exodus programmer greater/easier visibility into dimensiorned arrays when debugging
+	//(cannot use boost scoped pointer here because mv.h is required by exodus programmer who should not need boost)
 	var* data_;
 	bool initialised_;
 

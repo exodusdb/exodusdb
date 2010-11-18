@@ -20,9 +20,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef MVARRAY_H
-#define MVARRAY_H
-
 #define MV_NO_NARROW
 
 //C4530: C++ exception handler used, but unwind semantics are not enabled. 
@@ -226,5 +223,3 @@ var dim::unparse() const
 }
 
 }//of namespace exodus
-
-#endif

@@ -45,6 +45,12 @@ public:
 	static const wchar_t MVTYPE_DBLSTR=MVTYPE_DBL|MVTYPE_STR;
 	static const wchar_t MVTYPE_NANSTR=MVTYPE_NAN|MVTYPE_STR;
 
+//#define	CACHED_HANDLES
+
+#ifdef CACHED_HANDLES
+	static const wchar_t MVTYPE_HANDLE = 0x10;
+	static const wchar_t MVTYPE_OPENED = MVTYPE_INTSTR | MVTYPE_HANDLE;
+#endif
 /* moved to default contructor
 	//default ctor initialise to "unassigned"
 	pimpl() : mvtype(MVTYPE_UNA) {};
