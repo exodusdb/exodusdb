@@ -13,7 +13,6 @@
 #  define MVHANDLES_H
 
 #include <vector>
-#include <boost/thread/mutex.hpp>
 
 namespace exodus {
 
@@ -48,7 +47,6 @@ class MvHandlesCache
 
   private:
 	std::vector<MvHandleEntry> tbl;
-	boost::mutex io_mutex;
 };
 }	// namespace
 #endif // MVHANDLES_H

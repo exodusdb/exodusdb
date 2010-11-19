@@ -74,7 +74,10 @@ public:
 			var ownprintfile = 0;
 			if (printfilename == "") {
 				printfilename = (var(999999999).rnd()).substr(-8, 8);
-				printfilename = printfilename ^ html ? ".HTM" : ".txt";
+				if (html)
+					printfilename^=".HTM";
+				else
+					printfilename^=".txt";
 				env->SYSTEM.replacer(2, 0, 0, printfilename);
 				ownprintfile = 1;
 			}
