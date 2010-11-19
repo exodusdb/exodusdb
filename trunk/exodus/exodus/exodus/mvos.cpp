@@ -887,7 +887,9 @@ bool var::osbwrite(const var& osfilehandle, const int startoffset) const
 	//myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
 	//binary!
 ///		pmyfile->open(osfilehandle.tostring().c_str(), std::ios::out | std::ios::in | std::ios::binary | std::ios::ate);
-		pmyfile->open(osfilehandle.var_mvstr.c_str(), std::ios::out | std::ios::in | std::ios::binary);
+///		pmyfile->open(osfilehandle.var_mvstr.c_str(), std::ios::out | std::ios::in | std::ios::binary);
+		//linux wfstream wants a narrow filename
+		pmyfile->open(osfilehandle.tostring().c_str(), std::ios::out | std::ios::in | std::ios::binary);
 		if (! (*pmyfile))
 		{
 			delete pmyfile;
@@ -1017,7 +1019,9 @@ var& var::osbread(const var& osfilehandle, const int startoffset, const int size
 	//binary!
 	//use ::ate to position at end so tellg below can determine file size
 ///		pmyfile->open(osfilehandle.tostring().c_str(), std::ios::binary | std::ios::ate);
-		pmyfile->open(osfilehandle.var_mvstr.c_str(), std::ios::binary | std::ios::in | std::ios::out);
+///		pmyfile->open(osfilehandle.var_mvstr.c_str(), std::ios::binary | std::ios::in | std::ios::out);
+		//linux wfstream wants a narrow filename
+		pmyfile->open(osfilehandle.tostring().c_str(), std::ios::binary | std::ios::in | std::ios::out);
 		if( ! (*pmyfile))
 		{
 			delete pmyfile;
