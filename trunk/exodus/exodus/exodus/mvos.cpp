@@ -864,10 +864,12 @@ bool var::osbwrite(const var& osfilehandle, const int startoffset) const
 
 	//TODO buffer the fileopen ... is ate needed here?
 	//using wfstream instead of wofstream so that we can seek to the end of the file?
-	std::wofstream * pmyfile = 0;
+///	std::wofstream * pmyfile = 0;
+	std::wfstream * pmyfile = 0;
 	if( osfilehandle.var_mvtyp & pimpl::MVTYPE_HANDLE)
 	{
-		pmyfile = (std::wofstream *) h_cache.get_handle( (int) osfilehandle.var_mvint);
+///		pmyfile = (std::wofstream *) h_cache.get_handle( (int) osfilehandle.var_mvint);
+		pmyfile = (std::wfstream *) h_cache.get_handle( (int) osfilehandle.var_mvint);
 		if( pmyfile == 0)		// nonvalid handle
 		{
 			osfilehandle.var_mvint = 0;
@@ -876,14 +878,16 @@ bool var::osbwrite(const var& osfilehandle, const int startoffset) const
 	}
 	if( pmyfile == 0)
 	{
-		pmyfile = new std::wofstream;
+///		pmyfile = new std::wofstream;
+		pmyfile = new std::wfstream;
 
 	//what is the purpose of the following?
 	//to prevent locale conversion if writing narrow string to wide stream or vice versa
 	//imbue BEFORE opening
 	//myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
 	//binary!
-		pmyfile->open(osfilehandle.tostring().c_str(), std::ios::out | std::ios::in | std::ios::binary | std::ios::ate);
+///		pmyfile->open(osfilehandle.tostring().c_str(), std::ios::out | std::ios::in | std::ios::binary | std::ios::ate);
+		pmyfile->open(osfilehandle.var_mvstr.c_str(), std::ios::out | std::ios::in | std::ios::binary);
 		if (! (*pmyfile))
 		{
 			delete pmyfile;
@@ -916,6 +920,7 @@ bool var::osbwrite(const var& osfilehandle, const int startoffset) const
 // saved in cache, do not close		myfile.close();
 		return false;
 	}
+	pmyfile->flush();
 // saved in cache, do not close		myfile.close();
 	return true;
 }
@@ -987,10 +992,12 @@ var& var::osbread(const var& osfilehandle, const int startoffset, const int size
 	//avoiding wifstream due to non-availability on some platforms (mingw for starters)
 	//and to allow full control over narrow/wide character conversion
 	//std::wifstream myfile;
-	std::ifstream * pmyfile = 0;
+///	std::ifstream * pmyfile = 0;
+	std::wfstream * pmyfile = 0;
 	if( osfilehandle.var_mvtyp & pimpl::MVTYPE_HANDLE)
 	{
-		pmyfile = (std::ifstream *) h_cache.get_handle( (int) osfilehandle.var_mvint);
+//		pmyfile = (std::ifstream *) h_cache.get_handle( (int) osfilehandle.var_mvint);
+		pmyfile = (std::wfstream *) h_cache.get_handle( (int) osfilehandle.var_mvint);
 		if( pmyfile == 0)		// nonvalid handle
 		{
 			osfilehandle.var_mvint = 0;
@@ -1000,7 +1007,8 @@ var& var::osbread(const var& osfilehandle, const int startoffset, const int size
 	// Open file, checking for file handle in cache table
 	if( pmyfile == 0)		// nonvalid handle
 	{
-		pmyfile = new std::ifstream;
+///		pmyfile = new std::ifstream;
+		pmyfile = new std::wfstream;
 	//what is the purpose of the following?
 	//to prevent locale conversion if writing narrow string to wide stream or vice versa
 	//imbue BEFORE opening
@@ -1008,7 +1016,8 @@ var& var::osbread(const var& osfilehandle, const int startoffset, const int size
 
 	//binary!
 	//use ::ate to position at end so tellg below can determine file size
-		pmyfile->open(osfilehandle.tostring().c_str(), std::ios::binary | std::ios::ate);
+///		pmyfile->open(osfilehandle.tostring().c_str(), std::ios::binary | std::ios::ate);
+		pmyfile->open(osfilehandle.var_mvstr.c_str(), std::ios::binary | std::ios::in | std::ios::out);
 		if( ! (*pmyfile))
 		{
 			delete pmyfile;
@@ -1056,7 +1065,8 @@ var& var::osbread(const var& osfilehandle, const int startoffset, const int size
 	char* memblock;
 	memblock = new char [readsize];
 */
-	boost::scoped_array<char> memblock( new char [readsize]);
+///	boost::scoped_array<char> memblock( new char [readsize]);
+	boost::scoped_array<wchar_t> memblock( new wchar_t [readsize]);
 	if (memblock==0)
 	{//TODO NEED TO THROW HERE
 		return *this;
@@ -1065,7 +1075,8 @@ var& var::osbread(const var& osfilehandle, const int startoffset, const int size
 	pmyfile->read (memblock.get(), readsize);
 //	pmyfile->close();
 
-	var_mvstr=wstringfromchars(memblock.get(), readsize);
+//	var_mvstr=wstringfromchars(memblock.get(), readsize);
+	var_mvstr.assign( memblock.get(), readsize);
 	return *this;
 }
 #else
@@ -1184,14 +1195,16 @@ void var::osclose() const
 		{
 //			std::ios * ptr_to_base = (std::ios *) h_cache.get_handle(( int) var_mvint);
 //			std::ofstream * h = dynamic_cast<std::ofstream *> (ptr_to_base);
-			std::ofstream * h = (std::ofstream *) h_cache.get_handle(( int) var_mvint);
+///			std::ofstream * h = (std::ofstream *) h_cache.get_handle(( int) var_mvint);
+			std::wfstream * h = (std::wfstream *) h_cache.get_handle(( int) var_mvint);
 			if( h)
 				delete h;
 		}
-		else
+		else	//ALN:TODO: if OK with wfstream() - merge both execution paths
 		{
 //			std::ifstream * h = dynamic_cast<std::ifstream *> (ptr_to_base);
-			std::ifstream * h = (std::ifstream *) h_cache.get_handle(( int) var_mvint);
+///			std::ifstream * h = (std::ifstream *) h_cache.get_handle(( int) var_mvint);
+			std::wfstream * h = (std::wfstream *) h_cache.get_handle(( int) var_mvint);
 			if( h)
 				delete h;
 		}
