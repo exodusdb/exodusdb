@@ -5,6 +5,15 @@ programinit()
 
 function main()
 {
+	var tempfilename5 = "tempfilename5.txt";
+	var record5;
+	 oswrite("",tempfilename5);//
+	 assert(osbwrite("78",tempfilename5,2));
+	 assert(osread(record5,tempfilename5));
+	 assert(record5.oconv("HEX2") eq "000000003738");
+	 osclose(tempfilename5);
+	 osdelete(tempfilename5);
+
 	// Use any file with size 2-10Mb
 	var stroustrup = "Stroustrup B. - The C++ programming language (3rd edition) (1997).pdf";
 	var CppCounter = 0;
