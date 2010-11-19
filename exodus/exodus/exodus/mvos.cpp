@@ -851,7 +851,7 @@ bool var::oswrite(const var& osfilename) const
 		return false;
 	}
 
-   	myfile.close();
+	myfile.close();
 	return true;
 
 }
@@ -905,7 +905,7 @@ void var::osbwrite(const var& osfilehandle, const int startoffset) const
 	//ALN:TODO:check returned value byteswritten
 }
 #else
-void var::osbwrite(const var& osfilehandle, const int startoffset) const
+bool var::osbwrite(const var& osfilehandle, const int startoffset) const
 {
 	THISIS(L"void var::osbwrite(const var& osfilehandle, const int startoffset) const")
 	THISISSTRING()
@@ -920,32 +920,39 @@ void var::osbwrite(const var& osfilehandle, const int startoffset) const
 	//what is the purpose of the following?
 	//to prevent locale conversion if writing narrow string to wide stream or vice versa
 	//imbue BEFORE opening
-    //myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
+	//myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
 
 	//binary!
 	myfile.open(osfilehandle.tostring().c_str(), std::ios::out | std::ios::in | std::ios::binary | std::ios::ate);
 	if (!myfile)
-		return;
+		return false;
 
 	//NB seekp goes by bytes regardless of the fact that it is a wide stream
-	myfile.seekp (startoffset*sizeof(wchar_t));
+	//myfile.seekp (startoffset*sizeof(wchar_t));
+	//startoffset should be in bytes except for fixed multibyte code pages like UTF16 and UTF32
+	myfile.seekp (startoffset);
+
 	//NB but length goes by number of wide characters not bytes
 #ifndef __MINGW32__
-		myfile.write(var_mvstr.data(),int(var_mvstr.length()));
+	myfile.write(var_mvstr.data(),int(var_mvstr.length()));
 #else
 	//TODO avoid string copy if wofstream not defined to be ofstream
-        std::string tempstr=tostring();
-        myfile.write(tempstr.data(),int(tempstr.length()));
+	std::string tempstr=tostring();
+	myfile.write(tempstr.data(),int(tempstr.length()));
 #endif
 
+	//on windows, wfstream will try to convert to current locale codepage so
+	//if you are trying to write an exodus string containing a GREEK CAPITAL GAMMA
+	//unicode \x0393 and current codepage is *NOT* CP1253 (Greek)
+	//then c++ wiofstream cannot convert \x0393 to a single byte (in CP1253)
 	if (myfile.fail())
 	{
 		myfile.close();
-		return;
+		return false;
 	}
 
-   	myfile.close();
-	return;
+	myfile.close();
+	return true;
 
 }
 #endif

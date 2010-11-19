@@ -166,9 +166,9 @@ public:
 	int keypressed(int delayusecs=0) const;
 	bool esctoexit() const;
 	
-	void oswritex(const var& str, const var& filename) const;
-	void osbwritex(const var& str1, const var& filehandle, const var& filename, const int offset) const;
-	void osbreadx(var& str1, const var& filehandle, const var& filename, const int startoffset, const int length);
+	bool oswritex(const var& str, const var& filename) const;
+	bool osbwritex(const var& str1, const var& filehandle, const var& filename, const int offset) const;
+	bool osbreadx(var& str1, const var& filehandle, const var& filename, const int startoffset, const int length);
 	
 	bool authorised(const var& task, var& msg, const var& defaultlock=L"");
 	bool authorised(const var& task);

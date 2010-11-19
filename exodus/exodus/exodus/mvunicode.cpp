@@ -99,7 +99,9 @@ qt strings are unicode
 #include <string.h>
 #endif
 
+#include <boost/scoped_array.hpp>
 #include <exodus/mv.h>
+
 namespace exodus {
 
 int var::localeAwareCompare(const std::wstring& str1, const std::wstring& str2) const
@@ -109,8 +111,12 @@ int var::localeAwareCompare(const std::wstring& str1, const std::wstring& str2) 
 
 #if defined(_MSC_VER) && defined(UNICODE)
 
+	/*
+	Now of course this points to what may be the best solution for a single function that will let you pass string length, ignore case, choose an appropriate locale, and work in different versions of Windows -- the master NLS collation function, CompareStringW!
+	*/
 	int comparison;
-	comparison=CompareStringW(GetUserDefaultLCID(), 0,
+	//comparison=CompareStringW(GetUserDefaultLCID(), 0,
+	comparison=CompareStringW(GetThreadLocale(), 0,
 		(TCHAR*)str1.data(), int(str1.length()),
 		(TCHAR*)str2.data(), int(str2.length()));
 	switch (comparison) {
@@ -144,6 +150,128 @@ int var::localeAwareCompare(const std::wstring& str1, const std::wstring& str2) 
 #else
 #error stop here
 	return str1.compare(str2);
+#endif
+}
+
+var& var::localeAwareChangeCase(const int lowerupper)
+{
+	if (var_mvstr.length()==0)
+		return *this;
+
+#if defined(_MSC_VER) && defined(UNICODE)
+
+	//TODO http://stackoverflow.com/questions/1767946/getthreadlocale-returns-different-value-than-getuserdefaultlcid
+	//Microsoft is deprecating the Locale ID in favor of the Locale Name from Vista onwards
+
+	/*
+	http://msdn.microsoft.com/en-us/library/dd318700%28v=VS.85%29.aspx
+	int LCMapString(
+		__in   LCID Locale,
+		__in   DWORD dwMapFlags,
+		__in   LPCTSTR lpSrcStr,
+		__in   int cchSrc,
+		__out  LPTSTR lpDestStr,
+		__in   int cchDest
+	);
+	return 0 if it DOESNT succeed
+	GetLastError()
+    * ERROR_INSUFFICIENT_BUFFER. A supplied buffer size was not large enough, or it was incorrectly set to NULL.
+    * ERROR_INVALID_FLAGS. The values supplied for flags were not valid.
+    * ERROR_INVALID_PARAMETER. Any of the parameter values was invalid.
+	*/
+
+	//uppercasing can double the number of characters (eg german b to SS) can it triple?
+	int buffersize=(int) var_mvstr.length()*2+2;
+	boost::scoped_array<TCHAR> buffer( new TCHAR [buffersize]);
+	if (buffer==0)
+		throw MVException(var(L"Out of memory in changecase(). Need ")^int(buffersize)^" characters");
+
+	int tolowerupper=LCMAP_LINGUISTIC_CASING;
+	if (lowerupper==1) 
+		tolowerupper+=LCMAP_LOWERCASE;
+	else if (lowerupper==2)
+		tolowerupper+=LCMAP_UPPERCASE;
+
+	//LCMapStringW
+	int outputsize=LCMapStringW(
+		GetThreadLocale(),
+		tolowerupper,
+		(TCHAR*)var_mvstr.data(),
+		(int) var_mvstr.length(),
+		buffer.get(),
+		(int) buffersize);
+
+	//cant convert for some reason. see above
+	if (!outputsize)
+	{
+		//for now only ascii conversion
+		if (lowerupper==1) 
+			return converter(UPPERCASE_,LOWERCASE_);
+		else if (lowerupper==2)
+			return converter(LOWERCASE_, UPPERCASE_);
+	}
+
+	var_mvstr=std::wstring(buffer.get(),outputsize);
+
+	return *this;
+
+#elif 1
+	//for now only ascii conversion
+	if (lowerupper==1) 
+		converter(UPPERCASE_,LOWERCASE_);
+	else if (lowerupper==2)
+		converter(LOWERCASE_, UPPERCASE_);
+	return *this;
+
+#elif defined(_MACOS)
+
+//why not collate::compare?
+//#elseif defined(_UNIX)
+#elif defined(strcoll)
+#elif !defined(XYZZZZ)
+////	setlocale (LC_COLLATE, "en_US.UTF-8");
+//	return wcscoll(str1.c_str(),str2.c_str());
+	//TODO unicode/native conversion
+	converter(LOWERCASE_, UPPERCASE_);
+#else
+#error stop here
+	return str1.compare(str2);
+#endif
+}
+
+bool var::setxlocale() const
+{
+
+	/* http://msdn.microsoft.com/en-us/library/dd374051%28v=VS.85%29.aspx
+	//locale list
+	//XP 2003 http://msdn.microsoft.com/en-us/goglobal/bb895996.aspx
+	//http://msdn.microsoft.com/en-us/goglobal/bb964664.aspx
+	BOOL SetThreadLocale(
+		__in  LCID Locale
+	);
+	*/
+	//GetSystemDefaultLCID()
+	//GetUserDefaultLCID()
+	//LCID locale_lcid=1031;//German Standard
+	//LCID locale_lcid=1032;//Greek
+	//LCID locale_lcid=1055;//Turkish
+
+	return SetThreadLocale((*this).toInt())!=NULL;
+
+#if defined(_MSC_VER) && defined(UNICODE)
+
+#elif defined(_MACOS)
+	return true;
+#endif
+}
+
+var& var::getxlocale()
+{
+#if defined(_MSC_VER) && defined(UNICODE)
+	*this=(int)GetThreadLocale();
+	return *this;
+#elif defined(_MACOS)
+	return "";
 #endif
 }
 

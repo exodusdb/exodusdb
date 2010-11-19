@@ -32,6 +32,16 @@ THE SOFTWARE.
 
 namespace exodus {
 
+DLL_PUBLIC bool setxlocale(const var& locale)
+{
+	return locale.setxlocale();
+}
+
+DLL_PUBLIC var getxlocale()
+{
+	return var().getxlocale();
+}
+
 DLL_PUBLIC bool assigned(const var& var1)
 {
 	return var1.assigned();
@@ -108,9 +118,9 @@ var& osbread(var& data, const var& filehandle, const int startoffset, const int 
 	return data;
 }
 
-void DLL_PUBLIC osbwrite(const var& data, const var& filehandle, const int startoffset)
+DLL_PUBLIC bool osbwrite(const var& data, const var& filehandle, const int startoffset)
 {
-	data.osbwrite(filehandle, startoffset);
+	return data.osbwrite(filehandle, startoffset);
 }
 
 //two argument version returns success/failure to be used in if statement
@@ -925,9 +935,9 @@ DLL_PUBLIC bool selectrecord(const var& sortselectclause)
 	return var("default").selectrecord(sortselectclause);
 }
 
-DLL_PUBLIC bool readnextrecord(var& key, var& record)
+DLL_PUBLIC bool readnextrecord(var& record, var& key)
 {
-	return var("default").readnextrecord(key, record);
+	return var("default").readnextrecord(record, key);
 }
 
 /* done in ExodusProgramBase and MvEnvironment now

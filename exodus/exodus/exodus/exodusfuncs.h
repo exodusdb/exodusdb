@@ -46,8 +46,8 @@ DLL_PUBLIC var ostime();
 DLL_PUBLIC bool osopen(const var& filename, var& filehandle);
 DLL_PUBLIC void osclose(const var& filehandle);
 DLL_PUBLIC var osbread(const var& filehandle, const int startoffset, const int length);
-DLL_PUBLIC void osbread(var& data, const var& filehandle, const int startoffset, const int length);
-DLL_PUBLIC void osbwrite(const var& data, const var& filehandle, const int startoffset);
+DLL_PUBLIC bool osbread(var& data, const var& filehandle, const int startoffset, const int length);
+DLL_PUBLIC bool osbwrite(const var& data, const var& filehandle, const int startoffset);
 DLL_PUBLIC bool osread(var& data, const var& osfilename);
 DLL_PUBLIC var osread(const var& osfilename);
 DLL_PUBLIC bool oswrite(const var& data,const var& osfilename);
@@ -76,6 +76,9 @@ DLL_PUBLIC var execute(const var& command);
 DLL_PUBLIC var chain(const var& command);
 DLL_PUBLIC var logoff();
 DLL_PUBLIC void debug();
+
+DLL_PUBLIC bool setxlocale(const var& locale);
+DLL_PUBLIC var getxlocale();
 
 void print(const var& var2);
 void printl(const var& var2=L"");
@@ -212,7 +215,7 @@ DLL_PUBLIC void clearselect();
 DLL_PUBLIC bool readnext(var& key);
 DLL_PUBLIC bool readnext(var& key, var& valueno);
 DLL_PUBLIC bool selectrecord(const var& sortselectclause = L"");
-DLL_PUBLIC bool readnextrecord(var& key, var& record);
+DLL_PUBLIC bool readnextrecord(var& record, var& key);
 /* done in ExodusProgramBase and MvEnvironment now
 DLL_PUBLIC var calculate(const var& fieldname);
 */

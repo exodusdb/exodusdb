@@ -685,7 +685,7 @@ public:
 	//TODO cache osfilehandles somehow (use var_mvint?)
 	bool osopen(const var& osfilename);
 	var& osbread(const var& osfilehandle, const int startoffset, const int length);
-	void osbwrite(const var& osfilehandle, const int startoffset) const;
+	bool osbwrite(const var& osfilehandle, const int startoffset) const;
 	void osclose() const;
 	bool osread(const var& osfilename);
 	bool oswrite(const var& osfilename) const;
@@ -819,6 +819,10 @@ public:
 	var integer() const;
 	var floor() const;
 	var round(const int ndecimals=0) const;
+
+	//LOCALE
+	bool setxlocale() const;
+	var& getxlocale();
 
 	//STRING CREATION
 	var chr() const;
@@ -981,7 +985,7 @@ public:
 	bool readnext(var& key, var& valueno) const;
 
 	bool selectrecord(const var& sortselectclause = L"") const;
-	bool readnextrecord(var& key, var& record) const;
+	bool readnextrecord(var& record, var& key) const;
 
 	bool lock(const var& key) const;
 	void unlock(const var& key) const;
@@ -1049,6 +1053,7 @@ private:
 	bool locateat(const std::wstring& target,size_t start_pos,size_t end_pos,const wchar_t order,const var& usingchar,var& setting)const;
 
 	int localeAwareCompare(const std::wstring& str1, const std::wstring& str2) const;
+	var& localeAwareChangeCase(const int lowerupper);
 
 	friend class dim;
 
