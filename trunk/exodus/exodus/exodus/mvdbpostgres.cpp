@@ -2107,7 +2107,7 @@ bool var::readnext(var& key, var& valueno) const
 
 }
 
-bool var::readnextrecord(var& key, var& record) const
+bool var::readnextrecord(var& record, var& key) const
 {
 
 	//?allow undefined usage like var xyz=xyz.readnext();
@@ -2118,7 +2118,7 @@ bool var::readnextrecord(var& key, var& record) const
 		var_mvtyp=pimpl::MVTYPE_STR;
 	}
 
-	THISIS(L"bool var::readnextrecord(var& key, var& record) const")
+	THISIS(L"bool var::readnextrecord(var& record, var& key) const")
 	THISISSTRING()
 	ISDEFINED(key)
 	ISDEFINED(record)

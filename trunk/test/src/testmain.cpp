@@ -1,45 +1,100 @@
 #include <exodus/program.h>
 #include <cassert>
 
+//non-ASCII unicode characters
+var GreekQuestionMark		=L"\u037E";//GREEK QUESTION MARK (Punctuation)
+var GreekCapitalGamma		=L"\u0393";//GREEK CAPITAL LETTER GAMMA (Letter) (Uppercase)
+var GreekSmallGamma			=L"\u03B3";//GREEK SMALL LETTER GAMMA (Letter) (Lowercase)
+var ArabicIndicDigitZero	=L"\u0660";//ARABIC-INDIC DIGIT ZERO (Decimal Digit)
+
+var GreekSmallAlpha         =L"\u03B1";//GREEK SMALL LETTER ALPHA
+var GreekSmallFinalSigma    =L"\u03C2";//GREEK SMALL LETTER FINAL SIGMA
+var GreekSmallSigma         =L"\u03C3";//GREEK SMALL LETTER SIGMA
+var GreekCapitalSigma       =L"\u03A3";//GREEK CAPITAL LETTER SIGMA
+var GreekCapitalAlpha       =L"\u0391";//GREEK CAPITAL LETTER ALPHA
+var Greek_sas               =GreekSmallSigma^GreekSmallAlpha^GreekSmallFinalSigma;
+var Greek_SAS               =GreekCapitalSigma^GreekCapitalAlpha^GreekCapitalSigma;
+
+var TurkishCapitalDottedI   =L"\u0130";
+var TurkishSmallDotlessI    =L"\u0131";
+var LatinSmallI             ="i";
+var LatinCapitalI           ="I";
+
+var GermanEszet             =L"\u00DF";//German 
 programinit()
-
-function xyz(in xyzz)
-{
-	assert(xyzz(2,2,2) eq "b22");
-	return 1;
-}
-
-function accrest() {
-        var infilename="\\tapex";//=field(sentence()," ",2);
-        var infile;
-        if (not osopen(infilename,infile))
-                abort("Cant read "^infilename);
-
-        var fms=FM^VM^SM^TM^STM^SSTM;
-        var visibles="^]\???";
-        var EOL="\n\r";
-        var offset=0;
-        var blocksize=50000;
-        while (true) {
-                var block=osbread(infile,offset,blocksize);
- //printl(offset," ",len(block));
-                if (not len(block))
-                        break;
-                offset+=blocksize;
-                converter(block,fms,visibles);
-                swapper(block,IM,EOL);
-                print(block);
-				var xx;
-                inputn(xx,1);
-        }
-        return 0;
-}
-
-//program()
 
 function main()
 {
 	//DBTRACE=true;
+
+	//windows locales Windows XP and Windows Server 2003
+	//http://msdn.microsoft.com/en-us/goglobal/bb895996.aspx
+	var english_uk="";
+	var english_us="";
+	var german_standard="";
+	var greek="";
+	var turkish="";
+	if (SLASH_IS_BACKSLASH) {
+		english_uk=2057;
+		english_us=1033;
+		german_standard=1031;
+		greek=1032;
+		turkish=1055;
+	} else {
+	}
+	var locale0=getxlocale();
+
+	//in English/US Locale
+	//check ASCII upper/lower casing
+	setxlocale(english_us);
+	assert(ucase(LOWERCASE_) eq UPPERCASE_);
+	assert(lcase(UPPERCASE_) eq LOWERCASE_);
+
+	//in German/Standard Locale
+	//check Eszet (like a Beta) uppercases to SS
+	assert(setxlocale(german_standard));
+	//FAILS in Windows XPSP3UK
+	//assert(ucase(GermanEszet) eq "SS");
+	ucase(GermanEszet).oconv("HEX4").oconv("T#4").outputl();
+
+	//in Greek Locale
+	//convert word ending in "capital sigma" lower cases to "lower final sigma"
+	assert(ucase(Greek_sas) eq Greek_SAS);
+	//FAILS in Windows XPSP3UK
+	//assert(lcase(Greek_SAS) eq Greek_sas);
+	lcase(Greek_SAS).oconv("HEX4").oconv("T#4").outputl();
+
+	//in Turkish Locale
+	//check Latin "I" lowercases to "turkish dotless i"
+	//check Latin "i" uppercases to "turkish dotted I"
+	assert(setxlocale(turkish));
+	assert(lcase(LatinCapitalI) eq TurkishSmallDotlessI);
+	assert(ucase(LatinSmallI)   eq TurkishCapitalDottedI);
+
+	//restore initial locale
+	setxlocale(locale0);
+
+	var tempfilename5;
+	var record5;
+	tempfilename5="TEMP7657.TXT";
+
+	//check we cannot write to a non-existent file
+	osdelete(tempfilename5); //make sure the file doesnt exist
+	assert(not osbwrite("34",tempfilename5,2));
+
+	//check we can osbwrite to an existent file beyond end of file
+	oswrite("",tempfilename5);//
+	assert(osbwrite("78",tempfilename5,2));
+	assert(osread(record5,tempfilename5));
+	assert(record5.oconv("HEX2") eq "000000003738");
+	osdelete(tempfilename5);
+
+	//check cannot write non-codepage characters
+	assert(oswrite("",tempfilename5));
+	assert(not osbwrite(L"\u0393",tempfilename5,2));
+	osdelete(tempfilename5);
+
+	var xyzz=var("Abc").ucase().outputl();
 
 	assert(oconv("ABc.123","MCN") eq "123");
 	assert(oconv("ABc.123","MCA") eq "ABc");
@@ -56,9 +111,9 @@ function main()
 	//make some latin and greek upper and lower case letters and punctuation plus some digits.
 	var unicode="";
 	var expect;
-	unicode^=L"\u037E";//GREEK QUESTION MARK (Punctuation)
-	unicode^=L"\u0393";//GREEK CAPITAL LETTER GAMMA (Letter) (Uppercase)
-	unicode^=L"\u03B3";//GREEK SMALL LETTER GAMMA (Letter) (Lowercase)
+	unicode^=GreekQuestionMark;
+	unicode^=GreekCapitalGamma;
+	unicode^=GreekSmallGamma;
 	unicode^=L"ABc-123.456";//some LATIN characters and punctuation
 
 	//test swapping "letters" (i.e. alphabet) with "?"
@@ -76,11 +131,11 @@ function main()
 	//but what is its inverse?
 	//assert(swap(unicode,"\\PL","?","ri") eq expect);
 
-	var punctuation=L"\u037E";//GREEK QUESTION MARK (Punctuation)
-	var lowercase=L"\u0393";//GREEK CAPITAL LETTER GAMMA (Letter) (Uppercase)
-	var uppercase=L"\u03B3";//GREEK SMALL LETTER GAMMA (Letter) (Lowercase)
+	var punctuation=GreekQuestionMark;//(Punctuation)
+	var uppercase=GreekCapitalGamma;//(Uppercase)
+	var lowercase=GreekSmallGamma;//(Lowercase)
 	var letters=lowercase^uppercase;
-	var digits=L"\u0660";//ARABIC-INDIC DIGIT ZERO (decimal digit)
+	var digits=ArabicIndicDigitZero;//(Decimal Digit)
 
 	assert(oconv(punctuation,"MCA") eq "");
 	assert(oconv(punctuation,"MCN") eq "");
@@ -115,7 +170,7 @@ function main()
 
 	//no change
 	assert(oconv(uppercase,"MCU") eq uppercase);
-	assert(oconv(lowercase,"MCU") eq lowercase);
+	assert(oconv(lowercase,"MCL") eq lowercase);
 
 	assert(COMMAND eq "service"
 	 or COMMAND eq "main"
@@ -139,27 +194,37 @@ function main()
 	createfile("XUSERS");
 	createfile("DICT_XUSERS");
 
-	write("S"^FM^FM^"Age in Days"^FM^FM^FM^FM^FM^FM^"R"^FM^"10","DICT_XUSERS","AGE_IN_DAYS");
-	write("S"^FM^FM^"Age in Years"^FM^FM^FM^FM^FM^FM^"R"^FM^"10","DICT_XUSERS","AGE_IN_YEARS");
-	write("F"^FM^1^FM^"Number"^FM^FM^FM^FM^FM^FM^"R"^FM^"10","DICT_XUSERS","NUMBER");
+	//create some dictionary records (field descriptions)
+	//PERSON_NO    Type "F", Key Field (0)
+	//BIRTHDAY     Type "F", Data Field 1
+	//AGE IN DAYS  Type "S", Source Code needs a dictionary subroutine library called dict_XUSERS
+	//AGE IN YEARS Type "S", Source Code ditto
+	assert(write(convert( "F|0|Person No||||||R|10"   ,"|",FM),"DICT_XUSERS", "PERSON_NO"   ));
+	assert(write(convert( "F|1|Birthday||||D||R|12"   ,"|",FM),"DICT_XUSERS", "BIRTHDAY"    ));
+	assert(write(convert( "S||Age in Days||||||R|10"  ,"|",FM),"DICT_XUSERS", "AGE_IN_DAYS" ));
+	assert(write(convert( "S||Age in Years||||||R|10" ,"|",FM),"DICT_XUSERS", "AGE_IN_YEARS"));
 
-	write("1","XUSERS","1");
-	write("2","XUSERS","2");
-	write("3","XUSERS","3");
-	write("4","XUSERS","4");
+	//create some users and their birthdays 11000=11 FEB 1998 .... 14000=30 APR 2006
+	assert(write("11000","XUSERS","1"));
+	assert(write("12000","XUSERS","2"));
+	assert(write("13000","XUSERS","3"));
+	assert(write("14000","XUSERS","4"));
+
 //DBTRACE=true;
-	assert(createindex("XUSERS","NUMBER"));
-	assert(listindexes("XUSERS") eq ("xusers"^VM^"number"));
+	//check can create and delete indexes
+	assert(createindex("XUSERS","BIRTHDAY"));
+	assert(listindexes("XUSERS") eq ("xusers"^VM^"birthday"));
 	assert(listindexes() ne "");
-	assert(deleteindex("XUSERS","NUMBER"));
+	assert(deleteindex("XUSERS","BIRTHDAY"));
 	assert(listindexes("XUSERS") eq "");
 
-	assert(select("SELECT XUSERS WITH NUMBER BETWEEN 2 and 3"));
+	//check can select and readnext through the records
+	assert(select("SELECT XUSERS WITH BIRTHDAY BETWEEN '1 JAN 2000' AND '31 DEC 2003'"));
 	assert(readnext(ID));
 	assert(ID eq 2);
 	assert(readnext(ID));
 	assert(ID eq 3);
-	assert(not readnext(ID));
+	assert(not readnext(ID));//check no more
 
 //	if (not selectrecord("SELECT XUSERS WITH AGE_IN_DAYS GE 0 AND WITH AGE_IN_YEARS GE 0"))
 //	if (not select("SELECT XUSERS"))
@@ -1209,7 +1274,7 @@ while trying to match the argument list '(exodus::var, bool)'
 //	cin>>ii;
 	var record;
 	if (ads.selectrecord("SELECT ADS")) {
-		while (ii<3&&ads.readnextrecord(key,record))
+		while (ii<3&&ads.readnextrecord(record,key))
 		{
 			++ii;
 			if (!(ii%10000))
@@ -1224,6 +1289,38 @@ while trying to match the argument list '(exodus::var, bool)'
     printl("Shutting down ...");
 
     return 0;
+}
+
+function xyz(in xyzz)
+{
+	assert(xyzz(2,2,2) eq "b22");
+	return 1;
+}
+
+function accrest() {
+        var infilename="\\tapex";//=field(sentence()," ",2);
+        var infile;
+        if (not osopen(infilename,infile))
+                abort("Cant read "^infilename);
+
+        var fms=FM^VM^SM^TM^STM^SSTM;
+        var visibles="^]\???";
+        var EOL="\n\r";
+        var offset=0;
+        var blocksize=50000;
+        while (true) {
+                var block=osbread(infile,offset,blocksize);
+ //printl(offset," ",len(block));
+                if (not len(block))
+                        break;
+                offset+=blocksize;
+                converter(block,fms,visibles);
+                swapper(block,IM,EOL);
+                print(block);
+				var xx;
+                inputn(xx,1);
+        }
+        return 0;
 }
 
 programexit()

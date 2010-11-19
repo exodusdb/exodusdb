@@ -566,9 +566,7 @@ var& var::ucaser()
 	THISIS(L"var& var::ucaser()")
 	THISISSTRING()
 
-	//TODO unicode/native conversion
-	converter(LOWERCASE_, UPPERCASE_);
-	return *this;
+	return localeAwareChangeCase(2);
 }
 
 var var::lcase() const
@@ -584,9 +582,7 @@ var& var::lcaser()
 	THISIS(L"var& var::lcaser()")
 	THISISSTRING()
 
-	//TODO unicode/native conversion
-	converter(UPPERCASE_,LOWERCASE_);
-	return *this;
+	return localeAwareChangeCase(1);
 }
 
 /*

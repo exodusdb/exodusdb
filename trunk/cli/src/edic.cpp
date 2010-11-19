@@ -17,9 +17,9 @@ program()
 
         //TODO simplify this editor finding code
 
-        //enable edit at first error for crimson editor
+        //enable edit at first error for crimson editor (no quotes around filename for cedt)
         if (editor.lcase().index("cedt") and not editor.index("$") )
-                editor^=" /L:$LINENO '$FILENAME'";
+                editor^=" /L:$LINENO $FILENAME";
 
         //look for nano.exe next to edic.exe
         if (not editor and SLASH=="\\") {

@@ -866,38 +866,33 @@ lock:
 
 }
 
-void MvEnvironment::osbreadx(var& str1, const var& filehandle, const var& filename, const int startoffset, const int length)
+bool MvEnvironment::osbreadx(var& str1, const var& filehandle, const var& filename, const int startoffset, const int length)
 {
 	//convert from external to internal "codepage"
 	//park the high characters in the low place
-	str1.osbread(filehandle,startoffset,length).converter(EXTERNALCHARS, INTERNALCHARS);
-	return;
+	return str1.osbread(filehandle,startoffset,length).converter(EXTERNALCHARS, INTERNALCHARS);
 
 	//evade warning: unused parameter
 	if (filename) {}
 }
 
-void MvEnvironment::oswritex(const var& str1, const var& filename) const
+bool MvEnvironment::oswritex(const var& str1, const var& filename) const
 {
 
 	//convert from internal to external "codepage"
 	//move parked characters to high characters
 	//(any field seps in the output will already have been escaped like %fe)
-	str1.convert(INTERNALCHARS, EXTERNALCHARS).oswrite(filename);
-
-	return;
+	return str1.convert(INTERNALCHARS, EXTERNALCHARS).oswrite(filename);
 
 }
 
-void MvEnvironment::osbwritex(const var& str1, const var& filehandle, const var& filename, const int offset) const
+bool MvEnvironment::osbwritex(const var& str1, const var& filehandle, const var& filename, const int offset) const
 {
 
 	//convert from internal to external "codepage"
 	//move parked characters to high characters
 	//(any field seps in the output will already have been escaped like %fe)
-	str1.convert(INTERNALCHARS, EXTERNALCHARS).osbwrite(filehandle,offset);
-
-	return;
+	return str1.convert(INTERNALCHARS, EXTERNALCHARS).osbwrite(filehandle,offset);
 
 	//evade warning: unused parameter
 	if (filename) {}
