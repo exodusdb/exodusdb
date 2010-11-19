@@ -1728,16 +1728,15 @@ subroutine getmark(in mode, in html, out mark)
 	mark="";
 	return;
 	//prevent "warning unused" until properly implemented
-	mode;
-	html;
+	if (mode or html){};
 }
 
 subroutine addunits(in newunits, out totunits)
 {
 	return;
 	//prevent "warning unused" until properly implemented
-	newunits;
-	totunits;
+	if (newunits or totunits){};
+
 }
 
 subroutine mssg(in msg)
@@ -1756,9 +1755,10 @@ subroutine msg2(in msg, in options, io buffer, in params)
 	if (options.index("R"))
 		stop("msg2()");
 	return;
+
 	//prevent "warning unused" until properly implemented
-	buffer;
-	params;
+	if (buffer or params){};
+
 }
 
 subroutine dicti2a(out dictrec)

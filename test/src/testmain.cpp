@@ -1,5 +1,12 @@
 #include <exodus/program.h>
 #include <cassert>
+#include <locale.h>
+
+/*Ubuntu
+ apt-cache search locale |grep -i greek
+ greek turkish german
+ apt-get install language-support-el
+*/
 
 //non-ASCII unicode characters
 var GreekQuestionMark		=L"\u037E";//GREEK QUESTION MARK (Punctuation)
@@ -26,28 +33,39 @@ programinit()
 
 function main()
 {
+
+#ifdef __STDC_ISO_10646__
+//	printl("__STDC_ISO_10646__");
+#endif
+
+	//SQL tracing
 	//DBTRACE=true;
+
+	//save original locale
+	//setxlocale("C");
+	var locale0=getxlocale().outputl("Original Locale=");
 
 	//windows locales Windows XP and Windows Server 2003
 	//http://msdn.microsoft.com/en-us/goglobal/bb895996.aspx
-	var english_uk="";
 	var english_us="";
 	var german_standard="";
-	var greek="";
+	var greek_gr="";
 	var turkish="";
 	if (SLASH_IS_BACKSLASH) {
-		english_uk=2057;
 		english_us=1033;
 		german_standard=1031;
-		greek=1032;
+		greek_gr=1032;
 		turkish=1055;
 	} else {
+		english_us="en_US.utf8";
+		greek_gr="el_GR.UTF-8";
+		turkish="tr_TR.UTF-8";
 	}
-	var locale0=getxlocale();
 
 	//in English/US Locale
 	//check ASCII upper/lower casing
-	setxlocale(english_us);
+//	setxlocale(english_us);
+	assert(setxlocale(english_us));
 	assert(ucase(LOWERCASE_) eq UPPERCASE_);
 	assert(lcase(UPPERCASE_) eq LOWERCASE_);
 
@@ -56,28 +74,34 @@ function main()
 	assert(setxlocale(german_standard));
 	//FAILS in Windows XPSP3UK
 	//assert(ucase(GermanEszet) eq "SS");
-	ucase(GermanEszet).oconv("HEX4").oconv("T#4").outputl();
+	ucase(GermanEszet).oconv("HEX4").oconv("T#4").outputl("German Eszet:");
 
 	//in Greek Locale
 	//convert word ending in "capital sigma" lower cases to "lower final sigma"
+	assert(setxlocale(greek_gr));
+	//Greek_sas       .outputl("Greek_sas=");
+	//ucase(Greek_sas).outputl("ucased   =");
+	//lcase(Greek_SAS).oconv("HEX4").oconv("T#4").outputl();
 	assert(ucase(Greek_sas) eq Greek_SAS);
 	//FAILS in Windows XPSP3UK
 	//assert(lcase(Greek_SAS) eq Greek_sas);
-	lcase(Greek_SAS).oconv("HEX4").oconv("T#4").outputl();
 
 	//in Turkish Locale
 	//check Latin "I" lowercases to "turkish dotless i"
 	//check Latin "i" uppercases to "turkish dotted I"
-	assert(setxlocale(turkish));
-	assert(lcase(LatinCapitalI) eq TurkishSmallDotlessI);
-	assert(ucase(LatinSmallI)   eq TurkishCapitalDottedI);
+	//fails on Ubuntu 10.04
+	if (SLASH_IS_BACKSLASH) {
+		assert(setxlocale(turkish));
+		assert(lcase(LatinCapitalI) eq TurkishSmallDotlessI);
+		assert(ucase(LatinSmallI)   eq TurkishCapitalDottedI);
+	}
 
 	//restore initial locale
 	setxlocale(locale0);
 
 	var tempfilename5;
 	var record5;
-	tempfilename5=SLASH^"TEMP7657.TXT";
+	tempfilename5="temp7657.txt";
 
 	//check we cannot write to a non-existent file
 	osdelete(tempfilename5); //make sure the file doesnt exist
@@ -91,9 +115,11 @@ function main()
 	osdelete(tempfilename5);
 
 	//check cannot write non-codepage characters
-	assert(oswrite("",tempfilename5));
-	assert(not osbwrite(L"\u0393",tempfilename5,2));
-	osdelete(tempfilename5);
+	if (SLASH_IS_BACKSLASH) {
+		assert(oswrite("",tempfilename5));
+		assert(not osbwrite(L"\u0393",tempfilename5,2));
+		osdelete(tempfilename5);
+	}
 
 	var xyzz=var("Abc").ucase().outputl();
 
@@ -128,10 +154,12 @@ function main()
 	//swap(unicode,"\\p{L}","?","ri").outputl();
 	//swap(unicode,"\\p{L}","?","ri").oconv("HEX4").outputl();
 	//p(L} is regular expression for Unicode Letter
-	assert(swap(unicode,"\\pL","?","ri") eq expect);
+	if (SLASH_IS_BACKSLASH)
+		assert(swap(unicode,"\\pL","?","ri") eq expect);
 	//but what is its inverse?
 	//assert(swap(unicode,"\\PL","?","ri") eq expect);
 
+	setxlocale(english_us);
 	var punctuation=GreekQuestionMark;//(Punctuation)
 	var uppercase=GreekCapitalGamma;//(Uppercase)
 	var lowercase=GreekSmallGamma;//(Lowercase)
@@ -145,6 +173,7 @@ function main()
 	assert(oconv(punctuation,"MC/N") eq punctuation);
 	assert(oconv(punctuation,"MC/B") eq punctuation);
 
+	oconv(letters,"MCA").outputl("Expected:"^letters^" Actual:");
 	assert(oconv(letters,"MCA") eq letters);
 	assert(oconv(letters,"MCN") eq "");
 	assert(oconv(letters,"MCB") eq letters);

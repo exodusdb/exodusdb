@@ -1,3 +1,6 @@
+//UPCOMING BOOST LOCALE!
+//http://cppcms.sourceforge.net/boost_locale/html/index.html
+
 //#include <unicode/ustring.h>
 //#include <boost/regex/icu.hpp>
 /*
@@ -92,6 +95,9 @@ qt strings are unicode
 
 */
 
+//#include <boost/algorithm/string.hpp>
+#include <wctype.h>
+
 #if defined(_MSC_VER)
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -103,6 +109,7 @@ qt strings are unicode
 #include <locale.h>
 #define MV_NO_NARROW
 #include <exodus/mv.h>
+#include <exodus/mvexceptions.h>
 
 namespace exodus {
 
@@ -222,10 +229,26 @@ var& var::localeAwareChangeCase(const int lowerupper)
 
 #elif 1
 	//for now only ascii conversion
+	//if (lowerupper==1) 
+	//	converter(UPPERCASE_,LOWERCASE_);
+	//else if (lowerupper==2)
+	//	converter(LOWERCASE_, UPPERCASE_);
+
+	//for now only fairly simple one for one conversion
+
+	//if (lowerupper==1) 
+	//	boost::to_lower(var_mvstr);
+	//else if (lowerupper==2)
+	//	boost::to_upper(var_mvstr);
+
+	size_t  length=var_mvstr.length();
 	if (lowerupper==1) 
-		converter(UPPERCASE_,LOWERCASE_);
+		for (size_t ptr=0; ptr<length; ++ptr)
+			var_mvstr[ptr]=towlower(var_mvstr[ptr]);
 	else if (lowerupper==2)
-		converter(LOWERCASE_, UPPERCASE_);
+		for (size_t ptr=0; ptr<length; ++ptr)
+			var_mvstr[ptr]=towupper(var_mvstr[ptr]);
+
 	return *this;
 
 #elif defined(_MACOS)
@@ -267,6 +290,8 @@ bool var::setxlocale() const
 
 //#elif defined(_MACOS)
 #else
+	THISIS(L"bool var::setxlocale() const")
+	THISISSTRING()
 
 	//make a thread local locale if not done already
 	//TODO do this in thread creation
@@ -275,7 +300,7 @@ bool var::setxlocale() const
 	if (uselocale(NULL)==uselocale(LC_GLOBAL_LOCALE))
 		uselocale(duplocale(uselocale(LC_GLOBAL_LOCALE)));
 
-	return setlocale(LC_ALL,*this)!=NULL;
+	return setlocale(LC_ALL,(*this).tostring().c_str())!=NULL;
 
 #endif
 
@@ -289,7 +314,8 @@ var& var::getxlocale()
 //#elif defined(_MACOS)
 #else
 	//return "";
-	return setlocale(LC_ALL,NULL)
+	*this=var(setlocale(LC_ALL,NULL));
+	return *this;
 #endif
 }
 

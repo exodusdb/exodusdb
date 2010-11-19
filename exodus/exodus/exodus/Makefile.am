@@ -16,18 +16,20 @@ xfunctorf9.h xfunctors0.h xfunctors1.h xfunctors10.h xfunctors11.h \
 xfunctors12.h xfunctors13.h xfunctors14.h xfunctors15.h xfunctors16.h \
 xfunctors17.h xfunctors18.h xfunctors19.h xfunctors2.h xfunctors20.h \
 xfunctors3.h xfunctors4.h xfunctors5.h xfunctors6.h xfunctors7.h \
-xfunctors8.h xfunctors9.h 
+xfunctors8.h xfunctors9.h
 
 
 #some more headers
-buildonly_h_sources = ConvertUTF.h NullCodecvt.h TConvert.h gettimeofday.h neo.h mvconfig.h MurmurHash2_64.h
+buildonly_h_sources = ConvertUTF.h NullCodecvt.h TConvert.h gettimeofday.h neo.h mvconfig.h MurmurHash2_64.h \
+mvhandles.h
+
 
 #source files
 cc_sources = ConvertUTF.c howto.cpp mvarray.cpp mvdatetime.cpp  mvdebug.cpp mvfuncs.cpp mvioconv.cpp mvlibs.cpp mvos.cpp \
 mvutf.cpp naturalorder.cpp gettimeofday.cpp mv2.cpp mv.cpp mvdbpostgres.cpp mvenvironment.cpp mvglobalfuncs.cpp  \
 mvipc.cpp mvmv.cpp mvunicode.cpp mvipc_boost.cpp mvipc_posix.cpp \
 mvipc_ms.cpp mvposix.cpp MurmurHash2_64.cpp \
-mvfunctor.cpp mvprogram.cpp
+mvfunctor.cpp mvprogram.cpp mvhandles.cpp
 
 #where to install the libraries include headers
 library_includedir=$(includedir)/$(GENERIC_LIBRARY_NAME)-$(GENERIC_API_VERSION)/$(GENERIC_LIBRARY_NAME)
