@@ -912,32 +912,32 @@ DLL_PUBLIC bool insertrecord(const var& record, const var& filehandle,const var&
 
 DLL_PUBLIC bool select(const var& sortselectclause)
 {
-	return var("default").select(sortselectclause);
+	return var(L"default").select(sortselectclause);
 }
 
 void DLL_PUBLIC clearselect()
 {
-	var("default").clearselect();
+	var(L"default").clearselect();
 }
 
 DLL_PUBLIC bool readnext(var& key)
 {
-	return var("default").readnext(key);
+	return var(L"default").readnext(key);
 }
 
 DLL_PUBLIC bool readnext(var& key, var& valueno)
 {
-	return var("default").readnext(key,valueno);
+	return var(L"default").readnext(key,valueno);
 }
 
 DLL_PUBLIC bool selectrecord(const var& sortselectclause)
 {
-	return var("default").selectrecord(sortselectclause);
+	return var(L"default").selectrecord(sortselectclause);
 }
 
 DLL_PUBLIC bool readnextrecord(var& record, var& key)
 {
-	return var("default").readnextrecord(record, key);
+	return var(L"default").readnextrecord(record, key);
 }
 
 /* done in ExodusProgramBase and MvEnvironment now
