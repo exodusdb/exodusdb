@@ -100,6 +100,8 @@ qt strings are unicode
 #endif
 
 #include <boost/scoped_array.hpp>
+#include <locale.h>
+#define MV_NO_NARROW
 #include <exodus/mv.h>
 
 namespace exodus {
@@ -114,7 +116,10 @@ int var::localeAwareCompare(const std::wstring& str1, const std::wstring& str2) 
 	/*
 	Now of course this points to what may be the best solution for a single function that will let you pass string length, ignore case, choose an appropriate locale, and work in different versions of Windows -- the master NLS collation function, CompareStringW!
 	*/
+
 	int comparison;
+
+	//CompareStringW
 	//comparison=CompareStringW(GetUserDefaultLCID(), 0,
 	comparison=CompareStringW(GetThreadLocale(), 0,
 		(TCHAR*)str1.data(), int(str1.length()),
@@ -184,7 +189,7 @@ var& var::localeAwareChangeCase(const int lowerupper)
 	int buffersize=(int) var_mvstr.length()*2+2;
 	boost::scoped_array<TCHAR> buffer( new TCHAR [buffersize]);
 	if (buffer==0)
-		throw MVException(var(L"Out of memory in changecase(). Need ")^int(buffersize)^" characters");
+		throw MVException(var(L"Out of memory in changecase(). Need ")^int(buffersize)^L" characters");
 
 	int tolowerupper=LCMAP_LINGUISTIC_CASING;
 	if (lowerupper==1) 
@@ -242,6 +247,8 @@ var& var::localeAwareChangeCase(const int lowerupper)
 bool var::setxlocale() const
 {
 
+#if defined(_MSC_VER) && defined(UNICODE)
+
 	/* http://msdn.microsoft.com/en-us/library/dd374051%28v=VS.85%29.aspx
 	//locale list
 	//XP 2003 http://msdn.microsoft.com/en-us/goglobal/bb895996.aspx
@@ -258,11 +265,20 @@ bool var::setxlocale() const
 
 	return SetThreadLocale((*this).toInt())!=NULL;
 
-#if defined(_MSC_VER) && defined(UNICODE)
+//#elif defined(_MACOS)
+#else
 
-#elif defined(_MACOS)
-	return true;
+	//make a thread local locale if not done already
+	//TODO do this in thread creation
+	//TODO destroy threalocale in thread destruction *OTHERWISE MEMORY LEAK
+	//to avoid checking on every setxlocale
+	if (uselocale(NULL)==uselocale(LC_GLOBAL_LOCALE))
+		uselocale(duplocale(uselocale(LC_GLOBAL_LOCALE)));
+
+	return setlocale(LC_ALL,*this)!=NULL;
+
 #endif
+
 }
 
 var& var::getxlocale()
@@ -270,8 +286,10 @@ var& var::getxlocale()
 #if defined(_MSC_VER) && defined(UNICODE)
 	*this=(int)GetThreadLocale();
 	return *this;
-#elif defined(_MACOS)
-	return "";
+//#elif defined(_MACOS)
+#else
+	//return "";
+	return setlocale(LC_ALL,NULL)
 #endif
 }
 

@@ -289,6 +289,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\mvhandles.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\mvioconv.cpp"
 				>
 			</File>
@@ -444,6 +448,10 @@
 			</File>
 			<File
 				RelativePath=".\mvfunctor.h"
+				>
+			</File>
+			<File
+				RelativePath=".\mvhandles.h"
 				>
 			</File>
 			<File

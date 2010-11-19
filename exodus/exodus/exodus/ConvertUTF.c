@@ -36,6 +36,7 @@
 
 	Sep 2007: exodus/Steve Bush passthrough illegal utf8/16 characters 0xF9-0xFF used in pick database
 	Mar 2009: exodus/Steve Bush passthrough illegal utf8/32 characters 0xF9-0xFF used in pick database
+	Nov 2010: exodus/Steve Bush inline isLegalUTF8 as per suggestion (using supposedly portable INLINE macro)
 
     See the header file "ConvertUTF.h" for complete documentation.
 
@@ -212,6 +213,13 @@ static const UTF8 firstByteMark[7] = { 0x00, 0x00, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC 
  * into an inline function.
  */
 
+/*exodus*/
+#ifdef _MSC_VER
+  #define INLINE __forceinline // use __forceinline (VC++ specific)
+#else
+  #define INLINE inline // use standard inline
+#endif
+
 /* --------------------------------------------------------------------- */
 
 ConversionResult ConvertUTF16toUTF8 (
@@ -312,8 +320,7 @@ ConversionResult ConvertUTF16toUTF8 (
  * definition of UTF-8 goes up to 4-byte sequences.
  */
 
-/*exodus*/
-/*inline*/
+INLINE /*exodus*/
 
 static Boolean isLegalUTF8(const UTF8 *source, int length) {
     UTF8 a;
@@ -346,6 +353,9 @@ static Boolean isLegalUTF8(const UTF8 *source, int length) {
  * Exported function to return whether a UTF-8 sequence is legal or not.
  * This is not used here; it's just exported.
  */
+
+INLINE /*exodus*/
+
 Boolean isLegalUTF8Sequence(const UTF8 *source, const UTF8 *sourceEnd) {
     int length = trailingBytesForUTF8[*source]+1;
     if (source+length > sourceEnd) {

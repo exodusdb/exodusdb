@@ -21,6 +21,7 @@ var LatinSmallI             ="i";
 var LatinCapitalI           ="I";
 
 var GermanEszet             =L"\u00DF";//German 
+
 programinit()
 
 function main()
@@ -76,7 +77,7 @@ function main()
 
 	var tempfilename5;
 	var record5;
-	tempfilename5="TEMP7657.TXT";
+	tempfilename5=SLASH^"TEMP7657.TXT";
 
 	//check we cannot write to a non-existent file
 	osdelete(tempfilename5); //make sure the file doesnt exist
