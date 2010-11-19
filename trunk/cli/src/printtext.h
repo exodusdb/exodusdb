@@ -75,7 +75,7 @@ public:
 			if (printfilename == "") {
 				printfilename = (var(999999999).rnd()).substr(-8, 8);
 				if (html)
-					printfilename^=".HTM";
+					printfilename^=".htm";
 				else
 					printfilename^=".txt";
 				env->SYSTEM.replacer(2, 0, 0, printfilename);
