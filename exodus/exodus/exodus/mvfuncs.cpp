@@ -32,6 +32,10 @@ THE SOFTWARE.
 #pragma warning (disable: 4530)
 #endif
 
+#ifndef _MSC_VER
+#include <signal.h>
+#endif
+
 #include <iostream> //cin and cout
 #include <cmath> //for floor
 #include <cstdlib>//for exit
@@ -1523,6 +1527,11 @@ var var::debug() const
 	//"good way to break into the debugger by causing a seg fault"
     // *(int *)0 = 0;
 	//throw var(L"Debug Statement");
+
+#ifdef raise
+	raise(SIGTRAP);
+#endif
+
 	throw MVDebug();
 	return L"";
 }
