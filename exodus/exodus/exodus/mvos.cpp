@@ -857,7 +857,86 @@ bool var::oswrite(const var& osfilename) const
 }
 
 #ifdef CACHED_HANDLES
-void var::osbwrite(const var& osfilehandle, const int startoffset) const
+bool var::osbwrite(const var& osfilehandle, const int startoffset) const
+{
+	THISIS(L"void var::osbwrite(const var& osfilehandle, const int startoffset) const")
+	THISISSTRING()
+	ISSTRING(osfilehandle)
+
+	//TODO buffer the fileopen ... is ate needed here?
+	//using wfstream instead of wofstream so that we can seek to the end of the file?
+	std::wofstream * pmyfile = 0;
+	if( osfilehandle.var_mvtyp & pimpl::MVTYPE_HANDLE)
+	{
+		pmyfile = (std::wofstream *) h_cache.get_handle( (int) osfilehandle.var_mvint);
+		if( pmyfile == 0)		// nonvalid handle
+		{
+			osfilehandle.var_mvint = 0;
+			osfilehandle.var_mvtyp ^= pimpl::MVTYPE_HANDLE;	// clear bit
+		}
+	}
+	if( pmyfile == 0)
+	{
+		pmyfile = new std::wofstream;
+
+	//what is the purpose of the following?
+	//to prevent locale conversion if writing narrow string to wide stream or vice versa
+	//imbue BEFORE opening
+	//myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
+	//binary!
+		pmyfile->open(osfilehandle.tostring().c_str(), std::ios::out | std::ios::in | std::ios::binary | std::ios::ate);
+		if (! (*pmyfile))
+		{
+			delete pmyfile;
+			return false;
+		}
+		osfilehandle.var_mvint = h_cache.add_osfile( pmyfile);
+		osfilehandle.var_mvtyp = pimpl::MVTYPE_OPENED;
+		h_cache[(int)osfilehandle.var_mvint].extra = 1;		// mark it as output, (as ofstream)
+	}
+	//NB seekp goes by bytes regardless of the fact that it is a wide stream
+	//myfile.seekp (startoffset*sizeof(wchar_t));
+	//startoffset should be in bytes except for fixed multibyte code pages like UTF16 and UTF32
+	pmyfile->seekp (startoffset);
+
+	//NB but length goes by number of wide characters not bytes
+#ifndef __MINGW32__
+	pmyfile->write(var_mvstr.data(),int(var_mvstr.length()));
+#else
+	//TODO avoid string copy if wofstream not defined to be ofstream
+	std::string tempstr=tostring();
+	myfile.write(tempstr.data(),int(tempstr.length()));
+#endif
+
+	//on windows, wfstream will try to convert to current locale codepage so
+	//if you are trying to write an exodus string containing a GREEK CAPITAL GAMMA
+	//unicode \x0393 and current codepage is *NOT* CP1253 (Greek)
+	//then c++ wiofstream cannot convert \x0393 to a single byte (in CP1253)
+	if (pmyfile->fail())
+	{
+// saved in cache, do not close		myfile.close();
+		return false;
+	}
+// saved in cache, do not close		myfile.close();
+	return true;
+}
+#ifdef CACHED_HANDLES_ANSI_C
+static FILE * fopen_with_random_rw( const char * fname)
+{
+	FILE * h = fopen( fname, "r+b");
+	// Normally above command is OK on most frequest cases and we will return from the function.
+	if( h != NULL)
+		return h;
+
+	// Above operation could if a requested file not exist, for that case:
+	h = fopen( fname, "a+b");	// should create missing file
+	if( h == NULL)
+		return h;				// sorry, something wrong here
+
+	return freopen( fname, "r+b", h);	// reopen with write mode withoud append
+}
+
+bool var::osbwrite(const var& osfilehandle, const int startoffset) const
 {
 	THISIS(L"void var::osbwrite(const var& osfilehandle, const int startoffset) const")
 	THISISSTRING()
@@ -884,9 +963,11 @@ void var::osbwrite(const var& osfilehandle, const int startoffset) const
 		// if( not_exist( file)
 		//	create( file)
 		// open( file, "r+b")	ALN:TODO:implement, select proper mode
-		h = fopen( osfilehandle.tostring().c_str(), "a+b");	// append, not truncate
+
+//		h = fopen( osfilehandle.tostring().c_str(), "a+b");	// append, not truncate
+		h = fopen_with_random_rw( osfilehandle.tostring().c_str());
 		if( h == NULL)		// nonvalid handle
-			return;
+			return false;
 //		if( h != NULL)
 		{
 			osfilehandle.var_mvint = h_cache.add_osfile( h);
@@ -903,7 +984,9 @@ void var::osbwrite(const var& osfilehandle, const int startoffset) const
 	fseek( h, startoffset*sizeof(wchar_t), SEEK_SET);
 	size_t byteswritten = fwrite( var_mvstr.data(), sizeof(wchar_t), var_mvstr.length(), h);
 	//ALN:TODO:check returned value byteswritten
+	return true;
 }
+#  endif	// ANSI C version
 #else
 bool var::osbwrite(const var& osfilehandle, const int startoffset) const
 {
@@ -958,6 +1041,102 @@ bool var::osbwrite(const var& osfilehandle, const int startoffset) const
 #endif
 
 #ifdef CACHED_HANDLES
+var& var::osbread(const var& osfilehandle, const int startoffset, const int size)
+{
+	THISIS(L"var& var::osbread(const var& osfilehandle, const int startoffset, const int size)")
+	THISISDEFINED()
+	ISSTRING(osfilehandle)
+
+	var_mvstr=L"";
+	var_mvtyp=pimpl::MVTYPE_STR;
+
+	if (size<=0) return *this;
+
+	//avoiding wifstream due to non-availability on some platforms (mingw for starters)
+	//and to allow full control over narrow/wide character conversion
+	//std::wifstream myfile;
+	std::ifstream * pmyfile = 0;
+	if( osfilehandle.var_mvtyp & pimpl::MVTYPE_HANDLE)
+	{
+		pmyfile = (std::ifstream *) h_cache.get_handle( (int) osfilehandle.var_mvint);
+		if( pmyfile == 0)		// nonvalid handle
+		{
+			osfilehandle.var_mvint = 0;
+			osfilehandle.var_mvtyp ^= pimpl::MVTYPE_HANDLE;	// clear bit
+		}
+	}
+	// Open file, checking for file handle in cache table
+	if( pmyfile == 0)		// nonvalid handle
+	{
+		pmyfile = new std::ifstream;
+	//what is the purpose of the following?
+	//to prevent locale conversion if writing narrow string to wide stream or vice versa
+	//imbue BEFORE opening
+	//myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
+
+	//binary!
+	//use ::ate to position at end so tellg below can determine file size
+		pmyfile->open(osfilehandle.tostring().c_str(), std::ios::binary | std::ios::ate);
+		if( ! (*pmyfile))
+		{
+			delete pmyfile;
+			return * this;
+		}
+		osfilehandle.var_mvint = h_cache.add_osfile( pmyfile);
+		osfilehandle.var_mvtyp = pimpl::MVTYPE_OPENED;
+	}
+
+//NB all file sizes are in bytes NOT characters despite this being a wide character fstream
+	// Position get pointer at the end of file, as expected it to be if we open file anew
+	pmyfile->seekg( 0, std::ios::end);
+	unsigned int maxsize = pmyfile->tellg();
+	if ((unsigned long)startoffset>=maxsize)	// past EOF
+	{
+		return *this;
+	}
+
+	//allow negative offset to read from the back of the file
+	//!cannot be unsigned and allow negative
+	//unsigned int readfrom=startoffset;
+	int readfrom=startoffset;
+	if (readfrom<0) {
+		readfrom+=maxsize;
+		//but not so negative that it reads from before the beginning of the file
+		if (readfrom<0)
+			readfrom=0;
+	}
+
+	//limit reading up to end of file although probably happens automatically
+	unsigned int readsize=size;
+	if (readfrom+readsize>maxsize)
+		readsize=maxsize-readfrom;
+
+	//nothing to read
+	if (readsize<=0)
+	{
+		return *this;
+	}
+
+	//new
+	//wchar_t* memblock;
+	//memblock = new wchar_t [readsize/sizeof(wchar_t)];
+/*
+	char* memblock;
+	memblock = new char [readsize];
+*/
+	boost::scoped_array<char> memblock( new char [readsize]);
+	if (memblock==0)
+	{//TODO NEED TO THROW HERE
+		return *this;
+	}
+	pmyfile->seekg (startoffset, std::ios::beg);
+	pmyfile->read (memblock.get(), readsize);
+//	pmyfile->close();
+
+	var_mvstr=wstringfromchars(memblock.get(), readsize);
+	return *this;
+}
+#ifdef CACHED_HANDLES_ANSI_C
 var& var::osbread(const var& osfilehandle, const int startoffset, const int size)
 {
 	THISIS(L"var& var::osbread(const var& osfilehandle, const int startoffset, const int size)")
@@ -1044,6 +1223,7 @@ var& var::osbread(const var& osfilehandle, const int startoffset, const int size
 
 	return *this;
 }
+#endif // ANSI C version
 #else
 var& var::osbread(const var& osfilehandle, const int startoffset, const int size)
 {
@@ -1154,6 +1334,36 @@ void var::osclose() const
 	THISISSTRING()
 	if( var_mvtyp & pimpl::MVTYPE_HANDLE)
 	{
+		//ALN:TODO: dangerous - distinguish which object was saved
+		int is_output_file = h_cache[ ( int) var_mvint].extra;
+		if( is_output_file)
+		{
+//			std::ios * ptr_to_base = (std::ios *) h_cache.get_handle(( int) var_mvint);
+//			std::ofstream * h = dynamic_cast<std::ofstream *> (ptr_to_base);
+			std::ofstream * h = (std::ofstream *) h_cache.get_handle(( int) var_mvint);
+			if( h)
+				delete h;
+		}
+		else
+		{
+//			std::ifstream * h = dynamic_cast<std::ifstream *> (ptr_to_base);
+			std::ifstream * h = (std::ifstream *) h_cache.get_handle(( int) var_mvint);
+			if( h)
+				delete h;
+		}
+		h_cache.del_handle(( int) var_mvint);
+		var_mvint = 0L;
+		var_mvtyp ^= pimpl::MVTYPE_HANDLE | pimpl::MVTYPE_INT;	//only STR bit should remains
+	}
+	// in all other cases, the files shou8ld be closed.
+}
+#ifdef CACHED_HANDLES_ANSI_C
+void var::osclose() const
+{
+	THISIS(L"void var::osclose() const")
+	THISISSTRING()
+	if( var_mvtyp & pimpl::MVTYPE_HANDLE)
+	{
 		FILE * h = ( FILE *) h_cache.get_handle(( int) var_mvint);
 		fclose( h);
 		h_cache.del_handle(( int) var_mvint);
@@ -1162,6 +1372,7 @@ void var::osclose() const
 	}
 	// in all other cases, the files shou8ld be closed.
 }
+#endif
 #else
 void var::osclose() const
 {
