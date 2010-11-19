@@ -5,6 +5,9 @@
 #include <algorithm>
 #include "mvhandles.h"
 
+#include <boost/thread/mutex.hpp>
+boost::mutex mvhandles_mutex;
+
 #define HANDLES_CACHE_SIZE	3
 
 namespace exodus {
@@ -15,7 +18,7 @@ MvHandlesCache::MvHandlesCache()
 
 int MvHandlesCache::add_osfile( CACHED_HANDLE handle_to_opened_file)
 {
-	boost::mutex::scoped_lock lock(io_mutex);
+	boost::mutex::scoped_lock lock(mvhandles_mutex);
 
 	int ix;
 	for( ix = 0; ix < ( int) tbl.size(); ix ++)
@@ -37,19 +40,19 @@ int MvHandlesCache::add_osfile( CACHED_HANDLE handle_to_opened_file)
 
 CACHED_HANDLE MvHandlesCache::get_handle( int index)
 {
-	boost::mutex::scoped_lock lock(io_mutex);
+	boost::mutex::scoped_lock lock(mvhandles_mutex);
 	return tbl[index].flags == HANDLE_ENTRY_FREE ? BAD_CACHED_HANDLE : tbl[index].handle;
 }
 
 void MvHandlesCache::del_handle( int index)
 {
-	boost::mutex::scoped_lock lock(io_mutex);
+	boost::mutex::scoped_lock lock(mvhandles_mutex);
 	tbl[index].flags = HANDLE_ENTRY_FREE;
 }
 
 MvHandlesCache::~MvHandlesCache()
 {
-	boost::mutex::scoped_lock lock(io_mutex);
+	boost::mutex::scoped_lock lock(mvhandles_mutex);
 	int ix;
 	for( ix = 0; ix < ( int) tbl.size(); ix ++)
 		switch( tbl[ix].flags)
