@@ -26,6 +26,7 @@ THE SOFTWARE.
 //EXCELLENT!
 //http://www.regular-expressions.info/
 //http://www.regular-expressions.info/unicode.html 
+#define BOOST_HAS_ICU 1
 #include <boost/regex.hpp>
 #include <boost/scoped_array.hpp>
 
