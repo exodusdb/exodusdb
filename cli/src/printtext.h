@@ -68,7 +68,7 @@ public:
 			//if no printfile assume command mode and make an output file name
 			printfilename = env->SYSTEM.extract(2);
 			if (html.unassigned()) {
-				html = printfilename.substr(-4,4).ucase() eq ".HTM";
+				html = printfilename.substr(-4,4) eq ".htm";
 			}
 
 			var ownprintfile = 0;
@@ -82,8 +82,8 @@ public:
 				ownprintfile = 1;
 			}
 
-			//change the file extension to HTM
-			if (html and printfilename.substr(-4,4).ucase() not_eq ".HTM") {
+			//change the file extension to htm
+			if (html and printfilename.substr(-4,4) not_eq ".htm") {
 
 				printfilename.osclose();
 				printfilename.osdelete();
@@ -92,7 +92,7 @@ public:
 				var tt = (field2(printfilename, "\\", -1)).length();
 				var t2 = ((var(10).pwr(15)).rnd()).substr(1, 8);
 				//var t2 = ((var(pow(10,15)).rnd()).substr(1, 8);
-				printfilename.splicer(-tt, tt, t2 ^ ".HTM");
+				printfilename.splicer(-tt, tt, t2 ^ ".htm");
 
 				env->SYSTEM.replacer(2, 0, 0, printfilename);
 			}
