@@ -1,11 +1,10 @@
 #include <exodus/program.h>
 #include <cassert>
-#include <locale.h>
 
 /*Ubuntu
  apt-cache search locale |grep -i greek
  greek turkish german
- apt-get install language-support-el
+ apt-get install language-support-el language-support-tr
 */
 
 //non-ASCII unicode characters
