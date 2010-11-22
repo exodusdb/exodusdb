@@ -222,8 +222,16 @@ static ExodusOnce exodus_once_static;
 
 namespace exodus{
 #ifdef CACHED_HANDLES
-static /*TODO: make it threadsafe/threadspecific */ MvHandlesCache h_cache;
+	// this object caches wfstream * pointers, to avoid multiple reopening files
+static MvHandlesCache h_cache;
+	// Lifecircle of wfstream object:
+	//	- created (by new) and opened in osbread()/osbwrite();
+	//	- pointer to created object stored in h_cache;
+	//  - when user calls osclose(), the stream is closed and the object is deleted, and removed from h_cache;
+	//	- if user forgets to call osclose(), the stream remains opened (alive) until
+	//		~MvHandlesCache for h_cache closes/deletes all registered objects.
 #endif
+
 bool checknotabsoluterootfolder(std::wstring dirname)
 {
 	//safety - will not rename/remove top level folders
@@ -865,11 +873,9 @@ bool var::osbwrite(const var& osfilehandle, const int startoffset) const
 
 	//TODO buffer the fileopen ... is ate needed here?
 	//using wfstream instead of wofstream so that we can seek to the end of the file?
-///	std::wofstream * pmyfile = 0;
 	std::wfstream * pmyfile = 0;
 	if( osfilehandle.var_mvtyp & pimpl::MVTYPE_HANDLE)
 	{
-///		pmyfile = (std::wofstream *) h_cache.get_handle( (int) osfilehandle.var_mvint);
 		pmyfile = (std::wfstream *) h_cache.get_handle( (int) osfilehandle.var_mvint);
 		if( pmyfile == 0)		// nonvalid handle
 		{
@@ -879,7 +885,6 @@ bool var::osbwrite(const var& osfilehandle, const int startoffset) const
 	}
 	if( pmyfile == 0)
 	{
-///		pmyfile = new std::wofstream;
 		pmyfile = new std::wfstream;
 
 	//what is the purpose of the following?
@@ -890,6 +895,7 @@ bool var::osbwrite(const var& osfilehandle, const int startoffset) const
 ///		pmyfile->open(osfilehandle.tostring().c_str(), std::ios::out | std::ios::in | std::ios::binary | std::ios::ate);
 ///		pmyfile->open(osfilehandle.var_mvstr.c_str(), std::ios::out | std::ios::in | std::ios::binary);
 		//linux wfstream wants a narrow filename
+///		pmyfile->imbue( std::locale((std::locale::classic(), new NullCodecvt));
 		pmyfile->open(osfilehandle.tostring().c_str(), std::ios::out | std::ios::in | std::ios::binary);
 		if (! (*pmyfile))
 		{
@@ -898,7 +904,6 @@ bool var::osbwrite(const var& osfilehandle, const int startoffset) const
 		}
 		osfilehandle.var_mvint = h_cache.add_osfile( pmyfile);
 		osfilehandle.var_mvtyp = pimpl::MVTYPE_OPENED;
-		h_cache[(int)osfilehandle.var_mvint].extra = 1;		// mark it as output, (as ofstream)
 	}
 	//NB seekp goes by bytes regardless of the fact that it is a wide stream
 	//myfile.seekp (startoffset*sizeof(wchar_t));
@@ -995,11 +1000,9 @@ var& var::osbread(const var& osfilehandle, const int startoffset, const int size
 	//avoiding wifstream due to non-availability on some platforms (mingw for starters)
 	//and to allow full control over narrow/wide character conversion
 	//std::wifstream myfile;
-///	std::ifstream * pmyfile = 0;
 	std::wfstream * pmyfile = 0;
 	if( osfilehandle.var_mvtyp & pimpl::MVTYPE_HANDLE)
 	{
-//		pmyfile = (std::ifstream *) h_cache.get_handle( (int) osfilehandle.var_mvint);
 		pmyfile = (std::wfstream *) h_cache.get_handle( (int) osfilehandle.var_mvint);
 		if( pmyfile == 0)		// nonvalid handle
 		{
@@ -1010,7 +1013,6 @@ var& var::osbread(const var& osfilehandle, const int startoffset, const int size
 	// Open file, checking for file handle in cache table
 	if( pmyfile == 0)		// nonvalid handle
 	{
-///		pmyfile = new std::ifstream;
 		pmyfile = new std::wfstream;
 	//what is the purpose of the following?
 	//to prevent locale conversion if writing narrow string to wide stream or vice versa
@@ -1194,30 +1196,14 @@ void var::osclose() const
 	THISISSTRING()
 	if( var_mvtyp & pimpl::MVTYPE_HANDLE)
 	{
-		//ALN:TODO: dangerous - distinguish which object was saved
-		int is_output_file = h_cache[ ( int) var_mvint].extra;
-		if( is_output_file)
-		{
-//			std::ios * ptr_to_base = (std::ios *) h_cache.get_handle(( int) var_mvint);
-//			std::ofstream * h = dynamic_cast<std::ofstream *> (ptr_to_base);
-///			std::ofstream * h = (std::ofstream *) h_cache.get_handle(( int) var_mvint);
-			std::wfstream * h = (std::wfstream *) h_cache.get_handle(( int) var_mvint);
-			if( h)
-				delete h;
-		}
-		else	//ALN:TODO: if OK with wfstream() - merge both execution paths
-		{
-//			std::ifstream * h = dynamic_cast<std::ifstream *> (ptr_to_base);
-///			std::ifstream * h = (std::ifstream *) h_cache.get_handle(( int) var_mvint);
-			std::wfstream * h = (std::wfstream *) h_cache.get_handle(( int) var_mvint);
-			if( h)
-				delete h;
-		}
+		std::wfstream * h = (std::wfstream *) h_cache.get_handle(( int) var_mvint);
+		if( h)
+			delete h;
 		h_cache.del_handle(( int) var_mvint);
 		var_mvint = 0L;
 		var_mvtyp ^= pimpl::MVTYPE_HANDLE | pimpl::MVTYPE_INT;	//only STR bit should remains
 	}
-	// in all other cases, the files shou8ld be closed.
+	// in all other cases, the files should be closed.
 }
 #else
 void var::osclose() const
