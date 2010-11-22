@@ -121,14 +121,19 @@ int var::localeAwareCompare(const std::wstring& str1, const std::wstring& str2) 
 #if defined(_MSC_VER) && defined(UNICODE)
 
 	/*
-	Now of course this points to what may be the best solution for a single function that will let you pass string length, ignore case, choose an appropriate locale, and work in different versions of Windows -- the master NLS collation function, CompareStringW!
+	Now of course this points to what may be the best solution for a single function
+    that will let you pass string length, ignore case, choose an appropriate locale,
+    and work in different versions of Windows -- the master NLS collation function,
+	CompareStringW !
 	*/
 
 	int comparison;
 
 	//CompareStringW
 	//comparison=CompareStringW(GetUserDefaultLCID(), 0,
-	comparison=CompareStringW(GetThreadLocale(), 0,
+
+	// UNICODE is always defined so CompareString is CompareStringW.
+	comparison=CompareString(GetThreadLocale(), 0,
 		(TCHAR*)str1.data(), int(str1.length()),
 		(TCHAR*)str2.data(), int(str2.length()));
 	switch (comparison) {
@@ -136,8 +141,10 @@ int var::localeAwareCompare(const std::wstring& str1, const std::wstring& str2) 
 		return -1;
 	case CSTR_GREATER_THAN:
 		return 1;
-	default:
+	case CSTR_EQUAL:
 		return 0;
+	default:
+		throw MVException( L"localeAwareCompare(" ^ str1 ^ L", " ^ str2 ^ L")\n");
 	}
 
 #elif defined(_MACOS)
