@@ -1113,6 +1113,152 @@ bool var::isnum(void) const
 	//NB going backwards - for speed?
 	//TODO: check if going backwards is slow for variable width multi-byte character strings
 	//and replace with forward scanning
+
+	// Suggestion: statistically, non numeric strings are postfixed by numbers but not prefixed.
+	// Example, natural names for DB tables are CUSTOMERS1 and REPORT2009, but not 1CUSTOMER and 2009REPORT
+//	for (int ii=(int)var_mvstr.length()-1;ii>=0;--ii)
+	for (int ii=0; ii < (int)var_mvstr.length(); ii++)
+	{
+		wchar_t cc=var_mvstr[ii];
+		// + 2B		- 2D
+		// . 2E		number 30-39
+		if (cc > '9')		// for sure not a number
+		{
+			var_mvtyp=pimpl::MVTYPE_NANSTR;
+			return false;
+		}
+		if (cc >= '0')
+		{
+			digit=true;
+		}
+		else
+		{
+			switch (cc)
+			{
+				case L'.':
+					if (point)	// 2nd point - is non-numeric
+					{
+						var_mvtyp=pimpl::MVTYPE_NANSTR;
+						return false;
+					}
+					point=true;
+					break;
+
+				case L'-':
+				case L'+':
+					//non-numeric if +/- is not the first character or is the only character
+					if (ii)
+					{
+						var_mvtyp=pimpl::MVTYPE_NANSTR;
+						return false;
+					}
+					break;
+
+				//any other character mean non-numeric
+				default:
+					var_mvtyp=pimpl::MVTYPE_NANSTR;
+					return false;
+			}
+		}
+	}
+
+	//strategy:
+	//Only test the length of string once in the relatively common cases (ie where
+	//the string fails numeric testing or there is at least one digit in the string)
+	//Only in the rarer cases of the string being zero length
+	//(or being one of special cases + - . +. -.) will the length be checked twice
+	// digit=false
+	// test length zero so no loop
+	// if (!digit)
+	//  test length zero again
+
+	//perhaps slightly unusual cases here
+	//zero length string and strings like + - . +. -.
+	if (!digit)
+	{
+		//must be at least one digit unless zero length string
+		if (var_mvstr.length())
+		// goto nan;
+		{
+			var_mvtyp=pimpl::MVTYPE_NANSTR;
+			return false;
+		}
+
+		//zero length string is integer 0
+		var_mvint=0;
+		var_mvtyp=pimpl::MVTYPE_INTSTR;
+		return true;
+	}
+
+	//get and save the number as int or double
+	if (point)
+	{
+		//var_mvdbl=_wtof(var_mvstr.c_str());
+		//var_mvdbl=_wtof(var_mvstr.c_str());
+		//TODO optimise with code based on the following idea?
+		/*
+		union switchitup
+		{
+			wchar_t bigletter;
+			char smalletters[sizeof(wchar_t)/sizeof(char)];
+		} abcd;
+		abcd.bigletter=0x0035;	
+		std::cout<<atoi(abcd.smalletters)<<std::endl;
+		*/
+
+		// http://www.globalyzer.com/gi/help/gihelp/unsafeMethod/atof.htm :
+		// "... _wtof is supported only on Windows platforms"
+		// "... Recommended Replacements: ANSI UTF-16 wcstod"
+///		std::string result(var_mvstr.begin(),var_mvstr.end());
+///		var_mvdbl=atof(result.c_str());
+		var_mvdbl=wcstod(var_mvstr.c_str(), 0);
+		var_mvtyp=pimpl::MVTYPE_DBLSTR;
+	}
+	else
+	{
+		//var_mvint=_wtoi(var_mvstr.c_str());
+		//TODO optimise
+
+		//change from
+///		std::string result(var_mvstr.begin(),var_mvstr.end());
+///		var_mvint=atoi(result.c_str());
+		var_mvint=wcstol(var_mvstr.c_str(), 0, 10);
+		var_mvtyp=pimpl::MVTYPE_INTSTR;
+	}
+	//indicate isNumeric
+	return true;
+}
+
+bool var::isnum_old(void) const
+{
+	THISIS(L"bool var::isnum(void) const")
+	//TODO make isnum private and ensure ISDEFINED is checked before all calls to isnum
+	//to save the probably double check here
+	THISISDEFINED()
+
+	//is numeric already
+	if (var_mvtyp&pimpl::MVTYPE_INTDBL)
+		return true;
+
+	//is known not numeric already
+	//maybe put this first if comparison operations on strings are more frequent than numeric operations on numbers
+	if (var_mvtyp&pimpl::MVTYPE_NAN)
+		return false;
+
+	//not assigned error
+	if (!var_mvtyp)
+		throw MVUnassigned(L"isnum()");
+
+	//if not a number and not unassigned then it is an unknown string
+
+	bool point=false;
+	bool digit=false;
+
+	//otherwise find test
+	//a number is optional minus followed by digits and max of one decimal point
+	//NB going backwards - for speed?
+	//TODO: check if going backwards is slow for variable width multi-byte character strings
+	//and replace with forward scanning
 	for (int ii=(int)var_mvstr.length()-1;ii>=0;--ii)
 	{
 
