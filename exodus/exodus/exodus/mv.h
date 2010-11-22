@@ -840,6 +840,7 @@ public:
 	var len() const;
 	const wchar_t* data() const;
 	bool isnum() const;
+	bool isnum_old() const;
 	bool isalpha() const;
 
 	//STRING MANIPULATIONS (all return var& and are not const)
