@@ -57,12 +57,17 @@ MvHandlesCache::~MvHandlesCache()
 	for( ix = 0; ix < ( int) tbl.size(); ix ++)
 		switch( tbl[ix].flags)
 		{
-		  case HANDLE_ENTRY_OSFILE:
-			continue;
-		  case HANDLE_ENTRY_FREE:
-			continue;
-		  default:
-			continue;
+			case HANDLE_ENTRY_OSFILE:
+			{
+				//std::wfstream * h
+				void * h = tbl[ix].handle;
+				delete h;		// this should close a stream and destroy stream object
+				continue;
+			}
+			case HANDLE_ENTRY_FREE:
+				continue;
+			default:
+				continue;
 		}
 }
 
