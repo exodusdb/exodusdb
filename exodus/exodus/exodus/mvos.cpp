@@ -865,6 +865,11 @@ bool var::oswrite(const var& osfilename) const
 }
 
 #ifdef CACHED_HANDLES
+static void del_wfstream( void * handle)
+{
+	delete ( std::wfstream *) handle;
+}
+
 bool var::osbwrite(const var& osfilehandle, const int startoffset) const
 {
 	THISIS(L"void var::osbwrite(const var& osfilehandle, const int startoffset) const")
@@ -902,7 +907,7 @@ bool var::osbwrite(const var& osfilehandle, const int startoffset) const
 			delete pmyfile;
 			return false;
 		}
-		osfilehandle.var_mvint = h_cache.add_osfile( pmyfile);
+		osfilehandle.var_mvint = h_cache.add_handle( pmyfile, del_wfstream);
 		osfilehandle.var_mvtyp = pimpl::MVTYPE_OPENED;
 	}
 	//NB seekp goes by bytes regardless of the fact that it is a wide stream
@@ -1030,7 +1035,7 @@ var& var::osbread(const var& osfilehandle, const int startoffset, const int size
 			delete pmyfile;
 			return * this;
 		}
-		osfilehandle.var_mvint = h_cache.add_osfile( pmyfile);
+		osfilehandle.var_mvint = h_cache.add_handle( pmyfile, del_wfstream);
 		osfilehandle.var_mvtyp = pimpl::MVTYPE_OPENED;
 	}
 
@@ -1196,9 +1201,9 @@ void var::osclose() const
 	THISISSTRING()
 	if( var_mvtyp & pimpl::MVTYPE_HANDLE)
 	{
-		std::wfstream * h = (std::wfstream *) h_cache.get_handle(( int) var_mvint);
-		if( h)
-			delete h;
+//		std::wfstream * h = (std::wfstream *) h_cache.get_handle(( int) var_mvint);
+//		if( h)
+//			delete h;
 		h_cache.del_handle(( int) var_mvint);
 		var_mvint = 0L;
 		var_mvtyp ^= pimpl::MVTYPE_HANDLE | pimpl::MVTYPE_INT;	//only STR bit should remains
