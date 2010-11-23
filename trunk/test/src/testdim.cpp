@@ -14,6 +14,18 @@ function main()
 	 osclose(tempfilename5);
 	 osdelete(tempfilename5);
 
+	tempfilename5 = "tempfilename6.txt";
+	oswrite("",tempfilename5);
+	assert(osbwrite("This is written from 10th byte", tempfilename5, 10));
+
+	tempfilename5 = "tempfilename7.txt";
+	oswrite("",tempfilename5);
+	assert(osbwrite("This is written from 0th byte", tempfilename5, 0));
+
+	tempfilename5 = "tempfilename8.txt";
+	oswrite("",tempfilename5);
+	assert(osbwrite("Just to test dynamically grown handle cache table", tempfilename5, 0));
+
 	// Use any file with size 2-10Mb
 	var stroustrup = "Stroustrup B. - The C++ programming language (3rd edition) (1997).pdf";
 	var CppCounter = 0;
