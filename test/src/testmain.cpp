@@ -201,6 +201,8 @@ function main()
 	assert(oconv(punctuation,"MC/B") eq punctuation);
 
 	oconv(letters,"MCA").outputl("Expected:"^letters^" Actual:");
+	oconv(letters,"MCN").outputl("Expected:\"\" Actual:");
+	oconv(letters,"MCB").outputl("Expected:"^letters^" Actual:");
 	assert(oconv(letters,"MCA") eq letters);
 	assert(oconv(letters,"MCN") eq "");
 	assert(oconv(letters,"MCB") eq letters);

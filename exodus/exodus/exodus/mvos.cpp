@@ -582,9 +582,9 @@ var& var::swapper(const var& what, const var& with, const var& options)
 		try
 		{
 			if (options.index(L"i"))
-                                regex.assign(what.var_mvstr, boost::regex::extended|boost::regex_constants::icase);
+                                regex=boost::make_u32regex(what.var_mvstr, boost::regex::extended|boost::regex_constants::icase);
 			else
-                                regex.assign(what.tostring)(, boost::regex::extended);
+                                regex=boost::make_u32regex(what.var_mvstr, boost::regex::extended);
 		//boost::wregex toregex_regex(with.towstring(), boost::regex::extended);
 		}
 		catch (boost::regex_error& e)
@@ -597,7 +597,7 @@ var& var::swapper(const var& what, const var& with, const var& options)
 		//std::wostringstream outputstring(std::ios::out | std::ios::binary);
     //std::ostream_iterator<wchar_t, wchar_t> oiter(outputstring);
 		//boost::regex_replace(oiter, var_mvstr.begin(), var_mvstr.end(),regex_regex, with, boost::match_default | boost::format_all);
-                var_mvstr=var(boost::regex_replace(var_mvstr,regex, toTstring(with))).var_mvstr;
+		var_mvstr=boost::u32regex_replace(var_mvstr,regex, with.var_mvstr);
 
 #endif
 
