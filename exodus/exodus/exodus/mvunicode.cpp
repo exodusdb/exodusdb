@@ -236,7 +236,7 @@ var& var::localeAwareChangeCase(const int lowerupper)
 
 #elif 1
 	//for now only ascii conversion
-	//if (lowerupper==1) 
+	//if (lowerupper==1)
 	//	converter(UPPERCASE_,LOWERCASE_);
 	//else if (lowerupper==2)
 	//	converter(LOWERCASE_, UPPERCASE_);
