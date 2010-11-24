@@ -688,7 +688,9 @@ public:
 	bool osbwrite(const var& osfilehandle, const int startoffset) const;
 	void osclose() const;
 	bool osread(const var& osfilename);
+	bool osread(const var& osfilename, const var& locale);
 	bool oswrite(const var& osfilename) const;
+	bool oswrite(const var& osfilename, const var& locale) const;
 	bool osdelete() const;
 	bool osdelete(const var& osfilename) const;
 	bool osrename(const var& newosdir_or_filename) const;
@@ -712,6 +714,7 @@ public:
 	//but will usage of hard coded filenames etc really be in fast loops
 	//and performance related? perhaps only provide 
 	bool osread(const char* osfilename);
+	bool osread(const char* osfilename, const var& locale);
 
 	//libraries and subroutines/functions
 	bool load(const var& libraryname) const;
