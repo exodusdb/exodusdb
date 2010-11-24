@@ -66,6 +66,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="libpq.lib"
+				LinkIncremental="0"
 				AdditionalLibraryDirectories="&quot;\Program Files\PostgreSQL\8.3\lib&quot;;&quot;\Program Files\boost\boost_1_38\lib&quot;"
 				DelayLoadDLLs="libpq.dll"
 				GenerateDebugInformation="true"
@@ -141,6 +142,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="libpq.lib"
+				LinkIncremental="0"
 				AdditionalLibraryDirectories="&quot;\Program Files\PostgreSQL\8.3\lib&quot;;&quot;\Program Files\boost\boost_1_38\lib&quot;"
 				DelayLoadDLLs="libpq.dll"
 				RandomizedBaseAddress="1"
@@ -187,6 +189,10 @@
 			</File>
 			<File
 				RelativePath=".\howto.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\locale_tables.cpp"
 				>
 			</File>
 			<File
@@ -283,6 +289,10 @@
 			</File>
 			<File
 				RelativePath=".\mvglobalfuncs.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\mvhandles.cpp"
 				>
 			</File>
 			<File
@@ -441,6 +451,10 @@
 			</File>
 			<File
 				RelativePath=".\mvfunctor.h"
+				>
+			</File>
+			<File
+				RelativePath=".\mvhandles.h"
 				>
 			</File>
 			<File
