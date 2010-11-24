@@ -35,9 +35,6 @@ std::string stringfromUTF16(const UTF16* sourcestart, const size_t sourcelength)
 std::string stringfromUTF32(const UTF32* sourcestart, const size_t sourcelength);
 std::wstring wstringfromchars(const char* sourcestart, const size_t sourcelength);
 
-// locale_handles.cpp
-char * lcid2localename( int lcid);
-
 }//of namespace exodus
 
 #endif //MYUTF_H
