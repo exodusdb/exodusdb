@@ -1947,7 +1947,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		orderclause^=L"key";
 	}
 
-	//assemble the full sql select statement
+	//assemble the full sql select statement:	//ALN:TODO: optimize with stringbuffer
     var sql=L"DECLARE CURSOR1_" ^ (*this) ^ L" CURSOR FOR SELECT " ^ actualfieldnames ^ L" FROM ";
     sql ^= PGDATAFILEPREFIX ^ actualfilename;
 	if (joins)
