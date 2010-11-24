@@ -147,6 +147,11 @@ DLL_PUBLIC bool oswrite(const var& data,const var& osfilename)
 	return data.oswrite(osfilename);
 }
 
+DLL_PUBLIC bool oswrite(const var& data, const var& osfilename, const var& locale)
+{
+	return data.oswrite(osfilename, locale);
+}
+
 //if osdelete x else
 DLL_PUBLIC bool osdelete(const var& osfilename)
 {

@@ -51,6 +51,7 @@ DLL_PUBLIC bool osbwrite(const var& data, const var& filehandle, const int start
 DLL_PUBLIC bool osread(var& data, const var& osfilename);
 DLL_PUBLIC var osread(const var& osfilename);
 DLL_PUBLIC bool oswrite(const var& data,const var& osfilename);
+DLL_PUBLIC bool oswrite(const var& data,const var& osfilename,const var& locale);
 DLL_PUBLIC bool osdelete(const var& osfilename);
 DLL_PUBLIC bool osrename(const var& oldosdir_or_filename, const var& newosdir_or_filename);
 DLL_PUBLIC bool oscopy(const var& fromosdir_or_filename, const var& newosdir_or_filename);

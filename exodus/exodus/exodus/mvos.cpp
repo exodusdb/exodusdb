@@ -62,6 +62,7 @@ namespace boostfs = boost::filesystem;
 
 //#include <istream>
 //#include <ostream>
+#include <locale>
 #include <fstream>
 #include <cstdlib> //for getenv and setenv/putenv
 //#include <stdio.h> //for getenv
@@ -774,6 +775,15 @@ bool var::osread(const var& osfilename)
 	return osread(osfilename.tostring().c_str());
 }
 
+bool var::osread(const var& osfilename, const var& locale)
+{
+	THISIS(L"bool var::osread(const var& osfilename)")
+	//will be checked by nested osread
+	//THISISDEFINED()
+	ISSTRING(osfilename)
+	return osread(osfilename.tostring().c_str(), locale);
+}
+
 bool var::osread(const char* osfilename)
 {
 	THISIS(L"bool var::osread(const var& osfilename)")
@@ -783,17 +793,8 @@ bool var::osread(const char* osfilename)
 	var_mvstr=L"";
 	var_mvtyp=pimpl::MVTYPE_STR;
 
-	//std::wifstream myfile;
 	std::ifstream myfile;
 
-	//what is the purpose of the following?
-	//to prevent locale conversion if writing narrow string to wide stream or vice versa
-	//imbue BEFORE opening
-	//myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
-
-	//ios:ate to go to the end to find the size in the next statement with tellg
-	//myfile.open(osfilename.tostring().c_str(), std::ios::binary | std::ios::ate );
-	//binary!
 	myfile.open(osfilename, std::ios::binary | std::ios::ate );
 	if (!myfile)
 		return false;
@@ -809,6 +810,75 @@ bool var::osread(const char* osfilename)
 		memblock = new char [bytesize];
 */
 		boost::scoped_array<char> memblock( new char [bytesize]);
+//		boost::scoped_array<wchar_t> memblock( new wchar_t [bytesize]);
+   		if (memblock==0)
+   		{
+   			myfile.close();
+   			return false;
+   		}
+
+    	myfile.seekg (0, std::ios::beg);
+		myfile.read (memblock.get(), (unsigned int) bytesize);
+    	myfile.close();
+
+		//for now dont accept UTF8 in order to avoid failure if non-utf characters
+		var_mvstr=wstringfromUTF8((UTF8*) memblock.get(), (unsigned int) bytesize);
+
+//		std::string tempstr=std::string( memblock.get(), bytesize);
+
+		//ALN:JFI: actually we could use std::string 'tempstr' in place of 'memblock' by hacking
+		//	.data member and reserve() or resize(), thus avoiding buffer-to-buffer-copying
+
+//		var_mvstr=std::wstring(tempstr.begin(),tempstr.end());
+//		var_mvstr=std::wstring(memblock.get(), (unsigned int) bytesize);
+
+    	// scoped_array do it: delete[] memblock;
+	}
+	return true;
+}
+
+bool var::osread(const char* osfilename, const var& locale)
+{
+	THISIS(L"bool var::osread(const var& osfilename)")
+	THISISDEFINED()
+//	ISSTRING(osfilename)
+	ISNUMERIC(locale);		//ALN:TODO: implement flexible mapping of string names to integers
+
+	var_mvstr=L"";
+	var_mvtyp=pimpl::MVTYPE_STR;
+
+	std::wifstream myfile;
+	//std::ifstream myfile;
+
+	//what is the purpose of the following?
+	//to prevent locale conversion if writing narrow string to wide stream or vice versa
+	//imbue BEFORE opening
+	//myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
+
+	//ios:ate to go to the end to find the size in the next statement with tellg
+	//myfile.open(osfilename.tostring().c_str(), std::ios::binary | std::ios::ate );
+	//binary!
+	char * lname = lcid2localename(( int) locale.var_mvint);
+    std::locale mylocale( lname);
+//    std::locale mylocale("");   // Construct locale object with the user's default preferences
+    myfile.imbue( mylocale );   // Imbue that locale
+
+	myfile.open(osfilename, std::ios::binary | std::ios::ate );
+	if (!myfile)
+		return false;
+
+	//NB tellg and seekp goes by bytes regardless of normal/wide stream
+
+	unsigned int bytesize;
+    bytesize = myfile.tellg();
+
+	if (bytesize>0)
+	{
+/*		char* memblock;
+		memblock = new char [bytesize];
+*/
+//		boost::scoped_array<char> memblock( new char [bytesize]);
+		boost::scoped_array<wchar_t> memblock( new wchar_t [bytesize]);
    		if (memblock==0)
    		{
    			myfile.close();
@@ -821,17 +891,22 @@ bool var::osread(const char* osfilename)
 
 		//for now dont accept UTF8 in order to avoid failure if non-utf characters
 		//var_mvstr=wstringfromUTF8((UTF8*) memblock, (unsigned int) bytesize);
-		std::string tempstr=std::string( memblock.get(), bytesize);
+
+//		std::string tempstr=std::string( memblock.get(), bytesize);
+
 		//ALN:JFI: actually we could use std::string 'tempstr' in place of 'memblock' by hacking
 		//	.data member and reserve() or resize(), thus avoiding buffer-to-buffer-copying
 
-		var_mvstr=std::wstring(tempstr.begin(),tempstr.end());
+//		var_mvstr=std::wstring(tempstr.begin(),tempstr.end());
+		var_mvstr=std::wstring(memblock.get(), (unsigned int) bytesize);
 
     	// scoped_array do it: delete[] memblock;
 	}
 	return true;
 }
 
+// oswrite() without locale parameter outputs to UTF-8
+//ALN:TODO: discuss other possibility - to getxlocale() and use it
 bool var::oswrite(const var& osfilename) const
 {
 	THISIS(L"bool var::oswrite(const var& osfilename) const")
@@ -839,6 +914,7 @@ bool var::oswrite(const var& osfilename) const
 	ISSTRING(osfilename)
 
 	std::ofstream myfile;
+//	std::wofstream myfile;
 
 	//what is the purpose of the following?
 	//to prevent locale conversion if writing narrow string to wide stream or vice versa
@@ -846,21 +922,52 @@ bool var::oswrite(const var& osfilename) const
 	//myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
 
 	//binary!
+
+	myfile.open(osfilename.tostring().c_str(), std::ios::trunc | std::ios::out | std::ios::binary);
+	if (!myfile)
+		return false;
+
+//	myfile.write( var_mvstr.data(), int(var_mvstr.length()));
+	std::string output=toUTF8(var_mvstr);
+	myfile.write(output.data(),(unsigned int)output.length());
+	bool failed = myfile.fail();
+	myfile.close();
+	return ! failed;
+}
+
+bool var::oswrite(const var& osfilename, const var& locale) const
+{
+	THISIS(L"bool var::oswrite(const var& osfilename) const")
+	THISISSTRING()
+	ISSTRING(osfilename)
+	ISNUMERIC(locale)		//ALN:TODO: implement flexible mapping of string names to integers
+
+//	std::ofstream myfile;
+	std::wofstream myfile;
+
+	//what is the purpose of the following?
+	//to prevent locale conversion if writing narrow string to wide stream or vice versa
+	//imbue BEFORE opening
+	//myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
+
+	//binary!
+
+	char * lname = lcid2localename(( int) locale.var_mvint);
+    std::locale mylocale( lname);
+//    std::locale mylocale("");   // Construct locale object with the user's default preferences
+    myfile.imbue( mylocale );   // Imbue that locale
+
+	// Despite the stream works with wchar_t, its parameter file name is narrow char *
 	myfile.open(osfilename.tostring().c_str(), std::ios::trunc | std::ios::out | std::ios::binary);
 	if (!myfile)
 	 return false;
 
-	//myfile.write(var_mvstr.data(),int(var_mvstr.length()));
-	std::string output=toUTF8(var_mvstr);
-	myfile.write(output.data(),(unsigned int)output.length());
-	if (myfile.fail())
-	{
-		myfile.close();
-		return false;
-	}
-
+	myfile.write( var_mvstr.data(), int(var_mvstr.length()));
+//	std::string output=toUTF8(var_mvstr);
+//	myfile.write(output.data(),(unsigned int)output.length());
+	bool failed = myfile.fail();
 	myfile.close();
-	return true;
+	return ! failed;
 
 }
 
