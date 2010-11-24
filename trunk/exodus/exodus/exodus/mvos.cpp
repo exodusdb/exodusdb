@@ -26,7 +26,9 @@ THE SOFTWARE.
 //EXCELLENT!
 //http://www.regular-expressions.info/
 //http://www.regular-expressions.info/unicode.html 
-#define BOOST_HAS_ICU 1
+#ifdef BOOST_HAS_ICU
+#include <boost/regex/icu.hpp>
+#endif
 #include <boost/regex.hpp>
 #include <boost/scoped_array.hpp>
 
@@ -531,6 +533,7 @@ var& var::swapper(const var& what, const var& with, const var& options)
 
 	if (options.index(L"r"))
 	{
+#ifndef BOOST_HAS_ICU
 		//http://www.boost.org/doc/libs/1_38_0/libs/regex/doc/html/boost_regex/syntax/basic_syntax.html
 
 		//TODO automatic caching of regular expressions or new exodus datatype to handle them
@@ -554,6 +557,33 @@ var& var::swapper(const var& what, const var& with, const var& options)
     //std::ostream_iterator<wchar_t, wchar_t> oiter(outputstring);
 		//boost::regex_replace(oiter, var_mvstr.begin(), var_mvstr.end(),regex_regex, with, boost::match_default | boost::format_all);
                 var_mvstr=var(boost::regex_replace(toTstring((*this)),regex, toTstring(with))).var_mvstr;
+
+#else
+		//http://www.boost.org/doc/libs/1_38_0/libs/regex/doc/html/boost_regex/syntax/basic_syntax.html
+
+		//TODO automatic caching of regular expressions or new exodus datatype to handle them
+		boost::u32regex regex;
+		try
+		{
+			if (options.index(L"i"))
+                                regex.assign(what.var_mvstr, boost::regex::extended|boost::regex_constants::icase);
+			else
+                                regex.assign(what.tostring)(, boost::regex::extended);
+		//boost::wregex toregex_regex(with.towstring(), boost::regex::extended);
+		}
+		catch (boost::regex_error& e)
+		{
+			throw MVException(var(e.what()).quote() ^ L" is an invalid regular expression");
+		}
+
+		//return regex_match(var_mvstr, expression);
+
+		//std::wostringstream outputstring(std::ios::out | std::ios::binary);
+    //std::ostream_iterator<wchar_t, wchar_t> oiter(outputstring);
+		//boost::regex_replace(oiter, var_mvstr.begin(), var_mvstr.end(),regex_regex, with, boost::match_default | boost::format_all);
+                var_mvstr=var(boost::regex_replace(var_mvstr,regex, toTstring(with))).var_mvstr;
+
+#endif
 
 	}
 	else
@@ -842,7 +872,7 @@ bool var::osread(const char* osfilename, const var& locale)
 	THISIS(L"bool var::osread(const var& osfilename)")
 	THISISDEFINED()
 //	ISSTRING(osfilename)
-	ISNUMERIC(locale);		//ALN:TODO: implement flexible mapping of string names to integers
+	//ISNUMERIC(locale);		//ALN:TODO: implement flexible mapping of string names to integers
 
 	var_mvstr=L"";
 	var_mvtyp=pimpl::MVTYPE_STR;
@@ -858,8 +888,9 @@ bool var::osread(const char* osfilename, const var& locale)
 	//ios:ate to go to the end to find the size in the next statement with tellg
 	//myfile.open(osfilename.tostring().c_str(), std::ios::binary | std::ios::ate );
 	//binary!
-	char * lname = lcid2localename(( int) locale.var_mvint);
-    std::locale mylocale( lname);
+	//char * lname = lcid2localename(( int) locale.var_mvint);
+    //std::locale mylocale( lname);
+    std::locale mylocale( locale.tostring().c_str());
 //    std::locale mylocale("");   // Construct locale object with the user's default preferences
     myfile.imbue( mylocale );   // Imbue that locale
 
@@ -940,7 +971,7 @@ bool var::oswrite(const var& osfilename, const var& locale) const
 	THISIS(L"bool var::oswrite(const var& osfilename) const")
 	THISISSTRING()
 	ISSTRING(osfilename)
-	ISNUMERIC(locale)		//ALN:TODO: implement flexible mapping of string names to integers
+	//ISNUMERIC(locale)		//ALN:TODO: implement flexible mapping of string names to integers
 
 //	std::ofstream myfile;
 	std::wofstream myfile;
@@ -952,8 +983,10 @@ bool var::oswrite(const var& osfilename, const var& locale) const
 
 	//binary!
 
-	char * lname = lcid2localename(( int) locale.var_mvint);
-    std::locale mylocale( lname);
+	//char * lname = lcid2localename(( int) locale.var_mvint);
+    //std::locale mylocale( lname);
+	std::locale mylocale( locale.tostring().c_str());
+
 //    std::locale mylocale("");   // Construct locale object with the user's default preferences
     myfile.imbue( mylocale );   // Imbue that locale
 

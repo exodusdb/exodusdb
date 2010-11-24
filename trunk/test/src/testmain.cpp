@@ -33,6 +33,15 @@ programinit()
 function main()
 {
 
+	printl("testfr says 'Hello World!'");
+	//assert(setxlocale("fr_FR.utf8"));
+	assert(setxlocale(1036));
+	var xx3="1234.5678";
+	printl(xx3+1);
+	printl(oconv(xx3,"MD20P"));
+	//input();
+	//stop();
+
 #ifdef __STDC_ISO_10646__
 //	printl("__STDC_ISO_10646__");
 #endif
@@ -84,6 +93,25 @@ function main()
 	assert(ucase(Greek_sas) eq Greek_SAS);
 	//FAILS in Windows XPSP3UK
 	//assert(lcase(Greek_SAS) eq Greek_sas);
+
+	//NB codepage is 256 one byte characters selected from all unicode characters depending on locale
+
+	//show where we are working
+	printl(oscwd("OSCWD="));
+	var greektestfilename="greeksas.txt";
+	//check CANNOT write greek unicode characters using French codepage
+	assert(not Greek_sas.oswrite(greektestfilename,"French"));//CANNOT write
+	//check can write greek unicode characters to Greek codepage
+	assert(Greek_sas.oswrite(greektestfilename,"Greek"));
+	//check 3 (wide) characters output as 3 bytes
+	assert(osdir(greektestfilename)(1) eq 3);
+	//check can read greek wide unicode characters from greek codepage
+	var rec2;
+	assert(rec2.osread(greektestfilename,"Greek"));
+	assert(rec2 eq Greek_sas);
+	//check raw read as latin
+	assert(rec2.osread(greektestfilename,""));
+	assert(rec2=="\xF3\xE1\xF1");//greek code page characters
 
 	//in Turkish Locale
 	//check Latin "I" lowercases to "turkish dotless i"
