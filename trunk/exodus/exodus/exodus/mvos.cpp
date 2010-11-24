@@ -26,6 +26,22 @@ THE SOFTWARE.
 //EXCELLENT!
 //http://www.regular-expressions.info/
 //http://www.regular-expressions.info/unicode.html 
+
+//{{ to use utf8 facet
+#define BOOST_UTF8_BEGIN_NAMESPACE namespace boost { namespace filesystem { namespace detail {
+#define BOOST_UTF8_DECL
+#define BOOST_UTF8_END_NAMESPACE }}}
+
+#include <boost/detail/utf8_codecvt_facet.hpp>
+// this requires also to link with the library: libboost_filesystem-*.lib
+// For example (for debug under MSVS2008: libboost_filesystem-vc90-mt-gd-1_38.lib
+
+#undef BOOST_UTF8_END_NAMESPACE
+#undef BOOST_UTF8_DECL
+#undef BOOST_UTF8_BEGIN_NAMESPACE
+//}}
+
+
 #ifdef BOOST_HAS_ICU
 #include <boost/regex/icu.hpp>
 #endif
@@ -887,13 +903,41 @@ bool var::osread(const char* osfilename, const var& locale)
 
 	//ios:ate to go to the end to find the size in the next statement with tellg
 	//myfile.open(osfilename.tostring().c_str(), std::ios::binary | std::ios::ate );
-	//binary!
-	//char * lname = lcid2localename(( int) locale.var_mvint);
-    //std::locale mylocale( lname);
-    std::locale mylocale( locale.tostring().c_str());
-//    std::locale mylocale("");   // Construct locale object with the user's default preferences
-    myfile.imbue( mylocale );   // Imbue that locale
 
+	if( locale == L"utf8")
+	{
+//		typedef wchar_t ucs4_t;
+
+		std::locale old_locale;
+//		std::locale utf8_locale( old_locale, new boost::exodus::detail::utf8_codecvt_facet<ucs4_t>);
+		std::locale utf8_locale( old_locale, new boost::filesystem::detail::utf8_codecvt_facet());
+//		std::locale utf8_locale( old_locale, new utf8_codecvt_facet());
+		myfile.imbue( utf8_locale);
+
+  ////// Send the UCS-4 data out, converting to UTF-8
+  ////{
+  ////  std::wofstream ofs("data.ucd");
+  ////  ofs.imbue(utf8_locale);
+  ////  std::copy(ucs4_data.begin(),ucs4_data.end(),
+  ////        std::ostream_iterator<ucs4_t,ucs4_t>(ofs));
+  ////}
+
+  ////// Read the UTF-8 data back in, converting to UCS-4 on the way in
+  ////std::vector<ucs4_t> from_file;
+  ////{
+  ////  std::wifstream ifs("data.ucd");
+  ////  ifs.imbue(utf8_locale);
+  ////  ucs4_t item = 0;
+  ////  while (ifs >> item) from_file.push_back(item);
+  ////}
+
+	}
+	else
+	{
+		std::locale mylocale( locale.tostring().c_str());
+	//    std::locale mylocale("");   // Construct locale object with the user's default preferences
+		myfile.imbue( mylocale );   // Imbue that locale
+	}
 	myfile.open(osfilename, std::ios::binary | std::ios::ate );
 	if (!myfile)
 		return false;
@@ -918,6 +962,9 @@ bool var::osread(const char* osfilename, const var& locale)
 
     	myfile.seekg (0, std::ios::beg);
 		myfile.read (memblock.get(), (unsigned int) bytesize);
+		// NOTE: in "utf8" mode, number of read characters in memblock is less then requested.
+		//		As such, to prevent garbage in tail of returned string, do:
+		bytesize = myfile.gcount(); 
     	myfile.close();
 
 		//for now dont accept UTF8 in order to avoid failure if non-utf characters
@@ -983,13 +1030,25 @@ bool var::oswrite(const var& osfilename, const var& locale) const
 
 	//binary!
 
+
+	if( locale == L"utf8")
+	{
+//		typedef wchar_t ucs4_t;
+
+		std::locale old_locale;
+//		std::locale utf8_locale( old_locale, new boost::exodus::detail::utf8_codecvt_facet<ucs4_t>);
+		std::locale utf8_locale( old_locale, new boost::filesystem::detail::utf8_codecvt_facet());
+//		std::locale utf8_locale( old_locale, new utf8_codecvt_facet());
+		myfile.imbue( utf8_locale);
+	}
+	else
+	{
 	//char * lname = lcid2localename(( int) locale.var_mvint);
     //std::locale mylocale( lname);
-	std::locale mylocale( locale.tostring().c_str());
-
+		std::locale mylocale( locale.tostring().c_str());
 //    std::locale mylocale("");   // Construct locale object with the user's default preferences
-    myfile.imbue( mylocale );   // Imbue that locale
-
+		myfile.imbue( mylocale );   // Imbue that locale
+	}
 	// Despite the stream works with wchar_t, its parameter file name is narrow char *
 	myfile.open(osfilename.tostring().c_str(), std::ios::trunc | std::ios::out | std::ios::binary);
 	if (!myfile)

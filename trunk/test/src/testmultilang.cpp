@@ -17,17 +17,26 @@ function main()
 	var buf;
 	buf.osread( "utf8.html");
 	buf.oswrite( "utf8copy.html");
-	printl( "Check that 'utf8.html' and 'utf8copy.html' in working directory - identical");
+	buf.oswrite( "utf8utf8.html", "utf8");
+	printl( "Check that 'utf8.html', 'utf8copy.html', 'utf8utf8.html' in working directory - identical");
 	print( "Press any good key to continue ...");
 	char c = getchar();
+
+	// and chinese page
+	buf.osread( "calblur8.html");
+	buf.oswrite( "calblur8utf8.html", "utf8");
+	printl( "Check that 'calblur8.html' and 'calblur8utf8.html' in working directory - identical");
+	print( "Press any good key to continue ...");
+	c = getchar();
 
 //  this code fragment tests locale specific characters IO with narrow files (1 char = 1 byte codepages)
 	var EN_RU_UA_txt1 = L"[English language][Русский язык][Українська мова]\n";
 	var EN_RU_UA_txt2;
 	var EN_RU_UA_file = "test_EN_RU_UA.txt";
-	oswrite( EN_RU_UA_txt1, EN_RU_UA_file, 1058);
+//	oswrite( EN_RU_UA_txt1, EN_RU_UA_file, 1058);
+	oswrite( EN_RU_UA_txt1, EN_RU_UA_file, "Ukrainian_Ukraine.1251");
 	EN_RU_UA_file.osclose();
-	EN_RU_UA_txt2.osread( EN_RU_UA_file, 1058);
+	EN_RU_UA_txt2.osread( EN_RU_UA_file, "Ukrainian_Ukraine.1251");
 	EN_RU_UA_txt1.outputl( "Written   text:");
 	EN_RU_UA_txt2.outputl( "Read back text:");
 
@@ -38,14 +47,30 @@ function main()
 	var EN_GREEK_txt1 = L"[Greek character \\u03A3][\u03A3]\n";
 	var EN_GREEK_txt2;
 	var EN_GREEK_file = "test_EN_GREEK.txt";
-	oswrite( EN_GREEK_txt1, EN_GREEK_file, 1032);
+//	oswrite( EN_GREEK_txt1, EN_GREEK_file, 1032);
+	oswrite( EN_GREEK_txt1, EN_GREEK_file, "Greek_Greece.1253");
 	EN_GREEK_file.osclose();
-	EN_GREEK_txt2.osread( EN_GREEK_file, 1032);
+	EN_GREEK_txt2.osread( EN_GREEK_file, "Greek_Greece.1253");
 	EN_GREEK_txt1.outputl( "Written   text:");
 	EN_GREEK_txt2.outputl( "Read back text:");
 
 	print( "Press any good key to continue ...");
 	c = getchar();
+
+
+//  this code fragment tests locale specific characters IO with UTF8 files
+	var MIXTURE_txt1 = L"[English][Русский][Українська][Greek Char:\\u03A3][\u03A3]\n";
+	var MIXTURE_txt2;
+	var MIXTURE_file = "test_MIXTURE.txt";
+	oswrite( MIXTURE_txt1, MIXTURE_file, "utf8");
+	MIXTURE_file.osclose();
+	MIXTURE_txt2.osread( MIXTURE_file, "utf8");
+	MIXTURE_txt1.outputl( "Written   text:");
+	MIXTURE_txt2.outputl( "Read back text:");
+
+	print( "Press any good key to continue ...");
+	c = getchar();
+
 	return 0;
 }
 
