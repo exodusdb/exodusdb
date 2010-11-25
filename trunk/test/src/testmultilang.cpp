@@ -15,15 +15,16 @@ function main()
 //	this code fragment tests UTF8 coding/decoding by reading utf8.html and writing its copy ...
 	var utf8_html = "utf8.html";
 	var buf;
-	buf.osread( "utf8.html");
-	buf.oswrite( "utf8copy.html");
-	buf.oswrite( "utf8utf8.html", "utf8");
+	buf.osread( "utf8.html");				// read with built in UTF8 conversion wstringfromUTF8()
+	buf.oswrite( "utf8copy.html");			// write with built in UTF8 conversion
+	buf.osread( "utf8.html", "utf8");		// read with boost_utf8-facet
+	buf.oswrite( "utf8utf8.html", "utf8");	// write with boost_utf8_facet
 	printl( "Check that 'utf8.html', 'utf8copy.html', 'utf8utf8.html' in working directory - identical");
 	print( "Press any good key to continue ...");
 	char c = getchar();
 
 	// and chinese page
-	buf.osread( "calblur8.html");
+	buf.osread( "calblur8.html", "utf8");
 	buf.oswrite( "calblur8utf8.html", "utf8");
 	printl( "Check that 'calblur8.html' and 'calblur8utf8.html' in working directory - identical");
 	print( "Press any good key to continue ...");
@@ -47,7 +48,6 @@ function main()
 	var EN_GREEK_txt1 = L"[Greek character \\u03A3][\u03A3]\n";
 	var EN_GREEK_txt2;
 	var EN_GREEK_file = "test_EN_GREEK.txt";
-//	oswrite( EN_GREEK_txt1, EN_GREEK_file, 1032);
 	oswrite( EN_GREEK_txt1, EN_GREEK_file, "Greek_Greece.1253");
 	EN_GREEK_file.osclose();
 	EN_GREEK_txt2.osread( EN_GREEK_file, "Greek_Greece.1253");
@@ -57,6 +57,9 @@ function main()
 	print( "Press any good key to continue ...");
 	c = getchar();
 
+// Test throwing MvException on wrong locale name
+// Uncomment following line to test
+//	oswrite( EN_GREEK_txt1, EN_GREEK_file, "some_bad_locale");
 
 //  this code fragment tests locale specific characters IO with UTF8 files
 	var MIXTURE_txt1 = L"[English][Русский][Українська][Greek Char:\\u03A3][\u03A3]\n";
@@ -71,6 +74,59 @@ function main()
 	print( "Press any good key to continue ...");
 	c = getchar();
 
+//  this code fragment tests positioning in UTF8 files
+	var BUF_0_9, BUF_9_9, BUF_18_12, BUF_19_12, BUF_20_12, BUF_30_23;
+	var position = 0;
+	BUF_0_9.osbread( MIXTURE_file, position, 9, "utf8");
+	position = 9;
+	BUF_9_9.osbread( MIXTURE_file, position, 9, "utf8");
+	position = 18;
+	BUF_18_12.osbread( MIXTURE_file, position, 12, "utf8");
+	position = 19;
+	BUF_19_12.osbread( MIXTURE_file, position, 12, "utf8");
+	position = 20;
+	BUF_20_12.osbread( MIXTURE_file, position, 12, "utf8");
+	position = 30;
+	BUF_30_23.osbread( MIXTURE_file, position, 23, "utf8");
+	BUF_0_9.outputl( "BUF_0_9=");
+	BUF_9_9.outputl( "BUF_9_9=");
+	BUF_18_12.outputl( "BUF_18_12=");
+	BUF_19_12.outputl( "BUF_18_12=");
+	BUF_30_23.outputl( "BUF_30_23=");
+
+	position = 0;
+	BUF_0_9.osbread( MIXTURE_file, position, 9, "utf8");
+	BUF_9_9.osbread( MIXTURE_file, position, 9, "utf8");
+	BUF_18_12.osbread( MIXTURE_file, position, 12, "utf8");
+	BUF_30_23.osbread( MIXTURE_file, position, 23, "utf8");
+	BUF_0_9.outputl( "BUF_0_9=");
+	BUF_9_9.outputl( "BUF_9_9=");
+	BUF_18_12.outputl( "BUF_18_12=");
+	BUF_30_23.outputl( "BUF_30_23=");
+
+	// Lets test osbwrite() with position update and UTF8
+	var OUTPUT_file = "test_OUTPUT_UTF8.txt";
+	oswrite( "", OUTPUT_file, "utf8");
+	position = 5;
+	assert( osbwrite( L"1234567890", OUTPUT_file, position, "utf8"));
+	assert( osbwrite( L"1234567890\n", OUTPUT_file, position, "utf8"));
+	assert( osbwrite( L"Фраза із 22 символів", OUTPUT_file, position, "utf8"));
+	assert( osbwrite( L"\n1234567890", OUTPUT_file, position, "utf8"));
+	assert( osbwrite( L"1234567890\n", OUTPUT_file, position, "utf8"));
+	position = 10;
+	assert( osbwrite( L"XYZ", OUTPUT_file, position, "utf8"));
+
+	// Lets test osbwrite() with position update and default locale (1251)
+	OUTPUT_file = "test_OUTPUT_1251.txt";
+	oswrite( "", OUTPUT_file, "");
+	position = 5;
+	assert( osbwrite( L"1234567890", OUTPUT_file, position));
+	assert( osbwrite( L"1234567890\n", OUTPUT_file, position));
+	assert( osbwrite( L"Фраза із 22 символів", OUTPUT_file, position));
+	assert( osbwrite( L"\n1234567890", OUTPUT_file, position));
+	assert( osbwrite( L"1234567890\n", OUTPUT_file, position));
+	position = 10;
+	assert( osbwrite( L"XYZ", OUTPUT_file, position));
 	return 0;
 }
 
