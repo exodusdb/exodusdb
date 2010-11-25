@@ -846,15 +846,6 @@ bool var::osopen(const var& osfilename)
 //popen("iconv -f utf-32 -t utf-16 <sourcefile","r",filehandle) followed by progressive reads
 //use utf-16 or utf-32 depending on windows or unix
 
-bool var::osread(const var& osfilename)
-{
-	THISIS(L"bool var::osread(const var& osfilename)")
-	//will be checked by nested osread
-	//THISISDEFINED()
-	ISSTRING(osfilename)
-	return osread(osfilename.tostring().c_str());
-}
-
 bool var::osread(const var& osfilename, const var& locale)
 {
 	THISIS(L"bool var::osread(const var& osfilename)")
@@ -862,59 +853,6 @@ bool var::osread(const var& osfilename, const var& locale)
 	//THISISDEFINED()
 	ISSTRING(osfilename)
 	return osread(osfilename.tostring().c_str(), locale);
-}
-
-bool var::osread(const char* osfilename)
-{
-	THISIS(L"bool var::osread(const var& osfilename)")
-	THISISDEFINED()
-	//ISSTRING(osfilename)
-
-	var_mvstr=L"";
-	var_mvtyp=pimpl::MVTYPE_STR;
-
-	std::ifstream myfile;
-
-	myfile.open(osfilename, std::ios::binary | std::ios::ate );
-	if (!myfile)
-		return false;
-
-	//NB tellg and seekp goes by bytes regardless of normal/wide stream
-
-	unsigned int bytesize;
-    bytesize = myfile.tellg();
-
-	if (bytesize>0)
-	{
-/*		char* memblock;
-		memblock = new char [bytesize];
-*/
-		boost::scoped_array<char> memblock( new char [bytesize]);
-//		boost::scoped_array<wchar_t> memblock( new wchar_t [bytesize]);
-   		if (memblock==0)
-   		{
-   			myfile.close();
-   			return false;
-   		}
-
-    	myfile.seekg (0, std::ios::beg);
-		myfile.read (memblock.get(), (unsigned int) bytesize);
-    	myfile.close();
-
-		//for now dont accept UTF8 in order to avoid failure if non-utf characters
-		var_mvstr=wstringfromUTF8((UTF8*) memblock.get(), (unsigned int) bytesize);
-
-//		std::string tempstr=std::string( memblock.get(), bytesize);
-
-		//ALN:JFI: actually we could use std::string 'tempstr' in place of 'memblock' by hacking
-		//	.data member and reserve() or resize(), thus avoiding buffer-to-buffer-copying
-
-//		var_mvstr=std::wstring(tempstr.begin(),tempstr.end());
-//		var_mvstr=std::wstring(memblock.get(), (unsigned int) bytesize);
-
-    	// scoped_array do it: delete[] memblock;
-	}
-	return true;
 }
 
 bool var::osread(const char* osfilename, const var& locale)
@@ -984,36 +922,6 @@ bool var::osread(const char* osfilename, const var& locale)
 	return true;
 }
 
-// oswrite() without locale parameter outputs to UTF-8
-//ALN:TODO: discuss other possibility - to getxlocale() and use it
-bool var::oswrite(const var& osfilename) const
-{
-	THISIS(L"bool var::oswrite(const var& osfilename) const")
-	THISISSTRING()
-	ISSTRING(osfilename)
-
-	std::ofstream myfile;
-//	std::wofstream myfile;
-
-	//what is the purpose of the following?
-	//to prevent locale conversion if writing narrow string to wide stream or vice versa
-	//imbue BEFORE opening or after flushing
-	//myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
-
-	//binary!
-
-	myfile.open(osfilename.tostring().c_str(), std::ios::trunc | std::ios::out | std::ios::binary);
-	if (!myfile)
-		return false;
-
-//	myfile.write( var_mvstr.data(), int(var_mvstr.length()));
-	std::string output=toUTF8(var_mvstr);
-	myfile.write(output.data(),(unsigned int)output.length());
-	bool failed = myfile.fail();
-	myfile.close();
-	return ! failed;
-}
-
 bool var::oswrite(const var& osfilename, const var& locale) const
 {
 	THISIS(L"bool var::oswrite(const var& osfilename) const")
@@ -1048,12 +956,6 @@ bool var::oswrite(const var& osfilename, const var& locale) const
 static void del_wfstream( void * handle)
 {
 	delete ( std::wfstream *) handle;
-}
-
-bool var::osbwrite(const var& osfilehandle, var & startoffset) const
-{
-	var default_locale( L"");
-	return osbwrite( osfilehandle, startoffset, default_locale);
 }
 
 bool var::osbwrite(const var& osfilehandle, var & startoffset, const var & locale) const
@@ -1182,12 +1084,6 @@ bool var::osbwrite(const var& osfilehandle, const int startoffset) const
 #endif
 
 #ifdef CACHED_HANDLES
-var& var::osbread(const var& osfilehandle, var & startoffset, const int size)
-{
-	var default_locale( L"");
-	return osbread( osfilehandle, startoffset, size, default_locale);
-}
-
 var& var::osbread(const var& osfilehandle, var & startoffset, const int size, const var & locale)
 {
 	THISIS(L"var& var::osbread(const var& osfilehandle, const int startoffset, const int size, const var & locale)")

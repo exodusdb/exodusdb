@@ -1,16 +1,80 @@
 #include <exodus/program.h>
 #include <cassert>
+#include <locale>
 
 programinit()
 
 function main()
 {
-	var tempfilename5 = "tempfilename5.txt";
+{
+   std::locale locE ( "Ukrainian_Ukraine.1251" );	// en-US
+   std::locale loc ( "Greek_Greece.1253" );	// en-US
+   std::locale loc1;
+   std::cout << "The initial locale is: " << loc1.name( ) << std::endl;
+   std::locale loc2 = std::locale::global ( loc );
+   std::locale loc3;
+   std::cout << "The current locale is: " << loc3.name( ) << std::endl;
+   std::cout << "The previous locale was: " << loc2.name( ) << std::endl;
+}
+    std::locale mylocale("de");
+
+	///// STEP1. Test on default (Ukrainian) locale
+	var locale0 = getxlocale().outputl("Original Locale=");
+
+	var test = L"[English language][Русский язык][Українська мова]\n"
+L"can you write one A\n"
+L"[16:55:08] neosys: one й\n";
+	var test_file = "test_1.txt";
+	oswrite( test, test_file);
+	test_file.osclose();
+
+	var testback;
+	testback.osread( test_file);
+	test.outputl( "What was in test variable:");
+	testback.outputl( "What was read:");
+
+	printl( test == testback);
+
+	///// STEP2. Test on Greek (1032) locale
+	setxlocale( 1032);
+	locale0 = getxlocale().outputl("New Locale=");
+
+	test = L"[English language][we stick to greek \\u03A3][\u03A3]\n";
+	test_file = "test_2.txt";
+	oswrite( test, test_file);
+	test_file.osclose();
+
+	testback;
+	testback.osread( test_file);
+	test.outputl( "What was in test variable:");
+	testback.outputl( "What was read:");
+
+	assert( test == testback);
+
+/*	this code fragment tests UTF8 coding/decoding by reading utf8.html and writing its copy ...
+	var utf8_html = "utf8.html";
+	var buf;
+	buf.osread( "utf8.html");
+	buf.oswrite( "utf8copy.html");
+*/
+/* this is about greek character:
+	var tempfilename5 = "tempfilename5W.txt";
 	var record5;
-	 oswrite("",tempfilename5);//
-	 assert(osbwrite("78",tempfilename5,2));
+	 var Greek =L"This is string with character \\u038A: '\u038A'\n"
+				L"And this one is character \\u0393: '\u0393'";
+	 oswrite(Greek, tempfilename5);
+     tempfilename5.osflush();
+
+	 var Greek2 =L"This is string without character \\u038A\n"
+				L"And this one has no character \\u0393.";
+	 assert(osbwrite(Greek2,tempfilename5,100));
+
 	 assert(osread(record5,tempfilename5));
 	 assert(record5.oconv("HEX2") eq "000000003738");
+*/
+	var tempfilename5 = "tempfilename5.txt";
+	oswrite("",tempfilename5);
+	 assert( osbwrite("78",tempfilename5,2));
 	 osclose(tempfilename5);
 	 osdelete(tempfilename5);
 
