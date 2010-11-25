@@ -46,6 +46,7 @@ THE SOFTWARE.
 #include <boost/regex/icu.hpp>
 #endif
 #include <boost/regex.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <boost/scoped_array.hpp>
 
 //regex.assign("", boost::regex::extended|boost::regex_constants::icase);
@@ -251,6 +252,39 @@ static MvHandlesCache h_cache;
 	//		~MvHandlesCache for h_cache closes/deletes all registered objects.
 #endif
 
+/*ALN:TODO: wrap utf8_codecvt_facet in own class to investigate its destruction
+boost::scoped_ptr <boost::filesystem::detail::utf8_codecvt_facet> boost_utf8_facet;
+*/
+std::locale get_locale( const var & locale_name) // throw ( MVException)
+{
+	THISIS(L"std::locale get_locale( const var & locale_name)")
+	if( locale_name == L"utf8")
+	{
+//		typedef wchar_t ucs4_t;
+		std::locale old_locale;
+//		std::locale utf8_locale( old_locale, new boost::exodus::detail::utf8_codecvt_facet<ucs4_t>);
+
+		//if( boost_utf8_facet.get() == 0)
+		//	boost_utf8_facet.reset( new boost::filesystem::detail::utf8_codecvt_facet());
+		//std::locale utf8_locale( old_locale, boost_utf8_facet.get());
+
+		std::locale utf8_locale( old_locale, new boost::filesystem::detail::utf8_codecvt_facet());
+		return utf8_locale;
+	}
+	else
+	{
+//		bool bad_locale = false;
+		try {
+			std::locale mylocale( locale_name.tostring().c_str());
+			return mylocale;
+		} catch( std::runtime_error re) {
+//			bad_locale = true;
+			throw MVException(L"Cannot create locale for " ^ locale_name);
+		}
+//		if( bad_locale)
+	}
+}
+	
 bool checknotabsoluterootfolder(std::wstring dirname)
 {
 	//safety - will not rename/remove top level folders
@@ -904,40 +938,7 @@ bool var::osread(const char* osfilename, const var& locale)
 	//ios:ate to go to the end to find the size in the next statement with tellg
 	//myfile.open(osfilename.tostring().c_str(), std::ios::binary | std::ios::ate );
 
-	if( locale == L"utf8")
-	{
-//		typedef wchar_t ucs4_t;
-
-		std::locale old_locale;
-//		std::locale utf8_locale( old_locale, new boost::exodus::detail::utf8_codecvt_facet<ucs4_t>);
-		std::locale utf8_locale( old_locale, new boost::filesystem::detail::utf8_codecvt_facet());
-//		std::locale utf8_locale( old_locale, new utf8_codecvt_facet());
-		myfile.imbue( utf8_locale);
-
-  ////// Send the UCS-4 data out, converting to UTF-8
-  ////{
-  ////  std::wofstream ofs("data.ucd");
-  ////  ofs.imbue(utf8_locale);
-  ////  std::copy(ucs4_data.begin(),ucs4_data.end(),
-  ////        std::ostream_iterator<ucs4_t,ucs4_t>(ofs));
-  ////}
-
-  ////// Read the UTF-8 data back in, converting to UCS-4 on the way in
-  ////std::vector<ucs4_t> from_file;
-  ////{
-  ////  std::wifstream ifs("data.ucd");
-  ////  ifs.imbue(utf8_locale);
-  ////  ucs4_t item = 0;
-  ////  while (ifs >> item) from_file.push_back(item);
-  ////}
-
-	}
-	else
-	{
-		std::locale mylocale( locale.tostring().c_str());
-	//    std::locale mylocale("");   // Construct locale object with the user's default preferences
-		myfile.imbue( mylocale );   // Imbue that locale
-	}
+	myfile.imbue( get_locale( locale));
 	myfile.open(osfilename, std::ios::binary | std::ios::ate );
 	if (!myfile)
 		return false;
@@ -1028,27 +1029,7 @@ bool var::oswrite(const var& osfilename, const var& locale) const
 	//imbue BEFORE opening
 	//myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
 
-	//binary!
-
-
-	if( locale == L"utf8")
-	{
-//		typedef wchar_t ucs4_t;
-
-		std::locale old_locale;
-//		std::locale utf8_locale( old_locale, new boost::exodus::detail::utf8_codecvt_facet<ucs4_t>);
-		std::locale utf8_locale( old_locale, new boost::filesystem::detail::utf8_codecvt_facet());
-//		std::locale utf8_locale( old_locale, new utf8_codecvt_facet());
-		myfile.imbue( utf8_locale);
-	}
-	else
-	{
-	//char * lname = lcid2localename(( int) locale.var_mvint);
-    //std::locale mylocale( lname);
-		std::locale mylocale( locale.tostring().c_str());
-//    std::locale mylocale("");   // Construct locale object with the user's default preferences
-		myfile.imbue( mylocale );   // Imbue that locale
-	}
+	myfile.imbue( get_locale( locale));
 	// Despite the stream works with wchar_t, its parameter file name is narrow char *
 	myfile.open(osfilename.tostring().c_str(), std::ios::trunc | std::ios::out | std::ios::binary);
 	if (!myfile)
@@ -1069,9 +1050,15 @@ static void del_wfstream( void * handle)
 	delete ( std::wfstream *) handle;
 }
 
-bool var::osbwrite(const var& osfilehandle, const int startoffset) const
+bool var::osbwrite(const var& osfilehandle, var & startoffset) const
 {
-	THISIS(L"void var::osbwrite(const var& osfilehandle, const int startoffset) const")
+	var default_locale( L"");
+	return osbwrite( osfilehandle, startoffset, default_locale);
+}
+
+bool var::osbwrite(const var& osfilehandle, var & startoffset, const var & locale) const
+{
+	THISIS(L"void var::osbwrite(const var& osfilehandle, var & startoffset, const var & locale) const")
 	THISISSTRING()
 	ISSTRING(osfilehandle)
 
@@ -1100,6 +1087,10 @@ bool var::osbwrite(const var& osfilehandle, const int startoffset) const
 ///		pmyfile->open(osfilehandle.var_mvstr.c_str(), std::ios::out | std::ios::in | std::ios::binary);
 		//linux wfstream wants a narrow filename
 ///		pmyfile->imbue( std::locale((std::locale::classic(), new NullCodecvt));
+
+	//ALN:TODO: if locale changed, reopen the file
+	pmyfile->imbue( get_locale( locale));
+
 		pmyfile->open(osfilehandle.tostring().c_str(), std::ios::out | std::ios::in | std::ios::binary);
 		if (! (*pmyfile))
 		{
@@ -1112,7 +1103,7 @@ bool var::osbwrite(const var& osfilehandle, const int startoffset) const
 	//NB seekp goes by bytes regardless of the fact that it is a wide stream
 	//myfile.seekp (startoffset*sizeof(wchar_t));
 	//startoffset should be in bytes except for fixed multibyte code pages like UTF16 and UTF32
-	pmyfile->seekp (startoffset);
+	pmyfile->seekp ( static_cast<long> (startoffset.var_mvint));	// avoid warning, see comments to seekg()
 
 	//NB but length goes by number of wide characters not bytes
 #ifndef __MINGW32__
@@ -1132,6 +1123,7 @@ bool var::osbwrite(const var& osfilehandle, const int startoffset) const
 // saved in cache, do not close		myfile.close();
 		return false;
 	}
+	startoffset = pmyfile->tellp();
 	pmyfile->flush();
 // saved in cache, do not close		myfile.close();
 	return true;
@@ -1190,6 +1182,127 @@ bool var::osbwrite(const var& osfilehandle, const int startoffset) const
 #endif
 
 #ifdef CACHED_HANDLES
+var& var::osbread(const var& osfilehandle, var & startoffset, const int size)
+{
+	var default_locale( L"");
+	return osbread( osfilehandle, startoffset, size, default_locale);
+}
+
+var& var::osbread(const var& osfilehandle, var & startoffset, const int size, const var & locale)
+{
+	THISIS(L"var& var::osbread(const var& osfilehandle, const int startoffset, const int size, const var & locale)")
+	THISISDEFINED()
+	ISSTRING(osfilehandle)
+
+	var_mvstr=L"";
+	var_mvtyp=pimpl::MVTYPE_STR;
+
+	if (size<=0) return *this;
+
+	//avoiding wifstream due to non-availability on some platforms (mingw for starters)
+	//and to allow full control over narrow/wide character conversion
+	//std::wifstream myfile;
+	std::wfstream * pmyfile = 0;
+	if( osfilehandle.var_mvtyp & pimpl::MVTYPE_HANDLE)
+	{
+		pmyfile = (std::wfstream *) h_cache.get_handle( (int) osfilehandle.var_mvint);
+		if( pmyfile == 0)		// nonvalid handle
+		{
+			osfilehandle.var_mvint = 0;
+			osfilehandle.var_mvtyp ^= pimpl::MVTYPE_HANDLE;	// clear bit
+		}
+	}
+	// Open file, checking for file handle in cache table
+	if( pmyfile == 0)		// nonvalid handle
+	{
+		pmyfile = new std::wfstream;
+	//what is the purpose of the following?
+	//to prevent locale conversion if writing narrow string to wide stream or vice versa
+	//imbue BEFORE opening
+	//myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
+
+	//ALN:TODO: if locale changed, reopen the file
+	pmyfile->imbue( get_locale( locale));
+
+//////		std::locale old_locale;
+////////		std::locale utf8_locale( old_locale, new boost::exodus::detail::utf8_codecvt_facet<ucs4_t>);
+//////		std::locale utf8_locale( old_locale, new boost::filesystem::detail::utf8_codecvt_facet());
+////////		std::locale utf8_locale( old_locale, new utf8_codecvt_facet());
+//////		pmyfile->imbue( utf8_locale);
+
+	//binary!
+	//use ::ate to position at end so tellg below can determine file size
+///		pmyfile->open(osfilehandle.tostring().c_str(), std::ios::binary | std::ios::ate);
+///		pmyfile->open(osfilehandle.var_mvstr.c_str(), std::ios::binary | std::ios::in | std::ios::out);
+		//linux wfstream wants a narrow filename
+		pmyfile->open(osfilehandle.tostring().c_str(), std::ios::binary | std::ios::in | std::ios::out);
+		if( ! (*pmyfile))
+		{
+			delete pmyfile;
+			return * this;
+		}
+		osfilehandle.var_mvint = h_cache.add_handle( pmyfile, del_wfstream);
+		osfilehandle.var_mvtyp = pimpl::MVTYPE_OPENED;
+	}
+
+//NB all file sizes are in bytes NOT characters despite this being a wide character fstream
+	// Position get pointer at the end of file, as expected it to be if we open file anew
+	pmyfile->seekg( 0, std::ios::end);
+	unsigned int maxsize = pmyfile->tellg();
+	if ((unsigned long)( int)startoffset>=maxsize)	// past EOF
+	{
+		return *this;
+	}
+
+	//allow negative offset to read from the back of the file
+	//!cannot be unsigned and allow negative
+	//unsigned int readfrom=startoffset;
+	int readfrom=startoffset;
+	if (readfrom<0) {
+		readfrom+=maxsize;
+		//but not so negative that it reads from before the beginning of the file
+		if (readfrom<0)
+			readfrom=0;
+	}
+
+	//limit reading up to end of file although probably happens automatically
+	unsigned int readsize=size;
+	if (readfrom+readsize>maxsize)
+		readsize=maxsize-readfrom;
+
+	//nothing to read
+	if (readsize<=0)
+	{
+		return *this;
+	}
+
+	//new
+	//wchar_t* memblock;
+	//memblock = new wchar_t [readsize/sizeof(wchar_t)];
+/*
+	char* memblock;
+	memblock = new char [readsize];
+*/
+///	boost::scoped_array<char> memblock( new char [readsize]);
+	boost::scoped_array<wchar_t> memblock( new wchar_t [readsize]);
+	if (memblock==0)
+	{//TODO NEED TO THROW HERE
+		return *this;
+	}
+	pmyfile->seekg ( static_cast<long> (startoffset.var_mvint), std::ios::beg);	// 'std::streampos' usually 'long'
+//	pmyfile->seekg ( static_cast<std::streampos> (startoffset.var_mvint), std::ios::beg);	// naughty warning
+	pmyfile->read (memblock.get(), readsize);
+//	pmyfile->close();
+	readsize = pmyfile->gcount();
+	if( readsize > 0)
+	{
+		startoffset = pmyfile->tellg();
+	}
+//	var_mvstr=wstringfromchars(memblock.get(), readsize);
+	var_mvstr.assign( memblock.get(), readsize);
+	return *this;
+}
+#ifdef NOUTF8
 var& var::osbread(const var& osfilehandle, const int startoffset, const int size)
 {
 	THISIS(L"var& var::osbread(const var& osfilehandle, const int startoffset, const int size)")
@@ -1290,6 +1403,7 @@ var& var::osbread(const var& osfilehandle, const int startoffset, const int size
 	var_mvstr.assign( memblock.get(), readsize);
 	return *this;
 }
+#endif // NOUTF8
 #else
 var& var::osbread(const var& osfilehandle, const int startoffset, const int size)
 {
