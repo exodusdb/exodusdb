@@ -807,7 +807,7 @@ void var::osflush() const
 
 	//what is the purpose of the following?
 	//to prevent locale conversion if writing narrow string to wide stream or vice versa
-	//imbue BEFORE opening
+	//imbue BEFORE opening or after flushing
 	//	myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
 //var(int(sizeof(myfile))).outputl(L"filesize");
 	//if (osfilename.var_mvtyp&pimpl::MVTYPE_INT)
@@ -932,7 +932,7 @@ bool var::osread(const char* osfilename, const var& locale)
 
 	//what is the purpose of the following?
 	//to prevent locale conversion if writing narrow string to wide stream or vice versa
-	//imbue BEFORE opening
+	//imbue BEFORE opening or after flushing
 	//myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
 
 	//ios:ate to go to the end to find the size in the next statement with tellg
@@ -997,7 +997,7 @@ bool var::oswrite(const var& osfilename) const
 
 	//what is the purpose of the following?
 	//to prevent locale conversion if writing narrow string to wide stream or vice versa
-	//imbue BEFORE opening
+	//imbue BEFORE opening or after flushing
 	//myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
 
 	//binary!
@@ -1026,7 +1026,7 @@ bool var::oswrite(const var& osfilename, const var& locale) const
 
 	//what is the purpose of the following?
 	//to prevent locale conversion if writing narrow string to wide stream or vice versa
-	//imbue BEFORE opening
+	//imbue BEFORE opening or after flushing
 	//myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
 
 	myfile.imbue( get_locale( locale));
@@ -1080,7 +1080,7 @@ bool var::osbwrite(const var& osfilehandle, var & startoffset, const var & local
 
 	//what is the purpose of the following?
 	//to prevent locale conversion if writing narrow string to wide stream or vice versa
-	//imbue BEFORE opening
+	//imbue BEFORE opening or after flushing
 	//myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
 	//binary!
 ///		pmyfile->open(osfilehandle.tostring().c_str(), std::ios::out | std::ios::in | std::ios::binary | std::ios::ate);
@@ -1143,7 +1143,7 @@ bool var::osbwrite(const var& osfilehandle, const int startoffset) const
 
 	//what is the purpose of the following?
 	//to prevent locale conversion if writing narrow string to wide stream or vice versa
-	//imbue BEFORE opening
+	//imbue BEFORE opening or after flushing
 	//myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
 
 	//binary!
@@ -1333,7 +1333,7 @@ var& var::osbread(const var& osfilehandle, const int startoffset, const int size
 		pmyfile = new std::wfstream;
 	//what is the purpose of the following?
 	//to prevent locale conversion if writing narrow string to wide stream or vice versa
-	//imbue BEFORE opening
+	//imbue BEFORE opening or after flushing
 	//myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
 
 	//binary!
@@ -1425,7 +1425,7 @@ var& var::osbread(const var& osfilehandle, const int startoffset, const int size
 
 	//what is the purpose of the following?
 	//to prevent locale conversion if writing narrow string to wide stream or vice versa
-	//imbue BEFORE opening
+	//imbue BEFORE opening or after flushing
 	//myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
 
 	//binary!
