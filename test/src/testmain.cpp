@@ -104,14 +104,15 @@ function main()
 	//check can write greek unicode characters to Greek codepage
 	assert(Greek_sas.oswrite(greektestfilename,"Greek"));
 	//check 3 (wide) characters output as 3 bytes
-	assert(osdir(greektestfilename)(1) eq 3);
+	assert(osfile(greektestfilename)(1) eq 3);
 	//check can read greek wide unicode characters from greek codepage
 	var rec2;
 	assert(rec2.osread(greektestfilename,"Greek"));
 	assert(rec2 eq Greek_sas);
 	//check raw read as latin
-	assert(rec2.osread(greektestfilename,""));
-	assert(rec2=="\xF3\xE1\xF1");//greek code page characters
+	assert(rec2.osread(greektestfilename,"C"));
+	var rec3=L"\xF3\xE1\xF2";
+	assert(rec2 eq rec3);//greek code page characters
 
 	//in Turkish Locale
 	//check Latin "I" lowercases to "turkish dotless i"
