@@ -78,10 +78,9 @@ public:
 			exodus::var linetext=filename.field2(exodus::SLASH,-1) ^ ":" ^ lineno;
 			exodus::var filetext;
 	//ALN:NOTE: .osread could itself throw exception and we will have loop :(
-	// Changed to read directly with default locale.
-
-//			if (filetext.osread(filename))
-			if( filetext.osread(filename, L""))		// avoid to read C++ source as UTF8
+	// Changed to read directly with default locale. If no locale specified (as it was in original version of the code)
+			if (filetext.osread(filename))
+//			if( filetext.osread(filename, L""))		// avoid to read C++ source as UTF8
 			{
 				linetext^=": " ^ filetext.field("\x0A",lineno).trimf(" \t");
 				if (linetext.index("backtrace("))

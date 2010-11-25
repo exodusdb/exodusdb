@@ -123,6 +123,7 @@ function main()
 	assert( osbwrite( L"1234567890", OUTPUT_file, position));
 	assert( osbwrite( L"1234567890\n", OUTPUT_file, position));
 	assert( osbwrite( L"Фраза із 22 символів", OUTPUT_file, position));
+	assert( osbwrite( L"Фраза из 22 символов", OUTPUT_file, position));
 	assert( osbwrite( L"\n1234567890", OUTPUT_file, position));
 	assert( osbwrite( L"1234567890\n", OUTPUT_file, position));
 	position = 10;

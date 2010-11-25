@@ -684,15 +684,11 @@ public:
 	//SYSTEM FILE/DIRECTORY OPERATIONS
 	//TODO cache osfilehandles somehow (use var_mvint?)
 	bool osopen(const var& osfilename);
-	var& osbread(const var& osfilehandle, var & startoffset, const int length);
-	var& osbread(const var& osfilehandle, var & startoffset, const int length, const var& locale);
-	bool osbwrite(const var& osfilehandle, var & startoffset) const;
-	bool osbwrite(const var& osfilehandle, var & startoffset, const var& locale) const;
+	var& osbread(const var& osfilehandle, var & startoffset, const int length, const var& locale=L"");
+	bool osbwrite(const var& osfilehandle, var & startoffset, const var& locale = L"") const;
 	void osclose() const;
-	bool osread(const var& osfilename);
-	bool osread(const var& osfilename, const var& locale);
-	bool oswrite(const var& osfilename) const;
-	bool oswrite(const var& osfilename, const var& locale) const;
+	bool osread(const var& osfilename, const var& locale=L"");
+	bool oswrite(const var& osfilename, const var& locale=L"") const;
 	bool osdelete() const;
 	bool osdelete(const var& osfilename) const;
 	bool osrename(const var& newosdir_or_filename) const;
@@ -715,8 +711,7 @@ public:
 	//this is to only to avoid convertion too and from var
 	//but will usage of hard coded filenames etc really be in fast loops
 	//and performance related? perhaps only provide 
-	bool osread(const char* osfilename);
-	bool osread(const char* osfilename, const var& locale);
+	bool osread(const char* osfilename, const var& locale = L"");
 
 	//libraries and subroutines/functions
 	bool load(const var& libraryname) const;

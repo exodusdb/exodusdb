@@ -879,12 +879,11 @@ bool MvEnvironment::osbreadx(var& str1, const var& filehandle, const var& filena
 
 bool MvEnvironment::oswritex(const var& str1, const var& filename) const
 {
-
 	//convert from internal to external "codepage"
 	//move parked characters to high characters
 	//(any field seps in the output will already have been escaped like %fe)
-	return str1.convert(INTERNALCHARS, EXTERNALCHARS).oswrite(filename);
-
+	var default_locale( L"");
+	return str1.convert(INTERNALCHARS, EXTERNALCHARS).oswrite(filename, default_locale);
 }
 
 bool MvEnvironment::osbwritex(const var& str1, const var& filehandle, const var& filename, var & offset, const var & locale) const
