@@ -252,9 +252,30 @@ static MvHandlesCache h_cache;
 	//		~MvHandlesCache for h_cache closes/deletes all registered objects.
 #endif
 
-/*ALN:TODO: wrap utf8_codecvt_facet in own class to investigate its destruction
-boost::scoped_ptr <boost::filesystem::detail::utf8_codecvt_facet> boost_utf8_facet;
+/*ALN:TEST: following class is to investigate its destruction, tests show, that
+	destructor is called on pointer, passed as 2nd parameter to utf8_locale(),
+	from locale::Locimp destructor
+**
+class my_utf8_codecvt_facet: public boost::filesystem::detail::utf8_codecvt_facet
+{
+  public:
+	my_utf8_codecvt_facet()
+	: boost::filesystem::detail::utf8_codecvt_facet()
+	{
+		i++;
+	}
+
+	~my_utf8_codecvt_facet()
+	{
+		--i;
+	}
+  private:
+	static int i;
+};
+
+int my_utf8_codecvt_facet::i = 0;
 */
+
 std::locale get_locale( const var & locale_name) // throw ( MVException)
 {
 	THISIS(L"std::locale get_locale( const var & locale_name)")
@@ -269,19 +290,17 @@ std::locale get_locale( const var & locale_name) // throw ( MVException)
 		//std::locale utf8_locale( old_locale, boost_utf8_facet.get());
 
 		std::locale utf8_locale( old_locale, new boost::filesystem::detail::utf8_codecvt_facet());
+//ALN:TEST:		std::locale utf8_locale( old_locale, new my_utf8_codecvt_facet());
 		return utf8_locale;
 	}
 	else
 	{
-//		bool bad_locale = false;
 		try {
 			std::locale mylocale( locale_name.tostring().c_str());
 			return mylocale;
 		} catch( std::runtime_error re) {
-//			bad_locale = true;
 			throw MVException(L"Cannot create locale for " ^ locale_name);
 		}
-//		if( bad_locale)
 	}
 }
 	
