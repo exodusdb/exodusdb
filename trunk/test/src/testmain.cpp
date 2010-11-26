@@ -133,11 +133,11 @@ function main()
 
 	//check we cannot write to a non-existent file
 	osdelete(tempfilename5); //make sure the file doesnt exist
-	assert(not osbwrite("34",tempfilename5,2));
+	assert(not osbwrite("34",tempfilename5,var(2)));
 
 	//check we can osbwrite to an existent file beyond end of file
 	oswrite("",tempfilename5);//
-	assert(osbwrite("78",tempfilename5,2));
+	assert(osbwrite("78",tempfilename5,var(2)));
 	assert(osread(record5,tempfilename5));
 	assert(record5.oconv("HEX2") eq "000000003738");
 	osdelete(tempfilename5);
@@ -145,7 +145,7 @@ function main()
 	//check cannot write non-codepage characters
 	if (SLASH_IS_BACKSLASH) {
 		assert(oswrite("",tempfilename5));
-		assert(not osbwrite(L"\u0393",tempfilename5,2));
+		assert(not osbwrite(L"\u0393",tempfilename5,var(2)));
 		osdelete(tempfilename5);
 	}
 

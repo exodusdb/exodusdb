@@ -50,7 +50,6 @@ DLL_PUBLIC void osclose(const var& filehandle);
 DLL_PUBLIC var osbread(const var& filehandle, var & startoffset, const int length);
 DLL_PUBLIC bool osbread(var& data, const var& filehandle, var & startoffset, const int length);
 DLL_PUBLIC bool osbwrite(const var& data, const var& filehandle, var & startoffset);
-DLL_PUBLIC bool osbwrite(const var& data, const var& filehandle, var & startoffset, const var & locale);
 DLL_PUBLIC bool osread(var& data, const var& osfilename);
 DLL_PUBLIC var osread(const var& osfilename);
 DLL_PUBLIC bool oswrite(const var& data,const var& osfilename);

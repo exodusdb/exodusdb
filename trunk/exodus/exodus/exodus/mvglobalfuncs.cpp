@@ -120,15 +120,9 @@ var& osbread(var& data, const var& filehandle, var & startoffset, const int leng
 	return data;
 }
 
-DLL_PUBLIC bool osbwrite(const var& data, const var& filehandle, var & startoffset, const var & locale)
-{
-	return data.osbwrite(filehandle, startoffset, locale);
-}
-
 DLL_PUBLIC bool osbwrite(const var& data, const var& filehandle, var & startoffset)
 {
-	var default_locale(L"");
-	return data.osbwrite(filehandle, startoffset, default_locale);
+	return data.osbwrite(filehandle, startoffset);
 }
 
 //two argument version returns success/failure to be used in if statement

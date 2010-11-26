@@ -886,24 +886,12 @@ bool MvEnvironment::oswritex(const var& str1, const var& filename) const
 	return str1.convert(INTERNALCHARS, EXTERNALCHARS).oswrite(filename, default_locale);
 }
 
-bool MvEnvironment::osbwritex(const var& str1, const var& filehandle, const var& filename, var & offset, const var & locale) const
-{
-	//convert from internal to external "codepage"
-	//move parked characters to high characters
-	//(any field seps in the output will already have been escaped like %fe)
-	return str1.convert(INTERNALCHARS, EXTERNALCHARS).osbwrite(filehandle,offset,locale);
-
-	//evade warning: unused parameter
-	if (filename) {}
-}
-
 bool MvEnvironment::osbwritex(const var& str1, const var& filehandle, const var& filename, var & offset) const
 {
 	//convert from internal to external "codepage"
 	//move parked characters to high characters
 	//(any field seps in the output will already have been escaped like %fe)
-	var default_locale(L"");
-	return str1.convert(INTERNALCHARS, EXTERNALCHARS).osbwrite(filehandle,offset,default_locale);
+	return str1.convert(INTERNALCHARS, EXTERNALCHARS).osbwrite(filehandle,offset);
 
 	//evade warning: unused parameter
 	if (filename) {}
