@@ -684,8 +684,8 @@ public:
 	//SYSTEM FILE/DIRECTORY OPERATIONS
 	//TODO cache osfilehandles somehow (use var_mvint?)
 	bool osopen(const var& osfilename);
-	var& osbread(const var& osfilehandle, var & startoffset, const int length, const var& locale=L"");
-	bool osbwrite(const var& osfilehandle, var & startoffset, const var& locale = L"") const;
+	var& osbread(const var& osfilehandle, var & startoffset, const int length);
+	bool osbwrite(const var& osfilehandle, var & startoffset) const;
 	void osclose() const;
 	bool osread(const var& osfilename, const var& locale=L"");
 	bool oswrite(const var& osfilename, const var& locale=L"") const;

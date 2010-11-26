@@ -74,21 +74,24 @@ L"[16:55:08] neosys: one é\n";
 */
 	var tempfilename5 = "tempfilename5.txt";
 	oswrite("",tempfilename5);
-	 assert( osbwrite("78",tempfilename5,2));
+
+//	 assert( osbwrite("78",tempfilename5,2));
+	 assert( osbwrite("78",tempfilename5,var(2)));
+
 	 osclose(tempfilename5);
 	 osdelete(tempfilename5);
 
 	tempfilename5 = "tempfilename6.txt";
 	oswrite("",tempfilename5);
-	assert(osbwrite("This is written from 10th byte", tempfilename5, 10));
+	assert(osbwrite("This is written from 10th byte", tempfilename5, var(10)));
 
 	tempfilename5 = "tempfilename7.txt";
 	oswrite("",tempfilename5);
-	assert(osbwrite("This is written from 0th byte", tempfilename5, 0));
+	assert(osbwrite("This is written from 0th byte", tempfilename5, var(0)));
 
 	tempfilename5 = "tempfilename8.txt";
 	oswrite("",tempfilename5);
-	assert(osbwrite("Just to test dynamically grown handle cache table", tempfilename5, 0));
+	assert(osbwrite("Just to test dynamically grown handle cache table", tempfilename5, var(0)));
 
 	// Use any file with size 2-10Mb
 	var stroustrup = "Stroustrup B. - The C++ programming language (3rd edition) (1997).pdf";
@@ -101,7 +104,7 @@ L"[16:55:08] neosys: one é\n";
 	for( int i = 0; i < 3459406 / 5; i += 5)
 	{
 		var buf;
-		buf.osbread( stroustrup, i, 5);
+		buf.osbread( stroustrup, var(i), 5);
 //		if( buf == L"C")
 //			CppCounter ++;
 //		print( var(i)^L" "^CppCounter^L"\r");
@@ -127,7 +130,7 @@ L"[16:55:08] neosys: one é\n";
 	{
 		var buf(i);
 		buf ^= L"\n";
-		buf.osbwrite( counting, i);
+		buf.osbwrite( counting, var(i));
 	}
 	end = end.timedate();
 	print( L"End of  osbwrite()  benchmark: ");

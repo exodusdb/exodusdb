@@ -958,9 +958,9 @@ static void del_wfstream( void * handle)
 	delete ( std::wfstream *) handle;
 }
 
-bool var::osbwrite(const var& osfilehandle, var & startoffset, const var & locale) const
+bool var::osbwrite(const var& osfilehandle, var & startoffset) const
 {
-	THISIS(L"void var::osbwrite(const var& osfilehandle, var & startoffset, const var & locale) const")
+	THISIS(L"void var::osbwrite(const var& osfilehandle, var & startoffset) const")
 	THISISSTRING()
 	ISSTRING(osfilehandle)
 
@@ -991,7 +991,8 @@ bool var::osbwrite(const var& osfilehandle, var & startoffset, const var & local
 ///		pmyfile->imbue( std::locale((std::locale::classic(), new NullCodecvt));
 
 	//ALN:TODO: if locale changed, reopen the file
-	pmyfile->imbue( get_locale( locale));
+//	pmyfile->imbue( get_locale( locale));
+	pmyfile->imbue( std::locale( ""));
 
 		pmyfile->open(osfilehandle.tostring().c_str(), std::ios::out | std::ios::in | std::ios::binary);
 		if (! (*pmyfile))
@@ -1084,9 +1085,9 @@ bool var::osbwrite(const var& osfilehandle, const int startoffset) const
 #endif
 
 #ifdef CACHED_HANDLES
-var& var::osbread(const var& osfilehandle, var & startoffset, const int size, const var & locale)
+var& var::osbread(const var& osfilehandle, var & startoffset, const int size)
 {
-	THISIS(L"var& var::osbread(const var& osfilehandle, const int startoffset, const int size, const var & locale)")
+	THISIS(L"var& var::osbread(const var& osfilehandle, const int startoffset, const int size")
 	THISISDEFINED()
 	ISSTRING(osfilehandle)
 
@@ -1118,13 +1119,8 @@ var& var::osbread(const var& osfilehandle, var & startoffset, const int size, co
 	//myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
 
 	//ALN:TODO: if locale changed, reopen the file
-	pmyfile->imbue( get_locale( locale));
-
-//////		std::locale old_locale;
-////////		std::locale utf8_locale( old_locale, new boost::exodus::detail::utf8_codecvt_facet<ucs4_t>);
-//////		std::locale utf8_locale( old_locale, new boost::filesystem::detail::utf8_codecvt_facet());
-////////		std::locale utf8_locale( old_locale, new utf8_codecvt_facet());
-//////		pmyfile->imbue( utf8_locale);
+//	pmyfile->imbue( get_locale( locale));
+	pmyfile->imbue( std::locale( ""));
 
 	//binary!
 	//use ::ate to position at end so tellg below can determine file size

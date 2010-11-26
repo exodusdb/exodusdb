@@ -168,7 +168,6 @@ public:
 	
 	bool oswritex(const var& str, const var& filename) const;
 	bool osbwritex(const var& str1, const var& filehandle, const var& filename, var & offset) const;
-	bool osbwritex(const var& str1, const var& filehandle, const var& filename, var & offset, const var & locale) const;
 //	bool osbreadx(var& str1, const var& filehandle, const var& filename, const int startoffset, const int length);
 	bool osbreadx(var& str1, const var& filehandle, const var& filename, var & startoffset, const int length);
 	
