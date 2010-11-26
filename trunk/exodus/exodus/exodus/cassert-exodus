@@ -1,0 +1,28 @@
+//
+// cassert_exodus - assert customization include file
+//
+// Purpose: define assert_warn() and assert_pause() macros:
+//
+// assert_warn( expression) - just print message without subsequent abort()
+// assert_pause( expression) - print message and pause for key pressed, no abort()
+//
+// How to use:
+//	1) replace #include <cassert> by #include <cassert_exodus>
+//	2) insert assert_warn() or assert_pause(), or replace existing assert()
+//
+void print_assert_warning( const char * msg, const char * file, unsigned line)
+{
+  std::cout << "Assertion failed: '" << msg << "', file " << file << ", line " << line << "." << std::endl;
+}
+void print_assert_pause( const char * msg, const char * file, unsigned line)
+{
+  char c;
+  print_assert_warning( msg, file, line);
+  std::cout << "Press any key to continue ...";
+  std::cin.get( c);
+}
+#ifndef assert
+#  include <cassert>
+#endif
+#define assert_warn(_Expression) (void)( (!!(_Expression)) || (print_assert_warning( #_Expression, __FILE__, __LINE__), 0) )
+#define assert_pause(_Expression) (void)( (!!(_Expression)) || (print_assert_pause( #_Expression, __FILE__, __LINE__), 0) )

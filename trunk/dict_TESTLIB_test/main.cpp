@@ -9,6 +9,8 @@
 //NOTE 3. The code mainly copied from service.sln, .\service\main.cpp (or main2.cpp)
 //
 #include <exodus/program.h>
+//#include <cassert>
+#include <cassert-exodus>
 
 programinit()
 
@@ -20,9 +22,13 @@ function main()
 	var filename="TESTLIB";
     var dictfilename="dict_"^ filename;
 
+	std::string narrow = filename.tostring();
+
     // leave the test data files around for playing with
     var cleanup=true;
     if (cleanup) {
+		assert_warn( false);
+		assert_pause( ! filename);
         deletefile(filename);
         deletefile(dictfilename);
 	}
