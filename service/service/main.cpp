@@ -173,8 +173,7 @@ function xyz(in xyzz)
 
 function accrest() {
         var infilename="\\tapex";//=field(sentence()," ",2);
-        var infile;
-        if (not osopen(infilename,infile))
+        if (not osopen(infilename))
                 abort("Cant read "^infilename);
 
         var fms=FM^VM^SM^TM^STM^SSTM;
@@ -183,7 +182,7 @@ function accrest() {
         var offset=0;
         var blocksize=50000;
         while (true) {
-                var block=osbread(infile,offset,blocksize);
+                var block=osbread(infilename,offset,blocksize);
  //printl(offset," ",len(block));
                 if (not len(block))
                         break;

@@ -769,7 +769,6 @@ void MvWindow::select2(const var& filenamex, const var& linkfilename2, const var
 	var savereset;
 	var savevalid;
 	var dictfilename;
-	var linkfile2;
 	var dictmd;
 	var realfilename;
 	var triggers;
@@ -852,7 +851,7 @@ void MvWindow::select2(const var& filenamex, const var& linkfilename2, const var
 
 	if (linkfilename2) {
 			var(L"").oswrite(linkfilename2);
-		if (!(linkfile2.osopen(linkfilename2))) {
+		if (!(linkfilename2.osopen())) {
 			response = L"Error: " ^ (linkfilename2.quote()) ^ L" cannot open output file";
 			goto exit;
 		}
@@ -931,7 +930,7 @@ void MvWindow::select2(const var& filenamex, const var& linkfilename2, const var
 	if (xml and linkfilename2) {
 		//tx:='<xml id=':quote(lcase(filename)):'>':crlf
 		tx ^= L"<records>" ^ crlf2;
-		mv.osbwritex(tx, linkfile2, linkfilename2, dataptr);
+		mv.osbwritex(tx, linkfilename2, linkfilename2, dataptr);
 	}
 	dataptr += tx.length();
 
@@ -1122,7 +1121,7 @@ cell=library.call(dictid);
 			}
 
 			if (linkfilename2) {
-				mv.osbwritex(row, linkfile2, linkfilename2, dataptr);
+				mv.osbwritex(row, linkfilename2, linkfilename2, dataptr);
 
 			}else{
 				datax ^= row;
@@ -1138,11 +1137,11 @@ cell=library.call(dictid);
 
 	if (xml and linkfilename2) {
 		var tt = L"</records>";
-		mv.osbwritex(tt, linkfile2, linkfilename2, dataptr);
+		mv.osbwritex(tt, linkfilename2, linkfilename2, dataptr);
 	}
 
 	if (linkfilename2) {
-		linkfile2.osclose();
+		linkfilename2.osclose();
 		var().osflush();
 	}
 

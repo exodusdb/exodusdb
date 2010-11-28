@@ -35,7 +35,7 @@ function main()
 
 	printl("testfr says 'Hello World!'");
 	//assert(setxlocale("fr_FR.utf8"));
-	assert(setxlocale(1036));
+	//assert(setxlocale(1036));
 	var xx3="1234.5678";
 	printl(xx3+1);
 	printl(oconv(xx3,"MD20P"));
@@ -133,11 +133,13 @@ function main()
 
 	//check we cannot write to a non-existent file
 	osdelete(tempfilename5); //make sure the file doesnt exist
-	assert(not osbwrite("34",tempfilename5,var(2)));
+	var offset=2;
+	assert(not osbwrite(L"34",tempfilename5,offset));
 
 	//check we can osbwrite to an existent file beyond end of file
 	oswrite("",tempfilename5);//
-	assert(osbwrite("78",tempfilename5,var(2)));
+	offset=2;
+	assert(osbwrite("78",tempfilename5,offset));
 	assert(osread(record5,tempfilename5));
 	assert(record5.oconv("HEX2") eq "000000003738");
 	osdelete(tempfilename5);
@@ -145,7 +147,9 @@ function main()
 	//check cannot write non-codepage characters
 	if (SLASH_IS_BACKSLASH) {
 		assert(oswrite("",tempfilename5));
-		assert(not osbwrite(L"\u0393",tempfilename5,var(2)));
+		//offset=2;
+		//assert(not osbwrite(L"\u0393",tempfilename5,offset,"C"));
+		assert(not oswrite(L"\u0393",tempfilename5,"French"));
 		osdelete(tempfilename5);
 	}
 

@@ -10,7 +10,6 @@ class printtext
 	var html;
 	var ownprintfile;
 	var printfilename;
-	var printfile;
 	var letterhead;
 	var pagelns;
 	var bodyln;
@@ -46,7 +45,7 @@ public:
 	}
 
 	void close() {
-		printfile.osclose();
+		printfilename.osclose();
 	}
 
 	void printtx(io tx) {
@@ -65,7 +64,7 @@ public:
 			//call setptr('prn':char(0),1)
 			env->SYSTEM.replacer(3, 0, 0, 1);
 
-			//if no printfile assume command mode and make an output file name
+			//if no printfilename assume command mode and make an output file name
 			printfilename = env->SYSTEM.extract(2);
 			if (html.unassigned()) {
 				html = printfilename.substr(-4,4) eq ".htm";
@@ -99,7 +98,7 @@ public:
 
 			//open printout file
 			oswrite("", printfilename);
-			if (!printfile.osopen(printfilename)) {
+			if (!printfilename.osopen()) {
 				stop("SYSTEM ERROR - CANNOT OPEN PRINTFILE " ^ printfilename.quote());
 			}
 
@@ -222,8 +221,8 @@ private:
 			//convert 'Í' to '=-' in tx
 		}
 		tx.swapper(FM, "\r\n");
-		//osbwritex(tx, printfile, printfilename, printptr);
-		tx.osbwrite(printfile,printptr);
+		//osbwritex(tx, printfilename, printfilename, printptr);
+		tx.osbwrite(printfilename,printptr);
 
 		tx = "";
 		newpage = 0;

@@ -741,7 +741,7 @@ var inclusion=
 
 				//check object code can be produced.
  				if (oldobjfileinfo) {
-					if (osopen(objfilename,objfilename))
+					if (osopen(objfilename))
 						osclose(objfilename);
 					else {
 						print("Error: ",objfilename, " cannot be updated. Insufficient rights");
@@ -828,7 +828,7 @@ var inclusion=
 										//check can install file
                                         var outputpathandfile=outputdir^field2(binfilename,SLASH,-1);
 										if (osfile(outputpathandfile)) {
-											if (osopen(outputpathandfile,outputpathandfile))
+											if (osopen(outputpathandfile))
 												osclose(outputpathandfile);
 											else {
 												print("Error: ",outputpathandfile, " cannot be updated. Insufficient rights");

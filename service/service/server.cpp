@@ -263,17 +263,17 @@ var Server::run()
 	logfilename = logpath ^ datasetcode ^ SLASH ^ datex.substr(-2, 2) ^ datex.substr(1, 2) ^ datex.substr(4, 2) ^ var(L"00" ^ mv.SYSTEM.extract(24)).substr(-2, 2);
 	logfilename ^= L".xml";
 
-	if (logfile.osopen(logfilename)) {
+	if (logfilename.osopen()) {
 		logptr = logfilename.osfile().extract(1);
 
-		//osbread x from logfile at logptr-6 length 6
-		xx.osbread(logfile, logptr - 6, 6);
+		//osbread x from logfilename at logptr-6 length 6
+		xx.osbread(logfilename, logptr - 6, 6);
 		if (xx == L"</Log>")
 			logptr -= 6;
 
 	}else{
 		var(L"").oswrite(logfilename);
-		if (logfile.osopen(logfilename)) {
+		if (logfilename.osopen()) {
 			logptr = 0;
 			logx = L"<?xml version=\"1.0\"?>" ^ (var().chr(13) ^ var().chr(10));
 			logx ^= L"<?xml-stylesheet type=\'text/xsl\' href=\'.\\loglist.xsl\'?>" ^ (var().chr(13) ^ var().chr(10));
@@ -284,7 +284,7 @@ var Server::run()
 			logx ^= L">";
 			gosub_writelogx2();
 
-			mv.osbwritex(L"</Log>", logfile, logfilename, logptr);
+			mv.osbwritex(L"</Log>", logfilename, logfilename, logptr);
 
 		}else{
 			std::wcout << L"CANNOT OPEN LOG FILE "<< logfilename << std::endl;
@@ -491,7 +491,7 @@ stopper:
 		if (linkfilename1.osfile()!=L"") {
 
 			//flush
-			//osopen linkfilename1 to linkfile1 else
+			//osopen linkfilename1 to linkfilename1 else
 			// call timedelay(.1)
 			// if tracing then print 'cannot open ':quote(linkfilename1)
 			// goto nextrequest
@@ -658,7 +658,7 @@ var Server::processlink()
 //print 'lock locks,request*':linkfilename1
 
 		var().osflush();
-		if (!(linkfile1.osopen(linkfilename1))) {
+		if (!(linkfilename1.osopen())) {
 			//remove from future candidate files?
 			//qqq
 			var().ossleep(100);
@@ -670,16 +670,17 @@ var Server::processlink()
 		//get the .1 file which contains the request
 		//timex=time()+2
 readlink1:
-			//osbread request from linkfile1 at 0 length 256*256-4
-		USER0.osbread(linkfile1, 0, 256 * 256 - 4);
+			//osbread request from linkfilename1 at 0 length 256*256-4
+		var offset=0;
+		USER0.osbread(linkfilename1, offset, 256 * 256 - 4);
 
 		//if cannot read it then try again
 		if (USER0 == L"" && var().time() == timex) {
 			var().osflush();
 			//qqq
 			var().ossleep(100);
-			linkfile1.osclose();
-			if (!(linkfile1.osopen(linkfilename1)))
+			linkfilename1.osclose();
+			if (!(linkfilename1.osopen()))
 				{}
 			goto readlink1;
 		}
@@ -718,18 +719,18 @@ readlink1:
 		//delete then unlock the request file
 			var ntries = 0;
 deleterequest:
-			linkfile1.osclose();
+			linkfilename1.osclose();
 			linkfilename1.osdelete();
 			if (linkfilename1.osfile()) {
 				var().osflush();
 				//garbagecollect;
 			var().ossleep(100);
 			ntries += 1;
-			//if tracing then print 'could not delete ':linkfile1
+			//if tracing then print 'could not delete ':linkfilename1
 			if (ntries < 100)
 				goto deleterequest;
 			if (tracing)
-				std::wcout << L"COULD NOT DELETE "<< linkfile1 << std::endl;
+				std::wcout << L"COULD NOT DELETE "<< linkfilename1 << std::endl;
 		}
 
 		//leave these in place for the duration of the process
@@ -845,7 +846,7 @@ var Server::processrequest()
 		tt.transfer(logx);
 		gosub_writelogx2();
 
-		mv.osbwritex(L"<DataIn>", logfile, logfilename, logptr);
+		mv.osbwritex(L"<DataIn>", logfilename, logfilename, logptr);
 
 	}
 
@@ -899,10 +900,10 @@ var Server::processrequest()
 	//so that if Server fails then net the calling program can still respond
 	mv.PRIORITYINT.replacer(100, 0, 0, linkfilename3);
 
-	var linkfile2size = linkfilename2.osfile().extract(1);
-	if (linkfile2size > maxstringsize) {
+	var linkfilename2size = linkfilename2.osfile().extract(1);
+	if (linkfilename2size > maxstringsize) {
 
-		if (linkfile2.osopen(linkfilename2)) {
+		if (linkfilename2.osopen()) {
 
 			//read blocks of iodat
 			for (int blockn = 1; blockn <= nblocks; blockn++)
@@ -911,7 +912,7 @@ var Server::processrequest()
 			for (int blockn = 1; blockn <= nblocks; blockn++) {
 
 				//osbread datx(blockn) from linkfilename2 at ((blockn-1)*inblocksize) length inblocksize
-				mv.osbreadx(datx[blockn], linkfile2, linkfilename2, (blockn - 1) * inblocksize, inblocksize);
+				mv.osbreadx(datx[blockn], linkfilename2, linkfilename2, (blockn - 1) * inblocksize, inblocksize);
 
 				//BREAK;
 				if (!((datx[blockn]).length())) break;;
@@ -984,7 +985,7 @@ var Server::processrequest()
 
 			//cannot open linkfilename2 means no iodat
 			}else{
-cannotopenlinkfile2:
+cannotopenlinkfilename2:
 				Serverfailure = 1;
 				USER1 = L"";
 			USER3 = L"Error: Server cannot open " ^ linkfilename2;
@@ -992,17 +993,18 @@ cannotopenlinkfile2:
 
 	}else{
 
-		if (!linkfile2size) {
+		if (!linkfilename2size) {
 
 			USER1 = L"";
 
 		}else{
 
-			if (!(linkfile2.osopen(linkfilename2)))
-				goto cannotopenlinkfile2;
+			if (!(linkfilename2.osopen()))
+				goto cannotopenlinkfilename2;
 
-			//osread iodat from linkfilename2 else goto cannotopenlinkfile2
-			mv.osbreadx(USER1, linkfile2, linkfilename2, 0, maxstringsize);
+			//osread iodat from linkfilename2 else goto cannotopenlinkfilename2
+			var offset=0;
+			mv.osbreadx(USER1, linkfilename2, linkfilename2, offset, maxstringsize);
 
 			//hack to remove UTF16 BOM mark
 			if (USER1.substr(1,1)==L"\uFEFF")
@@ -1037,8 +1039,8 @@ cannotopenlinkfile2:
 
 	}
 
-	if (linkfile2.osopen(linkfilename2)) {
-		linkfile2.osclose();
+	if (linkfilename2.osopen()) {
+		linkfilename2.osclose();
 		linkfilename2.osdelete();
 		//osread _USER3 from linkfilename3 else USER3=''
 	}
@@ -1320,7 +1322,7 @@ void Server::gosub_requestexit()
 	}else{
 
 		var(L"").oswrite(linkfilename2);
-		if (linkfile2.osopen(linkfilename2)) {
+		if (linkfilename2.osopen()) {
 
 			//split into blocks and convert to escape chars
 			for (int blockn = 1; blockn <= nblocks; blockn++)
@@ -1346,7 +1348,7 @@ void Server::gosub_requestexit()
 
 				//write BEFORE converting control characters
 				//since writing restores 10-17 back up to F8-FF
-				mv.osbwritex(blk, linkfile2, linkfilename2, ptr);
+				mv.osbwritex(blk, linkfilename2, linkfilename2, ptr);
 				ptr += blk.length();
 
 				//encode control characters to show in log
@@ -1366,7 +1368,7 @@ void Server::gosub_requestexit()
 
 			};//blockn;
 
-			linkfile2.osclose();
+			linkfilename2.osclose();
 
 		}else{
 
@@ -1377,18 +1379,18 @@ void Server::gosub_requestexit()
 	}
 
 	//try to flush file open
-	if (linkfile2.osopen(linkfilename2))
-		linkfile2.osclose();
+	if (linkfilename2.osopen())
+		linkfilename2.osclose();
 
 	if (logfilename!=L"") {
 		var tt = L"";
 		if (iodatlen)
 			tt ^= L"</DataOut>";
 		tt ^= L"</Message>" ^ (var().chr(13) ^ var().chr(10));
-		mv.osbwritex(tt, logfile, logfilename, logptr);
+		mv.osbwritex(tt, logfilename, logfilename, logptr);
 		logptr += tt.length();
 
-		mv.osbwritex(L"</Log>", logfile, logfilename, logptr);
+		mv.osbwritex(L"</Log>", logfilename, logfilename, logptr);
 
 	}
 
@@ -1419,7 +1421,7 @@ void Server::gosub_exit()
 {
 
 	if (logfilename!=L"")
-		logfile.osclose();
+		logfilename.osclose();
 
 	//remove lock indicating processing
 	//gosub sysunlock
@@ -2253,7 +2255,7 @@ emptyrecorderror:
 		}
 
 		//make sure that the output file is closed
-		if (printfile.osopen(printfilename))
+		if (printfile.osopen())
 			printfile.osclose();
 
 	}else if (request1 == L"STOPDB") {
@@ -2829,7 +2831,7 @@ void Server::gosub_writelogx()
 
 void Server::gosub_writelogx2()
 {
-	mv.osbwritex(logx, logfile, logfilename, logptr);
+	mv.osbwritex(logx, logfilename, logfilename, logptr);
 	logptr += logx.length();
 	logx = L"";
 	return;
@@ -2837,7 +2839,7 @@ void Server::gosub_writelogx2()
 
 void Server::gosub_writelogx3()
 {
-	mv.osbwritex(logx, logfile, logfilename, logptr);
+	mv.osbwritex(logx, logfilename, logfilename, logptr);
 	logx = L"";
 	return;
 }

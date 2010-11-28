@@ -43,17 +43,16 @@ DLL_PUBLIC var time();
 DLL_PUBLIC var timedate();
 DLL_PUBLIC void ossleep(const int milliseconds);
 DLL_PUBLIC var ostime();
-DLL_PUBLIC bool osopen(const var& filename, var& filehandle);
-DLL_PUBLIC void osclose(const var& filehandle);
-//DLL_PUBLIC var osbread(const var& filehandle, const int startoffset, const int length);
-//DLL_PUBLIC bool osbread(var& data, const var& filehandle, const int startoffset, const int length);
-DLL_PUBLIC var osbread(const var& filehandle, var & startoffset, const int length);
-DLL_PUBLIC bool osbread(var& data, const var& filehandle, var & startoffset, const int length);
-DLL_PUBLIC bool osbwrite(const var& data, const var& filehandle, var & startoffset);
-DLL_PUBLIC bool osread(var& data, const var& osfilename);
+DLL_PUBLIC bool osopen(const var& filename, const var& locale=L"");
+DLL_PUBLIC void osclose(const var& filename);
+DLL_PUBLIC var osbread(const var& filename, var & startoffset, const int length);
+DLL_PUBLIC bool osbread(var& data, const var& filename, var & startoffset, const int length);
+DLL_PUBLIC bool osbwrite(const var& data, const var& filename, var & startoffset);
+
+DLL_PUBLIC bool osread(var& data, const var& osfilename, const var& locale=L"");
 DLL_PUBLIC var osread(const var& osfilename);
-DLL_PUBLIC bool oswrite(const var& data,const var& osfilename);
-DLL_PUBLIC bool oswrite(const var& data,const var& osfilename,const var& locale);
+DLL_PUBLIC bool oswrite(const var& data,const var& osfilename, const var& locale=L"");
+
 DLL_PUBLIC bool osdelete(const var& osfilename);
 DLL_PUBLIC bool osrename(const var& oldosdir_or_filename, const var& newosdir_or_filename);
 DLL_PUBLIC bool oscopy(const var& fromosdir_or_filename, const var& newosdir_or_filename);
