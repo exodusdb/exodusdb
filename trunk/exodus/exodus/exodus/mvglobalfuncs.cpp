@@ -88,9 +88,9 @@ DLL_PUBLIC var ostime()
 }
 
 //osopen x to y else
-DLL_PUBLIC bool osopen(const var& filename, var& filehandle)
+DLL_PUBLIC bool osopen(const var& filename, const var& locale)
 {
-	return filehandle.osopen(filename);
+	return filename.osopen(locale);
 }
 
 //osclose x
@@ -128,9 +128,9 @@ DLL_PUBLIC bool osbwrite(const var& data, const var& filehandle, var & startoffs
 //two argument version returns success/failure to be used in if statement
 //target variable first to be like "osread x from y else" and "read x from y else"
 //unfortunately different from osgetenv which is the reverse
-DLL_PUBLIC bool osread(var& data, const var& osfilename)
+DLL_PUBLIC bool osread(var& data, const var& osfilename, const var& locale)
 {
-	return data.osread(osfilename);
+	return data.osread(osfilename,locale);
 }
 
 //one argument returns the contents directly to be used in assignments
@@ -144,14 +144,9 @@ DLL_PUBLIC var osread(const var& osfilename)
 }
 
 //oswrite x on y else
-DLL_PUBLIC bool oswrite(const var& data,const var& osfilename)
+DLL_PUBLIC bool oswrite(const var& data, const var& osfilename, const var& locale=L"")
 {
-	return data.oswrite(osfilename);
-}
-
-DLL_PUBLIC bool oswrite(const var& data, const var& osfilename, const var& locale)
-{
-	return data.oswrite(osfilename, locale);
+	return data.oswrite(osfilename,locale);
 }
 
 //if osdelete x else

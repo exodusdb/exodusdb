@@ -41,7 +41,6 @@ THE SOFTWARE.
 #undef BOOST_UTF8_BEGIN_NAMESPACE
 //}}
 
-
 #ifdef BOOST_HAS_ICU
 #include <boost/regex/icu.hpp>
 #endif
@@ -99,9 +98,7 @@ namespace boostfs = boost::filesystem;
 #include <exodus/mvutf.h>
 #include <exodus/mvexceptions.h>
 
-#ifdef CACHED_HANDLES
-#  include "mvhandles.h"
-#endif
+#include "mvhandles.h"
 
 //#include "exodus/NullCodecvt.h"//used to prevent wifstream and wofstream widening/narrowing binary input/output to/from internal wchar_t
 
@@ -125,7 +122,7 @@ void exodus_once_func()
 	//.utf8 causes a utf-8 to wchar conversion when converting string to wstring by iterators .begin() .end()
 	//and we want to be able to control conversion more accurately than an automatic conversion
 	//en_US is missing from Ubuntu. en_IN is available on Ubuntu and Centos but not MacOSX
-	setlocale (LC_COLLATE, "en_US.utf-8");
+	setlocale (LC_COLLATE, "en_US.utf8");
 }
 
 /* Ubuntu 8.04 locale -a
@@ -241,16 +238,15 @@ public:
 static ExodusOnce exodus_once_static;
 
 namespace exodus{
-#ifdef CACHED_HANDLES
+
 	// this object caches wfstream * pointers, to avoid multiple reopening files
-static MvHandlesCache h_cache;
+	static MvHandlesCache h_cache;
 	// Lifecircle of wfstream object:
 	//	- created (by new) and opened in osbread()/osbwrite();
 	//	- pointer to created object stored in h_cache;
 	//  - when user calls osclose(), the stream is closed and the object is deleted, and removed from h_cache;
 	//	- if user forgets to call osclose(), the stream remains opened (alive) until
 	//		~MvHandlesCache for h_cache closes/deletes all registered objects.
-#endif
 
 /*ALN:TEST: following class is to investigate its destruction, tests show, that
 	destructor is called on pointer, passed as 2nd parameter to utf8_locale(),
@@ -823,40 +819,84 @@ void var::osflush() const
 	return;
 }
 
-
-	//what is the purpose of the following?
-	//to prevent locale conversion if writing narrow string to wide stream or vice versa
-	//imbue BEFORE opening or after flushing
-	//	myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
-//var(int(sizeof(myfile))).outputl(L"filesize");
-	//if (osfilename.var_mvtyp&pimpl::MVTYPE_INT)
-	//	myfile=(std::fstream) var_mvint;
-	//else
-bool var::osopen(const var& osfilename)
+bool var::osopen(const var& locale) const
 {
-	THISIS(L"bool var::osopen(const var& osfilename)")
-	THISISDEFINED()
-	ISSTRING(osfilename)
+	THISIS(L"bool var::osopen(const var& locale)")
+	THISISSTRING()
 
-	//TODO buffer filehandles to prevent continual reopening
+	//if reopening an osfile that is already opened then close and reopen
+	if (var_mvtyp & pimpl::MVTYPE_HANDLE)
+		osclose();
 
-	if (!(osfilename.var_mvtyp&pimpl::MVTYPE_STR))
+	return osopenx(*this, locale)!=0;
+
+}
+
+static void del_wfstream( void * handle)
+{
+	delete ( std::wfstream *) handle;
+}
+
+std::wfstream* var::osopenx(const var& osfilename, const var& locale) const
+{
+
+	//IDENTICAL code in osbread and osbwrite
+	//Try to get the cached file handle. the usual case is that you osopen a file before doing osbwrite/osbread
+	//Using wfstream instead of wofstream so that we can mix reads and writes on the same filehandle
+	std::wfstream * pmyfile = 0;
+	if( osfilename.var_mvtyp & pimpl::MVTYPE_HANDLE)
 	{
-		if (!osfilename.var_mvtyp)
-			throw MVUnassigned(L"osopen(osfilename)");
-		osfilename.createString();
+		pmyfile = (std::wfstream *) h_cache.get_handle( (int) osfilename.var_mvint);
+		if( pmyfile == 0)		// nonvalid handle
+		{
+			osfilename.var_mvint = 0;
+			osfilename.var_mvtyp ^= pimpl::MVTYPE_HANDLE;	// clear bit
+		}
 	}
 
-	std::string sfn = osfilename.tostring();
-	// avoid "fstream * pfstream = new ..." complexities
-	std::fstream fstr( sfn.c_str(), std::ios::out |std::ios::in | std::ios::binary);
-	if( ! fstr)
-		return false;
+	//if the file has NOT already been opened then open it now with the current default locale and add it to the cache.
+	//but normally the filehandle will have been previously opened with osopen and perhaps a specific locale.
+	if( pmyfile == 0)
+	{
 
-	var_mvstr=osfilename.var_mvstr;
-	var_mvtyp=pimpl::MVTYPE_STR;
-	fstr.close();
-	return true;
+		//delay checking until necessary
+		THISIS(L"bool var::osopenx(const var& osfilename, const var& locale)")
+		ISSTRING(osfilename)
+		ISSTRING(locale)
+
+		pmyfile = new std::wfstream;
+
+		//what is the purpose of the following?
+		//to prevent locale conversion if writing narrow string to wide stream or vice versa
+		//imbue BEFORE opening or after flushing
+		//myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
+
+		try
+		{
+			pmyfile->imbue(std::locale(locale.tostring().c_str()));
+		}
+		catch (...)
+		{
+			throw MVException(locale^L" is not supported on this system");
+		}
+
+		//open the file for i/o (fail if the file doesnt exist and do NOT delete any existing file)
+		//binary and in/out to allow reading and writing from same file handle
+		pmyfile->open(osfilename.tostring().c_str(), std::ios::out | std::ios::in | std::ios::binary);
+		if (! (*pmyfile))
+		{
+			delete pmyfile;
+			return 0;
+		}
+
+		//cache the file handle (we use the int to store the "file number"
+		//and NAN to prevent isnum trashing mvint in the possible case that the osfilename is an integer
+		//can addhandle fail?
+		osfilename.var_mvint = h_cache.add_handle( pmyfile, del_wfstream);
+		osfilename.var_mvtyp = pimpl::MVTYPE_OPENED;
+	}
+
+	return pmyfile;
 }
 
 //on unix or with iconv we could convert to or any character format
@@ -876,68 +916,62 @@ bool var::osread(const var& osfilename, const var& locale)
 
 bool var::osread(const char* osfilename, const var& locale)
 {
+
 	THISIS(L"bool var::osread(const var& osfilename)")
 	THISISDEFINED()
-//	ISSTRING(osfilename)
-	//ISNUMERIC(locale);		//ALN:TODO: implement flexible mapping of string names to integers
 
+	//osread returns empty string in any case
 	var_mvstr=L"";
 	var_mvtyp=pimpl::MVTYPE_STR;
 
-	std::wifstream myfile;
-	//std::ifstream myfile;
-
 	//what is the purpose of the following?
-	//to prevent locale conversion if writing narrow string to wide stream or vice versa
+	//RAW IO to prevent locale conversion if writing narrow string to wide stream or vice versa
 	//imbue BEFORE opening or after flushing
 	//myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
 
-	//ios:ate to go to the end to find the size in the next statement with tellg
-	//myfile.open(osfilename.tostring().c_str(), std::ios::binary | std::ios::ate );
-
+	//get a file structure configured to the right locale (locale provides a CodeCvt facet)
+	std::wifstream myfile;
 	myfile.imbue( get_locale( locale));
-	myfile.open(osfilename, std::ios::binary | std::ios::ate );
+
+	//open in binary (and position "at end" to find the file size with tellg)
+	myfile.open(osfilename, std::ios::binary | std::ios::in | std::ios::ate );
 	if (!myfile)
 		return false;
 
+	//determine the file size since we are going to read it all
 	//NB tellg and seekp goes by bytes regardless of normal/wide stream
-
 	unsigned int bytesize;
     bytesize = myfile.tellg();
 
-	if (bytesize>0)
+	//if empty file then done ok
+	if (bytesize==0)
 	{
-/*		char* memblock;
-		memblock = new char [bytesize];
-*/
-//		boost::scoped_array<char> memblock( new char [bytesize]);
-		boost::scoped_array<wchar_t> memblock( new wchar_t [bytesize]);
-   		if (memblock==0)
-   		{
-   			myfile.close();
-   			return false;
-   		}
-
-    	myfile.seekg (0, std::ios::beg);
-		myfile.read (memblock.get(), (unsigned int) bytesize);
-		// NOTE: in "utf8" mode, number of read characters in memblock is less then requested.
-		//		As such, to prevent garbage in tail of returned string, do:
-		bytesize = myfile.gcount(); 
-    	myfile.close();
-
-		//for now dont accept UTF8 in order to avoid failure if non-utf characters
-		//var_mvstr=wstringfromUTF8((UTF8*) memblock, (unsigned int) bytesize);
-
-//		std::string tempstr=std::string( memblock.get(), bytesize);
-
-		//ALN:JFI: actually we could use std::string 'tempstr' in place of 'memblock' by hacking
-		//	.data member and reserve() or resize(), thus avoiding buffer-to-buffer-copying
-
-//		var_mvstr=std::wstring(tempstr.begin(),tempstr.end());
-		var_mvstr=std::wstring(memblock.get(), (unsigned int) bytesize);
-
-    	// scoped_array do it: delete[] memblock;
+		myfile.close();
+		return	true;
 	}
+
+	//get file size * wchar memory to load the file or fail
+	boost::scoped_array<wchar_t> memblock( new wchar_t [bytesize]);
+	if (memblock==0)
+	{
+		throw MVOutOfMemory(L"Could not obtain "^var(int(bytesize*sizeof(wchar_t)))^L" bytes of memory to read "^var(osfilename));
+		//myfile.close();
+		//return false;
+	}
+
+	//read the file into the reserved memory block
+	myfile.seekg (0, std::ios::beg);
+	myfile.read (memblock.get(), (unsigned int) bytesize);
+
+	// NOTE: in "utf8" mode, number of read characters in memblock is less then requested.
+	//		As such, to prevent garbage in tail of returned string, do:
+	bytesize = myfile.gcount();
+	myfile.close();
+
+	//ALN:JFI: actually we could use std::string 'tempstr' in place of 'memblock' by hacking
+	//	.data member and reserve() or resize(), thus avoiding buffer-to-buffer-copying
+	var_mvstr=std::wstring(memblock.get(), (unsigned int) bytesize);
+	
 	return true;
 }
 
@@ -946,95 +980,51 @@ bool var::oswrite(const var& osfilename, const var& locale) const
 	THISIS(L"bool var::oswrite(const var& osfilename) const")
 	THISISSTRING()
 	ISSTRING(osfilename)
-	//ISNUMERIC(locale)		//ALN:TODO: implement flexible mapping of string names to integers
-
-//	std::ofstream myfile;
-	std::wofstream myfile;
 
 	//what is the purpose of the following?
 	//to prevent locale conversion if writing narrow string to wide stream or vice versa
 	//imbue BEFORE opening or after flushing
 	//myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
 
+	//get a file structure configured to the right locale (locale provides a CodeCvt facet)
+	std::wofstream myfile;
 	myfile.imbue( get_locale( locale));
-	// Despite the stream works with wchar_t, its parameter file name is narrow char *
+
+	//although the stream works with wchar_t, its parameter file name is narrow char *
+	//delete any previous file,
 	myfile.open(osfilename.tostring().c_str(), std::ios::trunc | std::ios::out | std::ios::binary);
 	if (!myfile)
-	 return false;
+		return false;
 
+	//write out the full string or fail
 	myfile.write( var_mvstr.data(), int(var_mvstr.length()));
-//	std::string output=toUTF8(var_mvstr);
-//	myfile.write(output.data(),(unsigned int)output.length());
 	bool failed = myfile.fail();
 	myfile.close();
 	return ! failed;
 
 }
 
-#ifdef CACHED_HANDLES
-static void del_wfstream( void * handle)
+bool var::osbwrite(const var& osfilename, var & startoffset) const
 {
-	delete ( std::wfstream *) handle;
-}
+	//osfilehandle is just the filename but buffers the "file number" in the mvint too
 
-bool var::osbwrite(const var& osfilehandle, var & startoffset) const
-{
-	THISIS(L"void var::osbwrite(const var& osfilehandle, var & startoffset) const")
+	THISIS(L"bool var::osbwrite(const var& osfilename, var & startoffset) const")
 	THISISSTRING()
-	ISSTRING(osfilehandle)
+	//test the following only if necessary in osopenx
+	//ISSTRING(osfilename)
 
-	//TODO buffer the fileopen ... is ate needed here?
-	//using wfstream instead of wofstream so that we can seek to the end of the file?
-	std::wfstream * pmyfile = 0;
-	if( osfilehandle.var_mvtyp & pimpl::MVTYPE_HANDLE)
-	{
-		pmyfile = (std::wfstream *) h_cache.get_handle( (int) osfilehandle.var_mvint);
-		if( pmyfile == 0)		// nonvalid handle
-		{
-			osfilehandle.var_mvint = 0;
-			osfilehandle.var_mvtyp ^= pimpl::MVTYPE_HANDLE;	// clear bit
-		}
-	}
+	//get the buffered file handle/open on the fly
+	std::wfstream * pmyfile = osopenx(osfilename,L"");
 	if( pmyfile == 0)
-	{
-		pmyfile = new std::wfstream;
+		return false;
 
-	//what is the purpose of the following?
-	//to prevent locale conversion if writing narrow string to wide stream or vice versa
-	//imbue BEFORE opening or after flushing
-	//myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
-	//binary!
-///		pmyfile->open(osfilehandle.tostring().c_str(), std::ios::out | std::ios::in | std::ios::binary | std::ios::ate);
-///		pmyfile->open(osfilehandle.var_mvstr.c_str(), std::ios::out | std::ios::in | std::ios::binary);
-		//linux wfstream wants a narrow filename
-///		pmyfile->imbue( std::locale((std::locale::classic(), new NullCodecvt));
-
-	//ALN:TODO: if locale changed, reopen the file
-//	pmyfile->imbue( get_locale( locale));
-	pmyfile->imbue( std::locale( ""));
-
-		pmyfile->open(osfilehandle.tostring().c_str(), std::ios::out | std::ios::in | std::ios::binary);
-		if (! (*pmyfile))
-		{
-			delete pmyfile;
-			return false;
-		}
-		osfilehandle.var_mvint = h_cache.add_handle( pmyfile, del_wfstream);
-		osfilehandle.var_mvtyp = pimpl::MVTYPE_OPENED;
-	}
 	//NB seekp goes by bytes regardless of the fact that it is a wide stream
 	//myfile.seekp (startoffset*sizeof(wchar_t));
 	//startoffset should be in bytes except for fixed multibyte code pages like UTF16 and UTF32
 	pmyfile->seekp ( static_cast<long> (startoffset.var_mvint));	// avoid warning, see comments to seekg()
 
-	//NB but length goes by number of wide characters not bytes
-#ifndef __MINGW32__
+	//NB but write length goes by number of wide characters (not bytes)
 	pmyfile->write(var_mvstr.data(),int(var_mvstr.length()));
-#else
-	//TODO avoid string copy if wofstream not defined to be ofstream
-	std::string tempstr=tostring();
-	myfile.write(tempstr.data(),int(tempstr.length()));
-#endif
 
 	//on windows, wfstream will try to convert to current locale codepage so
 	//if you are trying to write an exodus string containing a GREEK CAPITAL GAMMA
@@ -1042,383 +1032,78 @@ bool var::osbwrite(const var& osfilehandle, var & startoffset) const
 	//then c++ wiofstream cannot convert \x0393 to a single byte (in CP1253)
 	if (pmyfile->fail())
 	{
-// saved in cache, do not close		myfile.close();
+		//saved in cache, DO NOT CLOSE!
+		//myfile.close();
 		return false;
 	}
+
+	//pass back the file pointer offset
 	startoffset = pmyfile->tellp();
+
+	//although slow, ensure immediate visibility of osbwrites
 	pmyfile->flush();
-// saved in cache, do not close		myfile.close();
+
+	// saved in cache, DO NOT CLOSE!
+	//myfile.close();
+
 	return true;
 }
-#else
-bool var::osbwrite(const var& osfilehandle, const int startoffset) const
+
+var& var::osbread(const var& osfilename, var & startoffset, const int bytesize)
 {
-	THISIS(L"void var::osbwrite(const var& osfilehandle, const int startoffset) const")
-	THISISSTRING()
-	ISSTRING(osfilehandle)
-
-	//TODO buffer filehandles to prevent continual reopening
-
-	//TODO buffer the fileopen ... is ate needed here?
-	//using wfstream instead of wofstream so that we can seek to the end of the file?
-	std::wofstream myfile;
-
-	//what is the purpose of the following?
-	//to prevent locale conversion if writing narrow string to wide stream or vice versa
-	//imbue BEFORE opening or after flushing
-	//myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
-
-	//binary!
-	myfile.open(osfilehandle.tostring().c_str(), std::ios::out | std::ios::in | std::ios::binary | std::ios::ate);
-	if (!myfile)
-		return false;
-
-	//NB seekp goes by bytes regardless of the fact that it is a wide stream
-	//myfile.seekp (startoffset*sizeof(wchar_t));
-	//startoffset should be in bytes except for fixed multibyte code pages like UTF16 and UTF32
-	myfile.seekp (startoffset);
-
-	//NB but length goes by number of wide characters not bytes
-#ifndef __MINGW32__
-	myfile.write(var_mvstr.data(),int(var_mvstr.length()));
-#else
-	//TODO avoid string copy if wofstream not defined to be ofstream
-	std::string tempstr=tostring();
-	myfile.write(tempstr.data(),int(tempstr.length()));
-#endif
-
-	//on windows, wfstream will try to convert to current locale codepage so
-	//if you are trying to write an exodus string containing a GREEK CAPITAL GAMMA
-	//unicode \x0393 and current codepage is *NOT* CP1253 (Greek)
-	//then c++ wiofstream cannot convert \x0393 to a single byte (in CP1253)
-	if (myfile.fail())
-	{
-		myfile.close();
-		return false;
-	}
-
-	myfile.close();
-	return true;
-
-}
-#endif
-
-#ifdef CACHED_HANDLES
-var& var::osbread(const var& osfilehandle, var & startoffset, const int size)
-{
-	THISIS(L"var& var::osbread(const var& osfilehandle, const int startoffset, const int size")
+	THISIS(L"var& var::osbread(const var& osfilename, const int startoffset, const int size")
 	THISISDEFINED()
-	ISSTRING(osfilehandle)
+	//will be done if necessary in osopenx()
+	//ISSTRING(osfilename)
 
+	//default is to return empty string in any case
 	var_mvstr=L"";
 	var_mvtyp=pimpl::MVTYPE_STR;
 
-	if (size<=0) return *this;
+	//strange case request to read 0 bytes
+	if (bytesize<=0)
+		return *this;
 
-	//avoiding wifstream due to non-availability on some platforms (mingw for starters)
-	//and to allow full control over narrow/wide character conversion
-	//std::wifstream myfile;
-	std::wfstream * pmyfile = 0;
-	if( osfilehandle.var_mvtyp & pimpl::MVTYPE_HANDLE)
-	{
-		pmyfile = (std::wfstream *) h_cache.get_handle( (int) osfilehandle.var_mvint);
-		if( pmyfile == 0)		// nonvalid handle
-		{
-			osfilehandle.var_mvint = 0;
-			osfilehandle.var_mvtyp ^= pimpl::MVTYPE_HANDLE;	// clear bit
-		}
-	}
-	// Open file, checking for file handle in cache table
-	if( pmyfile == 0)		// nonvalid handle
-	{
-		pmyfile = new std::wfstream;
-	//what is the purpose of the following?
-	//to prevent locale conversion if writing narrow string to wide stream or vice versa
-	//imbue BEFORE opening
-	//myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
+	//get the buffered file handle/open on the fly
+	std::wfstream * pmyfile = osopenx(osfilename,L"");
+	if( pmyfile == 0)
+		return *this;
 
-	//ALN:TODO: if locale changed, reopen the file
-//	pmyfile->imbue( get_locale( locale));
-	pmyfile->imbue( std::locale( ""));
-
-	//binary!
-	//use ::ate to position at end so tellg below can determine file size
-///		pmyfile->open(osfilehandle.tostring().c_str(), std::ios::binary | std::ios::ate);
-///		pmyfile->open(osfilehandle.var_mvstr.c_str(), std::ios::binary | std::ios::in | std::ios::out);
-		//linux wfstream wants a narrow filename
-		pmyfile->open(osfilehandle.tostring().c_str(), std::ios::binary | std::ios::in | std::ios::out);
-		if( ! (*pmyfile))
-		{
-			delete pmyfile;
-			return * this;
-		}
-		osfilehandle.var_mvint = h_cache.add_handle( pmyfile, del_wfstream);
-		osfilehandle.var_mvtyp = pimpl::MVTYPE_OPENED;
-	}
-
-//NB all file sizes are in bytes NOT characters despite this being a wide character fstream
+	//NB all file sizes are in bytes NOT characters despite this being a wide character fstream
 	// Position get pointer at the end of file, as expected it to be if we open file anew
 	pmyfile->seekg( 0, std::ios::end);
 	unsigned int maxsize = pmyfile->tellg();
+
+	//return "" if start reading past end of file
 	if ((unsigned long)( int)startoffset>=maxsize)	// past EOF
-	{
 		return *this;
-	}
 
-	//allow negative offset to read from the back of the file
-	//!cannot be unsigned and allow negative
-	//unsigned int readfrom=startoffset;
-	int readfrom=startoffset;
-	if (readfrom<0) {
-		readfrom+=maxsize;
-		//but not so negative that it reads from before the beginning of the file
-		if (readfrom<0)
-			readfrom=0;
-	}
-
-	//limit reading up to end of file although probably happens automatically
-	unsigned int readsize=size;
-	if (readfrom+readsize>maxsize)
-		readsize=maxsize-readfrom;
-
-	//nothing to read
-	if (readsize<=0)
-	{
-		return *this;
-	}
-
-	//new
-	//wchar_t* memblock;
-	//memblock = new wchar_t [readsize/sizeof(wchar_t)];
-/*
-	char* memblock;
-	memblock = new char [readsize];
-*/
-///	boost::scoped_array<char> memblock( new char [readsize]);
-	boost::scoped_array<wchar_t> memblock( new wchar_t [readsize]);
-	if (memblock==0)
-	{//TODO NEED TO THROW HERE
-		return *this;
-	}
+	//seek to the startoffset
 	pmyfile->seekg ( static_cast<long> (startoffset.var_mvint), std::ios::beg);	// 'std::streampos' usually 'long'
-//	pmyfile->seekg ( static_cast<std::streampos> (startoffset.var_mvint), std::ios::beg);	// naughty warning
-	pmyfile->read (memblock.get(), readsize);
-//	pmyfile->close();
-	readsize = pmyfile->gcount();
-	if( readsize > 0)
-	{
-		startoffset = pmyfile->tellg();
-	}
-//	var_mvstr=wstringfromchars(memblock.get(), readsize);
-	var_mvstr.assign( memblock.get(), readsize);
-	return *this;
-}
-#ifdef NOUTF8
-var& var::osbread(const var& osfilehandle, const int startoffset, const int size)
-{
-	THISIS(L"var& var::osbread(const var& osfilehandle, const int startoffset, const int size)")
-	THISISDEFINED()
-	ISSTRING(osfilehandle)
 
-	var_mvstr=L"";
-	var_mvtyp=pimpl::MVTYPE_STR;
-
-	if (size<=0) return *this;
-
-	//avoiding wifstream due to non-availability on some platforms (mingw for starters)
-	//and to allow full control over narrow/wide character conversion
-	//std::wifstream myfile;
-	std::wfstream * pmyfile = 0;
-	if( osfilehandle.var_mvtyp & pimpl::MVTYPE_HANDLE)
-	{
-		pmyfile = (std::wfstream *) h_cache.get_handle( (int) osfilehandle.var_mvint);
-		if( pmyfile == 0)		// nonvalid handle
-		{
-			osfilehandle.var_mvint = 0;
-			osfilehandle.var_mvtyp ^= pimpl::MVTYPE_HANDLE;	// clear bit
-		}
-	}
-	// Open file, checking for file handle in cache table
-	if( pmyfile == 0)		// nonvalid handle
-	{
-		pmyfile = new std::wfstream;
-	//what is the purpose of the following?
-	//to prevent locale conversion if writing narrow string to wide stream or vice versa
-	//imbue BEFORE opening or after flushing
-	//myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
-
-	//binary!
-	//use ::ate to position at end so tellg below can determine file size
-///		pmyfile->open(osfilehandle.tostring().c_str(), std::ios::binary | std::ios::ate);
-///		pmyfile->open(osfilehandle.var_mvstr.c_str(), std::ios::binary | std::ios::in | std::ios::out);
-		//linux wfstream wants a narrow filename
-		pmyfile->open(osfilehandle.tostring().c_str(), std::ios::binary | std::ios::in | std::ios::out);
-		if( ! (*pmyfile))
-		{
-			delete pmyfile;
-			return * this;
-		}
-		osfilehandle.var_mvint = h_cache.add_handle( pmyfile, del_wfstream);
-		osfilehandle.var_mvtyp = pimpl::MVTYPE_OPENED;
-	}
-
-//NB all file sizes are in bytes NOT characters despite this being a wide character fstream
-	// Position get pointer at the end of file, as expected it to be if we open file anew
-	pmyfile->seekg( 0, std::ios::end);
-	unsigned int maxsize = pmyfile->tellg();
-	if ((unsigned long)startoffset>=maxsize)	// past EOF
-	{
-		return *this;
-	}
-
-	//allow negative offset to read from the back of the file
-	//!cannot be unsigned and allow negative
-	//unsigned int readfrom=startoffset;
-	int readfrom=startoffset;
-	if (readfrom<0) {
-		readfrom+=maxsize;
-		//but not so negative that it reads from before the beginning of the file
-		if (readfrom<0)
-			readfrom=0;
-	}
-
-	//limit reading up to end of file although probably happens automatically
-	unsigned int readsize=size;
-	if (readfrom+readsize>maxsize)
-		readsize=maxsize-readfrom;
-
-	//nothing to read
-	if (readsize<=0)
-	{
-		return *this;
-	}
-
-	//new
-	//wchar_t* memblock;
-	//memblock = new wchar_t [readsize/sizeof(wchar_t)];
-/*
-	char* memblock;
-	memblock = new char [readsize];
-*/
-///	boost::scoped_array<char> memblock( new char [readsize]);
-	boost::scoped_array<wchar_t> memblock( new wchar_t [readsize]);
+	//get a memory block to read into
+	boost::scoped_array<wchar_t> memblock( new wchar_t [bytesize]);
 	if (memblock==0)
-	{//TODO NEED TO THROW HERE
-		return *this;
-	}
-	pmyfile->seekg (startoffset, std::ios::beg);
-	pmyfile->read (memblock.get(), readsize);
-//	pmyfile->close();
+		throw MVOutOfMemory(L"Could not obtain "^var(int(bytesize*sizeof(wchar_t)))^L" bytes of memory to read "^osfilename);
+		//return *this;
 
-//	var_mvstr=wstringfromchars(memblock.get(), readsize);
-	var_mvstr.assign( memblock.get(), readsize);
+	//read the data (converting characters on the fly)
+	pmyfile->read (memblock.get(), bytesize);
+
+	//update the startoffset function argument
+	//if( readsize > 0)
+	startoffset = pmyfile->tellg();
+
+	//transfer the memory block to this variable's string
+	//(is is possible to read directly into string data() avoiding a memory copy?
+	//get the number of CHARACTERS read - utf8 bytes (except ASCII) convert to fewer wchar characters.
+	//int readsize = pmyfile->gcount();
+	var_mvstr.assign( memblock.get(), pmyfile->gcount());
+
 	return *this;
+
 }
-#endif // NOUTF8
-#else
-var& var::osbread(const var& osfilehandle, const int startoffset, const int size)
-{
-	THISIS(L"var& var::osbread(const var& osfilehandle, const int startoffset, const int size)")
-	THISISDEFINED()
-	ISSTRING(osfilehandle)
 
-	//TODO buffer filehandles to prevent continual reopening
-
-	var_mvstr=L"";
-	var_mvtyp=pimpl::MVTYPE_STR;
-
-	if (size<=0) return *this;
-
-	//avoiding wifstream due to non-availability on some platforms (mingw for starters)
-	//and to allow full control over narrow/wide character conversion
-	//std::wifstream myfile;
-	std::ifstream myfile;
-
-	//what is the purpose of the following?
-	//to prevent locale conversion if writing narrow string to wide stream or vice versa
-	//imbue BEFORE opening or after flushing
-	//myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
-
-	//binary!
-	//use ::ate to position at end so tellg below can determine file size
-	myfile.open(osfilehandle.tostring().c_str(), std::ios::binary | std::ios::ate);
-	if (!myfile)
-		return *this;
-//NB all file sizes are in bytes NOT characters despite this being a wide character fstream
-	unsigned int maxsize = myfile.tellg();
-	//int readsize=maxsize-startoffset*sizeof(wchar_t);
-	//if (readsize>size*2) readsize=size*sizeof(wchar_t);
-	//unsigned int readsize=maxsize-startoffset;
-	//unsigned int readsize=maxsize-startoffset;
-
-	//reading beyond end of file
-	if (startoffset>=0 && (unsigned int)startoffset>=maxsize)
-	{
-		myfile.close();
-		return *this;
-	}
-
-	//allow negative offset to read from the back of the file
-	//!cannot be unsigned and allow negative
-	//unsigned int readfrom=startoffset;
-	int readfrom=startoffset;
-	if (readfrom<0) {
-		readfrom+=maxsize;
-		//but not so negative that it reads from before the beginning of the file
-		if (readfrom<0)
-			readfrom=0;
-	}
-
-	//limit reading up to end of file although probably happens automatically
-	unsigned int readsize=size;
-	if (readfrom+readsize>maxsize)
-		readsize=maxsize-readfrom;
-
-	//nothing to read
-	if (readsize<=0)
-	{
-		myfile.close();
-		return *this;
-	}
-
-	//new
-	//wchar_t* memblock;
-	//memblock = new wchar_t [readsize/sizeof(wchar_t)];
-/*
-	char* memblock;
-	memblock = new char [readsize];
-*/
-	boost::scoped_array<char> memblock( new char [readsize]);
-	if (memblock==0)
-	{//TODO NEED TO THROW HERE
-		myfile.close();
-		return *this;
-	}
-
-	//myfile.seekg (startoffset/sizeof(wchar_t), std::ios::beg);
-	myfile.seekg (startoffset, std::ios::beg);
-	myfile.read (memblock.get(), readsize);
-	myfile.close();
-
-	//var_mvstr=std::wstring(memblock,readsize/sizeof(wchar_t));
-
-	//for now dont accept UTF8 in order to avoid failure if non-utf characters
-	//var_mvstr=wstringfromUTF8((UTF8*) memblock, (unsigned int) bytesize);
-	//
-	//following doesnt work in binary if locale ends in utf8 etc.
-	//but we need a locale for string collation on linux and there isnt a common non-utf8 one
-	//std::string tempstr=std::string(memblock, readsize);
-	//following does a conversion depending on the locale
-	//var_mvstr=std::wstring(tempstr.begin(),tempstr.end());
-	var_mvstr=wstringfromchars(memblock.get(), readsize);
-
-	//delete[] memblock;
-//	var_mvtyp=pimpl::MVTYPE_STR;
-	return *this;
-}
-#endif
-
-#ifdef CACHED_HANDLES
 void var::osclose() const
 {
 	THISIS(L"void var::osclose() const")
@@ -1434,17 +1119,7 @@ void var::osclose() const
 	}
 	// in all other cases, the files should be closed.
 }
-#else
-void var::osclose() const
-{
-	THISIS(L"void var::osclose() const")
-	THISISSTRING()
 
-	//TODO buffer filehandles to prevent continual reopening
-
-	return;
-}
-#endif
 bool var::osrename(const var& newosdir_or_filename) const
 {
 	THISIS(L"bool var::osrename(const var& newosdir_or_filename) const")

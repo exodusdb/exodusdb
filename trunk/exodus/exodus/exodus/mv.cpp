@@ -1464,16 +1464,16 @@ std::wstring intToString(int int1)
 //see 1997 http://www.cantrip.org/locale.html
 std::wstring dblToString(double double1)
 {
-    //see intToString for choice of ostringstream for implementation
-    //NB plain stringstream causes a memory leak in msvc8 before sp1
+	//see intToString for choice of ostringstream for implementation
+	//NB plain stringstream causes a memory leak in msvc8 before sp1
 	std::wostringstream ss;
-    ss.precision(10);
+	ss.precision(10);
 	ss << double1;
 	//debuggFUNCTION&& wcout<<L"dblToString(int "<<double1<<L") returns '"<<s<<L"'\n";
 #ifdef NARROW_IO
 	return std::wstring(ss.str().begin(),ss.str().end());
 #else
-    return ss.str();
+	return ss.str();
 #endif
 
 }
@@ -1488,6 +1488,7 @@ MVUnassigned		::MVUnassigned		(const var& var1)	: MVException(L"MVUnassigned:"		
 MVDivideByZero		::MVDivideByZero	(const var& var1)	: MVException(L"MVDivideByZero:"			^ var1	){}
 MVNonNumeric		::MVNonNumeric		(const var& var1)	: MVException(L"MVNonNumeric:"				^ var1	){}
 MVUndefined			::MVUndefined		(const var& var1)	: MVException(L"MVUndefined:"				^ var1	){}
+MVOutOfMemory		::MVOutOfMemory		(const var& var1)	: MVException(L"MVOutOfMemory:"				^ var1	){}
 MVInvalidPointer	::MVInvalidPointer	(const var& var1)	: MVException(L"MVInvalidPointer:"			^ var1	){}
 MVDBException		::MVDBException		(const var& var1)	: MVException(L"MVDBException:"				^ var1	){}
 MVNotImplemented	::MVNotImplemented	(const var& var1)	: MVException(L"MVNotImplemented:"			^ var1	){}

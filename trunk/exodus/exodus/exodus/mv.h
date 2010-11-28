@@ -215,6 +215,7 @@ std::wstring intToString(int int1);
 
 class dim;
 class var__extractreplace;
+class PFstream;
 
 //TODO ensure locale doesnt produce like 123.456,78
 std::wstring dblToString(double double1);
@@ -683,9 +684,9 @@ public:
 
 	//SYSTEM FILE/DIRECTORY OPERATIONS
 	//TODO cache osfilehandles somehow (use var_mvint?)
-	bool osopen(const var& osfilename);
-	var& osbread(const var& osfilehandle, var & startoffset, const int length);
-	bool osbwrite(const var& osfilehandle, var & startoffset) const;
+	bool osopen(const var& locale=L"") const;
+	var& osbread(const var& osfilename, var & startoffset, const int length);
+	bool osbwrite(const var& osfilename, var & startoffset) const;
 	void osclose() const;
 	bool osread(const var& osfilename, const var& locale=L"");
 	bool oswrite(const var& osfilename, const var& locale=L"") const;
@@ -1055,6 +1056,8 @@ private:
 
 	int localeAwareCompare(const std::wstring& str1, const std::wstring& str2) const;
 	var& localeAwareChangeCase(const int lowerupper);
+
+	std::wfstream* var::osopenx(const var& osfilename, const var& locale) const;
 
 	friend class dim;
 
@@ -1468,6 +1471,7 @@ public: MVException(const var& description);
 //individual exceptions are made public so exodus programmers can catch specific errors or even stop/abort/debug if they want
 class DLL_PUBLIC MVDivideByZero         : public MVException {public: MVDivideByZero         (const var& var1    );};
 class DLL_PUBLIC MVNonNumeric           : public MVException {public: MVNonNumeric           (const var& var1    );};
+class DLL_PUBLIC MVOutOfMemory          : public MVException {public: MVOutOfMemory          (const var& var1    );};
 class DLL_PUBLIC MVUnassigned           : public MVException {public: MVUnassigned           (const var& var1    );};
 class DLL_PUBLIC MVUndefined            : public MVException {public: MVUndefined            (const var& var1    );};
 class DLL_PUBLIC MVInvalidPointer       : public MVException {public: MVInvalidPointer       (const var& var1    );};

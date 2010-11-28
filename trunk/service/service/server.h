@@ -112,7 +112,7 @@ private:
 	var bakdisk;
 	var requeststarttime;//num
 	var linkfile1;
-	var linkfile2;
+	var linkfilename2;
 	var invaliduser;
 	var nostack;
 	var newfilename;
@@ -134,7 +134,6 @@ private:
 	var response;
 	var responsefilename;
 	var linkfilename1;
-	var linkfilename2;
 	var linkfilename3;
 	var replyfilename;
 	var filename;
