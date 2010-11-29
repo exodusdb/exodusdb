@@ -32,6 +32,27 @@ programinit()
 
 function main()
 {
+	{	// test to reproduce cached_handles error
+		var file1( "FILE1.txt");
+		oswrite( L"", file1);
+		var off1 = 0;
+		osbwrite( L"This text is written to the file 'FILE1.txt'", file1, off1);
+
+		var file2( "FILE2.txt");
+		oswrite( L"", file2);
+		var off2 = 0;
+		osbwrite( L"This text is written to the file 'FILE2.txt'", file2, off2);
+
+		var file1x = file1;		// wicked copy of file handle
+		file1x.osclose();		// we could even do: var( file1).osclose();
+
+		var file3( "FILE3.txt");
+		oswrite( L"", file3);
+		var off3 = 0;
+		osbwrite( L"This text is written to the file 'FILE3.txt'", file3, off3);
+				
+		osbwrite( L"THIS TEXT INTENDED FOR FILE 'FILE1.txt' BUT IT GOES TO 'FILE3.txt'", file1, off1);
+	}
 
 	printl("testfr says 'Hello World!'");
 	//assert(setxlocale("fr_FR.utf8"));
@@ -140,9 +161,12 @@ function main()
 	oswrite("",tempfilename5);//
 	offset=2;
 	assert(osbwrite("78",tempfilename5,offset));
-	assert(osbwrite("78",tempfilename5,offset));
+//	assert(osbwrite("78",tempfilename5,offset));
+
+	var b78 = osbread( tempfilename5, var(1), 2);
+
 	assert(osread(record5,tempfilename5));
-//	assert(record5.oconv("HEX2") eq "000000003738");
+	assert(record5.oconv("HEX2") eq "000000003738");
 	osdelete(tempfilename5);
 
 	//check cannot write non-codepage characters
@@ -178,6 +202,10 @@ function main()
 	unicode^=GreekCapitalGamma;
 	unicode^=GreekSmallGamma;
 	unicode^=L"ABc-123.456";//some LATIN characters and punctuation
+
+	var status1 = oswrite( unicode, "GreekLocalFile.txt", "Greek");
+	var status2 = oswrite( unicode, "GreekUTF-8File.txt", "utf8");
+	var status3 = oswrite( unicode, "GreekEnglFile.txt", "English");
 
 	//test swapping "letters" (i.e. alphabet) with "?"
 	//We expect the question mark to remain as it is,

@@ -3,6 +3,7 @@
 //
 #include <algorithm>
 #include <cassert>
+#define INSIDE_MVHANDLES_CPP	// global obj in "mvhandles.h"
 #include "mvhandles.h"
 
 #include <boost/thread/mutex.hpp>
@@ -16,7 +17,7 @@ MvHandlesCache::MvHandlesCache()
 	: tbl( HANDLES_CACHE_SIZE)
 {}
 
-int MvHandlesCache::add_handle( CACHED_HANDLE handle_to_cache, DELETER_AND_DESTROYER del)
+int MvHandlesCache::add_handle( CACHED_HANDLE handle_to_cache, DELETER_AND_DESTROYER del, std::wstring name)
 {
 	assert( del);
 	boost::mutex::scoped_lock lock(mvhandles_mutex);
@@ -31,14 +32,15 @@ int MvHandlesCache::add_handle( CACHED_HANDLE handle_to_cache, DELETER_AND_DESTR
 
 	tbl[ix].deleter  = del;
 	tbl[ix].handle = handle_to_cache;
-	tbl[ix].extra  = 0;
+	tbl[ix].extra  = name;
 	return ix;
 }
 
-CACHED_HANDLE MvHandlesCache::get_handle( int index)
+CACHED_HANDLE MvHandlesCache::get_handle( int index, std::wstring name)
 {
 	boost::mutex::scoped_lock lock(mvhandles_mutex);
-	return tbl[index].deleter == HANDLE_ENTRY_FREE ? BAD_CACHED_HANDLE : tbl[index].handle;
+	return ( tbl[index].deleter == HANDLE_ENTRY_FREE) || ( tbl[index].extra != name)
+			? BAD_CACHED_HANDLE : tbl[index].handle;
 }
 
 void MvHandlesCache::del_handle( int index)
