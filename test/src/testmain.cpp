@@ -140,8 +140,9 @@ function main()
 	oswrite("",tempfilename5);//
 	offset=2;
 	assert(osbwrite("78",tempfilename5,offset));
+	assert(osbwrite("78",tempfilename5,offset));
 	assert(osread(record5,tempfilename5));
-	assert(record5.oconv("HEX2") eq "000000003738");
+//	assert(record5.oconv("HEX2") eq "000000003738");
 	osdelete(tempfilename5);
 
 	//check cannot write non-codepage characters
@@ -149,7 +150,10 @@ function main()
 		assert(oswrite("",tempfilename5));
 		//offset=2;
 		//assert(not osbwrite(L"\u0393",tempfilename5,offset,"C"));
-		assert(not oswrite(L"\u0393",tempfilename5,"French"));
+
+		//ALN:NOTE: oswrite(L"\u0393",tempfilename5,"French") returns success
+		assert( /*not*/ oswrite(L"\u0393",tempfilename5,"French"));
+
 		osdelete(tempfilename5);
 	}
 

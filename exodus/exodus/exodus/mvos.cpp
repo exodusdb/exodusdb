@@ -825,7 +825,7 @@ bool var::osopen(const var& locale) const
 	THISISSTRING()
 
 	//if reopening an osfile that is already opened then close and reopen
-	if (var_mvtyp & pimpl::MVTYPE_HANDLE)
+	//	if (var_mvtyp & pimpl::MVTYPE_HANDLE)		-- this check is done in osclose
 		osclose();
 
 	return osopenx(*this, locale)!=0;
@@ -1183,7 +1183,7 @@ bool var::osdelete(const var& osfilename) const
 	THISIS(L"bool var::osdelete(const var& osfilename) const")
 	THISISDEFINED()
 	ISSTRING(osfilename)
-	
+	osfilename.osclose();		// in case this is cached opened file handle
 	return !std::remove(osfilename.tostring().c_str());
 }
 
