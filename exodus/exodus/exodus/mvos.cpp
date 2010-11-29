@@ -239,14 +239,15 @@ static ExodusOnce exodus_once_static;
 
 namespace exodus{
 
-	// this object caches wfstream * pointers, to avoid multiple reopening files
-	static MvHandlesCache h_cache;
-	// Lifecircle of wfstream object:
-	//	- created (by new) and opened in osbread()/osbwrite();
-	//	- pointer to created object stored in h_cache;
-	//  - when user calls osclose(), the stream is closed and the object is deleted, and removed from h_cache;
-	//	- if user forgets to call osclose(), the stream remains opened (alive) until
-	//		~MvHandlesCache for h_cache closes/deletes all registered objects.
+// this object caches wfstream * pointers, to avoid multiple reopening files
+//extern MvHandlesCache mv_handles_cache;
+// Lifecircle of wfstream object:
+//	- created (by new) and opened in osbread()/osbwrite();
+//	- pointer to created object stored in h_cache;
+//  - when user calls osclose(), the stream is closed and the object is deleted, and removed from h_cache;
+//	- if user forgets to call osclose(), the stream remains opened (alive) until
+//		~MvHandlesCache for h_cache closes/deletes all registered objects.
+
 
 /*ALN:TEST: following class is to investigate its destruction, tests show, that
 	destructor is called on pointer, passed as 2nd parameter to utf8_locale(),
@@ -846,7 +847,7 @@ std::wfstream* var::osopenx(const var& osfilename, const var& locale) const
 	std::wfstream * pmyfile = 0;
 	if( osfilename.var_mvtyp & pimpl::MVTYPE_HANDLE)
 	{
-		pmyfile = (std::wfstream *) h_cache.get_handle( (int) osfilename.var_mvint);
+		pmyfile = (std::wfstream *) mv_handles_cache.get_handle( (int) osfilename.var_mvint, osfilename.var_mvstr);
 		if( pmyfile == 0)		// nonvalid handle
 		{
 			osfilename.var_mvint = 0;
@@ -892,7 +893,7 @@ std::wfstream* var::osopenx(const var& osfilename, const var& locale) const
 		//cache the file handle (we use the int to store the "file number"
 		//and NAN to prevent isnum trashing mvint in the possible case that the osfilename is an integer
 		//can addhandle fail?
-		osfilename.var_mvint = h_cache.add_handle( pmyfile, del_wfstream);
+		osfilename.var_mvint = mv_handles_cache.add_handle( pmyfile, del_wfstream, osfilename.var_mvstr);
 		osfilename.var_mvtyp = pimpl::MVTYPE_OPENED;
 	}
 
@@ -1113,7 +1114,7 @@ void var::osclose() const
 //		std::wfstream * h = (std::wfstream *) h_cache.get_handle(( int) var_mvint);
 //		if( h)
 //			delete h;
-		h_cache.del_handle(( int) var_mvint);
+		mv_handles_cache.del_handle(( int) var_mvint);
 		var_mvint = 0L;
 		var_mvtyp ^= pimpl::MVTYPE_HANDLE | pimpl::MVTYPE_INT;	//only STR bit should remains
 	}

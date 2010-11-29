@@ -14,6 +14,7 @@
 #  define MVHANDLES_H
 
 #include <vector>
+#include <string>
 
 namespace exodus {
 
@@ -28,24 +29,30 @@ class MvHandleEntry
   public:
 	DELETER_AND_DESTROYER deleter;	// =0 means that slot is empty
 	CACHED_HANDLE handle;
-	int extra;
+	std::wstring extra;
 };
 
 class MvHandlesCache
 {
   public:
 	MvHandlesCache();
-	int add_handle( CACHED_HANDLE handle_to_opened_file, DELETER_AND_DESTROYER del);
-	MvHandleEntry & operator [] ( int idx)
-	{ 
-		return tbl[ idx];
-	}
-	CACHED_HANDLE get_handle( int index);
+	int add_handle( CACHED_HANDLE handle_to_opened_file, DELETER_AND_DESTROYER del, std::wstring name);
+	//MvHandleEntry & operator [] ( int idx)
+	//{ 
+	//	return tbl[ idx];
+	//}
+	CACHED_HANDLE get_handle( int index, std::wstring name);
 	void del_handle( int index);
    virtual ~MvHandlesCache();
 
   private:
 	std::vector<MvHandleEntry> tbl;
 };
+
+#ifndef INSIDE_MVHANDLES_CPP
+extern
+#endif	// INSIDE_MVHANDLES_CPP
+MvHandlesCache mv_handles_cache;	// global table (intended usage: mvos.cpp and mvdbpostgres.cpp)
+
 }	// namespace
 #endif // MVHANDLES_H
