@@ -44,7 +44,7 @@ var var::iconv(const var& convstr) const
 	THISIS(L"var var::iconv(const var& convstr) const")
 	ISSTRING(convstr)
 
-	return iconv(convstr.towstring().c_str());
+	return iconv(convstr.var_mvstr.c_str());
 }
 
 /**
@@ -414,7 +414,8 @@ var var::oconv_MD(const wchar_t* conversion) const
 		movedecs=ndecimals;
 
 		//are we done
-		if (charn>=convlen) goto convert;
+		if (charn>=convlen)
+			goto convert;
 
 		//look for a second digit
 		charn++;
@@ -425,7 +426,8 @@ var var::oconv_MD(const wchar_t* conversion) const
 			movedecs=nextchar-'0';
 
 			//are we done
-			if (charn>=convlen) goto convert;
+			if (charn>=convlen)
+				goto convert;
 
 			//move to the next character
 			charn++;
@@ -620,7 +622,7 @@ var var::oconv(const var& conversion) const
 	THISISDEFINED()
 	ISSTRING(conversion)
 
-	return oconv(conversion.towstring().c_str());
+	return oconv(conversion.var_mvstr.c_str());
 
 }
 

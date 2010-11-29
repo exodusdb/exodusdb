@@ -64,11 +64,11 @@ std::string var::tostring() const
 	//allow for max 4 bytes per single utf8 byte (utf16 max bytes is four)
 	if (sizeof(wchar_t)==4)
 	{
-		return stringfromUTF32((UTF32*)((*this).towstring().data()), length);	//ALN:TODO: try to move it into
+		return stringfromUTF32((UTF32*)((*this).var_mvstr.data()), length);	//ALN:TODO: try to move it into
 	}																			// var::toUTF8
 	else if (sizeof(wchar_t)==2)
 	{
-		return stringfromUTF16((UTF16*)( (*this).towstring().data() ), length);
+		return stringfromUTF16((UTF16*)( (*this).var_mvstr.data() ), length);
 	}
 	else if (sizeof(wchar_t)==1)
 	{

@@ -521,8 +521,8 @@ bool var::open(const var& filename)
 	//save the filename
 	var_mvstr=L"";
 	//var_mvstr+=filename.var_mvstr;
-	//var_mvstr+=filename.convert(L". ",L"__").towstring();
-	var_mvstr=filename.towstring();
+	//var_mvstr+=filename.convert(L". ",L"__").var_mvstr;
+	var_mvstr=filename.var_mvstr;
 	var_mvtyp=pimpl::MVTYPE_STR;
 
 	return true;

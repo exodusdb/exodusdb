@@ -514,6 +514,8 @@ bool var::locateat(const std::wstring& target,size_t start_pos,size_t end_pos,co
 	//this will probably be switched off as unnecessary and slow behaviour for neosys applications
 	if (order)
 	{
+		//THISIS(...)
+		//ISSTRING(usingchar)
 		bool result=locateat(target,start_pos,end_pos,0,usingchar,setting);
 		if (result) return result;
 	}
@@ -534,7 +536,7 @@ bool var::locateat(const std::wstring& target,size_t start_pos,size_t end_pos,co
 	//using start_pos and end_pos of
 	int targetlen=(int)target.length();
 	int valuen2=1;
-	std::wstring usingstring=usingchar.towstring();
+	std::wstring usingstring=usingchar.var_mvstr;
 	do
 	{
 		size_t nextstart_pos=var_mvstr.find(usingstring,start_pos);

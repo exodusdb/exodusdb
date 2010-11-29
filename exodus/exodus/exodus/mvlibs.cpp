@@ -71,7 +71,7 @@ void MvLibs::set(const var& libraryname, MvLib* mvlib)
 	int ii=0;
 	ii=getenvironmentn();
 	if (mvlibs_==NULL) reset();
-	(*mvlibs_)[libraryname.towstring()]=mvlib;
+	(*mvlibs_)[libraryname.var_mvstr]=mvlib;
 }
 
 MvLib* MvLibs::get(const var& libraryname)
@@ -79,7 +79,7 @@ MvLib* MvLibs::get(const var& libraryname)
 	int ii=0;
 	ii=getenvironmentn();
 	if (mvlibs_==NULL) reset();
-	return (*mvlibs_)[libraryname.towstring()];
+	return (*mvlibs_)[libraryname.var_mvstr];
 }
 
 //portable shared/dynamic library macros makes linux dlopen, dlsym, dlclose syntax ok for windows
@@ -139,14 +139,14 @@ bool var::load(const var& libraryname) const
 
 var var::call(const var& libraryname, const var& functionname) const
 {
-	return call(libraryname.towstring().c_str(),functionname.tostring().c_str());
+	return call(libraryname.var_mvstr.c_str(),functionname.tostring().c_str());
 }
 
 var var::call(const var& functionname) const
 {
 	createString();
 	var libraryname=field(L"*",1);
-	return call(libraryname.towstring().c_str(),functionname.tostring().c_str());
+	return call(libraryname.var_mvstr.c_str(),functionname.tostring().c_str());
 }
 
 var var::call() const
@@ -154,7 +154,7 @@ var var::call() const
 	createString();
 	var libraryname=field(L"*",1);
 	var functionname=field(L"*",2);
-	return call(libraryname.towstring().c_str(),functionname.tostring().c_str());
+	return call(libraryname.var_mvstr.c_str(),functionname.tostring().c_str());
 }
 
 inline MvEnvironment& getmvenvironment()

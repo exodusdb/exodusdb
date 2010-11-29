@@ -440,7 +440,7 @@ var& var::operator ^=(const var& rhs)
 	ISSTRING(rhs)
 
 	//tack it onto our string
-	var_mvstr+=rhs.towstring();
+	var_mvstr+=rhs.var_mvstr;
 
 	//reset to unknown string (clear int/dbl/nan flags)
 	var_mvtyp=pimpl::MVTYPE_STR;
@@ -1406,7 +1406,7 @@ DLL_PUBLIC
 
 	//use towstring() to avoid creating a ctor which logs here recursively
 	//should this use a ut16/32 -> UTF8 code facet? or convert to UTF8 and output to ostream?
-	wostream1 << var1.towstring();
+	wostream1 << var1.var_mvstr;
 	return wostream1;
 }
 

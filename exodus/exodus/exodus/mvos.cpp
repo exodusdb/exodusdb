@@ -122,7 +122,8 @@ void exodus_once_func()
 	//.utf8 causes a utf-8 to wchar conversion when converting string to wstring by iterators .begin() .end()
 	//and we want to be able to control conversion more accurately than an automatic conversion
 	//en_US is missing from Ubuntu. en_IN is available on Ubuntu and Centos but not MacOSX
-	setlocale (LC_COLLATE, "en_US.utf8");
+	if (!setlocale (LC_COLLATE, "en_US.utf8"))
+		{};
 }
 
 /* Ubuntu 8.04 locale -a
@@ -569,7 +570,7 @@ bool var::match(const var& matchstr, const var& options) const
                         regex.assign(toTstring(matchstr), boost::regex::extended|boost::regex_constants::icase);
 		else
                         regex.assign(toTstring(matchstr), boost::regex::extended|boost::regex_constants::icase);
-	//boost::wregex toregex_regex(with.towstring(), boost::regex::extended);
+	//boost::wregex toregex_regex(with.var_mvstr, boost::regex::extended);
 	}
 	catch (boost::regex_error& e)
     {
@@ -610,7 +611,7 @@ var& var::swapper(const var& what, const var& with, const var& options)
                                 regex.assign(toTstring(what), boost::regex::extended|boost::regex_constants::icase);
 			else
                                 regex.assign(toTstring(what), boost::regex::extended);
-		//boost::wregex toregex_regex(with.towstring(), boost::regex::extended);
+		//boost::wregex toregex_regex(with.var_mvstr, boost::regex::extended);
 		}
 		catch (boost::regex_error& e)
 		{
@@ -635,7 +636,7 @@ var& var::swapper(const var& what, const var& with, const var& options)
                                 regex=boost::make_u32regex(what.var_mvstr, boost::regex::extended|boost::regex_constants::icase);
 			else
                                 regex=boost::make_u32regex(what.var_mvstr, boost::regex::extended);
-		//boost::wregex toregex_regex(with.towstring(), boost::regex::extended);
+		//boost::wregex toregex_regex(with.var_mvstr, boost::regex::extended);
 		}
 		catch (boost::regex_error& e)
 		{
@@ -1348,7 +1349,7 @@ var var::oslist(const var& path, const var& spec, const int mode) const
 		}
 		catch (boost::regex_error& e)
 		{
-			std::wcout << spec.towstring() << L" is not a valid regular expression: \""
+			std::wcout << spec.var_mvstr << L" is not a valid regular expression: \""
 			<< e.what() << L"\"" << std::endl;
 			return L"";
 		}

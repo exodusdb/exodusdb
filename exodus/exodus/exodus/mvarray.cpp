@@ -53,14 +53,37 @@ dim::~dim()
 }
 
 dim::dim(int rows, int cols)
-   : nrows_ (rows)
-   , ncols_ (cols)
-   , initialised_(true)
-   //data_ <--initialized below (after the 'if/throw' statement)
+	: nrows_ (rows)
+	, ncols_ (cols)
+	, initialised_(true)
+	//data_ <--initialized below (after the 'if/throw' statement)
 {
-  if (rows == 0 || cols == 0)
-    throw MVArrayDimensionedZero();
-  data_ = new var[rows * cols + 1];
+	if (rows == 0 || cols == 0)
+		throw MVArrayDimensionedZero();
+	data_ = new var[rows * cols + 1];
+}
+
+bool dim::read(const var& filehandle, const var& key)
+{
+	THISIS(L"bool dim::matread(const var& filehandle, const var& key)")
+	ISSTRING(filehandle)
+	ISSTRING(key)
+
+	var temprecord;
+	if (!temprecord.read(filehandle,key))
+		return false;
+	(*this).parse(temprecord);
+	return true;
+}
+
+bool dim::write(const var& filehandle, const var& key) const
+{
+	THISIS(L"bool dim::matwrite(const var& filehandle, const var& key) const")
+	ISSTRING(filehandle)
+	ISSTRING(key)
+
+	var temprecord=(*this).unparse();
+	return temprecord.write(filehandle,key);
 }
 
 bool dim::redim(int rows, int cols)
