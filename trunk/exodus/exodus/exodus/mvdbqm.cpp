@@ -216,7 +216,7 @@ bool var::readv(const var& fileno,const var& key,const int fieldno)
 	if (!read(fileno,key))
 		return false;
 
-	var_mvstr=extract(fieldno).towstring();
+	var_mvstr=extract(fieldno).var_mvstr;
 
 	return true;
 }

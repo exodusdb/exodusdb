@@ -586,6 +586,16 @@ DLL_PUBLIC var trimb(const var& instring, const var trimchars)
 	return instring.trimb(trimchars);
 }
 
+DLL_PUBLIC bool matread(dim& dimrecord, const var& filehandle, const var& key)
+{
+	return dimrecord.read(filehandle,key);
+}
+
+DLL_PUBLIC bool matwrite(const dim& dimrecord, const var& filehandle,const var& key)
+{
+	return dimrecord.write(filehandle,key);
+}
+
 DLL_PUBLIC var matparse(const var& dynarray, dim& intodimarray)
 {
 	return intodimarray.parse(dynarray);

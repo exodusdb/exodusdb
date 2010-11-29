@@ -651,6 +651,26 @@ var& var::quoter()
 
 }
 
+var var::squote() const
+{
+	THISIS(L"var var::squote() const")
+	THISISSTRING()
+
+	return var(*this).squoter();
+}
+
+var& var::squoter()
+{
+	THISIS(L"var& var::squoter()")
+	THISISSTRING()
+
+	//NB this is std::wstring "replace" not var field replace
+	var_mvstr.replace(0,0,L"'");
+	var_mvstr+=L'\'';
+	return *this;
+
+}
+
 var var::unquote() const
 {
 	THISIS(L"var var::unquote() const")
@@ -2036,7 +2056,7 @@ var var::xlate(const var& filename,const var& fieldno, const var& mode) const
 	THISIS(L"var var::xlate(const var& filename,const var& fieldno, const var& mode) const")
 	ISSTRING(mode)
 
-	return xlate(filename,fieldno,mode.towstring().c_str());
+	return xlate(filename,fieldno,mode.var_mvstr.c_str());
 }
 
 //TODO provide a version with int fieldno to handle the most frequent case

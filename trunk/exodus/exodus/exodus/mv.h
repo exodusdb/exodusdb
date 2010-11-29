@@ -850,6 +850,7 @@ public:
 	var& splicer(const int start1,const int length,const var& str);
 	var& splicer(const int start1,const var& str);
 	var& quoter();
+	var& squoter();
 	var& unquoter();
 	var& ucaser();
 	var& lcaser();
@@ -870,6 +871,7 @@ public:
 	var splice(const int start1,const int length,const var& str) const;
 	var splice(const int start1,const var& str) const;
 	var quote() const;
+	var squote() const;
 	var unquote() const;
 	var ucase() const;
 	var lcase() const;
@@ -1268,6 +1270,10 @@ public:
 
 	//return the number of fields
 	var parse(const var& var1);
+
+	bool read(const var& filehandle, const var& key);
+
+	bool write(const var& filehandle, const var& key) const;
 
 	//following is implemented on the dim class now
 	//dim dimarray2();

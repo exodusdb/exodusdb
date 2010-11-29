@@ -63,10 +63,6 @@ function main()
 	//input();
 	//stop();
 
-#ifdef __STDC_ISO_10646__
-//	printl("__STDC_ISO_10646__");
-#endif
-
 	//SQL tracing
 	//DBTRACE=true;
 
@@ -172,12 +168,9 @@ function main()
 	//check cannot write non-codepage characters
 	if (SLASH_IS_BACKSLASH) {
 		assert(oswrite("",tempfilename5));
-		//offset=2;
-		//assert(not osbwrite(L"\u0393",tempfilename5,offset,"C"));
-
-		//ALN:NOTE: oswrite(L"\u0393",tempfilename5,"French") returns success
-		assert( /*not*/ oswrite(L"\u0393",tempfilename5,"French"));
-
+		assert(not osbwrite(GreekSmallFinalSigma,tempfilename5,var(2)));
+		osopen(tempfilename5,"Greek");
+		assert(osbwrite(GreekSmallFinalSigma,tempfilename5,var(2)));
 		osdelete(tempfilename5);
 	}
 
@@ -284,6 +277,8 @@ function main()
 	//if (not deletedb("steve",errmsg))
 	//	errmsg.outputl();
 
+#if 0
+
 	deletefile("XUSERS");
 	deletefile("dict_XUSERS");
 
@@ -351,6 +346,7 @@ dict(AGE_IN_YEARS) {
 		printl(" AGE_IN_YEARS=",calculate("AGE_IN_YEARS"));
 	}
 
+#endif
 
 	assert(unquote("\"This is quoted?\"") eq "This is quoted?");
 
@@ -643,8 +639,8 @@ dict(AGE_IN_YEARS) {
 	da1="f1" ^VM^ "f1v2s1" ^SM^ "f1v2s2" ^SM^ "f1v2s3" ^VM^ "f1v3" ^FM^ "f2";
 	assert(eraser(da1, 1, 2, 2) eq ("f1" ^VM^ "f1v2s1" ^SM^ "f1v2s3" ^VM^ "f1v3" ^FM^ "f2"));
 
-	var tempfile;
-	if (osopen(SLASH^"129834192784",tempfile))
+	var tempfile=SLASH^"129834192784";
+	if (osopen(tempfile))
 		assert(false and var("non-existent file opened!"));
 
 	//math.h seems to have been included in one of the boost or other special headers
