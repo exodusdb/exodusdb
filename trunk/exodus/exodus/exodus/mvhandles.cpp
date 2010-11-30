@@ -13,12 +13,12 @@ boost::mutex mvhandles_mutex;
 
 namespace exodus {
 
+	MvHandleEntry::MvHandleEntry()
+		: deleter(0)//	HANDLE_ENTRY_FREE
+	{}
 MvHandlesCache::MvHandlesCache()
 	: tbl( HANDLES_CACHE_SIZE)
-{
-	for(int ix = 0; ix < ( int) tbl.size(); ix ++)
-		tbl[ix].deleter = 0;	//	HANDLE_ENTRY_FREE
-}
+{}
 
 int MvHandlesCache::add_handle( CACHED_HANDLE handle_to_cache, DELETER_AND_DESTROYER del, std::wstring name)
 {
@@ -31,11 +31,7 @@ int MvHandlesCache::add_handle( CACHED_HANDLE handle_to_cache, DELETER_AND_DESTR
 			break;
 
 	if( ix == ( int) tbl.size())
-	{
 		tbl.resize( ix * 2);	// double the table size
-		for(int ix2 = ix+1; ix2 < ( int) tbl.size(); ix2 ++)
-			tbl[ix2].deleter = 0;	//	HANDLE_ENTRY_FREE
-	}
 
 	tbl[ix].deleter  = del;
 	tbl[ix].handle = handle_to_cache;

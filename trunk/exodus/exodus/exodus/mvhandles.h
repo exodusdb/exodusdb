@@ -27,6 +27,7 @@ typedef void ( * DELETER_AND_DESTROYER )( CACHED_HANDLE);
 class MvHandleEntry
 {
   public:
+	MvHandleEntry();
 	DELETER_AND_DESTROYER deleter;	// =0 means that slot is empty
 	CACHED_HANDLE handle;
 	std::wstring extra;
