@@ -276,7 +276,10 @@ int my_utf8_codecvt_facet::i = 0;
 
 std::locale get_locale( const var & locale_name) // throw ( MVException)
 {
-	THISIS(L"std::locale get_locale( const var & locale_name)")
+	//assume is checked prior to calling since this is an internal exodus function
+	//THISIS(L"std::locale get_locale( const var & locale_name)")
+	//ISSTRING(locale_name)
+
 	if( locale_name == L"utf8")
 	{
 //		typedef wchar_t ucs4_t;
