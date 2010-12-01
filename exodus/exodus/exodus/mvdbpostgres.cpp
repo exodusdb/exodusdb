@@ -385,7 +385,7 @@ bool var::connect(const var& conninfo, var & connectionhandle)
 	//DEBUG5, DEBUG4, DEBUG3, DEBUG2, DEBUG1, LOG, NOTICE, WARNING, ERROR, FATAL, and PANIC
 	var sql=L"SET client_min_messages = ";
 	sql^=DBTRACE? L"LOG" : L"WARNING";
-	sql.sqlexec();
+	sql.sqlexec(( int) this->var_mvint);
 	return true;
 }
 

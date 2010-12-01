@@ -35,7 +35,7 @@ function main()
 	{
 		var conn1;
 		var().connect( L"", conn1);
-	}		// one connection is lost here
+	}		// one connection is lost here (hangs)
 
 	{
 		var conn1;
@@ -53,6 +53,36 @@ function main()
 			assert( createfile(table1));
 		}
 		write( "ABCDEFGH", table1, "111");
+		write( "BCDEFGH", table1, "222");
+		write( "CDEFGH", table1, "333");
+		var().disconnect( conn2);
+	}
+	{
+		var conn1;
+		var().connect( L"", conn1);		// default dbname=exodus
+		var table1 = "TABLE1";
+		assert( table1.open());			// actually this is not convenient
+					// I can not open 3 connections and later open table1 :(
+
+		var conn3;
+		var().connect( L"dbname=exodus3", conn3);		// custom dbname=exodus3, should fail
+		var conn2;
+		var().connect( L"dbname=exodus2", conn2);		// custom dbname=exodus2, should succeed
+		var table2 = "TABLE2";
+		if( ! table2.open())			// for conn2
+		{
+			printl("Creating "^table2);
+			assert( createfile(table2));
+		}
+		// here we should read from table1 and write to table 2
+		var buf;
+		buf.read( table1, "111");
+		buf.write( table2, "999");
+		buf.read( table1, "222");
+		buf.write( table2, "888");
+		buf.read( table1, "333");
+		buf.write( table2, "777");
+		var().disconnect( conn1);
 		var().disconnect( conn2);
 	}
 
