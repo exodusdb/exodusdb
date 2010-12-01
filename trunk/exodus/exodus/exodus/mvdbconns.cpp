@@ -48,9 +48,13 @@ CACHED_CONNECTION MvConnectionsCache::get_current_connection() const
 void MvConnectionsCache::del_connection( int index)
 {
 	boost::mutex::scoped_lock lock(mvconnections_mutex);
-	CACHED_CONNECTION p /*std::pair<int, void*> p*/ = (CACHED_CONNECTION) tbl.find( index)->second;
-	del( p);
-	tbl.erase( index);
+	CONN_MAP::iterator iter = tbl.find( index);
+	if( iter != tbl.end())
+	{
+//	CACHED_CONNECTION p /*std::pair<int, void*> p*/ = ;
+		del((CACHED_CONNECTION) tbl.find( index)->second);
+		tbl.erase( index);
+	}
 }
 
 int MvConnectionsCache::get_current_id() const

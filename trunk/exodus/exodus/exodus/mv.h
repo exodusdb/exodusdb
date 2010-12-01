@@ -960,7 +960,9 @@ public:
 
 	//var FILE I/O
 	bool connect(const var& connectioninfo=L"");
+	bool connect(const var& conninfo, var & connectionhandle);	// alternative connect, create multiconnection
 	bool disconnect();
+	bool disconnect(const var & connectionhandle);				// alternative disconnect, to close multiconnection
 
 	bool begintrans() const;
 	bool rollbacktrans() const;
@@ -980,6 +982,7 @@ public:
 	bool deleteindex(const var& fieldname) const;
 	var listindexes(const var& filename=L"") const;
 
+	bool open();		// open current filename with current multicollection
 	bool open(const var& dbfilename);
 	void close();
 
@@ -1009,8 +1012,8 @@ public:
 	var xlate(const var& filename,const var& fieldno, const wchar_t* mode) const;
 	var xlate(const var& filename,const var& fieldno, const var& mode) const;
 
-	bool sqlexec() const;
-	bool sqlexec(var& errmsg) const;
+	bool sqlexec( int connection_id = 0) const;
+	bool sqlexec(var& errmsg, int connection_id = 0) const;
 
 	//bool selftest() const;
 	var version() const;
@@ -1033,7 +1036,10 @@ private:
 
 	bool selectx(const var& fieldnames, const var& sortselectclause) const;
 
+	void * connectionx() const;		// finds connection of this variable:
+									// if this is not filename SQLOPENED variable, returns connection()
 	void* connection() const;
+	var build_conn_info( const var & conninfo) const;
 
 	//TODO check if can speed up by returning reference to converted self like MC
 	var oconv_LR(const var& format) const;
