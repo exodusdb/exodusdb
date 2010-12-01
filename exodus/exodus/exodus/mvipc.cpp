@@ -103,6 +103,7 @@ bool startipc()
 	int environmentn=getenvironmentn();
 
 	//start another thread (for this threads environment) to calculate any dictionary items required by the db server backend
+	//ALN:DANGEROUS: following line works only if tss_pgconnparams was reset with some string
 	boost::thread thrd1(boost::bind(&MVipc, environmentn, *tss_pgconnparams.get()));
 
 	//wait for the new thread to signal that it is listening for requests before resuming

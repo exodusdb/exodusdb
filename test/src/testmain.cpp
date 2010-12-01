@@ -32,6 +32,30 @@ programinit()
 
 function main()
 {
+	{
+		var conn1;
+		var().connect( L"", conn1);
+	}		// one connection is lost here
+
+	{
+		var conn1;
+		var().connect( L"", conn1);
+		var().disconnect( conn1);
+	}
+
+	{
+		var conn2;
+		var().connect( L"", conn2);
+		var table1 = "TABLE1";
+		if( ! table1.open())			// for conn2
+		{
+			printl("Creating "^table1);
+			assert( createfile(table1));
+		}
+		write( "ABCDEFGH", table1, "111");
+		var().disconnect( conn2);
+	}
+
 	{	// test to reproduce cached_handles error
 		var file1( "FILE1.txt");
 		oswrite( L"", file1);

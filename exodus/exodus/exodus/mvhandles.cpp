@@ -13,9 +13,10 @@ boost::mutex mvhandles_mutex;
 
 namespace exodus {
 
-	MvHandleEntry::MvHandleEntry()
-		: deleter(0)//	HANDLE_ENTRY_FREE
-	{}
+MvHandleEntry::MvHandleEntry()
+	: deleter((DELETER_AND_DESTROYER)0), handle(0)
+{}
+
 MvHandlesCache::MvHandlesCache()
 	: tbl( HANDLES_CACHE_SIZE)
 {}

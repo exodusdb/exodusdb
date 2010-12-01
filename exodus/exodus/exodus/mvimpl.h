@@ -51,6 +51,8 @@ public:
 	static const wchar_t MVTYPE_HANDLE = 0x10;
 	static const wchar_t MVTYPE_OPENED = MVTYPE_INTSTR | MVTYPE_HANDLE;
 #endif
+	static const wchar_t MVTYPE_SQLCON = 0x20;
+	static const wchar_t MVTYPE_SQLOPENED = MVTYPE_INTSTR | MVTYPE_SQLCON;
 /* moved to default contructor
 	//default ctor initialise to "unassigned"
 	pimpl() : mvtype(MVTYPE_UNA) {};
