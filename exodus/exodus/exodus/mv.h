@@ -1012,8 +1012,9 @@ public:
 	var xlate(const var& filename,const var& fieldno, const wchar_t* mode) const;
 	var xlate(const var& filename,const var& fieldno, const var& mode) const;
 
-	bool sqlexec( int connection_id = 0) const;
-	bool sqlexec(var& errmsg, int connection_id = 0) const;
+	bool sqlexec( const var & SqlToExecute) const;	// this: filename, parm1: SQL to execute
+//	bool sqlexec( int connection_id = 0) const;
+	bool sqlexec(var& errmsg, int connection_id) const;	// this: SQL to execute
 
 	//bool selftest() const;
 	var version() const;

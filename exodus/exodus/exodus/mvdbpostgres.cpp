@@ -181,7 +181,17 @@ boost::thread_specific_ptr<LockTable> tss_locktables;
 */
 
 typedef PGresult* 	PGresultptr;
-bool pqexec(const var& sql, PGresultptr& pgresult);
+static bool pqexec(const var& sql, PGresultptr& pgresult, int connection_id = 0);
+
+bool var::sqlexec( const var & SqlToExecute) const
+{
+	int connection_id = ( var_mvtyp == pimpl::MVTYPE_SQLOPENED) ? ( int) var_mvint : 0;
+	var errmsg;
+	bool result = SqlToExecute.sqlexec( errmsg, connection_id);
+	if (not result && DBTRACE)
+		errmsg.outputl();
+	return result;
+}
 
 #if defined _MSC_VER //|| defined __CYGWIN__ || defined __MINGW32__
 LONG WINAPI DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS pExcPointers) {
@@ -383,9 +393,11 @@ bool var::connect(const var& conninfo, var & connectionhandle)
 	//but this does
 	//this turns off the notice when creating tables with a primary key
 	//DEBUG5, DEBUG4, DEBUG3, DEBUG2, DEBUG1, LOG, NOTICE, WARNING, ERROR, FATAL, and PANIC
-	var sql=L"SET client_min_messages = ";
-	sql^=DBTRACE? L"LOG" : L"WARNING";
-	sql.sqlexec(( int) this->var_mvint);
+
+//	var sql=L"SET client_min_messages = ";
+//	sql^=DBTRACE? L"LOG" : L"WARNING";
+//	sql.sqlexec(( int) this->var_mvint);
+	sqlexec( DBTRACE ? L"SET client_min_messages = LOG" : L"SET client_min_messages = WARNING");
 	return true;
 }
 
@@ -551,11 +563,11 @@ bool var::connect(const var& conninfo)
 	//but this does
 	//this turns off the notice when creating tables with a primary key
 	//DEBUG5, DEBUG4, DEBUG3, DEBUG2, DEBUG1, LOG, NOTICE, WARNING, ERROR, FATAL, and PANIC
-	var sql=L"SET client_min_messages = ";
-	sql^=DBTRACE? L"LOG" : L"WARNING";
+//	var sql=L"SET client_min_messages = ";
+//	sql^=DBTRACE? L"LOG" : L"WARNING";
+//	sql.sqlexec();
 
-	sql.sqlexec();
-
+	sqlexec( DBTRACE ? L"SET client_min_messages = LOG" : L"SET client_min_messages = WARNING");
 	return true;
 
 }
@@ -1039,22 +1051,20 @@ void var::unlockall() const
 		//register that it is locked
 		(*locktable).clear();
 	}
-
-	var sql=L"SELECT PG_ADVISORY_UNLOCK_ALL()";
-
-	sql.sqlexec();
-
+//	var sql=L"SELECT PG_ADVISORY_UNLOCK_ALL()";
+//	sql.sqlexec();
+	sqlexec(L"SELECT PG_ADVISORY_UNLOCK_ALL()");
 }
 
 //returns success or failure but no data
-bool var::sqlexec( int connection_id) const
-{
-	var errmsg;
-	bool result=sqlexec(errmsg, connection_id);
-	if (not result && DBTRACE)
-		errmsg.outputl();
-	return result;
-}
+//bool var::sqlexec_( int connection_id) const
+//{
+//	var errmsg;
+//	bool result=sqlexec(errmsg, connection_id);
+//	if (not result && DBTRACE)
+//		errmsg.outputl();
+//	return result;
+//}
 
 //returns success or failure but no data
 bool var::sqlexec(var& errmsg, int connection_id) const
@@ -1542,6 +1552,7 @@ bool var::deleterecord(const var& key) const
 	return true;
 }
 
+// If this is opened SQL connection, pass connection ID to sqlexec
 bool var::begintrans() const
 {
 	THISIS(L"bool var::begintrans() const")
@@ -1550,10 +1561,9 @@ bool var::begintrans() const
 	THISISDEFINED()
 
 	//begin a transaction
-	var sql=L"BEGIN";
-
-	return sql.sqlexec();
-	
+//	var sql=L"BEGIN";
+//	return sql.sqlexec();
+	return sqlexec(L"BEGIN");
 }
 
 bool var::rollbacktrans() const
@@ -1564,10 +1574,9 @@ bool var::rollbacktrans() const
 	THISISDEFINED()
 
 	// Rollback a transaction
-	var sql=L"BEGIN";
-
-	return sql.sqlexec();
-
+//	var sql=L"BEGIN";
+//	return sql.sqlexec();
+	return sqlexec(L"BEGIN");
 }
 
 bool var::committrans() const
@@ -1578,9 +1587,9 @@ bool var::committrans() const
 	THISISDEFINED()
 
 	//end (commit) a transaction
-	var sql=L"END";
-
-	return sql.sqlexec();
+//	var sql=L"END";
+//	return sql.sqlexec();
+	return sqlexec(L"END");
 }
 
 bool var::createdb(const var& dbname) const
@@ -1607,7 +1616,7 @@ bool var::createdb(const var& dbname, var& errmsg) const
 	sql^=L" WITH ENCODING='UTF8' ";
 	//sql^=" OWNER=exodus";
 
-	return sql.sqlexec(errmsg);
+	return sql.sqlexec(errmsg, 0);
 
 }
 
@@ -1621,7 +1630,7 @@ bool var::deletedb(const var& dbname, var& errmsg) const
 	//var sql = L"DROP DATABASE "^dbname.convert(L". ",L"__");
 	var sql = L"DROP DATABASE "^dbname;
 
-	return sql.sqlexec(errmsg);
+	return sql.sqlexec(errmsg, 0);
 
 }
 
@@ -1641,10 +1650,12 @@ bool var::createfile(const var& filename, const var& options)
 	//sql ^= L" TABLE " PGDATAFILEPREFIX ^ filename.convert(L".",L"_");
 	sql ^= L" TABLE " PGDATAFILEPREFIX ^ filename;
 	sql ^= L" (key bytea primary key, data bytea)";
-	if( filename.var_mvtyp == pimpl::MVTYPE_SQLOPENED)
-		return sql.sqlexec(( int) filename.var_mvint);
-	else
-		return sql.sqlexec();
+
+//	if( filename.var_mvtyp == pimpl::MVTYPE_SQLOPENED)
+//		return sql.sqlexec(( int) filename.var_mvint);
+//	else
+//		return sql.sqlexec();
+	return filename.sqlexec( sql);
 }
 
 bool var::deletefile() const
@@ -1652,12 +1663,12 @@ bool var::deletefile() const
 	THISIS(L"bool var::deletefile() const")
 	THISISSTRING()
 
-	var sql = L"DROP TABLE " PGDATAFILEPREFIX ^ *this;
-
-	if( this->var_mvtyp == pimpl::MVTYPE_SQLOPENED)
-		return sql.sqlexec(( int) this->var_mvint);
-	else
-		return sql.sqlexec();
+//	var sql = L"DROP TABLE " PGDATAFILEPREFIX ^ *this;
+//	if( this->var_mvtyp == pimpl::MVTYPE_SQLOPENED)
+//		return sql.sqlexec(( int) this->var_mvint);
+//	else
+//		return sql.sqlexec();
+	return sqlexec( L"DROP TABLE " PGDATAFILEPREFIX ^ *this);
 }
 
 bool var::clearfile() const
@@ -1665,12 +1676,12 @@ bool var::clearfile() const
 	THISIS(L"bool var::clearfile() const")
 	THISISSTRING()
 
-	var sql = L"DELETE FROM " PGDATAFILEPREFIX ^ *this;
-
-	if( this->var_mvtyp == pimpl::MVTYPE_SQLOPENED)
-		return sql.sqlexec(( int) this->var_mvint);
-	else
-		return sql.sqlexec();
+//	var sql = L"DELETE FROM " PGDATAFILEPREFIX ^ *this;
+//	if( this->var_mvtyp == pimpl::MVTYPE_SQLOPENED)
+//		return sql.sqlexec(( int) this->var_mvint);
+//	else
+//		return sql.sqlexec();
+	return sqlexec( L"DELETE FROM " PGDATAFILEPREFIX ^ *this);
 }
 
 inline void unquoter(var& string)
@@ -1992,6 +2003,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 			createString();
 	}
 
+	// Note that MVTYPE_SQLCON bit is still preserved in var_mvtyp
+
 	//TODO only do this if cursor already exists
 	//clearselect();
 
@@ -2250,7 +2263,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	if (!begintrans())
 		return false;
 
-	if (!sql.sqlexec())
+//	if (!sql.sqlexec())
+	if (! this->sqlexec( sql))
 		return false;
 
 	//allow select to be an assignment where filename becomes the cursor name
@@ -2275,7 +2289,8 @@ void var::clearselect() const
     if (var_mvtyp)
 		sql ^= *this;
 
-	if (!sql.sqlexec())
+//	if (!sql.sqlexec())
+	if ( ! sqlexec( sql))
 		return;
 
 	// end the transaction
@@ -2292,15 +2307,16 @@ bool var::readnext(var& key) const
 }
 
 //NB global not member function
-bool readnextx(const std::wstring& cursor, PGresultptr& pgresult)
+//	To make it var:: privat member -> pollute mv.h with PGresultptr :(
+//bool readnextx(const std::wstring& cursor, PGresultptr& pgresult)
+bool readnextx( const var & cursor, PGresultptr& pgresult, int connection_id)
 {
     var sql=L"FETCH NEXT in CURSOR1_" ^ cursor;
 
 	//execute the sql
 	//cant use sqlexec here because it returns data
 	//sqlexec();
-
-	if (!pqexec(sql,pgresult))
+	if (!pqexec(sql,pgresult,connection_id))
 		return false;
 
 	//close cursor if no more
@@ -2311,13 +2327,11 @@ bool readnextx(const std::wstring& cursor, PGresultptr& pgresult)
 		// close the cursor - we don't bother to check for errors
 		var sql=L"CLOSE CURSOR1_" ^ cursor;
 
-		sql.sqlexec();
+//		sql.sqlexec();
+		cursor.sqlexec(sql);
 		return false;
-
 	}
-
 	return true;
-
 }
 
 bool var::readnext(var& key, var& valueno) const
@@ -2335,7 +2349,10 @@ bool var::readnext(var& key, var& valueno) const
 
 	//PGconn* thread_pgconn=(PGconn*) connection();
 	PGresultptr pgresult;
-	if (!readnextx(var_mvstr, pgresult))
+	int connection_id = 0;
+	if( var_mvtyp == pimpl::MVTYPE_SQLOPENED)
+		connection_id = ( int) var_mvint;
+	if (!readnextx( *this, pgresult, connection_id))
 	{
 		// end the transaction and quit
 		committrans();
@@ -2408,9 +2425,14 @@ bool var::readnextrecord(var& record, var& key) const
 	ISDEFINED(key)
 	ISDEFINED(record)
 
-	connection();
 	PGresultptr pgresult;
-	if (!readnextx(var_mvstr, pgresult))
+	int connection_id = 0;
+	if( var_mvtyp != pimpl::MVTYPE_SQLOPENED)
+		connection();
+	else
+		connection_id = ( int) var_mvint;
+
+	if (!readnextx(*this, pgresult, connection_id))
 	{
 		// end the transaction
 		committrans();
@@ -2463,8 +2485,8 @@ bool var::createindex(const var& fieldname, const var& dictfile) const
 	sql^=dictexpression;
 	sql^=L")";
 
-	return sql.sqlexec();
-
+//	return sql.sqlexec();
+	return this->sqlexec( sql);
 }
 
 bool var::deleteindex(const var& fieldname) const
@@ -2476,7 +2498,8 @@ bool var::deleteindex(const var& fieldname) const
 	//var filename=*this;
 	var sql=L"drop index index__" ^ *this ^ L"__" ^ fieldname;
 
-	return sql.sqlexec();
+//	return sql.sqlexec();
+	return this->sqlexec( sql);
 }
 
 /*
@@ -2502,9 +2525,16 @@ var var::listfiles() const
 	var sql=L"SELECT table_name FROM information_schema.tables WHERE table_type = 'BASE TABLE' AND table_schema NOT IN ('pg_catalog', 'information_schema'); ";
 
 	//execute command or return empty string
-	connection();
 	PGresultptr result;
-	if (!pqexec(sql,result))
+	int connection_id = 0;
+	if( var_mvtyp == pimpl::MVTYPE_SQLOPENED)
+		connection_id = ( int) var_mvint;
+	else
+	{
+		connection();		// open default connection if it was never opened before
+		connection_id = 0;
+	}
+	if (!pqexec(sql,result,connection_id))
 		return L"";
 
 	var filenames=L"";
@@ -2545,9 +2575,19 @@ var var::listindexes(const var& filename) const
 		 L");";
 
 	//execute command or return empty string
-	connection();
+//	connection();
 	PGresultptr result;
-	if (!pqexec(sql,result))
+//	if (!pqexec(sql,result))
+//		return L"";
+	int connection_id = 0;
+	if( var_mvtyp == pimpl::MVTYPE_SQLOPENED)
+		connection_id = ( int) var_mvint;
+	else
+	{
+		connection();		// open default connection if it was never opened before
+		connection_id = 0;
+	}
+	if (!pqexec(sql,result,connection_id))
 		return L"";
 
 	var tt;
@@ -2579,11 +2619,14 @@ var var::listindexes(const var& filename) const
 //used for sql commands that require no parameters
 //returns 1 for success and PGresult points to result WHICH MUST BE PQclear(result)'ed
 //returns 0 for failure
-bool pqexec(const var& sql, PGresultptr& pgresult)
+static bool pqexec(const var& sql, PGresultptr& pgresult, int connection_id)
 {
 	DEBUG_LOG_SQL
-
-	PGconn* thread_pgconn=tss_pgconns.get();
+	PGconn * thread_pgconn = 0;
+	if( connection_id == 0)
+		thread_pgconn = tss_pgconns.get();
+	else
+		thread_pgconn = mv_connections_cache.get_connection( connection_id);
 	if (!thread_pgconn)
 		return false;
 
