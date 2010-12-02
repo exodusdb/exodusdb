@@ -85,6 +85,27 @@ function main()
 		var().disconnect( conn1);
 		var().disconnect( conn2);
 	}
+	{
+		// Go through table2 in exodus2 db and through table1 in exodus1 db, and print records
+		// Both tables are assumed existing
+		var conn1, conn2;
+		var().connect( L"dbname=exodus2", conn2);		// custom dbname=exodus2, should succeed
+		var table2 = "TABLE2";
+		assert( table2.open());
+		var().connect( L"dbname=exodus", conn1);		// custom dbname=exodus2, should succeed
+		var table1 = "TABLE1";
+		assert( table1.open());
+
+		table1.selectrecord();
+		table2.selectrecord();
+		var record1, id1, record2, id2;
+		while( table1.readnextrecord( record1, id1) and table2.readnextrecord( record2, id2))
+		{
+			printl( "r1=" ^ record1 ^ ", id1=" ^ id1 ^ ", r2=" ^ record2 ^ ", id2=" ^ id2 ^ ".");
+		}		
+		var().disconnect( conn1);
+		var().disconnect( conn2);
+	}
 
 	{	// test to reproduce cached_handles error
 		var file1( "FILE1.txt");
@@ -331,7 +352,7 @@ function main()
 	//if (not deletedb("steve",errmsg))
 	//	errmsg.outputl();
 
-#if 0
+//#if 0
 
 	deletefile("XUSERS");
 	deletefile("dict_XUSERS");
@@ -396,11 +417,11 @@ dict(AGE_IN_YEARS) {
 	ANS=calculate("AGE_IN_DAYS")/365.25;
 }
 */
-		print(" AGE_IN_DAYS=",calculate("AGE_IN_DAYS"));
-		printl(" AGE_IN_YEARS=",calculate("AGE_IN_YEARS"));
+			//		print(" AGE_IN_DAYS=",calculate("AGE_IN_DAYS"));
+			//		printl(" AGE_IN_YEARS=",calculate("AGE_IN_YEARS"));
 	}
 
-#endif
+//#endif
 
 	assert(unquote("\"This is quoted?\"") eq "This is quoted?");
 
