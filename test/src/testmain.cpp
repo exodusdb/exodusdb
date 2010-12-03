@@ -61,7 +61,7 @@ ID="";
         //return 0;
 #endif
 
-#ifndef MULTIPLE_CONNECTION_CODE_EXCLUDED
+#ifdef MULTIPLE_CONNECTION_CODE_EXCLUDED
 	{
 		var conn1;
 		conn1.connect( L"", conn1);	
@@ -138,6 +138,7 @@ ID="";
 	}
 #endif
 
+#ifdef FILE_IO_CACHED_HANDLES_EXCLUDED
 	{	// test to reproduce cached_handles error
 		var file1( "FILE1.txt");
 		oswrite( L"", file1);
@@ -159,6 +160,7 @@ ID="";
 				
 		osbwrite( L"THIS TEXT INTENDED FOR FILE 'FILE1.txt' BUT IT GOES TO 'FILE3.txt'", file1, off1);
 	}
+#endif
 
 	printl("testfr says 'Hello World!'");
 	//assert(setxlocale("fr_FR.utf8"));
@@ -412,8 +414,8 @@ ID="";
 	assert(createindex("XUSERS","BIRTHDAY"));
 	assert(listindexes("XUSERS") eq ("xusers"^VM^"birthday"));
 	assert(listindexes() ne "");
-	assert(deleteindex("XUSERS","BIRTHDAY"));
-	assert(listindexes("XUSERS") eq "");
+//ALN: do not delete to make subsequent select work::	assert(deleteindex("XUSERS","BIRTHDAY"));
+//	assert(listindexes("XUSERS") eq "");
 
 	//check can select and readnext through the records
 	assert(select("SELECT XUSERS WITH BIRTHDAY BETWEEN '1 JAN 2000' AND '31 DEC 2003'"));
