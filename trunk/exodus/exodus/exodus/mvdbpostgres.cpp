@@ -187,7 +187,7 @@ bool var::sqlexec( const var & SqlToExecute) const
 {
 	int connection_id = ( var_mvtyp == pimpl::MVTYPE_SQLOPENED) ? ( int) var_mvint : 0;
 	var errmsg;
-	bool result = SqlToExecute.sqlexec( errmsg, connection_id);
+	bool result = sqlexec( SqlToExecute, errmsg);
 	if (not result && DBTRACE)
 		errmsg.outputl();
 	return result;
@@ -314,6 +314,10 @@ var var::build_conn_info( const var & conninfo) const
 	return result;
 }
 
+// var connection;
+// connection.connect2( "dbname=exodusbase");
+// connection.connect( "dbname=exodusbase", connection);
+// ...
 bool var::connect(const var& conninfo, var & connectionhandle)
 {
 	THISIS(L"bool var::connect(const var& conninfo, var & connectionhandle")
@@ -372,8 +376,10 @@ bool var::connect(const var& conninfo, var & connectionhandle)
 	#endif
 
 	// ATM we have new good connection to database
-	*this = connectionhandle = ( int) mv_connections_cache.add_connection( pgconn);
-
+	this->var_mvint = ( int) mv_connections_cache.add_connection( pgconn);
+	this->var_mvstr = conninfo.var_mvstr;
+	this->var_mvtyp = pimpl::MVTYPE_SQLOPENED;
+	connectionhandle = * this;
 	//ALN:TODO: whats with locktables etc. ?	tss_locktables.reset(new LockTable());
 
 	tss_pgconnparams.reset( new var(conninfo2));	// store recent connection string (used in startipc())
@@ -477,7 +483,9 @@ bool var::connect(const var& conninfo)
 		}
 	#endif
 
-	*this=1;
+//	*this=1;
+	var_mvtyp=pimpl::MVTYPE_INT;
+	this->var_mvint = 0;		// identifies default connection (tss)
 
 	//save the connection in thread specific storage
 	tss_pgconns.reset(pgconn);					//ALN:TODO:so we save ptr to the object
@@ -556,7 +564,7 @@ void* var::connection() const
 	return (void*) thread_pgconn;
 }
 
-//disconnect thread-default connection
+// universal disconnect ( for thread-default connection and for multiple)
 bool var::disconnect()
 {
 	THISIS(L"bool var::disconnect()")
@@ -567,39 +575,27 @@ bool var::disconnect()
 		exodus::errputl(L"ERROR: mvdbpostgres disconnect() Closing connection");
 #	endif
 
-	PGconn* thread_pgconn=tss_pgconns.get();
+	if( this->var_mvtyp == pimpl::MVTYPE_SQLOPENED)	// close multiple connection
+	{
+		mv_connections_cache.del_connection(( int) this->var_mvint);
+		this->var_mvtyp=pimpl::MVTYPE_UNA;
+	}
+	else
+	{
+		PGconn* thread_pgconn=tss_pgconns.get();
 
-	if (thread_pgconn)
-		PQfinish(thread_pgconn);
+		if (thread_pgconn)
+			PQfinish(thread_pgconn);
 
-	tss_pgconns.release();
-	tss_locktables.release();
+		tss_pgconns.release();
+		tss_locktables.release();
 
-	var_mvstr=L"";
-	var_mvint=0;
+		var_mvstr=L"";
+		var_mvint=0;
 
-	//make unassigned()
-	var_mvtyp=pimpl::MVTYPE_UNA;
-
-	return true;
-}
-
-//handle-specific connection disconnect
-bool var::disconnect( const var & connectionhandle)
-{
-	THISIS(L"bool var::disconnect( const var & connectionhandle)")
-	THISISDEFINED()
-	ISNUMERIC(connectionhandle)
-
-#	if TRACING >= 3
-		exodus::errputl(L"ERROR: mvdbpostgres disconnect() Closing connection");
-#	endif
-
-	mv_connections_cache.del_connection( connectionhandle.toInt());
-
-	//make unassigned()
-	connectionhandle.var_mvtyp=pimpl::MVTYPE_UNA;
-
+		//make unassigned()
+		var_mvtyp=pimpl::MVTYPE_UNA;
+	}
 	return true;
 }
 
@@ -763,7 +759,7 @@ bool var::open(const var& filename)
 	//save the filename and memorise the current connection for this file var
 	var_mvstr=filename.var_mvstr;
 	var_mvint = connection_id;
-	var_mvtyp = pimpl::MVTYPE_SQLOPENED & pimpl::MVTYPE_STR;
+	var_mvtyp = pimpl::MVTYPE_SQLOPENED;
 
 	return true;
 }
@@ -1027,25 +1023,16 @@ void var::unlockall() const
 }
 
 //returns success or failure but no data
-bool var::sqlexec(var& errmsg, int connection_id) const
+bool var::sqlexec(const var& sqlcmd, var& errmsg) const
 {
-	THISIS(L"bool var::sqlexec(var& errmsg) const")
-	THISISSTRING()
+	THISIS(L"bool var::sqlexec(const var& sqlcmd, var& errmsg) const")
+	ISSTRING(sqlcmd)
 
-	PGconn * thread_pgconn;
-	if( connection_id != 0)
-	{
-		thread_pgconn = mv_connections_cache.get_connection( connection_id);
-	}
-	else
-	{
-		//TODO ... why isnt this using connectionx?
-		thread_pgconn=(PGconn *) connection();
-	}
+	PGconn * thread_pgconn = ( PGconn *) connectionx();
 	if (!thread_pgconn)
 	{
 		errmsg=L"Error: sqlexec cannot find thread database connection";
-		return 0;
+		return false;
 	}
 
 	//DEBUG_LOG_SQL
@@ -1059,7 +1046,7 @@ bool var::sqlexec(var& errmsg, int connection_id) const
 	//NB PQexec cannot be told to return binary results
 	//but it can execute multiple commands
 	//whereas PQexecParams is the opposite
-	pgresult = PQexec(thread_pgconn, (*this).tostring().c_str());
+	pgresult = PQexec(thread_pgconn, sqlcmd.tostring().c_str());
 	if (!pgresult) {
 		errmsg=var(PQerrorMessage(thread_pgconn));
 		return false;
@@ -1451,6 +1438,15 @@ bool var::deletedb(const var& dbname) const
 	return deletedb(dbname,errmsg);
 }
 
+//sample code
+//var().createdb("mynewdb");//create a new database on the current thread-default connection
+//var file;
+//file.open("myfile");
+//file.createdb("mynewdb");//creates a new db on the same connection as a file was opened on
+//var connectionhandle;
+//connectionhandle.connect("connection string pars");
+//connectionhandle.createdb("mynewdb");
+
 bool var::createdb(const var& dbname, var& errmsg) const
 {
 	THISIS(L"bool var::createdb(const var& dbname, var& errmsg)")
@@ -1464,7 +1460,7 @@ bool var::createdb(const var& dbname, var& errmsg) const
 	//sql^=" OWNER=exodus";
 
 	//TODO this shouldnt only be for default connection
-	return sql.sqlexec(errmsg, 0);
+	return sqlexec(sql,errmsg);
 
 }
 
@@ -1476,13 +1472,10 @@ bool var::deletedb(const var& dbname, var& errmsg) const
 	ISSTRING(dbname)
 
 	//var sql = L"DROP DATABASE "^dbname.convert(L". ",L"__");
-	var sql = L"DROP DATABASE "^dbname;
-
-	//TODO this shouldnt only be for default connection
-	return sql.sqlexec(errmsg, 0);
-
+	return sqlexec( L"DROP DATABASE "^dbname, errmsg);
 }
 
+//ALN:TODO: whats with options ? should be errmsg ?
 bool var::createfile(const var& filename, const var& options)
 {
 	THISIS(L"bool var::createfile(const var& filename, const var& options)")
@@ -2451,7 +2444,7 @@ var var::listindexes(const var& filename) const
 //used for sql commands that require no parameters
 //returns 1 for success and PGresult points to result WHICH MUST BE PQclear(result)'ed
 //returns 0 for failure
-static bool pqexec(const var& sql, PGresultptr& pgresult, int connection_id)
+static bool pqexec( const var& sql, PGresultptr& pgresult, int connection_id)
 {
 	DEBUG_LOG_SQL
 	PGconn * thread_pgconn = 0;

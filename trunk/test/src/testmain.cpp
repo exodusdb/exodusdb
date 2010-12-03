@@ -46,7 +46,7 @@ var f1(in arg1=var())
 
 function main()
 {
-
+#ifdef STEVE_CODE_INCLUDED	
         printl(sin(30));
 
 USERNAME="";
@@ -59,22 +59,23 @@ ID="";
         f1("xxx").outputl();
         ID.outputl("ID=");
         //return 0;
+#endif
 
-
-{
+#ifndef MULTIPLE_CONNECTION_CODE_EXCLUDED
+	{
 		var conn1;
-		var().connect( L"", conn1);
+		conn1.connect( L"", conn1);	
 	}		// one connection is lost here (hangs)
 
 	{
 		var conn1;
-		var().connect( L"", conn1);
-		var().disconnect( conn1);
+		conn1.connect( L"", conn1);
+		conn1.disconnect();
 	}
 
 	{
 		var conn2;
-		var().connect( L"", conn2);
+		conn2.connect( L"", conn2);
 		var table1;
 		if( ! table1.open("TABLE1"))			// for conn2
 		{
@@ -84,19 +85,19 @@ ID="";
 		write( "ABCDEFGH", table1, "111");
 		write( "BCDEFGH", table1, "222");
 		write( "CDEFGH", table1, "333");
-		var().disconnect( conn2);
+		conn2.disconnect();
 	}
 	{
 		var conn1;
-		var().connect( L"", conn1);		// default dbname=exodus
+		conn1.connect( L"", conn1);		// default dbname=exodus
 		var table1;
 		assert( table1.open("TABLE1"));			// actually this is not convenient
 					// I can not open 3 connections and later open table1 :(
 
 		var conn3;
-		var().connect( L"dbname=exodus3", conn3);		// custom dbname=exodus3, should fail
+		conn3.connect( L"dbname=exodus3", conn3);		// custom dbname=exodus3, should fail
 		var conn2;
-		var().connect( L"dbname=exodus2", conn2);		// custom dbname=exodus2, should succeed
+		conn2.connect( L"dbname=exodus2", conn2);		// custom dbname=exodus2, should succeed
 		var table2;
 		if( ! table2.open("TABLE2"))			// for conn2
 		{
@@ -111,19 +112,19 @@ ID="";
 		buf.write( table2, "888");
 		buf.read( table1, "333");
 		buf.write( table2, "777");
-		var().disconnect( conn1);
-		var().disconnect( conn2);
+		conn1.disconnect();
+		conn2.disconnect();
 	}
 	{
 		// Go through table2 in exodus2 db and through table1 in exodus1 db, and print records
 		// Both tables are assumed existing
 		var conn1, conn2;
 		var().connect( L"dbname=exodus2", conn2);		// custom dbname=exodus2, should succeed
-		var table2 = "TABLE2";
-		assert( table2.open());
+		var table2;
+		assert( table2.open( "TABLE2"));
 		var().connect( L"dbname=exodus", conn1);		// custom dbname=exodus2, should succeed
-		var table1 = "TABLE1";
-		assert( table1.open());
+		var table1;
+		assert( table1.open( "TABLE1"));
 
 		table1.selectrecord();
 		table2.selectrecord();
@@ -132,9 +133,10 @@ ID="";
 		{
 			printl( "r1=" ^ record1 ^ ", id1=" ^ id1 ^ ", r2=" ^ record2 ^ ", id2=" ^ id2 ^ ".");
 		}		
-		var().disconnect( conn1);
-		var().disconnect( conn2);
+		conn1.disconnect();
+		conn2.disconnect();
 	}
+#endif
 
 	{	// test to reproduce cached_handles error
 		var file1( "FILE1.txt");
