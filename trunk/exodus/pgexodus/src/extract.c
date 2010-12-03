@@ -5,10 +5,26 @@
 extern "C" {
 #endif
 
+#define FM_ '\u02FE'
+#define VM_ '\u02FD'
+#define SM_ '\u02FC'
+
+#define FM_UTF8_1 '\xCB'
+#define FM_UTF8_2 '\xBE'
+#define VM_UTF8_1 FM_UTF8_1
+#define VM_UTF8_2 '\xBD'
+#define SM_UTF8_1 FM_UTF8_1
+#define SM_UTF8_2 '\xBC'
+
+#define FM_UTF8 '\uCBBE'
+#define VM_UTF8 '\uCBBD'
+#define SM_UTF8 '\uCBBC'
+
+/*
 #define FM_ '\xFE'
 #define VM_ '\xFD'
 #define SM_ '\xFC'
-/*
+
 #define FM_ 'x'
 #define VM_ 'y'
 #define SM_ 'z'
@@ -61,19 +77,27 @@ void extract(char * instring, int inlength, int fieldno, int valueno, int subval
 
 	while (fieldn2<fieldno)
 	{
-		for (;start_pos<inlength && instring[start_pos] != FM_ ; start_pos++)
+		//ALN:NOTE - assume that string is valid UTF and FM_UTF8_1 can not be last char in the string
+		for (;
+				start_pos<inlength &&
+				instring[start_pos] != FM_UTF8_1 &&
+				instring[start_pos+1] != FM_UTF8_2 ;
+			start_pos++)
 		{};
 		/*past of of string?*/
 		if (start_pos>=inlength)
 			return;
-		start_pos++;
+		start_pos += 2;
 		fieldn2++;
 	}
 
 	/*find the end of the field (or one after the end of the string)*/
-	for (field_end_pos=start_pos;field_end_pos<inlength&&instring[field_end_pos]!=FM_;field_end_pos++)
+	for (field_end_pos=start_pos;
+			field_end_pos<inlength &&
+			instring[field_end_pos]!=FM_UTF8_1 &&
+			instring[field_end_pos+1] != FM_UTF8_2;
+		field_end_pos++)
 	{};
-
 
 	/*FIND VALUE*/
 
@@ -99,12 +123,16 @@ void extract(char * instring, int inlength, int fieldno, int valueno, int subval
 	valuen2=1;
 	while (valuen2<valueno)
 	{
-		for (start_pos=start_pos;start_pos<inlength&&instring[start_pos]!=VM_;start_pos++)
+		for (start_pos=start_pos;
+				start_pos<inlength &&
+				instring[start_pos]!=VM_UTF8_1 &&
+				instring[start_pos+1]!=VM_UTF8_2;
+			start_pos++)
 		{};
 		/*past end of string?*/
 		if (start_pos>=inlength)
 			return;
-		start_pos++;
+		start_pos+=2;
 		/*past end of field?*/
 		if (start_pos>field_end_pos)
 			return;
@@ -112,7 +140,11 @@ void extract(char * instring, int inlength, int fieldno, int valueno, int subval
 	}
 
 	/*find the end of the value (or string)*/
-	for (value_end_pos=start_pos;value_end_pos<field_end_pos&&instring[value_end_pos]!=VM_;value_end_pos++)
+	for (value_end_pos=start_pos;
+			value_end_pos<field_end_pos &&
+			instring[value_end_pos]!=VM_UTF8_1 &&
+			instring[value_end_pos+1]!=VM_UTF8_2;
+		value_end_pos++)
 	{}
 
 
@@ -134,7 +166,11 @@ void extract(char * instring, int inlength, int fieldno, int valueno, int subval
 	subvaluen2=1;
 	while (subvaluen2<subvalueno)
 	{
-		for (start_pos=start_pos;start_pos<field_end_pos&&instring[start_pos]!=SM_;start_pos++)
+		for (start_pos=start_pos;
+				start_pos<field_end_pos &&
+				instring[start_pos]!=SM_UTF8_1 &&
+				instring[start_pos+1]!=SM_UTF8_2;
+			start_pos++)
 		{};
 		/*past end of string?*/
 		if (start_pos>=inlength)
@@ -147,7 +183,11 @@ void extract(char * instring, int inlength, int fieldno, int valueno, int subval
 	}
 
 	/*find the end of the subvalue (or string)*/
-	for (subvalue_end_pos=start_pos;subvalue_end_pos<value_end_pos&&instring[subvalue_end_pos]!=SM_;subvalue_end_pos++)
+	for (subvalue_end_pos=start_pos;
+			subvalue_end_pos<value_end_pos &&
+			instring[subvalue_end_pos]!=SM_UTF8_1 &&
+			instring[subvalue_end_pos+1]!=SM_UTF8_2;
+		subvalue_end_pos++)
 	{};
 	if (subvalue_end_pos>=value_end_pos)
 	{
