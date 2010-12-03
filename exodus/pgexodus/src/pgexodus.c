@@ -222,13 +222,6 @@ bool callexodus(const char* serverid, const char* request, const int nrequestbyt
 
 void extract(char * instring, int inlength, int fieldno, int valueno, int subvalueno, int* outstart, int* outlength);
 
-#define FM_ '\xFE'
-#define VM_ '\xFD'
-#define SM_ '\xFC'
-//#define FM_ 'x'
-//#define VM_ 'y'
-//#define SM_ 'z'
-
 //#include <postgres.h>
 //#include <fmgr.h>
 //#include <utils/timestamp.h>

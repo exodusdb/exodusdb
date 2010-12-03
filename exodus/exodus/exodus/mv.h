@@ -149,46 +149,53 @@ typedef long long mvint_t;
 
 namespace exodus {
 
-//annoyingly FM as L'\xFE' doesnt work because prevents "AAA" FM "BBB"
-//const wchar_t FM=L'\xFE';
+//annoyingly FM as L'\u02FE' doesnt work because prevents "AAA" FM "BBB"
+//const wchar_t FM=L'\u02FE';
 
 //the var versions of the above (without leading or trailing _)
 //are defined AFTER the class declaration of "var"
 
-//these macros (with leading and trailing _) are wstring versions of the pick delimiters
-#define _IM_ L"\xFF"
-#define _RM_ L"\xFF"
-//#define _FM_ L"\376"
-//#define _FM_ L"\xFE"
-#define _FM_ L"\u02FE"
-#define _AM_ L"\xFE"
-//#define _VM_ L"\xFD"
-#define _VM_ L"\u02FD"
-//#define _SM_ L"\xFC"
-#define _SM_ L"\u02FC"
+//would be 256 if RM was character number 255. used in var::remove()
+#define LASTDELIMITERCHARNOPLUS1 0x0300
+
+//decided to use unicode characters 0x02F8-0x02FF instead of the classic 00F8-00FF which are latin accented characters
+//NB only unicode characters 0-07ff fit in 2 bytes in utf8. Therefore we dont use unicode PUA at E000-E8FF
+//the eight unicode characters 02F8-02FF are defined but rarely used and dont seem to be very important.
+//could also have used the undefined 05F8-05FF characters but risk important characters being defined there later
+
+//leading and trailing _ wchar* versions of classic pick delimiters
+//_RM_, _RM and RM_ versions (wchar*, char* and wchar respectively)
+#define _RM_ L"\u02FF"	//Record Mark
+#define _FM_ L"\u02FE"	//Field Mark
+#define _VM_ L"\u02FD"	//Value Mark
+#define _SM_ L"\u02FC"	//Subvalue Mark
+#define _TM_ L"\u02FB"	//Text Mark
+#define _STM_ L"\u02FA"	//Subtext Mark
+#define _SSTM_ L"\u02F9" //SubSubtext Mark
+
+//aliases for different implementations of multivalue
+#define _IM_ _RM_
+#define _AM_ _FM_
 #define _SVM_ _SM_
-//#define _SVM_ L"\xFC"
-#define _TM_ L"\xFB"
-#define _STM_ L"\xFA"
-#define _SSTM_ L"\xF9"
+
 #define _DQ_ L"\""
 #define _SQ_ L"\'"
 
-//these macros (with trailing _) are wchar versions of the pick delimiters
-#define IM_ L'\xFF'
-#define RM_ L'\xFF'
-//#define FM_ L'\xFE'
-#define FM_ L'\u02FE'
-#define AM_ L'\xFE'
-//#define VM_ L'\xFD'
-#define VM_ L'\u02FD'
-//#define SM_ L'\xFC'
-#define SM_ L'\u02FC'
-//#define SVM_ L'\xFC'
+//trailing _ wchar versions of classic pick delimiters
+//_RM_, _RM and RM_ versions (wchar*, char* and wchar respectively)
+#define RM_ L'\u02FF'	//Record Mark
+#define FM_ L'\u02FE'	//Field Mark
+#define VM_ L'\u02FD'	//Value Mark
+#define SM_ L'\u02FC'	//Subvalue Mark
+#define TM_ L'\u02FB'	//Text Mark
+#define STM_ L'\u02FA'	//Subtext Mark
+#define SSTM_ L'\u02F9' //SubSubtext Mark
+
+//aliases for different implementations of multivalue
+#define IM_ RM_
+#define AM_ FM_
 #define SVM_ SM_
-#define TM_ L'\xFB'
-#define STM_ L'\xFA'
-#define SSTM_ L'\xF9'
+
 #define DQ_ L'\"'
 #define SQ_ L'\''
 
@@ -1349,26 +1356,20 @@ private:
 */
 
 //must be after class declaration
-static const var IM = L"\xFF";
-static const var RM = L"\xFF";
-
-static const var AM = L"\xFE";
-
-//static const var FM = L"\xFE";
-//static const var VM = L"\xFD";
-//static const var SM = L"\xFC";
-//static const var SVM = L"\xFC";
 static const var FM = _FM_;
 static const var VM = _VM_;
 static const var SM = _SM_;
 static const var SVM = _SVM_;
+static const var TM = _TM_;
+static const var STM = _STM_;
+static const var SSTM = _SSTM_;
 
-static const var TM = L"\xFB";
-static const var STM = L"\xFA";
-static const var SSTM = L"\xF9";
+static const var IM = _IM_;
+static const var RM = _RM_;
+static const var AM = _AM_;
 
-static const var DQ = L"\"";
-static const var SQ = L"'";
+static const var DQ = _DQ_;
+static const var SQ = _SQ_;
 
 #if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
 const var SLASH = L"\\";

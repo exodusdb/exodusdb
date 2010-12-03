@@ -1017,9 +1017,8 @@ var& var::lowerer()
 	THISIS(L"var& var::lowerer()")
 	THISISSTRING()
 
-	//converter(L"\xFF\xFE\xFD\xFC\xFB\xFA",L"\xFE\xFD\xFC\xFB\xFA\xF9");
 	converter(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_,
-		_FM_ _VM_ _SM_ _TM_ _STM_ _SSTM_);
+			  _FM_ _VM_ _SM_ _TM_ _STM_ _SSTM_);
 
 	return *this;
 }
@@ -1037,9 +1036,8 @@ var& var::raiser()
 	THISIS(L"var& var::raiser()")
 	THISISSTRING()
 
-		//converter(L"\xFE\xFD\xFC\xFB\xFA\xF9",L"\xFF\xFE\xFD\xFC\xFB\xFA");
 	converter(_FM_ _VM_ _SM_ _TM_ _STM_ _SSTM_,
-		_RM_ _FM_ _VM_ _SM_ _TM_ _STM_);
+			  _RM_ _FM_ _VM_ _SM_ _TM_ _STM_);
 
 	return *this;
 }
