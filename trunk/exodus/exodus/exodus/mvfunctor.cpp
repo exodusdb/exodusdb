@@ -61,15 +61,28 @@ namespace exodus {
 
 //using namespace exodus;
 
-/*
-//default constructor
+//default constructor.  probably followed by .init(libname,funcname,mv)
 ExodusFunctorBase::ExodusFunctorBase()
-	: plibrary_(NULL),
-	pfunction_(NULL)
-{}
-*/
+//TODO optimise by only initialise one and detect usage on that only
+: mv_(NULL)
+, plibrary_(NULL)
+, pfunction_(NULL)
+, pobject_(NULL)
+, pmemberfunction_(NULL)
+{pobject_=0;};
 
-//constructor to provide environment immediately
+//constructor to provide library name and function immediately
+ExodusFunctorBase::ExodusFunctorBase(const std::string libname, const std::string funcname)
+: mv_(NULL)
+, libraryname_(libname)
+, plibrary_(NULL)
+, functionname_(funcname)
+, pfunction_(NULL)
+, pobject_(NULL)
+, pmemberfunction_(NULL)
+{pobject_=0;}
+
+//constructor to provide environment immediately. probably followed by .init(libname,funcname)
 ExodusFunctorBase::ExodusFunctorBase(MvEnvironment& mv)
 : mv_(&mv)
 , libraryname_("")
@@ -78,8 +91,40 @@ ExodusFunctorBase::ExodusFunctorBase(MvEnvironment& mv)
 , pfunction_(NULL)
 , pobject_(NULL)
 , pmemberfunction_(NULL)
-{}
+{pobject_=0;}
 
+
+//destructor
+ExodusFunctorBase::~ExodusFunctorBase()
+{
+	closelib();
+}
+
+bool ExodusFunctorBase::init(const char* libraryname, const char* functionname, MvEnvironment& mv)
+{
+	libraryname_=libraryname;
+	functionname_=functionname;
+	mv_=&mv;
+	checkload();
+
+	//call a function in the library to create one of its "exodus program" objects
+	//nb we MUST call the same library to delete it
+	//so that the same memory management routine is called to create and delete it.
+	//pfunction_ return a pobject_ if pobject_ is passed in NULL (using mv as an init argument)
+	// or deletes a pobject_ if not
+
+	//generate an error here to debug
+//	pobject_->main();
+
+	pfunction_(pobject_,*mv_,pmemberfunction_);
+	//pobject_->main();
+	//((*pobject_).*(pmemberfunction_))();
+	//CALLMEMBERFUNCTION(*pobject_,pmemberfunctibon_)();
+	if (pobject_==NULL||pmemberfunction_==NULL)
+		return false;
+
+	return true;
+}
 
 //this version was written to be called from mvipc in response to calculated dictionary callback
 //this version only opens lib if it has changed (after closing the old lib, if any, of course)
@@ -132,79 +177,6 @@ bool ExodusFunctorBase::init(const char* libraryname, const char* functionname)
 	//CALLMEMBERFUNCTION(*pobject_,pmemberfunctibon_)();
 */
 	return true;
-}
-
-void ExodusFunctorBase::calldict()
-{
-	//dictionaries are libraries of subroutines (ie return void) that 
-	//have one argument "MvEnvironment". They set their response in ANS.
-	typedef void (*ExodusDynamic)(MvEnvironment& mv);
-
-	//call the function via its pointer
-	((ExodusDynamic) pfunction_)(*mv_);
-	return;
-}
-
-bool ExodusFunctorBase::init(const char* libraryname, const char* functionname, MvEnvironment& mv)
-{
-	libraryname_=libraryname;
-	functionname_=functionname;
-	mv_=&mv;
-	checkload();
-
-	//call a function in the library to create one of its "exodus program" objects
-	//nb we MUST call the same library to delete it
-	//so that the same memory management routine is called to create and delete it.
-	//pfunction_ return a pobject_ if pobject_ is passed in NULL (using mv as an init argument)
-	// or deletes a pobject_ if not
-
-	//generate an error here to debug
-//	pobject_->main();
-
-	pfunction_(pobject_,*mv_,pmemberfunction_);
-	//pobject_->main();
-	//((*pobject_).*(pmemberfunction_))();
-	//CALLMEMBERFUNCTION(*pobject_,pmemberfunctibon_)();
-	if (pobject_==NULL||pmemberfunction_==NULL)
-		return false;
-
-	return true;
-}
-
-ExodusFunctorBase::ExodusFunctorBase()
-//TODO optimise by only initialise one and detect usage on that only
-: mv_(NULL)
-, plibrary_(NULL)
-, pfunction_(NULL)
-, pobject_(NULL)
-, pmemberfunction_(NULL)
-{};
-
-ExodusFunctorBase::ExodusFunctorBase(const std::string libname, const std::string funcname)
-: mv_(NULL)
-, libraryname_(libname)
-, plibrary_(NULL)
-, functionname_(funcname)
-, pfunction_(NULL)
-, pobject_(NULL)
-, pmemberfunction_(NULL)
-{}
-
-void ExodusFunctorBase::closelib()
-{
-	//the *library* function must be called to delete the object that it created
-	//(cant delete the object in the main process since it might have a different memory allocator)
-	if (pobject_!=NULL)
-		pfunction_(pobject_,*mv_,pmemberfunction_);
-
-	//close the connection
-	if (plibrary_!=NULL)
-		dlclose((library_t) plibrary_);
-}
-
-ExodusFunctorBase::~ExodusFunctorBase()
-{
-	closelib();
 }
 
 bool ExodusFunctorBase::checkload()
@@ -303,6 +275,29 @@ bool ExodusFunctorBase::openfunc()
 
 	return true;
 
+}
+
+void ExodusFunctorBase::calldict()
+{
+	//dictionaries are libraries of subroutines (ie return void) that 
+	//have one argument "MvEnvironment". They set their response in ANS.
+	typedef void (*ExodusDynamic)(MvEnvironment& mv);
+
+	//call the function via its pointer
+	((ExodusDynamic) pfunction_)(*mv_);
+	return;
+}
+
+void ExodusFunctorBase::closelib()
+{
+	//the *library* function must be called to delete the object that it created
+	//(cant delete the object in the main process since it might have a different memory allocator)
+	if (pobject_!=NULL)
+		pfunction_(pobject_,*mv_,pmemberfunction_);
+
+	//close the connection
+	if (plibrary_!=NULL)
+		dlclose((library_t) plibrary_);
 }
 
 }//namespace exodus

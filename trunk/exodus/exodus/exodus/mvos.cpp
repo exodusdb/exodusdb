@@ -556,7 +556,7 @@ bool var::match(const var& matchstr, const var& options) const
 	if (options.index(L"w"))
 	{
 		if (matchstr==L""||var_mvstr==matchstr||matchstr==L"*.*"){}
-		else if (matchstr.substr(1,1)==L"*"&&substr(-matchstr.length()+1)==matchstr.substr(2)){}
+		else if (matchstr[1]==L"*"&&substr(-matchstr.length()+1)==matchstr.substr(2)){}
 		else if (matchstr.substr(-1,1)==L"*"&&substr(1,matchstr.length()-1)==matchstr.substr(1,matchstr.length()-1)){}
 		else return false;
 		return true;

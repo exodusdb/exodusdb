@@ -75,7 +75,7 @@ function input_adminconn(in oldconn, out serverconn)
                 }
 
                 getinput("Cannot connect. Try Again? ",yesno);
-                if (yesno.ucase().substr(1,1) ne "Y")
+                if (yesno.ucase()[1] ne "Y")
                         return false;//stop("Cancelled.");
 
         } while (true);
@@ -253,7 +253,7 @@ program()
 		while (true) {
 
 			getinput("Save user configuration in .exodus",saveconfig);
-			if (not saveconfig.substr(1,1).ucase().index("Y"))
+			if (not saveconfig[1].ucase().index("Y"))
 				break;
 
 			var("Saving user configuration in .exodus").oconv("L#40").output();

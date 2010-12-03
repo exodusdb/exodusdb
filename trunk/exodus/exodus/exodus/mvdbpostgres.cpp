@@ -394,9 +394,6 @@ bool var::connect(const var& conninfo, var & connectionhandle)
 	//this turns off the notice when creating tables with a primary key
 	//DEBUG5, DEBUG4, DEBUG3, DEBUG2, DEBUG1, LOG, NOTICE, WARNING, ERROR, FATAL, and PANIC
 
-//	var sql=L"SET client_min_messages = ";
-//	sql^=DBTRACE? L"LOG" : L"WARNING";
-//	sql.sqlexec(( int) this->var_mvint);
 	sqlexec( DBTRACE ? L"SET client_min_messages = LOG" : L"SET client_min_messages = WARNING");
 	return true;
 }
@@ -419,66 +416,7 @@ bool var::connect(const var& conninfo)
 
 	var_mvtyp=pimpl::MVTYPE_UNA;
 
-	//find connection details
-#ifdef NOT_SUBSTITUTED_BY_SEPARATE_FUNCTION
-	var conninfo2=conninfo;
-
-	//if no conninfo details provided then use last connection details if any
-	if (!conninfo && tss_pgconnparams.get())
-		conninfo2==*tss_pgconnparams.get();
-	
-	//otherwise search for details from exodus config file
-	//if incomplete connection parameters provided
-	if (not conninfo2.index(L"host=") or 
-		not conninfo2.index(L"port=") or
-		not conninfo2.index(L"dbname=") or
-		not conninfo2.index(L"user=") or
-		not conninfo2.index(L"password=")
-		)
-	{
-
-		//discover any configuration file parameters
-		//TODO parse config properly instead of just changing \n\r to spaces!
-		var configfilename=L"";
-		var home=L"";
-		if (home.osgetenv(L"HOME"))
-			configfilename=home^SLASH^L".exodus";
-		else if (home.osgetenv(L"USERPROFILE"))
-			configfilename^=home^SLASH^L".exodus";
-		var configconn=L"";
-		if (!configconn.osread(configfilename))
-			configconn.osread(".exodus");
-
-		//discover any configuration in the environment
-		var envconn=L"";
-		var temp;
-		if (temp.osgetenv(L"EXODUS_CONNECTION"))
-			envconn^=L" "^temp;
-
-		//specific variable are appended ie override
-		if (temp.osgetenv(L"EXODUS_HOST"))
-			envconn^=L" host="^temp;
-
-		if (temp.osgetenv(L"EXODUS_PORT"))
-			envconn^=L" port="^temp;
-
-		if (temp.osgetenv(L"EXODUS_USER"))
-			envconn^=L" user="^temp;
-
-		if (temp.osgetenv(L"EXODUS_DBNAME"))
-			envconn^=L" dbname="^temp;
-
-		if (temp.osgetenv(L"EXODUS_PASSWORD"))
-			envconn^=L" password="^temp;
-
-		if (temp.osgetenv(L"EXODUS_TIMEOUT"))
-			envconn^=L" connect_timeout="^temp;
-
-		conninfo2=defaultconninfo^L" "^configconn^L" "^envconn^L" "^conninfo2;
-	}
-#else
 	var conninfo2 = build_conn_info( conninfo);
-#endif	// NOT_SUBSTITUTED_BY_SEPARATE_FUNCTION
  
 	//disconnect any previous connection
 	if (tss_pgconns.get())
@@ -563,25 +501,30 @@ bool var::connect(const var& conninfo)
 	//but this does
 	//this turns off the notice when creating tables with a primary key
 	//DEBUG5, DEBUG4, DEBUG3, DEBUG2, DEBUG1, LOG, NOTICE, WARNING, ERROR, FATAL, and PANIC
-//	var sql=L"SET client_min_messages = ";
-//	sql^=DBTRACE? L"LOG" : L"WARNING";
-//	sql.sqlexec();
 
-	sqlexec( DBTRACE ? L"SET client_min_messages = LOG" : L"SET client_min_messages = WARNING");
+	sqlexec( DBTRACE ? L"SET client_min_messages = LOG"
+					: L"SET client_min_messages = WARNING");
 	return true;
 
 }
 
+//utility to get handle-specific connection otherwise default thread connection
 void * var::connectionx() const
 {
 	PGconn * thread_pgconn;
+
+	//handle-specific connection
 	if( this->var_mvtyp == pimpl::MVTYPE_SQLOPENED)
 		thread_pgconn = mv_connections_cache.get_connection(( int) this->var_mvint);
+
+	//default thread connection
 	else
 		thread_pgconn=(PGconn*) connection();
+
 	return (void *)thread_pgconn;
 }
 
+//return the thread-default connection (do a default connect if necessary)
 //use void pointer to avoid need for including postgres headers in mv.h or any fancy class hierarchy
 //(assumes accurate programming by system programmers in exodus mvdb routines)
 void* var::connection() const
@@ -613,15 +556,16 @@ void* var::connection() const
 	return (void*) thread_pgconn;
 }
 
+//disconnect thread-default connection
 bool var::disconnect()
 {
 	THISIS(L"bool var::disconnect()")
 
 	THISISDEFINED()
 
-#if TRACING >= 3
+#	if TRACING >= 3
 		exodus::errputl(L"ERROR: mvdbpostgres disconnect() Closing connection");
-#endif
+#	endif
 
 	PGconn* thread_pgconn=tss_pgconns.get();
 
@@ -640,21 +584,26 @@ bool var::disconnect()
 	return true;
 }
 
-bool var::disconnect( const var & connectionhandle)				// alternative disconnect, to close multiconnection
+//handle-specific connection disconnect
+bool var::disconnect( const var & connectionhandle)
 {
-	THISIS(L"bool var::disconnect()")
+	THISIS(L"bool var::disconnect( const var & connectionhandle)")
 	THISISDEFINED()
 	ISNUMERIC(connectionhandle)
 
-#if TRACING >= 3
+#	if TRACING >= 3
 		exodus::errputl(L"ERROR: mvdbpostgres disconnect() Closing connection");
-#endif
+#	endif
+
 	mv_connections_cache.del_connection( connectionhandle.toInt());
+
 	//make unassigned()
 	connectionhandle.var_mvtyp=pimpl::MVTYPE_UNA;
+
 	return true;
 }
 
+#if 0 //done with connection buffering below
 bool var::open(const var& filename)
 {
 	THISIS(L"bool var::open(const var& dictcode,const var& filename)")
@@ -682,6 +631,7 @@ bool var::open(const var& filename)
     PGconn* thread_pgconn=(PGconn*) connection();
 	if (!thread_pgconn)
 		return false;
+
 	DEBUG_LOG_SQL1
 	PGresult* result = PQexecParams(thread_pgconn,
     					//TODO: parameterise filename
@@ -696,9 +646,9 @@ bool var::open(const var& filename)
 	int resultstatus=PQresultStatus(result);
     if (resultstatus != PGRES_TUPLES_OK)
     {
-#if TRACING >= 1
-		exodus::errputl(L"ERROR: mvdbpostgres open(" ^ filename.quote() ^ L") failed\n" ^ var(PQerrorMessage(thread_pgconn)));
-#endif
+#		if TRACING >= 1
+			exodus::errputl(L"ERROR: mvdbpostgres open(" ^ filename.quote() ^ L") failed\n" ^ var(PQerrorMessage(thread_pgconn)));
+#		endif
 		PQclear(result);
         return false;
     }
@@ -713,9 +663,9 @@ bool var::open(const var& filename)
 	if (PQntuples(result) > 1)
  	{
 		PQclear(result);
-#if TRACING >= 1
-		exodus::errputl(L"ERROR: mvdbpostgres open() SELECT returned more than one record");
-#endif
+#		if TRACING >= 1
+			exodus::errputl(L"ERROR: mvdbpostgres open() SELECT returned more than one record");
+#		endif
 		return false;
 	}
 
@@ -731,14 +681,22 @@ bool var::open(const var& filename)
 	return true;
 
 }
+#endif
 
-bool var::open()		// open current filename var in latest multiconnection
+//open filehandle given a filename on current thread-default connection
+//we are using strict filename/filehandle syntax (even though we could use one variable for both!)
+//we store the filename in the filehandle since that is what we need to generate read/write sql later
+//usage example:
+// var file;
+// var filename="customers";
+// if (not file.open(filename)) ...
+
+bool var::open(const var& filename)
 {
-	THISIS(L"bool var::open() - for last multiconnection")
+	THISIS(L"bool var::open(const var& filename)")
 	THISISDEFINED()
-	THISISSTRING()
+	ISSTRING(filename)
 
-    //dumb version of read to see if file exists
     //should perhaps prepare pg parameters for repeated speed
 
     const char* paramValues[1];
@@ -746,21 +704,23 @@ bool var::open()		// open current filename var in latest multiconnection
     int         paramFormats[1];
 //    uint32_t    binaryIntVal;
 
-    /* Here is our out-of-line parameter value */
-	std::string filename2=this->lcase().tostring();
-    paramValues[0] = filename2.c_str();
-    paramLengths[0] = int(filename2.length());
-    paramFormats[0] = 1;//binary
+	/* Here is our out-of-line parameter value */
+	std::string filename2=filename.lcase().tostring();
+	paramValues[0] = filename2.c_str();
+	paramLengths[0] = int(filename2.length());
+	paramFormats[0] = 1;//binary
 
 	//avoid any errors because ANY errors while a transaction is in progress cause failure of the whole transaction
 	//and remember that a select initiates a transaction committed on readnext eof or clearselect
 	var sql=L"SELECT table_name FROM information_schema.tables WHERE table_schema='public' and table_name=$1";
 
+	//get current connection or return false
 //    PGconn* thread_pgconn=(PGconn*) connection();
 	int connection_id = mv_connections_cache.get_current_id();
 	PGconn * thread_pgconn = (PGconn*) mv_connections_cache.get_connection( connection_id);
 	if (!thread_pgconn)
 		return false;
+
 	DEBUG_LOG_SQL1
 	PGresult* result = PQexecParams(thread_pgconn,
     					//TODO: parameterise filename
@@ -775,9 +735,9 @@ bool var::open()		// open current filename var in latest multiconnection
 	int resultstatus=PQresultStatus(result);
     if (resultstatus != PGRES_TUPLES_OK)
     {
-#if TRACING >= 1
-		exodus::errputl(L"ERROR: mvdbpostgres open(" ^ this->quote() ^ L") failed\n" ^ var(PQerrorMessage(thread_pgconn)));
-#endif
+#		if TRACING >= 1
+			exodus::errputl(L"ERROR: mvdbpostgres open(" ^ this->quote() ^ L") failed\n" ^ var(PQerrorMessage(thread_pgconn)));
+#		endif
 		PQclear(result);
         return false;
     }
@@ -792,16 +752,19 @@ bool var::open()		// open current filename var in latest multiconnection
 	if (PQntuples(result) > 1)
  	{
 		PQclear(result);
-#if TRACING >= 1
-		exodus::errputl(L"ERROR: mvdbpostgres open() SELECT returned more than one record");
-#endif
+#		if TRACING >= 1
+			exodus::errputl(L"ERROR: mvdbpostgres open() SELECT returned more than one record");
+#		endif
 		return false;
 	}
 
 	PQclear(result);
 
+	//save the filename and memorise the current connection for this file var
+	var_mvstr=filename.var_mvstr;
 	var_mvint = connection_id;
-	var_mvtyp = pimpl::MVTYPE_SQLOPENED;
+	var_mvtyp = pimpl::MVTYPE_SQLOPENED & pimpl::MVTYPE_STR;
+
 	return true;
 }
 
@@ -820,6 +783,7 @@ bool var::readv(const var& filehandle, const var& key, const int fieldno)
 
 	if (!read(filehandle,key))
 		return false;
+
 	var_mvstr=extract(fieldno).var_mvstr;
 	return true;
 }
@@ -844,25 +808,28 @@ bool var::read(const var& filehandle,const var& key)
 
 	var sql=L"SELECT data FROM " PGDATAFILEPREFIX ^ filehandle ^ L" WHERE key = $1";
 
-//    PGconn* thread_pgconn=(PGconn*) connection();
+	//get filehandle specific connection or fail
     PGconn* thread_pgconn = (PGconn*) filehandle.connectionx();
 	if (!thread_pgconn)
 		return false;
+
 	DEBUG_LOG_SQL1
 	PGresult* result = PQexecParams(thread_pgconn,
-    					//TODO: parameterise filename
-                       sql.tostring().c_str(),
-                       1,       /* one param */
-                       NULL,    /* let the backend deduce param type */
-                       paramValues,
-					   paramLengths,
-					   paramFormats,
-                       1);      /* ask for binary results */
+		//TODO: parameterise filename
+		sql.tostring().c_str(),
+		1,       /* one param */
+		NULL,    /* let the backend deduce param type */
+		paramValues,
+		paramLengths,
+		paramFormats,
+		1);      /* ask for binary results */
 
 	if (PQresultStatus(result) != PGRES_TUPLES_OK)
  	{
 		PQclear(result);
-		throw MVException(L"read(" ^ filehandle ^ L", " ^ key ^ L") - probably file not opened or doesnt exist\n" ^ var(PQerrorMessage(thread_pgconn)));
+		throw MVException(L"read(" ^ filehandle ^ L", " ^ key
+			^ L") - probably file not opened or doesnt exist\n"
+			^ var(PQerrorMessage(thread_pgconn)));
 		return false;
 	}
 
@@ -875,9 +842,9 @@ bool var::read(const var& filehandle,const var& key)
 	if (PQntuples(result) > 1)
  	{
 		PQclear(result);
-#if TRACING >= 1
-		exodus::errputl(L"ERROR: mvdbpostgres read() SELECT returned more than one record");
-#endif
+#		if TRACING >= 1
+			exodus::errputl(L"ERROR: mvdbpostgres read() SELECT returned more than one record");
+#		endif
 		return false;
 	}
 
@@ -925,12 +892,12 @@ bool var::lock(const var& key) const
 			//TODO indicate in some global variable "OWN LOCK"
 			return false;
 		//register that it is locked
-#ifdef USE_MAP_FOR_UNORDERED
-		std::pair<const uint64_t,int> lock(hash64,0);
-		(*locktable).insert(lock);
-#else
-		(*locktable).insert(hash64);
-#endif
+#		ifdef USE_MAP_FOR_UNORDERED
+			std::pair<const uint64_t,int> lock(hash64,0);
+			(*locktable).insert(lock);
+#		else
+			(*locktable).insert(hash64);
+#		endif
 	}
 
 	paramValues[0]=(char*)&hash64;
@@ -939,9 +906,11 @@ bool var::lock(const var& key) const
 
 	const char* sql="SELECT PG_TRY_ADVISORY_LOCK($1)";
 
-    PGconn* thread_pgconn=(PGconn*) connection();
+	//"this" is a filehandle - get its connection
+    PGconn* thread_pgconn=(PGconn*) this->connectionx();
 	if (!thread_pgconn)
 		return false;
+
 	DEBUG_LOG_SQL1
 	PGresult* result = PQexecParams(thread_pgconn,
     					//TODO: parameterise filename
@@ -1008,9 +977,11 @@ void var::unlock(const var& key) const
 
 	const char* sql="SELECT PG_ADVISORY_UNLOCK($1)";
 
-    PGconn* thread_pgconn=(PGconn*) connection();
+	//"this" is a filehandle - get its connection
+    PGconn* thread_pgconn=(PGconn*) this->connectionx();
 	if (!thread_pgconn)
 		return;
+
 	DEBUG_LOG_SQL1
 	PGresult* result = PQexecParams(thread_pgconn,
     					//TODO: parameterise filename
@@ -1051,20 +1022,9 @@ void var::unlockall() const
 		//register that it is locked
 		(*locktable).clear();
 	}
-//	var sql=L"SELECT PG_ADVISORY_UNLOCK_ALL()";
-//	sql.sqlexec();
+
 	sqlexec(L"SELECT PG_ADVISORY_UNLOCK_ALL()");
 }
-
-//returns success or failure but no data
-//bool var::sqlexec_( int connection_id) const
-//{
-//	var errmsg;
-//	bool result=sqlexec(errmsg, connection_id);
-//	if (not result && DBTRACE)
-//		errmsg.outputl();
-//	return result;
-//}
 
 //returns success or failure but no data
 bool var::sqlexec(var& errmsg, int connection_id) const
@@ -1079,26 +1039,8 @@ bool var::sqlexec(var& errmsg, int connection_id) const
 	}
 	else
 	{
+		//TODO ... why isnt this using connectionx?
 		thread_pgconn=(PGconn *) connection();
-#if 0
-		//check/establish connection
-		if (!connection())
-		{
-			errmsg=L"Error: sqlexec failed to connect to database";
-			return false;
-		}
-
-		/* dont use pqexec here since it cannot execute multiple commands
-		PGresultptr result;
-		if (!pqexec(*this,result)) {
-			PGconn* thread_pgconn=(PGconn*) connection();
-			errormsg=var(PQerrorMessage(thread_pgconn));
-			return false;
-		}
-		PQclear(result);
-		return true;
-		*/
-#endif
 	}
 	if (!thread_pgconn)
 	{
@@ -1122,6 +1064,7 @@ bool var::sqlexec(var& errmsg, int connection_id) const
 		errmsg=var(PQerrorMessage(thread_pgconn));
 		return false;
 	}
+
 	int pgresultstatus=PQresultStatus(pgresult);
 	if (pgresultstatus != PGRES_COMMAND_OK)
     {
@@ -1130,12 +1073,15 @@ bool var::sqlexec(var& errmsg, int connection_id) const
 		PQclear(pgresult);
         return false;
     }
+
 	errmsg=var(PQntuples(pgresult));
 	PQclear(pgresult);
 	return true;
 
 }
 
+//writev writes a specific field number in a record
+//(why it is "writev" instead of "writef" isnt known!
 bool var::writev(const var& filehandle,const var& key,const int fieldno) const
 {
 	if (fieldno<=0)
@@ -1162,101 +1108,8 @@ bool var::writev(const var& filehandle,const var& key,const int fieldno) const
 
 }
 
-/* prepared statement version doesnt seem to make much difference approx -10% - possibly because two field file is so simple
-bool var::write(const var& filehandle,const var& key) const
-{
-
-	if (!var_mvtyp) throw MVUnassigned(L"write()");
-	if (!filehandle.var_mvtyp) throw MVUnassigned(L"write(filehandle)");
-	if (!key.var_mvtyp) throw MVUnassigned(L"write(key)");
-
-	if (key==0)
-	{
-
-//	PGresult *PQprepare(PGconn *thread_pgconn,
-//		const wchar_t *stmtName,
-//		const wchar_t *query,
-//		int nParams,
-//		const Oid *paramTypes);
-
-	Oid paramTypes[3];
-	paramTypes[0]=BYTEAOID;
-	paramTypes[1]=TEXTOID;
-	paramTypes[2]=TEXTOID;
-
-	PGresult* res1;
-	res1 = PQprepare(thread_pgconn,
-						"PREPAREDINSERT",
-						"INSERT INTO TEST (key, data) values($2, $3)",
-						3,
-						paramTypes);
-
-	if (PQresultStatus(res1) != PGRES_COMMAND_OK)
-    {
-        cerr<<L"var::write() failed: Prepare: "<<PQerrorMessage(thread_pgconn)<<endl;
-        PQclear(res1);
-        return false;
-	}
-
-	}
-
-    // Here is our out-of-line parameter value
-    const char* paramValues[3];
-    int         paramLengths[3];
-    int         paramFormats[3];
-
-	std::string=filehandle2 filehandle.tostring();
-	std::string=key2 key.tostring();
-	std::string=data2 data.tostring();
-
-	paramValues[0] = filehandle2.data();//filename
-    paramValues[1] = key2.data();//key
-    paramValues[2] = data2.data();//data
-
-    paramLengths[0] = filehandle2.length();//filename
-    paramLengths[1] = key2.length();//key
-    paramLengths[2] = data2.length();//data
-
-    paramFormats[0] = 1;//binary
-    paramFormats[1] = 1;//binary
-    paramFormats[2] = 1;//binary
-
-//	PGresult *PQexecPrepared(PGconn *thread_pgconn,
-//                         const wchar_t *stmtName,
-//                         int nParams,
-//                         const wchar_t * const *paramValues,
-//                         const int *paramLengths,
-//                         const int *paramFormats,
-//                         int resultFormat);
-	PGresult* result;
-	result = PQexecPrepared(thread_pgconn,
-						"PREPAREDINSERT",
-						3,
-						paramValues,
-						paramLengths,
-						paramFormats,
-						1);      // ask for binary results
-
-//    if (PQntuples(result) != 1)
-	if (PQresultStatus(result) != PGRES_COMMAND_OK)
-    {
-        cerr<<L"var::write() failed: "<<PQntuples(result)<<L" "<<PQerrorMessage(thread_pgconn)<<endl;
-        PQclear(result);
-        return false;
-    }
-
-//    if (PQntuples(result) != 1)
-//    {
-//        cerr<<L"var::write() failed: "<<PQntuples(result)<<L" rows returned"<<endl;
-//        PQclear(result);
-//        return false;
-//    }
-
-    PQclear(result);
-
-	return true;
-
-}
+/* "prepared statement" version doesnt seem to make much difference approx -10% - possibly because two field file is so simple
+bool var::write(const var& filehandle,const var& key) const {}
 */
 
 //there is no "update if present or insert if not" command in postgres
@@ -1267,8 +1120,6 @@ bool var::write(const var& filehandle, const var& key) const
 	THISISSTRING()
 	ISSTRING(filehandle)
 	ISSTRING(key)
-
-//	const wchar_t* mode=L"write()";
 
 	const char* paramValues[2];
 	int         paramLengths[2];
@@ -1367,8 +1218,6 @@ bool var::updaterecord(const var& filehandle,const var& key) const
 	ISSTRING(filehandle)
 	ISSTRING(key)
 
-//	const wchar_t* mode=L"updaterecord()";
-
     const char* paramValues[2];
     int         paramLengths[2];
     int         paramFormats[2];
@@ -1388,10 +1237,10 @@ bool var::updaterecord(const var& filehandle,const var& key) const
 
 	var sql = L"UPDATE " PGDATAFILEPREFIX ^ filehandle ^ L" SET data = $2 WHERE key = $1";
 
-//	PGconn* thread_pgconn=(PGconn*) connection();
 	PGconn* thread_pgconn=(PGconn*) filehandle.connectionx();
 	if (!thread_pgconn)
 		return false;
+
 	DEBUG_LOG_SQL1
     PGresult* result = PQexecParams(thread_pgconn,
 		//TODO: parameterise filename
@@ -1405,18 +1254,22 @@ bool var::updaterecord(const var& filehandle,const var& key) const
 	if (PQresultStatus(result) != PGRES_COMMAND_OK)
 	{
 		PQclear(result);
-#if TRACING >= 1
-		exodus::errputl(L"ERROR: mvdbpostgres update() Failed: " ^ var(PQntuples(result)) ^ L" " ^ var(PQerrorMessage(thread_pgconn)));
-#endif
+#		if TRACING >= 1
+			exodus::errputl(L"ERROR: mvdbpostgres update() Failed: "
+				^ var(PQntuples(result)) ^ L" "
+				^ var(PQerrorMessage(thread_pgconn)));
+#		endif
 		return false;
 	}
 
 	//if not updated 1 then fail
     if (strcmp(PQcmdTuples(result),"1") != 0)
     {
-#if TRACING >= 3
-		exodus::errputl(L"ERROR: mvdbpostgres update() Failed: " ^ var(PQntuples(result)) ^ L" " ^ var(PQerrorMessage(thread_pgconn)));
-#endif
+#		if TRACING >= 3
+			exodus::errputl(L"ERROR: mvdbpostgres update() Failed: "
+				^ var(PQntuples(result)) ^ L" "
+				^ var(PQerrorMessage(thread_pgconn)));
+#		endif
 		PQclear(result);
  		return false;
 	}
@@ -1434,8 +1287,6 @@ bool var::insertrecord(const var& filehandle,const var& key) const
 	THISISSTRING()
 	ISSTRING(filehandle)
 	ISSTRING(key)
-
-//	const wchar_t* mode=L"insertrecord()";
 
 	const char* paramValues[2];
     int         paramLengths[2];
@@ -1456,10 +1307,10 @@ bool var::insertrecord(const var& filehandle,const var& key) const
 
 	var sql = L"INSERT INTO " PGDATAFILEPREFIX ^ filehandle ^ L" (key,data) values( $1 , $2)";
 
-//	PGconn* thread_pgconn=(PGconn*) connection();
 	PGconn* thread_pgconn=(PGconn*) filehandle.connectionx();
 	if (!thread_pgconn)
 		return false;
+
 	DEBUG_LOG_SQL1
 	PGresult* result = PQexecParams(thread_pgconn,
 		//TODO: parameterise filename
@@ -1474,9 +1325,11 @@ bool var::insertrecord(const var& filehandle,const var& key) const
 	if (PQresultStatus(result) != PGRES_COMMAND_OK)
     {
         PQclear(result);
-#if TRACING >= 3
-		exodus::errputl(L"ERROR: mvdbpostgres insertrecord() Failed: " ^ var(PQntuples(result)) ^ L" " ^ var(PQerrorMessage(thread_pgconn)));
-#endif
+#		if TRACING >= 3
+			exodus::errputl(L"ERROR: mvdbpostgres insertrecord() Failed: "
+				^ var(PQntuples(result)) ^ L" "
+				^ var(PQerrorMessage(thread_pgconn)));
+#		endif
         return false;
     }
 
@@ -1506,17 +1359,15 @@ bool var::deleterecord(const var& key) const
 	std::string key2=key.tostring();
 
     paramValues[0] = key2.data();
-
     paramLengths[0] = int(key2.length());
-
     paramFormats[0] = 1;//binary
 
 	var sql=L"DELETE FROM " PGDATAFILEPREFIX ^ var_mvstr ^ L" WHERE KEY = $1";
 
-//	PGconn* thread_pgconn=(PGconn*) connection();
 	PGconn* thread_pgconn=(PGconn*) this->connectionx();
 	if (!thread_pgconn)
 		return false;
+
 	DEBUG_LOG_SQL1
     PGresult* result = PQexecParams(thread_pgconn,
 		sql.tostring().c_str(),
@@ -1529,9 +1380,11 @@ bool var::deleterecord(const var& key) const
 
 	if (PQresultStatus(result) != PGRES_COMMAND_OK)
     {
-#if TRACING >= 1
-		exodus::errputl(L"ERROR: mvdbpostgres deleterecord() Failed: " ^ var(PQntuples(result)) ^ L" " ^ var(PQerrorMessage(thread_pgconn)));
-#endif
+#		if TRACING >= 1
+			exodus::errputl(L"ERROR: mvdbpostgres deleterecord() Failed: "
+				^ var(PQntuples(result)) ^ L" "
+				^ var(PQerrorMessage(thread_pgconn)));
+#		endif
         PQclear(result);
         return false;
     }
@@ -1540,9 +1393,9 @@ bool var::deleterecord(const var& key) const
     if (strcmp(PQcmdTuples(result),"1") != 0)
     {
 		PQclear(result);
-#if TRACING >= 3
-		exodus::logputl(L"var::deleterecord failed. Record does not exist "^var_mvstr);
-#endif
+#		if TRACING >= 3
+			exodus::logputl(L"var::deleterecord failed. Record does not exist "^var_mvstr);
+#		endif
 		return false;
 	}
 
@@ -1557,12 +1410,10 @@ bool var::begintrans() const
 {
 	THISIS(L"bool var::begintrans() const")
 
-	// *this is not used
+	// *this is not used (well it is used in sqlexec to get a specific connection)
 	THISISDEFINED()
 
 	//begin a transaction
-//	var sql=L"BEGIN";
-//	return sql.sqlexec();
 	return sqlexec(L"BEGIN");
 }
 
@@ -1574,8 +1425,6 @@ bool var::rollbacktrans() const
 	THISISDEFINED()
 
 	// Rollback a transaction
-//	var sql=L"BEGIN";
-//	return sql.sqlexec();
 	return sqlexec(L"BEGIN");
 }
 
@@ -1587,8 +1436,6 @@ bool var::committrans() const
 	THISISDEFINED()
 
 	//end (commit) a transaction
-//	var sql=L"END";
-//	return sql.sqlexec();
 	return sqlexec(L"END");
 }
 
@@ -1616,6 +1463,7 @@ bool var::createdb(const var& dbname, var& errmsg) const
 	sql^=L" WITH ENCODING='UTF8' ";
 	//sql^=" OWNER=exodus";
 
+	//TODO this shouldnt only be for default connection
 	return sql.sqlexec(errmsg, 0);
 
 }
@@ -1630,6 +1478,7 @@ bool var::deletedb(const var& dbname, var& errmsg) const
 	//var sql = L"DROP DATABASE "^dbname.convert(L". ",L"__");
 	var sql = L"DROP DATABASE "^dbname;
 
+	//TODO this shouldnt only be for default connection
 	return sql.sqlexec(errmsg, 0);
 
 }
@@ -1651,11 +1500,7 @@ bool var::createfile(const var& filename, const var& options)
 	sql ^= L" TABLE " PGDATAFILEPREFIX ^ filename;
 	sql ^= L" (key bytea primary key, data bytea)";
 
-//	if( filename.var_mvtyp == pimpl::MVTYPE_SQLOPENED)
-//		return sql.sqlexec(( int) filename.var_mvint);
-//	else
-//		return sql.sqlexec();
-	return filename.sqlexec( sql);
+	return sqlexec( sql);
 }
 
 bool var::deletefile() const
@@ -1663,11 +1508,6 @@ bool var::deletefile() const
 	THISIS(L"bool var::deletefile() const")
 	THISISSTRING()
 
-//	var sql = L"DROP TABLE " PGDATAFILEPREFIX ^ *this;
-//	if( this->var_mvtyp == pimpl::MVTYPE_SQLOPENED)
-//		return sql.sqlexec(( int) this->var_mvint);
-//	else
-//		return sql.sqlexec();
 	return sqlexec( L"DROP TABLE " PGDATAFILEPREFIX ^ *this);
 }
 
@@ -1676,11 +1516,6 @@ bool var::clearfile() const
 	THISIS(L"bool var::clearfile() const")
 	THISISSTRING()
 
-//	var sql = L"DELETE FROM " PGDATAFILEPREFIX ^ *this;
-//	if( this->var_mvtyp == pimpl::MVTYPE_SQLOPENED)
-//		return sql.sqlexec(( int) this->var_mvint);
-//	else
-//		return sql.sqlexec();
 	return sqlexec( L"DELETE FROM " PGDATAFILEPREFIX ^ *this);
 }
 
@@ -1688,7 +1523,7 @@ inline void unquoter(var& string)
 {
         //remove "", '' and {}
         static var quotecharacters(L"\"'{");
-        if (quotecharacters.index(string.substr(1,1)))
+        if (quotecharacters.index(string[1]))
                 string=string.substr(2,string.length()-2);
 }
 
@@ -1696,7 +1531,7 @@ inline void tosqlstring(var& string1)
 {
     //convert to sql style strings
     //use single quotes and double up any internal single quotes
-    if (string1.substr(1,1)==L"\"")
+    if (string1[1]==L"\"")
     {
         string1.swapper(L"'",L"''");
         string1.splicer(1,1,L"'");
@@ -1775,7 +1610,7 @@ var getdictexpression(const var& mainfilename, const var& filename, const var& d
 
 		if (conversion.substr(1,9)==L"[DATETIME")
 			sqlexpression=L"exodus_extract_datetime(" ^ params;
-		else if (conversion.substr(1,1)==L"D" || conversion.substr(1,5)==L"[DATE")
+		else if (conversion[1]==L"D" || conversion.substr(1,5)==L"[DATE")
 			sqlexpression=L"exodus_extract_date(" ^ params;
 		else if (conversion.substr(1,2)==L"MT" || conversion.substr(1,5)==L"[TIME")
 			sqlexpression=L"exodus_extract_time(" ^  params;
@@ -1835,7 +1670,7 @@ var getdictexpression(const var& mainfilename, const var& filename, const var& d
 					fromdictexpression ^= var(L", 0").str(3-fromdictexpression.count(',')) ^ L")";
 				}
 //TODO				if (xlatefromfieldname.substr(1,8)==L"FIELD(@ID)
-				else if (xlatefromfieldname.substr(1,1)==L"{")
+				else if (xlatefromfieldname[1]==L"{")
 				{
 					xlatefromfieldname=xlatefromfieldname.substr(2).splicer(-1,1,L"");
 					fromdictexpression=getdictexpression(filename, filename, dictfilename, dictfile, xlatefromfieldname, joins);
@@ -1889,7 +1724,7 @@ var getword(var& remainingwords)
 	remainingwords=remainingwords.field(L" ",2,99999);
 
 	//join quoted words together
-	var char1=word1.substr(1,1);
+	var char1=word1[1];
 	if ((char1==DQ||char1==SQ))
 	{
 		while (word1.substr(-1,1)!=char1)
@@ -1910,7 +1745,7 @@ var getword(var& remainingwords)
     tosqlstring(word1);
 
     //grab multiple values (numbers or strings) separated by FM
-	if (valuechars.index(word1.substr(1,1)))
+	if (valuechars.index(word1[1]))
 	{
 		word1 = SQ ^ word1.unquote() ^ SQ;
 
@@ -1922,14 +1757,14 @@ var getword(var& remainingwords)
 		if (nextword==L"AND")
 		{
 			var nextword2=remainingwords;
-			if (valuechars.index(nextword2.substr(1,1)))
+			if (valuechars.index(nextword2[1]))
 			{
 				nextword=nextword2;
 				remainingwords=remainingwords.field(L" ",2,99999);
 			}
 		}
 
-		while (nextword && valuechars.index(nextword.substr(1,1)))
+		while (nextword && valuechars.index(nextword[1]))
 		{
 			tosqlstring(nextword);
 			if (word1!=L"")
@@ -1945,7 +1780,7 @@ var getword(var& remainingwords)
 			if (nextword==L"AND")
 			{
 				var nextword2=remainingwords;
-				if (valuechars.index(nextword2.substr(1,1)))
+				if (valuechars.index(nextword2[1]))
 				{
 					nextword=nextword2;
 					remainingwords=remainingwords.field(L" ",2,99999);
@@ -2062,7 +1897,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
         var word1=getword(remainingsortselectclause);
 
         //initial numbers or strings mean record keys
-        if (word1.substr(1,1).index(L"\"'0123456789."))
+        if (word1[1].index(L"\"'0123456789."))
         {
             if (keycodes)
                 keycodes ^= FM;
@@ -2160,7 +1995,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 			else
 			{
 				//if value follows dictionary id without a relational operator then insert =
-				if (word2.substr(1,1)==L"'")
+				if (word2[1]==L"'")
 					whereclause ^= L" = ";
 			}
 
@@ -2192,7 +2027,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 
 			//TODO how to get sql to understand '' and 0 as nothing without resorting to numerics
 			//WITH X becomes WITH X <> ''
-			if (!word2.length() && !var(L".0123456789'\"").index(word2.substr(1,1)))
+			if (!word2.length() && !var(L".0123456789'\"").index(word2[1]))
 			{
 				//put the current word back on the pending
 				if (word.length())
@@ -2289,7 +2124,6 @@ void var::clearselect() const
     if (var_mvtyp)
 		sql ^= *this;
 
-//	if (!sql.sqlexec())
 	if ( ! sqlexec( sql))
 		return;
 
@@ -2485,7 +2319,6 @@ bool var::createindex(const var& fieldname, const var& dictfile) const
 	sql^=dictexpression;
 	sql^=L")";
 
-//	return sql.sqlexec();
 	return this->sqlexec( sql);
 }
 
@@ -2498,7 +2331,6 @@ bool var::deleteindex(const var& fieldname) const
 	//var filename=*this;
 	var sql=L"drop index index__" ^ *this ^ L"__" ^ fieldname;
 
-//	return sql.sqlexec();
 	return this->sqlexec( sql);
 }
 

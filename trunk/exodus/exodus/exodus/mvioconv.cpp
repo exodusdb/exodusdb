@@ -512,7 +512,7 @@ convert:
 			break;
 
 		case L'-':
-			if (part1.substr(1,1)==L"-")
+			if (part1[1]==L"-")
 			{
 				part1.splicer(1,1,L"");
 				part1^=L"-";
@@ -521,7 +521,7 @@ convert:
 			break;
 
 		case L'C':
-			if (part1.substr(1,1)==L"-")
+			if (part1[1]==L"-")
 			{
 				part1.splicer(1,1,L"");
 				part1^=L"CR";
@@ -530,7 +530,7 @@ convert:
 			break;
 
 		case L'D':
-			if (part1.substr(1,1)==L"-")
+			if (part1[1]==L"-")
 			{
 				part1.splicer(1,1,L"");
 				part1^=L"DR";

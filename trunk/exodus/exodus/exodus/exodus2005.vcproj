@@ -229,6 +229,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\mvdbconns.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\mvdbpostgres.cpp"
 				>
 				<FileConfiguration
@@ -436,6 +440,10 @@
 			</File>
 			<File
 				RelativePath=".\mvconfig.h"
+				>
+			</File>
+			<File
+				RelativePath=".\mvdbconns.h"
 				>
 			</File>
 			<File

@@ -214,7 +214,7 @@ void SIGINT_handler (int sig)
 		var cmd;
 		if (! cmd.input())
 		continue;
-		var cmd1=cmd.substr(1,1).ucase();
+		var cmd1=cmd[1].ucase();
 
 		if (cmd1 == "C")
 			break;

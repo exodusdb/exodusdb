@@ -130,7 +130,7 @@ program()
                 if (not index(filename,"."))
                         filename^=".cpp";
 
-                var iscompilable=filename.field2(".",-1).substr(1,1).lcase() ne "h";
+                var iscompilable=filename.field2(".",-1)[1].lcase() ne "h";
 
                 //make absolute in case EDITOR changes current working directory
                 var editcmd=editor;
@@ -195,7 +195,7 @@ program()
 								blankfile.swapper("program","library");
 						}
 
-						if (blankfile.substr(1,1) ne "\n")
+						if (blankfile[1] ne "\n")
 							blankfile^="\n";
 						if (SLASH ne "/")
                                 blankfile.swapper("\n","\r\n");
