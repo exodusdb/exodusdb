@@ -1013,7 +1013,8 @@ public:
 
 	bool sqlexec( const var & SqlToExecute) const;	// this: filename, parm1: SQL to execute
 //	bool sqlexec( int connection_id = 0) const;
-	bool sqlexec(var& errmsg, int connection_id) const;	// this: SQL to execute
+// outdated: 20101203:	bool sqlexec(var& errmsg, int connection_id) const;	// this: SQL to execute
+	bool sqlexec( const var& sqlcmd, var& errmsg) const;
 
 	//bool selftest() const;
 	var version() const;
