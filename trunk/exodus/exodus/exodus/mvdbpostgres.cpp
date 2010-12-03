@@ -713,7 +713,8 @@ bool var::open(const var& filename)
 	//get current connection or return false
 //    PGconn* thread_pgconn=(PGconn*) connection();
 	int connection_id = mv_connections_cache.get_current_id();
-	PGconn * thread_pgconn = (PGconn*) mv_connections_cache.get_connection( connection_id);
+//	PGconn * thread_pgconn = (PGconn*) mv_connections_cache.get_connection( connection_id);
+	PGconn * thread_pgconn = (PGconn *) connectionx();
 	if (!thread_pgconn)
 		return false;
 
@@ -758,9 +759,12 @@ bool var::open(const var& filename)
 
 	//save the filename and memorise the current connection for this file var
 	var_mvstr=filename.var_mvstr;
-	var_mvint = connection_id;
-	var_mvtyp = pimpl::MVTYPE_SQLOPENED;
-
+	var_mvtyp = pimpl::MVTYPE_STR;
+	if( connection_id > 0)
+	{
+		var_mvint = connection_id;
+		var_mvtyp = pimpl::MVTYPE_SQLOPENED;
+	}
 	return true;
 }
 
@@ -1037,7 +1041,17 @@ bool var::sqlexec(const var& sqlcmd, var& errmsg) const
 
 	//DEBUG_LOG_SQL
 	if (DBTRACE)
-		{exodus::logputl(L"SQL:" ^ *this);}
+	{
+//		exodus::logputl(L"SQL:" ^ *this);
+		var dbtrace( L"SQL:");
+		if( this->unassigned())
+			dbtrace ^= L"Unassigned variable";
+		else
+			dbtrace ^= * this;
+		exodus::logputl( dbtrace);
+	}
+
+
 	//will contain any result IF successful
 	//MUST do PQclear(local_result) after using it;
 
