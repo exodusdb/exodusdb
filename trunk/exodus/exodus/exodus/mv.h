@@ -159,25 +159,15 @@ namespace exodus {
 #define _IM_ L"\xFF"
 #define _RM_ L"\xFF"
 //#define _FM_ L"\376"
-#define _FM_ L"\xFE"
+//#define _FM_ L"\xFE"
+#define _FM_ L"\u02FE"
 #define _AM_ L"\xFE"
-#define _VM_ L"\xFD"
-#define _SM_ L"\xFC"
-#define _SVM_ L"\xFC"
-#define _TM_ L"\xFB"
-#define _STM_ L"\xFA"
-#define _SSTM_ L"\xF9"
-#define _DQ_ L"\""
-#define _SQ_ L"\'"
-
-#define _IM_ L"\xFF"
-#define _RM_ L"\xFF"
-//#define _FM_ L"\376"
-#define _FM_ L"\xFE"
-#define _AM_ L"\xFE"
-#define _VM_ L"\xFD"
-#define _SM_ L"\xFC"
-#define _SVM_ L"\xFC"
+//#define _VM_ L"\xFD"
+#define _VM_ L"\u02FD"
+//#define _SM_ L"\xFC"
+#define _SM_ L"\u02FC"
+#define _SVM_ _SM_
+//#define _SVM_ L"\xFC"
 #define _TM_ L"\xFB"
 #define _STM_ L"\xFA"
 #define _SSTM_ L"\xF9"
@@ -187,11 +177,15 @@ namespace exodus {
 //these macros (with trailing _) are wchar versions of the pick delimiters
 #define IM_ L'\xFF'
 #define RM_ L'\xFF'
-#define FM_ L'\xFE'
+//#define FM_ L'\xFE'
+#define FM_ L'\u02FE'
 #define AM_ L'\xFE'
-#define VM_ L'\xFD'
-#define SVM_ L'\xFC'
-#define SM_ L'\xFC'
+//#define VM_ L'\xFD'
+#define VM_ L'\u02FD'
+//#define SM_ L'\xFC'
+#define SM_ L'\u02FC'
+//#define SVM_ L'\xFC'
+#define SVM_ SM_
 #define TM_ L'\xFB'
 #define STM_ L'\xFA'
 #define SSTM_ L'\xF9'
@@ -1359,12 +1353,15 @@ static const var IM = L"\xFF";
 static const var RM = L"\xFF";
 
 static const var AM = L"\xFE";
-static const var FM = L"\xFE";
 
-static const var VM = L"\xFD";
-
-static const var SM = L"\xFC";
-static const var SVM = L"\xFC";
+//static const var FM = L"\xFE";
+//static const var VM = L"\xFD";
+//static const var SM = L"\xFC";
+//static const var SVM = L"\xFC";
+static const var FM = _FM_;
+static const var VM = _VM_;
+static const var SM = _SM_;
+static const var SVM = _SVM_;
 
 static const var TM = L"\xFB";
 static const var STM = L"\xFA";
