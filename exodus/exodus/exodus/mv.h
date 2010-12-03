@@ -982,7 +982,6 @@ public:
 	bool deleteindex(const var& fieldname) const;
 	var listindexes(const var& filename=L"") const;
 
-	bool open();		// open current filename with current multicollection
 	bool open(const var& dbfilename);
 	void close();
 

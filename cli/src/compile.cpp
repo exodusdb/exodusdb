@@ -527,7 +527,7 @@ program()
                 //and, for subroutines and functions, create header file (even if compilation not successful)
                 var crlf="\r\n";
                 var headertext="";
-                converter(text,"\r\n",FM^FM);
+                converter(text,crlf,FM^FM);
                 dim text2;
                 var nlines=matparse(text,text2);
 
@@ -622,19 +622,19 @@ program()
 
 //new method using member functions to call external functions with mv environment
 var inclusion=
-"\nExodusFunctorBase efb_funcx;"
-"\nvar funcx(in arg1=var(), out arg2=var(), out arg3=var())"
-"\n{"
-"\n if (efb_funcx.pmemberfunction_==NULL)"
-"\n  efb_funcx.init(\"funcx\",\"exodusprogrambasecreatedelete\",mv);"
-"\n"
-"\n //define a function that calls the shared library object member function"
-"\n typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(in,out,out);"
-"\n"
-"\n return CALLMEMBERFUNCTION(*(efb_funcx.pobject_),"
-"\n ((pExodusProgramBaseMemberFunction) (efb_funcx.pmemberfunction_)))"
-"\n  (arg1,arg2,arg3);"
-"\n}";
+"\r\nExodusFunctorBase efb_funcx;"
+"\r\nvar funcx(in arg1=var(), out arg2=var(), out arg3=var())"
+"\r\n{"
+"\r\n if (efb_funcx.pmemberfunction_==NULL)"
+"\r\n  efb_funcx.init(\"funcx\",\"exodusprogrambasecreatedelete\",mv);"
+"\r\n"
+"\r\n //define a function that calls the shared library object member function"
+"\r\n typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(in,out,out);"
+"\r\n"
+"\r\n return CALLMEMBERFUNCTION(*(efb_funcx.pobject_),"
+"\r\n ((pExodusProgramBaseMemberFunction) (efb_funcx.pmemberfunction_)))"
+"\r\n  (arg1,arg2,arg3);"
+"\r\n}";
 
 										swapper(inclusion,"funcx",libname);
 										//swapper(example,"exodusprogrambasecreatedelete",funcname);
@@ -691,7 +691,7 @@ var inclusion=
                         //build up list of loadtime libraries required by linker
                         if (loadtimelinking and word1 eq "#include") {
                                 var word2=line.field(" ",2);
-                                if (word2.substr(1,1)==DQ) {
+                                if (word2[1]==DQ) {
                                         word2=word2.substr(2,word2.len()-2);
                                         if (word2.substr(-2,2) eq ".h")
                                                 word2.splicer(-2,2,"");
@@ -706,6 +706,7 @@ var inclusion=
                         headertext.splicer(1,0,"#ifndef EXODUSDLFUNC_"^ucase(filebase)^"_H"^crlf);
                         headertext^=crlf^"#endif"^crlf;
                         var headerfilename=filebase^".h";
+
                         oswrite(headertext,headerfilename);
                 }
 
@@ -814,6 +815,20 @@ var inclusion=
                                 //	outputfilename=outputfilename.field(".",1,outputfilename.count("."));
                                 //}
 
+								//How to: Embed a Manifest Inside a C/C++ Application
+								//http://msdn.microsoft.com/en-us/library/ms235591%28VS.80%29.aspx
+								//mt.exe –manifest MyApp.exe.manifest -outputresource:MyApp.exe;1
+								//mt.exe –manifest MyLibrary.dll.manifest -outputresource:MyLibrary.dll;2
+								if (SLASH_IS_BACKSLASH) {
+									var cmd="mt.exe";
+									if (not verbose)
+										cmd^=" -nologo";
+									cmd^=" -manifest "^objfilename^".manifest";
+									cmd^=" -outputresource:"^objfilename^";"^(isprogram?"1":"2");
+									if (osshell(cmd)==0)
+										osdelete(objfilename^".manifest");
+								}
+
                                 //copy the obj file to the output directory
                                 if (installcmd) {
                                         if (not osdir(outputdir)) {
@@ -851,7 +866,7 @@ var inclusion=
 										//delete any manifest from early versions of compile which didnt have the
 										//MANIFEST:NO option
 										//was try to copy ms manifest so that the program can be run from anywhere?
-										if (SLASH eq "\\") {
+										if (SLASH_IS_BACKSLASH) {
 											if (true or (isprogram and manifest)) {
 												if (not oscopy(objfilename^".manifest",outputpathandfile^".manifest"))
 													{}//printl("ERROR: Failed to "^cmd);

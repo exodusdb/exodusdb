@@ -102,7 +102,7 @@ program()
 
                         //keep trying to update - perhaps futilely
                         //at least temp file will be left in the directory
-                        while (ucase(reply).substr(1,1) eq "Y" and true) {
+                        while (ucase(reply)[1] eq "Y" and true) {
 
                                 if (write(record2,file,key)) {
                                         printl(filename^" written "^key);

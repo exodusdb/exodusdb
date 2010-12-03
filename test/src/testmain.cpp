@@ -30,9 +30,38 @@ var GermanEszet             =L"\u00DF";//German
 
 programinit()
 
+ExodusFunctorBase efb_f1;
+var f1(in arg1=var())
+{
+ if (efb_f1.pmemberfunction_==NULL)
+  efb_f1.init("f1","exodusprogrambasecreatedelete",mv);
+
+ //define a function that calls the shared library object member function
+ typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(in);
+
+ return CALLMEMBERFUNCTION(*(efb_f1.pobject_),
+ ((pExodusProgramBaseMemberFunction) (efb_f1.pmemberfunction_)))
+  (arg1);
+}
+
 function main()
 {
-	{
+
+        printl(sin(30));
+
+USERNAME="";
+if (ID.assigned())
+ ID.outputl("ID=");
+ID="";
+//      stop();
+        printl("m1 says 'Hello World!'");
+        ID="xyz";
+        f1("xxx").outputl();
+        ID.outputl("ID=");
+        //return 0;
+
+
+{
 		var conn1;
 		var().connect( L"", conn1);
 	}		// one connection is lost here (hangs)
@@ -46,8 +75,8 @@ function main()
 	{
 		var conn2;
 		var().connect( L"", conn2);
-		var table1 = "TABLE1";
-		if( ! table1.open())			// for conn2
+		var table1;
+		if( ! table1.open("TABLE1"))			// for conn2
 		{
 			printl("Creating "^table1);
 			assert( createfile(table1));
@@ -60,16 +89,16 @@ function main()
 	{
 		var conn1;
 		var().connect( L"", conn1);		// default dbname=exodus
-		var table1 = "TABLE1";
-		assert( table1.open());			// actually this is not convenient
+		var table1;
+		assert( table1.open("TABLE1"));			// actually this is not convenient
 					// I can not open 3 connections and later open table1 :(
 
 		var conn3;
 		var().connect( L"dbname=exodus3", conn3);		// custom dbname=exodus3, should fail
 		var conn2;
 		var().connect( L"dbname=exodus2", conn2);		// custom dbname=exodus2, should succeed
-		var table2 = "TABLE2";
-		if( ! table2.open())			// for conn2
+		var table2;
+		if( ! table2.open("TABLE2"))			// for conn2
 		{
 			printl("Creating "^table2);
 			assert( createfile(table2));
@@ -1288,7 +1317,7 @@ while trying to match the argument list '(exodus::var, bool)'
 	osgetenv("XYZ");
 
 //	var().debug();
-//	var xx=xx.substr(1,1);
+//	var xx=xx[1];
 
 //experiment with some syntactic sugar
 #define on ,
@@ -1472,7 +1501,7 @@ function accrest() {
 
         var fms=FM^VM^SM^TM^STM^SSTM;
         var visibles="^]\???";
-        var EOL="\n\r";
+        var EOL="\r\n";
         var offset=0;
         var blocksize=50000;
         while (true) {
