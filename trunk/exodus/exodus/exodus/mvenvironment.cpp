@@ -373,10 +373,8 @@ var MvEnvironment::capitalise(const var& str0, const var& mode0, const var& word
 		};//ii;
 
 		if (mode.index(L"TRIM", 1)) {
-			//string2.converter(L"\x20\xFE", L"\xFE\x20");
 			string2.converter(L" " _FM_, _FM_ L" ");
 			string2 = string2.trim();
-			//string2.converter(L"\x20\xFE", L"\xFE\x20");
 			string2.converter(L" " _FM_, _FM_ L" ");
 		}
 
@@ -1305,7 +1303,6 @@ var MvEnvironment::sendmail(const var& toaddress0, const var& subject, const var
 	//cut off after end of file character
 	params2 = params2.field(var().chr(26), 1, 1);
 	params2.swapper(L"\r\n", L"\r");
-	//params2.converter(L"\r\n", L"\xFE\xFE");
 	params2.converter(L"\r\n", _FM_ _FM_);
 	for (int ii = 1; ii <= 9; ii++) {
 		if (params2.extract(ii))
@@ -1366,7 +1363,6 @@ var MvEnvironment::sendmail(const var& toaddress0, const var& subject, const var
 
 	if (errormsg.osread(errorfilename)) {
 		errorfilename.osdelete();
-		//errormsg.converter(L"\r\n", L"\xFE\xFE");
 		errormsg.converter(L"\r\n", _FM_ _FM_);
 		errormsg = errormsg.oconv(L"T#60");
 	}else{

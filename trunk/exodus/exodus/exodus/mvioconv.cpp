@@ -94,7 +94,7 @@ var var::iconv(const wchar_t* convstr) const
 
 				if (!terminator)
 					break;
-				output ^= var().chr(256 - terminator);
+				output ^= var().chr(LASTDELIMITERCHARNOPLUS1 - terminator.toInt());
 			} while (true);
 
 			return output;
@@ -156,7 +156,7 @@ var var::iconv(const wchar_t* convstr) const
 
  				if (!terminator)
 					break;
-				output ^= var().chr(256 - terminator);
+				output ^= var().chr(LASTDELIMITERCHARNOPLUS1 - terminator.toInt());
 			}
 
 			return output;
@@ -304,7 +304,7 @@ var var::oconv_T(const var& format) const
 				if (!terminator)
 					break;
 
-				output ^= var().chr(256 - terminator);
+				output ^= var().chr(LASTDELIMITERCHARNOPLUS1 - terminator.toInt());
 
 				continue;
 			}
@@ -370,7 +370,7 @@ var var::oconv_T(const var& format) const
 		if (!terminator)
 			break;
 
-		output ^= var().chr(256 - terminator);
+		output ^= var().chr(LASTDELIMITERCHARNOPLUS1 - terminator.toInt());
 
 	}//loop parts
 
@@ -609,7 +609,7 @@ var var::oconv_LR(const var& format) const
 		if (!terminator)
 			break;;
 
-		output ^= var().chr(256 - terminator);
+		output ^= var().chr(LASTDELIMITERCHARNOPLUS1 - terminator.toInt());
 	}//loop;
 
 	return output;
@@ -664,7 +664,7 @@ var var::oconv(const wchar_t* conversion) const
 
 				if (!terminator)
 					break;
-				output ^= var().chr(256 - terminator);
+				output ^= var().chr(LASTDELIMITERCHARNOPLUS1 - terminator.toInt());
 			} while (true);
 
 			return output;
@@ -727,7 +727,7 @@ var var::oconv(const wchar_t* conversion) const
 
 				if (!terminator)
 					break;
-				output ^= var().chr(256 - terminator);
+				output ^= var().chr(LASTDELIMITERCHARNOPLUS1 - terminator.toInt());
 			}
 
 			return output;

@@ -219,7 +219,7 @@ ID="";
 	//FAILS in Windows XPSP3UK
 	//assert(lcase(Greek_SAS) eq Greek_sas);
 
-	//NB codepage is 256 one byte characters selected from all unicode characters depending on locale
+	//NB a codepage is a 256 x one byte map of characters selected from all unicode characters depending on locale
 
 	//show where we are working
 	printl(oscwd("OSCWD="));
@@ -1191,7 +1191,8 @@ while trying to match the argument list '(exodus::var, bool)'
 	assert(oconv(FM ^ L"\x0035","HEX4") eq "02FE0035");
 	assert(oconv(FM,"HEX4") eq "02FE");
 
-	printl(osdir(SLASH));
+	printl();
+	printl("osdir("^SLASH^")=",osdir(SLASH));
 
 	//root directories
 
@@ -1281,21 +1282,27 @@ while trying to match the argument list '(exodus::var, bool)'
 
 	var ss;
 	printl("sizeof");
-	printl("char:   ",(int)sizeof(char));
-	printl("wchar_t:",(int)sizeof(wchar_t));
-	printl("string: ",(int)sizeof(std::string));
-	printl("wstring:",(int)sizeof(std::wstring));
-	printl("int:    ",(int)sizeof(int));
-	printl("double: ",(int)sizeof(double));
-	printl("var:    ",(int)sizeof(var));
+	printl("char:     ",(int)sizeof(char));
+	printl("wchar_t:  ",(int)sizeof(wchar_t));
+	printl("string:   ",(int)sizeof(std::string));
+	printl("wstring:  ",(int)sizeof(std::wstring));
+	printl("int:      ",(int)sizeof(int));
+	printl("long:     ",(int)sizeof(long));
+	printl("long long:",(int)sizeof(long long));
+	printl("double:   ",(int)sizeof(double));
+	printl("var:      ",(int)sizeof(var));
 
 	var tconv=FM.oconv("T#20");
+	assert(tconv eq (L"                    " _FM_ L"                    "));
 	tconv="xxxxx/xxxxx xxx" ^ FM ^ "xx";
 	tconv=tconv.oconv("T#8");
+	assert(tconv eq ("xxxxx/xx" ^ TM ^ "xxx xxx " ^ FM ^ "xx      "));
 
 	//test regular expression
-	var exp="(\\d{4}[- ]){3}\\d{4}";
-	var res=var("1247-1234-1234-1234").match(exp,"r");
+	//four digits followed by dash or space) three times ... followed by four digits
+	var regex1="(\\d{4}[- ]){3}\\d{4}";
+	var regtest="1247-1234-1234-1234";
+	assert(regtest.match(regex1,"r"));
 
 	//test redimensioning
 	dim aaa(10);

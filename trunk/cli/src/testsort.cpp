@@ -10,7 +10,7 @@ var filename="myclients";
 programinit()
 
 function main() {
-DBTRACE=1;
+
         if (not connect())
                 abort("Cannot connect to database. Please check configuration");
 

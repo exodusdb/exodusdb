@@ -25,7 +25,7 @@ notes:
 1. postgres bytea can be treated as UTF8 for comparisons/indexing etc without conversion
 2. icu likes everything to be in utf16
 3. icu offers a fast conversion between utf8 and utf16 but can only replace illegal bytes with one character fast
-(neosys uses a modified one that converts between F8-FF and u2558-u255F)
+(neosys uses a modified one that converts between F8-FF and u2558-u255F in the web interface)
 
 icu conversion functions allow custom function be convert illegal UTF8 pick field character bytes with some arbitrary unicode code points but what speed? this was not found/used ... maybe better than the custom function mentioned above
 

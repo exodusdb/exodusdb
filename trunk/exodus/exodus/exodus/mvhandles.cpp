@@ -58,7 +58,9 @@ void MvHandlesCache::del_handle( int index)
 
 MvHandlesCache::~MvHandlesCache()
 {
-	boost::mutex::scoped_lock lock(mvhandles_mutex);
+	//crashes on linux ... and destruction cant be multithreaded so remove
+	//boost::mutex::scoped_lock lock(mvhandles_mutex);
+
 	int ix;
 	for( ix = 0; ix < ( int) tbl.size(); ix ++)
 		if( tbl[ix].deleter != HANDLE_ENTRY_FREE)

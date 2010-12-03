@@ -1657,7 +1657,6 @@ var var::remove(var& startchar1, var& delimiterno) const
 
 	//find the end of the field (or string)
 	std::wstring::size_type end_pos;
-	//end_pos=var_mvstr.find_first_of(L"\xFF\xFE\xFD\xFC\xFB\xFA\xF9",start_pos);
 	end_pos=var_mvstr.find_first_of(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_ _SSTM_,start_pos);
 
 	//past of of string?
@@ -1669,7 +1668,7 @@ var var::remove(var& startchar1, var& delimiterno) const
 	}
 
 	//delimiters returned as numbers FF=1 FE=2, FD=3 etc to F9=7
-        delimiterno=int(256-var_mvstr[end_pos]);
+	delimiterno=int(LASTDELIMITERCHARNOPLUS1-var_mvstr[end_pos]);
 
 	startchar1=int(end_pos+2);
 
@@ -1696,6 +1695,7 @@ var var::sum(const var& sepchar) const
 	//var sepcharn=allsepchars.index(sepchar);
 	//if (!sepcharn) return var1*var2;
 
+	//TODO make this faster using remove or index?
 	for (int ii=1;ii<=nn;++ii)
 		result+= field(sepchar,ii);
 	return result;
