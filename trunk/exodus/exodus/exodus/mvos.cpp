@@ -568,20 +568,25 @@ bool var::match(const var& matchstr, const var& options) const
 	THISISSTRING()
 	ISSTRING(matchstr)
 
-	//TODO fully implement
+	//TODO fully implement (w=wildcard)
 	if (options.index(L"w"))
 	{
-		if (matchstr==L""||var_mvstr==matchstr||matchstr==L"*.*"){}
-		else if (matchstr[1]==L"*"&&substr(-matchstr.length()+1)==matchstr.substr(2)){}
-		else if (matchstr.substr(-1,1)==L"*"&&substr(1,matchstr.length()-1)==matchstr.substr(1,matchstr.length()-1)){}
-		else return false;
+		if (matchstr==L""||var_mvstr==matchstr||matchstr==L"*.*")
+			{}
+		else if (matchstr[1]==L"*"&&substr(-matchstr.length()+1)==matchstr[2])
+			{}
+		else if (matchstr[-1]==L"*"&&substr(1,matchstr.length()-1)==matchstr.substr(1,matchstr.length()-1))
+			{}
+		else
+			return false;
 		return true;
 	}
 
 	//http://www.boost.org/doc/libs/1_38_0/libs/regex/doc/html/boost_regex/syntax/basic_syntax.html
 
 	//TODO automatic caching of regular expressions or new exodus datatype to handle them
-	//TODO automatic caching of regular expressions or new exodus datatype to handle them
+
+#ifndef BOOST_HAS_ICU
 	boost::wregex regex;
 	try
 	{
@@ -589,7 +594,6 @@ bool var::match(const var& matchstr, const var& options) const
                         regex.assign(toTstring(matchstr), boost::regex::extended|boost::regex_constants::icase);
 		else
                         regex.assign(toTstring(matchstr), boost::regex::extended|boost::regex_constants::icase);
-	//boost::wregex toregex_regex(with.var_mvstr, boost::regex::extended);
 	}
 	catch (boost::regex_error& e)
     {
@@ -597,6 +601,22 @@ bool var::match(const var& matchstr, const var& options) const
 	}
 
         return regex_match(toTstring((*this)), regex);
+#else
+	boost::32wregex regex;
+	try
+	{
+		if (options.index(L"i"))
+                        regexboost::make_u32regex(matchstr, boost::regex::extended|boost::regex_constants::icase);
+		else
+                        regexboost::make_u32regex(matchstr, boost::regex::extended);
+	}
+	catch (boost::regex_error& e)
+    {
+		throw MVException(var(e.what()).quote() ^ L" is an invalid regular expression");
+	}
+
+        return u32regex_match(var_mvstr, regex);
+#endif
 
 }
 
