@@ -403,13 +403,23 @@ var& var::oconv_MC(const wchar_t* conversionchar)
 	\P{UNICODE PROPERTY NAME}	Match any character not having the specified Unicode Property.
 	*/
 
-	static const boost::wregex
-		digits_regex		(L"\\d*"		,boost::regex::extended), // \d numeric
-		alpha_regex			(L"[^\\W\\d]*"	,boost::regex::extended), // \a alphabetic
-		alphanum_regex		(L"\\w*"		,boost::regex::extended), // \w alphanumeric
-		non_digits_regex	(L"[^\\d]*"		,boost::regex::extended), // \D non-numeric
-		non_alpha_regex		(L"[\\W\\d]*"	,boost::regex::extended), // \A non-alphabetic
-		non_alphanum_regex	(L"\\W*"		,boost::regex::extended); // \W non-alphanumeric
+#ifndef BOOST_HAS_ICU
+#	define boost_regex boost::wregex
+#	define boost_mvstr toTstring((*this))
+#	define boost_regex_replace boost::regex_replace
+#else
+#	define boost_regex boost::u32regex
+#	define boost_mvstr var_mvstr
+#	define boost_regex_replace boost::u32regex_replace
+#endif
+
+	static const boost_regex
+		digits_regex		(L"\\d+"		,boost::regex::extended), // \d numeric
+		alpha_regex			(L"[^\\W\\d]+"	,boost::regex::extended), // \a alphabetic
+		alphanum_regex		(L"\\w+"		,boost::regex::extended), // \w alphanumeric
+		non_digits_regex	(L"[^\\d]+"		,boost::regex::extended), // \D non-numeric
+		non_alpha_regex		(L"[\\W\\d]+"	,boost::regex::extended), // \A non-alphabetic
+		non_alphanum_regex	(L"\\W+"		,boost::regex::extended); // \W non-alphanumeric
 
 	//negate if /
 	if (*conversionchar==L'/')
@@ -420,20 +430,23 @@ var& var::oconv_MC(const wchar_t* conversionchar)
 			// MC/N return everything except digits i.e. remove all digits 0123456789
 			case 'N':
 			{
-				var_mvstr=boost::regex_replace(toTstring((*this)),digits_regex, L"");
+				//var_mvstr=boost::regex_replace(toTstring((*this)),digits_regex, L"");
+				var_mvstr=boost_regex_replace(boost_mvstr,digits_regex, L"");
 				break;
 			}
 
 			// MC/A return everything except "alphabetic" i.e remove all "alphabetic"
 			case 'A':
 			{
-				var_mvstr=boost::regex_replace(toTstring((*this)),alpha_regex, L"");
+				//var_mvstr=boost::regex_replace(toTstring((*this)),alpha_regex, L"");
+				var_mvstr=boost_regex_replace(boost_mvstr,alpha_regex, L"");
 				break;
 			}
 			// MC/B return everything except "alphanumeric" remove all "alphanumeric"
 			case 'B':
 			{
-				var_mvstr=boost::regex_replace(toTstring((*this)),alphanum_regex, L"");
+				//var_mvstr=boost::regex_replace(toTstring((*this)),alphanum_regex, L"");
+				var_mvstr=boost_regex_replace(boost_mvstr,alphanum_regex, L"");
 				break;
 			}
 		}
@@ -448,19 +461,22 @@ var& var::oconv_MC(const wchar_t* conversionchar)
 		// MCN return only digits i.e. remove all non-digits
 		case 'N':
 		{
-			var_mvstr=boost::regex_replace(toTstring((*this)),non_digits_regex, L"");
+			//var_mvstr=boost::regex_replace(toTstring((*this)),non_digits_regex, L"");
+			var_mvstr=boost_regex_replace(boost_mvstr,non_digits_regex, L"");
 			break;
 		}
 		// MCA return only "alphabetic" i.e. remove all "non-alphabetic"
 		case 'A':
 		{
-			var_mvstr=boost::regex_replace(toTstring((*this)),non_alpha_regex, L"");
+			//var_mvstr=boost::regex_replace(toTstring((*this)),non_alpha_regex, L"");
+			var_mvstr=boost_regex_replace(boost_mvstr,non_alpha_regex, L"");
 			break;
 		}
 		// MCB return only "alphanumeric" i.e. remove all "non-alphanumeric"
 		case 'B':
 		{
-			var_mvstr=boost::regex_replace(toTstring((*this)),non_alphanum_regex, L"");
+			//var_mvstr=boost::regex_replace(toTstring((*this)),non_alphanum_regex, L"");
+			var_mvstr=boost_regex_replace(boost_mvstr,non_alphanum_regex, L"");
 			break;
 		}
 		// MCL to lower case
