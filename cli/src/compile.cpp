@@ -492,7 +492,7 @@ program()
                 //get file text
                 printl("sourcefilename:"^srcfilename);
                 if (not text and not text.osread(srcfilename)) {
-                        errputl(srcfilename^" doesnt exist");
+                        errputl(srcfilename^" doesnt exist or cant be read");
                         continue;
                 }
 
@@ -747,7 +747,7 @@ var inclusion=
 
 				//check object code can be produced.
  				if (oldobjfileinfo) {
-					if (osopen(objfilename))
+					if (osopen(objfilename,objfilename))
 						osclose(objfilename);
 					else {
 						print("Error: ",objfilename, " cannot be updated. Insufficient rights");
@@ -846,9 +846,9 @@ var inclusion=
                                         }
 
 										//check can install file
-                                        var outputpathandfile=outputdir^field2(binfilename,SLASH,-1);
+										var outputpathandfile=outputdir^field2(binfilename,SLASH,-1);
 										if (osfile(outputpathandfile)) {
-											if (osopen(outputpathandfile))
+											if (osopen(outputpathandfile,outputpathandfile))
 												osclose(outputpathandfile);
 											else {
 												print("Error: ",outputpathandfile, " cannot be updated. Insufficient rights");

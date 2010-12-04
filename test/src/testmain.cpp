@@ -156,16 +156,22 @@ function main()
 	var german_standard="";
 	var greek_gr="";
 	var turkish="";
+	var english_us_locale;
+	var greek_gr_locale;
 	if (SLASH_IS_BACKSLASH) {
 		english_us=1033;
 		german_standard=1031;
 		greek_gr=1032;
 		turkish=1055;
+		english_us_locale="English";
+		greek_gr_locale="Greek";
 	} else {
 		english_us="en_US.utf8";
 		german_standard="de_DE.utf8";
 		greek_gr="el_GR.utf8";
 		turkish="tr_TR.utf8";
+		english_us_locale=english_us;
+		greek_gr_locale=greek_gr;
 	}
 
 	//in English/US Locale
@@ -202,12 +208,12 @@ function main()
 		//check CANNOT write greek unicode characters using French codepage
 		assert(not Greek_sas.oswrite(greektestfilename,"French"));//CANNOT write
 		//check can write greek unicode characters to Greek codepage
-		assert(Greek_sas.oswrite(greektestfilename,greek_gr));
+		assert(Greek_sas.oswrite(greektestfilename,"Greek"));
 		//check 3 (wide) characters output as 3 bytes
 		assert(osfile(greektestfilename)(1) eq 3);
 		//check can read greek wide unicode characters from greek codepage
 		var rec2;
-		assert(rec2.osread(greektestfilename,greek_gr));
+		assert(rec2.osread(greektestfilename,"Greek"));
 		assert(rec2 eq Greek_sas);
 		//check raw read as latin
 		assert(rec2.osread(greektestfilename,"C"));
@@ -234,34 +240,41 @@ function main()
 	var tempfilename5;
 	var record5;
 	tempfilename5="temp7657.txt";
+	assert(oswrite("",tempfilename5));
+	assert(osdelete(tempfilename5));
 
 	//check we cannot write to a non-existent file
-	osdelete(tempfilename5); //make sure the file doesnt exist
+	//osdelete(tempfilename5); //make sure the file doesnt exist
+	assert(not osfile(tempfilename5) or osdelete(tempfilename5));
 	var offset=2;
 	assert(not osbwrite(L"34",tempfilename5,offset));
+	osclose(tempfilename5);
 
 	//check we can osbwrite to an existent file beyond end of file
-	oswrite("",tempfilename5);//
+	oswrite("",tempfilename5);
 	offset=2;
 	assert(osbwrite("78",tempfilename5,offset));
-//	assert(osbwrite("78",tempfilename5,offset));
+	offset=2;
+	assert(osbread( tempfilename5, offset, 2) eq "78");
 
 	var offset2=1;
 	var b78 = osbread( tempfilename5, offset, 2);
 
 	assert(osread(record5,tempfilename5));
 	assert(record5.oconv("HEX2") eq "000000003738");
+	assert(osdelete(tempfilename5));
 	osdelete(tempfilename5);
 
-	//check cannot write non-codepage characters
 	if (SLASH_IS_BACKSLASH) {
+		//check cannot write non-codepage characters
 		assert(oswrite("",tempfilename5));
 		var offset=2;
 		assert(not osbwrite(GreekSmallFinalSigma,tempfilename5,offset));
-		osopen(tempfilename5,greek_gr);
+		//check can write codepage characters
+		assert(osopen(tempfilename5,tempfilename5,"Greek"));
 		offset=2;
 		assert(osbwrite(GreekSmallFinalSigma,tempfilename5,offset));
-		osdelete(tempfilename5);
+		assert(osdelete(tempfilename5));
 	}
 
 	var xyzz=var("Abc").ucase().outputl();
@@ -286,9 +299,9 @@ function main()
 	unicode^=GreekSmallGamma;
 	unicode^=L"ABc-123.456";//some LATIN characters and punctuation
 
-	var status1 = oswrite( unicode, "GreekLocalFile.txt", greek_gr);
+	var status1 = oswrite( unicode, "GreekLocalFile.txt", greek_gr_locale);
 	var status2 = oswrite( unicode, "GreekUTF-8File.txt", "utf8");
-	var status3 = oswrite( unicode, "GreekEnglFile.txt", english_us);
+	var status3 = oswrite( unicode, "GreekEnglFile.txt", english_us_locale);
 
 	//test swapping "letters" (i.e. alphabet) with "?"
 	//We expect the question mark to remain as it is,
@@ -730,7 +743,7 @@ dict(AGE_IN_YEARS) {
 	assert(eraser(da1, 1, 2, 2) eq ("f1" ^VM^ "f1v2s1" ^SM^ "f1v2s3" ^VM^ "f1v3" ^FM^ "f2"));
 
 	var tempfile=SLASH^"129834192784";
-	if (osopen(tempfile))
+	if (osopen(tempfile,tempfile))
 		assert(false and var("non-existent file opened!"));
 
 	//math.h seems to have been included in one of the boost or other special headers

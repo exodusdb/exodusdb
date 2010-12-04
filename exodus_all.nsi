@@ -355,12 +355,12 @@ FunctionEnd
 ;--------------------------------
 ;General
 
-  Name "Exodus 10.10.16"
-  Outfile "exodus-10.10.16.exe"
-  InstallDir "$PROGRAMFILES\exodus\10.10"
+  Name "Exodus 10.12.1"
+  Outfile "exodus-10.12.1.exe"
+  InstallDir "$PROGRAMFILES\exodus\10.12"
   
   ;Get installation folder from registry if available
-  InstallDirRegKey HKCU "Software\exodus\10.10" ""
+  InstallDirRegKey HKCU "Software\exodus\10.12" ""
 
 ;--------------------------------
 ;Interface Settings
@@ -476,23 +476,23 @@ Section "All" SecAll
   ${EnvVarUpdate} $0 "PATH" "A" "HKCU" "$APPDATA\Exodus"
 
   ;Store installation folder
-  WriteRegStr HKCU "Software\exodus\10.10" "" $INSTDIR
+  WriteRegStr HKCU "Software\exodus\10.12" "" $INSTDIR
   
-  createDirectory "$SMPROGRAMS\Exodus-10.10"
-  createShortCut "$SMPROGRAMS\Exodus-10.10\Exodus Console.lnk" "$INSTDIR\bin\exodus.exe"
-  createShortCut "$SMPROGRAMS\Exodus-10.10\Exodus Config.lnk" "$INSTDIR\bin\configexodus.exe"
+  createDirectory "$SMPROGRAMS\Exodus-10.12"
+  createShortCut "$SMPROGRAMS\Exodus-10.12\Exodus Console.lnk" "$INSTDIR\bin\exodus.exe"
+  createShortCut "$SMPROGRAMS\Exodus-10.12\Exodus Config.lnk" "$INSTDIR\bin\configexodus.exe"
 
   ;Create uninstaller
   WriteUninstaller "$INSTDIR\Uninstall.exe"
 
   # create a shortcut named "new shortcut" in the start menu programs directory
   # point the new shortcut at the program uninstaller
-  createShortCut "$SMPROGRAMS\Exodus-10.10\Uninstall Exodus.lnk" "$INSTDIR\uninstall.exe"
+  createShortCut "$SMPROGRAMS\Exodus-10.12\Uninstall Exodus.lnk" "$INSTDIR\uninstall.exe"
 
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Exodus-10.10" \
-   "DisplayName" "Exodus-10.10 (remove only)"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Exodus-10.12" \
+   "DisplayName" "Exodus-10.12 (remove only)"
 
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Exodus-10.10" \
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Exodus-10.12" \
    "UninstallString" "$INSTDIR\Uninstall.exe"
 
 SectionEnd
@@ -553,16 +553,16 @@ Section "Uninstall"
 
   RMDir "$INSTDIR"
 
-  DeleteRegKey /ifempty HKCU "Software\exodus\10.10"
+  DeleteRegKey /ifempty HKCU "Software\exodus\10.12"
 
   # second, remove the link from the start menu
-  delete "$SMPROGRAMS\Exodus-10.10\Uninstall Exodus.lnk"
+  delete "$SMPROGRAMS\Exodus-10.12\Uninstall Exodus.lnk"
 
-  delete "$SMPROGRAMS\Exodus-10.10\Exodus Console.lnk"
-  delete "$SMPROGRAMS\Exodus-10.10\Exodus Config.lnk"
-  RMDir "$SMPROGRAMS\Exodus-10.10"
+  delete "$SMPROGRAMS\Exodus-10.12\Exodus Console.lnk"
+  delete "$SMPROGRAMS\Exodus-10.12\Exodus Config.lnk"
+  RMDir "$SMPROGRAMS\Exodus-10.12"
 
-  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Exodus-10.10"
+  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Exodus-10.12"
 
   ;remove the path to binaries HKLM=Local Machine and HKCU=Current User
   ${un.EnvVarUpdate} $0 "PATH" "R" "HKLM" "$INSTDIR\bin"
