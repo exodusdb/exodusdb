@@ -871,16 +871,30 @@ void var::osflush() const
 	return;
 }
 
-bool var::osopen(const var& locale) const
+bool var::osopen() const
 {
-	THISIS(L"bool var::osopen(const var& locale)")
+	THISIS(L"bool var::osopen()")
 	THISISSTRING()
 
 	//if reopening an osfile that is already opened then close and reopen
 	//	if (var_mvtyp & pimpl::MVTYPE_HANDLE)		-- this check is done in osclose
-		osclose();
+	osclose();
 
-	return osopenx(*this, locale)!=0;
+	return osopenx(*this, L"")!=0;
+
+}
+
+bool var::osopen(const var& osfilename, const var& locale) const
+{
+	THISIS(L"bool var::osopen(const var& osfilename, const var& locale)")
+	THISISDEFINED()
+	ISSTRING(osfilename)
+
+	//if reopening an osfile that is already opened then close and reopen
+	//	if (var_mvtyp & pimpl::MVTYPE_HANDLE)		-- this check is done in osclose
+	osclose();
+
+	return osopenx(osfilename, locale)!=0;
 
 }
 
@@ -896,13 +910,13 @@ std::wfstream* var::osopenx(const var& osfilename, const var& locale) const
 	//Try to get the cached file handle. the usual case is that you osopen a file before doing osbwrite/osbread
 	//Using wfstream instead of wofstream so that we can mix reads and writes on the same filehandle
 	std::wfstream * pmyfile = 0;
-	if( osfilename.var_mvtyp & pimpl::MVTYPE_HANDLE)
+	if( this->var_mvtyp & pimpl::MVTYPE_HANDLE)
 	{
-		pmyfile = (std::wfstream *) mv_handles_cache.get_handle( (int) osfilename.var_mvint, osfilename.var_mvstr);
+		pmyfile = (std::wfstream *) mv_handles_cache.get_handle( (int) this->var_mvint, this->var_mvstr);
 		if( pmyfile == 0)		// nonvalid handle
 		{
-			osfilename.var_mvint = 0;
-			osfilename.var_mvtyp ^= pimpl::MVTYPE_HANDLE;	// clear bit
+			this->var_mvint = 0;
+			this->var_mvtyp ^= pimpl::MVTYPE_HANDLE;	// clear bit
 		}
 	}
 
@@ -944,8 +958,8 @@ std::wfstream* var::osopenx(const var& osfilename, const var& locale) const
 		//cache the file handle (we use the int to store the "file number"
 		//and NAN to prevent isnum trashing mvint in the possible case that the osfilename is an integer
 		//can addhandle fail?
-		osfilename.var_mvint = mv_handles_cache.add_handle( pmyfile, del_wfstream, osfilename.var_mvstr);
-		osfilename.var_mvtyp = pimpl::MVTYPE_OPENED;
+		this->var_mvint = mv_handles_cache.add_handle( pmyfile, del_wfstream, osfilename.var_mvstr);
+		this->var_mvtyp = pimpl::MVTYPE_OPENED;
 	}
 
 	return pmyfile;
@@ -1061,17 +1075,17 @@ bool var::oswrite(const var& osfilename, const var& locale) const
 
 }
 
-bool var::osbwrite(const var& osfilename, var & startoffset) const
+bool var::osbwrite(const var& osfilevar, var & startoffset) const
 {
 	//osfilehandle is just the filename but buffers the "file number" in the mvint too
 
-	THISIS(L"bool var::osbwrite(const var& osfilename, var & startoffset) const")
+	THISIS(L"bool var::osbwrite(const var& osfilevar, var & startoffset) const")
 	THISISSTRING()
 	//test the following only if necessary in osopenx
 	//ISSTRING(osfilename)
 
 	//get the buffered file handle/open on the fly
-	std::wfstream * pmyfile = osopenx(osfilename,L"");
+	std::wfstream * pmyfile = osfilevar.osopenx(osfilevar,L"");
 	if( pmyfile == 0)
 		return false;
 
@@ -1106,9 +1120,9 @@ bool var::osbwrite(const var& osfilename, var & startoffset) const
 	return true;
 }
 
-var& var::osbread(const var& osfilename, var & startoffset, const int bytesize)
+var& var::osbread(const var& osfilevar, var & startoffset, const int bytesize)
 {
-	THISIS(L"var& var::osbread(const var& osfilename, const int startoffset, const int size")
+	THISIS(L"var& var::osbread(const var& osfilevar, const int startoffset, const int size")
 	THISISDEFINED()
 	//will be done if necessary in osopenx()
 	//ISSTRING(osfilename)
@@ -1122,7 +1136,7 @@ var& var::osbread(const var& osfilename, var & startoffset, const int bytesize)
 		return *this;
 
 	//get the buffered file handle/open on the fly
-	std::wfstream * pmyfile = osopenx(osfilename,L"");
+	std::wfstream * pmyfile = osfilevar.osopenx(osfilevar,L"");
 	if( pmyfile == 0)
 		return *this;
 
@@ -1141,7 +1155,7 @@ var& var::osbread(const var& osfilename, var & startoffset, const int bytesize)
 	//get a memory block to read into
 	boost::scoped_array<wchar_t> memblock( new wchar_t [bytesize]);
 	if (memblock==0)
-		throw MVOutOfMemory(L"Could not obtain "^var(int(bytesize*sizeof(wchar_t)))^L" bytes of memory to read "^osfilename);
+		throw MVOutOfMemory(L"Could not obtain "^var(int(bytesize*sizeof(wchar_t)))^L" bytes of memory to read "^osfilevar);
 		//return *this;
 
 	//read the data (converting characters on the fly)

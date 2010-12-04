@@ -88,15 +88,15 @@ DLL_PUBLIC var ostime()
 }
 
 //osopen x to y else
-DLL_PUBLIC bool osopen(const var& filename, const var& locale)
+DLL_PUBLIC bool osopen(const var& osfilename, var& osfilevar, const var& locale)
 {
-	return filename.osopen(locale);
+	return osfilevar.osopen(osfilename, locale);
 }
 
 //osclose x
-void DLL_PUBLIC osclose(const var& filehandle)
+void DLL_PUBLIC osclose(const var& osfilevar)
 {
-	filehandle.osclose();
+	osfilevar.osclose();
 }
 
 //3 argument version assignment statement format
