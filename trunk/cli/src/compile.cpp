@@ -490,7 +490,7 @@ program()
 
                 }
                 //get file text
-                printl(srcfilename);
+                printl("sourcefilename:"^srcfilename);
                 if (not text and not text.osread(srcfilename)) {
                         errputl(srcfilename^" doesnt exist");
                         continue;
@@ -517,8 +517,13 @@ program()
                         binfilename^=libfileextension;
                         objfilename^=libfileextension;
                         if (libfileprefix) {
-                                binfilename=libfileprefix^binfilename;
-                                objfilename=libfileprefix^objfilename;
+				//binfilename=libfileprefix^binfilename;
+				//objfilename=libfileprefix^objfilename;
+				var nfields=binfilename.dcount(SLASH);
+				binfilename=fieldstore(binfilename,SLASH,nfields,1,libfileprefix^field(binfilename,SLASH,nfields));
+				nfields=objfilename.dcount(SLASH);
+				objfilename=fieldstore(objfilename,SLASH,nfields,1,libfileprefix^field(objfilename,SLASH,nfields));
+
                         }
                         outputdir=libdir;
                         compileoptions=liboptions;

@@ -1067,7 +1067,7 @@ private:
 	int localeAwareCompare(const std::wstring& str1, const std::wstring& str2) const;
 	var& localeAwareChangeCase(const int lowerupper);
 
-	std::wfstream* var::osopenx(const var& osfilename, const var& locale) const;
+	std::wfstream* osopenx(const var& osfilename, const var& locale) const;
 
 	friend class dim;
 

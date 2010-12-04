@@ -185,7 +185,7 @@ static bool pqexec(const var& sql, PGresultptr& pgresult, int connection_id = 0)
 
 bool var::sqlexec( const var & SqlToExecute) const
 {
-	int connection_id = ( var_mvtyp == pimpl::MVTYPE_SQLOPENED) ? ( int) var_mvint : 0;
+	//int connection_id = ( var_mvtyp == pimpl::MVTYPE_SQLOPENED) ? ( int) var_mvint : 0;
 	var errmsg;
 	bool result = sqlexec( SqlToExecute, errmsg);
 	if (not result && DBTRACE)
@@ -246,7 +246,7 @@ bool msvc_PQconnectdb(PGconn** pgconn, const std::string& conninfo)
 #endif
 
 //the idea is for exodus to have access to one standard database without secret password
-static var defaultconninfo= "host=127.0.0.1 port=5432 dbname=exodus user=exodus password=somesillysecret connect_timeout=10";
+static var defaultconninfo= L"host=127.0.0.1 port=5432 dbname=exodus user=exodus password=somesillysecret connect_timeout=10";
 
 var var::build_conn_info( const var & conninfo) const
 {

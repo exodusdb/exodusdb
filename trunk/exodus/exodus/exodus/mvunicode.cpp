@@ -106,6 +106,7 @@ qt strings are unicode
 #endif
 
 #include <boost/scoped_array.hpp>
+//#include <boost/algorithm/string.hpp>
 #include <locale.h>
 #define MV_NO_NARROW
 #include <exodus/mv.h>
@@ -242,14 +243,16 @@ var& var::localeAwareChangeCase(const int lowerupper)
 	//	converter(LOWERCASE_, UPPERCASE_);
 
 	//for now only fairly simple one for one conversion
+#if 0
+	if (lowerupper==1)
+		boost::to_lower(var_mvstr);
+	else if (lowerupper==2)
+		boost::to_upper(var_mvstr);
 
-	//if (lowerupper==1) 
-	//	boost::to_lower(var_mvstr);
-	//else if (lowerupper==2)
-	//	boost::to_upper(var_mvstr);
-
+	return *this;
+#else
 	size_t  length=var_mvstr.length();
-	if (lowerupper==1) 
+	if (lowerupper==1)
 		for (size_t ptr=0; ptr<length; ++ptr)
 			var_mvstr[ptr]=towlower(var_mvstr[ptr]);
 	else if (lowerupper==2)
@@ -257,6 +260,7 @@ var& var::localeAwareChangeCase(const int lowerupper)
 			var_mvstr[ptr]=towupper(var_mvstr[ptr]);
 
 	return *this;
+#endif
 
 #elif defined(_MACOS)
 
@@ -307,7 +311,8 @@ bool var::setxlocale() const
 	if (uselocale(NULL)==uselocale(LC_GLOBAL_LOCALE))
 		uselocale(duplocale(uselocale(LC_GLOBAL_LOCALE)));
 
-	return setlocale(LC_ALL,(*this).tostring().c_str())!=NULL;
+	setlocale(LC_ALL,(*this).tostring().c_str())!=NULL;
+	//return setlocale(LC_CTYPE,(*this).tostring().c_str())!=NULL;
 
 #endif
 
