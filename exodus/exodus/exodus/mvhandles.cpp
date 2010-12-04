@@ -58,7 +58,8 @@ void MvHandlesCache::del_handle( int index)
 
 MvHandlesCache::~MvHandlesCache()
 {
-	//crashes on linux ... and destruction cant be multithreaded so remove
+
+	//crashes on linux and multithreaded destructor cant exist so  dont lock
 	//boost::mutex::scoped_lock lock(mvhandles_mutex);
 
 	int ix;

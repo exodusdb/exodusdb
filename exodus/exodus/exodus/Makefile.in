@@ -78,7 +78,7 @@ am__objects_2 = ConvertUTF.lo howto.lo mvarray.lo mvdatetime.lo \
 	mvenvironment.lo mvglobalfuncs.lo mvipc.lo mvmv.lo \
 	mvunicode.lo mvipc_boost.lo mvipc_posix.lo mvipc_ms.lo \
 	mvposix.lo MurmurHash2_64.lo mvfunctor.lo mvprogram.lo \
-	mvhandles.lo
+	mvhandles.lo mvdbconns.lo
 am_libexodus_la_OBJECTS = $(am__objects_1) $(am__objects_2) \
 	$(am__objects_1)
 libexodus_la_OBJECTS = $(am_libexodus_la_OBJECTS)
@@ -309,7 +309,7 @@ xfunctors8.h xfunctors9.h
 
 #some more headers
 buildonly_h_sources = ConvertUTF.h NullCodecvt.h TConvert.h gettimeofday.h neo.h mvconfig.h MurmurHash2_64.h \
-mvhandles.h
+mvhandles.h mvdbconns.h
 
 
 #source files
@@ -317,7 +317,7 @@ cc_sources = ConvertUTF.c howto.cpp mvarray.cpp mvdatetime.cpp  mvdebug.cpp mvfu
 mvutf.cpp naturalorder.cpp gettimeofday.cpp mv2.cpp mv.cpp mvdbpostgres.cpp mvenvironment.cpp mvglobalfuncs.cpp  \
 mvipc.cpp mvmv.cpp mvunicode.cpp mvipc_boost.cpp mvipc_posix.cpp \
 mvipc_ms.cpp mvposix.cpp MurmurHash2_64.cpp \
-mvfunctor.cpp mvprogram.cpp mvhandles.cpp
+mvfunctor.cpp mvprogram.cpp mvhandles.cpp mvdbconns.cpp
 
 
 #where to install the libraries include headers
@@ -435,6 +435,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mv2.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mvarray.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mvdatetime.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mvdbconns.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mvdbpostgres.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mvdebug.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mvenvironment.Plo@am__quote@

@@ -21,7 +21,7 @@ xfunctors8.h xfunctors9.h
 
 #some more headers
 buildonly_h_sources = ConvertUTF.h NullCodecvt.h TConvert.h gettimeofday.h neo.h mvconfig.h MurmurHash2_64.h \
-mvhandles.h
+mvhandles.h mvdbconns.h
 
 
 #source files
@@ -29,7 +29,7 @@ cc_sources = ConvertUTF.c howto.cpp mvarray.cpp mvdatetime.cpp  mvdebug.cpp mvfu
 mvutf.cpp naturalorder.cpp gettimeofday.cpp mv2.cpp mv.cpp mvdbpostgres.cpp mvenvironment.cpp mvglobalfuncs.cpp  \
 mvipc.cpp mvmv.cpp mvunicode.cpp mvipc_boost.cpp mvipc_posix.cpp \
 mvipc_ms.cpp mvposix.cpp MurmurHash2_64.cpp \
-mvfunctor.cpp mvprogram.cpp mvhandles.cpp
+mvfunctor.cpp mvprogram.cpp mvhandles.cpp mvdbconns.cpp
 
 #where to install the libraries include headers
 library_includedir=$(includedir)/$(GENERIC_LIBRARY_NAME)-$(GENERIC_API_VERSION)/$(GENERIC_LIBRARY_NAME)

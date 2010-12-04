@@ -404,22 +404,31 @@ var& var::oconv_MC(const wchar_t* conversionchar)
 	*/
 
 #ifndef BOOST_HAS_ICU
-#	define boost_regex boost::wregex
 #	define boost_mvstr toTstring((*this))
 #	define boost_regex_replace boost::regex_replace
-#else
-#	define boost_regex boost::u32regex
-#	define boost_mvstr var_mvstr
-#	define boost_regex_replace boost::u32regex_replace
-#endif
-
-	static const boost_regex
+	static const boost::wregex
 		digits_regex		(L"\\d+"		,boost::regex::extended), // \d numeric
 		alpha_regex			(L"[^\\W\\d]+"	,boost::regex::extended), // \a alphabetic
 		alphanum_regex		(L"\\w+"		,boost::regex::extended), // \w alphanumeric
 		non_digits_regex	(L"[^\\d]+"		,boost::regex::extended), // \D non-numeric
 		non_alpha_regex		(L"[\\W\\d]+"	,boost::regex::extended), // \A non-alphabetic
 		non_alphanum_regex	(L"\\W+"		,boost::regex::extended); // \W non-alphanumeric
+#else
+#	define boost_mvstr var_mvstr
+#	define boost_regex_replace boost::u32regex_replace
+	static const boost::u32regex
+		digits_regex=boost::make_u32regex(L"\\d+"	,boost::regex::extended); //\d numeric
+	static const boost::u32regex
+		alpha_regex=boost::make_u32regex(L"[^\\W\\d]+"	,boost::regex::extended); // \a alphabetic
+	static const boost::u32regex
+		alphanum_regex=boost::make_u32regex(L"\\w+"	,boost::regex::extended); // \w alphanumeric
+	static const boost::u32regex
+		non_digits_regex=boost::make_u32regex(L"[^\\d]+",boost::regex::extended); // \D non-numeric
+	static const boost::u32regex
+		non_alpha_regex=boost::make_u32regex(L"[\\W\\d]+",boost::regex::extended); // \A non-alphabetic
+	static const boost::u32regex
+		non_alphanum_regex=boost::make_u32regex(L"\\W+"	,boost::regex::extended); // \W non-alphanumeric
+#endif
 
 	//negate if /
 	if (*conversionchar==L'/')
@@ -591,9 +600,9 @@ bool var::match(const var& matchstr, const var& options) const
 	try
 	{
 		if (options.index(L"i"))
-                        regex.assign(toTstring(matchstr), boost::regex::extended|boost::regex_constants::icase);
+			regex.assign(toTstring(matchstr), boost::regex::extended|boost::regex_constants::icase);
 		else
-                        regex.assign(toTstring(matchstr), boost::regex::extended|boost::regex_constants::icase);
+			regex.assign(toTstring(matchstr), boost::regex::extended|boost::regex_constants::icase);
 	}
 	catch (boost::regex_error& e)
     {
@@ -602,13 +611,13 @@ bool var::match(const var& matchstr, const var& options) const
 
         return regex_match(toTstring((*this)), regex);
 #else
-	boost::32wregex regex;
+	boost::u32regex regex;
 	try
 	{
 		if (options.index(L"i"))
-                        regexboost::make_u32regex(matchstr, boost::regex::extended|boost::regex_constants::icase);
+                        regex=boost::make_u32regex(matchstr.var_mvstr, boost::regex::extended|boost::regex_constants::icase);
 		else
-                        regexboost::make_u32regex(matchstr, boost::regex::extended);
+                        regex=boost::make_u32regex(matchstr.var_mvstr, boost::regex::extended);
 	}
 	catch (boost::regex_error& e)
     {
@@ -672,10 +681,12 @@ var& var::swapper(const var& what, const var& with, const var& options)
 		try
 		{
 			if (options.index(L"i"))
-                                regex=boost::make_u32regex(what.var_mvstr, boost::regex::extended|boost::regex_constants::icase);
+				regex=boost::make_u32regex(what.var_mvstr,
+					boost::regex::extended|boost::regex_constants::icase);
 			else
-                                regex=boost::make_u32regex(what.var_mvstr, boost::regex::extended);
-		//boost::wregex toregex_regex(with.var_mvstr, boost::regex::extended);
+				regex=boost::make_u32regex(what.var_mvstr,
+					boost::regex::extended);
+			//boost::wregex toregex_regex(with.var_mvstr, boost::regex::extended);
 		}
 		catch (boost::regex_error& e)
 		{
@@ -685,7 +696,7 @@ var& var::swapper(const var& what, const var& with, const var& options)
 		//return regex_match(var_mvstr, expression);
 
 		//std::wostringstream outputstring(std::ios::out | std::ios::binary);
-    //std::ostream_iterator<wchar_t, wchar_t> oiter(outputstring);
+		//std::ostream_iterator<wchar_t, wchar_t> oiter(outputstring);
 		//boost::regex_replace(oiter, var_mvstr.begin(), var_mvstr.end(),regex_regex, with, boost::match_default | boost::format_all);
 		var_mvstr=boost::u32regex_replace(var_mvstr,regex, with.var_mvstr);
 
@@ -1084,7 +1095,7 @@ bool var::osbwrite(const var& osfilename, var & startoffset) const
 	}
 
 	//pass back the file pointer offset
-	startoffset = pmyfile->tellp();
+	startoffset = (int) pmyfile->tellp();
 
 	//although slow, ensure immediate visibility of osbwrites
 	pmyfile->flush();
@@ -1140,7 +1151,7 @@ var& var::osbread(const var& osfilename, var & startoffset, const int bytesize)
 
 	//update the startoffset function argument
 	//if( readsize > 0)
-	startoffset = pmyfile->tellg();
+	startoffset = (int) pmyfile->tellg();
 
 	//transfer the memory block to this variable's string
 	//(is is possible to read directly into string data() avoiding a memory copy?

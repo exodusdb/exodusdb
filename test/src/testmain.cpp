@@ -4,7 +4,7 @@
 /*Ubuntu
  apt-cache search locale |grep -i greek
  greek turkish german
- apt-get install language-support-el language-support-tr
+ apt-get install language-support-el language-support-tr language-support-de
 */
 
 //non-ASCII unicode characters
@@ -26,45 +26,17 @@ var TurkishSmallDotlessI    =L"\u0131";
 var LatinSmallI             ="i";
 var LatinCapitalI           ="I";
 
-var GermanEszet             =L"\u00DF";//German 
+var GermanEszet             =L"\u00DF";//German
 
 programinit()
 
-ExodusFunctorBase efb_f1;
-var f1(in arg1=var())
-{
- if (efb_f1.pmemberfunction_==NULL)
-  efb_f1.init("f1","exodusprogrambasecreatedelete",mv);
-
- //define a function that calls the shared library object member function
- typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(in);
-
- return CALLMEMBERFUNCTION(*(efb_f1.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_f1.pmemberfunction_)))
-  (arg1);
-}
-
 function main()
 {
-#ifdef STEVE_CODE_INCLUDED	
-        printl(sin(30));
-
-USERNAME="";
-if (ID.assigned())
- ID.outputl("ID=");
-ID="";
-//      stop();
-        printl("m1 says 'Hello World!'");
-        ID="xyz";
-        f1("xxx").outputl();
-        ID.outputl("ID=");
-        //return 0;
-#endif
 
 #ifdef MULTIPLE_CONNECTION_CODE_EXCLUDED
 	{
 		var conn1;
-		conn1.connect( L"", conn1);	
+		conn1.connect( L"", conn1);
 	}		// one connection is lost here (hangs)
 
 	{
@@ -132,7 +104,7 @@ ID="";
 		while( table1.readnextrecord( record1, id1) and table2.readnextrecord( record2, id2))
 		{
 			printl( "r1=" ^ record1 ^ ", id1=" ^ id1 ^ ", r2=" ^ record2 ^ ", id2=" ^ id2 ^ ".");
-		}		
+		}
 		conn1.disconnect();
 		conn2.disconnect();
 	}
@@ -157,7 +129,7 @@ ID="";
 		oswrite( L"", file3);
 		var off3 = 0;
 		osbwrite( L"This text is written to the file 'FILE3.txt'", file3, off3);
-				
+
 		osbwrite( L"THIS TEXT INTENDED FOR FILE 'FILE1.txt' BUT IT GOES TO 'FILE3.txt'", file1, off1);
 	}
 #endif
@@ -191,8 +163,9 @@ ID="";
 		turkish=1055;
 	} else {
 		english_us="en_US.utf8";
-		greek_gr="el_GR.UTF-8";
-		turkish="tr_TR.UTF-8";
+		german_standard="de_DE.utf8";
+		greek_gr="el_GR.utf8";
+		turkish="tr_TR.utf8";
 	}
 
 	//in English/US Locale
@@ -216,35 +189,41 @@ ID="";
 	//ucase(Greek_sas).outputl("ucased   =");
 	//lcase(Greek_SAS).oconv("HEX4").oconv("T#4").outputl();
 	assert(ucase(Greek_sas) eq Greek_SAS);
-	//FAILS in Windows XPSP3UK
+	//FAILS in Windows XPSP3UK and linux
 	//assert(lcase(Greek_SAS) eq Greek_sas);
 
 	//NB a codepage is a 256 x one byte map of characters selected from all unicode characters depending on locale
 
-	//show where we are working
-	printl(oscwd("OSCWD="));
-	var greektestfilename="greeksas.txt";
-	//check CANNOT write greek unicode characters using French codepage
-	assert(not Greek_sas.oswrite(greektestfilename,"French"));//CANNOT write
-	//check can write greek unicode characters to Greek codepage
-	assert(Greek_sas.oswrite(greektestfilename,"Greek"));
-	//check 3 (wide) characters output as 3 bytes
-	assert(osfile(greektestfilename)(1) eq 3);
-	//check can read greek wide unicode characters from greek codepage
-	var rec2;
-	assert(rec2.osread(greektestfilename,"Greek"));
-	assert(rec2 eq Greek_sas);
-	//check raw read as latin
-	assert(rec2.osread(greektestfilename,"C"));
-	var rec3=L"\xF3\xE1\xF2";
-	assert(rec2 eq rec3);//greek code page characters
+	//test windows codepages
+	if (SLASH_IS_BACKSLASH) {
+		//show where we are working
+		printl(oscwd("OSCWD="));
+		var greektestfilename="greeksas.txt";
+		//check CANNOT write greek unicode characters using French codepage
+		assert(not Greek_sas.oswrite(greektestfilename,"French"));//CANNOT write
+		//check can write greek unicode characters to Greek codepage
+		assert(Greek_sas.oswrite(greektestfilename,greek_gr));
+		//check 3 (wide) characters output as 3 bytes
+		assert(osfile(greektestfilename)(1) eq 3);
+		//check can read greek wide unicode characters from greek codepage
+		var rec2;
+		assert(rec2.osread(greektestfilename,greek_gr));
+		assert(rec2 eq Greek_sas);
+		//check raw read as latin
+		assert(rec2.osread(greektestfilename,"C"));
+		var rec3=L"\xF3\xE1\xF2";
+		assert(rec2 eq rec3);//greek code page characters
 
+	}
 	//in Turkish Locale
 	//check Latin "I" lowercases to "turkish dotless i"
 	//check Latin "i" uppercases to "turkish dotted I"
 	//fails on Ubuntu 10.04
+	assert(setxlocale(turkish));
+	printl("Latin Capital I should lower case to dotless Turkish i:",lcase(LatinCapitalI));
+	assert(lcase(TurkishCapitalDottedI) eq LatinSmallI);
+	assert(ucase(TurkishSmallDotlessI) eq LatinCapitalI);
 	if (SLASH_IS_BACKSLASH) {
-		assert(setxlocale(turkish));
 		assert(lcase(LatinCapitalI) eq TurkishSmallDotlessI);
 		assert(ucase(LatinSmallI)   eq TurkishCapitalDottedI);
 	}
@@ -267,7 +246,8 @@ ID="";
 	assert(osbwrite("78",tempfilename5,offset));
 //	assert(osbwrite("78",tempfilename5,offset));
 
-	var b78 = osbread( tempfilename5, var(1), 2);
+	var offset2=1;
+	var b78 = osbread( tempfilename5, offset, 2);
 
 	assert(osread(record5,tempfilename5));
 	assert(record5.oconv("HEX2") eq "000000003738");
@@ -276,9 +256,11 @@ ID="";
 	//check cannot write non-codepage characters
 	if (SLASH_IS_BACKSLASH) {
 		assert(oswrite("",tempfilename5));
-		assert(not osbwrite(GreekSmallFinalSigma,tempfilename5,var(2)));
-		osopen(tempfilename5,"Greek");
-		assert(osbwrite(GreekSmallFinalSigma,tempfilename5,var(2)));
+		var offset=2;
+		assert(not osbwrite(GreekSmallFinalSigma,tempfilename5,offset));
+		osopen(tempfilename5,greek_gr);
+		offset=2;
+		assert(osbwrite(GreekSmallFinalSigma,tempfilename5,offset));
 		osdelete(tempfilename5);
 	}
 
@@ -304,9 +286,9 @@ ID="";
 	unicode^=GreekSmallGamma;
 	unicode^=L"ABc-123.456";//some LATIN characters and punctuation
 
-	var status1 = oswrite( unicode, "GreekLocalFile.txt", "Greek");
+	var status1 = oswrite( unicode, "GreekLocalFile.txt", greek_gr);
 	var status2 = oswrite( unicode, "GreekUTF-8File.txt", "utf8");
-	var status3 = oswrite( unicode, "GreekEnglFile.txt", "English");
+	var status3 = oswrite( unicode, "GreekEnglFile.txt", english_us);
 
 	//test swapping "letters" (i.e. alphabet) with "?"
 	//We expect the question mark to remain as it is,
@@ -594,12 +576,12 @@ dict(AGE_IN_YEARS) {
 	a.splicer(-2,-3,"xx");
 	assert(a eq "axxe");
 
-	//replacing a section of a string - method 3 – but may be slower
+	//replacing a section of a string - method 3 - but may be slower
 	a="abcde";
 	a=splice(a,-2,-3,"xx");
 	assert(a eq "axxe");
 
-	//replacing a section of a string - method 4 – but may be slower
+	//replacing a section of a string - method 4 - but may be slower
 	a="abcde";
 	a=a.splice(-2,-3,"xx");
 	assert(a eq "axxe");
@@ -1255,7 +1237,7 @@ while trying to match the argument list '(exodus::var, bool)'
 	//check copying to a new file
 	var tempfilename2=tempfilename^2;
 	if (osfile(tempfilename2))
-		assert(osdelete(tempfilename2));
+	assert(osdelete(tempfilename2));
 	assert(oscopy(tempfilename,tempfilename2));
 	assert(osfile(tempfilename2) eq info);
 
