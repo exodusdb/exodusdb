@@ -968,10 +968,15 @@ bool var::osread(const char* osfilename, const var& locale)
 	myfile.seekg (0, std::ios::beg);
 	myfile.read (memblock.get(), (unsigned int) bytesize);
 
+	bool failed = myfile.fail();
+
 	// NOTE: in "utf8" mode, number of read characters in memblock is less then requested.
 	//		As such, to prevent garbage in tail of returned string, do:
 	bytesize = myfile.gcount();
 	myfile.close();
+
+	if (failed)
+		return false;
 
 	//ALN:JFI: actually we could use std::string 'tempstr' in place of 'memblock' by hacking
 	//	.data member and reserve() or resize(), thus avoiding buffer-to-buffer-copying
@@ -1094,6 +1099,8 @@ var& var::osbread(const var& osfilename, var & startoffset, const int bytesize)
 
 	//read the data (converting characters on the fly)
 	pmyfile->read (memblock.get(), bytesize);
+
+	//bool failed = pmyfile.fail();
 
 	//update the startoffset function argument
 	//if( readsize > 0)
