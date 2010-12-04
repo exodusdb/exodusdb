@@ -134,7 +134,7 @@ function main()
 	}
 #endif
 
-	printl("testfr says 'Hello World!'");
+	printl("testmain says 'Hello World!'");
 	//assert(setxlocale("fr_FR.utf8"));
 	//assert(setxlocale(1036));
 	var xx3="1234.5678";
@@ -236,6 +236,7 @@ function main()
 
 	//restore initial locale
 	setxlocale(locale0);
+	setxlocale(english_us);
 
 	var tempfilename5;
 	var record5;
@@ -251,7 +252,7 @@ function main()
 	osclose(tempfilename5);
 
 	//check we can osbwrite to an existent file beyond end of file
-	oswrite("",tempfilename5);
+	oswrite("",tempfilename5,"utf8");
 	offset=2;
 	assert(osbwrite("78",tempfilename5,offset));
 	offset=2;
