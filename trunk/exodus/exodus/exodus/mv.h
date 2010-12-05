@@ -713,7 +713,7 @@ public:
 	//same again but this time allowing native strings without needing automatic conversion of var->char*
 	//this is to only to avoid convertion too and from var
 	//but will usage of hard coded filenames etc really be in fast loops
-	//and performance related? perhaps only provide 
+	//and performance related? perhaps only provide
 	bool osread(const char* osfilename, const var& locale = L"");
 
 	//libraries and subroutines/functions

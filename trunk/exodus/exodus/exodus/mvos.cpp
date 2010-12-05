@@ -877,8 +877,9 @@ bool var::osopen() const
 	THISISSTRING()
 
 	//if reopening an osfile that is already opened then close and reopen
-	//	if (var_mvtyp & pimpl::MVTYPE_HANDLE)		-- this check is done in osclose
-	osclose();
+	//dont call if not necessary
+	if (var_mvtyp & pimpl::MVTYPE_HANDLE)
+		osclose();
 
 	return osopenx(*this, L"")!=0;
 
@@ -891,8 +892,9 @@ bool var::osopen(const var& osfilename, const var& locale) const
 	ISSTRING(osfilename)
 
 	//if reopening an osfile that is already opened then close and reopen
-	//	if (var_mvtyp & pimpl::MVTYPE_HANDLE)		-- this check is done in osclose
-	osclose();
+	//dont call if not necessary
+	if (var_mvtyp & pimpl::MVTYPE_HANDLE)
+		osclose();
 
 	return osopenx(osfilename, locale)!=0;
 
@@ -960,6 +962,7 @@ std::wfstream* var::osopenx(const var& osfilename, const var& locale) const
 		//can addhandle fail?
 		this->var_mvint = mv_handles_cache.add_handle( pmyfile, del_wfstream, osfilename.var_mvstr);
 		this->var_mvtyp = pimpl::MVTYPE_OPENED;
+		this->var_mvstr = osfilename.var_mvstr;
 	}
 
 	return pmyfile;
@@ -1179,8 +1182,8 @@ var& var::osbread(const var& osfilevar, var & startoffset, const int bytesize)
 
 void var::osclose() const
 {
-	THISIS(L"void var::osclose() const")
-	THISISSTRING()
+	//THISIS(L"void var::osclose() const")
+	//THISISSTRING()
 	if( var_mvtyp & pimpl::MVTYPE_HANDLE)
 	{
 //		std::wfstream * h = (std::wfstream *) h_cache.get_handle(( int) var_mvint);
