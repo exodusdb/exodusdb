@@ -938,7 +938,7 @@ std::wfstream* var::osopenx(const var& osfilename, const var& locale) const
 		//to prevent locale conversion if writing narrow string to wide stream or vice versa
 		//imbue BEFORE opening or after flushing
 		//myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
-
+/*
 		try
 		{
 			pmyfile->imbue(std::locale(locale.tostring().c_str()));
@@ -947,6 +947,8 @@ std::wfstream* var::osopenx(const var& osfilename, const var& locale) const
 		{
 			throw MVException(locale^L" is not supported on this system");
 		}
+*/
+		pmyfile->imbue( get_locale( locale));
 
 		//open the file for i/o (fail if the file doesnt exist and do NOT delete any existing file)
 		//binary and in/out to allow reading and writing from same file handle
@@ -1142,18 +1144,28 @@ var& var::osbread(const var& osfilevar, var & startoffset, const int bytesize)
 	std::wfstream * pmyfile = osfilevar.osopenx(osfilevar,L"");
 	if( pmyfile == 0)
 		return *this;
-
+/*
 	//NB all file sizes are in bytes NOT characters despite this being a wide character fstream
 	// Position get pointer at the end of file, as expected it to be if we open file anew
 	pmyfile->seekg( 0, std::ios::end);
 	unsigned int maxsize = pmyfile->tellg();
 
+var(int(maxsize)).outputl(L"maxsize=");
 	//return "" if start reading past end of file
 	if ((unsigned long)( int)startoffset>=maxsize)	// past EOF
 		return *this;
 
+*/
 	//seek to the startoffset
-	pmyfile->seekg ( static_cast<long> (startoffset.var_mvint), std::ios::beg);	// 'std::streampos' usually 'long'
+        //if (pmyfile->tellg() != static_cast<long> (startoffset.var_mvint))
+	{
+		if (pmyfile->fail())
+			pmyfile->clear();
+		//pmyfile->seekg ( static_cast<long> (startoffset.var_mvint), std::ios::beg);	// 'std::streampos' usually 'long'
+		//seekg always seems to result in tellg being -1 in linux (Ubunut 10.04 64bit)
+		pmyfile->rdbuf()->pubseekpos(static_cast<long> (startoffset.var_mvint));
+	}
+//var((int) pmyfile->tellg()).outputl(L"2 tellg=");
 
 	//get a memory block to read into
 	boost::scoped_array<wchar_t> memblock( new wchar_t [bytesize]);
@@ -1165,6 +1177,11 @@ var& var::osbread(const var& osfilevar, var & startoffset, const int bytesize)
 	pmyfile->read (memblock.get(), bytesize);
 
 	//bool failed = pmyfile.fail();
+	if (pmyfile->fail())
+	{
+		pmyfile->clear();
+		pmyfile->seekg( 0, std::ios::end);
+	}
 
 	//update the startoffset function argument
 	//if( readsize > 0)

@@ -151,6 +151,11 @@ function main()
 	}
 #endif
 
+	assert(oswrite("","temp1234.txt"));
+	var offs=2;
+	assert(osbwrite("78","temp1234.txt",offs));
+//	abort("stopping");
+
 	printl("testmain says 'Hello World!'");
 	//assert(setxlocale("fr_FR.utf8"));
 	//assert(setxlocale(1036));
@@ -269,12 +274,21 @@ function main()
 	osclose(tempfilename5);
 
 	//check we can osbwrite to an existent file beyond end of file
-	oswrite("",tempfilename5,"utf8");
+	//oswrite("",tempfilename5,"utf8");
+	oswrite("",tempfilename5);
 	offset=2;
+	if (not osopen(tempfilename5,tempfilename5))
+		abort("cant open "^tempfilename5);
 	assert(osbwrite("78",tempfilename5,offset));
 	offset=2;
-	assert(osbread( tempfilename5, offset, 2) eq "78");
-
+	assert(osbwrite("90",tempfilename5,offset));
+	offset=2;
+	var v78=osbread( tempfilename5, offset, 2).outputl("78=");
+	offset=2;
+	v78.osbread( tempfilename5, offset, 2).outputl("78=");
+	printl(v78," ",v78.len());
+	assert(v78 eq "90");
+abort("steve");
 	offset=2;
 	var b78 = osbread( tempfilename5, offset, 2);
 
