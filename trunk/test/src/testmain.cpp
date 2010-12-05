@@ -32,24 +32,37 @@ programinit()
 
 function main()
 {
-	{
-        var tempfilename5="temp.txt";
-        var tempfilename6="temp.txt";
 
-        oswrite("",tempfilename6);
-        var offset=2;
+	//test oswrite and osbread utf8
+	//following code works on win32 and linux64 (ubuntu 10.04)
+	{
+        var tempfilename5="temp5.txt";
+
+        var greek2=L"\u03B3\u03A3";//lowercase gamma and uppercase sigma
+        //greek2.outputl();
+        assert(oswrite(greek2,tempfilename5,"utf8"));
 
         var tempfile;
-        if (not osopen(tempfilename5,tempfile))
-                abort("cant open "^tempfile);
+        assert(osopen(tempfilename5,tempfile,"utf8"));
 
-        assert(osbwrite("78",tempfile,offset));
+		var data,offset2;
+		//test reading from beyond end of file - returns ""
+        offset2=4;
+        assert(data.osbread(tempfile,offset2,2) eq "");
+        offset2=3;
+        assert(data.osbread(tempfile,offset2,2) eq "");
 
-        var v78;
-		offset=2;
-        v78.osbread( tempfile, offset, 2);
-        assert(v78 eq "78");
+		offset2=2;
+        assert(data.osbread(tempfile,offset2,2) eq greek2[2]);
+
+		//read from non-first-byte of a multibyte unicode character returns ""
+		offset2=1;
+        assert(data.osbread(tempfile,offset2,2) eq "");
+
+        offset2=0;
+        assert(data.osbread(tempfile,offset2,2) eq greek2);
 	}
+
 #ifdef MULTIPLE_CONNECTION_CODE_EXCLUDED
 	{
 		var conn1;
@@ -276,26 +289,16 @@ function main()
 	//check we can osbwrite to an existent file beyond end of file
 	//oswrite("",tempfilename5,"utf8");
 	oswrite("",tempfilename5);
+	assert(osopen(tempfilename5,tempfilename5));
 	offset=2;
-	if (not osopen(tempfilename5,tempfilename5))
-		abort("cant open "^tempfilename5);
 	assert(osbwrite("78",tempfilename5,offset));
 	offset=2;
-	assert(osbwrite("90",tempfilename5,offset));
-	offset=2;
-	var v78=osbread( tempfilename5, offset, 2).outputl("78=");
-	offset=2;
-	v78.osbread( tempfilename5, offset, 2).outputl("78=");
-	printl(v78," ",v78.len());
-	assert(v78 eq "90");
-abort("steve");
-	offset=2;
-	var b78 = osbread( tempfilename5, offset, 2);
+	var v78=osbread( tempfilename5, offset, 2);
+	assert(v78 eq "78");
 
 	assert(osread(record5,tempfilename5));
-	assert(record5.oconv("HEX2") eq "000000003738");
+	assert(record5.oconv("HEX2") eq "00003738");
 	assert(osdelete(tempfilename5));
-	osdelete(tempfilename5);
 
 	if (SLASH_IS_BACKSLASH) {
 		//check cannot write non-codepage characters
