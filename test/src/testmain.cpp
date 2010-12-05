@@ -32,7 +32,24 @@ programinit()
 
 function main()
 {
+	{
+        var tempfilename5="temp.txt";
+        var tempfilename6="temp.txt";
 
+        oswrite("",tempfilename6);
+        var offset=2;
+
+        var tempfile;
+        if (not osopen(tempfilename5,tempfile))
+                abort("cant open "^tempfile);
+
+        assert(osbwrite("78",tempfile,offset));
+
+        var v78;
+		offset=2;
+        v78.osbread( tempfile, offset, 2);
+        assert(v78 eq "78");
+	}
 #ifdef MULTIPLE_CONNECTION_CODE_EXCLUDED
 	{
 		var conn1;
@@ -258,7 +275,7 @@ function main()
 	offset=2;
 	assert(osbread( tempfilename5, offset, 2) eq "78");
 
-	var offset2=1;
+	offset=2;
 	var b78 = osbread( tempfilename5, offset, 2);
 
 	assert(osread(record5,tempfilename5));

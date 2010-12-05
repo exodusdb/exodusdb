@@ -52,8 +52,8 @@ program()
                 var path=osgetenv("PATH");
                 var libp=osgetenv("LD_LIBRARY_PATH");
 
-                //prefer user binaries then exodus binaries before all else
-                ossetenv("PATH",home^"/bin:/var/lib/exodus/bin:"^path);
+                //prefer user binaries then exodus binaries AFTER existing path
+				ossetenv("PATH",path^":"^home^"/bin:/var/lib/exodus/bin");
 
 //print("LD_LIBRARY_PATH","~/lib:"^osgetenv("LD_LIBRARY_PATH"));
                 ossetenv("LD_LIBRARY_PATH",home^"/lib:"^libp);
