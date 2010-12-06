@@ -108,6 +108,10 @@ qt strings are unicode
 #include <boost/scoped_array.hpp>
 //#include <boost/algorithm/string.hpp>
 #include <locale.h>
+#ifdef __APPLE__
+#include <xlocale.h>
+#endif
+
 #define MV_NO_NARROW
 #include <exodus/mv.h>
 #include <exodus/mvexceptions.h>
@@ -311,7 +315,7 @@ bool var::setxlocale() const
 	if (uselocale(NULL)==uselocale(LC_GLOBAL_LOCALE))
 		uselocale(duplocale(uselocale(LC_GLOBAL_LOCALE)));
 
-	setlocale(LC_ALL,(*this).tostring().c_str())!=NULL;
+	return setlocale(LC_ALL,(*this).tostring().c_str())!=NULL;
 	//return setlocale(LC_CTYPE,(*this).tostring().c_str())!=NULL;
 
 #endif

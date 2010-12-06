@@ -961,10 +961,9 @@ public:
 	var sum(const var& sepchar=VM_) const;
 
 	//var FILE I/O
-	bool setdefaultconnection(const var& connectioninfo=L"");
-	bool connect(const var& conninfo);	// alternative connect, create multiconnection
+	bool connect(const var& conninfo=L"");
 	bool disconnect();
-	bool disconnect(const var & connectionhandle);				// alternative disconnect, to close multiconnection
+	bool setdefaultconnection();
 
 	bool begintrans() const;
 	bool rollbacktrans() const;
@@ -984,7 +983,7 @@ public:
 	bool deleteindex(const var& fieldname) const;
 	var listindexes(const var& filename=L"") const;
 
-	bool open(const var& dbfilename);
+	bool open(const var& dbfilename, const var& dbconnection=L"");
 	void close();
 
 	bool select(const var& sortselectclause = L"") const;
@@ -1039,11 +1038,11 @@ private:
 
 	bool selectx(const var& fieldnames, const var& sortselectclause) const;
 
-	void * connectionx() const;		// finds connection of this variable:
-									// if this is not filename SQLOPENED variable, returns connection()
+	// finds connection of this variable:
+	// if this is not filename SQLOPENED variable, returns thread default connection or attempts a default connect()
 	void* connection() const;
+
 	var build_conn_info( const var & conninfo) const;
-	bool open(const var& filename, int connection_id);
 
 	var getdictexpression(const var& mainfilename, const var& filename, const var& dictfilename, const var& dictfile, const var& fieldname, var& joins, bool forsort_or_select_or_index=false) const;
 
