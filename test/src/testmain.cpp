@@ -97,14 +97,13 @@ function main()
 
 	}
 	{
-		//create exodus2 and exodus3
+		printl("create dbs exodus2 and exodus3");
 		var conn1;
 		assert(conn1.connect(""));
 		assert(conn1.createdb(dbname2));
 		assert(conn1.createdb(dbname3));
-		
-		//create table1 on exodus and table2 on exodus2
-		//interleaving
+
+		printl("create table2 on exodus2 and table3 on exodus3 - interleaved");
 		var conn2,conn3;
 		var table2="TABLE2";
 		var table3="TABLE3";
@@ -128,8 +127,7 @@ function main()
 		assert(conn3.disconnect());
 	}
 	{
-		// Go through table2 in exodus2 db and through table1 in exodus1 db, and print records
-		// Both tables are assumed existing
+		printl("Go through table2 in exodus2 db and through table3 in exodus3 db");
 		var conn2, conn3;
 		assert(conn2.connect( L"dbname="^dbname2));
 		assert(conn3.connect( L"dbname="^dbname3));
@@ -152,15 +150,15 @@ function main()
 
 		assert(not table2.readnextrecord( record2, id2) and not table3.readnextrecord( record3, id3));
 
-		//check CANNOT delete databases while a connection is open
+		printl("check CANNOT delete databases while a connection is open");
 		//NB try to delete db2 from conn3 and vice versa
 		assert(not conn3.deletedb(dbname2));
 		assert(not conn2.deletedb(dbname3));
 
 		conn2.disconnect();
 		conn3.disconnect();
-		
-		//remove any existing test databases.
+
+		printl("remove any test databases");
 		//connect to exodus first cant delete db if connected to it.
 		var conn1;
 		assert(conn1.connect(L"dbname=exodus"));
