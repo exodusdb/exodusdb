@@ -63,21 +63,31 @@ function main()
         assert(data.osbread(tempfile,offset2,2) eq greek2);
 	}
 
-#ifdef MULTIPLE_CONNECTION_CODE_EXCLUDED
+#ifndef MULTIPLE_CONNECTION_CODE_EXCLUDED
+
 	{
 		var conn1;
-		conn1.connect( L"", conn1);
+		conn1.connect( L"");
 	}		// one connection is lost here (hangs)
 
 	{
 		var conn1;
-		conn1.connect( L"", conn1);
+		conn1.connect( L"");
 		conn1.disconnect();
 	}
-
+	{
+		var conn1;
+		conn1.connect( L"");			// creates new connection with default parameters (connection string)
+		var dummytable;
+		dummytable.open( "MD");				// create filename to use connection
+		dummytable.deletedb( "exodus2");
+		dummytable.deletedb( "exodus3");
+		dummytable.createdb( "exodus2");
+		dummytable.disconnect();
+	}
 	{
 		var conn2;
-		conn2.connect( L"", conn2);
+		conn2.connect( L"");
 		var table1;
 		if( ! table1.open("TABLE1"))			// for conn2
 		{
@@ -91,18 +101,20 @@ function main()
 	}
 	{
 		var conn1;
-		conn1.connect( L"", conn1);		// default dbname=exodus
+		conn1.connect( L"");		// default dbname=exodus
 		var table1;
 		assert( table1.open("TABLE1"));			// actually this is not convenient
 					// I can not open 3 connections and later open table1 :(
 
 		var conn3;
-		conn3.connect( L"dbname=exodus3", conn3);		// custom dbname=exodus3, should fail
+		assert( ! conn3.connect( L"dbname=exodus3"));		// custom dbname=exodus3, should fail
 		var conn2;
-		conn2.connect( L"dbname=exodus2", conn2);		// custom dbname=exodus2, should succeed
+		conn2.connect( L"dbname=exodus2");		// custom dbname=exodus2, should succeed
 		var table2;
 		if( ! table2.open("TABLE2"))			// for conn2
 		{
+			// table2 is NOT string here !
+			table2 = "TABLE2";
 			printl("Creating "^table2);
 			assert( createfile(table2));
 		}
@@ -121,10 +133,10 @@ function main()
 		// Go through table2 in exodus2 db and through table1 in exodus1 db, and print records
 		// Both tables are assumed existing
 		var conn1, conn2;
-		var().connect( L"dbname=exodus2", conn2);		// custom dbname=exodus2, should succeed
+		conn2.connect( L"dbname=exodus2");		// custom dbname=exodus2, should succeed
 		var table2;
 		assert( table2.open( "TABLE2"));
-		var().connect( L"dbname=exodus", conn1);		// custom dbname=exodus2, should succeed
+		conn1.connect( L"dbname=exodus");		// custom dbname=exodus2, should succeed
 		var table1;
 		assert( table1.open( "TABLE1"));
 
@@ -136,6 +148,7 @@ function main()
 			printl( "r1=" ^ record1 ^ ", id1=" ^ id1 ^ ", r2=" ^ record2 ^ ", id2=" ^ id2 ^ ".");
 		}
 		conn1.disconnect();
+		//ALN:TODO: add here code to: deletedb( "exodus2") -- just test this statement
 		conn2.disconnect();
 	}
 #endif

@@ -106,7 +106,7 @@ int MVipc(const int environmentn, var& pgconnparams)
 	tss_ipcstarted.reset(new bool(true));
 
 	//clone the postgres connection because the parent thread is running a select with it
-	if (!var().connect(pgconnparams))
+	if (!var().setdefaultconnection(pgconnparams))
 	{
 		//throw var(L"MVipc Cannot connect additional thread to postgres");
 		var(L"MVipc Cannot connect additional thread to postgres").errputl();

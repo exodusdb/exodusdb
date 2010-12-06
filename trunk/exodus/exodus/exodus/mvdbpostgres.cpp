@@ -316,11 +316,9 @@ var var::build_conn_info( const var & conninfo) const
 
 // var connection;
 // connection.connect2( "dbname=exodusbase");
-// connection.connect( "dbname=exodusbase", connection);
-// ...
-bool var::connect(const var& conninfo, var & connectionhandle)
+bool var::connect(const var& conninfo)
 {
-	THISIS(L"bool var::connect(const var& conninfo, var & connectionhandle")
+	THISIS(L"bool var::connect(const var& conninfo")
 	//nb dont log/trace or otherwise output the full connection info without HIDING the password
 	THISISDEFINED()
 	ISSTRING(conninfo)
@@ -379,7 +377,7 @@ bool var::connect(const var& conninfo, var & connectionhandle)
 	this->var_mvint = ( int) mv_connections_cache.add_connection( pgconn);
 	this->var_mvstr = conninfo.var_mvstr;
 	this->var_mvtyp = pimpl::MVTYPE_SQLOPENED;
-	connectionhandle = * this;
+//	connectionhandle = * this;
 	//ALN:TODO: whats with locktables etc. ?	tss_locktables.reset(new LockTable());
 
 	tss_pgconnparams.reset( new var(conninfo2));	// store recent connection string (used in startipc())
@@ -404,9 +402,9 @@ bool var::connect(const var& conninfo, var & connectionhandle)
 	return true;
 }
 
-bool var::connect(const var& conninfo)
+bool var::setdefaultconnection(const var& conninfo)
 {
-	THISIS(L"bool var::connect(const var& conninfo)")
+	THISIS(L"bool var::setdefaultconnection(const var& conninfo)")
 	//the idea is for exodus to have access to one standard database without secret password
 	var defaultconninfo=L"host=127.0.0.1 port=5432 dbname=exodus user=exodus password=somesillysecret connect_timeout=10";
 	//priority is
@@ -438,7 +436,7 @@ bool var::connect(const var& conninfo)
 #if TRACING >= 1
 				var libname=L"libpq.dll";
 				//var libname=L"libpq.so";
-				exodus::errputl(L"ERROR: mvdbpostgres connect() Cannot load shared library " ^ libname ^ L". Verify configuration PATH contains postgres's \\bin.");
+				exodus::errputl(L"ERROR: mvdbpostgres setdefaultconnection() Cannot load shared library " ^ libname ^ L". Verify configuration PATH contains postgres's \\bin.");
 #endif
 			return false;
 		};
@@ -460,9 +458,9 @@ bool var::connect(const var& conninfo)
 	if (PQstatus(pgconn) != CONNECTION_OK)
 	{
 		#if TRACING >= 2
-			exodus::errputl(L"ERROR: mvdbpostgres connect() Connection to database failed: " ^ var(PQerrorMessage(pgconn)));
+			exodus::errputl(L"ERROR: mvdbpostgres setdefaultconnection() Connection to database failed: " ^ var(PQerrorMessage(pgconn)));
 			//if (not conninfo2)
-				exodus::errputl(L"ERROR: mvdbpostgres connect() Postgres connection configuration missing or incorrect. Please login.");
+				exodus::errputl(L"ERROR: mvdbpostgres setdefaultconnection() Postgres connection configuration missing or incorrect. Please login.");
 ;
 		#endif
 		//required even if connect fails according to docs
@@ -551,7 +549,7 @@ void* var::connection() const
 		//that autoconnection could cause connect() to update the base var (this)
 		//if (!(const_cast<const var>(*this)).connect())
 		//dodge the issue for now
-		if (!var().connect())
+		if (!var().setdefaultconnection())
 		{
 			//handle failure to connect here to avoid error handling on every connection
 			//calling process can always use connect() or try/catch
@@ -693,6 +691,21 @@ bool var::open(const var& filename)
 	THISISDEFINED()
 	ISSTRING(filename)
 
+	// It might happen here, that latest multiple connection is closed, then use default TSS connection
+	int connection_id = mv_connections_cache.get_current_id();
+	if(( connection_id > 0) && ( mv_connections_cache.get_connection( connection_id) == 0))
+		connection_id = 0;
+
+	return open( filename, connection_id);
+}
+
+// internal function to use, when we should request connection explicitly
+bool var::open(const var& filename, int connection_id)
+{
+	THISIS(L"bool var::open(const var& filename)")
+	THISISDEFINED()
+	ISSTRING(filename)
+
     //should perhaps prepare pg parameters for repeated speed
 
     const char* paramValues[1];
@@ -710,11 +723,9 @@ bool var::open(const var& filename)
 	//and remember that a select initiates a transaction committed on readnext eof or clearselect
 	var sql=L"SELECT table_name FROM information_schema.tables WHERE table_schema='public' and table_name=$1";
 
-	//get current connection or return false
-//    PGconn* thread_pgconn=(PGconn*) connection();
-	int connection_id = mv_connections_cache.get_current_id();
-//	PGconn * thread_pgconn = (PGconn*) mv_connections_cache.get_connection( connection_id);
-	PGconn * thread_pgconn = (PGconn *) connectionx();
+	PGconn * thread_pgconn = (PGconn *)( connection_id > 0
+				? mv_connections_cache.get_connection( connection_id)
+				: connection());
 	if (!thread_pgconn)
 		return false;
 
@@ -1474,6 +1485,7 @@ bool var::createdb(const var& dbname, var& errmsg) const
 	//sql^=" OWNER=exodus";
 
 	//TODO this shouldnt only be for default connection
+//	if( this->var_mvtyp == pimpl::MVTYPE_SQLOPENED)
 	return sqlexec(sql,errmsg);
 
 }
@@ -1507,6 +1519,21 @@ bool var::createfile(const var& filename, const var& options)
 	sql ^= L" TABLE " PGDATAFILEPREFIX ^ filename;
 	sql ^= L" (key bytea primary key, data bytea)";
 
+	// if we create the file 'filename', it was not opened before, and can't be carrying the connection
+	if( this->var_mvtyp != pimpl::MVTYPE_SQLOPENED)		// this object has no idea about connection
+	{
+		// Lets use latest active connection
+		// It might happen here, that latest multiple connection is closed, then use default TSS connection
+		int connection_id = mv_connections_cache.get_current_id();
+		if(( connection_id > 0) && ( mv_connections_cache.get_connection( connection_id) == 0))
+			connection_id = 0;
+		if( connection_id > 0)		// save connection in *this
+		{
+			this->var_mvtyp = pimpl::MVTYPE_SQLOPENED;
+			this->var_mvint = connection_id;
+			this->var_mvstr = L"";
+		}
+	}
 	return sqlexec( sql);
 }
 
@@ -1526,7 +1553,7 @@ bool var::clearfile() const
 	return sqlexec( L"DELETE FROM " PGDATAFILEPREFIX ^ *this);
 }
 
-inline void unquoter(var& string)
+inline void unquoter_inline(var& string)
 {
         //remove "", '' and {}
         static var quotecharacters(L"\"'{");
@@ -1563,7 +1590,7 @@ inline var fileexpression(const var& mainfilename, const var& filename, const va
 	//return "coalesce(L" ^ expression ^", ''::bytea)";
 }
 
-var getdictexpression(const var& mainfilename, const var& filename, const var& dictfilename, const var& dictfile, const var& fieldname, var& joins, bool forsort_or_select_or_index=false)
+var var::getdictexpression(const var& mainfilename, const var& filename, const var& dictfilename, const var& dictfile, const var& fieldname, var& joins, bool forsort_or_select_or_index) const
 {
 
 	var actualdictfile=dictfile;
@@ -1574,7 +1601,13 @@ var getdictexpression(const var& mainfilename, const var& filename, const var& d
 			dictfilename=L"dict_md";
 		else
 			dictfilename=L"dict_"^mainfilename;
-		if (!actualdictfile.open(dictfilename))
+
+		// we should open it through the same connection, as this->was opened, not any default connection
+		int connection_id = 0;
+		if( this->var_mvtyp == pimpl::MVTYPE_SQLOPENED)
+			connection_id = ( int) this->var_mvint;
+
+		if (!actualdictfile.open(dictfilename, connection_id))
 		{
 			throw MVDBException(L"getdictexpression() cannot open " ^ dictfilename.quote());
 #if TRACING >= 1
@@ -1642,7 +1675,7 @@ var getdictexpression(const var& mainfilename, const var& filename, const var& d
 		{
 			functionx.splicer(1,11,L"");
 			var xlatetofilename=functionx.field(L",",1).trim();
-			unquoter(xlatetofilename);
+			unquoter_inline(xlatetofilename);
 			var xlatefromfieldname=functionx.field(L",",2).trim();
 			var xlatetofieldname=functionx.field(L",",3).trim();
 			var xlatemode=functionx.field(L",",4).trim().convert(L"'\" )",L"");

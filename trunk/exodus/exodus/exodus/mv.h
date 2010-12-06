@@ -961,8 +961,8 @@ public:
 	var sum(const var& sepchar=VM_) const;
 
 	//var FILE I/O
-	bool connect(const var& connectioninfo=L"");
-	bool connect(const var& conninfo, var & connectionhandle);	// alternative connect, create multiconnection
+	bool setdefaultconnection(const var& connectioninfo=L"");
+	bool connect(const var& conninfo);	// alternative connect, create multiconnection
 	bool disconnect();
 	bool disconnect(const var & connectionhandle);				// alternative disconnect, to close multiconnection
 
@@ -1043,6 +1043,9 @@ private:
 									// if this is not filename SQLOPENED variable, returns connection()
 	void* connection() const;
 	var build_conn_info( const var & conninfo) const;
+	bool open(const var& filename, int connection_id);
+
+	var getdictexpression(const var& mainfilename, const var& filename, const var& dictfilename, const var& dictfile, const var& fieldname, var& joins, bool forsort_or_select_or_index=false) const;
 
 	//TODO check if can speed up by returning reference to converted self like MC
 	var oconv_LR(const var& format) const;
