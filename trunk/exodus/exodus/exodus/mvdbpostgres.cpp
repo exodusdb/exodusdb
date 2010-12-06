@@ -160,7 +160,7 @@ typedef UNORDEREDSET LockTable;
 //this is not threadsafe
 //PGconn     *thread_pgconn;
 //but this is ...
-boost::thread_specific_ptr<PGconn> tss_pgconns;
+boost::thread_specific_ptr<int> tss_pgconnids;
 boost::thread_specific_ptr<var> tss_pgconnparams;
 boost::thread_specific_ptr<bool> tss_ipcstarted;
 boost::thread_specific_ptr<LockTable> tss_locktables;
@@ -181,11 +181,11 @@ boost::thread_specific_ptr<LockTable> tss_locktables;
 */
 
 typedef PGresult* 	PGresultptr;
-static bool pqexec(const var& sql, PGresultptr& pgresult, int connection_id = 0);
+static bool pqexec(const var& sql, PGresultptr& pgresult, PGconn * thread_pgconn);
 
 bool var::sqlexec( const var & SqlToExecute) const
 {
-	//int connection_id = ( var_mvtyp == pimpl::MVTYPE_SQLOPENED) ? ( int) var_mvint : 0;
+	//int connid = ( var_mvtyp == pimpl::MVTYPE_SQLOPENED) ? ( int) var_mvint : 0;
 	var errmsg;
 	bool result = sqlexec( SqlToExecute, errmsg);
 	if (not result && DBTRACE)
@@ -351,7 +351,7 @@ bool var::connect(const var& conninfo)
 	}
 	if (PQstatus(pgconn) != CONNECTION_OK)
 	{
-		#if TRACING >= 2
+		#if TRACING >= 3
 			exodus::errputl(L"ERROR: mvdbpostgres connect() Connection to database failed: " ^ var(PQerrorMessage(pgconn)));
 			//if (not conninfo2)
 				exodus::errputl(L"ERROR: mvdbpostgres connect() Postgres connection configuration missing or incorrect. Please login.");
@@ -380,6 +380,14 @@ bool var::connect(const var& conninfo)
 //	connectionhandle = * this;
 	//ALN:TODO: whats with locktables etc. ?	tss_locktables.reset(new LockTable());
 
+	//set default connection
+	//ONLY IF THERE ISNT ONE ALREADY
+	int* connid=tss_pgconnids.get();
+	if (connid==NULL)
+	{
+		tss_pgconnids.reset(new int((int)var_mvint));
+	}
+
 	tss_pgconnparams.reset( new var(conninfo2));	// store recent connection string (used in startipc())
 	//setup a thread to service callbacks from the database backend
 	if (!tss_ipcstarted.get())
@@ -402,163 +410,67 @@ bool var::connect(const var& conninfo)
 	return true;
 }
 
-bool var::setdefaultconnection(const var& conninfo)
+bool var::setdefaultconnection()
 {
-	THISIS(L"bool var::setdefaultconnection(const var& conninfo)")
-	//the idea is for exodus to have access to one standard database without secret password
-	var defaultconninfo=L"host=127.0.0.1 port=5432 dbname=exodus user=exodus password=somesillysecret connect_timeout=10";
-	//priority is
-	//1) given parameters or last connection parameters
-	//2) individual environment parameters
-	//3) environment connection string
-	//4) config file parameters
-	//5) default parameters
-
-	//nb dont log/trace or otherwise output the full connection info without HIDING the password
+	THISIS(L"bool var::setdefaultconnection()")
 	THISISDEFINED()
-	ISSTRING(conninfo)
 
-	var_mvtyp=pimpl::MVTYPE_UNA;
+	//handle-specific connection
+	if( this->var_mvtyp != pimpl::MVTYPE_SQLOPENED)
+		MVException(L"is not a valid connection in setdefaultconnection()");
 
-	var conninfo2 = build_conn_info( conninfo);
- 
-	//disconnect any previous connection
-	if (tss_pgconns.get())
-		disconnect();
+	tss_pgconnids.reset(new int((int)this->var_mvint));
 
-	//connect or fail
-	PGconn* pgconn;
-	do
-	{
-#if defined _MSC_VER //|| defined __CYGWIN__ || defined __MINGW32__
-		if (not msvc_PQconnectdb(&pgconn,conninfo2.tostring()))
-		{
-#if TRACING >= 1
-				var libname=L"libpq.dll";
-				//var libname=L"libpq.so";
-				exodus::errputl(L"ERROR: mvdbpostgres setdefaultconnection() Cannot load shared library " ^ libname ^ L". Verify configuration PATH contains postgres's \\bin.");
-#endif
-			return false;
-		};
-#else
-		pgconn=PQconnectdb(conninfo2.tostring().c_str());
-#endif
-
-		if (PQstatus(pgconn) == CONNECTION_OK || conninfo2)
-			break;
-
-		//required even if connect fails according to docs
-		PQfinish(pgconn);
-
-		//try again with default conninfo
-		conninfo2=defaultconninfo;
-
-	} while (true);
-
-	if (PQstatus(pgconn) != CONNECTION_OK)
-	{
-		#if TRACING >= 2
-			exodus::errputl(L"ERROR: mvdbpostgres setdefaultconnection() Connection to database failed: " ^ var(PQerrorMessage(pgconn)));
-			//if (not conninfo2)
-				exodus::errputl(L"ERROR: mvdbpostgres setdefaultconnection() Postgres connection configuration missing or incorrect. Please login.");
-;
-		#endif
-		//required even if connect fails according to docs
-		PQfinish(pgconn);
-
-		return false;
-	}
-	#if TRACING >= 3
-		exodus::logputl(L"var::connect() Connection to database succeeded.");
-	#endif
-
-	//abort if multithreading and it is not supported
-	#ifdef PQisthreadsafe
-		if (!PQisthreadsafe())
-		{
-			//TODO only abort if environmentn>0
-			throw MVDBException(L"connect(): Postgres PQ library is not threadsafe");
-		}
-	#endif
-
-//	*this=1;
-	var_mvtyp=pimpl::MVTYPE_INT;
-	this->var_mvint = 0;		// identifies default connection (tss)
-
-	//save the connection in thread specific storage
-	tss_pgconns.reset(pgconn);					//ALN:TODO:so we save ptr to the object
-												//	allocated during establishing the connection
-	tss_pgconnparams.reset(new var(conninfo2));
-	tss_locktables.reset(new LockTable());
-
-	//setup a thread to service callbacks from the database backend
-	if (!tss_ipcstarted.get())
-	{
-		#if TRACING >= 3
-			exodus::outputl(L"Starting IPC");
-		#endif
-		startipc();
-	}
-
-	//doesnt work
-	//need to set PQnoticeReceiver to suppress NOTICES like when creating files
-	//PQsetErrorVerbosity(pgconn, PQERRORS_TERSE);
-
-	//but this does
-	//this turns off the notice when creating tables with a primary key
-	//DEBUG5, DEBUG4, DEBUG3, DEBUG2, DEBUG1, LOG, NOTICE, WARNING, ERROR, FATAL, and PANIC
-
-	sqlexec( DBTRACE ? L"SET client_min_messages = LOG"
-					: L"SET client_min_messages = WARNING");
 	return true;
 
 }
 
-//utility to get handle-specific connection otherwise default thread connection
-void * var::connectionx() const
-{
-	PGconn * thread_pgconn;
-
-	//handle-specific connection
-	if( this->var_mvtyp == pimpl::MVTYPE_SQLOPENED)
-		thread_pgconn = mv_connections_cache.get_connection(( int) this->var_mvint);
-
-	//default thread connection
-	else
-		thread_pgconn=(PGconn*) connection();
-
-	return (void *)thread_pgconn;
-}
-
-//return the thread-default connection (do a default connect if necessary)
+//var::connection()
+//1. return the associated db connection
+//this could be a previously opened filevar, a previous connected connectionvar
+//or any variable previously used for a default connection
+//OR
+//2. return the thread-default connection
+//OR
+//3. do a default connect if necessary
+//
+//NB in case 2 and 3 the connection id is recorded in the var
 //use void pointer to avoid need for including postgres headers in mv.h or any fancy class hierarchy
 //(assumes accurate programming by system programmers in exodus mvdb routines)
 void* var::connection() const
 {
 	//THISIS(L"void* var::connection() const")
 
-	//provides jit connection and caching
+	PGconn * thread_pgconn;
 
-	//get the current thread connection if any
-	PGconn* thread_pgconn=tss_pgconns.get();
-
-	//autoconnect if not connected
-	if (!thread_pgconn)
+	//handle-specific connection
+	if( this->var_mvtyp == pimpl::MVTYPE_SQLOPENED)
 	{
-		//cast away const otherwise we have to remove const from all the var::select() methods to reflect
-		//that autoconnection could cause connect() to update the base var (this)
-		//if (!(const_cast<const var>(*this)).connect())
-		//dodge the issue for now
-		if (!var().setdefaultconnection())
-		{
-			//handle failure to connect here to avoid error handling on every connection
-			//calling process can always use connect() or try/catch
-			//throw MVDBException(L"connection(): Cannot connect. Please login");
-			return NULL;
-		}
-		//get the new connection
-		thread_pgconn=tss_pgconns.get();
+		thread_pgconn = mv_connections_cache.get_connection(( int) this->var_mvint);
+		return (void *)thread_pgconn;
 	}
+
+	int* connid=tss_pgconnids.get();
+
+	//autoconnect and set default if no default connection
+	int connid2;
+	if (connid&&*connid!=0)
+		connid2=*connid;
+	else
+	{
+		var conn1;
+		if (!conn1.connect())
+			return NULL;
+		conn1.setdefaultconnection();
+		connid2=(int) conn1.var_mvint;
+	}
+
+	//save the default connection
+	var_mvint = connid2;
+	var_mvtyp = pimpl::MVTYPE_SQLOPENED;
+
+	//return default connection
+	thread_pgconn = mv_connections_cache.get_connection(connid2);
 	return (void*) thread_pgconn;
 }
 
@@ -566,116 +478,27 @@ void* var::connection() const
 bool var::disconnect()
 {
 	THISIS(L"bool var::disconnect()")
-
 	THISISDEFINED()
 
 #	if TRACING >= 3
 		exodus::errputl(L"ERROR: mvdbpostgres disconnect() Closing connection");
 #	endif
 
-	if( this->var_mvtyp == pimpl::MVTYPE_SQLOPENED)	// close multiple connection
+	if( this->var_mvtyp == pimpl::MVTYPE_SQLOPENED)
 	{
 		mv_connections_cache.del_connection(( int) this->var_mvint);
 		this->var_mvtyp=pimpl::MVTYPE_UNA;
 	}
-	else
-	{
-		PGconn* thread_pgconn=tss_pgconns.get();
 
-		if (thread_pgconn)
-			PQfinish(thread_pgconn);
-
-		tss_pgconns.release();
-		tss_locktables.release();
-
-		var_mvstr=L"";
-		var_mvint=0;
-
-		//make unassigned()
-		var_mvtyp=pimpl::MVTYPE_UNA;
-	}
-	return true;
-}
-
-#if 0 //done with connection buffering below
-bool var::open(const var& filename)
-{
-	THISIS(L"bool var::open(const var& dictcode,const var& filename)")
-	THISISDEFINED()
-	ISSTRING(filename)
-
-    //dumb version of read to see if file exists
-    //should perhaps prepare pg parameters for repeated speed
-
-    const char* paramValues[1];
-    int         paramLengths[1];
-    int         paramFormats[1];
-//    uint32_t    binaryIntVal;
-
-    /* Here is our out-of-line parameter value */
-	std::string filename2=filename.lcase().tostring();
-    paramValues[0] = filename2.c_str();
-    paramLengths[0] = int(filename2.length());
-    paramFormats[0] = 1;//binary
-
-	//avoid any errors because ANY errors while a transaction is in progress cause failure of the whole transaction
-	//and remember that a select initiates a transaction committed on readnext eof or clearselect
-	var sql=L"SELECT table_name FROM information_schema.tables WHERE table_schema='public' and table_name=$1";
-
-    PGconn* thread_pgconn=(PGconn*) connection();
-	if (!thread_pgconn)
-		return false;
-
-	DEBUG_LOG_SQL1
-	PGresult* result = PQexecParams(thread_pgconn,
-    					//TODO: parameterise filename
-                       sql.tostring().c_str(),
-                       1,       /* one param */
-                       NULL,    /* let the backend deduce param type */
-                       paramValues,
-					   paramLengths,
-					   paramFormats,
-                       1);      /* ask for binary results */
-
-	int resultstatus=PQresultStatus(result);
-    if (resultstatus != PGRES_TUPLES_OK)
-    {
-#		if TRACING >= 1
-			exodus::errputl(L"ERROR: mvdbpostgres open(" ^ filename.quote() ^ L") failed\n" ^ var(PQerrorMessage(thread_pgconn)));
-#		endif
-		PQclear(result);
-        return false;
-    }
-
-	//file (table) doesnt exist
-	if (PQntuples(result) < 1)
-	{
-		PQclear(result);
-		return false;
-	}
-
-	if (PQntuples(result) > 1)
- 	{
-		PQclear(result);
-#		if TRACING >= 1
-			exodus::errputl(L"ERROR: mvdbpostgres open() SELECT returned more than one record");
-#		endif
-		return false;
-	}
-
-	PQclear(result);
-
-	//save the filename
-	var_mvstr=L"";
-	//var_mvstr+=filename.var_mvstr;
-	//var_mvstr+=filename.convert(L". ",L"__").var_mvstr;
-	var_mvstr=filename.var_mvstr;
-	var_mvtyp=pimpl::MVTYPE_STR;
+	//if we happen to be disconnecting the same connection as the default connection
+	//then reset the default connection so that it will be reconnected to the next connect
+	//this is rather too smart but will probably do what people expect
+	int* connid=tss_pgconnids.get();
+	if (connid && *connid==var_mvint)
+		tss_pgconnids.reset();
 
 	return true;
-
 }
-#endif
 
 //open filehandle given a filename on current thread-default connection
 //we are using strict filename/filehandle syntax (even though we could use one variable for both!)
@@ -685,33 +508,17 @@ bool var::open(const var& filename)
 // var filename="customers";
 // if (not file.open(filename)) ...
 
-bool var::open(const var& filename)
+//connection is optional and default connection may be used instead
+bool var::open(const var& filename, const var& connection)
 {
-	THISIS(L"bool var::open(const var& filename)")
+	THISIS(L"bool var::open(const var& filename, const var& connection)")
 	THISISDEFINED()
 	ISSTRING(filename)
 
-	// It might happen here, that latest multiple connection is closed, then use default TSS connection
-	int connection_id = mv_connections_cache.get_current_id();
-	if(( connection_id > 0) && ( mv_connections_cache.get_connection( connection_id) == 0))
-		connection_id = 0;
-
-	return open( filename, connection_id);
-}
-
-// internal function to use, when we should request connection explicitly
-bool var::open(const var& filename, int connection_id)
-{
-	THISIS(L"bool var::open(const var& filename)")
-	THISISDEFINED()
-	ISSTRING(filename)
-
-    //should perhaps prepare pg parameters for repeated speed
-
-    const char* paramValues[1];
-    int         paramLengths[1];
-    int         paramFormats[1];
-//    uint32_t    binaryIntVal;
+	const char* paramValues[1];
+	int         paramLengths[1];
+	int         paramFormats[1];
+//	uint32_t    binaryIntVal;
 
 	/* Here is our out-of-line parameter value */
 	std::string filename2=filename.lcase().tostring();
@@ -721,24 +528,23 @@ bool var::open(const var& filename, int connection_id)
 
 	//avoid any errors because ANY errors while a transaction is in progress cause failure of the whole transaction
 	//and remember that a select initiates a transaction committed on readnext eof or clearselect
+    //TODO should perhaps prepare pg parameters for repeated speed
 	var sql=L"SELECT table_name FROM information_schema.tables WHERE table_schema='public' and table_name=$1";
 
-	PGconn * thread_pgconn = (PGconn *)( connection_id > 0
-				? mv_connections_cache.get_connection( connection_id)
-				: connection());
+	PGconn * thread_pgconn = (PGconn *) connection.connection();
 	if (!thread_pgconn)
 		return false;
 
 	DEBUG_LOG_SQL1
 	PGresult* result = PQexecParams(thread_pgconn,
-    					//TODO: parameterise filename
-                       sql.tostring().c_str(),
-                       1,       /* one param */
-                       NULL,    /* let the backend deduce param type */
-                       paramValues,
-					   paramLengths,
-					   paramFormats,
-                       1);      /* ask for binary results */
+		//TODO: parameterise filename
+		sql.tostring().c_str(),
+		1,       /* one param */
+		NULL,    /* let the backend deduce param type */
+		paramValues,
+		paramLengths,
+		paramFormats,
+		1);      /* ask for binary results */
 
 	int resultstatus=PQresultStatus(result);
     if (resultstatus != PGRES_TUPLES_OK)
@@ -747,8 +553,8 @@ bool var::open(const var& filename, int connection_id)
 			exodus::errputl(L"ERROR: mvdbpostgres open(" ^ this->quote() ^ L") failed\n" ^ var(PQerrorMessage(thread_pgconn)));
 #		endif
 		PQclear(result);
-        return false;
-    }
+		return false;
+	}
 
 	//file (table) doesnt exist
 	if (PQntuples(result) < 1)
@@ -758,7 +564,7 @@ bool var::open(const var& filename, int connection_id)
 	}
 
 	if (PQntuples(result) > 1)
- 	{
+	{
 		PQclear(result);
 #		if TRACING >= 1
 			exodus::errputl(L"ERROR: mvdbpostgres open() SELECT returned more than one record");
@@ -770,12 +576,9 @@ bool var::open(const var& filename, int connection_id)
 
 	//save the filename and memorise the current connection for this file var
 	var_mvstr=filename.var_mvstr;
-	var_mvtyp = pimpl::MVTYPE_STR;
-	if( connection_id > 0)
-	{
-		var_mvint = connection_id;
-		var_mvtyp = pimpl::MVTYPE_SQLOPENED;
-	}
+	var_mvint = connection.var_mvint;
+	var_mvtyp = pimpl::MVTYPE_SQLOPENED;//TODO check if this includes MVTYPE_STR?
+
 	return true;
 }
 
@@ -820,7 +623,7 @@ bool var::read(const var& filehandle,const var& key)
 	var sql=L"SELECT data FROM " PGDATAFILEPREFIX ^ filehandle ^ L" WHERE key = $1";
 
 	//get filehandle specific connection or fail
-    PGconn* thread_pgconn = (PGconn*) filehandle.connectionx();
+    PGconn* thread_pgconn = (PGconn*) filehandle.connection();
 	if (!thread_pgconn)
 		return false;
 
@@ -918,7 +721,7 @@ bool var::lock(const var& key) const
 	const char* sql="SELECT PG_TRY_ADVISORY_LOCK($1)";
 
 	//"this" is a filehandle - get its connection
-    PGconn* thread_pgconn=(PGconn*) this->connectionx();
+    PGconn* thread_pgconn=(PGconn*) this->connection();
 	if (!thread_pgconn)
 		return false;
 
@@ -989,7 +792,7 @@ void var::unlock(const var& key) const
 	const char* sql="SELECT PG_ADVISORY_UNLOCK($1)";
 
 	//"this" is a filehandle - get its connection
-    PGconn* thread_pgconn=(PGconn*) this->connectionx();
+    PGconn* thread_pgconn=(PGconn*) this->connection();
 	if (!thread_pgconn)
 		return;
 
@@ -1043,7 +846,7 @@ bool var::sqlexec(const var& sqlcmd, var& errmsg) const
 	THISIS(L"bool var::sqlexec(const var& sqlcmd, var& errmsg) const")
 	ISSTRING(sqlcmd)
 
-	PGconn * thread_pgconn = ( PGconn *) connectionx();
+	PGconn * thread_pgconn = ( PGconn *) connection();
 	if (!thread_pgconn)
 	{
 		errmsg=L"Error: sqlexec cannot find thread database connection";
@@ -1156,7 +959,7 @@ bool var::write(const var& filehandle, const var& key) const
 
 	sql = L"UPDATE " PGDATAFILEPREFIX ^ filehandle ^ L" SET data = $2 WHERE key = $1";
 
-	PGconn * thread_pgconn = ( PGconn *) filehandle.connectionx();
+	PGconn * thread_pgconn = ( PGconn *) filehandle.connection();
 	if (!thread_pgconn)
 		return false;
 
@@ -1249,7 +1052,7 @@ bool var::updaterecord(const var& filehandle,const var& key) const
 
 	var sql = L"UPDATE " PGDATAFILEPREFIX ^ filehandle ^ L" SET data = $2 WHERE key = $1";
 
-	PGconn* thread_pgconn=(PGconn*) filehandle.connectionx();
+	PGconn* thread_pgconn=(PGconn*) filehandle.connection();
 	if (!thread_pgconn)
 		return false;
 
@@ -1319,7 +1122,7 @@ bool var::insertrecord(const var& filehandle,const var& key) const
 
 	var sql = L"INSERT INTO " PGDATAFILEPREFIX ^ filehandle ^ L" (key,data) values( $1 , $2)";
 
-	PGconn* thread_pgconn=(PGconn*) filehandle.connectionx();
+	PGconn* thread_pgconn=(PGconn*) filehandle.connection();
 	if (!thread_pgconn)
 		return false;
 
@@ -1376,7 +1179,7 @@ bool var::deleterecord(const var& key) const
 
 	var sql=L"DELETE FROM " PGDATAFILEPREFIX ^ var_mvstr ^ L" WHERE KEY = $1";
 
-	PGconn* thread_pgconn=(PGconn*) this->connectionx();
+	PGconn* thread_pgconn=(PGconn*) this->connection();
 	if (!thread_pgconn)
 		return false;
 
@@ -1524,13 +1327,13 @@ bool var::createfile(const var& filename, const var& options)
 	{
 		// Lets use latest active connection
 		// It might happen here, that latest multiple connection is closed, then use default TSS connection
-		int connection_id = mv_connections_cache.get_current_id();
-		if(( connection_id > 0) && ( mv_connections_cache.get_connection( connection_id) == 0))
-			connection_id = 0;
-		if( connection_id > 0)		// save connection in *this
+		int connid = mv_connections_cache.get_current_id();
+		if(( connid > 0) && ( mv_connections_cache.get_connection( connid) == 0))
+			connid = 0;
+		if( connid > 0)		// save connection in *this
 		{
 			this->var_mvtyp = pimpl::MVTYPE_SQLOPENED;
-			this->var_mvint = connection_id;
+			this->var_mvint = connid;
 			this->var_mvstr = L"";
 		}
 	}
@@ -1603,11 +1406,11 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 			dictfilename=L"dict_"^mainfilename;
 
 		// we should open it through the same connection, as this->was opened, not any default connection
-		int connection_id = 0;
+		int connid = 0;
 		if( this->var_mvtyp == pimpl::MVTYPE_SQLOPENED)
-			connection_id = ( int) this->var_mvint;
+			connid = ( int) this->var_mvint;
 
-		if (!actualdictfile.open(dictfilename, connection_id))
+		if (!actualdictfile.open(dictfilename, connid))
 		{
 			throw MVDBException(L"getdictexpression() cannot open " ^ dictfilename.quote());
 #if TRACING >= 1
@@ -2183,14 +1986,14 @@ bool var::readnext(var& key) const
 //NB global not member function
 //	To make it var:: privat member -> pollute mv.h with PGresultptr :(
 //bool readnextx(const std::wstring& cursor, PGresultptr& pgresult)
-bool readnextx( const var & cursor, PGresultptr& pgresult, int connection_id)
+bool readnextx( const var & cursor, PGresultptr& pgresult, PGconn* pgconn)
 {
-    var sql=L"FETCH NEXT in CURSOR1_" ^ cursor;
+	var sql=L"FETCH NEXT in CURSOR1_" ^ cursor;
 
 	//execute the sql
 	//cant use sqlexec here because it returns data
 	//sqlexec();
-	if (!pqexec(sql,pgresult,connection_id))
+	if (!pqexec(sql,pgresult, pgconn))
 		return false;
 
 	//close cursor if no more
@@ -2221,12 +2024,13 @@ bool var::readnext(var& key, var& valueno) const
 	THISIS(L"bool var::readnext(var& key, var& valueno) const")
 	THISISSTRING()
 
-	//PGconn* thread_pgconn=(PGconn*) connection();
+	PGconn* pgconn=(PGconn*) connection();
+	if (pgconn==NULL)
+		return L"";
+
 	PGresultptr pgresult;
-	int connection_id = 0;
-	if( var_mvtyp == pimpl::MVTYPE_SQLOPENED)
-		connection_id = ( int) var_mvint;
-	if (!readnextx( *this, pgresult, connection_id))
+
+	if (!readnextx( *this, pgresult, pgconn))
 	{
 		// end the transaction and quit
 		committrans();
@@ -2300,13 +2104,12 @@ bool var::readnextrecord(var& record, var& key) const
 	ISDEFINED(record)
 
 	PGresultptr pgresult;
-	int connection_id = 0;
-	if( var_mvtyp != pimpl::MVTYPE_SQLOPENED)
-		connection();
-	else
-		connection_id = ( int) var_mvint;
 
-	if (!readnextx(*this, pgresult, connection_id))
+	PGconn* pgconn=(PGconn*) connection();
+	if (pgconn==NULL)
+		return L"";
+
+	if (!readnextx(*this, pgresult, pgconn))
 	{
 		// end the transaction
 		committrans();
@@ -2396,17 +2199,13 @@ var var::listfiles() const
 
 	var sql=L"SELECT table_name FROM information_schema.tables WHERE table_type = 'BASE TABLE' AND table_schema NOT IN ('pg_catalog', 'information_schema'); ";
 
-	//execute command or return empty string
+	PGconn* pgconn=(PGconn*) connection();
+	if (pgconn==NULL)
+		return L"";
+
 	PGresultptr result;
-	int connection_id = 0;
-	if( var_mvtyp == pimpl::MVTYPE_SQLOPENED)
-		connection_id = ( int) var_mvint;
-	else
-	{
-		connection();		// open default connection if it was never opened before
-		connection_id = 0;
-	}
-	if (!pqexec(sql,result,connection_id))
+
+	if (!pqexec(sql,result, pgconn))
 		return L"";
 
 	var filenames=L"";
@@ -2446,20 +2245,13 @@ var var::listindexes(const var& filename) const
 		 L" AND indisprimary != 't'"
 		 L");";
 
+	PGconn* pgconn=(PGconn*) connection();
+	if (pgconn==NULL)
+		return L"";
+
 	//execute command or return empty string
-//	connection();
 	PGresultptr result;
-//	if (!pqexec(sql,result))
-//		return L"";
-	int connection_id = 0;
-	if( var_mvtyp == pimpl::MVTYPE_SQLOPENED)
-		connection_id = ( int) var_mvint;
-	else
-	{
-		connection();		// open default connection if it was never opened before
-		connection_id = 0;
-	}
-	if (!pqexec(sql,result,connection_id))
+	if (!pqexec(sql,result,pgconn))
 		return L"";
 
 	var tt;
@@ -2491,16 +2283,9 @@ var var::listindexes(const var& filename) const
 //used for sql commands that require no parameters
 //returns 1 for success and PGresult points to result WHICH MUST BE PQclear(result)'ed
 //returns 0 for failure
-static bool pqexec( const var& sql, PGresultptr& pgresult, int connection_id)
+static bool pqexec( const var& sql, PGresultptr& pgresult, PGconn * thread_pgconn)
 {
 	DEBUG_LOG_SQL
-	PGconn * thread_pgconn = 0;
-	if( connection_id == 0)
-		thread_pgconn = tss_pgconns.get();
-	else
-		thread_pgconn = mv_connections_cache.get_connection( connection_id);
-	if (!thread_pgconn)
-		return false;
 
 	/* dont use PQexec because is cannot be told to return binary results
 	 and use PQexecParams with zero parameters instead

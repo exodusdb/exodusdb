@@ -36,38 +36,42 @@ function main()
 	//test oswrite and osbread utf8
 	//following code works on win32 and linux64 (ubuntu 10.04)
 	{
-        var tempfilename5="temp5.txt";
+		var tempfilename5="temp5.txt";
 
-        var greek2=L"\u03B3\u03A3";//lowercase gamma and uppercase sigma
-        //greek2.outputl();
-        assert(oswrite(greek2,tempfilename5,"utf8"));
+		var greek2=L"\u03B3\u03A3";//lowercase gamma and uppercase sigma
+		//greek2.outputl();
+		assert(oswrite(greek2,tempfilename5,"utf8"));
 
-        var tempfile;
-        assert(osopen(tempfilename5,tempfile,"utf8"));
+		var tempfile;
+		assert(osopen(tempfilename5,tempfile,"utf8"));
 
 		var data,offset2;
 		//test reading from beyond end of file - returns ""
-        offset2=4;
-        assert(data.osbread(tempfile,offset2,2) eq "");
-        offset2=3;
-        assert(data.osbread(tempfile,offset2,2) eq "");
+		offset2=4;
+		assert(data.osbread(tempfile,offset2,2) eq "");
+		offset2=3;
+		assert(data.osbread(tempfile,offset2,2) eq "");
 
 		offset2=2;
-        assert(data.osbread(tempfile,offset2,2) eq greek2[2]);
+		assert(data.osbread(tempfile,offset2,2) eq greek2[2]);
 
 		//read from non-first-byte of a multibyte unicode character returns ""
 		offset2=1;
-        assert(data.osbread(tempfile,offset2,2) eq "");
+		assert(data.osbread(tempfile,offset2,2) eq "");
 
-        offset2=0;
-        assert(data.osbread(tempfile,offset2,2) eq greek2);
+		offset2=0;
+		assert(data.osbread(tempfile,offset2,2) eq greek2);
 	}
 
-#ifndef MULTIPLE_CONNECTION_CODE_EXCLUDED
-
+#define MULTIPLE_CONNECTION_CODE_EXCLUDED
+#ifdef MULTIPLE_CONNECTION_CODE_EXCLUDED
 	{
 		var conn1;
-		conn1.connect( L"");
+		//connect normally doesnt touch default connection
+		//!!! EXCEPT if default connection is empty then it sets it
+		//default connection is empty to start with
+		//OR if you disconnect a connection with the same number (ie the same connection)
+		assert(conn1.connect( L""));
 	}		// one connection is lost here (hangs)
 
 	{
@@ -75,81 +79,94 @@ function main()
 		conn1.connect( L"");
 		conn1.disconnect();
 	}
+	var dbname2="exodus2b";
+	var dbname3="exodus3b";
 	{
 		var conn1;
 		conn1.connect( L"");			// creates new connection with default parameters (connection string)
-		var dummytable;
-		dummytable.open( "MD");				// create filename to use connection
-		dummytable.deletedb( "exodus2");
-		dummytable.deletedb( "exodus3");
-		dummytable.createdb( "exodus2");
-		dummytable.disconnect();
-	}
-	{
-		var conn2;
-		conn2.connect( L"");
-		var table1;
-		if( ! table1.open("TABLE1"))			// for conn2
-		{
-			printl("Creating "^table1);
-			assert( createfile(table1));
-		}
-		write( "ABCDEFGH", table1, "111");
-		write( "BCDEFGH", table1, "222");
-		write( "CDEFGH", table1, "333");
-		conn2.disconnect();
-	}
-	{
-		var conn1;
-		conn1.connect( L"");		// default dbname=exodus
-		var table1;
-		assert( table1.open("TABLE1"));			// actually this is not convenient
-					// I can not open 3 connections and later open table1 :(
 
-		var conn3;
-		assert( ! conn3.connect( L"dbname=exodus3"));		// custom dbname=exodus3, should fail
-		var conn2;
-		conn2.connect( L"dbname=exodus2");		// custom dbname=exodus2, should succeed
-		var table2;
-		if( ! table2.open("TABLE2"))			// for conn2
-		{
-			// table2 is NOT string here !
-			table2 = "TABLE2";
-			printl("Creating "^table2);
-			assert( createfile(table2));
-		}
-		// here we should read from table1 and write to table 2
-		var buf;
-		buf.read( table1, "111");
-		buf.write( table2, "999");
-		buf.read( table1, "222");
-		buf.write( table2, "888");
-		buf.read( table1, "333");
-		buf.write( table2, "777");
+		//remove any existing test databases
+		conn1.deletedb( dbname2);
+		conn1.deletedb( dbname3);
+
+		//verify CANNOT connect to non-existent deleted database2
+		assert(not conn1.connect(L"dbname="^dbname2));
+		assert(not conn1.connect(L"dbname="^dbname3));
+
 		conn1.disconnect();
-		conn2.disconnect();
+
+	}
+	{
+		//create exodus2 and exodus3
+		var conn1;
+		assert(conn1.connect(""));
+		assert(conn1.createdb(dbname2));
+		assert(conn1.createdb(dbname3));
+		
+		//create table1 on exodus and table2 on exodus2
+		//interleaving
+		var conn2,conn3;
+		var table2="TABLE2";
+		var table3="TABLE3";
+		assert(conn2.connect("dbname="^dbname2));
+		assert(conn3.connect("dbname="^dbname3));
+		assert(not table2.open("TABLE2",conn2));
+		assert(not table3.open("TABLE3",conn3));
+		assert(conn2.createfile(table2));
+		assert(conn3.createfile(table3));
+		assert(not table2.open(table2,conn3));
+		assert(not table3.open(table3,conn2));
+		assert(table2.open(table2,conn2));
+		assert(table3.open(table3,conn3));
+		assert(write( "2.1111", table2, "2.111"));
+		assert(write( "3.1111", table3, "3.111"));
+		assert(write( "2.2222", table2, "2.222"));
+		assert(write( "3.2222", table3, "3.222"));
+		assert(write( "2.3333", table2, "2.333"));
+		assert(write( "3.3333", table3, "3.333"));
+		assert(conn2.disconnect());
+		assert(conn3.disconnect());
 	}
 	{
 		// Go through table2 in exodus2 db and through table1 in exodus1 db, and print records
 		// Both tables are assumed existing
-		var conn1, conn2;
-		conn2.connect( L"dbname=exodus2");		// custom dbname=exodus2, should succeed
-		var table2;
-		assert( table2.open( "TABLE2"));
-		conn1.connect( L"dbname=exodus");		// custom dbname=exodus2, should succeed
-		var table1;
-		assert( table1.open( "TABLE1"));
+		var conn2, conn3;
+		assert(conn2.connect( L"dbname="^dbname2));
+		assert(conn3.connect( L"dbname="^dbname3));
+		var table2,table3;
+		assert( table2.open( "TABLE2",conn2));
+		assert( table3.open( "TABLE3",conn3));
 
-		table1.selectrecord();
 		table2.selectrecord();
-		var record1, id1, record2, id2;
-		while( table1.readnextrecord( record1, id1) and table2.readnextrecord( record2, id2))
-		{
-			printl( "r1=" ^ record1 ^ ", id1=" ^ id1 ^ ", r2=" ^ record2 ^ ", id2=" ^ id2 ^ ".");
-		}
-		conn1.disconnect();
-		//ALN:TODO: add here code to: deletedb( "exodus2") -- just test this statement
+		table3.selectrecord();
+		var record2, id2, record3, id3;
+
+		assert(table2.readnextrecord( record2, id2) and table3.readnextrecord( record3, id3));
+		assert(record2 eq "2.1111" and id2 eq "2.111" and record3 eq "3.1111" and id3 eq "3.111");
+
+		assert(table2.readnextrecord( record2, id2) and table3.readnextrecord( record3, id3));
+		assert(record2 eq "2.2222" and id2 eq "2.222" and record3 eq "3.2222" and id3 eq "3.222");
+
+		assert(table2.readnextrecord( record2, id2) and table3.readnextrecord( record3, id3));
+		assert(record2 eq "2.3333" and id2 eq "2.333" and record3 eq "3.3333" and id3 eq "3.333");
+
+		assert(not table2.readnextrecord( record2, id2) and not table3.readnextrecord( record3, id3));
+
+		//check CANNOT delete databases while a connection is open
+		//NB try to delete db2 from conn3 and vice versa
+		assert(not conn3.deletedb(dbname2));
+		assert(not conn2.deletedb(dbname3));
+
 		conn2.disconnect();
+		conn3.disconnect();
+		
+		//remove any existing test databases.
+		//connect to exodus first cant delete db if connected to it.
+		var conn1;
+		assert(conn1.connect(L"dbname=exodus"));
+		assert(conn1.deletedb(dbname2));
+		assert(conn1.deletedb(dbname3));
+		conn1.disconnect();
 	}
 #endif
 
