@@ -794,7 +794,7 @@ DLL_PUBLIC var iconv(const var& instring, const var& conversion)
 
 DLL_PUBLIC bool connect(const var& connectioninfo)
 {
-	return var().connect(connectioninfo);
+	return var().setdefaultconnection(connectioninfo);
 }
 
 DLL_PUBLIC bool disconnect()
