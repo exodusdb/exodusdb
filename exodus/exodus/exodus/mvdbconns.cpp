@@ -47,13 +47,6 @@ UNORDERED_SET_FOR_LOCKTABLE * MvConnectionsCache::get_lock_table( int index) con
 	return ( UNORDERED_SET_FOR_LOCKTABLE *)( iter == tbl.end() ? 0 : iter->second.plock_table);
 }
 
-CACHED_CONNECTION MvConnectionsCache::_get_current_connection() const
-{
-	boost::mutex::scoped_lock lock(mvconnections_mutex);
-	CONN_MAP::const_iterator iter = tbl.find( connection_id);
-	return ( CACHED_CONNECTION)( iter == tbl.end() ? 0 : iter->second.connection);
-}
-
 void MvConnectionsCache::del_connection( int index)
 {
 	boost::mutex::scoped_lock lock(mvconnections_mutex);
@@ -65,12 +58,6 @@ void MvConnectionsCache::del_connection( int index)
 		delete /*tbl.find( index)*/iter->second.plock_table;
 		tbl.erase( index);
 	}
-}
-
-int MvConnectionsCache::_get_current_id() const
-{
-	boost::mutex::scoped_lock lock(mvconnections_mutex);
-	return connection_id; 
 }
 
 MvConnectionsCache::~MvConnectionsCache()

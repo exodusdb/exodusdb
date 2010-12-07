@@ -4,17 +4,18 @@
 // mvdbconn.h - keep table of connections in the way, that connection is linked to 'filename'
 //		variable (that is linked to SQL TABLE name - in mvint field)
 //
-// Requirement 1. Current default connection: PGconn* thread_pgconn=tss_pgconns.get();
+// Requirement 1. Current default connection id: tss_pgconnids.get();
 // Requirement 2. When open( filename) - if filename is 'only' STR variable, store current connection within
-// Requirement 3. read/write: if filename is 'only' STR variable, store current connection within
+// Requirement 3. read/write: if filename is 'only' STR variable, use default connection
 // Requirement 4. 'filename' variable with stored connection has special mvtyp = MVTYPE_SQLOPENED
 // Requirement 5. NO ! There is connection table, where all connection variables should be registered (at 2 and 3)
 // Requirement 6. No action is performed in destructor of 'filename' variable
-// Requirement 7. disconnect() without parameters closes current connection
+// Requirement 7. disconnect() without parameters closes current (default) connection
 // Requirement 8. filename.disconnect() closes the connection, linked to the 'filename', and 'frees' this var
-// Requirement 9. Closed connection: been closed and marked as 'invalidated'
+// Requirement 9. Closed connection: just erased from map
 // Requirement 10. Attempt to use 'invalidated' connection raises exception
-// Requirement 11. 
+// Requirement 11. LockTables (which accompany DB table locks), are added to connection table and
+//					stored/deleted within connection record
 
 #ifndef MVDBCONNS_H
 #  define MVDBCONNS_H
@@ -58,10 +59,6 @@ typedef UNORDERED_SET_FOR_LOCKTABLE LockTable;
 
 namespace exodus {
 
-//#define CONNECTION_ENTRY_FREE  (0)
-//#define ACTIVE_CONNECTION      (1)
-//#define INVALIDATED_CONNECTION (-1)
-
 typedef PGconn * CACHED_CONNECTION;
 typedef void ( * DELETER_AND_DESTROYER )( CACHED_CONNECTION/*, UNORDERED_SET_FOR_LOCKTABLE * */);
 
@@ -90,8 +87,6 @@ class MvConnectionsCache
 	int add_connection( CACHED_CONNECTION connection_with_file);
 	CACHED_CONNECTION get_connection( int index) const;
 	UNORDERED_SET_FOR_LOCKTABLE * get_lock_table( int index) const;
-	CACHED_CONNECTION _get_current_connection() const;
-	int _get_current_id() const;
 	void del_connection( int index);
 	virtual ~MvConnectionsCache();
 

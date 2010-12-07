@@ -39,6 +39,17 @@ THE SOFTWARE.
 
 //MSVC requires exception handling (eg compile with /EHsc or EHa?) for delayed dll loading detection
 
+////ALN:TODO: REFACTORING NOTES
+// Proposed to split content of mvdbpostres.cpp into 3 layers (classic approach):
+//	mvdbfuncs.cpp - api things, like mvglobalfuncs.cpp
+//	mvdbdrv.cpp - base abstract class mv_db_drv or MvDbDrv to define db access operations (db driver interface);
+//	mvdbdrvpostgres.cpp - subclass of mv_db_drv, specific to PostgreSQL things like PGconn and PQfinish;
+//	mvdbdrvmsde.cpp - possible subclass of mv_db_drv, specific to MSDE (AKA MSSQL Express);
+//	mvdblogic.cpp - intermediate processing (most of group 2) functions.
+// Proposed refactoring would:
+//		- improve modularity of the Exodus platform;
+//		- allow easy expanding to other DB engines.
+
 #ifndef DEBUG
 # define TRACING 1
 #else
