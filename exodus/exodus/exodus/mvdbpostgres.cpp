@@ -56,8 +56,6 @@ THE SOFTWARE.
 # define TRACING 2
 #endif
 
-#include "MurmurHash2_64.h"
-
 #if defined _MSC_VER // || defined __CYGWIN__ || defined __MINGW32__
 # define WIN32_LEAN_AND_MEAN
 # include <windows.h>
@@ -87,6 +85,8 @@ THE SOFTWARE.
 #include <libpq-fe.h>//in postgres/include
 
 #define MV_NO_NARROW
+
+//#include "MurmurHash2_64.h"			// it has included in mvdbconns.h (uint64_t defined)
 
 #include <exodus/mvdbconns.h>		// placed as last include, causes boost header compiler errors
 #include <exodus/mvimpl.h>
@@ -167,7 +167,6 @@ static bool pqexec(const var& sql, PGresultptr& pgresult, PGconn * thread_pgconn
 
 bool var::sqlexec( const var & SqlToExecute) const
 {
-	//int connid = ( var_mvtyp == pimpl::MVTYPE_SQLOPENED) ? ( int) var_mvint : 0;
 	var errmsg;
 	bool result = sqlexec( SqlToExecute, errmsg);
 	if (not result && DBTRACE)
@@ -358,7 +357,7 @@ bool var::connect(const var& conninfo)
 	// ATM we have new good connection to database
 	this->var_mvint = ( int) mv_connections_cache.add_connection( pgconn);
 	this->var_mvstr = conninfo.var_mvstr;
-	this->var_mvtyp = pimpl::MVTYPE_SQLOPENED;
+	this->var_mvtyp = pimpl::MVTYPE_DBOPENED;
 //	connectionhandle = * this;
 	//ALN:TODO: whats with locktables etc. ?	tss_locktables.reset(new LockTable());
 
@@ -398,13 +397,39 @@ bool var::setdefaultconnection()
 	THISISDEFINED()
 
 	//handle-specific connection
-	if( this->var_mvtyp != pimpl::MVTYPE_SQLOPENED)
+	if( ! THIS_IS_OPENED_CONNECTION())
 		MVException(L"is not a valid connection in setdefaultconnection()");
 
 	tss_pgconnids.reset(new int((int)this->var_mvint));
 
 	return true;
 
+}
+
+int var::connection_id() const
+{
+	if( THIS_IS_OPENED_CONNECTION())
+		return ( int) this->var_mvint;
+
+	int* connid=tss_pgconnids.get();
+	int connid2=0;
+	if (connid&&*connid!=0)
+		connid2=*connid;
+	else
+	{
+		var conn1;
+		if (conn1.connect())
+		{
+			conn1.setdefaultconnection();
+			connid2=(int) conn1.var_mvint;
+		}
+	}
+
+	//save the default connection
+	var_mvint = connid2;
+	var_mvtyp = pimpl::MVTYPE_DBOPENED;
+
+	return connid2;
 }
 
 //var::connection()
@@ -421,58 +446,15 @@ bool var::setdefaultconnection()
 //(assumes accurate programming by system programmers in exodus mvdb routines)
 void* var::connection() const
 {
-	//THISIS(L"void* var::connection() const")
-
-	PGconn * thread_pgconn;
-
-	//handle-specific connection
-	if( this->var_mvtyp == pimpl::MVTYPE_SQLOPENED)
-	{
-		thread_pgconn = mv_connections_cache.get_connection(( int) this->var_mvint);
-		return (void *)thread_pgconn;
-	}
-
-	int* connid=tss_pgconnids.get();
-
-	//autoconnect and set default if no default connection
-	int connid2;
-	if (connid&&*connid!=0)
-		connid2=*connid;
-	else
-	{
-		var conn1;
-		if (!conn1.connect())
-			return NULL;
-		conn1.setdefaultconnection();
-		connid2=(int) conn1.var_mvint;
-	}
-
-	//save the default connection
-	var_mvint = connid2;
-	var_mvtyp = pimpl::MVTYPE_SQLOPENED;
-
-	//return default connection
-	thread_pgconn = mv_connections_cache.get_connection(connid2);
-	return (void*) thread_pgconn;
+	int cid = connection_id();
+	return ( void *) cid ? mv_connections_cache.get_connection(cid) : NULL;
 }
 
-
 // gets lock_table, associated with connection, associated with this object
-void * var::lock_table() const
+void* var::lock_table() const
 {
-	int connection_id = 0;
-
-	if( this->var_mvtyp == pimpl::MVTYPE_SQLOPENED)
-	{
-		connection_id = ( int) this->var_mvint;
-	}
-	else
-	{
-		int* connid=tss_pgconnids.get();
-		if( connid)
-			connection_id = * connid;
-	}
-	return ( void *) connection_id == 0 ? 0 : mv_connections_cache.get_lock_table( connection_id);
+	int cid = connection_id();
+	return ( void *) cid ? mv_connections_cache.get_lock_table( cid) : NULL;
 }
 
 
@@ -489,7 +471,7 @@ bool var::disconnect()
 
 	int * default_connid=tss_pgconnids.get();
 
-	if( this->var_mvtyp == pimpl::MVTYPE_SQLOPENED)
+	if( THIS_IS_OPENED_CONNECTION())
 	{
 		mv_connections_cache.del_connection(( int) this->var_mvint);
 		this->var_mvtyp=pimpl::MVTYPE_UNA;
@@ -587,7 +569,7 @@ bool var::open(const var& filename, const var& connection)
 	//save the filename and memorise the current connection for this file var
 	var_mvstr=filename.var_mvstr;
 	var_mvint = connection.var_mvint;
-	var_mvtyp = pimpl::MVTYPE_SQLOPENED;//TODO check if this includes MVTYPE_STR?
+	var_mvtyp = pimpl::MVTYPE_DBOPENED;
 
 	return true;
 }
@@ -1303,7 +1285,6 @@ bool var::createdb(const var& dbname, var& errmsg) const
 	//sql^=" OWNER=exodus";
 
 	//TODO this shouldnt only be for default connection
-//	if( this->var_mvtyp == pimpl::MVTYPE_SQLOPENED)
 	return sqlexec(sql,errmsg);
 
 }
@@ -1337,7 +1318,7 @@ bool var::createfile(const var& filename, const var& options)
 	sql ^= L" TABLE " PGDATAFILEPREFIX ^ filename;
 	sql ^= L" (key bytea primary key, data bytea)";
 
-	if( this->var_mvtyp != pimpl::MVTYPE_SQLOPENED)		// this object has no idea about connection
+	if( ! THIS_IS_OPENED_CONNECTION())		// this object has no idea about connection
 	{
 		// Lets use default connection
 		int connid = 0;
@@ -1348,7 +1329,7 @@ bool var::createfile(const var& filename, const var& options)
 			connid = 0;
 		if( connid > 0)		// save connection in *this
 		{
-			this->var_mvtyp = pimpl::MVTYPE_SQLOPENED;
+			this->var_mvtyp = pimpl::MVTYPE_DBOPENED;
 			this->var_mvint = connid;
 			this->var_mvstr = L"";
 		}
@@ -1423,7 +1404,7 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 
 		// we should open it through the same connection, as this->was opened, not any default connection
 		int connid = 0;
-		if( this->var_mvtyp == pimpl::MVTYPE_SQLOPENED)
+		if( THIS_IS_OPENED_CONNECTION())
 			connid = ( int) this->var_mvint;
 
 		if (!actualdictfile.open(dictfilename, connid))
@@ -1697,7 +1678,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 			createString();
 	}
 
-	// Note that MVTYPE_SQLCON bit is still preserved in var_mvtyp
+	// Note that MVTYPE_DBCON bit is still preserved in var_mvtyp
 
 	//TODO only do this if cursor already exists
 	//clearselect();

@@ -112,11 +112,8 @@ int:	4	4
 double:	8	8
 var:	20	48
 */
-#ifdef CACHED_HANDLES
 static const unsigned int mvtypemask=0xffffff80;
-#else
-static const unsigned int mvtypemask=0xfffffff0;
-#endif
+//static const unsigned int mvtypemask=0xfffffff0;
 /* this has been resolved somehow without removing the automatic conversion to int:
 Remove automatic conversion to int which takes precedence over the automatic conversion to bool
 and therefore causes a non-numeric error if you include a non-numeric value in an if statement like
@@ -1038,12 +1035,16 @@ private:
 
 	bool selectx(const var& fieldnames, const var& sortselectclause) const;
 
+	// retrieves cid from *this, or uses default connection, or autoconnect with default connection string
+	// On return *this contains connection ID and type pimpl::MVTYPE_DBOPENED
+	int connection_id() const;
+
 	// finds connection of this variable:
 	// if this is not filename SQLOPENED variable, returns thread default connection or attempts a default connect()
 	void* connection() const;
 
 	// gets lock_table, associated with connection, associated with this object
-	void * lock_table() const;
+	void* lock_table() const;
 
 	var build_conn_info( const var & conninfo) const;
 
@@ -1076,6 +1077,9 @@ private:
 	std::wfstream* osopenx(const var& osfilename, const var& locale) const;
 
 	friend class dim;
+
+	bool THIS_IS_OPENED_CONNECTION() const	{ return (this->var_mvtyp & pimpl::MVTYPE_DBCON) != 0; }
+	bool THIS_IS_OPENED_OSFILE()	 const	{ return (this->var_mvtyp & pimpl::MVTYPE_HANDLE) != 0; }
 
 }; //of class "var"
 
