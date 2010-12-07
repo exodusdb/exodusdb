@@ -13,8 +13,8 @@ boost::mutex mvconnections_mutex;
 namespace exodus {
 
 MvConnectionsCache::MvConnectionsCache( DELETER_AND_DESTROYER del_)
-	: connection_id( 0)
-	, del( del_)
+	: del( del_)
+	, connection_id( 0)
 {}
 
 //MvConnectionsCache::set_deleter( DELETER_AND_DESTROYER del_)
