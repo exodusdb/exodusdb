@@ -1042,6 +1042,9 @@ private:
 	// if this is not filename SQLOPENED variable, returns thread default connection or attempts a default connect()
 	void* connection() const;
 
+	// gets lock_table, associated with connection, associated with this object
+	void * lock_table() const;
+
 	var build_conn_info( const var & conninfo) const;
 
 	var getdictexpression(const var& mainfilename, const var& filename, const var& dictfilename, const var& dictfile, const var& fieldname, var& joins, bool forsort_or_select_or_index=false) const;

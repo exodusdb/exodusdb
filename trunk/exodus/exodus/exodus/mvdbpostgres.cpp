@@ -71,30 +71,6 @@ THE SOFTWARE.
 #include <boost/thread/tss.hpp>
 //http://beta.boost.org/doc/libs/1_41_0/doc/html/unordered.html
 
-//#define HAVE_TR1
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-#ifdef  HAVE_CXX0X
-#  include <unordered_set>
-#  define UNORDEREDSET std::unordered_set<uint64_t>
-
-//expect bug here since centos5.3 32bit has tr1 but not with an unordered set
-#elif defined(HAVE_TR1)
-#  include <tr1/unordered_set>
-#  define UNORDEREDSET std::tr1::unordered_set<uint64_t>
-
-//assume we have a recent boost on windows
-//boost 1.33 doesnt seem to have unordered set
-#elif defined(HAVE_BOOST_UNORDERED_SET) || defined(_MSC_VER)
-#  include <boost/unordered_set.hpp>
-#  define UNORDEREDSET boost::unordered_set<uint64_t>
-#else
-#  define USE_MAP_FOR_UNORDERED
-#  include <map>
-#  define UNORDEREDSET std::map<uint64_t,int>
-#endif
-
 //see exports.txt for a list of all PQ functions
 //#include <postgresql/libpq-fe.h>//in postgres/include
 #include <libpq-fe.h>//in postgres/include
@@ -152,18 +128,13 @@ static MvConnectionsCache mv_connections_cache( connection_DELETER_AND_DESTROYER
 #define BYTEAOID 17;
 #define TEXTOID 25;
 
-//typedef boost::unordered_set<uint64_t> LockTable; 
-//typedef UNORDEREDSET<uint64_t> LockTable;
-typedef UNORDEREDSET LockTable;
-//typedef tr1::unordered_set<uint64_t> LockTable;
-
 //this is not threadsafe
 //PGconn     *thread_pgconn;
 //but this is ...
 boost::thread_specific_ptr<int> tss_pgconnids;
 boost::thread_specific_ptr<var> tss_pgconnparams;
 boost::thread_specific_ptr<bool> tss_ipcstarted;
-boost::thread_specific_ptr<LockTable> tss_locktables;
+//boost::thread_specific_ptr<LockTable> tss_locktables;
 
 //this is not thread safe since it is at global scope
 //var _STATUS;
@@ -474,6 +445,26 @@ void* var::connection() const
 	return (void*) thread_pgconn;
 }
 
+
+// gets lock_table, associated with connection, associated with this object
+void * var::lock_table() const
+{
+	int connection_id = 0;
+
+	if( this->var_mvtyp == pimpl::MVTYPE_SQLOPENED)
+	{
+		connection_id = ( int) this->var_mvint;
+	}
+	else
+	{
+		int* connid=tss_pgconnids.get();
+		if( connid)
+			connection_id = * connid;
+	}
+	return ( void *) connection_id == 0 ? 0 : mv_connections_cache.get_lock_table( connection_id);
+}
+
+
 // if this->obj contains connection_id, then such connection is disconnected with this-> becomes UNA
 // Otherwise, default connection is disconnected
 bool var::disconnect()
@@ -704,7 +695,10 @@ bool var::lock(const var& key) const
 	uint64_t hash64=MurmurHash64((wchar_t*)fileandkey.data(),int(fileandkey.length()*sizeof(wchar_t)),0);
 
 	//check if already lock in current connection
-	LockTable* locktable=tss_locktables.get();
+	
+//	LockTable* locktable=tss_locktables.get();
+	LockTable* locktable = ( LockTable *) this->lock_table();
+
 	if (locktable)
 	{
 		//if already in local lock table then dont lock on database
@@ -783,7 +777,8 @@ void var::unlock(const var& key) const
 	uint64_t hash64=MurmurHash64((wchar_t*)fileandkey.data(),int(fileandkey.length()*sizeof(wchar_t)),0);
 
 	//remove from local current connection locktable
-	LockTable* locktable=tss_locktables.get();
+//	LockTable* locktable=tss_locktables.get();
+	LockTable* locktable = ( LockTable *) this->lock_table();
 	if (locktable)
 	{
 		//if not in local locktable then no need to unlock on database
@@ -834,7 +829,8 @@ void var::unlockall() const
 	//THISIS(L"void var::unlockall() const")
 
 	//check if any locks
-	LockTable* locktable=tss_locktables.get();
+//	LockTable* locktable=tss_locktables.get();
+	LockTable* locktable = ( LockTable *) this->lock_table();
 	if (locktable)
 	{
 		//if local lock table is empty then dont unlock all database
@@ -1330,12 +1326,13 @@ bool var::createfile(const var& filename, const var& options)
 	sql ^= L" TABLE " PGDATAFILEPREFIX ^ filename;
 	sql ^= L" (key bytea primary key, data bytea)";
 
-	// if we create the file 'filename', it was not opened before, and can't be carrying the connection
 	if( this->var_mvtyp != pimpl::MVTYPE_SQLOPENED)		// this object has no idea about connection
 	{
-		// Lets use latest active connection
-		// It might happen here, that latest multiple connection is closed, then use default TSS connection
-		int connid = mv_connections_cache.get_current_id();
+		// Lets use default connection
+		int connid = 0;
+		int * pconnid = tss_pgconnids.get();
+		if( pconnid)
+			connid = * pconnid;
 		if(( connid > 0) && ( mv_connections_cache.get_connection( connid) == 0))
 			connid = 0;
 		if( connid > 0)		// save connection in *this

@@ -11,7 +11,7 @@
 //	mvdbconns.cpp:15: warning:   when initialized here
 //
 #include "mv.h"
-#define INSIDE_MVDBCONNS_CPP
+//#define INSIDE_MVDBCONNS_CPP
 #include "mvdbconns.h"
 
 namespace exodus {
@@ -21,6 +21,7 @@ MvConnectionsCache::MvConnectionsCache( DELETER_AND_DESTROYER del_)
 	: del( del_)
 	, connection_id( 0)
 	, mvconnections_mutex()
+	, tbl()
 {}
 
 int MvConnectionsCache::add_connection( CACHED_CONNECTION conn_to_cache)
@@ -28,7 +29,7 @@ int MvConnectionsCache::add_connection( CACHED_CONNECTION conn_to_cache)
 	boost::mutex::scoped_lock lock(mvconnections_mutex);
 
 	connection_id++;
-	tbl[connection_id] = conn_to_cache;
+	tbl[connection_id] = MvConnectionEntry( conn_to_cache, new LockTable);
 	return connection_id;
 }
 
@@ -36,14 +37,21 @@ CACHED_CONNECTION MvConnectionsCache::get_connection( int index) const
 {
 	boost::mutex::scoped_lock lock(mvconnections_mutex);
 	CONN_MAP::const_iterator iter = tbl.find( index);
-	return ( CACHED_CONNECTION)( iter == tbl.end() ? 0 : iter->second);
+	return ( CACHED_CONNECTION)( iter == tbl.end() ? 0 : iter->second.connection);
 }
 
-CACHED_CONNECTION MvConnectionsCache::get_current_connection() const
+UNORDERED_SET_FOR_LOCKTABLE * MvConnectionsCache::get_lock_table( int index) const
+{
+	boost::mutex::scoped_lock lock(mvconnections_mutex);
+	CONN_MAP::const_iterator iter = tbl.find( index);
+	return ( UNORDERED_SET_FOR_LOCKTABLE *)( iter == tbl.end() ? 0 : iter->second.plock_table);
+}
+
+CACHED_CONNECTION MvConnectionsCache::_get_current_connection() const
 {
 	boost::mutex::scoped_lock lock(mvconnections_mutex);
 	CONN_MAP::const_iterator iter = tbl.find( connection_id);
-	return ( CACHED_CONNECTION)( iter == tbl.end() ? 0 : iter->second);
+	return ( CACHED_CONNECTION)( iter == tbl.end() ? 0 : iter->second.connection);
 }
 
 void MvConnectionsCache::del_connection( int index)
@@ -53,12 +61,13 @@ void MvConnectionsCache::del_connection( int index)
 	if( iter != tbl.end())
 	{
 //	CACHED_CONNECTION p /*std::pair<int, void*> p*/ = ;
-		del((CACHED_CONNECTION) tbl.find( index)->second);
+		del((CACHED_CONNECTION) iter/*tbl.find( index)*/->second.connection);
+		delete /*tbl.find( index)*/iter->second.plock_table;
 		tbl.erase( index);
 	}
 }
 
-int MvConnectionsCache::get_current_id() const
+int MvConnectionsCache::_get_current_id() const
 {
 	boost::mutex::scoped_lock lock(mvconnections_mutex);
 	return connection_id; 
@@ -69,7 +78,10 @@ MvConnectionsCache::~MvConnectionsCache()
 	boost::mutex::scoped_lock lock(mvconnections_mutex);
 	CONN_MAP::iterator ix;
 	for( ix = tbl.begin(); ix != tbl.end(); ix ++)
-		del(( CACHED_CONNECTION) ix->second);
+	{
+		del(( CACHED_CONNECTION) ix->second.connection);
+		delete ix->second.plock_table;
+	}
 	// Release mutex, on closing brace it will be destroyed, and MUST be unlocked on ~mutex()
 	lock.unlock();
 }

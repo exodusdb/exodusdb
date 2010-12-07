@@ -96,6 +96,22 @@ function main()
 		conn1.disconnect();
 
 	}
+
+	{	// Lets test"
+		//	global connect/disconnect
+		//	locks/unlocks
+		//	createfile/deletefile
+		connect();			// global connection
+		var file = "NANOTABLE";
+		assert( createfile( file));
+		file.lock( "1");
+		file.lock( "2");
+		file.unlock( "2");
+		file.unlock( "1");
+		file.deletefile();
+		disconnect();		// global connection
+	}
+
 	{
 		printl("create dbs exodus2 and exodus3");
 		var conn1;
