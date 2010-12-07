@@ -101,12 +101,12 @@ THE SOFTWARE.
 
 #define MV_NO_NARROW
 
+#include <exodus/mvdbconns.h>		// placed as last include, causes boost header compiler errors
 #include <exodus/mvimpl.h>
 #include <exodus/mv.h>
 #include <exodus/mvenvironment.h>
 #include <exodus/mvutf.h>
 #include <exodus/mvexceptions.h>
-#include <exodus/mvdbconns.h>
 
 //#if TRACING >= 5
 #define DEBUG_LOG_SQL if (DBTRACE) {exodus::logputl(L"SQL:" ^ var(sql));}
@@ -474,7 +474,8 @@ void* var::connection() const
 	return (void*) thread_pgconn;
 }
 
-// universal disconnect ( for thread-default connection and for multiple)
+// if this->obj contains connection_id, then such connection is disconnected with this-> becomes UNA
+// Otherwise, default connection is disconnected
 bool var::disconnect()
 {
 	THISIS(L"bool var::disconnect()")
@@ -484,19 +485,26 @@ bool var::disconnect()
 		exodus::errputl(L"ERROR: mvdbpostgres disconnect() Closing connection");
 #	endif
 
+	int * default_connid=tss_pgconnids.get();
+
 	if( this->var_mvtyp == pimpl::MVTYPE_SQLOPENED)
 	{
 		mv_connections_cache.del_connection(( int) this->var_mvint);
 		this->var_mvtyp=pimpl::MVTYPE_UNA;
+		//if we happen to be disconnecting the same connection as the default connection
+		//then reset the default connection so that it will be reconnected to the next connect
+		//this is rather too smart but will probably do what people expect
+		if (default_connid && *default_connid==var_mvint)
+			tss_pgconnids.reset();
 	}
-
-	//if we happen to be disconnecting the same connection as the default connection
-	//then reset the default connection so that it will be reconnected to the next connect
-	//this is rather too smart but will probably do what people expect
-	int* connid=tss_pgconnids.get();
-	if (connid && *connid==var_mvint)
-		tss_pgconnids.reset();
-
+	else
+	{
+		if (default_connid && *default_connid)
+		{
+			mv_connections_cache.del_connection( * default_connid);
+			tss_pgconnids.reset();
+		}
+	}
 	return true;
 }
 
