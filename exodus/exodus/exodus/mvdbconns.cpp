@@ -4,23 +4,24 @@
 // mvdbconn.cpp - keep table of connections in the way, that connection is linked to 'filename'
 //		variable (that is linked to SQL TABLE name - in mvint field)
 //
+// NOTE_OSX: Changing order of member construction could cause warning under MacOSX, like:
+//	mvdbconns.h: In constructor 'exodus::MvConnectionsCache::MvConnectionsCache(void (*)(PGconn*))':
+//	mvdbconns.h:57: warning: 'exodus::MvConnectionsCache::connection_id' will be initialized after
+//	mvdbconns.h:56: warning:   'void (* exodus::MvConnectionsCache::del)(PGconn*)'
+//	mvdbconns.cpp:15: warning:   when initialized here
+//
 #include "mv.h"
 #define INSIDE_MVDBCONNS_CPP
 #include "mvdbconns.h"
-#include <boost/thread/mutex.hpp>
-boost::mutex mvconnections_mutex;
 
 namespace exodus {
 
 MvConnectionsCache::MvConnectionsCache( DELETER_AND_DESTROYER del_)
+	// see NOTE_OSX in header
 	: del( del_)
 	, connection_id( 0)
+	, mvconnections_mutex()
 {}
-
-//MvConnectionsCache::set_deleter( DELETER_AND_DESTROYER del_)
-//{
-//	del = del_;
-//}
 
 int MvConnectionsCache::add_connection( CACHED_CONNECTION conn_to_cache)
 {
@@ -67,15 +68,10 @@ MvConnectionsCache::~MvConnectionsCache()
 {
 	boost::mutex::scoped_lock lock(mvconnections_mutex);
 	CONN_MAP::iterator ix;
-
-/*ALN:TODO: make following code not to crash
-	Seems that after 2 threads closed, PQfinish( PGconn *) throws exception,
-	may be because PGconn * pointer is invalidated already.
-	Investigate this.
-    May be use PQstatus(PGconn *)
-*/
 	for( ix = tbl.begin(); ix != tbl.end(); ix ++)
 		del(( CACHED_CONNECTION) ix->second);
+	// Release mutex, on closing brace it will be destroyed, and MUST be unlocked on ~mutex()
+	lock.unlock();
 }
 
 }	// namespace

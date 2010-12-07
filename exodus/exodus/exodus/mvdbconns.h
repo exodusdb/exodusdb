@@ -21,6 +21,7 @@
 
 #include <map>
 #include <libpq-fe.h>//in postgres/include
+#include <boost/thread/mutex.hpp>
 
 namespace exodus {
 
@@ -57,6 +58,7 @@ class MvConnectionsCache
 	int connection_id;
 //	std::map<MvConnectionEntry> __tbl__;//
 	CONN_MAP tbl;
+	mutable boost::mutex mvconnections_mutex;
 };
 
 }	// namespace
