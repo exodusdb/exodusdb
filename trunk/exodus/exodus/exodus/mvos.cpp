@@ -878,7 +878,7 @@ bool var::osopen() const
 
 	//if reopening an osfile that is already opened then close and reopen
 	//dont call if not necessary
-	if (var_mvtyp & pimpl::MVTYPE_HANDLE)
+	if (THIS_IS_OPENED_OSFILE())
 		osclose();
 
 	return osopenx(*this, L"")!=0;
@@ -893,7 +893,7 @@ bool var::osopen(const var& osfilename, const var& locale) const
 
 	//if reopening an osfile that is already opened then close and reopen
 	//dont call if not necessary
-	if (var_mvtyp & pimpl::MVTYPE_HANDLE)
+	if (THIS_IS_OPENED_OSFILE())
 		osclose();
 
 	return osopenx(osfilename, locale)!=0;
@@ -912,13 +912,14 @@ std::wfstream* var::osopenx(const var& osfilename, const var& locale) const
 	//Try to get the cached file handle. the usual case is that you osopen a file before doing osbwrite/osbread
 	//Using wfstream instead of wofstream so that we can mix reads and writes on the same filehandle
 	std::wfstream * pmyfile = 0;
-	if( this->var_mvtyp & pimpl::MVTYPE_HANDLE)
+	if( THIS_IS_OPENED_OSFILE())
 	{
 		pmyfile = (std::wfstream *) mv_handles_cache.get_handle( (int) this->var_mvint, this->var_mvstr);
 		if( pmyfile == 0)		// nonvalid handle
 		{
 			this->var_mvint = 0;
-			this->var_mvtyp ^= pimpl::MVTYPE_HANDLE;	// clear bit
+//			this->var_mvtyp ^= pimpl::MVTYPE_HANDLE;	// clear bit
+			this->var_mvtyp ^= pimpl::MVTYPE_HANDLE | pimpl::MVTYPE_INT;	//only STR bit should remains
 		}
 	}
 
@@ -1201,11 +1202,8 @@ void var::osclose() const
 {
 	//THISIS(L"void var::osclose() const")
 	//THISISSTRING()
-	if( var_mvtyp & pimpl::MVTYPE_HANDLE)
+	if( THIS_IS_OPENED_OSFILE())
 	{
-//		std::wfstream * h = (std::wfstream *) h_cache.get_handle(( int) var_mvint);
-//		if( h)
-//			delete h;
 		mv_handles_cache.del_handle(( int) var_mvint);
 		var_mvint = 0L;
 		var_mvtyp ^= pimpl::MVTYPE_HANDLE | pimpl::MVTYPE_INT;	//only STR bit should remains
