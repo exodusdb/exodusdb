@@ -267,7 +267,8 @@ var Server::run()
 		logptr = logfilename.osfile().extract(1);
 
 		//osbread x from logfilename at logptr-6 length 6
-		xx.osbread(logfilename, logptr - 6, 6);
+		var tt=logptr-6;
+		xx.osbread(logfilename, tt, 6);
 		if (xx == L"</Log>")
 			logptr -= 6;
 
