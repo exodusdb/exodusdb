@@ -178,7 +178,7 @@
 	<References>
 		<ProjectReference
 			ReferencedProjectIdentifier="{8963EB1B-97D5-47C0-BF00-8F9B828B3139}"
-			RelativePathToProject=".\exodus\exodus\exodus\exodus.vcproj"
+			RelativePathToProject=".\exodus\exodus\exodus\exodus2005.vcproj"
 		/>
 	</References>
 	<Files>

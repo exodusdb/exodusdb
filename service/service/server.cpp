@@ -913,7 +913,8 @@ var Server::processrequest()
 			for (int blockn = 1; blockn <= nblocks; blockn++) {
 
 				//osbread datx(blockn) from linkfilename2 at ((blockn-1)*inblocksize) length inblocksize
-				mv.osbreadx(datx[blockn], linkfilename2, linkfilename2, (blockn - 1) * inblocksize, inblocksize);
+				var offset=(blockn - 1) * inblocksize;
+				mv.osbreadx(datx[blockn], linkfilename2, linkfilename2, offset, inblocksize);
 
 				//BREAK;
 				if (!((datx[blockn]).length())) break;;
