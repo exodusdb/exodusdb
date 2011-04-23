@@ -27,6 +27,8 @@ THE SOFTWARE.
 //http://www.regular-expressions.info/
 //http://www.regular-expressions.info/unicode.html 
 
+#include <boost/regex/config.hpp>
+
 //{{ to use utf8 facet
 #define BOOST_UTF8_BEGIN_NAMESPACE namespace boost { namespace filesystem { namespace detail {
 #define BOOST_UTF8_DECL
@@ -408,10 +410,10 @@ var& var::oconv_MC(const wchar_t* conversionchar)
 #	define boost_regex_replace boost::regex_replace
 	static const boost::wregex
 		digits_regex		(L"\\d+"		,boost::regex::extended), // \d numeric
-		alpha_regex			(L"[^\\W\\d]+"	,boost::regex::extended), // \a alphabetic
+		alpha_regex		(L"[^\\W\\d]+"		,boost::regex::extended), // \a alphabetic
 		alphanum_regex		(L"\\w+"		,boost::regex::extended), // \w alphanumeric
 		non_digits_regex	(L"[^\\d]+"		,boost::regex::extended), // \D non-numeric
-		non_alpha_regex		(L"[\\W\\d]+"	,boost::regex::extended), // \A non-alphabetic
+		non_alpha_regex		(L"[\\W\\d]+"		,boost::regex::extended), // \A non-alphabetic
 		non_alphanum_regex	(L"\\W+"		,boost::regex::extended); // \W non-alphanumeric
 #else
 #	define boost_mvstr var_mvstr
