@@ -84,12 +84,15 @@ dnl ---------------------------------------
 dnl http://www.nongnu.org/autoconf-archive/
 dnl see macros ./m4/*.m4
 dnl ---------------------------------------
+dnl https://github.com/tsuna/boost.m4 maybe better than
+dnl autoconf macro archive
 
 AX_BOOST_BASE([1.32.0])
 AX_BOOST_DATE_TIME
+dnl system is required for filesystem boost v39+
+AX_BOOST_SYSTEM
 AX_BOOST_FILESYSTEM
 AX_BOOST_REGEX
-#AX_BOOST_SYSTEM
 AX_BOOST_THREAD
 
 echo checking for PostgreSQL libraries 8.1+

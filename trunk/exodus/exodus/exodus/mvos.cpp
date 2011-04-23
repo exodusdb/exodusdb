@@ -1453,12 +1453,25 @@ var var::oslist(const var& path, const var& spec, const int mode) const
 
 	var filelist=L"";
 
+#if BOOST_FILESYSTEM_VERSION >= 3
+#define LEAForFILENAME path().filename().string()
+#define COMMABOOSTFSNATIVE
+#else
+#define LEAForFILENAME leaf()
+#define COMMABOOSTFSNATIVE ,boostfs::native
+#endif
 	//get handle to folder
 	//wpath or path before boost 1.34
 	//boostfs::wpath full_path( boostfs::initial_path<boostfs::wpath>());
     //full_path = boostfs::system_complete(boostfs::wpath( toTstring(path), boostfs::native ));
 	boostfs::path full_path( boostfs::initial_path());
-	full_path = boostfs::system_complete(boostfs::path( path.tostring().c_str(), boostfs::native ));
+	full_path = boostfs::system_complete
+		(
+			boostfs::path
+			(
+				path.tostring().c_str() COMMABOOSTFSNATIVE
+			)
+		);
 
 	//quit if it isnt a folder
 	if (!boostfs::is_directory(full_path))
@@ -1479,9 +1492,8 @@ var var::oslist(const var& path, const var& spec, const int mode) const
 		//also is_directory(dir_itr->status()) changed to is_directory(*dir_itr)
 		//to avoid compile errors on boost 1.33
 		//http://www.boost.org/doc/libs/1_33_1/libs/filesystem/doc/index.htm
-
         //skip unwanted items
-		if (filter&&!boost::regex_match(dir_itr->leaf(), re))
+		if (filter&&!boost::regex_match(dir_itr->LEAForFILENAME, re))
 			continue;
 
 		//using .leaf instead of .status provided in boost 1.34 .. but does it work/efficiently
@@ -1489,14 +1501,14 @@ var var::oslist(const var& path, const var& spec, const int mode) const
 		if ( boostfs::is_directory( *dir_itr ) )
 		{
 			if (getfolders)
-				filelist^=FM ^ dir_itr->leaf();
+				filelist^=FM ^ dir_itr->LEAForFILENAME;
 		}
 		//is_regular is only in boost > 1.34
 		//else if ( boostfs::is_regular( dir_itr->status() ) )
 		else// if ( boostfs::is_regular( dir_itr->status() ) )
 		{
 			if (getfiles)
-				filelist^=FM ^ dir_itr->leaf();
+				filelist^=FM ^ dir_itr->LEAForFILENAME;
 		}
 		//else
 		//{

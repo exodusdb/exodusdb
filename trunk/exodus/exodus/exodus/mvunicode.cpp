@@ -107,6 +107,7 @@ qt strings are unicode
 
 #include <boost/scoped_array.hpp>
 //#include <boost/algorithm/string.hpp>
+
 #include <locale.h>
 #ifdef __APPLE__
 #include <xlocale.h>
@@ -152,7 +153,7 @@ int var::localeAwareCompare(const std::wstring& str1, const std::wstring& str2) 
 		throw MVException( L"localeAwareCompare(" ^ str1 ^ L", " ^ str2 ^ L")\n");
 	}
 
-#elif defined(_MACOS)
+#elif defined(__APPLE__)
     // order strings the same way as native applications do, and also respects
     // the "Order for sorted lists" setting in the International preferences panel
 	const CFStringRef thisString=CFStringCreateWithCharactersNoCopy(kCFAllocatorDefault,
@@ -266,7 +267,7 @@ var& var::localeAwareChangeCase(const int lowerupper)
 	return *this;
 #endif
 
-#elif defined(_MACOS)
+//#elif defined(__APPLE__)
 
 //why not collate::compare?
 //#elseif defined(_UNIX)
@@ -303,7 +304,6 @@ bool var::setxlocale() const
 
 	return SetThreadLocale((*this).toInt())!=NULL;
 
-//#elif defined(_MACOS)
 #else
 	THISIS(L"bool var::setxlocale() const")
 	THISISSTRING()
@@ -327,7 +327,6 @@ var& var::getxlocale()
 #if defined(_MSC_VER) && defined(UNICODE)
 	*this=(int)GetThreadLocale();
 	return *this;
-//#elif defined(_MACOS)
 #else
 	//return "";
 	*this=var(setlocale(LC_ALL,NULL));

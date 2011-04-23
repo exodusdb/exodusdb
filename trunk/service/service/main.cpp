@@ -232,3 +232,6 @@ function main()
 }
 
 programexit()
+
+#include "server.cpp"
+#include "mvwindow.cpp"
