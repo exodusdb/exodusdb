@@ -10,7 +10,7 @@
 //non-ASCII unicode characters
 var GreekQuestionMark		=L"\u037E";//GREEK QUESTION MARK (Punctuation)
 var GreekCapitalGamma		=L"\u0393";//GREEK CAPITAL LETTER GAMMA (Letter) (Uppercase)
-var GreekSmallGamma			=L"\u03B3";//GREEK SMALL LETTER GAMMA (Letter) (Lowercase)
+var GreekSmallGamma		=L"\u03B3";//GREEK SMALL LETTER GAMMA (Letter) (Lowercase)
 var ArabicIndicDigitZero	=L"\u0660";//ARABIC-INDIC DIGIT ZERO (Decimal Digit)
 
 var GreekSmallAlpha         =L"\u03B1";//GREEK SMALL LETTER ALPHA
@@ -32,6 +32,14 @@ programinit()
 
 function main()
 {
+
+	printl("Using Exodus library version:"^var().version());
+
+	var errmsg;
+	//if (not createdb("steve",errmsg))
+	//	errmsg.outputl();
+	//if (not deletedb("steve",errmsg))
+	//	errmsg.outputl();
 
 	//test oswrite and osbread utf8
 	//following code works on win32 and linux64 (ubuntu 10.04)
@@ -62,127 +70,6 @@ function main()
 		offset2=0;
 		assert(data.osbread(tempfile,offset2,2) eq greek2);
 	}
-
-#define MULTIPLE_CONNECTION_CODE_EXCLUDED
-#ifdef MULTIPLE_CONNECTION_CODE_EXCLUDED
-	{
-		var conn1;
-		//connect normally doesnt touch default connection
-		//!!! EXCEPT if default connection is empty then it sets it
-		//default connection is empty to start with
-		//OR if you disconnect a connection with the same number (ie the same connection)
-		assert(conn1.connect( L""));
-	}		// one connection is lost here (hangs)
-
-	{
-		var conn1;
-		conn1.connect( L"");
-		conn1.disconnect();
-	}
-	var dbname2="exodus2b";
-	var dbname3="exodus3b";
-	{
-		var conn1;
-		conn1.connect( L"");			// creates new connection with default parameters (connection string)
-
-		//remove any existing test databases
-		conn1.deletedb( dbname2);
-		conn1.deletedb( dbname3);
-
-		//verify CANNOT connect to non-existent deleted database2
-		assert(not conn1.connect(L"dbname="^dbname2));
-		assert(not conn1.connect(L"dbname="^dbname3));
-
-		conn1.disconnect();
-
-	}
-
-	{	// Lets test"
-		//	global connect/disconnect
-		//	locks/unlocks
-		//	createfile/deletefile
-		connect();			// global connection
-		var file = "NANOTABLE";
-		assert( createfile( file));
-		file.lock( "1");
-		file.lock( "2");
-		file.unlock( "2");
-		file.unlock( "1");
-		file.deletefile();
-		disconnect();		// global connection
-	}
-
-	{
-		printl("create dbs exodus2 and exodus3");
-		var conn1;
-		assert(conn1.connect(""));
-		assert(conn1.createdb(dbname2));
-		assert(conn1.createdb(dbname3));
-
-		printl("create table2 on exodus2 and table3 on exodus3 - interleaved");
-		var conn2,conn3;
-		var table2="TABLE2";
-		var table3="TABLE3";
-		assert(conn2.connect("dbname="^dbname2));
-		assert(conn3.connect("dbname="^dbname3));
-		assert(not table2.open("TABLE2",conn2));
-		assert(not table3.open("TABLE3",conn3));
-		assert(conn2.createfile(table2));
-		assert(conn3.createfile(table3));
-		assert(not table2.open(table2,conn3));
-		assert(not table3.open(table3,conn2));
-		assert(table2.open(table2,conn2));
-		assert(table3.open(table3,conn3));
-		assert(write( "2.1111", table2, "2.111"));
-		assert(write( "3.1111", table3, "3.111"));
-		assert(write( "2.2222", table2, "2.222"));
-		assert(write( "3.2222", table3, "3.222"));
-		assert(write( "2.3333", table2, "2.333"));
-		assert(write( "3.3333", table3, "3.333"));
-		assert(conn2.disconnect());
-		assert(conn3.disconnect());
-	}
-	{
-		printl("Go through table2 in exodus2 db and through table3 in exodus3 db");
-		var conn2, conn3;
-		assert(conn2.connect( L"dbname="^dbname2));
-		assert(conn3.connect( L"dbname="^dbname3));
-		var table2,table3;
-		assert( table2.open( "TABLE2",conn2));
-		assert( table3.open( "TABLE3",conn3));
-
-		table2.selectrecord();
-		table3.selectrecord();
-		var record2, id2, record3, id3;
-
-		assert(table2.readnextrecord( record2, id2) and table3.readnextrecord( record3, id3));
-		assert(record2 eq "2.1111" and id2 eq "2.111" and record3 eq "3.1111" and id3 eq "3.111");
-
-		assert(table2.readnextrecord( record2, id2) and table3.readnextrecord( record3, id3));
-		assert(record2 eq "2.2222" and id2 eq "2.222" and record3 eq "3.2222" and id3 eq "3.222");
-
-		assert(table2.readnextrecord( record2, id2) and table3.readnextrecord( record3, id3));
-		assert(record2 eq "2.3333" and id2 eq "2.333" and record3 eq "3.3333" and id3 eq "3.333");
-
-		assert(not table2.readnextrecord( record2, id2) and not table3.readnextrecord( record3, id3));
-
-		printl("check CANNOT delete databases while a connection is open");
-		//NB try to delete db2 from conn3 and vice versa
-		assert(not conn3.deletedb(dbname2));
-		assert(not conn2.deletedb(dbname3));
-
-		conn2.disconnect();
-		conn3.disconnect();
-
-		printl("remove any test databases");
-		//connect to exodus first cant delete db if connected to it.
-		var conn1;
-		assert(conn1.connect(L"dbname=exodus"));
-		assert(conn1.deletedb(dbname2));
-		assert(conn1.deletedb(dbname3));
-		conn1.disconnect();
-	}
-#endif
 
 #ifdef FILE_IO_CACHED_HANDLES_EXCLUDED
 	{	// test to reproduce cached_handles error
@@ -356,8 +243,6 @@ function main()
 		assert(osdelete(tempfilename5));
 	}
 
-	var xyzz=var("Abc").ucase().outputl();
-
 	assert(oconv("ABc.123","MCN") eq "123");
 	assert(oconv("ABc.123","MCA") eq "ABc");
 	assert(oconv("ABc.123","MCB") eq "ABc123");
@@ -398,29 +283,19 @@ function main()
 	//but what is its inverse?
 	//assert(swap(unicode,"\\PL","?","ri") eq expect);
 
-	setxlocale(english_us);
+	setxlocale(greek_gr_locale);
 	var punctuation=GreekQuestionMark;//(Punctuation)
 	var uppercase=GreekCapitalGamma;//(Uppercase)
 	var lowercase=GreekSmallGamma;//(Lowercase)
 	var letters=lowercase^uppercase;
 	var digits=ArabicIndicDigitZero;//(Decimal Digit)
 
-	assert(oconv(punctuation,"MCA") eq "");
-	assert(oconv(punctuation,"MCN") eq "");
-	assert(oconv(punctuation,"MCB") eq "");
-	assert(oconv(punctuation,"MC/A") eq punctuation);
-	assert(oconv(punctuation,"MC/N") eq punctuation);
-	assert(oconv(punctuation,"MC/B") eq punctuation);
-
-	oconv(letters,"MCA").outputl("Expected:"^letters^" Actual:");
-	oconv(letters,"MCN").outputl("Expected:\"\" Actual:");
-	oconv(letters,"MCB").outputl("Expected:"^letters^" Actual:");
-	assert(oconv(letters,"MCA") eq letters);
-	assert(oconv(letters,"MCN") eq "");
-	assert(oconv(letters,"MCB") eq letters);
-	assert(oconv(letters,"MC/A") eq "");
-	assert(oconv(letters,"MC/N") eq letters);
-	assert(oconv(letters,"MC/B") eq "");
+	assert(oconv(punctuation,"MCA") eq "");//extract only alphabetic
+	assert(oconv(punctuation,"MCN") eq "");//extract only numeric
+	assert(oconv(punctuation,"MCB") eq "");//extract only alphanumeric
+	assert(oconv(punctuation,"MC/A") eq punctuation);//extract non-alphabetic
+	assert(oconv(punctuation,"MC/N") eq punctuation);//extract non-numeric
+	assert(oconv(punctuation,"MC/B") eq punctuation);//extract non-alphanumeric
 
 	assert(oconv(digits,"MCA") eq "");
 	assert(oconv(digits,"MCN") eq digits);
@@ -443,6 +318,16 @@ function main()
 	assert(oconv(uppercase,"MCU") eq uppercase);
 	assert(oconv(lowercase,"MCL") eq lowercase);
 
+	oconv(letters,"MCA").outputl("Expected:"^letters^" Actual:");
+	oconv(letters,"MCN").outputl("Expected:\"\" Actual:");
+	oconv(letters,"MCB").outputl("Expected:"^letters^" Actual:");
+	assert(oconv(letters,"MCA") eq letters);
+	assert(oconv(letters,"MCN") eq "");
+	assert(oconv(letters,"MCB") eq letters);
+	assert(oconv(letters,"MC/A") eq "");
+	assert(oconv(letters,"MC/N") eq letters);
+	assert(oconv(letters,"MC/B") eq "");
+
 	assert(COMMAND eq "service"
 	 or COMMAND eq "main"
 	 or COMMAND eq "main2"
@@ -451,13 +336,126 @@ function main()
 	 or COMMAND eq "testmain.out"
 	 );
 
-	printl("Using Exodus library version:"^var().version());
+#define MULTIPLE_CONNECTION_CODE_EXCLUDED
+#ifdef MULTIPLE_CONNECTION_CODE_EXCLUDED
+	{
+		var conn1;
+		//connect normally doesnt touch default connection
+		//!!! EXCEPT if default connection is empty then it sets it
+		//default connection is empty to start with
+		//OR if you disconnect a connection with the same number (ie the same connection)
+		assert(conn1.connect( L""));
+	}		// one connection is lost here (hangs)
 
-	var errmsg;
-	//if (not createdb("steve",errmsg))
-	//	errmsg.outputl();
-	//if (not deletedb("steve",errmsg))
-	//	errmsg.outputl();
+	{
+		var conn1;
+		conn1.connect( L"");
+		conn1.disconnect();
+	}
+	var dbname2="exodus2b";
+	var dbname3="exodus3b";
+	{
+		var conn1;
+		conn1.connect( L"");			// creates new connection with default parameters (connection string)
+
+		//remove any existing test databases
+		conn1.deletedb( dbname2);
+		conn1.deletedb( dbname3);
+
+		//verify CANNOT connect to non-existent deleted database2
+		assert(not conn1.connect(L"dbname="^dbname2));
+		assert(not conn1.connect(L"dbname="^dbname3));
+
+		conn1.disconnect();
+
+	}
+
+	{	// Lets test"
+		//	global connect/disconnect
+		//	locks/unlocks
+		//	createfile/deletefile
+		connect();			// global connection
+		var file = "NANOTABLE";
+		assert( createfile( file));
+		file.lock( "1");
+		file.lock( "2");
+		file.unlock( "2");
+		file.unlock( "1");
+		file.deletefile();
+		disconnect();		// global connection
+	}
+
+	{
+		printl("create dbs exodus2 and exodus3");
+		var conn1;
+		assert(conn1.connect(""));
+		assert(conn1.createdb(dbname2));
+		assert(conn1.createdb(dbname3));
+
+		printl("create table2 on exodus2 and table3 on exodus3 - interleaved");
+		var conn2,conn3;
+		var table2="TABLE2";
+		var table3="TABLE3";
+		assert(conn2.connect("dbname="^dbname2));
+		assert(conn3.connect("dbname="^dbname3));
+		assert(not table2.open("TABLE2",conn2));
+		assert(not table3.open("TABLE3",conn3));
+		assert(conn2.createfile(table2));
+		assert(conn3.createfile(table3));
+		assert(not table2.open(table2,conn3));
+		assert(not table3.open(table3,conn2));
+		assert(table2.open(table2,conn2));
+		assert(table3.open(table3,conn3));
+		assert(write( "2.1111", table2, "2.111"));
+		assert(write( "3.1111", table3, "3.111"));
+		assert(write( "2.2222", table2, "2.222"));
+		assert(write( "3.2222", table3, "3.222"));
+		assert(write( "2.3333", table2, "2.333"));
+		assert(write( "3.3333", table3, "3.333"));
+		assert(conn2.disconnect());
+		assert(conn3.disconnect());
+	}
+	{
+		printl("Go through table2 in exodus2 db and through table3 in exodus3 db");
+		var conn2, conn3;
+		assert(conn2.connect( L"dbname="^dbname2));
+		assert(conn3.connect( L"dbname="^dbname3));
+		var table2,table3;
+		assert( table2.open( "TABLE2",conn2));
+		assert( table3.open( "TABLE3",conn3));
+
+		table2.selectrecord();
+		table3.selectrecord();
+		var record2, id2, record3, id3;
+
+		assert(table2.readnextrecord( record2, id2) and table3.readnextrecord( record3, id3));
+		assert(record2 eq "2.1111" and id2 eq "2.111" and record3 eq "3.1111" and id3 eq "3.111");
+
+		assert(table2.readnextrecord( record2, id2) and table3.readnextrecord( record3, id3));
+		assert(record2 eq "2.2222" and id2 eq "2.222" and record3 eq "3.2222" and id3 eq "3.222");
+
+		assert(table2.readnextrecord( record2, id2) and table3.readnextrecord( record3, id3));
+		assert(record2 eq "2.3333" and id2 eq "2.333" and record3 eq "3.3333" and id3 eq "3.333");
+
+		assert(not table2.readnextrecord( record2, id2) and not table3.readnextrecord( record3, id3));
+
+		printl("check CANNOT delete databases while a connection is open");
+		//NB try to delete db2 from conn3 and vice versa
+		assert(not conn3.deletedb(dbname2));
+		assert(not conn2.deletedb(dbname3));
+
+		conn2.disconnect();
+		conn3.disconnect();
+
+		printl("remove any test databases");
+		//connect to exodus first cant delete db if connected to it.
+		var conn1;
+		assert(conn1.connect(L"dbname=exodus"));
+		assert(conn1.deletedb(dbname2));
+		assert(conn1.deletedb(dbname3));
+		conn1.disconnect();
+	}
+#endif
 
 //#if 0
 
