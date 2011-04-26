@@ -38,7 +38,7 @@ classinit()
 //complexity had been added that caused MS to optimise and break mfp compatibility
 //warning C4158: assuming #pragma pointers_to_members(full_generality, virtual_inheritance)
 #pragma warning (disable: 4158)
-#pragma pointers_to_members( full_generality )
+#pragma pointers_to_members(full_generality )
 
 //the above requirement could be removed if libraryexit() generated the exactly
 //correct pointer to member WITH THE RIGHT ARGUMENTS

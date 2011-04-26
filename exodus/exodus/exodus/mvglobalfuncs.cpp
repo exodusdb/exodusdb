@@ -102,7 +102,7 @@ void DLL_PUBLIC osclose(const var& osfilevar)
 //3 argument version assignment statement format
 //x=osbread(file,postition,length)
 //DLL_PUBLIC var osbread(const var& filehandle, const int startoffset, const int length)
-DLL_PUBLIC var osbread(const var& filehandle, var & startoffset, const int length)
+DLL_PUBLIC var osbread(const var& filehandle, var& startoffset, const int length)
 {
 	var data;
 	data.osbread(filehandle, startoffset, length);
@@ -113,14 +113,14 @@ DLL_PUBLIC var osbread(const var& filehandle, var & startoffset, const int lengt
 //osbread(data from x at y length z)
 //DLL_PUBLIC var& osbread(var& data, const var& filehandle, const int startoffset, const int length)
 DLL_PUBLIC
-var& osbread(var& data, const var& filehandle, var & startoffset, const int length)
+var& osbread(var& data, const var& filehandle, var& startoffset, const int length)
 {
 	//perhaps we can return book for success/failure despite the fact that it is a filehandle supposedly ok
 	data.osbread(filehandle, startoffset, length);
 	return data;
 }
 
-DLL_PUBLIC bool osbwrite(const var& data, const var& filehandle, var & startoffset)
+DLL_PUBLIC bool osbwrite(const var& data, const var& filehandle, var& startoffset)
 {
 	return data.osbwrite(filehandle, startoffset);
 }

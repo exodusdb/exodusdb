@@ -388,7 +388,7 @@ bool var::locatex(const std::wstring& target,const char ordercode,const wchar_t 
 
 	//find the end of the field (or string)
 	std::wstring::size_type field_end_pos;
-	field_end_pos=var_mvstr.find( FM_ ,start_pos);
+	field_end_pos=var_mvstr.find(FM_ ,start_pos);
 	if (field_end_pos==std::wstring::npos) field_end_pos=var_mvstr.length();
 
 	//FIND VALUE
@@ -416,7 +416,7 @@ bool var::locatex(const std::wstring& target,const char ordercode,const wchar_t 
 	int valuen2=1;
 	while (valuen2<valueno)
 	{
-		start_pos=var_mvstr.find( VM_ ,start_pos);
+		start_pos=var_mvstr.find(VM_ ,start_pos);
 		//past end of string?
 		if (start_pos==std::wstring::npos)
 		{
@@ -438,7 +438,7 @@ bool var::locatex(const std::wstring& target,const char ordercode,const wchar_t 
 
 	//find the end of the value (or string)
 	std::wstring::size_type value_end_pos;
-	value_end_pos=var_mvstr.find( VM_ ,start_pos);
+	value_end_pos=var_mvstr.find(VM_ ,start_pos);
 	if (value_end_pos==std::wstring::npos||value_end_pos>field_end_pos)
 	       	value_end_pos=field_end_pos;
 
@@ -464,7 +464,7 @@ bool var::locatex(const std::wstring& target,const char ordercode,const wchar_t 
 	int subvaluen2=1;
 	while (subvaluen2<subvalueno)
 	{
-		start_pos=var_mvstr.find( SM_ ,start_pos);
+		start_pos=var_mvstr.find(SM_ ,start_pos);
 		//past end of string?
 		if (start_pos==std::wstring::npos)
 		{
@@ -485,7 +485,7 @@ bool var::locatex(const std::wstring& target,const char ordercode,const wchar_t 
 
 	//find the end of the subvalue (or string)
 	std::wstring::size_type subvalue_end_pos;
-	subvalue_end_pos=var_mvstr.find( SM_ ,start_pos);
+	subvalue_end_pos=var_mvstr.find(SM_ ,start_pos);
 	if (subvalue_end_pos==std::wstring::npos||subvalue_end_pos>value_end_pos)
 	{
 	       	return locateat(target,start_pos,value_end_pos,ordercode,usingchar,setting);
@@ -810,7 +810,7 @@ var var::extract(const int argfieldn, const int argvaluen, const int argsubvalue
 
 	//find the end of the field (or string)
 	std::wstring::size_type field_end_pos;
-	field_end_pos=var_mvstr.find( FM_ ,start_pos);
+	field_end_pos=var_mvstr.find(FM_ ,start_pos);
 	if (field_end_pos==std::wstring::npos) field_end_pos=var_mvstr.length();
 
 	//FIND VALUE
@@ -831,7 +831,7 @@ var var::extract(const int argfieldn, const int argvaluen, const int argsubvalue
 	int valuen2=1;
 	while (valuen2<valueno)
 	{
-		start_pos=var_mvstr.find( VM_ ,start_pos);
+		start_pos=var_mvstr.find(VM_ ,start_pos);
 		//past end of string?
 		if (start_pos==std::wstring::npos)
 			return var(L"");
@@ -844,7 +844,7 @@ var var::extract(const int argfieldn, const int argvaluen, const int argsubvalue
 
 	//find the end of the value (or string)
 	std::wstring::size_type value_end_pos;
-	value_end_pos=var_mvstr.find( VM_ ,start_pos);
+	value_end_pos=var_mvstr.find(VM_ ,start_pos);
 	if (value_end_pos==std::wstring::npos||value_end_pos>field_end_pos)
 	       	value_end_pos=field_end_pos;
 
@@ -861,7 +861,7 @@ var var::extract(const int argfieldn, const int argvaluen, const int argsubvalue
 	int subvaluen2=1;
 	while (subvaluen2<subvalueno)
 	{
-		start_pos=var_mvstr.find( SM_ ,start_pos);
+		start_pos=var_mvstr.find(SM_ ,start_pos);
 		//past end of string?
 		if (start_pos==std::wstring::npos)
 			return var(L"");
@@ -874,7 +874,7 @@ var var::extract(const int argfieldn, const int argvaluen, const int argsubvalue
 
 	//find the end of the subvalue (or string)
 	std::wstring::size_type subvalue_end_pos;
-	subvalue_end_pos=var_mvstr.find( SM_ ,start_pos);
+	subvalue_end_pos=var_mvstr.find(SM_ ,start_pos);
 	if (subvalue_end_pos==std::wstring::npos||subvalue_end_pos>value_end_pos)
 	       	return var(var_mvstr.substr(start_pos,value_end_pos-start_pos));
 
@@ -944,7 +944,7 @@ var& var::eraser(int fieldno,int valueno,int subvalueno)
 		}
 		else
 		{
-			field_end_pos=var_mvstr.find( FM_ ,start_pos);
+			field_end_pos=var_mvstr.find(FM_ ,start_pos);
 			if (field_end_pos==std::wstring::npos) field_end_pos=var_mvstr.length();
 		}
 
@@ -1140,7 +1140,7 @@ var& var::replacer(int fieldno,int valueno,int subvalueno,const var& replacement
 		}
 		else
 		{
-			field_end_pos=var_mvstr.find( FM_ ,start_pos);
+			field_end_pos=var_mvstr.find(FM_ ,start_pos);
 			if (field_end_pos==std::wstring::npos) field_end_pos=var_mvstr.length();
 		}
 
@@ -1337,7 +1337,7 @@ var& var::inserter(const int fieldno,const int valueno,const int subvalueno,cons
 		}
 		else
 		{
-			field_end_pos=var_mvstr.find( FM_ ,start_pos);
+			field_end_pos=var_mvstr.find(FM_ ,start_pos);
 			if (field_end_pos==std::wstring::npos) field_end_pos=var_mvstr.length();
 		}
 

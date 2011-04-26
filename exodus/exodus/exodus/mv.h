@@ -684,8 +684,8 @@ public:
 	//TODO cache osfilehandles somehow (use var_mvint?)
 	bool osopen() const;
 	bool osopen(const var& filename, const var& locale=L"") const;
-	var& osbread(const var& osfilevar, var & startoffset, const int length);
-	bool osbwrite(const var& osfilevar, var & startoffset) const;
+	var& osbread(const var& osfilevar, var& startoffset, const int length);
+	bool osbwrite(const var& osfilevar, var& startoffset) const;
 	void osclose() const;
 	bool osread(const var& osfilename, const var& locale=L"");
 	bool oswrite(const var& osfilename, const var& locale=L"") const;
@@ -1009,10 +1009,10 @@ public:
 	var xlate(const var& filename,const var& fieldno, const wchar_t* mode) const;
 	var xlate(const var& filename,const var& fieldno, const var& mode) const;
 
-	bool sqlexec( const var & SqlToExecute) const;	// this: filename, parm1: SQL to execute
-//	bool sqlexec( int connection_id = 0) const;
+	bool sqlexec(const var& SqlToExecute) const;	// this: filename, parm1: SQL to execute
+//	bool sqlexec(int connection_id = 0) const;
 // outdated: 20101203:	bool sqlexec(var& errmsg, int connection_id) const;	// this: SQL to execute
-	bool sqlexec( const var& sqlcmd, var& errmsg) const;
+	bool sqlexec(const var& sqlcmd, var& errmsg) const;
 
 	//bool selftest() const;
 	var version() const;
@@ -1036,7 +1036,7 @@ private:
 	bool selectx(const var& fieldnames, const var& sortselectclause) const;
 
 	// retrieves cid from *this, or uses default connection, or autoconnect with default connection string
-	// On return *this contains connection ID and type pimpl::MVTYPE_DBOPENED
+	// On return *this contains connection ID and type pimpl::MVTYPE_NANSTR_DBCONN
 	int connection_id() const;
 
 	// finds connection of this variable:
@@ -1044,9 +1044,9 @@ private:
 	void* connection() const;
 
 	// gets lock_table, associated with connection, associated with this object
-	void* lock_table() const;
+	void* get_lock_table() const;
 
-	var build_conn_info( const var & conninfo) const;
+	var build_conn_info(const var& conninfo) const;
 
 	var getdictexpression(const var& mainfilename, const var& filename, const var& dictfilename, const var& dictfile, const var& fieldname, var& joins, bool forsort_or_select_or_index=false) const;
 
@@ -1078,8 +1078,8 @@ private:
 
 	friend class dim;
 
-	bool THIS_IS_OPENED_CONNECTION() const	{ return (this->var_mvtyp & pimpl::MVTYPE_DBCON) != 0; }
-	bool THIS_IS_OPENED_OSFILE()	 const	{ return (this->var_mvtyp & pimpl::MVTYPE_HANDLE) != 0; }
+	bool THIS_IS_DBCONN() const	{ return (this->var_mvtyp & pimpl::MVTYPE_DBCONN) != 0; }
+	bool THIS_IS_OSFILE() const	{ return (this->var_mvtyp & pimpl::MVTYPE_OSFILE) != 0; }
 
 }; //of class "var"
 
@@ -1207,7 +1207,7 @@ DLL_PUBLIC var operator% (const wchar_t*  char1  ,const var&    var2     );
 DLL_PUBLIC var operator% (const int    int1   ,const var&    var2     );
 DLL_PUBLIC var operator% (const double double1,const var&    var2     );
 
-//NB we should probably NEVER add operator^( var& var1, bool)
+//NB we should probably NEVER add operator^(var& var1, bool)
 //this is a trick to avoid a problem that exodus concat operator
 //has the wrong precedence versus the logical operators
 //a ^ b > c //we should prevent this from compiling because

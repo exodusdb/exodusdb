@@ -11,7 +11,7 @@ programinit()
 
 function main() {
 
-        if (not connect())
+	if (not connect())
                 abort("Cannot connect to database. Please check configuration");
 
         var dictfilename="dict_"^ filename;

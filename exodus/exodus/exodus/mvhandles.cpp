@@ -18,21 +18,21 @@ MvHandleEntry::MvHandleEntry()
 {}
 
 MvHandlesCache::MvHandlesCache()
-	: tbl( HANDLES_CACHE_SIZE)
+	: tbl(HANDLES_CACHE_SIZE)
 {}
 
-int MvHandlesCache::add_handle( CACHED_HANDLE handle_to_cache, DELETER_AND_DESTROYER del, std::wstring name)
+int MvHandlesCache::add_handle(CACHED_HANDLE handle_to_cache, DELETER_AND_DESTROYER del, std::wstring name)
 {
-	assert( del);
+	assert(del);
 	boost::mutex::scoped_lock lock(mvhandles_mutex);
 
 	int ix;
-	for( ix = 0; ix < ( int) tbl.size(); ix ++)
-		if( tbl[ix].deleter == HANDLE_ENTRY_FREE)
+	for(ix = 0; ix < (int) tbl.size(); ix ++)
+		if (tbl[ix].deleter == HANDLE_ENTRY_FREE)
 			break;
 
-	if( ix == ( int) tbl.size())
-		tbl.resize( ix * 2);	// double the table size
+	if (ix == (int) tbl.size())
+		tbl.resize(ix * 2);	// double the table size
 
 	tbl[ix].deleter  = del;
 	tbl[ix].handle = handle_to_cache;
@@ -40,19 +40,19 @@ int MvHandlesCache::add_handle( CACHED_HANDLE handle_to_cache, DELETER_AND_DESTR
 	return ix;
 }
 
-CACHED_HANDLE MvHandlesCache::get_handle( int index, std::wstring name)
+CACHED_HANDLE MvHandlesCache::get_handle(int index, std::wstring name)
 {
 	boost::mutex::scoped_lock lock(mvhandles_mutex);
-	return ( tbl[index].deleter == HANDLE_ENTRY_FREE) || ( tbl[index].extra != name)
+	return (tbl[index].deleter == HANDLE_ENTRY_FREE) || (tbl[index].extra != name)
 			? BAD_CACHED_HANDLE : tbl[index].handle;
 }
 
-void MvHandlesCache::del_handle( int index)
+void MvHandlesCache::del_handle(int index)
 {
 	boost::mutex::scoped_lock lock(mvhandles_mutex);
-	assert( tbl[index].deleter);
-	if( tbl[index].deleter)
-		tbl[index].deleter( tbl[index].handle);
+	assert(tbl[index].deleter);
+	if (tbl[index].deleter)
+		tbl[index].deleter(tbl[index].handle);
 	tbl[index].deleter = 0;	//	HANDLE_ENTRY_FREE
 }
 
@@ -63,11 +63,11 @@ MvHandlesCache::~MvHandlesCache()
 	//boost::mutex::scoped_lock lock(mvhandles_mutex);
 
 	int ix;
-	for( ix = 0; ix < ( int) tbl.size(); ix ++)
-		if( tbl[ix].deleter != HANDLE_ENTRY_FREE)
+	for(ix = 0; ix < (int) tbl.size(); ix ++)
+		if (tbl[ix].deleter != HANDLE_ENTRY_FREE)
 		{
-			// do not call 'del_handle( ix)' here because of deadlock
-			tbl[ix].deleter( tbl[ix].handle);
+			// do not call 'del_handle(ix)' here because of deadlock
+			tbl[ix].deleter(tbl[ix].handle);
 			tbl[ix].deleter = 0;	//	HANDLE_ENTRY_FREE
 		}
 }

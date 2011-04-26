@@ -66,7 +66,7 @@ bool callexodus(const char* serverid, const char* request, const int nrequestbyt
 	{
 		//elog(WARNING, "callexodus: stage 03"); 
 		// Try to open a named pipe; wait for it, if necessary. 
-		hPipe = CreateFile( 
+		hPipe = CreateFile(
 			pipename.c_str(),   // pipe name 
 			GENERIC_READ |  // read and write access 
 			GENERIC_WRITE, 
@@ -109,7 +109,7 @@ bool callexodus(const char* serverid, const char* request, const int nrequestbyt
 
 	//elog(WARNING, "callexodus: stage 08");
 	dwMode = PIPE_READMODE_MESSAGE; 
-	fSuccess = SetNamedPipeHandleState( 
+	fSuccess = SetNamedPipeHandleState(
 		hPipe,    // pipe handle 
 		&dwMode,  // new pipe mode 
 		NULL,     // don't set maximum bytes 
@@ -126,7 +126,7 @@ bool callexodus(const char* serverid, const char* request, const int nrequestbyt
  
 	// Send a message to the pipe server. 
 	//elog(WARNING, "callexodus: stage 10"); 
-	fSuccess = WriteFile( 
+	fSuccess = WriteFile(
 		hPipe,                  // pipe handle 
 		(LPTSTR) request,             // message 
 		nrequestbytes, // message length 
@@ -158,7 +158,7 @@ bool callexodus(const char* serverid, const char* request, const int nrequestbyt
 		if (! fSuccess && GetLastError() != ERROR_MORE_DATA) 
 			break; 
 	 
-		//_tprintf( TEXT("%s\n"), chBuf ); 
+		//_tprintf(TEXT("%s\n"), chBuf ); 
 
 		//elog(WARNING, "callexodus: stage 14");
 		//strcpy(response,chBuf);

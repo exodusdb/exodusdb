@@ -15,7 +15,7 @@
 #
 #############################################################################*/
 /* not used in exodus at the moment ... was used in windows pipe in mvipc
-#pragma warning ( disable : 4267 4996)
+#pragma warning (disable : 4267 4996)
 
 #ifndef __TCONVERT_H__
 #define __TCONVERT_H__ 1

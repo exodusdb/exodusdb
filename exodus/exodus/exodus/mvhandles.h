@@ -19,7 +19,7 @@
 namespace exodus {
 
 typedef void * CACHED_HANDLE;
-typedef void ( * DELETER_AND_DESTROYER )( CACHED_HANDLE);
+typedef void (* DELETER_AND_DESTROYER )(CACHED_HANDLE);
 
 #define BAD_CACHED_HANDLE	((void *)0)
 #define HANDLE_ENTRY_FREE	((void *)0)
@@ -37,13 +37,13 @@ class MvHandlesCache
 {
   public:
 	MvHandlesCache();
-	int add_handle( CACHED_HANDLE handle_to_opened_file, DELETER_AND_DESTROYER del, std::wstring name);
-	//MvHandleEntry & operator [] ( int idx)
+	int add_handle(CACHED_HANDLE handle_to_opened_file, DELETER_AND_DESTROYER del, std::wstring name);
+	//MvHandleEntry & operator [] (int idx)
 	//{ 
 	//	return tbl[ idx];
 	//}
-	CACHED_HANDLE get_handle( int index, std::wstring name);
-	void del_handle( int index);
+	CACHED_HANDLE get_handle(int index, std::wstring name);
+	void del_handle(int index);
    virtual ~MvHandlesCache();
 
   private:

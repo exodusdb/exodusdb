@@ -129,8 +129,10 @@ function main()
 		german_standard=1031;
 		greek_gr=1032;
 		turkish=1055;
-		english_us_locale="English";
-		greek_gr_locale="Greek";
+		//english_us_locale="English";
+		//greek_gr_locale="Greek";
+		english_us_locale=english_us;
+		greek_gr_locale=greek_gr;
 	} else {
 		english_us="en_US.utf8";
 		german_standard="de_DE.utf8";

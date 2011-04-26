@@ -150,7 +150,7 @@ int var::localeAwareCompare(const std::wstring& str1, const std::wstring& str2) 
 	case CSTR_EQUAL:
 		return 0;
 	default:
-		throw MVException( L"localeAwareCompare(" ^ str1 ^ L", " ^ str2 ^ L")\n");
+		throw MVException(L"localeAwareCompare(" ^ str1 ^ L", " ^ str2 ^ L")\n");
 	}
 
 #elif defined(__APPLE__)
@@ -207,7 +207,7 @@ var& var::localeAwareChangeCase(const int lowerupper)
 
 	//uppercasing can double the number of characters (eg german b to SS) can it triple?
 	int buffersize=(int) var_mvstr.length()*2+2;
-	boost::scoped_array<TCHAR> buffer( new TCHAR [buffersize]);
+	boost::scoped_array<TCHAR> buffer(new TCHAR [buffersize]);
 	if (buffer==0)
 		throw MVException(var(L"Out of memory in changecase(). Need ")^int(buffersize)^L" characters");
 

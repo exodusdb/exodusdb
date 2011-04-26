@@ -938,7 +938,7 @@ var& var::cropper()
 
 	//move the REVERSE iterator backwards to the first non-field character
 	int ntrailing2trim=0;
-	while ( iter!=iterend && (*iter)>=SSTM_ && (*iter)<=RM_)
+	while (iter!=iterend && (*iter)>=SSTM_ && (*iter)<=RM_)
 	{
 		++ntrailing2trim;
 		++iter;
@@ -967,10 +967,10 @@ var& var::cropper()
 		//so ++iter moves to the character to the LEFT not right
 		do
 		{
-			if ( iter == iterend )
+			if (iter == iterend )
 				goto cropperexit;
 
-			if ( (*iter) < SSTM_ || (*iter) >= lastchar )
+			if ((*iter) < SSTM_ || (*iter) >= lastchar )
 				break;
 
 			++ncropped;
@@ -1386,8 +1386,8 @@ bool var::isnum_old(void) const
 		//change to something like this? //ALN:TODO: finish and test !
 		/*
 		wchar_t * err_char;
-		var_mvint=wcstol( result.c_str(), & err_char, 10);
-		if( 
+		var_mvint=wcstol(result.c_str(), & err_char, 10);
+		if (
 		*/
 
 		var_mvtyp=pimpl::MVTYPE_INTSTR;

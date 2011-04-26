@@ -23,7 +23,7 @@ long long int is from C99 and is required to be at least 64 bits
 http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm
 
 The IEEE float and double formats were designed so that the numbers are lexicographically ordered, which in the words
-of IEEE architect William Kahan means if two floating-point numbers in the same format are ordered ( say x < y ),
+of IEEE architect William Kahan means if two floating-point numbers in the same format are ordered (say x < y ),
 then they are ordered the same way when their bits are reinterpreted as Sign-Magnitude integers.
 
 This means that if we take two floats in memory, interpret their bit pattern as integers, and compare them, we can tell

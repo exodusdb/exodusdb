@@ -223,7 +223,7 @@ bool MvEnvironment::lockrecord(const var& filename, const var& file, const var& 
 	// * wait infinite number of seconds
 	//if index(file,'message',1) else de bug
 lock:
-	if (file.lock( keyx)) {
+	if (file.lock(keyx)) {
 		return 1;
 	}else{
 		if (waitsecs) {
@@ -259,7 +259,7 @@ bool MvEnvironment::unlockrecord(const var& filename, const var& file0, const va
 	//done by shadow.mfs
 
 	//remove actual lock
-	file.unlock( key);
+	file.unlock(key);
 
 	return 1;
 
@@ -847,7 +847,7 @@ bool MvEnvironment::lockrecord(const var& filename, const var& file, const var& 
 	int waitsecs=waitsecs0;
 
 lock:
-	if (file.lock( keyx)) {
+	if (file.lock(keyx)) {
 		return 1;
 	}else{
 		if (waitsecs) {
@@ -865,7 +865,7 @@ lock:
 }
 
 //bool MvEnvironment::osbreadx(var& str1, const var& filehandle, const var& filename, const int startoffset, const int length)
-bool MvEnvironment::osbreadx(var& str1, const var& filehandle, const var& filename, var & startoffset, const int length)
+bool MvEnvironment::osbreadx(var& str1, const var& filehandle, const var& filename, var& startoffset, const int length)
 {
 	//convert from external to internal "codepage"
 	//park the high characters in the low place
@@ -880,11 +880,11 @@ bool MvEnvironment::oswritex(const var& str1, const var& filename) const
 	//convert from internal to external "codepage"
 	//move parked characters to high characters
 	//(any field seps in the output will already have been escaped like %fe)
-	var default_locale( L"");
+	var default_locale(L"");
 	return str1.convert(INTERNALCHARS, EXTERNALCHARS).oswrite(filename, default_locale);
 }
 
-bool MvEnvironment::osbwritex(const var& str1, const var& filehandle, const var& filename, var & offset) const
+bool MvEnvironment::osbwritex(const var& str1, const var& filehandle, const var& filename, var& offset) const
 {
 	//convert from internal to external "codepage"
 	//move parked characters to high characters

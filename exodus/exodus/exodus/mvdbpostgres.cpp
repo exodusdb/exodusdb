@@ -108,13 +108,13 @@ namespace exodus {
 bool startipc();
 
 // Deleter function to close connection and connection cache object
-static void connection_DELETER_AND_DESTROYER( CACHED_CONNECTION con_)
+static void connection_DELETER_AND_DESTROYER(CACHED_CONNECTION con_)
 {
-	PGconn * pgp = ( PGconn *) con_;
-	PQfinish( pgp);		// AFAIK, it destroys the object by pointer
+	PGconn * pgp = (PGconn *) con_;
+	PQfinish(pgp);		// AFAIK, it destroys the object by pointer
 //	delete pgp;
 }
-static MvConnectionsCache mv_connections_cache( connection_DELETER_AND_DESTROYER);
+static MvConnectionsCache mv_connections_cache(connection_DELETER_AND_DESTROYER);
 
 //#define PGDATAFILEPREFIX "data_"
 #define PGDATAFILEPREFIX L""
@@ -145,30 +145,14 @@ static MvConnectionsCache mv_connections_cache( connection_DELETER_AND_DESTROYER
 boost::thread_specific_ptr<int> tss_pgconnids;
 boost::thread_specific_ptr<var> tss_pgconnparams;
 boost::thread_specific_ptr<bool> tss_ipcstarted;
-//boost::thread_specific_ptr<LockTable> tss_locktables;
-
-//this is not thread safe since it is at global scope
-//var _STATUS;
-
-/* not used anywhere in postgres interface
-#define MV_MAX_KEY_LENGTH 8092-1
-#define MV_MAX_KEY_LENGTH_EXCEEDED "MV_MAX_KEY_LENGTH_EXCEEDED"
-#define MV_MAX_RECORD_LENGTH 1048576-1
-#define MV_MAX_RECORD_LENGTH_EXCEEDED "MV_MAX_RECORD_LENGTH_EXCEEDED"
-#define MV_MAX_FILENAME_LENGTH 8092-1
-#define MV_MAX_FILENAME_LENGTH_EXCEEDED "MV_MAX_FILENAME_LENGTH_EXCEEDED"
-#define MV_MAX_CONNECTPARAM_LENGTH 8092-1
-#define MV_MAX_CONNECTPARAM_LENGTH_EXCEEDED "MV_MAX_CONNECTPARAM_LENGTH_EXCEEDED"
-#define MV_BAD_FILENAME "MV_BAD_FILENAME"
-*/
 
 typedef PGresult* 	PGresultptr;
 static bool pqexec(const var& sql, PGresultptr& pgresult, PGconn * thread_pgconn);
 
-bool var::sqlexec( const var & SqlToExecute) const
+bool var::sqlexec(const var& SqlToExecute) const
 {
 	var errmsg;
-	bool result = sqlexec( SqlToExecute, errmsg);
+	bool result = sqlexec(SqlToExecute, errmsg);
 	if (not result && DBTRACE)
 		errmsg.outputl();
 	return result;
@@ -229,7 +213,7 @@ bool msvc_PQconnectdb(PGconn** pgconn, const std::string& conninfo)
 //the idea is for exodus to have access to one standard database without secret password
 static var defaultconninfo= L"host=127.0.0.1 port=5432 dbname=exodus user=exodus password=somesillysecret connect_timeout=10";
 
-var var::build_conn_info( const var & conninfo) const
+var var::build_conn_info(const var& conninfo) const
 {
 	//priority is
 	//1) given parameters or last connection parameters
@@ -238,7 +222,7 @@ var var::build_conn_info( const var & conninfo) const
 	//4) config file parameters
 	//5) default parameters
 
-	var result( conninfo);
+	var result(conninfo);
 	//if no conninfo details provided then use last connection details if any
 	if (!conninfo && tss_pgconnparams.get())
 		result = *tss_pgconnparams.get();
@@ -296,7 +280,7 @@ var var::build_conn_info( const var & conninfo) const
 }
 
 // var connection;
-// connection.connect2( "dbname=exodusbase");
+// connection.connect2("dbname=exodusbase");
 bool var::connect(const var& conninfo)
 {
 	THISIS(L"bool var::connect(const var& conninfo")
@@ -304,32 +288,36 @@ bool var::connect(const var& conninfo)
 	THISISDEFINED()
 	ISSTRING(conninfo)
 
-	var conninfo2 = build_conn_info( conninfo);
+	var conninfo2 = build_conn_info(conninfo);
 
 	PGconn* pgconn;
-	for( ;;)
+	for(;;)
 	{
-#if defined _MSC_VER //|| defined __CYGWIN__ || defined __MINGW32__
-		if (not msvc_PQconnectdb(&pgconn,conninfo2.tostring()))
-		{
-#if TRACING >= 1
-				var libname=L"libpq.dll";
-				//var libname=L"libpq.so";
-				exodus::errputl(L"ERROR: mvdbpostgres connect() Cannot load shared library " ^ libname ^ L". Verify configuration PATH contains postgres's \\bin.");
-#endif
-			return false;
-		};
-#else
-		pgconn=PQconnectdb(conninfo2.tostring().c_str());
-#endif
+#		if defined _MSC_VER //|| defined __CYGWIN__ || defined __MINGW32__
+			if (not msvc_PQconnectdb(&pgconn,conninfo2.tostring()))
+			{
+#				if TRACING >= 1
+					var libname=L"libpq.dll";
+					//var libname=L"libpq.so";
+					exodus::errputl(L"ERROR: mvdbpostgres connect() Cannot load shared library " ^ libname ^ L". Verify configuration PATH contains postgres's \\bin.");
+#				endif
+				return false;
+			};
+#		else
+			pgconn=PQconnectdb(conninfo2.tostring().c_str());
+#		endif
 
 		if (PQstatus(pgconn) == CONNECTION_OK || conninfo2)
 			break;
+
 		//required even if connect fails according to docs
 		PQfinish(pgconn);
 		//try again with default conninfo
 		conninfo2=defaultconninfo;
+
 	}
+
+	//failed to connect so return false
 	if (PQstatus(pgconn) != CONNECTION_OK)
 	{
 		#if TRACING >= 3
@@ -337,13 +325,11 @@ bool var::connect(const var& conninfo)
 			//if (not conninfo2)
 				exodus::errputl(L"ERROR: mvdbpostgres connect() Postgres connection configuration missing or incorrect. Please login.");
 		#endif
+
 		//required even if connect fails according to docs
 		PQfinish(pgconn);
 		return false;
 	}
-	#if TRACING >= 3
-		exodus::logputl(L"var::connect() Connection to database succeeded.");
-	#endif
 
 	//abort if multithreading and it is not supported
 	#ifdef PQisthreadsafe
@@ -354,22 +340,25 @@ bool var::connect(const var& conninfo)
 		}
 	#endif
 
-	// ATM we have new good connection to database
-	this->var_mvint = ( int) mv_connections_cache.add_connection( pgconn);
-	this->var_mvstr = conninfo.var_mvstr;
-	this->var_mvtyp = pimpl::MVTYPE_DBOPENED;
-//	connectionhandle = * this;
-	//ALN:TODO: whats with locktables etc. ?	tss_locktables.reset(new LockTable());
+	//at this point we have good new connection to database
+	#if TRACING >= 3
+		exodus::logputl(L"var::connect() Connection to database succeeded.");
+	#endif
+
+	//save a new connection handle
+	var_mvint = mv_connections_cache.add_connection(pgconn);
+	var_mvstr = conninfo.var_mvstr;
+	var_mvtyp = pimpl::MVTYPE_NANSTR_DBCONN;
 
 	//set default connection
 	//ONLY IF THERE ISNT ONE ALREADY
 	int* connid=tss_pgconnids.get();
 	if (connid==NULL)
-	{
 		tss_pgconnids.reset(new int((int)var_mvint));
-	}
 
-	tss_pgconnparams.reset( new var(conninfo2));	// store recent connection string (used in startipc())
+	//save last connection string (used in startipc())
+	tss_pgconnparams.reset(new var(conninfo2));
+
 	//setup a thread to service callbacks from the database backend
 	if (!tss_ipcstarted.get())
 	{
@@ -382,12 +371,11 @@ bool var::connect(const var& conninfo)
 	//doesnt work
 	//need to set PQnoticeReceiver to suppress NOTICES like when creating files
 	//PQsetErrorVerbosity(pgconn, PQERRORS_TERSE);
-
 	//but this does
 	//this turns off the notice when creating tables with a primary key
 	//DEBUG5, DEBUG4, DEBUG3, DEBUG2, DEBUG1, LOG, NOTICE, WARNING, ERROR, FATAL, and PANIC
+	sqlexec(DBTRACE ? L"SET client_min_messages = LOG" : L"SET client_min_messages = WARNING");
 
-	sqlexec( DBTRACE ? L"SET client_min_messages = LOG" : L"SET client_min_messages = WARNING");
 	return true;
 }
 
@@ -396,11 +384,12 @@ bool var::setdefaultconnection()
 	THISIS(L"bool var::setdefaultconnection()")
 	THISISDEFINED()
 
-	//handle-specific connection
-	if( ! THIS_IS_OPENED_CONNECTION())
+	//this should be a db connection
+	if (!THIS_IS_DBCONN())
 		MVException(L"is not a valid connection in setdefaultconnection()");
 
-	tss_pgconnids.reset(new int((int)this->var_mvint));
+	//save current connection handle number as thread specific handle no
+	tss_pgconnids.reset(new int((int) var_mvint));
 
 	return true;
 
@@ -408,13 +397,17 @@ bool var::setdefaultconnection()
 
 int var::connection_id() const
 {
-	if( THIS_IS_OPENED_CONNECTION())
-		return ( int) this->var_mvint;
+	//first return connection id if this is a connection handle
+	if (THIS_IS_DBCONN())
+		return (int) var_mvint;
 
+	//otherwise return thread default connection id
 	int* connid=tss_pgconnids.get();
 	int connid2=0;
 	if (connid&&*connid!=0)
 		connid2=*connid;
+
+	//otherwise do a default connect and do setdefaultconnection
 	else
 	{
 		var conn1;
@@ -425,9 +418,9 @@ int var::connection_id() const
 		}
 	}
 
-	//save the default connection
+	//turn this into a db connection
 	var_mvint = connid2;
-	var_mvtyp = pimpl::MVTYPE_DBOPENED;
+	var_mvtyp = pimpl::MVTYPE_NANSTR_DBCONN;
 
 	return connid2;
 }
@@ -446,15 +439,15 @@ int var::connection_id() const
 //(assumes accurate programming by system programmers in exodus mvdb routines)
 void* var::connection() const
 {
-	int cid = connection_id();
-	return ( void *) cid ? mv_connections_cache.get_connection(cid) : NULL;
+	int connid = connection_id();
+	return connid ? mv_connections_cache.get_connection(connid) : NULL;
 }
 
 // gets lock_table, associated with connection, associated with this object
-void* var::lock_table() const
+void* var::get_lock_table() const
 {
-	int cid = connection_id();
-	return ( void *) cid ? mv_connections_cache.get_lock_table( cid) : NULL;
+	int connid = connection_id();
+	return connid ? mv_connections_cache.get_lock_table(connid) : NULL;
 }
 
 
@@ -469,12 +462,12 @@ bool var::disconnect()
 		exodus::errputl(L"ERROR: mvdbpostgres disconnect() Closing connection");
 #	endif
 
-	int * default_connid=tss_pgconnids.get();
+	int* default_connid=tss_pgconnids.get();
 
-	if( THIS_IS_OPENED_CONNECTION())
+	if (THIS_IS_DBCONN())
 	{
-		mv_connections_cache.del_connection(( int) this->var_mvint);
-		this->var_mvtyp=pimpl::MVTYPE_UNA;
+		mv_connections_cache.del_connection((int) var_mvint);
+		var_mvtyp=pimpl::MVTYPE_UNA;
 		//if we happen to be disconnecting the same connection as the default connection
 		//then reset the default connection so that it will be reconnected to the next connect
 		//this is rather too smart but will probably do what people expect
@@ -485,7 +478,7 @@ bool var::disconnect()
 	{
 		if (default_connid && *default_connid)
 		{
-			mv_connections_cache.del_connection( * default_connid);
+			mv_connections_cache.del_connection(*default_connid);
 			tss_pgconnids.reset();
 		}
 	}
@@ -569,7 +562,7 @@ bool var::open(const var& filename, const var& connection)
 	//save the filename and memorise the current connection for this file var
 	var_mvstr=filename.var_mvstr;
 	var_mvint = connection.var_mvint;
-	var_mvtyp = pimpl::MVTYPE_DBOPENED;
+	var_mvtyp = pimpl::MVTYPE_NANSTR_DBCONN;
 
 	return true;
 }
@@ -690,7 +683,7 @@ bool var::lock(const var& key) const
 	//check if already lock in current connection
 	
 //	LockTable* locktable=tss_locktables.get();
-	LockTable* locktable = ( LockTable *) this->lock_table();
+	LockTable* locktable = (LockTable *) this->get_lock_table();
 
 	if (locktable)
 	{
@@ -771,7 +764,7 @@ void var::unlock(const var& key) const
 
 	//remove from local current connection locktable
 //	LockTable* locktable=tss_locktables.get();
-	LockTable* locktable = ( LockTable *) this->lock_table();
+	LockTable* locktable = (LockTable *) this->get_lock_table();
 	if (locktable)
 	{
 		//if not in local locktable then no need to unlock on database
@@ -823,7 +816,7 @@ void var::unlockall() const
 
 	//check if any locks
 //	LockTable* locktable=tss_locktables.get();
-	LockTable* locktable = ( LockTable *) this->lock_table();
+	LockTable* locktable = (LockTable *) this->get_lock_table();
 	if (locktable)
 	{
 		//if local lock table is empty then dont unlock all database
@@ -843,7 +836,7 @@ bool var::sqlexec(const var& sqlcmd, var& errmsg) const
 	THISIS(L"bool var::sqlexec(const var& sqlcmd, var& errmsg) const")
 	ISSTRING(sqlcmd)
 
-	PGconn * thread_pgconn = ( PGconn *) connection();
+	PGconn * thread_pgconn = (PGconn *) connection();
 	if (!thread_pgconn)
 	{
 		errmsg=L"Error: sqlexec cannot find thread database connection";
@@ -854,12 +847,12 @@ bool var::sqlexec(const var& sqlcmd, var& errmsg) const
 	if (DBTRACE)
 	{
 //		exodus::logputl(L"SQL:" ^ *this);
-		var dbtrace( L"SQL:");
-		if( this->unassigned())
+		var dbtrace(L"SQL:");
+		if (this->unassigned())
 			dbtrace ^= L"Unassigned variable";
 		else
 			dbtrace ^= * this;
-		exodus::logputl( dbtrace);
+		exodus::logputl(dbtrace);
 	}
 
 
@@ -956,7 +949,7 @@ bool var::write(const var& filehandle, const var& key) const
 
 	sql = L"UPDATE " PGDATAFILEPREFIX ^ filehandle ^ L" SET data = $2 WHERE key = $1";
 
-	PGconn * thread_pgconn = ( PGconn *) filehandle.connection();
+	PGconn * thread_pgconn = (PGconn *) filehandle.connection();
 	if (!thread_pgconn)
 		return false;
 
@@ -1297,7 +1290,7 @@ bool var::deletedb(const var& dbname, var& errmsg) const
 	ISSTRING(dbname)
 
 	//var sql = L"DROP DATABASE "^dbname.convert(L". ",L"__");
-	return sqlexec( L"DROP DATABASE "^dbname, errmsg);
+	return sqlexec(L"DROP DATABASE "^dbname, errmsg);
 }
 
 //ALN:TODO: whats with options ? should be errmsg ?
@@ -1318,23 +1311,23 @@ bool var::createfile(const var& filename, const var& options)
 	sql ^= L" TABLE " PGDATAFILEPREFIX ^ filename;
 	sql ^= L" (key bytea primary key, data bytea)";
 
-	if( ! THIS_IS_OPENED_CONNECTION())		// this object has no idea about connection
+	if (! THIS_IS_DBCONN())		// this object has no idea about connection
 	{
 		// Lets use default connection
 		int connid = 0;
 		int * pconnid = tss_pgconnids.get();
-		if( pconnid)
+		if (pconnid)
 			connid = * pconnid;
-		if(( connid > 0) && ( mv_connections_cache.get_connection( connid) == 0))
+		if((connid > 0) && (mv_connections_cache.get_connection(connid) == 0))
 			connid = 0;
-		if( connid > 0)		// save connection in *this
+		if (connid > 0)		// save connection in *this
 		{
-			this->var_mvtyp = pimpl::MVTYPE_DBOPENED;
-			this->var_mvint = connid;
-			this->var_mvstr = L"";
+			var_mvtyp = pimpl::MVTYPE_NANSTR_DBCONN;
+			var_mvint = connid;
+			var_mvstr = L"";
 		}
 	}
-	return sqlexec( sql);
+	return sqlexec(sql);
 }
 
 bool var::deletefile() const
@@ -1342,7 +1335,7 @@ bool var::deletefile() const
 	THISIS(L"bool var::deletefile() const")
 	THISISSTRING()
 
-	return sqlexec( L"DROP TABLE " PGDATAFILEPREFIX ^ *this);
+	return sqlexec(L"DROP TABLE " PGDATAFILEPREFIX ^ *this);
 }
 
 bool var::clearfile() const
@@ -1350,7 +1343,7 @@ bool var::clearfile() const
 	THISIS(L"bool var::clearfile() const")
 	THISISSTRING()
 
-	return sqlexec( L"DELETE FROM " PGDATAFILEPREFIX ^ *this);
+	return sqlexec(L"DELETE FROM " PGDATAFILEPREFIX ^ *this);
 }
 
 inline void unquoter_inline(var& string)
@@ -1404,8 +1397,8 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 
 		// we should open it through the same connection, as this->was opened, not any default connection
 		int connid = 0;
-		if( THIS_IS_OPENED_CONNECTION())
-			connid = ( int) this->var_mvint;
+		if (THIS_IS_DBCONN())
+			connid = (int) var_mvint;
 
 		if (!actualdictfile.open(dictfilename, connid))
 		{
@@ -1678,7 +1671,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 			createString();
 	}
 
-	// Note that MVTYPE_DBCON bit is still preserved in var_mvtyp
+	// Note that MVTYPE_DBCONN bit is still preserved in var_mvtyp
 
 	//TODO only do this if cursor already exists
 	//clearselect();
@@ -1939,7 +1932,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		return false;
 
 //	if (!sql.sqlexec())
-	if (! this->sqlexec( sql))
+	if (! this->sqlexec(sql))
 		return false;
 
 	//allow select to be an assignment where filename becomes the cursor name
@@ -1964,7 +1957,7 @@ void var::clearselect() const
     if (var_mvtyp)
 		sql ^= *this;
 
-	if ( ! sqlexec( sql))
+	if (! sqlexec(sql))
 		return;
 
 	// end the transaction
@@ -1983,7 +1976,7 @@ bool var::readnext(var& key) const
 //NB global not member function
 //	To make it var:: privat member -> pollute mv.h with PGresultptr :(
 //bool readnextx(const std::wstring& cursor, PGresultptr& pgresult)
-bool readnextx( const var & cursor, PGresultptr& pgresult, PGconn* pgconn)
+bool readnextx(const var& cursor, PGresultptr& pgresult, PGconn* pgconn)
 {
 	var sql=L"FETCH NEXT in CURSOR1_" ^ cursor;
 
@@ -2027,7 +2020,7 @@ bool var::readnext(var& key, var& valueno) const
 
 	PGresultptr pgresult;
 
-	if (!readnextx( *this, pgresult, pgconn))
+	if (!readnextx(*this, pgresult, pgconn))
 	{
 		// end the transaction and quit
 		committrans();
@@ -2159,7 +2152,7 @@ bool var::createindex(const var& fieldname, const var& dictfile) const
 	sql^=dictexpression;
 	sql^=L")";
 
-	return this->sqlexec( sql);
+	return this->sqlexec(sql);
 }
 
 bool var::deleteindex(const var& fieldname) const
@@ -2171,7 +2164,7 @@ bool var::deleteindex(const var& fieldname) const
 	//var filename=*this;
 	var sql=L"drop index index__" ^ *this ^ L"__" ^ fieldname;
 
-	return this->sqlexec( sql);
+	return this->sqlexec(sql);
 }
 
 /*
@@ -2280,7 +2273,7 @@ var var::listindexes(const var& filename) const
 //used for sql commands that require no parameters
 //returns 1 for success and PGresult points to result WHICH MUST BE PQclear(result)'ed
 //returns 0 for failure
-static bool pqexec( const var& sql, PGresultptr& pgresult, PGconn * thread_pgconn)
+static bool pqexec(const var& sql, PGresultptr& pgresult, PGconn * thread_pgconn)
 {
 	DEBUG_LOG_SQL
 

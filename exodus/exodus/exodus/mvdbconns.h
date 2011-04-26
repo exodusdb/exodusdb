@@ -4,10 +4,10 @@
 // mvdbconn.h - keep table of connections in the way, that connection is linked to 'filename'
 //		variable (that is linked to SQL TABLE name - in mvint field)
 //
-// Requirement 1. Current default connection id: tss_pgconnids.get();
-// Requirement 2. When open( filename) - if filename is 'only' STR variable, store current connection within
+// Requirement 1. Current threadwise default connection id: tss_pgconnids.get();
+// Requirement 2. When open(filename) - if filename is 'only' STR variable, store current connection within
 // Requirement 3. read/write: if filename is 'only' STR variable, use default connection
-// Requirement 4. 'filename' variable with stored connection has special mvtyp = MVTYPE_DBOPENED
+// Requirement 4. 'filename' variable with stored connection has special mvtyp bit = MVTYPE_DBCONN
 // Requirement 5. NO ! There is connection table, where all connection variables should be registered (at 2 and 3)
 // Requirement 6. No action is performed in destructor of 'filename' variable
 // Requirement 7. disconnect() without parameters closes current (default) connection
@@ -60,7 +60,7 @@ typedef UNORDERED_SET_FOR_LOCKTABLE LockTable;
 namespace exodus {
 
 typedef PGconn * CACHED_CONNECTION;
-typedef void ( * DELETER_AND_DESTROYER )( CACHED_CONNECTION/*, UNORDERED_SET_FOR_LOCKTABLE * */);
+typedef void (* DELETER_AND_DESTROYER )(CACHED_CONNECTION/*, UNORDERED_SET_FOR_LOCKTABLE * */);
 
 class MvConnectionEntry		// used as 'second' in pair, stored in connection map
 {
@@ -71,10 +71,10 @@ class MvConnectionEntry		// used as 'second' in pair, stored in connection map
 	int extra;
 
 	MvConnectionEntry()
-		: flag(0), connection(0), plock_table( 0), extra(0)
+		: flag(0), connection(0), plock_table(0), extra(0)
 	{}
-	MvConnectionEntry( CACHED_CONNECTION connection_, UNORDERED_SET_FOR_LOCKTABLE * LockTable_)
-		: flag(0), connection(connection_), plock_table( LockTable_), extra(0)
+	MvConnectionEntry(CACHED_CONNECTION connection_, UNORDERED_SET_FOR_LOCKTABLE * LockTable_)
+		: flag(0), connection(connection_), plock_table(LockTable_), extra(0)
 	{}
 };
 
@@ -83,11 +83,11 @@ typedef std::map<int, MvConnectionEntry> CONN_MAP;
 class MvConnectionsCache
 {
   public:
-	MvConnectionsCache( DELETER_AND_DESTROYER del_);
-	int add_connection( CACHED_CONNECTION connection_with_file);
-	CACHED_CONNECTION get_connection( int index) const;
-	UNORDERED_SET_FOR_LOCKTABLE * get_lock_table( int index) const;
-	void del_connection( int index);
+	MvConnectionsCache(DELETER_AND_DESTROYER del_);
+	int add_connection(CACHED_CONNECTION connection_with_file);
+	CACHED_CONNECTION get_connection(int index) const;
+	UNORDERED_SET_FOR_LOCKTABLE * get_lock_table(int index) const;
+	void del_connection(int index);
 	virtual ~MvConnectionsCache();
 
   private:
