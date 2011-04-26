@@ -276,32 +276,32 @@ class my_utf8_codecvt_facet: public boost::filesystem::detail::utf8_codecvt_face
 int my_utf8_codecvt_facet::i = 0;
 */
 
-std::locale get_locale( const var & locale_name) // throw ( MVException)
+std::locale get_locale(const var& locale_name) // throw (MVException)
 {
 	//assume is checked prior to calling since this is an internal exodus function
-	//THISIS(L"std::locale get_locale( const var & locale_name)")
+	//THISIS(L"std::locale get_locale(const var& locale_name)")
 	//ISSTRING(locale_name)
 
-	if( locale_name == L"utf8")
+	if (locale_name == L"utf8")
 	{
 //		typedef wchar_t ucs4_t;
 		std::locale old_locale;
-//		std::locale utf8_locale( old_locale, new boost::exodus::detail::utf8_codecvt_facet<ucs4_t>);
+//		std::locale utf8_locale(old_locale, new boost::exodus::detail::utf8_codecvt_facet<ucs4_t>);
 
-		//if( boost_utf8_facet.get() == 0)
-		//	boost_utf8_facet.reset( new boost::filesystem::detail::utf8_codecvt_facet());
-		//std::locale utf8_locale( old_locale, boost_utf8_facet.get());
+		//if (boost_utf8_facet.get() == 0)
+		//	boost_utf8_facet.reset(new boost::filesystem::detail::utf8_codecvt_facet());
+		//std::locale utf8_locale(old_locale, boost_utf8_facet.get());
 
-		std::locale utf8_locale( old_locale, new boost::filesystem::detail::utf8_codecvt_facet());
-//ALN:TEST:		std::locale utf8_locale( old_locale, new my_utf8_codecvt_facet());
+		std::locale utf8_locale(old_locale, new boost::filesystem::detail::utf8_codecvt_facet());
+//ALN:TEST:		std::locale utf8_locale(old_locale, new my_utf8_codecvt_facet());
 		return utf8_locale;
 	}
 	else
 	{
 		try {
-			std::locale mylocale( locale_name.tostring().c_str());
+			std::locale mylocale(locale_name.tostring().c_str());
 			return mylocale;
-		} catch( std::runtime_error re) {
+		} catch(std::runtime_error re) {
 			throw MVException(L"Cannot create locale for " ^ locale_name);
 		}
 	}
@@ -332,7 +332,7 @@ var var::iconv_MT() const
 	//ignore everything else and just get first three groups of digits "99 99 99"
 	//remove leading and trailing non-digits and replace internal strings of non-digits with single space
 	
-	//var time=(*this).swap( L"^\\D+|\\D+$", L"", L"r").swap( L"\\D+", L" ", L"r");
+	//var time=(*this).swap(L"^\\D+|\\D+$", L"", L"r").swap(L"\\D+", L" ", L"r");
 
 	static boost::wregex surrounding_nondigits_regex(L"^\\D+|\\D+$",boost::regex::extended|boost::regex_constants::icase);
 
@@ -410,10 +410,10 @@ var& var::oconv_MC(const wchar_t* conversionchar)
 #	define boost_regex_replace boost::regex_replace
 	static const boost::wregex
 		digits_regex		(L"\\d+"		,boost::regex::extended), // \d numeric
-		alpha_regex		(L"[^\\W\\d]+"		,boost::regex::extended), // \a alphabetic
+		alpha_regex			(L"[^\\W\\d]+"	,boost::regex::extended), // \a alphabetic
 		alphanum_regex		(L"\\w+"		,boost::regex::extended), // \w alphanumeric
 		non_digits_regex	(L"[^\\d]+"		,boost::regex::extended), // \D non-numeric
-		non_alpha_regex		(L"[\\W\\d]+"		,boost::regex::extended), // \A non-alphabetic
+		non_alpha_regex		(L"[\\W\\d]+"	,boost::regex::extended), // \A non-alphabetic
 		non_alphanum_regex	(L"\\W+"		,boost::regex::extended); // \W non-alphanumeric
 #else
 #	define boost_mvstr var_mvstr
@@ -569,7 +569,7 @@ void var::initrnd() const
 
 	//set the new seed
 	//logputl(L"Seeding random number generator to " ^ (*this));
-	(*threads_random_base_generator).seed(static_cast<unsigned int>( (*this).toInt() ));
+	(*threads_random_base_generator).seed(static_cast<unsigned int>((*this).toInt() ));
 }
 
 //only here really because boost regex is included here for file matching
@@ -739,7 +739,7 @@ bool var::osgetenv(const var& envvarname)
 	THISISDEFINED()
 	ISSTRING(envvarname)
 
-	#pragma warning ( disable : 4996)
+	#pragma warning (disable : 4996)
 	const char* cvalue=std::getenv(envvarname.tostring().c_str());
 	if (cvalue==0)
 	{
@@ -770,7 +770,7 @@ bool var::ossetenv(const var& envvarname) const
 	std::string tempstr=envvarname.tostring();
 	tempstr+="=";
 	tempstr+=tostring();
-	//#pragma warning ( disable : 4996)
+	//#pragma warning (disable : 4996)
 	const int result=putenv((char*)(tempstr.c_str()));
 	if (result==0)
 		return true;
@@ -880,7 +880,7 @@ bool var::osopen() const
 
 	//if reopening an osfile that is already opened then close and reopen
 	//dont call if not necessary
-	if (THIS_IS_OPENED_OSFILE())
+	if (THIS_IS_OSFILE())
 		osclose();
 
 	return osopenx(*this, L"")!=0;
@@ -895,16 +895,16 @@ bool var::osopen(const var& osfilename, const var& locale) const
 
 	//if reopening an osfile that is already opened then close and reopen
 	//dont call if not necessary
-	if (THIS_IS_OPENED_OSFILE())
+	if (THIS_IS_OSFILE())
 		osclose();
 
 	return osopenx(osfilename, locale)!=0;
 
 }
 
-static void del_wfstream( void * handle)
+static void del_wfstream(void * handle)
 {
-	delete ( std::wfstream *) handle;
+	delete (std::wfstream *) handle;
 }
 
 std::wfstream* var::osopenx(const var& osfilename, const var& locale) const
@@ -914,20 +914,20 @@ std::wfstream* var::osopenx(const var& osfilename, const var& locale) const
 	//Try to get the cached file handle. the usual case is that you osopen a file before doing osbwrite/osbread
 	//Using wfstream instead of wofstream so that we can mix reads and writes on the same filehandle
 	std::wfstream * pmyfile = 0;
-	if( THIS_IS_OPENED_OSFILE())
+	if (THIS_IS_OSFILE())
 	{
-		pmyfile = (std::wfstream *) mv_handles_cache.get_handle( (int) this->var_mvint, this->var_mvstr);
-		if( pmyfile == 0)		// nonvalid handle
+		pmyfile = (std::wfstream *) mv_handles_cache.get_handle((int) this->var_mvint, this->var_mvstr);
+		if (pmyfile == 0)		// nonvalid handle
 		{
 			this->var_mvint = 0;
-//			this->var_mvtyp ^= pimpl::MVTYPE_HANDLE;	// clear bit
-			this->var_mvtyp ^= pimpl::MVTYPE_HANDLE | pimpl::MVTYPE_INT;	//only STR bit should remains
+//			this->var_mvtyp ^= pimpl::MVTYPE_OSFILE;	// clear bit
+			this->var_mvtyp ^= pimpl::MVTYPE_OSFILE | pimpl::MVTYPE_INT;	//only STR bit should remains
 		}
 	}
 
 	//if the file has NOT already been opened then open it now with the current default locale and add it to the cache.
 	//but normally the filehandle will have been previously opened with osopen and perhaps a specific locale.
-	if( pmyfile == 0)
+	if (pmyfile == 0)
 	{
 
 		//delay checking until necessary
@@ -940,7 +940,7 @@ std::wfstream* var::osopenx(const var& osfilename, const var& locale) const
 		//what is the purpose of the following?
 		//to prevent locale conversion if writing narrow string to wide stream or vice versa
 		//imbue BEFORE opening or after flushing
-		//myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
+		//myfile.imbue(std::locale(std::locale::classic(), new NullCodecvt));
 /*
 		try
 		{
@@ -951,7 +951,7 @@ std::wfstream* var::osopenx(const var& osfilename, const var& locale) const
 			throw MVException(locale^L" is not supported on this system");
 		}
 */
-		pmyfile->imbue( get_locale( locale));
+		pmyfile->imbue(get_locale(locale));
 
 		//open the file for i/o (fail if the file doesnt exist and do NOT delete any existing file)
 		//binary and in/out to allow reading and writing from same file handle
@@ -965,8 +965,8 @@ std::wfstream* var::osopenx(const var& osfilename, const var& locale) const
 		//cache the file handle (we use the int to store the "file number"
 		//and NAN to prevent isnum trashing mvint in the possible case that the osfilename is an integer
 		//can addhandle fail?
-		this->var_mvint = mv_handles_cache.add_handle( pmyfile, del_wfstream, osfilename.var_mvstr);
-		this->var_mvtyp = pimpl::MVTYPE_OPENED;
+		this->var_mvint = mv_handles_cache.add_handle(pmyfile, del_wfstream, osfilename.var_mvstr);
+		this->var_mvtyp = pimpl::MVTYPE_NANSTR_OSFILE;
 		this->var_mvstr = osfilename.var_mvstr;
 	}
 
@@ -1001,11 +1001,11 @@ bool var::osread(const char* osfilename, const var& locale)
 	//what is the purpose of the following?
 	//RAW IO to prevent locale conversion if writing narrow string to wide stream or vice versa
 	//imbue BEFORE opening or after flushing
-	//myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
+	//myfile.imbue(std::locale(std::locale::classic(), new NullCodecvt));
 
 	//get a file structure configured to the right locale (locale provides a CodeCvt facet)
 	std::wifstream myfile;
-	myfile.imbue( get_locale( locale));
+	myfile.imbue(get_locale(locale));
 
 	//open in binary (and position "at end" to find the file size with tellg)
 	myfile.open(osfilename, std::ios::binary | std::ios::in | std::ios::ate );
@@ -1025,7 +1025,7 @@ bool var::osread(const char* osfilename, const var& locale)
 	}
 
 	//get file size * wchar memory to load the file or fail
-	boost::scoped_array<wchar_t> memblock( new wchar_t [bytesize]);
+	boost::scoped_array<wchar_t> memblock(new wchar_t [bytesize]);
 	if (memblock==0)
 	{
 		throw MVOutOfMemory(L"Could not obtain "^var(int(bytesize*sizeof(wchar_t)))^L" bytes of memory to read "^var(osfilename));
@@ -1063,11 +1063,11 @@ bool var::oswrite(const var& osfilename, const var& locale) const
 	//what is the purpose of the following?
 	//to prevent locale conversion if writing narrow string to wide stream or vice versa
 	//imbue BEFORE opening or after flushing
-	//myfile.imbue( std::locale(std::locale::classic(), new NullCodecvt));
+	//myfile.imbue(std::locale(std::locale::classic(), new NullCodecvt));
 
 	//get a file structure configured to the right locale (locale provides a CodeCvt facet)
 	std::wofstream myfile;
-	myfile.imbue( get_locale( locale));
+	myfile.imbue(get_locale(locale));
 
 	//although the stream works with wchar_t, its parameter file name is narrow char *
 	//delete any previous file,
@@ -1076,31 +1076,31 @@ bool var::oswrite(const var& osfilename, const var& locale) const
 		return false;
 
 	//write out the full string or fail
-	myfile.write( var_mvstr.data(), int(var_mvstr.length()));
+	myfile.write(var_mvstr.data(), int(var_mvstr.length()));
 	bool failed = myfile.fail();
 	myfile.close();
 	return ! failed;
 
 }
 
-bool var::osbwrite(const var& osfilevar, var & startoffset) const
+bool var::osbwrite(const var& osfilevar, var& startoffset) const
 {
 	//osfilehandle is just the filename but buffers the "file number" in the mvint too
 
-	THISIS(L"bool var::osbwrite(const var& osfilevar, var & startoffset) const")
+	THISIS(L"bool var::osbwrite(const var& osfilevar, var& startoffset) const")
 	THISISSTRING()
 	//test the following only if necessary in osopenx
 	//ISSTRING(osfilename)
 
 	//get the buffered file handle/open on the fly
 	std::wfstream * pmyfile = osfilevar.osopenx(osfilevar,L"");
-	if( pmyfile == 0)
+	if (pmyfile == 0)
 		return false;
 
 	//NB seekp goes by bytes regardless of the fact that it is a wide stream
 	//myfile.seekp (startoffset*sizeof(wchar_t));
 	//startoffset should be in bytes except for fixed multibyte code pages like UTF16 and UTF32
-	pmyfile->seekp ( static_cast<long> (startoffset.var_mvint));	// avoid warning, see comments to seekg()
+	pmyfile->seekp (static_cast<long> (startoffset.var_mvint));	// avoid warning, see comments to seekg()
 
 	//NB but write length goes by number of wide characters (not bytes)
 	pmyfile->write(var_mvstr.data(),int(var_mvstr.length()));
@@ -1128,7 +1128,7 @@ bool var::osbwrite(const var& osfilevar, var & startoffset) const
 	return true;
 }
 
-var& var::osbread(const var& osfilevar, var & startoffset, const int bytesize)
+var& var::osbread(const var& osfilevar, var& startoffset, const int bytesize)
 {
 	THISIS(L"var& var::osbread(const var& osfilevar, const int startoffset, const int size")
 	THISISDEFINED()
@@ -1145,17 +1145,17 @@ var& var::osbread(const var& osfilevar, var & startoffset, const int bytesize)
 
 	//get the buffered file handle/open on the fly
 	std::wfstream * pmyfile = osfilevar.osopenx(osfilevar,L"");
-	if( pmyfile == 0)
+	if (pmyfile == 0)
 		return *this;
 /*
 	//NB all file sizes are in bytes NOT characters despite this being a wide character fstream
 	// Position get pointer at the end of file, as expected it to be if we open file anew
-	pmyfile->seekg( 0, std::ios::end);
+	pmyfile->seekg(0, std::ios::end);
 	unsigned int maxsize = pmyfile->tellg();
 
 var(int(maxsize)).outputl(L"maxsize=");
 	//return "" if start reading past end of file
-	if ((unsigned long)( int)startoffset>=maxsize)	// past EOF
+	if ((unsigned long)(int)startoffset>=maxsize)	// past EOF
 		return *this;
 
 */
@@ -1164,14 +1164,14 @@ var(int(maxsize)).outputl(L"maxsize=");
 	{
 		if (pmyfile->fail())
 			pmyfile->clear();
-		//pmyfile->seekg ( static_cast<long> (startoffset.var_mvint), std::ios::beg);	// 'std::streampos' usually 'long'
+		//pmyfile->seekg (static_cast<long> (startoffset.var_mvint), std::ios::beg);	// 'std::streampos' usually 'long'
 		//seekg always seems to result in tellg being -1 in linux (Ubunut 10.04 64bit)
 		pmyfile->rdbuf()->pubseekpos(static_cast<long> (startoffset.var_mvint));
 	}
 //var((int) pmyfile->tellg()).outputl(L"2 tellg=");
 
 	//get a memory block to read into
-	boost::scoped_array<wchar_t> memblock( new wchar_t [bytesize]);
+	boost::scoped_array<wchar_t> memblock(new wchar_t [bytesize]);
 	if (memblock==0)
 		throw MVOutOfMemory(L"Could not obtain "^var(int(bytesize*sizeof(wchar_t)))^L" bytes of memory to read "^osfilevar);
 		//return *this;
@@ -1183,18 +1183,18 @@ var(int(maxsize)).outputl(L"maxsize=");
 	if (pmyfile->fail())
 	{
 		pmyfile->clear();
-		pmyfile->seekg( 0, std::ios::end);
+		pmyfile->seekg(0, std::ios::end);
 	}
 
 	//update the startoffset function argument
-	//if( readsize > 0)
+	//if (readsize > 0)
 	startoffset = (int) pmyfile->tellg();
 
 	//transfer the memory block to this variable's string
 	//(is is possible to read directly into string data() avoiding a memory copy?
 	//get the number of CHARACTERS read - utf8 bytes (except ASCII) convert to fewer wchar characters.
 	//int readsize = pmyfile->gcount();
-	var_mvstr.assign( memblock.get(), pmyfile->gcount());
+	var_mvstr.assign(memblock.get(), pmyfile->gcount());
 
 	return *this;
 
@@ -1204,11 +1204,11 @@ void var::osclose() const
 {
 	//THISIS(L"void var::osclose() const")
 	//THISISSTRING()
-	if( THIS_IS_OPENED_OSFILE())
+	if (THIS_IS_OSFILE())
 	{
-		mv_handles_cache.del_handle(( int) var_mvint);
+		mv_handles_cache.del_handle((int) var_mvint);
 		var_mvint = 0L;
-		var_mvtyp ^= pimpl::MVTYPE_HANDLE | pimpl::MVTYPE_INT;	//only STR bit should remains
+		var_mvtyp ^= pimpl::MVTYPE_OSFILE | pimpl::MVTYPE_INT;	//only STR bit should remains
 	}
 	// in all other cases, the files should be closed.
 }
@@ -1464,9 +1464,9 @@ var var::oslist(const var& path, const var& spec, const int mode) const
 #endif
 	//get handle to folder
 	//wpath or path before boost 1.34
-	//boostfs::wpath full_path( boostfs::initial_path<boostfs::wpath>());
-    //full_path = boostfs::system_complete(boostfs::wpath( toTstring(path), boostfs::native ));
-	boostfs::path full_path( boostfs::initial_path());
+	//boostfs::wpath full_path(boostfs::initial_path<boostfs::wpath>());
+    //full_path = boostfs::system_complete(boostfs::wpath(toTstring(path), boostfs::native ));
+	boostfs::path full_path(boostfs::initial_path());
 	full_path = boostfs::system_complete
 		(
 			boostfs::path
@@ -1481,9 +1481,9 @@ var var::oslist(const var& path, const var& spec, const int mode) const
 
 	//errno=0;
     //boostfs::wdirectory_iterator end_iter;
-    //for ( boostfs::wdirectory_iterator dir_itr( full_path );
+    //for (boostfs::wdirectory_iterator dir_itr(full_path );
     boostfs::directory_iterator end_iter;
-    for ( boostfs::directory_iterator dir_itr( full_path );
+    for (boostfs::directory_iterator dir_itr(full_path );
           dir_itr != end_iter;
           ++dir_itr )
     {
@@ -1499,15 +1499,15 @@ var var::oslist(const var& path, const var& spec, const int mode) const
 			continue;
 
 		//using .leaf instead of .status provided in boost 1.34 .. but does it work/efficiently
-        	//if ( boostfs::is_directory( dir_itr->status() ) )
-		if ( boostfs::is_directory( *dir_itr ) )
+        	//if (boostfs::is_directory(dir_itr->status() ) )
+		if (boostfs::is_directory(*dir_itr ) )
 		{
 			if (getfolders)
 				filelist^=FM ^ dir_itr->LEAForFILENAME;
 		}
 		//is_regular is only in boost > 1.34
-		//else if ( boostfs::is_regular( dir_itr->status() ) )
-		else// if ( boostfs::is_regular( dir_itr->status() ) )
+		//else if (boostfs::is_regular(dir_itr->status() ) )
+		else// if (boostfs::is_regular(dir_itr->status() ) )
 		{
 			if (getfiles)
 				filelist^=FM ^ dir_itr->LEAForFILENAME;
@@ -1518,7 +1518,7 @@ var var::oslist(const var& path, const var& spec, const int mode) const
 		//  //std::wcout << dir_itr->path().leaf() << L" [other]\n";
 		//}
       	}
-      	catch ( const std::exception & ex )
+      	catch (const std::exception & ex )
       	{
 		//evade warning: unused variable
 		if (false) if (ex.what()) {};
@@ -1568,7 +1568,7 @@ var var::oscwd() const
 
 /*
 	//http://www.boost.org/libs/filesystem/doc/tr2_proposal.html#Class-template-basic_path
-	//boost::filesystem::path full_path( boost::filesystem::current_path());
+	//boost::filesystem::path full_path(boost::filesystem::current_path());
 	//get the current path as wstring
 	std::string currentpath=boost::filesystem::current_path().string();
 	std::wstring wcurrentpath=std::wstring(currentpath.begin(),currentpath.end());
