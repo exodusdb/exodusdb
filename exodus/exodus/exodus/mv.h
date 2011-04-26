@@ -1028,7 +1028,7 @@ private:
 	//warning C4251: xxx needs to have dll-interface to be used by clients of class yyy
 	#pragma warning( disable: 4251 )
 	mutable std::wstring var_mvstr;
-	#pragma warning( enable: 4251 )
+	#pragma warning( 4: 4251 )
 	mutable mvint_t var_mvint;
 	mutable double var_mvdbl;
 	//initialise type last
