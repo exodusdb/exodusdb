@@ -39,16 +39,16 @@ public:
 	//above here is numeric
 	static const wchar_t MVTYPE_INT=0x4;
 	static const wchar_t MVTYPE_DBL=0x8;
+	static const wchar_t MVTYPE_OSFILE=0x10;
+	static const wchar_t MVTYPE_DBCONN=0x20;
 
 	static const wchar_t MVTYPE_INTDBL=MVTYPE_INT|MVTYPE_DBL;
 	static const wchar_t MVTYPE_INTSTR=MVTYPE_INT|MVTYPE_STR;
 	static const wchar_t MVTYPE_DBLSTR=MVTYPE_DBL|MVTYPE_STR;
 	static const wchar_t MVTYPE_NANSTR=MVTYPE_NAN|MVTYPE_STR;
 
-	static const wchar_t MVTYPE_HANDLE = 0x10;
-	static const wchar_t MVTYPE_OPENED = MVTYPE_INTSTR | MVTYPE_HANDLE;
-	static const wchar_t MVTYPE_DBCON = 0x20;
-	static const wchar_t MVTYPE_DBOPENED = MVTYPE_INTSTR | MVTYPE_DBCON;
+	static const wchar_t MVTYPE_NANSTR_OSFILE=MVTYPE_NANSTR | MVTYPE_OSFILE;
+	static const wchar_t MVTYPE_NANSTR_DBCONN=MVTYPE_NANSTR | MVTYPE_DBCONN;
 /* moved to default contructor
 	//default ctor initialise to "unassigned"
 	pimpl() : mvtype(MVTYPE_UNA) {};

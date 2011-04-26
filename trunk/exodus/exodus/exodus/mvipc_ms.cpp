@@ -46,7 +46,7 @@ Before disconnecting from a client, you must wait for a signal indicating the cl
 //for documentation see end of file
 
 //allow deprecated mbstowcs instead of "safe" mbstowcs_s
-#pragma warning ( disable : 4995 4996)
+#pragma warning (disable : 4995 4996)
 
 //for mingw
 #ifdef _MSC_VER
@@ -152,21 +152,21 @@ int MVipc(const int environmentn, var& pgconnparams)
 
 	// declare and initialize a security attributes structure
 	SECURITY_ATTRIBUTES SA;
-	ZeroMemory( &SA, sizeof(SA) );
-	SA.nLength = sizeof( SA );
+	ZeroMemory(&SA, sizeof(SA) );
+	SA.nLength = sizeof(SA );
 	SA.bInheritHandle = FALSE; // object uninheritable
 
 	// declare and initialize a security descriptor
 	SECURITY_DESCRIPTOR SD;
 
-	BOOL bInitOk = InitializeSecurityDescriptor( &SD,
+	BOOL bInitOk = InitializeSecurityDescriptor(&SD,
                          SECURITY_DESCRIPTOR_REVISION );
 
-	if ( bInitOk )
+	if (bInitOk )
 	{
    	// give the security descriptor a Null Dacl
   	 // done using the  "TRUE, (PACL)NULL" here
-   	BOOL bSetOk = SetSecurityDescriptorDacl( &SD,
+   	BOOL bSetOk = SetSecurityDescriptorDacl(&SD,
                                             TRUE,
                                             (PACL)NULL,
                                             FALSE );
@@ -203,7 +203,7 @@ ZeroMemory(Pipe,size);
  
    // Create an event object for this instance. 
  
-      hEvents[i] = CreateEvent( 
+      hEvents[i] = CreateEvent(
          NULL,    // default security attribute 
          TRUE,    // manual-reset event 
          TRUE,    // initial state = signaled 
@@ -217,7 +217,7 @@ ZeroMemory(Pipe,size);
  
       Pipe[i].oOverlap.hEvent = hEvents[i]; 
  
-      Pipe[i].hPipeInst = CreateNamedPipe( 
+      Pipe[i].hPipeInst = CreateNamedPipe(
          lpszPipename,            // pipe name 
          PIPE_ACCESS_DUPLEX |     // read/write access 
          FILE_FLAG_OVERLAPPED,    // overlapped mode 
@@ -246,7 +246,7 @@ ZeroMemory(Pipe,size);
 #endif 
    // Call the subroutine to connect to the new client
  
-      Pipe[i].fPendingIO = ConnectToNewClient( 
+      Pipe[i].fPendingIO = ConnectToNewClient(
          Pipe[i].hPipeInst, 
          &Pipe[i].oOverlap); 
  
@@ -289,7 +289,7 @@ ZeroMemory(Pipe,size);
 	wprintf(L"MVipc() WaitForMultipleObjects\n"); 
 #endif
 
-      dwWait = WaitForMultipleObjects( 
+      dwWait = WaitForMultipleObjects(
          INSTANCES,    // number of event objects 
          hEvents,      // array of event objects 
          FALSE,        // does not wait for all 
@@ -310,7 +310,7 @@ ZeroMemory(Pipe,size);
  
       if (Pipe[i].fPendingIO) 
       { 
-         fSuccess = GetOverlappedResult( 
+         fSuccess = GetOverlappedResult(
             Pipe[i].hPipeInst, // handle to pipe 
             &Pipe[i].oOverlap, // OVERLAPPED structure 
             &cbRet,            // bytes transferred 
@@ -390,7 +390,7 @@ ZeroMemory(Pipe,size);
 #if TRACING >= 3
 	wprintf(L"MVipc() IN READING_STATE\n");
 #endif
-            fSuccess = ReadFile( 
+            fSuccess = ReadFile(
                Pipe[i].hPipeInst, 
                Pipe[i].chRequest, 
                BUFSIZE*sizeof(TCHAR), 
@@ -485,7 +485,7 @@ ZeroMemory(Pipe,size);
 //wprintf(L"MVipc() wrote %d bytes <- \"%s\"\n",Pipe[i].cbToWrite, Pipe[i].chReply);
 wprintf(L"MVipc() writing %d bytes \n",Pipe[i].cbToWrite);
 #endif
-			fSuccess = WriteFile( 
+			fSuccess = WriteFile(
                Pipe[i].hPipeInst, 
                Pipe[i].chReply, 
                Pipe[i].cbToWrite, 
@@ -543,7 +543,7 @@ VOID DisconnectAndReconnect(DWORD i)
  
 // Call a subroutine to connect to the new client. 
  
-   Pipe[i].fPendingIO = ConnectToNewClient( 
+   Pipe[i].fPendingIO = ConnectToNewClient(
       Pipe[i].hPipeInst, 
       &Pipe[i].oOverlap); 
  

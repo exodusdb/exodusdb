@@ -11,7 +11,7 @@
 
 /*backward compatible to pre 8.3 with no SET_VARSIZE*/
 #ifndef SET_VARSIZE
-#define SET_VARSIZE(ret,size) VARATT_SIZEP( (ret) ) = (size)
+#define SET_VARSIZE(ret,size) VARATT_SIZEP((ret) ) = (size)
 #endif
 
 //defined in naturalorder.cpp

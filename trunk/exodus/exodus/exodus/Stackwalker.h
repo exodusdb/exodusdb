@@ -158,7 +158,7 @@ protected:
     EXCEPTION_POINTERS *pExp = NULL; \
     __try { \
       throw 0; \
-    } __except( ( (pExp = GetExceptionInformation()) ? EXCEPTION_EXECUTE_HANDLER : EXCEPTION_EXECUTE_HANDLER)) {} \
+    } __except(((pExp = GetExceptionInformation()) ? EXCEPTION_EXECUTE_HANDLER : EXCEPTION_EXECUTE_HANDLER)) {} \
     if (pExp != NULL) \
       memcpy(&c, pExp->ContextRecord, sizeof(CONTEXT)); \
       c.ContextFlags = contextFlags; \

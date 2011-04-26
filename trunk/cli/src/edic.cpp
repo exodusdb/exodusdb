@@ -184,7 +184,7 @@ program()
 							blankfile^="\n";
 							blankfile^="programinit()\n";
 							blankfile^="\n";
-							blankfile^="function main() {\n";
+							blankfile^="function main(/*in arg1, out arg2*/) {\n";
 							blankfile^="\tprintl(\""^basefilename^" says 'Hello World!'\");\n";
 							blankfile^="\treturn 0;\n";
 							blankfile^="}\n";

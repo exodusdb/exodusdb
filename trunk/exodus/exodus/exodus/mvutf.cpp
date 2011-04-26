@@ -57,7 +57,7 @@ std::string var::tostring() const
 {
 	THISIS(L"std::string var::tostring() const")
     THISISSTRING()
-	int length = ( int) var_mvstr.length();
+	int length = (int) var_mvstr.length();
 
 	//TODO! convert from internal UTF16/32 to external UTF8
 
@@ -68,7 +68,7 @@ std::string var::tostring() const
 	}																			// var::toUTF8
 	else if (sizeof(wchar_t)==2)
 	{
-		return stringfromUTF16((UTF16*)( (*this).var_mvstr.data() ), length);
+		return stringfromUTF16((UTF16*)((*this).var_mvstr.data() ), length);
 	}
 	else if (sizeof(wchar_t)==1)
 	{
@@ -132,7 +132,7 @@ std::wstring wstringfromUTF8(const UTF8* sourcestart, const size_t sourcelength)
 	if (sizeof(wchar_t)==4)
 	{
 //ALN:ML		UTF32* targetbuffer=new(UTF32[sourcelength]);
-		boost::scoped_array<UTF32> UTF32buffer( new UTF32[sourcelength]);
+		boost::scoped_array<UTF32> UTF32buffer(new UTF32[sourcelength]);
 		UTF32* targetbuffer = UTF32buffer.get();
 
 		UTF32* targetbufferptr = targetbuffer;
@@ -157,7 +157,7 @@ std::wstring wstringfromUTF8(const UTF8* sourcestart, const size_t sourcelength)
 	else if (sizeof(wchar_t)==2)
 	{
 		//allow for max 4 bytes per single utf8 byte (utf16 max bytes is four)
-		boost::scoped_array<UTF16> UTF16buffer( new UTF16[sourcelength]);
+		boost::scoped_array<UTF16> UTF16buffer(new UTF16[sourcelength]);
 //ALN:ML		UTF16* targetbuffer=new(UTF16[sourcelength*4]);
 		UTF16* targetbuffer = UTF16buffer.get();
 		UTF16* targetbufferptr=targetbuffer;
@@ -208,7 +208,7 @@ std::string stringfromUTF16(const UTF16* sourcestart, const size_t sourcelength)
 	//in order to ensure indexing characters in UTF16 strings can be lightning fast and proper
 
 //ALN:ML	UTF8* targetbuffer=new UTF8[sourcelength*4];
-	boost::scoped_array<UTF8> UTF8buffer( new UTF8[sourcelength*4]);
+	boost::scoped_array<UTF8> UTF8buffer(new UTF8[sourcelength*4]);
 	UTF8* targetbuffer = UTF8buffer.get();
 	UTF8* targetbufferptr=targetbuffer;
 	//TODO check if ok
@@ -245,7 +245,7 @@ std::string stringfromUTF32(const UTF32* sourcestart, const size_t sourcelength)
 	//in order to ensure indexing characters in UTF16 strings can be lightning fast and proper
 
 //ALN:ML	UTF8* targetbuffer=new(UTF8[sourcelength*4]);
-	boost::scoped_array<UTF8> UTF8buffer( new UTF8[sourcelength*4]);
+	boost::scoped_array<UTF8> UTF8buffer(new UTF8[sourcelength*4]);
 	UTF8* targetbuffer = UTF8buffer.get();
 	UTF8* targetbufferptr=targetbuffer;
 	//TODO check if ok

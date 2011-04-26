@@ -552,7 +552,7 @@ program()
 						if (not isprogram and word1.substr(1,11) eq "libraryinit")
 							useclassmemberfunctions=true;
 
-                        if (not(isprogram) and ( word1 eq "function" or word1 eq "subroutine") ) {
+                        if (not(isprogram) and (word1 eq "function" or word1 eq "subroutine") ) {
 
                                 //extract out the function declaration in including arguments
                                 //eg "function xyz(in arg1, out arg2)"
@@ -798,8 +798,8 @@ var inclusion=
                 //get new objfile info or continue
                 var newobjfileinfo=osfile(objfilename);
                 if (not objfilename) {
-                        print("CANNOT FIND OUTPUT FILE");
-                        var().input(1);
+                        printl("CANNOT FIND OUTPUT FILE "^objfilename);
+                        var("Press Enter").input(1);
                         continue;
                 }
 

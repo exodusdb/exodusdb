@@ -846,7 +846,7 @@ var var::oconv_HEX(const int ioratio) const
 
 	std::wostringstream ss;
 	int nchars=length();
-	ss.flags ( std::ios::right | std::ios::hex | std::ios::uppercase);
+	ss.flags (std::ios::right | std::ios::hex | std::ios::uppercase);
 	//ss.setbase(16) useful to set numerically instead of ios::hex
 	ss.fill('0');
 	//perhaps convert to use iterators especially to allow for variable width characters under utf16.

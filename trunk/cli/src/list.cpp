@@ -470,7 +470,7 @@ phraseinit:
 			while (true) {
 
 				///BREAK;
-				if ( not (nextword ne "" and (nextword.isnum() or nextword[1] eq DQ or nextword[1] eq SQ)))
+				if (not (nextword ne "" and (nextword.isnum() or nextword[1] eq DQ or nextword[1] eq SQ)))
 					break;
 
 				gosub getword();
