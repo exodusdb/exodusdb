@@ -1015,7 +1015,9 @@ bool var::osread(const char* osfilename, const var& locale)
 	//determine the file size since we are going to read it all
 	//NB tellg and seekp goes by bytes regardless of normal/wide stream
 	unsigned int bytesize;
-    bytesize = myfile.tellg();
+	//	#pragma warning( disable: 4244 )
+	//warning C4244: '=' : conversion from 'std::streamoff' to 'unsigned int', possible loss of data
+    bytesize = (unsigned int) myfile.tellg();
 
 	//if empty file then done ok
 	if (bytesize==0)
@@ -1041,7 +1043,9 @@ bool var::osread(const char* osfilename, const var& locale)
 
 	// NOTE: in "utf8" mode, number of read characters in memblock is less then requested.
 	//		As such, to prevent garbage in tail of returned string, do:
-	bytesize = myfile.gcount();
+	//	#pragma warning( disable: 4244 )
+	//warning C4244: '=' : conversion from 'std::streamoff' to 'unsigned int', possible loss of data
+	bytesize = (unsigned int) myfile.gcount();
 	myfile.close();
 
 	if (failed)
@@ -1194,7 +1198,9 @@ var(int(maxsize)).outputl(L"maxsize=");
 	//(is is possible to read directly into string data() avoiding a memory copy?
 	//get the number of CHARACTERS read - utf8 bytes (except ASCII) convert to fewer wchar characters.
 	//int readsize = pmyfile->gcount();
-	var_mvstr.assign(memblock.get(), pmyfile->gcount());
+	//	#pragma warning( disable: 4244 )
+	//warning C4244: '=' : conversion from 'std::streamoff' to 'unsigned int', possible loss of data
+	var_mvstr.assign(memblock.get(), (unsigned int) pmyfile->gcount());
 
 	return *this;
 

@@ -121,25 +121,28 @@ function main()
 	var english_us="";
 	var german_standard="";
 	var greek_gr="";
-	var turkish="";
+	var turkish_tr="";
 	var english_us_locale;
 	var greek_gr_locale;
+	var turkish_tr_locale;
 	if (SLASH_IS_BACKSLASH) {
 		english_us=1033;
 		german_standard=1031;
 		greek_gr=1032;
-		turkish=1055;
+		turkish_tr=1055;
 		//english_us_locale="English";
-		//greek_gr_locale="Greek";
-		english_us_locale=english_us;
-		greek_gr_locale=greek_gr;
+		greek_gr_locale="Greek";
+		turkish_tr_locale="Turkish";
+		english_us_locale="English";
+		//greek_gr_locale=greek_gr;
 	} else {
 		english_us="en_US.utf8";
 		german_standard="de_DE.utf8";
 		greek_gr="el_GR.utf8";
-		turkish="tr_TR.utf8";
+		turkish_tr="tr_TR.utf8";
 		english_us_locale=english_us;
 		greek_gr_locale=greek_gr;
+		turkish_tr_locale=turkish_tr;
 	}
 
 	//in English/US Locale
@@ -193,7 +196,7 @@ function main()
 	//check Latin "I" lowercases to "turkish dotless i"
 	//check Latin "i" uppercases to "turkish dotted I"
 	//fails on Ubuntu 10.04
-	assert(setxlocale(turkish));
+	assert(setxlocale(turkish_tr));
 	printl("Latin Capital I should lower case to dotless Turkish i:",lcase(LatinCapitalI));
 	assert(lcase(TurkishCapitalDottedI) eq LatinSmallI);
 	assert(ucase(TurkishSmallDotlessI) eq LatinCapitalI);
@@ -285,7 +288,7 @@ function main()
 	//but what is its inverse?
 	//assert(swap(unicode,"\\PL","?","ri") eq expect);
 
-	setxlocale(greek_gr_locale);
+	setxlocale(greek_gr);
 	var punctuation=GreekQuestionMark;//(Punctuation)
 	var uppercase=GreekCapitalGamma;//(Uppercase)
 	var lowercase=GreekSmallGamma;//(Lowercase)
