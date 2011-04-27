@@ -91,7 +91,7 @@ function runsomesql(in sql)
 {
 
         var errmsg;
-        if (not sql.sqlexec(errmsg)) {
+        if (not sql.sqlexec(sql, errmsg)) {
                 //printl("\nSQL " ^ errmsg ^ sql);
                 printl("\nSQL " ^ errmsg);
                 return false;
@@ -226,9 +226,67 @@ program()
                 stop("Stopping. Cannot connect to new database");
 		printl("done!");
 
-        print(oconv("Adding pgexodus postgres plugin ... ","L#40"));
-        if (not add_pgexodus_postgres_plugin())
-                stop("Stopping. Not enough privileges");
+		if (SLASH eq "\\") {
+			printl(oconv("Installing pgexodus postgres plugin ... ","L#40"));
+			var pgexodusdll="pgexodus.dll";
+			if (not osfile(pgexodusdll)) {
+				var exodusbinpath=field(EXECPATH,SLASH,1,dcount(EXECPATH,SLASH)-1);
+				pgexodusdll=exodusbinpath^SLASH^"pgexodus.dll";
+				if (not osfile(pgexodusdll)) {
+					printl("Cant find pgexodus.dll or "^pgexodusdll);
+					pgexodusdll="";
+				}
+			}
+
+			var pglibdir;
+			//pglibdir=osshellread("pg_config --libdir").field("\n",1);
+			pglibdir=osgetenv("POSTGRESQL")^"\\lib";
+			pglibdir.converter("/",SLASH);
+			//exodus oscopy cannot handle old 8.3 file names (boost library issue)
+			pglibdir.swapper("PROGRA~1","Program Files");
+			pglibdir.swapper("POSTGR~1","PostgreSQL");
+			var targetfilename=pglibdir^SLASH^"pgexodus.dll";
+
+			//delete any existing pgexodus.dll. restart service if cannot initially delete
+			if (osfile(targetfilename) and not osdelete(targetfilename)) {
+
+				//determine postgres service name
+				var pgversion=osshellread("pg_config --version").field(" ",2).field(".",1,2);
+				var servicename=(pgversion<9)?"pgsql":"postgresql";
+				servicename^="-"^pgversion;
+
+				outputl("Stopping "^servicename^" (to update pgexodus.dll plugin) ...");
+				if (osshell("NET STOP "^servicename))
+				{
+					outputl("Cant stop "^servicename^". Please restart it manually.");
+				} else {
+					outputl("Restarting "^servicename^" ...");
+					if (osshell("NET START "^servicename))
+						outputl("Cant restart "^servicename^". Please restart it manually");
+				}
+				if (not osdelete(targetfilename))
+						outputl("Cant delete existing pgexodus.dll plugin");
+			}
+
+			//copy pgexodus.dll plugin into place
+			//pgexodusdll.converter(SLASH,"/");
+			//targetfilename.converter(SLASH,"/");
+			//targetfile="D:/Program Files/PostgreSQL/8.3/lib/pgexodus.dll";
+			printl(quote(pgexodusdll));
+			printl("-> ",quote(targetfilename));
+			if (pgexodusdll and oscopy(pgexodusdll,targetfilename)) {
+	 			printl("done!");
+				printl("Installed pgexodus.dll");
+			} else {
+				printl("failed!");
+				printl("Did not install pgexodus.dll");
+			}
+
+		}
+
+		print(oconv("Configuring pgexodus postgres plugin ... ","L#40"));
+		if (not add_pgexodus_postgres_plugin())
+			stop("Stopping. Not enough privileges");
 
 		print(oconv("Detaching from new database ... ","L#40"));
 		disconnect();

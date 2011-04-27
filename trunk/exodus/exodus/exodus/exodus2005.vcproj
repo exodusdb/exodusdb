@@ -20,7 +20,6 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
-			InheritedPropertySheets="..\..\..\postgres.vsprops;..\..\..\boost.vsprops"
 			CharacterSet="1"
 			>
 			<Tool
@@ -41,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..;&quot;\Program Files\boost\boost_1_38&quot;;&quot;\Program Files\PostgreSQL\8.3\include&quot;"
+				AdditionalIncludeDirectories="..;&quot;$(BOOST)\&quot;;&quot;$(POSTGRESQL)\include&quot;"
 				PreprocessorDefinitions="BUILDING_LIBRARY;DEBUG"
 				MinimalRebuild="true"
 				ExceptionHandling="1"
@@ -66,7 +65,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="libpq.lib"
-				AdditionalLibraryDirectories="&quot;\Program Files\PostgreSQL\8.3\lib&quot;;&quot;\Program Files\boost\boost_1_38\lib&quot;"
+				AdditionalLibraryDirectories="&quot;$(POSTGRESQL)\lib&quot;;&quot;$(BOOST)\lib&quot;"
 				DelayLoadDLLs="libpq.dll"
 				GenerateDebugInformation="true"
 			/>
@@ -100,7 +99,6 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
-			InheritedPropertySheets="..\..\..\postgres.vsprops;..\..\..\boost.vsprops"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
@@ -121,7 +119,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories=".."
+				AdditionalIncludeDirectories="..;&quot;$(BOOST)\&quot;;&quot;$(POSTGRESQL)\include&quot;"
 				PreprocessorDefinitions="BUILDING_LIBRARY;NDEBUG"
 				ExceptionHandling="1"
 				RuntimeLibrary="2"
@@ -143,7 +141,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="libpq.lib"
-				AdditionalLibraryDirectories=""
+				AdditionalLibraryDirectories="&quot;$(POSTGRESQL)\lib&quot;;&quot;$(BOOST)\lib&quot;"
 				DelayLoadDLLs="libpq.dll"
 			/>
 			<Tool

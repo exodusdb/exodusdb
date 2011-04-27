@@ -20,7 +20,6 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
-			InheritedPropertySheets="..\..\..\postgres.vsprops;..\..\..\boost.vsprops"
 			CharacterSet="1"
 			>
 			<Tool
@@ -41,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=""
+				AdditionalIncludeDirectories="$(BOOST);&quot;$(POSTGRESQL)\include&quot;;&quot;$(POSTGRESQL)\include\server&quot;;&quot;$(POSTGRESQL)\include\server\port\win32_msvc&quot;;&quot;$(POSTGRESQL)\include\server\port\win32&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;PGEXODUS_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -65,7 +64,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="postgres.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories=""
+				AdditionalLibraryDirectories="&quot;$(BOOST)\lib&quot;;&quot;$(POSTGRESQL)\lib&quot;"
 				ModuleDefinitionFile="pgexodus.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -101,7 +100,6 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
-			InheritedPropertySheets="..\..\..\boost.vsprops;..\..\..\postgres.vsprops"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
@@ -122,7 +120,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories=""
+				AdditionalIncludeDirectories="$(BOOST);&quot;$(POSTGRESQL)\include&quot;;&quot;$(POSTGRESQL)\include\server&quot;;&quot;$(POSTGRESQL)\include\server\port\win32_msvc&quot;;&quot;$(POSTGRESQL)\include\server\port\win32&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;PGEXODUS_EXPORTS"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -143,7 +141,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="postgres.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories=""
+				AdditionalLibraryDirectories="&quot;$(BOOST)\lib&quot;;&quot;$(POSTGRESQL)\lib&quot;"
 				ModuleDefinitionFile="pgexodus.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
