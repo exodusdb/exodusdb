@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="$(BOOST);&quot;$(POSTGRESQL)\include&quot;;&quot;$(POSTGRESQL)\include\server&quot;;&quot;$(POSTGRESQL)\include\server\port\win32_msvc&quot;;&quot;$(POSTGRESQL)\include\server\port\win32&quot;"
+				AdditionalIncludeDirectories="&quot;$(POSTGRESQL)\include&quot;;&quot;$(POSTGRESQL)\include\server&quot;;&quot;$(POSTGRESQL)\include\server\port\win32_msvc&quot;;&quot;$(POSTGRESQL)\include\server\port\win32&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;PGEXODUS_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -64,7 +64,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="postgres.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;$(BOOST)\lib&quot;;&quot;$(BOOST)\stage\lib&quot;;&quot;$(POSTGRESQL)\lib&quot;"
+				AdditionalLibraryDirectories="&quot;$(POSTGRESQL)\lib&quot;"
 				ModuleDefinitionFile="pgexodus.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -120,7 +120,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="$(BOOST);&quot;$(POSTGRESQL)\include&quot;;&quot;$(POSTGRESQL)\include\server&quot;;&quot;$(POSTGRESQL)\include\server\port\win32_msvc&quot;;&quot;$(POSTGRESQL)\include\server\port\win32&quot;"
+				AdditionalIncludeDirectories="&quot;$(POSTGRESQL)\include&quot;;&quot;$(POSTGRESQL)\include\server&quot;;&quot;$(POSTGRESQL)\include\server\port\win32_msvc&quot;;&quot;$(POSTGRESQL)\include\server\port\win32&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;PGEXODUS_EXPORTS"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -141,7 +141,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="postgres.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;$(BOOST)\lib&quot;;&quot;$(BOOST)\stage\lib&quot;;&quot;$(POSTGRESQL)\lib&quot;"
+				AdditionalLibraryDirectories="&quot;$(POSTGRESQL)\lib&quot;"
 				ModuleDefinitionFile="pgexodus.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
