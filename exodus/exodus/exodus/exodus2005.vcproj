@@ -65,7 +65,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="libpq.lib"
-				AdditionalLibraryDirectories="&quot;$(POSTGRESQL)\lib&quot;;&quot;$(BOOST)\lib&quot;"
+				AdditionalLibraryDirectories="&quot;$(BOOST)\lib&quot;;&quot;$(BOOST)\stage\lib&quot;;&quot;$(POSTGRESQL)\lib&quot;"
 				DelayLoadDLLs="libpq.dll"
 				GenerateDebugInformation="true"
 			/>
@@ -141,7 +141,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="libpq.lib"
-				AdditionalLibraryDirectories="&quot;$(POSTGRESQL)\lib&quot;;&quot;$(BOOST)\lib&quot;"
+				AdditionalLibraryDirectories="&quot;$(BOOST)\lib&quot;;&quot;$(BOOST)\stage\lib&quot;;&quot;$(POSTGRESQL)\lib&quot;"
 				DelayLoadDLLs="libpq.dll"
 			/>
 			<Tool
