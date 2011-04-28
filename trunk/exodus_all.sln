@@ -96,6 +96,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "edir", "cli\src\edir.vcxpro
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testmain", "test\src\testmain.vcxproj", "{237FFD63-8F9A-4101-B98B-0EE8162345E9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -266,6 +268,16 @@ Global
 		{E97CCEAD-11F1-4CEE-B52D-10D7429AE622}.Release|Mixed Platforms.Build.0 = Release|Win32
 		{E97CCEAD-11F1-4CEE-B52D-10D7429AE622}.Release|Win32.ActiveCfg = Release|Win32
 		{E97CCEAD-11F1-4CEE-B52D-10D7429AE622}.Release|Win32.Build.0 = Release|Win32
+		{237FFD63-8F9A-4101-B98B-0EE8162345E9}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{237FFD63-8F9A-4101-B98B-0EE8162345E9}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{237FFD63-8F9A-4101-B98B-0EE8162345E9}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{237FFD63-8F9A-4101-B98B-0EE8162345E9}.Debug|Win32.ActiveCfg = Debug|Win32
+		{237FFD63-8F9A-4101-B98B-0EE8162345E9}.Debug|Win32.Build.0 = Debug|Win32
+		{237FFD63-8F9A-4101-B98B-0EE8162345E9}.Release|Any CPU.ActiveCfg = Release|Win32
+		{237FFD63-8F9A-4101-B98B-0EE8162345E9}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{237FFD63-8F9A-4101-B98B-0EE8162345E9}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{237FFD63-8F9A-4101-B98B-0EE8162345E9}.Release|Win32.ActiveCfg = Release|Win32
+		{237FFD63-8F9A-4101-B98B-0EE8162345E9}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

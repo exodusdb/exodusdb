@@ -73,6 +73,11 @@
   <ItemGroup>
     <ClCompile Include="testmain.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\exodus\exodus\exodus\exodus.vcxproj">
+      <Project>{8963eb1b-97d5-47c0-bf00-8f9b828b3139}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
