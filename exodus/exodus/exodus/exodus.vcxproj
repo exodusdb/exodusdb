@@ -1,0 +1,221 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{8963EB1B-97D5-47C0-BF00-8F9B828B3139}</ProjectGuid>
+    <RootNamespace>mv</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..;"$(BOOST)\";"$(POSTGRESQL)\include"</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BUILDING_LIBRARY;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <CallingConvention>Cdecl</CallingConvention>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>libpq.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>"$(BOOST)\lib";"$(BOOST)\stage\lib";"$(POSTGRESQL)\lib"</AdditionalLibraryDirectories>
+      <DelayLoadDLLs>libpq.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>..;"$(BOOST)\";"$(POSTGRESQL)\include"</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BUILDING_LIBRARY;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>libpq.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>"$(BOOST)\lib";"$(BOOST)\stage\lib";"$(POSTGRESQL)\lib"</AdditionalLibraryDirectories>
+      <DelayLoadDLLs>libpq.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="ConvertUTF.c" />
+    <ClCompile Include="gettimeofday.cpp" />
+    <ClCompile Include="howto.cpp" />
+    <ClCompile Include="MurmurHash2_64.cpp" />
+    <ClCompile Include="mv.cpp" />
+    <ClCompile Include="mv2.cpp" />
+    <ClCompile Include="mvarray.cpp" />
+    <ClCompile Include="mvdatetime.cpp">
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Sync</ExceptionHandling>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Sync</ExceptionHandling>
+    </ClCompile>
+    <ClCompile Include="mvdbconns.cpp" />
+    <ClCompile Include="mvdbpostgres.cpp">
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Sync</ExceptionHandling>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Sync</ExceptionHandling>
+    </ClCompile>
+    <ClCompile Include="mvdbqm.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="mvdebug.cpp" />
+    <ClCompile Include="mvenvironment.cpp" />
+    <ClCompile Include="mvfuncs.cpp" />
+    <ClCompile Include="mvfunctor.cpp" />
+    <ClCompile Include="mvglobalfuncs.cpp" />
+    <ClCompile Include="mvhandles.cpp" />
+    <ClCompile Include="mvioconv.cpp" />
+    <ClCompile Include="mvipc.cpp">
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Sync</ExceptionHandling>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Sync</ExceptionHandling>
+    </ClCompile>
+    <ClCompile Include="mvipc_boost.cpp" />
+    <ClCompile Include="mvipc_ms.cpp" />
+    <ClCompile Include="mvipc_posix.cpp" />
+    <ClCompile Include="mvlibs.cpp" />
+    <ClCompile Include="mvmv.cpp" />
+    <ClCompile Include="mvos.cpp">
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Sync</ExceptionHandling>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Sync</ExceptionHandling>
+    </ClCompile>
+    <ClCompile Include="mvposix.cpp" />
+    <ClCompile Include="mvprogram.cpp" />
+    <ClCompile Include="mvunicode.cpp" />
+    <ClCompile Include="mvutf.cpp" />
+    <ClCompile Include="mvwin.cpp" />
+    <ClCompile Include="naturalorder.cpp" />
+    <ClCompile Include="Stackwalker.cpp" />
+    <ClCompile Include="xfunctorf0.cpp" />
+    <ClCompile Include="genfunctors.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="common.h" />
+    <ClInclude Include="ConvertUTF.h" />
+    <ClInclude Include="dict.h" />
+    <ClInclude Include="exodus.h" />
+    <ClInclude Include="exodusfuncs.h" />
+    <ClInclude Include="exodusmacros.h" />
+    <ClInclude Include="gettimeofday.h" />
+    <ClInclude Include="library.h" />
+    <ClInclude Include="MurmurHash2_64.h" />
+    <ClInclude Include="mv.h" />
+    <ClInclude Include="mvconfig.h" />
+    <ClInclude Include="mvenvironment.h" />
+    <ClInclude Include="mvexceptions.h" />
+    <ClInclude Include="mvfunctor.h" />
+    <ClInclude Include="mvhandles.h" />
+    <ClInclude Include="mvimpl.h" />
+    <ClInclude Include="mvipc.h" />
+    <ClInclude Include="mvlibs.h" />
+    <ClInclude Include="mvlink.h" />
+    <ClInclude Include="mvprogram.h" />
+    <ClInclude Include="mvutf.h" />
+    <ClInclude Include="neo.h" />
+    <ClInclude Include="NullCodecvt.h" />
+    <ClInclude Include="program.h" />
+    <ClInclude Include="Stackwalker.h" />
+    <ClInclude Include="TConvert.h" />
+    <ClInclude Include="xfunctorf0.h" />
+    <ClInclude Include="xfunctorf1.h" />
+    <ClInclude Include="xfunctorf10.h" />
+    <ClInclude Include="xfunctorf11.h" />
+    <ClInclude Include="xfunctorf12.h" />
+    <ClInclude Include="xfunctorf13.h" />
+    <ClInclude Include="xfunctorf14.h" />
+    <ClInclude Include="xfunctorf15.h" />
+    <ClInclude Include="xfunctorf16.h" />
+    <ClInclude Include="xfunctorf17.h" />
+    <ClInclude Include="xfunctorf18.h" />
+    <ClInclude Include="xfunctorf19.h" />
+    <ClInclude Include="xfunctorf2.h" />
+    <ClInclude Include="xfunctorf20.h" />
+    <ClInclude Include="xfunctorf3.h" />
+    <ClInclude Include="xfunctorf4.h" />
+    <ClInclude Include="xfunctorf5.h" />
+    <ClInclude Include="xfunctorf6.h" />
+    <ClInclude Include="xfunctorf7.h" />
+    <ClInclude Include="xfunctorf8.h" />
+    <ClInclude Include="xfunctorf9.h" />
+    <ClInclude Include="xfunctors0.h" />
+    <ClInclude Include="xfunctors1.h" />
+    <ClInclude Include="xfunctors10.h" />
+    <ClInclude Include="xfunctors11.h" />
+    <ClInclude Include="xfunctors12.h" />
+    <ClInclude Include="xfunctors13.h" />
+    <ClInclude Include="xfunctors14.h" />
+    <ClInclude Include="xfunctors15.h" />
+    <ClInclude Include="xfunctors16.h" />
+    <ClInclude Include="xfunctors17.h" />
+    <ClInclude Include="xfunctors18.h" />
+    <ClInclude Include="xfunctors19.h" />
+    <ClInclude Include="xfunctors2.h" />
+    <ClInclude Include="xfunctors20.h" />
+    <ClInclude Include="xfunctors3.h" />
+    <ClInclude Include="xfunctors4.h" />
+    <ClInclude Include="xfunctors5.h" />
+    <ClInclude Include="xfunctors6.h" />
+    <ClInclude Include="xfunctors7.h" />
+    <ClInclude Include="xfunctors8.h" />
+    <ClInclude Include="xfunctors9.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="LICENCE.TXT" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
