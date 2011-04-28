@@ -1486,11 +1486,6 @@ while trying to match the argument list '(exodus::var, bool)'
 	filenames2^=FM^"MARKETS";
 	filenames2^=FM^"ADS";
 
-	write("F"^FM^0^FM^"Currency Code"^FM^FM^FM^FM^FM^FM^"L"^"10","DICT_CURRENCIES","CURRENCY_CODE");
-	write("F"^FM^1^FM^"Currency Name"^FM^FM^FM^FM^FM^FM^"T"^"20","DICT_CURRENCIES","CURRENCY_NAME");
-	write("F"^FM^1^FM^"Market Code"^FM^FM^FM^FM^FM^FM^"L"^"10","DICT_MARKETS","CODE");
-	write("F"^FM^1^FM^"Market Name"^FM^FM^FM^FM^FM^FM^"T"^"20","DICT_MARKETS","NAME");
-
 	printl();
 	var nfiles=dcount(filenames2,FM);
 	for (int ii=1;ii<=nfiles;++ii) {
@@ -1518,6 +1513,11 @@ while trying to match the argument list '(exodus::var, bool)'
 			printl("Cannot create ADS");
 			//abort("Cannot create ADS");
 	}
+
+	write("F"^FM^0^FM^"Currency Code"^FM^FM^FM^FM^FM^FM^"L"^"10","DICT_CURRENCIES","CURRENCY_CODE");
+	write("F"^FM^1^FM^"Currency Name"^FM^FM^FM^FM^FM^FM^"T"^"20","DICT_CURRENCIES","CURRENCY_NAME");
+	write("F"^FM^1^FM^"Market Code"^FM^FM^FM^FM^FM^FM^"L"^"10","DICT_MARKETS","CODE");
+	write("F"^FM^1^FM^"Market Name"^FM^FM^FM^FM^FM^FM^"T"^"20","DICT_MARKETS","NAME");
 
 	var dictrec="";
 	dictrec.replacer(1,"F");
@@ -1573,7 +1573,7 @@ while trying to match the argument list '(exodus::var, bool)'
 	}
 	clearselect();
 
-    printl("Shutting down ...");
+    printl("testmain exiting ...");
 
     return 0;
 }
