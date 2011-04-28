@@ -1,6 +1,5 @@
 #include <exodus/exodus.h>
 
-
 /*
 template1 is the default database that is used to create all new databases.
 
