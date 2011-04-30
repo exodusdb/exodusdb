@@ -170,7 +170,7 @@ program()
 		//should be same logic in mvdbpostgres and configexodus
 		var configfilename="";
 		if (SLASH eq "\\")
-			configfilename=osgetenv("USERPROFILE")^SLASH^".exodus";
+			configfilename=osgetenv("APPDATA")^SLASH^"Exodus\\.exodus";
 		else
 			configfilename=osgetenv("HOME")^SLASH^".exodus";
         if (temp.osread(configfilename))

@@ -65,17 +65,29 @@ typedef void (* DELETER_AND_DESTROYER )(CACHED_CONNECTION/*, UNORDERED_SET_FOR_L
 class MvConnectionEntry		// used as 'second' in pair, stored in connection map
 {
   public:
-	int flag;
-	CACHED_CONNECTION connection;
-	LockTable * plock_table;
-	int extra;
 
+	//ctors
 	MvConnectionEntry()
 		: flag(0), connection(0), plock_table(0), extra(0)
 	{}
 	MvConnectionEntry(CACHED_CONNECTION connection_, UNORDERED_SET_FOR_LOCKTABLE * LockTable_)
 		: flag(0), connection(connection_), plock_table(LockTable_), extra(0)
 	{}
+
+	//1=entry is in use
+	//0=entry is not longer used and may be reused
+	int flag;
+
+	//postgres connection handle
+	CACHED_CONNECTION connection;
+
+	//postgres locks per connection
+	//used to fail lock (per mv standard_ instead of stack locks (per postgres standard)
+	LockTable * plock_table;
+
+	//?
+	int extra;
+
 };
 
 typedef std::map<int, MvConnectionEntry> CONN_MAP;
@@ -83,19 +95,33 @@ typedef std::map<int, MvConnectionEntry> CONN_MAP;
 class MvConnectionsCache
 {
   public:
+
+	//ctors/dctors
 	MvConnectionsCache(DELETER_AND_DESTROYER del_);
-	int add_connection(CACHED_CONNECTION connection_with_file);
-	CACHED_CONNECTION get_connection(int index) const;
-	UNORDERED_SET_FOR_LOCKTABLE * get_lock_table(int index) const;
-	void del_connection(int index);
 	virtual ~MvConnectionsCache();
 
+	//manipulators
+	int add_connection(CACHED_CONNECTION connection_with_file);
+	void del_connection(int index);
+
+	//observers
+	CACHED_CONNECTION get_connection(int index) const;
+	UNORDERED_SET_FOR_LOCKTABLE * get_lock_table(int index) const;
+
   private:
+
+	//function to close pg connection?
 	DELETER_AND_DESTROYER del;
+
+	//cache size
 	int connection_id;
-//	std::map<MvConnectionEntry> __tbl__;//
-	CONN_MAP tbl;
+
+	//cache container to hold connections
+	CONN_MAP conntbl;
+
+	//mutex to coordinate updates
 	mutable boost::mutex mvconnections_mutex;
+
 };
 
 }	// namespace

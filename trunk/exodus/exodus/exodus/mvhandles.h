@@ -40,14 +40,14 @@ class MvHandlesCache
 	int add_handle(CACHED_HANDLE handle_to_opened_file, DELETER_AND_DESTROYER del, std::wstring name);
 	//MvHandleEntry & operator [] (int idx)
 	//{ 
-	//	return tbl[ idx];
+	//	return conntbl[ idx];
 	//}
 	CACHED_HANDLE get_handle(int index, std::wstring name);
 	void del_handle(int index);
    virtual ~MvHandlesCache();
 
   private:
-	std::vector<MvHandleEntry> tbl;
+	std::vector<MvHandleEntry> conntbl;
 };
 
 #ifndef INSIDE_MVHANDLES_CPP

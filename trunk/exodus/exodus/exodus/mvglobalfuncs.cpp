@@ -1119,7 +1119,8 @@ DLL_PUBLIC bool ossetenv(const var& name, const var& value)
 DLL_PUBLIC
 void exodus_atexit()
 {
-	var().disconnect();
+	//done in handle cache destructor now
+	//	var().disconnect();
 }
 
 /* getting path to current executable

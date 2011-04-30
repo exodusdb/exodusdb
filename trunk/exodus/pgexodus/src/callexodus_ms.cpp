@@ -3,7 +3,9 @@
 #ifdef EXODUS_IPC_WINPIPES
 
 //"postgres uses 32 bit time whereas windows uses 64 bit time"
+#ifndef _WIN64
 #define _USE_32BIT_TIME_T
+#endif
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h> 

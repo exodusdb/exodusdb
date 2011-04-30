@@ -23,7 +23,9 @@ static Pg_magic_struct
 
 #if defined(_MSC_VER) || defined(__MINGW32__)
 #ifndef _USE_32BIT_TIME_T
+#ifndef _WIN64
 #define _USE_32BIT_TIME_T
+#endif
 #endif
 #endif
 

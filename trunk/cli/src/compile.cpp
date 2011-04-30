@@ -132,7 +132,7 @@ program()
                 var lib=osgetenv("LIB");
 
                 //locate MS Visual Studio by environment variable or current disk or C:
-                var searchvars="CC VS90COMNTOOLS VS80COMNTOOLS VS70COMNTOOLS";
+                var searchvars="CC VS110COMNTOOLS VS100COMNTOOLS VS90COMNTOOLS VS80COMNTOOLS VS70COMNTOOLS";
                 if (verbose)
                         searchvars.outputl("Searching Environment Variables : " ^ searchvars);
 
@@ -198,7 +198,11 @@ program()
                                 msvs^=SLASH;
                         //get lib/path/include from batch file
                         var tempfilenamebase="comp$" ^rnd(99999999);
-                        var script="call " ^ (msvs ^ "vsvars32").quote();
+						var batfilename=msvs ^ "..\\..\\vc\\vcvarsall.bat";
+						if (not osfile(batfilename))
+							batfilename=msvs ^ "vsvars32.bat";
+                        var script="call " ^ batfilename.quote();
+						script^=" "^PLATFORM_;
                         script^="\nset";
                         if (verbose)
                                 printl("Calling script ", script);
@@ -332,7 +336,8 @@ program()
                 //"Enables all warnings, including warnings that are disabled by default."
                 basicoptions^=" /W3";
                 //basicoptions^=" /Wall";
-                //Enables one-line diagnostics for error and warning messages when compiling C++ source code from the command line.
+
+				//Enables one-line diagnostics for error and warning messages when compiling C++ source code from the command line.
                 basicoptions^=" /WL";
 
                 //Generates complete debugging information.
@@ -351,7 +356,7 @@ program()
 				///Gd, the default setting, specifies the __cdecl calling convention
 				//for all functions except C++ member functions and functions
 				//marked __stdcall or __fastcall.
-				basicoptions^=" /Gd";
+				//basicoptions^=" /Gd";
 				
                 //Enables minimal rebuild.
 				//dont do this by default to force recompilations to cater for new versions of exodus.dll
@@ -361,9 +366,9 @@ program()
                 //exodus library
                 if (debugging) {
                         //Creates a debug multithreaded DLL using MSVCRTD.lib.
-//using MDd causes wierd inability to access mv.DICT and other variables in main() despite them being initialised in exodus_main()
-//                        basicoptions^=" /MDd";
-                        basicoptions^=" /MD";
+//using MDd causes weird inability to access mv.DICT and other variables in main() despite them being initialised in exodus_main()
+                      basicoptions^=" /MDd";
+//                        basicoptions^=" /MD";
 
                         //Disables optimization.
                         basicoptions^=" /Od";
@@ -372,7 +377,8 @@ program()
                         basicoptions^=" /FD";
 
                         //macro used in exodus in some places to provide additional information eg mvdbpostgres
-                        basicoptions^=" /D \"DEBUG\"";
+                
+						basicoptions^=" /D \"DEBUG\"";
 
                         //Enables run-time error checking.
                         basicoptions^=" /RTC1";
@@ -426,9 +432,9 @@ program()
 
                 //target directories
 
-				var homedir=osgetenv("USERPROFILE");
+				var homedir=osgetenv("APPDATA");
 				if (homedir) {
-					bindir=homedir^"\\Application Data\\Exodus";
+					bindir=homedir^"\\Exodus";
 					libdir=bindir;
 					//installcmd="copy /y";
 					installcmd="copy";
@@ -797,9 +803,9 @@ var inclusion=
 
                 //get new objfile info or continue
                 var newobjfileinfo=osfile(objfilename);
-                if (not objfilename) {
-                        printl("CANNOT FIND OUTPUT FILE "^objfilename);
-                        var("Press Enter").input(1);
+                if (not newobjfileinfo) {
+						printl(oscwd());
+                        print("Error: Cannot file output file "^objfilename^". Press Enter");input();
                         continue;
                 }
 
@@ -824,7 +830,7 @@ var inclusion=
 								//http://msdn.microsoft.com/en-us/library/ms235591%28VS.80%29.aspx
 								//mt.exe –manifest MyApp.exe.manifest -outputresource:MyApp.exe;1
 								//mt.exe –manifest MyLibrary.dll.manifest -outputresource:MyLibrary.dll;2
-								if (SLASH_IS_BACKSLASH) {
+								if (SLASH_IS_BACKSLASH and PLATFORM_ ne "x64") {
 									var cmd="mt.exe";
 									if (not verbose)
 										cmd^=" -nologo";
@@ -871,7 +877,7 @@ var inclusion=
 										//delete any manifest from early versions of compile which didnt have the
 										//MANIFEST:NO option
 										//was try to copy ms manifest so that the program can be run from anywhere?
-										if (SLASH_IS_BACKSLASH) {
+										if (SLASH_IS_BACKSLASH and PLATFORM_ ne "x64") {
 											if (true or (isprogram and manifest)) {
 												if (not oscopy(objfilename^".manifest",outputpathandfile^".manifest"))
 													{}//printl("ERROR: Failed to "^cmd);
