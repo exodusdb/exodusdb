@@ -300,7 +300,7 @@ program()
                                 }
                                 if (startatlineno) {
                                         print("Press any key to re-edit at line "^startatlineno^" ... ");
-                                        var().input(1);
+                                        var().input("");
                                         continue;
                                 }
                         }

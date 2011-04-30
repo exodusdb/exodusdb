@@ -1402,6 +1402,12 @@ static const char SLASH_ = L'/';
 const var LOWERCASE_=L"abcdefghijklmnopqrstuvwxyz";
 const var UPPERCASE_=L"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
+#ifdef _WIN64
+const var PLATFORM_=L"x64";
+#else
+const var PLATFORM_=L"x86";
+#endif
+
 #ifndef EXO_MV_CPP
 extern
 DLL_PUBLIC int DBTRACE;

@@ -89,9 +89,9 @@ program()
 				var newpath=exodusbinpath^";"^currpath;
 
 				//APPEND user's Exodus binaries path (from compile/catalog)
-				var homedir=osgetenv("USERPROFILE");
+				var homedir=osgetenv("APPDATA");
 				if (homedir)
-					newpath^=";"^homedir^"\\Application Data\\Exodus";
+					newpath^=";"^homedir^"\\Exodus";
 
 				//update path
                 if (not ossetenv("PATH",newpath))
