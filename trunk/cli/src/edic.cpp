@@ -21,19 +21,23 @@ program()
         if (editor.lcase().index("cedt") and not editor.index("$") )
                 editor^=" /L:$LINENO $FILENAME";
 
-        //look for nano.exe next to edic.exe
-        if (not editor and SLASH=="\\") {
-                var nanopath=EXECPATH.swap("edic","nano");
-                if (nanopath.osfile())
-                        editor="nano $LINENO'$FILENAME'";
-        }
+		//look for installed nano (not on x64)
+		if (SLASH=="\\" and not index(PLATFORM_,"x64")) {
 
-        //look for nano in parent bin
-        if (not editor and SLASH=="\\") {
-                var nanopath="..\\bin\\nano.exe";
-                if (nanopath.osfile())
-                        editor="nano $LINENO'$FILENAME'";
-        }
+	        //look for nano.exe next to edic.exe
+		    if (not editor) {
+			        var nanopath=EXECPATH.swap("edic","nano");
+				    if (nanopath.osfile())
+					        editor="nano $LINENO'$FILENAME'";
+			}
+
+	        //look for nano in parent bin NOT ON WIN64 FOR THE MOMENT
+		    if (not editor) {
+			        var nanopath="..\\bin\\nano.exe";
+				    if (nanopath.osfile())
+					        editor="nano $LINENO'$FILENAME'";
+			}
+		}
 
         if (editor.index("nano"))
                 linenopattern="+$LINENO ";

@@ -344,6 +344,12 @@ FunctionEnd
 
 ;Here starts Exodus
 
+SetCompressor /SOLID LZMA
+
+;see following how to install for all users and still support uninstallation
+;http://nsis.sourceforge.net/Shortcuts_removal_fails_on_Windows_Vista
+;RequestExecutionLevel user
+RequestExecutionLevel admin #NOTE: You still need to check user rights with UserInfo!
 
 !define debugorrelease "release"
 
@@ -355,12 +361,12 @@ FunctionEnd
 ;--------------------------------
 ;General
 
-  Name "Exodus 10.12.1"
-  Outfile "exodus-10.12.1.exe"
-  InstallDir "$PROGRAMFILES\exodus\10.12"
+  Name "Exodus 11.05.1/64"
+  Outfile "exodus-11.05.1-64.exe"
+  InstallDir "$PROGRAMFILES\exodus\11.05"
   
   ;Get installation folder from registry if available
-  InstallDirRegKey HKCU "Software\exodus\10.12" ""
+  InstallDirRegKey HKCU "Software\exodus\11.05" ""
 
 ;--------------------------------
 ;Interface Settings
@@ -408,14 +414,32 @@ Section "All" SecAll
   ;File release\ssleay32.dll
   ;File release\libintl-8.dll
 
-  ;vc2005 should autodownloaded
-  ;redist for vs2005 msvcp80.dll but not msvcp80d.dll
-  ;http://download.microsoft.com/download/d/3/4/d342efa6-3266-4157-a2ec-5174867be706/vcredist_x86.exe
-  File "C:\Program Files\Microsoft Visual Studio 8\VC\redist\x86\Microsoft.VC80.CRT\msvcp80.dll"
-  File "C:\Program Files\Microsoft Visual Studio 8\VC\redist\x86\Microsoft.VC80.CRT\msvcr80.dll"
+;  ;vc2005 should autodownloaded
+;  ;redist for vs2005 msvcp80.dll but not msvcp80d.dll
+;  ;http://download.microsoft.com/download/d/3/4/d342efa6-3266-4157-a2ec-5174867be706/vcredist_x86.exe
+;  File "C:\Program Files\Microsoft Visual Studio 8\VC\redist\x86\Microsoft.VC80.CRT\msvcp80.dll"
+;  File "C:\Program Files\Microsoft Visual Studio 8\VC\redist\x86\Microsoft.VC80.CRT\msvcr80.dll"
+;
+;  ;vc2005 debug
+;  ;File "C:\Program Files\Microsoft Visual Studio 8\VC\redist\Debug_NonRedist\x86\Microsoft.VC80.DebugCRT\msvcp80d.dll"
 
-  ;vc2005 debug
-  ;File "C:\Program Files\Microsoft Visual Studio 8\VC\redist\Debug_NonRedist\x86\Microsoft.VC80.DebugCRT\msvcp80d.dll"
+  ;vc2010 x86 - could download
+  ;http://www.microsoft.com/downloads/info.aspx?na=41&SrcFamilyId=A7B7A05E-6DE6-4D3A-A423-37BF0912DB84&SrcDisplayLang=en&u=http%3a%2f%2fdownload.microsoft.com%2fdownload%2f5%2fB%2fC%2f5BC5DBB3-652D-4DCE-B14A-475AB85EEF6E%2fvcredist_x86.exe
+  File "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\redist\x86\Microsoft.VC100.CRT\msvcp100.dll"
+  File "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\redist\x86\Microsoft.VC100.CRT\msvcr100.dll"
+
+  ;vc2010 x86 debug - no download available
+  File "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\redist\Debug_NonRedist\x86\Microsoft.VC100.DebugCRT\msvcp100d.dll"
+  File "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\redist\Debug_NonRedist\x86\Microsoft.VC100.DebugCRT\msvcr100d.dll"
+  
+  ;vc2010 x64 - could download
+  ;http://www.microsoft.com/downloads/info.aspx?na=41&SrcFamilyId=BD512D9E-43C8-4655-81BF-9350143D5867&SrcDisplayLang=en&u=http%3a%2f%2fdownload.microsoft.com%2fdownload%2f3%2f2%2f2%2f3224B87F-CFA0-4E70-BDA3-3DE650EFEBA5%2fvcredist_x64.exe
+  File "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\redist\x64\Microsoft.VC100.CRT\msvcp100.dll"
+  File "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\redist\x64\Microsoft.VC100.CRT\msvcr100.dll"
+
+  ;vc2010 x64 debug - no download available
+  File "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\redist\Debug_NonRedist\x64\Microsoft.VC100.DebugCRT\msvcp100d.dll"
+  File "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\redist\Debug_NonRedist\x64\Microsoft.VC100.DebugCRT\msvcr100d.dll"
 
   ;dont do exodus.dll since we may want the debug version - below
   File /x exodus.dll release\*.dll
@@ -472,27 +496,30 @@ Section "All" SecAll
   ;Call AddToPath
   ;${EnvVarUpdate} $0 "PATH" "P" "HKLM" "$INSTDIR\bin"
   ${EnvVarUpdate} $0 "PATH" "A" "HKLM" "$INSTDIR\bin"
+
+  SetShellVarContext all
+
   ;cannot see to add %APPDATA% in local machine path so have to do for current user only :(
   ${EnvVarUpdate} $0 "PATH" "A" "HKCU" "$APPDATA\Exodus"
 
   ;Store installation folder
-  WriteRegStr HKCU "Software\exodus\10.12" "" $INSTDIR
+  WriteRegStr HKCU "Software\exodus\11.05" "" $INSTDIR
   
-  createDirectory "$SMPROGRAMS\Exodus-10.12"
-  createShortCut "$SMPROGRAMS\Exodus-10.12\Exodus Console.lnk" "$INSTDIR\bin\exodus.exe"
-  createShortCut "$SMPROGRAMS\Exodus-10.12\Exodus Config.lnk" "$INSTDIR\bin\configexodus.exe"
+  createDirectory "$SMPROGRAMS\Exodus-11.05"
+  createShortCut "$SMPROGRAMS\Exodus-11.05\Exodus Console.lnk" "$INSTDIR\bin\exodus.exe"
+  createShortCut "$SMPROGRAMS\Exodus-11.05\Exodus Config.lnk" "$INSTDIR\bin\configexodus.exe"
 
   ;Create uninstaller
   WriteUninstaller "$INSTDIR\Uninstall.exe"
 
   # create a shortcut named "new shortcut" in the start menu programs directory
   # point the new shortcut at the program uninstaller
-  createShortCut "$SMPROGRAMS\Exodus-10.12\Uninstall Exodus.lnk" "$INSTDIR\uninstall.exe"
+  createShortCut "$SMPROGRAMS\Exodus-11.05\Uninstall Exodus.lnk" "$INSTDIR\uninstall.exe"
 
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Exodus-10.12" \
-   "DisplayName" "Exodus-10.12 (remove only)"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Exodus-11.05" \
+   "DisplayName" "Exodus-11.05 (remove only)"
 
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Exodus-10.12" \
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Exodus-11.05" \
    "UninstallString" "$INSTDIR\Uninstall.exe"
 
 SectionEnd
@@ -553,16 +580,18 @@ Section "Uninstall"
 
   RMDir "$INSTDIR"
 
-  DeleteRegKey /ifempty HKCU "Software\exodus\10.12"
+  DeleteRegKey /ifempty HKCU "Software\exodus\11.05"
+
+  SetShellVarContext all
 
   # second, remove the link from the start menu
-  delete "$SMPROGRAMS\Exodus-10.12\Uninstall Exodus.lnk"
+  delete "$SMPROGRAMS\Exodus-11.05\Uninstall Exodus.lnk"
 
-  delete "$SMPROGRAMS\Exodus-10.12\Exodus Console.lnk"
-  delete "$SMPROGRAMS\Exodus-10.12\Exodus Config.lnk"
-  RMDir "$SMPROGRAMS\Exodus-10.12"
+  delete "$SMPROGRAMS\Exodus-11.05\Exodus Console.lnk"
+  delete "$SMPROGRAMS\Exodus-11.05\Exodus Config.lnk"
+  RMDir "$SMPROGRAMS\Exodus-11.05"
 
-  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Exodus-10.12"
+  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Exodus-11.05"
 
   ;remove the path to binaries HKLM=Local Machine and HKCU=Current User
   ${un.EnvVarUpdate} $0 "PATH" "R" "HKLM" "$INSTDIR\bin"
