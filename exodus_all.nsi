@@ -443,7 +443,8 @@ Section "All" SecAll
 
   ;dont do exodus.dll since we may want the debug version - below
   File /x exodus.dll release\*.dll
-  File release\nano.exe
+  File release\cygwin32\nano.exe
+  File release\cygwin32\*.dll
   File release\nanorc
   
   File ${DebugOrRelease}\*.exe
