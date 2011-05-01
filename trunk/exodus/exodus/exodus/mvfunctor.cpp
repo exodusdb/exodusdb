@@ -97,7 +97,7 @@ ExodusFunctorBase::ExodusFunctorBase(MvEnvironment& mv)
 //destructor
 ExodusFunctorBase::~ExodusFunctorBase()
 {
-	//closelib();
+	closelib();
 }
 
 bool ExodusFunctorBase::init(const char* libraryname, const char* functionname, MvEnvironment& mv)
@@ -290,18 +290,18 @@ void ExodusFunctorBase::calldict()
 
 void ExodusFunctorBase::closelib()
 {
-	outputl(L"000");
+	//outputl(L"000");
 	//the *library* function must be called to delete the object that it created
 	//(cant delete the object in the main process since it might have a different memory allocator)
 	if (pobject_!=NULL)
 	{
-		outputl(L"111");
+		//outputl(L"111");
 		pfunction_(pobject_,*mv_,pmemberfunction_);
 	}
 	//close the connection
 	if (plibrary_!=NULL)
 	{
-		outputl(L"222");
+		//outputl(L"222");
 		dlclose((library_t) plibrary_);
 	}
 }
