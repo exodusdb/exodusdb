@@ -169,8 +169,14 @@ program()
         //third from config file
 		//should be same logic in mvdbpostgres and configexodus
 		var configfilename="";
-		if (SLASH eq "\\")
-			configfilename=osgetenv("APPDATA")^SLASH^"Exodus\\.exodus";
+		if (SLASH eq "\\") {
+			var appdataexodusdir=osgetenv("APPDATA")^SLASH^"Exodus";
+			if (not osdir(appdataexodusdir)) {
+				if (not(osmkdir(appdataexodusdir)))
+					printl("Cannot mkdir ",appdataexodusdir," Maybe you dont have sufficient rights");
+			}
+			configfilename=appdataexodusdir^"\\.exodus";
+		}
 		else
 			configfilename=osgetenv("HOME")^SLASH^".exodus";
         if (temp.osread(configfilename))
