@@ -211,7 +211,7 @@ ZeroMemory(Pipe,size);
 
       if (hEvents[i] == NULL) 
       {
-		 wprintf(L"MVipc() CreateEvent failed. WIN32 Error: %d.\n", GetLastError()); 
+		 wprintf(L"MVipc() CreateEvent failed. WINAPI Error: %d.\n", GetLastError()); 
          return false;
       }
  
@@ -237,7 +237,7 @@ ZeroMemory(Pipe,size);
 			wprintf(L"MVipc() CreateNamedPipe failed because pipe %s is busy. Is another server running?",lpszPipename);
 			return false;
 		}
-		wprintf(L"MVipc() CreateNamedPipe %s failed. WIN32 Error: %d.\n", lpszPipename, GetLastError());
+		wprintf(L"MVipc() CreateNamedPipe %s failed. WINAPI Error: %d.\n", lpszPipename, GetLastError());
 		return false;
 	}
 	else
@@ -323,7 +323,7 @@ ZeroMemory(Pipe,size);
             case CONNECTING_STATE: 
                if (! fSuccess) 
                {
-                   wprintf(L"MVipc() CONNECTING STATE WIN32 Error %d.\n", GetLastError()); 
+                   wprintf(L"MVipc() CONNECTING STATE WINAPI Error %d.\n", GetLastError()); 
                    return false;
                }
                Pipe[i].dwState = READING_STATE; 
@@ -571,7 +571,7 @@ BOOL ConnectToNewClient(HANDLE hPipe, LPOVERLAPPED lpo)
 // Overlapped ConnectNamedPipe should return zero. 
    if (fConnected) 
    {
-      wprintf(L"MVipc-ConnectToNewClient() (1) ConnectNamedPipe failed. WIN32 Error %d.\n", GetLastError()); 
+      wprintf(L"MVipc-ConnectToNewClient() (1) ConnectNamedPipe failed. WINAPI Error %d.\n", GetLastError()); 
       return 0;
    }
  
@@ -589,7 +589,7 @@ BOOL ConnectToNewClient(HANDLE hPipe, LPOVERLAPPED lpo)
  
 		// If an error occurs during the connect operation... 
 		default: 
-         wprintf(L"MVipc-ConnectToNewClient() (2) ConnectNamedPipe failed. WIN32 Error %d.\n", GetLastError());
+         wprintf(L"MVipc-ConnectToNewClient() (2) ConnectNamedPipe failed. WINAPI Error %d.\n", GetLastError());
          return 0;
    }
  

@@ -4,6 +4,12 @@
 #ifndef _WIN64
 #define _USE_32BIT_TIME_T
 #endif
+//to avoid the following errors in postgres.h below
+//error C2011: 'timezone' : 'struct' type redefinition	d:\program files\postgresql\8.3\include\server\pg_config_os.h	188	
+//error C2011: 'itimerval' : 'struct' type redefinition	d:\program files\postgresql\8.3\include\server\pg_config_os.h	197	
+#ifndef WIN32
+#define WIN32
+#endif
 #endif
 
 #include <string>
