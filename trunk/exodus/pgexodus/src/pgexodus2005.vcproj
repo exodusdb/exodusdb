@@ -41,7 +41,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;$(POSTGRESQL)\include&quot;;&quot;$(POSTGRESQL)\include\server&quot;;&quot;$(POSTGRESQL)\include\server\port\win32_msvc&quot;;&quot;$(POSTGRESQL)\include\server\port\win32&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;PGEXODUS_EXPORTS"
+				PreprocessorDefinitions="_DEBUG;_WINDOWS;_USRDLL;PGEXODUS_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -121,7 +121,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="&quot;$(POSTGRESQL)\include&quot;;&quot;$(POSTGRESQL)\include\server&quot;;&quot;$(POSTGRESQL)\include\server\port\win32_msvc&quot;;&quot;$(POSTGRESQL)\include\server\port\win32&quot;"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;PGEXODUS_EXPORTS"
+				PreprocessorDefinitions="NDEBUG;_WINDOWS;_USRDLL;PGEXODUS_EXPORTS"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -172,6 +172,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine=""
 			/>
 		</Configuration>
 	</Configurations>
