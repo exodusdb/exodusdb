@@ -21,19 +21,28 @@ program()
         if (editor.lcase().index("cedt") and not editor.index("$") )
                 editor^=" /L:$LINENO $FILENAME";
 
-		//look for installed nano (not on x64)
-		if (SLASH=="\\" and not index(PLATFORM_,"x64")) {
+		//look for installed nano
+		//if (SLASH=="\\" and not index(PLATFORM_,"x64")) {
+		var nanopath="";
+		if (SLASH=="\\") {
 
 	        //look for nano.exe next to edic.exe
 		    if (not editor) {
-			        var nanopath=EXECPATH.swap("edic","nano");
+			        nanopath=EXECPATH.swap("edic","nano");
 				    if (nanopath.osfile())
 					        editor="nano $LINENO'$FILENAME'";
 			}
 
-	        //look for nano in parent bin NOT ON WIN64 FOR THE MOMENT
+	        //look for nano in parent bin
 		    if (not editor) {
-			        var nanopath="..\\bin\\nano.exe";
+			        nanopath="..\\bin\\nano.exe";
+				    if (nanopath.osfile())
+					        editor="nano $LINENO'$FILENAME'";
+			}
+
+	        //look for nano in release directory during exodus development
+		    if (not editor) {
+			        nanopath="..\\..\\release\\cygwin\\bin\\nano.exe";
 				    if (nanopath.osfile())
 					        editor="nano $LINENO'$FILENAME'";
 			}
@@ -43,9 +52,10 @@ program()
                 linenopattern="+$LINENO ";
 
         //otherwise on windows try to locate CYGWIN nano or vi
+		var cygwinpath="";
         if (not editor and SLASH=="\\") {
                 //from environment variable
-                var cygwinpath=osgetenv("CYGWIN_BIN");
+                cygwinpath=osgetenv("CYGWIN_BIN");
                 //else from current disk
                 if (not cygwinpath)
                         cygwinpath="\\cygwin\\bin\\";
@@ -73,7 +83,9 @@ program()
                         //editor^="\"";
                 } else
                         editor="";
-
+		}
+		printl("111");
+        if (SLASH=="\\") {
                 //configure nanorc (on windows)
                 //TODO same for non-windows
                 //nano on windows looks for nanorc config file as follows (probably merges all found)
@@ -84,13 +96,19 @@ program()
                 if (cygwinpath) {
                         nanorcfilename=cygwinpath.field(SLASH,1,dcount(cygwinpath,SLASH)-2) ^ SLASH ^ "etc" ^ SLASH ^ "nanorc";
                 } else {
-                        nanorcfilename=osgetenv("HOMEDRIVE") ^ osgetenv("HOMEPATH");
+		printl("222");
+						nanorcfilename=osgetenv("HOME");
+                        if (not nanorcfilename)
+							nanorcfilename=osgetenv("HOMEDRIVE") ^ osgetenv("HOMEPATH");
                         if (nanorcfilename[-1] ne SLASH)
                                 nanorcfilename^=SLASH;
                         nanorcfilename^=".nanorc";
                 }
                 if (not osfile(nanorcfilename)) {
-                        var nanorctemplatefilename=EXECPATH.field(SLASH,1,dcount(EXECPATH,SLASH)-1) ^ SLASH ^ "nanorc";
+		printl("333");
+						//var nanorctemplatefilename=EXECPATH.field(SLASH,1,dcount(EXECPATH,SLASH)-1) ^ SLASH ^ "nanorc";
+						var nanorctemplatefilename=nanopath.field(SLASH,1,dcount(nanopath,SLASH)-1) ^ SLASH ^ "nanorc";
+		printl("444", nanorctemplatefilename);
                         if (oscopy(nanorctemplatefilename,nanorcfilename)) {
                                 printl("Copied " ^ nanorctemplatefilename.quote() ^ " to " ^ nanorcfilename.quote());
                                 var ().input("Note: nano c++ syntax highlighting has been installed. Press Enter ... ");
@@ -100,7 +118,10 @@ program()
                                         errputl("nano syntax highlighting file is missing.");
                         }
                 }
+				if(not osgetenv("HOME"))
+					ossetenv("HOME",osgetenv("HOMEDRIVE") ^ osgetenv("HOMEPATH"));
         }
+
         if (not editor) {
                 if (SLASH=="/")
                         editor="nano ";
