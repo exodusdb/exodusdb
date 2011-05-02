@@ -361,7 +361,7 @@ RequestExecutionLevel admin #NOTE: You still need to check user rights with User
 ;--------------------------------
 ;General
 
-  Name "Exodus 11.05.1/64"
+  Name "Exodus 11.05.1 x64"
   Outfile "exodus-11.05.1-64.exe"
   InstallDir "$PROGRAMFILES\exodus\11.05"
   
@@ -403,6 +403,9 @@ Section "All" SecAll
   ;FileOpen $0 $INSTDIR\neosys\GLOBAL.END w
   ;FileClose $0
 
+  SetOutPath "$INSTDIR\usr\share\terminfo\63"
+  File release\cygwin\usr\share\terminfo\63\*
+
   SetOutPath "$INSTDIR\bin"
 
   ;if this file isnt built then fail  
@@ -443,9 +446,10 @@ Section "All" SecAll
 
   ;dont do exodus.dll since we may want the debug version - below
   File /x exodus.dll release\*.dll
-  File release\cygwin32\nano.exe
-  File release\cygwin32\*.dll
-  File release\nanorc
+
+  File release\cygwin\bin\nano.exe
+  File release\cygwin\bin\*.dll
+  File release\cygwin\bin\nanorc
   
   File ${DebugOrRelease}\*.exe
   File ${DebugOrRelease}\exodus.dll
