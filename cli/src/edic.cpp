@@ -44,7 +44,7 @@ program()
 		    if (not editor) {
 			        nanopath="..\\..\\release\\cygwin\\bin\\nano.exe";
 				    if (nanopath.osfile())
-					        editor="nano $LINENO'$FILENAME'";
+					        editor="..\\..\\release\\cygwin\\bin\\nano $LINENO'$FILENAME'";
 			}
 		}
 
@@ -84,7 +84,6 @@ program()
                 } else
                         editor="";
 		}
-		printl("111");
         if (SLASH=="\\") {
                 //configure nanorc (on windows)
                 //TODO same for non-windows
@@ -96,7 +95,6 @@ program()
                 if (cygwinpath) {
                         nanorcfilename=cygwinpath.field(SLASH,1,dcount(cygwinpath,SLASH)-2) ^ SLASH ^ "etc" ^ SLASH ^ "nanorc";
                 } else {
-		printl("222");
 						nanorcfilename=osgetenv("HOME");
                         if (not nanorcfilename)
 							nanorcfilename=osgetenv("HOMEDRIVE") ^ osgetenv("HOMEPATH");
@@ -105,10 +103,8 @@ program()
                         nanorcfilename^=".nanorc";
                 }
                 if (not osfile(nanorcfilename)) {
-		printl("333");
 						//var nanorctemplatefilename=EXECPATH.field(SLASH,1,dcount(EXECPATH,SLASH)-1) ^ SLASH ^ "nanorc";
 						var nanorctemplatefilename=nanopath.field(SLASH,1,dcount(nanopath,SLASH)-1) ^ SLASH ^ "nanorc";
-		printl("444", nanorctemplatefilename);
                         if (oscopy(nanorctemplatefilename,nanorcfilename)) {
                                 printl("Copied " ^ nanorctemplatefilename.quote() ^ " to " ^ nanorcfilename.quote());
                                 var ().input("Note: nano c++ syntax highlighting has been installed. Press Enter ... ");
