@@ -4,6 +4,22 @@
 
 ;;;;;;;;; package parameters ;;;;;;;;;;;;;;;;;;;;
 
+;EXODUS_TOOLPATH and EXODUS_VCVERSION
+;70 VS2003
+;80 VS2005
+;90 VS2008
+;100 VS2010
+;1) MUST! have been built with this toolset
+;2) MUST! be present as an environment variable pointing to the MSVC toolset
+!define EXODUS_TOOLPATH "$%VS80COMNTOOLS%"
+!define EXODUS_VCVERSION "80"
+
+;MUST have been LAST to be built since x86 and x64 currently both built in release directory
+!define debugorrelease "release"
+
+;PLATFORM MUST! be x86 or x64 ... one of the subdirectories in redist directory
+!define EXODUS_PLATFORM "x86"
+
 ;use Exodus for x86 since it will install on 32 or 64 bit machines
 ;and Exodus64 for x64 since it will only install on 64 bit machines
 ;it will be used as a folder name
@@ -16,19 +32,6 @@
 ;micro versions are for information and will simply overwrite previous minor versions
 ;TODO check we dont double add to path etc.
 !define EXODUS_MICRO_VERSION "11.5.3"
-
-;PLATFORM MUST be x86 or x64 ... one of the subdirectories in redist directory
-!define EXODUS_PLATFORM "x86"
-
-;VCVER MUST be 70 80 90 100 corresponding to VS2003 VS2005 VS2008 VS2010 etc
-!define EXODUS_VCVERSION "100"
-
-;1) must have been built with this toolset
-;2) MUST be present as an environment variable pointing to the MSVC toolset
-!define EXODUS_TOOLPATH "$%VS100COMNTOOLS%"
-
-;MUST have been LAST to be built since x86 and x64 currently both built in release directory
-!define debugorrelease "release"
 
 !define EXODUS_SHORTNAME "Exodus"
 !define EXODUS_CODENAME "exodus"
