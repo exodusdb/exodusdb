@@ -73,7 +73,7 @@ function input_adminconn(in oldconn, out serverconn)
                         break;
                 }
 
-                getinput("Cannot connect. Try Again? ",yesno);
+                getinput("\nCannot connect. Try Again? ",yesno);
                 if (yesno.ucase()[1] ne "Y")
                         return false;//stop("Cancelled.");
 
@@ -232,7 +232,10 @@ program()
 		printl("done!");
 
 		if (SLASH eq "\\") {
+
 			printl(oconv("Installing pgexodus postgres plugin ... ","L#40"));
+
+			//locate pgexodus dll to install
 			var pgexodusdll="pgexodus.dll";
 			if (not osfile(pgexodusdll)) {
 				var exodusbinpath=field(EXECPATH,SLASH,1,dcount(EXECPATH,SLASH)-1);
@@ -243,14 +246,35 @@ program()
 				}
 			}
 
+			//locate target directory (postgresql libdir)
 			var pglibdir;
-			//pglibdir=osshellread("pg_config --libdir").field("\n",1);
-			pglibdir=osgetenv("POSTGRESQL")^"\\lib";
+			var pgenvvar="POSTGRESQL";
+			if (index(PLATFORM_,"64"))
+				pgenvvar^="64";
+			else
+				pgenvvar^="32";
+			pglibdir=osgetenv(pgenvvar);
+			if (pglibdir)
+				pglibdir^="\\lib";
+			else
+				pglibdir=osshellread("pg_config --libdir").field("\n",1);
+			if (not pglibdir) {
+				pglibdir="\\PROGRA~1\\PostgreSQL\\9.0";
+			}
 			pglibdir.converter("/",SLASH);
 			//exodus oscopy cannot handle old 8.3 file names (boost library issue)
 			pglibdir.swapper("PROGRA~1","Program Files");
+			pglibdir.swapper("PROGRA~2","Program Files (x86)");
 			pglibdir.swapper("POSTGR~1","PostgreSQL");
 			var targetfilename=pglibdir^SLASH^"pgexodus.dll";
+			while (not osdir(pglibdir))
+			{
+				printl(pglibdir^" does not exist");
+				printl("Cannot locate PostgreSQL lib directory to install plugin");
+				input("PostgreSQL lib dir?",pglibdir);
+				if (not pglibdir)
+					stop();
+			}
 
 			//delete any existing pgexodus.dll. restart service if cannot initially delete
 			if (osfile(targetfilename) and not osdelete(targetfilename)) {

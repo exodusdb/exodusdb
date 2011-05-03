@@ -1,6 +1,52 @@
 ;initial code is just standard nsis macros that doesnt need to be changed or understood
 ;exodus build instructions at at the bottom, or search for exodus
 
+
+;;;;;;;;; package parameters ;;;;;;;;;;;;;;;;;;;;
+
+;use Exodus for x86 since it will install on 32 or 64 bit machines
+;and Exodus64 for x64 since it will only install on 64 bit machines
+;it will be used as a folder name
+!define EXODUS_LONGNAME "Exodus"
+;!define EXODUS_LONGNAME "Exodus64"
+
+;minor versions each get installed in a separate directory
+!define EXODUS_MINOR_VERSION "11.5"
+
+;micro versions are for information and will simply overwrite previous minor versions
+;TODO check we dont double add to path etc.
+!define EXODUS_MICRO_VERSION "11.5.3"
+
+;PLATFORM MUST be x86 or x64 ... one of the subdirectories in redist directory
+!define EXODUS_PLATFORM "x86"
+
+;VCVER MUST be 70 80 90 100 corresponding to VS2003 VS2005 VS2008 VS2010 etc
+!define EXODUS_VCVERSION "100"
+
+;1) must have been built with this toolset
+;2) MUST be present as an environment variable pointing to the MSVC toolset
+!define EXODUS_TOOLPATH "$%VS100COMNTOOLS%"
+
+;MUST have been LAST to be built since x86 and x64 currently both built in release directory
+!define debugorrelease "release"
+
+!define EXODUS_SHORTNAME "Exodus"
+!define EXODUS_CODENAME "exodus"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+  ;VC2010 x86 - could download
+  ;http://www.microsoft.com/downloads/info.aspx?na=41&SrcFamilyId=A7B7A05E-6DE6-4D3A-A423-37BF0912DB84&SrcDisplayLang=en&u=http%3a%2f%2fdownload.microsoft.com%2fdownload%2f5%2fB%2fC%2f5BC5DBB3-652D-4DCE-B14A-475AB85EEF6E%2fvcredist_x86.exe
+  ;VC2010 x86 debug - no download available
+
+  ;VC2010 x64 - could download
+  ;http://www.microsoft.com/downloads/info.aspx?na=41&SrcFamilyId=BD512D9E-43C8-4655-81BF-9350143D5867&SrcDisplayLang=en&u=http%3a%2f%2fdownload.microsoft.com%2fdownload%2f3%2f2%2f2%2f3224B87F-CFA0-4E70-BDA3-3DE650EFEBA5%2fvcredist_x64.exe
+  ;VC2010 x64 debug - no download available
+
+  ;VC2005 x86 - could download
+  ;http://download.microsoft.com/download/d/3/4/d342efa6-3266-4157-a2ec-5174867be706/vcredist_x86.exe
+  ;VC2005 x86 debug - no download available
+
 /**
  *  EnvVarUpdate.nsh
  *    : Environmental Variables: append, prepend, and remove entries
@@ -351,8 +397,6 @@ SetCompressor /SOLID LZMA
 ;RequestExecutionLevel user
 RequestExecutionLevel admin #NOTE: You still need to check user rights with UserInfo!
 
-!define debugorrelease "release"
-
 ;--------------------------------
 ;Include Modern UI
 
@@ -361,12 +405,12 @@ RequestExecutionLevel admin #NOTE: You still need to check user rights with User
 ;--------------------------------
 ;General
 
-  Name "Exodus 11.05.2 x86"
-  Outfile "exodus-11.05.2-x86.exe"
-  InstallDir "$PROGRAMFILES\exodus\11.05"
+  Name "${EXODUS_LONGNAME} ${EXODUS_MICRO_VERSION}"
+  Outfile "${EXODUS_CODENAME}-${EXODUS_PLATFORM}-${EXODUS_MICRO_VERSION}.exe"
+  InstallDir "$PROGRAMFILES\${EXODUS_LONGNAME}\${EXODUS_MINOR_VERSION}"
   
   ;Get installation folder from registry if available
-  InstallDirRegKey HKCU "Software\exodus\11.05" ""
+  InstallDirRegKey HKCU "Software\${EXODUS_LONGNAME}\${EXODUS_MINOR_VERSION}" ""
 
 ;--------------------------------
 ;Interface Settings
@@ -393,10 +437,19 @@ RequestExecutionLevel admin #NOTE: You still need to check user rights with User
 ;--------------------------------
 ;Installer Sections
 
+;!include "x64.nsh"
+
 Section "All" SecAll
 
 ;;;;;;;;;;;;; DEBUG OR RELEASE !!!
 ;StrCpy $DebugOrRelease "debug"
+
+
+;${If} ${RunningX64}
+;    File ..\x64\blah.exe
+;${Else}
+;    File ..\x86\blah.exe
+;${EndIf}
 
   ;create a GLOBAL.END file to try and shutdown NEOSYS processes
   ;will be deleted at the end
@@ -412,37 +465,15 @@ Section "All" SecAll
   File ${DebugOrRelease}\compile.exe
 
   ;should we install this in order to get access to postgres on another server?
-  ;File release\libpq.dll
-  ;File release\libeay32.dll
-  ;File release\ssleay32.dll
-  ;File release\libintl-8.dll
+  ;File release\libpq32\*
 
-  ;VC2005 x86 - could download
-  ;http://download.microsoft.com/download/d/3/4/d342efa6-3266-4157-a2ec-5174867be706/vcredist_x86.exe
-  File "C:\Program Files\Microsoft Visual Studio 8\VC\redist\x86\Microsoft.VC80.CRT\msvcp80.dll"
-  File "C:\Program Files\Microsoft Visual Studio 8\VC\redist\x86\Microsoft.VC80.CRT\msvcr80.dll"
-  ;VC2005 x86 debug - no download available
-  ;File "C:\Program Files\Microsoft Visual Studio 8\VC\redist\Debug_NonRedist\x86\Microsoft.VC80.DebugCRT\msvcp80d.dll"
-  ;File "C:\Program Files\Microsoft Visual Studio 8\VC\redist\Debug_NonRedist\x86\Microsoft.VC80.DebugCRT\msvcr80d.dll"
+  ;VC runtime (and runtime debug?!)
 
-;  ;VC2010 x86 - could download
-;  ;http://www.microsoft.com/downloads/info.aspx?na=41&SrcFamilyId=A7B7A05E-6DE6-4D3A-A423-37BF0912DB84&SrcDisplayLang=en&u=http%3a%2f%2fdownload.microsoft.com%2fdownload%2f5%2fB%2fC%2f5BC5DBB3-652D-4DCE-B14A-475AB85EEF6E%2fvcredist_x86.exe
-;  File "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\redist\x86\Microsoft.VC100.CRT\msvcp100.dll"
-;  File "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\redist\x86\Microsoft.VC100.CRT\msvcr100.dll"
-;  ;VC2010 x86 debug - no download available
-;  File "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\redist\Debug_NonRedist\x86\Microsoft.VC100.DebugCRT\msvcp100d.dll"
-;  File "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\redist\Debug_NonRedist\x86\Microsoft.VC100.DebugCRT\msvcr100d.dll"
-  
-;  ;VC2010 x64 - could download
-;  ;http://www.microsoft.com/downloads/info.aspx?na=41&SrcFamilyId=BD512D9E-43C8-4655-81BF-9350143D5867&SrcDisplayLang=en&u=http%3a%2f%2fdownload.microsoft.com%2fdownload%2f3%2f2%2f2%2f3224B87F-CFA0-4E70-BDA3-3DE650EFEBA5%2fvcredist_x64.exe
-;  File "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\redist\x64\Microsoft.VC100.CRT\msvcp100.dll"
-;  File "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\redist\x64\Microsoft.VC100.CRT\msvcr100.dll"
-;  ;VC2010 x64 debug - no download available
-;  File "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\redist\Debug_NonRedist\x64\Microsoft.VC100.DebugCRT\msvcp100d.dll"
-;  File "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\redist\Debug_NonRedist\x64\Microsoft.VC100.DebugCRT\msvcr100d.dll"
-
+  File "${EXODUS_TOOLPATH}..\..\VC\redist\${EXODUS_PLATFORM}\Microsoft.VC${EXODUS_VCVERSION}.CRT\*"
+  File "${EXODUS_TOOLPATH}..\..\VC\redist\Debug_NonRedist\${EXODUS_PLATFORM}\Microsoft.VC${EXODUS_VCVERSION}.DebugCRT\*"
 
   ;dont do exodus.dll since we may want the debug version - below
+  ;File /x exodus.dll /x libpq.dll release\*.dll
   File /x exodus.dll release\*.dll
 
   File release\cygwin\bin\nano.exe
@@ -503,26 +534,26 @@ Section "All" SecAll
   SetShellVarContext all
 
   ;cannot see to add %APPDATA% in local machine path so have to do for current user only :(
-  ${EnvVarUpdate} $0 "PATH" "A" "HKCU" "$APPDATA\Exodus"
+  ${EnvVarUpdate} $0 "PATH" "A" "HKCU" "$APPDATA\${EXODUS_LONGNAME}"
 
   ;Store installation folder
-  WriteRegStr HKCU "Software\exodus\11.05" "" $INSTDIR
+  WriteRegStr HKCU "Software\${EXODUS_LONGNAME}\${EXODUS_MINOR_VERSION}" "" $INSTDIR
   
-  createDirectory "$SMPROGRAMS\Exodus-11.05"
-  createShortCut "$SMPROGRAMS\Exodus-11.05\Exodus Console.lnk" "$INSTDIR\bin\exodus.exe"
-  createShortCut "$SMPROGRAMS\Exodus-11.05\Exodus Config.lnk" "$INSTDIR\bin\configexodus.exe"
+  createDirectory "$SMPROGRAMS\${EXODUS_LONGNAME}-${EXODUS_MINOR_VERSION}"
+  createShortCut "$SMPROGRAMS\${EXODUS_LONGNAME}-${EXODUS_MINOR_VERSION}\${EXODUS_LONGNAME} Console.lnk" "$INSTDIR\bin\exodus.exe"
+  createShortCut "$SMPROGRAMS\${EXODUS_LONGNAME}-${EXODUS_MINOR_VERSION}\${EXODUS_LONGNAME} Config.lnk" "$INSTDIR\bin\configexodus.exe"
 
   ;Create uninstaller
   WriteUninstaller "$INSTDIR\Uninstall.exe"
 
   # create a shortcut named "new shortcut" in the start menu programs directory
   # point the new shortcut at the program uninstaller
-  createShortCut "$SMPROGRAMS\Exodus-11.05\Uninstall Exodus.lnk" "$INSTDIR\uninstall.exe"
+  createShortCut "$SMPROGRAMS\${EXODUS_LONGNAME}-${EXODUS_MINOR_VERSION}\Uninstall ${EXODUS_LONGNAME}.lnk" "$INSTDIR\uninstall.exe"
 
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Exodus-11.05" \
-   "DisplayName" "Exodus-11.05 (remove only)"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${EXODUS_LONGNAME}-${EXODUS_MINOR_VERSION}" \
+   "DisplayName" "${EXODUS_LONGNAME}-${EXODUS_MINOR_VERSION} (remove only)"
 
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Exodus-11.05" \
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${EXODUS_LONGNAME}-${EXODUS_MINOR_VERSION}" \
    "UninstallString" "$INSTDIR\Uninstall.exe"
 
 SectionEnd
@@ -542,6 +573,12 @@ SectionEnd
 ;Uninstaller Section
 
 Section "Uninstall"
+
+  Delete "$INSTDIR\usr\share\terminfo\63\*.*"
+  RMDir  "$INSTDIR\usr\share\terminfo\63"
+  RMDir  "$INSTDIR\usr\share\terminfo"
+  RMDir  "$INSTDIR\usr\share"
+  RMDir  "$INSTDIR\usr"
 
   Delete "$INSTDIR\bin\*.*"
   RMDir "$INSTDIR\bin"
@@ -583,21 +620,23 @@ Section "Uninstall"
 
   RMDir "$INSTDIR"
 
-  DeleteRegKey /ifempty HKCU "Software\exodus\11.05"
+  RMDir "$PROGRAMFILES\${EXODUS_LONGNAME}"
+
+  DeleteRegKey /ifempty HKCU "Software\${EXODUS_LONGNAME}\${EXODUS_MINOR_VERSION}"
 
   SetShellVarContext all
 
   # second, remove the link from the start menu
-  delete "$SMPROGRAMS\Exodus-11.05\Uninstall Exodus.lnk"
+  delete "$SMPROGRAMS\${EXODUS_LONGNAME}-${EXODUS_MINOR_VERSION}\Uninstall ${EXODUS_LONGNAME}.lnk"
 
-  delete "$SMPROGRAMS\Exodus-11.05\Exodus Console.lnk"
-  delete "$SMPROGRAMS\Exodus-11.05\Exodus Config.lnk"
-  RMDir "$SMPROGRAMS\Exodus-11.05"
+  delete "$SMPROGRAMS\${EXODUS_LONGNAME}-${EXODUS_MINOR_VERSION}\${EXODUS_LONGNAME} Console.lnk"
+  delete "$SMPROGRAMS\${EXODUS_LONGNAME}-${EXODUS_MINOR_VERSION}\${EXODUS_LONGNAME} Config.lnk"
+  RMDir "$SMPROGRAMS\${EXODUS_LONGNAME}-${EXODUS_MINOR_VERSION}"
 
-  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Exodus-11.05"
+  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${EXODUS_LONGNAME}-${EXODUS_MINOR_VERSION}"
 
   ;remove the path to binaries HKLM=Local Machine and HKCU=Current User
   ${un.EnvVarUpdate} $0 "PATH" "R" "HKLM" "$INSTDIR\bin"
-  ${un.EnvVarUpdate} $0 "PATH" "R" "HKCU" "$APPDATA\Exodus"
+  ${un.EnvVarUpdate} $0 "PATH" "R" "HKCU" "$APPDATA\${EXODUS_LONGNAME}"
 
 SectionEnd

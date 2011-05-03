@@ -2,8 +2,13 @@ rem AUTOMATED VCBUILD
 rem http://msdn.microsoft.com/en-us/library/cz553aa1%28v=VS.80%29.aspx
 
 rem --- CONFIGURE VCVARS AND MAKENSIS LOCATIONS ---
-path c:\program files\microsoft visual studio 8\vc\;%PATH%
-path D:\Program Files\NSIS\;%PATH%
+path %VS80COMNTOOLS%..\..\vc\;%PATH%
+path %VS90COMNTOOLS%..\..\vc\;%PATH%
+path %VS100COMNTOOLS%..\..\vc\;%PATH%
+path %VS110COMNTOOLS%..\..\vc\;%PATH%
+
+rem path \Program Files\NSIS\;%PATH%
+path \Program Files (x86)\NSIS\;%PATH%
 
 rem -- CONFIGURE PROJECT NAME --
 set PROJECT=exodus_all
