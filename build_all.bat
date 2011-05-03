@@ -11,7 +11,7 @@ rem path \Program Files\NSIS\;%PATH%
 path \Program Files (x86)\NSIS\;%PATH%
 
 rem -- CONFIGURE PROJECT NAME --
-set PROJECT=exodus_all
+set PROJECT=exodus_all2005
 
 set error=no
 if exist %PROJECT%_vcb.log del %PROJECT%_vcb.log
