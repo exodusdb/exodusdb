@@ -22,6 +22,7 @@
 #include <string>
 
 //for Datum, VARSIZE, VARDATA etc
+#undef errcode
 #include "postgres.h"
 
 /*backward compatible to pre 8.3 with no SET_VARSIZE*/
