@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "exodus_cli", "cli\src\exodus_cli.vcxproj", "{697DB7F7-1C90-4F75-B3D9-727A78A7CCB0}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "exodus_cli", "cli\src\exodus_cli\exodus_cli.vcxproj", "{697DB7F7-1C90-4F75-B3D9-727A78A7CCB0}"
 	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
@@ -12,67 +12,67 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "exodus", "exodus\exodus\exo
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "compile", "cli\src\compile.vcxproj", "{5370265F-0888-4C89-BB23-359C88622F6F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "compile", "cli\src\compile\compile.vcxproj", "{5370265F-0888-4C89-BB23-359C88622F6F}"
 	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "createfile", "cli\src\createfile.vcxproj", "{9FAE685A-9F5C-4886-9715-F3E27772E2AD}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "createfile", "cli\src\createfile\createfile.vcxproj", "{9FAE685A-9F5C-4886-9715-F3E27772E2AD}"
 	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "createindex", "cli\src\createindex.vcxproj", "{CDA4B1D0-4472-472C-8B83-01FA5A4703A4}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "createindex", "cli\src\createindex\createindex.vcxproj", "{CDA4B1D0-4472-472C-8B83-01FA5A4703A4}"
 	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "delete", "cli\src\delete.vcxproj", "{18FD3C60-9B95-41EC-996E-56E9CE269FBF}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "delete", "cli\src\delete\delete.vcxproj", "{18FD3C60-9B95-41EC-996E-56E9CE269FBF}"
 	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "deletefile", "cli\src\deletefile.vcxproj", "{257042E5-7222-4978-8CDE-8A51B527C000}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "deletefile", "cli\src\deletefile\deletefile.vcxproj", "{257042E5-7222-4978-8CDE-8A51B527C000}"
 	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "deleteindex", "cli\src\deleteindex.vcxproj", "{7C71BC68-3261-45F7-8A28-B480603195C4}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "deleteindex", "cli\src\deleteindex\deleteindex.vcxproj", "{7C71BC68-3261-45F7-8A28-B480603195C4}"
 	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "edic", "cli\src\edic.vcxproj", "{7CF1BF89-082B-4C60-8929-60F8C3266139}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "edic", "cli\src\edic\edic.vcxproj", "{7CF1BF89-082B-4C60-8929-60F8C3266139}"
 	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "list", "cli\src\list.vcxproj", "{BB90B226-9FC2-43EA-B837-56F2703A3D52}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "list", "cli\src\list\list.vcxproj", "{BB90B226-9FC2-43EA-B837-56F2703A3D52}"
 	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "listfiles", "cli\src\listfiles.vcxproj", "{A2A0314D-E95F-4D16-8604-91EAF2E3772D}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "listfiles", "cli\src\listfiles\listfiles.vcxproj", "{A2A0314D-E95F-4D16-8604-91EAF2E3772D}"
 	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "listindexes", "cli\src\listindexes.vcxproj", "{5EBDBCB4-541A-489A-A0BD-04127399FFC9}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "listindexes", "cli\src\listindexes\listindexes.vcxproj", "{5EBDBCB4-541A-489A-A0BD-04127399FFC9}"
 	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testsort", "cli\src\testsort.vcxproj", "{709C530D-3803-4EF2-84F4-DAAC6A609708}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testsort", "cli\src\testsort\testsort.vcxproj", "{709C530D-3803-4EF2-84F4-DAAC6A609708}"
 	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
@@ -84,13 +84,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pgexodus", "exodus\pgexodus
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "configexodus", "cli\src\configexodus.vcxproj", "{3CA9C7D6-FC69-4D5C-B1D0-0B0A78109890}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "configexodus", "cli\src\configexodus\configexodus.vcxproj", "{3CA9C7D6-FC69-4D5C-B1D0-0B0A78109890}"
 	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "edir", "cli\src\edir.vcxproj", "{E97CCEAD-11F1-4CEE-B52D-10D7429AE622}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "edir", "cli\src\edir\edir.vcxproj", "{E97CCEAD-11F1-4CEE-B52D-10D7429AE622}"
 	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
