@@ -123,7 +123,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..;&quot;$(BOOST32)\&quot;;&quot;$(POSTGRESQL32)\include&quot;"
+				AdditionalIncludeDirectories="..;&quot;$(BOOST64)\&quot;;&quot;$(POSTGRESQL64)\include&quot;"
 				PreprocessorDefinitions="BUILDING_LIBRARY;DEBUG"
 				MinimalRebuild="true"
 				ExceptionHandling="1"
@@ -148,7 +148,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="libpq.lib"
-				AdditionalLibraryDirectories="&quot;$(BOOST32)\lib32&quot;;&quot;$(BOOST32)\stage32\lib&quot;;&quot;$(BOOST32)\lib&quot;;&quot;$(BOOST32)\stage\lib&quot;;&quot;$(POSTGRESQL32)\lib&quot;"
+				AdditionalLibraryDirectories="&quot;$(BOOST64)\lib64&quot;;&quot;$(BOOST64)\stage64\lib&quot;;&quot;$(BOOST64)\lib&quot;;&quot;$(BOOST64)\stage\lib&quot;;&quot;$(POSTGRESQL64)\lib&quot;"
 				DelayLoadDLLs="libpq.dll"
 				GenerateDebugInformation="true"
 				TargetMachine="17"
@@ -279,7 +279,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..;&quot;$(BOOST32)\&quot;;&quot;$(POSTGRESQL32)\include&quot;"
+				AdditionalIncludeDirectories="..;&quot;$(BOOST64)\&quot;;&quot;$(POSTGRESQL64)\include&quot;"
 				PreprocessorDefinitions="BUILDING_LIBRARY;NDEBUG"
 				ExceptionHandling="1"
 				RuntimeLibrary="2"
@@ -301,7 +301,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="libpq.lib"
-				AdditionalLibraryDirectories="&quot;$(BOOST32)\lib32&quot;;&quot;$(BOOST32)\stage32\lib&quot;;&quot;$(BOOST32)\lib&quot;;&quot;$(BOOST32)\stage\lib&quot;;&quot;$(POSTGRESQL32)\lib&quot;"
+				AdditionalLibraryDirectories="&quot;$(BOOST64)\lib64&quot;;&quot;$(BOOST64)\stage64\lib&quot;;&quot;$(BOOST64)\lib&quot;;&quot;$(BOOST64)\stage\lib&quot;;&quot;$(POSTGRESQL64)\lib&quot;"
 				DelayLoadDLLs="libpq.dll"
 				TargetMachine="17"
 			/>
