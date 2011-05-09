@@ -4,6 +4,14 @@
 
 ;;;;;;;;; package parameters ;;;;;;;;;;;;;;;;;;;;
 
+;SOURCE/LOCATION OF THE BUILT BINARIES TO BE PACKAGED UP
+;PICK ONE!
+;!define debugorrelease "debug"
+!define debugorrelease "release"
+;!define debugorrelease "x64\debug"
+;!define debugorrelease "x64\release"
+
+;WHICH VC RUNTIME VERSION TO DISTRIBUTE
 ;EXODUS_TOOLPATH and EXODUS_VCVERSION
 ;70 VS2003
 ;80 VS2005
@@ -14,26 +22,27 @@
 !define EXODUS_TOOLPATH "$%VS80COMNTOOLS%"
 !define EXODUS_VCVERSION "80"
 
-;MUST have been LAST to be built since x86 and x64 currently both built in release directory
-!define debugorrelease "release"
-
-;PLATFORM MUST! be x86 or x64 ... one of the subdirectories in redist directory
+;WHICH VC RUNTIME PLATFORM TO DISTRIBUTE (ALSO DETERMINES THE INSTALLER FILE NAME)
+;PLATFORM MUST! be x86 or x64
 !define EXODUS_PLATFORM "x86"
 
+;WHAT NAME TO GIVE EXODUS ON START MENU ETC (OMIT VERSION!)
 ;use Exodus for x86 since it will install on 32 or 64 bit machines
 ;and Exodus64 for x64 since it will only install on 64 bit machines
 ;it will be used as a folder name
 !define EXODUS_LONGNAME "Exodus"
 ;!define EXODUS_LONGNAME "Exodus64"
 
+;VERSION OF EXODUS FOR SEPARATE MENU ITEM AND INSTALLATION DIRECTORY
 ;minor versions each get installed in a separate directory
 !define EXODUS_MINOR_VERSION "11.5"
 
+;WHAT MINOR VERSION NUMBER (FOR INFORMATION ONLY)
 ;micro versions are for information and will simply overwrite previous minor versions
 ;TODO check we dont double add to path etc.
 !define EXODUS_MICRO_VERSION "11.5.3"
 
-!define EXODUS_SHORTNAME "Exodus"
+;BASIC FILENAME FOR EXODUS
 !define EXODUS_CODENAME "exodus"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -470,8 +479,7 @@ Section "All" SecAll
   ;should we install this in order to get access to postgres on another server?
   ;File release\libpq32\*
 
-  ;VC runtime (and runtime debug?!)
-
+  ;VC runtime (and runtime debug?!)
   File "${EXODUS_TOOLPATH}..\..\VC\redist\${EXODUS_PLATFORM}\Microsoft.VC${EXODUS_VCVERSION}.CRT\*"
   File "${EXODUS_TOOLPATH}..\..\VC\redist\Debug_NonRedist\${EXODUS_PLATFORM}\Microsoft.VC${EXODUS_VCVERSION}.DebugCRT\*"
 
