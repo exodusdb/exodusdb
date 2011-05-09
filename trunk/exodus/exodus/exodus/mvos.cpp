@@ -529,7 +529,9 @@ random_base_generator_type* get_random_base_generator()
 		//seed to the os clock (secs since unix epoch)
 		//Caveat: std::time(0) is not a very good truly-random seed.
 		//logputl(L"Seeding random number generator to system clock");
-		(*threads_random_base_generator).seed(static_cast<unsigned int>(std::time(0)+2375472354));
+//decimal constants is unsigned only in C99" ie this number exceed max SIGNED integer
+//		(*threads_random_base_generator).seed(static_cast<unsigned int>(std::time(0)+2375472354));
+		(*threads_random_base_generator).seed(static_cast<unsigned int>(std::time(0)+2075472354));
 		//(*thread_base_generator).seed(static_cast<unsigned int>(var().ostime().toInt()));
 
 	}

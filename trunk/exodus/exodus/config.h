@@ -20,7 +20,7 @@
 #define HAVE_BOOST_REGEX /**/
 
 /* define if the Boost::System library is available */
-#define HAVE_BOOST_SYSTEM /**/
+/* #undef HAVE_BOOST_SYSTEM */
 
 /* define if the Boost::Thread library is available */
 #define HAVE_BOOST_THREAD /**/

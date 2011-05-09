@@ -1026,9 +1026,13 @@ private:
 	//was in pimpl
 	//all mutable because asking for a string can create it from an integer and vice versa
 	//warning C4251: xxx needs to have dll-interface to be used by clients of class yyy
+#ifdef _MSC_VER
 	#pragma warning( disable: 4251 )
+#endif
 	mutable std::wstring var_mvstr;
+#ifdef _MSC_VER
 	#pragma warning( 4: 4251 )
+#endif
 	mutable mvint_t var_mvint;
 	mutable double var_mvdbl;
 	//initialise type last
