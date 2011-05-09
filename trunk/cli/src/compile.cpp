@@ -78,7 +78,9 @@ program()
 				//http://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#Warning-Options
                 basicoptions^=" -Wall";
 				basicoptions^=" -Wextra";
-				basicoptions^=" -Wno-unused-parameters"; //dont want if functions dont use their parameters
+
+		//not available on gcc 4.1.2 TODO work out gcc version
+		//basicoptions^=" -Wno-unused-parameters"; //dont want if functions dont use their parameters
 				//basicoptions^=" -pendantic -ansi";
                 //following will result in 2 byte wchar in linux
                 //but all exodus libs also need to be in this format too
@@ -805,7 +807,7 @@ var inclusion=
                 var newobjfileinfo=osfile(objfilename);
                 if (not newobjfileinfo) {
 						printl(oscwd());
-                        print("Error: Cannot file output file "^objfilename^". Press Enter");input();
+                        print("Error: Cannot output output file "^objfilename^". Press Enter");input();
                         continue;
                 }
 
