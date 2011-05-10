@@ -111,6 +111,9 @@ qt strings are unicode
 #include <locale.h>
 #ifdef __APPLE__
 #include <xlocale.h>
+//#include <CoreFoundation/CFBase.h>
+#include <CoreFoundation/CFString.h>
+//#include <CoreFoundation/CFStringEncodingExt.h>
 #endif
 
 #define MV_NO_NARROW
@@ -154,12 +157,13 @@ int var::localeAwareCompare(const std::wstring& str1, const std::wstring& str2) 
 	}
 
 #elif defined(__APPLE__)
+//#include <CoreFoundation/CFStringEncodingExt.h>
     // order strings the same way as native applications do, and also respects
     // the "Order for sorted lists" setting in the International preferences panel
 	const CFStringRef thisString=CFStringCreateWithCharactersNoCopy(kCFAllocatorDefault,
 		reinterpret_cast<const UniChar *>(str1.data()),str1.length(),kCFAllocatorNull);
 	const CFStringRef otherString=CFStringCreateWithCharactersNoCopy(kCFAllocatorDefault,
-		reinterpret_cast<const UniChar *>(data2), length2, kCFAllocatorNull);
+		reinterpret_cast<const UniChar *>(str2.data()), str2.length(), kCFAllocatorNull);
 
 	const int result = CFStringCompare(thisString, otherString, kCFCompareLocalized);
 	CFRelease(thisString);
