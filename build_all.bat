@@ -1,31 +1,63 @@
-rem AUTOMATED VCBUILD
-rem http://msdn.microsoft.com/en-us/library/cz553aa1%28v=VS.80%29.aspx
+rem run this from within a VC/VS command prompt
+rem COPY AND MODIFY THIS FILE TO SUIT YOUR OWN ENVIRONMENT
+rem make a shortcut to the copy so you can quickly develop and build
+rem with the right environment variables set
 
-rem --- CONFIGURE VCVARS AND MAKENSIS LOCATIONS ---
-path %VS80COMNTOOLS%..\..\vc\;%PATH%
-path %VS90COMNTOOLS%..\..\vc\;%PATH%
-path %VS100COMNTOOLS%..\..\vc\;%PATH%
-path %VS110COMNTOOLS%..\..\vc\;%PATH%
+rem ----- BOOST32 -----
 
-path \Program Files\NSIS\;%PATH%
-path \Program Files (x86)\NSIS\;%PATH%
+rem uncomment if you have binaries here but best to build from scratch to avoid 0xc0150002 error
+rem set BOOST32=C:\Program Files\Boost\boost_1_46_1
 
-rem -- CONFIGURE PROJECT NAME --
-set PROJECT=exodus_all2005
+rem assuming we have built libs here (in stage32)
+set BOOST32=d:\boost_1_46_1
 
-set error=no
-if exist %PROJECT%_vcb.log del %PROJECT%_vcb.log
-if exist %PROJECT%_nsi.log del %PROJECT%_nsi.log
+rem ----- BOOST64 -----
 
-call vcvarsall
-if errorlevel 1 set error=yes
-if error==yes goto upload
+rem binary installers are not available so we have built boost x64 libs (in stage64)
+set BOOST64=D:\boost_1_46_1
 
-vcbuild /nocolor /logfile:%PROJECT%_vcb.log /error:ERROR: /warning:WARNING: %PROJECT%.sln
-if errorlevel 2 set error=yes
-if error==yes goto upload
-echo vcbuild done
+rem ----- POSTGRESQL32 -----
 
-rem /V2 errors and warnings
-;MAKENSIS.exe /Oexodus_all_nsi.log exodus_all.nsi
-MAKENSIS.exe exodus_all.nsi
+rem on Win32, postgres is installed here
+set POSTGRESQL32=C:\Program Files\PostgreSQL\9.0
+
+rem but on win/64, postgres is installed here
+rem set POSTGRESQL32=C:\Program Files (x86)\PostgreSQL\9.0
+
+rem ----- POSTGRESQL64 -----
+
+set POSTGRESQL64=C:\Program Files\PostgreSQL\9.0
+
+rem ----- BUILD AT CONSOLE OR IN VISUAL STUDIO -----
+
+rem do one of the following depending on your toolset
+
+rem typical commands vc/vs2005 and win32
+rem vcbuild /platform:win32 exodus_all2005.sln
+rem vcexpress exodus_all2005.sln
+
+rem starting up VS2005 pro
+call "%VS80COMNTOOLS%vsvars32.bat"
+devenv exodus_all2005.sln
+pause
+
+rem vcbuild /nocolor /logfile:%PROJECT%_vcb.log /error:ERROR: /warning:WARNING: %PROJECT%.sln
+rem if errorlevel 2 set error=yes
+rem if error==yes goto upload
+rem echo vcbuild done
+
+rem typical commands vc/vs2010 and win64
+rem vcbuild /platform:win64 exodus_all.sln
+rem vcexpress exodus_all.sln
+
+rem 
+rem devenv exodus_all.sln
+
+rem ----- BUILDING INSTALLER -----
+
+rem "d:\program files\nsis\makensis.exe" exodus_all.nsi
+
+rem ----- INSTALLING ----
+
+rem exodus-x86-11.5.3.exe
+rem exodus-x86-11.5.3.exe /S     (silent install *capital* S)
