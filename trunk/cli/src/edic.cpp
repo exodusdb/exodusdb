@@ -45,6 +45,11 @@ program()
 			        nanopath="..\\..\\release\\cygwin\\bin\\nano.exe";
 				    if (nanopath.osfile())
 					        editor="..\\..\\release\\cygwin\\bin\\nano $LINENO'$FILENAME'";
+					else {
+						nanopath="..\\"^nanopath;
+						if (nanopath.osfile())
+					        editor="..\\..\\..\\release\\cygwin\\bin\\nano $LINENO'$FILENAME'";
+					}
 			}
 		}
 
@@ -105,6 +110,10 @@ program()
                 if (not osfile(nanorcfilename)) {
 						//var nanorctemplatefilename=EXECPATH.field(SLASH,1,dcount(EXECPATH,SLASH)-1) ^ SLASH ^ "nanorc";
 						var nanorctemplatefilename=nanopath.field(SLASH,1,dcount(nanopath,SLASH)-1) ^ SLASH ^ "nanorc";
+						if (!osfile(nanorctemplatefilename))
+							nanorctemplatefilename.swapper("release","..\\release");
+						//if (!osfile(nanorctemplatefilename))
+						//	nanorctemplatefilename.swapper("release","..\\"^PLATFORM_^"\\release");
                         if (oscopy(nanorctemplatefilename,nanorcfilename)) {
                                 printl("Copied " ^ nanorctemplatefilename.quote() ^ " to " ^ nanorcfilename.quote());
                                 var ().input("Note: nano c++ syntax highlighting has been installed. Press Enter ... ");
@@ -205,7 +214,10 @@ program()
 							blankfile^="\n";
 							blankfile^="programinit()\n";
 							blankfile^="\n";
-							blankfile^="function main(/*in arg1, out arg2*/) {\n";
+							blankfile^="function main(";
+							if (progtype eq "classlib")
+								blankfile^="/*in arg1, out arg2*/";
+							blankfile^=") {\n";
 							blankfile^="\tprintl(\""^basefilename^" says 'Hello World!'\");\n";
 							blankfile^="\treturn 0;\n";
 							blankfile^="}\n";
