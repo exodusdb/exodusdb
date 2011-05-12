@@ -108,6 +108,10 @@ program()
 					exodusincludepath=exodusbinpath^"\\..\\exodus\\exodus";
 					searched.replacer(-1,exodusincludepath);
 				}
+				if (!osdir(exodusincludepath)) {
+					exodusincludepath=exodusbinpath^"\\..\\..\\exodus\\exodus";
+					searched.replacer(-1,exodusincludepath);
+				}
                 if (!osfile(exodusincludepath^"\\exodus\\exodus.h")) {
                         exodusincludepath=osgetenv("EXODUS_INCLUDE");
 						searched.replacer(-1,exodusincludepath);
