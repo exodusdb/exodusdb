@@ -90,7 +90,7 @@ bool callexodus(const char* serverid, const char* request, const int nrequestbyt
 		{
 			//elog(ERROR, "pgexodus callexodus() Could not open pipe %s. Windows Error No: %d",serverid, GetLastError());
 			_snprintf(response,1000, "Could not open pipe %s. Windows Error No: %d",pipename.c_str(), GetLastError());
-			nresponsebytes=strlen(response);
+			nresponsebytes=(int)strlen(response);
 			return 0;
 		}
  
@@ -101,7 +101,7 @@ bool callexodus(const char* serverid, const char* request, const int nrequestbyt
 		{
 ///			elog(ERROR, "pgexodus callexodus() Could not open pipe. WaitNamedPipe failed");
 			_snprintf(response,1000, "Could not open pipe. WaitNamedPipe failed");
-			nresponsebytes=strlen(response);
+			nresponsebytes=(int)strlen(response);
 			return 0;
 		}
 
@@ -122,7 +122,7 @@ bool callexodus(const char* serverid, const char* request, const int nrequestbyt
 	{
 ///		elog(ERROR,"pgexodus callexodus() SetNamedPipeHandleState failed"); 
 		_snprintf(response,1000, "SetNamedPipeHandleState failed");
-		nresponsebytes=strlen(response);
+		nresponsebytes=(int)strlen(response);
 		return 0;
 	}
  
@@ -140,7 +140,7 @@ bool callexodus(const char* serverid, const char* request, const int nrequestbyt
 	{
 ///		elog(ERROR,"pgexodus callexodus() WriteFile failed");
 		_snprintf(response,1000, "WriteFile failed");
-		nresponsebytes=strlen(response);
+		nresponsebytes=(int)strlen(response);
 		return 0;
 	}
  

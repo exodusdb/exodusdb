@@ -75,6 +75,10 @@
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">exodus</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">exodus</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">exodus</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">exodus</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -166,7 +170,7 @@
     <ClCompile Include="..\..\src\exodus.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\exodus\exodus\exodus\exodus2005.vcxproj">
+    <ProjectReference Include="..\..\..\exodus\exodus\exodus\exodus.vcxproj">
       <Project>{8963eb1b-97d5-47c0-bf00-8f9b828b3139}</Project>
     </ProjectReference>
   </ItemGroup>
