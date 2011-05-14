@@ -1,51 +1,76 @@
 ;initial code is just standard nsis macros that doesnt need to be changed or understood
 ;exodus build instructions at at the bottom, or search for exodus
 
-
 ;;;;;;;;; package parameters ;;;;;;;;;;;;;;;;;;;;
 
-;SOURCE/LOCATION OF THE BUILT BINARIES TO BE PACKAGED UP
-;PICK ONE!
+;--------------------------------------------------------
+; SOURCE/LOCATION OF THE BUILT BINARIES TO BE PACKAGED UP
+; PICK ONE!
+;--------------------------------------------------------
 ;!define debugorrelease "debug"
-!define debugorrelease "release"
+;!define debugorrelease "release"
 ;!define debugorrelease "x64\debug"
-;!define debugorrelease "x64\release"
+!define debugorrelease "x64\release"
 
-;WHICH VC RUNTIME VERSION TO DISTRIBUTE
-;EXODUS_TOOLPATH and EXODUS_VCVERSION
-;70 VS2003
-;80 VS2005
-;90 VS2008
-;100 VS2010
-;1) MUST! have been built with this toolset
-;2) MUST! be present as an environment variable pointing to the MSVC toolset
-!define EXODUS_TOOLPATH "$%VS80COMNTOOLS%"
-!define EXODUS_VCVERSION "80"
+;---------------------------------------------------------------------------
+; EXODUS_VCVERSION=WHICH VC RUNTIME VERSION
+; 1) MUST! have been built with this toolset
+; 2) MUST! be present as an environment variable pointing to the MSVC toolset
+; 70  is VS2003
+; 80  is VS2005
+; 90  is VS2008
+; 100 is VS2010 (NB 100 NOT JUST 10!!!)
+;----------------------------------------------------------------------------
+;!define EXODUS_VCVERSION "70"
+;!define EXODUS_VCVERSION "80"
+;!define EXODUS_VCVERSION "90"
+!define EXODUS_VCVERSION "100"
 
-;WHICH VC RUNTIME PLATFORM TO DISTRIBUTE (ALSO DETERMINES THE INSTALLER FILE NAME)
-;PLATFORM MUST! be x86 or x64
-!define EXODUS_PLATFORM "x86"
+;------------------------------------------
+; WHERE IS VC RUNTIME VERSION TO DISTRIBUTE
+; currently hard coded?!
+;------------------------------------------
+;!define EXODUS_TOOLPATH "$%VS100COMNTOOLS%"
+!define EXODUS_TOOLPATH c:\windows\system32
 
-;WHAT NAME TO GIVE EXODUS ON START MENU ETC (OMIT VERSION!)
-;use Exodus for x86 since it will install on 32 or 64 bit machines
-;and Exodus64 for x64 since it will only install on 64 bit machines
-;it will be used as a folder name
-!define EXODUS_LONGNAME "Exodus"
-;!define EXODUS_LONGNAME "Exodus64"
+;----------------------------------------------------------------
+; EXODUS_PLATFORM MUST be x86 or x64
+; DETERMINES PART OF THE INSTALLER FILE NAME!
+; ALSO WHICH VC RUNTIME PLATFORM TO DISTRIBUTE (if not hard coded)
+;----------------------------------------------------------------
+;!define EXODUS_PLATFORM "x86"
+!define EXODUS_PLATFORM "x64"
 
-;VERSION OF EXODUS FOR SEPARATE MENU ITEM AND INSTALLATION DIRECTORY
-;minor versions each get installed in a separate directory
+;------------------------------------------------------------------
+; WHAT NAME TO GIVE EXODUS ON START MENU ETC (OMIT VERSION!)
+; use Exodus for x86 since it will install on 32 or 64 bit machines
+; and Exodus64 for x64 since it will only install on 64 bit machines
+; it will be used as a folder name
+;------------------------------------------------------------------
+;!define EXODUS_LONGNAME "Exodus"
+!define EXODUS_LONGNAME "Exodus64"
+
+;-------------------------------------------------------------------
+; VERSION OF EXODUS FOR SEPARATE MENU ITEM AND INSTALLATION DIRECTORY
+; minor versions each get installed in a separate directory
+;-------------------------------------------------------------------
 !define EXODUS_MINOR_VERSION "11.5"
 
-;WHAT MINOR VERSION NUMBER (FOR INFORMATION ONLY)
-;micro versions are for information and will simply overwrite previous minor versions
-;TODO check we dont double add to path etc.
+;-------------------------------------------------------------
+; WHAT MINOR VERSION NUMBER (FOR INFORMATION ONLY)
+; micro versions are for information and will simply overwrite
+; previous minor versions
+; TODO check we dont double add to path etc.
+;-------------------------------------------------------------
 !define EXODUS_MICRO_VERSION "11.5.3"
 
+;-------------------------
 ;BASIC FILENAME FOR EXODUS
+;-------------------------
 !define EXODUS_CODENAME "exodus"
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;; end of package parameters ;;;;;;;;;;;;;;;;;;;;
+
 
   ;VC2010 x86 - could download
   ;http://www.microsoft.com/downloads/info.aspx?na=41&SrcFamilyId=A7B7A05E-6DE6-4D3A-A423-37BF0912DB84&SrcDisplayLang=en&u=http%3a%2f%2fdownload.microsoft.com%2fdownload%2f5%2fB%2fC%2f5BC5DBB3-652D-4DCE-B14A-475AB85EEF6E%2fvcredist_x86.exe
@@ -479,9 +504,15 @@ Section "All" SecAll
   ;should we install this in order to get access to postgres on another server?
   ;File release\libpq32\*
 
-  ;VC runtime (and runtime debug?!)
-  File "${EXODUS_TOOLPATH}..\..\VC\redist\${EXODUS_PLATFORM}\Microsoft.VC${EXODUS_VCVERSION}.CRT\*"
-  File "${EXODUS_TOOLPATH}..\..\VC\redist\Debug_NonRedist\${EXODUS_PLATFORM}\Microsoft.VC${EXODUS_VCVERSION}.DebugCRT\*"
+  ;VC runtime without bloated redist package
+  ;also delivering debug versions?! so exodus programs can be developed with stackwalker
+  ;File "${EXODUS_TOOLPATH}..\..\VC\redist\${EXODUS_PLATFORM}\Microsoft.VC${EXODUS_VCVERSION}.CRT\*"
+  ;File "${EXODUS_TOOLPATH}..\..\VC\redist\Debug_NonRedist\${EXODUS_PLATFORM}\Microsoft.VC${EXODUS_VCVERSION}.DebugCRT\*"
+  ;hard coded!
+  File "${EXODUS_TOOLPATH}\msvcr${EXODUS_VCVERSION}.dll"
+  File "${EXODUS_TOOLPATH}\msvcp${EXODUS_VCVERSION}.dll"
+  File "${EXODUS_TOOLPATH}\msvcr${EXODUS_VCVERSION}d.dll"
+  File "${EXODUS_TOOLPATH}\msvcp${EXODUS_VCVERSION}d.dll"
 
   ;dont do exodus.dll since we may want the debug version - below
   ;File /x exodus.dll /x libpq.dll release\*.dll
@@ -493,15 +524,19 @@ Section "All" SecAll
   
   File ${DebugOrRelease}\*.exe
   File ${DebugOrRelease}\exodus.dll
+  File ${DebugOrRelease}\pgexodus.dll
+
+  ;also output exodus_cli.exe as exodus.exe for ease of access to the end user
+  File /oname=exodus.exe ${DebugOrRelease}\exodus_cli.exe
 
   SetOutPath "$INSTDIR\lib"
-
+	
   File ${DebugOrRelease}\exodus.exp
   File ${DebugOrRelease}\exodus.lib
   ;File ${DebugOrRelease}\exodus.pdb
 
   File /oname=pgexodus-8.dll release\pgexodus-8.dll
-  File /oname=pgexodus-9.dll release\pgexodus.dll
+  File /oname=pgexodus-9.dll ${DebugOrRelease}\pgexodus.dll
 
   SetOutPath "$INSTDIR\include\exodus"
 
