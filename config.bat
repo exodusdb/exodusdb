@@ -1,18 +1,20 @@
 rem run this from within a VC/VS command prompt
 rem COPY AND MODIFY THIS FILE TO SUIT YOUR OWN ENVIRONMENT
 
+
 rem ----- BOOST32 -----
 
 rem uncomment if you have binaries here but best to build from scratch to avoid 0xc0150002 error
 rem set BOOST32=C:\Program Files\Boost\boost_1_46_1
 
 rem assuming we have built libs here (in stage32)
-set BOOST32=d:\boost_1_46_1
+set BOOST32=F:\boost_1_46_1
 
 rem ----- BOOST64 -----
 
 rem binary installers are not available so we have built boost x64 libs (in stage64)
-set BOOST64=D:\boost_1_46_1
+set BOOST64=F:\boost_1_46_1
+
 
 rem ----- POSTGRESQL32 -----
 
@@ -26,6 +28,10 @@ rem ----- POSTGRESQL64 -----
 
 set POSTGRESQL64=C:\Program Files\PostgreSQL\9.0
 
+
+
+
+
 rem ----- BUILD AT CONSOLE OR IN VISUAL STUDIO -----
 
 rem do one of the following depending on your toolset
@@ -35,9 +41,8 @@ rem vcbuild /platform:win32 exodus_all2005.sln
 rem vcexpress exodus_all2005.sln
 
 rem starting up VS2005 pro
-call "%VS80COMNTOOLS%vsvars32.bat"
-devenv exodus_all2005.sln
-pause
+rem call "%VS80COMNTOOLS%vsvars32.bat"
+rem devenv exodus_all2005.sln
 
 rem typical commands vc/vs2010 and win64
 rem vcbuild /platform:win64 exodus_all.sln

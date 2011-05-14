@@ -157,14 +157,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\exodus\exodus\exodus\exodus2005.vcxproj">
-      <Project>{8963eb1b-97d5-47c0-bf00-8f9b828b3139}</Project>
-      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
-      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
-    </ProjectReference>
+    <ClCompile Include="..\..\src\listindexes.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\listindexes.cpp" />
+    <ProjectReference Include="..\..\..\exodus\exodus\exodus\exodus.vcxproj">
+      <Project>{8963eb1b-97d5-47c0-bf00-8f9b828b3139}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
