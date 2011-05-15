@@ -6,6 +6,17 @@ pause
 exit
 :gotconfig
 
+rem --------------
+rem --- ADVICE ---
+rem --------------
+rem if you hardcode drive paths here then search for :\ to make sure you dont miss any
+rem best to install all "programs" eg sdk, VS, postgresql, nsis etc on one drive
+rem and to the *standard path structure* even if you install them not on C:
+set PROGRAM_DRIVE=C:
+rem best to install all building stuff like exodus/boost libraries etc on one drive
+rem maybe the same as the programs, maybe not.
+set BUILD_DRIVE=F:
+
 if "%EXODUS_DEV%" == "YES" goto aftersetenv
 
 rem set EXODUS_GENERAL=VS2005
@@ -16,10 +27,10 @@ rem --------------
 rem --- VS2005 ---
 rem --------------
 
-if NOT "%EXODUS_GENERAL%" == "VS2005" goto aftersetenv
+if NOT "%EXODUS_GENERAL%" == "VS2005" goto defaultbuilder
 
-rem path d:\Program Files\Microsoft Visual Studio 8\VC\;%PATH%
-    path %PATH%;d:\Program Files\Microsoft Visual Studio 8\VC\
+rem path %PROGRAM_DRIVE%\Program Files\Microsoft Visual Studio 8\VC\;%PATH%
+    path %PATH%;%PROGRAM_DRIVE%\Program Files\Microsoft Visual Studio 8\VC\
 
 rem --- x86 command prompt ---
  call vcvarsall.bat x86
@@ -37,22 +48,23 @@ rem ------------------------
 rem Runtime version 70 80 90 100 for MSVC2003, 2005, 2008 and 2010 respectively
 rem and location of msvcrNNd.dll etc c runtime dlls
 set EXODUS_TOOLPATH=C:Windows\system32
- set EXODUS_TOOLPATHREL=D:\Program Files\Microsoft Visual Studio 8\VC\redist\x86\Microsoft.VC80.CRT
- set EXODUS_TOOLPATHDEB=D:\Program Files\Microsoft Visual Studio 8\VC\redist\Debug_NonRedist\x86\Microsoft.VC80.DebugCRT
-rem set EXODUS_TOOLPATHREL=D:\Program Files\Microsoft Visual Studio 8\VC\redist\amd64\Microsoft.VC80.CRT
-rem set EXODUS_TOOLPATHDEB=D:\Program Files\Microsoft Visual Studio 8\VC\redist\Debug_NonRedist\amd64\Microsoft.VC80.DebugCRT
+ set EXODUS_TOOLPATHREL=%PROGRAM_DRIVE%\Program Files\Microsoft Visual Studio 8\VC\redist\x86\Microsoft.VC80.CRT
+ set EXODUS_TOOLPATHDEB=%PROGRAM_DRIVE%\Program Files\Microsoft Visual Studio 8\VC\redist\Debug_NonRedist\x86\Microsoft.VC80.DebugCRT
+rem set EXODUS_TOOLPATHREL=%PROGRAM_DRIVE%\Program Files\Microsoft Visual Studio 8\VC\redist\amd64\Microsoft.VC80.CRT
+rem set EXODUS_TOOLPATHDEB=%PROGRAM_DRIVE%\Program Files\Microsoft Visual Studio 8\VC\redist\Debug_NonRedist\amd64\Microsoft.VC80.DebugCRT
 set EXODUS_VCVERSION=80
 
-goto aftersetenv
+goto sanitychecks
 
 
+:defaultbuilder
 
 rem ---------------------------
 rem --- SDK 7.1 the default ---
 rem ---------------------------
 
-rem path C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin;%PATH%
-    path %PATH%;C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin
+    path %PROGRAM_DRIVE%\Program Files\Microsoft SDKs\Windows\v7.1\Bin;%PATH%
+rem path %PATH%;%PROGRAM_DRIVE%\Program Files\Microsoft SDKs\Windows\v7.1\Bin
 
 rem ----------------------------------
 rem --- Platform and Configuration ---
@@ -60,7 +72,8 @@ rem ----------------------------------
 rem call setenv /x86 /debug
 rem call setenv /x86 /release
 rem call setenv /x64 /debug
-rem  call setenv /x64 /release
+    call setenv /x64 /release
+echo on
 
 rem ------------------------
 rem --- Binary Toolset ---
@@ -71,6 +84,25 @@ set EXODUS_TOOLPATHREL=C:Windows\system32
 set EXODUS_TOOLPATHDEB=C:Windows\system32
 set EXODUS_VCVERSION=100
 
+:sanitychecks
+
+rem ---------------------
+rem --- SANITY CHECKS ---
+rem ---------------------
+
+if not "%Configuration%" == "" goto gotconfiguration
+@echo MISSING CONFIGURATION ENVIRONMENT VARIABLE
+if "%EXODUS_BATCHMODE%" == "" pause
+exit
+:gotconfiguration
+@echo Configuration=%Configuration%
+
+if not "%TARGET_CPU%" == "" goto gottargetcpu
+@echo MISSING TARGET_CPU ENVIRONMENT VARIABLE
+if "%EXODUS_BATCHMODE%" == "" pause
+exit
+:gottargetcpu
+@echo TARGET_CPU=%TARGET_CPU%
 
 :aftersetenv
 
@@ -92,27 +124,27 @@ rem ----- BOOST32 -----
 rem -------------------
 rem uncomment if you have binaries here but best to build from scratch to avoid 0xc0150002 error
 rem Downloaded Binaries
-rem set BOOST32=C:\Program Files\Boost\boost_1_46_1
+rem set BOOST32=%PROGRAM_DRIVE%\Program Files\Boost\boost_1_46_1
 rem Built Binaries in something\stage32
-    set BOOST32=D:\boost_1_46_1
+    set BOOST32=%BUILD_DRIVE%\boost_1_46_1
 
 rem ----- BOOST64 -----
 rem -------------------
 rem binary installers are not available so we have built boost x64 libs (in stage64)
-    set BOOST64=D:\boost_1_46_1
+    set BOOST64=%BUILD_DRIVE%\boost_1_46_1
 
 
 rem ----- POSTGRESQL32 -----
 rem ------------------------
 rem on Win32, postgres is installed here
-    set POSTGRESQL32=C:\Program Files\PostgreSQL\9.0
+    set POSTGRESQL32=%PROGRAM_DRIVE%\Program Files\PostgreSQL\9.0
 
 rem but on win/64, postgres is installed here
-    if NOT "%ProgramFiles(x86)%" == "" set POSTGRESQL32=C:\Program Files (x86)\PostgreSQL\9.0
+    if NOT "%ProgramFiles(x86)%" == "" set POSTGRESQL32=%PROGRAM_DRIVE%\Program Files (x86)\PostgreSQL\9.0
 
 rem ----- POSTGRESQL64 -----
 rem ------------------------
-    set POSTGRESQL64=C:\Program Files\PostgreSQL\9.0
+    set POSTGRESQL64=%PROGRAM_DRIVE%\Program Files\PostgreSQL\9.0
 
 rem ------------------
 rem ---- BUILDING ----
@@ -124,10 +156,10 @@ if "%TARGET_CPU%" == "x86" set EXODUS_BINARIES=%Configuration%
 
 rem --- Solution ---
 rem ----------------
-rem VS2010
+rem default prohect
     set EXODUS_PROJECT=exodus_all
 rem VS2005
-    set EXODUS_PROJECT=exodus_all2005
+    if "%EXODUS_GENERAL%" == "VS2005" set EXODUS_PROJECT=exodus_all2005
 
 rem --- Build ---
 rem -------------
@@ -161,6 +193,19 @@ if exist "%EXODUS_VS%..\IDE\vcexpress.exe" set EXODUS_DEV="%EXODUS_VS%..\IDE\vce
 rem ---------------------------
 rem --- PACKAGING INSTALLER ---
 rem ---------------------------
-    set NSIS_PATH=D:\Program Files\NSIS
-rem set NSIS_PATH=C:\Program Files (x86)\NSIS
+set EXODUS_PACK=%PROGRAM_DRIVE%\Program Files (x86)\NSIS\makensis.exe
+if not exist "%EXODUS_PACK%" set EXODUS_PACK=%PROGRAM_DRIVE%\Program Files\NSIS\makensis.exe
+
+if exist "%EXODUS_PACK%" goto gotnsis
+@echo MISSING "%EXODUS_PACK%" PROGRAM
+if "%EXODUS_BATCHMODE%" == "" pause
+exit
+:gotnsis
+@echo EXODUS_PACK=%EXODUS_PACK%
+
+rem ------------------------
+rem --- INSTALLER SCRIPT ---
+rem ------------------------
+rem there is no exodus_all2005.nsi
+set EXODUS_PACK="%EXODUS_PACK%" exodus_all.nsi
 

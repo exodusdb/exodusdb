@@ -11,4 +11,4 @@ call config.bat
 @echo %EXODUS_CLEAN%
 %EXODUS_CLEAN%
 
-if not EXODUS_BATCHMODE == "" pause
+if "%EXODUS_BATCHMODE%" == "" pause
