@@ -8,7 +8,9 @@ exit
 
 call config
 
-"%NSIS_PATH%\makensis.exe" %EXODUS_PROJECT%.nsi
+rem there is no exodus_all2005.nsi
+rem "%NSIS_PATH%\makensis.exe" %EXODUS_PROJECT%.nsi
+"%NSIS_PATH%\makensis.exe" exodus_all.nsi
 
 if not EXODUS_BATCHMODE == "" pause
 

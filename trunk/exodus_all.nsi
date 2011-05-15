@@ -40,7 +40,8 @@
 ;!define EXODUS_TOOLPATH "$%VS90COMNTOOLS%"
 ;!define EXODUS_TOOLPATH "$%VS100COMNTOOLS%"
 ;!define EXODUS_TOOLPATH c:\windows\system32
- !define EXODUS_TOOLPATH "$%EXODUS_TOOLPATH%"
+ !define EXODUS_TOOLPATHREL "$%EXODUS_TOOLPATHREL%"
+ !define EXODUS_TOOLPATHDEB "$%EXODUS_TOOLPATHDEB%"
 
 ;----------------------------------------------------------------
 ; EXODUS_PLATFORM MUST be x86 or x64
@@ -540,10 +541,10 @@ Section "All" SecAll
   ;File "${EXODUS_TOOLPATH}..\..\VC\redist\${EXODUS_PLATFORM}\Microsoft.VC${EXODUS_VCVERSION}.CRT\*"
   ;File "${EXODUS_TOOLPATH}..\..\VC\redist\Debug_NonRedist\${EXODUS_PLATFORM}\Microsoft.VC${EXODUS_VCVERSION}.DebugCRT\*"
   ;hard coded!
-  File "${EXODUS_TOOLPATH}\msvcr${EXODUS_VCVERSION}.dll"
-  File "${EXODUS_TOOLPATH}\msvcp${EXODUS_VCVERSION}.dll"
-  File "${EXODUS_TOOLPATH}\msvcr${EXODUS_VCVERSION}d.dll"
-  File "${EXODUS_TOOLPATH}\msvcp${EXODUS_VCVERSION}d.dll"
+  File "${EXODUS_TOOLPATHREL}\msvcr${EXODUS_VCVERSION}.dll"
+  File "${EXODUS_TOOLPATHREL}\msvcp${EXODUS_VCVERSION}.dll"
+  File "${EXODUS_TOOLPATHDEB}\msvcr${EXODUS_VCVERSION}d.dll"
+  File "${EXODUS_TOOLPATHDEB}\msvcp${EXODUS_VCVERSION}d.dll"
 
   ;dont do exodus.dll since we may want the debug version - below
   ;File /x exodus.dll /x libpq.dll release\*.dll
