@@ -160,9 +160,6 @@
     <ClCompile Include="..\..\src\list.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="printtext.h" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\..\exodus\exodus\exodus\exodus.vcxproj">
       <Project>{8963eb1b-97d5-47c0-bf00-8f9b828b3139}</Project>
     </ProjectReference>
