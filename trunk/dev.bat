@@ -12,4 +12,4 @@ call config.bat
 @echo %EXODUS_DEV%
 %EXODUS_DEV%
 
-rem if not EXODUS_BATCHMODE == "" pause
+if "%EXODUS_BATCHMODE%" == "" pause

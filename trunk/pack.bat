@@ -8,11 +8,16 @@ exit
 
 call config
 
-rem there is no exodus_all2005.nsi
-rem "%NSIS_PATH%\makensis.exe" %EXODUS_PROJECT%.nsi
-"%NSIS_PATH%\makensis.exe" exodus_all.nsi
+rem if not X%EXODUS_PACK%X == XX goto gotexoduspack
+rem @echo MISSING EXODUS_PACK ENVIRONMENT VARIABLE
+rem if "%EXODUS_BATCHMODE%" == "" pause
+rem exit
+rem :gotexoduspack
+rem @echo EXODUS_PACK=%EXODUS_PACK%
 
-if not EXODUS_BATCHMODE == "" pause
+%EXODUS_PACK%
+
+if "%EXODUS_BATCHMODE%" == "" pause
 
 rem ----- INSTALLING ----
 rem exodus-x86-11.5.3.exe
