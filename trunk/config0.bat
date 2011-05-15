@@ -70,9 +70,9 @@ rem ----------------------------------
 rem --- Platform and Configuration ---
 rem ----------------------------------
 rem call setenv /x86 /debug
-rem call setenv /x86 /release
+ call setenv /x86 /release
 rem call setenv /x64 /debug
-    call setenv /x64 /release
+rem    call setenv /x64 /release
 echo on
 
 rem ------------------------
@@ -125,6 +125,7 @@ rem -------------------
 rem uncomment if you have binaries here but best to build from scratch to avoid 0xc0150002 error
 rem Downloaded Binaries
 rem set BOOST32=%PROGRAM_DRIVE%\Program Files\Boost\boost_1_46_1
+rem set BOOST32=%PROGRAM_DRIVE%\Program Files (x86)\Boost\boost_1_46_1
 rem Built Binaries in something\stage32
     set BOOST32=%BUILD_DRIVE%\boost_1_46_1
 

@@ -93,7 +93,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>libpq.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(BOOST32)\lib32;$(BOOST32)\stage32\lib;$(BOOST32)\stage\lib;$(POSTGRESQL32)\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(BOOST32)\lib32;$(BOOST32)\stage32\lib;$(BOOST32)\lib;$(BOOST32)\stage\lib;$(POSTGRESQL32)\lib</AdditionalLibraryDirectories>
       <DelayLoadDLLs>libpq.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -140,7 +140,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>libpq.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(BOOST32)\lib32;$(BOOST32)\stage32\lib;$(BOOST32)\stage\lib;$(POSTGRESQL32)\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(BOOST32)\lib32;$(BOOST32)\stage32\lib;$(BOOST32)\lib;$(BOOST32)\stage\lib;$(POSTGRESQL32)\lib</AdditionalLibraryDirectories>
       <DelayLoadDLLs>libpq.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
