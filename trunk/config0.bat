@@ -17,11 +17,11 @@ rem best to install all building stuff like exodus/boost libraries etc on one dr
 rem maybe the same as the programs, maybe not.
 set BUILD_DRIVE=F:
 
-if "%EXODUS_DEV%" == "YES" goto aftersetenv
-
 rem set EXODUS_GENERAL=VS2005
  set EXODUS_GENERAL=SDK71
 
+rem setenv etc seems to cause some confusion to vcexpress
+if "%EXODUS_DEV%" == "YES" goto aftersetenv
 
 rem --------------
 rem --- VS2005 ---
