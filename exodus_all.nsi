@@ -641,7 +641,11 @@ Section "All" SecAll
   File exodus\exodus\exodus\library.h
   File exodus\exodus\exodus\xfunctor*.h
 
-  SetOutPath "$INSTDIR\projects"
+  ;SetOutPath "$INSTDIR\src"
+  createDirectory "$%APPDATA%\Exodus"
+  createDirectory "$%APPDATA%\Exodus\src"
+  createDirectory "$%APPDATA%\Exodus\bin"
+  SetOutPath "$%APPDATA%\Exodus\src"
 
   File cli\src\compile.cpp
   File cli\src\createfile.cpp
@@ -673,7 +677,7 @@ Section "All" SecAll
   SetShellVarContext all
 
   ;cannot see to add %APPDATA% in local machine path so have to do for current user only :(
-  ${EnvVarUpdate} $0 "PATH" "A" "HKCU" "$APPDATA\${EXODUS_PRODUCTNAME}"
+  ${EnvVarUpdate} $0 "PATH" "A" "HKCU" "$APPDATA\${EXODUS_PRODUCTNAME}\bin"
 
   ;Store installation folder
   WriteRegStr HKCU "Software\${EXODUS_PRODUCTNAME}\${EXODUS_MINOR_VERSION}" "" $INSTDIR
@@ -743,24 +747,30 @@ Section "Uninstall"
   RMDir "$INSTDIR\include\exodus"
   RMDir "$INSTDIR\include"
 
-  Delete "$INSTDIR\projects\compile.cpp"
-  Delete "$INSTDIR\projects\createfile.cpp"
-  Delete "$INSTDIR\projects\createindex.cpp"
-  Delete "$INSTDIR\projects\delete.cpp"
-  Delete "$INSTDIR\projects\deletefile.cpp"
-  Delete "$INSTDIR\projects\deleteindex.cpp"
-  Delete "$INSTDIR\projects\edic.cpp"
-  Delete "$INSTDIR\projects\edir.cpp"
-  Delete "$INSTDIR\projects\list.cpp"
-  Delete "$INSTDIR\projects\printtext.h"
-  Delete "$INSTDIR\projects\listfiles.cpp"
-  Delete "$INSTDIR\projects\listindexes.cpp"
-  Delete "$INSTDIR\projects\testsort.cpp"
-  Delete "$INSTDIR\projects\configexodus.cpp"
+  Delete "$%APPDATA%\${EXODUS_PRODUCTNAME}\src\compile.cpp"
+  Delete "$%APPDATA%\${EXODUS_PRODUCTNAME}\src\createfile.cpp"
+  Delete "$%APPDATA%\${EXODUS_PRODUCTNAME}\src\createindex.cpp"
+  Delete "$%APPDATA%\${EXODUS_PRODUCTNAME}\src\delete.cpp"
+  Delete "$%APPDATA%\${EXODUS_PRODUCTNAME}\src\deletefile.cpp"
+  Delete "$%APPDATA%\${EXODUS_PRODUCTNAME}\src\deleteindex.cpp"
+  Delete "$%APPDATA%\${EXODUS_PRODUCTNAME}\src\edic.cpp"
+  Delete "$%APPDATA%\${EXODUS_PRODUCTNAME}\src\edir.cpp"
+  Delete "$%APPDATA%\${EXODUS_PRODUCTNAME}\src\list.cpp"
+  Delete "$%APPDATA%\${EXODUS_PRODUCTNAME}\src\printtext.h"
+  Delete "$%APPDATA%\${EXODUS_PRODUCTNAME}\src\listfiles.cpp"
+  Delete "$%APPDATA%\${EXODUS_PRODUCTNAME}\src\listindexes.cpp"
+  Delete "$%APPDATA%\${EXODUS_PRODUCTNAME}\src\testsort.cpp"
+  Delete "$%APPDATA%\${EXODUS_PRODUCTNAME}\src\configexodus.cpp"
 
-  Delete "$INSTDIR\projects\blanksolution\*.*"
-  RMDir "$INSTDIR\projects\blanksolution"
-  RMDir "$INSTDIR\projects"
+  Delete "$%APPDATA%\${EXODUS_PRODUCTNAME}\src\blanksolution\*.*"
+  RMDir "$%APPDATA%\${EXODUS_PRODUCTNAME}\src\blanksolution"
+
+  ;src and bin may remain if they created any programs
+  RMDir "$%APPDATA%\${EXODUS_PRODUCTNAME}\src"
+  RMDir "$%APPDATA%\${EXODUS_PRODUCTNAME}\bin"
+
+  ;Exodus is likely to remain since we will not delete .exodus
+  RMDir "$%APPDATA%\${EXODUS_PRODUCTNAME}"
 
   Delete "$INSTDIR\Uninstall.exe"
 
