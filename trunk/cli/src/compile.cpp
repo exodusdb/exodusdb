@@ -436,7 +436,7 @@ program()
 
 				var homedir=osgetenv("APPDATA");
 				if (homedir) {
-					bindir=homedir^"\\Exodus";
+					bindir=homedir^"\\Exodus\\bin";
 					libdir=bindir;
 					//installcmd="copy /y";
 					installcmd="copy";
