@@ -101,6 +101,67 @@
   ;http://download.microsoft.com/download/d/3/4/d342efa6-3266-4157-a2ec-5174867be706/vcredist_x86.exe
   ;VC2005 x86 debug - no download available
 
+
+
+
+!include LogicLib.nsh
+ 
+!ifndef IPersistFile
+!define IPersistFile {0000010b-0000-0000-c000-000000000046}
+!endif
+!ifndef CLSID_ShellLink
+!define CLSID_ShellLink {00021401-0000-0000-C000-000000000046}
+!define IID_IShellLinkA {000214EE-0000-0000-C000-000000000046}
+!define IID_IShellLinkW {000214F9-0000-0000-C000-000000000046}
+!define IShellLinkDataList {45e2b4ae-b1c3-11d0-b92f-00a0c90312e1}
+	!ifdef NSIS_UNICODE
+	!define IID_IShellLink ${IID_IShellLinkW}
+	!else
+	!define IID_IShellLink ${IID_IShellLinkA}
+	!endif
+!endif
+ 
+ 
+ 
+Function ShellLinkSetRunAs
+System::Store S
+pop $9
+System::Call "ole32::CoCreateInstance(g'${CLSID_ShellLink}',i0,i1,g'${IID_IShellLink}',*i.r1)i.r0"
+${If} $0 = 0
+	System::Call "$1->0(g'${IPersistFile}',*i.r2)i.r0" ;QI
+	${If} $0 = 0
+		System::Call "$2->5(w '$9',i 0)i.r0" ;Load
+		${If} $0 = 0
+			System::Call "$1->0(g'${IShellLinkDataList}',*i.r3)i.r0" ;QI
+			${If} $0 = 0
+				System::Call "$3->6(*i.r4)i.r0" ;GetFlags
+				${If} $0 = 0
+					System::Call "$3->7(i $4|0x2000)i.r0" ;SetFlags ;SLDF_RUNAS_USER
+					${If} $0 = 0
+						System::Call "$2->6(w '$9',i1)i.r0" ;Save
+					${EndIf}
+				${EndIf}
+				System::Call "$3->2()" ;Release
+			${EndIf}
+		System::Call "$2->2()" ;Release
+		${EndIf}
+	${EndIf}
+	System::Call "$1->2()" ;Release
+${EndIf}
+push $0
+System::Store L
+FunctionEnd
+
+/* use like this
+CreateShortcut "$temp\test.lnk" "calc.exe"
+push "$temp\test.lnk"
+call ShellLinkSetRunAs
+pop $0
+DetailPrint HR=$0
+*/
+
+
+
 /**
  *  EnvVarUpdate.nsh
  *    : Environmental Variables: append, prepend, and remove entries
@@ -444,7 +505,7 @@ FunctionEnd
 
 ;Here starts Exodus
 
-SetCompressor /SOLID LZMA
+;SetCompressor /SOLID LZMA
 
 ;see following how to install for all users and still support uninstallation
 ;http://nsis.sourceforge.net/Shortcuts_removal_fails_on_Windows_Vista
@@ -619,7 +680,14 @@ Section "All" SecAll
   
   createDirectory "$SMPROGRAMS\${EXODUS_PRODUCTNAME}-${EXODUS_MINOR_VERSION}"
   createShortCut "$SMPROGRAMS\${EXODUS_PRODUCTNAME}-${EXODUS_MINOR_VERSION}\${EXODUS_PRODUCTNAME} Console.lnk" "$INSTDIR\bin\exodus.exe"
+
   createShortCut "$SMPROGRAMS\${EXODUS_PRODUCTNAME}-${EXODUS_MINOR_VERSION}\${EXODUS_PRODUCTNAME} Config.lnk" "$INSTDIR\bin\configexodus.exe"
+
+  ;make it "run as"
+  push "$SMPROGRAMS\${EXODUS_PRODUCTNAME}-${EXODUS_MINOR_VERSION}\${EXODUS_PRODUCTNAME} Config.lnk"
+  call ShellLinkSetRunAs
+  pop $0
+  DetailPrint HR=$0
 
   ;Create uninstaller
   WriteUninstaller "$INSTDIR\Uninstall.exe"
@@ -718,3 +786,35 @@ Section "Uninstall"
   ${un.EnvVarUpdate} $0 "PATH" "R" "HKCU" "$APPDATA\${EXODUS_PRODUCTNAME}"
 
 SectionEnd
+
+Function .onInit
+ 
+  ReadRegStr $R0 HKLM \
+  "Software\Microsoft\Windows\CurrentVersion\Uninstall\${EXODUS_PRODUCTNAME}-${EXODUS_MINOR_VERSION}" \
+  "UninstallString"
+  StrCmp $R0 "" done
+ 
+  MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION \
+  "${EXODUS_PRODUCTNAME}-${EXODUS_MINOR_VERSION} is already installed. $\n$\nClick `OK` to remove the \
+  previous version or `Cancel` to cancel this upgrade." \
+  IDOK uninst
+  Abort
+ 
+;Run the uninstaller
+uninst:
+  ClearErrors
+
+  ;The following variant lets the uninstaller remove itself, so the IfErrors block is not needed any more:
+  ;Exec $INSTDIR\uninst.exe ; instead of the ExecWait line
+  ExecWait '$R0 _?=$INSTDIR' ;Do not copy the uninstaller to a temp file
+ 
+  IfErrors no_remove_uninstaller done
+    ;You can either use Delete /REBOOTOK in the uninstaller or add some code
+    ;here to remove the uninstaller. Use a registry key to check
+    ;whether the user has chosen to uninstall. If you are using an uninstaller
+    ;components page, make sure all sections are uninstalled.
+  no_remove_uninstaller:
+ 
+done:
+ 
+FunctionEnd
