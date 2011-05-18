@@ -1,3 +1,6 @@
+#include <exodus/program.h>
+
+programinit()
 
 //.def file is one way on msvc to force library function names to be "undecorated"
 // and therefore usable in on demand library loading
@@ -9,21 +12,14 @@
 
 #define EXODUS_FUNCTOR_MAXNARGS 20
 
-#include <exodus/exodus.h>
+//#include <exodus/exodus.h>
 
 //#include <exodus/xfunctorf0.h>
 //ExodusFunctorF0<int> xyz;
 
-function getparam(in result, in paramname, out paramvalue)
-{
-        var posn=index(result.ucase(),"\n"^paramname.ucase()^"=");
-        if (not posn)
-                return false;
-        paramvalue=result.substr(posn+len(paramname)+2).field("\n",1);
-        return true;
-}
+var verbose;
 
-program()
+function main()
 {
 
         var command=COMMAND;
@@ -34,7 +30,7 @@ program()
         var usedeffile=false;
 
         //extract options
-        var verbose=index(OPTIONS.ucase(),"V");
+        verbose=index(OPTIONS.ucase(),"V");
         var debugging=not index(OPTIONS.ucase(),"O");
 //	verbose=1;
 
@@ -128,117 +124,16 @@ program()
                 if (verbose)
                         printl("Windows environment detected. Finding C++ compiler.");
 
+				//this calls sdk setenv or vcvars
+				set_environment();
+
+				if (verbose)
+                        printl("Searching for Exodus for include and lib directories");
+
                 //get current environment
                 var path=osgetenv("PATH");
                 var include=osgetenv("INCLUDE");
                 var lib=osgetenv("LIB");
-
-                //locate MS Visual Studio by environment variable or current disk or C:
-                var searchvars="CC VS110COMNTOOLS VS100COMNTOOLS VS90COMNTOOLS VS80COMNTOOLS VS70COMNTOOLS";
-                if (verbose)
-                        searchvars.outputl("Searching Environment Variables : " ^ searchvars);
-
-                var msvs;
-                for (var ii=1;; ++ii) {
-                        var envname=searchvars.field(" ",ii);
-                        if (not envname)
-                                break;
-                        msvs=osgetenv(envname);
-                        if (verbose)
-                                msvs.outputl(envname^" is ");
-                        if (msvs)
-                                break;
-                }
-
-                if (not msvs) {
-                        if (verbose)
-                                printl("Searching standard directories");
-
-                        var searched=searchvars ^ " environment variables";
-                        var searchdirs="";
-
-                        //Visual Studio future?
-                        searchdirs^=FM ^ "\\Program Files\\Microsoft Visual Studio 11.0\\Common7\\Tools\\";
-
-                        //Visual Studio 2010?
-                        searchdirs^=FM ^ "\\Program Files\\Microsoft Visual Studio 10.0\\Common7\\Tools\\";
-
-                        //Visual Studio 2008 (Paid and Express)
-                        searchdirs^=FM ^ "\\Program Files\\Microsoft Visual Studio 9.0\\Common7\\Tools\\";
-
-                        //Visual Studio 2005
-                        searchdirs^=FM ^ "\\Program Files\\Microsoft Visual Studio 8\\Common7\\Tools\\";
-
-                        //http://syzygy.isl.uiuc.edu/szg/doc/VisualStudioBuildVars.html for VS6 and VS2003 folder info
-
-                        //Visual Studio .NET 2003
-                        searchdirs^= FM ^ "\\Program Files\\Microsoft Visual Studio .NET 2003\\Common7\\Tools\\";
-
-                        //Visual Studio 6.0
-                        searchdirs^= FM ^ "\\Program Files\\Microsoft Visual Studio\\Common\\Tools\\";
-
-                        searchdirs.splicer(1,1,"");
-                        for (var ii=1;; ++ii) {
-                                msvs=searchdirs.extract(ii);
-                                if (not msvs)
-                                        break;
-                                if (osdir(msvs))
-                                        break;
-                                searched^="\n" ^ msvs;
-                                msvs.splicer(1,0,"C:");
-                                if (osdir(msvs))
-                                        break;
-                                searched^="\n" ^ msvs;
-                        }
-                        if (not msvs)
-                                abort("Searching for C++ Compiler:\n" ^ searched ^ "\nCannot find C++ compiler. Set environment variable CC to the MSVS COMMON TOOLS directory");
-                }
-
-                //call VSvars32 to get the path, include and lib
-                if (msvs) {
-                        if (msvs[-1] ne SLASH)
-                                msvs^=SLASH;
-                        //get lib/path/include from batch file
-                        var tempfilenamebase="comp$" ^rnd(99999999);
-						var batfilename=msvs ^ "..\\..\\vc\\vcvarsall.bat";
-						if (not osfile(batfilename))
-							batfilename=msvs ^ "vsvars32.bat";
-                        var script="call " ^ batfilename.quote();
-						script^=" "^PLATFORM_;
-                        script^="\nset";
-                        if (verbose)
-                                printl("Calling script ", script);
-                        oswrite(script,tempfilenamebase^".cmd");
-                        osshell(tempfilenamebase ^ ".cmd > " ^ tempfilenamebase ^ ".$$$");
-                        var result;
-                        if (osread(result, tempfilenamebase^".$$$")) {
-                                //if (verbose)
-                                //	printl(result);
-                                //printl(result);
-                                result.converter("\r","\n");
-                                var value;
-                                if (getparam(result,"PATH",value))
-                                        path=value;
-                                if (getparam(result,"INCLUDE",value))
-                                        include=value;
-                                if (getparam(result,"LIB",value))
-                                        lib=value;
-                                /*
-                                if (verbose)
-                                {
-                                	printl("\nPATH=",path);
-                                	printl("\nINCLUDE=",include);
-                                	printl("\nLIB=",lib);
-                                }
-                                */
-
-                        }
-                        osdelete(tempfilenamebase^".cmd");
-                        osdelete(tempfilenamebase^".$$$");
-                }
-
-                if (verbose)
-                        printl("Searching for Exodus for include and lib directories");
 
                 //locate EXODUS_PATH by executable path, environment variable or current disk or C:
 				//EXODUS_PATH is the parent directory of bin and include etc.
@@ -807,7 +702,7 @@ var inclusion=
                 var newobjfileinfo=osfile(objfilename);
                 if (not newobjfileinfo) {
 						printl(oscwd());
-                        print("Error: Cannot output output file "^objfilename^". Press Enter");input();
+                        printl("Error: Cannot output file "^objfilename^". Press Enter");input();
                         continue;
                 }
 
@@ -893,4 +788,173 @@ var inclusion=
                         }
                 }//compilation
         }//fileno
+		return true;
 }
+
+function set_environment() {
+
+	if (verbose)
+		printl("Searching standard directories");
+
+	var searchdirs="";
+
+	searchdirs^=FM ^ osgetenv("CC");
+
+	//Visual Studio future?
+	searchdirs^=FM ^ "\\Program Files\\Microsoft Visual Studio 11.0\\Common7\\Tools\\";
+	searchdirs^=FM ^ osgetenv("VS110COMNTOOLS");
+
+	searchdirs^=FM ^ "\\Program Files\\Microsoft SDKs\\Windows\\v7.1\\bin\\";
+
+	//Visual Studio 2010?
+	searchdirs^=FM ^ "\\Program Files\\Microsoft Visual Studio 10.0\\Common7\\Tools\\";
+	searchdirs^=FM ^ osgetenv("VS100COMNTOOLS");
+
+	searchdirs^=FM ^ "\\Program Files\\Microsoft SDKs\\Windows\\v7.0a\\bin\\";
+
+	//Visual Studio 2008 (Paid and Express)
+	searchdirs^=FM ^ "\\Program Files\\Microsoft Visual Studio 9.0\\Common7\\Tools\\";
+	searchdirs^=FM ^ osgetenv("VS90COMNTOOLS");
+
+	//Visual Studio 2005
+	searchdirs^=FM ^ "\\Program Files\\Microsoft Visual Studio 8\\Common7\\Tools\\";
+	searchdirs^=FM ^ osgetenv("VS80COMNTOOLS");
+
+	//http://syzygy.isl.uiuc.edu/szg/doc/VisualStudioBuildVars.html for VS6 and VS2003 folder info
+
+	//Visual Studio .NET 2003
+	searchdirs^= FM ^ "\\Program Files\\Microsoft Visual Studio .NET 2003\\Common7\\Tools\\";
+	searchdirs^= FM ^ osgetenv("V70COMNTOOLS");
+
+	//Visual Studio 6.0
+	searchdirs^= FM ^ "\\Program Files\\Microsoft Visual Studio\\Common\\Tools\\";
+	searchdirs^= FM ^ osgetenv("VS60COMNTOOLS");
+
+	searchdirs.splicer(1,1,"").trimmer(FM);
+	var searched="";
+	var batfilename="";
+
+	for (var ii=1;; ++ii) {
+
+		var msvs=searchdirs.extract(ii);
+		if (not msvs)
+			break;
+
+		if (msvs[-1] ne SLASH)
+			msvs^=SLASH;
+		searched^="\n" ^ msvs;
+
+		//get lib/path/include from batch file
+		if (osdir(msvs)) {
+			batfilename=msvs ^ "setenv.cmd";
+			if (osfile(batfilename))
+				break;
+			batfilename=msvs ^ "..\\..\\vc\\vcvarsall.bat";
+			if (osfile(batfilename))
+				break;
+			batfilename=msvs ^ "vsvars32.bat";
+			if (osfile(batfilename))
+				break;
+		}
+
+		//look for path on C:
+		msvs.splicer(1,0,"C:");
+		searched^="\n" ^ msvs;
+
+		//get lib/path/include from batch file
+		if (osdir(msvs)) {
+			batfilename=msvs ^ "setenv.cmd";
+			if (osfile(batfilename))
+				break;
+			batfilename=msvs ^ "..\\..\\vc\\vcvarsall.bat";
+			if (osfile(batfilename))
+				break;
+			batfilename=msvs ^ "vsvars32.bat";
+			if (osfile(batfilename))
+				break;
+		}
+
+		batfilename="";
+	}
+	if (not batfilename)
+			abort("Searching for C++ Compiler:\n" ^ searched ^ "\nCannot find C++ compiler. Set environment variable CC to the MSVS COMMON TOOLS directory");
+
+	var script="call " ^ batfilename.quote();
+
+	//work out the options from the PLATFORM_ (and perhaps debug mode)
+	var options=PLATFORM_;
+	if (index(batfilename,"setenv.cmd")) {
+		if (options=="x86")
+			options="Win32";
+		options="//"^options;
+	}
+	script^=" "^options;
+
+	//track first line of batch file which is the compiler configuration line
+	if (verbose)
+		outputl("COMPILER="^script);
+
+	script^="\nset";
+	if (verbose)
+			printl("Calling script ", script);
+
+	//create a temporary command file
+	var tempfilenamebase=osgetenv("TEMP")^"\\exoduscomp$" ^rnd(99999999);
+	oswrite(script,tempfilenamebase^".cmd");
+
+	//run and get the output of the command
+	osshell(tempfilenamebase ^ ".cmd > " ^ tempfilenamebase ^ ".$$$");
+	var result;
+	if (osread(result, tempfilenamebase^".$$$")) {
+
+		//if (verbose)
+		//	printl(result);
+		//printl(result);
+
+		dim vars;
+		var nvars=matparse(result.converter("\r\n",FM^FM),vars);
+		for (var varn=1;varn<=nvars;++varn) {
+			ossetenv(
+				field(vars(varn),'=',1)
+				,field(vars(varn),'=',2,999999)
+				);
+			output(
+				field(vars(varn),'=',1)
+				^"="
+				^field(vars(varn),'=',2,999999)
+				);
+		}
+	/*
+		var value;
+		if (getparam(result,"PATH",value))
+				path=value;
+		if (getparam(result,"INCLUDE",value))
+				include=value;
+		if (getparam(result,"LIB",value))
+				lib=value;
+
+		//if (verbose)
+		//{
+		//	printl("\nPATH=",path);
+		//	printl("\nINCLUDE=",include);
+		//	printl("\nLIB=",lib);
+		//}
+	        
+	*/
+	}
+	osdelete(tempfilenamebase^".cmd");
+	osdelete(tempfilenamebase^".$$$");
+
+	return true;
+}
+
+function getparam(in result, in paramname, out paramvalue)
+{
+	var posn=index(result.ucase(),"\n"^paramname.ucase()^"=");
+	if (not posn)
+		return false;
+	paramvalue=result.substr(posn+len(paramname)+2).field("\n",1);
+	return true;
+}
+
+programexit()
