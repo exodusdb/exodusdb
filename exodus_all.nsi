@@ -102,6 +102,7 @@
 ;!define REDIST_URL1 http://download.microsoft.com/download/5/B/C/5BC5DBB3-652D-4DCE-B14A-475AB85EEF6E/vcredist_x86.exe
 
 !define REDIST_DESC "$%REDIST_DESC%"
+
 !define REDIST_SOURCE1 "$%REDIST_SOURCE1%"
 !define REDIST_URL1 $%REDIST_URL1%
 
@@ -702,6 +703,7 @@ Section "All" SecAll
   SetShellVarContext all
 
   ;cannot see to add %APPDATA% in local machine path so have to do for current user only :(
+  ;dont forget to remove the same in uninstall!
   ${EnvVarUpdate} $0 "PATH" "A" "HKCU" "$APPDATA\${EXODUS_PRODUCTNAME}\bin"
 
   ;Store installation folder
@@ -749,14 +751,16 @@ Section "${REDIST_DESC} Redist (req.)" SEC_CRT
 
   SetOutPath "$TEMP"
 
+  ;download source 1
   DetailPrint "Downloading ${REDIST_DESC} Redistributable Setup..."
   DetailPrint "Contacting ${REDIST_SOURCE1} ..."
-  NSISdl::download /TIMEOUT=15000 "${REDIST_URL1}" "${REDIST_FILENAME}"
+  NSISdl::download /TIMEOUT=15000 "${REDIST_URL1}xxxxxxxxxxxx" "${REDIST_FILENAME}"
 
   Pop $R0 ;Get the return value
   StrCmp $R0 "success" OnSuccess
   DetailPrint "Could not contact ${REDIST_SOURCE1}, or the file has been (re)moved!"
 
+  ;download source2
   DetailPrint "Contacting ${REDIST_SOURCE2} ..."
   NSISdl::download /TIMEOUT=20000 "${REDIST_URL2}" "${REDIST_FILENAME}"
 
@@ -764,16 +768,19 @@ Section "${REDIST_DESC} Redist (req.)" SEC_CRT
   ;Pop $R0 ;Get the return value
   ;StrCmp $R0 "success" +2
   ;DetailPrint "Contacting ${REDIST_SOURCE3} ..."
-  ;NSISdl::download /TIMEOUT=20000 "${REDIST_URL3}" "${REDIST_FILENAME}"
+  ;NSISdl::download /TIMEOUT=30000 "${REDIST_URL3}" "${REDIST_FILENAME}"
 
   Pop $R0 ;Get the return value
-  StrCmp $R0 "success" +2
-    MessageBox MB_OK "Could not download ${REDIST_DESC}, none of the mirrors appear to be functional."
+ ; StrCmp $R0 "success" +2
+  StrCmp $R0 "success" OnSuccess
+    MessageBox MB_OK "Could not download ${REDIST_DESC}, none of the mirrors appear to be functional. Please download it from Microsoft."
     Goto done
 
 OnSuccess:
   DetailPrint "Running ${REDIST_DESC} Setup..."
-  ExecWait '"$TEMP\${REDIST_FILENAME}" /qb'
+  ;gives command line option syntax error on vs2005
+;  ExecWait '"${REDIST_FILENAME}" /qb'
+  ExecWait '"${REDIST_FILENAME}" /q'
   DetailPrint "Finished ${REDIST_DESC} Setup"
   
   Delete "$TEMP\${REDIST_FILENAME}"
@@ -875,7 +882,7 @@ Section "Uninstall"
 
   ;remove the path to binaries HKLM=Local Machine and HKCU=Current User
   ${un.EnvVarUpdate} $0 "PATH" "R" "HKLM" "$INSTDIR\bin"
-  ${un.EnvVarUpdate} $0 "PATH" "R" "HKCU" "$APPDATA\${EXODUS_PRODUCTNAME}"
+  ${un.EnvVarUpdate} $0 "PATH" "R" "HKCU" "$APPDATA\${EXODUS_PRODUCTNAME}\bin"
 
 SectionEnd
 
