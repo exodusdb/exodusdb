@@ -6,6 +6,11 @@ pause
 exit
 :gotconfig
 
+    set TARGET_CPU=x86
+rem set TARGET_CPU=x64
+    set Configuration=Release
+rem set Configuration=Debug
+
 rem --------------
 rem --- ADVICE ---
 rem --------------
@@ -17,15 +22,15 @@ rem best to install all building stuff like exodus/boost libraries etc on one dr
 rem maybe the same as the programs, maybe not.
 set BUILD_DRIVE=F:
 
+if "%EXODUS_DEV%" == "YES" goto aftersetenv
+
 rem set EXODUS_GENERAL=VS2005
  set EXODUS_GENERAL=SDK71
 
-rem setenv etc seems to cause some confusion to vcexpress
-if "%EXODUS_DEV%" == "YES" goto aftersetenv
 
-rem --------------
-rem --- VS2005 ---
-rem --------------
+rem ---------------------------------------------------------------
+rem --- VS2005                                                  ---
+rem ---------------------------------------------------------------
 
 if NOT "%EXODUS_GENERAL%" == "VS2005" goto defaultbuilder
 
@@ -54,14 +59,31 @@ rem set EXODUS_TOOLPATHREL=%PROGRAM_DRIVE%\Program Files\Microsoft Visual Studio
 rem set EXODUS_TOOLPATHDEB=%PROGRAM_DRIVE%\Program Files\Microsoft Visual Studio 8\VC\redist\Debug_NonRedist\amd64\Microsoft.VC80.DebugCRT
 set EXODUS_VCVERSION=80
 
-goto sanitychecks
+rem -----------------------------
+rem --- 2005 Redistributables ---
+rem -----------------------------
+
+if "%TARGET_CPU%" == "x64" goto redist2005x64
+rem --- NOTE: QUOTE THE URLS! and NOT DESC/SOURCE! ---
+set REDIST_DESC=MSVC++ 2005 x86 SP1
+set REDIST_SOURCE1=Microsoft.com
+set REDIST_URL1="http://download.microsoft.com/download/e/1/c/e1c773de-73ba-494a-a5ba-f24906ecf088/vcredist_x86.exe"
+goto gotredist2005
+:redist2005x64
+set REDIST_DESC=MSVC++ 2005 x64 SP1
+set REDIST_SOURCE1=Microsoft.com
+set REDIST_URL1="http://download.microsoft.com/download/d/4/1/d41aca8a-faa5-49a7-a5f2-ea0aa4587da0/vcredist_x64.exe"
+:gotredist2005
+set REDIST_SOURCE2=0
+set REDIST_URL2=0
+
+goto gototoolset
 
 
 :defaultbuilder
-
-rem ---------------------------
-rem --- SDK 7.1 the default ---
-rem ---------------------------
+rem -------------------------------------------------------------------------
+rem --- SDK 7.1 the default                                               ---
+rem -------------------------------------------------------------------------
 
     path %PROGRAM_DRIVE%\Program Files\Microsoft SDKs\Windows\v7.1\Bin;%PATH%
 rem path %PATH%;%PROGRAM_DRIVE%\Program Files\Microsoft SDKs\Windows\v7.1\Bin
@@ -70,9 +92,10 @@ rem ----------------------------------
 rem --- Platform and Configuration ---
 rem ----------------------------------
 rem call setenv /x86 /debug
- call setenv /x86 /release
+rem call setenv /x86 /release
 rem call setenv /x64 /debug
-rem    call setenv /x64 /release
+rem call setenv /x64 /release
+    call setenv /%TARGET_CPU% /%Configuration
 echo on
 
 rem ------------------------
@@ -83,6 +106,30 @@ rem and location of msvcrNNd.dll etc c runtime dlls
 set EXODUS_TOOLPATHREL=C:Windows\system32
 set EXODUS_TOOLPATHDEB=C:Windows\system32
 set EXODUS_VCVERSION=100
+
+rem -----------------------------
+rem --- 2010 Redistributables ---
+rem -----------------------------
+rem 2008x86 is "http://download.microsoft.com/download/d/d/9/dd9a82d0-52ef-40db-8dab-795376989c03/vcredist_x86.exe"
+
+if "%TARGET_CPU%" == "x64" goto redist2010x64
+rem --- NOTE: QUOTE THE URLS! and NOT DESC/SOURCE! ---
+set REDIST_DESC=MSVC++ 2010 x86
+set REDIST_SOURCE1=Microsoft.com
+set REDIST_URL1="http://download.microsoft.com/download/5/B/C/5BC5DBB3-652D-4DCE-B14A-475AB85EEF6E/vcredist_x86.exe"
+goto gotredist2010
+:redist2010x64
+set REDIST_DESC=MSVC++ 2010 x64
+set REDIST_SOURCE1=Microsoft.com
+set REDIST_URL1="http://download.microsoft.com/download/3/2/2/3224B87F-CFA0-4E70-BDA3-3DE650EFEBA5/vcredist_x64.exe"
+:gotredist2010
+@echo REDIST_DESC=%REDIST_DESC%
+@echo REDIST_SOURCE1=%REDIST_SOURCE1%
+@echo REDIST_URL1=%REDIST_URL1%
+set REDIST_SOURCE2=0
+set REDIST_URL2=0
+
+:gottoolset
 
 :sanitychecks
 

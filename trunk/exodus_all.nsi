@@ -11,9 +11,17 @@
 ; EXODUS_TOOLPATH      eg C:\Windows\system32 - location of msvcrNNd.dll etc
 ;
 ; EXODUS_MINOR_VERSION eg 11.5
-; EXODUS_MICRO_VERSION eq 11.5.3
-; EXODUS_PRODUCTNAME   eq Exodus or Exodus64
-; SOURCE_PATH          eq debug release x64\debug x64\release
+; EXODUS_MICRO_VERSION eg 11.5.3
+; EXODUS_PRODUCTNAME   eg Exodus or Exodus64
+; SOURCE_PATH          eg debug release x64\debug x64\release
+
+; REDIST_DESC          eg "MSVC++ 2010"
+; REDIST_SOURCE1       eg "Microsoft.com"
+; REDIST_URL1          eg "http://download.microsoft.com/download/5/B/C/5BC5DBB3-652D-4DCE-B14A-475AB85EEF6E/vcredist_x86.exe"
+; REDIST_SOURCE2       optional
+; REDIST_URL2          optional
+; REDIST_SOURCE3       optional
+; REDIST_URL2          optional
 
 ;;;;;;;;; package parameters ;;;;;;;;;;;;;;;;;;;;
 
@@ -85,6 +93,21 @@
  !define EXODUS_CODENAME "$%EXODUS_CODENAME%"
 
  !define debugorrelease "$%EXODUS_BINARIES%"
+
+;-----------------------------------------
+;NAME, SOURCES AND URLS OF REDISTRIBUTABLE
+;-----------------------------------------
+;!define REDIST_DESC MSVC++ 2010
+;!define REDIST_SOURCE1 Microsoft.com
+;!define REDIST_URL1 http://download.microsoft.com/download/5/B/C/5BC5DBB3-652D-4DCE-B14A-475AB85EEF6E/vcredist_x86.exe
+
+!define REDIST_DESC "$%REDIST_DESC%"
+!define REDIST_SOURCE1 "$%REDIST_SOURCE1%"
+!define REDIST_URL1 $%REDIST_URL1%
+
+!define REDIST_SOURCE2 "$%REDIST_SOURCE2%"
+!define REDIST_URL2 $%REDIST_URL2%
+
 
 ;;;;;;;;;;;;; end of package parameters ;;;;;;;;;;;;;;;;;;;;
 
@@ -515,7 +538,7 @@ RequestExecutionLevel admin #NOTE: You still need to check user rights with User
 ;--------------------------------
 ;Include Modern UI
 
-  !include "MUI.nsh"
+  !include "MUI2.nsh"
 
 ;--------------------------------
 ;General
@@ -535,14 +558,16 @@ RequestExecutionLevel admin #NOTE: You still need to check user rights with User
 ;--------------------------------
 ;Pages
 
+
   ;!insertmacro MUI_PAGE_LICENSE "${NSISDIR}\Contrib\Modern UI\License.txt"
   !insertmacro MUI_PAGE_LICENSE "COPYING"
   !insertmacro MUI_PAGE_COMPONENTS
   !insertmacro MUI_PAGE_DIRECTORY
   !insertmacro MUI_PAGE_INSTFILES
-  
+
   !insertmacro MUI_UNPAGE_CONFIRM
   !insertmacro MUI_UNPAGE_INSTFILES
+
   
 ;--------------------------------
 ;Languages
@@ -708,16 +733,73 @@ Section "All" SecAll
 
 SectionEnd
 
+
+!define REDIST_FILENAME "vcredist_tmp.exe"
+Section "${REDIST_DESC} Redist (req.)" SEC_CRT
+
+;  SectionIn RO
+
+;dont bother attempting to detect since it doesnt seem to appear to work everywhere
+;  ; Detection made easy: Unlike previous redists, VC2010 now generates a platform
+;  ; independent key for checking availability.
+;  
+;  ReadRegDword $R0 HKLM "SOFTWARE\Microsoft\VisualStudio\10.0\VC\VCRedist\x86" "Installed"
+;  IfErrors done
+;  StrCmp $R0 "1" done
+
+  SetOutPath "$TEMP"
+
+  DetailPrint "Downloading ${REDIST_DESC} Redistributable Setup..."
+  DetailPrint "Contacting ${REDIST_SOURCE1} ..."
+  NSISdl::download /TIMEOUT=15000 "${REDIST_URL1}" "${REDIST_FILENAME}"
+
+  Pop $R0 ;Get the return value
+  StrCmp $R0 "success" OnSuccess
+  DetailPrint "Could not contact ${REDIST_SOURCE1}, or the file has been (re)moved!"
+
+  DetailPrint "Contacting ${REDIST_SOURCE2} ..."
+  NSISdl::download /TIMEOUT=20000 "${REDIST_URL2}" "${REDIST_FILENAME}"
+
+  ;[TODO] Provide 3rd Source
+  ;Pop $R0 ;Get the return value
+  ;StrCmp $R0 "success" +2
+  ;DetailPrint "Contacting ${REDIST_SOURCE3} ..."
+  ;NSISdl::download /TIMEOUT=20000 "${REDIST_URL3}" "${REDIST_FILENAME}"
+
+  Pop $R0 ;Get the return value
+  StrCmp $R0 "success" +2
+    MessageBox MB_OK "Could not download ${REDIST_DESC}, none of the mirrors appear to be functional."
+    Goto done
+
+OnSuccess:
+  DetailPrint "Running ${REDIST_DESC} Setup..."
+  ExecWait '"$TEMP\${REDIST_FILENAME}" /qb'
+  DetailPrint "Finished ${REDIST_DESC} Setup"
+  
+  Delete "$TEMP\${REDIST_FILENAME}"
+
+done:
+SectionEnd
+
+
+
+
+
 ;--------------------------------
 ;Descriptions
 
   ;Language strings
   LangString DESC_SecAll ${LANG_ENGLISH} "All Software"
 
+  LangString DESC_CRT    ${LANG_ENGLISH} "Will only be downloaded if you don't already have it installed."
+
   ;Assign language strings to sections
   !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
     !insertmacro MUI_DESCRIPTION_TEXT ${SecAll} $(DESC_SecAll)
+;  !insertmacro MUI_DESCRIPTION_TEXT ${SEC_CRT2008}     $(DESC_CRT2008)
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC_CRT}     $(DESC_CRT)
   !insertmacro MUI_FUNCTION_DESCRIPTION_END
+
 
 ;--------------------------------
 ;Uninstaller Section
@@ -797,6 +879,10 @@ Section "Uninstall"
 
 SectionEnd
 
+
+;--------------------------------
+;onInit Function
+
 Function .onInit
  
   ReadRegStr $R0 HKLM \
@@ -828,3 +914,6 @@ uninst:
 done:
  
 FunctionEnd
+
+
+
