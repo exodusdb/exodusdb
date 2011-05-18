@@ -34,12 +34,13 @@ rem or if EXODUS_BOOSTPRO=="YES" C:\Program Files\Boost\1_46_1\bin
 rem ----------------------------------------------
 rem --- TYPE OF BUILD - PICK *ONE* FROM *EACH* ---
 rem ----------------------------------------------
-    set TARGET_CPU=x86
-rem set TARGET_CPU=x64
-
+rem set TARGET_CPU=x86
 rem
- set Configuration=Release
-rem set Configuration=Debug
+ set TARGET_CPU=x64
+
+rem set Configuration=Release
+rem
+ set Configuration=Debug
 
     set EXODUS_TOOLSET=VS2005
 rem set EXODUS_TOOLSET=SDK71
@@ -126,7 +127,8 @@ rem \stage\lib
 rem ----- POSTGRESQL -----
 rem ----------------------
     set POSTGRESQL32=%EXODUS_PROGRAMFILES32%\PostgreSQL\%EXODUS_PGVERSION%
-    set POSTGRESQL64=%EXODUS_PROGRAMFILES64%\PostgreSQL\%EXODUS_PGVERSION%
+rem    set POSTGRESQL64=%EXODUS_PROGRAMFILES64%\PostgreSQL\%EXODUS_PGVERSION%
+    set POSTGRESQL64=D:\pg9dev
 rem solutions/projects search for includes and libs as follows:
 rem \include
 rem \stage\lib
@@ -150,14 +152,10 @@ rem path %EXODUS_PROGRAMFILES32%\Microsoft Visual Studio 8\VC\;%PATH%
     path %PATH%;%EXODUS_PROGRAMFILES32%\Microsoft Visual Studio 8\VC\
 
 rem --- x86 command prompt ---
- call vcvarsall.bat x86
- set Configuration=Release
- set TARGET_CPU=x86
+    if %TARGET_CPU%==x86 call vcvarsall.bat x86
 
 rem --- VS2005 cross compiler ---
-rem call vcvarsall.bat x86_amd64
-rem set Configuration=Release
-rem set TARGET_CPU=x64
+    if %TARGET_CPU%==x64 call vcvarsall.bat x86_amd64
 
 rem -----------------------
 rem --- VS2005 Binaries ---
