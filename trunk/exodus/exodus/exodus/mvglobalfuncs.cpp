@@ -1184,6 +1184,8 @@ int exodus_main(int exodus__argc, char *exodus__argv[], MvEnvironment& mv)
 
 	//reconstructs complete original sentence unfortunately quote marks will have been lost unless escaped
 	//needs to go after various exodus definitions
+	//how the MSVCRT tokenizes arguments http://msdn.microsoft.com/en-us/library/a1y7w461.aspx
+	//http://stackoverflow.com/questions/4094699/how-does-the-windows-command-interpreter-cmd-exe-parse-scripts
 	for (int ii=0; ii<exodus__argc; ++ii)
 	{
 		var word=var(exodus__argv[ii]);

@@ -215,8 +215,9 @@ program()
 							blankfile^="programinit()\n";
 							blankfile^="\n";
 							blankfile^="function main(";
-							if (progtype eq "classlib")
-								blankfile^="/*in arg1, out arg2*/";
+							//the .h maker not able to parse this yet and is rather clumsy anyway
+							//if (progtype eq "classlib")
+							//	blankfile^="/*in arg1, out arg2*/";
 							blankfile^=") {\n";
 							blankfile^="\tprintl(\""^basefilename^" says 'Hello World!'\");\n";
 							blankfile^="\treturn 0;\n";
