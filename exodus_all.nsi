@@ -42,6 +42,7 @@
 ;!define EXO_VCVERSION "90"
 ;!define EXO_VCVERSION "100"
  !define EXO_VCVERSION "$%EXO_VCVERSION%"
+ !define EXO_REDISTDOTVER "$%EXO_REDISTDOTVER%"
 ;------------------------------------------
 ; WHERE IS VC RUNTIME VERSION TO DISTRIBUTE
 ; currently hard coded?! otherwise
@@ -82,7 +83,7 @@
  !define EXO_DOTTEDMINORVERSION "$%EXO_MAJOR_VER%.$%EXO_MINOR_VER%"
  !define EXO_DOTTEDMICROVERSION "$%EXO_MAJOR_VER%.$%EXO_MINOR_VER%.$%EXO_MICRO_VER%"
 
- !define EXO_PRODUCTNAME_AND_DOTTEDMICROVERSION "$%EXO_PRODUCTNAME% $%EXO_MAJOR_VER%.$%EXO_MINOR_VER%.$%EXO_MICRO_VER%-$%EXO_PLATFORM%"
+ !define EXO_PRODUCTNAME_AND_DOTTEDMICROVERSION "$%EXO_PRODUCTNAME% $%EXO_MAJOR_VER%.$%EXO_MINOR_VER%.$%EXO_MICRO_VER%-$%TARGET_CPU%"
 
  !define EXO_INSTDIR "C:\$%EXO_PRODUCTNAME%$%EXO_MAJOR_VER%$%EXO_MINOR_VER%"
 
@@ -764,9 +765,14 @@ Section "${REDIST_DESC} Redist (req.)" SEC_CRT
 ;  ; Detection made easy: Unlike previous redists, VC2010 now generates a platform
 ;  ; independent key for checking availability.
 ;  
-;  ReadRegDword $R0 HKLM "SOFTWARE\Microsoft\VisualStudio\10.0\VC\VCRedist\x86" "Installed"
-;  IfErrors done
-;  StrCmp $R0 "1" done
+  ;VCVER is like 10.0
+  ReadRegDword $R0 HKLM "SOFTWARE\Microsoft\VisualStudio\$%EXO_REDISTDOTVER%\VC\Runtimes\$%TARGET_CPU%" "Installed"
+  IfErrors done
+  StrCmp $R0 "1" done
+
+  ReadRegDword $R0 HKLM "SOFTWARE\Microsoft\VisualStudio\$%EXO_REDISTDOTVER%\VC\VCRedist\$%TARGET_CPU%" "Installed"
+  IfErrors done
+  StrCmp $R0 "1" done
 
   SetOutPath "$TEMP"
 
@@ -817,7 +823,7 @@ SectionEnd
   ;Language strings
   LangString DESC_SecAll ${LANG_ENGLISH} "All Software"
 
-  LangString DESC_CRT    ${LANG_ENGLISH} "Will only be downloaded if you don't already have it installed."
+  LangString DESC_CRT    ${LANG_ENGLISH} "should only be downloaded if you don't already have it installed but if you know you have it - uncheck this."
 
   ;Assign language strings to sections
   !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
