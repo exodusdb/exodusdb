@@ -1,13 +1,25 @@
-rem --- dev.bat, make.bat, clean.bat, pack.bat and upload.bat all call config.bat to initialise ---
+rem ---------------------------------------------------------
+rem --- dev.bat, make.bat, clean.bat, pack.bat and upload.bat
+rem ---  all call this config.bat to initialise ---
+rem ---------------------------------------------------------
 
-rem --- preconfiguration ---
-rem --- you can create preconfig.bat to do any local preconfiguration
-    if exist preconfig.bat call preconfig %*
+rem --------------------------------------
+rem --- preconfiguration - config2.bat ---
+rem --------------------------------------
+rem you must create config2.bat to do any local preconfiguration
+rem for example:
+rem EXO_UPLOADUSER=neosys.com@gmail.com
+rem UPLOADPASS_EXO=somesillysecret
+rem -------------------------
+    if exist config2.bat call config2 %*
 
-rem --- customisation
-rem --- copy this file to configlocal.bat and REMOVE FROM CONFIGLOCAL the following line to avoid recursion
-rem --- if "configlocal.bat" is present, use it INSTEAD of config.bat
-    if exist configlocal.bat config.bat %*
+rem ---------------------
+rem --- customisation ---
+rem ---------------------
+rem just copy this file to configlocal.bat
+rem AND REMOVE FROM *YOUR* COPY THE FOLLOWING TWO LINES!!
+    if exist configlocal.bat call configlocal.bat %*
+    if exist configlocal.bat goto exit
 
 rem note: exodus project build looks for includes and libs in this order
 rem so that architecture specific lib32/lib64 is picked before generic lib
@@ -19,23 +31,23 @@ rem lib
 
 set EXO_CONFIGMODE=%*
 
-rem -------------------------------
-rem --- Output Product Version  ---
-rem -------------------------------
+rem ----------------------
+rem --- EXODUS VERSION ---
+rem ----------------------
 set EXO_MAJOR_VER=11
 set EXO_MINOR_VER=5
 set EXO_MICRO_VER=19
 set EXO_BUILD_VER=
 rem probably can put anything alphanumeric - BUT NO SPACES OR UNUSUAL CHARACTERS
 
-rem --------------------------
-rem --- Postgresql version ---
-rem --------------------------
+rem ------------------------
+rem --- POSTGRES VERSION ---
+rem ------------------------
     set EXO_POSTGRES_VER=9.0
 rem used in X:\Program Files\PostgreSQL\9.0\bin
 
 rem ------------------------------
-rem --- Boost version and type ---
+rem --- BOOST VERSION AND TYPE ---
 rem ------------------------------
     set EXO_BOOST_VER=1_46_1
     set EXO_BOOSTPRO=NO
@@ -43,25 +55,31 @@ rem ------------------------------
 rem eg if EXO_BOOSTPRO!="YES" X:\boost_1_46_1\bin
 rem or if EXO_BOOSTPRO=="YES" X:\Program Files\Boost\1_46_1\bin
 
-rem ----------------------------------------------
-rem --- TYPE OF BUILD - PICK *ONE* FROM *EACH* ---
-rem ----------------------------------------------
-rem set TARGET_CPU=x86
+rem ------------------
+rem --- X86 or X64 ---
+rem ------------------
 rem
- set TARGET_CPU=x64
+ set TARGET_CPU=x86
+rem set TARGET_CPU=x64
 
+rem ------------------------
+rem --- RELEASE OR DEBUG ---
+rem ------------------------
 rem
  set Configuration=Release
 rem set Configuration=Debug
 
+rem ---------------
+rem --- TOOLSET ---
+rem ---------------
+rem set EXO_TOOLSET=VS2005
 rem
- set EXO_TOOLSET=VS2005
-rem set EXO_TOOLSET=SDK71
+ set EXO_TOOLSET=SDK71
 
-rem -----------------------------------
-rem --- PROGRAM DRIVES TYPICALLY C: ---
-rem -----------------------------------
-    set EXO_PROGRAMDRV=D:
+rem -------------------------------------
+rem --- PROGRAM DRIVES - TYPICALLY C: ---
+rem -------------------------------------
+    set EXO_PROGRAMDRV=C:
 rem ------------------------------------
 rem POSTGRES, BOOSTPRO, VISUAL STUDIO, SDK, NSIS must all be stored on one drive
 rem otherwise you need to configure "below the line"
@@ -72,24 +90,28 @@ rem X:\Program Files\Microsoft Visual Studio 8\VC\
 rem X:\Program Files\Microsoft SDKs\Windows\v7.1\Bin
 rem X:\Program Files\NSIS\makensis.exe
 
-rem -------------------------------------
-rem --- DRIVES USED - TYPICALLY C: :  ---
-rem -------------------------------------
-    set EXO_BUILDDRV=D:
+rem ------------------------------------------------
+rem --- PATH TO PARENT DIRECTORY OF DEPENDENCIES ---
+rem ------------------------------------------------
+    set EXO_BUILD_ROOT=
 rem ------------------------------------
-rem POSTGRES, BOOSTPRO, VISUAL STUDIO, SDK, NSIS must all be stored on one drive
-rem otherwise you need to configure "below the line"
-rem EXAMPLES: (some may be "Program Files (x86)" on x64 platform)
-rem eg X:\Program Files\PostgreSQL\9.0\bin
-rem X:\Program Files\Boost\1_46_1\bin
-rem X:\Program Files\Microsoft Visual Studio 8\VC\
-rem X:\Program Files\Microsoft SDKs\Windows\v7.1\Bin
-rem X:\Program Files\NSIS\makensis.exe
+rem NO TRAILING SLASH!
+rem sadly must be absolute or blank which means root of exodus drive
+rem dependencies = currently only BOOST
+rem BOOSTPRO isnt here. it is installed with the "programs" (see above)
 
-rem =================================================================
-rem ===================== "THE LINE" ================================
-rem =================================================================
-rem
+
+
+rem #################################################################
+rem #################################################################
+rem #################################################################
+rem ####################  "THE LINE"  ###############################
+rem #################################################################
+rem #################################################################
+rem #################################################################
+
+
+
 rem =================================================================
 rem ===                 "BELOW THE LINE"                          ===
 rem =================================================================
@@ -100,10 +122,10 @@ rem =================================================================
 rem ---------------------------------------------------
 rem --- GENERAL INFO ABOUT LOCATION OF DEPENDENCIES ---
 rem ---------------------------------------------------
-rem 1. In case drive paths are hard coded in the config search for ":\" not to miss any
-rem 2. Best to install all "programs" eg VS/SDK, postgresql, nsis etc on one drive
-rem and to the *standard path structure* even if you install them not on C:
-rem 3. Best to install all building stuff like exodus/boost libraries etc on one drive
+rem 1. STANDARD build environment assumes all "programs" eg VS/SDK,
+rem  postgresql, nsis etc are installed on ONE drive
+rem  (and to the *standard path structure* even if you install them not on C:)
+rem 2. Best to install all building stuff like exodus/boost libraries etc on one drive
 rem maybe the same as the programs, maybe not.
 rem
 rem We need to know the location of MSVC, Boost, PostgreSQL and NSIS
@@ -134,10 +156,14 @@ rem ------------------------------------
     set EXO_PROGRAMFILES64=%EXO_PROGRAMDRV%\Program Files
     if "%PROCESSOR_ARCHITECTURE%" EQU "AMD64" set EXO_PROGRAMFILES32=%EXO_PROGRAMFILES32% (x86)
 
+rem ----- BUILT BOOST -----
+rem ---------------------------
+    set BOOST32=%EXO_BUILD_ROOT%\boost_%EXO_BOOST_VER%
+    set BOOST64=%EXO_BUILD_ROOT%\boost_%EXO_BOOST_VER%
+
+
 rem ----- INSTALLED BOOST -----
 rem ---------------------------
-    set BOOST32=%BOOST_DRV%\boost_%EXO_BOOST_VER%
-    set BOOST64=%BOOST_DRV%\boost_%EXO_BOOST_VER%
     IF BOOSTPRO=="YES" set BOOST32=%EXO_PROGRAMFILES32%\Boost\boost_%EXO_BOOST_VER%
     IF BOOSTPRO=="YES" set BOOST64=%EXO_PROGRAMFILES64%\Boost\boost_%EXO_BOOST_VER%
 
@@ -256,7 +282,7 @@ rem ---------------------------
 rem --- SDK71 Configuration ---
 rem ---------------------------
     call setenv /%TARGET_CPU% /%Configuration%
-ren eg
+rem examples:
 rem call setenv /x86 /debug
 rem call setenv /x86 /release
 rem call setenv /x64 /debug
@@ -328,6 +354,11 @@ rem if "%TARGET_CPU%" == "x64" set EXO_PRODUCTNAME=Exodus64
 rem stick with one name and installdir per minor version regardless of x86/x64 - like python
 set EXO_PRODUCTNAME=Exodus
 set EXO_CODENAME=exodus
+
+rem ------------------------
+rem --- INSTALLFILE NAME ---
+rem ------------------------
+    set EXO_INSTALLFILENAME=%EXO_CODENAME%-%EXO_MAJOR_VER%.%EXO_MINOR_VER%.%EXO_MICRO_VER%-%TARGET_CPU%.exe
 
 rem ------------------
 rem ---- BUILDING ----
@@ -407,6 +438,14 @@ rem there is no exodus_all2005.NSI!
 set EXO_PACKOPT=exodus_all.nsi
 
 :afterinstaller
+
+rem needs EXO_PYTHONPATH, EXO_UPLOADUSER
+rem -------------------------
+rem --- COMMAND TO UPLOAD ---
+rem -------------------------
+set EXO_PYTHONPATH=%EXO_PROGRAMDRV%\python27
+set EXO_UPLOADCMD="%EXO_PYTHONPATH%\python.exe"
+set EXO_UPLOADOPT=googlecode_upload.py  -s "Exodus Windows %TARGET_CPU% Installer" -p "exodusdb" -u "%EXO_UPLOADUSER%" -w "%UPLOADPASS_EXO%" -l "Type-Package,OpSys-Win" %EXO_INSTALLFILENAME%
 
 @echo BOOST32=%BOOST32%
 @echo BOOST64=%BOOST64%

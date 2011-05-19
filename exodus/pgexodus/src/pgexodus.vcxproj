@@ -78,7 +78,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>"$(POSTGRESQL32)\include";"$(POSTGRESQL32)\include\server";"$(POSTGRESQL32)\include\server\port\win32_msvc";"$(POSTGRESQL32)\include\server\port\win32"</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>"$(POSTGRES32)\include";"$(POSTGRES32)\include\server";"$(POSTGRES32)\include\server\port\win32_msvc";"$(POSTGRES32)\include\server\port\win32"</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;PGEXODUS_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -91,7 +91,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>postgres.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>"$(POSTGRESQL32)\lib"</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>"$(POSTGRES32)\lib32";"$(POSTGRES32)\lib"</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>pgexodus.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -104,7 +104,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>"$(POSTGRESQL64)\include";"$(POSTGRESQL64)\include\server";"$(POSTGRESQL64)\include\server\port\win32_msvc";"$(POSTGRESQL64)\include\server\port\win32"</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(POSTGRES64)\include;$(POSTGRES64)\include\server;$(POSTGRES64)\include\server\port\win32_msvc;$(POSTGRES64)\include\server\port\win32</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;PGEXODUS_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -116,7 +116,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>postgres.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>"$(POSTGRESQL64)\lib"</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>"$(POSTGRES64)\lib64";"$(POSTGRES64)\lib"</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>pgexodus.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -127,7 +127,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>"$(POSTGRESQL32)\include";"$(POSTGRESQL32)\include\server";"$(POSTGRESQL32)\include\server\port\win32_msvc";"$(POSTGRESQL32)\include\server\port\win32"</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>"$(POSTGRES32)\include";"$(POSTGRES32)\include\server";"$(POSTGRES32)\include\server\port\win32_msvc";"$(POSTGRES32)\include\server\port\win32"</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;PGEXODUS_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>
@@ -137,7 +137,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>postgres.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>"$(POSTGRESQL32)\lib"</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>"$(POSTGRES32)\lib32";"$(POSTGRES32)\lib"</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>pgexodus.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -151,7 +151,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>"$(POSTGRESQL64)\include";"$(POSTGRESQL64)\include\server";"$(POSTGRESQL64)\include\server\port\win32_msvc";"$(POSTGRESQL64)\include\server\port\win32"</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(POSTGRES64)\include;$(POSTGRES64)\include\server;$(POSTGRES64)\include\server\port\win32_msvc;$(POSTGRES64)\include\server\port\win32</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;PGEXODUS_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>
@@ -161,7 +161,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>postgres.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>"$(POSTGRESQL64)\lib"</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>"$(POSTGRES64)\lib64";"$(POSTGRES64)\lib"</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>pgexodus.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>

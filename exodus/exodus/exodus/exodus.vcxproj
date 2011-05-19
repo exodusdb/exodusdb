@@ -78,7 +78,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..;"$(BOOST32)\";"$(POSTGRESQL32)\include"</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..;"$(BOOST32)\";"$(POSTGRES32)\include"</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>BUILDING_LIBRARY;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -93,7 +93,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>libpq.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(BOOST32)\lib32;$(BOOST32)\stage32\lib;$(BOOST32)\lib;$(BOOST32)\stage\lib;$(POSTGRESQL32)\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(BOOST32)\lib32;$(BOOST32)\stage32\lib;$(BOOST32)\lib;$(BOOST32)\stage\lib;$(POSTGRES32)\lib32;$(POSTGRES32)\lib</AdditionalLibraryDirectories>
       <DelayLoadDLLs>libpq.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -104,7 +104,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..;"$(BOOST64)\";"$(POSTGRESQL64)\include"</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..;"$(BOOST64)\";"$(POSTGRES64)\include"</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>BUILDING_LIBRARY;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Sync</ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -118,7 +118,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>libpq.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(BOOST64)\lib64;$(BOOST64)\stage64\lib;$(BOOST64)\stage\lib;$(BOOST64)\lib;$(POSTGRESQL64)\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(BOOST64)\lib64;$(BOOST64)\stage64\lib;$(BOOST64)\stage\lib;$(BOOST64)\lib;$(POSTGRES64)\lib64;$(POSTGRES64)\lib</AdditionalLibraryDirectories>
       <DelayLoadDLLs>libpq.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -128,7 +128,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..;"$(BOOST32)\";"$(POSTGRESQL32)\include"</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..;"$(BOOST32)\";"$(POSTGRES32)\include"</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>BUILDING_LIBRARY;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Sync</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -140,7 +140,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>libpq.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(BOOST32)\lib32;$(BOOST32)\stage32\lib;$(BOOST32)\lib;$(BOOST32)\stage\lib;$(POSTGRESQL32)\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(BOOST32)\lib32;$(BOOST32)\stage32\lib;$(BOOST32)\lib;$(BOOST32)\stage\lib;$(POSTGRES32)\lib32;$(POSTGRES32)\lib</AdditionalLibraryDirectories>
       <DelayLoadDLLs>libpq.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
@@ -149,7 +149,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..;"$(BOOST64)\";"$(POSTGRESQL64)\include"</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..;"$(BOOST64)\";"$(POSTGRES64)\include"</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>BUILDING_LIBRARY;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Sync</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -161,7 +161,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>libpq.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(BOOST64)\lib64;$(BOOST64)\stage64\lib;$(BOOST64)\stage\lib;$(BOOST64)\lib;$(POSTGRESQL64)\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(BOOST64)\lib64;$(BOOST64)\stage64\lib;$(BOOST64)\stage\lib;$(BOOST64)\lib;$(POSTGRES64)\lib64;$(POSTGRES64)\lib</AdditionalLibraryDirectories>
       <DelayLoadDLLs>libpq.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
