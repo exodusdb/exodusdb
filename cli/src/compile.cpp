@@ -886,7 +886,7 @@ function set_environment() {
 	if (index(batfilename,"setenv.cmd")) {
 		if (options=="x86")
 			options="Win32";
-		options="//"^options;
+		options="/"^options;
 	}
 	script^=" "^options;
 
@@ -917,11 +917,6 @@ function set_environment() {
 			ossetenv(
 				field(vars(varn),'=',1)
 				,field(vars(varn),'=',2,999999)
-				);
-			output(
-				field(vars(varn),'=',1)
-				^"="
-				^field(vars(varn),'=',2,999999)
 				);
 		}
 	/*

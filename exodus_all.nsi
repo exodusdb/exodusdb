@@ -754,7 +754,7 @@ Section "${REDIST_DESC} Redist (req.)" SEC_CRT
   ;download source 1
   DetailPrint "Downloading ${REDIST_DESC} Redistributable Setup..."
   DetailPrint "Contacting ${REDIST_SOURCE1} ..."
-  NSISdl::download /TIMEOUT=15000 "${REDIST_URL1}xxxxxxxxxxxx" "${REDIST_FILENAME}"
+  NSISdl::download /TIMEOUT=15000 "${REDIST_URL1}" "${REDIST_FILENAME}"
 
   Pop $R0 ;Get the return value
   StrCmp $R0 "success" OnSuccess
