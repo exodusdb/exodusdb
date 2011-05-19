@@ -72,14 +72,14 @@ rem set Configuration=Debug
 rem ---------------
 rem --- TOOLSET ---
 rem ---------------
+rem set EXO_TOOLSET=VS2005
 rem
- set EXO_TOOLSET=VS2005
-rem set EXO_TOOLSET=SDK71
+ set EXO_TOOLSET=SDK71
 
 rem -------------------------------------
 rem --- PROGRAM DRIVES - TYPICALLY C: ---
 rem -------------------------------------
-    set EXO_PROGRAMDRV=D:
+    set EXO_PROGRAMDRV=C:
 rem ------------------------------------
 rem POSTGRES, BOOSTPRO, VISUAL STUDIO, SDK, NSIS must all be stored on one drive
 rem otherwise you need to configure "below the line"

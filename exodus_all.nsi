@@ -767,11 +767,11 @@ Section "${REDIST_DESC} Redist (req.)" SEC_CRT
 ;  
   ;VCVER is like 10.0
   ReadRegDword $R0 HKLM "SOFTWARE\Microsoft\VisualStudio\$%EXO_REDISTDOTVER%\VC\Runtimes\$%TARGET_CPU%" "Installed"
-  IfErrors done
+;  IfErrors done
   StrCmp $R0 "1" done
 
   ReadRegDword $R0 HKLM "SOFTWARE\Microsoft\VisualStudio\$%EXO_REDISTDOTVER%\VC\VCRedist\$%TARGET_CPU%" "Installed"
-  IfErrors done
+;  IfErrors done
   StrCmp $R0 "1" done
 
   SetOutPath "$TEMP"
