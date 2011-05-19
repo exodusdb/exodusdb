@@ -72,14 +72,14 @@ rem set Configuration=Debug
 rem ---------------
 rem --- TOOLSET ---
 rem ---------------
-rem set EXO_TOOLSET=VS2005
 rem
- set EXO_TOOLSET=SDK71
+ set EXO_TOOLSET=VS2005
+rem set EXO_TOOLSET=SDK71
 
 rem -------------------------------------
 rem --- PROGRAM DRIVES - TYPICALLY C: ---
 rem -------------------------------------
-    set EXO_PROGRAMDRV=C:
+    set EXO_PROGRAMDRV=D:
 rem ------------------------------------
 rem POSTGRES, BOOSTPRO, VISUAL STUDIO, SDK, NSIS must all be stored on one drive
 rem otherwise you need to configure "below the line"
@@ -242,6 +242,7 @@ set REDIST_URL1="http://download.microsoft.com/download/d/4/1/d41aca8a-faa5-49a7
 set REDIST_SOURCE2=exodusdb.googlecode.com
 set REDIST_URL2="http://exodusdb.googlecode.com/files/vcredist_2005_x64.exe"
 :gotredist2005
+set EXO_REDISTDOTVER=8.0
 
 goto checktoolset
 
@@ -320,9 +321,11 @@ set REDIST_URL1="http://download.microsoft.com/download/3/2/2/3224B87F-CFA0-4E70
 set REDIST_SOURCE2=exodusdb.googlecode.com
 set REDIST_URL2="http://exodusdb.googlecode.com/files/vcredist_2010_x64.exe"
 :gotredist2010
+set EXO_REDISTDOTVER=10.0
 @echo REDIST_DESC=%REDIST_DESC%
 @echo REDIST_SOURCE1=%REDIST_SOURCE1%
 @echo REDIST_URL1=%REDIST_URL1%
+@echo EXO_REDISTDOTVER=%EXO_REDISTDOTVER%
 
 rem all toolsets come here
 :checktoolset
@@ -413,7 +416,6 @@ if exist "%EXO_VS%..\IDE\vcexpress.exe" goto afterdevcmd
 "Error: Config: FAILED TO FIND VS/GUI PROGRAM"
 goto exit
 :afterdevcmd
-@echo EXO_DEVCMD=%EXO_DEVCMD%
 
 
 if "%EXO_CONFIGMODE%" == "CLEAN" goto afterinstaller
@@ -429,7 +431,6 @@ if "%EXO_CONFIGMODE%" NEQ "PACK" goto gotpackexe
 goto afterinstaller
 goto exit
 :gotpackexe
-@echo EXO_PACKCMD=%EXO_PACKCMD%
 
 rem ---------------------------------
 rem --- COMMAND TO MAKE INSTALLER ---
@@ -447,6 +448,9 @@ set EXO_PYTHONPATH=%EXO_PROGRAMDRV%\python27
 set EXO_UPLOADCMD="%EXO_PYTHONPATH%\python.exe"
 set EXO_UPLOADOPT=googlecode_upload.py  -s "Exodus Windows %TARGET_CPU% Installer" -p "exodusdb" -u "%EXO_UPLOADUSER%" -w "%UPLOADPASS_EXO%" -l "Type-Package,OpSys-Win" %EXO_INSTALLFILENAME%
 
+rem ------------------------------------------
+rem --- DUMP ALL THE ENVIRONMENT VARIABLES ---
+rem ------------------------------------------
 @echo BOOST32=%BOOST32%
 @echo BOOST64=%BOOST64%
 @echo POSTGRES32=%POSTGRES32%
