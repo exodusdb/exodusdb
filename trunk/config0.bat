@@ -26,7 +26,7 @@ rem --- Boost version and type ---
 rem ------------------------------
     set EXODUS_BOOSTVER=1_46_1
     set EXODUS_BOOSTPRO=NO
-    set EXODUS_BOOSTDRV=D:
+    set EXODUS_BOOSTDRV=E:
 rem ------------------------------
 rem eg if EXODUS_BOOSTPRO!="YES" C:\boost_1_46_1\bin
 rem or if EXODUS_BOOSTPRO=="YES" C:\Program Files\Boost\1_46_1\bin
@@ -38,17 +38,18 @@ rem set TARGET_CPU=x86
 rem
  set TARGET_CPU=x64
 
-rem set Configuration=Release
 rem
- set Configuration=Debug
+ set Configuration=Release
+rem set Configuration=Debug
 
-    set EXODUS_TOOLSET=VS2005
-rem set EXODUS_TOOLSET=SDK71
+rem set EXODUS_TOOLSET=VS2005
+rem
+ set EXODUS_TOOLSET=SDK71
 
 rem ------------------------------------
 rem --- DRIVE USED - TYPICALLY C: :  ---
 rem ------------------------------------
-    set PROGRAMS_DRIVE=D:
+    set PROGRAMS_DRIVE=C:
 rem ------------------------------------
 rem POSTGRESQL, BOOSTPRO, VISUAL STUDIO, SDK, NSIS must all be stored on one drive
 rem otherwise you need to configure "below the line"
@@ -127,8 +128,9 @@ rem \stage\lib
 rem ----- POSTGRESQL -----
 rem ----------------------
     set POSTGRESQL32=%EXODUS_PROGRAMFILES32%\PostgreSQL\%EXODUS_PGVERSION%
-rem    set POSTGRESQL64=%EXODUS_PROGRAMFILES64%\PostgreSQL\%EXODUS_PGVERSION%
-    set POSTGRESQL64=D:\pg9dev
+rem
+    set POSTGRESQL64=%EXODUS_PROGRAMFILES64%\PostgreSQL\%EXODUS_PGVERSION%
+rem     set POSTGRESQL64=D:\pg9dev
 rem solutions/projects search for includes and libs as follows:
 rem \include
 rem \stage\lib
@@ -176,14 +178,14 @@ rem ---------------------
 
 if "%TARGET_CPU%" == "x64" goto redist2005x64
 rem --- NOTE: QUOTE THE URLS! BUT NOT DESC/SOURCE! ---
-set REDIST_DESC=MSVC++ 2005 x86 SP1
+set REDIST_DESC=MSVC++ 2005 Redist. x86 SP1
 set REDIST_SOURCE1=download.microsoft.com
 set REDIST_URL1="http://download.microsoft.com/download/e/1/c/e1c773de-73ba-494a-a5ba-f24906ecf088/vcredist_x86.exe"
 set REDIST_SOURCE2=exodusdb.googlecode.com
 set REDIST_URL2="http://exodusdb.googlecode.com/files/vcredist_2005_x86.exe"
 goto gotredist2005
 :redist2005x64
-set REDIST_DESC=MSVC++ 2005 x64 SP1
+set REDIST_DESC=MSVC++ 2005 Redist. x64 SP1
 set REDIST_SOURCE1=download.microsoft.com
 set REDIST_URL1="http://download.microsoft.com/download/d/4/1/d41aca8a-faa5-49a7-a5f2-ea0aa4587da0/vcredist_x64.exe"
 set REDIST_SOURCE2=exodusdb.googlecode.com
@@ -222,8 +224,8 @@ rem -------------------------------------------------------------------------
 rem --- SDK71 TOOLSET (the last one and the default)                      ---
 rem -------------------------------------------------------------------------
 
-    path %EXODUS_PROGRAMFILES32%\Microsoft SDKs\Windows\v7.1\Bin;%PATH%
-rem path %PATH%;%EXODUS_PROGRAMFILES32%\Microsoft SDKs\Windows\v7.1\Bin
+    path %EXODUS_PROGRAMFILES64%\Microsoft SDKs\Windows\v7.1\Bin;%PATH%
+rem path %PATH%;%EXODUS_PROGRAMFILES64%\Microsoft SDKs\Windows\v7.1\Bin
 
 rem ---------------------------
 rem --- SDK71 Configuration ---
@@ -232,7 +234,8 @@ rem call setenv /x86 /debug
 rem call setenv /x86 /release
 rem call setenv /x64 /debug
 rem call setenv /x64 /release
-    call setenv /%TARGET_CPU% /%Configuration
+    call setenv /%TARGET_CPU% /%Configuration%
+
 echo on
 
 rem ----------------------
@@ -251,14 +254,14 @@ rem 2008x86 is "http://download.microsoft.com/download/d/d/9/dd9a82d0-52ef-40db-
 
 if "%TARGET_CPU%" == "x64" goto redist2010x64
 rem --- NOTE: QUOTE THE URLS! and NOT DESC/SOURCE! ---
-set REDIST_DESC=MSVC++ 2010 x86
+set REDIST_DESC=MSVC++ 2010 Redist. x86
 set REDIST_SOURCE1=Microsoft.com
 set REDIST_URL1="http://download.microsoft.com/download/5/B/C/5BC5DBB3-652D-4DCE-B14A-475AB85EEF6E/vcredist_x86.exe"
 set REDIST_SOURCE2=exodusdb.googlecode.com
 set REDIST_URL2="http://exodusdb.googlecode.com/files/vcredist_2010_x86.exe"
 goto gotredist2010
 :redist2010x64
-set REDIST_DESC=MSVC++ 2010 x64
+set REDIST_DESC=MSVC++ 2010 Redist. x64
 set REDIST_SOURCE1=Microsoft.com
 set REDIST_URL1="http://download.microsoft.com/download/3/2/2/3224B87F-CFA0-4E70-BDA3-3DE650EFEBA5/vcredist_x64.exe"
 set REDIST_SOURCE2=exodusdb.googlecode.com
@@ -344,6 +347,12 @@ rem search for the latest version of VS Professional or Express
     if "%EXODUS_VS%" =="" set EXODUS_VS=%VS80COMNTOOLS%
 if exist "%EXODUS_VS%..\IDE\devenv.exe" set EXODUS_DEV="%EXODUS_VS%..\IDE\devenv" %EXODUS_PROJECT%.sln
 if exist "%EXODUS_VS%..\IDE\vcexpress.exe" set EXODUS_DEV="%EXODUS_VS%..\IDE\vcexpress" %EXODUS_PROJECT%.sln
+if not "%EXODUS_DEV%"=="YES" goto gotgui
+@echo CANT FIND VS/GUI PROGRAM
+if "%EXODUS_BATCHMODE%" == "" pause
+exit
+:gotgui
+@echo EXODUS_PACK=%EXODUS_PACK%
 
 
 rem ---------------------------
@@ -353,6 +362,7 @@ set EXODUS_PACK=%EXODUS_PROGRAMFILES32%\NSIS\makensis.exe
 if not exist "%EXODUS_PACK%" set EXODUS_PACK=%EXODUS_PROGRAMFILES64%\NSIS\makensis.exe
 
 if exist "%EXODUS_PACK%" goto gotnsis
+if not "EXODUS_DEV" == "" goto gotnsis
 @echo MISSING "%EXODUS_PACK%" PROGRAM
 if "%EXODUS_BATCHMODE%" == "" pause
 exit
