@@ -1,29 +1,31 @@
-;initial code is just standard nsis macros that doesnt need to be changed or understood
-;exodus build instructions at at the bottom, or search for exodus
-
-;-----------------------------------------------
-;requires following environment variables PRESET
-;-----------------------------------------------
-; TARGET_CPU           eg x64 or x86 only
-; Configuration        eg Release or Debug only
+; top: parameters
+; middle: standard nsis macros that doesnt need to be changed or understood
+; bottom: exodus build instructions
+; ------------------------------------------------------------
+; requires AT LEAST the following environment variables PRESET
+; ------------------------------------------------------------
+;  TARGET_CPU           eg x64 or x86 only
+;  Configuration        eg Release or Debug only
 ;
-; EXO_VCVERSION     eg 70 80 90 100 etc
-; EXO_TOOLPATH      eg C:\Windows\system32 - location of msvcrNNd.dll etc
+;  EXO_VCVERSION     eg 70 80 90 100 etc
+;  EXO_TOOLPATH      eg C:\Windows\system32 - location of msvcrNNd.dll etc
 ;
-; EXO_MAJOR_VER eg 11
-; EXO_MINOR_VER eg 5
-; EXO_MICRO_VER eg 3
-; EXO_BUILD_VER eg 
-; EXO_PRODUCTNAME   eg Exodus
-; SOURCE_PATH          eg debug release x64\debug x64\release
-
-; REDIST_DESC          eg "MSVC++ 2010"
-; REDIST_SOURCE1       eg "Microsoft.com"
-; REDIST_URL1          eg "http://download.microsoft.com/download/5/B/C/5BC5DBB3-652D-4DCE-B14A-475AB85EEF6E/vcredist_x86.exe"
-; REDIST_SOURCE2       optional
-; REDIST_URL2          optional
-; REDIST_SOURCE3       optional
-; REDIST_URL3          optional
+;  EXO_MAJOR_VER eg 11
+;  EXO_MINOR_VER eg 5
+;  EXO_MICRO_VER eg 3
+;  EXO_BUILD_VER eg 
+;  EXO_PRODUCTNAME   eg Exodus
+;  SOURCE_PATH          eg debug release x64\debug x64\release
+;
+;  EXO_INSTALLFILENAME
+;
+;  REDIST_DESC          eg "MSVC++ 2010"
+;  REDIST_SOURCE1       eg "Microsoft.com"
+;  REDIST_URL1          eg "http://download.microsoft.com/download/5/B/C/5BC5DBB3-652D-4DCE-B14A-475AB85EEF6E/vcredist_x86.exe"
+;  REDIST_SOURCE2       optional
+;  REDIST_URL2          optional
+;  REDIST_SOURCE3       optional
+;  REDIST_URL3          optional
 
 ;;;;;;;;; package parameters ;;;;;;;;;;;;;;;;;;;;
 
@@ -84,7 +86,8 @@
 
  !define EXO_INSTDIR "C:\$%EXO_PRODUCTNAME%$%EXO_MAJOR_VER%$%EXO_MINOR_VER%"
 
- !define EXO_OUTFILE "$%EXO_CODENAME%-$%EXO_MAJOR_VER%.$%EXO_MINOR_VER%.$%EXO_MICRO_VER%-$%TARGET_CPU%.exe"
+ ;output file name
+ !define EXO_OUTFILE "$%EXO_INSTALLFILENAME%"
 
  !define EXO_REGKEY_ROOT "$%EXO_PRODUCTNAME%"
  !define EXO_REGKEY_VER  "$%EXO_PRODUCTNAME%\$%EXO_MAJOR_VER%.$%EXO_MINOR_VER%"
@@ -137,6 +140,13 @@
 
 
 ;;;;;;;;;;;;; end of package parameters ;;;;;;;;;;;;;;;;;;;;
+
+
+
+
+
+
+
 
 
 !include LogicLib.nsh
