@@ -7,12 +7,14 @@
 ; TARGET_CPU           eg x64 or x86 only
 ; Configuration        eg Release or Debug only
 ;
-; EXODUS_VCVERSION     eg 70 80 90 100 etc
-; EXODUS_TOOLPATH      eg C:\Windows\system32 - location of msvcrNNd.dll etc
+; EXO_VCVERSION     eg 70 80 90 100 etc
+; EXO_TOOLPATH      eg C:\Windows\system32 - location of msvcrNNd.dll etc
 ;
-; EXODUS_MINOR_VERSION eg 11.5
-; EXODUS_MICRO_VERSION eg 11.5.3
-; EXODUS_PRODUCTNAME   eg Exodus or Exodus64
+; EXO_MAJOR_VER eg 11
+; EXO_MINOR_VER eg 5
+; EXO_MICRO_VER eg 3
+; EXO_BUILD_VER eg 
+; EXO_PRODUCTNAME   eg Exodus
 ; SOURCE_PATH          eg debug release x64\debug x64\release
 
 ; REDIST_DESC          eg "MSVC++ 2010"
@@ -21,79 +23,89 @@
 ; REDIST_SOURCE2       optional
 ; REDIST_URL2          optional
 ; REDIST_SOURCE3       optional
-; REDIST_URL2          optional
+; REDIST_URL3          optional
 
 ;;;;;;;;; package parameters ;;;;;;;;;;;;;;;;;;;;
 
 ;---------------------------------------------------------------------------
-; EXODUS_VCVERSION=WHICH VC RUNTIME VERSION
+; EXO_VCVERSION=WHICH VC RUNTIME VERSION
 ; MUST have been built with this toolset
 ; 70  is VS2003
 ; 80  is VS2005
 ; 90  is VS2008
 ; 100 is VS2010 (NB 100 NOT JUST 10!!!)
 ;----------------------------------------------------------------------------
-;!define EXODUS_VCVERSION "70"
-;!define EXODUS_VCVERSION "80"
-;!define EXODUS_VCVERSION "90"
-;!define EXODUS_VCVERSION "100"
- !define EXODUS_VCVERSION "$%EXODUS_VCVERSION%"
+;!define EXO_VCVERSION "70"
+;!define EXO_VCVERSION "80"
+;!define EXO_VCVERSION "90"
+;!define EXO_VCVERSION "100"
+ !define EXO_VCVERSION "$%EXO_VCVERSION%"
 ;------------------------------------------
 ; WHERE IS VC RUNTIME VERSION TO DISTRIBUTE
 ; currently hard coded?! otherwise
 ; MUST! be present as an environment variable pointing to the MSVC toolset
 ;------------------------------------------
-;!define EXODUS_TOOLPATH "$%VS700COMNTOOLS%"
-;!define EXODUS_TOOLPATH "$%VS800COMNTOOLS%"
-;!define EXODUS_TOOLPATH "$%VS90COMNTOOLS%"
-;!define EXODUS_TOOLPATH "$%VS100COMNTOOLS%"
-;!define EXODUS_TOOLPATH c:\windows\system32
- !define EXODUS_TOOLPATHREL "$%EXODUS_TOOLPATHREL%"
- !define EXODUS_TOOLPATHDEB "$%EXODUS_TOOLPATHDEB%"
+;!define EXO_TOOLPATH "$%VS700COMNTOOLS%"
+;!define EXO_TOOLPATH "$%VS800COMNTOOLS%"
+;!define EXO_TOOLPATH "$%VS90COMNTOOLS%"
+;!define EXO_TOOLPATH "$%VS100COMNTOOLS%"
+;!define EXO_TOOLPATH c:\windows\system32
+ !define EXO_TOOLPATHREL "$%EXO_TOOLPATHREL%"
+ !define EXO_TOOLPATHDEB "$%EXO_TOOLPATHDEB%"
 
 ;----------------------------------------------------------------
-; EXODUS_PLATFORM MUST be x86 or x64
+; EXO_PLATFORM MUST be x86 or x64
 ; DETERMINES PART OF THE INSTALLER FILE NAME!
 ; ALSO WHICH VC RUNTIME PLATFORM TO DISTRIBUTE (if not hard coded)
 ;----------------------------------------------------------------
-;!define EXODUS_PLATFORM "x86"
-;!define EXODUS_PLATFORM "x64"
- !define EXODUS_PLATFORM "$%TARGET_CPU%"
+;!define EXO_PLATFORM "x86"
+;!define EXO_PLATFORM "x64"
+ !define EXO_PLATFORM "$%TARGET_CPU%"
 
 ;------------------------------------------------------------------
-; WHAT NAME TO GIVE EXODUS ON START MENU ETC (OMIT VERSION!)
-; use Exodus for x86 since it will install on 32 or 64 bit machines
-; and Exodus64 for x64 since it will only install on 64 bit machines
-; it will be used as a folder name
+; WHAT NAME TO GIVE EXODUS
 ;------------------------------------------------------------------
-;!define EXODUS_PRODUCTNAME "Exodus"
-;!define EXODUS_PRODUCTNAME "Exodus64"
- !define EXODUS_PRODUCTNAME "$%EXODUS_PRODUCTNAME%"
+ !define EXO_PRODUCTNAME "$%EXO_PRODUCTNAME%"
 
 ;-------------------------------------------------------------------
 ; VERSION OF EXODUS FOR SEPARATE MENU ITEM AND INSTALLATION DIRECTORY
-; minor versions each get installed in a separate directory
+; majorminor versions each get installed in a separate directory
+; micro versions get uninstalled/overwritten
 ;-------------------------------------------------------------------
-;!define EXODUS_MINOR_VERSION "11.5"
- !define EXODUS_MINOR_VERSION "$%EXODUS_MINOR_VERSION%"
+ !define EXO_MAJOR_VER "$%EXO_MAJOR_VER%"
+ !define EXO_MINOR_VER "$%EXO_MINOR_VER%"
+ !define EXO_MICRO_VER "$%EXO_MICRO_VER%"
+; !define EXO_BUILD_VER "$%EXO_MINOR_VER%"
 
-;-------------------------------------------------------------
-; WHAT MINOR VERSION NUMBER (FOR INFORMATION ONLY)
-; micro versions are for information and will simply overwrite
-; previous minor versions
-; TODO check we dont double add to path etc.
-;-------------------------------------------------------------
-;!define EXODUS_MICRO_VERSION "11.5.3"
- !define EXODUS_MICRO_VERSION "$%EXODUS_MICRO_VERSION%"
+ !define EXO_DOTTEDMINORVERSION "$%EXO_MAJOR_VER%.$%EXO_MINOR_VER%"
+ !define EXO_DOTTEDMICROVERSION "$%EXO_MAJOR_VER%.$%EXO_MINOR_VER%.$%EXO_MICRO_VER%"
+
+ !define EXO_PRODUCTNAME_AND_DOTTEDMICROVERSION "$%EXO_PRODUCTNAME% $%EXO_MAJOR_VER%.$%EXO_MINOR_VER%.$%EXO_MICRO_VER%-$%EXO_PLATFORM%"
+
+ !define EXO_INSTDIR "C:\$%EXO_PRODUCTNAME%$%EXO_MAJOR_VER%$%EXO_MINOR_VER%"
+
+ !define EXO_OUTFILE "$%EXO_CODENAME%-$%EXO_MAJOR_VER%.$%EXO_MINOR_VER%.$%EXO_MICRO_VER%-$%TARGET_CPU%.exe"
+
+ !define EXO_REGKEY_ROOT "$%EXO_PRODUCTNAME%"
+ !define EXO_REGKEY_VER  "$%EXO_PRODUCTNAME%\$%EXO_MAJOR_VER%.$%EXO_MINOR_VER%"
+
+ !define EXO_COMPILER_BINPATH "$APPDATA\$%EXO_PRODUCTNAME%\bin"
 
 ;-------------------------
 ;BASIC FILENAME FOR EXODUS
 ;-------------------------
-;!define EXODUS_CODENAME "exodus"
- !define EXODUS_CODENAME "$%EXODUS_CODENAME%"
+;!define EXO_CODENAME "exodus"
+ !define EXO_CODENAME "$%EXO_CODENAME%"
 
- !define debugorrelease "$%EXODUS_BINARIES%"
+ !define debugorrelease "$%EXO_BINARIES%"
 
+;----------------
+;MENU ITEM TITLES
+;----------------
+!define EXO_MENUDIR                        "$%EXO_PRODUCTNAME% $%EXO_MAJOR_VER%.$%EXO_MINOR_VER%"
+!define EXO_MENUITEM_TITLE_COMMANDLINE     "$%EXO_PRODUCTNAME% (command line)"
+!define EXO_MENUITEM_TITLE_CONFIGURE       "$%EXO_PRODUCTNAME% (configure)"
+!define EXO_MENUITEM_TITLE_UNINSTALL_TITLE "Uninstall"
 ;-----------------------------------------
 ;NAME, SOURCES AND URLS OF REDISTRIBUTABLE
 ;-----------------------------------------
@@ -110,8 +122,6 @@
 !define REDIST_URL2 $%REDIST_URL2%
 
 
-;;;;;;;;;;;;; end of package parameters ;;;;;;;;;;;;;;;;;;;;
-
 
   ;VC2010 x86 - could download
   ;http://www.microsoft.com/downloads/info.aspx?na=41&SrcFamilyId=A7B7A05E-6DE6-4D3A-A423-37BF0912DB84&SrcDisplayLang=en&u=http%3a%2f%2fdownload.microsoft.com%2fdownload%2f5%2fB%2fC%2f5BC5DBB3-652D-4DCE-B14A-475AB85EEF6E%2fvcredist_x86.exe
@@ -126,6 +136,7 @@
   ;VC2005 x86 debug - no download available
 
 
+;;;;;;;;;;;;; end of package parameters ;;;;;;;;;;;;;;;;;;;;
 
 
 !include LogicLib.nsh
@@ -544,12 +555,12 @@ RequestExecutionLevel admin #NOTE: You still need to check user rights with User
 ;--------------------------------
 ;General
 
-  Name "${EXODUS_PRODUCTNAME} ${EXODUS_MICRO_VERSION}"
-  Outfile "${EXODUS_CODENAME}-${EXODUS_PLATFORM}-${EXODUS_MICRO_VERSION}.exe"
-  InstallDir "$PROGRAMFILES\${EXODUS_PRODUCTNAME}\${EXODUS_MINOR_VERSION}"
+  Name "${EXO_PRODUCTNAME_AND_DOTTEDMICROVERSION}"
+  Outfile "${EXO_OUTFILE}"
+  InstallDir "${EXO_INSTDIR}"
   
   ;Get installation folder from registry if available
-  InstallDirRegKey HKCU "Software\${EXODUS_PRODUCTNAME}\${EXODUS_MINOR_VERSION}" ""
+  InstallDirRegKey HKLM "Software\${EXO_REGKEY_VER}" ""
 
 ;--------------------------------
 ;Interface Settings
@@ -594,7 +605,7 @@ RequestExecutionLevel admin #NOTE: You still need to check user rights with User
 
 Section "All" SecAll
 
-; StrCmp "${EXODUS_PLATFORM}" "x86" 0 nobla
+; StrCmp "${EXO_PLATFORM}" "x86" 0 nobla
 ;  strcpy $DebugOrRelease "${location1}"
 ;  Goto donee
 ;nobla:
@@ -625,13 +636,13 @@ Section "All" SecAll
 
   ;VC runtime without bloated redist package
   ;also delivering debug versions?! so exodus programs can be developed with stackwalker
-  ;File "${EXODUS_TOOLPATH}..\..\VC\redist\${EXODUS_PLATFORM}\Microsoft.VC${EXODUS_VCVERSION}.CRT\*"
-  ;File "${EXODUS_TOOLPATH}..\..\VC\redist\Debug_NonRedist\${EXODUS_PLATFORM}\Microsoft.VC${EXODUS_VCVERSION}.DebugCRT\*"
+  ;File "${EXO_TOOLPATH}..\..\VC\redist\${EXO_PLATFORM}\Microsoft.VC${EXO_VCVERSION}.CRT\*"
+  ;File "${EXO_TOOLPATH}..\..\VC\redist\Debug_NonRedist\${EXO_PLATFORM}\Microsoft.VC${EXO_VCVERSION}.DebugCRT\*"
   ;hard coded!
-  File "${EXODUS_TOOLPATHREL}\msvcr${EXODUS_VCVERSION}.dll"
-  File "${EXODUS_TOOLPATHREL}\msvcp${EXODUS_VCVERSION}.dll"
-  File "${EXODUS_TOOLPATHDEB}\msvcr${EXODUS_VCVERSION}d.dll"
-  File "${EXODUS_TOOLPATHDEB}\msvcp${EXODUS_VCVERSION}d.dll"
+  File "${EXO_TOOLPATHREL}\msvcr${EXO_VCVERSION}.dll"
+  File "${EXO_TOOLPATHREL}\msvcp${EXO_VCVERSION}.dll"
+  File "${EXO_TOOLPATHDEB}\msvcr${EXO_VCVERSION}d.dll"
+  File "${EXO_TOOLPATHDEB}\msvcp${EXO_VCVERSION}d.dll"
 
   ;dont do exodus.dll since we may want the debug version - below
   ;File /x exodus.dll /x libpq.dll release\*.dll
@@ -693,29 +704,28 @@ Section "All" SecAll
 
   ;append PATH to the binaries in system environment
   ;make available to all users
-  ;dont risk prepending because could overwrite system commands
   ;http://nsis.sourceforge.net/Path_Manipulation
-  ;Push $INSTDIR
-  ;Call AddToPath
+  ;dont risk prepending because could overwrite system commands
   ;${EnvVarUpdate} $0 "PATH" "P" "HKLM" "$INSTDIR\bin"
   ${EnvVarUpdate} $0 "PATH" "A" "HKLM" "$INSTDIR\bin"
 
   SetShellVarContext all
 
+  ;create a path to the user compiled binaries HKCU=Current User
   ;cannot see to add %APPDATA% in local machine path so have to do for current user only :(
-  ;dont forget to remove the same in uninstall!
-  ${EnvVarUpdate} $0 "PATH" "A" "HKCU" "$APPDATA\${EXODUS_PRODUCTNAME}\bin"
+;  ${EnvVarUpdate} $0 "PATH" "A" "HKCU" "$APPDATA\${EXO_PRODUCTNAME}\bin"
+  ${EnvVarUpdate} $0 "PATH" "A" "HKCU" "${EXO_COMPILER_BINPATH}"
 
-  ;Store installation folder
-  WriteRegStr HKCU "Software\${EXODUS_PRODUCTNAME}\${EXODUS_MINOR_VERSION}" "" $INSTDIR
-  
-  createDirectory "$SMPROGRAMS\${EXODUS_PRODUCTNAME}-${EXODUS_MINOR_VERSION}"
-  createShortCut "$SMPROGRAMS\${EXODUS_PRODUCTNAME}-${EXODUS_MINOR_VERSION}\${EXODUS_PRODUCTNAME} Console.lnk" "$INSTDIR\bin\exodus.exe"
+  ;record the installation folder in the registry
+  WriteRegStr HKLM "Software\${EXO_REGKEY_VER}" "" $INSTDIR
 
-  createShortCut "$SMPROGRAMS\${EXODUS_PRODUCTNAME}-${EXODUS_MINOR_VERSION}\${EXODUS_PRODUCTNAME} Config.lnk" "$INSTDIR\bin\configexodus.exe"
+  createDirectory "$SMPROGRAMS\${EXO_MENUDIR}"
 
-  ;make it "run as"
-  push "$SMPROGRAMS\${EXODUS_PRODUCTNAME}-${EXODUS_MINOR_VERSION}\${EXODUS_PRODUCTNAME} Config.lnk"
+  createShortCut "$SMPROGRAMS\${EXO_MENUDIR}\${EXO_MENUITEM_TITLE_COMMANDLINE}.lnk"     "$INSTDIR\bin\exodus.exe"
+
+  createShortCut "$SMPROGRAMS\${EXO_MENUDIR}\${EXO_MENUITEM_TITLE_CONFIGURE}.lnk" "$INSTDIR\bin\configexodus.exe"
+  ;make configure "run as" so it can copy dll to postgresql bin
+  push "$SMPROGRAMS\${EXO_MENUDIR}\${EXO_MENUITEM_TITLE_CONFIGURE}.lnk"
   call ShellLinkSetRunAs
   pop $0
   DetailPrint HR=$0
@@ -723,14 +733,13 @@ Section "All" SecAll
   ;Create uninstaller
   WriteUninstaller "$INSTDIR\Uninstall.exe"
 
-  # create a shortcut named "new shortcut" in the start menu programs directory
-  # point the new shortcut at the program uninstaller
-  createShortCut "$SMPROGRAMS\${EXODUS_PRODUCTNAME}-${EXODUS_MINOR_VERSION}\Uninstall ${EXODUS_PRODUCTNAME}.lnk" "$INSTDIR\uninstall.exe"
+  # create a shortcut in the start menu programs directory to the uninstaller
+  createShortCut "$SMPROGRAMS\${EXO_MENUDIR}\${EXO_MENUITEM_TITLE_UNINSTALL_TITLE}.lnk" "$INSTDIR\uninstall.exe"
 
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${EXODUS_PRODUCTNAME}-${EXODUS_MINOR_VERSION}" \
-   "DisplayName" "${EXODUS_PRODUCTNAME}-${EXODUS_MINOR_VERSION} (remove only)"
-
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${EXODUS_PRODUCTNAME}-${EXODUS_MINOR_VERSION}" \
+  #create a Windows Uninstall Item (title and path to uninstaller)
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${EXO_MENUDIR}" \
+   "DisplayName" "${EXO_MENUDIR} (remove only)"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${EXO_MENUDIR}" \
    "UninstallString" "$INSTDIR\Uninstall.exe"
 
 SectionEnd
@@ -836,53 +845,57 @@ Section "Uninstall"
   RMDir "$INSTDIR\include\exodus"
   RMDir "$INSTDIR\include"
 
-  Delete "$%APPDATA%\${EXODUS_PRODUCTNAME}\src\compile.cpp"
-  Delete "$%APPDATA%\${EXODUS_PRODUCTNAME}\src\createfile.cpp"
-  Delete "$%APPDATA%\${EXODUS_PRODUCTNAME}\src\createindex.cpp"
-  Delete "$%APPDATA%\${EXODUS_PRODUCTNAME}\src\delete.cpp"
-  Delete "$%APPDATA%\${EXODUS_PRODUCTNAME}\src\deletefile.cpp"
-  Delete "$%APPDATA%\${EXODUS_PRODUCTNAME}\src\deleteindex.cpp"
-  Delete "$%APPDATA%\${EXODUS_PRODUCTNAME}\src\edic.cpp"
-  Delete "$%APPDATA%\${EXODUS_PRODUCTNAME}\src\edir.cpp"
-  Delete "$%APPDATA%\${EXODUS_PRODUCTNAME}\src\list.cpp"
-  Delete "$%APPDATA%\${EXODUS_PRODUCTNAME}\src\printtext.h"
-  Delete "$%APPDATA%\${EXODUS_PRODUCTNAME}\src\listfiles.cpp"
-  Delete "$%APPDATA%\${EXODUS_PRODUCTNAME}\src\listindexes.cpp"
-  Delete "$%APPDATA%\${EXODUS_PRODUCTNAME}\src\testsort.cpp"
-  Delete "$%APPDATA%\${EXODUS_PRODUCTNAME}\src\configexodus.cpp"
+  Delete "$%APPDATA%\${EXO_PRODUCTNAME}\src\compile.cpp"
+  Delete "$%APPDATA%\${EXO_PRODUCTNAME}\src\createfile.cpp"
+  Delete "$%APPDATA%\${EXO_PRODUCTNAME}\src\createindex.cpp"
+  Delete "$%APPDATA%\${EXO_PRODUCTNAME}\src\delete.cpp"
+  Delete "$%APPDATA%\${EXO_PRODUCTNAME}\src\deletefile.cpp"
+  Delete "$%APPDATA%\${EXO_PRODUCTNAME}\src\deleteindex.cpp"
+  Delete "$%APPDATA%\${EXO_PRODUCTNAME}\src\edic.cpp"
+  Delete "$%APPDATA%\${EXO_PRODUCTNAME}\src\edir.cpp"
+  Delete "$%APPDATA%\${EXO_PRODUCTNAME}\src\list.cpp"
+  Delete "$%APPDATA%\${EXO_PRODUCTNAME}\src\printtext.h"
+  Delete "$%APPDATA%\${EXO_PRODUCTNAME}\src\listfiles.cpp"
+  Delete "$%APPDATA%\${EXO_PRODUCTNAME}\src\listindexes.cpp"
+  Delete "$%APPDATA%\${EXO_PRODUCTNAME}\src\testsort.cpp"
+  Delete "$%APPDATA%\${EXO_PRODUCTNAME}\src\configexodus.cpp"
 
-  Delete "$%APPDATA%\${EXODUS_PRODUCTNAME}\src\blanksolution\*.*"
-  RMDir "$%APPDATA%\${EXODUS_PRODUCTNAME}\src\blanksolution"
+  Delete "$%APPDATA%\${EXO_PRODUCTNAME}\src\blanksolution\*.*"
+  RMDir "$%APPDATA%\${EXO_PRODUCTNAME}\src\blanksolution"
 
   ;src and bin may remain if they created any programs
-  RMDir "$%APPDATA%\${EXODUS_PRODUCTNAME}\src"
-  RMDir "$%APPDATA%\${EXODUS_PRODUCTNAME}\bin"
+  RMDir "$%APPDATA%\${EXO_PRODUCTNAME}\src"
+  RMDir "$%APPDATA%\${EXO_PRODUCTNAME}\bin"
 
   ;Exodus is likely to remain since we will not delete .exodus
-  RMDir "$%APPDATA%\${EXODUS_PRODUCTNAME}"
+  RMDir "$%APPDATA%\${EXO_PRODUCTNAME}"
 
   Delete "$INSTDIR\Uninstall.exe"
 
   RMDir "$INSTDIR"
 
-  RMDir "$PROGRAMFILES\${EXODUS_PRODUCTNAME}"
+  RMDir "$PROGRAMFILES\${EXO_PRODUCTNAME}"
 
-  DeleteRegKey /ifempty HKCU "Software\${EXODUS_PRODUCTNAME}\${EXODUS_MINOR_VERSION}"
+  ;unrecord the installation folder in the registry
+  DeleteRegKey /ifempty HKLM "Software\${EXO_REGKEY_VER}"
+  DeleteRegKey /ifempty HKLM "Software\${EXO_REGKEY_ROOT}"
 
   SetShellVarContext all
 
   # second, remove the link from the start menu
-  delete "$SMPROGRAMS\${EXODUS_PRODUCTNAME}-${EXODUS_MINOR_VERSION}\Uninstall ${EXODUS_PRODUCTNAME}.lnk"
+  delete "$SMPROGRAMS\${EXO_MENUDIR}\${EXO_MENUITEM_TITLE_UNINSTALL_TITLE}.lnk"
+  delete "$SMPROGRAMS\${EXO_MENUDIR}\${EXO_MENUITEM_TITLE_COMMANDLINE}.lnk"
+  delete "$SMPROGRAMS\${EXO_MENUDIR}\${EXO_MENUITEM_TITLE_CONFIGURE}.lnk"
 
-  delete "$SMPROGRAMS\${EXODUS_PRODUCTNAME}-${EXODUS_MINOR_VERSION}\${EXODUS_PRODUCTNAME} Console.lnk"
-  delete "$SMPROGRAMS\${EXODUS_PRODUCTNAME}-${EXODUS_MINOR_VERSION}\${EXODUS_PRODUCTNAME} Config.lnk"
-  RMDir "$SMPROGRAMS\${EXODUS_PRODUCTNAME}-${EXODUS_MINOR_VERSION}"
+  RMDir "$SMPROGRAMS\${EXO_MENUDIR}"
 
-  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${EXODUS_PRODUCTNAME}-${EXODUS_MINOR_VERSION}"
+  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${EXO_MENUDIR}"
 
-  ;remove the path to binaries HKLM=Local Machine and HKCU=Current User
+  ;remove the path to installation binaries HKLM=Local Machine
   ${un.EnvVarUpdate} $0 "PATH" "R" "HKLM" "$INSTDIR\bin"
-  ${un.EnvVarUpdate} $0 "PATH" "R" "HKCU" "$APPDATA\${EXODUS_PRODUCTNAME}\bin"
+
+  ;remove the path to the user compiled binaries HKCU=Current User
+  ${un.EnvVarUpdate} $0 "PATH" "R" "HKCU" "${EXO_COMPILER_BINPATH}"
 
 SectionEnd
 
@@ -891,14 +904,15 @@ SectionEnd
 ;onInit Function
 
 Function .onInit
- 
+
+  ;skip out if no uninstaller found
   ReadRegStr $R0 HKLM \
-  "Software\Microsoft\Windows\CurrentVersion\Uninstall\${EXODUS_PRODUCTNAME}-${EXODUS_MINOR_VERSION}" \
+  "Software\Microsoft\Windows\CurrentVersion\Uninstall\${EXO_MENUDIR}" \
   "UninstallString"
   StrCmp $R0 "" done
  
   MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION \
-  "${EXODUS_PRODUCTNAME}-${EXODUS_MINOR_VERSION} is already installed. $\n$\nClick `OK` to remove the \
+  "${EXO_MENUDIR} is already installed. $\n$\nClick `OK` to remove the \
   previous version or `Cancel` to cancel this upgrade." \
   IDOK uninst
   Abort

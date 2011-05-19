@@ -43,7 +43,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(POSTGRESQL32)\include&quot;;&quot;$(POSTGRESQL32)\include\server&quot;;&quot;$(POSTGRESQL32)\include\server\port\win32_msvc&quot;;&quot;$(POSTGRESQL32)\include\server\port\win32&quot;"
+				AdditionalIncludeDirectories="&quot;$(POSTGRES32)\include&quot;;&quot;$(POSTGRES32)\include\server&quot;;&quot;$(POSTGRES32)\include\server\port\win32_msvc&quot;;&quot;$(POSTGRES32)\include\server\port\win32&quot;"
 				PreprocessorDefinitions="WIN32"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -67,7 +67,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="postgres.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;$(POSTGRESQL32)\lib&quot;"
+				AdditionalLibraryDirectories="&quot;$(POSTGRES32)\lib32&quot;;&quot;$(POSTGRES32)\lib&quot;"
 				ModuleDefinitionFile="pgexodus.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -124,7 +124,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(POSTGRESQL32)\include&quot;;&quot;$(POSTGRESQL32)\include\server&quot;;&quot;$(POSTGRESQL32)\include\server\port\win32_msvc&quot;;&quot;$(POSTGRESQL32)\include\server\port\win32&quot;"
+				AdditionalIncludeDirectories="&quot;$(POSTGRES64)\include&quot;;&quot;$(POSTGRES64)\include\server&quot;;&quot;$(POSTGRES64)\include\server\port\win32_msvc&quot;;&quot;$(POSTGRES64)\include\server\port\win32&quot;"
 				PreprocessorDefinitions="WIN32"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -148,7 +148,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="postgres.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;$(POSTGRESQL64)\lib&quot;"
+				AdditionalLibraryDirectories="&quot;$(POSTGRES64)\lib64&quot;;&quot;$(POSTGRES64)\lib&quot;"
 				ModuleDefinitionFile="pgexodus.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -204,7 +204,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;$(POSTGRESQL32)\include&quot;;&quot;$(POSTGRESQL32)\include\server&quot;;&quot;$(POSTGRESQL32)\include\server\port\win32_msvc&quot;;&quot;$(POSTGRESQL32)\include\server\port\win32&quot;"
+				AdditionalIncludeDirectories="&quot;$(POSTGRES32)\include&quot;;&quot;$(POSTGRES32)\include\server&quot;;&quot;$(POSTGRES32)\include\server\port\win32_msvc&quot;;&quot;$(POSTGRES32)\include\server\port\win32&quot;"
 				PreprocessorDefinitions="WIN32"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -225,7 +225,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="postgres.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;$(POSTGRESQL32)\lib&quot;"
+				AdditionalLibraryDirectories="&quot;$(POSTGRES32)\lib32&quot;;&quot;$(POSTGRES32)\lib&quot;"
 				ModuleDefinitionFile="pgexodus.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -285,7 +285,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;$(POSTGRESQL32)\include&quot;;&quot;$(POSTGRESQL32)\include\server&quot;;&quot;$(POSTGRESQL32)\include\server\port\win32_msvc&quot;;&quot;$(POSTGRESQL32)\include\server\port\win32&quot;"
+				AdditionalIncludeDirectories="&quot;$(POSTGRES64)\include&quot;;&quot;$(POSTGRES64)\include\server&quot;;&quot;$(POSTGRES64)\include\server\port\win32_msvc&quot;;&quot;$(POSTGRES64)\include\server\port\win32&quot;"
 				PreprocessorDefinitions="WIN32"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -306,7 +306,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="postgres.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;$(POSTGRESQL64)\lib&quot;"
+				AdditionalLibraryDirectories="&quot;$(POSTGRES64)\lib64&quot;;&quot;$(POSTGRES64)\lib&quot;"
 				ModuleDefinitionFile="pgexodus.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"

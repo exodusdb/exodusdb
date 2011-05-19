@@ -1,35 +1,47 @@
-:checkconfig
-@if exist config.bat goto gotconfig
-@echo Please first copy config0.bat to config.bat and 
-@echo edit the your new config.bat to your configuration
-pause
-exit
-:gotconfig
+rem --- dev.bat, make.bat, clean.bat, pack.bat and upload.bat all call config.bat to initialise ---
 
-rem aim to put the most frequently changed parameters first
+rem --- preconfiguration ---
+rem --- you can create preconfig.bat to do any local preconfiguration
+    if exist preconfig.bat call preconfig %*
 
-rem ------------------------
-rem --- Product Version  ---
-rem ------------------------
-set EXODUS_MINOR_VERSION=11.5
-set EXODUS_MICRO_VERSION=11.5.3
+rem --- customisation
+rem --- copy this file to configlocal.bat and REMOVE FROM CONFIGLOCAL the following line to avoid recursion
+rem --- if "configlocal.bat" is present, use it INSTEAD of config.bat
+    if exist configlocal.bat config.bat %*
+
+rem note: exodus project build looks for includes and libs in this order
+rem so that architecture specific lib32/lib64 is picked before generic lib
+rem and you can keep different architectures in the same tree
+rem (xx=32 or 64)
+rem include
+rem libxx
+rem lib
+
+set EXO_CONFIGMODE=%*
+
+rem -------------------------------
+rem --- Output Product Version  ---
+rem -------------------------------
+set EXO_MAJOR_VER=11
+set EXO_MINOR_VER=5
+set EXO_MICRO_VER=19
+set EXO_BUILD_VER=
 rem probably can put anything alphanumeric - BUT NO SPACES OR UNUSUAL CHARACTERS
 
 rem --------------------------
 rem --- Postgresql version ---
 rem --------------------------
-    set EXODUS_PGVERSION=9.0
-rem eg C:\Program Files\PostgreSQL\9.0\bin
+    set EXO_POSTGRES_VER=9.0
+rem used in X:\Program Files\PostgreSQL\9.0\bin
 
 rem ------------------------------
 rem --- Boost version and type ---
 rem ------------------------------
-    set EXODUS_BOOSTVER=1_46_1
-    set EXODUS_BOOSTPRO=NO
-    set EXODUS_BOOSTDRV=E:
+    set EXO_BOOST_VER=1_46_1
+    set EXO_BOOSTPRO=NO
 rem ------------------------------
-rem eg if EXODUS_BOOSTPRO!="YES" C:\boost_1_46_1\bin
-rem or if EXODUS_BOOSTPRO=="YES" C:\Program Files\Boost\1_46_1\bin
+rem eg if EXO_BOOSTPRO!="YES" X:\boost_1_46_1\bin
+rem or if EXO_BOOSTPRO=="YES" X:\Program Files\Boost\1_46_1\bin
 
 rem ----------------------------------------------
 rem --- TYPE OF BUILD - PICK *ONE* FROM *EACH* ---
@@ -42,23 +54,37 @@ rem
  set Configuration=Release
 rem set Configuration=Debug
 
-rem set EXODUS_TOOLSET=VS2005
 rem
- set EXODUS_TOOLSET=SDK71
+ set EXO_TOOLSET=VS2005
+rem set EXO_TOOLSET=SDK71
 
+rem -----------------------------------
+rem --- PROGRAM DRIVES TYPICALLY C: ---
+rem -----------------------------------
+    set EXO_PROGRAMDRV=D:
 rem ------------------------------------
-rem --- DRIVE USED - TYPICALLY C: :  ---
-rem ------------------------------------
-    set PROGRAMS_DRIVE=C:
-rem ------------------------------------
-rem POSTGRESQL, BOOSTPRO, VISUAL STUDIO, SDK, NSIS must all be stored on one drive
+rem POSTGRES, BOOSTPRO, VISUAL STUDIO, SDK, NSIS must all be stored on one drive
 rem otherwise you need to configure "below the line"
 rem EXAMPLES: (some may be "Program Files (x86)" on x64 platform)
-rem eg D:\Program Files\PostgreSQL\9.0\bin
-rem C:\Program Files\Boost\1_46_1\bin
-rem C:\Program Files\Microsoft Visual Studio 8\VC\
-rem C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin
-rem C:\Program Files\NSIS\makensis.exe
+rem eg X:\Program Files\PostgreSQL\9.0\bin
+rem X:\Program Files\Boost\1_46_1\bin
+rem X:\Program Files\Microsoft Visual Studio 8\VC\
+rem X:\Program Files\Microsoft SDKs\Windows\v7.1\Bin
+rem X:\Program Files\NSIS\makensis.exe
+
+rem -------------------------------------
+rem --- DRIVES USED - TYPICALLY C: :  ---
+rem -------------------------------------
+    set EXO_BUILDDRV=D:
+rem ------------------------------------
+rem POSTGRES, BOOSTPRO, VISUAL STUDIO, SDK, NSIS must all be stored on one drive
+rem otherwise you need to configure "below the line"
+rem EXAMPLES: (some may be "Program Files (x86)" on x64 platform)
+rem eg X:\Program Files\PostgreSQL\9.0\bin
+rem X:\Program Files\Boost\1_46_1\bin
+rem X:\Program Files\Microsoft Visual Studio 8\VC\
+rem X:\Program Files\Microsoft SDKs\Windows\v7.1\Bin
+rem X:\Program Files\NSIS\makensis.exe
 
 rem =================================================================
 rem ===================== "THE LINE" ================================
@@ -81,66 +107,65 @@ rem 3. Best to install all building stuff like exodus/boost libraries etc on one
 rem maybe the same as the programs, maybe not.
 rem
 rem We need to know the location of MSVC, Boost, PostgreSQL and NSIS
+rem the following is standard except drives and versions
 rem 
 rem MSVC
-rem C:\Program Files\Microsoft Visual Studio 8\VC\
-rem C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin
+rem X:\Program Files\Microsoft Visual Studio 8\VC\
+rem X:\Program Files\Microsoft SDKs\Windows\v7.1\Bin
 rem
-rem POSTGRESQL32/64
-rem C:\Program Files\PostgreSQL\9.0
-rem C:\Program Files (x86)\PostgreSQL\9.0
+rem POSTGRES32/64
+rem X:\Program Files\PostgreSQL\9.0
+rem X:\Program Files (x86)\PostgreSQL\9.0
 rem 
 rem BOOST32/64 eg D: for build drive and C: for 
-rem D:\boost_1_46_1
+rem Y:\boost_1_46_1
 rem If you are using the ready made boost/32 binaries then
-rem C:\Program Files\Boost\boost_1_46_1
-rem C:\Program Files (x86)\Boost\boost_1_46_1
+rem X:\Program Files\Boost\boost_1_46_1
+rem X:\Program Files (x86)\Boost\boost_1_46_1
 rem 
 rem NSIS
-rem rem C:\Program Files\NSIS\makensis.exe
-rem rem C:\Program Files (x86)\NSIS\makensis.exe
+rem rem X:\Program Files\NSIS\makensis.exe
+rem rem X:\Program Files (x86)\NSIS\makensis.exe
 
 rem ------------------------------------
 rem --- WHERE ARE PROGRAMS INSTALLED ---
 rem ------------------------------------
-    set EXODUS_PROGRAMFILES32=%PROGRAMS_DRIVE%\Program Files
-rem if not "%ProgramFiles(x86)%" == "" set EXODUS_PROGRAMFILES32=%EXODUS_PROGRAMFILES32% (x86)
-    if "%PROCESSOR_ARCHITECTURE%" == "AMD64" set EXODUS_PROGRAMFILES32=%EXODUS_PROGRAMFILES32% (x86)
-    set EXODUS_PROGRAMFILES64=%PROGRAMS_DRIVE%\Program Files
+    set EXO_PROGRAMFILES32=%EXO_PROGRAMDRV%\Program Files
+    set EXO_PROGRAMFILES64=%EXO_PROGRAMDRV%\Program Files
+    if "%PROCESSOR_ARCHITECTURE%" EQU "AMD64" set EXO_PROGRAMFILES32=%EXO_PROGRAMFILES32% (x86)
 
 rem ----- INSTALLED BOOST -----
 rem ---------------------------
-    set BOOST32=%BOOST_DRV%\boost_%EXODUS_BOOSTVER%
-    set BOOST64=%BOOST_DRV%\boost_%EXODUS_BOOSTVER%
-    IF BOOSTPRO=="YES" set BOOST32=%EXODUS_PROGRAMFILES32%\Boost\boost_%EXODUS_BOOSTVER%
-    IF BOOSTPRO=="YES" set BOOST64=%EXODUS_PROGRAMFILES64%\Boost\boost_%EXODUS_BOOSTVER%
+    set BOOST32=%BOOST_DRV%\boost_%EXO_BOOST_VER%
+    set BOOST64=%BOOST_DRV%\boost_%EXO_BOOST_VER%
+    IF BOOSTPRO=="YES" set BOOST32=%EXO_PROGRAMFILES32%\Boost\boost_%EXO_BOOST_VER%
+    IF BOOSTPRO=="YES" set BOOST64=%EXO_PROGRAMFILES64%\Boost\boost_%EXO_BOOST_VER%
 
 rem NOTE: boost x64 binary libs are not available so we generally build them here
 rem D:\boost_1_46_1\stage64\lib
 rem D:\boost_1_46_1\stage32\lib
-rem exodus project build looks for libs in this order
+rem exodus project build looks for includes and libs in this order
+rem so that architecture specific lib32/lib64 is picked before generic lib
+rem and you can keep different architectures in the same tree
 rem --- xx=32 or 64 ---
-rem \libxx
-rem \stagexx\lib
-rem \lib
-rem \stage\lib
+rem include
+rem libxx
+rem stagexx\lib
+rem lib
+rem stage\lib
 
-rem ----- POSTGRESQL -----
-rem ----------------------
-    set POSTGRESQL32=%EXODUS_PROGRAMFILES32%\PostgreSQL\%EXODUS_PGVERSION%
-rem
-    set POSTGRESQL64=%EXODUS_PROGRAMFILES64%\PostgreSQL\%EXODUS_PGVERSION%
-rem     set POSTGRESQL64=D:\pg9dev
-rem solutions/projects search for includes and libs as follows:
-rem \include
-rem \stage\lib
+rem ----- POSTGRES -----
+rem --------------------
+    set POSTGRES32=%EXO_PROGRAMFILES32%\PostgreSQL\%EXO_POSTGRES_VER%
+    set POSTGRES64=%EXO_PROGRAMFILES64%\PostgreSQL\%EXO_POSTGRES_VER%
 
 rem ---------------------------------------------
 rem --- SKIP TOOLSETS IF OPENING DEVELOPER UI ---
 rem ---------------------------------------------
-    if "%EXODUS_DEV%" == "YES" goto aftertoolsets
 
-    if NOT "%EXODUS_TOOLSET%" == "VS2005" goto toolset2
+    if "%EXO_CONFIGMODE%" == "DEV" goto aftertoolsets
+
+    if "%EXO_TOOLSET%" NEQ "VS2005" goto toolset2
 rem ---------------------------------------------------------------
 rem --- VS2005 TOOLSET                                          ---
 rem ---------------------------------------------------------------
@@ -150,8 +175,8 @@ rem --- VS2005 Configuration ---
 rem ----------------------------
 
 
-rem path %EXODUS_PROGRAMFILES32%\Microsoft Visual Studio 8\VC\;%PATH%
-    path %PATH%;%EXODUS_PROGRAMFILES32%\Microsoft Visual Studio 8\VC\
+rem path %EXO_PROGRAMFILES32%\Microsoft Visual Studio 8\VC\;%PATH%
+    path %PATH%;%EXO_PROGRAMFILES32%\Microsoft Visual Studio 8\VC\
 
 rem --- x86 command prompt ---
     if %TARGET_CPU%==x86 call vcvarsall.bat x86
@@ -165,12 +190,12 @@ rem -----------------------
 rem these are probably going to be removed at least for release versions that have redist packages ... debug versions may stay
 rem Runtime version 70 80 90 100 for MSVC2003, 2005, 2008 and 2010 respectively
 rem and location of msvcrNNd.dll etc c runtime dlls
-set EXODUS_TOOLPATH=C:Windows\system32
- set EXODUS_TOOLPATHREL=%EXODUS_PROGRAMFILES32%\Microsoft Visual Studio 8\VC\redist\x86\Microsoft.VC80.CRT
- set EXODUS_TOOLPATHDEB=%EXODUS_PROGRAMFILES32%\Microsoft Visual Studio 8\VC\redist\Debug_NonRedist\x86\Microsoft.VC80.DebugCRT
-rem set EXODUS_TOOLPATHREL=%EXODUS_PROGRAMFILES32%\Microsoft Visual Studio 8\VC\redist\amd64\Microsoft.VC80.CRT
-rem set EXODUS_TOOLPATHDEB=%EXODUS_PROGRAMFILES32%\Microsoft Visual Studio 8\VC\redist\Debug_NonRedist\amd64\Microsoft.VC80.DebugCRT
-set EXODUS_VCVERSION=80
+set EXO_TOOLPATH=C:Windows\system32
+ set EXO_TOOLPATHREL=%EXO_PROGRAMFILES32%\Microsoft Visual Studio 8\VC\redist\x86\Microsoft.VC80.CRT
+ set EXO_TOOLPATHDEB=%EXO_PROGRAMFILES32%\Microsoft Visual Studio 8\VC\redist\Debug_NonRedist\x86\Microsoft.VC80.DebugCRT
+rem set EXO_TOOLPATHREL=%EXO_PROGRAMFILES32%\Microsoft Visual Studio 8\VC\redist\amd64\Microsoft.VC80.CRT
+rem set EXO_TOOLPATHDEB=%EXO_PROGRAMFILES32%\Microsoft Visual Studio 8\VC\redist\Debug_NonRedist\amd64\Microsoft.VC80.DebugCRT
+set EXO_VCVERSION=80
 
 rem ---------------------
 rem --- VS2005 Redist ---
@@ -195,7 +220,7 @@ set REDIST_URL2="http://exodusdb.googlecode.com/files/vcredist_2005_x64.exe"
 goto checktoolset
 
 :toolset2
-if NOT "%EXODUS_TOOLSET%" == "XXXXXXX" goto toolset3
+if "%EXO_TOOLSET%" NEQ "XXXXXXX" goto toolset3
 rem ---------------------------------------------------------------
 rem --- xxxxxx TOOLSET                                          ---
 rem ---------------------------------------------------------------
@@ -204,7 +229,7 @@ goto checktoolset
 
 
 :toolset3
-if NOT "%EXODUS_TOOLSET%" == "XXXXXXX" goto toolset4
+if "%EXO_TOOLSET%" NEQ "XXXXXXX" goto toolset4
 rem ---------------------------------------------------------------
 rem --- xxxxxx TOOLSET                                          ---
 rem ---------------------------------------------------------------
@@ -212,7 +237,7 @@ rem ...
 goto checktoolset
 
 :toolset4
-if NOT "%EXODUS_TOOLSET%" == "XXXXXXX" goto toolset5
+if "%EXO_TOOLSET%" NEQ "XXXXXXX" goto toolset5
 rem ---------------------------------------------------------------
 rem --- xxxxxx TOOLSET                                          ---
 rem ---------------------------------------------------------------
@@ -224,18 +249,20 @@ rem -------------------------------------------------------------------------
 rem --- SDK71 TOOLSET (the last one and the default)                      ---
 rem -------------------------------------------------------------------------
 
-    path %EXODUS_PROGRAMFILES64%\Microsoft SDKs\Windows\v7.1\Bin;%PATH%
-rem path %PATH%;%EXODUS_PROGRAMFILES64%\Microsoft SDKs\Windows\v7.1\Bin
+    path %EXO_PROGRAMFILES64%\Microsoft SDKs\Windows\v7.1\Bin;%PATH%
+rem path %PATH%;%EXO_PROGRAMFILES64%\Microsoft SDKs\Windows\v7.1\Bin
 
 rem ---------------------------
 rem --- SDK71 Configuration ---
 rem ---------------------------
+    call setenv /%TARGET_CPU% /%Configuration%
+ren eg
 rem call setenv /x86 /debug
 rem call setenv /x86 /release
 rem call setenv /x64 /debug
 rem call setenv /x64 /release
-    call setenv /%TARGET_CPU% /%Configuration%
 
+rem setenv seems to switch off echo. switch echo back on
 echo on
 
 rem ----------------------
@@ -243,9 +270,9 @@ rem --- SDK71 Binaries ---
 rem ----------------------
 rem Runtime version 70 80 90 100 for MSVC2003, 2005, 2008 and 2010 respectively
 rem and location of msvcrNNd.dll etc c runtime dlls
-set EXODUS_TOOLPATHREL=C:Windows\system32
-set EXODUS_TOOLPATHDEB=C:Windows\system32
-set EXODUS_VCVERSION=100
+set EXO_TOOLPATHREL=C:Windows\system32
+set EXO_TOOLPATHDEB=C:Windows\system32
+set EXO_VCVERSION=100
 
 rem --------------------
 rem --- SDK71 Redist ---
@@ -278,17 +305,15 @@ rem ---------------------
 rem --- SANITY CHECKS ---
 rem ---------------------
 
-if not "%Configuration%" == "" goto gotconfiguration
-@echo MISSING CONFIGURATION ENVIRONMENT VARIABLE
-if "%EXODUS_BATCHMODE%" == "" pause
-exit
+if "%Configuration%" NEQ "" goto gotconfiguration
+"Error: Config: has failed to setup the 'Configuration' Environment variable"
+goto exit
 :gotconfiguration
 @echo Configuration=%Configuration%
 
-if not "%TARGET_CPU%" == "" goto gottargetcpu
-@echo MISSING TARGET_CPU ENVIRONMENT VARIABLE
-if "%EXODUS_BATCHMODE%" == "" pause
-exit
+if "%TARGET_CPU%" NEQ "" goto gottargetcpu
+"Error: Config: has failed to setup the 'TARGET_CPU' Environment variable"
+goto exit
 :gottargetcpu
 @echo TARGET_CPU=%TARGET_CPU%
 
@@ -298,40 +323,42 @@ rem --------------------
 rem --- Product Name ---
 rem --------------------
 rem Name for menus etc and basic name for installfile (without platform)
-if "%TARGET_CPU%" == "x86" set EXODUS_PRODUCTNAME=Exodus
-if "%TARGET_CPU%" == "x64" set EXODUS_PRODUCTNAME=Exodus64
-set EXODUS_CODENAME=exodus
+rem if "%TARGET_CPU%" == "x86" set EXO_PRODUCTNAME=Exodus
+rem if "%TARGET_CPU%" == "x64" set EXO_PRODUCTNAME=Exodus64
+rem stick with one name and installdir per minor version regardless of x86/x64 - like python
+set EXO_PRODUCTNAME=Exodus
+set EXO_CODENAME=exodus
 
 rem ------------------
 rem ---- BUILDING ----
 rem ------------------
 
-if "%TARGET_CPU%" == "x64" set EXODUS_PLATFORM=x64
-if "%TARGET_CPU%" == "x86" set EXODUS_PLATFORM=Win32
-if "%TARGET_CPU%" == "x64" set EXODUS_BINARIES=x64\%Configuration%
-if "%TARGET_CPU%" == "x86" set EXODUS_BINARIES=%Configuration%
+if "%TARGET_CPU%" == "x64" set EXO_PLATFORM=x64
+if "%TARGET_CPU%" == "x86" set EXO_PLATFORM=Win32
+if "%TARGET_CPU%" == "x64" set EXO_BINARIES=x64\%Configuration%
+if "%TARGET_CPU%" == "x86" set EXO_BINARIES=%Configuration%
 
 rem --- SOLUTION ---
 rem ----------------
 rem default project
-    set EXODUS_PROJECT=exodus_all
+    set EXO_PROJECT=exodus_all
 rem VS2005
-    if "%EXODUS_TOOLSET%" == "VS2005" set EXODUS_PROJECT=exodus_all2005
+    if "%EXO_TOOLSET%" == "VS2005" set EXO_PROJECT=exodus_all2005
 rem VS2008 - doesnt exist but could be created from 2005 solution
-    if "%EXODUS_TOOLSET%" == "VS2008" set EXODUS_PROJECT=exodus_all2008
+    if "%EXO_TOOLSET%" == "VS2008" set EXO_PROJECT=exodus_all2008
 
 rem --- COMMAND TO BUILD ---
 rem ------------------------
-rem set EXODUS_MAKE=vcbuild /p:Platform=%EXODUS_PLATFORM% /p:Configuration=%Configuration% %EXODUS_PROJECT%.sln
-    set EXODUS_MAKE=msbuild /p:Platform=%EXODUS_PLATFORM% /p:Configuration=%Configuration% %EXODUS_PROJECT%.sln
+rem set EXO_MAKECMD=vcbuild /p:Platform=%EXO_PLATFORM% /p:Configuration=%Configuration% %EXO_PROJECT%.sln
+    set EXO_MAKECMD=msbuild /p:Platform=%EXO_PLATFORM% /p:Configuration=%Configuration% %EXO_PROJECT%.sln
 
 rem --- COMMAND TO CLEAN ---
 rem ------------------------
-rem set EXODUS_CLEAN=%EXODUS_MAKE% /t:clean
-    set EXODUS_CLEAN=%EXODUS_MAKE% /t:clean
+rem set EXO_CLEANCMD=%EXO_MAKECMD% /t:clean
+    set EXO_CLEANCMD=%EXO_MAKECMD% /t:clean
 
 rem ignore this for now
-rem vcbuild /nocolor /logfile:%EXODUS_PROJECT%_vcb.log /error:ERROR: /warning:WARNING: %EXODUS_PROJECT%.sln
+rem vcbuild /nocolor /logfile:%EXO_PROJECT%_vcb.log /error:ERROR: /warning:WARNING: %EXO_PROJECT%.sln
 rem if errorlevel 2 set error=yes
 rem if error==yes goto upload
 rem echo vcbuild done
@@ -341,41 +368,52 @@ rem -----------------------
 rem --- DEVELOPMENT UI  ---
 rem -----------------------
 rem search for the latest version of VS Professional or Express
-    set EXODUS_VS=%VS110COMNTOOLS%
-    if "%EXODUS_VS%" =="" set EXODUS_VS=%VS100COMNTOOLS%
-    if "%EXODUS_VS%" =="" set EXODUS_VS=%VS90COMNTOOLS%
-    if "%EXODUS_VS%" =="" set EXODUS_VS=%VS80COMNTOOLS%
-if exist "%EXODUS_VS%..\IDE\devenv.exe" set EXODUS_DEV="%EXODUS_VS%..\IDE\devenv" %EXODUS_PROJECT%.sln
-if exist "%EXODUS_VS%..\IDE\vcexpress.exe" set EXODUS_DEV="%EXODUS_VS%..\IDE\vcexpress" %EXODUS_PROJECT%.sln
-if not "%EXODUS_DEV%"=="YES" goto gotgui
-@echo CANT FIND VS/GUI PROGRAM
-if "%EXODUS_BATCHMODE%" == "" pause
-exit
-:gotgui
-@echo EXODUS_PACK=%EXODUS_PACK%
+    set EXO_VS=%VS110COMNTOOLS%
+    if "%EXO_VS%" =="" set EXO_VS=%VS100COMNTOOLS%
+    if "%EXO_VS%" =="" set EXO_VS=%VS90COMNTOOLS%
+    if "%EXO_VS%" =="" set EXO_VS=%VS80COMNTOOLS%
 
+if exist "%EXO_VS%..\IDE\devenv.exe" set EXO_DEVCMD="%EXO_VS%..\IDE\devenv" %EXO_PROJECT%.sln
+if exist "%EXO_VS%..\IDE\devenv.exe" goto afterdevcmd
+
+if exist "%EXO_VS%..\IDE\vcexpress.exe" set EXO_DEVCMD="%EXO_VS%..\IDE\vcexpress" %EXO_PROJECT%.sln
+if exist "%EXO_VS%..\IDE\vcexpress.exe" goto afterdevcmd
+
+"Error: Config: FAILED TO FIND VS/GUI PROGRAM"
+goto exit
+:afterdevcmd
+@echo EXO_DEVCMD=%EXO_DEVCMD%
+
+
+if "%EXO_CONFIGMODE%" == "CLEAN" goto afterinstaller
 
 rem ---------------------------
 rem --- PACKAGING INSTALLER ---
 rem ---------------------------
-set EXODUS_PACK=%EXODUS_PROGRAMFILES32%\NSIS\makensis.exe
-if not exist "%EXODUS_PACK%" set EXODUS_PACK=%EXODUS_PROGRAMFILES64%\NSIS\makensis.exe
-
-if exist "%EXODUS_PACK%" goto gotnsis
-if not "EXODUS_DEV" == "" goto gotnsis
-@echo MISSING "%EXODUS_PACK%" PROGRAM
-if "%EXODUS_BATCHMODE%" == "" pause
-exit
-:gotnsis
-@echo EXODUS_PACK=%EXODUS_PACK%
+set EXO_PACKCMD="%EXO_PROGRAMFILES32%\NSIS\makensis.exe"
+if not exist %EXO_PACKCMD% set EXO_PACKCMD="%EXO_PROGRAMFILES64%\NSIS\makensis.exe"
+if exist %EXO_PACKCMD% goto gotpackexe
+if "%EXO_CONFIGMODE%" NEQ "PACK" goto gotpackexe
+"Error: Config: MISSING %EXO_PROGRAMFILES32%\NSIS\makensis.exe PROGRAM"
+goto afterinstaller
+goto exit
+:gotpackexe
+@echo EXO_PACKCMD=%EXO_PACKCMD%
 
 rem ---------------------------------
 rem --- COMMAND TO MAKE INSTALLER ---
 rem ---------------------------------
 rem there is no exodus_all2005.NSI!
-set EXODUS_PACK="%EXODUS_PACK%" exodus_all.nsi
+set EXO_PACKOPT=exodus_all.nsi
+
+:afterinstaller
 
 @echo BOOST32=%BOOST32%
 @echo BOOST64=%BOOST64%
-@echo POSTGRESQL32=%POSTGRESQL32%
-@echo POSTGRESQL64=%POSTGRESQL64%
+@echo POSTGRES32=%POSTGRES32%
+@echo POSTGRES64=%POSTGRES64%
+@set EXO
+
+rem this should be the only exit and pause in the program
+:exit
+if "%EXO_CONFIGMODE%" EQU "" pause
