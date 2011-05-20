@@ -415,6 +415,8 @@ rem needs EXO_UPLOADUSER UPLOADPASS_EXO EXO_INSTALLFILENAME
 rem -------------------------
 rem --- COMMAND TO UPLOAD ---
 rem -------------------------
+rem TODO MODIFY THE CMD TO FAIL NOT PROMPT FOR USER/PASS
+rem NOTE THAT IT ASKS FOR USER AND PASS FOR ANY TYPE OF FAILURE INCLUDE "FILE ALREADY EXISTS" - THERE IS NO OVERWRITE OPTION
 set EXO_UPLOADCMD=googlecode_upload.py
 set EXO_UPLOADOPT=-s "Exodus Windows %TARGET_CPU% Installer" --project=exodusdb --user=%EXO_UPLOADUSER% --password=%UPLOADPASS_EXO% -l "Type-Package,OpSys-Win" %EXO_INSTALLFILENAME%
 

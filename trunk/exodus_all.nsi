@@ -1,5 +1,5 @@
 ; top: parameters
-; middle: standard nsis macros that doesnt need to be changed or understood
+; middle: standard nsis macros that dont need to be changed
 ; bottom: exodus build instructions
 ; ------------------------------------------------------------
 ; requires AT LEAST the following environment variables PRESET
@@ -926,8 +926,8 @@ Section "Uninstall"
   ;remove the path to installation binaries HKLM=Local Machine
   ${un.EnvVarUpdate} $0 "PATH" "R" "HKLM" "$INSTDIR\bin"
 
-;  ;remove the path to the user compiled binaries HKCU=Current User
-;  ${un.EnvVarUpdate} $0 "PATH" "R" "HKCU" "${EXO_USERBIN}"
+  ;remove the path to the user compiled binaries HKCU=Current User
+  ${un.EnvVarUpdate} $0 "PATH" "R" "HKCU" "${EXO_USERBIN}"
 
 SectionEnd
 
