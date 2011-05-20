@@ -329,7 +329,7 @@ function main()
 
                 //target directories
 
-				var homedir=osgetenv("APPDATA");
+				var homedir=osgetenv("USERPROFILE");
 				if (homedir) {
 					bindir=homedir^"\\Exodus\\bin";
 					libdir=bindir;
