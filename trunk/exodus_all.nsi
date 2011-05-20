@@ -93,7 +93,17 @@
  !define EXO_REGKEY_ROOT "$%EXO_PRODUCTNAME%"
  !define EXO_REGKEY_VER  "$%EXO_PRODUCTNAME%\$%EXO_MAJOR_VER%.$%EXO_MINOR_VER%"
 
- !define EXO_COMPILER_BINPATH "$APPDATA\$%EXO_PRODUCTNAME%\bin"
+;%LOCALAPPDATA%  writable like appdata (if present)
+;%APPDATA% not writable - in vista+?
+; !define EXO_USERHOME "$APPDATA\$%EXO_PRODUCTNAME%"
+; !define EXO_USERBIN  "$APPDATA\$%EXO_PRODUCTNAME%\bin"
+; !define EXO_USERHOME "$LOCALAPPDATA\$%EXO_PRODUCTNAME%"
+; !define EXO_USERBIN  "$LOCALAPPDATA\$%EXO_PRODUCTNAME%\bin"
+
+;going to put user in same structure as \Exodus! like python
+;if userbin=exodusbin then dont double add it to the path - to avoid a confusing install message - and vice versa - search below
+ !define EXO_USERHOME "$INSTDIR"
+ !define EXO_USERBIN  "$INSTDIR\bin"
 
 ;-------------------------
 ;BASIC FILENAME FOR EXODUS
@@ -690,10 +700,10 @@ Section "All" SecAll
   File exodus\exodus\exodus\xfunctor*.h
 
   ;SetOutPath "$INSTDIR\src"
-  createDirectory "$%APPDATA%\Exodus"
-  createDirectory "$%APPDATA%\Exodus\src"
-  createDirectory "$%APPDATA%\Exodus\bin"
-  SetOutPath "$%APPDATA%\Exodus\src"
+  createDirectory "${EXO_USERHOME}"
+  createDirectory "${EXO_USERHOME}\src"
+  createDirectory "${EXO_USERHOME}\bin"
+  SetOutPath "${EXO_USERHOME}\src"
 
   File cli\src\compile.cpp
   File cli\src\createfile.cpp
@@ -722,10 +732,9 @@ Section "All" SecAll
 
   SetShellVarContext all
 
-  ;create a path to the user compiled binaries HKCU=Current User
-  ;cannot see to add %APPDATA% in local machine path so have to do for current user only :(
-;  ${EnvVarUpdate} $0 "PATH" "A" "HKCU" "$APPDATA\${EXO_PRODUCTNAME}\bin"
-  ${EnvVarUpdate} $0 "PATH" "A" "HKCU" "${EXO_COMPILER_BINPATH}"
+;  ;create a path to the user compiled binaries HKCU=Current User (add to "all users user??)
+;  ;cannot see to add %APPDATA% in local machine path so have to do for current user only :(
+;  ${EnvVarUpdate} $0 "PATH" "A" "HKCU" "${EXO_USERBIN}"
 
   ;record the installation folder in the registry
   WriteRegStr HKLM "Software\${EXO_REGKEY_VER}" "" $INSTDIR
@@ -761,11 +770,10 @@ Section "${REDIST_DESC} Redist (req.)" SEC_CRT
 
 ;  SectionIn RO
 
-;dont bother attempting to detect since it doesnt seem to appear to work everywhere
 ;  ; Detection made easy: Unlike previous redists, VC2010 now generates a platform
 ;  ; independent key for checking availability.
 ;  
-  ;VCVER is like 10.0
+  ;VCVER is like "10.0"
   ReadRegDword $R0 HKLM "SOFTWARE\Microsoft\VisualStudio\$%EXO_REDISTDOTVER%\VC\Runtimes\$%TARGET_CPU%" "Installed"
 ;  IfErrors done
   StrCmp $R0 "1" done
@@ -861,30 +869,30 @@ Section "Uninstall"
   RMDir "$INSTDIR\include\exodus"
   RMDir "$INSTDIR\include"
 
-  Delete "$%APPDATA%\${EXO_PRODUCTNAME}\src\compile.cpp"
-  Delete "$%APPDATA%\${EXO_PRODUCTNAME}\src\createfile.cpp"
-  Delete "$%APPDATA%\${EXO_PRODUCTNAME}\src\createindex.cpp"
-  Delete "$%APPDATA%\${EXO_PRODUCTNAME}\src\delete.cpp"
-  Delete "$%APPDATA%\${EXO_PRODUCTNAME}\src\deletefile.cpp"
-  Delete "$%APPDATA%\${EXO_PRODUCTNAME}\src\deleteindex.cpp"
-  Delete "$%APPDATA%\${EXO_PRODUCTNAME}\src\edic.cpp"
-  Delete "$%APPDATA%\${EXO_PRODUCTNAME}\src\edir.cpp"
-  Delete "$%APPDATA%\${EXO_PRODUCTNAME}\src\list.cpp"
-  Delete "$%APPDATA%\${EXO_PRODUCTNAME}\src\printtext.h"
-  Delete "$%APPDATA%\${EXO_PRODUCTNAME}\src\listfiles.cpp"
-  Delete "$%APPDATA%\${EXO_PRODUCTNAME}\src\listindexes.cpp"
-  Delete "$%APPDATA%\${EXO_PRODUCTNAME}\src\testsort.cpp"
-  Delete "$%APPDATA%\${EXO_PRODUCTNAME}\src\configexodus.cpp"
+  Delete "${EXO_USERHOME}\src\compile.cpp"
+  Delete "${EXO_USERHOME}\src\createfile.cpp"
+  Delete "${EXO_USERHOME}\src\createindex.cpp"
+  Delete "${EXO_USERHOME}\src\delete.cpp"
+  Delete "${EXO_USERHOME}\src\deletefile.cpp"
+  Delete "${EXO_USERHOME}\src\deleteindex.cpp"
+  Delete "${EXO_USERHOME}\src\edic.cpp"
+  Delete "${EXO_USERHOME}\src\edir.cpp"
+  Delete "${EXO_USERHOME}\src\list.cpp"
+  Delete "${EXO_USERHOME}\src\printtext.h"
+  Delete "${EXO_USERHOME}\src\listfiles.cpp"
+  Delete "${EXO_USERHOME}\src\listindexes.cpp"
+  Delete "${EXO_USERHOME}\src\testsort.cpp"
+  Delete "${EXO_USERHOME}\src\configexodus.cpp"
 
-  Delete "$%APPDATA%\${EXO_PRODUCTNAME}\src\blanksolution\*.*"
-  RMDir "$%APPDATA%\${EXO_PRODUCTNAME}\src\blanksolution"
+  Delete "${EXO_USERHOME}\src\blanksolution\*.*"
+  RMDir "${EXO_USERHOME}\src\blanksolution"
 
   ;src and bin may remain if they created any programs
-  RMDir "$%APPDATA%\${EXO_PRODUCTNAME}\src"
-  RMDir "$%APPDATA%\${EXO_PRODUCTNAME}\bin"
+  RMDir "${EXO_USERHOME}\src"
+  RMDir "${EXO_USERHOME}\bin"
 
   ;Exodus is likely to remain since we will not delete .exodus
-  RMDir "$%APPDATA%\${EXO_PRODUCTNAME}"
+  RMDir "${EXO_USERHOME}"
 
   Delete "$INSTDIR\Uninstall.exe"
 
@@ -910,8 +918,8 @@ Section "Uninstall"
   ;remove the path to installation binaries HKLM=Local Machine
   ${un.EnvVarUpdate} $0 "PATH" "R" "HKLM" "$INSTDIR\bin"
 
-  ;remove the path to the user compiled binaries HKCU=Current User
-  ${un.EnvVarUpdate} $0 "PATH" "R" "HKCU" "${EXO_COMPILER_BINPATH}"
+;  ;remove the path to the user compiled binaries HKCU=Current User
+;  ${un.EnvVarUpdate} $0 "PATH" "R" "HKCU" "${EXO_USERBIN}"
 
 SectionEnd
 

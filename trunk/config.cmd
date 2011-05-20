@@ -1,132 +1,58 @@
 rem ---------------------------------------------------------
 rem --- dev.cmd, make.cmd, clean.cmd, pack.cmd and upload.cmd
-rem ---  all call this config.cmd to initialise ---
+rem ---  all call this config.cmd to initialise           ---
 rem ---------------------------------------------------------
 
 set EXO_CONFIGMODE=%*
 
-rem --------------------------------------
-rem --- preconfiguration - config2.cmd ---
-rem --------------------------------------
-rem you must create config2.cmd to do any local preconfiguration
-rem for example:
-rem EXO_UPLOADUSER=neosys.com@gmail.com
-rem UPLOADPASS_EXO=somesillysecret
-rem -------------------------
-    if exist config2.cmd call config2 %*
-
-rem ---------------------
-rem --- customisation ---
-rem ---------------------
-rem just copy this file to configlocal.cmd
-rem AND REMOVE FROM *YOUR* COPY THE FOLLOWING TWO LINES!!
+rem --------------------------------------------------------------
+rem --- your local configuration is in configlocal.cmd         ---
+rem --- (copy configlocalEXAMPLE.cmd TO configlocal.cmd)       ---
+rem --------------------------------------------------------------
     if exist configlocal.cmd call configlocal.cmd %*
-    if exist configlocal.cmd goto exit
 
-rem note: exodus project build looks for includes and libs in this order
-rem so that architecture specific lib32/lib64 is picked before generic lib
-rem and you can keep different architectures in the same tree
-rem (xx=32 or 64)
-rem include
-rem libxx
-rem lib
+rem you should not have to edit this config.cmd but, if you do
+rem see "Completely customising configuration" below
 
-rem ------------------------ TARGETING --------------------
+rem ----------------
+rem --- Defaults ---
+rem ----------------
 
-rem ------------------
-rem --- X86 or X64 ---
-rem ------------------
-    if "%TARGET_CPU%" NEQ "" goto gottargetcpu0
-set TARGET_CPU=x86
-rem    set TARGET_CPU=x64
-:gottargetcpu0
+    if "%EXO_MAJOR_VER%" EQU "" set EXO_MAJOR_VER=0
+    if "%EXO_MINOR_VER%" EQU "" set EXO_MINOR_VER=0
+    if "%EXO_MICRO_VER%" EQU "" set EXO_MICRO_VER=0
+    if "%EXO_BUILD_VER%" EQU "" set EXO_BUILD_VER=0
 
-rem ------------------------
-rem --- RELEASE OR DEBUG ---
-rem ------------------------
-    if "%CONFIGURATION%" NEQ "" goto gotconfiguration0
-rem set Configuration=Debug
-    set Configuration=Release
-:gotconfiguration0
+    if "%TARGET_CPU%"    EQU "" set TARGET_CPU=x64
+    if "%CONFIGURATION%" EQU "" set CONFIGURATION=Release
+    if "%EXO_TOOLSET%"   EQU "" set EXO_TOOLSET=SDK71
 
-rem ---------------
-rem --- TOOLSET ---
-rem ---------------
-    if "%EXO_TOOLSET%" NEQ "" goto gottoolset0
-rem set EXO_TOOLSET=VS2005
-    set EXO_TOOLSET=SDK71
-:gottoolset0
+    if "%EXO_POSTGRES_VER%" EQU "" set EXO_POSTGRES_VER=9.0
 
-rem ---------------------- VERSIONING -----------------------
+    if "%EXO_BOOST_VER%" EQU "" set EXO_BOOST_VER=1_46_1
+    if "%EXO_BOOSTPRO%"  EQU "" set EXO_BOOSTPRO=NO
 
-rem ----------------------
-rem --- EXODUS VERSION ---
-rem ----------------------
-set EXO_MAJOR_VER=11
-set EXO_MINOR_VER=5
-set EXO_MICRO_VER=19
-set EXO_BUILD_VER=
-rem probably can put anything alphanumeric - BUT NO SPACES OR UNUSUAL CHARACTERS
-
-rem ------------------------
-rem --- POSTGRES VERSION ---
-rem ------------------------
-    set EXO_POSTGRES_VER=9.0
-rem used in X:\Program Files\PostgreSQL\9.0\bin
-
-rem ------------------------------
-rem --- BOOST VERSION AND TYPE ---
-rem ------------------------------
-    set EXO_BOOST_VER=1_46_1
-    set EXO_BOOSTPRO=NO
-rem ------------------------------
-rem eg if EXO_BOOSTPRO!="YES" X:\boost_1_46_1\bin
-rem or if EXO_BOOSTPRO=="YES" X:\Program Files\Boost\1_46_1\bin
-
-rem ------------------ LOCAL RESOURCES -----------------
-
-rem -------------------------------------
-rem --- PROGRAM DRIVES - TYPICALLY C: ---
-rem -------------------------------------
-    set EXO_PROGRAMDRV=C:
-rem ------------------------------------
-rem POSTGRES, BOOSTPRO, VISUAL STUDIO, SDK, NSIS must all be stored on one drive
-rem otherwise you need to configure "below the line"
-rem EXAMPLES: (some may be "Program Files (x86)" on x64 platform)
-rem eg X:\Program Files\PostgreSQL\9.0\bin
-rem X:\Program Files\Boost\1_46_1\bin
-rem X:\Program Files\Microsoft Visual Studio 8\VC\
-rem X:\Program Files\Microsoft SDKs\Windows\v7.1\Bin
-rem X:\Program Files\NSIS\makensis.exe
-
-rem ------------------------------------------------
-rem --- PATH TO PARENT DIRECTORY OF DEPENDENCIES ---
-rem ------------------------------------------------
-    set EXO_BUILD_ROOT=
-rem ------------------------------------
-rem NO TRAILING SLASH!
-rem sadly must be absolute or blank which means root of exodus drive
-rem dependencies = currently only BOOST
-rem BOOSTPRO isnt here. it is installed with the "programs" (see above)
+    if "%EXO_PROGRAMDRV%" EQU "" set EXO_PROGRAMDRV=C:
+    if "%EXO_BUILD_ROOT%" EQU "" set EXO_BUILD_ROOT=
 
 
+rem -----------------------------------------------------
+rem --- completely customising configuration          ---
+rem -----------------------------------------------------
+rem 1. Copy config.cmd to configcustom.cmd
+rem 2. Edit configcustom.cmd as desired
+rem 3. EDIT OUT ALL LINES DOWN TO "BELOW THE LINE" FROM CONFIGCUSTOM.CMD
+rem    TO AVOID CONFIGCUSTOM.CMD FROM CALLING CONFIGCUSTOM.CMD RECURSIVELY!
+rem -----------------------------------------------------
+    if exist configcustom.cmd call configcustom.cmd %*
+    if exist configcustom.cmd goto exit
 
-rem #################################################################
-rem #################################################################
-rem #################################################################
-rem ####################  "THE LINE"  ###############################
-rem #################################################################
-rem #################################################################
-rem #################################################################
-
-
-
-rem =================================================================
-rem ===                 "BELOW THE LINE"                          ===
-rem =================================================================
-rem === IF ALL THE PROGRAMS ARE INSTALLED IN THE "USUAL" PLACES   ===
-rem === YOU SHOULD NOT HAVE TO MODIFY ANYTHING "BELOW THE LINE"   ===
-rem =================================================================
+rem ================================================================
+rem ===                 "BELOW THE LINE"                         ===
+rem ================================================================
+rem === IF ALL THE PROGRAMS ARE INSTALLED IN THE USUAL PLACES    ===
+rem === YOU SHOULD NOT HAVE TO MODIFY ANYTHING "BELOW THE LINE"  ===
+rem ================================================================
 
 rem ---------------------------------------------------
 rem --- GENERAL INFO ABOUT LOCATION OF DEPENDENCIES ---
@@ -165,6 +91,19 @@ rem ------------------------------------
     set EXO_PROGRAMFILES64=%EXO_PROGRAMDRV%\Program Files
     if "%PROCESSOR_ARCHITECTURE%" EQU "AMD64" set EXO_PROGRAMFILES32=%EXO_PROGRAMFILES32% (x86)
 
+rem check programs directory exist
+    if %TARGET_CPU% EQU x86 set EXO_PROGRAMFILES=%EXO_PROGRAMFILES32%
+    if %TARGET_CPU% EQU x64 set EXO_PROGRAMFILES=%EXO_PROGRAMFILES64%
+    if exist "%EXO_PROGRAMFILES%" goto gotprogramfiles
+	echo "Error: EXO_PROGRAMFILES="%EXO_PROGRAMFILES%" does not exist" 1>&2
+	goto exit
+:gotprogramfiles
+
+rem clean, pack and upload do not need to know where libraries are
+if EXO_CONFIGMODE EQU "CLEAN" goto afterlibs
+if EXO_CONFIGMODE EQU "PACK" goto afterlibs
+if EXO_CONFIGMODE EQU "UPLOAD" goto afterlibs
+
 rem ----- BUILT BOOST -----
 rem ---------------------------
     set BOOST32=%EXO_BUILD_ROOT%\boost_%EXO_BOOST_VER%
@@ -175,6 +114,23 @@ rem ----- INSTALLED BOOST -----
 rem ---------------------------
     IF BOOSTPRO=="YES" set BOOST32=%EXO_PROGRAMFILES32%\Boost\boost_%EXO_BOOST_VER%
     IF BOOSTPRO=="YES" set BOOST64=%EXO_PROGRAMFILES64%\Boost\boost_%EXO_BOOST_VER%
+
+rem --- CHECK BOOST ---
+rem -------------------
+    if %TARGET_CPU% EQU x86 set EXO_BOOST=%BOOST32%
+    if %TARGET_CPU% EQU x64 set EXO_BOOST=%BOOST64%
+
+rem check boost exists
+    if exist "%EXO_BOOST%" goto gotboost
+	echo "Error: EXO_BOOST="%EXO_BOOST%" does not exist" 1>&2
+	goto exit
+:gotboost
+
+rem check boost include exists (assume lib can be found there too)
+    if exist "%EXO_BOOST%\boost\version.hpp" goto gotboostinclude
+	echo "Error: EXO_BOOST="%EXO_BOOST%\boost\version.hpp" does not exist" 1>&2
+	goto exit
+:gotboostinclude
 
 rem NOTE: boost x64 binary libs are not available so we generally build them here
 rem D:\boost_1_46_1\stage64\lib
@@ -194,13 +150,39 @@ rem --------------------
     set POSTGRES32=%EXO_PROGRAMFILES32%\PostgreSQL\%EXO_POSTGRES_VER%
     set POSTGRES64=%EXO_PROGRAMFILES64%\PostgreSQL\%EXO_POSTGRES_VER%
 
-rem ---------------------------------------------
-rem --- SKIP TOOLSETS IF OPENING DEVELOPER UI ---
-rem ---------------------------------------------
+rem check postgres master directory exists
+    if %TARGET_CPU% EQU x86 set EXO_POSTGRES=%EXO_PROGRAMFILES32%\PostgreSQL\
+    if %TARGET_CPU% EQU x64 set EXO_POSTGRES=%EXO_PROGRAMFILES64%\PostgreSQL\
+    if exist "%EXO_POSTGRES%" goto gotpostgres
+	echo "Error: EXO_POSTGRES="%EXO_POSTGRES%" does not exist" 1>&2
+	goto exit
+:gotpostgres
+
+rem check postgres ver include (assume libs can be found there too)
+    if %TARGET_CPU% EQU x86 set EXO_POSTGRES_INCLUDE=%POSTGRES32%\include
+    if %TARGET_CPU% EQU x64 set EXO_POSTGRES_INCLUDE=%POSTGRES64%\include
+    if exist "%EXO_POSTGRES_INCLUDE%\*.*" goto gotpostgresinclude
+	echo "Error: EXO_POSTGRES_INCLUDE="%EXO_POSTGRES_INCLUDE%" does not exist" 1>&2
+	goto exit
+:gotpostgresinclude
+
+:afterlibs
+
+rem ----------------
+rem --- TOOLSETS ---
+rem ----------------
 
     if "%EXO_CONFIGMODE%" == "DEV" goto aftertoolsets
 
-    if "%EXO_TOOLSET%" NEQ "VS2005" goto toolset2
+    if "%EXO_TOOLSET%" EQU "VS2005" goto VS2005
+    if "%EXO_TOOLSET%" EQU "SDK71" goto SDK71
+
+    echo "Error: Invalid EXO_TOOLSET="%EXO_TOOLSET%". Valid toolsets are VS2005 SDK71" 1>&2
+    goto exit
+
+
+
+:VS2005
 rem ---------------------------------------------------------------
 rem --- VS2005 TOOLSET                                          ---
 rem ---------------------------------------------------------------
@@ -208,7 +190,6 @@ rem ---------------------------------------------------------------
 rem ----------------------------
 rem --- VS2005 Configuration ---
 rem ----------------------------
-
 
 rem path %EXO_PROGRAMFILES32%\Microsoft Visual Studio 8\VC\;%PATH%
     path %PATH%;%EXO_PROGRAMFILES32%\Microsoft Visual Studio 8\VC\
@@ -255,32 +236,9 @@ set EXO_REDISTDOTVER=8.0
 
 goto checktoolset
 
-:toolset2
-if "%EXO_TOOLSET%" NEQ "XXXXXXX" goto toolset3
-rem ---------------------------------------------------------------
-rem --- xxxxxx TOOLSET                                          ---
-rem ---------------------------------------------------------------
-rem ...
-goto checktoolset
 
 
-:toolset3
-if "%EXO_TOOLSET%" NEQ "XXXXXXX" goto toolset4
-rem ---------------------------------------------------------------
-rem --- xxxxxx TOOLSET                                          ---
-rem ---------------------------------------------------------------
-rem ...
-goto checktoolset
-
-:toolset4
-if "%EXO_TOOLSET%" NEQ "XXXXXXX" goto toolset5
-rem ---------------------------------------------------------------
-rem --- xxxxxx TOOLSET                                          ---
-rem ---------------------------------------------------------------
-rem ...
-goto checktoolset
-
-:toolset5
+:SDK71
 rem -------------------------------------------------------------------------
 rem --- SDK71 TOOLSET (the last one and the default)                      ---
 rem -------------------------------------------------------------------------
@@ -336,21 +294,21 @@ set EXO_REDISTDOTVER=10.0
 @echo REDIST_URL1=%REDIST_URL1%
 @echo EXO_REDISTDOTVER=%EXO_REDISTDOTVER%
 
-rem all toolsets come here
-:checktoolset
 
-rem ---------------------
-rem --- SANITY CHECKS ---
-rem ---------------------
+
+:checktoolset
+rem -----------------------
+rem --- CHECK TOOLSETOK ---
+rem -----------------------
 
 if "%Configuration%" NEQ "" goto gotconfiguration
-"Error: Config: has failed to setup the 'Configuration' Environment variable"
+echo "Error: Config: has failed to setup the 'Configuration' Environment variable" 1>&2
 goto exit
 :gotconfiguration
 @echo Configuration=%Configuration%
 
 if "%TARGET_CPU%" NEQ "" goto gottargetcpu
-"Error: Config: has failed to setup the 'TARGET_CPU' Environment variable"
+echo "Error: Config: has failed to setup the 'TARGET_CPU' Environment variable" 1>&2
 goto exit
 :gottargetcpu
 @echo TARGET_CPU=%TARGET_CPU%
@@ -422,12 +380,14 @@ if exist "%EXO_VS%..\IDE\devenv.exe" goto afterdevcmd
 if exist "%EXO_VS%..\IDE\vcexpress.exe" set EXO_DEVCMD="%EXO_VS%..\IDE\vcexpress" %EXO_PROJECT%.sln
 if exist "%EXO_VS%..\IDE\vcexpress.exe" goto afterdevcmd
 
-"Error: Config: FAILED TO FIND VS/GUI PROGRAM"
+echo "Error: Config: FAILED TO FIND VS/GUI PROGRAM" 1>&2
 goto exit
 :afterdevcmd
 
 
-if "%EXO_CONFIGMODE%" == "CLEAN" goto afterinstaller
+if "%EXO_CONFIGMODE%" == "CLEAN" goto afteruploader
+if "%EXO_CONFIGMODE%" == "MAKE" goto afteruploader
+if "%EXO_CONFIGMODE%" == "DEV" goto afteruploader
 
 rem ---------------------------
 rem --- PACKAGING INSTALLER ---
@@ -436,7 +396,7 @@ set EXO_PACKCMD="%EXO_PROGRAMFILES32%\NSIS\makensis.exe"
 if not exist %EXO_PACKCMD% set EXO_PACKCMD="%EXO_PROGRAMFILES64%\NSIS\makensis.exe"
 if exist %EXO_PACKCMD% goto gotpackexe
 if "%EXO_CONFIGMODE%" NEQ "PACK" goto gotpackexe
-"Error: Config: MISSING %EXO_PROGRAMFILES32%\NSIS\makensis.exe PROGRAM"
+echo "Error: Config: MISSING %EXO_PROGRAMFILES32%\NSIS\makensis.exe PROGRAM" 1>&2
 goto afterinstaller
 goto exit
 :gotpackexe
@@ -450,11 +410,11 @@ rem set EXO_PACKOPT=exodus_all.nsi
 
 :afterinstaller
 
-rem EXO_UPLOADUSER
+
+rem needs EXO_UPLOADUSER UPLOADPASS_EXO EXO_INSTALLFILENAME
 rem -------------------------
 rem --- COMMAND TO UPLOAD ---
 rem -------------------------
-set EXO_PYTHONPATH=%EXO_PROGRAMDRV%\python27
 set EXO_UPLOADCMD=googlecode_upload.py
 set EXO_UPLOADOPT=-s "Exodus Windows %TARGET_CPU% Installer" --project=exodusdb --user=%EXO_UPLOADUSER% --password=%UPLOADPASS_EXO% -l "Type-Package,OpSys-Win" %EXO_INSTALLFILENAME%
 
@@ -466,6 +426,8 @@ rem ------------------------------------------
 @echo POSTGRES32=%POSTGRES32%
 @echo POSTGRES64=%POSTGRES64%
 @set EXO
+
+:afteruploader
 
 rem this should be the only exit and pause in the program
 :exit
