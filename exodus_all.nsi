@@ -102,8 +102,12 @@
 
 ;going to put user in same structure as \Exodus! like python
 ;if userbin=exodusbin then dont double add it to the path - to avoid a confusing install message - and vice versa - search below
- !define EXO_USERHOME "$INSTDIR"
- !define EXO_USERBIN  "$INSTDIR\bin"
+; !define EXO_USERHOME "$INSTDIR"
+; !define EXO_USERBIN  "$INSTDIR\bin"
+
+; another try "USERPROFILE" eg C:\User\John
+ !define EXO_USERHOME "$%USERPROFILE%\$%EXO_PRODUCTNAME%"
+ !define EXO_USERBIN  "$%USERPROFILE%\$%EXO_PRODUCTNAME%\bin"
 
 ;-------------------------
 ;BASIC FILENAME FOR EXODUS
@@ -655,7 +659,7 @@ Section "All" SecAll
   ;should we install this in order to get access to postgres on another server?
   ;File release\libpq32\*
 
-  ;VC runtime without bloated redist package
+  ;VC runtime without bloated redist package (maybe can do this for vs2005 vc8 only?)
   ;also delivering debug versions?! so exodus programs can be developed with stackwalker
   ;File "${EXO_TOOLPATH}..\..\VC\redist\${EXO_PLATFORM}\Microsoft.VC${EXO_VCVERSION}.CRT\*"
   ;File "${EXO_TOOLPATH}..\..\VC\redist\Debug_NonRedist\${EXO_PLATFORM}\Microsoft.VC${EXO_VCVERSION}.DebugCRT\*"
@@ -719,6 +723,7 @@ Section "All" SecAll
   File cli\src\listindexes.cpp
   File cli\src\testsort.cpp
   File cli\src\configexodus.cpp
+  File test\src\testmain.cpp
 
   ;example of recursive with excludes
   ;File /r /x neosys*.pdb /x imc*.* neosys.net\*.*
@@ -734,7 +739,8 @@ Section "All" SecAll
 
 ;  ;create a path to the user compiled binaries HKCU=Current User (add to "all users user??)
 ;  ;cannot see to add %APPDATA% in local machine path so have to do for current user only :(
-;  ${EnvVarUpdate} $0 "PATH" "A" "HKCU" "${EXO_USERBIN}"
+;appending ... not sure why not prepending
+  ${EnvVarUpdate} $0 "PATH" "A" "HKCU" "${EXO_USERBIN}"
 
   ;record the installation folder in the registry
   WriteRegStr HKLM "Software\${EXO_REGKEY_VER}" "" $INSTDIR
@@ -751,10 +757,11 @@ Section "All" SecAll
   DetailPrint HR=$0
 
   ;Create uninstaller
+  ;WriteUninstaller "$INSTDIR\bin\Uninstall.exe" appears we cannot do this
   WriteUninstaller "$INSTDIR\Uninstall.exe"
 
   # create a shortcut in the start menu programs directory to the uninstaller
-  createShortCut "$SMPROGRAMS\${EXO_MENUDIR}\${EXO_MENUITEM_TITLE_UNINSTALL_TITLE}.lnk" "$INSTDIR\uninstall.exe"
+  createShortCut "$SMPROGRAMS\${EXO_MENUDIR}\${EXO_MENUITEM_TITLE_UNINSTALL_TITLE}.lnk" "$INSTDIR\Uninstall.exe"
 
   #create a Windows Uninstall Item (title and path to uninstaller)
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${EXO_MENUDIR}" \
@@ -883,6 +890,7 @@ Section "Uninstall"
   Delete "${EXO_USERHOME}\src\listindexes.cpp"
   Delete "${EXO_USERHOME}\src\testsort.cpp"
   Delete "${EXO_USERHOME}\src\configexodus.cpp"
+  Delete "${EXO_USERHOME}\src\testmain.cpp"
 
   Delete "${EXO_USERHOME}\src\blanksolution\*.*"
   RMDir "${EXO_USERHOME}\src\blanksolution"

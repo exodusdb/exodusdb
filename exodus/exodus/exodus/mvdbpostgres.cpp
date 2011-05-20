@@ -243,7 +243,7 @@ var var::build_conn_info(const var& conninfo) const
 		var home=L"";
 		if (home.osgetenv(L"HOME"))
 			configfilename=home^SLASH^L".exodus";
-		else if (home.osgetenv(L"APPDATA"))
+		else if (home.osgetenv(L"USERPROFILE"))
 			configfilename^=home^SLASH^L"Exodus\\.exodus";
 		var configconn=L"";
 		if (!configconn.osread(configfilename))

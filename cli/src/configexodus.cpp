@@ -170,12 +170,12 @@ program()
 		//should be same logic in mvdbpostgres and configexodus
 		var configfilename="";
 		if (SLASH eq "\\") {
-			var appdataexodusdir=osgetenv("APPDATA")^SLASH^"Exodus";
-			if (not osdir(appdataexodusdir)) {
-				if (not(osmkdir(appdataexodusdir)))
-					printl("Cannot mkdir ",appdataexodusdir," Maybe you dont have sufficient rights");
+			var userprofile_exodusdir=osgetenv("USERPROFILE")^SLASH^"Exodus";
+			if (not osdir(userprofile_exodusdir)) {
+				if (not(osmkdir(userprofile_exodusdir)))
+					printl("Cannot mkdir ",userprofile_exodusdir," Maybe you dont have sufficient rights");
 			}
-			configfilename=appdataexodusdir^"\\.exodus";
+			configfilename=userprofile_exodusdir^"\\.exodus";
 		}
 		else
 			configfilename=osgetenv("HOME")^SLASH^".exodus";

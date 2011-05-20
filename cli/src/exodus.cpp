@@ -83,18 +83,25 @@ program()
                 if (exoduspath and not ossetenv("EXODUS_PATH",exoduspath))
                         errput("Couldnt set EXODUS_PATH environment variable");
 
-				var currpath=osgetenv("PATH");
+				var oldpath=osgetenv("PATH");
+				var newpath=oldpath;
 
-                //PREFIX exodus bin to path
-				var newpath=exodusbinpath^";"^currpath;
+                //forcibly PREFIX exodus bin to path
+				//when debugging in VS ... we need to overcome any standard exodus path!
+				//if (not newpath.locateusing(exodusbinpath,";"))
+					newpath=exodusbinpath^";"^newpath;
 
 				//APPEND user's Exodus binaries path (from compile/catalog)
-				var homedir=osgetenv("APPDATA");
-				if (homedir)
-					newpath^=";"^homedir^"\\Exodus";
+				//could use LOCALAPPDATA on WIN7 up but getting too complicated so lets use USERPROFILE everywhere
+				var homedir=osgetenv("USERPROFILE");
+				if (homedir) {
+					var bindir=homedir^"\\Exodus\\bin";
+					if (not newpath.locateusing(bindir,";"))
+						newpath^=";"^bindir;
+				}
 
 				//update path
-                if (not ossetenv("PATH",newpath))
+                if (newpath ne oldpath and not ossetenv("PATH",newpath))
                         errput("Couldnt set PATH environment variable");
 
                 //set INCLUDE path
