@@ -733,6 +733,7 @@ var inclusion=
 										cmd^=" -nologo";
 									cmd^=" -manifest "^objfilename^".manifest";
 									cmd^=" -outputresource:"^objfilename^";"^(isprogram?"1":"2");
+									cmd^=" 1> nul >2 nul";
 									if (osshell(cmd)==0)
 										osdelete(objfilename^".manifest");
 								}
@@ -884,8 +885,8 @@ function set_environment() {
 	//work out the options from the PLATFORM_ (and perhaps debug mode)
 	var options=PLATFORM_;
 	if (index(batfilename,"setenv.cmd")) {
-		if (options=="x86")
-			options="Win32";
+		//sdk71 wants x86 or x64
+		//if (options=="x86") options="Win32";
 		options="/"^options;
 	}
 	script^=" "^options;
