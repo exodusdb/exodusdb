@@ -823,7 +823,7 @@ SectionEnd
   ;Language strings
   LangString DESC_SecAll ${LANG_ENGLISH} "All Software"
 
-  LangString DESC_CRT    ${LANG_ENGLISH} "should only be downloaded if you don't already have it installed but if you know you have it - uncheck this."
+  LangString DESC_CRT    ${LANG_ENGLISH} "Should only be downloaded if you don't already have it installed but if you know you have it uncheck this if pre-2010 to save time."
 
   ;Assign language strings to sections
   !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
