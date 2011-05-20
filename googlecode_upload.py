@@ -77,8 +77,8 @@ def upload(file, project_name, user_name, password, summary, labels=None):
   """
   # The login is the user part of user@gmail.com. If the login provided
   # is in the full user@domain form, strip it down.
-  if user_name.endswith('@gmail.com'):
-    user_name = user_name[:user_name.index('@gmail.com')]
+  #if user_name.endswith('@gmail.com'):
+   # user_name = user_name[:user_name.index('@gmail.com')]
 
   form_fields = [('summary', summary)]
   if labels is not None:

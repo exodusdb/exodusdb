@@ -149,7 +149,6 @@
 
 
 
-
 !include LogicLib.nsh
  
 !ifndef IPersistFile
@@ -240,9 +239,10 @@ DetailPrint HR=$0
 !ifndef ENVVARUPDATE_FUNCTION
 !define ENVVARUPDATE_FUNCTION
 !verbose push
-!verbose 3
+!verbose 2
 !include "LogicLib.nsh"
 !include "WinMessages.NSH"
+!define STRFUNC_VERBOSITY 2
 !include "StrFunc.nsh"
  
 ; ---- Fix for conflict if StrFunc.nsh is already includes in main file -----------------------

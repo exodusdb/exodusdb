@@ -1,25 +1,27 @@
 rem ---------------------------------------------------------
-rem --- dev.bat, make.bat, clean.bat, pack.bat and upload.bat
-rem ---  all call this config.bat to initialise ---
+rem --- dev.cmd, make.cmd, clean.cmd, pack.cmd and upload.cmd
+rem ---  all call this config.cmd to initialise ---
 rem ---------------------------------------------------------
 
+set EXO_CONFIGMODE=%*
+
 rem --------------------------------------
-rem --- preconfiguration - config2.bat ---
+rem --- preconfiguration - config2.cmd ---
 rem --------------------------------------
-rem you must create config2.bat to do any local preconfiguration
+rem you must create config2.cmd to do any local preconfiguration
 rem for example:
 rem EXO_UPLOADUSER=neosys.com@gmail.com
 rem UPLOADPASS_EXO=somesillysecret
 rem -------------------------
-    if exist config2.bat call config2 %*
+    if exist config2.cmd call config2 %*
 
 rem ---------------------
 rem --- customisation ---
 rem ---------------------
-rem just copy this file to configlocal.bat
+rem just copy this file to configlocal.cmd
 rem AND REMOVE FROM *YOUR* COPY THE FOLLOWING TWO LINES!!
-    if exist configlocal.bat call configlocal.bat %*
-    if exist configlocal.bat goto exit
+    if exist configlocal.cmd call configlocal.cmd %*
+    if exist configlocal.cmd goto exit
 
 rem note: exodus project build looks for includes and libs in this order
 rem so that architecture specific lib32/lib64 is picked before generic lib
@@ -29,7 +31,33 @@ rem include
 rem libxx
 rem lib
 
-set EXO_CONFIGMODE=%*
+rem ------------------------ TARGETING --------------------
+
+rem ------------------
+rem --- X86 or X64 ---
+rem ------------------
+    if "%TARGET_CPU%" NEQ "" goto gottargetcpu0
+set TARGET_CPU=x86
+rem    set TARGET_CPU=x64
+:gottargetcpu0
+
+rem ------------------------
+rem --- RELEASE OR DEBUG ---
+rem ------------------------
+    if "%CONFIGURATION%" NEQ "" goto gotconfiguration0
+rem set Configuration=Debug
+    set Configuration=Release
+:gotconfiguration0
+
+rem ---------------
+rem --- TOOLSET ---
+rem ---------------
+    if "%EXO_TOOLSET%" NEQ "" goto gottoolset0
+rem set EXO_TOOLSET=VS2005
+    set EXO_TOOLSET=SDK71
+:gottoolset0
+
+rem ---------------------- VERSIONING -----------------------
 
 rem ----------------------
 rem --- EXODUS VERSION ---
@@ -55,26 +83,7 @@ rem ------------------------------
 rem eg if EXO_BOOSTPRO!="YES" X:\boost_1_46_1\bin
 rem or if EXO_BOOSTPRO=="YES" X:\Program Files\Boost\1_46_1\bin
 
-rem ------------------
-rem --- X86 or X64 ---
-rem ------------------
-rem
- set TARGET_CPU=x86
-rem set TARGET_CPU=x64
-
-rem ------------------------
-rem --- RELEASE OR DEBUG ---
-rem ------------------------
-rem
- set Configuration=Release
-rem set Configuration=Debug
-
-rem ---------------
-rem --- TOOLSET ---
-rem ---------------
-rem set EXO_TOOLSET=VS2005
-rem
- set EXO_TOOLSET=SDK71
+rem ------------------ LOCAL RESOURCES -----------------
 
 rem -------------------------------------
 rem --- PROGRAM DRIVES - TYPICALLY C: ---
@@ -436,17 +445,18 @@ rem ---------------------------------
 rem --- COMMAND TO MAKE INSTALLER ---
 rem ---------------------------------
 rem there is no exodus_all2005.NSI!
-set EXO_PACKOPT=exodus_all.nsi
+    set EXO_PACKOPT=/V2 exodus_all.nsi
+rem set EXO_PACKOPT=exodus_all.nsi
 
 :afterinstaller
 
-rem needs EXO_PYTHONPATH, EXO_UPLOADUSER
+rem EXO_UPLOADUSER
 rem -------------------------
 rem --- COMMAND TO UPLOAD ---
 rem -------------------------
 set EXO_PYTHONPATH=%EXO_PROGRAMDRV%\python27
-set EXO_UPLOADCMD="%EXO_PYTHONPATH%\python.exe"
-set EXO_UPLOADOPT=googlecode_upload.py  -s "Exodus Windows %TARGET_CPU% Installer" -p "exodusdb" -u "%EXO_UPLOADUSER%" -w "%UPLOADPASS_EXO%" -l "Type-Package,OpSys-Win" %EXO_INSTALLFILENAME%
+set EXO_UPLOADCMD=googlecode_upload.py
+set EXO_UPLOADOPT=-s "Exodus Windows %TARGET_CPU% Installer" --project=exodusdb --user=%EXO_UPLOADUSER% --password=%UPLOADPASS_EXO% -l "Type-Package,OpSys-Win" %EXO_INSTALLFILENAME%
 
 rem ------------------------------------------
 rem --- DUMP ALL THE ENVIRONMENT VARIABLES ---
