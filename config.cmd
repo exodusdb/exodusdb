@@ -92,17 +92,17 @@ rem ------------------------------------
     if "%PROCESSOR_ARCHITECTURE%" EQU "AMD64" set EXO_PROGRAMFILES32=%EXO_PROGRAMFILES32% (x86)
 
 rem check programs directory exist
-    if %TARGET_CPU% EQU x86 set EXO_PROGRAMFILES=%EXO_PROGRAMFILES32%
-    if %TARGET_CPU% EQU x64 set EXO_PROGRAMFILES=%EXO_PROGRAMFILES64%
+    if "%TARGET_CPU%" EQU "x86" set EXO_PROGRAMFILES=%EXO_PROGRAMFILES32%
+    if "%TARGET_CPU%" EQU "x64" set EXO_PROGRAMFILES=%EXO_PROGRAMFILES64%
     if exist "%EXO_PROGRAMFILES%" goto gotprogramfiles
 	echo "Error: EXO_PROGRAMFILES="%EXO_PROGRAMFILES%" does not exist" 1>&2
 	goto exit
 :gotprogramfiles
 
 rem clean, pack and upload do not need to know where libraries are
-if EXO_CONFIGMODE EQU "CLEAN" goto afterlibs
-if EXO_CONFIGMODE EQU "PACK" goto afterlibs
-if EXO_CONFIGMODE EQU "UPLOAD" goto afterlibs
+if "%EXO_CONFIGMODE%" EQU "CLEAN"  goto afterlibs
+if "%EXO_CONFIGMODE%" EQU "PACK"   goto afterlibs
+if "%EXO_CONFIGMODE%" EQU "UPLOAD" goto afterlibs
 
 rem ----- BUILT BOOST -----
 rem ---------------------------
@@ -112,13 +112,13 @@ rem ---------------------------
 
 rem ----- INSTALLED BOOST -----
 rem ---------------------------
-    IF BOOSTPRO=="YES" set BOOST32=%EXO_PROGRAMFILES32%\Boost\boost_%EXO_BOOST_VER%
-    IF BOOSTPRO=="YES" set BOOST64=%EXO_PROGRAMFILES64%\Boost\boost_%EXO_BOOST_VER%
+    IF "%BOOSTPRO%" EQU "YES" set BOOST32=%EXO_PROGRAMFILES32%\Boost\boost_%EXO_BOOST_VER%
+    IF "%BOOSTPRO%" EQU "YES" set BOOST64=%EXO_PROGRAMFILES64%\Boost\boost_%EXO_BOOST_VER%
 
 rem --- CHECK BOOST ---
 rem -------------------
-    if %TARGET_CPU% EQU x86 set EXO_BOOST=%BOOST32%
-    if %TARGET_CPU% EQU x64 set EXO_BOOST=%BOOST64%
+    if "%TARGET_CPU%" EQU "x86" set EXO_BOOST=%BOOST32%
+    if "%TARGET_CPU%" EQU "x64" set EXO_BOOST=%BOOST64%
 
 rem check boost exists
     if exist "%EXO_BOOST%" goto gotboost
@@ -151,16 +151,16 @@ rem --------------------
     set POSTGRES64=%EXO_PROGRAMFILES64%\PostgreSQL\%EXO_POSTGRES_VER%
 
 rem check postgres master directory exists
-    if %TARGET_CPU% EQU x86 set EXO_POSTGRES=%EXO_PROGRAMFILES32%\PostgreSQL\
-    if %TARGET_CPU% EQU x64 set EXO_POSTGRES=%EXO_PROGRAMFILES64%\PostgreSQL\
+    if "%TARGET_CPU%" EQU "x86" set EXO_POSTGRES=%EXO_PROGRAMFILES32%\PostgreSQL\
+    if "%TARGET_CPU%" EQU "x64" set EXO_POSTGRES=%EXO_PROGRAMFILES64%\PostgreSQL\
     if exist "%EXO_POSTGRES%" goto gotpostgres
 	echo "Error: EXO_POSTGRES="%EXO_POSTGRES%" does not exist" 1>&2
 	goto exit
 :gotpostgres
 
 rem check postgres ver include (assume libs can be found there too)
-    if %TARGET_CPU% EQU x86 set EXO_POSTGRES_INCLUDE=%POSTGRES32%\include
-    if %TARGET_CPU% EQU x64 set EXO_POSTGRES_INCLUDE=%POSTGRES64%\include
+    if "%TARGET_CPU%" EQU "x86" set EXO_POSTGRES_INCLUDE=%POSTGRES32%\include
+    if "%TARGET_CPU%" EQU "x64" set EXO_POSTGRES_INCLUDE=%POSTGRES64%\include
     if exist "%EXO_POSTGRES_INCLUDE%\*.*" goto gotpostgresinclude
 	echo "Error: EXO_POSTGRES_INCLUDE="%EXO_POSTGRES_INCLUDE%" does not exist" 1>&2
 	goto exit
@@ -172,7 +172,7 @@ rem ----------------
 rem --- TOOLSETS ---
 rem ----------------
 
-    if "%EXO_CONFIGMODE%" == "DEV" goto aftertoolsets
+    if "%EXO_CONFIGMODE%" EQU "DEV" goto aftertoolsets
 
     if "%EXO_TOOLSET%" EQU "VS2005" goto VS2005
     if "%EXO_TOOLSET%" EQU "SDK71" goto SDK71
@@ -243,13 +243,15 @@ rem -------------------------------------------------------------------------
 rem --- SDK71 TOOLSET (the last one and the default)                      ---
 rem -------------------------------------------------------------------------
 
-    path %EXO_PROGRAMFILES64%\Microsoft SDKs\Windows\v7.1\Bin;%PATH%
+rem    path %EXO_PROGRAMFILES64%\Microsoft SDKs\Windows\v7.1\Bin;%PATH%
 rem path %PATH%;%EXO_PROGRAMFILES64%\Microsoft SDKs\Windows\v7.1\Bin
 
 rem ---------------------------
 rem --- SDK71 Configuration ---
 rem ---------------------------
-    call setenv /%TARGET_CPU% /%Configuration%
+rem echo    call "%EXO_PROGRAMFILES64%\Microsoft SDKs\Windows\v7.1\Bin\setenv" /%TARGET_CPU% /%CONFIGURATION%
+rem pause
+    call "%EXO_PROGRAMFILES64%\Microsoft SDKs\Windows\v7.1\Bin\setenv" /%TARGET_CPU% /%CONFIGURATION% 2> nul
 rem examples:
 rem call setenv /x86 /debug
 rem call setenv /x86 /release
@@ -301,11 +303,11 @@ rem -----------------------
 rem --- CHECK TOOLSETOK ---
 rem -----------------------
 
-if "%Configuration%" NEQ "" goto gotconfiguration
-echo "Error: Config: has failed to setup the 'Configuration' Environment variable" 1>&2
+if "%CONFIGURATION%" NEQ "" goto gotconfiguration
+echo "Error: Config: has failed to setup the CONFIGURATION Environment variable" 1>&2
 goto exit
 :gotconfiguration
-@echo Configuration=%Configuration%
+@echo Configuration=%CONFIGURATION%
 
 if "%TARGET_CPU%" NEQ "" goto gottargetcpu
 echo "Error: Config: has failed to setup the 'TARGET_CPU' Environment variable" 1>&2
@@ -336,8 +338,9 @@ rem ------------------
 
 if "%TARGET_CPU%" == "x64" set EXO_PLATFORM=x64
 if "%TARGET_CPU%" == "x86" set EXO_PLATFORM=Win32
-if "%TARGET_CPU%" == "x64" set EXO_BINARIES=x64\%Configuration%
-if "%TARGET_CPU%" == "x86" set EXO_BINARIES=%Configuration%
+
+if "%TARGET_CPU%" == "x64" set EXO_BINARIES=x64\%CONFIGURATION%
+if "%TARGET_CPU%" == "x86" set EXO_BINARIES=%CONFIGURATION%
 
 rem --- SOLUTION ---
 rem ----------------
@@ -350,8 +353,8 @@ rem VS2008 - doesnt exist but could be created from 2005 solution
 
 rem --- COMMAND TO BUILD ---
 rem ------------------------
-rem set EXO_MAKECMD=vcbuild /p:Platform=%EXO_PLATFORM% /p:Configuration=%Configuration% %EXO_PROJECT%.sln
-    set EXO_MAKECMD=msbuild /p:Platform=%EXO_PLATFORM% /p:Configuration=%Configuration% %EXO_PROJECT%.sln
+rem set EXO_MAKECMD=vcbuild /p:Platform=%EXO_PLATFORM% /p:Configuration=%CONFIGURATION% %EXO_PROJECT%.sln
+    set EXO_MAKECMD=msbuild /p:Platform=%EXO_PLATFORM% /p:Configuration=%CONFIGURATION% %EXO_PROJECT%.sln
 
 rem --- COMMAND TO CLEAN ---
 rem ------------------------
@@ -364,6 +367,11 @@ rem if errorlevel 2 set error=yes
 rem if error==yes goto upload
 rem echo vcbuild done
 
+
+rem clean, pack and upload do not need to know what the devcmd is
+if "%EXO_CONFIGMODE%" EQU "CLEAN"  goto afterdevcmd
+if "%EXO_CONFIGMODE%" EQU "PACK"   goto afterdevcmd
+if "%EXO_CONFIGMODE%" EQU "UPLOAD" goto afterdevcmd
 
 rem -----------------------
 rem --- DEVELOPMENT UI  ---
