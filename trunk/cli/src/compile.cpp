@@ -891,6 +891,13 @@ function set_environment() {
 	}
 	script^=" "^options;
 
+	var tempfilenamebase=osgetenv("TEMP")^"\\exoduscomp$" ^rnd(99999999);
+
+	//capture errors from the setenv
+	//like the annoying
+	//ERROR: The system was unable to find the specified registry key or value.
+	script^=" 2> "^tempfilenamebase^".$2";
+
 	//track first line of batch file which is the compiler configuration line
 	if (verbose)
 		outputl("COMPILER="^script);
@@ -900,7 +907,6 @@ function set_environment() {
 			printl("Calling script ", script);
 
 	//create a temporary command file
-	var tempfilenamebase=osgetenv("TEMP")^"\\exoduscomp$" ^rnd(99999999);
 	oswrite(script,tempfilenamebase^".cmd");
 
 	//run and get the output of the command
@@ -940,6 +946,12 @@ function set_environment() {
 	}
 	osdelete(tempfilenamebase^".cmd");
 	osdelete(tempfilenamebase^".$$$");
+	if (verbose) {
+		var errtemp;
+		if (osread(errtemp,tempfilenamebase^".$2"))
+			printl(errtemp);
+	}
+	osdelete(tempfilenamebase^".$2");
 
 	return true;
 }

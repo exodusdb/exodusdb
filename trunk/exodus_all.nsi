@@ -105,9 +105,10 @@
 ; !define EXO_USERHOME "$INSTDIR"
 ; !define EXO_USERBIN  "$INSTDIR\bin"
 
-; another try "USERPROFILE" eg C:\User\John
- !define EXO_USERHOME "$%USERPROFILE%\$%EXO_PRODUCTNAME%"
- !define EXO_USERBIN  "$%USERPROFILE%\$%EXO_PRODUCTNAME%\bin"
+; another try "$PROFILE" eg C:\User\John
+;use $PROFILE to get the installing user not the installation "run as" administrator
+ !define EXO_USERHOME "$PROFILE\$%EXO_PRODUCTNAME%"
+ !define EXO_USERBIN  "$PROFILE\$%EXO_PRODUCTNAME%\bin"
 
 ;-------------------------
 ;BASIC FILENAME FOR EXODUS
