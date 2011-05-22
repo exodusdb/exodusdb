@@ -31,7 +31,10 @@ function main()
 
         //extract options
         verbose=index(OPTIONS.ucase(),"V");
-        var debugging=not index(OPTIONS.ucase(),"O");
+        //var debugging=not index(OPTIONS.ucase(),"O");
+		//for now the default is to build release mode since we are not delivering an exodusd.dll
+		//the backtrace seems to work fine with release mode at least in vs2005
+		var debugging=index(OPTIONS.ucase(),"D");
 //	verbose=1;
 
         //extract filenames
@@ -249,6 +252,13 @@ function main()
                 //to capture output after macro expansion
                 //basicoptions^=" /E";
 
+                //define common windows indicator (applies to WIN64 too!)
+                basicoptions^=" /D \"WIN32\"";
+
+                //define common windows indicator
+				if (PLATFORM_ eq 'x64')
+					basicoptions^=" /D \"WIN64\"";
+
 				//Uses the __cdecl calling convention (x86 only ie 32bit).
 				///Gd, the default setting, specifies the __cdecl calling convention
 				//for all functions except C++ member functions and functions
@@ -270,7 +280,7 @@ function main()
                         //Disables optimization.
                         basicoptions^=" /Od";
 
-                        //renames program database?
+                        //renames program database?? remove?
                         basicoptions^=" /FD";
 
                         //macro used in exodus in some places to provide additional information eg mvdbpostgres
