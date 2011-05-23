@@ -152,8 +152,11 @@ def encode_upload_request(fields, file_path):
   return 'multipart/form-data; boundary=%s' % BOUNDARY, CRLF.join(body)
 
 
+#exodus change tries to 1
+#def upload_find_auth(file_path, project_name, summary, labels=None,
+#                     user_name=None, password=None, tries=3):
 def upload_find_auth(file_path, project_name, summary, labels=None,
-                     user_name=None, password=None, tries=3):
+                     user_name=None, password=None, tries=1):
   """Find credentials and upload a file to a Google Code project's file server.
 
   file_path, project_name, summary, and labels are passed as-is to upload.
