@@ -8,30 +8,33 @@ rem sorry but you MUST remove trailing spaces on lines!!!
 rem
 rem EXODUS VERSION (no spaces or unusual characters!)
 rem --------------
-rem set EXO_MAJOR_VER=0*
-rem set EXO_MINOR_VER=0*
-rem set EXO_MICRO_VER=0*
-rem set EXO_BUILD_VER=0*
+    if exist version.cmd call version.cmd
+rem set DEFAULT_EXO_MAJOR_VER=0
+rem set DEFAULT_EXO_MINOR_VER=0
+rem set DEFAULT_EXO_MICRO_VER=0
+rem set DEFAULT_EXO_BUILD_VER=0
 rem
 rem TARGET_CPU
 rem ----------
-rem set TARGET_CPU=x64*
-rem set TARGET_CPU=x86
+rem set DEFAULT_TARGET_CPU=x64*
+rem set DEFAULT_TARGET_CPU=x86
 rem 
 rem CONFIGURATION
 rem -------------
-rem set CONFIGURATION=Release*
-rem set CONFIGURATION=Debug
+rem set DEFAULT_CONFIGURATION=Release*
+rem set DEFAULT_CONFIGURATION=Debug
 rem
 rem TOOLSET
 rem -------
-rem set EXO_TOOLSET=SDK71*
-rem set EXO_TOOLSET=VS2005
+rem set DEFAULT_EXO_TOOLSET=SDK71*
+rem set DEFAULT_EXO_TOOLSET=VS2005
 rem
+rem --------------------------------------------------------------
+rem 
 rem PROGRAM DRIVE - for the "EXO_PROGRAM_DRIVE" bit of EXO_PROGRAM_DRIVE\Program Files\Postgresql\9.0\bin etc
 rem -------------
-rem set EXO_PROGRAMDRV=C:*
-rem set EXO_PROGRAMDRV=D:
+rem set EXO_PROGRAMFILES_ROOT=C:*
+rem set EXO_PROGRAMFILES_ROOT=D:
 rem
 rem NO TRAILING SLASH!
 rem POSTGRES, BOOSTPRO, VISUAL STUDIO, SDK, NSIS must all be stored on one drive

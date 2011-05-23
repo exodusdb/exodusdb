@@ -14,6 +14,28 @@ rem --------------------------------------------------------------
 rem you should not have to edit this config.cmd but, if you do
 rem see "Completely customising configuration" below
 
+rem -------------------------------
+rem --- Batch Run Configuration ---
+rem -------------------------------
+
+    if "%EXO_BATCH_MAJOR_VER%" NEQ "" set EXO_MAJOR_VER=%EXO_BATCH_MAJOR_VER%
+    if "%EXO_BATCH_MINOR_VER%" NEQ "" set EXO_MINOR_VER=%EXO_BATCH_MINOR_VER%
+    if "%EXO_BATCH_MICRO_VER%" NEQ "" set EXO_MICRO_VER=%EXO_BATCH_MICRO_VER%
+    if "%EXO_BATCH_BUILD_VER%" NEQ "" set EXO_BUILD_VER=%EXO_BATCH_BUILD_VER%
+
+    if "%BATCH_TARGET_CPU%"    NEQ "" set TARGET_CPU=%BATCH_TARGET_CPU%
+    if "%BATCH_CONFIGURATION%" NEQ "" set CONFIGURATION=%BATCH_CONFIGURATION%
+    if "%EXO_BATCH_TOOLSET%"   NEQ "" set EXO_TOOLSET=%EXO_BATCH_TOOLSET%
+
+    if "%EXO_BATCH_POSTGRES_VER%" NEQ "" set EXO_POSTGRES_VER=%EXO_BATCH_POSTGRES_VER%
+
+    if "%EXO_BATCH_BOOST_VER%" NEQ "" set EXO_BOOST_VER=%EXO_BATCH_BOOST_VER%
+    if "%EXO_BATCH_BOOSTPRO%"  NEQ "" set EXO_BOOSTPRO=%EXO_BATCH_BOOSTPRO%
+
+    if "%EXO_BATCH_BUILD_ROOT%"        NEQ "" set EXO_BUILD_ROOT=%EXO_BATCH_BUILD_ROOT%
+
+    if "%EXO_BATCH_PROGRAMFILES_ROOT%" NEQ "" set EXO_PROGRAMFILES_ROOT=%EXO_BATCH_PROGRAMFILES_ROOT%
+
 rem ----------------
 rem --- Defaults ---
 rem ----------------
@@ -32,8 +54,9 @@ rem ----------------
     if "%EXO_BOOST_VER%" EQU "" set EXO_BOOST_VER=1_46_1
     if "%EXO_BOOSTPRO%"  EQU "" set EXO_BOOSTPRO=NO
 
-    if "%EXO_PROGRAMDRV%" EQU "" set EXO_PROGRAMDRV=C:
     if "%EXO_BUILD_ROOT%" EQU "" set EXO_BUILD_ROOT=
+
+    if "%EXO_PROGRAMFILES_ROOT%" EQU "" set EXO_PROGRAMFILES_ROOT=C:
 
 
 rem -----------------------------------------------------
@@ -84,18 +107,36 @@ rem NSIS
 rem rem X:\Program Files\NSIS\makensis.exe
 rem rem X:\Program Files (x86)\NSIS\makensis.exe
 
+rem ------------------------
+rem --- check target cpu ---
+rem ------------------------
+    if "%TARGET_CPU%" EQU "x86" goto validtargetcpu
+    if "%TARGET_CPU%" EQU "x64" goto validtargetcpu
+	echo "Error: config.cmd: TARGET_CPU:"%TARGET_CPU%" is invalid. Should be x86 or x64" 1>&2
+	goto exit
+:validtargetcpu
+
+rem ---------------------------
+rem --- check configuration ---
+rem ---------------------------
+    if "%CONFIGURATION%" EQU "Release" goto validconfiguration
+    if "%CONFIGURATION%" EQU "Debug" goto validconfiguration
+	echo "Error: config.cmd: CONFIGURATION:"%CONFIGURATION%" is invalid. Should be Release or Debug" 1>&2
+	goto exit
+:validconfiguration
+
 rem ------------------------------------
 rem --- WHERE ARE PROGRAMS INSTALLED ---
 rem ------------------------------------
-    set EXO_PROGRAMFILES32=%EXO_PROGRAMDRV%\Program Files
-    set EXO_PROGRAMFILES64=%EXO_PROGRAMDRV%\Program Files
+    set EXO_PROGRAMFILES32=%EXO_PROGRAMFILES_ROOT%\Program Files
+    set EXO_PROGRAMFILES64=%EXO_PROGRAMFILES_ROOT%\Program Files
     if "%PROCESSOR_ARCHITECTURE%" EQU "AMD64" set EXO_PROGRAMFILES32=%EXO_PROGRAMFILES32% (x86)
 
 rem check programs directory exist
     if "%TARGET_CPU%" EQU "x86" set EXO_PROGRAMFILES=%EXO_PROGRAMFILES32%
     if "%TARGET_CPU%" EQU "x64" set EXO_PROGRAMFILES=%EXO_PROGRAMFILES64%
     if exist "%EXO_PROGRAMFILES%" goto gotprogramfiles
-	echo "Error: EXO_PROGRAMFILES="%EXO_PROGRAMFILES%" does not exist" 1>&2
+	echo "Error: config.cmd: EXO_PROGRAMFILES="%EXO_PROGRAMFILES%" does not exist" 1>&2
 	goto exit
 :gotprogramfiles
 
@@ -122,13 +163,13 @@ rem -------------------
 
 rem check boost exists
     if exist "%EXO_BOOST%" goto gotboost
-	echo "Error: EXO_BOOST="%EXO_BOOST%" does not exist" 1>&2
+	echo "Error: config.cmd: EXO_BOOST="%EXO_BOOST%" does not exist" 1>&2
 	goto exit
 :gotboost
 
 rem check boost include exists (assume lib can be found there too)
     if exist "%EXO_BOOST%\boost\version.hpp" goto gotboostinclude
-	echo "Error: EXO_BOOST="%EXO_BOOST%\boost\version.hpp" does not exist" 1>&2
+	echo "Error: config.cmd: EXO_BOOST="%EXO_BOOST%\boost\version.hpp" does not exist" 1>&2
 	goto exit
 :gotboostinclude
 
@@ -154,7 +195,7 @@ rem check postgres master directory exists
     if "%TARGET_CPU%" EQU "x86" set EXO_POSTGRES=%EXO_PROGRAMFILES32%\PostgreSQL\
     if "%TARGET_CPU%" EQU "x64" set EXO_POSTGRES=%EXO_PROGRAMFILES64%\PostgreSQL\
     if exist "%EXO_POSTGRES%" goto gotpostgres
-	echo "Error: EXO_POSTGRES="%EXO_POSTGRES%" does not exist" 1>&2
+	echo "Error: config.cmd: EXO_POSTGRES="%EXO_POSTGRES%" does not exist" 1>&2
 	goto exit
 :gotpostgres
 
@@ -162,7 +203,7 @@ rem check postgres ver include (assume libs can be found there too)
     if "%TARGET_CPU%" EQU "x86" set EXO_POSTGRES_INCLUDE=%POSTGRES32%\include
     if "%TARGET_CPU%" EQU "x64" set EXO_POSTGRES_INCLUDE=%POSTGRES64%\include
     if exist "%EXO_POSTGRES_INCLUDE%\*.*" goto gotpostgresinclude
-	echo "Error: EXO_POSTGRES_INCLUDE="%EXO_POSTGRES_INCLUDE%" does not exist" 1>&2
+	echo "Error: config.cmd: EXO_POSTGRES_INCLUDE="%EXO_POSTGRES_INCLUDE%" does not exist" 1>&2
 	goto exit
 :gotpostgresinclude
 
@@ -177,7 +218,7 @@ rem ----------------
     if "%EXO_TOOLSET%" EQU "VS2005" goto VS2005
     if "%EXO_TOOLSET%" EQU "SDK71" goto SDK71
 
-    echo "Error: Invalid EXO_TOOLSET="%EXO_TOOLSET%". Valid toolsets are VS2005 SDK71" 1>&2
+    echo "Error: config.cmd: Invalid EXO_TOOLSET="%EXO_TOOLSET%". Valid toolsets are VS2005 SDK71" 1>&2
     goto exit
 
 
@@ -304,13 +345,13 @@ rem --- CHECK TOOLSETOK ---
 rem -----------------------
 
 if "%CONFIGURATION%" NEQ "" goto gotconfiguration
-echo "Error: Config: has failed to setup the CONFIGURATION Environment variable" 1>&2
+echo "Error: config.cmd: has failed to setup the CONFIGURATION Environment variable" 1>&2
 goto exit
 :gotconfiguration
 @echo Configuration=%CONFIGURATION%
 
 if "%TARGET_CPU%" NEQ "" goto gottargetcpu
-echo "Error: Config: has failed to setup the 'TARGET_CPU' Environment variable" 1>&2
+echo "Error: config.cmd: has failed to setup the 'TARGET_CPU' Environment variable" 1>&2
 goto exit
 :gottargetcpu
 @echo TARGET_CPU=%TARGET_CPU%
@@ -388,7 +429,7 @@ if exist "%EXO_VS%..\IDE\devenv.exe" goto afterdevcmd
 if exist "%EXO_VS%..\IDE\vcexpress.exe" set EXO_DEVCMD="%EXO_VS%..\IDE\vcexpress" %EXO_PROJECT%.sln
 if exist "%EXO_VS%..\IDE\vcexpress.exe" goto afterdevcmd
 
-echo "Error: Config: FAILED TO FIND VS/GUI PROGRAM" 1>&2
+echo "Error: config.cmd: FAILED TO FIND VS/GUI PROGRAM" 1>&2
 goto exit
 :afterdevcmd
 
@@ -404,7 +445,7 @@ set EXO_PACKCMD="%EXO_PROGRAMFILES32%\NSIS\makensis.exe"
 if not exist %EXO_PACKCMD% set EXO_PACKCMD="%EXO_PROGRAMFILES64%\NSIS\makensis.exe"
 if exist %EXO_PACKCMD% goto gotpackexe
 if "%EXO_CONFIGMODE%" NEQ "PACK" goto gotpackexe
-echo "Error: Config: MISSING %EXO_PROGRAMFILES32%\NSIS\makensis.exe PROGRAM" 1>&2
+echo "Error: config.cmd: MISSING %EXO_PROGRAMFILES32%\NSIS\makensis.exe PROGRAM" 1>&2
 goto afterinstaller
 goto exit
 :gotpackexe
@@ -413,7 +454,12 @@ rem ---------------------------------
 rem --- COMMAND TO MAKE INSTALLER ---
 rem ---------------------------------
 rem there is no exodus_all2005.NSI!
-    set EXO_PACKOPT=/V2 exodus_all.nsi
+rem /2 means output only errors or warnings
+rem NSIS outputs errors and warnings to standard output not standard error
+rem so we output only errors and warnings to standard output /V2
+rem
+ set EXO_PACKOPT=/V2 exodus_all.nsi
+rem set EXO_PACKOPT=/V3 exodus_all.nsi
 rem set EXO_PACKOPT=exodus_all.nsi
 
 :afterinstaller
