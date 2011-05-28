@@ -33,6 +33,7 @@ programinit()
 function main()
 {
 
+	printl("----------------------------------------------");
 	printl("Using Exodus library version:"^var().version());
 
 	var errmsg;
@@ -41,59 +42,64 @@ function main()
 	//if (not deletedb("steve",errmsg))
 	//	errmsg.outputl();
 
+	{
+		var data=L"\xFF\x30\x00\x32";
+		//assert(len(data) eq 4);
+	}
+	
+	{
+		//make a string of first 256 (excluding 0 for the time being!)
+		var data="";
+		for (var ii=1;ii<=255;++ii)
+		 data^=chr(ii);
+		assert(len(data) eq 255);
+		
+		//check can write characters 1-255 out as bytes using C locale
+		oswrite(data,"x.txt","C");
+		assert(osfile("x.txt")(1) eq 255);
+
+		//check can read in bytes as characters using C locale
+		var data2;
+		osread(data2,"x.txt","C");
+		assert(data2 eq data);
+	}
+	
 	//test oswrite and osbread utf8
 	//following code works on win32 and linux64 (ubuntu 10.04)
+	//contents of tempfile should end up as unicode bytes ce b3 ce a3
 	{
-		var tempfilename5="temp5.txt";
 
-		var greek2=L"\u03B3\u03A3";//lowercase gamma and uppercase sigma
+		//greek lowercase gamma and uppercase sigma
+		var greek2=L"\u03B3\u03A3";
+		assert(greek2[1].seq()=947);
+		assert(greek2[2].seq()=931);
+
+		//output as utf8 to temp5.txt		
+		var tempfilename5="temp5.txt";
 		//greek2.outputl();
 		assert(oswrite(greek2,tempfilename5,"utf8"));
 
+		//open temp5.txt as utf8 for random access
 		var tempfile;
 		assert(osopen(tempfilename5,tempfile,"utf8"));
 
-		var data,offset2;
 		//test reading from beyond end of file - returns ""
-		offset2=4;
-		assert(data.osbread(tempfile,offset2,2) eq "");
-		offset2=3;
-		assert(data.osbread(tempfile,offset2,2) eq "");
+		//offset2 is BYTE OFFSET NOT CHARACTER OFFSET!!!
+		var data,offset2;
+		assert(data.osbread(tempfile,offset2=4,2) eq "");
+		assert(data.osbread(tempfile,offset2=3,2) eq "");
 
-		offset2=2;
-		assert(data.osbread(tempfile,offset2,2) eq greek2[2]);
+		assert(data.osbread(tempfile,offset2=2,2) eq greek2[2]);
+		assert(data.osbread(tempfile,offset2=2,1) eq greek2[2]);
 
-		//read from non-first-byte of a multibyte unicode character returns ""
-		offset2=1;
-		assert(data.osbread(tempfile,offset2,2) eq "");
+		//read from non-first-byte of a multibyte utf8 character returns ""
+		assert(data.osbread(tempfile,offset2=1,2) eq "");
 
-		offset2=0;
-		assert(data.osbread(tempfile,offset2,2) eq greek2);
+		assert(data.osbread(tempfile,offset2=0,2) eq greek2);
+		assert(data.osbread(tempfile,offset2=0,1) eq greek2[1]);
+		
+		printl("greek utf8 tested ok");
 	}
-
-#ifdef FILE_IO_CACHED_HANDLES_EXCLUDED
-	{	// test to reproduce cached_handles error
-		var file1( "FILE1.txt");
-		oswrite( L"", file1);
-		var off1 = 0;
-		osbwrite( L"This text is written to the file 'FILE1.txt'", file1, off1);
-
-		var file2( "FILE2.txt");
-		oswrite( L"", file2);
-		var off2 = 0;
-		osbwrite( L"This text is written to the file 'FILE2.txt'", file2, off2);
-
-		var file1x = file1;		// wicked copy of file handle
-		file1x.osclose();		// we could even do: var( file1).osclose();
-
-		var file3( "FILE3.txt");
-		oswrite( L"", file3);
-		var off3 = 0;
-		osbwrite( L"This text is written to the file 'FILE3.txt'", file3, off3);
-
-		osbwrite( L"THIS TEXT INTENDED FOR FILE 'FILE1.txt' BUT IT GOES TO 'FILE3.txt'", file1, off1);
-	}
-#endif
 
 	assert(oswrite("","temp1234.txt"));
 	var offs=2;
@@ -164,8 +170,10 @@ function main()
 	//check Eszet (like a Beta) uppercases to SS
 	assert(setxlocale(german_standard));
 	//FAILS in Windows XPSP3UK
-	//assert(ucase(GermanEszet) eq "SS");
-	ucase(GermanEszet).oconv("HEX4").oconv("T#4").outputl("German Eszet:");
+	//if (not SLASH_IS_BACKSLASH)
+	//	assert(ucase(GermanEszet) eq "SS");
+	GermanEszet.oconv("HEX4").oconv("T#4").outputl("German Eszet:");
+	ucase(GermanEszet).oconv("HEX4").oconv("T#4").outputl("Uppercased German Eszet:");
 
 	//in Greek Locale
 	//convert word ending in "capital sigma" lower cases to "lower final sigma"
@@ -277,6 +285,7 @@ function main()
 	unicode^=L"ABc-123.456";//some LATIN characters and punctuation
 
 	var status1 = oswrite( unicode, "GreekLocalFile.txt", greek_gr_locale);
+var("xx").input();
 	var status2 = oswrite( unicode, "GreekUTF-8File.txt", "utf8");
 	var status3 = oswrite( unicode, "GreekEnglFile.txt", english_us_locale);
 
@@ -1580,6 +1589,30 @@ while trying to match the argument list '(exodus::var, bool)'
 		}
 	}
 	clearselect();
+
+#ifdef FILE_IO_CACHED_HANDLES_EXCLUDED
+	{	// test to reproduce cached_handles error
+		var file1( "FILE1.txt");
+		oswrite( L"", file1);
+		var off1 = 0;
+		osbwrite( L"This text is written to the file 'FILE1.txt'", file1, off1);
+
+		var file2( "FILE2.txt");
+		oswrite( L"", file2);
+		var off2 = 0;
+		osbwrite( L"This text is written to the file 'FILE2.txt'", file2, off2);
+
+		var file1x = file1;		// wicked copy of file handle
+		file1x.osclose();		// we could even do: var( file1).osclose();
+
+		var file3( "FILE3.txt");
+		oswrite( L"", file3);
+		var off3 = 0;
+		osbwrite( L"This text is written to the file 'FILE3.txt'", file3, off3);
+
+		osbwrite( L"THIS TEXT INTENDED FOR FILE 'FILE1.txt' BUT IT GOES TO 'FILE3.txt'", file1, off1);
+	}
+#endif
 
     printl("testmain exiting ...");
 
