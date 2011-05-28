@@ -140,6 +140,14 @@ function main()
 		german_standard="de_DE.utf8";
 		greek_gr="el_GR.utf8";
 		turkish_tr="tr_TR.utf8";
+                //try mac versions
+                //see locale -a for list
+                if (not setxlocale(english_us)) {
+                        english_us="en_US.UTF-8";
+                        german_standard="de_DE.UTF-8";
+                        greek_gr="el_GR.UTF-8";
+                        turkish_tr="tr_TR.UTF-8";
+                }
 		english_us_locale=english_us;
 		greek_gr_locale=greek_gr;
 		turkish_tr_locale=turkish_tr;
