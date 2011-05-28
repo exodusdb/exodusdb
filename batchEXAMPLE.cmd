@@ -29,18 +29,22 @@ rem set EXO_BATCH_BOOSTPRO=
 rem set EXO_BATCH_BUILD_ROOT=
 rem set EXO_BATCH_PROGRAMFILES_ROOT=
 
-rem ##############################################
-rem ### 2. Suppress any undesired batch stages ###
-rem ##############################################
+rem ##########################################
+rem ### 2. Change the default batch stages ###
+rem ##########################################
+rem *=default, un-remark the alternative if desired
 
-rem these are the opposites of the defaults. Uncomment to effect
+rem set EXO_BATCH_CLEAN=NO*
 rem set EXO_BATCH_CLEAN=YES
-rem
- set EXO_BATCH_MAKE=NO
-rem
- set EXO_BATCH_PACK=NO
-rem
- set EXO_BATCH_UPLOAD=YES
+
+rem set EXO_BATCH_MAKE=YES*
+rem set EXO_BATCH_MAKE=NO
+
+rem set EXO_BATCH_PACK=YES*
+rem set EXO_BATCH_PACK=NO
+
+rem set EXO_BATCH_UPLOAD=NO*
+rem set EXO_BATCH_UPLOAD=YES
 
 rem ################################
 rem ### 3. Standard Preparation ####

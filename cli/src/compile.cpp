@@ -138,27 +138,27 @@ function main()
                 var include=osgetenv("INCLUDE");
                 var lib=osgetenv("LIB");
 
-                //locate EXODUS_PATH by executable path, environment variable or current disk or C:
-				//EXODUS_PATH is the parent directory of bin and include etc.
+                //locate EXO_PATH by executable path, environment variable or current disk or C:
+				//EXO_PATH is the parent directory of bin and include etc.
 				//compile needs to locate the include and lib directories
 
                 var ndeep=dcount(EXECPATH,SLASH);
                 var exoduspath="";
 				//first guess is the parent directory of the executing command
-				//on the grounds that compile.exe is in EXODUS_PATH/bin
+				//on the grounds that compile.exe is in EXO_PATH/bin
                 if (ndeep>2)
                         exoduspath=EXECPATH.field(SLASH,1,ndeep-2);
                 var searched="";
 
-				//check if EXODUS_PATH\bin\exodus.dll exists
+				//check if EXO_PATH\bin\exodus.dll exists
 				if (not exoduspath or not (osfile(exoduspath^SLASH^"bin\\exodus.dll") or osfile(exoduspath^SLASH^"exodus.dll"))) {
                         if (exoduspath)
                                 searched^="\n"^exoduspath;
-                        exoduspath=osgetenv("EXODUS_PATH");
+                        exoduspath=osgetenv("EXO_PATH");
                         if (exoduspath)
-                                searched^="\nEXODUS_PATH is "^exoduspath;
+                                searched^="\nEXO_PATH is "^exoduspath;
 						else {
-                                searched^="\nEXODUS_PATH environment variable is not set";
+                                searched^="\nEXO_PATH environment variable is not set";
                                 exoduspath=L"\\Program Files\\exodus\\" EXODUS_RELEASE L"\\";
                                 if (not osdir(exoduspath)) {
                                         searched^="\n" ^ exoduspath;
@@ -176,7 +176,7 @@ function main()
                                 //exodusbin=EXECPATH;
                                 searched^="\n" ^ exoduspath;
                                 printl("Searching for Exodus",searched);
-                                abort("Cannot find Exodus. Set environment variable EXODUS_PATH to exodus directory and restart Exodus");
+                                abort("Cannot find Exodus. Set environment variable EXO_PATH to exodus directory and restart Exodus");
                         }
                 }
 
@@ -256,7 +256,7 @@ function main()
                 basicoptions^=" /D \"WIN32\"";
 
                 //define common windows indicator
-				if (PLATFORM_ eq 'x64')
+				if (PLATFORM_ eq "x64")
 					basicoptions^=" /D \"WIN64\"";
 
 				//Uses the __cdecl calling convention (x86 only ie 32bit).

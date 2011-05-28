@@ -252,26 +252,26 @@ var var::build_conn_info(const var& conninfo) const
 		//discover any configuration in the environment
 		var envconn=L"";
 		var temp;
-		if (temp.osgetenv(L"EXODUS_CONNECTION"))
+		if (temp.osgetenv(L"EXO_CONNECTION"))
 			envconn^=L" "^temp;
 
 		//specific variable are appended ie override
-		if (temp.osgetenv(L"EXODUS_HOST"))
+		if (temp.osgetenv(L"EXO_HOST"))
 			envconn^=L" host="^temp;
 
-		if (temp.osgetenv(L"EXODUS_PORT"))
+		if (temp.osgetenv(L"EXO_PORT"))
 			envconn^=L" port="^temp;
 
-		if (temp.osgetenv(L"EXODUS_USER"))
+		if (temp.osgetenv(L"EXO_USER"))
 			envconn^=L" user="^temp;
 
-		if (temp.osgetenv(L"EXODUS_DBNAME"))
+		if (temp.osgetenv(L"EXO_DBNAME"))
 			envconn^=L" dbname="^temp;
 
-		if (temp.osgetenv(L"EXODUS_PASSWORD"))
+		if (temp.osgetenv(L"EXO_PASSWORD"))
 			envconn^=L" password="^temp;
 
-		if (temp.osgetenv(L"EXODUS_TIMEOUT"))
+		if (temp.osgetenv(L"EXO_TIMEOUT"))
 			envconn^=L" connect_timeout="^temp;
 
 		result = defaultconninfo^L" "^configconn^L" "^envconn^L" "^result;

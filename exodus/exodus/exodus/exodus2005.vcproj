@@ -203,9 +203,11 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				Optimization="2"
 				AdditionalIncludeDirectories="..;&quot;$(BOOST32)\&quot;;&quot;$(POSTGRES32)\include&quot;"
 				PreprocessorDefinitions="BUILDING_LIBRARY;NDEBUG"
 				ExceptionHandling="1"
+				BasicRuntimeChecks="0"
 				RuntimeLibrary="2"
 				DisableLanguageExtensions="false"
 				UsePrecompiledHeader="0"
@@ -227,6 +229,7 @@
 				AdditionalDependencies="libpq.lib"
 				AdditionalLibraryDirectories="&quot;$(BOOST32)\lib32&quot;;&quot;$(BOOST32)\stage32\lib&quot;;&quot;$(BOOST32)\lib&quot;;&quot;$(BOOST32)\stage\lib&quot;;&quot;$(POSTGRES32)\lib32&quot;;&quot;$(POSTGRES32)\lib&quot;"
 				DelayLoadDLLs="libpq.dll"
+				GenerateDebugInformation="false"
 			/>
 			<Tool
 				Name="VCALinkTool"

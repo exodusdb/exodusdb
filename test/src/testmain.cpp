@@ -10,7 +10,7 @@
 //non-ASCII unicode characters
 var GreekQuestionMark		=L"\u037E";//GREEK QUESTION MARK (Punctuation)
 var GreekCapitalGamma		=L"\u0393";//GREEK CAPITAL LETTER GAMMA (Letter) (Uppercase)
-var GreekSmallGamma		=L"\u03B3";//GREEK SMALL LETTER GAMMA (Letter) (Lowercase)
+var GreekSmallGamma			=L"\u03B3";//GREEK SMALL LETTER GAMMA (Letter) (Lowercase)
 var ArabicIndicDigitZero	=L"\u0660";//ARABIC-INDIC DIGIT ZERO (Decimal Digit)
 
 var GreekSmallAlpha         =L"\u03B1";//GREEK SMALL LETTER ALPHA
@@ -285,7 +285,7 @@ function main()
 	unicode^=L"ABc-123.456";//some LATIN characters and punctuation
 
 	var status1 = oswrite( unicode, "GreekLocalFile.txt", greek_gr_locale);
-var("xx").input();
+
 	var status2 = oswrite( unicode, "GreekUTF-8File.txt", "utf8");
 	var status3 = oswrite( unicode, "GreekEnglFile.txt", english_us_locale);
 
@@ -554,6 +554,20 @@ dict(AGE_IN_YEARS) {
 
 	assert(unquote("\"This is quoted?\"") eq "This is quoted?");
 
+	var xyz;
+	//xyz=xyz;
+	printl("\nTest catching MVexceptions");
+	try {
+		//runtime errors
+		var x1=x1^=1;
+		var undefx=undefx++;
+		var z=z+1;
+		var xx=xx.operator++();
+	}
+	catch (MVException except) {
+		print(except.description);
+	}
+
 	printl("\nVerify that exodus catches c++ defect at runtime");
 	try {
 		var abc=abc+1;
@@ -564,6 +578,9 @@ dict(AGE_IN_YEARS) {
 		mve.description.outputl();
 	}
 	catch(MVUnassigned mve) {
+		mve.description.outputl();
+	}
+	catch(MVNonNumeric mve) {
 		mve.description.outputl();
 	}
 	catch (...) {
@@ -787,7 +804,7 @@ dict(AGE_IN_YEARS) {
 	assert(a<A);
 
 	var da1="aa"^FM^"b1"^VM^"b2"^SM^"b22"^FM^"cc";
-	gosub xyz(da1);
+	gosub internal_subroutine_xyz(da1);
 
 	//extraction
 	assert(da1(2) eq extract(da1,2));//this extracts field 2
@@ -879,7 +896,7 @@ dict(AGE_IN_YEARS) {
 	inputn(inpq,5);
 	*/
 
-	//ossetenv("EXODUS_PORT",5433);
+	//ossetenv("EXO_PORT",5433);
 	//if (not connect("port=5433"))
 	//	stop("Cannot connect!");
 
@@ -1148,20 +1165,6 @@ while trying to match the argument list '(exodus::var, bool)'
 
 	assert(space(-11) eq "");
 	assert(var("x").str(-7) eq "");
-
-	var xyz;
-	//xyz=xyz;
-	printl("\nTest catching MVexceptions");
-	try {
-		//runtime errors
-		var x1=x1^=1;
-		var undefx=undefx++;
-		var z=z+1;
-		var xx=xx.operator++();
-	}
-	catch (MVException except) {
-		print(except.description);
-	}
 
 	var x9;
 //	if (var xx eq x) {};
@@ -1619,7 +1622,8 @@ while trying to match the argument list '(exodus::var, bool)'
     return 0;
 }
 
-function xyz(in xyzz)
+//be careful not to name any subroutines the same as any variables
+function internal_subroutine_xyz(in xyzz)
 {
 	assert(xyzz(2,2,2) eq "b22");
 	return 1;
