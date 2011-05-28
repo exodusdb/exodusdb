@@ -52,25 +52,30 @@ function main()
 		//cant put unicode in narrow character strings
 		//data="\u0330";
 	}
-	
+
+#if defined(WIN32) or defined(__APPLE__)
+		var nbinarychars=256;
+#else
+		var nbinarychars=128;
+#endif
 	{	//test writing and reading bytes
 
 		//make a string of first 256 (excluding 0 for the time being!)
 		var data=chr(0);
-		for (var ii=1;ii<=255;++ii)
-		 data^=chr(ii);
-		assert(len(data) eq 256);
-		
+		for (var ii=1;ii<nbinarychars;++ii)
+			data^=chr(ii);
+		assert(len(data) eq nbinarychars);
+
 		//check can write characters 1-255 out as bytes using C locale
 		oswrite(data,"x.txt","C");
-		assert(osfile("x.txt")(1) eq 256);
+		assert(osfile("x.txt")(1) eq nbinarychars);
 
 		//check can read in bytes as characters using C locale
 		var data2;
 		osread(data2,"x.txt","C");
 		assert(data2 eq data);
 	}
-	
+
 	//test oswrite and osbread utf8
 	//following code works on win32 and linux64 (ubuntu 10.04)
 	//contents of tempfile should end up as unicode bytes ce b3 ce a3
@@ -81,7 +86,7 @@ function main()
 		assert(greek2[1].seq()=947);
 		assert(greek2[2].seq()=931);
 
-		//output as utf8 to temp5.txt		
+		//output as utf8 to temp5.txt
 		var tempfilename5="temp5.txt";
 		//greek2.outputl();
 		assert(oswrite(greek2,tempfilename5,"utf8"));
@@ -104,10 +109,12 @@ function main()
 
 		assert(data.osbread(tempfile,offset2=0,2) eq greek2);
 		assert(data.osbread(tempfile,offset2=0,1) eq greek2[1]);
-		
+
 		//verify utf-8 bytes
-		osread(data,tempfilename5,"C");
-		assert(data eq L"\u00ce\u00b3\u00ce\u00a3");
+		if (nbinarychars eq 256) {
+			osread(data,tempfilename5,"C");
+			assert(data eq L"\u00ce\u00b3\u00ce\u00a3");
+		}
 
 		printl("greek utf8 tested ok");
 	}
