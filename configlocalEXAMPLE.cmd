@@ -3,31 +3,31 @@ rem --------------------------------------------------------------
 rem --- your local configuration is in configlocal.cmd         ---
 rem --- (copy configlocalEXAMPLE.cmd TO configlocal.cmd)       ---
 rem --------------------------------------------------------------
-rem * indicates the default. Uncomment alternatives or add your own
-rem sorry but you MUST remove trailing spaces on lines!!!
+rem * = the default. Un-remark alternatives or add your own
+rem NOTE! you MUST remove trailing spaces on lines!!!
 rem
 rem EXODUS VERSION (no spaces or unusual characters!)
 rem --------------
     if exist version.cmd call version.cmd
-rem set DEFAULT_EXO_MAJOR_VER=0
-rem set DEFAULT_EXO_MINOR_VER=0
-rem set DEFAULT_EXO_MICRO_VER=0
-rem set DEFAULT_EXO_BUILD_VER=0
+rem set EXO_MAJOR_VER=0
+rem set EXO_MINOR_VER=0
+rem set EXO_MICRO_VER=0
+rem set EXO_BUILD_VER=0
 rem
 rem TARGET_CPU
 rem ----------
-rem set DEFAULT_TARGET_CPU=x64*
-rem set DEFAULT_TARGET_CPU=x86
+rem set TARGET_CPU=x64*
+rem set TARGET_CPU=x86
 rem 
 rem CONFIGURATION
 rem -------------
-rem set DEFAULT_CONFIGURATION=Release*
-rem set DEFAULT_CONFIGURATION=Debug
+rem set CONFIGURATION=Release*
+rem set CONFIGURATION=Debug
 rem
 rem TOOLSET
 rem -------
-rem set DEFAULT_EXO_TOOLSET=SDK71*
-rem set DEFAULT_EXO_TOOLSET=VS2005
+rem set EXO_TOOLSET=SDK71*
+rem set EXO_TOOLSET=VS2005
 rem
 rem --------------------------------------------------------------
 rem 
@@ -48,7 +48,7 @@ rem some may be "Program Files (x86)" on x64 platform
 rem
 rem BUILD ROOT - if not using BOOSTPRO, for the "EXO_BUILD_ROOT" bit of EXO_BUILD_ROOT\Boost\1_46_1\bin
 rem ----------
-rem set EXO_BUILD_ROOT=* (blank means root relative to location of Exodus source)
+rem set EXO_BUILD_ROOT=   (default is blank which means root relative to location of Exodus source)
 rem set EXO_BUILD_ROOT=D:
 rem
 rem NO TRAILING SLASH! NO RELATIVE PATHS - blank means root of exodus drive
