@@ -23,8 +23,8 @@ THE SOFTWARE.
 #ifndef MV_H
 #define MV_H 1
 
-#define EXODUS_RELEASE L"10.10"
-#define EXODUS_PATCH L"10.10.0"
+#define EXODUS_RELEASE L"11.5"
+#define EXODUS_PATCH L"11.5.0"
 
 //if installing with autotools then for latest version of boost and other installation macro
 //download the snapshot from here. AX_BOOST_DATE_TIME etc
@@ -1406,7 +1406,7 @@ static const char SLASH_ = L'/';
 const var LOWERCASE_=L"abcdefghijklmnopqrstuvwxyz";
 const var UPPERCASE_=L"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-#ifdef _WIN64
+#if defined(_WIN64) or defined(_LP64)
 const var PLATFORM_=L"x64";
 #else
 const var PLATFORM_=L"x86";
