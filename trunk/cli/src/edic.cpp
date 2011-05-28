@@ -211,7 +211,8 @@ program()
 						} else if (progtype eq "class" or progtype eq "classlib") {
 	                        startatlineno="6,9";
 							blankfile^="#include <exodus/program.h>\n";
-							blankfile^="\n";
+							//programinit() as 2nd line to avoid ppl in external functions before programinit
+							//blankfile^="\n";
 							blankfile^="programinit()\n";
 							blankfile^="\n";
 							blankfile^="function main(";

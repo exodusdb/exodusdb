@@ -2524,6 +2524,24 @@ Section "All" SecAll
   ;${EnvVarUpdate} $0 "PATH" "P" "HKLM" "$INSTDIR\bin"
   ${EnvVarUpdate} $0 "PATH" "A" "HKLM" "$INSTDIR\bin"
 
+  ;prepend and INCLUDE and LIBPATH to enable development for all users
+  ;http://nsis.sourceforge.net/Path_Manipulation
+  ;
+  ;LIBPATH=c:\Exodus115\lib
+  ;EXO_LIBPATH=c:\Exodus115\lib
+  ;EXO_LIBPATH_11.5=c:\Exodus115\lib
+  ;
+  ;INCLUDE=c:\Exodus115\include
+  ;EXO_INCLUDE=c:\Exodus115\include
+  ;EXO_INCLUDE_11.5=c:\Exodus115\include
+  ;
+  ${EnvVarUpdate} $0 "LIBPATH" "P" "HKLM" "$INSTDIR\lib"
+  ${EnvVarUpdate} $0 "INCLUDE" "P" "HKLM" "$INSTDIR\include"
+  ${EnvVarUpdate} $0 "EXO_LIBPATH" "P" "HKLM" "$INSTDIR\lib"
+  ${EnvVarUpdate} $0 "EXO_INCLUDE" "P" "HKLM" "$INSTDIR\include"
+  ${EnvVarUpdate} $0 "EXO_LIBPATH_${EXO_DOTTEDMINORVERSION}" "P" "HKLM" "$INSTDIR\lib"
+  ${EnvVarUpdate} $0 "EXO_INCLUDE_${EXO_DOTTEDMINORVERSION}" "P" "HKLM" "$INSTDIR\include"
+
   SetShellVarContext all
 
 ;  ;create a path to the user compiled binaries HKCU=Current User (add to "all users user??)
@@ -2711,6 +2729,13 @@ Section "Uninstall"
   RMDir "$SMPROGRAMS\${EXO_MENUDIR}"
 
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${EXO_MENUDIR}"
+
+  ${un.EnvVarUpdate} $0 "LIBPATH" "R" "HKLM" "$INSTDIR\lib"
+  ${un.EnvVarUpdate} $0 "INCLUDE" "R" "HKLM" "$INSTDIR\include"
+  ${un.EnvVarUpdate} $0 "EXO_LIBPATH" "R" "HKLM" "$INSTDIR\lib"
+  ${un.EnvVarUpdate} $0 "EXO_INCLUDE" "R" "HKLM" "$INSTDIR\include"
+  ${un.EnvVarUpdate} $0 "EXO_LIBPATH_${EXO_DOTTEDMINORVERSION}" "R" "HKLM" "$INSTDIR\lib"
+  ${un.EnvVarUpdate} $0 "EXO_INCLUDE_${EXO_DOTTEDMINORVERSION}" "R" "HKLM" "$INSTDIR\include"
 
   ;remove the path to installation binaries HKLM=Local Machine
   ${un.EnvVarUpdate} $0 "PATH" "R" "HKLM" "$INSTDIR\bin"
