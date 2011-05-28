@@ -10,6 +10,6 @@ SUBDIRS= $(GENERIC_LIBRARY_NAME)
 #DIST_SUBDIRS = $(GENERIC_LIBRARY_NAME)
 
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = exodus-10.10.pc
+pkgconfig_DATA = exodus.pc
 
 #EXTRA_DIST=autogen.sh

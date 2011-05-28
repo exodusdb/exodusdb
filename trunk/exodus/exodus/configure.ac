@@ -19,12 +19,12 @@ dnl -----------------------------------------------
 GENERIC_LIBRARY_NAME=exodus
 
 #release versioning
-GENERIC_MAJOR_VERSION=10
-GENERIC_MINOR_VERSION=10
+GENERIC_MAJOR_VERSION=11
+GENERIC_MINOR_VERSION=5
 GENERIC_MICRO_VERSION=0
 
 #API version (often = GENERIC_MAJOR_VERSION.GENERIC_MINOR_VERSION)
-GENERIC_API_VERSION=10.10
+GENERIC_API_VERSION=11.5
 AC_SUBST(GENERIC_API_VERSION)
 
 #shared library versioning
@@ -87,6 +87,13 @@ dnl ---------------------------------------
 dnl https://github.com/tsuna/boost.m4 maybe better than
 dnl autoconf macro archive
 
+m4_include([m4/ax_boost_base.m4])
+m4_include([m4/ax_boost_date_time.m4])
+m4_include([m4/ax_boost_filesystem.m4])
+m4_include([m4/ax_boost_regex.m4])
+m4_include([m4/ax_boost_system.m4])
+m4_include([m4/ax_boost_thread.m4])
+
 AX_BOOST_BASE([1.32.0])
 AX_BOOST_DATE_TIME
 dnl system is required for filesystem boost v39+
@@ -126,7 +133,7 @@ dnl Generates Makefile's, configuration files and scripts
 dnl -----------------------------------------------
 
 AC_CONFIG_FILES([Makefile \
-          exodus-10.10.pc \
+          exodus.pc \
           exodus/Makefile 
 ])
 AC_OUTPUT
