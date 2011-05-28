@@ -98,6 +98,10 @@ function main()
 		assert(data.osbread(tempfile,offset2=0,2) eq greek2);
 		assert(data.osbread(tempfile,offset2=0,1) eq greek2[1]);
 		
+		//verify utf-8 bytes
+		osread(data,tempfilename5,"C");
+		assert(data eq L"\u00ce\u00b3\u00ce\u00a3");
+
 		printl("greek utf8 tested ok");
 	}
 
