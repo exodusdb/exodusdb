@@ -42,21 +42,28 @@ function main()
 	//if (not deletedb("steve",errmsg))
 	//	errmsg.outputl();
 
-	{
+
+	{	//null characters cannot be embedded in string constants in c/c++
+
 		var data=L"\xFF\x30\x00\x32";
-		//assert(len(data) eq 4);
+		assert(len(data) eq 2);
+		//wont compile
+		//data=L"\u0032";
+		//cant put unicode in narrow character strings
+		//data="\u0330";
 	}
 	
-	{
+	{	//test writing and reading bytes
+
 		//make a string of first 256 (excluding 0 for the time being!)
-		var data="";
+		var data=chr(0);
 		for (var ii=1;ii<=255;++ii)
 		 data^=chr(ii);
-		assert(len(data) eq 255);
+		assert(len(data) eq 256);
 		
 		//check can write characters 1-255 out as bytes using C locale
 		oswrite(data,"x.txt","C");
-		assert(osfile("x.txt")(1) eq 255);
+		assert(osfile("x.txt")(1) eq 256);
 
 		//check can read in bytes as characters using C locale
 		var data2;
