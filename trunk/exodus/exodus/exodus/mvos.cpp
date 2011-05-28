@@ -302,7 +302,7 @@ std::locale get_locale(const var& locale_name) // throw (MVException)
 			std::locale mylocale(locale_name.tostring().c_str());
 			return mylocale;
 		} catch(std::runtime_error re) {
-			throw MVException(L"Cannot create locale for " ^ locale_name);
+			throw MVException(L"getlocale cannot create locale for " ^ locale_name);
 		}
 	}
 }

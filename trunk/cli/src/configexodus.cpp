@@ -163,7 +163,7 @@ program()
         //second from environment
 		//TODO should be per parameter
         var temp;
-        if (temp.osgetenv("EXODUS_CONNECTION"))
+        if (temp.osgetenv("EXO_CONNECTION"))
                 oldconn^=" "^temp;
 
         //third from config file

@@ -1217,7 +1217,7 @@ int exodus_main(int exodus__argc, char *exodus__argv[], MvEnvironment& mv)
 		mv.COMMAND.splicer(-(len(mv.OPTIONS)+2),len(mv.OPTIONS)+2, L"");
 
 	var temp;
-	DBTRACE=osgetenv(L"EXODUS_DBTRACE",temp);
+	DBTRACE=osgetenv(L"EXO_DBTRACE",temp);
 
 	//would have to passed in as a function pointer
 	//main2(exodus__argc, exodus__argv);
