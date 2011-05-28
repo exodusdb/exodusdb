@@ -70,7 +70,7 @@ THE SOFTWARE.
 		throw MVNonNumeric(var(functionname) ^ L" : " ^ var(#VARNAME) ^ L" is " ^ VARNAME.substr(1,20).quote()); \
 
 //in some bizarre case we cant show contents of variable so put the following line instead of the last one above	
-//	throw MVNonNumeric(var(functionname) ^ L" : " ^ var(#VARNAME)); \
+//	throw MVNonNumeric(var(functionname) ^ L" : " ^ var(#VARNAME));
 
 //see long comment on ISDEFINED
 #define THISISDEFINED() \
