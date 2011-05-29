@@ -99,7 +99,7 @@ libdir=`pg_config --pkglibdir`
 
 #only needed if no windows pipes and no unix sockets
 
-AX_BOOST_BASE([1.32.0])
+#AX_BOOST_BASE([1.32.0])
 
 #AX_BOOST_DATE_TIME
 #AX_BOOST_FILESYSTEM

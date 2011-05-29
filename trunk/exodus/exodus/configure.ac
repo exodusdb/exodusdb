@@ -91,18 +91,21 @@ m4_include([m4/ax_boost_base.m4])
 m4_include([m4/ax_boost_date_time.m4])
 m4_include([m4/ax_boost_filesystem.m4])
 m4_include([m4/ax_boost_regex.m4])
-m4_include([m4/ax_boost_serialization.m4])
+#m4_include([m4/ax_boost_serialization.m4])
 m4_include([m4/ax_boost_system.m4])
 m4_include([m4/ax_boost_thread.m4])
 
-AX_BOOST_BASE([1.32.0])
+#utf8_codecvt fixed in filesystem library from 1.40
+#redhat 5 = 1.33, redhat 6 = 1.41
+#AX_BOOST_BASE([1.32.0])
+AX_BOOST_BASE([1.40.0])
 AX_BOOST_DATE_TIME
 dnl system is required for filesystem boost v39+
 AX_BOOST_SYSTEM
 AX_BOOST_FILESYSTEM
 AX_BOOST_REGEX
 AX_BOOST_THREAD
-AX_BOOST_SERIALIZATION
+#AX_BOOST_SERIALIZATION
 
 echo checking for PostgreSQL libraries 8.1+
 AX_LIB_POSTGRESQL([8.1.0])
