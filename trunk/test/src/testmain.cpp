@@ -1333,7 +1333,7 @@ while trying to match the argument list '(exodus::var, bool)'
 	//need oermission to test root directory access
 	if (osmkdir(subdir2)) {
 
-		assert(osmkdir(subdir2));
+		//assert(osmkdir(subdir2));
 
 		printl("\nCheck CANNOT rename multilevel root folders");
 		assert(not osrename(topdir1,topdir1b));
@@ -1374,7 +1374,7 @@ while trying to match the argument list '(exodus::var, bool)'
 	assert(osmkdir(tempdir));
 	var tempfilename=tempdir^SLASH^"temp1";
 	printl(tempfilename);
-	printl(str(str1,filesize/len(str1)));
+	//printl(str(str1,filesize/len(str1)));
 	assert(oswrite(str(str1,filesize/len(str1)),tempfilename));
 	var filedate=date();
 	assert(osfile(tempfilename));
