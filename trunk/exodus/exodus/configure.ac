@@ -91,6 +91,7 @@ m4_include([m4/ax_boost_base.m4])
 m4_include([m4/ax_boost_date_time.m4])
 m4_include([m4/ax_boost_filesystem.m4])
 m4_include([m4/ax_boost_regex.m4])
+m4_include([m4/ax_boost_serialisation.m4])
 m4_include([m4/ax_boost_system.m4])
 m4_include([m4/ax_boost_thread.m4])
 
@@ -101,6 +102,7 @@ AX_BOOST_SYSTEM
 AX_BOOST_FILESYSTEM
 AX_BOOST_REGEX
 AX_BOOST_THREAD
+AX_BOOST_SERIALISATION
 
 echo checking for PostgreSQL libraries 8.1+
 AX_LIB_POSTGRESQL([8.1.0])
