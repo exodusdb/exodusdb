@@ -43,8 +43,11 @@ THE SOFTWARE.
 #undef BOOST_UTF8_BEGIN_NAMESPACE
 //}}
 
+#if !defined(BOOST_HAS_ICU) and !defined(BOOST_HASNT_ICU)
+#	define BOOST_HAS_ICU
+#endif
 #ifdef BOOST_HAS_ICU
-#include <boost/regex/icu.hpp>
+#	include <boost/regex/icu.hpp>
 #endif
 #include <boost/regex.hpp>
 #include <boost/scoped_ptr.hpp>
