@@ -160,7 +160,7 @@ void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsec
 	}
 
 	//TODO resolve warning: comparison between signed and unsigned integer expressions
-	else if (totlength!=request_size)
+	else if (totlength!=int(request_size))
 	{
 		var reply=response^L" Only "^int(request_size)^L" bytes read. Should be "^totlength;
 		std::wcerr<<reply<<std::endl;
