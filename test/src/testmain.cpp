@@ -340,12 +340,12 @@ function main()
 
 	assert(oconv(digits,"MCA") eq "");
 	assert(oconv(digits,"MC/A") eq digits);
-#ifndef __APPLE__
+//#ifndef __APPLE__
 	assert(oconv(digits,"MCN") eq digits);
 	assert(oconv(digits,"MCB") eq digits);
 	assert(oconv(digits,"MC/N") eq "");
 	assert(oconv(digits,"MC/B") eq "");
-#endif
+//#endif
 	assert(oconv("abc .DEF","MCU") eq "ABC .DEF");
 	assert(oconv("abc .DEF","MCL") eq "abc .def");
 
