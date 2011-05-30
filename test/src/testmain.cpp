@@ -302,10 +302,11 @@ function main()
 	unicode^=GreekSmallGamma;
 	unicode^=L"ABc-123.456";//some LATIN characters and punctuation
 
-	var status1 = oswrite( unicode, "GreekLocalFile.txt", greek_gr_locale);
-
 	var status2 = oswrite( unicode, "GreekUTF-8File.txt", "utf8");
+#ifndef __APPLE__
+	var status1 = oswrite( unicode, "GreekLocalFile.txt", greek_gr_locale);
 	var status3 = oswrite( unicode, "GreekEnglFile.txt", english_us_locale);
+#endif
 
 	//test swapping "letters" (i.e. alphabet) with "?"
 	//We expect the question mark to remain as it is,
@@ -338,12 +339,13 @@ function main()
 	assert(oconv(punctuation,"MC/B") eq punctuation);//extract non-alphanumeric
 
 	assert(oconv(digits,"MCA") eq "");
+	assert(oconv(digits,"MC/A") eq digits);
+#ifndef __APPLE__
 	assert(oconv(digits,"MCN") eq digits);
 	assert(oconv(digits,"MCB") eq digits);
-	assert(oconv(digits,"MC/A") eq digits);
 	assert(oconv(digits,"MC/N") eq "");
 	assert(oconv(digits,"MC/B") eq "");
-
+#endif
 	assert(oconv("abc .DEF","MCU") eq "ABC .DEF");
 	assert(oconv("abc .DEF","MCL") eq "abc .def");
 
