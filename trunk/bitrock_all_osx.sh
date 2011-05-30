@@ -1,9 +1,9 @@
 #!/bin/bash
 
-EXODUS_MAJOR_VERSION=10
-EXODUS_MINOR_VERSION=10.10
-EXODUS_MICRO_VERSION=10.10.9
-EXODUS_BUILD_VERSION=10.10.9.0
+EXO_MAJOR_VER=11
+EXO_MINOR_VER=11.5
+EXO_MICRO_VER=11.5.28
+EXO_BUILD_VER=11.5.28.0
 
 #/Applications/BitRock*/bin/Builder.app/Contents/MacOS/installbuilder.sh --help
 #
@@ -31,6 +31,6 @@ EXODUS_BUILD_VERSION=10.10.9.0
  build \
  bitrock_all.xml \
  --setvars \
- installdir=/Applications/Exodus/${EXODUS_MINOR_VERSION}/ \
- project.version="${EXODUS_MICRO_VERSION}" \
- project.fullName="Exodus Multivalue Database ${EXODUS_MICRO_VERSION}"
+ installdir=/Applications/Exodus/${EXO_MINOR_VER}/ \
+ project.version="${EXO_MICRO_VER}" \
+ project.fullName="Exodus Multivalue Database ${EXO_MICRO_VER}"
