@@ -214,7 +214,7 @@ def main():
                     help='Your Google Code password')
   parser.add_option('-l', '--labels', dest='labels',
                     help='An optional list of comma-separated labels to attach '
-                    'to the file')
+                   'to the file')
 
   options, args = parser.parse_args()
 
@@ -224,10 +224,14 @@ def main():
     parser.error('Project name is missing.')
   elif len(args) < 1:
     parser.error('File to upload not provided.')
-  elif len(args) > 1:
-    parser.error('Only one file may be specified.')
+  #elif len(args) > 1:
+  #  #print args[0]
+  #  #print args[1]
+  #  #print options.labels
+  #  parser.error('Only one file may be specified.')
 
-  file_path = args[0]
+  file_path = args[len(args)-1]
+  print file_path
 
   if options.labels:
     labels = options.labels.split(',')

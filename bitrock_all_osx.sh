@@ -1,9 +1,12 @@
 #!/bin/bash
 
-EXO_MAJOR_VER=11
-EXO_MINOR_VER=11.5
-EXO_MICRO_VER=11.5.28
-EXO_BUILD_VER=11.5.28.0
+#needs at least the following environment variables set first - see pack.sh and config.sh etc
+#EXO_MAJOR_VER
+#EXO_MINOR_VER
+#EXO_MICRO_VER
+
+export EXO_DOTTED_MINOR_VER=${EXO_MAJOR_VER}.${EXO_MINOR_VER}
+export EXO_DOTTED_MICRO_VER=${EXO_DOTTED_MINOR_VER}.${EXO_MICRO_VER}
 
 #/Applications/BitRock*/bin/Builder.app/Contents/MacOS/installbuilder.sh --help
 #
@@ -25,12 +28,42 @@ EXO_BUILD_VER=11.5.28.0
 # --onlyprojectfiles             On quickbuild mode, just update project files without considering new packed files
 # --project <project>            Open specified project for editing
 
-#TODO let these be set by command line or environment variables
+#--------------------------------------------------
+# 1. Use Bitrock to make an app installer directory
+#--------------------------------------------------
 
 /Applications/BitRock*/bin/Builder.app/Contents/MacOS/installbuilder.sh \
  build \
  bitrock_all.xml \
  --setvars \
- installdir=/Applications/Exodus/${EXO_MINOR_VER}/ \
- project.version="${EXO_MICRO_VER}" \
- project.fullName="Exodus Multivalue Database ${EXO_MICRO_VER}"
+ installdir=/Applications/Exodus/${EXO_DOTTED_MINOR_VER}/ \
+ project.version="${EXO_DOTTED_MICRO_VER}" \
+ project.fullName="Exodus Multivalue Database ${EXO_DOTTED_MICRO_VER}"
+
+#-------------------------------------------------------------------
+# 2. Zip up the directory into a single uploadable/downloadable file
+#-------------------------------------------------------------------
+
+#save current directory
+export SAVED_DIR_34635=`pwd`
+
+#get into BitRock's .app output folder
+pushd /Applications/BitRock*/output
+
+#delete any old zip
+if [ -f "exodus-${EXO_DOTTED_MICRO_VER}-osx-installer.app.zip" ]
+then
+rm exodus-${EXO_DOTTED_MICRO_VER}-osx-installer.app.zip
+fi
+
+#make a new zip
+zip -r \
+ exodus-${EXO_DOTTED_MICRO_VER}-osx-installer.app.zip \
+ exodus-${EXO_DOTTED_MICRO_VER}-osx-installer.app/*
+
+#move to original directory
+mv exodus-${EXO_DOTTED_MICRO_VER}-osx-installer.app.zip ${SAVED_DIR_34635}/
+popd
+
+#view new zip size
+ls -l exodus-${EXO_DOTTED_MICRO_VER}-osx-installer.app.zip

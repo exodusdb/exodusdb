@@ -1,7 +1,7 @@
 <project>
     <shortName>exodus</shortName>
     <fullName>Exodus Multivalue Database</fullName>
-    <version>11.5.28</version>
+    <version>${env(EXO_MAJOR_VER)}.${env(EXO_MINOR_VER)}.${env(EXO_MICRO_VER)}</version>
     <readmeFile>README</readmeFile>
     <licenseFile>COPYING</licenseFile>
     <leftImage>exodus.png</leftImage>
@@ -175,7 +175,7 @@
                     <platforms>osx</platforms>
                     <distributionFileList>
                         <distributionFile>
-                            <origin>exodus/exodus/exodus/.libs/libexodus-11.5.28.dylib</origin>
+                            <origin>exodus/exodus/exodus/.libs/libexodus-${env(EXO_MAJOR_VER)}.${env(EXO_MINOR_VER)}.0.dylib</origin>
                         </distributionFile>
                         <distributionFile>
                             <origin>exodus/exodus/exodus/.libs/libexodus.dylib</origin>
