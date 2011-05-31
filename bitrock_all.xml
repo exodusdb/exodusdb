@@ -75,7 +75,7 @@
                     <platforms>windows</platforms>
                 </folder>
                 <folder>
-                    <description>Program Files</description>
+                    <description>Program Files {installdir}</description>
                     <destination>${installdir}</destination>
                     <name>programfilesosx</name>
                     <platforms>osx</platforms>
@@ -118,29 +118,23 @@
                         </shortcut>
                     </shortcutList>
                 </folder>
-
                 <folder>
                     <description>Mac OS X usr/lib</description>
                     <destination>/usr/lib</destination>
-                    <name>usr/lib</name>
+                    <name>usr_lib</name>
                     <platforms>osx</platforms>
                     <distributionFileList>
-                        <distributionFile>
-                        </distributionFile>
-
                         <distributionDirectory>
                             <allowWildcards>1</allowWildcards>
                             <includeFiles>*/libpq.*.dylib</includeFiles>
-                            <origin>/usr/lib/*</origin>
+                            <origin>../../../Library/PostgreSQL/9.0/lib/*</origin>
                         </distributionDirectory>
-
                     </distributionFileList>
                 </folder>
-
                 <folder>
-                    <description>Mac OS X bin</description>
+                    <description>Mac OS X /usr/local/bin</description>
                     <destination>/usr/local/bin</destination>
-                    <name>bin</name>
+                    <name>usr_local_bin</name>
                     <platforms>osx</platforms>
                     <distributionFileList>
                         <distributionFile>
@@ -188,9 +182,9 @@
                     </distributionFileList>
                 </folder>
                 <folder>
-                    <description>Mac OS X lib</description>
+                    <description>Mac OS X usr/local/lib</description>
                     <destination>/usr/local/lib</destination>
-                    <name>lib</name>
+                    <name>usr_local_lib</name>
                     <platforms>osx</platforms>
                     <distributionFileList>
                         <distributionFile>
@@ -205,23 +199,43 @@
                         <distributionFile>
                             <origin>exodus/exodus/exodus/.libs/libexodus.la</origin>
                         </distributionFile>
+                        <distributionFile>
+                            <origin>../boost_1_46_1/bin.v2/libs/date_time/build/darwin-4.2.1/release/threading-multi/libboost_date_time.dylib</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>../boost_1_46_1/bin.v2/libs/filesystem/build/darwin-4.2.1/release/threading-multi/libboost_filesystem.dylib</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>../boost_1_46_1/bin.v2/libs/regex/build/darwin-4.2.1/release/threading-multi/libboost_regex.dylib</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>../boost_1_46_1/bin.v2/libs/system/build/darwin-4.2.1/release/threading-multi/libboost_system.dylib</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>../boost_1_46_1/bin.v2/libs/thread/build/darwin-4.2.1/release/threading-multi/libboost_thread.dylib</origin>
+                        </distributionFile>
                         <distributionDirectory>
                             <allowWildcards>1</allowWildcards>
-                            <includeFiles>*/libboost_*.dylib</includeFiles>
-                            <origin>/usr/local/lib/*</origin>
+                            <includeFiles>*/lib*</includeFiles>
+                            <origin>../icu48/source/*</origin>
                         </distributionDirectory>
+                        <distributionFile>
+                            <allowWildcards>1</allowWildcards>
+                            <includeFiles>*/*.dylib</includeFiles>
+                            <origin>../icu48/source/lib/*</origin>
+                        </distributionFile>
                     </distributionFileList>
                 </folder>
                 <folder>
-                    <description>Mac OS X include</description>
+                    <description>Mac OS X /usr/local/include/exodus</description>
                     <destination>/usr/local/include/exodus</destination>
-                    <name>include</name>
+                    <name>usr_local_include_exodus</name>
                     <platforms>osx</platforms>
                     <distributionFileList>
                         <distributionDirectory>
                             <allowWildcards>1</allowWildcards>
                             <includeFiles>*/exodus*.h;*/mv*.h;*/xfunc*.h;*/program.h;*/library.h</includeFiles>
-                            <origin>exodus/exodus/exodus/*</origin>
+                            <origin>exodus/exodus/exodus</origin>
                         </distributionDirectory>
                     </distributionFileList>
                 </folder>
@@ -260,7 +274,7 @@
             <description>Installer.Parameter.installdir.description</description>
             <explanation>Installer.Parameter.installdir.explanation</explanation>
             <value></value>
-            <default>${platform_install_prefix}/${product_shortname}-${product_version}</default>
+            <default>${platform_install_prefix}/Exodus/${env(EXO_MAJOR_VER)}.${env(EXO_MINOR_VER)}</default>
             <allowEmptyValue>0</allowEmptyValue>
             <ask>yes</ask>
             <cliOptionName>prefix</cliOptionName>

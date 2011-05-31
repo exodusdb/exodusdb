@@ -2,6 +2,8 @@
 
 source ./config.sh PACK > config.log
 
-$EXO_PACK_CMD $EXO_PACK_OPT
+echo $EXO_PACKER_CMD $EXO_PACKER_OPT
+
+$EXO_PACKER_CMD $EXO_PACKER_OPT
 
 #if [ $EXO_BATCHMODE -eq "" ] pause
