@@ -42,6 +42,17 @@ function main()
 	//if (not deletedb("steve",errmsg))
 	//	errmsg.outputl();
 
+	//simple test of regex and case insensitive regex swap (commonly known as replace)
+    assert(swap("abcd","b.","xyz","r").outputl() eq "axyzd");//right case to convert
+    assert(swap("abc","B.","xyz","r").outputl() eq "abc"); //wrong case to convert
+    assert(swap("abcd","B.","xyz","ri").outputl() eq "axyzd");//case insensitive converts
+    assert(swap("abc","b.","xyz","").outputl() eq "abc");//wont convert not regex
+
+	//simple test of case sensitive/insensitive swap
+    assert(swap("abc","b","xyz","").outputl() eq "axyzc");//will convert right case
+    assert(swap("abc","B","xyz").outputl() eq "abc");//wont convert wrong case
+    assert(swap("abc","B","xyz","i").outputl() eq "axyzc");//will convert case insensitive
+    assert(swap("ab*c","B*","xyz","i").outputl() eq "axyzc");//will convert case insensitive but not regex
 
 	{	//null characters cannot be embedded in string constants in c/c++
 
