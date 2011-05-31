@@ -65,7 +65,7 @@ libexodus_la_SOURCES= $(h_sources) $(cc_sources) $(buildonly_h_sources)
 #sublibs - not for now. needs SUBDIRS above too
 #libexodus_9_6_la_LIBADD= sub/libsub.la
 
-#linker flags for the library
+#linker flags for the library (-static and -static-libtool-libs seems to make a static .la library)
 libexodus_la_LDFLAGS= -version-info $(GENERIC_LIBRARY_VERSION) -release $(GENERIC_RELEASE) \
 $(BOOST_LDFLAGS) \
 $(BOOST_DATE_TIME_LDFLAGS) $(BOOST_FILESYSTEM_LDFLAGS) $(BOOST_REGEX_LDFLAGS) $(BOOST_SYSTEM_LDFLAGS) $(BOOST_THREAD_LDFLAGS) \
