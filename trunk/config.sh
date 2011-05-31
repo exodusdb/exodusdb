@@ -4,8 +4,8 @@ export EXO_CONFIGMODE=$1
 
 export EXO_CODENAME=exodus
 
-test ./version.sh     && source ./version.sh
-test ./configlocal.sh && source ./configlocal.sh
+test -f ./version.sh     && source ./version.sh
+test -f ./configlocal.sh && source ./configlocal.sh
 
 # ------------------------
 # --- INSTALLFILE NAME ---
@@ -17,13 +17,19 @@ test ./configlocal.sh && source ./configlocal.sh
 #if [ "$EXO_CONFIGMODE" -eq "MAKE"  ] goto afteruploader
 #if [ "$EXO_CONFIGMODE" -eq "DEV"   ] goto afteruploader
 
+# -------------------------
+# --- COMMAND PACKER UI ---
+# -------------------------
+  export EXO_PACKER_CMD=/Applications/BitRock*/bin/Builder.app/Contents/MacOS/installbuilder.sh
+  export EXO_PACKER_OPT="--project bitrock_all.xml"
+
 # -----------------------
 # --- COMMAND TO PACK ---
 # -----------------------
   export EXO_PACK_CMD=./bitrock_all_osx.sh
   export EXO_PACK_OPT=
-
 # needs EXO_UPLOADUSER UPLOADPASS_EXO EXO_INSTALLFILENAME
+
 # -------------------------
 # --- COMMAND TO UPLOAD ---
 # -------------------------
