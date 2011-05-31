@@ -574,6 +574,7 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="BOOST_HASNT_ICU"
 						ExceptionHandling="1"
 					/>
 				</FileConfiguration>

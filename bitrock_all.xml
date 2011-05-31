@@ -118,6 +118,25 @@
                         </shortcut>
                     </shortcutList>
                 </folder>
+
+                <folder>
+                    <description>Mac OS X usr/lib</description>
+                    <destination>/usr/lib</destination>
+                    <name>usr/lib</name>
+                    <platforms>osx</platforms>
+                    <distributionFileList>
+                        <distributionFile>
+                        </distributionFile>
+
+                        <distributionDirectory>
+                            <allowWildcards>1</allowWildcards>
+                            <includeFiles>*/libpq.*.dylib</includeFiles>
+                            <origin>/usr/lib/*</origin>
+                        </distributionDirectory>
+
+                    </distributionFileList>
+                </folder>
+
                 <folder>
                     <description>Mac OS X bin</description>
                     <destination>/usr/local/bin</destination>
@@ -186,6 +205,11 @@
                         <distributionFile>
                             <origin>exodus/exodus/exodus/.libs/libexodus.la</origin>
                         </distributionFile>
+                        <distributionDirectory>
+                            <allowWildcards>1</allowWildcards>
+                            <includeFiles>*/libboost_*.dylib</includeFiles>
+                            <origin>/usr/local/lib/*</origin>
+                        </distributionDirectory>
                     </distributionFileList>
                 </folder>
                 <folder>

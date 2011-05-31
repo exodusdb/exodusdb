@@ -43,7 +43,7 @@ THE SOFTWARE.
 #undef BOOST_UTF8_BEGIN_NAMESPACE
 //}}
 
-#if !defined(BOOST_HAS_ICU) and !defined(BOOST_HASNT_ICU)
+#if !defined(BOOST_HAS_ICU) && !defined(BOOST_HASNT_ICU)
 #	define BOOST_HAS_ICU
 #endif
 #ifdef BOOST_HAS_ICU
@@ -653,7 +653,7 @@ var& var::swapper(const var& what, const var& with, const var& options)
 	ISSTRING(with)
 	ISSTRING(options)
 
-	if (options.index(L"r"))
+	if (options.length()!=0)
 	{
 #ifndef BOOST_HAS_ICU
 		//http://www.boost.org/doc/libs/1_38_0/libs/regex/doc/html/boost_regex/syntax/basic_syntax.html
@@ -662,10 +662,14 @@ var& var::swapper(const var& what, const var& with, const var& options)
 		boost::wregex regex;
 		try
 		{
-			if (options.index(L"i"))
+			if (options==(L"ri"))
                                 regex.assign(toTstring(what), boost::regex::extended|boost::regex_constants::icase);
-			else
+			else if (options==(L"r"))
                                 regex.assign(toTstring(what), boost::regex::extended);
+			else if (options==(L"i"))
+                                regex.assign(toTstring(what), boost::regex::extended|boost::regex_constants::icase|boost::regex::literal);
+			else
+                                regex.assign(toTstring(what), boost::regex::extended|boost::regex_constants::literal);
 		//boost::wregex toregex_regex(with.var_mvstr, boost::regex::extended);
 		}
 		catch (boost::regex_error& e)
