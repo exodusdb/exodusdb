@@ -217,12 +217,12 @@
                         <distributionDirectory>
                             <allowWildcards>1</allowWildcards>
                             <includeFiles>*/lib*</includeFiles>
-                            <origin>../icu48/source/*</origin>
+                            <origin>../icu/source/*</origin>
                         </distributionDirectory>
                         <distributionFile>
                             <allowWildcards>1</allowWildcards>
                             <includeFiles>*/*.dylib</includeFiles>
-                            <origin>../icu48/source/lib/*</origin>
+                            <origin>../icu/source/lib/*</origin>
                         </distributionFile>
                     </distributionFileList>
                 </folder>
@@ -235,7 +235,7 @@
                         <distributionDirectory>
                             <allowWildcards>1</allowWildcards>
                             <includeFiles>*/exodus*.h;*/mv*.h;*/xfunc*.h;*/program.h;*/library.h</includeFiles>
-                            <origin>exodus/exodus/exodus</origin>
+                            <origin>exodus/exodus/exodus/*</origin>
                         </distributionDirectory>
                     </distributionFileList>
                 </folder>

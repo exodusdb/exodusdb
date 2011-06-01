@@ -38,7 +38,7 @@ int main(int exodus__argc, char *exodus__argv[]) \
 	} \
 	catch (MVException except) \
 	{ \
-		printl(except.description); \
+		/*printl(except.description);*/ \
 		print("Aborting. Press Enter"); \
 		input(); \
 		stop(0); \
