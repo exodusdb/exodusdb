@@ -302,10 +302,16 @@ std::locale get_locale(const var& locale_name) // throw (MVException)
 	else
 	{
 		try {
-			std::locale mylocale(locale_name.tostring().c_str());
-			return mylocale;
+			if (locale_name.length()) {
+				std::locale mylocale(locale_name.tostring().c_str());
+				return mylocale;
+			} else {
+				//dont trust default locale since on osx 10.5.6 it fails!
+				std::locale mylocale("C");
+				return mylocale;
+			}
 		} catch(std::runtime_error re) {
-			throw MVException(L"getlocale cannot create locale for " ^ locale_name);
+			throw MVException(L"get_locale cannot create locale for " ^ locale_name);
 		}
 	}
 }
