@@ -36,7 +36,7 @@ test -f ./configlocal.sh && source ./configlocal.sh
 # NOTE GOODLE CODE HAS NO OVERWRITE OPTION OR DELETE OPTION
   export EXO_UPLOAD_CMD=./googlecode_upload.py
   export EXO_UPLOAD_OPT=" \
- --summary=Mac OSX $TARGET_CPU Installer \
+ --summary=Mac_OSX_${TARGET_CPU}_Installer \
  --project=exodusdb \
  --user=$EXO_UPLOADUSER \
  --password=$UPLOADPASS_EXO \

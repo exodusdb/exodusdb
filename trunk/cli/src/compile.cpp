@@ -117,7 +117,9 @@ function main()
                 libdir="~/lib";
 
                 //target extensions
-                objfileextension=".out";
+		//make it easier for debuggers
+                //objfileextension=".out";
+		objfileextension="";
                 binfileextension="";
                 libfileextension=".so";
                 libfileprefix="lib";
@@ -485,32 +487,45 @@ function main()
                                         var funcreturnvoid=(word1=="function")?0:1;
                                         var funcargsdecl=funcdecl.field("(",2,999999);
                                         //funcargsdecl=funcargsdecl.field(")",1);
-										int level=0;
-										int charn;
-										for (charn=1;charn<=len(funcargsdecl);++charn) {
-											var ch=funcargsdecl.substr(charn,1);
-											if (ch eq ")") {
-												if (level eq 0)
-													break;
-												--level;
-											} else if (ch eq "(")
-												++level;
-										}
-										funcargsdecl.substrer(1,charn-1);
+					int level=0;
+					int charn;
+					for (charn=1;charn<=len(funcargsdecl);++charn) {
+						var ch=funcargsdecl.substr(charn,1);
+						if (ch eq ")") {
+							if (level eq 0)
+								break;
+							--level;
+						} else if (ch eq "(")
+							++level;
+					}
+					funcargsdecl.substrer(1,charn-1);
 
                                         //work out the function arguments without declaratives
                                         //to be inserted in the calling brackets.
                                         var funcargs="";
                                         //default to one template argument for functors with zero arguments
 
-										var nodefaults=index(funcargsdecl,"=") eq 0;
-										var funcargsdecl2=funcargsdecl;
+					var nodefaults=index(funcargsdecl,"=") eq 0;
+					var funcargsdecl2=funcargsdecl;
 
-										var funcargstype="int";
-										if (useclassmemberfunctions)
-											funcargstype="";
+					var funcargstype="int";
+					if (useclassmemberfunctions)
+						funcargstype="";
 
                                         int nargs=dcount(funcargsdecl,",");
+
+/* no longer generate default arguments using a dumb process since some pedantic compilers eg g++ 4.2.1 on osx 10.6 refuse to default non-constant parameters (io/out)
+for now, programmers can still manually define defaults eg "func1(in arg1=var(), in arg2=var())"
+
+new possibility can default ALL arguments regardless of i/o status:
+eg:
+	var lib1(in aaa,out bbb)
+could generate the following overloads in the lib's .h header
+	var lib1(in aaa){var bbb;return lib1(aaa,bbb);}
+	var lib1(){var aaa;var bbb;return lib1(aaa,bbb);}
+
+*/
+	nodefaults=0;
                                         for (int argn=1; argn<=nargs; ++argn) {
                                                 var funcarg=field(funcargsdecl,',',argn).trim();
 
@@ -519,14 +534,14 @@ function main()
 
                                                 funcarg=field(funcarg,"=",1).trim();
 
-												//default all if all are var (in io out)
-												if (nodefaults) {
-													if (var("in io out").locateusing(funcarg.field(" ",1)," "))
-														fieldstorer(funcargsdecl2,",",argn,1,funcarg^"=var()");
-													else
-														//reset to original if anything except in io out
-														funcargsdecl2=funcargsdecl;
-												}
+						//default all if all are var (in io out)
+						if (nodefaults) {
+							if (var("in io out").locateusing(funcarg.field(" ",1)," "))
+								fieldstorer(funcargsdecl2,",",argn,1,funcarg^"=var()");
+							else
+								//reset to original if anything except in io out
+								funcargsdecl2=funcargsdecl;
+						}
 
                                                 //assume the last word (by spaces) is the variable name
                                                 fieldstorer(funcargs,',',argn,1,funcarg.field2(" ",-1));
@@ -537,6 +552,7 @@ function main()
                                                 var argtype=field(funcarg," ",1,dcount(funcarg," ")-1);
                                                 fieldstorer(funcargstype,',',argn,1,argtype);
                                         }
+
 
 //new method using member functions to call external functions with mv environment
 var inclusion=

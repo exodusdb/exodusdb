@@ -24,7 +24,7 @@ THE SOFTWARE.
 #define _POSIX_SOURCE
 #endif
 
-//#define TRACING 1
+//#define TRACING
 
 #ifdef _POSIX_SOURCE
 	#include <config.h>
@@ -101,6 +101,48 @@ public:
 
 namespace exodus {
 
+void addbacktraceline(const var& sourcefilename, const var& lineno, var& returnlines)
+{
+
+#ifdef TRACING
+	sourcefilename.outputl("SOURCEFILENAME=");
+	lineno.outputl("LINENO=");
+#endif
+
+	if (not lineno || not lineno.isnum())
+		return;
+
+	var linetext=sourcefilename ^ ":" ^ lineno;
+
+	//get the source file text
+	var filetext;
+	if (filetext.osread(sourcefilename)) {
+	}
+
+	//change DOS/WIN and MAC line ends to lf only
+	filetext.swapper("\x0D\x0A","\x0A").converter("\x0D","\x0A");
+
+	//extract the source line
+	var line=filetext.field("\x0A",lineno).trimf(" \t");
+
+	//suppress confusing and unhelpful exodus macros
+	if (
+		(line == "programexit()" || line == "libraryexit()" || line == "classexit()")
+	or
+		(line == "}" && sourcefilename.substr(-2,2) == ".h")
+	)
+		return;
+
+
+	//outputl(linetext);
+	linetext^=": " ^ line;
+
+	returnlines^=FM^linetext;
+
+	return;
+}
+
+
 //http://www.delorie.com/gnu/docs/glibc/libc_665.html
 var backtrace()
 {
@@ -118,25 +160,110 @@ var backtrace()
 
 	var internaladdresses="";
 
-	void *addresses[100];
+#define BACKTRACE_MAXADDRESSES 500
+	void *addresses[BACKTRACE_MAXADDRESSES];
 
-	int size = ::backtrace(addresses, 100);
+
+/* example of TRACE from osx 64
+Stack frames: 8
+Backtrace 0: 0x10000c313
+0   libexodus-11.5.0.dylib              0x000000010000c313 _ZN6exodus9backtraceEv + 99
+Backtrace 1: 0x10001ec51
+1   libexodus-11.5.0.dylib              0x000000010001ec51 _ZN6exodus11MVExceptionC2ERKNS_3varE + 129
+Backtrace 2: 0x10001f314
+2   libexodus-11.5.0.dylib              0x000000010001f314 _ZN6exodus12MVUnassignedC2ERKNS_3varE + 52
+Backtrace 3: 0x10000e193
+3   libexodus-11.5.0.dylib              0x000000010000e193 _ZNK6exodus3var3putERSo + 243
+Backtrace 4: 0x10000e322
+4   libexodus-11.5.0.dylib              0x000000010000e322 _ZNK6exodus3var7outputlEv + 34
+Backtrace 5: 0x10000143f
+5   steve                               0x000000010000143f _ZN13ExodusProgram4mainEv + 77
+Backtrace 6: 0x1000010e6
+6   steve                               0x00000001000010e6 main + 99
+Backtrace 7: 0x100000f64
+7   steve                               0x0000000100000f64 start + 52
+*/
+
+	//TODO autodetect if addr2line or dwalfdump/dSYM is available
+
+
+
+#ifdef __APPLE__
+	int size = ::backtrace(addresses, BACKTRACE_MAXADDRESSES);
+	char **strings = backtrace_symbols(addresses, size);
+//printf("Stack frames: %d\n", size);
+
+	var returnlines="";
+
+	for(int i = 0; i < size; i++) {
+
+#ifdef TRACING
+		//each string is like:
+		//6   steve                               0x00000001000010e6 main + 99
+		//////////////////////////////////////////////////////////////////////
+		printf("%s\n", strings[i]);
+#endif
+		//parse one string for object filename and offset
+		var onestring=var(strings[i]).trim();
+		var objectfilename=onestring.field(L" ",2);
+		var objectoffset=onestring.field(L" ",3);
+
+		//looking for a dwarfdump line like this:
+		//Line table file: 'steve.cpp' line 14, column 0 with start address 0x000000010000109e
+		//////////////////////////////////////////////////////////////////////////////////////
+
+		//get a dwarfdump line containing source filename and line number
+		var debugfilename=objectfilename^".dSYM";
+		var cmd=L"dwarfdump "^debugfilename^L" --lookup "^objectoffset^L" |grep \"Line table file: \" 2> /dev/null";
+		var result=cmd.osshellread();
+#ifdef TRACING
+	cmd.outputl("CMD=");
+	result.outputl("RESULT=");
+#endif
+		if (not result)
+			continue;
+
+		//parse the dwarfdump line for source filename and line number
+		var sourcefilename=result.field("'",2);
+		var lineno=result.field("'",3).trim().field(" ",2).field(",",1);
+
+		addbacktraceline(sourcefilename,lineno,returnlines);
+
+	}
+
+	free(strings);
+	return returnlines.substr(2);
+
+
+
+//not __APPLE_
+#else
+
+	int size = ::backtrace(addresses, BACKTRACE_MAXADDRESSES);
 #ifdef TRACING
 	char **strings = backtrace_symbols(addresses, size);
 	printf("Stack frames: %d\n", size);
 #endif
+
 	for(int i = 0; i < size; i++)
 	{
 		//#pragma warning (disable: 4311)
 		internaladdresses^=" " ^ var((long long) addresses[i]).oconv("MX");
+
 #ifdef TRACING
-		printf("%d: %X\n", i, (int)addresses[i]);
+		if (sizeof addresses[i] == 4)
+			printf("Backtrace %d: %X\n", i, (unsigned int)(long long)addresses[i]);
+		else
+			printf("Backtrace %d: %#llx\n", i, (long long)addresses[i]);
 		printf("%s\n", strings[i]);
 #endif
+
 	}
+
 #ifdef TRACING
 	free(strings);
 #endif
+
 	FILE *fp;
 	//int status;
 	char path[1024];
@@ -144,14 +271,19 @@ var backtrace()
 	var binaryfilename=EXECPATH2.field(" ",1);
 	if (binaryfilename == binaryfilename.convert("/\\:",""))
 		binaryfilename="`which " ^ binaryfilename ^ "`";
-	var oscmd="addr2line -e " ^ binaryfilename.quote() ^ " " ^ internaladdresses;
 
+#ifdef __APPLE__
+	var oscmd="atos -o " ^ binaryfilename.quote() ^ " " ^ internaladdresses;
+#else
+	var oscmd="addr2line -e " ^ binaryfilename.quote() ^ " " ^ internaladdresses;
+#endif
 	//oscmd.outputl();
 
 #ifdef TRACING
 	printf("EXECPATH = %s\n",EXECPATH2.tostring().c_str());
 	printf("executing %s\n",oscmd.tostring().c_str());
 #endif
+
 	/* Open the command for reading. */
 	fp = popen(oscmd.tostring().c_str(), "r");
 	if (fp == NULL)
@@ -160,37 +292,33 @@ var backtrace()
 		return L"";
 	}
 
-	var returnlines="";
-
 #ifdef TRACING
 	printf("reading output of addr2line\n");
 #endif
+
+	var returnlines="";
+
 	/* Read the output a line at a time - output it. */
 	while (fgets(path, sizeof(path)-1, fp) != NULL)
 	{
+
 #ifdef TRACING
 		printf("fgets:%s", path);
 #endif
+
 		var path2=var(path).convert("\x0d\x0a","");//.outputl("path=");
-		var filename=path2.field(":",1);//.outputl("filename=");
+		var sourcefilename=path2.field(":",1);//.outputl("filename=");
 		var lineno=path2.field(":",2);//.outputl("lineno=");
-		if (lineno)		
-		{
-			var linetext=filename ^ ":" ^ lineno;
-			var filetext;
-			if (filetext.osread(filename))
-			{
-				linetext^=": " ^ filetext.field("\x0A",lineno).trimf(" \t");
-			}
-			//outputl(linetext);
-			returnlines^=FM^linetext;
-		}
+
+		addbacktraceline(sourcefilename,lineno,returnlines);
 	}
 
 	/* close */
 	pclose(fp);
 	
 	return returnlines.substr(2);
+#endif
+
 #endif
 	
 }
