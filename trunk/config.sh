@@ -4,8 +4,31 @@ export EXO_CONFIGMODE=$1
 
 export EXO_CODENAME=exodus
 
+export PATH=/Library/PostgreSQL/9.0/bin:$PATH
+
 test -f ./version.sh     && source ./version.sh
 test -f ./configlocal.sh && source ./configlocal.sh
+
+test "$EXO_BATCH_MAJOR_VER" = "" || export EXO_MAJOR_VER=$EXO_BATCH_MAJOR_VER
+test "$EXO_BATCH_MINOR_VER" = "" || export EXO_MINOR_VER=$EXO_BATCH_MINOR_VER
+test "$EXO_BATCH_MICRO_VER" = "" || export EXO_MICRO_VER=$EXO_BATCH_MICRO_VER
+test "$EXO_BATCH_BUILD_VER" = "" || export EXO_BUILD_VER=$EXO_BATCH_BUILD_VER
+
+# --------------------
+# --- CLEAN COMMAND ---
+# --------------------
+  export EXO_CLEAN_CMD="make clean"
+  export EXO_CLEAN_OPT=
+  export EXO_DISTCLEAN_CMD="make distclean"
+  export EXO_DISTCLEAN_OPT=
+
+# --------------------
+# --- MAKE COMMAND ---
+# --------------------
+  export EXO_CONFIGURE_CMD=./configure
+  export EXO_CONFIGURE_OPT=
+  export EXO_MAKE_CMD=make
+  export EXO_MAKE_OPT=
 
 # ------------------------
 # --- INSTALLFILE NAME ---
