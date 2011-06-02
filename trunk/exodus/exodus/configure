@@ -1407,7 +1407,7 @@ Optional Packages:
                           or disable it (ARG=no) [ARG=yes]
   --with-boost-libdir=LIB_DIR
                           Force given directory for boost libraries. Note that
-                          this will overwrite library path detection, so use
+                          this will override library path detection, so use
                           this parameter only if default library detection
                           fails and you know exactly where your boost
                           libraries are located.
@@ -15970,7 +15970,8 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 #   and this notice are preserved. This file is offered as-is, without any
 #   warranty.
 
-#serial 17
+#serial 20
+
 
 
 
@@ -16079,7 +16080,8 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 #   and this notice are preserved. This file is offered as-is, without any
 #   warranty.
 
-#serial 19
+#serial 20
+
 
 
 
@@ -16153,7 +16155,8 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 #   and this notice are preserved. This file is offered as-is, without any
 #   warranty.
 
-#serial 22
+#serial 23
+
 
 
 
@@ -16214,13 +16217,19 @@ $as_echo_n "checking for boostlib >= $boost_lib_version_req... " >&6; }
     succeeded=no
 
                         libsubdirs="lib"
-    if test `uname -m` = x86_64; then
+    ax_arch=`uname -m`
+    if test $ax_arch = x86_64 -o $ax_arch = ppc64 -o $ax_arch = s390x -o $ax_arch = sparc64; then
         libsubdirs="lib64 lib lib64"
     fi
 
                 if test "$ac_boost_path" != ""; then
-        BOOST_LDFLAGS="-L$ac_boost_path/$libsubdir"
         BOOST_CPPFLAGS="-I$ac_boost_path/include"
+        for ac_boost_path_tmp in $libsubdirs; do
+                if test -d "$ac_boost_path"/"$ac_boost_path_tmp" ; then
+                        BOOST_LDFLAGS="-L$ac_boost_path/$ac_boost_path_tmp"
+                        break
+                fi
+        done
     elif test "$cross_compiling" != yes; then
         for ac_boost_path_tmp in /usr /usr/local /opt /opt/local ; do
             if test -d "$ac_boost_path_tmp/include/boost" && test -r "$ac_boost_path_tmp/include/boost"; then
@@ -16404,7 +16413,7 @@ $as_echo "$as_me: We could not detect the boost libraries (version $boost_lib_ve
 $as_echo "$as_me: Your boost libraries seems to old (version $_version)." >&6;}
         fi
         # execute ACTION-IF-NOT-FOUND (if present):
-        :
+        exit
     else
 
 
@@ -17345,7 +17354,7 @@ fi
                done
             fi
             if test "x$ax_lib" = "x"; then
-                as_fn_error $? "Could not find a version of the library!" "$LINENO" 5
+                as_fn_error $? "Could not find a version of the Boost::Regex library!" "$LINENO" 5
             fi
 			if test "x$link_regex" != "xyes"; then
 				as_fn_error $? "Could not link against $ax_lib !" "$LINENO" 5
@@ -17401,9 +17410,9 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 			 CXXFLAGS_SAVE=$CXXFLAGS
 
-			 if test "x$build_os" = "xsolaris" ; then
+			 if test "x$host_os" = "xsolaris" ; then
 				 CXXFLAGS="-pthreads $CXXFLAGS"
-			 elif test "x$build_os" = "xming32" ; then
+			 elif test "x$host_os" = "xmingw32" ; then
 				 CXXFLAGS="-mthreads $CXXFLAGS"
 			 else
 				CXXFLAGS="-pthread $CXXFLAGS"
@@ -17438,9 +17447,9 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ax_cv_boost_thread" >&5
 $as_echo "$ax_cv_boost_thread" >&6; }
 		if test "x$ax_cv_boost_thread" = "xyes"; then
-           if test "x$build_os" = "xsolaris" ; then
+           if test "x$host_os" = "xsolaris" ; then
 			  BOOST_CPPFLAGS="-pthreads $BOOST_CPPFLAGS"
-		   elif test "x$build_os" = "xming32" ; then
+		   elif test "x$host_os" = "xmingw32" ; then
 			  BOOST_CPPFLAGS="-mthreads $BOOST_CPPFLAGS"
 		   else
 			  BOOST_CPPFLAGS="-pthread $BOOST_CPPFLAGS"
@@ -17454,7 +17463,7 @@ $as_echo "#define HAVE_BOOST_THREAD /**/" >>confdefs.h
             BOOSTLIBDIR=`echo $BOOST_LDFLAGS | sed -e 's/[^\/]*//'`
 
 			LDFLAGS_SAVE=$LDFLAGS
-                        case "x$build_os" in
+                        case "x$host_os" in
                           *bsd* )
                                LDFLAGS="-pthread $LDFLAGS"
                           break;
@@ -17613,7 +17622,7 @@ fi
 			if test "x$link_thread" = "xno"; then
 				as_fn_error $? "Could not link against $ax_lib !" "$LINENO" 5
                         else
-                           case "x$build_os" in
+                           case "x$host_os" in
                               *bsd* )
 				BOOST_LDFLAGS="-pthread $BOOST_LDFLAGS"
                               break;
