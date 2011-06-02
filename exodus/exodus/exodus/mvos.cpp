@@ -675,7 +675,7 @@ var& var::swapper(const var& what, const var& with, const var& options)
 			else if (options==(L"i"))
                                 regex.assign(toTstring(what), boost::regex::extended|boost::regex_constants::icase|boost::regex::literal);
 			else
-                                regex.assign(toTstring(what), boost::regex::extended|boost::regex_constants::literal);
+				regex.assign(toTstring(what), boost::regex_constants::literal);
 		//boost::wregex toregex_regex(with.var_mvstr, boost::regex::extended);
 		}
 		catch (boost::regex_error& e)
@@ -697,6 +697,7 @@ var& var::swapper(const var& what, const var& with, const var& options)
 		boost::u32regex regex;
 		try
 		{
+			/*
 			if (options.index(L"i"))
 				regex=boost::make_u32regex(what.var_mvstr,
 					boost::regex::extended|boost::regex_constants::icase);
@@ -704,6 +705,16 @@ var& var::swapper(const var& what, const var& with, const var& options)
 				regex=boost::make_u32regex(what.var_mvstr,
 					boost::regex::extended);
 			//boost::wregex toregex_regex(with.var_mvstr, boost::regex::extended);
+			*/
+			if (options==(L"ri"))
+				regex=boost::make_u32regex(what.var_mvstr,boost::regex::extended|boost::regex_constants::icase);
+			else if (options==(L"r"))
+				regex=boost::make_u32regex(what.var_mvstr,boost::regex::extended);
+			else if (options==(L"i"))
+				regex=boost::make_u32regex(what.var_mvstr,boost::regex_constants::icase|boost::regex::literal);
+			else
+				regex=boost::make_u32regex(what.var_mvstr,boost::regex::literal);
+		//boost::wregex toregex_regex(with.var_mvstr, boost::regex::extended);
 		}
 		catch (boost::regex_error& e)
 		{
