@@ -52,7 +52,7 @@ function main()
     assert(swap("abc","b","xyz","").outputl() eq "axyzc");//will convert right case
     assert(swap("abc","B","xyz").outputl() eq "abc");//wont convert wrong case
     assert(swap("abc","B","xyz","i").outputl() eq "axyzc");//will convert case insensitive
-    assert(swap("ab*c","*","xyz","i").outputl() eq "axyzc");//will convert case insensitive but not regex
+    assert(swap("ab*c","B*","xyz","i").outputl() eq "axyzc");//will convert case insensitive but not regex
     assert(swap("ab*c","B*","xyz","i").outputl() eq "axyzc");//will convert case insensitive but not regex
 
 	{	//null characters cannot be embedded in string constants in c/c++
