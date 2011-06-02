@@ -6,7 +6,7 @@
 
 # Note:
 # 1. Any options can be moved down to the per batch section
-# 2. These "BATCH" options override any settings in configlocal.cmd
+# 2. These _BATCH_ options override any settings in configlocal.cmd
 
 # If you want to override configlocal.cmd/version.cmd
 # -------------------------------------------------
