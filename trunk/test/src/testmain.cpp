@@ -541,6 +541,7 @@ function main()
 	//check can create and delete indexes
 	//errmsg = {var_mvstr="ERROR:  function exodus_extract_date(bytea, integer, integer, integer) does not exist
 	//use DBTRACE to see the error
+	printl("CHECKING IF PGEXODUS POSTGRES PLUGIN IS INSTALLED");
 	assert(createindex("XUSERS","BIRTHDAY"));
 	assert(listindexes("XUSERS") eq ("xusers"^VM^"birthday"));
 	assert(listindexes() ne "");
