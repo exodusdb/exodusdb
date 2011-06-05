@@ -135,11 +135,11 @@ function main() {
                 deletefile(dictfile);
         }
 
-        printl("\nJust type 'list' (without the quotes) to see the syntax of list");
+        printl("\nJust type 'list' to see the syntax of list");
         printl("or list dict_"^ filename^ " to see the dictionary");
         printl("Type edic cli/src/testsort to see or edit/recompile this program.");
 
-		return 0;
+	return 0;
 }
 
 subroutine sortselect(in file, in sortselectcmd) {

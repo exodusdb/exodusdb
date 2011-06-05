@@ -33,8 +33,9 @@ THE SOFTWARE.
 	#include <iostream>
 	#include <string>
 	#include <stdio.h>
-	//for backtrace
+#ifdef HAVE_BACKTRACE
 	#include <execinfo.h>
+#endif
 
 #endif
 	//for signal

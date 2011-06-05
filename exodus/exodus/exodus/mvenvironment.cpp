@@ -239,6 +239,7 @@ lock:
 
 	//evade warning: unused parameter
 	if (filename || recordx) {}
+	return 0;
 
 }
 
@@ -265,6 +266,7 @@ bool MvEnvironment::unlockrecord(const var& filename, const var& file0, const va
 
 	//evade warning: unused parameter
 	if (filename) {}
+	return 1;
 }
 
 
@@ -689,6 +691,7 @@ tryagain:
 
 	//evade warning: unused parameter
 	if (similarfilename || autocreate) {}
+	return 0;
 }
 
 var MvEnvironment::decide(const var& question, const var& options) const
