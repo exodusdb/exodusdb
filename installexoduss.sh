@@ -14,7 +14,8 @@ cd ~
 export PATH=EXO_POSTGRES_BIN:$PATH
 
 #patch in suppression of EXECINFO.H (backtrace) not available on 10.4
-test $EXO_MINVER = 10.4 && export EXO_FLAGS="$EXO_FLAGS -DHASNT_EXECINFO"
+#now relies on HAS_BACKTRACE to include execinfo.h
+#test $EXO_MINVER = 10.4 && export EXO_FLAGS="$EXO_FLAGS -DHASNT_EXECINFO"
 
 #--------------
 #--- Delete ---
@@ -110,7 +111,7 @@ echo
 echo   configexodus
 echo
 echo Test Exodus
-echo To get an exodus console (sets the right environment variables)
+echo To get an exodus console - sets some environment variables
 echo
 echo  exodus
 echo  testsort
