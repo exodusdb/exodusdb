@@ -13,6 +13,8 @@ export EXO_EXODUS_REUSE_DOWNLOAD=YES
 #--- Toolset ---
 #---------------
 export EXO_SDK=/Developer/SDKs/MacOSX10.4u.sdk
+#export EXO_SDK=/Developer/SDKs/MacOSX10.5.sdk
+#export EXO_SDK=/Developer/SDKs/MacOSX10.6.sdk
 export EXO_MINVER=10.4
 export EXO_ARCH=i386
 export EXO_BUILD=i386-apple-darwin8.11.0
@@ -22,8 +24,9 @@ export EXO_CXX=g++-4.0
 export EXO_LIBS_ICU="-licudata -licui18n -licutu -licuuc"
 export EXO_LIBS_BOOST="-lboost_date_time -lboost_filesystem -lboost_regex -lboost_system -lboost_thread"
 
-#export EXO_FLAGS="-arch $EXO_ARCH -isysroot $EXO_SDK -mmacosx-version-min=$EXO_MINVER -march=prescott"
-export EXO_FLAGS="-arch $EXO_ARCH -mmacosx-version-min=$EXO_MINVER -march=prescott"
+#seems to determine which include files and libs are used from /Developer/SDKs
+export EXO_FLAGS="-arch $EXO_ARCH -mmacosx-version-min=$EXO_MINVER -march=prescott -isysroot $EXO_SDK"
+#export EXO_FLAGS="-arch $EXO_ARCH -mmacosx-version-min=$EXO_MINVER -march=prescott"
 export EXO_LDFLAGS="-Bstatic"
 
 #see XCODE's Cross-Development Programming Guide:Configuring a Makefile-Based Project

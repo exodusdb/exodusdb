@@ -68,12 +68,20 @@ function main()
         //assume msvc (cl) on windows and g++ otherwise
         if (SLASH=="/") {
                 if (verbose)
-                        printl("Posix environment detected. Assuming standard C++ compiler g++");
+                        printl("Posix environment detected.");
 
-                compiler=osgetenv("CPP");
-                if (not compiler)
+                if (compiler=osgetenv("EXO_CXX")) {
+			if (verbose)
+				printl("Using EXO_CXX environment variable for compiler "^compiler.quote());
+		}
+		else if (compiler=osgetenv("CXX")) {
+			if (verbose)
+				printl("Using CXX environment variable for compiler "^compiler.quote());
+		} else {
 			compiler="g++";
-
+			if (verbose)
+				printl("no EXO_CXX or CXX environment variable. Assuming "^compiler.quote());
+		}
                 //basic compiler options
 
 				//http://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#Warning-Options
