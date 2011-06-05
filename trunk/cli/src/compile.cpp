@@ -70,7 +70,9 @@ function main()
                 if (verbose)
                         printl("Posix environment detected. Assuming standard C++ compiler g++");
 
-                compiler="g++";
+                compiler=osgetenv("CPP");
+                if (not compiler)
+			compiler="g++";
 
                 //basic compiler options
 

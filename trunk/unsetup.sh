@@ -1,3 +1,5 @@
+#!/bin/bash
+
 #ICU
 
 pushd /usr/local

@@ -199,6 +199,31 @@
                         <distributionFile>
                             <origin>exodus/exodus/exodus/.libs/libexodus.la</origin>
                         </distributionFile>
+                        <distributionFile>
+                            <origin>../boost_1_46_1/bin.v2/libs/date_time/build/darwin-4.2.1/release/threading-multi/libboost_date_time.dylib</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>../boost_1_46_1/bin.v2/libs/filesystem/build/darwin-4.2.1/release/threading-multi/libboost_filesystem.dylib</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>../boost_1_46_1/bin.v2/libs/regex/build/darwin-4.2.1/release/threading-multi/libboost_regex.dylib</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>../boost_1_46_1/bin.v2/libs/system/build/darwin-4.2.1/release/threading-multi/libboost_system.dylib</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>../boost_1_46_1/bin.v2/libs/thread/build/darwin-4.2.1/release/threading-multi/libboost_thread.dylib</origin>
+                        </distributionFile>
+                        <distributionDirectory>
+                            <allowWildcards>1</allowWildcards>
+                            <includeFiles>*/lib*</includeFiles>
+                            <origin>../icu/source/*</origin>
+                        </distributionDirectory>
+                        <distributionFile>
+                            <allowWildcards>1</allowWildcards>
+                            <includeFiles>*/*.dylib</includeFiles>
+                            <origin>../icu/source/lib/*</origin>
+                        </distributionFile>
                     </distributionFileList>
                 </folder>
                 <folder>

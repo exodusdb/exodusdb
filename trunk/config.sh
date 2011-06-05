@@ -2,6 +2,74 @@
 
 export EXO_CONFIGMODE=$1
 
+#-------------------
+#--- Run options ---
+#-------------------
+export EXO_ICU_REUSE_DOWNLOAD=YES
+export EXO_BOOST_REUSE_DOWNLOAD=YES
+export EXO_EXODUS_REUSE_DOWNLOAD=YES
+
+#---------------
+#--- Toolset ---
+#---------------
+export EXO_SDK=/Developer/SDKs/MacOSX10.4u.sdk
+export EXO_MINVER=10.4
+export EXO_ARCH=i386
+export EXO_BUILD=i386-apple-darwin8.11.0
+export EXO_CC=gcc-4.0
+export EXO_CXX=g++-4.0
+
+export EXO_LIBS_ICU="-licudata -licui18n -licutu -licuuc"
+export EXO_LIBS_BOOST="-lboost_date_time -lboost_filesystem -lboost_regex -lboost_system -lboost_thread"
+
+#export EXO_FLAGS="-arch $EXO_ARCH -isysroot $EXO_SDK -mmacosx-version-min=$EXO_MINVER -march=prescott"
+export EXO_FLAGS="-arch $EXO_ARCH -mmacosx-version-min=$EXO_MINVER -march=prescott"
+export EXO_LDFLAGS="-Bstatic"
+
+#see XCODE's Cross-Development Programming Guide:Configuring a Makefile-Based Project
+export MACOSX_DEPLOYMENT_TARGET=$EXO_MINVER
+
+export EXO_BOOST_JAM_USING="darwin : 8.11 : /usr/bin/g++-4.0 :"
+export EXO_BOOST_JAM_ARCHITECTURE=combined
+export EXO_BOOST_JAM_ADDRESS_MODEL=32
+#export EXO_BOOST_JAM_ADDRESS_MODEL=32_64
+
+#-----------
+#--- Icu ---
+#-----------
+export EXO_ICU_DOWNLOADER=SUBVERSION
+export EXO_ICU_VER=4_8
+export EXO_ICU_URL_SUBVERSION=http://source.icu-project.org/repos/icu/icu/tags/release-4-8/
+export EXO_ICU_URL_CURL=http://download.icu-project.org/files/icu4c/4.8/icu4c-4_8-src.tgz
+
+export EXO_ICU_FILE=icu4c-4_8-src.tgz
+export EXO_ICU_DIR=icu
+
+#-------------
+#--- Boost ---
+#-------------
+export EXO_BOOST_VER=1_46_1
+export EXO_BOOST_VERNO=1.46.1
+export EXO_BOOST_DIR=boost_${EXO_BOOST_VER}
+export EXO_BOOST_FILE=boost_${EXO_BOOST_VER}.tar.gz
+export EXO_BOOST_URL=http://sourceforge.net/projects/boost/files/boost/${EXO_BOOST_VERNO}/${EXO_BOOST_FILE}
+
+#----------------
+#--- Postgres ---
+#----------------
+export EXO_POSTGRES_BIN32=/Library/PostgreSQL/9.0/bin
+export EXO_POSTGRES_BIN=$EXO_POSTGRES_BIN32
+
+#--------------
+#--- Exodus ---
+#--------------
+export EXO_EXODUS_REUSE_DOWNLOAD=YES
+export EXO_EXODUS_DOWNLOADER=SUBVERSION
+export EXO_EXODUS_URL_SUBVERSION=HTTPS://exodusdb.googlecode.com/svn/trunk/
+export EXO_EXODUS_DIR=exodus
+export EXO_EXODUS_FILE=
+export EXO_EXODUS_URL=
+
 export EXO_CODENAME=exodus
 
 export PATH=/Library/PostgreSQL/9.0/bin:$PATH
@@ -69,4 +137,10 @@ test "$EXO_BATCH_BUILD_VER" = "" || export EXO_BUILD_VER=$EXO_BATCH_BUILD_VER
 
 #afteruploader:
 
-set|grep EXO_
+#----------
+#-- Log ---
+#----------
+set | grep EXO_
+
+
+
