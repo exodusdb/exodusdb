@@ -55,7 +55,7 @@ test -f Makefile && make clean && make distclean
        CC="$EXO_CC" \
    CFLAGS="$EXO_FLAGS" \
       CXX="$EXO_CXX" \
- CXXFLAGS="$EXO_FLAGS" \
+ CXXFLAGS="$EXO_FLAGS -fvisibility=hidden" \
   LDFLAGS="$EXO_LDFLAGS -fvisibility=hidden" \
      LIBS="$EXO_LIBS" \
  --enable-shared=no \

@@ -12,7 +12,9 @@ cd icu/source
   --enable-icuio=no \
   --enable-layout=no \
   --enable-tests=no \
-  --enable-samples=no 
+  --enable-samples=no \
+ --enable-shared=yes \
+ --enable-static=no
 make clean
 make
 sudo make install
