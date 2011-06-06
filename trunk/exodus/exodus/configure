@@ -16429,6 +16429,7 @@ $as_echo "#define HAVE_BOOST /**/" >>confdefs.h
 fi
 
 
+#TODO FIND A WAY TO STOP IF THE CORRECT LIBS ARE NOT AVAILABLE DESPITE BASE DETECTION SUCCEEDING!
 
 
 # Check whether --with-boost-date-time was given.
