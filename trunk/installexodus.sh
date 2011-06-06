@@ -1,5 +1,6 @@
 #!/bin/bash
 
+set -e
 
 echo 1. Build and install ICU
 cd ~
@@ -19,6 +20,7 @@ make clean
 make
 sudo make install
 
+
 echo 2. Build and install Boost
 cd ~
 rm -f boost_1_46_1.tar.gz
@@ -32,17 +34,12 @@ sudo ./bjam --with-date_time --with-filesystem --with-regex --with-system --with
 
 
 echo 3. Build and install Exodus
-
 export PATH=/Library/PostgreSQL/9.0/bin/:$PATH
-
-#see XCODE's Cross-Development Programming Guide:Configuring a Makefile-Based Project
-#export MACOSX_DEPLOYMENT_TARGET=10.4
-
 cd ~
 svn co HTTPS://exodusdb.googlecode.com/svn/trunk/ exodus
 cd ~/exodus
 #./configure --with-sysroot=/Developer/SDKs/MacOSX10.4.0.sdk
-./configure
+./configure 
 make clean #in case half-built with wrong boost libs
 make
 sudo make install

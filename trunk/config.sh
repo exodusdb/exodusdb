@@ -9,6 +9,15 @@ export EXO_ICU_REUSE_DOWNLOAD=YES
 export EXO_BOOST_REUSE_DOWNLOAD=YES
 export EXO_EXODUS_REUSE_DOWNLOAD=YES
 
+#-------------
+#--- Boost ---
+#-------------
+export EXO_BOOST_VER=1_46_1
+export EXO_BOOST_VERNO=1.46.1
+export EXO_BOOST_DIR=boost_${EXO_BOOST_VER}
+export EXO_BOOST_FILE=boost_${EXO_BOOST_VER}.tar.gz
+export EXO_BOOST_URL=http://sourceforge.net/projects/boost/files/boost/${EXO_BOOST_VERNO}/${EXO_BOOST_FILE}
+
 #---------------
 #--- Toolset ---
 #---------------
@@ -21,13 +30,15 @@ export EXO_BUILD=i386-apple-darwin8.11.0
 export EXO_CC=gcc-4.0
 export EXO_CXX=g++-4.0
 
+export EXO_PREFIX=$HOME
+export EXO_EPREFIX=$HOME/$EXO_ARCH-$EXO_MINVER
+
 export EXO_LIBS_ICU="-licudata -licui18n -licutu -licuuc"
 export EXO_LIBS_BOOST="-lboost_date_time -lboost_filesystem -lboost_regex -lboost_system -lboost_thread"
 
 #seems to determine which include files and libs are used from /Developer/SDKs
-export EXO_FLAGS="-arch $EXO_ARCH -mmacosx-version-min=$EXO_MINVER -march=prescott -isysroot $EXO_SDK"
-#export EXO_FLAGS="-arch $EXO_ARCH -mmacosx-version-min=$EXO_MINVER -march=prescott"
-export EXO_LDFLAGS="-Bstatic"
+export EXO_FLAGS="-I$EXO_PREFIX/include -I$EXO_PREFIX/$EXO_BOOST_DIR -arch $EXO_ARCH -mmacosx-version-min=$EXO_MINVER -march=prescott -isysroot $EXO_SDK"
+export EXO_LDFLAGS="-Bstatic -L$EXO_EPREFIX/lib"
 
 #see XCODE's Cross-Development Programming Guide:Configuring a Makefile-Based Project
 export MACOSX_DEPLOYMENT_TARGET=$EXO_MINVER
@@ -47,15 +58,6 @@ export EXO_ICU_URL_CURL=http://download.icu-project.org/files/icu4c/4.8/icu4c-4_
 
 export EXO_ICU_FILE=icu4c-4_8-src.tgz
 export EXO_ICU_DIR=icu
-
-#-------------
-#--- Boost ---
-#-------------
-export EXO_BOOST_VER=1_46_1
-export EXO_BOOST_VERNO=1.46.1
-export EXO_BOOST_DIR=boost_${EXO_BOOST_VER}
-export EXO_BOOST_FILE=boost_${EXO_BOOST_VER}.tar.gz
-export EXO_BOOST_URL=http://sourceforge.net/projects/boost/files/boost/${EXO_BOOST_VERNO}/${EXO_BOOST_FILE}
 
 #----------------
 #--- Postgres ---

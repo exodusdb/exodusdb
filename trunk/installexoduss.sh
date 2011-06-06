@@ -81,7 +81,8 @@ echo ./configure \
    CFLAGS="$EXO_FLAGS" \
  CXXFLAGS="$EXO_FLAGS" \
   LDFLAGS="$EXO_FLAGS $EXO_LDFLAGS" \
-     LIBS="$EXO_LIBS_ICU $EXO_LIBS_BOOST"
+     LIBS="$EXO_LIBS_ICU $EXO_LIBS_BOOST" \
+ --with-boost-libdir=$EXO_EPREFIX/lib
 
 ./configure \
   --build="$EXO_BUILD" \
@@ -90,7 +91,8 @@ echo ./configure \
    CFLAGS="$EXO_FLAGS" \
  CXXFLAGS="$EXO_FLAGS" \
   LDFLAGS="$EXO_FLAGS $EXO_LDFLAGS" \
-     LIBS="$EXO_LIBS_ICU $EXO_LIBS_BOOST"
+     LIBS="$EXO_LIBS_ICU $EXO_LIBS_BOOST" \
+ --with-boost-libdir=$EXO_EPREFIX/lib
 
 #------------
 #--- Make ---
