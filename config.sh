@@ -11,6 +11,8 @@ export EXO_ICU_REUSE_DOWNLOAD=YES
 export EXO_BOOST_REUSE_DOWNLOAD=YES
 export EXO_EXODUS_REUSE_DOWNLOAD=YES
 
+export EXO_PREFIX=$HOME/exo
+
 #-------------
 #--- Boost ---
 #-------------
@@ -24,7 +26,14 @@ export EXO_BOOST_URL=http://sourceforge.net/projects/boost/files/boost/${EXO_BOO
 #--- Toolset ---
 #---------------
 
+export EXO_UNAME=`uname`
+
+if [ $EXO_UNAME = Darwin ]; then
+
 export EXO_BUILDING="OSX10.6"
+
+export EXO_LIBS_ICU="-licudata -licui18n -licutu -licuuc"
+export EXO_LIBS_BOOST="-lboost_date_time -lboost_filesystem -lboost_regex -lboost_system -lboost_thread"
 
 if [ "$EXO_BUILDING" = "OSX10.6" ]; then
 echo --- Found $EXO_BUILDING ---
@@ -60,18 +69,20 @@ echo --- Found $EXO_BUILDING ---
  #export EXO_BOOST_JAM_ADDRESS_MODEL=32_64
 fi
 
-export EXO_PREFIX=$HOME/exo
-export EXO_EPREFIX=$EXO_PREFIX/$EXO_ARCH-$EXO_MINVER
-
-export EXO_LIBS_ICU="-licudata -licui18n -licutu -licuuc"
-export EXO_LIBS_BOOST="-lboost_date_time -lboost_filesystem -lboost_regex -lboost_system -lboost_thread"
-
-#seems to determine which include files and libs are used from /Developer/SDKs
-export EXO_FLAGS="-I$EXO_PREFIX/include -I$HOME/$EXO_BOOST_DIR -arch $EXO_ARCH -mmacosx-version-min=$EXO_MINVER -march=prescott -isysroot $EXO_SDK"
-export EXO_LDFLAGS="-Bstatic -L$EXO_EPREFIX/lib"
+#determine which include files and libs are used from /Developer/SDKs
+export EXO_OSX_FLAGS="-arch $EXO_ARCH -mmacosx-version-min=$EXO_MINVER -march=prescott -isysroot $EXO_SDK"
 
 #see XCODE's Cross-Development Programming Guide:Configuring a Makefile-Based Project
 export MACOSX_DEPLOYMENT_TARGET=$EXO_MINVER
+
+fi
+
+# --- common to all tools ---
+
+export EXO_EPREFIX=$EXO_PREFIX/$EXO_ARCH-$EXO_MINVER
+
+export EXO_FLAGS="-I$EXO_PREFIX/include -I$HOME/$EXO_BOOST_DIR $EXO_OSX_FLAGS"
+export EXO_LDFLAGS="-Bstatic -L$EXO_EPREFIX/lib"
 
 #-----------
 #--- Icu ---
@@ -131,8 +142,11 @@ test "$EXO_BATCH_BUILD_VER" = "" || export EXO_BUILD_VER=$EXO_BATCH_BUILD_VER
 # ------------------------
 # --- INSTALLFILE NAME ---
 # ------------------------
+if [ "`uname`" = "Darwin" ]; then
   export EXO_INSTALLFILENAME="$EXO_CODENAME-$EXO_MAJOR_VER.$EXO_MINOR_VER.$EXO_MICRO_VER-osx-installer.app.zip"
-
+else
+  export EXO_INSTALLFILENAME="$EXO_CODENAME-$EXO_MAJOR_VER.$EXO_MINOR_VER.$EXO_MICRO_VER.tar.gz"
+fi
 
 #if [ "$EXO_CONFIGMODE" -eq "CLEAN" ] goto afteruploader
 #if [ "$EXO_CONFIGMODE" -eq "MAKE"  ] goto afteruploader
@@ -147,10 +161,15 @@ test "$EXO_BATCH_BUILD_VER" = "" || export EXO_BUILD_VER=$EXO_BATCH_BUILD_VER
 # -----------------------
 # --- COMMAND TO PACK ---
 # -----------------------
+if [ $EXO_UNAME = Darwin ]; then
   export EXO_PACK_CMD=./bitrock_all_osx.sh
   export EXO_PACK_OPT=
-# needs EXO_UPLOADUSER UPLOADPASS_EXO EXO_INSTALLFILENAME
+else
+  export EXO_PACK_CMD=make dist
+  export EXO_PACK_OPT=
+fi
 
+# needs EXO_UPLOADUSER UPLOADPASS_EXO EXO_INSTALLFILENAME
 # -------------------------
 # --- COMMAND TO UPLOAD ---
 # -------------------------
