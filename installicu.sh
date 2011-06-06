@@ -45,6 +45,8 @@ test -f Makefile && make clean && make distclean
 #-----------------
 #-fvisibility=hidden is added in a futile attempt to avoid zillions of warnings while building icu
 ./configure \
+ --prefix=$EXO_PREFIX \
+ --exec-prefix=$EXO_EPREFIX \
  --enable-extras=no \
  --enable-extras=no \
  --enable-icuio=no \

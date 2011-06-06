@@ -65,9 +65,13 @@ echo ###########################################################################
 #TODO sudo only needed for install
 #./bjam
 sudo ./bjam \
+ --stagedir=$EXO_EPREFIX \
  --user-config=exodus-darwin-$EXO_BOOST_JAM_ARCHITECTURE-$EXO_BOOST_JAM_ADDRESS_MODEL-$EXO_MINVER.jam \
  define=U_STATIC_IMPLEMENTATION=1 \
  --with-date_time --with-filesystem --with-regex --with-system --with-thread \
  link=static \
- install
+ stage
 
+
+# --prefix=$EXO_PREFIX \
+# --exec-prefix=$EXO_EPREFIX \
