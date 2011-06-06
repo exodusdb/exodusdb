@@ -12,7 +12,7 @@ export EXO_EXODUS_REUSE_DOWNLOAD=YES
 #---------------
 #--- Toolset ---
 #---------------
-export EXO_SDK=/Developer/SDKs/MacOSX10.4u.sdk
+export EXO_SDK=/Developer/SDKs/MacOSX10.4u.sdk #doesnt have backtrace
 #export EXO_SDK=/Developer/SDKs/MacOSX10.5.sdk
 #export EXO_SDK=/Developer/SDKs/MacOSX10.6.sdk
 export EXO_MINVER=10.4
