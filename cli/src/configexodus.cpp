@@ -315,7 +315,7 @@ program()
 
 		print(oconv("Configuring pgexodus postgres plugin ... ","L#40"));
 		if (not add_pgexodus_postgres_plugin())
-			stop("Stopping. Not enough privileges");
+			printl("Not enough privileges?");
 
 		print(oconv("Detaching from new database ... ","L#40"));
 		disconnect();
@@ -329,7 +329,7 @@ program()
 
         print(oconv("Add pgexodus postgres plugin ... ","L#40"));
         if (not add_pgexodus_postgres_plugin())
-                stop("Stopping. Not enough privileges");
+                printl(" Not enough privileges");
 
         print(oconv("Detaching from template1 database ... ","L#40"));
 		disconnect();

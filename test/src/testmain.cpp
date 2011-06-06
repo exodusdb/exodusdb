@@ -542,20 +542,28 @@ function main()
 	//errmsg = {var_mvstr="ERROR:  function exodus_extract_date(bytea, integer, integer, integer) does not exist
 	//use DBTRACE to see the error
 	printl("CHECKING IF PGEXODUS POSTGRES PLUGIN IS INSTALLED");
-	assert(createindex("XUSERS","BIRTHDAY"));
-	assert(listindexes("XUSERS") eq ("xusers"^VM^"birthday"));
-	assert(listindexes() ne "");
+	var pluginok=true;
+	if (not createindex("XUSERS","BIRTHDAY")) {
+		pluginok=false;
+		printl("Error: pgexodus, Exodus's plugin to PostgreSQL is not working. Run configexodus.");
+	}
+
+	if (pluginok) {
+		assert(listindexes("XUSERS") eq ("xusers"^VM^"birthday"));
+		assert(listindexes() ne "");
 //ALN: do not delete to make subsequent select work::	assert(deleteindex("XUSERS","BIRTHDAY"));
-//	assert(listindexes("XUSERS") eq "");
-
+//		assert(listindexes("XUSERS") eq "");
+	}
 	//check can select and readnext through the records
-	assert(select("SELECT XUSERS WITH BIRTHDAY BETWEEN '1 JAN 2000' AND '31 DEC 2003'"));
-	assert(readnext(ID));
-	assert(ID eq 2);
-	assert(readnext(ID));
-	assert(ID eq 3);
-	assert(not readnext(ID));//check no more
-
+	if (pluginok) {
+		assert(select("SELECT XUSERS WITH BIRTHDAY BETWEEN '1 JAN 2000' AND '31 DEC 2003'"));
+		assert(readnext(ID));
+		assert(ID eq 2);
+		assert(readnext(ID));
+		assert(ID eq 3);
+		assert(not readnext(ID));//check no more
+	}
+//test function dictionaries
 //	if (not selectrecord("SELECT XUSERS WITH AGE_IN_DAYS GE 0 AND WITH AGE_IN_YEARS GE 0"))
 //	if (not select("SELECT XUSERS"))
 	if (not selectrecord("SELECT XUSERS"))

@@ -11,6 +11,8 @@ export EXO_ICU_REUSE_DOWNLOAD=YES
 export EXO_BOOST_REUSE_DOWNLOAD=YES
 export EXO_EXODUS_REUSE_DOWNLOAD=YES
 
+export EXO_DARWIN_BUILD=10.4
+
 export EXO_PREFIX=$HOME/exo
 
 #-------------
@@ -28,15 +30,13 @@ export EXO_BOOST_URL=http://sourceforge.net/projects/boost/files/boost/${EXO_BOO
 
 export EXO_UNAME=`uname`
 
-if [ $EXO_UNAME = Darwin ]; then
-
-export EXO_BUILDING="OSX10.6"
-
 export EXO_LIBS_ICU="-licudata -licui18n -licutu -licuuc"
 export EXO_LIBS_BOOST="-lboost_date_time -lboost_filesystem -lboost_regex -lboost_system -lboost_thread"
 
-if [ "$EXO_BUILDING" = "OSX10.6" ]; then
-echo --- Found $EXO_BUILDING ---
+if [ "$EXO_UNAME" = "Darwin" ]; then
+
+if [ "$EXO_DARWIN_BUILD" = "10.6" ]; then
+ echo BUILDING DARWIN $EXO_DARWIN_BUILD 
  #export EXO_SDK=/Developer/SDKs/MacOSX10.4u.sdk #doesnt have backtrace
  #export EXO_SDK=/Developer/SDKs/MacOSX10.5.sdk
  export EXO_SDK=/Developer/SDKs/MacOSX10.6.sdk
@@ -52,8 +52,8 @@ echo --- Found $EXO_BUILDING ---
  #export EXO_BOOST_JAM_ADDRESS_MODEL=32_64
 fi
 
-if [ "$EXO_BUILDING" = "OSX10.4" ]; then
-echo --- Found $EXO_BUILDING ---
+if [ "$EXO_DARWIN_BUILD" = "10.4" ]; then
+ echo BUILDING DARWIN $EXO_DARWIN_BUILD 
  export EXO_SDK=/Developer/SDKs/MacOSX10.4u.sdk #doesnt have backtrace
  #export EXO_SDK=/Developer/SDKs/MacOSX10.5.sdk
  #export EXO_SDK=/Developer/SDKs/MacOSX10.6.sdk
@@ -81,6 +81,7 @@ fi
 
 export EXO_EPREFIX=$EXO_PREFIX/$EXO_ARCH-$EXO_MINVER
 
+#note: any minor failure to compile can cause boost not to detect ICU see boosts bin.v2/config.log for errors
 export EXO_FLAGS="-I$EXO_PREFIX/include -I$HOME/$EXO_BOOST_DIR $EXO_OSX_FLAGS"
 export EXO_LDFLAGS="-Bstatic -L$EXO_EPREFIX/lib"
 

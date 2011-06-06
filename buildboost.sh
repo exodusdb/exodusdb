@@ -46,6 +46,7 @@ cd ${EXO_BOOST_DIR}
 #-----------------
 test -f bjam || ./bootstrap.sh
 
+export EXO_BOOST_JAMFILE=exodus-darwin-$EXO_BOOST_JAM_ARCHITECTURE-$EXO_BOOST_JAM_ADDRESS_MODEL-$EXO_MINVER.jam
 echo "# Compiler configuration
 using $EXO_BOOST_JAM_USING
        <architecture>\"$EXO_BOOST_JAM_ARCHITECTURE\"
@@ -53,16 +54,31 @@ using $EXO_BOOST_JAM_USING
      <macosx-version>\"$EXO_MINVER\"
  <macosx-version-min>\"$EXO_MINVER\"
               #<root>\"/Developer\"
-       <compileflags>\"\"
+       <compileflags>\"$EXO_FLAGS\"
           <linkflags>\"$EXO_LDFLAGS $EXO_LIBS_ICU \" ;" \
->exodus-darwin-$EXO_BOOST_JAM_ARCHITECTURE-$EXO_BOOST_JAM_ADDRESS_MODEL-$EXO_MINVER.jam
+> $EXO_BOOST_JAMFILE
+echo -----------------------------------------------------------------
+cat $EXO_BOOST_JAMFILE
 
 #--------------------
 #--- Make/Install ---
 #--------------------
-echo BJAM SHOULD SAY "HAS_ICU BUILDS: YES" OTHERWISE CHECK YOUR ICU INSTALLATION ABOVE
-echo #################################################################################
 #staging so only copied libs and no copying of zillons include files
+echo -----------------------------------------------------------------
+echo ./bjam \
+ --stagedir=$EXO_EPREFIX \
+ --user-config=$EXO_BOOST_JAMFILE \
+ define=U_STATIC_IMPLEMENTATION=1 \
+ --with-date_time --with-filesystem --with-regex --with-system --with-thread \
+ link=static \
+ -a -j2 \
+ stage
+echo -----------------------------------------------------------------
+sleep 1
+
+echo BJAM SHOULD SAY "HAS_ICU BUILDS: YES" OTHERWISE CHECK YOUR ICU INSTALLATION ABOVE
+echo  and  nano ~/boost_1_46_1/bin.v2/config.log for the compile options on test has_icu.cpp
+echo #######################################################################################
 ./bjam \
  --stagedir=$EXO_EPREFIX \
  --user-config=exodus-darwin-$EXO_BOOST_JAM_ARCHITECTURE-$EXO_BOOST_JAM_ADDRESS_MODEL-$EXO_MINVER.jam \
