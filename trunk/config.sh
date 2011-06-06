@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#assumes icu, boost and exodus are in the home directory
+
 export EXO_CONFIGMODE=$1
 
 #-------------------
@@ -21,32 +23,55 @@ export EXO_BOOST_URL=http://sourceforge.net/projects/boost/files/boost/${EXO_BOO
 #---------------
 #--- Toolset ---
 #---------------
-export EXO_SDK=/Developer/SDKs/MacOSX10.4u.sdk #doesnt have backtrace
-#export EXO_SDK=/Developer/SDKs/MacOSX10.5.sdk
-#export EXO_SDK=/Developer/SDKs/MacOSX10.6.sdk
-export EXO_MINVER=10.4
-export EXO_ARCH=i386
-export EXO_BUILD=i386-apple-darwin8.11.0
-export EXO_CC=gcc-4.0
-export EXO_CXX=g++-4.0
 
-export EXO_PREFIX=$HOME
-export EXO_EPREFIX=$HOME/$EXO_ARCH-$EXO_MINVER
+export EXO_BUILDING="OSX10.6"
+
+if [ "$EXO_BUILDING" = "OSX10.6" ]; then
+echo --- Found $EXO_BUILDING ---
+ #export EXO_SDK=/Developer/SDKs/MacOSX10.4u.sdk #doesnt have backtrace
+ #export EXO_SDK=/Developer/SDKs/MacOSX10.5.sdk
+ export EXO_SDK=/Developer/SDKs/MacOSX10.6.sdk
+ export EXO_MINVER=10.6
+ export EXO_ARCH=i686
+ export EXO_BUILD=x86_64-apple-darwin10.0.0
+ export EXO_CC=gcc-4.2
+ export EXO_CXX=g++-4.2
+
+ export EXO_BOOST_JAM_USING="darwin : 10.0 : /usr/bin/g++-4.2 :"
+ export EXO_BOOST_JAM_ARCHITECTURE=combined
+ export EXO_BOOST_JAM_ADDRESS_MODEL=64
+ #export EXO_BOOST_JAM_ADDRESS_MODEL=32_64
+fi
+
+if [ "$EXO_BUILDING" = "OSX10.4" ]; then
+echo --- Found $EXO_BUILDING ---
+ export EXO_SDK=/Developer/SDKs/MacOSX10.4u.sdk #doesnt have backtrace
+ #export EXO_SDK=/Developer/SDKs/MacOSX10.5.sdk
+ #export EXO_SDK=/Developer/SDKs/MacOSX10.6.sdk
+ export EXO_MINVER=10.4
+ export EXO_ARCH=i386
+ export EXO_BUILD=i386-apple-darwin8.11.0
+ export EXO_CC=gcc-4.0
+ export EXO_CXX=g++-4.0
+
+ export EXO_BOOST_JAM_USING="darwin : 8.11 : /usr/bin/g++-4.0 :"
+ export EXO_BOOST_JAM_ARCHITECTURE=combined
+ export EXO_BOOST_JAM_ADDRESS_MODEL=32
+ #export EXO_BOOST_JAM_ADDRESS_MODEL=32_64
+fi
+
+export EXO_PREFIX=$HOME/exo
+export EXO_EPREFIX=$EXO_PREFIX/$EXO_ARCH-$EXO_MINVER
 
 export EXO_LIBS_ICU="-licudata -licui18n -licutu -licuuc"
 export EXO_LIBS_BOOST="-lboost_date_time -lboost_filesystem -lboost_regex -lboost_system -lboost_thread"
 
 #seems to determine which include files and libs are used from /Developer/SDKs
-export EXO_FLAGS="-I$EXO_PREFIX/include -I$EXO_PREFIX/$EXO_BOOST_DIR -arch $EXO_ARCH -mmacosx-version-min=$EXO_MINVER -march=prescott -isysroot $EXO_SDK"
+export EXO_FLAGS="-I$EXO_PREFIX/include -I$HOME/$EXO_BOOST_DIR -arch $EXO_ARCH -mmacosx-version-min=$EXO_MINVER -march=prescott -isysroot $EXO_SDK"
 export EXO_LDFLAGS="-Bstatic -L$EXO_EPREFIX/lib"
 
 #see XCODE's Cross-Development Programming Guide:Configuring a Makefile-Based Project
 export MACOSX_DEPLOYMENT_TARGET=$EXO_MINVER
-
-export EXO_BOOST_JAM_USING="darwin : 8.11 : /usr/bin/g++-4.0 :"
-export EXO_BOOST_JAM_ARCHITECTURE=combined
-export EXO_BOOST_JAM_ADDRESS_MODEL=32
-#export EXO_BOOST_JAM_ADDRESS_MODEL=32_64
 
 #-----------
 #--- Icu ---
