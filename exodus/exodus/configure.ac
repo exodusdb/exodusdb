@@ -98,6 +98,7 @@ m4_include([m4/ax_boost_thread.m4])
 #utf8_codecvt fixed in filesystem library from 1.40
 #redhat 5 = 1.33, redhat 6 = 1.41
 #AX_BOOST_BASE([1.32.0])
+dnl boost base checks if include can be be found
 AX_BOOST_BASE([1.40.0],,exit)
 #TODO FIND A WAY TO STOP IF THE CORRECT LIBS ARE NOT AVAILABLE DESPITE BASE DETECTION SUCCEEDING!
 AX_BOOST_DATE_TIME

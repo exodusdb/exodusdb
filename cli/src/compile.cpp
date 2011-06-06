@@ -79,6 +79,10 @@ function main()
 				printl("Using CXX environment variable for compiler "^compiler.quote());
 		} else {
 			compiler="g++";
+#ifdef __APPLE__
+			if (PLATFORM_ eq "x86")
+				compiler="g++-4.0";
+#endif
 			if (verbose)
 				printl("no EXO_CXX or CXX environment variable. Assuming "^compiler.quote());
 		}

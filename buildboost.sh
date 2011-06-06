@@ -12,8 +12,8 @@ cd ~
 #--------------
 #optionally delete the boost download file to force redownloading
 if [ "$EXO_BOOST_REUSE_DOWNLOAD" != "YES" ]; then
-	test -f ${EXO_BOOST_FILE} && sudo rm -f ${EXO_BOOST_FILE}
-	test -d ${EXO_BOOST_DIR}  && sudo rm -rf ${EXO_BOOST_DIR}
+	test -f ${EXO_BOOST_FILE} && rm -f ${EXO_BOOST_FILE}
+	test -d ${EXO_BOOST_DIR}  && rm -rf ${EXO_BOOST_DIR}
 fi
 
 #replaced by curl - see below
@@ -62,16 +62,15 @@ using $EXO_BOOST_JAM_USING
 #--------------------
 echo BJAM SHOULD SAY "HAS_ICU BUILDS: YES" OTHERWISE CHECK YOUR ICU INSTALLATION ABOVE
 echo #################################################################################
-#TODO sudo only needed for install
-#./bjam
-sudo ./bjam \
+#staging so only copied libs and no copying of zillons include files
+./bjam \
  --stagedir=$EXO_EPREFIX \
  --user-config=exodus-darwin-$EXO_BOOST_JAM_ARCHITECTURE-$EXO_BOOST_JAM_ADDRESS_MODEL-$EXO_MINVER.jam \
  define=U_STATIC_IMPLEMENTATION=1 \
  --with-date_time --with-filesystem --with-regex --with-system --with-thread \
  link=static \
+ -a -j2 \
  stage
-
 
 # --prefix=$EXO_PREFIX \
 # --exec-prefix=$EXO_EPREFIX \

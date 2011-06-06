@@ -74,6 +74,7 @@ test -f Makefile && make clean && make distclean
 #  LDFLAGS=-arch i386 -mmacosx-version-min=10.4 -march=prescott -DHASNT_EXECINFO -Bstatic
 #     LIBS=-licudata -licui18n -licutu -licuuc -lboost_date_time -lboost_filesystem -lboost_regex -lboost_system -lboost_thread
 
+echo ------------------------------------------------------------
 echo ./configure \
   --build="$EXO_BUILD" \
        CC="$EXO_CC" \
@@ -82,7 +83,11 @@ echo ./configure \
  CXXFLAGS="$EXO_FLAGS" \
   LDFLAGS="$EXO_FLAGS $EXO_LDFLAGS" \
      LIBS="$EXO_LIBS_ICU $EXO_LIBS_BOOST" \
- --with-boost-libdir=$EXO_EPREFIX/lib
+ --with-boost-libdir=$EXO_EPREFIX/lib 
+# --enable-shared=no \
+# --enable-static=yes 
+echo ------------------------------------------------------------
+sleep 1
 
 ./configure \
   --build="$EXO_BUILD" \
@@ -92,7 +97,9 @@ echo ./configure \
  CXXFLAGS="$EXO_FLAGS" \
   LDFLAGS="$EXO_FLAGS $EXO_LDFLAGS" \
      LIBS="$EXO_LIBS_ICU $EXO_LIBS_BOOST" \
- --with-boost-libdir=$EXO_EPREFIX/lib
+ --with-boost-libdir=$EXO_EPREFIX/lib 
+# --enable-shared=no \
+# --enable-static=yes 
 
 #------------
 #--- Make ---
@@ -102,19 +109,19 @@ make
 #---------------
 #--- Install ---
 #---------------
-sudo make install
+echo ----------------
+echo To Install
+echo  sudo make install
 
 #-------------------
 #--- Postinstall ---
 #-------------------
-echo Configure Exodus for Postgres and vice versa
-echo After exodus is installed, to setup postgres do the following.
+echo After installtion, get an Exodus console
+echo " exodus"
 echo
-echo   configexodus
+echo Then setup postgres do the following.
+echo " configexodus"
 echo
-echo Test Exodus
-echo To get an exodus console - sets some environment variables
-echo
-echo  exodus
-echo  testsort
+echo After configuration, test
+echo " testsort"
 

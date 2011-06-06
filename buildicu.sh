@@ -43,7 +43,27 @@ test -f Makefile && make clean && make distclean
 #-----------------
 #--- Configure ---
 #-----------------
-#-fvisibility=hidden is added in a futile attempt to avoid zillions of warnings while building icu
+echo ---------------------------------------------
+echo ./configure \
+ --prefix=$EXO_PREFIX \
+ --exec-prefix=$EXO_EPREFIX \
+ --enable-extras=no \
+ --enable-extras=no \
+ --enable-icuio=no \
+ --enable-layout=no \
+ --enable-tests=no \
+ --enable-samples=no \
+  --build="$EXO_BUILD" \
+       CC="$EXO_CC" \
+   CFLAGS="$EXO_FLAGS" \
+      CXX="$EXO_CXX" \
+ CXXFLAGS="$EXO_FLAGS" \
+  LDFLAGS="$EXO_LDFLAGS" \
+     LIBS="$EXO_LIBS" \
+ --enable-shared=no \
+ --enable-static=yes
+echo ---------------------------------------------
+sleep 1
 ./configure \
  --prefix=$EXO_PREFIX \
  --exec-prefix=$EXO_EPREFIX \
@@ -57,8 +77,8 @@ test -f Makefile && make clean && make distclean
        CC="$EXO_CC" \
    CFLAGS="$EXO_FLAGS" \
       CXX="$EXO_CXX" \
- CXXFLAGS="$EXO_FLAGS -fvisibility=hidden" \
-  LDFLAGS="$EXO_LDFLAGS -fvisibility=hidden" \
+ CXXFLAGS="$EXO_FLAGS" \
+  LDFLAGS="$EXO_LDFLAGS" \
      LIBS="$EXO_LIBS" \
  --enable-shared=no \
  --enable-static=yes
@@ -71,4 +91,4 @@ make
 #---------------
 #--- Install ---
 #---------------
-sudo make install
+make install
