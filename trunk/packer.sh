@@ -1,9 +1,9 @@
 #!/bin/bash
 
-source ./config.sh PACK > config.log
+source ./config.sh PACK
 
 echo $EXO_PACKER_CMD $EXO_PACKER_OPT
 
 $EXO_PACKER_CMD $EXO_PACKER_OPT
 
-#if [ $EXO_BATCHMODE -eq "" ] pause
+test "$EXO_BATCHMODE" = "" && read -p "Press Enter:"

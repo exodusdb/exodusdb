@@ -34,3 +34,4 @@ sudo rm -f  pkgconfig/boost*.pc
 find . | grep boost
 popd
 
+test "$EXO_BATCHMODE" = "" && read -p "Press Enter:"

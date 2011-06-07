@@ -10,4 +10,4 @@ echo $EXO_MAKE_CMD $EXO_MAKE_OPT
 
 $EXO_MAKE_CMD $EXO_MAKE_OPT
 
-#if [ $EXO_BATCHMODE -eq "" ] pause
+test "$EXO_BATCHMODE" = "" && read -p "Press Enter:"

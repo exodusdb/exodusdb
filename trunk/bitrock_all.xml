@@ -1,7 +1,8 @@
 <project>
     <shortName>exodus</shortName>
     <fullName>Exodus Multivalue Database</fullName>
-    <version>${env(EXO_MAJOR_VER)}.${env(EXO_MINOR_VER)}.${env(EXO_MICRO_VER)}</version>
+    <version>${env(EXO_DOTTED_MICRO_VER)}</version>
+    <installerFilename>${env(EXO_INSTALLAPPDIR)}</installerFilename>
     <readmeFile>README</readmeFile>
     <licenseFile>COPYING</licenseFile>
     <leftImage>exodus.png</leftImage>
@@ -188,7 +189,7 @@
                     <platforms>osx</platforms>
                     <distributionFileList>
                         <distributionFile>
-                            <origin>exodus/exodus/exodus/.libs/libexodus-${env(EXO_MAJOR_VER)}.${env(EXO_MINOR_VER)}.0.dylib</origin>
+                            <origin>exodus/exodus/exodus/.libs/libexodus-${env(EXO_DOTTED_MINOR_VER)}.0.dylib</origin>
                         </distributionFile>
                         <distributionFile>
                             <origin>exodus/exodus/exodus/.libs/libexodus.dylib</origin>
@@ -249,7 +250,7 @@
             <description>Installer.Parameter.installdir.description</description>
             <explanation>Installer.Parameter.installdir.explanation</explanation>
             <value></value>
-            <default>${platform_install_prefix}/Exodus/${env(EXO_MAJOR_VER)}.${env(EXO_MINOR_VER)}</default>
+            <default>${platform_install_prefix}/Exodus/${env(EXO_DOTTED_MINOR_VER)}</default>
             <allowEmptyValue>0</allowEmptyValue>
             <ask>yes</ask>
             <cliOptionName>prefix</cliOptionName>

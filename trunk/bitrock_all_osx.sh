@@ -1,12 +1,8 @@
 #!/bin/bash
 
 #needs at least the following environment variables set first - see pack.sh and config.sh etc
-#EXO_MAJOR_VER
-#EXO_MINOR_VER
-#EXO_MICRO_VER
-
-export EXO_DOTTED_MINOR_VER=${EXO_MAJOR_VER}.${EXO_MINOR_VER}
-export EXO_DOTTED_MICRO_VER=${EXO_DOTTED_MINOR_VER}.${EXO_MICRO_VER}
+#EXO_DOTTED_MINOR_VER
+#EXO_DOTTED_MICRO_VER
 
 #/Applications/BitRock*/bin/Builder.app/Contents/MacOS/installbuilder.sh --help
 #
@@ -36,34 +32,38 @@ export EXO_DOTTED_MICRO_VER=${EXO_DOTTED_MINOR_VER}.${EXO_MICRO_VER}
  build \
  bitrock_all.xml \
  --setvars \
- installdir=/Applications/Exodus/${EXO_DOTTED_MINOR_VER}/ \
- project.version="${EXO_DOTTED_MICRO_VER}" \
- project.fullName="Exodus Multivalue Database ${EXO_DOTTED_MICRO_VER}"
+ installdir=/Applications/Exodus/$EXO_DOTTED_MINOR_VER/ \
+ project.version="$EXO_DOTTED_MICRO_VER" \
+ project.fullName="Exodus Multivalue Database $EXO_DOTTED_MICRO_VER"
 
 #-------------------------------------------------------------------
 # 2. Zip up the directory into a single uploadable/downloadable file
 #-------------------------------------------------------------------
 
 #save current directory
-export SAVED_DIR_34635=`pwd`
+export EXO_SAVED_DIR_34635=`pwd`/
 
 #get into BitRock's .app output folder
 pushd /Applications/BitRock*/output
 
 #delete any old zip
-if [ -f "exodus-${EXO_DOTTED_MICRO_VER}-osx-installer.app.zip" ]
+if [ -f $EXO_INSTALLFILENAME ]
 then
-rm exodus-${EXO_DOTTED_MICRO_VER}-osx-installer.app.zip
+rm $EXO_INSTALLFILENAME
 fi
 
 #make a new zip
-zip -r \
- exodus-${EXO_DOTTED_MICRO_VER}-osx-installer.app.zip \
- exodus-${EXO_DOTTED_MICRO_VER}-osx-installer.app/*
+echo zip -r $EXO_INSTALLFILENAME $EXO_INSTALLAPPDIR/*
+zip -r $EXO_INSTALLFILENAME $EXO_INSTALLAPPDIR/*
+pwd
+echo ls -l $EXO_INSTALLFILENAME
+ls -l $EXO_INSTALLFILENAME
 
 #move to original directory
-mv exodus-${EXO_DOTTED_MICRO_VER}-osx-installer.app.zip ${SAVED_DIR_34635}/
+echo mv $EXO_INSTALLFILENAME $EXO_SAVED_DIR_34635
+mv $EXO_INSTALLFILENAME $EXO_SAVED_DIR_34635
 popd
 
 #view new zip size
-ls -l exodus-${EXO_DOTTED_MICRO_VER}-osx-installer.app.zip
+echo ls -l $EXO_INSTALLFILENAME
+ls -l $EXO_INSTALLFILENAME
