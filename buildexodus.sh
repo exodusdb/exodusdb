@@ -111,11 +111,8 @@ make
 #---------------
 echo ----------------
 echo To Install
-echo  sudo make install
-
-#-------------------
-#--- Postinstall ---
-#-------------------
+echo " sudo make install"
+echo
 echo After installtion, get an Exodus console
 echo " exodus"
 echo

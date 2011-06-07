@@ -47,16 +47,17 @@ cd ${EXO_BOOST_DIR}
 test -f bjam || ./bootstrap.sh
 
 export EXO_BOOST_JAMFILE=exodus-darwin-$EXO_BOOST_JAM_ARCHITECTURE-$EXO_BOOST_JAM_ADDRESS_MODEL-$EXO_MINVER.jam
-echo "# Compiler configuration
+cat > $EXO_BOOST_JAMFILE << EOF
+# Compiler configuration
 using $EXO_BOOST_JAM_USING
-       <architecture>\"$EXO_BOOST_JAM_ARCHITECTURE\"
-      <address-model>\"$EXO_BOOST_JAM_ADDRESS_MODEL\"
-     <macosx-version>\"$EXO_MINVER\"
- <macosx-version-min>\"$EXO_MINVER\"
-              #<root>\"/Developer\"
-       <compileflags>\"$EXO_FLAGS\"
-          <linkflags>\"$EXO_LDFLAGS $EXO_LIBS_ICU \" ;" \
-> $EXO_BOOST_JAMFILE
+       <architecture>"$EXO_BOOST_JAM_ARCHITECTURE"
+      <address-model>"$EXO_BOOST_JAM_ADDRESS_MODEL"
+     <macosx-version>"$EXO_MINVER"
+ <macosx-version-min>"$EXO_MINVER"
+              #<root>"/Developer"
+       <compileflags>"$EXO_FLAGS"
+          <linkflags>"$EXO_LDFLAGS $EXO_LIBS_ICU" ;
+EOF
 echo -----------------------------------------------------------------
 cat $EXO_BOOST_JAMFILE
 
@@ -71,6 +72,7 @@ echo ./bjam \
  define=U_STATIC_IMPLEMENTATION=1 \
  --with-date_time --with-filesystem --with-regex --with-system --with-thread \
  link=static \
+ variant=release \
  -a -j2 \
  stage
 echo -----------------------------------------------------------------
@@ -85,6 +87,7 @@ echo ###########################################################################
  define=U_STATIC_IMPLEMENTATION=1 \
  --with-date_time --with-filesystem --with-regex --with-system --with-thread \
  link=static \
+ variant=release \
  -a -j2 \
  stage
 
