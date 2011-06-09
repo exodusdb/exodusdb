@@ -198,23 +198,26 @@ function main()
 
 	//in German/Standard Locale
 	//check Eszet (like a Beta) uppercases to SS
-	assert(setxlocale(german_standard));
-	//FAILS in Windows XPSP3UK
-	//if (not SLASH_IS_BACKSLASH)
-	//	assert(ucase(GermanEszet) eq "SS");
-	GermanEszet.oconv("HEX4").oconv("T#4").outputl("German Eszet:");
-	ucase(GermanEszet).oconv("HEX4").oconv("T#4").outputl("Uppercased German Eszet:");
-
+	if (setxlocale(german_standard)) {
+		assert(setxlocale(german_standard));
+		//FAILS in Windows XPSP3UK
+		//if (not SLASH_IS_BACKSLASH)
+		//	assert(ucase(GermanEszet) eq "SS");
+		GermanEszet.oconv("HEX4").oconv("T#4").outputl("German Eszet:");
+		ucase(GermanEszet).oconv("HEX4").oconv("T#4").outputl("Uppercased German Eszet:");
+	}
 	//in Greek Locale
 	//convert word ending in "capital sigma" lower cases to "lower final sigma"
-	assert(setxlocale(greek_gr));
-	//Greek_sas       .outputl("Greek_sas=");
-	//ucase(Greek_sas).outputl("ucased   =");
-	//lcase(Greek_SAS).oconv("HEX4").oconv("T#4").outputl();
-	assert(ucase(Greek_sas) eq Greek_SAS);
-	//FAILS in Windows XPSP3UK and linux
-	//assert(lcase(Greek_SAS) eq Greek_sas);
-
+	var hasgreeklocale=setxlocale(greek_gr);
+	if (hasgreeklocale) {
+		assert(setxlocale(greek_gr));
+		//Greek_sas       .outputl("Greek_sas=");
+		//ucase(Greek_sas).outputl("ucased   =");
+		//lcase(Greek_SAS).oconv("HEX4").oconv("T#4").outputl();
+		assert(ucase(Greek_sas) eq Greek_SAS);
+		//FAILS in Windows XPSP3UK and linux
+		//assert(lcase(Greek_SAS) eq Greek_sas);
+	}
 	//NB a codepage is a 256 x one byte map of characters selected from all unicode characters depending on locale
 
 	//test windows codepages
@@ -242,15 +245,16 @@ function main()
 	//check Latin "I" lowercases to "turkish dotless i"
 	//check Latin "i" uppercases to "turkish dotted I"
 	//fails on Ubuntu 10.04
-	assert(setxlocale(turkish_tr));
-	printl("Latin Capital I should lower case to dotless Turkish i:",lcase(LatinCapitalI));
-	assert(lcase(TurkishCapitalDottedI) eq LatinSmallI);
-	assert(ucase(TurkishSmallDotlessI) eq LatinCapitalI);
-	if (SLASH_IS_BACKSLASH) {
-		assert(lcase(LatinCapitalI) eq TurkishSmallDotlessI);
-		assert(ucase(LatinSmallI)   eq TurkishCapitalDottedI);
+	if (setxlocale(turkish_tr)) {
+		assert(setxlocale(turkish_tr));
+		printl("Latin Capital I should lower case to dotless Turkish i:",lcase(LatinCapitalI));
+		assert(lcase(TurkishCapitalDottedI) eq LatinSmallI);
+		assert(ucase(TurkishSmallDotlessI) eq LatinCapitalI);
+		if (SLASH_IS_BACKSLASH) {
+			assert(lcase(LatinCapitalI) eq TurkishSmallDotlessI);
+			assert(ucase(LatinSmallI)   eq TurkishCapitalDottedI);
+		}
 	}
-
 	//restore initial locale
 	setxlocale(locale0);
 	setxlocale(english_us);
@@ -315,9 +319,12 @@ function main()
 	unicode^=L"ABc-123.456";//some LATIN characters and punctuation
 
 	var status2 = oswrite( unicode, "GreekUTF-8File.txt", "utf8");
+
 #ifndef __APPLE__
-	var status1 = oswrite( unicode, "GreekLocalFile.txt", greek_gr_locale);
-	var status3 = oswrite( unicode, "GreekEnglFile.txt", english_us_locale);
+	if (hasgreeklocale) {
+		var status1 = oswrite( unicode, "GreekLocalFile.txt", greek_gr_locale);
+		var status3 = oswrite( unicode, "GreekEnglFile.txt", english_us_locale);
+	}
 #endif
 
 	//test swapping "letters" (i.e. alphabet) with "?"
@@ -336,7 +343,7 @@ function main()
 	//but what is its inverse?
 	//assert(swap(unicode,"\\PL","?","ri") eq expect);
 
-	setxlocale(greek_gr);
+	//setxlocale(greek_gr);
 	var punctuation=GreekQuestionMark;//(Punctuation)
 	var uppercase=GreekCapitalGamma;//(Uppercase)
 	var lowercase=GreekSmallGamma;//(Lowercase)
