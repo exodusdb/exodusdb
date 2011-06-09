@@ -109,7 +109,7 @@ AX_BOOST_REGEX
 AX_BOOST_THREAD
 #AX_BOOST_SERIALIZATION
 
-echo checking for PostgreSQL libraries 8.1+
+dnl checking for PostgreSQL libraries 8.1+
 AX_LIB_POSTGRESQL([8.1.0])
 
 #icu only required in boost at the moment
@@ -145,7 +145,7 @@ AC_CONFIG_FILES([Makefile \
 ])
 AC_OUTPUT
 
-echo 
-echo Congrats. You have configured the Exodus library
-echo
-echo Type 'make && sudo make install'
+dnl 
+dnl Congrats. You have configured the Exodus library
+dnl
+dnl Type 'make && sudo make install'

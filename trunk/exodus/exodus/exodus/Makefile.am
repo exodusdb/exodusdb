@@ -78,11 +78,26 @@ $(POSTGRESQL_LDFLAGS)
 #actlibfile=lib$(GENERIC_LIBRARY_NAME)-$(GENERIC_API_VERSION)$(LIBEXT).$(GENERIC_LIBRARY_VERSION)
 #symlibfile=lib$(GENERIC_LIBRARY_NAME)$(LIBEXT)
 install-data-hook:
-	( cd $(includedir) && { $(LN_S) -f exodus-$(GENERIC_RELEASE)/exodus exodus || { rm -f exodus && $(LN_S) exodus-$(GENERIC_RELEASE)/exodus exodus; }; })
-	( { echo $(libdir) > /etc/ld.so.conf.d/exodus-$(GENERIC_RELEASE).conf 2>/dev/null ; } || echo "skipping /etc/ld.so.conf.d")
-	( { ldconfig 2> /dev/null ; } || { /sbin/ldconfig 2> /dev/null ; } || echo "skipping ldconfig")
+	( cd $(includedir) \
+		&& { $(LN_S) -f exodus-$(GENERIC_RELEASE)/exodus exodus \
+		|| { rm -f exodus \
+			&& $(LN_S) exodus-$(GENERIC_RELEASE)/exodus exodus; }; \
+		}\
+	)
+	( { echo $(libdir) > /etc/ld.so.conf.d/exodus-$(GENERIC_RELEASE).conf 2>/dev/null ; } \
+		|| echo "skipping /etc/ld.so.conf.d")
+	( { ldconfig 2> /dev/null ; } || { /sbin/ldconfig 2> /dev/null ; } \
+		|| echo "skipping ldconfig")
 uninstall-hook:
-	( cd $(includedir) && { rm -f exodus ; } )
-	( cd $(includedir) && { rm -rf exodus-$(GENERIC_RELEASE) ; } )
-	( rm -f /etc/ld.so.conf.d/exodus-$(GENERIC_RELEASE).conf || echo "/etc/ld.so.conf.d/exodus-$(GENERIC_RELEASE).conf doesnt exist or is already removed" )
-	( { ldconfig 2> /dev/null ; } || { /sbin/ldconfig 2> /dev/null ; } || echo "skipping ldconfig" )
+	( cd $(includedir) \
+		&& { rm -f exodus ; } )
+	( cd $(includedir) \
+		&& { rm -rf exodus-$(GENERIC_RELEASE) ; } \
+	)
+	( rm -f /etc/ld.so.conf.d/exodus-$(GENERIC_RELEASE).conf \
+		|| echo "/etc/ld.so.conf.d/exodus-$(GENERIC_RELEASE).conf doesnt exist or is already removed" \
+	)
+	( { ldconfig 2> /dev/null ; } \
+		|| { /sbin/ldconfig 2> /dev/null ; } \
+		|| echo "skipping ldconfig" \
+	)

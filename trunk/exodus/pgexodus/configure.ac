@@ -92,10 +92,10 @@ dnl ---------------------------------------
 
 #NB patch for postgres SERVER in m4/ax_lib_postgresql.m4
 #            POSTGRESQL_CFLAGS="-I`$PG_CONFIG --includedir` -I`$PG_CONFIG --includedir-server`"
-echo checking for PostgreSQL libraries 8.1+
+dnl checking for PostgreSQL libraries 8.1+
 AX_LIB_POSTGRESQL([8.1.0])
 
-libdir=`pg_config --pkglibdir`
+#libdir=`pg_config --pkglibdir`
 
 #only needed if no windows pipes and no unix sockets
 
@@ -128,7 +128,8 @@ AC_CONFIG_FILES([Makefile \
 ])
 AC_OUTPUT
 
-echo
-echo Congrats. You have configured pgexodus.
-echo
-echo Type 'make && sudo make install'
+# use echo instead of dnl to show even with quiet option (-q)
+dnl
+dnl Congrats. You have configured pgexodus.
+dnl
+dnl Type 'make && sudo make install'

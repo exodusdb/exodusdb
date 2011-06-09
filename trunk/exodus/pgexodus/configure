@@ -16044,7 +16044,6 @@ fi
 
 #NB patch for postgres SERVER in m4/ax_lib_postgresql.m4
 #            POSTGRESQL_CFLAGS="-I`$PG_CONFIG --includedir` -I`$PG_CONFIG --includedir-server`"
-echo checking for PostgreSQL libraries 8.1+
 
 
 # Check whether --with-postgresql was given.
@@ -16191,7 +16190,7 @@ $as_echo "no" >&6; }
 
 
 
-libdir=`pg_config --pkglibdir`
+#libdir=`pg_config --pkglibdir`
 
 #only needed if no windows pipes and no unix sockets
 
@@ -19037,7 +19036,4 @@ $as_echo "$as_me: WARNING: unrecognized options: $ac_unrecognized_opts" >&2;}
 fi
 
 
-echo
-echo Congrats. You have configured pgexodus.
-echo
-echo Type 'make && sudo make install'
+# use echo instead of dnl to show even with quiet option (-q)

@@ -521,7 +521,8 @@ info: info-am
 info-am:
 
 install-data-am:
-
+	@$(NORMAL_INSTALL)
+	$(MAKE) $(AM_MAKEFLAGS) install-data-hook
 install-dvi: install-dvi-am
 
 install-dvi-am:
@@ -567,23 +568,41 @@ ps: ps-am
 ps-am:
 
 uninstall-am: uninstall-libLTLIBRARIES
-
-.MAKE: install-am install-strip
+	@$(NORMAL_INSTALL)
+	$(MAKE) $(AM_MAKEFLAGS) uninstall-hook
+.MAKE: install-am install-data-am install-strip uninstall-am
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
 	clean-libLTLIBRARIES clean-libtool ctags distclean \
 	distclean-compile distclean-generic distclean-libtool \
 	distclean-tags distdir dvi dvi-am html html-am info info-am \
-	install install-am install-data install-data-am install-dvi \
-	install-dvi-am install-exec install-exec-am install-html \
-	install-html-am install-info install-info-am \
-	install-libLTLIBRARIES install-man install-pdf install-pdf-am \
-	install-ps install-ps-am install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
+	install install-am install-data install-data-am \
+	install-data-hook install-dvi install-dvi-am install-exec \
+	install-exec-am install-html install-html-am install-info \
+	install-info-am install-libLTLIBRARIES install-man install-pdf \
+	install-pdf-am install-ps install-ps-am install-strip \
+	installcheck installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags uninstall uninstall-am uninstall-libLTLIBRARIES
+	tags uninstall uninstall-am uninstall-hook \
+	uninstall-libLTLIBRARIES
 
+
+install-data-hook:
+	(	(rm -f `pg_config --pkglibdir`/pgexodus.so \
+			&& echo "removed all pgexodus.so link" \
+		) \
+		|| echo "cannot remove pgexodus.so link" \
+	)
+	( $(LN_S) $(libdir)/pgexodus-$(GENERIC_RELEASE).so.0 `pg_config --pkglibdir`/pgexodus.so \
+		|| echo "CANT INSTALL pgexodus.so. Are you not root/sudo?" \
+	)
+uninstall-hook:
+	(	(rm -f `pg_config --pkglibdir`/pgexodus.so \
+			&& echo "removed all pgexodus.so link" \
+		) \
+		|| echo "cannot remove pgexodus.so link" \
+	)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
