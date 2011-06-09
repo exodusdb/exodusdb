@@ -17639,7 +17639,6 @@ fi
 
 #AX_BOOST_SERIALIZATION
 
-echo checking for PostgreSQL libraries 8.1+
 
 
 # Check whether --with-postgresql was given.
@@ -20905,7 +20904,3 @@ $as_echo "$as_me: WARNING: unrecognized options: $ac_unrecognized_opts" >&2;}
 fi
 
 
-echo
-echo Congrats. You have configured the Exodus library
-echo
-echo Type 'make && sudo make install'
