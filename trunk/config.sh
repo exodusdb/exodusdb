@@ -236,7 +236,7 @@ export EXO_DOTTED_MICRO_VER=$EXO_MAJOR_VER.$EXO_MINOR_VER.$EXO_MICRO_VER
   export EXO_CONFIGURE_OPT=
   export EXO_MAKE_CMD=make
 if [ $EXO_OSBASE == "DEBIAN" ]; then
-	export EXO_CONFIGURE_OPT=--prefix=`pwd`/debian/$EXO_DEBIAN_PKGCODE
+	export EXO_CONFIGURE_OPT="--prefix=`pwd`/debian/$EXO_DEBIAN_PKGCODE/usr/local"
 fi
 
 # -----------------------

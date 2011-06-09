@@ -3,7 +3,7 @@ Version: 11.5
 Section: Database
 Priority: optional
 Architecture: all
-Depends: libc6 (>= 2.5-0ubuntu1), libboost, postgresql-server
+Depends: libc6 (>= 2.5-0ubuntu1), postgresql (>=8.1)
 Installed-Size: 16032
 Maintainer: Steve Bush <steve.bush@neosys.com>
 Description: Exodus Multivalue Database
