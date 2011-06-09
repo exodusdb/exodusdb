@@ -46,7 +46,11 @@ cd ${EXO_BOOST_DIR}
 #-----------------
 test -f bjam || ./bootstrap.sh
 
-export EXO_BOOST_JAMFILE=exodus-darwin-$EXO_BOOST_JAM_ARCHITECTURE-$EXO_BOOST_JAM_ADDRESS_MODEL-$EXO_MINVER.jam
+# eg   using gcc : 3.4 : : <compileflags>-m64 <linkflags>-m64 ;
+
+export EXO_BOOST_JAMFILE=exodus-${EXO_UNAME}-${EXO_BOOST_JAM_ARCHITECTURE}-${EXO_BOOST_JAM_ADDRESS_MODEL}-${EXO_MINVER}.jam
+
+if [ "$EXO_UNAME" == "Darwin" ]; then
 cat > $EXO_BOOST_JAMFILE << EOF
 # Compiler configuration
 using $EXO_BOOST_JAM_USING
@@ -58,6 +62,18 @@ using $EXO_BOOST_JAM_USING
        <compileflags>"$EXO_FLAGS"
           <linkflags>"$EXO_LDFLAGS $EXO_LIBS_ICU" ;
 EOF
+
+else
+
+cat > $EXO_BOOST_JAMFILE << EOF
+# Compiler configuration
+using $EXO_BOOST_JAM_USING
+       <compileflags>"$EXO_FLAGS"
+          <linkflags>"$EXO_LDFLAGS $EXO_LIBS_ICU" 
+          <linkflags>"$EXO_LDFLAGS $EXO_LIBS_ICU $EXO_FLAGS" ;
+EOF
+fi
+
 echo -----------------------------------------------------------------
 cat $EXO_BOOST_JAMFILE
 
@@ -83,7 +99,7 @@ echo  and  nano ~/boost_1_46_1/bin.v2/config.log for the compile options on test
 echo #######################################################################################
 ./bjam \
  --stagedir=$EXO_EPREFIX \
- --user-config=exodus-darwin-$EXO_BOOST_JAM_ARCHITECTURE-$EXO_BOOST_JAM_ADDRESS_MODEL-$EXO_MINVER.jam \
+ --user-config=$EXO_BOOST_JAMFILE\
  define=U_STATIC_IMPLEMENTATION=1 \
  --with-date_time --with-filesystem --with-regex --with-system --with-thread \
  link=static \

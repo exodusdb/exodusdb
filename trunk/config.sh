@@ -66,13 +66,13 @@ export EXO_BOOST_URL=http://sourceforge.net/projects/boost/files/boost/${EXO_BOO
 export EXO_UNAME=`uname`
 export EXO_OSNAME=`lsb_release -is`
 test "$EXO_OSNAME" == "" && export EXO_OSNAME=`head -n 1 /etc/issue|cut -d' ' -f 1`
-test "`which dpkg 2>/dev/null`" != "" &&export EXO_OSBASE="DEBIAN"
-test "`which yum 2>/dev/null`" != "" &&export EXO_OSBASE="REDHAT"
+test "`which dpkg 2>/dev/null`" != "" &&export EXO_OSBASE="Debian"
+test "`which yum 2>/dev/null`" != "" &&export EXO_OSBASE="Redhat"
 
 #--- default build target or fail ---
 if [ "$EXO_BUILD_TARGET" = "" ]; then
-	test "$EXO_OSBASE" == "REDHAT" && export EXO_BUILD_TARGET=REDHAT
-	test "$EXO_OSBASE" == "DEBIAN" && export EXO_BUILD_TARGET=DEBIAN
+	test "$EXO_OSBASE" == "Redhat" && export EXO_BUILD_TARGET=Redhat
+	test "$EXO_OSBASE" == "Debian" && export EXO_BUILD_TARGET=Debian
 	#10.4/10.5/10.6
 	test "$EXO_UNAME"  == "Darwin" && export EXO_BUILD_TARGET=10.6
 fi
@@ -100,6 +100,12 @@ fi
 #  CXX         C++ compiler command
 #  CXXFLAGS    C++ compiler flags
 #  CXXCPP      C++ preprocessor
+
+if [ "$EXO_UNAME" == "Linux" ]; then
+	export EXO_BOOST_JAM_ARCHITECTURE=""
+	export EXO_BOOST_JAM_ADDRESS_MODEL="`uname -m`"
+	export EXO_BOOST_JAM_USING="gcc : : :"
+fi
 
 if [ "$EXO_UNAME" = "Darwin" ]; then
 
@@ -171,6 +177,10 @@ fi
 
 # --- common to all tools ---
 
+test "$EXO_MINVER" = "" && export EXO_MINVER=$EXO_OSBASE
+test "$EXO_ARCH" = ""   && export EXO_ARCH=`uname -m`
+
+#-s for static files for now
 export EXO_EPREFIX=$EXO_PREFIX/$EXO_MINVER-$EXO_ARCH-s
 
 #note: any minor failure to compile can cause boost not to detect ICU see boosts bin.v2/config.log for errors
@@ -235,7 +245,7 @@ export EXO_DOTTED_MICRO_VER=$EXO_MAJOR_VER.$EXO_MINOR_VER.$EXO_MICRO_VER
   export EXO_CONFIGURE_CMD=./configure
   export EXO_CONFIGURE_OPT=
   export EXO_MAKE_CMD=make
-if [ $EXO_OSBASE == "DEBIAN" ]; then
+if [ $EXO_OSBASE == "Debian" ]; then
 	export EXO_CONFIGURE_OPT="--prefix=`pwd`/debian/$EXO_DEBIAN_PKGCODE/usr/local"
 fi
 
@@ -256,7 +266,7 @@ if [ "$EXO_UNAME" = "Darwin" ]; then
 	export EXO_GOOGLECODE_SUMMARY=Mac_OSX_${EXO_OSCODENAME}_Installer
 	export EXO_GOOGLECODE_LABELS=Type-Installer,OpSys-OSX,Featured
 fi
-if [ $EXO_OSBASE == "DEBIAN" ]; then
+if [ $EXO_OSBASE == "Debian" ]; then
 	export EXO_ARCH=`uname -m`
 	export EXO_INSTALLFILENAME=${EXO_DEBIAN_PKGCODE}-${EXO_DOTTED_MICRO_VER}-${EXO_ARCH}.deb
 	export EXO_GOOGLECODE_SUMMARY=Debian_Package
@@ -287,7 +297,7 @@ if [ "$EXO_UNAME" = "Darwin" ]; then
 fi
 #  export EXO_PACK_CMD=make dist
 #  export EXO_PACK_OPT=
-if [ $EXO_OSBASE == "DEBIAN" ]; then
+if [ $EXO_OSBASE == "Debian" ]; then
 	export EXO_PACK_CMD=dpkg
 	export EXO_PACK_OPT="-b debian/exodusmvdb $EXO_INSTALLFILENAME"
 fi
