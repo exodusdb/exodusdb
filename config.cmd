@@ -9,6 +9,7 @@ rem --------------------------------------------------------------
 rem --- your local configuration is in configlocal.cmd         ---
 rem --- (copy configlocalEXAMPLE.cmd TO configlocal.cmd)       ---
 rem --------------------------------------------------------------
+    if exist version.cmd call version.cmd %*
     if exist configlocal.cmd call configlocal.cmd %*
 
 rem you should not have to edit this config.cmd but, if you do
