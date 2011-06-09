@@ -236,7 +236,7 @@ export EXO_DOTTED_MICRO_VER=$EXO_MAJOR_VER.$EXO_MINOR_VER.$EXO_MICRO_VER
   export EXO_CONFIGURE_OPT=
   export EXO_MAKE_CMD=make
 if [ $EXO_OSBASE == "DEBIAN" ]; then
-	export EXO_CONFIGURE_CMD=--prefix=`pwd`/debian/$EXO_DEBIAN_PKGCODE
+	export EXO_CONFIGURE_OPT=--prefix=`pwd`/debian/$EXO_DEBIAN_PKGCODE
 fi
 
 # -----------------------
@@ -260,7 +260,7 @@ if [ $EXO_OSBASE == "DEBIAN" ]; then
 	export EXO_ARCH=`uname -m`
 	export EXO_INSTALLFILENAME=$EXO_DEBIAN_PKGCODE-$EXO_DOTTED_MINOR_VER-$EXO_ARCH.deb
 	export EXO_GOOGLECODE_SUMMARY=Debian_Package
-	export EXO_GOOGLECODE_LABELS=Type-Installer,OpSys-Linux,Featured
+	export EXO_GOOGLECODE_LABELS=Type-Installer,OpSys-Linux
 fi
 
 #if [ "$EXO_CONFIGMODE" == "CLEAN" ] goto afteruploader
