@@ -10,4 +10,3 @@ echo "$EXO_MAKE_CMD $EXO_MAKE_OPT"
 
 $EXO_MAKE_CMD $EXO_MAKE_OPT
 
-test "$EXO_BATCHMODE" = "" && read -p "Press Enter:"
