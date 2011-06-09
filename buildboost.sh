@@ -69,8 +69,7 @@ cat > $EXO_BOOST_JAMFILE << EOF
 # Compiler configuration
 using $EXO_BOOST_JAM_USING
        <compileflags>"$EXO_FLAGS"
-          <linkflags>"$EXO_LDFLAGS $EXO_LIBS_ICU" 
-          <linkflags>"$EXO_LDFLAGS $EXO_LIBS_ICU $EXO_FLAGS" ;
+          <linkflags>"$EXO_LDFLAGS $EXO_LIBS_ICU" ;
 EOF
 fi
 
