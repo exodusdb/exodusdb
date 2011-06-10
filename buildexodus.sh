@@ -22,7 +22,7 @@ export PATH=EXO_POSTGRES_BIN:$PATH
 #--------------
 #optionally delete the EXODUS download file to force redownloading
 if [ "$EXO_EXODUS_REUSE_DOWNLOAD" != "YES" ]; then
-	test -f $EXO_EXODUS_FILE && sudo rm -f $EXO_EXODUS_FILE
+	test -f $EXO_EXODUS_FILENAME && sudo rm -f $EXO_EXODUS_FILENAME
 #dont delete exodus folder MIGHT LOSE SOME DEVELOPMENT WORK!!!
 #	test -d $EXO_EXODUS_DIR  && sudo rm -rf $EXO_EXODUS_DIR
 fi
@@ -37,9 +37,9 @@ if [ "$EXO_EXODUS_DOWNLOADER" = "SUBVERSION" ]; then
 else
 
 #untar any existing download already if the directory doesnt exist
-if [ -f $EXO_EXODUS_FILE ]; then
-	test -d $EXO_EXODUS_DIR || echo untarring $EXO_EXODUS_FILE -> $EXO_EXODUS_DIR
-	test -d $EXO_EXODUS_DIR || tar xfz $EXO_EXODUS_FILE
+if [ -f $EXO_EXODUS_FILENAME ]; then
+	test -d $EXO_EXODUS_DIR || echo untarring $EXO_EXODUS_FILENAME -> $EXO_EXODUS_DIR
+	test -d $EXO_EXODUS_DIR || tar xfz $EXO_EXODUS_FILENAME
 else
 	#copied from icu install but not tested
 
@@ -49,11 +49,11 @@ else
 
 	#download, save and untar (if not already present)
 	echo Downloading and untarring EXODUS
-	$EXO_CURL_WGET $EXO_EXODUS_URL | tee $EXO_EXODUS_FILE.part|tar xz
+	$EXO_CURL_WGET $EXO_EXODUS_URL_FILE | tee $EXO_EXODUS_FILENAME.part|tar xz
 
 	#save download if downloaded completed
 	# set -e in heading should prevent arrival here if download not complete
-	cp -f $EXO_EXODUS_FILE.part $EXO_EXODUS_FILE
+	cp -f $EXO_EXODUS_FILENAME.part $EXO_EXODUS_FILENAME
 fi
 fi
 

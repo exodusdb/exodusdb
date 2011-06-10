@@ -2,7 +2,7 @@
     <shortName>exodus</shortName>
     <fullName>Exodus Multivalue Database</fullName>
     <version>${env(EXO_DOTTED_MICRO_VER)}</version>
-    <installerFilename>${env(EXO_INSTALLAPPDIR)}</installerFilename>
+    <installerFilename>${env(EXO_INSTALL_APPDIR)}</installerFilename>
     <readmeFile>README</readmeFile>
     <licenseFile>COPYING</licenseFile>
     <leftImage>exodus.png</leftImage>

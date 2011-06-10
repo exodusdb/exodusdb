@@ -12,7 +12,7 @@ cd ~
 #--------------
 #optionally delete the boost download file to force redownloading
 if [ "$EXO_BOOST_REUSE_DOWNLOAD" != "YES" ]; then
-	test -f ${EXO_BOOST_FILE} && rm -f ${EXO_BOOST_FILE}
+	test -f ${EXO_BOOST_FILENAME} && rm -f ${EXO_BOOST_FILENAME}
 	test -d ${EXO_BOOST_DIR}  && rm -rf ${EXO_BOOST_DIR}
 fi
 
@@ -20,21 +20,22 @@ fi
 #--- Download/Extract ---
 #------------------------
 #untar any existing download already if the directory doesnt exist
-if [ -f ${EXO_BOOST_FILE} ]; then
-	test -d ${EXO_BOOST_DIR} || echo untarring boost ${EXO_BOOST_FILE} to ${EXO_BOOST_DIR}
-	test -d ${EXO_BOOST_DIR} || tar xfz ${EXO_BOOST_FILE}
-else
+if [ -f $EXO_BOOST_FILENAME ]; then
+	test -d ${EXO_BOOST_DIR} || echo untarring boost ${EXO_BOOST_FILENAME} to ${EXO_BOOST_DIR}
+	test -d ${EXO_BOOST_DIR} || tar xfz ${EXO_BOOST_FILENAME} || rm $EXO_BOOST_FILENAME
 
+#otherwise download and untar
+else
 	#detect curl or wget
 	export EXO_CURL_WGET="curl -L"
 	which curl 2>&1 > /dev/null || export EXO_CURL_WGET="wget -O-"
 
 	#download, save and untar (if not already present)
 	echo Downloading and untarring boost
-	$EXO_CURL_WGET ${EXO_BOOST_URL}|tee ${EXO_BOOST_FILE}.part|tar xz
+	$EXO_CURL_WGET ${EXO_BOOST_URL}|tee ${EXO_BOOST_FILENAME}.part|tar xz
 	#save download if downloaded completed
 	# set -e in heading should prevent arrival here if download not complete
-	cp -f ${EXO_BOOST_FILE}.part ${EXO_BOOST_FILE}
+	cp -f ${EXO_BOOST_FILENAME}.part ${EXO_BOOST_FILENAME}
 
 fi
 
@@ -73,9 +74,11 @@ using $EXO_BOOST_JAM_USING
        <compileflags>"$EXO_FLAGS"
           <linkflags>"$EXO_LDFLAGS $EXO_LIBS_ICU" ;
 EOF
+
 fi
 
 echo -----------------------------------------------------------------
+echo cat $EXO_BOOST_JAMFILE
 cat $EXO_BOOST_JAMFILE
 
 #--------------------
