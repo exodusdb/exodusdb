@@ -1,6 +1,6 @@
 # Process this file with autoreconf or autoconf to produce a configure script.
 
-AC_PREREQ(2.67)
+AC_PREREQ([2.67])
 
 dnl --------------------------------
 dnl Initialization macros.
@@ -61,11 +61,9 @@ VERSION=$GENERIC_VERSION
 
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
-AC_DISABLE_STATIC
-AC_ENABLE_SHARED
-AM_DISABLE_STATIC
-AM_ENABLE_SHARED
-AC_PROG_LIBTOOL
+AC_DISABLE_STATIC([])
+AC_ENABLE_SHARED([])
+LT_INIT
 
 dnl -----------------------------------------------
 dnl Checks for programs.
@@ -74,7 +72,7 @@ dnl -----------------------------------------------
 AC_PROG_CC
 AC_PROG_CXX
 
-AM_PROG_LIBTOOL
+LT_INIT
 AM_SANITY_CHECK
 
 AC_LANG([C++])

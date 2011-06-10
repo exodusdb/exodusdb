@@ -11618,8 +11618,8 @@ CC="$lt_save_CC"
 
 
 
-#AM_ENABLE_STATIC
-#AM_ENABLE_SHARED
+#AC_ENABLE_STATIC([])
+#AC_ENABLE_SHARED([])
 
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -15873,7 +15873,7 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
-#AM_PROG_LIBTOOL
+#LT_INIT
 #LT_INIT([disable-shared])
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether build environment is sane" >&5
 $as_echo_n "checking whether build environment is sane... " >&6; }

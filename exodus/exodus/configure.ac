@@ -6,7 +6,7 @@ dnl Initialization macros.
 dnl --------------------------------
 
 AC_INIT
-AC_PREREQ(2.67)
+AC_PREREQ([2.67])
 AC_CONFIG_SRCDIR([exodus/mv.cpp])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR(m4)
@@ -68,14 +68,14 @@ dnl -----------------------------------------------
 #AC_DISABLE_STATIC
 #AC_DISABLE_SHARED
 #AC_ENABLE_SHARED
-AC_PROG_LIBTOOL
+LT_INIT
 
-#AM_ENABLE_STATIC
-#AM_ENABLE_SHARED
+#AC_ENABLE_STATIC([])
+#AC_ENABLE_SHARED([])
 
 AC_PROG_CC
 AC_PROG_CXX
-#AM_PROG_LIBTOOL
+#LT_INIT
 #LT_INIT([disable-shared])
 AM_SANITY_CHECK
 
@@ -128,11 +128,33 @@ AC_C_RESTRICT
 AC_TYPE_SIZE_T
 AC_TYPE_UINT32_T
 AC_FUNC_STRCOLL
-AC_TYPE_SIGNAL
+AC_DIAGNOSE([obsolete],[your code may safely assume C89 semantics that RETSIGTYPE is void.
+Remove this warning and the `AC_CACHE_CHECK' when you adjust the code.])dnl
+AC_CACHE_CHECK([return type of signal handlers],[ac_cv_type_signal],[AC_COMPILE_IFELSE(
+[AC_LANG_PROGRAM([#include <sys/types.h>
+#include <signal.h>
+],
+		 [return *(signal (0, 0)) (0) == 1;])],
+		   [ac_cv_type_signal=int],
+		   [ac_cv_type_signal=void])])
+AC_DEFINE_UNQUOTED([RETSIGTYPE],[$ac_cv_type_signal],[Define as the return type of signal handlers
+		    (`int' or `void').])
+
 
 # Checks for library functions.
 AC_FUNC_MALLOC
-AC_TYPE_SIGNAL
+AC_DIAGNOSE([obsolete],[your code may safely assume C89 semantics that RETSIGTYPE is void.
+Remove this warning and the `AC_CACHE_CHECK' when you adjust the code.])dnl
+AC_CACHE_CHECK([return type of signal handlers],[ac_cv_type_signal],[AC_COMPILE_IFELSE(
+[AC_LANG_PROGRAM([#include <sys/types.h>
+#include <signal.h>
+],
+		 [return *(signal (0, 0)) (0) == 1;])],
+		   [ac_cv_type_signal=int],
+		   [ac_cv_type_signal=void])])
+AC_DEFINE_UNQUOTED([RETSIGTYPE],[$ac_cv_type_signal],[Define as the return type of signal handlers
+		    (`int' or `void').])
+
 AC_FUNC_STRCOLL
 AC_CHECK_FUNCS([atexit floor getcwd gettimeofday memset pow putenv select setenv socket sqrt strchr strerror strstr backtrace])
 
