@@ -107,6 +107,7 @@ if [ "$EXO_UNAME" == "Linux" ]; then
 	export EXO_BOOST_JAM_USING="gcc : : :"
 
 	#if static linking then libicu needs to link against libdl to avoid "undefined reference to `dlopen'" when building boost
+	export EXO_LIBS_BOOST="-Wl,-Bstatic $EXO_LIBS_BOOST -Wl,-Bdynamic"
 	export EXO_LIBS_ICU="$EXO_LIBS_ICU -ldl"
 fi
 
@@ -192,6 +193,7 @@ if [ "$EXO_UNAME" == "Darwin" ]; then
 	export EXO_LDFLAGS="-Bstatic -L$EXO_EPREFIX/lib"
 else
 	export EXO_LDFLAGS="-L$EXO_EPREFIX/lib"
+	#export "-Wl,-Bstatic -lsomestaticlib -Wl,-Bdynamic"
 fi
 
 #-----------
