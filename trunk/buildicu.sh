@@ -50,8 +50,8 @@ test -f Makefile && make clean && make distclean
 #-----------------
 echo ---------------------------------------------
 echo ./configure \
- --prefix=$EXO_PREFIX \
- --exec-prefix=$EXO_EPREFIX \
+ --prefix=$EXO_ICU_PREFIX \
+ --exec-prefix=$EXO_ICU_EPREFIX \
  --enable-extras=no \
  --enable-extras=no \
  --enable-icuio=no \
@@ -60,18 +60,18 @@ echo ./configure \
  --enable-samples=no \
   --build="$EXO_BUILD" \
        CC="$EXO_CC" \
-   CFLAGS="$EXO_FLAGS" \
       CXX="$EXO_CXX" \
- CXXFLAGS="$EXO_FLAGS" \
-  LDFLAGS="$EXO_LDFLAGS" \
-     LIBS="$EXO_LIBS" \
+   CFLAGS="$EXO_ICU_FLAGS" \
+ CXXFLAGS="$EXO_ICU_FLAGS" \
+  LDFLAGS="$EXO_ICU_LDFLAGS" \
+     LIBS="$EXO_ICU_LIBS" \
  --enable-shared=no \
  --enable-static=yes
 echo ---------------------------------------------
 sleep 1
 ./configure \
- --prefix=$EXO_PREFIX \
- --exec-prefix=$EXO_EPREFIX \
+ --prefix=$EXO_ICU_PREFIX \
+ --exec-prefix=$EXO_ICU_EPREFIX \
  --enable-extras=no \
  --enable-extras=no \
  --enable-icuio=no \
@@ -80,11 +80,11 @@ sleep 1
  --enable-samples=no \
   --build="$EXO_BUILD" \
        CC="$EXO_CC" \
-   CFLAGS="$EXO_FLAGS" \
       CXX="$EXO_CXX" \
- CXXFLAGS="$EXO_FLAGS" \
-  LDFLAGS="$EXO_LDFLAGS" \
-     LIBS="$EXO_LIBS" \
+   CFLAGS="$EXO_ICU_FLAGS" \
+ CXXFLAGS="$EXO_ICU_FLAGS" \
+  LDFLAGS="$EXO_ICU_LDFLAGS" \
+     LIBS="$EXO_ICU_LIBS" \
  --enable-shared=no \
  --enable-static=yes
 

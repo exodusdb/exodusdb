@@ -50,17 +50,14 @@ test "$EXO_MINOR_VER" == "" && export EXO_MINOR_VER=0
 test "$EXO_MICRO_VER" == "" && export EXO_MICRO_VER=0
 test "$EXO_BUILD_VER" == "" && export EXO_BUILD_VER=0
 
-#mimic /usr/local
-export EXO_PREFIX=$HOME/local
-
 #-------------
 #--- Boost ---
 #-------------
 export EXO_BOOST_VER=1_46_1
 export EXO_BOOST_VERNO=1.46.1
-export EXO_BOOST_DIR=boost_${EXO_BOOST_VER}
 export EXO_BOOST_FILENAME=boost_${EXO_BOOST_VER}.tar.gz
 export EXO_BOOST_URL_FILE=http://sourceforge.net/projects/boost/files/boost/${EXO_BOOST_VERNO}/${EXO_BOOST_FILENAME}
+export EXO_BOOST_DIR=boost_${EXO_BOOST_VER}
 
 #--- osdetection ---
 export EXO_UNAME=`uname`
@@ -85,9 +82,6 @@ fi
 #---------------
 #--- Toolset ---
 #---------------
-	export EXO_LIBS_ICU="-licudata -licui18n -licutu -licuuc"
-	export EXO_LIBS_BOOST="-lboost_date_time -lboost_filesystem -lboost_regex -lboost_system -lboost_thread"
-
 #Some influential environment variables:
 #  CC          C compiler command
 #  CFLAGS      C compiler flags
@@ -105,10 +99,6 @@ if [ "$EXO_UNAME" == "Linux" ]; then
 	export EXO_BOOST_JAM_ARCHITECTURE=""
 	export EXO_BOOST_JAM_ADDRESS_MODEL="`uname -m`"
 	export EXO_BOOST_JAM_USING="gcc : : :"
-
-	#if static linking then libicu needs to link against libdl to avoid "undefined reference to `dlopen'" when building boost
-	export EXO_LIBS_BOOST="-Wl,-Bstatic $EXO_LIBS_BOOST -Wl,-Bdynamic"
-	export EXO_LIBS_ICU="$EXO_LIBS_ICU -ldl"
 fi
 
 if [ "$EXO_UNAME" = "Darwin" ]; then
@@ -184,17 +174,58 @@ fi
 test "$EXO_MINVER" = "" && export EXO_MINVER=$EXO_OSBASE
 test "$EXO_ARCH" = ""   && export EXO_ARCH=`uname -m`
 
-#-s for static files for now
-export EXO_EPREFIX=$EXO_PREFIX/$EXO_MINVER-$EXO_ARCH-s
+export EXO_ICU_PREFIX=HOME
+export EXO_BOOST_PREFIX=HOME
+export EXO_EXODUS_PREFIX=DEBIAN
 
-#note: any minor failure to compile can cause boost not to detect ICU see boosts bin.v2/config.log for errors
-export EXO_FLAGS="-fPIC -DPIC -I$EXO_PREFIX/include -I$HOME/$EXO_BOOST_DIR $EXO_OSX_FLAGS -DU_STATIC_IMPLEMENTATION=1"
+#static files for now
+export EXO_ARCH_DIR=$EXO_MINVER-$EXO_ARCH-s
+
+#-s for stat#mimic /usr/local
+test "$EXO_ICU_PREFIX"      == "HOME"   && export EXO_ICU_PREFIX=$HOME/local && export EXO_ICU_EPREFIX=$EXO_ICU_PREFIX/$EXO_ARCH_DIR
+test "$EXO_BOOST_PREFIX"    == "HOME"   && export EXO_BOOST_PREFIX=$HOME/local && export EXO_BOOST_EPREFIX=$EXO_BOOST_PREFIX/$EXO_ARCH_DIR
+test "$EXO_EXODUS_PREFIX"   == "HOME"   && export EXO_EXODUS_PREFIX=$HOME/local && export EXO_EXODUS_EPREFIX=$EXO_EXODUS_PREFIX/$EXO_ARCH_DIR
+test "$EXO_EXODUS_PREFIX"   == "DEBIAN" && export EXO_EXODUS_PREFIX=`pwd`/debian/exodusmvdb/usr/local  && export EXO_EXODUS_EPREFIX=$EXO_EXODUS_PREFIX
+
+export EXO_LIBS_ICU="-licudata -licui18n -licutu -licuuc"
+#if static linking then libicu needs to link against libdl to avoid "undefined reference to `dlopen'" when building boost
+export EXO_LIBS_ICU="$EXO_LIBS_ICU -ldl"
+
+export EXO_LIBS_BOOST="-lboost_date_time -lboost_filesystem -lboost_regex -lboost_system -lboost_thread"
+export EXO_LIBS_BOOST="-Wl,-Bstatic $EXO_LIBS_BOOST -Wl,-Bdynamic"
+
+#!!! -fPIC -DPIC is needed to compile static libraries in order to be linked into SHARED libraries (eg libexodus is SHARED)
+export EXO_FLAGS="-fPIC -DPIC -DU_STATIC_IMPLEMENTATION=1"
+export EXO_LDFLAGS="-L$EXO_ICU_EPREFIX/lib"
 if [ "$EXO_UNAME" == "Darwin" ]; then
-	export EXO_LDFLAGS="-Bstatic -L$EXO_EPREFIX/lib"
-else
-	export EXO_LDFLAGS="-L$EXO_EPREFIX/lib"
-	#export "-Wl,-Bstatic -lsomestaticlib -Wl,-Bdynamic"
+	export EXO_FLAGS="$EXO_FLAGS $EXO_OSX_FLAGS"
+	export EXO_LDFLAGS="-Bstatic -L$EXO_LDFLAGS"
 fi
+
+#--- ICU ---
+export EXO_ICU_FLAGS="$EXO_FLAGS"
+export EXO_ICU_LDFLAGS="$EXO_LDFLAGS"
+export EXO_ICU_LIBS=""
+
+#--- BOOST ---
+#note: any minor failure to compile can cause boost not to detect ICU see boosts bin.v2/config.log for errors
+export EXO_BOOST_FLAGS="$EXO_FLAGS -I$EXO_ICU_PREFIX/include"
+export EXO_BOOST_LDFLAGS="$EXO_LDFLAGS -I$EXO_ICU_EPREFIX/lib"
+export EXO_BOOST_LIBS="$EXO_ICU_LIBS $EXO_LIBS_ICU"
+
+export EXO_EXODUS_FLAGS="$EXO_BOOST_FLAGS -I$EXO_BOOST_PREFIX/include -I$HOME/${EXO_BOOST_DIR}"
+export EXO_EXODUS_LDFLAGS="$EXO_BOOST_LDFLAGS -I$EXO_BOOST_EPREFIX/lib"
+export EXO_EXODUS_LIBS="$EXO_BOOST_LIBS $EXO_LIBS_BOOST"
+
+##note: any minor failure to compile can cause boost not to detect ICU see boosts bin.v2/config.log for errors
+##!!! need to compile static libraries with -fPIC -DPIC in order to be linked into SHARED libraries (eg libexodus is SHARED)
+#export EXO_FLAGS="-fPIC -DPIC -I$EXO_ICU_PREFIX/include -I$HOME/$EXO_BOOST_DIR $EXO_OSX_FLAGS -DU_STATIC_IMPLEMENTATION=1"
+#if [ "$EXO_UNAME" == "Darwin" ]; then
+#	export EXO_LDFLAGS="-Bstatic -L$EXO_EPREFIX/lib"
+#else
+#	export EXO_LDFLAGS="-L$EXO_EPREFIX/lib"
+#	#export "-Wl,-Bstatic -lsomestaticlib -Wl,-Bdynamic"
+#fi
 
 #-----------
 #--- Icu ---

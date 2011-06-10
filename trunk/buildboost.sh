@@ -59,8 +59,8 @@ using $EXO_BOOST_JAM_USING
      <macosx-version>"$EXO_MINVER"
  <macosx-version-min>"$EXO_MINVER"
               #<root>"/Developer"
-       <compileflags>"$EXO_FLAGS"
-          <linkflags>"$EXO_LDFLAGS $EXO_LIBS_ICU" ;
+       <compileflags>"$EXO_BOOST_FLAGS"
+          <linkflags>"$EXO_BOOST_LDFLAGS $EXO_BOOST_LIBS" ;
 EOF
 
 else
@@ -68,8 +68,8 @@ else
 cat > $EXO_BOOST_JAMFILE << EOF
 # Compiler configuration
 using $EXO_BOOST_JAM_USING
-       <compileflags>"$EXO_FLAGS"
-          <linkflags>"$EXO_LDFLAGS $EXO_LIBS_ICU" ;
+       <compileflags>"$EXO_BOOST_FLAGS"
+          <linkflags>"$EXO_BOOST_LDFLAGS" ;
 EOF
 
 fi
@@ -87,7 +87,7 @@ cat $EXO_BOOST_JAMFILE
 #staging so only copied libs and no copying of zillons include files
 echo -----------------------------------------------------------------
 echo ./bjam \
- --stagedir=$EXO_EPREFIX \
+ --stagedir=$EXO_BOOST_EPREFIX \
  --user-config=$EXO_BOOST_JAMFILE \
  --with-date_time --with-filesystem --with-regex --with-system --with-thread \
  $EXO_BOOST_LINKAGE \
@@ -98,10 +98,10 @@ echo -----------------------------------------------------------------
 sleep 1
 
 echo BJAM SHOULD SAY "HAS_ICU BUILDS: YES" OTHERWISE CHECK YOUR ICU INSTALLATION ABOVE
-echo  and  nano ~/boost_1_46_1/bin.v2/config.log for the compile options on test has_icu.cpp
-echo #######################################################################################
+echo !!! CHECK nano ~/boost_1_46_1/bin.v2/config.log for why has_icu.cpp wont compile!!!
+echo ###################################################################################
 ./bjam \
- --stagedir=$EXO_EPREFIX \
+ --stagedir=$EXO_BOOST_EPREFIX \
  --user-config=$EXO_BOOST_JAMFILE\
  --with-date_time --with-filesystem --with-regex --with-system --with-thread \
  $EXO_BOOST_LINKAGE \
@@ -110,4 +110,4 @@ echo ###########################################################################
  stage
 
 # --prefix=$EXO_PREFIX \
-# --exec-prefix=$EXO_EPREFIX \
+# --exec-prefix=$EXO_BOOST_EPREFIX \
