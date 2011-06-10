@@ -59,8 +59,8 @@ export EXO_PREFIX=$HOME/local
 export EXO_BOOST_VER=1_46_1
 export EXO_BOOST_VERNO=1.46.1
 export EXO_BOOST_DIR=boost_${EXO_BOOST_VER}
-export EXO_BOOST_FILE=boost_${EXO_BOOST_VER}.tar.gz
-export EXO_BOOST_URL=http://sourceforge.net/projects/boost/files/boost/${EXO_BOOST_VERNO}/${EXO_BOOST_FILE}
+export EXO_BOOST_FILENAME=boost_${EXO_BOOST_VER}.tar.gz
+export EXO_BOOST_URL_FILE=http://sourceforge.net/projects/boost/files/boost/${EXO_BOOST_VERNO}/${EXO_BOOST_FILENAME}
 
 #--- osdetection ---
 export EXO_UNAME=`uname`
@@ -197,9 +197,9 @@ fi
 export EXO_ICU_DOWNLOADER=SUBVERSION
 export EXO_ICU_VER=4_8
 export EXO_ICU_URL_SUBVERSION=http://source.icu-project.org/repos/icu/icu/tags/release-4-8/
-export EXO_ICU_URL_CURL=http://download.icu-project.org/files/icu4c/4.8/icu4c-4_8-src.tgz
+export EXO_ICU_URL_FILE=http://download.icu-project.org/files/icu4c/4.8/icu4c-4_8-src.tgz
 
-export EXO_ICU_FILE=icu4c-4_8-src.tgz
+export EXO_ICU_FILENAME=icu4c-4_8-src.tgz
 export EXO_ICU_DIR=icu
 
 #----------------
@@ -215,8 +215,8 @@ export EXO_EXODUS_REUSE_DOWNLOAD=YES
 export EXO_EXODUS_DOWNLOADER=SUBVERSION
 export EXO_EXODUS_URL_SUBVERSION=HTTPS://exodusdb.googlecode.com/svn/trunk/
 export EXO_EXODUS_DIR=exodus
-export EXO_EXODUS_FILE=
-export EXO_EXODUS_URL=
+export EXO_EXODUS_FILENAME=
+export EXO_EXODUS_URL_FILE=
 
 export EXO_CODENAME=exodus
 export EXO_CODEWORD=Exodus
@@ -260,19 +260,19 @@ export EXO_INSTALL_CMD="make"
 export EXO_INSTALL_OPT="install"
 
 # ------------------------
-# --- INSTALLFILE NAME ---
+# --- INSTALL_FILE NAME ---
 # ------------------------
-export EXO_INSTALLFILENAME="$EXO_CODENAME-$EXO_DOTTED_MICRO_VER.tar.gz"
+export EXO_INSTALL_FILENAME="$EXO_CODENAME-$EXO_DOTTED_MICRO_VER.tar.gz"
 
 if [ "$EXO_UNAME" = "Darwin" ]; then
-	export EXO_INSTALLAPPDIR=${EXO_CODENAME}-{$EXO_DOTTED_MICRO_VER}-osx-${EXO_OSCODENAME}-installer.app
-	export EXO_INSTALLFILENAME=${EXO_INSTALLAPPDIR}.zip
+	export EXO_INSTALL_APPDIR=${EXO_CODENAME}-${EXO_DOTTED_MICRO_VER}-osx-${EXO_OSCODENAME}-installer.app
+	export EXO_INSTALL_FILENAME=${EXO_INSTALL_APPDIR}.zip
 	export EXO_GOOGLECODE_SUMMARY=Mac_OSX_${EXO_OSCODENAME}_Installer
 	export EXO_GOOGLECODE_LABELS=Type-Installer,OpSys-OSX,Featured
 fi
 if [ $EXO_OSBASE == "Debian" ]; then
 	export EXO_ARCH=`uname -m`
-	export EXO_INSTALLFILENAME=${EXO_DEBIAN_PKGCODE}-${EXO_DOTTED_MICRO_VER}-${EXO_ARCH}.deb
+	export EXO_INSTALL_FILENAME=${EXO_DEBIAN_PKGCODE}-${EXO_DOTTED_MICRO_VER}-${EXO_ARCH}.deb
 	export EXO_GOOGLECODE_SUMMARY=Debian_Package
 	export EXO_GOOGLECODE_LABELS=Type-Installer,OpSys-Linux
 fi
@@ -303,10 +303,10 @@ fi
 #  export EXO_PACK_OPT=
 if [ $EXO_OSBASE == "Debian" ]; then
 	export EXO_PACK_CMD=dpkg
-	export EXO_PACK_OPT="-b debian/exodusmvdb $EXO_INSTALLFILENAME"
+	export EXO_PACK_OPT="-b debian/exodusmvdb $EXO_INSTALL_FILENAME"
 fi
 
-# needs EXO_UPLOADUSER UPLOADPASS_EXO EXO_INSTALLFILENAME
+# needs EXO_UPLOADUSER UPLOADPASS_EXO EXO_INSTALL_FILENAME
 # -------------------------
 # --- COMMAND TO UPLOAD ---
 # -------------------------
@@ -320,7 +320,7 @@ echo export UPLOAD_OPT_EXO=" \
  --user=$EXO_UPLOADUSER \
  --password= \
  --labels=$EXO_GOOGLE_CODE_LABELS \
- $EXO_INSTALLFILENAME"
+ $EXO_INSTALL_FILENAME"
 
 #with pass
   export UPLOAD_OPT_EXO=" \
@@ -329,7 +329,7 @@ echo export UPLOAD_OPT_EXO=" \
  --user=$EXO_UPLOADUSER \
  --password=$UPLOADPASS_EXO \
  --labels=$EXO_GOOGLE_CODE_LABELS \
- $EXO_INSTALLFILENAME"
+ $EXO_INSTALL_FILENAME"
 
 
 #afteruploader:

@@ -12,7 +12,7 @@ cd ~
 #---------------
 if [ "$EXO_ICU_REUSE_DOWNLOAD" != "YES" ]; then
 	echo TODO uninstall all icu libs first
-	test -f $EXO_ICU_FILE && rm -f $EXO_ICU_FILE
+	test -f $EXO_ICU_FILENAME && rm -f $EXO_ICU_FILENAME
 	test -d $EXO_ICU_DIR && rm -rf $EXO_ICU_DIR
 fi
 
@@ -31,7 +31,7 @@ if [ "$EXO_ICU_DOWNLOADER" = "SUBVERSION" ]; then
 #        export EXO_CURL_WGET="curl -L"
 #        which curl 2>&1 > /dev/null || export EXO_CURL_WGET="wget -O-"
 #
-#	 $EXO_CURL_WGET $EXO_ICU_URL_CURL | tee $EXO_ICU_FILE | tar xz
+#	 $EXO_CURL_WGET $EXO_ICU_URL_CURL | tee $EXO_ICU_FILENAME | tar xz
 fi
 
 

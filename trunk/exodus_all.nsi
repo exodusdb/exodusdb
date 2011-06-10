@@ -17,7 +17,7 @@
 ;  EXO_PRODUCTNAME   eg Exodus
 ;  SOURCE_PATH          eg debug release x64\debug x64\release
 ;
-;  EXO_INSTALLFILENAME
+;  EXO_INSTALL_FILENAME
 ;
 ;  REDIST_DESC          eg "MSVC++ 2010"
 ;  REDIST_SOURCE1       eg "Microsoft.com"
@@ -88,7 +88,7 @@
  !define EXO_INSTDIR "C:\$%EXO_PRODUCTNAME%$%EXO_MAJOR_VER%$%EXO_MINOR_VER%"
 
  ;output file name
- !define EXO_OUTFILE "$%EXO_INSTALLFILENAME%"
+ !define EXO_OUTFILE "$%EXO_INSTALL_FILENAME%"
 
  !define EXO_REGKEY_ROOT "$%EXO_PRODUCTNAME%"
  !define EXO_REGKEY_VER  "$%EXO_PRODUCTNAME%\$%EXO_MAJOR_VER%.$%EXO_MINOR_VER%"

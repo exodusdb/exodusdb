@@ -372,7 +372,7 @@ set EXO_CODENAME=exodus
 rem ------------------------
 rem --- INSTALLFILE NAME ---
 rem ------------------------
-    set EXO_INSTALLFILENAME=%EXO_CODENAME%-%EXO_MAJOR_VER%.%EXO_MINOR_VER%.%EXO_MICRO_VER%-%TARGET_CPU%.exe
+    set EXO_INSTALL_FILENAME=%EXO_CODENAME%-%EXO_MAJOR_VER%.%EXO_MINOR_VER%.%EXO_MICRO_VER%-%TARGET_CPU%.exe
 
 rem ------------------
 rem ---- BUILDING ----
@@ -466,14 +466,14 @@ rem set EXO_PACKOPT=exodus_all.nsi
 :afterinstaller
 
 
-rem needs EXO_UPLOADUSER UPLOADPASS_EXO EXO_INSTALLFILENAME
+rem needs EXO_UPLOADUSER UPLOADPASS_EXO EXO_INSTALL_FILENAME
 rem -------------------------
 rem --- COMMAND TO UPLOAD ---
 rem -------------------------
 rem TODO MODIFY THE CMD TO FAIL NOT PROMPT FOR USER/PASS
 rem NOTE THAT IT ASKS FOR USER AND PASS FOR ANY TYPE OF FAILURE INCLUDE "FILE ALREADY EXISTS" - THERE IS NO OVERWRITE OPTION
 set EXO_UPLOADCMD=googlecode_upload.py
-set EXO_UPLOADOPT=-s "Windows %TARGET_CPU% Installer" --project=exodusdb --user=%EXO_UPLOADUSER% --password=%UPLOADPASS_EXO% -l "Type-Package,OpSys-Win,Featured" %EXO_INSTALLFILENAME%
+set EXO_UPLOADOPT=-s "Windows %TARGET_CPU% Installer" --project=exodusdb --user=%EXO_UPLOADUSER% --password=%UPLOADPASS_EXO% -l "Type-Package,OpSys-Win,Featured" %EXO_INSTALL_FILENAME%
 
 rem ------------------------------------------
 rem --- DUMP ALL THE ENVIRONMENT VARIABLES ---
