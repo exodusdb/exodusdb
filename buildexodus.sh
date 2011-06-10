@@ -87,7 +87,8 @@ echo ./configure \
  CXXFLAGS="$EXO_FLAGS" \
   LDFLAGS="$EXO_FLAGS $EXO_LDFLAGS" \
      LIBS="$EXO_LIBS_ICU $EXO_LIBS_BOOST" \
- --with-boost-libdir=$EXO_EPREFIX/lib 
+ --with-boost-libdir=$EXO_EPREFIX/lib
+# --enable-shared=yes
 # --enable-shared=no \
 # --enable-static=yes 
 echo ------------------------------------------------------------
@@ -101,7 +102,8 @@ sleep 1
  CXXFLAGS="$EXO_FLAGS" \
   LDFLAGS="$EXO_FLAGS $EXO_LDFLAGS" \
      LIBS="$EXO_LIBS_ICU $EXO_LIBS_BOOST" \
- --with-boost-libdir=$EXO_EPREFIX/lib 
+ --with-boost-libdir=$EXO_EPREFIX/lib
+# --enable-shared=yes
 # --enable-shared=no \
 # --enable-static=yes 
 
