@@ -105,6 +105,9 @@ if [ "$EXO_UNAME" == "Linux" ]; then
 	export EXO_BOOST_JAM_ARCHITECTURE=""
 	export EXO_BOOST_JAM_ADDRESS_MODEL="`uname -m`"
 	export EXO_BOOST_JAM_USING="gcc : : :"
+
+	#if static linking then libicu needs to link against libdl to avoid "undefined reference to `dlopen'" when building boost
+	export EXO_LIBS_ICU="$EXO_LIBS_ICU -ldl"
 fi
 
 if [ "$EXO_UNAME" = "Darwin" ]; then
@@ -184,7 +187,7 @@ test "$EXO_ARCH" = ""   && export EXO_ARCH=`uname -m`
 export EXO_EPREFIX=$EXO_PREFIX/$EXO_MINVER-$EXO_ARCH-s
 
 #note: any minor failure to compile can cause boost not to detect ICU see boosts bin.v2/config.log for errors
-export EXO_FLAGS="-I$EXO_PREFIX/include -I$HOME/$EXO_BOOST_DIR $EXO_OSX_FLAGS"
+export EXO_FLAGS="-I$EXO_PREFIX/include -I$HOME/$EXO_BOOST_DIR $EXO_OSX_FLAGS -DU_STATIC_IMPLEMENTATION=1"
 if [ "$EXO_UNAME" == "Darwin" ]; then
 	export EXO_LDFLAGS="-Bstatic -L$EXO_EPREFIX/lib"
 else

@@ -7,18 +7,18 @@ set -e
 source config.sh
 cd ~
 
-#--------------
-#--- Delete ---
-#--------------
+#----------------
+#--- "Delete" ---
+#----------------
 #optionally delete the boost download file to force redownloading
 if [ "$EXO_BOOST_REUSE_DOWNLOAD" != "YES" ]; then
 	test -f ${EXO_BOOST_FILENAME} && rm -f ${EXO_BOOST_FILENAME}
 	test -d ${EXO_BOOST_DIR}  && rm -rf ${EXO_BOOST_DIR}
 fi
 
-#------------------------
-#--- Download/Extract ---
-#------------------------
+#--------------------------
+#--- "Download/Extract" ---
+#--------------------------
 #untar any existing download already if the directory doesnt exist
 if [ -f $EXO_BOOST_FILENAME ]; then
 	test -d ${EXO_BOOST_DIR} || echo untarring boost ${EXO_BOOST_FILENAME} to ${EXO_BOOST_DIR}
@@ -39,19 +39,16 @@ else
 
 fi
 
-#----------
-#--- cd ---
-#----------
+#-----------------
+#--- "Configure" ---
+#-----------------
 cd ${EXO_BOOST_DIR}
 
-#-----------------
-#--- Configure ---
-#-----------------
 test -f bjam || ./bootstrap.sh
 
-# eg   using gcc : 3.4 : : <compileflags>-m64 <linkflags>-m64 ;
-
 export EXO_BOOST_JAMFILE=exodus-${EXO_UNAME}-${EXO_BOOST_JAM_ARCHITECTURE}-${EXO_BOOST_JAM_ADDRESS_MODEL}-${EXO_MINVER}.jam
+
+# eg   using gcc : 3.4 : : <compileflags>-m64 <linkflags>-m64 ;
 
 if [ "$EXO_UNAME" == "Darwin" ]; then
 cat > $EXO_BOOST_JAMFILE << EOF
@@ -77,21 +74,23 @@ EOF
 
 fi
 
+#export EXO_BOOST_LINKAGE="define=U_STATIC_IMPLEMENTATION=1 link=static" #done in EXO_FLAGS now?
+export EXO_BOOST_LINKAGE="link=static"
+
 echo -----------------------------------------------------------------
 echo cat $EXO_BOOST_JAMFILE
 cat $EXO_BOOST_JAMFILE
 
-#--------------------
-#--- Make/Install ---
-#--------------------
+#------------------------
+#--- "Make & Install" ---
+#------------------------
 #staging so only copied libs and no copying of zillons include files
 echo -----------------------------------------------------------------
 echo ./bjam \
  --stagedir=$EXO_EPREFIX \
  --user-config=$EXO_BOOST_JAMFILE \
- define=U_STATIC_IMPLEMENTATION=1 \
  --with-date_time --with-filesystem --with-regex --with-system --with-thread \
- link=static \
+ $EXO_BOOST_LINKAGE \
  variant=release \
  -a -j2 \
  stage
@@ -104,9 +103,8 @@ echo ###########################################################################
 ./bjam \
  --stagedir=$EXO_EPREFIX \
  --user-config=$EXO_BOOST_JAMFILE\
- define=U_STATIC_IMPLEMENTATION=1 \
  --with-date_time --with-filesystem --with-regex --with-system --with-thread \
- link=static \
+ $EXO_BOOST_LINKAGE \
  variant=release \
  -a -j2 \
  stage
