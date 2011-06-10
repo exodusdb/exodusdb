@@ -43,9 +43,13 @@ if [ -f $EXO_EXODUS_FILE ]; then
 else
 	#copied from icu install but not tested
 
+        #detect curl or wget
+        export EXO_CURL_WGET="curl -L"
+        which curl 2>&1 > /dev/null || export EXO_CURL_WGET="wget -O-"
+
 	#download, save and untar (if not already present)
 	echo Downloading and untarring EXODUS
-	curl -L $EXO_EXODUS_URL | tee $EXO_EXODUS_FILE.part|tar xz
+	$EXO_CURL_WGET $EXO_EXODUS_URL | tee $EXO_EXODUS_FILE.part|tar xz
 
 	#save download if downloaded completed
 	# set -e in heading should prevent arrival here if download not complete

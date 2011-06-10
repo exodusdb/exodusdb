@@ -16,10 +16,6 @@ if [ "$EXO_BOOST_REUSE_DOWNLOAD" != "YES" ]; then
 	test -d ${EXO_BOOST_DIR}  && rm -rf ${EXO_BOOST_DIR}
 fi
 
-#replaced by curl - see below
-#wget ${EXO_BOOST_URL}
-
-
 #------------------------
 #--- Download/Extract ---
 #------------------------
@@ -31,7 +27,7 @@ else
 
 	#detect curl or wget
 	export EXO_CURL_WGET="curl -L"
-	which curl 2>&1 > /dev/null && export EXO_CURL_WGET="wget -O-"
+	which curl 2>&1 > /dev/null || export EXO_CURL_WGET="wget -O-"
 
 	#download, save and untar (if not already present)
 	echo Downloading and untarring boost

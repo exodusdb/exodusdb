@@ -26,7 +26,12 @@ if [ "$EXO_ICU_DOWNLOADER" = "SUBVERSION" ]; then
 	test -d $EXO_ICU_DIR             || svn co $EXO_ICU_URL_SUBVERSION $EXO_ICU_DIR
 #else
 #	#echo Downloading and untarring icu (in parallel)
-#	#curl -L $EXO_ICU_URL_CURL | tee $EXO_ICU_FILE | tar xz
+#
+#        #detect curl or wget
+#        export EXO_CURL_WGET="curl -L"
+#        which curl 2>&1 > /dev/null || export EXO_CURL_WGET="wget -O-"
+#
+#	 $EXO_CURL_WGET $EXO_ICU_URL_CURL | tee $EXO_ICU_FILE | tar xz
 fi
 
 
