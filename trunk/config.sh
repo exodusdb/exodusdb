@@ -185,7 +185,11 @@ export EXO_EPREFIX=$EXO_PREFIX/$EXO_MINVER-$EXO_ARCH-s
 
 #note: any minor failure to compile can cause boost not to detect ICU see boosts bin.v2/config.log for errors
 export EXO_FLAGS="-I$EXO_PREFIX/include -I$HOME/$EXO_BOOST_DIR $EXO_OSX_FLAGS"
-export EXO_LDFLAGS="-Bstatic -L$EXO_EPREFIX/lib"
+if [ "$EXO_UNAME" == "Darwin" ]; then
+	export EXO_LDFLAGS="-Bstatic -L$EXO_EPREFIX/lib"
+else
+	export EXO_LDFLAGS="-L$EXO_EPREFIX/lib"
+fi
 
 #-----------
 #--- Icu ---
