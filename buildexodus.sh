@@ -1,24 +1,20 @@
 #!/bin/bash
 
 #------------
-#--- Init ---
+#--- "Init" ---
 #------------
 set -e
 source config.sh
 cd ~
 
 #-------------
-#--- Setup ---
+#--- "Setup" ---
 #-------------
 
 export PATH=EXO_POSTGRES_BIN:$PATH
 
-#patch in suppression of EXECINFO.H (backtrace) not available on 10.4
-#now relies on HAS_BACKTRACE to include execinfo.h
-#test $EXO_MINVER = 10.4 && export EXO_FLAGS="$EXO_FLAGS -DHASNT_EXECINFO"
-
 #--------------
-#--- Delete ---
+#--- "Delete" ---
 #--------------
 #optionally delete the EXODUS download file to force redownloading
 if [ "$EXO_EXODUS_REUSE_DOWNLOAD" != "YES" ]; then
@@ -28,7 +24,7 @@ if [ "$EXO_EXODUS_REUSE_DOWNLOAD" != "YES" ]; then
 fi
 
 #------------------------
-#--- Download/Extract ---
+#--- "Download/Extract" ---
 #------------------------
 if [ "$EXO_EXODUS_DOWNLOADER" = "SUBVERSION" ]; then
         echo svn checkout/update $EXO_EXODUS_URL_SUBVERSION to $EXO_EXODUS_DIR
@@ -57,64 +53,51 @@ else
 fi
 fi
 
-#---------
-#-- cd ---
-#---------
+#------------
+#--- "cd" ---
+#------------
 cd $EXO_EXODUS_DIR
 
-#-------------
-#--- Clean ---
-#-------------
+#---------------
+#--- "Clean" ---
+#---------------
 test -f Makefile && make clean && make distclean
 
-#-----------------
-#--- Configure ---
-#-----------------
-#./configure
-#  --build=i386-apple-darwin8.11.0
-#       CC=gcc-4.0 CXX=g++-4.0
-#   CFLAGS=-arch i386 -mmacosx-version-min=10.4 -march=prescott -DHASNT_EXECINFO
-# CXXFLAGS=-arch i386 -mmacosx-version-min=10.4 -march=prescott -DHASNT_EXECINFO
-#  LDFLAGS=-arch i386 -mmacosx-version-min=10.4 -march=prescott -DHASNT_EXECINFO -Bstatic
-#     LIBS=-licudata -licui18n -licutu -licuuc -lboost_date_time -lboost_filesystem -lboost_regex -lboost_system -lboost_thread
+#-------------------
+#--- "Configure" ---
+#-------------------
+export EXO_EXODUS_CONFIG_SCRIPTFILE=configexodus-${EXO_UNAME}-${EXO_ARCH}-${EXO_MINVER}.sh
 
-echo ------------------------------------------------------------
 echo ./configure \
-  --build="$EXO_BUILD" \
-       CC="$EXO_CC" \
-      CXX="$EXO_CXX" \
-   CFLAGS="$EXO_FLAGS" \
- CXXFLAGS="$EXO_FLAGS" \
-  LDFLAGS="$EXO_FLAGS $EXO_LDFLAGS" \
-     LIBS="$EXO_LIBS_ICU $EXO_LIBS_BOOST" \
- --with-boost-libdir=$EXO_EPREFIX/lib
+ --prefix=\"$EXO_EXODUS_PREFIX\" \
+ -exec-prefix=\"$EXO_EXODUS_EPREFIX\" \
+  --build=\"$EXO_BUILD\" \
+       CC=\"$EXO_CC\" \
+      CXX=\"$EXO_CXX\" \
+   CFLAGS=\"$EXO_EXODUS_FLAGS\" \
+ CXXFLAGS=\"$EXO_EXODUS_FLAGS\" \
+  LDFLAGS=\"$EXO_EXODUS_LDFLAGS\" \
+     LIBS=\"$EXO_EXODUS_LIBS\" \
+ --with-boost-libdir=$EXO_BOOST_EPREFIX/lib >$EXO_EXODUS_CONFIG_SCRIPTFILE
 # --enable-shared=yes
 # --enable-shared=no \
 # --enable-static=yes 
+echo ------------------------------------------------------------
+echo $EXO_EXODUS_CONFIG_SCRIPTFILE
+cat $EXO_EXODUS_CONFIG_SCRIPTFILE
 echo ------------------------------------------------------------
 sleep 1
 
-./configure \
-  --build="$EXO_BUILD" \
-       CC="$EXO_CC" \
-      CXX="$EXO_CXX" \
-   CFLAGS="$EXO_FLAGS" \
- CXXFLAGS="$EXO_FLAGS" \
-  LDFLAGS="$EXO_FLAGS $EXO_LDFLAGS" \
-     LIBS="$EXO_LIBS_ICU $EXO_LIBS_BOOST" \
- --with-boost-libdir=$EXO_EPREFIX/lib
-# --enable-shared=yes
-# --enable-shared=no \
-# --enable-static=yes 
+. $EXO_EXODUS_CONFIG_SCRIPTFILE
 
-#------------
-#--- Make ---
-#------------
+#--------------
+#--- "Make" ---
+#--------------
 make
 
-#---------------
-#--- Install ---
-#---------------
+#-----------------
+#--- "Install" ---
+#-----------------
 echo ----------------
 echo To Install
 echo " sudo make install"
@@ -127,4 +110,3 @@ echo " configexodus"
 echo
 echo After configuration, test
 echo " testsort"
-
