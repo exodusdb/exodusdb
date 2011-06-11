@@ -63,4 +63,5 @@ g++ -shared exodus_wrap.o -o $SWIG_MODULE_FILENAME $EXO_EXODUS_LDFLAGS $SWIG_TAR
 #--- "Install" ---
 #-----------------
 test "$SWIG_TARGET_LIBDIR" == "" && exit
-sudo cp -f $SWIG_MODULE_FILENAME $SWIG_TARGET_LIBDIR/
+echo sudo cp -f $SWIG_MODULE_FILENAME $SWIG_TARGET_LIBDIR/
+     sudo cp -f $SWIG_MODULE_FILENAME $SWIG_TARGET_LIBDIR/
