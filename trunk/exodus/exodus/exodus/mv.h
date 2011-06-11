@@ -291,24 +291,28 @@ public:
 	//copy ctor
 	var(const var& var1);
 
-	//ctor for wchar_t
-	var(const wchar_t char1);
-
 	//ctor for wchar_t*
+	//place first before wchar_t so SWIG isnt tempted to use char to acquire strings resulting in ONE character strings)
 	var(const wchar_t* cstr1);
 
+	//ctor for wchar_t
+#ifndef SWIG
+	var(const wchar_t char1);
+#endif
 	//ctor for block of wchar_t
 	//to be implemented?
 	//var(const wchar_t* cstr1, const size_t int1);
 
-	//ctor for char to create
-	MV_CONSTRUCTION_FROM_CHAR_EXPLICIT
-	var(const char char1);
-
 	//ctor for char*
+	//place first before char so SWIG isnt tempted to use char to acquire strings resulting in ONE character strings)
 	MV_CONSTRUCTION_FROM_CHAR_EXPLICIT
 	var(const char* cstr1);
 
+	//ctor for char to create
+#ifndef SWIG
+	MV_CONSTRUCTION_FROM_CHAR_EXPLICIT
+	var(const char char1);
+#endif
 	//ctor for char memory block
 	MV_CONSTRUCTION_FROM_CHAR_EXPLICIT
 	var(const char* cstr1, const size_t int1);
