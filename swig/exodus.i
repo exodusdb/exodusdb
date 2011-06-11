@@ -32,6 +32,20 @@
 
 #endif
 
+#ifdef SWIGPHP
+%include "php/php.swg"
+//%include "php/phpinit.swg"
+////%include "php/phprun.swg"
+//%include "php/phpkw.swg"
+%include "php/typemaps.i"
+%include "php/std_string.i"
+//%include "exception.i"
+//%include "php/utils.i"
+
+%rename(__toString) tostring;
+
+#endif
+
 %{
 #include "exodus/mv.h"
 %}
