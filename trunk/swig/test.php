@@ -1,5 +1,5 @@
 <?php
-include("backtrace.php");
+//include("backtrace.php");
 include("php/exodus.php");
 
 //file=database table
