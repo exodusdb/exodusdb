@@ -31,14 +31,18 @@ python )
 ;;
 esac
 
+#------------
+#--- "cd" ---
+#------------
+
 test -d $SWIG_TARGET || mkdir $SWIG_TARGET
 cd $SWIG_TARGET
 
 #--------------
 #--- "Swig" ---
 #--------------
-echo swig -c++ -$SWIG_TARGET $EXO_EXODUS_INCLUDE_FLAGS ../exodus.i
-swig -c++ -$SWIG_TARGET -outdir $SWIG_TARGET $EXO_EXODUS_INCLUDE_FLAGS ../exodus.i
+echo swig -c++ -$SWIG_TARGET $EXO_EXODUS_INCLUDE_FLAGS -outcurrentdir ../exodus.i
+     swig -c++ -$SWIG_TARGET $EXO_EXODUS_INCLUDE_FLAGS -outcurrentdir ../exodus.i
 
 #-----------------
 #--- "Compile" ---
@@ -63,6 +67,8 @@ g++ -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions \
 #-----------------
 #--- "Install" ---
 #-----------------
+test "$SWIG_TARGET_LIBDIR" == "" && exit
 echo Installing
-test "$SWIG_TARGET_LIBDIR" != "" && sudo cp $SWIG_MODULE_FILENAME $SWIG_TARGET_LIBDIR
+echo sudo cp $SWIG_MODULE_FILENAME $SWIG_TARGET_LIBDIR
+     sudo cp $SWIG_MODULE_FILENAME $SWIG_TARGET_LIBDIR
 
