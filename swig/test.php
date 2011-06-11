@@ -1,6 +1,6 @@
 <?php
 include("backtrace.php");
-include("exodus.php");
+include("php/exodus.php");
 
 //file=database table
 //record=table row
