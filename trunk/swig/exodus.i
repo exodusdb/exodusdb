@@ -30,6 +30,7 @@
 }
 */
 
+%rename(__repr__) tostring;
 #endif
 
 #ifdef SWIGPHP
