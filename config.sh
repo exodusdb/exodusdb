@@ -190,6 +190,8 @@ test "$EXO_EXODUS_PREFIX"   == "DEBIAN" && export EXO_EXODUS_PREFIX=`pwd`/debian
 export EXO_LIBS_ICU="-licudata -licui18n -licutu -licuuc"
 #if static linking then libicu needs to link against libdl to avoid "undefined reference to `dlopen'" when building boost
 export EXO_LIBS_ICU="$EXO_LIBS_ICU -ldl"
+#added -lgcc to avoid - hidden symbol `icu_48::Locale::~Locale()' in /home/neosys/local/Debian-x86_64-s/lib/libicuuc.a(locid.ao) is referenced by DSO
+export EXO_LIBS_ICU="$EXO_LIBS_ICU -lgcc"
 
 export EXO_LIBS_BOOST="-lboost_date_time -lboost_filesystem -lboost_regex -lboost_system -lboost_thread"
 export EXO_LIBS_BOOST="-Wl,-Bstatic $EXO_LIBS_BOOST -Wl,-Bdynamic"
@@ -204,17 +206,18 @@ fi
 
 #--- ICU ---
 export EXO_ICU_FLAGS="$EXO_FLAGS"
+#export EXO_ICU_FLAGS="$EXO_FLAGS -fvisibility=default"
 export EXO_ICU_LDFLAGS="$EXO_LDFLAGS"
 export EXO_ICU_LIBS=""
 
 #--- BOOST ---
 #note: any minor failure to compile can cause boost not to detect ICU see boosts bin.v2/config.log for errors
 export EXO_BOOST_FLAGS="$EXO_FLAGS -I$EXO_ICU_PREFIX/include"
-export EXO_BOOST_LDFLAGS="$EXO_LDFLAGS -I$EXO_ICU_EPREFIX/lib"
+export EXO_BOOST_LDFLAGS="$EXO_LDFLAGS -L$EXO_ICU_EPREFIX/lib"
 export EXO_BOOST_LIBS="$EXO_ICU_LIBS $EXO_LIBS_ICU"
 
-export EXO_EXODUS_FLAGS="$EXO_BOOST_FLAGS -I$EXO_BOOST_PREFIX/include -I$HOME/${EXO_BOOST_DIR}"
-export EXO_EXODUS_LDFLAGS="$EXO_BOOST_LDFLAGS -I$EXO_BOOST_EPREFIX/lib"
+export EXO_EXODUS_FLAGS="$EXO_BOOST_FLAGS -I$EXO_BOOST_PREFIX/include -I$HOME/$EXO_BOOST_DIR"
+export EXO_EXODUS_LDFLAGS="$EXO_BOOST_LDFLAGS -L$EXO_BOOST_EPREFIX/lib"
 export EXO_EXODUS_LIBS="$EXO_BOOST_LIBS $EXO_LIBS_BOOST"
 
 ##note: any minor failure to compile can cause boost not to detect ICU see boosts bin.v2/config.log for errors

@@ -69,7 +69,7 @@ cat > $EXO_BOOST_JAMFILE << EOF
 # Compiler configuration
 using $EXO_BOOST_JAM_USING
        <compileflags>"$EXO_BOOST_FLAGS"
-          <linkflags>"$EXO_BOOST_LDFLAGS" ;
+          <linkflags>"$EXO_BOOST_LDFLAGS $EXO_BOOST_LIBS" ;
 EOF
 
 fi
