@@ -96,7 +96,12 @@ THE SOFTWARE.
 #if 1
 	//IF was private pointer then only required for debugging
 	//and couldcan be commented out in production code
+#ifdef SWIG
+#	include "mvimpl.h"
+#else
 #	include <exodus/mvimpl.h>
+#endif
+
 #else
 	class pimpl;
 #endif
@@ -293,7 +298,8 @@ public:
 	var(const wchar_t* cstr1);
 
 	//ctor for block of wchar_t
-	var(const wchar_t* cstr1, const size_t int1);
+	//to be implemented?
+	//var(const wchar_t* cstr1, const size_t int1);
 
 	//ctor for char to create
 	MV_CONSTRUCTION_FROM_CHAR_EXPLICIT
@@ -679,23 +685,33 @@ public:
 	var timedate() const;
 	void ossleep(const int milliseconds) const;
 	var ostime() const;
-
+#ifdef SWIG
+#	define DEFAULTNULL
+#	define DEFAULTDOT
+#	define DEFAULTSPACE
+#	define DEFAULTVM
+#else
+#	define DEFAULTNULL =L""
+#	define DEFAULTDOT =L"."
+#	define DEFAULTSPACE =L" "
+#	define DEFAULTVM =VM_
+#endif
 	//SYSTEM FILE/DIRECTORY OPERATIONS
 	//TODO cache osfilehandles somehow (use var_mvint?)
 	bool osopen() const;
-	bool osopen(const var& filename, const var& locale=L"") const;
+	bool osopen(const var& filename, const var& locale DEFAULTNULL) const;
 	var& osbread(const var& osfilevar, var& startoffset, const int length);
 	bool osbwrite(const var& osfilevar, var& startoffset) const;
 	void osclose() const;
-	bool osread(const var& osfilename, const var& locale=L"");
-	bool oswrite(const var& osfilename, const var& locale=L"") const;
+	bool osread(const var& osfilename, const var& locale DEFAULTNULL);
+	bool oswrite(const var& osfilename, const var& locale DEFAULTNULL) const;
 	bool osdelete() const;
 	bool osdelete(const var& osfilename) const;
 	bool osrename(const var& newosdir_or_filename) const;
 	bool oscopy(const var& to_osfilename) const;
-	var oslist(const var& path=L".", const var& wildcard=L"", const int mode=0) const;
-	var oslistf(const var& path=L".", const var& wildcard=L"") const;
-	var oslistd(const var& path=L".", const var& wildcard=L"") const;
+	var oslist(const var& path DEFAULTDOT, const var& wildcard DEFAULTNULL, const int mode=0) const;
+	var oslistf(const var& path DEFAULTDOT, const var& wildcard DEFAULTNULL) const;
+	var oslistd(const var& path DEFAULTDOT, const var& wildcard DEFAULTNULL) const;
 	var osfile() const;
 	var osdir() const;
 	bool osmkdir() const;
@@ -711,16 +727,17 @@ public:
 	//this is to only to avoid convertion too and from var
 	//but will usage of hard coded filenames etc really be in fast loops
 	//and performance related? perhaps only provide
-	bool osread(const char* osfilename, const var& locale = L"");
+	bool osread(const char* osfilename, const var& locale DEFAULTNULL);
 
 	//libraries and subroutines/functions
+/* replaced by  #include funcname.h
 	bool load(const var& libraryname) const;
 	var call(const wchar_t* libraryname, const char* functionname) const;
 	var call(const var& libraryname, const var& functionname) const;
 	var call(const char* functionname) const;
 	var call(const var& functionname) const;
 	var call() const;
-
+*/
 	//OS PROCESSING
 	var suspend() const;
 	var osshell() const;
@@ -728,8 +745,8 @@ public:
 	var osshellwrite(const var& writestr) const;
 	bool osgetenv(const var& name);
 	bool ossetenv(const var& name) const;
-	void stop(const var& text=L"") const;
-	void abort(const var& text=L"") const;
+	void stop(const var& text DEFAULTNULL) const;
+	void abort(const var& text DEFAULTNULL) const;
 	var perform() const;
 	var execute() const;
 	var chain() const;
@@ -790,6 +807,7 @@ public:
 	var& transfer(var& var2);
 	var& exchange(var& var2);
 	var& clone(var& var2);
+/*no implemented yet
 	var addressof() const;
 	void clear();
 	void clearcommon();
@@ -797,7 +815,7 @@ public:
 //	var bitor(const var) const;
 //	var bitxor(const var) const;
 	var bitnot() const;
-
+*/
 	//MATH/BOOLEAN
 	var abs() const;
 	var mod(const var& divisor) const;
@@ -825,13 +843,13 @@ public:
 	var& getxlocale();
 
 	//STRING CREATION
-	var chr() const;
+//	var chr() const;
 	var chr(const int num) const;
 	var str(const int num) const;
 	var space() const;
 
 	//STRING INFO
-	bool match(const var& matchstr,const var& options=L"") const;
+	bool match(const var& matchstr,const var& options DEFAULTNULL) const;
 	var seq() const;
 	var dcount(const var& substrx) const;
 	var count(const var& substrx) const;
@@ -841,11 +859,11 @@ public:
 	const wchar_t* data() const;
 	bool isnum() const;
 	bool isnum_old() const;
-	bool isalpha() const;
+//	bool isalpha() const;
 
 	//STRING MANIPULATIONS (all return var& and are not const)
 	var& converter(const var& oldchars,const var& newchars);
-	var& swapper(const var& oldstr,const var& newstr,const var& options=L"");
+	var& swapper(const var& oldstr,const var& newstr,const var& options DEFAULTNULL);
 	var& splicer(const int start1,const int length,const var& str);
 	var& splicer(const int start1,const var& str);
 	var& quoter();
@@ -854,9 +872,9 @@ public:
 	var& ucaser();
 	var& lcaser();
 	//var& inverter();
-	var& trimmer(const wchar_t* trimchar=L" ");
-	var& trimmerf(const wchar_t* trimchar=L" ");
-	var& trimmerb(const wchar_t* trimchar=L" ");
+	var& trimmer(const wchar_t* trimchar DEFAULTSPACE);
+	var& trimmerf(const wchar_t* trimchar DEFAULTSPACE);
+	var& trimmerb(const wchar_t* trimchar DEFAULTSPACE);
 	var& trimmer(const var trimchar);
 	var& trimmerf(const var trimchar);
 	var& trimmerb(const var trimchar);
@@ -866,7 +884,7 @@ public:
 
 	//STRING FILTERS
 	var convert(const var& oldchars,const var& newchars) const;
-	var swap(const var& oldstr,const var& newstr,const var& options=L"") const;
+	var swap(const var& oldstr,const var& newstr,const var& options DEFAULTNULL) const;
 	var splice(const int start1,const int length,const var& str) const;
 	var splice(const int start1,const var& str) const;
 	var quote() const;
@@ -875,14 +893,14 @@ public:
 	var ucase() const;
 	var lcase() const;
 	//var invert() const;
-	var trim(const wchar_t* trimchar=L" ") const;
-	var trimf(const wchar_t* trimchar=L" ") const;
-	var trimb(const wchar_t* trimchar=L" ") const;
+	var trim(const wchar_t* trimchar DEFAULTSPACE) const;
+	var trimf(const wchar_t* trimchar DEFAULTSPACE) const;
+	var trimb(const wchar_t* trimchar DEFAULTSPACE) const;
 	var trim(const var trimchar) const;
 	var trimf(const var trimchar) const;
 	var trimb(const var trimchar) const;
 	var fieldstore(const var& sepchar,const int fieldno,const int nfields,const var& replacement) const;
-	var hash() const;
+//	var hash() const;
 
 	//STRING EXTRACTION
 	//[x,y]
@@ -927,8 +945,9 @@ public:
 	var replace(const int fieldno,const var& replacement) const;
 
 	var insert(const int fieldno,const int valueno,const int subvalueno,const var& insertion) const;
-	var insert(const int fieldno,const int valueno,const var& insertion) const;
-	var insert(const int fieldno,const var& insertion) const;
+//to be implemented?
+//	var insert(const int fieldno,const int valueno,const var& insertion) const;
+//	var insert(const int fieldno,const var& insertion) const;
 
 	var erase(const int fieldno, const int valueno=0, const int subvalueno=0) const;
 	var extract(const int fieldno,const int valueno=0,const int subvalueno=0) const;
@@ -947,18 +966,17 @@ public:
 	//var& extracter(int fieldno,int valueno=0,int subvalueno=0) const;
 
 	//should these be like extract, replace, insert, delete
-	//locate(fieldno, valueno, subvalueno,target,setting,by=L"")
+	//locate(fieldno, valueno, subvalueno,target,setting,by DEFAULTNULL)
 	bool locate(const var& target, var& setting, const int fieldno=0,const int valueno=0) const;
 	//passing BY as a string for speed
 	bool locateby(const var& target, const char* ordercode, var& setting, const int fieldno=0,const int valueno=0) const;
 	bool locateby(const var& target, const var& ordercode, var& setting, const int fieldno=0,const int valueno=0) const;
 	bool locateusing(const var& target, const var& usingchar, var& setting, const int fieldno=0, const int valueno=0, const int subvalueno=0) const;
 	bool locateusing(const var& target, const var& usingchar) const;
-
-	var sum(const var& sepchar=VM_) const;
+	var sum(const var& sepchar DEFAULTVM) const;
 
 	//var FILE I/O
-	bool connect(const var& conninfo=L"");
+	bool connect(const var& conninfo DEFAULTNULL);
 	bool disconnect();
 	bool setdefaultconnection();
 
@@ -971,24 +989,24 @@ public:
 	bool createdb(const var& dbname, var& errmsg) const;
 	bool deletedb(const var& dbname, var& errmsg) const;
 
-	bool createfile(const var& filename,const var& options=L"");
+	bool createfile(const var& filename,const var& options DEFAULTNULL);
 	bool deletefile() const;
 	bool clearfile() const;
 	var listfiles() const;
 
-	bool createindex(const var& fieldname,const var& dictfile=L"") const;
+	bool createindex(const var& fieldname,const var& dictfile DEFAULTNULL) const;
 	bool deleteindex(const var& fieldname) const;
-	var listindexes(const var& filename=L"") const;
+	var listindexes(const var& filename DEFAULTNULL) const;
 
-	bool open(const var& dbfilename, const var& dbconnection=L"");
+	bool open(const var& dbfilename, const var& dbconnection DEFAULTNULL);
 	void close();
 
-	bool select(const var& sortselectclause = L"") const;
+	bool select(const var& sortselectclause DEFAULTNULL) const;
 	void clearselect() const;
 	bool readnext(var& key) const;
 	bool readnext(var& key, var& valueno) const;
 
-	bool selectrecord(const var& sortselectclause = L"") const;
+	bool selectrecord(const var& sortselectclause DEFAULTNULL) const;
 	bool readnextrecord(var& record, var& key) const;
 
 	bool lock(const var& key) const;
@@ -1165,7 +1183,9 @@ DLL_PUBLIC var MVmul(const var& var1,const var& var2);
 
 DLL_PUBLIC var MVdiv(const var& var1,const var& var2);
 
+#ifndef SWIG
 DLL_PUBLIC double neosysmodulus(const double v1,const double v2);
+#endif
 
 DLL_PUBLIC var MVmod(const var& var1,const var& var2);
 
@@ -1373,6 +1393,51 @@ private:
 */
 
 //must be after class declaration
+#ifdef SWIG
+//swig cant handle these as wide character L"" for some reason
+static const var FM = _FM;
+static const var VM = _VM;
+static const var SM = _SM;
+static const var SVM = _SVM;
+static const var TM = _TM;
+static const var STM = _STM;
+static const var SSTM = _SSTM;
+
+static const var IM = _IM;
+static const var RM = _RM;
+static const var AM = _AM;
+
+static const var DQ = _DQ;
+static const var SQ = _SQ;
+
+#if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
+const var SLASH = "\\";
+static const char SLASH_ = '\\';
+#define SLASH_IS_BACKSLASH true
+#else
+const var SLASH = "/";
+static const char SLASH_ = '/';
+#define SLASH_IS_BACKSLASH false
+#endif
+
+//being global const means that ucase() and lcase()
+//can only be fixed for ASCII
+//perhaps make a version of ucase/lcase that
+//receives an MvEnvironment in the parameters.
+//CF LOWERCASE which is
+const var LOWERCASE_="abcdefghijklmnopqrstuvwxyz";
+const var UPPERCASE_="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+#if defined(_WIN64) or defined(_LP64)
+const var PLATFORM_="x64";
+#else
+const var PLATFORM_="x86";
+#endif
+
+/////
+#else
+/////
+
 static const var FM = _FM_;
 static const var VM = _VM_;
 static const var SM = _SM_;
@@ -1410,6 +1475,8 @@ const var UPPERCASE_=L"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const var PLATFORM_=L"x64";
 #else
 const var PLATFORM_=L"x86";
+#endif
+
 #endif
 
 #ifndef EXO_MV_CPP
@@ -1473,14 +1540,14 @@ DLL_PUBLIC exodus::var EXECPATH2=L"";
 #endif
 
 void DLL_PUBLIC output(const var& var1);
-void DLL_PUBLIC outputl(const var& var1=L"");
-void DLL_PUBLIC outputt(const var& var1=L"");
+void DLL_PUBLIC outputl(const var& var1 DEFAULTNULL);
+void DLL_PUBLIC outputt(const var& var1 DEFAULTNULL);
 
 void DLL_PUBLIC errput(const var& var1);
-void DLL_PUBLIC errputl(const var& var1=L"");
+void DLL_PUBLIC errputl(const var& var1 DEFAULTNULL);
 
 void DLL_PUBLIC logput(const var& var1);
-void DLL_PUBLIC logputl(const var& var1=L"");
+void DLL_PUBLIC logputl(const var& var1 DEFAULTNULL);
 
 var DLL_PUBLIC backtrace();
 
@@ -1511,9 +1578,9 @@ class DLL_PUBLIC MVUndefined            : public MVException {public: MVUndefine
 class DLL_PUBLIC MVInvalidPointer       : public MVException {public: MVInvalidPointer       (const var& var1    );};
 class DLL_PUBLIC MVDBException          : public MVException {public: MVDBException          (const var& var1    );};
 class DLL_PUBLIC MVNotImplemented       : public MVException {public: MVNotImplemented       (const var& var1    );};
-class DLL_PUBLIC MVDebug                : public MVException {public: MVDebug                (const var& var1=L"");};
-class DLL_PUBLIC MVStop                 : public MVException {public: MVStop                 (const var& var1=L"");};
-class DLL_PUBLIC MVAbort                : public MVException {public: MVAbort                (const var& var1=L"");};
+class DLL_PUBLIC MVDebug                : public MVException {public: MVDebug                (const var& var1 DEFAULTNULL);};
+class DLL_PUBLIC MVStop                 : public MVException {public: MVStop                 (const var& var1 DEFAULTNULL);};
+class DLL_PUBLIC MVAbort                : public MVException {public: MVAbort                (const var& var1 DEFAULTNULL);};
 class DLL_PUBLIC MVArrayDimensionedZero : public MVException {public: MVArrayDimensionedZero (                   );};
 class DLL_PUBLIC MVArrayIndexOutOfBounds: public MVException {public: MVArrayIndexOutOfBounds(const var& var1    );};
 class DLL_PUBLIC MVArrayNotDimensioned  : public MVException {public: MVArrayNotDimensioned  (                   );};
