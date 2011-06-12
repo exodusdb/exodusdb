@@ -1,14 +1,14 @@
 #!/bin/bash
 set -e
 
-export SWIG_SYNTAX="Syntax is ./build.sh python|php|java|perl|all build/install/both"
+export SWIG_SYNTAX="Syntax is ./build.sh <action> <target> where action=make/install/all/clean target=python|php|java|perl|all"
 
-export SWIG_TARGET=$1
-export SWIG_MODE=$2
+export SWIG_MODE=$1
+export SWIG_TARGET=$2
 
-if [ "$2" == "both" ]; then
-	./build.sh $1 build
-	./build.sh $1 install
+if [ "$SWIG_MODE" == "all" ]; then
+	./build.sh make $2
+	./build.sh install $2
 	exit 0
 fi
 
@@ -37,10 +37,10 @@ case $SWIG_TARGET in
 
    all )
 
-	./build.sh php $2
-	./build.sh python $2
-	./build.sh php $2
-	./build.sh java $2
+	./build.sh $1 php
+	./build.sh $1 python
+	./build.sh $1 perl
+	./build.sh $1 java
 	echo "all done"
 	exit 0
 
@@ -75,6 +75,13 @@ case $SWIG_TARGET in
         export SWIG_TARGET_INCLUDE_FLAGS="-I/usr/lib/jvm/java-6-openjdk/include -I/usr/lib/jvm/java-6-openjdk/include/linux"
         export SWIG_TARGET_LIBFILE="lib$SWIG_MODULE_FILEBASE.so"
 
+	export SWIG_MODULE_BUILD="javac *.java"
+	#nb dont copy to local lib otherwise main libexodus.so will be lost
+
+;; csharp )
+        export SWIG_TARGET_INCLUDE_FLAGS=""
+        export SWIG_TARGET_LIBFILE="lib$SWIG_MODULE_FILEBASE.so"
+
 	#nb dont copy to local lib otherwise main libexodus.so will be lost
 
 ;;*)
@@ -82,6 +89,17 @@ case $SWIG_TARGET in
         exit 1
 ;;
 esac
+
+if [ "$SWIG_MODE" == "clean" ]; then
+echo
+echo ------------
+echo $SWIG_TARGET $SWIG_MODE
+echo ------------
+test -d $SWIG_TARGET || exit 0
+echo -ne "Removing: `pwd`/$SWIG_TARGET: "
+rm -rf $SWIG_TARGET && echo "removed."
+exit
+fi
 
 #------------
 #--- "cd" ---
@@ -95,7 +113,7 @@ echo $SWIG_TARGET $SWIG_MODE
 echo ------------
 echo Entering: `pwd`
 
-if [ "$SWIG_MODE" == "build" ]; then
+if [ "$SWIG_MODE" == "make" ]; then
 
 #--------------------
 #--- "SWIG MAGIC" ---
@@ -119,6 +137,13 @@ echo
 echo Linking: \
 g++ -shared exodus_wrap.o -o $SWIG_TARGET_LIBFILE $EXO_EXODUS_LDFLAGS $SWIG_TARGET_LDFLAGS
 g++ -shared exodus_wrap.o -o $SWIG_TARGET_LIBFILE $EXO_EXODUS_LDFLAGS $SWIG_TARGET_LDFLAGS
+
+if [ "$SWIG_MODULE_BUILD" != "" ]; then
+echo
+echo Building: \
+$SWIG_MODULE_BUILD
+$SWIG_MODULE_BUILD
+fi
 
 else
 
