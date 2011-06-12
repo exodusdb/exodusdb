@@ -27,6 +27,9 @@ case $SWIG_TARGET in
 	./build.sh python
 	./build.sh php
 	./build.sh java
+	echo "all done"
+	exit 0
+
 ;; php )
         export SWIG_TARGET_INCLUDE_FLAGS="`php-config --includes`"
         export SWIG_TARGET_LIBDIR="`php-config --extension-dir`"
