@@ -4,6 +4,7 @@ set -e
 export SWIG_TARGET=$1
 
 export EXO_EXODUS_INCLUDE_FLAGS="-I../../exodus/exodus"
+export EXO_WRAPPER_FLAGS="-fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes"
 export EXO_EXODUS_LDFLAGS="-lexodus"
 #defaults
 export SWIG_WRAPPER_EXT=cxx
@@ -86,7 +87,7 @@ echo Compiling
 #g++ -shared exodus_wrap.o -o exodus.so -L.libs -lexodus -lpython2.6 -Wl,-no-undefined
 
 
-gcc -c exodus_wrap.$SWIG_WRAPPER_EXT -fPIC $SWIG_TARGET_INCLUDE_FLAGS $EXO_EXODUS_INCLUDE_FLAGS
+gcc -c exodus_wrap.$SWIG_WRAPPER_EXT -fPIC $SWIG_TARGET_INCLUDE_FLAGS $EXO_EXODUS_INCLUDE_FLAGS $EXO_WRAPPER_FLAGS
 
 g++ -shared exodus_wrap.o -o $SWIG_MODULE_FILENAME $EXO_EXODUS_LDFLAGS $SWIG_TARGET_LDFLAGS
 
@@ -98,8 +99,8 @@ if [ "$SWIG_TARGET_LIBDIR" != "" ]; then
 	echo sudo cp -f $SWIG_MODULE_FILENAME $SWIG_TARGET_LIBDIR/
 	     sudo cp -f $SWIG_MODULE_FILENAME $SWIG_TARGET_LIBDIR/
 fi
-if [ "$SWIG_PERL_MODULEDIR" != "" ]; then
+if [ "$SWIG_PERLMODULE_DIR" != "" ]; then
 	echo sudo cp -f $SWIG_PERLMODULE_FILENAME $SWIG_PERLMODULE_DIR/
 	     sudo cp -f $SWIG_PERLMODULE_FILENAME $SWIG_PERLMODULE_DIR/
 fi
-
+sleep 3
