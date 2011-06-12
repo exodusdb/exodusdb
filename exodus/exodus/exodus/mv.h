@@ -996,7 +996,7 @@ public:
 	bool createdb(const var& dbname, var& errmsg) const;
 	bool deletedb(const var& dbname, var& errmsg) const;
 
-	bool createfile(const var& filename,const var& options DEFAULTNULL);
+	bool createfile(const var& filename, const var& options DEFAULTNULL);
 	bool deletefile() const;
 	bool clearfile() const;
 	var listfiles() const;

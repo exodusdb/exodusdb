@@ -61,6 +61,10 @@
 
 %{
 #include "exodus/mv.h"
+//#include "exodus/mvenvironment.h"
+//#include "exodus/exodusfuncs.h"
 %}
 
 %include "exodus/mv.h"
+//%include "exodus/mvenvironment.h"
+//%include "exodus/exodusfuncs.h"
