@@ -25,6 +25,22 @@ THE SOFTWARE.
 
 #include <exodus/mv.h>
 
+#ifndef DLL_PUBLIC
+#define DLL_PUBLIC
+#endif
+
+#ifdef SWIG
+#       define DEFAULTNULL
+#       define DEFAULTDOT
+#       define DEFAULTSPACE
+#       define DEFAULTVM
+#else
+#       define DEFAULTNULL =L""
+#       define DEFAULTDOT =L"."
+#       define DEFAULTSPACE =L" "
+#       define DEFAULTVM =VM_
+#endif
+
 //add global function type syntax to the exodus users
 namespace exodus
 {
@@ -43,22 +59,22 @@ DLL_PUBLIC var time();
 DLL_PUBLIC var timedate();
 DLL_PUBLIC void ossleep(const int milliseconds);
 DLL_PUBLIC var ostime();
-DLL_PUBLIC bool osopen(const var& osfilename, var& osfilevar, const var& locale=L"");
+DLL_PUBLIC bool osopen(const var& osfilename, var& osfilevar, const var& locale DEFAULTNULL);
 DLL_PUBLIC void osclose(const var& osfilevar);
 DLL_PUBLIC var osbread(const var& osfilevar, var& startoffset, const int length);
 DLL_PUBLIC bool osbread(var& data, const var& osfilevar, var& startoffset, const int length);
 DLL_PUBLIC bool osbwrite(const var& data, const var& osfilevar, var& startoffset);
 
-DLL_PUBLIC bool osread(var& data, const var& osfilename, const var& locale=L"");
+DLL_PUBLIC bool osread(var& data, const var& osfilename, const var& locale DEFAULTNULL);
 DLL_PUBLIC var osread(const var& osfilename);
-DLL_PUBLIC bool oswrite(const var& data,const var& osfilename, const var& locale=L"");
+DLL_PUBLIC bool oswrite(const var& data,const var& osfilename, const var& locale DEFAULTNULL);
 
 DLL_PUBLIC bool osdelete(const var& osfilename);
 DLL_PUBLIC bool osrename(const var& oldosdir_or_filename, const var& newosdir_or_filename);
 DLL_PUBLIC bool oscopy(const var& fromosdir_or_filename, const var& newosdir_or_filename);
-DLL_PUBLIC var oslist(const var& path=L".", const var& wildcard=L"", const int mode=0);
-DLL_PUBLIC var oslistf(const var& path=L".", const var& wildcard=L"");
-DLL_PUBLIC var oslistd(const var& path=L".", const var& wildcard=L"");
+DLL_PUBLIC var oslist(const var& path DEFAULTDOT, const var& wildcard DEFAULTNULL, const int mode=0);
+DLL_PUBLIC var oslistf(const var& path DEFAULTDOT, const var& wildcard DEFAULTNULL);
+DLL_PUBLIC var oslistd(const var& path DEFAULTDOT, const var& wildcard DEFAULTNULL);
 DLL_PUBLIC var osfile(const var& filename);
 DLL_PUBLIC var osdir(const var& filename);
 DLL_PUBLIC bool osmkdir(const var& dirname);
@@ -71,7 +87,7 @@ DLL_PUBLIC var osshell(const var& command);
 DLL_PUBLIC var osshellread(const var& command);
 DLL_PUBLIC void osshellread(var& readstr, const var& command);
 DLL_PUBLIC void osshellwrite(const var& writestr, const var& command);
-DLL_PUBLIC void stop(const var& text=L"");
+DLL_PUBLIC void stop(const var& text DEFAULTNULL);
 DLL_PUBLIC void abort(const var& text);//dont confuse with abort() which is standard c/c++
 DLL_PUBLIC var perform(const var& command);
 DLL_PUBLIC var execute(const var& command);
@@ -83,8 +99,8 @@ DLL_PUBLIC bool setxlocale(const var& locale);
 DLL_PUBLIC var getxlocale();
 
 void print(const var& var2);
-void printl(const var& var2=L"");
-void printt(const var& var2=L"");
+void printl(const var& var2 DEFAULTNULL);
+void printt(const var& var2 DEFAULTNULL);
 
 	//MATH/BOOLEAN
 DLL_PUBLIC var abs(const var& num1);
@@ -125,8 +141,8 @@ DLL_PUBLIC var len(const var& var2);
 DLL_PUBLIC var length(const var& var2);
 DLL_PUBLIC var& converter(var& instring, const var& oldchars, const var& newchars);
 DLL_PUBLIC var convert(const var& instring, const var& oldchars, const var& newchars);
-DLL_PUBLIC var& swapper(var& instring, const var& oldstr, const var& newstr, const var& options=L"");
-DLL_PUBLIC var swap(const var& instring, const var& oldstr, const var& newstr, const var& options=L"");
+DLL_PUBLIC var& swapper(var& instring, const var& oldstr, const var& newstr, const var& options DEFAULTNULL);
+DLL_PUBLIC var swap(const var& instring, const var& oldstr, const var& newstr, const var& options DEFAULTNULL);
 DLL_PUBLIC var& ucaser(var& instring);
 DLL_PUBLIC var ucase(const var& instring);
 DLL_PUBLIC var& lcaser(var& instring);
@@ -150,12 +166,12 @@ DLL_PUBLIC var& unquoter(var& instring);
 DLL_PUBLIC var unquote(const var& instring);
 DLL_PUBLIC var& fieldstorer(var& instring, const var& sepchar,const int fieldno, const int nfields,const var& replacement);
 DLL_PUBLIC var fieldstore(const var& instring, const var& sepchar,const int fieldno, const int nfields,const var& replacement);
-DLL_PUBLIC var& trimmer(var& instring, const wchar_t* trimchars=L" ");
-DLL_PUBLIC var trim(const var& instring, const wchar_t* trimchars=L" ");
-DLL_PUBLIC var& trimmerf(var& instring, const wchar_t* trimchars=L" ");
-DLL_PUBLIC var trimf(const var& instring, const wchar_t* trimchars=L" ");
-DLL_PUBLIC var& trimmerb(var& instring, const wchar_t* trimchars=L" ");
-DLL_PUBLIC var trimb(const var& instring, const wchar_t* trimchars=L" ");
+DLL_PUBLIC var& trimmer(var& instring, const wchar_t* trimchars DEFAULTSPACE);
+DLL_PUBLIC var trim(const var& instring, const wchar_t* trimchars DEFAULTSPACE);
+DLL_PUBLIC var& trimmerf(var& instring, const wchar_t* trimchars DEFAULTSPACE);
+DLL_PUBLIC var trimf(const var& instring, const wchar_t* trimchars DEFAULTSPACE);
+DLL_PUBLIC var& trimmerb(var& instring, const wchar_t* trimchars DEFAULTSPACE);
+DLL_PUBLIC var trimb(const var& instring, const wchar_t* trimchars DEFAULTSPACE);
 DLL_PUBLIC var& trimmer(var& instring, const var trimchars);
 DLL_PUBLIC var trim(const var& instring, const var trimchars);
 DLL_PUBLIC var& trimmerf(var& instring, const var trimchars);
@@ -166,7 +182,7 @@ DLL_PUBLIC var crop(const var& instring);
 DLL_PUBLIC var cropper(var& instring);
 DLL_PUBLIC var chr(const var& integer);
 DLL_PUBLIC var chr(const int integer);
-DLL_PUBLIC bool match(const var& instring, const var& matchstr, const var& options=L"");
+DLL_PUBLIC bool match(const var& instring, const var& matchstr, const var& options DEFAULTNULL);
 DLL_PUBLIC var seq(const var& char1);
 DLL_PUBLIC var str(const var& instring, const int number);
 DLL_PUBLIC var space(const int number);
@@ -184,19 +200,19 @@ DLL_PUBLIC var oconv(const var& instring, const wchar_t* conversion);
 DLL_PUBLIC var oconv(const var& instring, const var& conversion);
 DLL_PUBLIC var iconv(const var& instring, const wchar_t* conversion);
 DLL_PUBLIC var iconv(const var& instring, const var& conversion);
-DLL_PUBLIC bool connect(const var& connectionstring=L"");
+DLL_PUBLIC bool connect(const var& connectionstring DEFAULTNULL);
 DLL_PUBLIC bool disconnect();
 DLL_PUBLIC bool createdb(const var& dbname);
 DLL_PUBLIC bool deletedb(const var& dbname);
 DLL_PUBLIC bool createdb(const var& dbname, var& errmsg);
 DLL_PUBLIC bool deletedb(const var& dbname, var& errmsg);
-DLL_PUBLIC bool createfile(const var& filename,const var& options=L"");
+DLL_PUBLIC bool createfile(const var& filename,const var& options DEFAULTNULL);
 DLL_PUBLIC bool deletefile(const var& filename);
 DLL_PUBLIC bool clearfile(const var& filename);
 DLL_PUBLIC var listfiles();
-DLL_PUBLIC bool createindex(const var& filename, const var& fieldname, const var& dictfilename=L"");
+DLL_PUBLIC bool createindex(const var& filename, const var& fieldname, const var& dictfilename DEFAULTNULL);
 DLL_PUBLIC bool deleteindex(const var& filename, const var& fieldname);
-DLL_PUBLIC var listindexes(const var& filename=L"");
+DLL_PUBLIC var listindexes(const var& filename DEFAULTNULL);
 DLL_PUBLIC bool begintrans();
 DLL_PUBLIC bool rollbacktrans();
 DLL_PUBLIC bool committrans();
@@ -214,11 +230,11 @@ DLL_PUBLIC bool writev(const var& record, const var& filehandle,const var& key,c
 DLL_PUBLIC bool deleterecord(const var& filehandle, const var& key);
 DLL_PUBLIC bool updaterecord(const var& record, const var& filehandle,const var& key);
 DLL_PUBLIC bool insertrecord(const var& record, const var& filehandle,const var& key);
-DLL_PUBLIC bool select(const var& sortselectclause = L"");
+DLL_PUBLIC bool select(const var& sortselectclause DEFAULTNULL);
 DLL_PUBLIC void clearselect();
 DLL_PUBLIC bool readnext(var& key);
 DLL_PUBLIC bool readnext(var& key, var& valueno);
-DLL_PUBLIC bool selectrecord(const var& sortselectclause = L"");
+DLL_PUBLIC bool selectrecord(const var& sortselectclause DEFAULTNULL);
 DLL_PUBLIC bool readnextrecord(var& record, var& key);
 /* done in ExodusProgramBase and MvEnvironment now
 DLL_PUBLIC var calculate(const var& fieldname);
