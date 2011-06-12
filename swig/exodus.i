@@ -47,6 +47,18 @@
 
 #endif
 
+#ifdef SWIGPERL
+%include "perl5/perl5.swg"
+//%include "perl5/perlmain.i"
+%include "perl5/typemaps.i"
+%include "perl5/std_string.i"
+//%include "std/std_basic_string.i"
+//%include "std/std_wstring.i"
+
+%rename(__toString) tostring;
+
+#endif
+
 %{
 #include "exodus/mv.h"
 %}
