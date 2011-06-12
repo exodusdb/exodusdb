@@ -857,7 +857,10 @@ public:
 	var seq() const;
 	var dcount(const var& substrx) const;
 	var count(const var& substrx) const;
+#ifndef SWIGPERL
+//swig-perl chokes on this one character version with "SWIG_AsVal_wchar_t not defined" so skip it for now (can use slow var& version)
 	var count(const wchar_t charx) const;
+#endif
 	var length() const;
 	var len() const;
 	const wchar_t* data() const;
