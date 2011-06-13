@@ -50,12 +50,26 @@ rem ----------------
     if "%CONFIGURATION%" EQU "" set CONFIGURATION=Release
     if "%EXO_TOOLSET%"   EQU "" set EXO_TOOLSET=SDK71
 
-    if "%EXO_POSTGRES_VER%" EQU "" set EXO_POSTGRES_VER=9.0
+    if "%EXO_POSTGRES_PREFIX%" EQU "" set EXO_POSTGRES_PREFIX=
+    if "%EXO_POSTGRES_VER%"    EQU "" set EXO_POSTGRES_VER=9.0
 
-    if "%EXO_BOOST_VER%" EQU "" set EXO_BOOST_VER=1_46_1
-    if "%EXO_BOOSTPRO%"  EQU "" set EXO_BOOSTPRO=NO
+    if "%EXO_BOOST_PREFIX%"  EQU "" set EXO_BOOST_PREFIX=Boost_
+    if "%EXO_BOOST_VER%"     EQU "" set EXO_BOOST_VER=1_46_1
+    if "%EXO_BOOSTPRO%"      EQU "" set EXO_BOOSTPRO=NO
 
-    if "%EXO_BUILD_ROOT%" EQU "" set EXO_BUILD_ROOT=
+    if "%EXO_ICU_PREFIX%" EQU "" set EXO_ICU_PREFIX=icu
+    if "%EXO_ICU_VER%"    EQU "" set EXO_ICU_VER=
+    if "%EXO_ICU_SUFFIX%" EQU "" set EXO_ICU_SUFFIX=/source
+
+    if "%EXO_SWIG_PREFIX%"   EQU "" set EXO_SWIG_PREFIX=swigwin-
+    if "%EXO_SWIG_VER%"      EQU "" set EXO_SWIG_VER=2.0.4
+
+set EXO_SWIG_OPTIONS="-w503,314,389,361,362,370,383,384"
+
+    if "%EXO_PYTHON_PREFIX%" EQU "" set EXO_PYTHON_PREFIX=Python
+    if "%EXO_PYTHON_VER%"    EQU "" set EXO_PYTHON_VER=27
+
+    if "%EXO_BUILD_ROOT%"    EQU "" set EXO_BUILD_ROOT=
 
     if "%EXO_PROGRAMFILES_ROOT%" EQU "" set EXO_PROGRAMFILES_ROOT=C:
 
@@ -146,16 +160,21 @@ if "%EXO_CONFIGMODE%" EQU "CLEAN"  goto afterlibs
 if "%EXO_CONFIGMODE%" EQU "PACK"   goto afterlibs
 if "%EXO_CONFIGMODE%" EQU "UPLOAD" goto afterlibs
 
+rem ----- ICU -----
+rem ---------------
+    set ICU32=%EXO_BUILD_ROOT%\%EXO_ICU_PREFIX%%EXO_ICU_VER%%EXO_ICU_SUFFIX%
+    set ICU64=%EXO_BUILD_ROOT%\%EXO_ICU_PREFIX%%EXO_ICU_VER%%EXO_ICU_SUFFIX%
+
 rem ----- BUILT BOOST -----
-rem ---------------------------
-    set BOOST32=%EXO_BUILD_ROOT%\boost_%EXO_BOOST_VER%
-    set BOOST64=%EXO_BUILD_ROOT%\boost_%EXO_BOOST_VER%
+rem -----------------------
+    set BOOST32=%EXO_BUILD_ROOT%\%EXO_BOOST_PREFIX%%EXO_BOOST_VER%
+    set BOOST64=%EXO_BUILD_ROOT%\%EXO_BOOST_PREFIX%%EXO_BOOST_VER%
 
 
 rem ----- INSTALLED BOOST -----
 rem ---------------------------
-    IF "%BOOSTPRO%" EQU "YES" set BOOST32=%EXO_PROGRAMFILES32%\Boost\boost_%EXO_BOOST_VER%
-    IF "%BOOSTPRO%" EQU "YES" set BOOST64=%EXO_PROGRAMFILES64%\Boost\boost_%EXO_BOOST_VER%
+    IF "%BOOSTPRO%" EQU "YES" set BOOST32=%EXO_PROGRAMFILES32%\Boost\%EXO_BOOST_PREFIX%%EXO_BOOST_VER%
+    IF "%BOOSTPRO%" EQU "YES" set BOOST64=%EXO_PROGRAMFILES64%\Boost\%EXO_BOOST_PREFIX%%EXO_BOOST_VER%
 
 rem --- CHECK BOOST ---
 rem -------------------
@@ -189,8 +208,8 @@ rem stage\lib
 
 rem ----- POSTGRES -----
 rem --------------------
-    set POSTGRES32=%EXO_PROGRAMFILES32%\PostgreSQL\%EXO_POSTGRES_VER%
-    set POSTGRES64=%EXO_PROGRAMFILES64%\PostgreSQL\%EXO_POSTGRES_VER%
+    set POSTGRES32=%EXO_PROGRAMFILES32%\PostgreSQL\%EXO_POSTGRES_PREFIX%%EXO_POSTGRES_VER%
+    set POSTGRES64=%EXO_PROGRAMFILES64%\PostgreSQL\%EXO_POSTGRES_PREFIX%%EXO_POSTGRES_VER%
 
 rem check postgres master directory exists
     if "%TARGET_CPU%" EQU "x86" set EXO_POSTGRES=%EXO_PROGRAMFILES32%\PostgreSQL\
@@ -207,6 +226,43 @@ rem check postgres ver include (assume libs can be found there too)
 	echo "Error: config.cmd: EXO_POSTGRES_INCLUDE="%EXO_POSTGRES_INCLUDE%" does not exist" 1>&2
 	goto exit
 :gotpostgresinclude
+
+rem ----- SWIG -----
+rem ----------------
+    set SWIG32=%EXO_BUILD_ROOT%\%EXO_SWIG_PREFIX%%EXO_SWIG_VER%
+    set SWIG64=%EXO_BUILD_ROOT%\%EXO_SWIG_PREFIX%%EXO_SWIG_VER%
+
+rem check postgres master directory exists
+    if "%TARGET_CPU%" EQU "x86" set EXO_SWIG=EXO_SWIG32
+    if "%TARGET_CPU%" EQU "x64" set EXO_SWIG=EXO_SWIG64
+rem dont check for now in case they are not building the SWIG bindings
+rem    if exist "%EXO_SWIG%" goto gotSWIG
+rem	echo "Error: config.cmd: EXO_SWIG="%EXO_SWIG%" does not exist" 1>&2
+rem	goto exit
+:gotSWIG
+
+rem ----- PYTHON -----
+rem ------------------
+    set PYTHON32=%EXO_BUILD_ROOT%\%EXO_PYTHON_PREFIX%%EXO_PYTHON_VER%
+    set PYTHON64=%EXO_BUILD_ROOT%\%EXO_PYTHON_PREFIX%%EXO_PYTHON_VER%
+
+rem check postgres master directory exists
+    if "%TARGET_CPU%" EQU "x86" set EXO_PYTHON=EXO_PYTHON32
+    if "%TARGET_CPU%" EQU "x64" set EXO_PYTHON=EXO_PYTHON64
+rem dont check for now in case they are not building the python bindings
+rem    if exist "%EXO_PYTHON%" goto gotpython
+rem	echo "Error: config.cmd: EXO_PYTHON="%EXO_PYTHON%" does not exist" 1>&2
+rem	goto exit
+:gotpython
+
+rem check postgres ver include (assume libs can be found there too)
+    if "%TARGET_CPU%" EQU "x86" set EXO_POSTGRES_INCLUDE=%POSTGRES32%\include
+    if "%TARGET_CPU%" EQU "x64" set EXO_POSTGRES_INCLUDE=%POSTGRES64%\include
+    if exist "%EXO_POSTGRES_INCLUDE%\*.*" goto gotpostgresinclude
+	echo "Error: config.cmd: EXO_POSTGRES_INCLUDE="%EXO_POSTGRES_INCLUDE%" does not exist" 1>&2
+	goto exit
+:gotpostgresinclude
+
 
 :afterlibs
 
@@ -423,6 +479,8 @@ rem search for the latest version of VS Professional or Express
     if "%EXO_VS%" =="" set EXO_VS=%VS100COMNTOOLS%
     if "%EXO_VS%" =="" set EXO_VS=%VS90COMNTOOLS%
     if "%EXO_VS%" =="" set EXO_VS=%VS80COMNTOOLS%
+
+if exist "%EXO_VS%..\..\VC\vcvarsall.bat" set EXO_DEVPROMPTCMD="%EXO_VS%..\..\VC\vcvarsall.bat"
 
 if exist "%EXO_VS%..\IDE\devenv.exe" set EXO_DEVCMD="%EXO_VS%..\IDE\devenv" %EXO_PROJECT%.sln
 if exist "%EXO_VS%..\IDE\devenv.exe" goto afterdevcmd

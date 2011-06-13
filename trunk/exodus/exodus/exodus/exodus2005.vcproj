@@ -43,8 +43,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..;&quot;$(BOOST32)\&quot;;&quot;$(POSTGRES32)\include&quot;"
-				PreprocessorDefinitions="BUILDING_LIBRARY;DEBUG"
+				AdditionalIncludeDirectories="..;&quot;$(BOOST32)\&quot;;&quot;$(POSTGRES32)\include&quot;;&quot;$(ICU32)\common&quot;;&quot;$(ICU32)\i18n&quot;"
+				PreprocessorDefinitions="BOOST_HASNT_ICU;BUILDING_LIBRARY;DEBUG"
 				MinimalRebuild="true"
 				ExceptionHandling="1"
 				BasicRuntimeChecks="3"
@@ -204,8 +204,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
-				AdditionalIncludeDirectories="..;&quot;$(BOOST32)\&quot;;&quot;$(POSTGRES32)\include&quot;"
-				PreprocessorDefinitions="BUILDING_LIBRARY;NDEBUG"
+				AdditionalIncludeDirectories="..;&quot;$(BOOST32)\&quot;;&quot;$(POSTGRES32)\include&quot;;&quot;$(ICU32)\common&quot;;&quot;$(ICU32)\i18n&quot;"
+				PreprocessorDefinitions="BOOST_HASNT_ICU;BUILDING_LIBRARY;NDEBUG"
 				ExceptionHandling="1"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="2"
