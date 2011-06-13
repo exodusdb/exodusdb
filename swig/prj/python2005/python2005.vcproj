@@ -23,7 +23,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="$(SWIG32)\swig -c++ -python -I..\..\..\exodus\exodus -outcurrentdir $(EXO_SWIG_OPTIONS) ..\..\exodus.i"
+				CommandLine=""
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -102,7 +102,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="$(SWIG32)\swig -c++ -python -I..\..\..\exodus\exodus -outcurrentdir $(EXO_SWIG_OPTIONS) ..\..\exodus.i"
+				CommandLine=""
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -185,10 +185,6 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\exodus.i"
-				>
-			</File>
-			<File
 				RelativePath=".\exodus_wrap.cxx"
 				>
 			</File>
@@ -199,12 +195,30 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 		</Filter>
-		<Filter
-			Name="Resource Files"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
+		<File
+			RelativePath="..\..\exodus.i"
 			>
-		</Filter>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
+					CommandLine="echo Invoking SWIG...&#x0D;&#x0A;echo on&#x0D;&#x0A;$(SWIG32)\swig.exe -c++ -python  -I..\..\..\exodus\exodus -outcurrentdir $(EXO_SWIG_OPTIONS) &quot;$(InputPath)&quot;&#x0D;&#x0A;@echo off&#x0D;&#x0A;"
+					AdditionalDependencies="..\..\..\exodus\exodus\exodus\mv.h"
+					Outputs="$(InputName)_wrap.cxx"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
+					CommandLine="echo Invoking SWIG...&#x0D;&#x0A;echo on&#x0D;&#x0A;$(SWIG32)\swig.exe -c++ -python  -I..\..\..\exodus\exodus -outcurrentdir $(EXO_SWIG_OPTIONS) &quot;$(InputPath)&quot;&#x0D;&#x0A;@echo off&#x0D;&#x0A;"
+					AdditionalDependencies="..\..\..\exodus\exodus\exodus\mv.h"
+					Outputs="$(InputName)_wrap.cxx"
+				/>
+			</FileConfiguration>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>
