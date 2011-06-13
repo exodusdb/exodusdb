@@ -213,15 +213,19 @@ namespace exodus {
 	#define MV_CONSTRUCTION_FROM_CHAR_EXPLICIT
 #endif
 
-//TODO ensure locale doesnt produce like 123.456,78
-std::wstring intToString(int int1);
-
 class dim;
 class var__extractreplace;
 class PFstream;
 
+#ifndef SWIG
+
+//TODO ensure locale doesnt produce like 123.456,78
+std::wstring intToString(int int1);
+
 //TODO ensure locale doesnt produce like 123.456,78
 std::wstring dblToString(double double1);
+
+#endif
 
 //#define arg const var& - too likely to conflict with things eg in postgres library
 //#define call - conflicts with dynamic so/dll load/call
@@ -1558,7 +1562,9 @@ void DLL_PUBLIC logputl(const var& var1 DEFAULTNULL);
 
 var DLL_PUBLIC backtrace();
 
+#ifndef SWIG
 std::string naturalorder(const std::string& string1);
+#endif
 
 int DLL_PUBLIC getenvironmentn();
 void DLL_PUBLIC setenvironmentn(const int environmentn);
