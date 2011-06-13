@@ -110,6 +110,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testmain", "test\src\testma
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "python2005", "swig\prj\python2005\python2005.vcproj", "{51C15B0E-DD34-4EBC-A7A7-77071EBF5BBE}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "php2005", "swig\prj\php2005\php2005.vcproj", "{25EC48FB-359B-4E96-B2EA-13C80BB0F550}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "perl2005", "swig\prj\perl2005\perl2005.vcproj", "{46C3E9C4-5C5F-40F0-8DC3-FEDD0D3D6A1D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -260,6 +264,18 @@ Global
 		{51C15B0E-DD34-4EBC-A7A7-77071EBF5BBE}.Release|Win32.ActiveCfg = Release|Win32
 		{51C15B0E-DD34-4EBC-A7A7-77071EBF5BBE}.Release|Win32.Build.0 = Release|Win32
 		{51C15B0E-DD34-4EBC-A7A7-77071EBF5BBE}.Release|x64.ActiveCfg = Release|Win32
+		{25EC48FB-359B-4E96-B2EA-13C80BB0F550}.Debug|Win32.ActiveCfg = Debug|Win32
+		{25EC48FB-359B-4E96-B2EA-13C80BB0F550}.Debug|Win32.Build.0 = Debug|Win32
+		{25EC48FB-359B-4E96-B2EA-13C80BB0F550}.Debug|x64.ActiveCfg = Debug|Win32
+		{25EC48FB-359B-4E96-B2EA-13C80BB0F550}.Release|Win32.ActiveCfg = Release|Win32
+		{25EC48FB-359B-4E96-B2EA-13C80BB0F550}.Release|Win32.Build.0 = Release|Win32
+		{25EC48FB-359B-4E96-B2EA-13C80BB0F550}.Release|x64.ActiveCfg = Release|Win32
+		{46C3E9C4-5C5F-40F0-8DC3-FEDD0D3D6A1D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{46C3E9C4-5C5F-40F0-8DC3-FEDD0D3D6A1D}.Debug|Win32.Build.0 = Debug|Win32
+		{46C3E9C4-5C5F-40F0-8DC3-FEDD0D3D6A1D}.Debug|x64.ActiveCfg = Debug|Win32
+		{46C3E9C4-5C5F-40F0-8DC3-FEDD0D3D6A1D}.Release|Win32.ActiveCfg = Release|Win32
+		{46C3E9C4-5C5F-40F0-8DC3-FEDD0D3D6A1D}.Release|Win32.Build.0 = Release|Win32
+		{46C3E9C4-5C5F-40F0-8DC3-FEDD0D3D6A1D}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

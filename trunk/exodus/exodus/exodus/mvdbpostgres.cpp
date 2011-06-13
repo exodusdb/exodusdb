@@ -1925,7 +1925,11 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	if (maxnrecs)
 		sql ^= L" LIMIT " ^ maxnrecs;
 
-//outputl(sql);
+	//DEBUG_LOG_SQL
+	if (DBTRACE)
+	{
+		exodus::logputl(sql);
+	}
 
 	//Start a transaction block because postgres select requires to be inside one
 	if (!begintrans())

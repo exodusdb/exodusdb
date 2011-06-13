@@ -1,3 +1,4 @@
+set PERL32=D:\Perl
 rem ---------------------------------------------------------
 rem --- dev.cmd, make.cmd, clean.cmd, pack.cmd and upload.cmd
 rem ---  all call this config.cmd to initialise           ---
@@ -68,6 +69,9 @@ set EXO_SWIG_OPTIONS="-w503,314,389,361,362,370,383,384"
 
     if "%EXO_PYTHON_PREFIX%" EQU "" set EXO_PYTHON_PREFIX=Python
     if "%EXO_PYTHON_VER%"    EQU "" set EXO_PYTHON_VER=27
+
+    if "%EXO_PHP_PREFIX%" EQU "" set EXO_PHP_PREFIX=php-
+    if "%EXO_PHP_VER%"    EQU "" set EXO_PHP_VER=5.3.6
 
     if "%EXO_BUILD_ROOT%"    EQU "" set EXO_BUILD_ROOT=
 
@@ -246,7 +250,7 @@ rem ------------------
     set PYTHON32=%EXO_BUILD_ROOT%\%EXO_PYTHON_PREFIX%%EXO_PYTHON_VER%
     set PYTHON64=%EXO_BUILD_ROOT%\%EXO_PYTHON_PREFIX%%EXO_PYTHON_VER%
 
-rem check postgres master directory exists
+rem check python master directory exists
     if "%TARGET_CPU%" EQU "x86" set EXO_PYTHON=EXO_PYTHON32
     if "%TARGET_CPU%" EQU "x64" set EXO_PYTHON=EXO_PYTHON64
 rem dont check for now in case they are not building the python bindings
@@ -255,13 +259,38 @@ rem	echo "Error: config.cmd: EXO_PYTHON="%EXO_PYTHON%" does not exist" 1>&2
 rem	goto exit
 :gotpython
 
-rem check postgres ver include (assume libs can be found there too)
-    if "%TARGET_CPU%" EQU "x86" set EXO_POSTGRES_INCLUDE=%POSTGRES32%\include
-    if "%TARGET_CPU%" EQU "x64" set EXO_POSTGRES_INCLUDE=%POSTGRES64%\include
-    if exist "%EXO_POSTGRES_INCLUDE%\*.*" goto gotpostgresinclude
-	echo "Error: config.cmd: EXO_POSTGRES_INCLUDE="%EXO_POSTGRES_INCLUDE%" does not exist" 1>&2
+goto gotpythoninclude
+rem check python ver include (assume libs can be found there too)
+    if "%TARGET_CPU%" EQU "x86" set EXO_PYTHON_INCLUDE=%PYTHON32%\include
+    if "%TARGET_CPU%" EQU "x64" set EXO_PYTHON_INCLUDE=%PYTHON64%\include
+    if exist "%EXO_PYTHON_INCLUDE%\*.*" goto gotpythoninclude
+	echo "Error: config.cmd: EXO_PYTHON_INCLUDE="%EXO_PYTHON_INCLUDE%" does not exist" 1>&2
 	goto exit
-:gotpostgresinclude
+:gotpythoninclude
+
+
+rem ----- PHP -----
+rem ------------------
+    set PHP32=%EXO_BUILD_ROOT%\%EXO_PHP_PREFIX%%EXO_PHP_VER%
+    set PHP64=%EXO_BUILD_ROOT%\%EXO_PHP_PREFIX%%EXO_PHP_VER%
+
+rem check php master directory exists
+    if "%TARGET_CPU%" EQU "x86" set EXO_PHP=EXO_PHP32
+    if "%TARGET_CPU%" EQU "x64" set EXO_PHP=EXO_PHP64
+rem dont check for now in case they are not building the php bindings
+rem    if exist "%EXO_PHP%" goto gotphp
+rem	echo "Error: config.cmd: EXO_PHP="%EXO_PHP%" does not exist" 1>&2
+rem	goto exit
+:gotphp
+
+goto gotphpinclude
+rem check php ver include (assume libs can be found there too)
+    if "%TARGET_CPU%" EQU "x86" set EXO_PHP_INCLUDE=%PHP32%\include
+    if "%TARGET_CPU%" EQU "x64" set EXO_PHP_INCLUDE=%PHP64%\include
+    if exist "%EXO_PHP_INCLUDE%\*.*" goto gotphpinclude
+	echo "Error: config.cmd: EXO_PHP_INCLUDE="%EXO_PHP_INCLUDE%" does not exist" 1>&2
+	goto exit
+:gotphpinclude
 
 
 :afterlibs

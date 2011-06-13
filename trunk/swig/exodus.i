@@ -30,7 +30,8 @@
 }
 */
 
-%rename(__repr__) tostring;
+//%rename(__repr__) tostring;
+%rename(__str__) tostring;
 #endif
 
 #ifdef SWIGPHP
@@ -55,7 +56,8 @@
 //%include "std/std_basic_string.i"
 //%include "std/std_wstring.i"
 
-%rename(__toString) tostring;
+//%rename(__toString) tostring;
+%rename(toString) tostring;
 
 #endif
 

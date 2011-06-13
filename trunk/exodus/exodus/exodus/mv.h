@@ -754,7 +754,9 @@ public:
 	bool osgetenv(const var& name);
 	bool ossetenv(const var& name) const;
 	void stop(const var& text DEFAULTNULL) const;
+#ifndef SWIGPERL
 	void abort(const var& text DEFAULTNULL) const;
+#endif
 	var perform() const;
 	var execute() const;
 	var chain() const;
@@ -987,7 +989,9 @@ public:
 	var sum(const var& sepchar DEFAULTVM) const;
 
 	//var FILE I/O
+#ifndef SWIGPERL
 	bool connect(const var& conninfo DEFAULTNULL);
+#endif
 	bool disconnect();
 	bool setdefaultconnection();
 
@@ -1011,8 +1015,9 @@ public:
 
 	bool open(const var& dbfilename, const var& dbconnection DEFAULTNULL);
 	void close();
-
+#ifndef SWIGPERL
 	bool select(const var& sortselectclause DEFAULTNULL) const;
+#endif
 	void clearselect() const;
 	bool readnext(var& key) const;
 	bool readnext(var& key, var& valueno) const;
