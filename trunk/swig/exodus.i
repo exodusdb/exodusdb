@@ -56,8 +56,10 @@
 //%include "std/std_basic_string.i"
 //%include "std/std_wstring.i"
 
+//http://perldoc.perl.org/overload.html
 //%rename(__toString) tostring;
-%rename(toString) tostring;
+//%rename(as_string) tostring;
+//%rename(to_str) tostring;
 
 #endif
 
