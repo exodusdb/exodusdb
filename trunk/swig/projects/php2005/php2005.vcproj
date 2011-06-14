@@ -61,7 +61,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				ShowProgress="2"
-				OutputFile="$(OutDir)\exodus_php.dll"
+				OutputFile="$(OutDir)\exophp.dll"
 				AdditionalLibraryDirectories="$(PYTHON32)/Libs"
 				DelayLoadDLLs=""
 				GenerateDebugInformation="true"
@@ -137,7 +137,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				ShowProgress="2"
-				OutputFile="$(OutDir)\exodus_php.dll"
+				OutputFile="$(OutDir)\exophp.dll"
 				AdditionalLibraryDirectories="$(PYTHON32)/Libs"
 				IgnoreAllDefaultLibraries="false"
 				DelayLoadDLLs=""
@@ -207,7 +207,7 @@
 				>
 				<Tool
 					Name="VCCustomBuildTool"
-					CommandLine="echo Invoking SWIG...&#x0D;&#x0A;echo on&#x0D;&#x0A;if not exist $(SolutionDir)$(ConfigurationName)\swig $(SolutionDir)$(ConfigurationName)\swig&#x0D;&#x0A;$(SWIG32)\swig.exe -c++ -php -outdir $(SolutionDir)$(ConfigurationName)\swig -I..\..\..\exodus\exodus -outcurrentdir $(EXO_SWIG_OPTIONS) &quot;$(InputPath)&quot;&#x0D;&#x0A;@echo off&#x0D;&#x0A;"
+					CommandLine="echo Invoking SWIG...&#x0D;&#x0A;echo on&#x0D;&#x0A;if not exist $(SolutionDir)$(ConfigurationName)\swig $(SolutionDir)$(ConfigurationName)\swig&#x0D;&#x0A;$(SWIG32)\swig.exe -c++ -php -module exophp -outdir $(SolutionDir)$(ConfigurationName)\swig -I..\..\..\exodus\exodus -outcurrentdir $(EXO_SWIG_OPTIONS) &quot;$(InputPath)&quot;&#x0D;&#x0A;@echo off&#x0D;&#x0A;"
 					AdditionalDependencies="..\..\..\exodus\exodus\exodus\mv.h"
 					Outputs="$(InputName)_wrap.cxx"
 				/>

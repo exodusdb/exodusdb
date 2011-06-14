@@ -3633,7 +3633,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_var_towstring(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_var_toWString(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   exodus::var *arg1 = (exodus::var *) 0 ;
   void *argp1 = 0 ;
@@ -3641,13 +3641,13 @@ SWIGINTERN PyObject *_wrap_var_towstring(PyObject *SWIGUNUSEDPARM(self), PyObjec
   PyObject * obj0 = 0 ;
   std::wstring result;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:var_towstring",&obj0)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"O:var_toWString",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_exodus__var, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "var_towstring" "', argument " "1"" of type '" "exodus::var const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "var_toWString" "', argument " "1"" of type '" "exodus::var const *""'"); 
   }
   arg1 = reinterpret_cast< exodus::var * >(argp1);
-  result = ((exodus::var const *)arg1)->towstring();
+  result = ((exodus::var const *)arg1)->toWString();
   resultobj = SWIG_NewPointerObj((new std::wstring(static_cast< const std::wstring& >(result))), SWIGTYPE_p_std__wstring, SWIG_POINTER_OWN |  0 );
   return resultobj;
 fail:
@@ -3655,7 +3655,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_var___repr__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_var___str__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   exodus::var *arg1 = (exodus::var *) 0 ;
   void *argp1 = 0 ;
@@ -3663,13 +3663,35 @@ SWIGINTERN PyObject *_wrap_var___repr__(PyObject *SWIGUNUSEDPARM(self), PyObject
   PyObject * obj0 = 0 ;
   std::string result;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:var___repr__",&obj0)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"O:var___str__",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_exodus__var, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "var___repr__" "', argument " "1"" of type '" "exodus::var const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "var___str__" "', argument " "1"" of type '" "exodus::var const *""'"); 
   }
   arg1 = reinterpret_cast< exodus::var * >(argp1);
-  result = ((exodus::var const *)arg1)->tostring();
+  result = ((exodus::var const *)arg1)->toString();
+  resultobj = SWIG_From_std_string(static_cast< std::string >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_var_toString2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  exodus::var *arg1 = (exodus::var *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  std::string result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:var_toString2",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_exodus__var, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "var_toString2" "', argument " "1"" of type '" "exodus::var const *""'"); 
+  }
+  arg1 = reinterpret_cast< exodus::var * >(argp1);
+  result = ((exodus::var const *)arg1)->toString2();
   resultobj = SWIG_From_std_string(static_cast< std::string >(result));
   return resultobj;
 fail:
@@ -22953,8 +22975,9 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"var_toBool", _wrap_var_toBool, METH_VARARGS, NULL},
 	 { (char *)"var_toInt", _wrap_var_toInt, METH_VARARGS, NULL},
 	 { (char *)"var_toDouble", _wrap_var_toDouble, METH_VARARGS, NULL},
-	 { (char *)"var_towstring", _wrap_var_towstring, METH_VARARGS, NULL},
-	 { (char *)"var___repr__", _wrap_var___repr__, METH_VARARGS, NULL},
+	 { (char *)"var_toWString", _wrap_var_toWString, METH_VARARGS, NULL},
+	 { (char *)"var___str__", _wrap_var___str__, METH_VARARGS, NULL},
+	 { (char *)"var_toString2", _wrap_var_toString2, METH_VARARGS, NULL},
 	 { (char *)"new_var", _wrap_new_var, METH_VARARGS, NULL},
 	 { (char *)"var___nonzero__", _wrap_var___nonzero__, METH_VARARGS, NULL},
 	 { (char *)"var___call__", _wrap_var___call__, METH_VARARGS, NULL},

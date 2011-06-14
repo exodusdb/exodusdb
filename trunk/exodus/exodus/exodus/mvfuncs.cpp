@@ -130,6 +130,14 @@ void var::stop(const var& text) const
 	exit(0);
 }
 
+/*
+//swig for perl wants it on windows!
+void var::win32_abort(const var& text) const
+{
+	abort(text);
+}
+*/
+
 void var::abort(const var& text) const
 {
 	THISIS(L"void var::abort(const var& text) const")
@@ -326,7 +334,7 @@ void var::createString() const
 	{
 		//skip this test for speed and only call the function if required
 		//str already. no action required
-		//put this first guessing that towstring is most often called on strings;
+		//put this first guessing that toWString is most often called on strings;
 		//case pimpl::MVTYPE_STR:
 		//	return;
 
@@ -353,9 +361,9 @@ void var::createString() const
 
 }
 
-std::wstring var::towstring() const
+std::wstring var::toWString() const
 {
-	THISIS(L"std::wstring var::towstring() const")
+	THISIS(L"std::wstring var::toWString() const")
 	THISISSTRING()
 
 	return var_mvstr;
@@ -1417,7 +1425,7 @@ const var& var::put(std::ostream& ostream1) const
 	}
 
 	//verify conversion to UTF8
-	std::string tempstr=(*this).tostring();
+	std::string tempstr=(*this).toString();
 	ostream1.write(tempstr.data(),(std::streamsize) tempstr.length());
 	return *this;
 }
@@ -1661,7 +1669,7 @@ var var::perform() const
 	THISIS(L"var var::perform() const")
 	THISISSTRING()
 
-	std::cout<<"var::perform not implemented yet "<<tostring()<<std::endl;
+	std::cout<<"var::perform not implemented yet "<<toString()<<std::endl;
 	return L"";
 }
 
@@ -1670,7 +1678,7 @@ var var::chain() const
 	THISIS(L"var var::chain() const")
 	THISISSTRING()
 
-	std::cout<<"var::chain not implemented yet "<<tostring()<<std::endl;
+	std::cout<<"var::chain not implemented yet "<<toString()<<std::endl;
 	return L"";
 }
 
@@ -1679,7 +1687,7 @@ var var::execute() const
 	THISIS(L"var var::execute() const")
 	THISISSTRING()
 
-	std::cout<<"var::execute not implemented yet "<<tostring()<<std::endl;
+	std::cout<<"var::execute not implemented yet "<<toString()<<std::endl;
 	return L"";
 }
 

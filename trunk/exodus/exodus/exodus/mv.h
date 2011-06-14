@@ -20,6 +20,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+//prevent swig perl linking errors about win32_abort win32_select win32_connect
+#if defined(SWIGPERL)
+#if defined connect
+#undef connect
+#endif
+#if defined select
+#undef select
+#endif
+#if defined abort
+#undef abort
+#endif
+#endif
+
 #ifndef MV_H
 #define MV_H 1
 
@@ -46,7 +59,7 @@ THE SOFTWARE.
 #	define wregex regex
 #	define wdirectory_iterator directory_iterator
 #	define Tstring string
-#	define toTstring(item) item.tostring()
+#	define toTstring(item) item.toString()
 #else
 #	define toTstring(item) item.var_mvstr
 #	define Tstring wstring
@@ -282,9 +295,12 @@ public:
 
 	double toDouble() const;
 
-	std::wstring towstring() const;
+	std::wstring toWString() const;
 
-	std::string tostring() const;
+	std::string toString() const;
+
+	//weird version for perl that outputs "" if undefined
+	std::string var::toString2() const;
 
 	//CONSTRUCTORS
 	//////////////
@@ -392,7 +408,7 @@ public:
 
 	//Perhaps should NOT allow automatic convertion to char* since it assumes a conversion to utf8
 	//and cannot hold char(0) perhaps and force people to use
-	//something like .utf8() or .tostring().c_char()
+	//something like .utf8() or .toString().c_char()
 	//This was added to allow the arguments of osread type functions which need cstrings to be cstrings
 	//so that calls with fixed filenames etc dont require a conversion to var and back again
 	//The other solution would be to declare a parallel set of function with var arguments
@@ -408,7 +424,7 @@ public:
 	//EXPLICIT CONVERSIONS TO
 	/////////////////////////
 
-	//wstring - replicates towstring()
+	//wstring - replicates toWString()
 	//would allow the usage of any std::wstring function but may result
 	//in a lot of compilation failures due to "ambiguous overload"
 	//unfortunately there is no "explicit" keyword as for constructors - coming in C++0X
@@ -418,7 +434,7 @@ public:
 		operator std::wstring() const;
 	#endif
 
-	//string - replicates tostring()
+	//string - replicates toString()
 	//would allow the usage of any std::string function but may result
 	//in a lot of compilation failures due to "ambiguous overload"
 	//unfortunately there is no "explicit" keyword as for constructors - coming in C++0X
@@ -754,9 +770,8 @@ public:
 	bool osgetenv(const var& name);
 	bool ossetenv(const var& name) const;
 	void stop(const var& text DEFAULTNULL) const;
-#ifndef SWIGPERL
+
 	void abort(const var& text DEFAULTNULL) const;
-#endif
 	var perform() const;
 	var execute() const;
 	var chain() const;
@@ -865,6 +880,7 @@ public:
 	var count(const var& substrx) const;
 #ifndef SWIGPERL
 //swig-perl chokes on this one character version with "SWIG_AsVal_wchar_t not defined" so skip it for now (can use slow var& version)
+//do something similar to the python config in exodus.i
 	var count(const wchar_t charx) const;
 #endif
 	var length() const;
@@ -989,9 +1005,8 @@ public:
 	var sum(const var& sepchar DEFAULTVM) const;
 
 	//var FILE I/O
-#ifndef SWIGPERL
+
 	bool connect(const var& conninfo DEFAULTNULL);
-#endif
 	bool disconnect();
 	bool setdefaultconnection();
 
@@ -1015,9 +1030,8 @@ public:
 
 	bool open(const var& dbfilename, const var& dbconnection DEFAULTNULL);
 	void close();
-#ifndef SWIGPERL
+
 	bool select(const var& sortselectclause DEFAULTNULL) const;
-#endif
 	void clearselect() const;
 	bool readnext(var& key) const;
 	bool readnext(var& key, var& valueno) const;

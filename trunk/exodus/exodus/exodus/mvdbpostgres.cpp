@@ -95,14 +95,6 @@ THE SOFTWARE.
 #include <exodus/mvutf.h>
 #include <exodus/mvexceptions.h>
 
-//#if TRACING >= 5
-#define DEBUG_LOG_SQL if (DBTRACE) {exodus::logputl(L"SQL:" ^ var(sql));}
-#define DEBUG_LOG_SQL1 if (DBTRACE) {exodus::logputl(L"SQL:" ^ var(sql).swap(L"$1",L"'"^var(paramValues[0])^L"'"));}
-//#else
-//#define DEBUG_LOG_SQL
-//#define DEBUG_LOG_SQL1
-//#endif
-
 namespace exodus {
 
 bool startipc();
@@ -115,6 +107,24 @@ static void connection_DELETER_AND_DESTROYER(CACHED_CONNECTION con_)
 //	delete pgp;
 }
 static MvConnectionsCache mv_connections_cache(connection_DELETER_AND_DESTROYER);
+
+//DBTRACE is set in exodus_main (console programs) but not when used as a plain library
+//so initialise it on the fly. assume that it will usually be less than one for not tracing
+#define GETDBTRACE (DBTRACE>=0&&getdbtrace())
+bool getdbtrace()
+{
+	if (DBTRACE==0)
+		DBTRACE=var().osgetenv(L"EXO_DBTRACE")?1:-1;
+	return DBTRACE>0;
+}
+
+//#if TRACING >= 5
+#define DEBUG_LOG_SQL if (GETDBTRACE) {exodus::logputl(L"SQL:" ^ var(sql));}
+#define DEBUG_LOG_SQL1 if (GETDBTRACE) {exodus::logputl(L"SQL:" ^ var(sql).swap(L"$1",L"'"^var(paramValues[0])^L"'"));}
+//#else
+//#define DEBUG_LOG_SQL
+//#define DEBUG_LOG_SQL1
+//#endif
 
 //#define PGDATAFILEPREFIX "data_"
 #define PGDATAFILEPREFIX L""
@@ -153,7 +163,7 @@ bool var::sqlexec(const var& SqlToExecute) const
 {
 	var errmsg;
 	bool result = sqlexec(SqlToExecute, errmsg);
-	if (not result && DBTRACE)
+	if (not result && GETDBTRACE)
 		errmsg.outputl();
 	return result;
 }
@@ -290,11 +300,14 @@ bool var::connect(const var& conninfo)
 
 	var conninfo2 = build_conn_info(conninfo);
 
+	if (GETDBTRACE)
+		exodus::logputl(L"DBTRACE:" ^ conninfo2);
+
 	PGconn* pgconn;
 	for(;;)
 	{
 #		if defined _MSC_VER //|| defined __CYGWIN__ || defined __MINGW32__
-			if (not msvc_PQconnectdb(&pgconn,conninfo2.tostring()))
+			if (not msvc_PQconnectdb(&pgconn,conninfo2.toString()))
 			{
 #				if TRACING >= 1
 					var libname=L"libpq.dll";
@@ -304,7 +317,7 @@ bool var::connect(const var& conninfo)
 				return false;
 			};
 #		else
-			pgconn=PQconnectdb(conninfo2.tostring().c_str());
+			pgconn=PQconnectdb(conninfo2.toString().c_str());
 #		endif
 
 		if (PQstatus(pgconn) == CONNECTION_OK || conninfo2)
@@ -374,7 +387,7 @@ bool var::connect(const var& conninfo)
 	//but this does
 	//this turns off the notice when creating tables with a primary key
 	//DEBUG5, DEBUG4, DEBUG3, DEBUG2, DEBUG1, LOG, NOTICE, WARNING, ERROR, FATAL, and PANIC
-	sqlexec(DBTRACE ? L"SET client_min_messages = LOG" : L"SET client_min_messages = WARNING");
+	sqlexec(GETDBTRACE ? L"SET client_min_messages = LOG" : L"SET client_min_messages = WARNING");
 
 	return true;
 }
@@ -506,7 +519,7 @@ bool var::open(const var& filename, const var& connection)
 //	uint32_t    binaryIntVal;
 
 	/* Here is our out-of-line parameter value */
-	std::string filename2=filename.lcase().tostring();
+	std::string filename2=filename.lcase().toString();
 	paramValues[0] = filename2.c_str();
 	paramLengths[0] = int(filename2.length());
 	paramFormats[0] = 1;//binary
@@ -523,7 +536,7 @@ bool var::open(const var& filename, const var& connection)
 	DEBUG_LOG_SQL1
 	PGresult* result = PQexecParams(thread_pgconn,
 		//TODO: parameterise filename
-		sql.tostring().c_str(),
+		sql.toString().c_str(),
 		1,       /* one param */
 		NULL,    /* let the backend deduce param type */
 		paramValues,
@@ -599,7 +612,7 @@ bool var::read(const var& filehandle,const var& key)
     int         paramFormats[1];
 	//uint32_t    binaryIntVal;
 
-	std::string key2=key.tostring();
+	std::string key2=key.toString();
 
 	paramValues[0]=key2.c_str();
 	paramLengths[0]=int(key2.length());
@@ -615,7 +628,7 @@ bool var::read(const var& filehandle,const var& key)
 	DEBUG_LOG_SQL1
 	PGresult* result = PQexecParams(thread_pgconn,
 		//TODO: parameterise filename
-		sql.tostring().c_str(),
+		sql.toString().c_str(),
 		1,       /* one param */
 		NULL,    /* let the backend deduce param type */
 		paramValues,
@@ -843,16 +856,15 @@ bool var::sqlexec(const var& sqlcmd, var& errmsg) const
 		return false;
 	}
 
-	//DEBUG_LOG_SQL
-	if (DBTRACE)
+	if (GETDBTRACE)
 	{
 //		exodus::logputl(L"SQL:" ^ *this);
-		var dbtrace(L"SQL:");
+		var temp(L"SQL:");
 		if (this->unassigned())
-			dbtrace ^= L"Unassigned variable";
+			temp ^= L"Unassigned variable";
 		else
-			dbtrace ^= * this;
-		exodus::logputl(dbtrace);
+			temp ^= * this;
+		exodus::logputl(temp);
 	}
 
 
@@ -864,7 +876,7 @@ bool var::sqlexec(const var& sqlcmd, var& errmsg) const
 	//NB PQexec cannot be told to return binary results
 	//but it can execute multiple commands
 	//whereas PQexecParams is the opposite
-	pgresult = PQexec(thread_pgconn, sqlcmd.tostring().c_str());
+	pgresult = PQexec(thread_pgconn, sqlcmd.toString().c_str());
 	if (!pgresult) {
 		errmsg=var(PQerrorMessage(thread_pgconn));
 		return false;
@@ -931,8 +943,8 @@ bool var::write(const var& filehandle, const var& key) const
 	int         paramFormats[2];
 	//uint32_t    binaryIntVal;
 
-	std::string key2=key.tostring();
-	std::string data2=(*this).tostring();
+	std::string key2=key.toString();
+	std::string data2=(*this).toString();
 
     paramValues[0] = key2.data();
     paramValues[1] = data2.data();
@@ -956,7 +968,7 @@ bool var::write(const var& filehandle, const var& key) const
 	DEBUG_LOG_SQL1
     PGresult* result = PQexecParams(thread_pgconn,
     					//TODO: parameterise filename
-                       sql.tostring().c_str(),
+                       sql.toString().c_str(),
                        2,				// two params (key and data)
                        NULL,			// let the backend deduce param type
                        paramValues,
@@ -985,7 +997,7 @@ bool var::write(const var& filehandle, const var& key) const
 	sql = L"INSERT INTO " PGDATAFILEPREFIX ^ filehandle ^ L" (key,data) values( $1 , $2)";
 	DEBUG_LOG_SQL1
 	result = PQexecParams(thread_pgconn,
-		sql.tostring().c_str(),
+		sql.toString().c_str(),
 		2,				// two params (key and data)
 		NULL,			// let the backend deduce param type
 		paramValues,
@@ -1028,8 +1040,8 @@ bool var::updaterecord(const var& filehandle,const var& key) const
     int         paramFormats[2];
     //uint32_t    binaryIntVal;
 
-	std::string key2=key.tostring();
-	std::string data2=(*this).tostring();
+	std::string key2=key.toString();
+	std::string data2=(*this).toString();
 
     paramValues[0] = key2.data();
     paramValues[1] = data2.data();
@@ -1049,7 +1061,7 @@ bool var::updaterecord(const var& filehandle,const var& key) const
 	DEBUG_LOG_SQL1
     PGresult* result = PQexecParams(thread_pgconn,
 		//TODO: parameterise filename
-							  sql.tostring().c_str(),
+							  sql.toString().c_str(),
 		2,				// two params (key and data)
 		NULL,			// let the backend deduce param type
 		paramValues,
@@ -1098,8 +1110,8 @@ bool var::insertrecord(const var& filehandle,const var& key) const
     int         paramFormats[2];
     //uint32_t    binaryIntVal;
 
-	std::string key2=key.tostring();
-	std::string data2=(*this).tostring();
+	std::string key2=key.toString();
+	std::string data2=(*this).toString();
 
     paramValues[0] = key2.data();
     paramValues[1] = data2.data();
@@ -1119,7 +1131,7 @@ bool var::insertrecord(const var& filehandle,const var& key) const
 	DEBUG_LOG_SQL1
 	PGresult* result = PQexecParams(thread_pgconn,
 		//TODO: parameterise filename
-		sql.tostring().c_str(),
+		sql.toString().c_str(),
 		2,				// two params (key and data)
 		NULL,			// let the backend deduce param type
 		paramValues,
@@ -1161,7 +1173,7 @@ bool var::deleterecord(const var& key) const
     int         paramFormats[1];
     //uint32_t    binaryIntVal;
 
-	std::string key2=key.tostring();
+	std::string key2=key.toString();
 
     paramValues[0] = key2.data();
     paramLengths[0] = int(key2.length());
@@ -1175,7 +1187,7 @@ bool var::deleterecord(const var& key) const
 
 	DEBUG_LOG_SQL1
     PGresult* result = PQexecParams(thread_pgconn,
-		sql.tostring().c_str(),
+		sql.toString().c_str(),
 		1,       /* two param */
 		NULL,    /* let the backend deduce param type */
 		paramValues,
@@ -1837,7 +1849,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 				//get and append "from" value
                 word2=getword(remainingsortselectclause);
 				if (usingnaturalorder)
-					word2=naturalorder(word2.tostring());
+					word2=naturalorder(word2.toString());
 				whereclause ^= L" BETWEEN " ^ word2;
 
 				//get, check, discard AND
@@ -1881,7 +1893,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 
 			//append value(s)
 			if (usingnaturalorder)
-				word2=naturalorder(word2.tostring());
+				word2=naturalorder(word2.toString());
             whereclause ^= word2;
 
         }
@@ -1926,10 +1938,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		sql ^= L" LIMIT " ^ maxnrecs;
 
 	//DEBUG_LOG_SQL
-	if (DBTRACE)
-	{
+	if (GETDBTRACE)
 		exodus::logputl(sql);
-	}
 
 	//Start a transaction block because postgres select requires to be inside one
 	if (!begintrans())
@@ -2284,7 +2294,7 @@ static bool pqexec(const var& sql, PGresultptr& pgresult, PGconn * thread_pgconn
 	/* dont use PQexec because is cannot be told to return binary results
 	 and use PQexecParams with zero parameters instead
 	//execute the command
-	local_result = PQexec(thread_pgconn, sql.tostring().c_str());
+	local_result = PQexec(thread_pgconn, sql.toString().c_str());
 	pgresult = local_result;
 	*/
 
@@ -2297,7 +2307,7 @@ static bool pqexec(const var& sql, PGresultptr& pgresult, PGconn * thread_pgconn
 	//will contain any result IF successful
 	//MUST do PQclear(local_result) after using it;
 	PGresult* local_result = PQexecParams(thread_pgconn,
-		sql.tostring().c_str(),
+		sql.toString().c_str(),
 		0,       /* zero params */
 		NULL,    /* let the backend deduce param type */
 		paramValues,

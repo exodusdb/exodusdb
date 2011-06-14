@@ -1,4 +1,10 @@
-set PERL32=D:\Perl
+rem ------------------------------
+rem --- quick and dirty config ---
+rem ------------------------------
+rem this is stuff that has yet to be properly positioned in config.cmd and configlocalEXAMPLE.cmd
+
+rem NOTE: watch out for module names causing conflicting dll names to avoid overwriting.
+
 rem ---------------------------------------------------------
 rem --- dev.cmd, make.cmd, clean.cmd, pack.cmd and upload.cmd
 rem ---  all call this config.cmd to initialise           ---
@@ -70,6 +76,9 @@ set EXO_SWIG_OPTIONS="-w503,314,389,361,362,370,383,384"
     if "%EXO_PYTHON_PREFIX%" EQU "" set EXO_PYTHON_PREFIX=Python
     if "%EXO_PYTHON_VER%"    EQU "" set EXO_PYTHON_VER=27
 
+    if "%EXO_PERL_PREFIX%"   EQU "" set EXO_PERL_PREFIX=Perl
+    if "%EXO_PERL_VER%"      EQU "" set EXO_PERL_VER=
+
     if "%EXO_PHP_PREFIX%" EQU "" set EXO_PHP_PREFIX=php-
     if "%EXO_PHP_VER%"    EQU "" set EXO_PHP_VER=5.3.6
 
@@ -77,6 +86,14 @@ set EXO_SWIG_OPTIONS="-w503,314,389,361,362,370,383,384"
 
     if "%EXO_PROGRAMFILES_ROOT%" EQU "" set EXO_PROGRAMFILES_ROOT=C:
 
+    rem EG PYTHON exo.pm and exo.dll
+    set EXO_PERL_MODULENAME=exo
+
+    rem EG PYTHON exodus.py and _exodus.dll
+    set EXO_PYTHON_MODULENAME=exodus
+
+    rem EG PHP exo.php and exo.dll
+    set EXO_PHP_MODULENAME=exo
 
 rem -----------------------------------------------------
 rem --- completely customising configuration          ---
@@ -245,10 +262,11 @@ rem	echo "Error: config.cmd: EXO_SWIG="%EXO_SWIG%" does not exist" 1>&2
 rem	goto exit
 :gotSWIG
 
-rem ----- PYTHON -----
-rem ------------------
-    set PYTHON32=%EXO_BUILD_ROOT%\%EXO_PYTHON_PREFIX%%EXO_PYTHON_VER%
-    set PYTHON64=%EXO_BUILD_ROOT%\%EXO_PYTHON_PREFIX%%EXO_PYTHON_VER%
+rem --------------
+rem --- Python ---
+rem --------------
+    set EXO_PYTHON32=%EXO_BUILD_ROOT%\%EXO_PYTHON_PREFIX%%EXO_PYTHON_VER%
+    set EXO_PYTHON64=%EXO_BUILD_ROOT%\%EXO_PYTHON_PREFIX%%EXO_PYTHON_VER%
 
 rem check python master directory exists
     if "%TARGET_CPU%" EQU "x86" set EXO_PYTHON=EXO_PYTHON32
@@ -261,12 +279,37 @@ rem	goto exit
 
 goto gotpythoninclude
 rem check python ver include (assume libs can be found there too)
-    if "%TARGET_CPU%" EQU "x86" set EXO_PYTHON_INCLUDE=%PYTHON32%\include
-    if "%TARGET_CPU%" EQU "x64" set EXO_PYTHON_INCLUDE=%PYTHON64%\include
+    if "%TARGET_CPU%" EQU "x86" set EXO_PYTHON_INCLUDE=%EXO_PYTHON32%\include
+    if "%TARGET_CPU%" EQU "x64" set EXO_PYTHON_INCLUDE=%EXO_PYTHON64%\include
     if exist "%EXO_PYTHON_INCLUDE%\*.*" goto gotpythoninclude
 	echo "Error: config.cmd: EXO_PYTHON_INCLUDE="%EXO_PYTHON_INCLUDE%" does not exist" 1>&2
 	goto exit
 :gotpythoninclude
+
+set EXO_PYTHON32_INCLUDE=%EXO_PYTHON32%\Include
+set EXO_PYTHON64_INCLUDE=%EXO_PYTHON64%\Include
+
+set EXO_PYTHON32_LIB=%EXO_PYTHON32%\Libs
+set EXO_PYTHON64_LIB=%EXO_PYTHON64%\Libs
+
+set EXO_PYTHON32_MODULEDIR=%EXO_PYTHON32%\Lib\site-packages
+set EXO_PYTHON64_MODULEDIR=%EXO_PYTHON64%\Lib\site-packages
+
+rem ------------
+rem --- Perl ---
+rem ------------
+
+set EXO_PERL32=%EXO_BUILD_ROOT%\%EXO_PERL_PREFIX%%EXO_PERL_VER%
+set EXO_PERL64=%EXO_BUILD_ROOT%\%EXO_PERL_PREFIX%%EXO_PERL_VER%
+
+set EXO_PERL32_INCLUDE=%EXO_PERL32%\LIB\CORE
+set EXO_PERL64_INCLUDE=%EXO_PERL64%\LIB\CORE
+
+set EXO_PERL32_LIB=%EXO_PERL32%\LIB\CORE
+set EXO_PERL64_LIB=%EXO_PERL64%\LIB\CORE
+
+set EXO_PERL32_MODULEDIR=%EXO_PERL32%\site\lib
+set EXO_PERL64_MODULEDIR=%EXO_PERL64%\site\lib
 
 
 rem ----- PHP -----

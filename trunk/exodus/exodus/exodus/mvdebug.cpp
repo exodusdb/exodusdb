@@ -281,12 +281,12 @@ Backtrace 7: 0x100000f64
 	//oscmd.outputl();
 
 #ifdef TRACING
-	printf("EXECPATH = %s\n",EXECPATH2.tostring().c_str());
-	printf("executing %s\n",oscmd.tostring().c_str());
+	printf("EXECPATH = %s\n",EXECPATH2.toString().c_str());
+	printf("executing %s\n",oscmd.toString().c_str());
 #endif
 
 	/* Open the command for reading. */
-	fp = popen(oscmd.tostring().c_str(), "r");
+	fp = popen(oscmd.toString().c_str(), "r");
 	if (fp == NULL)
 	{
 		printf("Failed to run command\n" );

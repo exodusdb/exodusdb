@@ -993,37 +993,37 @@ dict(AGE_IN_YEARS) {
 	var alphanum1="Flat 10a";
 	var alphanum2="Flat 2b";
 	//Flat 2b is before Flat 10a
-	assert(naturalorder(alphanum1.tostring()) > naturalorder(alphanum2.tostring()));
+	assert(naturalorder(alphanum1.toString()) > naturalorder(alphanum2.toString()));
 
 	alphanum1="Part A-10";
 	alphanum2="Part A-2";
 	//Part A-2 is before Part A-10
-	assert(naturalorder(alphanum1.tostring()) > naturalorder(alphanum2.tostring()));
+	assert(naturalorder(alphanum1.toString()) > naturalorder(alphanum2.toString()));
 
 	alphanum1="Part -10";
 	alphanum2="Part -2";
 	//Part -10 is before Part -2
-	assert(naturalorder(alphanum1.tostring()) < naturalorder(alphanum2.tostring()));
+	assert(naturalorder(alphanum1.toString()) < naturalorder(alphanum2.toString()));
 
 	alphanum1="-10";
 	alphanum2="-2";
 	//-10 is before -2
-	assert(naturalorder(alphanum1.tostring()) < naturalorder(alphanum2.tostring()));
+	assert(naturalorder(alphanum1.toString()) < naturalorder(alphanum2.toString()));
 
 	alphanum1="-1.11";
 	alphanum2="-1.2";
 	//-1.2 is before -1.11
-	assert(naturalorder(alphanum1.tostring()) > naturalorder(alphanum2.tostring()));
+	assert(naturalorder(alphanum1.toString()) > naturalorder(alphanum2.toString()));
 
 	alphanum1="01.10";
 	alphanum2="1.1";
 	//01.10 is equal to 1.1
-	assert(naturalorder(alphanum1.tostring()) = naturalorder(alphanum2.tostring()));
+	assert(naturalorder(alphanum1.toString()) = naturalorder(alphanum2.toString()));
 
 	alphanum1="A B C..C+";
 	alphanum2="A B C.C";
 	//A B C..C+ is before A B C.C
-	assert(naturalorder(alphanum1.tostring()) < naturalorder(alphanum2.tostring()));
+	assert(naturalorder(alphanum1.toString()) < naturalorder(alphanum2.toString()));
 */
 
 	/*
