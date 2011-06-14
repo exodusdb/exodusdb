@@ -1,10 +1,9 @@
 public class test {
-  static {
-    System.loadLibrary("exodus");
-  }
 
   public static void main(String argv[]) {
-	exodus testvar;
-    System.out.println(testvar.date().tostring());
+    System.loadLibrary("exodus");
+    var c=new var();
+    System.out.println(exodusJNI.mvtypemask_get());
+    System.out.println("done");
   }
 }

@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-export SWIG_SYNTAX="Syntax is ./build.sh <action> <target> where action=make/install/all/clean target=python|php|java|perl|all"
+export SWIG_SYNTAX="Syntax is ./build.sh <action> <target> where action=make/install/all/clean target=all|csharp|java|perl|php|python"
 
 export SWIG_MODE=$1
 export SWIG_TARGET=$2
@@ -37,10 +37,11 @@ case $SWIG_TARGET in
 
    all )
 
+	./build.sh $1 csharp
+	./build.sh $1 java
+	./build.sh $1 perl
 	./build.sh $1 php
 	./build.sh $1 python
-	./build.sh $1 perl
-	./build.sh $1 java
 	echo "all done"
 	exit 0
 
