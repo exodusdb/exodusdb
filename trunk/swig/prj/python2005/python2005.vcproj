@@ -16,7 +16,7 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)\swig"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="2"
@@ -94,7 +94,7 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)\swig"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="2"
@@ -189,12 +189,6 @@
 				>
 			</File>
 		</Filter>
-		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
-			>
-		</Filter>
 		<File
 			RelativePath="..\..\exodus.i"
 			>
@@ -203,7 +197,7 @@
 				>
 				<Tool
 					Name="VCCustomBuildTool"
-					CommandLine="echo Invoking SWIG...&#x0D;&#x0A;echo on&#x0D;&#x0A;$(SWIG32)\swig.exe -c++ -python  -I..\..\..\exodus\exodus -outcurrentdir $(EXO_SWIG_OPTIONS) &quot;$(InputPath)&quot;&#x0D;&#x0A;@echo off&#x0D;&#x0A;"
+					CommandLine="echo Invoking SWIG...&#x0D;&#x0A;echo on&#x0D;&#x0A;if not exist  &quot;$(SolutionDir)$(ConfigurationName)\swig&quot; mkdir &quot;$(SolutionDir)$(ConfigurationName)\swig&quot;&#x0D;&#x0A;$(SWIG32)\swig.exe -c++ -python  -I..\..\..\exodus\exodus -outcurrentdir -outdir $(SolutionDir)$(ConfigurationName)\swig $(EXO_SWIG_OPTIONS) &quot;$(InputPath)&quot;&#x0D;&#x0A;@echo off&#x0D;&#x0A;"
 					AdditionalDependencies="..\..\..\exodus\exodus\exodus\mv.h"
 					Outputs="$(InputName)_wrap.cxx"
 				/>
@@ -213,7 +207,7 @@
 				>
 				<Tool
 					Name="VCCustomBuildTool"
-					CommandLine="echo Invoking SWIG...&#x0D;&#x0A;echo on&#x0D;&#x0A;$(SWIG32)\swig.exe -c++ -python  -I..\..\..\exodus\exodus -outcurrentdir $(EXO_SWIG_OPTIONS) &quot;$(InputPath)&quot;&#x0D;&#x0A;@echo off&#x0D;&#x0A;"
+					CommandLine="echo Invoking SWIG...&#x0D;&#x0A;echo on&#x0D;&#x0A;if not exist  &quot;$(SolutionDir)$(ConfigurationName)\swig&quot; mkdir &quot;$(SolutionDir)$(ConfigurationName)\swig&quot;&#x0D;&#x0A;$(SWIG32)\swig.exe -c++ -python  -I..\..\..\exodus\exodus -outcurrentdir -outdir $(SolutionDir)$(ConfigurationName)\swig $(EXO_SWIG_OPTIONS) &quot;$(InputPath)&quot;&#x0D;&#x0A;@echo off&#x0D;&#x0A;"
 					AdditionalDependencies="..\..\..\exodus\exodus\exodus\mv.h"
 					Outputs="$(InputName)_wrap.cxx"
 				/>
