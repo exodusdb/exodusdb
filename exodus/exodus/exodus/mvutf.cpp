@@ -53,9 +53,17 @@ binary), one to three backups are required to find the beginning of the characte
 */
 
 DLL_PUBLIC
-std::string var::tostring() const
+std::string var::toString2() const
 {
-	THISIS(L"std::string var::tostring() const")
+	if (var_mvtyp&mvtypemask)
+		return "";
+	return toString();
+}
+
+DLL_PUBLIC
+std::string var::toString() const
+{
+	THISIS(L"std::string var::toString() const")
     THISISSTRING()
 	int length = (int) var_mvstr.length();
 
@@ -78,8 +86,8 @@ std::string var::tostring() const
 	else
 	{
 		//std::cout<<" UTF8>>wstring ERROR ";
-		std::cerr<<"var::tostring(): sizeof wchar_t must be 1, 2 or 4"<<std::endl;
-		throw MVException("var::tostring(): sizeof wchar_t " ^ var(int(sizeof(wchar_t))) ^ L" must be 1, 2 or 4");
+		std::cerr<<"var::toString(): sizeof wchar_t must be 1, 2 or 4"<<std::endl;
+		throw MVException("var::toString(): sizeof wchar_t " ^ var(int(sizeof(wchar_t))) ^ L" must be 1, 2 or 4");
 	}
 
 }

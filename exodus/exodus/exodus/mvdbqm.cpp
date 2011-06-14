@@ -65,13 +65,13 @@ bool var::connectlocal(const var& accountname)
 	assert(accountname.assigned());
 
 	//if (!QMConnect(SERVER_ADDRESS, SERVER_PORT, SERVER_USER, SERVER_PASSWORD,SERVER_ACCOUNT))
-	if (accountname.tostring().length()>=MV_MAX_CONNECTPARAM_LENGTH)
+	if (accountname.toString().length()>=MV_MAX_CONNECTPARAM_LENGTH)
 	{
 		_STATUS=MV_MAX_CONNECTPARAM_LENGTH_EXCEEDED;
 		return false;
 	};
 	char caccountname[MV_MAX_CONNECTPARAM_LENGTH+1]="";
-	strncpy(caccountname,accountname.tostring().c_str(),MV_MAX_CONNECTPARAM_LENGTH);
+	strncpy(caccountname,accountname.toString().c_str(),MV_MAX_CONNECTPARAM_LENGTH);
 	caccountname[MV_MAX_CONNECTPARAM_LENGTH-1]='\0';
 
 	if (!QMConnectLocal(caccountname))
@@ -98,42 +98,42 @@ bool var::connect(const var& address, const var& port, const var& user, const va
 	assert(pass.assigned());
 	assert(account.assigned());
 
-	if (address.tostring().length()>=MV_MAX_CONNECTPARAM_LENGTH)
+	if (address.toString().length()>=MV_MAX_CONNECTPARAM_LENGTH)
 	{
 		_STATUS=MV_MAX_CONNECTPARAM_LENGTH_EXCEEDED;
 		return false;
 	};
 	char caddress[MV_MAX_CONNECTPARAM_LENGTH+1]="";
-	strncpy(caddress,address.tostring().c_str(),MV_MAX_CONNECTPARAM_LENGTH);
+	strncpy(caddress,address.toString().c_str(),MV_MAX_CONNECTPARAM_LENGTH);
 	caddress[MV_MAX_CONNECTPARAM_LENGTH-1]='\0';
 
 	assert(port.isnum());
 
-	if (user.tostring().length()>=MV_MAX_CONNECTPARAM_LENGTH)
+	if (user.toString().length()>=MV_MAX_CONNECTPARAM_LENGTH)
 	{
 		_STATUS=MV_MAX_CONNECTPARAM_LENGTH_EXCEEDED;
 		return false;
 	};
 	char cuser[MV_MAX_CONNECTPARAM_LENGTH+1]="";
-	strncpy(cuser,user.tostring().c_str(),MV_MAX_CONNECTPARAM_LENGTH);
+	strncpy(cuser,user.toString().c_str(),MV_MAX_CONNECTPARAM_LENGTH);
 	cuser[MV_MAX_CONNECTPARAM_LENGTH-1]='\0';
 
-	if (pass.tostring().length()>=MV_MAX_CONNECTPARAM_LENGTH)
+	if (pass.toString().length()>=MV_MAX_CONNECTPARAM_LENGTH)
 	{
 		_STATUS=MV_MAX_CONNECTPARAM_LENGTH_EXCEEDED;
 		return false;
 	};
 	char cpass[MV_MAX_CONNECTPARAM_LENGTH+1]="";
-	strncpy(cpass,pass.tostring().c_str(),MV_MAX_CONNECTPARAM_LENGTH);
+	strncpy(cpass,pass.toString().c_str(),MV_MAX_CONNECTPARAM_LENGTH);
 	cpass[MV_MAX_CONNECTPARAM_LENGTH-1]='\0';
 
-	if (account.tostring().length()>=MV_MAX_CONNECTPARAM_LENGTH)
+	if (account.toString().length()>=MV_MAX_CONNECTPARAM_LENGTH)
 	{
 		_STATUS=MV_MAX_CONNECTPARAM_LENGTH_EXCEEDED;
 		return false;
 	};
 	char caccount[MV_MAX_CONNECTPARAM_LENGTH+1]="";
-	strncpy(caccount,account.tostring().c_str(),MV_MAX_CONNECTPARAM_LENGTH);
+	strncpy(caccount,account.toString().c_str(),MV_MAX_CONNECTPARAM_LENGTH);
 	caccount[MV_MAX_CONNECTPARAM_LENGTH-1]='\0';
 
 	if (!QMConnect(caddress,port.toInt(),cuser,cpass,caccount))
@@ -172,20 +172,20 @@ bool var::open(const var& dictcode,const var& filename)
 	assert(dictcode.assigned());
 	assert(filename.assigned());
 
-	if (1+dictcode.tostring().length()+filename.tostring().length()>MV_MAX_FILENAME_LENGTH)
+	if (1+dictcode.toString().length()+filename.toString().length()>MV_MAX_FILENAME_LENGTH)
 	{
 		_STATUS=MV_MAX_FILENAME_LENGTH_EXCEEDED;
 		return false;
 	};
 
 	char cfilename[MV_MAX_FILENAME_LENGTH+1]="";
-	strncpy(cfilename,dictcode.tostring().c_str(),MV_MAX_CONNECTPARAM_LENGTH);
+	strncpy(cfilename,dictcode.toString().c_str(),MV_MAX_CONNECTPARAM_LENGTH);
 	cfilename[MV_MAX_CONNECTPARAM_LENGTH-1]='\0';
 
 	if (filename.length()>0)
 	{
 	 if (dictcode.length()>0) strcat(cfilename," ");
-	 strncat(cfilename,filename.tostring().c_str(),MV_MAX_CONNECTPARAM_LENGTH);
+	 strncat(cfilename,filename.toString().c_str(),MV_MAX_CONNECTPARAM_LENGTH);
 	}
 	cfilename[MV_MAX_CONNECTPARAM_LENGTH-1]='\0';
 
@@ -227,13 +227,13 @@ bool var::read(const var& fileno,const var& key)
 	assert(key.assigned());
 
 	char* crecord;
-	if (key.tostring().length()>MV_MAX_KEY_LENGTH)
+	if (key.toString().length()>MV_MAX_KEY_LENGTH)
 	{
 		_STATUS=MV_MAX_KEY_LENGTH_EXCEEDED;
 		return false;
 	};
 	char ckey[MV_MAX_KEY_LENGTH+1]="";
-	strncpy(ckey,key.tostring().c_str(),MV_MAX_KEY_LENGTH);
+	strncpy(ckey,key.toString().c_str(),MV_MAX_KEY_LENGTH);
 	ckey[MV_MAX_KEY_LENGTH-1]='\0';
 
 	int errno;
@@ -285,13 +285,13 @@ bool var::lock(const var& key) const
 	assert(key.assigned());
 
 	char* crecord;
-	if (key.tostring().length()>MV_MAX_KEY_LENGTH)
+	if (key.toString().length()>MV_MAX_KEY_LENGTH)
 	{
 		_STATUS=MV_MAX_KEY_LENGTH_EXCEEDED;
 		return false;
 	};
 	char ckey[MV_MAX_KEY_LENGTH+1]="";
-	strncpy(ckey,key.tostring().c_str(),MV_MAX_KEY_LENGTH);
+	strncpy(ckey,key.toString().c_str(),MV_MAX_KEY_LENGTH);
 	ckey[MV_MAX_KEY_LENGTH-1]='\0';
 
 	int errno;
@@ -317,13 +317,13 @@ void var::unlock(const var& key) const
 	assert(assigned());
 	assert(key.assigned());
 
-	if (key.tostring().length()>MV_MAX_KEY_LENGTH)
+	if (key.toString().length()>MV_MAX_KEY_LENGTH)
 	{
 		_STATUS=MV_MAX_KEY_LENGTH_EXCEEDED;
 		return;
 	};
 	char ckey[MV_MAX_KEY_LENGTH+1]="";
-	strncpy(ckey,key.tostring().c_str(),MV_MAX_KEY_LENGTH);
+	strncpy(ckey,key.toString().c_str(),MV_MAX_KEY_LENGTH);
 	ckey[MV_MAX_KEY_LENGTH-1]='\0';
 
 	//int errno;
@@ -366,22 +366,22 @@ bool var::write(const var& fileno,const var& key) const
 	assert(fileno.assigned());
 	assert(key.assigned());
 
-	if (tostring().length()>MV_MAX_RECORD_LENGTH)
+	if (toString().length()>MV_MAX_RECORD_LENGTH)
 	{
 		_STATUS=MV_MAX_RECORD_LENGTH_EXCEEDED;
 		return false;
 	};
 	char crecord[MV_MAX_RECORD_LENGTH+1]="";
-	strncpy(crecord,tostring().c_str(),MV_MAX_RECORD_LENGTH);
+	strncpy(crecord,toString().c_str(),MV_MAX_RECORD_LENGTH);
 	crecord[MV_MAX_RECORD_LENGTH-1]='\0';
 
-	if (key.tostring().length()>MV_MAX_KEY_LENGTH)
+	if (key.toString().length()>MV_MAX_KEY_LENGTH)
 	{
 		_STATUS=MV_MAX_KEY_LENGTH_EXCEEDED;
 		return false;
 	};
 	char ckey[MV_MAX_KEY_LENGTH+1]="";
-	strncpy(ckey,key.tostring().c_str(),MV_MAX_KEY_LENGTH);
+	strncpy(ckey,key.toString().c_str(),MV_MAX_KEY_LENGTH);
 	ckey[MV_MAX_KEY_LENGTH-1]='\0';
 
 	QMWrite(fileno.var_mvint,ckey,crecord);
@@ -394,13 +394,13 @@ bool var::deleterecord(const var& key) const
 	assert(assigned());
 	assert(key.assigned());
 
-	if (key.tostring().length()>MV_MAX_KEY_LENGTH)
+	if (key.toString().length()>MV_MAX_KEY_LENGTH)
 	{
 		_STATUS=MV_MAX_KEY_LENGTH_EXCEEDED;
 		return false;
 	};
 	char ckey[MV_MAX_KEY_LENGTH+1]="";
-	strncpy(ckey,key.tostring().c_str(),MV_MAX_KEY_LENGTH);
+	strncpy(ckey,key.toString().c_str(),MV_MAX_KEY_LENGTH);
 	ckey[MV_MAX_KEY_LENGTH-1]='\0';
 
 	QMDelete(var_mvint,ckey);

@@ -107,7 +107,7 @@ bool var::load(const var& libraryname) const
 		//http://msdn.microsoft.com/en-us/library/ms684175(VS.85).aspx
 		// Load DLL file
 		//HINSTANCE hinstLib = LoadLibrary("markets.dll");
-		HINSTANCE plibrary = LoadLibrary(libraryname.tostring().c_str());
+		HINSTANCE plibrary = LoadLibrary(libraryname.toString().c_str());
 		if (plibrary == NULL) {
 			//throw L"Unable to load " ^ libraryname ^ L".dll";
 			return false;
@@ -115,7 +115,7 @@ bool var::load(const var& libraryname) const
 		FreeLibrary(plibrary);
 	#else
 		library_t plibrary;
-		if ((plibrary=(library_t) dlopen(libraryname.tostring().c_str(), RTLD_NOW))==0)
+		if ((plibrary=(library_t) dlopen(libraryname.toString().c_str(), RTLD_NOW))==0)
 		{
 			{
 				//throw L"Unable to load " ^ libraryname ^ L".dll";
@@ -139,14 +139,14 @@ bool var::load(const var& libraryname) const
 
 var var::call(const var& libraryname, const var& functionname) const
 {
-	return call(libraryname.var_mvstr.c_str(),functionname.tostring().c_str());
+	return call(libraryname.var_mvstr.c_str(),functionname.toString().c_str());
 }
 
 var var::call(const var& functionname) const
 {
 	createString();
 	var libraryname=field(L"*",1);
-	return call(libraryname.var_mvstr.c_str(),functionname.tostring().c_str());
+	return call(libraryname.var_mvstr.c_str(),functionname.toString().c_str());
 }
 
 var var::call() const
@@ -154,7 +154,7 @@ var var::call() const
 	createString();
 	var libraryname=field(L"*",1);
 	var functionname=field(L"*",2);
-	return call(libraryname.var_mvstr.c_str(),functionname.tostring().c_str());
+	return call(libraryname.var_mvstr.c_str(),functionname.toString().c_str());
 }
 
 inline MvEnvironment& getmvenvironment()
@@ -178,14 +178,14 @@ var var::call(const wchar_t* libraryname, const char* functionname) const
 	#if 0
 		// Load DLL file
 		//HINSTANCE hinstLib = LoadLibrary("markets.dll");
-		HINSTANCE plibrary = LoadLibrary(var(libraryname).tostring().c_str());
+		HINSTANCE plibrary = LoadLibrary(var(libraryname).toString().c_str());
 		if (plibrary == NULL) {
 			//throw L"Unable to load " ^ var(libraryname) ^ L".dll";
 			return false;
 		}
 	#else
 		library_t plibrary;
-		if ((plibrary=(library_t)dlopen(var(libraryname).tostring().c_str(), RTLD_NOW))==0)
+		if ((plibrary=(library_t)dlopen(var(libraryname).toString().c_str(), RTLD_NOW))==0)
 		{
 			//throw L"Unable to load " ^ var(libraryname) ^ L".dll";
 			return false;
@@ -206,7 +206,7 @@ var var::call(const wchar_t* libraryname, const char* functionname) const
 	#if 0
 		DynamicFunction dictfunction = (DynamicFunction)GetProcAddress(plibrary, functionname);
 		if (dictfunction == NULL) {
-			dictfunction = (DynamicFunction)GetProcAddress(plibrary, var(functionname).lcase().tostring().c_str());
+			dictfunction = (DynamicFunction)GetProcAddress(plibrary, var(functionname).lcase().toString().c_str());
 			if (dictfunction == NULL) {
 				//FreeLibrary(plibrary);
 				throw L"Unable to find " ^ var(functionname) ^ L" in " ^ var(libraryname) ^ L".dll";
@@ -216,7 +216,7 @@ var var::call(const wchar_t* libraryname, const char* functionname) const
 	#else
 		DynamicFunction dictfunction = (DynamicFunction) dlsym(plibrary, functionname);
 		if (dictfunction == NULL) {
-			dictfunction = (DynamicFunction) dlsym(plibrary,var(functionname).lcase().tostring().c_str());
+			dictfunction = (DynamicFunction) dlsym(plibrary,var(functionname).lcase().toString().c_str());
 			if (dictfunction == NULL) {
 				//dlclose(plibrary);
 				throw L"Unable to find " ^ var(functionname) ^ L" in " ^ var(libraryname) ^ L".dll";

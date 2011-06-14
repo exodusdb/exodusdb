@@ -218,7 +218,7 @@ bool ExodusFunctorBase::openlib()
 	libraryfilename_=EXODUSLIBPREFIX libraryname_+EXODUSLIBEXT;
 	var home;
 	home.osgetenv(L"HOME");
-	libraryfilename_=var(libraryfilename_).swap(L"~",home).tostring();
+	libraryfilename_=var(libraryfilename_).swap(L"~",home).toString();
 	*/
 	//#include <stdlib.h>
 	libraryfilename_=EXODUSLIBPREFIX libraryname_+EXODUSLIBEXT;

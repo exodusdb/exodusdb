@@ -142,7 +142,7 @@ int MVipc(const int environmentn, var& pgconnparams)
 	//wchar_t* exoduspipename="\\\\.\\pipe\\exoduspipexyz";
 	var exoduspipename=L"\\\\.\\pipe\\exodusservice-";
 	exoduspipename^= getprocessn()^"."^environmentn;
-	std::wstring wexoduspipename=exoduspipename.towstring();
+	std::wstring wexoduspipename=exoduspipename.toWString();
 	LPTSTR lpszPipename = (LPTSTR) wexoduspipename.c_str();
 
 	//create a LPTSTR holding object that will automatically delete then LPTSTR when goes out of scope

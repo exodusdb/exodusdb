@@ -144,9 +144,9 @@ int MVipc(const int environmentn, var& pgconnparams)
 	//typedef basic_string<TCHAR> tstring;
 	//wchar_t* exoduspipename="\\\\.\\pipe\\exoduspipexyz";
 	var temp="requestexodusservice-"^processn^L"."^environmentn;
-	std::string requestqueuename=temp.tostring();
+	std::string requestqueuename=temp.toString();
 	var temp2="responseexodusservice-"^processn^L"."^environmentn;
-	std::string responsequeuename=temp2.tostring();
+	std::string responsequeuename=temp2.toString();
 	//string requestqueuename="requestexodusqueue";
 	//requestqueuename+=environmentn;
 	//string responsequeuename="responseexodusqueue";

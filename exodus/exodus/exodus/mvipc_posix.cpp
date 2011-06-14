@@ -165,7 +165,7 @@ int MVipc(const int environmentn, var& pgconnparams)
 		var(socketdir).osmkdir();
 
 	std::string socketpath=socketdir+"/ipc";
-	socketpath+="exodusservice-"+processn.tostring()+"."+var(environmentn).tostring();
+	socketpath+="exodusservice-"+processn.toString()+"."+var(environmentn).toString();
 
 	closeipcqueues(0,socketpath);
 

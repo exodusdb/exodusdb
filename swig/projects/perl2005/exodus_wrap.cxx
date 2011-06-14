@@ -1554,10 +1554,10 @@ static swig_module_info swig_module = {swig_types, 23, 0, 0, 0, 0};
 
 /* -------- TYPES TABLE (END) -------- */
 
-#define SWIG_init    boot_exodus_perl
+#define SWIG_init    boot_exo
 
-#define SWIG_name   "exodus_perlc::boot_exodus_perl"
-#define SWIG_prefix "exodus_perlc::"
+#define SWIG_name   "exoc::boot_exo"
+#define SWIG_prefix "exoc::"
 
 #define SWIGVERSION 0x020004 
 #define SWIG_VERSION SWIGVERSION
@@ -2017,8 +2017,8 @@ extern "C" {
 #endif
 
 #ifdef PERL_OBJECT
-#define MAGIC_CLASS _wrap_exodus_perl_var::
-class _wrap_exodus_perl_var : public CPerlObj {
+#define MAGIC_CLASS _wrap_exo_var::
+class _wrap_exo_var : public CPerlObj {
 public:
 #else
 #define MAGIC_CLASS
@@ -2326,7 +2326,7 @@ XS(_wrap_var_toDouble) {
 }
 
 
-XS(_wrap_var_towstring) {
+XS(_wrap_var_toWString) {
   {
     exodus::var *arg1 = (exodus::var *) 0 ;
     void *argp1 = 0 ;
@@ -2336,14 +2336,14 @@ XS(_wrap_var_towstring) {
     dXSARGS;
     
     if ((items < 1) || (items > 1)) {
-      SWIG_croak("Usage: var_towstring(self);");
+      SWIG_croak("Usage: var_toWString(self);");
     }
     res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_exodus__var, 0 |  0 );
     if (!SWIG_IsOK(res1)) {
-      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "var_towstring" "', argument " "1"" of type '" "exodus::var const *""'"); 
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "var_toWString" "', argument " "1"" of type '" "exodus::var const *""'"); 
     }
     arg1 = reinterpret_cast< exodus::var * >(argp1);
-    result = ((exodus::var const *)arg1)->towstring();
+    result = ((exodus::var const *)arg1)->toWString();
     ST(argvi) = SWIG_NewPointerObj((new std::wstring(static_cast< const std::wstring& >(result))), SWIGTYPE_p_std__wstring, SWIG_POINTER_OWN | 0); argvi++ ;
     
     XSRETURN(argvi);
@@ -2371,7 +2371,35 @@ XS(_wrap_var_toString) {
       SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "var_toString" "', argument " "1"" of type '" "exodus::var const *""'"); 
     }
     arg1 = reinterpret_cast< exodus::var * >(argp1);
-    result = ((exodus::var const *)arg1)->tostring();
+    result = ((exodus::var const *)arg1)->toString();
+    ST(argvi) = SWIG_From_std_string  SWIG_PERL_CALL_ARGS_1(static_cast< std::string >(result)); argvi++ ;
+    
+    XSRETURN(argvi);
+  fail:
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_var___str__) {
+  {
+    exodus::var *arg1 = (exodus::var *) 0 ;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    int argvi = 0;
+    std::string result;
+    dXSARGS;
+    
+    if ((items < 1) || (items > 1)) {
+      SWIG_croak("Usage: var___str__(self);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_exodus__var, 0 |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "var___str__" "', argument " "1"" of type '" "exodus::var const *""'"); 
+    }
+    arg1 = reinterpret_cast< exodus::var * >(argp1);
+    result = ((exodus::var const *)arg1)->toString2();
     ST(argvi) = SWIG_From_std_string  SWIG_PERL_CALL_ARGS_1(static_cast< std::string >(result)); argvi++ ;
     
     XSRETURN(argvi);
@@ -5510,6 +5538,46 @@ XS(_wrap_var_stop) {
     }
     arg2 = reinterpret_cast< exodus::var * >(argp2);
     ((exodus::var const *)arg1)->stop((exodus::var const &)*arg2);
+    ST(argvi) = sv_newmortal();
+    
+    
+    XSRETURN(argvi);
+  fail:
+    
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_var_abort) {
+  {
+    exodus::var *arg1 = (exodus::var *) 0 ;
+    exodus::var *arg2 = 0 ;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    void *argp2 ;
+    int res2 = 0 ;
+    int argvi = 0;
+    dXSARGS;
+    
+    if ((items < 2) || (items > 2)) {
+      SWIG_croak("Usage: var_abort(self,text);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_exodus__var, 0 |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "var_abort" "', argument " "1"" of type '" "exodus::var const *""'"); 
+    }
+    arg1 = reinterpret_cast< exodus::var * >(argp1);
+    res2 = SWIG_ConvertPtr(ST(1), &argp2, SWIGTYPE_p_exodus__var,  0 );
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "var_abort" "', argument " "2"" of type '" "exodus::var const &""'"); 
+    }
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "var_abort" "', argument " "2"" of type '" "exodus::var const &""'"); 
+    }
+    arg2 = reinterpret_cast< exodus::var * >(argp2);
+    ((exodus::var const *)arg1)->abort((exodus::var const &)*arg2);
     ST(argvi) = sv_newmortal();
     
     
@@ -16426,6 +16494,47 @@ XS(_wrap_var_sum) {
 }
 
 
+XS(_wrap_var_connect) {
+  {
+    exodus::var *arg1 = (exodus::var *) 0 ;
+    exodus::var *arg2 = 0 ;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    void *argp2 ;
+    int res2 = 0 ;
+    int argvi = 0;
+    bool result;
+    dXSARGS;
+    
+    if ((items < 2) || (items > 2)) {
+      SWIG_croak("Usage: var_connect(self,conninfo);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_exodus__var, 0 |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "var_connect" "', argument " "1"" of type '" "exodus::var *""'"); 
+    }
+    arg1 = reinterpret_cast< exodus::var * >(argp1);
+    res2 = SWIG_ConvertPtr(ST(1), &argp2, SWIGTYPE_p_exodus__var,  0 );
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "var_connect" "', argument " "2"" of type '" "exodus::var const &""'"); 
+    }
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "var_connect" "', argument " "2"" of type '" "exodus::var const &""'"); 
+    }
+    arg2 = reinterpret_cast< exodus::var * >(argp2);
+    result = (bool)(arg1)->connect((exodus::var const &)*arg2);
+    ST(argvi) = SWIG_From_bool  SWIG_PERL_CALL_ARGS_1(static_cast< bool >(result)); argvi++ ;
+    
+    
+    XSRETURN(argvi);
+  fail:
+    
+    
+    SWIG_croak_null();
+  }
+}
+
+
 XS(_wrap_var_disconnect) {
   {
     exodus::var *arg1 = (exodus::var *) 0 ;
@@ -17283,6 +17392,47 @@ XS(_wrap_var_close) {
     
     XSRETURN(argvi);
   fail:
+    
+    SWIG_croak_null();
+  }
+}
+
+
+XS(_wrap_var_select) {
+  {
+    exodus::var *arg1 = (exodus::var *) 0 ;
+    exodus::var *arg2 = 0 ;
+    void *argp1 = 0 ;
+    int res1 = 0 ;
+    void *argp2 ;
+    int res2 = 0 ;
+    int argvi = 0;
+    bool result;
+    dXSARGS;
+    
+    if ((items < 2) || (items > 2)) {
+      SWIG_croak("Usage: var_select(self,sortselectclause);");
+    }
+    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_exodus__var, 0 |  0 );
+    if (!SWIG_IsOK(res1)) {
+      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "var_select" "', argument " "1"" of type '" "exodus::var const *""'"); 
+    }
+    arg1 = reinterpret_cast< exodus::var * >(argp1);
+    res2 = SWIG_ConvertPtr(ST(1), &argp2, SWIGTYPE_p_exodus__var,  0 );
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "var_select" "', argument " "2"" of type '" "exodus::var const &""'"); 
+    }
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "var_select" "', argument " "2"" of type '" "exodus::var const &""'"); 
+    }
+    arg2 = reinterpret_cast< exodus::var * >(argp2);
+    result = (bool)((exodus::var const *)arg1)->select((exodus::var const &)*arg2);
+    ST(argvi) = SWIG_From_bool  SWIG_PERL_CALL_ARGS_1(static_cast< bool >(result)); argvi++ ;
+    
+    
+    XSRETURN(argvi);
+  fail:
+    
     
     SWIG_croak_null();
   }
@@ -28240,23 +28390,23 @@ static void *_p_exodus__MVAbortTo_p_exodus__MVException(void *x, int *SWIGUNUSED
     return (void *)((exodus::MVException *)  ((exodus::MVAbort *) x));
 }
 static swig_type_info _swigt__p_char = {"_p_char", "char *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_exodus__MVAbort = {"_p_exodus__MVAbort", "exodus::MVAbort *", 0, 0, (void*)"exodus_perl::MVAbort", 0};
-static swig_type_info _swigt__p_exodus__MVArrayDimensionedZero = {"_p_exodus__MVArrayDimensionedZero", "exodus::MVArrayDimensionedZero *", 0, 0, (void*)"exodus_perl::MVArrayDimensionedZero", 0};
-static swig_type_info _swigt__p_exodus__MVArrayIndexOutOfBounds = {"_p_exodus__MVArrayIndexOutOfBounds", "exodus::MVArrayIndexOutOfBounds *", 0, 0, (void*)"exodus_perl::MVArrayIndexOutOfBounds", 0};
-static swig_type_info _swigt__p_exodus__MVArrayNotDimensioned = {"_p_exodus__MVArrayNotDimensioned", "exodus::MVArrayNotDimensioned *", 0, 0, (void*)"exodus_perl::MVArrayNotDimensioned", 0};
-static swig_type_info _swigt__p_exodus__MVDBException = {"_p_exodus__MVDBException", "exodus::MVDBException *", 0, 0, (void*)"exodus_perl::MVDBException", 0};
-static swig_type_info _swigt__p_exodus__MVDebug = {"_p_exodus__MVDebug", "exodus::MVDebug *", 0, 0, (void*)"exodus_perl::MVDebug", 0};
-static swig_type_info _swigt__p_exodus__MVDivideByZero = {"_p_exodus__MVDivideByZero", "exodus::MVDivideByZero *", 0, 0, (void*)"exodus_perl::MVDivideByZero", 0};
-static swig_type_info _swigt__p_exodus__MVException = {"_p_exodus__MVException", "exodus::MVException *", 0, 0, (void*)"exodus_perl::MVException", 0};
-static swig_type_info _swigt__p_exodus__MVInvalidPointer = {"_p_exodus__MVInvalidPointer", "exodus::MVInvalidPointer *", 0, 0, (void*)"exodus_perl::MVInvalidPointer", 0};
-static swig_type_info _swigt__p_exodus__MVNonNumeric = {"_p_exodus__MVNonNumeric", "exodus::MVNonNumeric *", 0, 0, (void*)"exodus_perl::MVNonNumeric", 0};
-static swig_type_info _swigt__p_exodus__MVNotImplemented = {"_p_exodus__MVNotImplemented", "exodus::MVNotImplemented *", 0, 0, (void*)"exodus_perl::MVNotImplemented", 0};
-static swig_type_info _swigt__p_exodus__MVOutOfMemory = {"_p_exodus__MVOutOfMemory", "exodus::MVOutOfMemory *", 0, 0, (void*)"exodus_perl::MVOutOfMemory", 0};
-static swig_type_info _swigt__p_exodus__MVStop = {"_p_exodus__MVStop", "exodus::MVStop *", 0, 0, (void*)"exodus_perl::MVStop", 0};
-static swig_type_info _swigt__p_exodus__MVUnassigned = {"_p_exodus__MVUnassigned", "exodus::MVUnassigned *", 0, 0, (void*)"exodus_perl::MVUnassigned", 0};
-static swig_type_info _swigt__p_exodus__MVUndefined = {"_p_exodus__MVUndefined", "exodus::MVUndefined *", 0, 0, (void*)"exodus_perl::MVUndefined", 0};
-static swig_type_info _swigt__p_exodus__dim = {"_p_exodus__dim", "exodus::dim *", 0, 0, (void*)"exodus_perl::dim", 0};
-static swig_type_info _swigt__p_exodus__var = {"_p_exodus__var", "exodus::var *", 0, 0, (void*)"exodus_perl::var", 0};
+static swig_type_info _swigt__p_exodus__MVAbort = {"_p_exodus__MVAbort", "exodus::MVAbort *", 0, 0, (void*)"exo::MVAbort", 0};
+static swig_type_info _swigt__p_exodus__MVArrayDimensionedZero = {"_p_exodus__MVArrayDimensionedZero", "exodus::MVArrayDimensionedZero *", 0, 0, (void*)"exo::MVArrayDimensionedZero", 0};
+static swig_type_info _swigt__p_exodus__MVArrayIndexOutOfBounds = {"_p_exodus__MVArrayIndexOutOfBounds", "exodus::MVArrayIndexOutOfBounds *", 0, 0, (void*)"exo::MVArrayIndexOutOfBounds", 0};
+static swig_type_info _swigt__p_exodus__MVArrayNotDimensioned = {"_p_exodus__MVArrayNotDimensioned", "exodus::MVArrayNotDimensioned *", 0, 0, (void*)"exo::MVArrayNotDimensioned", 0};
+static swig_type_info _swigt__p_exodus__MVDBException = {"_p_exodus__MVDBException", "exodus::MVDBException *", 0, 0, (void*)"exo::MVDBException", 0};
+static swig_type_info _swigt__p_exodus__MVDebug = {"_p_exodus__MVDebug", "exodus::MVDebug *", 0, 0, (void*)"exo::MVDebug", 0};
+static swig_type_info _swigt__p_exodus__MVDivideByZero = {"_p_exodus__MVDivideByZero", "exodus::MVDivideByZero *", 0, 0, (void*)"exo::MVDivideByZero", 0};
+static swig_type_info _swigt__p_exodus__MVException = {"_p_exodus__MVException", "exodus::MVException *", 0, 0, (void*)"exo::MVException", 0};
+static swig_type_info _swigt__p_exodus__MVInvalidPointer = {"_p_exodus__MVInvalidPointer", "exodus::MVInvalidPointer *", 0, 0, (void*)"exo::MVInvalidPointer", 0};
+static swig_type_info _swigt__p_exodus__MVNonNumeric = {"_p_exodus__MVNonNumeric", "exodus::MVNonNumeric *", 0, 0, (void*)"exo::MVNonNumeric", 0};
+static swig_type_info _swigt__p_exodus__MVNotImplemented = {"_p_exodus__MVNotImplemented", "exodus::MVNotImplemented *", 0, 0, (void*)"exo::MVNotImplemented", 0};
+static swig_type_info _swigt__p_exodus__MVOutOfMemory = {"_p_exodus__MVOutOfMemory", "exodus::MVOutOfMemory *", 0, 0, (void*)"exo::MVOutOfMemory", 0};
+static swig_type_info _swigt__p_exodus__MVStop = {"_p_exodus__MVStop", "exodus::MVStop *", 0, 0, (void*)"exo::MVStop", 0};
+static swig_type_info _swigt__p_exodus__MVUnassigned = {"_p_exodus__MVUnassigned", "exodus::MVUnassigned *", 0, 0, (void*)"exo::MVUnassigned", 0};
+static swig_type_info _swigt__p_exodus__MVUndefined = {"_p_exodus__MVUndefined", "exodus::MVUndefined *", 0, 0, (void*)"exo::MVUndefined", 0};
+static swig_type_info _swigt__p_exodus__dim = {"_p_exodus__dim", "exodus::dim *", 0, 0, (void*)"exo::dim", 0};
+static swig_type_info _swigt__p_exodus__var = {"_p_exodus__var", "exodus::var *", 0, 0, (void*)"exo::var", 0};
 static swig_type_info _swigt__p_long_long = {"_p_long_long", "mvint_t *|long long *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__ostream = {"_p_std__ostream", "std::ostream *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__wostream = {"_p_std__wostream", "std::wostream *", 0, 0, (void*)0, 0};
@@ -28349,283 +28499,287 @@ static swig_constant_info swig_constants[] = {
 }
 #endif
 static swig_variable_info swig_variables[] = {
-    { "exodus_perlc::mvtypemask", MAGIC_CLASS swig_magic_readonly, MAGIC_CLASS _wrap_mvtypemask_get,0 },
-    { "exodus_perlc::FM", MAGIC_CLASS swig_magic_readonly, MAGIC_CLASS _wrap_FM_get,&SWIGTYPE_p_exodus__var },
-    { "exodus_perlc::VM", MAGIC_CLASS swig_magic_readonly, MAGIC_CLASS _wrap_VM_get,&SWIGTYPE_p_exodus__var },
-    { "exodus_perlc::SM", MAGIC_CLASS swig_magic_readonly, MAGIC_CLASS _wrap_SM_get,&SWIGTYPE_p_exodus__var },
-    { "exodus_perlc::SVM", MAGIC_CLASS swig_magic_readonly, MAGIC_CLASS _wrap_SVM_get,&SWIGTYPE_p_exodus__var },
-    { "exodus_perlc::TM", MAGIC_CLASS swig_magic_readonly, MAGIC_CLASS _wrap_TM_get,&SWIGTYPE_p_exodus__var },
-    { "exodus_perlc::STM", MAGIC_CLASS swig_magic_readonly, MAGIC_CLASS _wrap_STM_get,&SWIGTYPE_p_exodus__var },
-    { "exodus_perlc::SSTM", MAGIC_CLASS swig_magic_readonly, MAGIC_CLASS _wrap_SSTM_get,&SWIGTYPE_p_exodus__var },
-    { "exodus_perlc::IM", MAGIC_CLASS swig_magic_readonly, MAGIC_CLASS _wrap_IM_get,&SWIGTYPE_p_exodus__var },
-    { "exodus_perlc::RM", MAGIC_CLASS swig_magic_readonly, MAGIC_CLASS _wrap_RM_get,&SWIGTYPE_p_exodus__var },
-    { "exodus_perlc::AM", MAGIC_CLASS swig_magic_readonly, MAGIC_CLASS _wrap_AM_get,&SWIGTYPE_p_exodus__var },
-    { "exodus_perlc::DQ", MAGIC_CLASS swig_magic_readonly, MAGIC_CLASS _wrap_DQ_get,&SWIGTYPE_p_exodus__var },
-    { "exodus_perlc::SQ", MAGIC_CLASS swig_magic_readonly, MAGIC_CLASS _wrap_SQ_get,&SWIGTYPE_p_exodus__var },
-    { "exodus_perlc::SLASH", MAGIC_CLASS swig_magic_readonly, MAGIC_CLASS _wrap_SLASH_get,&SWIGTYPE_p_exodus__var },
-    { "exodus_perlc::SLASH_", MAGIC_CLASS swig_magic_readonly, MAGIC_CLASS _wrap_SLASH__get,0 },
-    { "exodus_perlc::LOWERCASE_", MAGIC_CLASS swig_magic_readonly, MAGIC_CLASS _wrap_LOWERCASE__get,&SWIGTYPE_p_exodus__var },
-    { "exodus_perlc::UPPERCASE_", MAGIC_CLASS swig_magic_readonly, MAGIC_CLASS _wrap_UPPERCASE__get,&SWIGTYPE_p_exodus__var },
-    { "exodus_perlc::PLATFORM_", MAGIC_CLASS swig_magic_readonly, MAGIC_CLASS _wrap_PLATFORM__get,&SWIGTYPE_p_exodus__var },
-    { "exodus_perlc::DBTRACE", MAGIC_CLASS _wrap_DBTRACE_set, MAGIC_CLASS _wrap_DBTRACE_get,0 },
-    { "exodus_perlc::EXECPATH2", MAGIC_CLASS _wrap_EXECPATH2_set, MAGIC_CLASS _wrap_EXECPATH2_get,&SWIGTYPE_p_exodus__var },
+    { "exoc::mvtypemask", MAGIC_CLASS swig_magic_readonly, MAGIC_CLASS _wrap_mvtypemask_get,0 },
+    { "exoc::FM", MAGIC_CLASS swig_magic_readonly, MAGIC_CLASS _wrap_FM_get,&SWIGTYPE_p_exodus__var },
+    { "exoc::VM", MAGIC_CLASS swig_magic_readonly, MAGIC_CLASS _wrap_VM_get,&SWIGTYPE_p_exodus__var },
+    { "exoc::SM", MAGIC_CLASS swig_magic_readonly, MAGIC_CLASS _wrap_SM_get,&SWIGTYPE_p_exodus__var },
+    { "exoc::SVM", MAGIC_CLASS swig_magic_readonly, MAGIC_CLASS _wrap_SVM_get,&SWIGTYPE_p_exodus__var },
+    { "exoc::TM", MAGIC_CLASS swig_magic_readonly, MAGIC_CLASS _wrap_TM_get,&SWIGTYPE_p_exodus__var },
+    { "exoc::STM", MAGIC_CLASS swig_magic_readonly, MAGIC_CLASS _wrap_STM_get,&SWIGTYPE_p_exodus__var },
+    { "exoc::SSTM", MAGIC_CLASS swig_magic_readonly, MAGIC_CLASS _wrap_SSTM_get,&SWIGTYPE_p_exodus__var },
+    { "exoc::IM", MAGIC_CLASS swig_magic_readonly, MAGIC_CLASS _wrap_IM_get,&SWIGTYPE_p_exodus__var },
+    { "exoc::RM", MAGIC_CLASS swig_magic_readonly, MAGIC_CLASS _wrap_RM_get,&SWIGTYPE_p_exodus__var },
+    { "exoc::AM", MAGIC_CLASS swig_magic_readonly, MAGIC_CLASS _wrap_AM_get,&SWIGTYPE_p_exodus__var },
+    { "exoc::DQ", MAGIC_CLASS swig_magic_readonly, MAGIC_CLASS _wrap_DQ_get,&SWIGTYPE_p_exodus__var },
+    { "exoc::SQ", MAGIC_CLASS swig_magic_readonly, MAGIC_CLASS _wrap_SQ_get,&SWIGTYPE_p_exodus__var },
+    { "exoc::SLASH", MAGIC_CLASS swig_magic_readonly, MAGIC_CLASS _wrap_SLASH_get,&SWIGTYPE_p_exodus__var },
+    { "exoc::SLASH_", MAGIC_CLASS swig_magic_readonly, MAGIC_CLASS _wrap_SLASH__get,0 },
+    { "exoc::LOWERCASE_", MAGIC_CLASS swig_magic_readonly, MAGIC_CLASS _wrap_LOWERCASE__get,&SWIGTYPE_p_exodus__var },
+    { "exoc::UPPERCASE_", MAGIC_CLASS swig_magic_readonly, MAGIC_CLASS _wrap_UPPERCASE__get,&SWIGTYPE_p_exodus__var },
+    { "exoc::PLATFORM_", MAGIC_CLASS swig_magic_readonly, MAGIC_CLASS _wrap_PLATFORM__get,&SWIGTYPE_p_exodus__var },
+    { "exoc::DBTRACE", MAGIC_CLASS _wrap_DBTRACE_set, MAGIC_CLASS _wrap_DBTRACE_get,0 },
+    { "exoc::EXECPATH2", MAGIC_CLASS _wrap_EXECPATH2_set, MAGIC_CLASS _wrap_EXECPATH2_get,&SWIGTYPE_p_exodus__var },
 {0,0,0,0}
 };
 static swig_command_info swig_commands[] = {
-{"exodus_perlc::delete_var", _wrap_delete_var},
-{"exodus_perlc::var_toBool", _wrap_var_toBool},
-{"exodus_perlc::var_toInt", _wrap_var_toInt},
-{"exodus_perlc::var_toDouble", _wrap_var_toDouble},
-{"exodus_perlc::var_towstring", _wrap_var_towstring},
-{"exodus_perlc::var_toString", _wrap_var_toString},
-{"exodus_perlc::new_var", _wrap_new_var},
-{"exodus_perlc::var___call__", _wrap_var___call__},
-{"exodus_perlc::var___plusplus__", _wrap_var___plusplus__},
-{"exodus_perlc::var___minmin__", _wrap_var___minmin__},
-{"exodus_perlc::var___iadd__", _wrap_var___iadd__},
-{"exodus_perlc::var___isub__", _wrap_var___isub__},
-{"exodus_perlc::var_date", _wrap_var_date},
-{"exodus_perlc::var_time", _wrap_var_time},
-{"exodus_perlc::var_timedate", _wrap_var_timedate},
-{"exodus_perlc::var_ossleep", _wrap_var_ossleep},
-{"exodus_perlc::var_ostime", _wrap_var_ostime},
-{"exodus_perlc::var_osopen", _wrap_var_osopen},
-{"exodus_perlc::var_osbread", _wrap_var_osbread},
-{"exodus_perlc::var_osbwrite", _wrap_var_osbwrite},
-{"exodus_perlc::var_osclose", _wrap_var_osclose},
-{"exodus_perlc::var_oswrite", _wrap_var_oswrite},
-{"exodus_perlc::var_osdelete", _wrap_var_osdelete},
-{"exodus_perlc::var_osrename", _wrap_var_osrename},
-{"exodus_perlc::var_oscopy", _wrap_var_oscopy},
-{"exodus_perlc::var_oslist", _wrap_var_oslist},
-{"exodus_perlc::var_oslistf", _wrap_var_oslistf},
-{"exodus_perlc::var_oslistd", _wrap_var_oslistd},
-{"exodus_perlc::var_osfile", _wrap_var_osfile},
-{"exodus_perlc::var_osdir", _wrap_var_osdir},
-{"exodus_perlc::var_osmkdir", _wrap_var_osmkdir},
-{"exodus_perlc::var_osrmdir", _wrap_var_osrmdir},
-{"exodus_perlc::var_oscwd", _wrap_var_oscwd},
-{"exodus_perlc::var_osflush", _wrap_var_osflush},
-{"exodus_perlc::var_osread", _wrap_var_osread},
-{"exodus_perlc::var_suspend", _wrap_var_suspend},
-{"exodus_perlc::var_osshell", _wrap_var_osshell},
-{"exodus_perlc::var_osshellread", _wrap_var_osshellread},
-{"exodus_perlc::var_osshellwrite", _wrap_var_osshellwrite},
-{"exodus_perlc::var_osgetenv", _wrap_var_osgetenv},
-{"exodus_perlc::var_ossetenv", _wrap_var_ossetenv},
-{"exodus_perlc::var_stop", _wrap_var_stop},
-{"exodus_perlc::var_perform", _wrap_var_perform},
-{"exodus_perlc::var_execute", _wrap_var_execute},
-{"exodus_perlc::var_chain", _wrap_var_chain},
-{"exodus_perlc::var_logoff", _wrap_var_logoff},
-{"exodus_perlc::var_debug", _wrap_var_debug},
-{"exodus_perlc::var_breakon", _wrap_var_breakon},
-{"exodus_perlc::var_breakoff", _wrap_var_breakoff},
-{"exodus_perlc::var_output", _wrap_var_output},
-{"exodus_perlc::var_outputl", _wrap_var_outputl},
-{"exodus_perlc::var_outputt", _wrap_var_outputt},
-{"exodus_perlc::var_logput", _wrap_var_logput},
-{"exodus_perlc::var_logputl", _wrap_var_logputl},
-{"exodus_perlc::var_errput", _wrap_var_errput},
-{"exodus_perlc::var_errputl", _wrap_var_errputl},
-{"exodus_perlc::var_put", _wrap_var_put},
-{"exodus_perlc::var_at", _wrap_var_at},
-{"exodus_perlc::var_getcursor", _wrap_var_getcursor},
-{"exodus_perlc::var_setcursor", _wrap_var_setcursor},
-{"exodus_perlc::var_getprompt", _wrap_var_getprompt},
-{"exodus_perlc::var_setprompt", _wrap_var_setprompt},
-{"exodus_perlc::var_input", _wrap_var_input},
-{"exodus_perlc::var_eof", _wrap_var_eof},
-{"exodus_perlc::var_assigned", _wrap_var_assigned},
-{"exodus_perlc::var_unassigned", _wrap_var_unassigned},
-{"exodus_perlc::var_transfer", _wrap_var_transfer},
-{"exodus_perlc::var_exchange", _wrap_var_exchange},
-{"exodus_perlc::var_clone", _wrap_var_clone},
-{"exodus_perlc::var_abs", _wrap_var_abs},
-{"exodus_perlc::var_mod", _wrap_var_mod},
-{"exodus_perlc::var_pwr", _wrap_var_pwr},
-{"exodus_perlc::var_rnd", _wrap_var_rnd},
-{"exodus_perlc::var_initrnd", _wrap_var_initrnd},
-{"exodus_perlc::var_exp", _wrap_var_exp},
-{"exodus_perlc::var_sqrt", _wrap_var_sqrt},
-{"exodus_perlc::var_sin", _wrap_var_sin},
-{"exodus_perlc::var_cos", _wrap_var_cos},
-{"exodus_perlc::var_tan", _wrap_var_tan},
-{"exodus_perlc::var_atan", _wrap_var_atan},
-{"exodus_perlc::var_loge", _wrap_var_loge},
-{"exodus_perlc::var_integer", _wrap_var_integer},
-{"exodus_perlc::var_floor", _wrap_var_floor},
-{"exodus_perlc::var_round", _wrap_var_round},
-{"exodus_perlc::var_setxlocale", _wrap_var_setxlocale},
-{"exodus_perlc::var_getxlocale", _wrap_var_getxlocale},
-{"exodus_perlc::var_chr", _wrap_var_chr},
-{"exodus_perlc::var_str", _wrap_var_str},
-{"exodus_perlc::var_space", _wrap_var_space},
-{"exodus_perlc::var_match", _wrap_var_match},
-{"exodus_perlc::var_seq", _wrap_var_seq},
-{"exodus_perlc::var_dcount", _wrap_var_dcount},
-{"exodus_perlc::var_count", _wrap_var_count},
-{"exodus_perlc::var_length", _wrap_var_length},
-{"exodus_perlc::var_len", _wrap_var_len},
-{"exodus_perlc::var_data", _wrap_var_data},
-{"exodus_perlc::var_isnum", _wrap_var_isnum},
-{"exodus_perlc::var_isnum_old", _wrap_var_isnum_old},
-{"exodus_perlc::var_converter", _wrap_var_converter},
-{"exodus_perlc::var_swapper", _wrap_var_swapper},
-{"exodus_perlc::var_splicer", _wrap_var_splicer},
-{"exodus_perlc::var_quoter", _wrap_var_quoter},
-{"exodus_perlc::var_squoter", _wrap_var_squoter},
-{"exodus_perlc::var_unquoter", _wrap_var_unquoter},
-{"exodus_perlc::var_ucaser", _wrap_var_ucaser},
-{"exodus_perlc::var_lcaser", _wrap_var_lcaser},
-{"exodus_perlc::var_trimmer", _wrap_var_trimmer},
-{"exodus_perlc::var_trimmerf", _wrap_var_trimmerf},
-{"exodus_perlc::var_trimmerb", _wrap_var_trimmerb},
-{"exodus_perlc::var_fieldstorer", _wrap_var_fieldstorer},
-{"exodus_perlc::var_substrer", _wrap_var_substrer},
-{"exodus_perlc::var_convert", _wrap_var_convert},
-{"exodus_perlc::var_swap", _wrap_var_swap},
-{"exodus_perlc::var_splice", _wrap_var_splice},
-{"exodus_perlc::var_quote", _wrap_var_quote},
-{"exodus_perlc::var_squote", _wrap_var_squote},
-{"exodus_perlc::var_unquote", _wrap_var_unquote},
-{"exodus_perlc::var_ucase", _wrap_var_ucase},
-{"exodus_perlc::var_lcase", _wrap_var_lcase},
-{"exodus_perlc::var_trim", _wrap_var_trim},
-{"exodus_perlc::var_trimf", _wrap_var_trimf},
-{"exodus_perlc::var_trimb", _wrap_var_trimb},
-{"exodus_perlc::var_fieldstore", _wrap_var_fieldstore},
-{"exodus_perlc::var_substr", _wrap_var_substr},
-{"exodus_perlc::var_index", _wrap_var_index},
-{"exodus_perlc::var_index2", _wrap_var_index2},
-{"exodus_perlc::var_field", _wrap_var_field},
-{"exodus_perlc::var_field2", _wrap_var_field2},
-{"exodus_perlc::var_oconv", _wrap_var_oconv},
-{"exodus_perlc::var_iconv", _wrap_var_iconv},
-{"exodus_perlc::var_lower", _wrap_var_lower},
-{"exodus_perlc::var_raise", _wrap_var_raise},
-{"exodus_perlc::var_crop", _wrap_var_crop},
-{"exodus_perlc::var_lowerer", _wrap_var_lowerer},
-{"exodus_perlc::var_raiser", _wrap_var_raiser},
-{"exodus_perlc::var_cropper", _wrap_var_cropper},
-{"exodus_perlc::var_remove", _wrap_var_remove},
-{"exodus_perlc::var_replace", _wrap_var_replace},
-{"exodus_perlc::var_insert", _wrap_var_insert},
-{"exodus_perlc::var_erase", _wrap_var_erase},
-{"exodus_perlc::var_extract", _wrap_var_extract},
-{"exodus_perlc::var_replacer", _wrap_var_replacer},
-{"exodus_perlc::var_inserter", _wrap_var_inserter},
-{"exodus_perlc::var_eraser", _wrap_var_eraser},
-{"exodus_perlc::var_locate", _wrap_var_locate},
-{"exodus_perlc::var_locateby", _wrap_var_locateby},
-{"exodus_perlc::var_locateusing", _wrap_var_locateusing},
-{"exodus_perlc::var_sum", _wrap_var_sum},
-{"exodus_perlc::var_disconnect", _wrap_var_disconnect},
-{"exodus_perlc::var_setdefaultconnection", _wrap_var_setdefaultconnection},
-{"exodus_perlc::var_begintrans", _wrap_var_begintrans},
-{"exodus_perlc::var_rollbacktrans", _wrap_var_rollbacktrans},
-{"exodus_perlc::var_committrans", _wrap_var_committrans},
-{"exodus_perlc::var_createdb", _wrap_var_createdb},
-{"exodus_perlc::var_deletedb", _wrap_var_deletedb},
-{"exodus_perlc::var_createfile", _wrap_var_createfile},
-{"exodus_perlc::var_deletefile", _wrap_var_deletefile},
-{"exodus_perlc::var_clearfile", _wrap_var_clearfile},
-{"exodus_perlc::var_listfiles", _wrap_var_listfiles},
-{"exodus_perlc::var_createindex", _wrap_var_createindex},
-{"exodus_perlc::var_deleteindex", _wrap_var_deleteindex},
-{"exodus_perlc::var_listindexes", _wrap_var_listindexes},
-{"exodus_perlc::var_open", _wrap_var_open},
-{"exodus_perlc::var_close", _wrap_var_close},
-{"exodus_perlc::var_clearselect", _wrap_var_clearselect},
-{"exodus_perlc::var_readnext", _wrap_var_readnext},
-{"exodus_perlc::var_selectrecord", _wrap_var_selectrecord},
-{"exodus_perlc::var_readnextrecord", _wrap_var_readnextrecord},
-{"exodus_perlc::var_lock", _wrap_var_lock},
-{"exodus_perlc::var_unlock", _wrap_var_unlock},
-{"exodus_perlc::var_unlockall", _wrap_var_unlockall},
-{"exodus_perlc::var_read", _wrap_var_read},
-{"exodus_perlc::var_readv", _wrap_var_readv},
-{"exodus_perlc::var_write", _wrap_var_write},
-{"exodus_perlc::var_writev", _wrap_var_writev},
-{"exodus_perlc::var_deleterecord", _wrap_var_deleterecord},
-{"exodus_perlc::var_updaterecord", _wrap_var_updaterecord},
-{"exodus_perlc::var_insertrecord", _wrap_var_insertrecord},
-{"exodus_perlc::var_xlate", _wrap_var_xlate},
-{"exodus_perlc::var_sqlexec", _wrap_var_sqlexec},
-{"exodus_perlc::var_version", _wrap_var_version},
-{"exodus_perlc::MVeq", _wrap_MVeq},
-{"exodus_perlc::MVlt", _wrap_MVlt},
-{"exodus_perlc::__eq__", _wrap___eq__},
-{"exodus_perlc::__ne__", _wrap___ne__},
-{"exodus_perlc::__lt__", _wrap___lt__},
-{"exodus_perlc::__ge__", _wrap___ge__},
-{"exodus_perlc::__gt__", _wrap___gt__},
-{"exodus_perlc::__le__", _wrap___le__},
-{"exodus_perlc::__not__", _wrap___not__},
-{"exodus_perlc::MVadd", _wrap_MVadd},
-{"exodus_perlc::MVmul", _wrap_MVmul},
-{"exodus_perlc::MVdiv", _wrap_MVdiv},
-{"exodus_perlc::MVmod", _wrap_MVmod},
-{"exodus_perlc::MVcat", _wrap_MVcat},
-{"exodus_perlc::__add__", _wrap___add__},
-{"exodus_perlc::__sub__", _wrap___sub__},
-{"exodus_perlc::__mul__", _wrap___mul__},
-{"exodus_perlc::__div__", _wrap___div__},
-{"exodus_perlc::__mod__", _wrap___mod__},
-{"exodus_perlc::__xor__", _wrap___xor__},
-{"exodus_perlc::__lshift__", _wrap___lshift__},
-{"exodus_perlc::dim_redim", _wrap_dim_redim},
-{"exodus_perlc::dim_unparse", _wrap_dim_unparse},
-{"exodus_perlc::dim___call__", _wrap_dim___call__},
-{"exodus_perlc::delete_dim", _wrap_delete_dim},
-{"exodus_perlc::new_dim", _wrap_new_dim},
-{"exodus_perlc::dim_parse", _wrap_dim_parse},
-{"exodus_perlc::dim_read", _wrap_dim_read},
-{"exodus_perlc::dim_write", _wrap_dim_write},
-{"exodus_perlc::output", _wrap_output},
-{"exodus_perlc::outputl", _wrap_outputl},
-{"exodus_perlc::outputt", _wrap_outputt},
-{"exodus_perlc::errput", _wrap_errput},
-{"exodus_perlc::errputl", _wrap_errputl},
-{"exodus_perlc::logput", _wrap_logput},
-{"exodus_perlc::logputl", _wrap_logputl},
-{"exodus_perlc::backtrace", _wrap_backtrace},
-{"exodus_perlc::getenvironmentn", _wrap_getenvironmentn},
-{"exodus_perlc::setenvironmentn", _wrap_setenvironmentn},
-{"exodus_perlc::getprocessn", _wrap_getprocessn},
-{"exodus_perlc::getexecpath", _wrap_getexecpath},
-{"exodus_perlc::new_MVException", _wrap_new_MVException},
-{"exodus_perlc::MVException_description_set", _wrap_MVException_description_set},
-{"exodus_perlc::MVException_description_get", _wrap_MVException_description_get},
-{"exodus_perlc::delete_MVException", _wrap_delete_MVException},
-{"exodus_perlc::new_MVDivideByZero", _wrap_new_MVDivideByZero},
-{"exodus_perlc::delete_MVDivideByZero", _wrap_delete_MVDivideByZero},
-{"exodus_perlc::new_MVNonNumeric", _wrap_new_MVNonNumeric},
-{"exodus_perlc::delete_MVNonNumeric", _wrap_delete_MVNonNumeric},
-{"exodus_perlc::new_MVOutOfMemory", _wrap_new_MVOutOfMemory},
-{"exodus_perlc::delete_MVOutOfMemory", _wrap_delete_MVOutOfMemory},
-{"exodus_perlc::new_MVUnassigned", _wrap_new_MVUnassigned},
-{"exodus_perlc::delete_MVUnassigned", _wrap_delete_MVUnassigned},
-{"exodus_perlc::new_MVUndefined", _wrap_new_MVUndefined},
-{"exodus_perlc::delete_MVUndefined", _wrap_delete_MVUndefined},
-{"exodus_perlc::new_MVInvalidPointer", _wrap_new_MVInvalidPointer},
-{"exodus_perlc::delete_MVInvalidPointer", _wrap_delete_MVInvalidPointer},
-{"exodus_perlc::new_MVDBException", _wrap_new_MVDBException},
-{"exodus_perlc::delete_MVDBException", _wrap_delete_MVDBException},
-{"exodus_perlc::new_MVNotImplemented", _wrap_new_MVNotImplemented},
-{"exodus_perlc::delete_MVNotImplemented", _wrap_delete_MVNotImplemented},
-{"exodus_perlc::new_MVDebug", _wrap_new_MVDebug},
-{"exodus_perlc::delete_MVDebug", _wrap_delete_MVDebug},
-{"exodus_perlc::new_MVStop", _wrap_new_MVStop},
-{"exodus_perlc::delete_MVStop", _wrap_delete_MVStop},
-{"exodus_perlc::new_MVAbort", _wrap_new_MVAbort},
-{"exodus_perlc::delete_MVAbort", _wrap_delete_MVAbort},
-{"exodus_perlc::new_MVArrayDimensionedZero", _wrap_new_MVArrayDimensionedZero},
-{"exodus_perlc::delete_MVArrayDimensionedZero", _wrap_delete_MVArrayDimensionedZero},
-{"exodus_perlc::new_MVArrayIndexOutOfBounds", _wrap_new_MVArrayIndexOutOfBounds},
-{"exodus_perlc::delete_MVArrayIndexOutOfBounds", _wrap_delete_MVArrayIndexOutOfBounds},
-{"exodus_perlc::new_MVArrayNotDimensioned", _wrap_new_MVArrayNotDimensioned},
-{"exodus_perlc::delete_MVArrayNotDimensioned", _wrap_delete_MVArrayNotDimensioned},
+{"exoc::delete_var", _wrap_delete_var},
+{"exoc::var_toBool", _wrap_var_toBool},
+{"exoc::var_toInt", _wrap_var_toInt},
+{"exoc::var_toDouble", _wrap_var_toDouble},
+{"exoc::var_toWString", _wrap_var_toWString},
+{"exoc::var_toString", _wrap_var_toString},
+{"exoc::var___str__", _wrap_var___str__},
+{"exoc::new_var", _wrap_new_var},
+{"exoc::var___call__", _wrap_var___call__},
+{"exoc::var___plusplus__", _wrap_var___plusplus__},
+{"exoc::var___minmin__", _wrap_var___minmin__},
+{"exoc::var___iadd__", _wrap_var___iadd__},
+{"exoc::var___isub__", _wrap_var___isub__},
+{"exoc::var_date", _wrap_var_date},
+{"exoc::var_time", _wrap_var_time},
+{"exoc::var_timedate", _wrap_var_timedate},
+{"exoc::var_ossleep", _wrap_var_ossleep},
+{"exoc::var_ostime", _wrap_var_ostime},
+{"exoc::var_osopen", _wrap_var_osopen},
+{"exoc::var_osbread", _wrap_var_osbread},
+{"exoc::var_osbwrite", _wrap_var_osbwrite},
+{"exoc::var_osclose", _wrap_var_osclose},
+{"exoc::var_oswrite", _wrap_var_oswrite},
+{"exoc::var_osdelete", _wrap_var_osdelete},
+{"exoc::var_osrename", _wrap_var_osrename},
+{"exoc::var_oscopy", _wrap_var_oscopy},
+{"exoc::var_oslist", _wrap_var_oslist},
+{"exoc::var_oslistf", _wrap_var_oslistf},
+{"exoc::var_oslistd", _wrap_var_oslistd},
+{"exoc::var_osfile", _wrap_var_osfile},
+{"exoc::var_osdir", _wrap_var_osdir},
+{"exoc::var_osmkdir", _wrap_var_osmkdir},
+{"exoc::var_osrmdir", _wrap_var_osrmdir},
+{"exoc::var_oscwd", _wrap_var_oscwd},
+{"exoc::var_osflush", _wrap_var_osflush},
+{"exoc::var_osread", _wrap_var_osread},
+{"exoc::var_suspend", _wrap_var_suspend},
+{"exoc::var_osshell", _wrap_var_osshell},
+{"exoc::var_osshellread", _wrap_var_osshellread},
+{"exoc::var_osshellwrite", _wrap_var_osshellwrite},
+{"exoc::var_osgetenv", _wrap_var_osgetenv},
+{"exoc::var_ossetenv", _wrap_var_ossetenv},
+{"exoc::var_stop", _wrap_var_stop},
+{"exoc::var_abort", _wrap_var_abort},
+{"exoc::var_perform", _wrap_var_perform},
+{"exoc::var_execute", _wrap_var_execute},
+{"exoc::var_chain", _wrap_var_chain},
+{"exoc::var_logoff", _wrap_var_logoff},
+{"exoc::var_debug", _wrap_var_debug},
+{"exoc::var_breakon", _wrap_var_breakon},
+{"exoc::var_breakoff", _wrap_var_breakoff},
+{"exoc::var_output", _wrap_var_output},
+{"exoc::var_outputl", _wrap_var_outputl},
+{"exoc::var_outputt", _wrap_var_outputt},
+{"exoc::var_logput", _wrap_var_logput},
+{"exoc::var_logputl", _wrap_var_logputl},
+{"exoc::var_errput", _wrap_var_errput},
+{"exoc::var_errputl", _wrap_var_errputl},
+{"exoc::var_put", _wrap_var_put},
+{"exoc::var_at", _wrap_var_at},
+{"exoc::var_getcursor", _wrap_var_getcursor},
+{"exoc::var_setcursor", _wrap_var_setcursor},
+{"exoc::var_getprompt", _wrap_var_getprompt},
+{"exoc::var_setprompt", _wrap_var_setprompt},
+{"exoc::var_input", _wrap_var_input},
+{"exoc::var_eof", _wrap_var_eof},
+{"exoc::var_assigned", _wrap_var_assigned},
+{"exoc::var_unassigned", _wrap_var_unassigned},
+{"exoc::var_transfer", _wrap_var_transfer},
+{"exoc::var_exchange", _wrap_var_exchange},
+{"exoc::var_clone", _wrap_var_clone},
+{"exoc::var_abs", _wrap_var_abs},
+{"exoc::var_mod", _wrap_var_mod},
+{"exoc::var_pwr", _wrap_var_pwr},
+{"exoc::var_rnd", _wrap_var_rnd},
+{"exoc::var_initrnd", _wrap_var_initrnd},
+{"exoc::var_exp", _wrap_var_exp},
+{"exoc::var_sqrt", _wrap_var_sqrt},
+{"exoc::var_sin", _wrap_var_sin},
+{"exoc::var_cos", _wrap_var_cos},
+{"exoc::var_tan", _wrap_var_tan},
+{"exoc::var_atan", _wrap_var_atan},
+{"exoc::var_loge", _wrap_var_loge},
+{"exoc::var_integer", _wrap_var_integer},
+{"exoc::var_floor", _wrap_var_floor},
+{"exoc::var_round", _wrap_var_round},
+{"exoc::var_setxlocale", _wrap_var_setxlocale},
+{"exoc::var_getxlocale", _wrap_var_getxlocale},
+{"exoc::var_chr", _wrap_var_chr},
+{"exoc::var_str", _wrap_var_str},
+{"exoc::var_space", _wrap_var_space},
+{"exoc::var_match", _wrap_var_match},
+{"exoc::var_seq", _wrap_var_seq},
+{"exoc::var_dcount", _wrap_var_dcount},
+{"exoc::var_count", _wrap_var_count},
+{"exoc::var_length", _wrap_var_length},
+{"exoc::var_len", _wrap_var_len},
+{"exoc::var_data", _wrap_var_data},
+{"exoc::var_isnum", _wrap_var_isnum},
+{"exoc::var_isnum_old", _wrap_var_isnum_old},
+{"exoc::var_converter", _wrap_var_converter},
+{"exoc::var_swapper", _wrap_var_swapper},
+{"exoc::var_splicer", _wrap_var_splicer},
+{"exoc::var_quoter", _wrap_var_quoter},
+{"exoc::var_squoter", _wrap_var_squoter},
+{"exoc::var_unquoter", _wrap_var_unquoter},
+{"exoc::var_ucaser", _wrap_var_ucaser},
+{"exoc::var_lcaser", _wrap_var_lcaser},
+{"exoc::var_trimmer", _wrap_var_trimmer},
+{"exoc::var_trimmerf", _wrap_var_trimmerf},
+{"exoc::var_trimmerb", _wrap_var_trimmerb},
+{"exoc::var_fieldstorer", _wrap_var_fieldstorer},
+{"exoc::var_substrer", _wrap_var_substrer},
+{"exoc::var_convert", _wrap_var_convert},
+{"exoc::var_swap", _wrap_var_swap},
+{"exoc::var_splice", _wrap_var_splice},
+{"exoc::var_quote", _wrap_var_quote},
+{"exoc::var_squote", _wrap_var_squote},
+{"exoc::var_unquote", _wrap_var_unquote},
+{"exoc::var_ucase", _wrap_var_ucase},
+{"exoc::var_lcase", _wrap_var_lcase},
+{"exoc::var_trim", _wrap_var_trim},
+{"exoc::var_trimf", _wrap_var_trimf},
+{"exoc::var_trimb", _wrap_var_trimb},
+{"exoc::var_fieldstore", _wrap_var_fieldstore},
+{"exoc::var_substr", _wrap_var_substr},
+{"exoc::var_index", _wrap_var_index},
+{"exoc::var_index2", _wrap_var_index2},
+{"exoc::var_field", _wrap_var_field},
+{"exoc::var_field2", _wrap_var_field2},
+{"exoc::var_oconv", _wrap_var_oconv},
+{"exoc::var_iconv", _wrap_var_iconv},
+{"exoc::var_lower", _wrap_var_lower},
+{"exoc::var_raise", _wrap_var_raise},
+{"exoc::var_crop", _wrap_var_crop},
+{"exoc::var_lowerer", _wrap_var_lowerer},
+{"exoc::var_raiser", _wrap_var_raiser},
+{"exoc::var_cropper", _wrap_var_cropper},
+{"exoc::var_remove", _wrap_var_remove},
+{"exoc::var_replace", _wrap_var_replace},
+{"exoc::var_insert", _wrap_var_insert},
+{"exoc::var_erase", _wrap_var_erase},
+{"exoc::var_extract", _wrap_var_extract},
+{"exoc::var_replacer", _wrap_var_replacer},
+{"exoc::var_inserter", _wrap_var_inserter},
+{"exoc::var_eraser", _wrap_var_eraser},
+{"exoc::var_locate", _wrap_var_locate},
+{"exoc::var_locateby", _wrap_var_locateby},
+{"exoc::var_locateusing", _wrap_var_locateusing},
+{"exoc::var_sum", _wrap_var_sum},
+{"exoc::var_connect", _wrap_var_connect},
+{"exoc::var_disconnect", _wrap_var_disconnect},
+{"exoc::var_setdefaultconnection", _wrap_var_setdefaultconnection},
+{"exoc::var_begintrans", _wrap_var_begintrans},
+{"exoc::var_rollbacktrans", _wrap_var_rollbacktrans},
+{"exoc::var_committrans", _wrap_var_committrans},
+{"exoc::var_createdb", _wrap_var_createdb},
+{"exoc::var_deletedb", _wrap_var_deletedb},
+{"exoc::var_createfile", _wrap_var_createfile},
+{"exoc::var_deletefile", _wrap_var_deletefile},
+{"exoc::var_clearfile", _wrap_var_clearfile},
+{"exoc::var_listfiles", _wrap_var_listfiles},
+{"exoc::var_createindex", _wrap_var_createindex},
+{"exoc::var_deleteindex", _wrap_var_deleteindex},
+{"exoc::var_listindexes", _wrap_var_listindexes},
+{"exoc::var_open", _wrap_var_open},
+{"exoc::var_close", _wrap_var_close},
+{"exoc::var_select", _wrap_var_select},
+{"exoc::var_clearselect", _wrap_var_clearselect},
+{"exoc::var_readnext", _wrap_var_readnext},
+{"exoc::var_selectrecord", _wrap_var_selectrecord},
+{"exoc::var_readnextrecord", _wrap_var_readnextrecord},
+{"exoc::var_lock", _wrap_var_lock},
+{"exoc::var_unlock", _wrap_var_unlock},
+{"exoc::var_unlockall", _wrap_var_unlockall},
+{"exoc::var_read", _wrap_var_read},
+{"exoc::var_readv", _wrap_var_readv},
+{"exoc::var_write", _wrap_var_write},
+{"exoc::var_writev", _wrap_var_writev},
+{"exoc::var_deleterecord", _wrap_var_deleterecord},
+{"exoc::var_updaterecord", _wrap_var_updaterecord},
+{"exoc::var_insertrecord", _wrap_var_insertrecord},
+{"exoc::var_xlate", _wrap_var_xlate},
+{"exoc::var_sqlexec", _wrap_var_sqlexec},
+{"exoc::var_version", _wrap_var_version},
+{"exoc::MVeq", _wrap_MVeq},
+{"exoc::MVlt", _wrap_MVlt},
+{"exoc::__eq__", _wrap___eq__},
+{"exoc::__ne__", _wrap___ne__},
+{"exoc::__lt__", _wrap___lt__},
+{"exoc::__ge__", _wrap___ge__},
+{"exoc::__gt__", _wrap___gt__},
+{"exoc::__le__", _wrap___le__},
+{"exoc::__not__", _wrap___not__},
+{"exoc::MVadd", _wrap_MVadd},
+{"exoc::MVmul", _wrap_MVmul},
+{"exoc::MVdiv", _wrap_MVdiv},
+{"exoc::MVmod", _wrap_MVmod},
+{"exoc::MVcat", _wrap_MVcat},
+{"exoc::__add__", _wrap___add__},
+{"exoc::__sub__", _wrap___sub__},
+{"exoc::__mul__", _wrap___mul__},
+{"exoc::__div__", _wrap___div__},
+{"exoc::__mod__", _wrap___mod__},
+{"exoc::__xor__", _wrap___xor__},
+{"exoc::__lshift__", _wrap___lshift__},
+{"exoc::dim_redim", _wrap_dim_redim},
+{"exoc::dim_unparse", _wrap_dim_unparse},
+{"exoc::dim___call__", _wrap_dim___call__},
+{"exoc::delete_dim", _wrap_delete_dim},
+{"exoc::new_dim", _wrap_new_dim},
+{"exoc::dim_parse", _wrap_dim_parse},
+{"exoc::dim_read", _wrap_dim_read},
+{"exoc::dim_write", _wrap_dim_write},
+{"exoc::output", _wrap_output},
+{"exoc::outputl", _wrap_outputl},
+{"exoc::outputt", _wrap_outputt},
+{"exoc::errput", _wrap_errput},
+{"exoc::errputl", _wrap_errputl},
+{"exoc::logput", _wrap_logput},
+{"exoc::logputl", _wrap_logputl},
+{"exoc::backtrace", _wrap_backtrace},
+{"exoc::getenvironmentn", _wrap_getenvironmentn},
+{"exoc::setenvironmentn", _wrap_setenvironmentn},
+{"exoc::getprocessn", _wrap_getprocessn},
+{"exoc::getexecpath", _wrap_getexecpath},
+{"exoc::new_MVException", _wrap_new_MVException},
+{"exoc::MVException_description_set", _wrap_MVException_description_set},
+{"exoc::MVException_description_get", _wrap_MVException_description_get},
+{"exoc::delete_MVException", _wrap_delete_MVException},
+{"exoc::new_MVDivideByZero", _wrap_new_MVDivideByZero},
+{"exoc::delete_MVDivideByZero", _wrap_delete_MVDivideByZero},
+{"exoc::new_MVNonNumeric", _wrap_new_MVNonNumeric},
+{"exoc::delete_MVNonNumeric", _wrap_delete_MVNonNumeric},
+{"exoc::new_MVOutOfMemory", _wrap_new_MVOutOfMemory},
+{"exoc::delete_MVOutOfMemory", _wrap_delete_MVOutOfMemory},
+{"exoc::new_MVUnassigned", _wrap_new_MVUnassigned},
+{"exoc::delete_MVUnassigned", _wrap_delete_MVUnassigned},
+{"exoc::new_MVUndefined", _wrap_new_MVUndefined},
+{"exoc::delete_MVUndefined", _wrap_delete_MVUndefined},
+{"exoc::new_MVInvalidPointer", _wrap_new_MVInvalidPointer},
+{"exoc::delete_MVInvalidPointer", _wrap_delete_MVInvalidPointer},
+{"exoc::new_MVDBException", _wrap_new_MVDBException},
+{"exoc::delete_MVDBException", _wrap_delete_MVDBException},
+{"exoc::new_MVNotImplemented", _wrap_new_MVNotImplemented},
+{"exoc::delete_MVNotImplemented", _wrap_delete_MVNotImplemented},
+{"exoc::new_MVDebug", _wrap_new_MVDebug},
+{"exoc::delete_MVDebug", _wrap_delete_MVDebug},
+{"exoc::new_MVStop", _wrap_new_MVStop},
+{"exoc::delete_MVStop", _wrap_delete_MVStop},
+{"exoc::new_MVAbort", _wrap_new_MVAbort},
+{"exoc::delete_MVAbort", _wrap_delete_MVAbort},
+{"exoc::new_MVArrayDimensionedZero", _wrap_new_MVArrayDimensionedZero},
+{"exoc::delete_MVArrayDimensionedZero", _wrap_delete_MVArrayDimensionedZero},
+{"exoc::new_MVArrayIndexOutOfBounds", _wrap_new_MVArrayIndexOutOfBounds},
+{"exoc::delete_MVArrayIndexOutOfBounds", _wrap_delete_MVArrayIndexOutOfBounds},
+{"exoc::new_MVArrayNotDimensioned", _wrap_new_MVArrayNotDimensioned},
+{"exoc::delete_MVArrayNotDimensioned", _wrap_delete_MVArrayNotDimensioned},
 {0,0}
 };
 /* -----------------------------------------------------------------------------
@@ -28930,28 +29084,28 @@ XS(SWIG_init) {
     sv_setsv(sv, SWIG_From_int  SWIG_PERL_CALL_ARGS_1(static_cast< int >(0x0300)));
     SvREADONLY_on(sv);
   } while(0) /*@SWIG@*/;
-  SWIG_TypeClientData(SWIGTYPE_p_exodus__var, (void*) "exodus_perl::var");
-  SWIG_TypeClientData(SWIGTYPE_p_exodus__dim, (void*) "exodus_perl::dim");
+  SWIG_TypeClientData(SWIGTYPE_p_exodus__var, (void*) "exo::var");
+  SWIG_TypeClientData(SWIGTYPE_p_exodus__dim, (void*) "exo::dim");
   /*@SWIG:D:\swigwin-2.0.4\Lib\perl5\perltypemaps.swg,65,%set_constant@*/ do {
     SV *sv = get_sv((char*) SWIG_prefix "SLASH_IS_BACKSLASH", TRUE | 0x2 | GV_ADDMULTI);
     sv_setsv(sv, SWIG_From_bool  SWIG_PERL_CALL_ARGS_1(static_cast< bool >(false)));
     SvREADONLY_on(sv);
   } while(0) /*@SWIG@*/;
-  SWIG_TypeClientData(SWIGTYPE_p_exodus__MVException, (void*) "exodus_perl::MVException");
-  SWIG_TypeClientData(SWIGTYPE_p_exodus__MVDivideByZero, (void*) "exodus_perl::MVDivideByZero");
-  SWIG_TypeClientData(SWIGTYPE_p_exodus__MVNonNumeric, (void*) "exodus_perl::MVNonNumeric");
-  SWIG_TypeClientData(SWIGTYPE_p_exodus__MVOutOfMemory, (void*) "exodus_perl::MVOutOfMemory");
-  SWIG_TypeClientData(SWIGTYPE_p_exodus__MVUnassigned, (void*) "exodus_perl::MVUnassigned");
-  SWIG_TypeClientData(SWIGTYPE_p_exodus__MVUndefined, (void*) "exodus_perl::MVUndefined");
-  SWIG_TypeClientData(SWIGTYPE_p_exodus__MVInvalidPointer, (void*) "exodus_perl::MVInvalidPointer");
-  SWIG_TypeClientData(SWIGTYPE_p_exodus__MVDBException, (void*) "exodus_perl::MVDBException");
-  SWIG_TypeClientData(SWIGTYPE_p_exodus__MVNotImplemented, (void*) "exodus_perl::MVNotImplemented");
-  SWIG_TypeClientData(SWIGTYPE_p_exodus__MVDebug, (void*) "exodus_perl::MVDebug");
-  SWIG_TypeClientData(SWIGTYPE_p_exodus__MVStop, (void*) "exodus_perl::MVStop");
-  SWIG_TypeClientData(SWIGTYPE_p_exodus__MVAbort, (void*) "exodus_perl::MVAbort");
-  SWIG_TypeClientData(SWIGTYPE_p_exodus__MVArrayDimensionedZero, (void*) "exodus_perl::MVArrayDimensionedZero");
-  SWIG_TypeClientData(SWIGTYPE_p_exodus__MVArrayIndexOutOfBounds, (void*) "exodus_perl::MVArrayIndexOutOfBounds");
-  SWIG_TypeClientData(SWIGTYPE_p_exodus__MVArrayNotDimensioned, (void*) "exodus_perl::MVArrayNotDimensioned");
+  SWIG_TypeClientData(SWIGTYPE_p_exodus__MVException, (void*) "exo::MVException");
+  SWIG_TypeClientData(SWIGTYPE_p_exodus__MVDivideByZero, (void*) "exo::MVDivideByZero");
+  SWIG_TypeClientData(SWIGTYPE_p_exodus__MVNonNumeric, (void*) "exo::MVNonNumeric");
+  SWIG_TypeClientData(SWIGTYPE_p_exodus__MVOutOfMemory, (void*) "exo::MVOutOfMemory");
+  SWIG_TypeClientData(SWIGTYPE_p_exodus__MVUnassigned, (void*) "exo::MVUnassigned");
+  SWIG_TypeClientData(SWIGTYPE_p_exodus__MVUndefined, (void*) "exo::MVUndefined");
+  SWIG_TypeClientData(SWIGTYPE_p_exodus__MVInvalidPointer, (void*) "exo::MVInvalidPointer");
+  SWIG_TypeClientData(SWIGTYPE_p_exodus__MVDBException, (void*) "exo::MVDBException");
+  SWIG_TypeClientData(SWIGTYPE_p_exodus__MVNotImplemented, (void*) "exo::MVNotImplemented");
+  SWIG_TypeClientData(SWIGTYPE_p_exodus__MVDebug, (void*) "exo::MVDebug");
+  SWIG_TypeClientData(SWIGTYPE_p_exodus__MVStop, (void*) "exo::MVStop");
+  SWIG_TypeClientData(SWIGTYPE_p_exodus__MVAbort, (void*) "exo::MVAbort");
+  SWIG_TypeClientData(SWIGTYPE_p_exodus__MVArrayDimensionedZero, (void*) "exo::MVArrayDimensionedZero");
+  SWIG_TypeClientData(SWIGTYPE_p_exodus__MVArrayIndexOutOfBounds, (void*) "exo::MVArrayIndexOutOfBounds");
+  SWIG_TypeClientData(SWIGTYPE_p_exodus__MVArrayNotDimensioned, (void*) "exo::MVArrayNotDimensioned");
   ST(0) = &PL_sv_yes;
   XSRETURN(1);
 }

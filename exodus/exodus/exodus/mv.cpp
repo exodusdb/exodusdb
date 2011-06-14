@@ -235,7 +235,7 @@ var::operator bool() const
 /*
 var::operator const char*() const
 {
-	return tostring().c_str();
+	return toString().c_str();
 }
 */
 
@@ -1376,9 +1376,9 @@ DLL_PUBLIC
 	THISIS(L"std::ostream& operator << (std::ostream& ostream1, const var& var1)")
 	ISSTRING(var1)
 
-	//use tostring() to avoid creating a ctor which logs here recursively
+	//use toString() to avoid creating a ctor which logs here recursively
 	//should this use a ut16/32 -> UTF8 code facet? or convert to UTF8 and output to ostream?
-	ostream1 << var1.tostring();
+	ostream1 << var1.toString();
 	return ostream1;
 }
 
@@ -1404,7 +1404,7 @@ DLL_PUBLIC
 	THISIS(L"std::wostream& operator << (std::wostream& wostream1, const var& var1)")
 	ISSTRING(var1)
 
-	//use towstring() to avoid creating a ctor which logs here recursively
+	//use toWString() to avoid creating a ctor which logs here recursively
 	//should this use a ut16/32 -> UTF8 code facet? or convert to UTF8 and output to ostream?
 	wostream1 << var1.var_mvstr;
 	return wostream1;

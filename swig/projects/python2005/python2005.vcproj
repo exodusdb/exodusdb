@@ -16,7 +16,7 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)\swig"
+			OutputDirectory="$(EXO_PYTHON32_MODULEDIR)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="2"
@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(PYTHON32)\include&quot;;&quot;$(ProjectDir)..\..\..\exodus\exodus&quot;;&quot;$(ProjectDir)..\..\..\exodus\exodus\exodus&quot;"
+				AdditionalIncludeDirectories="&quot;$(EXO_PYTHON32_INCLUDE)&quot;;&quot;$(ProjectDir)..\..\..\exodus\exodus&quot;;&quot;$(ProjectDir)..\..\..\exodus\exodus\exodus&quot;"
 				PreprocessorDefinitions="__WIN32__"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -61,8 +61,8 @@
 			<Tool
 				Name="VCLinkerTool"
 				ShowProgress="2"
-				OutputFile="$(OutDir)\_exodus.pyd"
-				AdditionalLibraryDirectories="$(PYTHON32)/Libs"
+				OutputFile="$(OutDir)\_$(EXO_PYTHON_MODULENAME).pyd"
+				AdditionalLibraryDirectories="&quot;$(EXO_PYTHON32_LIB)&quot;"
 				DelayLoadDLLs=""
 				GenerateDebugInformation="true"
 				TargetMachine="1"
@@ -94,7 +94,7 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)\swig"
+			OutputDirectory="$(EXO_PYTHON32_MODULEDIR)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="2"
@@ -118,7 +118,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;$(PYTHON32)\include&quot;;&quot;$(ProjectDir)..\..\..\exodus\exodus&quot;;&quot;$(ProjectDir)..\..\..\exodus\exodus\exodus&quot;"
+				AdditionalIncludeDirectories="&quot;$(EXO_PYTHON32_INCLUDE)&quot;;&quot;$(ProjectDir)..\..\..\exodus\exodus&quot;;&quot;$(ProjectDir)..\..\..\exodus\exodus\exodus&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;EXAMPLEVC_EXPORTS"
 				RuntimeLibrary="2"
 				WarningLevel="3"
@@ -137,8 +137,8 @@
 			<Tool
 				Name="VCLinkerTool"
 				ShowProgress="2"
-				OutputFile="$(OutDir)\_exodus.pyd"
-				AdditionalLibraryDirectories="$(PYTHON32)/Libs"
+				OutputFile="$(OutDir)\_$(EXO_PYTHON_MODULENAME).pyd"
+				AdditionalLibraryDirectories="&quot;$(EXO_PYTHON32_LIB)&quot;"
 				IgnoreAllDefaultLibraries="false"
 				DelayLoadDLLs=""
 				GenerateDebugInformation="true"
@@ -197,7 +197,7 @@
 				>
 				<Tool
 					Name="VCCustomBuildTool"
-					CommandLine="echo Invoking SWIG...&#x0D;&#x0A;echo on&#x0D;&#x0A;if not exist  &quot;$(SolutionDir)$(ConfigurationName)\swig&quot; mkdir &quot;$(SolutionDir)$(ConfigurationName)\swig&quot;&#x0D;&#x0A;$(SWIG32)\swig.exe -c++ -python  -I..\..\..\exodus\exodus -outcurrentdir -outdir $(SolutionDir)$(ConfigurationName)\swig $(EXO_SWIG_OPTIONS) &quot;$(InputPath)&quot;&#x0D;&#x0A;@echo off&#x0D;&#x0A;"
+					CommandLine="echo Invoking SWIG... Installing into $(EXO_PYTHON32_MODULEDIR)&#x0D;&#x0A;echo on&#x0D;&#x0A;$(SWIG32)\swig.exe -c++ -python -module $(EXO_PYTHON_MODULENAME) -I..\..\..\exodus\exodus -outcurrentdir -outdir $(EXO_PYTHON32_MODULEDIR) $(EXO_SWIG_OPTIONS) &quot;$(InputPath)&quot;&#x0D;&#x0A;@echo off&#x0D;&#x0A;"
 					AdditionalDependencies="..\..\..\exodus\exodus\exodus\mv.h"
 					Outputs="$(InputName)_wrap.cxx"
 				/>
@@ -207,7 +207,7 @@
 				>
 				<Tool
 					Name="VCCustomBuildTool"
-					CommandLine="echo Invoking SWIG...&#x0D;&#x0A;echo on&#x0D;&#x0A;if not exist  &quot;$(SolutionDir)$(ConfigurationName)\swig&quot; mkdir &quot;$(SolutionDir)$(ConfigurationName)\swig&quot;&#x0D;&#x0A;$(SWIG32)\swig.exe -c++ -python  -I..\..\..\exodus\exodus -outcurrentdir -outdir $(SolutionDir)$(ConfigurationName)\swig $(EXO_SWIG_OPTIONS) &quot;$(InputPath)&quot;&#x0D;&#x0A;@echo off&#x0D;&#x0A;"
+					CommandLine="echo Invoking SWIG... Installing into $(EXO_PYTHON32_MODULEDIR)&#x0D;&#x0A;echo on&#x0D;&#x0A;$(SWIG32)\swig.exe -c++ -python -module $(EXO_PYTHON_MODULENAME) -I..\..\..\exodus\exodus -outcurrentdir -outdir $(EXO_PYTHON32_MODULEDIR) $(EXO_SWIG_OPTIONS) &quot;$(InputPath)&quot;&#x0D;&#x0A;@echo off&#x0D;&#x0A;"
 					AdditionalDependencies="..\..\..\exodus\exodus\exodus\mv.h"
 					Outputs="$(InputName)_wrap.cxx"
 				/>

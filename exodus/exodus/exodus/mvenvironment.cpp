@@ -189,8 +189,8 @@ var MvEnvironment::calculate(const var& dictid)
 		//TODO deduplicate various exodusfunctorbase code spread around calculate mvipc* etc
 		if (newlibfunc)
 		{
-			std::string str_libname=DICT.tostring();
-			std::string str_funcname=dictid.tostring();
+			std::string str_libname=DICT.toString();
+			std::string str_funcname=dictid.toString();
 			if (!exodusfunctorbase_.init(str_libname.c_str(),str_funcname.c_str()))
 				throw MVException(L"calculate() Cannot find Library "^str_libname^L", or function "^str_funcname^L" is not present");
 		}

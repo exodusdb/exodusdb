@@ -303,7 +303,7 @@ std::locale get_locale(const var& locale_name) // throw (MVException)
 	{
 		try {
 			if (locale_name.length()) {
-				std::locale mylocale(locale_name.tostring().c_str());
+				std::locale mylocale(locale_name.toString().c_str());
 				return mylocale;
 			} else {
 				//dont trust default locale since on osx 10.5.6 it fails!
@@ -766,7 +766,7 @@ bool var::osgetenv(const var& envvarname)
 	ISSTRING(envvarname)
 
 	#pragma warning (disable : 4996)
-	const char* cvalue=std::getenv(envvarname.tostring().c_str());
+	const char* cvalue=std::getenv(envvarname.toString().c_str());
 	if (cvalue==0)
 	{
 		var_mvstr=L"";
@@ -793,9 +793,9 @@ bool var::ossetenv(const var& envvarname) const
 
 	//is this safe on windows??
 	//https://www.securecoding.cert.org/confluence/display/seccode/POS34-C.+Do+not+call+putenv()+with+a+pointer+to+an+automatic+variable+as+the+argument
-	std::string tempstr=envvarname.tostring();
+	std::string tempstr=envvarname.toString();
 	tempstr+="=";
-	tempstr+=tostring();
+	tempstr+=toString();
 	//#pragma warning (disable : 4996)
 	const int result=putenv((char*)(tempstr.c_str()));
 	if (result==0)
@@ -804,7 +804,7 @@ bool var::ossetenv(const var& envvarname) const
 		return false;
 
 #else
-	return setenv((char*)(envvarname.tostring().c_str()),(char*)(tostring().c_str()),1);
+	return setenv((char*)(envvarname.toString().c_str()),(char*)(toString().c_str()),1);
 #endif
 
 }
@@ -812,12 +812,12 @@ bool var::ossetenv(const var& envvarname) const
 var var::osshell() const
 {
 	THISIS(L"var var::osshell() const")
-	//will be checked again by tostring()
+	//will be checked again by toString()
 	//but put it here so any unassigned error shows in osshell
 	THISISSTRING()
 
 	breakoff();
-	int shellresult=system(tostring().c_str());
+	int shellresult=system(toString().c_str());
 	breakon();
 
 	return shellresult;
@@ -826,14 +826,14 @@ var var::osshell() const
 var var::osshellread() const
 {
 	THISIS(L"var var::osshellread() const")
-	//will be checked again by tostring()
+	//will be checked again by toString()
 	//but put it here so any unassigned error shows in osshell
 	THISISSTRING()
 
 	var output=L"";
 
 	//"r" means read
-	std::FILE *cmd=popen(tostring().c_str(), "r");
+	std::FILE *cmd=popen(toString().c_str(), "r");
 	//return a code to indicate program failure. but can this ever happen?
 	if (cmd==NULL)
 		return 1;
@@ -859,17 +859,17 @@ var var::osshellread() const
 var var::osshellwrite(const var& writestr) const
 {
 	THISIS(L"var var::osshellwrite(const var& writestr) const")
-	//will be checked again by tostring()
+	//will be checked again by toString()
 	//but put it here so any unassigned error shows in osshell
 	THISISSTRING()
 	ISSTRING(writestr)
 
 	//"w" means read
-	std::FILE *cmd=popen(tostring().c_str(), "w");
+	std::FILE *cmd=popen(toString().c_str(), "w");
 	//return a code to indicate program failure. but can this ever happen?
 	if (cmd==NULL)
 		return 1;
-	fputs(writestr.tostring().c_str(),cmd);
+	fputs(writestr.toString().c_str(),cmd);
 
 	//return the process termination status (pity cant do this for read too)
 	return pclose(cmd);
@@ -882,7 +882,7 @@ var var::suspend() const
 
 	breakoff();
 	//use dummy to avoid warning in gcc4 "warning: ignoring return value of int system(const char*), declared with attribute warn_unused_result"
-	int dummy=system(tostring().c_str());
+	int dummy=system(toString().c_str());
 	breakon();
 
 	return L"";
@@ -970,7 +970,7 @@ std::wfstream* var::osopenx(const var& osfilename, const var& locale) const
 /*
 		try
 		{
-			pmyfile->imbue(std::locale(locale.tostring().c_str()));
+			pmyfile->imbue(std::locale(locale.toString().c_str()));
 		}
 		catch (...)
 		{
@@ -981,7 +981,7 @@ std::wfstream* var::osopenx(const var& osfilename, const var& locale) const
 
 		//open the file for i/o (fail if the file doesnt exist and do NOT delete any existing file)
 		//binary and in/out to allow reading and writing from same file handle
-		pmyfile->open(osfilename.tostring().c_str(), std::ios::out | std::ios::in | std::ios::binary);
+		pmyfile->open(osfilename.toString().c_str(), std::ios::out | std::ios::in | std::ios::binary);
 		if (! (*pmyfile))
 		{
 			delete pmyfile;
@@ -1011,7 +1011,7 @@ bool var::osread(const var& osfilename, const var& locale)
 	//will be checked by nested osread
 	//THISISDEFINED()
 	ISSTRING(osfilename)
-	return osread(osfilename.tostring().c_str(), locale);
+	return osread(osfilename.toString().c_str(), locale);
 }
 
 bool var::osread(const char* osfilename, const var& locale)
@@ -1101,7 +1101,7 @@ bool var::oswrite(const var& osfilename, const var& locale) const
 
 	//although the stream works with wchar_t, its parameter file name is narrow char *
 	//delete any previous file,
-	myfile.open(osfilename.tostring().c_str(), std::ios::trunc | std::ios::out | std::ios::binary);
+	myfile.open(osfilename.toString().c_str(), std::ios::trunc | std::ios::out | std::ios::binary);
 	if (!myfile)
 		return false;
 
@@ -1255,7 +1255,7 @@ bool var::osrename(const var& newosdir_or_filename) const
 	//ACQUIRE
 	std::wifstream myfile;
 	//binary?
-	myfile.open(newosdir_or_filename.tostring().c_str(), std::ios::binary );
+	myfile.open(newosdir_or_filename.toString().c_str(), std::ios::binary );
 	if (myfile)
 	{
 		//RELEASE
@@ -1264,10 +1264,10 @@ bool var::osrename(const var& newosdir_or_filename) const
 	}
 
 	//safety
-	if (!checknotabsoluterootfolder(towstring()))
+	if (!checknotabsoluterootfolder(toWString()))
 		return false;
 
-	return !std::rename(tostring().c_str(),newosdir_or_filename.tostring().c_str());
+	return !std::rename(toString().c_str(),newosdir_or_filename.toString().c_str());
 
 }
 
@@ -1279,8 +1279,8 @@ bool var::oscopy(const var& to_osfilename) const
 	
     //boostfs::wpath frompathx(toTstring((*this)).c_str());
     //boostfs::wpath topathx(toTstring(to_osfilename).c_str());
-    boostfs::path frompathx((*this).tostring().c_str());
-    boostfs::path topathx(to_osfilename.tostring().c_str());
+    boostfs::path frompathx((*this).toString().c_str());
+    boostfs::path topathx(to_osfilename.toString().c_str());
     try
     {
 		//will not overwrite so this is redundant
@@ -1309,7 +1309,7 @@ bool var::osdelete(const var& osfilename) const
 	THISISDEFINED()
 	ISSTRING(osfilename)
 	osfilename.osclose();		// in case this is cached opened file handle
-	return !std::remove(osfilename.tostring().c_str());
+	return !std::remove(osfilename.toString().c_str());
 }
 
 var var::oslistf(const var& path, const var& spec) const
@@ -1332,7 +1332,7 @@ var var::osfile() const
     {
 		//boost 1.33 throws an error with files containing ~ or $ chars but 1.38 doesnt
 		//boostfs::wpath pathx(toTstring((*this)).c_str());
-		boostfs::path pathx((*this).tostring().c_str());
+		boostfs::path pathx((*this).toString().c_str());
 
         if (!boostfs::exists(pathx)) return L"";
         //is_regular is only in boost > 1.34
@@ -1366,7 +1366,7 @@ bool var::osmkdir() const
 
 		//boost 1.33 throws an error with files containing ~ or $ chars but 1.38 doesnt
 		//boostfs::wpath pathx(toTstring((*this)).c_str());
-		boostfs::path pathx((*this).tostring().c_str());
+		boostfs::path pathx((*this).toString().c_str());
 
 		if (boostfs::exists(pathx)) return false;
 		boostfs::create_directories(pathx);
@@ -1389,7 +1389,7 @@ bool var::osrmdir(bool evenifnotempty) const
 
 		//boost 1.33 throws an error with files containing ~ or $ chars but 1.38 doesnt
 		//boostfs::wpath pathx(toTstring((*this)).c_str());
-		boostfs::path pathx((*this).tostring().c_str());
+		boostfs::path pathx((*this).toString().c_str());
 
         if (!boostfs::exists(pathx)) return false;
         if (!boostfs::is_directory(pathx)) return false;
@@ -1398,7 +1398,7 @@ bool var::osrmdir(bool evenifnotempty) const
 		{
 
 			//safety
-			if (!checknotabsoluterootfolder(towstring()))
+			if (!checknotabsoluterootfolder(toWString()))
 				return false;
 
 			boostfs::remove_all(pathx);
@@ -1425,7 +1425,7 @@ var var::osdir() const
     {
 
 		//boost 1.33 throws an error with files containing ~ or $ chars but 1.38 doesnt
-		boostfs::path pathx((*this).tostring().c_str());
+		boostfs::path pathx((*this).toString().c_str());
 
         if (!boostfs::exists(pathx)) return L"";
         if (!boostfs::is_directory(pathx)) return L"";
@@ -1467,7 +1467,7 @@ var var::oslist(const var& path, const var& spec, const int mode) const
 		{
 			// Set up the regular expression for case-insensitivity
 			//re.assign(toTstring(spec).c_str(), boost::regex_constants::icase);
-			re.assign(spec.tostring().c_str(), boost::regex_constants::icase);
+			re.assign(spec.toString().c_str(), boost::regex_constants::icase);
 			filter=true;
 		}
 		catch (boost::regex_error& e)
@@ -1503,7 +1503,7 @@ var var::oslist(const var& path, const var& spec, const int mode) const
 		(
 			boostfs::path
 			(
-				path.tostring().c_str() COMMABOOSTFSNATIVE
+				path.toString().c_str() COMMABOOSTFSNATIVE
 			)
 		);
 
@@ -1578,7 +1578,7 @@ var var::oscwd(const var& newpath) const
 	//http://www.boost.org/doc/libs/1_38_0/libs/filesystem/doc/reference.html#Attribute-functions
 	//wont compile on boost 1.33 so comment it out and make non-functional
 	//until we have a reliable way to detect boost version
-	//boost::filesystem::current_path(newpath.tostring());
+	//boost::filesystem::current_path(newpath.toString());
 
 	return oscwd();
 

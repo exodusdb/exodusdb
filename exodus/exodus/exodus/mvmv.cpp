@@ -266,7 +266,7 @@ bool var::locateby(const var& target,const var& ordercode, var& setting, const i
 	THISIS(L"bool var::locateby(const var& target,const var& ordercode, var& setting, const int fieldno/*=0*/, const int valueno/*=0*/)const")
 	ISSTRING(ordercode)
 
-	return locateby(target,ordercode.tostring().c_str(), setting, fieldno, valueno);
+	return locateby(target,ordercode.toString().c_str(), setting, fieldno, valueno);
 }
 
 //specialised const wchar_t version of ordercode for speed of usual syntax where ordermode is given as string

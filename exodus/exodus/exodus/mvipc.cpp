@@ -164,7 +164,7 @@ void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsec
 	{
 		var reply=response^L" Only "^int(request_size)^L" bytes read. Should be "^totlength;
 		std::wcerr<<reply<<std::endl;
-		response=reply.tostring();
+		response=reply.toString();
 		return;
 	}
 
@@ -172,7 +172,7 @@ void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsec
 	{
 		var reply=response^L" MvEnvironment is not initialised";
 		std::wcerr<<reply<<std::endl;
-		response=reply.tostring();
+		response=reply.toString();
 		return;
 	}
 	else
@@ -246,7 +246,7 @@ void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsec
 		{
 			var reply=response^L"Cannot find Library "^str_libname^L", or function "^str_funcname^L" is not present";
 			std::wcerr<<reply<<std::endl;
-			response=reply.tostring();
+			response=reply.toString();
 			return;
 		}
 		else
@@ -261,7 +261,7 @@ void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsec
 					((pExodusProgramBaseMemberFunction) (exodusfunctorbase.pmemberfunction_)))
 					();
 					//(filename,dictkey,datakey,data,valueno,subvalueno);
-				response=reply.tostring();
+				response=reply.toString();
 				*/
 
 				//typedef var (*ExodusDynamic)(MvEnvironment& mvx);
@@ -269,7 +269,7 @@ void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsec
 				exodusfunctorbase.calldict();
 
 				//dictionary subroutines return return in mv ANS.
-				response=exodusfunctorbase.mv_->ANS.tostring();
+				response=exodusfunctorbase.mv_->ANS.toString();
 
 				//optionally limit the number of bytes of the reply sent
 				int nresponsebytes=(int)response.length();
@@ -277,7 +277,7 @@ void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsec
 				{
 					var reply=var(L"NEOSYS_IPC_ERROR: Response bytes) " ^ var(nresponsebytes) ^ L" too many for ipc buffer bytes " ^ var(maxresponsechars))^ " while calling "^str_libname^", "^str_funcname;
 					std::wcerr<<reply<<std::endl;
-					response=reply.tostring();
+					response=reply.toString();
 					return;
 				}
 
@@ -288,14 +288,14 @@ void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsec
 			{
 				var reply=response^"ERROR: Calling "^str_libname^", "^str_funcname^L". ERROR: "^mve.description;
 				std::wcerr<<reply<<std::endl;
-				response=reply.tostring();
+				response=reply.toString();
 				return;
 			}
 			catch (...)
 			{
 				var reply=response^"ERROR: Calling "^str_libname^", "^str_funcname;
 				std::wcerr<<reply<<std::endl;
-				response=reply.tostring();
+				response=reply.toString();
 				return;
 			}
 		}

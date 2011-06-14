@@ -1040,17 +1040,17 @@ static swig_module_info swig_module = {swig_types, 23, 0, 0, 0, 0};
 /* -------- TYPES TABLE (END) -------- */
 
 /* header section */
-ZEND_BEGIN_MODULE_GLOBALS(exodus)
+ZEND_BEGIN_MODULE_GLOBALS(exophp)
 const char *error_msg;
 int error_code;
-ZEND_END_MODULE_GLOBALS(exodus)
-ZEND_DECLARE_MODULE_GLOBALS(exodus)
+ZEND_END_MODULE_GLOBALS(exophp)
+ZEND_DECLARE_MODULE_GLOBALS(exophp)
 #ifdef ZTS
-#define SWIG_ErrorMsg() TSRMG(exodus_globals_id, zend_exodus_globals *, error_msg )
-#define SWIG_ErrorCode() TSRMG(exodus_globals_id, zend_exodus_globals *, error_code )
+#define SWIG_ErrorMsg() TSRMG(exophp_globals_id, zend_exophp_globals *, error_msg )
+#define SWIG_ErrorCode() TSRMG(exophp_globals_id, zend_exophp_globals *, error_code )
 #else
-#define SWIG_ErrorMsg() (exodus_globals.error_msg)
-#define SWIG_ErrorCode() (exodus_globals.error_code)
+#define SWIG_ErrorMsg() (exophp_globals.error_msg)
+#define SWIG_ErrorCode() (exophp_globals.error_code)
 #endif
 
 // Allow the user to workaround a PHP bug on some platforms/architectures by
@@ -1059,11 +1059,11 @@ ZEND_DECLARE_MODULE_GLOBALS(exodus)
 # define SWIG_ZEND_ERROR_NORETURN zend_error_noreturn
 #endif
 
-static void exodus_init_globals(zend_exodus_globals *globals ) {
+static void exophp_init_globals(zend_exophp_globals *globals ) {
   globals->error_msg = default_error_msg;
   globals->error_code = default_error_code;
 }
-static void exodus_destroy_globals(zend_exodus_globals * globals) { (void)globals; }
+static void exophp_destroy_globals(zend_exophp_globals * globals) { (void)globals; }
 
 static void SWIG_ResetError() {
   TSRMLS_FETCH();
@@ -1071,7 +1071,7 @@ static void SWIG_ResetError() {
   SWIG_ErrorCode() = default_error_code;
 }
 
-ZEND_NAMED_FUNCTION(_wrap_swig_exodus_alter_newobject) {
+ZEND_NAMED_FUNCTION(_wrap_swig_exophp_alter_newobject) {
   zval **args[2];
   swig_object_wrapper *value;
   int type;
@@ -1087,7 +1087,7 @@ ZEND_NAMED_FUNCTION(_wrap_swig_exodus_alter_newobject) {
 
   return;
 }
-ZEND_NAMED_FUNCTION(_wrap_swig_exodus_get_newobject) {
+ZEND_NAMED_FUNCTION(_wrap_swig_exophp_get_newobject) {
   zval **args[1];
   swig_object_wrapper *value;
   int type;
@@ -1102,14 +1102,14 @@ ZEND_NAMED_FUNCTION(_wrap_swig_exodus_get_newobject) {
 
   return;
 }
-#define SWIG_name  "exodus"
+#define SWIG_name  "exophp"
 #ifdef __cplusplus
 extern "C" {
 #endif
 #include "php.h"
 #include "php_ini.h"
 #include "ext/standard/info.h"
-#include "php_exodus.h"
+#include "php_exophp.h"
 #ifdef __cplusplus
 }
 #endif
@@ -1423,7 +1423,7 @@ fail:
 }
 
 
-ZEND_NAMED_FUNCTION(_wrap_c_var_towstring) {
+ZEND_NAMED_FUNCTION(_wrap_c_var_toWString) {
   exodus::var *arg1 = (exodus::var *) 0 ;
   zval **args[1];
   std::wstring result;
@@ -1435,11 +1435,11 @@ ZEND_NAMED_FUNCTION(_wrap_c_var_towstring) {
   
   {
     if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_exodus__var, 0) < 0) {
-      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of c_var_towstring. Expected SWIGTYPE_p_exodus__var");
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of c_var_toWString. Expected SWIGTYPE_p_exodus__var");
     }
   }
   if(!arg1) SWIG_PHP_Error(E_ERROR, "this pointer is NULL");
-  result = ((exodus::var const *)arg1)->towstring();
+  result = ((exodus::var const *)arg1)->toWString();
   {
     std::wstring * resultobj = new std::wstring((const std::wstring &) result);
     SWIG_SetPointerZval(return_value, (void *)resultobj, SWIGTYPE_p_std__wstring, 1);
@@ -1466,7 +1466,33 @@ ZEND_NAMED_FUNCTION(_wrap_c_var___toString) {
     }
   }
   if(!arg1) SWIG_PHP_Error(E_ERROR, "this pointer is NULL");
-  result = ((exodus::var const *)arg1)->tostring();
+  result = ((exodus::var const *)arg1)->toString();
+  
+  ZVAL_STRINGL(return_value, const_cast<char*>((&result)->data()), (&result)->size(), 1);
+  
+  return;
+fail:
+  zend_error(SWIG_ErrorCode(),"%s",SWIG_ErrorMsg());
+}
+
+
+ZEND_NAMED_FUNCTION(_wrap_c_var_toString2) {
+  exodus::var *arg1 = (exodus::var *) 0 ;
+  zval **args[1];
+  std::string result;
+  
+  SWIG_ResetError();
+  if(ZEND_NUM_ARGS() != 1 || zend_get_parameters_array_ex(1, args) != SUCCESS) {
+    WRONG_PARAM_COUNT;
+  }
+  
+  {
+    if(SWIG_ConvertPtr(*args[0], (void **) &arg1, SWIGTYPE_p_exodus__var, 0) < 0) {
+      SWIG_PHP_Error(E_ERROR, "Type error in argument 1 of c_var_toString2. Expected SWIGTYPE_p_exodus__var");
+    }
+  }
+  if(!arg1) SWIG_PHP_Error(E_ERROR, "this pointer is NULL");
+  result = ((exodus::var const *)arg1)->toString2();
   
   ZVAL_STRINGL(return_value, const_cast<char*>((&result)->data()), (&result)->size(), 1);
   
@@ -14729,13 +14755,14 @@ static ZEND_RSRC_DTOR_FUNC(_wrap_destroy_p_exodus__MVAbort) {
 
 /* entry subsection */
 /* Every non-class user visible function must have an entry here */
-static zend_function_entry exodus_functions[] = {
+static zend_function_entry exophp_functions[] = {
  SWIG_ZEND_NAMED_FE(mvtypemask_get,_wrap_mvtypemask_get,NULL)
  SWIG_ZEND_NAMED_FE(c_var_tobool,_wrap_c_var_toBool,NULL)
  SWIG_ZEND_NAMED_FE(c_var_toint,_wrap_c_var_toInt,NULL)
  SWIG_ZEND_NAMED_FE(c_var_todouble,_wrap_c_var_toDouble,NULL)
- SWIG_ZEND_NAMED_FE(c_var_towstring,_wrap_c_var_towstring,NULL)
+ SWIG_ZEND_NAMED_FE(c_var_towstring,_wrap_c_var_toWString,NULL)
  SWIG_ZEND_NAMED_FE(c_var___tostring,_wrap_c_var___toString,NULL)
+ SWIG_ZEND_NAMED_FE(c_var_tostring2,_wrap_c_var_toString2,NULL)
  SWIG_ZEND_NAMED_FE(new_c_var,_wrap_new_c_var,NULL)
  SWIG_ZEND_NAMED_FE(c_var_date,_wrap_c_var_date,NULL)
  SWIG_ZEND_NAMED_FE(c_var_time,_wrap_c_var_time,NULL)
@@ -14972,8 +14999,8 @@ static zend_function_entry exodus_functions[] = {
  SWIG_ZEND_NAMED_FE(new_mvarraydimensionedzero,_wrap_new_MVArrayDimensionedZero,NULL)
  SWIG_ZEND_NAMED_FE(new_mvarrayindexoutofbounds,_wrap_new_MVArrayIndexOutOfBounds,NULL)
  SWIG_ZEND_NAMED_FE(new_mvarraynotdimensioned,_wrap_new_MVArrayNotDimensioned,NULL)
- SWIG_ZEND_NAMED_FE(swig_exodus_alter_newobject,_wrap_swig_exodus_alter_newobject,NULL)
- SWIG_ZEND_NAMED_FE(swig_exodus_get_newobject,_wrap_swig_exodus_get_newobject,NULL)
+ SWIG_ZEND_NAMED_FE(swig_exophp_alter_newobject,_wrap_swig_exophp_alter_newobject,NULL)
+ SWIG_ZEND_NAMED_FE(swig_exophp_get_newobject,_wrap_swig_exophp_get_newobject,NULL)
 {NULL, NULL, NULL}
 };
 
@@ -14982,33 +15009,33 @@ static zend_function_entry exodus_functions[] = {
 #undef ZEND_MODULE_BUILD_ID
 #define ZEND_MODULE_BUILD_ID (char*)"API" ZEND_TOSTR(ZEND_MODULE_API_NO) ZEND_BUILD_TS ZEND_BUILD_DEBUG ZEND_BUILD_SYSTEM ZEND_BUILD_EXTRA
 #endif
-zend_module_entry exodus_module_entry = {
+zend_module_entry exophp_module_entry = {
 #if ZEND_MODULE_API_NO > 20010900
     STANDARD_MODULE_HEADER,
 #endif
-    (char*)"exodus",
-    exodus_functions,
-    PHP_MINIT(exodus),
-    PHP_MSHUTDOWN(exodus),
-    PHP_RINIT(exodus),
-    PHP_RSHUTDOWN(exodus),
-    PHP_MINFO(exodus),
+    (char*)"exophp",
+    exophp_functions,
+    PHP_MINIT(exophp),
+    PHP_MSHUTDOWN(exophp),
+    PHP_RINIT(exophp),
+    PHP_RSHUTDOWN(exophp),
+    PHP_MINFO(exophp),
 #if ZEND_MODULE_API_NO > 20010900
     NO_VERSION_YET,
 #endif
     STANDARD_MODULE_PROPERTIES
 };
-zend_module_entry* SWIG_module_entry = &exodus_module_entry;
+zend_module_entry* SWIG_module_entry = &exophp_module_entry;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-SWIGEXPORT zend_module_entry *get_module(void) { return &exodus_module_entry; }
+SWIGEXPORT zend_module_entry *get_module(void) { return &exophp_module_entry; }
 #ifdef __cplusplus
 }
 #endif
 
-#define SWIG_php_minit PHP_MINIT_FUNCTION(exodus)
+#define SWIG_php_minit PHP_MINIT_FUNCTION(exophp)
 /* -----------------------------------------------------------------------------
  * Type initialization:
  * This problem is tough by the requirement that no dynamic 
@@ -15251,7 +15278,7 @@ SWIG_PropagateClientData(void) {
     SWIG_InitializeModule(0);
 
 /* oinit subsection */
-ZEND_INIT_MODULE_GLOBALS(exodus, exodus_init_globals, exodus_destroy_globals);
+ZEND_INIT_MODULE_GLOBALS(exophp, exophp_init_globals, exophp_destroy_globals);
 
 /* Register resource destructors for pointer types */
 le_swig__p_exodus__var=zend_register_list_destructors_ex(_wrap_destroy_p_exodus__var,NULL,(char *)(SWIGTYPE_p_exodus__var->name),module_number);
@@ -15312,7 +15339,7 @@ SWIG_LONG_CONSTANT(SLASH_IS_BACKSLASH, false);
     return SUCCESS;
 }
 
-PHP_RINIT_FUNCTION(exodus)
+PHP_RINIT_FUNCTION(exophp)
 {
 /* rinit section */
 
@@ -15484,23 +15511,23 @@ PHP_RINIT_FUNCTION(exodus)
     return SUCCESS;
 }
 
-PHP_MSHUTDOWN_FUNCTION(exodus)
+PHP_MSHUTDOWN_FUNCTION(exophp)
 {
 /* shutdown section */
 #ifdef ZTS
-    ts_free_id(exodus_globals_id);
+    ts_free_id(exophp_globals_id);
 #endif
     return SUCCESS;
 }
 
-PHP_RSHUTDOWN_FUNCTION(exodus)
+PHP_RSHUTDOWN_FUNCTION(exophp)
 {
 /* rshutdown section */
 
     return SUCCESS;
 }
 
-PHP_MINFO_FUNCTION(exodus)
+PHP_MINFO_FUNCTION(exophp)
 {
 }
 /* end init section */
