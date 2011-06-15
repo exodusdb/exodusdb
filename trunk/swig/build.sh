@@ -48,6 +48,7 @@ case $SWIG_TARGET in
 
 ;; php )
 	export SWIG_MODULENAME="exo"
+
         export SWIG_TARGET_INCLUDE_FLAGS="`php-config --includes`"
         export SWIG_WRAPPER_EXT=cpp
 
@@ -68,16 +69,22 @@ case $SWIG_TARGET in
 
 ;; perl )
 	export SWIG_MODULENAME="exo"
-	export SWIG_TARGET_INCLUDE_FLAGS="`perl -MConfig -e 'print join(\" \", @Config{qw(ccflags optimize cccdlflags)}, \"-I$Config{archlib}/CORE\")'`"
-	export SWIG_TARGET_LDFLAGS="`perl -MConfig -e 'print $Config{lddlflags}'`"
 
 	export SWIG_TARGET_LIBFILE="$SWIG_MODULENAME.so"
         export SWIG_TARGET_LIBDIR=$SWIG_LOCAL_LIBDIR
+
+	export SWIG_TARGET_INCLUDE_FLAGS="`perl -MConfig -e 'print join(\" \", @Config{qw(ccflags optimize cccdlflags)}, \"-I$Config{archlib}/CORE\")'`"
+	export SWIG_TARGET_LDFLAGS="`perl -MConfig -e 'print $Config{lddlflags}'`"
 
         export SWIG_TARGET_MODDIR="/usr/lib/perl5"
         export SWIG_TARGET_MODFILE="$SWIG_MODULENAME.pm"
 
 ;; java )
+	export SWIG_MODULENAME="jexodus"
+
+	export SWIG_TARGET_LIBFILE="$SWIG_MODULENAME.so"
+        export SWIG_TARGET_LIBDIR=$SWIG_LOCAL_LIBDIR
+
         export SWIG_TARGET_INCLUDE_FLAGS="-I/usr/lib/jvm/java-6-openjdk/include -I/usr/lib/jvm/java-6-openjdk/include/linux"
         export SWIG_TARGET_LIBFILE="lib$SWIG_MODULENAME.so"
 
