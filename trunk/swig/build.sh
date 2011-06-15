@@ -71,7 +71,7 @@ case $SWIG_TARGET in
 	export SWIG_MODULENAME="exo"
 
 	export SWIG_TARGET_LIBFILE="$SWIG_MODULENAME.so"
-        export SWIG_TARGET_LIBDIR=$SWIG_LOCAL_LIBDIR
+	export SWIG_TARGET_LIBDIR=$SWIG_LOCAL_LIBDIR
 
 	export SWIG_TARGET_INCLUDE_FLAGS="`perl -MConfig -e 'print join(\" \", @Config{qw(ccflags optimize cccdlflags)}, \"-I$Config{archlib}/CORE\")'`"
 	export SWIG_TARGET_LDFLAGS="`perl -MConfig -e 'print $Config{lddlflags}'`"
@@ -80,15 +80,19 @@ case $SWIG_TARGET in
         export SWIG_TARGET_MODFILE="$SWIG_MODULENAME.pm"
 
 ;; java )
-	export SWIG_MODULENAME="jexodus"
-
+	export SWIG_PACKAGENAME=org.$SWIG_MODULENAME
+	export SWIG_JAVA_SUBDIR=org/$SWIG_MODULENAME
+	mkdir -pv java/$SWIG_JAVA_SUBDIR
+	export SWIG_OPTIONS="$SWIG_OPTIONS -package $SWIG_PACKAGENAME -outdir $SWIG_JAVA_SUBDIR"
 	export SWIG_TARGET_LIBFILE="$SWIG_MODULENAME.so"
-        export SWIG_TARGET_LIBDIR=$SWIG_LOCAL_LIBDIR
+        export SWIG_TARGET_LIBDIR=$SWIG_JAVA_LIBDIR
 
         export SWIG_TARGET_INCLUDE_FLAGS="-I/usr/lib/jvm/java-6-openjdk/include -I/usr/lib/jvm/java-6-openjdk/include/linux"
         export SWIG_TARGET_LIBFILE="lib$SWIG_MODULENAME.so"
 
-	export SWIG_MODULE_BUILD="javac *.java"
+	export SWIG_POSTGENERATE_CMD="javac $SWIG_JAVA_SUBDIR/*.java"
+	export SWIG_MODULE_BUILD="jar cvf $SWIG_PACKAGENAME.jar $SWIG_JAVA_SUBDIR"
+
 	#nb dont copy to local lib otherwise main libexodus.so will be lost
 
 ;; csharp )
