@@ -1,6 +1,7 @@
 <?php
+echo "Started\n";
 //include("backtrace.php");
-include("php/exodus.php");
+include("php/exo.php");
 
 //file=database table
 //record=table row
@@ -44,5 +45,5 @@ $dateconv=new c_var("D");
 $timeconv=new c_var("MT");
 echo "Date: ", $temp->date()->oconv($dateconv), " Time:", $temp->time()->oconv($timeconv),"\n";
 
-echo "\nAll Done!\n";
+echo "\nFinished\n";
 ?>
