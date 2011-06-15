@@ -54,6 +54,8 @@ case $SWIG_TARGET in
         export SWIG_TARGET_LIBDIR="`php-config --extension-dir`"
 	export SWIG_TARGET_LIBFILE="$SWIG_MODULENAME.so"
 
+	export SWIG_POSTGENERATE_CMD="patch exo.php ../exo.php.patch"
+
 ;; python )
         export SWIG_TARGET_INCLUDE_FLAGS="`python-config --includes`"
 	export SWIG_TARGET_LDFLAGS="-l$SWIG_PYTHON_LIBCODE"
@@ -126,6 +128,13 @@ echo
 echo Generating: \
 swig -c++ $SWIG_OPTIONS -$SWIG_TARGET -module $SWIG_MODULENAME $EXO_EXODUS_INCLUDE_FLAGS -outcurrentdir ../exodus.i
 swig -c++ $SWIG_OPTIONS -$SWIG_TARGET -module $SWIG_MODULENAME $EXO_EXODUS_INCLUDE_FLAGS -outcurrentdir ../exodus.i
+
+if [ "$SWIG_POSTGENERATE_CMD" != "" ]; then
+echo
+echo Post Generation: \
+$SWIG_POSTGENERATE_CMD
+$SWIG_POSTGENERATE_CMD
+fi
 
 #-----------------
 #--- "Compile" ---
