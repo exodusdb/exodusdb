@@ -300,7 +300,7 @@ public:
 	std::string toString() const;
 
 	//weird version for perl that outputs "" if undefined
-	std::string var::toString2() const;
+	std::string toString2() const;
 
 	//CONSTRUCTORS
 	//////////////
