@@ -5,7 +5,7 @@
 %include "java/javakw.swg"
 %include "java/typemaps.i"
 %include "java/std_wstring.i"
-%include "java/std_string.i"
+%include "java/std_string.i" 
 %include "exception.i"
 %include "php/utils.i"
 %include <std_string.i>
