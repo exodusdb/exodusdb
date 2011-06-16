@@ -24,6 +24,11 @@ public static void main(String argv[]) {
 
 	System.out.println(exo.listfiles());
 
+	var D=new var("D");
+	var MT=new var("MT");
+	System.out.println("Date:"+exo.date().oconv(D));
+	System.out.println("Time:"+exo.time().oconv(MT));
+
 	System.out.println("Finished");
 }
 }
