@@ -66,7 +66,7 @@ case $SWIG_TARGET in
 
         export SWIG_TARGET_MODFILE="$SWIG_MODULENAME.py*"
         export SWIG_TARGET_MODDIR="$SWIG_LOCAL_LIBDIR/$SWIG_PYTHON_LIBCODE/site-packages"
-
+#        export SWIG_TARGET_MODDIR=`python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()"`
 ;; perl )
 	export SWIG_MODULENAME="exo"
 

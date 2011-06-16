@@ -1,0 +1,111 @@
+#!/bin/bash
+set -e
+
+export SWIG_TARGET=$1
+
+export SWIG_ALL_TARGETS="perl php python java csharp"
+
+export EXO_EXODUS_INCLUDE_FLAGS="-I../../exodus/exodus"
+export EXO_WRAPPER_FLAGS="-fPIC -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes"
+export EXO_EXODUS_LDFLAGS="-lexodus"
+
+#defaults
+export SWIG_WRAPPER_EXT=cxx
+export SWIG_MODULENAME="exodus"
+
+export SWIG_LOCAL_LIBDIR=/usr/local/lib
+export SWIG_OPTIONS="-w503,314,389,361,362,370,383,384"
+
+#php    exodus.so in php extension dir
+#python _exodus.si in local lib
+#java   libexodus.so in local lib? but this conficts with main exodus library file name
+#perl   exodus.so in local lib (also exodus.pm in usr lib perl5
+
+#something like python2.6
+export SWIG_PYTHON_LIBCODE="`python --version 2>&1|cut -d'.' -f 1,2|sed -e 's/ //;y/P/p/'`"
+
+#----------------
+#--- "Target" ---
+#----------------
+case $SWIG_TARGET in
+
+   all )
+
+;; php )
+	export SWIG_MODULENAME="exo"
+
+        export SWIG_TARGET_INCLUDE_FLAGS="`php-config --includes`"
+        export SWIG_WRAPPER_EXT=cpp
+
+        export SWIG_TARGET_LIBDIR="`php-config --extension-dir`"
+	export SWIG_TARGET_LIBFILE="$SWIG_MODULENAME.so"
+
+	export SWIG_POSTGENERATE_CMD="patch $SWIG_MODULENAME.php ../$SWIG_MODULENAME.php.patch"
+
+;; python )
+
+#	export SWIG_TARGET_INCLUDE_FLAGS="`python-config --includes`"
+#	export SWIG_TARGET_LDFLAGS="-l$SWIG_PYTHON_LIBCODE"
+#
+#	export SWIG_TARGET_LIBFILE="_$SWIG_MODULENAME.so"
+#	export SWIG_TARGET_LIBDIR=$SWIG_LOCAL_LIBDIR
+
+#	export SWIG_TARGET_MODFILE="$SWIG_MODULENAME.py*"
+#	export SWIG_TARGET_MODDIR="$SWIG_LOCAL_LIBDIR/$SWIG_PYTHON_LIBCODE/site-packages"
+##	export SWIG_TARGET_MODDIR=`python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()"`
+##	something like python2.6
+#	export SWIG_PYTHON_LIBCODE="`python --version 2>&1|cut -d'.' -f 1,2|sed -e 's/ //;y/P/p/'`"
+
+	export SWIG_MODULE_COMPILE="python ../setup.py build"
+	export SWIG_MODULE_INSTALL="python ../setup.py install"
+
+;; perl )
+	export SWIG_MODULENAME="exo"
+
+	export SWIG_TARGET_LIBFILE="$SWIG_MODULENAME.so"
+	export SWIG_TARGET_LIBDIR=$SWIG_LOCAL_LIBDIR
+
+	export SWIG_TARGET_INCLUDE_FLAGS="`perl -MConfig -e 'print join(\" \", @Config{qw(ccflags optimize cccdlflags)}, \"-I$Config{archlib}/CORE\")'`"
+	export SWIG_TARGET_LDFLAGS="`perl -MConfig -e 'print $Config{lddlflags}'`"
+
+        export SWIG_TARGET_MODDIR="/usr/lib/perl5"
+        export SWIG_TARGET_MODFILE="$SWIG_MODULENAME.pm"
+
+;; java )
+
+	#module name determines name of the SO/DLL and loadlibrary statement
+	#package name determines the name of the jar and import statement
+
+	#libjexodus.so and jexodus.jar import jexodus.*;
+	#import jexodus.*;
+        #System.loadLibrary("jexodus");
+	#export SWIG_PACKAGENAME=org.$SWIG_MODULENAME
+	#export SWIG_PACKAGE_SUBDIR=org/$SWIG_MODULENAME
+	export SWIG_PACKAGENAME="j$SWIG_MODULENAME"
+	export SWIG_PACKAGE_SUBDIR="j$SWIG_MODULENAME"
+	export SWIG_MODULENAME="j$SWIG_MODULENAME"
+	export SWIG_OPTIONS="$SWIG_OPTIONS -package $SWIG_PACKAGENAME -outdir $SWIG_PACKAGE_SUBDIR"
+	export SWIG_TARGET_LIBFILE="$SWIG_MODULENAME.so"
+        export SWIG_TARGET_LIBDIR=$SWIG_JAVA_LIBDIR
+
+        export SWIG_TARGET_INCLUDE_FLAGS="-I/usr/lib/jvm/java-6-openjdk/include -I/usr/lib/jvm/java-6-openjdk/include/linux"
+        export SWIG_TARGET_LIBFILE="lib$SWIG_MODULENAME.so"
+
+	export SWIG_POSTGENERATE_CMD="javac $SWIG_PACKAGE_SUBDIR/*.java"
+	export SWIG_MODULE_BUILD="jar cvf $SWIG_PACKAGENAME.jar $SWIG_PACKAGE_SUBDIR"
+
+	#nb dont copy to local lib otherwise main libexodus.so will be lost
+
+;; csharp )
+        export SWIG_TARGET_INCLUDE_FLAGS=""
+        export SWIG_TARGET_LIBFILE="lib$SWIG_MODULENAME.so"
+
+	#nb dont copy to local lib otherwise main libexodus.so will be lost
+
+;;*)
+        echo "$SWIG_SYNTAX all or $SWIG_ALL_TARGETS"
+        exit 1
+;;
+esac
+
+

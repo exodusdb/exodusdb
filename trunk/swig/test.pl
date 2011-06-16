@@ -44,7 +44,7 @@ $MT=new exo::var("MT");
 print $D,"\n";
 print $MT,"\n";
 
-print $xo->date()->oconv($D), "\n";
-print $xo->time()->oconv($MT),"\n";
+print "Pick date: ", $xo->date(), " is ", $xo->date()->oconv($D), "\n";
+print "Pick time: ", $xo->time(), " is ", $xo->time()->oconv($MT),"\n";
 
 print "Finished\n"
