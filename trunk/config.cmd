@@ -1,3 +1,7 @@
+rem WHICH COMMAND IN WINDOWS!
+rem for %i in (YOURPROGRAM.exe) do @echo %~$PATH:i
+
+
 rem ------------------------------
 rem --- quick and dirty config ---
 rem ------------------------------
@@ -8,6 +12,7 @@ rem NOTE: watch out for module names causing conflicting dll names to avoid over
 rem ---------------------------------------------------------
 rem --- dev.cmd, make.cmd, clean.cmd, pack.cmd and upload.cmd
 rem ---  all call this config.cmd to initialise           ---
+rem --- NO GLOBAL ENVVAR CONFIGURATION SHOULD BE REQUIRED ---
 rem ---------------------------------------------------------
 
 set EXO_CONFIGMODE=%*
@@ -82,9 +87,16 @@ set EXO_SWIG_OPTIONS="-w503,314,389,361,362,370,383,384"
     if "%EXO_PHP_PREFIX%" EQU "" set EXO_PHP_PREFIX=php-
     if "%EXO_PHP_VER%"    EQU "" set EXO_PHP_VER=5.3.6
 
+    if "%EXO_JAVA_PREFIX%" EQU "" set EXO_JAVA_PREFIX=jdk
+    if "%EXO_JAVA_VER%"    EQU "" set EXO_JAVA_VER=1.6.0_26
+
     if "%EXO_BUILD_ROOT%"    EQU "" set EXO_BUILD_ROOT=
 
     if "%EXO_PROGRAMFILES_ROOT%" EQU "" set EXO_PROGRAMFILES_ROOT=C:
+
+rem ------------------
+rem -- Module Name ---
+rem ------------------
 
     rem EG PYTHON exo.pm and exo.dll
     set EXO_PERL_MODULENAME=exo
@@ -94,6 +106,13 @@ set EXO_SWIG_OPTIONS="-w503,314,389,361,362,370,383,384"
 
     rem EG PHP exo.php and exo.dll
     set EXO_PHP_MODULENAME=exo
+
+    rem EG JAVA org.exodus.jar and libexodus.dll?
+    set EXO_JAVA_MODULENAME=jexodus
+rem set EXO_JAVA_PACKAGE_NAME=org.exodus
+rem set EXO_JAVA_PACKAGE_SUBDIR=org\exodus
+    set EXO_JAVA_PACKAGE_NAME=exodus
+    set EXO_JAVA_PACKAGE_SUBDIR=exodus
 
 rem -----------------------------------------------------
 rem --- completely customising configuration          ---
@@ -335,6 +354,32 @@ rem check php ver include (assume libs can be found there too)
 	goto exit
 :gotphpinclude
 
+
+rem ------------
+rem --- Java ---
+rem ------------
+
+set EXO_JAVA32=%EXO_PROGRAMFILES32%\Java\%EXO_JAVA_PREFIX%%EXO_JAVA_VER%
+set EXO_JAVA64=%EXO_PROGRAMFILES64%\Java\%EXO_JAVA_PREFIX%%EXO_JAVA_VER%
+
+set EXO_JAVA32_BIN=%EXO_JAVA32%\bin
+set EXO_JAVA64_BIN=%EXO_JAVA64%\bin
+
+set EXO_JAVA32_INCLUDE=%EXO_JAVA32%\include
+set EXO_JAVA64_INCLUDE=%EXO_JAVA64%\include
+
+set EXO_JAVA32_LIB=%EXO_JAVA32%\lib
+set EXO_JAVA64_LIB=%EXO_JAVA64%\lib
+
+set EXO_JAVA32_MODULEDIR=%EXO_JAVA32%\lib
+set EXO_JAVA64_MODULEDIR=%EXO_JAVA64%\lib
+
+if "%TARGET_CPU%" EQU "x86" set EXO_JAVA=%EXO_JAVA32%
+if "%TARGET_CPU%" EQU "x64" set EXO_JAVA=%EXO_JAVA64%
+
+rem --- quick test of config ---
+rem ...
+rem pause
 
 :afterlibs
 

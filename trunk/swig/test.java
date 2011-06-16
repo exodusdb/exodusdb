@@ -1,24 +1,28 @@
 
-import org.exodus.*;
+import exodus.*;
 
 public class test {
 
 public static void main(String argv[]) {
 	System.out.println("Started");
 
-	System.loadLibrary("exodus");
+	System.loadLibrary("jexodus");
 	var exo=new var("");
 
 	var filename=new var("tempdbfilejava");
 	var options=new var("");
-	if (exo.createfile(filename,options)) {
+
+	if (!exo.connect(options))
+		System.out.println("couldnt connect to default database");
+
+	if (exo.open(filename,options))
+		System.out.println("db file already existed.");		
+	else if (exo.createfile(filename,options)) {
 		System.out.println("db file created");
 		if (filename.deletefile())
 			System.out.println("db file deleted");
-	}
-	else
+	} else
 		System.out.println("db file not created");
-
 	if (filename.deletefile())
 		System.out.println("db file deleted");
 
