@@ -2469,7 +2469,7 @@ XS(_wrap_new_var__SWIG_2) {
     dXSARGS;
     
     if ((items < 1) || (items > 1)) {
-      SWIG_croak("Usage: new_var(cstr1);");
+      SWIG_croak("Usage: new_var(wcstr1);");
     }
     res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_wchar_t, 0 |  0 );
     if (!SWIG_IsOK(res1)) {
@@ -2565,7 +2565,7 @@ XS(_wrap_new_var__SWIG_5) {
     dXSARGS;
     
     if ((items < 1) || (items > 1)) {
-      SWIG_croak("Usage: new_var(str1);");
+      SWIG_croak("Usage: new_var(wstr1);");
     }
     res1 = SWIG_ConvertPtr(ST(0), &argp1, SWIGTYPE_p_std__wstring,  0 );
     if (!SWIG_IsOK(res1)) {
