@@ -30,8 +30,8 @@ public static void main(String argv[]) {
 
 	var D=new var("D");
 	var MT=new var("MT");
-	System.out.println("Date:"+exo.date().oconv(D));
-	System.out.println("Time:"+exo.time().oconv(MT));
+	System.out.println("Pick Date: "+exo.date()+" is "+exo.date().oconv(D));
+	System.out.println("Pick Time: "+exo.time()+" is "+exo.time().oconv(MT));
 
 	System.out.println("Finished");
 }
