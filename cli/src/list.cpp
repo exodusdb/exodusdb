@@ -50,14 +50,6 @@ Type just list by itself to get a summary of its syntax
 //should be declared, and optionally *simply* initialised, before the programinit() line.
 //"simply initialised" means set to raw numbers and strings.
 //eg 'var xx="xyz";' or 'var xx=100.5;' etc.
-//
-//Multithreaded programs should declare globals after the programinit() line
-//and initialise them within any function.
-
-//TODO maybe implement printtext as normal exodus internal or external subroutine
-//although it is a good example how you can use objects in Exodus.
-#include "printtext.h"
-printtext printer1;
 
 //NB FOLLOWING SECTION is only declaration and optional *simple* initialisation of global variables.
 //In Exodus, all programming proper is to be done inside the main or other functions and subroutines
@@ -172,6 +164,10 @@ var underline2;
 var cell;//num
 var colbreakn;
 var char3;
+
+//TODO maybe implement printtext as normal exodus internal or external subroutine
+//although it is a good example how you can use objects in Exodus.
+#include "printtext.h"
 
 //programinit() is required AFTER program globals and BEFORE all local functions and subroutines including main()
 //in MV terms, "programinit" indicates the start of a set of functions and variables that form a single "program"

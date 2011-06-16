@@ -49,7 +49,7 @@ public:
 	}
 
 	void printtx(io tx) {
-		print(tx);
+		//print(tx);
 		if (printptr.unassigned())
 			printptr = 0;
 
@@ -222,7 +222,9 @@ private:
 		}
 		tx.swapper(FM, "\r\n");
 		//osbwritex(tx, printfilename, printfilename, printptr);
-		tx.osbwrite(printfilename,printptr);
+		//tx.osbwrite(printfilename,printptr);
+		printptr=99;
+		print(tx);
 
 		tx = "";
 		newpage = 0;
@@ -339,4 +341,4 @@ private:
 
 	}
 
-};
+} printer1;
