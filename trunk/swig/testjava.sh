@@ -1,6 +1,10 @@
 #!/bin/bash
 
 echo \
+rm test.class
+rm test.class
+
+echo \
 javac -cp java test.java
 javac -cp java test.java
 

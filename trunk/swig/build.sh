@@ -80,24 +80,28 @@ case $SWIG_TARGET in
         export SWIG_TARGET_MODFILE="$SWIG_MODULENAME.pm"
 
 ;; java )
+
+	#module name determines name of the SO/DLL and loadlibrary statement
+	#package name determines the name of the jar and import statement
+
 	#libjexodus.so and jexodus.jar import jexodus.*;
 	#import jexodus.*;
         #System.loadLibrary("jexodus");
 	#export SWIG_PACKAGENAME=org.$SWIG_MODULENAME
-	#export SWIG_JAVA_SUBDIR=org/$SWIG_MODULENAME
+	#export SWIG_PACKAGE_SUBDIR=org/$SWIG_MODULENAME
 	export SWIG_PACKAGENAME="j$SWIG_MODULENAME"
-	export SWIG_JAVA_SUBDIR="j$SWIG_MODULENAME"
+	export SWIG_PACKAGE_SUBDIR="j$SWIG_MODULENAME"
 	export SWIG_MODULENAME="j$SWIG_MODULENAME"
-	mkdir -pv java/$SWIG_JAVA_SUBDIR
-	export SWIG_OPTIONS="$SWIG_OPTIONS -package $SWIG_PACKAGENAME -outdir $SWIG_JAVA_SUBDIR"
+	mkdir -pv java/$SWIG_PACKAGE_SUBDIR
+	export SWIG_OPTIONS="$SWIG_OPTIONS -package $SWIG_PACKAGENAME -outdir $SWIG_PACKAGE_SUBDIR"
 	export SWIG_TARGET_LIBFILE="$SWIG_MODULENAME.so"
         export SWIG_TARGET_LIBDIR=$SWIG_JAVA_LIBDIR
 
         export SWIG_TARGET_INCLUDE_FLAGS="-I/usr/lib/jvm/java-6-openjdk/include -I/usr/lib/jvm/java-6-openjdk/include/linux"
         export SWIG_TARGET_LIBFILE="lib$SWIG_MODULENAME.so"
 
-	export SWIG_POSTGENERATE_CMD="javac $SWIG_JAVA_SUBDIR/*.java"
-	export SWIG_MODULE_BUILD="jar cvf $SWIG_PACKAGENAME.jar $SWIG_JAVA_SUBDIR"
+	export SWIG_POSTGENERATE_CMD="javac $SWIG_PACKAGE_SUBDIR/*.java"
+	export SWIG_MODULE_BUILD="jar cvf $SWIG_PACKAGENAME.jar $SWIG_PACKAGE_SUBDIR"
 
 	#nb dont copy to local lib otherwise main libexodus.so will be lost
 
