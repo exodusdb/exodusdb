@@ -1,5 +1,5 @@
 
-import exodus.*;
+import jexodus.*;
 
 public class test {
 

@@ -80,8 +80,14 @@ case $SWIG_TARGET in
         export SWIG_TARGET_MODFILE="$SWIG_MODULENAME.pm"
 
 ;; java )
-	export SWIG_PACKAGENAME=org.$SWIG_MODULENAME
-	export SWIG_JAVA_SUBDIR=org/$SWIG_MODULENAME
+	#libjexodus.so and jexodus.jar import jexodus.*;
+	#import jexodus.*;
+        #System.loadLibrary("jexodus");
+	#export SWIG_PACKAGENAME=org.$SWIG_MODULENAME
+	#export SWIG_JAVA_SUBDIR=org/$SWIG_MODULENAME
+	export SWIG_PACKAGENAME="j$SWIG_MODULENAME"
+	export SWIG_JAVA_SUBDIR="j$SWIG_MODULENAME"
+	export SWIG_MODULENAME="j$SWIG_MODULENAME"
 	mkdir -pv java/$SWIG_JAVA_SUBDIR
 	export SWIG_OPTIONS="$SWIG_OPTIONS -package $SWIG_PACKAGENAME -outdir $SWIG_JAVA_SUBDIR"
 	export SWIG_TARGET_LIBFILE="$SWIG_MODULENAME.so"
