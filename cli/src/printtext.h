@@ -7,7 +7,6 @@ class printtext
 	var printptr;
 	//var tx;
 	var topmargin;
-	var html;
 	var ownprintfile;
 	var printfilename;
 	var letterhead;
@@ -28,6 +27,8 @@ class printtext
 	var style;
 
 public:
+
+	var html;
 
 	void init(MvEnvironment* env_) {
 		env=env_;
@@ -56,7 +57,7 @@ public:
 		if (printptr == 0) {
 
 			if (topmargin.unassigned())
-				topmargin = 8;
+				topmargin = 0;
 
 			if (tx.unassigned())
 				tx = "";
@@ -213,7 +214,7 @@ private:
 				var htmltitle = (headx.extract(1)).field("\'", 1, 1);
 				if (htmltitle[1] == "<")
 					htmltitle = (htmltitle.field(">", 2, 1)).field("<", 1, 1);
-				tx.splicer(1, 0, "<html><head><title>" ^ htmltitle ^ "</title>" ^ FM ^ css ^ "</head><body style=\"background-color:#ffffff\"><div style=\"text-align:center\">" ^ (var().chr(13) ^ var().chr(10)));
+				tx.splicer(1, 0, "\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<title>" ^ htmltitle ^ "</title>" ^ FM ^ css ^ "</head>\n<body style=\"background-color:#ffffff\">\n<div style=\"text-align:center\">" ^ (var().chr(13) ^ var().chr(10)));
 				tx.splicer(1, 0, "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">");
 				css = "";
 			}
@@ -241,8 +242,29 @@ private:
 	}
 
 	void readcss(io css) {
-		css="";
-		return;
+		if (osread(css,"default.css"))
+			return;
+css=""
+"<style type=\"text/css\">\n"
+"body {background-color:#ffffff; font-family:neosysfont,trebuchet ms,arial,helvetica,sans serif; font-size: neosyssize}\n"
+"table,span,div,br,p,a,thread,tbody,tfoot,tr,th,td,b,i,u,dl,dt,dd,li,ul,form,font,small,big {font-size:100%}\n"
+"a {color:blue;}\n"
+"a:visited {color:purple;}\n"
+"a:hover {color:red;}\n"
+"tt {font-family:courier new,courier;font-size:8px;}\n"
+"th {background-color:#ffff80;}\n"
+"thead {display:table-header-group}\n"
+"td.nb {border-bottom:none}\n"
+"td.nt {border-top:none}\n"
+"td.nx {border-top:none;border-bottom:none}\n"
+".maintable {background-color:#ffffc0; border-width:2px; border-collapse:separate; padding:1px}\n"
+"</style>\n"
+"\n"
+"<style type=\"text/css\" media=\"print\">\n"
+".maintable {border-collapse:collapse;border-color:#bbbbbb}\n"
+"td {border-color:#bbbbbb;border-width:1px}\n"
+"th {border-color:#bbbbbb;border-width:1px}\n"
+"</style>\n";
 	}
 
 	void getmark(in mode, in html, io printtxmark) {
