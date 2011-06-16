@@ -267,6 +267,7 @@ USER0="";
 		tt = mv.SYSTEM.extract(2);
 		tt.swapper(".txt", ".htm");
 		mv.SYSTEM.replacer(2, tt);
+		printer1.html=1;
 	} else {
 		tr = "";
 		trx = crlf;
@@ -814,7 +815,7 @@ x1exit:
 				coln2 += 1;
 
 				//t='<th bgcolor=':thcolor
-				tt = "<th style=\"background-color:" ^ thcolor ^ DQ;
+				tt = "<th ";
 				//if detsupp=1 then t:=coldict(coln)<14>
 				if (not usecols)
 					tt ^= coldict(coln).extract(14);
@@ -873,13 +874,14 @@ x1exit:
 		gosub getmark("CLIENT", html, clientmark);
 		tt ^= clientmark;
 
+		//tt ^= "<table class=\"maintable\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\"";
 		tt ^= "<table border=\"1\" cellspacing=\"0\" cellpadding=\"2\"";
-		//t:=' align="center" '
-		tt ^= " style=\"font-size:66%";
+		tt ^= " align=\"center\" ";
+		tt ^= " style=\"font-size:66%;font-family:arial,sans-serif";
 		tt ^= ";background-color:" ^ tdcolor;
 		tt ^= ";page-break-after:avoid";
 		tt ^= "\">";
-		tt ^= FM ^ "<colgroup>" ^ coltags;
+		tt ^= FM ^ "<colgroup>" ^ coltags ^ "</colgroup>";
 		tt ^= FM ^ "<thead>";
 		//t:=fm:coltags
 
@@ -896,7 +898,7 @@ x1exit:
 	//heading options
 
 	if (head eq "")
-		head = "Page \'P\' " ^ space(50) ^ " \'T\'";
+			head = filename ^ space(10) ^ " \'T\'";
 
 	if (html) {
 		//
@@ -973,8 +975,8 @@ x1exit:
 //////////
 
 	//remove while no header being output
-	//if (html)
-	//	tx ^= "</div></body></html>";
+	if (html)
+		tx ^= "</tbody></table></div></body></html>";
 
 	printer1.printtx(tx);
 
