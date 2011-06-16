@@ -313,20 +313,22 @@ public:
 
 	//ctor for wchar_t*
 	//place first before wchar_t so SWIG isnt tempted to use char to acquire strings resulting in ONE character strings)
-	var(const wchar_t* cstr1);
+	var(const wchar_t* wcstr1);
 
 	//ctor for wchar_t
 #ifndef SWIG
-	var(const wchar_t char1);
+	var(const wchar_t wchar1);
 #endif
 	//ctor for block of wchar_t
 	//to be implemented?
 	//var(const wchar_t* cstr1, const size_t int1);
 
+#ifndef SWIGJAVA
 	//ctor for char*
 	//place first before char so SWIG isnt tempted to use char to acquire strings resulting in ONE character strings)
 	MV_CONSTRUCTION_FROM_CHAR_EXPLICIT
 	var(const char* cstr1);
+#endif
 
 	//ctor for char to create
 #ifndef SWIG
@@ -338,10 +340,13 @@ public:
 	var(const char* cstr1, const size_t int1);
 
 	//ctor for std::wstring
-	var(const std::wstring& str1);
+	var(const std::wstring& wstr1);
 
+	//swig java duplicates this with var(std::wstring&) above
+#ifndef SWIGJAVA
 	//ctor for std::string
 	var(const std::string& str1);
+#endif
 
 	//ctor for bool (dont allow this if no constructor for char* otherwise " " is converted to 1 in widechar only compilations
 	MV_CONSTRUCTION_FROM_CHAR_EXPLICIT
