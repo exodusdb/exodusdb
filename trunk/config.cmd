@@ -107,8 +107,11 @@ rem ------------------
     rem EG PHP exo.php and exo.dll
     set EXO_PHP_MODULENAME=exo
 
+    rem module name determines name of the SO/DLL and loadlibrary statement
     rem EG JAVA org.exodus.jar and libexodus.dll?
     set EXO_JAVA_MODULENAME=jexodus
+
+    rem package name determines the name of the jar and import statement
 rem set EXO_JAVA_PACKAGE_NAME=org.exodus
 rem set EXO_JAVA_PACKAGE_SUBDIR=org\exodus
     set EXO_JAVA_PACKAGE_NAME=exodus
