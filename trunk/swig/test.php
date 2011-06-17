@@ -4,50 +4,53 @@ echo "Started\n";
 //include("backtrace.php");
 include("php/exo.php");
 
+//glossary:
 //file means database table
 //record means table row
 
-//some exodus compatible variables
-//at the moment, all exodus function arguments must be exodus var's
+//some exodus compatible mvariables
+//at the moment, all exodus function arguments must be exodus mvar's
 //that wil be changed soon
-$xo=new c_var();
+$exo=new mvar();
 
-$filename=new c_var("tempfile");
-$options=new c_var("");
+$filename=new mvar("tempfile");
+$options=new mvar("");
 
-//exodus variables can convert to string automatically
-echo "filename is ->", $filename,"<-\n";
-
-//delete a file
-if ($filename->deletefile())
-	echo "deleted file $filename\n";
-else
-	echo "not deleted $filename\n";
+//exodus mvariables can convert to string automatically
+echo "filename is ", $filename->quote(),"\n";
 
 //crceate a file
-if ($xo->createfile($filename,$options))
+if ($exo->createfile($filename,$options))
 	echo "created file $filename\n";
 else
 	echo "not created $filename\n";
 
 //create some records
 for ($ii=1;$ii<=100;$ii++) {
-	$key=new c_var($ii);
-	$record=new c_var($ii);
+	$key=new mvar($ii);
+	$record=new mvar($ii);
 	$ok=$record->write($filename,$key);
 	echo "$key ";
 }
 echo "\n";
 
-//see what files are available
+//see what db files are available
 echo "list of files:\n";
-echo $xo->listfiles(),"\n";
+$listoffiles=$exo->listfiles();
+echo $listoffiles,"\n";
+echo $listoffiles->extract(1),"\n";
 
 //output current date and time using oconv
-$dateconv=new c_var("D");
-$timeconv=new c_var("MT");
-echo "Pick date: ", $xo->date(), " ", $xo->date()->oconv($dateconv), "\n";
-echo "Pick time: ", $xo->time(), " ", $xo->time()->oconv($timeconv), "\n";
+$dateconv=new mvar("D");
+$timeconv=new mvar("MT");
+echo "Pick date: ", $exo->date(), " ", $exo->date()->oconv($dateconv), "\n";
+echo "Pick time: ", $exo->time(), " ", $exo->time()->oconv($timeconv), "\n";
+
+//delete a file
+if ($filename->deletefile())
+	echo "deleted file $filename\n";
+else
+	echo "not deleted $filename\n";
 
 echo "Finished\n";
 ?>

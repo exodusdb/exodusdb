@@ -343,7 +343,7 @@ public:
 	var(const std::wstring& wstr1);
 
 	//swig java duplicates this with var(std::wstring&) above
-#ifndef SWIGJAVA
+#if !defined(SWIGJAVA) && !defined(SWIGCSHARP)
 	//ctor for std::string
 	var(const std::string& str1);
 #endif

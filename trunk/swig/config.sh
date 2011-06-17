@@ -24,6 +24,11 @@ export SWIG_OPTIONS="-w503,314,389,361,362,370,383,384"
 #something like python2.6
 export SWIG_PYTHON_LIBCODE="`python --version 2>&1|cut -d'.' -f 1,2|sed -e 's/ //;y/P/p/'`"
 
+#try to use user installed swig otherwise system swig which is 1.3 on Ubuntu 10.04 for example
+export SWIG_HOME="$HOME/local/bin/"
+test -f ${SWIG_HOME}swig || export SWIG_HOME=""
+export SWIG_CMD=${SWIG_HOME}swig
+
 #----------------
 #--- "Target" ---
 #----------------
@@ -40,7 +45,9 @@ case $SWIG_TARGET in
         export SWIG_TARGET_LIBDIR="`php-config --extension-dir`"
 	export SWIG_TARGET_LIBFILE="$SWIG_MODULENAME.so"
 
-	export SWIG_POSTGENERATE_CMD="patch $SWIG_MODULENAME.php ../$SWIG_MODULENAME.php.patch"
+	if [ "`$SWIG_TARGET -version |grep 1.3`" != "" ]; then
+		export SWIG_POSTGENERATE_CMD="patch $SWIG_MODULENAME.php ../$SWIG_MODULENAME.php.patch"
+	fi
 
 ;; python )
 
@@ -99,6 +106,10 @@ case $SWIG_TARGET in
 ;; csharp )
         export SWIG_TARGET_INCLUDE_FLAGS=""
         export SWIG_TARGET_LIBFILE="lib$SWIG_MODULENAME.so"
+
+	export SWIG_PATCH_CMD="sed -i -e 's/public string ToString/public override string ToString/' mvar.cs"
+
+	export SWIG_POSTGENERATE_CMD="gmcs $SWIG_MODULENAME.cs *.cs -target:library"
 
 	#nb dont copy to local lib otherwise main libexodus.so will be lost
 

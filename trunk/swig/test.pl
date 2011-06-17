@@ -8,16 +8,16 @@ use exo;
 #that will be fixed soon.
 #apologies perl monks, my 1st perl prog
 
-$xo=new exo::var("");
+$exo=new exo::var("");
 
-if (!$xo->connect($xo)) {
+if (!$exo->connect($exo)) {
 	print "no default database connection\n";
 } else {
 
 	$filename=new exo::var("tempdbfile564");
 	$options=new exo::var("");
 
-	if ($xo->createfile($filename,$options)) {
+	if ($exo->createfile($filename,$options)) {
 		print "$filename file created\n";
 	}else{
 		print "$filename file not created. maybe already exists. try deletefile $filename\n";
@@ -25,7 +25,7 @@ if (!$xo->connect($xo)) {
 
 	#write 10 records
 	for ($ii=1;$ii<=100;++$ii) {
-		$record=$xo->date();
+		$record=$exo->date();
 		$id=new exo::var($ii);
 		if (!$record->write($filename,$id)) {
 			last;
@@ -44,7 +44,7 @@ $MT=new exo::var("MT");
 print $D,"\n";
 print $MT,"\n";
 
-print "Pick date: ", $xo->date(), " is ", $xo->date()->oconv($D), "\n";
-print "Pick time: ", $xo->time(), " is ", $xo->time()->oconv($MT),"\n";
+print "Pick date: ", $exo->date(), " is ", $exo->date()->oconv($D), "\n";
+print "Pick time: ", $exo->time(), " is ", $exo->time()->oconv($MT),"\n";
 
 print "Finished\n"

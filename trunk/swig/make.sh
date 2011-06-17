@@ -47,14 +47,21 @@ fi
 #--------------------
 #--- "SWIG MAGIC" ---
 #--------------------
+echo Using: ${SWIG_CMD}
+echo Generating Source: \
+${SWIG_CMD} -c++ $SWIG_OPTIONS -$SWIG_TARGET -module $SWIG_MODULENAME $EXO_EXODUS_INCLUDE_FLAGS -outcurrentdir ../exodus.i
+${SWIG_CMD} -c++ $SWIG_OPTIONS -$SWIG_TARGET -module $SWIG_MODULENAME $EXO_EXODUS_INCLUDE_FLAGS -outcurrentdir ../exodus.i
+
+if [ "$SWIG_PATCH_CMD" != "" ]; then
 echo
-echo Generating: \
-swig -c++ $SWIG_OPTIONS -$SWIG_TARGET -module $SWIG_MODULENAME $EXO_EXODUS_INCLUDE_FLAGS -outcurrentdir ../exodus.i
-swig -c++ $SWIG_OPTIONS -$SWIG_TARGET -module $SWIG_MODULENAME $EXO_EXODUS_INCLUDE_FLAGS -outcurrentdir ../exodus.i
+echo Patching: \
+     $SWIG_PATCH_CMD
+eval $SWIG_PATCH_CMD
+fi
 
 if [ "$SWIG_POSTGENERATE_CMD" != "" ]; then
 echo
-echo Post Generation: \
+echo Module Generation: \
 $SWIG_POSTGENERATE_CMD
 $SWIG_POSTGENERATE_CMD
 fi
