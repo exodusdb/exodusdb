@@ -1,4 +1,20 @@
-%module(docstring="An interface to Exodus.") exodus
+%module(docstring="An interface to Exodus") exodus
+
+%include "swig.swg"
+
+#ifdef SWIGCSHARP
+%rename(mvar) var;
+%include "csharp/csharp.swg"
+%include "csharp/std_wstring.i"
+%include "csharp/std_string.i" 
+%include "csharp/typemaps.i"
+%include "csharp/wchar.i"
+%include "exception.i"
+%include <std_string.i>
+%ignore exodus::var::var(wchar_t const *);
+%ignore exodus::var::var(char const *);
+%rename (ToString) toString;
+#endif
 
 #ifdef SWIGJAVA
 %include "java/java.swg"
@@ -6,8 +22,8 @@
 %include "java/typemaps.i"
 %include "java/std_wstring.i"
 %include "java/std_string.i" 
-%include "exception.i"
 %include "php/utils.i"
+%include "exception.i"
 %include <std_string.i>
 //%rename (tostring) toString;
 #endif
@@ -48,14 +64,18 @@
 
 #ifdef SWIGPHP
 %include "php/php.swg"
+
 //%include "php/phpinit.swg"
-////%include "php/phprun.swg"
+//%include "php/phprun.swg"
 //%include "php/phpkw.swg"
+
 %include "php/typemaps.i"
 %include "php/std_string.i"
-//%include "exception.i"
-//%include "php/utils.i"
 
+%include "exception.i"
+%include "php/utils.i"
+
+%rename(mvar) var;
 %rename(__toString) toString;
 
 #endif

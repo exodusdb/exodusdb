@@ -1,8 +1,7 @@
 #!/bin/bash
+set -e
 
-echo \
-rm test.class
-rm test.class
+test -f test.class && rm test.class && echo rm test.class
 
 echo \
 javac -cp java test.java
