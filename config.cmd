@@ -62,31 +62,39 @@ rem ----------------
     if "%CONFIGURATION%" EQU "" set CONFIGURATION=Release
     if "%EXO_TOOLSET%"   EQU "" set EXO_TOOLSET=SDK71
 
+    rem eg C:\Program Files\PostgreSQL\9.0
     if "%EXO_POSTGRES_PREFIX%" EQU "" set EXO_POSTGRES_PREFIX=
     if "%EXO_POSTGRES_VER%"    EQU "" set EXO_POSTGRES_VER=9.0
 
+    rem eg C:\boost_1_46_1
     if "%EXO_BOOST_PREFIX%"  EQU "" set EXO_BOOST_PREFIX=Boost_
     if "%EXO_BOOST_VER%"     EQU "" set EXO_BOOST_VER=1_46_1
+
+    rem eg C:\Program Files\boost_1_46_1
     if "%EXO_BOOSTPRO%"      EQU "" set EXO_BOOSTPRO=NO
 
+    rem eg c:\icu\source
     if "%EXO_ICU_PREFIX%" EQU "" set EXO_ICU_PREFIX=icu
     if "%EXO_ICU_VER%"    EQU "" set EXO_ICU_VER=
-    if "%EXO_ICU_SUFFIX%" EQU "" set EXO_ICU_SUFFIX=/source
+    if "%EXO_ICU_SUFFIX%" EQU "" set EXO_ICU_SUFFIX=\source
 
+    rem eg C:\swigwin-2.0.4
     if "%EXO_SWIG_PREFIX%"   EQU "" set EXO_SWIG_PREFIX=swigwin-
     if "%EXO_SWIG_VER%"      EQU "" set EXO_SWIG_VER=2.0.4
 
-set EXO_SWIG_OPTIONS="-w503,314,389,361,362,370,383,384"
-
+    rem eg C:\Python27
     if "%EXO_PYTHON_PREFIX%" EQU "" set EXO_PYTHON_PREFIX=Python
     if "%EXO_PYTHON_VER%"    EQU "" set EXO_PYTHON_VER=27
 
+    rem eg C:\Perl
     if "%EXO_PERL_PREFIX%"   EQU "" set EXO_PERL_PREFIX=Perl
     if "%EXO_PERL_VER%"      EQU "" set EXO_PERL_VER=
 
+    rem eg C:\php-5.3.6
     if "%EXO_PHP_PREFIX%" EQU "" set EXO_PHP_PREFIX=php-
     if "%EXO_PHP_VER%"    EQU "" set EXO_PHP_VER=5.3.6
 
+    rem eg D:\Program Files\Java\jdk1.6.0_26
     if "%EXO_JAVA_PREFIX%" EQU "" set EXO_JAVA_PREFIX=jdk
     if "%EXO_JAVA_VER%"    EQU "" set EXO_JAVA_VER=1.6.0_26
 
@@ -272,12 +280,14 @@ rem check postgres ver include (assume libs can be found there too)
 
 rem ----- SWIG -----
 rem ----------------
+    set EXO_SWIG_OPTIONS="-w503,314,389,361,362,370,383,384"
+
     set SWIG32=%EXO_BUILD_ROOT%\%EXO_SWIG_PREFIX%%EXO_SWIG_VER%
     set SWIG64=%EXO_BUILD_ROOT%\%EXO_SWIG_PREFIX%%EXO_SWIG_VER%
 
 rem check postgres master directory exists
-    if "%TARGET_CPU%" EQU "x86" set EXO_SWIG=EXO_SWIG32
-    if "%TARGET_CPU%" EQU "x64" set EXO_SWIG=EXO_SWIG64
+    if "%TARGET_CPU%" EQU "x86" set EXO_SWIG=%EXO_SWIG32%
+    if "%TARGET_CPU%" EQU "x64" set EXO_SWIG=%EXO_SWIG64%
 rem dont check for now in case they are not building the SWIG bindings
 rem    if exist "%EXO_SWIG%" goto gotSWIG
 rem	echo "Error: config.cmd: EXO_SWIG="%EXO_SWIG%" does not exist" 1>&2
@@ -291,8 +301,8 @@ rem --------------
     set EXO_PYTHON64=%EXO_BUILD_ROOT%\%EXO_PYTHON_PREFIX%%EXO_PYTHON_VER%
 
 rem check python master directory exists
-    if "%TARGET_CPU%" EQU "x86" set EXO_PYTHON=EXO_PYTHON32
-    if "%TARGET_CPU%" EQU "x64" set EXO_PYTHON=EXO_PYTHON64
+    if "%TARGET_CPU%" EQU "x86" set EXO_PYTHON=%EXO_PYTHON32%
+    if "%TARGET_CPU%" EQU "x64" set EXO_PYTHON=%EXO_PYTHON64%
 rem dont check for now in case they are not building the python bindings
 rem    if exist "%EXO_PYTHON%" goto gotpython
 rem	echo "Error: config.cmd: EXO_PYTHON="%EXO_PYTHON%" does not exist" 1>&2
@@ -340,8 +350,8 @@ rem ------------------
     set PHP64=%EXO_BUILD_ROOT%\%EXO_PHP_PREFIX%%EXO_PHP_VER%
 
 rem check php master directory exists
-    if "%TARGET_CPU%" EQU "x86" set EXO_PHP=EXO_PHP32
-    if "%TARGET_CPU%" EQU "x64" set EXO_PHP=EXO_PHP64
+    if "%TARGET_CPU%" EQU "x86" set EXO_PHP=%EXO_PHP32%
+    if "%TARGET_CPU%" EQU "x64" set EXO_PHP=%EXO_PHP64%
 rem dont check for now in case they are not building the php bindings
 rem    if exist "%EXO_PHP%" goto gotphp
 rem	echo "Error: config.cmd: EXO_PHP="%EXO_PHP%" does not exist" 1>&2
