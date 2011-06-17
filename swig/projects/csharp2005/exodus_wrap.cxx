@@ -8,7 +8,7 @@
  * interface file instead. 
  * ----------------------------------------------------------------------------- */
 
-#define SWIGJAVA
+#define SWIGCSHARP
 
 
 #ifdef __cplusplus
@@ -144,71 +144,153 @@ template <typename T> T SwigValueInit() {
 
 
 
-/* Fix for jlong on some versions of gcc on Windows */
-#if defined(__GNUC__) && !defined(__INTEL_COMPILER)
-  typedef long long __int64;
-#endif
-
-/* Fix for jlong on 64-bit x86 Solaris */
-#if defined(__x86_64)
-# ifdef _LP64
-#   undef _LP64
-# endif
-#endif
-
-#include <jni.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 
-/* Support for throwing Java exceptions */
+/* Support for throwing C# exceptions from C/C++. There are two types: 
+ * Exceptions that take a message and ArgumentExceptions that take a message and a parameter name. */
 typedef enum {
-  SWIG_JavaOutOfMemoryError = 1, 
-  SWIG_JavaIOException, 
-  SWIG_JavaRuntimeException, 
-  SWIG_JavaIndexOutOfBoundsException,
-  SWIG_JavaArithmeticException,
-  SWIG_JavaIllegalArgumentException,
-  SWIG_JavaNullPointerException,
-  SWIG_JavaDirectorPureVirtual,
-  SWIG_JavaUnknownError
-} SWIG_JavaExceptionCodes;
+  SWIG_CSharpApplicationException,
+  SWIG_CSharpArithmeticException,
+  SWIG_CSharpDivideByZeroException,
+  SWIG_CSharpIndexOutOfRangeException,
+  SWIG_CSharpInvalidCastException,
+  SWIG_CSharpInvalidOperationException,
+  SWIG_CSharpIOException,
+  SWIG_CSharpNullReferenceException,
+  SWIG_CSharpOutOfMemoryException,
+  SWIG_CSharpOverflowException,
+  SWIG_CSharpSystemException
+} SWIG_CSharpExceptionCodes;
+
+typedef enum {
+  SWIG_CSharpArgumentException,
+  SWIG_CSharpArgumentNullException,
+  SWIG_CSharpArgumentOutOfRangeException
+} SWIG_CSharpExceptionArgumentCodes;
+
+typedef void (SWIGSTDCALL* SWIG_CSharpExceptionCallback_t)(const char *);
+typedef void (SWIGSTDCALL* SWIG_CSharpExceptionArgumentCallback_t)(const char *, const char *);
 
 typedef struct {
-  SWIG_JavaExceptionCodes code;
-  const char *java_exception;
-} SWIG_JavaExceptions_t;
+  SWIG_CSharpExceptionCodes code;
+  SWIG_CSharpExceptionCallback_t callback;
+} SWIG_CSharpException_t;
+
+typedef struct {
+  SWIG_CSharpExceptionArgumentCodes code;
+  SWIG_CSharpExceptionArgumentCallback_t callback;
+} SWIG_CSharpExceptionArgument_t;
+
+static SWIG_CSharpException_t SWIG_csharp_exceptions[] = {
+  { SWIG_CSharpApplicationException, NULL },
+  { SWIG_CSharpArithmeticException, NULL },
+  { SWIG_CSharpDivideByZeroException, NULL },
+  { SWIG_CSharpIndexOutOfRangeException, NULL },
+  { SWIG_CSharpInvalidCastException, NULL },
+  { SWIG_CSharpInvalidOperationException, NULL },
+  { SWIG_CSharpIOException, NULL },
+  { SWIG_CSharpNullReferenceException, NULL },
+  { SWIG_CSharpOutOfMemoryException, NULL },
+  { SWIG_CSharpOverflowException, NULL },
+  { SWIG_CSharpSystemException, NULL }
+};
+
+static SWIG_CSharpExceptionArgument_t SWIG_csharp_exceptions_argument[] = {
+  { SWIG_CSharpArgumentException, NULL },
+  { SWIG_CSharpArgumentNullException, NULL },
+  { SWIG_CSharpArgumentOutOfRangeException, NULL }
+};
+
+static void SWIGUNUSED SWIG_CSharpSetPendingException(SWIG_CSharpExceptionCodes code, const char *msg) {
+  SWIG_CSharpExceptionCallback_t callback = SWIG_csharp_exceptions[SWIG_CSharpApplicationException].callback;
+  if ((size_t)code < sizeof(SWIG_csharp_exceptions)/sizeof(SWIG_CSharpException_t)) {
+    callback = SWIG_csharp_exceptions[code].callback;
+  }
+  callback(msg);
+}
+
+static void SWIGUNUSED SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpExceptionArgumentCodes code, const char *msg, const char *param_name) {
+  SWIG_CSharpExceptionArgumentCallback_t callback = SWIG_csharp_exceptions_argument[SWIG_CSharpArgumentException].callback;
+  if ((size_t)code < sizeof(SWIG_csharp_exceptions_argument)/sizeof(SWIG_CSharpExceptionArgument_t)) {
+    callback = SWIG_csharp_exceptions_argument[code].callback;
+  }
+  callback(msg, param_name);
+}
 
 
-static void SWIGUNUSED SWIG_JavaThrowException(JNIEnv *jenv, SWIG_JavaExceptionCodes code, const char *msg) {
-  jclass excep;
-  static const SWIG_JavaExceptions_t java_exceptions[] = {
-    { SWIG_JavaOutOfMemoryError, "java/lang/OutOfMemoryError" },
-    { SWIG_JavaIOException, "java/io/IOException" },
-    { SWIG_JavaRuntimeException, "java/lang/RuntimeException" },
-    { SWIG_JavaIndexOutOfBoundsException, "java/lang/IndexOutOfBoundsException" },
-    { SWIG_JavaArithmeticException, "java/lang/ArithmeticException" },
-    { SWIG_JavaIllegalArgumentException, "java/lang/IllegalArgumentException" },
-    { SWIG_JavaNullPointerException, "java/lang/NullPointerException" },
-    { SWIG_JavaDirectorPureVirtual, "java/lang/RuntimeException" },
-    { SWIG_JavaUnknownError,  "java/lang/UnknownError" },
-    { (SWIG_JavaExceptionCodes)0,  "java/lang/UnknownError" }
-  };
-  const SWIG_JavaExceptions_t *except_ptr = java_exceptions;
+#ifdef __cplusplus
+extern "C" 
+#endif
+SWIGEXPORT void SWIGSTDCALL SWIGRegisterExceptionCallbacks_exodus(
+                                                SWIG_CSharpExceptionCallback_t applicationCallback,
+                                                SWIG_CSharpExceptionCallback_t arithmeticCallback,
+                                                SWIG_CSharpExceptionCallback_t divideByZeroCallback, 
+                                                SWIG_CSharpExceptionCallback_t indexOutOfRangeCallback, 
+                                                SWIG_CSharpExceptionCallback_t invalidCastCallback,
+                                                SWIG_CSharpExceptionCallback_t invalidOperationCallback,
+                                                SWIG_CSharpExceptionCallback_t ioCallback,
+                                                SWIG_CSharpExceptionCallback_t nullReferenceCallback,
+                                                SWIG_CSharpExceptionCallback_t outOfMemoryCallback, 
+                                                SWIG_CSharpExceptionCallback_t overflowCallback, 
+                                                SWIG_CSharpExceptionCallback_t systemCallback) {
+  SWIG_csharp_exceptions[SWIG_CSharpApplicationException].callback = applicationCallback;
+  SWIG_csharp_exceptions[SWIG_CSharpArithmeticException].callback = arithmeticCallback;
+  SWIG_csharp_exceptions[SWIG_CSharpDivideByZeroException].callback = divideByZeroCallback;
+  SWIG_csharp_exceptions[SWIG_CSharpIndexOutOfRangeException].callback = indexOutOfRangeCallback;
+  SWIG_csharp_exceptions[SWIG_CSharpInvalidCastException].callback = invalidCastCallback;
+  SWIG_csharp_exceptions[SWIG_CSharpInvalidOperationException].callback = invalidOperationCallback;
+  SWIG_csharp_exceptions[SWIG_CSharpIOException].callback = ioCallback;
+  SWIG_csharp_exceptions[SWIG_CSharpNullReferenceException].callback = nullReferenceCallback;
+  SWIG_csharp_exceptions[SWIG_CSharpOutOfMemoryException].callback = outOfMemoryCallback;
+  SWIG_csharp_exceptions[SWIG_CSharpOverflowException].callback = overflowCallback;
+  SWIG_csharp_exceptions[SWIG_CSharpSystemException].callback = systemCallback;
+}
 
-  while (except_ptr->code != code && except_ptr->code)
-    except_ptr++;
+#ifdef __cplusplus
+extern "C" 
+#endif
+SWIGEXPORT void SWIGSTDCALL SWIGRegisterExceptionArgumentCallbacks_exodus(
+                                                SWIG_CSharpExceptionArgumentCallback_t argumentCallback,
+                                                SWIG_CSharpExceptionArgumentCallback_t argumentNullCallback,
+                                                SWIG_CSharpExceptionArgumentCallback_t argumentOutOfRangeCallback) {
+  SWIG_csharp_exceptions_argument[SWIG_CSharpArgumentException].callback = argumentCallback;
+  SWIG_csharp_exceptions_argument[SWIG_CSharpArgumentNullException].callback = argumentNullCallback;
+  SWIG_csharp_exceptions_argument[SWIG_CSharpArgumentOutOfRangeException].callback = argumentOutOfRangeCallback;
+}
 
-  jenv->ExceptionClear();
-  excep = jenv->FindClass(except_ptr->java_exception);
-  if (excep)
-    jenv->ThrowNew(excep, msg);
+
+/* Callback for returning strings to C# without leaking memory */
+typedef char * (SWIGSTDCALL* SWIG_CSharpStringHelperCallback)(const char *);
+static SWIG_CSharpStringHelperCallback SWIG_csharp_string_callback = NULL;
+
+
+#ifdef __cplusplus
+extern "C" 
+#endif
+SWIGEXPORT void SWIGSTDCALL SWIGRegisterStringCallback_exodus(SWIG_CSharpStringHelperCallback callback) {
+  SWIG_csharp_string_callback = callback;
 }
 
 
 /* Contract support */
 
-#define SWIG_contract_assert(nullreturn, expr, msg) if (!(expr)) {SWIG_JavaThrowException(jenv, SWIG_JavaIllegalArgumentException, msg); return nullreturn; } else
+#define SWIG_contract_assert(nullreturn, expr, msg) if (!(expr)) {SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, msg, ""); return nullreturn; } else
+
+
+/* Callback for returning strings to C# without leaking memory */
+typedef void * (SWIGSTDCALL* SWIG_CSharpWStringHelperCallback)(const wchar_t *);
+static SWIG_CSharpWStringHelperCallback SWIG_csharp_wstring_callback = NULL;
+
+
+#ifdef __cplusplus
+extern "C"
+#endif
+SWIGEXPORT void SWIGSTDCALL SWIGRegisterWStringCallback_exodus(SWIG_CSharpWStringHelperCallback callback) {
+  SWIG_csharp_wstring_callback = callback;
+}
 
 /*  Errors in SWIG */
 #define  SWIG_UnknownError    	   -1 
@@ -231,37 +313,42 @@ static void SWIGUNUSED SWIG_JavaThrowException(JNIEnv *jenv, SWIG_JavaExceptionC
 #include <string>
 
 
-SWIGINTERN void SWIG_JavaException(JNIEnv *jenv, int code, const char *msg) {
-  SWIG_JavaExceptionCodes exception_code = SWIG_JavaUnknownError;
-  switch(code) {
-  case SWIG_MemoryError:
-    exception_code = SWIG_JavaOutOfMemoryError;
-    break;
-  case SWIG_IOError:
-    exception_code = SWIG_JavaIOException;
-    break;
-  case SWIG_SystemError:
-  case SWIG_RuntimeError:
-    exception_code = SWIG_JavaRuntimeException;
-    break;
-  case SWIG_OverflowError:
-  case SWIG_IndexError:
-    exception_code = SWIG_JavaIndexOutOfBoundsException;
-    break;
-  case SWIG_DivisionByZero:
-    exception_code = SWIG_JavaArithmeticException;
-    break;
-  case SWIG_SyntaxError:
-  case SWIG_ValueError:
-  case SWIG_TypeError:
-    exception_code = SWIG_JavaIllegalArgumentException;
-    break;
-  case SWIG_UnknownError:
-  default:
-    exception_code = SWIG_JavaUnknownError;
-    break;
+#include <string>
+
+
+SWIGINTERN void SWIG_CSharpException(int code, const char *msg) {
+  if (code == SWIG_ValueError) {
+    SWIG_CSharpExceptionArgumentCodes exception_code = SWIG_CSharpArgumentOutOfRangeException;
+    SWIG_CSharpSetPendingExceptionArgument(exception_code, msg, 0);
+  } else {
+    SWIG_CSharpExceptionCodes exception_code = SWIG_CSharpApplicationException;
+    switch(code) {
+    case SWIG_MemoryError:
+      exception_code = SWIG_CSharpOutOfMemoryException;
+      break;
+    case SWIG_IndexError:
+      exception_code = SWIG_CSharpIndexOutOfRangeException;
+      break;
+    case SWIG_DivisionByZero:
+      exception_code = SWIG_CSharpDivideByZeroException;
+      break;
+    case SWIG_IOError:
+      exception_code = SWIG_CSharpIOException;
+      break;
+    case SWIG_OverflowError:
+      exception_code = SWIG_CSharpOverflowException;
+      break;
+    case SWIG_RuntimeError:
+    case SWIG_TypeError:
+    case SWIG_SyntaxError:
+    case SWIG_SystemError:
+    case SWIG_UnknownError:
+    default:
+      exception_code = SWIG_CSharpApplicationException;
+      break;
+    }
+    SWIG_CSharpSetPendingException(exception_code, msg);
   }
-  SWIG_JavaThrowException(jenv, exception_code, msg);
 }
 
 
@@ -277,2554 +364,2041 @@ SWIGINTERN void SWIG_JavaException(JNIEnv *jenv, int code, const char *msg) {
 extern "C" {
 #endif
 
-SWIGEXPORT jint JNICALL Java_exodus_jexodusJNI_MV_1H_1get(JNIEnv *jenv, jclass jcls) {
-  jint jresult = 0 ;
+SWIGEXPORT int SWIGSTDCALL CSharp_MV_H_get() {
+  int jresult ;
   int result;
   
-  (void)jenv;
-  (void)jcls;
   result = (int)(1);
-  jresult = (jint)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_mvtypemask_1get(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvtypemask_get() {
+  unsigned int jresult ;
   unsigned int result;
   
-  (void)jenv;
-  (void)jcls;
   result = (unsigned int)(unsigned int)mvtypemask;
-  jresult = (jlong)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_exodus_jexodusJNI_LASTDELIMITERCHARNOPLUS1_1get(JNIEnv *jenv, jclass jcls) {
-  jint jresult = 0 ;
+SWIGEXPORT int SWIGSTDCALL CSharp_LASTDELIMITERCHARNOPLUS1_get() {
+  int jresult ;
   int result;
   
-  (void)jenv;
-  (void)jcls;
   result = (int)(0x0300);
-  jresult = (jint)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_delete_1var(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void SWIGSTDCALL CSharp_delete_mvar(void * jarg1) {
   exodus::var *arg1 = (exodus::var *) 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   delete arg1;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1toBool(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_toBool(void * jarg1) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = (bool)((exodus::var const *)arg1)->toBool();
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_exodus_jexodusJNI_var_1toInt(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
+SWIGEXPORT int SWIGSTDCALL CSharp_mvar_toInt(void * jarg1) {
+  int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   int result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = (int)((exodus::var const *)arg1)->toInt();
-  jresult = (jint)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jdouble JNICALL Java_exodus_jexodusJNI_var_1toDouble(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jdouble jresult = 0 ;
+SWIGEXPORT double SWIGSTDCALL CSharp_mvar_toDouble(void * jarg1) {
+  double jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   double result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = (double)((exodus::var const *)arg1)->toDouble();
-  jresult = (jdouble)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jstring JNICALL Java_exodus_jexodusJNI_var_1toWString(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_toWString(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   std::wstring result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->toWString();
-  jsize result_len = (&result)->length();
-  jchar *conv_buf = new jchar[result_len];
-  for (jsize i = 0; i < result_len; ++i) {
-    conv_buf[i] = (jchar)result[i];
-  }
-  jresult = jenv->NewString(conv_buf, result_len);
-  delete [] conv_buf; 
+  jresult = SWIG_csharp_wstring_callback((&result)->c_str()); 
   return jresult;
 }
 
 
-SWIGEXPORT jstring JNICALL Java_exodus_jexodusJNI_var_1toString(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
+SWIGEXPORT char * SWIGSTDCALL CSharp_mvar_ToString(void * jarg1) {
+  char * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   std::string result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->toString();
-  jresult = jenv->NewStringUTF((&result)->c_str()); 
+  jresult = SWIG_csharp_string_callback((&result)->c_str()); 
   return jresult;
 }
 
 
-SWIGEXPORT jstring JNICALL Java_exodus_jexodusJNI_var_1toString2(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
+SWIGEXPORT char * SWIGSTDCALL CSharp_mvar_toString2(void * jarg1) {
+  char * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   std::string result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->toString2();
-  jresult = jenv->NewStringUTF((&result)->c_str()); 
+  jresult = SWIG_csharp_string_callback((&result)->c_str()); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_new_1var_1_1SWIG_10(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_mvar__SWIG_0() {
+  void * jresult ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
   result = (exodus::var *)new exodus::var();
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_new_1var_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_mvar__SWIG_1(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1;
+  arg1 = (exodus::var *)jarg1;
   if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (exodus::var *)new exodus::var((exodus::var const &)*arg1);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_new_1var_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  jlong jresult = 0 ;
-  wchar_t *arg1 = (wchar_t *) 0 ;
-  exodus::var *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(wchar_t **)&jarg1; 
-  result = (exodus::var *)new exodus::var((wchar_t const *)arg1);
-  *(exodus::var **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_new_1var_1_1SWIG_13(JNIEnv *jenv, jclass jcls, jstring jarg1, jlong jarg2) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_mvar__SWIG_2(char * jarg1, unsigned long jarg2) {
+  void * jresult ;
   char *arg1 = (char *) 0 ;
   size_t arg2 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  arg1 = 0;
-  if (jarg1) {
-    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
-    if (!arg1) return 0;
-  }
+  arg1 = (char *)jarg1; 
   arg2 = (size_t)jarg2; 
   result = (exodus::var *)new exodus::var((char const *)arg1,arg2);
-  *(exodus::var **)&jresult = result; 
-  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_new_1var_1_1SWIG_14(JNIEnv *jenv, jclass jcls, jstring jarg1) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_mvar__SWIG_3(wchar_t * jarg1) {
+  void * jresult ;
   std::wstring *arg1 = 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  if(!jarg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::wstring");
+  if (!jarg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null wstring", 0);
     return 0;
   }
-  const jchar *arg1_pstr = jenv->GetStringChars(jarg1, 0);
-  if (!arg1_pstr) return 0;
-  jsize arg1_len = jenv->GetStringLength(jarg1);
-  std::wstring arg1_str;
-  if (arg1_len) {
-    arg1_str.reserve(arg1_len);
-    for (jsize i = 0; i < arg1_len; ++i) {
-      arg1_str.push_back((wchar_t)arg1_pstr[i]);
-    }
-  }
-  arg1 = &arg1_str;
-  jenv->ReleaseStringChars(jarg1, arg1_pstr);
-  
+  std::wstring arg1_str(jarg1);
+  arg1 = &arg1_str; 
   result = (exodus::var *)new exodus::var((std::wstring const &)*arg1);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_new_1var_1_1SWIG_15(JNIEnv *jenv, jclass jcls, jboolean jarg1) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_mvar__SWIG_4(unsigned int jarg1) {
+  void * jresult ;
   bool arg1 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
   arg1 = jarg1 ? true : false; 
   result = (exodus::var *)new exodus::var(arg1);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_new_1var_1_1SWIG_16(JNIEnv *jenv, jclass jcls, jint jarg1) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_mvar__SWIG_5(int jarg1) {
+  void * jresult ;
   int arg1 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
   arg1 = (int)jarg1; 
   result = (exodus::var *)new exodus::var(arg1);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_new_1var_1_1SWIG_17(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_mvar__SWIG_6(long long jarg1) {
+  void * jresult ;
   long long arg1 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
   arg1 = (long long)jarg1; 
   result = (exodus::var *)new exodus::var(arg1);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_new_1var_1_1SWIG_18(JNIEnv *jenv, jclass jcls, jdouble jarg1) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_mvar__SWIG_7(double jarg1) {
+  void * jresult ;
   double arg1 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
   arg1 = (double)jarg1; 
   result = (exodus::var *)new exodus::var(arg1);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1date(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_date(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->date();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1time(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_time(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->time();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1timedate(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_timedate(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->timedate();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_var_1ossleep(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void SWIGSTDCALL CSharp_mvar_ossleep(void * jarg1, int jarg2) {
   exodus::var *arg1 = (exodus::var *) 0 ;
   int arg2 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   arg2 = (int)jarg2; 
   ((exodus::var const *)arg1)->ossleep(arg2);
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1ostime(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_ostime(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->ostime();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1osopen_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_osopen__SWIG_0(void * jarg1) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = (bool)((exodus::var const *)arg1)->osopen();
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1osopen_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_osopen__SWIG_1(void * jarg1, void * jarg2, void * jarg3) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (bool)((exodus::var const *)arg1)->osopen((exodus::var const &)*arg2,(exodus::var const &)*arg3);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1osbread(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_, jint jarg4) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_osbread(void * jarg1, void * jarg2, void * jarg3, int jarg4) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
   int arg4 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var & type is null", 0);
     return 0;
   } 
   arg4 = (int)jarg4; 
   result = (exodus::var *) &(arg1)->osbread((exodus::var const &)*arg2,*arg3,arg4);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1osbwrite(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_osbwrite(void * jarg1, void * jarg2, void * jarg3) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var & type is null", 0);
     return 0;
   } 
   result = (bool)((exodus::var const *)arg1)->osbwrite((exodus::var const &)*arg2,*arg3);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_var_1osclose(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void SWIGSTDCALL CSharp_mvar_osclose(void * jarg1) {
   exodus::var *arg1 = (exodus::var *) 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   ((exodus::var const *)arg1)->osclose();
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1osread_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_osread__SWIG_0(void * jarg1, void * jarg2, void * jarg3) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (bool)(arg1)->osread((exodus::var const &)*arg2,(exodus::var const &)*arg3);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1oswrite(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_oswrite(void * jarg1, void * jarg2, void * jarg3) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (bool)((exodus::var const *)arg1)->oswrite((exodus::var const &)*arg2,(exodus::var const &)*arg3);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1osdelete_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_osdelete__SWIG_0(void * jarg1) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = (bool)((exodus::var const *)arg1)->osdelete();
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1osdelete_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_osdelete__SWIG_1(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (bool)((exodus::var const *)arg1)->osdelete((exodus::var const &)*arg2);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1osrename(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_osrename(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (bool)((exodus::var const *)arg1)->osrename((exodus::var const &)*arg2);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1oscopy(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_oscopy(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (bool)((exodus::var const *)arg1)->oscopy((exodus::var const &)*arg2);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1oslist_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_, jint jarg4) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_oslist__SWIG_0(void * jarg1, void * jarg2, void * jarg3, int jarg4) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
   int arg4 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   arg4 = (int)jarg4; 
   result = ((exodus::var const *)arg1)->oslist((exodus::var const &)*arg2,(exodus::var const &)*arg3,arg4);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1oslist_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_oslist__SWIG_1(void * jarg1, void * jarg2, void * jarg3) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = ((exodus::var const *)arg1)->oslist((exodus::var const &)*arg2,(exodus::var const &)*arg3);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1oslistf(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_oslistf(void * jarg1, void * jarg2, void * jarg3) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = ((exodus::var const *)arg1)->oslistf((exodus::var const &)*arg2,(exodus::var const &)*arg3);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1oslistd(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_oslistd(void * jarg1, void * jarg2, void * jarg3) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = ((exodus::var const *)arg1)->oslistd((exodus::var const &)*arg2,(exodus::var const &)*arg3);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1osfile(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_osfile(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->osfile();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1osdir(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_osdir(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->osdir();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1osmkdir(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_osmkdir(void * jarg1) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = (bool)((exodus::var const *)arg1)->osmkdir();
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1osrmdir_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jboolean jarg2) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_osrmdir__SWIG_0(void * jarg1, unsigned int jarg2) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   bool arg2 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   arg2 = jarg2 ? true : false; 
   result = (bool)((exodus::var const *)arg1)->osrmdir(arg2);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1osrmdir_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_osrmdir__SWIG_1(void * jarg1) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = (bool)((exodus::var const *)arg1)->osrmdir();
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1oscwd_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_oscwd__SWIG_0(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->oscwd();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1oscwd_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_oscwd__SWIG_1(void * jarg1, void * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = ((exodus::var const *)arg1)->oscwd((exodus::var const &)*arg2);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_var_1osflush(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void SWIGSTDCALL CSharp_mvar_osflush(void * jarg1) {
   exodus::var *arg1 = (exodus::var *) 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   ((exodus::var const *)arg1)->osflush();
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1osread_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jlong jarg3, jobject jarg3_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_osread__SWIG_1(void * jarg1, char * jarg2, void * jarg3) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   char *arg2 = (char *) 0 ;
   exodus::var *arg3 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg3_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = 0;
-  if (jarg2) {
-    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
-    if (!arg2) return 0;
-  }
-  arg3 = *(exodus::var **)&jarg3;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (char *)jarg2; 
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (bool)(arg1)->osread((char const *)arg2,(exodus::var const &)*arg3);
-  jresult = (jboolean)result; 
-  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1suspend(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_suspend(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->suspend();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1osshell(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_osshell(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->osshell();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1osshellread(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_osshellread(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->osshellread();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1osshellwrite(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_osshellwrite(void * jarg1, void * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = ((exodus::var const *)arg1)->osshellwrite((exodus::var const &)*arg2);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1osgetenv(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_osgetenv(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (bool)(arg1)->osgetenv((exodus::var const &)*arg2);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1ossetenv(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_ossetenv(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (bool)((exodus::var const *)arg1)->ossetenv((exodus::var const &)*arg2);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_var_1stop(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT void SWIGSTDCALL CSharp_mvar_stop(void * jarg1, void * jarg2) {
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return ;
   } 
   ((exodus::var const *)arg1)->stop((exodus::var const &)*arg2);
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_var_1abort(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT void SWIGSTDCALL CSharp_mvar_abort(void * jarg1, void * jarg2) {
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return ;
   } 
   ((exodus::var const *)arg1)->abort((exodus::var const &)*arg2);
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1perform(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_perform(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->perform();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1execute(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_execute(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->execute();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1chain(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_chain(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->chain();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1logoff(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_logoff(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->logoff();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1debug_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_debug__SWIG_0(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->debug();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1debug_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_debug__SWIG_1(void * jarg1, void * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = ((exodus::var const *)arg1)->debug((exodus::var const &)*arg2);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_var_1breakon(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void SWIGSTDCALL CSharp_mvar_breakon(void * jarg1) {
   exodus::var *arg1 = (exodus::var *) 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   ((exodus::var const *)arg1)->breakon();
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_var_1breakoff(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void SWIGSTDCALL CSharp_mvar_breakoff(void * jarg1) {
   exodus::var *arg1 = (exodus::var *) 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   ((exodus::var const *)arg1)->breakoff();
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1output_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_output__SWIG_0(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = (exodus::var *) &((exodus::var const *)arg1)->output();
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1outputl_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_outputl__SWIG_0(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = (exodus::var *) &((exodus::var const *)arg1)->outputl();
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1outputt_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_outputt__SWIG_0(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = (exodus::var *) &((exodus::var const *)arg1)->outputt();
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1output_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_output__SWIG_1(void * jarg1, void * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (exodus::var *) &((exodus::var const *)arg1)->output((exodus::var const &)*arg2);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1outputl_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_outputl__SWIG_1(void * jarg1, void * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (exodus::var *) &((exodus::var const *)arg1)->outputl((exodus::var const &)*arg2);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1outputt_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_outputt__SWIG_1(void * jarg1, void * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (exodus::var *) &((exodus::var const *)arg1)->outputt((exodus::var const &)*arg2);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1logput_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_logput__SWIG_0(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = (exodus::var *) &((exodus::var const *)arg1)->logput();
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1logputl_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_logputl__SWIG_0(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = (exodus::var *) &((exodus::var const *)arg1)->logputl();
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1logput_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_logput__SWIG_1(void * jarg1, void * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (exodus::var *) &((exodus::var const *)arg1)->logput((exodus::var const &)*arg2);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1logputl_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_logputl__SWIG_1(void * jarg1, void * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (exodus::var *) &((exodus::var const *)arg1)->logputl((exodus::var const &)*arg2);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1errput_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_errput__SWIG_0(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = (exodus::var *) &((exodus::var const *)arg1)->errput();
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1errputl_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_errputl__SWIG_0(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = (exodus::var *) &((exodus::var const *)arg1)->errputl();
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1errput_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_errput__SWIG_1(void * jarg1, void * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (exodus::var *) &((exodus::var const *)arg1)->errput((exodus::var const &)*arg2);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1errputl_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_errputl__SWIG_1(void * jarg1, void * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (exodus::var *) &((exodus::var const *)arg1)->errputl((exodus::var const &)*arg2);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1put(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_put(void * jarg1, void * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   std::ostream *arg2 = 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(std::ostream **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (std::ostream *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "std::ostream & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "std::ostream & type is null", 0);
     return 0;
   } 
   result = (exodus::var *) &((exodus::var const *)arg1)->put(*arg2);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1at_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_at__SWIG_0(void * jarg1, int jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   int arg2 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   arg2 = (int)jarg2; 
   result = ((exodus::var const *)arg1)->at(arg2);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1at_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_at__SWIG_1(void * jarg1, int jarg2, int jarg3) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   int arg2 ;
   int arg3 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   arg2 = (int)jarg2; 
   arg3 = (int)jarg3; 
   result = ((exodus::var const *)arg1)->at(arg2,arg3);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1getcursor(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_getcursor(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->getcursor();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_var_1setcursor(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void SWIGSTDCALL CSharp_mvar_setcursor(void * jarg1) {
   exodus::var *arg1 = (exodus::var *) 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   ((exodus::var const *)arg1)->setcursor();
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1getprompt(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_getprompt(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->getprompt();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_var_1setprompt(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void SWIGSTDCALL CSharp_mvar_setprompt(void * jarg1) {
   exodus::var *arg1 = (exodus::var *) 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   ((exodus::var const *)arg1)->setprompt();
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1input_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_input__SWIG_0(void * jarg1) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = (bool)(arg1)->input();
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1input_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jint jarg3) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_input__SWIG_1(void * jarg1, void * jarg2, int jarg3) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   int arg3 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   arg3 = (int)jarg3; 
   result = (bool)(arg1)->input((exodus::var const &)*arg2,arg3);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1input_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_input__SWIG_2(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (bool)(arg1)->input((exodus::var const &)*arg2);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1eof(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_eof(void * jarg1) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = (bool)((exodus::var const *)arg1)->eof();
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1assigned(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_assigned(void * jarg1) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = (bool)((exodus::var const *)arg1)->assigned();
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1unassigned(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_unassigned(void * jarg1) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = (bool)((exodus::var const *)arg1)->unassigned();
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1transfer(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_transfer(void * jarg1, void * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var & type is null", 0);
     return 0;
   } 
   result = (exodus::var *) &(arg1)->transfer(*arg2);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1exchange(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_exchange(void * jarg1, void * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var & type is null", 0);
     return 0;
   } 
   result = (exodus::var *) &(arg1)->exchange(*arg2);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1clone(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_clone(void * jarg1, void * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var & type is null", 0);
     return 0;
   } 
   result = (exodus::var *) &(arg1)->clone(*arg2);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1abs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_abs(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->abs();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1mod_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_mod__SWIG_0(void * jarg1, void * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = ((exodus::var const *)arg1)->mod((exodus::var const &)*arg2);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1mod_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_mod__SWIG_1(void * jarg1, int jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   int arg2 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   arg2 = (int)jarg2; 
   result = ((exodus::var const *)arg1)->mod(arg2);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1pwr(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_pwr(void * jarg1, void * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = ((exodus::var const *)arg1)->pwr((exodus::var const &)*arg2);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1rnd(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_rnd(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->rnd();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_var_1initrnd(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void SWIGSTDCALL CSharp_mvar_initrnd(void * jarg1) {
   exodus::var *arg1 = (exodus::var *) 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   ((exodus::var const *)arg1)->initrnd();
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1exp(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_exp(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->exp();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1sqrt(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_sqrt(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->sqrt();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1sin(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_sin(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->sin();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1cos(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_cos(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->cos();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1tan(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_tan(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->tan();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1atan(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_atan(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->atan();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1loge(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_loge(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->loge();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1integer(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_integer(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->integer();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1floor(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_floor(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->floor();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1round_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_round__SWIG_0(void * jarg1, int jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   int arg2 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   arg2 = (int)jarg2; 
   result = ((exodus::var const *)arg1)->round(arg2);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1round_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_round__SWIG_1(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->round();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1setxlocale(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_setxlocale(void * jarg1) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = (bool)((exodus::var const *)arg1)->setxlocale();
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1getxlocale(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_getxlocale(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = (exodus::var *) &(arg1)->getxlocale();
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1chr(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_chr(void * jarg1, int jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   int arg2 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   arg2 = (int)jarg2; 
   result = ((exodus::var const *)arg1)->chr(arg2);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1str(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_str(void * jarg1, int jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   int arg2 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   arg2 = (int)jarg2; 
   result = ((exodus::var const *)arg1)->str(arg2);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1space(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_space(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->space();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1match(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_match(void * jarg1, void * jarg2, void * jarg3) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (bool)((exodus::var const *)arg1)->match((exodus::var const &)*arg2,(exodus::var const &)*arg3);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1seq(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_seq(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->seq();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1dcount(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_dcount(void * jarg1, void * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = ((exodus::var const *)arg1)->dcount((exodus::var const &)*arg2);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1count_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_count__SWIG_0(void * jarg1, void * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = ((exodus::var const *)arg1)->count((exodus::var const &)*arg2);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1count_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_count__SWIG_1(void * jarg1, wchar_t jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   wchar_t arg2 ;
-  wchar_t const *argp2 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
-  argp2 = *(wchar_t **)&jarg2; 
-  if (!argp2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null wchar_t const");
-    return 0;
-  }
-  arg2 = *argp2; 
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (wchar_t)jarg2; 
   result = ((exodus::var const *)arg1)->count(arg2);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1length(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_length(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->length();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1len(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_len(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->len();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1data(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT wchar_t * SWIGSTDCALL CSharp_mvar_data(void * jarg1) {
+  wchar_t * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   wchar_t *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = (wchar_t *)((exodus::var const *)arg1)->data();
-  *(wchar_t **)&jresult = result; 
+  jresult = (wchar_t *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1isnum(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_isnum(void * jarg1) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = (bool)((exodus::var const *)arg1)->isnum();
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1isnum_1old(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_isnum_old(void * jarg1) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = (bool)((exodus::var const *)arg1)->isnum_old();
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1converter(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_converter(void * jarg1, void * jarg2, void * jarg3) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (exodus::var *) &(arg1)->converter((exodus::var const &)*arg2,(exodus::var const &)*arg3);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1swapper(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_, jlong jarg4, jobject jarg4_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_swapper(void * jarg1, void * jarg2, void * jarg3, void * jarg4) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
   exodus::var *arg4 = 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  (void)jarg4_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg4 = *(exodus::var **)&jarg4;
+  arg4 = (exodus::var *)jarg4;
   if (!arg4) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (exodus::var *) &(arg1)->swapper((exodus::var const &)*arg2,(exodus::var const &)*arg3,(exodus::var const &)*arg4);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1splicer_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3, jlong jarg4, jobject jarg4_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_splicer__SWIG_0(void * jarg1, int jarg2, int jarg3, void * jarg4) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   int arg2 ;
   int arg3 ;
   exodus::var *arg4 = 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg4_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   arg2 = (int)jarg2; 
   arg3 = (int)jarg3; 
-  arg4 = *(exodus::var **)&jarg4;
+  arg4 = (exodus::var *)jarg4;
   if (!arg4) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (exodus::var *) &(arg1)->splicer(arg2,arg3,(exodus::var const &)*arg4);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1splicer_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jlong jarg3, jobject jarg3_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_splicer__SWIG_1(void * jarg1, int jarg2, void * jarg3) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   int arg2 ;
   exodus::var *arg3 = 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg3_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   arg2 = (int)jarg2; 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (exodus::var *) &(arg1)->splicer(arg2,(exodus::var const &)*arg3);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1quoter(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_quoter(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = (exodus::var *) &(arg1)->quoter();
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1squoter(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_squoter(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = (exodus::var *) &(arg1)->squoter();
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1unquoter(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_unquoter(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = (exodus::var *) &(arg1)->unquoter();
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1ucaser(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_ucaser(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = (exodus::var *) &(arg1)->ucaser();
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1lcaser(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_lcaser(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = (exodus::var *) &(arg1)->lcaser();
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1trimmer_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_trimmer__SWIG_0(void * jarg1, wchar_t * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   wchar_t *arg2 = (wchar_t *) 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(wchar_t **)&jarg2; 
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (wchar_t *)jarg2; 
   result = (exodus::var *) &(arg1)->trimmer((wchar_t const *)arg2);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1trimmerf_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_trimmerf__SWIG_0(void * jarg1, wchar_t * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   wchar_t *arg2 = (wchar_t *) 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(wchar_t **)&jarg2; 
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (wchar_t *)jarg2; 
   result = (exodus::var *) &(arg1)->trimmerf((wchar_t const *)arg2);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1trimmerb_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_trimmerb__SWIG_0(void * jarg1, wchar_t * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   wchar_t *arg2 = (wchar_t *) 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(wchar_t **)&jarg2; 
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (wchar_t *)jarg2; 
   result = (exodus::var *) &(arg1)->trimmerb((wchar_t const *)arg2);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1trimmer_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_trimmer__SWIG_1(void * jarg1, void * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var arg2 ;
   exodus::var const *argp2 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  argp2 = *(exodus::var **)&jarg2; 
+  arg1 = (exodus::var *)jarg1; 
+  argp2 = (exodus::var *)jarg2; 
   if (!argp2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null exodus::var const");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null exodus::var const", 0);
     return 0;
   }
   arg2 = *argp2; 
   result = (exodus::var *) &(arg1)->trimmer(arg2);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1trimmerf_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_trimmerf__SWIG_1(void * jarg1, void * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var arg2 ;
   exodus::var const *argp2 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  argp2 = *(exodus::var **)&jarg2; 
+  arg1 = (exodus::var *)jarg1; 
+  argp2 = (exodus::var *)jarg2; 
   if (!argp2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null exodus::var const");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null exodus::var const", 0);
     return 0;
   }
   arg2 = *argp2; 
   result = (exodus::var *) &(arg1)->trimmerf(arg2);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1trimmerb_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_trimmerb__SWIG_1(void * jarg1, void * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var arg2 ;
   exodus::var const *argp2 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  argp2 = *(exodus::var **)&jarg2; 
+  arg1 = (exodus::var *)jarg1; 
+  argp2 = (exodus::var *)jarg2; 
   if (!argp2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null exodus::var const");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null exodus::var const", 0);
     return 0;
   }
   arg2 = *argp2; 
   result = (exodus::var *) &(arg1)->trimmerb(arg2);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1fieldstorer(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jint jarg3, jint jarg4, jlong jarg5, jobject jarg5_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_fieldstorer(void * jarg1, void * jarg2, int jarg3, int jarg4, void * jarg5) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   int arg3 ;
@@ -2832,381 +2406,315 @@ SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1fieldstorer(JNIEnv *jenv, j
   exodus::var *arg5 = 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg5_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   arg3 = (int)jarg3; 
   arg4 = (int)jarg4; 
-  arg5 = *(exodus::var **)&jarg5;
+  arg5 = (exodus::var *)jarg5;
   if (!arg5) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (exodus::var *) &(arg1)->fieldstorer((exodus::var const &)*arg2,arg3,arg4,(exodus::var const &)*arg5);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1substrer_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_substrer__SWIG_0(void * jarg1, int jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   int arg2 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   arg2 = (int)jarg2; 
   result = (exodus::var *) &(arg1)->substrer(arg2);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1substrer_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_substrer__SWIG_1(void * jarg1, int jarg2, int jarg3) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   int arg2 ;
   int arg3 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   arg2 = (int)jarg2; 
   arg3 = (int)jarg3; 
   result = (exodus::var *) &(arg1)->substrer(arg2,arg3);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1convert(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_convert(void * jarg1, void * jarg2, void * jarg3) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = ((exodus::var const *)arg1)->convert((exodus::var const &)*arg2,(exodus::var const &)*arg3);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1swap(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_, jlong jarg4, jobject jarg4_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_swap(void * jarg1, void * jarg2, void * jarg3, void * jarg4) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
   exodus::var *arg4 = 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  (void)jarg4_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg4 = *(exodus::var **)&jarg4;
+  arg4 = (exodus::var *)jarg4;
   if (!arg4) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = ((exodus::var const *)arg1)->swap((exodus::var const &)*arg2,(exodus::var const &)*arg3,(exodus::var const &)*arg4);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1splice_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3, jlong jarg4, jobject jarg4_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_splice__SWIG_0(void * jarg1, int jarg2, int jarg3, void * jarg4) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   int arg2 ;
   int arg3 ;
   exodus::var *arg4 = 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg4_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   arg2 = (int)jarg2; 
   arg3 = (int)jarg3; 
-  arg4 = *(exodus::var **)&jarg4;
+  arg4 = (exodus::var *)jarg4;
   if (!arg4) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = ((exodus::var const *)arg1)->splice(arg2,arg3,(exodus::var const &)*arg4);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1splice_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jlong jarg3, jobject jarg3_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_splice__SWIG_1(void * jarg1, int jarg2, void * jarg3) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   int arg2 ;
   exodus::var *arg3 = 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg3_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   arg2 = (int)jarg2; 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = ((exodus::var const *)arg1)->splice(arg2,(exodus::var const &)*arg3);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1quote(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_quote(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->quote();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1squote(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_squote(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->squote();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1unquote(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_unquote(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->unquote();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1ucase(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_ucase(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->ucase();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1lcase(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_lcase(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->lcase();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1trim_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_trim__SWIG_0(void * jarg1, wchar_t * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   wchar_t *arg2 = (wchar_t *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(wchar_t **)&jarg2; 
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (wchar_t *)jarg2; 
   result = ((exodus::var const *)arg1)->trim((wchar_t const *)arg2);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1trimf_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_trimf__SWIG_0(void * jarg1, wchar_t * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   wchar_t *arg2 = (wchar_t *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(wchar_t **)&jarg2; 
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (wchar_t *)jarg2; 
   result = ((exodus::var const *)arg1)->trimf((wchar_t const *)arg2);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1trimb_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_trimb__SWIG_0(void * jarg1, wchar_t * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   wchar_t *arg2 = (wchar_t *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(wchar_t **)&jarg2; 
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (wchar_t *)jarg2; 
   result = ((exodus::var const *)arg1)->trimb((wchar_t const *)arg2);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1trim_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_trim__SWIG_1(void * jarg1, void * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var arg2 ;
   exodus::var const *argp2 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  argp2 = *(exodus::var **)&jarg2; 
+  arg1 = (exodus::var *)jarg1; 
+  argp2 = (exodus::var *)jarg2; 
   if (!argp2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null exodus::var const");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null exodus::var const", 0);
     return 0;
   }
   arg2 = *argp2; 
   result = ((exodus::var const *)arg1)->trim(arg2);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1trimf_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_trimf__SWIG_1(void * jarg1, void * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var arg2 ;
   exodus::var const *argp2 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  argp2 = *(exodus::var **)&jarg2; 
+  arg1 = (exodus::var *)jarg1; 
+  argp2 = (exodus::var *)jarg2; 
   if (!argp2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null exodus::var const");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null exodus::var const", 0);
     return 0;
   }
   arg2 = *argp2; 
   result = ((exodus::var const *)arg1)->trimf(arg2);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1trimb_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_trimb__SWIG_1(void * jarg1, void * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var arg2 ;
   exodus::var const *argp2 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  argp2 = *(exodus::var **)&jarg2; 
+  arg1 = (exodus::var *)jarg1; 
+  argp2 = (exodus::var *)jarg2; 
   if (!argp2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null exodus::var const");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Attempt to dereference null exodus::var const", 0);
     return 0;
   }
   arg2 = *argp2; 
   result = ((exodus::var const *)arg1)->trimb(arg2);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1fieldstore(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jint jarg3, jint jarg4, jlong jarg5, jobject jarg5_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_fieldstore(void * jarg1, void * jarg2, int jarg3, int jarg4, void * jarg5) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   int arg3 ;
@@ -3214,457 +2722,377 @@ SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1fieldstore(JNIEnv *jenv, jc
   exodus::var *arg5 = 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg5_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   arg3 = (int)jarg3; 
   arg4 = (int)jarg4; 
-  arg5 = *(exodus::var **)&jarg5;
+  arg5 = (exodus::var *)jarg5;
   if (!arg5) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = ((exodus::var const *)arg1)->fieldstore((exodus::var const &)*arg2,arg3,arg4,(exodus::var const &)*arg5);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1substr_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_substr__SWIG_0(void * jarg1, int jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   int arg2 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   arg2 = (int)jarg2; 
   result = ((exodus::var const *)arg1)->substr(arg2);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1substr_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_substr__SWIG_1(void * jarg1, int jarg2, int jarg3) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   int arg2 ;
   int arg3 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   arg2 = (int)jarg2; 
   arg3 = (int)jarg3; 
   result = ((exodus::var const *)arg1)->substr(arg2,arg3);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1index_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jint jarg3) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_index__SWIG_0(void * jarg1, void * jarg2, int jarg3) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   int arg3 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   arg3 = (int)jarg3; 
   result = ((exodus::var const *)arg1)->index((exodus::var const &)*arg2,arg3);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1index_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_index__SWIG_1(void * jarg1, void * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = ((exodus::var const *)arg1)->index((exodus::var const &)*arg2);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1index2_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jint jarg3) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_index2__SWIG_0(void * jarg1, void * jarg2, int jarg3) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   int arg3 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   arg3 = (int)jarg3; 
   result = ((exodus::var const *)arg1)->index2((exodus::var const &)*arg2,arg3);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1index2_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_index2__SWIG_1(void * jarg1, void * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = ((exodus::var const *)arg1)->index2((exodus::var const &)*arg2);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1field_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jint jarg3, jint jarg4) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_field__SWIG_0(void * jarg1, void * jarg2, int jarg3, int jarg4) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   int arg3 ;
   int arg4 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   arg3 = (int)jarg3; 
   arg4 = (int)jarg4; 
   result = ((exodus::var const *)arg1)->field((exodus::var const &)*arg2,arg3,arg4);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1field_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jint jarg3) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_field__SWIG_1(void * jarg1, void * jarg2, int jarg3) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   int arg3 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   arg3 = (int)jarg3; 
   result = ((exodus::var const *)arg1)->field((exodus::var const &)*arg2,arg3);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1field2_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jint jarg3, jint jarg4) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_field2__SWIG_0(void * jarg1, void * jarg2, int jarg3, int jarg4) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   int arg3 ;
   int arg4 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   arg3 = (int)jarg3; 
   arg4 = (int)jarg4; 
   result = ((exodus::var const *)arg1)->field2((exodus::var const &)*arg2,arg3,arg4);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1field2_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jint jarg3) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_field2__SWIG_1(void * jarg1, void * jarg2, int jarg3) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   int arg3 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   arg3 = (int)jarg3; 
   result = ((exodus::var const *)arg1)->field2((exodus::var const &)*arg2,arg3);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1oconv_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_oconv__SWIG_0(void * jarg1, wchar_t * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   wchar_t *arg2 = (wchar_t *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(wchar_t **)&jarg2; 
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (wchar_t *)jarg2; 
   result = ((exodus::var const *)arg1)->oconv((wchar_t const *)arg2);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1oconv_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_oconv__SWIG_1(void * jarg1, void * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = ((exodus::var const *)arg1)->oconv((exodus::var const &)*arg2);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1iconv_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_iconv__SWIG_0(void * jarg1, wchar_t * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   wchar_t *arg2 = (wchar_t *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(wchar_t **)&jarg2; 
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (wchar_t *)jarg2; 
   result = ((exodus::var const *)arg1)->iconv((wchar_t const *)arg2);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1iconv_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_iconv__SWIG_1(void * jarg1, void * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = ((exodus::var const *)arg1)->iconv((exodus::var const &)*arg2);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1lower(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_lower(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->lower();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1raise(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_raise(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->raise();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1crop(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_crop(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->crop();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1lowerer(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_lowerer(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = (exodus::var *) &(arg1)->lowerer();
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1raiser(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_raiser(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = (exodus::var *) &(arg1)->raiser();
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1cropper(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_cropper(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = (exodus::var *) &(arg1)->cropper();
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1remove(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_remove(void * jarg1, void * jarg2, void * jarg3) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var & type is null", 0);
     return 0;
   } 
   result = ((exodus::var const *)arg1)->remove(*arg2,*arg3);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1replace_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3, jint jarg4, jlong jarg5, jobject jarg5_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_replace__SWIG_0(void * jarg1, int jarg2, int jarg3, int jarg4, void * jarg5) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   int arg2 ;
   int arg3 ;
@@ -3672,77 +3100,65 @@ SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1replace_1_1SWIG_10(JNIEnv *
   exodus::var *arg5 = 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg5_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   arg2 = (int)jarg2; 
   arg3 = (int)jarg3; 
   arg4 = (int)jarg4; 
-  arg5 = *(exodus::var **)&jarg5;
+  arg5 = (exodus::var *)jarg5;
   if (!arg5) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = ((exodus::var const *)arg1)->replace(arg2,arg3,arg4,(exodus::var const &)*arg5);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1replace_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3, jlong jarg4, jobject jarg4_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_replace__SWIG_1(void * jarg1, int jarg2, int jarg3, void * jarg4) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   int arg2 ;
   int arg3 ;
   exodus::var *arg4 = 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg4_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   arg2 = (int)jarg2; 
   arg3 = (int)jarg3; 
-  arg4 = *(exodus::var **)&jarg4;
+  arg4 = (exodus::var *)jarg4;
   if (!arg4) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = ((exodus::var const *)arg1)->replace(arg2,arg3,(exodus::var const &)*arg4);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1replace_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jlong jarg3, jobject jarg3_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_replace__SWIG_2(void * jarg1, int jarg2, void * jarg3) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   int arg2 ;
   exodus::var *arg3 = 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg3_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   arg2 = (int)jarg2; 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = ((exodus::var const *)arg1)->replace(arg2,(exodus::var const &)*arg3);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1insert(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3, jint jarg4, jlong jarg5, jobject jarg5_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_insert(void * jarg1, int jarg2, int jarg3, int jarg4, void * jarg5) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   int arg2 ;
   int arg3 ;
@@ -3750,141 +3166,119 @@ SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1insert(JNIEnv *jenv, jclass
   exodus::var *arg5 = 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg5_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   arg2 = (int)jarg2; 
   arg3 = (int)jarg3; 
   arg4 = (int)jarg4; 
-  arg5 = *(exodus::var **)&jarg5;
+  arg5 = (exodus::var *)jarg5;
   if (!arg5) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = ((exodus::var const *)arg1)->insert(arg2,arg3,arg4,(exodus::var const &)*arg5);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1erase_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3, jint jarg4) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_erase__SWIG_0(void * jarg1, int jarg2, int jarg3, int jarg4) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   int arg2 ;
   int arg3 ;
   int arg4 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   arg2 = (int)jarg2; 
   arg3 = (int)jarg3; 
   arg4 = (int)jarg4; 
   result = ((exodus::var const *)arg1)->erase(arg2,arg3,arg4);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1erase_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_erase__SWIG_1(void * jarg1, int jarg2, int jarg3) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   int arg2 ;
   int arg3 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   arg2 = (int)jarg2; 
   arg3 = (int)jarg3; 
   result = ((exodus::var const *)arg1)->erase(arg2,arg3);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1erase_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_erase__SWIG_2(void * jarg1, int jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   int arg2 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   arg2 = (int)jarg2; 
   result = ((exodus::var const *)arg1)->erase(arg2);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1extract_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3, jint jarg4) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_extract__SWIG_0(void * jarg1, int jarg2, int jarg3, int jarg4) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   int arg2 ;
   int arg3 ;
   int arg4 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   arg2 = (int)jarg2; 
   arg3 = (int)jarg3; 
   arg4 = (int)jarg4; 
   result = ((exodus::var const *)arg1)->extract(arg2,arg3,arg4);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1extract_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_extract__SWIG_1(void * jarg1, int jarg2, int jarg3) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   int arg2 ;
   int arg3 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   arg2 = (int)jarg2; 
   arg3 = (int)jarg3; 
   result = ((exodus::var const *)arg1)->extract(arg2,arg3);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1extract_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_extract__SWIG_2(void * jarg1, int jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   int arg2 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   arg2 = (int)jarg2; 
   result = ((exodus::var const *)arg1)->extract(arg2);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1replacer_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3, jint jarg4, jlong jarg5, jobject jarg5_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_replacer__SWIG_0(void * jarg1, int jarg2, int jarg3, int jarg4, void * jarg5) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   int arg2 ;
   int arg3 ;
@@ -3892,77 +3286,65 @@ SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1replacer_1_1SWIG_10(JNIEnv 
   exodus::var *arg5 = 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg5_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   arg2 = (int)jarg2; 
   arg3 = (int)jarg3; 
   arg4 = (int)jarg4; 
-  arg5 = *(exodus::var **)&jarg5;
+  arg5 = (exodus::var *)jarg5;
   if (!arg5) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (exodus::var *) &(arg1)->replacer(arg2,arg3,arg4,(exodus::var const &)*arg5);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1replacer_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3, jlong jarg4, jobject jarg4_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_replacer__SWIG_1(void * jarg1, int jarg2, int jarg3, void * jarg4) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   int arg2 ;
   int arg3 ;
   exodus::var *arg4 = 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg4_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   arg2 = (int)jarg2; 
   arg3 = (int)jarg3; 
-  arg4 = *(exodus::var **)&jarg4;
+  arg4 = (exodus::var *)jarg4;
   if (!arg4) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (exodus::var *) &(arg1)->replacer(arg2,arg3,(exodus::var const &)*arg4);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1replacer_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jlong jarg3, jobject jarg3_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_replacer__SWIG_2(void * jarg1, int jarg2, void * jarg3) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   int arg2 ;
   exodus::var *arg3 = 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg3_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   arg2 = (int)jarg2; 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (exodus::var *) &(arg1)->replacer(arg2,(exodus::var const &)*arg3);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1inserter_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3, jint jarg4, jlong jarg5, jobject jarg5_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_inserter__SWIG_0(void * jarg1, int jarg2, int jarg3, int jarg4, void * jarg5) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   int arg2 ;
   int arg3 ;
@@ -3970,134 +3352,113 @@ SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1inserter_1_1SWIG_10(JNIEnv 
   exodus::var *arg5 = 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg5_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   arg2 = (int)jarg2; 
   arg3 = (int)jarg3; 
   arg4 = (int)jarg4; 
-  arg5 = *(exodus::var **)&jarg5;
+  arg5 = (exodus::var *)jarg5;
   if (!arg5) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (exodus::var *) &(arg1)->inserter(arg2,arg3,arg4,(exodus::var const &)*arg5);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1inserter_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3, jlong jarg4, jobject jarg4_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_inserter__SWIG_1(void * jarg1, int jarg2, int jarg3, void * jarg4) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   int arg2 ;
   int arg3 ;
   exodus::var *arg4 = 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg4_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   arg2 = (int)jarg2; 
   arg3 = (int)jarg3; 
-  arg4 = *(exodus::var **)&jarg4;
+  arg4 = (exodus::var *)jarg4;
   if (!arg4) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (exodus::var *) &(arg1)->inserter(arg2,arg3,(exodus::var const &)*arg4);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1inserter_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jlong jarg3, jobject jarg3_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_inserter__SWIG_2(void * jarg1, int jarg2, void * jarg3) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   int arg2 ;
   exodus::var *arg3 = 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg3_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   arg2 = (int)jarg2; 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (exodus::var *) &(arg1)->inserter(arg2,(exodus::var const &)*arg3);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1eraser_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3, jint jarg4) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_eraser__SWIG_0(void * jarg1, int jarg2, int jarg3, int jarg4) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   int arg2 ;
   int arg3 ;
   int arg4 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   arg2 = (int)jarg2; 
   arg3 = (int)jarg3; 
   arg4 = (int)jarg4; 
   result = (exodus::var *) &(arg1)->eraser(arg2,arg3,arg4);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1eraser_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_eraser__SWIG_1(void * jarg1, int jarg2, int jarg3) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   int arg2 ;
   int arg3 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   arg2 = (int)jarg2; 
   arg3 = (int)jarg3; 
   result = (exodus::var *) &(arg1)->eraser(arg2,arg3);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1eraser_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_eraser__SWIG_2(void * jarg1, int jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   int arg2 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   arg2 = (int)jarg2; 
   result = (exodus::var *) &(arg1)->eraser(arg2);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1locate_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_, jint jarg4, jint jarg5) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_locate__SWIG_0(void * jarg1, void * jarg2, void * jarg3, int jarg4, int jarg5) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
@@ -4105,92 +3466,77 @@ SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1locate_1_1SWIG_10(JNIEnv
   int arg5 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var & type is null", 0);
     return 0;
   } 
   arg4 = (int)jarg4; 
   arg5 = (int)jarg5; 
   result = (bool)((exodus::var const *)arg1)->locate((exodus::var const &)*arg2,*arg3,arg4,arg5);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1locate_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_, jint jarg4) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_locate__SWIG_1(void * jarg1, void * jarg2, void * jarg3, int jarg4) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
   int arg4 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var & type is null", 0);
     return 0;
   } 
   arg4 = (int)jarg4; 
   result = (bool)((exodus::var const *)arg1)->locate((exodus::var const &)*arg2,*arg3,arg4);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1locate_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_locate__SWIG_2(void * jarg1, void * jarg2, void * jarg3) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var & type is null", 0);
     return 0;
   } 
   result = (bool)((exodus::var const *)arg1)->locate((exodus::var const &)*arg2,*arg3);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1locateby_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jstring jarg3, jlong jarg4, jobject jarg4_, jint jarg5, jint jarg6) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_locateby__SWIG_0(void * jarg1, void * jarg2, char * jarg3, void * jarg4, int jarg5, int jarg6) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   char *arg3 = (char *) 0 ;
@@ -4199,38 +3545,28 @@ SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1locateby_1_1SWIG_10(JNIE
   int arg6 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg4_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = 0;
-  if (jarg3) {
-    arg3 = (char *)jenv->GetStringUTFChars(jarg3, 0);
-    if (!arg3) return 0;
-  }
-  arg4 = *(exodus::var **)&jarg4;
+  arg3 = (char *)jarg3; 
+  arg4 = (exodus::var *)jarg4;
   if (!arg4) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var & type is null", 0);
     return 0;
   } 
   arg5 = (int)jarg5; 
   arg6 = (int)jarg6; 
   result = (bool)((exodus::var const *)arg1)->locateby((exodus::var const &)*arg2,(char const *)arg3,*arg4,arg5,arg6);
-  jresult = (jboolean)result; 
-  if (arg3) jenv->ReleaseStringUTFChars(jarg3, (const char *)arg3);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1locateby_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jstring jarg3, jlong jarg4, jobject jarg4_, jint jarg5) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_locateby__SWIG_1(void * jarg1, void * jarg2, char * jarg3, void * jarg4, int jarg5) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   char *arg3 = (char *) 0 ;
@@ -4238,73 +3574,53 @@ SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1locateby_1_1SWIG_11(JNIE
   int arg5 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg4_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = 0;
-  if (jarg3) {
-    arg3 = (char *)jenv->GetStringUTFChars(jarg3, 0);
-    if (!arg3) return 0;
-  }
-  arg4 = *(exodus::var **)&jarg4;
+  arg3 = (char *)jarg3; 
+  arg4 = (exodus::var *)jarg4;
   if (!arg4) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var & type is null", 0);
     return 0;
   } 
   arg5 = (int)jarg5; 
   result = (bool)((exodus::var const *)arg1)->locateby((exodus::var const &)*arg2,(char const *)arg3,*arg4,arg5);
-  jresult = (jboolean)result; 
-  if (arg3) jenv->ReleaseStringUTFChars(jarg3, (const char *)arg3);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1locateby_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jstring jarg3, jlong jarg4, jobject jarg4_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_locateby__SWIG_2(void * jarg1, void * jarg2, char * jarg3, void * jarg4) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   char *arg3 = (char *) 0 ;
   exodus::var *arg4 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg4_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = 0;
-  if (jarg3) {
-    arg3 = (char *)jenv->GetStringUTFChars(jarg3, 0);
-    if (!arg3) return 0;
-  }
-  arg4 = *(exodus::var **)&jarg4;
+  arg3 = (char *)jarg3; 
+  arg4 = (exodus::var *)jarg4;
   if (!arg4) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var & type is null", 0);
     return 0;
   } 
   result = (bool)((exodus::var const *)arg1)->locateby((exodus::var const &)*arg2,(char const *)arg3,*arg4);
-  jresult = (jboolean)result; 
-  if (arg3) jenv->ReleaseStringUTFChars(jarg3, (const char *)arg3);
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1locateby_1_1SWIG_13(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_, jlong jarg4, jobject jarg4_, jint jarg5, jint jarg6) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_locateby__SWIG_3(void * jarg1, void * jarg2, void * jarg3, void * jarg4, int jarg5, int jarg6) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
@@ -4313,38 +3629,32 @@ SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1locateby_1_1SWIG_13(JNIE
   int arg6 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  (void)jarg4_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg4 = *(exodus::var **)&jarg4;
+  arg4 = (exodus::var *)jarg4;
   if (!arg4) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var & type is null", 0);
     return 0;
   } 
   arg5 = (int)jarg5; 
   arg6 = (int)jarg6; 
   result = (bool)((exodus::var const *)arg1)->locateby((exodus::var const &)*arg2,(exodus::var const &)*arg3,*arg4,arg5,arg6);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1locateby_1_1SWIG_14(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_, jlong jarg4, jobject jarg4_, jint jarg5) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_locateby__SWIG_4(void * jarg1, void * jarg2, void * jarg3, void * jarg4, int jarg5) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
@@ -4352,73 +3662,61 @@ SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1locateby_1_1SWIG_14(JNIE
   int arg5 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  (void)jarg4_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg4 = *(exodus::var **)&jarg4;
+  arg4 = (exodus::var *)jarg4;
   if (!arg4) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var & type is null", 0);
     return 0;
   } 
   arg5 = (int)jarg5; 
   result = (bool)((exodus::var const *)arg1)->locateby((exodus::var const &)*arg2,(exodus::var const &)*arg3,*arg4,arg5);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1locateby_1_1SWIG_15(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_, jlong jarg4, jobject jarg4_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_locateby__SWIG_5(void * jarg1, void * jarg2, void * jarg3, void * jarg4) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
   exodus::var *arg4 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  (void)jarg4_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg4 = *(exodus::var **)&jarg4;
+  arg4 = (exodus::var *)jarg4;
   if (!arg4) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var & type is null", 0);
     return 0;
   } 
   result = (bool)((exodus::var const *)arg1)->locateby((exodus::var const &)*arg2,(exodus::var const &)*arg3,*arg4);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1locateusing_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_, jlong jarg4, jobject jarg4_, jint jarg5, jint jarg6, jint jarg7) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_locateusing__SWIG_0(void * jarg1, void * jarg2, void * jarg3, void * jarg4, int jarg5, int jarg6, int jarg7) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
@@ -4428,39 +3726,33 @@ SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1locateusing_1_1SWIG_10(J
   int arg7 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  (void)jarg4_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg4 = *(exodus::var **)&jarg4;
+  arg4 = (exodus::var *)jarg4;
   if (!arg4) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var & type is null", 0);
     return 0;
   } 
   arg5 = (int)jarg5; 
   arg6 = (int)jarg6; 
   arg7 = (int)jarg7; 
   result = (bool)((exodus::var const *)arg1)->locateusing((exodus::var const &)*arg2,(exodus::var const &)*arg3,*arg4,arg5,arg6,arg7);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1locateusing_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_, jlong jarg4, jobject jarg4_, jint jarg5, jint jarg6) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_locateusing__SWIG_1(void * jarg1, void * jarg2, void * jarg3, void * jarg4, int jarg5, int jarg6) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
@@ -4469,38 +3761,32 @@ SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1locateusing_1_1SWIG_11(J
   int arg6 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  (void)jarg4_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg4 = *(exodus::var **)&jarg4;
+  arg4 = (exodus::var *)jarg4;
   if (!arg4) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var & type is null", 0);
     return 0;
   } 
   arg5 = (int)jarg5; 
   arg6 = (int)jarg6; 
   result = (bool)((exodus::var const *)arg1)->locateusing((exodus::var const &)*arg2,(exodus::var const &)*arg3,*arg4,arg5,arg6);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1locateusing_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_, jlong jarg4, jobject jarg4_, jint jarg5) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_locateusing__SWIG_2(void * jarg1, void * jarg2, void * jarg3, void * jarg4, int jarg5) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
@@ -4508,2418 +3794,1955 @@ SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1locateusing_1_1SWIG_12(J
   int arg5 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  (void)jarg4_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg4 = *(exodus::var **)&jarg4;
+  arg4 = (exodus::var *)jarg4;
   if (!arg4) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var & type is null", 0);
     return 0;
   } 
   arg5 = (int)jarg5; 
   result = (bool)((exodus::var const *)arg1)->locateusing((exodus::var const &)*arg2,(exodus::var const &)*arg3,*arg4,arg5);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1locateusing_1_1SWIG_13(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_, jlong jarg4, jobject jarg4_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_locateusing__SWIG_3(void * jarg1, void * jarg2, void * jarg3, void * jarg4) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
   exodus::var *arg4 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  (void)jarg4_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg4 = *(exodus::var **)&jarg4;
+  arg4 = (exodus::var *)jarg4;
   if (!arg4) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var & type is null", 0);
     return 0;
   } 
   result = (bool)((exodus::var const *)arg1)->locateusing((exodus::var const &)*arg2,(exodus::var const &)*arg3,*arg4);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1locateusing_1_1SWIG_14(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_locateusing__SWIG_4(void * jarg1, void * jarg2, void * jarg3) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (bool)((exodus::var const *)arg1)->locateusing((exodus::var const &)*arg2,(exodus::var const &)*arg3);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1sum(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_sum(void * jarg1, void * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = ((exodus::var const *)arg1)->sum((exodus::var const &)*arg2);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1connect(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_connect(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (bool)(arg1)->connect((exodus::var const &)*arg2);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1disconnect(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_disconnect(void * jarg1) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = (bool)(arg1)->disconnect();
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1setdefaultconnection(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_setdefaultconnection(void * jarg1) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = (bool)(arg1)->setdefaultconnection();
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1begintrans(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_begintrans(void * jarg1) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = (bool)((exodus::var const *)arg1)->begintrans();
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1rollbacktrans(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_rollbacktrans(void * jarg1) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = (bool)((exodus::var const *)arg1)->rollbacktrans();
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1committrans(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_committrans(void * jarg1) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = (bool)((exodus::var const *)arg1)->committrans();
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1createdb_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_createdb__SWIG_0(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (bool)((exodus::var const *)arg1)->createdb((exodus::var const &)*arg2);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1deletedb_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_deletedb__SWIG_0(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (bool)((exodus::var const *)arg1)->deletedb((exodus::var const &)*arg2);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1createdb_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_createdb__SWIG_1(void * jarg1, void * jarg2, void * jarg3) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var & type is null", 0);
     return 0;
   } 
   result = (bool)((exodus::var const *)arg1)->createdb((exodus::var const &)*arg2,*arg3);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1deletedb_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_deletedb__SWIG_1(void * jarg1, void * jarg2, void * jarg3) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var & type is null", 0);
     return 0;
   } 
   result = (bool)((exodus::var const *)arg1)->deletedb((exodus::var const &)*arg2,*arg3);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1createfile(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_createfile(void * jarg1, void * jarg2, void * jarg3) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (bool)(arg1)->createfile((exodus::var const &)*arg2,(exodus::var const &)*arg3);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1deletefile(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_deletefile(void * jarg1) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = (bool)((exodus::var const *)arg1)->deletefile();
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1clearfile(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_clearfile(void * jarg1) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = (bool)((exodus::var const *)arg1)->clearfile();
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1listfiles(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_listfiles(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->listfiles();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1createindex(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_createindex(void * jarg1, void * jarg2, void * jarg3) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (bool)((exodus::var const *)arg1)->createindex((exodus::var const &)*arg2,(exodus::var const &)*arg3);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1deleteindex(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_deleteindex(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (bool)((exodus::var const *)arg1)->deleteindex((exodus::var const &)*arg2);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1listindexes(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_listindexes(void * jarg1, void * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = ((exodus::var const *)arg1)->listindexes((exodus::var const &)*arg2);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1open(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_open(void * jarg1, void * jarg2, void * jarg3) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (bool)(arg1)->open((exodus::var const &)*arg2,(exodus::var const &)*arg3);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_var_1close(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void SWIGSTDCALL CSharp_mvar_close(void * jarg1) {
   exodus::var *arg1 = (exodus::var *) 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   (arg1)->close();
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1select(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_select(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (bool)((exodus::var const *)arg1)->select((exodus::var const &)*arg2);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_var_1clearselect(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void SWIGSTDCALL CSharp_mvar_clearselect(void * jarg1) {
   exodus::var *arg1 = (exodus::var *) 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   ((exodus::var const *)arg1)->clearselect();
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1readnext_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_readnext__SWIG_0(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var & type is null", 0);
     return 0;
   } 
   result = (bool)((exodus::var const *)arg1)->readnext(*arg2);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1readnext_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_readnext__SWIG_1(void * jarg1, void * jarg2, void * jarg3) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var & type is null", 0);
     return 0;
   } 
   result = (bool)((exodus::var const *)arg1)->readnext(*arg2,*arg3);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1selectrecord(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_selectrecord(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (bool)((exodus::var const *)arg1)->selectrecord((exodus::var const &)*arg2);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1readnextrecord(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_readnextrecord(void * jarg1, void * jarg2, void * jarg3) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var & type is null", 0);
     return 0;
   } 
   result = (bool)((exodus::var const *)arg1)->readnextrecord(*arg2,*arg3);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1lock(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar__lock(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (bool)((exodus::var const *)arg1)->lock((exodus::var const &)*arg2);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_var_1unlock(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT void SWIGSTDCALL CSharp_mvar_unlock(void * jarg1, void * jarg2) {
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return ;
   } 
   ((exodus::var const *)arg1)->unlock((exodus::var const &)*arg2);
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_var_1unlockall(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void SWIGSTDCALL CSharp_mvar_unlockall(void * jarg1) {
   exodus::var *arg1 = (exodus::var *) 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   ((exodus::var const *)arg1)->unlockall();
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1read(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_read(void * jarg1, void * jarg2, void * jarg3) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (bool)(arg1)->read((exodus::var const &)*arg2,(exodus::var const &)*arg3);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1readv(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_, jint jarg4) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_readv(void * jarg1, void * jarg2, void * jarg3, int jarg4) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
   int arg4 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   arg4 = (int)jarg4; 
   result = (bool)(arg1)->readv((exodus::var const &)*arg2,(exodus::var const &)*arg3,arg4);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1write(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_write(void * jarg1, void * jarg2, void * jarg3) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (bool)((exodus::var const *)arg1)->write((exodus::var const &)*arg2,(exodus::var const &)*arg3);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1writev(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_, jint jarg4) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_writev(void * jarg1, void * jarg2, void * jarg3, int jarg4) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
   int arg4 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   arg4 = (int)jarg4; 
   result = (bool)((exodus::var const *)arg1)->writev((exodus::var const &)*arg2,(exodus::var const &)*arg3,arg4);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1deleterecord(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_deleterecord(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (bool)((exodus::var const *)arg1)->deleterecord((exodus::var const &)*arg2);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1updaterecord(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_updaterecord(void * jarg1, void * jarg2, void * jarg3) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (bool)((exodus::var const *)arg1)->updaterecord((exodus::var const &)*arg2,(exodus::var const &)*arg3);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1insertrecord(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_insertrecord(void * jarg1, void * jarg2, void * jarg3) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (bool)((exodus::var const *)arg1)->insertrecord((exodus::var const &)*arg2,(exodus::var const &)*arg3);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1xlate_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_, jlong jarg4) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_xlate__SWIG_0(void * jarg1, void * jarg2, void * jarg3, wchar_t * jarg4) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
   wchar_t *arg4 = (wchar_t *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg4 = *(wchar_t **)&jarg4; 
+  arg4 = (wchar_t *)jarg4; 
   result = ((exodus::var const *)arg1)->xlate((exodus::var const &)*arg2,(exodus::var const &)*arg3,(wchar_t const *)arg4);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1xlate_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_, jlong jarg4, jobject jarg4_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_xlate__SWIG_1(void * jarg1, void * jarg2, void * jarg3, void * jarg4) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
   exodus::var *arg4 = 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  (void)jarg4_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg4 = *(exodus::var **)&jarg4;
+  arg4 = (exodus::var *)jarg4;
   if (!arg4) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = ((exodus::var const *)arg1)->xlate((exodus::var const &)*arg2,(exodus::var const &)*arg3,(exodus::var const &)*arg4);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1sqlexec_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_sqlexec__SWIG_0(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (bool)((exodus::var const *)arg1)->sqlexec((exodus::var const &)*arg2);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_var_1sqlexec_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_mvar_sqlexec__SWIG_1(void * jarg1, void * jarg2, void * jarg3) {
+  unsigned int jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  arg1 = *(exodus::var **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::var *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var & type is null", 0);
     return 0;
   } 
   result = (bool)((exodus::var const *)arg1)->sqlexec((exodus::var const &)*arg2,*arg3);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_var_1version(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_mvar_version(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = (exodus::var *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   result = ((exodus::var const *)arg1)->version();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_MVeq(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_MVeq(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
   exodus::var *arg1 = 0 ;
   exodus::var *arg2 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1;
+  arg1 = (exodus::var *)jarg1;
   if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg2 = *(exodus::var **)&jarg2;
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (bool)exodus::MVeq((exodus::var const &)*arg1,(exodus::var const &)*arg2);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_MVlt_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_MVlt__SWIG_0(void * jarg1, void * jarg2) {
+  unsigned int jresult ;
   exodus::var *arg1 = 0 ;
   exodus::var *arg2 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1;
+  arg1 = (exodus::var *)jarg1;
   if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg2 = *(exodus::var **)&jarg2;
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (bool)exodus::MVlt((exodus::var const &)*arg1,(exodus::var const &)*arg2);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_MVlt_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_MVlt__SWIG_1(void * jarg1, int jarg2) {
+  unsigned int jresult ;
   exodus::var *arg1 = 0 ;
   int arg2 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1;
+  arg1 = (exodus::var *)jarg1;
   if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   arg2 = (int)jarg2; 
   result = (bool)exodus::MVlt((exodus::var const &)*arg1,arg2);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_MVlt_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jobject jarg2_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_MVlt__SWIG_2(int jarg1, void * jarg2) {
+  unsigned int jresult ;
   int arg1 ;
   exodus::var *arg2 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg2_;
   arg1 = (int)jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (bool)exodus::MVlt(arg1,(exodus::var const &)*arg2);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_MVadd(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_MVadd(void * jarg1, void * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1;
+  arg1 = (exodus::var *)jarg1;
   if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg2 = *(exodus::var **)&jarg2;
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = exodus::MVadd((exodus::var const &)*arg1,(exodus::var const &)*arg2);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_MVmul(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_MVmul(void * jarg1, void * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1;
+  arg1 = (exodus::var *)jarg1;
   if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg2 = *(exodus::var **)&jarg2;
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = exodus::MVmul((exodus::var const &)*arg1,(exodus::var const &)*arg2);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_MVdiv(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_MVdiv(void * jarg1, void * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1;
+  arg1 = (exodus::var *)jarg1;
   if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg2 = *(exodus::var **)&jarg2;
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = exodus::MVdiv((exodus::var const &)*arg1,(exodus::var const &)*arg2);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_MVmod(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_MVmod(void * jarg1, void * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1;
+  arg1 = (exodus::var *)jarg1;
   if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg2 = *(exodus::var **)&jarg2;
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = exodus::MVmod((exodus::var const &)*arg1,(exodus::var const &)*arg2);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_MVcat(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_MVcat(void * jarg1, void * jarg2) {
+  void * jresult ;
   exodus::var *arg1 = 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::var **)&jarg1;
+  arg1 = (exodus::var *)jarg1;
   if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg2 = *(exodus::var **)&jarg2;
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = exodus::MVcat((exodus::var const &)*arg1,(exodus::var const &)*arg2);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_new_1dim_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jint jarg1, jint jarg2) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_dim__SWIG_0(int jarg1, int jarg2) {
+  void * jresult ;
   int arg1 ;
   int arg2 ;
   exodus::dim *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
   arg1 = (int)jarg1; 
   arg2 = (int)jarg2; 
   result = (exodus::dim *)new exodus::dim(arg1,arg2);
-  *(exodus::dim **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_new_1dim_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jint jarg1) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_dim__SWIG_1(int jarg1) {
+  void * jresult ;
   int arg1 ;
   exodus::dim *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
   arg1 = (int)jarg1; 
   result = (exodus::dim *)new exodus::dim(arg1);
-  *(exodus::dim **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_dim_1redim_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_dim_redim__SWIG_0(void * jarg1, int jarg2, int jarg3) {
+  unsigned int jresult ;
   exodus::dim *arg1 = (exodus::dim *) 0 ;
   int arg2 ;
   int arg3 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::dim **)&jarg1; 
+  arg1 = (exodus::dim *)jarg1; 
   arg2 = (int)jarg2; 
   arg3 = (int)jarg3; 
   result = (bool)(arg1)->redim(arg2,arg3);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_dim_1redim_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_dim_redim__SWIG_1(void * jarg1, int jarg2) {
+  unsigned int jresult ;
   exodus::dim *arg1 = (exodus::dim *) 0 ;
   int arg2 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::dim **)&jarg1; 
+  arg1 = (exodus::dim *)jarg1; 
   arg2 = (int)jarg2; 
   result = (bool)(arg1)->redim(arg2);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_dim_1unparse(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_dim_unparse(void * jarg1) {
+  void * jresult ;
   exodus::dim *arg1 = (exodus::dim *) 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::dim **)&jarg1; 
+  arg1 = (exodus::dim *)jarg1; 
   result = ((exodus::dim const *)arg1)->unparse();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_delete_1dim(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void SWIGSTDCALL CSharp_delete_dim(void * jarg1) {
   exodus::dim *arg1 = (exodus::dim *) 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(exodus::dim **)&jarg1; 
+  arg1 = (exodus::dim *)jarg1; 
   delete arg1;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_new_1dim_1_1SWIG_12(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_dim__SWIG_2() {
+  void * jresult ;
   exodus::dim *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
   result = (exodus::dim *)new exodus::dim();
-  *(exodus::dim **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_dim_1parse(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_dim_parse(void * jarg1, void * jarg2) {
+  void * jresult ;
   exodus::dim *arg1 = (exodus::dim *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::dim **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::dim *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (arg1)->parse((exodus::var const &)*arg2);
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_dim_1read(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_dim_read(void * jarg1, void * jarg2, void * jarg3) {
+  unsigned int jresult ;
   exodus::dim *arg1 = (exodus::dim *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  arg1 = *(exodus::dim **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::dim *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (bool)(arg1)->read((exodus::var const &)*arg2,(exodus::var const &)*arg3);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_dim_1write(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_dim_write(void * jarg1, void * jarg2, void * jarg3) {
+  unsigned int jresult ;
   exodus::dim *arg1 = (exodus::dim *) 0 ;
   exodus::var *arg2 = 0 ;
   exodus::var *arg3 = 0 ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  (void)jarg3_;
-  arg1 = *(exodus::dim **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2;
+  arg1 = (exodus::dim *)jarg1; 
+  arg2 = (exodus::var *)jarg2;
   if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
-  arg3 = *(exodus::var **)&jarg3;
+  arg3 = (exodus::var *)jarg3;
   if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (bool)((exodus::dim const *)arg1)->write((exodus::var const &)*arg2,(exodus::var const &)*arg3);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_FM_1get(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_FM_get() {
+  void * jresult ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
   result = (exodus::var *)&exodus::FM;
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_VM_1get(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_VM_get() {
+  void * jresult ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
   result = (exodus::var *)&exodus::VM;
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_SM_1get(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_SM_get() {
+  void * jresult ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
   result = (exodus::var *)&exodus::SM;
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_SVM_1get(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_SVM_get() {
+  void * jresult ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
   result = (exodus::var *)&exodus::SVM;
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_TM_1get(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_TM_get() {
+  void * jresult ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
   result = (exodus::var *)&exodus::TM;
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_STM_1get(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_STM_get() {
+  void * jresult ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
   result = (exodus::var *)&exodus::STM;
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_SSTM_1get(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_SSTM_get() {
+  void * jresult ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
   result = (exodus::var *)&exodus::SSTM;
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_IM_1get(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_IM_get() {
+  void * jresult ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
   result = (exodus::var *)&exodus::IM;
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_RM_1get(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_RM_get() {
+  void * jresult ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
   result = (exodus::var *)&exodus::RM;
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_AM_1get(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_AM_get() {
+  void * jresult ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
   result = (exodus::var *)&exodus::AM;
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_DQ_1get(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_DQ_get() {
+  void * jresult ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
   result = (exodus::var *)&exodus::DQ;
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_SQ_1get(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_SQ_get() {
+  void * jresult ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
   result = (exodus::var *)&exodus::SQ;
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_SLASH_1get(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_SLASH_get() {
+  void * jresult ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
   result = (exodus::var *)&exodus::SLASH;
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jchar JNICALL Java_exodus_jexodusJNI_SLASH_1_1get(JNIEnv *jenv, jclass jcls) {
-  jchar jresult = 0 ;
+SWIGEXPORT char SWIGSTDCALL CSharp_SLASH__get() {
+  char jresult ;
   char result;
   
-  (void)jenv;
-  (void)jcls;
   result = (char)(char)exodus::SLASH_;
-  jresult = (jchar)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_exodus_jexodusJNI_SLASH_1IS_1BACKSLASH_1get(JNIEnv *jenv, jclass jcls) {
-  jboolean jresult = 0 ;
+SWIGEXPORT unsigned int SWIGSTDCALL CSharp_SLASH_IS_BACKSLASH_get() {
+  unsigned int jresult ;
   bool result;
   
-  (void)jenv;
-  (void)jcls;
   result = (bool)(false);
-  jresult = (jboolean)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_LOWERCASE_1_1get(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_LOWERCASE__get() {
+  void * jresult ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
   result = (exodus::var *)&exodus::LOWERCASE_;
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_UPPERCASE_1_1get(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_UPPERCASE__get() {
+  void * jresult ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
   result = (exodus::var *)&exodus::UPPERCASE_;
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_PLATFORM_1_1get(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_PLATFORM__get() {
+  void * jresult ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
   result = (exodus::var *)&exodus::PLATFORM_;
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_DBTRACE_1set(JNIEnv *jenv, jclass jcls, jint jarg1) {
+SWIGEXPORT void SWIGSTDCALL CSharp_DBTRACE_set(int jarg1) {
   int arg1 ;
   
-  (void)jenv;
-  (void)jcls;
   arg1 = (int)jarg1; 
   exodus::DBTRACE = arg1;
 }
 
 
-SWIGEXPORT jint JNICALL Java_exodus_jexodusJNI_DBTRACE_1get(JNIEnv *jenv, jclass jcls) {
-  jint jresult = 0 ;
+SWIGEXPORT int SWIGSTDCALL CSharp_DBTRACE_get() {
+  int jresult ;
   int result;
   
-  (void)jenv;
-  (void)jcls;
   result = (int)exodus::DBTRACE;
-  jresult = (jint)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_EXECPATH2_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void SWIGSTDCALL CSharp_EXECPATH2_set(void * jarg1) {
   exodus::var *arg1 = (exodus::var *) 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1; 
+  arg1 = (exodus::var *)jarg1; 
   exodus::EXECPATH2 = *arg1;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_EXECPATH2_1get(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_EXECPATH2_get() {
+  void * jresult ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
   result = (exodus::var *)&exodus::EXECPATH2;
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_output(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void SWIGSTDCALL CSharp_output(void * jarg1) {
   exodus::var *arg1 = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1;
+  arg1 = (exodus::var *)jarg1;
   if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return ;
   } 
   exodus::output((exodus::var const &)*arg1);
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_outputl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void SWIGSTDCALL CSharp_outputl(void * jarg1) {
   exodus::var *arg1 = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1;
+  arg1 = (exodus::var *)jarg1;
   if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return ;
   } 
   exodus::outputl((exodus::var const &)*arg1);
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_outputt(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void SWIGSTDCALL CSharp_outputt(void * jarg1) {
   exodus::var *arg1 = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1;
+  arg1 = (exodus::var *)jarg1;
   if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return ;
   } 
   exodus::outputt((exodus::var const &)*arg1);
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_errput(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void SWIGSTDCALL CSharp_errput(void * jarg1) {
   exodus::var *arg1 = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1;
+  arg1 = (exodus::var *)jarg1;
   if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return ;
   } 
   exodus::errput((exodus::var const &)*arg1);
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_errputl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void SWIGSTDCALL CSharp_errputl(void * jarg1) {
   exodus::var *arg1 = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1;
+  arg1 = (exodus::var *)jarg1;
   if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return ;
   } 
   exodus::errputl((exodus::var const &)*arg1);
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_logput(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void SWIGSTDCALL CSharp_logput(void * jarg1) {
   exodus::var *arg1 = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1;
+  arg1 = (exodus::var *)jarg1;
   if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return ;
   } 
   exodus::logput((exodus::var const &)*arg1);
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_logputl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void SWIGSTDCALL CSharp_logputl(void * jarg1) {
   exodus::var *arg1 = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1;
+  arg1 = (exodus::var *)jarg1;
   if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return ;
   } 
   exodus::logputl((exodus::var const &)*arg1);
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_backtrace(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_backtrace() {
+  void * jresult ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
   result = exodus::backtrace();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_exodus_jexodusJNI_getenvironmentn(JNIEnv *jenv, jclass jcls) {
-  jint jresult = 0 ;
+SWIGEXPORT int SWIGSTDCALL CSharp_getenvironmentn() {
+  int jresult ;
   int result;
   
-  (void)jenv;
-  (void)jcls;
   result = (int)exodus::getenvironmentn();
-  jresult = (jint)result; 
+  jresult = result; 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_setenvironmentn(JNIEnv *jenv, jclass jcls, jint jarg1) {
+SWIGEXPORT void SWIGSTDCALL CSharp_setenvironmentn(int jarg1) {
   int arg1 ;
   
-  (void)jenv;
-  (void)jcls;
   arg1 = (int)jarg1; 
   exodus::setenvironmentn(arg1);
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_getprocessn(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_getprocessn() {
+  void * jresult ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
   result = exodus::getprocessn();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_getexecpath(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_getexecpath() {
+  void * jresult ;
   exodus::var result;
   
-  (void)jenv;
-  (void)jcls;
   result = exodus::getexecpath();
-  *(exodus::var **)&jresult = new exodus::var((const exodus::var &)result); 
+  jresult = new exodus::var((const exodus::var &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_new_1MVException(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_MVException(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = 0 ;
   exodus::MVException *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1;
+  arg1 = (exodus::var *)jarg1;
   if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (exodus::MVException *)new exodus::MVException((exodus::var const &)*arg1);
-  *(exodus::MVException **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_MVException_1description_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT void SWIGSTDCALL CSharp_MVException_description_set(void * jarg1, void * jarg2) {
   exodus::MVException *arg1 = (exodus::MVException *) 0 ;
   exodus::var *arg2 = (exodus::var *) 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(exodus::MVException **)&jarg1; 
-  arg2 = *(exodus::var **)&jarg2; 
+  arg1 = (exodus::MVException *)jarg1; 
+  arg2 = (exodus::var *)jarg2; 
   if (arg1) (arg1)->description = *arg2;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_MVException_1description_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_MVException_description_get(void * jarg1) {
+  void * jresult ;
   exodus::MVException *arg1 = (exodus::MVException *) 0 ;
   exodus::var *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::MVException **)&jarg1; 
+  arg1 = (exodus::MVException *)jarg1; 
   result = (exodus::var *)& ((arg1)->description);
-  *(exodus::var **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_delete_1MVException(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void SWIGSTDCALL CSharp_delete_MVException(void * jarg1) {
   exodus::MVException *arg1 = (exodus::MVException *) 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(exodus::MVException **)&jarg1; 
+  arg1 = (exodus::MVException *)jarg1; 
   delete arg1;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_new_1MVDivideByZero(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_MVDivideByZero(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = 0 ;
   exodus::MVDivideByZero *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1;
+  arg1 = (exodus::var *)jarg1;
   if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (exodus::MVDivideByZero *)new exodus::MVDivideByZero((exodus::var const &)*arg1);
-  *(exodus::MVDivideByZero **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_delete_1MVDivideByZero(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void SWIGSTDCALL CSharp_delete_MVDivideByZero(void * jarg1) {
   exodus::MVDivideByZero *arg1 = (exodus::MVDivideByZero *) 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(exodus::MVDivideByZero **)&jarg1; 
+  arg1 = (exodus::MVDivideByZero *)jarg1; 
   delete arg1;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_new_1MVNonNumeric(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_MVNonNumeric(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = 0 ;
   exodus::MVNonNumeric *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1;
+  arg1 = (exodus::var *)jarg1;
   if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (exodus::MVNonNumeric *)new exodus::MVNonNumeric((exodus::var const &)*arg1);
-  *(exodus::MVNonNumeric **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_delete_1MVNonNumeric(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void SWIGSTDCALL CSharp_delete_MVNonNumeric(void * jarg1) {
   exodus::MVNonNumeric *arg1 = (exodus::MVNonNumeric *) 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(exodus::MVNonNumeric **)&jarg1; 
+  arg1 = (exodus::MVNonNumeric *)jarg1; 
   delete arg1;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_new_1MVOutOfMemory(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_MVOutOfMemory(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = 0 ;
   exodus::MVOutOfMemory *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1;
+  arg1 = (exodus::var *)jarg1;
   if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (exodus::MVOutOfMemory *)new exodus::MVOutOfMemory((exodus::var const &)*arg1);
-  *(exodus::MVOutOfMemory **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_delete_1MVOutOfMemory(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void SWIGSTDCALL CSharp_delete_MVOutOfMemory(void * jarg1) {
   exodus::MVOutOfMemory *arg1 = (exodus::MVOutOfMemory *) 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(exodus::MVOutOfMemory **)&jarg1; 
+  arg1 = (exodus::MVOutOfMemory *)jarg1; 
   delete arg1;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_new_1MVUnassigned(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_MVUnassigned(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = 0 ;
   exodus::MVUnassigned *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1;
+  arg1 = (exodus::var *)jarg1;
   if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (exodus::MVUnassigned *)new exodus::MVUnassigned((exodus::var const &)*arg1);
-  *(exodus::MVUnassigned **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_delete_1MVUnassigned(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void SWIGSTDCALL CSharp_delete_MVUnassigned(void * jarg1) {
   exodus::MVUnassigned *arg1 = (exodus::MVUnassigned *) 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(exodus::MVUnassigned **)&jarg1; 
+  arg1 = (exodus::MVUnassigned *)jarg1; 
   delete arg1;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_new_1MVUndefined(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_MVUndefined(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = 0 ;
   exodus::MVUndefined *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1;
+  arg1 = (exodus::var *)jarg1;
   if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (exodus::MVUndefined *)new exodus::MVUndefined((exodus::var const &)*arg1);
-  *(exodus::MVUndefined **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_delete_1MVUndefined(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void SWIGSTDCALL CSharp_delete_MVUndefined(void * jarg1) {
   exodus::MVUndefined *arg1 = (exodus::MVUndefined *) 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(exodus::MVUndefined **)&jarg1; 
+  arg1 = (exodus::MVUndefined *)jarg1; 
   delete arg1;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_new_1MVInvalidPointer(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_MVInvalidPointer(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = 0 ;
   exodus::MVInvalidPointer *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1;
+  arg1 = (exodus::var *)jarg1;
   if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (exodus::MVInvalidPointer *)new exodus::MVInvalidPointer((exodus::var const &)*arg1);
-  *(exodus::MVInvalidPointer **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_delete_1MVInvalidPointer(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void SWIGSTDCALL CSharp_delete_MVInvalidPointer(void * jarg1) {
   exodus::MVInvalidPointer *arg1 = (exodus::MVInvalidPointer *) 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(exodus::MVInvalidPointer **)&jarg1; 
+  arg1 = (exodus::MVInvalidPointer *)jarg1; 
   delete arg1;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_new_1MVDBException(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_MVDBException(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = 0 ;
   exodus::MVDBException *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1;
+  arg1 = (exodus::var *)jarg1;
   if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (exodus::MVDBException *)new exodus::MVDBException((exodus::var const &)*arg1);
-  *(exodus::MVDBException **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_delete_1MVDBException(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void SWIGSTDCALL CSharp_delete_MVDBException(void * jarg1) {
   exodus::MVDBException *arg1 = (exodus::MVDBException *) 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(exodus::MVDBException **)&jarg1; 
+  arg1 = (exodus::MVDBException *)jarg1; 
   delete arg1;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_new_1MVNotImplemented(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_MVNotImplemented(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = 0 ;
   exodus::MVNotImplemented *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1;
+  arg1 = (exodus::var *)jarg1;
   if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (exodus::MVNotImplemented *)new exodus::MVNotImplemented((exodus::var const &)*arg1);
-  *(exodus::MVNotImplemented **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_delete_1MVNotImplemented(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void SWIGSTDCALL CSharp_delete_MVNotImplemented(void * jarg1) {
   exodus::MVNotImplemented *arg1 = (exodus::MVNotImplemented *) 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(exodus::MVNotImplemented **)&jarg1; 
+  arg1 = (exodus::MVNotImplemented *)jarg1; 
   delete arg1;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_new_1MVDebug(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_MVDebug(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = 0 ;
   exodus::MVDebug *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1;
+  arg1 = (exodus::var *)jarg1;
   if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (exodus::MVDebug *)new exodus::MVDebug((exodus::var const &)*arg1);
-  *(exodus::MVDebug **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_delete_1MVDebug(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void SWIGSTDCALL CSharp_delete_MVDebug(void * jarg1) {
   exodus::MVDebug *arg1 = (exodus::MVDebug *) 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(exodus::MVDebug **)&jarg1; 
+  arg1 = (exodus::MVDebug *)jarg1; 
   delete arg1;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_new_1MVStop(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_MVStop(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = 0 ;
   exodus::MVStop *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1;
+  arg1 = (exodus::var *)jarg1;
   if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (exodus::MVStop *)new exodus::MVStop((exodus::var const &)*arg1);
-  *(exodus::MVStop **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_delete_1MVStop(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void SWIGSTDCALL CSharp_delete_MVStop(void * jarg1) {
   exodus::MVStop *arg1 = (exodus::MVStop *) 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(exodus::MVStop **)&jarg1; 
+  arg1 = (exodus::MVStop *)jarg1; 
   delete arg1;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_new_1MVAbort(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_MVAbort(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = 0 ;
   exodus::MVAbort *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1;
+  arg1 = (exodus::var *)jarg1;
   if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (exodus::MVAbort *)new exodus::MVAbort((exodus::var const &)*arg1);
-  *(exodus::MVAbort **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_delete_1MVAbort(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void SWIGSTDCALL CSharp_delete_MVAbort(void * jarg1) {
   exodus::MVAbort *arg1 = (exodus::MVAbort *) 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(exodus::MVAbort **)&jarg1; 
+  arg1 = (exodus::MVAbort *)jarg1; 
   delete arg1;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_new_1MVArrayDimensionedZero(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_MVArrayDimensionedZero() {
+  void * jresult ;
   exodus::MVArrayDimensionedZero *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
   result = (exodus::MVArrayDimensionedZero *)new exodus::MVArrayDimensionedZero();
-  *(exodus::MVArrayDimensionedZero **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_delete_1MVArrayDimensionedZero(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void SWIGSTDCALL CSharp_delete_MVArrayDimensionedZero(void * jarg1) {
   exodus::MVArrayDimensionedZero *arg1 = (exodus::MVArrayDimensionedZero *) 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(exodus::MVArrayDimensionedZero **)&jarg1; 
+  arg1 = (exodus::MVArrayDimensionedZero *)jarg1; 
   delete arg1;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_new_1MVArrayIndexOutOfBounds(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_MVArrayIndexOutOfBounds(void * jarg1) {
+  void * jresult ;
   exodus::var *arg1 = 0 ;
   exodus::MVArrayIndexOutOfBounds *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(exodus::var **)&jarg1;
+  arg1 = (exodus::var *)jarg1;
   if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "exodus::var const & reference is null");
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "exodus::var const & type is null", 0);
     return 0;
   } 
   result = (exodus::MVArrayIndexOutOfBounds *)new exodus::MVArrayIndexOutOfBounds((exodus::var const &)*arg1);
-  *(exodus::MVArrayIndexOutOfBounds **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_delete_1MVArrayIndexOutOfBounds(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void SWIGSTDCALL CSharp_delete_MVArrayIndexOutOfBounds(void * jarg1) {
   exodus::MVArrayIndexOutOfBounds *arg1 = (exodus::MVArrayIndexOutOfBounds *) 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(exodus::MVArrayIndexOutOfBounds **)&jarg1; 
+  arg1 = (exodus::MVArrayIndexOutOfBounds *)jarg1; 
   delete arg1;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_new_1MVArrayNotDimensioned(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
+SWIGEXPORT void * SWIGSTDCALL CSharp_new_MVArrayNotDimensioned() {
+  void * jresult ;
   exodus::MVArrayNotDimensioned *result = 0 ;
   
-  (void)jenv;
-  (void)jcls;
   result = (exodus::MVArrayNotDimensioned *)new exodus::MVArrayNotDimensioned();
-  *(exodus::MVArrayNotDimensioned **)&jresult = result; 
+  jresult = (void *)result; 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_exodus_jexodusJNI_delete_1MVArrayNotDimensioned(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void SWIGSTDCALL CSharp_delete_MVArrayNotDimensioned(void * jarg1) {
   exodus::MVArrayNotDimensioned *arg1 = (exodus::MVArrayNotDimensioned *) 0 ;
   
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(exodus::MVArrayNotDimensioned **)&jarg1; 
+  arg1 = (exodus::MVArrayNotDimensioned *)jarg1; 
   delete arg1;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_MVDivideByZero_1SWIGUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-    jlong baseptr = 0;
-    (void)jenv;
-    (void)jcls;
-    *(exodus::MVException **)&baseptr = *(exodus::MVDivideByZero **)&jarg1;
-    return baseptr;
+SWIGEXPORT exodus::MVException * SWIGSTDCALL CSharp_MVDivideByZero_SWIGUpcast(exodus::MVDivideByZero *jarg1) {
+    return (exodus::MVException *)jarg1;
 }
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_MVNonNumeric_1SWIGUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-    jlong baseptr = 0;
-    (void)jenv;
-    (void)jcls;
-    *(exodus::MVException **)&baseptr = *(exodus::MVNonNumeric **)&jarg1;
-    return baseptr;
+SWIGEXPORT exodus::MVException * SWIGSTDCALL CSharp_MVNonNumeric_SWIGUpcast(exodus::MVNonNumeric *jarg1) {
+    return (exodus::MVException *)jarg1;
 }
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_MVOutOfMemory_1SWIGUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-    jlong baseptr = 0;
-    (void)jenv;
-    (void)jcls;
-    *(exodus::MVException **)&baseptr = *(exodus::MVOutOfMemory **)&jarg1;
-    return baseptr;
+SWIGEXPORT exodus::MVException * SWIGSTDCALL CSharp_MVOutOfMemory_SWIGUpcast(exodus::MVOutOfMemory *jarg1) {
+    return (exodus::MVException *)jarg1;
 }
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_MVUnassigned_1SWIGUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-    jlong baseptr = 0;
-    (void)jenv;
-    (void)jcls;
-    *(exodus::MVException **)&baseptr = *(exodus::MVUnassigned **)&jarg1;
-    return baseptr;
+SWIGEXPORT exodus::MVException * SWIGSTDCALL CSharp_MVUnassigned_SWIGUpcast(exodus::MVUnassigned *jarg1) {
+    return (exodus::MVException *)jarg1;
 }
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_MVUndefined_1SWIGUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-    jlong baseptr = 0;
-    (void)jenv;
-    (void)jcls;
-    *(exodus::MVException **)&baseptr = *(exodus::MVUndefined **)&jarg1;
-    return baseptr;
+SWIGEXPORT exodus::MVException * SWIGSTDCALL CSharp_MVUndefined_SWIGUpcast(exodus::MVUndefined *jarg1) {
+    return (exodus::MVException *)jarg1;
 }
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_MVInvalidPointer_1SWIGUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-    jlong baseptr = 0;
-    (void)jenv;
-    (void)jcls;
-    *(exodus::MVException **)&baseptr = *(exodus::MVInvalidPointer **)&jarg1;
-    return baseptr;
+SWIGEXPORT exodus::MVException * SWIGSTDCALL CSharp_MVInvalidPointer_SWIGUpcast(exodus::MVInvalidPointer *jarg1) {
+    return (exodus::MVException *)jarg1;
 }
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_MVDBException_1SWIGUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-    jlong baseptr = 0;
-    (void)jenv;
-    (void)jcls;
-    *(exodus::MVException **)&baseptr = *(exodus::MVDBException **)&jarg1;
-    return baseptr;
+SWIGEXPORT exodus::MVException * SWIGSTDCALL CSharp_MVDBException_SWIGUpcast(exodus::MVDBException *jarg1) {
+    return (exodus::MVException *)jarg1;
 }
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_MVNotImplemented_1SWIGUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-    jlong baseptr = 0;
-    (void)jenv;
-    (void)jcls;
-    *(exodus::MVException **)&baseptr = *(exodus::MVNotImplemented **)&jarg1;
-    return baseptr;
+SWIGEXPORT exodus::MVException * SWIGSTDCALL CSharp_MVNotImplemented_SWIGUpcast(exodus::MVNotImplemented *jarg1) {
+    return (exodus::MVException *)jarg1;
 }
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_MVDebug_1SWIGUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-    jlong baseptr = 0;
-    (void)jenv;
-    (void)jcls;
-    *(exodus::MVException **)&baseptr = *(exodus::MVDebug **)&jarg1;
-    return baseptr;
+SWIGEXPORT exodus::MVException * SWIGSTDCALL CSharp_MVDebug_SWIGUpcast(exodus::MVDebug *jarg1) {
+    return (exodus::MVException *)jarg1;
 }
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_MVStop_1SWIGUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-    jlong baseptr = 0;
-    (void)jenv;
-    (void)jcls;
-    *(exodus::MVException **)&baseptr = *(exodus::MVStop **)&jarg1;
-    return baseptr;
+SWIGEXPORT exodus::MVException * SWIGSTDCALL CSharp_MVStop_SWIGUpcast(exodus::MVStop *jarg1) {
+    return (exodus::MVException *)jarg1;
 }
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_MVAbort_1SWIGUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-    jlong baseptr = 0;
-    (void)jenv;
-    (void)jcls;
-    *(exodus::MVException **)&baseptr = *(exodus::MVAbort **)&jarg1;
-    return baseptr;
+SWIGEXPORT exodus::MVException * SWIGSTDCALL CSharp_MVAbort_SWIGUpcast(exodus::MVAbort *jarg1) {
+    return (exodus::MVException *)jarg1;
 }
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_MVArrayDimensionedZero_1SWIGUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-    jlong baseptr = 0;
-    (void)jenv;
-    (void)jcls;
-    *(exodus::MVException **)&baseptr = *(exodus::MVArrayDimensionedZero **)&jarg1;
-    return baseptr;
+SWIGEXPORT exodus::MVException * SWIGSTDCALL CSharp_MVArrayDimensionedZero_SWIGUpcast(exodus::MVArrayDimensionedZero *jarg1) {
+    return (exodus::MVException *)jarg1;
 }
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_MVArrayIndexOutOfBounds_1SWIGUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-    jlong baseptr = 0;
-    (void)jenv;
-    (void)jcls;
-    *(exodus::MVException **)&baseptr = *(exodus::MVArrayIndexOutOfBounds **)&jarg1;
-    return baseptr;
+SWIGEXPORT exodus::MVException * SWIGSTDCALL CSharp_MVArrayIndexOutOfBounds_SWIGUpcast(exodus::MVArrayIndexOutOfBounds *jarg1) {
+    return (exodus::MVException *)jarg1;
 }
 
-SWIGEXPORT jlong JNICALL Java_exodus_jexodusJNI_MVArrayNotDimensioned_1SWIGUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-    jlong baseptr = 0;
-    (void)jenv;
-    (void)jcls;
-    *(exodus::MVException **)&baseptr = *(exodus::MVArrayNotDimensioned **)&jarg1;
-    return baseptr;
+SWIGEXPORT exodus::MVException * SWIGSTDCALL CSharp_MVArrayNotDimensioned_SWIGUpcast(exodus::MVArrayNotDimensioned *jarg1) {
+    return (exodus::MVException *)jarg1;
 }
 
 #ifdef __cplusplus
