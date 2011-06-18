@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(EXO_CSHARP32_INCLUDE)&quot;;&quot;$(EXO_CSHARP32_INCLUDE)/win32&quot;;&quot;$(ProjectDir)..\..\..\exodus\exodus&quot;;&quot;$(ProjectDir)..\..\..\exodus\exodus\exodus&quot;"
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)..\..\..\exodus\exodus&quot;;&quot;$(ProjectDir)..\..\..\exodus\exodus\exodus&quot;"
 				PreprocessorDefinitions="__WIN32__"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -61,7 +61,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				ShowProgress="2"
-				OutputFile="$(OutDir)\$(EXO_CSHARP_MODULENAME).dll"
+				OutputFile="$(OutDir)\$(EXO_CSHARP_WRAPPER_NAME).dll"
 				AdditionalLibraryDirectories=""
 				DelayLoadDLLs=""
 				GenerateDebugInformation="true"
@@ -120,7 +120,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;$(EXO_CSHARP32_INCLUDE)&quot;;&quot;$(EXO_CSHARP32_INCLUDE)/win32&quot;;&quot;$(ProjectDir)..\..\..\exodus\exodus&quot;;&quot;$(ProjectDir)..\..\..\exodus\exodus\exodus&quot;"
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)..\..\..\exodus\exodus&quot;;&quot;$(ProjectDir)..\..\..\exodus\exodus\exodus&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;EXAMPLEVC_EXPORTS"
 				RuntimeLibrary="2"
 				WarningLevel="3"
@@ -139,7 +139,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				ShowProgress="2"
-				OutputFile="$(OutDir)\$(EXO_CSHARP_MODULENAME).dll"
+				OutputFile="$(OutDir)\$(EXO_CSHARP_WRAPPER_NAME).dll"
 				AdditionalLibraryDirectories=""
 				IgnoreAllDefaultLibraries="false"
 				DelayLoadDLLs=""
@@ -201,7 +201,7 @@
 				>
 				<Tool
 					Name="VCCustomBuildTool"
-					CommandLine="prebuildcsharp.cmd $(SWIG32) $(EXO_CSHARP32_MODULEDIR) $(EXO_CSHARP_PACKAGE_SUBDIR) $(EXO_CSHARP32_BIN) $(EXO_CSHARP_MODULENAME) $(EXO_CSHARP_PACKAGE_NAME) $(EXO_SWIG_OPTIONS)&#x0D;&#x0A;"
+					CommandLine="prebuildcsharp.cmd $(SWIG32) $(EXO_CSHARP32_MODULEDIR) $(EXO_CSHARP_PACKAGE_SUBDIR) $(EXO_CSHARP32_BIN) $(EXO_CSHARP_MODULENAME) $(EXO_CSHARP_WRAPPER_NAME) $(EXO_SWIG_OPTIONS)&#x0D;&#x0A;"
 					AdditionalDependencies="..\..\..\exodus\exodus\exodus\mv.h;..\prebuildcsharp.cmd"
 					Outputs="$(InputName)_wrap.cxx"
 				/>
@@ -211,7 +211,7 @@
 				>
 				<Tool
 					Name="VCCustomBuildTool"
-					CommandLine="prebuildcsharp.cmd $(SWIG32) $(EXO_CSHARP32_MODULEDIR) $(EXO_CSHARP_PACKAGE_SUBDIR) $(EXO_CSHARP32_BIN) $(EXO_CSHARP_MODULENAME) $(EXO_CSHARP_PACKAGE_NAME) $(EXO_SWIG_OPTIONS)&#x0D;&#x0A;"
+					CommandLine="prebuildcsharp.cmd $(SWIG32) $(EXO_CSHARP32_MODULEDIR) $(EXO_CSHARP_PACKAGE_SUBDIR) $(EXO_CSHARP32_BIN) $(EXO_CSHARP_MODULENAME) $(EXO_CSHARP_WRAPPER_NAME) $(EXO_SWIG_OPTIONS)&#x0D;&#x0A;"
 					AdditionalDependencies="..\..\..\exodus\exodus\exodus\mv.h;..\prebuildcsharp.cmd"
 					Outputs="$(InputName)_wrap.cxx"
 				/>
