@@ -62,8 +62,8 @@ fi
 if [ "$SWIG_POSTGENERATE_CMD" != "" ]; then
 echo
 echo Module Generation: \
-$SWIG_POSTGENERATE_CMD
-$SWIG_POSTGENERATE_CMD
+     $SWIG_POSTGENERATE_CMD
+eval $SWIG_POSTGENERATE_CMD
 fi
 
 #-----------------

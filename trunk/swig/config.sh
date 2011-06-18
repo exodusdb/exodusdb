@@ -45,8 +45,9 @@ case $SWIG_TARGET in
         export SWIG_TARGET_LIBDIR="`php-config --extension-dir`"
 	export SWIG_TARGET_LIBFILE="$SWIG_MODULENAME.so"
 
-	if [ "`$SWIG_TARGET -version |grep 1.3`" != "" ]; then
-		export SWIG_POSTGENERATE_CMD="patch $SWIG_MODULENAME.php ../$SWIG_MODULENAME.php.patch"
+	if [ "`$SWIG_CMD -version |grep 1.3`" != "" ]; then
+		#export SWIG_POSTGENERATE_CMD="patch $SWIG_MODULENAME.php ../$SWIG_MODULENAME.php.patch"
+		export SWIG_POSTGENERATE_CMD="sed -i -e 's/\$this->_cPtr=\$r;/\/\/EXODUSPATCH \$this-\>_cPtr=\$r;/' $SWIG_MODULENAME.php"
 	fi
 
 ;; python )
