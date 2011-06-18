@@ -77,6 +77,7 @@ case $SWIG_TARGET in
 	export SWIG_TARGET_LDFLAGS="`perl -MConfig -e 'print $Config{lddlflags}'`"
 
         export SWIG_TARGET_MODDIR="/usr/lib/perl5"
+	test -d /usr/lib/perl5/site_perl && export SWIG_TARGET_MODDIR="/usr/lib/perl5/site_perl"
         export SWIG_TARGET_MODFILE="$SWIG_MODULENAME.pm"
 
 ;; java )
