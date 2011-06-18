@@ -104,6 +104,8 @@ case $SWIG_TARGET in
 	#nb dont copy to local lib otherwise main libexodus.so will be lost
 
 ;; csharp )
+	export SWIG_MODULENAME="cs$SWIG_MODULENAME"
+	#export SWIG_OPTIONS="$SWIG_OPTIONS -dllimport $SWIG_MODULENAME"
         export SWIG_TARGET_INCLUDE_FLAGS=""
         export SWIG_TARGET_LIBFILE="lib$SWIG_MODULENAME.so"
 
