@@ -4,7 +4,7 @@ set -e
 #----------------------
 #--- Do this first  ---
 #----------------------
-apt-get update
+sudo apt-get update
 sudo apt-get install swig
 
 #------------
