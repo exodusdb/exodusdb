@@ -11,5 +11,5 @@ gmcs test.cs -r:$EXO_MOD_PATH/exodus_library
 gmcs test.cs -r:$EXO_MOD_PATH/exodus_library
 
 echo \
-env LD_LIBRARY_PATH=$EXO_LIB_PATH ./test.exe
-env LD_LIBRARY_PATH=$EXO_LIB_PATH ./test.exe
+env MONO_PATH=$EXO_MOD_PATH env LD_LIBRARY_PATH=$EXO_LIB_PATH ./test.exe
+env MONO_PATH=$EXO_MOD_PATH env LD_LIBRARY_PATH=$EXO_LIB_PATH ./test.exe

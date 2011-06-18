@@ -4,7 +4,7 @@ import jexodus.*;
 public class test {
 
 public static void main(String argv[]) {
-	System.out.println("Started");
+	System.out.println("--- Testing ---");
 
 	System.loadLibrary("jexodus");
 	var exo=new var("");
