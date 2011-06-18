@@ -102,9 +102,9 @@ rem ----------------
 
     if "%EXO_PROGRAMFILES_ROOT%" EQU "" set EXO_PROGRAMFILES_ROOT=C:
 
-rem ------------------
-rem -- Module Name ---
-rem ------------------
+rem -------------------
+rem -- Module Names ---
+rem -------------------
 
     rem EG PYTHON exo.pm and exo.dll
     set EXO_PERL_MODULENAME=exo
@@ -115,15 +115,22 @@ rem ------------------
     rem EG PHP exo.php and exo.dll
     set EXO_PHP_MODULENAME=exo
 
-    rem module name determines name of the SO/DLL and loadlibrary statement
-    rem EG JAVA org.exodus.jar and libexodus.dll?
+    rem 1. java module name determines name of the SO/DLL and loadlibrary statement
+    rem EG JAVA jexodus.dll
     set EXO_JAVA_MODULENAME=jexodus
 
-    rem package name determines the name of the jar and import statement
-rem set EXO_JAVA_PACKAGE_NAME=org.exodus
-rem set EXO_JAVA_PACKAGE_SUBDIR=org\exodus
+    rem 2. java package name determines the name of the jar and import statement
+    rem EG exodus.jar and import exodus.*;
     set EXO_JAVA_PACKAGE_NAME=exodus
     set EXO_JAVA_PACKAGE_SUBDIR=exodus
+rem eg org.exodus.jar and import org.exodus.*;
+rem set EXO_JAVA_PACKAGE_NAME=org.exodus
+rem set EXO_JAVA_PACKAGE_SUBDIR=org\exodus
+
+    set EXO_CSHARP_MODULENAME=exodus_library
+    set EXO_CSHARP_WRAPPER_NAME=exodus_wrapper
+    rem just put in moduledir for now
+    set EXO_CSHARP_PACKAGE_SUBDIR=.
 
 rem -----------------------------------------------------
 rem --- completely customising configuration          ---
@@ -280,7 +287,7 @@ rem check postgres ver include (assume libs can be found there too)
 
 rem ----- SWIG -----
 rem ----------------
-    set EXO_SWIG_OPTIONS="-w503,314,389,361,362,370,383,384"
+    set EXO_SWIG_OPTIONS=-w503,314,389,361,362,370,383,384
 
     set SWIG32=%EXO_BUILD_ROOT%\%EXO_SWIG_PREFIX%%EXO_SWIG_VER%
     set SWIG64=%EXO_BUILD_ROOT%\%EXO_SWIG_PREFIX%%EXO_SWIG_VER%
@@ -344,8 +351,9 @@ set EXO_PERL32_MODULEDIR=%EXO_PERL32%\site\lib
 set EXO_PERL64_MODULEDIR=%EXO_PERL64%\site\lib
 
 
+rem ---------------
 rem ----- PHP -----
-rem ------------------
+rem ---------------
     set PHP32=%EXO_BUILD_ROOT%\%EXO_PHP_PREFIX%%EXO_PHP_VER%
     set PHP64=%EXO_BUILD_ROOT%\%EXO_PHP_PREFIX%%EXO_PHP_VER%
 
@@ -389,6 +397,18 @@ set EXO_JAVA64_MODULEDIR=%EXO_JAVA64%\lib
 
 if "%TARGET_CPU%" EQU "x86" set EXO_JAVA=%EXO_JAVA32%
 if "%TARGET_CPU%" EQU "x64" set EXO_JAVA=%EXO_JAVA64%
+
+set PATH=%PATH%;%EXO_JAVA%\bin
+
+rem ----------
+rem --- C# ---
+rem ----------
+
+set EXO_CSHARP32_MODULEDIR=\csharp
+set EXO_CSHARP64_MODULEDIR=\csharp
+rem BIN not used for now unless to find CSC C# compiler but is on same path as C++ compiler cl
+set EXO_CSHARP32_BIN=.
+set EXO_CSHARP64_BIN=.
 
 rem --- quick test of config ---
 rem ...

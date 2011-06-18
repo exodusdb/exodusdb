@@ -3,6 +3,8 @@
 %include "swig.swg"
 
 #ifdef SWIGCSHARP
+//if you change "mvar" then it also need to be changed in build scripts prebuildcsharp.cmd and config.sh
+//(until exodus.i somehow implements "override" keyword on mvar ToString)
 %rename(mvar) var;
 %include "csharp/csharp.swg"
 %include "csharp/std_wstring.i"
