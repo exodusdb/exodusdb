@@ -104,13 +104,13 @@ case $SWIG_TARGET in
 	#nb dont copy to local lib otherwise main libexodus.so will be lost
 
 ;; csharp )
-	export SWIG_MODULENAME="${SWIG_MODULENAME}_library"
 	export SWIG_OPTIONS="$SWIG_OPTIONS -dllimport ${SWIG_MODULENAME}_wrapper"
         export SWIG_TARGET_INCLUDE_FLAGS=""
-        export SWIG_TARGET_LIBFILE="lib$SWIG_MODULENAME.so"
+        export SWIG_TARGET_LIBFILE="lib${SWIG_MODULENAME}_wrapper.so"
 
 	export SWIG_PATCH_CMD="sed -i -e 's/public string ToString/public override string ToString/' mvar.cs"
 
+	export SWIG_MODULENAME="${SWIG_MODULENAME}_library"
 	export SWIG_POSTGENERATE_CMD="gmcs $SWIG_MODULENAME.cs *.cs -target:library"
 
 	#nb dont copy to local lib otherwise main libexodus.so will be lost
