@@ -1,5 +1,5 @@
 <?php
-echo "Started\n";
+echo "--- Testing ---\n";
 
 //include("backtrace.php");
 include("php/exo.php");

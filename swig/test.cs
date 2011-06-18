@@ -3,7 +3,7 @@ using System;
  public class test {
      static void Main() {
 
-        Console.WriteLine("Started");
+        Console.WriteLine("--- Testing ---");
 
 //in C#2008 onwards you can put var xyz=new ...
 //csharp has no way to say "for var put mvar" for old versions that dont support it. "welcome to the machine, my son"

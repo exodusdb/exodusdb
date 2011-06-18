@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-print "Started\n"
+print "--- Testing ---\n"
 
 from exodus import *
 

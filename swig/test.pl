@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-print "Started\n";
+print "--- Testing ---\n";
 use exo;
 
 #currently exodus function arguments must given as exodus variables
