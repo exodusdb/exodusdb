@@ -9,7 +9,6 @@ source config.sh
 
 if [ "$SWIG_TARGET" == "all" ]; then
 	for  SWIG_TARGET in $SWIG_ALL_TARGETS; do
-echo --- $SWIG_TARGET ---
 		./install.sh $SWIG_TARGET
 	done
         echo "all done"

@@ -108,13 +108,15 @@ case $SWIG_TARGET in
 	export SWIG_OPTIONS="$SWIG_OPTIONS -dllimport ${SWIG_MODULENAME}_wrapper"
         export SWIG_TARGET_INCLUDE_FLAGS=""
         export SWIG_TARGET_LIBFILE="lib${SWIG_MODULENAME}_wrapper.so"
+        export SWIG_TARGET_LIBDIR=$SWIG_LOCAL_LIBDIR
 
 	export SWIG_PATCH_CMD="sed -i -e 's/public string ToString/public override string ToString/' mvar.cs"
 
 	export SWIG_MODULENAME="${SWIG_MODULENAME}_library"
-	export SWIG_POSTGENERATE_CMD="gmcs $SWIG_MODULENAME.cs *.cs -target:library"
+	export SWIG_POSTGENERATE_CMD="gmcs $SWIG_MODULENAME.cs *.cs ../AssemblyInfo.cs -target:library -keyfile:../${SWIG_MODULENAME}.snk"
 
-	#nb dont copy to local lib otherwise main libexodus.so will be lost
+	#export SWIG_MODULE_INSTALL="sn -R ${SWIG_MODULENAME}.dll ../exodus_library.snk ; gacutil -i ${SWIG_MODULENAME}.dll"
+	export SWIG_MODULE_INSTALL="cp ${SWIG_MODULENAME}.dll $SWIG_LOCAL_LIBDIR"
 
 ;;*)
         echo "$SWIG_SYNTAX all or $SWIG_ALL_TARGETS"
