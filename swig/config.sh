@@ -7,7 +7,9 @@ export SWIG_ALL_TARGETS="perl php python java csharp"
 
 export EXO_EXODUS_INCLUDE_FLAGS="-I../../exodus/exodus"
 export EXO_WRAPPER_FLAGS="-fPIC -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes"
-export EXO_EXODUS_LDFLAGS="-lexodus"
+#export EXO_EXODUS_LDFLAGS="-lexodus"
+#attempt to build in exodus statically
+export EXO_EXODUS_LDFLAGS="-fPIC -Bstatic -lexodus -Bdynamic"
 
 #defaults
 export SWIG_WRAPPER_EXT=cxx

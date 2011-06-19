@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.67])
+AC_PREREQ([2.65])
 AC_INIT([ExodusCLI],[11.5],[steve.bush@neosys.com])
 AC_CONFIG_SRCDIR([src/exodus.cpp])
 #AC_CONFIG_HEADERS([config.h])
