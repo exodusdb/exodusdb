@@ -50,11 +50,10 @@ case $SWIG_TARGET in
 		export SWIG_POSTGENERATE_CMD="sed -i -e 's/\$this->_cPtr=\$r;/\/\/EXODUSPATCH \$this-\>_cPtr=\$r;/' $SWIG_MODULENAME.php"
 	fi
 	#centos in /etc/php.ini
-echo xxx
+
 	export PHPINIFILES="/etc/php.ini /etc/php5/cli/php.ini /etc/php5/conf.d/php.ini"
-echo yyy
+
 	export SWIG_MODULE_INSTALL="for FILE in \$PHPINIFILES; do test -f \$FILE && [ ! \`grep extension=exo.so \$FILE\` ] && echo \"extension=exo.so\" >> \$FILE; done"
-echo zzz
 
 ;; python )
 

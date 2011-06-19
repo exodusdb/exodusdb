@@ -5,7 +5,9 @@ set -e
 #--- Do this first  ---
 #----------------------
 sudo apt-get update
-sudo apt-get install swig
+sudo apt-get -y install swig
+
+cd ~/exodus/swig
 
 #------------
 #--- Perl ---
@@ -24,16 +26,16 @@ sudo ./install.sh python
 #-----------
 #--- PHP ---
 #-----------
-sudo apt-get install php5-dev php5-cli
+sudo apt-get install -y php5-dev
 ./make.sh php
+sudo apt-get install -y php5-cli
 sudo ./install.sh php
-sudo sed -i".orig" -e "s/enable_dl = Off/enable_dl = On/" /etc/php5/cli/php.ini
 php test.php
 
 #------------
 #--- Java ---
 #------------
-sudo apt-get install default-jdk
+sudo apt-get install -y default-jdk
 ./make.sh java
 sudo ./install.sh java
 ./testjava.sh
@@ -41,11 +43,8 @@ sudo ./install.sh java
 #----------
 #--- C# ---
 #----------
-sudo apt-get install libmono-dev mono-gmcs
+sudo apt-get install -y libmono-dev mono-gmcs
 ./make.sh csharp
 sudo ./install.sh csharp
 ./testc#.sh
-
-
-
 
