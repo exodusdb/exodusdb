@@ -57,7 +57,7 @@ lib_LTLIBRARIES= libexodus.la
 libexodus_la_SOURCES= $(h_sources) $(cc_sources) $(buildonly_h_sources)
 
 #compiler flags for the library - not used - using global AM_CPPFLAGS
-#libexodus_la_CPPFLAGS=$(BOOST_CPPFLAGS)
+#libexodus_la_CPPFLAGS=$(BOOST_CPPFLAGS) -fPIC
 
 #linker lib names for the library - not used - using global LIBS
 #libexodus_la_LIBS= 
