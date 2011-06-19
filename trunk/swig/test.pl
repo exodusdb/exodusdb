@@ -23,9 +23,10 @@ if (!$exo->connect($exo)) {
 		print "$filename file not created. maybe already exists. try deletefile $filename\n";
 	}
 
-	#write 10 records
+	#write some records
+	$exo->begintrans();
+	$record=new exo::var("X")->str(1000);
 	for ($ii=1;$ii<=100;++$ii) {
-		$record=$exo->date();
 		$id=new exo::var($ii);
 		if (!$record->write($filename,$id)) {
 			last;
@@ -33,6 +34,7 @@ if (!$exo->connect($exo)) {
 		print $id," ";
 	}
 	print "\n";
+	$exo->committrans();
 
 	if ($filename->deletefile()) {
 		print "$filename file deleted\n";

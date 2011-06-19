@@ -12,19 +12,37 @@ public static void main(String argv[]) {
 	var filename=new var("tempdbfilejava");
 	var options=new var("");
 
-	if (!exo.connect(options))
-		System.out.println("couldnt connect to default database");
+	if (!exo.connect(options)) {
+        	System.out.println("no default database connection");
+	} else {
 
-	if (exo.open(filename,options))
-		System.out.println("db file already existed.");		
-	else if (exo.createfile(filename,options)) {
-		System.out.println("db file created");
-		if (filename.deletefile())
-			System.out.println("db file deleted");
-	} else
-		System.out.println("db file not created");
-	if (filename.deletefile())
-		System.out.println("db file deleted");
+	        filename=new var("tempdbfile564");
+        	options=new var("");
+
+	        if (exo.createfile(filename,options)) {
+        	        System.out.println("filename file created");
+        	}else{
+                	System.out.println("filename file not created. maybe already exists. try deletefile filename");
+        	}
+
+		exo.begintrans();
+        	//write some records
+                var record=new var("X").str(1000);
+        	for (int ii=1;ii<=100;++ii) {
+                	var id=new var(ii);
+                	if (!record.write(filename,id)) {
+                        	break;
+	                }
+        	        System.out.print(ii);
+        	        System.out.print(" ");
+        	}
+        	System.out.println();
+		exo.committrans();
+
+	        if (filename.deletefile()) {
+         	       System.out.println("filename file deleted");
+        	}
+	}
 
 	System.out.println(exo.listfiles());
 

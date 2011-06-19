@@ -21,7 +21,7 @@ using System;
         Console.WriteLine(testnum.toInt()+1);
         Console.WriteLine(testnum.quote());
 
-        mvar filename=new mvar("Tempfilecs");
+        mvar filename=new mvar("T");
         Console.WriteLine(filename);
 
         Console.WriteLine(filename.quote());
@@ -40,15 +40,17 @@ using System;
         else
                 Console.WriteLine("db file not created");
 
-        //write 10 records
+        //write some records
+	exo.begintrans();
+	mvar record=(new mvar("X")).str(1000);
         for (int ii=1;ii<=100;++ii) {
-                mvar record=exo.time();
                 mvar id=new mvar(ii);
                 if (record.write(filename,id))
                         break;
                 Console.Write(id+" ");
         }
         Console.WriteLine();
+	exo.committrans();
 
         mvar listoffiles=exo.listfiles();
         Console.WriteLine(listoffiles);
