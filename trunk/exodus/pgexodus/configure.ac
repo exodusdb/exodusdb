@@ -1,6 +1,6 @@
 # Process this file with autoreconf or autoconf to produce a configure script.
 
-AC_PREREQ([2.67])
+AC_PREREQ([2.65])
 
 dnl --------------------------------
 dnl Initialization macros.
@@ -91,6 +91,7 @@ dnl ---------------------------------------
 #NB patch for postgres SERVER in m4/ax_lib_postgresql.m4
 #            POSTGRESQL_CFLAGS="-I`$PG_CONFIG --includedir` -I`$PG_CONFIG --includedir-server`"
 dnl checking for PostgreSQL libraries 8.1+
+m4_include([m4/ax_lib_postgresql.m4])
 AX_LIB_POSTGRESQL([8.1.0])
 
 #libdir=`pg_config --pkglibdir`

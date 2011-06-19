@@ -32,6 +32,7 @@
 
 #ifdef SWIGPYTHON
 
+%implicitconv var;
 %include "python/pywstrings.swg"
 %include "python/pystrings.swg"
 %include "python/std_string.i"
@@ -94,6 +95,51 @@
 
 //swig interface is currently converting undefined var to string in some cases
 //for now, return "" in that case
+
+
+
+
+/*
+%include "perl5/attribute.i"
+%include "perl5/carrays.i"
+%include "perl5/cdata.i"
+%include "perl5/cmalloc.i"
+//%include "perl5/cni.i"
+%include "perl5/cpointer.i"
+%include "perl5/cstring.i"
+%include "perl5/exception.i"
+%include "perl5/factory.i"
+%include "perl5/jstring.i"
+//%include "perl5/Makefile.pl"
+//%include "perl5/noembed.h"
+%include "perl5/perl5.swg"
+//%include "perl5/perlerrors.swg"
+%include "perl5/perlfragments.swg"
+%include "perl5/perlhead.swg"
+%include "perl5/perlinit.swg"
+%include "perl5/perlkw.swg"
+%include "perl5/perlmacros.swg"
+%include "perl5/perlmain.i"
+%include "perl5/perlopers.swg"
+%include "perl5/perlprimtypes.swg"
+//%include "perl5/perlrun.swg"
+%include "perl5/perlruntime.swg"
+%include "perl5/perlstrings.swg"
+%include "perl5/perltypemaps.swg"
+%include "perl5/perluserdir.swg"
+%include "perl5/reference.i"
+%include "perl5/std_common.i"
+%include "perl5/std_deque.i"
+%include "perl5/std_except.i"
+%include "perl5/std_list.i"
+%include "perl5/std_map.i"
+%include "perl5/std_pair.i"
+%include "perl5/std_string.i"
+%include "perl5/std_vector.i"
+%include "perl5/stl.i"
+%include "perl5/typemaps.i"
+*/
+
 %rename(__str__) toString2;
 
 //linking of swig gets confused and wants var:win32_connect and var:win32_select?!

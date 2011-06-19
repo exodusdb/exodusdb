@@ -29,7 +29,7 @@ sudo ./install.sh python
 sudo apt-get install -y php5-dev
 ./make.sh php
 sudo apt-get install -y php5-cli
-sudo ./install.sh php
+sudo ./install.sh php || echo php install works but returns fail
 php test.php
 
 #------------
