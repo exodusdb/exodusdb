@@ -19,9 +19,9 @@ $options=new mvar("");
 //exodus mvariables can convert to string automatically
 echo "filename is ", $filename->quote(),"\n";
 
-//crceate a file
+//create a file
 if ($exo->createfile($filename,$options))
-	echo "created file $filename\n";
+	echo "created file ",$filename,"\n";
 else
 	echo "not created $filename\n";
 
@@ -30,7 +30,7 @@ for ($ii=1;$ii<=100;$ii++) {
 	$key=new mvar($ii);
 	$record=new mvar($ii);
 	$ok=$record->write($filename,$key);
-	echo "$key ";
+	echo $key," ";
 }
 echo "\n";
 
@@ -48,9 +48,9 @@ echo "Pick time: ", $exo->time(), " ", $exo->time()->oconv($timeconv), "\n";
 
 //delete a file
 if ($filename->deletefile())
-	echo "deleted file $filename\n";
+	echo "deleted file ",$filename,"\n";
 else
-	echo "not deleted $filename\n";
+	echo "not deleted ",$filename,"\n";
 
 echo "Finished\n";
 ?>

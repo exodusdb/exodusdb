@@ -34,8 +34,8 @@ echo Entering: `pwd`
 if [ "$SWIG_MODULE_INSTALL" != "" ]; then
 	echo
 	echo -ne "Installing: "
-	echo $SWIG_MODULE_INSTALL
-	     $SWIG_MODULE_INSTALL
+	echo eval $SWIG_MODULE_INSTALL
+	     eval $SWIG_MODULE_INSTALL
 fi
 
 if [ "$SWIG_TARGET_LIBDIR" != "" ]; then
@@ -44,6 +44,7 @@ if [ "$SWIG_TARGET_LIBDIR" != "" ]; then
 	echo cp -f $SWIG_TARGET_LIBFILE $SWIG_TARGET_LIBDIR/
 	     cp -f $SWIG_TARGET_LIBFILE $SWIG_TARGET_LIBDIR/
 fi
+
 if [ "$SWIG_TARGET_MODDIR" != "" ]; then
 	echo
 	echo -ne "Installing $SWIG_TARGET module: "
