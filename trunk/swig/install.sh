@@ -31,12 +31,7 @@ echo Entering: `pwd`
 #--- "Install" ---
 #-----------------
 
-if [ "$SWIG_MODULE_INSTALL" != "" ]; then
-	echo
-	echo -ne "Installing: "
-	echo eval $SWIG_MODULE_INSTALL
-	     eval $SWIG_MODULE_INSTALL
-fi
+echo $PHPINIFILES
 
 if [ "$SWIG_TARGET_LIBDIR" != "" ]; then
 	echo
@@ -51,4 +46,12 @@ if [ "$SWIG_TARGET_MODDIR" != "" ]; then
 	echo cp -f $SWIG_TARGET_MODFILE $SWIG_TARGET_MODDIR/
 	     cp -f $SWIG_TARGET_MODFILE $SWIG_TARGET_MODDIR/
 fi
+
+if [ "$SWIG_MODULE_INSTALL" != "" ]; then
+	echo
+	echo -ne "Installing: "
+	echo eval $SWIG_MODULE_INSTALL
+	     eval $SWIG_MODULE_INSTALL
+fi
+
 sleep 1
