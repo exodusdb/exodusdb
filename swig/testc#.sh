@@ -10,6 +10,8 @@ echo \
 gmcs test.cs -r:$EXO_MOD_PATH/exodus_library
 gmcs test.cs -r:$EXO_MOD_PATH/exodus_library
 
+#mono xxx command not necessary in later versions can execute .exe from command line
+
 echo \
-env MONO_PATH=$EXO_MOD_PATH env LD_LIBRARY_PATH=$EXO_LIB_PATH ./test.exe
-env MONO_PATH=$EXO_MOD_PATH env LD_LIBRARY_PATH=$EXO_LIB_PATH ./test.exe
+env MONO_PATH=$EXO_MOD_PATH env LD_LIBRARY_PATH=$EXO_LIB_PATH mono ./test.exe
+env MONO_PATH=$EXO_MOD_PATH env LD_LIBRARY_PATH=$EXO_LIB_PATH mono ./test.exe
