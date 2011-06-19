@@ -26,13 +26,17 @@ else
 	echo "not created $filename\n";
 
 //create some records
+$exo->begintrans();
+$record=new mvar("X");
+$record=$record->str(1000);
 for ($ii=1;$ii<=100;$ii++) {
 	$key=new mvar($ii);
-	$record=new mvar($ii);
+//	$record=new mvar($ii);
 	$ok=$record->write($filename,$key);
 	echo $key," ";
 }
 echo "\n";
+$exo->committrans();
 
 //see what db files are available
 echo "list of files:\n";
