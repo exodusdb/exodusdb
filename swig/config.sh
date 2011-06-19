@@ -103,7 +103,10 @@ echo zzz
 	export SWIG_TARGET_LIBFILE="$SWIG_MODULENAME.so"
         export SWIG_TARGET_LIBDIR=$SWIG_JAVA_LIBDIR
 
-        export SWIG_TARGET_INCLUDE_FLAGS="-I/usr/lib/jvm/java-6-openjdk/include -I/usr/lib/jvm/java-6-openjdk/include/linux"
+	export SWIG_TARGET_INCLUDE_FLAGS="-I/usr/lib/jvm/java-6-openjdk/include -I/usr/lib/jvm/java-6-openjdk/include/linux"
+	#centos 5
+	test -d /usr/lib/jvm/java/ && SWIG_TARGET_INCLUDE_FLAGS="-I/usr/lib/jvm/java/include -I/usr/lib/jvm/java/include/linux"
+
         export SWIG_TARGET_LIBFILE="lib$SWIG_MODULENAME.so"
 
 	export SWIG_POSTGENERATE_CMD="javac $SWIG_PACKAGE_SUBDIR/*.java"
