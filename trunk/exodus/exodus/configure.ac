@@ -5,11 +5,15 @@ dnl --------------------------------
 dnl Initialization macros.
 dnl --------------------------------
 
-AC_INIT
+#require autoconf version 2.65 (why?) and Libtool version 2.2 (why?)
 AC_PREREQ([2.65])
+LT_PREREQ([2.2])
+
+AC_INIT
+#AC_PREREQ([2.65])
 AC_CONFIG_SRCDIR([exodus/mv.cpp])
 AC_CONFIG_HEADERS([config.h])
-AC_CONFIG_MACRO_DIR(m4)
+AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_AUX_DIR(config)
 
 dnl -----------------------------------------------
@@ -65,20 +69,9 @@ dnl -----------------------------------------------
 dnl Checks for programs.
 dnl -----------------------------------------------
 
-#AC_DISABLE_STATIC
-#AC_DISABLE_SHARED
-#AC_ENABLE_SHARED
 LT_INIT
-
-#AC_ENABLE_STATIC([])
-#AC_ENABLE_SHARED([])
-
-AC_PROG_CC
 AC_PROG_CXX
-#LT_INIT
-#LT_INIT([disable-shared])
 AM_SANITY_CHECK
-
 AC_LANG([C++])
 
 dnl ---------------------------------------
@@ -88,11 +81,14 @@ dnl ---------------------------------------
 dnl https://github.com/tsuna/boost.m4 maybe better than
 dnl autoconf macro archive
 
+dnl checking for PostgreSQL libraries 8.1+
+m4_include([m4/ax_lib_postgresql.m4])
+AX_LIB_POSTGRESQL([8.1.0])
+
 m4_include([m4/ax_boost_base.m4])
 m4_include([m4/ax_boost_date_time.m4])
 m4_include([m4/ax_boost_filesystem.m4])
 m4_include([m4/ax_boost_regex.m4])
-#m4_include([m4/ax_boost_serialization.m4])
 m4_include([m4/ax_boost_system.m4])
 m4_include([m4/ax_boost_thread.m4])
 
@@ -109,14 +105,6 @@ AX_BOOST_FILESYSTEM
 AX_BOOST_REGEX
 AX_BOOST_THREAD
 #AX_BOOST_SERIALIZATION
-
-dnl checking for PostgreSQL libraries 8.1+
-m4_include([m4/ax_lib_postgresql.m4])
-AX_LIB_POSTGRESQL([8.1.0])
-
-#icu only required in boost at the moment
-#AC_CHECK_ICU(version, action-if, action-if-not)
-#AC_CHECK_ICU([3])
 
 # Checks for header files.
 AC_CHECK_HEADERS([netinet/in.h stdlib.h string.h sys/socket.h sys/time.h unistd.h])
