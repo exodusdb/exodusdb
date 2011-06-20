@@ -15,6 +15,10 @@
 
 @SET_MAKE@
 
+#-------------------------------
+# define source and header files
+#-------------------------------
+
 
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
@@ -79,13 +83,21 @@ am__installdirs = "$(DESTDIR)$(libdir)" \
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libexodus_la_LIBADD =
 am__objects_1 =
-am__objects_2 = ConvertUTF.lo howto.lo mvarray.lo mvdatetime.lo \
-	mvdebug.lo mvfuncs.lo mvioconv.lo mvlibs.lo mvos.lo mvutf.lo \
-	naturalorder.lo gettimeofday.lo mv2.lo mv.lo mvdbpostgres.lo \
-	mvenvironment.lo mvglobalfuncs.lo mvipc.lo mvmv.lo \
-	mvunicode.lo mvipc_boost.lo mvipc_posix.lo mvipc_ms.lo \
-	mvposix.lo MurmurHash2_64.lo mvfunctor.lo mvprogram.lo \
-	mvhandles.lo mvdbconns.lo
+am__objects_2 = libexodus_la-ConvertUTF.lo libexodus_la-howto.lo \
+	libexodus_la-mvarray.lo libexodus_la-mvdatetime.lo \
+	libexodus_la-mvdebug.lo libexodus_la-mvfuncs.lo \
+	libexodus_la-mvioconv.lo libexodus_la-mvlibs.lo \
+	libexodus_la-mvos.lo libexodus_la-mvutf.lo \
+	libexodus_la-naturalorder.lo libexodus_la-gettimeofday.lo \
+	libexodus_la-mv2.lo libexodus_la-mv.lo \
+	libexodus_la-mvdbpostgres.lo libexodus_la-mvenvironment.lo \
+	libexodus_la-mvglobalfuncs.lo libexodus_la-mvipc.lo \
+	libexodus_la-mvmv.lo libexodus_la-mvunicode.lo \
+	libexodus_la-mvipc_boost.lo libexodus_la-mvipc_posix.lo \
+	libexodus_la-mvipc_ms.lo libexodus_la-mvposix.lo \
+	libexodus_la-MurmurHash2_64.lo libexodus_la-mvfunctor.lo \
+	libexodus_la-mvprogram.lo libexodus_la-mvhandles.lo \
+	libexodus_la-mvdbconns.lo
 am_libexodus_la_OBJECTS = $(am__objects_1) $(am__objects_2) \
 	$(am__objects_1)
 libexodus_la_OBJECTS = $(am_libexodus_la_OBJECTS)
@@ -116,48 +128,10 @@ CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(libexodus_la_SOURCES)
 DIST_SOURCES = $(libexodus_la_SOURCES)
-RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
-	html-recursive info-recursive install-data-recursive \
-	install-dvi-recursive install-exec-recursive \
-	install-html-recursive install-info-recursive \
-	install-pdf-recursive install-ps-recursive install-recursive \
-	installcheck-recursive installdirs-recursive pdf-recursive \
-	ps-recursive uninstall-recursive
 HEADERS = $(library_include_HEADERS)
-RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
-  distclean-recursive maintainer-clean-recursive
-AM_RECURSIVE_TARGETS = $(RECURSIVE_TARGETS:-recursive=) \
-	$(RECURSIVE_CLEAN_TARGETS:-recursive=) tags TAGS ctags CTAGS \
-	distdir
 ETAGS = etags
 CTAGS = ctags
-DIST_SUBDIRS = $(SUBDIRS)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-am__relativize = \
-  dir0=`pwd`; \
-  sed_first='s,^\([^/]*\)/.*$$,\1,'; \
-  sed_rest='s,^[^/]*/*,,'; \
-  sed_last='s,^.*/\([^/]*\)$$,\1,'; \
-  sed_butlast='s,/*[^/]*$$,,'; \
-  while test -n "$$dir1"; do \
-    first=`echo "$$dir1" | sed -e "$$sed_first"`; \
-    if test "$$first" != "."; then \
-      if test "$$first" = ".."; then \
-        dir2=`echo "$$dir0" | sed -e "$$sed_last"`/"$$dir2"; \
-        dir0=`echo "$$dir0" | sed -e "$$sed_butlast"`; \
-      else \
-        first2=`echo "$$dir2" | sed -e "$$sed_first"`; \
-        if test "$$first2" = "$$first"; then \
-          dir2=`echo "$$dir2" | sed -e "$$sed_rest"`; \
-        else \
-          dir2="../$$dir2"; \
-        fi; \
-        dir0="$$dir0"/"$$first"; \
-      fi; \
-    fi; \
-    dir1=`echo "$$dir1" | sed -e "$$sed_rest"`; \
-  done; \
-  reldir="$$dir2"
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
 AR = @AR@
@@ -206,10 +180,7 @@ INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
-
-#libs for all links
-LIBS = @LIBS@ $(BOOST_DATE_TIME_LIB) $(BOOST_FILESYSTEM_LIB) \
-	$(BOOST_THREAD_LIB) $(BOOST_REGEX_LIB)
+LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
 LIPO = @LIPO@
 LN_S = @LN_S@
@@ -293,73 +264,68 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+h_sources = \
+ exodus.h exodusmacros.h mvenvironment.h mv.h mvlibs.h \
+ exodusfuncs.h mvexceptions.h mvimpl.h mvutf.h mvipc.h mvconfig.h \
+ mvlink.h mvfunctor.h program.h library.h dict.h mvprogram.h\
+ xfunctorf0.h xfunctorf1.h xfunctorf10.h xfunctorf11.h xfunctorf12.h \
+ xfunctorf13.h xfunctorf14.h xfunctorf15.h xfunctorf16.h xfunctorf17.h \
+ xfunctorf18.h xfunctorf19.h xfunctorf2.h xfunctorf20.h xfunctorf3.h \
+ xfunctorf4.h xfunctorf5.h xfunctorf6.h xfunctorf7.h xfunctorf8.h \
+ xfunctorf9.h xfunctors0.h xfunctors1.h xfunctors10.h xfunctors11.h \
+ xfunctors12.h xfunctors13.h xfunctors14.h xfunctors15.h xfunctors16.h \
+ xfunctors17.h xfunctors18.h xfunctors19.h xfunctors2.h xfunctors20.h \
+ xfunctors3.h xfunctors4.h xfunctors5.h xfunctors6.h xfunctors7.h \
+ xfunctors8.h xfunctors9.h
 
-### not for now .. if restore then ALSO restore LIBADD= below
-#SUBDIRS = sub
-SUBDIRS = 
+buildonly_h_sources = \
+ ConvertUTF.h NullCodecvt.h TConvert.h gettimeofday.h neo.h mvconfig.h \
+ MurmurHash2_64.h mvhandles.h mvdbconns.h
 
-#some header files
-h_sources = exodus.h exodusmacros.h mvenvironment.h mv.h mvlibs.h \
-exodusfuncs.h mvexceptions.h mvimpl.h mvutf.h mvipc.h mvconfig.h \
-mvlink.h mvfunctor.h program.h library.h dict.h mvprogram.h\
-xfunctorf0.h xfunctorf1.h xfunctorf10.h xfunctorf11.h xfunctorf12.h \
-xfunctorf13.h xfunctorf14.h xfunctorf15.h xfunctorf16.h xfunctorf17.h \
-xfunctorf18.h xfunctorf19.h xfunctorf2.h xfunctorf20.h xfunctorf3.h \
-xfunctorf4.h xfunctorf5.h xfunctorf6.h xfunctorf7.h xfunctorf8.h \
-xfunctorf9.h xfunctors0.h xfunctors1.h xfunctors10.h xfunctors11.h \
-xfunctors12.h xfunctors13.h xfunctors14.h xfunctors15.h xfunctors16.h \
-xfunctors17.h xfunctors18.h xfunctors19.h xfunctors2.h xfunctors20.h \
-xfunctors3.h xfunctors4.h xfunctors5.h xfunctors6.h xfunctors7.h \
-xfunctors8.h xfunctors9.h
-
-
-#some more headers
-buildonly_h_sources = ConvertUTF.h NullCodecvt.h TConvert.h gettimeofday.h neo.h mvconfig.h MurmurHash2_64.h \
-mvhandles.h mvdbconns.h
-
-
-#source files
-cc_sources = ConvertUTF.c howto.cpp mvarray.cpp mvdatetime.cpp  mvdebug.cpp mvfuncs.cpp mvioconv.cpp mvlibs.cpp mvos.cpp \
-mvutf.cpp naturalorder.cpp gettimeofday.cpp mv2.cpp mv.cpp mvdbpostgres.cpp mvenvironment.cpp mvglobalfuncs.cpp  \
-mvipc.cpp mvmv.cpp mvunicode.cpp mvipc_boost.cpp mvipc_posix.cpp \
-mvipc_ms.cpp mvposix.cpp MurmurHash2_64.cpp \
-mvfunctor.cpp mvprogram.cpp mvhandles.cpp mvdbconns.cpp
+cc_sources = \
+ ConvertUTF.c howto.cpp mvarray.cpp mvdatetime.cpp  mvdebug.cpp \
+ mvfuncs.cpp mvioconv.cpp mvlibs.cpp mvos.cpp \
+ mvutf.cpp naturalorder.cpp gettimeofday.cpp mv2.cpp mv.cpp \
+ mvdbpostgres.cpp mvenvironment.cpp mvglobalfuncs.cpp  \
+ mvipc.cpp mvmv.cpp mvunicode.cpp mvipc_boost.cpp mvipc_posix.cpp \
+ mvipc_ms.cpp mvposix.cpp MurmurHash2_64.cpp \
+ mvfunctor.cpp mvprogram.cpp mvhandles.cpp mvdbconns.cpp
 
 
-#where to install the libraries include headers
-library_includedir = $(includedir)/$(GENERIC_LIBRARY_NAME)-$(GENERIC_API_VERSION)/$(GENERIC_LIBRARY_NAME)
+#------------------------------------------------------
+# install public headers in {include}/exodus-99.99/exodus
+#------------------------------------------------------
+library_includedir = \
+ $(includedir)/$(GENERIC_LIBRARY_NAME)-$(GENERIC_API_VERSION)/$(GENERIC_LIBRARY_NAME)
 
-#name of the libraries include headers to be installed
-library_include_HEADERS = $(h_sources)
-
-#compiler flags for all compilations
-AM_CPPFLAGS = -I$(top_srcdir) $(BOOST_CPPFLAGS) $(POSTGRESQL_CFLAGS) \
- -Wall -Wextra -Wno-unknown-pragmas  
+library_include_HEADERS = \
+ $(h_sources)
 
 
-#make a library with  libtools
-##############################
+#----------------------------------------------------------------
+# make a library with  libtools and install it in "lib" directory
+#----------------------------------------------------------------
 lib_LTLIBRARIES = libexodus.la
+libexodus_la_SOURCES = \
+ $(h_sources) $(cc_sources) $(buildonly_h_sources)
 
-#source code files for the library
-libexodus_la_SOURCES = $(h_sources) $(cc_sources) $(buildonly_h_sources)
+libexodus_la_CPPFLAGS = \
+ -Wall -Wextra -Wno-unknown-pragmas \
+ -I$(top_srcdir) \
+ $(POSTGRESQL_CFLAGS) \
+ $(BOOST_CPPFLAGS) $(BOOST_DATE_TIME_CPPFLAGS) $(BOOST_FILESYSTEM_CPPFLAGS) \
+ $(BOOST_REGEX_CPPFLAGS) $(BOOST_SYSTEM_CPPFLAGS) $(BOOST_THREAD_CPPFLAGS)
 
-#compiler flags for the library - not used - using global AM_CPPFLAGS
-#libexodus_la_CPPFLAGS=$(BOOST_CPPFLAGS)
+libexodus_la_LDFLAGS = \
+ -version-info $(GENERIC_LIBRARY_VERSION) \
+ -release $(GENERIC_RELEASE) \
+ $(BOOST_LDFLAGS) $(BOOST_DATE_TIME_LDFLAGS) $(BOOST_FILESYSTEM_LDFLAGS) $(BOOST_REGEX_LDFLAGS) $(BOOST_SYSTEM_LDFLAGS) $(BOOST_THREAD_LDFLAGS) \
+ $(POSTGRESQL_LDFLAGS)
 
-#linker lib names for the library - not used - using global LIBS
-#libexodus_la_LIBS= 
+libexodus_la_LIBS = \
+ $(BOOST_DATE_TIME_LIB) $(BOOST_FILESYSTEM_LIB) $(BOOST_REGEX_LIB) $(BOOST_SYSTEM_LIB) $(BOOST_THREAD_LIB)
 
-#sublibs - not for now. needs SUBDIRS above too
-#libexodus_9_6_la_LIBADD= sub/libsub.la
-
-#linker flags for the library (-static and -static-libtool-libs seems to make a static .la library)
-libexodus_la_LDFLAGS = -version-info $(GENERIC_LIBRARY_VERSION) -release $(GENERIC_RELEASE) \
-$(BOOST_LDFLAGS) \
-$(BOOST_DATE_TIME_LDFLAGS) $(BOOST_FILESYSTEM_LDFLAGS) $(BOOST_REGEX_LDFLAGS) $(BOOST_SYSTEM_LDFLAGS) $(BOOST_THREAD_LDFLAGS) \
-$(POSTGRESQL_LDFLAGS)
-
-all: all-recursive
+all: all-am
 
 .SUFFIXES:
 .SUFFIXES: .c .cpp .lo .o .obj
@@ -433,35 +399,35 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ConvertUTF.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MurmurHash2_64.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gettimeofday.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/howto.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mv.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mv2.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mvarray.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mvdatetime.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mvdbconns.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mvdbpostgres.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mvdebug.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mvenvironment.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mvfuncs.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mvfunctor.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mvglobalfuncs.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mvhandles.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mvioconv.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mvipc.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mvipc_boost.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mvipc_ms.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mvipc_posix.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mvlibs.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mvmv.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mvos.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mvposix.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mvprogram.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mvunicode.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mvutf.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/naturalorder.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libexodus_la-ConvertUTF.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libexodus_la-MurmurHash2_64.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libexodus_la-gettimeofday.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libexodus_la-howto.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libexodus_la-mv.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libexodus_la-mv2.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libexodus_la-mvarray.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libexodus_la-mvdatetime.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libexodus_la-mvdbconns.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libexodus_la-mvdbpostgres.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libexodus_la-mvdebug.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libexodus_la-mvenvironment.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libexodus_la-mvfuncs.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libexodus_la-mvfunctor.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libexodus_la-mvglobalfuncs.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libexodus_la-mvhandles.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libexodus_la-mvioconv.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libexodus_la-mvipc.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libexodus_la-mvipc_boost.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libexodus_la-mvipc_ms.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libexodus_la-mvipc_posix.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libexodus_la-mvlibs.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libexodus_la-mvmv.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libexodus_la-mvos.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libexodus_la-mvposix.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libexodus_la-mvprogram.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libexodus_la-mvunicode.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libexodus_la-mvutf.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libexodus_la-naturalorder.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -484,6 +450,13 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
 
+libexodus_la-ConvertUTF.lo: ConvertUTF.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libexodus_la-ConvertUTF.lo -MD -MP -MF $(DEPDIR)/libexodus_la-ConvertUTF.Tpo -c -o libexodus_la-ConvertUTF.lo `test -f 'ConvertUTF.c' || echo '$(srcdir)/'`ConvertUTF.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libexodus_la-ConvertUTF.Tpo $(DEPDIR)/libexodus_la-ConvertUTF.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ConvertUTF.c' object='libexodus_la-ConvertUTF.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libexodus_la-ConvertUTF.lo `test -f 'ConvertUTF.c' || echo '$(srcdir)/'`ConvertUTF.c
+
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
 @am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
@@ -504,6 +477,202 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
+
+libexodus_la-howto.lo: howto.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libexodus_la-howto.lo -MD -MP -MF $(DEPDIR)/libexodus_la-howto.Tpo -c -o libexodus_la-howto.lo `test -f 'howto.cpp' || echo '$(srcdir)/'`howto.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libexodus_la-howto.Tpo $(DEPDIR)/libexodus_la-howto.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='howto.cpp' object='libexodus_la-howto.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libexodus_la-howto.lo `test -f 'howto.cpp' || echo '$(srcdir)/'`howto.cpp
+
+libexodus_la-mvarray.lo: mvarray.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libexodus_la-mvarray.lo -MD -MP -MF $(DEPDIR)/libexodus_la-mvarray.Tpo -c -o libexodus_la-mvarray.lo `test -f 'mvarray.cpp' || echo '$(srcdir)/'`mvarray.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libexodus_la-mvarray.Tpo $(DEPDIR)/libexodus_la-mvarray.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mvarray.cpp' object='libexodus_la-mvarray.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libexodus_la-mvarray.lo `test -f 'mvarray.cpp' || echo '$(srcdir)/'`mvarray.cpp
+
+libexodus_la-mvdatetime.lo: mvdatetime.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libexodus_la-mvdatetime.lo -MD -MP -MF $(DEPDIR)/libexodus_la-mvdatetime.Tpo -c -o libexodus_la-mvdatetime.lo `test -f 'mvdatetime.cpp' || echo '$(srcdir)/'`mvdatetime.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libexodus_la-mvdatetime.Tpo $(DEPDIR)/libexodus_la-mvdatetime.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mvdatetime.cpp' object='libexodus_la-mvdatetime.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libexodus_la-mvdatetime.lo `test -f 'mvdatetime.cpp' || echo '$(srcdir)/'`mvdatetime.cpp
+
+libexodus_la-mvdebug.lo: mvdebug.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libexodus_la-mvdebug.lo -MD -MP -MF $(DEPDIR)/libexodus_la-mvdebug.Tpo -c -o libexodus_la-mvdebug.lo `test -f 'mvdebug.cpp' || echo '$(srcdir)/'`mvdebug.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libexodus_la-mvdebug.Tpo $(DEPDIR)/libexodus_la-mvdebug.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mvdebug.cpp' object='libexodus_la-mvdebug.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libexodus_la-mvdebug.lo `test -f 'mvdebug.cpp' || echo '$(srcdir)/'`mvdebug.cpp
+
+libexodus_la-mvfuncs.lo: mvfuncs.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libexodus_la-mvfuncs.lo -MD -MP -MF $(DEPDIR)/libexodus_la-mvfuncs.Tpo -c -o libexodus_la-mvfuncs.lo `test -f 'mvfuncs.cpp' || echo '$(srcdir)/'`mvfuncs.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libexodus_la-mvfuncs.Tpo $(DEPDIR)/libexodus_la-mvfuncs.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mvfuncs.cpp' object='libexodus_la-mvfuncs.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libexodus_la-mvfuncs.lo `test -f 'mvfuncs.cpp' || echo '$(srcdir)/'`mvfuncs.cpp
+
+libexodus_la-mvioconv.lo: mvioconv.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libexodus_la-mvioconv.lo -MD -MP -MF $(DEPDIR)/libexodus_la-mvioconv.Tpo -c -o libexodus_la-mvioconv.lo `test -f 'mvioconv.cpp' || echo '$(srcdir)/'`mvioconv.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libexodus_la-mvioconv.Tpo $(DEPDIR)/libexodus_la-mvioconv.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mvioconv.cpp' object='libexodus_la-mvioconv.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libexodus_la-mvioconv.lo `test -f 'mvioconv.cpp' || echo '$(srcdir)/'`mvioconv.cpp
+
+libexodus_la-mvlibs.lo: mvlibs.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libexodus_la-mvlibs.lo -MD -MP -MF $(DEPDIR)/libexodus_la-mvlibs.Tpo -c -o libexodus_la-mvlibs.lo `test -f 'mvlibs.cpp' || echo '$(srcdir)/'`mvlibs.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libexodus_la-mvlibs.Tpo $(DEPDIR)/libexodus_la-mvlibs.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mvlibs.cpp' object='libexodus_la-mvlibs.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libexodus_la-mvlibs.lo `test -f 'mvlibs.cpp' || echo '$(srcdir)/'`mvlibs.cpp
+
+libexodus_la-mvos.lo: mvos.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libexodus_la-mvos.lo -MD -MP -MF $(DEPDIR)/libexodus_la-mvos.Tpo -c -o libexodus_la-mvos.lo `test -f 'mvos.cpp' || echo '$(srcdir)/'`mvos.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libexodus_la-mvos.Tpo $(DEPDIR)/libexodus_la-mvos.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mvos.cpp' object='libexodus_la-mvos.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libexodus_la-mvos.lo `test -f 'mvos.cpp' || echo '$(srcdir)/'`mvos.cpp
+
+libexodus_la-mvutf.lo: mvutf.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libexodus_la-mvutf.lo -MD -MP -MF $(DEPDIR)/libexodus_la-mvutf.Tpo -c -o libexodus_la-mvutf.lo `test -f 'mvutf.cpp' || echo '$(srcdir)/'`mvutf.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libexodus_la-mvutf.Tpo $(DEPDIR)/libexodus_la-mvutf.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mvutf.cpp' object='libexodus_la-mvutf.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libexodus_la-mvutf.lo `test -f 'mvutf.cpp' || echo '$(srcdir)/'`mvutf.cpp
+
+libexodus_la-naturalorder.lo: naturalorder.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libexodus_la-naturalorder.lo -MD -MP -MF $(DEPDIR)/libexodus_la-naturalorder.Tpo -c -o libexodus_la-naturalorder.lo `test -f 'naturalorder.cpp' || echo '$(srcdir)/'`naturalorder.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libexodus_la-naturalorder.Tpo $(DEPDIR)/libexodus_la-naturalorder.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='naturalorder.cpp' object='libexodus_la-naturalorder.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libexodus_la-naturalorder.lo `test -f 'naturalorder.cpp' || echo '$(srcdir)/'`naturalorder.cpp
+
+libexodus_la-gettimeofday.lo: gettimeofday.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libexodus_la-gettimeofday.lo -MD -MP -MF $(DEPDIR)/libexodus_la-gettimeofday.Tpo -c -o libexodus_la-gettimeofday.lo `test -f 'gettimeofday.cpp' || echo '$(srcdir)/'`gettimeofday.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libexodus_la-gettimeofday.Tpo $(DEPDIR)/libexodus_la-gettimeofday.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='gettimeofday.cpp' object='libexodus_la-gettimeofday.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libexodus_la-gettimeofday.lo `test -f 'gettimeofday.cpp' || echo '$(srcdir)/'`gettimeofday.cpp
+
+libexodus_la-mv2.lo: mv2.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libexodus_la-mv2.lo -MD -MP -MF $(DEPDIR)/libexodus_la-mv2.Tpo -c -o libexodus_la-mv2.lo `test -f 'mv2.cpp' || echo '$(srcdir)/'`mv2.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libexodus_la-mv2.Tpo $(DEPDIR)/libexodus_la-mv2.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mv2.cpp' object='libexodus_la-mv2.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libexodus_la-mv2.lo `test -f 'mv2.cpp' || echo '$(srcdir)/'`mv2.cpp
+
+libexodus_la-mv.lo: mv.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libexodus_la-mv.lo -MD -MP -MF $(DEPDIR)/libexodus_la-mv.Tpo -c -o libexodus_la-mv.lo `test -f 'mv.cpp' || echo '$(srcdir)/'`mv.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libexodus_la-mv.Tpo $(DEPDIR)/libexodus_la-mv.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mv.cpp' object='libexodus_la-mv.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libexodus_la-mv.lo `test -f 'mv.cpp' || echo '$(srcdir)/'`mv.cpp
+
+libexodus_la-mvdbpostgres.lo: mvdbpostgres.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libexodus_la-mvdbpostgres.lo -MD -MP -MF $(DEPDIR)/libexodus_la-mvdbpostgres.Tpo -c -o libexodus_la-mvdbpostgres.lo `test -f 'mvdbpostgres.cpp' || echo '$(srcdir)/'`mvdbpostgres.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libexodus_la-mvdbpostgres.Tpo $(DEPDIR)/libexodus_la-mvdbpostgres.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mvdbpostgres.cpp' object='libexodus_la-mvdbpostgres.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libexodus_la-mvdbpostgres.lo `test -f 'mvdbpostgres.cpp' || echo '$(srcdir)/'`mvdbpostgres.cpp
+
+libexodus_la-mvenvironment.lo: mvenvironment.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libexodus_la-mvenvironment.lo -MD -MP -MF $(DEPDIR)/libexodus_la-mvenvironment.Tpo -c -o libexodus_la-mvenvironment.lo `test -f 'mvenvironment.cpp' || echo '$(srcdir)/'`mvenvironment.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libexodus_la-mvenvironment.Tpo $(DEPDIR)/libexodus_la-mvenvironment.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mvenvironment.cpp' object='libexodus_la-mvenvironment.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libexodus_la-mvenvironment.lo `test -f 'mvenvironment.cpp' || echo '$(srcdir)/'`mvenvironment.cpp
+
+libexodus_la-mvglobalfuncs.lo: mvglobalfuncs.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libexodus_la-mvglobalfuncs.lo -MD -MP -MF $(DEPDIR)/libexodus_la-mvglobalfuncs.Tpo -c -o libexodus_la-mvglobalfuncs.lo `test -f 'mvglobalfuncs.cpp' || echo '$(srcdir)/'`mvglobalfuncs.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libexodus_la-mvglobalfuncs.Tpo $(DEPDIR)/libexodus_la-mvglobalfuncs.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mvglobalfuncs.cpp' object='libexodus_la-mvglobalfuncs.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libexodus_la-mvglobalfuncs.lo `test -f 'mvglobalfuncs.cpp' || echo '$(srcdir)/'`mvglobalfuncs.cpp
+
+libexodus_la-mvipc.lo: mvipc.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libexodus_la-mvipc.lo -MD -MP -MF $(DEPDIR)/libexodus_la-mvipc.Tpo -c -o libexodus_la-mvipc.lo `test -f 'mvipc.cpp' || echo '$(srcdir)/'`mvipc.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libexodus_la-mvipc.Tpo $(DEPDIR)/libexodus_la-mvipc.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mvipc.cpp' object='libexodus_la-mvipc.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libexodus_la-mvipc.lo `test -f 'mvipc.cpp' || echo '$(srcdir)/'`mvipc.cpp
+
+libexodus_la-mvmv.lo: mvmv.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libexodus_la-mvmv.lo -MD -MP -MF $(DEPDIR)/libexodus_la-mvmv.Tpo -c -o libexodus_la-mvmv.lo `test -f 'mvmv.cpp' || echo '$(srcdir)/'`mvmv.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libexodus_la-mvmv.Tpo $(DEPDIR)/libexodus_la-mvmv.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mvmv.cpp' object='libexodus_la-mvmv.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libexodus_la-mvmv.lo `test -f 'mvmv.cpp' || echo '$(srcdir)/'`mvmv.cpp
+
+libexodus_la-mvunicode.lo: mvunicode.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libexodus_la-mvunicode.lo -MD -MP -MF $(DEPDIR)/libexodus_la-mvunicode.Tpo -c -o libexodus_la-mvunicode.lo `test -f 'mvunicode.cpp' || echo '$(srcdir)/'`mvunicode.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libexodus_la-mvunicode.Tpo $(DEPDIR)/libexodus_la-mvunicode.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mvunicode.cpp' object='libexodus_la-mvunicode.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libexodus_la-mvunicode.lo `test -f 'mvunicode.cpp' || echo '$(srcdir)/'`mvunicode.cpp
+
+libexodus_la-mvipc_boost.lo: mvipc_boost.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libexodus_la-mvipc_boost.lo -MD -MP -MF $(DEPDIR)/libexodus_la-mvipc_boost.Tpo -c -o libexodus_la-mvipc_boost.lo `test -f 'mvipc_boost.cpp' || echo '$(srcdir)/'`mvipc_boost.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libexodus_la-mvipc_boost.Tpo $(DEPDIR)/libexodus_la-mvipc_boost.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mvipc_boost.cpp' object='libexodus_la-mvipc_boost.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libexodus_la-mvipc_boost.lo `test -f 'mvipc_boost.cpp' || echo '$(srcdir)/'`mvipc_boost.cpp
+
+libexodus_la-mvipc_posix.lo: mvipc_posix.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libexodus_la-mvipc_posix.lo -MD -MP -MF $(DEPDIR)/libexodus_la-mvipc_posix.Tpo -c -o libexodus_la-mvipc_posix.lo `test -f 'mvipc_posix.cpp' || echo '$(srcdir)/'`mvipc_posix.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libexodus_la-mvipc_posix.Tpo $(DEPDIR)/libexodus_la-mvipc_posix.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mvipc_posix.cpp' object='libexodus_la-mvipc_posix.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libexodus_la-mvipc_posix.lo `test -f 'mvipc_posix.cpp' || echo '$(srcdir)/'`mvipc_posix.cpp
+
+libexodus_la-mvipc_ms.lo: mvipc_ms.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libexodus_la-mvipc_ms.lo -MD -MP -MF $(DEPDIR)/libexodus_la-mvipc_ms.Tpo -c -o libexodus_la-mvipc_ms.lo `test -f 'mvipc_ms.cpp' || echo '$(srcdir)/'`mvipc_ms.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libexodus_la-mvipc_ms.Tpo $(DEPDIR)/libexodus_la-mvipc_ms.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mvipc_ms.cpp' object='libexodus_la-mvipc_ms.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libexodus_la-mvipc_ms.lo `test -f 'mvipc_ms.cpp' || echo '$(srcdir)/'`mvipc_ms.cpp
+
+libexodus_la-mvposix.lo: mvposix.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libexodus_la-mvposix.lo -MD -MP -MF $(DEPDIR)/libexodus_la-mvposix.Tpo -c -o libexodus_la-mvposix.lo `test -f 'mvposix.cpp' || echo '$(srcdir)/'`mvposix.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libexodus_la-mvposix.Tpo $(DEPDIR)/libexodus_la-mvposix.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mvposix.cpp' object='libexodus_la-mvposix.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libexodus_la-mvposix.lo `test -f 'mvposix.cpp' || echo '$(srcdir)/'`mvposix.cpp
+
+libexodus_la-MurmurHash2_64.lo: MurmurHash2_64.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libexodus_la-MurmurHash2_64.lo -MD -MP -MF $(DEPDIR)/libexodus_la-MurmurHash2_64.Tpo -c -o libexodus_la-MurmurHash2_64.lo `test -f 'MurmurHash2_64.cpp' || echo '$(srcdir)/'`MurmurHash2_64.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libexodus_la-MurmurHash2_64.Tpo $(DEPDIR)/libexodus_la-MurmurHash2_64.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='MurmurHash2_64.cpp' object='libexodus_la-MurmurHash2_64.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libexodus_la-MurmurHash2_64.lo `test -f 'MurmurHash2_64.cpp' || echo '$(srcdir)/'`MurmurHash2_64.cpp
+
+libexodus_la-mvfunctor.lo: mvfunctor.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libexodus_la-mvfunctor.lo -MD -MP -MF $(DEPDIR)/libexodus_la-mvfunctor.Tpo -c -o libexodus_la-mvfunctor.lo `test -f 'mvfunctor.cpp' || echo '$(srcdir)/'`mvfunctor.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libexodus_la-mvfunctor.Tpo $(DEPDIR)/libexodus_la-mvfunctor.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mvfunctor.cpp' object='libexodus_la-mvfunctor.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libexodus_la-mvfunctor.lo `test -f 'mvfunctor.cpp' || echo '$(srcdir)/'`mvfunctor.cpp
+
+libexodus_la-mvprogram.lo: mvprogram.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libexodus_la-mvprogram.lo -MD -MP -MF $(DEPDIR)/libexodus_la-mvprogram.Tpo -c -o libexodus_la-mvprogram.lo `test -f 'mvprogram.cpp' || echo '$(srcdir)/'`mvprogram.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libexodus_la-mvprogram.Tpo $(DEPDIR)/libexodus_la-mvprogram.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mvprogram.cpp' object='libexodus_la-mvprogram.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libexodus_la-mvprogram.lo `test -f 'mvprogram.cpp' || echo '$(srcdir)/'`mvprogram.cpp
+
+libexodus_la-mvhandles.lo: mvhandles.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libexodus_la-mvhandles.lo -MD -MP -MF $(DEPDIR)/libexodus_la-mvhandles.Tpo -c -o libexodus_la-mvhandles.lo `test -f 'mvhandles.cpp' || echo '$(srcdir)/'`mvhandles.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libexodus_la-mvhandles.Tpo $(DEPDIR)/libexodus_la-mvhandles.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mvhandles.cpp' object='libexodus_la-mvhandles.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libexodus_la-mvhandles.lo `test -f 'mvhandles.cpp' || echo '$(srcdir)/'`mvhandles.cpp
+
+libexodus_la-mvdbconns.lo: mvdbconns.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libexodus_la-mvdbconns.lo -MD -MP -MF $(DEPDIR)/libexodus_la-mvdbconns.Tpo -c -o libexodus_la-mvdbconns.lo `test -f 'mvdbconns.cpp' || echo '$(srcdir)/'`mvdbconns.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libexodus_la-mvdbconns.Tpo $(DEPDIR)/libexodus_la-mvdbconns.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mvdbconns.cpp' object='libexodus_la-mvdbconns.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libexodus_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libexodus_la-mvdbconns.lo `test -f 'mvdbconns.cpp' || echo '$(srcdir)/'`mvdbconns.cpp
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -531,76 +700,6 @@ uninstall-library_includeHEADERS:
 	echo " ( cd '$(DESTDIR)$(library_includedir)' && rm -f" $$files ")"; \
 	cd "$(DESTDIR)$(library_includedir)" && rm -f $$files
 
-# This directory's subdirectories are mostly independent; you can cd
-# into them and run `make' without going through this Makefile.
-# To change the values of `make' variables: instead of editing Makefiles,
-# (1) if the variable is set in `config.status', edit `config.status'
-#     (which will cause the Makefiles to be regenerated when you run `make');
-# (2) otherwise, pass the desired values on the `make' command line.
-$(RECURSIVE_TARGETS):
-	@fail= failcom='exit 1'; \
-	for f in x $$MAKEFLAGS; do \
-	  case $$f in \
-	    *=* | --[!k]*);; \
-	    *k*) failcom='fail=yes';; \
-	  esac; \
-	done; \
-	dot_seen=no; \
-	target=`echo $@ | sed s/-recursive//`; \
-	list='$(SUBDIRS)'; for subdir in $$list; do \
-	  echo "Making $$target in $$subdir"; \
-	  if test "$$subdir" = "."; then \
-	    dot_seen=yes; \
-	    local_target="$$target-am"; \
-	  else \
-	    local_target="$$target"; \
-	  fi; \
-	  ($(am__cd) $$subdir && $(MAKE) $(AM_MAKEFLAGS) $$local_target) \
-	  || eval $$failcom; \
-	done; \
-	if test "$$dot_seen" = "no"; then \
-	  $(MAKE) $(AM_MAKEFLAGS) "$$target-am" || exit 1; \
-	fi; test -z "$$fail"
-
-$(RECURSIVE_CLEAN_TARGETS):
-	@fail= failcom='exit 1'; \
-	for f in x $$MAKEFLAGS; do \
-	  case $$f in \
-	    *=* | --[!k]*);; \
-	    *k*) failcom='fail=yes';; \
-	  esac; \
-	done; \
-	dot_seen=no; \
-	case "$@" in \
-	  distclean-* | maintainer-clean-*) list='$(DIST_SUBDIRS)' ;; \
-	  *) list='$(SUBDIRS)' ;; \
-	esac; \
-	rev=''; for subdir in $$list; do \
-	  if test "$$subdir" = "."; then :; else \
-	    rev="$$subdir $$rev"; \
-	  fi; \
-	done; \
-	rev="$$rev ."; \
-	target=`echo $@ | sed s/-recursive//`; \
-	for subdir in $$rev; do \
-	  echo "Making $$target in $$subdir"; \
-	  if test "$$subdir" = "."; then \
-	    local_target="$$target-am"; \
-	  else \
-	    local_target="$$target"; \
-	  fi; \
-	  ($(am__cd) $$subdir && $(MAKE) $(AM_MAKEFLAGS) $$local_target) \
-	  || eval $$failcom; \
-	done && test -z "$$fail"
-tags-recursive:
-	list='$(SUBDIRS)'; for subdir in $$list; do \
-	  test "$$subdir" = . || ($(am__cd) $$subdir && $(MAKE) $(AM_MAKEFLAGS) tags); \
-	done
-ctags-recursive:
-	list='$(SUBDIRS)'; for subdir in $$list; do \
-	  test "$$subdir" = . || ($(am__cd) $$subdir && $(MAKE) $(AM_MAKEFLAGS) ctags); \
-	done
-
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
 	unique=`for i in $$list; do \
@@ -611,23 +710,10 @@ ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	mkid -fID $$unique
 tags: TAGS
 
-TAGS: tags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
+TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 		$(TAGS_FILES) $(LISP)
 	set x; \
 	here=`pwd`; \
-	if ($(ETAGS) --etags-include --version) >/dev/null 2>&1; then \
-	  include_option=--etags-include; \
-	  empty_fix=.; \
-	else \
-	  include_option=--include; \
-	  empty_fix=; \
-	fi; \
-	list='$(SUBDIRS)'; for subdir in $$list; do \
-	  if test "$$subdir" = .; then :; else \
-	    test ! -f $$subdir/TAGS || \
-	      set "$$@" "$$include_option=$$here/$$subdir/TAGS"; \
-	  fi; \
-	done; \
 	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
 	unique=`for i in $$list; do \
 	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
@@ -646,7 +732,7 @@ TAGS: tags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 	  fi; \
 	fi
 ctags: CTAGS
-CTAGS: ctags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
+CTAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 		$(TAGS_FILES) $(LISP)
 	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
 	unique=`for i in $$list; do \
@@ -696,51 +782,22 @@ distdir: $(DISTFILES)
 	    || exit 1; \
 	  fi; \
 	done
-	@list='$(DIST_SUBDIRS)'; for subdir in $$list; do \
-	  if test "$$subdir" = .; then :; else \
-	    test -d "$(distdir)/$$subdir" \
-	    || $(MKDIR_P) "$(distdir)/$$subdir" \
-	    || exit 1; \
-	  fi; \
-	done
-	@list='$(DIST_SUBDIRS)'; for subdir in $$list; do \
-	  if test "$$subdir" = .; then :; else \
-	    dir1=$$subdir; dir2="$(distdir)/$$subdir"; \
-	    $(am__relativize); \
-	    new_distdir=$$reldir; \
-	    dir1=$$subdir; dir2="$(top_distdir)"; \
-	    $(am__relativize); \
-	    new_top_distdir=$$reldir; \
-	    echo " (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) top_distdir="$$new_top_distdir" distdir="$$new_distdir" \\"; \
-	    echo "     am__remove_distdir=: am__skip_length_check=: am__skip_mode_fix=: distdir)"; \
-	    ($(am__cd) $$subdir && \
-	      $(MAKE) $(AM_MAKEFLAGS) \
-	        top_distdir="$$new_top_distdir" \
-	        distdir="$$new_distdir" \
-		am__remove_distdir=: \
-		am__skip_length_check=: \
-		am__skip_mode_fix=: \
-	        distdir) \
-	      || exit 1; \
-	  fi; \
-	done
 check-am: all-am
-check: check-recursive
+check: check-am
 all-am: Makefile $(LTLIBRARIES) $(HEADERS)
-installdirs: installdirs-recursive
-installdirs-am:
+installdirs:
 	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(library_includedir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
-install: install-recursive
-install-exec: install-exec-recursive
-install-data: install-data-recursive
-uninstall: uninstall-recursive
+install: install-am
+install-exec: install-exec-am
+install-data: install-data-am
+uninstall: uninstall-am
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 
-installcheck: installcheck-recursive
+installcheck: installcheck-am
 install-strip:
 	$(MAKE) $(AM_MAKEFLAGS) INSTALL_PROGRAM="$(INSTALL_STRIP_PROGRAM)" \
 	  install_sh_PROGRAM="$(INSTALL_STRIP_PROGRAM)" INSTALL_STRIP_FLAG=-s \
@@ -757,73 +814,73 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-clean: clean-recursive
+clean: clean-am
 
 clean-am: clean-generic clean-libLTLIBRARIES clean-libtool \
 	mostlyclean-am
 
-distclean: distclean-recursive
+distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
 
-dvi: dvi-recursive
+dvi: dvi-am
 
 dvi-am:
 
-html: html-recursive
+html: html-am
 
 html-am:
 
-info: info-recursive
+info: info-am
 
 info-am:
 
 install-data-am: install-library_includeHEADERS
 	@$(NORMAL_INSTALL)
 	$(MAKE) $(AM_MAKEFLAGS) install-data-hook
-install-dvi: install-dvi-recursive
+install-dvi: install-dvi-am
 
 install-dvi-am:
 
 install-exec-am: install-libLTLIBRARIES
 
-install-html: install-html-recursive
+install-html: install-html-am
 
 install-html-am:
 
-install-info: install-info-recursive
+install-info: install-info-am
 
 install-info-am:
 
 install-man:
 
-install-pdf: install-pdf-recursive
+install-pdf: install-pdf-am
 
 install-pdf-am:
 
-install-ps: install-ps-recursive
+install-ps: install-ps-am
 
 install-ps-am:
 
 installcheck-am:
 
-maintainer-clean: maintainer-clean-recursive
+maintainer-clean: maintainer-clean-am
 	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
-mostlyclean: mostlyclean-recursive
+mostlyclean: mostlyclean-am
 
 mostlyclean-am: mostlyclean-compile mostlyclean-generic \
 	mostlyclean-libtool
 
-pdf: pdf-recursive
+pdf: pdf-am
 
 pdf-am:
 
-ps: ps-recursive
+ps: ps-am
 
 ps-am:
 
@@ -831,27 +888,23 @@ uninstall-am: uninstall-libLTLIBRARIES \
 	uninstall-library_includeHEADERS
 	@$(NORMAL_INSTALL)
 	$(MAKE) $(AM_MAKEFLAGS) uninstall-hook
-.MAKE: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) ctags-recursive \
-	install-am install-data-am install-strip tags-recursive \
-	uninstall-am
+.MAKE: install-am install-data-am install-strip uninstall-am
 
-.PHONY: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) CTAGS GTAGS \
-	all all-am check check-am clean clean-generic \
-	clean-libLTLIBRARIES clean-libtool ctags ctags-recursive \
-	distclean distclean-compile distclean-generic \
-	distclean-libtool distclean-tags distdir dvi dvi-am html \
-	html-am info info-am install install-am install-data \
-	install-data-am install-data-hook install-dvi install-dvi-am \
-	install-exec install-exec-am install-html install-html-am \
-	install-info install-info-am install-libLTLIBRARIES \
+.PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
+	clean-libLTLIBRARIES clean-libtool ctags distclean \
+	distclean-compile distclean-generic distclean-libtool \
+	distclean-tags distdir dvi dvi-am html html-am info info-am \
+	install install-am install-data install-data-am \
+	install-data-hook install-dvi install-dvi-am install-exec \
+	install-exec-am install-html install-html-am install-info \
+	install-info-am install-libLTLIBRARIES \
 	install-library_includeHEADERS install-man install-pdf \
 	install-pdf-am install-ps install-ps-am install-strip \
-	installcheck installcheck-am installdirs installdirs-am \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
-	pdf pdf-am ps ps-am tags tags-recursive uninstall uninstall-am \
-	uninstall-hook uninstall-libLTLIBRARIES \
-	uninstall-library_includeHEADERS
+	installcheck installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	tags uninstall uninstall-am uninstall-hook \
+	uninstall-libLTLIBRARIES uninstall-library_includeHEADERS
 
 
 #additional symbolic links but ...
@@ -860,6 +913,7 @@ uninstall-am: uninstall-libLTLIBRARIES \
 #libtool --config|grep ext
 #actlibfile=lib$(GENERIC_LIBRARY_NAME)-$(GENERIC_API_VERSION)$(LIBEXT).$(GENERIC_LIBRARY_VERSION)
 #symlibfile=lib$(GENERIC_LIBRARY_NAME)$(LIBEXT)
+
 install-data-hook:
 	( cd $(includedir) \
 		&& { $(LN_S) -f exodus-$(GENERIC_RELEASE)/exodus exodus \
@@ -873,10 +927,10 @@ install-data-hook:
 		|| echo "skipping ldconfig")
 uninstall-hook:
 	( cd $(includedir) \
-		&& { rm -f exodus ; } )
-	( cd $(includedir) \
 		&& { rm -rf exodus-$(GENERIC_RELEASE) ; } \
 	)
+	( cd $(includedir) \
+		&& { find -L exodus -type l -delete || echo "exodus wasnt pointing to version being deleted"; } )
 	( rm -f /etc/ld.so.conf.d/exodus-$(GENERIC_RELEASE).conf \
 		|| echo "/etc/ld.so.conf.d/exodus-$(GENERIC_RELEASE).conf doesnt exist or is already removed" \
 	)
