@@ -61,8 +61,15 @@ libexodus_la_LDFLAGS= \
  $(BOOST_LDFLAGS) $(BOOST_DATE_TIME_LDFLAGS) $(BOOST_FILESYSTEM_LDFLAGS) $(BOOST_REGEX_LDFLAGS) $(BOOST_SYSTEM_LDFLAGS) $(BOOST_THREAD_LDFLAGS) \
  $(POSTGRESQL_LDFLAGS)
 
-libexodus_la_LIBS= \
+libexodus_la_LIBADD= \
  $(BOOST_DATE_TIME_LIB) $(BOOST_FILESYSTEM_LIB) $(BOOST_REGEX_LIB) $(BOOST_SYSTEM_LIB) $(BOOST_THREAD_LIB)
+
+#libs for all links
+#LIBS += \
+#       $(BOOST_DATE_TIME_LIB) \
+#        $(BOOST_FILESYSTEM_LIB) \
+#        $(BOOST_THREAD_LIB) \
+#        $(BOOST_REGEX_LIB)
 
 #additional symbolic links but ...
 #doesnt work because cant workout exact library naming on all plaforms and libext is missing
