@@ -1,75 +1,68 @@
-## Source directory
+#-------------------------------
+# define source and header files
+#-------------------------------
 
-### not for now .. if restore then ALSO restore LIBADD= below
-#SUBDIRS = sub
-SUBDIRS = 
+h_sources = \
+ exodus.h exodusmacros.h mvenvironment.h mv.h mvlibs.h \
+ exodusfuncs.h mvexceptions.h mvimpl.h mvutf.h mvipc.h mvconfig.h \
+ mvlink.h mvfunctor.h program.h library.h dict.h mvprogram.h\
+ xfunctorf0.h xfunctorf1.h xfunctorf10.h xfunctorf11.h xfunctorf12.h \
+ xfunctorf13.h xfunctorf14.h xfunctorf15.h xfunctorf16.h xfunctorf17.h \
+ xfunctorf18.h xfunctorf19.h xfunctorf2.h xfunctorf20.h xfunctorf3.h \
+ xfunctorf4.h xfunctorf5.h xfunctorf6.h xfunctorf7.h xfunctorf8.h \
+ xfunctorf9.h xfunctors0.h xfunctors1.h xfunctors10.h xfunctors11.h \
+ xfunctors12.h xfunctors13.h xfunctors14.h xfunctors15.h xfunctors16.h \
+ xfunctors17.h xfunctors18.h xfunctors19.h xfunctors2.h xfunctors20.h \
+ xfunctors3.h xfunctors4.h xfunctors5.h xfunctors6.h xfunctors7.h \
+ xfunctors8.h xfunctors9.h
 
-#some header files
-h_sources = exodus.h exodusmacros.h mvenvironment.h mv.h mvlibs.h \
-exodusfuncs.h mvexceptions.h mvimpl.h mvutf.h mvipc.h mvconfig.h \
-mvlink.h mvfunctor.h program.h library.h dict.h mvprogram.h\
-xfunctorf0.h xfunctorf1.h xfunctorf10.h xfunctorf11.h xfunctorf12.h \
-xfunctorf13.h xfunctorf14.h xfunctorf15.h xfunctorf16.h xfunctorf17.h \
-xfunctorf18.h xfunctorf19.h xfunctorf2.h xfunctorf20.h xfunctorf3.h \
-xfunctorf4.h xfunctorf5.h xfunctorf6.h xfunctorf7.h xfunctorf8.h \
-xfunctorf9.h xfunctors0.h xfunctors1.h xfunctors10.h xfunctors11.h \
-xfunctors12.h xfunctors13.h xfunctors14.h xfunctors15.h xfunctors16.h \
-xfunctors17.h xfunctors18.h xfunctors19.h xfunctors2.h xfunctors20.h \
-xfunctors3.h xfunctors4.h xfunctors5.h xfunctors6.h xfunctors7.h \
-xfunctors8.h xfunctors9.h
+buildonly_h_sources = \
+ ConvertUTF.h NullCodecvt.h TConvert.h gettimeofday.h neo.h mvconfig.h \
+ MurmurHash2_64.h mvhandles.h mvdbconns.h
 
+cc_sources = \
+ ConvertUTF.c howto.cpp mvarray.cpp mvdatetime.cpp  mvdebug.cpp \
+ mvfuncs.cpp mvioconv.cpp mvlibs.cpp mvos.cpp \
+ mvutf.cpp naturalorder.cpp gettimeofday.cpp mv2.cpp mv.cpp \
+ mvdbpostgres.cpp mvenvironment.cpp mvglobalfuncs.cpp  \
+ mvipc.cpp mvmv.cpp mvunicode.cpp mvipc_boost.cpp mvipc_posix.cpp \
+ mvipc_ms.cpp mvposix.cpp MurmurHash2_64.cpp \
+ mvfunctor.cpp mvprogram.cpp mvhandles.cpp mvdbconns.cpp
 
-#some more headers
-buildonly_h_sources = ConvertUTF.h NullCodecvt.h TConvert.h gettimeofday.h neo.h mvconfig.h MurmurHash2_64.h \
-mvhandles.h mvdbconns.h
+#------------------------------------------------------
+# install public headers in {include}/exodus-99.99/exodus
+#------------------------------------------------------
 
+library_includedir= \
+ $(includedir)/$(GENERIC_LIBRARY_NAME)-$(GENERIC_API_VERSION)/$(GENERIC_LIBRARY_NAME)
 
-#source files
-cc_sources = ConvertUTF.c howto.cpp mvarray.cpp mvdatetime.cpp  mvdebug.cpp mvfuncs.cpp mvioconv.cpp mvlibs.cpp mvos.cpp \
-mvutf.cpp naturalorder.cpp gettimeofday.cpp mv2.cpp mv.cpp mvdbpostgres.cpp mvenvironment.cpp mvglobalfuncs.cpp  \
-mvipc.cpp mvmv.cpp mvunicode.cpp mvipc_boost.cpp mvipc_posix.cpp \
-mvipc_ms.cpp mvposix.cpp MurmurHash2_64.cpp \
-mvfunctor.cpp mvprogram.cpp mvhandles.cpp mvdbconns.cpp
+library_include_HEADERS = \
+ $(h_sources)
 
-#where to install the libraries include headers
-library_includedir=$(includedir)/$(GENERIC_LIBRARY_NAME)-$(GENERIC_API_VERSION)/$(GENERIC_LIBRARY_NAME)
-
-#name of the libraries include headers to be installed
-library_include_HEADERS = $(h_sources)
-
-#compiler flags for all compilations
-AM_CPPFLAGS = -I$(top_srcdir) $(BOOST_CPPFLAGS) $(POSTGRESQL_CFLAGS) \
- -Wall -Wextra -Wno-unknown-pragmas  
-
-#libs for all links
-LIBS += \
-	$(BOOST_DATE_TIME_LIB) \
-	$(BOOST_FILESYSTEM_LIB) \
-	$(BOOST_THREAD_LIB) \
-	$(BOOST_REGEX_LIB)
-
-#make a library with  libtools
-##############################
+#----------------------------------------------------------------
+# make a library with  libtools and install it in "lib" directory
+#----------------------------------------------------------------
 
 lib_LTLIBRARIES= libexodus.la
 
-#source code files for the library
-libexodus_la_SOURCES= $(h_sources) $(cc_sources) $(buildonly_h_sources)
+libexodus_la_SOURCES= \
+ $(h_sources) $(cc_sources) $(buildonly_h_sources)
 
-#compiler flags for the library - not used - using global AM_CPPFLAGS
-#libexodus_la_CPPFLAGS=$(BOOST_CPPFLAGS)
+libexodus_la_CPPFLAGS = \
+ -Wall -Wextra -Wno-unknown-pragmas \
+ -I$(top_srcdir) \
+ $(POSTGRESQL_CFLAGS) \
+ $(BOOST_CPPFLAGS) $(BOOST_DATE_TIME_CPPFLAGS) $(BOOST_FILESYSTEM_CPPFLAGS) \
+ $(BOOST_REGEX_CPPFLAGS) $(BOOST_SYSTEM_CPPFLAGS) $(BOOST_THREAD_CPPFLAGS)
 
-#linker lib names for the library - not used - using global LIBS
-#libexodus_la_LIBS= 
+libexodus_la_LDFLAGS= \
+ -version-info $(GENERIC_LIBRARY_VERSION) \
+ -release $(GENERIC_RELEASE) \
+ $(BOOST_LDFLAGS) $(BOOST_DATE_TIME_LDFLAGS) $(BOOST_FILESYSTEM_LDFLAGS) $(BOOST_REGEX_LDFLAGS) $(BOOST_SYSTEM_LDFLAGS) $(BOOST_THREAD_LDFLAGS) \
+ $(POSTGRESQL_LDFLAGS)
 
-#sublibs - not for now. needs SUBDIRS above too
-#libexodus_9_6_la_LIBADD= sub/libsub.la
-
-#linker flags for the library (-static and -static-libtool-libs seems to make a static .la library)
-libexodus_la_LDFLAGS= -version-info $(GENERIC_LIBRARY_VERSION) -release $(GENERIC_RELEASE) \
-$(BOOST_LDFLAGS) \
-$(BOOST_DATE_TIME_LDFLAGS) $(BOOST_FILESYSTEM_LDFLAGS) $(BOOST_REGEX_LDFLAGS) $(BOOST_SYSTEM_LDFLAGS) $(BOOST_THREAD_LDFLAGS) \
-$(POSTGRESQL_LDFLAGS)
+libexodus_la_LIBS= \
+ $(BOOST_DATE_TIME_LIB) $(BOOST_FILESYSTEM_LIB) $(BOOST_REGEX_LIB) $(BOOST_SYSTEM_LIB) $(BOOST_THREAD_LIB)
 
 #additional symbolic links but ...
 #doesnt work because cant workout exact library naming on all plaforms and libext is missing
@@ -77,6 +70,7 @@ $(POSTGRESQL_LDFLAGS)
 #libtool --config|grep ext
 #actlibfile=lib$(GENERIC_LIBRARY_NAME)-$(GENERIC_API_VERSION)$(LIBEXT).$(GENERIC_LIBRARY_VERSION)
 #symlibfile=lib$(GENERIC_LIBRARY_NAME)$(LIBEXT)
+
 install-data-hook:
 	( cd $(includedir) \
 		&& { $(LN_S) -f exodus-$(GENERIC_RELEASE)/exodus exodus \
@@ -90,10 +84,10 @@ install-data-hook:
 		|| echo "skipping ldconfig")
 uninstall-hook:
 	( cd $(includedir) \
-		&& { rm -f exodus ; } )
-	( cd $(includedir) \
 		&& { rm -rf exodus-$(GENERIC_RELEASE) ; } \
 	)
+	( cd $(includedir) \
+		&& { find -L exodus -type l -delete || echo "exodus wasnt pointing to version being deleted"; } )
 	( rm -f /etc/ld.so.conf.d/exodus-$(GENERIC_RELEASE).conf \
 		|| echo "/etc/ld.so.conf.d/exodus-$(GENERIC_RELEASE).conf doesnt exist or is already removed" \
 	)
