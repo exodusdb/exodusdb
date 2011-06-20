@@ -7,9 +7,35 @@ export SWIG_ALL_TARGETS="perl php python java csharp"
 
 export EXO_EXODUS_INCLUDE_FLAGS="-I../../exodus/exodus"
 export EXO_WRAPPER_FLAGS="-fPIC -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes"
-#export EXO_EXODUS_LDFLAGS="-lexodus"
-#attempt to build in exodus statically
-export EXO_EXODUS_LDFLAGS="-fPIC -Bstatic -lexodus -Bdynamic"
+
+export EXO_EXODUS_LINK="STATIC"
+if [ "$EXO_EXODUS_LINK" == "STATIC" ]; then
+
+ #can only link to exodus statically if compiled with -fPIC
+ export EXO_EXODUS_LINKTYPE="-Wl,-Bstatic"
+
+ export EXO_BOOST_LIBS=" -Wl,-lboost_date_time -Wl,-lboost_filesystem -Wl,-lboost_regex -Wl,-lboost_system -Wl,-lboost_thread"
+ export EXO_POSTGRES_LIBS=" -Wl,-lpq"
+ export EXO_ICU_LIBS=""
+
+ if [ "$EXO_BOOST_LINK" == "STATIC" ]; then
+  export EXO_BOOST_LINKTYPE="-Wl,-Bstatic"
+ else
+  export EXO_BOOST_LINKTYPE="-Wl,-Bdynamic"
+ fi
+
+ if [ "$EXO_POSTGRES_LINK" == "STATIC" ]; then
+  export EXO_POSTGRES_LINKTYPE="-Wl,-Bstatic"
+ else
+  export EXO_POSTGRES_LINKTYPE="-Wl,-Bdynamic"
+ fi
+
+fi
+
+export EXO_EXODUS_LDFLAGS=" \
+ $EXO_EXODUS_LINKTYPE -Wl,-lexodus \
+ $EXO_BOOST_LINKTYPE $EXO_BOOST_LIBS \
+ $EXO_POSTGRES_LINKTYPE $EXO_POSTGRES_LIBS"
 
 #defaults
 export SWIG_WRAPPER_EXT=cxx
