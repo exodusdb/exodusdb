@@ -21,7 +21,7 @@ cd ~/exodus/swig
 #------------
 #--- Perl ---
 #------------
-sudo yum install perl-devel
+sudo yum -y install perl-devel
 ./make.sh perl && sudo ./install.sh perl && ./test.pl
 
 #-------------
