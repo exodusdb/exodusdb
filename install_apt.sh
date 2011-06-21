@@ -1,5 +1,5 @@
 #!/bin/bash
-#=== Building and Installing Exodus on Ubuntu 10.04.2 LTS x64 ===
+#=== Building and Installing Exodus Using apt-get ===
 
 #cut and paste everything into a bash script and run it as follows:
 #nano install_apt.sh
