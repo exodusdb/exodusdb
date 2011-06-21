@@ -25,9 +25,11 @@ if (!$exo->connect($exo)) {
 
 	#write some records
 	$exo->begintrans();
-	$record=new exo::var("X")->str(1000);
+	$record=new exo::var("X");
+	$record=$record->str(1000);
+
 	for ($ii=1;$ii<=100;++$ii) {
-		$id=new exo::var($ii);
+		$id=new exo::var("XYZ");
 		if (!$record->write($filename,$id)) {
 			last;
 		}
