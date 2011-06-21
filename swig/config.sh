@@ -5,6 +5,12 @@ export SWIG_TARGET=$1
 
 export SWIG_ALL_TARGETS="perl python java csharp php" put php last because it exits somehow
 
+#php    ?/exo.php -> /usr/lib/php5/20090626+lfs/exo.so
+#python /usr/local/lib/python2.6/dist-packages/exodus.py -> _exodus.so (same dir)
+#perl   /etc/perl/exo.pm -> /usr/local/lib/exo.so
+#java   /usr/local/lib/jexodus.jar -> libjexodus.so (same dir)
+#csharp /usr/local/lib/exodus_library.dll ->  exodus_wrapper.so (same dir)
+
 export EXO_EXODUS_INCLUDE_FLAGS="-I../../exodus/exodus"
 export EXO_WRAPPER_FLAGS="-fPIC -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes"
 
@@ -62,11 +68,6 @@ export SWIG_MODULENAME="exodus"
 export SWIG_LOCAL_LIBDIR=/usr/local/lib
 test -d ${SWIG_LOCAL_LIBDIR}64 && export SWIG_LOCAL_LIBDIR=${SWIG_LOCAL_LIBDIR}64
 export SWIG_OPTIONS="-w503,314,389,361,362,370,383,384"
-
-#php    exodus.so in php extension dir
-#python _exodus.si in local lib
-#java   libexodus.so in local lib? but this conficts with main exodus library file name
-#perl   exodus.so in local lib (also exodus.pm in usr lib perl5
 
 #something like python2.6
 export SWIG_PYTHON_LIBCODE="`python --version 2>&1|cut -d'.' -f 1,2|sed -e 's/ //;y/P/p/'`"
