@@ -1,8 +1,11 @@
 #!/bin/bash
 set -e
 
-export EXO_MOD_PATH=/usr/local/lib
-export EXO_LIB_PATH=/usr/local/lib
+export LOCAL_LIBDIR=/usr/local/lib
+test -d ${LOCAL_LIBDIR}64 && export LOCAL_LIBDIR=${LOCAL_LIBDIR}64
+
+export EXO_MOD_PATH=$LOCAL_LIBDIR
+export EXO_LIB_PATH=$LOCAL_LIBDIR
 
 test -f test.exe && rm -f test.exe && echo rm -f test.exe
 

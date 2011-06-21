@@ -27,34 +27,39 @@ using System;
         Console.WriteLine(filename.quote());
         mvar options=new mvar("");
 
-        if (exo.connect(options))
-                Console.WriteLine("connected to default database");
-        else
+        if (!exo.connect(options))
                 Console.WriteLine("couldnt connect to default database");
+        else {
+                Console.WriteLine("connected to default database");
 
-        if (exo.open(filename,options))
-                Console.WriteLine("db file already existed.");
+	        if (exo.open(filename,options))
+	                Console.WriteLine("db file already existed.");
 
-        else if (exo.createfile(filename,options))
-                Console.WriteLine("db file created");
-        else
-                Console.WriteLine("db file not created");
+		else if (exo.createfile(filename,options))
+			Console.WriteLine("db file created");
+		else
+			Console.WriteLine("db file not created");
 
-        //write some records
-	exo.begintrans();
-	mvar record=(new mvar("X")).str(1000);
-        for (int ii=1;ii<=100;++ii) {
-                mvar id=new mvar(ii);
-                if (record.write(filename,id))
-                        break;
-                Console.Write(id+" ");
-        }
-        Console.WriteLine();
-	exo.committrans();
+	        //write some records
+		exo.begintrans();
+		mvar record=(new mvar("X")).str(1000);
+	        for (int ii=1;ii<=100;++ii) {
+	                mvar id=new mvar(ii);
+	                if (!record.write(filename,id))
+	                        break;
+	                Console.Write(id+" ");
+	        }
+	        Console.WriteLine();
+		exo.committrans();
 
-        mvar listoffiles=exo.listfiles();
-        Console.WriteLine(listoffiles);
-        Console.WriteLine(listoffiles.extract(1));
+	        mvar listoffiles=exo.listfiles();
+	        Console.WriteLine(listoffiles);
+	        Console.WriteLine(listoffiles.extract(1));
+
+	        if (filename.deletefile())
+	                Console.WriteLine("db file deleted");
+
+	}
 
         //mvar MT=new mvar("MT");
         string MTs="MT";
@@ -63,9 +68,6 @@ using System;
         Console.WriteLine("Pick Time: "+exo.time()+" is "+exo.time().oconv(MT));
 MT.seq().outputl();
         Console.WriteLine("Pick Time: "+exo.time()+" is "+exo.time().oconv(MTs));
-
-        if (filename.deletefile())
-                Console.WriteLine("db file deleted");
 
         Console.WriteLine("Finished");
 
