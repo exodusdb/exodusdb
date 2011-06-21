@@ -5,11 +5,11 @@ export SWIG_TARGET=$1
 
 export SWIG_ALL_TARGETS="perl python java csharp php" put php last because it exits somehow
 
-#php    ?/exo.php -> /usr/lib/php5/20090626+lfs/exo.so
+#php    ?/exo.php                         -> /usr/lib/php5/20090626+lfs/exo.so
 #python /usr/local/lib/python2.6/dist-packages/exodus.py -> _exodus.so (same dir)
-#perl   /etc/perl/exo.pm -> /usr/local/lib/exo.so
-#java   /usr/local/lib/jexodus.jar -> libjexodus.so (same dir)
-#csharp /usr/local/lib/exodus_library.dll ->  exodus_wrapper.so (same dir)
+#perl   /etc/perl/exo.pm                  -> /usr/local/lib/exo.so
+#java   /usr/local/lib/jexodus.jar        -> libjexodus.so (same dir)
+#csharp /usr/local/lib/exodus_library.dll -> exodus_wrapper.so (same dir)
 
 export EXO_EXODUS_INCLUDE_FLAGS="-I../../exodus/exodus"
 export EXO_WRAPPER_FLAGS="-fPIC -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes"
@@ -18,7 +18,9 @@ export EXO_EXODUS_LINK="NOTSTATIC"
 #cant link static on debian6 due to missing reference to icudt44_dat
 #Cant load /usr/local/lib/exo.so for module exo: /usr/local/lib/exo.so: undefined symbol: icudt44_dat
 #export EXO_EXODUS_LINK="STATIC"
-#[module - platform independent not .so]->someexoduswrapper.so->exodus.so->boost->icu and postgres
+#[module - (not .so/dll) platform INDEPENDENT .php .py .pm .jar .dll] (yes PLATFORM INDEPENDENT "DLL"!)
+# -> langexoduswrapper.so/dll -> standard exodus.so/dll -> boost libs -> icu and postgres libs
+#php=exo.so python=_exodus.so perl=exo.so java=jexodus.so csharp=exodus_library.so
 #therefore NONE are static if EXODUS isnt
 #if exodus is static then try to link boost and icu statically
 export EXO_BOOST_LINK="STATIC"
