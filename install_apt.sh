@@ -2,23 +2,25 @@
 #=== Building and Installing Exodus on Ubuntu 10.04.2 LTS x64 ===
 
 #cut and paste everything into a bash script and run it as follows:
-#nano installexodus.sh
-#chmod +x installexodus.sh
-#sudo ./installexodus.sh
+#nano install_apt.sh
+#chmod +x install_apt.sh
+#sudo ./install_apt.sh    #NOTE: NOT ./install_apt.sh
 
 #tested on:
-
-#Ubuntu 10.04.2 LTS
-#Linux lucid64 2.6.32-31-server #61-Ubuntu SMP Fri Apr 8 19:44:42 UTC 2011 x86_64 GNU/Linux
 
 uname -a
 cat /etc/issue
 
+#Ubuntu 10.04.2 LTS
+#Linux lucid64 2.6.32-31-server #61-Ubuntu SMP Fri Apr 8 19:44:42 UTC 2011 x86_64 GNU/Linux
+
+#Debian GNU/Linux 6.0 \n \l
+#Linux debian32 2.6.32-5-686 #1 SMP Wed May 18 07:08:50 UTC 2011 i686 GNU/Linux
 
 #==== 1. Building and Installing Exodus ====
 
 ###yum -y install subversion gcc-c++ postgresql-devel
-sudo apt-get -y install subversion g++ postgresql-server-dev*
+sudo apt-get -y install subversion g++ postgresql-server-dev* libboost-all-dev build-essential
 
 cd ~
 svn co HTTPS://exodusdb.googlecode.com/svn/trunk/ exodus
