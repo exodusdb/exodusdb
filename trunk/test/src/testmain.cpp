@@ -154,45 +154,47 @@ function main()
 
 	//windows locales Windows XP and Windows Server 2003
 	//http://msdn.microsoft.com/en-us/goglobal/bb895996.aspx
-	var english_us="";
+	var english_usuk="";
 	var german_standard="";
 	var greek_gr="";
 	var turkish_tr="";
-	var english_us_locale;
+	var english_usuk_locale;
 	var greek_gr_locale;
 	var turkish_tr_locale;
 	if (SLASH_IS_BACKSLASH) {
-		english_us=1033;
+		english_usuk=1033;
 		german_standard=1031;
 		greek_gr=1032;
 		turkish_tr=1055;
-		//english_us_locale="English";
+		//english_usuk_locale="English";
 		greek_gr_locale="Greek";
 		turkish_tr_locale="Turkish";
-		english_us_locale="English";
+		english_usuk_locale="English";
 		//greek_gr_locale=greek_gr;
 	} else {
-		english_us="en_US.utf8";
+		english_usuk="en_US.utf8";
 		german_standard="de_DE.utf8";
 		greek_gr="el_GR.utf8";
 		turkish_tr="tr_TR.utf8";
                 //try mac versions
                 //see locale -a for list
-                if (not setxlocale(english_us)) {
-                        english_us="en_US.UTF-8";
+                if (not setxlocale(english_usuk)) 
+			english_usuk="en_GB.utf8";
+                if (not setxlocale(english_usuk)) {
+                        english_usuk="en_US.UTF-8";
                         german_standard="de_DE.UTF-8";
                         greek_gr="el_GR.UTF-8";
                         turkish_tr="tr_TR.UTF-8";
                 }
-		english_us_locale=english_us;
+		english_usuk_locale=english_usuk;
 		greek_gr_locale=greek_gr;
 		turkish_tr_locale=turkish_tr;
 	}
 
 	//in English/US Locale
 	//check ASCII upper/lower casing
-//	setxlocale(english_us);
-	assert(setxlocale(english_us));
+//	setxlocale(english_usuk);
+	assert(setxlocale(english_usuk));
 	assert(ucase(LOWERCASE_) eq UPPERCASE_);
 	assert(lcase(UPPERCASE_) eq LOWERCASE_);
 
@@ -257,7 +259,7 @@ function main()
 	}
 	//restore initial locale
 	setxlocale(locale0);
-	setxlocale(english_us);
+	setxlocale(english_usuk);
 
 	var tempfilename5;
 	var record5;
@@ -323,7 +325,7 @@ function main()
 #ifndef __APPLE__
 	if (hasgreeklocale) {
 		var status1 = oswrite( unicode, "GreekLocalFile.txt", greek_gr_locale);
-		var status3 = oswrite( unicode, "GreekEnglFile.txt", english_us_locale);
+		var status3 = oswrite( unicode, "GreekEnglFile.txt", english_usuk_locale);
 	}
 #endif
 
