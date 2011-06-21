@@ -35,7 +35,7 @@ sudo yum install -y python-devel
 #-----------
 sudo yum install -y php-devel php-cli
 ./make.sh php && sudo ./install.sh php && ./test.php
-service httpd restart || echo "service httpd restart" failed
+sudo service httpd restart || echo "service httpd restart" failed
 
 #------------
 #--- Java ---
