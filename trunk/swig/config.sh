@@ -3,18 +3,18 @@ set -e
 
 export SWIG_TARGET=$1
 
-export SWIG_ALL_TARGETS="perl php python java csharp"
+export SWIG_ALL_TARGETS="perl python java csharp php" put php last because it exits somehow
 
 export EXO_EXODUS_INCLUDE_FLAGS="-I../../exodus/exodus"
 export EXO_WRAPPER_FLAGS="-fPIC -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes"
 
-export EXO_EXODUS_LINK="STATIC"
+export EXO_EXODUS_LINK="NOTSTATIC"
 if [ "$EXO_EXODUS_LINK" == "STATIC" ]; then
 
  #can only link to exodus statically if compiled with -fPIC
  export EXO_EXODUS_LINKTYPE="-Wl,-Bstatic"
 
- export EXO_BOOST_LIBS=" -Wl,-lboost_date_time -Wl,-lboost_filesystem -Wl,-lboost_regex -Wl,-lboost_system -Wl,-lboost_thread"
+ export EXO_BOOST_LIBS=" -L/usr/lib64 -Wl,-lboost_date_time -Wl,-lboost_filesystem -Wl,-lboost_regex -Wl,-lboost_system -Wl,-lboost_thread"
  export EXO_POSTGRES_LIBS=" -Wl,-lpq"
  export EXO_ICU_LIBS=""
 
@@ -42,6 +42,7 @@ export SWIG_WRAPPER_EXT=cxx
 export SWIG_MODULENAME="exodus"
 
 export SWIG_LOCAL_LIBDIR=/usr/local/lib
+test -d ${SWIG_LOCAL_LIBDIR}64 && export SWIG_LOCAL_LIBDIR=${SWIG_LOCAL_LIBDIR}64
 export SWIG_OPTIONS="-w503,314,389,361,362,370,383,384"
 
 #php    exodus.so in php extension dir
@@ -108,7 +109,7 @@ case $SWIG_TARGET in
 	export SWIG_TARGET_INCLUDE_FLAGS="`perl -MConfig -e 'print join(\" \", @Config{qw(ccflags optimize cccdlflags)}, \"-I$Config{archlib}/CORE\")'`"
 	export SWIG_TARGET_LDFLAGS="`perl -MConfig -e 'print $Config{lddlflags}'`"
 
-        export SWIG_TARGET_MODDIR="/usr/lib/perl5"
+        export SWIG_TARGET_MODDIR="`perl -e 'print @INC[0]'`"
 	test -d /usr/lib/perl5/site_perl && export SWIG_TARGET_MODDIR="/usr/lib/perl5/site_perl"
         export SWIG_TARGET_MODFILE="$SWIG_MODULENAME.pm"
 

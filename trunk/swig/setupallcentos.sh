@@ -4,41 +4,47 @@ set -e
 #-------------------------------
 #--- MUST Install Swig First ---
 #-------------------------------
-yum -y install pcre-devel
-wget http://downloads.sourceforge.net/project/swig/swig/swig-2.0.4/swig-2.0.4.tar.gz
-tar xf swig-2.0.4.tar.gz
-cd swig-2.0.4
-./configure --prefix=$HOME/local
-make && make install
+sudo yum install -y swig
+if [ "`swig -version | grep 1.3`" != "" ]; then
+ sudo yum -y install pcre-devel
+ cd ~
+ export SWIG_VER=2.0.4
+ wget http://downloads.sourceforge.net/project/swig/swig/swig-$SWIG_VER/swig-$SWIG_VER.tar.gz
+ tar xf swig-$SWIG_VER.tar.gz
+ cd swig-$SWIG_VER
+ ./configure --prefix=$HOME/local
+ make && sudo make install
+fi
 
 cd ~/exodus/swig
 
 #------------
 #--- Perl ---
 #------------
+sudo yum install perl-devel
 ./make.sh perl && sudo ./install.sh perl && ./test.pl
 
 #-------------
 #-- Python ---
 #-------------
-yum install -y python-devel
+sudo yum install -y python-devel
 ./make.sh python && sudo ./install.sh python && ./test.py
 
 #-----------
 #--- PHP ---
 #-----------
-yum install -y php-devel php-cli
+sudo yum install -y php-devel php-cli
 ./make.sh php && sudo ./install.sh php && ./test.php
 service httpd restart || echo "service httpd restart" failed
 
 #------------
 #--- Java ---
 #------------
-yum install -y java java-devel
+sudo yum install -y java java-devel
 ./make.sh java && sudo ./install.sh java && ./testjava.sh
 
 #----------
 #--- C# ---
 #----------
-yum install -y mono-devel
+sudo yum install -y mono-devel
 ./make.sh csharp && sudo ./install.sh csharp && ./testc#.sh

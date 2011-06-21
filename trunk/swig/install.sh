@@ -36,6 +36,7 @@ echo $PHPINIFILES
 if [ "$SWIG_TARGET_LIBDIR" != "" ]; then
 	echo
 	echo -ne "Installing $SWIG_TARGET library: "
+	test -d ${SWIG_TARGET_LIBDIR}64 && export SWIG_TARGET_LIBDIR=${SWIG_TARGET_LIBDIR}64
 	echo cp -f $SWIG_TARGET_LIBFILE $SWIG_TARGET_LIBDIR/
 	     cp -f $SWIG_TARGET_LIBFILE $SWIG_TARGET_LIBDIR/
 fi
@@ -49,7 +50,7 @@ fi
 
 if [ "$SWIG_MODULE_INSTALL" != "" ]; then
 	echo
-	echo -ne "Installing: "
+	echo -ne "Installing Module: "
 	echo eval $SWIG_MODULE_INSTALL
 	     eval $SWIG_MODULE_INSTALL
 fi
