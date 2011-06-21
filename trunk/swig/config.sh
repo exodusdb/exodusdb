@@ -9,6 +9,14 @@ export EXO_EXODUS_INCLUDE_FLAGS="-I../../exodus/exodus"
 export EXO_WRAPPER_FLAGS="-fPIC -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes"
 
 export EXO_EXODUS_LINK="NOTSTATIC"
+#cant link static on debian6 due to missing reference to icudt44_dat
+#Cant load /usr/local/lib/exo.so for module exo: /usr/local/lib/exo.so: undefined symbol: icudt44_dat
+#export EXO_EXODUS_LINK="STATIC"
+#module->wrapper->exodus.so->boost->icu and postgres
+#therefore NONE are static if EXODUS isnt
+#if exodus is static then try to link boost and icu statically
+export EXO_BOOST_LINK="STATIC"
+export EXO_ICU_LINK="STATIC"
 if [ "$EXO_EXODUS_LINK" == "STATIC" ]; then
 
  #can only link to exodus statically if compiled with -fPIC
@@ -24,6 +32,14 @@ if [ "$EXO_EXODUS_LINK" == "STATIC" ]; then
   export EXO_BOOST_LINKTYPE="-Wl,-Bdynamic"
  fi
 
+ export EXO_ICU_LIBS=" -Wl,-licudata -Wl,-licui18n -Wl,-licuuc"
+ #export EXO_ICU_LIBS=" -Wl,-licudata -Wl,-licui18n -Wl,-licuuc -Wl,-licuio -Wl,-licule -Wl,-liculx -Wl,-licutu"
+ if [ "$EXO_ICU_LINK" == "STATIC" ]; then
+  export EXO_ICU_LINKTYPE="-Wl,-Bstatic"
+ else
+  export EXO_ICU_LINKTYPE="-Wl,-Bdynamic"
+ fi
+
  if [ "$EXO_POSTGRES_LINK" == "STATIC" ]; then
   export EXO_POSTGRES_LINKTYPE="-Wl,-Bstatic"
  else
@@ -35,7 +51,9 @@ fi
 export EXO_EXODUS_LDFLAGS=" \
  $EXO_EXODUS_LINKTYPE -Wl,-lexodus \
  $EXO_BOOST_LINKTYPE $EXO_BOOST_LIBS \
- $EXO_POSTGRES_LINKTYPE $EXO_POSTGRES_LIBS"
+ $EXO_ICU_LINKTYPE $EXO_ICU_LIBS \
+ $EXO_POSTGRES_LINKTYPE $EXO_POSTGRES_LIBS \
+ "
 
 #defaults
 export SWIG_WRAPPER_EXT=cxx
