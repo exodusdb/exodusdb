@@ -3,8 +3,7 @@
 
 #cut and paste everything into a bash script and run it as follows:
 #nano install_apt.sh
-#chmod +x install_apt.sh
-#sudo ./install_apt.sh    #NOTE: NOT ./install_apt.sh
+#. install_apt.sh    #NOTE: NOT ./install_apt.sh
 
 #tested on:
 
