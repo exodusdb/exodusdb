@@ -5,12 +5,6 @@ export SWIG_TARGET=$1
 
 export SWIG_ALL_TARGETS="perl python java csharp php" put php last because it exits somehow
 
-#php    ?/exo.php                         -> /usr/lib/php5/20090626+lfs/exo.so
-#python /usr/local/lib/python2.6/dist-packages/exodus.py -> _exodus.so (same dir)
-#perl   /etc/perl/exo.pm                  -> /usr/local/lib/exo.so
-#java   /usr/local/lib/jexodus.jar        -> libjexodus.so (same dir)
-#csharp /usr/local/lib/exodus_library.dll -> exodus_wrapper.so (same dir)
-
 #[module - (not .so/dll) platform INDEPENDENT .php .py .pm .jar .dll] (yes PLATFORM INDEPENDENT "DLL"!)
 #  -> per lang exodus wrapper.so/dll
 #    -> standard exodus.so/dll
@@ -18,21 +12,21 @@ export SWIG_ALL_TARGETS="perl python java csharp php" put php last because it ex
 #         -> icu libs
 #         -> postgres libs
 
-#per lang exodus module names
+#per lang exodus module names and locations
 
-# php    = exo.php
-# python = exodus.py
-# perl   = exo.pm
-# java   = jexodus.jar
-# csharp = exodus_library.so
+# php    = exo.php             dumped in /usr/local/lib
+# python = exodus.py/pyc       only setup.py knows
+# perl   = exo.pm              eg /etc/perl
+# java   = jexodus.jar         dumped in /usr/local/lib
+# csharp = exodus_library.so   dumped in /usr/local/lib
 
-#per lang exodus wrapper names
+#per lang exodus wrapper names and locations
 
-# php    = exo.so
-# python = _exodus.so
-# perl   = exo.so
-# java   = jexodus.so
-# csharp = exodus_wrapper.so
+# php    = exo.so              php package dir
+# python = _exodus.so          only setup.py knows
+# perl   = exo.so              /usr/local/lib
+# java   = jexodus.so          dumped in /usr/local/lib
+# csharp = exodus_wrapper.so   dumped in /usr/local/lib
 
 export EXO_EXODUS_INCLUDE_FLAGS="-I../../exodus/exodus"
 export EXO_WRAPPER_FLAGS="-fPIC -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes"
