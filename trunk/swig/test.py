@@ -1,39 +1,36 @@
 #!/usr/bin/python
-
-print "--- Testing ---\n"
-
 from exodus import *
+xo=var()
 
-options=var("")
-if not var().connect(options):
-        print "no default database connection\n"
+print "--- Testing ---"
+
+filename="tempdbfile564"
+
+if xo.createfile(filename,""): 
+	print filename, " file created\n"
 else:
-        filename=var("tempdbfile564")
-        options=var("")
+	print filename, "file not created. maybe already exists. try deletefile filename\n"
 
-        if var().createfile(filename,options): 
-                print filename, " file created\n"
-        else:
-                print filename, "file not created. maybe already exists. try deletefile filename\n"
-        
+#transactions
+xo.begintrans()
 
-        #write some records
-	var().begintrans()
-	record=var("X").str(1000)
-        for ii in range(1,100):
-                id=var(ii)
-                if not record.write(filename,id):
-                        break
-                
-                print id," ",
-        print "\n"
-	var().committrans()
+#write some records
+record=var("X").str(1000)
 
-        if filename.deletefile():
-               print "filename file deleted\n"
-        
+for ii in range(1,100):
+	if not record.write(filename,ii):
+		break                
+	print ii,
+print
 
-print "Pick date:", var().date(), var().date().oconv(var("D"))
-print "Pick time:", var().time(), var().time().oconv(var("MT"))
+xo.committrans()
+
+print xo.listfiles()
+
+if var(filename).deletefile():
+	print "filename file deleted"
+
+print "Pick date:", xo.date(), xo.date().oconv("D")
+print "Pick time:", xo.time(), xo.time().oconv("MT")
 
 print "Finished"
