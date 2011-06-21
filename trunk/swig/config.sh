@@ -18,7 +18,7 @@ export EXO_EXODUS_LINK="NOTSTATIC"
 #cant link static on debian6 due to missing reference to icudt44_dat
 #Cant load /usr/local/lib/exo.so for module exo: /usr/local/lib/exo.so: undefined symbol: icudt44_dat
 #export EXO_EXODUS_LINK="STATIC"
-#module->wrapper->exodus.so->boost->icu and postgres
+#[module - platform independent not .so]->someexoduswrapper.so->exodus.so->boost->icu and postgres
 #therefore NONE are static if EXODUS isnt
 #if exodus is static then try to link boost and icu statically
 export EXO_BOOST_LINK="STATIC"
