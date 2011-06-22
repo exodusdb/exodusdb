@@ -6,7 +6,7 @@ export SWIG_TARGET=$1
 export SWIG_ALL_TARGETS="perl python java csharp php" put php last because it exits somehow
 
 #[module - (not .so/dll) platform INDEPENDENT .php .py .pm .jar .dll] (yes PLATFORM INDEPENDENT "DLL"!)
-#  -> per lang exodus wrapper.so/dll
+#  -> per-language exodus wrapper.so/dll
 #    -> standard exodus.so/dll
 #       -> boost libs
 #         -> icu libs
