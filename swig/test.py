@@ -25,10 +25,18 @@ print
 
 xo.committrans()
 
-print xo.listfiles()
+#enumerate db files
+dbfilenames=xo.listfiles()
+print dbfilenames
 
+#extract fields
+for ii in range(1,dbfilenames.dcount(FM)):
+	print ii,dbfilenames(ii)
+
+#delete the db file
 if var(filename).deletefile():
-	print "filename file deleted"
+	print filename," file deleted"
+
 
 print "Pick date:", xo.date(), xo.date().oconv("D")
 print "Pick time:", xo.time(), xo.time().oconv("MT")
