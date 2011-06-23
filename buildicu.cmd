@@ -1,17 +1,18 @@
 @echo on
-rem xp 2008 win7
+
+rem xp 2008 win7 to produce VS2005 VS2008 VS2010 libs respectively
 set SETENV_TARGET=2008
 set SOURCEDRV=F:
 set SOURCEDIR="\icu4c-4_6_1-src\icu\source\"
 
-%SOURCEDRV%
-cd %SOURCEDIR%
-
+rem if you dont want all options then remove the options you dont want
 set SETENV_PLATFORMS=x86 x64
 set CONFIGURATIONS=Release Debug
 set ACTIONS=clean build
-rem set ACTIONS=build
 set SUBDIRS=common i18n
+
+%SOURCEDRV%
+cd %SOURCEDIR%
 
 if "%SETENV_TARGET%" EQU "xp"   set BUILD_TARGET=v2.0
 if "%SETENV_TARGET%" EQU "2008" set BUILD_TARGET=v3.5
