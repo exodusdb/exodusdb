@@ -1681,6 +1681,10 @@ var var::remove(var& startchar1, var& delimiterno) const
 //SUM
 /////
 
+var var::sum() const
+{
+	return sum(VM);
+}
 
 var var::sum(const var& sepchar) const
 {

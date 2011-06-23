@@ -826,9 +826,9 @@ DLL_PUBLIC bool deletedb(const var& dbname, var& errmsg)
 	return var().deletedb(dbname, errmsg);
 }
 
-DLL_PUBLIC bool createfile(const var& filename,const var& options)
+DLL_PUBLIC bool createfile(const var& filename)
 {
-	return var().createfile(filename, options);
+	return var().createfile(filename);
 }
 
 DLL_PUBLIC bool deletefile(const var& filename)
@@ -1082,6 +1082,11 @@ DLL_PUBLIC bool locateusing(const var& target, const var& instring, const var& u
 DLL_PUBLIC var sum(const var& instring, const var& sepchar)
 {
 	return instring.sum(sepchar);
+}
+
+DLL_PUBLIC var sum(const var& instring)
+{
+	return instring.sum();
 }
 
 DLL_PUBLIC var listfiles()
