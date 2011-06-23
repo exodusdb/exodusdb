@@ -206,7 +206,7 @@ DLL_PUBLIC bool createdb(const var& dbname);
 DLL_PUBLIC bool deletedb(const var& dbname);
 DLL_PUBLIC bool createdb(const var& dbname, var& errmsg);
 DLL_PUBLIC bool deletedb(const var& dbname, var& errmsg);
-DLL_PUBLIC bool createfile(const var& filename,const var& options DEFAULTNULL);
+DLL_PUBLIC bool createfile(const var& filename);
 DLL_PUBLIC bool deletefile(const var& filename);
 DLL_PUBLIC bool clearfile(const var& filename);
 DLL_PUBLIC var listfiles();
@@ -272,7 +272,8 @@ DLL_PUBLIC bool locateby(const var& instring, const var& target, const wchar_t* 
 DLL_PUBLIC bool locateby(const var& instring, const var& target, const var& ordercode, var& setting, const int fieldno=0,const int valueno=0);
 DLL_PUBLIC bool locateusing(const var& instring, const var& target, const var& usingchar, var& setting, const int fieldno=0, const int valueno=0, const int subvalueno=0);
 DLL_PUBLIC bool locateusing(const var& instring, const var& target, const var& usingchar);
-DLL_PUBLIC var sum(const var& instring, const var& sepchar=VM_);
+DLL_PUBLIC var sum(const var& instring, const var& sepchar);
+DLL_PUBLIC var sum(const var& instring);
 
 template<class T1, class T2>
 void print(T1 arg1, T2 arg2)

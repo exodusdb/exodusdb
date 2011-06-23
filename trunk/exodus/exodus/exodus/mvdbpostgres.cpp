@@ -1305,24 +1305,17 @@ bool var::deletedb(const var& dbname, var& errmsg) const
 	return sqlexec(L"DROP DATABASE "^dbname, errmsg);
 }
 
-//ALN:TODO: whats with options ? should be errmsg ?
-bool var::createfile(const var& filename, const var& options)
+bool var::createfile(const var& filename)
 {
-	THISIS(L"bool var::createfile(const var& filename, const var& options)")
+	THISIS(L"bool var::createfile(const var& filename)")
 	// *this is not used
 	THISISDEFINED()
 	ISSTRING(filename)
-	ISSTRING(options)
 
 	//var tablename = L"TEMP" ^ var(100000000).rnd();
 	//Postgres The ON COMMIT clause for temporary tables also resembles the SQL standard, but has some differences. If the ON COMMIT clause is omitted, SQL specifies that the default behavior is ON COMMIT DELETE ROWS. However, the default behavior in PostgreSQL is ON COMMIT PRESERVE ROWS. The ON COMMIT DROP option does not exist in SQL.
 
-	var sql = L"CREATE";
-	//if (options.ucase().index(L"TEMPORARY")) sql ^= L" TEMPORARY";
-	//sql ^= L" TABLE " PGDATAFILEPREFIX ^ filename.convert(L".",L"_");
-	sql ^= L" TABLE " PGDATAFILEPREFIX ^ filename;
-	sql ^= L" (key bytea primary key, data bytea)";
-
+/* surely we dont need to do this here because the default connection will be obtained in sqlexec?!
 	if (! THIS_IS_DBCONN())		// this object has no idea about connection
 	{
 		// Lets use default connection
@@ -1339,6 +1332,13 @@ bool var::createfile(const var& filename, const var& options)
 			var_mvstr = L"";
 		}
 	}
+*/
+	var sql = L"CREATE";
+	//if (options.ucase().index(L"TEMPORARY")) sql ^= L" TEMPORARY";
+	//sql ^= L" TABLE " PGDATAFILEPREFIX ^ filename.convert(L".",L"_");
+	sql ^= L" TABLE " PGDATAFILEPREFIX ^ filename;
+	sql ^= L" (key bytea primary key, data bytea)";
+
 	return sqlexec(sql);
 }
 

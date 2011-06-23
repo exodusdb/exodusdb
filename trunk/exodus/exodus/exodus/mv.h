@@ -1007,7 +1007,8 @@ public:
 	bool locateby(const var& target, const var& ordercode, var& setting, const int fieldno=0,const int valueno=0) const;
 	bool locateusing(const var& target, const var& usingchar, var& setting, const int fieldno=0, const int valueno=0, const int subvalueno=0) const;
 	bool locateusing(const var& target, const var& usingchar) const;
-	var sum(const var& sepchar DEFAULTVM) const;
+	var sum(const var& sepchar) const;
+	var sum() const;
 
 	//var FILE I/O
 
@@ -1024,7 +1025,7 @@ public:
 	bool createdb(const var& dbname, var& errmsg) const;
 	bool deletedb(const var& dbname, var& errmsg) const;
 
-	bool createfile(const var& filename, const var& options DEFAULTNULL);
+	bool createfile(const var& filename);
 	bool deletefile() const;
 	bool clearfile() const;
 	var listfiles() const;
