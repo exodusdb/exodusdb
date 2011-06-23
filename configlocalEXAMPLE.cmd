@@ -28,6 +28,14 @@ rem TOOLSET
 rem -------
 rem set EXO_TOOLSET=SDK71*
 rem set EXO_TOOLSET=VS2005
+rem use highest available unless specified below
+rem if SDK may be higher than Visual Studio version installed
+rem then you need to specify here which VS version to us
+rem 80/90/100 is VS2005/VS2008/VS2010
+rem set EXO_VS=%VS110COMNTOOLS%
+rem set EXO_VS=%VS100COMNTOOLS%
+rem set EXO_VS=%VS90COMNTOOLS%
+rem set EXO_VS=%VS80COMNTOOLS%
 rem
 rem --------------------------------------------------------------
 rem 
