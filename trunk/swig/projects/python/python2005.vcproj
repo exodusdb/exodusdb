@@ -197,7 +197,7 @@
 				>
 				<Tool
 					Name="VCCustomBuildTool"
-					CommandLine="echo Invoking SWIG... Installing into $(EXO_PYTHON32_MODULEDIR)&#x0D;&#x0A;echo on&#x0D;&#x0A;$(SWIG32)\swig.exe -c++ -python -module $(EXO_PYTHON_MODULENAME) -I..\..\..\exodus\exodus -outcurrentdir -outdir $(EXO_PYTHON32_MODULEDIR) $(EXO_SWIG_OPTIONS) &quot;$(InputPath)&quot;&#x0D;&#x0A;@echo off&#x0D;&#x0A;"
+					CommandLine="echo Invoking SWIG... Installing into $(EXO_PYTHON32_MODULEDIR)&#x0D;&#x0A;echo on&#x0D;&#x0A;$(EXO_SWIG32)\swig.exe -c++ -python -module $(EXO_PYTHON_MODULENAME) -I..\..\..\exodus\exodus -outcurrentdir -outdir $(EXO_PYTHON32_MODULEDIR) $(EXO_SWIG_OPTIONS) &quot;$(InputPath)&quot;&#x0D;&#x0A;@echo off&#x0D;&#x0A;"
 					AdditionalDependencies="..\..\..\exodus\exodus\exodus\mv.h"
 					Outputs="$(InputName)_wrap.cxx"
 				/>
@@ -207,7 +207,7 @@
 				>
 				<Tool
 					Name="VCCustomBuildTool"
-					CommandLine="echo Invoking SWIG... Installing into $(EXO_PYTHON32_MODULEDIR)&#x0D;&#x0A;echo on&#x0D;&#x0A;$(SWIG32)\swig.exe -c++ -python -module $(EXO_PYTHON_MODULENAME) -I..\..\..\exodus\exodus -outcurrentdir -outdir $(EXO_PYTHON32_MODULEDIR) $(EXO_SWIG_OPTIONS) &quot;$(InputPath)&quot;&#x0D;&#x0A;@echo off&#x0D;&#x0A;"
+					CommandLine="echo Invoking SWIG... Installing into $(EXO_PYTHON32_MODULEDIR)&#x0D;&#x0A;echo on&#x0D;&#x0A;$(EXO_SWIG32)\swig.exe -c++ -python -module $(EXO_PYTHON_MODULENAME) -I..\..\..\exodus\exodus -outcurrentdir -outdir $(EXO_PYTHON32_MODULEDIR) $(EXO_SWIG_OPTIONS) &quot;$(InputPath)&quot;&#x0D;&#x0A;@echo off&#x0D;&#x0A;"
 					AdditionalDependencies="..\..\..\exodus\exodus\exodus\mv.h"
 					Outputs="$(InputName)_wrap.cxx"
 				/>

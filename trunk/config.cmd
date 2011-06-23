@@ -360,8 +360,8 @@ set EXO_PERL64_MODULEDIR=%EXO_PERL64%\site\lib
 rem ---------------
 rem ----- PHP -----
 rem ---------------
-    set PHP32=%EXO_PROGRAMFILES_ROOT%\%EXO_PHP_PREFIX%%EXO_PHP_VER%
-    set PHP64=%EXO_PROGRAMFILES_ROOT%\%EXO_PHP_PREFIX%%EXO_PHP_VER%
+    set EXO_PHP32=%EXO_PROGRAMFILES_ROOT%\%EXO_PHP_PREFIX%%EXO_PHP_VER%
+    set EXO_PHP64=%EXO_PROGRAMFILES_ROOT%\%EXO_PHP_PREFIX%%EXO_PHP_VER%
 
 rem check php master directory exists
     if "%TARGET_CPU%" EQU "x86" set EXO_PHP=%EXO_PHP32%
