@@ -63,6 +63,8 @@
 
 //%rename(__repr__) toString;
 %rename(__str__) toString;
+%rename(__int__) toInt;
+%rename(__float__) toDouble;
 #endif
 
 #ifdef SWIGPHP
