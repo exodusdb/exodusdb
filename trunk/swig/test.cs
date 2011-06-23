@@ -35,7 +35,7 @@ using System;
 	        if (exo.open(filename,options))
 	                Console.WriteLine("db file already existed.");
 
-		else if (exo.createfile(filename,options))
+		else if (exo.createfile(filename))
 			Console.WriteLine("db file created");
 		else
 			Console.WriteLine("db file not created");

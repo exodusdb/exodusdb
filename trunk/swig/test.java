@@ -19,7 +19,7 @@ public static void main(String argv[]) {
 	        filename=new var("tempdbfile564");
         	options=new var("");
 
-	        if (exo.createfile(filename,options)) {
+	        if (exo.createfile(filename)) {
         	        System.out.println("filename file created");
         	}else{
                 	System.out.println("filename file not created. maybe already exists. try deletefile filename");

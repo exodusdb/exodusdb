@@ -1,6 +1,6 @@
 %module(docstring="An interface to Exodus") exodus
 
-%include "swig.swg"
+%include <swig.swg>
 
 #ifdef SWIGCSHARP
 //if you change "mvar" then it also need to be changed in build scripts prebuildcsharp.cmd and config.sh
@@ -13,8 +13,11 @@
 %include "csharp/wchar.i"
 %include "exception.i"
 %include <std_string.i>
+
 %ignore exodus::var::var(wchar_t const *);
 %ignore exodus::var::var(char const *);
+
+//prebuildcsharp.cmd adds OVERRIDE replce "public string ToString" with "public override string ToString"
 %rename (ToString) toString;
 #endif
 
@@ -64,7 +67,10 @@
 //%rename(__repr__) toString;
 %rename(__str__) toString;
 %rename(__int__) toInt;
-%rename(__float__) toDouble;
+
+//not necessary? since __nonzero__ is automatic from exodus var operator bool
+//%rename(__nonzero__) toBool;
+
 #endif
 
 #ifdef SWIGPHP
@@ -86,12 +92,13 @@
 #endif
 
 #ifdef SWIGPERL
-%include "perl5/perl5.swg"
-//%include "perl5/perlmain.i"
-%include "perl5/typemaps.i"
-%include "perl5/std_string.i"
-//%include "std/std_basic_string.i"
-//%include "std/std_wstring.i"
+
+%include <typemaps/implicit.swg>
+%include <perl5.swg>
+%include <typemaps.i>
+%include <std_string.i>
+//%include <std_wstring.i>
+%include <wchar.i>
 
 //http://perldoc.perl.org/overload.html
 
@@ -149,15 +156,42 @@
 //%rename (connect) connect_renamed;
 //%rename (select) select_renamed;
 //%rename (abort) abort_renamed;
+//%implicitconv var;
+
+%fragment("SWIG_AsVal_wchar_t", "header", fragment="<wchar.h>") {
+    SWIGINTERN int SWIG_AsVal_wchar_t(PlObject* p, wchar_t* c) {
+        return SWIG_OK;
+    }
+}
+%fragment("SWIG_From_wchar_t", "header", fragment="<wchar.h>") {
+    SWIGINTERNINLINE PlObject* SWIG_From_wchar_t(wchar_t c) {
+        return SWIG_Pl_Void();
+    }
+} 
+
+%fragment("SWIG_AsVal_char", "header", fragment="<char.h>") {
+    SWIGINTERN int SWIG_AsVal_char(PlObject* p, char* c) {
+        return SWIG_OK;
+    }
+}
+%fragment("SWIG_From_char", "header", fragment="<char>") {
+    SWIGINTERNINLINE PlObject* SWIG_From_char(char c) {
+        return SWIG_Pl_Void();
+    }
+} 
 
 #endif
 
+//#define EXO_MVENVIRONMENT_CPP
+
 %{
-#include "exodus/mv.h"
 //#include "exodus/mvenvironment.h"
 //#include "exodus/exodusfuncs.h"
+//#include "exodus/exodusmacros.h"
+#include "exodus/mv.h"
 %}
 
-%include "exodus/mv.h"
 //%include "exodus/mvenvironment.h"
 //%include "exodus/exodusfuncs.h"
+//%include "exodus/exodusmacros.h"
+%include "exodus/mv.h"

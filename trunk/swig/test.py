@@ -6,7 +6,7 @@ print "--- Testing ---"
 
 filename="tempdbfile564"
 
-if xo.createfile(filename,""): 
+if xo.createfile(filename): 
 	print filename, " file created\n"
 else:
 	print filename, "file not created. maybe already exists. try deletefile filename\n"
