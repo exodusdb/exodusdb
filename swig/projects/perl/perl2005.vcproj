@@ -199,7 +199,7 @@
 				>
 				<Tool
 					Name="VCCustomBuildTool"
-					CommandLine="echo Invoking SWIG... Installing into $(EXO_PERL32_MODULEDIR)&#x0D;&#x0A;echo on&#x0D;&#x0A;$(SWIG32)\swig.exe -c++ -perl -module $(EXO_PERL_MODULENAME) -outdir $(EXO_PERL32_MODULEDIR) -I..\..\..\exodus\exodus -outcurrentdir $(EXO_SWIG_OPTIONS) &quot;$(InputPath)&quot;&#x0D;&#x0A;@echo off&#x0D;&#x0A;"
+					CommandLine="echo Invoking SWIG... Installing into $(EXO_PERL32_MODULEDIR)&#x0D;&#x0A;echo on&#x0D;&#x0A;$(EXO_SWIG32)\swig.exe -c++ -perl -module $(EXO_PERL_MODULENAME) -outdir $(EXO_PERL32_MODULEDIR) -I..\..\..\exodus\exodus -outcurrentdir $(EXO_SWIG_OPTIONS) &quot;$(InputPath)&quot;&#x0D;&#x0A;@echo off&#x0D;&#x0A;"
 					AdditionalDependencies="..\..\..\exodus\exodus\exodus\mv.h"
 					Outputs="$(InputName)_wrap.cxx"
 				/>
@@ -209,11 +209,15 @@
 				>
 				<Tool
 					Name="VCCustomBuildTool"
-					CommandLine="echo Invoking SWIG... Installing into $(EXO_PERL32_MODULEDIR)&#x0D;&#x0A;echo on&#x0D;&#x0A;$(SWIG32)\swig.exe -c++ -perl -module $(EXO_PERL_MODULENAME) -outdir $(EXO_PERL32_MODULEDIR) -I..\..\..\exodus\exodus -outcurrentdir $(EXO_SWIG_OPTIONS) &quot;$(InputPath)&quot;&#x0D;&#x0A;@echo off&#x0D;&#x0A;"
+					CommandLine="echo Invoking SWIG... Installing into $(EXO_PERL32_MODULEDIR)&#x0D;&#x0A;echo on&#x0D;&#x0A;$(EXO_SWIG32)\swig.exe -c++ -perl -module $(EXO_PERL_MODULENAME) -outdir $(EXO_PERL32_MODULEDIR) -I..\..\..\exodus\exodus -outcurrentdir $(EXO_SWIG_OPTIONS) &quot;$(InputPath)&quot;&#x0D;&#x0A;@echo off&#x0D;&#x0A;"
 					AdditionalDependencies="..\..\..\exodus\exodus\exodus\mv.h"
 					Outputs="$(InputName)_wrap.cxx"
 				/>
 			</FileConfiguration>
+		</File>
+		<File
+			RelativePath="..\..\test.pl"
+			>
 		</File>
 	</Files>
 	<Globals>

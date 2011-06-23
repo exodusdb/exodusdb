@@ -16,7 +16,7 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(EXO_CSHARP32_MODULEDIR)"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="2"
@@ -96,7 +96,7 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(EXO_CSHARP32_MODULEDIR)"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="2"
@@ -201,7 +201,7 @@
 				>
 				<Tool
 					Name="VCCustomBuildTool"
-					CommandLine="prebuildcsharp.cmd $(SWIG32) $(EXO_CSHARP32_MODULEDIR) $(EXO_CSHARP_PACKAGE_SUBDIR) $(EXO_CSHARP32_BIN) $(EXO_CSHARP_MODULENAME) $(EXO_CSHARP_WRAPPER_NAME) $(EXO_SWIG_OPTIONS)&#x0D;&#x0A;"
+					CommandLine="prebuildcsharp.cmd $(EXO_SWIG32) $(EXO_CSHARP32_MODULEDIR) $(EXO_CSHARP_PACKAGE_SUBDIR) $(EXO_CSHARP32_BIN) $(EXO_CSHARP_MODULENAME) $(EXO_CSHARP_WRAPPER_NAME) $(EXO_SWIG_OPTIONS)&#x0D;&#x0A;"
 					AdditionalDependencies="..\..\..\exodus\exodus\exodus\mv.h;..\prebuildcsharp.cmd"
 					Outputs="$(InputName)_wrap.cxx"
 				/>
@@ -211,7 +211,7 @@
 				>
 				<Tool
 					Name="VCCustomBuildTool"
-					CommandLine="prebuildcsharp.cmd $(SWIG32) $(EXO_CSHARP32_MODULEDIR) $(EXO_CSHARP_PACKAGE_SUBDIR) $(EXO_CSHARP32_BIN) $(EXO_CSHARP_MODULENAME) $(EXO_CSHARP_WRAPPER_NAME) $(EXO_SWIG_OPTIONS)&#x0D;&#x0A;"
+					CommandLine="prebuildcsharp.cmd $(EXO_SWIG32) $(EXO_CSHARP32_MODULEDIR) $(EXO_CSHARP_PACKAGE_SUBDIR) $(EXO_CSHARP32_BIN) $(EXO_CSHARP_MODULENAME) $(EXO_CSHARP_WRAPPER_NAME) $(EXO_SWIG_OPTIONS)&#x0D;&#x0A;"
 					AdditionalDependencies="..\..\..\exodus\exodus\exodus\mv.h;..\prebuildcsharp.cmd"
 					Outputs="$(InputName)_wrap.cxx"
 				/>
@@ -223,6 +223,10 @@
 		</File>
 		<File
 			RelativePath=".\prebuildcsharp.cmd"
+			>
+		</File>
+		<File
+			RelativePath="..\..\testc#.cmd"
 			>
 		</File>
 	</Files>

@@ -120,12 +120,12 @@ rem -------------------
     set EXO_JAVA_MODULENAME=jexodus
 
     rem 2. java package name determines the name of the jar and import statement
-    rem EG exodus.jar and import exodus.*;
-    set EXO_JAVA_PACKAGE_NAME=exodus
-    set EXO_JAVA_PACKAGE_SUBDIR=exodus
-rem eg org.exodus.jar and import org.exodus.*;
-rem set EXO_JAVA_PACKAGE_NAME=org.exodus
-rem set EXO_JAVA_PACKAGE_SUBDIR=org\exodus
+    rem EG jexodus.jar and import jexodus.*; MUST BE THE SAME AS THE MODULENAME ABOVE
+    set EXO_JAVA_PACKAGE_NAME=%EXO_JAVA_MODULENAME%
+    set EXO_JAVA_PACKAGE_SUBDIR=%EXO_JAVA_MODULENAME%
+rem eg org.jexodus.jar and import org.jexodus.*;
+rem set EXO_JAVA_PACKAGE_NAME=org.%EXO_JAVA_MODULENAME%
+rem set EXO_JAVA_PACKAGE_SUBDIR=org\%EXO_JAVA_MODULENAME%
 
     set EXO_CSHARP_MODULENAME=exodus_library
     set EXO_CSHARP_WRAPPER_NAME=exodus_wrapper
@@ -289,8 +289,8 @@ rem ----- SWIG -----
 rem ----------------
     set EXO_SWIG_OPTIONS=-w503,314,389,361,362,370,383,384
 
-    set SWIG32=%EXO_PROGRAMFILES_ROOT%\%EXO_SWIG_PREFIX%%EXO_SWIG_VER%
-    set SWIG64=%EXO_PROGRAMFILES_ROOT%\%EXO_SWIG_PREFIX%%EXO_SWIG_VER%
+    set EXO_SWIG32=%EXO_PROGRAMFILES_ROOT%\%EXO_SWIG_PREFIX%%EXO_SWIG_VER%
+    set EXO_SWIG64=%EXO_PROGRAMFILES_ROOT%\%EXO_SWIG_PREFIX%%EXO_SWIG_VER%
 
 rem check postgres master directory exists
     if "%TARGET_CPU%" EQU "x86" set EXO_SWIG=%EXO_SWIG32%

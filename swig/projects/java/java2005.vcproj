@@ -201,7 +201,7 @@
 				>
 				<Tool
 					Name="VCCustomBuildTool"
-					CommandLine="prebuildjava.cmd $(SWIG32) $(EXO_JAVA32_MODULEDIR) $(EXO_JAVA_PACKAGE_SUBDIR) $(EXO_JAVA32_BIN) $(EXO_JAVA_MODULENAME) $(EXO_JAVA_PACKAGE_NAME) $(EXO_SWIG_OPTIONS)&#x0D;&#x0A;"
+					CommandLine="prebuildjava.cmd $(EXO_SWIG32) $(EXO_JAVA32_MODULEDIR) $(EXO_JAVA_PACKAGE_SUBDIR) $(EXO_JAVA32_BIN) $(EXO_JAVA_MODULENAME) $(EXO_JAVA_PACKAGE_NAME) $(EXO_SWIG_OPTIONS)&#x0D;&#x0A;"
 					AdditionalDependencies="..\..\..\exodus\exodus\exodus\mv.h;..\prebuildjava.cmd"
 					Outputs="$(InputName)_wrap.cxx"
 				/>
@@ -211,7 +211,7 @@
 				>
 				<Tool
 					Name="VCCustomBuildTool"
-					CommandLine="prebuildjava.cmd $(SWIG32) $(EXO_JAVA32_MODULEDIR) $(EXO_JAVA_PACKAGE_SUBDIR) $(EXO_JAVA32_BIN) $(EXO_JAVA_MODULENAME) $(EXO_JAVA_PACKAGE_NAME) $(EXO_SWIG_OPTIONS)&#x0D;&#x0A;"
+					CommandLine="prebuildjava.cmd $(EXO_SWIG32) $(EXO_JAVA32_MODULEDIR) $(EXO_JAVA_PACKAGE_SUBDIR) $(EXO_JAVA32_BIN) $(EXO_JAVA_MODULENAME) $(EXO_JAVA_PACKAGE_NAME) $(EXO_SWIG_OPTIONS)&#x0D;&#x0A;"
 					AdditionalDependencies="..\..\..\exodus\exodus\exodus\mv.h;..\prebuildjava.cmd"
 					Outputs="$(InputName)_wrap.cxx"
 				/>
@@ -223,6 +223,10 @@
 		</File>
 		<File
 			RelativePath=".\prebuildjava.cmd"
+			>
+		</File>
+		<File
+			RelativePath="..\..\testjava.cmd"
 			>
 		</File>
 	</Files>

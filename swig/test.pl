@@ -17,7 +17,7 @@ if (!$exo->connect($exo)) {
 	$filename=new exo::var("tempdbfile564");
 	$options=new exo::var("");
 
-	if ($exo->createfile($filename,$options)) {
+	if ($exo->createfile($filename)) {
 		print "$filename file created\n";
 	}else{
 		print "$filename file not created. maybe already exists. try deletefile $filename\n";
