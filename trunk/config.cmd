@@ -289,8 +289,8 @@ rem ----- SWIG -----
 rem ----------------
     set EXO_SWIG_OPTIONS=-w503,314,389,361,362,370,383,384
 
-    set SWIG32=%EXO_BUILD_ROOT%\%EXO_SWIG_PREFIX%%EXO_SWIG_VER%
-    set SWIG64=%EXO_BUILD_ROOT%\%EXO_SWIG_PREFIX%%EXO_SWIG_VER%
+    set SWIG32=%EXO_PROGRAMFILES_ROOT%\%EXO_SWIG_PREFIX%%EXO_SWIG_VER%
+    set SWIG64=%EXO_PROGRAMFILES_ROOT%\%EXO_SWIG_PREFIX%%EXO_SWIG_VER%
 
 rem check postgres master directory exists
     if "%TARGET_CPU%" EQU "x86" set EXO_SWIG=%EXO_SWIG32%
@@ -304,8 +304,11 @@ rem	goto exit
 rem --------------
 rem --- Python ---
 rem --------------
-    set EXO_PYTHON32=%EXO_BUILD_ROOT%\%EXO_PYTHON_PREFIX%%EXO_PYTHON_VER%
-    set EXO_PYTHON64=%EXO_BUILD_ROOT%\%EXO_PYTHON_PREFIX%%EXO_PYTHON_VER%
+    set EXO_PYTHON32=%EXO_PROGRAMFILES_ROOT%\%EXO_PYTHON_PREFIX%%EXO_PYTHON_VER%
+    set EXO_PYTHON64=%EXO_PROGRAMFILES_ROOT%\%EXO_PYTHON_PREFIX%%EXO_PYTHON_VER%
+
+    if exist %EXO_PYTHON32%-32 set EXO_PYTHON32=%EXO_PYTHON32%-32
+    if exist %EXO_PYTHON64%-64 set EXO_PYTHON64=%EXO_PYTHON64%-64
 
 rem check python master directory exists
     if "%TARGET_CPU%" EQU "x86" set EXO_PYTHON=%EXO_PYTHON32%
@@ -338,8 +341,11 @@ rem ------------
 rem --- Perl ---
 rem ------------
 
-set EXO_PERL32=%EXO_BUILD_ROOT%\%EXO_PERL_PREFIX%%EXO_PERL_VER%
-set EXO_PERL64=%EXO_BUILD_ROOT%\%EXO_PERL_PREFIX%%EXO_PERL_VER%
+set EXO_PERL32=%EXO_PROGRAMFILES_ROOT%\%EXO_PERL_PREFIX%%EXO_PERL_VER%
+set EXO_PERL64=%EXO_PROGRAMFILES_ROOT%\%EXO_PERL_PREFIX%%EXO_PERL_VER%
+
+if exist %EXO_PERL32%32 set EXO_PERL32=%EXO_PERL32%32
+if exist %EXO_PERL64%64 set EXO_PERL64=%EXO_PERL64%64
 
 set EXO_PERL32_INCLUDE=%EXO_PERL32%\LIB\CORE
 set EXO_PERL64_INCLUDE=%EXO_PERL64%\LIB\CORE
@@ -354,8 +360,8 @@ set EXO_PERL64_MODULEDIR=%EXO_PERL64%\site\lib
 rem ---------------
 rem ----- PHP -----
 rem ---------------
-    set PHP32=%EXO_BUILD_ROOT%\%EXO_PHP_PREFIX%%EXO_PHP_VER%
-    set PHP64=%EXO_BUILD_ROOT%\%EXO_PHP_PREFIX%%EXO_PHP_VER%
+    set PHP32=%EXO_PROGRAMFILES_ROOT%\%EXO_PHP_PREFIX%%EXO_PHP_VER%
+    set PHP64=%EXO_PROGRAMFILES_ROOT%\%EXO_PHP_PREFIX%%EXO_PHP_VER%
 
 rem check php master directory exists
     if "%TARGET_CPU%" EQU "x86" set EXO_PHP=%EXO_PHP32%
@@ -625,7 +631,7 @@ rem -----------------------
 rem --- DEVELOPMENT UI  ---
 rem -----------------------
 rem search for the latest version of VS Professional or Express
-    set EXO_VS=%VS110COMNTOOLS%
+    if "%EXO_VS%" =="" set EXO_VS=%VS110COMNTOOLS%
     if "%EXO_VS%" =="" set EXO_VS=%VS100COMNTOOLS%
     if "%EXO_VS%" =="" set EXO_VS=%VS90COMNTOOLS%
     if "%EXO_VS%" =="" set EXO_VS=%VS80COMNTOOLS%
