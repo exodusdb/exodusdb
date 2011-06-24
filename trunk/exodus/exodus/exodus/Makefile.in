@@ -927,7 +927,7 @@ uninstall-am: uninstall-libLTLIBRARIES \
 #symlibfile=lib$(GENERIC_LIBRARY_NAME)$(LIBEXT)
 
 install-data-hook:
-	( cd $(includedir) \
+	( cd $(DESTDIR)$(prefix)/include \
 		&& { $(LN_S) -f exodus-$(GENERIC_RELEASE)/exodus exodus \
 		|| { rm -f exodus \
 			&& $(LN_S) exodus-$(GENERIC_RELEASE)/exodus exodus; }; \
@@ -938,10 +938,10 @@ install-data-hook:
 	( { ldconfig 2> /dev/null ; } || { /sbin/ldconfig 2> /dev/null ; } \
 		|| echo "skipping ldconfig")
 uninstall-hook:
-	( cd $(includedir) \
+	( cd $(DESTDIR)$(prefix)/include \
 		&& { rm -rf exodus-$(GENERIC_RELEASE) ; } \
 	)
-	( cd $(includedir) \
+	( cd $(DESTDIR)$(prefix)/include \
 		&& { find -L exodus -type l -delete || echo "exodus wasnt pointing to version being deleted"; } )
 	( rm -f /etc/ld.so.conf.d/exodus-$(GENERIC_RELEASE).conf \
 		|| echo "/etc/ld.so.conf.d/exodus-$(GENERIC_RELEASE).conf doesnt exist or is already removed" \
