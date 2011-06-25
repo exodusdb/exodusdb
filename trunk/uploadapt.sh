@@ -5,9 +5,12 @@ set -e
 #requires manual input change exodus version, package version and package signer
 
 export EXO_GNUPG_KEY=2FE45E65
-export EXO_PACKVER=1
+export EXO_PACKVER=2
 export EXO_PKGNAM=exodus
 export EXO_EXOVER=11.5.29
+export DEBEMAIL=steve.bush@neosys.com
+export DEBFULLNAME="Steve Bush"
+debchange --newversion ${EXO_EXOVER}-${EXO_PACKVER}
 
 #irc://irc.freenode.net/launchpad
 
@@ -51,7 +54,6 @@ tar xfz ${EXO_PKGNAM}_${EXO_EXOVER}.orig.tar.gz
 cd ${EXO_PKGNAM}-$EXO_EXOVER
 
 cp -a $EXO_ORIGDIR/debian .
-nano debian/changelog
 
 #following hex code is a gnu privacy guard id - must be in ~/.gnupg
 debuild -S -k$EXO_GNUPG_KEY
@@ -60,5 +62,6 @@ cd ..
 
 lintian -Ivi *.dsc
 
-dput -f my-ppa ${EXO_PKGNAM}_${EXO_EXOVER}-${EXO_PACKVER}_source.changes
+echo "dput -f my-ppa ${EXO_PKGNAM}_${EXO_EXOVER}-${EXO_PACKVER}_source.changes"
+#dput -f my-ppa ${EXO_PKGNAM}_${EXO_EXOVER}-${EXO_PACKVER}_source.changes
 
