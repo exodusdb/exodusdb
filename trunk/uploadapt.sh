@@ -10,6 +10,9 @@ export EXO_PKGNAM=exodus
 export DEBEMAIL=steve.bush@neosys.com
 export DEBFULLNAME="Steve Bush"
 export EXO_GNUPG_KEY=2FE45E65
+export EXO_DPUT_OPT=ppa:steve-bush/ppa
+
+#open editor on debian/changelog
 debchange --newversion ${EXO_EXOVER}-${EXO_PACKVER}
 
 #irc://irc.freenode.net/launchpad
@@ -29,7 +32,7 @@ debchange --newversion ${EXO_EXOVER}-${EXO_PACKVER}
 #------
 # Setup
 #------
-#sudo apt-get install pbuilder pgp
+#sudo apt-get install pbuilder pgp debhelper
 
 #--------------
 # Using apt-get
@@ -49,14 +52,25 @@ debchange --newversion ${EXO_EXOVER}-${EXO_PACKVER}
 export EXO_ORIGDIR=`pwd`
 export EXO_APTDIR=$HOME/exodusapt
 
-test -d $EXO_APTDIR || mkdir $EXO_APTDIR
-cp ${EXO_PKGNAM}-${EXO_EXOVER}.tar.gz $EXO_APTDIR/${EXO_PKGNAM}_${EXO_EXOVER}.orig.tar.gz
+    test -d ${EXO_APTDIR}/${EXO_PKGNAM}-$EXO_EXOVER/debian \
+|| mkdir -p ${EXO_APTDIR}/${EXO_PKGNAM}-$EXO_EXOVER/debian
+
+pushd debian
+#cp -r [!.svn]* ${EXO_APTDIR}/${EXO_PKGNAM}-$EXO_EXOVER/debian
+cp -r . ${EXO_APTDIR}/${EXO_PKGNAM}-$EXO_EXOVER/debian
+find ${EXO_APTDIR}/${EXO_PKGNAM}-$EXO_EXOVER/debian | grep "/\.svn" | xargs rm -rf
+popd
+
+#nb change from xxxxxxxx-99.99.99 to xxxxxxxx_99.99.99
+export EXO_DISTFILENAME=${EXO_PKGNAM}-${EXO_EXOVER}.tar.gz
+export EXO_PACKFILENAME=${EXO_PKGNAM}_${EXO_EXOVER}.orig.tar.gz
+
+cp $EXO_DISTFILENAME $EXO_APTDIR/$EXO_PACKFILENAME
+
 cd $EXO_APTDIR
 
-tar xfz ${EXO_PKGNAM}_${EXO_EXOVER}.orig.tar.gz
+tar xfz $EXO_PACKFILENAME
 cd ${EXO_PKGNAM}-$EXO_EXOVER
-
-cp -r $EXO_ORIGDIR/debian .
 
 #following hex code is a gnu privacy guard id - must be in ~/.gnupg
 debuild -S -k$EXO_GNUPG_KEY
@@ -65,6 +79,4 @@ cd ..
 
 lintian -Ivi *.dsc
 
-echo "dput -f my-ppa ${EXO_PKGNAM}_${EXO_EXOVER}-${EXO_PACKVER}_source.changes"
-#dput -f my-ppa ${EXO_PKGNAM}_${EXO_EXOVER}-${EXO_PACKVER}_source.changes
-
+echo "dput -f $EXO_DPUT_OPT ${EXO_PKGNAM}_${EXO_EXOVER}-${EXO_PACKVER}_source.changes"
