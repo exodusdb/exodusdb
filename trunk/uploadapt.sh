@@ -4,12 +4,12 @@ set -e
 #this isnt perfected yet since it requires manual input.
 #requires manual input change exodus version, package version and package signer
 
-export EXO_GNUPG_KEY=2FE45E65
 export EXO_PACKVER=2
-export EXO_PKGNAM=exodus
 export EXO_EXOVER=11.5.29
+export EXO_PKGNAM=exodus
 export DEBEMAIL=steve.bush@neosys.com
 export DEBFULLNAME="Steve Bush"
+export EXO_GNUPG_KEY=2FE45E65
 debchange --newversion ${EXO_EXOVER}-${EXO_PACKVER}
 
 #irc://irc.freenode.net/launchpad
@@ -31,6 +31,9 @@ debchange --newversion ${EXO_EXOVER}-${EXO_PACKVER}
 #------
 #sudo apt-get install pbuilder pgp
 
+#--------------
+# Using apt-get
+#--------------
 #using the repository
 #sudo sh -c 'echo "deb http://ppa.launchpad.net/steve-bush/ppa-exodus/ubuntu lucid main\ndeb-src http://ppa.launchpad.net/steve-bush/ppa-exodus/ubuntu lucid main" > /etc/apt/sources.list.d/exodus-ppa-lucid.list'
 #sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E7815451
@@ -53,7 +56,7 @@ cd $EXO_APTDIR
 tar xfz ${EXO_PKGNAM}_${EXO_EXOVER}.orig.tar.gz
 cd ${EXO_PKGNAM}-$EXO_EXOVER
 
-cp -a $EXO_ORIGDIR/debian .
+cp -r $EXO_ORIGDIR/debian .
 
 #following hex code is a gnu privacy guard id - must be in ~/.gnupg
 debuild -S -k$EXO_GNUPG_KEY
