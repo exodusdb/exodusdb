@@ -10,5 +10,5 @@ Homepage: http://devwiki.neosys.com
 
 Package: exodus
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, postgresql (>=8.1), libboost-dev (>=1.40)
+Depends: ${shlibs:Depends}, ${misc:Depends}, postgresql (>=8.1), libboost-dev (>=1.40), g++
 Description: Exodus Multivalue Database

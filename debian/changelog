@@ -1,3 +1,10 @@
+exodus (11.5.29-2) lucid; urgency=low
+
+  * Make g++ a dependency so compiling is available immediately to users
+  * Later versions will split Exodus into its various subcomponents
+
+ -- Steve Bush <steve.bush@neosys.com>  Sat, 25 Jun 2011 12:02:11 +0100
+
 exodus (11.5.29-1) lucid; urgency=low
 
   * Initial release
