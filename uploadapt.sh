@@ -10,7 +10,7 @@ export EXO_PKGNAM=exodus
 export DEBEMAIL=steve.bush@neosys.com
 export DEBFULLNAME="Steve Bush"
 export EXO_GNUPG_KEY=2FE45E65
-export EXO_DPUT_OPT=ppa:steve-bush/ppa
+export EXO_DPUT_OPT=ppa:steve-bush/ppa-exodus
 
 #open editor on debian/changelog
 debchange --newversion ${EXO_EXOVER}-${EXO_PACKVER}
