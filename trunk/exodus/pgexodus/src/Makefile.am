@@ -1,5 +1,7 @@
 INCLUDES = -I$(top_srcdir)
 
+dist_bin_SCRIPTS = installexodus-postgresql installexodus-postgresql2
+
 AM_CPPFLAGS=-I$(top_srcdir) $(POSTGRESQL_CFLAGS) $(BOOST_CPPFLAGS) \
  -Wall -Wextra  -Wno-unknown-pragmas
 # -pedantic
