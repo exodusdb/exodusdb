@@ -1,4 +1,6 @@
-#include <exodus/exodus.h>
+#include <exodus/program.h>
+
+programinit()
 
 /*
 template1 is the default database that is used to create all new databases.
@@ -15,6 +17,94 @@ so we do this instead
 2. add pgexodus functions to database
 3. add pgexodus functions to template1 (for all future database creations)
 */
+
+function main()
+{
+
+	printl("Exodus Copyright (c) 2009 Stephen John Bush");
+	printl("Licence: http://www.opensource.org/licenses/mit-license.php");
+
+	//get existing/defaults
+
+	//first from the command
+	var oldconn=field(sentence()," ",2,999999999);
+
+	//second from environment
+	//TODO should be per parameter
+	var temp;
+	if (temp.osgetenv("EXO_CONNECTION"))
+		oldconn^=" "^temp;
+
+        //third from config file
+	//should be same logic in mvdbpostgres and configexodus
+	var configfilename="";
+	if (SLASH eq "\\") {
+		var userprofile_exodusdir=osgetenv("USERPROFILE")^SLASH^"Exodus";
+		if (not osdir(userprofile_exodusdir)) {
+			if (not(osmkdir(userprofile_exodusdir)))
+				printl("Cannot mkdir ",userprofile_exodusdir," Maybe you dont have sufficient rights");
+		}
+		configfilename=userprofile_exodusdir^"\\.exodus";
+	}
+	else
+		configfilename=osgetenv("HOME")^SLASH^".exodus";
+	if (temp.osread(configfilename))
+		oldconn^=" "^temp;
+
+	//finally from hard-coded
+	oldconn^=" host=127.0.0.1 port=5432 dbname=exodus user=exodus password=somesillysecret connect_timeout=10";
+	oldconn.converter("\x0d\x0a","  ");
+
+	printl("-- Exodus Postgres Configuration ---");
+
+        printl(var("Input options and connect to postgres").oconv("L#40"));
+	var serverconn;
+        var adminconn=input_adminconn(oldconn,serverconn);
+	if (not adminconn)
+                stop("Stopping. Cannot continue without a working connection.");
+
+	var connecttimeout="10";
+        getparam(oldconn,"connect_timeout",connecttimeout);
+
+	//for now exodus a default database to play in with a non-secret password
+        var dbusername="exodus";
+        var dbname="exodus";
+        var dbuserpass="somesillysecret";
+
+	getparam(oldconn,"dbname",dbname);
+	getparam(oldconn,"user",dbusername);
+        getparam(oldconn,"password",dbuserpass);
+
+        getinput("New database code",dbname);
+        getinput("New user code",dbusername);
+        getinput("New user password",dbuserpass);
+
+	//if (SLASH eq "\\")
+		configure_via_connection(adminconn, dbname, dbusername, dbuserpass);
+	//else
+	//	configure_via_script(adminconn, dbname, dbusername, dbuserpass);
+
+	//ask to save configuration
+	var saveconfig="Y";
+	while (true) {
+
+		getinput("Save user configuration in .exodus",saveconfig);
+		if (not saveconfig[1].ucase().index("Y"))
+			break;
+
+		var("Saving user configuration in .exodus").oconv("L#40").output();
+		var userconn=serverconn^" dbname="^dbname^" user="^dbusername^" password="^dbuserpass;
+		if (oswrite(userconn,configfilename)) {
+			printl("done!");
+			break;
+		}
+		printl("Cannot update ",configfilename," Maybe you dont have sufficient rights");
+	}
+
+	print("Press Enter ... ");
+	input();
+	return 0;
+}
 
 //get the first definition of each parameter
 subroutine getparam(in config, in name, out value)
@@ -149,67 +239,8 @@ function create_db(in dbname, in dbusername)
         return runsomesql(sql);
 }
 
-program()
+function configure_via_connection(in adminconn, in dbname, in dbusername, in dbuserpass)
 {
-
-        printl("Exodus Copyright (c) 2009 Stephen John Bush");
-        printl("Licence: http://www.opensource.org/licenses/mit-license.php");
-
-        //get existing/defaults
-
-        //first from the command
-		var oldconn=field(sentence()," ",2,999999999);
-
-        //second from environment
-		//TODO should be per parameter
-        var temp;
-        if (temp.osgetenv("EXO_CONNECTION"))
-                oldconn^=" "^temp;
-
-        //third from config file
-		//should be same logic in mvdbpostgres and configexodus
-		var configfilename="";
-		if (SLASH eq "\\") {
-			var userprofile_exodusdir=osgetenv("USERPROFILE")^SLASH^"Exodus";
-			if (not osdir(userprofile_exodusdir)) {
-				if (not(osmkdir(userprofile_exodusdir)))
-					printl("Cannot mkdir ",userprofile_exodusdir," Maybe you dont have sufficient rights");
-			}
-			configfilename=userprofile_exodusdir^"\\.exodus";
-		}
-		else
-			configfilename=osgetenv("HOME")^SLASH^".exodus";
-        if (temp.osread(configfilename))
-                oldconn^=" "^temp;
-
-        //finally from hard-coded
-        oldconn^=" host=127.0.0.1 port=5432 dbname=exodus user=exodus password=somesillysecret connect_timeout=10";
-        oldconn.converter("\x0d\x0a","  ");
-
-        printl("-- Exodus Postgres Configuration ---");
-
-        printl(var("Input options and connect to postgres").oconv("L#40"));
-		var serverconn;
-        var adminconn=input_adminconn(oldconn,serverconn);
-		if (not adminconn)
-                stop("Stopping. Cannot continue without a working connection.");
-
-		var connecttimeout="10";
-        getparam(oldconn,"connect_timeout",connecttimeout);
-
-		//for now exodus a default database to play in with a non-secret password
-        var dbusername="exodus";
-        var dbname="exodus";
-        var dbuserpass="somesillysecret";
-
-		getparam(oldconn,"dbname",dbname);
-		getparam(oldconn,"user",dbusername);
-        getparam(oldconn,"password",dbuserpass);
-
-        getinput("New database code",dbname);
-        getinput("New user code",dbusername);
-        getinput("New user password",dbuserpass);
-
         print(("Creating new user "^ dbusername^ " ... ").oconv("L#40"));
         if (not create_dbuser(dbusername,dbuserpass))
                 //stop();
@@ -221,105 +252,105 @@ program()
                 printl("Error: Could not create database ",dbname);
 
         print(oconv("Detaching from postgres database ... ","L#40"));
-		disconnect();
-		printl("done!");
+	disconnect();
+	printl("done!");
 
         print(var("Connecting to new database ... ").oconv("L#40"));
-		var connstr2=adminconn^" dbname="^dbname;
-		//^" user="^dbusername^" password="^dbuserpass;
+	var connstr2=adminconn^" dbname="^dbname;
+
+	//^" user="^dbusername^" password="^dbuserpass;
         if (not connect(connstr2))
                 stop("Stopping. Cannot connect to new database");
-		printl("done!");
+	printl("done!");
 
-		if (SLASH eq "\\") {
+	if (SLASH eq "\\") {
 
-			printl(oconv("Installing pgexodus postgres plugin ... ","L#40"));
+		printl(oconv("Installing pgexodus postgres plugin ... ","L#40"));
 
-			//locate pgexodus dll to install
-			var pgexodusdll="pgexodus.dll";
+		//locate pgexodus dll to install
+		var pgexodusdll="pgexodus.dll";
+		if (not osfile(pgexodusdll)) {
+			var exodusbinpath=field(EXECPATH,SLASH,1,dcount(EXECPATH,SLASH)-1);
+			pgexodusdll=exodusbinpath^SLASH^"pgexodus.dll";
 			if (not osfile(pgexodusdll)) {
-				var exodusbinpath=field(EXECPATH,SLASH,1,dcount(EXECPATH,SLASH)-1);
-				pgexodusdll=exodusbinpath^SLASH^"pgexodus.dll";
-				if (not osfile(pgexodusdll)) {
-					printl("Cant find pgexodus.dll or "^pgexodusdll);
-					pgexodusdll="";
-				}
+				printl("Cant find pgexodus.dll or "^pgexodusdll);
+				pgexodusdll="";
 			}
-
-			//locate target directory (postgresql libdir)
-			var pglibdir;
-			var pgenvvar="POSTGRESQL";
-			if (index(PLATFORM_,"64"))
-				pgenvvar^="64";
-			else
-				pgenvvar^="32";
-			pglibdir=osgetenv(pgenvvar);
-			if (pglibdir)
-				pglibdir^="\\lib";
-			else
-				pglibdir=osshellread("pg_config --libdir").field("\n",1);
-			if (not pglibdir) {
-				pglibdir="\\PROGRA~1\\PostgreSQL\\9.0";
-			}
-			pglibdir.converter("/",SLASH);
-			//exodus oscopy cannot handle old 8.3 file names (boost library issue)
-			pglibdir.swapper("PROGRA~1","Program Files");
-			pglibdir.swapper("PROGRA~2","Program Files (x86)");
-			pglibdir.swapper("POSTGR~1","PostgreSQL");
-			var targetfilename=pglibdir^SLASH^"pgexodus.dll";
-			while (not osdir(pglibdir))
-			{
-				printl(pglibdir^" does not exist");
-				printl("Cannot locate PostgreSQL lib directory to install plugin");
-				input("PostgreSQL lib dir?",pglibdir);
-				if (not pglibdir)
-					stop();
-			}
-
-			//delete any existing pgexodus.dll. restart service if cannot initially delete
-			if (osfile(targetfilename) and not osdelete(targetfilename)) {
-
-				//determine postgres service name
-				var pgversion=osshellread("pg_config --version").field(" ",2).field(".",1,2);
-				var servicename=(pgversion<9)?"pgsql":"postgresql";
-				servicename^="-"^pgversion;
-
-				outputl("Stopping "^servicename^" (to update pgexodus.dll plugin) ...");
-				if (osshell("NET STOP "^servicename))
-				{
-					outputl("Cant stop "^servicename^". Please restart it manually.");
-				} else {
-					outputl("Restarting "^servicename^" ...");
-					if (osshell("NET START "^servicename))
-						outputl("Cant restart "^servicename^". Please restart it manually");
-				}
-				if (not osdelete(targetfilename))
-						outputl("Cant delete existing pgexodus.dll plugin");
-			}
-
-			//copy pgexodus.dll plugin into place
-			//pgexodusdll.converter(SLASH,"/");
-			//targetfilename.converter(SLASH,"/");
-			//targetfile="D:/Program Files/PostgreSQL/8.3/lib/pgexodus.dll";
-			printl(quote(pgexodusdll));
-			printl("-> ",quote(targetfilename));
-			if (pgexodusdll and oscopy(pgexodusdll,targetfilename)) {
-	 			printl("done!");
-				printl("Installed pgexodus.dll");
-			} else {
-				printl("failed!");
-				printl("Did not install pgexodus.dll");
-			}
-
 		}
 
-		print(oconv("Configuring pgexodus postgres plugin ... ","L#40"));
-		if (not add_pgexodus_postgres_plugin())
-			printl("Not enough privileges?");
+		//locate target directory (postgresql libdir)
+		var pglibdir;
+		var pgenvvar="POSTGRESQL";
+		if (index(PLATFORM_,"64"))
+			pgenvvar^="64";
+		else
+			pgenvvar^="32";
+		pglibdir=osgetenv(pgenvvar);
+		if (pglibdir)
+			pglibdir^="\\lib";
+		else
+			pglibdir=osshellread("pg_config --libdir").field("\n",1);
+		if (not pglibdir) {
+			pglibdir="\\PROGRA~1\\PostgreSQL\\9.0";
+		}
+		pglibdir.converter("/",SLASH);
+		//exodus oscopy cannot handle old 8.3 file names (boost library issue)
+		pglibdir.swapper("PROGRA~1","Program Files");
+		pglibdir.swapper("PROGRA~2","Program Files (x86)");
+		pglibdir.swapper("POSTGR~1","PostgreSQL");
+		var targetfilename=pglibdir^SLASH^"pgexodus.dll";
+		while (not osdir(pglibdir))
+		{
+			printl(pglibdir^" does not exist");
+			printl("Cannot locate PostgreSQL lib directory to install plugin");
+			input("PostgreSQL lib dir?",pglibdir);
+			if (not pglibdir)
+				stop();
+		}
 
-		print(oconv("Detaching from new database ... ","L#40"));
-		disconnect();
-		printl("done!");
+		//delete any existing pgexodus.dll. restart service if cannot initially delete
+		if (osfile(targetfilename) and not osdelete(targetfilename)) {
+			//determine postgres service name
+			var pgversion=osshellread("pg_config --version").field(" ",2).field(".",1,2);
+			var servicename=(pgversion<9)?"pgsql":"postgresql";
+			servicename^="-"^pgversion;
+
+			outputl("Stopping "^servicename^" (to update pgexodus.dll plugin) ...");
+			if (osshell("NET STOP "^servicename))
+			{
+				outputl("Cant stop "^servicename^". Please restart it manually.");
+			} else {
+				outputl("Restarting "^servicename^" ...");
+				if (osshell("NET START "^servicename))
+					outputl("Cant restart "^servicename^". Please restart it manually");
+			}
+			if (not osdelete(targetfilename))
+					outputl("Cant delete existing pgexodus.dll plugin");
+		}
+
+		//copy pgexodus.dll plugin into place
+		//pgexodusdll.converter(SLASH,"/");
+			//targetfilename.converter(SLASH,"/");
+		//targetfile="D:/Program Files/PostgreSQL/8.3/lib/pgexodus.dll";
+		printl(quote(pgexodusdll));
+		printl("-> ",quote(targetfilename));
+		if (pgexodusdll and oscopy(pgexodusdll,targetfilename)) {
+			printl("done!");
+		printl("Installed pgexodus.dll");
+		} else {
+			printl("failed!");
+			printl("Did not install pgexodus.dll");
+		}
+
+	}
+
+	print(oconv("Configuring pgexodus postgres plugin ... ","L#40"));
+	if (not add_pgexodus_postgres_plugin())
+		printl("Not enough privileges?");
+
+	print(oconv("Detaching from new database ... ","L#40"));
+	disconnect();
+	printl("done!");
 
         print(var("Connecting to template1 database ... ").oconv("L#40"));
 		var connstr3=adminconn^" dbname=template1";
@@ -335,23 +366,11 @@ program()
 		disconnect();
 		printl("done!");
 
-		//ask to save configuration
-		var saveconfig="Y";
-		while (true) {
-
-			getinput("Save user configuration in .exodus",saveconfig);
-			if (not saveconfig[1].ucase().index("Y"))
-				break;
-
-			var("Saving user configuration in .exodus").oconv("L#40").output();
-			var userconn=serverconn^" dbname="^dbname^" user="^dbusername^" password="^dbuserpass;
-			if (oswrite(userconn,configfilename)) {
-				printl("done!");
-				break;
-			}
-			printl("Cannot update ",configfilename," Maybe you dont have sufficient rights");
-		}
-
-		print("Press Enter ... ");
-		input();
+	return true;
 }
+
+function configure_via_script(in adminconn, in dbname, in dbusername, in dbuserpass) {
+	return true;
+}
+
+programexit()
