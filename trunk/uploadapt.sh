@@ -5,12 +5,13 @@ set -e
 #requires manual input change exodus version, package version and package signer
 
 export EXO_PACKVER=1
-export EXO_EXOVER=11.5.30
+export EXO_EXOVER=11.5.31
 export EXO_PKGNAM=exodus
 export DEBEMAIL=steve.bush@neosys.com
 export DEBFULLNAME="Steve Bush"
 export EXO_GNUPG_KEY=2FE45E65
-export EXO_DPUT_OPT=ppa:steve-bush/ppa-exodus
+#export EXO_DPUT_OPT=ppa:steve-bush/ppa-exodus
+export EXO_DPUT_OPT=steve-bush/ppa-exodus
 
 #open editor on debian/changelog
 debchange --newversion ${EXO_EXOVER}-${EXO_PACKVER}
@@ -33,6 +34,13 @@ debchange --newversion ${EXO_EXOVER}-${EXO_PACKVER}
 # Setup
 #------
 #sudo apt-get install pbuilder pgp debhelper
+
+#sudo nano /etc/dput.cf
+#[ppa]
+#fqdn                    = ppa.launchpad.net
+#method                  = ftp
+#incoming                = ~%(ppa)s/ubuntu
+#login                   = anonymous
 
 #--------------
 # Using apt-get
@@ -79,4 +87,24 @@ cd ..
 
 lintian -Ivi *.dsc
 
-echo "dput -f $EXO_DPUT_OPT ${EXO_PKGNAM}_${EXO_EXOVER}-${EXO_PACKVER}_source.changes"
+if [ "YES" == "YES" ]; then
+
+cat > ~/.dput.cf << EOF
+
+[my-ppa]
+fqdn = ppa.launchpad.net
+method = ftp
+incoming = ~$EXO_DPUT_OPT/ubuntu/
+login = anonymous
+allow_unsigned_uploads = 0
+
+EOF
+
+echo "dput -f my-ppa ${EXO_PKGNAM}_${EXO_EXOVER}-${EXO_PACKVER}_source.changes"
+      dput -f my-ppa ${EXO_PKGNAM}_${EXO_EXOVER}-${EXO_PACKVER}_source.changes
+else
+
+echo "dput -f ppa:$EXO_DPUT_OPT ${EXO_PKGNAM}_${EXO_EXOVER}-${EXO_PACKVER}_source.changes"
+      dput -f ppa:$EXO_DPUT_OPT ${EXO_PKGNAM}_${EXO_EXOVER}-${EXO_PACKVER}_source.changes
+
+fi

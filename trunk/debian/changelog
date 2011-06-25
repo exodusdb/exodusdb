@@ -1,3 +1,9 @@
+exodus (11.5.31-1) lucid; urgency=low
+
+  * fix postinstall
+
+ -- Steve Bush <steve.bush@neosys.com>  Sat, 25 Jun 2011 20:48:21 +0100
+
 exodus (11.5.30-1) lucid; urgency=low
 
   * Automatic postinstall script calls installexodus-postgresql
