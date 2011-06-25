@@ -270,9 +270,14 @@ Backtrace 7: 0x100000f64
 	char path[1024];
 
 	var binaryfilename=EXECPATH2.field(" ",1);
-	if (binaryfilename == binaryfilename.convert("/\\:",""))
-		binaryfilename="`which " ^ binaryfilename ^ "`";
-
+	//if (binaryfilename == binaryfilename.convert("/\\:",""))
+	if (not binaryfilename.osdir())
+	{
+		var temp="which " ^ binaryfilename.field2(SLASH,-1);
+		temp=temp.osshellread().field("\n",1).field("\r",1);
+		if (temp)
+			binaryfilename=temp;
+	}
 #ifdef __APPLE__
 	var oscmd="atos -o " ^ binaryfilename.quote() ^ " " ^ internaladdresses;
 #else
