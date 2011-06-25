@@ -4,8 +4,8 @@ set -e
 #this isnt perfected yet since it requires manual input.
 #requires manual input change exodus version, package version and package signer
 
-export EXO_PACKVER=2
-export EXO_EXOVER=11.5.29
+export EXO_PACKVER=1
+export EXO_EXOVER=11.5.30
 export EXO_PKGNAM=exodus
 export DEBEMAIL=steve.bush@neosys.com
 export DEBFULLNAME="Steve Bush"
