@@ -1,3 +1,9 @@
+exodus (11.5.30-1) lucid; urgency=low
+
+  * Automatic postinstall script calls installexodus-postgresql
+
+ -- Steve Bush <steve.bush@neosys.com>  Sat, 25 Jun 2011 18:18:38 +0200
+
 exodus (11.5.29-2) lucid; urgency=low
 
   * Make g++ a dependency so compiling is available immediately to users
