@@ -1,1 +1,1 @@
-SUBDIRS=exodus pgexodus
+SUBDIRS=libexodus libpgexodus

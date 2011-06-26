@@ -20,6 +20,6 @@ AM_INIT_AUTOMAKE
 # Checks for library functions.
 
 AC_CONFIG_FILES([Makefile])
-AC_CONFIG_SUBDIRS([exodus
-                   pgexodus])
+AC_CONFIG_SUBDIRS([libexodus
+                   libpgexodus])
 AC_OUTPUT

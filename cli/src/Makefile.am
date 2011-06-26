@@ -1,6 +1,6 @@
-AM_LDFLAGS=-lexodus -L../../exodus/exodus/exodus/.libs
-#AM_CXXFLAGS=-I../../exodus/exodus
-AM_CPPFLAGS=-I../../exodus/exodus -Wall -Wextra -ansi -Wno-unused-parameter
+AM_LDFLAGS=-lexodus -L../../exodus/libexodus/exodus/.libs
+#AM_CXXFLAGS=-I../../exodus/libexodus
+AM_CPPFLAGS=-I../../exodus/libexodus -Wall -Wextra -ansi -Wno-unused-parameter
 
 bin_PROGRAMS=compile createfile createindex delete deletefile deleteindex edir edic exodus \
 list listfiles listindexes testsort configexodus

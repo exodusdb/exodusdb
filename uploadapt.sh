@@ -4,17 +4,17 @@ set -e
 #this isnt perfected yet since it requires manual input.
 #requires manual input change exodus version, package version and package signer
 
-export EXO_PACKVER=1
-export EXO_EXOVER=11.5.31
-export EXO_PKGNAM=exodus
+#export EXO_PACKVER=1
+#export EXO_EXOVER=11.5.31
+#export EXO_PKGNAM=exodus
+export EXO_PACKVER=$3
+export EXO_EXOVER=$2
+export EXO_PKGNAM=$1
 export DEBEMAIL=steve.bush@neosys.com
 export DEBFULLNAME="Steve Bush"
 export EXO_GNUPG_KEY=2FE45E65
 #export EXO_DPUT_OPT=ppa:steve-bush/ppa-exodus
 export EXO_DPUT_OPT=steve-bush/ppa-exodus
-
-#open editor on debian/changelog
-debchange --newversion ${EXO_EXOVER}-${EXO_PACKVER}
 
 #irc://irc.freenode.net/launchpad
 
@@ -58,16 +58,8 @@ debchange --newversion ${EXO_EXOVER}-${EXO_PACKVER}
 #make dist
 
 export EXO_ORIGDIR=`pwd`
-export EXO_APTDIR=$HOME/exodusapt
-
-    test -d ${EXO_APTDIR}/${EXO_PKGNAM}-$EXO_EXOVER/debian \
-|| mkdir -p ${EXO_APTDIR}/${EXO_PKGNAM}-$EXO_EXOVER/debian
-
-pushd debian
-#cp -r [!.svn]* ${EXO_APTDIR}/${EXO_PKGNAM}-$EXO_EXOVER/debian
-cp -r . ${EXO_APTDIR}/${EXO_PKGNAM}-$EXO_EXOVER/debian
-find ${EXO_APTDIR}/${EXO_PKGNAM}-$EXO_EXOVER/debian | grep "/\.svn" | xargs rm -rf
-popd
+#export EXO_APTDIR=$HOME/exodusapt
+export EXO_APTDIR=$EXO_ORIGDIR
 
 #nb change from xxxxxxxx-99.99.99 to xxxxxxxx_99.99.99
 export EXO_DISTFILENAME=${EXO_PKGNAM}-${EXO_EXOVER}.tar.gz
@@ -75,19 +67,38 @@ export EXO_PACKFILENAME=${EXO_PKGNAM}_${EXO_EXOVER}.orig.tar.gz
 
 cp $EXO_DISTFILENAME $EXO_APTDIR/$EXO_PACKFILENAME
 
-cd $EXO_APTDIR
-
 tar xfz $EXO_PACKFILENAME
+
+pushd debian
+
+    test -d ${EXO_APTDIR}/${EXO_PKGNAM}-$EXO_EXOVER/debian \
+|| mkdir -p ${EXO_APTDIR}/${EXO_PKGNAM}-$EXO_EXOVER/debian
+
+echo `pwd`
+#cp -r [!.svn]* ${EXO_APTDIR}/${EXO_PKGNAM}-$EXO_EXOVER/debian
+cp -r . ${EXO_APTDIR}/${EXO_PKGNAM}-$EXO_EXOVER/debian
+find ${EXO_APTDIR}/${EXO_PKGNAM}-$EXO_EXOVER/debian | grep "/\.svn" | xargs rm -rf
+
+popd
+
 cd ${EXO_PKGNAM}-$EXO_EXOVER
 
-#following hex code is a gnu privacy guard id - must be in ~/.gnupg
-debuild -S -k$EXO_GNUPG_KEY
+#open editor on debian/changelog
+debchange --newversion ${EXO_EXOVER}-${EXO_PACKVER}
 
+#ln -s ../debian debian
+#following hex code is a gnu privacy guard id - must be in ~/.gnupg
+echo `pwd`
+debuild -S -k$EXO_GNUPG_KEY
 cd ..
+
+cp -r ${EXO_APTDIR}/${EXO_PKGNAM}-$EXO_EXOVER/debian .
+
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E7815451
 
 lintian -Ivi *.dsc
 
-if [ "YES" == "YES" ]; then
+if [ "`uname -a|grep Ubuntu`" == "" ]; then
 
 cat > ~/.dput.cf << EOF
 
