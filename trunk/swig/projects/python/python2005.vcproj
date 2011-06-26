@@ -41,7 +41,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;$(EXO_PYTHON32_INCLUDE)&quot;;&quot;$(ProjectDir)..\..\..\exodus\libexodus&quot;;&quot;$(ProjectDir)..\..\..\exodus\libexodus\exodus&quot;"
-				PreprocessorDefinitions="__WIN32__"
+				PreprocessorDefinitions="__WIN32__;_NDEBUG"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -197,8 +197,8 @@
 				>
 				<Tool
 					Name="VCCustomBuildTool"
-					CommandLine="echo Invoking SWIG... Installing into $(EXO_PYTHON32_MODULEDIR)&#x0D;&#x0A;echo on&#x0D;&#x0A;$(EXO_SWIG32)\swig.exe -c++ -python -module $(EXO_PYTHON_MODULENAME) -I..\..\..\exodus\libexodus -outcurrentdir -outdir $(EXO_PYTHON32_MODULEDIR) $(EXO_SWIG_OPTIONS) &quot;$(InputPath)&quot;&#x0D;&#x0A;@echo off&#x0D;&#x0A;"
-					AdditionalDependencies="..\..\..\exodus\libexodus\exodus\mv.h"
+					CommandLine="prebuildpython.cmd $(EXO_SWIG32) $(EXO_PYTHON32_MODULEDIR) $(EXO_PYTHON_MODULENAME) $(EXO_SWIG_OPTIONS)&#x0D;&#x0A;"
+					AdditionalDependencies="..\..\..\exodus\libexodus\exodus\mv.h;..\prebuildpython.cmd"
 					Outputs="$(InputName)_wrap.cxx"
 				/>
 			</FileConfiguration>
@@ -207,11 +207,15 @@
 				>
 				<Tool
 					Name="VCCustomBuildTool"
-					CommandLine="echo Invoking SWIG... Installing into $(EXO_PYTHON32_MODULEDIR)&#x0D;&#x0A;echo on&#x0D;&#x0A;$(EXO_SWIG32)\swig.exe -c++ -python -module $(EXO_PYTHON_MODULENAME) -I..\..\..\exodus\libexodus -outcurrentdir -outdir $(EXO_PYTHON32_MODULEDIR) $(EXO_SWIG_OPTIONS) &quot;$(InputPath)&quot;&#x0D;&#x0A;@echo off&#x0D;&#x0A;"
-					AdditionalDependencies="..\..\..\exodus\libexodus\exodus\mv.h"
+					CommandLine="prebuildpython.cmd $(EXO_SWIG32) $(EXO_PYTHON32_MODULEDIR) $(EXO_PYTHON_MODULENAME) $(EXO_SWIG_OPTIONS)&#x0D;&#x0A;"
+					AdditionalDependencies="..\..\..\exodus\libexodus\exodus\mv.h;..\prebuildpython.cmd"
 					Outputs="$(InputName)_wrap.cxx"
 				/>
 			</FileConfiguration>
+		</File>
+		<File
+			RelativePath=".\prebuildpython.cmd"
+			>
 		</File>
 	</Files>
 	<Globals>
