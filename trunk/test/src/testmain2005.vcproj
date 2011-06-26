@@ -42,7 +42,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\exodus\exodus"
+				AdditionalIncludeDirectories="..\..\exodus\libexodus"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -115,7 +115,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\exodus\exodus"
+				AdditionalIncludeDirectories="..\..\exodus\libexodus"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -187,7 +187,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\exodus\exodus"
+				AdditionalIncludeDirectories="..\..\exodus\libexodus"
 				RuntimeLibrary="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -260,7 +260,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\exodus\exodus"
+				AdditionalIncludeDirectories="..\..\exodus\libexodus"
 				RuntimeLibrary="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -311,7 +311,7 @@
 	<References>
 		<ProjectReference
 			ReferencedProjectIdentifier="{8963EB1B-97D5-47C0-BF00-8F9B828B3139}"
-			RelativePathToProject=".\exodus\exodus\exodus\exodus2005.vcproj"
+			RelativePathToProject=".\exodus\libexodus\exodus\exodus2005.vcproj"
 		/>
 	</References>
 	<Files>

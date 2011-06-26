@@ -78,7 +78,7 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <AdditionalIncludeDirectories>..\..\exodus\exodus</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\exodus\libexodus</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -92,7 +92,7 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>..\..\exodus\exodus</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\exodus\libexodus</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -100,7 +100,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\exodus\exodus</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\exodus\libexodus</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -114,7 +114,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\exodus\exodus</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\exodus\libexodus</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -129,7 +129,7 @@
     <ClCompile Include="testmain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\exodus\exodus\exodus\exodus.vcxproj">
+    <ProjectReference Include="..\..\exodus\libexodus\exodus\exodus.vcxproj">
       <Project>{8963eb1b-97d5-47c0-bf00-8f9b828b3139}</Project>
     </ProjectReference>
   </ItemGroup>

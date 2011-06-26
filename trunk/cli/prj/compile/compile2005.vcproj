@@ -43,7 +43,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="$(ProjectDir)..\..\..\exodus\exodus;$(ProjectDir)..\..\..\exodus\exodus\exodus"
+				AdditionalIncludeDirectories="$(ProjectDir)..\..\..\exodus\libexodus;$(ProjectDir)..\..\..\exodus\libexodus\exodus"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -121,7 +121,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="$(ProjectDir)..\..\..\exodus\exodus;$(ProjectDir)..\..\..\exodus\exodus\exodus"
+				AdditionalIncludeDirectories="$(ProjectDir)..\..\..\exodus\libexodus;$(ProjectDir)..\..\..\exodus\libexodus\exodus"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -198,7 +198,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="$(ProjectDir)..\..\..\exodus\exodus;$(ProjectDir)..\..\..\exodus\exodus\exodus"
+				AdditionalIncludeDirectories="$(ProjectDir)..\..\..\exodus\libexodus;$(ProjectDir)..\..\..\exodus\libexodus\exodus"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -276,7 +276,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="$(ProjectDir)..\..\..\exodus\exodus;$(ProjectDir)..\..\..\exodus\exodus\exodus"
+				AdditionalIncludeDirectories="$(ProjectDir)..\..\..\exodus\libexodus;$(ProjectDir)..\..\..\exodus\libexodus\exodus"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -332,7 +332,7 @@
 	<References>
 		<ProjectReference
 			ReferencedProjectIdentifier="{8963EB1B-97D5-47C0-BF00-8F9B828B3139}"
-			RelativePathToProject=".\exodus\exodus\exodus\exodus2005.vcproj"
+			RelativePathToProject=".\exodus\libexodus\exodus\exodus2005.vcproj"
 		/>
 	</References>
 	<Files>

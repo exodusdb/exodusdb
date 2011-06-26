@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(EXO_PERL32_INCLUDE)&quot;;&quot;$(ProjectDir)..\..\..\exodus\exodus&quot;;&quot;$(ProjectDir)..\..\..\exodus\exodus\exodus&quot;"
+				AdditionalIncludeDirectories="&quot;$(EXO_PERL32_INCLUDE)&quot;;&quot;$(ProjectDir)..\..\..\exodus\libexodus&quot;;&quot;$(ProjectDir)..\..\..\exodus\libexodus\exodus&quot;"
 				PreprocessorDefinitions="__WIN32__"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -119,7 +119,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;$(EXO_PERL32_INCLUDE)&quot;;&quot;$(ProjectDir)..\..\..\exodus\exodus&quot;;&quot;$(ProjectDir)..\..\..\exodus\exodus\exodus&quot;"
+				AdditionalIncludeDirectories="&quot;$(EXO_PERL32_INCLUDE)&quot;;&quot;$(ProjectDir)..\..\..\exodus\libexodus&quot;;&quot;$(ProjectDir)..\..\..\exodus\libexodus\exodus&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;EXAMPLEVC_EXPORTS"
 				RuntimeLibrary="2"
 				WarningLevel="3"
@@ -177,7 +177,7 @@
 	<References>
 		<ProjectReference
 			ReferencedProjectIdentifier="{8963EB1B-97D5-47C0-BF00-8F9B828B3139}"
-			RelativePathToProject=".\exodus\exodus\exodus\exodus2005.vcproj"
+			RelativePathToProject=".\exodus\libexodus\exodus\exodus2005.vcproj"
 		/>
 	</References>
 	<Files>
@@ -199,8 +199,8 @@
 				>
 				<Tool
 					Name="VCCustomBuildTool"
-					CommandLine="echo Invoking SWIG... Installing into $(EXO_PERL32_MODULEDIR)&#x0D;&#x0A;echo on&#x0D;&#x0A;$(EXO_SWIG32)\swig.exe -c++ -perl -module $(EXO_PERL_MODULENAME) -outdir $(EXO_PERL32_MODULEDIR) -I..\..\..\exodus\exodus -outcurrentdir $(EXO_SWIG_OPTIONS) &quot;$(InputPath)&quot;&#x0D;&#x0A;@echo off&#x0D;&#x0A;"
-					AdditionalDependencies="..\..\..\exodus\exodus\exodus\mv.h"
+					CommandLine="echo Invoking SWIG... Installing into $(EXO_PERL32_MODULEDIR)&#x0D;&#x0A;echo on&#x0D;&#x0A;$(EXO_SWIG32)\swig.exe -c++ -perl -module $(EXO_PERL_MODULENAME) -outdir $(EXO_PERL32_MODULEDIR) -I..\..\..\exodus\libexodus -outcurrentdir $(EXO_SWIG_OPTIONS) &quot;$(InputPath)&quot;&#x0D;&#x0A;@echo off&#x0D;&#x0A;"
+					AdditionalDependencies="..\..\..\exodus\libexodus\exodus\mv.h"
 					Outputs="$(InputName)_wrap.cxx"
 				/>
 			</FileConfiguration>
@@ -209,8 +209,8 @@
 				>
 				<Tool
 					Name="VCCustomBuildTool"
-					CommandLine="echo Invoking SWIG... Installing into $(EXO_PERL32_MODULEDIR)&#x0D;&#x0A;echo on&#x0D;&#x0A;$(EXO_SWIG32)\swig.exe -c++ -perl -module $(EXO_PERL_MODULENAME) -outdir $(EXO_PERL32_MODULEDIR) -I..\..\..\exodus\exodus -outcurrentdir $(EXO_SWIG_OPTIONS) &quot;$(InputPath)&quot;&#x0D;&#x0A;@echo off&#x0D;&#x0A;"
-					AdditionalDependencies="..\..\..\exodus\exodus\exodus\mv.h"
+					CommandLine="echo Invoking SWIG... Installing into $(EXO_PERL32_MODULEDIR)&#x0D;&#x0A;echo on&#x0D;&#x0A;$(EXO_SWIG32)\swig.exe -c++ -perl -module $(EXO_PERL_MODULENAME) -outdir $(EXO_PERL32_MODULEDIR) -I..\..\..\exodus\libexodus -outcurrentdir $(EXO_SWIG_OPTIONS) &quot;$(InputPath)&quot;&#x0D;&#x0A;@echo off&#x0D;&#x0A;"
+					AdditionalDependencies="..\..\..\exodus\libexodus\exodus\mv.h"
 					Outputs="$(InputName)_wrap.cxx"
 				/>
 			</FileConfiguration>
