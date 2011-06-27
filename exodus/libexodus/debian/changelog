@@ -1,3 +1,9 @@
+libexodus (11.5.43-1) lucid; urgency=low
+
+  * remove mistaken dependency on libboost-dev and rely on autodetect
+
+ -- Steve Bush <steve.bush@neosys.com>  Mon, 27 Jun 2011 20:41:22 +0100
+
 libexodus (11.5.31-1) lucid; urgency=low
 
   * Initial release
