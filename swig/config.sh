@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -ex
 
 export SWIG_TARGET=$1
 
@@ -30,6 +30,13 @@ export SWIG_ALL_TARGETS="perl python java csharp php" put php last because it ex
 
 export EXO_EXODUS_INCLUDE_FLAGS="-I../../exodus/libexodus -I/usr/include"
 export EXO_WRAPPER_FLAGS="-fPIC -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes"
+export EXO_EXODUS_LDFLAGS="-lexodus"
+
+#defaults
+export SWIG_WRAPPER_EXT=cxx
+export SWIG_MODULENAME="exodus"
+
+export SWIG_OPTIONS="-w503,314,389,361,362,370,383,384"
 
 export EXO_EXODUS_LINK="NOTSTATIC"
 #cant link static on debian6 due to missing reference to icudt44_dat
@@ -81,8 +88,13 @@ export EXO_EXODUS_LDFLAGS=" \
 export SWIG_WRAPPER_EXT=cxx
 export SWIG_MODULENAME="exodus"
 
-export SWIG_LOCAL_LIBDIR=/usr/local/lib
-test -d ${SWIG_LOCAL_LIBDIR}64 && export SWIG_LOCAL_LIBDIR=${SWIG_LOCAL_LIBDIR}64
+if [ "$FAKEROOTKEY" == "" ]; then
+ export SWIG_SHARED_LIBDIR=/usr/local/lib
+else
+ export SWIG_SHARED_LIBDIR=/usr/lib
+fi
+test -d ${SWIG_SHARED_LIBDIR}64 && export SWIG_SHARED_LIBDIR=${SWIG_SHARED_LIBDIR}64
+
 export SWIG_OPTIONS="-w503,314,389,361,362,370,383,384"
 
 #something like python2.6
@@ -107,7 +119,7 @@ case $SWIG_TARGET in
         export SWIG_WRAPPER_EXT=cpp
 
 	#dump exo.php in lib dir from where it can be copied to php web directories for including
-        export SWIG_TARGET_MODDIR=$SWIG_LOCAL_LIBDIR
+        export SWIG_TARGET_MODDIR=$SWIG_SHARED_LIBDIR
         export SWIG_TARGET_MODFILE="$SWIG_MODULENAME.php"
 
         export SWIG_TARGET_LIBDIR="`php-config --extension-dir`"
@@ -128,10 +140,10 @@ case $SWIG_TARGET in
 #	export SWIG_TARGET_LDFLAGS="-l$SWIG_PYTHON_LIBCODE"
 #
 #	export SWIG_TARGET_LIBFILE="_$SWIG_MODULENAME.so"
-#	export SWIG_TARGET_LIBDIR=$SWIG_LOCAL_LIBDIR
+#	export SWIG_TARGET_LIBDIR=$SWIG_SHARED_LIBDIR
 
 #	export SWIG_TARGET_MODFILE="$SWIG_MODULENAME.py*"
-#	export SWIG_TARGET_MODDIR="$SWIG_LOCAL_LIBDIR/$SWIG_PYTHON_LIBCODE/site-packages"
+#	export SWIG_TARGET_MODDIR="$SWIG_SHARED_LIBDIR/$SWIG_PYTHON_LIBCODE/site-packages"
 ##	export SWIG_TARGET_MODDIR=`python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()"`
 ##	something like python2.6
 #	export SWIG_PYTHON_LIBCODE="`python --version 2>&1|cut -d'.' -f 1,2|sed -e 's/ //;y/P/p/'`"
@@ -143,7 +155,7 @@ case $SWIG_TARGET in
 	export SWIG_MODULENAME="exo"
 
 	export SWIG_TARGET_LIBFILE="$SWIG_MODULENAME.so"
-	export SWIG_TARGET_LIBDIR=$SWIG_LOCAL_LIBDIR
+	export SWIG_TARGET_LIBDIR=$SWIG_SHARED_LIBDIR
 
 	export SWIG_TARGET_INCLUDE_FLAGS="`perl -MConfig -e 'print join(\" \", @Config{qw(ccflags optimize cccdlflags)}, \"-I$Config{archlib}/CORE\")'`"
 	export SWIG_TARGET_LDFLAGS="`perl -MConfig -e 'print $Config{lddlflags}'`"
@@ -167,7 +179,7 @@ case $SWIG_TARGET in
 	export SWIG_MODULENAME="j$SWIG_MODULENAME"
 	export SWIG_OPTIONS="$SWIG_OPTIONS -package $SWIG_PACKAGENAME -outdir $SWIG_PACKAGE_SUBDIR"
 	export SWIG_TARGET_LIBFILE="$SWIG_MODULENAME.so"
-        export SWIG_TARGET_LIBDIR=$SWIG_LOCAL_LIBDIR
+        export SWIG_TARGET_LIBDIR=$SWIG_SHARED_LIBDIR
 
 	export SWIG_TARGET_INCLUDE_FLAGS="-I/usr/lib/jvm/java-6-openjdk/include -I/usr/lib/jvm/java-6-openjdk/include/linux"
 	#centos 5
@@ -177,13 +189,13 @@ case $SWIG_TARGET in
 
 	export SWIG_POSTGENERATE_CMD="javac $SWIG_PACKAGE_SUBDIR/*.java"
 	export SWIG_MODULE_BUILD="jar cvf $SWIG_PACKAGENAME.jar $SWIG_PACKAGE_SUBDIR"
-	export SWIG_MODULE_INSTALL="cp -f ${SWIG_MODULENAME}.jar $SWIG_LOCAL_LIBDIR"
+	export SWIG_MODULE_INSTALL="cp -f ${SWIG_MODULENAME}.jar $SWIG_SHARED_LIBDIR"
 
 ;; csharp )
 	export SWIG_OPTIONS="$SWIG_OPTIONS -dllimport ${SWIG_MODULENAME}_wrapper"
         export SWIG_TARGET_INCLUDE_FLAGS=""
         export SWIG_TARGET_LIBFILE="lib${SWIG_MODULENAME}_wrapper.so"
-        export SWIG_TARGET_LIBDIR=$SWIG_LOCAL_LIBDIR
+        export SWIG_TARGET_LIBDIR=$SWIG_SHARED_LIBDIR
 
 	export SWIG_PATCH_CMD="sed -i -e 's/public string ToString/public override string ToString/' mvar.cs"
 
@@ -191,7 +203,7 @@ case $SWIG_TARGET in
 	export SWIG_POSTGENERATE_CMD="gmcs $SWIG_MODULENAME.cs *.cs ../AssemblyInfo.cs -target:library -keyfile:../${SWIG_MODULENAME}.snk"
 
 	#export SWIG_MODULE_INSTALL="sn -R ${SWIG_MODULENAME}.dll ../exodus_library.snk ; gacutil -i ${SWIG_MODULENAME}.dll"
-	export SWIG_MODULE_INSTALL="cp -f ${SWIG_MODULENAME}.dll $SWIG_LOCAL_LIBDIR"
+	export SWIG_MODULE_INSTALL="cp -f ${SWIG_MODULENAME}.dll $SWIG_SHARED_LIBDIR"
 
 ;;*)
         echo "$SWIG_SYNTAX all or $SWIG_ALL_TARGETS"
@@ -200,3 +212,4 @@ case $SWIG_TARGET in
 esac
 
 
+env

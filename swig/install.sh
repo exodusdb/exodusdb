@@ -1,6 +1,5 @@
 #!/bin/bash
-set -e
-set -o xtrace
+set -ex
 
 export SWIG_SYNTAX="Syntax is ./install.sh "
 
@@ -15,6 +14,15 @@ if [ "$SWIG_TARGET" == "all" ]; then
         echo "all done"
         exit 0
 fi
+
+#---------------
+#--- DESTDIR ---
+#---------------
+export SWIG_DESTDIR=""
+if [ "$FAKEROOTKEY" != "" ]; then
+	export SWIG_DESTDIR="../debian/libexodus-$SWIG_TARGET"
+fi
+
 
 #------------
 #--- "cd" ---
@@ -38,15 +46,17 @@ if [ "$SWIG_TARGET_LIBDIR" != "" ]; then
 	echo
 	echo -ne "Installing $SWIG_TARGET library: "
 	test -d ${SWIG_TARGET_LIBDIR}64 && export SWIG_TARGET_LIBDIR=${SWIG_TARGET_LIBDIR}64
-	echo cp -f $SWIG_TARGET_LIBFILE $SWIG_TARGET_LIBDIR/
-	     cp -f $SWIG_TARGET_LIBFILE $SWIG_TARGET_LIBDIR/
+	test -d ${SWIG_DESTDIR}$SWIG_TARGET_LIBDIR || mkdir -p ${SWIG_DESTDIR}$SWIG_TARGET_LIBDIR
+	echo cp -f $SWIG_TARGET_LIBFILE ${SWIG_DESTDIR}$SWIG_TARGET_LIBDIR/
+	     cp -f $SWIG_TARGET_LIBFILE ${SWIG_DESTDIR}$SWIG_TARGET_LIBDIR/
 fi
 
 if [ "$SWIG_TARGET_MODDIR" != "" ]; then
 	echo
 	echo -ne "Installing $SWIG_TARGET module: "
-	echo cp -f $SWIG_TARGET_MODFILE $SWIG_TARGET_MODDIR/
-	     cp -f $SWIG_TARGET_MODFILE $SWIG_TARGET_MODDIR/
+	test -d ${SWIG_DESTDIR}$SWIG_TARGET_MODDIR || mkdir -p ${SWIG_DESTDIR}$SWIG_TARGET_MODDIR
+	echo cp -f $SWIG_TARGET_MODFILE ${SWIG_DESTDIR}$SWIG_TARGET_MODDIR/
+	     cp -f $SWIG_TARGET_MODFILE ${SWIG_DESTDIR}$SWIG_TARGET_MODDIR/
 fi
 
 if [ "$SWIG_MODULE_INSTALL" != "" ]; then
