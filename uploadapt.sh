@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -ex
 
 #this isnt perfected yet since it requires manual input.
 #requires manual input change exodus version, package version and package signer
@@ -59,27 +59,22 @@ export EXO_DPUT_OPT=steve-bush/ppa-exodus
 
 export EXO_ORIGDIR=`pwd`
 #export EXO_APTDIR=$HOME/exodusapt
-export EXO_APTDIR=$EXO_ORIGDIR
+export EXO_APTDIR=$EXO_ORIGDIR/..
 
 #nb change from xxxxxxxx-99.99.99 to xxxxxxxx_99.99.99
 export EXO_DISTFILENAME=${EXO_PKGNAM}-${EXO_EXOVER}.tar.gz
 export EXO_PACKFILENAME=${EXO_PKGNAM}_${EXO_EXOVER}.orig.tar.gz
 
-cp $EXO_DISTFILENAME $EXO_APTDIR/$EXO_PACKFILENAME
+#mv $EXO_DISTFILENAME $EXO_APTDIR/$EXO_PACKFILENAME
 
-tar xfz $EXO_PACKFILENAME
+cd ..
 
-pushd debian
+#tar xfz $EXO_PACKFILENAME
+test -h ${EXO_PKGNAM}-$EXO_EXOVER || ln -s $EXO_ORIGDIR ${EXO_PKGNAM}-$EXO_EXOVER
 
-    test -d ${EXO_APTDIR}/${EXO_PKGNAM}-$EXO_EXOVER/debian \
-|| mkdir -p ${EXO_APTDIR}/${EXO_PKGNAM}-$EXO_EXOVER/debian
-
-echo `pwd`
-#cp -r [!.svn]* ${EXO_APTDIR}/${EXO_PKGNAM}-$EXO_EXOVER/debian
-cp -r . ${EXO_APTDIR}/${EXO_PKGNAM}-$EXO_EXOVER/debian
-find ${EXO_APTDIR}/${EXO_PKGNAM}-$EXO_EXOVER/debian | grep "/\.svn" | xargs rm -rf
-
-popd
+test -f ${EXO_PKGNAM}_$EXO_EXOVER.orig.tar.gz \
+  && rm ${EXO_PKGNAM}_$EXO_EXOVER.orig.tar.gz
+tar cfzh ${EXO_PKGNAM}_$EXO_EXOVER.orig.tar.gz ${EXO_PKGNAM}-$EXO_EXOVER/* --exclude=.svn
 
 cd ${EXO_PKGNAM}-$EXO_EXOVER
 
@@ -90,9 +85,8 @@ debchange --newversion ${EXO_EXOVER}-${EXO_PACKVER}
 #following hex code is a gnu privacy guard id - must be in ~/.gnupg
 echo `pwd`
 debuild -S -k$EXO_GNUPG_KEY
-cd ..
 
-cp -r ${EXO_APTDIR}/${EXO_PKGNAM}-$EXO_EXOVER/debian .
+cd ..
 
 sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E7815451
 
