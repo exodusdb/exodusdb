@@ -1,9 +1,12 @@
 #!/bin/bash
 #=== Building and Installing Exodus Using apt-get ===
 
-#cut and paste everything into a bash script and run it as follows:
-#nano install_apt.sh
-#. install_apt.sh    #NOTE: NOT ./install_apt.sh
+#you can view/run the latest version of this script directly
+# wget -O - http://exodusdb.googlecode.com/svn/trunk/install_apt.sh | less
+# wget -O - http://exodusdb.googlecode.com/svn/trunk/install_apt.sh | bash
+#or
+# curl http://exodusdb.googlecode.com/svn/trunk/install_apt.sh | less
+# curl http://exodusdb.googlecode.com/svn/trunk/install_apt.sh | bash
 
 #tested on:
 
