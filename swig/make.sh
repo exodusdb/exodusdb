@@ -9,6 +9,9 @@ export EXO_EXODUS_INCLUDE_FLAGS="-I../../exodus/exodus"
 export EXO_WRAPPER_FLAGS="-fPIC -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes"
 export EXO_EXODUS_LDFLAGS="-lexodus"
 
+ls /usr/include/exodus/mv.h
+#find /usr|grep exodus
+
 #defaults
 export SWIG_WRAPPER_EXT=cxx
 export SWIG_MODULENAME="exodus"
