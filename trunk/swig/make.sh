@@ -1,27 +1,13 @@
 #!/bin/bash
-set -e
-set -o xtrace
+set -ex
 
 export SWIG_SYNTAX="Syntax is ./make.sh"
 export SWIG_TARGET=$1
 
-export EXO_EXODUS_INCLUDE_FLAGS="-I../../exodus/exodus"
-export EXO_WRAPPER_FLAGS="-fPIC -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes"
-export EXO_EXODUS_LDFLAGS="-lexodus"
-
-ls /usr/include/exodus/mv.h
-#find /usr|grep exodus
-
-#defaults
-export SWIG_WRAPPER_EXT=cxx
-export SWIG_MODULENAME="exodus"
-
-export SWIG_LOCAL_LIBDIR=/usr/local/lib
-export SWIG_OPTIONS="-w503,314,389,361,362,370,383,384"
-
 export SWIG_MODE=make
 
 source config.sh
+
 if [ "$SWIG_TARGET" == "all" ]; then
 	for  SWIG_TARGET in $SWIG_ALL_TARGETS; do
 		./make.sh $SWIG_TARGET

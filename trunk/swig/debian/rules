@@ -1,0 +1,13 @@
+#!/usr/bin/make -f
+
+build:
+	./make.sh perl
+clean:
+	./clean.sh perl
+
+binary: binary-arch binary-indep
+
+binary-arch:
+	./install.sh perl 
+
+binary-indep:
