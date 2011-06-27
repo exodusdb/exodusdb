@@ -1,5 +1,6 @@
-libexodus-perl (11.5.40-1) lucid; urgency=low
+libexodus-perl (11.5.43-1) lucid; urgency=low
 
-  * ...
+  * standard debian/rules calling custom Makefile
 
- -- Steve Bush <steve.bush@neosys.com>  Mon, 27 Jun 2011 17:04:12 +0100
+ -- Steve Bush <steve.bush@neosys.com>  Mon, 27 Jun 2011 19:45:14 +0100
+
