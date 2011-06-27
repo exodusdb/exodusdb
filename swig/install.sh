@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+set -o xtrace
 
 export SWIG_SYNTAX="Syntax is ./install.sh "
 

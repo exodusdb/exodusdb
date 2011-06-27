@@ -28,7 +28,7 @@ export SWIG_ALL_TARGETS="perl python java csharp php" put php last because it ex
 # java   = jexodus.so          dumped in /usr/local/lib
 # csharp = exodus_wrapper.so   dumped in /usr/local/lib
 
-export EXO_EXODUS_INCLUDE_FLAGS="-I../../exodus/exodus"
+export EXO_EXODUS_INCLUDE_FLAGS="-I../../exodus/libexodus"
 export EXO_WRAPPER_FLAGS="-fPIC -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes"
 
 export EXO_EXODUS_LINK="NOTSTATIC"
