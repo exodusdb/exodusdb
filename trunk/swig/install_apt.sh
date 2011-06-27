@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+set -o xtrace
 
 #----------------------
 #--- Do this first  ---
