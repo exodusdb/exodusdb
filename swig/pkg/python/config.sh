@@ -111,6 +111,8 @@ export SWIG_CMD=${SWIG_HOME}swig
 export SWIG_DESTDIR="/"
 if [ "$FAKEROOTKEY" != "" ]; then
 	export SWIG_DESTDIR="../debian/libexodus-$SWIG_TARGET"
+	#avoid error ... dh_usrlocal: debian/libexodus-python/usr/local/lib/python2.6/dist-packages/_exodus.so is not a directory"
+	export PREFIX="/usr"
 fi
 
 #----------------
@@ -156,8 +158,8 @@ case $SWIG_TARGET in
 ##	something like python2.6
 #	export SWIG_PYTHON_LIBCODE="`python --version 2>&1|cut -d'.' -f 1,2|sed -e 's/ //;y/P/p/'`"
 
-	export SWIG_MODULE_COMPILE="python ../setup.py build"
-	export SWIG_MODULE_INSTALL="python ../setup.py install --root=$DESTDIR"
+	export SWIG_MODULE_COMPILE="python ../setup.py build "
+	export SWIG_MODULE_INSTALL="python ../setup.py install --root=$DESTDIR --prefix=$PREFIX"
 
 ;; perl )
 	export SWIG_MODULENAME="exo"
