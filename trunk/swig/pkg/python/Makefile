@@ -1,7 +1,7 @@
 make:
-	../../make.sh python
+	./make.sh python
 clean:
-	../../clean.sh python
+	./clean.sh python
 
 install:
-	../../install.sh python
+	./install.sh python

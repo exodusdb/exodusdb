@@ -39,8 +39,8 @@ fi
 #--------------------
 echo Using: ${SWIG_CMD}
 echo Generating Source: \
-${SWIG_CMD} -c++ $SWIG_OPTIONS -$SWIG_TARGET -module $SWIG_MODULENAME $EXO_EXODUS_INCLUDE_FLAGS -outcurrentdir ../../../exodus.i
-${SWIG_CMD} -c++ $SWIG_OPTIONS -$SWIG_TARGET -module $SWIG_MODULENAME $EXO_EXODUS_INCLUDE_FLAGS -outcurrentdir ../../../exodus.i
+${SWIG_CMD} -c++ $SWIG_OPTIONS -$SWIG_TARGET -module $SWIG_MODULENAME $EXO_EXODUS_INCLUDE_FLAGS -outcurrentdir ../exodus.i
+${SWIG_CMD} -c++ $SWIG_OPTIONS -$SWIG_TARGET -module $SWIG_MODULENAME $EXO_EXODUS_INCLUDE_FLAGS -outcurrentdir ../exodus.i
 
 if [ "$SWIG_PATCH_CMD" != "" ]; then
 echo
