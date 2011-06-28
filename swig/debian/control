@@ -12,4 +12,4 @@ Package: libexodus-perl
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, libexodus, perl
 Suggests: postgresql
-Description: Exodus Multivalue Database Programming in perl
+Description: Exodus Multivalue Database Programming in Perl
