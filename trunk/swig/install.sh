@@ -17,15 +17,6 @@ if [ "$SWIG_TARGET" == "all" ]; then
         exit 0
 fi
 
-#---------------
-#--- DESTDIR ---
-#---------------
-export SWIG_DESTDIR=""
-if [ "$FAKEROOTKEY" != "" ]; then
-	export SWIG_DESTDIR="../debian/libexodus-$SWIG_TARGET"
-fi
-
-
 #------------
 #--- "cd" ---
 #------------

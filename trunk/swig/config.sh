@@ -105,6 +105,14 @@ export SWIG_HOME="$HOME/local/bin/"
 test -f ${SWIG_HOME}swig || export SWIG_HOME=""
 export SWIG_CMD=${SWIG_HOME}swig
 
+#---------------
+#--- DESTDIR ---
+#---------------
+export SWIG_DESTDIR="/"
+if [ "$FAKEROOTKEY" != "" ]; then
+	export SWIG_DESTDIR="../debian/libexodus-$SWIG_TARGET"
+fi
+
 #----------------
 #--- "Target" ---
 #----------------
@@ -149,7 +157,7 @@ case $SWIG_TARGET in
 #	export SWIG_PYTHON_LIBCODE="`python --version 2>&1|cut -d'.' -f 1,2|sed -e 's/ //;y/P/p/'`"
 
 	export SWIG_MODULE_COMPILE="python ../../../setup.py build"
-	export SWIG_MODULE_INSTALL="python ../../../setup.py install"
+	export SWIG_MODULE_INSTALL="python ../../../setup.py install --root=$DESTDIR"
 
 ;; perl )
 	export SWIG_MODULENAME="exo"
