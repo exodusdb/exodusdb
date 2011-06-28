@@ -1,15 +1,9 @@
 #!/bin/bash
-set -ex
+set -e
 
 #this isnt perfected yet since it requires manual input.
 #requires manual input change exodus version, package version and package signer
 
-#export EXO_PACKVER=1
-#export EXO_EXOVER=11.5.31
-#export EXO_PKGNAM=exodus
-export EXO_PACKVER=$3
-export EXO_EXOVER=$2
-export EXO_PKGNAM=$1
 export DEBEMAIL=steve.bush@neosys.com
 export DEBFULLNAME="Steve Bush"
 export EXO_GNUPG_KEY=2FE45E65
@@ -58,29 +52,65 @@ export EXO_DPUT_OPT=steve-bush/ppa-exodus
 #./configure
 #make dist
 
+export EXO_PACKAGE_NAME=`head -n 1 debian/changelog|cut -d' ' -f 1`
+   export EXO_MAJOR_VER=`head -n 1 debian/changelog|cut -d' ' -f 2|cut -d'(' -f 2|cut -d')' -f 1|cut -d'-' -f 1|cut -d'.' -f 1`
+   export EXO_MINOR_VER=`head -n 1 debian/changelog|cut -d' ' -f 2|cut -d'(' -f 2|cut -d')' -f 1|cut -d'-' -f 1|cut -d'.' -f 2`
+   export EXO_MICRO_VER=`head -n 1 debian/changelog|cut -d' ' -f 2|cut -d'(' -f 2|cut -d')' -f 1|cut -d'-' -f 1|cut -d'.' -f 3`
+    export EXO_PACK_VER=`head -n 1 debian/changelog|cut -d' ' -f 2|cut -d'(' -f 2|cut -d')' -f 1|cut -d'-' -f 2`
+
+case $1 in
+
+        (+)
+                let EXO_PACK_VER=EXO_PACK_VER+1
+        ;;
+        (++)
+                let EXO_MICRO_VER=EXO_MICRO_VER+1
+                EXO_PACK_VER=1
+        ;;
+        (+++)
+                let EXO_MINOR_VER=EXO_MINOR_VER+1
+                EXO_MICRO_VER=1
+                EXO_PACK_VER=1
+        ;;
+        (++++)
+                let EXO_MAJOR_VER=EXO_MAJOR_VER+1
+                EXO_MINOR_VER=1
+                EXO_MICRO_VER=1
+                EXO_PACK_VER=1
+        ;;
+        (*)
+                echo "Syntax is {command} +|++|+++|++++"
+                exit 2
+esac
+export EXO_EXO_DOTTED_VER=$EXO_MAJOR_VER.$EXO_MINOR_VER.$EXO_MICRO_VER
+
+#export EXO_PACK_VER=1
+#export EXO_EXO_DOTTED_VER=11.5.31
+#export EXO_PACKAGE_NAME=exodus
+
 export EXO_ORIGDIR=`pwd`
 #export EXO_APTDIR=$HOME/exodusapt
 export EXO_APTDIR=$EXO_ORIGDIR/..
 
 #nb change from xxxxxxxx-99.99.99 to xxxxxxxx_99.99.99
-export EXO_DISTFILENAME=${EXO_PKGNAM}-${EXO_EXOVER}.tar.gz
-export EXO_PACKFILENAME=${EXO_PKGNAM}_${EXO_EXOVER}.orig.tar.gz
+export EXO_DISTFILENAME=${EXO_PACKAGE_NAME}-${EXO_EXO_DOTTED_VER}.tar.gz
+export EXO_PACKFILENAME=${EXO_PACKAGE_NAME}_${EXO_EXO_DOTTED_VER}.orig.tar.gz
 
 #mv $EXO_DISTFILENAME $EXO_APTDIR/$EXO_PACKFILENAME
 
 cd ..
 
 #tar xfz $EXO_PACKFILENAME
-test -h ${EXO_PKGNAM}-$EXO_EXOVER || ln -s $EXO_ORIGDIR ${EXO_PKGNAM}-$EXO_EXOVER
+test -h ${EXO_PACKAGE_NAME}-$EXO_EXO_DOTTED_VER || ln -s $EXO_ORIGDIR ${EXO_PACKAGE_NAME}-$EXO_EXO_DOTTED_VER
 
-test -f ${EXO_PKGNAM}_$EXO_EXOVER.orig.tar.gz \
-  && rm ${EXO_PKGNAM}_$EXO_EXOVER.orig.tar.gz
-tar cfzh ${EXO_PKGNAM}_$EXO_EXOVER.orig.tar.gz ${EXO_PKGNAM}-$EXO_EXOVER/* --exclude=.svn
+test -f ${EXO_PACKAGE_NAME}_$EXO_EXO_DOTTED_VER.orig.tar.gz \
+  && rm ${EXO_PACKAGE_NAME}_$EXO_EXO_DOTTED_VER.orig.tar.gz
+tar cfzh ${EXO_PACKAGE_NAME}_$EXO_EXO_DOTTED_VER.orig.tar.gz ${EXO_PACKAGE_NAME}-$EXO_EXO_DOTTED_VER/* --exclude=.svn
 
-cd ${EXO_PKGNAM}-$EXO_EXOVER
+cd ${EXO_PACKAGE_NAME}-$EXO_EXO_DOTTED_VER
 
 #open editor on debian/changelog
-debchange --newversion ${EXO_EXOVER}-${EXO_PACKVER}
+debchange --newversion ${EXO_EXO_DOTTED_VER}-${EXO_PACK_VER}
 
 #ln -s ../debian debian
 #following hex code is a gnu privacy guard id - must be in ~/.gnupg
@@ -106,11 +136,11 @@ allow_unsigned_uploads = 0
 
 EOF
 
-echo "dput -f my-ppa ${EXO_PKGNAM}_${EXO_EXOVER}-${EXO_PACKVER}_source.changes"
-      dput -f my-ppa ${EXO_PKGNAM}_${EXO_EXOVER}-${EXO_PACKVER}_source.changes
+echo "dput -f my-ppa ${EXO_PACKAGE_NAME}_${EXO_EXO_DOTTED_VER}-${EXO_PACK_VER}_source.changes"
+      dput -f my-ppa ${EXO_PACKAGE_NAME}_${EXO_EXO_DOTTED_VER}-${EXO_PACK_VER}_source.changes
 else
 
-echo "dput -f ppa:$EXO_DPUT_OPT ${EXO_PKGNAM}_${EXO_EXOVER}-${EXO_PACKVER}_source.changes"
-      dput -f ppa:$EXO_DPUT_OPT ${EXO_PKGNAM}_${EXO_EXOVER}-${EXO_PACKVER}_source.changes
+echo "dput -f ppa:$EXO_DPUT_OPT ${EXO_PACKAGE_NAME}_${EXO_EXO_DOTTED_VER}-${EXO_PACK_VER}_source.changes"
+      dput -f ppa:$EXO_DPUT_OPT ${EXO_PACKAGE_NAME}_${EXO_EXO_DOTTED_VER}-${EXO_PACK_VER}_source.changes
 
 fi
