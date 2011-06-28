@@ -6,11 +6,13 @@ export SWIG_TARGET=$1
 
 export SWIG_MODE=make
 
-source config.sh
+source ../../config.sh
 
 if [ "$SWIG_TARGET" == "all" ]; then
 	for  SWIG_TARGET in $SWIG_ALL_TARGETS; do
-		./make.sh $SWIG_TARGET
+		pushd pkg/$SWIG_TARGET
+		../../make.sh $SWIG_TARGET
+		popd
 	done
 	echo "all done"
 	exit 0
@@ -39,8 +41,8 @@ fi
 #--------------------
 echo Using: ${SWIG_CMD}
 echo Generating Source: \
-${SWIG_CMD} -c++ $SWIG_OPTIONS -$SWIG_TARGET -module $SWIG_MODULENAME $EXO_EXODUS_INCLUDE_FLAGS -outcurrentdir ../exodus.i
-${SWIG_CMD} -c++ $SWIG_OPTIONS -$SWIG_TARGET -module $SWIG_MODULENAME $EXO_EXODUS_INCLUDE_FLAGS -outcurrentdir ../exodus.i
+${SWIG_CMD} -c++ $SWIG_OPTIONS -$SWIG_TARGET -module $SWIG_MODULENAME $EXO_EXODUS_INCLUDE_FLAGS -outcurrentdir ../../../exodus.i
+${SWIG_CMD} -c++ $SWIG_OPTIONS -$SWIG_TARGET -module $SWIG_MODULENAME $EXO_EXODUS_INCLUDE_FLAGS -outcurrentdir ../../../exodus.i
 
 if [ "$SWIG_PATCH_CMD" != "" ]; then
 echo

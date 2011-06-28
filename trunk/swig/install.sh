@@ -5,11 +5,13 @@ export SWIG_SYNTAX="Syntax is ./install.sh "
 
 export SWIG_TARGET=$1
 
-source config.sh
+source ../../config.sh
 
 if [ "$SWIG_TARGET" == "all" ]; then
 	for  SWIG_TARGET in $SWIG_ALL_TARGETS; do
-		./install.sh $SWIG_TARGET
+		pushd pkg/$SWIG_TARGET
+		../../install.sh $SWIG_TARGET
+		popd
 	done
         echo "all done"
         exit 0
@@ -45,7 +47,7 @@ echo $PHPINIFILES
 if [ "$SWIG_TARGET_LIBDIR" != "" ]; then
 	echo
 	echo -ne "Installing $SWIG_TARGET library: "
-	test -d ${SWIG_TARGET_LIBDIR}64 && export SWIG_TARGET_LIBDIR=${SWIG_TARGET_LIBDIR}64
+	test -d ${SWIG_TARGET_LIBDIR}64 && ( test -L ${SWIG_TARGET_LIBDIR}64 || export SWIG_TARGET_LIBDIR=${SWIG_TARGET_LIBDIR}64 )
 	test -d ${SWIG_DESTDIR}$SWIG_TARGET_LIBDIR || mkdir -p ${SWIG_DESTDIR}$SWIG_TARGET_LIBDIR
 	echo cp -f $SWIG_TARGET_LIBFILE ${SWIG_DESTDIR}$SWIG_TARGET_LIBDIR/
 	     cp -f $SWIG_TARGET_LIBFILE ${SWIG_DESTDIR}$SWIG_TARGET_LIBDIR/
