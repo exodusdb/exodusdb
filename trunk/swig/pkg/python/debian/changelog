@@ -1,4 +1,16 @@
-libexodus-python (11.5.52-1) lucid; urgency=low
+libexodus-python (11.5.57-1) lucid; urgency=low
+
+  * config PREFIX=/usr
+
+ -- Steve Bush <steve.bush@neosys.com>  Tue, 28 Jun 2011 21:12:28 +0200
+
+libexodus-python (11.5.55-1) lucid; urgency=low
+
+  * add python-dev
+
+ -- Steve Bush <steve.bush@neosys.com>  Tue, 28 Jun 2011 20:45:46 +0200
+
+libexodus-python (11.5.54-1) lucid; urgency=low
 
   * relocate installation scripts
 
