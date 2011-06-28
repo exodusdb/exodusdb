@@ -33,7 +33,8 @@ export EXO_DPUT_OPT=steve-bush/ppa-exodus
 #------
 # Setup
 #------
-#sudo apt-get install pbuilder pgp debhelper
+#sudo apt-get update
+#sudo apt-get install pbuilder pgp debhelper devscripts
 
 #sudo nano /etc/dput.cf
 #[ppa]

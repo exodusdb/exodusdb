@@ -1,3 +1,9 @@
+libexodus-perl (11.5.44-1) lucid; urgency=low
+
+  * missing install
+
+ -- Steve Bush <steve.bush@neosys.com>  Tue, 28 Jun 2011 00:59:50 +0100
+
 libexodus-perl (11.5.43-1) lucid; urgency=low
 
   * standard debian/rules calling custom Makefile
