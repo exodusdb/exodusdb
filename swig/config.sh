@@ -28,7 +28,7 @@ export SWIG_ALL_TARGETS="perl python java csharp php" put php last because it ex
 # java   = jexodus.so          dumped in /usr/local/lib
 # csharp = exodus_wrapper.so   dumped in /usr/local/lib
 
-export EXO_EXODUS_INCLUDE_FLAGS="-I../../exodus/libexodus -I/usr/include"
+export EXO_EXODUS_INCLUDE_FLAGS="-I../../../../exodus/libexodus -I/usr/include"
 export EXO_WRAPPER_FLAGS="-fPIC -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes"
 export EXO_EXODUS_LDFLAGS="-lexodus"
 
@@ -93,7 +93,7 @@ if [ "$FAKEROOTKEY" == "" ]; then
 else
  export SWIG_SHARED_LIBDIR=/usr/lib
 fi
-test -d ${SWIG_SHARED_LIBDIR}64 && export SWIG_SHARED_LIBDIR=${SWIG_SHARED_LIBDIR}64
+test -d ${SWIG_SHARED_LIBDIR}64 && ( test -L ${SWIG_SHARED_LIBDIR}64 || export SWIG_SHARED_LIBDIR=${SWIG_SHARED_LIBDIR}64 )
 
 export SWIG_OPTIONS="-w503,314,389,361,362,370,383,384"
 
@@ -148,8 +148,8 @@ case $SWIG_TARGET in
 ##	something like python2.6
 #	export SWIG_PYTHON_LIBCODE="`python --version 2>&1|cut -d'.' -f 1,2|sed -e 's/ //;y/P/p/'`"
 
-	export SWIG_MODULE_COMPILE="python ../setup.py build"
-	export SWIG_MODULE_INSTALL="python ../setup.py install"
+	export SWIG_MODULE_COMPILE="python ../../../setup.py build"
+	export SWIG_MODULE_INSTALL="python ../../../setup.py install"
 
 ;; perl )
 	export SWIG_MODULENAME="exo"

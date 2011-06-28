@@ -1,0 +1,12 @@
+libexodus-python (11.5.46-2) lucid; urgency=low
+
+  * fix
+
+ -- Steve Bush <steve.bush@neosys.com>  Tue, 28 Jun 2011 03:46:49 +0100
+
+libexodus-python (11.5.46-1) lucid; urgency=low
+
+  * initial release
+
+ -- Steve Bush <steve.bush@neosys.com>  Tue, 28 Jun 2011 03:17:50 +0100
+

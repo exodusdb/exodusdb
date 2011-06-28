@@ -4,10 +4,12 @@ set -e
 export SWIG_SYNTAX="Syntax is ./clean.sh"
 export SWIG_TARGET=$1
 
-source config.sh
+source ../../config.sh
 if [ "$SWIG_TARGET" == "all" ]; then
 	for  SWIG_TARGET in $SWIG_ALL_TARGETS; do
-		./clean.sh $SWIG_TARGET
+		push pkg/$SWIG_TARGET
+		../../clean.sh $SWIG_TARGET
+		popd
 	done
 	echo "all clean"
 	exit 0
