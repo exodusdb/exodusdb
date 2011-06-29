@@ -34,7 +34,7 @@ for ii in range(1,dbfilenames.dcount(FM)):
 	print ii,dbfilenames(ii)
 
 #delete the db file
-if var(filename).deletefile():
+if xo.deletefile(filename):
 	print filename," file deleted"
 
 

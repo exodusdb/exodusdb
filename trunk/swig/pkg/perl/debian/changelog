@@ -1,3 +1,15 @@
+libexodus-perl (11.6.6-1) lucid; urgency=low
+
+  * ...
+
+ -- Steve Bush <steve.bush@neosys.com>  Wed, 29 Jun 2011 15:04:05 +0200
+
+libexodus-perl (11.6.3-1) lucid; urgency=low
+
+  * missing NEWS
+
+ -- Steve Bush <steve.bush@neosys.com>  Wed, 29 Jun 2011 12:40:46 +0200
+
 libexodus-perl (11.6.2-1) lucid; urgency=low
 
   * fix build
