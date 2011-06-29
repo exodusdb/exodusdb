@@ -1,7 +1,4 @@
-/*
-Copyright (c) 2009 Stephen John Bush
-See MIT Licence
-*/
+/* Copyright (c) 2009 steve.bush@neosys.com */
 
 //var used to hold a pointer to its private data
 //but for ease of debugging programs using var 

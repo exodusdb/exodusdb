@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2009 Stephen John Bush
+Copyright (c) 2009 steve.bush@neosys.com
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -805,7 +805,6 @@ DLL_PUBLIC bool disconnect()
 	return var().disconnect();
 }
 
-
 DLL_PUBLIC bool createdb(const var& dbname)
 {
 	return dbname.createdb(dbname);
@@ -831,7 +830,7 @@ DLL_PUBLIC bool createfile(const var& filename)
 	return filename.createfile(filename);
 }
 
-DLL_PUBLIC bool deletefile(const var& filename)
+DLL_PUBLIC bool deletefile(const var& filename) 
 {
 	return filename.deletefile(filename);
 }
