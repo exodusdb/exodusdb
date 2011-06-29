@@ -1,0 +1,14 @@
+Source: exodus
+Section: devel
+Priority: optional
+Maintainer: Steve Bush <steve.bush@neosys.com>
+Build-Depends: debhelper (>= 7.0.50~)
+Standards-Version: 3.9.1
+Homepage: http://devwiki.neosys.com
+#Vcs-Git: git://git.debian.org/collab-maint/exodus.git
+#Vcs-Browser: http://git.debian.org/?p=collab-maint/exodus.git;a=summary
+
+Package: exodus
+Architecture: any
+Depends: ${misc:Depends}, exodus-cli, libpgexodus, libexodus-perl, libexodus-python
+Description: Exodus Multivalue Database
