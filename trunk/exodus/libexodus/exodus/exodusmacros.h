@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2009 Stephen John Bush
+Copyright (c) 2009 steve.bush@neosys.com
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

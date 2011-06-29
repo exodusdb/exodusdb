@@ -21,7 +21,7 @@ so we do this instead
 function main()
 {
 
-	printl("Exodus Copyright (c) 2009 Stephen John Bush");
+	printl("Exodus Copyright (c) 2009 steve.bush@neosys.com");
 	printl("Licence: http://www.opensource.org/licenses/mit-license.php");
 
 	//get existing/defaults
