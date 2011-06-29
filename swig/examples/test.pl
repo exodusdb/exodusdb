@@ -38,7 +38,7 @@ if (!$exo->connect($exo)) {
 	print "\n";
 	$exo->committrans();
 
-	if ($filename->deletefile()) {
+	if ($exo->deletefile($filename)) {
 		print "$filename file deleted\n";
 	}
 }

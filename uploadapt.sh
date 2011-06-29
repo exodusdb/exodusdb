@@ -1,8 +1,10 @@
 #!/bin/bash
 set -e
 
-#this isnt perfected yet since it requires manual input.
-#requires manual input change exodus version, package version and package signer
+#use this tp upload into ubuntu launchpad or debian type build farms
+#cd into the folder with debian. changelog version like 1.2.3-4
+#<path>/uploadapt.sh +|++|+++|++++
+#where + increments 4, ++ increments 3 and so on
 
 export DEBEMAIL=steve.bush@neosys.com
 export DEBFULLNAME="Steve Bush"

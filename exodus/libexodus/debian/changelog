@@ -1,3 +1,9 @@
+libexodus (11.6.2-1) lucid; urgency=low
+
+  * ...
+
+ -- Steve Bush <steve.bush@neosys.com>  Wed, 29 Jun 2011 14:09:05 +0200
+
 libexodus (11.6.1-1) lucid; urgency=low
 
   * standardise createfile, deletefile and clearfile api
