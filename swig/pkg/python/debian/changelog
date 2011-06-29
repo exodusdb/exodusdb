@@ -1,30 +1,12 @@
-libexodus-python (11.5.58-1) lucid; urgency=low
+libexodus-python (11.6.1-1) lucid; urgency=low
 
-  * try --install-layout=deb
+  * use libexodus 11.6
 
- -- Steve Bush <steve.bush@neosys.com>  Wed, 29 Jun 2011 00:47:58 +0200
+ -- Steve Bush <steve.bush@neosys.com>  Wed, 29 Jun 2011 03:07:50 +0200
 
-libexodus-python (11.5.57-1) lucid; urgency=low
+libexodus-python (11.5.60-1) lucid; urgency=low
 
-  * config PREFIX=/usr
+ * initial release
 
- -- Steve Bush <steve.bush@neosys.com>  Tue, 28 Jun 2011 21:12:28 +0200
-
-libexodus-python (11.5.55-1) lucid; urgency=low
-
-  * add python-dev
-
- -- Steve Bush <steve.bush@neosys.com>  Tue, 28 Jun 2011 20:45:46 +0200
-
-libexodus-python (11.5.54-1) lucid; urgency=low
-
-  * relocate installation scripts
-
- -- Steve Bush <steve.bush@neosys.com>  Tue, 28 Jun 2011 17:47:09 +0100
-
-libexodus-python (11.5.46-1) lucid; urgency=low
-
-  * initial release
-
- -- Steve Bush <steve.bush@neosys.com>  Tue, 28 Jun 2011 03:17:50 +0100
+ -- Steve Bush <steve.bush@neosys.com>  Wed, 29 Jun 2011 02:46:53 +0200
 
