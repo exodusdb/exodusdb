@@ -1,7 +1,6 @@
 make:
-	../../make.sh perl
+	./make.sh perl
 clean:
-	../../clean.sh perl
-
+	./clean.sh perl
 install:
-	../../install.sh perl
+	./install.sh perl

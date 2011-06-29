@@ -1,24 +1,17 @@
-libexodus-perl (11.5.46-2) lucid; urgency=low
+libexodus-perl (11.6.2-1) lucid; urgency=low
 
-  * test
+  * fix build
 
- -- Steve Bush <steve.bush@neosys.com>  Tue, 28 Jun 2011 03:39:58 +0100
+ -- Steve Bush <steve.bush@neosys.com>  Wed, 29 Jun 2011 03:20:54 +0200
 
-libexodus-perl (11.5.46-1) lucid; urgency=low
+libexodus-perl (11.6.1-1) lucid; urgency=low
 
-  * remove files dir
+  * use libexodus 11.6
 
- -- Steve Bush <steve.bush@neosys.com>  Tue, 28 Jun 2011 02:30:24 +0100
+ -- Steve Bush <steve.bush@neosys.com>  Wed, 29 Jun 2011 02:57:35 +0200
 
-libexodus-perl (11.5.45-1) lucid; urgency=low
+libexodus-perl (11.5.59-1) lucid; urgency=low
 
-  * missing install
+  * initial release
 
- -- Steve Bush <steve.bush@neosys.com>  Tue, 28 Jun 2011 02:24:20 +0100
-
-libexodus-perl (11.5.43-1) lucid; urgency=low
-
-  * standard debian/rules calling custom Makefile
-
- -- Steve Bush <steve.bush@neosys.com>  Mon, 27 Jun 2011 19:45:14 +0100
-
+ -- Steve Bush <steve.bush@neosys.com>  Wed, 29 Jun 2011 02:48:45 +0200

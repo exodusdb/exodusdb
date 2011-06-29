@@ -1,3 +1,9 @@
+libexodus (11.6.1-1) lucid; urgency=low
+
+  * standardise createfile, deletefile and clearfile api
+
+ -- Steve Bush <steve.bush@neosys.com>  Wed, 29 Jun 2011 02:52:52 +0200
+
 libexodus (11.5.43-1) lucid; urgency=low
 
   * remove mistaken dependency on libboost-dev and rely on autodetect
