@@ -1,7 +1,0 @@
-#!/bin/bash
-#DEBHELPER#
-for PGLIBDIR in `ls /usr/lib/postgresql`
-do
- ln -s /usr/lib/pgexodus.so /usr/lib/postgresql/$PGLIBDIR/lib/pgexodus.so
-done
-installexodus-postgresql

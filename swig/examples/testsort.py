@@ -98,7 +98,7 @@ if not rec.read(dictfilename,"BALANCE"):
 	print "Cant read BALANCE record from dictionary"
 
 print "\nClear the client file"
-var(filename).clearfile()
+x.clearfile(filename)
 
 print "\nPrepare some data records in a readable format"
 
