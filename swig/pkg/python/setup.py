@@ -13,10 +13,10 @@ exodus_module = Extension('_exodus',
                            )
 
 setup (name    = 'exodus',
-       version = '11.5',
+       version = '11.6',
        author       = "Steve Bush",
        author_email = "steve.bush@neosys.com",
-       license      = "BSD or MIT",
+       license      = "MIT",
        url          = "http://code.google.com/p/exodusdb/",
        description      = """Exodus Python module for Multivalue Database Programming""",
        long_description = """Exodus Python module for Multivalue Database Programming""",
