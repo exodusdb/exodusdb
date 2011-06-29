@@ -1,5 +1,6 @@
 #!/bin/bash
 
+#Launchpad PPA repository hosted by Canonical
 sudo sh -c 'echo "deb http://ppa.launchpad.net/steve-bush/ppa-exodus/ubuntu lucid main\n \
  deb-src http://ppa.launchpad.net/steve-bush/ppa-exodus/ubuntu lucid main" \
  > /etc/apt/sources.list.d/exodus-ppa-lucid.list'
