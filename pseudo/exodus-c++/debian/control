@@ -1,0 +1,14 @@
+Source: libexodus-c++
+Section: devel
+Priority: optional
+Maintainer: Steve Bush <steve.bush@neosys.com>
+Build-Depends: debhelper (>= 7.0.50~)
+Standards-Version: 3.9.1
+Homepage: http://devwiki.neosys.com
+#Vcs-Git: git://git.debian.org/collab-maint/exodus.git
+#Vcs-Browser: http://git.debian.org/?p=collab-maint/exodus.git;a=summary
+
+Package: libexodus-c++
+Architecture: any
+Depends: ${misc:Depends}, exodus-cli, g++
+Description: Exodus Multivalue Database Programming in C++
