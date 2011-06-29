@@ -1025,9 +1025,9 @@ public:
 	bool createdb(const var& dbname, var& errmsg) const;
 	bool deletedb(const var& dbname, var& errmsg) const;
 
-	bool createfile(const var& filename);
-	bool deletefile() const;
-	bool clearfile() const;
+	bool createfile(const var& filename) const;
+	bool deletefile(const var& filename) const;
+	bool clearfile(const var& filename) const;
 	var listfiles() const;
 
 	bool createindex(const var& fieldname,const var& dictfile DEFAULTNULL) const;

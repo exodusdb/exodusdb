@@ -444,7 +444,7 @@ function main()
 		file.lock( "2");
 		file.unlock( "2");
 		file.unlock( "1");
-		file.deletefile();
+		assert( deletefile( file));
 		disconnect();		// global connection
 	}
 

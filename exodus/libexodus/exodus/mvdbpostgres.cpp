@@ -1305,7 +1305,7 @@ bool var::deletedb(const var& dbname, var& errmsg) const
 	return sqlexec(L"DROP DATABASE "^dbname, errmsg);
 }
 
-bool var::createfile(const var& filename)
+bool var::createfile(const var& filename) const
 {
 	THISIS(L"bool var::createfile(const var& filename)")
 	// *this is not used
@@ -1315,24 +1315,6 @@ bool var::createfile(const var& filename)
 	//var tablename = L"TEMP" ^ var(100000000).rnd();
 	//Postgres The ON COMMIT clause for temporary tables also resembles the SQL standard, but has some differences. If the ON COMMIT clause is omitted, SQL specifies that the default behavior is ON COMMIT DELETE ROWS. However, the default behavior in PostgreSQL is ON COMMIT PRESERVE ROWS. The ON COMMIT DROP option does not exist in SQL.
 
-/* surely we dont need to do this here because the default connection will be obtained in sqlexec?!
-	if (! THIS_IS_DBCONN())		// this object has no idea about connection
-	{
-		// Lets use default connection
-		int connid = 0;
-		int * pconnid = tss_pgconnids.get();
-		if (pconnid)
-			connid = * pconnid;
-		if((connid > 0) && (mv_connections_cache.get_connection(connid) == 0))
-			connid = 0;
-		if (connid > 0)		// save connection in *this
-		{
-			var_mvtyp = pimpl::MVTYPE_NANSTR_DBCONN;
-			var_mvint = connid;
-			var_mvstr = L"";
-		}
-	}
-*/
 	var sql = L"CREATE";
 	//if (options.ucase().index(L"TEMPORARY")) sql ^= L" TEMPORARY";
 	//sql ^= L" TABLE " PGDATAFILEPREFIX ^ filename.convert(L".",L"_");
@@ -1342,20 +1324,23 @@ bool var::createfile(const var& filename)
 	return sqlexec(sql);
 }
 
-bool var::deletefile() const
+bool var::deletefile(const var& filename) const
 {
-	THISIS(L"bool var::deletefile() const")
-	THISISSTRING()
-
-	return sqlexec(L"DROP TABLE " PGDATAFILEPREFIX ^ *this);
+	THISIS(L"bool var::deletefile(const var& filename)")
+	// *this is not used
+	THISISDEFINED()
+	ISSTRING(filename)
+	return sqlexec(L"DROP TABLE " PGDATAFILEPREFIX ^ filename);
 }
 
-bool var::clearfile() const
+bool var::clearfile(const var& filename) const
 {
-	THISIS(L"bool var::clearfile() const")
-	THISISSTRING()
+	THISIS(L"bool var::clearfile(const var& filename)")
+	// *this is not used
+	THISISDEFINED()
+	ISSTRING(filename)
 
-	return sqlexec(L"DELETE FROM " PGDATAFILEPREFIX ^ *this);
+	return sqlexec(L"DELETE FROM " PGDATAFILEPREFIX ^ filename);
 }
 
 inline void unquoter_inline(var& string)
