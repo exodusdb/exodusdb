@@ -808,32 +808,32 @@ DLL_PUBLIC bool disconnect()
 
 DLL_PUBLIC bool createdb(const var& dbname)
 {
-	return var().createdb(dbname);
+	return dbname.createdb(dbname);
 }
 
 DLL_PUBLIC bool deletedb(const var& dbname)
 {
-	return var().deletedb(dbname);
+	return dbname.deletedb(dbname);
 }
 
 DLL_PUBLIC bool createdb(const var& dbname, var& errmsg)
 {
-	return var().createdb(dbname, errmsg);
+	return dbname.createdb(dbname, errmsg);
 }
 
 DLL_PUBLIC bool deletedb(const var& dbname, var& errmsg)
 {
-	return var().deletedb(dbname, errmsg);
+	return dbname.deletedb(dbname, errmsg);
 }
 
 DLL_PUBLIC bool createfile(const var& filename)
 {
-	return var().createfile(filename);
+	return filename.createfile(filename);
 }
 
 DLL_PUBLIC bool deletefile(const var& filename)
 {
-	return filename.deletefile();
+	return filename.deletefile(filename);
 }
 
 DLL_PUBLIC bool createindex(const var& filename, const var& fieldname, const var& dictfilename)
@@ -848,7 +848,7 @@ DLL_PUBLIC bool deleteindex(const var& filename, const var& fieldname)
 
 DLL_PUBLIC bool clearfile(const var& filename)
 {
-	return filename.clearfile();
+	return filename.clearfile(filename);
 }
 
 
