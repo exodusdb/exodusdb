@@ -1,0 +1,11 @@
+#!/bin/bash
+#DEBHELPER#
+for FILE in `find /etc/php5|grep php.ini` ; do
+	echo $FILE
+	if [ "`grep extension=exo.so $FILE`" == "" ]; then
+		echo "echo \"extension=exo.so\" >> $FILE"
+		echo "extension=exo.so" >> $FILE || echo "failed. permission denied?"
+		test -f /etc/init.d/apache2 && /etc/init.d/apache2 restart || echo "there was some issue restarting apache"
+		test -f /etc/init.d/httpd && /etc/init.d/apache2 httpd || echo "there was some issue restarting httpd"
+	fi;
+done

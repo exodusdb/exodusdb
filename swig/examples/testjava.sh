@@ -1,27 +1,42 @@
 #!/bin/bash
 set -e
 
-#we installed exodus_library.so and exodus_wrapper.so in the general lib
-#because dotnet has no easy pcentral place for modules and libraries
-#the GAC is highly controlled
-export LOCAL_LIBDIR=/usr/local/lib
-test -d ${LOCAL_LIBDIR}64 && export LOCAL_LIBDIR=${LOCAL_LIBDIR}64
-export EXO_LIB_PATH=$LOCAL_LIBDIR
-export EXO_CLASSPATH=$LOCAL_LIBDIR/jexodus.jar
+#java has no standard place for modules and libraries
+#exodus installed jexodus.jar in usr/shared/java
+# since it is platform independent
+# and libjexodu.so in /usr/lib
+export LIBDIR=/usr/lib
+test -d ${LIBDIR}64 && export LIBDIR=${LIBDIR}64
+if [ -f $LIBDIR/libjexodus.so ]; then
+        export LIBDIR=/usr/lib
+        export MODULEDIR=/usr/share/java
+else
+        export LIBDIR=/usr/local/lib
+        test -d ${LIBDIR}64 && export LIBDIR=${LIBDIR}64
+        export MODULEDIR=/usr/local/share/java
+fi
 
 #delete any existing test.exe
-test -f test.class && rm -f test.class && echo rm -f test.class
+test -f test.exe && rm -f test.exe && echo rm -f test.exe
 
-#--------
-# Compile
-#--------
+echo -------------------------------------------
+echo USING MODULE: $MODULEDIR/exodus_library.dll
+echo USING LIBRARY: $LIBDIR/libexodus_wrapper.so
+echo -------------------------------------------
+echo Assuming you have installed default-jdk - for javac
+echo --------
+echo Compile
+echo --------
 echo \
-javac -cp $EXO_CLASSPATH test.java
-javac -cp $EXO_CLASSPATH test.java
+javac -cp $MODULEDIR/jexodus.jar test.java
+javac -cp $MODULEDIR/jexodus.jar test.java
 
-#----
-# Run
-#----
+echo ----
+echo Run
+echo ----
 echo \
-java -cp $EXO_CLASSPATH:. -Djava.library.path=$EXO_LIB_PATH test
-java -cp $EXO_CLASSPATH:. -Djava.library.path=$EXO_LIB_PATH test
+java -cp $MODULEDIR/jexodus.jar:. -Djava.library.path=$LIBDIR test
+java -cp $MODULEDIR/jexodus.jar:. -Djava.library.path=$LIBDIR test
+
+
+

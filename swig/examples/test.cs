@@ -6,7 +6,7 @@ using System;
         Console.WriteLine("--- Testing ---");
 
 //in C#2008 onwards you can put var xyz=new ...
-//csharp has no way to say "for var put mvar" for old versions that dont support it. "welcome to the machine, my son"
+//csharp has no way to say "for var put mvar for old versions that dont support var". "welcome to the machine, my son"
 //        var exo=new mvar("");
 
         mvar exo=new mvar("");
@@ -56,7 +56,7 @@ using System;
 	        Console.WriteLine(listoffiles);
 	        Console.WriteLine(listoffiles.extract(1));
 
-	        if (filename.deletefile())
+	        if (exo.deletefile(filename))
 	                Console.WriteLine("db file deleted");
 
 	}

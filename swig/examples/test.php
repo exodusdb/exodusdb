@@ -2,7 +2,7 @@
 echo "--- Testing ---\n";
 
 //include("backtrace.php");
-include("php/exo.php");
+include("exo.php");
 
 //glossary:
 //file means database table
@@ -50,7 +50,7 @@ if (!$exo->connect($options)) {
 	echo $listoffiles->extract(1),"\n";
 
 	//delete a file
-	if ($filename->deletefile())
+	if ($exo->deletefile($filename))
 		echo "deleted file ",$filename,"\n";
 	else
 		echo "not deleted ",$filename,"\n";

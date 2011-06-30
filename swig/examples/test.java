@@ -39,7 +39,7 @@ public static void main(String argv[]) {
         	System.out.println();
 		exo.committrans();
 
-	        if (filename.deletefile()) {
+	        if (exo.deletefile(filename)) {
          	       System.out.println("filename file deleted");
         	}
 	}

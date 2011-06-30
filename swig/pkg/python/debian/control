@@ -11,5 +11,5 @@ Homepage: http://devwiki.neosys.com
 Package: libexodus-python
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, libexodus, python
-Suggests: libpgexodus
+Suggests: exodus-cli, libpgexodus
 Description: Exodus Multivalue Database Programming in Python
