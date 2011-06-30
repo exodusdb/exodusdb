@@ -1,16 +1,15 @@
-%define baseversion 9.6
+%define baseversion 11.6
 
-Summary: Exodus C++ library
-Name: exodus
-Version: 9.6.0
+Summary: Exodus Multivalue Database Programming in any language
+Name: libexodus
+Version: 11.6.1
 Release: 1
 Source0: %{name}-%{version}.tar.gz
 License: MIT http://www.opensource.org/licenses/mit-license.php
 Group: Development/Libraries
 BuildRoot: /var/tmp/%{name}-%{version}-%{release}-root
 %description
-The Exodus library enables Pick/Multivalue database style programming
-with only C++ and Postgres.
+Pick/Multivalue database programming in any language
 %prep
 %setup -q
 %build
