@@ -1,3 +1,9 @@
+libexodus-c++ (11.6.2-1) lucid; urgency=low
+
+  * add examples
+
+ -- Steve Bush <steve.bush@neosys.com>  Thu, 30 Jun 2011 17:14:58 +0200
+
 libexodus-c++ (11.6.1-1) lucid; urgency=low
 
   * Initial release
