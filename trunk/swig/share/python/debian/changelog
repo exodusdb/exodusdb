@@ -1,3 +1,9 @@
+libexodus-python (11.6.3-1) lucid; urgency=low
+
+  * add examples
+
+ -- Steve Bush <steve.bush@neosys.com>  Thu, 30 Jun 2011 16:44:30 +0200
+
 libexodus-python (11.6.2-1) lucid; urgency=low
 
   * ...
