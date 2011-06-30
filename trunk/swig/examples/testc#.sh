@@ -1,28 +1,40 @@
 #!/bin/bash
 set -e
 
-#we installed jexodus.jar and jexodus.so in the general library
-#because java has no standard place for modules and libraries
-export LOCAL_LIBDIR=/usr/local/lib
-test -d ${LOCAL_LIBDIR}64 && export LOCAL_LIBDIR=${LOCAL_LIBDIR}64
-export EXO_MOD_PATH=$LOCAL_LIBDIR
-export EXO_LIB_PATH=$LOCAL_LIBDIR
-
+#not using GAC so csharp has no standard place for modules and libraries
+#exodus installed exodus_library.dll in usr/shared/csharp
+# since it is platform independent (despite the dll extension)
+# and libexodus_wrapper.so in /usr/lib
+export LIBDIR=/usr/lib
+test -d ${LIBDIR}64 && export LIBDIR=${LIBDIR}64
+if [ -f $LIBDIR/libexodus_wrapper.so ]; then
+	export LIBDIR=/usr/lib
+	export MODULEDIR=/usr/share/csharp
+else
+	export LIBDIR=/usr/local/lib
+	test -d ${LIBDIR}64 && export LIBDIR=${LIBDIR}64
+	export MODULEDIR=/usr/local/share/csharp
+fi
 
 #delete any existing test.exe
 test -f test.exe && rm -f test.exe && echo rm -f test.exe
 
-#--------
-# Compile
-#--------
+echo -------------------------------------------
+echo USING MODULE: $MODULEDIR/exodus_library.dll
+echo USING LIBRARY: $LIBDIR/libexodus_wrapper.so
+echo -------------------------------------------
+echo Assuming you have installed mono-gmcs - for gmcs
+echo --------
+echo Compile
+echo --------
 echo \
-gmcs test.cs -r:$EXO_MOD_PATH/exodus_library
-gmcs test.cs -r:$EXO_MOD_PATH/exodus_library
+gmcs test.cs -r:$MODULEDIR/exodus_library
+gmcs test.cs -r:$MODULEDIR/exodus_library
 
-#----
-# Run
-#----
+echo ----
+echo Run
+echo ----
 #mono xxx command not necessary in later versions can execute .exe from command line
 echo \
-env MONO_PATH=$EXO_MOD_PATH env LD_LIBRARY_PATH=$EXO_LIB_PATH mono ./test.exe
-env MONO_PATH=$EXO_MOD_PATH env LD_LIBRARY_PATH=$EXO_LIB_PATH mono ./test.exe
+env MONO_PATH=$MODULEDIR env LD_LIBRARY_PATH=$LIBDIR mono ./test.exe
+env MONO_PATH=$MODULEDIR env LD_LIBRARY_PATH=$LIBDIR mono ./test.exe

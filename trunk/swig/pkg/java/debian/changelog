@@ -1,0 +1,11 @@
+libexodus-java (11.6.4-1) lucid; urgency=low
+
+  * replace jdk dependency with jre - allow installation without compiler
+
+ -- Steve Bush <steve.bush@neosys.com>  Thu, 30 Jun 2011 03:32:13 +0200
+
+libexodus-java (11.6.2-1) lucid; urgency=low
+
+  * initial release
+
+ -- Steve Bush <steve.bush@neosys.com>  Thu, 30 Jun 2011 02:18:23 +0200

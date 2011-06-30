@@ -90,8 +90,10 @@ export SWIG_MODULENAME="exodus"
 
 if [ "$FAKEROOTKEY" == "" ]; then
  export SWIG_SHARED_LIBDIR=/usr/local/lib
+ export SWIG_SHARE_DIR=/usr/local/share
 else
  export SWIG_SHARED_LIBDIR=/usr/lib
+ export SWIG_SHARE_DIR=/usr/share
 fi
 test -d ${SWIG_SHARED_LIBDIR}64 && ( test -L ${SWIG_SHARED_LIBDIR}64 || export SWIG_SHARED_LIBDIR=${SWIG_SHARED_LIBDIR}64 )
 
@@ -130,8 +132,9 @@ case $SWIG_TARGET in
         export SWIG_WRAPPER_EXT=cpp
 
 	#dump exo.php in lib dir from where it can be copied to php web directories for including
-        export SWIG_TARGET_MODDIR=$SWIG_SHARED_LIBDIR
-        export SWIG_TARGET_MODFILE="$SWIG_MODULENAME.php"
+        #export SWIG_TARGET_MODDIR=$SWIG_SHARED_LIBDIR
+        export SWIG_TARGET_MODDIR=$SWIG_SHARE_DIR/php
+        export SWIG_TARGET_MODFILE=$SWIG_MODULENAME.php
 
         export SWIG_TARGET_LIBDIR="`php-config --extension-dir`"
 	export SWIG_TARGET_LIBFILE="$SWIG_MODULENAME.so"
@@ -143,7 +146,15 @@ case $SWIG_TARGET in
 
 	#centos in /etc/php.ini, ubuntu in /etc/php5 ...
 	export PHPINIFILES="/etc/php.ini /etc/php5/cli/php.ini /etc/php5/conf.d/php.ini"
-	export SWIG_MODULE_INSTALL="for FILE in $PHPINIFILES; do test -f \$FILE && [ ! \`grep extension=exo.so \$FILE\` ] && echo \"extension=exo.so\"  && echo \"extension=exo.so\" >> \$FILE; done"
+	#export SWIG_MODULE_INSTALL="for FILE in $PHPINIFILES; do test -f \$FILE && [ ! \`grep extension=exo.so \$FILE\` ] && echo \"extension=exo.so\"  && echo \"extension=exo.so\" >> \$FILE; done"
+	if [ "$FAKEROOTKEY" == "" ]; then
+		export SWIG_MODULE_INSTALL="for FILE in $PHPINIFILES; do \
+					if [[ -f \$FILE && \"\`grep extension=exo.so \$FILE\`\" == \"\" ]]; then\
+						echo \"extension=exo.so\"  && \
+						echo \"extension=exo.so\" >> \$FILE; \
+					fi; \
+				    done"
+	fi
 
 ;; python )
 
@@ -172,9 +183,9 @@ case $SWIG_TARGET in
 	export SWIG_TARGET_INCLUDE_FLAGS="`perl -MConfig -e 'print join(\" \", @Config{qw(ccflags optimize cccdlflags)}, \"-I$Config{archlib}/CORE\")'`"
 	export SWIG_TARGET_LDFLAGS="`perl -MConfig -e 'print $Config{lddlflags}'`"
 
-        export SWIG_TARGET_MODDIR="`perl -e 'print @INC[0]'`"
+        export SWIG_TARGET_MODDIR=`perl -e 'print @INC[0]'`
 	test -d /usr/lib/perl5/site_perl && export SWIG_TARGET_MODDIR="/usr/lib/perl5/site_perl"
-        export SWIG_TARGET_MODFILE="$SWIG_MODULENAME.pm"
+        export SWIG_TARGET_MODFILE=$SWIG_MODULENAME.pm
 
 ;; java )
 
@@ -201,7 +212,9 @@ case $SWIG_TARGET in
 
 	export SWIG_POSTGENERATE_CMD="javac $SWIG_PACKAGE_SUBDIR/*.java"
 	export SWIG_MODULE_BUILD="jar cvf $SWIG_PACKAGENAME.jar $SWIG_PACKAGE_SUBDIR"
-	export SWIG_MODULE_INSTALL="cp -f ${SWIG_MODULENAME}.jar $SWIG_SHARED_LIBDIR"
+	#export SWIG_MODULE_INSTALL="cp -f ${SWIG_MODULENAME}.jar $SWIG_SHARED_LIBDIR"
+	export SWIG_TARGET_MODFILE=${SWIG_MODULENAME}.jar
+	export SWIG_TARGET_MODDIR=${SWIG_SHARE_DIR}/java
 
 ;; csharp )
 	export SWIG_OPTIONS="$SWIG_OPTIONS -dllimport ${SWIG_MODULENAME}_wrapper"
@@ -215,9 +228,11 @@ case $SWIG_TARGET in
 	export SWIG_POSTGENERATE_CMD="gmcs $SWIG_MODULENAME.cs *.cs ../AssemblyInfo.cs -target:library -keyfile:../${SWIG_MODULENAME}.snk"
 
 	#export SWIG_MODULE_INSTALL="sn -R ${SWIG_MODULENAME}.dll ../exodus_library.snk ; gacutil -i ${SWIG_MODULENAME}.dll"
-	export SWIG_MODULE_INSTALL="cp -f ${SWIG_MODULENAME}.dll $SWIG_SHARED_LIBDIR"
+	#export SWIG_MODULE_INSTALL="cp -f ${SWIG_MODULENAME}.dll ${SWIG_DESTDIR}${SWIG_SHARE_DIR}/"
+	export SWIG_TARGET_MODFILE=${SWIG_MODULENAME}.dll
+	export SWIG_TARGET_MODDIR=${SWIG_SHARE_DIR}/csharp
 
-;;*)
+;; *)
         echo "$SWIG_SYNTAX all or $SWIG_ALL_TARGETS"
         exit 1
 ;;
