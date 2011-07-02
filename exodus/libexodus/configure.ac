@@ -94,8 +94,8 @@ m4_include([m4/ax_boost_regex.m4])
 m4_include([m4/ax_boost_system.m4])
 m4_include([m4/ax_boost_thread.m4])
 
-ls /usr/include
-ls /usr/lib
+ls -la -d /usr/include/boost*
+ls -la /usr/lib/libboost*
 
 #utf8_codecvt fixed in filesystem library from 1.40
 #redhat 5 = 1.33, redhat 6 = 1.41
