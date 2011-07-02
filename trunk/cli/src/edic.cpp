@@ -277,6 +277,7 @@ program()
                                 newfile=false;
                         else {
                                 //delete the skeleton
+								printl("File unchanged. Not saving.");
                                 if (newfile)
                                         osdelete(filename);
                                 //move to the next file

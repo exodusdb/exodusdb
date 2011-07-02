@@ -22,7 +22,9 @@ THE SOFTWARE.
 
 
 //C4530: C++ exception handler used, but unwind semantics are not enabled. 
+#ifdef _MSC_VER
 #pragma warning (disable: 4530)
+#endif
 
 #define MV_NO_NARROW
 
