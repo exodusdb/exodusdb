@@ -15099,8 +15099,8 @@ $as_echo "no" >&6; }
 
 
 
-ls /usr/include
-ls /usr/lib
+ls -la -d /usr/include/boost*
+ls -la /usr/lib/libboost*
 
 #utf8_codecvt fixed in filesystem library from 1.40
 #redhat 5 = 1.33, redhat 6 = 1.41
@@ -15153,6 +15153,7 @@ if test "x$want_boost" = "xyes"; then
         boost_lib_version_req_sub_minor="0"
         fi
     WANT_BOOST_VERSION=`expr $boost_lib_version_req_major \* 100000 \+  $boost_lib_version_req_minor \* 100 \+ $boost_lib_version_req_sub_minor`
+echo "0---$WANT_BOOST_VERSION---"
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking for boostlib >= $boost_lib_version_req" >&5
 $as_echo_n "checking for boostlib >= $boost_lib_version_req... " >&6; }
     succeeded=no
@@ -15165,20 +15166,26 @@ $as_echo_n "checking for boostlib >= $boost_lib_version_req... " >&6; }
 
                 if test "$ac_boost_path" != ""; then
         BOOST_CPPFLAGS="-I$ac_boost_path/include"
+echo "1---$BOOST_CPPFLAGS---"
         for ac_boost_path_tmp in $libsubdirs; do
                 if test -d "$ac_boost_path"/"$ac_boost_path_tmp" ; then
                         BOOST_LDFLAGS="-L$ac_boost_path/$ac_boost_path_tmp"
                         break
                 fi
         done
+echo "2---$BOOST_LDFLAGS---"
     elif test "$cross_compiling" != yes; then
         for ac_boost_path_tmp in /usr /usr/local /opt /opt/local ; do
+echo "3---$ac_boost_path_tmp---"
             if test -d "$ac_boost_path_tmp/include/boost" && test -r "$ac_boost_path_tmp/include/boost"; then
                 for libsubdir in $libsubdirs ; do
+echo "4---$lib_subdir---"
                     if ls "$ac_boost_path_tmp/$libsubdir/libboost_"* >/dev/null 2>&1 ; then break; fi
                 done
                 BOOST_LDFLAGS="-L$ac_boost_path_tmp/$libsubdir"
                 BOOST_CPPFLAGS="-I$ac_boost_path_tmp/include"
+echo "5---$BOOST_LDFLAGS---"
+echo "6---$BOOST_CPPFLAGS---"
                 break;
             fi
         done
@@ -15238,9 +15245,10 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-
+echo "6.1---$succeeded---"
 
             if test "x$succeeded" != "xyes"; then
+echo "7---$BOOST_LDFLAGS---$BOOST_CPPFLAGS---"
         _version=0
         if test "$ac_boost_path" != ""; then
             if test -d "$ac_boost_path" && test -r "$ac_boost_path"; then
@@ -15257,10 +15265,13 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
         else
             if test "$cross_compiling" != yes; then
                 for ac_boost_path in /usr /usr/local /opt /opt/local ; do
+echo "9---$ac_boost_path---"
                     if test -d "$ac_boost_path" && test -r "$ac_boost_path"; then
+echo "10---$ac_boost_path---"
                         for i in `ls -d $ac_boost_path/include/boost-* 2>/dev/null`; do
                             _version_tmp=`echo $i | sed "s#$ac_boost_path##" | sed 's/\/include\/boost-//' | sed 's/_/./'`
                             V_CHECK=`expr $_version_tmp \> $_version`
+echo "11---$_version_tmp---$_version---$V_CHECK---"
                             if test "$V_CHECK" = "1" ; then
                                 _version=$_version_tmp
                                 best_path=$ac_boost_path
@@ -15270,14 +15281,21 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
                 done
 
                 VERSION_UNDERSCORE=`echo $_version | sed 's/\./_/'`
+echo "12---$VERSION_UNDERSCORE---"
                 BOOST_CPPFLAGS="-I$best_path/include/boost-$VERSION_UNDERSCORE"
                 if test "$ac_boost_lib_path" = ""; then
                     for libsubdir in $libsubdirs ; do
+{ $as_echo "$as_me:${as_lineno-$LINENO}: 12.2 ---$best_path/$libsubdir/libboost_ ---" >&5
+$as_echo "$as_me: 12.2 ---$best_path/$libsubdir/libboost_ ---" >&6;}
                         if ls "$best_path/$libsubdir/libboost_"* >/dev/null 2>&1 ; then break; fi
                     done
                     BOOST_LDFLAGS="-L$best_path/$libsubdir"
                 fi
+echo "13---$BOOST_LDFLAGS---$BOOST_CPPFLAGS---"
             fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: 13---$BOOST_LDFLAGS---$BOOST_CPPFLAGS---" >&5
+$as_echo "$as_me: 13---$BOOST_LDFLAGS---$BOOST_CPPFLAGS---" >&6;}
 
             if test "x$BOOST_ROOT" != "x"; then
                 for libsubdir in $libsubdirs ; do
@@ -15302,6 +15320,8 @@ $as_echo "$as_me: We will use a staged boost library from $BOOST_ROOT" >&6;}
         export CPPFLAGS
         LDFLAGS="$LDFLAGS $BOOST_LDFLAGS"
         export LDFLAGS
+
+echo "80---$BOOST_LDFLAGS---$BOOST_CPPFLAGS---"
 
         ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
@@ -15342,6 +15362,9 @@ ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+echo "81---$succeeded---$found_system---$_version"
 
     fi
 
