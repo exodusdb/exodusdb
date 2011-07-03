@@ -21,21 +21,24 @@ pgexodus_la_LDFLAGS= -module -version-info $(GENERIC_LIBRARY_VERSION) \
  -release $(GENERIC_RELEASE) $(POSTGRESQL_LDFLAGS) $(BOOST_LDFLAGS)
 
 install-data-hook:
-	(	(rm -f `pg_config --pkglibdir`/pgexodus.so \
+	(	(rm -f $(DESTDIR)`pg_config --pkglibdir`/pgexodus.so \
 			&& echo "removed all pgexodus.so link" \
 		) \
 		|| echo "cannot remove pgexodus.so link" \
 	)
-	( $(LN_S) $(libdir)/pgexodus-$(GENERIC_RELEASE).so.0 `pg_config --pkglibdir`/pgexodus.so \
-		|| echo "CANT INSTALL pgexodus.so. Are you not root/sudo?" \
+	( $(LN_S) $(DESTDIR)$(libdir)/pgexodus-$(GENERIC_RELEASE).so.0 $(DESTDIR)`pg_config --pkglibdir`/pgexodus.so \
+		|| echo "CANT INSTALL pgexodus.so." \
 	)
+	( { ldconfig 2> /dev/null ; } || { /sbin/ldconfig 2> /dev/null ; } \
+		|| echo "skipping ldconfig")
 uninstall-hook:
-	(	(rm -f `pg_config --pkglibdir`/pgexodus.so \
+	(	(rm -f $(DESTDIR)`pg_config --pkglibdir`/pgexodus.so \
 			&& echo "removed all pgexodus.so link" \
 		) \
 		|| echo "cannot remove pgexodus.so link" \
 	)
-
+	( { ldconfig 2> /dev/null ; } || { /sbin/ldconfig 2> /dev/null ; } \
+		|| echo "skipping ldconfig")
 
 
 
