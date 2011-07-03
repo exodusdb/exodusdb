@@ -26,6 +26,9 @@ install-data-hook:
 		) \
 		|| echo "cannot remove pgexodus.so link" \
 	)
+	(
+		$(DESTDIR)`pg_config --pkglibdir` \
+	)
 	( $(LN_S) $(DESTDIR)$(libdir)/pgexodus-$(GENERIC_RELEASE).so.0 $(DESTDIR)`pg_config --pkglibdir`/pgexodus.so \
 		|| echo "CANT INSTALL pgexodus.so." \
 	)
