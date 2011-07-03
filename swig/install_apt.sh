@@ -2,6 +2,8 @@
 set -e
 set -o xtrace
 
+# NEEDS EXODUS/LIBEXODUS INSTALLED FIRST
+
 #----------------------
 #--- Do this first  ---
 #----------------------
