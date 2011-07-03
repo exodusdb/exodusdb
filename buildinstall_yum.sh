@@ -2,8 +2,8 @@
 #=== Building and Installing Exodus Using yum ===
 
 #you can view/run the latest version of this script directly
-# wget -O - http://exodusdb.googlecode.com/svn/trunk/buildinstall_yum.sh | less
-# wget -O - http://exodusdb.googlecode.com/svn/trunk/buildinstall_yum.sh | bash
+# wget -O - -q http://exodusdb.googlecode.com/svn/trunk/buildinstall_yum.sh | less
+# wget -O - -q http://exodusdb.googlecode.com/svn/trunk/buildinstall_yum.sh | bash
 #or
 # curl http://exodusdb.googlecode.com/svn/trunk/buildinstall_yum.sh | less
 # curl http://exodusdb.googlecode.com/svn/trunk/buildinstall_yum.sh | bash
