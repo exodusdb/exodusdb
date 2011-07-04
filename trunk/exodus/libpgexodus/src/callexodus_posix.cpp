@@ -36,7 +36,9 @@ extern "C" {
 bool callexodus(const char* serverid, const char* request, const int nrequestbytes, char* response, int* nresponsebytes)
 {
 
-	std::string socketpath="/tmp/exodus/ipc";
+	//std::string socketpath="/tmp/exodus/ipc";
+	//TODO allow customisation and privatisation for security since tmp is PUBLIC!
+	std::string socketpath="/tmp/";
 	socketpath+=serverid;
 
 	/*prepare a socket*/
