@@ -39,8 +39,14 @@ fi
 #--------------------
 echo Using: ${SWIG_CMD}
 echo Generating Source: \
-${SWIG_CMD} -c++ $SWIG_OPTIONS -$SWIG_TARGET -module $SWIG_MODULENAME $EXO_EXODUS_INCLUDE_FLAGS -outcurrentdir ../exodus.i
-${SWIG_CMD} -c++ $SWIG_OPTIONS -$SWIG_TARGET -module $SWIG_MODULENAME $EXO_EXODUS_INCLUDE_FLAGS -outcurrentdir ../exodus.i
+${SWIG_CMD} -c++ $SWIG_OPTIONS -$SWIG_TARGET -module $SWIG_MODULENAME $EXO_EXODUS_INCLUDE_FLAGS ../exodus.i
+#${SWIG_CMD} -c++ $SWIG_OPTIONS -$SWIG_TARGET -module $SWIG_MODULENAME $EXO_EXODUS_INCLUDE_FLAGS -outcurrentdir ../exodus.i
+${SWIG_CMD} -c++ $SWIG_OPTIONS -$SWIG_TARGET -module $SWIG_MODULENAME $EXO_EXODUS_INCLUDE_FLAGS ../exodus.i
+
+#can use swig's -outcurrentdir option in later versions of swig but not the ones in centos5/rh5
+echo Moving Source: \
+mv ../*_wrap.cxx ../*_wrap.cpp . || :
+mv ../*_wrap.cxx ../*_wrap.cpp . || :
 
 if [ "$SWIG_PATCH_CMD" != "" ]; then
 echo

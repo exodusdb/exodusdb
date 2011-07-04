@@ -4,6 +4,9 @@ clean:
 	./clean.sh python
 install:
 	./install.sh python
-	#mkdir -p debian/libexodus-python/usr/share/doc/libexodus-python/examples
-	#cp examples/* debian/libexodus-python/usr/share/doc/libexodus-python/examples
-	dh_installexamples -Xsvn examples/* -X.pyc
+	if `which dh_installexamples` then;
+		dh_installexamples -Xsvn examples/* -X.pyc
+	else
+		mkdir -p $(DESTDIR)/usr/share/doc/libexodus-python/examples
+		cp examples/* $(DESTDIR)/usr/share/doc/libexodus-python/examples
+	fi
