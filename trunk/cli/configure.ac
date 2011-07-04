@@ -14,7 +14,7 @@ AC_PROG_CXX
 AC_PROG_INSTALL
 
 AC_CONFIG_HEADERS([config.h])
-AM_INIT_AUTOMAKE(exodus-cli, 11.6, no-define)
+AM_INIT_AUTOMAKE(exodus-cli, 11.6.1, no-define)
 AM_SANITY_CHECK
 
 # Checks for libraries.
