@@ -1,9 +1,18 @@
 #!/bin/bash
 
-echo "you need to run this script as root eg"
-echo " sudo su postgres ./configexodus-postgresql2"
-echo "or be able to login as postgres (often disabled)"
-echo " su postgres ./configexodus-postgresql2"
+#you need to run this script as root eg
+# sudo su postgres ./configexodus-postgresql2
+#or be able to login as postgres (often disabled)
+# su postgres ./configexodus-postgresql2
+
+##allow local tcp/ip login
+#change "ident sameuser" to "md5" for all/all/127.0.0.1/32
+#host    all         all         127.0.0.1/32          ident sameuser
+#host    all         all         127.0.0.1/32          md5
+cp ~/data/pg_hba.conf ~/data/pg_hba.conf.preexodus
+egrep -v "^\w*host.*all.*127.0.0.1/.*ident" ~/data/pg_hba.conf.preexodus > ~/data/pg_hba.conf
+echo host all all 127.0.0.1/32 md5 >> ~/data/pg_hba.conf
+
 
 psql -U postgres -d template1 << EOF2
 \connect template1
