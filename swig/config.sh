@@ -172,8 +172,11 @@ case $SWIG_TARGET in
 
 	export SWIG_MODULE_COMPILE="python ../setup.py build "
 	#export SWIG_MODULE_INSTALL="python ../setup.py install --root=$DESTDIR --prefix=$PREFIX"
-	export SWIG_MODULE_INSTALL="python ../setup.py install --root=$DESTDIR --install-layout=deb"
-
+	#export SWIG_MODULE_INSTALL="python ../setup.py install --root=$DESTDIR --install-layout=deb"
+	export SWIG_MODULE_INSTALL="python ../setup.py install --root=$DESTDIR"
+	if test -d /etc/apt/apt.conf.d; then
+		export SWIG_MODULE_INSTALL="$SWIG_MODULE_INSTALL --install-layout=deb"
+	fi
 ;; perl )
 	export SWIG_MODULENAME="exo"
 
