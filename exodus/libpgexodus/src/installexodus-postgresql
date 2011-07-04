@@ -8,6 +8,5 @@ test -f ./installexodus-postgresql2 && su postgres ./installexodus-postgresql2
 
 test -f ./installexodus-postgresql2 || su postgres installexodus-postgresql2
 
-for PGSERVICE in `ls /etc/init.d/postgresql*`; do $PGSERVICE reload; done
 for PGSERVICE in `ls /etc/init.d/postgresql* 2>/dev/null`; do $PGSERVICE reload || : ; done
 for PGSERVICE in `ls /etc/init.d/httpd* 2>/dev/null`; do $PGSERVICE reload || : ; done
