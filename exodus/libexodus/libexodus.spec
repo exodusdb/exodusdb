@@ -1,4 +1,3 @@
-
 %define baseversion 11.6
 %define debug_package %{nil}
 
@@ -17,9 +16,8 @@ BuildRequires: postgresql-devel
 BuildRequires: libicu-devel
 BuildRoot: /var/tmp/%{name}-%{version}-%{release}-root
 
-#centos identifies as redhat but doesnt provide a rhel version number
-#so centos 6 will probably still want our custom boostbase without need!
-%if "%{_vendor}" == "redhat" && 0%{?rhel} < 6
+#%if "%{_vendor}" == "redhat" && 0%{?rhel} < 6 && 0%{?fedora} < 10
+%if ( 0%{?rhel_version} && 0%{?rhel_version} < 600 ) || ( 0%{?centos_version} && 0%{?centos_version} < 600 )
 Requires: boostbase
 BuildRequires: boostbase-devel
 %else
