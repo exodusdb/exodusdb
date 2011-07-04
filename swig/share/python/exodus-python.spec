@@ -19,6 +19,8 @@ BuildRoot: /var/tmp/%{name}-%{version}-%{release}-root
 %description
 Exodus Multivalue Database Programming in Python
 
+%{!?_pylibdir: %define _pylibdir %(A=`python -c "import os, atexit; print os.path.dirname(atexit.__file__)"`; echo ${A})}
+
 %prep
 %setup -q
 
@@ -55,7 +57,7 @@ fi
 
 %files
 %defattr(-,root,root)
-%{_libdir}/python/site-packages/
+%{_pylibdir}/python/site-packages/
 
 #%doc /usr/local/info/exodus.info
 #%doc %attr(0444,root,root) /usr/local/man/man1/exodus.1
