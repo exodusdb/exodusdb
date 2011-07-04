@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.65])
-AC_INIT([ExodusCLI],[11.5],[steve.bush@neosys.com])
+AC_INIT([exodus-cli],[11.5],[steve.bush@neosys.com])
 AC_CONFIG_SRCDIR([src/exodus.cpp])
 #AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR(m4)
@@ -14,7 +14,7 @@ AC_PROG_CXX
 AC_PROG_INSTALL
 
 AC_CONFIG_HEADERS([config.h])
-AM_INIT_AUTOMAKE(ExodusCLI, 11.5, no-define)
+AM_INIT_AUTOMAKE(exodus-cli, 11.5, no-define)
 AM_SANITY_CHECK
 
 # Checks for libraries.
@@ -34,6 +34,6 @@ AC_CONFIG_FILES([Makefile \
 AC_OUTPUT
 
 echo
-echo "Congrats. You have configured the Exodus CLI components"
+echo "Congrats. You have configured the exodus-cli"
 echo
 echo "Type 'make && sudo make install'"
