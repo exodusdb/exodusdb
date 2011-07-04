@@ -1,7 +1,7 @@
 #!/bin/bash
 
-echo "to run installexodus-postgresql you need to be root or run it as sudo or"
-echo "or be able to login to user postgres (often disabled)"
+#to run installexodus-postgresql you need to be root or run it as sudo or
+#or be able to login to user postgres (often disabled)
 
 #run in current directory if present (eg during development)
 test -f ./installexodus-postgresql2 && su postgres ./installexodus-postgresql2
@@ -9,3 +9,5 @@ test -f ./installexodus-postgresql2 && su postgres ./installexodus-postgresql2
 test -f ./installexodus-postgresql2 || su postgres installexodus-postgresql2
 
 for PGSERVICE in `ls /etc/init.d/postgresql*`; do $PGSERVICE reload; done
+for PGSERVICE in `ls /etc/init.d/postgresql* 2>/dev/null`; do $PGSERVICE reload || : ; done
+for PGSERVICE in `ls /etc/init.d/httpd* 2>/dev/null`; do $PGSERVICE reload || : ; done
