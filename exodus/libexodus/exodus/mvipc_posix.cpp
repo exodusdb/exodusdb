@@ -160,11 +160,11 @@ int MVipc(const int environmentn, var& pgconnparams)
 	ExodusFunctorBase exodusfunctorbase(*mv);
 
 	/*create the socket directory*/
-	std::string socketdir="/tmp/exodus";
-	if (!var(socketdir).osdir())
-		var(socketdir).osmkdir();
-
-	std::string socketpath=socketdir+"/ipc";
+	//std::string socketdir="/tmp/exodus";
+	//if (!var(socketdir).osdir())
+	//	var(socketdir).osmkdir();
+	//std::string socketpath=socketdir+"/ipc";
+	std::string socketpath="/tmp/";
 	socketpath+="exodusservice-"+processn.toString()+"."+var(environmentn).toString();
 
 	closeipcqueues(0,socketpath);
