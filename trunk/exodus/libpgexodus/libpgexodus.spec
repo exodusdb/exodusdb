@@ -8,7 +8,7 @@ Release: 1
 Source0: %{name}-%{version}.tar.gz
 License: MIT http://www.opensource.org/licenses/mit-license.php
 Group: Development/Libraries
-Requires: postgresql-libs
+Requires: postgresql-server
 BuildRequires: postgresql-devel
 BuildRequires: gcc-c++
 BuildRoot: /var/tmp/%{name}-%{version}-%{release}-root
@@ -39,15 +39,21 @@ else
 fi
 %{__make} install DESTDIR="$RPM_BUILD_ROOT"
 
-%post -p /sbin/ldconfig
+#%post -p /sbin/ldconfig
+%post
 
-for PGLIBDIR in `ls /usr/lib/postgresql`
-do
- ln -s /usr/lib/pgexodus.so /usr/lib/postgresql/$PGLIBDIR/lib/pgexodus.so
-done
+#done in build post install hooks now
+#for PGLIBDIR in `pg_config --pkglibdir`
+#do
+# ln -s /usr/lib/pgexodus.so $PGLIBDIR/pgexodus.so || :
+#done
+
+/etc/init.d/postgresql start || :
+
 installexodus-postgresql
 
-%postun -p /sbin/ldconfig
+#%postun -p /sbin/ldconfig
+%postun
 
 %clean
 if [ "$RPM_BUILD_ROOT" != "/var/tmp/%{name}-%{version}-%{release}-root" ]
