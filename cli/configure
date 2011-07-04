@@ -3154,7 +3154,7 @@ fi
 
 # Define the identity of the package.
  PACKAGE=exodus-cli
- VERSION=11.6
+ VERSION=11.6.1
 
 
 # Some tools Automake needs.
