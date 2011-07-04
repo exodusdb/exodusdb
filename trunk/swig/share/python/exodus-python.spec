@@ -51,10 +51,10 @@ fi
 
 %files
 %defattr(-,root,root)
-%{_bindir}/*
+%{_libdir}/python2.4/site-packages/
 
 #%doc /usr/local/info/exodus.info
 #%doc %attr(0444,root,root) /usr/local/man/man1/exodus.1
 #%doc COPYING AUTHORS README NEWS
 
-%doc %attr(0444,root,root) %{_docdir}/%{name}/examples
+%doc %attr(0444,root,root) %{_docdir}/lib%{name}/examples
