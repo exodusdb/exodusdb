@@ -66,7 +66,11 @@ fi
 
 %files
 %defattr(-,root,root)
-%{_libdir}/%{name}*
+#%{_libdir}/%{name}*
+%{_libdir}/pgexodus*
+%{_bindir}/installexodus-postgresql
+%{_bindir}/installexodus-postgresql2
+%{_libdir}/pgsql/pgexodus.so
 
 #%doc /usr/local/info/exodus.info
 #%doc %attr(0444,root,root) /usr/local/man/man1/exodus.1
