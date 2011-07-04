@@ -1,3 +1,4 @@
+
 %define baseversion 11.6
 %define debug_package %{nil}
 
@@ -6,25 +7,33 @@ Name: libexodus
 Version: 11.6.1
 Release: 1
 Source0: %{name}-%{version}.tar.gz
+#Patch0: boostm4.patch
 License: MIT http://www.opensource.org/licenses/mit-license.php
 Group: Development/Libraries
 Requires: postgresql-libs
-Requires: boost-date_time
-Requires: boost-filesystem
-Requires: boost-regex
-Requires: boost-system
-Requires: boost-thread
-Requires: libicu
+#Requires: libicu
+BuildRequires: gcc-c++
 BuildRequires: postgresql-devel
-BuildRequires: boost-devel
 BuildRequires: libicu-devel
 BuildRoot: /var/tmp/%{name}-%{version}-%{release}-root
+
+#centos identifies as redhat but doesnt provide a rhel version number
+#so centos 6 will probably still want our custom boostbase without need!
+%if "%{_vendor}" == "redhat" && 0%{?rhel} < 6
+Requires: boostbase
+BuildRequires: boostbase-devel
+%else
+Requires: boost
+BuildRequires: boost-devel
+%endif
 
 %description
 Pick/Multivalue database programming in any language
 
 %prep
 %setup -q
+
+#%patch0 -p1
 
 %build
 %configure
