@@ -24,9 +24,10 @@ Exodus Multivalue Database Programming in Python
 %prep
 %setup -q
 
-pylib=`python -c "import os, atexit; print
-os.path.dirname(atexit.__file__)"` 
-[ -d /usr/lib/python ] || ln -s $pylib /usr/lib/python 
+#pylib=`python -c "import os, atexit; print
+#os.path.dirname(atexit.__file__)"` 
+#echo "---$pylib---"
+#[ -d /usr/lib/python ] || ln -s $pylib /usr/lib/python 
 
 %build
 #%configure
@@ -57,7 +58,7 @@ fi
 
 %files
 %defattr(-,root,root)
-%{_pylibdir}/python/site-packages/
+%{_pylibdir}/site-packages/
 
 #%doc /usr/local/info/exodus.info
 #%doc %attr(0444,root,root) /usr/local/man/man1/exodus.1
