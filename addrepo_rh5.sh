@@ -1,4 +1,4 @@
-y#!/bin/bash
+#!/bin/bash
 set -ex
 sudo su -c 'echo "\
 [home_neosys]\
