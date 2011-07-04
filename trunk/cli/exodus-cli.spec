@@ -9,7 +9,7 @@ License: MIT http://www.opensource.org/licenses/mit-license.php
 Group: Development/Libraries
 Requires: libexodus
 BuildRequires: libexodus
-BuildRequires: gcc-g++
+BuildRequires: gcc-c++
 BuildRoot: /var/tmp/%{name}-%{version}-%{release}-root
 
 %description
