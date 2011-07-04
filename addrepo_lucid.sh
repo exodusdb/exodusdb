@@ -7,7 +7,7 @@ sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E7815451
 #Add a Launchpad PPA repository hosted by Canonical for the above key
 sudo sh -c 'echo "deb http://ppa.launchpad.net/steve-bush/ppa-exodus/ubuntu lucid main\n \
  deb-src http://ppa.launchpad.net/steve-bush/ppa-exodus/ubuntu lucid main" \
- > /etc/apt/sources.list.d/exodus-ppa-lucid.list'
+ > /etc/apt/sources.list.d/launchpad-exodus-lucid.list'
 
 sudo apt-get update
 
