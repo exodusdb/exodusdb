@@ -42,14 +42,14 @@ if cleanup :
 print "\nOpen or create test file ", filename
 
 if not x.open(filename,""):
-	x.createfile(filename,"")
+	x.createfile(filename)
 	if not x.open(filename,""):
 		x.abort("Cannot open ".filename)
 
 print "\nOpen or create the test files dictionary ", dictfilename
 
 if not x.open(dictfilename,""):
-	x.createfile(dictfilename,"")
+	x.createfile(dictfilename)
 	if not x.open(dictfilename,""):
 		x.abort("Cannot open dictionary " + dictfilename)
 
