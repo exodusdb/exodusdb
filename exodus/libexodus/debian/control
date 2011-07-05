@@ -2,7 +2,7 @@ Source: libexodus
 Section: devel
 Priority: optional
 Maintainer: Steve Bush <steve.bush@neosys.com>
-Build-Depends: debhelper (>= 7.0.50~), autotools-dev, postgresql-server-dev-8.4, libboost-all-dev (>=1.40)
+Build-Depends: debhelper (>= 7.0.50~), autotools-dev, postgresql-server-dev-8.4, libboost-all-dev (>=1.40) | libboost1.40-all-dev | libboost1.42-all-dev | boost-devel
 Standards-Version: 3.9.1
 Homepage: http://devwiki.neosys.com
 #Vcs-Git: git://git.debian.org/collab-maint/exodus.git
