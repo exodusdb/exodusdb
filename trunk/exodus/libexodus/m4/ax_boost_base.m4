@@ -101,26 +101,20 @@ echo "0---$WANT_BOOST_VERSION---"
     dnl or if you install boost with RPM
     if test "$ac_boost_path" != ""; then
         BOOST_CPPFLAGS="-I$ac_boost_path/include"
-echo "1---$BOOST_CPPFLAGS---"
         for ac_boost_path_tmp in $libsubdirs; do
                 if test -d "$ac_boost_path"/"$ac_boost_path_tmp" ; then
                         BOOST_LDFLAGS="-L$ac_boost_path/$ac_boost_path_tmp"
                         break
                 fi
         done
-echo "2---$BOOST_LDFLAGS---"
     elif test "$cross_compiling" != yes; then
         for ac_boost_path_tmp in /usr /usr/local /opt /opt/local ; do
-echo "3---$ac_boost_path_tmp---"
             if test -d "$ac_boost_path_tmp/include/boost" && test -r "$ac_boost_path_tmp/include/boost"; then
                 for libsubdir in $libsubdirs ; do
-echo "4---$lib_subdir---"
                     if ls "$ac_boost_path_tmp/$libsubdir/libboost_"* >/dev/null 2>&1 ; then break; fi
                 done
                 BOOST_LDFLAGS="-L$ac_boost_path_tmp/$libsubdir"
                 BOOST_CPPFLAGS="-I$ac_boost_path_tmp/include"
-echo "5---$BOOST_LDFLAGS---"
-echo "6---$BOOST_CPPFLAGS---"
                 break;
             fi
         done
@@ -158,12 +152,9 @@ echo "6---$BOOST_CPPFLAGS---"
         ])
     AC_LANG_POP([C++])
 
-echo "6.1---$succeeded---"
-
     dnl if we found no boost with system layout we search for boost libraries
     dnl built and installed without the --layout=system option or for a staged(not installed) version
     if test "x$succeeded" != "xyes"; then
-echo "7---$BOOST_LDFLAGS---$BOOST_CPPFLAGS---"
         _version=0
         if test "$ac_boost_path" != ""; then
             if test -d "$ac_boost_path" && test -r "$ac_boost_path"; then
@@ -180,13 +171,10 @@ echo "7---$BOOST_LDFLAGS---$BOOST_CPPFLAGS---"
         else
             if test "$cross_compiling" != yes; then
                 for ac_boost_path in /usr /usr/local /opt /opt/local ; do
-echo "9---$ac_boost_path---"
                     if test -d "$ac_boost_path" && test -r "$ac_boost_path"; then
-echo "10---$ac_boost_path---"
                         for i in `ls -d $ac_boost_path/include/boost-* 2>/dev/null`; do
                             _version_tmp=`echo $i | sed "s#$ac_boost_path##" | sed 's/\/include\/boost-//' | sed 's/_/./'`
                             V_CHECK=`expr $_version_tmp \> $_version`
-echo "11---$_version_tmp---$_version---$V_CHECK---"
                             if test "$V_CHECK" = "1" ; then
                                 _version=$_version_tmp
                                 best_path=$ac_boost_path
@@ -196,19 +184,14 @@ echo "11---$_version_tmp---$_version---$V_CHECK---"
                 done
 
                 VERSION_UNDERSCORE=`echo $_version | sed 's/\./_/'`
-echo "12---$VERSION_UNDERSCORE---"
                 BOOST_CPPFLAGS="-I$best_path/include/boost-$VERSION_UNDERSCORE"
                 if test "$ac_boost_lib_path" = ""; then
                     for libsubdir in $libsubdirs ; do
-AC_MSG_NOTICE(12.2 ---$best_path/$libsubdir/libboost_ ---)
                         if ls "$best_path/$libsubdir/libboost_"* >/dev/null 2>&1 ; then break; fi
                     done
                     BOOST_LDFLAGS="-L$best_path/$libsubdir"
                 fi
-echo "13---$BOOST_LDFLAGS---$BOOST_CPPFLAGS---"
             fi
-
-AC_MSG_NOTICE(13---$BOOST_LDFLAGS---$BOOST_CPPFLAGS---)
 
             if test "x$BOOST_ROOT" != "x"; then
                 for libsubdir in $libsubdirs ; do
@@ -233,8 +216,6 @@ AC_MSG_NOTICE(13---$BOOST_LDFLAGS---$BOOST_CPPFLAGS---)
         LDFLAGS="$LDFLAGS $BOOST_LDFLAGS"
         export LDFLAGS
 
-echo "80---$BOOST_LDFLAGS---$BOOST_CPPFLAGS---"
-
         AC_LANG_PUSH(C++)
             AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
         @%:@include <boost/version.hpp>
@@ -251,8 +232,6 @@ echo "80---$BOOST_LDFLAGS---$BOOST_CPPFLAGS---"
             ],[
             ])
         AC_LANG_POP([C++])
-
-echo "81---$succeeded---$found_system---$_version"
 
     fi
 
