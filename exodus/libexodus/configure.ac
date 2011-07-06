@@ -33,7 +33,7 @@ AC_SUBST(GENERIC_API_VERSION)
 
 #shared library versioning
 #http://www.gnu.org/software/libtool/manual/libtool.html#Versioning
-GENERIC_LIBRARY_VERSION=0:0:0
+GENERIC_LIBRARY_VERSION=11:6:0
 #                       | | |
 #                +------+ | +---+
 #                |        |     |
