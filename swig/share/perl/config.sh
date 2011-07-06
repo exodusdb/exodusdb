@@ -14,19 +14,19 @@ export SWIG_ALL_TARGETS="perl python java csharp php" put php last because it ex
 
 #per lang exodus module names and locations
 
-# php    = exo.php             dumped in /usr/local/lib
+# php    = exo.php             dumped in /usr/lib
 # python = exodus.py/pyc       only setup.py knows
 # perl   = exo.pm              eg /etc/perl
-# java   = jexodus.jar         dumped in /usr/local/lib
-# csharp = exodus_library.so   dumped in /usr/local/lib
+# java   = jexodus.jar         dumped in /usr/lib
+# csharp = exodus_library.so   dumped in /usr/lib
 
 #per lang exodus wrapper names and locations
 
-# php    = exo.so              php package dir
+# php    = exo.so              php package dir eg /usr/lib64/php/modules/
 # python = _exodus.so          only setup.py knows
-# perl   = exo.so              /usr/local/lib
-# java   = jexodus.so          dumped in /usr/local/lib
-# csharp = exodus_wrapper.so   dumped in /usr/local/lib
+# perl   = exo.so              /usr/lib
+# java   = jexodus.so          dumped in /usr/lib
+# csharp = exodus_wrapper.so   dumped in /usr/lib
 
 export EXO_EXODUS_INCLUDE_FLAGS="-I../../../../exodus/libexodus -I/usr/include"
 export EXO_WRAPPER_FLAGS="-fPIC -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes"
@@ -112,6 +112,7 @@ export SWIG_CMD=${SWIG_HOME}swig
 #---------------
 #export SWIG_DESTDIR="/"
 export SWIG_DESTDIR=$DESTDIR
+
 if [ "$SWIG_DESTDIR" == "" ]; then export SWIG_DESTDIR="/"; fi
 if [ "$FAKEROOTKEY" != "" ]; then
 	export SWIG_DESTDIR="../debian/libexodus-$SWIG_TARGET"
@@ -139,6 +140,10 @@ case $SWIG_TARGET in
         export SWIG_TARGET_MODFILE=$SWIG_MODULENAME.php
 
         export SWIG_TARGET_LIBDIR="`php-config --extension-dir`"
+	if [ "$SWIG_TARGET_LIBDIR" == "" ]; then
+		test -d /usr/lib/php/modules/ && export SWIG_TARGET_LIBDIR="/usr/lib/php/modules/"
+		test -d /usr/lib64/php/modules/ && export SWIG_TARGET_LIBDIR="/usr/lib64/php/modules/"
+	fi
 	export SWIG_TARGET_LIBFILE="$SWIG_MODULENAME.so"
 
 	if [ "`$SWIG_CMD -version |grep 1.3`" != "" ]; then
@@ -149,7 +154,7 @@ case $SWIG_TARGET in
 	#centos in /etc/php.ini, ubuntu in /etc/php5 ...
 	export PHPINIFILES="/etc/php.ini /etc/php5/cli/php.ini /etc/php5/conf.d/php.ini"
 	#export SWIG_MODULE_INSTALL="for FILE in $PHPINIFILES; do test -f \$FILE && [ ! \`grep extension=exo.so \$FILE\` ] && echo \"extension=exo.so\"  && echo \"extension=exo.so\" >> \$FILE; done"
-	if [ "$FAKEROOTKEY" == "" ]; then
+	if [ "$FAKEROOTKEY$DESTDIR" == "" ]; then
 		export SWIG_MODULE_INSTALL="for FILE in $PHPINIFILES; do \
 					if [[ -f \$FILE && \"\`grep extension=exo.so \$FILE\`\" == \"\" ]]; then\
 						echo \"extension=exo.so\"  && \
