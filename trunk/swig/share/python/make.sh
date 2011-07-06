@@ -6,6 +6,23 @@ export SWIG_TARGET=$1
 
 export SWIG_MODE=make
 
+swig -version
+
+#----------------------
+#--- install swig 2 ---
+#----------------------
+#if [ "`swig -version | grep 1.3`" != "" ]; then
+# #yum -y install pcre-devel || :
+# #apt-get -y install libpcre3-dev || :
+# cd ~
+# export SWIG_VER=2.0.4
+# wget http://downloads.sourceforge.net/project/swig/swig/swig-$SWIG_VER/swig-$SWIG_VER.tar.gz
+# tar xf swig-$SWIG_VER.tar.gz
+# cd swig-$SWIG_VER
+# ./configure --prefix=$HOME/local
+# make && sudo make install
+#fi
+
 source config.sh
 
 if [ "$SWIG_TARGET" == "all" ]; then
