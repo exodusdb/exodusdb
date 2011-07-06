@@ -9,8 +9,9 @@
 #change "ident sameuser" to "md5" for all/all/127.0.0.1/32
 #host    all         all         127.0.0.1/32          ident sameuser
 #host    all         all         127.0.0.1/32          md5
-cp ~/data/pg_hba.conf ~/data/pg_hba.conf.preexodus
-egrep -v "^\w*host.*all.*127.0.0.1/.*ident" ~/data/pg_hba.conf.preexodus > ~/data/pg_hba.conf
+test -f ~/data/pg_hba.conf.preexodus || cp ~/data/pg_hba.conf ~/data/pg_hba.conf.preexodus
+cp ~/data/pg_hba.conf ~/data/pg_hba.conf.lastexodus
+egrep -v "^\w*host.*all.*127.0.0.1/.*ident" ~/data/pg_hba.conf.lastexodus > ~/data/pg_hba.conf
 echo host all all 127.0.0.1/32 md5 >> ~/data/pg_hba.conf
 
 
