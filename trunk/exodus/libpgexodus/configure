@@ -2598,7 +2598,7 @@ GENERIC_API_VERSION=9.6
 
 
 #shared library versioning
-GENERIC_LIBRARY_VERSION=0:0:0
+GENERIC_LIBRARY_VERSION=9:6:0
 #                       | | |
 #                +------+ | +---+
 #                |        |     |

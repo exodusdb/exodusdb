@@ -29,7 +29,7 @@ GENERIC_API_VERSION=9.6
 AC_SUBST(GENERIC_API_VERSION)
 
 #shared library versioning
-GENERIC_LIBRARY_VERSION=0:0:0
+GENERIC_LIBRARY_VERSION=9:6:0
 #                       | | |
 #                +------+ | +---+
 #                |        |     |
