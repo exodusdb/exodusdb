@@ -4,7 +4,7 @@ set -e
 #java has no standard place for modules and libraries
 #exodus installed jexodus.jar in usr/shared/java
 # since it is platform independent
-# and libjexodu.so in /usr/lib
+# and libjexodus.so in /usr/lib
 export LIBDIR=/usr/lib
 test -d ${LIBDIR}64 && export LIBDIR=${LIBDIR}64
 if [ -f $LIBDIR/libjexodus.so ]; then
