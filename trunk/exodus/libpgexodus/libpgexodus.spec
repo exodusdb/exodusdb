@@ -30,7 +30,7 @@ then
   echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
   echo @                                                                    @
   echo @  RPM_BUILD_ROOT is not what I expected.  Please clean it yourself. @
-  echo @                                                                    @
+  echo @                                                                   @
   echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
   echo
 else

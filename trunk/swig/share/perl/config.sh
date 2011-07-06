@@ -88,7 +88,7 @@ export EXO_EXODUS_LDFLAGS=" \
 export SWIG_WRAPPER_EXT=cxx
 export SWIG_MODULENAME="exodus"
 
-if [ "$FAKEROOTKEY" == "" ]; then
+if [ "$FAKEROOTKEY$DESTDIR" == "" ]; then
  export SWIG_SHARED_LIBDIR=/usr/local/lib
  export SWIG_SHARE_DIR=/usr/local/share
 else
@@ -110,7 +110,9 @@ export SWIG_CMD=${SWIG_HOME}swig
 #---------------
 #--- DESTDIR ---
 #---------------
-export SWIG_DESTDIR="/"
+#export SWIG_DESTDIR="/"
+export SWIG_DESTDIR=$DESTDIR
+if [ "$SWIG_DESTDIR" == "" ]; then export SWIG_DESTDIR="/"; fi
 if [ "$FAKEROOTKEY" != "" ]; then
 	export SWIG_DESTDIR="../debian/libexodus-$SWIG_TARGET"
 	#avoid error ... dh_usrlocal: debian/libexodus-python/usr/local/lib/python2.6/dist-packages/_exodus.so is not a directory"
@@ -172,8 +174,11 @@ case $SWIG_TARGET in
 
 	export SWIG_MODULE_COMPILE="python ../setup.py build "
 	#export SWIG_MODULE_INSTALL="python ../setup.py install --root=$DESTDIR --prefix=$PREFIX"
-	export SWIG_MODULE_INSTALL="python ../setup.py install --root=$DESTDIR --install-layout=deb"
-
+	#export SWIG_MODULE_INSTALL="python ../setup.py install --root=$DESTDIR --install-layout=deb"
+	export SWIG_MODULE_INSTALL="python ../setup.py install --root=$DESTDIR"
+	if test -d /etc/apt/apt.conf.d; then
+		export SWIG_MODULE_INSTALL="$SWIG_MODULE_INSTALL --install-layout=deb"
+	fi
 ;; perl )
 	export SWIG_MODULENAME="exo"
 
@@ -184,7 +189,8 @@ case $SWIG_TARGET in
 	export SWIG_TARGET_LDFLAGS="`perl -MConfig -e 'print $Config{lddlflags}'`"
 
         export SWIG_TARGET_MODDIR=`perl -e 'print @INC[0]'`
-	test -d /usr/lib/perl5/site_perl && export SWIG_TARGET_MODDIR="/usr/lib/perl5/site_perl"
+	#test -d /usr/lib/perl5/site_perl && export SWIG_TARGET_MODDIR="/usr/lib/perl5/site_perl"
+	#test -d /usr/lib64/perl5/site_perl && export SWIG_TARGET_MODDIR="/usr/lib64/perl5/site_perl"
         export SWIG_TARGET_MODFILE=$SWIG_MODULENAME.pm
 
 ;; java )

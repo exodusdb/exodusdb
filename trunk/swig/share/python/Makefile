@@ -10,4 +10,3 @@ install:
 		cp examples/* $(DESTDIR)/usr/share/doc/libexodus-python/examples \
 	)
 	./install.sh python
-	echo ------------
