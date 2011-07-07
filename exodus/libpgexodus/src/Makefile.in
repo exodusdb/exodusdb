@@ -234,14 +234,20 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-INCLUDES = -I$(top_srcdir)
+
+# postinstall scripts to setup postgres
+#--------------------------------------
 dist_bin_SCRIPTS = installexodus-postgresql installexodus-postgresql2
+
+# compiler options
+#-----------------
+INCLUDES = -I$(top_srcdir)
 AM_CPPFLAGS = -I$(top_srcdir) $(POSTGRESQL_CFLAGS) $(BOOST_CPPFLAGS) \
  -Wall -Wextra  -Wno-unknown-pragmas
 
-# -pedantic
 
-# library to build and how #
+# library to build
+#-----------------
 
 #build a library pgexodus #and install it in lib (default prefix/libdir /usr/local/lib)
 lib_LTLIBRARIES = pgexodus.la
@@ -626,26 +632,25 @@ uninstall-am: uninstall-dist_binSCRIPTS uninstall-libLTLIBRARIES
 	uninstall-hook uninstall-libLTLIBRARIES
 
 
+# postinstall
+#------------
+#add a symbolic link in postgres package libdir pointing to the lib in \usr\lib
 install-data-hook:
-	(	(rm -f $(DESTDIR)`pg_config --pkglibdir`/pgexodus.so \
-			&& echo "removed all pgexodus.so link" \
-		) \
-		|| echo "cannot remove pgexodus.so link" \
-	)
+	rm -f $(DESTDIR)`pg_config --pkglibdir`/pgexodus.so \
+		|| echo "cannot remove pgexodus.so link"
 	mkdir -p $(DESTDIR)`pg_config --pkglibdir`
-	( $(LN_S) $(libdir)/pgexodus-$(GENERIC_RELEASE).so.0 $(DESTDIR)`pg_config --pkglibdir`/pgexodus.so \
-		|| echo "CANT INSTALL pgexodus.so." \
-	)
+	$(LN_S) $(DESTDIR)$(libdir)/pgexodus-$(GENERIC_RELEASE).so.0 $(DESTDIR)`pg_config --pkglibdir`/pgexodus.so
 	( { ldconfig 2> /dev/null ; } || { /sbin/ldconfig 2> /dev/null ; } \
-		|| echo "skipping ldconfig")
+		|| echo "cannot ldconfig")
+
+# postuninstall
+#--------------
+#remove the symbolic link in postgres package dir
 uninstall-hook:
-	(	(rm -f $(DESTDIR)`pg_config --pkglibdir`/pgexodus.so \
-			&& echo "removed all pgexodus.so link" \
-		) \
-		|| echo "cannot remove pgexodus.so link" \
-	)
+	rm -f $(DESTDIR)`pg_config --pkglibdir`/pgexodus.so \
+		|| echo "cannot remove pgexodus.so link"
 	( { ldconfig 2> /dev/null ; } || { /sbin/ldconfig 2> /dev/null ; } \
-		|| echo "skipping ldconfig")
+		|| echo "cannot ldconfig")
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
