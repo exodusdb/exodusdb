@@ -64,4 +64,4 @@ fi
 #%doc %attr(0444,root,root) /usr/local/man/man1/exodus.1
 #%doc COPYING AUTHORS README NEWS
 
-%doc %{_docdir}/lib%{name}/examples
+%doc %{_docdir}/%{name}/examples
