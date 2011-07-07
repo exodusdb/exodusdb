@@ -39,6 +39,7 @@ install-data-hook:
 # postuninstall
 #--------------
 #remove the symbolic link in postgres package dir
+	ls -la $(DESTDIR)$(libdir)/pgexodus*
 uninstall-hook:
 	rm -f $(DESTDIR)`pg_config --pkglibdir`/pgexodus.so \
 		|| echo "cannot remove pgexodus.so link"

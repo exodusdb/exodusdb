@@ -64,20 +64,6 @@ libexodus_la_LDFLAGS= \
 libexodus_la_LIBADD= \
  $(BOOST_DATE_TIME_LIB) $(BOOST_FILESYSTEM_LIB) $(BOOST_REGEX_LIB) $(BOOST_SYSTEM_LIB) $(BOOST_THREAD_LIB)
 
-#libs for all links
-#LIBS += \
-#       $(BOOST_DATE_TIME_LIB) \
-#        $(BOOST_FILESYSTEM_LIB) \
-#        $(BOOST_THREAD_LIB) \
-#        $(BOOST_REGEX_LIB)
-
-#additional symbolic links but ...
-#doesnt work because cant workout exact library naming on all plaforms and libext is missing
-#therefore we have to rely on libtool and Wl option
-#libtool --config|grep ext
-#actlibfile=lib$(GENERIC_LIBRARY_NAME)-$(GENERIC_API_VERSION)$(LIBEXT).$(GENERIC_LIBRARY_VERSION)
-#symlibfile=lib$(GENERIC_LIBRARY_NAME)$(LIBEXT)
-
 install-data-hook:
 	( cd $(DESTDIR)$(prefix)/include \
 		&& { $(LN_S) -f exodus-$(GENERIC_RELEASE)/exodus exodus \
@@ -89,6 +75,7 @@ install-data-hook:
 		|| echo "skipping /etc/ld.so.conf.d")
 	( { ldconfig 2> /dev/null ; } || { /sbin/ldconfig 2> /dev/null ; } \
 		|| echo "skipping ldconfig")
+	ls -la $(DESTDIR)$(libdir)/libexodus*
 uninstall-hook:
 	( cd $(DESTDIR)$(prefix)/include \
 		&& { rm -rf exodus-$(GENERIC_RELEASE) ; } \
