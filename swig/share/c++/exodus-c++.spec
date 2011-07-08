@@ -7,7 +7,7 @@ Release: 1
 Source: %{name}-%{version}.tar.gz
 License: MIT http://www.opensource.org/licenses/mit-license.php
 Group: Development/Libraries
-Requires: libexodus
+Requires: libexodus-devel
 Requires: gcc-c++
 BuildRoot: /var/tmp/%{name}-%{version}-%{release}-root
 
@@ -51,7 +51,7 @@ fi
 #%doc %attr(0444,root,root) /usr/local/man/man1/exodus.1
 #%doc COPYING AUTHORS README NEWS
 
-%if 0%{?rhel_version} || 0%{?fedora_version}
+%if 0%{?rhel_version}
 %{_docdir}/packages/lib%{name}
 %{_docdir}/packages/lib%{name}/examples
 %else
