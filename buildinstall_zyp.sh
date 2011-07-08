@@ -20,7 +20,7 @@ echo building on:
  uname -a
 
 export yum="yum -y"
-export yum=zypper
+export yum=zypper --non-interactive
 
 #==== 1. Installing or Building Boost ====
 
@@ -52,7 +52,7 @@ fi
 
 #==== 2. Building and Installing Exodus ====
 
- sudo $yum install subversion gcc-c++ postgresql-devel
+ sudo $yum install subversion gcc-c++ postgresql-devel make
 
  cd ~
  svn co HTTPS://exodusdb.googlecode.com/svn/trunk/ exodus
@@ -66,7 +66,7 @@ fi
  sudo $yum install postgresql-server
 
  test -f /usr/local/bin/installexodus-postgresql && sudo /usr/local/bin/installexodus-postgresql
- test -f /usr/local/bin/installexodus-postgresql || sudo /usr/local/bin/installexodus-postgresql
+ test -f /usr/bin/installexodus-postgresql && sudo /usr/bin/installexodus-postgresql
 
 #==== 4. Configuring Exodus ====
 
