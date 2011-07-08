@@ -20,8 +20,8 @@ echo building on:
  uname -a
 
 export yum="yum -y"
-export yum=zypper --non-interactive
-export boostlibs="'
+export yum="zypper --non-interactive"
+
 #==== 1. Installing or Building Boost ====
 
 sudo $yum install icu libicu libicu-devel
