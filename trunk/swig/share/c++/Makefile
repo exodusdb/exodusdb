@@ -2,4 +2,4 @@ EXO_MODULE:=c++
 make:
 clean:
 install:
-	./installer.sh
+	./installer.sh $(EXO_MODULE)
