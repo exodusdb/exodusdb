@@ -7,17 +7,18 @@
 
 #should be postgres
 /usr/bin/whoami
-cd $HOME
 
-##allow local tcp/ip login
+##allow local tcp/ip login (not required on debian/ubuntu and co)
 #change "ident sameuser" to "md5" for all/all/127.0.0.1/32
 #host    all         all         127.0.0.1/32          ident sameuser
 #host    all         all         127.0.0.1/32          md5
-test -f ./data/pg_hba.conf.preexodus || cp ./data/pg_hba.conf ./data/pg_hba.conf.preexodus
-cp ./data/pg_hba.conf ./data/pg_hba.conf.lastexodus
-egrep -v "^\w*host.*all.*127.0.0.1/.*ident" ./data/pg_hba.conf.lastexodus > ./data/pg_hba.conf
-echo host all all 127.0.0.1/32 md5 >> ./data/pg_hba.conf
-
+cd $HOME
+if [ -f ./data/pg_hba.conf ]; then
+        test -f ./data/pg_hba.conf.preexodus || cp ./data/pg_hba.conf ./data/pg_hba.conf.preexodus
+        cp ./data/pg_hba.conf ./data/pg_hba.conf.lastexodus
+        egrep -v "^\w*host.*all.*127.0.0.1/.*ident" ./data/pg_hba.conf.lastexodus > ./data/pg_hba.conf
+        echo host all all 127.0.0.1/32 md5 >> ./data/pg_hba.conf
+fi
 
 psql -U postgres -d template1 << EOF2
 \connect template1
@@ -39,4 +40,3 @@ CREATE DATABASE exodus
 \df exodus*
 \q
 EOF2
-
