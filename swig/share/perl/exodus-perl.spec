@@ -10,6 +10,7 @@ Group: Development/Libraries
 Requires: libexodus
 Requires: perl
 BuildRequires: libexodus
+BuildRequires: libexodus-devel
 BuildRequires: gcc-c++
 BuildRequires: swig
 
@@ -17,7 +18,8 @@ BuildRequires: swig
 %if 0%{?rhel_version}
 BuildRequires: perl
 %else
-BuildRequires: perl-devel
+BuildRequires: perl
+#BuildRequires: perl-devel
 %endif
 
 BuildRoot: /var/tmp/%{name}-%{version}-%{release}-root
@@ -66,4 +68,10 @@ fi
 #%doc %attr(0444,root,root) /usr/local/man/man1/exodus.1
 #%doc COPYING AUTHORS README NEWS
 
-%doc %{_docdir}/lib%{name}/examples
+%if 0%{?rhel_version}
+%{_docdir}/packages/lib%{name}
+%{_docdir}/packages/lib%{name}/examples
+%else
+%{_docdir}/lib%{name}
+%{_docdir}/lib%{name}/examples
+%endif

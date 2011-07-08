@@ -31,6 +31,8 @@ Pick/Multivalue database programming using PostgreSQL
 This postgres library enables sort/select/index by
 dictionary field name.
 
+%{!?_pgpkglibdir: %define _pgpkglibdir %(A=`pg_config --pkglibdir`; echo ${A})}
+
 %prep
 #http://www.rpm.org/max-rpm/s1-rpm-inside-macros.html
 #can cater for tar which doesnt unpack as per package name
@@ -61,4 +63,4 @@ rm -rf "$RPM_BUILD_ROOT"
 %{_libdir}/%{namebase}*
 %{_bindir}/installexodus-postgresql
 %{_bindir}/installexodus-postgresql2
-%{_libdir}/pgsql/%{namebase}.so
+%{_pgpkglibdir}/%{namebase}.so
