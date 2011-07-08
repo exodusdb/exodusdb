@@ -130,7 +130,11 @@ AC_CONFIG_FILES([Makefile \
 AC_OUTPUT
 
 # use echo instead of dnl to show even with quiet option (-q)
-dnl
-dnl Congrats. You have configured pgexodus.
-dnl
-dnl Type 'make && sudo make install'
+echo
+echo Congrats. You have configured pgexodus.
+echo
+echo Type 'make && sudo make install' 
+echo then configure postgresql server to use the plugin
+echo  sudo /usr/local/bin/installexodus-postgresql
+echo or
+echo  sudo /usr/bin/installexodus-postgresql

@@ -31,3 +31,8 @@ echo 2. Exodus Postgres Plugin
 echo 3. Exodus CLI
 echo
 echo Type 'make && sudo make install'
+echo then configure postgresql server to use the plugin
+echo  sudo /usr/local/bin/installexodus-postgresql
+echo or
+echo  sudo /usr/local/bin/installexodus-postgresql
+
