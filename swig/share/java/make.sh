@@ -59,6 +59,8 @@ echo \
 cp ../exodus.i .
 cp ../exodus.i .
 
+swig -version
+
 echo Using: ${SWIG_CMD}
 echo Generating Source: \
 ${SWIG_CMD} -c++ $SWIG_OPTIONS -$SWIG_TARGET -module $SWIG_MODULENAME $EXO_EXODUS_INCLUDE_FLAGS ../exodus.i
@@ -76,6 +78,7 @@ if [ "$SWIG_POSTGENERATE_CMD" != "" ]; then
 echo
 echo Module Generation: \
      $SWIG_POSTGENERATE_CMD
+sleep 10
 eval $SWIG_POSTGENERATE_CMD
 fi
 
@@ -90,7 +93,7 @@ echo
 echo Compiling: \
 gcc -c exodus_wrap.$SWIG_WRAPPER_EXT $SWIG_TARGET_INCLUDE_FLAGS $EXO_EXODUS_INCLUDE_FLAGS $EXO_WRAPPER_FLAGS
 gcc -c exodus_wrap.$SWIG_WRAPPER_EXT $SWIG_TARGET_INCLUDE_FLAGS $EXO_EXODUS_INCLUDE_FLAGS $EXO_WRAPPER_FLAGS
-
+sleep 10
 echo
 echo Linking: \
 g++ -shared exodus_wrap.o -o $SWIG_TARGET_LIBFILE $EXO_EXODUS_LDFLAGS $SWIG_TARGET_LDFLAGS

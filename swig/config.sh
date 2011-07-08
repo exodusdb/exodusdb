@@ -223,9 +223,11 @@ case $SWIG_TARGET in
 	export SWIG_TARGET_LIBFILE="$SWIG_MODULENAME.so"
         export SWIG_TARGET_LIBDIR=$SWIG_SHARED_LIBDIR
 
-	export SWIG_TARGET_INCLUDE_FLAGS="-I/usr/lib/jvm/java-6-openjdk/include -I/usr/lib/jvm/java-6-openjdk/include/linux"
+	export USRLIBJVM=/usr/lib/jvm
+	test -d /usr/lib64/jvm && export USRLIBJVM=/usr/lib64/jvm
+	export SWIG_TARGET_INCLUDE_FLAGS="-I$USRLIBJVM/java-6-openjdk/include -I$USRLIBJVM/java-6-openjdk/include/linux"
 	#centos 5
-	test -d /usr/lib/jvm/java/ && SWIG_TARGET_INCLUDE_FLAGS="-I/usr/lib/jvm/java/include -I/usr/lib/jvm/java/include/linux"
+	test -d $USRLIBJVM/java/ && SWIG_TARGET_INCLUDE_FLAGS="-I$USRLIBJVM/java/include -I$USRLIBJVM/java/include/linux"
 
         export SWIG_TARGET_LIBFILE="lib$SWIG_MODULENAME.so"
 
