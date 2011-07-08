@@ -121,6 +121,13 @@ if [ "$FAKEROOTKEY" != "" ]; then
 	#export PREFIX="/usr"
 fi
 
+#--------------
+#--- DOCDIR ---
+#--------------
+if [ "$PREFIX" == "" ]; then export PREFIX="/usr"; fi
+export SWIG_DOCDIR=$PREFIX/share/doc
+test -d $SWIG_DOCDIR/packages && export SWIG_DOCDIR=$SWIG_DOCDIR/packages
+
 #----------------
 #--- "Target" ---
 #----------------
@@ -178,9 +185,9 @@ case $SWIG_TARGET in
 #	export SWIG_PYTHON_LIBCODE="`python --version 2>&1|cut -d'.' -f 1,2|sed -e 's/ //;y/P/p/'`"
 
 	export SWIG_MODULE_COMPILE="python ../setup.py build "
-	#export SWIG_MODULE_INSTALL="python ../setup.py install --root=$DESTDIR --prefix=$PREFIX"
+	export SWIG_MODULE_INSTALL="python ../setup.py install --root=$DESTDIR --prefix=$PREFIX"
 	#export SWIG_MODULE_INSTALL="python ../setup.py install --root=$DESTDIR --install-layout=deb"
-	export SWIG_MODULE_INSTALL="python ../setup.py install --root=$DESTDIR"
+	#export SWIG_MODULE_INSTALL="python ../setup.py install --root=$DESTDIR"
 	if test -d /etc/apt/apt.conf.d; then
 		export SWIG_MODULE_INSTALL="$SWIG_MODULE_INSTALL --install-layout=deb"
 	fi

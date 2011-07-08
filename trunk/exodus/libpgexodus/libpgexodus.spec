@@ -1,83 +1,64 @@
-%define baseversion 11.6
-%define debug_package %{nil}
+%define namebase pgexodus
+%define majorver 9
+%define minorver 6
+%define microver 0
+%define sonamever0 9
+%define sonamever 9.0.6
 
 Summary: Exodus Multivalue Database Plugin to PostgreSQL
-Name: libpgexodus
-Version: 9.6.0
+Name: lib%{namebase}-9_6-9
+Provides: lib%{namebase}
+Version: %{majorver}.%{minorver}.%{microver}
+%define baseversion %{majorver}.%{minorver}
 Release: 1
-Source0: %{name}-%{version}.tar.gz
+Source: lib%{namebase}-%{version}.tar.gz
 License: MIT http://www.opensource.org/licenses/mit-license.php
-Group: Development/Libraries
+Group: Development/Libraries/C and C++
+URL: http://devwiki.neosys.com
+
 Requires: postgresql-server
 BuildRequires: postgresql-devel
 BuildRequires: gcc-c++
+
+%if 0%{?suse_version} > 0
+BuildRequires: pkg-config
+%endif
+
 BuildRoot: /var/tmp/%{name}-%{version}-%{release}-root
 
 %description
 Pick/Multivalue database programming using PostgreSQL
+This postgres library enables sort/select/index by
+dictionary field name.
 
 %prep
-%setup -q
+#http://www.rpm.org/max-rpm/s1-rpm-inside-macros.html
+#can cater for tar which doesnt unpack as per package name
+%setup -q -n lib%{namebase}-%{version}
 
 %build
 %configure
 %{__make}
 
 %install
-if [ "$RPM_BUILD_ROOT" != "/var/tmp/%{name}-%{version}-%{release}-root" ]
-then
-  echo
-  echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-  echo @                                                                    @
-  echo @  RPM_BUILD_ROOT is not what I expected.  Please clean it yourself. @
-  echo @                                                                   @
-  echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-  echo
-else
-  echo Cleaning RPM_BUILD_ROOT: "$RPM_BUILD_ROOT"
-  rm -rf "$RPM_BUILD_ROOT"
-fi
 %{__make} install DESTDIR="$RPM_BUILD_ROOT"
 
-#%post -p /sbin/ldconfig
 %post
 
-#done in build post install hooks now
-#for PGLIBDIR in `pg_config --pkglibdir`
-#do
-# ln -s /usr/lib/pgexodus.so $PGLIBDIR/pgexodus.so || :
-#done
+/sbin/ldconfig ||:
 
 /etc/init.d/postgresql start || :
 
 installexodus-postgresql
 
-#%postun -p /sbin/ldconfig
-%postun
+%postun -p /sbin/ldconfig
 
 %clean
-if [ "$RPM_BUILD_ROOT" != "/var/tmp/%{name}-%{version}-%{release}-root" ]
-then
- echo
- echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
- echo @                                                                    @
- echo @  RPM_BUILD_ROOT is not what I expected.  Please clean it yourself. @
- echo @                                                                    @
- echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
- echo
-else
- echo Cleaning RPM_BUILD_ROOT: "$RPM_BUILD_ROOT"
- rm -rf "$RPM_BUILD_ROOT"
-fi
+rm -rf "$RPM_BUILD_ROOT"
 
 %files
 %defattr(-,root,root)
-#%{_libdir}/%{name}*
-%{_libdir}/pgexodus*
+%{_libdir}/%{namebase}*
 %{_bindir}/installexodus-postgresql
 %{_bindir}/installexodus-postgresql2
-%{_libdir}/pgsql/pgexodus.so
-
-#%doc /usr/local/info/exodus.info
-#%doc %attr(0444,root,root) /usr/local/man/man1/exodus.1
-#%doc COPYING AUTHORS README NEWS
+%{_libdir}/pgsql/%{namebase}.so
