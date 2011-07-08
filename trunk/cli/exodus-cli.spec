@@ -1,5 +1,3 @@
-#%define debug_package %{nil}
-
 Summary: Exodus Multivalue Database Command Line Utilities
 Name: exodus-cli
 Version: 11.6.1
@@ -9,6 +7,7 @@ License: MIT http://www.opensource.org/licenses/mit-license.php
 Group: Development/Libraries
 Requires: libexodus
 BuildRequires: libexodus
+BuildRequires: libexodus-devel
 BuildRequires: gcc-c++
 BuildRoot: /var/tmp/%{name}-%{version}-%{release}-root
 

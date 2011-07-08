@@ -1,56 +1,65 @@
-%define baseversion 11.6
-%define debug_package %{nil}
+%define namebase exodus
+%define majorver 11
+%define minorver 6
+%define microver 1
+%define sonamever0 11
+%define sonamever 11.0.6
 
 Summary: Exodus Multivalue Database Programming in any language
-Name: libexodus
-Version: 11.6.1
+Name: lib%{namebase}-11_6-11
+Provides: lib%{namebase}
+Version: %{majorver}.%{minorver}.%{microver}
+%define baseversion %{majorver}.%{minorver}
 Release: 1
-Source0: %{name}-%{version}.tar.gz
-#Patch0: boostm4.patch
+Source: lib%{namebase}-%{version}.tar.gz
 License: MIT http://www.opensource.org/licenses/mit-license.php
-Group: Development/Libraries
-Requires: postgresql-libs
-#Requires: libicu
-BuildRequires: gcc-c++
+Group: Development/Libraries/C and C++
+URL: http://devwiki.neosys.com
+
 BuildRequires: postgresql-devel
 BuildRequires: libicu-devel
+BuildRequires: gcc-c++
+
+%if 0%{?suse_version} > 0
+BuildRequires: pkg-config
+%endif
+
 BuildRoot: /var/tmp/%{name}-%{version}-%{release}-root
 
-#%if "%{_vendor}" == "redhat" && 0%{?rhel} < 6 && 0%{?fedora} < 10
 %if ( 0%{?rhel_version} && 0%{?rhel_version} < 600 ) || ( 0%{?centos_version} && 0%{?centos_version} < 600 )
 Requires: boostbase
 BuildRequires: boostbase-devel
 %else
-Requires: boost
+#suse cant find boost so lets see if rpmbuild can automatically work out dependency
+#Requires: boost
 BuildRequires: boost-devel
 %endif
 
 %description
 Pick/Multivalue database programming in any language
 
-%prep
-%setup -q
 
-#%patch0 -p1
+%package devel
+Summary: The Exodus C++ headers and shared development libraries
+Group: Development/Libraries/C and C++
+Requires: %{name} = %{version}-%{release}
+Provides: libexodus-devel, libexodus-dev
+ 
+%description devel
+Headers and shared object symlinks for the Exodus C++ libraries.
+
+
+%prep
+#http://www.rpm.org/max-rpm/s1-rpm-inside-macros.html
+#can cater for tar which doesnt unpack as per package name
+%setup -q -n lib%{namebase}-%{version}
+#mv lib?{namebase}-?{version}/* .
 
 %build
 %configure
 %{__make}
 
 %install
-if [ "$RPM_BUILD_ROOT" != "/var/tmp/%{name}-%{version}-%{release}-root" ]
-then
-  echo
-  echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-  echo @                                                                    @
-  echo @  RPM_BUILD_ROOT is not what I expected.  Please clean it yourself. @
-  echo @                                                                    @
-  echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-  echo
-else
-  echo Cleaning RPM_BUILD_ROOT: "$RPM_BUILD_ROOT"
-  rm -rf "$RPM_BUILD_ROOT"
-fi
 %{__make} install DESTDIR="$RPM_BUILD_ROOT"
 
 %post -p /sbin/ldconfig
@@ -58,27 +67,18 @@ fi
 %postun -p /sbin/ldconfig
 
 %clean
-if [ "$RPM_BUILD_ROOT" != "/var/tmp/%{name}-%{version}-%{release}-root" ]
-then
- echo
- echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
- echo @                                                                    @
- echo @  RPM_BUILD_ROOT is not what I expected.  Please clean it yourself. @
- echo @                                                                    @
- echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
- echo
-else
- echo Cleaning RPM_BUILD_ROOT: "$RPM_BUILD_ROOT"
- rm -rf "$RPM_BUILD_ROOT"
-fi
+rm -rf "$RPM_BUILD_ROOT"
 
 %files
 %defattr(-,root,root)
-/usr/include/exodus-%{baseversion}/
-/usr/include/exodus
-%{_libdir}/%{name}*
-%{_libdir}/pkgconfig/exodus.pc
+%{_libdir}/lib%{namebase}-%{baseversion}.so.%{sonamever}
 
-#%doc /usr/local/info/exodus.info
-#%doc %attr(0444,root,root) /usr/local/man/man1/exodus.1
-#%doc COPYING AUTHORS README NEWS
+%files devel
+%defattr(-,root,root)
+%{_libdir}/lib%{namebase}.so
+%{_libdir}/lib%{namebase}.a
+%{_libdir}/lib%{namebase}.la
+%{_libdir}/lib%{namebase}-%{baseversion}.so.%{sonamever0}
+%{_libdir}/pkgconfig/%{namebase}.pc
+%{_includedir}/%{namebase}-%{baseversion}/
+%{_includedir}/%{namebase}

@@ -48,4 +48,4 @@ fi
 
 %files
 
-%doc COPYING AUTHORS README NEWS
+%doc %attr(0444,root,root) COPYING AUTHORS README NEWS
