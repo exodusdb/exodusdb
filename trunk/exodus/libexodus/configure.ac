@@ -87,6 +87,11 @@ dnl checking for PostgreSQL libraries 8.1+
 m4_include([m4/ax_lib_postgresql.m4])
 AX_LIB_POSTGRESQL([8.1.0])
 
+dnl checking for ICU libraries 3.0 +
+dnl TODO should be optional if BOOST_HASNT_ICU is set
+m4_include([m4/ax_check_icu.m4])
+AX_CHECK_ICU([3.0])
+
 m4_include([m4/ax_boost_base.m4])
 m4_include([m4/ax_boost_date_time.m4])
 m4_include([m4/ax_boost_filesystem.m4])
