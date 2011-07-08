@@ -33,10 +33,17 @@ echo Entering: `pwd`
 
 echo $PHPINIFILES
 
+dh_installexamples -Xsvn examples/* -X.pyc 2>/dev/null || \
+( \
+	echo "--- dh_installexamples didnt work. doing it the manual way ---" && \
+	mkdir -p $SWIG_DESTDIR/$SWIG_DOCDIR/libexodus-$SWIG_TARGET/examples && \
+	cp ../examples/* $SWIG_DESTDIR/$SWIG_DOCDIR/libexodus-$SWIG_TARGET/examples \
+)
+
 if [ "$SWIG_TARGET_LIBDIR" != "" ]; then
 	echo
 	echo -ne "Installing $SWIG_TARGET library: "
-	test -d ${SWIG_TARGET_LIBDIR}64 && ( test -L ${SWIG_TARGET_LIBDIR}64 || export SWIG_TARGET_LIBDIR=${SWIG_TARGET_LIBDIR}64 )
+	if [ -d ${SWIG_TARGET_LIBDIR}64 ] && [ ! test -L ${SWIG_TARGET_LIBDIR}64 ]; then export SWIG_TARGET_LIBDIR=${SWIG_TARGET_LIBDIR}64; fi
 	test -d ${SWIG_DESTDIR}$SWIG_TARGET_LIBDIR || mkdir -p ${SWIG_DESTDIR}$SWIG_TARGET_LIBDIR
 	echo cp -f $SWIG_TARGET_LIBFILE ${SWIG_DESTDIR}$SWIG_TARGET_LIBDIR/
 	     cp -f $SWIG_TARGET_LIBFILE ${SWIG_DESTDIR}$SWIG_TARGET_LIBDIR/

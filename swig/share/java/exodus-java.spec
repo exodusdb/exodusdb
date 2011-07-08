@@ -58,8 +58,10 @@ fi
 %{_libdir}
 /usr/share/java
 
-#%doc /usr/local/info/exodus.info
-#%doc %attr(0444,root,root) /usr/local/man/man1/exodus.1
-#%doc COPYING AUTHORS README NEWS
-
-%doc %{_docdir}/lib%{name}/examples
+%if 0%{?suse_version} > 0
+%{_docdir}/packages/lib%{name}
+%{_docdir}/packages/lib%{name}/examples
+%else
+%{_docdir}/lib%{name}
+%{_docdir}/lib%{name}/examples
+%endif

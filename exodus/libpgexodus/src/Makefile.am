@@ -32,7 +32,8 @@ install-data-hook:
 	rm -f $(DESTDIR)`pg_config --pkglibdir`/pgexodus.so \
 		|| echo "cannot remove pgexodus.so link"
 	mkdir -p $(DESTDIR)`pg_config --pkglibdir`
-	$(LN_S) $(libdir)/pgexodus-$(GENERIC_RELEASE).so.0 $(DESTDIR)`pg_config --pkglibdir`/pgexodus.so
+	ls -l $(DESTDIR)$(libdir)/pgexodus*
+	$(LN_S) $(libdir)/pgexodus.so $(DESTDIR)`pg_config --pkglibdir`/pgexodus.so
 	( { ldconfig 2> /dev/null ; } || { /sbin/ldconfig 2> /dev/null ; } \
 		|| echo "cannot ldconfig")
 

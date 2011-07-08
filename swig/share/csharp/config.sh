@@ -88,14 +88,14 @@ export EXO_EXODUS_LDFLAGS=" \
 export SWIG_WRAPPER_EXT=cxx
 export SWIG_MODULENAME="exodus"
 
-if [ "$FAKEROOTKEY$DESTDIR" == "" ]; then
+if [ "$FAKEROOTKEY$DESTDIR$RPM_BUILD_ROOT" == "" ]; then
  export SWIG_SHARED_LIBDIR=/usr/local/lib
  export SWIG_SHARE_DIR=/usr/local/share
 else
  export SWIG_SHARED_LIBDIR=/usr/lib
  export SWIG_SHARE_DIR=/usr/share
 fi
-test -d ${SWIG_SHARED_LIBDIR}64 && ( test -L ${SWIG_SHARED_LIBDIR}64 || export SWIG_SHARED_LIBDIR=${SWIG_SHARED_LIBDIR}64 )
+if [ -d ${SWIG_SHARED_LIBDIR}64 ] && [ ! -L ${SWIG_SHARED_LIBDIR}64 ]; then export SWIG_SHARED_LIBDIR=${SWIG_SHARED_LIBDIR}64; fi
 
 export SWIG_OPTIONS="-w503,314,389,361,362,370,383,384"
 
@@ -120,6 +120,14 @@ if [ "$FAKEROOTKEY" != "" ]; then
 	#but causes installation into "sites" instead of "distro" which isnt on python path
 	#export PREFIX="/usr"
 fi
+
+#--------------
+#--- DOCDIR ---
+#--------------
+if [ "$PREFIX" == "" ]; then export PREFIX="/usr"; fi
+export SWIG_DOCDIR=$PREFIX/share/doc
+test -d $SWIG_DOCDIR/packages && export SWIG_DOCDIR=$SWIG_DOCDIR/packages
+echo $SWIG_DOCDIR
 
 #----------------
 #--- "Target" ---
@@ -178,9 +186,9 @@ case $SWIG_TARGET in
 #	export SWIG_PYTHON_LIBCODE="`python --version 2>&1|cut -d'.' -f 1,2|sed -e 's/ //;y/P/p/'`"
 
 	export SWIG_MODULE_COMPILE="python ../setup.py build "
-	#export SWIG_MODULE_INSTALL="python ../setup.py install --root=$DESTDIR --prefix=$PREFIX"
+	export SWIG_MODULE_INSTALL="python ../setup.py install --root=$DESTDIR --prefix=$PREFIX"
 	#export SWIG_MODULE_INSTALL="python ../setup.py install --root=$DESTDIR --install-layout=deb"
-	export SWIG_MODULE_INSTALL="python ../setup.py install --root=$DESTDIR"
+	#export SWIG_MODULE_INSTALL="python ../setup.py install --root=$DESTDIR"
 	if test -d /etc/apt/apt.conf.d; then
 		export SWIG_MODULE_INSTALL="$SWIG_MODULE_INSTALL --install-layout=deb"
 	fi
