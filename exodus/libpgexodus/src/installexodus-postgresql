@@ -4,7 +4,7 @@
 #or be able to login to user postgres (often disabled)
 
 #ensure postgresql is configured and running (not just installed and waiting)
-for PGSERVICE in `ls /etc/init.d/postgresql* 2>/dev/null`; do $PGSERVICE reload || : ; done
+for PGSERVICE in `ls /etc/init.d/postgresql* 2>/dev/null`; do $PGSERVICE start || : ; done
 
 #run the actual postgres configuration script as su postgres
 #su postgres installexodus-postgresql2
