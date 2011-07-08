@@ -81,7 +81,7 @@ if test "x$want_boost" = "xyes"; then
         boost_lib_version_req_sub_minor="0"
         fi
     WANT_BOOST_VERSION=`expr $boost_lib_version_req_major \* 100000 \+  $boost_lib_version_req_minor \* 100 \+ $boost_lib_version_req_sub_minor`
-echo "0---$WANT_BOOST_VERSION---"
+
     AC_MSG_CHECKING(for boostlib >= $boost_lib_version_req)
     succeeded=no
 
