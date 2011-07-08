@@ -5,7 +5,7 @@ export SWIG_SYNTAX="Syntax is ./install.sh "
 
 export SWIG_TARGET=$1
 
-source config.sh
+source ./config.sh
 
 if [ "$SWIG_TARGET" == "all" ]; then
 	for  SWIG_TARGET in $SWIG_ALL_TARGETS; do
