@@ -21,7 +21,7 @@ echo building on:
 
 export yum="yum -y"
 export yum=zypper --non-interactive
-
+export boostlibs="'
 #==== 1. Installing or Building Boost ====
 
 sudo $yum install icu libicu libicu-devel
@@ -29,7 +29,8 @@ sudo $yum install icu libicu libicu-devel
 #rather dumb version centos/redhat 5 detection
 if [ "`cat /etc/issue|grep " 5"`" == "" ]; then
 
- sudo $yum install boost-devel boost-date-time boost-filesystem boost-regex boost-system boost-thread
+ #sudo $yum install boost-devel boost-date-time boost-filesystem boost-regex boost-system boost-thread
+ sudo $yum install boost-devel '*boost_date_time*' '*boost_filesystem*' '*boost_regex*' '*boost_system*' '*boost_thread*'
 
 else
 
