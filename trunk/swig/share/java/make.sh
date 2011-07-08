@@ -23,7 +23,7 @@ swig -version
 # make && sudo make install
 #fi
 
-source config.sh
+source ./config.sh
 
 if [ "$SWIG_TARGET" == "all" ]; then
 	for  SWIG_TARGET in $SWIG_ALL_TARGETS; do
