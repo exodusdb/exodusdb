@@ -8,6 +8,7 @@ Group: Development/Libraries
 Requires: libexodus
 Requires: php
 BuildRequires: libexodus
+BuildRequires: libexodus-devel
 BuildRequires: gcc-c++
 BuildRequires: swig
 BuildRequires: php-devel
@@ -30,25 +31,15 @@ make make
 %{__make} install DESTDIR="$RPM_BUILD_ROOT"
 
 %post
-echo -e "; Enable exodus extension module\nextension=exo.so" > /etc/php.d/exodus.ini
+test -f /etc/php.d && echo -e "; Enable exodus extension module\nextension=exo.so" > /etc/php.d/exodus.ini
+test -f /etc/php5/conf.d && echo -e "; Enable exodus extension module\nextension=exo.so" > /etc/php5/conf.d/exodus.ini
 
 %postun
-rm /etc/php.d/exodus.ini
+test -f /etc/php.d/exodus.ini && rm /etc/php.d/exodus.ini
+test -f /etc/php5/conf.d/exodus.ini && rm /etc/php5/conf.d/exodus.ini
 
 %clean
-if [ "$RPM_BUILD_ROOT" != "/var/tmp/%{name}-%{version}-%{release}-root" ]
-then
- echo
- echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
- echo @                                                                    @
- echo @  RPM_BUILD_ROOT is not what I expected.  Please clean it yourself. @
- echo @                                                                    @
- echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
- echo
-else
- echo Cleaning RPM_BUILD_ROOT: "$RPM_BUILD_ROOT"
- rm -rf "$RPM_BUILD_ROOT"
-fi
+rm -rf "$RPM_BUILD_ROOT"
 
 %files
 %defattr(-,root,root)
@@ -59,4 +50,10 @@ fi
 #%doc %attr(0444,root,root) /usr/local/man/man1/exodus.1
 #%doc COPYING AUTHORS README NEWS
 
-%doc %{_docdir}/lib%{name}/examples
+%if 0%{?rhel_version}
+%{_docdir}/packages/lib%{name}
+%{_docdir}/packages/lib%{name}/examples
+%else
+%{_docdir}/lib%{name}
+%{_docdir}/lib%{name}/examples
+%endif
