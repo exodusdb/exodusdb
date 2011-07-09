@@ -88,14 +88,14 @@ export EXO_EXODUS_LDFLAGS=" \
 export SWIG_WRAPPER_EXT=cxx
 export SWIG_MODULENAME="exodus"
 
-if [ "$FAKEROOTKEY$DESTDIR" == "" ]; then
+if [ "$FAKEROOTKEY$DESTDIR$RPM_BUILD_ROOT" == "" ]; then
  export SWIG_SHARED_LIBDIR=/usr/local/lib
  export SWIG_SHARE_DIR=/usr/local/share
 else
  export SWIG_SHARED_LIBDIR=/usr/lib
  export SWIG_SHARE_DIR=/usr/share
 fi
-test -d ${SWIG_SHARED_LIBDIR}64 && ( test -L ${SWIG_SHARED_LIBDIR}64 || export SWIG_SHARED_LIBDIR=${SWIG_SHARED_LIBDIR}64 )
+if [ -d ${SWIG_SHARED_LIBDIR}64 ] && [ ! -L ${SWIG_SHARED_LIBDIR}64 ]; then export SWIG_SHARED_LIBDIR=${SWIG_SHARED_LIBDIR}64; fi
 
 export SWIG_OPTIONS="-w503,314,389,361,362,370,383,384"
 
@@ -127,6 +127,7 @@ fi
 if [ "$PREFIX" == "" ]; then export PREFIX="/usr"; fi
 export SWIG_DOCDIR=$PREFIX/share/doc
 test -d $SWIG_DOCDIR/packages && export SWIG_DOCDIR=$SWIG_DOCDIR/packages
+echo $SWIG_DOCDIR
 
 #----------------
 #--- "Target" ---
@@ -144,12 +145,15 @@ case $SWIG_TARGET in
 	#dump exo.php in lib dir from where it can be copied to php web directories for including
         #export SWIG_TARGET_MODDIR=$SWIG_SHARED_LIBDIR
         export SWIG_TARGET_MODDIR=$SWIG_SHARE_DIR/php
+        test -d ${SWIG_TARGET_MODDIR}5 && export SWIG_TARGET_MODDIR=$SWIG_SHARE_DIR/php5
         export SWIG_TARGET_MODFILE=$SWIG_MODULENAME.php
 
         export SWIG_TARGET_LIBDIR="`php-config --extension-dir`"
 	if [ "$SWIG_TARGET_LIBDIR" == "" ]; then
 		test -d /usr/lib/php/modules/ && export SWIG_TARGET_LIBDIR="/usr/lib/php/modules/"
+		test -d /usr/lib/php5/modules/ && export SWIG_TARGET_LIBDIR="/usr/lib/php5/modules/"
 		test -d /usr/lib64/php/modules/ && export SWIG_TARGET_LIBDIR="/usr/lib64/php/modules/"
+		test -d /usr/lib64/php5/modules/ && export SWIG_TARGET_LIBDIR="/usr/lib64/php5/modules/"
 	fi
 	export SWIG_TARGET_LIBFILE="$SWIG_MODULENAME.so"
 
