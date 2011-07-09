@@ -22,7 +22,15 @@ echo -------------------------------------------
 echo USING MODULE: $MODULEDIR/exodus_library.dll
 echo USING LIBRARY: $LIBDIR/libexodus_wrapper.so
 echo -------------------------------------------
-echo Assuming you have installed default-jdk - for javac
+echo
+echo ===================================================
+echo !!!     Assuming you have installed javac       !!!
+echo ===================================================
+echo redhat/fedora/centos    sudo yum install java-devel
+echo debian/ubuntu      sudo apt-get install default-jdk
+echo suse                 sudo zypper install java-devel
+echo ===================================================
+echo
 echo --------
 echo Compile
 echo --------
