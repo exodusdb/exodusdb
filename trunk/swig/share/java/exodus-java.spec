@@ -1,15 +1,15 @@
-#%define debug_package %{nil}
-
 Summary: Exodus Multivalue Database Programming in Java
 Name: exodus-java
 Version: 11.6.1
 Release: 1
 Source: %{name}-%{version}.tar.gz
 License: MIT http://www.opensource.org/licenses/mit-license.php
-Group: Development/Libraries
-Requires: libexodus
+Group: Development/Libraries/Java
+URL: http://exodusdb.googlecode.com/
+
 Requires: java
 BuildRequires: libexodus
+BuildRequires: libexodus-devel
 BuildRequires: gcc-c++
 BuildRequires: swig
 BuildRoot: /var/tmp/%{name}-%{version}-%{release}-root
@@ -27,41 +27,25 @@ Exodus Multivalue Database Programming in Java
 %setup -q
 
 %build
-#%configure
-#{__make} build
-make make
+%{__make} make
 
 %install
 %{__make} install DESTDIR="$RPM_BUILD_ROOT"
 
-%post
+%post -p /sbin/ldconfig
 
-%postun
+%postun -p /sbin/ldconfig
 
 %clean
-if [ "$RPM_BUILD_ROOT" != "/var/tmp/%{name}-%{version}-%{release}-root" ]
-then
- echo
- echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
- echo @                                                                    @
- echo @  RPM_BUILD_ROOT is not what I expected.  Please clean it yourself. @
- echo @                                                                    @
- echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
- echo
-else
- echo Cleaning RPM_BUILD_ROOT: "$RPM_BUILD_ROOT"
- rm -rf "$RPM_BUILD_ROOT"
-fi
+rm -rf "$RPM_BUILD_ROOT"
 
 %files
 %defattr(-,root,root)
-%{_libdir}
-/usr/share/java
+%{_libdir}/libjexodus*
+/usr/share/java/jexodus*
 
-%if 0%{?suse_version} > 0
+%if 0%{?rhel_version}
 %{_docdir}/packages/lib%{name}
-%{_docdir}/packages/lib%{name}/examples
 %else
 %{_docdir}/lib%{name}
-%{_docdir}/lib%{name}/examples
 %endif

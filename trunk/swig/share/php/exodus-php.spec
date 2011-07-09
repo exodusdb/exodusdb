@@ -4,8 +4,8 @@ Version: 11.6.1
 Release: 1
 Source: %{name}-%{version}.tar.gz
 License: MIT http://www.opensource.org/licenses/mit-license.php
-Group: Development/Libraries
-Requires: libexodus
+URL: http://exodusdb.googlecode.com/
+Group: Development/Libraries/PHP
 Requires: php
 BuildRequires: libexodus
 BuildRequires: libexodus-devel
@@ -23,8 +23,6 @@ Exodus Multivalue Database Programming in PHP
 %setup -q
 
 %build
-#%configure
-#{__make} build
 make make
 
 %install
@@ -33,10 +31,14 @@ make make
 %post
 test -f /etc/php.d && echo -e "; Enable exodus extension module\nextension=exo.so" > /etc/php.d/exodus.ini
 test -f /etc/php5/conf.d && echo -e "; Enable exodus extension module\nextension=exo.so" > /etc/php5/conf.d/exodus.ini
+/sbin/ldconfig
+exit 0
 
 %postun
 test -f /etc/php.d/exodus.ini && rm /etc/php.d/exodus.ini
 test -f /etc/php5/conf.d/exodus.ini && rm /etc/php5/conf.d/exodus.ini
+/sbin/ldconfig
+exit 0
 
 %clean
 rm -rf "$RPM_BUILD_ROOT"
@@ -44,16 +46,11 @@ rm -rf "$RPM_BUILD_ROOT"
 %files
 %defattr(-,root,root)
 %{_phpmoddir}
-/usr/share/php
-
-#%doc /usr/local/info/exodus.info
-#%doc %attr(0444,root,root) /usr/local/man/man1/exodus.1
-#%doc COPYING AUTHORS README NEWS
 
 %if 0%{?rhel_version}
 %{_docdir}/packages/lib%{name}
-%{_docdir}/packages/lib%{name}/examples
+/usr/share/php
 %else
 %{_docdir}/lib%{name}
-%{_docdir}/lib%{name}/examples
+/usr/share/php5
 %endif

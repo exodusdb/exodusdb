@@ -48,7 +48,8 @@ lib_LTLIBRARIES= libexodus.la
 libexodus_la_SOURCES= \
  $(h_sources) $(cc_sources) $(buildonly_h_sources)
 
-libexodus_la_CPPFLAGS = -fPIC -DPIC \
+#libexodus_la_CPPFLAGS = -fPIC -DPIC \
+libexodus_la_ \
  -Wall -Wextra -Wno-unknown-pragmas \
  -I$(top_srcdir) \
  $(POSTGRESQL_CFLAGS) \
