@@ -145,12 +145,15 @@ case $SWIG_TARGET in
 	#dump exo.php in lib dir from where it can be copied to php web directories for including
         #export SWIG_TARGET_MODDIR=$SWIG_SHARED_LIBDIR
         export SWIG_TARGET_MODDIR=$SWIG_SHARE_DIR/php
+        test -d ${SWIG_TARGET_MODDIR}5 && export SWIG_TARGET_MODDIR=$SWIG_SHARE_DIR/php5
         export SWIG_TARGET_MODFILE=$SWIG_MODULENAME.php
 
         export SWIG_TARGET_LIBDIR="`php-config --extension-dir`"
 	if [ "$SWIG_TARGET_LIBDIR" == "" ]; then
 		test -d /usr/lib/php/modules/ && export SWIG_TARGET_LIBDIR="/usr/lib/php/modules/"
+		test -d /usr/lib/php5/modules/ && export SWIG_TARGET_LIBDIR="/usr/lib/php5/modules/"
 		test -d /usr/lib64/php/modules/ && export SWIG_TARGET_LIBDIR="/usr/lib64/php/modules/"
+		test -d /usr/lib64/php5/modules/ && export SWIG_TARGET_LIBDIR="/usr/lib64/php5/modules/"
 	fi
 	export SWIG_TARGET_LIBFILE="$SWIG_MODULENAME.so"
 
