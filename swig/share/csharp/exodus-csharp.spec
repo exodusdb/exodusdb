@@ -39,7 +39,7 @@ rm -rf "$RPM_BUILD_ROOT"
 %{_libdir}/libexodus*
 /usr/share/csharp
 
-%if 0%{?rhel_version}
+%if 0%{?rhel_version} || 0%{?fedora}
 %{_docdir}/packages/lib%{name}
 %else
 %{_docdir}/lib%{name}

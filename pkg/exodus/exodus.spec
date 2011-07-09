@@ -1,4 +1,3 @@
-
 Summary: Exodus Multivalue Database
 Name: exodus
 Version: 11.6.1
@@ -33,6 +32,6 @@ Multivalue database and programming.
 rm -rf "$RPM_BUILD_ROOT"
 
 %files
-%attr(0444,root,root)
+%defattr(-,root,root)
 
-%doc %attr(0444,root,root) COPYING AUTHORS README NEWS
+%doc COPYING AUTHORS README NEWS

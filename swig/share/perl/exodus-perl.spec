@@ -14,11 +14,10 @@ BuildRequires: libexodus-devel
 BuildRequires: gcc-c++
 BuildRequires: swig
 
-%if 0%{?rhel_version}
-BuildRequires: perl
+%if 0%{?fedora}
+BuildRequires: perl-devel
 %else
 BuildRequires: perl
-#BuildRequires: perl-devel
 %endif
 
 BuildRoot: /var/tmp/%{name}-%{version}-%{release}-root
@@ -49,7 +48,7 @@ rm -rf "$RPM_BUILD_ROOT"
 %{_perlmoddir}/*.pm
 %{_libdir}/exo.so
 
-%if 0%{?rhel_version}
+%if 0%{?rhel_version} || 0%{?fedora}
 %{_docdir}/packages/lib%{name}
 %else
 %{_docdir}/lib%{name}

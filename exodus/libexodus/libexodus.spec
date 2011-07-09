@@ -8,6 +8,7 @@
 Summary: Exodus Multivalue Database Programming in any language
 Name: lib%{namebase}-11_6-11
 Provides: lib%{namebase}
+#version should have no dash - says suse osc
 Version: %{majorver}.%{minorver}.%{microver}
 %define baseversion %{majorver}.%{minorver}
 Release: 1
@@ -56,7 +57,7 @@ Headers and shared object symlinks for the Exodus C++ libraries.
 #mv lib?{namebase}-?{version}/* .
 
 %build
-%configure
+%configure CPPFLAGS=-I%{_includedir}/pgsql
 %{__make}
 
 %install
