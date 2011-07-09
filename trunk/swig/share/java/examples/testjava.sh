@@ -8,7 +8,6 @@ set -e
 export LIBDIR=/usr/lib
 test -d ${LIBDIR}64 && export LIBDIR=${LIBDIR}64
 if [ -f $LIBDIR/libjexodus.so ]; then
-        export LIBDIR=/usr/lib
         export MODULEDIR=/usr/share/java
 else
         export LIBDIR=/usr/local/lib
