@@ -7,7 +7,7 @@ License: MIT http://www.opensource.org/licenses/mit-license.php
 URL: http://exodusdb.googlecode.com
 Group: Development/Libraries/Other
 
-BuildRequires: libexodus
+#BuildRequires: libexodus
 BuildRequires: libexodus-devel
 BuildRequires: gcc-c++
 BuildRoot: /var/tmp/%{name}-%{version}-%{release}-root
@@ -31,3 +31,4 @@ rm -rf "$RPM_BUILD_ROOT"
 %files
 %defattr(-,root,root)
 %{_bindir}/*
+
