@@ -41,7 +41,7 @@ rm -rf "$RPM_BUILD_ROOT"
 %defattr(-,root,root)
 %{_pylibdir}/site-packages/
 
-%if 0%{?rhel_version}
+%if 0%{?rhel_version} || 0%{?fedora}
 %{_docdir}/packages/lib%{name}
 %else
 %{_docdir}/lib%{name}
