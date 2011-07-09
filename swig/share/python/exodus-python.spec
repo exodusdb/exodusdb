@@ -4,8 +4,8 @@ Version: 11.6.1
 Release: 1
 Source: %{name}-%{version}.tar.gz
 License: MIT http://www.opensource.org/licenses/mit-license.php
-Group: Development/Libraries
-Requires: python
+URL: http://exodusdb.googlecode.com
+Group: Development/Languages/Python
 BuildRequires: libexodus-devel
 BuildRequires: libexodus
 BuildRequires: gcc-c++
@@ -22,24 +22,17 @@ Exodus Multivalue Database Programming in Python
 %prep
 %setup -q
 
-#pylib=`python -c "import os, atexit; print
-#os.path.dirname(atexit.__file__)"` 
-#echo "---$pylib---"
-#[ -d /usr/lib/python ] || ln -s $pylib /usr/lib/python 
-
 %build
-#%configure
-#{__make} build
-make make
+%{__make} make
 
 %install
 %{__make} install DESTDIR="$RPM_BUILD_ROOT"
 
 find "$RPM_BUILD_ROOT"
 
-%post
-
-%postun
+%post -p /sbin/ldconfig
+ 
+%postun -p /sbin/ldconfig
 
 %clean
 rm -rf "$RPM_BUILD_ROOT"
@@ -50,8 +43,6 @@ rm -rf "$RPM_BUILD_ROOT"
 
 %if 0%{?rhel_version}
 %{_docdir}/packages/lib%{name}
-%{_docdir}/packages/lib%{name}/examples
 %else
 %{_docdir}/lib%{name}
-%{_docdir}/lib%{name}/examples
 %endif
