@@ -86,6 +86,10 @@ dnl autoconf macro archive
 dnl checking for PostgreSQL libraries 8.1+
 m4_include([m4/ax_lib_postgresql.m4])
 AX_LIB_POSTGRESQL([8.1.0])
+AC_MSG_CHECKING(POSTGRESQL_CFLAGS) && AC_MSG_RESULT($POSTGRESQL_CFLAGS)
+AC_MSG_CHECKING(POSTGRESQL_LDFLAGS) && AC_MSG_RESULT($POSTGRESQL_LDFLAGS)
+AC_MSG_CHECKING(POSTGRESQL_VERSION) && AC_MSG_RESULT($POSTGRESQL_VERSION)
+AC_MSG_CHECKING(HAVE_POSTGRESQL) && AC_MSG_RESULT($HAVE_POSTGRESQL)
 
 dnl checking for ICU libraries 3.0 +
 dnl TODO should be optional if BOOST_HASNT_ICU is set
@@ -100,7 +104,7 @@ m4_include([m4/ax_boost_system.m4])
 m4_include([m4/ax_boost_thread.m4])
 
 ls -la -d /usr/include/boost*
-ls -la /usr/lib*/libboost*
+ls -la /usr/lib*/libboost*regex*
 
 #utf8_codecvt fixed in filesystem library from 1.40
 #redhat 5 = 1.33, redhat 6 = 1.41

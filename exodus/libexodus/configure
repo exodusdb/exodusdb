@@ -14865,6 +14865,18 @@ $as_echo "no" >&6; }
 
 
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking POSTGRESQL_CFLAGS" >&5
+$as_echo_n "checking POSTGRESQL_CFLAGS... " >&6; } && { $as_echo "$as_me:${as_lineno-$LINENO}: result: $POSTGRESQL_CFLAGS" >&5
+$as_echo "$POSTGRESQL_CFLAGS" >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking POSTGRESQL_LDFLAGS" >&5
+$as_echo_n "checking POSTGRESQL_LDFLAGS... " >&6; } && { $as_echo "$as_me:${as_lineno-$LINENO}: result: $POSTGRESQL_LDFLAGS" >&5
+$as_echo "$POSTGRESQL_LDFLAGS" >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking POSTGRESQL_VERSION" >&5
+$as_echo_n "checking POSTGRESQL_VERSION... " >&6; } && { $as_echo "$as_me:${as_lineno-$LINENO}: result: $POSTGRESQL_VERSION" >&5
+$as_echo "$POSTGRESQL_VERSION" >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking HAVE_POSTGRESQL" >&5
+$as_echo_n "checking HAVE_POSTGRESQL... " >&6; } && { $as_echo "$as_me:${as_lineno-$LINENO}: result: $HAVE_POSTGRESQL" >&5
+$as_echo "$HAVE_POSTGRESQL" >&6; }
 
 # ===========================================================================
 #       http://www.gnu.org/software/autoconf-archive/ax_check_icu.html
@@ -15244,7 +15256,7 @@ $as_echo "$ICU_LIBS" >&6; }
 
 
 ls -la -d /usr/include/boost*
-ls -la /usr/lib*/libboost*
+ls -la /usr/lib*/libboost*regex*
 
 #utf8_codecvt fixed in filesystem library from 1.40
 #redhat 5 = 1.33, redhat 6 = 1.41
