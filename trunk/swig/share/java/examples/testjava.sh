@@ -18,10 +18,10 @@ fi
 #delete any existing test.exe
 test -f test.exe && rm -f test.exe && echo rm -f test.exe
 
-echo -------------------------------------------
-echo USING MODULE: $MODULEDIR/exodus_library.dll
-echo USING LIBRARY: $LIBDIR/libexodus_wrapper.so
-echo -------------------------------------------
+echo ------------------------------------
+echo USING MODULE: $MODULEDIR/jexodus.jar
+echo USING LIBRARY: $LIBDIR/libjexodus.so
+echo ------------------------------------
 echo
 echo ===================================================
 echo !!!     Assuming you have installed javac       !!!
