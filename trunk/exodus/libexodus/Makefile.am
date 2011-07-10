@@ -1,6 +1,5 @@
 ## top directory
 
-#error if in, warning if out
 ACLOCAL_AMFLAGS = -I m4
 
 #Build in these directories:
