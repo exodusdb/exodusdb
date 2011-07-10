@@ -48,11 +48,12 @@ lib_LTLIBRARIES= libexodus.la
 libexodus_la_SOURCES= \
  $(h_sources) $(cc_sources) $(buildonly_h_sources)
 
+#hardcode include/pgsql for suse since ax_lib_postgresql.m4 isnt finding it (ac version?)
 #libexodus_la_CPPFLAGS = -fPIC -DPIC \
 libexodus_la_ \
  -Wall -Wextra -Wno-unknown-pragmas \
  -I$(top_srcdir) \
- $(POSTGRESQL_CFLAGS) \
+ $(POSTGRESQL_CFLAGS) $(includedir)/pgsql\
  $(BOOST_CPPFLAGS) $(BOOST_DATE_TIME_CPPFLAGS) $(BOOST_FILESYSTEM_CPPFLAGS) \
  $(BOOST_REGEX_CPPFLAGS) $(BOOST_SYSTEM_CPPFLAGS) $(BOOST_THREAD_CPPFLAGS)
 
