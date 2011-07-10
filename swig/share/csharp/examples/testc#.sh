@@ -8,12 +8,11 @@ set -e
 export LIBDIR=/usr/lib
 test -d ${LIBDIR}64 && export LIBDIR=${LIBDIR}64
 if [ -f $LIBDIR/libexodus_wrapper.so ]; then
-	export LIBDIR=/usr/lib
-	export MODULEDIR=/usr/share/csharp
+        export MODULEDIR=/usr/share/csharp
 else
-	export LIBDIR=/usr/local/lib
-	test -d ${LIBDIR}64 && export LIBDIR=${LIBDIR}64
-	export MODULEDIR=/usr/local/share/csharp
+        export LIBDIR=/usr/local/lib
+        test -d ${LIBDIR}64 && export LIBDIR=${LIBDIR}64
+        export MODULEDIR=/usr/local/share/csharp
 fi
 
 #delete any existing test.exe
@@ -23,7 +22,11 @@ echo -------------------------------------------
 echo USING MODULE: $MODULEDIR/exodus_library.dll
 echo USING LIBRARY: $LIBDIR/libexodus_wrapper.so
 echo -------------------------------------------
-echo Assuming you have installed mono-gmcs - for gmcs
+echo
+echo ======================================================
+echo !!! Assuming you have installed mono-gmcs compiler !!!
+echo ubuntu - sudo apt-get install mono-gmcs
+echo ======================================================
 echo --------
 echo Compile
 echo --------
