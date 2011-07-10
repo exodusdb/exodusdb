@@ -4,19 +4,29 @@
 #or be able to login to user postgres (often disabled)
 
 if [ -d /var/lib/pgsql ] && [ ! -f /var/lib/pgsql/data/pg_hba.conf ]; then
-/etc/init.d/postgresql initdb
-/etc/init.d/postgresql start
-/sbin/chkconfig postgresql on
-fi
 
-#start/restart it in case it is not running
-for PGSERVICE in `ls /etc/init.d/postgresql* 2>/dev/null`; do $PGSERVICE restart || : ; done
+	echo initialising postgresql
+	/etc/init.d/postgresql initdb
+
+	echo starting postgresql
+	/etc/init.d/postgresql start
+
+	echo setting postgresql autostartup
+	/sbin/chkconfig postgresql on
+else
+
+	#start it in case it is not running
+	for PGSERVICE in `ls /etc/init.d/postgresql* 2>/dev/null`
+		do $PGSERVICE start || :
+ 	done
+
+fi
 
 #run the actual postgres configuration script as su postgres
 #su postgres installexodus-postgresql2
 su postgres ${0}2
 
 #reload the new postgresql configuration
-for PGSERVICE in `ls /etc/init.d/postgresql* 2>/dev/null`; do $PGSERVICE reload || : ; done
-
-
+for PGSERVICE in `ls /etc/init.d/postgresql* 2>/dev/null`
+	do $PGSERVICE reload || :
+done
