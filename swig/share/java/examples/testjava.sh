@@ -28,7 +28,7 @@ echo !!!     Assuming you have installed javac       !!!
 echo ===================================================
 echo redhat/fedora/centos    sudo yum install java-devel
 echo debian/ubuntu      sudo apt-get install default-jdk
-echo suse                 sudo zypper install java-devel
+echo suse   sudo zypper install java-1_6_0-openjdk-devel
 echo ===================================================
 echo
 echo --------
