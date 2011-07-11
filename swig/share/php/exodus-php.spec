@@ -7,7 +7,6 @@ License: MIT http://www.opensource.org/licenses/mit-license.php
 URL: http://exodusdb.googlecode.com/
 Group: Development/Libraries/PHP
 Requires: php
-BuildRequires: libexodus
 BuildRequires: libexodus-devel
 BuildRequires: gcc-c++
 BuildRequires: swig
@@ -29,15 +28,23 @@ make make
 %{__make} install DESTDIR="$RPM_BUILD_ROOT"
 
 %post
-test -f /etc/php.d && echo -e "; Enable exodus extension module\nextension=exo.so" > /etc/php.d/exodus.ini
-test -f /etc/php5/conf.d && echo -e "; Enable exodus extension module\nextension=exo.so" > /etc/php5/conf.d/exodus.ini
-/sbin/ldconfig
+if [ -d /etc/php.d ]; then
+ echo "extension=exo.so" > /etc/php.d/exodus.ini
+fi
+if [ -d /etc/php5/conf.d ]; then
+ echo "extension=exo.so" > /etc/php5/conf.d/exodus.ini
+fi
+/sbin/ldconfig ||:
 exit 0
 
 %postun
-test -f /etc/php.d/exodus.ini && rm /etc/php.d/exodus.ini
-test -f /etc/php5/conf.d/exodus.ini && rm /etc/php5/conf.d/exodus.ini
-/sbin/ldconfig
+if [ -f /etc/php.d/exodus.ini ]; then
+ rm /etc/php.d/exodus.ini ||:
+fi
+if [ -f /etc/php5/conf.d/exodus.ini ]; then
+ rm /etc/php5/conf.d/exodus.ini ||:
+fi
+/sbin/ldconfig ||:
 exit 0
 
 %clean
