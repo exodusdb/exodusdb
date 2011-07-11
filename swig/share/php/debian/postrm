@@ -1,7 +1,7 @@
 #!/bin/bash
 #DEBHELPER#
 set -e
-if [ -d /etc/php5/conf.d ]; then
- echo "extension=exo.so" > /etc/php5/conf.d/exodus.ini
+if [ -f /etc/php5/conf.d/exodus.ini ]; then
+ rm /etc/php5/conf.d/exodus.ini
  test -f /etc/init.d/apache2 && ( /etc/init.d/apache2 restart || echo "there was some issue restarting apache" )
 fi
