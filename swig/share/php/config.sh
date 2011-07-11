@@ -142,10 +142,11 @@ case $SWIG_TARGET in
         export SWIG_TARGET_INCLUDE_FLAGS="`php-config --includes`"
         export SWIG_WRAPPER_EXT=cpp
 
-	#dump exo.php in lib dir from where it can be copied to php web directories for including
-        #export SWIG_TARGET_MODDIR=$SWIG_SHARED_LIBDIR
-        export SWIG_TARGET_MODDIR=$SWIG_SHARE_DIR/php
-        test -d ${SWIG_TARGET_MODDIR}5 && export SWIG_TARGET_MODDIR=$SWIG_SHARE_DIR/php5
+        #is usr/share/php on debian/ubuntu despite there being a usr/share/php5 directory!
+	#but usr/share/pear is common to all distro
+        #export SWIG_TARGET_MODDIR=$SWIG_SHARE_DIR/php
+        #test -d ${SWIG_TARGET_MODDIR}5 && export SWIG_TARGET_MODDIR=$SWIG_SHARE_DIR/php5
+        export SWIG_TARGET_MODDIR=$SWIG_SHARE_DIR/pear
         export SWIG_TARGET_MODFILE=$SWIG_MODULENAME.php
 
         export SWIG_TARGET_LIBDIR="`php-config --extension-dir`"
