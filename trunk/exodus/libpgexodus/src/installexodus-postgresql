@@ -13,6 +13,8 @@ if [ -d /var/lib/pgsql ] && [ ! -f /var/lib/pgsql/data/pg_hba.conf ]; then
 
 	echo setting postgresql autostartup
 	/sbin/chkconfig postgresql on
+
+	/etc/init.d/postgresql restart
 else
 
 	#start it in case it is not running
