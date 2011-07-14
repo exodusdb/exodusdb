@@ -15,6 +15,9 @@
  uname -a
  cat /etc/issue
 
+#CentOS Linux release 6.0 (Final)
+#Linux localhost.localdomain 2.6.32-71.29.1.el6.i686 #1 SMP Mon Jun 27 18:07:00 BST 2011 i686 i686 i386 GNU/Linux
+
 #CentOS release 5.6 (Final)
 #Linux localhost.localdomain 2.6.18-238.9.1.el5 #1 SMP Tue Apr 12 18:10:56 EDT 2011 i686 i686 i386 GNU/Linux
 
@@ -54,7 +57,7 @@ fi
 
 #==== 2. Building and Installing Exodus ====
 
- sudo yum -y install subversion gcc-c++ postgresql-devel
+ sudo yum -y install subversion gcc-c++ postgresql-devel make
 
  cd ~
  svn co HTTPS://exodusdb.googlecode.com/svn/trunk/ exodus
@@ -69,17 +72,20 @@ fi
  sudo service postgresql initdb
  sudo service postgresql start
  sudo chkconfig postgresql on
-
+ sudo service postgresql restart
+ 
  sudo su - postgres
 
  ##allow local tcp/ip login
  #change "ident sameuser" to "md5" for all/all/127.0.0.1/32
  #host    all         all         127.0.0.1/32          ident sameuser
  #host    all         all         127.0.0.1/32          md5
+ if [ -f ~/data/pg_hba.conf ]; then
  cp ~/data/pg_hba.conf ~/data/pg_hba.conf.preexodus
  egrep -v "^\w*host.*all.*127.0.0.1/.*ident" ~/data/pg_hba.conf.preexodus > ~/data/pg_hba.conf
  echo host all all 127.0.0.1/32 md5 >> ~/data/pg_hba.conf
-
+ fi
+ 
  psql -U postgres -d template1
  \connect template1
  CREATE OR REPLACE FUNCTION exodus_call(bytea, bytea, bytea, bytea, bytea, int4, int4) RETURNS bytea AS 'pgexodus', 'exodus_call' LANGUAGE C IMMUTABLE;
