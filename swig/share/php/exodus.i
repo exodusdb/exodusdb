@@ -56,8 +56,8 @@ namespace exodus {
 	case IS_LONG:
 		//convert_to_long_ex($input);
 		//tempvar=(exodus::var) (long long int) (*$input)->value.lval;
-		//tempvar=exodus::var((int) Z_LVAL_PP($input));
-		tempvar=123456;
+		tempvar=exodus::var((int) (Z_LVAL_PP($input)));
+		//tempvar=123456;
 		break;
 	default:
 		convert_to_string_ex($input);
