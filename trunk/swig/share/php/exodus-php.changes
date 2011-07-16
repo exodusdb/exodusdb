@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Sat Jul 16 00:52:47 UTC 2011 - steve.bush@neosys.com
+
+- allow any php expression/variable for exodus function arguments
+
+-------------------------------------------------------------------
 Mon Jul 11 22:46:15 UTC 2011 - sb2@neosys.com
 
 - move exo.php to usr/share/pear for all distros
