@@ -30,6 +30,7 @@ export SWIG_ALL_TARGETS="perl python java csharp php" put php last because it ex
 
 export EXO_EXODUS_INCLUDE_FLAGS="-I../../../../exodus/libexodus -I/usr/include"
 export EXO_WRAPPER_FLAGS="-fPIC -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes"
+#export EXO_WRAPPER_FLAGS="-fPIC -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -fpermissive"
 export EXO_EXODUS_LDFLAGS="-lexodus"
 
 #defaults
