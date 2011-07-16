@@ -226,7 +226,7 @@
 			>
 		</File>
 		<File
-			RelativePath="..\..\testjava.cmd"
+			RelativePath="..\..\share\java\examples\testjava.cmd"
 			>
 		</File>
 	</Files>
