@@ -80,8 +80,8 @@ void extract(char * instring, int inlength, int fieldno, int valueno, int subval
 		//ALN:NOTE - assume that string is valid UTF and FM_UTF8_1 can not be last char in the string
 		for (;
 				start_pos<inlength &&
-				instring[start_pos] != FM_UTF8_1 &&
-				instring[start_pos+1] != FM_UTF8_2 ;
+				(instring[start_pos] != FM_UTF8_1 ||
+				instring[start_pos+1] != FM_UTF8_2) ;
 			start_pos++)
 		{};
 		/*past of of string?*/
@@ -94,8 +94,8 @@ void extract(char * instring, int inlength, int fieldno, int valueno, int subval
 	/*find the end of the field (or one after the end of the string)*/
 	for (field_end_pos=start_pos;
 			field_end_pos<inlength &&
-			instring[field_end_pos]!=FM_UTF8_1 &&
-			instring[field_end_pos+1] != FM_UTF8_2;
+			(instring[field_end_pos]!=FM_UTF8_1 ||
+			instring[field_end_pos+1] != FM_UTF8_2);
 		field_end_pos++)
 	{};
 
@@ -125,8 +125,8 @@ void extract(char * instring, int inlength, int fieldno, int valueno, int subval
 	{
 		for (start_pos=start_pos;
 				start_pos<inlength &&
-				instring[start_pos]!=VM_UTF8_1 &&
-				instring[start_pos+1]!=VM_UTF8_2;
+				(instring[start_pos]!=VM_UTF8_1 ||
+				instring[start_pos+1]!=VM_UTF8_2);
 			start_pos++)
 		{};
 		/*past end of string?*/
@@ -142,8 +142,8 @@ void extract(char * instring, int inlength, int fieldno, int valueno, int subval
 	/*find the end of the value (or string)*/
 	for (value_end_pos=start_pos;
 			value_end_pos<field_end_pos &&
-			instring[value_end_pos]!=VM_UTF8_1 &&
-			instring[value_end_pos+1]!=VM_UTF8_2;
+			(instring[value_end_pos]!=VM_UTF8_1 ||
+			instring[value_end_pos+1]!=VM_UTF8_2);
 		value_end_pos++)
 	{}
 
@@ -168,8 +168,8 @@ void extract(char * instring, int inlength, int fieldno, int valueno, int subval
 	{
 		for (start_pos=start_pos;
 				start_pos<field_end_pos &&
-				instring[start_pos]!=SM_UTF8_1 &&
-				instring[start_pos+1]!=SM_UTF8_2;
+				(instring[start_pos]!=SM_UTF8_1 ||
+				instring[start_pos+1]!=SM_UTF8_2);
 			start_pos++)
 		{};
 		/*past end of string?*/
@@ -185,8 +185,8 @@ void extract(char * instring, int inlength, int fieldno, int valueno, int subval
 	/*find the end of the subvalue (or string)*/
 	for (subvalue_end_pos=start_pos;
 			subvalue_end_pos<value_end_pos &&
-			instring[subvalue_end_pos]!=SM_UTF8_1 &&
-			instring[subvalue_end_pos+1]!=SM_UTF8_2;
+			(instring[subvalue_end_pos]!=SM_UTF8_1 ||
+			instring[subvalue_end_pos+1]!=SM_UTF8_2);
 		subvalue_end_pos++)
 	{};
 	if (subvalue_end_pos>=value_end_pos)
