@@ -137,9 +137,9 @@ public:
 		}
 
 		//if tx[-1,1] ne char(12) then tx:=fm
-		tx ^= FM;
+		//tx ^= FM;
 
-		var ntxlns = tx.count(FM);
+		var ntxlns = tx.count(FM)+1;
 		bodyln += ntxlns;
 
 		if (bodyln == ntxlns or bodyln > nbodylns or newpage) {
@@ -222,11 +222,11 @@ private:
 			//cannot remove these since they may be nonibm codepage letters
 			//convert 'Í' to '=-' in tx
 		}
-		tx.swapper(FM, "\r\n");
+		tx.swapper(FM, "\n");
 		//osbwritex(tx, printfilename, printfilename, printptr);
 		//tx.osbwrite(printfilename,printptr);
 		printptr=99;
-		print(tx);
+		printl(tx);
 
 		tx = "";
 		newpage = 0;
