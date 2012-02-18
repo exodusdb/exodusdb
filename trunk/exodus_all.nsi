@@ -2484,13 +2484,13 @@ Section "All" SecAll
 
   SetOutPath "$INSTDIR\include\exodus"
 
-  File exodus\exodus\exodus\mv*.h
-  File exodus\exodus\exodus\exodus*.h
-  File exodus\exodus\exodus\program.h
-  File exodus\exodus\exodus\mvprogram.h
-  File exodus\exodus\exodus\dict.h
-  File exodus\exodus\exodus\library.h
-  File exodus\exodus\exodus\xfunctor*.h
+  File exodus\libexodus\exodus\mv*.h
+  File exodus\libexodus\exodus\exodus*.h
+  File exodus\libexodus\exodus\program.h
+  File exodus\libexodus\exodus\mvprogram.h
+  File exodus\libexodus\exodus\dict.h
+  File exodus\libexodus\exodus\library.h
+  File exodus\libexodus\exodus\xfunctor*.h
 
   ;SetOutPath "$INSTDIR\src"
   createDirectory "${EXO_USERHOME}"

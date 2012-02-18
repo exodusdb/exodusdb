@@ -58,7 +58,10 @@ Type just list by itself to get a summary of its syntax
 var datafile;
 
 var quotes=DQ^SQ;
-var crlf="\r\n";
+//var crlf="\r\n";
+//put() on standard out (on windows at least) converts \n to 0d 0a automatically
+//and manually outputing 0d 0a results in 0d 0d 0a in the file
+var crlf="\n";
 
 //some identifying name (from environment?)
 var company="";
@@ -283,7 +286,7 @@ USER0="";
 
 			//prepare some dictionary records
 			var dictrecs = "";
-			dictrecs  =      "@ID   |F|0 |Id     |S|||||L|10";
+			dictrecs  =      "@ID   |F|0 |Id     |S|||||L|20";
 			dictrecs ^= FM ^ "TYPE  |F|1 |Type   |S|||||L|4";
 			dictrecs ^= FM ^ "FMC   |F|2 |Field  |S|||||R|3";
 			dictrecs ^= FM ^ "TITLE |F|3 |Title  |M|||||T|20";
@@ -291,9 +294,9 @@ USER0="";
 			dictrecs ^= FM ^ "PART  |F|5 |Part   |S|||||R|2";
 			dictrecs ^= FM ^ "CONV  |F|7 |Convert|S|||||T|20";
 			dictrecs ^= FM ^ "JUST  |F|9 |Justify|S|||||L|3";
-			dictrecs ^= FM ^ "LENGTH|F|10|Length |S|||||R|10";
+			dictrecs ^= FM ^ "LENGTH|F|10|Length |S|||||R|6";
 			dictrecs ^= FM ^ "MASTER|F|28|Master |S|||||L|1";
-			dictrecs ^= FM ^ "@CRT  |G|  |TYPE FMC PART TITLE SM CONV JUST LENGTH MASTER";
+			dictrecs ^= FM ^ "@CRT  |G|  |TYPE FMC PART TITLE SM CONV JUST LENGTH MASTER BY TYPE BY FMC";
 
 			//write the dictionary records to the dictionary
 			var nrecs=dictrecs.dcount(FM);
@@ -303,6 +306,8 @@ USER0="";
 					dictrec.swapper(" |","|");
 				var key=field(dictrec,"|",1);
 				var rec=field(dictrec,"|",2,9999);
+				if (key.extract(1)=="F")
+					rec.replacer(28,0,0,1);//master
 				//printl(key ^ ": " ^ rec);
 				write(rec.convert("|",FM), dictmd, key);
 			}
@@ -1151,10 +1156,13 @@ subroutine process_one_record()
 		} else 
 			cell=calculate(colname(coln));
 
-		mcol(coln)=cell;
+		if (not html and dictrec.extract(9) == L"T")
+			mcol(coln)=cell.oconv(dictrec.extract(11));
+		else
+			mcol(coln)=cell;
 
-		//	if (html)
-		mcol(coln).swapper(TM, "<br />");
+		if (html)
+			mcol(coln).swapper(TM, "<br />");
 
 		pcol(coln) = 1;
 		ccol(coln) = 7;
@@ -1295,7 +1303,7 @@ subroutine process_one_record()
 			};//coln;
 
 			//terminate the row and output it
-			tx ^= trx;
+			//tx ^= trx;
 			printer1.printtx(tx);
 
 			//loop back if any multivalued lines/folded text

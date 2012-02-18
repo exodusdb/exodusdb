@@ -1387,7 +1387,7 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 	if (!actualdictfile)
 	{
 		var dictfilename;
-		if (mainfilename.substr(1,5)== L"dict_")
+		if (mainfilename.substr(1,5).lcase()== L"dict_")
 			dictfilename=L"dict_md";
 		else
 			dictfilename=L"dict_"^mainfilename;

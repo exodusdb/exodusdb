@@ -181,7 +181,10 @@ program()
 						//question^="\n3=main(), 4=simple so/dll\n";
 						question^="\n"^basefilename.quote()^" does not exist. Create what? (1-2) ";
 						while (true) {
-							progtype.input(question);
+							if (basefilename.substr(1,5).lcase() eq "dict_")
+								progtype=5;
+							else
+								progtype.input(question);
 							if (progtype eq 2)
 								progtype="classlib";
 							else if (progtype eq 3)
@@ -190,6 +193,8 @@ program()
 								progtype="mainlib";
 							else if (progtype eq 1)
 								progtype="class";
+							else if (progtype eq 5)
+								progtype="dict";
 							else
 								stop();
 							break;
@@ -228,6 +233,19 @@ program()
 
 							if (progtype eq "classlib")
 								blankfile.swapper("program","library");
+						} else if (progtype eq "dict") {
+	                        startatlineno="6,9";
+							blankfile^="#include <exodus/dict.h>\n\n";
+							//programinit() as 2nd line to avoid ppl in external functions before programinit
+							//blankfile^="\n";
+							blankfile^="dict(EXAMPLEDICTID1) {\n";
+							blankfile^="\tANS=RECORD(1)^\"x\";\n";
+							blankfile^="}\n\n";
+
+							blankfile^="dict(EXAMPLEDICTID2) {\n";
+							blankfile^="\tANS=RECORD(2)^\"x\";\n";
+							blankfile^="}\n";
+
 						}
 
 						if (blankfile[1] ne "\n")
