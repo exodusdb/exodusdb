@@ -1,4 +1,5 @@
-AM_LDFLAGS=-lexodus -L../../exodus/libexodus/exodus/.libs
+LDADD=-lexodus
+AM_LDFLAGS=-L../../exodus/libexodus/exodus/.libs
 #AM_CXXFLAGS=-I../../exodus/libexodus
 AM_CPPFLAGS=-I../../exodus/libexodus -Wall -Wextra -ansi -Wno-unused-parameter
 
