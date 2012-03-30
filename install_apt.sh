@@ -35,7 +35,8 @@ sudo make install
 
 #==== 2. Installing Postgres and Configuring it for Exodus ====
 
-export POSTGRESVER=8.4
+#export POSTGRESVER=8.4
+export POSTGRESVER=`apt-cache search ^postgresql-[0-9]+.[0-9]+$|tail -n 1|cut -d" " -f 1|cut -d- -f 2`
 
 ###yum -y install postgresql-server
 sudo apt-get -y install postgresql-$POSTGRESVER
