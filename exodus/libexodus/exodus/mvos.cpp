@@ -90,6 +90,12 @@ namespace boostfs = boost::filesystem;
 #include <cstdlib> //for getenv and setenv/putenv
 //#include <stdio.h> //for getenv
 
+//boost changed from TIME_UTC to TIME_UTC_ (when?) to avoid a new standard TIME_UTC macro in C11 time.h
+#include <boost/version.hpp>
+#if BOOST_VERSION < 105000
+#define TIME_UTC_ TIME_UTC
+#endif
+
 //oshell capturing output needs posix popen
 #if defined(_MSC_VER) && !defined(popen)
 #define popen _popen
@@ -1617,7 +1623,7 @@ void var::ossleep(const int milliseconds) const
 	THISISDEFINED()//not needed if *this not used
 
     boost::xtime xt;
-    boost::xtime_get(&xt, boost::TIME_UTC);
+    boost::xtime_get(&xt, boost::TIME_UTC_);
     xt.nsec += milliseconds*1000000;
     boost::thread::sleep(xt);
 

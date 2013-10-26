@@ -11,6 +11,8 @@
 #include <sys/un.h>
 #include <netinet/in.h>
 #include <errno.h>
+//for posix read/write/close
+#include <unistd.h>
 
 //#include <winsock2.h>
 //#include <ws2tcpip.h>
