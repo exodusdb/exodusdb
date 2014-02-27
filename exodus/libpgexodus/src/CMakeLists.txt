@@ -40,6 +40,33 @@ add_library(pgexodus SHARED
 
 #set_target_properties(pgexodus PROPERTIES OUTPUT_NAME pgexodus)
 
-# INSTALL libpgexodus postgres server shared object
 
-install(TARGETS pgexodus DESTINATION ${PostgreSQL_PKGLIBDIR})
+# INSTALL libpgexodus postgres server shared object and postinstall scripts
+
+#place pgexodus.so in server package lib directory (not ordinary lib)
+install(TARGETS pgexodus
+DESTINATION ${PostgreSQL_PKGLIBDIR})
+
+#script to add exodus functions into all new databases and exodus database
+install(PROGRAMS installexodus-postgresql installexodus-postgresql2
+DESTINATION ${PostgreSQL_PKGLIBDIR})
+
+#				pg_config --pkglibdir
+install(
+	CODE "
+		execute_process(
+			COMMAND 
+				${PostgreSQL_PKGLIBDIR}/installexodus-postgresql
+#				OUTPUT_VARIABLE OUTVAR
+#				ERROR_VARIABLE ERRVAR
+				RESULT_VARIABLE RESVAR
+			
+		)
+		message(<\${OUTVAR}>\n
+			<\${ERRVAR}>\n
+			<\${RESVAR}>\n
+		)
+	"
+)
+
+#install (SCRIPT "${CMAKE_SOURCE_DIR}/PostInstall.cmake")
