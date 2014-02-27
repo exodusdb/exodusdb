@@ -16,3 +16,4 @@ add_library(pgexodus SHARED
 
 )
 
+install(TARGETS pgexodus DESTINATION ${PostgreSQL_LIBRARY_DIRS})
