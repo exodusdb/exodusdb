@@ -9,6 +9,8 @@
 namespace exodus
 {
 
+std::vector<MvWindow*> global_wins(NTHREADS+1);
+
 bool MvWindow::security(const var& mode)
 {
 	/////////

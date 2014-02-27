@@ -6,6 +6,8 @@
 //this program is dependent on boost to do threads - but threads will be added to exodus directly
 //exodus is designed to be threadsafe (a few global variables are not threadsafe and need coordinated access)
 
+//g++ -o main main.cpp mvwindow.cpp server.cpp -lexodus -lboost_system -lboost_thread
+
 //#include <unicode/ustring.h>
 //"visual leak detector" debugger
 //#include <vld.h>
@@ -233,5 +235,5 @@ function main()
 
 programexit()
 
-#include "server.cpp"
-#include "mvwindow.cpp"
+//#include "server.cpp"
+//#include "mvwindow.cpp"

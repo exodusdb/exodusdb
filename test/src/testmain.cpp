@@ -819,6 +819,7 @@ dict(AGE_IN_YEARS) {
 			a8(ii,jj).outputt("=");
 //		printl();
 	}
+	printl();
 
 	assert(a7.parse("xx"^FM^"bb") eq 2);
 	assert(a7(1) eq "xx");
@@ -1573,6 +1574,8 @@ while trying to match the argument list '(exodus::var, bool)'
 	var nfiles=dcount(filenames2,FM);
 	for (int ii=1;ii<=nfiles;++ii) {
 		var filename=filenames2.extract(ii);
+		
+		printl(filename);
 
 		if (not open(filename, tempfile)) {
 			printl("creating "^filename);
@@ -1680,7 +1683,7 @@ while trying to match the argument list '(exodus::var, bool)'
 	}
 #endif
 
-    printl("testmain exiting ...");
+    printl("testmain finished ok and exiting ...");
 
     return 0;
 }
@@ -1688,6 +1691,7 @@ while trying to match the argument list '(exodus::var, bool)'
 //be careful not to name any subroutines the same as any variables
 function internal_subroutine_xyz(in xyzz)
 {
+	printl("internal_subroutine_xyz(in xyzz)");
 	assert(xyzz(2,2,2) eq "b22");
 	return 1;
 }
