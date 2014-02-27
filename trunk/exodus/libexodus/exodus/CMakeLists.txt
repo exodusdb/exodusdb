@@ -37,3 +37,6 @@ add_library(exodus SHARED
 
 #dl is needed for dynamic link library code
 target_link_libraries(exodus ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} ${ICU_LIBRARIES} dl)
+
+install(TARGETS exodus DESTINATION lib)
+

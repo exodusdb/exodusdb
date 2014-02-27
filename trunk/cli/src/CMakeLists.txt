@@ -57,3 +57,19 @@ target_link_libraries(listfiles exodus ${LIBS})
 target_link_libraries(listindexes exodus ${LIBS})
 target_link_libraries(testsort exodus ${LIBS})
 target_link_libraries(configexodus exodus ${LIBS})
+
+install(TARGETS compile
+createfile
+createindex
+delete
+deletefile
+deleteindex
+edir
+edic
+exodus-cli
+list
+listfiles
+listindexes
+testsort
+configexodus
+ DESTINATION bin)
