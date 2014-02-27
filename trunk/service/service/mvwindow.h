@@ -10,12 +10,12 @@ namespace exodus
 {
 
 class MvWindow;
-#ifdef NEO_MVWINDOW_CPP
-	//plus 1 to allow main thread to have its own (0)
-	std::vector<MvWindow*> global_wins(NTHREADS+1);
-#else
+//#ifdef NEO_MVWINDOW_CPP
+//	//plus 1 to allow main thread to have its own (0)
+//	std::vector<MvWindow*> global_wins(NTHREADS+1);
+//#else
 	extern std::vector<MvWindow*> global_wins;
-#endif
+//#endif
 
 class MvWindow
 {
