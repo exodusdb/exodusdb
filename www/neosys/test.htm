@@ -1,0 +1,200 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+
+    <script type="text/javascript" src="scripts/client.js"></script>
+
+    <script type="text/javascript">
+
+var gnosavelocation=true
+
+window.onload=window_onload
+
+function window_onload()
+{
+ $milliseconds=$$('milliseconds')
+ $response=$$('response')
+ $customcommand=$$('customcommand')
+ 
+}
+
+function test()
+{ 
+ $milliseconds.innerText='Please wait'
+ $response.innerText=''
+ window.setTimeout("testx(neosysint(getvalue('ntests')))",10)
+ window.setTimeout("if (!Number($milliseconds.innerText)) $milliseconds.innerText=''",100)
+}
+
+function testx(n,cmd)
+{
+ if (!cmd)
+  cmd=getvalue('cmd')
+ 
+ if (cmd=='CUSTOM')
+  cmd=$customcommand.value
+ 
+ //timer1=new neosystimer()
+ timer=new Date
+ var minimum=false
+ var maximum=false
+ var totalelapsed=0
+ var n2=n
+ //var all=''
+ var firstpass=true
+ for (var i=0;i<n;i++)
+ {
+
+  if (cmd=='TEST')
+   db.request=cmd+'\r'+(i+1)
+  else
+   db.request=cmd
+   
+  var before=new Date
+  
+  ///////////////////////
+  var responded=db.send()
+  ///////////////////////
+
+  //fix bug in KEEPALIVE
+  if (db.response=='OK') responded=true
+
+  if (!responded&&stoponerror.checked)
+  {
+   alert(db.response)
+   break
+  }
+  
+  var elapsed=new Date-before
+  totalelapsed+=elapsed
+  //all+=' '+elapsed
+
+  if (firstpass)
+  {
+   firstpass=false
+   minimum=elapsed
+   maximum=elapsed
+  }
+  else
+  {
+   if (elapsed<minimum)
+    minimum=elapsed
+   if (elapsed>maximum)
+    maximum=elapsed
+  }
+
+  n2=i+1
+  
+ }
+ 
+  //window.status=i+' '+db.response
+ $response.innerText=db.response+'\r\r'+db.data
+
+ //calculate and display average milliseconds (numeric otherwise will be cleared)
+ if (n==1)
+  //milliseconds.innerHTML=Math.floor((new Date-timer)*1000/(n2))/1000
+  $milliseconds.innerHTML=minimum
+ else
+ { 
+  $milliseconds.innerHTML=
+   minimum
+  //+ '&nbsp;&nbsp;&nbsp;'+Math.floor((new Date-timer)*1000/(n2)/1000+.5)
+  + '&nbsp;&nbsp;&nbsp;'+Math.floor(totalelapsed/n2+.5)
+  + '&nbsp;&nbsp;&nbsp;'+maximum
+  + '&nbsp;&nbsp;&nbsp;(min avg max)'
+ }
+ 
+ //window.status=timer1.stop()/1000/n+' secs'
+ 
+}
+
+function getvalue(id)
+{
+ var value=''
+ var elements=document.getElementsByName(id)
+ for (var ii=elements.length-1;ii>=0;ii--)
+ {
+  if (elements[ii].checked)
+  {
+   value=elements[ii].value
+   break
+  }
+ }
+ return value
+}
+
+    </script>
+
+</head>
+<body>
+    <div style="text-align: center">
+        <h2>
+            Connection Speed Test</h2>
+        <table class="neosystable" border="1">
+            <tr>
+                <td>
+                    Number of times to repeat</td>
+                <td>
+                    <input id="ntests" type="radio" value="1" checked="checked" />1<br />
+                    <input id="ntests" type="radio" value="10" />10<br />
+                    <input id="ntests" type="radio" value="100" />100<br />
+                    <input id="ntests" type="radio" value="1000" />1000</td>
+            </tr>
+            <tr>
+                <td>
+                    Test to perform</td>
+                <td>
+                    <input id="cmd" type="radio" value="KEEPALIVE" />Web server loopback<br />
+                    <input id="cmd" checked="checked" type="radio" value="TEST" />NEOSYS server loopback<br />
+                    <input id="cmd" type="radio" value="SELECT\rCURRENCIES\rBY CURRENCY_CODE\rCURRENCY_CODE CURRENCY_NAME\rXML" />NEOSYS
+                    application loopback<br />
+                    <input id="cmd" type="radio" value="CUSTOM" />NEOSYS custom command<br />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Custom Command</td>
+                <td>
+                    <input id="customcommand" value="" size="60" /></td>
+            </tr>
+            <tr style="display: none">
+                <td>
+                    Stop on error</td>
+                <td>
+                    <input id="stoponerror" checked="checked" type="checkbox" /></td>
+            </tr>
+            <tr>
+                <td>
+                </td>
+                <td>
+                    <button onclick="test()">
+                        Start</button></td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align: center">
+                    <br />
+                    <h2>
+                        Result</h2>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Milliseconds per request</td>
+                <td>
+                    <p id="milliseconds">
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Response</td>
+                <td>
+                    <p id="response">
+                    </p>
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>

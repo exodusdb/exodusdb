@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+    <script type="text/javascript"> 
+ var gmodule='GENERAL'
+ var gdatafilename='VIEWLOG'
+ 
+ //dummy to prevent client.js trying to load a _dict script
+ var dict_VIEWLOG=''
+
+    </script>
+
+    <script type="text/javascript" src='../neosys/scripts/client.js'></script>
+
+    <script type="text/javascript" src='../general/scripts/general.js'></script>
+
+    <script type="text/javascript" src='../agency/scripts/agency.js'></script>
+
+    <script type="text/javascript">
+		
+function dict_VIEWLOG(parameters)
+{
+
+ //returns an array representing the client dictionary
+ 
+ var dict=[]//of dictrecs
+ var din=-1
+ 
+ //single valued fields
+ 
+ di=dict[++din]=dictrec('FROM_DATE', 'F',5)
+ neosys_dict_date(di,'TO=UPTO_DATE')
+ 
+ di=dict[++din]=dictrec('UPTO_DATE', 'F',6)
+ neosys_dict_date(di,'FROM=FROM_DATE')
+ di.defaultvalue='gds.getx("FROM_DATE")'
+
+ di=dict[++din]=dictrec('CONTAINING','F',7)
+ di.length=30
+   
+ return dict
+ 
+}
+
+function form_postinit()
+{
+ 
+ gparameters.savebuttonvalue='List'
+ 
+ return true
+ 
+}
+    </script>
+
+    <title>Log</title>
+</head>
+<body>
+    <div style="text-align: center">
+        <h1>
+            Log
+        </h1>
+        <table class="neosystable" border="1">
+            <tr id="dateoptions">
+                <td>
+                    Which date(s) do you want?</td>
+                <td valign="middle">
+                    <input id="FROM_DATE" />
+                    to
+                    <input id="UPTO_DATE" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Containing the word or phrase?</td>
+                <td valign="middle">
+                    <input id="CONTAINING" />
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>

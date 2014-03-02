@@ -1,0 +1,120 @@
+<html>
+<head>
+
+    <script>
+
+//to execute a program MODULEXPROXY define gmodule and no field 0
+var gmodule='MODULEX'
+var gdictfilename='FILENAMEX'
+
+//to update a file, optionally define filename if different from dictfilename
+//and define a field 0 in the dict and on the form
+//var gdatafilename='FILENAMEX'
+
+function dict_FILENAMEX()
+{
+
+ var dict=[]//of dictrecs
+ var din=-1
+ var di
+ var groupn=0
+
+ //using a field 0 on a form indicates the key field of a file
+ //otherwise OK/SAVE executes a program defined by gmodule
+ di=dict[++din]=dictrec('FIELD0','F',0)
+ 
+ di=dict[++din]=dictrec('FIELD1','F',1)
+ di=dict[++din]=dictrec('FIELD2','F',2)
+ 
+ di=dict[++din]=dictrec('FIELD3','F',3)
+ di=dict[++din]=dictrec('FIELD4','F',4)
+ 
+ ++groupn
+ 
+ di=dict[++din]=dictrec('FIELD5','F',5,'',groupn)
+ di=dict[++din]=dictrec('FIELD6','F',6,'',groupn)
+
+ return dict
+
+}
+    </script>
+
+    <script type="text/javascript" src='../neosys/scripts/client.js'></script>
+
+    <script type="text/javascript" src='../general/scripts/general.js'></script>
+
+    <title>CHANGEME Title</title>
+</head>
+<body>
+    <div align="center">
+        <h1>
+            CHANGE Title</h1>
+        <table class="NEOSYSTABLE" border="1">
+            <tr valign="top">
+                <td>
+                    <table>
+                        <!-- uncomment for file/table -->
+                        <tr>
+                            <td>
+                                Key Field 0</td>
+                            <td>
+                                <input id="FIELD0" /></td>
+                        </tr>
+                        <!-- -->
+                        <tr>
+                            <td>
+                                Field 1</td>
+                            <td>
+                                <input id="FIELD1" /></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Field 2</td>
+                            <td>
+                                <input id="FIELD2" /></td>
+                        </tr>
+                    </table>
+                </td>
+                <td>
+                    <table>
+                        <tr>
+                            <td>
+                                Field 3</td>
+                            <td>
+                                <input id="FIELD3" /></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Field 4</td>
+                            <td>
+                                <input id="FIELD4" /></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <table class="NEOSYSTABLE" border="1">
+                        <thead>
+                            <tr>
+                                <td>
+                                    Field 5</td>
+                                <td>
+                                    Field 6</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr valign="top">
+                                <td>
+                                    <input id="FIELD5" /></td>
+                                <td>
+                                    <input id="FIELD6"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>

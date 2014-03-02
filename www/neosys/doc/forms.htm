@@ -1,0 +1,973 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" >
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <meta id="GENERATOR" content="Microsoft Visual Studio 7.0">
+</head>
+<body>
+    <table border="1">
+        <tr>
+            <td height="20">
+                <strong>property name</strong></td>
+            <td height="20">
+                <strong>Type</strong></td>
+            <td height="20">
+                <strong>Example</strong></td>
+            <td height="20">
+                <strong>Description</strong></td>
+            <td height="20">
+                <strong>AREV PAINT</strong></td>
+        </tr>
+        <tr>
+            <td height="20">
+                name
+            </td>
+            <td height="20">
+                string</td>
+            <td height="20">
+                "CLIENT_CODE"</td>
+            <td height="20">
+                Advisable to be in upper case to avoid confusion with other objects. Many names
+                are disallowed eg DATE, NUMBER etc.</td>
+            <td height="20">
+                FieldName</td>
+        </tr>
+        <tr>
+            <td>
+                type
+            </td>
+            <td>
+                string</td>
+            <td>
+                <p>
+                    "F"<br />
+                    "S"</p>
+            </td>
+            <td>
+                F for stored fields<br />
+                S for symbolic (calculated fields)</td>
+            <td>
+                DictType</td>
+        </tr>
+        <tr>
+            <td>
+                fieldno
+            </td>
+            <td>
+                integer</td>
+            <td>
+                <p>
+                    0<br />
+                    1</p>
+            </td>
+            <td>
+                <p>
+                    0 for the key field or key part fields<br />
+                    1 or more for stored fields</p>
+            </td>
+            <td>
+                Position</td>
+        </tr>
+        <tr>
+            <td>
+                title
+            </td>
+            <td>
+                string</td>
+            <td>
+                "Client code"</td>
+            <td>
+                <p>
+                    Optional, will default to a lower case version of the name property if not specificed.</p>
+                <p>
+                    Is used in various messages such as "Client code is required"</p>
+            </td>
+            <td>
+                No equivalent</td>
+        </tr>
+        <tr>
+            <td>
+                groupno
+            </td>
+            <td>
+                integer</td>
+            <td>
+                <p>
+                    0(default)<br />
+                    1</p>
+            </td>
+            <td>
+                <p>
+                    Single valued fields groupno must be 0 or ""</p>
+                <p>
+                    Multivalued fields must indicate the group or group number that they belong to in
+                    parallel with other fields</p>
+            </td>
+            <td>
+                Group No</td>
+        </tr>
+        <tr>
+            <td>
+                keypart
+            </td>
+            <td>
+                integer</td>
+            <td>
+                0 (default)<br />
+                1</td>
+            <td>
+                For multi-part keys separated by the "*" character as conventional in AREV</td>
+            <td>
+                KeyPart</td>
+        </tr>
+        <tr>
+            <td height="191">
+                conversion
+            </td>
+            <td height="191">
+                string</td>
+            <td height="191">
+                "Y;Yes:N;No"<br />
+                "[NUMBER,2]"</td>
+            <td height="191">
+                <p>
+                    Either</p>
+                <p>
+                    A&nbsp;list of possibly code and value pairs&nbsp;separated by colons ":" character.
+                    The code and value&nbsp;is separated by a semicolon ";". On screen this is implemented
+                    as a dropdown box showing the values only.&nbsp;The&nbsp;code is stored internally.</p>
+                <p>
+                    Or</p>
+                <p>
+                    An input/output function name with optional parameters surrounded by square bracket
+                    characters. Common functions like TIME DATE etc are provided in the included script
+                    ..\neosys\scripts\general.js</p>
+            </td>
+            <td height="191">
+                <p>
+                    ValidationPattern<br />
+                    (approximately)</p>
+                <p>
+                    see also <strong>checkbox</strong> and <strong>radio</strong> properties</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                functioncode
+            </td>
+            <td>
+                string</td>
+            <td>
+                "return gds.getx('CLIENT_CODE').neosysxlate('CLIENTS',1,'X')"</td>
+            <td>
+                <p>
+                    For symbolic (calculated) fields only. A fragment of jscript that returns a value
+                    to be displayed.</p>
+                <p>
+                    The example corresponds to AREV<br />
+                    @ans=xlate('CLIENTS',{CLIENT_CODE},1,'X')</p>
+            </td>
+            <td>
+                In dictionary</td>
+        </tr>
+        <tr>
+            <td>
+                length
+            </td>
+            <td>
+                integer</td>
+            <td>
+                10</td>
+            <td>
+                The approximate number of characters to be reserved for input fields. This is approximate
+                because data entry font will usually be proportionally spaced.</td>
+            <td>
+                DisplayLength</td>
+        </tr>
+        <tr>
+            <td>
+                align
+            </td>
+            <td>
+                character</td>
+            <td>
+                L<br />
+                R<br />
+                T</td>
+            <td>
+                <p>
+                    L=Left<br />
+                    R=Right (has no effect in HTML)<br />
+                    T=Text (has no effect in HTML)</p>
+            </td>
+            <td>
+                Justification<br />
+                not TN or C</td>
+        </tr>
+        <tr>
+            <td>
+                wordsep
+            </td>
+            <td>
+                character</td>
+            <td>
+                "/"</td>
+            <td>
+                <p>
+                    Used in conjunction with wordno and nwords. Used to&nbsp;further extract, display
+                    and update&nbsp;fields from normal fields based on a separator character of your
+                    own choosing.</p>
+                <p>
+                    The <strong>wordsep</strong> character is disallowed as input data.</p>
+            </td>
+            <td>
+                <p>
+                    No corresponding feature in AREV</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                wordno
+            </td>
+            <td>
+                integer</td>
+            <td>
+                1</td>
+            <td>
+                see <strong>wordsep</strong> above</td>
+            <td>
+                <p>
+                    No corresponding feature in AREV</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                nwords
+            </td>
+            <td>
+                integer</td>
+            <td>
+                1</td>
+            <td>
+                see <strong>wordsep</strong> above</td>
+            <td>
+                <p>
+                    No corresponding feature in AREV</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                validation
+            </td>
+            <td>
+                string</td>
+            <td>
+                "return orders_val_clientcode()"</td>
+            <td>
+                <p>
+                    A fragment of jscript to be called to validate any change of data in the current
+                    field.</p>
+                <p>
+                    Must return true or false if invalid</p>
+            </td>
+            <td>
+                PostPrompt<br />
+                Subroutine</td>
+        </tr>
+        <tr>
+            <td>
+                popup
+            </td>
+            <td>
+                string</td>
+            <td>
+                "return orders_pop_clientcode()"</td>
+            <td>
+                <p>
+                    A&nbsp;fragment of jscript to be called&nbsp;if the user&nbsp;presses F7 or clicks
+                    the&nbsp;popup icon.</p>
+                <p>
+                    Must return a string or boolean false!</p>
+            </td>
+            <td>
+                <p>
+                    Options<br />
+                    Subroutine</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                checkbox
+            </td>
+            <td>
+                string</td>
+            <td>
+                <p>
+                    "Y;Yes"</p>
+                <p>
+                    "1;CHECK1:2;CHECK2"</p>
+            </td>
+            <td>
+                <p>
+                    One or more&nbsp;pairs of codes and values separated by colons ":". The code and
+                    value&nbsp;is separated by a semicolon ";".</p>
+                <p>
+                    The user can check one or more pairs.</p>
+                <p>
+                    The code is stored in the data. The value is optional if there is only one pair.</p>
+                <p>
+                    Often only one pair is used as a single check box. However, if more than one pair&nbsp;is
+                    defined&nbsp;then all the checked codes are stored&nbsp;as multivalued in the field
+                    if single valued or as subvalues if the field is multivalued itself.</p>
+                <p>
+                    Multiple options are arranged vertically onscreen unless the <strong>horizontal</strong>
+                    property is set to true</p>
+            </td>
+            <td>
+                <p>
+                    ValidationPattern<br />
+                    (approximately)</p>
+                <p>
+                    see also <strong>checkbox</strong> and <strong>radio</strong> properties</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                radio
+            </td>
+            <td>
+                string</td>
+            <td>
+                "1;Station 1:2;Station 2</td>
+            <td>
+                <p>
+                    Similar to <strong>checkbox</strong> above but only one option can be checked at
+                    a time.</p>
+            </td>
+            <td>
+                <p>
+                    ValidationPattern<br />
+                    (approximately)</p>
+                <p>
+                    see also <strong>checkbox</strong> and <strong>radio</strong> properties</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                horizontal
+            </td>
+            <td>
+                boolean</td>
+            <td>
+                <p>
+                    true<br />
+                    false (default)</p>
+            </td>
+            <td>
+                Determines whether <strong>checkbox</strong> and <strong>radio</strong> fields are
+                arranged vertically (default or false) or horizontally (true)</td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                required
+            </td>
+            <td>
+                boolean</td>
+            <td>
+                true<br />
+                false (default)</td>
+            <td>
+                Ensures&nbsp;that a field has a value before proceeding to fields further on&nbsp;in
+                the form.&nbsp;Defaults will authomatically be applied if the field is required.</td>
+            <td>
+                EntryType "R"</td>
+        </tr>
+        <tr>
+            <td>
+                openfunction
+            </td>
+            <td>
+                string</td>
+            <td>
+                "return orders_pop_orderno()"</td>
+            <td>
+                A&nbsp;jscript expression that returns a new key or the boolean false. Usually used
+                to present a search form for the user to interactively browse and locate records
+                ... currently only one at a time.</td>
+            <td>
+                <p>
+                    F2 Options<br />
+                    Subroutine</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                dropdown
+            </td>
+            <td>
+                object</td>
+            <td>
+                ['SELECT\rCURRENCIES\r\rCURRENCY_CODE CURRENCY_NAME\rXML',['CURRENCY_CODE','CURRENCY_NAME']]</td>
+            <td>
+                <p>
+                    A multicolumn popup design, specifying a query and columns to display.</p>
+                <p>
+                    Must be an array two long.</p>
+                <ul>
+                    <li>dropdown[0] is a string database SELECT request.
+                        <li>dropdown[1] is an array of columns to display</li></ul>
+            </td>
+            <td>
+                Roughly speaking this is F2 POPUP<br />
+                Catalyst Code P<br />
+                and is the POPUP design</td>
+        </tr>
+        <tr>
+            <td>
+                rowrequired
+            </td>
+            <td>
+                boolean</td>
+            <td>
+                true<br />
+                false (default)</td>
+            <td>
+                <p>
+                    Ensures that at least one row is entered before the record can be saved or processed.</p>
+                <p>
+                    Can be placed on any field that belongs to the relevent group or group.</p>
+                <p>
+                    No AREV equivalent</p>
+            </td>
+            <td>
+                <p>
+                    No corresponding feature in AREV</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                unique
+            </td>
+            <td>
+                boolean</td>
+            <td>
+                true - disallow duplicate mvs<br />
+                false (default) allow duplicate mvs</td>
+            <td>
+                <p>
+                    Duplicate multivalues are allowed by default unless <strong>unique</strong> is set
+                    true</p>
+                <p>
+                    But see <strong>nonuniquewarning</strong> below</p>
+            </td>
+            <td>
+                Validation Pattern<br />
+                %U%</td>
+        </tr>
+        <tr>
+            <td>
+                nonuniquewarning
+            </td>
+            <td>
+                boolean</td>
+            <td>
+                <p>
+                    true -&nbsp;warn about duplicates<br />
+                    false - disallow duplicates</p>
+            </td>
+            <td>
+                <p>
+                    if <strong>unique</strong> is true then duplicates are still allowed if <strong>nonuniquewarning</strong>
+                    is set true and the user confirms that it is OK.</p>
+            </td>
+            <td>
+                <p>
+                    No corresponding feature in AREV</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                defaultvalue
+            </td>
+            <td>
+                string or function</td>
+            <td>
+                ' "Y" '</td>
+            <td>
+                A&nbsp;jscript expression that returns a default value or "" an empty string if
+                none.</td>
+            <td>
+                Default</td>
+        </tr>
+        <tr>
+            <td>
+                validcharacters
+            </td>
+            <td>
+                string</td>
+            <td>
+                "0123456789ABCDEF"</td>
+            <td>
+                <p>
+                    A&nbsp;string of valid characters that may be entered. Valid characters override
+                    any invalid characters.</p>
+            </td>
+            <td>
+                <p>
+                    No corresponding feature in AREV</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                invalidcharacters
+            </td>
+            <td>
+                string</td>
+            <td>
+                '`~!@$%^&amp;*()_+={}[]|\\:;"\'&lt;&gt;,. '</td>
+            <td>
+                <p>
+                    A&nbsp;string of invalid characters that may not be entered.<br />
+                    In primary key field(s),&nbsp;punctuation characters and spaces (except / - and
+                    # slash, dash and hash) are not allowed unless specified as <strong>validcharacters</strong>
+                    above.</p>
+            </td>
+            <td>
+                <p>
+                    No corresponding feature in AREV</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                display
+            </td>
+            <td>
+                boolean</td>
+            <td>
+                true (default)<br />
+                false</td>
+            <td>
+                Determines if the field is visible or not on the form. Invisible fields will be
+                defaulted but are not required even if <strong>required</strong> is true and there
+                is no default.</td>
+            <td>
+                <p>
+                    No corresponding feature in AREV</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                lowercase
+            </td>
+            <td>
+                boolean</td>
+            <td>
+                <p>
+                    true<br />
+                    false (default)</p>
+            </td>
+            <td>
+                Lowercase typing is converted to uppercase instantly unless <strong>lowercase</strong>
+                is true.&nbsp;T aligned fields and fields formated with the neosys_dict_text() routine
+                are lowercase.</td>
+            <td>
+                LowerCase</td>
+        </tr>
+        <tr>
+            <td>
+                readonly
+            </td>
+            <td>
+                boolean</td>
+            <td>
+                true<br />
+                false (default)</td>
+            <td>
+                true means that the field is skipped unless the user mouse clicks it. Any default
+                is applied.</td>
+            <td>
+                EntryType P</td>
+        </tr>
+        <tr>
+            <td>
+                maxlength
+            </td>
+            <td>
+                integer</td>
+            <td>
+                10 (optional)</td>
+            <td>
+                Limits the number of characters that can be entered into the field</td>
+            <td>
+                MaxLength</td>
+        </tr>
+        <tr>
+            <td>
+                printfunction
+            </td>
+            <td>
+                string or function</td>
+            <td>
+                "return order_print('%KEY%')"</td>
+            <td>
+                <p>
+                    On the key field or any field that is part of a multifield key, this is a jscript
+                    expression that&nbsp;commences some kind of Print/Send process. If set, then the
+                    Print/Send button is enabled when&nbsp; a record is being entered or updated.</p>
+                <p>
+                    If the string %KEY% is present in the expression, it is replaced with the current
+                    key in internal format before evaluation.</p>
+                <p>
+                    The function must return a boolean true or false but it is discarded.</p>
+            </td>
+            <td>
+                <p>
+                    No corresponding feature in AREV except softkeys</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                filename
+            </td>
+            <td>
+                string</td>
+            <td>
+                "CLIENTS"</td>
+            <td>
+                Validates&nbsp;that the data entered is a key field in the specified file.</td>
+            <td>
+                <p>
+                    Validation pattern<br />
+                    &lt;filename&gt;</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                rows
+            </td>
+            <td>
+                integer</td>
+            <td>
+                3</td>
+            <td>
+                For a text box that allows multiple lines of text</td>
+            <td>
+                Multiline but Multivalue=0</td>
+        </tr>
+        <tr>
+            <td>
+                sequence</td>
+            <td>
+                char</td>
+            <td>
+                <p>
+                    "A" Ascending<br />
+                    "D" Descending<br />
+                    "" or missing - any order</p>
+            </td>
+            <td>
+                Validates that multivalued fields are enter in ascending or descending order.</td>
+            <td>
+                <p>
+                    No corresponding feature in AREV</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                noinsertrow
+            </td>
+            <td>
+                boolean</td>
+            <td>
+                true - prevent insert row<br />
+                false (default) - allow insert row</td>
+            <td>
+                Rows can be inserted&nbsp;unless this is set to true on any field of the relevent
+                group or group which is bound to the HTML</td>
+            <td>
+                <p>
+                    No corresponding feature in AREV</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                nodeleterow
+            </td>
+            <td>
+                boolean</td>
+            <td>
+                <p>
+                    true -&nbsp;prevent delete row<br />
+                    false (default) - allow delete row</p>
+            </td>
+            <td>
+                Rows can be deleted unless this is set to true&nbsp;on any field&nbsp;(of the relevent
+                group or group) which is bound to the HTML.</td>
+            <td>
+                <p>
+                    No corresponding feature in AREV</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                allowemptyrows
+            </td>
+            <td>
+                boolean</td>
+            <td>
+                true - allow empty rows<br />
+                false (default) - prevent empty rows</td>
+            <td>
+                Blank rows are disallowed unless this is set to&nbsp;true on any field&nbsp;(of
+                the relevent group or group) which is bound to the HTML.</td>
+            <td>
+                <p>
+                    No corresponding feature in AREV</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                copyable
+            </td>
+            <td>
+                boolean</td>
+            <td>
+                true (default) allow copy<br />
+                false - disallow copy</td>
+            <td>
+                All fields except those marked copyable=false are copied when copying new records
+                from old records.</td>
+            <td>
+                <p>
+                    No corresponding feature in AREV</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                link
+            </td>
+            <td>
+                string or function</td>
+            <td>
+                "client_open('%KEY%)"</td>
+            <td>
+                Adds an icon next to the field that can be clicked to hyper-link to the item in
+                question. The link could be anything. For example a printout or a data entry file.</td>
+            <td>
+                <p>
+                    No corresponding feature in AREV</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                nochangeswarning
+            </td>
+            <td>
+                boolean</td>
+            <td>
+                true - allow data loss with no warning<br />
+                false (default) - data loss with warning</td>
+            <td>
+                True suppresses the normal warning presented to the user when closing a form, or
+                clearing the form in any way, and some data has been entered or modified.</td>
+            <td>
+                <p>
+                    No corresponding feature in AREV</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                allowduplicatefieldno</td>
+            <td>
+                boolean</td>
+            <td>
+                true - allow<br />
+                false (default) disallow</td>
+            <td>
+                <p>
+                    Normally one would not have more than one F type dictionary item using the same
+                    field number position in the record.</p>
+                <p>
+                    Note that fields extracted using wordsep, wordn and nwords are not subject to this
+                    restriction.</p>
+            </td>
+            <td>
+                <p>
+                    No corresponding feature in AREV</p>
+            </td>
+        </tr>
+    </table>
+    <p>
+        &nbsp;</p>
+    <h2>
+        Client side form events</h2>
+    <p>
+        Functions with the specified names will be called at the appropriate times if present.</p>
+    <p>
+        All functions must return something otherwise an error message will appear.</p>
+    <h3>
+        function form_preinit()</h3>
+    <p>
+        no input or output</p>
+    <h3>
+        function form_postinit()</h3>
+    <p>
+        no input or output</p>
+    <p>
+        form_postinit can be defined anytime up to and including preinit</p>
+    <h3>
+        function form_onload()</h3>
+    <p>
+        no input or output</p>
+    <p>
+        called after form loaded</p>
+    <h3>
+        function form_onkeydown()</h3>
+    <p>
+        return true, or false to cancel the key pressed</p>
+    <h3>
+        function form_preread()</h3>
+    <p>
+        return false to cancel read</p>
+    <h3>
+        function form_postread()</h3>
+    <p>
+        return false to cancel read (existing record will be unlocked and cleared)</p>
+    <h3>
+        function form_prewrite()</h3>
+    <p>
+        called after standard validations</p>
+    <p>
+        return false to cancel the write</p>
+    <h3>
+        function form_write()</h3>
+    <p>
+        for unbound forms only</p>
+    <p>
+        return false to cancel the write</p>
+    <h3>
+        function form_postwrite()</h3>
+    <p>
+        suppresses record print function if present</p>
+    <p>
+        return false to cancel any following close or clear</p>
+    <h3>
+        function form_predelete()</h3>
+    <p>
+        for&nbsp;forms bound to files</p>
+    <p>
+        return false to cancel the deletion</p>
+    <h3>
+        function form_postdelete()</h3>
+    <p>
+        for&nbsp;forms bound to files</p>
+    <h3>
+        function form_preinsertrowN()</h3>
+    <p>
+        N&nbsp;is the group or group number</p>
+    <p>
+        return false to prevent the insertion</p>
+    <h3>
+        function form_postinsertrowN()</h3>
+    <p>
+        N&nbsp;is the group or group number</p>
+    <h3>
+        function form_predeleterowN()</h3>
+    <p>
+        N&nbsp;is the group or group number</p>
+    <p>
+        return false to prevent the deletion</p>
+    <h3>
+        function form_postdeleterowN()</h3>
+    <p>
+        N&nbsp;is the group or group number</p>
+    <h2>
+        Form properties</h2>
+    <h3>
+        gparameters</h3>
+    <p>
+        gparameters is a useful holding place for various parameters designed to customise
+        a form depending on how it is called.</p>
+    <p>
+        gparameters can be loaded initially from the following places</p>
+    <p>
+        1. The script in a form<br />
+        2. The URL after the ? character is broken intopropertynameandpropertyvaluepairs.AAA=111&amp;BBB=222<br />
+        3. The dialog arguments that may be passed into a window if it is opened in script</p>
+    <h3>
+        gparameters.XXXXXX</h3>
+    <p>
+        Sets any field XXXXXX to the contents of gparameters.XXXXXX after postinit.</p>
+    <h3>
+        gparameters.confirm</h3>
+    <p>
+        For unbound forms only. Indicates that after the user&nbsp;presses the save button,
+        they&nbsp;have to confirm before the data is processed.</p>
+    <p>
+        See also gparameters.savemode which may contain the word 'CONFIRM'</p>
+    <h3>
+        gparameters.savemode</h3>
+    <p>
+        may contain the words:</p>
+    <p>
+        CONFIRM which will ask the user to confirm before processing the form on Save</p>
+    <p>
+        EXECUTE which will call the relevent module and process on the server (automatic
+        if a standalone window not called from another)</p>
+    <p>
+        CLOSE which will automatically close the form after processing (automatic if called
+        from another window)</p>
+    <h3>
+        gparameters.key</h3>
+    <p>
+        Contains the initial record key&nbsp;for file&nbsp;forms.</p>
+    <p>
+        Can be set anytime upto and including form_postinit()</p>
+    <h3>
+        gparameters.defaultrevstr</h3>
+    <p>
+        Contains the initial form data for data forms.</p>
+    <p>
+        Can be set anytime upto and including form_postinit()</p>
+    <h3>
+        gparameters.documenttitle</h3>
+    <p>
+        Can be set anytime upto but excluding form_postinit()</p>
+    <h3>
+        gparameters.cancel=true</h3>
+    <p>
+        Indicate that Cancel button is required on data forms not called with window.dialogArguments
+        (normally suppressed)</p>
+    <h3>
+        gparameters.savebuttonvalue="OK'</h3>
+    <p>
+        can be set anytime upto and including form_postint</p>
+    <h3>
+        gupdateonlymode</h3>
+    <p>
+        prevent create and delete, allow read and update</p>
+    <h3>
+        greadonlymode</h3>
+    <p>
+        prevent create, update and delete, allow read</p>
+    <h3>
+        gpreventcreation</h3>
+    <p>
+        allow read, update and delete but not creation</p>
+    <h3>
+        gpreventdeletion</h3>
+    <p>
+        allow create, read&nbsp;and update but not deletion</p>
+    <h2>
+        Form Utility Methods</h2>
+    <p>
+        recalcfields(gdependents)</p>
+    <p>
+        &nbsp;</p>
+    <p>
+        © 2004 NEOSYS Software Ltd. All Rights Reserved.</p>
+</body>
+</html>

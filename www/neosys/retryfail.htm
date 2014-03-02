@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <link rel="stylesheet" type="text/css" href="global.css" />
+    <title>Retry/Cancel</title>
+</head>
+<body>
+    <p>
+        &nbsp;</p>
+    <table width="100%" border="0" cellspacing="1" cellpadding="1">
+        <tr>
+            <td>
+                <div id="question" style="text-align: center">
+                </div>
+                <p style="text-align: center">
+
+                    <script type="text/javascript">
+
+document.onkeypress=document_onkeypress
+$$('question').innerText=window.dialogArguments
+
+function document_onkeypress()
+{
+
+ var key=window.event.keyCode
+
+ //Y=Yes 
+ if (key==121)
+ {
+  window.returnValue=1
+  window.close()
+ }
+ 
+ //N=No
+ if (key==110)
+ {
+  window.returnValue=2
+  window.close()
+ }
+ 
+ //Esc=Cancel
+ if (key==27)
+ {
+  window.returnValue=0
+  window.close()
+ }
+ 
+}
+
+function closeit(arg1)
+{
+ window.returnValue=arg1
+ window.close()
+}
+
+                    </script>
+
+                    &nbsp;</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p style="text-align: center">
+                    <input id="retry" onclick="closeit(1)" style="height: 24px; width: 80px" class="neosysbutton"
+                        type="button" value="Retry" />&nbsp;
+                    <input id="cancel" onclick="closeit(0)" style="height: 24px; width: 80px" class="neosysbutton"
+                        type="button" value="Cancel" />
+                </p>
+            </td>
+        </tr>
+    </table>
+
+    <script type="text/javascript">
+retry.accessKey='R'
+cancel.accessKey='C'
+    </script>
+
+    <p style="text-align: center">
+        &nbsp;&nbsp;&nbsp;&nbsp;
+    </p>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+
+    <script type="text/javascript" src="scripts/client.js">
+    </script>
+
+    <script type="text/javascript">
+
+<!--
+
+var data
+
+function window_onload()
+{
+ demoneosysdblink()
+}
+
+function demoneosysdblink()
+{
+ db=new neosysdblink()
+// db.request="SELECT\rCURRENCIES\r\rCURRENCY_CODE CURRENCY_NAME\rXML"
+ db.request='STOPDB'
+ 
+ if (db.send()){
+  alert(db.data+'\n'+db.response)
+ }
+ else
+ {
+  alert("failed "+db.response)
+  alert(db.data)
+ }
+}
+
+//-->
+
+    </script>
+
+</head>
+<body onload="return window_onload()">
+    <p>
+        &nbsp;</p>
+</body>
+</html>
