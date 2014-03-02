@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>
+
+        <script type="text/javascript" src="scripts/client.js"></script>
+
+        <script type="text/javascript" src="../neosys/scripts/neosys.js"></script>
+
+        <script type="text/javascript">
+
+var gnosavelocation=true
+
+function stopservice()
+{
+
+ db.request='STOPDB'
+ if (mode[1].checked) db.request+='\rRESTART'
+ db.send()
+ neosysnote(db.response)
+ 
+}
+
+        </script>
+
+    </title>
+</head>
+<body>
+    <div style="text-align: center">
+        <h2>
+            Stop NEOSYS Service</h2>
+        <table border="0">
+            <tr>
+                <td>
+                    <input value="1" id="mode" type="radio" /></td>
+                <td>
+                    Stop and prevent restart (delete all *.end files in the neosys folder to allow restart)</td>
+            </tr>
+            <tr>
+                <td>
+                    <input value="2" id="mode" type="radio" id="Radio1" /></td>
+                <td>
+                    Stop and allow restart</td>
+            </tr>
+        </table>
+        <button onclick="stopservice()">
+            OK</button>
+    </div>
+</body>
+</html>

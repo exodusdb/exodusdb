@@ -1,473 +1,461 @@
-<html>
-	<head>
-		<script>
-			var NEOSYSlocation='./neosys/'
-			var glogin=true
-		</script>
-		<script id="clientfunctions" src="neosys/scripts/client.js"></script>
-		<script id="generalfunctions" src="neosys/scripts/neosys.js"></script>
-		<title>NEOSYS Login</title>
-		<script>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <script type="text/javascript">
 
-var gsystem
-var href=document.location.href.split('?')
-startinglocation=href[1]
-var gsystem=href[2]
+        //var NEOSYSlocation='./neosys/'
+        var NEOSYSlocation = 'neosys/'
+        var glogin = true
+        var gshowmenu = false
+    </script>
+    <script type="text/javascript" src="neosys/scripts/client.js"></script>
+    <title>NEOSYS Login</title>
+    <script type="text/javascript">
 
-if (!gsystem) gsystem=neosysgetcookie('','NEOSYSsystem')
+        var gsystem
+        var href = document.location.href.split('?')
+        startinglocation = href[1]
+        var gsystem = href[2]
 
-if (!gsystem||gsystem=='UNDEFINED') gsystem='ADAGENCY'
-gsystem=gsystem.toUpperCase()
-//save permanent default
-document.cookie='NEOSYSsystem='+gsystem+';path=/;'
-//expires=Sun 31 Dec 2100 23:59:59 UTC;'
+        if (!gsystem)
+            gsystem = neosysgetcookie('', 'NEOSYSsystem')
+        if (!gsystem || gsystem == 'UNDEFINED')
+            gsystem = 'ADAGENCY'
+        gsystem = gsystem.toUpperCase()
+        //save permanent default
+        document.cookie = 'NEOSYSsystem=' + gsystem
+        //+'; path=/'
+        //expires=Sun, 31 Dec 2100 23:59:59 GMT'
 
-try
-{
- gisdialog=dialogArguments
- gisdialog=true
-}
-catch (e)
-{
- gisdialog=false
-}
+        gisdialog = typeof window.dialogArguments != 'undefined'
 
-var username
-var password
-var dataset
-var gsystem
-var autologin
-var loginbutton
-var portno
+        var username
+        var password
+        var dataset
+        var gsystem
+        var autologin
+        var loginbutton
+        var portno
 
-var waitdiv
+        var waitdiv
 
-//document.onerror=documentonerror
-//function documentonerror(){alert('an error')}
+        function autologin_onclick() {
+            if (!autologin.checked) return true
+            return confirm('PLEASE READ THE FOLLOWING CAREFULLY.\n\nAutologin requires your username and password to be stored on your computer in a "cookie"\rwhich could be viewed by anybody who has access to your computer.\r\rIF YOU DO NOT WANT THIS TO BE DONE, CLICK THE CANCEL BUTTON.')
+        }
 
-function autologin_onclick()
-{
- if (!autologin.checked) return true
- return confirm('PLEASE READ THE FOLLOWING CAREFULLY.\n\nAutologin requires your username and password to be stored on your computer in a "cookie"\rwhich could be viewed by anybody who has access to your computer.\r\rIF YOU DO NOT WANT THIS TO BE DONE, CLICK THE CANCEL BUTTON.')
-}
+        //treat password reminders/resets like logins because we have validated session yet to pass requests
+        function passwordreset_onclick() {
+            //var args={}
+            //args.USER_ID=username.value
+            //neosysshowmodaldialog(NEOSYSlocation+'passwordreset.htm')
+            var usercode = username.value.toUpperCase()
+            if (!usercode) {
+                window.setTimeout('username.focus()', 100)
+                username.focus()
+                username.select()
+                return neosysinvalid('Username is required')
+            }
+            var oldpass = password.value
+            var email = neosysinput('PASSWORD RESET FOR DATABASE "' + dataset.value + '"\n\nWhat is the registered email address for usercode ' + usercode + '?')
+            if (!email)
+                return
+            if (email.indexOf('@') < 0)
+                return neosysinvalid('Email address must contain an @ character')
+            password.value = email
+            dblogin()
+            password.value = oldpass
+        }
+alert('xxx')
+        function formfunctions_onload() {
+alert('xx')
+            db = new neosysdblink
+alert('yy')
+            username = $$('usernameelement')
+            password = $$('passwordelement')
+            dataset = $$('datasetelement')
+            autologin = $$('autologinelement')
+            loginbutton = $$('loginbuttonelement')
+            waitdiv = $$('waitdivelement')
 
-function bodyonload()
-{
+            $$('wrongconfiguration').style.display = 'none'
+            $$('logindiv').style.display = ''
 
- db=new neosysdblink
- 
- //this must be first
- //this is duplicated in client.htm
- //check right browser and cookies allowed else switch to login which handled this error
- //if (!navigator.cookieEnabled||(navigator.appVersion.indexOf('MSIE 5.5')<0&&navigator.appVersion.indexOf('MSIE 6')<0))
- if (
-//     ((!window.dialogArguments||!window.dialogArguments.cookie)&&!navigator.cookieEnabled)
-//     ||
-     (navigator.appVersion.indexOf('MSIE 5.5')==-1 && navigator.appVersion.indexOf('MSIE 6')==-1 && navigator.appVersion.indexOf('MSIE 7')==-1 && navigator.userAgent.indexOf('MSIE 5.23')==-1 && navigator.userAgent.indexOf('Firefox/2.0.0.1')==-1)
-    )
- {
- // alert('Problem')
-  return false
- }
- 
+            loginbutton.onclick = login_onclick
+            autologin.onclick = autologin_onclick
 
-//window.status='xxx'
-// if (!document.getElementById('generalfunctions'))
-// {
-//  window.status=new Date
-//  window.setTimeout('bodyonload()',1000)
-//  return
-// }
-  
- username=document.getElementById('usernameelement')
- password=document.getElementById('passwordelement')
- dataset=document.getElementById('datasetelement')
- autologin=document.getElementById('autologinelement')
- loginbutton=document.getElementById('loginbuttonelement')
- waitdiv=document.getElementById('waitdivelement')
+            var datasetx
 
- document.getElementById('wrongconfiguration').style.display='none'
- document.getElementById('logindiv').style.display='inline'
- 
- var datasetx
-   
- //fix a bug in mac ie5 where input fields are not selectable in modaldialogs
- //by doing all popups in calling window
+            //fix a bug in mac ie5 where input fields are not selectable in modaldialogs
+            //by doing all popups in calling window
+            if (gisdialog) {
+                //  var username.value=gDialogArguments[0]
+                //  var password.value=gDialogArguments[1]
+                var datasetx = gDialogArguments[2]
+                var datasetlist = gDialogArguments[4]
+                setdropdown2(dataset, datasetlist, Array("code", "name"), datasetx, null)
 
- if (gisdialog)
- {
-//  var username.value=dialogArguments[0]
-//  var password.value=dialogArguments[1]
-  var datasetx=dialogArguments[2]
-  var datasetlist=dialogArguments[4]
-  setdropdown2(dataset,datasetlist,Array("code","name"),datasetx,null)
-  
-  if (dialogArguments[5]=='true')
-  {
-   username.innerText=dialogArguments[0]
-   password.innerText=dialogArguments[1]
-   autologin.checked=true
-  }
- }
- else
- {
- 
-  //gsystem=href[2]
-  //if (!gsystem) gsystem='ADAGENCY'
-  
-  datasetcode=neosysgetcookie('',"NEOSYS","dataset")
-  neosyssetdropdown(dataset,"GETDATASETS\r"+gsystem,Array("code","name"),datasetcode,null)
-  if (startinglocation!='login'&&neosysgetcookie('',"NEOSYS","a")=='true')
-  {
-   username.innerText=neosysgetcookie('',"NEOSYS","u")
-   password.innerText=neosysgetcookie('',"NEOSYS","p")
-   if (username.value&&password.value)
-   {
-    autologin.checked=true
-   }
-  }
-  else
-  {
-   username.innerText=''
-   password.innerText=''
-   autologin.checked=false
-  }
-  //if (autologin.checked!=true) neosyssetcookie('','NEOSYS','','ll',true)
- }
- 
- //show the demo login name and password
- if (neosysgetdropdown(dataset).indexOf('DEMOADSY')>=0)
- {
-  demodiv.style.display='inline'
- }
- 
- waitdiv.style.display="none"
- 
- window.setTimeout('username.focus()',100)
- username.focus()
- username.select()
- 
- //dataset.onkeydown=dataset_onkeydown
- document.onkeydown=document_onkeydown
+                if (gDialogArguments[5] == 'true') {
+                    username.innerText = gDialogArguments[0]
+                    password.innerText = gDialogArguments[1]
+                    autologin.checked = true
+                }
+            }
+            else {
+                //gsystem=href[2]
+                //if (!gsystem) gsystem='ADAGENCY'
+                datasetcode = neosysgetcookie('', "NEOSYS", "dataset")
+                neosyssetdropdown(dataset, "GETDATASETS\r" + gsystem, Array("code", "name"), datasetcode, null)
+                if (startinglocation != 'login' && neosysgetcookie('', "NEOSYS", "a") == 'true') {
+                    username.value = neosysgetcookie('', "NEOSYS", "u")
+                    password.value = neosysgetcookie('', "NEOSYS", "p")
+                    if (username.value && password.value) {
+                        autologin.checked = true
+                    }
+                }
+                else {
+                    username.value = ''
+                    password.value = ''
+                    autologin.checked = false
+                }
+                //if (autologin.checked!=true) neosyssetcookie('','NEOSYS','','ll',true)
+            }
 
- //autosize if a popup login
- if (gisdialog)
- {
-  var newheight=wholediv.offsetHeight+100
-  if (newheight>window.screen.availHeight) newheight=window.screen.availHeight
-  //alert(screen.availHeight)
-  window.dialogHeight=newheight+'px'
-  var newwidth=wholediv.offsetWidth+50
-  if (newwidth>window.screen.availWidth) newwidth=window.screen.availWidth
-  //alert(screen.availHeight)
-  window.dialogWidth=newwidth+'px'
- }
- 
- if (window.event&&!window.event.shiftKey&&autologin.value) dblogin()
- 
-}
+            //show the demo login name and password
+            if (neosysgetdropdown(dataset).indexOf('DEMOADSY') >= 0) {
+                demodiv.style.display = ''
+            }
 
-function document_onkeydown()
-{
- //enter or F9 moves on or clicks login
-// if (window.event.keyCode==13) loginbutton.click()
- if (window.event&&(window.event.keyCode==13||window.event.keyCode==120))
- {
-  dblogin()
-  window.event.cancelBubble=true
-  window.event.returnValue=false
- }
-}
+            waitdiv.style.display = "none"
 
-function dblogin()
- {
- 
-  //force selection of current selection in drop down if dropped down
-  loginbutton.focus()
+            window.setTimeout('username.focus()', 100)
+            username.focus()
+            username.select()
 
-  //simulate enter means submit
-  //do not use proper form submit though
-  loginbutton.click()
-  
- }
+            //dataset.onkeydown=dataset_onkeydown
+            document.onkeydown = document_onkeydown
 
-		</script>
-		<script>
+            //autosize if a popup login
+            if (gisdialog) {
+                //window.setTimeout('neosysautofitwindow()',100)
+                neosysautofitwindow()
+            }
 
-gloggedon=false
+            if ((!window.event || !window.event.shiftKey) && autologin.value == 'on')
+                dblogin()
 
-function login_onclick()
-{
+        }
 
- //prevent double execution due to onkeydown and enter key hitting login
- if (gloggedon) return
- 
- //prevent form being submitted
- //event.cancelBubble=true
- //event.returnValue=false
- 
- var datasetx=neosysgetdropdown(dataset)
+        function document_onkeydown(event) {
+            if (!event)
+                event = window.event
+            //keycode=event.keyCode?event.keyCode:event.which
+            gkeycode = event.keyCode
 
- if (!username.value)
- {
-//  alert('Please enter your username first')
-  username.focus()
-  return
- }
- 
- //ensure username is in uppercase and no trailing spaces
- username.value=username.value.toUpperCase().replace(/ *$/,'')
-  
- if (!password.value)
- {
-//  alert('Please enter your password first')
-  password.focus()
-  return
- }
+            //Enter or F9 moves on or clicks login
+            if (gkeycode == 13 || gkeycode == 120) {
+                window.setTimeout('dblogin()', 10)
+                return neosyscancelevent(event)
+            }
 
- var authno=''
+        }
 
- //mac modaldialogs cannot have interactivity so return to caller
- if (gisdialog)
- {
-  window.returnValue=[username.value,password.value,datasetx,authno,'',autologin.checked]
-  self.close()
-  return 0
- }
+        function dblogin() {
 
- while (true)
- {
- 
-  var db=new neosysdblink
-//  db.system=gsystem
+            //force selection of current selection in drop down if dropped down
+            loginbutton.focus()
 
-  var href=document.location.href.split('?')
-  startinglocation=href[1]
-  //gsystem=href[2]?href[2]:'ADAGENCY'
+            //simulate enter means submit
+            //do not use proper form submit though
+            loginbutton.click()
 
-  //gdataset and username is used as the login id. this is the ONLY place that it is set. elsewhere it is copied around
-  //if you change this then also change the check in xhttp.asp
-  //http standard allows max 20 cookies of 4Kb each. if more are created then the old ones are dropped
-  //2 are used by NEOSYS for global. 1 is used by ASP for session id. Leaving 17 max for logins
-  //using dataset and username allows multiple logins to differnt databases in the same domain
-  //and multiple logins to the same db with different usernames but only one login per username per database
-  //also may exist in ABP LEDGER2 on server in reports to generate drill down code
-  glogincode=datasetx+'*'+username.value+'*'
-  
-  db.request='LOGIN\r'+username.value+'\r'+password.value+'\r'+datasetx+'\r'+authno+'\r'+gsystem+'\r'+portno
-  if (db.send())
-  {
-   
-   //save the settings
-   
-   //any login messages/reminders/warnings
-   if (db.response!='OK')
-   {
-    neosyswarning(db.response.slice(3))
-   }
-   
-   //cannot set cookie in modal dialog so this also has to be done in caller (clientfunctions)
-   var temp='dataset='+datasetx
-   
-   if (autologin.checked)
-   {
-    temp+='&u='+username.value
-    temp+='&p='+password.value
-    temp+='&a='+autologin.checked
-    temp+='&s='+gsystem
-   }
-   else
-   {
-    temp+='&u='
-    temp+='&p='
-    temp+='&a='
-    temp+='&s='
-   }
-   
-   //temp+=';expires=Sun 31 Dec 2100 23:59:59 UTC;'
-   neosyssetcookie('','NEOSYS',temp,'')
-   
-   //temporary cookie for menu, gcompany etc
-   neosyssetcookie(glogincode,'NEOSYS2',db.data)
-   
-   //temporary cookie for password
-   //gsystem=href[2]
-   //if (!gsystem) gsystem='ADAGENCY'
-   
-   var temp='dataset='+datasetx+'&username='+username.value+'&system='+gsystem
-   if (document.protocolcode=='file') temp+='&password='+password.value
+        }
 
-   neosyssetcookie(glogincode,'NEOSYS2',temp)
+    </script>
+    <script type="text/javascript">
 
-   //save gdataset so that opening page knows what database we are in/get cookies for
-   neosyssetcookie('','NEOSYSlogincode',glogincode,'logincode')
- //loginalert('default set '+glogincode)
-   //work out the starting location
-   startinglocation=document.location.href.split('?')[1]
-   if (startinglocation=='login') startinglocation=''
-   else if (!startinglocation) startinglocation=unescape(neosysgetcookie('','NEOSYS','ll'))
-   if (!startinglocation||(window.event&&window.event.shiftKey)) startinglocation=NEOSYSlocation+'users.htm'
-   
-   if (ismac)
-   {
-    windowopen(startinglocation)
-    self.close()
-   }
-   else
-   {
-   //redirect to the starting location
-//   while (temp=prompt('eval?')) alert(eval(temp))
-//   location.href=startinglocation
-//   window.setTimeout("alert('sdef';location.href='sdvsdvsdv'",50)
-    document.location=startinglocation
-    gloggedon=true
-   }
-   window.status=new Date()
-   
-   return true
-   
-  }
-   
-  //option to relogin with authorisation number
-  //otherwise put up error message
-  if (db.response.indexOf('This computer is number')>=0)
-  {
-   var q=db.response.split('|').slice(1,2)+' What is the authorisation number?\r(Please contact NEOSYS or your technical support)'
-   var authno=prompt(q,'')
-   if (authno==''||authno==null) break
-  }
-  else
-  {
-   neosysinvalid('Cannot login because:\r\n'+db.response.split('|').join('\n'))
-   password.focus()
-   password.select()
-   break
-  }
-  
- }//while
+        gloggedon = false
 
-}
+        function login_onclick(event) {
 
-		</script>
-	</head>
-	<body id="body1" onload="bodyonload()">
-		<div id="wholediv">
-			<div id="demodiv" style="display:none">
-				Enter username DEMO. Enter password DEMO then click Login
-			</div>
-			<div id="logindiv" style="DISPLAY: none">
-				<table WIDTH="100%" ALIGN="center" BORDER="0" CELLSPACING="0" CELLPADDING="0">
-					<tr>
-						<td vALIGN="middle" ROWSPAN="4" width="10%">
-							<nobr><img xheight="174" xwidth="200" alt="NEOSYS" src="neosys/images/neosysm.jpg">
-								&nbsp;&nbsp;&nbsp; </nobr>
-						</td>
-						<td>
-							<table border="0">
-								<tr>
-									<td VALIGN="top" WIDTH="20%">
-										<font xFACE="Arial,Helvetica" SIZE="2"><b>Username:</b> </font>
-										<br>
-										<input tabindex="1" style="TEXT-TRANSFORM: uppercase" id="usernameelement" name="usernameelement" SIZE="15">&nbsp;&nbsp;&nbsp;
-									</td>
-									<td VALIGN="top" WIDTH="20%">
-										<font xFACE="Arial,Helvetica" SIZE="2"><b>Password:</b> </font>
-										<br>
-										<input tabindex="1" type="password" id="passwordelement" name="passwordelement" SIZE="15">&nbsp;&nbsp;&nbsp;
-									</td>
-									<td VALIGN="top" ALIGN="left" xWIDTH="20%">
-										<font xFACE="Arial,Helvetica" SIZE="2"><b>&nbsp;</b> </font>
-										<br>
-										<nobr>
-											<button tabindex="1" id="loginbuttonelement" name="loginbuttonelement" LANGUAGE="javascript" onclick="return login_onclick()">Login</button>
-											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </nobr>
-									</td>
-									<td VALIGN="top" WIDTH="20%">
-										<font xFACE="Arial,Helvetica" SIZE="2"><b>Autologin</b></font><br>
-										<input onclick="return autologin_onclick()" border="1" valign="top" align="right" type="checkbox" tabindex="1" id="autologinelement" name="autologinelement">
-										&nbsp;&nbsp;&nbsp;
-									</td>
-								</tr>
-							</table>
-						</td>
-					</tr>
-					<tr>
-						<td>&nbsp;</td>
-					</tr>
-					<tr>
-						<td colspan="3" VALIGN="top" WIDTH="20%">
-							<font xFACE="Arial,Helvetica" SIZE="2"><b>Dataset:</b> </font>
-							<br>
-							<select id="datasetelement" name="datasetelement">
-							</select>
-						</td>
-					</tr>
-					<tr>
-						<td COLSPAN="6">
-							<br>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							&nbsp;
-						</td>
-						<td colspan="4">
-							<font size="1"><nobr>Copyright © 2000-2007 NEOSYS Software Ltd. All rights reserved</nobr>
-							</font>
-						</td>
-					</tr>
-				</table>
-			</div>
-			<!-- copy this to wrongbrowser.htm and default.htm as well -->
-			<div ALIGN="center" id="wrongconfiguration">
-				<div align="center">
-					<p>&nbsp;</p>
-					<p>&nbsp;</p>
-					<h3>
-						<table border="1" cellpadding="5" cellspacing="0" style="BACKGROUND-COLOR: #f5fffa">
-							<tr align="top" style="BACKGROUND-COLOR: #b0e0e6">
-								<th>
-									You need
-								</th>
-								<th>
-									You have
-								</th>
-							</tr>
-							<tr align="top">
-								<td>
-									1. Microsoft Internet Explorer<br>
-									Version 5.5 or greater<br>
-								</td>
-								<td>
-									<script>document.writeln(navigator.appName)</script>
-									<br>
-									<script>document.writeln(navigator.userAgent)</script>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									2. Scripting enabled
-								</td>
-								<td>
-									<noscript>
-										<font color="red"><b>Scripting disabled</b></font></noscript>
-									<script>document.write('Scripting enabled')</script>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									3. Cookies enabled
-								</td>
-								<td>
-									<script>document.writeln((!window.dialogArguments&&navigator.cookieEnabled)?'Cookies enabled':'<B>Cookies disabled</B>')</script>
-								</td>
-							</tr>
-						</table>
-					</h3>
-				</div>
-			</div>
-			<div style="DISPLAY: none" id="waitdivelement" name="waitdivelement" class="waiting" border="1" align="center">Please 
-				wait ...</div>
-		</div>
-	</body>
+            //prevent double execution due to onkeydown and enter gkeycode hitting login
+            if (gloggedon)
+                return
+
+            //prevent form being submitted
+            //event.cancelBubble=true
+            //event.returnValue=false
+            //neosyscancelevent(event)
+
+            var datasetx = neosysgetdropdown(dataset)
+
+            if (!username.value) {
+                //  alert('Please enter your username first')
+                username.focus()
+                return
+            }
+
+            //ensure username is in uppercase and no trailing spaces
+            username.value = username.value.toUpperCase().replace(/ *$/, '')
+
+            if (!password.value) {
+                //  alert('Please enter your password first')
+                password.focus()
+                return
+            }
+
+            var authno = ''
+
+            //mac modaldialogs cannot have interactivity so return to caller
+            if (gisdialog) {
+                window.returnValue = [username.value, password.value, datasetx, authno, '', autologin.checked, gsystem]
+                self.close()
+                return 0
+            }
+
+            while (true) {
+
+                var db = new neosysdblink
+                //  db.system=gsystem
+
+                var href = document.location.href.split('?')
+                startinglocation = href[1]
+                //gsystem=href[2]?href[2]:'ADAGENCY'
+
+                //gdataset and username is used as the login id. this is the ONLY place that it is set. elsewhere it is copied around
+                //if you change this then also change the check in xhttp.asp
+                //http standard allows max 20 cookies of 4Kb each. if more are created then the old ones are dropped
+                //2 are used by NEOSYS for global. 1 is used by ASP for session id. Leaving 17 max for logins
+                //using dataset and username allows multiple logins to differnt databases in the same domain
+                //and multiple logins to the same db with different usernames but only one login per username per database
+                //also may exist in ABP LEDGER2 on server in reports to generate drill down code
+                glogincode = datasetx + '*' + username.value + '*'
+                neosyssetcookie('', 'NEOSYSlogincode', glogincode, 'logincode')
+
+                db.request = 'LOGIN\r' + username.value + '\r' + password.value + '\r' + datasetx + '\r' + authno + '\r' + gsystem + '\r' + portno + '\rnewpass'
+                if (db.send()) {
+
+                    //save the settings
+
+                    //any login messages/reminders/warnings
+                    if (db.response != 'OK') {
+                        neosyswarning(db.response.slice(3))
+                    }
+
+                    //cannot set cookie in modal dialog so this also has to be done in caller (clientfunctions)
+                    var temp = 'dataset=' + datasetx
+
+                    if (autologin.checked) {
+                        temp += '&u=' + username.value
+                        temp += '&p=' + password.value
+                        temp += '&a=' + autologin.checked
+                        temp += '&s=' + gsystem
+                    }
+                    else {
+                        temp += '&u='
+                        temp += '&p='
+                        temp += '&a='
+                        temp += '&s='
+                    }
+
+                    //permanent
+                    neosyssetcookie('', 'NEOSYS', temp, '', true)
+
+                    //temporary cookie for menu, gcompany etc
+                    neosyssetcookie(glogincode, 'NEOSYS2', db.data)
+
+                    //temporary cookie for password
+                    //gsystem=href[2]
+                    //if (!gsystem) gsystem='ADAGENCY'
+
+                    var temp = 'dataset=' + datasetx + '&username=' + username.value + '&system=' + gsystem
+                    if (document.protocolcode == 'file') temp += '&password=' + password.value
+
+                    neosyssetcookie(glogincode, 'NEOSYS2', temp)
+
+                    //save gdataset so that opening page knows what database we are in/get cookies for
+                    //not really necessary since set above now
+                    neosyssetcookie('', 'NEOSYSlogincode', glogincode, 'logincode')
+                    //loginalert('default set '+glogincode)
+
+                    //work out the starting location
+                    startinglocation = document.location.href.split('?')[1]
+                    if (startinglocation == 'login') startinglocation = ''
+                    else if (!startinglocation) startinglocation = unescape(neosysgetcookie('', 'NEOSYS', 'll'))
+                    //if (!startinglocation||(window.event&&window.event.shiftKey)) startinglocation=NEOSYSlocation+'users.htm'
+                    if (!startinglocation || (window.event && window.event.shiftKey)) {
+                        startinglocation = NEOSYSlocation
+                        if (neosysgetcookie(glogincode, 'NEOSYS2', 'm').split(',')[0] == 'TIMESHEETS')
+                            startinglocation += '../jobs/timesheets.htm'
+                        else
+                            startinglocation = NEOSYSlocation + 'users.htm'
+                    }
+
+                    //open the starting location
+                    document.location = startinglocation
+                    gloggedon = true
+
+                    return true
+
+                }
+
+                //quit login if actually a password reset
+                if (db.response.indexOf('Password Reset ') >= 0) {
+                    if (db.response.indexOf('Password Reset Failed') >= 0)
+                        return neosysinvalid(db.response)
+                    else
+                        return neosysnote(db.response)
+                }
+
+                //option to relogin with authorisation number
+                //otherwise put up error message
+                if (db.response.indexOf('This computer is number') >= 0) {
+                    var q = db.response.split('|').slice(1, 2) + ' What is the authorisation number?\r(Please contact NEOSYS or your technical support)'
+                    var authno = prompt(q, '')
+                    if (authno == '' || authno == null) break
+                }
+                else {
+                    neosysinvalid('Cannot login because:\r\n' + db.response.split('|').join('\n'))
+                    password.focus()
+                    password.select()
+                    break
+                }
+
+            } //while
+
+        }
+
+    </script>
+</head>
+<body>
+    <div id="autofitwindowelement" style="margin-left: auto; margin-right: auto; float: left">
+        <div id="logindiv" style="display: none">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td valign="middle" rowspan="4">
+                        <span style="white-space: nowrap">
+                            <img alt="NEOSYS" src="neosys/images/neosysm.jpg" />
+                        </span>
+                    </td>
+                    <td>
+                        <table border="0">
+                            <tr>
+                                <td valign="top">
+                                    <b>Username:</b>
+                                    <br />
+                                    <input tabindex="1" style="text-transform: uppercase" id="usernameelement" size="15" />&nbsp;&nbsp;&nbsp;
+                                </td>
+                                <td valign="top">
+                                    <b>Password:</b>
+                                    <br />
+                                    <input tabindex="1" type="password" id="passwordelement" size="15" />&nbsp;&nbsp;&nbsp;
+                                </td>
+                                <td valign="top" align="left">
+                                    <b>&nbsp;</b>
+                                    <br />
+                                    <span style="white-space: nowrap">
+                                        <button tabindex="1" id="loginbuttonelement" type="submit" onclick="return login_onclick()">
+                                            Login</button>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>
+                                </td>
+                                <td valign="top">
+                                    <div>
+                                        Autologin</div>
+                                    <input onclick="return autologin_onclick()" type="checkbox" tabindex="1" id="autologinelement" />
+                                    &nbsp;&nbsp;&nbsp;
+                                </td>
+                                <td>
+                                    &nbsp;&nbsp;&nbsp;
+                                </td>
+                                <td valign="top">
+                                    <div>
+                                        Password</div>
+                                    <button tabindex="1" id="passwordreset" onclick="return passwordreset_onclick()">
+                                        Reset</button>
+                                    &nbsp;&nbsp;&nbsp;
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        &nbsp;
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3" valign="top">
+                        <b>Dataset:</b>
+                        <br />
+                        <select id="datasetelement">
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="6">
+                        <br />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        &nbsp;
+                    </td>
+                    <td colspan="4">
+                        <span style="white-space: nowrap">Copyright © NEOSYS All rights reserved.</span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <!-- copy this to wrongbrowser.htm and default.htm as well -->
+        <div style="text-align: center" id="wrongconfiguration">
+            <div style="text-align: center">
+                <table border="1" cellpadding="5" cellspacing="0" style="background-color: #f5fffa">
+                    <tr valign="top" style="background-color: #b0e0e6">
+                        <th>
+                            NEOSYS requires
+                        </th>
+                        <th>
+                            You have
+                        </th>
+                    </tr>
+                    <tr valign="top">
+                        <td>
+                            1. Internet Explorer 6+<br />
+                            &nbsp;or Safari 3.1+<br />
+                            &nbsp;or Firefox 3+<br />
+                            &nbsp;or Chrome 8.0+<br />
+                        </td>
+                        <td>
+                            <script type="text/javascript">                                document.writeln(navigator.appName)</script>
+                            <br />
+                            <script type="text/javascript">                                document.writeln(navigator.userAgent)</script>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            2. Scripting enabled
+                        </td>
+                        <td>
+                            <noscript>
+                                <span style="color: Red"><b>Scripting disabled</b></span></noscript>
+                            <script type="text/javascript">                                document.write('Scripting enabled')</script>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            3. Cookies enabled
+                        </td>
+                        <td>
+                            <noscript>
+                                <span style="color: Red"><b>Unknown</b></span></noscript>
+                            <script type="text/javascript">                                document.writeln((!window.dialogArguments && navigator.cookieEnabled) ? 'Cookies enabled' : '<font color="red"><B>Cookies disabled</B></font>')</script>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div style="display: none; text-align: center" id="waitdivelement" class="waiting">
+            Please wait ...</div>
+    </div>
+</body>
 </html>

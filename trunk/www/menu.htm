@@ -1,300 +1,334 @@
-<span onclick="if (typeof menuonmouseover!='undefined') menuonmouseover('click')"
-    onmouseover="menuonmouseover()" onmouseout="menuonmouseout()" onmouseup='this.style.borderStyle="outset"'
-    class="graphicbutton" onmousedown='this.style.borderStyle="inset"' id="menubutton"
-    title="Menu (Press Alt+M)" style="border-top-style: outset; border-right-style: outset;
-    border-left-style: outset; border-bottom-style: outset" accesskey="M" onmouseout='this.style.borderStyle="outset"'
-    border="1">
-    <img src="../neosys/images/theme2/menu.gif"></img>
-    <span id="menubutton_label" style="border-top-width: 1px; border-left-width: 1px;
-        font-size: 100%; border-bottom-width: 1px; vertical-align: super; border-right-width: 1px;
-        xborder-style: solid"><u>M</u>enu </span></span>
+<!-- <div style="display: inline; float: left" onmouseup='this.style.borderStyle="outset"'
+    onmousedown='this.style.borderStyle="inset"' id="menubutton" class="graphicbutton"
+    title="Menu (Press Alt+M)" style="border-style: outset;" accesskey="M" onmouseout='this.style.borderStyle="outset"'>
+    <img alt="" src="../neosys/images/theme2/menu.gif" style="vertical-align: text-top;" />
+    <span id="menubutton_label" style="border: 1px;"><u>M</u>enu </span>
+-->
 <div id="menudiv" class="menu" style="display: none">
-    <a id="menu_MEDIA"><u>M</u>edia</a>
-    <div class="menu" id="menu_MEDIA">
+    <a id="menu_MEDIA_SUPPRESS"><u>M</u>edia</a>
+    <div class="menu" id="menu_MEDIA_SUPPRESS">
         <a><u>P</u>lans</a>
         <div class="menu" id="plandivmenu">
             <a href="../media/schedules.htm?filename=PLANS&amp;plantype=1&ratings=1"><u>M</u>onth
-                Plan File</a><br>
+                Plan File</a><br />
             <a href="../media/schedules.htm?filename=PLANS&amp;plantype=2&ratings=1"><u>W</u>eek
-                Plan File</a><br>
+                Plan File</a><br />
             <a href="../media/schedules.htm?filename=PLANS&amp;plantype=3&ratings=1"><u>D</u>ate
-                Plan File</a><br>
+                Plan File</a><br />
             <a href="../media/schedules.htm?filename=PLANS&amp;plantype=4&ratings=1"><u>P</u>lan
-                File</a><br>
-            <hr>
-            <a href="../media/scheduleprint.htm?DOCUMENT_TYPE=1">Plan P<u>r</u>intout</a><br>
-            <hr>
-            <a href="../media/schedulelist.htm?MODE=UNAPPROVED&amp;DOCUMENT_TYPE=1">&nbsp;<u>L</u>ist
-                of Plans Pending Approval</a><br>
+                File</a><br />
+            <hr style="width: 200px; text-align: left" />
+            <a href="../media/scheduleprint.htm?DOCUMENT_TYPE=1">Plan P<u>r</u>intout</a><br />
+            <hr style="width: 200px; text-align: left" />
+            <a href="../media/schedulelist.htm?MODE=UNAPPROVED&amp;DOCUMENT_TYPE=1"><u>L</u>ist
+                of Plans Pending Approval</a><br />
             <a href="../media/schedulelist.htm?MODE=APPROVED&amp;DOCUMENT_TYPE=1">List of <u>A</u>pproved
                 Plans</a>
         </div>
-        <br>
+        <br />
         <a><u>S</u>chedules</a>
         <div class="menu">
-            <a href="../media/schedules.htm"><u>S</u>chedule File</a><br>
-            <a href="../media/schedules.htm?split=1&prices=1">Schedule File <u>w</u>ith Public pricing</a><br>
-            <a href="../media/schedules.htm?ratings=1">Schedule File with <u>R</u>atings</a><br>
-            <a href="../media/schedules.htm?grid=true">Schedule File with <u>G</u>rid</a><br>
-            <a href="../media/scheduleprint.htm?DOCUMENT_TYPE=2">Schedule <u>P</u>rintout</a><br>
-            <hr>
-            <a href="../media/mediadiary.htm">Media <u>D</u>iary</a><br>
-            <a href="../media/mediadiary.htm?MODE=CALENDAR">Media <u>C</u>alendar</a><br>
-            <a href="../media/mediadiary.htm?MODE=UNPROFITABLE">List of <u>U</u>nprofitable Ads</a><br>
-            <a href="../media/schedulelist.htm?MODE=UNAPPROVED">&nbsp;<u>L</u>ist of Schedules Pending
-                Approval</a><br>
-            <a href="../media/schedulelist.htm?MODE=APPROVED">List of <u>A</u>pproved Schedules</a><br>
-            <a href="../media/materiallist.htm?MODE=MATERIALLIST">List of <u>M</u>aterials</a><br>
-            <hr />
-            <a href="../media/programs.htm">Program <u>F</u>ile</a><br>
-            <a href="../media/mediadiary.htm?MODE=PROGRAMBREAKFILE">Program <u>B</u>reaks</a><br>
+            <a href="../media/schedules.htm"><u>S</u>chedule File</a><br />
+            <a href="../media/schedules.htm?split=1&prices=1">Schedule File w<u>i</u>th Public pricing</a><br />
+            <a href="../media/schedules.htm?ratings=1">Schedule File with <u>R</u>atings</a><br />
+            <a href="../media/scheduleprint.htm?DOCUMENT_TYPE=2">Schedule <u>P</u>rintout</a><br />
+            <hr style="width: 200px; text-align: left" />
+            <a href="../media/mediadiary.htm">Media <u>D</u>iary</a><br />
+            <a href="../media/mediadiary.htm?MODE=CALENDAR">Media <u>C</u>alendar</a><br />
+            <a href="../media/mediadiary.htm?MODE=CALENDAR&SUB=WEEKLY"><u>W</u>eekly Summary</a><br />
+            <a href="../media/mediadiary.htm?MODE=PROGRESS">Media Pro<u>g</u>ress Summary</a><br />
+            <a href="../media/mediadiary.htm?MODE=UNPROFITABLE">List of <u>U</u>nprofitable Ads</a><br />
+            <hr style="width: 200px; text-align: left" />
+            <a href="../media/schedulelist.htm?MODE=UNAPPROVED"><u>L</u>ist of Schedules Pending
+                Approval</a><br />
+            <a href="../media/schedulelist.htm?MODE=APPROVED">List of <u>A</u>pproved Schedules</a><br />
+            <a href="../media/schedulelist.htm?MODE=UNSCHEDULED">List of Schedules P<u>e</u>nding
+                Scheduling</a><br />
+            <hr style="width: 200px; text-align: left" />
+            <a href="../media/programs.htm">Program <u>F</u>ile</a><br />
+            <a href="../media/mediadiary.htm?MODE=PROGRAMBREAKFILE">Program <u>B</u>reaks</a><br />
             <a href="../media/broadcastorder.htm">Broadcast <u>O</u>rder</a>
         </div>
-        <br>
-        <hr width="100" align="left">
+        <br />
+        <hr style="width: 200px; text-align: left" />
         <a><u>B</u>ooking Orders</a>
         <div class="menu">
-            <a href="../media/bookings.htm">New <u>B</u>ooking Orders/Cancellations</a><br>
-            <a href="../media/orderreprint.htm"><u>O</u>ld Orders</a><br>
-            <a href="../media/scheduleprint.htm?DOCUMENT_TYPE=3"><u>Q</u>uick Orders</a><br>
-            <hr>
-            <a href="../media/bookinglist.htm?PENDING=1">&nbsp;List of Booking Orders <u>P</u>ending
-                Despatch</a><br>
-            <a href="../media/bookinglist.htm"><u>L</u>ist of Booking Orders</a><br>
-            <a href="../media/schedulelist.htm?MODE=UNBOOKED">List of <u>S</u>chedules Pending Booking</a><br>
-            <a href="../media/mediadiary.htm?MODE=UNBOOKED">List of Ads Pending <b>B</b>ooking</a><br>
-        </div>
-        <br>
-        <a><u>C</u>ertificates</a>
-        <div class="menu">
-            <a href="../media/mediadiary.htm?MODE=CERTIFICATEFILE"><u>C</u>ertificate/Voucher File</a><br>
-            <hr>
-            <a href="../media/mediadiary.htm?MODE=UNCERTIFIED">&nbsp;<u>L</u>ist of Ads Pending
-                Certification</a><br>
-            <a href="../media/mediadiary.htm?MODE=WRONG">List of <u>W</u>rong Ads</a><br>
-            <a href="../media/mediadiary.htm?MODE=CERTIFIED">Li<u>s</u>t of Certified Ads</a><br>
-        </div>
-        <br>
-        <a>S<u>u</u>pplier Invoices</a>
-        <div class="menu">
-            <a href="../media/mediadiary.htm?MODE=SUPPLIERINVOICEFILE">S<u>u</u>pplier Invoice File</a><br>
-            <a href="../finance/journals.htm">Supplier Invoice <u>J</u>ournal</a><br>
-            <hr>
-            <a href="../media/mediadiary.htm?MODE=UNSUPPLIERINVOICED">&nbsp;<u>L</u>ist of Ads Pending
-                Supplier Invoices</a><br>
-            <a href="../media/mediadiary.htm?MODE=SUPPLIERINVOICED">Li<u>s</u>t of Supplier Invoiced
-                Ads</a><br>
-        </div>
-        <br>
-        <a><u>I</u>nvoices</a>
-        <div class="menu">
-            <a href="../media/scheduleprint.htm?DOCUMENT_TYPE=5">New <u>I</u>nvoices/Proformas</a><br>
-            <a href="../agency/invoicereprint.htm?MEDIA_NONMEDIA=2"><u>O</u>ld Invoices/Proformas</a><br>
-            <hr>
-            <a href="../media/schedulelist.htm?MODE=UNINVOICED">&nbsp;<u>L</u>ist of Schedules Pending
-                Invoicing</a><br>
-            <a href="../media/mediadiary.htm?MODE=UNINVOICED">List of Ads <u>P</u>ending Invoicing</a><br>
-            <a href="../agency/invoicelist.htm?MEDIA_NONMEDIA=2">Li<u>s</u>t of Invoices</a><br>
-            <a href="../agency/invoiceaudit.htm?MEDIA_NONMEDIA=2">Invoice <u>A</u>udit</a><br>
-            <a href="../agency/invoicenumbers.htm?MODE=MEDIA">Invoice <u>N</u>umbering</a>
-            <br>
-        </div>
-        <hr width="100" align="left">
-        <a><u>F</u>iles</a>
-        <div class="menu" id="Div2">
-            <a href="../agency/clients.htm"><u>C</u>lient &amp; Brand File</a><br>
-            <a href="../agency/suppliers.htm"><u>S</u>upplier File</a><br>
-            <a href="../media/vehicles.htm"><u>V</u>ehicle File</a><br>
-            <a href="../media/ratecards.htm">Vehicle <u>R</u>ate Card File</a><br>
-            <a href="../media/ratecards2.htm">Vehicle C<u>o</u>sts File</a><br>
-            <hr width="200" align="left">
-            <a href="../agency/productcategories.htm"><u>P</u>roduct Categories File</a><br>
-            <a href="../agency/types.htm?MODE=MEDIA"><u>M</u>edia Types File</a><br>
-            <a href="../general/markets.htm">Mar<u>k</u>et File</a><br>
-            <a href="../general/currencies.htm">C<u>u</u>rrency &amp; Exchange Rate File</a><br>
-            <a href="../agency/configuration.htm?mode=media">Con<u>f</u>iguration File</a><br />
+            <a href="../media/bookings.htm">New <u>B</u>ooking Orders/Cancellations</a><br />
+            <a href="../media/orderreprint.htm"><u>O</u>ld Orders</a><br />
+            <a href="../media/scheduleprint.htm?DOCUMENT_TYPE=3"><u>Q</u>uick Orders</a><br />
+            <hr style="width: 200px; text-align: left" />
+            <a href="../media/bookinglist.htm"><u>L</u>ist of Booking Orders</a><br />
+            <a href="../media/bookinglist.htm?PENDING=1">List of Booking Orders <u>P</u>ending Despatch</a><br />
+            <a href="../media/schedulelist.htm?MODE=UNBOOKED">List of <u>S</u>chedules Pending Booking</a><br />
+            <a href="../media/mediadiary.htm?MODE=UNBOOKED">List of <u>A</u>ds Pending Booking</a><br />
         </div>
         <br />
-        <a href onclick="jscript:if (typeof general_switch_company!='undefined'){if (!general_switch_company()) return false} else {alert('Please select another menu\roption first and then try again')};document.location.href=document.location.href;return false">
-            C<u>o</u>mpanies</a>
-    </div>
-    <a id="menu_ADPRODUCTION"><u>J</u>obs</a>
-    <div class="menu" id="menu_ADPRODUCTION">
-        <a><u>J</u>obs</a>
+        <a><u>M</u>aterials</a>
         <div class="menu">
-            <a href="../jobs/jobs.htm"><u>J</u>ob File</a><br>
-            <a href="../jobs/jobprint.htm">Job <u>P</u>rintout</a><br>
-            <hr>
-            <a href="../jobs/joblist.htm?MODE=NOQUOTE"><u>L</u>ist of Jobs Pending Estimates</a><br>
-            <a href="../jobs/joblist.htm">Li<u>s</u>t of Jobs</a><br>
-            <a href="../jobs/joblist.htm?MODE=WIP">List of Jobs with <u>W</u>IP</a><br>
-            <a href="../jobs/joblist.htm?MODE=ACCRUALS">&nbsp;List of Jobs with <u>A</u>ccrued Costs</a><br>
+            <a href="../media/materials.htm"><u>M</u>aterial File</a><br />
+            <a href="../media/materialorder.htm">Material <u>O</u>rders</a><br />
+            <a href="../media/materiallist.htm"><u>L</u>ist of Materials</a><br />
         </div>
-        <hr width="100" align="left">
-        <a><u>P</u>urchases</a>
+        <br />
+        <hr style="width: 200px; text-align: left" />
+        <a><u>C</u>ertificates</a>
         <div class="menu">
-            <a href="../jobs/costs.htm"><u>P</u>urchase Request/Order/Invoice File</a><br>
-            <a href="../jobs/costestimateprint.htm?DOCUMENT_TYPE=COST">Purchase Request/Order/Invoice
-                Prin<u>t</u>out</a><br>
-            <hr>
-            <a href="../jobs/joblist.htm?MODE=PURCHASEORDERSPENDING">&nbsp;<u>L</u>ist of Purchase
-                Orders Pending Supplier Invoices</a><br>
-            <a href="../jobs/joblist.htm?MODE=PURCHASEORDERS">Li<u>s</u>t of Purchase Orders</a><br>
-            <a href="../jobs/joblist.htm?MODE=PURCHASEINVOICES">List of Purchase <u>I</u>nvoices</a><br>
+            <a href="../media/mediadiary.htm?MODE=CERTIFICATEFILE"><u>C</u>ertificate/Voucher File</a><br />
+            <a href="../media/monitor.htm"><u>I</u>mport Certificates</a><br />
+            <hr style="width: 200px; text-align: left" />
+            <a href="../media/mediadiary.htm?MODE=UNCERTIFIED"><u>L</u>ist of Ads Pending Certification</a><br />
+            <a href="../media/mediadiary.htm?MODE=WRONG">List of <u>W</u>rong Ads</a><br />
+            <a href="../media/mediadiary.htm?MODE=CERTIFIED">Li<u>s</u>t of Certified Ads</a><br />
         </div>
-        <br>
-        <a><u>E</u>stimates</a>
+        <br />
+        <a>S<u>u</u>pplier Invoices</a>
         <div class="menu">
-            <a href="../jobs/estimates.htm"><u>E</u>stimate File</a><br>
-            <a href="../jobs/costestimateprint.htm?DOCUMENT_TYPE=ESTIMATE">Estimate <u>P</u>rintout</a><br>
-            <a href="../jobs/costestimateprint.htm?DOCUMENT_TYPE=DELIVERY"><u>D</u>elivery Note Printout</a><br>
-            <hr>
-            <a href="../jobs/joblist.htm?MODE=ESTIMATESPENDING">&nbsp;<u>L</u>ist of Pending Estimates</a><br>
-            <a href="../jobs/joblist.htm?MODE=ESTIMATES">Li<u>s</u>t of Estimates</a><br>
+            <a href="../media/mediadiary.htm?MODE=SUPPLIERINVOICEFILE">S<u>u</u>pplier Invoice File</a><br />
+            <a href="../finance/journals.htm">Supplier Invoice <u>J</u>ournal</a><br />
+            <hr style="width: 200px; text-align: left" />
+            <a href="../media/mediadiary.htm?MODE=BADSUPPINVS">List of <u>W</u>rongly Supplier Invoiced
+                Ads</a><br />
+            <a href="../media/mediadiary.htm?MODE=UNSUPPLIERINVOICED"><u>L</u>ist of Ads Pending
+                Supplier Invoices</a><br />
+            <a href="../media/mediadiary.htm?MODE=SUPPLIERINVOICED">Li<u>s</u>t of Supplier Invoiced
+                Ads</a><br />
         </div>
-        <br>
+        <br />
         <a><u>I</u>nvoices</a>
         <div class="menu">
-            <a href="../jobs/costestimateprint.htm?DOCUMENT_TYPE=INVOICE">&nbsp;New <u>I</u>nvoices/Proformas</a><br>
-            <a href="../agency/invoicereprint.htm?MEDIA_NONMEDIA=3"><u>O</u>ld Invoices/Proformas</a><br>
-            <hr>
-            <a href="../agency/invoicelist.htm?MEDIA_NONMEDIA=3"><u>L</u>ist of Invoices</a><br>
-            <a href="../agency/invoiceaudit.htm?MEDIA_NONMEDIA=3">Invoice <u>A</u>udit</a><br>
+            <a href="../media/scheduleprint.htm?DOCUMENT_TYPE=5">New <u>I</u>nvoices/Proformas</a><br />
+            <a href="../agency/invoicereprint.htm?MEDIA_NONMEDIA=2"><u>O</u>ld Invoices/Proformas</a><br />
+            <a href="../agency/invoicereprint.htm?MEDIA_NONMEDIA=2">Invoice <u>D</u>elivery Note</a><br />
+            <a href="../finance/collections.htm"><u>C</u>ollections File</a><br />
+            <a href="../media/ifmedia.htm"><u>F</u>inance Interface</a><br />
+            <hr style="width: 200px; text-align: left" />
+            <a href="../media/schedulelist.htm?MODE=UNINVOICED"><u>L</u>ist of Schedules Pending
+                Invoicing</a><br />
+            <a href="../media/mediadiary.htm?MODE=UNINVOICED">List of Ads <u>P</u>ending Invoicing</a><br />
+            <a href="../agency/invoicelist.htm?MEDIA_NONMEDIA=2">Li<u>s</u>t of Invoices</a><br />
+            <a href="../agency/invoiceaudit.htm?MEDIA_NONMEDIA=2">Invoice <u>A</u>udit/Export</a><br />
             <a href="../agency/invoicenumbers.htm?MODE=MEDIA">Invoice <u>N</u>umbering</a>
-            <br>
+            <br />
         </div>
-        <hr width="100" align="left">
+        <hr style="width: 200px; text-align: left" />
+        <a><u>F</u>iles</a>
+        <div class="menu" id="Div2">
+            <a href="../agency/clients.htm"><u>C</u>lient &amp; Brand File</a><br />
+            <a href="../agency/suppliers.htm?MODE=MEDIA"><u>S</u>upplier File</a><br />
+            <a href="../media/vehicles.htm"><u>V</u>ehicle File</a><br />
+            <a href="../media/ratecards.htm">Vehicle <u>R</u>ate Card File</a><br />
+            <a href="../media/ratecards2.htm">Vehicle C<u>o</u>sts File</a><br />
+            <hr style="width: 200px; text-align: left" />
+            <a href="../agency/productcategories.htm"><u>P</u>roduct Categories File</a><br />
+            <a href="../agency/types.htm?MODE=MEDIA"><u>M</u>edia Types File</a><br />
+            <a href="../general/markets.htm">Mar<u>k</u>et File</a><br />
+            <a href="../general/currencies.htm">C<u>u</u>rrency &amp; Exchange Rate File</a><br />
+            <a href="../agency/configuration.htm?mode=media">Media Con<u>f</u>iguration File</a><br />
+        </div>
+        <br />
+        <a href="" onclick="jscript:if (typeof general_switch_company!='undefined'){if (!general_switch_company()) return false} else {alert('Please select another menu\noption first and then try again')};document.location.href=document.location.href;return false">
+            C<u>o</u>mpanies</a>
+    </div>
+    <a id="menu_JOBS"><u>J</u>obs</a>
+    <div class="menu" id="menu_JOBS">
+        <a><u>J</u>obs</a>
+        <div class="menu">
+            <a href="../jobs/jobs.htm"><u>J</u>ob File</a><br />
+            <a href="../jobs/myjobs.htm"><u>M</u>y Jobs</a><br />
+            <a href="../jobs/jobprint.htm">Job <u>P</u>rintout</a><br />
+            <hr style="width: 200px; text-align: left" />
+            <a href="../jobs/joblist.htm?MODE=NOQUOTE"><u>L</u>ist of Jobs Pending Estimates</a><br />
+            <a href="../jobs/joblist.htm">Li<u>s</u>t of Jobs</a><br />
+            <a href="../jobs/joblist.htm?MODE=WIP">List of Jobs with <u>W</u>IP</a><br />
+            <a href="../jobs/joblist.htm?MODE=ACCRUALS">List of Jobs with <u>A</u>ccrued Costs</a><br />
+        </div>
+        <hr width="100px" align="left" />
+        <a><u>P</u>urchases</a>
+        <div class="menu">
+            <a href="../jobs/costs.htm"><u>P</u>urchase Request/Order/Requisition/Invoice File</a><br />
+            <a href="../jobs/costestimateprint.htm?DOCUMENT_TYPE=COST">&nbsp;Purchase Request/Order/Requisition/Invoice
+                Prin<u>t</u>out</a><br />
+            <hr style="width: 200px; text-align: left" />
+            <a href="../jobs/joblist.htm?MODE=PURCHASEORDERSPENDING"><u>L</u>ist of Purchase Orders
+                Pending Supplier Invoices</a><br />
+            <a href="../jobs/joblist.htm?MODE=PURCHASEORDERS">Li<u>s</u>t of Purchase Orders</a><br />
+            <a href="../jobs/joblist.htm?MODE=PURCHASEINVOICES">List of Purchase <u>I</u>nvoices</a><br />
+        </div>
+        <br />
+        <a><u>E</u>stimates</a>
+        <div class="menu">
+            <a href="../jobs/estimates.htm"><u>E</u>stimate File</a><br />
+            <a href="../jobs/costestimateprint.htm?DOCUMENT_TYPE=ESTIMATE">Estimate <u>P</u>rintout</a><br />
+            <a href="../jobs/costestimateprint.htm?DOCUMENT_TYPE=DELIVERY"><u>D</u>elivery Note
+                Printout</a><br />
+            <hr style="width: 200px; text-align: left" />
+            <a href="../jobs/joblist.htm?MODE=ESTIMATESPENDING"><u>L</u>ist of Pending Estimates</a><br />
+            <a href="../jobs/joblist.htm?MODE=ESTIMATES">Li<u>s</u>t of Estimates</a><br />
+        </div>
+        <br />
+        <a><u>I</u>nvoices</a>
+        <div class="menu">
+            <a href="../jobs/costestimateprint.htm?DOCUMENT_TYPE=INVOICE">New <u>I</u>nvoices/Proformas</a><br />
+            <a href="../agency/invoicereprint.htm?MEDIA_NONMEDIA=3"><u>O</u>ld Invoices/Proformas</a><br />
+            <a href="../agency/invoicereprint.htm?MEDIA_NONMEDIA=3&DELIVERY_NOTE=1">Invoice <u>D</u>elivery
+                Note</a><br />
+            <a href="../finance/collections.htm"><u>C</u>ollections File</a><br />
+            <hr style="width: 200px; text-align: left" />
+            <a href="../agency/invoicelist.htm?MEDIA_NONMEDIA=3"><u>L</u>ist of Invoices</a><br />
+            <a href="../agency/invoiceaudit.htm?MEDIA_NONMEDIA=3">Invoice <u>A</u>udit/Listing</a><br />
+            <a href="../agency/invoicenumbers.htm?MODE=MEDIA">Invoice <u>N</u>umbering</a>
+            <br />
+        </div>
+        <hr width="100px" align="left" />
         <a><u>F</u>iles</a>
         <div class="menu" id="Div1">
-            <a href="../agency/clients.htm"><u>C</u>lient &amp; Brand File</a><br>
-            <a href="../agency/suppliers.htm"><u>S</u>upplier File</a><br>
-            <hr width="200" align="left">
-            <a href="../agency/productcategories.htm"><u>P</u>roduct Categories File</a><br>
-            <a href="../agency/types.htm?MODE=JOBS"><u>J</u>ob Types File</a><br>
-            <a href="../general/markets.htm">Mar<u>k</u>et File</a><br>
+            <a href="../agency/clients.htm"><u>C</u>lient &amp; Brand File</a><br />
+            <a href="../agency/suppliers.htm?MODE=JOBS"><u>S</u>upplier File</a><br />
+            <hr style="width: 200px; text-align: left" />
+            <a href="../agency/productcategories.htm"><u>P</u>roduct Categories File</a><br />
+            <a href="../agency/types.htm?MODE=JOBS"><u>J</u>ob Types File</a><br />
+            <a href="../general/markets.htm">Mar<u>k</u>et File</a><br />
             <a href="../general/currencies.htm">C<u>u</u>rrency &amp; Exchange Rate File</a><br />
-            <a href="../agency/configuration.htm?mode=jobs">Con<u>f</u>iguration File</a><br />
+            <a href="../agency/configuration.htm?mode=jobs">Jobs Con<u>f</u>iguration File</a><br />
         </div>
-        <br>
-        <a href onclick="jscript:if (typeof general_switch_company!='undefined'){if (!general_switch_company()) return false} else {alert('Please select another menu\roption first and then try again')};document.location.href=document.location.href;return false">
-            C<u>o</u>mpanies</a><br>
+        <br />
+        <a href="" onclick="jscript:if (typeof general_switch_company!='undefined'){if (!general_switch_company()) return false} else {alert('Please select another menu\noption first and then try again')};document.location.href=document.location.href;return false">
+            C<u>o</u>mpanies</a><br />
     </div>
-    <a id="menu_ANALMENU"><u>A</u>nalysis</a>
-    <div class="menu" id="menu_ANALMENU">
+    <a id="menu_MEDIAANALYSIS_SUPPRESS"><u>A</u>nalysis</a>
+    <div class="menu" id="menu_MEDIAANALYSIS_SUPPRESS">
         <a href="../general/reports.htm?module=media&mode=mediaanalysis"><u>M</u>edia Analysis
-            Reports</a><br>
-        <a href="../media/mediadiary.htm?MODE=FREEADS"><u>F</u>ree Ad Analysis</a><br>
-        <hr width="200" align="left">
+            Reports</a><br />
+        <a href="../media/mediadiary.htm?MODE=FREEADS"><u>F</u>ree Ad Analysis</a><br />
+        <hr style="width: 200px; text-align: left" />
         <a href="../general/reports.htm?module=agency&mode=billinganalysis"><u>B</u>illing Analysis
-            Reports</a><br>
-        <a href="../agency/billinganalysiscolumns.htm">Billing Analysis <u>C</u>olumn Design</a><br>
-        <hr width="200" align="left">
-        <a href="../agency/analysis.htm">Budget File</a><br>
+            Reports</a><br />
+        <a href="../agency/billinganalysiscolumns.htm">Billing Analysis <u>C</u>olumn Design</a><br />
+        <hr style="width: 200px; text-align: left" />
+        <a href="../agency/analysis.htm">Budget File</a><br />
     </div>
-    <a id="menu_ANALYSIS_INVOICES">Analysis</a>
-    <div class="menu" id="menu_ANALYSIS_INVOICES">
+    <a id="menu_ANALYSIS"><u>A</u>nalysis</a>
+    <div class="menu" id="menu_ANALYSIS">
         <a href="../general/reports.htm?module=agency&mode=billinganalysis">Billing Analysis
-            Reports</a><br>
-        <a href="../agency/billinganalysiscolumns.htm">Billing Analysis Column Design</a><br>
-        <a href="../agency/analysis.htm">Budget File</a><br>
+            Reports</a><br />
+        <a href="../agency/billinganalysiscolumns.htm">Billing Analysis Column Design</a><br />
+        <a href="../agency/analysis.htm">Budget File</a><br />
     </div>
-    <a id="menu_ACCS"><u>F</u>inance</a>
-    <div class="menu" id="menu_ACCS">
+    <a id="menu_FINANCE_SUPPRESS"><u>F</u>inance</a>
+    <div class="menu" id="menu_FINANCE_SUPPRESS">
         <a><u>J</u>ournals</a>
         <div class="menu">
-            <a href="../finance/journals.htm">&nbsp;<u>J</u>ournal Entry/Query</a><br>
-            <a href="../finance/journalaudit.htm">Journal <u>A</u>udit</a><br>
-            <hr>
-            <a href="../finance/recurringjournals.htm">Re<u>c</u>urring Journals</a><br>
-            <a href="../finance/revaluationjournals.htm">&nbsp;Re<u>v</u>aluation Journals</a><br>
-            <a href="../finance/reversingjournals.htm"><u>R</u>eversing Journals</a><br>
-            <hr>
+            <a href="../finance/journals.htm"><u>J</u>ournal Entry/Query</a><br />
+            <a href="../finance/journalaudit.htm?mode=unposted">&nbsp;<u>U</u>nposted Journals</a><br />
+            <a href="../finance/journalaudit.htm">Journal <u>A</u>udit/Export</a><br />
+            <hr style="width: 200px; text-align: left" />
+            <a href="../finance/journalaudit.htm?mode=unposted"><u>U</u>nposted Journals</a><br />
+            <a href="../finance/recurringjournals.htm">Re<u>c</u>urring Journals</a><br />
+            <a href="../finance/revaluationjournals.htm">Re<u>v</u>aluation Journals</a><br />
+            <a href="../finance/reversingjournals.htm"><u>R</u>eversing Journals</a><br />
+            <hr style="width: 200px; text-align: left" />
             <a href="../finance/journaltypes.htm">Journal <u>S</u>etup</a>
         </div>
-        <br>
+        <br />
         <a><u>V</u>ouchers</a>
         <div class="menu">
-            <a href="../finance/vouchers.htm"><u>V</u>oucher File/Deallocation</a><br>
-            <a href="../finance/ledgerprint.htm?MODE=ALLOCATION">Voucher <u>A</u>llocation</a><br>
+            <a href="../finance/vouchers.htm"><u>V</u>oucher File/Deallocation</a><br />
+            <a href="../finance/voucherallocation.htm">Voucher <u>A</u>llocation</a><br />
+            <a href="../finance/voucherlist.htm"><u>L</u>ist of Vouchers/Voucher Search</a><br />
         </div>
-        <br>
+        <br />
         <a><u>L</u>edgers</a>
         <div class="menu">
-            <a href="../finance/ledgerprint.htm"><u>L</u>edger Account</a><br>
-            <a href="../finance/ledgerprint.htm?MODE=STATEMENT"><u>S</u>tatement of Account</a><br>
-            <a href="../finance/ledgerprint.htm?MODE=RECONCILIATION">Account <u>R</u>econciliation</a><br>
-            <hr>
-            <a href="../finance/charts.htm"><u>C</u>hart of Accounts File</a><br>
-            <a href="../finance/chartlist.htm">&nbsp;Chart of Accounts <u>P</u>rintout</a><br>
-            <a href="../finance/charts.htm?MODE=REPORTDESIGN">Report <u>D</u>esign</a><br>
+            <a href="../finance/ledgerprint.htm"><u>L</u>edger Account</a><br />
+            <a href="../finance/ledgerprint.htm?MODE=STATEMENT"><u>S</u>tatement of Account</a><br />
+            <a href="../finance/accountreconciliation.htm">Account <u>R</u>econciliation</a><br />
+            <a href="../finance/collections.htm">C<u>o</u>llections File</a><br />
+            <hr style="width: 200px; text-align: left" />
+            <a href="../finance/charts.htm"><u>C</u>hart of Accounts File</a><br />
+            <a href="../finance/chartlist.htm">Chart of Accounts <u>P</u>rintout</a><br />
+            <a href="../finance/charts.htm?MODE=REPORTDESIGN">Report <u>D</u>esign</a><br />
         </div>
-        <br>
+        <br />
         <a><u>R</u>eports</a>
         <div class="menu">
-            <a href="../finance/trialbalance.htm">T<u>r</u>ial Balances</a><br>
+            <a href="../finance/trialbalance.htm">T<u>r</u>ial Balances</a><br />
             <a href="../general/reports.htm?module=finance&mode=financialstatements"><u>F</u>inancial
-                Statements</a><br>
-            <hr>
-            <a href="../finance/ledgerprint.htm?MODE=AGED"><u>A</u>ged Balances Report</a><br>
-            <a href="../finance/ledgerprint.htm?MODE=FORECAST"><u>C</u>ash Flow Report</a><br>
-            <a href="../finance/accountanalysis.htm">&nbsp;Account A<u>n</u>alysis Report</a><br>
-            <a href="../finance/taxreport.htm">Tax/<u>V</u>AT Statement</a><br>
+                Statements</a><br />
+            <hr style="width: 200px; text-align: left" />
+            <a href="../finance/ledgerprint.htm?MODE=AGED"><u>A</u>ged Balances Report</a><br />
+            <a href="../finance/ledgerprint.htm?MODE=FORECAST"><u>C</u>ash Flow Report</a><br />
+            <a href="../finance/accountanalysis.htm">Account A<u>n</u>alysis Report</a><br />
+            <a href="../finance/taxreport.htm">Tax/<u>V</u>AT Statement</a><br />
             <a href="../finance/budgets.htm"><u>B</u>udget File</a>
         </div>
-        <br>
-        <hr width="80" align="left">
-        <a href="../general/companies.htm">C<u>o</u>mpanies</a><br>
+        <br />
+        <hr width="100px" align="left" />
+        <a href="../general/companies.htm">C<u>o</u>mpanies</a><br />
         <a>C<u>u</u>rrencies</a>
         <div class="menu">
-            <a href="../general/currencies.htm">C<u>u</u>rrency &amp; Exchange Rate File</a><br>
-            <a href onclick="if (ratedate=neosysinput('List of Currencies &amp; Exchange Rates\r\rDate for exchange rates?',neosysdate().neosysoconv('[DATE]'))){openwindow('EXECUTE\rGENERAL\rLISTCURRENCIES\r'+ratedate)};return false">
-                <u>L</u>ist of Currencies &amp; Exchange Rates</a>
+            <a href="../general/currencies.htm">C<u>u</u>rrency &amp; Exchange Rate File</a><br />
+            <a href="../general/currencylist.htm"><u>L</u>ist of Currencies &amp; Exchange Rates</a>
         </div>
-        <br>
+        <br />
         <a><u>M</u>aintenance</a>
         <div class="menu">
-            <a href="../finance/clearallocated.htm"><u>C</u>lear Open Item Statements</a><br>
-            <a href="../finance/opennewyear.htm"><u>O</u>pen New Year</a><br>
-            <a href="../finance/taxes.htm"><u>T</u>ax Rate File</a><br>
+            <a href="../finance/clearallocated.htm"><u>C</u>lear Open Item Statements</a><br />
+            <a href="../finance/opennewyear.htm"><u>O</u>pen New Year</a><br />
+            <a href="../finance/taxes.htm"><u>T</u>ax Rate File</a><br />
         </div>
-        <br>
-        <a href onclick="jscript:if (typeof general_pop_settings!='undefined'){general_pop_settings()} else {alert('Please select another menu\roption first and then try again')};return false">
-            <u>S</u>ettings</a><br>
+        <br />
+        <a href="" onclick="jscript:if (typeof general_pop_settings!='undefined'){general_pop_settings()} else {alert('Please select another menu\noption first and then try again')};return false">
+            <u>S</u>ettings</a><br />
     </div>
     <a id="menu_TIMESHEETS"><u>T</u>imesheets</a>
     <div class="menu" id="menu_TIMESHEETS">
-        <a href="../jobs/timesheets.htm"><u>T</u>imesheet File</a><br>
-        <a href="../jobs/timesheetprint.htm">Timesheet <u>P</u>rintout</a><br>
-        <a href="../jobs/timesheetanalysis.htm">Timesheet <u>A</u>nalysis</a><br>
-        <a href="../agency/activities.htm?activities=1">A<u>c</u>tivity File</a><br>
-        <a href="../jobs/hourlyrates.htm"><u>H</u>ourly Rates File</a><br>
+        <a href="../jobs/timesheets.htm"><u>T</u>imesheet File</a><br />
+        <a href="../jobs/timesheetprint.htm">Timesheet <u>P</u>rintout</a><br />
+        <a href="../jobs/timesheetanalysis.htm">Timesheet <u>A</u>nalysis</a><br />
+        <a><u>F</u>iles</a>
+        <div class="menu">
+            <a href="../agency/activities.htm?activities=1">A<u>c</u>tivity File</a><br />
+            <a href="../jobs/hourlyrates.htm"><u>H</u>ourly Rates File</a><br />
+            <a href="../jobs/timesheetconfiguration.htm">Con<u>f</u>iguration File</a><br />
+        </div>
     </div>
-    <a id="menu_GENERAL"><u>S</u>upport</a>
-    <div class="menu" id="menu_GENERAL" align="justify">
-        <span style="font-size: 1%">&nbsp</span><a href onclick="openwindow('EXECUTE\rGENERAL\rLISTPROCESSES');return false">List
-            of Database <u>P</u>rocesses</a><br>
-        <span style="font-size: 1%">&nbsp</span><a href onclick="openwindow('EXECUTE\rGENERAL\rLISTLOCKS');return false"><u>L</u>ist
-            of Documents in Use</a><br>
-        <a href="../neosys/stopservice.htm">&nbsp;<u>S</u>top/Restart NEOSYS Service</a><br>
-        <a href="../neosys/backup.htm"><u>B</u>ackup</a><br>
-        <a href="../neosys/log.htm">L<u>o</u>g</a><br>
-        <a href="../neosys/authorisation.htm">&nbsp;<u>A</u>uthorisation File</a><br>
+    <a id="menu_SUPPORT"><u>S</u>upport</a>
+    <div class="menu" id="menu_SUPPORT">
+        <a href="../neosys/authorisation.htm"><u>A</u>uthorisation File</a><br />
+        <a href="../neosys/configuration.htm">System Con<u>f</u>iguration File</a><br />
+        <a href="../neosys/backup.htm"><u>B</u>ackup</a><br />
+        <a href="../neosys/log.htm">L<u>o</u>g</a><br />
+        <a href="../neosys/usagestatistics.htm"><u>U</u>sage Statistics</a><br />
+        <hr style="width: 200px; text-align: left" />
+        <a href="" onclick="openwindow('EXECUTE\rGENERAL\rLISTPROCESSES');return false">List
+            of Database <u>P</u>rocesses</a><br />
+        <a href="" onclick="openwindow('EXECUTE\rGENERAL\rLISTLOCKS');return false"><u>L</u>ist
+            of Documents in Use</a><br />
+        <a href="../neosys/stopservice.htm"><u>S</u>top/Restart NEOSYS Service</a><br />
+        <a href="../neosys/test.htm">System <u>T</u>est</a><br />
     </div>
     <a id="menu_HELP"><u>H</u>elp</a>
-    <div class="menu" id="menu_HELP" align="justify">
+    <div class="menu" id="menu_HELP">
         <a href="javascript:document.location=(typeof gusername!='undefined'&&gusername=='NEOSYS'&&confirm('NEOSYS only option\r\rChange Log File=OK\rWhats New Report=Cancel'))?'../general/changelog.htm':'../general/whatsnew.htm'">
-            &nbsp;<u>W</u>hats new in NEOSYS</a><br>
-        <a href="../neosys/users.htm">&nbsp;<u>U</u>ser Details</a><br>
-        <a href onclick="windowopen('../neosys/helpkeyboard.htm');return false">&nbsp;<u>K</u>eyboard
-            Shortcuts</a><br>
-        <a href onclick="openwindow('EXECUTE\rGENERAL\rABOUT');return false">&nbsp;<u>A</u>bout</a><br>
+            <u>W</u>hat's new in NEOSYS</a><br />
+        <a href="../neosys/users.htm"><u>U</u>ser Details</a><br />
+        <a href="../neosys/emailusers.htm"><u>E</u>mail </u>Users</a><br />
+        <a href="" onclick="windowopen('../neosys/helpkeyboard.htm');return false"><u>K</u>eyboard
+            Shortcuts</a><br />
+        <a href="http://www.neosys.com/ie.htm">Browser Reset</a><br />
+        <a href="http://www.neosys.com/help">NEOSYS Help Desk</a><br />
+        <a href="" onclick="displayresponsedata('EXECUTE\rGENERAL\rABOUT');return false"><u>
+            A</u>bout</a><br />
         <div id="menucompleted">
         </div>
     </div>
-</div>
-<button tabindex=-1 style="background-color:white; height:1;width:1" accesskey="M" onclick="if (typeof menuonmouseover!='undefined') menuonmouseover('click')"></button>
-<!--<button id="menubutton" title="Menu (Press Alt+M)" accesskey="M" tabindex="9999"
+    <!--    </div>
+-->
+    <button tabindex="-1" style="background-color: white; height: 1; width: 1; border-style: none;
+        margin: 0; padding: 0" accesskey="M" onclick="if (typeof menuonmouseover!='undefined') menuonmouseover('click')">
+    </button>
+    <!--<button id="menubutton" title="Menu (Press Alt+M)" accesskey="M" tabindex="9999"
     onclick="if (typeof menuonmouseover!='undefined') menuonmouseover('click')" onmouseover="menuonmouseover()"
     onmouseout="menuonmouseout()">
-    &nbsp;Menu&nbsp;</button>
+    Menu</button>
     -->
