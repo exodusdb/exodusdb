@@ -570,18 +570,29 @@ could generate the following overloads in the lib's .h header
 
 //new method using member functions to call external functions with mv environment
 var inclusion=
+"\r\n"
+"\r\n//a member variable/object to cache a pointer/object for the shared library function"
 "\r\nExodusFunctorBase efb_funcx;"
+"\r\n"
+"\r\n//a member function with the right arguments, returning a var"
 "\r\nvar funcx(in arg1=var(), out arg2=var(), out arg3=var())"
 "\r\n{"
+"\r\n"
+"\r\n //first time link to the shared lib and create/cache an object from it"
+"\r\n //passing current standard variables in mv"
 "\r\n if (efb_funcx.pmemberfunction_==NULL)"
 "\r\n  efb_funcx.init(\"funcx\",\"exodusprogrambasecreatedelete\",mv);"
 "\r\n"
-"\r\n //define a function that calls the shared library object member function"
+"\r\n //define a function type (pExodusProgramBaseMemberFunction)"
+"\r\n //that can call the shared library object member function"
+"\r\n //with the right arguments and returning a var"
 "\r\n typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(in,out,out);"
 "\r\n"
+"\r\n //call the shared library object main function with the right args, returning a var"
 "\r\n return CALLMEMBERFUNCTION(*(efb_funcx.pobject_),"
 "\r\n ((pExodusProgramBaseMemberFunction) (efb_funcx.pmemberfunction_)))"
 "\r\n  (arg1,arg2,arg3);"
+"\r\n"
 "\r\n}";
 
 										swapper(inclusion,"funcx",libname);

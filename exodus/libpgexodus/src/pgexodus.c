@@ -689,6 +689,9 @@ exodus_natural_order(char * instring, int inlength);
 
 PG_FUNCTION_INFO_V1(exodus_extract_sort);
 
+//avoid warning "Unused declaration of .." in above macro
+int no_such_variable;
+
 Datum
 exodus_extract_sort(PG_FUNCTION_ARGS)
 {

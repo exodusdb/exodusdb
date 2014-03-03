@@ -1365,11 +1365,11 @@ inline void tosqlstring(var& string1)
 
 inline var fileexpression(const var& mainfilename, const var& filename, const var& keyordata)
 {
-	var expression=filename ^ L"." ^ keyordata;
-	return expression;
-
 	//evade warning: unused parameter mainfilename
 	if (false && mainfilename) {}
+
+	var expression=filename ^ L"." ^ keyordata;
+	return expression;
 
 	//if you dont use STRICT in the postgres function declaration/definitions then NULL parameters do not abort functions
 
@@ -2382,7 +2382,7 @@ int main() {
 	//viewsuffix='_VIEW'
 	var viewsuffix = "";
 	var viewprefix = "VIEW_";
-	//syntax is DICT2SQL filename,...Ývolumename
+	//syntax is DICT2SQL filename,...ï¿½volumename
 
 	var filename = filenames.extract(filen);
 	if (filename == "")

@@ -56,6 +56,22 @@ install(
 	CODE "
 		execute_process(
 			COMMAND 
+				ldconfig
+				OUTPUT_VARIABLE OUTVAR
+				ERROR_VARIABLE ERRVAR
+				RESULT_VARIABLE RESVAR
+			
+		)
+		message(ldconfig <\${OUTVAR}>\n
+			<\${ERRVAR}>\n
+			<\${RESVAR}>\n
+		)
+	"
+)
+install(
+	CODE "
+		execute_process(
+			COMMAND 
 				${PostgreSQL_PKGLIBDIR}/installexodus-postgresql
 #				OUTPUT_VARIABLE OUTVAR
 #				ERROR_VARIABLE ERRVAR

@@ -95,7 +95,8 @@ subroutine genfunctor(in mode, in nargs) {
     functionargs^=", arg"^argn;
    }
    //add missing default parameters, but not to operator decl
-   for (argn=argn;argn<=nargs;++argn) {
+   //for (argn=argn;argn<=nargs;++argn) {
+   for (;argn<=nargs;++argn) {
     functiondecl^=", T"^argn^" arg"^argn;
     functionargs^=", T"^argn^"()";
    }
