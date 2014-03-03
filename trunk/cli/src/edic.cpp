@@ -174,7 +174,7 @@ program()
                 if (iscompilable and !osfile(filename)) {
 
 						var basefilename=field2(filename,SLASH,-1);
-						basefilename=field(basefilename,".",dcount(basefilename,".")-1);
+						basefilename=basefilename.field(".",dcount(basefilename,".")-1);
 
 						var progtype;
 						var question="1=Normal Program, 2=External Subroutine or Function";

@@ -12,6 +12,7 @@
 // so we need not to check the version (because we only support _MSC_VER >= 1100)!
 #pragma once
 
+#ifndef EXODUS_POSIX
 #include <windows.h>
 
 // special defines for VC5/6 (if no actual PSDK is installed):
@@ -186,4 +187,6 @@ protected:
     c.ContextFlags = contextFlags; \
     RtlCaptureContext(&c); \
 } while(0);
+#endif
+
 #endif

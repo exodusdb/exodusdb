@@ -123,7 +123,7 @@ void extract(char * instring, int inlength, int fieldno, int valueno, int subval
 	valuen2=1;
 	while (valuen2<valueno)
 	{
-		for (start_pos=start_pos;
+		for (/*start_pos=start_pos*/;
 				start_pos<inlength &&
 				(instring[start_pos]!=VM_UTF8_1 ||
 				instring[start_pos+1]!=VM_UTF8_2);
@@ -166,7 +166,7 @@ void extract(char * instring, int inlength, int fieldno, int valueno, int subval
 	subvaluen2=1;
 	while (subvaluen2<subvalueno)
 	{
-		for (start_pos=start_pos;
+		for (/*start_pos=start_pos*/;
 				start_pos<field_end_pos &&
 				(instring[start_pos]!=SM_UTF8_1 ||
 				instring[start_pos+1]!=SM_UTF8_2);

@@ -23,6 +23,7 @@ THE SOFTWARE.
 #ifndef EXO_H
 #define EXO_H 1
 
+#ifndef EXODUS_POSIX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <exodus/mv.h>
@@ -36,7 +37,7 @@ Module-definition (.def) files provide the linker with information about exports
 //http://en.wikipedia.org/wiki/Dynamic_link_library
 
 /* http://en.wikipedia.org/wiki/Dynamic_link_library
-DLL files may be explicitly loaded at run-time, a process referred to simply as run-time dynamic linking by Microsoft, by using the LoadLibrary (or LoadLibraryEx) API function. The GetProcAddress API function is used to lookup exported symbols by name, and FreeLibrary — to unload the DLL. These functions are analogous to dlopen, dlsym, and dlclose in the POSIX standard API.
+DLL files may be explicitly loaded at run-time, a process referred to simply as run-time dynamic linking by Microsoft, by using the LoadLibrary (or LoadLibraryEx) API function. The GetProcAddress API function is used to lookup exported symbols by name, and FreeLibrary ï¿½ to unload the DLL. These functions are analogous to dlopen, dlsym, and dlclose in the POSIX standard API.
 */
 
 //Allocating and freeing memory across module boundaries
@@ -99,4 +100,5 @@ extern "C"
 
 #define libraryexit }
 
+#endif EXODUS_POSIX
 #endif //EXO_H

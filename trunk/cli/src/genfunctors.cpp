@@ -71,7 +71,7 @@ subroutine genfunctor(in mode, in nargs)
                         functionargs^=", arg"^argn;
                 }
                 //add missing default parameters, but not to operator decl
-                for (argn=argn; argn<=nargs; ++argn) {
+                for (; argn<=nargs; ++argn) {
                         functiondecl^=", T"^argn^" arg"^argn;
                         functionargs^=", T"^argn^"()";
                 }
@@ -99,7 +99,7 @@ subroutine genfunctor(in mode, in nargs)
         text^=foot;
 
         var outputfilename="xfunctor"^mode.substr(1,1)^nargs^".h";
-        println(outputfilename);
+        printl(outputfilename);
         oswrite(text,outputfilename);
 
 }

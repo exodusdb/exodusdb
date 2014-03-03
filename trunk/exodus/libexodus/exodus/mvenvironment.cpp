@@ -28,6 +28,7 @@ THE SOFTWARE.
 
 #define MV_NO_NARROW
 
+#include <string>
 #define EXO_MVENVIRONMENT_CPP
 #include <exodus/mvenvironment.h>
 

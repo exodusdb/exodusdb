@@ -31,6 +31,10 @@ THE SOFTWARE.
 #include <exodus/mv.h>
 #include <exodus/mvfunctor.h>
 
+//for labelled commons
+#include <map>
+#include <boost/any.hpp>
+
 namespace exodus
 {
 
@@ -51,14 +55,19 @@ class MvEnvironment;
 	std::vector<MvEnvironment*> global_environments;
 #endif
 
+class LabelledCommon{
+	public:
+	virtual ~LabelledCommon(){}
+};
+
 class DLL_PUBLIC MvEnvironment
 {
 public:
 
 	virtual ~MvEnvironment();
-    
+
 	bool init(const int threadno);
-	
+
 	var ID;
 	var RECORD;
 	var DICT;
@@ -75,15 +84,15 @@ public:
 
 	var UPPERCASE;
 	var LOWERCASE;
-	
+
 	var CRTHIGH;
 	var CRTWIDE;
-	
+
 	var COL1;
 	var COL2;
 	var STATION;
 	var STATUS;
-	
+
 	//seems to fail initialisation in msvc2005 in release mode only ?!
 
 	var USER0;
@@ -107,16 +116,21 @@ public:
 	var PRIVILEGE;
 	var PRIORITYINT;
 	var ROLLOUTFILE;
-	
+
 	var TCLSTACK;
 	var VOLUMES;
 	var FILES;
-	
+
 	var DEFINITIONS;
 	var SECURITY;
 	var SESSION;
 	var SYSTEM;
 	var THREADNO;
+
+	//define a type of object that holds many LabelledCommons
+	//typedef std::map<const char*, LabelledCommon> LabelledCommons;
+	//typedef std::map<std::string, boost::any> labelledcommons;
+	LabelledCommon* labelledcommon[3];
 
 	//given dictid reads dictrec from DICT file and extracts from RECORD/ID or calls library called dict+DICT function dictid
 	//not const so we can mess with the library?
@@ -124,53 +138,50 @@ public:
 
 	var otherusers(const var& param);
 	var otherdatasetusers(const var& param);
-	
-	//define a type of object that holds many LabelledCommons
-	//typedef std::map<const char*, LabelledCommon> LabelledCommons;
-	
+
 	//NB does not return record yet
 	bool lockrecord(const var& filename, const var& file, const var& keyx, const var& recordx, const int waitsecs=0) const;
 	bool lockrecord(const var& filename, const var& file, const var& keyx) const;
-	
+
 	var capitalise(const var& str0, const var& mode=L"", const var& wordseps=L"") const;
-	
+
 	void mssg(const var& msg) const;
 	void mssg(const var& msg, const var& options) const;
 	void mssg(const var& msg, const var& options, var& buffer, const var& params) const;
 	void msg2(const var& msg, const var& options, var& buffer, const var& params) const;
-	
+
 	void note(const var& msg) const;
 	void note(const var& msg, const var& options) const;
 	void note(const var& msg, const var& options, var& buffer, const var& params) const;
 	void note2(const var& msg, const var& options, var& buffer, const var& params) const;
-	
+
 	void msgbase(const var& msg, const var& options=L"", const var& response=L"", const var& params=L"") const;
-	
+
 	var handlefilename(const var& handle) const;
 	void debug() const;
 	void fsmsg() const;
 	var sysvar(const var& var1,const var& var2,const var& mv3,const var& mv4);
-    void setprivilege(const var& var1);
-    bool openfile(const var& filename, var& file) const;
-    bool openfile2(const var& filename, var& file, const var& similarfilename, const var& autocreate=L"") const;
-	
+	void setprivilege(const var& var1);
+	bool openfile(const var& filename, var& file) const;
+	bool openfile2(const var& filename, var& file, const var& similarfilename, const var& autocreate=L"") const;
+
 	bool lockrecord(const var& xfilename, const var& xfile, const var& keyx, const var& recordx, const var& waitsecs) const;
 	bool unlockrecord(const var& filename, const var& file, const var& key) const;
-	
+
 	var decide(const var& question, const var& options) const;
 	var decide(const var& question, const var& options, var& reply) const;
 	var decide(const var& question, const var& options, var& reply, var& buffer) const;
-	
+
 	void savescreen(var& origscrn, var& origattr) const;
 	//void ostime(var& ostimenow) const;
 	int keypressed(int delayusecs=0) const;
 	bool esctoexit() const;
-	
+
 	bool oswritex(const var& str, const var& filename) const;
 	bool osbwritex(const var& str1, const var& filehandle, const var& filename, var& offset) const;
 //	bool osbreadx(var& str1, const var& filehandle, const var& filename, const int startoffset, const int length);
 	bool osbreadx(var& str1, const var& filehandle, const var& filename, var& startoffset, const int length);
-	
+
 	bool authorised(const var& task, var& msg, const var& defaultlock=L"");
 	bool authorised(const var& task);
 	void readuserprivs();
@@ -185,7 +196,7 @@ public:
 	var loginnet(const var& dataset, const var& username, var& cookie, var& msg);
 	var at(const int code) const;
 	var at(const int x, const int y) const;
-	
+
     //was MVDB
 	var getuserdept(const var& usercode);
 
