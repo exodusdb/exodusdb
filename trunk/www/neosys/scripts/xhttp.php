@@ -300,7 +300,7 @@ debug("REQUEST :".$xml->request);
 		//read the data .2 file or empty data if not
 		//can return data even if not "OK")
 		$data=file_get_contents($linkfilename . '.2');
-		if (!data)
+		if (!$data)
 			$data='';
 		//$data = escapedfms2unicode(tf.ReadAll())
 
