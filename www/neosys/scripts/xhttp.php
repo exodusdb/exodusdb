@@ -1,7 +1,14 @@
 <?php
 
-//defaults
+	//errors cannot be echoed to xmlhttp so force them off in case set in php.ini
+	ini_set('display_errors', 'Off');
+	//php.ini
+	//display_errors = off
 
+//constants
+
+	//if mb php implemented
+	//change explode to mb_split, mb_strlen, mb_substr
 	//mb_internal_encoding('UTF-8');
 	//mb_regex_encoding('UTF-8');
 
@@ -11,7 +18,7 @@
 	$sm = '\x25\x5c';
 
 	$gautostartdatabase = true;//unless ../exodus/net.cfg first line is AUTOSTART=NO
-	$gsecondstowaitforreceipt = 10;
+	$gsecondstowaitforreceipt = 15;
 	$gsecondstowaitforstart = 30;
 
 	$cannotfinddatabaseresponse = 'ERROR: SERVER CONFIGURATION ERROR - CANNOT FIND DATABASE ON SERVER';
@@ -20,10 +27,12 @@
 	$nodataresponse = 'ERROR: NO DATA';
 	$invaliddatapathresponse = 'ERROR: CANNOT WRITE TO ';
 
-	$loginlocation = '../default.htm';
+//defaults
 
 	//default timeout is 10 minutes (NB BACKEND timeout (in GIVEWAY) is hard coded to 10 mins?)
 	$defaulttimeoutmins = 10;
+	$timeout = $defaulttimeoutmins * 60;
+
 
 // session
 
@@ -36,12 +45,12 @@
 		$unicode = 0;
 
 	//get and cleanup hostname
-	//remove space . " ' characters
-	//and take first and last four characters if longer than 8 characters. why?
 	$localhostname = $_SERVER['SERVER_NAME'];
+	//remove space . " ' characters
 	$localhostname = str_replace(array(".", ".", " "),"_",$localhostname);
-	if (mb_strlen($localhostname) > 8)
-		$localhostname = mb_substr($localhostname,0, 4) . mb_substr($localhostname,-4);
+	//and take first and last four characters if longer than 8 characters. why?
+	if (strlen($localhostname) > 8)
+		$localhostname = substr($localhostname,0, 4) . substr($localhostname,-4);
 
 	$remoteaddr = $_SERVER['REMOTE_ADDR'];
 	$remotehost = $_SERVER['REMOTE_HOST'];
@@ -51,8 +60,8 @@
 
 	//client delivers a request in xml format
 	$xml = simplexml_load_string($HTTP_RAW_POST_DATA);
-//	debug("POST   ---> ".$HTTP_RAW_POST_DATA);
 
+//debug("POST   ---> ".$HTTP_RAW_POST_DATA);
 debug("REQUEST :".$xml->request);
 
 	//request contains token, request, database and data
@@ -62,54 +71,55 @@ debug("REQUEST :".$xml->request);
 	$data=rawurldecode($xml->data);
 
 	//convert any crlf to just cr
-	//neosys uses \r which is \cr because \n and lf are messed about as either 0d0a or just 0a
+	//neosys uses \r which is cr because \n and lf are messed about as either 0d0a or just 0a
 	$request = str_replace("\n","\r",$request);
 	$token = str_replace("\n","\r",$token);
 
-	$requests = mb_split("\r",$request . "\r\r\r\r\r\r\r\r");
+	$requests = explode("\r",$request . "\r\r\r\r\r\r\r\r");
 
-	//try and get the username, password and database from the session
-	session_start();//
-	$username = $_SESSION[$token . '_username'];
-	$password = $_SESSION[$token . '_password'];
-	$database = $_SESSION[$token . '_database'];
-	$system = $_SESSION[$token . '_system'];
-	$timeout = $_SESSION[$token . '_timeout'];
+	if ($token) {
 
-	//if ($username=='NEOSYS')
-		$defaulttimeoutmins=5;
-	if (!$timeout)
-		$timeout = $defaulttimeoutmins * 60;
+		//if login then save new details regardless of success or not
+		if ($requests[0] == 'LOGIN') {
 
-	//seconds for script timeout is our timeout plus 60 seconds
-	//TODO Server.ScriptTimeout = $timeout / 1000 + 60;
+			$username = $requests[1];
+			$password = $requests[2];
+			$database = $requests[3];
+			$authno = $requests[4];
+			$system = $requests[5];
+			$request = $requests[0];//remove the password from the request string
 
-	//either login
-	if ($requests[0] == 'LOGIN') {
+			$_SESSION[$token . '_username'] = $username;
+			$_SESSION[$token . '_password'] = $password;
+			$_SESSION[$token . '_database'] = $database;
+			$_SESSION[$token . '_system'] = $system;
+			$_SESSION[$token . '_timeout'] = $timeout;
+		} else {
 
-		$username = $requests[1];
-		$password = $requests[2];
-		$database = $requests[3];
-		$authno = $requests[4];
-		$system = $requests[5];
-		$request = $requests[0];//remove the password from the request string
+			//try and get the username, password and database from the session
+			session_start();//
+			$username = $_SESSION[$token . '_username'];
+			$password = $_SESSION[$token . '_password'];
+			$database = $_SESSION[$token . '_database'];
+			$system = $_SESSION[$token . '_system'];
+			$timeout = $_SESSION[$token . '_timeout'];
+		}
 
-		$_SESSION[$token . '_username'] = $username;
-		$_SESSION[$token . '_password'] = $password;
-		$_SESSION[$token . '_database'] = $database;
-		$_SESSION[$token . '_system'] = $system;
-		$_SESSION[$token . '_timeout'] = $timeout;
+		//seconds for script timeout is our timeout plus 60 seconds
+		//TODO Server.ScriptTimeout = $timeout / 1000 + 60;
+
+		//append trailing '/' to databasedir if necessary
+		$databasedir = $database . "/";
+
+		$globalserverfilename = $datalocation . $databasedir . $database . '.SVR';
 	}
-
-	//append trailing '/' to databasedir if necessary
-	$databasedir = $database . "/";
-
-	$globalserverfilename = $datalocation . $databasedir . $database . '.SVR';
 
 // attempt(s)
 
-	//continue=repeated attempts after attempting to start database
-	//break = failures or success
+	//using "loop" to avoid use of function/subroutine
+	//break = failures (or at end, success)
+	//continue = possible 2nd attempt after requesting database to start
+	//actually php 5.3 has goto commands which might be used instead and avoid 1 indent
 	while (1)
 	{
 
@@ -178,8 +188,7 @@ debug("REQUEST :".$xml->request);
 			$linkfilename = $datalocation . $databasedir . $linkfilename;
 		} while (glob($linkfilename .'.*'));
 
-		//write data if any
-		//(before request so that there is no sharing violation with server reader)
+		//write data (if any) before request so that there is no sharing violation with server reader
 		if ($data) {
 
 			//tf.Write(escape($data))
@@ -187,22 +196,22 @@ debug("REQUEST :".$xml->request);
 			//only really need the four characters FB-FE
 			//$temp = unicode2escapedfms($data)
 			//unicode to codepage conversion used to take place here in win/IIS
-
+//debug('data');
 			if (!file_put_contents($linkfilename . '.2', $data)) {
 				$response = $invaliddatapathresponse . ' "' . $linkfilename . '.2" ';
 				break;
 			}
-
 		}
 
 		//more info in request			
 		if (!$remoteaddr)
 			$remoteaddr = '';
 		if (!$remotehost)
-			$remotehost = '';
+			$remotehost = $remoteaddr;//if no hostname then use ip
 		if (!$https)
 			$https = '';
 
+		//prepare a request file to "send" to the server as a polled file
 		$fullrequest = '';
 		$fullrequest .= $linkfilename .'.1'."\r";
 		$fullrequest .= 'VERSION 3'."\r";
@@ -225,13 +234,15 @@ debug("REQUEST :".$xml->request);
 		//try to read it before it is ready
 		//codepage used to happen here conversion happens here in win/iis
 		//otherwise abort
+
 		if (!file_put_contents($linkfilename . '.1$', $fullrequest)) {
 			$response = $invaliddatapathresponse . ' "' . $linkfilename . '.1$" ';
 			break;
 		}
+		chmod($linkfilename . '.1$', 0775);
 
-		//now that everything is in place
-		//rename the command file to end in .1
+		//now that everything is in place (request and data files)
+		//rename the request file to end in .1
 		//so that server/listener pick it up
 		//otherwise abort
 		if (!rename($linkfilename . '.1$', $linkfilename .'.1')) {
@@ -239,26 +250,28 @@ debug("REQUEST :".$xml->request);
 			break;
 		}
 
-		//wait for 10 seconds for the request to disappear
+		//wait briefly for 10 seconds for the request to disappear
 		//sleeping between checks every 10 ms
 		$waituntil = time() + $gsecondstowaitforreceipt;
-		while (is_file($linkfilename . '.1') && time() < $waituntil ){
+		while (is_file($linkfilename . '.1')){
+
 			//TODO increase sleep if not fast result
 			usleep(10000);
-		}
 
-		// otherwise abort
-		//TODO start the database and try again
-		//TODO really should rename to take control back of request file to ensure it isnt processed
-		if (time() >= $waituntil) {
-			$response = 'Error: No response in ' . $gsecondstowaitforreceipt . ' seconds from database server at ' . $linkfilename . '.1';
-			break;
+			// abort if request file has not been taken within 10 seconds
+			//TODO start the database and try again
+			//TODO really should rename to take control back of request file to ensure it isnt processed
+			if (time() >= $waituntil){
+				$response = 'Error: No response in ' . $gsecondstowaitforreceipt . ' seconds from database server at ' . $linkfilename . '.1';
+				break 2;
+			}
+			clearstatcache();
 		}
 
 		//wait patiently for 10 minutes for the response to appear otherwise quit
-		//sleep between checking every 10 ms
+		//sleep between checkds every 10 ms
 		$waituntil = time() + $timeout;
-		while (!is_file($linkfilename . '.3') && time() < $waituntil) {
+		while (!is_file($linkfilename . '.3')) {
 
 			//sleep for 10ms before checking for response again
 			//TODO make it sleep longer the long the delay
@@ -266,31 +279,28 @@ debug("REQUEST :".$xml->request);
 			//(after waiting 10 seconds it is pointless to check every 10ms)
 			usleep(10000);//10,000 microseconds = 10 ms
 
+			//abort if no response within 10 minutes
+			if (time() >= $waituntil) {
+				$response = 'Error: No response in ' . $timeout . ' seconds from database server at ' . $linkfilename.".3";
+				break 2;
+			}
+
 		}
 
-		//abort if no response within x seconds
-		if (time() >= $waituntil) {
-			$response = 'Error: No response in ' . $timeout . ' seconds from database server at ' . $linkfilename;
-			break;
-		}
-
-		//read response in .2 file
+		//read response in .3 file
 
 		//response determines true or false
-		if (!file_get_contents($linkfilename . '.3')) {
-			$response = 'Error: Cannot read response file ' . $linkfilename;
+		$response=file_get_contents($linkfilename . '.3');
+		if (!$response) {
+			$response = 'Error: Cannot read response file ' . $linkfilename.".3";
 			break;
 		}
 		//$response = escapedfms2unicode(tf.ReadAll())
-		if (mb_split(' ',$response)[0] == 'OK') 
-			$result = 1;
-		else
-			$result = 0;
-		
-		//read the data .2 file or empty data if not
 
-		//(moved from below so can return data even if not "OK")
-		if (!file_get_contents($linkfilename . '.2',$data))
+		//read the data .2 file or empty data if not
+		//can return data even if not "OK")
+		$data=file_get_contents($linkfilename . '.2');
+		if (!data)
 			$data='';
 		//$data = escapedfms2unicode(tf.ReadAll())
 
@@ -300,17 +310,22 @@ debug("REQUEST :".$xml->request);
 
 	}//end of attempt "loop"
 
-// clean up
+//result
+
+	if (explode(' ',$response)[0] == 'OK') 
+		$result = 1;
+	else
+		$result = 0;
+
+//clean up
 
 	//normally .1 will have been consumed (renamed, read and then deleted) by the neosys database and cannot be deleted
 	if (is_file($linkfilename . '.1'))
 		unlink($linkfilename . '.1');
 
-	//if we cannot delete one or other of the .2 data and .3 response files
-	//then creating a .4 file instructs the db server to do it
 	$deletefailed=false;
 
-	//often there is no .2 data file returned and and even then usually we dont have privileges to delete it
+	//often there is no .2 data file returned and even then usually we dont have privileges to delete it
 	if (is_file($linkfilename . '.2') && !unlink($linkfilename . '.2'))
 		$deletefailed=true;
 
@@ -318,10 +333,12 @@ debug("REQUEST :".$xml->request);
 	if (is_file($linkfilename . '.3') && !unlink($linkfilename . '.3'))
 		$deletefailed=true;
 
+	//if we cannot delete one or other of the .2 data and .3 response files
+	//then creating a .4 file instructs the db server to do it
 	if ($deletefailed)
 		file_put_contents($linkfilename . '.4', '');
 
-// output
+//output
 
 	$xmltext = "<root>";
 	$xmltext .= "<data>" . rawurlencode($data) . "</data>";
@@ -329,18 +346,18 @@ debug("REQUEST :".$xml->request);
 	$xmltext .= "<result>" . rawurlencode($result) . "</result>";
 	$xmltext .= "</root>";
 
-	//Response.ContentType = "text/xml"
 	//Response.Expires = -1000
 	//Response.Buffer = 0
 
 	header ("Content-Type:text/xml");
+
 	print($xmltext);
 
-//debug("RESPONSE:$response");
-//if ($data)
-//debug("DATA    :$data");
-//if (!$result)
-//debug("RESULT  :$result");
+debug("RESPONSE:$response");
+if ($data)
+debug("DATA    :$data");
+if (!$result)
+debug("RESULT  :$result");
 	
 	/// finished
 
@@ -360,7 +377,7 @@ function neosysrnd($max, $min) {
 //debug in php like this
 //tail -f /var/log/apache2/error.log
 function debug($msg) {
-	error_log($msg,0);
+	error_log("\"$msg\"" ,0);
 }
 
 function getdatabases($neosysrootpath, $systemcode) {
@@ -370,7 +387,7 @@ function getdatabases($neosysrootpath, $systemcode) {
 	//return an array of available database codes and names
 	//or an empty array
 
-	global $fm,$vm,$sm;
+	global $fm,$vm,$sm,$response;
 
 	//if (!$systemcode)
 		$systemcode = 'default';
@@ -390,14 +407,14 @@ function getdatabases($neosysrootpath, $systemcode) {
 	$databases=str_replace(',',$sm,$databases);
 
 	//the first line contains the pairs of dbname sm dbcode vm ...
-	//$databases = mb_split($fm,$databases)[0];
+	//$databases = explode($fm,$databases)[0];
 	$databases = explode($fm,$databases)[0];
-	//$databases=mb_split($vm,$databases);
+	//$databases=explode($vm,$databases);
 	$databases=explode($vm,$databases);
 
 	$xmltext = "<records>\r";
 	foreach ($databases as $database) {
-		//$database=mb_split($sm,$database.$sm);
+		//$database=explode($sm,$database.$sm);
 		$database=explode($sm,$database.$sm);
 		$databasename=$database[0];
 		$databasecode=$database[1];
@@ -410,6 +427,8 @@ function getdatabases($neosysrootpath, $systemcode) {
 		$xmltext .= "</record>\r";
 	}
 	$xmltext .= "</records>\r";
+
+	$response = "OK";
 
 	return $xmltext;
 
