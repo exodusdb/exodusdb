@@ -1,43 +1,108 @@
-<html>
-	<head>
-		<script>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+    <script type="text/javascript">
  var gmodule='GENERAL'
  var gdatafilename='MARKETS'
-		</script>
-		<script language="javascript" src="../neosys/scripts/client.js"></script>
-		<script language="javascript" src="scripts/general.js"></script>
-		<title>Markets File</title>
-	</head>
-	<body>
-		<h1 align="center">Markets File</h1>
-		<table class="neosystable" border="1" align="center">
-			<tr>
-				<td>Market code</td>
-				<td><input datafld="MARKET_CODE"></td>
-			</tr>
-			<tr>
-				<td>Market name</td>
-				<td><input datafld="MARKET_NAME"></td>
-			</tr>
-			<tr>
-				<td>Main currency</td>
-				<td><input datafld="CURRENCY_CODE">
-					<span datafld="CURRENCY_NAME"></span></td>
-			</tr>
-			<tr>
-				<td>Sequence</td>
-				<td><input datafld="SEQUENCE"></td>
-			</tr>
+    </script>
+
+    <script type="text/javascript" src="../neosys/scripts/client.js"></script>
+
+    <script type="text/javascript" src="scripts/general.js"></script>
+
+    <title>Markets File</title>
+</head>
+<body>
+    <div style="text-align: center">
+        <h1>
+            Markets File</h1>
+        <table class="neosystable" border="1">
             <tr>
-                <td colspan=2>
-                    <table class="neosystable" border="1" xwidth=80%>
+                <td>
+                    Market code</td>
+                <td>
+                    <input id="MARKET_CODE" /></td>
+            </tr>
+            <tr>
+                <td>
+                    Market name</td>
+                <td>
+                    <input id="MARKET_NAME" /></td>
+            </tr>
+            <tr>
+                <td>
+                    Main currency</td>
+                <td>
+                    <input id="CURRENCY_CODE" />
+                    <span id="CURRENCY_NAME"></span>
+                </td>
+            </tr>
+            <tr style="display: none">
+                <td>
+                    Sequence</td>
+                <td>
+                    <input id="SEQUENCE" /></td>
+            </tr>
+            <tr>
+                <td>
+                    First Day of Week</td>
+                <td>
+                    <input id="FIRST_DAY_OF_WEEK" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Weekend/Days Off</td>
+                <td>
+                    <input id="WEEKEND_DAYS_OFF" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Highlight Days</td>
+                <td>
+                    <input id="HIGHLIGHT_DAYS" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Public Holidays</td>
+                <td>
+                    <table>
+                        <tr>
+                            <td>
+                                Date: <input id="HOLIDAY_DATE" /></td>
+                            <td>
+                                Reason: <input id="HOLIDAY_REASON" /></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        <tr>
+            <td>
+                Alias
+            </td>
+            <td>
+                <table>
+                    <tr>
+                        <td>
+                            System:<input id="ALIAS_SYSTEM" />
+                        </td>
+                        <td>
+                            Code:<input id="ALIAS_CODE" />
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+            <tr>
+                <td colspan="2">
+                    <table class="neosystable2" border="1">
                         <thead>
                             <tr>
                                 <th>
                                     Version
-                                </th>
-                                <th>
-                                    Status
                                 </th>
                                 <th>
                                     User name
@@ -53,25 +118,23 @@
                         <tbody>
                             <tr>
                                 <td>
-                                    <span datafld="VERSION_UPDATED"></span>
+                                    <span id="VERSION_UPDATED"></span>
                                 </td>
                                 <td>
-                                    <span datafld="STATUS_UPDATED"></span>
+                                    <span id="USERNAME_UPDATED"></span>
                                 </td>
                                 <td>
-                                    <span datafld="USERNAME_UPDATED"></span>
+                                    <span id="DATETIME_UPDATED"></span>
                                 </td>
                                 <td>
-                                    <span datafld="DATETIME_UPDATED"></span>
-                                </td>
-                                <td>
-                                    <span datafld="STATION_UPDATED"></span>
+                                    <span id="STATION_UPDATED"></span>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </td>
             </tr>
-		</table>
-	</body>
+        </table>
+    </div>
+</body>
 </html>
