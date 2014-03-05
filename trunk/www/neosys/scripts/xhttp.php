@@ -36,6 +36,8 @@
 
 // session
 
+	session_start();//
+
 	$neosysrootpath = getneosysrootpath($_SERVER['DOCUMENT_ROOT']);
 	$datalocation = ($neosysrootpath . '/data/');
 
@@ -63,18 +65,24 @@
 
 //debug("POST   ---> ".$HTTP_RAW_POST_DATA);
 debug("REQUEST :".$xml->request);
+if ($xml->token)
+debug("TOKEN   :".$xml->token);
+if ($xml->database)
+debug("DATABASE:".$xml->base);
+if (strlen($xml->data))
+debug("DATA_IN :".$xml->data);
 
 	//request contains token, request, database and data
 	$token=rawurldecode($xml->token);
 	$request=rawurldecode($xml->request);
 	$database=rawurldecode($xml->dataset);//probably come as DATASET not DATABASE
-	$data=rawurldecode($xml->data);
+	$data_in=rawurldecode($xml->data);
 
 	//convert any crlf to just cr
 	//neosys uses \r which is cr because \n and lf are messed about as either 0d0a or just 0a
 	$request = str_replace("\n","\r",$request);
 	$token = str_replace("\n","\r",$token);
-
+debug("token $token");
 	$requests = explode("\r",$request . "\r\r\r\r\r\r\r\r");
 
 	if ($token) {
@@ -97,12 +105,21 @@ debug("REQUEST :".$xml->request);
 		} else {
 
 			//try and get the username, password and database from the session
-			session_start();//
 			$username = $_SESSION[$token . '_username'];
 			$password = $_SESSION[$token . '_password'];
 			$database = $_SESSION[$token . '_database'];
 			$system = $_SESSION[$token . '_system'];
 			$timeout = $_SESSION[$token . '_timeout'];
+debug("username $username");
+		}
+
+		//if logout then clear session username, password and database from the session
+		if ($requests[0] == 'LOGOUT') {
+			$_SESSION[$token . '_username'] = "";
+			$_SESSION[$token . '_password'] = "";
+			$_SESSION[$token . '_database'] = "";
+			$_SESSION[$token . '_system'] = "";
+			$_SESSION[$token . '_timeout'] = "";
 		}
 
 		//seconds for script timeout is our timeout plus 60 seconds
@@ -124,10 +141,18 @@ debug("REQUEST :".$xml->request);
 	{
 
 		//failure
-		$data = '';
+		$data_out = '';
 		$response = '';
 		$result = 0;
 		$linkfilename = '';
+
+		//keepalive
+		if ($requests[0] == 'KEEPALIVE') {
+debug("KEEPALIVE");
+			$response = "OK";
+			$result = 1;
+			break;
+		}
 
 		//fail if could not locate the database
 		if (!$neosysrootpath) {
@@ -143,7 +168,7 @@ debug("REQUEST :".$xml->request);
 
 		//special request that doesnt require anything but a request and neosysrootpath
 		if ($requests[0]=='GETDATASETS') {
-			$data=getdatabases($neosysrootpath,$requests[1]);
+			$data_out=getdatabases($neosysrootpath,$requests[1]);
 			$result=1;
 			break;
 		}
@@ -188,19 +213,22 @@ debug("REQUEST :".$xml->request);
 			$linkfilename = $datalocation . $databasedir . $linkfilename;
 		} while (glob($linkfilename .'.*'));
 
+debug("data_in $data_in");
+
 		//write data (if any) before request so that there is no sharing violation with server reader
-		if ($data) {
+		if ($data_in) {
 
 			//tf.Write(escape($data))
 			//allow field marks to pass through unicode conversion untouched to the backend as escaped characters
 			//only really need the four characters FB-FE
 			//$temp = unicode2escapedfms($data)
 			//unicode to codepage conversion used to take place here in win/IIS
-//debug('data');
-			if (!file_put_contents($linkfilename . '.2', $data)) {
+			if (!file_put_contents($linkfilename . '.2', $data_in)) {
 				$response = $invaliddatapathresponse . ' "' . $linkfilename . '.2" ';
 				break;
 			}
+			//ensure server can write it for returned data
+			chmod($linkfilename . '.2', 0775);
 		}
 
 		//more info in request			
@@ -239,6 +267,7 @@ debug("REQUEST :".$xml->request);
 			$response = $invaliddatapathresponse . ' "' . $linkfilename . '.1$" ';
 			break;
 		}
+		//ensure server can delete it after renaming/processing it
 		chmod($linkfilename . '.1$', 0775);
 
 		//now that everything is in place (request and data files)
@@ -299,10 +328,10 @@ debug("REQUEST :".$xml->request);
 
 		//read the data .2 file or empty data if not
 		//can return data even if not "OK")
-		$data=file_get_contents($linkfilename . '.2');
-		if (!$data)
-			$data='';
-		//$data = escapedfms2unicode(tf.ReadAll())
+		$data_out=file_get_contents($linkfilename . '.2');
+		if (!$data_out)
+			$data_out='';
+		//$data_out = escapedfms2unicode(tf.ReadAll())
 
 		//using a "loop" as a way to jump forward to abort or succeed anywhere or at end (break statements)
 		//only looping if starting database
@@ -341,7 +370,7 @@ debug("REQUEST :".$xml->request);
 //output
 
 	$xmltext = "<root>";
-	$xmltext .= "<data>" . rawurlencode($data) . "</data>";
+	$xmltext .= "<data>" . rawurlencode($data_out) . "</data>";
 	$xmltext .= "<response>" . rawurlencode($response) . "</response>";
 	$xmltext .= "<result>" . rawurlencode($result) . "</result>";
 	$xmltext .= "</root>";
@@ -354,8 +383,8 @@ debug("REQUEST :".$xml->request);
 	print($xmltext);
 
 debug("RESPONSE:$response");
-if ($data)
-debug("DATA    :$data");
+if ($data_out)
+debug("DATA_OUT:$data_out");
 if (!$result)
 debug("RESULT  :$result");
 	

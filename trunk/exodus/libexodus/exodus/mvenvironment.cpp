@@ -462,7 +462,7 @@ void MvEnvironment::mssg(const var& msg0, const var& options0, var& response, co
 	if (var(L"FS124" _VM_ L"FS125" _VM_ L"FS126" _VM_ L"FS127" _VM_ L"FS128" _VM_ L"FS129").locate(msg, xx, 1)) {
 
 		//30/6/2001
-		msg = msg.extract(1, 1, 1).xlate(L"SYS.MESSAGES", 11, L"C");
+		msg = msg.extract(1, 1, 1);//.xlate(L"SYS_MESSAGES", 11, L"C");
 
 		goto damaged;
 	}
@@ -482,7 +482,7 @@ damaged:
 
 			//30/6/2001
 			if (!(msg.index(FM, 1) || msg.index(VM, 1))) {
-				var msg2 = msg.extract(1, 1, 1).xlate(L"SYS.MESSAGES", 11, L"X");
+				var msg2 = msg.extract(1, 1, 1);//.xlate(L"SYS.MESSAGES", 11, L"X");
 				if (!(msg2))
 					msg2 = msg.extract(1, 1, 1).xlate(L"SYSMESSAGES", 11, L"X");
 				if (msg2)
