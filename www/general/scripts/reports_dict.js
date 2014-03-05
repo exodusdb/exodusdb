@@ -16,7 +16,8 @@ function dict_REPORTS()
   finance_dict_settings(di)
   
   di=dict[++din]=dictrec('SETTINGS_STRING','F',10)
- 
+  finance_dict_settingsstring(di)
+
  }
  
  di=dict[++din]=dictrec('CREATOR','F',1,'',1)
@@ -51,9 +52,30 @@ function dict_REPORTS()
  di=dict[++din]=dictrec('DOCUMENT_NO','F',9,'',1)
  di.readonly=true
  
- di=dict[++din]=dictrec('DELETE_FLAG','F',10,'',1)
+ di=dict[++din]=dictrec('DELETE_FLAG','F',11,'',1)
  di.checkbox='1; '
  
+ di=dict[++din]=dictrec('DATETIME_LASTRUN','F',13,'',1)
+ neosys_dict_datetime(di)
+
+ di=dict[++din]=dictrec('SCHEDULED_MINUTE','F',21,'',1)
+ di.readonly=true
+ 
+ di=dict[++din]=dictrec('SCHEDULED_HOUR','F',22,'',1)
+ di.readonly=true
+ 
+ di=dict[++din]=dictrec('SCHEDULED_DAY_OF_MONTH','F',23,'',1)
+ di.readonly=true
+ 
+ di=dict[++din]=dictrec('SCHEDULED_MONTH','F',24,'',1)
+ di.readonly=true
+ 
+ di=dict[++din]=dictrec('SCHEDULED_DAY_OF_WEEK','F',25,'',1)
+ di.readonly=true
+ 
+ di=dict[++din]=dictrec('SCHEDULED_DATE','F',26,'',1)
+ di.readonly=true
+  
  return dict
  
 }

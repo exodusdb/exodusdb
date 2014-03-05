@@ -1,0 +1,185 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <script type="text/javascript">
+        var gmodule = 'AGENCY'
+        var gdatafilename = 'DEFINITIONS'
+        var gdictfilename = 'TIMESHEETCONFIGURATION'
+        var gpreventdeletion = false
+    </script>
+    <script type="text/javascript" src="../neosys/scripts/client.js"></script>
+    <script type="text/javascript" src="../general/scripts/general.js"></script>
+    <title id="titleelement">Timesheet Configuration File</title>
+</head>
+<body>
+    <div align="center">
+        <h1 id="headerelement">
+            Timesheet Configuration File</h1>
+        <table class="neosystable" border="1">
+            <thead>
+            </thead>
+            <tbody>
+                <tr style="display: none">
+                    <td>
+                        Key Field
+                    </td>
+                    <td>
+                        <input id="KEY">
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <h2>
+                            Restrictions</h2>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Minimum Hours per Day
+                    </td>
+                    <td>
+                        <input id="MINIMUM_HOURS_PER_DAY">
+                    </td>
+                    <td>
+                        Timesheets without sufficient hours are treated as pending/not complete.
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Maximum Hours per Day
+                    </td>
+                    <td>
+                        <input id="MAXIMUM_HOURS_PER_DAY">
+                    </td>
+                    <td>
+                        The total hours recorded per day cannot exceed this.
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Minimum Minutes per Entry
+                    </td>
+                    <td>
+                        <input id="MINIMUM_MINUTES_PER_ENTRY">
+                    </td>
+                    <td>
+                        Optionally limits overly detailed recording of time.
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Maximum Days in Advance
+                    </td>
+                    <td>
+                        <input id="MAXIMUM_DAYS_IN_ADVANCE">
+                    </td>
+                    <td>
+                        This controls if and how far timesheets can be entered in advance.
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Maximum Days Delay
+                    </td>
+                    <td>
+                        <input id="MAXIMUM_DAYS_DELAY">
+                    </td>
+                    <td>
+                        Potentially blocked after this
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Require Activity
+                    </td>
+                    <td>
+                        <input id="REQUIRE_ACTIVITY">
+                    </td>
+                    <td>
+                        Specific details required. See Activity File
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <h2>
+                            Reminder/Approval Emails</h2>
+                    </td>
+                </tr>
+                <tr style="display: none">
+                    <td>
+                        Minimum Time
+                    </td>
+                    <td>
+                        <input id="MINIMUM_TIME">
+                    </td>
+                    <td>
+                        What is this?
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Reminder Hour
+                    </td>
+                    <td>
+                        <input id="REMINDER_HOUR">
+                    </td>
+                    <td>
+                        0-23 or blank for none (Recommended 12 - noon)
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Approval Hour
+                    </td>
+                    <td>
+                        <input id="APPROVAL_HOUR">
+                    </td>
+                    <td>
+                        0-23 or blank for none (Recommended 15 - 3pm)
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Reminder/Approval Monitors
+                    </td>
+                    <td>
+                        <table>
+                            <tr>
+                                <td>
+                                    <input id="TIMESHEET_MONITORS">
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td>
+                        Receive email alert summaries
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Start Date
+                    </td>
+                    <td>
+                        <input id="START_DATE">
+                    </td>
+                    <td>
+                        From this date timesheets will be required otherwise reminders will be sent
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Testing Email(s)
+                    </td>
+                    <td>
+                        <input id="TESTING_EMAIL">
+                    </td>
+                    <td>
+                        Normally blank unless testing - then all email alerts will be sent here and not
+                        to users
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
