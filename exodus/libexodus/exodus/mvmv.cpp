@@ -752,7 +752,7 @@ bool var::locateat(const std::wstring& target,size_t start_pos,size_t end_pos,co
 
 var var::operator() (int fieldno, int valueno, int subvalueno) const
 {
-	return extract(fieldno,valueno,subvalueno);
+	return a(fieldno,valueno,subvalueno);
 }
 
 /* sadly no way to get a different operator() function called when on the left hand side of assign
@@ -770,7 +770,7 @@ var& var::operator() (int fieldno, int valueno, int subvalueno)
 
 //extract int int int
 //NB declared with value=0 and subvalue=0
-var var::extract(const int argfieldn, const int argvaluen, const int argsubvaluen) const
+var var::a(const int argfieldn, const int argvaluen, const int argsubvaluen) const
 {
 	THISIS(L"var var::extract(const int argfieldn, const int argvaluen, const int argsubvaluen) const")
 	THISISSTRING()
@@ -1049,7 +1049,7 @@ var var::replace(const int fieldno,const int valueno,const int subvalueno,const 
 	THISIS(L"var var::replace(const int fieldno,const int valueno,const int subvalueno,const var& replacement) const")
 	THISISSTRING()
 
-	return var(*this).replacer(fieldno,valueno,subvalueno,replacement);
+	return var(*this).r(fieldno,valueno,subvalueno,replacement);
 }
 
 var var::replace(const int fieldno,const int valueno,const var& replacement) const
@@ -1057,7 +1057,7 @@ var var::replace(const int fieldno,const int valueno,const var& replacement) con
 	THISIS(L"var var::replace(const int fieldno,const int valueno,const var& replacement) const")
 	THISISSTRING()
 
-	return var(*this).replacer(fieldno,valueno,0,replacement);
+	return var(*this).r(fieldno,valueno,0,replacement);
 }
 
 var var::replace(const int fieldno,const var& replacement) const
@@ -1065,26 +1065,26 @@ var var::replace(const int fieldno,const var& replacement) const
 	THISIS(L"var var::replace(const int fieldno,const var& replacement) const")
 	THISISSTRING()
 
-	return var(*this).replacer(fieldno,0,0,replacement);
+	return var(*this).r(fieldno,0,0,replacement);
 }
 
-var& var::replacer(const int fieldno,const int valueno,const var& replacement)
+var& var::r(const int fieldno,const int valueno,const var& replacement)
 {
-	THISIS(L"var var::replacer(const int fieldno,const int valueno,const var& replacement")
+	THISIS(L"var var::r(const int fieldno,const int valueno,const var& replacement")
 	THISISSTRING()
 
-	return replacer(fieldno,valueno,0,replacement);
+	return r(fieldno,valueno,0,replacement);
 }
 
-var& var::replacer(const int fieldno,const var& replacement)
+var& var::r(const int fieldno,const var& replacement)
 {
 	THISIS(L"var var::replacer(const int fieldno,const var& replacement)")
 	THISISSTRING()
 
-	return replacer(fieldno,0,0,replacement);
+	return r(fieldno,0,0,replacement);
 }
 
-var& var::replacer(int fieldno,int valueno,int subvalueno,const var& replacement)
+var& var::r(int fieldno,int valueno,int subvalueno,const var& replacement)
 {
 	THISIS(L"var& var::replacer(int fieldno,int valueno,int subvalueno,const var& replacement)")
 	THISISSTRING()

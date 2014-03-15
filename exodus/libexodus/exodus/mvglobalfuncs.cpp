@@ -57,7 +57,7 @@ DLL_PUBLIC var& transfer(var& fromvar, var& tovar)
 	return fromvar.transfer(tovar);
 }
 
-DLL_PUBLIC var& exchange(var& var1, var& var2)
+DLL_PUBLIC const var& exchange(const var& var1, const var& var2)
 {
 	return var1.exchange(var2);
 }
@@ -262,10 +262,10 @@ void DLL_PUBLIC abort(const var& text)
 	var().abort(text);
 }
 
-DLL_PUBLIC var perform(const var& command)
-{
-	return command.perform();
-}
+//DLL_PUBLIC var perform(const var& command)
+//{
+//	return command.perform();
+//}
 
 DLL_PUBLIC var execute(const var& command)
 {
@@ -954,13 +954,6 @@ DLL_PUBLIC bool readnextrecord(var& record, var& key)
 	return var(L"default").readnextrecord(record, key);
 }
 
-/* done in ExodusProgramBase and MvEnvironment now
-DLL_PUBLIC var calculate(const var& fieldname)
-{
-	return fieldname.calculate();
-}
-*/
-
 DLL_PUBLIC var xlate(const var& filename, const var& key, const var& fieldno, const wchar_t* mode)
 {
 	return key.xlate(filename, fieldno, mode);
@@ -993,7 +986,7 @@ DLL_PUBLIC var replace(const var& instring, const int fieldno, const var& replac
 
 DLL_PUBLIC var extract(const var& instring, const int fieldno, const int valueno, const int subvalueno)
 {
-	return instring.extract(fieldno, valueno, subvalueno);
+	return instring.a(fieldno, valueno, subvalueno);
 }
 
 DLL_PUBLIC var insert(const var& instring, const int fieldno, const int valueno, const int subvalueno, const var& insertion)
@@ -1018,17 +1011,17 @@ DLL_PUBLIC var erase(const var& instring, const int fieldno, const int valueno, 
 
 DLL_PUBLIC var& replacer(var& instring, const int fieldno, const int valueno, const int subvalueno, const var& replacement)
 {
-	return instring.replacer(fieldno, valueno, subvalueno, replacement);
+	return instring.r(fieldno, valueno, subvalueno, replacement);
 }
 
 DLL_PUBLIC var& replacer(var& instring, const int fieldno, const int valueno, const var& replacement)
 {
-	return instring.replacer(fieldno, valueno, 0, replacement);
+	return instring.r(fieldno, valueno, 0, replacement);
 }
 
 DLL_PUBLIC var& replacer(var& instring, const int fieldno, const var& replacement)
 {
-	return instring.replacer(fieldno, 0, 0, replacement);
+	return instring.r(fieldno, 0, 0, replacement);
 }
 
 DLL_PUBLIC var& inserter(var& instring, const int fieldno, const int valueno, const int subvalueno, const var& insertion)

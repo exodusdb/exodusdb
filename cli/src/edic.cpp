@@ -147,7 +147,7 @@ program()
         var filen=0;
         while (filen<nfiles) {
                 filen+=1;
-                var filename=filenames.extract(filen).unquote();
+                var filename=filenames.a(filen).unquote();
 
                 //split out trailing line number after :
                 var startatlineno=field(filename,":",2);

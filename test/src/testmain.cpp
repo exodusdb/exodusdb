@@ -1412,8 +1412,8 @@ while trying to match the argument list '(exodus::var, bool)'
 	var filedate=date();
 	assert(osfile(tempfilename));
 	var info=osfile(tempfilename);
-	assert(info.extract(1) eq filesize);
-	assert(info.extract(2) eq filedate);
+	assert(info.a(1) eq filesize);
+	assert(info.a(2) eq filedate);
 
 	//check copying to a new file
 	var tempfilename2=tempfilename^2;
@@ -1573,7 +1573,7 @@ while trying to match the argument list '(exodus::var, bool)'
 	printl();
 	var nfiles=dcount(filenames2,FM);
 	for (int ii=1;ii<=nfiles;++ii) {
-		var filename=filenames2.extract(ii);
+		var filename=filenames2.a(ii);
 		
 		printl(filename);
 
@@ -1606,9 +1606,9 @@ while trying to match the argument list '(exodus::var, bool)'
 	write("F"^FM^1^FM^"Market Name"^FM^FM^FM^FM^FM^FM^"T"^"20","DICT_MARKETS","NAME");
 
 	var dictrec="";
-	dictrec.replacer(1,"F");
-	dictrec.replacer(2,"3");
-	dictrec.replacer(3,"Brand Code");
+	dictrec.r(1,"F");
+	dictrec.r(2,"3");
+	dictrec.r(3,"Brand Code");
 	if (not dictrec.write("DICT_ADS","BRAND_CODE"))
 		printl("cannot write dict_ads, BRAND_CODE");
 	if (not ads.createindex("BRAND_CODE")) {

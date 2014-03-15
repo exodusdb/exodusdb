@@ -12,7 +12,7 @@ program()
         var nfiles=dcount(filenames,FM);
         for (var filen=1; filen<=nfiles; ++filen) {
 
-                var filename=filenames.extract(filen);
+                var filename=filenames.a(filen);
 
                 if (createfile(filename)) {
                         if (not silent)

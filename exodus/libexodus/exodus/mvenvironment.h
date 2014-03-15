@@ -84,6 +84,7 @@ public:
 
 	var UPPERCASE;
 	var LOWERCASE;
+	var DATEFORMAT;
 
 	var CRTHIGH;
 	var CRTWIDE;
@@ -108,6 +109,9 @@ public:
 	var AW;
 	var ENVIRONSET;
 	var EW;
+	var XW;
+	var VW;
+	var PW;
 	var FILEERROR;
 	var FILEERRORMODE;
 	var FLUSHNEEDED;
@@ -132,16 +136,15 @@ public:
 	//typedef std::map<std::string, boost::any> labelledcommons;
 	LabelledCommon* labelledcommon[3];
 
+	var perform(const var& sentence);
+
 	//given dictid reads dictrec from DICT file and extracts from RECORD/ID or calls library called dict+DICT function dictid
 	//not const so we can mess with the library?
 	var calculate(const var& dictid);
+	var calculate(const var& dictid, const var& dictfile, const var& id, const var& record, const var& mv=0);
 
 	var otherusers(const var& param);
 	var otherdatasetusers(const var& param);
-
-	//NB does not return record yet
-	bool lockrecord(const var& filename, const var& file, const var& keyx, const var& recordx, const int waitsecs=0) const;
-	bool lockrecord(const var& filename, const var& file, const var& keyx) const;
 
 	var capitalise(const var& str0, const var& mode=L"", const var& wordseps=L"") const;
 
@@ -165,7 +168,10 @@ public:
 	bool openfile(const var& filename, var& file) const;
 	bool openfile2(const var& filename, var& file, const var& similarfilename, const var& autocreate=L"") const;
 
-	bool lockrecord(const var& xfilename, const var& xfile, const var& keyx, const var& recordx, const var& waitsecs) const;
+	//NB does not return record yet
+	bool lockrecord(const var& filename, const var& file, const var& keyx, const var& recordx, const int waitsecs=0, const bool allowduplicate=false) const;
+	//bool lockrecord(const var& xfilename, const var& xfile, const var& keyx, const var& recordx, const var& waitsecs, const bool allowduplicate=false) const;
+	bool lockrecord(const var& filename, const var& file, const var& keyx) const;
 	bool unlockrecord(const var& filename, const var& file, const var& key) const;
 
 	var decide(const var& question, const var& options) const;
@@ -207,6 +213,11 @@ private:
 	//TODO cache many not just one
 	mutable var cache_dictid_;
 	mutable var cache_dictrec_;
+
+	//used by perform to call libraries
+	mutable ExodusFunctorBase perform_exodusfunctorbase_;
+	//TODO cache many not just one
+	mutable var cache_perform_libid_;
 
 };
 

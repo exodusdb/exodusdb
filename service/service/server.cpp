@@ -14,8 +14,8 @@ var Server::run()
 
 	renaming = 1;
 	portno = 5700;
-	if (mv.SYSTEM.extract(38))
-		portno += mv.SYSTEM.extract(38) - 1;
+	if (mv.SYSTEM.a(38))
+		portno += mv.SYSTEM.a(38) - 1;
 
 	onalertsecs = renaming ? 0 : 1;
 
@@ -103,7 +103,7 @@ var Server::run()
 	//std::wcout<<L"OK"<<std::endl;
 
 	//std::wcout<<L"MvEnvironment::init: completed "<<std::endl;
-	datasetcode = mv.SYSTEM.extract(17);
+	datasetcode = mv.SYSTEM.a(17);
 	if (datasetcode == L"")
 		datasetcode = L"DEFAULT";
 
@@ -150,7 +150,7 @@ var Server::run()
 	gosub_getbakpars();
 
 	//if @username='neosys.net' then system<33>=1
-	origbatchmode = mv.SYSTEM.extract(33);
+	origbatchmode = mv.SYSTEM.a(33);
 
 	//webpath=field(origsentence,' ',3)
 	webpath = neopath ^ L"data/";
@@ -176,7 +176,7 @@ var Server::run()
 
 	//savescreen(origscrn, origattr);
 
-//	std::wcout << mv.AW.extract(30);
+//	std::wcout << mv.AW.a(30);
 
 	//tracing=(@username='neosys' or trim(@station)='sbcp1800')
 	//tracing=(not(index(origsentence,'auto',1)))
@@ -187,12 +187,12 @@ var Server::run()
 	tracing = 1;
 
 	//ensure unique sorttempfile
-	//if (!(sysvar(L"SET", 192, 102, L"R" ^ var(L"0000" ^ mv.SYSTEM.extract(24)).substr(-5, 5) ^ L".SFX")))
+	//if (!(sysvar(L"SET", 192, 102, L"R" ^ var(L"0000" ^ mv.SYSTEM.a(24)).substr(-5, 5) ^ L".SFX")))
 	//	{}
 
-	nrequests = mv.SYSTEM.extract(35) + 0;
+	nrequests = mv.SYSTEM.a(35) + 0;
 	//if tracing then
-	std::wcout << L"NEOSYS.NET SERVICE "<< mv.SYSTEM.extract(24);
+	std::wcout << L"NEOSYS.NET SERVICE "<< mv.SYSTEM.a(24);
 	std::wcout << L" STARTED "<< var().timedate() << std::endl;
 	std::wcout << std::endl;
 
@@ -237,7 +237,7 @@ var Server::run()
 
 	relistlocks = 1;
 
-	timeoutsecs = mv.SYSTEM.extract(33, 5);
+	timeoutsecs = mv.SYSTEM.a(33, 5);
 	if (!timeoutsecs.isnum())
 		timeoutsecs = L"";
 	//if timeoutsecs='' then timeoutsecs=20*60;*ie 20 minutes
@@ -260,11 +260,11 @@ var Server::run()
 		(logpath ^ datasetcode).osmkdir();
 	}
 	var datex = (var().date()).oconv(L"D2.");
-	logfilename = logpath ^ datasetcode ^ SLASH ^ datex.substr(-2, 2) ^ datex.substr(1, 2) ^ datex.substr(4, 2) ^ var(L"00" ^ mv.SYSTEM.extract(24)).substr(-2, 2);
+	logfilename = logpath ^ datasetcode ^ SLASH ^ datex.substr(-2, 2) ^ datex.substr(1, 2) ^ datex.substr(4, 2) ^ var(L"00" ^ mv.SYSTEM.a(24)).substr(-2, 2);
 	logfilename ^= L".xml";
 
 	if (logfilename.osopen()) {
-		logptr = logfilename.osfile().extract(1);
+		logptr = logfilename.osfile().a(1);
 
 		//osbread x from logfilename at logptr-6 length 6
 		var tt=logptr-6;
@@ -280,7 +280,7 @@ var Server::run()
 			logx ^= L"<?xml-stylesheet type=\'text/xsl\' href=\'.\\loglist.xsl\'?>" ^ (var().chr(13) ^ var().chr(10));
 			//logx:="<?xml-stylesheet type='text/xsl'?>":crlf
 			logx ^= L"<Log";
-			logx ^= L" Process=" ^ mv.SYSTEM.extract(24).quote();
+			logx ^= L" Process=" ^ mv.SYSTEM.a(24).quote();
 			logx ^= L" Dataset=" ^ datasetcode.quote();
 			logx ^= L">";
 			gosub_writelogx2();
@@ -316,9 +316,9 @@ var Server::run()
 	//force into interactive mode for deb ugging
 	//if tracing then
 	if (1) {
-		mv.SYSTEM.replacer(33, 0, 0, 1);
+		mv.SYSTEM.r(33, 0, 0, 1);
 	}else{
-		mv.SYSTEM.replacer(33, 0, 0, L"");
+		mv.SYSTEM.r(33, 0, 0, L"");
 	}
 	//end else
 	// end
@@ -326,8 +326,8 @@ var Server::run()
 	//force into server mode - suppress interactive messages
 	batchmode = origbatchmode;
 	if (batchmode == L"") {
-		batchmode = mv.SYSTEM.extract(33);
-		mv.SYSTEM.replacer(33, 0, 0, L"1");
+		batchmode = mv.SYSTEM.a(33);
+		mv.SYSTEM.r(33, 0, 0, L"1");
 	}
 	// if trim(@station)='sb_compaq' and @username='neosys' then system<33>=''
 
@@ -371,7 +371,7 @@ var Server::serviceloop()
 		//if tracing then
 	std::wcout << mv.at(0);
 	std::wcout << (var().time()).oconv(L"MTS");
-	std::wcout << L" " << mv.SYSTEM.extract(17);
+	std::wcout << L" " << mv.SYSTEM.a(17);
 	std::wcout << L" " << mv.ROLLOUTFILE.field2(L"\\", -1).field(L".", 1, 1);
 	std::wcout << L" " << nrequests;
 	std::wcout << L" " << onalert.oconv(L"MD10P");
@@ -387,22 +387,22 @@ var Server::serviceloop()
 
 	//prevent sleep in esc.to.exit
 	timenow=var().ostime();
-	mv.SYSTEM.replacer(25, 0, 0, timenow);
-	mv.SYSTEM.replacer(26, 0, 0, timenow);
+	mv.SYSTEM.r(25, 0, 0, timenow);
+	mv.SYSTEM.r(26, 0, 0, timenow);
 
 	if (mv.esctoexit())
 		return false;
 
 	//look for db stoppers in program directory
 	for (int filen = 1; filen <= 2; filen++) {
-		var filename = (globalend ^ VM ^ neopath ^ datasetcode ^ L".END").extract(1, filen);
+		var filename = (globalend ^ VM ^ neopath ^ datasetcode ^ L".END").a(1, filen);
 		if (filename.osfile()) {
 
 			if (USER1.osread(filename)) {
 
 				USER1.converter(var().chr(13) ^ var().chr(10), FM);
 
-				if (USER1.extract(1) == L"") {
+				if (USER1.a(1) == L"") {
 stopper:
 						request1 = L"STOPDB";
 					return false;
@@ -459,7 +459,7 @@ stopper:
         linkfilename=linkfilename.oslistf(inpath,L".*\\.1$");
 		if (linkfilename)
 		{
-            linkfilename=linkfilename.extract(1);
+            linkfilename=linkfilename.a(1);
 			var(inpath^linkfilename).osrename(linkfilename1);
 			break;
 		}
@@ -529,8 +529,8 @@ stopper:
 		//check for upgrade to Server
 
 		//switch into interactive mode to check for operator input
-		var s33 = mv.SYSTEM.extract(33);
-		mv.SYSTEM.replacer(33, 0, 0, L"");
+		var s33 = mv.SYSTEM.a(33);
+		mv.SYSTEM.r(33, 0, 0, L"");
 
 		//check for esc key to exit
 		//if esc.to.exit() then return 999999
@@ -546,7 +546,7 @@ stopper:
 			charx = charx.substr(1, 1).ucase();
 
 			//esc
-			if (charx == mv.INTCONST.extract(1)) {
+			if (charx == mv.INTCONST.a(1)) {
 				mv.msg2(L"You have pressed the [Esc]  key to exit|press again to confirm|", L"UB", buffer, L"");
 				while (true) {
 					reply.input(-1);
@@ -554,9 +554,9 @@ stopper:
 				if (reply) break;;
 				}//loop;
 //				mv.msg2(L"", L"DB", buffer, L"");
-				if (reply == mv.INTCONST.extract(1))
+				if (reply == mv.INTCONST.a(1))
 					return false;
-				if (reply == mv.INTCONST.extract(7))
+				if (reply == mv.INTCONST.a(7))
 					charx = reply;
 			}
 
@@ -567,12 +567,12 @@ stopper:
 			}
 
 			//f5
-			if (charx == mv.PRIORITYINT.extract(2))
+			if (charx == mv.PRIORITYINT.a(2))
 				var(L"").execute();
 
 			//f10
-			if (charx == mv.INTCONST.extract(7))
-				var(L"RUNMENU " ^ mv.ENVIRONSET.extract(37)).execute();
+			if (charx == mv.INTCONST.a(7))
+				var(L"RUNMENU " ^ mv.ENVIRONSET.a(37)).execute();
 
 			if (charx != L"") {
 
@@ -585,7 +585,7 @@ stopper:
 			}
 
 			//switch back to not interactive mode
-			mv.SYSTEM.replacer(33, 0, 0, s33);
+			mv.SYSTEM.r(33, 0, 0, s33);
 
 			gosub_getbakpars();
 
@@ -606,7 +606,7 @@ stopper:
 					lastbakattemptdate.writev(mv.DEFINITIONS, L"BACKUP", 1);
 
 					USER4 = L"";
-					var(L"FILEMAN BACKUP " ^ datasetcode ^ L" " ^ bakdisk ^ L" SYSTEM").perform();
+					perform(L"FILEMAN BACKUP " ^ datasetcode ^ L" " ^ bakdisk ^ L" SYSTEM");
 
 					//quit and indicate to calling program that a backup has been done
 					//if tracing else
@@ -630,11 +630,11 @@ stopper:
 var Server::processlink()
 {
 	nrequests += 1;
-	mv.SYSTEM.replacer(35,0,0,nrequests);
+	mv.SYSTEM.r(35,0,0,nrequests);
 
 	//get the earliest time possible for the log
 	requeststarttime=var().ostime();
-	mv.SYSTEM.replacer(25, 0, 0, requeststarttime);
+	mv.SYSTEM.r(25, 0, 0, requeststarttime);
 
 	gosub_gettimeouttime();
 
@@ -643,7 +643,7 @@ var Server::processlink()
 	//find a request to process
 	for (int linkfilen = 1; linkfilen <= nlinkfiles; linkfilen++) {
 
-		linkfilename1 = inpath ^ linkfilenames.extract(linkfilen);
+		linkfilename1 = inpath ^ linkfilenames.a(linkfilen);
 
 		//lock it to prevent other Servers from processing it
 		//unlock locks,'request*':linkfilename1
@@ -704,7 +704,7 @@ readlink1:
 		USER0.swapper(L"%FA", STM);
 		USER0.swapper(L"%F9", SSTM);
 
-		replyfilename = USER0.extract(1).ucase();
+		replyfilename = USER0.a(1).ucase();
 		USER0.eraser(1, 0, 0);
 
 		//lock the replyfilename to prevent other Servers from processing it
@@ -778,30 +778,30 @@ var Server::processrequest()
 
 	//analyse the input file
 	connection = L"";
-	if (USER0.extract(1) == L"VERSION 2") {
+	if (USER0.a(1) == L"VERSION 2") {
 		//remote_addr remote_host https
 		connection = USER0.field(FM, 1, 4);
 		USER0 = USER0.field(FM, 5, 99999);
 	}
 	connection.converter(FM, VM);
-	mv.SYSTEM.replacer(40, 0, 0, connection);
+	mv.SYSTEM.r(40, 0, 0, connection);
 
-	dataset = USER0.extract(1).ucase();
-	username = USER0.extract(2).ucase();
-	password = USER0.extract(3).ucase();
+	dataset = USER0.a(1).ucase();
+	username = USER0.a(2).ucase();
+	password = USER0.a(3).ucase();
 	firstrequestfieldn = 4;
-	request1 = USER0.extract(firstrequestfieldn);
+	request1 = USER0.a(firstrequestfieldn);
 
 	if (request1 == L"CACHE") {
 		USER0.eraser(firstrequestfieldn, 0, 0);
-		request1 = USER0.extract(firstrequestfieldn);
+		request1 = USER0.a(firstrequestfieldn);
 	}
 	request1 = request1.ucase();
 	//convert @lower.case to @upper.case in request
-	request2 = USER0.extract(5);
-	request3 = USER0.extract(6);
-	request4 = USER0.extract(7);
-	request5 = USER0.extract(8);
+	request2 = USER0.a(5);
+	request3 = USER0.a(6);
+	request4 = USER0.a(7);
+	request5 = USER0.a(8);
 
     //remove dataset and password
     USER0 = USER0.field(FM, firstrequestfieldn, 99999);
@@ -817,9 +817,9 @@ var Server::processrequest()
 		tt ^= L" User=" ^ mv.xmlquote(username);
 		tt ^= L" File=" ^ mv.xmlquote(replyfilename.field2(L"\\", -1));
 		//remote_addr remote_host https
-		tt ^= L" IP_NO=" ^ mv.xmlquote(connection.extract(1, 2));
-		tt ^= L" Host=" ^ mv.xmlquote(connection.extract(1, 3));
-		tt ^= L" HTTPS=" ^ mv.xmlquote(connection.extract(1, 4));
+		tt ^= L" IP_NO=" ^ mv.xmlquote(connection.a(1, 2));
+		tt ^= L" Host=" ^ mv.xmlquote(connection.a(1, 3));
+		tt ^= L" HTTPS=" ^ mv.xmlquote(connection.a(1, 4));
 		tt ^= L">" ^ (var().chr(13) ^ var().chr(10));
 
 		tt ^= L"<Request ";
@@ -827,17 +827,17 @@ var Server::processrequest()
 		logx = USER0;
 		gosub_convlogx();
 		logx.converter(L"^", FM);
-		logx.replacer(1, 0, 0, request1);
-		if (logx.extract(1)!=L"")
-			tt ^= L" Req1=" ^ logx.extract(1).quote();
-		if (logx.extract(5)!=L"")
-			tt ^= L" Req2=" ^ logx.extract(5).quote();
-		if (logx.extract(6)!=L"")
-			tt ^= L" Req3=" ^ logx.extract(6).quote();
-		if (logx.extract(7)!=L"")
-			tt ^= L" Req4=" ^ logx.extract(7).quote();
-		if (logx.extract(8)!=L"")
-			tt ^= L" Req5=" ^ logx.extract(8).quote();
+		logx.r(1, 0, 0, request1);
+		if (logx.a(1)!=L"")
+			tt ^= L" Req1=" ^ logx.a(1).quote();
+		if (logx.a(5)!=L"")
+			tt ^= L" Req2=" ^ logx.a(5).quote();
+		if (logx.a(6)!=L"")
+			tt ^= L" Req3=" ^ logx.a(6).quote();
+		if (logx.a(7)!=L"")
+			tt ^= L" Req4=" ^ logx.a(7).quote();
+		if (logx.a(8)!=L"")
+			tt ^= L" Req5=" ^ logx.a(8).quote();
 		var req6up = logx.field(FM, 9, 9999);
 		req6up.converter(FM, L"^");
 		if (req6up.length())
@@ -866,9 +866,9 @@ var Server::processrequest()
 //		tt.replace(firstrequestfieldn - 3, 0, 0, L"");
 		tt.convert(FM, L" ");
 
-		var t2 = connection.extract(1, 2);
-		if (connection.extract(1, 3) != t2)
-			t2 ^= L" " ^ connection.extract(1, 3);
+		var t2 = connection.a(1, 2);
+		if (connection.a(1, 3) != t2)
+			t2 ^= L" " ^ connection.a(1, 3);
 
 //		t2=t2^" "^tt;
 
@@ -899,9 +899,9 @@ var Server::processrequest()
 
 	//save the response file name
 	//so that if Server fails then net the calling program can still respond
-	mv.PRIORITYINT.replacer(100, 0, 0, linkfilename3);
+	mv.PRIORITYINT.r(100, 0, 0, linkfilename3);
 
-	var linkfilename2size = linkfilename2.osfile().extract(1);
+	var linkfilename2size = linkfilename2.osfile().a(1);
 	if (linkfilename2size > maxstringsize) {
 
 		if (linkfilename2.osopen()) {
@@ -1068,7 +1068,7 @@ cannotopenlinkfilename2:
 	//and assume that identity if ok
 	gosub_validate();
 
-	mv.SYSTEM.replacer(2, 0, 0, linkfilename2);
+	mv.SYSTEM.r(2, 0, 0, linkfilename2);
 
 	//get the current program stack
 //	var stack = programstack(nostack);
@@ -1139,12 +1139,12 @@ void Server::gosub_login()
 		var userrec;
 		if (userrec.read(users, username)) {
 			//save prior login
-			userrec.replacer(15, 0, 0, userrec.extract(13));
-			userrec.replacer(16, 0, 0, userrec.extract(14));
+			userrec.r(15, 0, 0, userrec.a(13));
+			userrec.r(16, 0, 0, userrec.a(14));
 			//save current login
 			var datetime = var().date() ^ L"." ^ (var().time()).oconv(L"R(0)#5");
-			userrec.replacer(13, 0, 0, datetime);
-			userrec.replacer(14, 0, 0, mv.SYSTEM.extract(40, 2));
+			userrec.r(13, 0, 0, datetime);
+			userrec.r(14, 0, 0, mv.SYSTEM.a(40, 2));
 			userrec.write(users, username);
 		}
 	}
@@ -1165,10 +1165,10 @@ void Server::gosub_validate()
 
     if (username==L"NEOSYS") goto userok;
 	else if (mv.SECURITY.locate(username, usern, 1)) {
-		if (encrypt0 == (mv.SECURITY.extract(4, usern, 2)).field(TM, 7, 1)) {
+		if (encrypt0 == (mv.SECURITY.a(4, usern, 2)).field(TM, 7, 1)) {
 
 			//determine allowed connections
-			connections = mv.SECURITY.extract(6, usern);
+			connections = mv.SECURITY.a(6, usern);
 
 			//skip old integer sleep times
 			if (connections.match(L"1N0N"))
@@ -1177,21 +1177,21 @@ void Server::gosub_validate()
 			if (!connections) {
 
 				//look for ip numbers in following users of the same group
-				int nn = (mv.SECURITY.extract(6)).count(VM) + 1;
+				int nn = (mv.SECURITY.a(6)).count(VM) + 1;
 				for (int ii = usern + 1; ii <= nn; ii++) {
-					connections = mv.SECURITY.extract(6, ii);
+					connections = mv.SECURITY.a(6, ii);
 
 					//skip old integer sleep times
 					if (connections.match(L"1N0N"))
 						connections = L"";
 
 				//BREAK;
-				if (!(!connections && mv.SECURITY.extract(1, ii + 1) != L"---")) break;;
+				if (!(!connections && mv.SECURITY.a(1, ii + 1) != L"---")) break;;
 				};//ii;
 
 				//otherwise use system default
 				if (!connections)
-					connections = mv.SYSTEM.extract(39);
+					connections = mv.SYSTEM.a(39);
 
 				//otherwise use traditional private ip ranges
 				//cannot implement this until check existing clients installations
@@ -1206,7 +1206,7 @@ void Server::gosub_validate()
 				int nn = connections.dcount(SVM);
 				for (int ii = 1; ii <= nn; ii++) {
 
-					var connectionx = connections.extract(1, 1, ii).quote();
+					var connectionx = connections.a(1, 1, ii).quote();
 					connectionx.swapper(L"*", L"\"0N\"");
 
 					//invert the bits that are "quoted" to suit the match syntax '"999"0n'
@@ -1218,12 +1218,12 @@ void Server::gosub_validate()
 					if (ndots < 3)
 						connectionx ^= var(L"\".\"0N").str(3 - ndots);
 
-					connections.replacer(1, 1, ii, connectionx);
+					connections.r(1, 1, ii, connectionx);
 				};//ii;
 
 				//buffer it (space prevents reassement even if none)
 				//trailing space also means wildcards have been converted
-				mv.SECURITY.replacer(6, usern, 0, connections ^ L" ");
+				mv.SECURITY.r(6, usern, 0, connections ^ L" ");
 			}
 
 			//check if allowed to connect from xxx
@@ -1232,21 +1232,21 @@ void Server::gosub_validate()
 				int nn = connections.dcount(SVM);
 				int ii;
 				for (ii = 1; ii <= nn; ii++) {
-					var connectionx = (connections.extract(1, 1, ii)).trimb();
+					var connectionx = (connections.a(1, 1, ii)).trimb();
 				//BREAK;
-				if ((connection.extract(1, 2)).match(connectionx)) break;;
+				if ((connection.a(1, 2)).match(connectionx)) break;;
 				};//ii;
 				if (ii > nn) {
-					invaliduser = username ^ L" is not authorised to login" ^ FM ^ L"on this computer (IP Number: " ^ connection.extract(1, 2) ^ L")";
+					invaliduser = username ^ L" is not authorised to login" ^ FM ^ L"on this computer (IP Number: " ^ connection.a(1, 2) ^ L")";
 						return;
 					}
 				}
 
 userok:
 				USERNAME=username;
-				tt = connection.extract(1, 2);
-				if (connection.extract(1, 3) != tt)
-					tt ^= L"_" ^ connection.extract(1, 3);
+				tt = connection.a(1, 2);
+				if (connection.a(1, 3) != tt)
+					tt ^= L"_" ^ connection.a(1, 3);
 			tt.converter(L". ", L"_");
 			mv.STATION=tt;
 			invaliduser = L"";
@@ -1256,7 +1256,7 @@ userok:
 		//check revelation system file
 		if (systemrec.read(mv.DEFINITIONS, L"SYSUSER*"^username)) {
 			//if systemrec<7>=encrypt0 and (speed<1.5 or mode='sleep') then ok=1
-			if (systemrec.extract(7) == encrypt0)
+			if (systemrec.a(7) == encrypt0)
 				goto userok;
 		}
 
@@ -1437,12 +1437,12 @@ void Server::gosub_exit()
 
 	//get into interactive mode
 	//system<33>=origbatchmode
-	mv.SYSTEM.replacer(33, 0, 0, L"");
+	mv.SYSTEM.r(33, 0, 0, L"");
 	mv.PRIVILEGE=origprivilege;
 
 	if (request1 == L"RESTART") {
 		//chain 'Server'
-		mv.SYSTEM.replacer(35, 0, 0, nrequests);
+		mv.SYSTEM.r(35, 0, 0, nrequests);
 		//msg='restart'
 		//stop
 
@@ -1685,7 +1685,7 @@ keyx=L"";
 		}else{
 			//if @file.error<1>='100' then
 			//no file error for jbase
-			if (!mv.FILEERROR || mv.FILEERROR.extract(1) == L"100") {
+			if (!mv.FILEERROR || mv.FILEERROR.a(1) == L"100") {
 
 				//prevent create
 				if (withlock) {
@@ -1815,7 +1815,7 @@ keyx=L"";
 
 		//prevent reading passwords postread and postwrite
 		if (filename == L"DEFINITIONS" && keyx == L"SECURITY")
-			USER1.replacer(4, 0, 0, L"");
+			USER1.r(4, 0, 0, L"");
 
 		USER1.cropper();
 
@@ -1896,8 +1896,8 @@ keyx=L"";
 		lockkey = filename ^ L"*" ^ ID;
 		if (!lockx.read(locks, lockkey))
 			lockx = FM ^ FM ^ FM ^ FM ^ L"NO LOCK RECORD";
-		if (sessionid != lockx.extract(5)) {
-			USER3 = L"Somebody has updated this record." _VM_ L"Your update cannot be applied." L"" _VM_ L"The session id does not agree " ^ lockx.extract(5).quote();
+		if (sessionid != lockx.a(5)) {
+			USER3 = L"Somebody has updated this record." _VM_ L"Your update cannot be applied." L"" _VM_ L"The session id does not agree " ^ lockx.a(5).quote();
 			gosub_formatresponse();
 			return;
 		}
@@ -1929,9 +1929,9 @@ keyx=L"";
 				var dictrec;
 				//if (dictrec.reado(allcols, filename ^ L"*DATE_TIME")) {
 				if (dictrec.read(allcols, filename ^ L"*DATE_TIME")) {
-					var datetimefn = dictrec.extract(2);
-					var olddatetime = win.orec.extract(datetimefn);
-					var newdatetime = RECORD.extract(datetimefn);
+					var datetimefn = dictrec.a(2);
+					var olddatetime = win.orec.a(datetimefn);
+					var newdatetime = RECORD.a(datetimefn);
 					if (olddatetime && olddatetime != newdatetime) {
 						USER3 = L"Somebody else has updated this record." _VM_ L"Your update cannot be applied." L"" _VM_ L"The time stamp does not agree";
 						gosub_formatresponse();
@@ -2039,7 +2039,7 @@ emptyrecorderror:
 
 			//prevent reading passwords postread and postwrite
 			if (filename == L"DEFINITIONS" && keyx == L"SECURITY")
-				USER1.replacer(4, 0, 0, L"");
+				USER1.r(4, 0, 0, L"");
 
 		}else if (request1 == L"DELETE") {
 
@@ -2166,17 +2166,17 @@ emptyrecorderror:
 		//t=printfilename[-1,'b.']
 		tt = printfilename.field2(L".", -1);
 		printfilename.splicer(-tt.length(), tt.length(), L"htm");
-		mv.SYSTEM.replacer(2, 0, 0, printfilename);
+		mv.SYSTEM.r(2, 0, 0, printfilename);
 		if (tracing)
 			std::wcout << L"Waiting for output ... ";
 
 		//switch to server mode and html output
-		var s6 = mv.SYSTEM.extract(6);
-		var s7 = mv.SYSTEM.extract(7);
-		var s11 = mv.SYSTEM.extract(11);
-		mv.SYSTEM.replacer(6, 0, 0, 1);
-		mv.SYSTEM.replacer(7, 0, 0, 1);
-		mv.SYSTEM.replacer(11, 0, 0, 1);
+		var s6 = mv.SYSTEM.a(6);
+		var s7 = mv.SYSTEM.a(7);
+		var s11 = mv.SYSTEM.a(11);
+		mv.SYSTEM.r(6, 0, 0, 1);
+		mv.SYSTEM.r(7, 0, 0, 1);
+		mv.SYSTEM.r(11, 0, 0, 1);
 
 		//execute the program
 		//print timedate2():' starting ':indata[1,60]
@@ -2192,9 +2192,9 @@ emptyrecorderror:
 
 		//pass the output file in linkfilename2
 		//not good method, pass in system?
-		if (var(L"LIST" _VM_ L"SELECTBATCHES").locate(USER0.extract(1),xx,1))
+		if (var(L"LIST" _VM_ L"SELECTBATCHES").locate(USER0.a(1),xx,1))
 			USER1 = linkfilename2;
-		if ((USER0.extract(1)).substr(1, 4) == L"VAL.")
+		if ((USER0.a(1)).substr(1, 4) == L"VAL.")
 			USER1 = linkfilename2;
 
 		//TODO
@@ -2218,8 +2218,8 @@ emptyrecorderror:
 			//oswriteresponse on 'r186.$3'
 			//oswritemsg on 'r186.$4'
 			halt = 1;
-			USER4.replacer(-1, 0, 0, L"Corrupt temporary file. Restart Needed.");
-			USER4.replacer(-1, 0, 0, L"NEOSYS.NET TERMINATED");
+			USER4.r(-1, 0, 0, L"Corrupt temporary file. Restart Needed.");
+			USER4.r(-1, 0, 0, L"NEOSYS.NET TERMINATED");
 		}
 
 		//send errors to neosys
@@ -2245,12 +2245,12 @@ emptyrecorderror:
 		}
 
 		//switch off server mode
-		mv.SYSTEM.replacer(6, 0, 0, s6);
-		mv.SYSTEM.replacer(7, 0, 0, s7);
-		mv.SYSTEM.replacer(11, 0, 0, s11);
+		mv.SYSTEM.r(6, 0, 0, s6);
+		mv.SYSTEM.r(7, 0, 0, s7);
+		mv.SYSTEM.r(11, 0, 0, s11);
 
 		//get the printfilename in case the print program changed it
-		printfilename = mv.SYSTEM.extract(2);
+		printfilename = mv.SYSTEM.a(2);
 		if (tracing) {
 			//print ' got it'
 			std::wcout << mv.at(0)<< mv.at(-4);
@@ -2272,13 +2272,13 @@ emptyrecorderror:
 			timex = var().time();
 			while (true) {
 			//BREAK;
-			if (!(mv.otherusers(L"").extract(1) && (var().time() - timex).abs() < 30)) break;;
+			if (!(mv.otherusers(L"").a(1) && (var().time() - timex).abs() < 30)) break;;
 				var().ossleep(1000);
 			}//loop;
 
 			USER1 = L"";
 
-			if (mv.otherusers(L"").extract(1)) {
+			if (mv.otherusers(L"").a(1)) {
 				USER3 = L"Error: Could not terminate " ^ mv.otherusers(L"") ^ L" users|" ^ mv.otherdatasetusers(L"*");
 				globalend.osdelete();
 			}else{
@@ -2305,12 +2305,12 @@ emptyrecorderror:
 
 		//backup will respond to user itself if it starts
 		USER4 = L"";
-		var(L"FILEMAN BACKUP " ^ datasetcode ^ L" " ^ bakdisk).perform();
+		perform(L"FILEMAN BACKUP " ^ datasetcode ^ L" " ^ bakdisk);
 
 		//if backup has already responded to user
 		//then quit and indicate to calling program that a backup has been done
 		//user will be emailed
-		if (mv.SYSTEM.extract(2) == L"") {
+		if (mv.SYSTEM.a(2) == L"") {
 			mv.PSEUDO = L"BACKUP2";
 			if (USER4)
 				var().stop();
@@ -2345,9 +2345,9 @@ emptyrecorderror:
 void Server::gosub_geterrorresponse()
 {
 	var fileerror = mv.FILEERROR;
-	USER3 = L"Error: FS" ^ fileerror.extract(1, 1).xlate(L"SYS.MESSAGES", 11, L"X");
-	USER3.swapper(L"%1%", mv.handlefilename(fileerror.extract(2, 1)));
-	USER3.swapper(L"%2%", fileerror.extract(2, 2));
+	USER3 = L"Error: FS" ^ fileerror.a(1, 1).xlate(L"SYS.MESSAGES", 11, L"X");
+	USER3.swapper(L"%1%", mv.handlefilename(fileerror.a(2, 1)));
+	USER3.swapper(L"%2%", fileerror.a(2, 2));
 	gosub_formatresponse();
 	return;
 
@@ -2541,10 +2541,10 @@ void Server::gosub_lock()
 	lockkey = filename ^ L"*" ^ keyx;
 	if (lockrec.read(locks, lockkey)) {
 
-		if (lockrec.extract(5) != newsessionid) {
+		if (lockrec.a(5) != newsessionid) {
 
 			//fail if other lock has not timed out
-			if (lockrec.extract(1) > ostimenow) {
+			if (lockrec.a(1) > ostimenow) {
 				USER3 = L"NOT OK";
 				goto lockexit;
 			}
@@ -2576,11 +2576,11 @@ void Server::gosub_lock()
 
 	//write the lock in the locks file
 	lockrec = L"";
-	lockrec.replacer(1, 0, 0, lockduration + ostimenow);
-	lockrec.replacer(2, 0, 0, ostimenow);
-	lockrec.replacer(3, 0, 0, connection ? connection.extract(1, 2): mv.STATION);
-	lockrec.replacer(4, 0, 0, USERNAME);
-	lockrec.replacer(5, 0, 0, newsessionid);
+	lockrec.r(1, 0, 0, lockduration + ostimenow);
+	lockrec.r(2, 0, 0, ostimenow);
+	lockrec.r(3, 0, 0, connection ? connection.a(1, 2): mv.STATION);
+	lockrec.r(4, 0, 0, USERNAME);
+	lockrec.r(5, 0, 0, newsessionid);
 	mv.FILEERRORMODE = 1;
 	mv.FILEERROR = L"";
 	USER3 = L"OK";
@@ -2639,7 +2639,7 @@ void Server::gosub_unlock()
 	if (!lockrec.read(locks, lockkey))
 		lockrec = L"";
 	if (!lockrec) {
-		if (mv.FILEERROR.extract(1) == 100) {
+		if (mv.FILEERROR.a(1) == 100) {
 			//lock is missing but ignore it
 			//because we are unlocking anyway
 			USER3 = L"OK";
@@ -2650,7 +2650,7 @@ void Server::gosub_unlock()
 	}
 
 	//check that the current lock agrees with the session id provided
-	if (!(sessionid == lockrec.extract(5))) {
+	if (!(sessionid == lockrec.a(5))) {
 
 		//cannot unlock because the lock belongs to somebody else
 		USER3 = L"Error: Cannot unlock - ";
@@ -2738,11 +2738,11 @@ void Server::gosub_getbakpars()
 	var tt;
 	if (tt.osread("BACKUP.CFG")) {
 		for (int ii = 1; ii <= 99; ii++) {
-			if (tt.extract(ii))
-				bakpars.replacer(ii, 0, 0, tt.extract(ii));
+			if (tt.a(ii))
+				bakpars.r(ii, 0, 0, tt.a(ii));
 		};//ii;
 	}
-	var lastbakattemptdate = bakpars.extract(1);
+	var lastbakattemptdate = bakpars.a(1);
 	//if bakpars<2> then
 	// bakreq=(trim(@station)=bakpars<2>)
 	//end else
@@ -2751,34 +2751,34 @@ void Server::gosub_getbakpars()
 	var testdata = 0;
 	if (datasetcode.substr(-4, 4) == L"TEST")
 		testdata = 1;
-	if (mv.SYSTEM.extract(23).ucase().index(L"TRAINING", 1))
+	if (mv.SYSTEM.a(23).ucase().index(L"TRAINING", 1))
 		testdata = 1;
-	if (mv.SYSTEM.extract(23).ucase().index(L"TESTING", 1))
+	if (mv.SYSTEM.a(23).ucase().index(L"TESTING", 1))
 		testdata = 1;
 	if (bakpars.locate(datasetcode, xx, 8))
 		testdata = 1;
 	//testdata will not backup but will terminate if bakreq
 	//bakreq=not(testdata)
 	var bakreq = 1;
-	if (bakpars.extract(9))
+	if (bakpars.a(9))
 		bakreq = 0;
 	//address to email backup is bakpars<10>
 
-	var minbaktime = bakpars.extract(3);
+	var minbaktime = bakpars.a(3);
 	if (minbaktime == L"")
 		minbaktime = var(L"2:00").iconv(L"MT");
 	//if @username='neosys' then minbaktime=iconv('00:00','mt')
-	var maxbaktime = bakpars.extract(4);
+	var maxbaktime = bakpars.a(4);
 	//if maxbaktime='' then maxbaktime=iconv('2:05','mt')
 	if (maxbaktime == L"")
 		maxbaktime = minbaktime + 60 * 10;
 	//if @username='neosys' then maxbaktime=iconv('23:59','mt')
 
-	var bakdows = bakpars.extract(5);
+	var bakdows = bakpars.a(5);
 	if (bakdows == L"")
 		bakdows = L"1234567";
 
-	var bakdisk = bakpars.extract(7);
+	var bakdisk = bakpars.a(7);
 
 	return;
 }
@@ -2879,7 +2879,7 @@ void Server::gosub_respond()
 	//responsefilename[-len(t),len(t)]='3'
 
 	//linkfilename3
-	responsefilename = mv.PRIORITYINT.extract(100);
+	responsefilename = mv.PRIORITYINT.a(100);
 	if (!responsefilename)
 		return;
 
@@ -2894,7 +2894,7 @@ void Server::gosub_respond()
 	var().ossleep(2000);
 
 	//indicate that response has been made
-	mv.SYSTEM.replacer(2, 0, 0, L"");
+	mv.SYSTEM.r(2, 0, 0, L"");
 
 	return;
 
@@ -3019,10 +3019,10 @@ return;
 //TODO:
 //USER3="GeneralProxy: SELECT2 not implemented yet";
 //return;
-	win.select2(filename0, mv.SYSTEM.extract(2), sortselect, dictids, options, USER1, USER3, L"", L"", L"");
+	win.select2(filename0, mv.SYSTEM.a(2), sortselect, dictids, options, USER1, USER3, L"", L"", L"");
 
 	if (USER4) {
-		USER3 = USER4.extract(1).trim(FM);
+		USER3 = USER4.a(1).trim(FM);
 	}else{
 		USER1 = L"%DIRECTOUTPUT%";
 		//USER3='ok'
@@ -3061,7 +3061,7 @@ void Server::gosub_deleteoldfiles(const var& inpath, const var& pattern)
 				//and delete it if older than the cut off time
 				//and has a file extension (ie leave params and params2)
 				var fileattributes = filename.osfile();
-				var filetime = fileattributes.extract(2) * 24 * 60 * 60 + fileattributes.extract(3);
+				var filetime = fileattributes.a(2) * 24 * 60 * 60 + fileattributes.a(3);
 				if ((filename.substr(-4, 4)).index(L".", 1) && filetime <= deletetime) {
 					filename.osdelete();
 				}else{

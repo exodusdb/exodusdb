@@ -89,7 +89,6 @@ DLL_PUBLIC void osshellread(var& readstr, const var& command);
 DLL_PUBLIC void osshellwrite(const var& writestr, const var& command);
 DLL_PUBLIC void stop(const var& text DEFAULTNULL);
 DLL_PUBLIC void abort(const var& text);//dont confuse with abort() which is standard c/c++
-DLL_PUBLIC var perform(const var& command);
 DLL_PUBLIC var execute(const var& command);
 DLL_PUBLIC var chain(const var& command);
 DLL_PUBLIC var logoff();
@@ -236,9 +235,7 @@ DLL_PUBLIC bool readnext(var& key);
 DLL_PUBLIC bool readnext(var& key, var& valueno);
 DLL_PUBLIC bool selectrecord(const var& sortselectclause DEFAULTNULL);
 DLL_PUBLIC bool readnextrecord(var& record, var& key);
-/* done in ExodusProgramBase and MvEnvironment now
-DLL_PUBLIC var calculate(const var& fieldname);
-*/
+
 DLL_PUBLIC var xlate(const var& filename, const var& key, const var& fieldno, const wchar_t* mode);
 DLL_PUBLIC var xlate(const var& filename, const var& key, const var& fieldno, const var& mode);
 DLL_PUBLIC var remove(const var& fromstr, var& startx, var& delimiterno);

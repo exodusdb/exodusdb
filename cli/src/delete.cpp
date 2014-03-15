@@ -3,7 +3,7 @@
 program()
 {
 
-        var filename=COMMAND.extract(2);
+        var filename=COMMAND.a(2);
 
         var itemids=erase(COMMAND,1,0,0);
         eraser(itemids,1,0,0);

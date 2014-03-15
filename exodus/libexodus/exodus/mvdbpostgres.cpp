@@ -596,7 +596,7 @@ bool var::readv(const var& filehandle, const var& key, const int fieldno)
 	if (!read(filehandle,key))
 		return false;
 
-	var_mvstr=extract(fieldno).var_mvstr;
+	var_mvstr=a(fieldno).var_mvstr;
 	return true;
 }
 
@@ -668,7 +668,7 @@ bool var::read(const var& filehandle,const var& key)
 
 }
 
-bool var::lock(const var& key) const
+var var::lock(const var& key) const
 {
 	//on postgres, repeated locks for the same thing (from the same connection) succeed and stack up
 	//they need the same number of unlocks (from the same connection) before other connections
@@ -704,15 +704,7 @@ bool var::lock(const var& key) const
 		//since postgres stacks up multiple locks
 		//whereas multivalue databases dont
 		if (((*locktable).find(hash64))!=(*locktable).end())
-			//TODO indicate in some global variable "OWN LOCK"
-			return false;
-		//register that it is locked
-#		ifdef USE_MAP_FOR_UNORDERED
-			std::pair<const uint64_t,int> lock(hash64,0);
-			(*locktable).insert(lock);
-#		else
-			(*locktable).insert(hash64);
-#		endif
+			return L"";
 	}
 
 	paramValues[0]=(char*)&hash64;
@@ -751,6 +743,18 @@ bool var::lock(const var& key) const
 	bool lockedok= *PQgetvalue(result, 0, 0)!=0;
 
 	PQclear(result);
+
+	//add it to the lock table
+	if (lockedok && locktable)
+	{
+		//register that it is locked
+#		ifdef USE_MAP_FOR_UNORDERED
+			std::pair<const uint64_t,int> lock(hash64,0);
+			(*locktable).insert(lock);
+#		else
+			(*locktable).insert(hash64);
+#		endif
+	}
 
 	return lockedok;
 }
@@ -916,7 +920,7 @@ bool var::writev(const var& filehandle,const var& key,const int fieldno) const
 		record=L"";
 
 	//replace the field
-	record.replacer(fieldno,0,0,var_mvstr);
+	record.r(fieldno,var_mvstr);
 
 	//write it back
 	record.write(filehandle,key);
@@ -1407,7 +1411,7 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 		}
 	}
 	//given a file and dictionary id
-    //returns a postgres sql expression like (textextract(filename.data,99,0,0))
+    //returns a postgres sql expression like (texta(filename.data,99,0,0))
     //using one of the neosys backend functions installed in postgres like textextract, dateextract etc.
     var dictrec;
     if (!dictrec.read(actualdictfile,fieldname))
@@ -1427,11 +1431,11 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 		}
 	}
     var sqlexpression;
-	var dicttype=dictrec.extract(1);
+	var dicttype=dictrec.a(1);
     if (dicttype==L"F")
     {
-        var conversion=dictrec.extract(7);
-        var fieldno=dictrec.extract(2);
+        var conversion=dictrec.a(7);
+        var fieldno=dictrec.a(2);
 		var params;
 		if (fieldno)
 			params=fileexpression(mainfilename, filename, L"data") ^ L"," ^ fieldno ^ L", 0, 0)";
@@ -1451,16 +1455,16 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 		else if (forsort_or_select_or_index)
 			sqlexpression=L"exodus_extract_sort(" ^  params;
 
-		else if (conversion==L"[NUMBER,0]" || dictrec.extract(11)==L"0N" || dictrec.extract(11).substr(1,3)==L"0N_")
+		else if (conversion==L"[NUMBER,0]" || dictrec.a(11)==L"0N" || dictrec.a(11).substr(1,3)==L"0N_")
 			sqlexpression=L"cast( exodus_extract_text(" ^ params ^ L" as integer)";
-		else if (conversion.substr(1,2)==L"MD" || conversion.substr(1,7)==L"[NUMBER" || dictrec.extract(12)==L"FLOAT" || dictrec.extract(11).index(L"0N"))
+		else if (conversion.substr(1,2)==L"MD" || conversion.substr(1,7)==L"[NUMBER" || dictrec.a(12)==L"FLOAT" || dictrec.a(11).index(L"0N"))
 				sqlexpression=L"cast( exodus_extract_text(" ^ params ^ L" as float)";
 		else
 			sqlexpression=L"exodus_extract_text(" ^ params;
 	}
 	else if (dicttype==L"S")
 	{
-		var functionx=dictrec.extract(8).trim().ucase();
+		var functionx=dictrec.a(8).trim().ucase();
 		if (functionx.substr(1,11)==L"@ANS=XLATE(")
 		{
 			functionx.splicer(1,11,L"");
@@ -1507,9 +1511,9 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 				}
 				else
 				{
-					//throw  MVDBException(L"getdictexpression() " ^ filename.quote() ^ L" " ^ fieldname.quote() ^ L" - INVALID DICTIONARY EXPRESSION - " ^ dictrec.extract(8).quote());
+					//throw  MVDBException(L"getdictexpression() " ^ filename.quote() ^ L" " ^ fieldname.quote() ^ L" - INVALID DICTIONARY EXPRESSION - " ^ dictrec.a(8).quote());
 #if TRACING >= 1
-					exodus::errputl(L"ERROR: mvdbpostgres getdictexpression() " ^ filename.quote() ^ L" " ^ fieldname.quote() ^ L" - INVALID DICTIONARY EXPRESSION - " ^ dictrec.extract(8).quote());
+					exodus::errputl(L"ERROR: mvdbpostgres getdictexpression() " ^ filename.quote() ^ L" " ^ fieldname.quote() ^ L" - INVALID DICTIONARY EXPRESSION - " ^ dictrec.a(8).quote());
 #endif
 					return L"";
 				}
@@ -1518,7 +1522,7 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 				var join=L"LEFT JOIN " ^ xlatetofilename ^ L" ON " ^ fromdictexpression ^ L" = " ^ xlatetofilename ^ L".key";
 				var xx;
 				if (!joins.locate(join,xx,1))
-					joins.replacer(1,-1,0,join);
+					joins.r(1,-1,join);
 
 			}
 		}
@@ -2384,7 +2388,7 @@ int main() {
 	var viewprefix = "VIEW_";
 	//syntax is DICT2SQL filename,...�volumename
 
-	var filename = filenames.extract(filen);
+	var filename = filenames.a(filen);
 	if (filename == "")
 		goto exit;
 
@@ -2464,7 +2468,7 @@ nextdict:
 
 		dictitem2sql(dict,sql);
 
-		if (dict.extract(1) not_eq "F")
+		if (dict.a(1) not_eq "F")
 			continue;
 
 		//skip duplicates
@@ -2474,7 +2478,7 @@ nextdict:
 
 		//sql^=crlf;
 
-		var ismv = dict.extract(4)[1] == "M";
+		var ismv = dict.a(4)[1] == "M";
 		if (ismv) {
 			anyvar = 1;
 			extractvarno = "lineno";
@@ -2482,25 +2486,25 @@ nextdict:
 			extractvarno = "0";
 		}
 
-		if (dict.extract(2) == "0") {
-			if (not dict.extract(5)) {
+		if (dict.a(2) == "0") {
+			if (not dict.a(5)) {
 				expression = "key";
 			}else{
 				//needs pgneosys function not written as yet
 				//sql:='text_field(key,"*",':dict<5>:')'
 				//postgres only probably
-				expression = "split_part(key,\'*\'," ^ dict.extract(5) ^ ")";
+				expression = "split_part(key,\'*\'," ^ dict.a(5) ^ ")";
 			}
 		}else{
 			//if dict<7> then
 			//needs pgneosys functions installed in server
-			expression = "exodus_extract_text(data," ^ dict.extract(2) ^ "," ^ extractvarno ^ ",0)";
+			expression = "exodus_extract_text(data," ^ dict.a(2) ^ "," ^ extractvarno ^ ",0)";
 			//end else
-			// sql:='bytea_extract(data,':dict<2>:',':extractvarno:',0)'
+			// sql:='bytea_a(data,':dict<2>:',':extractvarno:',0)'
 			// end
 		}
 
-		var conversion = dict.extract(7);
+		var conversion = dict.a(7);
 		if (conversion.substr(1, 9) == "[DATETIME") {
 			expression.swapper("exodus_extract_text(", "exodus_extract_datetime(");
 
@@ -2509,13 +2513,13 @@ nextdict:
 			//expression:=' as integer)'
 			expression.swapper("exodus_extract_text(", "exodus_extract_date(");
 
-		}else if (conversion == "[NUMBER,0]" or dict.extract(11) == "0N" or (dict.extract(11)).substr(1, 3) == "0N_") {
+		}else if (conversion == "[NUMBER,0]" or dict.a(11) == "0N" or (dict.a(11)).substr(1, 3) == "0N_") {
 			expression.splicer(1, 0, "cast(");
 			expression ^= " as integer)";
 			//zero length string to be treated as null
 			expression.swapper("exodus_extract_text(", "exodus_extract_text2(");
 
-		}else if (conversion.substr(1, 2) == "MD" or conversion.substr(1, 7) == "[NUMBER" or (dict.extract(11)).substr(1, 7) == "[NUMBER" or dict.extract(12) == "FLOAT" or (dict.extract(11)).index("0N", 1)) {
+		}else if (conversion.substr(1, 2) == "MD" or conversion.substr(1, 7) == "[NUMBER" or (dict.a(11)).substr(1, 7) == "[NUMBER" or dict.a(12) == "FLOAT" or (dict.a(11)).index("0N", 1)) {
 			expression.splicer(1, 0, "cast(");
 			expression ^= " as float)";
 			//zero length string to be treated as null
@@ -2526,7 +2530,7 @@ nextdict:
 			//expression:=' as interval)'
 			expression.swapper("exodus_extract_text(", "exodus_extract_time(");
 
-		}else if (dict.extract(9) == "R") {
+		}else if (dict.a(9) == "R") {
 			//expression[1,0]="cast("
 			//expression:=' as numeric)'
 			//zero length string to be treated as null
