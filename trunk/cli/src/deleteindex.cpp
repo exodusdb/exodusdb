@@ -3,8 +3,8 @@
 program()
 {
 
-        var filename=COMMAND.extract(2);
-        var fieldname=COMMAND.extract(3);
+        var filename=COMMAND.a(2);
+        var fieldname=COMMAND.a(3);
         var silent=index(ucase(OPTIONS),"S");
 
         if (not filename or not fieldname)

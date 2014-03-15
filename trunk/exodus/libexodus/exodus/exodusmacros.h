@@ -50,7 +50,7 @@ THE SOFTWARE.
 //capture global SENTENCE in wrapper function exodus_main
 //main calls main2 so that opening { is required after program() macro
 //TODO get exodus_main to call main2 directly - need to pass it a function pointer
-//sadly, passing argc argv causes gcc and -Wall -Wextra to give "warning: unused parameter ‘exodus__argc’"
+//sadly, passing argc argv causes gcc and -Wall -Wextra to give "warning: unused parameter ï¿½exodus__argcï¿½"
 //so dont pass them ... they are included in mv SENTENCE/COMMAND/OPTION somehow anyway.
 //void main2(int exodus__argc, char *exodus__argv[], MvEnvironment& mv)
 #define program() \
@@ -210,9 +210,21 @@ typedef var& out;
 #define EXECPATH mv.EXECPATH
 #define COMMAND mv.COMMAND
 #define OPTIONS mv.OPTIONS
+#define SYSTEM mv.SYSTEM
+#define SECURITY mv.SECURITY
+#define DEFINITIONS mv.DEFINITIONS
 
 //there is a calculate in ExodusProgramBase which calls mv.calculate
 //but simple external functions are functions not based on ExodusFunctionBase
 #define calculate mv.calculate
+#define perform mv.perform
+#define lockrecord mv.lockrecord
+#define unlockrecord mv.unlockrecord
+#define fsmsg mv.fsmsg
+#define mssg mv.mssg
+#define msg2 mv.msg2
+#define note mv.note
+#define note2 mv.note2
+#define decide mv.decide
 
 #endif //EXODUSMACROS_H

@@ -384,7 +384,7 @@ function main()
                 var filebase;
 
                 //get the next file name
-                var srcfilename=filenames.extract(fileno).unquote();
+                var srcfilename=filenames.a(fileno).unquote();
                 if (not srcfilename)
                         continue;
 
@@ -776,8 +776,8 @@ var inclusion=
 
 								//How to: Embed a Manifest Inside a C/C++ Application
 								//http://msdn.microsoft.com/en-us/library/ms235591%28VS.80%29.aspx
-								//mt.exe –manifest MyApp.exe.manifest -outputresource:MyApp.exe;1
-								//mt.exe –manifest MyLibrary.dll.manifest -outputresource:MyLibrary.dll;2
+								//mt.exe ï¿½manifest MyApp.exe.manifest -outputresource:MyApp.exe;1
+								//mt.exe ï¿½manifest MyLibrary.dll.manifest -outputresource:MyLibrary.dll;2
 								if (SLASH_IS_BACKSLASH and PLATFORM_ ne "x64") {
 									var cmd="mt.exe";
 									if (not verbose)
@@ -888,7 +888,7 @@ function set_environment() {
 
 	for (var ii=1;; ++ii) {
 
-		var msvs=searchdirs.extract(ii);
+		var msvs=searchdirs.a(ii);
 		if (not msvs)
 			break;
 

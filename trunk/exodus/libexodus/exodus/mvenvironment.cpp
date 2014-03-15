@@ -1,25 +1,24 @@
 /*
-Copyright (c) 2009 steve.bush@neosys.com
+ Copyright (c) 2009 steve.bush@neosys.com
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-*/
-
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ THE SOFTWARE.
+ */
 
 //C4530: C++ exception handler used, but unwind semantics are not enabled. 
 #ifdef _MSC_VER
@@ -36,12 +35,11 @@ THE SOFTWARE.
 //(stick to throwing MVException with a suitable error message)
 //#include <exodus/mvexceptions.h>
 
-namespace exodus
-{
+namespace exodus {
 
 //MUST be the same length
-const var INTERNALCHARS=L"\x11\x12\x13\x14\x15\x16\x17";
-const var EXTERNALCHARS=_SSTM_ _STM_ _TM_ _SM_ _VM_ _FM_ _RM_;
+const var INTERNALCHARS = L"\x11\x12\x13\x14\x15\x16\x17";
+const var EXTERNALCHARS = _SSTM_ _STM_ _TM_ _SM_ _VM_ _FM_ _RM_;
 
 //TODO Should not be global otherwise cannot multithread MvEnvironment
 
@@ -49,86 +47,81 @@ const var EXTERNALCHARS=_SSTM_ _STM_ _TM_ _SM_ _VM_ _FM_ _RM_;
 //derived classes to implement them since they are defined in the class header
 
 //destructor
-MvEnvironment::~MvEnvironment()
-{
+MvEnvironment::~MvEnvironment() {
 
 	//std::wcout<<L"MVProcess: Closing Definitions ... "<<std::flush;
-	if (this->DEFINITIONS.assigned())
-	{
+	if (this->DEFINITIONS.assigned()) {
 		this->DEFINITIONS.close();
 	}
 	//std::wcout<<L"OK"<<std::endl;
 
 	//std::wcout<<L"MVProcess: Disconnecting DB ... "<<std::flush;
-	if (this->SESSION.assigned())
-	{
+	if (this->SESSION.assigned()) {
 		this->SESSION.close();
 	}
 	//std::wcout<<L"OK"<<std::endl;
 
 	//std::wcout<<L"MvEnvironment: Closing Definitions ... "<<std::flush;
-	if (this->DEFINITIONS.assigned()&&this->DEFINITIONS)
-	{
+	if (this->DEFINITIONS.assigned() && this->DEFINITIONS) {
 		this->DEFINITIONS.close();
 	}
 	//std::wcout<<L"OK"<<std::endl;
 
 	//std::wcout<<L"MvEnvironment: Disconnecting DB ... "<<std::flush;
-	if (this->SESSION.assigned()&&this->SESSION)
-	{
+	if (this->SESSION.assigned() && this->SESSION) {
 		this->SESSION.close();
 	}
 	//std::wcout<<L"OK"<<std::endl;
 
 }
 
-bool MvEnvironment::init(const int threadno)
-{
+bool MvEnvironment::init(const int threadno) {
 	//std::wcout<<L"MvEnvironment::init("<<threadno<<L")"<<std::endl;
 	//mvprocess
 
-	this->USERNAME=L"";
-	this->ACCOUNT=L"";
-	this->STATION=L"";
-	this->ROLLOUTFILE=L"~"^var(threadno)^L".$$$";
-	this->THREADNO=threadno;
-	//this->SYSTEM.replacer(17,0,0,L"");
+	this->USERNAME = L"";
+	this->ACCOUNT = L"";
+	this->STATION = L"";
+	this->ROLLOUTFILE = L"~" ^ var(threadno) ^ L".$$$";
+	this->THREADNO = threadno;
+	//this->SYSTEM.r(17, L"");
 
-	cache_dictid_=L"";
+	cache_dictid_ = L"";
+	cache_perform_libid_ = L"";
 
-	this->DICT=L"";
+	this->DICT = L"";
 	//this->DICT=L"x";
 	//var("this->DICT=L\"\";").outputl();
 
-	this->ID=L"";
+	this->ID = L"";
 	//this->ID=L"idx";
 	//var("this->ID=L\"idx\";").outputl();
 
 	//	return true;
 
-	this->USERNAME=L"";
-	this->ACCOUNT=L"";
-	this->AW=L"";
-	this->LOWERCASE=LOWERCASE_;
-	this->UPPERCASE=UPPERCASE_;
-	this->SYSTEM=L"";
-	this->SENTENCE=L"";
-	this->STATION=L"";
-	this->PRIVILEGE=L"";
+	this->USERNAME = L"";
+	this->ACCOUNT = L"";
+	this->AW = L"";
+	this->LOWERCASE = LOWERCASE_;
+	this->UPPERCASE = UPPERCASE_;
+	this->SYSTEM = L"";
+	this->SENTENCE = L"";
+	this->STATION = L"";
+	this->PRIVILEGE = L"";
 
-	this->USER0=L"";
-	this->USER1=L"";
-	this->USER2=L"";
-	this->USER3=L"";
-	this->USER4=L"";
-	this->FILES=L"";
-	this->TCLSTACK=L"";
-	this->ROLLOUTFILE=L"";
-	this->INTCONST=L"";
-	this->PRIORITYINT=L"";
-	this->DEFINITIONS=L"";
-	this->SECURITY=L"";
-	this->LISTACTIVE=0;
+	this->USER0 = L"";
+	this->USER1 = L"";
+	this->USER2 = L"";
+	this->USER3 = L"";
+	this->USER4 = L"";
+	this->FILES = L"";
+	this->TCLSTACK = L"";
+	this->ROLLOUTFILE = L"";
+	this->INTCONST = L"";
+	this->PRIORITYINT = L"";
+	this->DEFINITIONS = L"";
+	this->SECURITY = L"";
+	this->LISTACTIVE = 0;
 
 	//this->RECORD=L"";	// to avoid RECORD(1) throw exception because var is not string
 
@@ -136,8 +129,81 @@ bool MvEnvironment::init(const int threadno)
 
 }
 
-var MvEnvironment::calculate(const var& dictid)
-{
+var MvEnvironment::perform(const var& sentence) {
+	//THISIS(L"var MvEnvironment::perform(const var& sentence)")
+	//ISSTRING(sentence)
+
+	//return ID^L"*"^dictid;
+
+	//wire up the the library linker to have the current mvenvironment
+	//if (!perform_exodusfunctorbase_.mv_)
+	//	perform_exodusfunctorbase_.mv_=this;
+
+	var libid = sentence.field(L" ", 1);
+
+	//open the library routine
+	if (libid != cache_perform_libid_) {
+		cache_perform_libid_ = libid;
+
+		if (!perform_exodusfunctorbase_.mv_)
+			perform_exodusfunctorbase_.mv_ = this;
+
+		std::string str_libname = libid.toString();
+		//std::string str_funcname="main";
+		//if (!exodusfunctorbase_.init(str_libname.c_str(),str_funcname.c_str()))
+		//	throw MVException(L"perform() Cannot find Library "^str_libname^L", or function "^str_funcname^L" is not present");
+		if (!perform_exodusfunctorbase_.init2(str_libname.c_str(),
+				"exodusprogrambasecreatedelete"))
+			throw MVException(
+					L"perform() Cannot find shared library \"" ^ str_libname
+							^ L"\", or function \"libraryexit()\" is not present");
+	}
+
+	//save some environment
+	var savesentence;
+	savesentence.transfer(SENTENCE);
+
+	//set new perform environment
+	SENTENCE = sentence;
+
+	//move to perform() in efb like calldict? or move both here?
+
+	//same code in "sharedlibsubroutine.h" of callable external functions (returns var, zero arguments version)
+
+	//define a function type (pExodusProgramBaseMemberFunction)
+	//that can call the shared library object member function
+	//with the right arguments and returning a var
+	typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)();
+
+	//call the shared library object main function with the right args, returning a var
+	ANS =
+			CALLMEMBERFUNCTION(*(perform_exodusfunctorbase_.pobject_),
+					((pExodusProgramBaseMemberFunction) (perform_exodusfunctorbase_.pmemberfunction_)))();
+
+	//restore some environment
+	savesentence.transfer(SENTENCE);
+
+	return ANS;
+
+}
+
+var MvEnvironment::calculate(const var& dictid, const var& dictfile, const var& id, const var& record, const var& mv) {
+	DICT.exchange(dictfile);
+	ID.exchange(id);
+	RECORD.exchange(record);
+	MV.exchange(mv);
+
+	var result=calculate(dictid);
+
+	DICT.exchange(dictfile);
+	ID.exchange(id);
+	RECORD.exchange(record);
+	MV.exchange(mv);
+
+	return result;
+}
+
+var MvEnvironment::calculate(const var& dictid) {
 	//THISIS(L"var MvEnvironment::calculate(const var& dictid)")
 	//ISSTRING(dictid)
 
@@ -145,70 +211,73 @@ var MvEnvironment::calculate(const var& dictid)
 
 	//wire up the the library linker to have the current mvenvironment
 	if (!exodusfunctorbase_.mv_)
-		exodusfunctorbase_.mv_=this;
+		exodusfunctorbase_.mv_ = this;
 
 	//get the dictionary record so we know how to extract the correct field or call the right library
 	bool newlibfunc;
-	if (cache_dictid_!=dictid)
-	{
-		newlibfunc=true;
+	if (cache_dictid_ != dictid) {
+		newlibfunc = true;
 		if (not DICT)
-			throw MVException(L"calculate("^dictid^L") DICT file variable has not been set");
-		if (not cache_dictrec_.read(DICT,dictid))
-			throw MVException(L"calculate("^dictid^L") dictionary record not in DICT "^DICT.quote());
-		cache_dictid_=dictid;
-	}
-	else
-		newlibfunc=false;
+			throw MVException(
+					L"calculate(" ^ dictid
+							^ L") DICT file variable has not been set");
+		if (not cache_dictrec_.read(DICT, dictid))
+			throw MVException(
+					L"calculate(" ^ dictid ^ L") dictionary record not in DICT "
+							^ DICT.quote());
+		cache_dictid_ = dictid;
+	} else
+		newlibfunc = false;
 
-	var dicttype=cache_dictrec_(1);
+	var dicttype = cache_dictrec_(1);
 
 	//F type dictionaries
-	if (dicttype==L"F")
-	{
+	if (dicttype == L"F") {
 
 		//check field number is numeric
-		var fieldno=cache_dictrec_(2);
+		var fieldno = cache_dictrec_(2);
 		if (!fieldno.isnum())
 			return L"";
 
 		//field no > 0
 		if (fieldno)
-			return RECORD(fieldno,MV);
+			return RECORD(fieldno, MV);
 
 		//field no 0
-		else
-		{
-			var keypart=cache_dictrec_(5);
-			if (keypart&&keypart.isnum())
-				return ID.field(L"*",keypart);
+		else {
+			var keypart = cache_dictrec_(5);
+			if (keypart && keypart.isnum())
+				return ID.field(L"*", keypart);
 			else
 				return ID;
 
 		}
-	}
-	else if (dicttype==L"S")
-	{
+	} else if (dicttype == L"S") {
 		//TODO deduplicate various exodusfunctorbase code spread around calculate mvipc* etc
-		if (newlibfunc)
-		{
-			std::string str_libname=DICT.toString();
-			std::string str_funcname=dictid.toString();
-			if (!exodusfunctorbase_.init(str_libname.c_str(),str_funcname.c_str()))
-				throw MVException(L"calculate() Cannot find Library "^str_libname^L", or function "^str_funcname^L" is not present");
+		if (newlibfunc) {
+			std::string str_libname = DICT.toString();
+			std::string str_funcname = dictid.toString();
+			if (!exodusfunctorbase_.init(str_libname.c_str(),
+					str_funcname.c_str()))
+				throw MVException(
+						L"calculate() Cannot find Library " ^ str_libname
+								^ L", or function " ^ str_funcname
+								^ L" is not present");
 		}
 
 		exodusfunctorbase_.calldict();
 		return ANS;
 	}
 
-	throw MVException(L"calculate("^dictid^L") "^DICT^L" Invalid dictionary type "^dicttype.quote());
+	throw MVException(
+			L"calculate(" ^ dictid ^ L") " ^ DICT ^ L" Invalid dictionary type "
+					^ dicttype.quote());
 	return L"";
 
 }
 
-bool MvEnvironment::lockrecord(const var& filename, const var& file, const var& keyx, const var& recordx, const var& waitsecs0) const
-{
+/*bool MvEnvironment::lockrecord(const var& filename, const var& file,
+		const var& keyx, const var& recordx, const var& waitsecs0, const bool allowduplicate) const {
 
 	//linemark
 	//common /shadow.mfs/ shfilenames,shhandles,shadow.file,shsession.no,locks,spare1,spare2,spare3
@@ -216,7 +285,8 @@ bool MvEnvironment::lockrecord(const var& filename, const var& file, const var& 
 	var waitsecs;
 	if (waitsecs0.unassigned())
 		waitsecs = 0;
-	else waitsecs=waitsecs0;
+	else
+		waitsecs = waitsecs0;
 
 	//nb case where we do not wish to wai
 	//wait
@@ -225,10 +295,9 @@ bool MvEnvironment::lockrecord(const var& filename, const var& file, const var& 
 	// - wait for a default number of seconds
 	// * wait infinite number of seconds
 	//if index(file,'message',1) else de bug
-lock:
-	if (file.lock(keyx)) {
+	lock: if (file.lock(keyx)) {
 		return 1;
-	}else{
+	} else {
 		if (waitsecs) {
 			var().ossleep(1000);
 			waitsecs -= 1;
@@ -241,17 +310,19 @@ lock:
 	return 0;
 
 	//evade warning: unused parameter
-	if (filename || recordx) {}
+	if (filename || recordx) {
+	}
 	return 0;
 
-}
+}*/
 
-bool MvEnvironment::unlockrecord(const var& filename, const var& file0, const var& key) const
-{
+bool MvEnvironment::unlockrecord(const var& filename, const var& file0,
+		const var& key) const {
 	var file;
 	if (file0.unassigned())
 		file = L"";
-	else file=file0;
+	else
+		file = file0;
 
 	if (file == L"") {
 		var().unlockall();
@@ -268,38 +339,39 @@ bool MvEnvironment::unlockrecord(const var& filename, const var& file0, const va
 	return 1;
 
 	//evade warning: unused parameter
-	if (filename) {}
+	if (filename) {
+	}
 	return 1;
 }
 
-
-var MvEnvironment::capitalise(const var& str0, const var& mode0, const var& wordseps0) const
-{
+var MvEnvironment::capitalise(const var& str0, const var& mode0,
+		const var& wordseps0) const {
 
 	var string2;
 	var mode;
 	//j b a s e
 	if (mode0.unassigned())
 		mode = L"CAPITALISE";
-	else mode=mode0;
+	else
+		mode = mode0;
 
 	if (mode == L"QUOTE") {
 		string2 = str0;
 		if (string2 != L"") {
-			string2.converter(FM ^VM ^SVM ^TM, L"    ");
+			string2.converter(FM ^ VM ^ SVM ^ TM, L"    ");
 			string2.swapper(L" ", L"\" \"");
 			string2 = string2.quote();
 		}
 
-	}else if (mode == L"UPPERCASE") {
+	} else if (mode == L"UPPERCASE") {
 		string2 = str0;
 		string2.converter(this->LOWERCASE, this->UPPERCASE);
 
-	}else if (mode == L"LOWERCASE") {
+	} else if (mode == L"LOWERCASE") {
 		string2 = str0;
 		string2.converter(this->UPPERCASE, this->LOWERCASE);
 
-	}else if (mode == L"CAPITALISE") {
+	} else if (mode == L"CAPITALISE") {
 
 		string2 = str0;
 		//convert @upper.case to @lower.case in string2
@@ -311,26 +383,29 @@ var MvEnvironment::capitalise(const var& str0, const var& mode0, const var& word
 		//wordseps=' /-.()&'
 		if (wordseps0.unassigned())
 			wordseps = L" .()&_" _RM_ _FM_ _VM_ _SM_ _TM_ _STM_ _SSTM_;
-		else wordseps=wordseps0;
+		else
+			wordseps = wordseps0;
 		for (int ii = 1; ii <= nn; ii++) {
 			var tt = string2.substr(ii, 1);
 
 			if (inquotes) {
 				inquotes = tt != inquotes;
-			}else{
-				if (tt == DQ && (string2.count(DQ) > 1 || tt == L"\'") && string2.count(L"\'") > 1) {
+			} else {
+				if (tt == DQ && (string2.count(DQ) > 1 || tt == L"\'")
+						&& string2.count(L"\'") > 1) {
 					inquotes = tt;
-				}else{
+				} else {
 					if (wordseps.index(tt, 1)) {
 						cap = 1;
 						if (tt == L" ")
-							numx = var(L"1234567890").index(string2.substr(ii +1, 1), 1);
-					}else{
+							numx = var(L"1234567890").index(
+									string2.substr(ii + 1, 1), 1);
+					} else {
 						if (cap || numx) {
 							tt.converter(this->LOWERCASE, this->UPPERCASE);
 							string2.splicer(ii, 1, tt);
 							cap = 0;
-						}else{
+						} else {
 							tt.converter(this->UPPERCASE, this->LOWERCASE);
 							string2.splicer(ii, 1, tt);
 						}
@@ -338,13 +413,13 @@ var MvEnvironment::capitalise(const var& str0, const var& mode0, const var& word
 				}
 			}
 
-		};//ii;
+		};	//ii;
 
 		string2.swapper(L"\'S ", L"\'s ");
 		if (string2.substr(-2, 2) == L"\'S")
 			string2.splicer(-2, 2, L"\'s");
 
-	}else if (mode.substr(1, 5) == L"PARSE") {
+	} else if (mode.substr(1, 5) == L"PARSE") {
 
 		var uppercase = mode.index(L"UPPERCASE", 1);
 
@@ -354,19 +429,20 @@ var MvEnvironment::capitalise(const var& str0, const var& mode0, const var& word
 		var quoted = L"";
 		for (int ii = 1; ii <= 99999; ii++) {
 			var tt = string2.substr(ii, 1);
-		//BREAK;
-		if (!(tt != L"")) break;;
+			//BREAK;
+			if (!(tt != L""))
+				break;;
 			if (tt == quoted) {
 				quoted = L"";
-			}else{
+			} else {
 				if (!quoted) {
 					if ((DQ ^ L"\'").index(tt, 1)) {
 						quoted = tt;
-					}else{
+					} else {
 						if (tt == L" ") {
 							tt = FM;
 							string2.splicer(ii, 1, tt);
-						}else{
+						} else {
 							if (uppercase) {
 								tt.converter(this->LOWERCASE, this->UPPERCASE);
 								string2.splicer(ii, 1, tt);
@@ -375,7 +451,7 @@ var MvEnvironment::capitalise(const var& str0, const var& mode0, const var& word
 					}
 				}
 			}
-		};//ii;
+		};	//ii;
 
 		if (mode.index(L"TRIM", 1)) {
 			string2.converter(L" " _FM_, _FM_ L" ");
@@ -389,40 +465,38 @@ var MvEnvironment::capitalise(const var& str0, const var& mode0, const var& word
 
 }
 
-void MvEnvironment::note(const var& msg, const var& options, var& buffer, const var& params) const
-{
-	note2(msg,options,buffer,params);
+void MvEnvironment::note(const var& msg, const var& options, var& buffer,
+		const var& params) const {
+	note2(msg, options, buffer, params);
 }
 
-void MvEnvironment::note2(const var& msg0, const var& options, var& buffer, const var& params) const
-{
+void MvEnvironment::note2(const var& msg0, const var& options, var& buffer,
+		const var& params) const {
 
-	var msg=msg0.trimf('!');
+	var msg = msg0.trimf('!');
 	msg.converter(TM, FM);
 	mssg(msg, options, buffer, params);
 	return;
 
 }
 
-void MvEnvironment::mssg(const var& msg) const
-{
-	var buffer=L"";
+void MvEnvironment::mssg(const var& msg) const {
+	var buffer = L"";
 	mssg(msg, L"", buffer, L"");
 }
 
-void MvEnvironment::mssg(const var& msg, const var& options) const
-{
-	var buffer=L"";
+void MvEnvironment::mssg(const var& msg, const var& options) const {
+	var buffer = L"";
 	mssg(msg, options, buffer, L"");
 }
 
-void MvEnvironment::msg2(const var& msg, const var& options, var& buffer, const var& params) const
-{
+void MvEnvironment::msg2(const var& msg, const var& options, var& buffer,
+		const var& params) const {
 	mssg(msg, options, buffer, params);
 }
 
-void MvEnvironment::mssg(const var& msg0, const var& options0, var& response, const var& params0) const
-{
+void MvEnvironment::mssg(const var& msg0, const var& options0, var& response,
+		const var& params0) const {
 
 	var interactive;
 	var xx;
@@ -430,19 +504,19 @@ void MvEnvironment::mssg(const var& msg0, const var& options0, var& response, co
 	if (msg0.unassigned())
 		//msg = L"";
 		return;
-	var msg=msg0;
-	var options=options0;
-	var params=params0;
+	var msg = msg0;
+	var options = options0;
+	var params = params0;
 	/* automatic params
-	if (options.unassigned())
-		options = L"";
-	if (response.unassigned())
-		response = L"";
-	if (params.unassigned())
-		params = L"";
-	*/
+	 if (options.unassigned())
+	 options = L"";
+	 if (response.unassigned())
+	 response = L"";
+	 if (params.unassigned())
+	 params = L"";
+	 */
 
-	interactive = !this->SYSTEM.extract(33);
+	interactive = !this->SYSTEM.a(33);
 
 	//suggested problem report example
 
@@ -459,37 +533,38 @@ void MvEnvironment::mssg(const var& msg0, const var& options0, var& response, co
 		goto damaged;
 	if (options.index(L"[FS129]", 1))
 		goto damaged;
-	if (var(L"FS124" _VM_ L"FS125" _VM_ L"FS126" _VM_ L"FS127" _VM_ L"FS128" _VM_ L"FS129").locate(msg, xx, 1)) {
+	if (var(
+			L"FS124" _VM_ L"FS125" _VM_ L"FS126" _VM_ L"FS127" _VM_ L"FS128" _VM_ L"FS129").locate(
+			msg, xx, 1)) {
 
 		//30/6/2001
-		msg = msg.extract(1, 1, 1);//.xlate(L"SYS_MESSAGES", 11, L"C");
+		msg = msg.a(1, 1, 1);	//.xlate(L"SYS_MESSAGES", 11, L"C");
 
 		goto damaged;
 	}
 	if (options.index(L"DAMAGED FILE", 1)) {
-damaged:
-		var osfile = params.extract(1, 1);
+		damaged: var osfile = params.a(1, 1);
 		if (osfile.substr(-3, 1) == L".")
 			osfile.splicer(-3, 3, L"");
 		var filename = handlefilename(osfile);
 		//filename:=' - ':params<1,1>
 		if (filename)
-			params.replacer(1, 1, 0, filename);
+			params.r(1, 1, filename);
 		if (!interactive) {
 			response = var().chr(27);
 			options.swapper(L"%1%", filename);
-			options.swapper(L"%2%", params.extract(1, 2));
+			options.swapper(L"%2%", params.a(1, 2));
 
 			//30/6/2001
 			if (!(msg.index(FM, 1) || msg.index(VM, 1))) {
-				var msg2 = msg.extract(1, 1, 1);//.xlate(L"SYS.MESSAGES", 11, L"X");
+				var msg2 = msg.a(1, 1, 1);	//.xlate(L"SYS.MESSAGES", 11, L"X");
 				if (!(msg2))
-					msg2 = msg.extract(1, 1, 1).xlate(L"SYSMESSAGES", 11, L"X");
+					msg2 = msg.a(1, 1, 1).xlate(L"SYSMESSAGES", 11, L"X");
 				if (msg2)
 					msg = msg2;
 			}
 			msg.swapper(L"%1%", filename);
-			msg.swapper(L"%2%", params.extract(1, 2));
+			msg.swapper(L"%2%", params.a(1, 2));
 
 		}
 	}
@@ -501,12 +576,12 @@ damaged:
 			if (options.index(L"U", 1)) {
 				msg.output();
 				var(L" ...").output();
-			}else{
+			} else {
 				var(L"done").outputl();
 			}
 			return;
 		}
-	}else{
+	} else {
 		//if interactive then print wchar_t(7)
 	}
 
@@ -516,26 +591,27 @@ damaged:
 
 }
 
-void MvEnvironment::msgbase(const var& msg, const var& options, const var& response, const var& params) const
-{
+void MvEnvironment::msgbase(const var& msg, const var& options,
+		const var& response, const var& params) const {
 
-	std::wcout<<msg;
+	std::wcout << msg;
 	return;
 
 	//evade warning: unused parameter
-	if (options || response || params) {}
+	if (options || response || params) {
+	}
 
 }
 
-var MvEnvironment::handlefilename(const var& handle) const
-{
+var MvEnvironment::handlefilename(const var& handle) const {
 
 	var handle2;
 	var handle3;
 	var files;
 
 	handle2 = handle.field(VM, 2, 999);
-	handle3 = (handle.field2(var().chr(13), -1)).substr(13, 9999).field(VM, 1, 1);
+	handle3 = (handle.field2(var().chr(13), -1)).substr(13, 9999).field(VM, 1,
+			1);
 	if (handle3.substr(-3, 1) == L".")
 		handle3.splicer(-3, 3, L"");
 	handle3 ^= L".LK";
@@ -543,112 +619,107 @@ var MvEnvironment::handlefilename(const var& handle) const
 	if (!files.open(L"FILES")) {
 		mssg(L"HANDLEFILENAME CANNOT OPEN THE \"FILES\" FILE");
 //TODO:		var().stop();
-        return L"";
+		return L"";
 	}
 
 	var nfiles = (this->FILES).count(FM) + 1;
 	for (int filen = 1; filen <= nfiles; filen++) {
-		var filename = this->FILES.extract(filen);
+		var filename = this->FILES.a(filen);
 		var file;
 		if (file.read(files, filename)) {
 
-			if (file.extract(5)) {
+			if (file.a(5)) {
 
 				//passed a filehandle
-				if (file.extract(5) == handle2)
+				if (file.a(5) == handle2)
 					return filename;
 
 				//passed a pathname to the osfile
-				if ((file.extract(5)).index(handle3, 1))
+				if ((file.a(5)).index(handle3, 1))
 					return filename;
 
 			}
 
 		}
-	};//filen;
+	};	//filen;
 
 	return L"";
 
 }
 
-void MvEnvironment::note(const var& msg, const var& options) const
-{
-	var buffer=L"";
+void MvEnvironment::note(const var& msg, const var& options) const {
+	var buffer = L"";
 	note(msg, options, buffer, L"");
 }
 
-void MvEnvironment::note(const var& msg) const
-{
+void MvEnvironment::note(const var& msg) const {
 
 	//linemark
 	//this should never be called with more than one parameters
 	//but to avoid run time error allow four params
 	var buffer;
-	note2(msg,L"",buffer,L"");
+	note2(msg, L"", buffer, L"");
 	return;
 
 }
 
-void MvEnvironment::debug() const
-{
+void MvEnvironment::debug() const {
 
 	var reply;
-	std::wcout<<L"debug():";
+	std::wcout << L"debug():";
 	//cin>>reply;
 	return;
 
 }
 
-void MvEnvironment::fsmsg() const
-{
+void MvEnvironment::fsmsg() const {
 
-	std::wcout<<L"fsmsg():";
+	std::wcout << L"fsmsg():";
 //	var reply;
 //	cin>>reply;
 	return;
 
 }
 
-var MvEnvironment::sysvar(const var& var1,const var& var2,const var& var3,const var& var4)
-{
+var MvEnvironment::sysvar(const var& var1, const var& var2, const var& var3,
+		const var& var4) {
 
-	std::wcout<<L"sysvar() do nothing:";
+	std::wcout << L"sysvar() do nothing:";
 //	var reply;
 //	cin>>reply;
 	return L"";
 
 	//evade warning: unused parameter
-	if (var1 || var2 || var3 || var4) {}
+	if (var1 || var2 || var3 || var4) {
+	}
 }
 
 void MvEnvironment::setprivilege(const var& var1) {
 
-	this->PRIVILEGE=var1;
-	std::wcout<<L"setprivilege("<<var1<<L") do nothing"<<std::endl;
+	this->PRIVILEGE = var1;
+	std::wcout << L"setprivilege(" << var1 << L") do nothing" << std::endl;
 //	var reply;
 //	cin>>reply;
 	return;
 
 }
 
-bool MvEnvironment::openfile(const var& filename0, var& file) const
-{
+bool MvEnvironment::openfile(const var& filename0, var& file) const {
 	if (filename0.unassigned())
 		throw MVException(L"filename0");
-	var filename=filename0;
+	var filename = filename0;
 	var xx;
 
 	var nomsg = filename[1] == L"*";
 	if (nomsg)
 		filename.splicer(1, 1, L"");
-open:
-	if (file.open(filename)) {
+	open: if (file.open(filename)) {
 
 //		if (!(this->FILES.locateusing(filename, FM, xx)))
-//			this->FILES.replacer(-1, 0, 0, filename);
+//			this->FILES.r(-1, filename);
 
 		return 1;
-	}else{
+	} else {
 		if (filename == L"MD") {
 			filename = L"MD";
 			goto open;
@@ -663,14 +734,14 @@ open:
 
 }
 
-bool MvEnvironment::openfile2(const var& filename, var& file, const var& similarfilename, const var& autocreate) const
-{
+bool MvEnvironment::openfile2(const var& filename, var& file,
+		const var& similarfilename, const var& autocreate) const {
 
 	var reply;
 	//if (autocreate.unassigned())
 	//	autocreate = 1;
 	var firsttry = 1;
-tryagain:
+	tryagain:
 
 	if (openfile(L"*" ^ filename, file))
 		return 1;
@@ -679,41 +750,41 @@ tryagain:
 		//user option to create file if it does not exist
 		var tt;
 
-        if (file.createfile(filename)){};
+		if (file.createfile(filename)) {
+		};
 
-        firsttry = 0;
+		firsttry = 0;
 		goto tryagain;
 	}
 
 	std::wcout << var().chr(7);
-	var temp=L"THE " ^ filename.quote() ^ L" FILE IS MISSING";
+	var temp = L"THE " ^ filename.quote() ^ L" FILE IS MISSING";
 	mssg(temp);
 	file = L"";
 	return 0;
 
-
 	//evade warning: unused parameter
-	if (similarfilename || autocreate) {}
+	if (similarfilename || autocreate) {
+	}
 	return 0;
 }
 
-var MvEnvironment::decide(const var& question, const var& options) const
-{
-	var reply=L"";
+var MvEnvironment::decide(const var& question, const var& options) const {
+	var reply = L"";
 	var buffer;
-	return decide(question,options,reply,buffer);
+	return decide(question, options, reply, buffer);
 }
 
-var MvEnvironment::decide(const var& question, const var& options, var& reply) const
-{
+var MvEnvironment::decide(const var& question, const var& options,
+		var& reply) const {
 	var buffer;
-	return decide(question,options,reply,buffer);
+	return decide(question, options, reply, buffer);
 }
 
-var MvEnvironment::decide (const var& questionx, const var& optionsx, var& reply, var& buffer) const
-{
+var MvEnvironment::decide(const var& questionx, const var& optionsx, var& reply,
+		var& buffer) const {
 
-	var interactive = !this->SYSTEM.extract(33);
+	var interactive = !this->SYSTEM.a(33);
 
 	var options = optionsx;
 	var question = questionx;
@@ -722,10 +793,10 @@ var MvEnvironment::decide (const var& questionx, const var& optionsx, var& reply
 	if (!interactive) {
 		if (buffer) {
 			reply = buffer;
-		}else{
+		} else {
 			reply = 1;
 		}
-		return options.extract(reply);
+		return options.a(reply);
 	}
 
 	question.converter(VM ^ L"|", FM ^ FM);
@@ -735,13 +806,12 @@ var MvEnvironment::decide (const var& questionx, const var& optionsx, var& reply
 //	var noptions = options.count(FM) + (options != L"");
 	var noptions = options.dcount(FM);
 	for (int optionn = 1; optionn <= noptions; optionn++)
-		std::wcout << optionn<< L". "<< options.extract(optionn) << std::endl;
+		std::wcout << optionn << L". " << options.a(optionn) << std::endl;
 
-inp:
-	reply.input();
+	inp: reply.input();
 	if (reply == L"" || reply >= 1 || reply <= noptions) {
 		return reply;
-	}else{
+	} else {
 		goto inp;
 	}
 
@@ -749,62 +819,61 @@ inp:
 
 }
 
-void MvEnvironment::savescreen(var& origscrn, var& origattr) const
-{
-	std::wcout<<L"MvEnvironment::savescreen not implemented"<<std::endl;
+void MvEnvironment::savescreen(var& origscrn, var& origattr) const {
+	std::wcout << L"MvEnvironment::savescreen not implemented" << std::endl;
 
 	//evade warning: unused parameter
-	if (origscrn || origattr) {}
+	if (origscrn || origattr) {
+	}
 
 }
 
 // Checks keyboard buffer (stdin) and returns key
 // pressed, or -1 for no key pressed
-int MvEnvironment::keypressed(int delayusecs) const
-{
-/* will not compile on mingw because unlike cygwin
- * mingw is close to windows and windows select only works on sockets
- * should be easy to reimplement in another way
-    wchar_t keypressed;
-    struct timeval waittime;
-    int numthis->charsthis->read;
-    struct fdthis->set mask;
-    FDthis->SET(0, &mask);
+int MvEnvironment::keypressed(int delayusecs) const {
+	/* will not compile on mingw because unlike cygwin
+	 * mingw is close to windows and windows select only works on sockets
+	 * should be easy to reimplement in another way
+	 wchar_t keypressed;
+	 struct timeval waittime;
+	 int numthis->charsthis->read;
+	 struct fdthis->set mask;
+	 FDthis->SET(0, &mask);
 
-    waittime.tvthis->sec = 0;
-    waittime.tvthis->usec = delayusecs;
-    if (select (1, &mask, 0, 0, &waittime))
-    {
-        numthis->charsthis->read = read (0, &keypressed, 1);
-        if (numthis->charsthis->read == 1)
-        {
-           	cin.putback(keypressed);
-            return keypressed;
-        }
-    }
-*/
-    return 0;
+	 waittime.tvthis->sec = 0;
+	 waittime.tvthis->usec = delayusecs;
+	 if (select (1, &mask, 0, 0, &waittime))
+	 {
+	 numthis->charsthis->read = read (0, &keypressed, 1);
+	 if (numthis->charsthis->read == 1)
+	 {
+	 cin.putback(keypressed);
+	 return keypressed;
+	 }
+	 }
+	 */
+	return 0;
 
 	//evade warning: unused parameter
-	if (delayusecs) {}
+	if (delayusecs) {
+	}
 
 }
 
-bool MvEnvironment::esctoexit() const
-{
-	wchar_t keypress=keypressed();
-	if (keypress!=0x1B)
-	{
+bool MvEnvironment::esctoexit() const {
+	wchar_t keypress = keypressed();
+	if (keypress != 0x1B) {
 //		cin.putback(keypress);
 		return false;
 	}
 
-	std::wcout<<L"Paused. Press Enter to resume or Ctrl+C to cancel:"<<std::endl;
+	std::wcout << L"Paused. Press Enter to resume or Ctrl+C to cancel:"
+			<< std::endl;
 
-	while (true)
-	{
-		keypress=keypressed(1000000);
-		if (keypress==0x1B) return true;
+	while (true) {
+		keypress = keypressed(1000000);
+		if (keypress == 0x1B)
+			return true;
 	}
 
 //	keypress=cin.peek();
@@ -813,32 +882,32 @@ bool MvEnvironment::esctoexit() const
 	return false;
 }
 
-var MvEnvironment::otherusers(const var& param)
-{
-	std::wcout<<L"MvEnvironment::otherusers not implemented yet";
+var MvEnvironment::otherusers(const var& param) {
+	std::wcout << L"MvEnvironment::otherusers not implemented yet";
 	return var(L"");
 
 	//evade warning: unused parameter
-	if (param) {}
+	if (param) {
+	}
 }
 
-var MvEnvironment::otherdatasetusers(const var& param)
-{
-	std::wcout<<L"MvEnvironment::otherdatausers not implemented yet";
+var MvEnvironment::otherdatasetusers(const var& param) {
+	std::wcout << L"MvEnvironment::otherdatausers not implemented yet";
 	return var(L"");
 
 	//evade warning: unused parameter
-	if (param) {}
+	if (param) {
+	}
 }
 
-bool MvEnvironment::lockrecord(const var& filename, const var& file, const var& keyx) const
-{
+bool MvEnvironment::lockrecord(const var& filename, const var& file,
+		const var& keyx) const {
 	var record;
 	return lockrecord(filename, file, keyx, record);
 }
 
-bool MvEnvironment::lockrecord(const var& filename, const var& file, const var& keyx, const var& recordx, const int waitsecs0) const
-{
+bool MvEnvironment::lockrecord(const var& filename, const var& file,
+		const var& keyx, const var& recordx, const int waitsecs0, const bool allowduplicate) const {
 
 	//linemark
 	//common /shadow.mfs/ shfilenames,shhandles,shadow.file,shsession.no,locks,spare1,spare2,spare3
@@ -850,83 +919,88 @@ bool MvEnvironment::lockrecord(const var& filename, const var& file, const var& 
 	//- wait for a default number of seconds
 	// * wait infinite number of seconds
 	//if index(file,'message',1) else de bug
-	int waitsecs=waitsecs0;
+	int waitsecs = waitsecs0;
 
-lock:
-	if (file.lock(keyx)) {
-		return 1;
-	}else{
-		if (waitsecs) {
-			var().ossleep(1000);
-			waitsecs -= 1;
-			goto lock;
-		}
+	lock:
+		var locked=file.lock(keyx);
+		if (locked || allowduplicate && locked eq L"") {
+			return 1;
+		} else {
+			if (waitsecs) {
+				var().ossleep(1000);
+				waitsecs -= 1;
+				goto lock;
+			}
 		return false;
 	}
 
 	//evade warning: unused parameter
-	if (filename || recordx) {}
+	(false||filename||recordx);
+
 	return true;
 
 }
 
 //bool MvEnvironment::osbreadx(var& str1, const var& filehandle, const var& filename, const int startoffset, const int length)
-bool MvEnvironment::osbreadx(var& str1, const var& filehandle, const var& filename, var& startoffset, const int length)
-{
+bool MvEnvironment::osbreadx(var& str1, const var& filehandle,
+		const var& filename, var& startoffset, const int length) {
 	//convert from external to internal "codepage"
 	//park the high characters in the low place
-	return str1.osbread(filehandle,startoffset,length).converter(EXTERNALCHARS, INTERNALCHARS);
+	return str1.osbread(filehandle, startoffset, length).converter(
+			EXTERNALCHARS, INTERNALCHARS);
 
 	//evade warning: unused parameter
-	if (filename) {}
+	if (filename) {
+	}
 }
 
-bool MvEnvironment::oswritex(const var& str1, const var& filename) const
-{
+bool MvEnvironment::oswritex(const var& str1, const var& filename) const {
 	//convert from internal to external "codepage"
 	//move parked characters to high characters
 	//(any field seps in the output will already have been escaped like %fe)
 	var default_locale(L"");
-	return str1.convert(INTERNALCHARS, EXTERNALCHARS).oswrite(filename, default_locale);
+	return str1.convert(INTERNALCHARS, EXTERNALCHARS).oswrite(filename,
+			default_locale);
 }
 
-bool MvEnvironment::osbwritex(const var& str1, const var& filehandle, const var& filename, var& offset) const
-{
+bool MvEnvironment::osbwritex(const var& str1, const var& filehandle,
+		const var& filename, var& offset) const {
 	//convert from internal to external "codepage"
 	//move parked characters to high characters
 	//(any field seps in the output will already have been escaped like %fe)
-	return str1.convert(INTERNALCHARS, EXTERNALCHARS).osbwrite(filehandle,offset);
+	return str1.convert(INTERNALCHARS, EXTERNALCHARS).osbwrite(filehandle,
+			offset);
 
 	//evade warning: unused parameter
-	if (filename) {}
+	if (filename) {
+	}
 }
 
-bool MvEnvironment::authorised(const var& task0)
-{
+bool MvEnvironment::authorised(const var& task0) {
 	var msg;
 	return authorised(task0, msg, L"");
 }
 
-bool MvEnvironment::authorised(const var& task0, var& msg, const var& defaultlock0)
-{
+bool MvEnvironment::authorised(const var& task0, var& msg,
+		const var& defaultlock0) {
 
-	var task=task0;
-	var defaultlock=defaultlock0;
+	var task = task0;
+	var defaultlock = defaultlock0;
 
 	var dost;
-	dost=var().ostime();
+	dost = var().ostime();
 	//std::wcout<<dost<<std::endl;
 
 	var noadd;
 	var positive;
-	var isneosys;//num
+	var isneosys;	//num
 	var deleting;
 	var taskn;
 	var locks;
 	var nlocks;
 	var usern;
 	var keys;
-	var temp;//num
+	var temp;	//num
 
 	//if @username='neosys' or @username='steve' then call msg(task:'')
 
@@ -970,7 +1044,7 @@ bool MvEnvironment::authorised(const var& task0, var& msg, const var& defaultloc
 	if (task[1] == L"?") {
 		isneosys = 0;
 		task.splicer(1, 1, L"");
-	}else{
+	} else {
 		isneosys = this->USERNAME == L"NEOSYS";
 	}
 
@@ -989,14 +1063,13 @@ bool MvEnvironment::authorised(const var& task0, var& msg, const var& defaultloc
 			writeuserprivs();
 			return 1;
 		}
-	}else{
+	} else {
 		if (!noadd) {
 			readuserprivs();
 			if (this->USERNAME == L"NEOSYS")
 				note(task ^ L"|TASK ADDED");
 			if (this->SECURITY.length() < 65000) {
-				if (!(this->SECURITY.locateby(task, L"AL", taskn, 10)))
-				{
+				if (!(this->SECURITY.locateby(task, L"AL", taskn, 10))) {
 					if (defaultlock.unassigned())
 						defaultlock = L"";
 					this->SECURITY.inserter(10, taskn, 0, task);
@@ -1008,16 +1081,17 @@ bool MvEnvironment::authorised(const var& task0, var& msg, const var& defaultloc
 	}
 
 	//if no locks then pass ok unless positive locking required
-	locks = this->SECURITY.extract(11, taskn);
+	locks = this->SECURITY.a(11, taskn);
 	if (locks == L"") {
 		if (positive && !isneosys) {
-notallowed:
-			msg = capitalise(task) ^ L"||Sorry, L" ^ capitalise(this->USERNAME) ^ L", you are not authorised to do this->|";
+			notallowed: msg = capitalise(task) ^ L"||Sorry, L"
+					^ capitalise(this->USERNAME)
+					^ L", you are not authorised to do this->|";
 			return 0;
-		}else{
+		} else {
 			goto ok;
 		}
-	}else{
+	} else {
 		if (locks == L"NOONE")
 			goto notallowed;
 	}
@@ -1031,7 +1105,7 @@ notallowed:
 	if (!(this->SECURITY.locate(this->USERNAME, usern, 1))) {
 		if (this->USERNAME != L"NEOSYS" && this->USERNAME != this->ACCOUNT) {
 			readuserprivs();
-			usern = (this->SECURITY.extract(1)).dcount(VM) + 1;
+			usern = (this->SECURITY.a(1)).dcount(VM) + 1;
 			if (this->SECURITY.length() < 65000) {
 				this->SECURITY.inserter(1, usern, 0, this->USERNAME);
 				this->SECURITY.inserter(2, usern, 0, L"");
@@ -1042,7 +1116,7 @@ notallowed:
 
 	//user must have all the keys for all the locks on this task
 	//following users up to first blank line also have the same keys
-	keys = (this->SECURITY.extract(2)).field(VM, usern, 999);
+	keys = (this->SECURITY.a(2)).field(VM, usern, 999);
 	temp = keys.index(L"---", 1);
 	if (temp)
 		keys.splicer(temp - 1, 999, L"");
@@ -1054,22 +1128,22 @@ notallowed:
 	for (int lockn = 1; lockn <= nlocks; lockn++) {
 		var lockx = locks.field(VM, lockn, 1);
 		if (keys.locate(lockx, temp, 1)) {
-	//call note(task:' ok')
-		}else{
-			msg = capitalise(task) ^ L"||Sorry, L" ^ capitalise(this->USERNAME) ^ L", you are not authorised to do this->|";
-	//call note(task:' ko')
+			//call note(task:' ok')
+		} else {
+			msg = capitalise(task) ^ L"||Sorry, L" ^ capitalise(this->USERNAME)
+					^ L", you are not authorised to do this->|";
+			//call note(task:' ko')
 			return 0;
 		}
-	};//lockn;
+	};	//lockn;
 
-ok:
+	ok:
 	//call statup(2,3,task)
 	return 1;
 
 }
 
-void MvEnvironment::readuserprivs()
-{
+void MvEnvironment::readuserprivs() {
 	//if definitions then
 	//put back in case called from fileman due to no datasets
 	//if definitions then
@@ -1082,9 +1156,8 @@ void MvEnvironment::readuserprivs()
 
 }
 
-void MvEnvironment::writeuserprivs()
-{
-	this->SECURITY.replacer(9, 0,0, L"");
+void MvEnvironment::writeuserprivs() {
+	this->SECURITY.r(9, L"");
 	//if definitions then
 	//put back in case called from fileman due to no datasets
 	//if definitions then
@@ -1095,16 +1168,15 @@ void MvEnvironment::writeuserprivs()
 
 }
 
-void MvEnvironment::logger(const var& programname0, const var& text0)
-{
+void MvEnvironment::logger(const var& programname0, const var& text0) {
 
 	var log;
 	var time;
-	var programname=programname0;
-	var text=text0;
+	var programname = programname0;
+	var text = text0;
 	//turn off interactivity. why?
-	var s33 = this->SYSTEM.extract(33);
-	this->SYSTEM.replacer(33, 0, 0, L"");
+	var s33 = this->SYSTEM.a(33);
+	this->SYSTEM.r(33, L"");
 
 	if (programname.unassigned())
 		programname = L"";
@@ -1116,34 +1188,33 @@ void MvEnvironment::logger(const var& programname0, const var& text0)
 		var entry = programname;
 		var text2 = text.lower();
 		text2.converter(L"|", VM);
-		entry.replacer(2, 0, 0, text2);
+		entry.r(2, text2);
 
 		if (s33) {
-			var station = this->SYSTEM.extract(40, 2);
-		}else{
+			var station = this->SYSTEM.a(40, 2);
+		} else {
 			var station = this->STATION.trim();
 		}
 
-getlogkey:
-		time=var().ostime();
-		var logkey = this->STATION.trim() ^ L"*" ^ this->USERNAME ^ L"*" ^ var().date() ^ L"*" ^ time;
+		getlogkey: time = var().ostime();
+		var logkey = this->STATION.trim() ^ L"*" ^ this->USERNAME ^ L"*"
+				^ var().date() ^ L"*" ^ time;
 		var xx;
 		if (xx.read(log, logkey))
 			goto getlogkey;
 
-		entry.replacer(2, 0, 0, entry.extract(2).trim(VM));
+		entry.r(2, entry.a(2).trim(VM));
 		entry.write(log, logkey);
 	}
 
 	//restore interactivity
-	this->SYSTEM.replacer(33, 0, 0, s33);
+	this->SYSTEM.r(33, s33);
 
 	return;
 
 }
 
-var MvEnvironment::singular(const var& pluralnoun)
-{
+var MvEnvironment::singular(const var& pluralnoun) {
 
 	var temp = pluralnoun;
 
@@ -1155,20 +1226,20 @@ var MvEnvironment::singular(const var& pluralnoun)
 
 			//addresses=address
 
-		}else if (temp.substr(-4, 4) == L"SSES") {
+		} else if (temp.substr(-4, 4) == L"SSES") {
 			temp.splicer(-2, 2, L"");
 
-		}else if (temp.substr(-4, 4) == L"SHES") {
+		} else if (temp.substr(-4, 4) == L"SHES") {
 			temp.splicer(-2, 2, L"");
 
-			}else if (temp.substr(-4, 4) == L"CHES") {
+		} else if (temp.substr(-4, 4) == L"CHES") {
 			temp.splicer(-2, 2, L"");
 
-		}else if (1) {
+		} else if (1) {
 			temp.splicer(-1, 1, L"");
 		}
 
-	}else{
+	} else {
 
 		if (temp[-1] == L"S") {
 			//analysis, dos
@@ -1182,14 +1253,13 @@ var MvEnvironment::singular(const var& pluralnoun)
 
 }
 
-void MvEnvironment::flushindex(const var& filename)
-{
-	std::wcout<<L"MvEnvironment::std::flushindex not implemented yet, "<<filename<<std::endl;
+void MvEnvironment::flushindex(const var& filename) {
+	std::wcout << L"MvEnvironment::std::flushindex not implemented yet, "
+			<< filename << std::endl;
 	return;
 }
 
-void MvEnvironment::sysmsg(const var& msg0)
-{
+void MvEnvironment::sysmsg(const var& msg0) {
 
 	var tt;
 	var ver;
@@ -1197,7 +1267,7 @@ void MvEnvironment::sysmsg(const var& msg0)
 	//logs a message and sends it to all the technical support emails (backup)
 	//do not call msg or note etc, otherwise may be recursive
 
-	var datasetcode = this->SYSTEM.extract(17);
+	var datasetcode = this->SYSTEM.a(17);
 
 	//protect the msg
 	var msg = msg0;
@@ -1212,19 +1282,19 @@ void MvEnvironment::sysmsg(const var& msg0)
 	//dos backup.cfg overrides
 	if (tt.osread("BACKUP.CFG")) {
 		for (int ii = 1; ii <= 99; ii++) {
-			if (tt.extract(ii))
-				bakpars.replacer(ii, 0, 0, tt.extract(ii));
-		};//ii;
+			if (tt.a(ii))
+				bakpars.r(ii, tt.a(ii));
+		};	//ii;
 	}
 
 	//get technical emailaddrs to send to
 	//nb if any emailaddrs and neosys.com not in them
 	//then neosys will not receive any message
-	var emailaddrs = bakpars.extract(6);
-	if (bakpars.extract(10)) {
+	var emailaddrs = bakpars.a(6);
+	if (bakpars.a(10)) {
 		if (emailaddrs)
 			emailaddrs ^= L"/";
-		emailaddrs ^= bakpars.extract(10);
+		emailaddrs ^= bakpars.a(10);
 	}
 	emailaddrs = emailaddrs.field(L"/", 1, 1);
 	//if emailaddrs='' then readv emailaddrs from definitions,'replication',12 else emailaddrs=''
@@ -1237,19 +1307,19 @@ void MvEnvironment::sysmsg(const var& msg0)
 	//determine subject
 	var subject = L"NEOSYS System Message : Datasetcode=" ^ datasetcode;
 
-	var body = L"Server=" ^ (this->SYSTEM.extract(44)).trim();
-	body.replacer(-1, 0, 0, L"Client=" ^ this->STATION.trim());
-	body.replacer(-1, 0, 0, L"User=" ^ this->USERNAME.trim());
+	var body = L"Server=" ^ (this->SYSTEM.a(44)).trim();
+	body.r(-1, L"Client=" ^ this->STATION.trim());
+	body.r(-1, L"User=" ^ this->USERNAME.trim());
 	var temp = this->USER0;
 	temp.converter(RM ^ FM ^ VM ^ SVM ^ TM ^ STM, L"`^]}\\~");
-	body.replacer(-1, 0, 0, L"Request=" ^ temp);
-	body.replacer(-1, 0, 0, L"Message=" ^ FM ^ msg);
+	body.r(-1, L"Request=" ^ temp);
+	body.r(-1, L"Message=" ^ FM ^ msg);
 	temp = this->USER1;
 	temp.converter(RM ^ FM ^ VM ^ SVM ^ TM ^ STM, L"`^]}\\~");
 	if (ver.osread("general\\version.dat"))
-		body.replacer(-1, 0, 0, L"NEOSYS Ver:" ^ ver.extract(1));
-	body.replacer(-1, 0, 0, L"@Id=" ^ this->ID);
-	body.replacer(-1, 0, 0, L"Data=" ^ temp);
+		body.r(-1, L"NEOSYS Ver:" ^ ver.a(1));
+	body.r(-1, L"@Id=" ^ this->ID);
+	body.r(-1, L"Data=" ^ temp);
 	body.converter(FM ^ VM ^ SVM ^ TM ^ STM ^ L"|", L"\r\r\r\r\r\r");
 	body.swapper(L"\r", L"\r\n");
 
@@ -1264,19 +1334,21 @@ void MvEnvironment::sysmsg(const var& msg0)
 
 }
 
-var MvEnvironment::sendmail(const var& toaddress0, const var& subject, const var& body0, const var& attachfilename, const var& deletex, var& errormsg)
-{
+var MvEnvironment::sendmail(const var& toaddress0, const var& subject,
+		const var& body0, const var& attachfilename, const var& deletex,
+		var& errormsg) {
 
 	var params2;
 	var bodyfilename;
-	var toaddress=toaddress0;
+	var toaddress = toaddress0;
 
 	if (this->SENTENCE.field(L" ", 1, 1) == L"SENDMAIL") {
 		toaddress = this->SENTENCE.field(L" ", 2, 1);
 		if (!toaddress)
 			toaddress = L"steve.bush@neosys.com";
 		this->SENTENCE = L"";
-		sendmail(toaddress, L"test email test subject", L"test body line 1\rtest body line2", L"", 0, errormsg);
+		sendmail(toaddress, L"test email test subject",
+				L"test body line 1\rtest body line2", L"", 0, errormsg);
 		if (errormsg)
 			mssg(errormsg);
 		var().stop();
@@ -1300,8 +1372,8 @@ var MvEnvironment::sendmail(const var& toaddress0, const var& subject, const var
 	var params1 = L"";
 	var definitions;
 	if (definitions.open(L"DEFINITIONS")) {
-		if (!(params1.read(definitions, L"SMTP.CFG")))
-			{}
+		if (!(params1.read(definitions, L"SMTP.CFG"))) {
+		}
 	}
 
 	//global override
@@ -1311,28 +1383,29 @@ var MvEnvironment::sendmail(const var& toaddress0, const var& subject, const var
 	params2.swapper(L"\r\n", L"\r");
 	params2.converter(L"\r\n", _FM_ _FM_);
 	for (int ii = 1; ii <= 9; ii++) {
-		if (params2.extract(ii))
-			params1.replacer(ii, 0, 0, params2.extract(ii));
-	};//ii;
+		if (params2.a(ii))
+			params1.r(ii, params2.a(ii));
+	};	//ii;
 
 	var params = L"";
-	params.replacer(-1, 0, 0, L"fromaddress=" ^ params1.extract(1));
-	params.replacer(-1, 0, 0, L"smtphostname=" ^ params1.extract(2));
-	params.replacer(-1, 0, 0, L"smtpportno=" ^ params1.extract(3));
-	params.replacer(-1, 0, 0, L"smtptimeoutsecs=" ^ params1.extract(4));
-	params.replacer(-1, 0, 0, L"smtpusessl=" ^ params1.extract(5));
-	params.replacer(-1, 0, 0, L"smtpauthtype=" ^ params1.extract(6));
-	params.replacer(-1, 0, 0, L"smtpuserid=" ^ params1.extract(7));
-	params.replacer(-1, 0, 0, L"smtppassword=" ^ params1.extract(8));
+	params.r(-1, L"fromaddress=" ^ params1.a(1));
+	params.r(-1, L"smtphostname=" ^ params1.a(2));
+	params.r(-1, L"smtpportno=" ^ params1.a(3));
+	params.r(-1, L"smtptimeoutsecs=" ^ params1.a(4));
+	params.r(-1, L"smtpusessl=" ^ params1.a(5));
+	params.r(-1, L"smtpauthtype=" ^ params1.a(6));
+	params.r(-1, L"smtpuserid=" ^ params1.a(7));
+	params.r(-1, L"smtppassword=" ^ params1.a(8));
 
 	var body = body0;
 
-	if (body.index(L" ", 1) || body.length() > 10 || body.index(L"\r", 1) || body.index(L"\n", 1)) {
+	if (body.index(L" ", 1) || body.length() > 10 || body.index(L"\r", 1)
+			|| body.index(L"\n", 1)) {
 		bodyfilename = var(99999999).rnd() ^ L".TXT";
 		body.oswrite(bodyfilename);
 		bodyfilename.osclose();
 		body = L"@" ^ bodyfilename;
-	}else{
+	} else {
 		body.converter(DQ, L"\'");
 		bodyfilename = L"";
 	}
@@ -1348,13 +1421,13 @@ var MvEnvironment::sendmail(const var& toaddress0, const var& subject, const var
 
 	//params='/t ':quote(toaddress):' /s ':quote(subject):' /b ':quote(body):' /a ':quote(attachfilename)
 	//if delete then params:=' /d ':delete
-	params.replacer(-1, 0, 0, L"toaddress=" ^ toaddress.quote());
-	params.replacer(-1, 0, 0, L"subject=" ^ subject.quote());
-	params.replacer(-1, 0, 0, L"body=" ^ body.quote());
+	params.r(-1, L"toaddress=" ^ toaddress.quote());
+	params.r(-1, L"subject=" ^ subject.quote());
+	params.r(-1, L"body=" ^ body.quote());
 	if (attachfilename)
-		params.replacer(-1, 0, 0, L"attachfilename=" ^ attachfilename.quote());
+		params.r(-1, L"attachfilename=" ^ attachfilename.quote());
 	if (deletex)
-		params.replacer(-1, 0, 0, L"deleteaftersend=" ^ deletex.quote());
+		params.r(-1, L"deleteaftersend=" ^ deletex.quote());
 	params ^= FM;
 
 	params.swapper(FM, L"\r\n");
@@ -1371,14 +1444,14 @@ var MvEnvironment::sendmail(const var& toaddress0, const var& subject, const var
 		errorfilename.osdelete();
 		errormsg.converter(L"\r\n", _FM_ _FM_);
 		errormsg = errormsg.oconv(L"T#60");
-	}else{
+	} else {
 		errormsg = L"Unknown error in sendmail.js Failed to complete";
-		errormsg.replacer(-1, 0, 0, cmd);
-		errormsg.replacer(-1, 0, 0, params.oconv(L"T#60"));
+		errormsg.r(-1, cmd);
+		errormsg.r(-1, params.oconv(L"T#60"));
 	}
 	errormsg.converter(TM, FM);
 
-	if ((errormsg.extract(1)).trim() != L"OK") {
+	if ((errormsg.a(1)).trim() != L"OK") {
 		logger(L"SENDMAIL", errormsg);
 		return 0;
 	}
@@ -1387,41 +1460,41 @@ var MvEnvironment::sendmail(const var& toaddress0, const var& subject, const var
 
 }
 
-var MvEnvironment::encrypt2(const var& encrypt0) const
-{
+var MvEnvironment::encrypt2(const var& encrypt0) const {
 
-	var encrypt=encrypt0;
+	var encrypt = encrypt0;
 	var encryptkey = 1234567;
 
 	//pass1
 	while (true) {
-	//BREAK;
-	if (!(encrypt != L"")) break;;
+		//BREAK;
+		if (!(encrypt != L""))
+			break;;
 		encryptkey = (encryptkey % 390001) * (encrypt[1]).seq() + 1;
 		encrypt.splicer(1, 1, L"");
-	}//loop;
+	}	//loop;
 
 	//pass2
 	while (true) {
 		encrypt ^= var().chr(65 + (encryptkey % 50));
 		encryptkey = (encryptkey / 50).floor();
-	//BREAK;
-	if (!encryptkey) break;;
-	}//loop;
+		//BREAK;
+		if (!encryptkey)
+			break;;
+	}	//loop;
 
 	return encrypt;
 
 }
 
-var MvEnvironment::xmlquote(const var& string0) const
-{
+var MvEnvironment::xmlquote(const var& string0) const {
 
 	var string1;
 
 	if (string0.unassigned()) {
 		//de bug
 		string1 = L"UNASSIGNED";
-	}else{
+	} else {
 		string1 = string0;
 	}
 
@@ -1437,11 +1510,12 @@ var MvEnvironment::xmlquote(const var& string0) const
 
 }
 
-var MvEnvironment::loginnet(const var& dataset, const var& username, var& cookie, var& msg)
-{
+var MvEnvironment::loginnet(const var& dataset, const var& username,
+		var& cookie, var& msg) {
 
 	//evade warning: unused parameter
-	if (false && dataset) {}
+	if (false && dataset) {
+	}
 
 	var menuid;
 	var usern;
@@ -1452,7 +1526,7 @@ var MvEnvironment::loginnet(const var& dataset, const var& username, var& cookie
 	cookie = L"";
 	var menus;
 	if (!menus.open(L"ADMENUS")) {
-		if (!menus.open(L"MENUS")&&username != L"NEOSYS") {
+		if (!menus.open(L"MENUS") && username != L"NEOSYS") {
 			msg = L"Error: Cannot open MENUS file";
 			return false;
 		}
@@ -1462,22 +1536,23 @@ var MvEnvironment::loginnet(const var& dataset, const var& username, var& cookie
 	if (username == L"NEOSYS") {
 		menuid = L"ADAGENCY";
 
-	}else{
-		if (!(this->SECURITY.locate(username, usern, 1 ))) {
+	} else {
+		if (!(this->SECURITY.locate(username, usern, 1))) {
 			msg = L"Error: " ^ username.quote() ^ L" user is missing";
 			return false;
 		}
-		menuid = this->SECURITY.extract(3, usern);
+		menuid = this->SECURITY.a(3, usern);
 	}
 
 	var menu = L"";
-    if (!menu.read(menus, menuid)) {
+	if (!menu.read(menus, menuid)) {
 		if (username == L"NEOSYS") {
-			if (!menu.read(menus, L"NEOSYS"))
-			{
-                    menu=FM^FM^FM^FM^FM^L"MEDIA|ADPRODUCTION|ACCS|ANALMENU|TIMESHEETS|FILESMENU|GENERAL|EXIT2";
-                    menu=menu.converter(L"|",VM);
-            }
+			if (!menu.read(menus, L"NEOSYS")) {
+				menu =
+						FM ^ FM ^ FM ^ FM ^ FM
+								^ L"MEDIA|ADPRODUCTION|ACCS|ANALMENU|TIMESHEETS|FILESMENU|GENERAL|EXIT2";
+				menu = menu.converter(L"|", VM);
+			}
 		}
 	}
 	if (!menu) {
@@ -1485,7 +1560,7 @@ var MvEnvironment::loginnet(const var& dataset, const var& username, var& cookie
 		return false;
 	}
 
-	var menucodes = menu.extract(6) ^ VM ^ L"HELP";
+	var menucodes = menu.a(6) ^ VM ^ L"HELP";
 	//remove local support menu
 	if (!authorised(L"SUPPORT MENU ACCESS", msg, L"LS")) {
 		if (menucodes.locate(L"GENERAL", menun, 1))
@@ -1498,120 +1573,117 @@ var MvEnvironment::loginnet(const var& dataset, const var& username, var& cookie
 
 	return true;
 
-/* custom login per application
-	var compcode = L"";
+	/* custom login per application
+	 var compcode = L"";
 
-	var temp;
-	if (!(temp.read(companies, L"%RECORDS%"))) {
-		companies.select();
-		temp = L"";
-nextcomp:
-		var compcodex;
-		if (var(L"").readnext(compcodex)) {
-			temp.replace(-1, 0, 0, compcodex);
-			goto nextcomp;
-		}
-	}
+	 var temp;
+	 if (!(temp.read(companies, L"%RECORDS%"))) {
+	 companies.select();
+	 temp = L"";
+	 nextcomp:
+	 var compcodex;
+	 if (var(L"").readnext(compcodex)) {
+	 temp.replace(-1, 0, 0, compcodex);
+	 goto nextcomp;
+	 }
+	 }
 
-	if (this->ACCOUNT == L"ADAGENCY") {
-		for (int ii = 1; ii <= 9999; ii++) {
-			compcode = temp.extract(ii);
-			//until validcode('company',compcode)
-		//BREAK;
-		if (validcode2(compcode, L"", L"")) break;;
-		};//ii;
-	}else{
-		compcode = temp.extract(1);
-	}
+	 if (this->ACCOUNT == L"ADAGENCY") {
+	 for (int ii = 1; ii <= 9999; ii++) {
+	 compcode = temp.a(ii);
+	 //until validcode('company',compcode)
+	 //BREAK;
+	 if (validcode2(compcode, L"", L"")) break;;
+	 };//ii;
+	 }else{
+	 compcode = temp.a(1);
+	 }
 
-	if (!compcode) {
-		msg = L"Error: You are not authorised to access any companies";
-		return false;
-	}
+	 if (!compcode) {
+	 msg = L"Error: You are not authorised to access any companies";
+	 return false;
+	 }
 
-	var tempcompany;
-	if (!tempcompany.read(companies, compcode)) {
-		msg = L"Error: " ^ compcode.quote() ^ L" company code is missing";
-		return;
-	}
+	 var tempcompany;
+	 if (!tempcompany.read(companies, compcode)) {
+	 msg = L"Error: " ^ compcode.quote() ^ L" company code is missing";
+	 return;
+	 }
 
-	company = L"";
-	initcompany(compcode);
+	 company = L"";
+	 initcompany(compcode);
 
-force error here TODO: check trigraph following;
-	var defmarketcode = (company.extract(30)) ? (company.extract(30)) : (agp.extract(37));
-	//if unassigned(markets) then markets=''
+	 force error here TODO: check trigraph following;
+	 var defmarketcode = (company.a(30)) ? (company.a(30)) : (agp.a(37));
+	 //if unassigned(markets) then markets=''
 
-	//markets is not open in finance only module
-	//readv maincurrcode from markets,defmarketcode,5 else maincurrcode=''
-	var maincurrcode = L"";
-	if (this->FILES[0].locateusing(L"MARKETS", FM, xx))
-		maincurrcode = defmarketcode.xlate(L"MARKETS", 5, L"X");
+	 //markets is not open in finance only module
+	 //readv maincurrcode from markets,defmarketcode,5 else maincurrcode=''
+	 var maincurrcode = L"";
+	 if (this->FILES[0].locateusing(L"MARKETS", FM, xx))
+	 maincurrcode = defmarketcode.xlate(L"MARKETS", 5, L"X");
 
-	if (maincurrcode.unassigned())
-		maincurrcode = L"";
-	if (maincurrcode == L"")
-		maincurrcode = basecurrency;
+	 if (maincurrcode.unassigned())
+	 maincurrcode = L"";
+	 if (maincurrcode == L"")
+	 maincurrcode = basecurrency;
 
-	cookie ^= L"&cc=" ^ compcode;
-	cookie ^= L"&pd=" ^ currperiod ^ L"/" ^ addcent(curryear);
-	cookie ^= L"&bc=" ^ basecurrency;
-	cookie ^= L"&bf=" ^ this->USER2;
-	cookie ^= L"&mk=" ^ defmarketcode;
-	cookie ^= L"&mc=" ^ maincurrcode;
-	temp = this->SYSTEM.extract(23);
-	temp.swap(L"&", L" and ");
-	cookie ^= L"&db=" ^ temp;
+	 cookie ^= L"&cc=" ^ compcode;
+	 cookie ^= L"&pd=" ^ currperiod ^ L"/" ^ addcent(curryear);
+	 cookie ^= L"&bc=" ^ basecurrency;
+	 cookie ^= L"&bf=" ^ this->USER2;
+	 cookie ^= L"&mk=" ^ defmarketcode;
+	 cookie ^= L"&mc=" ^ maincurrcode;
+	 temp = this->SYSTEM.a(23);
+	 temp.swap(L"&", L" and ");
+	 cookie ^= L"&db=" ^ temp;
 
-	backupreminder(dataset, msg);
+	 backupreminder(dataset, msg);
 
-	changelogsubs(L"WHATSNEW" ^ FM ^ menucodes);
-	cookie ^= L"&wn=" ^ this->ANS;
+	 changelogsubs(L"WHATSNEW" ^ FM ^ menucodes);
+	 cookie ^= L"&wn=" ^ this->ANS;
 
-*/
+	 */
 
 }
 
-var MvEnvironment::at(const int code) const
-{
+var MvEnvironment::at(const int code) const {
 	//should depend on terminal type
 	return var().at(code);
 }
 
-var MvEnvironment::at(const int x, const int y) const
-{
+var MvEnvironment::at(const int x, const int y) const {
 	//should depend on terminal type
 	return var().at(x, y);
 }
 
-
-var MvEnvironment::getuserdept(const var& usercode)
-{
+var MvEnvironment::getuserdept(const var& usercode) {
 	//locate the user in the list of users
 	var usern;
 	if (!(this->SECURITY.locate(usercode, usern, 1))) {
 		if (usercode == L"NEOSYS") {
 			this->ANS = L"NEOSYS";
 			return this->ANS;
-		}else{
+		} else {
 			this->ANS = L"";
 			return this->ANS;
 		}
 	}
 
 	//locate divider, or usern+1
-	var nusers = (this->SECURITY.extract(1)).count(VM) + 1;
+	var nusers = (this->SECURITY.a(1)).count(VM) + 1;
 	var usernx;
 	for (usernx = 1; usernx <= nusers; usernx++) {
-	//BREAK;
-	if (this->SECURITY.extract(1, usernx) == L"---") break;;
-	};//usern;
+		//BREAK;
+		if (this->SECURITY.a(1, usernx) == L"---")
+			break;;
+	};	//usern;
 
 	//get the department code
-	this->ANS = this->SECURITY.extract(1, usernx - 1);
+	this->ANS = this->SECURITY.a(1, usernx - 1);
 
 	return this->ANS;
 
 }
 
-}//of namespace exodus
+}	//of namespace exodus

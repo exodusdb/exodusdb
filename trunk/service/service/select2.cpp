@@ -151,7 +151,7 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 			dictids = L"ID";
 		ndictids = dictids.count(FM) + 1;
 		for (int dictidn = 1; dictidn <= ndictids; dictidn++) {
-			var dictid = dictids.extract(dictidn);
+			var dictid = dictids.a(dictidn);
 			var dictrec;
 			if (!dictrec.read(DICT, dictid)) {
 				if (!dictmd||!dictrec.read(dictmd, dictid)) {
@@ -165,16 +165,16 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 			}
 
 			//pick items
-//TODO:			if (var(L"DI").index(dictrec.extract(1), 1))
+//TODO:			if (var(L"DI").index(dictrec.a(1), 1))
 //				dicti2a(dictrec);
 
 			//pick a is revelation f
-			if (dictrec.extract(1) == L"A")
-				dictrec.replacer(1, 0, 0, L"F");
+			if (dictrec.a(1) == L"A")
+				dictrec.r(1, L"F");
 
 			dictrec.lowerer();
-			dictrecs.replacer(dictidn, 0, 0, dictrec);
-			oconvsx.replacer(dictidn, 0, 0, dictrec.extract(1, 7));
+			dictrecs.r(dictidn, dictrec);
+			oconvsx.r(dictidn, dictrec.a(1, 7));
 		};//dictidn;
 	}
 
@@ -250,9 +250,9 @@ selectnext:
 				var nlimitfields = limitfields.count(VM) + 1;
 				var value, reqvalue, limitcheck;
 				for (int limitfieldn = 1; limitfieldn <= nlimitfields; limitfieldn++) {
-					value = calculate(var(limitfields.extract(1, limitfieldn)));
-					reqvalue = limitvalues.extract(1, limitfieldn);
-					limitcheck = limitchecks.extract(1, limitfieldn);
+					value = calculate(var(limitfields.a(1, limitfieldn)));
+					reqvalue = limitvalues.a(1, limitfieldn);
+					limitcheck = limitchecks.a(1, limitfieldn);
 					if (limitcheck == L"EQ") {
 						if (value not_eq reqvalue)
 							goto selectnext;
@@ -297,7 +297,7 @@ selectnext:
 
 				//prevent reading passwords postread and postwrite
 				if (filename == L"DEFINITIONS" and ID == L"SECURITY")
-					RECORD.replacer(4, 0, 0, L"");
+					RECORD.r(4, L"");
 
 				RECORD.transfer(row);
 
@@ -311,7 +311,7 @@ selectnext:
 				row = L"";
 
 				for (int dictidn = 1; dictidn <= ndictids; dictidn++) {
-					var dictid = dictids.extract(dictidn);
+					var dictid = dictids.a(dictidn);
 					var dictid2 = dictid;
 					dictid2.converter(L"@", L"");
 					var cell = L"";
@@ -319,16 +319,16 @@ selectnext:
                     if (dictid==L"ID")
 id:
                         cell=ID;
-					else if (dictrecs.extract(dictidn,1)=="F")
+					else if (dictrecs.a(dictidn,1)=="F")
 					{
-						var fn=dictrecs.extract(dictidn,2);
+						var fn=dictrecs.a(dictidn,2);
 						if (!fn) goto id;
-						var vn=dictrecs.extract(dictidn,4).substr(1,1)==L"M";
+						var vn=dictrecs.a(dictidn,4).substr(1,1)==L"M";
 						if (vn)
 							vn=MV;
 						else
 							vn=0;
-						cell=RECORD.extract(fn,vn);
+						cell=RECORD.a(fn,vn);
 					}
 					else
 					{
@@ -337,8 +337,8 @@ id:
 cell=library.call(dictid);
 */						//cell=ANS;
 					}
-					if (oconvsx.extract(dictidn))
-						cell = cell.oconv(oconvsx.extract(dictidn));
+					if (oconvsx.a(dictidn))
+						cell = cell.oconv(oconvsx.a(dictidn));
 					if (xml) {
 						//cell='x'
 						//convert "'":'".+/,()&%:-1234567890abcdefghijklmnopqrstuvwxyz abcdefghijklmnopqrstuvwxyz' to '' in cell
@@ -349,7 +349,7 @@ cell=library.call(dictid);
 						//cell=quote(str(cell,10))
 						row ^= L"<" ^ dictid2 ^ L">" ^ cell ^ L"</" ^ dictid2 ^ L">" ^ crlf2;
 					}else{
-						row.replacer(1, dictidn, 0, cell);
+						row.r(1, dictidn, cell);
 					}
 				};//dictidn;
 

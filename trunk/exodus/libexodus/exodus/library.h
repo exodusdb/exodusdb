@@ -65,6 +65,7 @@ extern "C" DLL_PUBLIC void exodusprogrambasecreatedelete( \
 	if (pexodusprogrambase) {\
 			delete pexodusprogrambase; \
 			pexodusprogrambase=NULL; \
+			pmemberfunction=NULL; \
 	} else { \
 			pexodusprogrambase=new ExodusProgram(mv); \
 			pmemberfunction=(pExodusProgramBaseMemberFunction) &ExodusProgram::main; \

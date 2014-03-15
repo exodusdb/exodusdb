@@ -837,7 +837,8 @@ var& var::clone(var& var2)
 	return var2;
 }
 
-var& var::exchange(var& var2)
+//kind of const needed in calculatex
+const var& var::exchange(const var& var2) const
 {
 	THISIS(L"var& var::exchange(var& var2)")
 	//exchange even unassigned vars (but not uninitialised ones)
@@ -1664,14 +1665,14 @@ var var::index(const var& substrx,const int occurrenceno) const
 
 }
 
-var var::perform() const
-{
-	THISIS(L"var var::perform() const")
-	THISISSTRING()
+//var var::perform() const
+//{
+//	THISIS(L"var var::perform() const")
+//	THISISSTRING()
 
-	std::cout<<"var::perform not implemented yet "<<toString()<<std::endl;
-	return L"";
-}
+//	std::cout<<"var::perform not implemented yet "<<toString()<<std::endl;
+//	return L"";
+//}
 
 var var::chain() const
 {
@@ -2103,7 +2104,7 @@ var var::xlate(const var& filename,const var& fieldno, const wchar_t* mode) cons
 	{
 		//extract the field or field 0 means return the whole record
 		if (fieldno)
-			record=record.extract(fieldno);
+			record=record.a(fieldno);
 	}
 	return record;
 }

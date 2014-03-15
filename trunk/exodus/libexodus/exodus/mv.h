@@ -777,7 +777,7 @@ public:
 	void stop(const var& text DEFAULTNULL) const;
 
 	void abort(const var& text DEFAULTNULL) const;
-	var perform() const;
+//	var perform() const;
 	var execute() const;
 	var chain() const;
 	var logoff() const;
@@ -835,7 +835,7 @@ public:
 	bool assigned() const;
 	bool unassigned() const;
 	var& transfer(var& var2);
-	var& exchange(var& var2);
+	const var& exchange(const var& var2) const;
 	var& clone(var& var2);
 /*no implemented yet
 	var addressof() const;
@@ -984,12 +984,12 @@ public:
 //	var insert(const int fieldno,const var& insertion) const;
 
 	var erase(const int fieldno, const int valueno=0, const int subvalueno=0) const;
-	var extract(const int fieldno,const int valueno=0,const int subvalueno=0) const;
+	var a(const int fieldno,const int valueno=0,const int subvalueno=0) const;
 
 	//mutable versions update and return source
-	var& replacer(const int fieldno,const int valueno,const int subvalueno,const var& replacement);
-	var& replacer(const int fieldno,const int valueno,const var& replacement);
-	var& replacer(const int fieldno,const var& replacement);
+	var& r(const int fieldno,const int valueno,const int subvalueno,const var& replacement);
+	var& r(const int fieldno,const int valueno,const var& replacement);
+	var& r(const int fieldno,const var& replacement);
 
 	var& inserter(const int fieldno,const int valueno,const int subvalueno,const var& insertion);
 	var& inserter(const int fieldno,const int valueno,const var& insertion);
@@ -1045,7 +1045,8 @@ public:
 	bool selectrecord(const var& sortselectclause DEFAULTNULL) const;
 	bool readnextrecord(var& record, var& key) const;
 
-	bool lock(const var& key) const;
+	//1=ok, 0=failed, ""=already locked
+	var lock(const var& key) const;
 	void unlock(const var& key) const;
 	void unlockall() const;
 
@@ -1372,7 +1373,7 @@ private:
 	// NOTE: trying to implement data_ as boost smart array pointer (boost::scoped_array<var> data_;)
 	// raises warning: as dim is DLL_PUBLIC, boost library should have DLL interface.
 	// Choices: 1) leave memory allocation as is (refuse from scoped_array, or
-	// 2) use pimpl metaphore with slight decrease in performance.
+	// 2) use pimpl metaphor with slight decrease in performance.
 	// Constructors of dim are very simple, no exception expected between 'new' and return from constructor
 	// As such, choice (1).
 

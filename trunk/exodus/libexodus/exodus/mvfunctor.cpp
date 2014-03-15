@@ -100,6 +100,38 @@ ExodusFunctorBase::~ExodusFunctorBase()
 	closelib();
 }
 
+bool ExodusFunctorBase::init2(const char* libraryname, const char* functionname)
+{
+	if (libraryname_!=libraryname)
+	{
+		closelib();
+		libraryname_=libraryname;
+		functionname_="";
+//		mv_=&mv;
+		libraryname_=libraryname;
+		functionname_=functionname;
+		checkload();
+	}
+
+	//call a function in the library to create one of its "exodus program" objects
+	//nb we MUST call the same library to delete it
+	//so that the same memory management routine is called to create and delete it.
+	//pfunction_ return a pobject_ if pobject_ is passed in NULL (using mv as an init argument)
+	// or deletes a pobject_ if not
+
+	//generate an error here to debug
+//	pobject_->main();
+
+	pfunction_(pobject_,*mv_,pmemberfunction_);
+	//pobject_->main();
+	//((*pobject_).*(pmemberfunction_))();
+	//CALLMEMBERFUNCTION(*pobject_,pmemberfunctibon_)();
+	if (pobject_==NULL||pmemberfunction_==NULL)
+		return false;
+
+	return true;
+}
+
 bool ExodusFunctorBase::init(const char* libraryname, const char* functionname, MvEnvironment& mv)
 {
 	libraryname_=libraryname;
@@ -137,6 +169,7 @@ bool ExodusFunctorBase::init(const char* libraryname, const char* functionname)
 		libraryname_=libraryname;
 		if (!openlib())
 			return false;
+		functionname_="";
 	}
 
 /* init now works for dict FUNCTIONS not dict PROGRAMS
@@ -295,14 +328,13 @@ void ExodusFunctorBase::closelib()
 	//(cant delete the object in the main process since it might have a different memory allocator)
 	if (pobject_!=NULL)
 	{
-		//outputl(L"111");
 		pfunction_(pobject_,*mv_,pmemberfunction_);
 	}
 	//close the connection
 	if (plibrary_!=NULL)
 	{
-		//outputl(L"222");
 		dlclose((library_t) plibrary_);
+		plibrary_=NULL;
 	}
 }
 

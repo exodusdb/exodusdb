@@ -15,15 +15,15 @@ Traditional - honed by usage over the decades. function names on the left and pa
 
 OO flavour - does exactly the same thing but is perhaps easier to read from left to right in one pass:
 
-    xx.extract(6).field("/",2).oconv("D2").outputl(); 
+    xx.a(6).field("/",2).oconv("D2").outputl();
 
 Hybrid:
 
-    printl(xx.extract(6).field("/",2).oconv("D2")); 
+    printl(xx.a(6).field("/",2).oconv("D2"));
 
 Comments about style:
 
-	1. Decided to stick with wordier "xx.extract(99)" instead exodus's "xx(99)" for now because
+	1. Decided to stick with wordier "xx.a(99)" instead exodus's "xx(99)" for now because
 		a. Exodus lack of xx<99> syntax makes it harder to understand what xx(99) means
 		*especially* because list also makes liberal use of dim arrays which have the same round brackets
 		b. It makes LIST marginally more portable into languages like java which are slightly less flexible syntaxwise
@@ -183,7 +183,7 @@ programinit()
 function main() {
 /////////////////
 USER0="";
-	printer1.init(&mv);
+	printer1.init(mv);
 
 	//@sentence='LIST 10 SCHEDULES BY VEHICLE_CODE with vehicle_code "kjh kjh" VEHICLE_NAME BREAK-ON VEHICLE_CODE BREAK-ON VEHICLE_CODE TOTAL PRICE (SX)'
 	//@sentence='list markets code name'
@@ -267,9 +267,9 @@ USER0="";
 		td = "<td>";
 		tdx = "</td>";
 		nbsp = "&nbsp;";
-		tt = mv.SYSTEM.extract(2);
+		tt = SYSTEM.a(2);
 		tt.swapper(".txt", ".htm");
-		mv.SYSTEM.replacer(2, tt);
+		SYSTEM.r(2, tt);
 		printer1.html=1;
 	} else {
 		tr = "";
@@ -301,13 +301,13 @@ USER0="";
 			//write the dictionary records to the dictionary
 			var nrecs=dictrecs.dcount(FM);
 			for (var recn = 1; recn <= nrecs; recn++) {
-				var dictrec=dictrecs.extract(recn);
+				var dictrec=dictrecs.a(recn);
 				while (dictrec.index(" |"))
 					dictrec.swapper(" |","|");
 				var key=field(dictrec,"|",1);
 				var rec=field(dictrec,"|",2,9999);
-				if (key.extract(1)=="F")
-					rec.replacer(28,0,0,1);//master
+				if (key.a(1)=="F")
+					rec.r(28,0,0,1);//master
 				//printl(key ^ ": " ^ rec);
 				write(rec.convert("|",FM), dictmd, key);
 			}
@@ -318,9 +318,9 @@ USER0="";
 //init1:
 ////////
 
-	var thcolor = mv.SYSTEM.extract(46, 1);
-	var tdcolor = mv.SYSTEM.extract(46, 2);
-	var reportfont = mv.SYSTEM.extract(46, 3);
+	var thcolor = SYSTEM.a(46, 1);
+	var tdcolor = SYSTEM.a(46, 2);
+	var reportfont = SYSTEM.a(46, 3);
 	if (not tdcolor)
 		tdcolor = "#FFFFC0";
 	if (not thcolor)
@@ -406,7 +406,8 @@ phraseinit:
 
 	} else if (word eq "GETLIST") {
 		gosub getword();
-		var("GETLIST " ^ word).perform();
+		//var("GETLIST " ^ word).perform();
+		perform("GETLIST "^word);
 
 	} else if (word eq "AND" or word eq "OR") {
 		ss ^= " " ^ word;
@@ -437,10 +438,10 @@ phraseinit:
 		//field or NO
 		ss ^= " " ^ word;
 		if (limit)
-			limits.replacer(1, nlimits, word);
+			limits.r(1, nlimits, word);
 
 		//negate next comparision
-		if (var("NOT,NE,<>").extract(1).locateusing(nextword, ",", xx)) {
+		if (var("NOT,NE,<>").a(1).locateusing(nextword, ",", xx)) {
 			nextword = "NOT";
 			gosub getword();
 			ss ^= " " ^ word;
@@ -451,7 +452,7 @@ phraseinit:
 			gosub getword();
 			ss ^= " " ^ word;
 			if (limit)
-				limits.replacer(2, nlimits, word);
+				limits.r(2, nlimits, word);
 		}
 
 		//with x between y and z
@@ -482,7 +483,7 @@ phraseinit:
 					if (word eq "")
 						word = "\"\"";
 					//append a subvalue
-					limits.replacer(3, nlimits, -1, word);
+					limits.r(3, nlimits, -1, word);
 				}
 			}//loop;
 
@@ -552,9 +553,9 @@ phraseinit:
 		gosub getword();
 		word.splicer(1, 1, "");
 		word.splicer(-1, 1, "");
-		coldict(int(coln)).replacer(9, word[1]);
-		coldict(coln).replacer(10, word[3]);
-		coldict(coln).replacer(11, word);
+		coldict(int(coln)).r(9, word[1]);
+		coldict(coln).r(10, word[3]);
+		coldict(coln).r(11, word);
 
 	//colhead
 	} else if (word eq "COLHEAD") {
@@ -563,7 +564,7 @@ phraseinit:
 		if (coldict(coln).assigned()) {
 			word.unquoter();
 			word.converter("|", VM);
-			coldict(coln).replacer(3, word);
+			coldict(coln).r(3, word);
 		}
 
 	} else if (word eq "OCONV") {
@@ -572,7 +573,7 @@ phraseinit:
 		word.splicer(-1, 1, "");
 		if (html)
 			word.swapper("[DATE]", "[DATE,*]");
-		coldict(coln).replacer(7, word);
+		coldict(coln).r(7, word);
 
 	} else if (word eq "ID-SUPP") {
 		idsupp = 1;
@@ -582,17 +583,17 @@ phraseinit:
 
 	} else if (dictrec) {
 
-		if (var("FSDIA").index(dictrec.extract(1), 1)) {
+		if (var("FSDIA").index(dictrec.a(1), 1)) {
 
 			var nn;
 
 			//pick items
-			if (var("DI").index(dictrec.extract(1), 1))
+			if (var("DI").index(dictrec.a(1), 1))
 				dicti2a(dictrec);
 
 			//pick A equ F
-			if (dictrec.extract(1) eq "A")
-				dictrec.replacer(1, "F");
+			if (dictrec.a(1) eq "A")
+				dictrec.r(1, "F");
 
 			//suppress untotalled columns if doing detsupp2
 			if (detsupp eq 2) {
@@ -609,12 +610,12 @@ phraseinit:
 			colname(coln) = word;
 
 			//increase column width if column title needs it
-			nn = (dictrec.extract(3)).dcount(VM);
+			nn = (dictrec.a(3)).dcount(VM);
 			for (var ii = 1; ii <= nn; ii++) {
-				tt = dictrec.extract(3, ii);
-				var f10=dictrec.extract(10);
+				tt = dictrec.a(3, ii);
+				var f10=dictrec.a(10);
 				if (f10=="" or (f10 and tt.length() > f10))
-					dictrec.replacer(10, tt.length());
+					dictrec.r(10, tt.length());
 			};//ii;
 
 			if (detsupp < 2) {
@@ -622,26 +623,26 @@ phraseinit:
 					tt = " id=\"BHEAD\"";
 					if (detsupp)
 						tt ^= " style=\"display:none\"";
-					dictrec.replacer(14, tt);
+					dictrec.r(14, tt);
 				}
 			}
 
 			//total required ?
 			if (totalflag) {
 				totalflag = 0;
-				dictrec.replacer(12, 1);
+				dictrec.r(12, 1);
 				anytotals = 1;
 			} else
-				dictrec.replacer(12, 0);
+				dictrec.r(12, 0);
 
 			if (html) {
-				tt = dictrec.extract(7);
+				tt = dictrec.a(7);
 				tt.swapper("[DATE]", "[DATE,*]");
 				if (tt eq "[DATE,4]")
 					tt = "[DATE,4*]";
-				dictrec.replacer(7, tt);
+				dictrec.r(7, tt);
 				if (tt eq "[DATE,*]")
-					dictrec.replacer(9, "R");
+					dictrec.r(9, "R");
 			}
 			coldict(coln) = dictrec;
 
@@ -649,30 +650,30 @@ phraseinit:
 			if (html)
 				tt = "";
 			else {
-				tt = coldict(coln).extract(9);
+				tt = coldict(coln).a(9);
 				if (tt)
-					tt ^= "#" ^ coldict(coln).extract(10);
+					tt ^= "#" ^ coldict(coln).a(10);
 			}
-			coldict(coln).replacer(11, tt);
+			coldict(coln).r(11, tt);
 
 			//this could be a break-on column and have break-on options
 			//if coln=breakcolns<1> then
 			if (breakonflag) {
-				coldict(coln).replacer(13, 1);
+				coldict(coln).r(13, 1);
 				breakonflag = 0;
 				if (nextword[1] eq DQ) {
 					gosub getword();
 					//zzz break options
 					if (word.index("B", 1))
 						pagebreakcoln = coln;
-					breakoptions.replacer(1, word);
+					breakoptions.r(1, word);
 				}
 			}
 		}
 
 	} else if (word eq "IGNOREWORD") {
 		gosub getword();
-		ignorewords.replacer(1, -1, word);
+		ignorewords.r(1, -1, word);
 
 		//@LPTR word is skipped if not located in MD/DICT.MD
 	} else if (word eq "@LPTR") {
@@ -740,20 +741,20 @@ x1exit:
 		if (html)
 			tt = "";
 		else
-			tt = coldict(1).extract(9) ^ "#" ^ coldict(1).extract(10);
+			tt = coldict(1).a(9) ^ "#" ^ coldict(1).a(10);
 
-		coldict(1).replacer(11, tt);
+		coldict(1).r(11, tt);
 
 		//increment the list of breaking columns by one as well
 		for (var breakn = 1; breakn <= nbreaks; breakn++)
-			breakcolns.replacer(breakn, breakcolns.extract(breakn) + 1);
+			breakcolns.r(breakn, breakcolns.a(breakn) + 1);
 		pagebreakcoln += 1;
 
 	}
 
 	//work out column "widths". zero suppresses a column. blank or anything else allows it.
 	for (int coln=1; coln<=ncols; ++coln) {
-		var tt=coldict(coln).extract(10);
+		var tt=coldict(coln).a(10);
 		if (tt eq "")
 			tt="10";
 		wcol(coln)=tt;
@@ -771,7 +772,7 @@ x1exit:
 		colunderline = "";
 		for (int coln = 1; coln <= ncols; coln++) {
 			if (wcol(coln)) {
-				if (coldict(coln).extract(12)) {
+				if (coldict(coln).a(12)) {
 					tt = "-";
 				} else {
 					tt = " ";
@@ -813,7 +814,7 @@ x1exit:
 
 		//suppress drilldown if no totals or breakdown
 		if (not anytotals or not nbreaks)
-			coldict(coln).replacer(14, "");
+			coldict(coln).r(14, "");
 
 		if (wcol(coln)) {
 			if (html) {
@@ -823,13 +824,13 @@ x1exit:
 				tt = "<th ";
 				//if detsupp=1 then t:=coldict(coln)<14>
 				if (not usecols)
-					tt ^= coldict(coln).extract(14);
-				tt ^= ">" ^ coldict(coln).extract(3) ^ "</th>";
-				colheading.replacer(coln2, tt);
+					tt ^= coldict(coln).a(14);
+				tt ^= ">" ^ coldict(coln).a(3) ^ "</th>";
+				colheading.r(coln2, tt);
 
 				colheading.swapper(VM, "<br />");
-				coltags.replacer(-1, "<col");
-				var align = coldict(coln).extract(9);
+				coltags.r(-1, "<col");
+				var align = coldict(coln).a(9);
 				if (align eq "R") {
 					//if index(coldict(coln)<7>,'[NUMBER',1) then
 					// *http://www.w3.org/TR/html401/struct/tables.html#adef-align-TD
@@ -843,11 +844,11 @@ x1exit:
 					coltags ^= " style=\"text-align:left\"";
 
 				if (usecols)
-					coltags ^= coldict(coln).extract(14);
+					coltags ^= coldict(coln).a(14);
 				coltags ^= " />";
 			} else {
 				for (var ii = 1; ii <= 9; ++ii)
-					colheading.replacer(ii, colheading.extract(ii) ^ (coldict(coln).extract(3, ii)).oconv(coldict(coln).extract(11)) ^ " ");
+					colheading.r(ii, colheading.a(ii) ^ (coldict(coln).a(3, ii)).oconv(coldict(coln).a(11)) ^ " ");
 			}
 		}
 	}
@@ -861,14 +862,14 @@ x1exit:
 	//compare to (if (nobase) ... " a little below
 	tt = html ? "" : "C#6";
 
-	var t2 = company.extract(3);
+	var t2 = company.a(3);
 	if (t2) {
 		if (nobase)
 			t2 = "";
 		else
 			t2 = "(" ^ t2 ^ ")";
 		colheading.swapper("(Base)", t2.oconv(tt));
-		colheading.swapper("%BASE%", company.extract(3));
+		colheading.swapper("%BASE%", company.a(3));
 	}
 
 	//trim off blank lines (due to the 9 above)
@@ -938,7 +939,7 @@ x1exit:
 	if (dblspc)
 		head ^= FM;
 	orighead = head;
-	printer1.setheadfoot(head,foot);
+	printer1.setheadfoot(mv,head,foot);
 
 //////////
 //initrec:
@@ -967,7 +968,7 @@ x1exit:
 			tx ^= "</tbody></table>";
 
 		tx ^= "No records listed";
-		printer1.printtx(tx);
+		printer1.printtx(mv,tx);
 */
 
 	} else {
@@ -983,9 +984,9 @@ x1exit:
 	if (html)
 		tx ^= "</tbody></table></div></body></html>";
 
-	printer1.printtx(tx);
+	printer1.printtx(mv, tx);
 
-	printer1.close();
+	printer1.close(mv);
 
 	return 0;
 }
@@ -1004,7 +1005,7 @@ subroutine process_all_records()
 			if (html)
 				tx ^= "</tbody></table>";
 			tx ^= "*** incomplete - interrupted ***";
-			printer1.printtx(tx);
+			printer1.printtx(mv,tx);
 			clearselect();
 			//goto x2bexit;
 			return;
@@ -1022,18 +1023,18 @@ subroutine process_all_records()
 			mv.FILEERRORMODE = 0;
 			/* treat all errors as just "no more records"
 			if (_STATUS) {
-			tx = "*** Fatal Error " ^ mv.FILEERROR.extract(1) ^ " reading record " ^ ID ^ " ***";
-			printer1.printtx(tx);
+			tx = "*** Fatal Error " ^ mv.FILEERROR.a(1) ^ " reading record " ^ ID ^ " ***";
+			printer1.printtx(mv,tx);
 			abort("");
 			}
-			if (mv.FILEERROR.extract(1) eq 421) {
+			if (mv.FILEERROR.a(1) eq 421) {
 			tx = "Operation aborted by user.";
-			printer1.printtx(tx);
+			printer1.printtx(mv,tx);
 			abort("");
 			}
-			if (mv.FILEERROR and mv.FILEERROR.extract(1) ne 111) {
-			tx = "*** Error " ^ mv.FILEERROR.extract(1) ^ " reading record " ^ ID ^ " ***";
-			printer1.printtx(tx);
+			if (mv.FILEERROR and mv.FILEERROR.a(1) ne 111) {
+			tx = "*** Error " ^ mv.FILEERROR.a(1) ^ " reading record " ^ ID ^ " ***";
+			printer1.printtx(mv,tx);
 			readerr += 1;
 			abort("");
 			}
@@ -1058,7 +1059,7 @@ subroutine process_all_records()
 			//find maximum var number
 			var nvars = 1;
 			for (var fn = 1; fn <= nfns; fn++) {
-				temp = RECORD.extract(fn);
+				temp = RECORD.a(fn);
 				if (temp.length()) {
 					temp = temp.dcount(VM);
 					if (temp > nvars)
@@ -1069,16 +1070,16 @@ subroutine process_all_records()
 			for (var limitn = 1; limitn <= nlimits; limitn++) {
 
 				//calculate() accesses data via dictionary keys
-				var limitvals = calculate(var(limits.extract(1, limitn)));
+				var limitvals = calculate(var(limits.a(1, limitn)));
 
 				for (var varx = nvars; varx >= 1; varx--) {
-					temp = limitvals.extract(1, varx);
+					temp = limitvals.a(1, varx);
 					if (temp eq "")
 						temp = "\"\"";
 					//locate temp in (limits<3,limitn>)<1,1> using sm setting x else
-					if (not limits.extract(3, limitn).locateusing(temp, SVM, xx)) {
+					if (not limits.a(3, limitn).locateusing(temp, SVM, xx)) {
 						for (var fn = 1; fn <= nfns; fn++) {
-							var varalues = RECORD.extract(fn);
+							var varalues = RECORD.a(fn);
 							if (varalues.count(VM))
 								RECORD.eraser(fn, varx, 0);
 						};//fn;
@@ -1124,8 +1125,8 @@ subroutine process_one_record()
 
 	//visible progress indicator
 	//var().getcursor();
-	//if (not mv.SYSTEM.extract(33)) {
-	//	print(mv.AW.extract(30), var().cursor(36, mv.CRTHIGH / 2));
+	//if (not SYSTEM.a(33)) {
+	//	print(mv.AW.a(30), var().cursor(36, mv.CRTHIGH / 2));
 	//}else{
 	//	print(var().cursor(0));
 	//}
@@ -1142,22 +1143,22 @@ subroutine process_one_record()
 		//dont call calculate except for S items because some F items
 		//are constructed and/or exist in dict_md
 		dictrec=coldict(coln);
-		if (dictrec.extract(1) eq "F") {
-			fieldno=dictrec.extract(2);
+		if (dictrec.a(1) eq "F") {
+			fieldno=dictrec.a(2);
 			if (not fieldno) {
 				cell=ID;
-				keypart=dictrec.extract(6);
+				keypart=dictrec.a(6);
 				if (keypart)
 					cell=cell.field(L'.',keypart);
 			} else
-				cell=RECORD.extract(fieldno);
+				cell=RECORD.a(fieldno);
 
 		//calculate() accesses data via dictionary keys
 		} else 
 			cell=calculate(colname(coln));
 
-		if (not html and dictrec.extract(9) == L"T")
-			mcol(coln)=cell.oconv(dictrec.extract(11));
+		if (not html and dictrec.a(9) == L"T")
+			mcol(coln)=cell.oconv(dictrec.a(11));
 		else
 			mcol(coln)=cell;
 
@@ -1180,7 +1181,7 @@ subroutine process_one_record()
 		int coln;
 		int leveln;//used after loop so cant declare in the "for" statement
 		for (leveln = nbreaks; leveln >= 1; leveln--) {
-			coln = breakcolns.extract(leveln);
+			coln = breakcolns.a(leveln);
 
 			///BREAK;
 			if (scol(coln) ne breakvalue(coln))
@@ -1219,7 +1220,7 @@ subroutine process_one_record()
 		//break totals - add at the bottom level (1)
 		for (int coln = 1; coln <= ncols; coln++) {
 			//only totalled columns
-			if (coldict(coln).extract(12)) {
+			if (coldict(coln).a(12)) {
 				if (icol(coln)) {
 					if (html) {
 						//breaktotal(coln,1)+=i.col(coln)
@@ -1273,7 +1274,7 @@ subroutine process_one_record()
 				tt = scol(coln);
 
 				//oconv
-				var oconvx = coldict(coln).extract(7);
+				var oconvx = coldict(coln).a(7);
 				if (oconvx) {
 					tt = tt.oconv(oconvx);
 
@@ -1291,7 +1292,7 @@ subroutine process_one_record()
 
 					//non-html format to fixed with with spaces
 					if (not html)
-						tt = tt.oconv(coldict(coln).extract(11));
+						tt = tt.oconv(coldict(coln).a(11));
 
 					//html blank is nbsp
 					if (tt eq "")
@@ -1304,7 +1305,7 @@ subroutine process_one_record()
 
 			//terminate the row and output it
 			//tx ^= trx;
-			printer1.printtx(tx);
+			printer1.printtx(mv,tx);
 
 			//loop back if any multivalued lines/folded text
 			if (newmarklevel) {
@@ -1316,7 +1317,7 @@ subroutine process_one_record()
 
 			//double space
 			if (dblspc)
-				printer1.printtx(tx);
+				printer1.printtx(mv,tx);
 
 		}//detsupp < 2
 
@@ -1444,8 +1445,8 @@ subroutine getwordexit()
 
 	//standardise
 	if (DICT ne "" and dictrec.read(DICT, word)) {
-		if (dictrec.extract(1) eq "G") {
-			tt = dictrec.extract(3);
+		if (dictrec.a(1) eq "G") {
+			tt = dictrec.a(3);
 			tt.converter(VM, " ");
 			sentencex.splicer(startcharn, word.length(), tt);
 			charn = startcharn - 1;
@@ -1457,9 +1458,9 @@ subroutine getwordexit()
 	} else {
 		dictrec = "";
 		if (dictmd and dictrec.read(dictmd, word)) {
-			if (dictrec.extract(1) eq "RLIST") {
-				if (dictrec.extract(4))
-					word = dictrec.extract(4);
+			if (dictrec.a(1) eq "RLIST") {
+				if (dictrec.a(4))
+					word = dictrec.a(4);
 				dictrec = "";
 			}
 		}
@@ -1508,7 +1509,7 @@ subroutine printbreaks()
 	//for leveln=breakleveln to 1 step -1
 
 	for (var leveln = 1; leveln <= breakleveln; leveln++) {
-		var breakcoln = breakcolns.extract(leveln);
+		var breakcoln = breakcolns.a(leveln);
 
 		var storetx = tx;
 		//output any prior tx is this level is suppressed
@@ -1548,7 +1549,7 @@ subroutine printbreaks()
 		for (int coln = 1; coln <= ncols; coln++) {
 
 			//total column
-			if (coldict(coln).extract(12)) {
+			if (coldict(coln).a(12)) {
 				cell = breaktotal(coln,leveln);
 
 				//add into the higher level
@@ -1574,7 +1575,7 @@ subroutine printbreaks()
 				}
 
 				//format it
-				var oconvx = coldict(coln).extract(7);
+				var oconvx = coldict(coln).a(7);
 				if (oconvx)
 					cell = cell.oconv(oconvx);
 
@@ -1593,7 +1594,7 @@ subroutine printbreaks()
 
 				//print the old break value
 				cell = breakvalue(coln);
-				var oconvx = coldict(coln).extract(7);
+				var oconvx = coldict(coln).a(7);
 				if (oconvx)
 					cell = cell.oconv(oconvx);
 
@@ -1629,13 +1630,13 @@ subroutine printbreaks()
 			if (wcol(coln)) {
 				if (not html) {
 					cell = cell.substr(1, wcol(coln));
-					cell = cell.oconv(coldict(coln).extract(11));
+					cell = cell.oconv(coldict(coln).a(11));
 					tx ^= cell ^ tdx;
 				} else {
 					tx ^= "<td";
 					if (not usecols)
-						tx ^= coldict(coln).extract(14);
-					if (coldict(coln).extract(9) eq "R")
+						tx ^= coldict(coln).a(14);
+					if (coldict(coln).a(9) eq "R")
 						tx ^= " style=\"text-align:right\"";
 					tx ^= ">";
 					tx ^= cell ^ tdx;
@@ -1658,7 +1659,7 @@ subroutine printbreaks()
 
 		//option to suppress the current level
 		//or if this is the first record cannot be any totals before it.
-		if ((breakoptions.extract(leveln)).index("X", 1) or recn eq 1)
+		if ((breakoptions.a(leveln)).index("X", 1) or recn eq 1)
 			tx = storetx;
 
 	};//leveln;
@@ -1681,7 +1682,7 @@ subroutine printbreaks()
 		if (newhead and html and tx)
 			tx ^= "</tbody></table>";
 		if (tx)
-			printer1.printtx(tx);
+			printer1.printtx(mv,tx);
 	} else {
 		tx = "";
 	}
@@ -1745,14 +1746,10 @@ subroutine addunits(in newunits, out totunits)
 
 }
 
+/*
 subroutine mssg(in msg)
 {
 	printl(msg);
-}
-
-subroutine fsmsg()
-{
-	printl("fsmsg():");
 }
 
 subroutine msg2(in msg, in options, io buffer, in params)
@@ -1766,6 +1763,7 @@ subroutine msg2(in msg, in options, io buffer, in params)
 	if (buffer or params){};
 
 }
+*/
 
 subroutine dicti2a(out dictrec)
 {

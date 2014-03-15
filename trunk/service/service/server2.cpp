@@ -481,9 +481,9 @@ function main()
 	//force into interactive mode for deb ugging
 	//if tracing then
 	if (1) {
-		mv.SYSTEM.replacer(33, 0, 0, 1);
+		mv.SYSTEM.r(33, 1);
 	}else{
-		mv.SYSTEM.replacer(33, 0, 0, "");
+		mv.SYSTEM.r(33, "");
 	}
 	//end else
 	// end
@@ -492,7 +492,7 @@ function main()
 	batchmode = origbatchmode;
 	if (batchmode == "") {
 		batchmode = mv.SYSTEM.a(33);
-		mv.SYSTEM.replacer(33, 0, 0, "1");
+		mv.SYSTEM.r(33, "1");
 	}
 	// if trim(@station)='sb_compaq' and @username='neosys' then system<33>=''
 
@@ -519,7 +519,6 @@ function main()
 	//sleepms
 	//datasetcode
 
-	//TODO needs a break out of loop forever
 	while (requestloop()){};
 
 	return "";
@@ -544,6 +543,7 @@ function requestloop()
 	//indicate that we are active
 //		messaging("CHECK");
 
+	//TODO needs a break out of loop forever
 	while (serviceloop()){}
 
 	return false;
@@ -576,8 +576,8 @@ function serviceloop()
 
 	//prevent sleep in esc.to.exit
 	timenow=var().ostime();
-	mv.SYSTEM.replacer(25, 0, 0, timenow);
-	mv.SYSTEM.replacer(26, 0, 0, timenow);
+	mv.SYSTEM.r(25, timenow);
+	mv.SYSTEM.r(26, timenow);
 
 	if (mv.esctoexit())
 		return false;
@@ -670,7 +670,7 @@ stopper:
 
 	//switch into interactive mode to check for operator input
 	var s33 = mv.SYSTEM.a(33);
-	mv.SYSTEM.replacer(33, 0, 0, "");
+	mv.SYSTEM.r(33, "");
 
 	//check for esc key to exit
 	//if esc.to.exit() then return 999999
@@ -725,7 +725,7 @@ stopper:
 		}
 
 		//switch back to not interactive mode
-		mv.SYSTEM.replacer(33, 0, 0, s33);
+		mv.SYSTEM.r(33, s33);
 
 		gosub getbakpars();
 
@@ -740,13 +740,14 @@ stopper:
 			if (charx == "B" || ( bakdows.index(dow, 1) && timex > minbaktime && timex < maxbaktime)) {
 
 				if (testdata)
-					var("OFF").perform();
+					//var("OFF").perform();
+					return false;
 
 				lastbakattemptdate = var().date();
 				lastbakattemptdate.writev(mv.DEFINITIONS, "BACKUP", 1);
 
 				USER4 = "";
-				var("FILEMAN BACKUP " ^ datasetcode ^ " " ^ bakdisk ^ " SYSTEM").perform();
+				perform("FILEMAN BACKUP " ^ datasetcode ^ " " ^ bakdisk ^ " SYSTEM");
 
 				//quit and indicate to calling program that a backup has been done
 				//if tracing else
@@ -771,11 +772,11 @@ function processlink()
 //printl("processlink:"^linkfilenames);
 
 	nrequests += 1;
-	mv.SYSTEM.replacer(35,0,0,nrequests);
+	mv.SYSTEM.r(35,0,0,nrequests);
 
 	//get the earliest time possible for the log
 	requeststarttime=var().ostime();
-	mv.SYSTEM.replacer(25, 0, 0, requeststarttime);
+	mv.SYSTEM.r(25, requeststarttime);
 
 	gosub gettimeouttime();
 
@@ -967,7 +968,7 @@ function processrequest()
 	USER0 = USER0.field(FM,  nconnectionfields+1, 99999);
 
 	//save connection details
-	mv.SYSTEM.replacer(40, 0, 0, connection);
+	mv.SYSTEM.r(40, connection);
 //connection.outputl("connection=");
 //USER0.outputl("USER0 after removal of connection=");
 
@@ -1012,7 +1013,7 @@ function processrequest()
 		logx = USER0;
 		gosub convlogx();
 		logx.converter("^", FM);
-		logx.replacer(1, 0, 0, request1);
+		logx.r(1, request1);
 		if (logx.a(1)!="")
 			tt ^= " Req1=" ^ logx.a(1).quote();
 		if (logx.a(5)!="")
@@ -1079,7 +1080,7 @@ function processrequest()
 
 	//save the response file name
 	//so that if Server fails then net the calling program can still respond
-	mv.PRIORITYINT.replacer(100, 0, 0, linkfilename3);
+	mv.PRIORITYINT.r(100, linkfilename3);
 
 	var linkfilename2size = linkfilename2.osfile().a(1);
 	if (linkfilename2size > maxstringsize) {
@@ -1248,7 +1249,7 @@ cannotopenlinkfilename2:
 	//and assume that identity if ok
 	gosub validate();
 
-	mv.SYSTEM.replacer(2, 0, 0, linkfilename2);
+	mv.SYSTEM.r(2, linkfilename2);
 
 	//get the current program stack
 //	var stack = programstack(nostack);
@@ -1319,12 +1320,12 @@ subroutine login()
 		var userrec;
 		if (userrec.read(users, username)) {
 			//save prior login
-			userrec.replacer(15, 0, 0, userrec.a(13));
-			userrec.replacer(16, 0, 0, userrec.a(14));
+			userrec.r(15, userrec.a(13));
+			userrec.r(16, userrec.a(14));
 			//save current login
 			var datetime = var().date() ^ "." ^ (var().time()).oconv("R(0)#5");
-			userrec.replacer(13, 0, 0, datetime);
-			userrec.replacer(14, 0, 0, mv.SYSTEM.a(40, 2));
+			userrec.r(13, datetime);
+			userrec.r(14, mv.SYSTEM.a(40, 2));
 			userrec.write(users, username);
 		}
 	}
@@ -1398,12 +1399,12 @@ subroutine validate()
 					if (ndots < 3)
 						connectionx ^= var("\".\"0N").str(3 - ndots);
 
-					connections.replacer(1, 1, ii, connectionx);
+					connections.r(1, 1, ii, connectionx);
 				};//ii;
 
 				//buffer it (space prevents reassement even if none)
 				//trailing space also means wildcards have been converted
-				mv.SECURITY.replacer(6, usern, 0, connections ^ " ");
+				mv.SECURITY.r(6, usern, 0, connections ^ " ");
 			}
 
 			//check if allowed to connect from xxx
@@ -1620,12 +1621,12 @@ subroutine exit()
 
 	//get into interactive mode
 	//system<33>=origbatchmode
-	mv.SYSTEM.replacer(33, 0, 0, "");
+	mv.SYSTEM.r(33, "");
 	mv.PRIVILEGE=origprivilege;
 
 	if (request1 == "RESTART") {
 		//chain 'Server'
-		mv.SYSTEM.replacer(35, 0, 0, nrequests);
+		mv.SYSTEM.r(35, nrequests);
 		//msg='restart'
 		//stop
 
@@ -1636,10 +1637,10 @@ subroutine exit()
 	//BREAK OFF;
 	//BREAK ON;
 
-	if (origbatchmode || request1 == "STOPDB" || halt) {
-		//BREAK OFF;
-		var("OFF").perform();
-	}
+	//if (origbatchmode || request1 == "STOPDB" || halt) {
+	//	//BREAK OFF;
+		//var("OFF").perform();
+	//}
 
 	//msg is @user4
 	USER4 = "TERMINATED OK";
@@ -1998,7 +1999,7 @@ keyx="";
 
 		//prevent reading passwords postread and postwrite
 		if (filename == "DEFINITIONS" && keyx == "SECURITY")
-			USER1.replacer(4, 0, 0, "");
+			USER1.r(4, "");
 
 		USER1.cropper();
 
@@ -2222,7 +2223,7 @@ emptyrecorderror:
 
 			//prevent reading passwords postread and postwrite
 			if (filename == "DEFINITIONS" && keyx == "SECURITY")
-				USER1.replacer(4, 0, 0, "");
+				USER1.r(4, "");
 
 		}else if (request1 == "DELETE") {
 
@@ -2349,7 +2350,7 @@ emptyrecorderror:
 		//t=printfilename[-1,'b.']
 		tt = printfilename.field2(".", -1);
 		printfilename.splicer(-tt.length(), tt.length(), "htm");
-		mv.SYSTEM.replacer(2, 0, 0, printfilename);
+		mv.SYSTEM.r(2, printfilename);
 		if (tracing)
 			std::wcout << "Waiting for output ... ";
 
@@ -2357,9 +2358,9 @@ emptyrecorderror:
 		var s6 = mv.SYSTEM.a(6);
 		var s7 = mv.SYSTEM.a(7);
 		var s11 = mv.SYSTEM.a(11);
-		mv.SYSTEM.replacer(6, 0, 0, 1);
-		mv.SYSTEM.replacer(7, 0, 0, 1);
-		mv.SYSTEM.replacer(11, 0, 0, 1);
+		mv.SYSTEM.r(6, 1);
+		mv.SYSTEM.r(7, 1);
+		mv.SYSTEM.r(11, 1);
 
 		//execute the program
 		//print timedate2():' starting ':indata[1,60]
@@ -2386,7 +2387,7 @@ emptyrecorderror:
 		//call @mdcmd
 		//send errors to neosys
 //		USER4="NOT IMPLEMENTED YET:\rEXECUTE " ^ mdcmd ^ "\r" ^ USER0;
-
+		perform(mdcmd);
 		//discard any stored input
 		mv.DATA = "";
 
@@ -2412,9 +2413,9 @@ emptyrecorderror:
 		}
 
 		//switch off server mode
-		mv.SYSTEM.replacer(6, 0, 0, s6);
-		mv.SYSTEM.replacer(7, 0, 0, s7);
-		mv.SYSTEM.replacer(11, 0, 0, s11);
+		mv.SYSTEM.r(6, s6);
+		mv.SYSTEM.r(7, s7);
+		mv.SYSTEM.r(11, s11);
 
 		//get the printfilename in case the print program changed it
 		printfilename = mv.SYSTEM.a(2);
@@ -2472,7 +2473,7 @@ emptyrecorderror:
 
 		//backup will respond to user itself if it starts
 		USER4 = "";
-		var("FILEMAN BACKUP " ^ datasetcode ^ " " ^ bakdisk).perform();
+		perform("FILEMAN BACKUP " ^ datasetcode ^ " " ^ bakdisk);
 
 		//if backup has already responded to user
 		//then quit and indicate to calling program that a backup has been done
@@ -2743,11 +2744,11 @@ subroutine lock()
 
 	//write the lock in the locks file
 	lockrec = "";
-	lockrec.replacer(1, 0, 0, lockduration + ostimenow);
-	lockrec.replacer(2, 0, 0, ostimenow);
-	lockrec.replacer(3, 0, 0, connection ? connection.a(1, 2): mv.STATION);
-	lockrec.replacer(4, 0, 0, USERNAME);
-	lockrec.replacer(5, 0, 0, newsessionid);
+	lockrec.r(1, lockduration + ostimenow);
+	lockrec.r(2, ostimenow);
+	lockrec.r(3, connection ? connection.a(1, 2): mv.STATION);
+	lockrec.r(4, USERNAME);
+	lockrec.r(5, newsessionid);
 	mv.FILEERRORMODE = 1;
 	mv.FILEERROR = "";
 	USER3 = "OK";
@@ -2906,7 +2907,7 @@ subroutine getbakpars()
 	if (tt.osread("BACKUP.CFG")) {
 		for (int ii = 1; ii <= 99; ii++) {
 			if (tt.a(ii))
-				bakpars.replacer(ii, 0, 0, tt.a(ii));
+				bakpars.r(ii, tt.a(ii));
 		};//ii;
 	}
 	var lastbakattemptdate = bakpars.a(1);
@@ -3061,7 +3062,7 @@ subroutine respond()
 	var().ossleep(2000);
 
 	//indicate that response has been made
-	mv.SYSTEM.replacer(2, 0, 0, "");
+	mv.SYSTEM.r(2, "");
 
 	return;
 
@@ -3140,6 +3141,7 @@ subroutine getindexvalues()
 
 subroutine select()
 {
+
 	//USER1=''
 
 //TODO

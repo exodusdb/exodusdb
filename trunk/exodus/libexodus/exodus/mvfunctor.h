@@ -99,10 +99,10 @@ namespace exodus {
 class ExodusProgramBase;
 class MvEnvironment;
 
-//pExodusProgramBase - pointer to exodus program type
+//pExodusProgramBase - "pointer to exodus program" type
 typedef ExodusProgramBase* pExodusProgramBase;
 
-//pExodusProgramBaseMemberFunction - pointer to exodus program member function
+//pExodusProgramBaseMemberFunction - "pointer to exodus program" member function
 typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)();
 
 /*
@@ -158,8 +158,12 @@ virtual ~ExodusFunctorBase();
 //void* pfunction_;
 
 public:
+	//for call
 	bool init(const char* libraryname, const char* functionname);
+	//for calculate dict
 	bool init(const char* libraryname, const char* functionname, MvEnvironment& mv);
+	//for perform
+	bool init2(const char* libraryname, const char* functionname);
 
 private:
 	bool openlib();

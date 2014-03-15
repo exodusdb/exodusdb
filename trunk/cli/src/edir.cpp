@@ -29,8 +29,8 @@ program()
                 stop();
         }
 
-        var filename=COMMAND.extract(2);
-        var key=COMMAND.extract(3);
+        var filename=COMMAND.a(2);
+        var key=COMMAND.a(3);
 
         //connect to the database
         if (not connect())

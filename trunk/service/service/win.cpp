@@ -150,7 +150,7 @@ function invalidq(in msg)
 
 {
 
-	return invalid(msg.splice(1, 0, (win.is.extract(1, 1, 1)).quote() ^ L" "));
+	return invalid(msg.splice(1, 0, (win.is.a(1, 1, 1)).quote() ^ L" "));
 
 }
 

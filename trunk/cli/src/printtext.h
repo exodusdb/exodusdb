@@ -2,7 +2,6 @@
 
 class printtext
 {
-	MvEnvironment* env;
 
 	var printptr;
 	//var tx;
@@ -30,26 +29,24 @@ public:
 
 	var html;
 
-	void init(MvEnvironment* env_) {
-		env=env_;
-	}
+    void init(MvEnvironment& mv){}
 
-	void printnext(io bodyln, io pagen) {
+	void printnext(MvEnvironment& mv, io bodyln, io pagen) {
 		bodyln = 999;
 		pagen = 0;
 		return;
 	}
 
-	void setheadfoot(in newhead, in newfoot) {
+	void setheadfoot(MvEnvironment& mv, in newhead, in newfoot) {
 		head=newhead;
 		foot=newfoot;
 	}
 
-	void close() {
+	void close(MvEnvironment& mv) {
 		printfilename.osclose();
 	}
 
-	void printtx(io tx) {
+	void printtx(MvEnvironment& mv, io tx) {
 		//print(tx);
 		if (printptr.unassigned())
 			printptr = 0;
@@ -63,10 +60,10 @@ public:
 				tx = "";
 
 			//call setptr('prn':char(0),1)
-			env->SYSTEM.replacer(3, 0, 0, 1);
+			SYSTEM.r(3, 1);
 
 			//if no printfilename assume command mode and make an output file name
-			printfilename = env->SYSTEM.extract(2);
+			printfilename = SYSTEM.a(2);
 			if (html.unassigned()) {
 				html = printfilename.substr(-4,4) eq ".htm";
 			}
@@ -78,7 +75,7 @@ public:
 					printfilename^=".htm";
 				else
 					printfilename^=".txt";
-				env->SYSTEM.replacer(2, 0, 0, printfilename);
+				SYSTEM.r(2, printfilename);
 				ownprintfile = 1;
 			}
 
@@ -94,7 +91,7 @@ public:
 				//var t2 = ((var(pow(10,15)).rnd()).substr(1, 8);
 				printfilename.splicer(-tt, tt, t2 ^ ".htm");
 
-				env->SYSTEM.replacer(2, 0, 0, printfilename);
+				SYSTEM.r(2, printfilename);
 			}
 
 			//open printout file
@@ -111,7 +108,7 @@ public:
 					letterhead = "";
 			}
 
-			//pagelns = env.LPTRHIGH - 1;
+			//pagelns = mv.LPTRHIGH - 1;
 			bodyln = 0;
 			realpagen = 0;
 			pagen = 0;
@@ -156,7 +153,7 @@ public:
 			pagen += 1;
 
 			//var().getcursor();
-			//cout << _AW.extract(30)<< var().cursor(36, _CRTHIGH / 2)<< "Page"<< " "<< realpagen<< ".";
+			//cout << _AW.a(30)<< var().cursor(36, _CRTHIGH / 2)<< "Page"<< " "<< realpagen<< ".";
 			//cursor.setcursor();
 
 			//insert page break except on first page
@@ -212,7 +209,7 @@ private:
 					style = "";
 				if (style)
 					css.swapper("</style>", style ^ "</style>");
-				var htmltitle = (headx.extract(1)).field("\'", 1, 1);
+				var htmltitle = (headx.a(1)).field("\'", 1, 1);
 				if (htmltitle[1] == "<")
 					htmltitle = (htmltitle.field(">", 2, 1)).field("<", 1, 1);
 				tx.splicer(1, 0, "\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<title>" ^ htmltitle ^ "</title>" ^ FM ^ css ^ "</head>\n<body style=\"background-color:#ffffff\">\n<div style=\"text-align:center\">" ^ (var().chr(13) ^ var().chr(10)));
@@ -344,13 +341,13 @@ css=""
 		}
 
 		if (html) {
-			var head1 = headx.extract(1);
+			var head1 = headx.a(1);
 			head1.swapper(" ", "&nbsp;");
 			head1.converter("~", " ");
 			while (head1.substr(-6, 6) == "&nbsp;") {
 				head1.splicer(-6, 6, "");
 			}
-			headx.replacer(1, 0, 0, head1);
+			headx.r(1, head1);
 			head1 = "";
 		}
 
