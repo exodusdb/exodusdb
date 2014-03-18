@@ -176,12 +176,16 @@ var MvEnvironment::perform(const var& sentence) {
 	typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)();
 
 	//call the shared library object main function with the right args, returning a var
+	//std::cout<<"precall"<<std::endl;
 	ANS =
 			CALLMEMBERFUNCTION(*(perform_exodusfunctorbase_.pobject_),
 					((pExodusProgramBaseMemberFunction) (perform_exodusfunctorbase_.pmemberfunction_)))();
+	//std::cout<<"postcall"<<std::endl;
 
 	//restore some environment
+	//std::cout<<"pretransfer"<<std::endl;
 	savesentence.transfer(SENTENCE);
+	//std::cout<<"posttransfer"<<std::endl;
 
 	return ANS;
 
@@ -348,30 +352,8 @@ var MvEnvironment::capitalise(const var& str0, const var& mode0,
 		const var& wordseps0) const {
 
 	var string2;
-	var mode;
-	//j b a s e
-	if (mode0.unassigned())
-		mode = L"CAPITALISE";
-	else
-		mode = mode0;
 
-	if (mode == L"QUOTE") {
-		string2 = str0;
-		if (string2 != L"") {
-			string2.converter(FM ^ VM ^ SVM ^ TM, L"    ");
-			string2.swapper(L" ", L"\" \"");
-			string2 = string2.quote();
-		}
-
-	} else if (mode == L"UPPERCASE") {
-		string2 = str0;
-		string2.converter(this->LOWERCASE, this->UPPERCASE);
-
-	} else if (mode == L"LOWERCASE") {
-		string2 = str0;
-		string2.converter(this->UPPERCASE, this->LOWERCASE);
-
-	} else if (mode == L"CAPITALISE") {
+	if (mode0.unassigned() || mode0 == L"CAPITALISE") {
 
 		string2 = str0;
 		//convert @upper.case to @lower.case in string2
@@ -419,9 +401,26 @@ var MvEnvironment::capitalise(const var& str0, const var& mode0,
 		if (string2.substr(-2, 2) == L"\'S")
 			string2.splicer(-2, 2, L"\'s");
 
-	} else if (mode.substr(1, 5) == L"PARSE") {
+	} else if (mode0 == L"QUOTE") {
+		string2 = str0;
+		if (string2 != L"") {
+			string2.converter(FM ^ VM ^ SVM ^ TM, L"    ");
+			string2.swapper(L" ", L"\" \"");
+			string2 = string2.quote();
+		}
 
-		var uppercase = mode.index(L"UPPERCASE", 1);
+	} else if (mode0 == L"UPPERCASE") {
+		string2 = str0;
+		string2.converter(this->LOWERCASE, this->UPPERCASE);
+
+	} else if (mode0 == L"LOWERCASE") {
+		string2 = str0;
+		string2.converter(this->UPPERCASE, this->LOWERCASE);
+
+
+	} else if (mode0.substr(1, 5) == L"PARSE") {
+
+		var uppercase = mode0.index(L"UPPERCASE", 1);
 
 		string2 = str0;
 
@@ -453,7 +452,7 @@ var MvEnvironment::capitalise(const var& str0, const var& mode0,
 			}
 		};	//ii;
 
-		if (mode.index(L"TRIM", 1)) {
+		if (mode0.index(L"TRIM", 1)) {
 			string2.converter(L" " _FM_, _FM_ L" ");
 			string2 = string2.trim();
 			string2.converter(L" " _FM_, _FM_ L" ");
@@ -594,7 +593,7 @@ void MvEnvironment::mssg(const var& msg0, const var& options0, var& response,
 void MvEnvironment::msgbase(const var& msg, const var& options,
 		const var& response, const var& params) const {
 
-	std::wcout << msg;
+	std::wcout << msg << std::endl;
 	return;
 
 	//evade warning: unused parameter
@@ -775,14 +774,8 @@ var MvEnvironment::decide(const var& question, const var& options) const {
 	return decide(question, options, reply, buffer);
 }
 
-var MvEnvironment::decide(const var& question, const var& options,
-		var& reply) const {
-	var buffer;
-	return decide(question, options, reply, buffer);
-}
-
 var MvEnvironment::decide(const var& questionx, const var& optionsx, var& reply,
-		var& buffer) const {
+		const int defaultreply) const {
 
 	var interactive = !this->SYSTEM.a(33);
 
@@ -791,8 +784,8 @@ var MvEnvironment::decide(const var& questionx, const var& optionsx, var& reply,
 
 	options.converter(VM ^ L"|", FM ^ FM);
 	if (!interactive) {
-		if (buffer) {
-			reply = buffer;
+		if (defaultreply) {
+			reply = defaultreply;
 		} else {
 			reply = 1;
 		}

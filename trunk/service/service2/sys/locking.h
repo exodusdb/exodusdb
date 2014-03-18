@@ -1,0 +1,27 @@
+#ifndef EXODUSDLFUNC_LOCKING_H
+#define EXODUSDLFUNC_LOCKING_H
+
+//a member variable/object to cache a pointer/object for the shared library function
+ExodusFunctorBase efb_locking;
+
+//a member function with the right arguments, returning a var
+var locking(in mode, in lockfilename, in lockkey, io lockdesc, io locklist, int ntries, out msg)
+{
+
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ if (efb_locking.pmemberfunction_==NULL)
+  efb_locking.init("locking","exodusprogrambasecreatedelete",mv);
+
+ //define a function type (pExodusProgramBaseMemberFunction)
+ //that can call the shared library object member function
+ //with the right arguments and returning a var
+ typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(in,in,in,io,io,int,out);
+
+ //call the shared library object main function with the right args, returning a var
+ return CALLMEMBERFUNCTION(*(efb_locking.pobject_),
+ ((pExodusProgramBaseMemberFunction) (efb_locking.pmemberfunction_)))
+  (mode,lockfilename,lockkey,lockdesc,locklist,ntries,msg);
+
+}
+#endif

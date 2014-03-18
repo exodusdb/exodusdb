@@ -1,0 +1,91 @@
+#include <exodus/library.h>
+libraryinit()
+
+#include <log2.h>
+#include <openfile.h>
+#include <authorised.h>
+#include <readaccparams.h>
+
+#include <gen.h>
+#include <fin.h>
+
+var logtime;
+
+function main() {
+
+	call log2("-----initacc init", logtime);
+
+	readaccparams();
+
+	gen.accounting = SYSTEM.a(31);
+	gen.accounting.converter(VM, FM);
+	gen.accounting.r(1, 1);
+
+	//initialise statement type and hexdates (v.critical and important)
+	//TODO move to declare static in fin.h
+	fin.statmtypes = "13";
+	fin.hexdatesize = 3;
+/*TODO
+	gosub makeindex("BATCHES", "COMPANY_JOURNAL_YEAR_PERIOD");
+	gosub makeindex("VOUCHERS", "REFERENCE_AND_ACNO");
+	gosub makeindex("VOUCHERS", "TEXT", "XREF");
+	gosub makeindex("VOUCHERS", "AMOUNT_NUMBER");
+*/
+	call log2("*open the accounts files", logtime);
+	openfile("ACCOUNTS",      fin.accounts,     "ACCOUNTS");
+	openfile("BALANCES",      fin.balances,     "ACCOUNTS");
+	openfile("BATCHES",       fin.batches,      "ACCOUNTS");
+	openfile("LEDGERS",       fin.ledgers,      "ACCOUNTS");
+	openfile("CHARTS",        fin.charts,       "ACCOUNTS");
+	openfile("VOUCHERS",      fin.vouchers,     "ACCOUNTS");
+	openfile("VOUCHER_INDEX", fin.voucherindex, "ACCOUNTS");
+	openfile("COLLECTIONS",   fin.collections,  "ACCOUNTS");
+	//{
+	//	call mssg("DO NOT CONTINUE UNLESS YOU KNOW WHAT YOU ARE DOING");
+	//}
+
+	log2("insert new or missing tasks", logtime);
+	var xx="";
+	call authorised("JOURNAL POST FUTURE PERIOD",    xx, "UA");
+	call authorised("JOURNAL POST REVENUE",          xx, "UA2");
+	call authorised("FINANCIAL REPORT AGING ACCESS", xx, "FINANCIAL REPORT ACCESS");
+	call authorised("FINANCIAL REPORT AGING ACCESS PARTIAL", xx, "FINANCIAL REPORT ACCESS PARTIAL");
+	call authorised("MENU FINANCE",                  xx);
+	call authorised("JOURNAL ACCESS POSTED",         xx);//not working while creation always starts as posted
+	call authorised("JOURNAL ACCESS UNPOSTED",       xx);
+	call authorised("JOURNAL POST UNALLOCATED", xx);
+	//ensure REVALUATION (BASE CURRENCY ONLY) ENTRIES ARE LOCKED
+	//if security('JOURNAL POST REVALUATION',xx,'NEOSYS') else null
+	var tt;
+	if (ACCOUNT eq "" or ACCOUNT eq "ADAGENCY") {
+		tt = "NEOSYS";
+	}else{
+		tt = "";
+	}
+	call authorised("JOURNAL POST REVALUATION", xx, tt);
+
+	call log2("-----initacc exit", logtime);
+
+	return 1;
+
+}
+
+subroutine makeindex(in filename, in indexname, in mode="btree", in lowercase=""){
+	
+	if (mode ne "btree" or lowercase ne "") {
+		call log2("*WARNING cant create index " ^ filename ^ " " ^
+			indexname ^ " " ^ mode, logtime);
+		return;
+	}
+	call log2("check index " ^ filename ^ " " ^ indexname, logtime);
+	if (not var().listindexes(filename).index(indexname)) {
+
+		call log2("*create* index " ^ filename ^ " " ^ indexname, logtime);
+		if (not createindex(filename, indexname)) {
+			printl("WARNING could not create index ", indexname , " for ", filename);
+		}
+	}
+	return;
+}
+
+libraryexit()

@@ -157,7 +157,7 @@ program()
                         startatlineno="";
 
 
-                if (not index(filename,"."))
+                if (not index(field2(filename,SLASH,-1),"."))
                         filename^=".cpp";
 
                 var iscompilable=filename.field2(".",-1)[1].lcase() ne "h";
