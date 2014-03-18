@@ -155,7 +155,7 @@ var backtrace()
 	sw.ShowCallstack();
 	return sw.returnlines;
 #elif !defined(HAVE_BACKTRACE)
-	printf("backtrace() not available");
+	printf("backtrace() not available\n");
 	return L"";
 #else
 

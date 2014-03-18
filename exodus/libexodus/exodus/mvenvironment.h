@@ -112,6 +112,7 @@ public:
 	var XW;
 	var VW;
 	var PW;
+	var SW;
 	var FILEERROR;
 	var FILEERRORMODE;
 	var FLUSHNEEDED;
@@ -146,7 +147,8 @@ public:
 	var otherusers(const var& param);
 	var otherdatasetusers(const var& param);
 
-	var capitalise(const var& str0, const var& mode=L"", const var& wordseps=L"") const;
+	var capitalise(const var& str0, const var& mode=var(), const var& wordseps=var()) const;
+	//var capitalise(const var& str0, const var& mode=L"", const var& wordseps=L"") const;
 
 	void mssg(const var& msg) const;
 	void mssg(const var& msg, const var& options) const;
@@ -175,8 +177,7 @@ public:
 	bool unlockrecord(const var& filename, const var& file, const var& key) const;
 
 	var decide(const var& question, const var& options) const;
-	var decide(const var& question, const var& options, var& reply) const;
-	var decide(const var& question, const var& options, var& reply, var& buffer) const;
+	var decide(const var& question, const var& options, var& reply, const int defaultreply=0) const;
 
 	void savescreen(var& origscrn, var& origattr) const;
 	//void ostime(var& ostimenow) const;

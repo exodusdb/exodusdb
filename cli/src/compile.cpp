@@ -18,6 +18,8 @@ programinit()
 //ExodusFunctorF0<int> xyz;
 
 var verbose;
+var debugging;
+var optimise;
 
 function main()
 {
@@ -31,17 +33,15 @@ function main()
 
         //extract options
         verbose=index(OPTIONS.ucase(),"V");
-        //var debugging=not index(OPTIONS.ucase(),"O");
-		//for now the default is to build release mode since we are not delivering an exodusd.dll
-		//the backtrace seems to work fine with release mode at least in vs2005
-		var debugging=index(OPTIONS.ucase(),"D");
-//	verbose=1;
+        debugging=not index(OPTIONS.ucase(),"R");//no symbols for backtrace
+	//the backtrace seems to work fine with release mode at least in vs2005
+        optimise=index(OPTIONS.ucase(),"O");//prevents backtrace
 
         //extract filenames
         var filenames=field(command,FM,2,999999999);
         var nfiles=dcount(filenames,FM);
         if (not filenames)
-                abort("Syntax is compile filename ... {options}\nOptions are O=Optimise V=Verbose");
+                abort("Syntax is compile filename ... {options}\nOptions are R=Release O=Optimise V=Verbose");
 
         //source extensions
         var src_extensions="cpp cxx cc";
@@ -109,16 +109,22 @@ function main()
                         linkoptions=" -lexodus";
 
                 //enable function names in backtrace
-                basicoptions^=" -g -rdynamic";
+		if (debugging)
+			basicoptions^=" -g -rdynamic";
 
-                outputoption=" -o ";
                 //optimiser unfortunately prevents backtrace
-                //basicoptions^="-O1";
+		if (optimise)
+			basicoptions^=" -O1";
+
+		//how to output to a named file
+                outputoption=" -o ";
+
+		//general options
                 binoptions="";
                 //binoptions=" -g -L./ -lfunc1 -Wl,-rpath,./";
                 //binoptions=" -fPIC";
 
-                //make a shared library
+                //how to make a shared library
                 liboptions=" -fPIC -shared";
                 //soname?
 #if __GNUC__ >= 4
@@ -595,7 +601,7 @@ var inclusion=
 "\r\n"
 "\r\n}";
 
-										swapper(inclusion,"funcx",libname);
+										swapper(inclusion,"funcx",field2(libname, SLASH, -1));
 										//swapper(example,"exodusprogrambasecreatedelete",funcname);
 										swapper(inclusion,"in arg1=var(), out arg2=var(), out arg3=var()",funcargsdecl2);
 										swapper(inclusion,"in,out,out",funcargstype);
@@ -661,8 +667,9 @@ var inclusion=
                         }
                 }
                 if (headertext) {
-                        headertext.splicer(1,0,"#define EXODUSDLFUNC_"^ucase(filebase)^"_H");
-                        headertext.splicer(1,0,"#ifndef EXODUSDLFUNC_"^ucase(filebase)^"_H"^crlf);
+                		var filebaseend=filebase.field2(SLASH,-1);
+                        headertext.splicer(1,0,"#define EXODUSDLFUNC_"^ucase(filebaseend)^"_H");
+                        headertext.splicer(1,0,"#ifndef EXODUSDLFUNC_"^ucase(filebaseend)^"_H"^crlf);
                         headertext^=crlf^"#endif"^crlf;
                         var headerfilename=filebase^".h";
 

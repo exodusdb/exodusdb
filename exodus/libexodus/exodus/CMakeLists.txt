@@ -1,3 +1,5 @@
+#cmakedefine HAVE_BACKTRACE 1
+
 find_package(PostgreSQL REQUIRED)
 find_package(Boost REQUIRED COMPONENTS filesystem date_time system regex thread)
 #find_package(PostgreSQL REQUIRED COMPONENTS pqlib)
