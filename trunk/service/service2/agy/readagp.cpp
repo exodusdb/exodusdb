@@ -1,6 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
+#include <initagency.h>
 
 #include <gen.h>
 #include <agy.h>
@@ -9,8 +10,6 @@ var vn;
 
 function main() {
 	//jbase
-
-	//get agp and uses company<1> to default various items
 
 	if (not(agy.agp.read(gen._definitions, "AGENCY.PARAMS"))) {
 		call note("AGENCY.PARAMS IS MISSING FROM DEFINITIONS");

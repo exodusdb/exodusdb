@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-//#include <giveway.h>
+#include <giveway.h>
 #include <authorised.h>
 #include <singular.h>
 #include <materialsubs.h>

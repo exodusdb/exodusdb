@@ -177,7 +177,7 @@ subroutine calcubill2() {
 	//update net unit bill and redisplay
 	RECORD.r(cunitbillfn, win.mvx, unitbill);
 	if (mode ne "RECALC_ALL_NETS") {
-		tt = win.registerx[1].a(cunitbillfn);
+		tt = win.registerx(1).a(cunitbillfn);
 		//gosub r();
 	}
 	// IF cUNIT.BILL.FN=38 THEN T=TOT.BILL.WI ELSE T=TOT.cost.wi
@@ -219,7 +219,7 @@ subroutine getexchrate() {
 		}
 		vehiclecurrcode = vehicle.a(5);
 		RECORD.r(45, win.mvx, vehiclecurrcode);
-		tt = win.registerx[1].a(45);
+		tt = win.registerx(1).a(45);
 		//gosub r();
 	}
 
@@ -306,9 +306,9 @@ getrate:
 	//zzzcall note(rate)
 	RECORD.r(40, win.mvx, rate);
 	RECORD.r(44, win.mvx, costrate);
-	tt = win.registerx[1].a(40);
+	tt = win.registerx(1).a(40);
 	//gosub r();
-	tt = win.registerx[1].a(44);
+	tt = win.registerx(1).a(44);
 	//gosub r();
 
 	return;

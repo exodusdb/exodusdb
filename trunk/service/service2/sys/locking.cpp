@@ -6,8 +6,9 @@ libraryinit()
 var xx;
 var allowduplicate;//num
 var lockn;//num
+var lockdesc;
 
-function main(in mode, in lockfilename, in lockkey, io lockdesc, io locklist, int ntries, out msg) {
+function main(in mode, in lockfilename, in lockkey, in lockdesc0, io locklist, int ntries, out msg) {
 	//jbase
 
 	//declare function delay
@@ -17,8 +18,10 @@ function main(in mode, in lockfilename, in lockkey, io lockdesc, io locklist, in
 	if (not ntries) {
 		ntries = 100;
 	}
-	if (lockdesc.unassigned()) {
+	if (lockdesc0.unassigned()) {
 		lockdesc = "";
+	} else {
+		lockdesc = lockdesc0;
 	}
 	if (not ntries) {
 		ntries = 100;
@@ -68,7 +71,7 @@ tryagain:
 				lockholder = "Someone, maybe you,";
 
 			//if lockdesc then
-			gosub getlockdesc(lockfilename,lockkey,lockdesc);
+			gosub getlockdesc(lockfilename,lockkey);
 			if (interactive) {
 				call mssg(lockholder ^ " is using the " ^ lockdesc, "T1");
 				if (mv.esctoexit()) {
@@ -156,7 +159,7 @@ tryagain:
 
 }
 
-subroutine getlockdesc(in lockfilename, in lockkey, io lockdesc) {
+subroutine getlockdesc(in lockfilename, in lockkey) {
 	if (not lockdesc) {
 		lockdesc = lockfilename ^ " " ^ lockkey;
 		lockdesc.converter(".", " ");

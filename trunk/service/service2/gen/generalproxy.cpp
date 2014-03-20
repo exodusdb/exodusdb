@@ -28,16 +28,26 @@ var logfromdate;
 var loguptodate;
 var logkey;
 var logsearch;
-var proxyname;
+var thisname;
 var mode;
 
 function main() {
-print("generalproxy");
-	//*subroutine general(request,data,response)
+
+	printl("-----generalproxy init");
+
+	var thisname="generalproxy";
+
+        if (not iscommon(win)) {
+		return invalidx("win common is not initialised in " ^ thisname);
+	}
+        if (not iscommon(gen)) {
+		return invalidx("gen common is not initialised in " ^ thisname);
+	}
+
+        // *subroutine general(request,data,response)
 	//jbase
 
 	//var().clearcommon();
-	proxyname="GENERALPROXY";
 
 	win.valid = 1;
 	USER4 = "";
@@ -658,7 +668,7 @@ performreport:
 		USER1 = ANS;
 
 	} else if (1) {
-		call mssg("System Error: " ^ (DQ ^ (mode ^ DQ)) ^ " invalid request in " ^ proxyname);
+		call mssg("System Error: " ^ (DQ ^ (mode ^ DQ)) ^ " invalid request in " ^ thisname);
 		return 0;
 
 	}
@@ -666,6 +676,11 @@ performreport:
 ///exit:
 	return 1;
 
+}
+
+function invalidx(in msg) {
+	USER3 ^= msg;
+	return errorexit();
 }
 
 function errorexit() {
@@ -722,7 +737,7 @@ subroutine checkoutputfileexists() {
 	}else{
 		USER3 = USER4;
 		if (USER3 == "") {
-			USER3 = "Error: No output file in  " ^ proxyname ^ "," ^ mode;
+			USER3 = "Error: No output file in  " ^ thisname ^ "," ^ mode;
 			call sysmsg(USER3);
 		}
 	}

@@ -2391,13 +2391,18 @@ printl("EXECUTE");
 		//send errors to neosys
 //		USER4="NOT IMPLEMENTED YET:\rEXECUTE " ^ mdcmd ^ "\r" ^ USER0;
 
-		try {
 printl("try", mdcmd.lcase());
-			perform(mdcmd.lcase());
-		} catch (...) {
-			outputl("error in " ^ mdcmd.lcase());
-		}
+USER0=USER0.field(FM,3,9999);
 
+		if (false) {
+			try {
+				perform(mdcmd.lcase());
+			} catch (...) {
+				outputl("error in " ^ mdcmd.lcase());
+			}
+		} else {
+			perform(mdcmd.lcase());
+		}
 		//discard any stored input
 		mv.DATA = "";
 

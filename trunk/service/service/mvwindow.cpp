@@ -6,6 +6,8 @@
 
 //using namespace std;
 
+// MVWINDOW NO LONGER REQUIRED - REPLACED BY win.h window.cpp and various external subroutines
+/////////////////////////////////////////////////////////////////
 namespace exodus
 {
 

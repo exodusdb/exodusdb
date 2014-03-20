@@ -123,7 +123,7 @@ cancelaction:
 			var nn = amvfns.count(VM) + 1;
 			for (var ii = 1; ii <= nn; ++ii) {
 				tt = amvfns.a(1, ii);
-				if (not(win.registerx[1].a(tt))) {
+				if (not(win.registerx(1).a(tt))) {
 					if (RECORD.a(tt)) {
 						RECORD.eraser(tt, win.mvx);
 					}
@@ -135,7 +135,7 @@ cancelaction:
 			var nn = amvfns.count(VM) + 1;
 			for (var ii = 1; ii <= nn; ++ii) {
 				tt = amvfns.a(1, ii);
-				if (not(win.registerx[1].a(tt))) {
+				if (not(win.registerx(1).a(tt))) {
 					if (RECORD.a(tt)) {
 						RECORD.inserter(tt, win.mvx, "");
 					}
@@ -268,7 +268,7 @@ defversion:
 		//copy the material description
 		if (RECORD.a(155, win.mvx) == "" and material.a(2)) {
 			RECORD.r(155, win.mvx, material.a(2));
-			tt = win.registerx[1].a(155);
+			tt = win.registerx(1).a(155);
 			gosub r();
 		}
 
@@ -754,7 +754,7 @@ valexchrate:
 		}
 
 		//five vehicles in columns, half hour blocks
-		var vehiclecodes = win.registerx[9];
+		var vehiclecodes = win.registerx(9);
 		if (not vehiclecodes) {
 			if (not(vehiclecodes.read(gen._definitions, "MAINTV"))) {
 				vehiclecodes = "ANT1,RIK TV1,RIK TV2,LOGOS,SIGMA";
@@ -768,7 +768,7 @@ valexchrate:
 		vehiclecodes.swapper(", ", ",");
 		vehiclecodes.swapper(" ,", ",");
 		vehiclecodes.converter(",", VM);
-		win.registerx[9] = vehiclecodes;
+		win.registerx(9) = vehiclecodes;
 		var nvehicles = vehiclecodes.count(VM) + 1;
 		vehiclecodes.write(gen._definitions, "MAINTV");
 
@@ -957,7 +957,7 @@ nextratings:
 
 				//add the vehicle code
 				RECORD.r(20, win.mvx, vehiclecode);
-				tt = win.registerx[1].a(20);
+				tt = win.registerx(1).a(20);
 				gosub r();
 				var isx = win.is;
 				var isorigx = win.isorig;
@@ -971,16 +971,16 @@ nextratings:
 
 			//put the date and number of spots in the schedule
 			RECORD.r(22, win.mvx, (dom.field(" ", 1) - 1).space() ^ "1");
-			tt = win.registerx[1].a(22);
+			tt = win.registerx(1).a(22);
 			gosub r();
 			RECORD.r(70, win.mvx, dom);
-			tt = win.registerx[1].a(70);
+			tt = win.registerx(1).a(70);
 			gosub r();
 			RECORD.r(39, win.mvx, 1);
 			RECORD.r(43, win.mvx, 1);
-			tt = win.registerx[1].a(39);
+			tt = win.registerx(1).a(39);
 			gosub r();
-			tt = win.registerx[1].a(43);
+			tt = win.registerx(1).a(43);
 			gosub r();
 
 			//put the time and program in the details
@@ -995,18 +995,18 @@ nextratings:
 				details = details.fieldstore("/", 3, 1, programx);
 			}
 			RECORD.r(23, win.mvx, details);
-			tt = win.registerx[1].a(23);
+			tt = win.registerx(1).a(23);
 			gosub r();
 
 			//put the nearest quarter hour into the rating time
 			var ratingtime = ((7.5 * 60 + timex) / (15 * 60)).floor() * 15 * 60;
 			RECORD.r(111, win.mvx, ratingtime);
-			tt = win.registerx[1].a(111);
+			tt = win.registerx(1).a(111);
 			gosub r();
 
 			//put the rating
 			RECORD.r(106, win.mvx, ratingperc);
-			tt = win.registerx[1].a(106);
+			tt = win.registerx(1).a(106);
 			gosub r();
 
 			//put the rateband into the spec and get costs
@@ -1021,7 +1021,7 @@ nextratings:
 				spec = spec.fieldstore(",", 2, 1, duration);
 			}
 			RECORD.r(21, win.mvx, spec.fieldstore(",", 1, 1, rateband));
-			tt = win.registerx[1].a(21);
+			tt = win.registerx(1).a(21);
 			gosub r();
 			call plansubs2("VAL.SPEC2");
 

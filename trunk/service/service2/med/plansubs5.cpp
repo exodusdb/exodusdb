@@ -33,7 +33,7 @@ var t2;
 var lgrcd;
 var accno;
 
-function main() {
+function main(in mode) {
 	//garbagecollect;
 
 	//y2k2 *jbase

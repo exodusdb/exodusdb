@@ -824,11 +824,11 @@ var inclusion=
 										var cmd=installcmd^" " ^ objfilename ^ " " ^ outputpathandfile;
                                         if (verbose)
                                                 printl(cmd);
-                                        //osshell(cmd);
+                                        osshell(cmd);
                                         if (osfile(outputpathandfile) and osfile(objfilename))
                                                 osdelete(outputpathandfile);
-                                        if (!oscopy(objfilename,outputpathandfile))
-                                                printl("ERROR: Failed to "^cmd);
+                                        //if (!oscopy(objfilename,outputpathandfile))
+                                        //        printl("ERROR: Failed to "^cmd);
 
 										//delete any manifest from early versions of compile which didnt have the
 										//MANIFEST:NO option

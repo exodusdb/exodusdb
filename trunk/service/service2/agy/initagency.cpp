@@ -26,186 +26,218 @@ var ii2;
 var xx;
 
 function main() {
+	var thisname="initagency";//TODO could be mv. name set in perform and other places
 
-	//CREATE LABELLED COMMON
-	mv.labelledcommon[4]=new agy_common;
-
-	call log2("*INIT.AGENCY initialisation", logtime);
+	call log2("-----initagency init", logtime);
 	var interactive = not SYSTEM.a(33);
-
-	//y2k2
-
 	var reloading = SENTENCE.field(" ", 2);
 
-	call log2("*open various files", logtime);
-	if (not(openfile("SCHEDULES", agy.schedules))) {
-		var valid = "";
-	}
-	if (not(openfile("ADS", agy.ads, "SCHEDULES", ""))) {
-		var valid = "";
-	}
-	if (not(openfile("SURVEYS", agy.surveys, "SCHEDULES", ""))) {
-		var valid = "";
-	}
-	if (not(openfile("SUPPLIER.INVOICES", supplierinvoices, "SCHEDULES", 1))) {
-		var valid = "";
-	}
-	if (not(openfile("CLIENTS", agy.clients))) {
-		var valid = "";
-	}
-	if (not(openfile("BRANDS", agy.brands))) {
-		var valid = "";
-	}
-	if (not(openfile("VEHICLES", agy.vehicles))) {
-		var valid = "";
-	}
-	if (not(openfile("SUPPLIERS", agy.suppliers))) {
-		var valid = "";
-	}
-	if (not(openfile("RATECARDS", agy.ratecards))) {
-		var valid = "";
-	}
-	if (not(openfile("MEDIA.TYPES", agy.mediatypes))) {
-		var valid = "";
-	}
-	if (not(openfile("MARKETS", agy.markets))) {
-		var valid = "";
-	}
-	if (not(openfile("INVOICES", agy.invoices))) {
-		var valid = "";
-	}
-	if (not(openfile("ANALYSIS", agy.analysis))) {
-		var valid = "";
-	}
-	if (not(openfile("ANALYSIS2", analysis2, "ANALYSIS", ""))) {
-		var valid = "";
-	}
-	if (not(openfile("BOOKING.ORDERS", agy.bookingorders))) {
-		var valid = "";
-	}
-	if (not(openfile("JOBS", agy.jobs))) {
-		var valid = "";
-	}
-	if (not(openfile("PRODUCTION.INVOICES", agy.productioninvoices))) {
-		var valid = "";
-	}
-	if (not(openfile("PRODUCTION.ORDERS", agy.productionorders))) {
-		var valid = "";
-	}
-	if (not(openfile("CERTIFICATES", certificates, "SCHEDULES", 1))) {
-		var valid = "";
-	}
-	if (not(openfile("PROGRAMS", programs, "SCHEDULES", 1))) {
-		var valid = "";
-	}
-	if (not(openfile("RATINGS", agy.ratings, "SCHEDULES", 1))) {
-		var valid = "";
-	}
-	if (not(openfile("MATERIALS", agy.materials, "SCHEDULES", 1))) {
-		var valid = "";
-	}
-	if (not(openfile("PRODUCT.CATEGORIES", productcategories, "BRANDS", 1))) {
-		var valid = "";
-	}
-	if (not(openfile("TASKS", tasks, "JOBS", 1))) {
-		var valid = "";
+	//check general common is available
+	if (not iscommon(gen)) {
+		var().stop("gen common is not initialised in " ^ thisname);
 	}
 
-	gosub makeindex("tasks", "user_code");
-	gosub makeindex("tasks", "parent_user_code");
+	//CREATE agency common
+	mv.labelledcommon[4]=new agy_common;
+	if (not iscommon(agy)) {
+		var().stop("agy common is not initialised in " ^ thisname);
+	}
 
-	gosub makeindex("materials", "first_appearance_date");
-	gosub makeindex("booking.orders", "date");
+	//what about creating dicts?
 
-	call log2("*add ADS brand vehicle date time index if needed", logtime);
-	//import certification will be slow until the next day restart after createads
-	//but generally clients will not have an additional index on ads unless required
-	var unmatchedads;
-	if (unmatchedads.open("UNMATCHED.ADS", "")) {
-		unmatchedads.select();
-		if (unmatchedads.readnext(xx)) {
-			gosub makeindex("ads", "brand_vehicle_date_time");
-			gosub makeindex("unmatched_ads", "brand_and_date");
-			gosub makeindex("unmatched_ads", "vehicle_and_date");
-			gosub makeindex("unmatched_ads", "date");
+	call log2("checking for agency modules (clients file)", logtime);
+	if (openfile("CLIENTS", agy.clients)) {
+
+		call log2("open agency files", logtime);
+		openfile("BRANDS"		, agy.brands		,"CLIENTS");
+		openfile("PRODUCT_CATEGORIES"	, productcategories	,"CLIENTS");
+		openfile("SUPPLIERS"		, agy.suppliers		,"CLIENTS");
+		openfile("MEDIA_TYPES"		, agy.mediatypes	,"CLIENTS");
+		openfile("MARKETS"		, agy.markets		,"CLIENTS");
+		openfile("INVOICES"		, agy.invoices		,"CLIENTS");
+		openfile("ANALYSIS"		, agy.analysis		,"CLIENTS");
+		openfile("ANALYSIS2"		, analysis2		, "ANALYSIS");
+
+		openfile("CURRENCY_VERSIONS"	, xx			, "CURRENCIES");
+		openfile("MARKET_VERSIONS"	, xx			, "MARKETS");
+		openfile("COMPANY_VERSIONS"	, xx			, "COMPANIES");
+		openfile("CLIENT_VERSIONS"	, xx			, "CLIENTS");
+		openfile("SUPPLIER_VERSIONS"	, xx			, "SUPPLIERS");
+		openfile("MEDIA_TYPE_VERSIONS"	, xx			, "MEDIA_TYPES");
+
+		call log2("Add agency indexes", logtime);
+		gosub makeindex("clients"	, "group_code");
+		gosub makeindex("suppliers"	, "group_code");
+		gosub makeindex("clients"	, "sequence"		, "xref");
+		gosub makeindex("clients"	, "executive_code"	, "btree", "lowercase");
+		gosub makeindex("brands"	, "executive_code"	, "btree", "lowercase");
+		gosub makeindex("brands"	, "sequence"		, "xref");
+		gosub makeindex("brands"	, "client_code");
+		gosub makeindex("invoices"	, "date");
+		gosub makeindex("invoices"	, "sch_or_job_no");
+
+		call log2("Add agency tasks", logtime);
+		addtask("MENU ANALYSIS"			, "NEOSYS");
+		addtask("CLIENT UPDATE TERMS"		, "UA");
+		addtask("SUPPLIER UPDATE TERMS"		, "UA");
+		addtask("CLIENT CREATE STOPPED");
+		addtask("BRAND CHANGE CLIENT");
+
+	}
+	
+	call log2("check for media module (schedules file)", logtime);
+	agy.schedules="";
+	if ((openfile("SCHEDULES", agy.schedules))) {
+
+		call log2("open media files", logtime);
+		openfile("PLANS"		, agy.plans		, "SCHEDULES");
+		openfile("ADS"			, agy.ads		, "SCHEDULES");
+		openfile("SURVEYS"		, agy.surveys		, "SCHEDULES");
+		openfile("SUPPLIER_INVOICES"	, supplierinvoices	, "SCHEDULES");
+		openfile("CERTIFICATES"		, certificates		, "SCHEDULES");
+		openfile("PROGRAMS"		, programs		, "SCHEDULES");
+		openfile("RATINGS"		, agy.ratings		, "SCHEDULES");
+		openfile("MATERIALS"		, agy.materials		, "SCHEDULES");
+		openfile("RATECARDS"		, agy.ratecards		, "SCHEDULES");
+		openfile("VEHICLES"		, agy.vehicles		, "SCHEDULES");
+		openfile("BOOKING_ORDERS"	, agy.bookingorders	, "SCHEDULES");
+
+		openfile("VEHICLE_VERSIONS"	, xx			, "VEHICLES");
+		openfile("RATECARD_VERSIONS"	, xx			, "RATECARDS");
+		openfile("PLAN_VERSIONS"	, xx			, "PLANS");
+		openfile("SCHEDULE_VERSIONS"	, xx			, "SCHEDULES");
+
+		call log2("Add media indexes", logtime);
+		gosub makeindex("schedules"	, "executive_code"		, "btree"	, "lowercase");
+		gosub makeindex("plans"		, "executive_code"		, "btree"	, "lowercase");
+		gosub makeindex("schedules"	, "year_periods"		, "btree");
+		gosub makeindex("schedules"	, "client_order_no_parts");
+		gosub makeindex("plans"		, "year_periods"		, "btree");
+		gosub makeindex("ads"		, "vehicle_and_date");
+		gosub makeindex("ads"		, "brand_and-date");
+		gosub makeindex("booking.orders", "schedule_no");
+		gosub makeindex("booking.orders", "year_period");
+		gosub makeindex("vehicles"	, "media_type_code");
+		gosub makeindex("vehicles"	, "sequence"			, "xref");
+		gosub makeindex("materials"	, "first_appearance_date");
+		gosub makeindex("booking.orders", "date");
+
+		call log2("add index for ADS brand vehicle date time if needed", logtime);
+		//import certification will be slow until the next day restart after createads
+		//but generally clients will not have an additional index on ads unless required
+		var unmatchedads;
+		if (unmatchedads.open("UNMATCHED.ADS", "")) {
+			unmatchedads.select();
+			if (unmatchedads.readnext(xx)) {
+				gosub makeindex("ads", "brand_vehicle_date_time");
+				gosub makeindex("unmatched_ads", "brand_and_date");
+				gosub makeindex("unmatched_ads", "vehicle_and_date");
+				gosub makeindex("unmatched_ads", "date");
+			}
 		}
+
+		call log2("Add media tasks", logtime);
+		addtask("MENU MEDIA"				, "NEOSYS");
+		addtask("PLAN UNPROFITABLE");
+		addtask("PLAN SET NUMBER"			, "NEOSYS");
+		addtask("PLAN CREATE OWN NO"			, "PLAN CREATE OWN NUMBER");
+		addtask("SCHEDULE CREATE OWN NO"		, "SCHEDULE CREATE OWN NUMBER");
+		addtask("SCHEDULE SET NUMBER"		, "NEOSYS");
+		addtask("BOOKING ORDER SET NUMBER"		, "NEOSYS");
+		addtask("MEDIA INVOICE SET NUMBER"		, "NEOSYS");
+		addtask("MEDIA INVOICE CREATE CREDIT"	, "UM");
+		addtask("BOOKING ORDER CREATE CHANGE");
+		addtask("BOOKING ORDER CREATE REPLACEMENT");
+		addtask("BOOKING ORDER CREATE COMBINATION");
+		addtask("BOOKING ORDER CREATE REISSUE");
+		addtask("BOOKING ORDER CREATE CANCELLATION");
+		addtask("SCHEDULE COINCIDENT ADS");
+		addtask("SCHEDULE UPDATE WITHOUT REBOOKING");
+		addtask("BOOKING ORDER BACKDATE"		, "NEOSYS");
+		addtask("SCHEDULE UPDATE WEEK");
+		addtask("SCHEDULE UPDATE MATERIAL"		, "SCHEDULE UPDATE PLAN");
+		addtask("SCHEDULE UPDATE CERTIFIED"		, "SCHEDULE UPDATE AFTER INVOICE");
+		addtask("SCHEDULE UPDATE SUPPLIER INVOICED"	, "SCHEDULE UPDATE AFTER INVOICE");
+		addtask("MEDIA PRICE ACCESS");
+		addtask("SCHEDULE UPDATE BRAND AFTER BOOKING"	, "UM2");
+		addtask("SCHEDULE UPDATE BRAND AFTER INVOICE"	, "UM2");
+		addtask("SCHEDULE UPDATE COMPANY AFTER BOOKING"	, "NEOSYS");
+		addtask("SCHEDULE UPDATE UNAPPROVED");
+		addtask("SCHEDULE UPDATE BRAND AFTER BOOKING"	, "UM2");
+		addtask("SCHEDULE ADVANCED");
+		addtask("SCHEDULE ACCESS TOTALS");
+		addtask("SCHEDULE WITHOUT DATES");
+		addtask("VEHICLE UPDATE SUPPLIER");
+		addtask("RATECARD ACCESS A");
+		addtask("RATECARD ACCESS B");
+		addtask("RATECARD ACCESS C");
+		addtask("RATECARD ACCESS D");
+		addtask("PLAN APPROVAL");
+		addtask("MEDIA INVOICE ACCESS RECEIPT"		, "AM");
+		addtask("MEDIA ACCESS COMMISSION"			, "AM2");
+		addtask("MEDIA INVOICE DESPATCH");
+		addtask("MEDIA INVOICE UNDESPATCH");
+		addtask("MEDIA INVOICE APPROVE");
+		addtask("MEDIA INVOICE UNAPPROVE");
+
 	}
 
-	gosub makeindex("clients", "group_code");
-	gosub makeindex("suppliers", "group_code");
-	gosub makeindex("clients", "sequence", "xref");
-	gosub makeindex("clients", "executive_code", "btree", "lowercase");
-	gosub makeindex("brands", "executive_code", "btree", "lowercase");
-	gosub makeindex("brands", "sequence", "xref");
-	gosub makeindex("jobs", "master_job_no");
-	gosub makeindex("jobs", "closed");
-	gosub makeindex("vehicles", "media_type_code");
-	gosub makeindex("vehicles", "sequence", "xref");
-	gosub makeindex("invoices", "date");
-	gosub makeindex("invoices", "sch_or_job_no");
-	gosub makeindex("production.invoices", "status");
-	gosub makeindex("schedules", "executive_code", "btree", "lowercase");
-	gosub makeindex("plans", "executive_code", "btree", "lowercase");
-	gosub makeindex("jobs", "executive_code", "btree", "lowercase");
-	gosub makeindex("schedules", "year_periods", "btree");
-	gosub makeindex("plans", "year_periods", "btree");
-	gosub makeindex("ads", "vehicle_and_date");
-	gosub makeindex("ads", "brand_and-date");
-	gosub makeindex("brands", "client_code");
-	gosub makeindex("booking.orders", "schedule_no");
-	gosub makeindex("booking.orders", "year_period");
-	gosub makeindex("production.invoices", "client_order_no_parts");
-	gosub makeindex("schedules", "client_order_no_parts");
+	call log2("check for jobs module (jobs file)", logtime);
+	agy.jobs="";
+	if (openfile("JOBS", agy.jobs)) {
 
-	//to find all schedules that start, cover or end on a particular period
-	//we index on YEAR_PERIODS which would be mv start period and stop period
-	//based on periods of start and stop dates (not start period in schedule)
-	//eg SELECT SCHEDULES WITH YEAR_PERIODS BETWEEN FROM_YEAR_PERIOD AND UPTO_YEAR_PERIOD
-	//call log2('*add schedule year_period_to index',logtime)
+		call log2("open jobs files", logtime);
+		openfile("PRODUCTION_INVOICES"		, agy.productioninvoices	, "JOBS");
+		openfile("PRODUCTION_ORDERS"		, agy.productionorders		, "JOBS");
+		openfile("TASKS"			, tasks				, "JOBS");
 
-	if (not(openfile("JOB.VERSIONS", xx, "JOBS", 1))) {
-		var valid = "";
-	}
-	if (not(openfile("TIMESHEET.VERSIONS", xx, "TIMESHEETS", 1))) {
-		var valid = "";
-	}
-	if (not(openfile("PRODUCTION.ORDER.VERSIONS", xx, "PRODUCTION.ORDERS", 1))) {
-		var valid = "";
-	}
-	if (not(openfile("PRODUCTION.INVOICE.VERSIONS", xx, "PRODUCTION.INVOICES", 1))) {
-		var valid = "";
-	}
+		openfile("JOB_VERSIONS"			, xx				, "JOBS");
+		openfile("TIMESHEET_VERSIONS"		, xx				, "TIMESHEETS");
+		openfile("PRODUCTION_ORDER_VERSIONS"	, xx				, "PRODUCTION_ORDERS");
+		openfile("PRODUCTION_INVOICE_VERSIONS"	, xx				, "PRODUCTION_INVOICES");
 
-	if (not(openfile("CURRENCY.VERSIONS", xx, "CURRENCIES", 1))) {
-		var valid = "";
-	}
-	if (not(openfile("MARKET.VERSIONS", xx, "MARKETS", 1))) {
-		var valid = "";
-	}
-	if (not(openfile("COMPANY.VERSIONS", xx, "COMPANIES", 1))) {
-		var valid = "";
-	}
-	if (not(openfile("CLIENT.VERSIONS", xx, "CLIENTS", 1))) {
-		var valid = "";
-	}
-	if (not(openfile("SUPPLIER.VERSIONS", xx, "SUPPLIERS", 1))) {
-		var valid = "";
-	}
-	if (not(openfile("MEDIA.TYPE.VERSIONS", xx, "MEDIA.TYPES", 1))) {
-		var valid = "";
-	}
-	if (not(openfile("VEHICLE.VERSIONS", xx, "VEHICLES", 1))) {
-		var valid = "";
-	}
-	if (not(openfile("RATECARD.VERSIONS", xx, "RATECARDS", 1))) {
-		var valid = "";
-	}
+		call log2("create jobs indexes", logtime);
+		gosub makeindex("jobs"			, "master_job_no");
+		gosub makeindex("jobs"			, "closed");
+		gosub makeindex("jobs"			, "executive_code"		, "btree"	, "lowercase");
+		gosub makeindex("production_invoices"	, "client_order_no_parts");
+		gosub makeindex("production_invoices"	, "status");
+		gosub makeindex("tasks"			, "user_code");
+		gosub makeindex("tasks"			, "parent_user_code");
 
-	if (not(openfile("PLAN.VERSIONS", xx, "PLANS", 1))) {
-		var valid = "";
-	}
-	if (not(openfile("SCHEDULE.VERSIONS", xx, "SCHEDULES", 1))) {
-		var valid = "";
+		call log2("Add job tasks", logtime);
+		addtask("MENU JOBS"				, "NEOSYS");
+		addtask("MENU TIMESHEETS"			, "NEOSYS");
+		addtask("JOB SET NUMBER"			, "NEOSYS");
+		addtask("PRODUCTION ORDER SET NUMBER"		, "NEOSYS");
+		addtask("PRODUCTION ESTIMATE SET NUMBER"	, "NEOSYS");
+		addtask("PRODUCTION INVOICE SET NUMBER"		, "NEOSYS");
+		addtask("PRODUCTION ORDER ISSUE"		, "PRODUCTION ORDER CREATE");
+		addtask("PRODUCTION ESTIMATE ISSUE"		, "PRODUCTION ESTIMATE CREATE");
+		addtask("PRODUCTION ESTIMATE APPROVE"		, "PRODUCTION ESTIMATE ISSUE");
+		addtask("PRODUCTION ESTIMATE CANCEL"		, "PRODUCTION ESTIMATE APPROVE");
+		addtask("PRODUCTION ESTIMATE DELIVER"		, "PRODUCTION ESTIMATE APPROVE");
+		//NOTE: PRODUCTION ESTIMATE INVOICE is PRODUCTION SUPPLIER INVOICE CREATE
+		addtask("PRODUCTION SUPPLIER INVOICE CREATE"	, "PRODUCTION SUPPLIER INVOICE UPDATE");
+		addtask("PRODUCTION ORDER CANCEL"		, "PRODUCTION ORDER ISSUE");
+		addtask("PRODUCTION ESTIMATE CREATE MANY PER JOB");
+		addtask("PRODUCTION ORDER CREATE WITHOUT ESTIMATE");
+		addtask("JOB REOPEN"				, "UA");
+		addtask("JOB CREATE WITHOUT TYPE");
+		addtask("PRODUCTION INVOICE ACCESS RECEIPT"	, "AP");
+		addtask("PRODUCTION ACCESS COMMISSION"		, "AP2");
+		addtask("TASK ACCESS"				, "AP");
+		addtask("TASK ACCESS TEAM"			, "AP2");
+		addtask("TASK ACCESS ALL"			, "AP2");
+		addtask("TASK CREATE"				, "UP");
+		addtask("TASK CREATE ALL"			, "UP2");
+		addtask("TASK CREATE CROSSDEPT"			, "UP");
+		addtask("TASK UPDATE"				, "UP");
+		addtask("PRODUCTION INVOICE DESPATCH");
+		addtask("PRODUCTION INVOICE UNDESPATCH");
+		addtask("PRODUCTION INVOICE APPROVE");
+		addtask("PRODUCTION INVOICE UNAPPROVE");
+
 	}
 
 	//get agp to do various updates to it
@@ -222,7 +254,7 @@ function main() {
 		//writev agp<2> on definitions,'AGENCY.PARAMS',2
 	}
 
-	//fix base currency format
+	call log2("fix base currency format", logtime);
 	if (gen.company.a(3)) {
 		if (gen.currency.read(gen.currencies, gen.company.a(3))) {
 			agy.agp.r(3, "MD" ^ gen.currency.a(3) ^ "0P");
@@ -231,13 +263,13 @@ function main() {
 		}
 	}
 
-	//make sure of currency format
+	call log2("make sure of currency format", logtime);
 	if (not(agy.agp.a(3) == "MD20P" or agy.agp.a(3) == "MD30P" or agy.agp.a(3) == "MD00P")) {
 		agy.agp.r(3, "MD20P");
 		//writev agp<3> on definitions,'AGENCY.PARAMS',3
 	}
 
-	//move booking options into new grouping
+	call log2("move booking options into new grouping", logtime);
 	if ((agy.agp.a(77)).length()) {
 		if (agy.agp.a(77)) {
 			agy.agp.r(79, 1, -1, "4");
@@ -251,14 +283,15 @@ function main() {
 		agy.agp.r(78, "");
 	}
 
+	call log2("update agency.params", logtime);
 	if (agy.agp ne origagp) {
 		agy.agp.write(gen._definitions, "AGENCY.PARAMS");
 	}
 
-	//get agency.params
+	call log2("get agency.params", logtime);
 	call readagp();
 
-	call log2("*web site", logtime);
+	call log2("put web site and email into system parameters", logtime);
 	if (SYSTEM.a(8) == "") {
 		SYSTEM.r(8, agy.agp.a(16));
 	}
@@ -278,20 +311,19 @@ function main() {
 	call log2("*clear unused brands", logtime);
 	if (not(xx.read(gen._definitions, "ORPHANBRANDSFIXED"))) {
 		agy.brands.select();
-nextbrandcode:
 		var brandcode;
-		if (agy.brands.readnext(brandcode)) {
+		while (agy.brands.readnext(brandcode)) {
 			var brand;
 			if (brand.read(agy.brands, brandcode)) {
 				if (brand.a(1) == "") {
 					agy.brands.deleterecord(brandcode);
 				}
 			}
-			goto nextbrandcode;
 		}
 		var().date().write(gen._definitions, "ORPHANBRANDSFIXED");
 	}
 
+/*TODO
 	call log2("*build client group members", logtime);
 	var convkey = "BUILDCLIENTGROUPMEMBERS";
 	if (lockrecord("DEFINITIONS", gen._definitions, convkey, recordx, 999999)) {
@@ -311,290 +343,20 @@ nextbrandcode:
 		}
 		call unlockrecord("DEFINITIONS", gen._definitions, convkey);
 	}
+*/
 
 	var datasetcode = SYSTEM.a(17);
 
-	var deletex = "%DELETE%";
-
-	//setup a few tasks in advance since failure to find task in client
+	//add missing/new tasks
+	//since failure to find task in web ui
 	//doesnt cause automatic addition into auth file since only disallowed
 	//tasks are sent to client for speed
 	//Failure to show all possible tasks would mean difficulty to know
 	//what tasks are available to be locked
 	//in init.xxx files per module
-	if (not(authorised("PLAN UNPROFITABLE", msg))) {
-		{}
-	}
-	if (not(authorised("PLAN SET NUMBER", msg, "NEOSYS"))) {
-		{}
-	}
+	var deletex = "%DELETE%";
 
-	if (not(authorised("PLAN CREATE OWN NO", msg, "PLAN CREATE OWN NUMBER"))) {
-		{}
-	}
-	if (not(authorised(deletex ^ "PLAN CREATE OWN NUMBER", msg))) {
-		{}
-	}
-	if (not(authorised("SCHEDULE CREATE OWN NO", msg, "SCHEDULE CREATE OWN NUMBER"))) {
-		{}
-	}
-	if (not(authorised(deletex ^ "SCHEDULE CREATE OWN NUMBER", msg))) {
-		{}
-	}
-
-	if (not(authorised("SCHEDULE SET NUMBER", msg, "NEOSYS"))) {
-		{}
-	}
-	if (not(authorised("BOOKING ORDER SET NUMBER", msg, "NEOSYS"))) {
-		{}
-	}
-	if (not(authorised("MEDIA INVOICE SET NUMBER", msg, "NEOSYS"))) {
-		{}
-	}
-	if (not(authorised("MEDIA INVOICE CREATE CREDIT", msg, "UM"))) {
-		{}
-	}
-	if (not(authorised("%RENAME%" "MEDIA INVOICE INVOICE UNCERTIFIED", msg, "MEDIA INVOICE CREATE UNCERTIFIED"))) {
-		{}
-	}
-
-	if (not(authorised("JOB SET NUMBER", msg, "NEOSYS"))) {
-		{}
-	}
-	if (not(authorised("PRODUCTION ORDER SET NUMBER", msg, "NEOSYS"))) {
-		{}
-	}
-	if (not(authorised("PRODUCTION ESTIMATE SET NUMBER", msg, "NEOSYS"))) {
-		{}
-	}
-	if (not(authorised("PRODUCTION INVOICE SET NUMBER", msg, "NEOSYS"))) {
-		{}
-	}
-	if (not(authorised("CLIENT UPDATE TERMS", msg, "UA"))) {
-		{}
-	}
-	if (not(authorised("SUPPLIER UPDATE TERMS", msg, "UA"))) {
-		{}
-	}
-	//if security('RATECARD OVERRIDE',msg,'') else null
-	if (not(authorised("BOOKING ORDER CREATE CHANGE", msg, ""))) {
-		{}
-	}
-	if (not(authorised("BOOKING ORDER CREATE REPLACEMENT", msg, ""))) {
-		{}
-	}
-	if (not(authorised("BOOKING ORDER CREATE COMBINATION", msg, ""))) {
-		{}
-	}
-	if (not(authorised("BOOKING ORDER CREATE REISSUE", msg, ""))) {
-		{}
-	}
-	if (not(authorised("BOOKING ORDER CREATE CANCELLATION", msg, ""))) {
-		{}
-	}
-	if (not(authorised("SCHEDULE COINCIDENT ADS", msg, ""))) {
-		{}
-	}
-	if (not(authorised("SCHEDULE UPDATE WITHOUT REBOOKING", msg, ""))) {
-		{}
-	}
-	if (not(authorised("BOOKING ORDER BACKDATE", msg, "NEOSYS"))) {
-		{}
-	}
-	if (not(authorised("CLIENT CREATE STOPPED", msg))) {
-		{}
-	}
-	if (not(authorised("SCHEDULE UPDATE WEEK", msg))) {
-		{}
-	}
-	if (not(authorised("SCHEDULE UPDATE MATERIAL", msg, "SCHEDULE UPDATE PLAN"))) {
-		{}
-	}
-	if (not(authorised("SCHEDULE UPDATE CERTIFIED", msg, "SCHEDULE UPDATE AFTER INVOICE"))) {
-		{}
-	}
-	if (not(authorised("SCHEDULE UPDATE SUPPLIER INVOICED", msg, "SCHEDULE UPDATE AFTER INVOICE"))) {
-		{}
-	}
-
-	if (not(authorised("MENU MEDIA", msg))) {
-		{}
-	}
-	if (not(authorised("MENU JOBS", msg))) {
-		{}
-	}
-	if (not(authorised("MENU ANALYSIS", msg))) {
-		{}
-	}
-	if (not(authorised("MENU TIMESHEETS", msg))) {
-		{}
-	}
-	if (not(authorised("SCHEDULE UPDATE BRAND AFTER BOOKING", msg, "UM2"))) {
-		{}
-	}
-	if (not(authorised("SCHEDULE UPDATE BRAND AFTER INVOICE", msg, "UM2"))) {
-		{}
-	}
-	if (not(authorised("SCHEDULE UPDATE COMPANY AFTER BOOKING",msg, "NEOSYS"))) {
-		{}
-	}
-	if (not(authorised("SCHEDULE UPDATE UNAPPROVED", msg))) {
-		{}
-	}
-	if (not(authorised("SCHEDULE UPDATE BRAND AFTER BOOKING", msg, "UM2"))) {
-		{}
-	}
-	if (not(authorised("SCHEDULE ADVANCED", msg, ""))) {
-		{}
-	}
-	if (not(authorised("SCHEDULE ACCESS TOTALS", msg, ""))) {
-		{}
-	}
-	if (not(authorised("SCHEDULE WITHOUT DATES", msg, ""))) {
-		{}
-	}
-	if (not(authorised("BRAND CHANGE CLIENT", msg, ""))) {
-		{}
-	}
-	if (not(authorised("VEHICLE UPDATE SUPPLIER", msg, ""))) {
-		{}
-	}
-	if (not(authorised("PRODUCTION ORDER ISSUE", msg, "PRODUCTION ORDER CREATE"))) {
-		{}
-	}
-	if (not(authorised("PRODUCTION ESTIMATE ISSUE", msg, "PRODUCTION ESTIMATE CREATE"))) {
-		{}
-	}
-	if (not(authorised("PRODUCTION ESTIMATE APPROVE", msg, "PRODUCTION ESTIMATE ISSUE"))) {
-		{}
-	}
-	if (not(authorised("PRODUCTION ESTIMATE CANCEL", msg, "PRODUCTION ESTIMATE APPROVE"))) {
-		{}
-	}
-	if (not(authorised("PRODUCTION ESTIMATE DELIVER", msg, "PRODUCTION ESTIMATE APPROVE"))) {
-		{}
-	}
-	//PRODUCTION ESTIMATE INVOICE is PRODUCTION SUPPLIER INVOICE CREATE
-	if (not(authorised("PRODUCTION SUPPLIER INVOICE CREATE", msg, "PRODUCTION SUPPLIER INVOICE UPDATE"))) {
-		{}
-	}
-	if (not(authorised("PRODUCTION ORDER CANCEL", msg, "PRODUCTION ORDER ISSUE"))) {
-		{}
-	}
-	if (not(authorised("MEDIA PRICE ACCESS", msg, ""))) {
-		{}
-	}
-	if (not(authorised("PRODUCTION ESTIMATE CREATE MANY PER JOB", msg, ""))) {
-		{}
-	}
-	if (not(authorised("PRODUCTION ORDER CREATE WITHOUT ESTIMATE", msg, ""))) {
-		{}
-	}
-	for (var ii = 1; ii <= 4; ++ii) {
-		if (not(authorised("RATECARD ACCESS " ^ var().chr(64 + ii), msg, ""))) {
-			{}
-		}
-	};//ii;
-	if (not(authorised("PLAN APPROVAL", msg, ""))) {
-		{}
-	}
-	if (not(authorised("JOB REOPEN", msg, "UA"))) {
-		{}
-	}
-	if (not(authorised("JOB CREATE WITHOUT TYPE", msg))) {
-		{}
-	}
-	if (not(authorised("MEDIA INVOICE ACCESS RECEIPT", msg, "AM"))) {
-		{}
-	}
-	if (not(authorised("PRODUCTION INVOICE ACCESS RECEIPT", msg, "AP"))) {
-		{}
-	}
-	if (not(authorised("MEDIA ACCESS COMMISSION", msg, "AM2"))) {
-		{}
-	}
-	if (not(authorised("PRODUCTION ACCESS COMMISSION", msg, "AP2"))) {
-		{}
-	}
-
-	if (not(authorised("TASK ACCESS", msg, "AP"))) {
-		{}
-	}
-	if (not(authorised("TASK ACCESS TEAM", msg, "AP2"))) {
-		{}
-	}
-	if (not(authorised("TASK ACCESS ALL", msg, "AP2"))) {
-		{}
-	}
-	if (not(authorised("TASK CREATE", msg, "UP"))) {
-		{}
-	}
-	if (not(authorised("TASK CREATE ALL", msg, "UP2"))) {
-		{}
-	}
-	if (not(authorised("TASK CREATE CROSSDEPT", msg, "UP"))) {
-		{}
-	}
-	if (not(authorised("TASK UPDATE", msg, "UP"))) {
-		{}
-	}
-	for (var ii = 1; ii <= 2; ++ii) {
-		var tt = var("MEDIA,PRODUCTION").field(",", ii);
-		if (not(authorised(tt ^ " INVOICE DESPATCH", msg, ""))) {
-			{}
-		}
-		if (not(authorised(tt ^ " INVOICE UNDESPATCH", msg, ""))) {
-			{}
-		}
-		if (not(authorised(tt ^ " INVOICE APPROVE", msg, ""))) {
-			{}
-		}
-		if (not(authorised(tt ^ " INVOICE UNAPPROVE", msg, ""))) {
-			{}
-		}
-	};//ii;
-
-	if (not(authorised(deletex ^ "SUPPLIER INVOICE ACCESS", msg))) {
-		{}
-	}
-	if (not(authorised(deletex ^ "SUPPLIER INVOICE CREATE", msg))) {
-		{}
-	}
-	if (not(authorised(deletex ^ "SUPPLIER INVOICE UPDATE", msg))) {
-		{}
-	}
-
-	//split/rename RATECARD OVERRIDE
-	if (not(authorised("SCHEDULE UPDATE PRICE", msg, "RATECARD OVERRIDE"))) {
-		{}
-	}
-	if (not(authorised("SCHEDULE UPDATE BILL", msg, "RATECARD OVERRIDE"))) {
-		{}
-	}
-	if (not(authorised("SCHEDULE UPDATE COST", msg, "RATECARD OVERRIDE"))) {
-		{}
-	}
-	if (not(authorised(deletex ^ "RATECARD OVERRIDE", msg))) {
-		{}
-	}
-
-/*	call log2("*delete wrong plural tasks", logtime);
-	if (not((tt).readv(gen._definitions, "DELETEWRONGPLURALTASKS", 1))) {
-		tt = "";
-	}
-	if (tt < 16033) {
-		tt = "BRANDS,JOBS,PLANS,SCHEDULES,PRODUCTION ORDERS,PRODUCTION INVOICES,PRODUCTION ESTIMATES,TIMESHEETS";
-		tt.converter(",", VM);
-		var nn = (tt).count(VM) + 1;
-		for (var ii = 1; ii <= nn; ++ii) {
-			if (not(authorised(deletex ^ tt.a(1, ii) ^ " LIST"))) {
-				{}
-			}
-		};//ii;
-		var().date().write(gen._definitions, "DELETEWRONGPLURALTASKS");
-	}
-*/
-	call log2("*create default timesheet parameters", logtime);
+	call log2("create default timesheet parameters", logtime);
 	var rec;
 	if (not(rec.read(gen._definitions, "TIMESHEET.PARAMS"))) {
 		var("N" ^ FM ^ 0 ^ FM ^ 16 ^ FM ^ 3 ^ FM ^ 0 ^ FM ^ "DEFAULTED").write(gen._definitions, "TIMESHEET.PARAMS");
@@ -677,7 +439,7 @@ nextbrandcode:
 		}
 	}
 */
-	call log2("*quit INIT.AGENCY", logtime);
+	call log2("-----initagency exit", logtime);
 
 	return 0;
 }
@@ -691,9 +453,14 @@ subroutine makeindex(in filename, in indexname, in mode="btree", in lowercase=""
 	}
 	call log2("*check/create index " ^ filename ^ " " ^ indexname, logtime);
 	if (not var().listindexes(filename).index(indexname)) {
-		var().createindex(indexname, filename);
+		//TODO AFTER CREATING DICT FILES AND COLUMNS filename.createindex(indexname);
 	}
 	return;
+}
+
+subroutine addtask(in taskname, in defaultlock_or_taskname="") {
+		var xx;
+		authorised(taskname, xx, defaultlock_or_taskname);
 }
 
 libraryexit()

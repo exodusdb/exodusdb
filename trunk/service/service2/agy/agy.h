@@ -10,6 +10,7 @@ agy_common(){
 }
 
 var schedules;
+var plans;
 var clients;
 var vehicles;
 var ratecards;
@@ -34,6 +35,7 @@ var tsmvfns;
 
 };
 #define agy (*((agy_common*) mv.labelledcommon[4]))
+#define agy_isdefined (mv.labelledcommon[4] != NULL)
 //#define labc2 ((labc2x) mv.labelledcommon[4])
 
 #endif //NEO_FIN_H
