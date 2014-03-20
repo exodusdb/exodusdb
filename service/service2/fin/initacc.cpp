@@ -13,7 +13,20 @@ var logtime;
 
 function main() {
 
+	var thisname="initacc";
+
 	call log2("-----initacc init", logtime);
+
+	if (not iscommon(gen)) {
+		var().stop("gen common is not initialised in " ^ thisname);
+	}
+
+	//unfortunately general needs finance for now until some finance commons
+	//get moved into general common (and this moved into initacc)
+	//mv.labelledcommon[3]=new fin_common;
+	if (not iscommon(fin)) {
+		var().stop("fin common is not initialised in " ^ thisname);
+	}
 
 	readaccparams();
 

@@ -2,6 +2,7 @@
 libraryinit()
 
 #include <log2.h>
+#include <initagency.h>//could be perform but crashes on return atm (some double perform ptr error?)
 #include <initgeneral2.h>
 #include <otherusers.h>
 #include <authorised.h>
@@ -47,19 +48,29 @@ var xx;
 
 function main() {
 	//return true or false to caller to abort
+	var thisname="initgeneral";
 
 	call log2("-----initgeneral init", logtime);
 
 	//CREATE LABELLED COMMON
 	mv.labelledcommon[2]=new gen_common;
+	if (not iscommon(gen)) {
+		var().stop("gen common is not initialised in " ^ thisname);
+	}
 
 	//unfortunately general needs finance for now until some finance commons
-	//get moved into general common
+	//get moved into general common (and this moved into initacc)
 	mv.labelledcommon[3]=new fin_common;
+	if (not iscommon(fin)) {
+		var().stop("fin common is not initialised in " ^ thisname);
+	}
 
 gen.gcurrcompany="";
 gen.company="";
 USERNAME="";
+if (not gen._definitions.open("DEFINITIONS")) {
+	var().stop("cant open DEFINITIONS");
+}
 
 	var resetting = mv.PSEUDO == "RESET";
 
@@ -766,7 +777,7 @@ getproxy:
 
 	call log2("*open advertising system files INIT.AGENCY", logtime);
 	if (xx.open("SCHEDULES")) {
-		perform("initagency " ^ resetting);
+		call initagency();
 	}
 /* move to initagency
 	call log2("*add new indexes", logtime);

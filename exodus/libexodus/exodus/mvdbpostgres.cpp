@@ -1403,13 +1403,19 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 
 		if (!actualdictfile.open(dictfilename, connid))
 		{
-			throw MVDBException(L"getdictexpression() cannot open " ^ dictfilename.quote());
-#if TRACING >= 1
-			exodus::errputl(L"ERROR: mvdbpostgres getdictexpression() cannot open " ^ dictfilename.quote());
-#endif
-			return L"";
+			dictfilename=L"dict_md";
+			if (!actualdictfile.open(dictfilename, connid))
+			{
+
+				throw MVDBException(L"getdictexpression() cannot open " ^ dictfilename.quote());
+	#if TRACING >= 1
+				exodus::errputl(L"ERROR: mvdbpostgres getdictexpression() cannot open " ^ dictfilename.quote());
+	#endif
+				return L"";
+			}
 		}
 	}
+
 	//given a file and dictionary id
     //returns a postgres sql expression like (texta(filename.data,99,0,0))
     //using one of the neosys backend functions installed in postgres like textextract, dateextract etc.

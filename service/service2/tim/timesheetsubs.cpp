@@ -11,6 +11,7 @@ libraryinit()
 #include <generalsubs.h>
 #include <singular.h>
 #include <timesheetsubs.h>
+#include <log2.h>
 
 #include <gen.h>
 #include <agy.h>
@@ -43,7 +44,9 @@ var ln;//num
 var userisadmin;
 var t2;
 var wsmsg;
+
 var mode;
+var logtime;
 
 function main(in mode0) {
 
@@ -54,7 +57,9 @@ function main(in mode0) {
 	//equ maxdaysdelay to register(1)<4>
 	//equ jobs to register(5)
 	//equ security.net to register(9)
-printl("IN TIMESHEETSUBS ",mode0);
+
+	log2("-----timesheetsubs," ^ mode0^" init", logtime);
+
 	var interactive = not SYSTEM.a(33);
 	mode=mode0;
 
@@ -86,23 +91,17 @@ printl("IN TIMESHEETSUBS ",mode0);
 		RECORD.write(gen._definitions, "TIMESHEET.PARAMS");
 
 	} else if (mode.substr(1, 8) == "POSTINIT") {
+
 		win.valid = 1;
 		gosub security(mode);
 		if (not win.valid) {
-			var().stop();
+			return invalid();
 		}
 
 		gosub getregisterparams();
 
 		if (not(openfile("MEDIA.TYPES", win.registerx(4)))) {
 			win.registerx(4) = "";
-		}
-		//if openfile('JOBS',jobs) else jobs=''
-
-		//flag to init.general that the timesheet is not required
-		win.registerx(6) = mv.PSEUDO;
-		if (win.registerx(1).a(2) == "") {
-			win.registerx(6) = "";
 		}
 
 		if (mode == "POSTINIT2") {
@@ -115,6 +114,7 @@ printl("IN TIMESHEETSUBS ",mode0);
 			win.registerx(4) = "";
 			//jobs=''
 
+			call log2("select users by rank user_code user_and_dept_name", logtime);
 			if (win.registerx(7)) {
 				//equ response to @user3
 				//call select2('USERS','','BY DEPT_AND_USER_NAME WITH DEPARTMENT_CODE NE @ID','USER_CODE USER_AND_DEPT_NAME','',data,response)
@@ -668,7 +668,8 @@ nextjob:
 		return invalid(msg);
 	}
 
-	return 0;
+	log2("-----timesheetsubs," ^ mode0^" exit", logtime);
+	return 1;
 
 }
 

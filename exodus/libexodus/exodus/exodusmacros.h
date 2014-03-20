@@ -147,6 +147,8 @@ public: \
 	CLASSNAME##_ExodusProgram(MvEnvironment& mv):ExodusProgramBase(mv){} \
 }; \
 
+#define iscommon(COMMONNAME) ((&COMMONNAME)!=NULL)
+
 //simplify declaration of function/subroutine arguments
 //eg. allow "function xyz(in arg1, out arg2)"
 //instead of "function xyz(const var& arg1, var& arg2)"

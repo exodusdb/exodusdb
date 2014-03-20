@@ -384,8 +384,10 @@ phraseinit:
 		else
 			dictfilename = filename;
 
-		if (not DICT.open("dict_"^dictfilename))
+		if (not DICT.open("dict_"^dictfilename)) {
+			dictfilename = "MD";
 			DICT = dictmd;
+		}
 		ss ^= " " ^ word;
 
 		//get any specific keys
@@ -703,7 +705,8 @@ dictrecexit:
 x1exit:
 ///////
 	//if no columns selected then try to use default @crt or @lptr group item
-	if (not (coln or crtx)) {
+	//if (not (coln or crtx) and (DICT ne dictmd or datafile eq "md" or datafile eq "dict_md")) {
+	if (not (coln or crtx) and ((DICT.ucase() ne dictmd.ucase()) or (filename.ucase() eq "MD") or (filename.ucase() eq "DICT_MD"))) {
 		word = "@LPTR";
 		if (DICT and not xx.read(DICT, word)) {
 			word = "@CRT";
@@ -1782,4 +1785,5 @@ function esctoexit()
 //2. closes the class that programinit opened
 //3. sets up the required global main() function that will instantiate the class run its main() function
 
-programexit()
+debugprogramexit()
+//programexit()

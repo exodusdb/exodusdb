@@ -15,6 +15,7 @@ libraryinit()
 //#include <ubr.h>
 #include <generalsubs.h>
 #include <sysmsg.h>
+#include <log2.h>
 
 #include <agy.h>
 #include <gen.h>
@@ -43,16 +44,31 @@ var xx;
 var mode;
 var tasks;
 var proxyname;
+var logtime;
 
 function main() {
 	//subroutine jobsproxy(request,datax,response)
+	var thisname="productionproxy";
 
+	if (not iscommon(gen)) {
+		return invalid("gen common is not initialised in " ^ thisname);
+	}
+	if (not iscommon(agy)) {
+		return invalid("agy common is not initialised in " ^ thisname);
+	}
 	//var().clearcommon();
 	win.valid = 1;
 	USER4 = "";
 	var nbsp = "&nbsp;";
 
 	proxyname="PRODUCTIONPROXY";
+
+	log2("-----productioproxy init", logtime);
+
+	if (!agy_isdefined) {
+		call mssg("INITAGENCY NOT DONE");
+		return invalid();
+	}
 
 	//refresh agency.params every 10 seconds
 	call readagp();
@@ -758,6 +774,11 @@ nexttask:
 
 	goto nexttask;
 
+}
+
+function invalid(in msg) {
+	USER4=msg;
+	return invalid();
 }
 
 function invalid() {
