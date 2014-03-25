@@ -608,8 +608,8 @@ approvalerror:
 		deptcode.converter("0123456789", "");
 
 		//select
-		//perform 'SSELECT MEDIA.TYPES WITH DEPARTMENT ':quote(deptcode)
-		call select2("MEDIA.TYPES", "", "WITH DEPARTMENT " ^ (DQ ^ (deptcode ^ DQ)), "CODE NAME", "XML", USER1, USER3, "", "", "");
+		//perform 'SSELECT JOB_TYPES WITH DEPARTMENT ':quote(deptcode)
+		call select2("JOB_TYPES", "", "WITH DEPARTMENT " ^ (DQ ^ (deptcode ^ DQ)), "CODE NAME", "XML", USER1, USER3, "", "", "");
 		var activitycodes = USER1;
 		activitycodes.converter(FM, VM);
 

@@ -2354,7 +2354,10 @@ static bool pqexec(const var& sql, PGresultptr& pgresult, PGconn * thread_pgconn
 		default:
 
 #if TRACING >= 1
-			exodus::errputl(L"ERROR: mvdbpostgres "^var(PQresStatus(PQresultStatus(local_result))) ^ L": " ^ var(PQresultErrorMessage(local_result)));
+			if (sql.field(L" ",1,2) !="FETCH NEXT") {
+				exodus::errputl(L"ERROR: mvdbpostgres pqexec "^var(sql));
+				exodus::errputl(L"ERROR: mvdbpostgres pqexec "^var(PQresStatus(PQresultStatus(local_result))) ^ L": " ^ var(PQresultErrorMessage(local_result)));
+			}
 #endif
 
 			//this is defaulted above for safety

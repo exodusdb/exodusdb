@@ -137,12 +137,14 @@ public:
 	//typedef std::map<std::string, boost::any> labelledcommons;
 	LabelledCommon* labelledcommon[3];
 
-	var perform(const var& sentence);
+	//moved to exodusprogrambase
+	//var perform(const var& sentence);
 
+	//ditto
 	//given dictid reads dictrec from DICT file and extracts from RECORD/ID or calls library called dict+DICT function dictid
 	//not const so we can mess with the library?
-	var calculate(const var& dictid);
-	var calculate(const var& dictid, const var& dictfile, const var& id, const var& record, const var& mv=0);
+	//var calculate(const var& dictid);
+	//var calculate(const var& dictid, const var& dictfile, const var& id, const var& record, const var& mv=0);
 
 	var otherusers(const var& param);
 	var otherdatasetusers(const var& param);
@@ -210,7 +212,7 @@ public:
 private:
 
 	//used by calculate to call dict libraries
-	mutable ExodusFunctorBase exodusfunctorbase_;
+	mutable ExodusFunctorBase dict_exodusfunctorbase_;
 	//TODO cache many not just one
 	mutable var cache_dictid_;
 	mutable var cache_dictrec_;

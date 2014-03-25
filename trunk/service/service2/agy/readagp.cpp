@@ -66,6 +66,14 @@ function main() {
 		agy.agp.r(37, marketcode);
 	}
 	var market;
+
+var schedules;
+var plans;
+var clients;
+var vehicles;
+var ratecards;
+var markets;
+var brands;
 	if (market.read(agy.markets, marketcode)) {
 
 		//NB agp<13> is LAST DAY OF WEEK whereas market<10> is FIRST DAY OF WEEK

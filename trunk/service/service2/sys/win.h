@@ -145,7 +145,8 @@ win_common(){
  dim registerx;
 
 };
-#define win (*((win_common*) mv.labelledcommon[1]))
-//#define labc2 ((labc2x) mv.labelledcommon[4])
+#define win_common_no 1
+#define win (*((win_common*) mv.labelledcommon[win_common_no]))
+#define win_isdefined (mv.labelledcommon[win_common_no] != NULL)
 
 #endif //EXO_WIN_H

@@ -768,6 +768,11 @@ var& var::operator() (int fieldno, int valueno, int subvalueno)
 }
 */
 
+var var::extract(const int argfieldn, const int argvaluen, const int argsubvaluen) const
+{
+	return extract(argfieldn, argvaluen, argsubvaluen);
+}
+
 //extract int int int
 //NB declared with value=0 and subvalue=0
 var var::a(const int argfieldn, const int argvaluen, const int argsubvaluen) const

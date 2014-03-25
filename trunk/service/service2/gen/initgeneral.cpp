@@ -2,8 +2,8 @@
 libraryinit()
 
 #include <log2.h>
-#include <initagency.h>//could be perform but crashes on return atm (some double perform ptr error?)
-#include <initgeneral2.h>
+#include <initagency.h>
+#include <initgeneral2.h>//alternatively it could be performed
 #include <otherusers.h>
 #include <authorised.h>
 #include <logprocess.h>
@@ -711,10 +711,12 @@ getproxy:
 
 	call log2("*open processes own lists file", logtime);
 	var workdir = "NEOS" ^ (SYSTEM.a(24)).oconv("R(0)#4");
-	var workpath = "DATAVOL\\" ^ workdir ^ "\\";
-	if (not oslistf(workpath)) {
-		osmkdir(workpath);
-	}
+
+	//not needed yet
+	//var workpath = "DATAVOL\\" ^ workdir ^ "\\";
+	//if (not oslistf(workpath)) {
+	//	osmkdir(workpath);
+	//}
 
 	call log2("*open/make/clear lists file", logtime);
 	var lists;
@@ -778,6 +780,7 @@ getproxy:
 	call log2("*open advertising system files INIT.AGENCY", logtime);
 	if (xx.open("SCHEDULES")) {
 		call initagency();
+		//perform("initagency");
 	}
 /* move to initagency
 	call log2("*add new indexes", logtime);

@@ -17,7 +17,7 @@ var ratecards;
 var markets;
 var brands;
 var agp;
-var mediatypes;
+var jobtypes;
 var invoices;
 var analysis;
 var bookingorders;

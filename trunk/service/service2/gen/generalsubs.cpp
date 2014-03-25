@@ -34,6 +34,8 @@ var lastbackup;
 
 function main(in mode) {
 
+	var thisprogram="generalsubs";
+
 	if (mode == "GETDATASETS") {
 		gosub getdatasets();
 		ANS = datasetparams;
@@ -83,14 +85,14 @@ f2dataset:
 		if (ANS == "") {
 			ANS = "Deleted";
 		}
-
-	if (mode.field(",", 1) == "GETUSERDEPT") {
-		gosub getuserdept();
+*/
+	} else if (mode.field(",", 1) == "GETUSERDEPT") {
+		gosub getuserdept(mode);
 		if (ANS == "") {
 			msg = DQ ^ (usercode ^ DQ) ^ " - USER DOES NOT EXIST";
 			return invalid();
 		}
-*/
+
 	} else if (mode == "GETDEPTS") {
 		gosub getdepts();
 		ANS = depts;
@@ -306,7 +308,7 @@ badexchrate:
 */
 	} else {
 		var().chr(7).output();
-		call mssg(DQ ^ (mode ^ DQ) ^ " - invalid mode ignored");
+		call mssg(DQ ^ (mode ^ DQ) ^ " - invalid mode ignored in " ^ thisprogram);
 		return invalid();
 	}
 

@@ -86,8 +86,8 @@ bool MvEnvironment::init(const int threadno) {
 	this->THREADNO = threadno;
 	//this->SYSTEM.r(17, L"");
 
-	cache_dictid_ = L"";
-	cache_perform_libid_ = L"";
+	//cache_dictid_ = L"";
+	//cache_perform_libid_ = L"";
 
 	this->DICT = L"";
 	//this->DICT=L"x";
@@ -106,6 +106,7 @@ bool MvEnvironment::init(const int threadno) {
 	this->UPPERCASE = UPPERCASE_;
 	this->SYSTEM = L"";
 	this->SENTENCE = L"";
+	this->PSEUDO = L"";
 	this->STATION = L"";
 	this->PRIVILEGE = L"";
 
@@ -129,6 +130,7 @@ bool MvEnvironment::init(const int threadno) {
 
 }
 
+/*
 var MvEnvironment::perform(const var& sentence) {
 	//THISIS(L"var MvEnvironment::perform(const var& sentence)")
 	//ISSTRING(sentence)
@@ -145,7 +147,7 @@ var MvEnvironment::perform(const var& sentence) {
 	if (libid != cache_perform_libid_) {
 		cache_perform_libid_ = libid;
 
-		if (!perform_exodusfunctorbase_.mv_)
+		//if (!perform_exodusfunctorbase_.mv_)
 			perform_exodusfunctorbase_.mv_ = this;
 
 		std::string str_libname = libid.toString();
@@ -190,7 +192,9 @@ var MvEnvironment::perform(const var& sentence) {
 	return ANS;
 
 }
+*/
 
+/*
 var MvEnvironment::calculate(const var& dictid, const var& dictfile, const var& id, const var& record, const var& mv) {
 	DICT.exchange(dictfile);
 	ID.exchange(id);
@@ -214,8 +218,8 @@ var MvEnvironment::calculate(const var& dictid) {
 	//return ID^L"*"^dictid;
 
 	//wire up the the library linker to have the current mvenvironment
-	if (!exodusfunctorbase_.mv_)
-		exodusfunctorbase_.mv_ = this;
+	//if (!dict_exodusfunctorbase_.mv_)
+		dict_exodusfunctorbase_.mv_ = this;
 
 	//get the dictionary record so we know how to extract the correct field or call the right library
 	bool newlibfunc;
@@ -261,7 +265,7 @@ var MvEnvironment::calculate(const var& dictid) {
 		if (newlibfunc) {
 			std::string str_libname = DICT.toString();
 			std::string str_funcname = dictid.toString();
-			if (!exodusfunctorbase_.init(str_libname.c_str(),
+			if (!dict_exodusfunctorbase_.init(str_libname.c_str(),
 					str_funcname.c_str()))
 				throw MVException(
 						L"calculate() Cannot find Library " ^ str_libname
@@ -269,7 +273,7 @@ var MvEnvironment::calculate(const var& dictid) {
 								^ L" is not present");
 		}
 
-		exodusfunctorbase_.calldict();
+		dict_exodusfunctorbase_.calldict();
 		return ANS;
 	}
 
@@ -279,6 +283,7 @@ var MvEnvironment::calculate(const var& dictid) {
 	return L"";
 
 }
+*/
 
 /*bool MvEnvironment::lockrecord(const var& filename, const var& file,
 		const var& keyx, const var& recordx, const var& waitsecs0, const bool allowduplicate) const {
@@ -666,6 +671,8 @@ void MvEnvironment::debug() const {
 
 	var reply;
 	std::wcout << L"debug():";
+	if (SLASH == L"/")
+		asm("int $3");
 	//cin>>reply;
 	return;
 
@@ -821,13 +828,15 @@ void MvEnvironment::savescreen(var& origscrn, var& origattr) const {
 
 }
 
+//NO STANDARD C/C++ way to test for key pressed or chars in input buffer!
+//SEE http://c-faq.com/osdep/kbhit.txt (but 1996) for info
 // Checks keyboard buffer (stdin) and returns key
 // pressed, or -1 for no key pressed
 int MvEnvironment::keypressed(int delayusecs) const {
 	/* will not compile on mingw because unlike cygwin
 	 * mingw is close to windows and windows select only works on sockets
 	 * should be easy to reimplement in another way
-	 wchar_t keypressed;
+	 *wchar_t keypressed;
 	 struct timeval waittime;
 	 int numthis->charsthis->read;
 	 struct fdthis->set mask;

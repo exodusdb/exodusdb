@@ -135,7 +135,7 @@ ExodusFunctorBase(const std::string libname,
 //constructor to provide environment immediately
 ExodusFunctorBase(MvEnvironment& mv);
 
-void calldict();
+var calldict();
 
 /*
 //constructor to provide library and function names immediately

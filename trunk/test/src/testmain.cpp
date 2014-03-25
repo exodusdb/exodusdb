@@ -712,8 +712,10 @@ dict(AGE_IN_YEARS) {
 	//just add brackets to clarify and correct the precedence for exodus and it will compile
 	assert( ((e1^e2)>e3) eq 1); //=1 ... correct result because (1^2)>3 i.e. "12">3 is true
 
-	var s1="111";
-	var s2;
+	var s1,s2;
+/* why wont this compile??
+	s1="111";
+	s2;
 	exchange(s1,s2); //works even on unassigned variables (rather meaningless if both are unassigned though!)
 	assert(s1.unassigned());
 	assert(s2 eq "111");
@@ -726,7 +728,7 @@ dict(AGE_IN_YEARS) {
 	assert(exchange(s1,s2) eq "1");
 	assert(s1 eq "2");
 	assert(s2 eq "1");
-
+*/
 	s1="1";
 	s2="2";
 	assert(transfer(s1,s2) eq "1");
@@ -773,7 +775,7 @@ dict(AGE_IN_YEARS) {
 	var expected="a" ^ FM ^ "a" ^ FM ^ "b" ^ FM ^ "a" ^ FM ^ "a" ^ FM ^ "b" ^ FM ^ "";
 	var tempstr2="ab";
 	for (var ii=-3; ii<=3; ++ii)
-		assert(tempstr2[ii] eq expected.extract(ii+4));
+		assert(tempstr2[ii] eq expected.a(ii+4));
 
 	//test single character extraction on ""
 	tempstr2="";

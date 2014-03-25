@@ -4,7 +4,7 @@
 
 //#include "mvroutine.h"
 
-//TODO replace wcout<< with printl to remove dependency on <iostream>
+//TODO replace wcout, with printl to remove dependency on <iostream>
 
 //perhaps following is not necessary
 //and only need to grant www-data group access (+sgid) to data since exodus is owner
@@ -52,15 +52,13 @@ programinit()
 
 	bool routineexists;
 
-	var nblocks;
-	var datx[4];
-	var hexx[256];
+//	var hexx[256];
 	var sleepms;//num
 	var origscrn;
 	var origattr;
 	var locks;
-	var logfilename;
-	var logfile;
+//	var logfilename;
+//	var logfile;
 	var logptr;//num
 	var xx;
 	var logx;
@@ -78,8 +76,6 @@ programinit()
 	var testdata;
 	var bakdisk;
 	var requeststarttime;//num
-	var linkfile1;
-	var linkfilename2;
 	var invaliduser;
 	var nostack;
 	var newfilename;
@@ -96,11 +92,15 @@ programinit()
 	var request4;
 	var request5;
 
+	var linkfile1;
+
 	var code;
 	var response;
 	var responsefilename;
-	var linkfilename1;
-	var linkfilename3;
+	var linkfilename1;//request
+	var linkfilename2;//request data and response data
+	var linkfilename3;//response
+	var linkfilename5;//temporary response before renamed to achieve atomicity
 	var replyfilename;
 	var filename;
 	var keyx;
@@ -123,9 +123,6 @@ programinit()
 	var ostimex;
 
 	var maxstringsize;
-	var inblocksize;
-	//inblocksize=50000
-	var outblocksize;
 	var Serverversion;
 	var origsentence;
 	var md;
@@ -142,7 +139,6 @@ programinit()
 	var origbatchmode;
 
 	var portno;
-	var onalertsecs;
 
 	var datasetcode;
 	var neopath;
@@ -168,7 +164,6 @@ programinit()
 	var withlock;
 	var updatenotallowed;
 	var logpath;
-	var onalert;
 	var timestarted;
 
 function main()
@@ -184,25 +179,18 @@ SYSTEM="";
 		return 1;
 	}
 
-	nblocks = 4;
+	maxstringsize=1024*1024;
 
 	portno = 5700;
 	if (SYSTEM.a(38))
 		portno += SYSTEM.a(38) - 1;
-
-	onalertsecs = 0;
 
 	//delete files older than ...
 	ageinsecs = 60 * 60;
 
 	halt = 0;
 
-//TODO	var("ADDMFS SHADOW.MFS FILEORDER.COMMON").perform();
-
-	maxstringsize = 65530;
-	inblocksize = 65500;
-	//inblocksize=50000
-	outblocksize = (maxstringsize / 3).floor();
+//TODO	var(L"ADDMFS SHADOW.MFS FILEORDER.COMMON").perform();
 
 	Serverversion = "";
 	origsentence = SENTENCE;
@@ -211,59 +199,59 @@ SYSTEM="";
 //	SYSTEM.printl();
 
 	//openqm connection
-	//std::wcout<<"Connecting DB ... "<<std::flush;
+	//std::wcout,"Connecting DB ... ",std::flush;
 	//if (!this->SESSION.connect("127.0.0.1","4243","steve","stetempp","QMSYS"))
 	//{
-	//	std::wcout<<"couldn't connect to QMSYS"<<std::endl;
+	//	std::wcout,"couldn't connect to QMSYS",std::endl;
 	//	return false;
 	//}
-	//std::wcout<<"OK"<<std::endl;
+	//std::wcout,"OK",std::endl;
 	var conninfo="";//"host=localhost port=5432 dbname=exodus user=exodus password=somesillysecret connect_timeout=10";
 	if (!mv.SESSION.connect(conninfo))
 	{
-		std::wcerr<<"MvEnvironment::init: Couldn't connect to local database"<<std::endl;
+		errputl("MvEnvironment::init: Couldn't connect to local database");
 		return false;
 	}
 
 	/* arev's byte/character bit inverter not available for now
-	//std::wcout<<"Reading Security ... "<<std::flush;
+	//std::wcout,"Reading Security ... ",std::flush;
 	if (!SECURITY.read(DEFINITIONS,"SECURITY"))
 	{
-		//std::wcout<<"Cannot read SECURITY"<<std::endl;
+		//std::wcout,"Cannot read SECURITY",std::endl;
 		//return false;
 		SECURITY="";
 	}
 	SECURITY=SECURITY.invert();
-//	std::wcout<<"OK"<<std::endl;
+//	std::wcout,"OK",std::endl;
 	*/
 
-	//std::wcout<<"Opening MD ... "<<std::flush;
+	//std::wcout,"Opening MD ... ",std::flush;
 	var mdfilename="MD";
 	var md;
 	if (!md.open(mdfilename))
 	{
 			if (!md.createfile(mdfilename)||!md.open(mdfilename))
 		{
-			std::wcerr<<"Cannot create "<<mdfilename<<std::endl;
+			errputl("Cannot create "^mdfilename);
 			return false;
 		}
 	}
-	//std::wcout<<"OK"<<std::endl;
+	//std::wcout,"OK",std::endl;
 
-	//std::wcout<<"Opening MENUS ... "<<std::flush;
+	//std::wcout,"Opening MENUS ... ",std::flush;
 	var menufilename="MENUS";
 	var menus;
 	if (!menus.open(menufilename))
 	{
 		if (!menus.createfile(menufilename)||!menus.open(menufilename))
 		{
-			std::wcerr<<"Cannot create "<<menufilename<<std::endl;
+			errputl("Cannot create "^menufilename);
 			return false;
 		}
 	}
-	//std::wcout<<"OK"<<std::endl;
+	//std::wcout,"OK",std::endl;
 
-	//std::wcout<<"MvEnvironment::init: completed "<<std::endl;
+	//std::wcout,"MvEnvironment::init: completed ",std::endl;
 	datasetcode = SYSTEM.a(17);
 	if (datasetcode == "")
 //		datasetcode = "DEFAULT";
@@ -283,15 +271,15 @@ SYSTEM="";
 	globalend = neopath ^ "GLOBAL.END";
 	if (!allcols.open("ACCESSIBLE_COLUMNS"))
 		allcols = "";
-
+/*
 	//prepare for sending and receiving escaped iodat > 64kbh
 	for (int ii = 0; ii <= 255; ii++)
 	{
 		hexx[ii]= ("%" ^ (var(ii).oconv("MX")).oconv("R(0)#2"));
 		//hexx[ii]="%00";
-//		std::wcout<<hexx[ii]<<" ";
+//		std::wcout,hexx[ii]," ";
 	}
-
+*/
 	//discover the server name
 	//servername=field(getdrivepath(drive()[1,2])[3,9999],'\',1)
 	servername = "";
@@ -342,8 +330,6 @@ SYSTEM="";
 
 	//savescreen(origscrn, origattr);
 
-//	std::wcout << mv.AW.a(30);
-
 	//tracing=(@username='neosys' or trim(@station)='sbcp1800')
 	//tracing=(not(index(origsentence,'auto',1)))
 
@@ -358,15 +344,13 @@ SYSTEM="";
 
 	nrequests = SYSTEM.a(35) + 0;
 	//if tracing then
-	std::wcout << "NEOSYS.NET SERVICE "<< SYSTEM.a(24);
-	std::wcout << " STARTED "<< var().timedate() << std::endl;
-	std::wcout << std::endl;
-
-	std::wcout << "Station  : "<< mv.STATION<<std::endl;
-	std::wcout << "Drive : "<< var().oscwd() << std::endl;
-
-	std::wcout << "Server   : "<< servername<<std::endl;
-	std::wcout << "Data  : "<< inpath << std::endl;
+	printl("NEOSYS.NET SERVICE ", SYSTEM.a(24));
+	printl(" STARTED ", var().timedate());
+	printl();
+	printl("Station  : ", mv.STATION);
+	printl("Drive : ", var().oscwd());
+	printl("Server   : ", servername);
+	printl("Data  : ", inpath);
 
 	//print 'tcp port : ':portno
 	//end else
@@ -413,8 +397,7 @@ SYSTEM="";
 
 	gosub flagserveractive();
 
-	onalert = onalertsecs;
-
+/*
 	//open a log file
 	logfilename = "";
 	logpath = neopath ^ "/LOGS/";
@@ -454,10 +437,11 @@ SYSTEM="";
 			mv.osbwritex("</Log>", logfilename, logfilename, logptr);
 
 		}else{
-			std::wcout << "CANNOT OPEN LOG FILE "<< logfilename << std::endl;
+		printl("CANNOT OPEN LOG FILE ", logfilename);
 			logfilename = "";
 		}
 	}
+*/
 
 	linkfilename1 = "";
 	replyfilename = "";
@@ -468,7 +452,7 @@ SYSTEM="";
 	//</arev>
 
 	if (tracing)
-		std::wcout << var("-").str(79) << std::endl;
+	printl(var("-").str(79));
 	RECORD = "";
 	ID = "";
 	USER0 = "";
@@ -506,7 +490,7 @@ SYSTEM="";
 			break;
 
 		//if (tracing)
-		std::wcout << "CANNOT DELETE "<< linkfilename1<< " GENERATING ANOTHER" << std::endl;
+	printl("CANNOT DELETE ", linkfilename1, " GENERATING ANOTHER");
 
 	}
 	linkfilename0 = linkfilename1.substr(inpath.length() + 1, 9999);
@@ -558,22 +542,15 @@ function serviceloop()
 	if (nrequests.substr(-1, 1) == "0")
 		gosub deleteoldfiles(inpath,".*\\.4$");
 
-		//if tracing then
-	std::wcout << mv.at(0);
-	std::wcout << (var().time()).oconv("MTS");
-	std::wcout << " " << SYSTEM.a(17);
-	std::wcout << " " << mv.ROLLOUTFILE.field2("\\", -1).field(".", 1, 1);
-	std::wcout << " " << nrequests;
-	std::wcout << " " << onalert.oconv("MD10P");
-	std::wcout << " Listening ..."<< mv.at(-4)<<std::endl;
-
-	//end else
-	// print @(25,@crthigh/2-1):
-	// print (date() 'd':' ':timex 'mts') 'c#30':
-	// print @(25,@crthigh/2+1):
-	// print ('requests: ':nrequests:' on alert: ':onalert 'md10p') 'c#30':
-	// *print @(25,@crthigh/2+2):('on alert: ':onalert 'md10p') 'c#30':
-	// end
+	//if tracing then
+	logput(mv.at(0));
+	logput((var().time()).oconv("MTS"));
+	logput(" "^SYSTEM.a(17));
+	//logput(" "^mv.ROLLOUTFILE.field2("\\", -1).field(".", 1, 1));
+	logput(" "^SYSTEM.a(24));
+	logput(" "^nrequests);
+	logput(" Listening ...");
+	logput(mv.at(-4));
 
 	//prevent sleep in esc.to.exit
 	timenow=var().ostime().round(2);
@@ -793,9 +770,7 @@ function processlink()
 		if (!(lockrecord("", locks, "REQUEST*" ^ linkfilename1))) {
 			if (tracing)
 			{
-				std::wcout<< "CANNOT LOCK LOCKS,";
-				std::wcout<<("REQUEST*" ^ linkfilename1).quote();
-				std::wcout<< std::endl;
+				errputl("CANNOT LOCK LOCKS," ^ ("REQUEST*" ^ linkfilename1).quote());
 			}
 			continue;//goto nextlinkfile;
 		}
@@ -806,7 +781,7 @@ function processlink()
 			//TODO remove from future candidate files?
 			unlockrecord("", locks, "REQUEST*" ^ linkfilename1);
 			if (tracing)
-				std::wcout << "CANNOT OPEN " << linkfilename1.quote() << std::endl;
+			errputl("CANNOT OPEN "^ linkfilename1.quote());
 			var().ossleep(100);
 			continue;//goto nextlinkfile;
 		}
@@ -814,9 +789,13 @@ function processlink()
 		//get the .1 file which contains the request
 		//timex=time()+2
 readlink1:
+/*
 		//osbread request from linkfilename1 at 0 length 256*256-4
 		var offset=0;
 		USER0.osbread(linkfilename1, offset, 256 * 256 - 4);
+*/
+		USER0.osread(linkfilename1, "utf8");
+		USER0=decode(USER0);
 
 		//if cannot read it then try again
 		if (USER0 == "" && var().time() == timex) {
@@ -825,7 +804,7 @@ readlink1:
 			var().ossleep(100);
 			linkfilename1.osclose();
 			if (tracing)
-				std::wcout << "CANNOT READ " << linkfilename1.quote() << std::endl;
+			errputl("CANNOT READ " ^ linkfilename1.quote());
 			if (!(linkfilename1.osopen()))
 				{}
 			goto readlink1;
@@ -862,7 +841,7 @@ USER0.outputl("USER0 after decode =");
 		//check request is VERSION 3
 		if (USER0.a(1) ne "VERSION 3") {
 			if (tracing)
-				std::wcout << "REQUEST TYPE MUST BE VERSION 3 BUT IS " << USER0.a(1).quote() << std::endl;
+			errputl("REQUEST TYPE MUST BE VERSION 3 BUT IS "^USER0.a(1).quote());
 			unlockrecord("", locks, "REQUEST*" ^ linkfilename1);
 			continue;//goto nextlinkfile;
 		}
@@ -871,7 +850,7 @@ USER0.outputl("USER0 after decode =");
 		//unlock locks,'request*':replyfilename
 		if (!(lockrecord("", locks, "REQUEST*" ^ replyfilename))) {
 			if (tracing)
-				std::wcout << "CANNOT LOCK LOCKS," << ("REQUEST*" ^ replyfilename).quote() << std::endl;
+			errputl("CANNOT LOCK LOCKS," ^ ("REQUEST*" ^ replyfilename).quote());
 			unlockrecord("", locks, "REQUEST*" ^ linkfilename1);
 			continue;//goto nextlinkfile;
 		}
@@ -892,7 +871,7 @@ deleterequest:
 			if (ntries < 100)
 				goto deleterequest;
 			if (tracing)
-				std::wcout << "COULD NOT DELETE "<< linkfilename1 << std::endl;
+			errputl("COULD NOT DELETE "^ linkfilename1.quote());
 		}
 
 		//leave these in place for the duration of the process
@@ -920,7 +899,11 @@ function processrequest()
 	//print @(0):@(-4):time() 'mts':' ':count(program.stack(),fm):
 	//print @(0):@(-4):time() 'mts':' ':field2(linkfilename1,'\',-1):' ':field2(replyfilename,'\',-1):
 	//print @(0):@(-4):time() 'mts':' ':field2(replyfilename,'\',-1):
-	std::wcout << mv.at(0)<< mv.at(-4)<< (var().time()).oconv("MTS")<< " ";
+	logput(mv.at(0)^
+		mv.at(-4)^
+		var().time().oconv("MTS")^
+		" "
+	);
 	//end else
 	// print @(25,@crthigh/2+1):
 	// print ('processing request : ':nrequests) 'c#30':
@@ -932,10 +915,6 @@ function processrequest()
 	//USER2=''
 	USER3 = "Error: Response not set in Server.";
 	USER4 = "";
-
-	//only go on alert if we actually get the request
-	//to avoid multiple processes going on alert for only one request
-	onalert = onalertsecs;
 
 	Serverfailure = 0;
 
@@ -992,6 +971,7 @@ function processrequest()
 	request5 = USER0.a(5);
 //USER0.outputl("USER0 finally=");
 
+/*
 	if (logfilename!="") {
 
 		var datex = var().date();
@@ -1037,7 +1017,7 @@ function processrequest()
 		mv.osbwritex("<DataIn>", logfilename, logfilename, logptr);
 
 	}
-
+*/
 	var anydata = 0;
 
 	if (request2 == "JOURNALS") {
@@ -1056,13 +1036,11 @@ function processrequest()
 			t2 ^= " " ^ connection.a(1, 3);
 
 		t2.trimmer();
-		std::wcout << " " << (t2 ^ " " ^ tt).trim().quote() << std::endl;
+		logputl(" " ^ (t2 ^ " " ^ tt).trim().quote());
 	}
 
 	linkfilename2 = replyfilename.splice(-1, 1, 2);
-	
-	//should be made into a MvLib
-	linkfilename2.swapper("/\\",SLASH^SLASH);
+	linkfilename2.swapper("/\\",SLASH^SLASH);	
 	//if (linkfilename2.index(":"))
 	//{
 	//	linkfilename2.swapper(":",SLASH);
@@ -1070,14 +1048,15 @@ function processrequest()
 	//}
 
 	linkfilename3 = replyfilename.splice(-1, 1, 3);
-	
-	//should be made into a MvLib
 	linkfilename3.swapper("/\\",SLASH^SLASH);
 	//if (linkfilename3.index(":"))
 	//{
 	//	linkfilename3.swapper(":",SLASH);
 	//	linkfilename3="/cygdrive/"^linkfilename3;
 	//}
+
+	//temporary responsefilename before renaming
+	linkfilename5 = linkfilename3.splice(-1, 1, 5);
 
 	//save the response file name
 	//so that if Server fails then net the calling program can still respond
@@ -1086,140 +1065,55 @@ function processrequest()
 	var linkfilename2size = linkfilename2.osfile().a(1);
 	if (linkfilename2size > maxstringsize) {
 
-		if (linkfilename2.osopen()) {
+		USER1 = "";
+		USER3 = "Error: Maximum record size " ^ maxstringsize ^ " exceeded in Server";
+		Serverfailure = 1;
 
-			//read blocks of iodat
-			for (int blockn = 1; blockn <= nblocks; blockn++)
-				datx[blockn]="";
-//				datx.initarray("");
-			for (int blockn = 1; blockn <= nblocks; blockn++) {
+	} else if (!linkfilename2size) {
+		USER1 = "";
 
-				//osbread datx(blockn) from linkfilename2 at ((blockn-1)*inblocksize) length inblocksize
-				var offset=(blockn - 1) * inblocksize;
-				mv.osbreadx(datx[blockn], linkfilename2, linkfilename2, offset, inblocksize);
+	}else if (!(linkfilename2.osopen())) {
 
-				//BREAK;
-				if (!((datx[blockn]).length())) break;;
-
-				//hack to remove UTF16 BOM mark
-				if (blockn==1&&datx[blockn].substr(1,1)=="\uFEFF")
-					datx[blockn].splicer(1,1,"");
-
-				//avoid hexcode spanning block end by moving one or two bytes backwards
-				if (blockn > 1) {
-					var tt = ((datx[int(blockn - 1)]).substr(-2, 2)).index("%", 1);
-					if (tt) {
-						datx[int(blockn - 1)] ^= (datx[blockn]).substr(1, tt);
-						(datx[blockn]).splicer(1, tt, "");
-					}
-				}
-
-			};//blockn;
-
-			//unescape all blocks
-			var lendata = 0;
-			for (int blockn = 1; blockn <= nblocks; blockn++) {
-
-				if ((datx[blockn]).length()) {
-
-					//hack to remove UTF16 BOM mark
-					if (blockn==1&&datx[blockn].substr(1,1)=="\uFEFF")
-						datx[blockn].splicer(1,1,"");
-
-					//output to log
-					if (logfilename) {
-
-						//start after the last <datain>
-						if (!anydata) {
-							anydata = 1;
-							logptr += 8;
-						}
-
-						logx = datx[blockn];
-						gosub writelogx();
-
-					}
-
-					for (int ii = 0; ii <= 36; ii++)
-						datx[blockn].swapper(hexx[ii], var().chr(ii));
-					for (int ii = 38; ii <= 255; ii++)
-						datx[blockn].swapper(hexx[ii], var().chr(ii));
-					datx[blockn].swapper(hexx[37], var().chr(37));
-
-					lendata += (datx[blockn]).length();
-
-				}
-
-			};//blockn;
-
-			//check max iodat size <= maxstringsize
-			if (lendata > maxstringsize) {
-				USER1 = "";
-				USER3 = "Error: Maximum record size of 64Kb exceeded in Server";
-				Serverfailure = 1;
-
-				//otherwise join the blocks
-			}else{
-				USER1 = "";
-				for (int blockn = 1; blockn <= nblocks; blockn++) {
-					USER1 ^= datx[blockn];
-					datx[blockn] = "";
-				};//blockn;
-			}
-
-			//cannot open linkfilename2 means no iodat
-			}else{
-cannotopenlinkfilename2:
-				Serverfailure = 1;
-				USER1 = "";
-			USER3 = "Error: Server cannot open " ^ linkfilename2;
-		}
+		USER1 = "";
+		USER3 = "Error: Server cannot open " ^ linkfilename2;
+		Serverfailure = 1;
 
 	}else{
 
-		if (!linkfilename2size) {
+/*
+		//osread iodat from linkfilename2 else goto cannotopenlinkfilename2
+		var offset=0;
+		mv.osbreadx(USER1, linkfilename2, linkfilename2, offset, maxstringsize);
 
-			USER1 = "";
+		//hack to remove UTF16 BOM mark
+		if (USER1.substr(1,1)=="\uFEFF")
+			USER1.splicer(1,1,"");
+*/
+		USER1.osread(linkfilename2, "utf8");
+		USER1=decode(USER1);
 
-		}else{
+/*
+		//output to log before unescaping
+		if (logfilename) {
 
-			if (!(linkfilename2.osopen()))
-				goto cannotopenlinkfilename2;
-
-			//osread iodat from linkfilename2 else goto cannotopenlinkfilename2
-			var offset=0;
-			mv.osbreadx(USER1, linkfilename2, linkfilename2, offset, maxstringsize);
-
-			//hack to remove UTF16 BOM mark
-			if (USER1.substr(1,1)=="\uFEFF")
-				USER1.splicer(1,1,"");
-
-			//unescape
-			//for ii=0 to 255
-
-			//output to log
-			if (logfilename) {
-
-				//start after the last <datain>
-				if (!anydata) {
-					anydata = 1;
-					logptr += 8;
-				}
-
-				logx = USER1;
-				gosub writelogx();
+			//start after the last <datain>
+			if (!anydata) {
+				anydata = 1;
+				logptr += 8;
 			}
 
-			for (int ii = 0; ii <= 36; ii++)
-				USER1.swapper(hexx[ii], var().chr(ii));
-			for (int ii = 38; ii <= 255; ii++)
-				USER1.swapper(hexx[ii], var().chr(ii));
-			//unescape %25 to % LAST!
-			USER1.swapper(hexx[37], var().chr(37));
-
-			// next i
-
+			logx = USER1;
+			gosub writelogx();
 		}
+*/
+/*
+		for (int ii = 0; ii <= 36; ii++)
+			USER1.swapper(hexx[ii], var().chr(ii));
+		for (int ii = 38; ii <= 255; ii++)
+			USER1.swapper(hexx[ii], var().chr(ii));
+		//unescape %25 to % LAST!
+		USER1.swapper(hexx[37], var().chr(37));
+*/
 
 	}
 
@@ -1229,6 +1123,7 @@ cannotopenlinkfilename2:
 		//osread _USER3 from linkfilename3 else USER3=''
 	}
 
+/*
 	if (logfilename!="") {
 
 		if (anydata) {
@@ -1241,7 +1136,7 @@ cannotopenlinkfilename2:
 		gosub writelogx3();
 
 	}
-
+*/
 	//update security table every few secs and every login
 	if (request1 == "LOGIN" || var("036").index(var().time()).substr(-1, 1))
 		gosub getsecurity();
@@ -1472,6 +1367,7 @@ printl("requestexit:"^USER3.quote());
 	var rawresponse = USER3;
 	rawresponse.converter(var().chr(13) ^ var().chr(10), "|");
 
+/*
 	if (logfilename!="") {
 
 		var secs = (requeststoptime - requeststarttime).oconv("MD20P");
@@ -1480,8 +1376,9 @@ printl("requestexit:"^USER3.quote());
 		logx ^= ">";
 		gosub writelogx2();
 
-		//convert non ascii to hexcode
 		logx = USER3;
+
+		//convert non ascii to hexcode
 		//escape % to %25 FIRST!
 		logx.swapper("%", "%25");
 		//for (int ii = 128; ii <= 255; ii++)
@@ -1489,6 +1386,7 @@ printl("requestexit:"^USER3.quote());
 			logx.swapper(var().chr(ii), hexx[ii]);
 		for (int ii = 0; ii <= 31; ii++)
 			logx.swapper(var().chr(ii), hexx[ii]);
+
 		gosub writelogx();
 
 		logx = "</Response>" ^ (var().chr(13) ^ var().chr(10));
@@ -1498,61 +1396,59 @@ printl("requestexit:"^USER3.quote());
 		gosub writelogx2();
 
 	}
+*/
 
 	if (USER1 == "%DIRECTOUTPUT%") {
 
+/*
 		logx = USER1;
 		logx.swapper("%", "%25");
 		gosub writelogx();
-
+*/
 	}else{
 
-		var("").oswrite(linkfilename2);
-		if (linkfilename2.osopen()) {
+		//var("").oswrite(linkfilename2);
+		//if (linkfilename2.osopen()) {
 
-			//split into blocks and convert to escape chars
-			for (int blockn = 1; blockn <= nblocks; blockn++)
-				datx[blockn]="";
-//			datx.initarray("");
-			var ptr = 0;
-			for (int blockn = 1; blockn <= nblocks; blockn++) {
-				var blk = USER1.substr(1, outblocksize);
-				USER1.splicer(1, outblocksize, "");
-			//BREAK;
-			if (!blk.length()) break;;
+/*
+			//escape the escape character first!
+			USER1.swapper("%", "%25");
 
-				//escape the escape character first!
-				blk.swapper("%", "%25");
+			//allow top eight pick language characters to pass through
+			//to whatever corresponding unicode characters are desired by front end
+			for (int ii = 249; ii <= 255; ii++) {
+				USER1.swapper(var().chr(ii), hexx[int(ii)]);
+				//should not be done per block but is code economic
+				USER3.swapper(var().chr(ii), hexx[int(ii)]);
+			};//ii;
+*/
+			//write BEFORE converting control characters
+			//since writing restores 10-17 back up to F8-FF
+/*
+			var ptr=0;
+USER1.outputl("USER1 written:");
+			mv.osbwritex(USER1, linkfilename2, linkfilename2, ptr);
+//USER1.outputl("USER1 written:");
+			ptr += USER1.length();
+*/
 
-				//allow top eight pick language characters to pass through
-				//to whatever corresponding unicode characters are desired by front end
-				for (int ii = 249; ii <= 255; ii++) {
-					blk.swapper(var().chr(ii), hexx[int(ii)]);
-					//should not be done per block but is code economic
-					USER3.swapper(var().chr(ii), hexx[int(ii)]);
-				};//ii;
+		if (oswrite(encode(USER1), linkfilename2, "utf8")) {
 
-				//write BEFORE converting control characters
-				//since writing restores 10-17 back up to F8-FF
-				mv.osbwritex(blk, linkfilename2, linkfilename2, ptr);
-				ptr += blk.length();
+/*
+			//encode control characters to show in log
+			//should convert x10-x17 back to proper characters
+			for (int ii = 0; ii <= 31; ii++) {
+				USER1.swapper(var().chr(ii), hexx[int(ii)]);
+				//should not be done per block but is code economic
+				USER3.swapper(var().chr(ii), hexx[int(ii)]);
+			};//ii;
 
-				//encode control characters to show in log
-				//should convert x10-x17 back to proper characters
-				for (int ii = 0; ii <= 31; ii++) {
-					blk.swapper(var().chr(ii), hexx[int(ii)]);
-					//should not be done per block but is code economic
-					USER3.swapper(var().chr(ii), hexx[int(ii)]);
-				};//ii;
-
-				if (logfilename!="") {
-					blk.transfer(logx);
-					gosub writelogx();
-				}
-
-				blk = "";
-
-			};//blockn;
+			if (logfilename!="") {
+				USER1.transfer(logx);
+				gosub writelogx();
+			}
+*/
+			USER1 = "";
 
 			linkfilename2.osclose();
 
@@ -1565,9 +1461,9 @@ printl("requestexit:"^USER3.quote());
 	}
 
 	//try to flush file open
-	if (linkfilename2.osopen())
-		linkfilename2.osclose();
-
+	//if (linkfilename2.osopen())
+	//	linkfilename2.osclose();
+/*
 	if (logfilename!="") {
 		var tt = "";
 		if (iodatlen)
@@ -1579,19 +1475,21 @@ printl("requestexit:"^USER3.quote());
 		mv.osbwritex("</Log>", logfilename, logfilename, logptr);
 
 	}
-
+*/
 	//swap '|' with wchar_t(13) in USER3
 	//swap fm with wchar_t(13) in USER3
 
 //printl("writing response:", USER3, linkfilename3);
 	//write the response
-	mv.oswritex(USER3, linkfilename3);
+
+	oswrite(encode(USER3), linkfilename5, "utf8");
+	osrename(linkfilename5, linkfilename3);
 
 	//trace responded
 	requeststoptime=var().ostime().round(2);
 	if (tracing) {
 
-		std::wcout << "Responding in "<< (requeststoptime - requeststarttime).oconv("MD20P")<< " SECS "<< rawresponse << std::endl;
+		printl("Responding in ", (requeststoptime - requeststarttime).oconv("MD20P"), " SECS ", rawresponse);
 		//print linkfilename1
 	}
 
@@ -1607,9 +1505,10 @@ printl("requestexit:"^USER3.quote());
 subroutine exit()
 {
 
+/*
 	if (logfilename!="")
 		logfilename.osclose();
-
+*/
 	//remove lock indicating processing
 	//gosub sysunlock
 
@@ -2355,7 +2254,7 @@ printl("EXECUTE");
 		printfilename.splicer(-tt.length(), tt.length(), "htm");
 		SYSTEM.r(2, printfilename);
 		if (tracing)
-			std::wcout << "Waiting for output ... ";
+		logput("Waiting for output ... ");
 
 		//switch to server mode and html output
 		var s6 = SYSTEM.a(6);
@@ -2436,7 +2335,7 @@ USER0=USER0.field(FM,3,9999);
 		printfilename = SYSTEM.a(2);
 		if (tracing) {
 			//print ' got it'
-			std::wcout << mv.at(0)<< mv.at(-4);
+			logput(mv.at(0)^ mv.at(-4));
 		}
 
 		//make sure that the output file is closed
@@ -2581,7 +2480,7 @@ return;
 subroutine lockit2()
 {
 	//rtp57(code, nextbfs, handle, keyorfilename, fmc, record, state);
-	std::wcout<<"MFS file handle not handled yet"<<std::endl;
+	errputl("MFS file handle not handled yet");
 	state=1;
 	return;
 
@@ -2868,8 +2767,7 @@ subroutine getsecurity()
 {
 	if (!SECURITY.read(DEFINITIONS, "SECURITY"))
 	{
-		//std::wcout<<"CANNOT READ SECURITY"<<std::endl;
-		//return;
+		errputl("CANNOT READ SECURITY");
 		SECURITY="";
 	}
 	//SECURITY.inverter();
@@ -3007,6 +2905,7 @@ subroutine convlogx()
 	return;
 }
 
+/*
 subroutine writelogx()
 {
 	gosub convlogx();
@@ -3029,6 +2928,7 @@ subroutine writelogx3()
 	return;
 }
 
+*/
 
 function filesecurity(in secmode)
 {
@@ -3258,6 +3158,24 @@ subroutine deleteoldfiles(in inpath, in pattern)
 
 	return;
 
+}
+
+function encode(in instr) {
+	//do xml character encoding (do % FIRST!)
+	return instr
+	.swap(L"%",L"%25")
+	.swap(L"<",L"%3C")
+	.swap(L">",L"%3E")
+	.swap(L"&",L"%26");
+}
+
+function decode(in instr) {
+	//undo xml character encoding
+	return instr
+	.swap(L"%3C",L"<")
+	.swap(L"%3E",L">")
+	.swap(L"%26",L"&")
+	.swap(L"%25",L"%");
 }
 
 //use debug if using debugger to get stack backtrace

@@ -134,6 +134,7 @@ class ExodusProgram : public ExodusProgramBase {
 
 #define classexit() \
 public: \
+	/*constructor with one arg of MvEnvironment mv */ \
 	ExodusProgram(MvEnvironment& mv):ExodusProgramBase(mv){} \
 }; \
 
@@ -218,8 +219,8 @@ typedef var& out;
 
 //there is a calculate in ExodusProgramBase which calls mv.calculate
 //but simple external functions are functions not based on ExodusFunctionBase
-#define calculate mv.calculate
-#define perform mv.perform
+//#define calculate mv.calculate
+//#define perform mv.perform
 #define lockrecord mv.lockrecord
 #define unlockrecord mv.unlockrecord
 #define fsmsg mv.fsmsg

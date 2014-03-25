@@ -25,7 +25,7 @@ function main(in marketcodex, in suppliercodex, in vehiclecodex, io vehicles, ou
 	//from the vehicle's supplier and market
 	//company=market
 	//client=supplier
-	//category=mediatype
+	//category=jobtype
 	//brand=vehicle
 
 	//equ group2fn to
@@ -78,12 +78,12 @@ function main(in marketcodex, in suppliercodex, in vehiclecodex, io vehicles, ou
 	var supplier = "";
 	var group1suppliercode = supplier.a(17);
 	//group2suppliercode=supplier<group2fn>
-	var mediatypecode = "";
+	var jobtypecode = "";
 
 	if (vehiclecode) {
 
-		//get vehicle record - to check supplier, market, mediatype etc
-		//if not(marketcode) or not(suppliercode) or not(mediatypecode) then
+		//get vehicle record - to check supplier, market, jobtype etc
+		//if not(marketcode) or not(suppliercode) or not(jobtypecode) then
 
 		if (vehicles == "") {
 			if (not(vehicles.open("VEHICLES", ""))) {
@@ -107,7 +107,7 @@ function main(in marketcodex, in suppliercodex, in vehiclecodex, io vehicles, ou
 		//marketcode=vehicle<13>
 		//group1suppliercode=vehicle<14>
 		//group2suppliercode=vehicle<15>
-		mediatypecode = vehicle.a(2);
+		jobtypecode = vehicle.a(2);
 
 		//check market access here if discovered from vehicle
 		if (marketcode == "") {
@@ -192,10 +192,10 @@ getsupplier:
 	// if ok else return 0
 	// end
 
-	//check mediatype
-	if (mediatypecode) {
+	//check jobtype
+	if (jobtypecode) {
 		filen = 4;
-		code = mediatypecode;
+		code = jobtypecode;
 		gosub checkcode(msg);
 		if (not ok) {
 			return 0;

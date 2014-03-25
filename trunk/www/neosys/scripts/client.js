@@ -243,20 +243,40 @@ var fm2 = '╞'
 var vm2 = '╝'
 var sm2 = '╜'
 
-//prestored regular expressions for speed
-var STMre = /\u255A/g
-var TMre = /\u255B/g
-var SMre = /\u255C/g
-var VMre = /\u255D/g
-var FMre = /\u255E/g
-var RMre = /\u255F/g
-
 //also block character F8 and F9
 //F9 is used as a field mark in AREV eg PRINT ("XXX":\F9\:"YYY") 'L#20' ... formats both to 20 characters
 //also block character F8 since to make logical block of eight field mark characters
-var XMLXXre = /([\x25\x3C\x3E\x26\u255F\u255E\u255D\u255C\u255B\u255A\u2559\u2558])/g
-var FMs = '\u255F\u255E\u255D\u255C\u255B\u255A\u2559\u2558'
-rmcharcode = 9567//U+255F ╟ (box drawings vertical double and right single)
+
+//prestored regular expressions for speed
+//var STMre = /\u255A/g
+//var TMre = /\u255B/g
+//var SMre = /\u255C/g
+//var VMre = /\u255D/g
+//var FMre = /\u255E/g
+//var RMre = /\u255F/g
+//var FMs = '\u255F\u255E\u255D\u255C\u255B\u255A\u2559\u2558'
+//rmcharcode = 9567//U+255F ╟ (box drawings vertical double and right single)
+
+//prestored regular expressions for speed
+var STMre = /\u02FA/g
+var TMre = /\u02FBB/g
+var SMre = /\u02FC/g
+var VMre = /\u02FD/g
+var FMre = /\u02FE/g
+var RMre = /\u02FF/g
+var FMs = '\u02FF\u02FE\u02FD\u02FC\u02FB\u02FA\u02F9\u02F8'
+rmcharcode = 767//U+02FF
+/* Uralitic phonetic alphabet repurposed
+02F7 ˷ MODIFIER LETTER LOW TILDE
+02F8 ˸ MODIFIER LETTER RAISED COLON
+02F9 ˹ MODIFIER LETTER BEGIN HIGH TONE
+02FA ˺ MODIFIER LETTER END HIGH TONE
+02FB ˻ MODIFIER LETTER BEGIN LOW TONE
+02FC ˼ MODIFIER LETTER END LOW TONE
+02FD ˽ MODIFIER LETTER SHELF
+02FE ˾ MODIFIER LETTER OPEN SHELF
+02FF ˿ MODIFIER LETTER LOW LEFT ARROW
+*/
 
 //calculate all the field mark variables
 var rm = String.fromCharCode(rmcharcode)
@@ -266,6 +286,8 @@ var sm = String.fromCharCode(rmcharcode - 3)
 var tm = String.fromCharCode(rmcharcode - 4)
 var stm = String.fromCharCode(rmcharcode - 5)
 
+//var XMLXXre = /([\x25\x3C\x3E\x26\u255F\u255E\u255D\u255C\u255B\u255A\u2559\u2558])/g
+var XMLXXre = /([\x25\x3C\x3E\x26])/g
 
 var dbcache
 
@@ -1643,7 +1665,7 @@ function neosysdblink_send_byhttp_using_xmlhttp(data) {
         //dont escape everything otherwise unicode will arrive in the database as encoded text
         //instead of being converted to system default single byte code page in server filesystem/asp
         //convert any ascii incompatible with xml text eg < > &
-        //convert the escape character "%" FIRST
+        //convert the escape character "%" FIRST!
         //also convert revelation delimiters so that they arrive unconverted
         //XMLre is something like [\x25\x3C\x3E\x26\ plus the field and value marks etc
         temp = this.data.replace(XMLXXre, function ($0) { return escape($0) })
@@ -1705,6 +1727,14 @@ function neosysdblink_send_byhttp_using_xmlhttp(data) {
             //avoid unknown problems. Perhaps it is not necessary for active pages like .asp.
             xhttp.setRequestHeader("Pragma", "no-cache");
             xhttp.setRequestHeader("Cache-control", "no-cache");
+/*            //following added in attempt to force client to read bytes as utf-8 and not latin code page 1
+            xhttp.setRequestHeader("Content-Type", "text/xml; charset=UTF-8");
+            xhttp.overrideMimeType('text/xml');
+            xhttp.setRequestHeader("Accept-Charset", "utf-8");
+            xhttp.setRequestHeader("Accept-Encoding", "utf-8");
+            xhttp.setRequestHeader("Content-Transfer-Encoding", "utf-8");
+            xhttp.setRequestHeader("Transfer-Encoding", "utf-8");
+*/
             //xhttp.setRequestHeader('Content-type','application/x-www-form-urlencoded');
             //consider also putting the following in asp web pages
             //<% Response.CacheControl = "no-cache" %>
@@ -1786,6 +1816,7 @@ function neosysdblink_send_byhttp_using_xmlhttp(data) {
                 //var result=unescape(dbgetnodevalues(responsex.childNodes[2]))
                 this.data = unescape(dbgetnodesvalue(xhttp.responseXML.getElementsByTagName('data')[0].childNodes))
                 this.response = unescape(dbgetnodesvalue(xhttp.responseXML.getElementsByTagName('response')[0].childNodes))
+
                 var result = xhttp.responseXML.getElementsByTagName('result')
                 if (result.length)
                     result = unescape(dbgetnodesvalue(result[0].childNodes))

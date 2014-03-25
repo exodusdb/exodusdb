@@ -689,7 +689,7 @@ jobclosed:
 				tt = calculate("JOB_PRODUCTION_TYPE");
 				if (tt) {
 					var prodtype;
-					if (not(prodtype.read(agy.mediatypes, tt))) {
+					if (not(prodtype.read(agy.jobtypes, tt))) {
 						prodtype = "";
 					}
 					if (not prodtype.a(5)) {

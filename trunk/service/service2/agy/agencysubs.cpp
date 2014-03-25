@@ -231,7 +231,7 @@ field2err:
 				msg ^= "7 - job type code is required";
 				return 0;
 			}
-			if (not(xx.read(agy.mediatypes, typecode))) {
+			if (not(xx.read(agy.jobtypes, typecode))) {
 				msg ^= "7 - " ^ (DQ ^ (typecode ^ DQ)) ^ " job type code does not exist";
 				return 0;
 			}
@@ -1093,7 +1093,7 @@ badperiod:
 		var title = "PRODUCTION";
 
 		var typerec;
-		if (not(typerec.read(agy.mediatypes, win.is))) {
+		if (not(typerec.read(agy.jobtypes, win.is))) {
 			msg = DQ ^ (win.is ^ DQ) ^ " " ^ title ^ " TYPE DOES NOT EXIST";
 			return invalid();
 		}

@@ -52,7 +52,7 @@ function main() {
 		openfile("BRANDS"		, agy.brands		,"CLIENTS");
 		openfile("PRODUCT_CATEGORIES"	, productcategories	,"CLIENTS");
 		openfile("SUPPLIERS"		, agy.suppliers		,"CLIENTS");
-		openfile("MEDIA_TYPES"		, agy.mediatypes	,"CLIENTS");
+		openfile("JOB_TYPES"		, agy.jobtypes	,"CLIENTS");
 		openfile("MARKETS"		, agy.markets		,"CLIENTS");
 		openfile("INVOICES"		, agy.invoices		,"CLIENTS");
 		openfile("ANALYSIS"		, agy.analysis		,"CLIENTS");
@@ -63,7 +63,7 @@ function main() {
 		openfile("COMPANY_VERSIONS"	, xx			, "COMPANIES");
 		openfile("CLIENT_VERSIONS"	, xx			, "CLIENTS");
 		openfile("SUPPLIER_VERSIONS"	, xx			, "SUPPLIERS");
-		openfile("MEDIA_TYPE_VERSIONS"	, xx			, "MEDIA_TYPES");
+		openfile("JOB_TYPE_VERSIONS"	, xx			, "JOB_TYPES");
 
 		call log2("Add agency indexes", logtime);
 		gosub makeindex("clients"	, "group_code");
@@ -117,7 +117,7 @@ function main() {
 		gosub makeindex("ads"		, "brand_and-date");
 		gosub makeindex("booking.orders", "schedule_no");
 		gosub makeindex("booking.orders", "year_period");
-		gosub makeindex("vehicles"	, "media_type_code");
+		gosub makeindex("vehicles"	, "JOB_TYPE_code");
 		gosub makeindex("vehicles"	, "sequence"			, "xref");
 		gosub makeindex("materials"	, "first_appearance_date");
 		gosub makeindex("booking.orders", "date");

@@ -89,6 +89,7 @@ namespace boostfs = boost::filesystem;
 #include <fstream>
 #include <cstdlib> //for getenv and setenv/putenv
 //#include <stdio.h> //for getenv
+#include <algorithm> //for count in osrename
 
 //boost changed from TIME_UTC to TIME_UTC_ (when?) to avoid a new standard TIME_UTC macro in C11 time.h
 #include <boost/version.hpp>
@@ -291,7 +292,7 @@ std::locale get_locale(const var& locale_name) // throw (MVException)
 	//THISIS(L"std::locale get_locale(const var& locale_name)")
 	//ISSTRING(locale_name)
 
-	if (locale_name == L"utf8")
+	if (not locale_name.length() || locale_name == L"utf8")
 	{
 //		typedef wchar_t ucs4_t;
 		std::locale old_locale;
@@ -328,12 +329,20 @@ bool checknotabsoluterootfolder(std::wstring dirname)
 	//cwd to top level and delete relative
 	//top level folder has only one slash either at the beginning or, on windows, like x:\ .
 	//NB copy/same code in osrmdir and osrename
-	if (dirname[0] == SLASH_
-		|| (SLASH_IS_BACKSLASH
-		&& (dirname[1] == L':')
-		&& (dirname[2] == SLASH_)))
+	if (
+			(
+				!SLASH_IS_BACKSLASH
+				&& dirname[0] ==SLASH_
+				&& std::count(dirname.begin(), dirname.end(), SLASH_) < 3
+			)
+		||	(
+				SLASH_IS_BACKSLASH
+				&& (dirname[1] == L':')
+				&& (dirname[2] == SLASH_)
+			)
+		)
 	{
-		std::wcout << "Forced removal/renaming of top level directories by absolute path is not supported for safety but you can use cwd() and relative path." <<dirname << std::endl;
+		std::wcout << "Forced removal/renaming of top two level directories by absolute path is not supported for safety but you can use cwd() and relative path." <<dirname << std::endl;
 		return false;
 	}
 	return true;

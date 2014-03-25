@@ -42,6 +42,26 @@ DLL_PUBLIC
 	//so that ID RECORD etc. continue to appear to the application programmer to be "threadsafe global" variables
 	MvEnvironment& mv;
 
+	var perform(const var& sentence);
+
+	//given dictid reads dictrec from DICT file and extracts from RECORD/ID or calls library called dict+DICT function dictid
+	//not const so we can mess with the library?
+	var calculate(const var& dictid);
+	var calculate(const var& dictid, const var& dictfile, const var& id, const var& record, const var& mv=0);
+
+private:
+
+	//used by calculate to call dict libraries
+	mutable ExodusFunctorBase dict_exodusfunctorbase_;
+	//TODO cache many not just one
+	mutable var cache_dictid_;
+	mutable var cache_dictrec_;
+
+	//used by perform to call libraries
+	mutable ExodusFunctorBase perform_exodusfunctorbase_;
+	//TODO cache many not just one
+	mutable var cache_perform_libid_;
+
 };
 
 }

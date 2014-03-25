@@ -11,8 +11,10 @@ extern "C" {
 
 #define FM_UTF8_1 '\xCB'
 #define FM_UTF8_2 '\xBE'
+
 #define VM_UTF8_1 FM_UTF8_1
 #define VM_UTF8_2 '\xBD'
+
 #define SM_UTF8_1 FM_UTF8_1
 #define SM_UTF8_2 '\xBC'
 
@@ -75,9 +77,11 @@ void extract(char * instring, int inlength, int fieldno, int valueno, int subval
 	start_pos=0;
 	fieldn2=1;
 
+	//ALN:NOTE - bad algorithm - assumes that string is valid UTF
+	//and FM_UTF8_1 or VM_UTF8_1 SM_UTF8_1 can not be last char in the string
+
 	while (fieldn2<fieldno)
 	{
-		//ALN:NOTE - assume that string is valid UTF and FM_UTF8_1 can not be last char in the string
 		for (;
 				start_pos<inlength &&
 				(instring[start_pos] != FM_UTF8_1 ||

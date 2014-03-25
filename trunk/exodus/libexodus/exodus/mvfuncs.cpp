@@ -1507,7 +1507,9 @@ const var& var::errputl(const var& str) const
 // 3>xyz.log captures nothing on windows
 const var& var::logput() const
 {
-	return put(std::clog);
+	put(std::clog);
+	std::clog.flush();
+	return *this;
 }
 
 const var& var::logputl() const

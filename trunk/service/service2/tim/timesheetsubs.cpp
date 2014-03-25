@@ -13,9 +13,9 @@ libraryinit()
 #include <timesheetsubs.h>
 #include <log2.h>
 
+#include <win.h>
 #include <gen.h>
 #include <agy.h>
-#include <win.h>
 
 #include <window.hpp>
 
@@ -100,10 +100,6 @@ function main(in mode0) {
 
 		gosub getregisterparams();
 
-		if (not(openfile("MEDIA.TYPES", win.registerx(4)))) {
-			win.registerx(4) = "";
-		}
-
 		if (mode == "POSTINIT2") {
 
 			usercode = USERNAME;
@@ -111,14 +107,13 @@ function main(in mode0) {
 			cols = "CODE NAME";
 			gosub getactivities();
 
-			win.registerx(4) = "";
-			//jobs=''
-
 			call log2("select users by rank user_code user_and_dept_name", logtime);
 			if (win.registerx(7)) {
 				//equ response to @user3
 				//call select2('USERS','','BY DEPT_AND_USER_NAME WITH DEPARTMENT_CODE NE @ID','USER_CODE USER_AND_DEPT_NAME','',data,response)
 				call select2("USERS", "", "BY RANK WITH DEPARTMENT_CODE NE @ID", "USER_CODE USER_AND_DEPT_NAME", "", data, USER3, "", "", "");
+
+//printl("timesheetsubs data ", data);
 				data.transfer(win.registerx(8));
 			}
 
@@ -128,6 +123,7 @@ function main(in mode0) {
 
 		}
 
+/*
 	} else if (mode == "F2.PERSON") {
 		//prevent others
 		if (not win.registerx(7)) {
@@ -140,7 +136,7 @@ function main(in mode0) {
 		}
 		ANS = gen._security.a(1, reply);
 		data ^= "" "\r";
-
+*/
 	} else if (mode.field(".", 1) == "GETNEXTTIMESHEET") {
 		ID = mode.field(".", 2, 9999);
 		call timesheetsubs("PREREAD");
@@ -693,8 +689,8 @@ subroutine getactivities() {
 	win.registerx(2).converter("0123456789", "");
 
 	//select
-	//perform 'SSELECT MEDIA.TYPES WITH DEPARTMENT ':quote(deptcode)
-	call select2("MEDIA.TYPES", "", "WITH DEPARTMENT " ^ (DQ ^ (win.registerx(2) ^ DQ)), cols, xml, data, USER3);
+	//perform 'SSELECT JOB_TYPES WITH DEPARTMENT ':quote(deptcode)
+	call select2("JOB_TYPES", "", "WITH DEPARTMENT " ^ (DQ ^ (win.registerx(2) ^ DQ)), cols, xml, data, USER3);
 	win.registerx(3) = data;
 
 	//convert fm to vm in activitycodes

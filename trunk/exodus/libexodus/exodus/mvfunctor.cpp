@@ -310,15 +310,16 @@ bool ExodusFunctorBase::openfunc()
 
 }
 
-void ExodusFunctorBase::calldict()
+var ExodusFunctorBase::calldict()
 {
 	//dictionaries are libraries of subroutines (ie return void) that 
 	//have one argument "MvEnvironment". They set their response in ANS.
-	typedef void (*ExodusDynamic)(MvEnvironment& mv);
+	//they are global functions and receive mv environment reference as their one and only argument.
+	typedef var (*ExodusDynamic)(MvEnvironment& mv);
 
 	//call the function via its pointer
-	((ExodusDynamic) pfunction_)(*mv_);
-	return;
+	return ((ExodusDynamic) pfunction_)(*mv_);
+	//return;
 }
 
 void ExodusFunctorBase::closelib()

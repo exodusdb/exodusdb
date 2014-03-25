@@ -514,7 +514,7 @@ subroutine defexchrate() {
 				tt = calculate("JOB_PRODUCTION_TYPE");
 				if (tt) {
 					var prodtype;
-					if (not(prodtype.read(agy.mediatypes, tt))) {
+					if (not(prodtype.read(agy.jobtypes, tt))) {
 						prodtype = "";
 					}
 					if (not prodtype.a(5)) {
@@ -1167,7 +1167,7 @@ errexit:
 	var firstprodtypecode = trim2(calculate("OLD_PRODUCTION_TYPE"), VM, "F").a(1, 1);
 	//multitype
 	var firstprodtype;
-	if (not(firstprodtype.read(agy.mediatypes, firstprodtypecode))) {
+	if (not(firstprodtype.read(agy.jobtypes, firstprodtypecode))) {
 		msg = DQ ^ (firstprodtypecode ^ DQ) ^ " production type is missing";
 		goto errexit;
 	}
@@ -1469,7 +1469,7 @@ creditcostspertype:
 						lineprodtypecode = tt;
 					}
 					if (lineprodtypecode ne currlineprodtypecode) {
-						if (not(lineprodtype.read(agy.mediatypes, lineprodtypecode))) {
+						if (not(lineprodtype.read(agy.jobtypes, lineprodtypecode))) {
 							//should never get here since all are checked in validation
 							lineprodtype = "";
 						}
@@ -1952,7 +1952,7 @@ subroutine lockandaccumulateanalysis() {
 		tt = prodtypecodes.a(1, amountn);
 		if (tt and tt ne currprodtypecode) {
 			//check exists
-			if (not(currprodtype.read(agy.mediatypes, tt))) {
+			if (not(currprodtype.read(agy.jobtypes, tt))) {
 				msg = DQ ^ (tt ^ DQ) ^ " production type is missing";
 				//goto errexit
 				return;
