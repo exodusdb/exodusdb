@@ -354,10 +354,12 @@ debug("data_in $data_in");
 
 	$deletefailed=false;
 
+/* debug - leave data
+
 	//often there is no .2 data file returned and even then usually we dont have privileges to delete it
 	if (is_file($linkfilename . '.2') && !unlink($linkfilename . '.2'))
 		$deletefailed=true;
-
+*/
 	//sometimes we dont have the privileges to delete the response file
 	if (is_file($linkfilename . '.3') && !unlink($linkfilename . '.3'))
 		$deletefailed=true;
@@ -370,24 +372,28 @@ debug("data_in $data_in");
 //output
 
 	$xmltext = "<root>";
-	$xmltext .= "<data>" . rawurlencode($data_out) . "</data>";
-	$xmltext .= "<response>" . rawurlencode($response) . "</response>";
-	$xmltext .= "<result>" . rawurlencode($result) . "</result>";
+//	$xmltext .= "<data>" . rawurlencode($data_out) . "</data>";
+//	$xmltext .= "<response>" . rawurlencode($response) . "</response>";
+	$xmltext .= "<data>$data_out</data>";
+	$xmltext .= "<response>$response</response>";
+	$xmltext .= "<result>$result</result>";
 	$xmltext .= "</root>";
 
 	//Response.Expires = -1000
 	//Response.Buffer = 0
 
-	header ("Content-Type:text/xml");
+	header ("Content-Type:text/xml; charset=utf-8");
 
 	print($xmltext);
-
+/*
 debug("RESPONSE:$response");
 if ($data_out)
 debug("DATA_OUT:$data_out");
 if (!$result)
 debug("RESULT  :$result");
-	
+//debug("XMLOUT  :$xmltext");
+*/
+
 	/// finished
 
 function getneosysrootpath($documentlocation) {
@@ -448,14 +454,23 @@ function getdatabases($neosysrootpath, $systemcode) {
 		$databasename=$database[0];
 		$databasecode=$database[1];
 
+		//skip databases that dont exist
 		if (!is_dir($datalocation . '/' . $databasecode))
 			continue;
+
 		$xmltext .= "<record>\r";
 		$xmltext .= "<name>$databasename</name>\r";
 		$xmltext .= "<code>$databasecode</code>\r";
 		$xmltext .= "</record>\r";
 	}
 	$xmltext .= "</records>\r";
+
+	//encode xml related characters since message to client is in xml format
+	//will be decoded in client after unpacking xml message
+	$xmltext=str_replace("%","%25",$xmltext);
+	$xmltext=str_replace("<","%3C",$xmltext);
+	$xmltext=str_replace('>',"%3E",$xmltext);
+	$xmltext=str_replace('&',"%26",$xmltext);
 
 	$response = "OK";
 

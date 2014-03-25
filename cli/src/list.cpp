@@ -686,7 +686,7 @@ phraseinit:
 		tt = "\"%1%\" is an unrecognized word.";
 		tt.swapper("%1%", word);
 		msg2(tt, "RCE", word, word);
-		if (word eq var().chr(27))
+		//if (word eq var().chr(27))
 			abort("");
 		gosub getwordexit();
 		goto phraseinit;

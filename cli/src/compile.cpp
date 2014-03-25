@@ -286,7 +286,7 @@ function main()
 				//for all functions except C++ member functions and functions
 				//marked __stdcall or __fastcall.
 				//basicoptions^=" /Gd";
-				
+
                 //Enables minimal rebuild.
 				//dont do this by default to force recompilations to cater for new versions of exodus.dll
 				//provide an options?
@@ -306,8 +306,7 @@ function main()
                         basicoptions^=" /FD";
 
                         //macro used in exodus in some places to provide additional information eg mvdbpostgres
-                
-						basicoptions^=" /D \"DEBUG\"";
+			basicoptions^=" /D \"DEBUG\"";
 
                         //Enables run-time error checking.
                         basicoptions^=" /RTC1";
@@ -607,7 +606,7 @@ var inclusion=
 										swapper(inclusion,"in,out,out",funcargstype);
 										swapper(inclusion,"arg1,arg2,arg3",funcargs);
 
-                                        var usepredefinedfunctor=nargs<=EXODUS_FUNCTOR_MAXNARGS;
+										var usepredefinedfunctor=nargs<=EXODUS_FUNCTOR_MAXNARGS;
 										if (useclassmemberfunctions) {
 											if (funcname eq "main")
 														headertext^=inclusion;

@@ -26,7 +26,7 @@ function main(in companycodex, in clientcodex, in brandcodex, io brands, out msg
 	//from the vehicle's supplier and market
 	//company=market
 	//client=supplier
-	//category=mediatype
+	//category=jobtype
 	//brand=vehicle
 
 	var username = USERNAME;

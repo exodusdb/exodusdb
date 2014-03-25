@@ -984,7 +984,9 @@ public:
 //	var insert(const int fieldno,const var& insertion) const;
 
 	var erase(const int fieldno, const int valueno=0, const int subvalueno=0) const;
+
 	var a(const int fieldno,const int valueno=0,const int subvalueno=0) const;
+	var extract(const int fieldno,const int valueno=0,const int subvalueno=0) const;
 
 	//mutable versions update and return source
 	var& r(const int fieldno,const int valueno,const int subvalueno,const var& replacement);

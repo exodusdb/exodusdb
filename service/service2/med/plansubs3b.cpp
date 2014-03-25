@@ -77,7 +77,7 @@ function main(in modex) {
 						suppliername = vehicle.a(1);
 					}
 					var medianame;
-					if (not(medianame.readv(agy.mediatypes, vehicle.a(2), 1))) {
+					if (not(medianame.readv(agy.jobtypes, vehicle.a(2), 1))) {
 						medianame = "";
 					}
 

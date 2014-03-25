@@ -40,7 +40,7 @@ function main(in mode0) {
 				//decide where it should go
 				var typecode = prodorder.a(15);
 				var type;
-				if (not(type.read(agy.mediatypes, typecode))) {
+				if (not(type.read(agy.jobtypes, typecode))) {
 					type = "";
 				}
 				base.splicer(1, 0, "-");
@@ -90,14 +90,14 @@ function main(in mode0) {
 					if (temp) {
 						typecode = temp;
 						var type;
-						if (not(type.read(agy.mediatypes, typecode))) {
+						if (not(type.read(agy.jobtypes, typecode))) {
 							type = "";
 						}
 					}
 					if (not typecode) {
 						typecode = RECORD.a(3);
 						var type;
-						if (not(type.read(agy.mediatypes, typecode))) {
+						if (not(type.read(agy.jobtypes, typecode))) {
 							type = "";
 						}
 					}

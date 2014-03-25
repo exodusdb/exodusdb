@@ -446,7 +446,7 @@ subroutine getfiledefaults() {
 		defaultstatus = "";
 		logfn = 40;
 
-	} else if (win.datafile == "MEDIA.TYPES") {
+	} else if (win.datafile == "JOB_TYPES") {
 		statusfn = 25;
 		versionfn = 26;
 		firstversion = "1";
