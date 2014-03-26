@@ -11,7 +11,7 @@ var materialsubs(in mode)
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_materialsubs.pmemberfunction_==NULL)
-  efb_materialsubs.init("materialsubs","exodusprogrambasecreatedelete",mv);
+  efb_materialsubs.init("materialsubs","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

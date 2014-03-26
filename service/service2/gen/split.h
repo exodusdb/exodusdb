@@ -11,7 +11,7 @@ var split(in input0, out unitx )
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_split.pmemberfunction_==NULL)
-  efb_split.init("split","exodusprogrambasecreatedelete",mv);
+  efb_split.init("split","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

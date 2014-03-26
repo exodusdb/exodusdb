@@ -11,7 +11,7 @@ var decide(in question0, in options0, io reply)
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_decide.pmemberfunction_==NULL)
-  efb_decide.init("decide","exodusprogrambasecreatedelete",mv);
+  efb_decide.init("decide","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

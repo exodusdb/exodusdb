@@ -11,7 +11,7 @@ var authorised(in task0, out msg, in defaultlock="", in username0="")
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_authorised.pmemberfunction_==NULL)
-  efb_authorised.init("authorised","exodusprogrambasecreatedelete",mv);
+  efb_authorised.init("authorised","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

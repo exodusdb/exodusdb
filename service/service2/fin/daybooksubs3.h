@@ -11,7 +11,7 @@ var daybooksubs3(in mode)
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_daybooksubs3.pmemberfunction_==NULL)
-  efb_daybooksubs3.init("daybooksubs3","exodusprogrambasecreatedelete",mv);
+  efb_daybooksubs3.init("daybooksubs3","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

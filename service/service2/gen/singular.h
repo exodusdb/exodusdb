@@ -11,7 +11,7 @@ var singular(in pluralnoun)
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_singular.pmemberfunction_==NULL)
-  efb_singular.init("singular","exodusprogrambasecreatedelete",mv);
+  efb_singular.init("singular","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

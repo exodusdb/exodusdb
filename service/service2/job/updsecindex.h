@@ -11,7 +11,7 @@ var updsecindex(in mode, in filename, in keys, in fieldnames, in oldvalues, in n
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_updsecindex.pmemberfunction_==NULL)
-  efb_updsecindex.init("updsecindex","exodusprogrambasecreatedelete",mv);
+  efb_updsecindex.init("updsecindex","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

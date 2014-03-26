@@ -11,7 +11,7 @@ var quote2(in string0)
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_quote2.pmemberfunction_==NULL)
-  efb_quote2.init("quote2","exodusprogrambasecreatedelete",mv);
+  efb_quote2.init("quote2","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

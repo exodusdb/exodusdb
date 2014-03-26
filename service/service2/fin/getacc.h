@@ -11,7 +11,7 @@ var getacc(io mode, io validaccs, io reqcompanies2, io acctype, io reqledgertype
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_getacc.pmemberfunction_==NULL)
-  efb_getacc.init("getacc","exodusprogrambasecreatedelete",mv);
+  efb_getacc.init("getacc","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

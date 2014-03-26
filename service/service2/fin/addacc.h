@@ -11,7 +11,7 @@ var addacc(in mode, io ledgercode, in newaccno0, in newaccount, in sortorder, in
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_addacc.pmemberfunction_==NULL)
-  efb_addacc.init("addacc","exodusprogrambasecreatedelete",mv);
+  efb_addacc.init("addacc","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

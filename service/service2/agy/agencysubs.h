@@ -11,7 +11,7 @@ var agencysubs(in mode, io msg, in param3x="")
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_agencysubs.pmemberfunction_==NULL)
-  efb_agencysubs.init("agencysubs","exodusprogrambasecreatedelete",mv);
+  efb_agencysubs.init("agencysubs","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

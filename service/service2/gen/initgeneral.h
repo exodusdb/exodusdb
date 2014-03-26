@@ -11,7 +11,7 @@ var initgeneral()
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_initgeneral.pmemberfunction_==NULL)
-  efb_initgeneral.init("initgeneral","exodusprogrambasecreatedelete",mv);
+  efb_initgeneral.init("initgeneral","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

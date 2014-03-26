@@ -11,7 +11,7 @@ var sortarray(io array, in fns, in order="A", in justification="L")
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_sortarray.pmemberfunction_==NULL)
-  efb_sortarray.init("sortarray","exodusprogrambasecreatedelete",mv);
+  efb_sortarray.init("sortarray","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

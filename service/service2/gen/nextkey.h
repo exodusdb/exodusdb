@@ -11,7 +11,7 @@ var nextkey(in mode, in previous=var(""))
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_nextkey.pmemberfunction_==NULL)
-  efb_nextkey.init("nextkey","exodusprogrambasecreatedelete",mv);
+  efb_nextkey.init("nextkey","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

@@ -11,7 +11,7 @@ var productionproxy()
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_productionproxy.pmemberfunction_==NULL)
-  efb_productionproxy.init("productionproxy","exodusprogrambasecreatedelete",mv);
+  efb_productionproxy.init("productionproxy","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
