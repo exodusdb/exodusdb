@@ -1,8 +1,10 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include "win.h"
-#include "window.hpp"
+#include <authorised.h>
+
+#include <win.h>
+#include <window.hpp>
 
 function main(in mode)
 {
@@ -35,7 +37,7 @@ function main(in mode)
 
 		//check allowed access
 		var msg;
-		if (!(mv.authorised(datafilename ^ L" ACCESS", msg, defaultlock))) {
+		if (!(authorised(datafilename ^ L" ACCESS", msg, defaultlock))) {
 			return invalid(msg);
 		}
 
@@ -47,8 +49,8 @@ function main(in mode)
 			}
 
 			//check supervisor status
-			win.registerx(4) = mv.authorised(L"AUTHORISATION UPDATE LOWER GROUPS", msg, L"");
-			win.registerx(5) = mv.authorised(L"AUTHORISATION UPDATE HIGHER GROUPS", msg, L"");
+			win.registerx(4) = authorised(L"AUTHORISATION UPDATE LOWER GROUPS", msg, L"");
+			win.registerx(5) = authorised(L"AUTHORISATION UPDATE HIGHER GROUPS", msg, L"");
 
 		}
 
@@ -60,7 +62,7 @@ function main(in mode)
 		}
 
 		//check security
-		if (mv.authorised(datafilename ^ L" UPDATE", msg, defaultlock)) {
+		if (authorised(datafilename ^ L" UPDATE", msg, defaultlock)) {
 		}else{
 			if (!interactive)
 				win.wlocked = 0;
@@ -99,7 +101,7 @@ function main(in mode)
 			for (int taskn = ntasks; taskn >= 1; taskn--) {
 				var task = tasks.a(1, taskn);
 				var temp = (task.substr(1, 10) == L"DOCUMENT: ") ? L"#" : L"";
-				if (!(mv.authorised(L"!" ^ temp ^ task, msg, L""))) {
+				if (!(authorised(L"!" ^ temp ^ task, msg, L""))) {
 					RECORD.eraser(10, taskn, 0);
 					RECORD.eraser(11, taskn, 0);
 				}
@@ -519,7 +521,8 @@ function main(in mode)
 		for (int taskn = 1; taskn <= ntasks; taskn++) {
 			var task = tasks.a(1, taskn);
 			var ok;
-			if (mv.authorised(task))
+			var xx;
+			if (authorised(task, xx))
 				ok = 1;
 			else
 				ok = 0;

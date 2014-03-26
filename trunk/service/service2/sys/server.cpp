@@ -832,7 +832,7 @@ readlink1:
 		USER0.swapper("%F9", SSTM);
 		USER0.trimmerb(FM);
 
-USER0.outputl("USER0 after decode =");
+//USER0.outputl("USER0 after decode =");
 
 		//extract and remove reply filename
 		replyfilename = USER0.a(1);
@@ -1551,7 +1551,7 @@ subroutine exit()
 
 subroutine process()
 {
-printl("process:"^USER0);
+//printl("process:"^USER0);
 	//process the input
 	//////////////////
 
@@ -1587,7 +1587,7 @@ printl("process:"^USER0);
 	//select some data
 	}else if (request1 == "SELECT") {
 
-		select();
+		gosub requestselect();
 
 	//lock a record
 	}else if (request1 == "LOCK" || request1 == "RELOCK") {
@@ -1659,9 +1659,9 @@ printl("process:"^USER0);
 		//security check - cannot lock so cannot write or delete
 		if (withlock) {
 			//if 1 then
-			if (mv.authorised(filename2 ^ " UPDATE", updatenotallowed, ""))
+			if (authorised(filename2 ^ " UPDATE", updatenotallowed, ""))
 				{}
-			if (mv.authorised(filename2 ^ " CREATE", createnotallowed, ""))
+			if (authorised(filename2 ^ " CREATE", createnotallowed, ""))
 				{}
 			//if updatenotallowed and createnotallowed then
 			// USER3='error: sorry, you are not authorised to create or update records in the ':lcase(filename):' file.'
@@ -2216,7 +2216,7 @@ emptyrecorderror:
 		gosub formatresponse();
 
 		//if postroutine else call flush.index(filename)
-		mv.flushindex(filename);
+		//mv.flushindex(filename);
 
 		//execute a request
 
@@ -2932,13 +2932,13 @@ subroutine writelogx3()
 
 function filesecurity(in secmode)
 {
-	if (mv.authorised(filename2 ^ " " ^ secmode, msg0, "")) {
+	if (authorised(filename2 ^ " " ^ secmode, msg0, "")) {
 		positive = "";
 	}else{
 		positive = "#";
 	}
 	var msgx="";
-	if (!(mv.authorised(positive ^ filename2 ^ " " ^ secmode ^ " " ^ keyx.quote(), msgx, ""))) {
+	if (!(authorised(positive ^ filename2 ^ " " ^ secmode ^ " " ^ keyx.quote(), msgx, ""))) {
 		if (positive) {
 			msg0.transfer(USER3);
 		}else{
@@ -3012,11 +3012,11 @@ subroutine getindexvalues()
 
 	temp.convert(".", " ");
 	temp = mv.singular(temp);
-	if (!(mv.authorised(temp ^ " ACCESS", USER4, ""))) {
+	if (!(authorised(temp ^ " ACCESS", USER4, ""))) {
 		USER3 = USER4;
 		return;
 	}
-	if (!(mv.authorised(temp ^ " LIST", USER4, ""))) {
+	if (!(authorised(temp ^ " LIST", USER4, ""))) {
 		USER3 = USER4;
 		return;
 	}
@@ -3054,7 +3054,7 @@ subroutine getindexvalues()
 }
 
 
-subroutine select()
+subroutine requestselect()
 {
 
 	//USER1=''
@@ -3079,9 +3079,9 @@ subroutine select()
 		var temp = filename;
 		temp.convert(".", " ");
 		temp = mv.singular(temp);
-		if (!(mv.authorised(temp ^ " ACCESS", USER4, ""))) {
+		if (!(authorised(temp ^ " ACCESS", USER4, ""))) {
 			var msgx="";
-			if (!(mv.authorised("!#" ^ temp ^ " ACCESS PARTIAL", msgx, ""))) {
+			if (!(authorised("!#" ^ temp ^ " ACCESS PARTIAL", msgx, ""))) {
 				USER3 = USER4;
 				return;
 			}
@@ -3092,17 +3092,19 @@ subroutine select()
 	//any data passed to select is assumed to be a selectlist
 
 	if (USER1) {
-//TODO:
-USER3="GeneralProxy: MAKELIST not implemented yet";
-return;
 //		makelist("", USER1, "", "");
-		sortselect ^= "%SELECTLIST%";
-		USER1 = "";
+//		sortselect ^= "%SELECTLIST%";
+//		USER1 = "";
+		if (not USER1.index(DQ)) {
+			USER1.quoter().swapper(" ", DQ^" "^DQ);
+		}
+		if (sortselect.ucase().index("WITH")) {
+			sortselect^=" AND ";
+		}
+		sortselect^="WITH @ID EQ ";
+		sortselect^=USER1;
 	}
-
-//TODO:
-//USER3="GeneralProxy: SELECT2 not implemented yet";
-//return;
+USER1.outputl("USER1=");
 	call select2(filename0, SYSTEM.a(2), sortselect, dictids, options, USER1, USER3, "", "", "");
 
 	if (USER4) {
