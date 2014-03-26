@@ -400,7 +400,7 @@ id:
 
 	if (linkfilename2) {
 		linkfilename2.osclose();
-		var().osflush();
+		//var().osflush();
 	}
 
 	return exit(response, "");

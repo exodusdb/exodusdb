@@ -127,24 +127,17 @@ updateprivs:
 			return 1;
 		}
 		if (renaming) {
-			//if the task to be renamed doesnt exist .. just add the target task
-			//call authorised(defaultlock);
+			//if the task to be renamed doesnt exist just add the target task
 			call authorised(defaultlock,msg);
 			return 1;
 		}
 		if (not noadd) {
 			gosub readuserprivs();
-			if (username == "NEOSYS") {
-				var interactive = not SYSTEM.a(33);
-				if (interactive) {
-					call note(task ^ "|TASK ADDED");
-				}
-			}
-			if (SECURITY.length() < 65000) {
+			//if (SECURITY.length() < 65000) {
+			if (true) {
+var x=var();
 				if (not(SECURITY.locateby(task, "AL", taskn, 10))) {
 					var newlock=defaultlock;
-					//if (defaultlock.unassigned()) {
-					//	defaultlock = "";
 					//get locks on default task if present otherwise new locks are none
 					if (newlock and SECURITY.locate(newlock, xx, 10)) {
 						newlock = SECURITY.a(11, xx);
@@ -152,6 +145,9 @@ updateprivs:
 					SECURITY.inserter(10, taskn, task);
 					SECURITY.inserter(11, taskn, newlock);
 					gosub writeuserprivs();
+					if (username == "NEOSYS") {
+						call note(task ^ "|TASK ADDED");
+					}
 				}
 			}
 		}
@@ -245,37 +241,16 @@ notallowed:
 }
 
 subroutine readuserprivs() {
-	//IF DEFINITIONS THEN
-	//put back in case called from FILEMAN due to no datasets
-	//taken out again but why?
-	//if definitions then
-	if (DEFINITIONS.open("DEFINITIONS", "")) {
-		if (not(SECURITY.read(DEFINITIONS, "SECURITY"))) {
-			SECURITY = "";
-		}
-		//SECURITY = SECURITY.invert();
-	} else
+	if (not(SECURITY.read(DEFINITIONS, "SECURITY"))) {
 		SECURITY = "";
-	// end
-	// END
+	}
 	return;
-
 }
 
 subroutine writeuserprivs() {
 	SECURITY.r(9, "");
-	//IF DEFINITIONS THEN
-	//put back in case called from FILEMAN due to no datasets
-	//taken out again but why?
-	//if definitions then
-	if (DEFINITIONS.open("DEFINITIONS", "")) {
-		//SECURITY.invert().write(DEFINITIONS, "SECURITY");
-		SECURITY.write(DEFINITIONS, "SECURITY");
-	}
-	// end
-	// end
+	SECURITY.write(DEFINITIONS, "SECURITY");
 	return;
-
 }
 
 

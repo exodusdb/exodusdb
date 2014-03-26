@@ -11,7 +11,7 @@ var testd2()
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_testd2.pmemberfunction_==NULL)
-  efb_testd2.init("testd2","exodusprogrambasecreatedelete",mv);
+  efb_testd2.init("testd2","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

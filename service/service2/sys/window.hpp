@@ -1,3 +1,5 @@
+#include <authorised.h>
+
 function security(in mode)
 {
 	/////////
@@ -22,7 +24,7 @@ function security2(in mode, in op0)
 	}
 	if (mode.index(L"INIT", 1)) {
 		var msg;
-		if (!(mv.authorised(op ^ L" ACCESS" ^ op2, msg, L"")))
+		if (!(authorised(op ^ L" ACCESS" ^ op2, msg, L"")))
 			return invalid(msg);
 
 	}else if (mode.index(L"READ", 1) || mode.index(L"WRITE", 1)) {
@@ -36,7 +38,7 @@ function security2(in mode, in op0)
 			}
 		}
 		var msg;
-		if (!(mv.authorised(op ^ op2, msg, L""))) {
+		if (!(authorised(op ^ op2, msg, L""))) {
 			if (win.orec == L"" || !win.wlocked) {
 				invalid();
 				win.reset = 5;
@@ -49,7 +51,7 @@ function security2(in mode, in op0)
 
 	}else if (mode.index(L"DELETE", 1)) {
 		var msg;
-		if (!(mv.authorised(op ^ L" DELETE" ^ op2, msg, L"")))
+		if (!(authorised(op ^ L" DELETE" ^ op2, msg, L"")))
 			return invalid(msg);
 
 	}else if (1) {
@@ -62,7 +64,7 @@ function security3(in op, in op2)
 {
 	var op2b=op2.assigned()?op2:L"";
 	var msg;
-	if (!(mv.authorised(op ^ op2b, msg, L"")))
+	if (!(authorised(op ^ op2b, msg, L"")))
 		return invalid(msg);
 
 	return true;
