@@ -11,7 +11,7 @@ var changelogsubs(in mode0)
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_changelogsubs.pmemberfunction_==NULL)
-  efb_changelogsubs.init("changelogsubs","exodusprogrambasecreatedelete",mv);
+  efb_changelogsubs.init("changelogsubs","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

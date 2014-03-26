@@ -11,7 +11,7 @@ var updalloc(io mode, io payment, in paymentcode, io allocs)
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_updalloc.pmemberfunction_==NULL)
-  efb_updalloc.init("updalloc","exodusprogrambasecreatedelete",mv);
+  efb_updalloc.init("updalloc","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

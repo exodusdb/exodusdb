@@ -11,7 +11,7 @@ var getagp(in agpparams, in period0)
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_getagp.pmemberfunction_==NULL)
-  efb_getagp.init("getagp","exodusprogrambasecreatedelete",mv);
+  efb_getagp.init("getagp","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

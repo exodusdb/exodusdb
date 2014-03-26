@@ -11,7 +11,7 @@ var validcode3(in marketcodex, in suppliercodex, in vehiclecodex, io vehicles, o
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_validcode3.pmemberfunction_==NULL)
-  efb_validcode3.init("validcode3","exodusprogrambasecreatedelete",mv);
+  efb_validcode3.init("validcode3","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

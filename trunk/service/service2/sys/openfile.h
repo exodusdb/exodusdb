@@ -11,7 +11,7 @@ var openfile(in filename, io file, in similarfilename="")
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_openfile.pmemberfunction_==NULL)
-  efb_openfile.init("openfile","exodusprogrambasecreatedelete",mv);
+  efb_openfile.init("openfile","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

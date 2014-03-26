@@ -11,7 +11,7 @@ var plansubs2(in modex)
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_plansubs2.pmemberfunction_==NULL)
-  efb_plansubs2.init("plansubs2","exodusprogrambasecreatedelete",mv);
+  efb_plansubs2.init("plansubs2","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

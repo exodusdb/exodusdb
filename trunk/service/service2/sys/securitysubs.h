@@ -11,7 +11,7 @@ var securitysubs(in mode)
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_securitysubs.pmemberfunction_==NULL)
-  efb_securitysubs.init("securitysubs","exodusprogrambasecreatedelete",mv);
+  efb_securitysubs.init("securitysubs","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

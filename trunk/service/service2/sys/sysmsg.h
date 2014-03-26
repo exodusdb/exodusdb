@@ -11,7 +11,7 @@ var sysmsg(in msg0, in subject0="", in username0="")
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_sysmsg.pmemberfunction_==NULL)
-  efb_sysmsg.init("sysmsg","exodusprogrambasecreatedelete",mv);
+  efb_sysmsg.init("sysmsg","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

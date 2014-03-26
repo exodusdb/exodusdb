@@ -11,7 +11,7 @@ var btreeextract(in cmd, in filename, in dictfile, out hits)
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_btreeextract.pmemberfunction_==NULL)
-  efb_btreeextract.init("btreeextract","exodusprogrambasecreatedelete",mv);
+  efb_btreeextract.init("btreeextract","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

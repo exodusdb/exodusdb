@@ -11,7 +11,7 @@ var otherusers(in databasecode="")
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_otherusers.pmemberfunction_==NULL)
-  efb_otherusers.init("otherusers","exodusprogrambasecreatedelete",mv);
+  efb_otherusers.init("otherusers","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

@@ -11,7 +11,7 @@ var select2(in filenamex, in linkfilename2, in sortselect0, in dictids0, in opti
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_select2.pmemberfunction_==NULL)
-  efb_select2.init("select2","exodusprogrambasecreatedelete",mv);
+  efb_select2.init("select2","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

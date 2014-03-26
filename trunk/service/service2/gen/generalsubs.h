@@ -11,7 +11,7 @@ var generalsubs(in mode)
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_generalsubs.pmemberfunction_==NULL)
-  efb_generalsubs.init("generalsubs","exodusprogrambasecreatedelete",mv);
+  efb_generalsubs.init("generalsubs","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

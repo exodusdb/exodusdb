@@ -11,7 +11,7 @@ var logprocess(io processid, in processcategory, in processparameters="", in pro
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_logprocess.pmemberfunction_==NULL)
-  efb_logprocess.init("logprocess","exodusprogrambasecreatedelete",mv);
+  efb_logprocess.init("logprocess","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

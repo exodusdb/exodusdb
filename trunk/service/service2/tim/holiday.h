@@ -11,7 +11,7 @@ var holiday(in mode, in idate0, in usercode, in user, in marketcode, in market, 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_holiday.pmemberfunction_==NULL)
-  efb_holiday.init("holiday","exodusprogrambasecreatedelete",mv);
+  efb_holiday.init("holiday","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

@@ -11,7 +11,7 @@ var autorun2(in mode, in title0, in module, in request, in data, in runasusercod
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_autorun2.pmemberfunction_==NULL)
-  efb_autorun2.init("autorun2","exodusprogrambasecreatedelete",mv);
+  efb_autorun2.init("autorun2","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

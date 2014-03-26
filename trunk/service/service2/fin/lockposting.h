@@ -11,7 +11,7 @@ var lockposting(in mode, io locklist, in ntries0, io msg)
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_lockposting.pmemberfunction_==NULL)
-  efb_lockposting.init("lockposting","exodusprogrambasecreatedelete",mv);
+  efb_lockposting.init("lockposting","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

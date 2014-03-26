@@ -11,7 +11,7 @@ var prodordersubs(in mode)
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_prodordersubs.pmemberfunction_==NULL)
-  efb_prodordersubs.init("prodordersubs","exodusprogrambasecreatedelete",mv);
+  efb_prodordersubs.init("prodordersubs","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

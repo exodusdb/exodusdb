@@ -11,7 +11,7 @@ var updvoucher2(io mode, io voucher, io vouchercode, io allocs, in username0="")
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_updvoucher2.pmemberfunction_==NULL)
-  efb_updvoucher2.init("updvoucher2","exodusprogrambasecreatedelete",mv);
+  efb_updvoucher2.init("updvoucher2","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

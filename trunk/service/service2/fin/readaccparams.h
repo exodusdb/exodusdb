@@ -11,7 +11,7 @@ var readaccparams()
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_readaccparams.pmemberfunction_==NULL)
-  efb_readaccparams.init("readaccparams","exodusprogrambasecreatedelete",mv);
+  efb_readaccparams.init("readaccparams","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

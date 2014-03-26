@@ -11,7 +11,7 @@ var validcode2(in companycodex, in clientcodex, in brandcodex, io brands, out ms
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_validcode2.pmemberfunction_==NULL)
-  efb_validcode2.init("validcode2","exodusprogrambasecreatedelete",mv);
+  efb_validcode2.init("validcode2","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

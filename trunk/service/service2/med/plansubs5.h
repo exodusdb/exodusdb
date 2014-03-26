@@ -11,7 +11,7 @@ var plansubs5(in mode)
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_plansubs5.pmemberfunction_==NULL)
-  efb_plansubs5.init("plansubs5","exodusprogrambasecreatedelete",mv);
+  efb_plansubs5.init("plansubs5","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

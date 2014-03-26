@@ -11,7 +11,7 @@ var readbakpars(io bakpars, in process0=var())
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_readbakpars.pmemberfunction_==NULL)
-  efb_readbakpars.init("readbakpars","exodusprogrambasecreatedelete",mv);
+  efb_readbakpars.init("readbakpars","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

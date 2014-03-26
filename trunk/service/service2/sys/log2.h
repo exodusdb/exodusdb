@@ -11,7 +11,7 @@ var log2(in msg0, io time0)
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_log2.pmemberfunction_==NULL)
-  efb_log2.init("log2","exodusprogrambasecreatedelete",mv);
+  efb_log2.init("log2","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

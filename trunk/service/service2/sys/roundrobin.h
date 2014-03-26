@@ -11,7 +11,7 @@ var roundrobin(in mode, in params0, io msg, io result)
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_roundrobin.pmemberfunction_==NULL)
-  efb_roundrobin.init("roundrobin","exodusprogrambasecreatedelete",mv);
+  efb_roundrobin.init("roundrobin","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

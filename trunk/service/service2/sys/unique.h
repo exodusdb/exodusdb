@@ -11,7 +11,7 @@ var unique(in list0)
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_unique.pmemberfunction_==NULL)
-  efb_unique.init("unique","exodusprogrambasecreatedelete",mv);
+  efb_unique.init("unique","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

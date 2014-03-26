@@ -59,6 +59,10 @@ function main(in companycodex, in clientcodex, in brandcodex, io brands, out msg
 		brands = "";
 	}
 
+	if (not mv.VW.assigned()) {
+		mv.VW="";
+		mv.XW="";
+	}
 	//initialise buffer if not for the same user
 	if (mv.VW.a(10) ne username) {
 		mv.VW = mv.VW.field(FM, 1, 9);

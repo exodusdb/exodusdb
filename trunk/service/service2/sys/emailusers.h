@@ -11,7 +11,7 @@ var emailusers(in mode, in subject0, in body0, in groupids0, in jobids0, in user
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_emailusers.pmemberfunction_==NULL)
-  efb_emailusers.init("emailusers","exodusprogrambasecreatedelete",mv);
+  efb_emailusers.init("emailusers","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

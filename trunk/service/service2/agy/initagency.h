@@ -11,7 +11,7 @@ var initagency()
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_initagency.pmemberfunction_==NULL)
-  efb_initagency.init("initagency","exodusprogrambasecreatedelete",mv);
+  efb_initagency.init("initagency","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function

@@ -11,7 +11,7 @@ var getlang(in origprogname0, in languagecode0, in origdatatype, io languagefile
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
  if (efb_getlang.pmemberfunction_==NULL)
-  efb_getlang.init("getlang","exodusprogrambasecreatedelete",mv);
+  efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
