@@ -13,6 +13,7 @@ libraryinit(authorised)
 var positive;
 var msg;
 function main() {
+
 	//ALLOWPARTIALACCESS
 	//market code is not currently data entered in suppliers but validate it anyway
 	ANS = 0;
@@ -24,10 +25,10 @@ function main() {
 	}
 
 	if (authorised(positive ^ "MEDIA/PRODUCTION TYPE ACCESS " ^ ID.quote(), msg )) {
-		var compcode = calculate("COMPANY_CODE");
+		var compcode = calculate("company_code");
 		if (compcode) {
 			var xx;
-			if (validcode2(calculate("COMPANY_CODE"), "", "", xx, msg)) {
+			if (validcode2(compcode, "", "", xx, msg)) {
 				ANS = 1;
 			}
 		}else{

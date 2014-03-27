@@ -21,9 +21,9 @@ function main()
 	///// STEP1. Test on default (Ukrainian) locale
 	var locale0 = getxlocale().outputl("Original Locale=");
 
-	var test = L"[English language][Русский язык][Українська мова]\n"
+	var test = L"[English language][Р СѓСЃСЃРєРёР№ СЏР·С‹Рє][РЈРєСЂР°С—РЅСЃСЊРєР° РјРѕРІР°]\n"
 L"can you write one A\n"
-L"[16:55:08] neosys: one й\n";
+L"[16:55:08] neosys: one Р№\n";
 	var test_file = "test_1.txt";
 	oswrite( test, test_file);
 	test_file.osclose();

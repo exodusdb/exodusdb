@@ -280,23 +280,23 @@ USER0="";
 	}
 
 	//automatically create dict_md if it is not present so you can list dictionaries
-	if (not open("DICT_MD",dictmd)) {
-		createfile("DICT_MD");
-		if (open("DICT_MD",dictmd)) {
+	if (not open("dict_md",dictmd)) {
+		createfile("dict_md");
+		if (open("dict_md",dictmd)) {
 
 			//prepare some dictionary records
 			var dictrecs = "";
-			dictrecs  =      "@ID   |F|0 |Id     |S|||||L|20";
-			dictrecs ^= FM ^ "TYPE  |F|1 |Type   |S|||||L|4";
-			dictrecs ^= FM ^ "FMC   |F|2 |Field  |S|||||R|3";
-			dictrecs ^= FM ^ "TITLE |F|3 |Title  |M|||||T|20";
-			dictrecs ^= FM ^ "SM    |F|4 |SM     |S|||||L|1";
-			dictrecs ^= FM ^ "PART  |F|5 |Part   |S|||||R|2";
-			dictrecs ^= FM ^ "CONV  |F|7 |Convert|S|||||T|20";
-			dictrecs ^= FM ^ "JUST  |F|9 |Justify|S|||||L|3";
-			dictrecs ^= FM ^ "LENGTH|F|10|Length |S|||||R|6";
-			dictrecs ^= FM ^ "MASTER|F|28|Master |S|||||L|1";
-			dictrecs ^= FM ^ "@CRT  |G|  |TYPE FMC PART TITLE SM CONV JUST LENGTH MASTER BY TYPE BY FMC";
+			dictrecs  =      "@id   |F|0 |Id     |S|||||L|20";
+			dictrecs ^= FM ^ "type  |F|1 |Type   |S|||||L|4";
+			dictrecs ^= FM ^ "fmc   |F|2 |Field  |S|||||R|3";
+			dictrecs ^= FM ^ "title |F|3 |Title  |M|||||T|20";
+			dictrecs ^= FM ^ "sm    |F|4 |SM     |S|||||L|1";
+			dictrecs ^= FM ^ "part  |F|5 |Part   |S|||||R|2";
+			dictrecs ^= FM ^ "conv  |F|7 |Convert|S|||||T|20";
+			dictrecs ^= FM ^ "just  |F|9 |Justify|S|||||L|3";
+			dictrecs ^= FM ^ "length|F|10|Length |S|||||R|6";
+			dictrecs ^= FM ^ "master|F|28|Master |S|||||L|1";
+			dictrecs ^= FM ^ "@crt  |G|  |type fmc part title sm conv just length master by type by fmc";
 
 			//write the dictionary records to the dictionary
 			var nrecs=dictrecs.dcount(FM);
@@ -326,13 +326,13 @@ USER0="";
 	if (not thcolor)
 		thcolor = "#FFFF80";
 
-	if (sentencex.index(" DET-SUPP", 1))
+	if (sentencex.index(" det-supp", 1))
 		detsupp = 1;
-	if (sentencex.index(" DET-SUPP2", 1))
+	if (sentencex.index(" det-supp2", 1))
 		detsupp = 2;
 
-	if (not open("DICT_MD", dictmd))
-		//stop("Cannot open DICT_MD");
+	if (not open("dict_md", dictmd))
+		//stop("Cannot open dict_md");
 		dictmd="";
 
 
@@ -351,12 +351,11 @@ nextphrase:
 
 phraseinit:
 ///////////
+	if (word.substr(1, 4) eq "sort" or word.substr(1, 4) eq "list") {
 
-	if (word.substr(1, 4) eq "SORT" or word.substr(1, 4) eq "LIST") {
-
-		if (word.index("SORT"))
-			ss ^= "S";
-		ss ^= "SELECT";
+		if (word.index("sort"))
+			ss ^= "s";
+		ss ^= "select";
 		//filename:
 		gosub getword();
 		if (not word)
@@ -371,7 +370,7 @@ phraseinit:
 
 		//get the filename
 		// deleted
-		if (word eq "DICT") {
+		if (word eq "dict") {
 			gosub getword();
 			word = "dict_" ^ word;    // changed
 		}
@@ -380,59 +379,49 @@ phraseinit:
 			abort(filename^" file does not exist");
 
 		if (filename.substr(1, 5).lcase() eq "dict_")
-			dictfilename = "MD";
+			dictfilename = "md";
 		else
 			dictfilename = filename;
 
 		if (not DICT.open("dict_"^dictfilename)) {
-			dictfilename = "MD";
+			dictfilename = "md";
 			DICT = dictmd;
 		}
 		ss ^= " " ^ word;
 
-		//get any specific keys
-		while (true) {
-
-			///BREAK;
-			if (not (nextword.isnum() or nextword[1] eq SQ or nextword[1] eq DQ))
-				break;
-
+		//get any specific keys (numbers or quoted words)
+		while (nextword ne "" and (nextword.isnum() or nextword[1] eq SQ or nextword[1] eq DQ)) {
 			keylist = 1;
-			gosub getword();
-			if (word eq "")
-				//goto exitloop;
-				break;
 			ss ^= " " ^ word;
-		}//loop;
-		//exitloop:
+			gosub getword();
+		}
 
-	} else if (word eq "GETLIST") {
-		gosub getword();
-		//var("GETLIST " ^ word).perform();
-		perform("GETLIST "^word);
+	} else if (word eq "getlist") {
+		gosub getword();		//var("GETLIST " ^ word).perform();
+		perform("getlist "^word);
 
-	} else if (word eq "AND" or word eq "OR") {
+	} else if (word eq "and" or word eq "or") {
 		ss ^= " " ^ word;
 
 	} else if (word eq "(" or word eq ")") {
 		ss ^= " " ^ word;
 
-	} else if (word eq "BY" or word eq "BY-DSND") {
+	} else if (word eq "by" or word eq "by-dsnd") {
 		ss ^= " " ^ word;
 		gosub getword();
 		ss ^= " " ^ word;
 
-	} else if (word eq "WITH NOT" or word eq "WITH" or word eq "WITHOUT" or word eq "LIMIT") {
+	} else if (word eq "with not" or word eq "with" or word eq "without" or word eq "limit") {
 		ss ^= " " ^ word;
 
-		var limit = word eq "LIMIT";
+		var limit = word eq "limit";
 		if (limit)
 			nlimits += 1;
 
 		gosub getword();
 
 		//NO/EVERY
-		if (word eq "NOT" or word eq "NO" or word eq "EVERY") {
+		if (word eq "not" or word eq "no" or word eq "every") {
 			ss ^= " " ^ word;
 			gosub getword();
 		}
@@ -443,14 +432,14 @@ phraseinit:
 			limits.r(1, nlimits, word);
 
 		//negate next comparision
-		if (var("NOT,NE,<>").a(1).locateusing(nextword, ",", xx)) {
-			nextword = "NOT";
+		if (var("not,ne,<>").locateusing(nextword, ",", xx)) {
+			nextword = "not";
 			gosub getword();
 			ss ^= " " ^ word;
 		}
 
 		//comparision
-		if (var("MATCH,EQ,NE,GT,LT,GE,LE,[,],[]").locateusing(nextword, ",", xx)) {
+		if (var("match,eq,ne,gt,lt,ge,le,[,],[]").locateusing(nextword, ",", xx)) {
 			gosub getword();
 			ss ^= " " ^ word;
 			if (limit)
@@ -459,7 +448,7 @@ phraseinit:
 
 		//with x between y and z
 		//with x from y to z
-		if (nextword eq "BETWEEN" or nextword eq "FROM") {
+		if (nextword eq "between" or nextword eq "from") {
 			gosub getword();
 			ss ^= " " ^ word;
 			gosub getword();
@@ -491,37 +480,37 @@ phraseinit:
 
 		}
 
-	} else if (word eq "BREAK-ON") {
+	} else if (word eq "break-on") {
 		breakcolns.splicer(1, 0, (coln + 1) ^ FM);
 		breakoptions.splicer(1, 0, FM);
 		nbreaks += 1;
 		breakonflag = 1;
 
-	} else if (word eq "GRAND-TOTAL") {
+	} else if (word eq "grand-total") {
 		//zzz throw away the grand total options for the time being
 		gosub getword();
 		gtotreq = 1;
 
-	} else if (word eq "NO-BASE") {
+	} else if (word eq "no-base") {
 		nobase = 1;
 
 	//"DET-SUPP"
-	} else if (word eq "DET-SUPP") {
+	} else if (word eq "det-supp") {
 		detsupp = 1;
 
 	//"DET-SUPP"
-	} else if (word eq "DET-SUPP2") {
+	} else if (word eq "det-supp2") {
 		detsupp = 2;
 
 	//"GTOT-SUPP"
-	} else if (word eq "GTOT-SUPP") {
+	} else if (word eq "gtot-supp") {
 		gtotsupp = 1;
 
 	//case dictrec
-	} else if (word eq "TOTAL") {
+	} else if (word eq "total") {
 		totalflag = 1;
 
-	} else if (word eq "USING") {
+	} else if (word eq "using") {
 		gosub getword();
 		dictfilename = word;
 		if (not DICT.open("dict_"^dictfilename)) {
@@ -529,7 +518,7 @@ phraseinit:
 			abort("");
 		}
 
-	} else if (word eq "HEADING") {
+	} else if (word eq "heading") {
 
 		gosub getword();
 		head = word;
@@ -540,16 +529,16 @@ phraseinit:
 		head.splicer(1, 1, "");
 		head.splicer(-1, 1, "");
 
-	} else if (word eq "FOOTING") {
+	} else if (word eq "footing") {
 		gosub getword();
 		foot = word;
 		foot.splicer(1, 1, "");
 		foot.splicer(-1, 1, "");
 
 	//justlen
-	} else if (word eq "JUSTLEN") {
+	} else if (word eq "justlen") {
 		if (not coln) {
-			mssg("JUSTLEN/JL must follow a column name");
+			mssg("justlen/jl must follow a column name");
 			abort("");
 		}
 		gosub getword();
@@ -560,7 +549,7 @@ phraseinit:
 		coldict(coln).r(11, word);
 
 	//colhead
-	} else if (word eq "COLHEAD") {
+	} else if (word eq "colhead") {
 		gosub getword();
 		//skip if detsupp2 and column is being skipped
 		if (coldict(coln).assigned()) {
@@ -569,7 +558,7 @@ phraseinit:
 			coldict(coln).r(3, word);
 		}
 
-	} else if (word eq "OCONV") {
+	} else if (word eq "oconv") {
 		gosub getword();
 		word.splicer(1, 1, "");
 		word.splicer(-1, 1, "");
@@ -577,10 +566,10 @@ phraseinit:
 			word.swapper("[DATE]", "[DATE,*]");
 		coldict(coln).r(7, word);
 
-	} else if (word eq "ID-SUPP") {
+	} else if (word eq "id-supp") {
 		idsupp = 1;
 
-	} else if (word eq "DBL-SPC") {
+	} else if (word eq "dbl-spc") {
 		dblspc = 1;
 
 	} else if (dictrec) {
@@ -600,7 +589,7 @@ phraseinit:
 			//suppress untotalled columns if doing detsupp2
 			if (detsupp eq 2) {
 				//if (var("JL,JUSTLEN,CH,COL,HEAD,OC,OCONV").locateusing(nextword, ",", xx)) {
-				if (var("JUSTLEN,COLHEAD,OCONV").locateusing(nextword, ",", xx)) {
+				if (var("justlen,colhead,oconv").locateusing(nextword, ",", xx)) {
 					gosub getword();
 					gosub getword();
 				}
@@ -673,12 +662,12 @@ phraseinit:
 			}
 		}
 
-	} else if (word eq "IGNOREWORD") {
+	} else if (word eq "ignoreword") {
 		gosub getword();
 		ignorewords.r(1, -1, word);
 
 		//@LPTR word is skipped if not located in MD/DICT.MD
-	} else if (word eq "@LPTR") {
+	} else if (word eq "@lptr") {
 
 	} else {
 		//sys.messages W156
@@ -707,11 +696,17 @@ x1exit:
 	//if no columns selected then try to use default @crt or @lptr group item
 	//if (not (coln or crtx) and (DICT ne dictmd or datafile eq "md" or datafile eq "dict_md")) {
 	if (not (coln or crtx) and ((DICT.ucase() ne dictmd.ucase()) or (filename.ucase() eq "MD") or (filename.ucase() eq "DICT_MD"))) {
-		word = "@LPTR";
+		word = "@lptr";
 		if (DICT and not xx.read(DICT, word)) {
-			word = "@CRT";
-			if (not xx.read(DICT, word))
-				word = "";
+			word = "@LPTR";
+			if (DICT and not xx.read(DICT, word)) {
+				word = "@crt";
+				if (not xx.read(DICT, word)) {
+					word = "@CRT";
+					if (not xx.read(DICT, word))
+						word = "";
+				}
+			}
 		}
 		if (word) {
 			crtx = 1;
@@ -736,8 +731,8 @@ x1exit:
 		};//coln;
 
 		//set column 1 @ID
-		colname(1) = "@" "ID";
-		if (not DICT or not coldict(1).read(DICT, "@" "ID")) {
+		colname(1) = "@" "id";
+		if (not DICT or not coldict(1).read(DICT, "@" "id")) {
 			if (not dictmd or not coldict(1).read(dictmd, "@" "ID"))
 				coldict(1) = "F" ^ FM ^ "0" ^ FM ^ "Ref" ^ FM ^ FM ^ FM ^ FM ^ FM ^ FM ^ "L" ^ FM ^ 15;
 		}
@@ -1364,11 +1359,10 @@ subroutine getword()
 
 	// call note(quote(word):' ':quote(nextword))
 
-	if (not quotes.index(word[1]))
-		word.ucaser();
-
-	if (not quotes.index(nextword[1]))
-		nextword.ucaser();
+	//if (not quotes.index(word[1]))
+	//	word.ucaser();
+	//if (not quotes.index(nextword[1]))
+	//	nextword.ucaser();
 
 	return;
 }
@@ -1424,8 +1418,8 @@ subroutine getword2()
 			word ^= searchchar;
 			charn += 1;
 		} else {
-			word.ucaser();
-			word = word.trimb().trimf();
+			//word.ucaser();
+			word.trimmerf().trimmerb();
 		}
 
 		//options

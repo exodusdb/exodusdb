@@ -40,7 +40,7 @@ var ExodusProgramBase::perform(const var& sentence) {
 		//if (!exodusfunctorbase_.init(str_libname.c_str(),str_funcname.c_str()))
 		//	throw MVException(L"perform() Cannot find Library "^str_libname^L", or function "^str_funcname^L" is not present");
 		if (!perform_exodusfunctorbase_.init2(str_libname.c_str(),
-				"exodusprogrambasecreatedelete"))
+				"exodusprogrambasecreatedelete_"))
 			throw MVException(
 					L"perform() Cannot find shared library \"" ^ str_libname
 							^ L"\", or function \"libraryexit()\" is not present");
@@ -113,7 +113,8 @@ var ExodusProgramBase::calculate(const var& dictid) {
 					L"calculate(" ^ dictid
 							^ L") mv.DICT file variable has not been set");
 		if (not cache_dictrec_.read(mv.DICT, dictid))
-			throw MVException(
+			if (not cache_dictrec_.read(mv.DICT, dictid.lcase()))
+				throw MVException(
 					L"calculate(" ^ dictid ^ L") dictionary record not in mv.DICT "
 							^ mv.DICT.quote());
 		cache_dictid_ = dictid;
@@ -143,13 +144,13 @@ var ExodusProgramBase::calculate(const var& dictid) {
 				return mv.ID;
 
 		}
+/*
 	} else if (dicttype == L"S") {
 		//TODO deduplicate various exodusfunctorbase code spread around calculate mvipc* etc
 		if (newlibfunc) {
-			std::string str_libname = mv.DICT.toString();
+			std::string str_libname = mv.DICT.lcase().toString();
 			std::string str_funcname = dictid.toString();
-			if (!dict_exodusfunctorbase_.init(str_libname.c_str(),
-					str_funcname.c_str()))
+			if (!dict_exodusfunctorbase_.init(str_libname.c_str(),str_funcname.c_str()))
 				throw MVException(
 						L"calculate() Cannot find Library " ^ str_libname
 								^ L", or function " ^ str_funcname
@@ -158,6 +159,38 @@ var ExodusProgramBase::calculate(const var& dictid) {
 
 		return dict_exodusfunctorbase_.calldict();
 		//return mv.ANS;
+	}
+*/
+
+	} else if (dicttype == L"S") {
+		//TODO deduplicate various exodusfunctorbase code spread around calculate mvipc* etc
+		if (newlibfunc) {
+			std::string str_libname = mv.DICT.lcase().toString();
+			std::string str_funcname = (L"exodusprogrambasecreatedelete_" ^ dictid.lcase()).toString();
+			if (!dict_exodusfunctorbase_.initdict(str_libname.c_str(),str_funcname.c_str()))
+				throw MVException(
+						L"calculate() Cannot find Library " ^ str_libname
+								^ L", or function " ^ dictid.lcase()
+								^ L" is not present");
+		}
+
+		//return dict_exodusfunctorbase_.calldict();
+		//return mv.ANS;
+
+		//define a function type (pExodusProgramBaseMemberFunction)
+		//that can call the shared library object member function
+		//with the right arguments and returning a var
+		typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)();
+
+		//call the shared library object main function with the right args, returning a var
+		//std::cout<<"precall"<<std::endl;
+		mv.ANS =
+				CALLMEMBERFUNCTION(*(dict_exodusfunctorbase_.pobject_),
+						((pExodusProgramBaseMemberFunction) (dict_exodusfunctorbase_.pmemberfunction_)))();
+		//std::cout<<"postcall"<<std::endl;
+
+		return mv.ANS;
+
 	}
 
 	throw MVException(

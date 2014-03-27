@@ -50,7 +50,7 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 
 	//declared high up outside range of return exit(); statement
 	var selectresult;
-	var dataptr;
+	var offset;
 	var cmd;
 	var xml;
 	var oconvsx;
@@ -109,7 +109,7 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 	}else{
 		datax = L"";
 	}
-	dataptr = 0;
+	offset = 0;
 
 	cmd = L"SELECT " ^ filename0;
 	if (maxnrecs)
@@ -176,9 +176,9 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 	if (xml and linkfilename2) {
 		//tx:='<xml id=':quote(lcase(filename)):'>':crlf
 		tx ^= L"<records>" ^ crlf2;
-		mv.osbwritex(tx, linkfilename2, linkfilename2, dataptr);
+		mv.osbwritex(tx, linkfilename2, linkfilename2, offset);
 	}
-	dataptr += tx.length();
+//	offset += tx.length();
 
 	//zzz should for validity of select parameters first
 	//otherwise in server mode it loops with a very long error message
@@ -301,7 +301,7 @@ nextrecord:
 
 			var prefix = ID ^ FM;
 
-			if (dataptr)
+			if (offset)
 				prefix.splicer(1, 0, RM);
 			row.splicer(1, 0, prefix);
 
@@ -365,7 +365,7 @@ id:
 				row.swapper(L"&", L"&amp;");
 				//swap "'" with "" in row
 			}
-			if (dataptr) {
+			if (offset) {
 				if (xml) {
 				}else{
 					row.splicer(1, 0, FM);
@@ -380,12 +380,12 @@ id:
 		}
 
 		if (linkfilename2) {
-			mv.osbwritex(row, linkfilename2, linkfilename2, dataptr);
+			mv.osbwritex(row, linkfilename2, linkfilename2, offset);
 
 		}else{
 			datax ^= row;
 		}
-		dataptr += row.length();
+//		offset += row.length();
 
 		if (xml or datax.length() < 64000)
 			goto nextrecord;
@@ -395,7 +395,7 @@ id:
 
 	if (xml and linkfilename2) {
 		var tt = L"</records>";
-		mv.osbwritex(tt, linkfilename2, linkfilename2, dataptr);
+		mv.osbwritex(tt, linkfilename2, linkfilename2, offset);
 	}
 
 	if (linkfilename2) {

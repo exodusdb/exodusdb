@@ -10,7 +10,7 @@
 //non-ASCII unicode characters
 var GreekQuestionMark		=L"\u037E";//GREEK QUESTION MARK (Punctuation)
 var GreekCapitalGamma		=L"\u0393";//GREEK CAPITAL LETTER GAMMA (Letter) (Uppercase)
-var GreekSmallGamma			=L"\u03B3";//GREEK SMALL LETTER GAMMA (Letter) (Lowercase)
+var GreekSmallGamma		=L"\u03B3";//GREEK SMALL LETTER GAMMA (Letter) (Lowercase)
 var ArabicIndicDigitZero	=L"\u0660";//ARABIC-INDIC DIGIT ZERO (Decimal Digit)
 
 var GreekSmallAlpha         =L"\u03B1";//GREEK SMALL LETTER ALPHA
@@ -41,6 +41,18 @@ function main()
 	//	errmsg.outputl();
 	//if (not deletedb("steve",errmsg))
 	//	errmsg.outputl();
+
+	var testfilename="VM.txt";
+	var charout=GreekSmallGamma;//VM;
+	assert(oswrite(charout,testfilename, "utf8"));
+	var offsetx,testfilex;
+	assert(osopen(testfilename,testfilex));
+	assert(osbread(testfilex,offsetx=0,1) eq GreekSmallGamma);
+//	assert(testfilename.osfile().a(1) eq 2);
+	var charin;
+//fails on ubuntu 13.10x64	assert(osread(charin,testfilename, "utf8"));
+	//assert(charin eq charout);
+	assert(osdelete(testfilename));
 
 	//simple test of regex and case insensitive regex swap (commonly known as replace)
     assert(swap("abcd","b.","xyz","r").outputl() eq "axyzd");//right case to convert
@@ -565,7 +577,7 @@ function main()
 	}
 	//check can select and readnext through the records
 	if (pluginok) {
-		assert(select("SELECT XUSERS WITH BIRTHDAY BETWEEN '1 JAN 2000' AND '31 DEC 2003'"));
+		assert(select("select XUSERS with BIRTHDAY between '1 JAN 2000' and '31 DEC 2003'"));
 		assert(readnext(ID));
 		assert(ID eq 2);
 		assert(readnext(ID));

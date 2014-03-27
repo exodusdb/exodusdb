@@ -100,6 +100,7 @@ ExodusFunctorBase::~ExodusFunctorBase()
 	closelib();
 }
 
+//used in perform
 bool ExodusFunctorBase::init2(const char* libraryname, const char* functionname)
 {
 	if (libraryname_!=libraryname)
@@ -158,6 +159,45 @@ bool ExodusFunctorBase::init(const char* libraryname, const char* functionname, 
 	return true;
 }
 
+bool ExodusFunctorBase::initdict(const char* libraryname, const char* functionname)
+{
+	if (libraryname_!=libraryname)
+	{
+		closelib();
+		libraryname_=libraryname;
+		if (!openlib())
+			return false;
+		functionname_="";
+	}
+
+	//make sure we have the right program object creation/deletion function
+	if (functionname_!=functionname)
+	{
+		closefunc();
+		functionname_=functionname;
+		if (!openfunc())
+			return false;
+	}
+
+	//call a function in the library to create one of its "exodus program" objects
+	//nb we MUST call the same library to delete it
+	//so that the same memory management routine is called to create and delete it.
+	//pfunction_ return a pobject_ if pobject_ is passed in NULL (using mv as an init argument)
+	// or deletes a pobject_ if not
+
+	//generate an error here to debug
+//	pobject_->main();
+
+	pfunction_(pobject_,*mv_,pmemberfunction_);
+	//pobject_->main();
+	//((*pobject_).*(pmemberfunction_))();
+	//CALLMEMBERFUNCTION(*pobject_,pmemberfunctibon_)();
+	if (pobject_==NULL||pmemberfunction_==NULL)
+		return false;
+
+	return true;
+}
+
 //this version was written to be called from mvipc in response to calculated dictionary callback
 //this version only opens lib if it has changed (after closing the old lib, if any, of course)
 //init now doesnt call the function to get a program object
@@ -181,6 +221,7 @@ bool ExodusFunctorBase::init(const char* libraryname, const char* functionname)
 	//make sure we have the right program object creation/deletion function
 	if (functionname_!=functionname)
 	{
+		closelib();
 		functionname_=functionname;
 		if (!openfunc())
 			return false;
@@ -310,6 +351,7 @@ bool ExodusFunctorBase::openfunc()
 
 }
 
+/*was used to call global (non-member functions)
 var ExodusFunctorBase::calldict()
 {
 	//dictionaries are libraries of subroutines (ie return void) that 
@@ -321,8 +363,39 @@ var ExodusFunctorBase::calldict()
 	return ((ExodusDynamic) pfunction_)(*mv_);
 	//return;
 }
+*/
+
+var ExodusFunctorBase::calldict()
+{
+	//define a function type (pExodusProgramBaseMemberFunction)
+	//that can call the shared library object member function
+	//with the right arguments and returning a var
+	typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)();
+
+	//call the shared library object main function with the right args, returning a var
+	//std::cout<<"precall"<<std::endl;
+	return CALLMEMBERFUNCTION(*(
+			pobject_),
+			((pExodusProgramBaseMemberFunction) (pmemberfunction_)))
+					();
+	//std::cout<<"postcall"<<std::endl;
+
+}
 
 void ExodusFunctorBase::closelib()
+{
+	//close the function object
+	closefunc();
+
+	//close the connection
+	if (plibrary_!=NULL)
+	{
+		dlclose((library_t) plibrary_);
+		plibrary_=NULL;
+	}
+}
+
+void ExodusFunctorBase::closefunc()
 {
 	//outputl(L"000");
 	//the *library* function must be called to delete the object that it created
@@ -330,12 +403,6 @@ void ExodusFunctorBase::closelib()
 	if (pobject_!=NULL)
 	{
 		pfunction_(pobject_,*mv_,pmemberfunction_);
-	}
-	//close the connection
-	if (plibrary_!=NULL)
-	{
-		dlclose((library_t) plibrary_);
-		plibrary_=NULL;
 	}
 }
 

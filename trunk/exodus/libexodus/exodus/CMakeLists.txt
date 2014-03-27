@@ -1,3 +1,7 @@
+add_definitions(-DEXODUS_IPC_BOOST)
+add_definitions(-DEXODUS_IPC_POSIX)
+add_definitions(-DEXODUS_IPC_WINPIPES)
+
 #cmakedefine HAVE_BACKTRACE 1
 
 find_package(PostgreSQL REQUIRED)
@@ -29,12 +33,12 @@ add_library(exodus SHARED
  MurmurHash2_64.h mvhandles.h mvdbconns.h
 
  ConvertUTF.c howto.cpp mvarray.cpp mvdatetime.cpp  mvdebug.cpp
- mvfuncs.cpp mvioconv.cpp mvlibs.cpp mvos.cpp
+ mvfuncs.cpp mvioconv.cpp mvlibs.cpp
  mvutf.cpp naturalorder.cpp gettimeofday.cpp mv2.cpp mv.cpp
  mvdbpostgres.cpp mvenvironment.cpp mvglobalfuncs.cpp
  mvipc.cpp mvmv.cpp mvunicode.cpp mvipc_boost.cpp mvipc_posix.cpp
  mvipc_ms.cpp mvposix.cpp MurmurHash2_64.cpp
- mvfunctor.cpp mvprogram.cpp mvhandles.cpp mvdbconns.cpp
+ mvfunctor.cpp mvprogram.cpp mvhandles.cpp mvdbconns.cpp mvos.cpp
 )
 
 #set_target_properties(exodus PROPERTIES SOVERSION "${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_VERSION}")

@@ -1,13 +1,13 @@
 #!/bin/bash
 
-rm */*~ */*.2 */eevalt.cpp
-rm *~ *.2 */eevalt.cpp
+rm -I -f */*~ */*.2 */eevalt.cpp
+rm -I -f *~ *.2 eevalt.cpp 2>/dev/null
 
-rm */NLOG */LOG */NEOSYS.CFG
-rm NLOG LOG NEOSYS.CFG
+rm -I -f */NLOG */LOG */NEOSYS.CFG
+rm -I -f NLOG LOG NEOSYS.CFG
 
-rm -rf */DATAVOL\\*
-rm -rf DATAVOL\\*
+rm -I -rf */DATAVOL\\*
+rm -I -rf DATAVOL\\*
 
-rm arev/*
+rm -I -f arev/*
 

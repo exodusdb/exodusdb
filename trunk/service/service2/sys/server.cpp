@@ -571,7 +571,7 @@ function serviceloop()
 
 				if (USER1.a(1) == "") {
 stopper:
-						request1 = "STOPDB";
+					request1 = "STOPDB";
 					return false;
 				}
 
@@ -794,7 +794,9 @@ readlink1:
 		var offset=0;
 		USER0.osbread(linkfilename1, offset, 256 * 256 - 4);
 */
-		USER0.osread(linkfilename1, "utf8");
+		//problem osreading utf8 data on linux ubuntu 13.10 x65
+		//USER0.osread(linkfilename1, "utf8");
+		USER0=osbread(linkfilename1,xx=0,999999);
 		USER0=decode(USER0);
 
 		//if cannot read it then try again
@@ -1062,81 +1064,32 @@ function processrequest()
 	//so that if Server fails then net the calling program can still respond
 	mv.PRIORITYINT.r(100, linkfilename3);
 
+	USER1="";
 	var linkfilename2size = linkfilename2.osfile().a(1);
-	if (linkfilename2size > maxstringsize) {
+	if (!linkfilename2size) {
+		//zero file size not nice or necessary but tolerable
 
-		USER1 = "";
+	} else if (linkfilename2size > maxstringsize) {
 		USER3 = "Error: Maximum record size " ^ maxstringsize ^ " exceeded in Server";
 		Serverfailure = 1;
 
-	} else if (!linkfilename2size) {
-		USER1 = "";
-
 	}else if (!(linkfilename2.osopen())) {
-
-		USER1 = "";
 		USER3 = "Error: Server cannot open " ^ linkfilename2;
 		Serverfailure = 1;
 
-	}else{
+	}else if (not (USER1=osbread(linkfilename2,xx=0,999999999))) {
+		USER3 = "Error: Server cannot read " ^ linkfilename2;
+		Serverfailure = 1;
 
-/*
-		//osread iodat from linkfilename2 else goto cannotopenlinkfilename2
-		var offset=0;
-		mv.osbreadx(USER1, linkfilename2, linkfilename2, offset, maxstringsize);
-
-		//hack to remove UTF16 BOM mark
-		if (USER1[1]=="\uFEFF")
-			USER1.splicer(1,1,"");
-*/
-		USER1.osread(linkfilename2, "utf8");
+	} else {
 		USER1=decode(USER1);
-
-/*
-		//output to log before unescaping
-		if (logfilename) {
-
-			//start after the last <datain>
-			if (!anydata) {
-				anydata = 1;
-				logptr += 8;
-			}
-
-			logx = USER1;
-			gosub writelogx();
-		}
-*/
-/*
-		for (int ii = 0; ii <= 36; ii++)
-			USER1.swapper(hexx[ii], var().chr(ii));
-		for (int ii = 38; ii <= 255; ii++)
-			USER1.swapper(hexx[ii], var().chr(ii));
-		//unescape %25 to % LAST!
-		USER1.swapper(hexx[37], var().chr(37));
-*/
-
 	}
 
 	if (linkfilename2.osopen()) {
 		linkfilename2.osclose();
 		linkfilename2.osdelete();
-		//osread _USER3 from linkfilename3 else USER3=''
 	}
 
-/*
-	if (logfilename!="") {
-
-		if (anydata) {
-			logx = "</DataIn>";
-			gosub writelogx2();
-		}
-
-		//to be overwritten unless fails
-		logx = "</Message></Log>";
-		gosub writelogx3();
-
-	}
-*/
 	//update security table every few secs and every login
 	if (request1 == "LOGIN" || var("036").index(var().time())[-1])
 		gosub getsecurity();
@@ -1147,14 +1100,11 @@ function processrequest()
 
 	SYSTEM.r(2, linkfilename2);
 
-	//get the current program stack
-//	var stack = programstack(nostack);
-
 	try
 	{
 		gosub process();
 	}
-//dont catch general MVExceptions to force debugging
+//dont catch general MVExceptions so we can debug
 //	catch (MVException& mvexception)
 	catch (std::wstring& message)
 	{

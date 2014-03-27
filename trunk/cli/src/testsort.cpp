@@ -3,7 +3,7 @@
  
 //for the sake of multivalue gurus new to exodus programming this is written
 //with multivalue-mimicking "everything is a global function" syntax
-//instead of exodus's OO-style syntax "xxx.yyy().zzz()"
+//instead of exodus's oo-style syntax "xxx.yyy().zzz()"
 
 var filename="myclients";
 
@@ -18,10 +18,10 @@ function main() {
 
         //leave the test data files around for playing with
         var cleanup=false;
-        if (cleanup) {
+        //if (cleanup) {
                 deletefile(filename);
                 deletefile(dictfilename);
-		}
+	//	}
 
         printl("\nOpen or create test file ", filename);
 
@@ -44,14 +44,14 @@ function main() {
         printl("\nPrepare some dictionary records");
 
         var dictrecs = "";
-        dictrecs  =      "CLIENT_CODE |F|0|Code     ||||          ||L|8";
-        dictrecs ^= FM ^ "CLIENT_NAME |F|1|Name     ||||          ||T|15";
-        dictrecs ^= FM ^ "CLIENT_TYPE |F|2|Type     ||||          ||L|5";
-        dictrecs ^= FM ^ "DATE_CREATED|F|3|Date     ||||D4        ||L|12";
-        dictrecs ^= FM ^ "TIME_CREATED|F|4|Time     ||||MTH       ||L|12";
-        dictrecs ^= FM ^ "BALANCE     |F|5|Balance  ||||MD20P     ||R|10";
-        dictrecs ^= FM ^ "TIMESTAMP   |F|6|Timestamp||||[DATETIME]||L|12";
-        dictrecs ^= FM ^ "@CRT        |G| |CLIENT_CODE CLIENT_NAME CLIENT_TYPE BALANCE DATE_CREATED TIME_CREATED TIMESTAMP";
+        dictrecs  =      "client_code |F|0|Code     ||||          ||L|8";
+        dictrecs ^= FM ^ "client_name |F|1|Name     ||||          ||T|15";
+        dictrecs ^= FM ^ "client_type |F|2|Type     ||||          ||L|5";
+        dictrecs ^= FM ^ "date_created|F|3|Date     ||||D4        ||L|12";
+        dictrecs ^= FM ^ "time_created|F|4|Time     ||||MTH       ||L|12";
+        dictrecs ^= FM ^ "balance     |F|5|Balance  ||||MD20P     ||R|10";
+        dictrecs ^= FM ^ "timestamp   |F|6|Timestamp||||[DATETIME]||L|12";
+        dictrecs ^= FM ^ "@crt        |G| |client_code client_name client_type balance date_created time_created timestamp";
 
         printl("\nWrite the dictionary records to the dictionary");
 
@@ -111,15 +111,15 @@ function main() {
                 write(trimb(convert(rec, "|", FM)), file, trim(key));
         }
 
-        var prefix="SELECT "^ filename;
+        var prefix="select "^ filename;
 
-        gosub sortselect(file, prefix^ " BY CLIENT_CODE");
+        gosub sortselect(file, prefix^ " by client_code");
 
-        gosub sortselect(file, prefix^ " BY BALANCE BY CLIENT_CODE");
+        gosub sortselect(file, prefix^ " by balance by client_code");
 
-        gosub sortselect(file, prefix^ " BY TIMESTAMP");
+        gosub sortselect(file, prefix^ " by timestamp");
 
-        gosub sortselect(file, prefix^ " WITH CLIENT_TYPE 'B' BY BALANCE");
+        gosub sortselect(file, prefix^ " with client_type 'B' by balance");
 
         var cmd="list "^ filename^ " id-supp";
         printl("\nList the file using ", quote(cmd));
@@ -144,7 +144,7 @@ function main() {
 
 subroutine sortselect(in file, in sortselectcmd) {
 
-        printl("\nSSELECT the data - ", sortselectcmd);
+        printl("\nsselect the data - ", sortselectcmd);
 
         if (!select(sortselectcmd)) {
                 printl("Cannot sselect");

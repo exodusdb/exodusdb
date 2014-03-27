@@ -910,7 +910,7 @@ void var::osflush() const
 {
 	//THISIS(L"void var::osflush() const")
 
-	std::wcout<<L"var::flush not implemented yet"<<std::endl;
+	std::wcout<<L"var::osflush ignored - not implemented yet"<<std::endl;
 	return;
 }
 
@@ -1032,6 +1032,11 @@ bool var::osread(const var& osfilename, const var& locale)
 bool var::osread(const char* osfilename, const var& locale)
 {
 
+	//osread unicode eg FM fails on ubuntu linux 13.10 x64 for some reason
+	//oswrite works! ... use osbreadx 9999999 as workaround
+	//maybe try vector/pushback instead of file.read(
+	//http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/codecvt.html
+
 	THISIS(L"bool var::osread(const var& osfilename)")
 	THISISDEFINED()
 
@@ -1058,7 +1063,7 @@ bool var::osread(const char* osfilename, const var& locale)
 	unsigned int bytesize;
 	//	#pragma warning( disable: 4244 )
 	//warning C4244: '=' : conversion from 'std::streamoff' to 'unsigned int', possible loss of data
-    bytesize = (unsigned int) myfile.tellg();
+	bytesize = (unsigned int) myfile.tellg();
 
 	//if empty file then done ok
 	if (bytesize==0)
@@ -1095,7 +1100,7 @@ bool var::osread(const char* osfilename, const var& locale)
 	//ALN:JFI: actually we could use std::string 'tempstr' in place of 'memblock' by hacking
 	//	.data member and reserve() or resize(), thus avoiding buffer-to-buffer-copying
 	var_mvstr=std::wstring(memblock.get(), (unsigned int) bytesize);
-	
+
 	return true;
 }
 

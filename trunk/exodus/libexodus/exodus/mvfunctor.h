@@ -160,8 +160,10 @@ virtual ~ExodusFunctorBase();
 public:
 	//for call
 	bool init(const char* libraryname, const char* functionname);
-	//for calculate dict
+	//was used for calculate dict via external so global functions (not member functions)
 	bool init(const char* libraryname, const char* functionname, MvEnvironment& mv);
+	//for dicts
+	bool initdict(const char* libraryname, const char* functionname);
 	//for perform
 	bool init2(const char* libraryname, const char* functionname);
 
@@ -169,6 +171,7 @@ private:
 	bool openlib();
 	void closelib();
 	bool openfunc();
+	void closefunc();
 
 protected:
 	bool checkload();

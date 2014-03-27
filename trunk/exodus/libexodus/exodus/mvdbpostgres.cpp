@@ -150,7 +150,7 @@ bool getdbtrace()
 #define TEXTOID 25;
 
 //this is not threadsafe
-//PGconn     *thread_pgconn;
+//PGconn	 *thread_pgconn;
 //but this is ...
 boost::thread_specific_ptr<int> tss_pgconnids;
 boost::thread_specific_ptr<var> tss_pgconnparams;
@@ -163,7 +163,7 @@ bool var::sqlexec(const var& SqlToExecute) const
 {
 	var errmsg;
 	bool result = sqlexec(SqlToExecute, errmsg);
-	if (not result && GETDBTRACE)
+	if (not result && (errmsg.index(L"syntax") || GETDBTRACE))
 		errmsg.outputl();
 	return result;
 }
@@ -173,28 +173,28 @@ LONG WINAPI DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS pExcPointers) {
    LONG lDisposition = EXCEPTION_EXECUTE_HANDLER;
    
    PDelayLoadInfo pDelayLoadInfo =
-    PDelayLoadInfo(pExcPointers->ExceptionRecord->ExceptionInformation[0]);
+	PDelayLoadInfo(pExcPointers->ExceptionRecord->ExceptionInformation[0]);
 
    switch (pExcPointers->ExceptionRecord->ExceptionCode) {
    case VcppException(ERROR_SEVERITY_ERROR, ERROR_MOD_NOT_FOUND):
 	   printf("mvdbpostgres: %s was not found\n", pDelayLoadInfo->szDll);
-      break;
+	  break;
 /*
    case VcppException(ERROR_SEVERITY_ERROR, ERROR_PROC_NOT_FOUND):
-      if (pdli->dlp.fImportByName) {
+	  if (pdli->dlp.fImportByName) {
 			  printf("Function %s was not found in %sn",
-      	      pDelayLoadInfo->dlp.szProcName, pDelayLoadInfo->szDll);
-      } else {
-      printf("Function ordinal %d was not found in %sn",
-      	      pDelayLoadInfo->dlp.dwOrdinal, pDelayLoadInfo->szDll);
-      }
-      break; 
+	  		  pDelayLoadInfo->dlp.szProcName, pDelayLoadInfo->szDll);
+	  } else {
+	  printf("Function ordinal %d was not found in %sn",
+	  		  pDelayLoadInfo->dlp.dwOrdinal, pDelayLoadInfo->szDll);
+	  }
+	  break; 
 */
    default:
-      // Exception is not related to delay loading
-      printf("Unknown problem %s\n", pDelayLoadInfo->szDll);
-      lDisposition = EXCEPTION_CONTINUE_SEARCH;
-      break;
+	  // Exception is not related to delay loading
+	  printf("Unknown problem %s\n", pDelayLoadInfo->szDll);
+	  lDisposition = EXCEPTION_CONTINUE_SEARCH;
+	  break;
    }
 
    return(lDisposition);
@@ -514,9 +514,9 @@ bool var::open(const var& filename, const var& connection)
 	ISSTRING(filename)
 
 	const char* paramValues[1];
-	int         paramLengths[1];
-	int         paramFormats[1];
-//	uint32_t    binaryIntVal;
+	int		 paramLengths[1];
+	int		 paramFormats[1];
+//	uint32_t	binaryIntVal;
 
 	/* Here is our out-of-line parameter value */
 	std::string filename2=filename.lcase().toString();
@@ -526,7 +526,7 @@ bool var::open(const var& filename, const var& connection)
 
 	//avoid any errors because ANY errors while a transaction is in progress cause failure of the whole transaction
 	//and remember that a select initiates a transaction committed on readnext eof or clearselect
-    //TODO should perhaps prepare pg parameters for repeated speed
+	//TODO should perhaps prepare pg parameters for repeated speed
 	var sql=L"SELECT table_name FROM information_schema.tables WHERE table_schema='public' and table_name=$1";
 
 	PGconn * thread_pgconn = (PGconn *) connection.connection();
@@ -537,16 +537,16 @@ bool var::open(const var& filename, const var& connection)
 	PGresult* result = PQexecParams(thread_pgconn,
 		//TODO: parameterise filename
 		sql.toString().c_str(),
-		1,       /* one param */
-		NULL,    /* let the backend deduce param type */
+		1,	   /* one param */
+		NULL,	/* let the backend deduce param type */
 		paramValues,
 		paramLengths,
 		paramFormats,
-		1);      /* ask for binary results */
+		1);	  /* ask for binary results */
 
 	int resultstatus=PQresultStatus(result);
-    if (resultstatus != PGRES_TUPLES_OK)
-    {
+	if (resultstatus != PGRES_TUPLES_OK)
+	{
 #		if TRACING >= 1
 			exodus::errputl(L"ERROR: mvdbpostgres open(" ^ this->quote() ^ L") failed\n" ^ var(PQerrorMessage(thread_pgconn)));
 #		endif
@@ -607,10 +607,10 @@ bool var::read(const var& filehandle,const var& key)
 	ISSTRING(filehandle)
 	ISSTRING(key)
 
-    const char* paramValues[1];
-    int         paramLengths[1];
-    int         paramFormats[1];
-	//uint32_t    binaryIntVal;
+	const char* paramValues[1];
+	int		 paramLengths[1];
+	int		 paramFormats[1];
+	//uint32_t	binaryIntVal;
 
 	std::string key2=key.toString();
 
@@ -621,7 +621,7 @@ bool var::read(const var& filehandle,const var& key)
 	var sql=L"SELECT data FROM " PGDATAFILEPREFIX ^ filehandle ^ L" WHERE key = $1";
 
 	//get filehandle specific connection or fail
-    PGconn* thread_pgconn = (PGconn*) filehandle.connection();
+	PGconn* thread_pgconn = (PGconn*) filehandle.connection();
 	if (!thread_pgconn)
 		return false;
 
@@ -629,12 +629,12 @@ bool var::read(const var& filehandle,const var& key)
 	PGresult* result = PQexecParams(thread_pgconn,
 		//TODO: parameterise filename
 		sql.toString().c_str(),
-		1,       /* one param */
-		NULL,    /* let the backend deduce param type */
+		1,	   /* one param */
+		NULL,	/* let the backend deduce param type */
 		paramValues,
 		paramLengths,
 		paramFormats,
-		1);      /* ask for binary results */
+		1);	  /* ask for binary results */
 
 	if (PQresultStatus(result) != PGRES_TUPLES_OK)
  	{
@@ -679,10 +679,10 @@ var var::lock(const var& key) const
 	THISISDEFINED()
 	ISSTRING(key)
 
-    const char* paramValues[1];
-    int         paramLengths[1];
-    int         paramFormats[1];
-	//uint32_t    binaryIntVal;
+	const char* paramValues[1];
+	int		 paramLengths[1];
+	int		 paramFormats[1];
+	//uint32_t	binaryIntVal;
 
 	std::wstring fileandkey=var_mvstr;
 	fileandkey.append(L" ");
@@ -714,20 +714,20 @@ var var::lock(const var& key) const
 	const char* sql="SELECT PG_TRY_ADVISORY_LOCK($1)";
 
 	//"this" is a filehandle - get its connection
-    PGconn* thread_pgconn=(PGconn*) this->connection();
+	PGconn* thread_pgconn=(PGconn*) this->connection();
 	if (!thread_pgconn)
 		return false;
 
 	DEBUG_LOG_SQL1
 	PGresult* result = PQexecParams(thread_pgconn,
-    					//TODO: parameterise filename
-                       sql,
-                       1,       /* one param */
-                       NULL,    /* let the backend deduce param type */
-                       paramValues,
+						//TODO: parameterise filename
+					   sql,
+					   1,	   /* one param */
+					   NULL,	/* let the backend deduce param type */
+					   paramValues,
 					   paramLengths,
 					   paramFormats,
-                       1);      /* ask for binary results */
+					   1);	  /* ask for binary results */
 
 	if (PQresultStatus(result) != PGRES_TUPLES_OK || PQntuples(result) != 1)
  	{
@@ -766,9 +766,9 @@ void var::unlock(const var& key) const
 	THISISDEFINED()
 	ISSTRING(key)
 
-    const char* paramValues[1];
-    int         paramLengths[1];
-    int         paramFormats[1];
+	const char* paramValues[1];
+	int		 paramLengths[1];
+	int		 paramFormats[1];
 
 	std::wstring fileandkey=var_mvstr;
 	fileandkey.append(L" ");
@@ -798,20 +798,20 @@ void var::unlock(const var& key) const
 	const char* sql="SELECT PG_ADVISORY_UNLOCK($1)";
 
 	//"this" is a filehandle - get its connection
-    PGconn* thread_pgconn=(PGconn*) this->connection();
+	PGconn* thread_pgconn=(PGconn*) this->connection();
 	if (!thread_pgconn)
 		return;
 
 	DEBUG_LOG_SQL1
 	PGresult* result = PQexecParams(thread_pgconn,
-    					//TODO: parameterise filename
-                       sql,
-                       1,       /* one param */
-                       NULL,    /* let the backend deduce param type */
-                       paramValues,
+						//TODO: parameterise filename
+					   sql,
+					   1,	   /* one param */
+					   NULL,	/* let the backend deduce param type */
+					   paramValues,
 					   paramLengths,
 					   paramFormats,
-                       1);      /* ask for binary results */
+					   1);	  /* ask for binary results */
 
 	if (PQresultStatus(result) != PGRES_TUPLES_OK || PQntuples(result) != 1)
  	{
@@ -888,12 +888,12 @@ bool var::sqlexec(const var& sqlcmd, var& errmsg) const
 
 	int pgresultstatus=PQresultStatus(pgresult);
 	if (pgresultstatus != PGRES_COMMAND_OK)
-    {
-        errmsg=var(PQerrorMessage(thread_pgconn));
+	{
+		errmsg=var(PQerrorMessage(thread_pgconn));
 		//std::wcerr<<errmsg<<std::endl;
 		PQclear(pgresult);
-        return false;
-    }
+		return false;
+	}
 
 	errmsg=var(PQntuples(pgresult));
 	PQclear(pgresult);
@@ -943,21 +943,21 @@ bool var::write(const var& filehandle, const var& key) const
 	ISSTRING(key)
 
 	const char* paramValues[2];
-	int         paramLengths[2];
-	int         paramFormats[2];
-	//uint32_t    binaryIntVal;
+	int		 paramLengths[2];
+	int		 paramFormats[2];
+	//uint32_t	binaryIntVal;
 
 	std::string key2=key.toString();
 	std::string data2=(*this).toString();
 
-    paramValues[0] = key2.data();
-    paramValues[1] = data2.data();
+	paramValues[0] = key2.data();
+	paramValues[1] = data2.data();
 
-    paramLengths[0] = int(key2.length());
-    paramLengths[1] = int(data2.length());
+	paramLengths[0] = int(key2.length());
+	paramLengths[1] = int(data2.length());
 
-    paramFormats[0] = 1;//binary
-    paramFormats[1] = 1;//binary
+	paramFormats[0] = 1;//binary
+	paramFormats[1] = 1;//binary
 
 	var sql;
 
@@ -970,34 +970,34 @@ bool var::write(const var& filehandle, const var& key) const
 		return false;
 
 	DEBUG_LOG_SQL1
-    PGresult* result = PQexecParams(thread_pgconn,
-    					//TODO: parameterise filename
-                       sql.toString().c_str(),
-                       2,				// two params (key and data)
-                       NULL,			// let the backend deduce param type
-                       paramValues,
-                       paramLengths,
-                       paramFormats,
-                       1);				// ask for binary results
+	PGresult* result = PQexecParams(thread_pgconn,
+						//TODO: parameterise filename
+					   sql.toString().c_str(),
+					   2,				// two params (key and data)
+					   NULL,			// let the backend deduce param type
+					   paramValues,
+					   paramLengths,
+					   paramFormats,
+					   1);				// ask for binary results
 	if (PQresultStatus(result) != PGRES_COMMAND_OK)
 	{
 		PQclear(result);
 #if TRACING >= 1
-        exodus::errputl(L"ERROR: mvdbpostgres write() failed: " ^ var(PQntuples(result)) ^ L" " ^ var(PQerrorMessage(thread_pgconn)));
+		exodus::errputl(L"ERROR: mvdbpostgres write() failed: " ^ var(PQntuples(result)) ^ L" " ^ var(PQerrorMessage(thread_pgconn)));
 #endif
 		return false;
 	}
 
 	//if updated 1 then OK because update worked and no need to try insert below
-    if (strcmp(PQcmdTuples(result),"1") == 0)
-    {
+	if (strcmp(PQcmdTuples(result),"1") == 0)
+	{
 		PQclear(result);
  		return true;
 	}
 
 	//if update fails then try insert
 
-    PQclear(result);
+	PQclear(result);
 	sql = L"INSERT INTO " PGDATAFILEPREFIX ^ filehandle ^ L" (key,data) values( $1 , $2)";
 	DEBUG_LOG_SQL1
 	result = PQexecParams(thread_pgconn,
@@ -1010,17 +1010,17 @@ bool var::write(const var& filehandle, const var& key) const
 		1);				// ask for binary results
 
 	if (PQresultStatus(result) != PGRES_COMMAND_OK)
-    {
+	{
 		PQclear(result);
 #if TRACING >= 1
-        exodus::errputl(L"ERROR: mvdbpostgres write() INSERT failed: " ^ var(PQntuples(result)) ^ L" " ^ var(PQerrorMessage(thread_pgconn)));
+		exodus::errputl(L"ERROR: mvdbpostgres write() INSERT failed: " ^ var(PQntuples(result)) ^ L" " ^ var(PQerrorMessage(thread_pgconn)));
 #endif
-        return false;
-    }
+		return false;
+	}
 
 	//if not updated 1 then fail
-    if (strcmp(PQcmdTuples(result),"1") != 0)
-    {
+	if (strcmp(PQcmdTuples(result),"1") != 0)
+	{
 		PQclear(result);
  		return false;
 	}
@@ -1039,22 +1039,22 @@ bool var::updaterecord(const var& filehandle,const var& key) const
 	ISSTRING(filehandle)
 	ISSTRING(key)
 
-    const char* paramValues[2];
-    int         paramLengths[2];
-    int         paramFormats[2];
-    //uint32_t    binaryIntVal;
+	const char* paramValues[2];
+	int		 paramLengths[2];
+	int		 paramFormats[2];
+	//uint32_t	binaryIntVal;
 
 	std::string key2=key.toString();
 	std::string data2=(*this).toString();
 
-    paramValues[0] = key2.data();
-    paramValues[1] = data2.data();
+	paramValues[0] = key2.data();
+	paramValues[1] = data2.data();
 
-    paramLengths[0] = int(key2.length());
-    paramLengths[1] = int(data2.length());
+	paramLengths[0] = int(key2.length());
+	paramLengths[1] = int(data2.length());
 
-    paramFormats[0] = 1;//binary
-    paramFormats[1] = 1;//binary
+	paramFormats[0] = 1;//binary
+	paramFormats[1] = 1;//binary
 
 	var sql = L"UPDATE " PGDATAFILEPREFIX ^ filehandle ^ L" SET data = $2 WHERE key = $1";
 
@@ -1063,7 +1063,7 @@ bool var::updaterecord(const var& filehandle,const var& key) const
 		return false;
 
 	DEBUG_LOG_SQL1
-    PGresult* result = PQexecParams(thread_pgconn,
+	PGresult* result = PQexecParams(thread_pgconn,
 		//TODO: parameterise filename
 							  sql.toString().c_str(),
 		2,				// two params (key and data)
@@ -1084,8 +1084,8 @@ bool var::updaterecord(const var& filehandle,const var& key) const
 	}
 
 	//if not updated 1 then fail
-    if (strcmp(PQcmdTuples(result),"1") != 0)
-    {
+	if (strcmp(PQcmdTuples(result),"1") != 0)
+	{
 #		if TRACING >= 3
 			exodus::errputl(L"ERROR: mvdbpostgres update() Failed: "
 				^ var(PQntuples(result)) ^ L" "
@@ -1110,21 +1110,21 @@ bool var::insertrecord(const var& filehandle,const var& key) const
 	ISSTRING(key)
 
 	const char* paramValues[2];
-    int         paramLengths[2];
-    int         paramFormats[2];
-    //uint32_t    binaryIntVal;
+	int		 paramLengths[2];
+	int		 paramFormats[2];
+	//uint32_t	binaryIntVal;
 
 	std::string key2=key.toString();
 	std::string data2=(*this).toString();
 
-    paramValues[0] = key2.data();
-    paramValues[1] = data2.data();
+	paramValues[0] = key2.data();
+	paramValues[1] = data2.data();
 
-    paramLengths[0] = int(key2.length());
-    paramLengths[1] = int(data2.length());
+	paramLengths[0] = int(key2.length());
+	paramLengths[1] = int(data2.length());
 
-    paramFormats[0] = 1;//binary
-    paramFormats[1] = 1;//binary
+	paramFormats[0] = 1;//binary
+	paramFormats[1] = 1;//binary
 
 	var sql = L"INSERT INTO " PGDATAFILEPREFIX ^ filehandle ^ L" (key,data) values( $1 , $2)";
 
@@ -1144,19 +1144,19 @@ bool var::insertrecord(const var& filehandle,const var& key) const
 		1);				// ask for binary results
 
 	if (PQresultStatus(result) != PGRES_COMMAND_OK)
-    {
-        PQclear(result);
+	{
+		PQclear(result);
 #		if TRACING >= 3
 			exodus::errputl(L"ERROR: mvdbpostgres insertrecord() Failed: "
 				^ var(PQntuples(result)) ^ L" "
 				^ var(PQerrorMessage(thread_pgconn)));
 #		endif
-        return false;
-    }
+		return false;
+	}
 
 	//if not updated 1 then fail
-    if (strcmp(PQcmdTuples(result),"1") != 0)
-    {
+	if (strcmp(PQcmdTuples(result),"1") != 0)
+	{
 		PQclear(result);
  		return false;
 	}
@@ -1172,16 +1172,16 @@ bool var::deleterecord(const var& key) const
 	THISISSTRING()
 	ISSTRING(key)
 
-    const char* paramValues[1];
-    int         paramLengths[1];
-    int         paramFormats[1];
-    //uint32_t    binaryIntVal;
+	const char* paramValues[1];
+	int		 paramLengths[1];
+	int		 paramFormats[1];
+	//uint32_t	binaryIntVal;
 
 	std::string key2=key.toString();
 
-    paramValues[0] = key2.data();
-    paramLengths[0] = int(key2.length());
-    paramFormats[0] = 1;//binary
+	paramValues[0] = key2.data();
+	paramLengths[0] = int(key2.length());
+	paramFormats[0] = 1;//binary
 
 	var sql=L"DELETE FROM " PGDATAFILEPREFIX ^ var_mvstr ^ L" WHERE KEY = $1";
 
@@ -1190,29 +1190,29 @@ bool var::deleterecord(const var& key) const
 		return false;
 
 	DEBUG_LOG_SQL1
-    PGresult* result = PQexecParams(thread_pgconn,
+	PGresult* result = PQexecParams(thread_pgconn,
 		sql.toString().c_str(),
-		1,       /* two param */
-		NULL,    /* let the backend deduce param type */
+		1,	   /* two param */
+		NULL,	/* let the backend deduce param type */
 		paramValues,
 		paramLengths,
 		paramFormats,
-		1);      /* ask for binary results */
+		1);	  /* ask for binary results */
 
 	if (PQresultStatus(result) != PGRES_COMMAND_OK)
-    {
+	{
 #		if TRACING >= 1
 			exodus::errputl(L"ERROR: mvdbpostgres deleterecord() Failed: "
 				^ var(PQntuples(result)) ^ L" "
 				^ var(PQerrorMessage(thread_pgconn)));
 #		endif
-        PQclear(result);
-        return false;
-    }
+		PQclear(result);
+		return false;
+	}
 
 	//if not updated 1 then fail
-    if (strcmp(PQcmdTuples(result),"1") != 0)
-    {
+	if (strcmp(PQcmdTuples(result),"1") != 0)
+	{
 		PQclear(result);
 #		if TRACING >= 3
 			exodus::logputl(L"var::deleterecord failed. Record does not exist "^var_mvstr);
@@ -1221,7 +1221,7 @@ bool var::deleterecord(const var& key) const
 	}
 
 
-    PQclear(result);
+	PQclear(result);
 
 	return true;
 }
@@ -1349,22 +1349,22 @@ bool var::clearfile(const var& filename) const
 
 inline void unquoter_inline(var& string)
 {
-        //remove "", '' and {}
-        static var quotecharacters(L"\"'{");
-        if (quotecharacters.index(string[1]))
-                string=string.substr(2,string.length()-2);
+		//remove "", '' and {}
+		static var quotecharacters(L"\"'{");
+		if (quotecharacters.index(string[1]))
+				string=string.substr(2,string.length()-2);
 }
 
 inline void tosqlstring(var& string1)
 {
-    //convert to sql style strings
-    //use single quotes and double up any internal single quotes
-    if (string1[1]==L"\"")
-    {
-        string1.swapper(L"'",L"''");
-        string1.splicer(1,1,L"'");
-        string1.splicer(-1,1,L"'");
-    }
+	//convert to sql style strings
+	//use single quotes and double up any internal single quotes
+	if (string1[1]==L"\"")
+	{
+		string1.swapper(L"'",L"''");
+		string1.splicer(1,1,L"'");
+		string1.splicer(-1,1,L"'");
+	}
 }
 
 inline var fileexpression(const var& mainfilename, const var& filename, const var& keyordata)
@@ -1417,10 +1417,10 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 	}
 
 	//given a file and dictionary id
-    //returns a postgres sql expression like (texta(filename.data,99,0,0))
-    //using one of the neosys backend functions installed in postgres like textextract, dateextract etc.
-    var dictrec;
-    if (!dictrec.read(actualdictfile,fieldname))
+	//returns a postgres sql expression like (texta(filename.data,99,0,0))
+	//using one of the neosys backend functions installed in postgres like textextract, dateextract etc.
+	var dictrec;
+	if (!dictrec.read(actualdictfile,fieldname))
 	{
 		if (not dictrec.read(L"dict_md", fieldname))
 		{
@@ -1436,12 +1436,12 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 			}
 		}
 	}
-    var sqlexpression;
+	var sqlexpression;
 	var dicttype=dictrec.a(1);
-    if (dicttype==L"F")
-    {
-        var conversion=dictrec.a(7);
-        var fieldno=dictrec.a(2);
+	if (dicttype==L"F")
+	{
+		var conversion=dictrec.a(7);
+		var fieldno=dictrec.a(2);
 		var params;
 		if (fieldno)
 			params=fileexpression(mainfilename, filename, L"data") ^ L"," ^ fieldno ^ L", 0, 0)";
@@ -1470,8 +1470,8 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 	}
 	else if (dicttype==L"S")
 	{
-		var functionx=dictrec.a(8).trim().ucase();
-		if (functionx.substr(1,11)==L"@ANS=XLATE(")
+		var functionx=dictrec.a(8).trim();
+		if (functionx.substr(1,11).ucase()==L"@ANS=XLATE(")
 		{
 			functionx.splicer(1,11,L"");
 			var xlatetofilename=functionx.field(L",",1).trim();
@@ -1494,7 +1494,7 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 				else
 				{
 					var dictxlatetofile=xlatetofilename;
-			        //if (!dictxlatetofile.open(L"DICT",xlatetofilename))
+					//if (!dictxlatetofile.open(L"DICT",xlatetofilename))
 					//	throw MVDBException(L"getdictexpression() DICT" ^ xlatetofilename ^ L" file cannot be opened");
 					todictexpression=getdictexpression(filename,xlatetofilename, dictxlatetofile, dictxlatetofile, xlatetofieldname, joins,forsort_or_select_or_index);
 				}
@@ -1530,10 +1530,14 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 				if (!joins.locate(join,xx,1))
 					joins.r(1,-1,join);
 
+			} else {
+				//not xlate X or C
+				goto exodus_call;
 			}
 		}
 		else
 		{
+exodus_call:
 			sqlexpression=L"'" ^ fieldname ^ L"'";
 			sqlexpression=L"exodus_call('exodusservice-" ^ getprocessn() ^ L"." ^ getenvironmentn() ^ L"'::bytea, '" ^ dictfilename ^ L"'::bytea, '" ^ fieldname ^ L"'::bytea, "^ filename ^ L".key, " ^ filename ^ L".data,0,0)";
 			//TODO apply naturalorder conversion by passing forsort_or_select_or_index option to exodus_call
@@ -1548,15 +1552,15 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 #endif
 		return L"";
 	}
-    return sqlexpression;
+	return sqlexpression;
 }
 
 var getword(var& remainingwords)
 {
 
-    //gets the next word (or series of words separated by FM while they are numbers or quoted strings)
-    //converts to sql quoted strings
-    //and clips them from the input string
+	//gets the next word (or series of words separated by FM while they are numbers or quoted strings)
+	//converts to sql quoted strings
+	//and clips them from the input string
 
 	static const var valuechars(L"\"'.0123456789-+");
 
@@ -1582,9 +1586,9 @@ var getword(var& remainingwords)
 		}
 	}
 
-    tosqlstring(word1);
+	tosqlstring(word1);
 
-    //grab multiple values (numbers or strings) separated by FM
+	//grab multiple values (numbers or strings) separated by FM
 	if (valuechars.index(word1[1]))
 	{
 		word1 = SQ ^ word1.unquote() ^ SQ;
@@ -1594,7 +1598,7 @@ var getword(var& remainingwords)
 		//'x' and 'y' and 'z' becomes 'x' 'y' 'z'
 		//to cater for WITH fieldname NOT 'X' AND 'Y' AND 'Z'
 		//duplicated above/below
-		if (nextword==L"AND")
+		if (nextword==L"and")
 		{
 			var nextword2=remainingwords;
 			if (valuechars.index(nextword2[1]))
@@ -1617,7 +1621,7 @@ var getword(var& remainingwords)
 			//'x' and 'y' and 'z' becomes 'x' 'y' 'z'
 			//to cater for WITH fieldname NOT 'X' AND 'Y' AND 'Z'
 			//duplicated above/below
-			if (nextword==L"AND")
+			if (nextword==L"and")
 			{
 				var nextword2=remainingwords;
 				if (valuechars.index(nextword2[1]))
@@ -1629,10 +1633,10 @@ var getword(var& remainingwords)
 
 		}
 	}else{
-		word1.ucaser();
+		//word1.ucaser();
 	}
 
-    return word1;
+	return word1;
 }
 
 bool var::selectrecord(const var& sortselectclause) const
@@ -1700,10 +1704,11 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	var remainingsortselectclause=sortselectclause;
 
 	//sortselectclause may start with {SELECT|SSELECT {maxnrecs} filename}
-	var word=remainingsortselectclause.field(L" ",1).ucase();
-    if (word==L"SELECT"||word==L"SSELECT")
-    {
-		if (word==L"SSELECT")
+	var word=remainingsortselectclause.field(L" ",1);
+	var word2=word.ucase();
+	if (word2==L"SELECT"||word2==L"SSELECT")
+	{
+		if (word2==L"SSELECT")
 			bykey=1;
 
 		//discard it and get the second word which is either max number of records or filename
@@ -1720,7 +1725,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		actualfilename=word;
 		dictfilename=word;
 
-    }
+	}
 
 	//optionally get filename from the current var
 	if (!actualfilename)
@@ -1731,20 +1736,20 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		dictfilename=*this;
 	}
 
-    while (remainingsortselectclause.length())
-    {
+	while (remainingsortselectclause.length())
+	{
 
-        var word1=getword(remainingsortselectclause);
+		var word1=getword(remainingsortselectclause);
 
-        //initial numbers or strings mean record keys
-        if (word1[1].index(L"\"'0123456789."))
-        {
-            if (keycodes)
-                keycodes ^= FM;
-            keycodes ^= word1;
-            continue;
+		//initial numbers or strings mean record keys
+		if (word1[1].index(L"\"'0123456789."))
+		{
+			if (keycodes)
+				keycodes ^= FM;
+			keycodes ^= word1;
+			continue;
 		}
-		else if (word1==L"USING")
+		else if (word1==L"using")
 		{
 			dictfilename=getword(remainingsortselectclause);
 			if (!dictfile.open(L"dict_"^dictfilename))
@@ -1755,51 +1760,51 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 #endif
 				return L"";
 			}
-        }
-        else if (word1==L"BY" || word1==L"BY-DSND")
-        {
-            if (orderclause)
-                orderclause^=L", ";
-            var dictexpression=getdictexpression(actualfilename,actualfilename,dictfilename,dictfile,getword(remainingsortselectclause),joins,true);
-            orderclause ^= dictexpression;
-            if (word1==L"BY-DSND")
-                orderclause^=L" DESC";
-        }
-//           else if (word1==L"BETWEEN")
-//           {
-//               var word2=getword(remainingsortselectclause);
-//               whereclause ^= word2;
-//           }
-		else if (word1==L"WITH")
+		}
+		else if (word1==L"by" || word1==L"by-dsnd")
+		{
+			if (orderclause)
+				orderclause^=L", ";
+			var dictexpression=getdictexpression(actualfilename,actualfilename,dictfilename,dictfile,getword(remainingsortselectclause),joins,true);
+			orderclause ^= dictexpression;
+			if (word1==L"by-dsnd")
+				orderclause^=L" DESC";
+		}
+//		   else if (word1==L"between")
+//		   {
+//			   var word2=getword(remainingsortselectclause);
+//			   whereclause ^= word2;
+//		   }
+		else if (word1==L"with")
 		{
 
 			//add the dictionary id
-            var word2=getword(remainingsortselectclause);
+			var word2=getword(remainingsortselectclause);
 			var dictexpression=getdictexpression(actualfilename,actualfilename,dictfilename,dictfile,word2,joins,true);
 			var usingnaturalorder=dictexpression.index(L"exodus_extract_sort");
-            whereclause ^= L" " ^ dictexpression;
+			whereclause ^= L" " ^ dictexpression;
 
 			//handle STARTING, ENDING and CONTAINING
-            word2=getword(remainingsortselectclause);
+			word2=getword(remainingsortselectclause);
 			var startingpercent=L"";
 			var endingpercent=L"";
-			if (word2==L"CONTAINING")
+			if (word2==L"containing")
 			{
-				word2=L"LIKE";
+				word2=L"like";
 				startingpercent=L"%";
 				endingpercent=L"%";
 			}
-			else if (word2==L"STARTING")
+			else if (word2==L"starting")
 			{
-				word2=L"LIKE";
+				word2=L"like";
 				endingpercent=L"%";
 			}
-			else if (word2==L"ENDING")
+			else if (word2==L"ending")
 			{
-				word2=L"LIKE";
+				word2=L"like";
 				startingpercent=L"%";
 			}
-			if (word2==L"LIKE")
+			if (word2==L"like")
 			{
 
 				var word2=getword(remainingsortselectclause);
@@ -1819,15 +1824,15 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 				continue;
 			}
 
-            //convert neosys relational operators to standard relational operators
-	        var aliasno;
-		    if (var(L"EQ,NE,NOT,GT,LT,GE,LE").locateusing(word2,L",",aliasno))
+			//convert neosys relational operators to standard relational operators
+			var aliasno;
+			if (var(L"eq,ne,not,gt,lt,ge,le").locateusing(word2,L",",aliasno))
 			{
 				word2=var(L"=,<>,<>,>,<,>=,<=").field(L",",aliasno);
 			}
 
 			//output relational operators and get the value
-		    if (var(L"=,<>,>,<,>=,<=").locateusing(word2,L",",aliasno))
+			if (var(L"=,<>,>,<,>=,<=").locateusing(word2,L",",aliasno))
 			{
 				whereclause ^= L" " ^ word2 ^ L" ";
 				word2=getword(remainingsortselectclause);
@@ -1839,21 +1844,21 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 					whereclause ^= L" = ";
 			}
 
-			if (word2==L"BETWEEN")
+			if (word2==L"between")
 			{
 				//get and append "from" value
-                word2=getword(remainingsortselectclause);
+				word2=getword(remainingsortselectclause);
 				if (usingnaturalorder)
 					word2=naturalorder(word2.toString());
 				whereclause ^= L" BETWEEN " ^ word2;
 
 				//get, check, discard AND
 				word2=getword(remainingsortselectclause);
-				if (word2 != L"AND")
+				if (word2 != L"and")
 				{
-					//throw MVDBException(L"SELECT STATEMENT SYNTAX IS 'BETWEEN x *AND* y'");
-#if TRACING >= 1
-					exodus::errputl(L"ERROR: mvdbpostgres SELECT STATEMENT SYNTAX IS 'BETWEEN x *AND* y'");
+					//throw MVDBException(L"SELECT STATEMENT SYNTAX IS 'between x *and* y'");
+#if TRACING
+					exodus::errputl(L"ERROR: mvdbpostgres SELECT STATEMENT SYNTAX IS 'between x *and* y'");
 #endif
 					return L"";
 				}
@@ -1876,7 +1881,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 			}
 
 			//convert to IN clause if multiple values
-            else if (word2.index(FM))
+			else if (word2.index(FM))
 			{
 
 				//prevent  " = IN ( ... )"
@@ -1889,40 +1894,40 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 			//append value(s)
 			if (usingnaturalorder)
 				word2=naturalorder(word2.toString());
-            whereclause ^= word2;
+			whereclause ^= word2;
 
-        }
-        else
-        {
+		}
+		else
+		{
 			//todo exclude any ordinary fields included in select?
 
 			//and or ( ) and anything else is copied to the where clause
-            whereclause ^= L" " ^ word1;
-        }
-    }//getword loop
+			whereclause ^= L" " ^ word1;
+		}
+	}//getword loop
 
-    if (keycodes)
-    {
-        if (keycodes.count(FM))
-        {
-            keycodes=L"key IN ( " ^ keycodes.swap(FM,L", ") ^ L" )";
-            if (whereclause)
-                whereclause=L" AND ( " ^ whereclause ^ L" ) ";
-            whereclause=keycodes ^ whereclause;
-        }
-    }
+	if (keycodes)
+	{
+		if (keycodes.count(FM))
+		{
+			keycodes=L"key IN ( " ^ keycodes.swap(FM,L", ") ^ L" )";
+			if (whereclause)
+				whereclause=L" AND ( " ^ whereclause ^ L" ) ";
+			whereclause=keycodes ^ whereclause;
+		}
+	}
 
 	//sselect add by key on the end of any specific order bys
 	if (bykey)
 	{
 		if (orderclause)
-                    orderclause^=L", ";
+			orderclause^=L", ";
 		orderclause^=L"key";
 	}
 
 	//assemble the full sql select statement:	//ALN:TODO: optimize with stringbuffer
-    var sql=L"DECLARE CURSOR1_" ^ (*this) ^ L" CURSOR FOR SELECT " ^ actualfieldnames ^ L" FROM ";
-    sql ^= PGDATAFILEPREFIX ^ actualfilename;
+	var sql=L"DECLARE CURSOR1_" ^ (*this) ^ L" CURSOR FOR SELECT " ^ actualfieldnames ^ L" FROM ";
+	sql ^= PGDATAFILEPREFIX ^ actualfilename;
 	if (joins)
 		sql ^= L" " ^ joins.swap(VM,L" ");
 	if (whereclause)
@@ -1962,8 +1967,8 @@ void var::clearselect() const
 	THISIS(L"void var::clearselect() const")
 	THISISSTRING()
 
-    var sql=L"CLOSE CURSOR1_";
-    if (var_mvtyp)
+	var sql=L"CLOSE CURSOR1_";
+	if (var_mvtyp)
 		sql ^= *this;
 
 	if (! sqlexec(sql))
@@ -2069,19 +2074,19 @@ bool var::readnext(var& key, var& valueno) const
 
 /*how to access multiple records and fields*/
 #if 0
-    /* first, print out the attribute names */
-    int nFields = PQnfields(result);
-    for (i = 0; i < nFields; i++)
-        wprintf(L"%-15s", PQfname(result, i));
-    wprintf(L"\n\n");
+	/* first, print out the attribute names */
+	int nFields = PQnfields(result);
+	for (i = 0; i < nFields; i++)
+		wprintf(L"%-15s", PQfname(result, i));
+	wprintf(L"\n\n");
 
-    /* next, print out the rows */
-    for (i = 0; i < PQntuples(result); i++)
-    {
-        for (j = 0; j < nFields; j++)
-            wprintf(L"%-15s", PQgetvalue(result, i, j));
-        wprintf(L"\n");
-    }
+	/* next, print out the rows */
+	for (i = 0; i < PQntuples(result); i++)
+	{
+		for (j = 0; j < nFields; j++)
+			wprintf(L"%-15s", PQgetvalue(result, i, j));
+		wprintf(L"\n");
+	}
 #endif
 
 }
@@ -2179,12 +2184,12 @@ bool var::deleteindex(const var& fieldname) const
 /*
 http://www.petefreitag.com/item/666.cfm
 information_schema is am SQL-92 standard for accessinging information about the tables etc in a database
-    * Microsoft SQL Server - Supported in Version 7 and up
-    * MySQL - Supported in Version 5 and up
-    * PostgreSQL - Supported in Version 7.4 and up
+	* Microsoft SQL Server - Supported in Version 7 and up
+	* MySQL - Supported in Version 5 and up
+	* PostgreSQL - Supported in Version 7.4 and up
 
-    * Oracle - Does not appear to be supported
-    * Apache Derby - NOT Supported As of Version 10.3
+	* Oracle - Does not appear to be supported
+	* Apache Derby - NOT Supported As of Version 10.3
 	* DB2 - NOT supported?
 */
 
@@ -2294,21 +2299,21 @@ static bool pqexec(const var& sql, PGresultptr& pgresult, PGconn * thread_pgconn
 	*/
 
 	//no parameters
-    const char* paramValues[1];
-    int         paramLengths[1];
-    int         paramFormats[1];
+	const char* paramValues[1];
+	int		 paramLengths[1];
+	int		 paramFormats[1];
 
-    //PGresult*
+	//PGresult*
 	//will contain any result IF successful
 	//MUST do PQclear(local_result) after using it;
 	PGresult* local_result = PQexecParams(thread_pgconn,
 		sql.toString().c_str(),
-		0,       /* zero params */
-		NULL,    /* let the backend deduce param type */
+		0,	   /* zero params */
+		NULL,	/* let the backend deduce param type */
 		paramValues,
 		paramLengths,
 		paramFormats,
-		1);      /* ask for binary results */
+		1);	  /* ask for binary results */
 
 	pgresult=local_result;
 	if (!local_result) {
