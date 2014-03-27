@@ -16,7 +16,7 @@ function security2(in mode, in op0)
 //	win.valid = 1;
 	var op=op0.convert(L"_.", L"  ");
 	var op2 = L"";
-	if (op.substr(-1, 1) == DQ) {
+	if (op[-1] == DQ) {
 //		op2 = (op.substr(-2, L"B\"")).quote();
 		op2=op.field2(DQ,-2);
 		op.splicer(-op2.length(), op2.length(), L"");

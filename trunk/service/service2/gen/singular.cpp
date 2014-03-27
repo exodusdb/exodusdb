@@ -29,7 +29,7 @@ function main(in pluralnoun) {
 
 	}else{
 
-		if (temp2.substr(-1, 1) == "S") {
+		if (temp2[-1] == "S") {
 			//ANALYSIS, DOS
 			if (temp2.substr(-2, 2) ne "IS" and temp2.substr(-2, 2) ne "OS") {
 				temp.splicer(-1, 1, "");

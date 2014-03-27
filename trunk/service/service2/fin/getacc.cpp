@@ -281,7 +281,7 @@ nextbatch:
 		if (suffix) {
 			question ^= "(Unposted batches)";
 		}
-		if (selection.substr(-1, 1) == FM) {
+		if (selection[-1] == FM) {
 			selection.splicer(-1, 1, "");
 		}
 
@@ -611,7 +611,7 @@ badledger:
 				}
 			}
 
-			if (ledgercode.substr(1, 1) == "%") {
+			if (ledgercode[1] == "%") {
 				continue;
 			}
 			//remove ledgers not allowed access to
@@ -629,7 +629,7 @@ badledger:
 				//remove ledgers of the wrong type
 				//(if the ledger type is in brackets is means all EXCEPT that ledger type)
 				if (reqledgertype ne "*") {
-					if (reqledgertype.substr(1, 1) == "(") {
+					if (reqledgertype[1] == "(") {
 						if (reqledgertype == ("(" ^ ledgertype ^ ")")) {
 							continue;
 						}
@@ -851,7 +851,7 @@ selchart:
 	}//loop;
 	while (true) {
 	///BREAK;
-	if (not(listofaccs.substr(1, 1) == VM)) break;;
+	if (not(listofaccs[1] == VM)) break;;
 		listofaccs.splicer(1, 1, "");
 	}//loop;
 
@@ -952,7 +952,7 @@ function nosuitable(in mode, in acctype, out msg) {
 	}
 	//CONVERT @LOWER.CASE TO @UPPER.CASE IN TEMP
 	temp.lcaser();
-	if (temp.substr(-1, 1) ne "s") {
+	if (temp[-1] ne "s") {
 		temp ^= "s";
 	}
 	msg ^= " " ^ temp;

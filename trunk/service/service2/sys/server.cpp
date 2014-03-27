@@ -311,7 +311,7 @@ SYSTEM="";
 	if (!webpath)
 		webpath = "../data/";
 	webpath.converter("/\\",SLASH ^ SLASH);
-	if (webpath.substr(-1, 1) ne SLASH)
+	if (webpath[-1] ne SLASH)
 		webpath ^= SLASH;
 	if (!md.open("MD")) {
 		mssg("CANNOT OPEN MD FILE");
@@ -539,7 +539,7 @@ function serviceloop()
 {
 
 	//delete old response files every 10 requests or service loop
-	if (nrequests.substr(-1, 1) == "0")
+	if (nrequests[-1] == "0")
 		gosub deleteoldfiles(inpath,".*\\.4$");
 
 	//if tracing then
@@ -661,7 +661,7 @@ stopper:
 	{
 
 		//charx.input(-1, 2);
-		charx = charx.substr(1, 1).ucase();
+		charx = charx[1].ucase();
 
 		//esc
 		if (charx == mv.INTCONST.a(1)) {
@@ -813,7 +813,7 @@ readlink1:
 //printl("processlink:read request ok");
 
 		//hack to remove UTF16 BOM mark
-		if (USER0.substr(1,1)=="\uFEFF")
+		if (USER0[1]=="\uFEFF")
 			USER0.splicer(1,1,"");
 
 		//cleanup the input request
@@ -1022,7 +1022,7 @@ function processrequest()
 
 	if (request2 == "JOURNALS") {
 		request2 = "BATCHES";
-		if (request3.count("*") == 3 && request3.substr(-1, 1) == "*")
+		if (request3.count("*") == 3 && request3[-1] == "*")
 			request3.splicer(-1, 1, "");
 	}
 
@@ -1086,7 +1086,7 @@ function processrequest()
 		mv.osbreadx(USER1, linkfilename2, linkfilename2, offset, maxstringsize);
 
 		//hack to remove UTF16 BOM mark
-		if (USER1.substr(1,1)=="\uFEFF")
+		if (USER1[1]=="\uFEFF")
 			USER1.splicer(1,1,"");
 */
 		USER1.osread(linkfilename2, "utf8");
@@ -1138,7 +1138,7 @@ function processrequest()
 	}
 */
 	//update security table every few secs and every login
-	if (request1 == "LOGIN" || var("036").index(var().time()).substr(-1, 1))
+	if (request1 == "LOGIN" || var("036").index(var().time())[-1])
 		gosub getsecurity();
 
 	//validate username and password (like login)
@@ -1277,7 +1277,7 @@ subroutine validate()
 			}
 
 			//convert wildcards
-			if (connections.substr(-1, 1) != " ") {
+			if (connections[-1] != " ") {
 
 				connections.converter(",; ", SVM ^ SVM ^ SVM);
 				int nn = connections.dcount(SVM);
@@ -1687,7 +1687,7 @@ subroutine process()
 		}
 
 		var autokey = 0;
-		if (keyx == "" || keyx.substr(1, 1) == "*" || keyx.substr(-1, 1) == "*" || keyx.index("**", 1)) {
+		if (keyx == "" || keyx[1] == "*" || keyx[-1] == "*" || keyx.index("**", 1)) {
 
 			//must provide a key unless locking
 			if (!withlock) {
@@ -2446,7 +2446,7 @@ subroutine formatresponse()
 	//cannot remove since these may be proper codepage letters
 	USER3.converter("|", FM);
 	USER3.converter(VM, FM);
-	if (USER3.substr(1, 1) == FM)
+	if (USER3[1] == FM)
 		USER3.splicer(1, 1, "");
 	USER3.swapper(FM, var().chr(13) ^ var().chr(10));
 
@@ -3023,14 +3023,14 @@ subroutine getindexvalues()
 
 	collectixvals(filename, fieldname, prefix);
 	mv.PSEUDO.transfer(USER1);
-	if (USER1.substr(1, 1) == FM)
+	if (USER1[1] == FM)
 		USER1.splicer(1, 1, "");
 	USER3 = "OK";
 
 	if (sortby && USER1) {
 		USER1.convert(FM, mv.RM);
 		USER1 ^= mv.RM;
-		v119("S", "", sortby.substr(1, 1), sortby.substr(2, 1), USER1, flag);
+		v119("S", "", sortby[1], sortby[2], USER1, flag);
 		USER1.convert(mv.RM, FM);
 		USER1.splicer(-1, 1, "");
 	}

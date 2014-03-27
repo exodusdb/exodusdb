@@ -494,7 +494,7 @@ updateversion:
 	tt = SYSTEM.a(49);
 	if (tt == "") {
 		tt="..\\images\\";
-	} else if (tt.substr(-1, 1) ne SLASH) {
+	} else if (tt[-1] ne SLASH) {
 		tt ^= SLASH;
 	}
 	SYSTEM.r(49, tt).convert("\\/", SLASH^SLASH);
@@ -551,7 +551,7 @@ updateversion:
 	var nn = locations.count(VM) + 1;
 	for (var ii = 1; ii <= nn; ++ii) {
 		var location = locations.a(1, ii);
-		if (location.substr(-1, 1) ne "\\") {
+		if (location[-1] ne "\\") {
 			location ^= "\\";
 		}
 		tt = var().oslistf(location ^ "*.*");

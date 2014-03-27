@@ -139,7 +139,7 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 	//check/get dict recs
 
 	if (dictids not_eq L"RECORD") {
-		while (dictids.substr(-1, 1) == FM) {
+		while (dictids[-1] == FM) {
 			dictids.splicer(-1, 1, L"");
 		}
 		if (dictids == L"")
@@ -235,7 +235,7 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 nextrecord:
 	if (filename.readnext(ID,MV)) {
 
-		if (ID.substr(1,1) eq "%") {
+		if (ID[1] eq "%") {
 			goto nextrecord;
 		}
 //printl("select2 "^ID);
@@ -327,7 +327,7 @@ id:
 						goto id;
 					}
 
-					var vn=dictrecs.a(dictidn,4).substr(1,1)==L"M";
+					var vn=dictrecs.a(dictidn,4)[1]==L"M";
 					if (vn) {
 						vn=MV;
 					} else {

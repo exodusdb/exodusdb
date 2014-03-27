@@ -345,7 +345,7 @@ defversion:
 		if (maxminutes == "") {
 			//locate reqmedium in 'TV,T,SAT,S,RAD,R'<1> using ',' setting x then
 			//tv satellite radio newspaper (daily)
-			if (var("TSR").index(reqmedium.substr(1, 1), 1)) {
+			if (var("TSR").index(reqmedium[1], 1)) {
 
 				//global default to 15 minutes for radio, 30 mins for TV and Satellite
 				maxminutes = reqmedium.xlate("JOB_TYPES", 8, "X");

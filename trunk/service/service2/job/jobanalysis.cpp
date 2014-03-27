@@ -20,7 +20,7 @@ function main(in mode0) {
 	//updates fn 17-25
 	if (false) print(mode0);
 
-	basefmtx = "MD" ^ USER2.substr(3, 1) ^ "0P";
+	basefmtx = "MD" ^ USER2[3] ^ "0P";
 
 	mode = "COST";
 	var costs = "";

@@ -30,7 +30,7 @@ function main(in task0, out msg, in defaultlock="", in username0="") {
 
 	//if username='NEOSYS' or username='STEVE' then call msg(task:'');
 
-	if (task.substr(1, 1) == " ") {
+	if (task[1] == " ") {
 		call mssg(DQ ^ (task0 ^ DQ));
 	}
 	//Each task may have many "locks", each users may have many "keys"
@@ -55,16 +55,16 @@ function main(in task0, out msg, in defaultlock="", in username0="") {
 		return 1;
 	}
 
-	var noadd = task.substr(1, 1) == "!";
+	var noadd = task[1] == "!";
 	if (noadd) {
 		task.splicer(1, 1, "");
 	}
 	//if noadd else NOADD=((TASK[-1,1]='"') and (len(userprivs)<10000))
 	if (not noadd) {
 		var lenuserprivs = SECURITY.length();
-		noadd = task.substr(-1, 1) == DQ or lenuserprivs > 48000;
+		noadd = task[-1] == DQ or lenuserprivs > 48000;
 	}
-	var positive = task.substr(1, 1);
+	var positive = task[1];
 	if (positive == "#")
 		task.splicer(1, 1, "");
 	else
@@ -73,7 +73,7 @@ function main(in task0, out msg, in defaultlock="", in username0="") {
 	//? as first character of task (after positive) means
 	//security is being used as a configuration and user neosys has no special privs
 	var isneosys;
-	if (task.substr(1, 1) == "?") {
+	if (task[1] == "?") {
 		isneosys = 0;
 		task.splicer(1, 1, "");
 	} else

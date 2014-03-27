@@ -38,7 +38,7 @@ function main(in mode, in previous=var("")) {
 	var starttime=time();
 	while ((time()-starttime)<99 and not(lockrecord("", keyfile, seqkey))) {
 		var temp = keyfilename;
-		if (temp.substr(-1, 1) == "S") {
+		if (temp[-1] == "S") {
 			temp.splicer(1, 1, "");
 		}
 		if (not buffer) {

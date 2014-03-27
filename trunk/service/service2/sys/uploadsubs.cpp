@@ -133,7 +133,7 @@ postuploadfail:
 		//convert '"' to "'" in uploadpath
 
 		//if doesnt terminate with a \ then assume that the last bit is filename
-		if (uploadpath.substr(-1, 1) ne "\\") {
+		if (uploadpath[-1] ne "\\") {
 			uploadpath = uploadpath.field("\\", 1, uploadpath.count("\\")) ^ "\\";
 		}
 
@@ -579,7 +579,7 @@ subroutine getline() {
 
 	//ignore lf (should only be after cr)
 	if (anycr) {
-		if (line.substr(1, 1) == "\n") {
+		if (line[1] == "\n") {
 			line.splicer(1, 1, "");
 			fileoffset += 1;
 		}

@@ -651,7 +651,7 @@ function opendatafile() {
 	if (temp.substr(-3, 3) == "IES") {
 		temp.splicer(-3, 3, "Y");
 	}
-	if (temp.substr(-1, 1) == "S") {
+	if (temp[-1] == "S") {
 		temp.splicer(-1, 1, "");
 	}
 	if (not(authorised(temp ^ " ACCESS", USER4, ""))) {

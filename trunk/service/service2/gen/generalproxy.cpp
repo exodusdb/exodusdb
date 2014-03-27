@@ -581,7 +581,7 @@ badsetcodepage:
 			//data=@pseudo
 			//override the saved period with a current period
 			var runtimeperiod = ((var().date()).oconv("D2/E")).substr(4, 5);
-			if (runtimeperiod.substr(1, 1) == "0") {
+			if (runtimeperiod[1] == "0") {
 				runtimeperiod.splicer(1, 1, "");
 			}
 			USER1.swapper("{RUNTIME_PERIOD}", runtimeperiod);
@@ -710,7 +710,7 @@ function opendatafile() {
 	if (temp.substr(-3, 3) == "IES") {
 		temp.splicer(-3, 3, "Y");
 	}
-	if (temp.substr(-1, 1) == "S") {
+	if (temp[-1] == "S") {
 		temp.splicer(-1, 1, "");
 	}
 	if (not(authorised(temp ^ " ACCESS", USER4, ""))) {

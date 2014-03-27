@@ -505,7 +505,7 @@ subroutine defexchrate() {
 		if (tt.a(1, 1) == "") {
 			while (true) {
 			///BREAK;
-			if (not(tt.substr(1, 1) == VM)) break;;
+			if (not(tt[1] == VM)) break;;
 				tt.splicer(1, 1, "");
 			}//loop;
 			if (tt.a(1, 1)) {
@@ -1319,7 +1319,7 @@ errexit:
 
 		//multitype
 		analperiod = (accountingdate.oconv("D2/E")).substr(4, 5);
-		if (analperiod.substr(1, 1) == "0") {
+		if (analperiod[1] == "0") {
 			analperiod.splicer(1, 1, "");
 		}
 		gosub lockandaccumulateanalysis();

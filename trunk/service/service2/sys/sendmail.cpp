@@ -214,7 +214,7 @@ forcedemail:
 	//body=body0
 
 	//if index(body,' ',1) or len(body)>10 or index(body,\0D\,1) or index(body,\0A\,1) then
-	if (body and body.substr(1, 1) ne "@") {
+	if (body and body[1] ne "@") {
 		bodyfilename = "$" ^ (var("999999999999").rnd()).substr(1, 7) ^ ".TXT";
 		//solve stupid outlook joining lines together if > 40 chars
 		//by adding tab on the end of every line

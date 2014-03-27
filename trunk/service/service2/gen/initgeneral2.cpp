@@ -32,7 +32,7 @@ function main(in mode, io logtime) {
 
 		//remove any trailing . from 10. etc which is valid syntax for hosts.allow
 		hosts.swapper("." ^ SVM, SVM);
-		if (hosts.substr(-1, 1) == ".") {
+		if (hosts[-1] == ".") {
 			hosts.splicer(-1, 1, "");
 		}
 
@@ -101,7 +101,7 @@ function main(in mode, io logtime) {
 				if (tt2.index(".HTM", 1)) {
 					tt.splicer(-tt2.length(), tt2.length(), "");
 				}
-				if (not(var("\\/").index(tt.substr(-1, 1), 1))) {
+				if (not(var("\\/").index(tt[-1], 1))) {
 					tt ^= "/";
 				}
 				baselinks.r(1, linkn, tt);
