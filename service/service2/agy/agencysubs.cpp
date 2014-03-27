@@ -405,7 +405,7 @@ getolderjobdate:
 		//if no pattern then allow own patterns like X99999
 		//if they enter a single letter
 		if ((keyformat == "" or keyformat == "<NUMBER>") and ID.match("1A\"*\"")) {
-			keyformat = ID.substr(1, 1) ^ "%<>";
+			keyformat = ID[1] ^ "%<>";
 		}
 
 		if (not(keyformat.index("<", 1))) {
@@ -594,7 +594,7 @@ novehiclecodes:
 
 			var nn = vehiclecodes.count(FM) + 1;
 			for (var ii = 1; ii <= nn; ++ii) {
-				if (ii.substr(-1, 1) == "0") {
+				if (ii[-1] == "0") {
 					call giveway("");
 				}
 				ID = vehiclecodes.a(ii);
@@ -772,7 +772,7 @@ L3355:
 				if (type.length() == 1) {
 					var nsuppliers = suppliercodes.count(FM) + 1;
 					for (var suppliern = 1; suppliern <= nsuppliers; ++suppliern) {
-						if (suppliern.substr(-1, 1) == "0") {
+						if (suppliern[-1] == "0") {
 							call giveway("");
 						}
 						if (not(supplier.read(agy.suppliers, suppliercodes.a(suppliern)))) {
@@ -823,7 +823,7 @@ L3355:
 		}
 
 		//check right type of supplier
-		type = (mode.field(".", 3)).substr(1, 1);
+		type = (mode.field(".", 3))[1];
 		if (type == "N") {
 			type = "P";
 		} else if (type == "1") {
@@ -1015,7 +1015,7 @@ selectsupplier:
 			return 0;
 		}
 		win.isdflt = (var().date()).oconv("D2/E").field("/", 2, 2);
-		if (win.isdflt.substr(1, 1) == "0") {
+		if (win.isdflt[1] == "0") {
 			win.isdflt.splicer(1, 1, "");
 		}
 
@@ -1030,7 +1030,7 @@ selectsupplier:
 		}
 
 		//trim leading zeroes
-		if (win.is.substr(1, 1) == "0") {
+		if (win.is[1] == "0") {
 			win.is.splicer(1, 1, "");
 		}
 
@@ -1182,7 +1182,7 @@ subroutine getmode3() {
 		if (mode3 == "N" or mode3 == 3) {
 			mode3 = "PRODUCTION";
 		}
-		type = mode3.substr(1, 1);
+		type = mode3[1];
 		mode = mode.fieldstore(".", 3, 1, mode3);
 
 getmode3exit:
@@ -1247,7 +1247,7 @@ subroutine findbrand() {
 		lists.deleterecord(temp);
 		//call note(temp)
 
-		if ((mode.field(",", 1)).substr(-1, 1) == "S") {
+		if ((mode.field(",", 1))[-1] == "S") {
 			temp = "S";
 		}else{
 			temp = "";
@@ -1307,7 +1307,7 @@ subroutine findclient() {
 		}
 		call makelist("", clientcodes, "", "");
 
-		if ((mode.field(",", 1)).substr(-1, 1) == "S") {
+		if ((mode.field(",", 1))[-1] == "S") {
 			temp = "S";
 		}else{
 			temp = "";

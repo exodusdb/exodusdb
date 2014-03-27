@@ -275,7 +275,7 @@ lockit:
 				if (rate.substr(1, 2) == "1/") {
 					rate = 1 / rate.substr(3, 999);
 				}
-				if (rate.substr(1, 1) == "/") {
+				if (rate[1] == "/") {
 					rate = 1 / rate.substr(2, 999);
 				}
 				if (not rate.isnum()) {

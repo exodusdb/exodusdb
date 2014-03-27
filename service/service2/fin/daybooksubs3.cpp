@@ -136,7 +136,7 @@ function main(in mode) {
 
 	//force prefix into @ID
 	if (suffix) {
-		ID = ID.fieldstore("*", 4, 1, suffix.substr(2, 1));
+		ID = ID.fieldstore("*", 4, 1, suffix[2]);
 	}
 
 	DATA ^= "" "\r";
@@ -159,14 +159,14 @@ valbatchref:
 		}
 
 		//query by voucher number
-		if (win.is.substr(1, 1) == "V") {
+		if (win.is[1] == "V") {
 			if (not(win.is.readv(fin.vouchers, ID.field("*", 2) ^ "*" ^ win.is.substr(2, 99) ^ "*" ^ fin.currcompany, 12))) {
 				{}
 			}
 		}
 
 		suffix = "";
-		if (var(".U").index(win.is.substr(1, 1), 1)) {
+		if (var(".U").index(win.is[1], 1)) {
 			suffix = "*U";
 			win.is.splicer(1, 1, "");
 		}
@@ -218,7 +218,7 @@ valbatchref:
 		}
 
 		//no leading zero
-		if (win.is.substr(1, 1) == "0") {
+		if (win.is[1] == "0") {
 			win.is.splicer(1, 1, "");
 		}
 

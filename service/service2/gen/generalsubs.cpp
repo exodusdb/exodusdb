@@ -116,7 +116,7 @@ f2dataset:
 		}
 
 	} else if (mode == "VAL.EXCH.RATE") {
-		if (win.is.substr(1, 2) == "1/" or win.is.substr(1, 1) == "/") {
+		if (win.is.substr(1, 2) == "1/" or win.is[1] == "/") {
 			tt = win.is.field("/", 2);
 			if (tt and tt.isnum()) {
 				win.is = ((1 / win.is.substr(3, 99)).oconv("MD90P")) + 0;
@@ -375,7 +375,7 @@ subroutine getdatasets() {
 		}
 	}
 
-	var nodata = (directory.field("\r", 1)).substr(-1, 1) == " ";
+	var nodata = (directory.field("\r", 1))[-1] == " ";
 	//call msg(nodata:' ')
 	//convert dos text to revelation format and standardise
 	directory.ucaser();

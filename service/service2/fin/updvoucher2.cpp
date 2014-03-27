@@ -96,7 +96,7 @@ function main(io mode, io voucher, io vouchercode, io allocs, in username0="") {
 		if (var("JO,OB,TR,RV").locateusing(internalvouchertype, ",", xx)) {
 			vtypereverse = 0;
 		}else{
-			vtypereverse = var("D+").index(fin.definition.a(4, temp).substr(1, 1));
+			vtypereverse = var("D+").index(fin.definition.a(4, temp)[1]);
 			if (not vtypereverse) {
 				vtypereverse = internalvouchertype == "PI";
 			}
@@ -395,7 +395,7 @@ subroutine postdirect(io mode, io voucher, io vouchercode, io allocs) {
 				//convert voucher number to special format
 				//- if digits only then they are converted char(239+nchars) plus hex
 				var convvoucherno = vouchercode.field("*", 2);
-				if (convvoucherno.substr(1, 1) ne "0") {
+				if (convvoucherno[1] ne "0") {
 					temp = convvoucherno;
 					temp.converter("0123456789", "");
 					if (not temp) {
@@ -756,7 +756,7 @@ newbatch:
 				var nn = allocamounts.count(SVM) + 1;
 				for (var ii = 1; ii <= nn; ++ii) {
 					var allocamount = allocamounts.a(1, 1, ii);
-					if (allocamount.substr(1, 1) == "-") {
+					if (allocamount[1] == "-") {
 						allocamount.splicer(1, 1, "");
 					}else{
 						if (allocamount) {
@@ -882,7 +882,7 @@ subroutine reverse2(io amount) {
 	for (var subln = 1; subln <= nsublns; ++subln) {
 		var subamount = amount.a(1, 1, subln);
 		if (subamount) {
-			if (subamount.substr(1, 1) == "-") {
+			if (subamount[1] == "-") {
 				subamount.splicer(1, 1, "");
 			}else{
 				subamount.splicer(1, 0, "-");

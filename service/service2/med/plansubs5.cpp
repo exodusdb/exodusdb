@@ -161,7 +161,7 @@ cantmove:
 
 				//save pointer as copied pointer
 				//retain filename, key and lnid
-				var temp = win.datafile.substr(1, 1) ^ "~" ^ lnid;
+				var temp = win.datafile[1] ^ "~" ^ lnid;
 				temp.converter(":", "~");
 				RECORD.r(160, ln, temp);
 
@@ -509,7 +509,7 @@ lockit:
 			return 0;
 		}
 		win.isdflt = (var().date()).oconv("D2/E").field("/", 2, 2);
-		if (win.isdflt.substr(1, 1) == "0") {
+		if (win.isdflt[1] == "0") {
 			win.isdflt.splicer(1, 1, "");
 		}
 
@@ -544,7 +544,7 @@ lockit:
 		}
 
 		//trim leading zeroes
-		if (win.is.substr(1, 1) == "0") {
+		if (win.is[1] == "0") {
 			win.is.splicer(1, 1, "");
 		}
 

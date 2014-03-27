@@ -7,7 +7,7 @@ function main(in input0, out unitx ) {
 
 	inputx.converter(" ", "");
 	var temp = inputx;
-	var char1 = temp.substr(1, 1);
+	var char1 = temp[1];
 	if (char1 == "-") {
 		temp.splicer(1, 1, "");
 	}

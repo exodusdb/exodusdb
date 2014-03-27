@@ -275,7 +275,7 @@ unlocksecurity:
 		win.srcfile.select();
 
 		while (win.srcfile.readnext(ID)) {
-			if (not(ID.substr(1, 1) == "%")) {
+			if (not(ID[1] == "%")) {
 				if (RECORD.read(users, ID)) {
 					gosub updatemirror();
 				}

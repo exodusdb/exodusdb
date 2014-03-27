@@ -46,7 +46,7 @@ function main(in addaccmode, in jobno, io msg) {
 	params.r(4, jobx.a(14));
 
 	var accno = jobno;
-	if ((accno.substr(1, 1)).isnum()) {
+	if ((accno[1]).isnum()) {
 		accno.splicer(1, 0, "JOB");
 	}
 

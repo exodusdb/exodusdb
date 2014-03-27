@@ -88,7 +88,7 @@ chkacc:
 	}else{
 
 		//prevent leading '.'
-		if (isaccno.substr(1, 1) == ".") {
+		if (isaccno[1] == ".") {
 			goto badacc;
 		}
 
@@ -128,7 +128,7 @@ badacc:
 				var acclist = "";
 				var storedict = DICT;
 				if (DICT.open("DICT", "ACCOUNTS")) {
-					plussign = isaccno.substr(-1, 1) == "+";
+					plussign = isaccno[-1] == "+";
 					if (plussign) {
 						isaccno.splicer(-1, 1, "");
 					}
@@ -171,7 +171,7 @@ badacc:
 								goto nextaccno;
 							}
 						}
-						if (accno.substr(1, 1) ne ".") {
+						if (accno[1] ne ".") {
 							if (not(acclist2.locateby(accno, "AL", posn))) {
 
 								//skip wrong ledgers
@@ -364,7 +364,7 @@ nextacc:
 							if (not(ledgername.readv(fin.ledgers, acc.a(2), 1))) {
 								ledgername = "";
 							}
-							if (accno.substr(1, 1) == ".") {
+							if (accno[1] == ".") {
 								accno2 = accno.substr(2, 99);
 							}else{
 								accno2 = acc.a(10);

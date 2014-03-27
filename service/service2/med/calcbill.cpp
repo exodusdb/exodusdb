@@ -93,7 +93,7 @@ function main(io grossbill, in size, in extrasx, in unused, io msg, in roundingx
 			var extra = extras.field(",", extran).trim().field(" ", 1);
 
 			//commas indicate breaks but slashes within commas are converted to commas
-			if (extra.substr(1, 1) == 0x1B) {
+			if (extra[1] == 0x1B) {
 				extra.splicer(1, 1, "");
 				breakn += 1;
 			}
@@ -101,7 +101,7 @@ function main(io grossbill, in size, in extrasx, in unused, io msg, in roundingx
 			//various types of free ads
 			//t=extra[1,1]
 			//convert @lower.case to @upper.case in t
-			if ((extra.substr(1, 1)).match("1A")) {
+			if ((extra[1]).match("1A")) {
 				extra = "-100%";
 			}
 
@@ -112,7 +112,7 @@ function main(io grossbill, in size, in extrasx, in unused, io msg, in roundingx
 
 			//if extra<>'' then locate extra in 'FREE?free?Free?'<1> setting x then extra='-100%'
 			//if ucase(extra)='FREE' then extra='-100%'
-			if (extra.substr(1, 1) == "=") {
+			if (extra[1] == "=") {
 				if ((extra.substr(2, 9999)).isnum()) {
 					prevnetbill = netbill;
 					netbill = extra.substr(2, 9999);
@@ -123,7 +123,7 @@ function main(io grossbill, in size, in extrasx, in unused, io msg, in roundingx
 
 				origextra = extra;
 
-				if (extra.substr(1, 1) == "+") {
+				if (extra[1] == "+") {
 					extra.splicer(1, 1, "");
 				}
 
@@ -157,7 +157,7 @@ function main(io grossbill, in size, in extrasx, in unused, io msg, in roundingx
 					extra = extra.field(">", 1);
 				}
 
-				if (extra.substr(-1, 1) == "%") {
+				if (extra[-1] == "%") {
 					perc = 1;
 					extra.splicer(-1, 1, "");
 				}else{

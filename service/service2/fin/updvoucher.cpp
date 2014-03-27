@@ -465,7 +465,7 @@ newbatch:
 	//convert voucher number to special format
 	//- if digits only then they are converted char(239+nchars) plus hex
 	var convvoucherno = vouchercode.field("*", 2);
-	if (convvoucherno.substr(1, 1) ne "0") {
+	if (convvoucherno[1] ne "0") {
 		temp = convvoucherno;
 		temp.converter("0123456789", "");
 		if (not temp) {

@@ -328,7 +328,7 @@ subroutine getimagelocation() {
 	if (imagelocation == "") {
 		imagelocation = "..\\IMAGES\\";
 	}
-	if (imagelocation.substr(-1, 1) ne "\\") {
+	if (imagelocation[-1] ne "\\") {
 		imagelocation ^= "\\";
 	}
 	if (imagelocation.substr(1, 2) == "..") {

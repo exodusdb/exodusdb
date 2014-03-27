@@ -103,7 +103,7 @@ unlockrecord:
 				indexingrecord = "0";
 			}
 
-			if (not(indexinglist.substr(-1, 1) == FM)) {
+			if (not(indexinglist[-1] == FM)) {
 				indexinglist ^= FM;
 			}
 			indexingrecord ^= indexinglist;
