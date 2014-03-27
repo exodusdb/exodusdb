@@ -241,7 +241,7 @@ notallowed:
 }
 
 subroutine readuserprivs() {
-	if (not(SECURITY.read(DEFINITIONS, "SECURITY"))) {
+	if (not DEFINITIONS or not(SECURITY.read(DEFINITIONS, "SECURITY"))) {
 		SECURITY = "";
 	}
 	return;
@@ -249,7 +249,9 @@ subroutine readuserprivs() {
 
 subroutine writeuserprivs() {
 	SECURITY.r(9, "");
-	SECURITY.write(DEFINITIONS, "SECURITY");
+	if (DEFINITIONS) {
+		SECURITY.write(DEFINITIONS, "SECURITY");
+	}
 	return;
 }
 

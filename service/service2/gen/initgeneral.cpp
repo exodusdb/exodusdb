@@ -53,9 +53,12 @@ function main() {
 	call log2("-----initgeneral init", logtime);
 
 	//CREATE LABELLED COMMON
-	mv.labelledcommon[2]=new gen_common;
+		mv.labelledcommon[2]=new gen_common;
+	//TODO iscommon always true?!
 	if (not iscommon(gen)) {
-		var().stop("gen common is not initialised in " ^ thisname);
+		if (not iscommon(gen)) {
+			var().stop("gen common is not initialised in " ^ thisname);
+		}
 	}
 
 	//unfortunately general needs finance for now until some finance commons

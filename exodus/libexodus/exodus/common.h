@@ -18,7 +18,7 @@ classinit()
 
 #define commonexit() \
 classexit() \
-extern "C" DLL_PUBLIC void exodusprogrambasecreatedelete( \
+extern "C" DLL_PUBLIC void exodusprogrambasecreatedelete_( \
                         pExodusProgramBase& pexodusprogrambase, \
                         MvEnvironment& mv, \
 						pExodusProgramBaseMemberFunction& \

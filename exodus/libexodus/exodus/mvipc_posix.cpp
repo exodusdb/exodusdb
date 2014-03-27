@@ -28,7 +28,7 @@ using namespace std;
 #ifndef DEBUG
 #define TRACING 0
 #else
-#define TRACING 2
+#define TRACING 3
 #endif
 namespace exodus {
 
@@ -61,7 +61,7 @@ void respondToRequests(int sock, const std::string& socketpath, ExodusFunctorBas
 			std::cout << "mvipc: error " << errno << " " << strerror(errno) << " accepting socket " << socketpath << std::endl;
 			continue;
 		}
-
+/*
 		//log
 		#if TRACING >= 3
 			wprintf(L"---------------------------------\nMVipc: reading %d byte size from socket %d\n",sizeof(int),sock2);
@@ -97,9 +97,27 @@ void respondToRequests(int sock, const std::string& socketpath, ExodusFunctorBas
 		#if TRACING >= 3
 			wprintf(L"---------------------------------\nMVipc() read  %d more bytes from socket\n",nn);
 		#endif
+*/
 		
+		//log
+		#if TRACING >= 3
+			wprintf(L"---------------------------------\nMVipc: reading upto %d bytes from data socket\n",sizeof(chRequest));
+		#endif
+
+		int nn;
+		if ((nn=read(sock2,chRequest,sizeof(chRequest)))<0)
+		{
+			std::cout << "mvipc: error " << errno << " " << strerror(errno) << " reading data from socket " << socketpath << std::endl;
+			continue;
+		}
+
+		//log
+		#if TRACING >= 3
+			wprintf(L"---------------------------------\nMVipc() read  %d bytes from socket\n",nn);
+		#endif
+
 		//determine a response
-		getResponseToRequest(chRequest,request_size,0,response,exodusfunctorbase);
+		getResponseToRequest(chRequest,nn,0,response,exodusfunctorbase);
 
 		//send a response
 		if (write(sock2,response.data(),response.length())<0)

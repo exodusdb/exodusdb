@@ -425,8 +425,11 @@ function main()
                 }
                 //get file text
                 printl("sourcefilename:"^srcfilename);
-                if (not text and not text.osread(srcfilename)) {
-                        errputl(srcfilename^" doesnt exist or cant be read");
+                if (not text and not text.osread(srcfilename, "utf8")) {
+			if (osfile(srcfilename))
+                        	errputl(srcfilename^" Cant be read. (encoding issue? non-utf8/ascii characters?)");
+			else
+                        	errputl(srcfilename^" doesnt exist.");
                         continue;
                 }
 
@@ -586,7 +589,7 @@ var inclusion=
 "\r\n //first time link to the shared lib and create/cache an object from it"
 "\r\n //passing current standard variables in mv"
 "\r\n if (efb_funcx.pmemberfunction_==NULL)"
-"\r\n  efb_funcx.init(\"funcx\",\"exodusprogrambasecreatedelete\",mv);"
+"\r\n  efb_funcx.init(\"funcx\",\"exodusprogrambasecreatedelete_\",mv);"
 "\r\n"
 "\r\n //define a function type (pExodusProgramBaseMemberFunction)"
 "\r\n //that can call the shared library object member function"
@@ -601,7 +604,7 @@ var inclusion=
 "\r\n}";
 
 										swapper(inclusion,"funcx",field2(libname, SLASH, -1));
-										//swapper(example,"exodusprogrambasecreatedelete",funcname);
+										//swapper(example,"exodusprogrambasecreatedelete_",funcname);
 										swapper(inclusion,"in arg1=var(), out arg2=var(), out arg3=var()",funcargsdecl2);
 										swapper(inclusion,"in,out,out",funcargstype);
 										swapper(inclusion,"arg1,arg2,arg3",funcargs);

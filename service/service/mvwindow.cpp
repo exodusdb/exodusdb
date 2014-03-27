@@ -900,14 +900,14 @@ void MvWindow::select2(const var& filenamex, const var& linkfilename2, const var
 			dictids.splicer(-1, 1, L"");
 		}
 		if (dictids == L"")
-			dictids = L"ID";
+			dictids = L"id";
 		ndictids = dictids.count(FM) + 1;
 		for (int dictidn = 1; dictidn <= ndictids; dictidn++) {
 			var dictid = dictids.a(dictidn);
 			var dictrec;
 			if (!dictrec.read(DICT, dictid)) {
 				if (!dictmd||!dictrec.read(dictmd, dictid)) {
-					if (dictid == L"ID") {
+					if (dictid == L"id") {
 						dictrec=var(L"F" _VM_ L"0" _VM_ L"No" _VM_ L"" _VM_ L"" _VM_ L"" _VM_ L"" _VM_ L"" _VM_ L"L" _VM_ L"15" _VM_ L"").raise();
 					}else{
 						response = L"Error: " ^ (dictid.quote()) ^ L" IS MISSING FROM DICT." ^ filename;
@@ -945,18 +945,18 @@ void MvWindow::select2(const var& filenamex, const var& linkfilename2, const var
 
 	//if filename='jobs' or filename='companies' then
 
-	if (xx.read(DICT, L"mv.authorised")) {
-		if (!(sortselect.index(L" WITH mv.authorised", 1))) {
-			if (var(L" " ^ sortselect).index(L" WITH ", 1))
-				sortselect ^= L" AND";
-			sortselect ^= L" WITH mv.authorised";
+	if (xx.read(DICT, L"authorised")) {
+		if (!(sortselect.index(L" with authorised", 1))) {
+			if (var(L" " ^ sortselect).index(L" with ", 1))
+				sortselect ^= L" and";
+			sortselect ^= L" with authorised";
 		}
 	}
 
 	//if not sorted then try use %records% if present and <200 chars
 	records = L"";
 	//if @list.active or index(' ':sortselect,' by ',1) or index(sortselect,'with mv.authorised',1) else
-	if (!(LISTACTIVE or var(L" " ^ sortselect).index(L" BY ", 1))) {
+	if (!(LISTACTIVE or var(L" " ^ sortselect).index(L" by ", 1))) {
 		if (records.read(file, L"%RECORDS%")) {
 			if (records.length() < 200) {
 				records.swapper(FM, L"\" \"");
@@ -1005,11 +1005,11 @@ selectnext:
 					value = calculate(var(limitfields.a(1, limitfieldn)));
 					reqvalue = limitvalues.a(1, limitfieldn);
 					limitcheck = limitchecks.a(1, limitfieldn);
-					if (limitcheck == L"EQ") {
+					if (limitcheck == L"eq") {
 						if (value not_eq reqvalue)
 							goto selectnext;
 
-					}else if (limitcheck == L"NE") {
+					}else if (limitcheck == L"ne") {
 						if (value == reqvalue)
 							goto selectnext;
 
@@ -1048,7 +1048,7 @@ selectnext:
 				}
 
 				//prevent reading passwords postread and postwrite
-				if (filename == L"DEFINITIONS" and ID == L"SECURITY")
+				if (filename.lcase() == L"definitions" and ID == L"SECURITY")
 					RECORD.r(4, L"");
 
 				RECORD.transfer(row);
@@ -1068,7 +1068,7 @@ selectnext:
 					dictid2.converter(L"@", L"");
 					var cell = L"";
 //TODO:calculate					var cell = var(dictid).calculate();
-                    if (dictid==L"ID")
+                    if (dictid==L"id")
 id:
                         cell=ID;
 					else if (dictrecs.a(dictidn,1)=="F")

@@ -54,7 +54,7 @@ int main(int exodus__argc, char *exodus__argv[]) \
 	exodus_main(exodus__argc, exodus__argv, mv); \
 	ExodusProgram exodusprogram1(mv); \
 	int result=exodusprogram1.main(); \
-	print("Press Enter"); \
+	print("Debugging. Program finished. Press Enter"); \
 	input(); \
 	return result; \
 }

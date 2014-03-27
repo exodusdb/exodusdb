@@ -1004,7 +1004,7 @@ public:
 	//should these be like extract, replace, insert, delete
 	//locate(fieldno, valueno, subvalueno,target,setting,by DEFAULTNULL)
 	bool locate(const var& target, var& setting, const int fieldno=0,const int valueno=0) const;
-	//passing BY as a string for speed
+	//passing "by" as a string for speed
 	bool locateby(const var& target, const char* ordercode, var& setting, const int fieldno=0,const int valueno=0) const;
 	bool locateby(const var& target, const var& ordercode, var& setting, const int fieldno=0,const int valueno=0) const;
 	bool locateusing(const var& target, const var& usingchar, var& setting, const int fieldno=0, const int valueno=0, const int subvalueno=0) const;

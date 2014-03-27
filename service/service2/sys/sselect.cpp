@@ -5,12 +5,24 @@ function main() {
 	var cmd=SENTENCE.substr(2);
 	var file,key;
 	file.select(cmd);
-	if (file.readnext(key)) {
-		key.outputl("first key=");
-	} else {
-		printl("Nothing selected");
+
+	var nkeys=0;
+	var keys="";
+	while (file.readnext(key)) {
+		if (nkeys) {
+			keys^="\n";
+		}
+		nkeys++;
+		keys^=key;
 	}
-	return 0;
+	var result;
+	if (nkeys) {
+		oswrite(keys,"sselect.lst");
+		printl(nkeys^" record(s) selected");
+	} else {
+		printl("No records found");
+	}
+	return nkeys==0;//0=success/1=failure
 }
 
 programexit()

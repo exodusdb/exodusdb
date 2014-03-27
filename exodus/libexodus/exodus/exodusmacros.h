@@ -129,24 +129,23 @@ void main2(MvEnvironment& mv)
 #define call
 #define gosub
 
-#define classinit() \
+#define oldclassinit() \
 class ExodusProgram : public ExodusProgramBase {
 
-#define classexit() \
+#define oldclassexit() \
 public: \
 	/*constructor with one arg of MvEnvironment mv */ \
 	ExodusProgram(MvEnvironment& mv):ExodusProgramBase(mv){} \
-}; \
+};
 
-//possible version to allow multiple named "exodus classes"
+//version to allow multiple named "exodus classes"
+#define classinit(CLASSNAME) \
+class CLASSNAME##ExodusProgram : public ExodusProgramBase {
 
-#define xclassinit(CLASSNAME) \
-class CLASSNAME##_ExodusProgram : public ExodusProgramBase {
-
-#define xclassexit(CLASSNAME) \
+#define classexit(CLASSNAME) \
 public: \
-	CLASSNAME##_ExodusProgram(MvEnvironment& mv):ExodusProgramBase(mv){} \
-}; \
+	CLASSNAME##ExodusProgram(MvEnvironment& mv):ExodusProgramBase(mv){} \
+};
 
 #define iscommon(COMMONNAME) ((&COMMONNAME)!=NULL)
 
