@@ -43,6 +43,7 @@ DLL_PUBLIC
 	MvEnvironment& mv;
 
 	var perform(const var& sentence);
+	var execute(const var& sentence);
 
 	//given dictid reads dictrec from DICT file and extracts from RECORD/ID or calls library called dict+DICT function dictid
 	//not const so we can mess with the library?

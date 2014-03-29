@@ -847,6 +847,8 @@ var var::osshellread() const
 
 	var output=L"";
 
+	//fflush?
+
 	//"r" means read
 	std::FILE *cmd=popen(toString().c_str(), "r");
 	//return a code to indicate program failure. but can this ever happen?

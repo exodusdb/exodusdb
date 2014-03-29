@@ -267,10 +267,10 @@ void DLL_PUBLIC abort(const var& text)
 //	return command.perform();
 //}
 
-DLL_PUBLIC var execute(const var& command)
-{
-	return command.execute();
-}
+//DLL_PUBLIC var execute(const var& command)
+//{
+//	return command.execute();
+//}
 
 DLL_PUBLIC var chain(const var& command)
 {

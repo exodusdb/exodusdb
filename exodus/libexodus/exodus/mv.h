@@ -778,7 +778,7 @@ public:
 
 	void abort(const var& text DEFAULTNULL) const;
 //	var perform() const;
-	var execute() const;
+//	var execute() const;
 	var chain() const;
 	var logoff() const;
 	var debug() const;

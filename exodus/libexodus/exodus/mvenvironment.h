@@ -88,6 +88,8 @@ public:
 
 	var CRTHIGH;
 	var CRTWIDE;
+	var LPTRHIGH;
+	var LPTRWIDE;
 
 	var COL1;
 	var COL2;

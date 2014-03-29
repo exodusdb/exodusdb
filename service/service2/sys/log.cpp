@@ -6,7 +6,7 @@ libraryinit()
 #include <sendmail.h>
 
 
-var STATION;
+var station;
 var time;
 var log;
 var bakpars;
@@ -31,9 +31,9 @@ function main(in programname0, in text0) {
 
 	var year = ((var().date()).oconv("D")).substr(-4, 4);
 	if (s33) {
-		STATION = SYSTEM.a(40, 2);
+		station = SYSTEM.a(40, 2);
 	}else{
-		STATION.trimmer();
+		station = mv.STATION.trim();
 		}
 	//call dostime(time);//seconds and hundredths since midnight
 	time = ostime().round(2);
@@ -47,7 +47,7 @@ function main(in programname0, in text0) {
 getlogkey:
 		//call dostime(time);
 		time = var(int(ostime()*100)/100).oconv("MD20P");
-		var logkey = STATION.trim() ^ "*" ^ USERNAME ^ "*" ^ var().date() ^ "*" ^ time;
+		var logkey = station.trim() ^ "*" ^ USERNAME ^ "*" ^ var().date() ^ "*" ^ time;
 		var xx;
 		if (xx.read(log, logkey)) {
 			goto getlogkey;
@@ -81,7 +81,7 @@ getlogkey:
 		body.r(-1, "Database=" ^ SYSTEM.a(45).trim() ^ " " ^ SYSTEM.a(17));
 		body.r(-1, "Process=" ^ SYSTEM.a(24));
 		body.r(-1, "User=" ^ USERNAME);
-		body.r(-1, "Station=" ^ STATION);
+		body.r(-1, "Station=" ^ station);
 		body.r(-1, "Source=" ^ programname);
 
 		body.r(-1, FM ^ text2);

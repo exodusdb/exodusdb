@@ -2,6 +2,38 @@
 
 //#include <gen.h>
 
+libraryinit(executive_name)
+
+function main() {
+
+	//ans={EXECUTIVE_CODE}
+	//ans2=ans
+	//convert @lower.case to @upper.case in ans2
+	//@ans=xlate('USERS',ans2,1,'X')
+	//if @ans else @ans=ans
+	var ans = calculate("EXECUTIVE_CODE");
+	var ans2 = ans;
+	ans2.ucaser();
+	if (ans2 ne ans) {
+		ans.transfer(ANS);
+	}else{
+		ANS = var("%" ^ ans2 ^ "%").xlate("USERS", 1, "X");
+		if (ANS) {
+			ans2 = ANS;
+			ans2.ucaser();
+			if (ans2 == ANS) {
+				ANS = mv.capitalise(ANS);
+			}
+		}else{
+			ans.transfer(ANS);
+			ANS = mv.capitalise(ANS);
+		}
+	}
+	return ANS;
+
+}
+libraryexit(executive_name)
+
 libraryinit(alert_subject)
 
 function main()  {

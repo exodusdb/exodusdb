@@ -1,28 +1,28 @@
-#ifndef EXODUSDLFUNC_LOG_H
-#define EXODUSDLFUNC_LOG_H
+#ifndef EXODUSDLFUNC_PRINTJOB_H
+#define EXODUSDLFUNC_PRINTJOB_H
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_log;
+ExodusFunctorBase efb_printjob;
 
 //a member function with the right arguments, returning a var or void
-var log(in programname0, in text0)
+var printjob()
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_log.pmemberfunction_==NULL)
-  efb_log.init("log","exodusprogrambasecreatedelete_",mv);
+ if (efb_printjob.pmemberfunction_==NULL)
+  efb_printjob.init("printjob","exodusprogrambasecreatedelete_",mv);
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
  //with the right arguments and returning a var or void
- typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(in,in);
+ typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)();
 
  //call the shared library object main function with the right args,
- // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_log.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_log.pmemberfunction_)))
-  (programname0,text0);
+  returning a var or void
+ return CALLMEMBERFUNCTION(*(efb_printjob.pobject_),
+ ((pExodusProgramBaseMemberFunction) (efb_printjob.pmemberfunction_)))
+  ();
 
 }
 #endif

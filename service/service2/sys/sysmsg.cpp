@@ -130,7 +130,7 @@ function main(in msg0, in subject0="", in username0="") {
 	body.r(-1, msg);
 	body ^= FM;
 	body.r(-1, "Server=" ^ SYSTEM.a(44).trim());
-	body.r(-1, "Install=" ^ var().osdir());
+	body.r(-1, "Install=" ^ oscwd());
 	if (ver.osread("general\\version.dat")) {
 		body.r(-1, "Version=" ^ ver.a(1));
 	}

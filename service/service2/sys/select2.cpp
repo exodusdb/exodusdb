@@ -143,17 +143,19 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 			dictids.splicer(-1, 1, L"");
 		}
 		if (dictids == L"")
-			dictids = L"ID";
+			dictids = L"id";
 		ndictids = dictids.count(FM) + 1;
 		for (int dictidn = 1; dictidn <= ndictids; dictidn++) {
 			var dictid = dictids.a(dictidn);
 			var dictrec;
 			if (!dictrec.read(DICT, dictid)) {
-				if (!dictmd||!dictrec.read(dictmd, dictid)) {
-					if (dictid == L"ID") {
-						dictrec=var(L"F" _VM_ L"0" _VM_ L"No" _VM_ L"" _VM_ L"" _VM_ L"" _VM_ L"" _VM_ L"" _VM_ L"L" _VM_ L"15" _VM_ L"").raise();
-					}else{
-						return exit(response, dictid.quote() ^ L" IS MISSING FROM DICT." ^ filename);
+				if (!dictrec.read(DICT, dictid.lcase())) {
+					if (!dictmd||!dictrec.read(dictmd, dictid)) {
+						if (dictid.lcase() == L"id") {
+							dictrec=var(L"F" _VM_ L"0" _VM_ L"No" _VM_ L"" _VM_ L"" _VM_ L"" _VM_ L"" _VM_ L"" _VM_ L"L" _VM_ L"15" _VM_ L"").raise();
+						}else{
+							return exit(response, dictid.quote() ^ L" IS MISSING FROM DICT." ^ filename);
+						}
 					}
 				}
 			}
@@ -176,7 +178,7 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 	if (xml and linkfilename2) {
 		//tx:='<xml id=':quote(lcase(filename)):'>':crlf
 		tx ^= L"<records>" ^ crlf2;
-		mv.osbwritex(tx, linkfilename2, linkfilename2, offset);
+		mv.osbwritex(encode(tx), linkfilename2, linkfilename2, offset);
 	}
 //	offset += tx.length();
 
@@ -380,7 +382,7 @@ id:
 		}
 
 		if (linkfilename2) {
-			mv.osbwritex(row, linkfilename2, linkfilename2, offset);
+			mv.osbwritex(encode(row), linkfilename2, linkfilename2, offset);
 
 		}else{
 			datax ^= row;
@@ -395,7 +397,7 @@ id:
 
 	if (xml and linkfilename2) {
 		var tt = L"</records>";
-		mv.osbwritex(tt, linkfilename2, linkfilename2, offset);
+		mv.osbwritex(encode(tt), linkfilename2, linkfilename2, offset);
 	}
 
 	if (linkfilename2) {
@@ -462,6 +464,16 @@ function exit(io response, in errmsg="") {
 		response=L"Error: select2: " ^ errmsg;
 		return 0;
 	}
+}
+
+//in server and select2 for directoutput
+function encode(in instr) {
+	//do xml character encoding (do % FIRST!)
+	return instr
+	.swap(L"%",L"%25")
+	.swap(L"<",L"%3C")
+	.swap(L">",L"%3E")
+	.swap(L"&",L"%26");
 }
 
 libraryexit()

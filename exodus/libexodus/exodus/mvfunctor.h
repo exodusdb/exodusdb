@@ -135,7 +135,11 @@ ExodusFunctorBase(const std::string libname,
 //constructor to provide environment immediately
 ExodusFunctorBase(MvEnvironment& mv);
 
-var calldict();
+//call shared member function
+var callsmf();
+
+//call shared global function
+var callsgf();
 
 /*
 //constructor to provide library and function names immediately
@@ -158,39 +162,51 @@ virtual ~ExodusFunctorBase();
 //void* pfunction_;
 
 public:
-	//for call
-	bool init(const char* libraryname, const char* functionname);
-	//was used for calculate dict via external so global functions (not member functions)
+	//for call or die (smf)
 	bool init(const char* libraryname, const char* functionname, MvEnvironment& mv);
-	//for dicts
-	bool initdict(const char* libraryname, const char* functionname);
-	//for perform
-	bool init2(const char* libraryname, const char* functionname);
+
+	//for dict/perform/execute (external shared member functions)
+	//forcenew used by perform/execute to delete and create new object each time
+	//so that global variables start out unassigned each time performed/executed
+	bool initsmf(const char* libraryname, const char* functionname, const bool forcenew=false);
+
+	//external shared global functions (not member functions)
+	bool initsgf(const char* libraryname, const char* functionname);
 
 private:
-	bool openlib();
+	bool openlib(std::string libraryname);
 	void closelib();
-	bool openfunc();
+	bool openfunc(std::string functionname);
 	void closefunc();
 
 protected:
-	bool checkload();
+	bool checkload(std::string libraryname, std::string functionname);
 
 public:
 	//only public for rather hacked mvipc getResponseToRequest()
 	mutable MvEnvironment* mv_;
 
 private:
+	//records the library opened so we can close and reopen new libraries automatically
 	std::string libraryname_;
+	//internal memory of the actual library file name. only used for error messages
 	std::string libraryfilename_;
+	//pointer to the shared library file
 	void* plibrary_;
 
+	//normally something like
+	//exodusprogrambasecreatedelete_
+	//or exodusprogrambasecreatedelete_{dictid}
+	//one function is used to create and delete the shared library object
 	std::string functionname_;
 
 protected:
+	//functioname_ is used to open a dl shared function to this point
 	ExodusProgramBaseCreateDeleteFunction pfunction_;
 
 public:
+	//holds the 
+	//not used if functor is calling global functions in the shared object
 	pExodusProgramBase pobject_;
 	pExodusProgramBaseMemberFunction pmemberfunction_;
 
