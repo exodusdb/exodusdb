@@ -1667,6 +1667,7 @@ var var::index(const var& substrx,const int occurrenceno) const
 
 }
 
+//moved to mvprogram
 //var var::perform() const
 //{
 //	THISIS(L"var var::perform() const")
@@ -1676,21 +1677,23 @@ var var::index(const var& substrx,const int occurrenceno) const
 //	return L"";
 //}
 
+//moved to mvprogram
+//var var::execute() const
+//{
+//	THISIS(L"var var::execute() const")
+//	THISISSTRING()
+//
+//	std::cout<<"var::execute not implemented yet. perform instead"<<toString()<<std::endl;
+//	return (*this).perform();
+//	return L"";
+//}
+
 var var::chain() const
 {
 	THISIS(L"var var::chain() const")
 	THISISSTRING()
 
 	std::cout<<"var::chain not implemented yet "<<toString()<<std::endl;
-	return L"";
-}
-
-var var::execute() const
-{
-	THISIS(L"var var::execute() const")
-	THISISSTRING()
-
-	std::cout<<"var::execute not implemented yet "<<toString()<<std::endl;
 	return L"";
 }
 

@@ -171,6 +171,7 @@ function main()
 	//CREATE LABELLED COMMON
 	mv.labelledcommon[1]=new win_common;
 
+mv.STATION="";
 mv.PSEUDO="";
 SYSTEM="";
 
@@ -685,12 +686,12 @@ stopper:
 		}
 
 		//f5
-		if (charx == mv.PRIORITYINT.a(2))
-			var("").execute();
+		//if (charx == mv.PRIORITYINT.a(2))
+		//	var("").execute();
 
 		//f10
-		if (charx == mv.INTCONST.a(7))
-			var("RUNMENU " ^ mv.ENVIRONSET.a(37)).execute();
+		//if (charx == mv.INTCONST.a(7))
+		//	var("RUNMENU " ^ mv.ENVIRONSET.a(37)).execute();
 
 		if (charx != "") {
 
@@ -2360,7 +2361,7 @@ USER0=USER0.field(FM,3,9999);
 		mv.DATA ^= var().chr(13);
 		if (request2 == "")
 			request2 = ACCOUNT;
-		("INSTALL " ^ request2 ^ " I !:").execute();
+		execute("INSTALL " ^ request2 ^ " I !:");
 		USER3 = USER4;
 
 		//or give an error message
@@ -3112,6 +3113,7 @@ subroutine deleteoldfiles(in inpath, in pattern)
 
 }
 
+//in server and select2 for directoutput
 function encode(in instr) {
 	//do xml character encoding (do % FIRST!)
 	return instr

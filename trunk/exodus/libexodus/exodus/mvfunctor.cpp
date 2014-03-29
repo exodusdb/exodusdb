@@ -20,6 +20,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+//mvfunctor provides simple function-like syntax xyz() to call main functions in objects
+//stored in external shared objects libraries
+//
+//strategy is to open a pointer to the main function in an object in the library
+//
+// initialisation
+//1. open a pointer to a library (plibrary_)
+//2. open a pointer to a global function in that library (pfunction_)
+//3. call the global function from 2. to retrieve a new object and pointer
+//   to its main function pobject_ and pmemberfunction_)
+
+//usage
+//4. call the main function on that object to execute the code
+
+//NOTE that the code can also stop at step 2 to call global functions directly BUT
+// although calling global functions gives them mv (via argument) they cant call
+// external subroutines since external subroutines are implemented in exodus
+// as member functions which require special coding to be called from global functions
+
 #include <iostream>
 
 #define MV_NO_NARROW
@@ -48,7 +67,7 @@ typedef HINSTANCE library_t;
 #else
 # include <dlfcn.h>
   typedef void* library_t;
-# define EXODUSLIBPREFIX "~/lib/lib"+
+# define EXODUSLIBPREFIX "~/lib/lib"
 //# define EXODUSLIBPREFIX "./lib"+
 #endif
 
@@ -65,6 +84,8 @@ namespace exodus {
 ExodusFunctorBase::ExodusFunctorBase()
 //TODO optimise by only initialise one and detect usage on that only
 : mv_(NULL)
+, libraryname_("")
+, functionname_("")
 , plibrary_(NULL)
 , pfunction_(NULL)
 , pobject_(NULL)
@@ -75,8 +96,8 @@ ExodusFunctorBase::ExodusFunctorBase()
 ExodusFunctorBase::ExodusFunctorBase(const std::string libname, const std::string funcname)
 : mv_(NULL)
 , libraryname_(libname)
-, plibrary_(NULL)
 , functionname_(funcname)
+, plibrary_(NULL)
 , pfunction_(NULL)
 , pobject_(NULL)
 , pmemberfunction_(NULL)
@@ -86,59 +107,24 @@ ExodusFunctorBase::ExodusFunctorBase(const std::string libname, const std::strin
 ExodusFunctorBase::ExodusFunctorBase(MvEnvironment& mv)
 : mv_(&mv)
 , libraryname_("")
-, plibrary_(NULL)
 , functionname_("")
+, plibrary_(NULL)
 , pfunction_(NULL)
 , pobject_(NULL)
 , pmemberfunction_(NULL)
 {pobject_=0;}
 
-
-//destructor
 ExodusFunctorBase::~ExodusFunctorBase()
 {
+	//will delete any shared object first
 	closelib();
 }
 
-//used in perform
-bool ExodusFunctorBase::init2(const char* libraryname, const char* functionname)
+//atm designed to be called once only the first time an external function is called
+bool ExodusFunctorBase::init(const char* newlibraryname, const char* newfunctionname, MvEnvironment& mv)
 {
-	if (libraryname_!=libraryname)
-	{
-		closelib();
-		libraryname_=libraryname;
-		functionname_="";
-//		mv_=&mv;
-		libraryname_=libraryname;
-		functionname_=functionname;
-		checkload();
-	}
-
-	//call a function in the library to create one of its "exodus program" objects
-	//nb we MUST call the same library to delete it
-	//so that the same memory management routine is called to create and delete it.
-	//pfunction_ return a pobject_ if pobject_ is passed in NULL (using mv as an init argument)
-	// or deletes a pobject_ if not
-
-	//generate an error here to debug
-//	pobject_->main();
-
-	pfunction_(pobject_,*mv_,pmemberfunction_);
-	//pobject_->main();
-	//((*pobject_).*(pmemberfunction_))();
-	//CALLMEMBERFUNCTION(*pobject_,pmemberfunctibon_)();
-	if (pobject_==NULL||pmemberfunction_==NULL)
-		return false;
-
-	return true;
-}
-
-bool ExodusFunctorBase::init(const char* libraryname, const char* functionname, MvEnvironment& mv)
-{
-	libraryname_=libraryname;
-	functionname_=functionname;
 	mv_=&mv;
-	checkload();
+	checkload(newlibraryname, newfunctionname);
 
 	//call a function in the library to create one of its "exodus program" objects
 	//nb we MUST call the same library to delete it
@@ -159,143 +145,118 @@ bool ExodusFunctorBase::init(const char* libraryname, const char* functionname, 
 	return true;
 }
 
-bool ExodusFunctorBase::initdict(const char* libraryname, const char* functionname)
+//used in dict/perform/execute ... can be called repeatably since buffers lib and func
+bool ExodusFunctorBase::initsmf(const char* newlibraryname, const char* newfunctionname, const bool forcenew) 
 {
-	if (libraryname_!=libraryname)
-	{
-		closelib();
-		libraryname_=libraryname;
-		if (!openlib())
-			return false;
-		functionname_="";
+#if TRACING >= 3
+std::cout<<"mvfunctor:initsmf: in:"<<newlibraryname<<" "<<newfunctionname<<std::endl;
+#endif
+	if (newlibraryname!=libraryname_ && !openlib(newlibraryname)) {
+		return false;
 	}
 
 	//make sure we have the right program object creation/deletion function
-	if (functionname_!=functionname)
+	//forcenew is used in perform/execute to ensure that all global variables
+	//are initialised ie performing the same command twice
+	//starts from scratch each time
+	if (forcenew || newfunctionname!=functionname_)
 	{
-		closefunc();
-		functionname_=functionname;
-		if (!openfunc())
+		if (!openfunc(newfunctionname)) {
 			return false;
-	}
+		}
+		//call a function in the library to create one of its "exodus program" objects
+		//nb we MUST call the same library to delete it
+		//so that the same memory management routine is called to create and delete it.
+		//pfunction_ return a pobject_ if pobject_ is passed in NULL (using mv as an init argument)
+		// or deletes a pobject_ if not
 
-	//call a function in the library to create one of its "exodus program" objects
-	//nb we MUST call the same library to delete it
-	//so that the same memory management routine is called to create and delete it.
-	//pfunction_ return a pobject_ if pobject_ is passed in NULL (using mv as an init argument)
-	// or deletes a pobject_ if not
+		//generate an error here to debug
+	//	pobject_->main();
 
-	//generate an error here to debug
-//	pobject_->main();
-
-	pfunction_(pobject_,*mv_,pmemberfunction_);
-	//pobject_->main();
-	//((*pobject_).*(pmemberfunction_))();
-	//CALLMEMBERFUNCTION(*pobject_,pmemberfunctibon_)();
-	if (pobject_==NULL||pmemberfunction_==NULL)
-		return false;
-
-	return true;
-}
-
-//this version was written to be called from mvipc in response to calculated dictionary callback
-//this version only opens lib if it has changed (after closing the old lib, if any, of course)
-//init now doesnt call the function to get a program object
-bool ExodusFunctorBase::init(const char* libraryname, const char* functionname)
-{
-	if (libraryname_!=libraryname)
-	{
-		closelib();
-		libraryname_=libraryname;
-		if (!openlib())
-			return false;
-		functionname_="";
-	}
-
-/* init now works for dict FUNCTIONS not dict PROGRAMS
-	//always close any old program object so that we simulate a "new" program with unassigned globals.
-	if (pobject_)
+		//create a shared object and get pointer to its main member function
 		pfunction_(pobject_,*mv_,pmemberfunction_);
-*/
-
-	//make sure we have the right program object creation/deletion function
-	if (functionname_!=functionname)
-	{
-		closelib();
-		functionname_=functionname;
-		if (!openfunc())
+		//pobject_->main();
+		//((*pobject_).*(pmemberfunction_))();
+		//CALLMEMBERFUNCTION(*pobject_,pmemberfunctibon_)();
+		if (pobject_==NULL||pmemberfunction_==NULL) {
 			return false;
+#if TRACING >= 3
+std::cout<<"mvfunctor:initsmf: ko: no pobject_"<<libraryname_<<" "<<functionname_<<std::endl;
+#endif
+		}
 	}
 
-/* init now works for dict FUNCTIONS not dict PROGRAMS
-
-	//get a new program object
-	pfunction_(pobject_,*mv_,pmemberfunction_);
-
-	//call a function in the library to create one of its "exodus program" objects
-	//nb we MUST call the same library to delete it
-	//so that the same memory management routine is called to create and delete it.
-	//pfunction_ return a pobject_ if pobject_ is passed in NULL (using mv as an init argument)
-	// or deletes a pobject_ if not
-
-	//generate an error here to debug
-//	pobject_->main();
-
-	//call the function in the library that will create an object
-	pfunction_(pobject_,*mv_,pmemberfunction_);
-	if (pobject_==NULL||pmemberfunction_==NULL)
-		return false;
-
-	//pobject_->main();
-	//((*pobject_).*(pmemberfunction_))();
-	//CALLMEMBERFUNCTION(*pobject_,pmemberfunctibon_)();
-*/
+#if TRACING >= 3
+std::cout<<"mvfunctor:initsmf: ok:"<<libraryname_<<" "<<functionname_<<std::endl;
+#endif
 	return true;
 }
 
-bool ExodusFunctorBase::checkload()
+//this version just gets a pointer to an external shared global function
+//not used atm?
+bool ExodusFunctorBase::initsgf(const char* newlibraryname, const char* newfunctionname)
 {
-	if (plibrary_!=0)
-		return true;
+	if (newlibraryname!=libraryname_ and !openlib(newlibraryname)) {
+		return false;
+	}
 
+	//make sure we have the right program object creation/deletion function
+	if (newfunctionname!=functionname_ and !openfunc(newfunctionname)) {
+		return false;
+	}
+
+	return true;
+}
+
+bool ExodusFunctorBase::checkload(std::string newlibraryname, std::string newfunctionname)
+{
+#if TRACING >= 3
+std::cout<<"mvfunctor:checkload: in:"<< newlibraryname<<" "<< newfunctionname<<std::endl;
+#endif
 	//find the library or fail
-	if (not openlib())
+	if (not openlib(newlibraryname))
 	{
+#if TRACING >= 3
+std::cout<<"mvfunctor:checkload: ko:"<<newlibraryname<<std::endl;
+#endif
 		throw MVException(L"Unable to load " ^ var(libraryfilename_));
 		return false;
 	}
 
 	//find the function or fail
-	if (not openfunc())
+	if (not openfunc(newfunctionname))
 	{
+#if TRACING >= 3
+std::cout<<"mvfunctor:checkload: ko:"<<libraryname_<<" "<< newfunctionname<<std::endl;
+#endif
 		throw MVException(L"Unable to find "
-		^ var(functionname_)
+		^ var(newfunctionname)
 		^ L" in "
 		^ var(libraryfilename_));
 		return false;
 	}
 
+#if TRACING >= 3
+std::cout<<"mvfunctor:checkload: ok:"<<libraryname_<<" "<<functionname_<<std::endl;
+#endif
 	return true;
 }
 
-bool ExodusFunctorBase::openlib()
+bool ExodusFunctorBase::openlib(std::string newlibraryname)
 {
+#if TRACING >= 3
+std::cout<<"mvfunctor:openlib: in:"<<newlibraryname<<std::endl;
+#endif
 	//open the library or return 0
 	//dlopen arg2 is ignored by macro on windows
+
+	closelib();
 
 #ifdef dlerror
 	dlerror();
 #endif
 
-	//TODO optimise with std::string instead of var
-	/*
-	libraryfilename_=EXODUSLIBPREFIX libraryname_+EXODUSLIBEXT;
-	var home;
-	home.osgetenv(L"HOME");
-	libraryfilename_=var(libraryfilename_).swap(L"~",home).toString();
-	*/
-	//#include <stdlib.h>
-	libraryfilename_=EXODUSLIBPREFIX libraryname_+EXODUSLIBEXT;
+	libraryfilename_=EXODUSLIBPREFIX+newlibraryname+EXODUSLIBEXT;
 	if (libraryfilename_[0]=='~')
 		#pragma warning (disable: 4996)
 		//env string is copied into string so following getenv usage is safe
@@ -313,27 +274,40 @@ bool ExodusFunctorBase::openlib()
 
 	if (plibrary_==NULL)
 	{
+#if TRACING >= 3
+std::cout<<"mvfunctor:openlib: ko:"<< newlibraryname<<std::endl;
+#endif
 		std::cerr<<libraryfilename_<<" cannot be found or cannot be opened"<<std::endl;
 		return false;
 	}
 
+	libraryname_=newlibraryname;
+#if TRACING >= 3
+std::cout<<"mvfunctor:openlib: ok:"<<libraryname_<<std::endl;
+#endif
 	return true;
 }
 
-bool ExodusFunctorBase::openfunc()
+bool ExodusFunctorBase::openfunc(std::string newfunctionname)
 {
+#if TRACING >= 3
+std::cout<<"mvfunctor:openfunc: in:"<<libraryname_<<" "<< newfunctionname<<std::endl;
+#endif
 	//find the function and return true/false
 	//pfunction_ = (EXODUSFUNCTYPE) dlsym(plibrary_, functionname_.c_str());
+
+	//close any existing function
+	closefunc();
 
 #ifdef dlerror
 	dlerror();
 #endif
 
-	//var(libraryfilename_)^L" "^var(functionname_).outputl();
+	//var(libraryfilename_)^L" "^var(newfunctionname).outputl();
 
-	//pfunction_ = (void*) dlsym((library_t) plibrary_, functionname_.c_str());
+	//pfunction_ = (void*) dlsym((library_t) plibrary_, newfunctionname.c_str());
 	pfunction_ = (ExodusProgramBaseCreateDeleteFunction)
-		dlsym((library_t) plibrary_, functionname_.c_str());
+		dlsym((library_t) plibrary_, newfunctionname.c_str());
 
 #ifdef dlerror
 	const char* dlsym_error = dlerror();
@@ -343,67 +317,92 @@ bool ExodusFunctorBase::openfunc()
 
 	if (pfunction_==NULL)
 	{
+#if TRACING >= 3
+std::cout<<"mvfunctor:openfunc: ko:"<<libraryname_<<" "<<newfunctionname<<std::endl;
+#endif
 		std::cerr<<functionname_<<" function cannot be found in "<<libraryfilename_<<std::endl;
 		return false;
 	}
 
+	functionname_=newfunctionname;
+#if TRACING >= 3
+std::cout<<"mvfunctor:openfunc: ok:"<<libraryname_<<" "<< functionname_<<std::endl;
+#endif
 	return true;
 
 }
 
-/*was used to call global (non-member functions)
-var ExodusFunctorBase::calldict()
+//call shared global function (not used atm)
+var ExodusFunctorBase::callsgf()
 {
 	//dictionaries are libraries of subroutines (ie return void) that 
 	//have one argument "MvEnvironment". They set their response in ANS.
 	//they are global functions and receive mv environment reference as their one and only argument.
 	typedef var (*ExodusDynamic)(MvEnvironment& mv);
 
+#if TRACING >= 3
+std::cout<<"mvfunctor:callsgf: in:"<<libraryname_<<" "<< functionname_<<std::endl;
+#endif
 	//call the function via its pointer
 	return ((ExodusDynamic) pfunction_)(*mv_);
 	//return;
 }
-*/
 
-var ExodusFunctorBase::calldict()
+//call shared member function
+var ExodusFunctorBase::callsmf()
 {
 	//define a function type (pExodusProgramBaseMemberFunction)
 	//that can call the shared library object member function
 	//with the right arguments and returning a var
 	typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)();
 
+#if TRACING >= 3
+std::cout<<"mvfunctor:callsmf: in:" << libraryname_<< " " << functionname_<<std::endl;
+#endif
 	//call the shared library object main function with the right args, returning a var
-	//std::cout<<"precall"<<std::endl;
 	return CALLMEMBERFUNCTION(*(
 			pobject_),
 			((pExodusProgramBaseMemberFunction) (pmemberfunction_)))
 					();
-	//std::cout<<"postcall"<<std::endl;
 
 }
 
 void ExodusFunctorBase::closelib()
 {
-	//close the function object
+	//delete any shared object first!
 	closefunc();
 
-	//close the connection
+	//close any existing connection to the library
 	if (plibrary_!=NULL)
 	{
 		dlclose((library_t) plibrary_);
+		//record the library share no longer exists
 		plibrary_=NULL;
+#if TRACING >= 3
+std::cout<<"mvfunctor:closed libraryname_:" <<libraryname_<<std::endl;
+#endif
 	}
+	//record this library is no longer connected
+	libraryname_="";
 }
 
+//actually this deletes any shared object created by the shared global function
 void ExodusFunctorBase::closefunc()
 {
-	//outputl(L"000");
 	//the *library* function must be called to delete the object that it created
 	//(cant delete the object in the main process since it might have a different memory allocator)
 	if (pobject_!=NULL)
 	{
+		//second call will delete
 		pfunction_(pobject_,*mv_,pmemberfunction_);
+		//record the object no longer exists
+		pobject_=NULL;
+#if TRACING >= 3
+std::cout<< "mvfunctor:closed functionname:" << functionname_ << std::endl;
+#endif
 	}
+	//record this function (and object) no longer exists
+	functionname_="";
 }
 
 }//namespace exodus

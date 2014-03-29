@@ -5,6 +5,11 @@
 	//php.ini
 	//display_errors = off
 
+	//debug in php like this
+	//tail -f /var/log/apache2/error.log
+	//also .2 and .3 files are left in interface directory
+	$debugging = false;
+
 //constants
 
 	//if mb php implemented
@@ -36,11 +41,12 @@
 
 // session
 
-	session_start();//
+	session_start();
 
 	$neosysrootpath = getneosysrootpath($_SERVER['DOCUMENT_ROOT']);
 	$datalocation = ($neosysrootpath . '/data/');
 
+	//not used atm
 	if (($neosysrootpath . "UNICODE.INI"))
 		$unicode = -1;
 	else
@@ -63,14 +69,14 @@
 	//client delivers a request in xml format
 	$xml = simplexml_load_string($HTTP_RAW_POST_DATA);
 
-//debug("POST   ---> ".$HTTP_RAW_POST_DATA);
-debug("REQUEST :".$xml->request);
-if ($xml->token)
-debug("TOKEN   :".$xml->token);
-if ($xml->database)
-debug("DATABASE:".$xml->base);
-if (strlen($xml->data))
-debug("DATA_IN :".$xml->data);
+	//debug("POST   ---> ".$HTTP_RAW_POST_DATA);
+	debug("REQUEST :".$xml->request);
+	if ($xml->token)
+		debug("TOKEN   :".$xml->token);
+	if ($xml->database)
+		debug("DATABASE:".$xml->base);
+	if (strlen($xml->data))
+		debug("DATA_IN :".$xml->data);
 
 	//request contains token, request, database and data
 	$token=rawurldecode($xml->token);
@@ -82,7 +88,9 @@ debug("DATA_IN :".$xml->data);
 	//neosys uses \r which is cr because \n and lf are messed about as either 0d0a or just 0a
 	$request = str_replace("\n","\r",$request);
 	$token = str_replace("\n","\r",$token);
-debug("token $token");
+
+	debug("token $token");
+
 	$requests = explode("\r",$request . "\r\r\r\r\r\r\r\r");
 
 	if ($token) {
@@ -110,7 +118,9 @@ debug("token $token");
 			$database = $_SESSION[$token . '_database'];
 			$system = $_SESSION[$token . '_system'];
 			$timeout = $_SESSION[$token . '_timeout'];
-debug("username $username");
+
+			debug("username from session: $username");
+
 		}
 
 		//if logout then clear session username, password and database from the session
@@ -148,7 +158,9 @@ debug("username $username");
 
 		//keepalive
 		if ($requests[0] == 'KEEPALIVE') {
-debug("KEEPALIVE");
+
+			debug("KEEPALIVE");
+
 			$response = "OK";
 			$result = 1;
 			break;
@@ -213,7 +225,7 @@ debug("KEEPALIVE");
 			$linkfilename = $datalocation . $databasedir . $linkfilename;
 		} while (glob($linkfilename .'.*'));
 
-debug("data_in $data_in");
+		debug("data_in $data_in");
 
 		//write data (if any) before request so that there is no sharing violation with server reader
 		if ($data_in) {
@@ -348,21 +360,25 @@ debug("data_in $data_in");
 
 //clean up
 
-	//normally .1 will have been consumed (renamed, read and then deleted) by the neosys database and cannot be deleted
+	//normally .1 will already have been consumed
+	//(renamed, read and then deleted)
+	//by the neosys database and cannot be deleted here
 	if (is_file($linkfilename . '.1'))
 		unlink($linkfilename . '.1');
 
 	$deletefailed=false;
 
-/* debug - leave data
+	if (!$debugging) {
 
-	//often there is no .2 data file returned and even then usually we dont have privileges to delete it
-	if (is_file($linkfilename . '.2') && !unlink($linkfilename . '.2'))
-		$deletefailed=true;
-*/
-	//sometimes we dont have the privileges to delete the response file
-	if (is_file($linkfilename . '.3') && !unlink($linkfilename . '.3'))
-		$deletefailed=true;
+		//often there is no .2 data file returned and even then usually we dont have privileges to delete it
+		if (is_file($linkfilename . '.2') && !unlink($linkfilename . '.2'))
+			$deletefailed=true;
+
+		//sometimes we dont have the privileges to delete the response file
+		if (is_file($linkfilename . '.3') && !unlink($linkfilename . '.3'))
+			$deletefailed=true;
+
+	}
 
 	//if we cannot delete one or other of the .2 data and .3 response files
 	//then creating a .4 file instructs the db server to do it
@@ -371,9 +387,10 @@ debug("data_in $data_in");
 
 //output
 
+	//data and response is already preencoded by exodus server engine
+	//so can be encapsulated in xml tags here without issue
+
 	$xmltext = "<root>";
-//	$xmltext .= "<data>" . rawurlencode($data_out) . "</data>";
-//	$xmltext .= "<response>" . rawurlencode($response) . "</response>";
 	$xmltext .= "<data>$data_out</data>";
 	$xmltext .= "<response>$response</response>";
 	$xmltext .= "<result>$result</result>";
@@ -385,14 +402,13 @@ debug("data_in $data_in");
 	header ("Content-Type:text/xml; charset=utf-8");
 
 	print($xmltext);
-/*
-debug("RESPONSE:$response");
-if ($data_out)
-debug("DATA_OUT:$data_out");
-if (!$result)
-debug("RESULT  :$result");
-//debug("XMLOUT  :$xmltext");
-*/
+
+	debug("RESPONSE:$response");
+	if ($data_out)
+		debug("DATA_OUT:$data_out");
+	if (!$result)
+		debug("RESULT  :$result");
+	//debug("XMLOUT  :$xmltext");
 
 	/// finished
 
@@ -409,10 +425,9 @@ function neosysrnd($max, $min) {
 	return mt_rand($min,$max);
 };
 
-//debug in php like this
-//tail -f /var/log/apache2/error.log
 function debug($msg) {
-	error_log("\"$msg\"" ,0);
+	if ($debugging)
+		error_log("\"$msg\"" ,0);
 }
 
 function getdatabases($neosysrootpath, $systemcode) {

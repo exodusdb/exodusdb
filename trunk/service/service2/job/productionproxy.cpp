@@ -504,7 +504,7 @@ approvalerror:
 
 	} else if (mode == "COSTESTIMATEPRINT") {
 		mv.PSEUDO = USER1;
-		var("PRODINVS").execute();
+		execute("prodinvs");
 
 		gosub checkoutputfileexists();
 
@@ -527,7 +527,7 @@ approvalerror:
 		}
 
 		//execute 'PRINTJOB ':@pseudo<2>
-		var("PRINTJOB").execute();
+		execute("printjob");
 		gosub checkoutputfileexists();
 
 	} else if (mode == "JOBLIST") {
@@ -550,7 +550,7 @@ approvalerror:
 
 	} else if (mode == "TIMESHEETANALYSIS") {
 		mv.PSEUDO = USER1;
-		var("ANALTIME").execute();
+		execute("analtime");
 		gosub checkoutputfileexists();
 
 	} else if (mode == "TIMESHEETPRINT" or mode == "TIMESHEETALERTS") {
@@ -583,7 +583,7 @@ approvalerror:
 
 		//@pseudo=request
 		mv.PSEUDO = "";
-		var("ANALTIME2 " ^ USER0.a(2)).execute();
+		execute("analtime2 " ^ USER0.a(2));
 		gosub checkoutputfileexists();
 
 	} else if (USER0 == "TIMESHEET.POSTINIT") {

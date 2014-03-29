@@ -216,10 +216,6 @@ typedef var& out;
 #define SECURITY mv.SECURITY
 #define DEFINITIONS mv.DEFINITIONS
 
-//there is a calculate in ExodusProgramBase which calls mv.calculate
-//but simple external functions are functions not based on ExodusFunctionBase
-//#define calculate mv.calculate
-//#define perform mv.perform
 #define lockrecord mv.lockrecord
 #define unlockrecord mv.unlockrecord
 #define fsmsg mv.fsmsg

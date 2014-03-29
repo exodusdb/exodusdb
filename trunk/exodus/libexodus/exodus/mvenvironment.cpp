@@ -102,6 +102,11 @@ bool MvEnvironment::init(const int threadno) {
 	this->USERNAME = L"";
 	this->ACCOUNT = L"";
 	this->AW = L"";
+	this->EW = L"";
+	this->XW = L"";
+	this->VW = L"";
+	this->PW = L"";
+	this->SW = L"";
 	this->LOWERCASE = LOWERCASE_;
 	this->UPPERCASE = UPPERCASE_;
 	this->SYSTEM = L"";
@@ -123,6 +128,11 @@ bool MvEnvironment::init(const int threadno) {
 	this->DEFINITIONS = L"";
 	this->SECURITY = L"";
 	this->LISTACTIVE = 0;
+	this->CRTWIDE = 80;
+	this->CRTHIGH = 25;
+	this->LPTRWIDE = 132;
+	this->LPTRHIGH = 66;
+
 
 	//this->RECORD=L"";	// to avoid RECORD(1) throw exception because var is not string
 

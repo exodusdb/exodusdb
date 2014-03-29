@@ -243,7 +243,7 @@ void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsec
 			reply=library.call(filename,dictkey);
 */
 std::wcerr<<L"mvipc: " << str_libname.c_str() << L" " << str_funcname.c_str()<<std::endl;
-		if (not exodusfunctorbase.initdict(str_libname.c_str(),str_funcname.c_str()))
+		if (not exodusfunctorbase.initsmf(str_libname.c_str(),str_funcname.c_str()))
 		/////////////////////////////////////////////////////////////////////////////
 		{
 			var reply=response^L"Cannot find Library "^str_libname^L", or function "^str_funcname^L" is not present";
@@ -269,7 +269,7 @@ std::wcerr<<L"mvipc: " << str_libname.c_str() << L" " << str_funcname.c_str()<<s
 				//typedef var (*ExodusDynamic)(MvEnvironment& mvx);
 				//((ExodusDynamic) exodusfunctorbase.pfunction_)(exodusfunctorbase.mv_);
 
-				exodusfunctorbase.calldict();
+				exodusfunctorbase.callsmf();
 				/////////////////////////////
 
 				//dictionary subroutines return return in mv ANS.

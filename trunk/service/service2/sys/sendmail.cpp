@@ -15,7 +15,6 @@ var savesentence;
 var v5;
 var v6;
 var v8;
-var VM;
 var params;
 var params2;
 var bodyfilename;
@@ -214,7 +213,7 @@ forcedemail:
 	//body=body0
 
 	//if index(body,' ',1) or len(body)>10 or index(body,\0D\,1) or index(body,\0A\,1) then
-	if (body and body[1] ne "@") {
+	if (SLASH_IS_BACKSLASH and body and body[1] ne "@") {
 		bodyfilename = "$" ^ (var("999999999999").rnd()).substr(1, 7) ^ ".TXT";
 		//solve stupid outlook joining lines together if > 40 chars
 		//by adding tab on the end of every line
@@ -243,33 +242,66 @@ forcedemail:
 
 	var errorfilename = var("99999999").rnd() ^ ".$$$";
 
-	var cmd = "START /w";
-	//option to de-bug
-	//cmd=' WSCRIPT //X'
-	cmd ^= " sendmail.js /e " ^ errorfilename ^ " /p " ^ paramfilename;
+	var cmd;
+	if (SLASH_IS_BACKSLASH) {
+		cmd = "START /w";
+		//option to de-bug
+		//cmd=' WSCRIPT //X'
+		cmd ^= " sendmail.js /e " ^ errorfilename ^ " /p " ^ paramfilename;
 
-	//params='/t ':quote(toaddress):' /s ':quote(subject):' /b ':quote(body):' /a ':quote(attachfilename)
-	//if delete then params:=' /d ':delete
+		//params='/t ':quote(toaddress):' /s ':quote(subject):' /b ':quote(body):' /a ':quote(attachfilename)
+		//if delete then params:=' /d ':delete
 
-	params.r(-1, "toaddress=" ^ (DQ ^ (toaddress ^ DQ)));
-	if (ccaddress) {
-		params.r(-1, "ccaddress=" ^ (DQ ^ (ccaddress ^ DQ)));
+		params.r(-1, "toaddress=" ^ (DQ ^ (toaddress ^ DQ)));
+		if (ccaddress) {
+			params.r(-1, "ccaddress=" ^ (DQ ^ (ccaddress ^ DQ)));
+		}
+		params.r(-1, "subject=" ^ (DQ ^ (subject ^ DQ)));
+		params.r(-1, "body=" ^ (DQ ^ (body ^ DQ)));
+
+		if (attachfilename) {
+			params.r(-1, "attachfilename=" ^ (DQ ^ (attachfilename ^ DQ)));
+		}
+		if (deletex) {
+			params.r(-1, "deleteaftersend=" ^ (DQ ^ (deletex ^ DQ)));
+		}
+		params ^= FM;
+
+		params.swapper(FM, "\r\n");
+		call oswrite(params, paramfilename);
+
+		osshell(cmd);
+		/////////////
+
+	//use mail/mailx
+	} else {
+
+		ossetenv("MAILFROM",params1.a(1));
+		if (replyto) {
+			ossetenv("replyto",replyto);
+		}
+
+		cmd="mail";
+		cmd^=" -r "^params1.a(1);//mailfrom but doesnt work via smtp according to man mailx
+		cmd^=" -s "^subject.quote();
+		if (ccaddress) {
+			cmd^=" -c "^ccaddress;
+		}
+		if (attachfilename) {
+			cmd^=" -a "^attachfilename;
+		}
+		cmd^=" "^toaddress;
+
+		cmd^=" 2>"^errorfilename;
+asm("int $3");
+		var mailresult=cmd.osshellwrite(body);
+		/////////////////////////////////////
+
+//		oswrite(mailresult,"mailresult");
+
+		//cmd^="-- -F $MAILFROM -f ${MAILFROM}@somedomain.com";
+
 	}
-	params.r(-1, "subject=" ^ (DQ ^ (subject ^ DQ)));
-	params.r(-1, "body=" ^ (DQ ^ (body ^ DQ)));
-
-	if (attachfilename) {
-		params.r(-1, "attachfilename=" ^ (DQ ^ (attachfilename ^ DQ)));
-	}
-	if (deletex) {
-		params.r(-1, "deleteaftersend=" ^ (DQ ^ (deletex ^ DQ)));
-	}
-	params ^= FM;
-
-	params.swapper(FM, "\r\n");
-	call oswrite(params, paramfilename);
-
-	osshell(cmd);
 
 	if (bodyfilename) {
 		bodyfilename.osdelete();

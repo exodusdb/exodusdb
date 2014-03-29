@@ -1768,7 +1768,9 @@ function neosysdblink_send_byhttp_using_xmlhttp(data) {
 
             var timesent = new Date
             //alert('DEBUG: pre:'+thisrequest)
+  	    ///////////////
             xhttp.send(xdoc)
+	    ///////////////
             //alert('DEBUG: post:'+thisrequest)
 
             log(action + ' ' + (new Date - timesent) + 'ms')

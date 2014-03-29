@@ -16,6 +16,10 @@ DLL_PUBLIC
 	ExodusProgramBase::~ExodusProgramBase()
 		{};
 
+var ExodusProgramBase::execute(const var& sentence) {
+	return perform(sentence);
+}
+
 var ExodusProgramBase::perform(const var& sentence) {
 	//THISIS(L"var MvEnvironment::perform(const var& sentence)")
 	//ISSTRING(sentence)
@@ -29,8 +33,7 @@ var ExodusProgramBase::perform(const var& sentence) {
 	var libid = sentence.field(L" ", 1);
 
 	//open the library routine
-	if (libid != cache_perform_libid_) {
-		cache_perform_libid_ = libid;
+	//if (libid != cache_perform_libid_) {
 
 		//if (!perform_exodusfunctorbase_.mv_)
 			perform_exodusfunctorbase_.mv_ = (&mv);
@@ -39,12 +42,18 @@ var ExodusProgramBase::perform(const var& sentence) {
 		//std::string str_funcname="main";
 		//if (!exodusfunctorbase_.init(str_libname.c_str(),str_funcname.c_str()))
 		//	throw MVException(L"perform() Cannot find Library "^str_libname^L", or function "^str_funcname^L" is not present");
-		if (!perform_exodusfunctorbase_.init2(str_libname.c_str(),
-				"exodusprogrambasecreatedelete_"))
-			throw MVException(
-					L"perform() Cannot find shared library \"" ^ str_libname
-							^ L"\", or function \"libraryexit()\" is not present");
-	}
+		if (!perform_exodusfunctorbase_.initsmf(
+			str_libname.c_str(),
+			"exodusprogrambasecreatedelete_",
+			true //forcenew each perform/execute
+			)) {
+			mv.USER4^=L"perform() Cannot find shared library \"" ^ str_libname
+				^ L"\", or function \"libraryexit()\" is not present";
+			//throw MVException(USER4);
+			return "";
+		}
+	//	cache_perform_libid_ = libid;
+	//}
 
 	//save some environment
 	var savesentence;
@@ -53,21 +62,8 @@ var ExodusProgramBase::perform(const var& sentence) {
 	//set new perform environment
 	mv.SENTENCE = sentence;
 
-	//move to perform() in efb like calldict? or move both here?
-
-	//same code in "sharedlibsubroutine.h" of callable external functions (returns var, zero arguments version)
-
-	//define a function type (pExodusProgramBaseMemberFunction)
-	//that can call the shared library object member function
-	//with the right arguments and returning a var
-	typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)();
-
-	//call the shared library object main function with the right args, returning a var
-	//std::cout<<"precall"<<std::endl;
-	mv.ANS =
-			CALLMEMBERFUNCTION(*(perform_exodusfunctorbase_.pobject_),
-					((pExodusProgramBaseMemberFunction) (perform_exodusfunctorbase_.pmemberfunction_)))();
-	//std::cout<<"postcall"<<std::endl;
+	mv.ANS=perform_exodusfunctorbase_.callsmf();
+	////////////////////////////////////////////
 
 	//restore some environment
 	//std::cout<<"pretransfer"<<std::endl;
@@ -106,17 +102,36 @@ var ExodusProgramBase::calculate(const var& dictid) {
 
 	//get the dictionary record so we know how to extract the correct field or call the right library
 	bool newlibfunc;
+	bool indictmd=false;
 	if (cache_dictid_ != dictid) {
 		newlibfunc = true;
 		if (not mv.DICT)
 			throw MVException(
 					L"calculate(" ^ dictid
 							^ L") mv.DICT file variable has not been set");
-		if (not cache_dictrec_.read(mv.DICT, dictid))
-			if (not cache_dictrec_.read(mv.DICT, dictid.lcase()))
-				throw MVException(
-					L"calculate(" ^ dictid ^ L") dictionary record not in mv.DICT "
-							^ mv.DICT.quote());
+		if (not cache_dictrec_.read(mv.DICT, dictid)) {
+			//try lower case
+			if (not cache_dictrec_.read(mv.DICT, dictid.lcase())) {
+
+				//try dict_md
+				var dictmd;//TODO implement mv.DICTMD to avoid opening
+				if (not dictmd.open("dict_md")) {
+baddict:
+					throw MVException(
+						L"calculate("
+						^ dictid
+						^ L") dictionary record not in mv.DICT "
+						^ mv.DICT.quote());
+				}
+				if (not cache_dictrec_.read(dictmd, dictid)) {
+					//try lower case
+					if (not cache_dictrec_.read(dictmd, dictid.lcase())) {
+						goto baddict;
+					}
+				}
+				indictmd=true;
+			}
+		}
 		cache_dictid_ = dictid;
 	} else
 		newlibfunc = false;
@@ -164,10 +179,14 @@ var ExodusProgramBase::calculate(const var& dictid) {
 
 	} else if (dicttype == L"S") {
 		//TODO deduplicate various exodusfunctorbase code spread around calculate mvipc* etc
-		if (newlibfunc) {
-			std::string str_libname = mv.DICT.lcase().toString();
+		if (newlibfunc) {			
+			std::string str_libname;
+			if (indictmd)
+				str_libname = "dict_md";
+			else
+				str_libname = mv.DICT.lcase().toString();
 			std::string str_funcname = (L"exodusprogrambasecreatedelete_" ^ dictid.lcase()).toString();
-			if (!dict_exodusfunctorbase_.initdict(str_libname.c_str(),str_funcname.c_str()))
+			if (!dict_exodusfunctorbase_.initsmf(str_libname.c_str(),str_funcname.c_str()))
 				throw MVException(
 						L"calculate() Cannot find Library " ^ str_libname
 								^ L", or function " ^ dictid.lcase()
