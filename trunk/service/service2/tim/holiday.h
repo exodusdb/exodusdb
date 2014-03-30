@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_HOLIDAY_H
+//#ifndef EXODUSDLFUNC_HOLIDAY_H
 #define EXODUSDLFUNC_HOLIDAY_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var holiday(in mode, in idate0, in usercode, in user, in marketcode, in market, 
   (mode,idate0,usercode,user,marketcode,market,agp,holidaytype,workdate);
 
 }
-#endif
+//#endif

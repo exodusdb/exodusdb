@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_AGENCYSUBS_H
+//#ifndef EXODUSDLFUNC_AGENCYSUBS_H
 #define EXODUSDLFUNC_AGENCYSUBS_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var agencysubs(in mode, io msg, in param3x="")
   (mode,msg,param3x);
 
 }
-#endif
+//#endif

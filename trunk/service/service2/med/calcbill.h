@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_CALCBILL_H
+//#ifndef EXODUSDLFUNC_CALCBILL_H
 #define EXODUSDLFUNC_CALCBILL_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var calcbill(io grossbill, in size, in extrasx, in unused, io msg, in roundingx,
   (grossbill,size,extrasx,unused,msg,roundingx,mult,amounts);
 
 }
-#endif
+//#endif

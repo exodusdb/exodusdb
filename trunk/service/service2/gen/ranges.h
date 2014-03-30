@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_RANGES_H
+//#ifndef EXODUSDLFUNC_RANGES_H
 #define EXODUSDLFUNC_RANGES_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var ranges(io ranges0, in basekey0, in listid="")
   (ranges0,basekey0,listid);
 
 }
-#endif
+//#endif

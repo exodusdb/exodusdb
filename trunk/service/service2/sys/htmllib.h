@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_HTMLLIB_H
+//#ifndef EXODUSDLFUNC_HTMLLIB_H
 #define EXODUSDLFUNC_HTMLLIB_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ void htmllib(in mode, io datax, in params="", in params20="")
   (mode,datax,params,params20);
 
 }
-#endif
+//#endif

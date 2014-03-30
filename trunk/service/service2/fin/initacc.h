@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_INITACC_H
+//#ifndef EXODUSDLFUNC_INITACC_H
 #define EXODUSDLFUNC_INITACC_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var initacc()
   ();
 
 }
-#endif
+//#endif

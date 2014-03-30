@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_VALIDCODE3_H
+//#ifndef EXODUSDLFUNC_VALIDCODE3_H
 #define EXODUSDLFUNC_VALIDCODE3_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var validcode3(in marketcodex, in suppliercodex, in vehiclecodex, io vehicles, o
   (marketcodex,suppliercodex,vehiclecodex,vehicles,msg);
 
 }
-#endif
+//#endif

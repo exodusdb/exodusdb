@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_SECURITYSUBS_H
+//#ifndef EXODUSDLFUNC_SECURITYSUBS_H
 #define EXODUSDLFUNC_SECURITYSUBS_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var securitysubs(in mode)
   (mode);
 
 }
-#endif
+//#endif

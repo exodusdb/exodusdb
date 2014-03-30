@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_BTREEEXTRACT_H
+//#ifndef EXODUSDLFUNC_BTREEEXTRACT_H
 #define EXODUSDLFUNC_BTREEEXTRACT_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var btreeextract(in cmd, in filename, in dictfile, out hits)
   (cmd,filename,dictfile,hits);
 
 }
-#endif
+//#endif

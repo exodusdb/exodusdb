@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_EMAILUSERS_H
+//#ifndef EXODUSDLFUNC_EMAILUSERS_H
 #define EXODUSDLFUNC_EMAILUSERS_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var emailusers(in mode, in subject0, in body0, in groupids0, in jobids0, in user
   (mode,subject0,body0,groupids0,jobids0,userids0,options,emaillog);
 
 }
-#endif
+//#endif

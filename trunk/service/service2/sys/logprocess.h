@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_LOGPROCESS_H
+//#ifndef EXODUSDLFUNC_LOGPROCESS_H
 #define EXODUSDLFUNC_LOGPROCESS_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var logprocess(io processid, in processcategory, in processparameters="", in pro
   (processid,processcategory,processparameters,processresult,processcomments);
 
 }
-#endif
+//#endif

@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_GETLANG_H
+//#ifndef EXODUSDLFUNC_GETLANG_H
 #define EXODUSDLFUNC_GETLANG_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var getlang(in origprogname0, in languagecode0, in origdatatype, io languagefile
   (origprogname0,languagecode0,origdatatype,languagefile,lang);
 
 }
-#endif
+//#endif

@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_GETSUBS_H
+//#ifndef EXODUSDLFUNC_GETSUBS_H
 #define EXODUSDLFUNC_GETSUBS_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var getsubs(in mode)
   (mode);
 
 }
-#endif
+//#endif

@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_INITAGENCY_H
+//#ifndef EXODUSDLFUNC_INITAGENCY_H
 #define EXODUSDLFUNC_INITAGENCY_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var initagency()
   ();
 
 }
-#endif
+//#endif

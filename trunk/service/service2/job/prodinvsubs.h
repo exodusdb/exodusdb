@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_PRODINVSUBS_H
+//#ifndef EXODUSDLFUNC_PRODINVSUBS_H
 #define EXODUSDLFUNC_PRODINVSUBS_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var prodinvsubs(in mode)
   (mode);
 
 }
-#endif
+//#endif

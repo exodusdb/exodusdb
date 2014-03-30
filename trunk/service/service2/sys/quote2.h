@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_QUOTE2_H
+//#ifndef EXODUSDLFUNC_QUOTE2_H
 #define EXODUSDLFUNC_QUOTE2_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var quote2(in string0)
   (string0);
 
 }
-#endif
+//#endif

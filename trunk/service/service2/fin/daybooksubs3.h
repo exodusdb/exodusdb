@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_DAYBOOKSUBS3_H
+//#ifndef EXODUSDLFUNC_DAYBOOKSUBS3_H
 #define EXODUSDLFUNC_DAYBOOKSUBS3_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var daybooksubs3(in mode)
   (mode);
 
 }
-#endif
+//#endif

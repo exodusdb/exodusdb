@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_GETHTML_H
+//#ifndef EXODUSDLFUNC_GETHTML_H
 #define EXODUSDLFUNC_GETHTML_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var gethtml(in mode, out html, in companycode0="")
   (mode,html,companycode0);
 
 }
-#endif
+//#endif

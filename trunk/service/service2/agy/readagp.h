@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_READAGP_H
+//#ifndef EXODUSDLFUNC_READAGP_H
 #define EXODUSDLFUNC_READAGP_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var readagp()
   ();
 
 }
-#endif
+//#endif

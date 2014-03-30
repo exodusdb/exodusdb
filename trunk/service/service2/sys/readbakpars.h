@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_READBAKPARS_H
+//#ifndef EXODUSDLFUNC_READBAKPARS_H
 #define EXODUSDLFUNC_READBAKPARS_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var readbakpars(io bakpars, in process0=var())
   (bakpars,process0);
 
 }
-#endif
+//#endif

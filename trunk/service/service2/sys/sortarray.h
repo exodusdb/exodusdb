@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_SORTARRAY_H
+//#ifndef EXODUSDLFUNC_SORTARRAY_H
 #define EXODUSDLFUNC_SORTARRAY_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var sortarray(io array, in fns, in order="A", in justification="L")
   (array,fns,order,justification);
 
 }
-#endif
+//#endif

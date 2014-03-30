@@ -4,18 +4,15 @@ libraryinit()
 //recursive call
 #include <authorised.h>
 
-#include <gen.h>
-
-var username;
-var msgusername;
-var taskn;//num
-var taskn2;
-var xx;
-var usern;
-
 function main(in task0, out msg, in defaultlock="", in username0="") {
-	//call msg(task)
-	//jbase
+
+	var username;
+	var msgusername;
+	var taskn;//num
+	var taskn2;
+	var xx;
+	var usern;
+
 	var task=task0;
 	if (username0.unassigned() or username0 eq "") {
 		//allow for username like FINANCE(STEVE)

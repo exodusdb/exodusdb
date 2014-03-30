@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_DICT_BRANDS_H
+//#ifndef EXODUSDLFUNC_DICT_BRANDS_H
 #define EXODUSDLFUNC_DICT_BRANDS_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -275,4 +275,4 @@ var dict_brands()
   ();
 
 }
-#endif
+//#endif

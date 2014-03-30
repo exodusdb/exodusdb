@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_PRINTJOB_H
+//#ifndef EXODUSDLFUNC_PRINTJOB_H
 #define EXODUSDLFUNC_PRINTJOB_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var printjob()
   ();
 
 }
-#endif
+//#endif

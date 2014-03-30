@@ -1,10 +1,10 @@
-#include <authorised.h>
+//#include <authorised.h>
 
 function security(in mode)
 {
 	/////////
 	//valid=1 move down
-	var op = mv.singular(win.datafile);
+	var op = singular(win.datafile);
 	//if op[-3,3]='ies' then op[-3,3]='y'
 	//if op-1,1]='s' then op[-1,1]=''
 	//op:=' file'
