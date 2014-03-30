@@ -4,7 +4,7 @@
 //a member variable/object to cache a pointer/object for the shared library function
 ExodusFunctorBase efb_printtx;
 
-//a member function with the right arguments, returning a var
+//a member function with the right arguments, returning a var or void
 var printtx(io tx, in mode="", in modevalue="")
 {
 
@@ -15,10 +15,11 @@ var printtx(io tx, in mode="", in modevalue="")
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
- //with the right arguments and returning a var
+ //with the right arguments and returning a var or void
  typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(io,in,in);
 
- //call the shared library object main function with the right args, returning a var
+ //call the shared library object main function with the right args,
+ // returning a var or void
  return CALLMEMBERFUNCTION(*(efb_printtx.pobject_),
  ((pExodusProgramBaseMemberFunction) (efb_printtx.pmemberfunction_)))
   (tx,mode,modevalue);

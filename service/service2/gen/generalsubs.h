@@ -1,10 +1,10 @@
-#ifndef EXODUSDLFUNC_GENERALSUBS_H
+//#ifndef EXODUSDLFUNC_GENERALSUBS_H
 #define EXODUSDLFUNC_GENERALSUBS_H
 
 //a member variable/object to cache a pointer/object for the shared library function
 ExodusFunctorBase efb_generalsubs;
 
-//a member function with the right arguments, returning a var
+//a member function with the right arguments, returning a var or void
 var generalsubs(in mode)
 {
 
@@ -15,13 +15,14 @@ var generalsubs(in mode)
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
- //with the right arguments and returning a var
+ //with the right arguments and returning a var or void
  typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(in);
 
- //call the shared library object main function with the right args, returning a var
+ //call the shared library object main function with the right args,
+ // returning a var or void
  return CALLMEMBERFUNCTION(*(efb_generalsubs.pobject_),
  ((pExodusProgramBaseMemberFunction) (efb_generalsubs.pmemberfunction_)))
   (mode);
 
 }
-#endif
+//#endif

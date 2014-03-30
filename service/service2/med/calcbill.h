@@ -4,7 +4,7 @@
 //a member variable/object to cache a pointer/object for the shared library function
 ExodusFunctorBase efb_calcbill;
 
-//a member function with the right arguments, returning a var
+//a member function with the right arguments, returning a var or void
 var calcbill(io grossbill, in size, in extrasx, in unused, io msg, in roundingx, io mult, io amounts)
 {
 
@@ -15,10 +15,11 @@ var calcbill(io grossbill, in size, in extrasx, in unused, io msg, in roundingx,
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
- //with the right arguments and returning a var
+ //with the right arguments and returning a var or void
  typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(io,in,in,in,io,in,io,io);
 
- //call the shared library object main function with the right args, returning a var
+ //call the shared library object main function with the right args,
+ // returning a var or void
  return CALLMEMBERFUNCTION(*(efb_calcbill.pobject_),
  ((pExodusProgramBaseMemberFunction) (efb_calcbill.pmemberfunction_)))
   (grossbill,size,extrasx,unused,msg,roundingx,mult,amounts);

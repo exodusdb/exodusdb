@@ -4,7 +4,7 @@
 //a member variable/object to cache a pointer/object for the shared library function
 ExodusFunctorBase efb_updalloc;
 
-//a member function with the right arguments, returning a var
+//a member function with the right arguments, returning a var or void
 var updalloc(io mode, io payment, in paymentcode, io allocs)
 {
 
@@ -15,10 +15,11 @@ var updalloc(io mode, io payment, in paymentcode, io allocs)
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
- //with the right arguments and returning a var
+ //with the right arguments and returning a var or void
  typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(io,io,in,io);
 
- //call the shared library object main function with the right args, returning a var
+ //call the shared library object main function with the right args,
+ // returning a var or void
  return CALLMEMBERFUNCTION(*(efb_updalloc.pobject_),
  ((pExodusProgramBaseMemberFunction) (efb_updalloc.pmemberfunction_)))
   (mode,payment,paymentcode,allocs);

@@ -4,7 +4,7 @@
 //a member variable/object to cache a pointer/object for the shared library function
 ExodusFunctorBase efb_giveway;
 
-//a member function with the right arguments, returning a var
+//a member function with the right arguments, returning a var or void
 var giveway()
 {
 
@@ -15,10 +15,11 @@ var giveway()
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
- //with the right arguments and returning a var
+ //with the right arguments and returning a var or void
  typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)();
 
- //call the shared library object main function with the right args, returning a var
+ //call the shared library object main function with the right args,
+ // returning a var or void
  return CALLMEMBERFUNCTION(*(efb_giveway.pobject_),
  ((pExodusProgramBaseMemberFunction) (efb_giveway.pmemberfunction_)))
   ();

@@ -4,7 +4,7 @@
 //a member variable/object to cache a pointer/object for the shared library function
 ExodusFunctorBase efb_addacc;
 
-//a member function with the right arguments, returning a var
+//a member function with the right arguments, returning a var or void
 var addacc(in mode, io ledgercode, in newaccno0, in newaccount, in sortorder, in params0, out msg)
 {
 
@@ -15,10 +15,11 @@ var addacc(in mode, io ledgercode, in newaccno0, in newaccount, in sortorder, in
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
- //with the right arguments and returning a var
+ //with the right arguments and returning a var or void
  typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(in,io,in,in,in,in,out);
 
- //call the shared library object main function with the right args, returning a var
+ //call the shared library object main function with the right args,
+ // returning a var or void
  return CALLMEMBERFUNCTION(*(efb_addacc.pobject_),
  ((pExodusProgramBaseMemberFunction) (efb_addacc.pmemberfunction_)))
   (mode,ledgercode,newaccno0,newaccount,sortorder,params0,msg);

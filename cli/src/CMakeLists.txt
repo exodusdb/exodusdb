@@ -1,24 +1,22 @@
 cmake_minimum_required(VERSION 2.8)
 
 include_directories(
-	.
-	..
-	${PostgreSQL_INCLUDE_DIRS}
-	/usr/include/postgresql/9.1/server/
 	../../exodus/libexodus
 )
-
-#SET(CPACK_DEB_COMPONENT_INSTALL 1)
-#INSTALL(TARGETS compile DESTINATION bin/exodus COMPONENT main)
 
 project(exodus)
 
 link_directories(../../exodus/libexodus/exodus)
 
+#NB add any NEW programs here and in TWO MORE sections further down
+#target_link_libraries(
+#install(
+
 add_executable(compile compile.cpp)
 add_executable(createfile createfile.cpp)
 add_executable(createindex createindex.cpp)
 add_executable(delete delete.cpp)
+add_executable(clearfile clearfile.cpp)
 add_executable(deletefile deletefile.cpp)
 add_executable(deleteindex deleteindex.cpp)
 add_executable(edir edir.cpp)
@@ -36,17 +34,12 @@ add_executable(configexodus configexodus.cpp)
 
 
 #dl is needed for dynamic link library code
-find_package(Boost REQUIRED COMPONENTS filesystem date_time system regex thread)
-find_package(PostgreSQL REQUIRED COMPONENTS pqlib)
-find_package(ICU 4.4 REQUIRED)
-
-#should be automatic from exodus lib somehow
-#set(LIBS ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} ${ICU_LIBRARIES} dl)
 
 target_link_libraries(compile exodus ${LIBS})
 target_link_libraries(createfile exodus ${LIBS})
 target_link_libraries(createindex exodus ${LIBS})
 target_link_libraries(delete exodus ${LIBS})
+target_link_libraries(clearfile exodus ${LIBS})
 target_link_libraries(deletefile exodus ${LIBS})
 target_link_libraries(deleteindex exodus ${LIBS})
 target_link_libraries(edir exodus ${LIBS})
@@ -62,6 +55,7 @@ install(TARGETS compile
 createfile
 createindex
 delete
+clearfile
 deletefile
 deleteindex
 edir

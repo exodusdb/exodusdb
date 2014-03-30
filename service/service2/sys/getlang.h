@@ -4,7 +4,7 @@
 //a member variable/object to cache a pointer/object for the shared library function
 ExodusFunctorBase efb_getlang;
 
-//a member function with the right arguments, returning a var
+//a member function with the right arguments, returning a var or void
 var getlang(in origprogname0, in languagecode0, in origdatatype, io languagefile, io lang)
 {
 
@@ -15,10 +15,11 @@ var getlang(in origprogname0, in languagecode0, in origdatatype, io languagefile
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
- //with the right arguments and returning a var
+ //with the right arguments and returning a var or void
  typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(in,in,in,io,io);
 
- //call the shared library object main function with the right args, returning a var
+ //call the shared library object main function with the right args,
+ // returning a var or void
  return CALLMEMBERFUNCTION(*(efb_getlang.pobject_),
  ((pExodusProgramBaseMemberFunction) (efb_getlang.pmemberfunction_)))
   (origprogname0,languagecode0,origdatatype,languagefile,lang);

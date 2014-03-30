@@ -4,7 +4,7 @@
 //a member variable/object to cache a pointer/object for the shared library function
 ExodusFunctorBase efb_decide;
 
-//a member function with the right arguments, returning a var
+//a member function with the right arguments, returning a var or void
 var decide(in question0, in options0, io reply)
 {
 
@@ -15,10 +15,11 @@ var decide(in question0, in options0, io reply)
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
- //with the right arguments and returning a var
+ //with the right arguments and returning a var or void
  typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(in,in,io);
 
- //call the shared library object main function with the right args, returning a var
+ //call the shared library object main function with the right args,
+ // returning a var or void
  return CALLMEMBERFUNCTION(*(efb_decide.pobject_),
  ((pExodusProgramBaseMemberFunction) (efb_decide.pmemberfunction_)))
   (question0,options0,reply);

@@ -4,7 +4,7 @@
 //a member variable/object to cache a pointer/object for the shared library function
 ExodusFunctorBase efb_updbalances;
 
-//a member function with the right arguments, returning a var
+//a member function with the right arguments, returning a var or void
 var updbalances(in balancesfile, in balanceskey, in deleting, in balanceperiod, in amount, in baseamount, in unused, in basecurrency, in vouchertype)
 {
 
@@ -15,10 +15,11 @@ var updbalances(in balancesfile, in balanceskey, in deleting, in balanceperiod, 
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
- //with the right arguments and returning a var
+ //with the right arguments and returning a var or void
  typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(in,in,in,in,in,in,in,in,in);
 
- //call the shared library object main function with the right args, returning a var
+ //call the shared library object main function with the right args,
+ // returning a var or void
  return CALLMEMBERFUNCTION(*(efb_updbalances.pobject_),
  ((pExodusProgramBaseMemberFunction) (efb_updbalances.pmemberfunction_)))
   (balancesfile,balanceskey,deleting,balanceperiod,amount,baseamount,unused,basecurrency,vouchertype);

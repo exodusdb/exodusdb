@@ -4,7 +4,7 @@
 //a member variable/object to cache a pointer/object for the shared library function
 ExodusFunctorBase efb_updtasks;
 
-//a member function with the right arguments, returning a var
+//a member function with the right arguments, returning a var or void
 var updtasks(in mode, io oldtaskid, io task, io errmsg)
 {
 
@@ -15,10 +15,11 @@ var updtasks(in mode, io oldtaskid, io task, io errmsg)
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
- //with the right arguments and returning a var
+ //with the right arguments and returning a var or void
  typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(in,io,io,io);
 
- //call the shared library object main function with the right args, returning a var
+ //call the shared library object main function with the right args,
+ // returning a var or void
  return CALLMEMBERFUNCTION(*(efb_updtasks.pobject_),
  ((pExodusProgramBaseMemberFunction) (efb_updtasks.pmemberfunction_)))
   (mode,oldtaskid,task,errmsg);

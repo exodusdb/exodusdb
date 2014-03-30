@@ -4,7 +4,7 @@
 //a member variable/object to cache a pointer/object for the shared library function
 ExodusFunctorBase efb_updvoucher;
 
-//a member function with the right arguments, returning a var
+//a member function with the right arguments, returning a var or void
 var updvoucher(in mode0, io voucher, io vouchercode, io allocs)
 {
 
@@ -15,10 +15,11 @@ var updvoucher(in mode0, io voucher, io vouchercode, io allocs)
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
- //with the right arguments and returning a var
+ //with the right arguments and returning a var or void
  typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(in,io,io,io);
 
- //call the shared library object main function with the right args, returning a var
+ //call the shared library object main function with the right args,
+ // returning a var or void
  return CALLMEMBERFUNCTION(*(efb_updvoucher.pobject_),
  ((pExodusProgramBaseMemberFunction) (efb_updvoucher.pmemberfunction_)))
   (mode0,voucher,vouchercode,allocs);
