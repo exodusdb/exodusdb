@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_ADDJOBACC_H
+//#ifndef EXODUSDLFUNC_ADDJOBACC_H
 #define EXODUSDLFUNC_ADDJOBACC_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var addjobacc(in addaccmode, in jobno, io msg)
   (addaccmode,jobno,msg);
 
 }
-#endif
+//#endif

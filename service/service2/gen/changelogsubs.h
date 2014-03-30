@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_CHANGELOGSUBS_H
+//#ifndef EXODUSDLFUNC_CHANGELOGSUBS_H
 #define EXODUSDLFUNC_CHANGELOGSUBS_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var changelogsubs(in mode0)
   (mode0);
 
 }
-#endif
+//#endif

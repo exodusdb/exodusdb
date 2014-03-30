@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_GENERALPROXY_H
+//#ifndef EXODUSDLFUNC_GENERALPROXY_H
 #define EXODUSDLFUNC_GENERALPROXY_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var generalproxy()
   ();
 
 }
-#endif
+//#endif

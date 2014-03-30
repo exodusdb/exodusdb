@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_SELECT2_H
+//#ifndef EXODUSDLFUNC_SELECT2_H
 #define EXODUSDLFUNC_SELECT2_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var select2(in filenamex, in linkfilename2, in sortselect0, in dictids0, in opti
   (filenamex,linkfilename2,sortselect0,dictids0,options,datax,response,limitfields0,limitchecks,limitvalues,maxnrecs);
 
 }
-#endif
+//#endif

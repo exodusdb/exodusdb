@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_INITGENERAL2_H
+//#ifndef EXODUSDLFUNC_INITGENERAL2_H
 #define EXODUSDLFUNC_INITGENERAL2_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var initgeneral2(in mode, io logtime)
   (mode,logtime);
 
 }
-#endif
+//#endif

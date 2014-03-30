@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_MATERIALSUBS_H
+//#ifndef EXODUSDLFUNC_MATERIALSUBS_H
 #define EXODUSDLFUNC_MATERIALSUBS_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var materialsubs(in mode)
   (mode);
 
 }
-#endif
+//#endif

@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_ROUNDROBIN_H
+//#ifndef EXODUSDLFUNC_ROUNDROBIN_H
 #define EXODUSDLFUNC_ROUNDROBIN_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var roundrobin(in mode, in params0, io msg, io result)
   (mode,params0,msg,result);
 
 }
-#endif
+//#endif

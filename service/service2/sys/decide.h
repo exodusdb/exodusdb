@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_DECIDE_H
+//#ifndef EXODUSDLFUNC_DECIDE_H
 #define EXODUSDLFUNC_DECIDE_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var decide(in question0, in options0, io reply)
   (question0,options0,reply);
 
 }
-#endif
+//#endif

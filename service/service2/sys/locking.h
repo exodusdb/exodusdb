@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_LOCKING_H
+//#ifndef EXODUSDLFUNC_LOCKING_H
 #define EXODUSDLFUNC_LOCKING_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var locking(in mode, in lockfilename, in lockkey, in lockdesc0, io locklist, int
   (mode,lockfilename,lockkey,lockdesc0,locklist,ntries,msg);
 
 }
-#endif
+//#endif

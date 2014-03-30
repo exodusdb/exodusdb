@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_INITCOMPANY_H
+//#ifndef EXODUSDLFUNC_INITCOMPANY_H
 #define EXODUSDLFUNC_INITCOMPANY_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var initcompany(in nextcompanycode)
   (nextcompanycode);
 
 }
-#endif
+//#endif

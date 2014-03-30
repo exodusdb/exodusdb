@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_GETACC_H
+//#ifndef EXODUSDLFUNC_GETACC_H
 #define EXODUSDLFUNC_GETACC_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var getacc(io mode, io validaccs, io reqcompanies2, io acctype, io reqledgertype
   (mode,validaccs,reqcompanies2,acctype,reqledgertype,getacc2,inpaccnos);
 
 }
-#endif
+//#endif

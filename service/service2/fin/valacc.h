@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_VALACC_H
+//#ifndef EXODUSDLFUNC_VALACC_H
 #define EXODUSDLFUNC_VALACC_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var valacc(io mode, io is, io isorig, in validaccs, io msg, in acctype0)
   (mode,is,isorig,validaccs,msg,acctype0);
 
 }
-#endif
+//#endif

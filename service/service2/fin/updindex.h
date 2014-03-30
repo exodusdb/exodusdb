@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_UPDINDEX_H
+//#ifndef EXODUSDLFUNC_UPDINDEX_H
 #define EXODUSDLFUNC_UPDINDEX_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var updindex(in postingsindex, in indexkey, in daterefline, in deleting)
   (postingsindex,indexkey,daterefline,deleting);
 
 }
-#endif
+//#endif

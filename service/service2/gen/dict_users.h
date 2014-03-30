@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_DICT_USERS_H
+//#ifndef EXODUSDLFUNC_DICT_USERS_H
 #define EXODUSDLFUNC_DICT_USERS_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -50,4 +50,4 @@ var dict_users()
   ();
 
 }
-#endif
+//#endif

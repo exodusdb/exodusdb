@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_READCSS_H
+//#ifndef EXODUSDLFUNC_READCSS_H
 #define EXODUSDLFUNC_READCSS_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var readcss(io css)
   (css);
 
 }
-#endif
+//#endif

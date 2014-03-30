@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_READACCPARAMS_H
+//#ifndef EXODUSDLFUNC_READACCPARAMS_H
 #define EXODUSDLFUNC_READACCPARAMS_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var readaccparams()
   ();
 
 }
-#endif
+//#endif

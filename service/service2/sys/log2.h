@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_LOG2_H
+//#ifndef EXODUSDLFUNC_LOG2_H
 #define EXODUSDLFUNC_LOG2_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var log2(in msg0, io time0)
   (msg0,time0);
 
 }
-#endif
+//#endif

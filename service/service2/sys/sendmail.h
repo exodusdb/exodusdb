@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_SENDMAIL_H
+//#ifndef EXODUSDLFUNC_SENDMAIL_H
 #define EXODUSDLFUNC_SENDMAIL_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var sendmail(in toaddress0, in ccaddress0, in subject0, in body0, in attachfilen
   (toaddress0,ccaddress0,subject0,body0,attachfilename0,delete0,errormsg,replyto0,params0);
 
 }
-#endif
+//#endif

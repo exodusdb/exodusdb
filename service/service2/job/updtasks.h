@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_UPDTASKS_H
+//#ifndef EXODUSDLFUNC_UPDTASKS_H
 #define EXODUSDLFUNC_UPDTASKS_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var updtasks(in mode, io oldtaskid, io task, io errmsg)
   (mode,oldtaskid,task,errmsg);
 
 }
-#endif
+//#endif

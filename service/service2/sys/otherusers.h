@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_OTHERUSERS_H
+//#ifndef EXODUSDLFUNC_OTHERUSERS_H
 #define EXODUSDLFUNC_OTHERUSERS_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var otherusers(in databasecode="")
   (databasecode);
 
 }
-#endif
+//#endif

@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_OPENFILE_H
+//#ifndef EXODUSDLFUNC_OPENFILE_H
 #define EXODUSDLFUNC_OPENFILE_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var openfile(in filename, io file, in similarfilename="")
   (filename,file,similarfilename);
 
 }
-#endif
+//#endif

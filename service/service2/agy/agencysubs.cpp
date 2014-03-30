@@ -16,7 +16,7 @@ libraryinit()
 //#include <getreccount.h>
 //#include <suppliersubs.h>
 #include <singular.h>
-#include <authorised.h>
+//#include <authorised.h>
 
 
 #include <agy.h>

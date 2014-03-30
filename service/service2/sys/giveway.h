@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_GIVEWAY_H
+//#ifndef EXODUSDLFUNC_GIVEWAY_H
 #define EXODUSDLFUNC_GIVEWAY_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var giveway()
   ();
 
 }
-#endif
+//#endif

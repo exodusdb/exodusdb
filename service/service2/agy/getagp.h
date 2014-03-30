@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_GETAGP_H
+//#ifndef EXODUSDLFUNC_GETAGP_H
 #define EXODUSDLFUNC_GETAGP_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var getagp(in agpparams, in period0)
   (agpparams,period0);
 
 }
-#endif
+//#endif

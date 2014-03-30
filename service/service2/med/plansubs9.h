@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_PLANSUBS9_H
+//#ifndef EXODUSDLFUNC_PLANSUBS9_H
 #define EXODUSDLFUNC_PLANSUBS9_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var plansubs9(in msgno, out msg, in params="")
   (msgno,msg,params);
 
 }
-#endif
+//#endif

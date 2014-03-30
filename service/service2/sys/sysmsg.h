@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_SYSMSG_H
+//#ifndef EXODUSDLFUNC_SYSMSG_H
 #define EXODUSDLFUNC_SYSMSG_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var sysmsg(in msg0, in subject0="", in username0="")
   (msg0,subject0,username0);
 
 }
-#endif
+//#endif

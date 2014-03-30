@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_ADDCENT_H
+//#ifndef EXODUSDLFUNC_ADDCENT_H
 #define EXODUSDLFUNC_ADDCENT_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var addcent(in type)
   (type);
 
 }
-#endif
+//#endif

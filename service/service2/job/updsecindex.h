@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_UPDSECINDEX_H
+//#ifndef EXODUSDLFUNC_UPDSECINDEX_H
 #define EXODUSDLFUNC_UPDSECINDEX_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var updsecindex(in mode, in filename, in keys, in fieldnames, in oldvalues, in n
   (mode,filename,keys,fieldnames,oldvalues,newvalues,valid,msg);
 
 }
-#endif
+//#endif

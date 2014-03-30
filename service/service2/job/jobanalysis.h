@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_JOBANALYSIS_H
+//#ifndef EXODUSDLFUNC_JOBANALYSIS_H
 #define EXODUSDLFUNC_JOBANALYSIS_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var jobanalysis(in mode0)
   (mode0);
 
 }
-#endif
+//#endif

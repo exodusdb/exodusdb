@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_NEXTKEY_H
+//#ifndef EXODUSDLFUNC_NEXTKEY_H
 #define EXODUSDLFUNC_NEXTKEY_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var nextkey(in mode, in previous=var(""))
   (mode,previous);
 
 }
-#endif
+//#endif

@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_SPLIT_H
+//#ifndef EXODUSDLFUNC_SPLIT_H
 #define EXODUSDLFUNC_SPLIT_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var split(in input0, out unitx )
   (input0,unitx);
 
 }
-#endif
+//#endif

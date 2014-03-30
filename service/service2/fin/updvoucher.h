@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_UPDVOUCHER_H
+//#ifndef EXODUSDLFUNC_UPDVOUCHER_H
 #define EXODUSDLFUNC_UPDVOUCHER_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var updvoucher(in mode0, io voucher, io vouchercode, io allocs)
   (mode0,voucher,vouchercode,allocs);
 
 }
-#endif
+//#endif

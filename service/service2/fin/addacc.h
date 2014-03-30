@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_ADDACC_H
+//#ifndef EXODUSDLFUNC_ADDACC_H
 #define EXODUSDLFUNC_ADDACC_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var addacc(in mode, io ledgercode, in newaccno0, in newaccount, in sortorder, in
   (mode,ledgercode,newaccno0,newaccount,sortorder,params0,msg);
 
 }
-#endif
+//#endif

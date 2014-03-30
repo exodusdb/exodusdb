@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_PRINTTX_H
+//#ifndef EXODUSDLFUNC_PRINTTX_H
 #define EXODUSDLFUNC_PRINTTX_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var printtx(io tx, in mode="", in modevalue="")
   (tx,mode,modevalue);
 
 }
-#endif
+//#endif

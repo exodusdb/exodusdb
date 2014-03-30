@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_XREF_H
+//#ifndef EXODUSDLFUNC_XREF_H
 #define EXODUSDLFUNC_XREF_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var xref(in instr, in sepchars, in stoplist, in mode)
   (instr,sepchars,stoplist,mode);
 
 }
-#endif
+//#endif

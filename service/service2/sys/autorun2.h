@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_AUTORUN2_H
+//#ifndef EXODUSDLFUNC_AUTORUN2_H
 #define EXODUSDLFUNC_AUTORUN2_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var autorun2(in mode, in title0, in module, in request, in data, in runasusercod
   (mode,title0,module,request,data,runasusercode0,targetusercodes0,document0,docid,msg);
 
 }
-#endif
+//#endif

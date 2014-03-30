@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_UPDBALANCES_H
+//#ifndef EXODUSDLFUNC_UPDBALANCES_H
 #define EXODUSDLFUNC_UPDBALANCES_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var updbalances(in balancesfile, in balanceskey, in deleting, in balanceperiod, 
   (balancesfile,balanceskey,deleting,balanceperiod,amount,baseamount,unused,basecurrency,vouchertype);
 
 }
-#endif
+//#endif

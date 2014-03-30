@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_GETMARK_H
+//#ifndef EXODUSDLFUNC_GETMARK_H
 #define EXODUSDLFUNC_GETMARK_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var getmark(in mode, in html, io mark)
   (mode,html,mark);
 
 }
-#endif
+//#endif

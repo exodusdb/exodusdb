@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_UNIQUE_H
+//#ifndef EXODUSDLFUNC_UNIQUE_H
 #define EXODUSDLFUNC_UNIQUE_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var unique(in list0)
   (list0);
 
 }
-#endif
+//#endif

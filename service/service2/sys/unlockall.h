@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_UNLOCKALL_H
+//#ifndef EXODUSDLFUNC_UNLOCKALL_H
 #define EXODUSDLFUNC_UNLOCKALL_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var unlockall(io locklist)
   (locklist);
 
 }
-#endif
+//#endif

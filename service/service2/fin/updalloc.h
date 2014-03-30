@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_UPDALLOC_H
+//#ifndef EXODUSDLFUNC_UPDALLOC_H
 #define EXODUSDLFUNC_UPDALLOC_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var updalloc(io mode, io payment, in paymentcode, io allocs)
   (mode,payment,paymentcode,allocs);
 
 }
-#endif
+//#endif

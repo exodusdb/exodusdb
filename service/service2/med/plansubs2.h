@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_PLANSUBS2_H
+//#ifndef EXODUSDLFUNC_PLANSUBS2_H
 #define EXODUSDLFUNC_PLANSUBS2_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var plansubs2(in modex)
   (modex);
 
 }
-#endif
+//#endif

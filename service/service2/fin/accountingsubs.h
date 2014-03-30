@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_ACCOUNTINGSUBS_H
+//#ifndef EXODUSDLFUNC_ACCOUNTINGSUBS_H
 #define EXODUSDLFUNC_ACCOUNTINGSUBS_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var accountingsubs(in mode)
   (mode);
 
 }
-#endif
+//#endif

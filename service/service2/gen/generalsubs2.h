@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_GENERALSUBS2_H
+//#ifndef EXODUSDLFUNC_GENERALSUBS2_H
 #define EXODUSDLFUNC_GENERALSUBS2_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var generalsubs2(in mode)
   (mode);
 
 }
-#endif
+//#endif

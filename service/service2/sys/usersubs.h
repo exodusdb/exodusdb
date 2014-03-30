@@ -1,4 +1,4 @@
-#ifndef EXODUSDLFUNC_USERSUBS_H
+//#ifndef EXODUSDLFUNC_USERSUBS_H
 #define EXODUSDLFUNC_USERSUBS_H
 
 //a member variable/object to cache a pointer/object for the shared library function
@@ -25,4 +25,4 @@ var usersubs(in mode)
   (mode);
 
 }
-#endif
+//#endif
