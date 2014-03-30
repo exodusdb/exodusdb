@@ -4,7 +4,7 @@
 //a member variable/object to cache a pointer/object for the shared library function
 ExodusFunctorBase efb_sortarray;
 
-//a member function with the right arguments, returning a var
+//a member function with the right arguments, returning a var or void
 var sortarray(io array, in fns, in order="A", in justification="L")
 {
 
@@ -15,10 +15,11 @@ var sortarray(io array, in fns, in order="A", in justification="L")
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
- //with the right arguments and returning a var
+ //with the right arguments and returning a var or void
  typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(io,in,in,in);
 
- //call the shared library object main function with the right args, returning a var
+ //call the shared library object main function with the right args,
+ // returning a var or void
  return CALLMEMBERFUNCTION(*(efb_sortarray.pobject_),
  ((pExodusProgramBaseMemberFunction) (efb_sortarray.pmemberfunction_)))
   (array,fns,order,justification);

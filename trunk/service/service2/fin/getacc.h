@@ -4,7 +4,7 @@
 //a member variable/object to cache a pointer/object for the shared library function
 ExodusFunctorBase efb_getacc;
 
-//a member function with the right arguments, returning a var
+//a member function with the right arguments, returning a var or void
 var getacc(io mode, io validaccs, io reqcompanies2, io acctype, io reqledgertype, io getacc2, io inpaccnos)
 {
 
@@ -15,10 +15,11 @@ var getacc(io mode, io validaccs, io reqcompanies2, io acctype, io reqledgertype
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
- //with the right arguments and returning a var
+ //with the right arguments and returning a var or void
  typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(io,io,io,io,io,io,io);
 
- //call the shared library object main function with the right args, returning a var
+ //call the shared library object main function with the right args,
+ // returning a var or void
  return CALLMEMBERFUNCTION(*(efb_getacc.pobject_),
  ((pExodusProgramBaseMemberFunction) (efb_getacc.pmemberfunction_)))
   (mode,validaccs,reqcompanies2,acctype,reqledgertype,getacc2,inpaccnos);

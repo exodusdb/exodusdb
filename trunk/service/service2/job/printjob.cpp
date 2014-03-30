@@ -709,7 +709,7 @@ unauth:
 
 		call printtx(tx);
 
-		call printtx(xx,"printnext");
+		call printtx(xx,"pagebreak");
 		var newpage = 1;
 
 	}//nextjob;

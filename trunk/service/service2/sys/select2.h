@@ -4,7 +4,7 @@
 //a member variable/object to cache a pointer/object for the shared library function
 ExodusFunctorBase efb_select2;
 
-//a member function with the right arguments, returning a var
+//a member function with the right arguments, returning a var or void
 var select2(in filenamex, in linkfilename2, in sortselect0, in dictids0, in options, io datax, io response, in limitfields0="", in limitchecks="", in limitvalues="", int maxnrecs=0)
 {
 
@@ -15,10 +15,11 @@ var select2(in filenamex, in linkfilename2, in sortselect0, in dictids0, in opti
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
- //with the right arguments and returning a var
+ //with the right arguments and returning a var or void
  typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(in,in,in,in,in,io,io,in,in,in,int);
 
- //call the shared library object main function with the right args, returning a var
+ //call the shared library object main function with the right args,
+ // returning a var or void
  return CALLMEMBERFUNCTION(*(efb_select2.pobject_),
  ((pExodusProgramBaseMemberFunction) (efb_select2.pmemberfunction_)))
   (filenamex,linkfilename2,sortselect0,dictids0,options,datax,response,limitfields0,limitchecks,limitvalues,maxnrecs);

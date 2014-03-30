@@ -4,7 +4,7 @@
 //a member variable/object to cache a pointer/object for the shared library function
 ExodusFunctorBase efb_authorised;
 
-//a member function with the right arguments, returning a var
+//a member function with the right arguments, returning a var or void
 var authorised(in task0, out msg, in defaultlock="", in username0="")
 {
 
@@ -15,10 +15,11 @@ var authorised(in task0, out msg, in defaultlock="", in username0="")
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
- //with the right arguments and returning a var
+ //with the right arguments and returning a var or void
  typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(in,out,in,in);
 
- //call the shared library object main function with the right args, returning a var
+ //call the shared library object main function with the right args,
+ // returning a var or void
  return CALLMEMBERFUNCTION(*(efb_authorised.pobject_),
  ((pExodusProgramBaseMemberFunction) (efb_authorised.pmemberfunction_)))
   (task0,msg,defaultlock,username0);

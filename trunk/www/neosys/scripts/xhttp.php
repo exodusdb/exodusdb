@@ -7,7 +7,7 @@
 
 	//debug in php like this
 	//tail -f /var/log/apache2/error.log
-	//also .2 and .3 files are left in interface directory
+	//also .2 and .3 files are left in interface directory if debugging
 	$debugging = false;
 
 //constants
@@ -44,6 +44,8 @@
 	session_start();
 
 	$neosysrootpath = getneosysrootpath($_SERVER['DOCUMENT_ROOT']);
+	debug("DOCUMENT_ROOT :".$neosysrootpath);
+
 	$datalocation = ($neosysrootpath . '/data/');
 
 	//not used atm
@@ -358,6 +360,15 @@
 	else
 		$result = 0;
 
+	//convert data path to web path
+	if ($requests[0] == "EXECUTE") {
+		$leadin=substr($data_out, 0, strlen($neosysrootpath)) . "/";
+		debug("EXECUTE LEADIN ". $leadin);
+		if (substr($data_out, 0, strlen($leadin)) == $neosysrootpath . "/") {
+			$data_out = "../" . substr($data_out,strlen($leadin));
+		}
+	}
+
 //clean up
 
 	//normally .1 will already have been consumed
@@ -426,6 +437,7 @@ function neosysrnd($max, $min) {
 };
 
 function debug($msg) {
+	global $debugging;
 	if ($debugging)
 		error_log("\"$msg\"" ,0);
 }

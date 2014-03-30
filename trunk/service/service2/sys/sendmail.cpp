@@ -282,7 +282,7 @@ forcedemail:
 		}
 
 		cmd="mail";
-		cmd^=" -r "^params1.a(1);//mailfrom but doesnt work via smtp according to man mailx
+		cmd^=" -r "^params1.a(1);//mailfrom but -r doesnt work via smtp according to man mailx
 		cmd^=" -s "^subject.quote();
 		if (ccaddress) {
 			cmd^=" -c "^ccaddress;
@@ -293,7 +293,7 @@ forcedemail:
 		cmd^=" "^toaddress;
 
 		cmd^=" 2>"^errorfilename;
-asm("int $3");
+//asm("int $3");
 		var mailresult=cmd.osshellwrite(body);
 		/////////////////////////////////////
 

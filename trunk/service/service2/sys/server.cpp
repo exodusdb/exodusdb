@@ -1302,7 +1302,7 @@ subroutine requestexit()
 	if (USER3 == "")
 		USER3 = "Error: No response";
 
-printl("requestexit:"^USER3.quote());
+//printl("requestexit:"^USER3.quote());
 
 	if (USER3.index("ERROR NO:", 1))
 		mv.logger("Server", USER3);
@@ -1434,6 +1434,7 @@ USER1.outputl("USER1 written:");
 	//write the response
 
 	oswrite(encode(USER3), linkfilename5, "utf8");
+	osdelete(linkfilename3);
 	osrename(linkfilename5, linkfilename3);
 
 	//trace responded

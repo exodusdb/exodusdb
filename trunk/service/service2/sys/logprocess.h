@@ -4,7 +4,7 @@
 //a member variable/object to cache a pointer/object for the shared library function
 ExodusFunctorBase efb_logprocess;
 
-//a member function with the right arguments, returning a var
+//a member function with the right arguments, returning a var or void
 var logprocess(io processid, in processcategory, in processparameters="", in processresult="", in processcomments="")
 {
 
@@ -15,10 +15,11 @@ var logprocess(io processid, in processcategory, in processparameters="", in pro
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
- //with the right arguments and returning a var
+ //with the right arguments and returning a var or void
  typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(io,in,in,in,in);
 
- //call the shared library object main function with the right args, returning a var
+ //call the shared library object main function with the right args,
+ // returning a var or void
  return CALLMEMBERFUNCTION(*(efb_logprocess.pobject_),
  ((pExodusProgramBaseMemberFunction) (efb_logprocess.pmemberfunction_)))
   (processid,processcategory,processparameters,processresult,processcomments);

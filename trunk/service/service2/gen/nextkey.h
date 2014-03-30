@@ -4,7 +4,7 @@
 //a member variable/object to cache a pointer/object for the shared library function
 ExodusFunctorBase efb_nextkey;
 
-//a member function with the right arguments, returning a var
+//a member function with the right arguments, returning a var or void
 var nextkey(in mode, in previous=var(""))
 {
 
@@ -15,10 +15,11 @@ var nextkey(in mode, in previous=var(""))
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
- //with the right arguments and returning a var
+ //with the right arguments and returning a var or void
  typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(in,in);
 
- //call the shared library object main function with the right args, returning a var
+ //call the shared library object main function with the right args,
+ // returning a var or void
  return CALLMEMBERFUNCTION(*(efb_nextkey.pobject_),
  ((pExodusProgramBaseMemberFunction) (efb_nextkey.pmemberfunction_)))
   (mode,previous);

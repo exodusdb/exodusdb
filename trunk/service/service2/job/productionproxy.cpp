@@ -583,7 +583,9 @@ approvalerror:
 
 		//@pseudo=request
 		mv.PSEUDO = "";
+
 		execute("analtime2 " ^ USER0.a(2));
+
 		gosub checkoutputfileexists();
 
 	} else if (USER0 == "TIMESHEET.POSTINIT") {
@@ -677,6 +679,7 @@ subroutine checkoutputfileexists() {
 		USER4 = "";
 	}else{
 		USER3 = USER4;
+		//USER3 ^= FM ^ USER4;
 		if (USER3 == "") {
 			USER3 = "Error: No output file in  " ^ proxyname ^ "," ^ mode;
 			call sysmsg(USER3);

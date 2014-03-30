@@ -4,7 +4,7 @@
 //a member variable/object to cache a pointer/object for the shared library function
 ExodusFunctorBase efb_plansubs2;
 
-//a member function with the right arguments, returning a var
+//a member function with the right arguments, returning a var or void
 var plansubs2(in modex)
 {
 
@@ -15,10 +15,11 @@ var plansubs2(in modex)
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
- //with the right arguments and returning a var
+ //with the right arguments and returning a var or void
  typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(in);
 
- //call the shared library object main function with the right args, returning a var
+ //call the shared library object main function with the right args,
+ // returning a var or void
  return CALLMEMBERFUNCTION(*(efb_plansubs2.pobject_),
  ((pExodusProgramBaseMemberFunction) (efb_plansubs2.pmemberfunction_)))
   (modex);

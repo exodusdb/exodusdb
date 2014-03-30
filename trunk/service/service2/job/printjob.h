@@ -19,7 +19,7 @@ var printjob()
  typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)();
 
  //call the shared library object main function with the right args,
-  returning a var or void
+ // returning a var or void
  return CALLMEMBERFUNCTION(*(efb_printjob.pobject_),
  ((pExodusProgramBaseMemberFunction) (efb_printjob.pmemberfunction_)))
   ();

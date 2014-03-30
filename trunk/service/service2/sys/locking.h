@@ -4,7 +4,7 @@
 //a member variable/object to cache a pointer/object for the shared library function
 ExodusFunctorBase efb_locking;
 
-//a member function with the right arguments, returning a var
+//a member function with the right arguments, returning a var or void
 var locking(in mode, in lockfilename, in lockkey, in lockdesc0, io locklist, int ntries, out msg)
 {
 
@@ -15,10 +15,11 @@ var locking(in mode, in lockfilename, in lockkey, in lockdesc0, io locklist, int
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
- //with the right arguments and returning a var
+ //with the right arguments and returning a var or void
  typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(in,in,in,in,io,int,out);
 
- //call the shared library object main function with the right args, returning a var
+ //call the shared library object main function with the right args,
+ // returning a var or void
  return CALLMEMBERFUNCTION(*(efb_locking.pobject_),
  ((pExodusProgramBaseMemberFunction) (efb_locking.pmemberfunction_)))
   (mode,lockfilename,lockkey,lockdesc0,locklist,ntries,msg);

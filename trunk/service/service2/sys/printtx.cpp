@@ -4,7 +4,7 @@ libraryinit()
 #include <gethtml.h>
 #include <getmark.h>
 #include <readcss.h>
-
+#include <sysmsg.h>
 
 //settable by modes
 var html;
@@ -38,10 +38,20 @@ function main(io tx, in mode="", in modevalue="") {
 	//blank mode prints tx, other modes set parameters
 	if (mode) {
 
+		//clear existing output
+		if (mode eq "init") {
+			printptr=0;
+			if (printfilename.assigned()) {
+				printfilename.osdelete();
+			}
+
 		//trigger new page on next print
-		if (mode eq "printnext") {
+		} else if (mode eq "pagebreak") {
 			bodyln = 999;
 			pagen = 0;
+
+		} else if (mode eq "getprintfilename") {
+			return printfilename;
 
 		//parameters
 		} else if (mode eq "html") {
@@ -62,6 +72,10 @@ function main(io tx, in mode="", in modevalue="") {
 			letterhead = modevalue;
 		} else if (mode eq "topmargin") {
 			topmargin = modevalue;
+		} else {
+			var msg=mode.quote() ^ " invalid mode in printtx";
+			call sysmsg(msg);
+			call mssg(msg);
 		}
 		return 1;
 	}

@@ -676,8 +676,8 @@ var inclusion=
                 if (headertext) {
                 		var filebaseend=filebase.field2(SLASH,-1);
                         headertext.splicer(1,0,"#define EXODUSDLFUNC_"^ucase(filebaseend)^"_H");
-                        headertext.splicer(1,0,"#ifndef EXODUSDLFUNC_"^ucase(filebaseend)^"_H"^crlf);
-                        headertext^=crlf^"#endif"^crlf;
+                        headertext.splicer(1,0,"//#ifndef EXODUSDLFUNC_"^ucase(filebaseend)^"_H"^crlf);
+                        headertext^=crlf^"//#endif"^crlf;
                         var headerfilename=filebase^".h";
 
                         oswrite(headertext,headerfilename);
