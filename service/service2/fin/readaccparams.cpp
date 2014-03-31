@@ -41,7 +41,7 @@ function main() {
 		fin.accparams.r(16, tt2);
 	}
 
-	if (fin.accparams.a(16) == "" and ACCOUNT == "ADAGENCY") {
+	if (fin.accparams.a(16) == "" and APPLICATION ne "ACCOUNTS") {
 
 		fin.accparams.r(16, 3, "Brand");
 		//acc.params<16,4>='Vehicle'

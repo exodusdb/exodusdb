@@ -139,7 +139,7 @@ libraryinit(department2)
 #include <generalsubs.h>
 function main()  {
 	call generalsubs("GETUSERDEPTX," ^ ID.field("*", 1));
-	return mv.capitalise(ANS);
+	return capitalise(ANS);
 }
 libraryexit(department2)
 
@@ -210,7 +210,7 @@ libraryexit(period)
 libraryinit(person_name)
 
 function main()  {
-	return mv.capitalise(calculate("PERSON_CODE"));
+	return capitalise(calculate("PERSON_CODE"));
 }
 libraryexit(person_name)
 

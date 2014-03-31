@@ -91,7 +91,7 @@ function main() {
 	if (mode == "TEST") {
 
 	} else if (mode == "INACTIVEJOBS") {
-		USER1.transfer(mv.PSEUDO);
+		USER1.transfer(PSEUDO);
 		perform("INACTIVEJOBS");
 
 	} if (mode == "AMENDORDERNO") {
@@ -107,7 +107,7 @@ function main() {
 		win.srcfile = agy.productioninvoices;
 		if (not(DICT.open("DICT.PRODUCTION.INVOICES", ""))) {
 			call fsmsg();
-			var().stop();
+			return invalid();
 		}
 
 		if (not(win.srcfile.lock( ID))) {
@@ -186,7 +186,7 @@ unlockamend:
 		var tasks;
 		if (not(tasks.open("TASKS", ""))) {
 			call fsmsg();
-			var().stop();
+			return invalid();
 		}
 		USER1.transfer(taskdata);
 
@@ -254,7 +254,7 @@ unlockamend:
 		if (not(authorised("TIMESHEET ADMINISTRATION",xx))) {
 			if (not(authorised("TIMESHEET APPROVAL", USER4, "TAP"))) {
 				call mssg(USER4);
-				var().stop();
+				return invalid();
 			}
 		}
 
@@ -263,13 +263,13 @@ unlockamend:
 		win.srcfile = gen.timesheets;
 		if (not(DICT.open("DICT", "TIMESHEETS"))) {
 			call fsmsg();
-			var().stop();
+			return invalid();
 		}
 
 		usercodes = USER1.a(1);
 		if (not usercodes) {
 			call mssg("Nothing to approve");
-			var().stop();
+			return invalid();
 		}
 
 		var idates = USER1.a(2);
@@ -445,14 +445,16 @@ approvalerror:
 			cmd ^= " AND WITH USER_CODE " ^ quote2(usercodes);
 		}
 		totsize = 0;
-		gosub addtasks();
+		if (not addtasks())
+			return invalid();
 
 		//add uncompleted tasks that the user requested
 		cmd = "SSELECT TASKS BY KEY";
 		if (usercodes) {
 			cmd ^= " AND WITH PARENT_USER_CODE " ^ quote2(usercodes);
 		}
-		gosub addtasks();
+		if (not addtasks())
+			return invalid();
 
 	} else if (mode == "VAL.SUPPINVNO") {
 		if (not opendatafile())
@@ -500,10 +502,10 @@ approvalerror:
 	} else if (USER0 == "F2.EXECUTIVE") {
 		call agencysubs(USER0,xx);
 		USER1 = ANS;
-		mv.DATA = "";
+		DATA = "";
 
 	} else if (mode == "COSTESTIMATEPRINT") {
-		mv.PSEUDO = USER1;
+		PSEUDO = USER1;
 		execute("prodinvs");
 
 		gosub checkoutputfileexists();
@@ -519,11 +521,11 @@ approvalerror:
 
 		//quick printsend eg from timesheets f6 link
 		if (mode == "PRINTJOB") {
-			mv.PSEUDO = USER0;
+			PSEUDO = USER0;
 
 			//JOBPRINT from a form
 		}else{
-			mv.PSEUDO = FM ^ USER1;
+			PSEUDO = FM ^ USER1;
 		}
 
 		//execute 'PRINTJOB ':@pseudo<2>
@@ -531,12 +533,12 @@ approvalerror:
 		gosub checkoutputfileexists();
 
 	} else if (mode == "JOBLIST") {
-		mv.PSEUDO = USER1;
-		var emaildirect = mv.PSEUDO.a(59);
+		PSEUDO = USER1;
+		var emaildirect = PSEUDO.a(59);
 
-		if ((mv.PSEUDO.a(1)).substr(1, 8) == "PURCHASE") {
+		if ((PSEUDO.a(1)).substr(1, 8) == "PURCHASE") {
 			cmd = "LISTPRODORDERS";
-		} else if ((mv.PSEUDO.a(1)).substr(1, 9) == "ESTIMATES") {
+		} else if ((PSEUDO.a(1)).substr(1, 9) == "ESTIMATES") {
 			cmd = "LISTPRODINVS";
 		} else {
 			cmd = "LISTJOBS";
@@ -549,22 +551,22 @@ approvalerror:
 		}
 
 	} else if (mode == "TIMESHEETANALYSIS") {
-		mv.PSEUDO = USER1;
+		PSEUDO = USER1;
 		execute("analtime");
 		gosub checkoutputfileexists();
 
 	} else if (mode == "TIMESHEETPRINT" or mode == "TIMESHEETALERTS") {
 
-		mv.PSEUDO = USER1;
+		PSEUDO = USER1;
 		USER3 = "OK";
 		USER4 = "";
 
 		cmd = "ANALTIME2";
-		if (mv.PSEUDO.a(1)) {
-			cmd ^= " 1/" ^ mv.PSEUDO.a(1).field(".", 2) ^ "/" ^ mv.PSEUDO.a(1).field(".", 1);
+		if (PSEUDO.a(1)) {
+			cmd ^= " 1/" ^ PSEUDO.a(1).field(".", 2) ^ "/" ^ PSEUDO.a(1).field(".", 1);
 		}
 		perform(cmd);
-		if (mv.PSEUDO.a(2) >= 3) {
+		if (PSEUDO.a(2) >= 3) {
 			//analtime2 now returns response not msg (except in error)
 			//response=msg
 			//should not return any report url (since opt 3+ is email)
@@ -582,7 +584,7 @@ approvalerror:
 	} else if (mode == "PRINTMONTHLYTIMESHEET") {
 
 		//@pseudo=request
-		mv.PSEUDO = "";
+		PSEUDO = "";
 
 		execute("analtime2 " ^ USER0.a(2));
 
@@ -689,16 +691,17 @@ subroutine checkoutputfileexists() {
 	return;
 }
 
-subroutine addtasks() {
+function addtasks() {
 
+	//ignore after a certain number
 	if (USER1.length() > 32000) {
-		return;
+		return true;
 	}
 
 	var tasks;
 	if (not(tasks.open("TASKS", ""))) {
 		call fsmsg();
-		var().stop();
+		return invalid();
 	}
 
 	var maxtaskfn = 100;
@@ -712,70 +715,71 @@ subroutine addtasks() {
 		cmd.splicer(tt, 4, "");
 	}
 
-	perform(cmd ^ " (S)");
+	var("").select(cmd);
 
 	//get mattasks and ntasks
-	gosub addtasks2();
+	if (not addtasks2())
+		return invalid();
 
 	//add new tasks to end of current tasks
 	for (var fn = 1; fn <= maxtaskfn; ++fn) {
 		tt = mattasks(fn);
 		if (tt.length()) {
 			if (USER1.length() + tt.length() > 32000) {
-				return;
+				return true;
 			}
 			USER1.r(fn, nblocktasks + 1, mattasks(fn));
 		}
 	};//fn;
 	nblocktasks += ntasks;
 
-	return;
+	return true;
 
 }
 
-subroutine addtasks2() {
+function addtasks2() {
 
 	ntasks = "";
 	mattasks = "";
 	USER3 = "OK";
 	var prevtaskids = USER1.a(5);
 
-nexttask:
+	while (var("").readnext(taskid)) {
 
-	if (totsize > 60000) {
-		var().clearselect();
-		return;
-	}
-
-	if (not var().readnext(taskid)) {
-		return;
-	}
-
-	if (prevtaskids.locate(taskid, xx, 1)) {
-		goto nexttask;
-	}
-
-	var task;
-	if (not(task.read(tasks, taskid))) {
-		goto nexttask;
-	}
-
-	//force key into field 5 to enable updating
-	task.r(5, taskid);
-
-	ntasks += 1;
-
-	task = lower(task);
-	var nfs = task.count(VM) + 1;
-	for (var fn = 1; fn <= nfs; ++fn) {
-		var tt = task.a(1, fn);
-		if (tt) {
-			mattasks[fn].r(1, ntasks, tt);
-			totsize += tt.length() + 1;
+		//limit number
+		if (totsize > 60000) {
+			var().clearselect();
+			return true;
 		}
-	};//fn;
 
-	goto nexttask;
+		//skip existing
+		if (prevtaskids.locate(taskid, xx, 1)) {
+			continue;
+		}
+
+		var task;
+		if (not(task.read(tasks, taskid))) {
+			continue;
+		}
+
+		//force key into field 5 to enable updating
+		task.r(5, taskid);
+
+		ntasks += 1;
+
+		task = lower(task);
+		var nfs = task.count(VM) + 1;
+		for (var fn = 1; fn <= nfs; ++fn) {
+			var tt = task.a(1, fn);
+			if (tt) {
+				mattasks[fn].r(1, ntasks, tt);
+				totsize += tt.length() + 1;
+			}
+		};//fn;
+
+	}
+
+	return true;
 
 }
 

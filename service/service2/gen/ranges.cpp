@@ -87,7 +87,7 @@ function main(io ranges0, in basekey0, in listid="") {
 			}
 			var range = "";
 			for (var i2 = startx; i2 <= finish; ++i2) {
-				if (mv.esctoexit()) {
+				if (esctoexit()) {
 					goto exit;
 				}
 

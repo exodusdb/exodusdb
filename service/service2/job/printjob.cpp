@@ -57,11 +57,11 @@ function main() {
 		return 0;
 	}
 
-	if (mv.PSEUDO.unassigned() or mv.PSEUDO eq "") {
-		mv.PSEUDO=SENTENCE.convert(" ",FM);
+	if (PSEUDO.unassigned() or PSEUDO eq "") {
+		PSEUDO=SENTENCE.convert(" ",FM);
 	}
 
-	var reqsections = mv.PSEUDO.a(3);
+	var reqsections = PSEUDO.a(3);
 
 	//check securities
 	var accessbrief = 1;
@@ -110,7 +110,7 @@ function main() {
 		return 0;
 	}
 
-	var jobnos = mv.PSEUDO.a(2);
+	var jobnos = PSEUDO.a(2);
 	if (jobnos) {
 		call ranges(jobnos, xx);
 		if (not jobnos) {
@@ -130,7 +130,7 @@ function main() {
 	jobnos.converter(FM ^ " ", " " ^ FM);
 
 //nextjob:
-	while (not mv.esctoexit()) {
+	while (not esctoexit()) {
 		if (jobnos) {
 			jobn += 1;
 			ID = jobnos.a(jobn);
@@ -455,7 +455,7 @@ unauth:
 					tx ^= (calculate("ORDER_DESC")).oconv(l20) ^ sep;
 					tx ^= orderinvno.oconv(l12) ^ sep;
 					tx ^= (calculate("SUPPLIER_NAME")).oconv(l20) ^ sep;
-					tx ^= mv.capitalise(status);
+					tx ^= capitalise(status);
 				}
 			};//MV;
 
@@ -493,11 +493,11 @@ unauth:
 			var sortselect = "WITH JOB_NO " ^ (DQ ^ (ID ^ DQ)) ^ " BY JOB_NO BY DEPARTMENT BY PERSON_CODE BY DATE";
 			sortselect ^= " AND WITH AUTHORISED1";
 			var options = "";
-			var DATA = "";
+			var selecteddata = "";
 			var response = "";
-			call select2(filename, linkfilename2, sortselect, dictids, options, DATA, response, "JOB_NO" _VM_ "HOURS" _VM_ "HOURS", "EQ" _VM_ "NE" _VM_ "NE", ID ^ "" _VM_ "0" _VM_ "");
+			call select2(filename, linkfilename2, sortselect, dictids, options, selecteddata, response, "JOB_NO" _VM_ "HOURS" _VM_ "HOURS", "EQ" _VM_ "NE" _VM_ "NE", ID ^ "" _VM_ "0" _VM_ "");
 
-			if (DATA) {
+			if (selecteddata) {
 
 				//open superrow
 				tx = "<TR><TD><xP><xP></TD></TR>";
@@ -529,16 +529,16 @@ unauth:
 				var ratecoln = 7;
 				var hourscoln = 6;
 
-				var nlines = DATA.count(FM) + 1;
+				var nlines = selecteddata.count(FM) + 1;
 				var totalamount = 0;
 				var totalhours = 0;
 				var personamount = 0;
 				var personhours = 0;
 				var personn = 1;
-				var personcode = DATA.a(1, personcoln);
+				var personcode = selecteddata.a(1, personcoln);
 				for (var ln = 1; ln <= nlines; ++ln) {
 
-					tx = DATA.a(ln);
+					tx = selecteddata.a(ln);
 					totalamount += tx.a(1, amountcoln);
 					personamount += tx.a(1, amountcoln);
 					var hours = tx.a(1, hourscoln);
@@ -552,7 +552,7 @@ unauth:
 					}
 
 					//person subtotal
-					if (DATA.a(ln + 1, personcoln) ne personcode) {
+					if (selecteddata.a(ln + 1, personcoln) ne personcode) {
 						if (personhours or personamount) {
 							rowattribs = "style={cursor:hand} onclick=toggle(person" ^ personn ^ ")";
 							if (personhours) {
@@ -560,13 +560,13 @@ unauth:
 							}else{
 								avghourlyrate = "";
 							}
-							tx = DATA.a(ln, 1) ^ sep ^ mv.capitalise(personcode) ^ sep ^ sep ^ sep ^ sep ^ personhours.oconv("[MT2]") ^ sep ^ avghourlyrate ^ sep ^ "<B>" ^ personamount.oconv(fin.basefmt) ^ "</B>";
+							tx = selecteddata.a(ln, 1) ^ sep ^ capitalise(personcode) ^ sep ^ sep ^ sep ^ sep ^ personhours.oconv("[MT2]") ^ sep ^ avghourlyrate ^ sep ^ "<B>" ^ personamount.oconv(fin.basefmt) ^ "</B>";
 							tag = "TH";
 							gosub printtxrow(tx);
 							personhours = "";
 							personamount = "";
 						}
-						personcode = DATA.a(ln + 1, personcoln);
+						personcode = selecteddata.a(ln + 1, personcoln);
 						personn += 1;
 					}
 
@@ -631,7 +631,7 @@ unauth:
 						tx ^= FM;
 					}
 					tx ^= (calculate("QUOTE_NO")).oconv(l6) ^ sep;
-					//fix bug in data tx:=oconv({QUOTE_DATE},'[DATE,*]') 'L#12':' '
+					//fix bug in selecteddata tx:=oconv({QUOTE_DATE},'[DATE,*]') 'L#12':' '
 					tx ^= ((calculate("QUOTE_DATE").a(1, 1)).oconv("[DATE,*]")).oconv(l12) ^ sep;
 					tx ^= (calculate("QUOTE_AMOUNT") ^ calculate("QUOTE_CURRENCY")).oconv(r15) ^ sep;
 					//tx:=({QUOTE_AMOUNT_BASE}) r12:sep
@@ -668,7 +668,7 @@ unauth:
 						};//receiptn;
 					}
 
-					tx ^= sep ^ mv.capitalise(status);
+					tx ^= sep ^ capitalise(status);
 
 				}
 

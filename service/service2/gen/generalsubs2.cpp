@@ -185,7 +185,7 @@ function main(in mode) {
 					var lastuser = win.orec.a(userlogfn, logn);
 					if (lastuser == USERNAME) {
 						var laststation = win.orec.a(stationlogfn, logn);
-						if (laststation == mv.STATION.trim()) {
+						if (laststation == STATION.trim()) {
 							if (statusfn) {
 								var laststatus = win.orec.a(statuslogfn, logn);
 								if (laststatus == status) {
@@ -508,7 +508,7 @@ subroutine addlog() {
 	var datetime = var().date() ^ "." ^ (var().time()).oconv("R(0)#5");
 	RECORD.inserter(datetimelogfn, logn, datetime);
 
-	RECORD.inserter(stationlogfn, logn, mv.STATION.trim());
+	RECORD.inserter(stationlogfn, logn, STATION.trim());
 
 	if (versionfn) {
 		RECORD.inserter(versionlogfn, logn, version);

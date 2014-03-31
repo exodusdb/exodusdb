@@ -137,7 +137,7 @@ function main(in mode, in title0, in module, in request, in data, in runasuserco
 	gen.document.r(1, runasusercode);
 	gen.document.r(14, targetusercodes);
 
-	gen.document.r(7, ACCOUNT);
+	gen.document.r(7, APPLICATION);
 	gen.document.r(3, var().date());
 	gen.document.r(4, var().time());
 	if (gen.document.a(12) == "") {

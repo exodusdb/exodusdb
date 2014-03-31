@@ -46,8 +46,8 @@ function main(in mode, in params0, io msg, io result) {
 		printl();
 		while (true) {
 		///BREAK;
-		if (not(not mv.esctoexit())) break;;
-			sleep(int(rnd(3)));
+		if (not(not esctoexit())) break;;
+			ossleep(int(rnd(3000)));
 			call roundrobin("ONEVENT", params, result, msg);
 		}//loop;
 

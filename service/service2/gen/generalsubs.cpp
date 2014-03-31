@@ -367,10 +367,10 @@ subroutine getdepts() {
 subroutine getdatasets() {
 	var dospath = (var().osdir()).substr(1, 2) ^ "..\\data\\";
 
-	var dosfilename = ACCOUNT ^ ".vol";
+	var dosfilename = APPLICATION ^ ".vol";
 	if (not directory.osread(dosfilename)) {
-		if (not(directory.osread(ACCOUNT ^ ".vox"))) {
-			call mssg(ACCOUNT ^ ".vol is missing");
+		if (not(directory.osread(APPLICATION ^ ".vox"))) {
+			call mssg(APPLICATION ^ ".vol is missing");
 			var().stop();
 		}
 	}

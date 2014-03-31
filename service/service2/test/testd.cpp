@@ -1,14 +1,14 @@
 #include <exodus/program.h>
 programinit()
 
-#include <testd2.h>
+#include <testqqqd2.h>
 #include <initgeneral.h>
 
 #include <win.h>
 #include <gen.h>
 
 function main() {
-	printl("testd says 'Hello World!'");
+	printl("testqqqd says 'Hello World!'");
 	//CREATE LABELLED COMMON
 	mv.labelledcommon[1]=new win_common;
 
@@ -22,7 +22,7 @@ function main() {
 	win.reset="";
 	win.valid="";
 
-	call testd2();
+	call testqqqd2();
 	return 0;
 }
 

@@ -78,22 +78,22 @@ function main(in nextcompanycode) {
 	if (gen.glang.unassigned() or gen.glang == "" or gen.company.a(14) ne oldcompany.a(14)) {
 		call getlang("GENERAL", "", "", fin.alanguage, gen.glang);
 		if (gen.glang.a(9)) {
-			mv.UPPERCASE = gen.glang.a(9);
+			UPPERCASE = gen.glang.a(9);
 		}
 		if (gen.glang.a(10)) {
-			mv.LOWERCASE = gen.glang.a(10);
+			LOWERCASE = gen.glang.a(10);
 		}
-		mv.UPPERCASE.swapper("%FF", RM);
-		mv.LOWERCASE.swapper("%FF", RM);
-		mv.UPPERCASE.swapper("%FE", FM);
-		mv.LOWERCASE.swapper("%FE", FM);
-		mv.UPPERCASE.swapper("%FD", VM);
-		mv.LOWERCASE.swapper("%FD", VM);
-		mv.UPPERCASE.swapper("%25", "%");
-		mv.LOWERCASE.swapper("%25", "%");
-		if (mv.UPPERCASE.length() ne mv.LOWERCASE.length()) {
-			mv.LOWERCASE = "abcdefghijklmnopqrstuvwxyz";
-			mv.UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		UPPERCASE.swapper("%FF", RM);
+		LOWERCASE.swapper("%FF", RM);
+		UPPERCASE.swapper("%FE", FM);
+		LOWERCASE.swapper("%FE", FM);
+		UPPERCASE.swapper("%FD", VM);
+		LOWERCASE.swapper("%FD", VM);
+		UPPERCASE.swapper("%25", "%");
+		LOWERCASE.swapper("%25", "%");
+		if (UPPERCASE.length() ne LOWERCASE.length()) {
+			LOWERCASE = "abcdefghijklmnopqrstuvwxyz";
+			UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 		}
 
 		//sort.order
@@ -141,30 +141,30 @@ function main(in nextcompanycode) {
 	gen.company.r(45, firstmonth ^ "," ^ fin.maxperiod);
 
 	call log2("date format", logtime);
-	mv.DATEFORMAT = "D2/E";
+	DATEFORMAT = "D2/E";
 	var dateformat = gen.company.a(10);
 	if (dateformat == "") {
-		mv.DATEFORMAT = "D2/E";
+		DATEFORMAT = "D2/E";
 	} else if (dateformat.substr(1, 6) == "31/01/") {
-		mv.DATEFORMAT = "D2/E";
+		DATEFORMAT = "D2/E";
 	} else if (dateformat.substr(1, 6) == "31-01-") {
-		mv.DATEFORMAT = "D2-E";
+		DATEFORMAT = "D2-E";
 	} else if (dateformat == "31 JAN 90") {
-		mv.DATEFORMAT = "D2E";
+		DATEFORMAT = "D2E";
 	} else if (dateformat == "31 JAN 90.") {
-		mv.DATEFORMAT = "D2";
+		DATEFORMAT = "D2";
 	} else if (dateformat.substr(1, 6) == "01/31/") {
-		mv.DATEFORMAT = "D2/";
+		DATEFORMAT = "D2/";
 	} else if (dateformat.substr(1, 6) == "01-31-") {
-		mv.DATEFORMAT = "D2-";
+		DATEFORMAT = "D2-";
 	} else if (dateformat.substr(-6, 6) == "90/01/31") {
-		mv.DATEFORMAT = "D2J";
+		DATEFORMAT = "D2J";
 	//CASE DATE.FORMAT='31/01/2000';@DATE.FORMAT='D2/E'
 	//CASE DATE.FORMAT='31-01-2000';@DATE.FORMAT='D2-E'
 	} else if (dateformat == "31 JAN 2000") {
-		mv.DATEFORMAT = "D2E";
+		DATEFORMAT = "D2E";
 	} else if (dateformat == "31 JAN 2000.") {
-		mv.DATEFORMAT = "D2";
+		DATEFORMAT = "D2";
 	//CASE DATE.FORMAT='01/31/2000';@DATE.FORMAT='D2/'
 	//CASE DATE.FORMAT='01-31-2000';@DATE.FORMAT='D2-'
 	//CASE DATE.FORMAT='2000/01/31';@DATE.FORMAT='D2J'

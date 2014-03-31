@@ -121,7 +121,7 @@ function main(in mode, in subject0, in body0, in groupids0, in jobids0, in useri
 	for (usern=1; usern<=nusers;++usern) {
 
 		//interrupt
-		if (mv.esctoexit()) {
+		if (esctoexit()) {
 			break;
 		}
 

@@ -5,7 +5,6 @@ libraryinit()
 #include <sysmsg.h>
 #include <securitysubs.h>
 #include <sortarray.h>
-#include <singular.h>
 #include <usersubs.h>
 
 #include <gen.h>
@@ -65,7 +64,7 @@ function main(in mode) {
 		//prevent new users with punctuation characters etc
 		if (win.orec == "" and win.wlocked) {
 			var temp = ID;
-			temp.converter(mv.UPPERCASE ^ "0123456789", "");
+			temp.converter(UPPERCASE ^ "0123456789", "");
 			if (temp) {
 				msg = DQ ^ (ID ^ DQ) ^ " user doesnt exist and new usercodes";
 				msg.r(-1, "must be alphanumeric characters only");
@@ -251,7 +250,7 @@ unlocksecurity:
 			RECORD.inserter(15, 1, datetime);
 			RECORD.inserter(16, 1, SYSTEM.a(40, 2));
 
-			if (USERNAME == ACCOUNT) {
+			if (USERNAME == APPLICATION) {
 				text = "OK New password sent to " ^ RECORD.a(7);
 			}else{
 				text = "OK New password set by " ^ USERNAME;

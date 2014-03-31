@@ -155,17 +155,17 @@ var x=var();
 	if (locks == "") {
 		if (positive and not isneosys) {
 notallowed:
-			//MSG=mv.capitalise(TASK):'||Sorry, ':mv.capitalise(msgusername):', you are not authorised to do this.|'
+			//MSG=capitalise(TASK):'||Sorry, ':capitalise(msgusername):', you are not authorised to do this.|'
 			if (msgusername ne USERNAME)
-				msg = mv.capitalise(msgusername) ^ "is not";
+				msg = capitalise(msgusername) ^ "is not";
 			else
-				msg = "Sorry, " ^ mv.capitalise(msgusername) ^ ", you are";
+				msg = "Sorry, " ^ capitalise(msgusername) ^ ", you are";
 
 			msg ^= " not";
 			if (positive) {
 				msg ^= " specifically";
 			}
-			msg ^= " authorised to do||" ^ mv.capitalise(task);
+			msg ^= " authorised to do||" ^ capitalise(task);
 
 			return 0;
 
@@ -184,7 +184,7 @@ notallowed:
 	//find the user (add to bottom if not found)
 	//surely this is not necessary since users are in already
 	if (not(SECURITY.locate(username, usern, 1))) {
-		if (username ne "NEOSYS" and username ne ACCOUNT) {
+		if (username ne "NEOSYS" and username ne APPLICATION) {
 			gosub readuserprivs();
 			usern = (SECURITY.a(1)).count(VM) + (SECURITY.a(1) ne "") + 1;
 			if (SECURITY.length() < 65000) {
@@ -224,8 +224,8 @@ notallowed:
 		if (keys.locateusing(lockx, " ", temp)) {
 			//call note(task:' ok')
 		} else
-		//MSG=mv.capitalise(TASK):'||Sorry, ':mv.capitalise(msgusername):', you are not authorised to do this.|'
-		//MSG='Sorry, ':mv.capitalise(msgusername):', you are not authorised to do||':mv.capitalise(task)
+		//MSG=capitalise(TASK):'||Sorry, ':capitalise(msgusername):', you are not authorised to do this.|'
+		//MSG='Sorry, ':capitalise(msgusername):', you are not authorised to do||':capitalise(task)
 	//call note(task:' ko')
 		//RETURN 0
 		goto notallowed;

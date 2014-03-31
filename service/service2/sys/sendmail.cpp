@@ -20,7 +20,7 @@ var params2;
 var bodyfilename;
 
 function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfilename0, in delete0, out errormsg, in replyto0=var(), in params0=var()) {
-	//uses sendmail.js
+	//uses sendmail.js on windows and mailx otherwise
 
 	if (ccaddress0.unassigned()) {
 		ccaddress = "";
@@ -217,7 +217,7 @@ forcedemail:
 		bodyfilename = "$" ^ (var("999999999999").rnd()).substr(1, 7) ^ ".TXT";
 		//solve stupid outlook joining lines together if > 40 chars
 		//by adding tab on the end of every line
-		body.swapper("\r", "\t\r");
+		body.swapper("\r", "\t\n");
 		call oswrite(body, bodyfilename);
 		bodyfilename.osclose();
 		body = "@" ^ bodyfilename;

@@ -154,7 +154,7 @@ lockit:
 		options.r(-1, "ON HOLD   (Temporary stop)");
 		reply = (decide("", options, replyn)).substr(1, 10).trim();
 		if (reply) {
-			mv.DATA ^= reply ^ "\r";
+			DATA ^= reply ^ "\r";
 		}
 
 	} else if (mode == "VAL.JOB") {
@@ -270,7 +270,7 @@ lockit:
 		//option to convert amounts
 		if (win.is ne win.isorig and (RECORD.a(3)).sum()) {
 			var rate = "";
-			call note2("Exchange rate ? 1 " ^ win.isorig ^ " = ? " ^ win.is ^ "|(enter \"1/rate\" for inverse rate)", "RC", rate, "");
+			call note("Exchange rate ? 1 " ^ win.isorig ^ " = ? " ^ win.is ^ "|(enter \"1/rate\" for inverse rate)", "RC", rate, "");
 			if (rate) {
 				if (rate.substr(1, 2) == "1/") {
 					rate = 1 / rate.substr(3, 999);

@@ -153,7 +153,7 @@ nextdoc:
 		}
 		RECORD.r(3, var().date());
 		RECORD.r(4, var().time());
-		RECORD.r(7, ACCOUNT);
+		RECORD.r(7, APPLICATION);
 
 		//update neosys standard (in case doing this on the programming system)
 		//the programming standard is installed into all clients

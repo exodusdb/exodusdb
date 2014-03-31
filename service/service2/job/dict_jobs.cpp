@@ -22,11 +22,11 @@ function main() {
 			ans2 = ANS;
 			ans2.ucaser();
 			if (ans2 == ANS) {
-				ANS = mv.capitalise(ANS);
+				ANS = capitalise(ANS);
 			}
 		}else{
 			ans.transfer(ANS);
-			ANS = mv.capitalise(ANS);
+			ANS = capitalise(ANS);
 		}
 	}
 	return ANS;
@@ -257,7 +257,7 @@ libraryexit(description1_ucase)
 libraryinit(estimate_status)
 
 function main()  {
-	return mv.capitalise(calculate("QUOTE_NO").xlate("PRODUCTION_INVOICES", 11, "X"));
+	return capitalise(calculate("QUOTE_NO").xlate("PRODUCTION_INVOICES", 11, "X"));
 }
 libraryexit(estimate_status)
 
@@ -487,7 +487,7 @@ libraryexit(order_inv_no)
 libraryinit(order_status)
 
 function main()  {
-	return mv.capitalise(calculate("ORDER_NO").xlate("PRODUCTION_ORDERS", 11, "X"));
+	return capitalise(calculate("ORDER_NO").xlate("PRODUCTION_ORDERS", 11, "X"));
 }
 libraryexit(order_status)
 
@@ -817,7 +817,7 @@ libraryinit(quote_status2c)
 function main()  {
 	var quotenos = calculate("QUOTE_NO");
 	if (quotenos) {
-		ANS = mv.capitalise(quotenos.xlate("PRODUCTION_INVOICES", 11, "X"));
+		ANS = capitalise(quotenos.xlate("PRODUCTION_INVOICES", 11, "X"));
 	}else{
 		ANS = "";
 	}

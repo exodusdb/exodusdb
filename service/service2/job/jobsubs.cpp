@@ -312,7 +312,7 @@ unlockprodorders:
 		if (ii and RECORD.a(40, ii) == "") {
 			RECORD.r(40, ii, USERNAME);
 			RECORD.r(41, ii, var().date() ^ "." ^ (var().time()).oconv("R(0)#5"));
-			RECORD.r(42, ii, mv.STATION);
+			RECORD.r(42, ii, STATION);
 
 		}else{
 

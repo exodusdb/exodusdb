@@ -1,7 +1,6 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <unique.h>
 #include <sendmail.h>
 #include <select2.h>
 #include <sysmsg.h>
