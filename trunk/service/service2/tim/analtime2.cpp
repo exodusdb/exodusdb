@@ -101,7 +101,7 @@ function main() {
 	//pseudo<2> 1=byuserandjob 2=consolidated 3=reminders 4=approvals 5 rem&app
 	//pseudo<3> usercodes (sentence 4 is blank)
 	//pseudo<4> 31=last 31 days (eg for NEOS_TSSU timesheet summary alert)
-	var pseudo = mv.PSEUDO;
+	var pseudo = PSEUDO;
 
 	anyprint=false;
 
@@ -468,7 +468,6 @@ nextuser:
 			goto nextuser;
 		}
 
-		var user;
 		if (not(user.read(users, usercode))) {
 			user = usercode;
 		}

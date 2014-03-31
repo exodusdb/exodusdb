@@ -9,7 +9,6 @@ libraryinit()
 #include <select2.h>
 #include <generalsubs2.h>
 #include <generalsubs.h>
-#include <singular.h>
 #include <timesheetsubs.h>
 #include <log2.h>
 
@@ -78,12 +77,12 @@ function main(in mode0) {
 
 		gosub getregisterparams();
 
-		mv.PSEUDO = "";
-		mv.PSEUDO.r(1, win.registerx(1).a(1));
-		mv.PSEUDO.r(2, win.registerx(1).a(2));
-		mv.PSEUDO.r(3, win.registerx(1).a(3));
-		mv.PSEUDO.r(4, win.registerx(1).a(4));
-		mv.PSEUDO.r(5, win.registerx(1).a(5));
+		PSEUDO = "";
+		PSEUDO.r(1, win.registerx(1).a(1));
+		PSEUDO.r(2, win.registerx(1).a(2));
+		PSEUDO.r(3, win.registerx(1).a(3));
+		PSEUDO.r(4, win.registerx(1).a(4));
+		PSEUDO.r(5, win.registerx(1).a(5));
 
 	} else if (mode == "OPTIONSAVE") {
 		//used to update from dos mode window
@@ -657,7 +656,7 @@ nextjob:
 		gosub security(mode);
 
 	} else if (mode == "POSTAPP") {
-		mv.PSEUDO = win.registerx(6);
+		PSEUDO = win.registerx(6);
 
 	} else {
 		msg = DQ ^ (mode ^ DQ) ^ " - unknown mode skipped in TIMESHEET.SUBS";

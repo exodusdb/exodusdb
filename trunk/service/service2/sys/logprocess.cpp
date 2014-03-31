@@ -91,7 +91,7 @@ subroutine newprocessid(io processid){
 	processrec="";
 	processrec.r(1, var().date());
 	processrec.r(2, timex);
-	processrec.r(3, mv.STATION);
+	processrec.r(3, STATION);
 	processrec.r(4, SYSTEM.a(17));
 	processrec.r(5, USERNAME);
 

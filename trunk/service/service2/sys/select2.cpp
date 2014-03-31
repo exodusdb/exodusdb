@@ -125,7 +125,7 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 		return exit(response, L"DICT." ^ filename.quote() ^ L" file is not available");
 	}
 
-	//if (!mv.openfile(L"DICT.MD", dictmd))
+	//if (!openfile(L"DICT.MD", dictmd))
 		dictmd = L"";
 
 	library="";
@@ -178,7 +178,7 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 	if (xml and linkfilename2) {
 		//tx:='<xml id=':quote(lcase(filename)):'>':crlf
 		tx ^= L"<records>" ^ crlf2;
-		mv.osbwritex(encode(tx), linkfilename2, linkfilename2, offset);
+		osbwritex(encode(tx), linkfilename2, linkfilename2, offset);
 	}
 //	offset += tx.length();
 
@@ -285,9 +285,9 @@ nextrecord:
 /* reimplement as external function
 				library.call(filename,"POSTREAD");
 */
-				mv.DATA = L"";
+				//could perform but perform calls func with no args!
 
-				//call trimexcessmarks(iodat)
+				DATA = L"";
 
 				//postread can request abort by setting msg or reset>=5
 				if (win.reset >= 5 or USER4)
@@ -382,7 +382,7 @@ id:
 		}
 
 		if (linkfilename2) {
-			mv.osbwritex(encode(row), linkfilename2, linkfilename2, offset);
+			osbwritex(encode(row), linkfilename2, linkfilename2, offset);
 
 		}else{
 			datax ^= row;
@@ -397,7 +397,7 @@ id:
 
 	if (xml and linkfilename2) {
 		var tt = L"</records>";
-		mv.osbwritex(encode(tt), linkfilename2, linkfilename2, offset);
+		osbwritex(encode(tt), linkfilename2, linkfilename2, offset);
 	}
 
 	if (linkfilename2) {

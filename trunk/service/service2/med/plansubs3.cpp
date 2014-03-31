@@ -8,7 +8,6 @@ libraryinit()
 #include <giveway.h>
 #include <generalsubs.h>
 #include <plansubs3b.h>
-#include <openfile.h>
 //#include <pop_up.h>
 #include <plansubs2.h>
 #include <plansubs3.h>//recursive
@@ -290,23 +289,23 @@ defversion:
 			return 0;
 		}
 
-		ID = mv.PSEUDO.a(1);
-		var brandcode = mv.PSEUDO.a(2);
-		var currvehiclecode = mv.PSEUDO.a(3);
-		var startdate = mv.PSEUDO.a(4);
+		ID = PSEUDO.a(1);
+		var brandcode = PSEUDO.a(2);
+		var currvehiclecode = PSEUDO.a(3);
+		var startdate = PSEUDO.a(4);
 
-		var newdates = mv.PSEUDO.a(5);
-		var olddates = mv.PSEUDO.a(6);
+		var newdates = PSEUDO.a(5);
+		var olddates = PSEUDO.a(6);
 
-		var newtime = mv.PSEUDO.a(7).field("-", 1);
+		var newtime = PSEUDO.a(7).field("-", 1);
 		if (newtime and not newtime.isnum()) {
 			newtime = newtime.iconv("[TIME2]");
 		}
 
-		//we no longer use oldtime in @mv.PSEUDO<8> if newtime is a range
-		var newtime2 = mv.PSEUDO.a(7).field("-", 2);
+		//we no longer use oldtime in @PSEUDO<8> if newtime is a range
+		var newtime2 = PSEUDO.a(7).field("-", 2);
 		if (not newtime2) {
-			newtime2 = mv.PSEUDO.a(8);
+			newtime2 = PSEUDO.a(8);
 		}
 		if (not newtime2) {
 			newtime2 = newtime;
@@ -315,11 +314,11 @@ defversion:
 			newtime2 = newtime2.iconv("[TIME2]");
 		}
 
-		var newspec = mv.PSEUDO.a(9);
-		var oldspec = mv.PSEUDO.a(10);
+		var newspec = PSEUDO.a(9);
+		var oldspec = PSEUDO.a(10);
 		var newspec1 = (newspec.field(",", 1)).field("*", 1);
 
-		mv.PSEUDO = "";
+		PSEUDO = "";
 
 		//get brand and clientcode
 		var brand;
@@ -644,7 +643,7 @@ gotcoincidences:
 		}else{
 			msg = "";
 		}
-		mv.PSEUDO = msg;
+		PSEUDO = msg;
 
 	} else if (mode == "VAL.EXCH.RATE") {
 		if (win.is == win.isorig) {
@@ -722,7 +721,7 @@ valexchrate:
 		datex = datex.field(" ", 1);
 		if (datex.isnum()) {
 			var idate = datex.iconv("[DAY.OF.MONTH]");
-			if (mv.STATUS) {
+			if (STATUS) {
 				msg = "Please enter a number 1-31";
 				return invalid(msg);
 			}
@@ -731,7 +730,7 @@ valexchrate:
 
 		//check & convert date format
 		var idate = datex.iconv("[DATE]");
-		if (mv.STATUS) {
+		if (STATUS) {
 			msg = DQ ^ (datex ^ DQ) ^ " cannot be understood as a date";
 			return invalid(msg);
 		}

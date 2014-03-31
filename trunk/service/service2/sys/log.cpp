@@ -33,7 +33,7 @@ function main(in programname0, in text0) {
 	if (s33) {
 		station = SYSTEM.a(40, 2);
 	}else{
-		station = mv.STATION.trim();
+		station = STATION.trim();
 		}
 	//call dostime(time);//seconds and hundredths since midnight
 	time = ostime().round(2);

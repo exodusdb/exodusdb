@@ -6,7 +6,7 @@ libraryinit()
 #include <win.h>
 
 function main() {
-	printl("testd2 says 'Hello World!'");
+	printl("testqqqd2 says 'Hello World!'");
 
 	var data;
 	win.srcfile="";

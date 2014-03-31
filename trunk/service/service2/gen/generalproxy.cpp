@@ -550,15 +550,15 @@ badsetcodepage:
 			}
 		}
 
-		mv.PSEUDO = gen.document.a(6);
-		mv.PSEUDO.converter(var().chr(255), VM);
-		mv.PSEUDO.raiser();
+		PSEUDO = gen.document.a(6);
+		PSEUDO.converter(var().chr(255), VM);
+		PSEUDO.raiser();
 
 		//merge any runtime parameters into the real parameters
 		for (var fn = 1; fn <= 999; ++fn) {
 			var tt = USER1.a(fn);
 			if (tt) {
-				mv.PSEUDO.r(fn, tt);
+				PSEUDO.r(fn, tt);
 			}
 		};//fn;
 		USER1 = "";
@@ -568,7 +568,7 @@ badsetcodepage:
 
 		var sentencex = gen.document.a(5);
 		sentencex.converter(VM, " ");
-		USER1 = mv.PSEUDO;
+		USER1 = PSEUDO;
 
 		//in case we are calling another proxy
 		if ((gen.document.a(5, 1)).substr(-5, 5) == "PROXY") {
@@ -622,7 +622,7 @@ performreport:
 	*/
 
 	} else if (mode == "USAGESTATISTICS") {
-		mv.PSEUDO = USER1;
+		PSEUDO = USER1;
 		perform("LISTSTATS");
 		gosub checkoutputfileexists();
 

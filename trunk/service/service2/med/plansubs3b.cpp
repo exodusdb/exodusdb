@@ -61,7 +61,7 @@ function main(in modex) {
 
 			if (vehiclecode) {
 				var number = RECORD.a(39, lnx);
-				var extras = mv.capitalise(field2(RECORD.a(140, lnx), ",", -1));
+				var extras = capitalise(field2(RECORD.a(140, lnx), ",", -1));
 				if (number) {
 					var vehicle;
 					if (not(vehicle.read(agy.vehicles, vehiclecode))) {

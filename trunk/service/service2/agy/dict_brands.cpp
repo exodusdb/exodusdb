@@ -32,7 +32,7 @@ function main()  {
 	var codes = RECORD.a(8);
 	var code = ID;
 	var nn = codes.count(VM) + 1;
-	var alphanum = mv.UPPERCASE ^ mv.LOWERCASE ^ "0123456789";
+	var alphanum = UPPERCASE ^ LOWERCASE ^ "0123456789";
 	for (var ii = nn - 1; ii >= 1; --ii) {
 		var newcode = codes.a(1, ii);
 		if (newcode ne code) {

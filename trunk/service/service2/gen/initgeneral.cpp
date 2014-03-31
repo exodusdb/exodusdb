@@ -68,17 +68,19 @@ function main() {
 		var().stop("fin common is not initialised in " ^ thisname);
 	}
 
+/*
 gen.gcurrcompany="";
 gen.company="";
 USERNAME="";
 if (not gen._definitions.open("DEFINITIONS")) {
 	var().stop("cant open DEFINITIONS");
 }
+*/
 
-	var resetting = mv.PSEUDO == "RESET";
+	var resetting = PSEUDO == "RESET";
 
 	var initmode = SENTENCE.field(" ", 2);
-	mv.PSEUDO = "";
+	PSEUDO = "";
 	//equ request to @user0
 	//equ data to @user1
 	//equ response to @user3
@@ -297,7 +299,7 @@ updateversion:
 		SYSTEM.r(43, USERNAME);
 	}
 	if (not SYSTEM.a(44)) {
-		SYSTEM.r(44, mv.STATION.trim());
+		SYSTEM.r(44, STATION.trim());
 	}
 
 	call log2("*convert reports file", logtime);
@@ -367,7 +369,7 @@ updateversion:
 	}
 
 	call log2("*check for invalid characters in workstation name", logtime);
-	mv.STATION.converter(SQ^DQ,"");
+	STATION.converter(SQ^DQ,"");
 
 	//save current system so we can restore various runtime parameters
 	//which are unfortunately stored with configuration params
@@ -413,7 +415,7 @@ updateversion:
 	//SYSTEM.r(111, "");
 	//SYSTEM.r(111, cid());
 
-	SYSTEM.r(51, ACCOUNT);
+	SYSTEM.r(51, APPLICATION);
 
 	SYSTEM.r(33, oldsystem.a(33));
 
@@ -605,7 +607,7 @@ getproxy:
 	}
 
 	call log2("*default date format is DD/MM/YY", logtime);
-	mv.DATEFORMAT = "D2/E";
+	DATEFORMAT = "D2/E";
 
 	call log2("*get security ... also in LISTEN", logtime);
 	if (not(gen._security.read(gen._definitions, "SECURITY"))) {
@@ -764,15 +766,11 @@ getproxy:
 	var companycode;
 	gen.companies.readnext(companycode);
 
-	call log2("*open accounts system files", logtime);
+	call log2("*check for ACCOUNTS file", logtime);
 	if (xx.open("ACCOUNTS")) {
-	call log2("*open accounts system files", logtime);
-
-	call initacc();
-
-	call log2("*open accounts system files", logtime);
+		call log2("*open accounts system files", logtime);
+		call initacc();
 	}
-	call log2("*open accounts system files", logtime);
 
 	call log2("*definitions file", logtime);
 	//backward compatible with DEFINITIONS file in \data\accounts directory
@@ -783,19 +781,8 @@ getproxy:
 	call log2("*open advertising system files INIT.AGENCY", logtime);
 	if (xx.open("SCHEDULES")) {
 		call initagency();
-		//perform("initagency");
 	}
-/* move to initagency
-	call log2("*add new indexes", logtime);
-	if (not(indices2("TIMESHEETS", "JOB_NO"))) {
-		if (ACCOUNT == "ADAGENCY") {
-			var("MAKEINDEX TIMESHEETS JOB_NO").execute();
-			if (not(openfile("TIMESHEETS", gen.timesheets))) {
-				gen.timesheets = "";
-			}
-		}
-	}
-*/
+
 	call log2("*add number format to company records", logtime);
 	gen.companies.select();
 	var numberformat = "";

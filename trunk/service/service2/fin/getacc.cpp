@@ -327,7 +327,7 @@ inponeacc:
 		msg ^= " do you want ?||Give the " ^ accstk2 ^ " or name,|or press [Enter] if not known.|(separate multiple entries with spaces)";
 		if (interactive) {
 			ANS = "";
-			call note2(msg, "RCE", ANS, "");
+			call note(msg, "RCE", ANS, "");
 		}else{
 			if (inpaccnos.unassigned()) {
 				inpaccnos = "";
@@ -910,7 +910,7 @@ subroutine sortledgercodes() {
 }
 
 subroutine getchart() {
-	call note2("Getting chart.|Please wait ...", "UB", buffer, "");
+	call note("Getting chart.|Please wait ...", "UB", buffer, "");
 	selection = chart(3);
 	if (selection.index(SVM, 1)) {
 		var nn = selection.count(VM) + 1;
@@ -925,7 +925,7 @@ subroutine getchart() {
 //TODO UNCONVERTED MV CONCAT	selection = selection:::sep:::chart[7]:::sep:::chart[10];
 	selection.converter(var().chr(240) ^ VM, VM ^ FM);
 	selection.splicer(-1, 1, "");
-	call msg2("", "DB", buffer, "");
+	call mssg("", "DB", buffer, "");
 	return;
 
 }

@@ -67,10 +67,11 @@ function main() {
 	call authorised("JOURNAL ACCESS POSTED",         xx);//not working while creation always starts as posted
 	call authorised("JOURNAL ACCESS UNPOSTED",       xx);
 	call authorised("JOURNAL POST UNALLOCATED", xx);
+
 	//ensure REVALUATION (BASE CURRENCY ONLY) ENTRIES ARE LOCKED
 	//if security('JOURNAL POST REVALUATION',xx,'NEOSYS') else null
 	var tt;
-	if (ACCOUNT eq "" or ACCOUNT eq "ADAGENCY") {
+	if (APPLICATION ne "ACCOUNTS") {
 		tt = "NEOSYS";
 	}else{
 		tt = "";
@@ -84,7 +85,7 @@ function main() {
 }
 
 subroutine makeindex(in filename, in indexname, in mode="btree", in lowercase=""){
-	
+
 	if (mode ne "btree" or lowercase ne "") {
 		call log2("*WARNING cant create index " ^ filename ^ " " ^
 			indexname ^ " " ^ mode, logtime);

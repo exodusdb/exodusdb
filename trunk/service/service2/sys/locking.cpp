@@ -74,7 +74,7 @@ tryagain:
 			gosub getlockdesc(lockfilename,lockkey);
 			if (interactive) {
 				call mssg(lockholder ^ " is using the " ^ lockdesc, "T1");
-				if (mv.esctoexit()) {
+				if (esctoexit()) {
 					return 0;
 				}else{
 					goto tryagain;
@@ -88,7 +88,7 @@ tryagain:
 						print( msg, "*", " ");
 					}
 					msg = "";
-					call sleep(1);
+					call ossleep(1000);
 					tryn += 1;
 					goto tryagain;
 				}

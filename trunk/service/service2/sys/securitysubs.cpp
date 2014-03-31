@@ -55,7 +55,7 @@ function main(in mode)
 		}
 
 		//if logged in as account then same as logged in as neosys
-		if (var(L"012").index(mv.PRIVILEGE, 1)) {
+		if (var(L"012").index(PRIVILEGE, 1)) {
 			win.registerx(6) = L"NEOSYS";
 		}else{
 			win.registerx(6) = USERNAME;
@@ -218,7 +218,7 @@ function main(in mode)
 		//pass possible menus to remote client
 		var datax = L"";
 		var menufilename;
-		if (ACCOUNT == L"ADAGENCY") {
+		if (APPLICATION != L"ACCOUNTS") {
 			menufilename = L"ADMENUS";
 		}else{
 			menufilename = L"MENUS";
@@ -443,7 +443,7 @@ function main(in mode)
 					var origuserrec = userrec;
 
 					//determine the user department
-					var deptcode = mv.getuserdept(usercode).trim();
+					var deptcode = getuserdept(usercode).trim();
 					deptcode.converter(L"0123456789", L"");
 
 					//update the user record
@@ -463,7 +463,7 @@ function main(in mode)
 				// end
 
 				//update the central system file if user already exists there
-				if (sysrec and sysrec not_eq osysrec and usercode not_eq ACCOUNT) {
+				if (sysrec and sysrec not_eq osysrec and usercode not_eq APPLICATION) {
 					sysrec.converter(TM ^ STM ^ SSTM, FM ^ VM ^ SVM);
 					if (temp.read(DEFINITIONS, usercode))
 						sysrec.write(DEFINITIONS, usercode);
@@ -583,7 +583,7 @@ subroutine securitysubs_changepassx(const var& newpassword, const var& usercode,
 	if (!sysrec) {
 		if (!sysrec.read(systemfile(), user)) {
 			sysrec = L"USER";
-			sysrec.r(2, ACCOUNT);
+			sysrec.r(2, APPLICATION);
 			sysrec.r(5, L"NEOSYS");
 		}
 	}
@@ -610,22 +610,22 @@ subroutine securitysubs_changepassx(const var& newpassword, const var& usercode,
 		sysrec.r(1, passwordfn == 7 ? L"USER" : L"ACCOUNT");
 	}
 	if (!(sysrec.a(2)))
-		sysrec.r(2, ACCOUNT);
+		sysrec.r(2, APPLICATION);
 	if (!(sysrec.a(5)))
 		sysrec.r(5, L"NEOSYS");
 	if (!sysrec.a(lastfn))
 		sysrec.r(lastfn, L"xxxxx");
 
 	//store the encrypted new password
-	var encryptx = mv.encrypt2(newpassword);
+	var encryptx = encrypt2(newpassword);
 	//gosub_makepass();
 	sysrec.r(passwordfn, encryptx);
 
-	encryptx = mv.encrypt2(usercode ^ FM ^ sysrec.field(FM, 2, lastfn - 2));
+	encryptx = encrypt2(usercode ^ FM ^ sysrec.field(FM, 2, lastfn - 2));
 	//gosub_makepass();
 	sysrec.r(lastfn, encryptx);
 
-	encryptx = mv.encrypt2(usercode ^ FM ^ sysrec.field(FM, 2, lastfn - 2));
+	encryptx = encrypt2(usercode ^ FM ^ sysrec.field(FM, 2, lastfn - 2));
 	//gosub_makepass();
 	sysrec.r(lastfn, encryptx);
 

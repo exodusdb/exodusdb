@@ -3,7 +3,6 @@ libraryinit()
 
 #include <sysmsg.h>
 #include <authorised.h>
-#include <singular.h>
 
 #include <gen.h>
 #include <win.h>
@@ -88,7 +87,7 @@ postuploadfail:
 		rec.r(fns.a(2), ii, newstatus);
 		rec.r(fns.a(3), ii, USERNAME);
 		rec.r(fns.a(4), ii, var().date() ^ "." ^ (var().time()).oconv("R(0)#5"));
-		rec.r(fns.a(5), ii, mv.STATION);
+		rec.r(fns.a(5), ii, STATION);
 
 		rec.write(file, key);
 
@@ -456,7 +455,7 @@ postuploadfail:
 						for (var coln = 1; coln <= ncols; ++coln) {
 							var dictrec = "F";
 							dictrec.r(2, coln + fieldoffset);
-							dictrec.r(3, mv.capitalise(cols.a(coln, 1)));
+							dictrec.r(3, capitalise(cols.a(coln, 1)));
 							dictrec.r(10, "10");
 							var dictid = dictcolprefix ^ "_" ^ cols.a(coln, 1).convert(" ","_").ucase();
 

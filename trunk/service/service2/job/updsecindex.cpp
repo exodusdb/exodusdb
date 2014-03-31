@@ -1,13 +1,9 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <lockrecord.h>
-
-#include <gen.h>
-
 var indexingrecord;
 
-function main(in mode, in filename, in keys, in fieldnames, in oldvalues, in newvalues=, io valid, io msg) {
+function main(in mode, in filename, in keys0, in fieldnames, in oldvalues, in newvalues, io valid, io msg) {
 	//update symbolic indexed files
 	//this is designed to be called in prewrite
 	//to update the indexes of associated records
@@ -24,6 +20,7 @@ function main(in mode, in filename, in keys, in fieldnames, in oldvalues, in new
 	var secstowaitforindexinglock = 99;
 	var secstowaitforlock = 9;
 	var indexingkey = "0";
+	var indexingfile;
 
 	valid = 0;
 	msg = "Unknown error in UPD.SECINDEX";
@@ -46,6 +43,7 @@ function main(in mode, in filename, in keys, in fieldnames, in oldvalues, in new
 		var cnt = 0;
 
 		//allow for keys to be passed as vm
+		var keys=keys0;
 		keys.converter(VM, FM);
 
 		var nkeys = keys.count(FM) + (keys ne "");

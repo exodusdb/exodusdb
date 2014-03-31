@@ -42,17 +42,17 @@ function main(in mode, in previous=var("")) {
 			temp.splicer(1, 1, "");
 		}
 		if (not buffer) {
-			call msg2("WAITING TO GET THE NEXT " ^ temp ^ " NUMBER|PRESS ESCAPE TO EXIT.", "UB", buffer, "");
+			call mssg("WAITING TO GET THE NEXT " ^ temp ^ " NUMBER|PRESS ESCAPE TO EXIT.", "UB", buffer, "");
 		}
-		if (mv.esctoexit()) {
-			call msg2("", "DB", buffer, "");
+		if (esctoexit()) {
+			call mssg("", "DB", buffer, "");
 			return "";
 		}
 		//call delay(1);
-		sleep(1);
+		ossleep(1000);
 	}
 	if (buffer) {
-		call msg2("", "DB", buffer, "");
+		call mssg("", "DB", buffer, "");
 	}
 
 	//get the initial next number
@@ -64,7 +64,7 @@ function main(in mode, in previous=var("")) {
 		tt.swapper(".", " ");
 		if (seqkey.substr(1, 4) == "JOBS") {
 inpnextno:
-			call note2("PLEASE ENTER THE|FIRST NUMBER FOR " ^ tt, "RC", nextno, "");
+			call note("PLEASE ENTER THE|FIRST NUMBER FOR " ^ tt, "RC", nextno, "");
 			if (nextno == "") {
 				var xx = unlockrecord("", keyfile, seqkey);
 				ANS = "";

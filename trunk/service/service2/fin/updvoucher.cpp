@@ -12,7 +12,6 @@ libraryinit()
 #include <giveway.h>
 #include <updindex.h>
 #include <updbalances.h>
-#include <updvoucher.h>
 
 #include <fin.h>
 #include <gen.h>

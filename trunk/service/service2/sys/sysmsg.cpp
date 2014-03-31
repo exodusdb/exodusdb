@@ -6,8 +6,6 @@ libraryinit()
 #include <roundrobin.h>
 #include <sendmail.h>
 
-#include <gen.h>
-
 var subjectin;
 var username;
 var bakpars;
@@ -84,7 +82,7 @@ function main(in msg0, in subject0="", in username0="") {
 	emailaddrs.swapper("backups@neosys.com", "sysmsg@neosys.com");
 
 	//suppress login failure messages
-	if (ACCOUNT ne "ACCOUNTS" and USERNAME ne "NEOSYS" and subjectin.substr(1, 13) == "Login Failure") {
+	if (APPLICATION ne "ACCOUNTS" and USERNAME ne "NEOSYS" and subjectin.substr(1, 13) == "Login Failure") {
 		emailaddrs.swapper("sysmsg@neosys.com", "");
 		emailaddrs.trimmer(";");
 	}
@@ -136,7 +134,7 @@ function main(in msg0, in subject0="", in username0="") {
 	}
 	body.r(-1, "Database=" ^ SYSTEM.a(45).trim() ^ " " ^ SYSTEM.a(17));
 	body.r(-1, "Process=" ^ SYSTEM.a(24));
-	body.r(-1, "Client=" ^ mv.STATION.trim());
+	body.r(-1, "Client=" ^ STATION.trim());
 	body.r(-1, "User=" ^ username.trim());
 	if (useremail) {
 		//if user email is not in the list of people being sent to then

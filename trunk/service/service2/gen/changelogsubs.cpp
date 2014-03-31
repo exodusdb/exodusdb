@@ -19,6 +19,9 @@ var msg;
 
 function main(in mode0) {
 
+	//WHATSNEW returns in ANS
+	ANS="";
+
 	var mode=mode0;
 
 	var keywords = "MEDIA" _VM_ "JOBS" _VM_ "FINANCE" _VM_ "TIMESHEETS" _VM_ "TECHNICAL" _VM_ "USER INTERFACE";
@@ -26,10 +29,10 @@ function main(in mode0) {
 	var nkeywords = keywords.count(VM) + 1;
 
 	if (not(openfile("CHANGELOG", changelog))) {
-		var().stop();
+		return 0;
 	}
-	if (not(openfile("DICT.CHANGELOG", DICT))) {
-		var().stop();
+	if (not(openfile("DICT_CHANGELOG", DICT))) {
+		return 0;
 	}
 
 	if (mode.a(1) == "SELECTANDLIST") {
@@ -44,6 +47,7 @@ function main(in mode0) {
 		//call changelog.subs('LIST':fm:data)
 		gosub list(mode);
 
+	//returns outputfilename in ANS
 	} else if (mode.a(1) == "WHATSNEW") {
 
 		var menucodes = mode.a(2);
@@ -151,7 +155,7 @@ function main(in mode0) {
 		}
 
 		//make a suitable output filename based on the responsefilename
-		temp = mv.PRIORITYINT.a(100);
+		temp = PRIORITYINT.a(100);
 		temp.splicer(-1, 1, "HTM");
 		SYSTEM.r(2, temp);
 

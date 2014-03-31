@@ -360,10 +360,10 @@ subroutine createchart(io chart, in ledgercode) {
 	//orec=storerec
 	//@record=storerecord
 
-	var storepseudo = mv.PSEUDO;
-	mv.PSEUDO = ledgercode ^ FM ^ chart;
+	var storepseudo = PSEUDO;
+	PSEUDO = ledgercode ^ FM ^ chart;
 	perform("WINDOWSTUB LEDGER.SUBS PSEUDOWRITE");
-	mv.PSEUDO = storepseudo;
+	PSEUDO = storepseudo;
 
 	return;
 

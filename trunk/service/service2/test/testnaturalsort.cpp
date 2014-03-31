@@ -3,9 +3,9 @@
 programinit()
 
 function main() {
-	printl("testnaturalsort says 'Hello World!'");
+	printl("testqqqnaturalsort says 'Hello World!'");
 
-	var tempsortfile="temptestnaturalsortfile";
+	var tempsortfile="temptestqqqnaturalsortfile";
 	deletefile(tempsortfile);
 
 	//let everything be one transaction
@@ -18,7 +18,7 @@ function main() {
 	var ndigits=9;
 	var nzeros=25;
 
-	//create records backwards to test sort
+	//create records backwards to testqqq sort
 	var ii,jj;
 	for (ii=ndigits;ii>=1;--ii)
 		for (jj=nzeros;jj>=0;--jj) {

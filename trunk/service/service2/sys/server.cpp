@@ -45,6 +45,8 @@ programinit()
 #include <initgeneral.h>
 #include <select2.h>
 #include <securitysubs.h>
+#include <sysmsg.h>
+#include <loginnet.h>
 
 #include "window.hpp"
 
@@ -171,8 +173,8 @@ function main()
 	//CREATE LABELLED COMMON
 	mv.labelledcommon[1]=new win_common;
 
-mv.STATION="";
-mv.PSEUDO="";
+STATION="";
+PSEUDO="";
 SYSTEM="";
 
 	//initialise or abort
@@ -208,7 +210,7 @@ SYSTEM="";
 	//}
 	//std::wcout,"OK",std::endl;
 	var conninfo="";//"host=localhost port=5432 dbname=exodus user=exodus password=somesillysecret connect_timeout=10";
-	if (!mv.SESSION.connect(conninfo))
+	if (!SESSION.connect(conninfo))
 	{
 		errputl("MvEnvironment::init: Couldn't connect to local database");
 		return false;
@@ -284,7 +286,7 @@ SYSTEM="";
 	//discover the server name
 	//servername=field(getdrivepath(drive()[1,2])[3,9999],'\',1)
 	servername = "";
-	onserver = servername == "" || mv.STATION.trim() == servername;
+	onserver = servername == "" || STATION.trim() == servername;
 
 	//should be less than 25 unless waiting.exe modified to update the server flag
 	waitfor = 1;
@@ -327,7 +329,7 @@ SYSTEM="";
 	gosub deleteoldfiles(inpath,"^.*$");
 
 	Serverusername = USERNAME;
-	Serverstation = mv.STATION;
+	Serverstation = STATION;
 
 	//savescreen(origscrn, origattr);
 
@@ -348,7 +350,7 @@ SYSTEM="";
 	printl("NEOSYS.NET SERVICE ", SYSTEM.a(24));
 	printl(" STARTED ", var().timedate());
 	printl();
-	printl("Station  : ", mv.STATION);
+	printl("Station  : ", STATION);
 	printl("Drive : ", var().oscwd());
 	printl("Server   : ", servername);
 	printl("Data  : ", inpath);
@@ -364,7 +366,7 @@ SYSTEM="";
 	// s33=system<33>
 	// system<33>=''
 	//
-	// * call note2('neosys.net service' 'c#30':'||||||press esc and wait 10 secs to interrupt','ub')
+	// * call note('neosys.net service' 'c#30':'||||||press esc and wait 10 secs to interrupt','ub')
 	//
 	// *switch back to silent mode
 	// system<33>=s33
@@ -373,15 +375,15 @@ SYSTEM="";
 	//
 	// end
 
-	origprivilege = mv.PRIVILEGE;
-	//mv.setprivilege("");
+	origprivilege = PRIVILEGE;
+	//setprivilege("");
 
 	request1 = "";
 
 	//image=''
 
 
-	if (!(mv.openfile2("LOCKS", locks, "LISTS", 1))) {
+	if (!(openfile2("LOCKS", locks, "LISTS", 1))) {
 		mssg("CANNOT OPEN LOCKS FILE");
 		return "";
 	}
@@ -435,7 +437,7 @@ SYSTEM="";
 			logx ^= ">";
 			gosub writelogx2();
 
-			mv.osbwritex("</Log>", logfilename, logfilename, logptr);
+			osbwritex("</Log>", logfilename, logfilename, logptr);
 
 		}else{
 		printl("CANNOT OPEN LOG FILE ", logfilename);
@@ -447,7 +449,7 @@ SYSTEM="";
 	linkfilename1 = "";
 	replyfilename = "";
 
-	mv.TCLSTACK = mv.TCLSTACK.field(FM, 1, 10);
+	//TCLSTACK = TCLSTACK.field(FM, 1, 10);
 	//<arev>
 //	var("RESET").execute();
 	//</arev>
@@ -544,21 +546,21 @@ function serviceloop()
 		gosub deleteoldfiles(inpath,".*\\.4$");
 
 	//if tracing then
-	logput(mv.at(0));
+	logput(AT(0));
 	logput((var().time()).oconv("MTS"));
 	logput(" "^SYSTEM.a(17));
-	//logput(" "^mv.ROLLOUTFILE.field2("\\", -1).field(".", 1, 1));
+	//logput(" "^ROLLOUTFILE.field2("\\", -1).field(".", 1, 1));
 	logput(" "^SYSTEM.a(24));
 	logput(" "^nrequests);
 	logput(" Listening ...");
-	logput(mv.at(-4));
+	logput(AT(-4));
 
 	//prevent sleep in esc.to.exit
 	timenow=var().ostime().round(2);
 	SYSTEM.r(25, timenow);
 	SYSTEM.r(26, timenow);
 
-	if (mv.esctoexit())
+	if (esctoexit())
 		return false;
 
 	//look for db stoppers in program directory
@@ -665,17 +667,17 @@ stopper:
 		charx = charx[1].ucase();
 
 		//esc
-		if (charx == mv.INTCONST.a(1)) {
-			msg2("You have pressed the [Esc]  key to exit|press again to confirm|", "UB", buffer, "");
+		if (charx == INTCONST.a(1)) {
+			mssg("You have pressed the [Esc]  key to exit|press again to confirm|", "UB", buffer, "");
 			while (true) {
 				reply.input(-1);
 			//BREAK;
 			if (reply) break;;
 			}//loop;
-//				msg2("", "DB", buffer, "");
-			if (reply == mv.INTCONST.a(1))
+//				mssg("", "DB", buffer, "");
+			if (reply == INTCONST.a(1))
 				return false;
-			if (reply == mv.INTCONST.a(7))
+			if (reply == INTCONST.a(7))
 				charx = reply;
 		}
 
@@ -686,12 +688,12 @@ stopper:
 		}
 
 		//f5
-		//if (charx == mv.PRIORITYINT.a(2))
+		//if (charx == PRIORITYINT.a(2))
 		//	var("").execute();
 
 		//f10
-		//if (charx == mv.INTCONST.a(7))
-		//	var("RUNMENU " ^ mv.ENVIRONSET.a(37)).execute();
+		//if (charx == INTCONST.a(7))
+		//	var("RUNMENU " ^ ENVIRONSET.a(37)).execute();
 
 		if (charx != "") {
 
@@ -730,7 +732,7 @@ stopper:
 
 				//quit and indicate to calling program that a backup has been done
 				//if tracing else
-				mv.PSEUDO = "BACKUP";
+				PSEUDO = "BACKUP";
 				if (USER4)
 					return false;
 				// end
@@ -797,8 +799,8 @@ readlink1:
 */
 		//problem osreading utf8 data on linux ubuntu 13.10 x65
 		//USER0.osread(linkfilename1, "utf8");
-		USER0=osbread(linkfilename1,xx=0,999999);
-		USER0=decode(USER0);
+		var origrequest=osbread(linkfilename1,xx=0,999999);
+		USER0=decode(origrequest);
 
 		//if cannot read it then try again
 		if (USER0 == "" && var().time() == timex) {
@@ -864,7 +866,9 @@ readlink1:
 		var ntries = 0;
 deleterequest:
 		linkfilename1.osclose();
-		linkfilename1.osdelete();
+		//linkfilename1.osdelete();
+		var savelinkfilename1=linkfilename1^"$";
+		linkfilename1.osrename(savelinkfilename1);
 		if (linkfilename1.osfile()) {
 			//var().osflush();
 			//garbagecollect;
@@ -883,7 +887,12 @@ deleterequest:
 		//unlock locks,'request*':linkfilename1
 
 		//found a good one so process it
-		return processrequest();
+		var result=processrequest();
+
+		//will be left behind for debugging if request crashes
+		savelinkfilename1.osdelete();
+
+		return result;
 
 	};//linkfilen;
 
@@ -902,8 +911,8 @@ function processrequest()
 	//print @(0):@(-4):time() 'mts':' ':count(program.stack(),fm):
 	//print @(0):@(-4):time() 'mts':' ':field2(linkfilename1,'\',-1):' ':field2(replyfilename,'\',-1):
 	//print @(0):@(-4):time() 'mts':' ':field2(replyfilename,'\',-1):
-	logput(mv.at(0)^
-		mv.at(-4)^
+	logput(AT(0)^
+		AT(-4)^
 		var().time().oconv("MTS")^
 		" "
 	);
@@ -981,15 +990,15 @@ function processrequest()
 		timex = requeststarttime;
 
 		var tt = var().chr(13) ^ var().chr(10) ^ "<Message ";
-		tt ^= " Date=" ^ mv.xmlquote(datex.oconv("D"));
-		tt ^= " Time=" ^ mv.xmlquote(timex.oconv("MTS"));
-		tt ^= " DateTime=" ^ mv.xmlquote(datex.oconv("DJ-") ^ "T" ^ timex.oconv("MTS") ^ "." ^ timex.field(".", 2, 1));
-		tt ^= " User=" ^ mv.xmlquote(username);
-		tt ^= " File=" ^ mv.xmlquote(replyfilename.field2("\\", -1));
+		tt ^= " Date=" ^ xmlquote(datex.oconv("D"));
+		tt ^= " Time=" ^ xmlquote(timex.oconv("MTS"));
+		tt ^= " DateTime=" ^ xmlquote(datex.oconv("DJ-") ^ "T" ^ timex.oconv("MTS") ^ "." ^ timex.field(".", 2, 1));
+		tt ^= " User=" ^ xmlquote(username);
+		tt ^= " File=" ^ xmlquote(replyfilename.field2("\\", -1));
 		//remote_addr remote_host https
-		tt ^= " IP_NO=" ^ mv.xmlquote(connection.a(1, 2));
-		tt ^= " Host=" ^ mv.xmlquote(connection.a(1, 3));
-		tt ^= " HTTPS=" ^ mv.xmlquote(connection.a(1, 4));
+		tt ^= " IP_NO=" ^ xmlquote(connection.a(1, 2));
+		tt ^= " Host=" ^ xmlquote(connection.a(1, 3));
+		tt ^= " HTTPS=" ^ xmlquote(connection.a(1, 4));
 		tt ^= ">" ^ (var().chr(13) ^ var().chr(10));
 
 		tt ^= "<Request ";
@@ -1017,7 +1026,7 @@ function processrequest()
 		tt.transfer(logx);
 		gosub writelogx2();
 
-		mv.osbwritex("<DataIn>", logfilename, logfilename, logptr);
+		osbwritex("<DataIn>", logfilename, logfilename, logptr);
 
 	}
 */
@@ -1063,7 +1072,7 @@ function processrequest()
 
 	//save the response file name
 	//so that if Server fails then net the calling program can still respond
-	mv.PRIORITYINT.r(100, linkfilename3);
+	PRIORITYINT.r(100, linkfilename3);
 
 	USER1="";
 	var linkfilename2size = linkfilename2.osfile().a(1);
@@ -1144,13 +1153,14 @@ subroutine login()
 
 	USER1 = "";
 	USER4 = "";
+	var authcompcodes;
 
 	//custom login routine
 	//returns iodat (cookie string "x=1&y=2" etc and optional comment)
 	//if (xx.read(md, "LOGIN.NET")) {
 		USER1 = "";
 		USER4 = "";
-		mv.loginnet(dataset, username, USER1, USER4);
+		loginnet(dataset, username, USER1, USER4, authcompcodes);
 		if (USER1 == "") {
 			USER3 = USER4;
 			return;
@@ -1173,7 +1183,13 @@ subroutine login()
 			var datetime = var().date() ^ "." ^ (var().time()).oconv("R(0)#5");
 			userrec.r(13, datetime);
 			userrec.r(14, SYSTEM.a(40, 2));
+
+			if (authcompcodes) {
+				userrec.r(33, authcompcodes);
+			}
+
 			userrec.write(users, username);
+
 		}
 	}
 
@@ -1185,7 +1201,7 @@ subroutine validate()
 	invaliduser = "Error: Invalid username and/or password";
 //printl("validate");
 	//encrypt the passwors and check it
-	var encrypt0 = mv.encrypt2(password ^ "");
+	var encrypt0 = encrypt2(password ^ "");
 	var usern;
 	var systemrec;
 	var tt;
@@ -1276,7 +1292,7 @@ userok:
 				if (connection.a(1, 3) != tt)
 					tt ^= "_" ^ connection.a(1, 3);
 			tt.converter(". ", "_");
-			mv.STATION=tt;
+			STATION=tt;
 			invaliduser = "";
 		}
 	}else{
@@ -1305,10 +1321,10 @@ subroutine requestexit()
 //printl("requestexit:"^USER3.quote());
 
 	if (USER3.index("ERROR NO:", 1))
-		mv.logger("Server", USER3);
+		logger("Server", USER3);
 
 	USERNAME=Serverusername;
-	mv.STATION=Serverstation;
+	STATION=Serverstation;
 
 	//if USER3[1,6].ucase()='ERROR:' then iodat=''
 
@@ -1378,7 +1394,7 @@ subroutine requestexit()
 /*
 			var ptr=0;
 USER1.outputl("USER1 written:");
-			mv.osbwritex(USER1, linkfilename2, linkfilename2, ptr);
+			osbwritex(USER1, linkfilename2, linkfilename2, ptr);
 //USER1.outputl("USER1 written:");
 			ptr += USER1.length();
 */
@@ -1420,10 +1436,10 @@ USER1.outputl("USER1 written:");
 		if (iodatlen)
 			tt ^= "</DataOut>";
 		tt ^= "</Message>" ^ (var().chr(13) ^ var().chr(10));
-		mv.osbwritex(tt, logfilename, logfilename, logptr);
+		osbwritex(tt, logfilename, logfilename, logptr);
 		logptr += tt.length();
 
-		mv.osbwritex("</Log>", logfilename, logfilename, logptr);
+		osbwritex("</Log>", logfilename, logfilename, logptr);
 
 	}
 */
@@ -1474,7 +1490,7 @@ subroutine exit()
 	//get into interactive mode
 	//system<33>=origbatchmode
 	SYSTEM.r(33, "");
-	mv.PRIVILEGE=origprivilege;
+	PRIVILEGE=origprivilege;
 
 	if (request1 == "RESTART") {
 		//chain 'Server'
@@ -1597,7 +1613,7 @@ subroutine process()
 		}
 		if (newfilename == "") newfilename = filename;
 
-		filename2 = mv.singular(newfilename);
+		filename2 = singular(newfilename);
 		filename2.converter(".", " ");
 		//if security(filename2:' access',msg0,'') else
 		// if security('#':filename2:' access ':quote(keyx),msg2,'') else
@@ -1634,7 +1650,7 @@ subroutine process()
 /*TODO reimplement as simple external function
 			library.call("PREREAD");
 */
-			mv.DATA = "";
+			DATA = "";
 			ID.transfer(keyx);
 		}
 
@@ -1692,8 +1708,8 @@ keyx="";
 			// end
 		}
 
-		mv.FILEERRORMODE = 1;
-		mv.FILEERROR = "";
+		FILEERRORMODE = 1;
+		FILEERROR = "";
 		if (USER1.read(file, keyx)) {
 
 			//if record already on file somehow then get next key
@@ -1722,7 +1738,7 @@ keyx="";
 		}else{
 			//if @file.error<1>='100' then
 			//no file error for jbase
-			if (!mv.FILEERROR || mv.FILEERROR.a(1) == "100") {
+			if (!FILEERROR || FILEERROR.a(1) == "100") {
 
 				//prevent create
 				if (withlock) {
@@ -1785,7 +1801,7 @@ keyx="";
 /*TODO reimplement as simple external function
 			library.call("POSTREAD");
 */
-			mv.DATA = "";
+			DATA = "";
 
 //restore this programs environment
 			RECORD.transfer(USER1);
@@ -1886,7 +1902,7 @@ keyx="";
 		}
 		if (newfilename == "") newfilename = filename;
 
-		filename2 = mv.singular(newfilename);
+		filename2 = singular(newfilename);
 		filename2.converter(".", " ");
 
 		//double check allowed access to file
@@ -2011,7 +2027,7 @@ emptyrecorderror:
 /*TODO reimplement as simple external function
 				library.call("PREWRITE");
 */
-				mv.DATA = "";
+				DATA = "";
 			}
 
 			if (!win.valid) {
@@ -2064,7 +2080,7 @@ emptyrecorderror:
 /*TODO reimplement as simple external function
 				library.call("POSTWRITE");
 */
-				mv.DATA = "";
+				DATA = "";
 			}
 
 			//send back revised data or nothing
@@ -2105,7 +2121,7 @@ emptyrecorderror:
 /*TODO reimplement as simple external function
 				library.call("PREDELETE");
 */
-				mv.DATA = "";
+				DATA = "";
 			}
 			if (!win.valid) {
 				gosub properunlock();
@@ -2122,7 +2138,7 @@ emptyrecorderror:
 /*TODO reimplement as simple external function
 				library.call("POSTDELETE");
 */
-				mv.DATA = "";
+				DATA = "";
 			}
 
 			//send back no iodat
@@ -2255,14 +2271,14 @@ USER0=USER0.field(FM,3,9999);
 			perform(mdcmd.lcase());
 		}
 		//discard any stored input
-		mv.DATA = "";
+		DATA = "";
 
 		//call msg2('','db',buffer,'')
 		//print timedate2():' finished ':indata[1,60]
 
 		//send errors to neosys
 		if (USER4.index("An internal error", 1))
-			mv.sysmsg(USER4);
+			sysmsg(USER4);
 
 		USER4.cropper();
 		USER3.cropper();
@@ -2287,7 +2303,7 @@ USER0=USER0.field(FM,3,9999);
 		printfilename = SYSTEM.a(2);
 		if (tracing) {
 			//print ' got it'
-			logput(mv.at(0)^ mv.at(-4));
+			logput(AT(0)^ AT(-4));
 		}
 
 		//make sure that the output file is closed
@@ -2306,14 +2322,14 @@ USER0=USER0.field(FM,3,9999);
 			timex = var().time();
 			while (true) {
 			//BREAK;
-			if (!(mv.otherusers("").a(1) && (var().time() - timex).abs() < 30)) break;;
+			if (!(otherusers("").a(1) && (var().time() - timex).abs() < 30)) break;;
 				var().ossleep(1000);
 			}//loop;
 
 			USER1 = "";
 
-			if (mv.otherusers("").a(1)) {
-				USER3 = "Error: Could not terminate " ^ mv.otherusers("") ^ " users|" ^ mv.otherdatasetusers("*");
+			if (otherusers("").a(1)) {
+				USER3 = "Error: Could not terminate " ^ otherusers("") ^ " users|" ^ otherdatasetusers("*");
 				globalend.osdelete();
 			}else{
 				var("NET STOP NEOSYSSERVICE").osshell();
@@ -2345,7 +2361,7 @@ USER0=USER0.field(FM,3,9999);
 		//then quit and indicate to calling program that a backup has been done
 		//user will be emailed
 		if (SYSTEM.a(2) == "") {
-			mv.PSEUDO = "BACKUP2";
+			PSEUDO = "BACKUP2";
 			if (USER4)
 				var().stop();
 		}
@@ -2359,9 +2375,9 @@ USER0=USER0.field(FM,3,9999);
 		USER3 = "UNKNOWN VERSION";
 
 	}else if (request1 == "INSTALL") {
-		mv.DATA ^= var().chr(13);
+		DATA ^= var().chr(13);
 		if (request2 == "")
-			request2 = ACCOUNT;
+			request2 = APPLICATION;
 		execute("INSTALL " ^ request2 ^ " I !:");
 		USER3 = USER4;
 
@@ -2378,9 +2394,9 @@ USER0=USER0.field(FM,3,9999);
 
 subroutine geterrorresponse()
 {
-	var fileerror = mv.FILEERROR;
+	var fileerror = FILEERROR;
 	USER3 = "Error: FS" ^ fileerror.a(1, 1);//.xlate("SYS_MESSAGES", 11, "X");
-//	USER3.swapper("%1%", mv.handlefilename(fileerror.a(2, 1)));
+//	USER3.swapper("%1%", handlefilename(fileerror.a(2, 1)));
 	USER3.swapper("%2%", fileerror.a(2, 2));
 	gosub formatresponse();
 	return;
@@ -2492,7 +2508,7 @@ subroutine properlock()
 	//dont pass the filename because that causes persistent lock checking
 	//in jbase version of lockrecord()
 	if (!(lockrecord("", srcfile2, keyx))) {
-		if (mv.STATUS != 1) {
+		if (STATUS != 1) {
 			win.valid = 0;
 			USER3 = "Error: " ^ keyx.quote() ^ " CANNOT BE WRITTEN BECAUSE IT IS LOCKED ELSEWHERE";
 		}
@@ -2612,14 +2628,14 @@ subroutine lock()
 	lockrec = "";
 	lockrec.r(1, lockduration + ostimenow);
 	lockrec.r(2, ostimenow);
-	lockrec.r(3, connection ? connection.a(1, 2): mv.STATION);
+	lockrec.r(3, connection ? connection.a(1, 2): STATION);
 	lockrec.r(4, USERNAME);
 	lockrec.r(5, newsessionid);
-	mv.FILEERRORMODE = 1;
-	mv.FILEERROR = "";
+	FILEERRORMODE = 1;
+	FILEERROR = "";
 	USER3 = "OK";
 	lockrec.write(locks, lockkey);
-	if (mv.FILEERROR) {
+	if (FILEERROR) {
 		mssg("CANNOT WRITE LOCKS RECORD " ^ lockkey);
 		gosub geterrorresponse();
 	}
@@ -2668,12 +2684,12 @@ subroutine unlock()
 
 	//get the current lock else return ok
 	lockkey = filename ^ "*" ^ keyx;
-	mv.FILEERRORMODE = 1;
-	mv.FILEERROR = "";
+	FILEERRORMODE = 1;
+	FILEERROR = "";
 	if (!lockrec.read(locks, lockkey))
 		lockrec = "";
 	if (!lockrec) {
-		if (mv.FILEERROR.a(1) == 100) {
+		if (FILEERROR.a(1) == 100) {
 			//lock is missing but ignore it
 			//because we are unlocking anyway
 			USER3 = "OK";
@@ -2698,11 +2714,11 @@ subroutine unlock()
 	}
 
 	//delete the lock
-	mv.FILEERRORMODE = 1;
-	mv.FILEERROR = "";
+	FILEERRORMODE = 1;
+	FILEERROR = "";
 	USER3 = "OK";
 	locks.deleterecord(lockkey);
-	if (mv.FILEERROR) {
+	if (FILEERROR) {
 		mssg("CANNOT DELETE LOCK KEY " ^ lockkey);
 		gosub geterrorresponse();
 	}
@@ -2867,7 +2883,7 @@ subroutine writelogx()
 
 subroutine writelogx2()
 {
-	mv.osbwritex(logx, logfilename, logfilename, logptr);
+	osbwritex(logx, logfilename, logfilename, logptr);
 	logptr += logx.length();
 	logx = "";
 	return;
@@ -2875,7 +2891,7 @@ subroutine writelogx2()
 
 subroutine writelogx3()
 {
-	mv.osbwritex(logx, logfilename, logfilename, logptr);
+	osbwritex(logx, logfilename, logfilename, logptr);
 	logx = "";
 	return;
 }
@@ -2914,7 +2930,7 @@ subroutine respond()
 	//responsefilename[-len(t),len(t)]='3'
 
 	//linkfilename3
-	responsefilename = mv.PRIORITYINT.a(100);
+	responsefilename = PRIORITYINT.a(100);
 	if (!responsefilename)
 		return;
 
@@ -2963,7 +2979,7 @@ subroutine getindexvalues()
 		temp = "JOURNAL";
 
 	temp.convert(".", " ");
-	temp = mv.singular(temp);
+	temp = singular(temp);
 	if (!(authorised(temp ^ " ACCESS", USER4, ""))) {
 		USER3 = USER4;
 		return;
@@ -2974,16 +2990,16 @@ subroutine getindexvalues()
 	}
 
 	collectixvals(filename, fieldname, prefix);
-	mv.PSEUDO.transfer(USER1);
+	PSEUDO.transfer(USER1);
 	if (USER1[1] == FM)
 		USER1.splicer(1, 1, "");
 	USER3 = "OK";
 
 	if (sortby && USER1) {
-		USER1.convert(FM, mv.RM);
-		USER1 ^= mv.RM;
+		USER1.convert(FM, RM);
+		USER1 ^= RM;
 		v119("S", "", sortby[1], sortby[2], USER1, flag);
-		USER1.convert(mv.RM, FM);
+		USER1.convert(RM, FM);
 		USER1.splicer(-1, 1, "");
 	}
 
@@ -3030,7 +3046,7 @@ subroutine requestselect()
 	if (!(var("MENUS" _VM_ "ADMENUS").locate(filename, xx))) {
 		var temp = filename;
 		temp.convert(".", " ");
-		temp = mv.singular(temp);
+		temp = singular(temp);
 		if (!(authorised(temp ^ " ACCESS", USER4, ""))) {
 			var msgx="";
 			if (!(authorised("!#" ^ temp ^ " ACCESS PARTIAL", msgx, ""))) {

@@ -336,13 +336,13 @@ accname:
 
 			if (reply == 1) {
 
-				call note2("Searching for " ^ isaccno ^ "|(Please wait or press [Esc] to exit)", "UB", buff, "");
+				call note("Searching for " ^ isaccno ^ "|(Please wait or press [Esc] to exit)", "UB", buff, "");
 				fin.accounts.select();
 				var rejectedaccnos = "";
 
 nextacc:
-				if (mv.esctoexit()) {
-					call msg2("", "DB", buff, "");
+				if (esctoexit()) {
+					call mssg("", "DB", buff, "");
 					return "";
 				}
 
@@ -350,10 +350,10 @@ nextacc:
 					temp.input(-1, 0);
 					if (temp) {
 						if (temp == var().chr(27)) {
-							call msg2("", "DB", buff, "");
+							call mssg("", "DB", buff, "");
 							return "";
 						}
-						mv.DATA ^= temp;
+						DATA ^= temp;
 					}
 					var acc;
 					if (acc.read(fin.accounts, accno)) {
@@ -372,11 +372,11 @@ nextacc:
 							if (not(rejectedaccnos.locate(accno2, temp, 1))) {
 								//print char(7):
 								if (not(decide(acc.a(1) ^ " (" ^ accno2 ^ ")|" ^ ledgername ^ "||" "IS THIS THE ONE YOU WANT ?", "", reply))) {
-									call msg2("", "DB", buff, "");
+									call mssg("", "DB", buff, "");
 									return 0;
 								}
 								if (reply == 1) {
-									call msg2("", "DB", buff, "");
+									call mssg("", "DB", buff, "");
 									is = accno2;
 									goto chkacc;
 								}else{
@@ -387,7 +387,7 @@ nextacc:
 					}
 					goto nextacc;
 				}
-				call msg2("", "DB", buff, "");
+				call mssg("", "DB", buff, "");
 				msg = DQ ^ (isaccno ^ DQ) ^ "|" "No accounts can be found.|";
 				//print char(7):
 				call mssg(msg);

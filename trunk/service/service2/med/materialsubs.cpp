@@ -41,7 +41,7 @@ function main(in mode) {
 		}
 		gosub getimagelocation();
 
-		var materialcode = mv.PSEUDO.a(1);
+		var materialcode = PSEUDO.a(1);
 
 		if (not(oslist(imagelocation ^ materialcode))) {
 			msg = DQ ^ (imagelocation ^ materialcode ^ " file cannot be found" ^ DQ);
@@ -119,7 +119,7 @@ function main(in mode) {
 		}
 
 	} else if (mode == "GETSCHEDULEMATERIALS") {
-		var schid = mv.PSEUDO.a(1);
+		var schid = PSEUDO.a(1);
 		var schedule;
 		if (not(schedule.read(agy.schedules, schid))) {
 			msg = DQ ^ (schid ^ DQ) ^ " Schedule does not exist";
