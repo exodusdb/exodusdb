@@ -72,7 +72,7 @@ function main() {
 gen.gcurrcompany="";
 gen.company="";
 USERNAME="";
-if (not gen._definitions.open("DEFINITIONS")) {
+if (not DEFINITIONS.open("DEFINITIONS")) {
 	var().stop("cant open DEFINITIONS");
 }
 */
@@ -241,9 +241,9 @@ if (not gen._definitions.open("DEFINITIONS")) {
 			dbdatetimerequired = dbdate.iconv("D") + dbtime.iconv("MT") / 86400;
 		}else{
 		}
-		if (gen._definitions.open("DEFINITIONS")) {
+		if (DEFINITIONS.open("DEFINITIONS")) {
 			var dbversion;
-			if (not(dbversion.read(gen._definitions, "DBVERSION"))) {
+			if (not(dbversion.read(DEFINITIONS, "DBVERSION"))) {
 				goto updateversion;
 			}
 			if (oldmethod and dbversion.a(1) == 14334.5) {
@@ -289,7 +289,7 @@ updateversion:
 				dbversion = dbdatetimerequired;
 				dbversion.r(2, dbdate);
 				dbversion.r(3, dbtime);
-				dbversion.write(gen._definitions, "DBVERSION");
+				dbversion.write(DEFINITIONS, "DBVERSION");
 			}
 		}
 	}
@@ -341,7 +341,7 @@ updateversion:
 	}
 
 	//if OPENFILE('DEFINITIONS',DEFINITIONS) then null
-	if (not(gen._definitions.open("DEFINITIONS"))) {
+	if (not(DEFINITIONS.open("DEFINITIONS"))) {
 		var().chr(7).output();
 		msg = "The DEFINITIONS file is missing";
 		msg.r(-1, "Did you startup using the right command file/datasettype?");
@@ -378,7 +378,7 @@ updateversion:
 
 	call log2("*get DEFINITIONS SYSTEM parameters", logtime);
 	//do in reverse order so that the higher levels get priority
-	if (not(SYSTEM.read(gen._definitions, "SYSTEM"))) {
+	if (not(SYSTEM.read(DEFINITIONS, "SYSTEM"))) {
 		SYSTEM = "";
 	}
 	gosub getsystem("SYSTEM.CFG", 2);
@@ -396,7 +396,7 @@ updateversion:
 			call osread(smtp, "SMTP.CFG");
 		}
 		if (not smtp.a(1)) {
-			if (not(smtp.read(gen._definitions, "SMTP.CFG"))) {
+			if (not(smtp.read(DEFINITIONS, "SMTP.CFG"))) {
 				{}
 			}
 		}
@@ -610,10 +610,10 @@ getproxy:
 	DATEFORMAT = "D2/E";
 
 	call log2("*get security ... also in LISTEN", logtime);
-	if (not(gen._security.read(gen._definitions, "SECURITY"))) {
+	if (not(gen._security.read(DEFINITIONS, "SECURITY"))) {
 		if (temp.open("DICT", "DEFINITIONS")) {
 			if (gen._security.read(temp, "SECURITY")) {
-				gen._security.write(gen._definitions, "SECURITY");
+				gen._security.write(DEFINITIONS, "SECURITY");
 			}
 		}
 	}
@@ -679,7 +679,7 @@ getproxy:
 
 	call log2("*open general files", logtime);
 	var valid = 1;
-	gen._definitions = "";
+	DEFINITIONS = "";
 	if (not(openfile("ALANGUAGE", xx, "DEFINITIONS"))) {
 		valid = 0;
 	}
@@ -752,71 +752,48 @@ getproxy:
 
 	call log2("*perform the autoexec task BEFORE initialising other systems", logtime);
 	if (not neosysid) {
-		if (openfile("DEFINITIONS", gen._definitions)) {
-			if (temp.read(gen._definitions, "AUTOEXEC")) {
+		if (openfile("DEFINITIONS", DEFINITIONS)) {
+			if (temp.read(DEFINITIONS, "AUTOEXEC")) {
 				perform("TASK AUTOEXEC");
 			}
 		}
 	}
 
-	call log2("*get first company for init.acc", logtime);
+	call log2("get an initial company to work with for init routines", logtime);
 	gen.companies.clearselect();
 	//TODO should be a sequence code on companies to sort the important companies first
 	gen.companies.select();
-	var companycode;
-	gen.companies.readnext(companycode);
+	gen.companies.readnext(gen.gcurrcompany);
+	gen.companies.clearselect();
 
-	call log2("*check for ACCOUNTS file", logtime);
+	if (gen.company.read(gen.companies, gen.gcurrcompany))
+		gen.company="";
+
+	gen.glang = "";
+
+	call log2("*check for finance module", logtime);
 	if (xx.open("ACCOUNTS")) {
-		call log2("*open accounts system files", logtime);
+		call log2("*initialise finance module - initacc", logtime);
 		call initacc();
 	}
 
-	call log2("*definitions file", logtime);
-	//backward compatible with DEFINITIONS file in \data\accounts directory
-	if (not(openfile("DEFINITIONS", gen._definitions))) {
-		valid = 0;
-	}
-
-	call log2("*open advertising system files INIT.AGENCY", logtime);
-	if (xx.open("SCHEDULES")) {
+	call log2("*check for agency module", logtime);
+	if (xx.open("JOBS")) {
+		call log2("*initialise agency module - initagency", logtime);
 		call initagency();
 	}
 
-	call log2("*add number format to company records", logtime);
-	gen.companies.select();
-	var numberformat = "";
-	var currcompany = "";
-	while (gen.companies.readnext(currcompany)) {
-		var tempcompany;
-		if (tempcompany.read(gen.companies, currcompany)) {
-			if (tempcompany.a(22) == "") {
-				if (not numberformat) {
-					if (not(decide("Which format do you want for numbers ?||(See \"NUMBER FORMAT\" on the company file)", "1.000,00 (dot for thousands)" _VM_ "1,000.00 (comma for thousands)", reply))) {
-						reply = 2;
-					}
-					if (reply == 1) {
-						numberformat = "1.000,00";
-					} else
-						numberformat = "1,000.00";
-				}
-				numberformat.writev(gen.companies, currcompany, 22);
-			}
-		}
-	}
-
 	call log2("*get the company description", logtime);
-	gen.company = "";
 	var currperiod = "";
 	//call init.company('')
 	//change so that interactive ADAGENCY gets a company code
 	//force acquisition of language
 	gen.glang = "";
-	call initcompany(currcompany);
+	call initcompany(gen.gcurrcompany);
 
-	log2("save gen.gcurrcompany", logtime);
-	fin.currcompanycodes = currcompany;
-	gen.gcurrcompany = currcompany;
+	//is this needed?
+	fin.currcompanycodes = gen.gcurrcompany;
+	//main company code
 	SYSTEM.r(37, gen.gcurrcompany);
 
 	call log2("*check currency accounts", logtime);
@@ -844,14 +821,17 @@ getproxy:
 		}
 	}
 
+  //database name
 	if (not SYSTEM.a(23))
 		SYSTEM.r(23,"Default");
+	
+	//database
 	if (not SYSTEM.a(17))
 		SYSTEM.r(17,"exodus");
 
 	call log2("*ensure random key exists", logtime);
 	var datasetid;
-	if (not(datasetid.read(gen._definitions, "GLOBALDATASETID"))) {
+	if (not(datasetid.read(DEFINITIONS, "GLOBALDATASETID"))) {
 newdatasetid:
 		dostime=ostime().round(2);
 		datasetid = var().date() ^ "." ^ dostime;
@@ -861,7 +841,7 @@ newdatasetid:
 adddatasetcodename:
 		datasetid.r(2, SYSTEM.a(23));
 		datasetid.r(3, SYSTEM.a(17));
-		datasetid.write(gen._definitions, "GLOBALDATASETID");
+		datasetid.write(DEFINITIONS, "GLOBALDATASETID");
 	}
 	if (datasetid.a(3) == "") {
 		goto adddatasetcodename;
@@ -959,9 +939,9 @@ adddatasetcodename:
 */
 	call log2("*create user name index", logtime);
 	var convkey = "CONVERTED*USERNAMEINDEX";
-	if (not(xx.read(gen._definitions, convkey))) {
+	if (not(xx.read(DEFINITIONS, convkey))) {
 		call usersubs("CREATEUSERNAMEINDEX");
-		var().date().write(gen._definitions, convkey);
+		var().date().write(DEFINITIONS, convkey);
 	}
 
 	call log2("*stop init.general", logtime);

@@ -197,10 +197,12 @@ typedef var& out;
 #define DICT mv.DICT
 #define ANS mv.ANS
 #define MV mv.MV
+#define PSEUDO mv.PSEUDO
+#define DATA mv.DATA
 #define LISTACTIVE mv.LISTACTIVE
 
 #define USERNAME mv.USERNAME
-#define ACCOUNT mv.ACCOUNT
+#define APPLICATION mv.APPLICATION
 #define SENTENCE mv.SENTENCE
 
 #define	USER0 mv.USER0
@@ -212,17 +214,26 @@ typedef var& out;
 #define EXECPATH mv.EXECPATH
 #define COMMAND mv.COMMAND
 #define OPTIONS mv.OPTIONS
-#define SYSTEM mv.SYSTEM
-#define SECURITY mv.SECURITY
-#define DEFINITIONS mv.DEFINITIONS
 
-#define lockrecord mv.lockrecord
-#define unlockrecord mv.unlockrecord
-#define fsmsg mv.fsmsg
-#define mssg mv.mssg
-#define msg2 mv.msg2
-#define note mv.note
-#define note2 mv.note2
-#define decide mv.decide
+#define DEFINITIONS mv.DEFINITIONS
+#define SECURITY mv.SECURITY
+#define SYSTEM mv.SYSTEM
+#define SESSION mv.SESSION
+#define THREADNO mv.THREADNO
+
+#define INTERNALCHARS mv.INTERNALCHARS
+#define EXTERNALCHARS mv.EXTERNALCHARS
+#define LOWERCASE mv.LOWERCASE
+#define UPPERCASE mv.UPPERCASE
+
+#define STATION mv.STATION
+#define DATEFORMAT mv.DATEFORMAT
+#define PRIVILEGE mv.PRIVILEGE
+#define FILES mv.FILES
+#define INTCONST mv.INTCONST
+#define STATUS mv.STATUS
+#define PRIORITYINT mv.PRIORITYINT
+#define FILEERRORMODE mv.FILEERRORMODE
+#define FILEERROR mv.FILEERROR
 
 #endif //EXODUSMACROS_H

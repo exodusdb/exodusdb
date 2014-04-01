@@ -115,7 +115,7 @@ var var::timedate() const
 
 	//TODO make this rely on a single timestamp instead of time and date
 	//to avoid the slight chance of time and date being called different sides of midnight
-	return time().oconv_MT(L"MTS") ^ L" " ^ date().oconv_D(L"D");
+	return time().oconv_MT(L"S") ^ L" " ^ date().oconv_D(L"D");
 }
 
 var var::ostime() const
@@ -502,56 +502,93 @@ var var::oconv_D(const wchar_t* conversion) const
 
 var var::oconv_MT(const wchar_t* conversion) const
 {
-	//MT, MTH, MTS, MTx, MTHx, MTSx where x is a sep char
-
+	//conversion points to the character AFTER MT - which may be \0
+	//MT, MTH, MTS, MTx, MTHx, MTSx MTHS MTHSx where x is a sep char
+	
+	//MT2... also a 2 digit may be inserted in all cases just after MT
+	//to indicate that the input is in hours (either decimal or int)
+	
+	//MT2U... also a U letter may be inserted in all cases instead of
+	//or after 2 to indicate that the output is not limited to 24 hours
+	//and can be 25:59 or even 1200:59
+	
 	//defaults
 	bool twelvehour=false;
+	bool unlimited=false;//incompatible with twelvehour
 	bool showsecs=false;
+	bool decimalhours=false;
 	wchar_t sepchar=L':';
-
-	//1st character must be M otherwise no conversion
 	const wchar_t* conversionchar=conversion;
-	if (*conversionchar!=L'M')
-		return *this;
+	int timesecs;
 
-	//2nd character must be T otherwise no conversion
-	++conversionchar;
-	if (*conversionchar!=L'T')
-		return *this;
-
-	//guess 3rd character is most often zero/ie most conversions are MT only and short circuit
-	++conversionchar;
-	if (*conversionchar)
+	//guess 1st option is most often zero/ie most conversions are MT only and short circuit
+	if (!(*conversionchar))
 	{
+		timesecs=round();
 
-		//third character may be an H to indicate AM/PM
+	//interpret conversion characters
+	} else {
+	
+		//first may be an 2 to indicate input is integer or decimal hours
+		//if so, convert by *3600 to seconds
+		if (*conversionchar==L'2')
+		{
+			++conversionchar;
+			timesecs=(3600*(*this)).round();
+
+		//if not, just get the seconds
+		} else {
+			timesecs=round();
+		}
+
+		//first may be a U to indicate unlimited hours
+		if (*conversionchar==L'U')
+		{
+			++conversionchar;
+			unlimited=true;
+		}
+		
+		//next may be an H to indicate AM/PM
 		if (*conversionchar==L'H')
 		{
-			twelvehour=true;
 			++conversionchar;
+			twelvehour=true;
 		}
 
-		//third or fourth character may be an S to show seconds
+		//next may be an S to show seconds
 		if (*conversionchar==L'S')
 		{
-			showsecs=true;
 			++conversionchar;
+			showsecs=true;
 		}
-
-		//first of remaining characters is the separator
+/* dont allow H after S
+		//next may be an H to indicate unlimited time eg 25:00
+		if (*conversionchar==L'H')
+		{
+			++conversionchar;
+			twelvehour=true;
+		}
+*/
+		//first of remaining characters is the separator. remainder are ignored
 		if (*conversionchar)
 		{
 			sepchar=*conversionchar;
 		}
 
 	}
-	int timesecs=round();
 
 	//standardise times <0 and >=86400 to one day ie 0-85399 seconds
-	timesecs=timesecs%86400;
-	if (timesecs<0)
-			timesecs+=86400;
-
+	var negative;
+	if (unlimited) {
+		negative=timesecs<0;
+		if (negative)
+			timesecs=-timesecs;
+	} else {
+		timesecs=timesecs%86400;
+		if (timesecs<0)
+				timesecs+=86400;
+	}
+	
 	int hours=timesecs/3600;
 	int mins=timesecs%3600/60;
 	int secs=timesecs%60;
@@ -574,7 +611,17 @@ var var::oconv_MT(const wchar_t* conversion) const
 	//TODO two digit formatting in C instead of var
 
 	//two digit hours
-	var newmv=(L"00"^var(hours)).substr(-2);
+	var newmv;
+	if (unlimited) {
+	  if (negative)
+	  	newmv=L"-";
+	  else
+	  	newmv=L"";
+		if (hours<10)
+			newmv^=L"0";
+		newmv^=hours;
+	} else
+		newmv=(L"00"^var(hours)).substr(-2);
 
 	//separator
 	newmv^=sepchar;

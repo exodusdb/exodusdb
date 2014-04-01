@@ -11,7 +11,7 @@ var vn;
 function main() {
 	//jbase
 
-	if (not(agy.agp.read(gen._definitions, "AGENCY.PARAMS"))) {
+	if (not(agy.agp.read(DEFINITIONS, "AGENCY.PARAMS"))) {
 		call note("AGENCY.PARAMS IS MISSING FROM DEFINITIONS");
 		var().stop();
 	}
@@ -205,7 +205,7 @@ var brands;
 	var vtyp = agy.agp.a(46);
 	if (vtyp == "") {
 		var def;
-		if (def.read(gen._definitions, "ALL")) {
+		if (def.read(DEFINITIONS, "ALL")) {
 			if (def.a(1).locateusing("SI", VM, vn)) {
 				vtyp = def.a(6, vn);
 			}
@@ -220,7 +220,7 @@ var brands;
 	vtyp = agy.agp.a(47);
 	if (vtyp == "") {
 		var def;
-		if (def.read(gen._definitions, "ALL")) {
+		if (def.read(DEFINITIONS, "ALL")) {
 			if (def.a(1).locateusing("SI", VM, vn)) {
 				vtyp = def.a(6, vn);
 				//try to locate second occurrence of sales invoices
@@ -240,7 +240,7 @@ var brands;
 	var vouchertype = agy.agp.a(91);
 	if (vouchertype == "") {
 		var def;
-		if (def.read(gen._definitions, "ALL")) {
+		if (def.read(DEFINITIONS, "ALL")) {
 			if (def.a(1).locateusing("PI", VM, vn)) {
 				vouchertype = def.a(6, vn);
 			}
@@ -257,7 +257,7 @@ var brands;
 	vouchertype = agy.agp.a(85);
 	if (vouchertype == "") {
 		var def;
-		if (def.read(gen._definitions, "ALL")) {
+		if (def.read(DEFINITIONS, "ALL")) {
 			if (def.a(1).locateusing("PI", VM, vn)) {
 				vouchertype = def.a(6, vn);
 			}

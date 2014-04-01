@@ -160,7 +160,7 @@ function main() {
 			}
 
 		}else{
-			usersordefinitions = gen._definitions;
+			usersordefinitions = DEFINITIONS;
 			userkey = "BADUSER*" ^ ID;
 			if (not(userrec.read(usersordefinitions, userkey))) {
 				userrec = "";

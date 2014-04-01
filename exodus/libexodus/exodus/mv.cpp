@@ -259,8 +259,7 @@ var::operator int() const
 			throw MVUnassigned(L"int(var)");
 		}
 	}
-	//must be string - try to convert to numeric
-	while (isnum());
+	while (isnum());//must be string - try to convert to numeric and go round again
 
 	THISISNUMERIC()
 	throw MVNonNumeric(L"int(L" ^ substr(1,20) ^ L")");
@@ -355,7 +354,7 @@ var& var::operator = (const int int1)
 	//THISISDEFINED()
 
 	var_mvint=int1;
-	var_mvtyp=pimpl::MVTYPE_INT;
+	var_mvtyp=pimpl::MVTYPE_INT;//reset to one unique type
 
 	return *this;
 }
@@ -371,7 +370,7 @@ var& var::operator = (const double double1)
 	//THISISDEFINED()
 
 	var_mvdbl=double1;
-	var_mvtyp=pimpl::MVTYPE_DBL;
+	var_mvtyp=pimpl::MVTYPE_DBL;//reset to one unique type
 
 	return *this;
 }
@@ -391,7 +390,7 @@ var& var::operator = (const wchar_t char2)
 						//ALN:TODO: argumentation: var with mvtyp=0 is NOT defined
 
 	var_mvstr=char2;
-	var_mvtyp=pimpl::MVTYPE_STR;
+	var_mvtyp=pimpl::MVTYPE_STR;//reset to one unique type
 
 	return *this;
 }
@@ -408,7 +407,7 @@ var& var::operator = (const wchar_t* char2)
 	THISISDEFINED()
 	
 	var_mvstr=char2;
-	var_mvtyp=pimpl::MVTYPE_STR;
+	var_mvtyp=pimpl::MVTYPE_STR;//reset to one unique type
 
 	return *this;
 }
@@ -425,7 +424,7 @@ var& var::operator = (const std::wstring string2)
 	//slows down all string settings so consider NOT CHECKING in production code
 	THISISDEFINED()
 	var_mvstr=string2;
-	var_mvtyp=pimpl::MVTYPE_STR;
+	var_mvtyp=pimpl::MVTYPE_STR;//reset to one unique type
 
 	return *this;
 }
@@ -441,9 +440,7 @@ var& var::operator ^=(const var& rhs)
 
 	//tack it onto our string
 	var_mvstr+=rhs.var_mvstr;
-
-	//reset to unknown string (clear int/dbl/nan flags)
-	var_mvtyp=pimpl::MVTYPE_STR;
+	var_mvtyp=pimpl::MVTYPE_STR;//reset to one unique type
 
 	return *this;
 }
@@ -457,9 +454,7 @@ var& var::operator ^= (const int int1)
 
 	//var_mvstr+=var(int1).var_mvstr;
 	var_mvstr+=intToString(int1);
-
-	//reset to unknown string (clear int/dbl/nan flags)
-	var_mvtyp=pimpl::MVTYPE_STR;
+	var_mvtyp=pimpl::MVTYPE_STR;//reset to one unique type
 
 	return *this;
 }
@@ -473,9 +468,7 @@ var& var::operator ^= (const double double1)
 
 	//var_mvstr+=var(int1).var_mvstr;
 	var_mvstr+=dblToString(double1);
-
-	//reset to unknown string (clear int/dbl/nan flags)
-	var_mvtyp=pimpl::MVTYPE_STR;
+	var_mvtyp=pimpl::MVTYPE_STR;//reset to one unique type
 
 	return *this;
 }
@@ -489,9 +482,7 @@ var& var::operator ^= (const wchar_t char1)
 
 	//var_mvstr+=var(int1).var_mvstr;
 	var_mvstr+=char1;
-
-	//reset to unknown string (clear int/dbl/nan flags)
-	var_mvtyp=pimpl::MVTYPE_STR;
+	var_mvtyp=pimpl::MVTYPE_STR;//reset to one unique type
 
 	return *this;
 }
@@ -506,9 +497,7 @@ var& var::operator ^= (const wchar_t* char1)
 	//var_mvstr+=var(int1).var_mvstr;
 	//var_mvstr+=std::wstring(char1);
 	var_mvstr+=char1;
-
-	//reset to unknown string (clear int/dbl/nan flags)
-	var_mvtyp=pimpl::MVTYPE_STR;
+	var_mvtyp=pimpl::MVTYPE_STR;//reset to one unique type
 
 	return *this;
 }
@@ -522,9 +511,7 @@ var& var::operator ^= (const std::wstring string1)
 
 	//var_mvstr+=var(int1).var_mvstr;
 	var_mvstr+=string1;
-
-	//reset to unknown string (clear int/dbl/nan flags)
-	var_mvtyp=pimpl::MVTYPE_STR;
+	var_mvtyp=pimpl::MVTYPE_STR;//reset to one unique type
 
 	return *this;
 }
@@ -542,18 +529,20 @@ var var::operator ++ (int)
 
 tryagain:
 	if (var_mvtyp&pimpl::MVTYPE_INT)
+	{
 		var_mvint++;
+		var_mvtyp=pimpl::MVTYPE_INT;//reset to one unique type
+	}
 	else if (var_mvtyp&pimpl::MVTYPE_DBL)
+	{
 		var_mvdbl++;
+		var_mvtyp=pimpl::MVTYPE_DBL;//reset to one unique type
+	}
 	else if (var_mvtyp&pimpl::MVTYPE_STR)
 	{
 		//try to convert to numeric
 		if (isnum())
-		{
-			//turn off string flag because it is about to be obsoleted;
-			var_mvtyp=var_mvtyp^pimpl::MVTYPE_STR;
 			goto tryagain;
-		}
 
 		//throw MVNonNumeric(L"(L" ^ substr(1,20) ^ L")++");
 		THISISNUMERIC()
@@ -582,18 +571,20 @@ var var::operator -- (int)
 		throw MVUndefined(L"var--");
 tryagain:
 	if (var_mvtyp&pimpl::MVTYPE_INT)
+	{
 		var_mvint--;
+		var_mvtyp=pimpl::MVTYPE_INT;//reset to one unique type
+	}
 	else if (var_mvtyp&pimpl::MVTYPE_DBL)
+	{
 		var_mvdbl--;
+		var_mvtyp=pimpl::MVTYPE_DBL;//reset to one unique type
+	}
 	else if (var_mvtyp&pimpl::MVTYPE_STR)
 	{
 		//try to convert to numeric
 		if (isnum())
-		{
-			//NB turn off string flag because it is about to be obsoleted;
-			var_mvtyp=var_mvtyp^pimpl::MVTYPE_STR;
 			goto tryagain;
-		}
 
 		//throw MVNonNumeric(L"(L" ^ substr(1,20) ^ L")--");
 		THISISNUMERIC()
@@ -620,18 +611,20 @@ var& var::operator ++ ()
 
 tryagain:
 	if (var_mvtyp&pimpl::MVTYPE_INT)
+	{
 		var_mvint++;
+		var_mvtyp=pimpl::MVTYPE_INT;//reset to one unique type
+	}
 	else if (var_mvtyp&pimpl::MVTYPE_DBL)
+	{
 		var_mvdbl++;
+		var_mvtyp=pimpl::MVTYPE_DBL;//reset to one unique type
+	}
 	else if (var_mvtyp&pimpl::MVTYPE_STR)
 	{
 		//try to convert to numeric
 		if (isnum())
-		{
-			//NB turn off string flag because it is about to be obsoleted;
-			var_mvtyp=var_mvtyp^pimpl::MVTYPE_STR;
 			goto tryagain;
-		}
 
 		//throw MVNonNumeric(L"++(L" ^ substr(1,20) ^ L")");
 		THISISDEFINED()
@@ -658,18 +651,20 @@ var& var::operator -- ()
 
 tryagain:
 	if (var_mvtyp&pimpl::MVTYPE_INT)
+	{
 		var_mvint--;
+		var_mvtyp=pimpl::MVTYPE_INT;//reset to one unique type
+	}
 	else if (var_mvtyp&pimpl::MVTYPE_DBL)
+	{
 		var_mvdbl--;
+		var_mvtyp=pimpl::MVTYPE_DBL;//reset to one unique type
+	}
 	else if (var_mvtyp&pimpl::MVTYPE_STR)
 	{
 		//try to convert to numeric
 		if (isnum())
-		{
-			//NB turn off string flag because it is about to be obsoleted;
-			var_mvtyp=var_mvtyp^pimpl::MVTYPE_STR;
 			goto tryagain;
-		}
 
 		throw MVNonNumeric(L"--(L" ^ substr(1,20) ^ L")");
 	}
@@ -697,11 +692,12 @@ tryagain:
 		if (rhs.var_mvtyp&pimpl::MVTYPE_INT)
 		{
 			var_mvint+=rhs.var_mvint;
+			var_mvtyp=pimpl::MVTYPE_INT;//reset to one unique type
 			return *this;
 		}
 		//dbl source, convert target to dbl
 		var_mvdbl=var_mvint+rhs.var_mvdbl;
-		var_mvtyp=pimpl::MVTYPE_DBL;
+		var_mvtyp=pimpl::MVTYPE_DBL;//reset to one unique type
 		return *this;
 	}
 
@@ -710,6 +706,7 @@ tryagain:
 	{
 		//+= int or dbl from source
 		var_mvdbl+=(rhs.var_mvtyp&pimpl::MVTYPE_INT)?rhs.var_mvint:rhs.var_mvdbl;
+		var_mvtyp=pimpl::MVTYPE_DBL;//reset to one unique type
 		return *this;
 	}
 
@@ -729,14 +726,7 @@ tryagain:
 
 	//try to convert to numeric
 	if (isnum())
-	{
-		// NB TODO turn off string flag because it is about to be obsoleted;
-		//faster but less safe to do it here instead of at the point of updating
-		//since increment and decrement probably mostly not on strings
-		//xor
-		var_mvtyp=var_mvtyp^pimpl::MVTYPE_STR;
 		goto tryagain;
-	}
 
  	THISISNUMERIC()
 	throw MVNonNumeric(substr(1,20) ^ L"+= ");
@@ -758,11 +748,12 @@ tryagain:
 		if (rhs.var_mvtyp&pimpl::MVTYPE_INT)
 		{
 			var_mvint-=rhs.var_mvint;
+			var_mvtyp=pimpl::MVTYPE_INT;//reset to one unique type
 			return *this;
 		}
 		//dbl source, convert target to dbl
 		var_mvdbl=var_mvint-rhs.var_mvdbl;
-		var_mvtyp=pimpl::MVTYPE_DBL;
+		var_mvtyp=pimpl::MVTYPE_DBL;//reset to one unique type
 		return *this;
 	}
 
@@ -771,6 +762,7 @@ tryagain:
 	{
 		//-= int or dbl from source
 		var_mvdbl-=(rhs.var_mvtyp&pimpl::MVTYPE_INT)?rhs.var_mvint:rhs.var_mvdbl;
+		var_mvtyp=pimpl::MVTYPE_DBL;//reset to one unique type
 		return *this;
 	}
 
@@ -790,13 +782,7 @@ tryagain:
 	}
 	//try to convert to numeric
 	if (isnum())
-	{
-		// NB TODO turn off string flag because it is about to be obsoleted;
-		//faster but less safe to do it here instead of at the point of updating
-		//since increment and decrement probably mostly not on strings
-		var_mvtyp=var_mvtyp^pimpl::MVTYPE_STR;
 		goto tryagain;
-	}
 
 	THISISNUMERIC()
 	throw MVNonNumeric(substr(1,20) ^ L"-= ");

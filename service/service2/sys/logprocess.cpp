@@ -13,7 +13,7 @@ function main(io processid, in processcategory, in processparameters="", in proc
 	//"heartbeat" called from messaging
 
 	//if definitions else
-	if (not(gen._definitions.open("DEFINITIONS", ""))) {
+	if (not(DEFINITIONS.open("DEFINITIONS", ""))) {
 		return 0;
 	}
 
@@ -24,20 +24,20 @@ function main(io processid, in processcategory, in processparameters="", in proc
 	if (processcategory == "HEARTBEAT") {
 
 		//FILEERRORMODE = 1;
-		if (not processrec.read(gen._definitions, "PROCESS*" ^ processid)) {
+		if (not processrec.read(DEFINITIONS, "PROCESS*" ^ processid)) {
 			processrec = "";
 		}
 		//if (not FILEERROR) {
 			processrec.r(11, var().date());
 			processrec.r(12, var().time());
 
-			processrec.write(gen._definitions, "PROCESS*" ^ processid);
+			processrec.write(DEFINITIONS, "PROCESS*" ^ processid);
 
 		//}
 
 	} else if (processcategory == "LOGOFF" or processcategory == "DELETE") {
 
-		gen._definitions.deleterecord("PROCESS*" ^ processid);
+		DEFINITIONS.deleterecord("PROCESS*" ^ processid);
 		processid = "";
 
 	}else{
@@ -47,7 +47,7 @@ function main(io processid, in processcategory, in processparameters="", in proc
 			gosub newprocessid(processid);
 		}else{
 
-			if (not(processrec.read(gen._definitions, "PROCESS*" ^ processid))) {
+			if (not(processrec.read(DEFINITIONS, "PROCESS*" ^ processid))) {
 				gosub newprocessid(processid);
 			}
 
@@ -70,7 +70,7 @@ function main(io processid, in processcategory, in processparameters="", in proc
 			processrec.r(14, processcomments);
 		}
 
-		processrec.write(gen._definitions, "PROCESS*" ^ processid);
+		processrec.write(DEFINITIONS, "PROCESS*" ^ processid);
 
 	}
 
@@ -86,7 +86,7 @@ subroutine newprocessid(io processid){
 	do {
 		processid = (rnd(99999999)).substr(-8, 8);
 		printl("New process Id:" ^ processid);
-	} while (xx.read(gen._definitions, "PROCESS*" ^ processid));
+	} while (xx.read(DEFINITIONS, "PROCESS*" ^ processid));
 
 	processrec="";
 	processrec.r(1, var().date());

@@ -146,6 +146,7 @@ DLL_PUBLIC var& ucaser(var& instring);
 DLL_PUBLIC var ucase(const var& instring);
 DLL_PUBLIC var& lcaser(var& instring);
 DLL_PUBLIC var lcase(const var& instring);
+DLL_PUBLIC var unique(const var& instring);
 //arev character bit swapper
 //changing all the bits of exodus' 2 or 4 byte characters might make illegal unicode characters
 //could be implemented as xor xff ie bottom eight bits only and leave top bits unchanged

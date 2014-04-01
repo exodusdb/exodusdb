@@ -31,9 +31,9 @@ THE SOFTWARE.
 #include <exodus/mv.h>
 #include <exodus/mvfunctor.h>
 
-//for labelled commons
-#include <map>
-#include <boost/any.hpp>
+//for labelled commons if not using array
+//#include <map>
+//#include <boost/any.hpp>
 
 namespace exodus
 {
@@ -68,161 +68,93 @@ public:
 
 	bool init(const int threadno);
 
+//keep in sync both 1) declaration in class and 2) contruction initialisation
+
+	//per user
+	var USERNAME;
+	var PRIVILEGE;
+
+	//per application
+	var APPLICATION;
+
+	//per host
+	var STATION;
+
+	//per execution
+	var COMMAND;
+	var OPTIONS;
+	var EXECPATH;
+
+	//per process
+	var ROLLOUTFILE;
+	var THREADNO;
+
+	//per db access
+	var DICT;
 	var ID;
 	var RECORD;
-	var DICT;
 	var MV;
-	var ANS;
 	var LISTACTIVE;
-
-	var USERNAME;
-	var ACCOUNT;
-	var SENTENCE;
-
-	var DATA;
-	var PSEUDO;
-
-	var UPPERCASE;
-	var LOWERCASE;
-	var DATEFORMAT;
-
-	var CRTHIGH;
-	var CRTWIDE;
-	var LPTRHIGH;
-	var LPTRWIDE;
-
-	var COL1;
-	var COL2;
-	var STATION;
+	var SESSION;
 	var STATUS;
+	var FILEERROR;
+	var FILEERRORMODE;
+	var FILES;
 
-	//seems to fail initialisation in msvc2005 in release mode only ?!
+	//per configuration
+	var DEFINITIONS;
+	var SYSTEM;
+	var SECURITY;
 
+	//per request
+	var SENTENCE;
+	var PSEUDO;
+	var DATA;
+	var ANS;
+
+	//temporary application globals
 	var USER0;
 	var USER1;
-	var USER2;
+	//var USER2;//temp moved section
 	var USER3;
 	var USER4;
 
-	var EXECPATH;
-	var COMMAND;
-	var OPTIONS;
+	//i18n/l10n - internationalisation/localisation
+	var DATEFORMAT;
+	var USER2;
+	var SW;
 
+	//encoding globals
+	//MUST be the same length
+	//TODO Should not be global otherwise cannot multithread MvEnvironment
+	var LOWERCASE;
+	var UPPERCASE;
+	var INTERNALCHARS;
+	var EXTERNALCHARS;
+
+	var TCLSTACK;
+	var INTCONST;
+	var PRIORITYINT;
+
+	//old scratch variables used for various buffering
 	var AW;
-	var ENVIRONSET;
 	var EW;
 	var XW;
 	var VW;
 	var PW;
-	var SW;
-	var FILEERROR;
-	var FILEERRORMODE;
-	var FLUSHNEEDED;
-	var HW;
-	var INTCONST;
-	var PRIVILEGE;
-	var PRIORITYINT;
-	var ROLLOUTFILE;
 
-	var TCLSTACK;
-	var VOLUMES;
-	var FILES;
-
-	var DEFINITIONS;
-	var SECURITY;
-	var SESSION;
-	var SYSTEM;
-	var THREADNO;
+	//pretty obsolete nowadays
+	//environment variables may not be available until exported
+	//do set -p to find out exported variables instead of all
+	var CRTWIDE;
+	var CRTHIGH;
+	var LPTRWIDE;
+	var LPTRHIGH;
 
 	//define a type of object that holds many LabelledCommons
 	//typedef std::map<const char*, LabelledCommon> LabelledCommons;
 	//typedef std::map<std::string, boost::any> labelledcommons;
-	LabelledCommon* labelledcommon[3];
-
-	//moved to exodusprogrambase
-	//var perform(const var& sentence);
-
-	//ditto
-	//given dictid reads dictrec from DICT file and extracts from RECORD/ID or calls library called dict+DICT function dictid
-	//not const so we can mess with the library?
-	//var calculate(const var& dictid);
-	//var calculate(const var& dictid, const var& dictfile, const var& id, const var& record, const var& mv=0);
-
-	var otherusers(const var& param);
-	var otherdatasetusers(const var& param);
-
-	var capitalise(const var& str0, const var& mode=var(), const var& wordseps=var()) const;
-	//var capitalise(const var& str0, const var& mode=L"", const var& wordseps=L"") const;
-
-	void mssg(const var& msg) const;
-	void mssg(const var& msg, const var& options) const;
-	void mssg(const var& msg, const var& options, var& buffer, const var& params) const;
-	void msg2(const var& msg, const var& options, var& buffer, const var& params) const;
-
-	void note(const var& msg) const;
-	void note(const var& msg, const var& options) const;
-	void note(const var& msg, const var& options, var& buffer, const var& params) const;
-	void note2(const var& msg, const var& options, var& buffer, const var& params) const;
-
-	void msgbase(const var& msg, const var& options=L"", const var& response=L"", const var& params=L"") const;
-
-	var handlefilename(const var& handle) const;
-	void debug() const;
-	void fsmsg() const;
-	var sysvar(const var& var1,const var& var2,const var& mv3,const var& mv4);
-	void setprivilege(const var& var1);
-	bool openfile(const var& filename, var& file) const;
-	bool openfile2(const var& filename, var& file, const var& similarfilename, const var& autocreate=L"") const;
-
-	//NB does not return record yet
-	bool lockrecord(const var& filename, const var& file, const var& keyx, const var& recordx, const int waitsecs=0, const bool allowduplicate=false) const;
-	//bool lockrecord(const var& xfilename, const var& xfile, const var& keyx, const var& recordx, const var& waitsecs, const bool allowduplicate=false) const;
-	bool lockrecord(const var& filename, const var& file, const var& keyx) const;
-	bool unlockrecord(const var& filename, const var& file, const var& key) const;
-
-	var decide(const var& question, const var& options) const;
-	var decide(const var& question, const var& options, var& reply, const int defaultreply=0) const;
-
-	void savescreen(var& origscrn, var& origattr) const;
-	//void ostime(var& ostimenow) const;
-	int keypressed(int delayusecs=0) const;
-	bool esctoexit() const;
-
-	bool oswritex(const var& str, const var& filename) const;
-	bool osbwritex(const var& str1, const var& filehandle, const var& filename, var& offset) const;
-//	bool osbreadx(var& str1, const var& filehandle, const var& filename, const int startoffset, const int length);
-	bool osbreadx(var& str1, const var& filehandle, const var& filename, var& startoffset, const int length);
-
-	bool authorised(const var& task, var& msg, const var& defaultlock=L"");
-	bool authorised(const var& task);
-	void readuserprivs();
-	void writeuserprivs();
-	void logger(const var& programname, const var& logtext);
-	var singular(const var& pluralnoun);
-	void flushindex(const var& filename);
-	void sysmsg(const var& msg);
-	var sendmail(const var& toaddress, const var& subject, const var& body0, const var& attachfilename, const var& deletex, var& errormsg);
-	var encrypt2(const var& encrypt0) const;
-	var xmlquote(const var& str) const;
-	var loginnet(const var& dataset, const var& username, var& cookie, var& msg);
-	var at(const int code) const;
-	var at(const int x, const int y) const;
-
-    //was MVDB
-	var getuserdept(const var& usercode);
-
-private:
-
-	//used by calculate to call dict libraries
-	mutable ExodusFunctorBase dict_exodusfunctorbase_;
-	//TODO cache many not just one
-	mutable var cache_dictid_;
-	mutable var cache_dictrec_;
-
-	//used by perform to call libraries
-	mutable ExodusFunctorBase perform_exodusfunctorbase_;
-	//TODO cache many not just one
-	mutable var cache_perform_libid_;
+	LabelledCommon* labelledcommon[99];
 
 };
 

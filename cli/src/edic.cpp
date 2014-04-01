@@ -156,7 +156,7 @@ program()
                 else
                         startatlineno="";
 
-
+		filename.trimmerb(".");
                 if (not index(field2(filename,SLASH,-1),"."))
                         filename^=".cpp";
 

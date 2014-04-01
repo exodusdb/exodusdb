@@ -1087,7 +1087,7 @@ function processrequest()
 		USER3 = "Error: Server cannot open " ^ linkfilename2;
 		Serverfailure = 1;
 
-	}else if (not (USER1=osbread(linkfilename2,xx=0,999999999))) {
+	}else if (not (USER1=osbread(linkfilename2,xx=0,999999))) {
 		USER3 = "Error: Server cannot read " ^ linkfilename2;
 		Serverfailure = 1;
 

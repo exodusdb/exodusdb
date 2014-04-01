@@ -444,6 +444,11 @@ DLL_PUBLIC var lcase(const var& instring)
 	return instring.lcase();
 }
 
+DLL_PUBLIC var unique(const var& instring)
+{
+	return instring.unique();
+}
+
 /* AREV character bit inverter not implemented for now
 DLL_PUBLIC var& inverter(var& instring)
 {

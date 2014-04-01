@@ -755,7 +755,7 @@ valexchrate:
 		//five vehicles in columns, half hour blocks
 		var vehiclecodes = win.registerx(9);
 		if (not vehiclecodes) {
-			if (not(vehiclecodes.read(gen._definitions, "MAINTV"))) {
+			if (not(vehiclecodes.read(DEFINITIONS, "MAINTV"))) {
 				vehiclecodes = "ANT1,RIK TV1,RIK TV2,LOGOS,SIGMA";
 			}
 		}
@@ -769,7 +769,7 @@ valexchrate:
 		vehiclecodes.converter(",", VM);
 		win.registerx(9) = vehiclecodes;
 		var nvehicles = vehiclecodes.count(VM) + 1;
-		vehiclecodes.write(gen._definitions, "MAINTV");
+		vehiclecodes.write(DEFINITIONS, "MAINTV");
 
 		//divide into half hours
 		var minperdiv = 30;

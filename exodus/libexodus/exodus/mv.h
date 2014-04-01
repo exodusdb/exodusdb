@@ -170,13 +170,13 @@ namespace exodus {
 //the var versions of the above (without leading or trailing _)
 //are defined AFTER the class declaration of "var"
 
-//would be 256 if RM was character number 255. used in var::remove()
-#define LASTDELIMITERCHARNOPLUS1 0x0300
-
 //decided to use unicode characters 0x02F8-0x02FF instead of the classic 00F8-00FF which are latin accented characters
 //NB only unicode characters 0-07ff fit in 2 bytes in utf8. Therefore we dont use unicode PUA at E000-E8FF
 //the eight unicode characters 02F8-02FF are defined but rarely used and dont seem to be very important.
 //could also have used the undefined 05F8-05FF characters but risk important characters being defined there later
+
+//would be 256 if RM was character number 255. used in var::remove()
+#define LASTDELIMITERCHARNOPLUS1 0x0300
 
 //leading and trailing _ wchar* versions of classic pick delimiters
 //_RM_, _RM and RM_ versions (wchar*, char* and wchar respectively)
@@ -935,6 +935,7 @@ public:
 	var trimb(const var trimchar) const;
 	var fieldstore(const var& sepchar,const int fieldno,const int nfields,const var& replacement) const;
 //	var hash() const;
+	var unique() const;
 
 	//STRING EXTRACTION
 	//[x,y]

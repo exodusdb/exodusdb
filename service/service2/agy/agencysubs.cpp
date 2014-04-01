@@ -82,7 +82,7 @@ function main(in mode, io msg, in param3x="") {
 		// stop
 		// end
 		var billcostaccs;
-		if (not(billcostaccs.read(gen._definitions, "BILLCOSTACCS"))) {
+		if (not(billcostaccs.read(DEFINITIONS, "BILLCOSTACCS"))) {
 			msg = "System Error: BILLCOSTACCS is missing in AGENCY.SUBS";
 			call sysmsg(msg);
 			return 0;

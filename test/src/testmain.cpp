@@ -190,7 +190,7 @@ function main()
 		turkish_tr="tr_TR.utf8";
                 //try mac versions
                 //see locale -a for list
-                if (not setxlocale(english_usuk)) 
+                if (not setxlocale(english_usuk))
 			english_usuk="en_GB.utf8";
                 if (not setxlocale(english_usuk)) {
                         english_usuk="en_US.UTF-8";
@@ -616,6 +616,74 @@ dict(AGE_IN_YEARS) {
 
 //#endif
 
+	//test int/string changes after inc/dec (should really check MANY other ops)
+	var nn=0;
+	assert(nn.toString() eq "0");//nn now has string available internally
+	++nn;//this should destroy the internal string
+	assert(nn.toString() eq "1");//the string should be recalculated after the ++
+	nn++;
+	assert(nn.toString() eq "2");
+	--nn;
+	assert(nn.toString() eq "1");
+	nn--;
+	assert(nn.toString() eq "0");
+	nn+=1;
+	assert(nn.toString() eq "1");
+	nn-=1;
+	assert(nn.toString() eq "0");
+
+	//same for float/string
+	nn=0.1;
+	assert(nn.toString() eq "0.1");//nn now has string available internally
+	++nn;//this should destroy the internal string
+	assert(nn.toString() eq "1.1");//the string should be recalculated after the ++
+	nn++;
+	assert(nn.toString() eq "2.1");
+	--nn;
+	assert(nn.toString() eq "1.1");
+	nn--;
+	assert(nn.toString() eq "0.1");
+	nn+=1.0;
+	assert(nn.toString() eq "1.1");
+	nn-=1.0;
+	assert(nn.toString() eq "0.1");
+
+	//test remove
+	
+	var rem="abc"^FM^"xyz";
+	var ptr=2;
+	var sep;
+
+	//bc|5|2
+	//xyz|9|0
+	//abc|5|2
+	//xyz|9|0
+	//|999|0
+	//|999|0
+
+	var result=rem.remove(ptr,sep);
+	assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "bc|5|2");
+
+	result=rem.remove(ptr,sep);
+	assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "xyz|9|0");
+
+	ptr=0;
+
+	result=rem.remove(ptr,sep);
+	assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "abc|5|2");
+
+	result=rem.remove(ptr,sep);
+	assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "xyz|9|0");
+
+	ptr=999;
+
+	result=rem.remove(ptr,sep);
+	assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "|999|0");
+
+	result=rem.remove(ptr,sep);
+	assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "|999|0");
+
+	//test unquote
 	assert(unquote("\"This is quoted?\"") eq "This is quoted?");
 
 	var xyz;
@@ -1344,15 +1412,70 @@ while trying to match the argument list '(exodus::var, bool)'
 	assert(oconv(61201,"MTHS") eq "05:00:01PM");
 
 	var time2=43261;
-	assert(time2.oconv("MT") eq "12:01");
-	assert(time2.oconv("MTH") eq "12:01PM");
-	assert(time2.oconv("MTS") eq "12:01:01");
-	assert(time2.oconv("MTSH") eq "12H01H01");
+	assert(time2.oconv("MT").outputl() eq "12:01");
+	assert(time2.oconv("MTH").outputl() eq "12:01PM");
+	assert(time2.oconv("MTS").outputl() eq "12:01:01");
+	assert(time2.oconv("MTSH").outputl() eq "12H01H01");
 	assert(time2.oconv("MTx") eq "12x01");
 	assert(time2.oconv("MTHx") eq "12x01PM");
 	assert(time2.oconv("MTSx") eq "12x01x01");
 	assert(time2.oconv("MTSHx") eq "12H01H01");
 
+	time2=0;
+	assert(time2.oconv("MT").outputl() eq "00:00");
+	assert(time2.oconv("MTH").outputl() eq "12:00AM");
+	assert(time2.oconv("MTS").outputl() eq "00:00:00");
+	assert(time2.oconv("MTHS").outputl() eq "12:00:00AM");
+
+	//negative time
+	time2=-1;
+	assert(time2.oconv("MT").outputl() eq "23:59");
+	assert(time2.oconv("MTH").outputl() eq "11:59PM");
+	assert(time2.oconv("MTS").outputl() eq "23:59:59");
+	assert(time2.oconv("MTHS").outputl() eq "11:59:59PM");
+	time2=-86400/2;
+	assert(time2.oconv("MT").outputl() eq "12:00");
+	assert(time2.oconv("MTH").outputl() eq "12:00PM");
+	assert(time2.oconv("MTS").outputl() eq "12:00:00");
+	assert(time2.oconv("MTHS").outputl() eq "12:00:00PM");
+	time2=-86400-1;
+	assert(time2.oconv("MT").outputl() eq "23:59");
+	
+	//test some unlimited time
+	assert(var(-100).oconv("MTU").outputl() eq "-00:01");
+	assert(var(-100).oconv("MTUS").outputl() eq "-00:01:40");
+	assert(var(-10000).oconv("MTUS").outputl() eq "-02:46:40");
+	
+	assert(var(100).oconv("MTU").outputl() eq "00:01");
+	assert(var(100).oconv("MTUS").outputl() eq "00:01:40");
+	assert(var(1000).oconv("MTUS").outputl() eq "00:16:40");
+	assert(var(10000).oconv("MTUS").outputl() eq "02:46:40");
+	//NB 27:46:40 NOT ROUNDED UP TO 27:47 because mins like on clock
+	assert(var(100000).oconv("MTU").outputl() eq "27:46");
+	assert(var(100000).oconv("MTUS").outputl() eq "27:46:40");
+
+	//test some decimal hours based time
+	assert(var(0).oconv("MT2").outputl() eq "00:00");
+	assert(var(0).oconv("MT2S").outputl() eq "00:00:00");
+	assert(var(0.25).oconv("MT2").outputl() eq "00:15");
+	assert(var(0.25).oconv("MT2S").outputl() eq "00:15:00");
+	assert(var(24).oconv("MT2S").outputl() eq "00:00:00");
+	assert(var(25).oconv("MT2S").outputl() eq "01:00:00");
+	assert(var(-25).oconv("MT2S").outputl() eq "23:00:00");
+
+	//test some UNLIMITED decimal hours based time
+	//NB negative unlimited time is symmetrical (unlike normal time_
+	assert(var(.01).oconv("MT2US").outputl() eq "00:00:36");
+	assert(var(-.01).oconv("MT2US").outputl() eq "-00:00:36");
+	assert(var(.25).oconv("MT2US").outputl() eq "00:15:00");
+	assert(var(-.25).oconv("MT2US").outputl() eq "-00:15:00");
+	assert(var(25).oconv("MT2US").outputl() eq "25:00:00");
+	assert(var(-25).oconv("MT2US").outputl() eq "-25:00:00");
+	assert(var(125.25).oconv("MT2US").outputl() eq "125:15:00");
+	assert(var(-125.25).oconv("MT2US").outputl() eq "-125:15:00");
+	assert(var(9).oconv("MT2US").outputl() eq "09:00:00");
+	assert(var(-9).oconv("MT2US").outputl() eq "-09:00:00");
+		
 //	assert(oconv(FM ^ L"\x0035","HEX4") eq "00FE0035");
 	assert(oconv(FM ^ L"\x0035","HEX4") eq "02FE0035");
 	assert(oconv(FM,"HEX4") eq "02FE");

@@ -518,59 +518,63 @@ bool var::open(const var& filename, const var& connection)
 	int		 paramFormats[1];
 //	uint32_t	binaryIntVal;
 
-	/* Here is our out-of-line parameter value */
-	std::string filename2=filename.lcase().toString();
-	paramValues[0] = filename2.c_str();
-	paramLengths[0] = int(filename2.length());
-	paramFormats[0] = 1;//binary
+	//asking to open DOS file! ok can osread/oswrite later!
+	if (filename != L"DOS") {
 
-	//avoid any errors because ANY errors while a transaction is in progress cause failure of the whole transaction
-	//and remember that a select initiates a transaction committed on readnext eof or clearselect
-	//TODO should perhaps prepare pg parameters for repeated speed
-	var sql=L"SELECT table_name FROM information_schema.tables WHERE table_schema='public' and table_name=$1";
+		/* Here is our out-of-line parameter value */
+		std::string filename2=filename.lcase().toString();
+		paramValues[0] = filename2.c_str();
+		paramLengths[0] = int(filename2.length());
+		paramFormats[0] = 1;//binary
 
-	PGconn * thread_pgconn = (PGconn *) connection.connection();
-	if (!thread_pgconn)
-		return false;
+		//avoid any errors because ANY errors while a transaction is in progress cause failure of the whole transaction
+		//and remember that a select initiates a transaction committed on readnext eof or clearselect
+		//TODO should perhaps prepare pg parameters for repeated speed
+		var sql=L"SELECT table_name FROM information_schema.tables WHERE table_schema='public' and table_name=$1";
 
-	DEBUG_LOG_SQL1
-	PGresult* result = PQexecParams(thread_pgconn,
-		//TODO: parameterise filename
-		sql.toString().c_str(),
-		1,	   /* one param */
-		NULL,	/* let the backend deduce param type */
-		paramValues,
-		paramLengths,
-		paramFormats,
-		1);	  /* ask for binary results */
+		PGconn * thread_pgconn = (PGconn *) connection.connection();
+		if (!thread_pgconn)
+			return false;
 
-	int resultstatus=PQresultStatus(result);
-	if (resultstatus != PGRES_TUPLES_OK)
-	{
-#		if TRACING >= 1
-			exodus::errputl(L"ERROR: mvdbpostgres open(" ^ this->quote() ^ L") failed\n" ^ var(PQerrorMessage(thread_pgconn)));
-#		endif
+		DEBUG_LOG_SQL1
+		PGresult* result = PQexecParams(thread_pgconn,
+			//TODO: parameterise filename
+			sql.toString().c_str(),
+			1,	   /* one param */
+			NULL,	/* let the backend deduce param type */
+			paramValues,
+			paramLengths,
+			paramFormats,
+			1);	  /* ask for binary results */
+
+		int resultstatus=PQresultStatus(result);
+		if (resultstatus != PGRES_TUPLES_OK)
+		{
+	#		if TRACING >= 1
+				exodus::errputl(L"ERROR: mvdbpostgres open(" ^ this->quote() ^ L") failed\n" ^ var(PQerrorMessage(thread_pgconn)));
+	#		endif
+			PQclear(result);
+			return false;
+		}
+
+		//file (table) doesnt exist
+		if (PQntuples(result) < 1)
+		{
+			PQclear(result);
+			return false;
+		}
+
+		if (PQntuples(result) > 1)
+		{
+			PQclear(result);
+	#		if TRACING >= 1
+				exodus::errputl(L"ERROR: mvdbpostgres open() SELECT returned more than one record");
+	#		endif
+			return false;
+		}
+
 		PQclear(result);
-		return false;
 	}
-
-	//file (table) doesnt exist
-	if (PQntuples(result) < 1)
-	{
-		PQclear(result);
-		return false;
-	}
-
-	if (PQntuples(result) > 1)
-	{
-		PQclear(result);
-#		if TRACING >= 1
-			exodus::errputl(L"ERROR: mvdbpostgres open() SELECT returned more than one record");
-#		endif
-		return false;
-	}
-
-	PQclear(result);
 
 	//save the filename and memorise the current connection for this file var
 	var_mvstr=filename.var_mvstr;
@@ -606,6 +610,12 @@ bool var::read(const var& filehandle,const var& key)
 	THISISDEFINED()
 	ISSTRING(filehandle)
 	ISSTRING(key)
+
+	//asking to read DOS file! do osread using key as osfilename!
+	if (filehandle == L"DOS") {
+		(*this).osread(key.convert(L"\\",SLASH));
+		return true;
+	}
 
 	const char* paramValues[1];
 	int		 paramLengths[1];
@@ -731,8 +741,11 @@ var var::lock(const var& key) const
 
 	if (PQresultStatus(result) != PGRES_TUPLES_OK || PQntuples(result) != 1)
  	{
-		PQclear(result);
-		throw MVException(L"lock(" ^ (*this) ^ L", " ^ key ^ L")\n" ^ var(PQerrorMessage(thread_pgconn)));
+		var msg=L"lock(" ^ (*this) ^ L", " ^ key ^ L")\n" ^ var(PQerrorMessage(thread_pgconn)) ^ L"\n"
+		^ L"PQresultStatus=" ^ var(PQresultStatus(result)) ^ L", PQntuples=" ^ var(PQntuples(result));
+		PQclear(result);//DO THIS OR SUFFER MEMORY LEAK
+		exodus::errputl(msg);
+		//throw MVException(msg);
 		return false;
 	}
 
@@ -815,8 +828,11 @@ void var::unlock(const var& key) const
 
 	if (PQresultStatus(result) != PGRES_TUPLES_OK || PQntuples(result) != 1)
  	{
-		PQclear(result);
-		throw MVException(L"unlock(" ^ (*this) ^ L", " ^ key ^ L")\n" ^ var(PQerrorMessage(thread_pgconn)));
+		var msg=L"unlock(" ^ (*this) ^ L", " ^ key ^ L")\n" ^ var(PQerrorMessage(thread_pgconn)) ^ L"\n"
+		^ L"PQresultStatus=" ^ var(PQresultStatus(result)) ^ L", PQntuples=" ^ var(PQntuples(result));
+		PQclear(result);//DO THIS OR SUFFER MEMORY LEAK
+		exodus::errputl(msg);
+		//throw MVException(msg);
 		return;
 	}
 
@@ -942,6 +958,12 @@ bool var::write(const var& filehandle, const var& key) const
 	ISSTRING(filehandle)
 	ISSTRING(key)
 
+	//asking to write DOS file! do osread!
+	if (filehandle == L"DOS") {
+		(*this).oswrite(key.convert(L"\\",SLASH));
+		return true;
+	}
+
 	const char* paramValues[2];
 	int		 paramLengths[2];
 	int		 paramFormats[2];
@@ -983,7 +1005,7 @@ bool var::write(const var& filehandle, const var& key) const
 	{
 		PQclear(result);
 #if TRACING >= 1
-		exodus::errputl(L"ERROR: mvdbpostgres write() failed: " ^ var(PQntuples(result)) ^ L" " ^ var(PQerrorMessage(thread_pgconn)));
+		exodus::errputl(L"ERROR: mvdbpostgres write() failed: PQresultStatus=" ^ var(PQresultStatus(result)) ^ L" " ^ var(PQerrorMessage(thread_pgconn)));
 #endif
 		return false;
 	}
@@ -1860,6 +1882,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 #if TRACING
 					exodus::errputl(L"ERROR: mvdbpostgres SELECT STATEMENT SYNTAX IS 'between x *and* y'");
 #endif
+
 					return L"";
 				}
 

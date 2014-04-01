@@ -1644,6 +1644,7 @@ var var::operator[](const int charno) const
 ////////
 
 //returns the characters up to the next delimiter
+//NOTE startchar1 is 1 based not 0. anything less than 1 is treated as 1
 var var::remove(var& startchar1, var& delimiterno) const
 {
 	THISIS(L"var var::remove(var& startchar1, var& delimiterno) const")
@@ -1653,6 +1654,15 @@ var var::remove(var& startchar1, var& delimiterno) const
 
 	std::wstring::size_type start_pos=startchar1.toInt()-1;
 
+	//domain check
+	//handle before start of string
+	//startchar1 arg is 1 based per mv/pick standard
+	//remove treats anything below 1 as 1
+	//start_pos variable is zero based standard c++ logic
+	if (long(start_pos)<0)
+		start_pos=0;
+		
+	//domain check
 	//handle after end of string
 	if (start_pos>=var_mvstr.length())
 	{
@@ -1673,8 +1683,10 @@ var var::remove(var& startchar1, var& delimiterno) const
 	}
 
 	//delimiters returned as numbers FF=1 FE=2, FD=3 etc to F9=7
-	delimiterno=int(LASTDELIMITERCHARNOPLUS1-var_mvstr[end_pos]);
+	//delimiterno=int(LASTDELIMITERCHARNOPLUS1-var_mvstr[end_pos]);
+	delimiterno=int(*_RM_)-int(var_mvstr[end_pos])+1;
 
+	//point 1 after (next separator/or one character after the string)
 	startchar1=int(end_pos+2);
 
 	//extract and return the substr as well
@@ -1688,7 +1700,21 @@ var var::remove(var& startchar1, var& delimiterno) const
 
 var var::sum() const
 {
-	return sum(VM);
+	THISIS(L"var var::sum()")
+	THISISSTRING()
+
+	//add up all number regardless of separator level (multilevel)
+	var result = 0;
+	var start = 0;
+	var bit,term,xx;
+	while (true) {
+		bit=(*this).remove(start, term);
+		if (bit.length())
+			result+=bit;
+		if (not term)
+			break;
+	}
+	return result;
 }
 
 var var::sum(const var& sepchar) const
@@ -1696,8 +1722,7 @@ var var::sum(const var& sepchar) const
 	THISIS(L"var var::sum(const var& sepchar) const")
 	THISISSTRING()
 
-	//TODO make this work with a mixture of separator characters
-	var result=L"0";
+	var result=0;
 	int nn=this->dcount(sepchar);
 
 	//static var allsepchars=_SSTM_ _STM_ _TM_ _SM_ _VM_ _FM_ _RM_;
@@ -1705,8 +1730,14 @@ var var::sum(const var& sepchar) const
 	//if (!sepcharn) return var1*var2;
 
 	//TODO make this faster using remove or index?
-	for (int ii=1;ii<=nn;++ii)
-		result+= field(sepchar,ii);
+	var temp;
+	for (int ii=1;ii<=nn;++ii) {
+		temp=(*this).field(sepchar,ii);
+		if (temp.isnum())
+			result+=temp;
+		else
+			result+=(*this).sum(temp);
+	}
 	return result;
 }
 
