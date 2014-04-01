@@ -87,7 +87,7 @@ function main(in mode0) {
 	} else if (mode == "OPTIONSAVE") {
 		//used to update from dos mode window
 
-		RECORD.write(gen._definitions, "TIMESHEET.PARAMS");
+		RECORD.write(DEFINITIONS, "TIMESHEET.PARAMS");
 
 	} else if (mode.substr(1, 8) == "POSTINIT") {
 
@@ -703,7 +703,7 @@ subroutine getregisterparams() {
 	// call fsmsg()
 	// stop
 	// end
-	if (not((win.registerx(1)).read(gen._definitions, "TIMESHEET.PARAMS"))) {
+	if (not((win.registerx(1)).read(DEFINITIONS, "TIMESHEET.PARAMS"))) {
 		win.registerx(1) = "";
 		//if index(ucase(company<1>),'IMPACT',1) then
 		// register(1)<1>=1
@@ -789,9 +789,9 @@ subroutine getprevioustimesheet() {
 				msg = "Your previous timesheet ("
 					^ idate.oconv("[DATE,4*]")
 					^ ")|has only "
-					^ tothours.oconv("[MT2]")
+					^ tothours.oconv("MT2U")
 					^ " hours on it but the|minimum allowed is "
-					^ (win.registerx(1).a(2)).oconv("[MT2]")
+					^ win.registerx(1).a(2).oconv("MT2U")
 					^ ".||Please complete your|previous timesheet first.";
 				gosub invalid();
 				win.reset = 5;

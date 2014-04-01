@@ -543,8 +543,10 @@ unauth:
 					personamount += tx.a(1, amountcoln);
 					var hours = tx.a(1, hourscoln);
 					if (hours) {
-						personhours += (tx.a(1, hourscoln)).iconv("[MT2]");
-						totalhours += (tx.a(1, hourscoln)).iconv("[MT2]");
+						//personhours += (tx.a(1, hourscoln)).iconv("[MT2U]");
+						//totalhours += (tx.a(1, hourscoln)).iconv("[MT2U]");
+						personhours += tx.a(1, hourscoln);
+						totalhours += tx.a(1, hourscoln);
 						tx.swapper(VM, sep);
 						tag = "TD";
 						rowattribs = "ID=person" ^ personn ^ " style={cursor:hand} style=\"{display:none}\" onclick=\"toggle(" "\'" "person" ^ personn ^ "\'" ")\"";
@@ -560,7 +562,9 @@ unauth:
 							}else{
 								avghourlyrate = "";
 							}
-							tx = selecteddata.a(ln, 1) ^ sep ^ capitalise(personcode) ^ sep ^ sep ^ sep ^ sep ^ personhours.oconv("[MT2]") ^ sep ^ avghourlyrate ^ sep ^ "<B>" ^ personamount.oconv(fin.basefmt) ^ "</B>";
+							tx = selecteddata.a(ln, 1) ^ sep ^ capitalise(personcode) ^ sep ^ sep ^ sep ^ sep
+							 ^ personhours.oconv("MT2U") ^ sep ^ avghourlyrate ^ sep ^ "<B>"
+							 ^ personamount.oconv(fin.basefmt) ^ "</B>";
 							tag = "TH";
 							gosub printtxrow(tx);
 							personhours = "";
@@ -578,7 +582,8 @@ unauth:
 					}else{
 						avghourlyrate = "";
 					}
-					tx = "Total" ^ sep ^ sep ^ sep ^ sep ^ sep ^ totalhours.oconv("[MT2]") ^ sep ^ avghourlyrate ^ sep ^ "<B>" ^ totalamount.oconv(fin.basefmt) ^ "</B>";
+					tx = "Total" ^ sep ^ sep ^ sep ^ sep ^ sep ^ totalhours.oconv("MT2U")
+					 ^ sep ^ avghourlyrate ^ sep ^ "<B>" ^ totalamount.oconv(fin.basefmt) ^ "</B>";
 					tag = "TH";
 					gosub printtxrow(tx);
 				}

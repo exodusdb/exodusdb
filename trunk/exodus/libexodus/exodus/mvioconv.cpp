@@ -169,7 +169,8 @@ var var::iconv(const wchar_t* convstr) const
 			if (var_mvtyp&pimpl::MVTYPE_STR && var_mvstr.length()==0)
 				return L"";
 
-			//check second character
+			//check following first character
+			//(could be \0 since convstr is char*)
 			switch (convstr[1])
 			{
 				//[NUMBER
@@ -192,6 +193,11 @@ var var::iconv(const wchar_t* convstr) const
 				case L'T':
 					//return iconv_MT(L"MT");
 					return iconv_MT();
+					break;
+					
+				//passed only one [ character!
+				case L'\0':
+					return (*this);
 					break;
 			}
 
@@ -710,7 +716,8 @@ var var::oconv(const wchar_t* conversion) const
 
 						//MT
 						case L'T':
-							output ^= part.oconv_MT(conversion);
+							//point to the remainder of the conversion after the MT
+							output ^= part.oconv_MT(++conversionchar);
 							break;
 
 						//MX number to hex (not string to hex)
@@ -740,8 +747,10 @@ var var::oconv(const wchar_t* conversion) const
 			if (var_mvtyp&pimpl::MVTYPE_STR && var_mvstr.length()==0)
 				return L"";
 
+			++conversionchar;
+			
 			//check second character
-			switch (conversion[1])
+			switch (*conversionchar)
 			{
 				//[NUMBER
 				case L'N':
@@ -767,9 +776,12 @@ var var::oconv(const wchar_t* conversion) const
 					if (!isnum())
 						return *this;
 
-					return oconv_MT(L"MT");
+					//return oconv_MT(L"MT");
+					//point to the remainder of the conversion (may be nothing if just MT)
+					return oconv_MT(++conversionchar);
 					break;
 			}
+			break;
 
 		//L#, R#
 		//format even empty strings

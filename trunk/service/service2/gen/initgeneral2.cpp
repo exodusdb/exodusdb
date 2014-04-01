@@ -78,7 +78,7 @@ function main(in mode, io logtime) {
 		hosts.inserter(1, 1, 2, "127");
 		hosts.inserter(1, 1, 3, configips);
 
-		hosts.write(gen._definitions, "IPNOS*NEOSYS");
+		hosts.write(DEFINITIONS, "IPNOS*NEOSYS");
 
 	} else if (mode == "FIXURLS") {
 

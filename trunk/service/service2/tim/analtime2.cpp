@@ -8,6 +8,7 @@ libraryinit()
 #include <gethtml.h>
 #include <readcss.h>
 #include <printtx.h>
+#include <tag.h>
 
 #include <gen.h>
 #include <agy.h>
@@ -74,8 +75,7 @@ var neosystesting;
 var anyprint;
 var byuserandjob;
 
-var html, nbsp, r5, r10, l20, sep, tr, trr, trx, th, thx, td, tdx;
-var hoursfmt;
+var html, nbsp, sep, tr, trr, trx, th, thx, td, tdl;
 var approverreminders, timesheetparams;
 var baselinks,baselinkdescs;
 var firstdayn, lastdayn, daysback;
@@ -101,6 +101,9 @@ function main() {
 	//pseudo<2> 1=byuserandjob 2=consolidated 3=reminders 4=approvals 5 rem&app
 	//pseudo<3> usercodes (sentence 4 is blank)
 	//pseudo<4> 31=last 31 days (eg for NEOS_TSSU timesheet summary alert)
+	//or
+	//pseudo<3> usercode
+	//pseudo<5> fromdate for personal timesheet
 	var pseudo = PSEUDO;
 
 	anyprint=false;
@@ -200,7 +203,6 @@ neosystesting=true;
 
 	//y2k
 	if (not(authorised("TIMESHEET PRINTOUT", msg, ""))) {
-		var().chr(7).output();
 		call mssg(msg);
 		return 0;
 	}
@@ -212,32 +214,28 @@ neosystesting=true;
 
 	var sortbyjobno = 1;
 
-	//hoursfmt='MD20PZ'
-	hoursfmt = "[MT2,Z]";
-
 	var topmargin = 0;
+	sep = "\n";//was space when text formatted. now just \n to make html code more readable
 
 	html = 1;
 
 	nbsp = "&nbsp;";
-	r5 = "[TAGHTML,td]";
-	r10 = "[TAGHTML,td]";
-	l20 = "[TAGHTML,td ALIGN=LEFT]";
-	sep = "";
 	tr = "<tr>";
 	//trr='<tr align=right>'
 	trr = "<tr>";
 	trx = "</tr>";
 	th = "<th>";
 	thx = "</th>";
-	td = "<td>";
-	tdx = "</td>";
+
+	//tag() args
+	td = "td";
+	tdl="td align=left";
 
 	//remove options
-	var temp = SENTENCE.index(" (P", 1);
-	if (temp) {
-		SENTENCE = SENTENCE.substr(1,temp - 1);
-	}
+	//var temp = SENTENCE.index(" (P", 1);
+	//if (temp) {
+	//	SENTENCE = SENTENCE.substr(1,temp - 1);
+	//}
 
 	if (reminderapproval) {
 		nemails = 0;
@@ -283,7 +281,7 @@ neosystesting=true;
 	}else{
 
 		//determine period
-		fromdate = SENTENCE.field(" ", 2);
+		fromdate = pseudo.a(5);
 		//if fromdate else fromdate=date() 'D'
 		if (fromdate) {
 			var idate = fromdate.iconv("D/E");
@@ -308,7 +306,6 @@ neosystesting=true;
 		//convert fromdate to period
 		fromdate = var("1/" ^ period).iconv("D/E");
 		if (not fromdate) {
-			var().chr(7).output();
 			call mssg(DQ ^ (period ^ DQ) ^ " must be month/year");
 			return 0;
 		}
@@ -332,12 +329,12 @@ neosystesting=true;
 
 	//determine usercodes
 	var usercodes = pseudo.a(3);
-	if (not usercodes) {
-		usercodes = SENTENCE.field(" ", 4, 999);
+	//if (not usercodes) {
+	//	usercodes = SENTENCE.field(" ", 4, 999);
 		if (usercodes == "PERSONAL") {
 			usercodes = USERNAME;
 		}
-	}
+	//}
 	if (not usercodes) {
 		if (isntadmin) {
 			usercode = USERNAME;
@@ -444,7 +441,7 @@ neosystesting=true;
 nextuser:
 /////////
 
-	while (++usern <=nusers) {
+	while (++usern <= nusers) {
 
 		//pass through them all in order now
 		//skipping the undesired ones
@@ -575,13 +572,14 @@ nextuser:
 		unapproveddays = "";
 		var usermissingdates = "";
 		for (var idate = fromdate; idate <= uptodate; ++idate) {
-			//dayn+=1
-			var dayn = idate - fromdate + 1;
-			ID = usercode ^ "*" ^ idate;
 
 			if (idate < timesheetparams.a(8)) {
 				continue;
 			}
+
+			//dayn+=1
+			var dayn = idate - fromdate + 1;
+			ID = usercode ^ "*" ^ idate;
 
 			var insufficient;
 			if (RECORD.read(gen.timesheets, ID)) {
@@ -668,7 +666,7 @@ nextuser:
 							if (unapprovedday) {
 								var tt = timesheet.a(3, linen, dayn);
 								//garbagecollect;
-								tt ^= "<br>" ^ hours.oconv(hoursfmt);
+								tt ^= "<br>" ^ hours.oconv("MT2U");
 								if (details) {
 									tt ^= "<br>" ^ details;
 								}
@@ -691,11 +689,10 @@ nextuser:
 
 				//nothing more here - put above min hours check above
 
+			//insufficient (or just no timesheet)
 			}else{
 				insufficient = "";
-
-	insufficienthours:
-				//insufficient (or just no timesheet)
+insufficienthours:
 
 				//handle missing timesheet
 				if (idate >= timesheetparams.a(8) and idate <= latestrequireddate) {
@@ -785,31 +782,20 @@ nextuser:
 
 		//do all users
 		if (byuserandjob) {
-			if (timesheet == "") {
-				goto nextuser;
-			}
-
-			//dont output for admins or approvers
 			if (reminderapproval and (istimesheetadmin or istimesheetapprover)) {
-
+				//never output for timesheet admins
 				if (istimesheetadmin) {
 					goto nextuser;
 				}
-
+				//output for timesheet approvers only on configured weekdays
 				var currentdow = var().date() - 1 % 7 + 1;
 				if (not(adminapprovaldows.index(currentdow, 1))) {
 					goto nextuser;
 				}
-
 			}
-
-		}else{
-			goto nextuser;
+		gosub printone();
 		}
 
-		gosub printone();
-
-		goto nextuser;
 	}//next user
 
 ////////
@@ -821,7 +807,6 @@ nextuser:
 		if (reminderapproval) {
 			gosub sendreminderapproval();
 		}
-
 	//print the consolidated report
 	} else {
 		gosub printone();
@@ -874,11 +859,12 @@ nextuser:
 
 }
 
-/////////
-//userinit:
-/////////
-
+//prints one persons timesheet or one consolidated timesheet for everybody
 subroutine printone() {
+
+	if (timesheet == "") {
+				return;
+	}
 
 	var tx="";
 
@@ -899,6 +885,7 @@ subroutine printone() {
 		username = usercode;
 	}
 
+	//per person timesheets
 	if (byuserandjob) {
 		newpage = 1;
 		head ^= FM ^ "Name : ";
@@ -940,21 +927,21 @@ subroutine printone() {
 	//colh:=t2:'<BR>'
 	colh ^= clientmark ^ "<BR>";
 
-	colh ^= "<TABLE BGCOLOR=" ^ SYSTEM.a(46, 2) ^ " BORDER=1 CELLSPACING=0 CELLPADDING=2";
+	colh ^= "<table bgcolor=" ^ SYSTEM.a(46, 2) ^ " border=1 cellspacing=0 cellpadding=2";
 	colh ^= " class=neosystable";
-	colh ^= " ALIGN=CENTER";
-	colh ^= " STYLE=\"{font-size:66%}\"";
-	colh ^= "><THEAD>";
+	colh ^= " align=center";
+	colh ^= " style=\"{font-size:66%}\"";
+	colh ^= "><thead>";
 
 	if (byuserandjob) {
-		colh ^= tr ^ var("Job No").oconv(l20) ^ sep;
+		colh ^= tr ^ tag(tdl, "Job No") ^ sep;
 	}else{
-		//colh:=tr:'Name' l20:sep
-		colh ^= tr ^ var("Name<br /><small>* Approver<br />**Administrator</small>").oconv(l20) ^ sep;
+		colh ^= tr ^ tag(tdl, "Name<br /><small>* Approver<br />**Administrator</small>") ^ sep;
 	}
 
+	//per person timesheets
 	if (byuserandjob) {
-		colh ^= var("Job Description").oconv("[TAGHTML,td ALIGN=LEFT]") ^ sep;
+		colh ^= tag(tdl, "Job Description") ^ sep;
 	}
 
 	//for dayn=1 to ndays
@@ -1025,7 +1012,7 @@ subroutine printone() {
 
 	colh ^= thx ^ trx;
 
-	colh ^= "</THEAD><TBODY>";
+	colh ^= "</thead><tbody>";
 	colh.swapper("<td", "<th");
 	colh.swapper("</td", "</th");
 	head ^= colh;
@@ -1035,7 +1022,7 @@ subroutine printone() {
 	//rows
 	var nlines = (timesheet.a(1)).count(VM) + 1;
 
-	//precalculate daytots
+	//precalculate daytots (end row) by column(day)
 	var daytots = "";
 	for (var linen = 1; linen <= nlines; ++linen) {
 		var timesheetline = timesheet.a(2, linen);
@@ -1049,7 +1036,6 @@ subroutine printone() {
 
 	for (var linen = 1; linen <= nlines; ++linen) {
 
-	// tx:=trr:(sep:timesheet<1,linen>) l20:sep
 		var cell = timesheet.a(1, linen);
 		if (not byuserandjob) {
 			usercode = cell;
@@ -1077,7 +1063,8 @@ subroutine printone() {
 				cell ^= " " ^ tags;
 			}
 		}
-		tx ^= trr ^ (sep ^ cell).oconv(l20) ^ sep;
+
+		tx ^= trr ^ sep ^ tag(tdl,cell) ^ sep;
 
 		if (byuserandjob) {
 			jobno = timesheet.a(1, linen);
@@ -1085,7 +1072,7 @@ subroutine printone() {
 			if (not(job.read(agy.jobs, jobno))) {
 				job = "";
 			}
-			tx ^= (job.a(9, 1)).oconv("[TAGHTML,td ALIGN=LEFT]");
+			tx ^= tag(tdl,job.a(9, 1));
 		}
 
 		//determine user holidays
@@ -1113,6 +1100,7 @@ subroutine printone() {
 
 		}
 
+		var linetothours2=timesheet.a(2, linen);
 		var linetothours = (timesheet.a(2, linen)).sum();
 
 		//for dayn=1 to ndays
@@ -1124,21 +1112,19 @@ subroutine printone() {
 			var something;
 			if (details) {
 				details.splicer(1, 4, "");
-				//tx:=td:details:tdx
-				something = td ^ details ^ tdx;
+				something = tag(td, details);
 			}else{
-				//garbagecollect;
-				something = hours.oconv(hoursfmt);
+				something = hours.oconv("MT2U");
 				if (byuserandjob) {
-					something = something.oconv(r5) ^ sep;
+					something = tag(td, something) ^ sep;
 				}else{
 
 					//bold pending approval
 					if (not approved and hours) {
-						something = "<B>" ^ something ^ "</B>";
+						something = "<b>" ^ something ^ "</b>";
 					}
 
-					something = something.oconv(r5) ^ sep;
+					something = tag(td, something) ^ sep;
 
 				}
 
@@ -1184,7 +1170,7 @@ subroutine printone() {
 
 		//final column
 		//garbagecollect;
-		tx ^= (linetothours.oconv(hoursfmt)).oconv(r10) ^ trx;
+		tx ^= tag(td,linetothours.oconv("MT2U")) ^ trx;
 
 		call printtx(tx);
 		anyprint=true;
@@ -1192,14 +1178,14 @@ subroutine printone() {
 	};//linen;
 
 	//total row
-	tx ^= var(" Total Hours:").oconv(l20) ^ sep;
+	tx ^= tag(tdl, " Total Hours:") ^ sep;
 	if (byuserandjob) {
-		tx ^= var("").oconv(l20);
+		tx ^= tag(tdl,"");
 	}
 	//for dayn=1 to ndays
 	for (var dayn = firstdayn; dayn <= lastdayn; ++dayn) {
 		//garbagecollect;
-		var cell = ((daytots.a(dayn)).oconv(hoursfmt)).oconv(r5) ^ sep;
+		var cell = tag(td, daytots.a(dayn).oconv("MT2U")) ^ sep;
 
 		var color = "";
 		if (byuserandjob) {
@@ -1217,10 +1203,10 @@ subroutine printone() {
 		tx ^= cell;
 	};//dayn;
 	//garbagecollect;
-	tx ^= ((daytots.sum()).oconv(hoursfmt)).oconv(r10) ^ FM;
+	tx ^= tag(td,daytots.sum().oconv("MT2U")) ^ FM;
 	tx.swapper("<td", "<th");
 	tx.swapper("</td", "</th");
-	tx ^= "</TBODY></TABLE>";
+	tx ^= "</tbody></table>";
 
 	var mark = "";
 	call getmark("OWN", html, mark);

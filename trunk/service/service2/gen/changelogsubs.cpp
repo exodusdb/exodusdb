@@ -66,10 +66,10 @@ function main(in mode0) {
 			//leave in case reloading ancient data
 			if (not userrec.a(17)) {
 				var changelogkey = "USER*" ^ USERNAME;
-				if (changelog.read(gen._definitions, changelogkey)) {
+				if (changelog.read(DEFINITIONS, changelogkey)) {
 					userrec.r(17, changelog.a(8));
 					(userrec.a(17)).writev(users, USERNAME, 17);
-					var("").writev(gen._definitions, changelogkey, 8);
+					var("").writev(DEFINITIONS, changelogkey, 8);
 				}
 			}
 

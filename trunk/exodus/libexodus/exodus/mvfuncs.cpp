@@ -567,9 +567,6 @@ var& var::trimmer(const wchar_t* trimchar)
 
 var var::ucase() const
 {
-	THISIS(L"var var::ucase() const")
-	THISISSTRING()
-
 	return var(*this).ucaser();
 }
 
@@ -583,9 +580,6 @@ var& var::ucaser()
 
 var var::lcase() const
 {
-	THISIS(L"var var::lcase() const")
-	THISISSTRING()
-
 	return var(*this).lcaser();
 }
 
@@ -597,29 +591,29 @@ var& var::lcaser()
 	return localeAwareChangeCase(1);
 }
 
-/*
-var var::invert() const
+var var::unique() const
 {
-	THISIS(L"var var::invert() const")
+	THISIS(L"var var::unique()")
 	THISISSTRING()
 
-	return var(*this).inverter();
+        //linemark
+        var result = L"";
+        var start = 0;
+	var bit,term,xx;
+        while (true) {
+                bit=(*this).remove(start, term);
+                if (bit.length()) {
+                        if (not(result.locateusing(bit, VM, xx))) {
+                                result ^= bit ^ VM;
+                        }
+                }
+		if (not term)
+			break;
+        }//loop;
+        result.splicer(-1, 1, L"");
+        return result;
+
 }
-
-var& var::inverter()
-{
-	THISIS(L"var& var::inverter()")
-	THISISSTRING()
-
-	//TODO IMPLEMENT as xor with -1
-	//or perhaps with with binary 2^16 ie 1111111111111111 to retain top two bytes of UT32
-	//so that it doesnt go totally illegal
-//	throw MVNotImplemented(L"inverter()");
-
-    return *this;
-
-}
-*/
 
 var var::seq() const
 {

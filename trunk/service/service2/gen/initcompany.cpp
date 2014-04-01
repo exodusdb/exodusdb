@@ -172,11 +172,11 @@ function main(in nextcompanycode) {
 
 	call log2("get voucher type details", logtime);
 	fin.definition = "";
-	if (gen._definitions ne "") {
+	if (DEFINITIONS ne "") {
 		//almost certainly by company is not implemented at any client or other code
 		//TODO confirm and deleted
-		if (not(fin.definition.read(gen._definitions, "ALL*" ^ fin.currcompany))) {
-			if (not(fin.definition.read(gen._definitions, "ALL"))) {
+		if (not(fin.definition.read(DEFINITIONS, "ALL*" ^ fin.currcompany))) {
+			if (not(fin.definition.read(DEFINITIONS, "ALL"))) {
 				{}
 			}
 		}
@@ -228,12 +228,12 @@ function main(in nextcompanycode) {
 
 	call log2("initialise the vat rates", logtime);
 	fin.taxes = "";
-	if (gen._definitions ne "") {
-		if (not(fin.taxes.read(gen._definitions, "TAXES"))) {
+	if (DEFINITIONS ne "") {
+		if (not(fin.taxes.read(DEFINITIONS, "TAXES"))) {
 			fin.taxes = "Standard" _VM_ "Zero rated" _VM_ "Exempt";
 			fin.taxes.r(2, "1" _VM_ "2" _VM_ "3");
 			fin.taxes.r(3, "5" _VM_ "0" _VM_ "");
-			fin.taxes.write(gen._definitions, "TAXES");
+			fin.taxes.write(DEFINITIONS, "TAXES");
 		}
 
 		//onetime setup of tax account number per tax code
@@ -244,7 +244,7 @@ function main(in nextcompanycode) {
 			if (not(fin.taxes.a(1, ii))) break;;
 				fin.taxes.r(4, ii, taxaccno);
 			};//ii;
-			fin.taxes.write(gen._definitions, "TAXES");
+			fin.taxes.write(DEFINITIONS, "TAXES");
 		}
 
 	}

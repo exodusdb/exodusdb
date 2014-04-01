@@ -192,13 +192,13 @@ badexchrate:
 
 			//convert SK in datafile to SK in definitions
 			var no;
-			if (not(no.readv(gen._definitions, win.datafile ^ ".SK", 1))) {
+			if (not(no.readv(DEFINITIONS, win.datafile ^ ".SK", 1))) {
 				if (no.readv(win.srcfile, "%SK%", 1)) {
 					win.srcfile.deleterecord("%SK%");
 				}else{
 					no = 1;
 				}
-				no.writev(gen._definitions, win.datafile ^ ".SK", 1);
+				no.writev(DEFINITIONS, win.datafile ^ ".SK", 1);
 			}
 
 
@@ -209,7 +209,7 @@ badexchrate:
 				if (xx.read(win.srcfile, win.isdflt)) {
 					if (win.isdflt.isnum()) {
 						win.isdflt += 1;
-						win.isdflt.writev(gen._definitions, win.datafile ^ ".SK", 1);
+						win.isdflt.writev(DEFINITIONS, win.datafile ^ ".SK", 1);
 						continue;
 					}
 				}

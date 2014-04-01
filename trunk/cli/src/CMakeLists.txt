@@ -8,6 +8,9 @@ project(exodus)
 
 link_directories(../../exodus/libexodus/exodus)
 
+
+### 1. COMPILE ###
+
 #NB add any NEW programs here and in TWO MORE sections further down
 #target_link_libraries(
 #install(
@@ -33,6 +36,8 @@ add_executable(testsort testsort.cpp)
 add_executable(configexodus configexodus.cpp)
 
 
+### 2. LINK ###
+
 #dl is needed for dynamic link library code
 
 target_link_libraries(compile exodus ${LIBS})
@@ -50,6 +55,9 @@ target_link_libraries(listfiles exodus ${LIBS})
 target_link_libraries(listindexes exodus ${LIBS})
 target_link_libraries(testsort exodus ${LIBS})
 target_link_libraries(configexodus exodus ${LIBS})
+
+
+### 3. INSTALL ###
 
 install(TARGETS compile
 createfile

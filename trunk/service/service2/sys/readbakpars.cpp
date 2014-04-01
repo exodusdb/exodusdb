@@ -34,7 +34,7 @@ function main(io bakpars, in process0=var()) {
 	//13='' is default (weekly rotation) 1=wrong media doesnt fail the backup
 	//max 30 since copied into system.cfg for editing
 
-	if (not(bakpars.read(gen._definitions, "BACKUP"))) {
+	if (not(bakpars.read(DEFINITIONS, "BACKUP"))) {
 		bakpars = "";
 	}
 	if (tt.osread("BACKUP.CFG")) {

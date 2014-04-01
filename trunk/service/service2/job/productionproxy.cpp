@@ -16,6 +16,7 @@ libraryinit()
 #include <generalsubs.h>
 #include <sysmsg.h>
 #include <log2.h>
+#include <analtime2.h>
 
 #include <agy.h>
 #include <gen.h>
@@ -74,7 +75,7 @@ function main() {
 	call readagp();
 
 	var xx;
-	if (xx.read(gen._definitions, "PENDINGUPDATES")) {
+	if (xx.read(DEFINITIONS, "PENDINGUPDATES")) {
 		perform("PENDINGUPDATES");
 	}
 
@@ -506,14 +507,14 @@ approvalerror:
 
 	} else if (mode == "COSTESTIMATEPRINT") {
 		PSEUDO = USER1;
-		execute("prodinvs");
+		perform("prodinvs");
 
 		gosub checkoutputfileexists();
 
 	} else if (mode.field(".", 1) == "UPDATEATTACHMENTS") {
 		if (USER1 and (mode.field(".", 2)).length() == 3) {
 			USER1.converter(VM, FM);
-			USER1.write(gen._definitions, "ENCLOSURES.PROD" ^ mode.field(".", 2));
+			USER1.write(DEFINITIONS, "ENCLOSURES.PROD" ^ mode.field(".", 2));
 			USER3 = "OK";
 		}
 
@@ -529,7 +530,7 @@ approvalerror:
 		}
 
 		//execute 'PRINTJOB ':@pseudo<2>
-		execute("printjob");
+		perform("printjob");
 		gosub checkoutputfileexists();
 
 	} else if (mode == "JOBLIST") {
@@ -552,7 +553,7 @@ approvalerror:
 
 	} else if (mode == "TIMESHEETANALYSIS") {
 		PSEUDO = USER1;
-		execute("analtime");
+		perform("analtime");
 		gosub checkoutputfileexists();
 
 	} else if (mode == "TIMESHEETPRINT" or mode == "TIMESHEETALERTS") {
@@ -565,7 +566,8 @@ approvalerror:
 		if (PSEUDO.a(1)) {
 			cmd ^= " 1/" ^ PSEUDO.a(1).field(".", 2) ^ "/" ^ PSEUDO.a(1).field(".", 1);
 		}
-		perform(cmd);
+		call analtime2();
+		
 		if (PSEUDO.a(2) >= 3) {
 			//analtime2 now returns response not msg (except in error)
 			//response=msg
@@ -580,19 +582,20 @@ approvalerror:
 			gosub checkoutputfileexists();
 		}
 
-	//keep for compatibility with old mac version of front end?
 	} else if (mode == "PRINTMONTHLYTIMESHEET") {
 
-		//@pseudo=request
 		PSEUDO = "";
-
-		execute("analtime2 " ^ USER0.a(2));
+		PSEUDO.r(3,USER0.a(2).field(" ",3));//fromdate
+		PSEUDO.r(5,USER0.a(2).field(" ",1));//usercode
+		call analtime2();
 
 		gosub checkoutputfileexists();
 
 	} else if (USER0 == "TIMESHEET.POSTINIT") {
 		win.datafile = "TIMESHEETS";
 		call timesheetsubs("POSTINIT2");
+		
+		//return contents of register(1-10)
 		USER1 = "";
 		for (var ii = 1; ii <= 10; ++ii) {
 			USER1 ^= RM ^ win.registerx(ii);

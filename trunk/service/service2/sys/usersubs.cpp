@@ -159,7 +159,7 @@ function main(in mode) {
 			return 0;
 		}
 
-		if (not(lockrecord("DEFINITIONS", gen._definitions, "SECURITY", xx, 0))) {
+		if (not(lockrecord("DEFINITIONS", DEFINITIONS, "SECURITY", xx, 0))) {
 			if (resetpassword) {
 				resetpassword = 2;
 			}else{
@@ -190,14 +190,14 @@ function main(in mode) {
 		gosub getusern();
 		if (not win.valid) {
 unlocksecurity:
-			call unlockrecord("DEFINITIONS", gen._definitions, "SECURITY");
+			call unlockrecord("DEFINITIONS", DEFINITIONS, "SECURITY");
 			return 0;
 		}
 
 		//get the latest userprivs
-		if (not(gen._security.read(gen._definitions, "SECURITY"))) {
+		if (not(gen._security.read(DEFINITIONS, "SECURITY"))) {
 			msg = "SECURITY is missing from DEFINITIONS";
-			call unlockrecord("DEFINITIONS", gen._definitions, "SECURITY");
+			call unlockrecord("DEFINITIONS", DEFINITIONS, "SECURITY");
 			call sysmsg(msg);
 			return invalid(msg);
 		}
@@ -236,8 +236,8 @@ unlocksecurity:
 		}
 
 		if (resetpassword < 2 and gen._security ne olduserprivs) {
-			//gen._security.invert().write(gen._definitions, "SECURITY");
-			gen._security.write(gen._definitions, "SECURITY");
+			//gen._security.invert().write(DEFINITIONS, "SECURITY");
+			gen._security.write(DEFINITIONS, "SECURITY");
 			//no need on user if on userprivs
 			RECORD.r(4, "");
 		}
@@ -267,7 +267,7 @@ unlocksecurity:
 
 		gosub updatemirror();
 
-		call unlockrecord("DEFINITIONS", gen._definitions, "SECURITY");
+		call unlockrecord("DEFINITIONS", DEFINITIONS, "SECURITY");
 
 	} else if (mode == "CREATEUSERNAMEINDEX") {
 		win.srcfile = users;

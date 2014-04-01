@@ -241,7 +241,7 @@ function main() {
 	}
 
 	//get agp to do various updates to it
-	if (not(agy.agp.read(gen._definitions, "AGENCY.PARAMS"))) {
+	if (not(agy.agp.read(DEFINITIONS, "AGENCY.PARAMS"))) {
 		call note("AGENCY.PARAMS IS MISSING FROM DEFINITIONS");
 		var().stop();
 	}
@@ -285,7 +285,7 @@ function main() {
 
 	call log2("update agency.params", logtime);
 	if (agy.agp ne origagp) {
-		agy.agp.write(gen._definitions, "AGENCY.PARAMS");
+		agy.agp.write(DEFINITIONS, "AGENCY.PARAMS");
 	}
 
 	call log2("get agency.params", logtime);
@@ -309,7 +309,7 @@ function main() {
 	}
 
 	call log2("*clear unused brands", logtime);
-	if (not(xx.read(gen._definitions, "ORPHANBRANDSFIXED"))) {
+	if (not(xx.read(DEFINITIONS, "ORPHANBRANDSFIXED"))) {
 		agy.brands.select();
 		var brandcode;
 		while (agy.brands.readnext(brandcode)) {
@@ -320,28 +320,28 @@ function main() {
 				}
 			}
 		}
-		var().date().write(gen._definitions, "ORPHANBRANDSFIXED");
+		var().date().write(DEFINITIONS, "ORPHANBRANDSFIXED");
 	}
 
 /*TODO
 	call log2("*build client group members", logtime);
 	var convkey = "BUILDCLIENTGROUPMEMBERS";
-	if (lockrecord("DEFINITIONS", gen._definitions, convkey, recordx, 999999)) {
-		if (not(xx.read(gen._definitions, convkey))) {
+	if (lockrecord("DEFINITIONS", DEFINITIONS, convkey, recordx, 999999)) {
+		if (not(xx.read(DEFINITIONS, convkey))) {
 			perform("WINDOWSTUB CLIENT.SUBS " ^ convkey);
-			var().date().write(gen._definitions, convkey);
+			var().date().write(DEFINITIONS, convkey);
 		}
-		call unlockrecord("DEFINITIONS", gen._definitions, convkey);
+		call unlockrecord("DEFINITIONS", DEFINITIONS, convkey);
 	}
 
 	call log2("*build supplier group members", logtime);
 	convkey = "BUILDSUPPLIERGROUPMEMBERS";
-	if (lockrecord("DEFINITIONS", gen._definitions, convkey, recordx, 999999)) {
-		if (not(xx.read(gen._definitions, convkey))) {
+	if (lockrecord("DEFINITIONS", DEFINITIONS, convkey, recordx, 999999)) {
+		if (not(xx.read(DEFINITIONS, convkey))) {
 			perform("WINDOWSTUB SUPPLIER.SUBS " ^ convkey);
-			var().date().write(gen._definitions, convkey);
+			var().date().write(DEFINITIONS, convkey);
 		}
-		call unlockrecord("DEFINITIONS", gen._definitions, convkey);
+		call unlockrecord("DEFINITIONS", DEFINITIONS, convkey);
 	}
 */
 
@@ -358,8 +358,8 @@ function main() {
 
 	call log2("create default timesheet parameters", logtime);
 	var rec;
-	if (not(rec.read(gen._definitions, "TIMESHEET.PARAMS"))) {
-		var("N" ^ FM ^ 0 ^ FM ^ 16 ^ FM ^ 3 ^ FM ^ 0 ^ FM ^ "DEFAULTED").write(gen._definitions, "TIMESHEET.PARAMS");
+	if (not(rec.read(DEFINITIONS, "TIMESHEET.PARAMS"))) {
+		var("N" ^ FM ^ 0 ^ FM ^ 16 ^ FM ^ 3 ^ FM ^ 0 ^ FM ^ "DEFAULTED").write(DEFINITIONS, "TIMESHEET.PARAMS");
 	}
 
 	//TODO call log2("*setup timesheet reminder/approval autorun");
@@ -368,7 +368,7 @@ function main() {
 /* needs createalert
 	call log2("*autostop inactive vehicles", logtime);
 	var tt;
-	if (not(tt.readv(gen._definitions, "INIT*INACTVEH", 1))) {
+	if (not(tt.readv(DEFINITIONS, "INIT*INACTVEH", 1))) {
 		tt = "";
 	}
 	if (tt < 16207) {
@@ -386,11 +386,11 @@ function main() {
 		tt = cmd;
 		tt.swapper("{}", "7:" ^ dom);
 		perform(tt);
-		var().date().write(gen._definitions, "INIT*INACTVEH");
+		var().date().write(DEFINITIONS, "INIT*INACTVEH");
 	}
 
 	call log2("*autoclose inactive jobs", logtime);
-	if (not(tt.readv(gen._definitions, "INIT*INACTJOB", 1))) {
+	if (not(tt.readv(DEFINITIONS, "INIT*INACTJOB", 1))) {
 		tt = "";
 	}
 	if (tt < 16230) {
@@ -408,7 +408,7 @@ function main() {
 		tt = cmd;
 		tt.swapper("{}", "7:" ^ dom);
 		perform("CREATEALERT INACTJOB " ^ tt);
-		var().date().write(gen._definitions, "INIT*INACTJOB");
+		var().date().write(DEFINITIONS, "INIT*INACTJOB");
 	}
 */
 
@@ -418,7 +418,7 @@ function main() {
 	var nyears = agy.agp.a(125);
 	if (nyears.length() and not SYSTEM.a(61) and var().time() < var("07:00").iconv("MT") and not interactive and not reloading) {
 
-		if (gen._definitions.lock( "LOCK*CREATEADS")) {
+		if (DEFINITIONS.lock( "LOCK*CREATEADS")) {
 
 			//nyearsback/agp<125> will be cleared if CREATEADS starts
 			//hopefully there will be no other processes running
@@ -433,7 +433,7 @@ function main() {
 			var cmd = "CREATEADS CREATE " ^ nyears ^ " (S)";
 			perform(cmd);
 
-			gen._definitions.unlock( "LOCK*CREATEADS");
+			DEFINITIONS.unlock( "LOCK*CREATEADS");
 		}else{
 
 		}

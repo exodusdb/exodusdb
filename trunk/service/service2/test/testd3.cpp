@@ -2,7 +2,7 @@
 libraryinit()
 
 function main() {
-	printl("testqqqd3 says 'Hello World!'");
+	printl("testd3 says 'Hello World!'");
 	return 0;
 }
 

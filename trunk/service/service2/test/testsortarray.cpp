@@ -4,7 +4,7 @@ programinit()
 #include <sortarray.h>
 
 function main() {
-	printl("testqqqsortarray says 'Hello World!'");
+	printl("testsortarray says 'Hello World!'");
 	var array="";
 
 	array.r(3,	1  ^VM ^2  ^VM ^20  ^VM ^10);
