@@ -261,13 +261,14 @@ libraryinit(year_period)
 function main()  {
 	//date=field(@id,'*',2) 'D2/E'
 	//@ans=field(date,'/',3):'.':('00':field(date,'/',2))[-2,2]
-	var periods = calculate("PERIOD");
+	var periods = calculate("PERIOD").outputl("PERIOS=");
 	//@ANS=XLATE('JOBS',{JOB_NO},1,'X')
 	var nn = periods.count(VM) + (periods ne "");
 	var ans = "";
+	var period;
 	for (var ii = 1; ii <= nn; ++ii) {
-		var period = periods.a(1, ii);
-		ANS.r(1, ii, period.field("/", 2) ^ "." "00" ^ period.field("/", 1).substr(-2,2));
+		period = periods.a(1, ii);
+		ANS.r(1, ii, period.field("/", 2) ^ "." ^ ("00" ^ period.field("/", 1)).substr(-2,2));
 	};//ii;
 	return ANS;
 

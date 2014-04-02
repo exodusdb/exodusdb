@@ -89,7 +89,7 @@ function main(in mode, io msg, in param3x="") {
 		}
 
 		//check if the account requires analysis
-		if (not(billcostaccs.a(2).locateusing(iaccno, VM, billcostn))) {
+		if (not(billcostaccs.locate(iaccno, billcostn, 2))) {
 			billcostn = 0;
 			var accounts;
 			if (not(accounts.open("ACCOUNTS", ""))) {
@@ -99,7 +99,7 @@ function main(in mode, io msg, in param3x="") {
 			var icontrolaccno;
 			if (icontrolaccno.readv(accounts, iaccno, 6)) {
 				if (icontrolaccno) {
-					if (not(billcostaccs.a(2).locateusing(icontrolaccno, VM, billcostn))) {
+					if (not(billcostaccs.locate(icontrolaccno, billcostn, 2))) {
 						billcostn = 0;
 					}
 				}
@@ -123,7 +123,7 @@ function main(in mode, io msg, in param3x="") {
 
 		//analysis field number
 		var tt = billcostaccs.a(3, billcostn);
-		if (not(tt.locateusing(param3.field("*", 1), SVM, xx))) {
+		if (not(tt.locateusing(param3.field("*", 1), SVM))) {
 			//could be BILL and COST for some accounts
 			if (tt.index(SVM, 1)) {
 				tt.swapper(28, "28 for Bill");
@@ -144,7 +144,7 @@ function main(in mode, io msg, in param3x="") {
 		if (not colno) {
 			goto field2err;
 		}
-		if (not(var("1" _VM_ "2" _VM_ "3" _VM_ "4" _VM_ "5" _VM_ "6" _VM_ "7").a(1).locateusing(colno, VM, xx))) {
+		if (not(var("1,2,3,4,5,6,7").locateusing(colno, ","))) {
 field2err:
 			msg ^= "2 is required and must be one of";
 			msg.r(-1, "1=Gross");
@@ -173,7 +173,7 @@ field2err:
 		if (vehiclecode) {
 
 			//check account allows media
-			if (not(billcostaccs.a(5, billcostn).locateusing(1, SVM, xx))) {
+			if (not(billcostaccs.locate(1, xx, 5, billcostn))) {
 				//could force jobs here but best to indicate some error since unexpected
 				msg ^= "4 - media/vehicle code cannot be entered";
 				return 0;
@@ -198,7 +198,7 @@ field2err:
 		}else{
 
 			//check account allows jobs
-			if (not(billcostaccs.a(5, billcostn).locateusing(2, SVM, xx))) {
+			if (not(billcostaccs.locate(2, xx, 5, billcostn))) {
 				//TODO we should try and avoid an account being used for both media and jobs
 				msg ^= "4 - media/vehicle code must be entered";
 				return 0;
@@ -240,7 +240,7 @@ field2err:
 			//type code limitation
 			tt = billcostaccs.a(4, billcostn);
 			if (tt) {
-				if (not(tt.locateusing(typecode, SVM, xx))) {
+				if (not(tt.locateusing(typecode, SVM))) {
 					tt.swapper(SVM, ", ");
 					msg ^= "7 job type code must be one of " ^ tt;
 					return 0;
@@ -391,7 +391,7 @@ getolderjobdate:
 			call readagp();
 		}
 
-		if (not(var("PLANS" _VM_ "SCHEDULES" _VM_ "JOBS" _VM_ "PRODUCTION.ORDERS" _VM_ "PRODUCTION.INVOICES").a(1).locateusing(win.datafile, VM, filen))) {
+		if (not(var("PLANS,SCHEDULES,JOBS,PRODUCTION_ORDERS,PRODUCTION_INVOICES").locateusing(win.datafile.ucase(), VM, filen))) {
 			msg = "File " ^ (DQ ^ (win.datafile ^ DQ)) ^ " is invalid in AGENCY.SUBS,GETNEXTID";
 			return invalid();
 		}
@@ -1036,7 +1036,7 @@ selectsupplier:
 
 		//check month/year format
 		var month = win.is.field("/", 1);
-		if (not(var("1" _VM_ "2" _VM_ "3" _VM_ "4" _VM_ "5" _VM_ "6" _VM_ "7" _VM_ "8" _VM_ "9" _VM_ "10" _VM_ "11" _VM_ "12").a(1).locateusing(month, VM, temp))) {
+		if (not(var("1,2,3,4,5,6,7,8,9,10,11,12").locateusing(month, ","))) {
 badperiod:
 			msg = "PLEASE ENTER PERIOD AS \"MONTH/YEAR\"|(EG \"1/92\")";
 			return invalid();

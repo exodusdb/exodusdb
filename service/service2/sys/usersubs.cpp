@@ -120,7 +120,7 @@ function main(in mode) {
 					var word = sysemails.field(" ", ii);
 					word = field2(word, "@", -1);
 					//remove smtp. mailout. etc from smtp host domain
-					if (var("smtp,mail,mailout").locateusing(word.field(".", 1), ",", xx)) {
+					if (var("smtp,mail,mailout").locateusing(word.field(".", 1), ",")) {
 						word = word.field(".", 2, 999);
 					}
 					sysemails = sysemails.fieldstore(" ", ii, 1, word);
@@ -139,8 +139,8 @@ function main(in mode) {
 				var email = emails.field(";", ii);
 				if (email) {
 					var emaildomain = email.field("@", 2);
-					if (not(emaildomains.locateusing(emaildomain, " ", xx))) {
-						if (not(emaildomains.locateusing(email, " ", xx))) {
+					if (not(emaildomains.locateusing(emaildomain, " "))) {
+						if (not(emaildomains.locateusing(email, " "))) {
 							msg = DQ ^ (emaildomain ^ DQ) ^ " of " ^ (DQ ^ (email ^ DQ)) ^ " is not in the list of allowed email domains/addresses";
 							return invalid(msg);
 						}

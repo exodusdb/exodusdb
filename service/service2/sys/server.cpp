@@ -2189,8 +2189,9 @@ emptyrecorderror:
 		//execute a request
 
 	}else if (request1 == "EXECUTE") {
-printl("EXECUTE");
-		//check request is a win.valid program
+
+		//for security, requests can only call program names
+		//ending in proxy like mediaproxy, productionproxy etc		
 		var mdcmd = request2;
 		if (mdcmd == "") {
 //badproxy:
@@ -2198,15 +2199,7 @@ printl("EXECUTE");
 			return;
 		}
 		mdcmd ^= "PROXY";
-//		if (!xx.read(md, mdcmd))
-//			goto badproxy;
-//		routineexists=routines.count(mdcmd.towstring());
-//		MVRoutine *routine;
-//		if (!routineexists)
-//			goto badproxy;
-//		routine=routines[mdcmd.towstring()];
-		//newfilename=routine->execute("GETALIAS");
-
+		
 		//provide an output file for the program to be executed
 		//nb response file name for detaching processes
 		//will be obtained from the output file name Server2 respond
@@ -2233,8 +2226,6 @@ printl("EXECUTE");
 		SYSTEM.r(11, 1);
 
 		//execute the program
-		//print timedate2():' starting ':indata[1,60]
-		//call msg2('processing remote request','ub',buffer,'')
 		USER3 = "OK";
 		win.valid = 1;
 		USER4 = "";
@@ -2251,16 +2242,10 @@ printl("EXECUTE");
 		if ((USER0.a(1)).substr(1, 4) == "VAL.")
 			USER1 = linkfilename2;
 
-		//TODO
-		//mdcmd.execute();
-//		routine->execute(mdcmd);
-		//call @mdcmd
-		//send errors to neosys
-//		USER4="NOT IMPLEMENTED YET:\rEXECUTE " ^ mdcmd ^ "\r" ^ USER0;
+		//cut off EXECUTE and proxyname, leaving on the real request to the proxy program
+		USER0=USER0.field(FM,3,9999);
 
-printl("try", mdcmd.lcase());
-USER0=USER0.field(FM,3,9999);
-
+		//if we have debugger attached, perform directly without try/catch
 		if (false) {
 			try {
 				perform(mdcmd.lcase());
@@ -2270,11 +2255,9 @@ USER0=USER0.field(FM,3,9999);
 		} else {
 			perform(mdcmd.lcase());
 		}
+
 		//discard any stored input
 		DATA = "";
-
-		//call msg2('','db',buffer,'')
-		//print timedate2():' finished ':indata[1,60]
 
 		//send errors to neosys
 		if (USER4.index("An internal error", 1))
@@ -2302,7 +2285,6 @@ USER0=USER0.field(FM,3,9999);
 		//get the printfilename in case the print program changed it
 		printfilename = SYSTEM.a(2);
 		if (tracing) {
-			//print ' got it'
 			logput(AT(0)^ AT(-4));
 		}
 
@@ -2321,9 +2303,12 @@ USER0=USER0.field(FM,3,9999);
 
 			timex = var().time();
 			while (true) {
-			//BREAK;
-			if (!(otherusers("").a(1) && (var().time() - timex).abs() < 30)) break;;
+
+				if (not (otherusers("").a(1) && (var().time() - timex).abs() < 30))
+					break;
+					
 				var().ossleep(1000);
+				
 			}//loop;
 
 			USER1 = "";
@@ -2383,7 +2368,7 @@ USER0=USER0.field(FM,3,9999);
 
 		//or give an error message
 
-	}else if (1) {
+	}else{
 		USER1 = "";
 		USER3 = "Error: " ^ USER0.field(FM, 4, 9999).quote() ^ " unknown request";
 	}
