@@ -206,7 +206,7 @@ var brands;
 	if (vtyp == "") {
 		var def;
 		if (def.read(DEFINITIONS, "ALL")) {
-			if (def.a(1).locateusing("SI", VM, vn)) {
+			if (def.locate("SI", vn, 1)) {
 				vtyp = def.a(6, vn);
 			}
 		}
@@ -221,11 +221,11 @@ var brands;
 	if (vtyp == "") {
 		var def;
 		if (def.read(DEFINITIONS, "ALL")) {
-			if (def.a(1).locateusing("SI", VM, vn)) {
+			if (def.locate("SI", vn, 1)) {
 				vtyp = def.a(6, vn);
 				//try to locate second occurrence of sales invoices
 				def.r(1, vn, "");
-				if (def.a(1).locateusing("SI", VM, vn)) {
+				if (def.locate("SI", vn, 1)) {
 					vtyp = def.a(6, vn);
 				}
 			}
@@ -241,7 +241,7 @@ var brands;
 	if (vouchertype == "") {
 		var def;
 		if (def.read(DEFINITIONS, "ALL")) {
-			if (def.a(1).locateusing("PI", VM, vn)) {
+			if (def.locate("PI", vn, 1)) {
 				vouchertype = def.a(6, vn);
 			}
 		}
@@ -258,7 +258,7 @@ var brands;
 	if (vouchertype == "") {
 		var def;
 		if (def.read(DEFINITIONS, "ALL")) {
-			if (def.a(1).locateusing("PI", VM, vn)) {
+			if (def.locate("PI", vn, 1)) {
 				vouchertype = def.a(6, vn);
 			}
 		}

@@ -54,7 +54,7 @@ function main(in marketcodex, in suppliercodex, in vehiclecodex, io vehicles, ou
 
 	//return quick answer if checking vehicles and is in buffer
 	if (vehiclecode) {
-		if (mv.EW.a(10 + 5).locateusing(vehiclecode, VM, coden)) {
+		if (mv.EW.locate(vehiclecode, coden, 10 + 5)) {
 			if (mv.PW.a(10 + 5, coden)) {
 				return 1;
 			}else{
@@ -263,7 +263,7 @@ subroutine checkcode(io msg) {
 	ok = 0;
 	//if dont have general access to file then
 	//access to a specific record must be positively allowed (use # task prefix)
-	if (mv.EW.a(10 + filen).locateusing(code, VM, coden)) {
+	if (mv.EW.locate(code, coden, 10 + filen)) {
 		if (not(mv.PW.a(10 + filen, coden))) {
 			return;
 		}

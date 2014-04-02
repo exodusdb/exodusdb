@@ -86,7 +86,7 @@ function main(in companycodex, in clientcodex, in brandcodex, io brands, out msg
 	//return quick answer if checking brands and is in buffer
 	//since remaining checks are all dependent on brand
 	if (brandcode) {
-		if (mv.VW.a(10 + 5).locateusing(brandcode, VM, coden)) {
+		if (mv.VW.locate(brandcode, coden, 10 + 5)) {
 			if (mv.XW.a(10 + 5, coden)) {
 				return 1;
 			}else{
@@ -287,7 +287,7 @@ subroutine checkcode(io msg) {
 	ok = 0;
 	//if dont have general access to file then
 	//access to a specific record must be positively allowed (use # task prefix)
-	if (mv.VW.a(10 + filen).locateusing(code, VM, coden)) {
+	if (mv.VW.locate(code, coden, 10 + filen)) {
 		if (not(mv.XW.a(10 + filen, coden))) {
 			return;
 		}

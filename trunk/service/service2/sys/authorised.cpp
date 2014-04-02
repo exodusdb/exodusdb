@@ -221,7 +221,7 @@ notallowed:
 	for (var lockn = 1; lockn <= nlocks; ++lockn) {
 		//LOCKx=FIELD(LOCKS,vm,LOCKN)
 		var lockx = locks.field(" ", lockn);
-		if (keys.locateusing(lockx, " ", temp)) {
+		if (keys.locateusing(lockx, " ")) {
 			//call note(task:' ok')
 		} else
 		//MSG=capitalise(TASK):'||Sorry, ':capitalise(msgusername):', you are not authorised to do this.|'

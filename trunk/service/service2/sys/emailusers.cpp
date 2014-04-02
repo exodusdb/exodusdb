@@ -194,7 +194,7 @@ function main(in mode, in subject0, in body0, in groupids0, in jobids0, in useri
 		var nn = emails.count(VM) + (emails ne "");
 		for (var ii = nn; ii >= 1; --ii) {
 			var email = emails.a(1, ii);
-			if (alreadyemailed.locateusing(email, VM, xx)) {
+			if (alreadyemailed.locateusing(email, VM)) {
 				emails.eraser(1, ii);
 			}else{
 				alreadyemailed ^= VM ^ email;
