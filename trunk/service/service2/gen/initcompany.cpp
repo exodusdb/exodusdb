@@ -65,9 +65,9 @@ function main(in nextcompanycode) {
 	if (fin.currcompanycodes.unassigned()) {
 		fin.currcompanycodes = "";
 	}
-	var xx;
-	if (fin.currcompanycodes.a(1).locate(fin.currcompany, xx, 1)) {
-		fin.currcompanycodes.eraser(1, xx);
+	var cn;
+	if (fin.currcompanycodes.locateusing(fin.currcompany, VM, cn)) {
+		fin.currcompanycodes.eraser(1, cn);
 	}else{
 		fin.currcompanycodes = "";
 	}
@@ -111,7 +111,7 @@ function main(in nextcompanycode) {
 	var firstmonth = financialyear.field(",", 1);
 	var temp;
 	if (firstmonth.isnum()) {
-		if (not(var("1" _VM_ "2" _VM_ "3" _VM_ "4" _VM_ "5" _VM_ "6" _VM_ "7" _VM_ "8" _VM_ "9" _VM_ "10" _VM_ "11" _VM_ "12").a(1).locate(firstmonth, temp, 1))) {
+		if (not(var("1,2,3,4,5,6,7,8,9,10,11,12").locateusing(firstmonth, ","))) {
 			firstmonth = 1;
 		}
 		fin.maxperiod = financialyear.field(",", 2);
@@ -304,11 +304,11 @@ function main(in nextcompanycode) {
 
 	//number format (@USER2)
 	USER2 = "MC";
-	if (var("1,000.00" _VM_ "1000.00").a(1).locate(gen.company.a(22), xx, 1)) {
+	if (var("1,000.00 1000.00").locateusing(gen.company.a(22), " ")) {
 		USER2 = "MD";
 	}
 	USER2 ^= ndec ^ "0P";
-	if (var("1,000.00" _VM_ "1.000,00").a(1).locate(gen.company.a(22), xx, 1)) {
+	if (var("1,000.00 1.000,00").locateusing(gen.company.a(22), " ")) {
 		USER2 ^= ",";
 	}
 
@@ -429,14 +429,13 @@ basedesc:
 		var s23 = SYSTEM.a(23);
 		s23.converter(" ", FM);
 		//locate 'TEST' in s23 setting x then username:='*' else
-		var xx;
-		if (s23.locate("TESTDATA", xx, 1)) {
+		if (s23.locateusing("TESTDATA", FM)) {
 			username ^= "*";
 		}else{
-			if (s23.locate("TESTING", xx, 1)) {
+			if (s23.locateusing("TESTING", FM)) {
 				username ^= "*";
 			}else{
-				if (s23.locate("TRAINING", xx, 1)) {
+				if (s23.locateusing("TRAINING", FM)) {
 					username ^= "*";
 				}else{
 					if ((SYSTEM.a(17)).index("TEST", 1)) {

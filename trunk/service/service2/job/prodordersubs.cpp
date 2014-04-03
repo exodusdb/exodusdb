@@ -237,8 +237,8 @@ lockit:
 		for (var estimaten = 1; estimaten <= nestimates; ++estimaten) {
 			var estimate;
 			if (estimate.read(agy.productioninvoices, estimatenos.a(1, estimaten))) {
-				var inactivestatuses = "FINISHED" _VM_ "CANCELLED" _VM_ "ON HOLD" _VM_ "INVOICED";
-				if (not(inactivestatuses.locate(estimate.a(11), xx, 1))) {
+				var inactivestatuses = "FINISHED,CANCELLED,ON HOLD,INVOICED";
+				if (not(inactivestatuses.locateusing(estimate.a(11), ","))) {
 					ok = 1;
 				}
 			}
@@ -1002,7 +1002,7 @@ errexit:
 
 	//basic checks done
 	//no further processing for cancelled records
-	if (var("DRAFT" _VM_ "CANCELLED").locate(RECORD.a(11), xx, 1)) {
+	if (var("DRAFT CANCELLED").locate(RECORD.a(11), " ")) {
 		return;
 	}
 
@@ -1366,7 +1366,7 @@ errexit:
 
 subroutine update() {
 
-	if (var("DRAFT" _VM_ "CANCELLED").locate(calculate("STATUS")) xx, 1)) {
+	if (var("DRAFT CANCELLED").locate(calculate("STATUS")), " ") {
 		return;
 	}
 

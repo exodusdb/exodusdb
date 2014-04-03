@@ -74,7 +74,7 @@ function main(in mode) {
 
 		//password autoexpiry inform UI directly to allow warning
 		//without an additional request to the server to get the expiry days
-		var expirydays = gen._security.a(25);
+		var expirydays = SECURITY.a(25);
 		if (expirydays) {
 			//password date default to lastlogin date
 			//if no login date then consider the account to have expired
@@ -120,7 +120,7 @@ function main(in mode) {
 					var word = sysemails.field(" ", ii);
 					word = field2(word, "@", -1);
 					//remove smtp. mailout. etc from smtp host domain
-					if (var("smtp,mail,mailout").locateusing(word.field(".", 1), ",")) {
+					if (var("smtp mail mailout").locateusing(word.field(".", 1), " ")) {
 						word = word.field(".", 2, 999);
 					}
 					sysemails = sysemails.fieldstore(" ", ii, 1, word);
@@ -195,23 +195,23 @@ unlocksecurity:
 		}
 
 		//get the latest userprivs
-		if (not(gen._security.read(DEFINITIONS, "SECURITY"))) {
+		if (not(SECURITY.read(DEFINITIONS, "SECURITY"))) {
 			msg = "SECURITY is missing from DEFINITIONS";
 			call unlockrecord("DEFINITIONS", DEFINITIONS, "SECURITY");
 			call sysmsg(msg);
 			return invalid(msg);
 		}
-		//gen._security = gen._security.invert();
+		//SECURITY = SECURITY.invert();
 
-		var olduserprivs = gen._security;
+		var olduserprivs = SECURITY;
 
 		if (resetpassword < 2) {
 
 			//email address
-			gen._security.r(7, usern, RECORD.a(7));
+			SECURITY.r(7, usern, RECORD.a(7));
 
 			//user name
-			gen._security.r(8, usern, RECORD.a(1));
+			SECURITY.r(8, usern, RECORD.a(1));
 
 		}
 
@@ -230,14 +230,14 @@ unlocksecurity:
 			if (resetpassword < 2) {
 				ANS.converter(FM, TM);
 				var tt = "<hidden>" ^ SVM ^ ANS;
-				gen._security.r(4, usern, tt);
+				SECURITY.r(4, usern, tt);
 			}
 
 		}
 
-		if (resetpassword < 2 and gen._security ne olduserprivs) {
-			//gen._security.invert().write(DEFINITIONS, "SECURITY");
-			gen._security.write(DEFINITIONS, "SECURITY");
+		if (resetpassword < 2 and SECURITY ne olduserprivs) {
+			//SECURITY.invert().write(DEFINITIONS, "SECURITY");
+			SECURITY.write(DEFINITIONS, "SECURITY");
 			//no need on user if on userprivs
 			RECORD.r(4, "");
 		}
@@ -296,7 +296,7 @@ subroutine getusern() {
 	if (ID == "NEOSYS") {
 		//usern remains unassigned to force an error if used later on
 	}else{
-		if (not(gen._security.locate(ID, usern, 1))) {
+		if (not(SECURITY.locate(ID, usern, 1))) {
 			msg = DQ ^ (ID ^ DQ) ^ " User does not exist";
 			gosub invalid(msg);
 		}

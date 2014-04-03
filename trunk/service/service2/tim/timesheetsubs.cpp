@@ -130,10 +130,10 @@ function main(in mode0) {
 			call mssg(win.registerx(8));
 			return 0;
 		}
-		if (not(decide("", gen._security.a(1), reply))) {
+		if (not(decide("", SECURITY.a(1), reply))) {
 			return 0;
 		}
-		ANS = gen._security.a(1, reply);
+		ANS = SECURITY.a(1, reply);
 		data ^= "" "\r";
 */
 	} else if (mode.field(".", 1) == "GETNEXTTIMESHEET") {
@@ -232,7 +232,7 @@ L1007:
 		if (win.is == "---") {
 			goto baduser;
 		}
-		if (not(gen._security.locate(win.is, personn, 1))) {
+		if (not(SECURITY.locate(win.is, personn, 1))) {
 baduser:
 			msg = DQ ^ (win.is ^ DQ) ^ " - person not authorised";
 			return invalid(msg);

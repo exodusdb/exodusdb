@@ -175,7 +175,7 @@ badacc:
 							if (not(acclist2.locateby(accno, "AL", posn))) {
 
 								//skip wrong ledgers
-								if (var("CHART" _VM_ "STOCK" _VM_ "JOB").locate(validaccs.substr(1, 5), xx, 1 )) {
+								if (var("CHART,STOCK,JOB").locateusing(validaccs.substr(1, 5), ",")) {
 									if (not(fin.account.read(fin.accounts, accno))) {
 										fin.account = "";
 									}

@@ -110,7 +110,7 @@ f2dataset:
 			return;
 		}
 		gosub getdepts();
-		if (not(depts.locate(win.is, xx))) {
+		if (not(depts.locate(win.is))) {
 			msg = DQ ^ (win.is ^ DQ) ^ " IS NOT A VALID DEPARTMENT";
 			return invalid();
 		}
@@ -320,7 +320,7 @@ subroutine getuserdept(in mode) {
 	//locate the user in the list of users
 	usercode = mode.field(",", 2);
 	var usern;
-	if (not(gen._security.locate(usercode, usern, 1))) {
+	if (not(SECURITY.locate(usercode, usern, 1))) {
 		if (usercode == "NEOSYS") {
 			ANS = "NEOSYS";
 			return;
@@ -331,25 +331,25 @@ subroutine getuserdept(in mode) {
 	}
 
 	//locate divider, or usern+1
-	var nusers = (gen._security.a(1)).count(VM) + 1;
+	var nusers = SECURITY.a(1).dcount(VM);
 	for (usern = 1; usern <= nusers; ++usern) {
 		///BREAK;
-		if (gen._security.a(1, usern) == "---")
+		if (SECURITY.a(1, usern) == "---")
 			break;
 	};//usern;
 
 	//get the department code
-	ANS = gen._security.a(1, usern - 1);
+	ANS = SECURITY.a(1, usern - 1);
 	return;
 }
 
 subroutine getdepts() {
 	depts = "";
-	var nusers = (gen._security.a(1)).count(VM) + 1;
+	var nusers = (SECURITY.a(1)).dcount(VM);
 	for (var usern = 2; usern <= nusers + 1; ++usern) {
-		var text = gen._security.a(1, usern);
+		var text = SECURITY.a(1, usern);
 		if (text == "---" or text == "") {
-			text = gen._security.a(1, usern - 1);
+			text = SECURITY.a(1, usern - 1);
 			text.converter("0123456789", "");
 			text.trimmer();
 			if (text and text ne "---") {

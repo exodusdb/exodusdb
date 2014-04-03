@@ -610,14 +610,14 @@ getproxy:
 	DATEFORMAT = "D2/E";
 
 	call log2("*get security ... also in LISTEN", logtime);
-	if (not(gen._security.read(DEFINITIONS, "SECURITY"))) {
+	if (not(SECURITY.read(DEFINITIONS, "SECURITY"))) {
 		if (temp.open("DICT", "DEFINITIONS")) {
-			if (gen._security.read(temp, "SECURITY")) {
-				gen._security.write(DEFINITIONS, "SECURITY");
+			if (SECURITY.read(temp, "SECURITY")) {
+				SECURITY.write(DEFINITIONS, "SECURITY");
 			}
 		}
 	}
-//	gen._security = gen._security.invert();
+//	SECURITY = SECURITY.invert();
 
 	call log2("*create user file", logtime);
 	var users;
@@ -628,7 +628,7 @@ getproxy:
 		}
 
 		call log2("*zzz should create full user record not just the name", logtime);
-		var usercodes = gen._security.a(1);
+		var usercodes = SECURITY.a(1);
 		var nusers = usercodes.count(VM) + (usercodes ne "");
 		for (var usern = 1; usern <= nusers; ++usern) {
 			var USER = usercodes.a(1, usern);

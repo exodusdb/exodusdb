@@ -93,7 +93,7 @@ function main(in mode, in subject0, in body0, in groupids0, in jobids0, in useri
 		}
 	}
 
-	var usercodes = gen._security.a(1);
+	var usercodes = SECURITY.a(1);
 	var nusers = usercodes.count(VM) + 1;
 	var usern = 0;
 	emaillog = "";

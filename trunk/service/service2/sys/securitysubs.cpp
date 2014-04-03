@@ -115,7 +115,7 @@ function main(in mode)
 			var nusers = usercodes.dcount(VM);
 
 			var usern;
-			if (!(usercodes.locate(USERNAME, usern, 1)))
+			if (not usercodes.locateusing(USERNAME, VM, usern))
 				return invalid(USERNAME ^ L" user not in in authorisation file");
 
 			//hide higher users
@@ -173,8 +173,8 @@ function main(in mode)
 						for (int keyn = 1; keyn <= nkeys; keyn++) {
 							var keyx = invisiblekeys.a(1, keyn);
 							var xx;
-							if (!(otherkeys.locate(keyx, xx, 1))) {
-								if (!(visiblekeys.locate(keyx, xx, 1)))
+							if (!(otherkeys.locateusing(keyx, VM))) {
+								if (!(visiblekeys.locateusing(keyx, VM)))
 									otherkeys ^= VM ^ keyx;
 							}
 						};//keyn;

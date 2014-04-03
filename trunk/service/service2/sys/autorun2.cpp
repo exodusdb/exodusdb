@@ -83,7 +83,7 @@ function main(in mode, in title0, in module, in request, in data, in runasuserco
 	//auto targeting
 	if (targetusercodes == "{GROUP}") {
 		var tt = runasusercode;
-		if (gen._security.locate(tt, usern, 1)) {
+		if (SECURITY.locate(tt, usern, 1)) {
 			while (true) {
 				var USER;
 				if (USER.read(users, tt)) {
@@ -98,7 +98,7 @@ function main(in mode, in title0, in module, in request, in data, in runasuserco
 					}
 				}
 				usern -= 1;
-				tt = gen._security.a(1, usern);
+				tt = SECURITY.a(1, usern);
 			///BREAK;
 			if (not(usern and tt and tt ne "---")) break;;
 			}//loop;
