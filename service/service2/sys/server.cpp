@@ -1209,7 +1209,7 @@ subroutine validate()
 
 	if (username=="NEOSYS") goto userok;
 	else if (SECURITY.locate(username, usern, 1)) {
-		if (encrypt0 == (SECURITY.a(4, usern, 2)).field(TM, 7, 1)) {
+		if (encrypt0 == SECURITY.a(4, usern, 2).field(TM, 7)) {
 
 			//determine allowed connections
 			connections = SECURITY.a(6, usern);
@@ -2237,7 +2237,7 @@ emptyrecorderror:
 
 		//pass the output file in linkfilename2
 		//not good method, pass in system?
-		if (var("LIST" _VM_ "SELECTBATCHES").locate(USER0.a(1),xx,1))
+		if (var("LIST SELECTBATCHES").locateusing(USER0.a(1)," "))
 			USER1 = linkfilename2;
 		if ((USER0.a(1)).substr(1, 4) == "VAL.")
 			USER1 = linkfilename2;
@@ -2950,7 +2950,7 @@ subroutine getindexvalues()
 
 	_USER1 = "";
 	if (sortby) {
-		if (!(var("AL" _VM_ "AR" _VM_ "DL" _VM_ "DR").locate(sortby, xx))) {
+		if (!(var("AL AR DL DR").locateusing(sortby, " "))) {
 			USER3 = "Invalid sortby " ^ sortby.quote() ^ " in Server,GETINDEXVALUES";
 			return;
 		}
@@ -3028,7 +3028,7 @@ subroutine requestselect()
 	}
 
 	//security check
-	if (!(var("MENUS" _VM_ "ADMENUS").locate(filename, xx))) {
+	if (not var("MENUS ADMENUS").locateusing(filename, " ")) {
 		var temp = filename;
 		temp.convert(".", " ");
 		temp = singular(temp);
@@ -3057,7 +3057,7 @@ subroutine requestselect()
 		sortselect^="WITH @ID EQ ";
 		sortselect^=USER1;
 	}
-USER1.outputl("USER1=");
+//USER1.outputl("USER1=");
 	call select2(filename0, SYSTEM.a(2), sortselect, dictids, options, USER1, USER3, "", "", "");
 
 	if (USER4) {
@@ -3086,7 +3086,7 @@ subroutine deleteoldfiles(in inpath, in pattern)
 		filenames.splicer(1,filename.length()+1,"");
 		filename = inpath ^ filename;
 
-		if (!(var(".JPG" _VM_ ".GIF").locate(filename.substr(-4, 4).ucase(),xx,1))) {
+		if (!(var(".JPG .GIF").locateusing(filename.substr(-4, 4).ucase()," "))) {
 
 			//a file ending .4 means that the .2 and .3 files need to be deleted
 			if (filename.substr(-2, 2) == ".4") {

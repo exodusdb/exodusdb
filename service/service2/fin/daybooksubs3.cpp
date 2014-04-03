@@ -189,7 +189,7 @@ valbatchref:
 		}
 
 		//check if own batch
-		if (not(tt.a(25).locateusing(USERNAME, VM, temp))) {
+		if (not(tt.locate(USERNAME, temp, 25))) {
 			if (not(authorised("JOURNAL ACCESS OTHER PEOPLES", msg, ""))) {
 				win.is = "";
 				goto invalid2;

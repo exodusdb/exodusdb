@@ -68,7 +68,7 @@ function main() {
 	} else if (mode == "FILEMAN" and USER0.a(2) == "COPYDB") {
 
 		var copydb = USER0.a(3);
-		if (not(SYSTEM.a(58).locateusing(copydb, VM, dbn))) {
+		if (not(SYSTEM.locate(copydb, dbn, 58))) {
 			{}
 		}
 		var todb = SYSTEM.a(63, dbn);

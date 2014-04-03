@@ -71,7 +71,7 @@ function main(in mode, io oldtaskid, io task, io errmsg) {
 
 			//prevent adding duplicate tasks for the same user
 			if (taskx.a(2) == task.a(2)) {
-				if (not(var("Completed" ^ VM ^ "Cancelled").locateusing(taskx.a(3), VM, xx))) {
+				if (not(var("Completed Cancelled").locateusing(taskx.a(3), " "))) {
 					errmsg = DQ ^ (task.a(2) ^ DQ) ^ " is already " ^ taskx.a(3) ^ " on this job (" ^ newtaskid ^ ")";
 					return 0;
 				}
@@ -292,7 +292,7 @@ function main(in mode, io oldtaskid, io task, io errmsg) {
 }
 
 subroutine adduser() {
-	if (not(tousercodes.locateusing(tousercode, VM, xx))) {
+	if (not(tousercodes.locateusing(tousercode, VM))) {
 		tousercodes.r(1, -1, tousercode);
 		var emailaddress = tousercode.xlate("USERS", 7, "X");
 		if (emailaddress) {

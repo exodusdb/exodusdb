@@ -181,8 +181,9 @@ lockit:
 
 		//warning of other estimates on the job
 		var estimatenos = job.a(10);
-		if (estimatenos.locate(win.isorig, xx, 1)) {
-			estimatenos.eraser(1, xx);
+		var en;
+		if (estimatenos.locateusing(win.isorig, VM, en)) {
+			estimatenos.eraser(1, en);
 		}
 		if (estimatenos) {
 			msg = "Note: Job " ^ win.is ^ " also has|the following estimates:";
@@ -705,7 +706,7 @@ badtype:
 		}
 
 		//check can add an account for APPROVED
-		if (not(var("DRAFT,ISSUED,CANCELLED,INVOICED").locateusing(RECORD.a(11), ",", xx))) {
+		if (not(var("DRAFT,ISSUED,CANCELLED,INVOICED").locateusing(RECORD.a(11), ","))) {
 			call addjobacc("ADD", jobcode, msg);
 			if (msg) {
 				if (interactive) {
@@ -779,7 +780,7 @@ subroutine updanalysis2(in sign) {
 	if (not status) {
 		return;
 	}
-	if (var("DRAFT,ISSUED,CANCELLED,ON HOLD,INVOICED").locateusing(status, ",", xx)) {
+	if (var("DRAFT,ISSUED,CANCELLED,ON HOLD,INVOICED").locateusing(status, ",")) {
 		return;
 	}
 
@@ -800,9 +801,10 @@ subroutine updanalysis2(in sign) {
 			}else{
 				prodtypecodes.r(1, linen, prodtypecode);
 			}
-			if (prodtypecodes.locate(prodtypecode, xx, 1)) {
-				if (xx < linen) {
-					amountbases.r(1, xx, (amountbases.a(1, xx) + amountbase).oconv(basecurrencyfmtz));
+			var ii;
+			if (prodtypecodes.locateusing(prodtypecode, VM, ii)) {
+				if (ii < linen) {
+					amountbases.r(1, ii, (amountbases.a(1, ii) + amountbase).oconv(basecurrencyfmtz));
 					amountbases.r(1, linen, "");
 				}
 			}

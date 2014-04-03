@@ -210,7 +210,7 @@ subroutine gettime() {
 			var tsrec;
 			if (tsrec.read(gen.timesheets, tskey)) {
 				var ntslines = (tsrec.a(2)).count(VM) + 1;
-				if (tsrec.a(1).locateusing(ID, VM, MV)) {
+				if (tsrec.locate(ID, MV, 1)) {
 onetsline:
 					var hours = tsrec.a(2, MV);
 					if (hours) {

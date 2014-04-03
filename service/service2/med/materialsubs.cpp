@@ -157,8 +157,10 @@ function main(in mode) {
 		dategrid.converter(" " _SM_ _VM_ "1234567890", "");
 
 		for (var ii = 1; ii <= dategrid.length(); ++ii) {
-			if (not(materialdata.a(1).locateusing(dategrid.substr(ii, 1), VM, xx))) {
-				materialdata.r(1, -1, dategrid.substr(ii, 1));
+			var mdn;
+			var materialletter=dategrid[ii];
+			if (not(materialdata.locate(materialletter, mdn, 1))) {
+				materialdata.r(1, -1, materialletter);
 			}
 		};//ii;
 
@@ -207,7 +209,7 @@ function main(in mode) {
 			//check not in self referencing chain of materials
 			//and save the chain of materialnos
 			if (schid) {
-				if (materialnos.a(1).locateusing(materialno, VM, chainn)) {
+				if (materialnos.locateusing(materialno, VM, chainn)) {
 					msg = "Material " ^ (DQ ^ (materialno ^ DQ)) ^ " refers back to|the same material on plan/schedule " ^ (DQ ^ (schids.a(1, chainn) ^ DQ));
 					return invalid(msg);
 				}else{
@@ -257,7 +259,7 @@ function main(in mode) {
 			}
 
 			//locate the material in the prior schedule
-			if (not(doc.a(184).locateusing(letter, VM, matn))) {
+			if (not(doc.locate(letter, matn, 184))) {
 
 				if (interactive) {
 					var lettersources = "X" ^ doc.a(184) ^ doc.a(22) ^ doc.field(FM, 171, 13);

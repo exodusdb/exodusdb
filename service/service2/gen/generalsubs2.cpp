@@ -311,19 +311,19 @@ function main(in mode) {
 			var monitorusers = "";
 
 			//find key otherwise no monitors
-			if (not(gen._security.a(10).locateusing(task, VM, taskn))) {
+			if (not(SECURITY.a(10).locateusing(task, VM, taskn))) {
 				return 0;
 			}
-			var locks = gen._security.a(11, taskn);
+			var locks = SECURITY.a(11, taskn);
 			if (not locks) {
 				return 0;
 			}
 
 			//find all users with the key (no hierarchy!)
-			var keys = gen._security.a(2);
+			var keys = SECURITY.a(2);
 			var nusers = keys.count(VM) + 1;
 			for (var usern = 1; usern <= nusers; ++usern) {
-				var usercode = gen._security.a(1, usern);
+				var usercode = SECURITY.a(1, usern);
 				//locate key in keys<1,user> using ',' setting xx then
 				if (usercode ne "---" and var(2).rnd()) {
 					monitorusers ^= SM ^ usercode;

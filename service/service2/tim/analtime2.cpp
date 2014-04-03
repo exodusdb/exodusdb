@@ -339,7 +339,7 @@ neosystesting=true;
 		if (isntadmin) {
 			usercode = USERNAME;
 		}else{
-			usercodes = gen._security.a(1);
+			usercodes = SECURITY.a(1);
 			var usercodes2 = "";
 			var nusers = usercodes.count(VM) + 1;
 			for (var usern = nusers; usern >= 1; --usern) {
