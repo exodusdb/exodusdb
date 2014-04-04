@@ -1467,13 +1467,16 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 		var params;
 		if (fieldno)
 			params=fileexpression(mainfilename, filename, L"data") ^ L"," ^ fieldno ^ L", 0, 0)";
+			
 		else
 			params=fileexpression(mainfilename, filename,L"key") ^ L",0,0,0)";
 
 		if (conversion.substr(1,9)==L"[DATETIME")
 			sqlexpression=L"exodus_extract_datetime(" ^ params;
+
 		else if (conversion[1]==L"D" || conversion.substr(1,5)==L"[DATE")
 			sqlexpression=L"exodus_extract_date(" ^ params;
+
 		else if (conversion.substr(1,2)==L"MT" || conversion.substr(1,5)==L"[TIME")
 			sqlexpression=L"exodus_extract_time(" ^  params;
 
@@ -1485,10 +1488,13 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 
 		else if (conversion==L"[NUMBER,0]" || dictrec.a(11)==L"0N" || dictrec.a(11).substr(1,3)==L"0N_")
 			sqlexpression=L"cast( exodus_extract_text(" ^ params ^ L" as integer)";
+
 		else if (conversion.substr(1,2)==L"MD" || conversion.substr(1,7)==L"[NUMBER" || dictrec.a(12)==L"FLOAT" || dictrec.a(11).index(L"0N"))
 				sqlexpression=L"cast( exodus_extract_text(" ^ params ^ L" as float)";
+
 		else
 			sqlexpression=L"exodus_extract_text(" ^ params;
+
 	}
 	else if (dicttype==L"S")
 	{

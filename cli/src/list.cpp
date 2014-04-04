@@ -81,6 +81,7 @@ var wordn;
 var sentencex="";
 var ignorewords="";
 var html;
+var printing;//only prefers @lptr to @crt if no columns specified
 var tx;
 var ncols;
 var breakleveln;
@@ -233,7 +234,7 @@ USER0="";
 		"\n"
 		"\n {(options)}"
 		"\n"
-		"\nOptions: (H)tml"
+		"\nOptions: (H)tml (P)rint"
 		"\n"
 		"\nOn Unix prefix special characters like \" ' etc. with \\. Use {} instead of ()."
 		"\nOn Windows use ' instead of \". Use the word GT instead of the > character."
@@ -271,6 +272,8 @@ USER0="";
 	DICT = L"";
 
 	html = index(options,"H");
+	printing = index(options,"P");
+	
 	if (html) {
 		tr = L"<tr>";
 		trx = L"</tr>" ^ crlf;
@@ -306,7 +309,9 @@ USER0="";
 			dictrecs ^= FM ^ L"just  |F|9 |Justify|S|||||L|3";
 			dictrecs ^= FM ^ L"length|F|10|Length |S|||||R|6";
 			dictrecs ^= FM ^ L"master|F|28|Master |S|||||L|1";
-			dictrecs ^= FM ^ L"@crt  |G|  |type fmc part title sm conv just length master by type by fmc";
+			dictrecs ^= FM ^ L"@crt  |G|  |"
+			"type fmc part title sm conv just length master"
+			" by type by fmc by part by @id";
 
 			//write the dictionary records to the dictionary
 			var nrecs=dictrecs.dcount(FM);
@@ -378,13 +383,12 @@ phraseinit:
 			gosub getword();
 		}
 
-		//get the filename
-		// deleted
+		//get the filename (or dict filename as dict_filename)
 		if (word eq L"dict") {
 			gosub getword();
-			word = L"dict_" ^ word;    // changed
+			word = L"dict_" ^ word;
 		}
-		filename = word;               // new
+		filename = word;
 		if (not srcfile.open(filename))
 			abort(filename^" file does not exist");
 
@@ -394,9 +398,11 @@ phraseinit:
 			dictfilename = filename;
 
 		if (not DICT.open(L"dict_"^dictfilename)) {
-			dictfilename = L"md";
+			dictfilename = L"dict_md";
 			DICT = dictmd;
 		}
+		
+		//add the filename to the sort/select command
 		ss ^= L" " ^ word;
 
 		//get any specific keys (numbers or quoted words)
@@ -676,8 +682,8 @@ phraseinit:
 		gosub getword();
 		ignorewords.r(1, -1, word);
 
-		//@LPTR word is skipped if not located in MD/DICT.MD
-	} else if (word eq L"@lptr") {
+	//@LPTR word is skipped if not located in MD/DICT.MD
+	} else if (word eq L"@lptr" or word eq L"@crt") {
 
 	} else {
 		//sys.messages W156
@@ -705,23 +711,22 @@ x1exit:
 ///////
 	//if no columns selected then try to use default @crt or @lptr group item
 	//if (not (coln or crtx) and (DICT ne dictmd or datafile eq L"md" or datafile eq L"dict_md")) {
-	if (not (coln or crtx) and ((DICT.ucase() ne dictmd.ucase()) or (filename.ucase() eq L"MD") or (filename.ucase() eq L"DICT_MD"))) {
-		word = L"@lptr";
-		if (DICT and not xx.read(DICT, word)) {
-			word = L"@LPTR";
-			if (DICT and not xx.read(DICT, word)) {
-				word = L"@crt";
+	if (not (coln or crtx) and DICT.outputl("dict")) {
+	// and ((DICT.ucase() ne dictmd.ucase()) or (filename.ucase() eq L"MD") or (filename.ucase() eq L"DICT_MD"))) {
+		var words=printing ? L"@lptr,@crt" : L"@crt,@lptr";
+		for (int ii=1;ii<=2;++ii) {
+			word = words.field(L",",ii).outputl("word=");
+			if (not xx.read(DICT, word)) {
+				word.ucaser().outputl();
 				if (not xx.read(DICT, word)) {
-					word = L"@CRT";
-					if (not xx.read(DICT, word))
-						word = L"";
+					word = L"";
+					printl("not found");
 				}
 			}
 		}
 		if (word) {
 			crtx = 1;
 			sentencex ^= L" " ^ word;
-			//charn-=2
 			charn = sentencex.length() - word.length();
 			goto nextphrase;
 		}
@@ -1345,9 +1350,8 @@ subroutine getword()
 
 		gosub getword2();
 
-		if (word.length()) {
-			if (ignorewords.locateusing(word, VM, xx))
-				continue;
+		if (word.length() and ignorewords.locateusing(word, VM)) {
+			continue;
 		}
 		break;
 	}
