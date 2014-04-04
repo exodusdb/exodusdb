@@ -1465,6 +1465,12 @@ while trying to match the argument list '(exodus::var, bool)'
 
 	//test some UNLIMITED decimal hours based time
 	//NB negative unlimited time is symmetrical (unlike normal time_
+	//negative time could be useful to refer to previous dates
+	//but in a non-symmetrical fashion ie -1 means one second back into yesterday
+	//ie 23:59:59 ... not -00:00:01. negative hours could perhaps be used
+	//to credit hours in some imaginary volumetric numerical fashion
+	//The "symmetric" feature should perhaps be a SEPARATE option
+	//instead of being tied to the U unlimited option
 	assert(var(.01).oconv("MT2US").outputl() eq "00:00:36");
 	assert(var(-.01).oconv("MT2US").outputl() eq "-00:00:36");
 	assert(var(.25).oconv("MT2US").outputl() eq "00:15:00");
