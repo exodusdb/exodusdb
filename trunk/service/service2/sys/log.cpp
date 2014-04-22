@@ -17,18 +17,19 @@ function main(in programname0, in text0) {
 
 	var programname;
 	var text;
-	if (programname.unassigned())
+	if (programname0.unassigned())
 		programname = "";
 	else
 		programname = programname0;
-	if (text.unassigned())
+	if (text0.unassigned())
 		text = "";
 	else
 		text = text0;
 
 	//update the log
 	///////////////
-
+	printl("LOG:", programname, " ", text.a(1));
+	
 	var year = ((var().date()).oconv("D")).substr(-4, 4);
 	if (s33) {
 		station = SYSTEM.a(40, 2);
@@ -44,13 +45,17 @@ function main(in programname0, in text0) {
 
 	if (openfile("LOG" ^ year, log, "DEFINITIONS")) {
 
-getlogkey:
-		//call dostime(time);
-		time = var(int(ostime()*100)/100).oconv("MD20P");
-		var logkey = station.trim() ^ "*" ^ USERNAME ^ "*" ^ var().date() ^ "*" ^ time;
-		var xx;
-		if (xx.read(log, logkey)) {
-			goto getlogkey;
+		var logkey;
+
+		//dont update log with same time
+		while (true) {
+			//call dostime(time);
+			time = ostime().round(2);
+			logkey = station.trim() ^ "*" ^ USERNAME ^ "*" ^ var().date() ^ "*" ^ time;
+			var xx;
+			if (not xx.read(log, logkey))
+				break;		
+			ossleep(rnd(2000));
 		}
 
 		var entry = programname;

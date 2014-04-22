@@ -446,7 +446,7 @@ var ExodusProgramBase::perform(const var& sentence) {
 			true //forcenew each perform/execute
 			)) {
 			USER4^=L"perform() Cannot find shared library \"" ^ str_libname
-				^ L"\", or function \"libraryexit()\" is not present";
+				^ L"\", or \"libraryexit()\" is not present in it.";
 			//throw MVException(USER4);
 			return "";
 		}
@@ -657,13 +657,9 @@ void ExodusProgramBase::debug() const {
 
 }
 
-void ExodusProgramBase::fsmsg() const {
-
-	std::wcout << L"fsmsg():";
-//	var reply;
-//	cin>>reply;
-	return;
-
+bool ExodusProgramBase::fsmsg(const var& msg) const {
+	mssg(msg ^ var().getlasterror());
+	return false;
 }
 
 var ExodusProgramBase::sysvar(const var& var1, const var& var2, const var& var3,

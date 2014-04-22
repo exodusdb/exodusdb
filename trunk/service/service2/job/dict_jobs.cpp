@@ -29,6 +29,7 @@ function main() {
 			ANS = capitalise(ANS);
 		}
 	}
+
 	return ANS;
 
 }

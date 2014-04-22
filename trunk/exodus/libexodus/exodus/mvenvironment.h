@@ -68,7 +68,7 @@ public:
 
 	bool init(const int threadno);
 
-//keep in sync both 1) declaration in class and 2) contruction initialisation
+//keep in sync both 1) declaration in class and 2) construction initialisation
 
 	//per user
 	var USERNAME;

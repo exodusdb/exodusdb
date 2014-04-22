@@ -67,6 +67,7 @@ function main() {
 	call authorised("JOURNAL ACCESS POSTED",         xx);//not working while creation always starts as posted
 	call authorised("JOURNAL ACCESS UNPOSTED",       xx);
 	call authorised("JOURNAL POST UNALLOCATED", xx);
+	call authorised("JOURNAL POST TAX", xx, "NEOSYS");
 
 	//ensure REVALUATION (BASE CURRENCY ONLY) ENTRIES ARE LOCKED
 	//if security('JOURNAL POST REVALUATION',xx,'NEOSYS') else null
