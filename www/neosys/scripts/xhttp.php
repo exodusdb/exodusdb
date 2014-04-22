@@ -35,7 +35,7 @@
 //defaults
 
 	//default timeout is 10 minutes (NB BACKEND timeout (in GIVEWAY) is hard coded to 10 mins?)
-	$defaulttimeoutmins = 10;
+	$defaulttimeoutmins = 5;
 	$timeout = $defaulttimeoutmins * 60;
 
 

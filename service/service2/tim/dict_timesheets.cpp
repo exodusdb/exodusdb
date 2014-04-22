@@ -71,7 +71,7 @@ libraryexit(brand_code)
 libraryinit(brand_name)
 
 function main()  {
-	return xlate("JOBS", RECORD.a(1, MV), "BRAND_NAME", "X");
+	return xlate("JOBS", RECORD.a(1, MV), 2, "X").xlate("BRANDS", 2, "C");
 }
 libraryexit(brand_name)
 
@@ -87,7 +87,7 @@ libraryexit(client_code)
 libraryinit(client_name)
 
 function main()  {
-	return xlate("JOBS", RECORD.a(1, MV), "CLIENT_NAME", "X");
+	return xlate("JOBS", RECORD.a(1, MV), 2, "X").xlate("BRANDS", 3, "C");
 }
 libraryexit(client_name)
 

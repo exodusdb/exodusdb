@@ -10,7 +10,7 @@ function main(in instr, in sepchars, in stoplist, in mode) {
 	if (mode) {
 		var xx;
 		for (var ii=outstr.dcount(VM);ii>0;--ii) {
-			if (stoplist.locate(outstr.a(1,ii),xx,1)) {
+			if (stoplist.locateusing(outstr.a(1,ii),VM)) {
 				outstr.eraser(1,ii);
 			}
 		}

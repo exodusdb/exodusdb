@@ -154,7 +154,29 @@ bool getdbtrace()
 //but this is ...
 boost::thread_specific_ptr<int> tss_pgconnids;
 boost::thread_specific_ptr<var> tss_pgconnparams;
+boost::thread_specific_ptr<var> tss_pglasterror;
 boost::thread_specific_ptr<bool> tss_ipcstarted;
+
+void var::setlasterror(const var& msg) const
+{
+	//no checking for speed
+	//THISIS(L"void var::setlasterror(const var& msg")
+	//ISSTRING(msg)
+	tss_pglasterror.reset(new var(msg));	
+}
+
+void var::setlasterror() const
+{
+	tss_pglasterror.reset();	
+}
+
+var var::getlasterror() const
+{
+	if (tss_pglasterror.get())
+		return *tss_pglasterror.get();
+	else
+		return L"";
+}
 
 typedef PGresult* 	PGresultptr;
 static bool pqexec(const var& sql, PGresultptr& pgresult, PGconn * thread_pgconn);
@@ -163,8 +185,11 @@ bool var::sqlexec(const var& SqlToExecute) const
 {
 	var errmsg;
 	bool result = sqlexec(SqlToExecute, errmsg);
-	if (not result && (errmsg.index(L"syntax") || GETDBTRACE))
-		errmsg.outputl();
+	if (not result) {
+		this->setlasterror(errmsg);
+		if (errmsg.index(L"syntax") || GETDBTRACE)
+			errmsg.outputl();
+	}
 	return result;
 }
 
@@ -431,8 +456,10 @@ int var::connection_id() const
 		}
 	}
 
-	//turn this into a db connection
+	//turn this into a db connection (int holds the connection number)
+	//leave any string in place but prevent it being used a number
 	var_mvint = connid2;
+	//var_mvstr = L""; does it ever need initialising?
 	var_mvtyp = pimpl::MVTYPE_NANSTR_DBCONN;
 
 	return connid2;
@@ -533,9 +560,11 @@ bool var::open(const var& filename, const var& connection)
 		var sql=L"SELECT table_name FROM information_schema.tables WHERE table_schema='public' and table_name=$1";
 
 		PGconn * thread_pgconn = (PGconn *) connection.connection();
-		if (!thread_pgconn)
+		if (!thread_pgconn) {
+			this->setlasterror(L"db connection not opened");
 			return false;
-
+		}
+		
 		DEBUG_LOG_SQL1
 		PGresult* result = PQexecParams(thread_pgconn,
 			//TODO: parameterise filename
@@ -550,31 +579,36 @@ bool var::open(const var& filename, const var& connection)
 		int resultstatus=PQresultStatus(result);
 		if (resultstatus != PGRES_TUPLES_OK)
 		{
-	#		if TRACING >= 1
-				exodus::errputl(L"ERROR: mvdbpostgres open(" ^ this->quote() ^ L") failed\n" ^ var(PQerrorMessage(thread_pgconn)));
-	#		endif
+			this->setlasterror(L"ERROR: mvdbpostgres open(" ^ filename.quote() ^ L") failed\n" ^ var(PQerrorMessage(thread_pgconn)));
 			PQclear(result);
+	#		if TRACING >= 1
+			exodus::errputl(getlasterror());
+	#		endif
 			return false;
 		}
 
 		//file (table) doesnt exist
 		if (PQntuples(result) < 1)
 		{
+			this->setlasterror(L"ERROR: mvdbpostgres open(" ^ filename.quote() ^ L") failed\n" ^ var(PQerrorMessage(thread_pgconn)));
 			PQclear(result);
 			return false;
 		}
 
 		if (PQntuples(result) > 1)
 		{
+			this->setlasterror(L"ERROR: mvdbpostgres open() SELECT returned more than one record");
 			PQclear(result);
 	#		if TRACING >= 1
-				exodus::errputl(L"ERROR: mvdbpostgres open() SELECT returned more than one record");
+				exodus::errputl(getlasterror());
 	#		endif
 			return false;
 		}
 
 		PQclear(result);
-	}
+		this->setlasterror();
+
+	}//of not DOS
 
 	//save the filename and memorise the current connection for this file var
 	var_mvstr=filename.var_mvstr;
@@ -649,24 +683,27 @@ bool var::read(const var& filehandle,const var& key)
 	if (PQresultStatus(result) != PGRES_TUPLES_OK)
  	{
 		PQclear(result);
-		throw MVException(L"read(" ^ filehandle ^ L", " ^ key
+		var errmsg=L"read(" ^ filehandle ^ L", " ^ key.quote()
 			^ L") - probably file not opened or doesnt exist\n"
-			^ var(PQerrorMessage(thread_pgconn)));
-		return false;
+			^ var(PQerrorMessage(thread_pgconn));
+		this->setlasterror(errmsg);
+		throw MVException(errmsg);
+		//return false;
 	}
 
 	if (PQntuples(result) < 1)
 	{
 		PQclear(result);
+		this->setlasterror(L"ERROR: mvdbpostgres read() record does not exist " ^ key.quote());
 		return false;
 	}
 
 	if (PQntuples(result) > 1)
  	{
 		PQclear(result);
-#		if TRACING >= 1
-			exodus::errputl(L"ERROR: mvdbpostgres read() SELECT returned more than one record");
-#		endif
+		var errmsg=L"ERROR: mvdbpostgres read() SELECT returned more than one record";
+		exodus::errputl(errmsg);
+		this->setlasterror(errmsg);
 		return false;
 	}
 
@@ -674,6 +711,8 @@ bool var::read(const var& filehandle,const var& key)
 
 	PQclear(result);
 
+	this->setlasterror();
+	
 	return true;
 
 }
@@ -684,8 +723,9 @@ var var::lock(const var& key) const
 	//they need the same number of unlocks (from the same connection) before other connections
 	//can take the lock
 	//unlock returns true if a lock (your lock) was released and false if you dont have the lock
+	//NB return "" if ALREADY locked on this connection
 	
-	THISIS(L"bool var::lock(const var& key) const")
+	THISIS(L"var var::lock(const var& key) const")
 	THISISDEFINED()
 	ISSTRING(key)
 
@@ -897,6 +937,7 @@ bool var::sqlexec(const var& sqlcmd, var& errmsg) const
 	//but it can execute multiple commands
 	//whereas PQexecParams is the opposite
 	pgresult = PQexec(thread_pgconn, sqlcmd.toString().c_str());
+	
 	if (!pgresult) {
 		errmsg=var(PQerrorMessage(thread_pgconn));
 		return false;
@@ -907,12 +948,12 @@ bool var::sqlexec(const var& sqlcmd, var& errmsg) const
 	{
 		errmsg=var(PQerrorMessage(thread_pgconn));
 		//std::wcerr<<errmsg<<std::endl;
-		PQclear(pgresult);
+		PQclear(pgresult);//essential
 		return false;
 	}
 
 	errmsg=var(PQntuples(pgresult));
-	PQclear(pgresult);
+	PQclear(pgresult);//essential
 	return true;
 
 }
@@ -1252,8 +1293,6 @@ bool var::deleterecord(const var& key) const
 bool var::begintrans() const
 {
 	THISIS(L"bool var::begintrans() const")
-
-	// *this is not used (well it is used in sqlexec to get a specific connection)
 	THISISDEFINED()
 
 	//begin a transaction
@@ -1263,25 +1302,37 @@ bool var::begintrans() const
 bool var::rollbacktrans() const
 {
 	THISIS(L"bool var::rollbacktrans() const")
-
-	// *this is not used
 	THISISDEFINED()
 
 	// Rollback a transaction
-	return sqlexec(L"BEGIN");
+	return sqlexec(L"ROLLBACK");
 }
 
 bool var::committrans() const
 {
 	THISIS(L"bool var::committrans() const")
-
-	// *this is not used
 	THISISDEFINED()
 
 	//end (commit) a transaction
 	return sqlexec(L"END");
 }
 
+bool var::statustrans() const
+{
+	THISIS(L"bool var::statustrans() const")
+	THISISDEFINED()
+	
+	PGconn * thread_pgconn = (PGconn *) connection();
+	if (!thread_pgconn) {
+		this->setlasterror(L"db connection not opened");
+		return false;
+	}
+	this->setlasterror();
+
+	//only idle is considered to be not in a transaction
+	return (PQtransactionStatus(thread_pgconn)!=PQTRANS_IDLE);
+}
+     
 bool var::createdb(const var& dbname) const
 {
 	var errmsg;
@@ -1599,7 +1650,7 @@ var getword(var& remainingwords)
 	var char1=word1[1];
 	if ((char1==DQ||char1==SQ))
 	{
-		while (word1.substr(-1,1)!=char1)
+		while (word1[-1]!=char1)
 		{
 			if (remainingwords.length())
 			{
@@ -1689,7 +1740,7 @@ bool var::select(const var& sortselectclause) const
 
 bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 {
-	//private unchecked
+	//private - and arguments are left unchecked for speed
 
 	//?allow undefined usage like var xyz=xyz.select();
 	if (var_mvtyp&mvtypemask)
@@ -1764,19 +1815,28 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		dictfilename=*this;
 	}
 
+	static const var valuechars(L"\"'.0123456789-+");
+	
 	while (remainingsortselectclause.length())
 	{
 
 		var word1=getword(remainingsortselectclause);
 
 		//initial numbers or strings mean record keys
-		if (word1[1].index(L"\"'0123456789."))
+		if (valuechars.index(word1[1]))
 		{
 			if (keycodes)
 				keycodes ^= FM;
 			keycodes ^= word1;
 			continue;
 		}
+
+		//ignore options (last word and surrounded by brackets)
+		else if (!remainingsortselectclause.length() && (word1[1]==L"(" && word1[-1]==L")") || (word1[1] == L"{" && word1[-1] == L"}")) {
+//		word1.outputl(L"skipping ");
+		}
+
+		//using
 		else if (word1==L"using")
 		{
 			dictfilename=getword(remainingsortselectclause);
@@ -1789,12 +1849,16 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 				return L"";
 			}
 		}
+		
+		//by or by-dsnd
 		else if (word1==L"by" || word1==L"by-dsnd")
 		{
 			if (orderclause)
 				orderclause^=L", ";
+				
 			var dictexpression=getdictexpression(actualfilename,actualfilename,dictfilename,dictfile,getword(remainingsortselectclause),joins,true);
 			orderclause ^= dictexpression;
+			
 			if (word1==L"by-dsnd")
 				orderclause^=L" DESC";
 		}
@@ -1803,6 +1867,9 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 //			   var word2=getword(remainingsortselectclause);
 //			   whereclause ^= word2;
 //		   }
+
+		//with
+		//TODO:without (same as "with xxx not a and b and c")
 		else if (word1==L"with")
 		{
 
@@ -1934,15 +2001,19 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 			whereclause ^= L" " ^ word1;
 		}
 	}//getword loop
+	
+	//prefix specified keys into where clause
 
 	if (keycodes)
 	{
 		if (keycodes.count(FM))
 		{
 			keycodes=L"key IN ( " ^ keycodes.swap(FM,L", ") ^ L" )";
+
 			if (whereclause)
 				whereclause=L" AND ( " ^ whereclause ^ L" ) ";
 			whereclause=keycodes ^ whereclause;
+			
 		}
 	}
 
@@ -1970,13 +2041,17 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	if (GETDBTRACE)
 		exodus::logputl(sql);
 
-	//Start a transaction block because postgres select requires to be inside one
-	if (!begintrans())
+	//Start a transaction block because postgres requires select to cursor to be inside one
+	if (!begintrans()) {
 		return false;
+	}
 
 //	if (!sql.sqlexec())
-	if (! this->sqlexec(sql))
+	if (! this->sqlexec(sql)) {
+		rollbacktrans();
 		return false;
+	}
+//exodus::logputl(L"selectx exiting ok");
 
 	//allow select to be an assignment where filename becomes the cursor name
 	//if actual file is in the sortselectclause

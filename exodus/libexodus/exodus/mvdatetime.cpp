@@ -122,7 +122,7 @@ var var::ostime() const
 {
 	//return decimal seconds since midnight up to micro or nano second accuracy
 
-	boost::posix_time::ptime localtimenow = boost::posix_time::second_clock::local_time();
+	boost::posix_time::ptime localtimenow = boost::posix_time::microsec_clock::local_time();
 	boost::posix_time::time_duration localtimeofdaynow=localtimenow.time_of_day();
 
 //#ifdef BOOST_HAS_FRACTIONAL_SECONDS

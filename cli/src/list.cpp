@@ -340,7 +340,7 @@ USER0="";
 		tdcolor = L"#FFFFC0";
 	if (not thcolor)
 		thcolor = L"#FFFF80";
-
+oswrite(sentencex,"sentencex");
 	if (sentencex.index(L" det-supp", 1))
 		detsupp = 1;
 	if (sentencex.index(L" det-supp2", 1))
@@ -407,9 +407,9 @@ phraseinit:
 
 		//get any specific keys (numbers or quoted words)
 		while (nextword ne L"" and (nextword.isnum() or nextword[1] eq SQ or nextword[1] eq DQ)) {
+			gosub getword();
 			keylist = 1;
 			ss ^= L" " ^ word;
-			gosub getword();
 		}
 
 	} else if (word eq L"getlist") {
@@ -958,6 +958,7 @@ x1exit:
 //initrec:
 //////////
 	var selectedok;
+oswrite(ss,"ss");
 	if (ss.count(L" ") > 2 or keylist) {
 		//call mssg('Selecting records, please wait.||(Press Esc or F10 to interrupt)','UB',buffer,'')
 		//perform ss:' (S)'

@@ -80,7 +80,7 @@ DLL_PUBLIC
 	////var capitalise(const var& str0, const var& mode=L"", const var& wordseps=L"") const;
 
 	void debug() const;
-	void fsmsg() const;
+	bool fsmsg(const var& msg="") const;//always returns false so can be used like return fsmsg();
 	var sysvar(const var& var1,const var& var2,const var& mv3,const var& mv4);
 	void setprivilege(const var& var1);
 	bool openfile(const var& filename, var& file) const;

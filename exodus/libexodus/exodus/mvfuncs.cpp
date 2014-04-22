@@ -2073,7 +2073,8 @@ var var::xlate(const var& filename,const var& fieldno, const wchar_t* mode) cons
 	THISIS(L"var var::xlate(const var& filename,const var& fieldno, const wchar_t* mode) const")
 	THISISSTRING()
 	ISSTRING(filename)
-	ISSTRING(fieldno)
+	//until we support fieldnames ISSTRING(fieldno)
+	ISNUMERIC(fieldno)
 
 	//open the file (skip this for now since sql doesnt need "open"
 	var file;
@@ -2091,21 +2092,36 @@ var var::xlate(const var& filename,const var& fieldno, const wchar_t* mode) cons
 	{
 		//if record doesnt exist then "", or original key if mode is "C"
 
-         //gcc warning: comparison with string literal results in unspecified behaviour
-	 //if (mode==L"C")
 
-	 if (*mode==*L"C")
-			record=*this;
-		else
-			record=L"";
+		//no record and mode C returns the key
+		//gcc warning: comparison with string literal results in unspecified behaviour
+		//if (mode==L"C")
+		if (*mode==*L"C")
+			return *this;
+	
+		//no record and mode X or anything else returns ""
+		return L"";
 	}
-	else
-	{
-		//extract the field or field 0 means return the whole record
-		if (fieldno)
-			record=record.a(fieldno);
+
+	//extract the field or field 0 means return the whole record
+	if (fieldno) {
+
+		//numeric fieldno not zero return field
+		//if (fieldno.isnum())
+			return record.a(fieldno);
+		
+		//non-numeric fieldno do calculate
+		//return calculate(fieldno,filename,mode);
+		
 	}
-	return record;
+	
+	//fieldno "" returns whole record
+	if (!fieldno.length())
+		return L"";
+
+	//field no 0 returns key
+	return *this;
+
 }
 
 } // namespace exodus

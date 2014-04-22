@@ -293,11 +293,18 @@ forcedemail:
 		cmd^=" "^toaddress;
 
 		cmd^=" 2>"^errorfilename;
-//asm("int $3");
+
+		print("SENDMAIL: to:" ^ toaddress);
+		if (ccaddress)
+			print(" cc:" ^ ccaddress);
+		printl(" subject:" ^ subject);
+		//cmd.outputl("cmd=");
+		//body.outputl("body=");
 		var mailresult=cmd.osshellwrite(body);
 		/////////////////////////////////////
 
-//		oswrite(mailresult,"mailresult");
+//	mailresult.outputl("mailresult=");	
+//	oswrite(mailresult,"mailresult");
 
 		//cmd^="-- -F $MAILFROM -f ${MAILFROM}@somedomain.com";
 
@@ -314,7 +321,9 @@ forcedemail:
 		errorfilename.osdelete();
 		errormsg.converter("\r\n", "\xFE\xFE");
 		//errormsg=errormsg 'T#60'
-	}else{
+	} else if (not SLASH_IS_BACKSLASH) {
+		errormsg="OK";
+	} else {
 		errormsg = "Unknown error in sendmail.js Failed to complete";
 		errormsg.r(-1, cmd);
 		//errormsg<-1>=params 'T#60'
@@ -343,7 +352,9 @@ forcedemail:
 			errormsg ^= "********";
 		}
 
+		//parameter SENDMAIL prevents log from calling sendmail recursively
 		call log("SENDMAIL", errormsg);
+
 		return 0;
 	}
 

@@ -1022,6 +1022,7 @@ public:
 	bool begintrans() const;
 	bool rollbacktrans() const;
 	bool committrans() const;
+	bool statustrans() const;
 
 	bool createdb(const var& dbname) const;
 	bool deletedb(const var& dbname) const;
@@ -1061,6 +1062,8 @@ public:
 	bool updaterecord(const var& file,const var& key) const;
 	bool insertrecord(const var& file,const var& key) const;
 
+	var getlasterror() const;
+
 	/* MvEnvironment function now
 	var calculate() const;
 */
@@ -1097,6 +1100,9 @@ private:
 	mutable wchar_t var_mvtyp;
 
 	void createString() const;
+
+	void setlasterror(const var& msg) const;
+	void setlasterror() const;
 
 	bool selectx(const var& fieldnames, const var& sortselectclause) const;
 
@@ -1350,7 +1356,7 @@ public:
 	dim& operator= (const int int1);
 	dim& operator= (const double dbl1);
 
-	//allow default contruction for class variables later resized in class methods
+	//allow default construction for class variables later resized in class methods
 	dim();
 
 	//return the number of fields
