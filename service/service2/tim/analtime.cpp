@@ -7,6 +7,7 @@ libraryinit()
 #include <readcss.h>
 #include <printtx.h>
 #include <tag.h>
+#include <quote2.h>
 
 #include <gen.h>
 #include <agy.h>
@@ -65,6 +66,7 @@ function main() {
 	var ifromdate = PSEUDO.a(30);
 	var itodate = PSEUDO.a(31);
 	var fileformat = PSEUDO.a(1);
+	var reqcompcodes = PSEUDO.a(22);
 	fileformat = "xls";
 
 	/*;
@@ -115,60 +117,64 @@ function main() {
 		head ^= FM ^ "For the period " ^ ifromdate.oconv("[DATE,*4]") ^ " to " ^ itodate.oconv("[DATE,*4]") ^ FM;
 		head ^= "</H3>";
 	}
+
+	if (usercodes) {
+		cmd ^= " AND WITH PERSON_CODE " ^ quote2(usercodes);
+	}
+
+	//this should be filtered per line
+	//develop exodus to explode sort if filter with on mv dictionary unless invent new WITH ANY type of syntax
+	if (reqcompcodes) {
+		cmd ^= " AND WITH COMPANY_CODE " ^ quote2(reqcompcodes);
+		head ^= "<H3>";
+		head ^= FM ^ "Company: " ^ swap(xlate("COMPANIES",reqcompcodes,1,"C")) ^ FM;
+		head ^= "</H3>";
+	}
+	
 	/*;
 		IF BRANDCODES THEN;
 			head:='Brand     : ':BRANDCODES:"'L'";
-			SWAP vm WITH '" "' IN BRANDCODES;
-			CMD:=' AND WITH BRAND_CODE ':QUOTE(BRANDCODES);
+			CMD:=' AND WITH BRAND_CODE ':QUOTE2(BRANDCODES);
 			END;
 
 		IF executivecodes THEN;
 			head:='Executive     : ':executivecodes:"'L'";
-			SWAP vm WITH '" "' IN executivecodes;
-			CMD:=' AND WITH EXECUTIVE_CODE ':QUOTE(executivecodes);
+			CMD:=' AND WITH EXECUTIVE_CODE ':QUOTE2(executivecodes);
 			END;
 
 		if companycodes then;
 			head:='Company    : ':companycodes:"'L'";
-			SWAP vm WITH '" "' IN companycodes;
-			CMD:=' AND WITH COMPANY_CODE ':QUOTE(companycodes);
+			CMD:=' AND WITH COMPANY_CODE ':QUOTE2(companycodes);
 			end;
 
 		if suppliercodes then;
 			head:='Supplier  : ':suppliercodes:"'L'";
-			SWAP vm WITH '" "' IN suppliercodes;
-			CMD:=' AND WITH SUPPLIER_CODE ':QUOTE(suppliercodes);
+			CMD:=' AND WITH SUPPLIER_CODE ':QUOTE2(suppliercodes);
 			end;
 
 		if marketcodes then;
 			head:='Market    : ':marketcodes:"'L'";
-			SWAP vm WITH '" "' IN marketcodes;
-			CMD:=' AND WITH MARKET_CODE ':QUOTE(marketcodes);
+			CMD:=' AND WITH MARKET_CODE ':QUOTE2(marketcodes);
 			end;
 
 		if clientcodes then;
 			head:='Client    : ':CLIENTCODES:"'L'";
 			SWAP vm WITH '" "' IN CLIENTCODES;
-			CMD:=' AND WITH CLIENT_CODE ':QUOTE(CLIENTCODES);
+			CMD:=' AND WITH CLIENT_CODE ':QUOTE2(CLIENTCODES);
 			END;
-
-		cmd:=' AND WITH AUTHORISED';
 
 	*/
 
-	if (usercodes) {
-		usercodes.swapper(VM, "\" \"");
-		cmd ^= " AND WITH PERSON_CODE " ^ (DQ ^ (usercodes ^ DQ));
-	}
-
+	//always explode by job_no in order to check company code and authorisation per job
+	cmd ^= " BY JOB_NO";
+	
+	//timesheet authorised should be mv depending on job company and brand
+	cmd:=' AND WITH AUTHORISED';
+	
 	//remove the first AND
 	temp = cmd.index("AND WITH", 1);
 	if (temp) {
 		cmd.splicer(temp, 4, "");
-	}
-
-	if (not fileformat) {
-		cmd ^= " BY JOB_NO";
 	}
 
 	cmd ^= " (S)";

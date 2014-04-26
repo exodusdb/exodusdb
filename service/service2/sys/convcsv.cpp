@@ -343,31 +343,32 @@ function main() {
 			file.select();
 		}
 	}
-file.getlasterror().outputl("getlasterror=");
+
 	var recn = 0;
 
 	rec.redim(ncols);
 	mvrec.redim(ncols);
 
 /////
-//next:
+//nextrecord:
 /////
 
-	while (true) {
-	
+	//get the next key and mv
+	var mvx;
+	while (file.readnext(ID, mvx)) {
+
+		//user interrupt
 		if (esctoexit()) {
-			break;
+			outfile.osclose();
+			//osdelete outfilename
+			return exit2("Interrupted by User");
 		}
 
-		//get the next key
-		var mvx = 0;
-		if (not file.readnext(ID, mvx)) {
-			break;
-		}
-
+		//skip "" key
 		if (ID == "") {
 			continue;
 		}
+
 		recn += 1;
 
 		//cout << AW.a(30)<< var().cursor(0)<< var().cursor(-4);
@@ -378,176 +379,150 @@ file.getlasterror().outputl("getlasterror=");
 			continue;
 		}
 
-		if (dicthasauthorised) {
-			if (not calculate("AUTHORISED")) {
-				continue;
-			}
+		//skip record if not authorised
+		if (dicthasauthorised and not calculate("AUTHORISED")) {
+			continue;
 		}
-
-		//find the maximum multivalue
-		var maxvn = 1;
 
 		//skip zero hours in timesheets
-		if (filename == "TIMESHEETS") {
-			if (mvx) {
-				if (not RECORD.a(2, mvx)) {
-					continue;
-				}
+		//TODO get this hack into a special dictionary item like LIMIT
+		if (filename == "TIMESHEETS" and mvx and not RECORD.a(2, mvx)) {
+			continue;
+		}
+		
+		//get the data and work out maximum vn
+		mvrec = "";
+		var maxvn=0;
+		for (var coln = 1; coln <= ncols; ++coln) {
+
+			dictid = dictids(coln);
+			if (dictid eq "LINE_NO")
+				continue;
+
+			MV = mvx;
+			var cell = calculate(dictid);
+			if (not cell.length())
+				continue;
+				
+			if (oconvxs(coln)) {
+				cell = cell.oconv(oconvxs(coln));
 			}
+
+			mvrec(coln) = cell;
+
+			var temp = cell.dcount(VM);
+			if (temp > maxvn)
+				maxvn = temp;
+				
 		}
 
-		/*;
-			if normalise then;
-				nfields=count(@record,fm)+1;
-				for fn=1 to nfields;
-					temp=count(@record<fn>,vm)+1;
-					if temp>maxvn then maxvn=temp;
-					next fn;
-				nfields=count(@record,fm)+1;
-				end;
-		*/
-		//maxvn=1
-
-		for (var coln = 1; coln <= ncols; ++coln) {
-			MV = mvx;
-			dictid = dictids(coln);
-			temp = "";
-coln.logputl("coln=");	
-dictid.logputl("dictid=");	
-dictrecs(coln).logputl("dictrecs(coln)=");
-
-			if (dictid ne "LINE_NO" and dictrecs(coln).a(4) ne "S") {
-				temp = (calculate(dictid)).count(VM) + 1;
-			}
-			if (temp > maxvn) {
-				maxvn = temp;
-			}
-		};//coln;
-		//d ebug
-		//get the data
-		rec 	= "";
-		var anydata = 0;
-		for (var coln = 1; coln <= ncols; ++coln) {
-			MV = mvx;
-			dictid = dictids(coln);
-			if (dictid == "LINE_NO") {
-			}else{
-		//if dictid='EXTRAS' then de bug
-				var cell = calculate(dictid);
-		//if len(rec)+len(cell)>65000 then de bug
-				if (cell ne "") {
-					rec(coln) = cell;
-					anydata = 1;
-				}
-			}
-		};//coln;
+		//skip if no data
+		if (not maxvn)
+			continue;
 
 		//normalise the data and output to csv file
-		//if rec<>'' then
-		if (anydata) {
+		
+		//output the lines
+		for (var vn=1; vn <= maxvn; ++vn) {
 
-			//mvrec.parse(rec);
-			mvrec=rec;
-			var vn = 0;
-nextvn:
-			vn += 1;
-
-			if (esctoexit()) {
-				outfile.osclose();
-				//osdelete outfilename
-				return exit2("Interrupted by User");
-			}
-
+			rec="";
+					
 			//conversions
 			for (var coln = 1; coln <= ncols; ++coln) {
 
-				//choose the right mv
+				var cell;
+				
 				if (dictids(coln) == "LINE_NO") {
-					rec(coln) = vn;
-				}else{
-					mvx = colgroups(coln);
-					if (mvx) {
-						rec(coln) = mvrec(coln).a(1, vn);
+					cell = vn;
+
+				//select right multivalue if multivalued field/column
+				//non-multivalued fields/columns are repeated on every line
+				}else if (colgroups(coln)) {
+						cell=mvrec(coln).a(1,vn);
+						
+				//not multivalued so repeat on every line
+				} else {
+						cell = mvrec(coln);
+				}
+								
+				//skip empty cells
+				if (not cell.length())
+					continue;
+
+				//conversions
+				if (mvx or vn == 1) {
+
+					//convert codes to names
+					if (filenames(coln) and not raw) {
+						var rec2;
+						if (rec2.read(files(coln), cell)) {
+							if (filenames(coln) == "BRANDS") {
+								cell = rec2.a(2, 1);
+							}else{
+								cell = rec2.a(1);
+							}
+						}
 					}
+
 				}
 
-				var cell = rec(coln);
+				//remove any initial + sign - on numbers only
+				if (cell[1] == "+") {
+					if ((cell.substr(2,9999)).isnum()) {
+						cell.splicer(1, 1, "");
+					}
+				}
+				
+				//a single double quote gets changed to ''
+				if (cell == DQ) {
+					cell = "\'\'";
+				}
+				
+				//swap double quotes for '' unless already double quoted
+				if (cell[1] ne DQ or cell[-1] ne DQ) {
+					cell.swapper(DQ, "\'\'");
+				}
+				
+				//WARNING prevent cell length more than 255
+				if (cell.length() > 255) {
+					cell = cell.substr(1,250) ^ " ...";
+				}
+				
+				//double quote non-numerics
+				if (fmtxs(coln) ne "R") {
 
-				if (cell ne "") {
-
-					if (mvx or vn == 1) {
-
-						//convert codes to names
-						if (filenames(coln) and not raw) {
-							var rec2;
-							if (rec2.read(files(coln), cell)) {
-								if (filenames(coln) == "BRANDS") {
-									cell = rec2.a(2, 1);
-								}else{
-									cell = rec2.a(1);
-								}
+					//make sure "1-12" is not interpreted as a formula (by prefixing a space?)
+					if (1 or excel) {
+						if (var(".-+0123456789").index(cell[1])) {
+							if (not cell.isnum()) {
+								cell.splicer(1, 0, " ");
 							}
 						}
-
-						//other conversions
-						if (oconvxs(coln)) {
-							cell = cell.oconv(oconvxs(coln));
-						}
-
 					}
 
-					if (cell[1] == "+") {
-						if ((cell.substr(2,9999)).isnum()) {
-							cell.splicer(1, 1, "");
-						}
-					}
-					if (cell == DQ) {
-						cell = "\'\'";
-					}
-					if (cell[1] ne DQ or cell[-1] ne DQ) {
-						cell.swapper(DQ, "\'\'");
-					}
-					if (cell.length() > 255) {
-						cell = cell.substr(1,200) ^ " ...";
-					}
-					if (fmtxs(coln) ne "R") {
-
-						//make sure "1-12" is not interpreted as a formula
-						if (1 or excel) {
-							if (var(".-+0123456789").index(cell[1], 1)) {
-								if (not cell.isnum()) {
-									cell.splicer(1, 0, " ");
-								}
+					//convert any existing double quotes to '' for T columns which are not already double quoted
+					if (cell.index(DQ, 1)) {
+						if (fmtxs(coln) == "T") {
+							if (cell[1] ne DQ or cell[-1] ne DQ) {
+								cell.swapper(DQ, "\'\'");
+								cell = DQ ^ (cell ^ DQ);
 							}
 						}
-
-						if (cell.index(DQ, 1)) {
-							if (fmtxs(coln) == "T") {
-								if (cell[1] ne DQ or cell[-1] ne DQ) {
-									cell.swapper(DQ, "\'\'");
-									cell = DQ ^ (cell ^ DQ);
-								}
-							}
-						}else{
-							cell = DQ ^ (cell ^ DQ);
-						}
-
+					//otherwise just double quote stuff
+					}else{
+						cell = DQ ^ (cell ^ DQ);
 					}
-//gotcell:
-					rec(coln) = cell;
 
 				}
+
+				rec(coln) = cell;
 
 			};//coln;
 
 			var line = rec.unparse();
-
+			
 			//remove trailing or all tab chars
-			while (true) {
-			///BREAK;
-			if (not(line[-1] == FM)) break;;
-				line.splicer(-1, 1, "");
-			}//loop;
+			line.trimmerb(FM);
 
 			//suppress output of empty amv rows
 			if (mvgroupno and nkeys) {
@@ -556,61 +531,47 @@ nextvn:
 				}
 			}
 
-			//skip zero hours in timesheets
-			if (filename == "TIMESHEETS") {
-				if (not(RECORD.a(2, vn))) {
-					line = "";
-				}
-			}
+			//output one line
+			if (not line.length())
+				continue;
 
 			//remove leading equal signs in order not to confuse Excel
 			line.swapper(FM ^ "=", FM);
 
-			//output one line
-			if (line ne "") {
+			//output header row if first line and not suppressed
 
-				//output header row if first line and not suppressed
+			if (headingx) {
 
-				if (headingx) {
+//				if (converter) {
+//					//headingx will come back converted and maybe as multiple lines
+//					//converterparams initially contains first line so heading can put some columns into heading if required
+//					//converterparams comes back with info to speed convertion of lines
+//					converterparams = line;
+//					call onverter("HEAD", headingx, converterparams, filename);
+//				}else{
+					headingx.converter(FM, var().chr(9));
+					headingx ^= "\r\n";
+//				}
 
-	//				if (converter) {
-	//					//headingx will come back converted and maybe as multiple lines
-	//					//converterparams initially contains first line so heading can put some columns into heading if required
-	//					//converterparams comes back with info to speed convertion of lines
-	//					converterparams = line;
-	//					call onverter("HEAD", headingx, converterparams, filename);
-	//				}else{
-						headingx.converter(FM, var().chr(9));
-						headingx ^= "\r\n";
-	//				}
+				osbwrite(headingx, outfile, ptr);
 
-					osbwrite(headingx, outfile, ptr);
-					//ptr += headingx.length();
-
-					headingx = "";
-				}
-
-				//output line
-
-	//			if (converter) {
-	//				call @converter("LINE", line, converterparams, filename);
-	//			}else{
-					line.swapper(FM, var().chr(9));
-					line ^= "\r\n";
-	//			}
-
-				osbwrite(line, outfile, ptr);
-				//ptr += line.length();
-
+				headingx = "";
 			}
 
-			if (vn < maxvn) {
-				goto nextvn;
-			}
+			//output line
 
-		}
+//			if (converter) {
+//				call @converter("LINE", line, converterparams, filename);
+//			}else{
+				line.swapper(FM, var().chr(9));
+				line ^= "\r\n";
+//			}
 
-	}//goto next
+			osbwrite(line, outfile, ptr);
+
+		}//next vn
+
+	}//goto nextrecord
 	
 /////
 //exit:

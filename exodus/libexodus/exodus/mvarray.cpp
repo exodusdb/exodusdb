@@ -134,9 +134,9 @@ var& dim::operator() (int rowno, int colno) const
 {
 
 	//check bounds
-	if (rowno > nrows_)
+	if (rowno > nrows_ || rowno < 0)
 		throw MVArrayIndexOutOfBounds(L"row:" ^ var(rowno) ^ L" > " ^ nrows_);
-	if (colno > ncols_)
+	if (colno > ncols_ || colno < 0)
 		throw MVArrayIndexOutOfBounds(L"col:" ^ var(colno) ^ L" > " ^ ncols_);
 
 	if (rowno ==0 || colno == 0 )
@@ -238,7 +238,8 @@ var dim::unparse() const
 
 	for (int ii=2;ii<=arraysize;++ii)
 	{
-		output.var_mvstr.push_back(FM_);
+		//output.var_mvstr.push_back(FM_);//bug if first field is numeric since string hasnt been constructed yet
+		output^=_FM_;
 		output^=data_[ii];
 	}
 

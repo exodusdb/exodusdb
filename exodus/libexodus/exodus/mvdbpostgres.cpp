@@ -1495,17 +1495,21 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 	var dictrec;
 	if (!dictrec.read(actualdictfile,fieldname))
 	{
-		if (not dictrec.read(L"dict_md", fieldname))
+		if (!dictrec.read(actualdictfile,fieldname.lcase()))
 		{
-			if (fieldname==L"@ID")
-				dictrec = L"F" ^ FM ^ L"0" ^ FM ^ L"Ref" ^ FM ^ FM ^ FM ^ FM ^ FM ^ FM ^ L"L" ^ FM ^ 15;
-			else
+			if (!dictrec.read(actualdictfile,fieldname.ucase()))
 			{
-				throw MVDBException(L"getdictexpression() cannot read " ^ fieldname.quote() ^ L" from " ^ actualdictfile.quote());
-#if TRACING >= 1
-				exodus::errputl(L"ERROR: mvdbpostgres getdictexpression() cannot read " ^ fieldname.quote() ^ L" from " ^ actualdictfile.quote());
-#endif
-				return L"";
+				if (not dictrec.read(L"dict_md", fieldname))
+				{
+					if (fieldname.ucase()==L"@ID")
+						dictrec = L"F" ^ FM ^ L"0" ^ FM ^ L"Ref" ^ FM ^ FM ^ FM ^ FM ^ FM ^ FM ^ L"L" ^ FM ^ 15;
+					else
+					{
+		//				throw MVDBException(L"getdictexpression() cannot read " ^ fieldname.quote() ^ L" from " ^ actualdictfile.quote());
+						exodus::errputl(L"ERROR: mvdbpostgres getdictexpression() cannot read " ^ fieldname.quote() ^ L" from " ^ actualdictfile.quote());
+						return L"";
+					}
+				}
 			}
 		}
 	}
@@ -1520,8 +1524,24 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 			params=fileexpression(mainfilename, filename, L"data") ^ L"," ^ fieldno ^ L", 0, 0)";
 			
 		else
-			params=fileexpression(mainfilename, filename,L"key") ^ L",0,0,0)";
+		{
+			//example of multipart key and date conversion
+			//select date '1967-12-31' + split_part(convert_from(key, 'UTF8'), '*',2)::integer from filename
 
+			sqlexpression=L"convert_from(" ^ fileexpression(mainfilename, filename,L"key") ^ L", 'UTF8')";
+			
+			var keypartn=dictrec.a(5);
+			if (keypartn)
+			{
+				sqlexpression=L"split_part(" ^ sqlexpression ^ L", '*', " ^ keypartn ^ L")";
+			}
+			
+			if (conversion[1]==L"D" || conversion.substr(1,5)==L"[DATE")
+				sqlexpression=L"date '1967-12-31' + " ^ sqlexpression ^ L"::integer";
+				
+			return sqlexpression;
+		}
+		
 		if (conversion.substr(1,9)==L"[DATETIME")
 			sqlexpression=L"exodus_extract_datetime(" ^ params;
 
@@ -1634,7 +1654,7 @@ exodus_call:
 	return sqlexpression;
 }
 
-var getword(var& remainingwords)
+var getword(var& remainingwords, const var& joinvalues=false)
 {
 
 	//gets the next word (or series of words separated by FM while they are numbers or quoted strings)
@@ -1668,7 +1688,7 @@ var getword(var& remainingwords)
 	tosqlstring(word1);
 
 	//grab multiple values (numbers or strings) separated by FM
-	if (valuechars.index(word1[1]))
+	if (joinvalues && valuechars.index(word1[1]))
 	{
 		word1 = SQ ^ word1.unquote() ^ SQ;
 
@@ -1766,6 +1786,10 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	//TODO only do this if cursor already exists
 	//clearselect();
 
+	//DEBUG_LOG_SQL
+	if (GETDBTRACE)
+		exodus::logputl(sortselectclause);
+
 	var actualfilename=L"";
 	var dictfilename=L"";
 	var actualfieldnames=fieldnames;
@@ -1783,26 +1807,25 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	var remainingsortselectclause=sortselectclause;
 
 	//sortselectclause may start with {SELECT|SSELECT {maxnrecs} filename}
-	var word=remainingsortselectclause.field(L" ",1);
-	var word2=word.ucase();
+	var word1=getword(remainingsortselectclause);
+	var word2=word1.ucase();
 	if (word2==L"SELECT"||word2==L"SSELECT")
 	{
+
 		if (word2==L"SSELECT")
 			bykey=1;
 
 		//discard it and get the second word which is either max number of records or filename
-		getword(remainingsortselectclause);
-		word=getword(remainingsortselectclause);
+		actualfilename=getword(remainingsortselectclause);
 
 		//the second word can be a limiting number of records
-		if (word.isnum())
+		if (actualfilename.length() and actualfilename.isnum())
 		{
-			maxnrecs=word;
-			word=getword(remainingsortselectclause);
+			maxnrecs=actualfilename;
+			actualfilename=getword(remainingsortselectclause);
 		}
 
-		actualfilename=word;
-		dictfilename=word;
+		dictfilename=actualfilename;
 
 	}
 
@@ -1816,13 +1839,22 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	}
 
 	static const var valuechars(L"\"'.0123456789-+");
-	
+  	
 	while (remainingsortselectclause.length())
 	{
 
-		var word1=getword(remainingsortselectclause);
+		word1=getword(remainingsortselectclause);
+		word2=word1.ucase();
 
-		//initial numbers or strings mean record keys
+		//options - last word enclosed in () or {}
+		//ignore options (last word and surrounded by brackets)
+		if (!remainingsortselectclause.length() && (word1[1]==L"(" && word1[-1]==L")") || (word1[1] == L"{" && word1[-1] == L"}"))
+		{
+//		word1.outputl(L"skipping last word in () options ");
+			continue;
+		}
+
+		//numbers or strings without leading clauses like with ... mean record keys
 		if (valuechars.index(word1[1]))
 		{
 			if (keycodes)
@@ -1831,27 +1863,21 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 			continue;
 		}
 
-		//ignore options (last word and surrounded by brackets)
-		else if (!remainingsortselectclause.length() && (word1[1]==L"(" && word1[-1]==L")") || (word1[1] == L"{" && word1[-1] == L"}")) {
-//		word1.outputl(L"skipping ");
-		}
-
-		//using
-		else if (word1==L"using")
+		//using filename
+		if (word2==L"USING" && remainingsortselectclause)
 		{
 			dictfilename=getword(remainingsortselectclause);
 			if (!dictfile.open(L"dict_"^dictfilename))
 			{
 				//throw MVDBException(L"select() dict_" ^ dictfilename ^ L" file cannot be opened");
-#if TRACING >= 1
 				exodus::errputl(L"ERROR: mvdbpostgres select() dict_" ^ dictfilename ^ L" file cannot be opened");
-#endif
 				return L"";
 			}
+			continue;
 		}
 		
 		//by or by-dsnd
-		else if (word1==L"by" || word1==L"by-dsnd")
+		if (word2==L"BY" || word1==L"BY-DSND")
 		{
 			if (orderclause)
 				orderclause^=L", ";
@@ -1859,78 +1885,110 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 			var dictexpression=getdictexpression(actualfilename,actualfilename,dictfilename,dictfile,getword(remainingsortselectclause),joins,true);
 			orderclause ^= dictexpression;
 			
-			if (word1==L"by-dsnd")
+			if (word2==L"BY-DESC")
 				orderclause^=L" DESC";
+				
+			continue;
 		}
-//		   else if (word1==L"between")
-//		   {
-//			   var word2=getword(remainingsortselectclause);
-//			   whereclause ^= word2;
-//		   }
 
-		//with
+		//subexpressions (,),and,or
+		if (var(L"( ) AND OR").locateusing(word2,L" "))
+		{
+			whereclause ^= L" " ^ word2;
+			continue;
+		}
+
+		//with dictid eq/starting/ending/containing/like 1 2 3
+		//with dictid 1 2 3
+		//with dictid between x and y
 		//TODO:without (same as "with xxx not a and b and c")
-		else if (word1==L"with")
+		if (word2==L"WITH")
 		{
 
 			//add the dictionary id
-			var word2=getword(remainingsortselectclause);
-			var dictexpression=getdictexpression(actualfilename,actualfilename,dictfilename,dictfile,word2,joins,true);
+			word1=getword(remainingsortselectclause);
+			var dictexpression=getdictexpression(actualfilename,actualfilename,dictfilename,dictfile,word1,joins,true);
 			var usingnaturalorder=dictexpression.index(L"exodus_extract_sort");
 			whereclause ^= L" " ^ dictexpression;
 
-			//handle STARTING, ENDING and CONTAINING
-			word2=getword(remainingsortselectclause);
-			var startingpercent=L"";
-			var endingpercent=L"";
-			if (word2==L"containing")
-			{
-				word2=L"like";
-				startingpercent=L"%";
-				endingpercent=L"%";
-			}
-			else if (word2==L"starting")
-			{
-				word2=L"like";
-				endingpercent=L"%";
-			}
-			else if (word2==L"ending")
-			{
-				word2=L"like";
-				startingpercent=L"%";
-			}
-			if (word2==L"like")
-			{
+			//get the word/values after the dictid
+			word1=getword(remainingsortselectclause, true);
+			word2=word1.ucase();
 
-				var word2=getword(remainingsortselectclause);
-				if (endingpercent)
+			if (word2==L"BETWEEN")
+			{
+				//get and append "from" value
+				word2=getword(remainingsortselectclause);
+				if (usingnaturalorder)
+					word2=naturalorder(word2.toString());
+				whereclause ^= L" BETWEEN " ^ word2;
+
+				//get, check, discard "and"
+				word2=getword(remainingsortselectclause).ucase();
+				if (word2 != L"AND")
 				{
-					word2.swapper(L"'" ^ FM, L"%'" ^ FM);
-					word2.splicer(-1,0,L"%");
-				}
-				if (startingpercent)
-				{
-					word2.swapper(FM ^ L"'", FM ^ L"'%");
-					word2.splicer(2,0,L"%");
+					exodus::errputl(L"ERROR: mvdbpostgres SELECT STATEMENT SYNTAX IS 'between x *and* y'");
+					return L"";
 				}
 
-				whereclause ^= L" LIKE " ^ word2;
+				//get and append "to" value
+				word2=getword(remainingsortselectclause);
+
+				whereclause ^= L" AND " ^ word2;
 
 				continue;
 			}
 
-			//convert neosys relational operators to standard relational operators
-			var aliasno;
-			if (var(L"eq,ne,not,gt,lt,ge,le").locateusing(word2,L",",aliasno))
+			//starting, ending, containing, like
+			var startingpercent=L"";
+			var endingpercent=L"";
+			if (word2==L"CONTAINING")
 			{
-				word2=var(L"=,<>,<>,>,<,>=,<=").field(L",",aliasno);
+				word2=L"LIKE";
+				startingpercent=L"%";
+				endingpercent=L"%";
+			}
+			else if (word2==L"STARTING")
+			{
+				word2=L"LIKE";
+				endingpercent=L"%";
+			}
+			else if (word2==L"ENDING")
+			{
+				word2=L"LIKE";
+				startingpercent=L"%";
+			}
+			if (word2==L"LIKE")
+			{
+
+				word1=getword(remainingsortselectclause);
+				if (endingpercent)
+				{
+					word1.swapper(L"'" ^ FM, L"%'" ^ FM);
+					word1.splicer(-1,0,L"%");
+				}
+				if (startingpercent)
+				{
+					word1.swapper(FM ^ L"'", FM ^ L"'%");
+					word1.splicer(2,0,L"%");
+				}
+
+				whereclause ^= L" LIKE " ^ word1;
+
+				continue;
 			}
 
-			//output relational operators and get the value
-			if (var(L"=,<>,>,<,>=,<=").locateusing(word2,L",",aliasno))
+			//comparison operators
+			//convert neosys relational operators to standard relational operators
+			var aliasno;
+			if (var(L"EQ NE NOT GT LT GE LE").locateusing(word2,L" ",aliasno))
+			{
+				word2=var(L"= <> <> > < >= <=").field(L" ",aliasno);
+			}
+			if (var(L"= <> > < >= <=").locateusing(word2,L" ",aliasno))
 			{
 				whereclause ^= L" " ^ word2 ^ L" ";
-				word2=getword(remainingsortselectclause);
+				word2=getword(remainingsortselectclause, true);
 			}
 			else
 			{
@@ -1939,67 +1997,13 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 					whereclause ^= L" = ";
 			}
 
-			if (word2==L"between")
-			{
-				//get and append "from" value
-				word2=getword(remainingsortselectclause);
-				if (usingnaturalorder)
-					word2=naturalorder(word2.toString());
-				whereclause ^= L" BETWEEN " ^ word2;
-
-				//get, check, discard AND
-				word2=getword(remainingsortselectclause);
-				if (word2 != L"and")
-				{
-					//throw MVDBException(L"SELECT STATEMENT SYNTAX IS 'between x *and* y'");
-#if TRACING
-					exodus::errputl(L"ERROR: mvdbpostgres SELECT STATEMENT SYNTAX IS 'between x *and* y'");
-#endif
-
-					return L"";
-				}
-
-				whereclause ^= L" AND ";
-
-				//get "to" value
-				word2=getword(remainingsortselectclause);
-
-			}
-
-			//TODO how to get sql to understand '' and 0 as nothing without resorting to numerics
-			//WITH X becomes WITH X <> ''
-			if (!word2.length() && !var(L".0123456789'\"").index(word2[1]))
-			{
-				//put the current word back on the pending
-				if (word.length())
-					remainingsortselectclause.splicer(1,0,word2 ^ L" ");
-				word2=L" <> ''";
-			}
-
-			//convert to IN clause if multiple values
-			else if (word2.index(FM))
-			{
-
-				//prevent  " = IN ( ... )"
-				if (whereclause.substr(-3,3)==L" = ")
-					whereclause.splicer(-3,3,L"");
-
-				word2=L" IN ( " ^ word2.swap(FM, L", ") ^ L" ) ";
-			}
-
 			//append value(s)
 			if (usingnaturalorder)
 				word2=naturalorder(word2.toString());
 			whereclause ^= word2;
 
 		}
-		else
-		{
-			//todo exclude any ordinary fields included in select?
-
-			//and or ( ) and anything else is copied to the where clause
-			whereclause ^= L" " ^ word1;
-		}
+		
 	}//getword loop
 	
 	//prefix specified keys into where clause
@@ -2012,8 +2016,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 
 			if (whereclause)
 				whereclause=L" AND ( " ^ whereclause ^ L" ) ";
-			whereclause=keycodes ^ whereclause;
-			
+			else
+				whereclause=keycodes;
 		}
 	}
 
