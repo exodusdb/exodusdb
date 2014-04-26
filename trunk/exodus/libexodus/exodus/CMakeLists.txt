@@ -1,14 +1,24 @@
+cmake_minimum_required(VERSION 2.8)
+
 add_definitions(-DEXODUS_IPC_BOOST)
 add_definitions(-DEXODUS_IPC_POSIX)
 add_definitions(-DEXODUS_IPC_WINPIPES)
 
 #cmakedefine HAVE_BACKTRACE 1
 
+# set(PostgreSQL_ADDITIONAL_VERSIONS "")
+#for development version
+set(PostgreSQL_INCLUDE_DIR "/usr/local/pgsql/include/")
+set(PostgreSQL_LIBRARY_DIR "/usr/local/pgsql/lib/")
+
+set(PostgreSQL_DEBUG 1)
 find_package(PostgreSQL REQUIRED)
 find_package(Boost REQUIRED COMPONENTS filesystem date_time system regex thread)
-#find_package(PostgreSQL REQUIRED COMPONENTS pqlib)
+find_package(PostgreSQL REQUIRED COMPONENTS pqlib)
 find_package(ICU 4.4 REQUIRED)
 
+#include_directories(. .. ${PostgreSQL_INCLUDE_DIRS} /usr/local/pgsql/include/)
+#nano `locate FindPostgreSQL`
 include_directories(. .. ${PostgreSQL_INCLUDE_DIRS})
 
 set(Boost_USE_STATIC_LIBS        ON)

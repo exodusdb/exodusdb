@@ -872,6 +872,10 @@ dict(AGE_IN_YEARS) {
 	assert(matparse("xx"^FM^"bb",a9) eq 2);
 	assert(matunparse(a9) eq ("xx" ^FM^ "bb"));
 
+	dim dx(3);
+	dx=1;
+	assert(dx.unparse().outputl()==(1^FM^1^FM^1));
+
 	var r[2];
 	assert(unassigned(r[0]));
 

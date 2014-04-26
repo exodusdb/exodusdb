@@ -2078,7 +2078,6 @@ var var::xlate(const var& filename,const var& fieldno, const wchar_t* mode) cons
 
 	//open the file (skip this for now since sql doesnt need "open"
 	var file;
-	var record;
 	//if (!file.open(filename))
 	//{
 	//	_STATUS=filename^L" does not exist";
@@ -2087,41 +2086,62 @@ var var::xlate(const var& filename,const var& fieldno, const wchar_t* mode) cons
 	//}
 	file=filename;
 
-	//read the record
-	if (!record.read(file,var_mvstr))
-	{
-		//if record doesnt exist then "", or original key if mode is "C"
+	var sep;
+	if (fieldno.length())
+		sep=_VM_;
+	else
+		sep=_RM_;
 
+	var response=L"";
+	var nmv=(*this).dcount(_VM_);
+	for (var vn=1;vn<=nmv;++vn) {
 
-		//no record and mode C returns the key
-		//gcc warning: comparison with string literal results in unspecified behaviour
-		//if (mode==L"C")
-		if (*mode==*L"C")
-			return *this;
+		if (vn>1)
+			response^=sep;
+			
+		//read the record
+		var key=(*this).a(1,vn);
+		var record;
+		if (!record.read(file,key))
+		{
+			//if record doesnt exist then "", or original key if mode is "C"
+
+			//no record and mode C returns the key
+			//gcc warning: comparison with string literal results in unspecified behaviour
+			//if (mode==L"C")
+			if (*mode==*L"C")
+				response^=*this;
 	
-		//no record and mode X or anything else returns ""
-		return L"";
-	}
+			//no record and mode X or anything else returns ""
+			continue;
+		}
 
-	//extract the field or field 0 means return the whole record
-	if (fieldno) {
+		//extract the field or field 0 means return the whole record
+		if (fieldno) {
 
-		//numeric fieldno not zero return field
-		//if (fieldno.isnum())
-			return record.a(fieldno);
+			//numeric fieldno not zero return field
+			//if (fieldno.isnum())
+				response ^= record.a(fieldno);
 		
-		//non-numeric fieldno do calculate
-		//return calculate(fieldno,filename,mode);
+			//non-numeric fieldno do calculate
+			//return calculate(fieldno,filename,mode);
+			continue;
+			
+		}
+	
+		//fieldno "" returns whole record
+		if (!fieldno.length()) {
+			response^=record;
+			continue;
+		}
+
+		//field no 0 returns key
+		response^=key;
 		
 	}
 	
-	//fieldno "" returns whole record
-	if (!fieldno.length())
-		return L"";
-
-	//field no 0 returns key
-	return *this;
-
+	return response;
+	
 }
 
 } // namespace exodus
