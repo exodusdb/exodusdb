@@ -12,12 +12,18 @@ execute_process(
 )
 message(PostgreSQL_PKGLIBDIR=${PostgreSQL_PKGLIBDIR})
 
+IF(NOT ${PostgreSQL_PKGLIBDIR} MATCHES ".*")
+message(FATAL_ERROR "cannot find PostgreSQL pg_config program. Set PATH and try again.")
+#message(FATAL_ERROR "nb sudo on ubuntu ignores PATH environment variable")
+endif()
+
 execute_process(
 	COMMAND 		pg_config --includedir-server
 	OUTPUT_VARIABLE		PostgreSQL_INCLUDEDIR_SERVER
 	OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 message(PostgreSQL_INCLUDEDIR_SERVER=${PostgreSQL_INCLUDEDIR_SERVER})
+
 
 include_directories(
 	.
@@ -29,6 +35,7 @@ include_directories(
 
 # BUILD libpgexodus
 
+#postgresql shared object library c functions are not prefixed with "lib"
 set (CMAKE_SHARED_LIBRARY_PREFIX "")
 
 add_library(pgexodus SHARED
