@@ -63,6 +63,9 @@ extern "C"
 #include "fmgr.h"
 /*#include "utils/geo_decls.h"*/
 #include <utils/timestamp.h>
+#ifndef int4
+#define int4 int32
+#endif
 int4 pg_atoi(char*,int4,int4);
 
 /*backward compatible to pre 8.3 with no SET_VARSIZE*/
