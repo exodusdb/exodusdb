@@ -9,9 +9,8 @@ add_definitions(-DEXODUS_IPC_BOOST)
 add_definitions(-DEXODUS_IPC_POSIX)
 add_definitions(-DEXODUS_IPC_WINPIPES)
 
-
 ### POSTGRES ###
-
+################
 #set(PostgreSQL_DEBUG 1)
 #find_package(PostgreSQL REQUIRED)
 #find_package(PostgreSQL REQUIRED COMPONENTS pqlib)
@@ -30,13 +29,21 @@ execute_process(
 )
 message(PostgreSQL_INCLUDE_DIR=${PostgreSQL_INCLUDE_DIR})
 
+#execute_process(
+#        COMMAND                 pg_config --libs
+#        OUTPUT_VARIABLE         PostgreSQL_LIBRARIES
+#        OUTPUT_STRIP_TRAILING_WHITESPACE
+#)
+#message(PostgreSQL_LIBRARIES=${PostgreSQL_LIBRARIES})
+
 
 ### BOOST ###
-
+#############
 find_package(Boost REQUIRED COMPONENTS filesystem date_time system regex thread)
 
-### ICU ###
 
+### ICU ###
+###########
 find_package(ICU 4.4 REQUIRED)
 
 include_directories(. .. ${PostgreSQL_INCLUDE_DIRS} ${PostgreSQL_INCLUDE_DIR})
@@ -75,7 +82,7 @@ add_library(exodus SHARED
 set_target_properties(exodus PROPERTIES SOVERSION "14.01")
 
 #dl is needed for dynamic link library code
-target_link_libraries(exodus ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} ${ICU_LIBRARIES} dl)
+target_link_libraries(exodus ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} ${PostgreSQL_LIBRARY_DIR} pq ${ICU_LIBRARIES} dl)
 
 install(TARGETS exodus DESTINATION lib)
 
