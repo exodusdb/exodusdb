@@ -1,25 +1,45 @@
 cmake_minimum_required(VERSION 2.8)
 
+#set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake/)
+#set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "cmake/")
+message(CMAKE_MODULE_PATH=${CMAKE_MODULE_PATH})
+
 add_definitions(-DEXODUS_IPC_BOOST)
 add_definitions(-DEXODUS_IPC_POSIX)
 add_definitions(-DEXODUS_IPC_WINPIPES)
 
-#cmakedefine HAVE_BACKTRACE 1
 
-# set(PostgreSQL_ADDITIONAL_VERSIONS "")
-#for development version
-set(PostgreSQL_INCLUDE_DIR "/usr/local/pgsql/include/")
-set(PostgreSQL_LIBRARY_DIR "/usr/local/pgsql/lib/")
+### POSTGRES ###
 
-set(PostgreSQL_DEBUG 1)
-find_package(PostgreSQL REQUIRED)
+#set(PostgreSQL_DEBUG 1)
+#find_package(PostgreSQL REQUIRED)
+#find_package(PostgreSQL REQUIRED COMPONENTS pqlib)
+
+execute_process(
+        COMMAND                 pg_config --libdir
+        OUTPUT_VARIABLE         PostgreSQL_LIBRARY_DIR
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+message(PostgreSQL_LIBRARY_DIR=${PostgreSQL_LIBRARY_DIR})
+
+execute_process(
+        COMMAND                 pg_config --includedir
+        OUTPUT_VARIABLE         PostgreSQL_INCLUDE_DIR
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+message(PostgreSQL_INCLUDE_DIR=${PostgreSQL_INCLUDE_DIR})
+
+
+### BOOST ###
+
 find_package(Boost REQUIRED COMPONENTS filesystem date_time system regex thread)
-find_package(PostgreSQL REQUIRED COMPONENTS pqlib)
+
+### ICU ###
+
 find_package(ICU 4.4 REQUIRED)
 
-#include_directories(. .. ${PostgreSQL_INCLUDE_DIRS} /usr/local/pgsql/include/)
-#nano `locate FindPostgreSQL`
-include_directories(. .. ${PostgreSQL_INCLUDE_DIRS})
+include_directories(. .. ${PostgreSQL_INCLUDE_DIRS} ${PostgreSQL_INCLUDE_DIR})
 
 set(Boost_USE_STATIC_LIBS        ON)
 set(Boost_USE_MULTITHREADED      ON)

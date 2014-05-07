@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.8)
 
 # CONFIGURE PostgreSQL
 
-find_package(PostgreSQL REQUIRED)
+#find_package(PostgreSQL REQUIRED)
 
 execute_process(
 	COMMAND 		pg_config --pkglibdir
