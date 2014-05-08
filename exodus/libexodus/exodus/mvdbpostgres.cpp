@@ -1520,9 +1520,20 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 		var conversion=dictrec.a(7);
 		var fieldno=dictrec.a(2);
 		var params;
+		var ismv=dictrec.a(4)[1] eq L"M";
 		if (fieldno)
-			params=fileexpression(mainfilename, filename, L"data") ^ L"," ^ fieldno ^ L", 0, 0)";
-			
+			if (ismv)
+			{
+				var sqlexpression=L"mv_field_" ^ fieldno;
+				var phrase=L"unnest(regexp_split_to_array(split_part(convert_from(data,'UTF8'),'" ^ VM ^ L"'," ^ fieldno ^ L"),'˽')"
+					L" with ordinality as ( " ^ sqlexpression ^ L")";
+				joins ^= VM ^ L", " ^ phrase;
+				return sqlexpression;
+			}
+			else
+			{
+				params=fileexpression(mainfilename, filename, L"data") ^ L"," ^ fieldno ^ L", 0, 0)";
+			}
 		else
 		{
 			//example of multipart key and date conversion

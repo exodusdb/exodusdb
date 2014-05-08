@@ -3,13 +3,16 @@ cmake_minimum_required(VERSION 2.8)
 
 # CONFIGURE PostgreSQL
 
-#find_package(PostgreSQL REQUIRED)
+find_package(PostgreSQL REQUIRED)
 
 execute_process(
 	COMMAND 		pg_config --pkglibdir
 	OUTPUT_VARIABLE		PostgreSQL_PKGLIBDIR
 	OUTPUT_STRIP_TRAILING_WHITESPACE
 )
+message(PostgreSQL_PKGLIBDIR=${PostgreSQL_PKGLIBDIR})
+#pg_config does seem to find the right folder so add it!
+set(PostgreSQL_PKGLIBDIR ${PostgreSQL_PKGLIBDIR}/postgresql/)
 message(PostgreSQL_PKGLIBDIR=${PostgreSQL_PKGLIBDIR})
 
 IF(NOT ${PostgreSQL_PKGLIBDIR} MATCHES ".*")

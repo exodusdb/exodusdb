@@ -11,34 +11,12 @@ add_definitions(-DEXODUS_IPC_WINPIPES)
 
 ### POSTGRES ###
 ################
-#set(PostgreSQL_DEBUG 1)
-#find_package(PostgreSQL REQUIRED)
-#find_package(PostgreSQL REQUIRED COMPONENTS pqlib)
-
-# set(PostgreSQL_ADDITIONAL_VERSIONS "")
-#for development version
-#set(PostgreSQL_INCLUDE_DIR "/usr/local/pgsql/include/")
-#set(PostgreSQL_LIBRARY_DIR "/usr/local/pgsql/lib/")
-
-execute_process(
-        COMMAND                 pg_config --includedir
-        OUTPUT_VARIABLE         PostgreSQL_INCLUDE_DIR
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-message(PostgreSQL_INCLUDE_DIR=${PostgreSQL_INCLUDE_DIR})
-
-#execute_process(
-#        COMMAND                 pg_config --libs
-#        OUTPUT_VARIABLE         PostgreSQL_LIBRARIES
-#        OUTPUT_STRIP_TRAILING_WHITESPACE
-#)
-#message(PostgreSQL_LIBRARIES=${PostgreSQL_LIBRARIES})
-
+find_package(PostgreSQL REQUIRED)
+find_package(PostgreSQL REQUIRED COMPONENTS pqlib)
 
 ### BOOST ###
 #############
 find_package(Boost REQUIRED COMPONENTS filesystem date_time system regex thread)
-
 
 ### ICU ###
 ###########

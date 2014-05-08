@@ -12,7 +12,7 @@ function main()
 
 	//CREATE LABELLED COMMON
 	mv.labelledcommon[1]=new win_common;
-	mv.PSEUDO="";
+	PSEUDO="";
 	SYSTEM="";
 	//initialise or abort
 	if (not perform("initgeneral")){

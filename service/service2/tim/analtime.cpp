@@ -127,7 +127,7 @@ function main() {
 	if (reqcompcodes) {
 		cmd ^= " AND WITH COMPANY_CODE " ^ quote2(reqcompcodes);
 		head ^= "<H3>";
-		head ^= FM ^ "Company: " ^ swap(xlate("COMPANIES",reqcompcodes,1,"C")) ^ FM;
+		head ^= FM ^ "Company: " ^ quote(xlate("COMPANIES",reqcompcodes,1,"C")) ^ FM;
 		head ^= "</H3>";
 	}
 	
@@ -169,7 +169,7 @@ function main() {
 	cmd ^= " BY JOB_NO";
 	
 	//timesheet authorised should be mv depending on job company and brand
-	cmd:=' AND WITH AUTHORISED';
+	cmd^=" AND WITH AUTHORISED";
 	
 	//remove the first AND
 	temp = cmd.index("AND WITH", 1);
