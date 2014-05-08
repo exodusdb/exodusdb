@@ -7,9 +7,17 @@ INCLUDE(CPack)
 #allow exodus executable and exodus library
 #cmake_policy(SET CMP0002 OLD)
 
-message("export PostgreSQL_ROOT=/usr/local/pgsql/")
-message("export PATH=$PATH:/usr/local/pgsql/bin/")
-message("export LIBRARY_PATH=/usr/local/pgsql/lib/")
+#if using custom postgres then configure and build it to /usr/local
+#./configure --prefix=/usr/local --eprefix=/usr/local
+#otherwise it builds to rather none-standard /usr/local/pgsql
+#and exodus make cannot find it easily
+
+#ld -lpq --verbose to debug library paths ... also check /etc/ld.so.conf.d
+
+#for VERY non-standard postgres installation path use
+#message("export PostgreSQL_ROOT=/usr/local/pgsql/")
+#message("export PATH=$PATH:/usr/local/pgsql/bin/")
+#message("export LIBRARY_PATH=/usr/local/pgsql/lib/")
 
 project(exodus)
 
@@ -27,9 +35,9 @@ execute_process(
 )
 message(PostgreSQL_INCLUDEDIR_SERVER=${PostgreSQL_INCLUDEDIR_SERVER})
 
-add_subdirectory( cli/src)
 add_subdirectory( exodus/libexodus/exodus)
 add_subdirectory( exodus/libpgexodus/src)
+add_subdirectory( cli/src)
 
 # uninstall target
 configure_file(
