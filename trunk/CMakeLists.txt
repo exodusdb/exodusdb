@@ -7,6 +7,10 @@ INCLUDE(CPack)
 #allow exodus executable and exodus library
 #cmake_policy(SET CMP0002 OLD)
 
+message("export PostgreSQL_ROOT=/usr/local/pgsql/")
+message("export PATH=$PATH:/usr/local/pgsql/bin/")
+message("export LIBRARY_PATH=/usr/local/pgsql/lib/")
+
 project(exodus)
 
 execute_process(

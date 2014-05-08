@@ -15,12 +15,10 @@ add_definitions(-DEXODUS_IPC_WINPIPES)
 #find_package(PostgreSQL REQUIRED)
 #find_package(PostgreSQL REQUIRED COMPONENTS pqlib)
 
-execute_process(
-        COMMAND                 pg_config --libdir
-        OUTPUT_VARIABLE         PostgreSQL_LIBRARY_DIR
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-message(PostgreSQL_LIBRARY_DIR=${PostgreSQL_LIBRARY_DIR})
+# set(PostgreSQL_ADDITIONAL_VERSIONS "")
+#for development version
+#set(PostgreSQL_INCLUDE_DIR "/usr/local/pgsql/include/")
+#set(PostgreSQL_LIBRARY_DIR "/usr/local/pgsql/lib/")
 
 execute_process(
         COMMAND                 pg_config --includedir
