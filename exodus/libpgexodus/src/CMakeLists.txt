@@ -11,9 +11,11 @@ execute_process(
 	OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 message(PostgreSQL_PKGLIBDIR=${PostgreSQL_PKGLIBDIR})
+
 #pg_config does seem to find the right folder so add it!
-set(PostgreSQL_PKGLIBDIR ${PostgreSQL_PKGLIBDIR}/postgresql/)
-message(PostgreSQL_PKGLIBDIR=${PostgreSQL_PKGLIBDIR})
+#ONLY FOR LOCALLY INSTALLED postgres 9.4 on ubuntu 14.04
+#set(PostgreSQL_PKGLIBDIR ${PostgreSQL_PKGLIBDIR}/postgresql/)
+#message(PostgreSQL_PKGLIBDIR=${PostgreSQL_PKGLIBDIR})
 
 IF(NOT ${PostgreSQL_PKGLIBDIR} MATCHES ".*")
 message(FATAL_ERROR "cannot find PostgreSQL pg_config program. Set PATH and try again.")
@@ -56,6 +58,9 @@ add_library(pgexodus SHARED
 #place pgexodus.so in server package lib directory (not ordinary lib)
 install(TARGETS pgexodus
 DESTINATION ${PostgreSQL_PKGLIBDIR})
+#also install in another location in case of dev install and pg_config pkglibdir is wrong
+install(TARGETS pgexodus
+DESTINATION ${PostgreSQL_PKGLIBDIR}/postgresql)
 
 #script to add exodus functions into all new databases and exodus database
 install(PROGRAMS installexodus-postgresql installexodus-postgresql2

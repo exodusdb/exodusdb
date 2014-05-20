@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.8)
 #set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake/)
 #set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "cmake/")
-message(CMAKE_MODULE_PATH=${CMAKE_MODULE_PATH})
+#message(CMAKE_MODULE_PATH=${CMAKE_MODULE_PATH})
 
 add_definitions(-DEXODUS_IPC_BOOST)
 add_definitions(-DEXODUS_IPC_POSIX)
@@ -11,8 +11,15 @@ add_definitions(-DEXODUS_IPC_WINPIPES)
 
 ### POSTGRES ###
 ################
-find_package(PostgreSQL REQUIRED)
-find_package(PostgreSQL REQUIRED COMPONENTS pqlib)
+##set(PostgreSQL_ADDITIONAL_VERSIONS "9.3" "9.3.4")
+##find_package(PostgreSQL REQUIRED)
+##find_package(PostgreSQL REQUIRED COMPONENTS pqlib)
+execute_process(
+        COMMAND                 pg_config --includedir
+        OUTPUT_VARIABLE         PostgreSQL_INCLUDE_DIR
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+message(PostgreSQL_INCLUDEDIR=${PostgreSQL_INCLUDEDIR})
 
 ### BOOST ###
 #############
@@ -23,6 +30,7 @@ find_package(Boost REQUIRED COMPONENTS filesystem date_time system regex thread)
 find_package(ICU 4.4 REQUIRED)
 
 include_directories(. .. ${PostgreSQL_INCLUDE_DIRS} ${PostgreSQL_INCLUDE_DIR})
+message(---------------PostgreSQL_INCLUDE_DIR=${PostgreSQL_INCLUDE_DIR})
 
 set(Boost_USE_STATIC_LIBS        ON)
 set(Boost_USE_MULTITHREADED      ON)

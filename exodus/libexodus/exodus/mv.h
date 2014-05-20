@@ -1048,6 +1048,7 @@ public:
 
 	bool selectrecord(const var& sortselectclause DEFAULTNULL) const;
 	bool readnextrecord(var& record, var& key) const;
+	bool readnextrecord(var& record, var& key, var& valueno) const;
 
 	//1=ok, 0=failed, ""=already locked
 	var lock(const var& key) const;
@@ -1119,7 +1120,7 @@ private:
 
 	var build_conn_info(const var& conninfo) const;
 
-	var getdictexpression(const var& mainfilename, const var& filename, const var& dictfilename, const var& dictfile, const var& fieldname, var& joins, bool forsort_or_select_or_index=false) const;
+	var getdictexpression(const var& mainfilename, const var& filename, const var& dictfilename, const var& dictfile, const var& fieldname, var& joins, var& ismv, bool forsort_or_select_or_index=false) const;
 
 	//TODO check if can speed up by returning reference to converted self like MC
 	var oconv_LR(const var& format) const;

@@ -1164,9 +1164,12 @@ subroutine process_one_record()
 				keypart=dictrec.a(5);
 				if (keypart)
 					cell=cell.field(L'*',keypart);
-			} else
-				cell=RECORD.a(fieldno);
-
+			} else {
+				if (dictrec.a(4)[1] eq L"M")
+					cell=RECORD.a(fieldno,MV);
+				else
+					cell=RECORD.a(fieldno);
+			}
 		//calculate() accesses data via dictionary keys
 		} else 
 			cell=calculate(colname(coln));
