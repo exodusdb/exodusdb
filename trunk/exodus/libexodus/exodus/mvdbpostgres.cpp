@@ -84,6 +84,7 @@ THE SOFTWARE.
 //#include <postgresql/libpq-fe.h>//in postgres/include
 #include <libpq-fe.h>//in postgres/include
 
+#include <arpa/inet.h>//for ntohl()
 #define MV_NO_NARROW
 
 //#include "MurmurHash2_64.h"			// it has included in mvdbconns.h (uint64_t defined)
@@ -1457,7 +1458,7 @@ inline var fileexpression(const var& mainfilename, const var& filename, const va
 	//return "coalesce(L" ^ expression ^", ''::bytea)";
 }
 
-var var::getdictexpression(const var& mainfilename, const var& filename, const var& dictfilename, const var& dictfile, const var& fieldname, var& joins, bool forsort_or_select_or_index) const
+var var::getdictexpression(const var& mainfilename, const var& filename, const var& dictfilename, const var& dictfile, const var& fieldname, var& joins, var& ismv, bool forsort_or_select_or_index) const
 {
 
 	var actualdictfile=dictfile;
@@ -1520,14 +1521,16 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 		var conversion=dictrec.a(7);
 		var fieldno=dictrec.a(2);
 		var params;
-		var ismv=dictrec.a(4)[1] eq L"M";
+		var ismv1=dictrec.a(4)[1] eq L"M";
 		if (fieldno)
-			if (ismv)
+			if (ismv1)
 			{
+				ismv=true;
 				var sqlexpression=L"mv_field_" ^ fieldno;
-				var phrase=L"unnest(regexp_split_to_array(split_part(convert_from(data,'UTF8'),'" ^ VM ^ L"'," ^ fieldno ^ L"),'˽')"
-					L" with ordinality as ( " ^ sqlexpression ^ L")";
-				joins ^= VM ^ L", " ^ phrase;
+				var phrase=L"unnest(regexp_split_to_array(split_part(convert_from(data,'UTF8'),'" ^ FM ^ L"'," ^ fieldno ^ L"),'"^VM^L"'))"
+					//L" with ordinality as t( " ^ sqlexpression ^ L", pg_ordinal_mv)";
+					L" with ordinality as t( " ^ sqlexpression ^ L", mv)";
+				joins ^= L", " ^ phrase;
 				return sqlexpression;
 			}
 			else
@@ -1606,7 +1609,8 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 					var dictxlatetofile=xlatetofilename;
 					//if (!dictxlatetofile.open(L"DICT",xlatetofilename))
 					//	throw MVDBException(L"getdictexpression() DICT" ^ xlatetofilename ^ L" file cannot be opened");
-					todictexpression=getdictexpression(filename,xlatetofilename, dictxlatetofile, dictxlatetofile, xlatetofieldname, joins,forsort_or_select_or_index);
+					//var ismv;
+					todictexpression=getdictexpression(filename,xlatetofilename, dictxlatetofile, dictxlatetofile, xlatetofieldname, joins, ismv, forsort_or_select_or_index);
 				}
 
 				//determine the join details
@@ -1623,7 +1627,7 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 				else if (xlatefromfieldname[1]==L"{")
 				{
 					xlatefromfieldname=xlatefromfieldname.substr(2).splicer(-1,1,L"");
-					fromdictexpression=getdictexpression(filename, filename, dictfilename, dictfile, xlatefromfieldname, joins);
+					fromdictexpression=getdictexpression(filename, filename, dictfilename, dictfile, xlatefromfieldname, joins, ismv);
 				}
 				else
 				{
@@ -1636,9 +1640,11 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 
 				//add the join
 				var join=L"LEFT JOIN " ^ xlatetofilename ^ L" ON " ^ fromdictexpression ^ L" = " ^ xlatetofilename ^ L".key";
-				var xx;
-				if (!joins.locate(join,xx,1))
-					joins.r(1,-1,join);
+				if (!joins.index(join)) {
+					if (joins)
+						joins^=L", ";
+					joins^=join;
+				}
 
 			} else {
 				//not xlate X or C
@@ -1756,7 +1762,7 @@ bool var::selectrecord(const var& sortselectclause) const
 	//THISISDEFINED()
 	ISSTRING(sortselectclause)
 
-	return const_cast<const var&>(*this).selectx(L"key, data",sortselectclause);
+	return const_cast<const var&>(*this).selectx(L"key, mv::integer, data",sortselectclause);
 }
 
 bool var::select(const var& sortselectclause) const
@@ -1766,7 +1772,7 @@ bool var::select(const var& sortselectclause) const
 	THISISDEFINED()
 	ISSTRING(sortselectclause)
 
-	return selectx(L"key",sortselectclause);
+	return selectx(L"key, mv::integer",sortselectclause);
 }
 
 bool var::selectx(const var& fieldnames, const var& sortselectclause) const
@@ -1812,6 +1818,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	var whereclause=L"";//exodus_call('NAME', "^ filename ^ L".data, " ^ filename ^ L".key,0,0) <> '' AND ";
 	var orderclause=L"";
 	var joins=L"";
+	var ismv=false;
 
 	var maxnrecs=L"";
 
@@ -1892,8 +1899,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		{
 			if (orderclause)
 				orderclause^=L", ";
-				
-			var dictexpression=getdictexpression(actualfilename,actualfilename,dictfilename,dictfile,getword(remainingsortselectclause),joins,true);
+			var dictexpression=getdictexpression(actualfilename,actualfilename,dictfilename,dictfile,getword(remainingsortselectclause),joins,ismv,true);
+			
 			orderclause ^= dictexpression;
 			
 			if (word2==L"BY-DESC")
@@ -1918,7 +1925,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 
 			//add the dictionary id
 			word1=getword(remainingsortselectclause);
-			var dictexpression=getdictexpression(actualfilename,actualfilename,dictfilename,dictfile,word1,joins,true);
+			var dictexpression=getdictexpression(actualfilename,actualfilename,dictfilename,dictfile,word1,joins,ismv,true);
 			var usingnaturalorder=dictexpression.index(L"exodus_extract_sort");
 			whereclause ^= L" " ^ dictexpression;
 
@@ -2040,11 +2047,24 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		orderclause^=L"key";
 	}
 
+	if (!ismv)
+	{
+		//sql ^= L", 0 as mv";
+		if (actualfieldnames.index(L"record"))
+		{
+			actualfieldnames.swapper(L", mv::integer",L", 0:integer");
+		}
+		else
+		{
+			actualfieldnames.swapper(L", mv::integer",L"");
+		}
+	}
+			
 	//assemble the full sql select statement:	//ALN:TODO: optimize with stringbuffer
 	var sql=L"DECLARE CURSOR1_" ^ (*this) ^ L" CURSOR FOR SELECT " ^ actualfieldnames ^ L" FROM ";
 	sql ^= PGDATAFILEPREFIX ^ actualfilename;
 	if (joins)
-		sql ^= L" " ^ joins.swap(VM,L" ");
+		sql ^= L" " ^ joins;
 	if (whereclause)
 		sql ^= L" WHERE " ^ whereclause;
 	if (orderclause)
@@ -2100,12 +2120,6 @@ void var::clearselect() const
 
 }
 
-bool var::readnext(var& key) const
-{
-	var valueno;
-	return readnext(key, valueno);
-}
-
 //NB global not member function
 //	To make it var:: privat member -> pollute mv.h with PGresultptr :(
 //bool readnextx(const std::wstring& cursor, PGresultptr& pgresult)
@@ -2134,6 +2148,12 @@ bool readnextx(const var& cursor, PGresultptr& pgresult, PGconn* pgconn)
 	return true;
 }
 
+bool var::readnext(var& key) const
+{
+	var valueno;
+	return readnext(key, valueno);
+}
+
 bool var::readnext(var& key, var& valueno) const
 {
 	//?allow undefined usage like var xyz=xyz.readnext();
@@ -2159,8 +2179,7 @@ bool var::readnext(var& key, var& valueno) const
 		committrans();
 		return false;
 	}
-/* abortive code to handle unescaping returned hex/escape data
-	//avoid the need for this by calling pqexecparams flagged for binary
+/* abortive code to handle unescaping returned hex/escape data	//avoid the need for this by calling pqexecparams flagged for binary
 	//even in the case where there are no parameters and pqexec could be used.
 
 	//eg 90001 is 9.0.1
@@ -2178,14 +2197,23 @@ bool var::readnext(var& key, var& valueno) const
 		return true;
 	}
 */
-	//get the key from the first and only column
+	//get the key from the first column
 	//char* data = PQgetvalue(result, 0, 0);
 	//int datalen = PQgetlength(result, 0, 0);
 	//key=std::string(data,datalen);
 	key=wstringfromUTF8((UTF8*)PQgetvalue(pgresult, 0, 0), PQgetlength(pgresult, 0, 0));
 //key.output(L"key=").len().outputl(L" len=");
-	//TODO implement order by multivalue
-	valueno = 0;
+
+  //vn is second column	
+	//record is third column
+	if (PQnfields(pgresult)>1)
+	{
+		valueno=var((int)ntohl(*(uint32_t*)PQgetvalue(pgresult, 0, 1)));
+	}
+	else
+	{
+		valueno=0;
+	}
 
 	PQclear(pgresult);
 
@@ -2211,6 +2239,12 @@ bool var::readnext(var& key, var& valueno) const
 }
 
 bool var::readnextrecord(var& record, var& key) const
+{
+	var valueno=0;
+	return readnextrecord(record, key, valueno);
+}
+
+bool var::readnextrecord(var& record, var& key, var& valueno) const
 {
 
 	//?allow undefined usage like var xyz=xyz.readnext();
@@ -2244,13 +2278,20 @@ bool var::readnextrecord(var& record, var& key) const
 	//int datalen = PQgetlength(result, 0, 0);
 	//key=std::string(data,datalen);
 	key=wstringfromUTF8((UTF8*)PQgetvalue(pgresult, 0, 0), PQgetlength(pgresult, 0, 0));
-	
-	//record is second column
-	//data = PQgetvalue(result, 0, 1);
-	//datalen = PQgetlength(result, 0, 1);
-	//record=std::string(data,datalen);
-	record=wstringfromUTF8((UTF8*)PQgetvalue(pgresult, 0, 1), PQgetlength(pgresult, 0, 1));
+//TODO return zero if no mv in select because no by mv column
+	//vn is second column
+	valueno=var((int)ntohl(*(uint32_t*)PQgetvalue(pgresult, 0, 1)));
 
+	//record is third column
+	if (PQnfields(pgresult)<3) {
+		PQclear(pgresult);
+		var errmsg=L"readnextrecord() must follow selectrecord() (not select())";
+		this->setlasterror(errmsg);
+		throw MVException(errmsg);
+		//return false;
+	}
+	record=wstringfromUTF8((UTF8*)PQgetvalue(pgresult, 0, 2), PQgetlength(pgresult, 0, 2));
+	
 	PQclear(pgresult);
 
 	return true;
@@ -2278,7 +2319,8 @@ bool var::createindex(const var& fieldname, const var& dictfile) const
 
 	//throws if cannot find dict file or record
 	var joins=L"";//throw away - cant index on joined fields at the moment
-	var dictexpression=getdictexpression(filename,filename,actualdictfile,actualdictfile,fieldname,joins,true);
+	var ismv;
+	var dictexpression=getdictexpression(filename,filename,actualdictfile,actualdictfile,fieldname,joins,ismv,true);
 
 	var sql=L"create index index__" ^ filename ^ L"__" ^ fieldname ^ L" on " ^ filename;
 	sql^=L" (";

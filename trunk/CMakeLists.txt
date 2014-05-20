@@ -1,5 +1,6 @@
-cmake_minimum_required(VERSION 2.8)
+#use VERBOSE=1 make to debug
 
+cmake_minimum_required(VERSION 2.8)
 set(CPACK_PACKAGE_CONTACT neo)
 set(CPACK_PACKAGE_VERSION 14.01.1)
 INCLUDE(CPack)
@@ -21,19 +22,19 @@ INCLUDE(CPack)
 
 project(exodus)
 
-execute_process(
-        COMMAND                 pg_config --pkglibdir
-        OUTPUT_VARIABLE         PostgreSQL_PKGLIBDIR
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-message(PostgreSQL_PKGLIBDIR=${PostgreSQL_PKGLIBDIR})
+#execute_process(
+#        COMMAND                 pg_config --pkglibdir
+#        OUTPUT_VARIABLE         PostgreSQL_PKGLIBDIR
+#        OUTPUT_STRIP_TRAILING_WHITESPACE
+#)
+#message(PostgreSQL_PKGLIBDIR=${PostgreSQL_PKGLIBDIR})
 
-execute_process(
-        COMMAND                 pg_config --includedir-server
-        OUTPUT_VARIABLE         PostgreSQL_INCLUDEDIR_SERVER
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-message(PostgreSQL_INCLUDEDIR_SERVER=${PostgreSQL_INCLUDEDIR_SERVER})
+#execute_process(
+#        COMMAND                 pg_config --includedir-server
+#        OUTPUT_VARIABLE         PostgreSQL_INCLUDEDIR_SERVER
+#        OUTPUT_STRIP_TRAILING_WHITESPACE
+#)
+#message(PostgreSQL_INCLUDEDIR_SERVER=${PostgreSQL_INCLUDEDIR_SERVER})
 
 add_subdirectory( exodus/libexodus/exodus)
 add_subdirectory( exodus/libpgexodus/src)
