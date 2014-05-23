@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 2.8)
 
 #set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake/)
+#set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake/)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake/ ../../../cmake/)
 #set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "cmake/")
 #message(CMAKE_MODULE_PATH=${CMAKE_MODULE_PATH})
 
@@ -19,7 +20,7 @@ execute_process(
         OUTPUT_VARIABLE         PostgreSQL_INCLUDE_DIR
         OUTPUT_STRIP_TRAILING_WHITESPACE
 )
-message(PostgreSQL_INCLUDEDIR=${PostgreSQL_INCLUDEDIR})
+message(PostgreSQL_INCLUDEDIR=${PostgreSQL_INCLUDE_DIR})
 
 ### BOOST ###
 #############
