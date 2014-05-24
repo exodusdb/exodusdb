@@ -1,3 +1,4 @@
+#ifdef asasdasdff
 #include <exodus/library.h>
 libraryinit()
 
@@ -2024,3 +2025,4 @@ subroutine updateanalysis() {
 
 
 libraryexit()
+#endif
