@@ -1,3 +1,4 @@
+#ifdef ascascascascsac
 #include <exodus/library.h>
 libraryinit()
 
@@ -1000,3 +1001,4 @@ smdatesunconverted:
 
 
 libraryexit()
+#endif
