@@ -396,6 +396,7 @@ function main()
 	if (libdir[-1]!=SLASH)
 		libdir ^= SLASH;
 
+	var ncompilationfailures=0;
 	for (var fileno=1; fileno<=nfiles; ++fileno) {
 
 		var text="";
@@ -629,7 +630,6 @@ var inclusion=
 					swapper(inclusion,"arg1,arg2,arg3",funcargs);
 					swapper(inclusion,"varorvoid", returnsvarorvoid);
 					swapper(inclusion,"callorreturn", callorreturn);
-					
 
 					var usepredefinedfunctor=nargs<=EXODUS_FUNCTOR_MAXNARGS;
 					if (useclassmemberfunctions) {
@@ -792,6 +792,7 @@ var inclusion=
 		//get new objfile info or continue
 		var newobjfileinfo=osfile(objfilename);
 		if (not newobjfileinfo) {
+			ncompilationfailures++;
 			errputl(oscwd());
 			objfilename.errputl("Error: Cannot output file ");
 			var("Press Enter").input();
@@ -848,15 +849,16 @@ var inclusion=
 					if (osfile(outputpathandfile)) {
 						if (osopen(outputpathandfile,outputpathandfile)) {
 							osclose(outputpathandfile);
-							
+
 						} else if (windows or (posix and not updateinusebinposix)) {
+							ncompilationfailures++;
 							outputpathandfile.errput("Error: Cannot update ");
 							errput(" In use or insufficient rights (2)");
 							if (windows)
 								errput(" or cannot install/catalog program while in use or blocked by antivirus/antimalware");
 							errputl(".");
 							continue;
-							
+
 						} else {
 							outputpathandfile.logput("Warning: ");
 							logputl(" updated while in use. Reload required.");
@@ -889,7 +891,7 @@ var inclusion=
 			}
 		}//compilation
 	}//fileno
-		return true;
+	return ncompilationfailures;
 }
 
 function set_environment() {
@@ -1041,7 +1043,7 @@ function set_environment() {
 		//	printl("\nINCLUDE=",include);
 		//	printl("\nLIB=",lib);
 		//}
-		
+
 	*/
 	}
 	osdelete(tempfilenamebase^".cmd");
