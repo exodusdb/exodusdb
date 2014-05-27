@@ -1,0 +1,92 @@
+
+
+broadcast master import file column breaks
+2
+6
+11
+12
+14
+20
+22
+24
+26
+32
+34
+36
+37
+46
+56
+66
+71
+76
+81
+86
+123
+125
+128
+137
+139
+
+=== images ===
+
+sudo docker.io images
+
+#remove an image
+sudo docker.io rmi exodus/exodus
+
+#get a shell into an image
+sudo docker.io run -i -t exodus/exodus /bin/bash
+
+=== containers ===
+
+sudo docker.io ps -a
+
+#remove all containers
+sudo docker.io rm $(sudo docker.io ps -a -q)
+
+
+=== building postgres from source ===
+
+https://wiki.postgresql.org/wiki/Detailed_installation_guides
+
+apt-get -y install wget g++ build-essential libreadline-dev zlib1g-dev libxml2-dev libxslt-dev libssl-dev
+
+wget http://ftp.postgresql.org/pub/source/v9.4beta1/postgresql-9.4beta1.tar.bz2
+
+tar xvf postgresql-9.4beta1.tar.bz2
+
+cd postgresql-9.4beta1
+
+./configure --prefix=/usr/local/
+
+make && make install
+
+useradd postgres
+
+mkdir -p /usr/local/pgsql/data
+chown postgres /usr/local/pgsql/data
+su postgres
+initdb -D /usr/local/pgsql/data -E UTF-8
+exit
+
+su postgres
+postgres -D /usr/local/pgsql/data &
+exit
+
+kill -SIGTERM `head -1 /usr/local/pgsql/data/postmaster.pid`
+
+apt-get -y install cmake
+apt-get -y install subversion libboost-all-dev
+
+svn co HTTPS://exodusdb.googlecode.com/svn/trunk/ exodus
+cd ~/exodus
+#./configure
+cmake .
+make
+make install
+testsort
+
+
+add www-data to www-exodus group
+grant www-exodus
+make exodus/www/
