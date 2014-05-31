@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 2.8)
 
+#2014/06/01 exodus doesnt require c++11 but we enable it for
+#config is set to look in /usr/local/include and /usr/local/lib first for any source version of boost compiled for c++11
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
 #set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 #set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake/)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake/ ../../../cmake/)
@@ -15,6 +19,7 @@ add_definitions(-DEXODUS_IPC_WINPIPES)
 ##set(PostgreSQL_ADDITIONAL_VERSIONS "9.3" "9.3.4")
 ##find_package(PostgreSQL REQUIRED)
 ##find_package(PostgreSQL REQUIRED COMPONENTS pqlib)
+#message(PostgreSQL_INCLUDE_DIRS=${PostgreSQL_INCLUDE_DIRS})
 execute_process(
         COMMAND                 pg_config --includedir
         OUTPUT_VARIABLE         PostgreSQL_INCLUDE_DIR
@@ -25,17 +30,17 @@ message(PostgreSQL_INCLUDEDIR=${PostgreSQL_INCLUDE_DIR})
 ### BOOST ###
 #############
 find_package(Boost REQUIRED COMPONENTS filesystem date_time system regex thread)
+message("BUT LOOKING IN /usr/local/lib and /usr/local/include FIRST!")
+
+set(Boost_USE_STATIC_LIBS        ON)
+set(Boost_USE_MULTITHREADED      ON)
+set(Boost_USE_STATIC_RUNTIME     ON)
 
 ### ICU ###
 ###########
 find_package(ICU 4.4 REQUIRED)
 
 include_directories(. .. ${PostgreSQL_INCLUDE_DIRS} ${PostgreSQL_INCLUDE_DIR})
-message(---------------PostgreSQL_INCLUDE_DIR=${PostgreSQL_INCLUDE_DIR})
-
-set(Boost_USE_STATIC_LIBS        ON)
-set(Boost_USE_MULTITHREADED      ON)
-set(Boost_USE_STATIC_RUNTIME     ON)
 
 add_library(exodus SHARED
  exodus.h exodusmacros.h mvenvironment.h mv.h mvlibs.h
@@ -67,7 +72,7 @@ add_library(exodus SHARED
 set_target_properties(exodus PROPERTIES SOVERSION "14.01")
 
 #dl is needed for dynamic link library code
-target_link_libraries(exodus ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} ${PostgreSQL_LIBRARY_DIR} pq ${ICU_LIBRARIES} dl)
+target_link_libraries(exodus -L/usr/local/lib ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} ${PostgreSQL_LIBRARY_DIR} pq ${ICU_LIBRARIES} dl)
 
 install(TARGETS exodus DESTINATION lib)
 

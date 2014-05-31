@@ -8,7 +8,7 @@
 	//debug in php like this
 	//tail -f /var/log/apache2/error.log
 	//also .2 and .3 files are left in interface directory if debugging
-	$debugging = false;
+	$debugging = false;//true;
 
 //constants
 
@@ -62,10 +62,16 @@
 	if (strlen($localhostname) > 8)
 		$localhostname = substr($localhostname,0, 4) . substr($localhostname,-4);
 
-	$remoteaddr = $_SERVER['REMOTE_ADDR'];
-	$remotehost = $_SERVER['REMOTE_HOST'];
-	$https = $_SERVER['HTTPS'];
+	if (isset( $_SERVER["REMOTE_ADDR"]))
+		$remoteaddr = $_SERVER['REMOTE_ADDR'];
+	else
+		$remoteaddr = "";
 
+	if (isset( $_SERVER["HTTPS"]))
+		$https = $_SERVER['HTTPS'];
+	else
+		$https="";
+		
 //request
 
 	//client delivers a request in xml format
@@ -457,11 +463,17 @@ function getdatabases($neosysrootpath, $systemcode) {
 	//get an array of databases
 	$datalocation = $neosysrootpath . "/data/";
 	$volfilename=$datalocation . $systemcode . '.vol';
-	if (is_file($volfilename))
-		$databases=file_get_contents($volfilename);
-	else
-		$databases='';
-
+debug("volfilename:".$volfilename);
+	if (!is_file($volfilename)) {
+		$response="Cannot see vol file $volfilename";
+		return "";
+	}
+	$databases=file_get_contents($volfilename);
+	if (!$databases) {
+		$response="Vol file is empty or cannot be read $volfilename";
+		return "";
+	}
+debug("getdatabases:".$databases);
 	//convert text format to mv format
 	$databases=str_replace("\n",$fm,$databases);
 	$databases=str_replace("\r",$fm,$databases);
