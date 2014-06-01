@@ -71,7 +71,8 @@ namespace boostfs = boost::filesystem;
 //#include NullCodecvt.h
 
 //#include <boost/date_time/gregorian/gregorian.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
+//not needed on ubuntu 14.04 x64 c++11 build so comment out - maybe needed on other platforms
+//#include <boost/date_time/posix_time/posix_time.hpp>
 
 //for sleep
 #include <boost/thread/thread.hpp>
