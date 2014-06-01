@@ -15,7 +15,7 @@ RUN sh -c 'echo "/usr/local/lib" >> /etc/ld.so.conf.d/usrlocal.conf' && ldconfig
 
 # build exodus with c++11 and install in /usr/local
 
-#RUN a=a#cachebuster2
+RUN a=a#cachebuster2
 RUN svn co HTTPS://exodusdb.googlecode.com/svn/trunk/ exodus
 RUN cd ~/exodus/exodus/libexodus/exodus  && cmake . && make && make install && ldconfig
 RUN cd ~/exodus/cli/src && cmake . && make && make install
