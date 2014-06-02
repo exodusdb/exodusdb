@@ -13,12 +13,13 @@ RUN cd boost_1_55_0/ && ./bootstrap.sh --prefix=/usr/local
 RUN cd boost_1_55_0/ && n=`cat /proc/cpuinfo | grep "cpu cores" | uniq | awk '{print $NF}'` && ./b2 -j $n cxxflags=-std=c++11 --with-filesystem --with-regex --with-system --with-thread install
 RUN sh -c 'echo "/usr/local/lib" >> /etc/ld.so.conf.d/usrlocal.conf' && ldconfig
 
-# build exodus with c++11 and install in /usr/local
+# build exodus install in /usr/local (c++11 configured in cmake config)
 
-RUN a=a#cachebuster2
+RUN a=b#cachebuster
 RUN svn co HTTPS://exodusdb.googlecode.com/svn/trunk/ exodus
-RUN cd ~/exodus/exodus/libexodus/exodus  && cmake . && make && make install && ldconfig
-RUN cd ~/exodus/cli/src && cmake . && make && make install
+RUN mkdir ~/exodus/exodus/libexodus/exodus/dockerbuild && cd ~/exodus/exodus/libexodus/exodus/dockerbuild  && cmake .. && make && make install && ldconfig
+RUN mkdir ~/exodus/cli/src/dockerbuild && cd ~/exodus/cli/src/dockerbuild && cmake .. && make && make install
+#compile the service programs
 RUN cd ~/exodus/service/service2 && export CPLUS_INCLUDE_PATH=../sys:../gen:../fin:../agy:../job:../tim:../med:../test && export PATH=$PATH:~/bin && cd sys && compile ../???/*.cpp
 RUN mkdir /var/run/sshd
 RUN sed -i -e's/without-password/yes/' /etc/ssh/sshd_config
