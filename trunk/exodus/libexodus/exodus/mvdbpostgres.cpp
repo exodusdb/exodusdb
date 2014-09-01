@@ -1655,7 +1655,7 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 		{
 exodus_call:
 			sqlexpression=L"'" ^ fieldname ^ L"'";
-			sqlexpression=L"exodus_call('exodusservice-" ^ getprocessn() ^ L"." ^ getenvironmentn() ^ L"'::bytea, '" ^ dictfilename ^ L"'::bytea, '" ^ fieldname ^ L"'::bytea, "^ filename ^ L".key, " ^ filename ^ L".data,0,0)";
+			sqlexpression=L"exodus_call('exodusservice-" ^ getprocessn() ^ L"." ^ getenvironmentn() ^ L"'::bytea, '" ^ dictfilename.lcase() ^ L"'::bytea, '" ^ fieldname.lcase() ^ L"'::bytea, "^ filename ^ L".key, " ^ filename ^ L".data,0,0)";
 			//TODO apply naturalorder conversion by passing forsort_or_select_or_index option to exodus_call
 		}
 	}
