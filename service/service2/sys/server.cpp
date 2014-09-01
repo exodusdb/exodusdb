@@ -455,7 +455,7 @@ SYSTEM="";
 	//</arev>
 
 	if (tracing)
-	printl(var("-").str(79));
+		printl(var("-").str(79));
 	RECORD = "";
 	ID = "";
 	USER0 = "";

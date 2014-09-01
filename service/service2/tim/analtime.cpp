@@ -65,9 +65,10 @@ function main() {
 
 	var ifromdate = PSEUDO.a(30);
 	var itodate = PSEUDO.a(31);
-	var fileformat = PSEUDO.a(1);
+	//var fileformat = PSEUDO.a(1);
+	//no html for now
+	var fileformat = "xls";
 	var reqcompcodes = PSEUDO.a(22);
-	fileformat = "xls";
 
 	/*;
 		YEAR.PERIODS=@PSEUDO<29>;
@@ -105,7 +106,7 @@ function main() {
 	head ^= FM;
 
 	head ^= "<H4>";
-	
+
 	head ^= var(3).space() ^ "produced " ^ timedate();
 	head ^= "</H4>";
 
@@ -130,7 +131,7 @@ function main() {
 		head ^= FM ^ "Company: " ^ quote(xlate("COMPANIES",reqcompcodes,1,"C")) ^ FM;
 		head ^= "</H3>";
 	}
-	
+
 	/*;
 		IF BRANDCODES THEN;
 			head:='Brand     : ':BRANDCODES:"'L'";
@@ -167,17 +168,17 @@ function main() {
 
 	//always explode by job_no in order to check company code and authorisation per job
 	cmd ^= " BY JOB_NO";
-	
+
 	//timesheet authorised should be mv depending on job company and brand
-	cmd^=" AND WITH AUTHORISED";
-	
+	//TODO! cmd^=" AND WITH AUTHORISED \"1\"";
+
 	//remove the first AND
 	temp = cmd.index("AND WITH", 1);
 	if (temp) {
 		cmd.splicer(temp, 4, "");
 	}
 
-	cmd ^= " (S)";
+	//cmd ^= " (S)";
 
 	if (fileformat) {
 		var sys2 = SYSTEM.a(2);
@@ -187,7 +188,8 @@ function main() {
 		return 1;//ok
 	}
 
-	cmd ^= " (S)";
+/*
+	//cmd ^= " (S)";
 
 	perform(cmd);
 	if (not LISTACTIVE) {
@@ -233,7 +235,7 @@ function main() {
 	head ^= tr ^ temp ^ trx ^ FM;
 
 	call printtx(tx, "head", head);
-	
+
 	gosub getrec();
 
 //////////
@@ -261,7 +263,7 @@ function main() {
 			if (not(newjobno == jobno and ID)) {
 				break;
 			}
-			
+
 			var hours = RECORD.a(2, MV);
 			var activity = RECORD.a(4);
 			var username = ID.field("*", 1);
@@ -313,10 +315,13 @@ function main() {
 
 	call printtx(tx);
 
+*/
+
 	return 1;
-	
+
 }
 
+/*
 subroutine getrec() {
 
 getrec2:
@@ -333,6 +338,6 @@ getrec2:
 	return;
 
 }
-
+*/
 
 libraryexit()
