@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 2.8)
 
 #2014/06/01 exodus doesnt require c++11 but we enable it for
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+#removing this to avoid problem linking to filesystem at the moment with c++11
+#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 include_directories(
 	../../exodus/libexodus
@@ -9,7 +10,7 @@ include_directories(
 
 project(exodus)
 
-link_directories(../../exodus/libexodus/exodus)
+link_directories(${CMAKE_CURRENT_SOURCE_DIR}../../exodus/libexodus/exodus)
 
 
 ### 1. COMPILE ###

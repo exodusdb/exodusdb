@@ -1,3 +1,6 @@
+message("")
+message("--LIBPGEXODUS CMAKE INIT--")
+
 cmake_minimum_required(VERSION 2.8)
 
 
@@ -101,3 +104,5 @@ install(
 )
 
 #install (SCRIPT "${CMAKE_SOURCE_DIR}/PostInstall.cmake")
+
+message("--LIBPGEXODUS CMAKE EXIT--")
