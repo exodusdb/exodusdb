@@ -4,10 +4,6 @@ cmake_minimum_required(VERSION 2.8)
 #config is set to look in /usr/local/include and /usr/local/lib first for any source version of boost compiled for c++11
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-#FindICU.cmake in cmake directory look in parent directories of source too
-set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};cmake;${PROJECT_SOURCE_DIR}/cmake/;${PROJECT_SOURCE_DIR}/../cmake/;${PROJECT_SOURCE_DIR}/../../cmake ${PROJECT_SOURCE_DIR}/../../../cmake;cmake")
-message(CMAKE_MODULE_PATH=${CMAKE_MODULE_PATH})
-
 add_definitions(-DEXODUS_IPC_BOOST)
 add_definitions(-DEXODUS_IPC_POSIX)
 add_definitions(-DEXODUS_IPC_WINPIPES)
@@ -38,7 +34,14 @@ set(Boost_USE_STATIC_RUNTIME     ON)
 
 ### ICU ###
 ###########
+#FindICU.cmake in cmake directory look in three levels of parent directories of source too
+set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};cmake;${PROJECT_SOURCE_DIR}/cmake/;${PROJECT_SOURCE_DIR}/../cmake/;${PROJECT_SOURCE_DIR}/../../cmake;${PROJECT_SOURCE_DIR}/../../../cmake")
+#note that displayed path confusingly shows no space or ; between multiple paths if multiple are specified either by space or ;
+message(CMAKE_MODULE_PATH=${CMAKE_MODULE_PATH})
+
 find_package(ICU 4.4 REQUIRED)
+
+### include postgres ###
 
 include_directories(. .. ${PostgreSQL_INCLUDE_DIRS} ${PostgreSQL_INCLUDE_DIR})
 
