@@ -16,47 +16,51 @@ sudo docker.io ps -a
 sudo docker.io rm $(sudo docker.io ps -a -q)
 
 
-=== building postgres from source ===
+=== building and installing postgres from source ===
 
 https://wiki.postgresql.org/wiki/Detailed_installation_guides
 
-apt-get -y install wget g++ build-essential libreadline-dev zlib1g-dev libxml2-dev libxslt-dev libssl-dev
+build
 
-wget http://ftp.postgresql.org/pub/source/v9.4beta1/postgresql-9.4beta1.tar.bz2
+ sudo apt-get -y install wget g++ build-essential libreadline-dev zlib1g-dev libxml2-dev libxslt-dev libssl-dev
 
-tar xvf postgresql-9.4beta1.tar.bz2
+ cd ~
+ wget http://ftp.postgresql.org/pub/source/v9.4beta1/postgresql-9.4beta1.tar.bz2
+ tar xvf postgresql-9.4beta1.tar.bz2
+ cd postgresql-9.4beta1
+ ./configure --prefix=/usr/local/
+ make && sudo make install
 
-cd postgresql-9.4beta1
+initialise - once only after installation and before first run
 
-./configure --prefix=/usr/local/
+ sudo useradd postgres
+ sudo mkdir -p /usr/local/pgsql/data
+ sudo chown postgres /usr/local/pgsql/data
+ sudo su postgres
+ initdb -D /usr/local/pgsql/data -E UTF-8
+ exit
 
-make && make install
+run postgres - in background but will die when you disconnect shell
 
-useradd postgres
+ sudo su postgres
+ postgres -D /usr/local/pgsql/data &
+ exit
 
-mkdir -p /usr/local/pgsql/data
-chown postgres /usr/local/pgsql/data
-su postgres
-initdb -D /usr/local/pgsql/data -E UTF-8
-exit
+to stop postgres
 
-su postgres
-postgres -D /usr/local/pgsql/data &
-exit
+ sudo kill -SIGTERM `head -1 /usr/local/pgsql/data/postmaster.pid`
 
-kill -SIGTERM `head -1 /usr/local/pgsql/data/postmaster.pid`
+=== build exodus ===
 
-apt-get -y install cmake
-apt-get -y install subversion libboost-all-dev
+ sudo apt-get -y install cmake subversion libboost-all-dev libicu-dev
 
-svn co HTTPS://exodusdb.googlecode.com/svn/trunk/ exodus
-cd ~/exodus
-#./configure
-cmake .
-make
-make install
-testsort
-
+ cd ~
+ svn co HTTPS://exodusdb.googlecode.com/svn/trunk/ exodus
+ cd exodus
+ #./configure
+ cmake .
+ make && sudo make install
+ testsort
 
 add www-data to www-exodus group
 grant www-exodus
