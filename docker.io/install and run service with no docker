@@ -1,12 +1,44 @@
-cd ~/exodus/service/service2 && export CPLUS_INCLUDE_PATH=../sys:../gen:../fin:../agy:../job:../tim:../med:../test && export PATH=$PATH:~/bin && cd sys && compile ../???/*.cpp
+#build and install exodus before doing this
+
+#from existing exodus database server SEND database to target server (port/user/host)
+#exodus database needs to be created in target (exodus' sudo make install) and be empty
+pg_dump -U exodus | ssh -p 19518 neosys@nl10r.neosys.com psql -U postgres exodus
 
 sudo apt-get -y install apache2 php5 libapache2-mod-php5
 
-sudo usermod -a -G www-exodus www-data && sudo usermod -a -G www-exodus root && sudo chgrp -R www-exodus ~/exodus/service/data/ && sudo chmod g+sw -R ~/exodus/service/data/ && sudo chmod g+x ~/exodus/service/data/ && sudo find ~/exodus/service/data/ -type d -exec chmod g+rwxs {} +
+sudo addgroup www-exodus
+sudo usermod -a -G www-exodus www-data
+sudo usermod -a -G www-exodus `whoami`
+sudo chgrp -R www-exodus ~/exodus/service/data/
+sudo chmod g+sw -R ~/exodus/service/data/
+sudo chmod g+x ~/exodus/service/data/
+sudo find ~/exodus/service/data/ -type d -exec chmod g+rwxs {} +
 
-sudo mv /var/www/html /var/www/html.orig && sudo ln -s ~/exodus/www /var/www/html
-sudo a2enmod ssl rewrite && sudo a2ensite default-ssl
+sudo mv /var/www/html /var/www/html.orig
+sudo ln -s ~/exodus/www /var/www/html
+sudo a2enmod ssl rewrite
+sudo a2ensite default-ssl
 sudo cp ~/exodus/service/exodus-apache2.conf /etc/apache2/conf-enabled
 
-echo "host=$PGEXODUS_PORT_5432_TCP_ADDR port=$PGEXODUS_PORT_5432_TCP_PORT dbname=exodus user=exodus password=somesillysecret connect_timeout=10" > ~/.exodus && sudo service apache2 restart && sudo service ssh restart && export EXO_HOST=$PGEXODUS_PORT_5432_TCP_ADDR && export EXO_PORT=$PGEXODUS_PORT_5432_TCP_PORT && cd ~/exodus/service/service2/sys/ && ~/bin/server
+#must restart apache/php after adding apache to www-exodus group
+sudo service apache2 restart
 
+#if logged in on ssh then MUST quit and reconnect to become effective before running server
+#exit
+
+export PATH=$PATH:~/bin
+
+cd ~/exodus/service/service2/sys
+export CPLUS_INCLUDE_PATH=../sys:../gen:../fin:../agy:../job:../tim:../med:../test
+compile ../???/*.cpp
+
+#configure connection
+echo "host=$PGEXODUS_PORT_5432_TCP_ADDR port=$PGEXODUS_PORT_5432_TCP_PORT dbname=exodus user=exodus password=somesillysecret connect_timeout=10" > ~/.exodus
+
+#run server
+cd ~/exodus/service/service2/sys
+export PGEXODUS_PORT_5432_TCP_ADDR=127.0.0.1
+export PGEXODUS_PORT_5432_TCP_PORT=5432
+export EXO_HOST=$PGEXODUS_PORT_5432_TCP_ADDR
+export EXO_PORT=$PGEXODUS_PORT_5432_TCP_PORT
+~/bin/server
