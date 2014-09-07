@@ -763,7 +763,9 @@ getproxy:
 	gen.companies.clearselect();
 	//TODO should be a sequence code on companies to sort the important companies first
 	gen.companies.select();
-	gen.companies.readnext(gen.gcurrcompany);
+	if (not gen.companies.readnext(gen.gcurrcompany)) {
+		var().stop("no companies setup - cannot start server");
+	}
 	gen.companies.clearselect();
 
 	if (gen.company.read(gen.companies, gen.gcurrcompany))
