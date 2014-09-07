@@ -42,13 +42,15 @@ initialise - once only after installation and before first run
 
 run postgres - in background but will die when you disconnect shell
 
+ sudo ls
+ 
  sudo su postgres
  postgres -D /usr/local/pgsql/data &
  exit
 
-to stop postgres
+to stop postgres (nicely) (gives usage if not running)
 
- sudo kill -SIGTERM `head -1 /usr/local/pgsql/data/postmaster.pid`
+ sudo kill -SIGTERM `sudo head -1 /usr/local/pgsql/data/postmaster.pid`
 
 === build exodus ===
 
@@ -62,6 +64,4 @@ to stop postgres
  make && sudo make install
  testsort
 
-add www-data to www-exodus group
-grant www-exodus
-make exodus/www/
+#see how to install exodus web service
