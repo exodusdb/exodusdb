@@ -715,12 +715,12 @@ x1exit:
 	// and ((DICT.ucase() ne dictmd.ucase()) or (filename.ucase() eq L"MD") or (filename.ucase() eq L"DICT_MD"))) {
 		var words=printing ? L"@lptr,@crt" : L"@crt,@lptr";
 		for (int ii=1;ii<=2;++ii) {
-			word = words.field(L",",ii).outputl("word=");
+			word = words.field(L",",ii);
 			if (not xx.read(DICT, word)) {
-				word.ucaser().outputl();
+				//word.ucaser().outputl();
 				if (not xx.read(DICT, word)) {
+					//word.outputl("word not found:");
 					word = L"";
-					printl("not found");
 				}
 			}
 		}
