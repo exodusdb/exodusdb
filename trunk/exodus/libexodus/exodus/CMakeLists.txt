@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 2.8)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 #FindICU.cmake in cmake directory look in parent directories of source too
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} cmake ${PROJECT_SOURCE_DIR}/cmake/ ${PROJECT_SOURCE_DIR}/../cmake/ ${PROJECT_SOURCE_DIR}/../../cmake ${PROJECT_SOURCE_DIR}/../../../cmake cmake)
+set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};cmake;${PROJECT_SOURCE_DIR}/cmake/;${PROJECT_SOURCE_DIR}/../cmake/;${PROJECT_SOURCE_DIR}/../../cmake ${PROJECT_SOURCE_DIR}/../../../cmake;cmake")
 message(CMAKE_MODULE_PATH=${CMAKE_MODULE_PATH})
 
 add_definitions(-DEXODUS_IPC_BOOST)
