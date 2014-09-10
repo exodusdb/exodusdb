@@ -2,7 +2,7 @@
 libraryinit()
 
 #include <authorised.h>
-#include <openfile.h>
+//#include <openfile.h>
 #include <sysmsg.h>
 #include <holiday.h>
 #include <agencysubs.h>
@@ -172,7 +172,7 @@ function main(in mode0) {
 		gosub getregisterparams();
 
 		//find last ts
-		for (idate = var().date(); idate >= var().date() - 31; --idate) {
+		for (idate = var().date(); idate < var().date() - 31; --idate) {
 			var timesheet;
 			if (not(timesheet.read(win.srcfile, ID.field("*", 1) ^ "*" ^ idate))) {
 				timesheet = "";
