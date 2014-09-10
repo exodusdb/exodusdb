@@ -1,6 +1,6 @@
 #build and install exodus before doing this
 
-#from existing exodus database server SEND database to target server (port/user/host)
+#from any existing exodus database server SEND a starting database to target server (port/user/host)
 #exodus database needs to be created in target (exodus' sudo make install) and be empty
 pg_dump -U exodus | ssh -p 19518 neosys@nl10r.neosys.com psql -U postgres exodus
 
@@ -19,7 +19,6 @@ sudo ln -s ~/exodus/www /var/www/html
 sudo a2enmod ssl rewrite
 sudo a2ensite default-ssl
 sudo cp ~/exodus/service/exodus-apache2.conf /etc/apache2/conf-enabled
-
 #must restart apache/php after adding apache to www-exodus group
 sudo service apache2 restart
 
@@ -33,12 +32,12 @@ export CPLUS_INCLUDE_PATH=../sys:../gen:../fin:../agy:../job:../tim:../med:../te
 compile ../???/*.cpp
 
 #configure connection
-echo "host=$PGEXODUS_PORT_5432_TCP_ADDR port=$PGEXODUS_PORT_5432_TCP_PORT dbname=exodus user=exodus password=somesillysecret connect_timeout=10" > ~/.exodus
-
-#run server
-cd ~/exodus/service/service2/sys
 export PGEXODUS_PORT_5432_TCP_ADDR=127.0.0.1
 export PGEXODUS_PORT_5432_TCP_PORT=5432
 export EXO_HOST=$PGEXODUS_PORT_5432_TCP_ADDR
 export EXO_PORT=$PGEXODUS_PORT_5432_TCP_PORT
+echo "host=$PGEXODUS_PORT_5432_TCP_ADDR port=$PGEXODUS_PORT_5432_TCP_PORT dbname=exodus user=exodus password=somesillysecret connect_timeout=10" > ~/.exodus
+
+#run server
+cd ~/exodus/service/service2/sys
 ~/bin/server
