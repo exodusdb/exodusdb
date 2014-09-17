@@ -21,37 +21,37 @@ program()
         if (editor.lcase().index("cedt") and not editor.index("$") )
                 editor^=" /L:$LINENO $FILENAME";
 
-		//look for installed nano
-		//if (SLASH=="\\" and not index(PLATFORM_,"x64")) {
-		var nanopath="";
-		if (SLASH=="\\") {
+	//look for installed nano
+	//if (SLASH=="\\" and not index(PLATFORM_,"x64")) {
+	var nanopath="";
+	if (SLASH=="\\") {
 
-	        //look for nano.exe next to edic.exe
-		    if (not editor) {
-			        nanopath=EXECPATH.swap("edic","nano");
-				    if (nanopath.osfile())
-					        editor="nano $LINENO'$FILENAME'";
-			}
+		//look for nano.exe next to edic.exe
+		if (not editor) {
+	        	nanopath=EXECPATH.swap("edic","nano");
+			if (nanopath.osfile())
+			        editor="nano $LINENO'$FILENAME'";
+		}
 
 	        //look for nano in parent bin
-		    if (not editor) {
-			        nanopath="..\\bin\\nano.exe";
-				    if (nanopath.osfile())
-					        editor="nano $LINENO'$FILENAME'";
-			}
+		if (not editor) {
+		    nanopath="..\\bin\\nano.exe";
+		    if (nanopath.osfile())
+		        editor="nano $LINENO'$FILENAME'";
+		}
 
 	        //look for nano in release directory during exodus development
-		    if (not editor) {
-			        nanopath="..\\..\\release\\cygwin\\bin\\nano.exe";
-				    if (nanopath.osfile())
-					        editor="..\\..\\release\\cygwin\\bin\\nano $LINENO'$FILENAME'";
-					else {
-						nanopath="..\\"^nanopath;
-						if (nanopath.osfile())
-					        editor="..\\..\\..\\release\\cygwin\\bin\\nano $LINENO'$FILENAME'";
-					}
+		if (not editor) {
+			nanopath="..\\..\\release\\cygwin\\bin\\nano.exe";
+			if (nanopath.osfile())
+				editor="..\\..\\release\\cygwin\\bin\\nano $LINENO'$FILENAME'";
+			else {
+				nanopath="..\\"^nanopath;
+				if (nanopath.osfile())
+				       editor="..\\..\\..\\release\\cygwin\\bin\\nano $LINENO'$FILENAME'";
 			}
 		}
+	}
 
         if (editor.index("nano"))
                 linenopattern="+$LINENO ";
