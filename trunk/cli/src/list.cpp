@@ -36,7 +36,7 @@ Comments about style:
 		Exodus's "goto" cannot jump over "var" statements or into/out of subroutines some code refactoring
 		may be still be required during porting.
 	4. L prefix to all strings is not required but faster for utility programs *unbenchmarked
-	
+
 usage
 
 list ads brand_code brand_name with brand_code 'XYZ'
@@ -273,7 +273,7 @@ USER0="";
 
 	html = index(options,"H");
 	printing = index(options,"P");
-	
+
 	if (html) {
 		tr = L"<tr>";
 		trx = L"</tr>" ^ crlf;
@@ -340,7 +340,7 @@ USER0="";
 		tdcolor = L"#FFFFC0";
 	if (not thcolor)
 		thcolor = L"#FFFF80";
-oswrite(sentencex,"sentencex");
+//oswrite(sentencex,"sentencex");
 	if (sentencex.index(L" det-supp", 1))
 		detsupp = 1;
 	if (sentencex.index(L" det-supp2", 1))
@@ -401,7 +401,7 @@ phraseinit:
 			dictfilename = L"dict_md";
 			DICT = dictmd;
 		}
-		
+
 		//add the filename to the sort/select command
 		ss ^= L" " ^ word;
 
@@ -711,8 +711,9 @@ x1exit:
 ///////
 	//if no columns selected then try to use default @crt or @lptr group item
 	//if (not (coln or crtx) and (DICT ne dictmd or datafile eq L"md" or datafile eq L"dict_md")) {
-	if (not (coln or crtx) and DICT.outputl("dict")) {
+	if (not (coln or crtx) and DICT) {
 	// and ((DICT.ucase() ne dictmd.ucase()) or (filename.ucase() eq L"MD") or (filename.ucase() eq L"DICT_MD"))) {
+
 		var words=printing ? L"@lptr,@crt" : L"@crt,@lptr";
 		for (int ii=1;ii<=2;++ii) {
 			word = words.field(L",",ii);
@@ -722,13 +723,14 @@ x1exit:
 					//word.outputl("word not found:");
 					word = L"";
 				}
+			} //else word.outputl("word found:");
+
+			if (word) {
+				crtx = 1;
+				sentencex ^= L" " ^ word;
+				charn = sentencex.length() - word.length();
+				goto nextphrase;
 			}
-		}
-		if (word) {
-			crtx = 1;
-			sentencex ^= L" " ^ word;
-			charn = sentencex.length() - word.length();
-			goto nextphrase;
 		}
 	}
 
@@ -958,7 +960,7 @@ x1exit:
 //initrec:
 //////////
 	var selectedok;
-oswrite(ss,"ss");
+//oswrite(ss,"ss");
 	if (ss.count(L" ") > 2 or keylist) {
 		//call mssg('Selecting records, please wait.||(Press Esc or F10 to interrupt)','UB',buffer,'')
 		//perform ss:' (S)'
@@ -1778,5 +1780,5 @@ function esctoexit()
 //2. closes the class that programinit opened
 //3. sets up the required global main() function that will instantiate the class run its main() function
 
-debugprogramexit()
-//programexit()
+//debugprogramexit()
+programexit()
