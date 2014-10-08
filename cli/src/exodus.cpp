@@ -31,13 +31,13 @@ program()
 
         var verbose=OPTIONS.index("V");
 
-		if (verbose)
-			EXECPATH.outputl("Executable:");
+	if (verbose)
+		EXECPATH.outputl("Executable:");
 
         var exodusbinpath=field(EXECPATH,SLASH,1,dcount(EXECPATH,SLASH)-1);
 
-		if (verbose)
-			exodusbinpath.outputl("Path:");
+	if (verbose)
+		exodusbinpath.outputl("Path:");
 
         //if (not var().load("libpq.dll"))
         //	printl("Warning: Cannot find libpq.dll to connect to postgres");
@@ -45,7 +45,7 @@ program()
         var command=SENTENCE.field(" ",2,999999);
         var shell;
 
-		//non-windows
+	//non-windows
         if (SLASH eq "/" and shell.osgetenv("SHELL")) {
 
                 var home=osgetenv("HOME");
@@ -78,7 +78,7 @@ program()
 
                 //set EXO_PATH used by compile to find LIB and INCLUDE paths
                 var exoduspath=exodusbinpath;
-                if (exoduspath.field2(SLASH,-1)=="bin")
+                if (exoduspath.field2(SLASH,-1) eq "bin")
                         exoduspath=field(exoduspath,SLASH,1,dcount(exoduspath,SLASH)-1);
                 if (exoduspath and not ossetenv("EXO_PATH",exoduspath))
                         errput("Couldnt set EXO_PATH environment variable");
