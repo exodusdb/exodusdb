@@ -1,6 +1,5 @@
-
 #include <exodus/program.h>
- 
+
 //for the sake of multivalue gurus new to exodus programming this is written
 //with multivalue-mimicking "everything is a global function" syntax
 //instead of exodus's oo-style syntax "xxx.yyy().zzz()"
@@ -14,10 +13,12 @@ function main() {
 	if (not connect())
                 abort("Cannot connect to database. Please check configuration or run configexodus.");
 
-        var dictfilename="dict_"^ filename;
+        var dictfilename="dict_"^filename;
 
-        //leave the test data files around for playing with
+        //leave the test data files around for playing with after the program finishes
         var cleanup=false;
+
+	//always delete and start from scratch (ignore fact that files will not exist the first time)
         //if (cleanup) {
                 deletefile(filename);
                 deletefile(dictfilename);
@@ -29,7 +30,7 @@ function main() {
         if (not open(filename, file)) {
                 createfile(filename);
                 if (not open(filename, file))
-                        abort("Cannot open "^filename);
+                        abort("Cannot create/open "^filename);
         }
 
         printl("\nOpen or create the test files dictionary ", dictfilename);
@@ -38,31 +39,35 @@ function main() {
         if (not open(dictfilename, dictfile)) {
                 createfile(dictfilename);
                 if (not open(dictfilename, dictfile))
-                        abort("Cannot open dictionary "^ dictfilename);
+                        abort("Cannot create/open dictionary "^ dictfilename);
         }
 
         printl("\nPrepare some dictionary records");
 
-        var dictrecs = "";
-        dictrecs  =      "client_code |F|0|Code     ||||          ||L|8";
-        dictrecs ^= FM ^ "client_name |F|1|Name     ||||          ||T|15";
-        dictrecs ^= FM ^ "client_type |F|2|Type     ||||          ||L|5";
-        dictrecs ^= FM ^ "date_created|F|3|Date     ||||D4        ||L|12";
-        dictrecs ^= FM ^ "time_created|F|4|Time     ||||MTH       ||L|12";
-        dictrecs ^= FM ^ "balance     |F|5|Balance  ||||MD20P     ||R|10";
-        dictrecs ^= FM ^ "timestamp   |F|6|Timestamp||||[DATETIME]||L|12";
-        dictrecs ^= FM ^ "@crt        |G| |client_code client_name client_type balance date_created time_created timestamp";
+        var dictrecs =
+             "client_code |F|0|Code     ||||          ||L|8"
+        _FM_ "client_name |F|1|Name     ||||          ||T|15"
+        _FM_ "client_type |F|2|Type     ||||          ||L|5"
+        _FM_ "date_created|F|3|Date     ||||D4        ||L|12"
+        _FM_ "time_created|F|4|Time     ||||MTH       ||L|12"
+        _FM_ "balance     |F|5|Balance  ||||MD20P     ||R|10"
+        _FM_ "timestamp   |F|6|Timestamp||||[DATETIME]||L|12"
+        _FM_ "@crt        |G| |client_code client_name client_type balance date_created time_created timestamp";
 
         printl("\nWrite the dictionary records to the dictionary");
 
         var nrecs=dcount(dictrecs, FM);
-        for (var recn = 1; recn <= nrecs; recn++) {
+        for (var recn = 1; recn <= nrecs; ++recn) {
+
                 var dictrec=extract(dictrecs, recn);
+
                 var key=field(dictrec, "|", 1);
-                var rec=field(dictrec, "|", 2, 9999);
+                var rec=field(dictrec, "|", 2, 999999);
 
                 printl(key, ": ", rec);
+
                 key=trim(key);
+
                 rec=trim(rec);
                 rec=swap(rec, " |", "|");
                 rec=convert(rec, "|", FM);
