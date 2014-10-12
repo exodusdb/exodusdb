@@ -42,11 +42,7 @@ initialise - once only after installation and before first run
 
 run postgres - in background but will die when you disconnect shell
 
- sudo ls
- 
- sudo su postgres
- postgres -D /usr/local/pgsql/data &
- exit
+ sudo su -c "postgres -D /usr/local/pgsql/data &" postgres
 
 to stop postgres (nicely) (gives usage if not running)
 

@@ -1052,7 +1052,7 @@ function processrequest()
 	}
 
 	linkfilename2 = replyfilename.splice(-1, 1, 2);
-	linkfilename2.swapper("/\\",SLASH^SLASH);	
+	linkfilename2.swapper("/\\",SLASH^SLASH);
 	//if (linkfilename2.index(":"))
 	//{
 	//	linkfilename2.swapper(":",SLASH);
@@ -1319,7 +1319,7 @@ subroutine requestexit()
 		printl("Rolling back uncommitted transaction");
 		var().rollbacktrans();
 	}
-		
+
 	if (USER3 == "")
 		USER3 = "Error: No response";
 
@@ -2196,7 +2196,7 @@ emptyrecorderror:
 	}else if (request1 == "EXECUTE") {
 
 		//for security, requests can only call program names
-		//ending in proxy like mediaproxy, productionproxy etc		
+		//ending in proxy like mediaproxy, productionproxy etc
 		var mdcmd = request2;
 		if (mdcmd == "") {
 //badproxy:
@@ -2204,7 +2204,7 @@ emptyrecorderror:
 			return;
 		}
 		mdcmd ^= "PROXY";
-		
+
 		//provide an output file for the program to be executed
 		//nb response file name for detaching processes
 		//will be obtained from the output file name Server2 respond
@@ -2311,9 +2311,9 @@ emptyrecorderror:
 
 				if (not (otherusers("").a(1) && (var().time() - timex).abs() < 30))
 					break;
-					
+
 				var().ossleep(1000);
-				
+
 			}//loop;
 
 			USER1 = "";
@@ -2425,7 +2425,7 @@ return;
 	var nextbfs = "";
 	var handle = file;
 	//<arev>
-	
+
 	//handle = handle.substr(-1, "B" ^ VM);
 	handle = handle.field2(VM,-1);
 	//</arev>

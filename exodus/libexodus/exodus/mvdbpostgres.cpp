@@ -1827,12 +1827,14 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	var maxnrecs=L"";
 
 	var remainingsortselectclause=sortselectclause;
+//remainingsortselectclause.outputl(L"remainingsortselectclause=");
 
 	//sortselectclause may start with {SELECT|SSELECT {maxnrecs} filename}
-	var word1=getword(remainingsortselectclause);
+    var word1=remainingsortselectclause.field(L" ", 1);
 	var word2=word1.ucase();
 	if (word2==L"SELECT"||word2==L"SSELECT")
 	{
+        remainingsortselectclause.substrer(word2.length()+2);
 
 		if (word2==L"SSELECT")
 			bykey=1;
@@ -1861,7 +1863,9 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	}
 
 	static const var valuechars(L"\"'.0123456789-+");
-  	
+
+//remainingsortselectclause.outputl(L"remainingsortselectclause=");
+
 	while (remainingsortselectclause.length())
 	{
 
@@ -1899,13 +1903,17 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		}
 		
 		//by or by-dsnd
-		if (word2==L"BY" || word1==L"BY-DSND")
+        if (word2==L"BY" || word2==L"BY-DSND")
 		{
 			if (orderclause)
 				orderclause^=L", ";
-			var dictexpression=getdictexpression(actualfilename,actualfilename,dictfilename,dictfile,getword(remainingsortselectclause),joins,ismv,true);
-			
-			orderclause ^= dictexpression;
+
+            var dictexpression=getdictexpression(actualfilename,actualfilename,dictfilename,dictfile,getword(remainingsortselectclause),joins,ismv,true);
+
+//dictexpression.outputl(L"dictexpression=");
+//orderclause.outputl(L"orderclause=");
+
+            orderclause ^= dictexpression;
 			
 			if (word2==L"BY-DESC")
 				orderclause^=L" DESC";
@@ -2080,14 +2088,18 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	if (GETDBTRACE)
 		exodus::logputl(sql);
 
-	//Start a transaction block because postgres requires select to cursor to be inside one
-	if (!begintrans()) {
-		return false;
-	}
-
+	//Start a transaction block if none already - because postgres requires select to cursor to be inside one
+	//var autotrans=!statustrans();
+    //if (autotrans && !begintrans()) {
+	//	return false;
+	//}
+	if (!this->statustrans())
+		throw MVDBException(L"select() must be preceeded by begintrans()");
+		
 //	if (!sql.sqlexec())
 	if (! this->sqlexec(sql)) {
-		rollbacktrans();
+		//if (autotrans)
+		//	rollbacktrans();
 		return false;
 	}
 //exodus::logputl(L"selectx exiting ok");
@@ -2118,7 +2130,9 @@ void var::clearselect() const
 		return;
 
 	// end the transaction
-	committrans();
+	//no more since we only start trans for cursor if not already in trans
+	//however this means you must do commit after select without
+	//committrans();
 
 	return;
 
@@ -2134,19 +2148,16 @@ bool readnextx(const var& cursor, PGresultptr& pgresult, PGconn* pgconn)
 	//execute the sql
 	//cant use sqlexec here because it returns data
 	//sqlexec();
-	if (!pqexec(sql,pgresult, pgconn))
+	if (!pqexec(sql,pgresult, pgconn)) {
+		cursor.clearselect();
 		return false;
+	}
 
 	//close cursor if no more
 	if (PQntuples(pgresult) < 1)
 	{
 		PQclear(pgresult);
-
-		// close the cursor - we don't bother to check for errors
-		var sql=L"CLOSE CURSOR1_" ^ cursor;
-
-//		sql.sqlexec();
-		cursor.sqlexec(sql);
+		cursor.clearselect();
 		return false;
 	}
 	return true;
@@ -2172,15 +2183,19 @@ bool var::readnext(var& key, var& valueno) const
 	THISISSTRING()
 
 	PGconn* pgconn=(PGconn*) connection();
-	if (pgconn==NULL)
+	if (pgconn==NULL) {
+		this->clearselect();
 		return L"";
-
+	}
+	
 	PGresultptr pgresult;
 
 	if (!readnextx(*this, pgresult, pgconn))
 	{
 		// end the transaction and quit
-		committrans();
+		// no more
+		//committrans();
+		this->clearselect();
 		return false;
 	}
 /* abortive code to handle unescaping returned hex/escape data	//avoid the need for this by calling pqexecparams flagged for binary
@@ -2273,7 +2288,8 @@ bool var::readnextrecord(var& record, var& key, var& valueno) const
 	if (!readnextx(*this, pgresult, pgconn))
 	{
 		// end the transaction
-		committrans();
+		// no more
+		//committrans();
 		return false;
 	}
 
