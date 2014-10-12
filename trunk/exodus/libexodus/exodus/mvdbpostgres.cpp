@@ -1506,8 +1506,8 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 						dictrec = L"F" ^ FM ^ L"0" ^ FM ^ L"Ref" ^ FM ^ FM ^ FM ^ FM ^ FM ^ FM ^ L"L" ^ FM ^ 15;
 					else
 					{
-		//				throw MVDBException(L"getdictexpression() cannot read " ^ fieldname.quote() ^ L" from " ^ actualdictfile.quote());
-						exodus::errputl(L"ERROR: mvdbpostgres getdictexpression() cannot read " ^ fieldname.quote() ^ L" from " ^ actualdictfile.quote());
+						throw MVDBException(L"getdictexpression() cannot read " ^ fieldname.quote() ^ L" from " ^ actualdictfile.quote());
+		//				exodus::errputl(L"ERROR: mvdbpostgres getdictexpression() cannot read " ^ fieldname.quote() ^ L" from " ^ actualdictfile.quote());
 						return L"";
 					}
 				}
@@ -1915,7 +1915,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 
             orderclause ^= dictexpression;
 			
-			if (word2==L"BY-DESC")
+			if (word2==L"BY-DSND")
 				orderclause^=L" DESC";
 				
 			continue;

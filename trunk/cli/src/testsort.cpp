@@ -45,14 +45,14 @@ function main() {
         printl("\nPrepare some dictionary records");
 
         var dictrecs =
-             "client_code |F|0|Code     ||||          ||L|8"
-        _FM_ "client_name |F|1|Name     ||||          ||T|15"
-        _FM_ "client_type |F|2|Type     ||||          ||L|5"
-        _FM_ "date_created|F|3|Date     ||||D4        ||L|12"
-        _FM_ "time_created|F|4|Time     ||||MTH       ||L|12"
-        _FM_ "balance     |F|5|Balance  ||||MD20P     ||R|10"
-        _FM_ "timestamp   |F|6|Timestamp||||[DATETIME]||L|12"
-        _FM_ "@crt        |G| |client_code client_name client_type balance date_created time_created timestamp";
+             "code        |F|0|Code        ||||          ||L|8"
+        _FM_ "name        |F|1|Name        ||||          ||T|15"
+        _FM_ "type        |F|2|Type        ||||          ||L|5"
+        _FM_ "date_created|F|3|Date Created||||D4        ||L|12"
+        _FM_ "time_created|F|4|Time Created||||MTH       ||L|12"
+        _FM_ "balance     |F|5|Balance     ||||MD20P     ||R|10"
+        _FM_ "timestamp   |F|6|Timestamp   ||||[DATETIME]||L|12"
+        _FM_ "@crt        |G| |code name type balance date_created time_created timestamp";
 
         printl("\nWrite the dictionary records to the dictionary");
 
@@ -76,7 +76,6 @@ function main() {
 
                 //check we can read the record back
                 var rec2;
-                dictfile.outputl("dictfile");
                 //key.outputl("key");
                 if (read(rec2,dictfile, key)) {
                         if (rec2 ne rec) 
@@ -86,8 +85,8 @@ function main() {
         }
 
         var rec;
-        if (not read(rec,dictfile,"BALANCE"))
-                printl("Cant read BALANCE record from dictionary");
+        if (not read(rec,dictfile,"balance"))
+                printl("Cant read 'balance' record from dictionary");
 
         printl("\nClear the client file");
         clearfile(filename);
@@ -118,13 +117,13 @@ function main() {
 
         var prefix="select "^ filename;
 
-        gosub sortselect(file, prefix^ " by client_code");
+        gosub sortselect(file, prefix^ " by code");
 
-        gosub sortselect(file, prefix^ " by balance by client_code");
+        gosub sortselect(file, prefix^ " by balance by code");
 
         gosub sortselect(file, prefix^ " by timestamp");
 
-        gosub sortselect(file, prefix^ " with client_type 'B' by balance");
+        gosub sortselect(file, prefix^ " with type 'B' by balance");
 
         var cmd="list "^ filename^ " id-supp";
         printl("\nList the file using ", quote(cmd));
@@ -151,6 +150,8 @@ subroutine sortselect(in file, in sortselectcmd) {
 
         printl("\nsselect the data - ", sortselectcmd);
 
+	begintrans();
+
         if (!select(sortselectcmd)) {
                 printl("Cannot sselect");
                 return;
@@ -174,6 +175,7 @@ subroutine sortselect(in file, in sortselectcmd) {
 
         }
 
+	rollbacktrans();
 }
 
 programexit()

@@ -1,0 +1,44 @@
+[file_prefs]
+final_new_line=true
+ensure_convert_new_lines=false
+strip_trailing_spaces=false
+replace_tabs=false
+
+[indentation]
+indent_width=4
+indent_type=1
+indent_hard_tab_width=8
+detect_indent=false
+detect_indent_width=false
+indent_mode=2
+
+[project]
+name=libexodus
+base_path=/home/neo/exodus/exodus/libexodus/exodus/
+description=
+file_patterns=*.c;*.cpp;*.h;*.h;
+
+[long line marker]
+long_line_behaviour=1
+long_line_column=72
+
+[files]
+current_page=-1
+
+[VTE]
+last_dir=/home/neo/exodus
+
+[build-menu]
+NF_03_LB=Install
+NF_03_CM=sudo make install
+NF_03_WD=
+C++FT_00_LB=_Compile
+C++FT_00_CM=g++ -c "%f" -I..
+C++FT_00_WD=
+filetypes=C++;
+
+[gproject]
+source_patterns=*.c;*.C;*.cpp;*.cxx;*.c++;*.cc;
+header_patterns=*.h;*.H;*.hpp;*.hxx;*.h++;*.hh;*.m;
+ignored_dirs_patterns=.*;CVS;CMakeFiles;
+generate_tags=true
