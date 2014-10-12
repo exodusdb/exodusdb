@@ -1542,7 +1542,11 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 			//example of multipart key and date conversion
 			//select date '1967-12-31' + split_part(convert_from(key, 'UTF8'), '*',2)::integer from filename
 
-			sqlexpression=L"convert_from(" ^ fileexpression(mainfilename, filename,L"key") ^ L", 'UTF8')";
+            if (forsort_or_select_or_index)
+                //sqlexpression=L"exodus_extract_sort(" ^  fileexpression(mainfilename, filename,L"key") ^ L")";
+                sqlexpression=L"exodus_extract_sort(key,0,0,0)";
+            else
+                sqlexpression=L"convert_from(" ^ fileexpression(mainfilename, filename,L"key") ^ L", 'UTF8')";
 			
 			var keypartn=dictrec.a(5);
 			if (keypartn)

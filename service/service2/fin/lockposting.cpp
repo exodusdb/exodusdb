@@ -9,8 +9,8 @@ function main(in mode, io locklist, in ntries0, io msg) {
 		locklist = "";
 	}
 
-	var ntries=ntries0;
-	if (ntries.unassigned()) {
+	var ntries;
+	if (ntries0.unassigned()) {
 		ntries = "";
 	}
 		ntries = ntries0;

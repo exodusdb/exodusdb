@@ -96,7 +96,7 @@ The problem isnt just about sorting 10A and 2B correctly, it is about correctly 
 2, 10, A, B ie mixed data but not mixed within any one field. All picks can do that because they have a type-less comparison
 operator > that works "correctly" on text and textual numbers.
 
-To avoid requiring the implementation of a proper pick comparison operator in every sql database that exodus uses in future a
+To avoid requiring the implementation of a proper pick comparison operator in every sql database that exodus uses in future, a
 function is provided that preprocesses a bit of text into a text that, when compared as ascii/unicode, produces the right result.
 Essentially this involves replacing all the numbers found in a string with a 16 hex digit representation of the number. This function
 must be called around all sorting and indexing fields and also on all filtering values passed like 'ABC' in "with xyz > 'ABC'".
