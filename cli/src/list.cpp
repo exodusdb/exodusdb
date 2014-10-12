@@ -955,6 +955,9 @@ x1exit:
 	orighead = head;
 	printer1.setheadfoot(mv,head,foot);
 
+	//required before select()
+	begintrans();
+
 //////////
 //initrec:
 //////////
