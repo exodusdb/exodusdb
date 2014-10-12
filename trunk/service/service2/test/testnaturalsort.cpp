@@ -16,6 +16,7 @@ function main() {
 
 	//let everything be one transaction
 	//with automatic rollback at close of program ^_^
+	//and anyway is REQUIRED for the select() command
 	begintrans();
 
 	if (not createfile(tempfilename))
@@ -51,19 +52,20 @@ function main() {
 	var ii,jj;
 	for (ii=ndigits;ii>=0;--ii)
 		for (jj=nzeros;jj>=0;--jj) {
-			var key=""^ii^str("0",jj);
-			write("x",tempfile,key.outputl("key="));
+			var key="x"^ii^str("0",jj);
+			write("junk",tempfile,key.outputl("key="));
 		}
 	//read sorted records forwards to check numbers
-	if (not tempfile.select("by IDxxx"))
+	if (not tempfile.select("by ID")) {
+		tempfile.getlasterror().logputl("lasterror=");
 		abort("problem sorting file");
+	}
 	var key;
 	//while (tempfile.readnext(key)) {
 	while (tempfile.readnext(key)) {
 		printl(key);
 	}
-
-	//rely on automatic rollback
+	//rely on automatic rollback to rollback all work done
 	//deletefile(tempfilename);
 	committrans();
 
