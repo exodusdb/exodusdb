@@ -1527,6 +1527,7 @@ subroutine process()
 //printl("process:"^USER0);
 	//process the input
 	//////////////////
+	begintrans();
 
 	//failure in Server above
 	if (Serverfailure) {

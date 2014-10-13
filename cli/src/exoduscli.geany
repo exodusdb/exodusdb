@@ -14,7 +14,7 @@ indent_mode=2
 
 [project]
 name=exoduscli
-base_path=/home/neo/exodus/cli/src/
+base_path=/home/greg/exodus/cli/src/
 description=
 file_patterns=*.c;*.cpp;*.h;CMakeLists.txt;
 
@@ -24,24 +24,7 @@ long_line_column=72
 
 [files]
 current_page=0
-FILE_NAME_0=247;C++;0;EUTF-8;1;1;0;%2Fhome%2Fneo%2Fexodus%2Fcli%2Fsrc%2Fclearfile.cpp;0;4
-FILE_NAME_1=276;CMake;0;EUTF-8;1;1;0;%2Fhome%2Fneo%2Fexodus%2Fcli%2Fsrc%2FCMakeLists.txt;0;4
-FILE_NAME_2=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fneo%2Fexodus%2Fcli%2Fsrc%2Fcompile.cpp;0;4
-FILE_NAME_3=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fneo%2Fexodus%2Fcli%2Fsrc%2Fconfigexodus.cpp;0;4
-FILE_NAME_4=142;C++;0;EUTF-8;1;1;0;%2Fhome%2Fneo%2Fexodus%2Fcli%2Fsrc%2Fcreatefile.cpp;0;4
-FILE_NAME_5=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fneo%2Fexodus%2Fcli%2Fsrc%2Fcreateindex.cpp;0;4
-FILE_NAME_6=406;C++;0;EUTF-8;1;1;0;%2Fhome%2Fneo%2Fexodus%2Fcli%2Fsrc%2Fdelete.cpp;0;4
-FILE_NAME_7=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fneo%2Fexodus%2Fcli%2Fsrc%2Fdeletefile.cpp;0;4
-FILE_NAME_8=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fneo%2Fexodus%2Fcli%2Fsrc%2Fdeleteindex.cpp;0;4
-FILE_NAME_9=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fneo%2Fexodus%2Fcli%2Fsrc%2Fedic.cpp;0;4
-FILE_NAME_10=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fneo%2Fexodus%2Fcli%2Fsrc%2Fedicc.cpp;0;4
-FILE_NAME_11=26;C++;0;EUTF-8;1;1;0;%2Fhome%2Fneo%2Fexodus%2Fcli%2Fsrc%2Fedir.cpp;0;4
-FILE_NAME_12=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fneo%2Fexodus%2Fcli%2Fsrc%2Fexodus.cpp;0;4
-FILE_NAME_13=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fneo%2Fexodus%2Fcli%2Fsrc%2Fgenfunctors.cpp;0;4
-FILE_NAME_14=41117;C++;0;EUTF-8;1;1;0;%2Fhome%2Fneo%2Fexodus%2Fcli%2Fsrc%2Flist.cpp;0;4
-FILE_NAME_15=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fneo%2Fexodus%2Fcli%2Fsrc%2Flistindexes.cpp;0;4
-FILE_NAME_16=3783;C++;0;EUTF-8;1;1;0;%2Fhome%2Fneo%2Fexodus%2Fcli%2Fsrc%2Ftestsort.cpp;0;4
-FILE_NAME_17=66;C;0;EUTF-8;1;1;0;%2Fhome%2Fneo%2Fexodus%2Fcli%2Fsrc%2Fprinttext.h;0;4
+FILE_NAME_0=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fgreg%2Fexodus%2Fcli%2Fsrc%2Fclearfile.cpp;0;4
 
 [VTE]
 last_dir=/home/neo/exodus/cli/src
