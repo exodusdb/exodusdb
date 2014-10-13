@@ -27,6 +27,7 @@ sudo apt-get -y install subversion g++ postgresql-server-dev* libboost-all-dev b
 cd ~
 svn co HTTPS://exodusdb.googlecode.com/svn/trunk/ exodus
 cd ~/exodus
+# or "cmake ." 
 ./configure
 make clean #in case half-built with wrong boost libs
 make
@@ -40,6 +41,7 @@ export POSTGRESVER=`apt-cache search ^postgresql-[0-9]+.[0-9]+$|tail -n 1|cut -d
 
 ###yum -y install postgresql-server
 sudo apt-get -y install postgresql-$POSTGRESVER
+# or just sudo apt-get -y install postgresql
 
 ###/etc/init.d/postgresql start
 #/etc/init.d/postgresql-$POSTGRESVER start
