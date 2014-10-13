@@ -305,6 +305,7 @@ updateversion:
 	call log2("*convert reports file", logtime);
 	var reports;
 	if (reports.open("REPORTS")) {
+		begintrans();
 		reports.select();
 		var reportkey;
 		while (reports.readnext(reportkey)) {
@@ -338,6 +339,7 @@ updateversion:
 				}
 			}
 		}
+		committrans();
 	}
 
 	//if OPENFILE('DEFINITIONS',DEFINITIONS) then null
@@ -761,12 +763,15 @@ getproxy:
 
 	call log2("get an initial company to work with for init routines", logtime);
 	gen.companies.clearselect();
+	begintrans();
 	//TODO should be a sequence code on companies to sort the important companies first
 	gen.companies.select();
 	if (not gen.companies.readnext(gen.gcurrcompany)) {
 		var().stop("no companies setup - cannot start server");
 	}
 	gen.companies.clearselect();
+	committrans();
+	//finished selecting
 
 	if (gen.company.read(gen.companies, gen.gcurrcompany))
 		gen.company="";
@@ -887,6 +892,7 @@ adddatasetcodename:
 
 	call log2("*clean up document keys", logtime);
 	if (gen.documents.open("DOCUMENTS")) {
+		begintrans();
 		gen.documents.select();
 
 		var docid;
@@ -900,6 +906,7 @@ adddatasetcodename:
 				}
 			}
 		}
+		committrans();
 	}
 
 	call log2("*save upgrade history and email notification", logtime);
