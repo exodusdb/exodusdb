@@ -6,6 +6,7 @@ cmake_minimum_required(VERSION 2.8)
 
 # CONFIGURE PostgreSQL
 
+set(PostgreSQL_ADDITIONAL_SEARCH_PATHS "/usr/include/postgresql/9.3/server")
 find_package(PostgreSQL REQUIRED)
 
 execute_process(

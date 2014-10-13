@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 2.8)
 #2014/06/01 exodus doesnt require c++11 but we enable it for
 #config is set to look in /usr/local/include and /usr/local/lib first for any source version of boost compiled for c++11
 #not using c++11 for now until solve problem linking to filesystem
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 add_definitions(-DEXODUS_IPC_BOOST)
 add_definitions(-DEXODUS_IPC_POSIX)
