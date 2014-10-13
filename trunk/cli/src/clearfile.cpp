@@ -5,8 +5,13 @@ function main()
 {
 
         var filenames=COMMAND.field(FM,2,999999);
+
+		//"classic" global functions
         var silent=index(ucase(OPTIONS),"S");
 
+		//"modern" methods (member functions)
+		//var silent=OPTIONS.ucase().index("S"));
+		
         if (not filenames)
                 stop("Syntax is clearfile filename filename ...\ndict files are named dict_filename");
 
