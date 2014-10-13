@@ -2,7 +2,7 @@
 
 //for the sake of multivalue gurus new to exodus programming this is written
 //with multivalue-mimicking "everything is a global function" syntax
-//instead of exodus's oo-style syntax "xxx.yyy().zzz()"
+//instead of exodus's oo-style syntax "xxx.yyy().zzz()".
 
 var filename="myclients";
 
@@ -95,7 +95,7 @@ function main() {
 
         var recs = "";
         recs ^= FM ^ "SB001|Client AAA |A |15070|76539|1000.00|15070.76539";
-        recs ^= FM ^ "JB002|Client BBB |B |15000|50539|200.00|15000.50539";
+        recs ^= FM ^ "JB002|Client BBB |B |15000|50539|200.00 |15000.50539";
         recs ^= FM ^ "JB001|Client CCC |B |15010|60539|2000.00|15010.60539";
         recs ^= FM ^ "SB1  |Client SB1 |1 |     |     |       |           ";
         recs ^= FM ^ "JB2  |Client JB2 |2 |14000|10539|0      |14000.10539";
