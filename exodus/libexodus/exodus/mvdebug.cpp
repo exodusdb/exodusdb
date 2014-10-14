@@ -33,9 +33,10 @@ THE SOFTWARE.
 	#include <iostream>
 	#include <string>
 	#include <stdio.h>
-#ifdef HAVE_BACKTRACE
+//defined in config.h but config.h created by ./configure (automake tools not cmake)
+//#ifdef HAVE_BACKTRACE
 	#include <execinfo.h>
-#endif
+//#endif
 
 #endif
 	//for signal
@@ -314,19 +315,19 @@ Backtrace 7: 0x100000f64
 
 		var path2=var(path).convert("\x0d\x0a","");//.outputl("path=");
 		var sourcefilename=path2.field(":",1);//.outputl("filename=");
-		var lineno=path2.field(":",2);//.outputl("lineno=");
+		var lineno=path2.field(":",2).field(" ",1).field("(",1);//.outputl("lineno=");
 
 		addbacktraceline(sourcefilename,lineno,returnlines);
 	}
 
 	/* close */
 	pclose(fp);
-	
+
 	return returnlines.substr(2);
 #endif
 
 #endif
-	
+
 }
 
 void SIGINT_handler (int sig)
