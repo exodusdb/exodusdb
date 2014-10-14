@@ -1315,10 +1315,11 @@ subroutine requestexit()
 {
 	var().unlockall();
 
-	for (var ii=0;ii<10 and var().statustrans();++ii) {
-		printl("Rolling back uncommitted transaction");
-		var().rollbacktrans();
-	}
+	//for (var ii=0;ii<10 and var().statustrans();++ii) {
+	//	printl("Rolling back uncommitted transaction");
+	//	var().rollbacktrans();
+	//}
+	committrans();
 
 	if (USER3 == "")
 		USER3 = "Error: No response";

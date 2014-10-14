@@ -3,9 +3,14 @@ message("--LIBEXODUS CMAKE INIT --")
 
 cmake_minimum_required(VERSION 2.8)
 
-#2014/06/01 exodus doesnt require c++11 but we enable it for
+#2014/06/01 exodus doesnt require c++11 but can compile using it
+#NB exodus cli "compile" hard codes compilation as c++11 so exodus applications can be written in c++11
+#even if libexodus is compiled and linked to c++99 boost libraries etc
 #config is set to look in /usr/local/include and /usr/local/lib first for any source version of boost compiled for c++11
-#not using c++11 for now until solve problem linking to filesystem
+#not using c++11 for now until solve problem linking to boost filesystem unless boost libs were compiled in c++11
+#perhaps using some BOOST_NO_CXX11_SCOPED_ENUMS macro
+#line #define BOOST_NO_CXX11_SCOPED_ENUMS before boost/filesystem is included
+#said to be not a good idea to link c++11 lib to pre c+11 libs (whether this applies to exodus annd boost is unknown)
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 add_definitions(-DEXODUS_IPC_BOOST)

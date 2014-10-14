@@ -3,6 +3,8 @@
 #from any existing exodus database server SEND a starting database to target server (port/user/host)
 #exodus database needs to be created in target (exodus' sudo make install) and be empty
 pg_dump -U exodus | ssh -p 19518 neosys@nl10r.neosys.com psql -U postgres exodus
+#or if command running on the starting database machine and pulling data from remote machine
+ssh -p 19518 neosys@nl10r.neosys.com pg_dump -U exodus | sudo su -c "psql -U postgres exodus" postgres
 
 sudo apt-get -y install apache2 php5 libapache2-mod-php5
 

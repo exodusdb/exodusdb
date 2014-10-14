@@ -684,7 +684,7 @@ bool var::read(const var& filehandle,const var& key)
 	if (PQresultStatus(result) != PGRES_TUPLES_OK)
  	{
 		PQclear(result);
-		var errmsg=L"read(" ^ filehandle ^ L", " ^ key.quote()
+		var errmsg=L"read(" ^ filehandle.quote() ^ L", " ^ key.quote()
 			^ L") - probably file not opened or doesnt exist\n"
 			^ var(PQerrorMessage(thread_pgconn));
 		this->setlasterror(errmsg);
@@ -925,6 +925,7 @@ bool var::sqlexec(const var& sqlcmd, var& errmsg) const
 			temp ^= L"Unassigned variable";
 		else
 			temp ^= * this;
+        temp ^= L" " ^ sqlcmd;
 		exodus::logputl(temp);
 	}
 
@@ -2195,7 +2196,10 @@ bool var::readnext(var& key, var& valueno) const
 		// end the transaction and quit
 		// no more
 		//committrans();
-		this->clearselect();
+
+        //already done in readnextx
+        //this->clearselect();
+
 		return false;
 	}
 /* abortive code to handle unescaping returned hex/escape data	//avoid the need for this by calling pqexecparams flagged for binary
