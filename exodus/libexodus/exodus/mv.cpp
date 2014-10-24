@@ -35,6 +35,7 @@ THE SOFTWARE.
 #define MV_NO_NARROW
 
 #define EXO_MV_CPP //indicates globals are to be defined (omit extern keyword)
+#include <limits>
 #include <exodus/mv.h>
 #include <exodus/mvimpl.h>
 #include <exodus/mvutf.h>
@@ -191,8 +192,8 @@ var::var(const long long longlong1)
 //ctor for double
 //just use initializers since cannot fail
 var::var(const double double1)
-	: var_mvdbl(double1)
-	, var_mvtyp(pimpl::MVTYPE_DBL)
+    : var_mvdbl(double1)
+    , var_mvtyp(pimpl::MVTYPE_DBL)
 {}
 
 //EXPLICIT AND AUTOMATIC CONVERSIONS
@@ -363,7 +364,7 @@ var& var::operator = (const int int1)
 //The assignment operator should always return a reference to *this.
 var& var::operator = (const double double1)
 {
-	//THISIS(L"var& var::operator = (const double double1)")
+    //THISIS(L"var& var::operator = (const double double1)")
 	//protect against unlikely syntax as follows:
 	//var undefinedassign=undefinedassign=9.9';
 	// !!RISK NOT CHECKING TO SPEED THINGS UP SINCE SEEMS TO WORK IN MSVC AND GCC
@@ -463,7 +464,7 @@ var& var::operator ^= (const int int1)
 //The assignment operator should always return a reference to *this.
 var& var::operator ^= (const double double1)
 {
-	THISIS(L"var& var::operator ^= (const double double1)")
+    THISIS(L"var& var::operator ^= (const double double1)")
 	THISISSTRING()
 
 	//var_mvstr+=var(int1).var_mvstr;
@@ -524,12 +525,14 @@ var& var::operator ^= (const std::wstring string1)
 var var::operator ++ (int)
 {
 	THISIS(L"var var::operator ++ (int)")
-	//full check done below to avoid double checking number type
+    //full check done below to avoid double checking number type
 	THISISDEFINED()
 
 tryagain:
 	if (var_mvtyp&pimpl::MVTYPE_INT)
 	{
+        if (var_mvint==std::numeric_limits<mvint_t>::max())
+            throw MVIntOverflow(L"operator ++");
 		var_mvint++;
 		var_mvtyp=pimpl::MVTYPE_INT;//reset to one unique type
 	}
@@ -564,7 +567,7 @@ var var::operator -- (int)
 {
 
 	THISIS(L"var var::operator -- (int)")
-	//full check done below to avoid double checking number type
+    //full check done below to avoid double checking number type
 	THISISDEFINED()
 
 	if (var_mvtyp&mvtypemask)
@@ -606,7 +609,7 @@ var& var::operator ++ ()
 {
 
 	THISIS(L"var var::operator ++ ()")
-	//full check done below to avoid double checking number type
+    //full check done below to avoid double checking number type
 	THISISDEFINED()
 
 tryagain:
@@ -646,7 +649,7 @@ tryagain:
 var& var::operator -- ()
 {
 	THISIS(L"var& var::operator -- ()")
-	//full check done below to avoid double checking number type
+    //full check done below to avoid double checking number type
 	THISISDEFINED()
 
 tryagain:
@@ -955,7 +958,7 @@ DLL_PUBLIC bool MVlt(const var& lhs,const var& rhs)
 				return (lhs.var_mvint<rhs.var_mvint);
 			else
 				//different from MVeq
-				return (double(lhs.var_mvint)<rhs.var_mvdbl);
+                return (double(lhs.var_mvint)<rhs.var_mvdbl);
 		}
 		if (rhs.var_mvtyp&pimpl::MVTYPE_INT)
 			//different from MVeq
@@ -1248,13 +1251,13 @@ var MVdiv(const var& lhs,const var& rhs)
 	ISNUMERIC(lhs)
 	ISNUMERIC(rhs)
 
-	//always returns a double
+    //always returns a double
 
-	double bottom=(rhs.var_mvtyp&pimpl::MVTYPE_INT) ? double(rhs.var_mvint) : rhs.var_mvdbl;
+    double bottom=(rhs.var_mvtyp&pimpl::MVTYPE_INT) ? double(rhs.var_mvint) : rhs.var_mvdbl;
 	if (!bottom)
 		throw MVDivideByZero(L"div('" ^ lhs.substr(1,20) ^ L"', '" ^ rhs.substr(1,20) ^ L"')");
 
-	double top=(lhs.var_mvtyp&pimpl::MVTYPE_INT) ? double(lhs.var_mvint) : lhs.var_mvdbl;
+    double top=(lhs.var_mvtyp&pimpl::MVTYPE_INT) ? double(lhs.var_mvint) : lhs.var_mvdbl;
 	return top/bottom;
 }
 
@@ -1272,11 +1275,11 @@ var MVmod(const var& lhs,const var& rhs)
 		return lhs.var_mvint%rhs.var_mvint;
 	}
 
-	double bottom=(rhs.var_mvtyp&pimpl::MVTYPE_INT) ? double(rhs.var_mvint) : rhs.var_mvdbl;
+    double bottom=(rhs.var_mvtyp&pimpl::MVTYPE_INT) ? double(rhs.var_mvint) : rhs.var_mvdbl;
 	if (!bottom)
 		throw MVDivideByZero(L"div('" ^ lhs.substr(1,20) ^ L"', '" ^ rhs.substr(1,20) ^ L"')");
 
-	double top=(lhs.var_mvtyp&pimpl::MVTYPE_INT) ? double(lhs.var_mvint) : lhs.var_mvdbl;
+    double top=(lhs.var_mvtyp&pimpl::MVTYPE_INT) ? double(lhs.var_mvint) : lhs.var_mvdbl;
 	return neosysmodulus(top,bottom);
 }
 
@@ -1411,7 +1414,7 @@ std::wistream& operator >> (std::wistream& wistream1,var& var1)
 
 inline double neosysmodulus(const double top,const double bottom)
 {
-	return top-double(int(top/bottom)*bottom);
+    return top-double(int(top/bottom)*bottom);
 }
 
 //TODO ensure locale doesnt produce like 123.456,78
@@ -1473,6 +1476,8 @@ MVException::MVException(const var& description_) : description(description_)
 MVUnassigned		::MVUnassigned		(const var& var1)	: MVException(L"MVUnassigned:"				^ var1	){}
 MVDivideByZero		::MVDivideByZero	(const var& var1)	: MVException(L"MVDivideByZero:"			^ var1	){}
 MVNonNumeric		::MVNonNumeric		(const var& var1)	: MVException(L"MVNonNumeric:"				^ var1	){}
+MVIntOverflow		::MVIntOverflow		(const var& var1)	: MVException(L"MVIntOverflow:"				^ var1	){}
+MVIntUnderflow		::MVIntUnderflow	(const var& var1)	: MVException(L"MVIntUnderflow:"			^ var1	){}
 MVUndefined			::MVUndefined		(const var& var1)	: MVException(L"MVUndefined:"				^ var1	){}
 MVOutOfMemory		::MVOutOfMemory		(const var& var1)	: MVException(L"MVOutOfMemory:"				^ var1	){}
 MVInvalidPointer	::MVInvalidPointer	(const var& var1)	: MVException(L"MVInvalidPointer:"			^ var1	){}

@@ -122,7 +122,7 @@ ABC	<	BC
 
 Flat 2B	<	Flat 10A
 
-A-2	<	A-10		dots and dashes within text don’t imply negative/decimal points
+A-2	<	A-10		dots and dashes within text dont imply negative/decimal points
 A -10	<	A -2        unless prefixed by space
 A.2	<	A.10
 A .10	<	A .2
