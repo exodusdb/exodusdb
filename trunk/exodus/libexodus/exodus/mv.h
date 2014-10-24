@@ -274,6 +274,7 @@ As a result, symmetric operators like + and - are generally implemented as non-m
 //TODO check sizeof var with virtual destructor
 //since this class has no virtual functions it should still be save to derive from it and do delete()
 //http://www.parashift.com/c++-faq-lite/virtual-functions.html#faq-20.7
+//class var
 class DLL_PUBLIC var
 {
 
@@ -293,7 +294,7 @@ public:
 	//standard c/c++ int() in other words simply take the number to the left of the point. -1.5 becomes -1 and 1.5 becomes 1
 	int toInt() const;
 
-	double toDouble() const;
+    double toDouble() const;
 
 	std::wstring toWString() const;
 
@@ -358,8 +359,8 @@ public:
 	//ctor for long long
 	var(const long long longlong1);
 
-	//ctor for double
-	var(const double double1);
+    //ctor for double
+    var(const double double1);
 
 	//AUTOMATIC CONVERSIONS TO bool, void* and int
 	//////////////////////////////////////////////
@@ -496,8 +497,8 @@ public:
 	//=int
 	var& operator= (const int int1);
 
-	//=double
-	var& operator= (const double double1);
+    //=double
+    var& operator= (const double double1);
 
 	//=wchar_t
 	var& operator= (const wchar_t char2);
@@ -514,8 +515,8 @@ public:
 	//=int
 	var& operator^= (const int int1);
 
-	//=double
-	var& operator^= (const double double1);
+    //=double
+    var& operator^= (const double double1);
 
 	//=wchar_t
 	var& operator^= (const wchar_t char2);
@@ -568,72 +569,72 @@ public:
 	DLL_PUBLIC friend  var operator+ (const var&,const var&);
 	DLL_PUBLIC friend  var operator+ (const var&,const wchar_t*);
 	DLL_PUBLIC friend  var operator+ (const var&,const int);
-	DLL_PUBLIC friend  var operator+ (const var&,const double);
+    DLL_PUBLIC friend  var operator+ (const var&,const double);
 	DLL_PUBLIC friend  var operator+ (const var&,const bool);
 	DLL_PUBLIC friend  var operator+ (const wchar_t*,const var&);
 	DLL_PUBLIC friend  var operator+ (const int,const var&);
-	DLL_PUBLIC friend  var operator+ (const double,const var&);
+    DLL_PUBLIC friend  var operator+ (const double,const var&);
 	DLL_PUBLIC friend  var operator+ (const bool,const var&);
 
 	DLL_PUBLIC friend  var operator- (const var&,const var&);
 	DLL_PUBLIC friend  var operator- (const var&,const wchar_t*);
 	DLL_PUBLIC friend  var operator- (const var&,const int);
-	DLL_PUBLIC friend  var operator- (const var&,const double);
+    DLL_PUBLIC friend  var operator- (const var&,const double);
 	DLL_PUBLIC friend  var operator- (const var&,const bool);
 	DLL_PUBLIC friend  var operator- (const wchar_t*,const var&);
 	DLL_PUBLIC friend  var operator- (const int,const var&);
-	DLL_PUBLIC friend  var operator- (const double,const var&);
+    DLL_PUBLIC friend  var operator- (const double,const var&);
 	DLL_PUBLIC friend  var operator- (const bool,const var&);
 
 	DLL_PUBLIC friend  var operator* (const var&,const var&);
 	DLL_PUBLIC friend  var operator* (const var&,const wchar_t*);
 	DLL_PUBLIC friend  var operator* (const var&,const int);
-	DLL_PUBLIC friend  var operator* (const var&,const double);
+    DLL_PUBLIC friend  var operator* (const var&,const double);
 	DLL_PUBLIC friend  var operator* (const var&,const bool);
 	DLL_PUBLIC friend  var operator* (const wchar_t*,const var&);
 	DLL_PUBLIC friend  var operator* (const int,const var&);
-	DLL_PUBLIC friend  var operator* (const double,const var&);
+    DLL_PUBLIC friend  var operator* (const double,const var&);
 	DLL_PUBLIC friend  var operator* (const bool,const var&);
 
 	DLL_PUBLIC friend  var operator/ (const var&,const var&);
 	DLL_PUBLIC friend  var operator/ (const var&,const wchar_t*);
 	DLL_PUBLIC friend  var operator/ (const var&,const int);
-	DLL_PUBLIC friend  var operator/ (const var&,const double);
+    DLL_PUBLIC friend  var operator/ (const var&,const double);
 	//disallow divide by boolean to prevent possible runtime divide by zero
 	//DLL_PUBLIC friend  var operator/ (const var&,const bool);
 	DLL_PUBLIC friend  var operator/ (const wchar_t*,const var&);
 	DLL_PUBLIC friend  var operator/ (const int,const var&);
-	DLL_PUBLIC friend  var operator/ (const double,const var&);
+    DLL_PUBLIC friend  var operator/ (const double,const var&);
 	DLL_PUBLIC friend  var operator/ (const bool,const var&);
 
 	DLL_PUBLIC friend  var operator% (const var&,const var&);
 	DLL_PUBLIC friend  var operator% (const var&,const wchar_t*);
 	DLL_PUBLIC friend  var operator% (const var&,const int);
-	DLL_PUBLIC friend  var operator% (const var&,const double);
+    DLL_PUBLIC friend  var operator% (const var&,const double);
 	//disallow divide by boolean to prevent possible runtime divide by zero
 	//DLL_PUBLIC friend  var operator/ (const var&,const bool);
 	DLL_PUBLIC friend  var operator% (const var&,const bool);
 	DLL_PUBLIC friend  var operator% (const wchar_t*,const var&);
 	DLL_PUBLIC friend  var operator% (const int,const var&);
-	DLL_PUBLIC friend  var operator% (const double,const var&);
+    DLL_PUBLIC friend  var operator% (const double,const var&);
 	DLL_PUBLIC friend  var operator% (const bool,const var&);
 
 	//NB do NOT allow concat with bool or vice versa - find reason why
 	DLL_PUBLIC friend  var operator^ (const var&,const var&);
 	DLL_PUBLIC friend  var operator^ (const var&,const wchar_t*);
 	DLL_PUBLIC friend  var operator^ (const var&,const int);
-	DLL_PUBLIC friend  var operator^ (const var&,const double);
+    DLL_PUBLIC friend  var operator^ (const var&,const double);
 	DLL_PUBLIC friend  var operator^ (const wchar_t*,const var&);
 	DLL_PUBLIC friend  var operator^ (const int,const var&);
-	DLL_PUBLIC friend  var operator^ (const double,const var&);
+    DLL_PUBLIC friend  var operator^ (const double,const var&);
 
 	DLL_PUBLIC friend  bool operator< (const var&,const var&);
 	DLL_PUBLIC friend  bool operator< (const var&,const wchar_t*);
 	DLL_PUBLIC friend  bool operator< (const var&,const int);
-	DLL_PUBLIC friend  bool operator< (const var&,const double);
+    DLL_PUBLIC friend  bool operator< (const var&,const double);
 	DLL_PUBLIC friend  bool operator< (const wchar_t*,const var&);
 	DLL_PUBLIC friend  bool operator< (const int,const var&);
-	DLL_PUBLIC friend  bool operator< (const double,const var&);
+    DLL_PUBLIC friend  bool operator< (const double,const var&);
 //#ifndef MV_NO_NARROW
 	DLL_PUBLIC friend  bool operator< (const var&,const char*);
 	DLL_PUBLIC friend  bool operator< (const char*,const var&);
@@ -642,10 +643,10 @@ public:
 	DLL_PUBLIC friend  bool operator<= (const var&,const var&);
 	DLL_PUBLIC friend  bool operator<= (const var&,const wchar_t*);
 	DLL_PUBLIC friend  bool operator<= (const var&,const int);
-	DLL_PUBLIC friend  bool operator<= (const var&,const double);
+    DLL_PUBLIC friend  bool operator<= (const var&,const double);
 	DLL_PUBLIC friend  bool operator<= (const wchar_t*,const var&);
 	DLL_PUBLIC friend  bool operator<= (const int,const var&);
-	DLL_PUBLIC friend  bool operator<= (const double,const var&);
+    DLL_PUBLIC friend  bool operator<= (const double,const var&);
 //#ifndef MV_NO_NARROW
 	DLL_PUBLIC friend  bool operator<= (const var&,const char*);
 	DLL_PUBLIC friend  bool operator<= (const char*,const var&);
@@ -654,10 +655,10 @@ public:
 	DLL_PUBLIC friend  bool operator> (const var&,const var&);
 	DLL_PUBLIC friend  bool operator> (const var&,const wchar_t*);
 	DLL_PUBLIC friend  bool operator> (const var&,const int);
-	DLL_PUBLIC friend  bool operator> (const var&,const double);
+    DLL_PUBLIC friend  bool operator> (const var&,const double);
 	DLL_PUBLIC friend  bool operator> (const wchar_t*,const var&);
 	DLL_PUBLIC friend  bool operator> (const int,const var&);
-	DLL_PUBLIC friend  bool operator> (const double,const var&);
+    DLL_PUBLIC friend  bool operator> (const double,const var&);
 //#ifndef MV_NO_NARROW
 	DLL_PUBLIC friend  bool operator> (const var&,const char*);
 	DLL_PUBLIC friend  bool operator> (const char*,const var&);
@@ -666,10 +667,10 @@ public:
 	DLL_PUBLIC friend  bool operator>= (const var&,const var&);
 	DLL_PUBLIC friend  bool operator>= (const var&,const wchar_t*);
 	DLL_PUBLIC friend  bool operator>= (const var&,const int);
-	DLL_PUBLIC friend  bool operator>= (const var&,const double);
+    DLL_PUBLIC friend  bool operator>= (const var&,const double);
 	DLL_PUBLIC friend  bool operator>= (const wchar_t*,const var&);
 	DLL_PUBLIC friend  bool operator>= (const int,const var&);
-	DLL_PUBLIC friend  bool operator>= (const double,const var&);
+    DLL_PUBLIC friend  bool operator>= (const double,const var&);
 //#ifndef MV_NO_NARROW
 	DLL_PUBLIC friend  bool operator>= (const var&,const char*);
 	DLL_PUBLIC friend  bool operator>= (const char*,const var&);
@@ -678,11 +679,11 @@ public:
 	DLL_PUBLIC friend  bool operator== (const var&,const var&);
 	DLL_PUBLIC friend  bool operator== (const var&,const wchar_t*);
 	DLL_PUBLIC friend  bool operator== (const var&,const int);
-	DLL_PUBLIC friend  bool operator== (const var&,const double);
+    DLL_PUBLIC friend  bool operator== (const var&,const double);
 	DLL_PUBLIC friend  bool operator== (const var&,const bool);
 	DLL_PUBLIC friend  bool operator== (const wchar_t*,const var&);
 	DLL_PUBLIC friend  bool operator== (const int,const var&);
-	DLL_PUBLIC friend  bool operator== (const double,const var&);
+    DLL_PUBLIC friend  bool operator== (const double,const var&);
 	DLL_PUBLIC friend  bool operator== (const bool,const var&);
 //#ifndef MV_NO_NARROW
 	DLL_PUBLIC friend  bool operator== (const var&,const char*);
@@ -692,11 +693,11 @@ public:
 	DLL_PUBLIC friend  bool operator!= (const var&,const var&);
 	DLL_PUBLIC friend  bool operator!= (const var&,const wchar_t*);
 	DLL_PUBLIC friend  bool operator!= (const var&,const int);
-	DLL_PUBLIC friend  bool operator!= (const var&,const double);
+    DLL_PUBLIC friend  bool operator!= (const var&,const double);
 	DLL_PUBLIC friend  bool operator!= (const var&,const bool);
 	DLL_PUBLIC friend  bool operator!= (const wchar_t*,const var&);
 	DLL_PUBLIC friend  bool operator!= (const int,const var&);
-	DLL_PUBLIC friend  bool operator!= (const double,const var&);
+    DLL_PUBLIC friend  bool operator!= (const double,const var&);
 	DLL_PUBLIC friend  bool operator!= (const bool,const var&);
 //#ifndef MV_NO_NARROW
 	DLL_PUBLIC friend  bool operator!= (const var&,const char*);
@@ -1096,7 +1097,7 @@ private:
 	#pragma warning( 4: 4251 )
 #endif
 	mutable mvint_t var_mvint;
-	mutable double var_mvdbl;
+    mutable double var_mvdbl;
 	//initialise type last
 	mutable wchar_t var_mvtyp;
 
@@ -1355,7 +1356,7 @@ public:
 	//see also ^= etc
 	dim& operator= (const var& var1);
 	dim& operator= (const int int1);
-	dim& operator= (const double dbl1);
+    dim& operator= (const double dbl1);
 
 	//allow default construction for class variables later resized in class methods
 	dim();
@@ -1621,6 +1622,8 @@ public: MVException(const var& description);
 //individual exceptions are made public so exodus programmers can catch specific errors or even stop/abort/debug if they want
 class DLL_PUBLIC MVDivideByZero         : public MVException {public: MVDivideByZero         (const var& var1    );};
 class DLL_PUBLIC MVNonNumeric           : public MVException {public: MVNonNumeric           (const var& var1    );};
+class DLL_PUBLIC MVIntOverflow          : public MVException {public: MVIntOverflow          (const var& var1    );};
+class DLL_PUBLIC MVIntUnderflow         : public MVException {public: MVIntUnderflow         (const var& var1    );};
 class DLL_PUBLIC MVOutOfMemory          : public MVException {public: MVOutOfMemory          (const var& var1    );};
 class DLL_PUBLIC MVUnassigned           : public MVException {public: MVUnassigned           (const var& var1    );};
 class DLL_PUBLIC MVUndefined            : public MVException {public: MVUndefined            (const var& var1    );};
