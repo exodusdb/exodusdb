@@ -28,8 +28,8 @@ cd ~
 svn co https://github.com/exodusdb/exodusdb/trunk/ exodus
 
 cd ~/exodus
+#./configure
 cmake .
-./configure
 make clean #in case half-built with wrong boost libs
 make
 sudo make install
