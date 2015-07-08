@@ -2,11 +2,11 @@
 #=== Building and Installing Exodus Using apt-get ===
 
 #you can view/run the latest version of this script directly
-# wget -O - https://github.com/exodusdb/exodusdb/trunk/install_apt.sh | less
-# wget -O - https://github.com/exodusdb/exodusdb/trunk/install_apt.sh | bash
+# wget -O -https://raw.githubusercontent.com/exodusdb/exodusdb/master/install_apt.sh | less
+# wget -O - https://raw.githubusercontent.com/exodusdb/exodusdb/master/install_apt.sh | bash
 #or
-# curl https://github.com/exodusdb/exodusdb/trunk/install_apt.sh | less
-# curl https://github.com/exodusdb/exodusdb/trunk/install_apt.sh | bash
+# curl https://raw.githubusercontent.com/exodusdb/exodusdb/master/install_apt.sh | less
+# curl https://raw.githubusercontent.com/exodusdb/exodusdb/master/install_apt.sh | bash
 
 #tested on:
 
