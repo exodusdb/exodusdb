@@ -2,11 +2,11 @@
 #=== Building and Installing Exodus Using apt-get ===
 
 #you can view/run the latest version of this script directly
-# wget -O - http://exodusdb.googlecode.com/svn/trunk/install_apt.sh | less
-# wget -O - http://exodusdb.googlecode.com/svn/trunk/install_apt.sh | bash
+# wget -O - https://github.com/exodusdb/exodusdb/trunk/install_apt.sh | less
+# wget -O - https://github.com/exodusdb/exodusdb/trunk/install_apt.sh | bash
 #or
-# curl http://exodusdb.googlecode.com/svn/trunk/install_apt.sh | less
-# curl http://exodusdb.googlecode.com/svn/trunk/install_apt.sh | bash
+# curl https://github.com/exodusdb/exodusdb/trunk/install_apt.sh | less
+# curl https://github.com/exodusdb/exodusdb/trunk/install_apt.sh | bash
 
 #tested on:
 
@@ -22,12 +22,13 @@ cat /etc/issue
 #==== 1. Building and Installing Exodus ====
 
 ###yum -y install subversion gcc-c++ postgresql-devel
-sudo apt-get -y install subversion g++ postgresql-server-dev* libboost-all-dev build-essential
+sudo apt-get -y install subversion g++ postgresql-server-dev* libboost-all-dev build-essential cmake
 
 cd ~
-svn co HTTPS://exodusdb.googlecode.com/svn/trunk/ exodus
+svn co https://github.com/exodusdb/exodusdb/trunk/ exodus
+
 cd ~/exodus
-# or "cmake ." 
+cmake .
 ./configure
 make clean #in case half-built with wrong boost libs
 make
