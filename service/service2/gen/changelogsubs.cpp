@@ -29,9 +29,11 @@ function main(in mode0) {
 	var nkeywords = keywords.count(VM) + 1;
 
 	if (not(openfile("CHANGELOG", changelog))) {
+		call fsmsg();
 		return 0;
 	}
 	if (not(openfile("DICT_CHANGELOG", DICT))) {
+		call fsmsg();
 		return 0;
 	}
 

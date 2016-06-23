@@ -119,7 +119,8 @@ function main(in mode, io msg, in param3x="") {
 			return 0;
 		}
 
-		msg ^= FM ^ FM ^ "Analysis code field ";
+		//msg:=fm:fm:'Analysis code field '
+		msg ^= FM ^ FM ^ "Analysis ";
 
 		//analysis field number
 		var tt = billcostaccs.a(3, billcostn);
@@ -157,31 +158,31 @@ field2err:
 			return 0;
 		}
 
-		//brandcode
+		//brandcode - analysis field 3
 		brandcode = param3.field("*", 3);
 		if (not brandcode) {
-			msg ^= "3 - brand code is required";
+			msg ^= "brand is required";
 			return 0;
 		}
 		if (not(xx.read(agy.brands, brandcode))) {
-			msg ^= "3 - " ^ (DQ ^ (brandcode ^ DQ)) ^ " brand code does not exist";
+			msg ^= DQ ^ (brandcode ^ DQ) ^ " brand code does not exist";
 			return 0;
 		}
 
-		//media verification
+		//media verification - analysis field 4
 		var vehiclecode = param3.field("*", 4);
 		if (vehiclecode) {
 
 			//check account allows media
 			if (not(billcostaccs.locate(1, xx, 5, billcostn))) {
 				//could force jobs here but best to indicate some error since unexpected
-				msg ^= "4 - media/vehicle code cannot be entered";
+				msg ^= "media/vehicle code must not be entered";
 				return 0;
 			}
 
 			//vehiclecode
 			if (not(xx.read(agy.vehicles, vehiclecode))) {
-				msg ^= "4 - " ^ (DQ ^ (vehiclecode ^ DQ)) ^ " vehicle code does not exist";
+				msg ^= DQ ^ (vehiclecode ^ DQ) ^ " vehicle code does not exist";
 				return 0;
 			}
 
@@ -190,50 +191,50 @@ field2err:
 			tt.converter("*", "");
 			if (tt.length()) {
 				//could force no fields here but best to indicate some error since unexpected
-				msg ^= "5-7 must be empty";
+				msg ^= "fields 5-7 must be empty";
 				return 0;
 			}
 
 			//nonmedia verification
 		}else{
 
-			//check account allows jobs
+			//check account allows jobs - analysis field 4
 			if (not(billcostaccs.locate(2, xx, 5, billcostn))) {
 				//TODO we should try and avoid an account being used for both media and jobs
-				msg ^= "4 - media/vehicle code must be entered";
+				msg ^= "media/vehicle is required";
 				return 0;
 			}
 
-			//marketcode
+			//marketcode - analysis field 5
 			var marketcode = param3.field("*", 5);
 			if (not marketcode) {
-				msg ^= "5 - market code is required";
+				msg ^= "market is required";
 				return 0;
 			}
 			if (not(xx.read(agy.markets, marketcode))) {
-				msg ^= "5 - " ^ (DQ ^ (marketcode ^ DQ)) ^ " market code does not exist";
+				msg ^= DQ ^ (marketcode ^ DQ) ^ " market code does not exist";
 				return 0;
 			}
 
-			//suppliercode
+			//suppliercode - analysis field 6
 			var suppliercode = param3.field("*", 6);
 			if (not suppliercode) {
-				msg ^= "6 - supplier code is required";
+				msg ^= "supplier code is required";
 				return 0;
 			}
 			if (not(xx.read(agy.suppliers, suppliercode))) {
-				msg ^= "6 - " ^ (DQ ^ (suppliercode ^ DQ)) ^ " supplier code does not exist";
+				msg ^= (DQ ^ (suppliercode ^ DQ)) ^ " supplier code does not exist";
 				return 0;
 			}
 
 			//type exists
 			var typecode = param3.field("*", 7);
 			if (not typecode) {
-				msg ^= "7 - job type code is required";
+				msg ^= "job type is required";
 				return 0;
 			}
 			if (not(xx.read(agy.jobtypes, typecode))) {
-				msg ^= "7 - " ^ (DQ ^ (typecode ^ DQ)) ^ " job type code does not exist";
+				msg ^= DQ ^ (typecode ^ DQ) ^ " job type code does not exist";
 				return 0;
 			}
 
@@ -241,8 +242,13 @@ field2err:
 			tt = billcostaccs.a(4, billcostn);
 			if (tt) {
 				if (not(tt.locateusing(typecode, SVM))) {
-					tt.swapper(SVM, ", ");
-					msg ^= "7 job type code must be one of " ^ tt;
+					msg ^= " type (" ^ typecode ^ ") must be ";
+					if (tt.index(SVM, 1)) {
+						tt.swapper(SVM, ", ");
+						msg ^= "one of " ^ tt;
+					}else{
+						msg ^= DQ ^ (tt ^ DQ);
+					}
 					return 0;
 				}
 			}

@@ -36,7 +36,7 @@ function main(in mode) {
 		if (not(valacc("", win.is, win.isorig, "", msg))) {
 			return invalid(msg);
 		}
-		win.is = win.is.a(1, 1, 1);
+		//win.is = win.is.a(1, 1, 1);
 	}
 
 	*/

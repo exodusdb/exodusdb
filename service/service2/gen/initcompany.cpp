@@ -189,12 +189,6 @@ function main(in nextcompanycode) {
 			if (fin.definition.a(6, vn) == "") {
 				fin.definition.r(6, vn, temp);
 			}
-			call log2("fix auto number", logtime);
-			//dont do this now that UI checkbox is 1 or '' and invoices may ne in journal format
-			//IF DEFINITION<9,VN> EQ '' THEN
-			// LOCATE DEFINITION<1,VN> IN 'SI':vm:'CN'<1> SETTING TEMP THEN TEMP=0 ELSE TEMP=1
-			// DEFINITION<9,VN>=TEMP
-			// END
 		}
 	};//vn;
 	fin.basecurrency = gen.company.a(3);

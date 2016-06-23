@@ -36,7 +36,9 @@ var result;
 var errors;
 var savelistactive;
 
-function main() {
+function main(in mode, in select, in nfilters, dim& filters) {
+
+	if (false && mode && select && nfilters && filters(0,0)){};
 
 	var filename = SENTENCE.field(" ", 2);
 	var file;

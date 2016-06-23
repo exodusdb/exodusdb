@@ -8,6 +8,7 @@ libraryinit()
 #include <printtx.h>
 #include <tag.h>
 #include <quote2.h>
+#include <convcsv.h>
 
 #include <gen.h>
 #include <agy.h>
@@ -22,6 +23,7 @@ var sep;
 var tr;
 var trx;
 var todate;
+var filters;
 var newjobno;
 var usern;
 var printptr;//num
@@ -57,6 +59,11 @@ function main() {
 	//l40 = "[TAGHTML,TD]";
 	tdr="td aligh=right";
 	td="td";
+	var timesheetparams;
+	if (not(timesheetparams.read(DEFINITIONS, "TIMESHEET.PARAMS"))) {
+		timesheetparams = "";
+	}
+
 	sep = "";
 	tr = "<tr>";
 	var trr = "<tr align=right>";
@@ -68,7 +75,7 @@ function main() {
 	//var fileformat = PSEUDO.a(1);
 	//no html for now
 	var fileformat = "xls";
-	var reqcompcodes = PSEUDO.a(22);
+	var reqcompanycodes = PSEUDO.a(22);
 
 	/*;
 		YEAR.PERIODS=@PSEUDO<29>;
@@ -80,6 +87,9 @@ function main() {
 		EXECUTIVECODES=@PSEUDO<41>;
 	*/
 	var usercodes = PSEUDO.a(52);
+	var reqclientcodes = PSEUDO.a(23);
+	var reqactivitycodes = PSEUDO.a(45);
+	var requsercodes = PSEUDO.a(52);
 
 	if (not(DICT.open("dict_TIMESHEETS"))) {
 		return fsmsg();
@@ -113,22 +123,26 @@ function main() {
 	var cmd = "SELECT TIMESHEETS";
 
 	if (ifromdate) {
+		if (timesheetparams.a(8) and ifromdate < timesheetparams.a(8)) {
+			call mssg("Timesheet analysis is only available from " ^ (timesheetparams.a(8)).oconv("[DATE,*4]"));
+			var().stop();
+		}
 		cmd ^= " AND WITH DATE BETWEEN " ^ (DQ ^ (ifromdate.oconv("[DATE,4*]") ^ DQ)) ^ " AND " ^ (DQ ^ (itodate.oconv("[DATE,4*]") ^ DQ));
 		head ^= "<H3>";
 		head ^= FM ^ "For the period " ^ ifromdate.oconv("[DATE,*4]") ^ " to " ^ itodate.oconv("[DATE,*4]") ^ FM;
 		head ^= "</H3>";
 	}
 
-	if (usercodes) {
-		cmd ^= " AND WITH PERSON_CODE " ^ quote2(usercodes);
+	if (requsercodes) {
+		cmd ^= " AND WITH PERSON_CODE " ^ quote2(requsercodes);
 	}
 
 	//this should be filtered per line
 	//develop exodus to explode sort if filter with on mv dictionary unless invent new WITH ANY type of syntax
-	if (reqcompcodes) {
-		cmd ^= " AND WITH COMPANY_CODE " ^ quote2(reqcompcodes);
+	if (reqcompanycodes) {
+		//cmd ^= " AND WITH COMPANY_CODE " ^ quote2(reqcompanycodes);
 		head ^= "<H3>";
-		head ^= FM ^ "Company: " ^ quote(xlate("COMPANIES",reqcompcodes,1,"C")) ^ FM;
+		head ^= FM ^ "Company: " ^ quote(xlate("COMPANIES",reqcompanycodes,1,"C")) ^ FM;
 		head ^= "</H3>";
 	}
 
@@ -181,11 +195,52 @@ function main() {
 	//cmd ^= " (S)";
 
 	if (fileformat) {
+
+		call select(cmd);
+		if (not LISTACTIVE) {
+			call mssg("No records found");
+			var().stop();
+		}
+		cmd = "";
+
+		//annoyingly cannot seem to filter multivalues in arev select
+		//so do it per multivalue (similar to LIMIT clause in NLIST)
+
+		dim filters(3, 3);
+		filters="";
+
+		var nfilters = 1;
+		filters(1, nfilters) = "HOURS";
+		filters(3, nfilters) = "";
+
+		if (reqactivitycodes) {
+			nfilters += 1;
+			filters(1, nfilters) = "ACTIVITY_CODE";
+			filters(3, nfilters) = reqactivitycodes;
+		}
+
+		if (reqcompanycodes) {
+			nfilters += 1;
+			//look up on jobs
+			filters(1, nfilters) = "COMPANY_CODE";
+			filters(3, nfilters) = reqcompanycodes;
+		}
+
+		if (reqclientcodes) {
+			nfilters += 1;
+			//look up brand on jobs, then client on brands
+			filters(1, nfilters) = "CLIENT_CODE";
+			filters(3, nfilters) = reqclientcodes;
+		}
+
+		//change output file to desired extension
 		var sys2 = SYSTEM.a(2);
 		sys2.splicer(-3, 3, fileformat);
 		SYSTEM.r(2, sys2);
-		perform("convcsv TIMESHEETS SELECT " ^ cmd.field(" ", 3, 9999));
+
+		call convcsv("SELECT TIMESHEETS", "", nfilters, filters);
 		return 1;//ok
+
 	}
 
 /*

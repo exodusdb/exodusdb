@@ -390,9 +390,16 @@ lockit:
 			}
 		}
 
-		goto 4271;
-	}
-	if (mode.field(".", 1, 2) == "DEF.REF") {
+	//call chain to get a plan/schedule number
+	//UI sends company code in readenvironment
+	//0. LISTEN calls PLAN.SUBS PREREAD which adds * to all single letters
+	// * tells LISTEN to get a sequential key (which is does in step 1.)
+	//1. LISTEN call general.subs('DEF.SK.':readenvironment)
+	//2. GENERAL.SUBS call plan.subs5('DEF.REF.':field(mode,'.',3,999))
+	//3. PLAN.SUBS5 call agency.subs('GETNEXTID.':compcode)
+	//4. AGENCY.SUBS call GENERAL.SUBS('DEF.SK2') pattern NOT <NUMBER>
+	// @ans=nextkey(params,previous) pattern IS <NUMBER>
+	} else if (mode.field(".", 1, 2) == "DEF.REF") {
 		//call general.subs('DEF.SK')
 
 		if (win.wlocked or RECORD) {
@@ -401,7 +408,22 @@ lockit:
 
 		var previous = 0;
 
-		var compcode = mode.field(".", 3);
+		//var compcode = mode.field(".", 3);
+		//try to use single letter key as sequential key IF IS COMPANY CODE
+		//why was the following commented out?
+		if (ID.length() == 2 and ID[-1] == "*" and ID[1].xlate("COMPANIES", 1, "X")) {
+			compcode = ID[1];
+			//can this really happen (see step 0)
+		} else if (ID.length() == 1) {
+			compcode = ID;
+		}else{
+			//read environment (company code expected TODO should be checked)
+			compcode = mode.field(".", 3);
+		}
+
+		//end else
+		// compcode=field(mode,'.',3)
+		// end
 		//gosub getnextref
 		call agencysubs("GETNEXTID." ^ compcode);
 
@@ -504,8 +526,7 @@ lockit:
 		DATA ^= "" "\r";
 
 		goto 4271;
-	}
-	if (mode == "DEF.PERIOD") {
+	} else if (mode == "DEF.PERIOD") {
 		if (win.is) {
 			return 0;
 		}

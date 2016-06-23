@@ -71,6 +71,10 @@ case 18:
 case 19:
 	msg = "Non-numeric planned ads in line " ^ (params.count(VM) + 1) ^ ". Please correct.";
 	break;
+case 20:
+	msg = DQ ^ (params ^ DQ) ^ " company is missing";
+	break;
+	//see line 6
 
 default:
 	var msg = DQ ^ (msgno ^ DQ) ^ " unknown message no in plansubs9";

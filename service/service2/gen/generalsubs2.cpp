@@ -21,6 +21,7 @@ var firstversion;
 var useversioneconomy;//num
 var datetimelogfn;
 var logn;//num
+var ologn;//num
 var userlogfn;
 var stationlogfn;
 var statuslogfn;//num
@@ -28,6 +29,7 @@ var oldversion;
 var versionsepchar;
 var ascending;//num
 var versionlogfn;//num
+var execn;
 var status2;
 var subject;
 var module;
@@ -154,13 +156,16 @@ function main(in mode) {
 			//if version='' then version='A'
 			if (version == "") {
 				version = firstversion;
+				RECORD.r(versionfn, firstversion);
 			}
 		}
+
+		var anythingchanged = 1;
 
 		if (win.orec) {
 
 			//update the version if anything changed except status
-			var anythingchanged = 0;
+			anythingchanged = 0;
 			if (statusfn) {
 				var temporec = win.orec.replace(statusfn, 0, 0, RECORD.a(statusfn));
 
@@ -180,14 +185,14 @@ function main(in mode) {
 
 			//option not to save version if status/user/date/workstation same
 			if (anythingchanged and useversioneconomy) {
-				var lastdate = win.orec.a(datetimelogfn, logn).field(".", 1);
+				var lastdate = win.orec.a(datetimelogfn, ologn).field(".", 1);
 				if (lastdate == var().date()) {
-					var lastuser = win.orec.a(userlogfn, logn);
+					var lastuser = win.orec.a(userlogfn, ologn);
 					if (lastuser == USERNAME) {
-						var laststation = win.orec.a(stationlogfn, logn);
+						var laststation = win.orec.a(stationlogfn, ologn);
 						if (laststation == STATION.trim()) {
 							if (statusfn) {
-								var laststatus = win.orec.a(statuslogfn, logn);
+								var laststatus = win.orec.a(statuslogfn, ologn);
 								if (laststatus == status) {
 									anythingchanged = 0;
 								}
@@ -239,14 +244,53 @@ function main(in mode) {
 		//could update last log instead of inserting if doing versioneconomy?
 		//would lose complete datetime record but avoid confusing same versions
 
-		//backward compatible with old records without versioning
-		//save version 1 line even if record doesnt exist
-		if (win.orec and ascending and logn == 1 and versionfn) {
-			RECORD.inserter(versionlogfn, logn, oldversion);
-			logn += 1;
+		//this condition will suppress recording every change in the document log
+		//for timesheets
+		if (win.datafile == "TIMESHEETS" and RECORD.a(8) ne win.orec.a(8)) {
+			//here it means add an entry in the log
+			anythingchanged = 1;
 		}
 
-		gosub addlog();
+		if (anythingchanged or win.datafile ne "TIMESHEETS") {
+
+			//backward compatible with old records without versioning
+			//save version 1 line even if record doesnt exist
+			if (win.orec and ascending and logn == 1 and versionfn) {
+				RECORD.inserter(versionlogfn, logn, oldversion);
+				logn += 1;
+			}
+
+			gosub addlog();
+		
+		}
+
+		//update
+		//add new executives/reactivate executives if reused
+		//TODO obtain temporary lock
+		if (win.datafile == "JOBS" or win.datafile == "SCHEDULES") {
+			var execcode = calculate("EXECUTIVE_CODE");
+			var indexvalueskey = "INDEXVALUES*" ^ win.datafile ^ "*EXECUTIVE_CODE";
+			var indexvalues;
+			if (indexvalues.read(DEFINITIONS, indexvalueskey)) {
+				if (indexvalues.locateby(execcode, "AL", execn, 1)) {
+					//reactivate so seen when creating new documents again
+					if (indexvalues.a(1, execn)) {
+						indexvalues.r(2, execn, "");
+						goto updindexvalues;
+					}
+				}else{
+					//add so all are seen if updating "Executive File"
+					//NB no "Executive File" on UI as at 2014/06/26 and probably not needed
+					//can adjust frequency and age of clearing (default one year) in autorun task
+					indexvalues.inserter(1, execn, execcode);
+					indexvalues.inserter(2, execn, "");
+updindexvalues:
+					indexvalues.write(DEFINITIONS, indexvalueskey);
+				}
+			}
+		}
+
+		//create a onetime autorun task to print and email the document to the group
 
 		if (win.datafile == "JOBS") {
 			status2 = calculate("STATUS2");
@@ -492,8 +536,10 @@ subroutine getfiledefaults() {
 	if (ascending) {
 		logn = RECORD.a(logfn + 0);
 		logn = logn.count(VM) + (logn ne "") + 1;
+		ologn = logn - 1;
 	}else{
 		logn = 1;
+		ologn = 1;
 	}
 
 	return;

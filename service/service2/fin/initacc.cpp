@@ -79,6 +79,33 @@ function main() {
 	}
 	call authorised("JOURNAL POST REVALUATION", xx, tt);
 
+	if (not(authorised("JOURNAL POST UNALLOCATED", xx))) {
+		{}
+	}
+
+	call log2("*initialise statement type and hexdates", logtime);
+	fin.statmtypes = "13";
+	fin.hexdatesize = 3;
+
+	call log2("*add analysis code column to journals if not pure finance module", logtime);
+	if (APPLICATION EQ "ADAGENCY" and fin.definition.a(60) == "") {
+		if (lockrecord("DEFINITIONS", DEFINITIONS, "ALL", "", 3)) {
+			if (fin.definition.read(DEFINITIONS, "ALL")) {
+				var nn = (fin.definition.a(5)).count(VM) + 1;
+				for (var ii = 1; ii <= nn; ++ii) {
+					if (fin.definition.a(5, ii) and fin.definition.a(60, ii) == "") {
+						fin.definition.r(60, ii, "Analysis Code");
+					}
+				};//ii;
+				fin.definition.write(DEFINITIONS, "ALL");
+				call unlockrecord("DEFINITIONS", DEFINITIONS, "ALL");
+			}
+		}
+
+		call log2("*setup default budget names etc", logtime);
+		call readaccparams();
+	}
+	
 	call log2("-----initacc exit", logtime);
 
 	return 1;

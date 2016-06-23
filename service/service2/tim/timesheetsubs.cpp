@@ -558,11 +558,12 @@ nextjob:
 		var tothours = (RECORD.a(2)).sum();
 
 		//always require some hours
-		if (not tothours) {
-			msg = "The total hours:minutes cannot be zero";
-			return invalid(msg);
-		}
-
+		//removed to allow saving on timer start
+		//if tothours else
+		// msg='The total hours:minutes cannot be zero'
+		// goto invalid
+		// end
+		
 		//check max hours (if any) always
 		if (win.registerx(1).a(3)) {
 			if (tothours > win.registerx(1).a(3)) {
@@ -572,11 +573,14 @@ nextjob:
 			}
 		}
 
-		//check min hours (of non-timesheet admin timesheets)
-		if (win.registerx(1).a(2) and tothours < win.registerx(1).a(2) and not userisadmin) {
+		//autosave if done for timer timesheet (timer is only available for today)
+		//but anybody can save less time for the current date
 
-			//anybody can enter less for the current date but it cannot be approved
-			if (idate ne var().date() or approving) {
+		//check min hours (of non-timesheet admin timesheets)
+		if (not calculate("AUTOSAVED") and win.registerx(1).a(2) and tothours < win.registerx(1).a(2) and not userisadmin) {
+
+			//anybody can enter less for the current and future date but it cannot be approved
+			if (idate < var().date() or approving) {
 
 				getholidaytypedate = idate;
 				gosub getholidaytype();
@@ -599,6 +603,7 @@ nextjob:
 		}
 
 		//check details entered for sundry clients
+		MV = 0;
 		if (agy.clients.open("CLIENTS", "")) {
 			var clientcodes = calculate("CLIENT_CODE");
 			var nlns = clientcodes.count(VM) + 1;
@@ -607,8 +612,9 @@ nextjob:
 					var clientcode = clientcodes.a(1, ln);
 					var client;
 					if (not(client.read(agy.clients, clientcode))) {
-						msg = DQ ^ (clientcode ^ DQ) ^ " is missing from the client file";
-						return invalid(msg);
+						//msg = DQ ^ (clientcode ^ DQ) ^ " is missing from the client file";
+						//return invalid(msg);
+						client = "";
 					}
 					if (client.a(38)) {
 						//msg='Details are missing for ':client<1>

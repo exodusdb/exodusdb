@@ -1,4 +1,4 @@
-#ifdef asasdasdff
+#ifdef CONVERTIONCOMPLETED
 #include <exodus/library.h>
 libraryinit()
 
@@ -6,10 +6,13 @@ libraryinit()
 #include <validcode2.h>
 #include <validcode3.h>
 #include <authorised.h>
+
 #include <btreeextract.h>
+
 #include <generalsubs.h>
 //#include <chklic.h>
 #include <generalsubs2.h>
+
 #include <sysmsg.h>
 #include <addjobacc.h>
 #include <initcompany.h>
@@ -81,13 +84,14 @@ function main(in mode) {
 	//curranalysis<4>=mv costbase
 
 	if (mode == "F2.PRODUCTION.ORDERS") {
-		call agencysubs(mode);
+		call agencysubs(mode, msg);
 
 		//case mode='DEF.ORDER.NO'
 		// call general.subs('DEF.SK')
 		// defaultorderno=is.dflt
 
 	} else if (mode.field(".", 1, 3) == "DEF.ORDER.NO") {
+
 		//pretty much identical in prodorder.subs, prodinv.subs and even plan.subs
 		//call general.subs('DEF.SK')
 
@@ -99,12 +103,12 @@ function main(in mode) {
 
 		var compcode = mode.field(".", 4);
 		//gosub getnextjobno
-		call agencysubs("GETNEXTID." ^ compcode);
+		call agencysubs("GETNEXTID." ^ compcode, msg);
 
 		win.isdflt = ANS;
 		ANS = "";
 
-		win.registerx[10] = win.isdflt;
+		win.registerx(10) = win.isdflt;
 
 		if (not interactive) {
 			ID = win.isdflt;
@@ -113,6 +117,7 @@ function main(in mode) {
 		return 0;
 
 	} else if (mode == "VAL.ORDER.NO") {
+
 		if (win.is == "" or win.is == win.isorig) {
 			return 0;
 		}
@@ -162,15 +167,13 @@ lockit:
 
 		}
 
-	} else if (mode == "CHOOSECOLS") {
+<Merge Conflict>
 
-		var prodorderheads = var("PRODORDER.COLHEADS").xlate("DEFINITIONS", 1, "X");
-		RECORD.r(13, prodorderheads ^ VM ^ RECORD.a(13));
-		RECORD.inserter(3, 1, "");
-		win.displayaction = 5;
-		win.reset = 3;
+<Merge Conflict>
 
 	} else if (mode == "VAL.JOB") {
+
+
 		if (win.is == win.isorig) {
 			return 0;
 		}
@@ -181,7 +184,7 @@ lockit:
 			temp = ".OPEN";
 		}
 		//call agency.subs(mode)
-		call agencysubs(mode ^ temp);
+		call agencysubs(mode ^ temp, msg);
 		if (not win.valid) {
 			return 0;
 		}
@@ -277,7 +280,8 @@ lockit:
 
 	} else if (mode == "VAL.SUPPLIER") {
 
-		call agencysubs("VAL.SUPPLIER.PRODUCTION");
+
+		call agencysubs("VAL.SUPPLIER.PRODUCTION", msg);
 
 		//check supplier currency
 		var supplier;
@@ -304,6 +308,7 @@ lockit:
 
 		//called from web interface
 	} else if (mode == "VAL.SUPPINV") {
+
 		if (win.is == "" or win.isorig == win.is) {
 			return 0;
 		}
@@ -418,6 +423,7 @@ lockit:
 	// IF IS ELSE IS.DFLT=BASE.CURRENCY.CODE
 
 	} else if (mode == "VAL.CURRENCY") {
+
 		if (win.is == win.isorig) {
 			return 0;
 		}
@@ -441,6 +447,7 @@ lockit:
 
 	} else if (mode == "VAL.AMOUNT") {
 		win.is = win.is.oconv("MD" ^ calculate("NDECS") ^ "0P");
+
 
 	} else if (mode == "DEF.EXCH.RATE") {
 }
@@ -471,6 +478,7 @@ subroutine defexchrate() {
 		ANS = rate;
 
 	} else if (mode == "POSTINIT") {
+
 		gosub security();
 		if (not(authorised("PRODUCTION COST ACCESS", msg, ""))) {
 			return invalid(msg);
@@ -650,6 +658,7 @@ badtype:
 
 	} else if (mode == "PREDELETE") {
 
+
 		msg = "Orders cannot be deleted. Change the status to cancelled.";
 		return invalid(msg);
 
@@ -702,8 +711,10 @@ badtype:
 		}
 
 		//restrict access based on company and brand
-		if (RECORD.a(2)) {
+		var jobno = RECORD.a(2);
+		if (jobno) {
 			if (not(validcode2(calculate("COMPANY_CODE"), "", calculate("BRAND_CODE"), agy.brands, msg))) {
+
 				win.reset = 5;
 				return invalid(msg);
 			}
@@ -711,6 +722,24 @@ badtype:
 				win.reset = 5;
 				return invalid(msg);
 			}
+
+			//check allowed to access job
+			//similar code in job.subs prodorder.subs prodinv.subs
+			//also listprodords listprodinvs listinvs
+			var accessothers = authorised("JOB ACCESS OTHERS", msg);
+			if (not accessothers) {
+				var executivecode = calculate("EXECUTIVE_CODE");
+				if (executivecode) {
+					if (executivecode ne USERNAME) {
+						if (executivecode ne USERNAME.xlate("USERS", 1, "X")) {
+							msg = "Production cost " ^ (DQ ^ (ID ^ DQ)) ^ " belongs to job " ^ (DQ ^ (jobno ^ DQ)) ^ " which belongs to executive " ^ executivecode ^ FM ^ FM ^ msg;
+							win.reset = 5;
+							goto EOF_449;
+						}
+					}
+				}
+			}
+
 		}
 
 		//option to prevent adding costs after job has been billed
@@ -752,16 +781,12 @@ badtype:
 
 						end;
 					end;
-				end*/;
-
-			//get the number of decimals
-			if @record and @record<14>='' then;
-		if (RECORD and RECORD.a(14) == "") {
-				@record<14>={NDECS}
-			RECORD.r(14, calculate("NDECS"));
-				orec<14>=@record<14>;
-			win.orec.r(14, RECORD.a(14));
 				end;
+*/
+		//get the number of decimals
+		if (RECORD and RECORD.a(14) == "") {
+			RECORD.r(14, calculate("NDECS"));
+			win.orec.r(14, RECORD.a(14));
 		}
 
 	/* moved to before validations;
@@ -935,7 +960,9 @@ initrec:
 	} else if (mode == "POSTWRITE" or mode == "POSTDELETE") {
 //		call flushindex("PRODUCTION.ORDERS");
 
+
 	} else {
+
 		msg = DQ ^ (mode ^ DQ) ^ " unrecognised mode in prodorder.subs";
 		return invalid(msg);
 	}
@@ -1003,7 +1030,7 @@ errexit:
 
 	//basic checks done
 	//no further processing for cancelled records
-	if (var("DRAFT CANCELLED").locate(RECORD.a(11), " ")) {
+	if (var("DRAFT CANCELLED").locateusing(RECORD.a(11), " ")) {
 		return;
 	}
 
@@ -1016,7 +1043,7 @@ errexit:
 
 	if (orderestno) {
 		//get invoice number from estimate (in case they changed estimate number)
-		//isinvoiced=(xlate('PRODUCTION.INVOICES',orderestno,10,'X') ne '')
+		//isinvoiced=(xlate('PRODUCTION_INVOICES',orderestno,10,'X') ne '')
 		var prodinv;
 		if (not(prodinv.read(agy.productioninvoices, orderestno))) {
 			msg = DQ ^ (orderestno ^ DQ) ^ " estimate is missing in PRODORDER.SUBS";
@@ -1026,8 +1053,35 @@ errexit:
 		orderourinvno = prodinv.a(10);
 		RECORD.r(16, orderourinvno);
 		isinvoiced = orderourinvno ne "";
+
+		//if job was changed then order estimate number is cleared
+		//TODO if they change and before saving, restore job no in UI - what happens?
 	}else{
+
 		orderourinvno = RECORD.a(16);
+
+		//make sure the invoice belongs to the job number otherwise remove
+		//since user must have changed the job number in UI and not entered a new Est No
+		//NB we dont want this production order looking like it has been invoiced
+		//and skipped from cost generation if and when the new job is invoiced
+		//as it was in NEOSYS up to 2014/07/01
+		if (orderourinvno and not deleting) {
+			var invkey = orderourinvno;
+			if (agy.agp.a(48)) {
+				invkey = invkey.fieldstore("*", 3, 1, calculate("COMPANY_CODE"));
+			}
+			var inv;
+			if (not(inv.read(agy.invoices, invkey))) {
+				msg = DQ ^ (invkey ^ DQ) ^ " missing from invoices";
+				call sysmsg(msg);
+				goto errexit;
+			}
+			if (inv.a(11) ne jobno!!!) {
+				RECORD.r(16, "");
+				orderourinvno = "";
+			}
+		}
+
 		isinvoiced = jobourinvnos ne "";
 	}
 	//2007/07/16 changing po on manually closed job generated accounting entries
@@ -1367,7 +1421,7 @@ errexit:
 
 subroutine update() {
 
-	if (var("DRAFT CANCELLED").locate(calculate("STATUS")), " ") {
+	if (var("DRAFT CANCELLED").locateusing(calculate("STATUS"), " ")) {
 		return;
 	}
 
@@ -1536,6 +1590,7 @@ creditcostspertype:
 			if (agy.agp.a(102)) {
 				tt = "POST";
 			}
+
 			call updvoucher2(tt, voucher, vouchercode, "", agy.agp.a(102));
 
 			if (job.a(14) ne "") {

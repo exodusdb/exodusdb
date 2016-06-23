@@ -362,8 +362,25 @@ lockit:
 				win.reset = 5;
 				return invalid();
 			}
-		}
 
+			//check allowed to access job
+			//similar code in job.subs prodorder.subs prodinv.subs
+			//also listprodords listprodinvs listinvs prodinvs
+			var jobno = RECORD.a(2);
+			var accessothers = authorised("JOB ACCESS OTHERS", msg);
+			if (not accessothers) {
+				var executivecode = calculate("EXECUTIVE_CODE");
+				if (executivecode) {
+					if (executivecode ne USERNAME) {
+						if (executivecode ne USERNAME.xlate("USERS", 1, "X")) {
+							msg = "Production estimate " ^ (DQ ^ (ID ^ DQ)) ^ " belongs to job " ^ (DQ ^ (jobno ^ DQ)) ^ " which belongs to executive " ^ executivecode ^ FM ^ FM ^ msg;
+							win.reset = 5;
+							return invalid();
+						}
+					}
+				}
+			}
+		}
 		call agencysubs("CHKCLOSEDPERIOD." ^ mode, msg);
 		if (msg) {
 			//comment to client

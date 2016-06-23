@@ -202,6 +202,10 @@ if (not DEFINITIONS.open("DEFINITIONS")) {
 	//system<121> to syncdata required (every hour to ..\data2\dataset.1/2/3
 	//system<122> to emailblockingusers
 	//system<123> to installationgroup defaults to GLOBAL (for ..\..\GLOBAL.END)
+	//system<124> to checkforupgrades 0 1 default to yes
+	//system<125> to closeafterbackups 0 1 default to yes
+	//system<126> to testcanstartprocesses 0 1 default to no
+	//see also systemconfiguration_dict.js
 
 	//std::wcout<<"Opening Definitions ... "<<std::flush;
 	var definitionsfilename="DEFINITIONS";
@@ -390,6 +394,18 @@ updateversion:
 	if (not SYSTEM.a(123)) {
 		SYSTEM.r(123, "GLOBAL");
 	}
+	// upgrades yes
+	if (not SYSTEM.a(124)) {
+		SYSTEM.r(124, 2);
+	}
+	//close after backup yes
+	if (not SYSTEM.a(125)) {
+		SYSTEM.r(125, 2);
+	}
+	//test should start missing processes
+	if (not SYSTEM.a(126)) {
+		SYSTEM.r(126, 0);
+	}
 
 	call log2("*determine systemid from old smtp sender name", logtime);
 	if (not SYSTEM.a(57)) {
@@ -405,7 +421,7 @@ updateversion:
 		if (smtp.a(1)) {
 			var sysname = smtp.a(1).field("@", 1).lcase();
 			//remove all punctuation
-			sysname.converter("!\"$%^&*()_+-=[]{};:@,./<>?", "");
+			sysname.converter("!\"#$%^&*()_+-=[]{};:@,./<>?", "");
 			SYSTEM.r(57, sysname);
 			call osread(tt, "SYSTEM.CFG");
 			tt.r(57, sysname);
@@ -537,20 +553,21 @@ updateversion:
 	var currdataset = SYSTEM.a(17);
 
 	call log2("*try to update upload.dll", logtime);
-	for (var extn = 1; extn <= 2; ++extn) {
-		var ext = var("net,w3c").field(",", extn);
-		var path = "..\\neosys." ^ ext ^ "\\neosys\\dll\\";
-		tt = (path ^ "upload.dl_").osfile();
-		if (tt) {
-			if (tt ne (path ^ "upload.dll").osfile()) {
-				call osdelete(path ^ "upload.dll");
-				if (not((path ^ "upload.dll").osfile())) {
-					//call shell('ren ':path:'upload.dl_ upload.dll')
-					osshell("copy " ^ path ^ "upload.dl_ " ^ path ^ "upload.dll");
-				}
+	//for extn=1 to 3
+	// ext=field('net,w3c,www',',',extn)
+	var ext = "NET";
+	var path = "..\\neosys." ^ ext ^ "\\neosys\\dll\\";
+	tt = (path ^ "upload.dl_").osfile();
+	if (tt) {
+		if (tt ne (path ^ "upload.dll").osfile()) {
+			call osdelete(path ^ "upload.dll");
+			if (not((path ^ "upload.dll").osfile())) {
+				//call shell('ren ':path:'upload.dl_ upload.dll')
+				osshell("copy " ^ path ^ "upload.dl_ " ^ path ^ "upload.dll");
 			}
 		}
-	};//extn;
+	}
+	// next extn
 
 	call log2("*find cygwin", logtime);
 	var locations = SYSTEM.a(50);
@@ -912,8 +929,8 @@ adddatasetcodename:
 	call log2("*save upgrade history and email notification", logtime);
 	if (version.osread("GENERAL\\VERSION.DAT")) {
 		version = version.field("\r", 1).field(0x1A, 1).trim();
-		//idate=iconv(field(version,' ',2,3),'D')
-		//itime=iconv(field(version,' ',1),'MT')
+		var idate = (version.field(" ", 2, 4)).iconv("D");
+		var itime = (version.field(" ", 1)).iconv("MT");
 		call osread(upgradelog, "UPGRADE.CFG");
 		//if field2(upgradelog,crlf,-1) ne version then
 		if (field2(upgradelog, var().chr(10), -1) ne version) {
@@ -925,10 +942,13 @@ adddatasetcodename:
 
 			//should only email users on live database (ie not copies that are not backedup)
 			if (not SYSTEM.a(61) and not var("NEOSYS.ID").osfile()) {
+				tt = idate.oconv("D/J") ^ " " ^ itime.oconv("MT");
+
 				if (decide("Email users about upgrade/to clear cache?|(F5 EMAILUSERS UPGRADE)|Mandatory if there are significant changes in web UI", xx) == 1) {
+
 					perform("EMAILUSERS UPGRADE " ^ version);
 				} else {
-					call sysmsg("NEOSYS Software Upgrade " ^ version);
+					call sysmsg("NEOSYS Software Upgrade " ^ tt);
 				}
 			}
 
@@ -957,7 +977,8 @@ adddatasetcodename:
 	call unlockrecord("DEFINITIONS", definitions, "INIT.GENERAL.LOGIN");
 
 	call initgeneral2("FIXURLS", logtime);
-	call initgeneral2("UPDATECONNECTIONS", logtime);
+	call initgeneral2("UPDATEIPNOS4NEOSYS", logtime);
+	call initgeneral2("CREATEALERTS", logtime);
 
 	call log2("*indicate success to LOGIN", logtime);
 	if (SYSTEM.a(33, 10)) {

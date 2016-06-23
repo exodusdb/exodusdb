@@ -7,7 +7,33 @@ libraryinit()
 
 function main(in mode, io logtime) {
 
-	if (mode == "UPDATECONNECTIONS") {
+	if (mode == "CREATEALERTS") {
+
+		call log2("*createalert currusers", logtime);
+		var tt;
+		if (not(tt.readv(DEFINITIONS, "INIT*CREATEALERT*CURRUSERS", 1))) {
+			tt = "";
+		}
+		if (tt < 17203) {
+
+			var cmd = "CREATEALERT CURRUSERS GENERAL CURRUSERS {} NEOSYS (ROS)";
+
+			//run once on first installation
+			tt = cmd;
+			tt.swapper("{}", "7:::::1");
+			perform(tt);
+
+			//run every 1st of the month
+			tt = cmd;
+			tt.swapper("{}", "7:1");
+			perform(tt);
+
+			var().date().write(DEFINITIONS, "INIT*CREATEALERT*CURRUSERS");
+		}
+
+	//update NEOSYS-allowed ipnos from GBP file
+	} else if (mode == "UPDATEIPNOS4NEOSYS") {
+
 		var gbp;
 		if (not(gbp.open("GBP", ""))) {
 			return 0;
@@ -73,10 +99,14 @@ function main(in mode, io logtime) {
 			}
 		};//ii;
 
-		//allow neosys login from 127.* and any default ips
+		//allow neosys login from 127.*, LAN and any config default ips
+		//although any full 4 part LAN ips in configips will be BLOCKED in LISTEN2
+		//since they are deemed to be inwardly NATTING routers (see LISTEN2)
 		hosts.inserter(1, 1, 1, "127.0.0.1");
 		hosts.inserter(1, 1, 2, "127");
-		hosts.inserter(1, 1, 3, configips);
+		hosts.inserter(1, 1, 3, "192.168");
+		hosts.inserter(1, 1, 4, "172");
+		hosts.inserter(1, 1, 5, configips);
 
 		hosts.write(DEFINITIONS, "IPNOS*NEOSYS");
 

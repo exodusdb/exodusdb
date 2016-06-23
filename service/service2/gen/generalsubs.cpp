@@ -139,6 +139,15 @@ badexchrate:
 			//special defaults for special files
 			if (mode ne "DEF.SK2") {
 
+				//ratecards
+				if (win.datafile == "RATECARDS") {
+					if (not(ID.field("*", 2))) {
+						ID = ID.fieldstore("*", 2, 1, "1/1/" ^ (var().date()).oconv("D2/E").field("/", 3)).iconv("D2/E");
+						win.isdflt = ID;
+						return 1;
+					}
+				}
+
 				//batches
 				if (win.datafile == "BATCHES") {
 					call daybooksubs3("DEF.BATCH.REF");

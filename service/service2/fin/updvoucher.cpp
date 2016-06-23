@@ -73,7 +73,7 @@ var currs;
 var ncurrs;
 var unitcodes;
 var rates;
-
+var locks;
 
 function main(in mode0, io voucher, io vouchercode, io allocs) {
 
@@ -92,6 +92,11 @@ function main(in mode0, io voucher, io vouchercode, io allocs) {
 
 	//extract voucher type
 	vouchertype = vouchercode.field("*", 1);
+
+	if (not(locks.open("LOCKS", ""))) {
+		call sysmsg("CANNOT OPEN LOCKS IN UPD.VOUCHER");
+		locks = "";
+	}
 
 	//detect if inter company voucher from MODE
 	//inter company vouchers are stripped of other company lines
@@ -146,12 +151,15 @@ function main(in mode0, io voucher, io vouchercode, io allocs) {
 		//if voucher not provided then get from file
 		if (not voucher) {
 			if (not(voucher.read(fin.vouchers, vouchercode))) {
-				voucher = "";
+				return exit();
 			}
 		}
 		doctype = voucher.a(29);
 
-		if (voucher.a(7, 1) eq "D") {
+		//this should probably be after deleting any intercompany vouchers
+		//but since unposted voucher are not split into intercompany vouchers ATM
+		//then it doesnt matter ATM
+		if (voucher.a(7, 1) == "D") {
 			//call upd.voucher2('DELETE',voucher,voucher.code,allocs)
 
 			return exit();
@@ -206,8 +214,12 @@ nextvoucherno:
 		var pattern = fin.accparams.a(17);
 		if (addcent(year) >= 2011 and pattern) {
 
+			//TODO ensure that PP is prefixed by YY ALWAYS in format
 			if (pattern.index("Y", 1)) {
 				seqkey ^= "*<YEAR>";
+			}
+			if (pattern.index("P", 1)) {
+				seqkey ^= "*<PERIOD>";
 			}
 			mindigits = pattern.count("N");
 			prefix = pattern;
@@ -229,6 +241,7 @@ nextvoucherno:
 			prefix.swapper("N", "");
 			prefix.swapper("YY", year);
 			prefix.swapper("CC", companyserialno.oconv("R(0)#2"));
+			prefix.swapper("PP", period.oconv("R(0)#2"));
 			prefix.swapper("C", companyserialno);
 			prefix.swapper("VV", vtypeserialno.oconv("R(0)#2"));
 			prefix.swapper("V", vtypeserialno);
@@ -241,6 +254,7 @@ nextvoucherno:
 		seqkey.swapper("<TYPE>", vouchercode.field("*", 1));
 		seqkey.swapper("<COMPANY>", fin.currcompany);
 		seqkey.swapper("<YEAR>", year);
+		seqkey.swapper("<PERIOD>", period);
 		seqkey = "%" ^ seqkey ^ "%";
 		if (not(lockrecord("", fin.vouchers, seqkey))) {
 			call mssg("WAITING TO GET NEXT VOUCHER NUMBER", "T");
@@ -342,6 +356,13 @@ nextvoucherno:
 
 function writevoucher(in voucher, in vouchercode) {
 
+	//cant call upd.voucher3 here since we need to update indexes
+	//so if reposting any vouchers then we have to ensure
+	//no reposted vouchers are locked for editing anywhere
+	//therefore simply DELETE any record in lock file!
+	if (locks) {
+		locks.deleterecord("VOUCHERS*" ^ vouchercode);
+	}
 	voucher.write(fin.vouchers, vouchercode);
 
 	return exit();
@@ -406,7 +427,7 @@ subroutine process(in mode, io voucher, io vouchercode) {
 	}
 
 	//add to last batch/make new batch
-	if (not voucher.a(12)) {
+	if (not deleting and not voucher.a(12)) {
 
 		//look at last batch
 		var nextkeyparam = ":%" ^ fin.currcompany ^ "*" ^ vouchertype ^ "%:BATCHES:" ^ fin.currcompany ^ "*" ^ vouchertype ^ "*%";
@@ -529,7 +550,11 @@ newbatch:
 		analysiscode = voucher.a(37, ln);
 		if (analysis and analysiscode) {
 
+			//eg 28/29 bill/cost xx/yy wip/acc
 			var analfn = analysiscode.field("*", 1);
+
+			//eg 1/2/3/4/5/6/7 gross/load/disc/comm/fee/tax/other
+			//currently always 1 in manual entries and 1/2 for media/jobs in automated
 			var analcoln = analysiscode.field("*", 2);
 
 			var analkey = analyear ^ "*" ^ analysiscode.field("*", 3, 5);
@@ -805,7 +830,7 @@ subroutine postacc(in mode, in vouchercode, io voucher, in ln) {
 	prevnoncurrency = noncurrency;
 	//update balances of following year(s) if voucher year less than current year
 	//check maximum year
-	var maxyear = (gen.company.a(2)).substr(-2, 2);
+	var maxyear = gen.company.a(2).substr(-2,2);
 	//990508 IF addcent(YEAR) LT addcent(CURRYEAR) THEN
 	if (addcent(year) < addcent(maxyear)) {
 
@@ -1345,7 +1370,7 @@ revalit:
 			}
 		}
 
-	//no currency amounts
+		//no currency amounts so must be a base imbalance
 	}else{
 
 		//if currency balances but base does not then

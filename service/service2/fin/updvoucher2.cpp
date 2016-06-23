@@ -112,8 +112,8 @@ function main(io mode, io voucher, io vouchercode, io allocs, in username0="") {
 		if (gen.company.a(6)) {
 			yearperiod = voucherdate.oconv(gen.company.a(6));
 		}else{
-			temp = (voucherdate.oconv("D2/E")).substr(-5, 5);
-			yearperiod = temp.substr(-2, 2) ^ temp.substr(1, 2);
+			temp = voucherdate.oconv("D2/E").substr(-5,5);
+			yearperiod = temp.substr(-2,2) ^ temp.substr(1,2);
 		}
 		voucher.r(16, yearperiod);
 	}

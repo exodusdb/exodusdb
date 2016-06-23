@@ -29,6 +29,7 @@ var msg;
 var interactive;
 
 function main(in mode) {
+	//seems to be used only for VAL.PERIOD and RAISEUNPOSTEDMINIMUM
 	//garbagecollect;
 	//y2k2
 	// daybook batch header validation and interface routines
@@ -56,7 +57,7 @@ function main(in mode) {
 	//do not set valid because valid used in prewrite to indicate failed
 	//valid=1
 
-
+	//none used from web
 	if (mode eq "DEF.BATCH.REF") {
 
 		if (not(win.wlocked or RECORD)) {
@@ -87,7 +88,7 @@ function main(in mode) {
 		return 0;
 	}
 
-	if (authorised("JOURNAL ACCESS POSTED BATCHES", msg, "")) {
+	if (authorised("JOURNAL ACCESS POSTED", msg, "")) {
 		if (not(decide("", "Posted batches" _VM_ "Unposted batches", reply))) {
 			return 0;
 		}

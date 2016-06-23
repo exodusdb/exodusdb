@@ -463,7 +463,10 @@ unlockprodorders:
 		}else{
 
 			//restrict access to own jobs
-			if (RECORD.a(8) and RECORD.a(8) ne USERNAME) {
+			//similar code in job.subs prodorder.subs prodinv.subs
+			//also listprodords listprodinvs listinvs
+			var executivecode = RECORD.a(8);
+			if (executivecode and executivecode ne USERNAME and executivecode ne USERNAME.xlate("USERS", 1, "X")) {
 				if (not(authorised("JOB ACCESS OTHERS", msg, "UP"))) {
 					win.reset = 5;
 					return invalid();

@@ -63,6 +63,12 @@ function main() {
 
 	var reqsections = PSEUDO.a(3);
 
+	var timesheetparams;
+	if (not(timesheetparams.read(DEFINITIONS, "TIMESHEET.PARAMS"))) {
+		timesheetparams = "";
+	}
+
+
 	//check securities
 	var accessbrief = 1;
 	var accesscost = authorised("PRODUCTION COST ACCESS", msg, "");
@@ -84,8 +90,13 @@ function main() {
 			accesscost = 0;
 		}
 		if (not reqsections.index(3)) {
-			accesstime = 0;
-		}
+			if (not accesstime) {
+				//personal time only
+				accesstime = 2;
+			}
+			}else{
+				accesstime = 0;
+			}
 		if (not reqsections.index(4)) {
 			accessbill = 0;
 		}
@@ -129,6 +140,8 @@ function main() {
 	jobnos.trimmer();
 	jobnos.converter(FM ^ " ", " " ^ FM);
 
+	var personn = 1;
+	
 //nextjob:
 	while (not esctoexit()) {
 		if (jobnos) {
@@ -153,6 +166,10 @@ function main() {
 		}
 		MV = 0;
 
+		if (RECORD.a(14) and RECORD.a(14) ne gen.gcurrcompany) {
+			call initcompany(RECORD.a(14));
+		}
+	
 		var mark = "";
 		call getmark("CLIENT", html, mark);
 
@@ -168,9 +185,9 @@ unauth:
 
 	//jobinit:
 
-		if (RECORD.a(14) and RECORD.a(14) ne gen.gcurrcompany) {
-			call initcompany(RECORD.a(14));
-		}
+		//if (RECORD.a(14) and RECORD.a(14) ne gen.gcurrcompany) {
+		//	call initcompany(RECORD.a(14));
+		//}
 
 		var head = "";
 		head ^= "JOB FILE";
@@ -488,10 +505,21 @@ unauth:
 			//get relevent timesheet lines by department person and date
 			//better be under 64kb!!!
 			var dictids = "DEPARTMENT2 PERSON_NAME DATE ACTIVITY_NAME DETAILS HOURS RATE AMOUNT";
+			//not personal
+			if (accesstime == 1) {
+				dictids ^= " RATE AMOUNT";
+			}
 			var filename = "TIMESHEETS";
 			var linkfilename2 = "";
 			var sortselect = "WITH JOB_NO " ^ (DQ ^ (ID ^ DQ)) ^ " BY JOB_NO BY DEPARTMENT BY PERSON_CODE BY DATE";
+			if (timesheetparams.a(8)) {
+				sortselect ^= " AND WITH DATE GE " ^ (DQ ^ ((timesheetparams.a(8)).oconv("[DATE,*]") ^ DQ));
+			}
 			sortselect ^= " AND WITH AUTHORISED1";
+			//personal time only
+			if (accesstime ne 1) {
+				sortselect ^= " AND WITH PERSON_CODE " ^ (DQ ^ ("NABEEHA" ^ DQ));
+			}
 			var options = "";
 			var selecteddata = "";
 			var response = "";
@@ -530,11 +558,18 @@ unauth:
 				var hourscoln = 6;
 
 				var nlines = selecteddata.count(FM) + 1;
+
+				//personal show lines immediately
+				var styledisplay = "display:none";
+				if (accesstime ne 1) {
+					styledisplay = "";
+				}
+
 				var totalamount = 0;
 				var totalhours = 0;
 				var personamount = 0;
 				var personhours = 0;
-				var personn = 1;
+				//var personn = 1;
 				var personcode = selecteddata.a(1, personcoln);
 				for (var ln = 1; ln <= nlines; ++ln) {
 
@@ -549,7 +584,10 @@ unauth:
 						totalhours += tx.a(1, hourscoln);
 						tx.swapper(VM, sep);
 						tag = "TD";
-						rowattribs = "ID=person" ^ personn ^ " style={cursor:hand} style=\"{display:none}\" onclick=\"toggle(" "\'" "person" ^ personn ^ "\'" ")\"";
+						//rowattribs = "ID=person" ^ personn ^ " style={cursor:hand} style=\"{display:none}\" onclick=\"toggle(" "\'" "person" ^ personn ^ "\'" ")\"";
+						//id for pre ie8 compatibility without getElementsByClassName
+						rowattribs = "id=\"person" ^ personn ^ "\" class=\"person" ^ personn ^ "\" style=\"cursor:pointer; " ^ styledisplay ^ "\" onclick=\"toggle(" "\'" "person" ^ personn ^ "\'" ")\"";
+						//rowattribs='class="person':personn:'" style="cursor:pointer; display:none" onclick="toggle(':"'":'person':personn:"'":')"'
 						gosub printtxrow(tx);
 					}
 
@@ -562,9 +600,11 @@ unauth:
 							}else{
 								avghourlyrate = "";
 							}
-							tx = selecteddata.a(ln, 1) ^ sep ^ capitalise(personcode) ^ sep ^ sep ^ sep ^ sep
-							 ^ personhours.oconv("MT2U") ^ sep ^ avghourlyrate ^ sep ^ "<B>"
-							 ^ personamount.oconv(fin.basefmt) ^ "</B>";
+							tx = selecteddata.a(ln, 1) ^ sep ^ capitalise(personcode) ^ sep ^ sep ^ sep ^ sep ^ personhours.oconv("MT2U");
+							//if not personal
+							 if (accesstime < 2){
+							 	tx ^= sep ^ avghourlyrate ^ sep ^ "<B>" ^ personamount.oconv(fin.basefmt) ^ "</B>";
+							 }
 							tag = "TH";
 							gosub printtxrow(tx);
 							personhours = "";
@@ -582,8 +622,11 @@ unauth:
 					}else{
 						avghourlyrate = "";
 					}
-					tx = "Total" ^ sep ^ sep ^ sep ^ sep ^ sep ^ totalhours.oconv("MT2U")
-					 ^ sep ^ avghourlyrate ^ sep ^ "<B>" ^ totalamount.oconv(fin.basefmt) ^ "</B>";
+					tx = "Total" ^ sep ^ sep ^ sep ^ sep ^ sep ^ totalhours.oconv("MT2U");
+					//not personal
+					if (accesstime < 2) {
+						tx ^= sep ^ avghourlyrate ^ sep ^ "<B>" ^ totalamount.oconv(fin.basefmt) ^ "</B>";
+					}
 					tag = "TH";
 					gosub printtxrow(tx);
 				}
@@ -619,7 +662,7 @@ unauth:
 			tx ^= var("Amount").oconv(r12) ^ sep;
 			tx ^= var("Status").oconv(l12);
 
-			var bar = var("-").str(tx.length());
+			var bar = var("_").str(tx.length());
 
 			tx ^= FM;
 

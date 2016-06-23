@@ -20,7 +20,7 @@ var units;
 var popuprowbuffer;
 var _security;
 var glang;
-var _definitions;
+var definitions;
 var accounting;
 
 };

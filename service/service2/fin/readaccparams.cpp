@@ -28,6 +28,9 @@ function main() {
 		};//ii;
 	}
 
+	if (fin.accparams.a(16) eq "" and APPLICATION ne "ACCOUNTS") {
+		fin.accparams.r(16, "ALL");
+	}
 	if (fin.accparams.a(16, 1) == "ALL") {
 		var tt = "//Brand/Vehicle////Executive//////Market/////////Client/Supplier//////////Media Type";
 		var tt2 = fin.accparams.a(16);

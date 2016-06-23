@@ -221,7 +221,8 @@ function main()  {
 	if (not ANS) {
 		ANS = field2(RECORD.a(31), VM, -1);
 	}
-	return ANS;
+	//get only date part otherwise select between x and y omits last date
+	return ANS.field(".", 1);
 }
 libraryexit(date_created)
 

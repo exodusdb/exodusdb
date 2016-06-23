@@ -339,23 +339,24 @@ defversion:
 		var reqmarket = vehicle.a(4);
 		var maxminutes = reqmedium.xlate("JOB_TYPES", 8, "X");
 
+		//skip coincidence check of media types with max minutes -1
+		if (maxminutes < 0) {
+			return 0;
+		}
+
 		//include ANY medium which has max minutes specified
 		//and certain media type codes for TV, Satellite and Radio
 		if (maxminutes == "") {
 			//locate reqmedium in 'TV,T,SAT,S,RAD,R'<1> using ',' setting x then
 			//tv satellite radio newspaper (daily)
-			if (var("TSR").index(reqmedium[1], 1)) {
+			if (maxminutes == "" and var("TSR").index(reqmedium[1], 1)) {
 
 				//global default to 15 minutes for radio, 30 mins for TV and Satellite
-				maxminutes = reqmedium.xlate("JOB_TYPES", 8, "X");
-				if (maxminutes == "") {
-					if (reqmedium == "R" or reqmedium == "RAD") {
-						maxminutes = 15;
-					}else{
-						maxminutes = 30;
-					}
+				if (reqmedium == "R" or reqmedium == "RAD") {
+					maxminutes = 15;
+				}else{
+					maxminutes = 30;
 				}
-
 			}
 		}
 
@@ -492,8 +493,10 @@ checkad:
 											coincide = 0;
 										}
 										//if newtime2>(adtime+maxminutes*60) then coincide=0
-										if (newtime2 > adtime2 + maxminutes * 60) {
-											coincide = 0;
+										if (coincide) {
+											if (newtime2 > adtime2 + maxminutes * 60) {
+												coincide = 0;
+											}
 										}
 									}
 

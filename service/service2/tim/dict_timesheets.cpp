@@ -39,12 +39,19 @@ libraryinit(authorised)
 #include <validcode2.h>
 
 function main()  {
-	var xx;
-	if (validcode2(calculate("COMPANY_CODE"), "", calculate("BRAND_CODE").a(1, 1), xx, msg)) {
+	var oldmv = MV;
+	//authorise whole ts based on first line (eg ts printout)
+	//or authorise lines based on the particular line (analysis by job)
+	if (not MV) {
+		MV = 1;
+	}
+	var brands;
+	if (validcode2(calculate("COMPANY_CODE"), "", calculate("BRAND_CODE"), brands, msg)) {
 		ANS = 1;
 	}else{
 		ANS = 0;
 	}
+	MV = oldmv;
 	return ANS;
 }
 libraryexit(authorised)
@@ -275,4 +282,5 @@ function main()  {
 }
 
 libraryexit(year_period)
+
 

@@ -163,10 +163,6 @@ var brands;
 	if (agy.agp.a(55) == "") {
 		agy.agp.r(55, "Budget");
 		agy.agp.r(56, "F/cast");
-		if ((gen.company.a(1)).index("Impact", 1)) {
-			agy.agp.r(55, 3, "Plan");
-			agy.agp.r(56, 2, "Apr F/c" _VM_ "Jul F/c" _VM_ "Oct F/c");
-		}
 	}
 
 	//force separate column for vehicle
@@ -214,6 +210,20 @@ var brands;
 			vtyp = "INV";
 		}
 		agy.agp.r(46, vtyp);
+	}
+	if (agy.agp.a(146) == "") {
+		agy.agp.r(146, vtyp);
+	}
+	if (agy.agp.a(147) == "") {
+		agy.agp.r(147, vtyp);
+	}
+
+	var mediainvnopattern = agy.agp.a(49);
+	if (agy.agp.a(149) == "") {
+		agy.agp.r(149, mediainvnopattern);
+	}
+	if (agy.agp.a(150) == "") {
+		agy.agp.r(150, mediainvnopattern);
 	}
 
 	//production invoice voucher type
@@ -284,6 +294,8 @@ var brands;
 
 	if (agy.agp.a(89) == "") {
 		if ((agy.agp.a(1).ucase()).index("ADLINE", 1)) {
+			//0/30/60/90/99999
+			//4.5/4/3.5/3/2
 			agy.agp.r(89, 0 ^ VM ^ 30 ^ VM ^ 60 ^ VM ^ 90 ^ VM ^ 9999);
 			agy.agp.r(90, 4.5 ^ VM ^ 4 ^ VM ^ 3.5 ^ VM ^ 3 ^ VM ^ 2);
 		}else{
@@ -308,9 +320,17 @@ var brands;
 		agy.agp.r(119, 1);
 	}
 
+	//default to show account terms of payment by preference if specified
+	if (agy.agp.a(151) == "") {
+		agy.agp.r(151, 1);
+	}
+
+	//default to show (x1) for single ads on lines with any multiple ads
+	if (agy.agp.a(152) == "") {
+		agy.agp.r(152, 1);
+	}
+
 	return 0;
-
 }
-
 
 libraryexit()

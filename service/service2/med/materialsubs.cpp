@@ -32,6 +32,8 @@ function main(in mode) {
 	//jbase
 	var interactive = not SYSTEM.a(33);
 
+	//NB material<16> is also updated in gbp upload.subs (shouldnt be there)
+
 	win.valid = 1;
 
 	if (mode == "DELETEMATERIAL") {

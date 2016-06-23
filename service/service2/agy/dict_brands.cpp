@@ -37,7 +37,7 @@ function main()  {
 		var newcode = codes.a(1, ii);
 		if (newcode ne code) {
 			code = newcode;
-			if (var("!\"#$%^&*()_+-={}[]:@;\\<>,.").index(ans.substr(1,1), 1)) {
+			if (var("!\"#$%^&*()_+-={}[]:@;\\<>,.").index(ans[1])) {
 				ans.splicer(1, 0, " ");
 			}else{
 				ans.splicer(1, 0, " - ");
@@ -89,6 +89,30 @@ function main()  {
 libraryexit(name)
 
 
+libraryinit(no_of_jobs)
+
+function main()  {
+	//call pushselect(0, v69, v70, v71);
+	//call safeselect("SELECT JOBS WITH BRAND_CODE " ^ (DQ ^ (ID ^ DQ)) ^ " (S)");
+	//ANS = RECCOUNT;
+	//call popselect(0, v69, v70, v71);
+	//return ANS;
+	return 9999;
+}
+libraryexit(no_of_jobs)
+
+
+libraryinit(no_of_schedules)
+
+function main()  {
+	//call pushselect(0, v69, v70, v71);
+	//call safeselect("SELECT SCHEDULES WITH BRAND_CODE " ^ (DQ ^ (ID ^ DQ)) ^ " (S)");
+	//ANS = RECCOUNT;
+	//call popselect(0, v69, v70, v71);
+	//return ANS;
+	return 9999;
+}
+libraryexit(no_of_schedules)
 libraryinit(rawname)
 
 function main()  {

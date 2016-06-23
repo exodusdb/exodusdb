@@ -76,10 +76,34 @@ function main() {
 			call mssg("\"Copy to\" database must be configured (and saved) for database " ^ copydb ^ " first");
 			return 1;
 		}
+
+		//ensure authorised to login to one or the other database
+		//by ensuring the user is currently logged in to one or other database
+		if (USERNAME ne "NEOSYS" and copydb ne SYSTEM.a(17) and todb ne SYSTEM.a(17)) {
+			USER4 = "In order to copy database " ^ (DQ ^ (copydb ^ DQ)) ^ " to " ^ (DQ ^ (todb ^ DQ)) ^ ",";
+			USER4.r(-1, "you must be logged in to database " ^ (DQ ^ (copydb ^ DQ)) ^ " or " ^ (DQ ^ (todb ^ DQ)));
+			USER4.r(-1, "but you are currently logged in to database " ^ (DQ ^ (SYSTEM.a(17) ^ DQ)));
+			call mssg(USER4);
+			var().stop();
+		}
+
+		//should really have an option to close the live dataset and then copy
+		if (not(authorised("DATASET COPY", USER4, "LS"))) {
+			call mssg(USER4);
+			var().stop();
+		}
+
+		var started = (var().time()).oconv("MTS");
+		var otherusers = otherusers(copydb);
+		var log = started ^ " Started copy database " ^ copydb ^ " to " ^ todb;
+		log ^= "|" ^ started ^ " Other processes online:" ^ otherusers.a(1);
+
 		perform("COPYDB " ^ copydb ^ " " ^ todb);
 		USER3 = USER4;
 		if (not USER3) {
-			USER3 = "OK Copy database " ^ copydb ^ " to " ^ todb ^ " completed";
+			log ^= "|" ^ (var().time()).oconv("MTS") ^ " Finished";
+			call sysmsg(log);
+			USER3 = "OK " ^ log;
 		}
 
 	} else if (mode == "EMAILUSERS") {

@@ -285,7 +285,7 @@ nextbatch:
 			selection.splicer(-1, 1, "");
 		}
 
-		var returncoln = suffix ? (9) : (2);
+		var returncoln = suffix ? 9 : 2;
 
 		if (nvtypes2 == 1) {
 			ANS = selection.a(1, returncoln);

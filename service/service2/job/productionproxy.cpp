@@ -95,7 +95,12 @@ function main() {
 		USER1.transfer(PSEUDO);
 		perform("INACTIVEJOBS");
 
-	} if (mode == "AMENDORDERNO") {
+	} else if (mode == "INACTIVEJOBEXECS") {
+		USER1.transfer(PSEUDO);
+		PSEUDO.r(3, "JOBS");
+		perform("INACTIVEEXECUTIVES");
+
+	} else if (mode == "AMENDORDERNO") {
 
 		if (not(authorised("PRODUCTION INVOICE UPDATE", USER4))) {
 			return invalid();
@@ -610,9 +615,14 @@ approvalerror:
 		}
 
 		//get dept
-		call generalsubs("GETUSERDEPT," ^ usercode);
-		var deptcode = ANS.trim();
-		deptcode.converter("0123456789", "");
+		var deptcode;
+		if (usercode) {
+			call generalsubs("GETUSERDEPT," ^ usercode);
+			deptcode = ANS.trim();
+			deptcode.converter("0123456789", "");
+		}else{
+			deptcode = "";
+		}
 
 		//select
 		//perform 'SSELECT JOB_TYPES WITH DEPARTMENT ':quote(deptcode)

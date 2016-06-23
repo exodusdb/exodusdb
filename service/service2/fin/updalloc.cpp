@@ -3,6 +3,7 @@ libraryinit()
 
 #include <split.h>
 #include <addcent.h>
+#include <updvoucher3.h>
 #include <updvoucher.h>
 
 #include <fin.h>
@@ -332,7 +333,8 @@ function main(io mode, io payment, in paymentcode, io allocs) {
 //invexit:
 			//write the invoice back to file
 			if (not selfalloc and mode ne "UNPOSTED") {
-				invoice.write(fin.vouchers, invoicecode);
+		//write invoice on vouchers,invoice.code
+		call updvoucher3(mode, fin.vouchers, invoice, invoicecode);
 			}
 
 		}
@@ -388,7 +390,7 @@ subroutine diffperiod(in payment) {
 	var xx="";
 	call updvoucher("", revalvoucher, revalvouchercode,xx);
 
-	//the invoice will point back to the revaluation voucher
+	//the invoice will point back to the reval voucher
 	revalvoucherpointer = revalvouchercode.field("*", 1, 2);
 	return;
 

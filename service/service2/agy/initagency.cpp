@@ -82,6 +82,9 @@ function main() {
 		addtask("SUPPLIER UPDATE TERMS"		, "UA");
 		addtask("CLIENT CREATE STOPPED");
 		addtask("BRAND CHANGE CLIENT");
+		addtask("SCHEDULE UPDATE \"BULK AD\"", "UM2");
+		addtask("PRODUCTION ORDER CREATE MANY PER JOB");
+		addtask("TIMESHEET ADMINISTRATION","TA");
 
 	}
 	
@@ -462,5 +465,5 @@ subroutine addtask(in taskname, in defaultlock_or_taskname="") {
 		var xx;
 		authorised(taskname, xx, defaultlock_or_taskname);
 }
-
+///
 libraryexit()

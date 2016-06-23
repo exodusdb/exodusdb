@@ -56,11 +56,7 @@ function main(in task0, out msg, in defaultlock="", in username0="") {
 	if (noadd) {
 		task.splicer(1, 1, "");
 	}
-	//if noadd else NOADD=((TASK[-1,1]='"') and (len(userprivs)<10000))
-	if (not noadd) {
-		var lenuserprivs = SECURITY.length();
-		noadd = task[-1] == DQ or lenuserprivs > 48000;
-	}
+
 	var positive = task[1];
 	if (positive == "#")
 		task.splicer(1, 1, "");
@@ -128,6 +124,15 @@ updateprivs:
 			call authorised(defaultlock,msg);
 			return 1;
 		}
+		if (not noadd) {
+			noadd = task[-1] == DQ or SECURITY.length() > 48000;
+			//if passed a default lock then add even tasks ending like "XXXXX"
+			if (not defaultlockunassigned()) {
+				if (defaultlock) {
+				noadd = 0;
+			}
+		}
+		
 		if (not noadd) {
 			gosub readuserprivs();
 			//if (SECURITY.length() < 65000) {

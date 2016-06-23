@@ -243,7 +243,8 @@ neosystesting=true;
 		alltoaddresses = "";
 
 		//link=baselink
-		link = "neosys/dblink.htm?";
+		//link = "neosys/dblink.htm?";
+		link = "2/neosys/dblink.htm?";
 		link ^= "ADAGENCY?";
 		link ^= SYSTEM.a(17) ^ "?";
 		//skip user
@@ -872,7 +873,7 @@ subroutine printone() {
 	var head = "";
 
 	head ^= "<H2~style=\"margin:0px;text-align:center\">";
-	head ^= "TIMESHEET (HOURS) ";
+	head ^= "TIMESHEET (Hours) ";
 	head ^= "</H2>";
 
 	head ^= FM;
@@ -1016,6 +1017,7 @@ subroutine printone() {
 	colh.swapper("<td", "<th");
 	colh.swapper("</td", "</th");
 	head ^= colh;
+	head.swapper("<th", "\r\n <th");
 
 	call printtx(tx,"head", head);
 
@@ -1051,6 +1053,11 @@ subroutine printone() {
 				//dont send email to expired logins
 				var useremail;
 				if (user.a(35) and var().date() >= user.a(35)) {
+					//skip expired users ie dont print a line for them
+					if (not((timesheet.a(2, linen)).sum())) {
+						continue;
+					}
+
 					useremail = "";
 				}else{
 					useremail = user.a(7);
@@ -1172,6 +1179,8 @@ subroutine printone() {
 		//garbagecollect;
 		tx ^= tag(td,linetothours.oconv("MT2U")) ^ trx;
 
+		tx.swapper("<td", "\r\n <td");
+		tx.swapper("<th", "\r\n <th");
 		call printtx(tx);
 		anyprint=true;
 
@@ -1212,6 +1221,8 @@ subroutine printone() {
 	call getmark("OWN", html, mark);
 	tx ^= mark;
 
+	tx.swapper("<td", "\r\n <td");
+	tx.swapper("<th", "\r\n <th");
 	call printtx(tx);
 	anyprint=true;
 
