@@ -45,7 +45,7 @@ function main(in task0, out msg, in defaultlock="", in username0="") {
 	task.trimmer();
 
 	msg = "";
-	//**CALL note(' ':TASK)
+	// **CALL note(' ':TASK)
 
 	if (task.substr(1, 2) == "..") {
 		// call note(task:'')
@@ -116,6 +116,7 @@ updateprivs:
 			goto updateprivs;
 		}
 	} else {
+
 		if (deleting) {
 			return 1;
 		}
@@ -127,12 +128,12 @@ updateprivs:
 		if (not noadd) {
 			noadd = task[-1] == DQ or SECURITY.length() > 48000;
 			//if passed a default lock then add even tasks ending like "XXXXX"
-			if (not defaultlockunassigned()) {
-				if (defaultlock) {
-				noadd = 0;
+			if (not defaultlock.unassigned()) {
+				if (defaultlock)
+					noadd = 0;
 			}
 		}
-		
+
 		if (not noadd) {
 			gosub readuserprivs();
 			//if (SECURITY.length() < 65000) {

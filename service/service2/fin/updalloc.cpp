@@ -3,7 +3,7 @@ libraryinit()
 
 #include <split.h>
 #include <addcent.h>
-#include <updvoucher3.h>
+//#include <updvoucher3.h>
 #include <updvoucher.h>
 
 #include <fin.h>
@@ -333,8 +333,8 @@ function main(io mode, io payment, in paymentcode, io allocs) {
 //invexit:
 			//write the invoice back to file
 			if (not selfalloc and mode ne "UNPOSTED") {
-		//write invoice on vouchers,invoice.code
-		call updvoucher3(mode, fin.vouchers, invoice, invoicecode);
+				//write invoice on vouchers,invoice.code;
+				//call updvoucher3(mode, fin.vouchers, invoice, invoicecode);
 			}
 
 		}
