@@ -708,6 +708,11 @@ getproxy:
 	if (not(openfile("CURRENCIES", gen.currencies, "DEFINITIONS"))) {
 		valid = 0;
 	}
+	//markets should be gen.markets instead of agy.markets to allow initialisation of company with market code
+	var markets;
+	if (not(openfile("MARKETS", markets, "DEFINITIONS"))) {
+		valid = 0;
+	}
 	if (not(openfile("UNITS", gen.units, "DEFINITIONS"))) {
 		valid = 0;
 	}
@@ -778,15 +783,55 @@ getproxy:
 		}
 	}
 
-	call log2("get an initial company to work with for init routines", logtime);
+	call log2("*get an initial company to work with for init routines", logtime);
 	gen.companies.clearselect();
 	begintrans();
 	//TODO should be a sequence code on companies to sort the important companies first
 	gen.companies.select();
 	if (not gen.companies.readnext(gen.gcurrcompany)) {
-		var().stop("no companies setup - cannot start server");
+
+		//var().stop("no companies setup - cannot start server");
+
+		gen.gcurrcompany="1";
+		var basecurrencycode="USD";
+        var marketcode="ALL";
+
+		call log2("*create initial company " ^ gen.gcurrcompany, logtime);
+		var company="";
+		company.r(1, "Company 1");//company name
+		company.r(2, "1/17");//current financial year
+		company.r(3, basecurrencycode);//base currency code
+		company.r(6, "1");
+		company.r(10,"31/12/2002");//date format
+		company.r(14,"ENGLISH");//language
+		company.r(22,"1,000.00");//number format
+		company.r(30,"ALL");//market
+		//company(36)=1;//version
+		company.write("COMPANIES",gen.gcurrcompany);
+
+		call log2("*create initial currency " ^ basecurrencycode, logtime);
+		var currency="";
+		if (!currency.read("CURRENCIES",basecurrencycode)) {
+			currency.r(1, "US Dollar");
+			currency.r(2, "cents");
+			currency.r(3, 2);//number of decimals
+			currency.r(4, date());//exchange rate date
+			currency.r(5,1);//exchange rate
+			currency.r(12,1);//reverse exchange rate
+			//currency(26,1);//version
+			currency.write("CURRENCIES",basecurrencycode);
+		}
+
+		call log2("*create initial market " ^ marketcode, logtime);
+		var market="";
+		if (!market.read("MARKETS",marketcode)) {
+			market.r(1,"All Markets");
+			//market(26)=1;//version
+			market.write("MARKETS",marketcode);
+		}
+
 	}
-	gen.companies.clearselect();
+//	gen.companies.clearselect();
 	committrans();
 	//finished selecting
 
@@ -848,7 +893,7 @@ getproxy:
   //database name
 	if (not SYSTEM.a(23))
 		SYSTEM.r(23,"Default");
-	
+
 	//database
 	if (not SYSTEM.a(17))
 		SYSTEM.r(17,"exodus");

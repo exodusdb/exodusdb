@@ -271,6 +271,7 @@ unlocksecurity:
 
 	} else if (mode == "CREATEUSERNAMEINDEX") {
 		win.srcfile = users;
+		begintrans();
 		win.srcfile.select();
 
 		while (win.srcfile.readnext(ID)) {
@@ -280,7 +281,7 @@ unlocksecurity:
 				}
 			}
 		}
-
+		committrans();
 	} else {
 		msg = DQ ^ (mode ^ DQ) ^ " is invalid in USER.SUBS";
 		return invalid(msg);
