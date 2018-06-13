@@ -2,7 +2,7 @@
 #=== Building and Installing Exodus Using apt-get ===
 
 #you can view/run the latest version of this script directly
-# wget -O -https://raw.githubusercontent.com/exodusdb/exodusdb/master/install_apt.sh | less
+# wget -O - https://raw.githubusercontent.com/exodusdb/exodusdb/master/install_apt.sh | less
 # wget -O - https://raw.githubusercontent.com/exodusdb/exodusdb/master/install_apt.sh | bash
 #or
 # curl https://raw.githubusercontent.com/exodusdb/exodusdb/master/install_apt.sh | less
@@ -22,7 +22,7 @@ cat /etc/issue
 #==== 1. Building and Installing Exodus ====
 
 ###yum -y install subversion gcc-c++ postgresql-devel
-sudo apt-get -y install subversion g++ postgresql-server-dev* libboost-all-dev build-essential cmake
+sudo apt-get -y install subversion g++ postgresql-server-dev-all libboost-all-dev build-essential cmake
 
 cd ~
 svn co https://github.com/exodusdb/exodusdb/trunk/ exodus
@@ -37,15 +37,8 @@ sudo make install
 
 #==== 2. Installing Postgres and Configuring it for Exodus ====
 
-#export POSTGRESVER=8.4
-export POSTGRESVER=`apt-cache search ^postgresql-[0-9]+.[0-9]+$|tail -n 1|cut -d" " -f 1|cut -d- -f 2`
-
 ###yum -y install postgresql-server
-sudo apt-get -y install postgresql-$POSTGRESVER
-# or just sudo apt-get -y install postgresql
-
-###/etc/init.d/postgresql start
-#/etc/init.d/postgresql-$POSTGRESVER start
+sudo apt-get -y install postgresql postgresql-client
 
 cat > /tmp/exoduspg.input << EOF
 #!/bin/bash
