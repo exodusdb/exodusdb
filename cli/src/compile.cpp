@@ -163,8 +163,8 @@ function main()
 		libfileprefix="lib";
 
 		installcmd="mv";
-		
-		
+
+
 	//not posix
 	} else {
 		if (verbose)

@@ -42,25 +42,39 @@ program()
         //if (not var().load("libpq.dll"))
         //	printl("Warning: Cannot find libpq.dll to connect to postgres");
 
-        var command=SENTENCE.field(" ",2,999999);
-        var shell;
+        var command=COMMAND.field(" ",2,999999);
 
 	//non-windows
-        if (SLASH eq "/" and shell.osgetenv("SHELL")) {
+	var shell=osgetenv("SHELL");
+        //if (SLASH eq "/" and shell.osgetenv("SHELL")) {
+        if (SLASH eq "/" and shell) {
 
                 var home=osgetenv("HOME");
                 var path=osgetenv("PATH");
                 var libp=osgetenv("LD_LIBRARY_PATH");
 
+		//ossetenv doesnt work in exodus due to problems with putenv/setenv memory loss/leak
+		//so prepend command with env changing statements
+		var setenv="";
+
                 //prefer user binaries then exodus binaries AFTER existing path
-				ossetenv("PATH",path^":"^home^"/bin:/var/lib/exodus/bin");
+		var newpath=path^":"^home^"/bin:/var/lib/exodus/bin";
+		//if (!ossetenv("PATH",newpath))
+		//	printl("Could not set PATH="^newpath);
+		setenv^="PATH="^newpath;
 
-//print("LD_LIBRARY_PATH","~/lib:"^osgetenv("LD_LIBRARY_PATH"));
-                ossetenv("LD_LIBRARY_PATH",home^"/lib:"^libp);
+		//print("LD_LIBRARY_PATH","~/lib:"^osgetenv("LD_LIBRARY_PATH"));
+                var newlibpath=home^"/lib:"^libp;
+                //if (!ossetenv("LD_LIBRARY_PATH",newlibpath))
+		//	printl("Could not set LD_LIBRARY_PATH="^newlibpath);
+		setenv^=" LD_LIBRARY_PATH="^newlibpath;
 
-
-                //enable core dumps
-                osshell("ulimit -c unlimited");
+		//var path2=osgetenv("PATH");
+		//if (path2!=newpath) {
+		//	printl("Failed to set PATH to "^newpath);
+		//	printl("PATH was: "^path);
+		//	printl("PATH is:  "^path2);
+		//}
 
                 if (verbose) {
                         osgetenv("HOME").outputl("HOME=");
@@ -68,10 +82,16 @@ program()
                         osgetenv("LD_LIBRARY_PATH").outputl("LD_LIBRARY_PATH=");
                 }
 
+                //enable core dumps
+                osshell("ulimit -c unlimited");
+
                 //execute command or enter exodus shell
                 //if (not osshell("env PS1='exodus [\\u@\\h \\W]\\$ '  "^(command?command:shell)))
 
-                osshell(command?command:shell);
+                var shellcmd=setenv^" "^(command?command:shell);
+		if (verbose)
+			printl("SHELL=\n"^shellcmd);
+                osshell(shellcmd);
 
 		//windows
         } else if (SLASH eq "\\" and shell.osgetenv("ComSpec")) {

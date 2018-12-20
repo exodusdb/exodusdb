@@ -89,7 +89,6 @@ namespace boostfs = boost::filesystem;
 #include <locale>
 #include <fstream>
 #include <cstdlib> //for getenv and setenv/putenv
-//#include <stdio.h> //for getenv
 #include <algorithm> //for count in osrename
 
 //boost changed from TIME_UTC to TIME_UTC_ (when?) to avoid a new standard TIME_UTC macro in C11 time.h
@@ -806,12 +805,17 @@ bool var::ossetenv(const var& envvarname) const
         /* on windows this should be used
 	BOOL WINAPI SetEnvironmentVariable(LPCTSTR lpName, LPCTSTR lpValue);
 	*/
-
+//var(L"USING PUTENV").outputl();
 	//is this safe on windows??
 	//https://www.securecoding.cert.org/confluence/display/seccode/POS34-C.+Do+not+call+putenv()+with+a+pointer+to+an+automatic+variable+as+the+argument
 	std::string tempstr=envvarname.toString();
 	tempstr+="=";
 	tempstr+=toString();
+//var(tempstr).outputl(L"temp std:string");
+//std::cout<<tempstr<<" "<<tempstr.length()<<std::endl;
+
+	//this will NOT work reliably since putenv will NOT COPY the local (i.e. temporary) variable string
+
 	//#pragma warning (disable : 4996)
 	const int result=putenv((char*)(tempstr.c_str()));
 	if (result==0)
