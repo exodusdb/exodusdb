@@ -17,16 +17,6 @@
 
 //constants
 
-	//if mb php implemented
-	//change explode to mb_split, mb_strlen, mb_substr
-	//mb_internal_encoding('UTF-8');
-	//mb_regex_encoding('UTF-8');
-
-	//php5 doesnt recognise "\u255e" etc.
-	$fm = '\x25\x5e';
-	$vm = '\x25\x5d';
-	$sm = '\x25\x5c';
-
 	$gautostartdatabase = true;//unless ../exodus/net.cfg first line is AUTOSTART=NO
 	$gsecondstowaitforreceipt = 15;
 	$gsecondstowaitforstart = 30;
@@ -82,10 +72,10 @@
 	//client delivers a request in xml format
 	//$xml = simplexml_load_string($HTTP_RAW_POST_DATA);
 	$raw_xml=file_get_contents("php://input");
-debug("POST   ---> ".$raw_xml);
+	debug("POST   ---> ".$raw_xml);
 
 	$xml = simplexml_load_string($raw_xml);
-debug("REQUEST :".$xml->request);
+	debug("REQUEST :".$xml->request);
 	if ($xml->token)
 		debug("TOKEN   :".$xml->token);
 	if ($xml->database)
@@ -462,7 +452,7 @@ function getdatabases($neosysrootpath, $systemcode) {
 	//return an array of available database codes and names
 	//or an empty array
 
-	global $fm,$vm,$sm,$response;
+	global $response;
 
 	//if (!$systemcode)
 		$systemcode = 'default';
@@ -470,7 +460,7 @@ function getdatabases($neosysrootpath, $systemcode) {
 	//get an array of databases
 	$datalocation = $neosysrootpath . "/data/";
 	$volfilename=$datalocation . $systemcode . '.vol';
-debug("volfilename:".$volfilename);
+	debug("volfilename:".$volfilename);
 	if (!is_file($volfilename)) {
 		$response="Cannot see vol file $volfilename";
 		return "";
@@ -481,13 +471,6 @@ debug("volfilename:".$volfilename);
 		return "";
 	}
 	debug("getdatabases text:".$databases);
-
-	//convert text format to mv format
-	//$databases=str_replace("\n",$fm,$databases);
-	//$databases=str_replace("\r",$linesep,$databases);
-	//$databases=str_replace('*',$vm,$databases);
-	//$databases=str_replace(',',$sm,$databases);
-	//debug("getdatabases list:".$databases);
 
 	$linesep="\n";
 	$dbsep='*';

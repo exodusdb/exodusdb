@@ -260,14 +260,17 @@ SYSTEM="";
 //		datasetcode = "DEFAULT";
 		datasetcode = "exodus";
 
+	neopath = COMMAND.a(2).outputl("NEOPATH=");
+	if (!neopath) {
 #ifdef _WIN32
-	neopath = "d:\\neosys\\";
+		neopath = "d:\\neosys\\";
 #else
 //	neopath = "/cygdrive/d/neosys/neosys/";
 	//look for data in parent and grandparent directory
-	neopath = "../";
-	if (! osdir(neopath^"data"))
-		neopath = "../../";
+		neopath = "../";
+		if (! osdir(neopath^"data"))
+			neopath = "../../";
+	}
 #endif
 
 	neopath.converter("/\\",SLASH^SLASH);

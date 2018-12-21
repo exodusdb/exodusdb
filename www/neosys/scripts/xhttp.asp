@@ -1,13 +1,7 @@
 <%@  language="javascript" %>
 <%
-    //<SCRIPT RUNAT=Server SRC=server0.js type="text/javascript"></script>
 
-    //<SCRIPT RUNAT=Server SRC=server.js type="text/javascript"></script>
-
-%>
-<%
-
-    // © 2000-2008 NEOSYS Software Ltd. All Rights Reserved.//**Start Encode**
+    // Copyright NEOSYS All Rights Reserved.
 
     //keep sessions for 16 hours to try and avoid multiple sessions per user (limit is 24 hours)
     Session.Timeout = 16 * 60
@@ -33,12 +27,12 @@
     //writing to backend
     function unicode2escapedfms(data) {
         //NB encode % to %25 FIRST
-        return data.replace(/\u0025/g, '%25').replace(/\u255F/g, '%FF').replace(/\u255E/g, '%FE').replace(/\u255D/g, '%FD').replace(/\u255C/g, '%FC').replace(/\u255B/g, '%FB').replace(/\u255A/g, '%FA').replace(/\u2559/g, '%F9').replace(/\u2558/g, '%F8')
+        return data.replace(/\u0025/g, '%25').replace(/\u07FF/g, '%FF').replace(/\u07FE/g, '%FE').replace(/\u07FD/g, '%FD').replace(/\u07FC/g, '%FC').replace(/\u07FB/g, '%FB').replace(/\u07FA/g, '%FA').replace(/\u07F9/g, '%F9').replace(/\u07F8/g, '%F8')
     }
 
     //reading from backend
     function escapedfms2unicode(data) {
-        return unescape(data.replace(/%FF/g, '\u255F').replace(/%FE/g, '\u255E').replace(/%FD/g, '\u255D').replace(/%FC/g, '\u255C').replace(/%FB/g, '\u255B').replace(/%FA/g, '\u255A').replace(/%F9/g, '\u2559').replace(/%F8/g, '\u2558'))
+        return unescape(data.replace(/%FF/g, '\u07FF').replace(/%FE/g, '\u07FE').replace(/%FD/g, '\u07FD').replace(/%FC/g, '\u07FC').replace(/%FB/g, '\u07FB').replace(/%FA/g, '\u07FA').replace(/%F9/g, '\u07F9').replace(/%F8/g, '\u07F8'))
         //NB unencode %25 to % and any other encoded characters LAST
     }
 
@@ -48,7 +42,7 @@
         if (!resume) Response.End()
     }
     //debug(Session.CodePage+' '+Response.CodePage)
-    //db=new neosysdblink
+    //db2=new neosysdblink
 
     //see also neosysdblink in client.js for file access
     function neosysdblink(token) {
@@ -68,7 +62,7 @@
         this.portno = Session(this.token + '_portno')
 
         //default timeout is 10 minutes (NB BACKEND GIVEWAY timeout is hard coded to 10 mins?)
-        var defaulttimeoutmins = 10
+        var defaulttimeoutmins = 11
         //if (this.username=='NEOSYS') defaulttimeoutmins=5
         if (!this.timeout) this.timeout = defaulttimeoutmins * 60 * 1000
 
@@ -97,12 +91,15 @@
         //remove space . " ' characters
         this.localhostname = this.localhostname.replace(/[\ |\.|\"|\']/g, '')
         //take first and last four characters if longer than 8 characters
-        if (this.localhostname.length > 8) this.localhostname = this.localhostname.slice(0, 4) + this.localhostname.slice(-4)
+        if (this.localhostname.length > 8)
+            this.localhostname = this.localhostname.slice(0, 4) + this.localhostname.slice(-4)
         this.wscriptshell = new ActiveXObject('WScript.Shell')
 
         this.remoteaddr = Request.ServerVariables("REMOTE_ADDR")
         this.remotehost = Request.ServerVariables("REMOTE_HOST")
         this.https = Request.ServerVariables("HTTPS")
+        //this.agent = Request.ServerVariables("REMOTE_AGENT")
+        this.agent = Request.ServerVariables("HTTP_USER_AGENT") + ''
 
     }
 
@@ -187,14 +184,14 @@
 
     }
 
-    function xlog() {
+    function log() {
     }
 
     function neosysdblink_send_byfile(data) {
 
         if (!gfso) return
 
-        xlog(this.request)
+        log(this.request)
 
         //try to use cache
         var request2 = this.request
@@ -237,6 +234,8 @@
 
         var loginlocation = '../default.htm'
 
+        var result
+        
         // try
         {
             //failure means that there was no response within the timeout period
@@ -258,14 +257,23 @@
             //***port number connection not used at the moment due to slower speed under IIS
             var requests = (this.request + '\r\r\r\r\r\r\r\r').split('\r')
             if (requests[0] == 'LOGIN' || requests[0] == 'GETDATASETS') {
-                var datasets = getdatasets(this.neosysrootpath, requests[requests[0] == 'LOGIN' ? 5 : 1])
-                if (!datasets) return 0
+                var systemrequestn=requests[0]=='LOGIN' ? 5 : 1
+                //relogin fails to send system in request but does return it in the cookie
+                if (!requests[systemrequestn])
+                    requests[systemrequestn]=Request.Cookies('NEOSYSsystem')
+                var datasets = getdatasets(this.neosysrootpath, requests[systemrequestn])
+                if (typeof datasets=='string') {
+                    this.response = datasets
+                    dbready(dbwaitingwindow)
+                    this.request = ''
+                    return 0
+                }
             }
 
             //special request without username or password
             //gets info without accessing neosys engine
             if (requests[0] == 'GETDATASETS') {
-                //convert to xml 
+                //convert to xml
                 xmltext = '<records>\r'
                 for (var i = 0; i < datasets.length; i++) {
                     xmltext += '<record>\r'
@@ -310,7 +318,7 @@
                 }
                 if (ii >= datasets.length) {
                     this.data = ''
-                    this.response = 'Error: Dataset "' + requests[3] + '"not found in dataset codes'
+                    this.response = 'Error: Dataset "' + requests[3] + '"not found in dataset codes for '+this.system
                     dbready(dbwaitingwindow)
                     this.request = ''
                     return (0)
@@ -328,9 +336,9 @@
                 }
                 else {
 
-                    //verify!
+                    //verify! same as glogincode in the client
                     if (this.token
-			    && this.token != this.dataset + '*' + this.username + '*')
+                        && this.token != (this.dataset + '*' + this.username + '*').replace(/ /g,''))
                         debug('token is ' + this.token + ' but should be ' + this.dataset + '*' + this.username + '*')
 
                     Session(this.token + '_username') = this.username
@@ -342,24 +350,25 @@
                 }
             } //of LOGIN
 
-            //check username is present - session may have timed out
-            if (typeof (this.username) == 'undefined' || this.username == '') {
+            //check username and password is present - session may have timed out
+            if (typeof this.username == 'undefined' || this.username == ''
+                || typeof this.password == 'undefined' || this.password == '') {
                 this.response = 'Error: Please login - Session not established or timed out'
                 dbready(dbwaitingwindow)
                 this.request = ''
                 return (0)
             }
-
+            //TODO move password check up in xhttp.php too
             //check password is present
-            if (typeof (this.password) == 'undefined' || this.password == '') {
-                this.response = 'Error: Password parameter is missing'
-                dbready(dbwaitingwindow)
-                this.request = ''
-                return (0)
-            }
+            //if (typeof this.password == 'undefined' || this.password == '') {
+            //    this.response = 'Error: Password parameter is missing'
+            //    dbready(dbwaitingwindow)
+            //    this.request = ''
+            //    return (0)
+            //}
 
             //check dataset is present
-            if (typeof (this.dataset) == 'undefined' || this.dataset == '') {
+            if (typeof this.dataset == 'undefined' || this.dataset == '') {
                 this.response = 'Error: Dataset parameter is missing'
                 dbready(dbwaitingwindow)
                 this.request = ''
@@ -368,8 +377,8 @@
 
             //check system is present
             /*
-            if (typeof(this.system)=='undefined'||this.system=='')
-            {
+            if (typeof this.system =='undefined'||this.system=='') {
+
             this.response='Error: System parameter is missing'
             dbready(dbwaitingwindow)
             this.request=''
@@ -377,7 +386,7 @@
             }
             */
             //check port no is present
-            if (typeof (this.portno) == 'undefined' || this.portno == '') {
+            if (typeof this.portno == 'undefined' || this.portno == '') {
                 this.response = 'Error: Port No parameter is missing'
                 dbready(dbwaitingwindow)
                 this.request = ''
@@ -391,17 +400,9 @@
             }
 
             datalocation = (this.neosysrootpath + 'data\\').toUpperCase()
-            //var globalserverfilename = datalocation + datasetdir + 'GLOBAL.SVR'
-            var globalserverfilename = datalocation + datasetdir + this.dataset + '.SVR'
+            var flag_filename = datalocation + datasetdir + this.dataset + '.SVR'
 
-            //nodatabaseconnectionresponse='ERROR: Trying to start the NEOSYS engine - please try again.\\n\\n"'+this.dataset+'"\\n\\n'+globalserverfilename
-
-            if (!this.start(globalserverfilename)) {
-                //this.response='ERROR: '+startresult
-                dbready(dbwaitingwindow)
-                this.request = ''
-                return 0
-            }
+            //nodatabaseconnectionresponse='ERROR: Trying to start the NEOSYS engine - please try again.\\n\\n"'+this.dataset+'"\\n\\n'+flag_filename
 
             /*
             //check that engine is active and start if not
@@ -413,12 +414,11 @@
             var loopcount=0
 
             thisloop:
-            while (1)
-            {
+            while (1) {
 		
             //fail if no response within x seconds
-            if (date1.getTime() > waituntil)
-            {
+            if (date1.getTime() > waituntil) {
+
             this.response = 'Error: Cannot start NEOSYS engine for ' + this.dataset
             dbready(dbwaitingwindow)
             this.request=''
@@ -428,7 +428,7 @@
             ////ok if db flag file exists and has been updated in the last 60secs
             //try
             //{
-            // var file=gfso.GetFile(globalserverfilename)
+            // var file=gfso.GetFile(flag_filename)
             // var datelastmodified=file.DateLastModified
             // //file.close
             // file.Close()
@@ -446,8 +446,8 @@
             //ok if any db flag file exists and has been updated in the last 60secs
             var folder = gfso.GetFolder(datalocation+datasetdir)
             var files = new Enumerator(folder.files)
-            for (;!files.atEnd();files.moveNext())
-            {
+            for (;!files.atEnd();files.moveNext()) {
+
             var file=files.item()
 				
             //skip if not a server flag file
@@ -459,8 +459,8 @@
             }
 
             //fail if not allowed to start database
-            if (!autostartdatabase)
-            {
+            if (!autostartdatabase) {
+
             this.response='NEOSYS.NET Service not started\rDataset: '+datasetdir.slice(0,-1)
             dbready(dbwaitingwindow)
             this.request=''
@@ -468,10 +468,10 @@
             }
 				
             loopcount++
-            if(loopcount==1)
-            {
+            if(loopcount==1) {
+
             //start database
-            if (!this.start())
+            if (!(this.start()))
             //if (startresult.toString().split(' ')[0]!='OK')
             {
             //this.response='ERROR: '+startresult
@@ -479,8 +479,8 @@
             this.request=''
             return 0
             } 
-            else
-            {
+            else {
+
             //do not break, go round loop waiting for the 'listening' flag file to appear
             //break
             }
@@ -546,7 +546,7 @@
                             case 1256: { unicodefrom = 1535; unicodeto = 1535 + 256; break } //0600
                         }
 
-                        var invalidchars = 'ERROR: Unacceptable characters in data'
+                        var invalidchars = 'ERROR: Unacceptable characters in data.\n\nPossibly in cut and pasted data.'
                         if (e.number == -2146828283) this.response = invalidchars
                         else this.response = e.number + ' ' + e.description
                         return 0
@@ -573,13 +573,15 @@
                 if (!this.remoteaddr) this.remoteaddr = ''
                 if (!this.remotehost) this.remotehost = ''
                 if (!this.https) this.https = ''
+                if (!this.agent) this.agent = ''
                 //			tf.WriteLine('VERSION 2')
                 tf.WriteLine('VERSION 3')
-                tf.WriteLine(6)//npre-dataset connection info related fields
+                tf.WriteLine(7)//npre-dataset connection info related fields
                 tf.WriteLine(this.remoteaddr)
                 tf.WriteLine(this.remotehost)
                 tf.WriteLine(this.https)
                 tf.WriteLine(Session.SessionID)
+                tf.WriteLine(this.agent)
 
                 tf.WriteLine(this.dataset)
                 tf.WriteLine(this.username)
@@ -613,7 +615,7 @@
 
                 var TCP1
                 //var hostname="localhost"
-                var hostname = '127.0.0.1'
+                var hostname = "127.0.0.1"
                 var portno = this.portno//5700
                 var message = linkfilename0 + '.1'
                 var reply
@@ -625,8 +627,8 @@
                 //SockLite object
                 //WScript.echo('Creating Object')
                 TCP1=Application('TCP1B')
-                if (!TCP1)
-                {
+                if (!TCP1) {
+
                 //TCP1=new ActiveXObject('Socket.TCP')
                 TCP1=new ActiveXObject('SockLite.SocketLite')
                 Application('TCP1B')=TCP1
@@ -636,8 +638,8 @@
 			
                 //WScript.echo('Connecting to Host '+hostname+':'+portno)
                 hSocket = TCP1.ConnectSock(hostname, portno)
-                if (hSocket==-1)
-                {
+                if (hSocket==-1) {
+
                 this.response = 'Cannot connect to '+hostname+':'+portno
                 dbready(dbwaitingwindow)
                 this.request=''
@@ -646,8 +648,8 @@
 			
                 //WScript.echo('Sending message "'+message+'"')
                 bytessent=TCP1.SendData(hSocket,message)
-                if (bytessent==0)
-                {
+                if (bytessent==0) {
+
                 this.response = 'Cannot connect to '+hostname+':'+portno
                 dbready(dbwaitingwindow)
                 this.request=''
@@ -661,7 +663,7 @@
 			
                 //WScript.echo('Destroying object')
                 TCP1=null
-                //Response.Write(new Date-timex)
+                //Response.Write(new Date()-timex)
                 //Response.End()
                 */
 
@@ -671,8 +673,8 @@
 			
                 //WScript.echo('Creating Object')
                 TCP1=Application('TCP2')
-                if (!TCP1)
-                {
+                if (!TCP1) {
+
                 TCP1=new ActiveXObject('Socket.TCP')
                 // Application('TCP2')=TCP1
                 }
@@ -739,7 +741,7 @@
                     }
 
                     //start database otherwise fail
-                    if (!this.start()) {
+                    if (!(this.start())) {
 
                         //delete request file
                         try { gfso.DeleteFile(linkfilename + '.1') } catch (e) { }
@@ -753,7 +755,7 @@
                     break
 
                 }
-                //Response.Write(new Date-timex)
+                //Response.Write(new Date()-timex)
                 //Response.End()
 
                 //wait for response
@@ -761,10 +763,24 @@
                 var date1 = new Date()
                 //waituntil = date1.getTime() + (this.timeout / 1000 / 24 / 60 / 60)
                 waituntil = date1.getTime() + this.timeout
+                var timestarted = new Date()
+
                 while (1) {
 
+                    //exit if client disconnected (not MSIE /2/ which hasnt yield and uses synchronous XMLHTTP in the client)
+                    //if (!Response.IsClientConnected) {
+                    //debug(this.agent)
+                    if (this.agent.indexOf('MSIE')<0 && !Response.IsClientConnected) {
+                        var elapsedseconds = Math.floor((new Date() - timestarted)/10)/100
+                        this.response = 'Error: Client disconnected after ' + elapsedseconds + ' seconds in NEOSYS xhttp.asp ' + linkfilename                        
+                        neosysoswrite(this.response,linkfilename + '.5',unicode)//just so we can see interrupted requests on the server more easily
+                        dbready(dbwaitingwindow)
+                        this.request = ''
+                        return (0)                        
+                    }
+                    
                     //exit if no response within x seconds
-                    if ((new Date).getTime() > waituntil) {
+                    if ((new Date()).getTime() > waituntil) {
                         this.response = 'Error: No response in ' + (this.timeout / 1000) + ' seconds from database server at ' + linkfilename
                         dbready(dbwaitingwindow)
                         this.request = ''
@@ -827,15 +843,15 @@
                             result = 1
                             /*
                             //read the data if any
-                            try
-                            {
+                            try {
+
                             tf = gfso.OpenTextFile(linkfilename + '.2')
                             this.data = unescape(tf.ReadAll())
                             tf.Close()
                             //tf.Close
                             }
-                            catch(e)
-                            {
+                            catch(e) {
+
                             }
                             */
 
@@ -867,7 +883,7 @@
 
         } //end of loop to try
 
-        //if direct access then convert relative reference to fullpath
+        //if direct access then convert relative reference to fullpath (typically ..\\data)
         if (this.documentprotocolcode == 'file') {
             if (this.request.slice(0, 7) == 'EXECUTE' && this.data.slice(0, 3).toUpperCase() == '..\\') {
                 this.data = this.neosysrootpath + this.data.slice(3)
@@ -906,7 +922,7 @@
     //then returns 'OK' or someother message to indicate failure
     //negative response would be bad username, password or dataset
     ///////////////////////////////////////////////////////////////
-    function neosysdblink_startdb(globalsrvfilename) {
+    function neosysdblink_startdb() {
 
         var cannotfinddatabaseresponse = 'ERROR: SERVER CONFIGURATION ERROR - CANNOT FIND DATABASE ON SERVER'.toUpperCase()
         if (this.neosysrootpath == null) {
@@ -939,8 +955,8 @@
 
             /*
             //delete the response file
-            if (!osdelete(responsefilename,'neosysdblink_startdb init'))
-            {
+            if (!(osdelete(responsefilename,'neosysdblink_startdb init'))) {
+
             //throw(e)
             //if (gmsg.indexOf('2146828218')>=0) gmsg='Not authorised to start database service'
             this.response=gmsg
@@ -1012,36 +1028,6 @@
             }
         }
 
-        //quit if dbname.SVR indicates server is already listening
-        if (globalsrvfilename) {
-            try {
-                var file = gfso.GetFile(globalsrvfilename)
-                var datelastmodified = file.DateLastModified
-                file.Close
-                //no need to start if server has been listening in the last 30 seconds
-                var ageinsecs = (new Date() - datelastmodified) / 1000
-                if (ageinsecs <= 30) return 1
-            }
-            catch (e) {
-                //if not file not found error then return an error
-                if (e.number != -2146828235) {
-                    this.response = 'Error: Cannot open ' + this.dataset + '.SVR because\r' + e.number + ' ' + e.description
-                    return 0
-                }
-                this.response = 'Error: The ' + this.dataset + ' database is not available right now.'
-
-                //var globalsvr = (this.neosysrootpath + 'data\\').toUpperCase() + this.dataset + '\\GLOBAL.SVR'
-                var globalsvr = (this.neosysrootpath + 'data\\').toUpperCase() + this.dataset + '\\' + this.dataset + '.SVR'
-                try {
-                    var file = gfso.GetFile(globalsvr)
-                    this.response += '\r(Last available ' + file.DateLastModified + ')'
-                    //file.Close()
-                } catch (e) { }
-
-                return 0
-            }
-        }
-
         //quit if autostart suppressed
         try {
             var file = gfso.OpenTextFile('NET.CFG')
@@ -1049,12 +1035,7 @@
             file.Close()
             //if (text.split('\r')[0].toUpperCase()=='AUTOSTART=NO') return true
             //returning true will cause it to wait until a process becomes available or timeout
-            if (text.toUpperCase().indexOf('AUTOSTART=NO') >= 0)
-            // return true
-            {
-                this.response = 'Error: The ' + this.dataset + ' database is not available right now.'
-                return 0
-            }
+            if (text.toUpperCase().indexOf('AUTOSTART=NO') >= 0) return true
         }
         catch (e) {
             //if not file not found error then return an error
@@ -1063,6 +1044,15 @@
                 return 0
             }
             this.response = 'Error: The ' + this.dataset + ' database is not available right now.'
+
+            //var globalsvr = (this.neosysrootpath + 'data\\').toUpperCase() + this.dataset + '\\GLOBAL.SVR'
+            var globalsvr = (this.neosysrootpath + 'data\\').toUpperCase() + this.dataset + '\\' + this.dataset + '.SVR'
+            try {
+                var file = gfso.GetFile(globalsvr)
+                this.response += '\r(Last available ' + file.DateLastModified + ')'
+                //file.Close()
+            } catch (e) { }
+
             return 0
         }
 
@@ -1129,8 +1119,8 @@
 
                 /* dont try because usually cannot - leave it to the database to delete its own responses after a time
                 //delete the response file
-                if (!osdelete(responsefilename,'neosysdblink_startdb exit'))
-                {
+                if (!(osdelete(responsefilename,'neosysdblink_startdb exit'))) {
+
                 //throw(e)
                 this.response=gmsg
                 return false
@@ -1159,14 +1149,12 @@
         return (Math.floor(min + Math.random() * (max - min + 1)))
     }
 
-    /*
-    function neosysoswrite(string,filename,unicode)
-    {
-    tf = gfso.CreateTextFile(filename,true,unicode)
-    tf.Write(string)
-    tf.Close()
+    function neosysoswrite(string,filename,unicode) {
+
+        tf = gfso.CreateTextFile(filename,true,unicode)
+        tf.Write(string)
+        tf.Close()
     }
-    */
 
     function neosysosread(filename) {
         var text = ''
@@ -1209,27 +1197,33 @@
         //get an array of datasets
         //location of \neosys folder
         var proglocation = (neosysrootpath + 'neosys\\').toUpperCase()
-        var datasets = neosysosread(proglocation + systemcode + '.vol')
+        var volfilename=proglocation + systemcode + '.VOL'
+
+        var datasets = neosysosread(volfilename)
+        if (!datasets) {
+            return "ERROR: Cannot read "+volfilename
+        }
+        var origdatasets=datasets
+        //}
         //.split('\r')[0]
         //backward compatible with old text format
-        var fm = String.fromCharCode(254)
-        var vm = String.fromCharCode(253)
-        var sm = String.fromCharCode(252)
-        datasets = datasets.replace(/\r/g, fm)
-        datasets = datasets.replace(/\*/g, vm)
-        datasets = datasets.replace(/,/g, sm)
+
+        var linesep='\r'
+        var dbsep='*'
+        var dbnamecodesep=','
+        datasets=datasets.replace(/[\r\n]/g,linesep)
 
         //strip off the firstline
-        datasets = datasets.substr(0, datasets.indexOf(fm))
+        datasets = datasets.split(linesep)[0]
 
         //strip off the firstword
         datasets = datasets.substr(datasets.indexOf(' ') + 1)
 
-        //split by vm
-        datasets = datasets.split(vm)
-        //subsplit by sm
+        //split into dbs
+        datasets = datasets.split(dbsep)
+        //subsplit into dbname and dbcode
         for (var i = 0; i < datasets.length; i++) {
-            datasets[i] = (datasets[i] + sm + sm + sm + sm + sm + sm).split(sm)
+            datasets[i] = (datasets[i] + dbnamecodesep).split(dbnamecodesep)
             datasets[i][0] = datasets[i][0] + ' (' + datasets[i][1] + ')'
         }
 
@@ -1242,6 +1236,10 @@
             }
         }
 
+        if (!existingdatasets.length) {
+            return "ERROR: Cannot find any datasets or "+volfilename+" is corrupt\n"+origdatasets.slice(0,100)
+        }
+        
         return existingdatasets
 
 
@@ -1267,31 +1265,31 @@
     if (currenttimeout != "") timeout = currenttimeout
 
     //use this for testing or keeping session alive
-    if (this.request.slice(0, 9) == 'KEEPALIVE') {
-        db = new Object
-        db.data = 'KEEPALIVE'
-        db.response = 'OK'
+    if (this.request.slice(0, 9) == 'KEEPALIVE' || this.request.slice(0, 8) == 'LOOPBACK') {
+        db2 = new Object
+        db2.data = this.request
+        db2.response = 'OK'
         dbresult = true
     }
     else {
         //send the request and data to the database
-        var db = new neosysdblink(token)
-        db.request = request
+        var db2 = new neosysdblink(token)
+        db2.request = request
         var error = null
         try {
-            var dbresult = db.send(data)
+            var dbresult = db2.send(data)
         }
         catch (e) {
-            db.response = e.description
-            db.data = ""
+            db2.response = e.description
+            db2.data = ""
         }
     }
 
     //package the response in xml text format
     //zzz maybe faster to send as xml object?
     xmltext = "<root>"
-    xmltext += "<data>" + escape(db.data) + "</data>"
-    xmltext += "<response>" + escape(db.response) + "</response>"
+    xmltext += "<data>" + escape(db2.data) + "</data>"
+    xmltext += "<response>" + escape(db2.response) + "</response>"
     xmltext += "<result>" + escape(dbresult) + "</result>"
     xmltext += "</root>"
 

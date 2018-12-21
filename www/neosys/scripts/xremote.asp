@@ -26,12 +26,12 @@
  //send the request and data to the database
  var dbresult
  db.request=request
- try
- {
+ try {
+
   dbresult=db.send(data)
  }
- catch(e)
- {
+ catch(e) {
+
   dbresult=0
   db.response=e.description
   db.data=""

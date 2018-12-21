@@ -87,7 +87,7 @@ function main() {
 		addtask("TIMESHEET ADMINISTRATION","TA");
 
 	}
-	
+
 	call log2("check for media module (schedules file)", logtime);
 	agy.schedules="";
 	if ((openfile("SCHEDULES", agy.schedules))) {

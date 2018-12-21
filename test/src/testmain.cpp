@@ -499,9 +499,19 @@ function main()
 		assert( table2.open( "TABLE2",conn2));
 		assert( table3.open( "TABLE3",conn3));
 
+		conn2.begintrans();
+		printl("select table2");
 		table2.selectrecord();
+
+		conn3.begintrans();
+		printl("select table3");
 		table3.selectrecord();
 		var record2, id2, record3, id3;
+
+		//if (!table2.readnextrecord( record2, id2))
+		//	printl("couldnt readnext table2");
+		//if (!table3.readnextrecord( record3, id3))
+		//	printl("couldnt readnext table23");
 
 		assert(table2.readnextrecord( record2, id2) and table3.readnextrecord( record3, id3));
 		assert(record2 eq "2.1111" and id2 eq "2.111" and record3 eq "3.1111" and id3 eq "3.111");
@@ -520,6 +530,8 @@ function main()
 		assert(not conn3.deletedb(dbname2));
 		assert(not conn2.deletedb(dbname3));
 */
+		conn2.committrans();
+		conn3.committrans();
 
 		conn2.disconnect();
 		conn3.disconnect();
@@ -576,6 +588,7 @@ function main()
 //		assert(listindexes("XUSERS") eq "");
 	}
 	//check can select and readnext through the records
+	begintrans();
 	if (pluginok) {
 		assert(select("select XUSERS with BIRTHDAY between '1 JAN 2000' and '31 DEC 2003'"));
 		assert(readnext(ID));
@@ -615,6 +628,8 @@ dict(AGE_IN_YEARS) {
 	}
 
 //#endif
+
+	committrans();
 
 	//test int/string changes after inc/dec (should really check MANY other ops)
 	var nn=0;
@@ -1444,12 +1459,12 @@ while trying to match the argument list '(exodus::var, bool)'
 	assert(time2.oconv("MTHS").outputl() eq "12:00:00PM");
 	time2=-86400-1;
 	assert(time2.oconv("MT").outputl() eq "23:59");
-	
+
 	//test some unlimited time
 	assert(var(-100).oconv("MTU").outputl() eq "-00:01");
 	assert(var(-100).oconv("MTUS").outputl() eq "-00:01:40");
 	assert(var(-10000).oconv("MTUS").outputl() eq "-02:46:40");
-	
+
 	assert(var(100).oconv("MTU").outputl() eq "00:01");
 	assert(var(100).oconv("MTUS").outputl() eq "00:01:40");
 	assert(var(1000).oconv("MTUS").outputl() eq "00:16:40");
@@ -1485,10 +1500,10 @@ while trying to match the argument list '(exodus::var, bool)'
 	assert(var(-125.25).oconv("MT2US").outputl() eq "-125:15:00");
 	assert(var(9).oconv("MT2US").outputl() eq "09:00:00");
 	assert(var(-9).oconv("MT2US").outputl() eq "-09:00:00");
-		
+
 //	assert(oconv(FM ^ L"\x0035","HEX4") eq "00FE0035");
-	assert(oconv(FM ^ L"\x0035","HEX4") eq "02FE0035");
-	assert(oconv(FM,"HEX4") eq "02FE");
+	assert(oconv(FM ^ L"\x0035","HEX4") eq "07FE0035");
+	assert(oconv(FM,"HEX4") eq "07FE");
 
 	printl();
 	printl("osdir("^SLASH^")=",osdir(SLASH));
@@ -1793,6 +1808,7 @@ while trying to match the argument list '(exodus::var, bool)'
 	int ii=0;
 //	cin>>ii;
 	var record;
+	begintrans();
 	if (ads.selectrecord("SELECT ADS")) {
 		while (ii<3&&ads.readnextrecord(record,key))
 		{
@@ -1805,7 +1821,7 @@ while trying to match the argument list '(exodus::var, bool)'
 		}
 	}
 	clearselect();
-
+	committrans();
 #ifdef FILE_IO_CACHED_HANDLES_EXCLUDED
 	{	// test to reproduce cached_handles error
 		var file1( "FILE1.txt");

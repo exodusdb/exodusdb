@@ -23,6 +23,8 @@ function main(in nextcompanycode) {
 	call log2("default fin.currcompany", logtime);
 	if (fin.currcompany.unassigned()) {
 		fin.currcompany="";
+		fin.currcurrency="";
+		fin.converted="";
 	}
 
 	call log2("get first company", logtime);

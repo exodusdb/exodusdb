@@ -565,7 +565,7 @@ bool var::open(const var& filename, const var& connection)
 			this->setlasterror(L"db connection not opened");
 			return false;
 		}
-		
+
 		DEBUG_LOG_SQL1
 		PGresult* result = PQexecParams(thread_pgconn,
 			//TODO: parameterise filename
@@ -713,7 +713,7 @@ bool var::read(const var& filehandle,const var& key)
 	PQclear(result);
 
 	this->setlasterror();
-	
+
 	return true;
 
 }
@@ -725,7 +725,7 @@ var var::lock(const var& key) const
 	//can take the lock
 	//unlock returns true if a lock (your lock) was released and false if you dont have the lock
 	//NB return "" if ALREADY locked on this connection
-	
+
 	THISIS(L"var var::lock(const var& key) const")
 	THISISDEFINED()
 	ISSTRING(key)
@@ -745,7 +745,7 @@ var var::lock(const var& key) const
 	uint64_t hash64=MurmurHash64((wchar_t*)fileandkey.data(),int(fileandkey.length()*sizeof(wchar_t)),0);
 
 	//check if already lock in current connection
-	
+
 //	LockTable* locktable=tss_locktables.get();
 	LockTable* locktable = (LockTable *) this->get_lock_table();
 
@@ -1323,7 +1323,7 @@ bool var::statustrans() const
 {
 	THISIS(L"bool var::statustrans() const")
 	THISISDEFINED()
-	
+
 	PGconn * thread_pgconn = (PGconn *) connection();
 	if (!thread_pgconn) {
 		this->setlasterror(L"db connection not opened");
@@ -1334,7 +1334,7 @@ bool var::statustrans() const
 	//only idle is considered to be not in a transaction
 	return (PQtransactionStatus(thread_pgconn)!=PQTRANS_IDLE);
 }
-     
+
 bool var::createdb(const var& dbname) const
 {
 	var errmsg;
@@ -1902,7 +1902,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 			}
 			continue;
 		}
-		
+
 		//by or by-dsnd
         if (word2==L"BY" || word2==L"BY-DSND")
 		{
@@ -1915,10 +1915,10 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 //orderclause.outputl(L"orderclause=");
 
             orderclause ^= dictexpression;
-			
+
 			if (word2==L"BY-DSND")
 				orderclause^=L" DESC";
-				
+
 			continue;
 		}
 
@@ -2034,9 +2034,9 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 			whereclause ^= word2;
 
 		}
-		
+
 	}//getword loop
-	
+
 	//prefix specified keys into where clause
 
 	if (keycodes)
@@ -2063,16 +2063,17 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	if (!ismv)
 	{
 		//sql ^= L", 0 as mv";
-		if (actualfieldnames.index(L"record"))
+		if (actualfieldnames.index(L"mv::integer, data"))
 		{
-			actualfieldnames.swapper(L", mv::integer",L", 0:integer");
+			//replace the mv column with zero if selecting record
+			actualfieldnames.swapper(L"mv::integer, data",L"0::integer, data");
 		}
 		else
 		{
 			actualfieldnames.swapper(L", mv::integer",L"");
 		}
 	}
-			
+
 	//assemble the full sql select statement:	//ALN:TODO: optimize with stringbuffer
 	var sql=L"DECLARE CURSOR1_" ^ (*this) ^ L" CURSOR FOR SELECT " ^ actualfieldnames ^ L" FROM ";
 	sql ^= PGDATAFILEPREFIX ^ actualfilename;
@@ -2096,7 +2097,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	//}
 	if (!this->statustrans())
 		throw MVDBException(L"select() must be preceeded by begintrans()");
-		
+
 //	if (!sql.sqlexec())
 	if (! this->sqlexec(sql)) {
 		//if (autotrans)
@@ -2309,13 +2310,13 @@ bool var::readnextrecord(var& record, var& key, var& valueno) const
 	//record is third column
 	if (PQnfields(pgresult)<3) {
 		PQclear(pgresult);
-		var errmsg=L"readnextrecord() must follow selectrecord() (not select())";
+		var errmsg=L"readnextrecord() must follow selectrecord(), not select()";
 		this->setlasterror(errmsg);
 		throw MVException(errmsg);
 		//return false;
 	}
 	record=wstringfromUTF8((UTF8*)PQgetvalue(pgresult, 0, 2), PQgetlength(pgresult, 0, 2));
-	
+
 	PQclear(pgresult);
 
 	return true;

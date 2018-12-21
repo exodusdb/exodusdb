@@ -29,7 +29,9 @@ function main(in mode0) {
 	var nkeywords = keywords.count(VM) + 1;
 
 	if (not(openfile("CHANGELOG", changelog))) {
-		call fsmsg();
+		//suppress openfiles errormsg
+		if (mode.a(1) == "WHATSNEW")
+			USER4="";
 		return 0;
 	}
 	if (not(openfile("DICT_CHANGELOG", DICT))) {

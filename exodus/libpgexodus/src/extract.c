@@ -5,6 +5,7 @@
 extern "C" {
 #endif
 
+/*
 #define FM_ '\u02FE'
 #define VM_ '\u02FD'
 #define SM_ '\u02FC'
@@ -21,6 +22,26 @@ extern "C" {
 #define FM_UTF8 '\uCBBE'
 #define VM_UTF8 '\uCBBD'
 #define SM_UTF8 '\uCBBC'
+*/
+
+//unicode characters 07FE 07FD 07FC for FM/VM/SM must fit in two byte utf8
+
+#define FM_ '\u07FE'
+#define VM_ '\u07FD'
+#define SM_ '\u07FC'
+
+#define FM_UTF8_1 '\xDF'
+#define FM_UTF8_2 '\xBE'
+
+#define VM_UTF8_1 FM_UTF8_1
+#define VM_UTF8_2 '\xBD'
+
+#define SM_UTF8_1 FM_UTF8_1
+#define SM_UTF8_2 '\xBC'
+
+#define FM_UTF8 '\uDFBE'
+#define VM_UTF8 '\uDFBD'
+#define SM_UTF8 '\uDFBC'
 
 /*
 #define FM_ '\xFE'

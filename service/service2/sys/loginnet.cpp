@@ -10,7 +10,7 @@ libraryinit()
 
 #include <gen.h>
 #include <fin.h>
-#include <agy.h>
+//#include <agy.h>
 
 var taskn;//num
 var menun2;
@@ -147,7 +147,8 @@ deleteit:
 			if (not compcode)
 				break;
 
-			if (validcode2(compcode, "", "", agy.brands, msg)) {
+			var brands="";//agy.brands may not be available and is not useful in this case
+			if (validcode2(compcode, "", "", brands, msg)) {
 				compcodes.r(-1, compcode);
 			}
 		};//ii;
@@ -180,17 +181,19 @@ deleteit:
 
 	//market
 	var defmarketcode = gen.company.a(30);
-	if (not defmarketcode) {
-		defmarketcode = agy.agp.a(37);
-	}
+	//agy may not be available
+	//if (not defmarketcode) {
+	//	defmarketcode = agy.agp.a(37);
+	//}
 	//if unassigned(markets) then markets=''
 	//TODO maybe use the market on the user file?
 	//markets is not open in finance only module
 	//readv maincurrcode from markets,defmarketcode,5 else maincurrcode=''
 	var maincurrcode = "";
-	if (agy.markets) {
-		maincurrcode = defmarketcode.xlate("MARKETS", 5, "X");
-	}
+	//agy may not be available
+	//if (agy.markets) {
+	//	maincurrcode = defmarketcode.xlate("MARKETS", 5, "X");
+	//}
 	if (maincurrcode == "") {
 		maincurrcode = fin.basecurrency;
 	}
@@ -213,7 +216,8 @@ deleteit:
 	cookie ^= "&db=" ^ temp;
 
 	//split extras
-	cookie ^= "&sp=" ^ agy.agp.a(5);
+	//always split now
+	//cookie ^= "&sp=" ^ agy.agp.a(5);
 
 	//form color, font and fontsize
 	cookie ^= "&fc=" ^ SYSTEM.a(46, 5);
@@ -224,10 +228,12 @@ deleteit:
 	cookie ^= "&df=" ^ gen.company.a(10);
 
 	//first day of week
-	var tt = agy.agp.a(13) + 1;
-	if (tt > 7) {
-		tt = 1;
-	}
+	//agy may not be available
+	//var tt = agy.agp.a(13) + 1;
+	//if (tt > 7) {
+	//	tt = 1;
+	//}
+	var tt="";
 	cookie ^= "&fd=" ^ tt;
 
 	//whats new
@@ -236,7 +242,8 @@ deleteit:
 	cookie ^= "&wn=" ^ ans;
 
 //TODO	call backupreminder(dataset, msg);
-	if (false) dataset.output();
+	if (false)
+		dataset.output();
 
 	return 0;
 

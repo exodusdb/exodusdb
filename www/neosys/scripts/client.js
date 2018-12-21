@@ -1,58 +1,111 @@
-﻿//Copyright© 2000 NEOSYS Software Ltd. All Rights Reserved.//**Start Encode**
+//Copyright NEOSYS All Rights Reserved.
 //undocumented functions
-//CollectGarbage() in all versions 
+//CollectGarbage() in all versions
 //"finally" block in v5.0
 
-//mozilla differences from IE
+//mozilla differences from IE (out of date?)
 // HTML element has a parentNode which is not usual element so be careful in "ancestor finder" routines
 // elements cannot be referred to simply as variables like idx
 // (must use getElementById or set an equivalent global variable)
 // insertBefore secondparameter is mandatory (put null)
 // document.body cannot be referred to in heading scripts until the document body is started
 // (so put document.onload function in the body tag. onload function cannot be called onload)
-// selectelement.options() should 
+// selectelement.options() should
 //parentElement nonstandard use parentNode
 
 //default location of neosys scripts etc
 if (typeof NEOSYSlocation == 'undefined')
     NEOSYSlocation = '../neosys/'
 
-gdomainname = window.location.toString().split('/')[2]
+//define global variables and initialise some of them
+//many global variables are defined throughout the code outside functions ... ususally just preceeding them
+//some global variable might be defined inside function by assignment without a defining var
+//most global variables start with g except some very commonly used ones like fm, vm, sm
+//a more complete set of global variables may be found using a debugger
+
+var gautofitwindow=true
+var gisdialog
+var glocked//mainly required in dbform but used in logout
+
+var gdomainname = window.location.toString().split('/')[2]
 //if (document.cookie.indexOf('username') < 0)
 //    alert('qno username')
 
+var geventlog = ''
+var geventstack = ['', '']
+var geventdepth = 1
+var gonunload = false
+var gonbeforeunload = false
+
+var glogging, gstepping
+
+var glogevents//related to yield
+var glogcookie
+var glogsettimeout
+
 //various images
-var gimagetheme = '../neosys/images/theme2/'
+var gimagetheme = '../../neosys/images/theme2/'
 //var gmenuimage=gimagetheme+'menu.png'//'add.png'
 var gmenuimage = gimagetheme + 'menu.gif'//'add.gif'
 var glogoutimage = gimagetheme + 'disconnect.png'//'add.png'
 var grefreshimage = gimagetheme + 'refresh.png'
 
-var e//mac safari 3.1.2 cannot tolerate "catch(e)"
+var gcache
 
-//ensure print preview styles are set during print/preview
-window.onbeforeprint = window_onbeforeprint
-function window_onbeforeprint() {
-    clientfunctions_setstyle()
-}
+var glogincode
+var gDialogArguments//similar to window.dialogArguments
+
+var gusername
+var gdataset
+var gsystem
+
+var gcompanycode
+var gperiod
+var gbasecurr
+var gbasefmt
+var gthousands_regex
+var gmarketcode
+var gmaincurrcode
+var gdatasetname
+var gtz = [0, 0]
+//gtz[0]=new Date().getTimezoneOffset()*-60
+
+var gnpendingscripts = 0
+
+//load gparameters from gDialogArguments if present
+var gparameters
+
+//var grecn should only be used in dbform.js. used here in ICONV special case
+
+//Revelation/Pick field separator characters
+var rm, fm, vm, sm, tm, stm
+var STMre, TMre, SMre, VMre, FMre, RMre, ALLFMre
+var XMLXXre
+var FMs
+
+isMSIE = typeof ActiveXObject != 'undefined' || ('ActiveXObject' in window)//|| is for MSIE11
+isMac = navigator.appVersion.indexOf('Macintosh') >= 0
+
+var e//mac safari 3.1.2 cannot tolerate "catch(e)" without this
 
 var goriginalstyles = {}
 
-//prevent framing
-if (window != top)
-    top.location.href = location.href
+//prevent framing?
+//if (window != top)
+//    top.location.href = location.href
 
 var gkeepalivemins = 10
 //gkeepalivemins=1
 
 //check browser capabilities
 
-var unsupported = ''
+var gunsupported = ''
+var gswitchingbrowser=false
 
 //support "innerText" or fail
-if (typeof document.createElement('DIV').innerText == 'undefined') {
+if (typeof document.createElement('div').innerText == 'undefined') {
     if (typeof HTMLElement == 'undefined' || !HTMLElement.prototype || !HTMLElement.prototype.__defineGetter__)
-        unsupported += ' innerText()'
+        gunsupported += ' innerText()'
     else {
         //for more see http://dean.edwards.name/moz-behaviors/src/
         //for moz/safari
@@ -74,360 +127,302 @@ if (typeof document.createElement('DIV').innerText == 'undefined') {
         */
     }
 }
-if (!window.showModalDialog)
-    unsupported += ' showModalDialog()'
+//define if our source contains function * and yield * statements
+//HARD CODED DEPENDING ON PRESENCE OR NOT OF YIELD STATEMENTS IN SOURCE CODE
+//AND THEREFORE CANNOT BE CHANGED
+/* yield */ var guseyield=true
+// noyield // var guseyield=false
+var gyieldregex=/yield ?\*/g
 
-//actually this is only needed if neosysforms are used
-if (!document.getElementsByClassName && !document.all)
-    unsupported += ' getElementsByClassName or .all'
+//determine if yield * supported by browser (not used anywhere atm)
+var gcan_yield
+try{eval('function * gcan_yield(x){return yield * true;}');gcan_yield=true} catch(e){gcan_yield=false}
 
-//check right browser and cookies allowed else switch to login which handled this error
-if (unsupported) {
-    alert('Sorry, your web browser does not support NEOSYS.\nUse Internet Explorer 6+, Safari 3+, Firefox 3+ or Chrome 8.0+\n\nIt doesnt support' + unsupported)
-    //document.location=NEOSYSlocation+'wrongbrowser.htm'
-    if (typeof glogin == 'undefined')
-        document.location = NEOSYSlocation + '../default.htm'
-}
+var gcan_showmodaldialog=window.showModalDialog
 
-//implement swapNode if not native
-if (self.Node) {
-    Node.prototype.swapNode = function (n) {
-        var p = n.parentNode;
-        var s = n.nextSibling;
-        this.parentNode.replaceChild(n, this);
-        p.insertBefore(this, s);
-        return this;
+//this forces pages going to /2/ to switch to /3/ which might be important for backend generated links to /2/ eg neosys/dblink.htm
+//simulate no modal dialog in firefox as will happen in mid 2015-2016
+//apparently it is not actually blocked in firefox yet (2016) but, without special configuration, user is given annoying options to suppress the popup
+if (gcan_yield)
+    gcan_showmodaldialog=false
+
+//this code only executes in /2/ ie javascript without yield option
+//cannot continue in non-yielding code if browser does not support showmodaldialog
+//maybe could be used to inform user/support team
+//that the user could use alternative web site supporting yield (if detected gcan_yield above)
+if (!guseyield) {
+    if (!gcan_showmodaldialog) {
+        //switch to neosys/3 if browser hasnt showModalDialog but can yield
+        if (gcan_yield) {
+
+            var url=window.location.toString()
+            window.location=url.replace(/\/[12]\//,'/3/')
+            gswitchingbrowser=true
+            //return // no return in global code
+        } else
+            gunsupported += ' showModalDialog() or yield'
     }
 }
 
-//works like msie
-function $all(elementid, element) {
-    if (!element) {
-        var id = elementid.id ? elementid.id : elementid
-        /*
-        var result
-        if (document.querySelectorAll) {
-        result = document.querySelectorAll('.neosysid_' + id)
-        if (!result.length)
-        result = false
+//call remainder of global code only if not switching browser
+if (!gswitchingbrowser) {
+    neosys_client_init()
+}
+
+//this is only called if not switching browser
+//any global variable defined in this function must not of course be declare var here otherwise would be local function variables
+function neosys_client_init() {
+
+    //actually this is only needed if neosysforms are used
+    if (!document.getElementsByClassName && !document.all)
+        gunsupported += ' getElementsByClassName or .all'
+
+    //check right browser and cookies allowed else switch to login which handled this error
+    if (gunsupported && !gswitchingbrowser) {
+        alert('Sorry, your web browser does not support NEOSYS.\nUse Internet Explorer 6+, Safari 3+, Firefox 3+ or Chrome 8.0+\n\nIt doesnt support' + gunsupported)
+        //window.location.assign(NEOSYSlocation+'wrongbrowser.htm')
+        if (typeof glogin == 'undefined') {
+            window.location.assign(NEOSYSlocation + '../default.htm')
+            return
         }
-        if (!result)
-        */
-        //return document.all(id) //this returns only one element in ie8 unless in compatibility mode
-        return document.all[id]
-
-        /* doesnt solve difference in document.all in ie8 between normal and compatibility mode
-        var id = elementid.id ? elementid.id : elementid
-        var temp = window[id]
-        if (temp)
-        return temp
-        else
-        return document.all(elementid)
-
-        */
     }
-    else
-    //should this be changed to [elementid] similar to above
-    // or is it supposed to return element it only 1 and array if more than one
-        return element.all(elementid)
-}
 
-function $class(elementid, element) {
-    var temp
-    if (element)
-        temp = element.getElementsByClassName('neosysid_' + elementid)
-    else
-        temp = document.getElementsByClassName('neosysid_' + elementid)
-    //return the element if one(
-    if (temp.length == 1)
-        return temp[0]
-    //return an array if many
-    else if (temp.length > 1)
-        return temp
-
-    //last ditch attempt to find by id
-    //NB but this doesnt respect the element argument
-    temp = document.getElementById(elementid)
-    if (temp)
-        return temp
-
-    //return undefined if not found
-    return
-}
-
-//setup function $$() NOT $() since that is used by JQuery
-if (document.getElementsByClassName)
-    $$ = $class
-else
-    $$ = $all
-
-isMSIE = typeof ActiveXObject != 'undefined'
-
-isMac = navigator.appVersion.indexOf('Macintosh') >= 0
-
-document.protocolcode = document.location.toString().slice(0, 4)
-
-var cr = String.fromCharCode(13)
-
-//global constants for revelation high end separator characters
-/*
-var fm2='þ'
-var vm2='ý'
-var sm2='ü'
-//regular expressions
-var STMre=/\xFA/g
-var TMre=/\xFB/g
-var SMre=/\xFC/g
-var VMre=/\xFD/g
-var FMre=/\xFE/g
-var RMre=/\xFF/g
-var XMLXXre=/([\x25\x3C\x3E\x26\xFF\xFE\xFD\xFC\xFB\xFA\xF9\xF8])/g
-//also block character F9 as is used as a field mark in AREV eg PRINT ("XXX":\F9\:"YYY") 'L#20' ... formats both to 20 characters
-//also block character F8 since to make logical block of eight field mark characters
-var FMs='\xFF\xFE\xFD\xFC\xFB\xFA\xF9\xF8'
-rmcharcode=255
-*/
-
-//c0,c1, f5-ff do not occur in utf8 at all.
-//see http://www.ifi.unizh.ch/mml/mduerst/papers/PDF/IUC11-UTF-8.pdf for graphical layout of utf8
-//00-7f means one ascii byte
-//80-BF means is a trailing byte
-//c0-c1 is illegal
-//c2-df is a two byte sequence first byte
-//e0-ef is a three byte sequence first byte
-//f0-f4 is a four byte sequence first byte
-//c0,c1, f5-ff do not occur in utf8 at all.
-//0xxxxxxx (US-ASCII)
-//110xxxxx 10xxxxxx
-//1110xxxx 10xxxxxx 10xxxxxx
-//11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-//111110xx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
-//1111110x 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
-
-//UTF8 web page containing all main characters (not CJK)
-//internet explorer 7.0 on XP takes a long time to open this and slow paging
-//firefox 2.0.0.6 on the same machine has no problem pages much faster and shows main more characters as non-box
-//win32 http://www.columbia.edu/kermit/utf8-t1.html
-
-//linux http://dejavu.sourceforge.net/samples/DejaVuSansMono.pdf
-//http://www.unicode.org/charts/PDF/U2500.pdf
-//http://www.eki.ee/letter/chardata.cgi?ucode=00FA-00FF
-//choose symbol that exist in both environments in to order to read
-// but ones that we can acceptably say that we cannot handle
-//choose ending in hex F to be easy to compare to original 00FF
-//could also choose and 2 byte private use unicode code point in the range E000-F8FF
-/*
-box drawing character show in firefox and explorer test page above but not system boxes unfortunately.
-[╘]  U+2558   &amp;#9560;  BOX DRAWINGS UP SINGLE AND RIGHT DOUBLE
-[╙]  U+2559   &amp;#9561;  BOX DRAWINGS UP DOUBLE AND RIGHT SINGLE
-[╚]  U+255A   &amp;#9562;  BOX DRAWINGS DOUBLE UP AND RIGHT
-[╛]  U+255B   &amp;#9563;  BOX DRAWINGS UP SINGLE AND LEFT DOUBLE
-[╜]  U+255C   &amp;#9564;  BOX DRAWINGS UP DOUBLE AND LEFT SINGLE
-[╝]  U+255D   &amp;#9565;  BOX DRAWINGS DOUBLE UP AND LEFT
-[╞]  U+255E   &amp;#9566;  BOX DRAWINGS VERTICAL SINGLE AND RIGHT DOUBLE
-[╟]  U+255F   &amp;#9567;  BOX DRAWINGS VERTICAL DOUBLE AND RIGHT SINGLE
-*/
-//IN THE THAT THE UNICODE CODE POINTS CHOSEN TO REPRESENT FIELD MARKS IN THE FRONT END NEEDS TO BE CHANGES
-//YOU ONLY NEED TO CHANGE THEM IN THIS PROJECT client.js (here) and xhttp.asp
-//1. change here and in xhttp.asp
-//2. search whole project for something like u255F to verify
-//3. be aware that ntvdm backend sends and receives field marks characters F8-FF as escaped characters to the asp file
-//4. the asp file converts them to the chosen unicode characters here before sending them to the front end HTML.
-//5. the process works in reverse when sending data from the front end to (or back to) the backend
-//6. be aware that the ntvdm backend converts any real F8-FF characters from the front end to to hex 16-1F to make way for unescaping %F8-FF
-//7. ie in the unlikely event that the front end sends any real 16-1F characters to the ntvdm backend they will appear to be converted
-// to characters F8-FF on return.
-
-//these should be replaced by fm/vm/sm
-var fm2 = '╞'
-var vm2 = '╝'
-var sm2 = '╜'
-
-//also block character F8 and F9
-//F9 is used as a field mark in AREV eg PRINT ("XXX":\F9\:"YYY") 'L#20' ... formats both to 20 characters
-//also block character F8 since to make logical block of eight field mark characters
-
-//prestored regular expressions for speed
-//var STMre = /\u255A/g
-//var TMre = /\u255B/g
-//var SMre = /\u255C/g
-//var VMre = /\u255D/g
-//var FMre = /\u255E/g
-//var RMre = /\u255F/g
-//var FMs = '\u255F\u255E\u255D\u255C\u255B\u255A\u2559\u2558'
-//rmcharcode = 9567//U+255F ╟ (box drawings vertical double and right single)
-
-//prestored regular expressions for speed
-var STMre = /\u02FA/g
-var TMre = /\u02FBB/g
-var SMre = /\u02FC/g
-var VMre = /\u02FD/g
-var FMre = /\u02FE/g
-var RMre = /\u02FF/g
-var FMs = '\u02FF\u02FE\u02FD\u02FC\u02FB\u02FA\u02F9\u02F8'
-rmcharcode = 767//U+02FF
-/* Uralitic phonetic alphabet repurposed
-02F7 ˷ MODIFIER LETTER LOW TILDE
-02F8 ˸ MODIFIER LETTER RAISED COLON
-02F9 ˹ MODIFIER LETTER BEGIN HIGH TONE
-02FA ˺ MODIFIER LETTER END HIGH TONE
-02FB ˻ MODIFIER LETTER BEGIN LOW TONE
-02FC ˼ MODIFIER LETTER END LOW TONE
-02FD ˽ MODIFIER LETTER SHELF
-02FE ˾ MODIFIER LETTER OPEN SHELF
-02FF ˿ MODIFIER LETTER LOW LEFT ARROW
-*/
-
-//calculate all the field mark variables
-var rm = String.fromCharCode(rmcharcode)
-var fm = String.fromCharCode(rmcharcode - 1)
-var vm = String.fromCharCode(rmcharcode - 2)
-var sm = String.fromCharCode(rmcharcode - 3)
-var tm = String.fromCharCode(rmcharcode - 4)
-var stm = String.fromCharCode(rmcharcode - 5)
-
-//var XMLXXre = /([\x25\x3C\x3E\x26\u255F\u255E\u255D\u255C\u255B\u255A\u2559\u2558])/g
-var XMLXXre = /([\x25\x3C\x3E\x26])/g
-
-var dbcache
-
-var glogincode
-
-//get alternative dialog arguments - see dialogArgumentsForChild in function neosysshowmodaldialog
-gDialogArguments = window.dialogArguments
-if (!gDialogArguments && window.opener) {
-    try {
-        //window.opener may have been closed and refreshing the page might cause an error
-        gDialogArguments = window.opener.dialogArgumentsForChild
+    //implement swapNode if not native
+    if (!document.swapNode) {
+        Node.prototype.swapNode = function (node) {
+            var p = node.parentNode;
+            var s = node.nextSibling;
+            this.parentNode.replaceChild(node, this);
+            p.insertBefore(this, s);
+            return this;
+        }
     }
-    catch (e)
-  { }
+
+    //polyfill
+    if (typeof console=='undefined')
+        window.console={}
+    if (typeof console.log=='undefined')
+        window.console.log=log
+
+    //setup function $$() NOT $() since that is used by JQuery
+    if (document.getElementsByClassName)
+        $$ = $class
+    else
+        $$ = $all
+
+    document.protocolcode = document.location.toString().slice(0, 4)
+
+    //global constants for revelation high end separator characters
+
+    //new style flexible but chose unusual characters not likely to be required by clients and yet visible for debugging
+    //characters can be changed if required by require a change in the http server message handler too
+
+    //c0,c1, f5-ff do not occur in utf8 at all.
+    //see http://www.ifi.unizh.ch/mml/mduerst/papers/PDF/IUC11-UTF-8.pdf for graphical layout of utf8
+    //00-7f means one ascii byte
+    //80-BF means is a trailing byte
+    //c0-c1 is illegal
+    //c2-df is a two byte sequence first byte
+    //e0-ef is a three byte sequence first byte
+    //f0-f4 is a four byte sequence first byte
+    //c0,c1, f5-ff do not occur in utf8 at all.
+    //0xxxxxxx (US-ASCII)
+    //110xxxxx 10xxxxxx
+    //1110xxxx 10xxxxxx 10xxxxxx
+    //11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+    //111110xx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
+    //1111110x 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
+
+    //UTF8 web page containing all main characters (not CJK)
+    //internet explorer 7.0 on XP takes a long time to open this and slow paging
+    //firefox 2.0.0.6 on the same machine has no problem pages much faster and shows main more characters as non-box
+    //win32 http://www.columbia.edu/kermit/utf8-t1.html
+
+    //linux http://dejavu.sourceforge.net/samples/DejaVuSansMono.pdf
+    //http://www.unicode.org/charts/PDF/U2500.pdf
+    //http://www.eki.ee/letter/chardata.cgi?ucode=00FA-00FF
+    //choose symbol that exist in both environments in to order to read
+    // but ones that we can acceptably say that we cannot handle
+    //choose ending in hex F to be easy to compare to original 00FF
+    //could also choose and 2 byte private use unicode code point in the range E000-F8FF
+    /*
+    box drawing character show in firefox and explorer test page above but not system boxes unfortunately.
+     * in order to ensure that this file is ASCII
+    [*]  U+2558   &amp;#9560;  BOX DRAWINGS UP SINGLE AND RIGHT DOUBLE
+    [*]  U+2559   &amp;#9561;  BOX DRAWINGS UP DOUBLE AND RIGHT SINGLE
+    [*]  U+255A   &amp;#9562;  BOX DRAWINGS DOUBLE UP AND RIGHT
+    [*]  U+255B   &amp;#9563;  BOX DRAWINGS UP SINGLE AND LEFT DOUBLE
+    [*]  U+255C   &amp;#9564;  BOX DRAWINGS UP DOUBLE AND LEFT SINGLE
+    [*]  U+255D   &amp;#9565;  BOX DRAWINGS DOUBLE UP AND LEFT
+    [*]  U+255E   &amp;#9566;  BOX DRAWINGS VERTICAL SINGLE AND RIGHT DOUBLE
+    [*]  U+255F   &amp;#9567;  BOX DRAWINGS VERTICAL DOUBLE AND RIGHT SINGLE
+    */
+    //IN THE THAT THE UNICODE CODE POINTS CHOSEN TO REPRESENT FIELD MARKS IN THE FRONT END NEEDS TO BE CHANGES
+    //YOU ONLY NEED TO CHANGE THEM IN THIS PROJECT client.js (here) and xhttp.asp
+    //1. change here and in xhttp.asp
+    //2. search whole project for something like u255F to verify
+    //3. be aware that ntvdm backend sends and receives field marks characters F8-FF as escaped characters to the asp file
+    //4. the asp file converts them to the chosen unicode characters here before sending them to the front end HTML.
+    //5. the process works in reverse when sending data from the front end to (or back to) the backend
+    //6. be aware that the ntvdm backend converts any real F8-FF characters from the front end to to hex 16-1F to make way for unescaping %F8-FF
+    //7. ie in the unlikely event that the front end sends any real 16-1F characters to the ntvdm backend they will appear to be converted
+    // to characters F8-FF on return.
+
+    //prestored global regular expressions for speed
+    STMre = /\u07FA/g
+    TMre = /\u07FB/g
+    SMre = /\u07FC/g
+    VMre = /\u07FD/g
+    FMre = /\u07FE/g
+    RMre = /\u07FF/g
+    ALLFMre = /[\u07FA\u07FA\u07FB\u07FC\u07FD\u07FE\u07FF]/g
+
+    //also block character F8 and F9
+    //F9 is used as a field mark in AREV eg PRINT ("XXX":\F9\:"YYY") 'L#20' ... formats both to 20 characters
+    //also block character F8 since to make logical block of eight field mark characters
+    XMLXXre = /([\x25\x3C\x3E\x26\u07FF\u07FE\u07FD\u07FC\u07FB\u07FA\u07F9\u07F8])/g
+    FMs = '\u07FF\u07FE\u07FD\u07FC\u07FB\u07FA\u07F9\u07F8'
+
+    //calculate all the global field separator character variables
+    rm = FMs[0]
+    fm = FMs[1]
+    vm = FMs[2]
+    sm = FMs[3]
+    tm = FMs[4]
+    stm = FMs[5]
+
+    //get alternative global dialog arguments - see dialogArgumentsForChild in function neosysshowmodaldialog
+    gDialogArguments = window.dialogArguments
+    if (!gDialogArguments && window.opener) {
+        try {
+            //window.opener may have been closed and refreshing the page might cause an error
+            gDialogArguments = window.opener.dialogArgumentsForChild
+        }
+        catch (e)
+      { }
+    }
+
+    gisdialog = typeof window.dialogArguments != 'undefined'
+
+    if (window.dialogArguments && window.dialogArguments.logincode) {
+        glogincode = window.dialogArguments.logincode
+        //alert('debug client.js glogincode=window.dialogArguments.logincode '+window.dialogArguments.logincode)
+    }
+
+    //can extract cookied immediately
+    if (!glogincode) glogincode = ''
+    if (!glogincode) {
+        glogincode = neosysgetcookie2('logincode','NEOSYSlogincode')
+    }
+    if (!gdataset) gdataset = ''
+    if (!gdataset) {
+        gdataset = neosysgetcookie2('dataset')
+    }
+    setdateformat()
+
+    if (typeof gparameters == 'undefined')
+        gparameters = new Object
+    if (typeof window.dialogArguments != 'undefined') {
+        for (var param in window.dialogArguments)
+            gparameters[param] = window.dialogArguments[param]
+    }
+    if (gparameters.gtasks && !gtasks)
+        gtasks = gparameters.gtasks
+
+    //add gparameters from URL if present eg. neosys.com/xyz.htm?param1=1&param2=2 etc.
+    var temp = window.location.toString()
+    if (temp.indexOf('?') >= 0) {
+        temp = unescape(temp.slice(temp.indexOf('?') + 1)).split('&')
+        for (i = 0; i < temp.length; i++)
+            gparameters[temp[i].split('=')[0]] = temp[i].split('=').slice(1).join('=')
+    }
+    if (typeof gparameters.savemode == 'undefined')
+        gparameters.savemode = gparameters.SAVEMODE
+
+    //file access functions
+    if (document.protocolcode == 'file') {
+        document.writeln('<scr' + 'ipt type="text/javascript" src="' + NEOSYSlocation + 'scripts/server.js"></scr' + 'ipt>')
+    }
+
+    //style sheet
+    //copy any modifications to decide.htm and decide2.htm as well
+    document.writeln('<link rel="stylesheet" type="text/css" href="' + NEOSYSlocation + 'global.css">')
+    //be careful to always have private.css even if empty otherwise it is ALWAYS not in cache and
+    //requires a server lookup all the time. therefore upgrades will destroy any neosys client's private.css
+    //actually it shouldnt be ../ in the login and inital menu screen
+    //cut out because slows at least modaldialog in ie7
+    //document.writeln('<link REL="stylesheet" TYPE="text/css" HREF="../private.css">')
+
+    //jquery (not used)
+    //document.writeln('<scr' + 'ipt type="text/javascript" id=jquery src="' + NEOSYSlocation + 'scripts/jquery-1.4.4-min.js"></scr' + 'ipt>')
+
+    //general functions
+    if (!($$('generalfunctions'))) {
+        document.writeln('<scr' + 'ipt type="text/javascript" id=generalfunctions src="' + NEOSYSlocation + 'scripts/neosys.js"></scr' + 'ipt>')
+    }
+
+    //form functions
+    if (typeof gdatafilename != 'undefined' || typeof gdictfilename != 'undefined') {
+        document.writeln('<scr' + 'ipt type="text/javascript" src="' + NEOSYSlocation + 'scripts/db.js"></scr' + 'ipt>')
+        document.writeln('<scr' + 'ipt type="text/javascript" src="' + NEOSYSlocation + 'scripts/gds.js"></scr' + 'ipt>')
+        document.writeln('<scr' + 'ipt type="text/javascript" src="' + NEOSYSlocation + 'scripts/dbform.js"></scr' + 'ipt>')
+    }
+
+    //if (!window.onload)
+    //save any custom onload function to be executed by clientfunctions_windowonload when it finishes
+    gwindowonload = window.onload
+    //window.onload = clientfunctions_windowonload
+    window.onload = null
+    addeventlistener(window,'load','clientfunctions_windowonload')
+    //addeventlistener(window,'unload','clientfunctions_windowonunload_sync')
+
+    //ensure print preview styles are set during print/preview
+    //window.onbeforeprint = window_onbeforeprint
+    addeventlistener(window,'beforeprint','window_onbeforeprint')
+
+    //save location except if logging in
+    if (typeof gnosavelocation == 'undefined' && !window.dialogArguments && NEOSYSlocation != './neosys/') {
+        //if (gdataset) neosyssetcookie('','NEOSYS',escape(location),'ll',true)
+    }
+
+    glogging = false
+    gstepping = 0
+
+    //ensure http session is kept alive
+    if (document.protocolcode != 'file') {
+        if (gkeepalivemins)
+            //neosyssetinterval('yield* sessionkeepalive()', gkeepalivemins * 60 * 1000)
+            neosyssetinterval('yield* sessionkeepalive()', gkeepalivemins * 60 * 1000)
+    }
+
+    loadcache()
+
 }
 
-if (window.dialogArguments && window.dialogArguments.logincode) {
-    glogincode = window.dialogArguments.logincode
-    //alert('debug client.js glogincode=window.dialogArguments.logincode '+window.dialogArguments.logincode)
-}
-/* sometimes seems to get the wrong window opener resulting in wrong glogincode
-else if (window.opener)
-{
-try
-{
-glogincode=window.opener.glogincode
-//alert('debug client.js glogincode=window.opener.glogincode '+window.opener.glogincode)
-//if (typeof gparameters=='undefined'&&window.opener.gparametersforcallee)
-// gparameters=window.opener.gparametersforcallee
-}
-catch (e){}
-}
-*/
-if (!glogincode) glogincode = ''
-if (!glogincode) {
-    glogincode = neosysgetcookie('', 'NEOSYSlogincode', 'logincode')
-    //alert('debug client.js glogincode=neosysgetcookie(\'\',\'NEOSYSlogincode\',\'logincode\') '+window.opener.glogincode)
-    //alert('debug client.js glogincode= '+glogincode)
-    //alert('xyz3'+neosysgetcookie(glogincode,'NEOSYS2','username'))
-    //alert(document.cookie)
+//end of main initialisation.
+//what follows should be functions and their global variables only
+
+function* window_onbeforeprint() {
+    yield* clientfunctions_setstyle()
 }
 
-var gusername
-var gdataset
-var gsystem
-
-var gcompanycode
-var gperiod
-var gbasecurr
-var gbasefmt
-var gmarketcode
-var gmaincurrcode
-var gdatasetname
-var gtz = [0, 0]
-//gtz[0]=new Date().getTimezoneOffset()*-60
-
-var gnpendingscripts = 0
-
-//load gparameters from window.dialogArguments if present
-var gparameters
-if (typeof gparameters == 'undefined') gparameters = new Object
-if (typeof window.dialogArguments != 'undefined') {
-    for (var param in window.dialogArguments) gparameters[param] = window.dialogArguments[param]
-}
-if (gparameters.gtasks && !gtasks)
-    gtasks = gparameters.gtasks
-
-//add gparameters from URL if present eg. neosys.com/xyz.htm?param1=1&param2=2 etc.
-var temp = window.location.toString()
-if (temp.indexOf('?') >= 0) {
-    temp = unescape(temp.slice(temp.indexOf('?') + 1)).split('&')
-    for (i = 0; i < temp.length; i++) gparameters[temp[i].split('=')[0]] = temp[i].split('=').slice(1).join('=')
-}
-if (typeof gparameters.savemode == 'undefined') gparameters.savemode = gparameters.SAVEMODE
-
-//file access functions
-if (document.protocolcode == 'file') {
-    document.writeln('<SCR' + 'IPT type="text/javascript" src="' + NEOSYSlocation + 'scripts/server.js"></SCR' + 'IPT>')
-}
-
-//style sheet
-//copy any modifications to decide.htm and decide2.htm as well
-document.writeln('<link REL="stylesheet" TYPE="text/css" HREF="' + NEOSYSlocation + 'global.css">')
-//be careful to always have private.css even if empty otherwise it is ALWAYS not in cache and
-//requires a server lookup all the time. therefore upgrades will destroy any neosys client's private.css
-//actually it shouldnt be ../ in the login and inital menu screen
-//cut out because slows at least modaldialog in ie7
-//document.writeln('<link REL="stylesheet" TYPE="text/css" HREF="../private.css">')
-
-//jquery
-document.writeln('<SCR' + 'IPT type="text/javascript" id=jquery src="' + NEOSYSlocation + 'scripts/jquery-1.4.4-min.js"></SCR' + 'IPT>')
-
-//general functions
-if (!$$('generalfunctions')) {
-    document.writeln('<SCR' + 'IPT type="text/javascript" id=generalfunctions src="' + NEOSYSlocation + 'scripts/neosys.js"></SCR' + 'IPT>')
-}
-
-//form functions
-if (typeof gdatafilename != 'undefined' || typeof gdictfilename != 'undefined') {
-    document.writeln('<SCR' + 'IPT type="text/javascript" src="' + NEOSYSlocation + 'scripts/db.js"></SCR' + 'IPT>')
-    document.writeln('<SCR' + 'IPT type="text/javascript" src="' + NEOSYSlocation + 'scripts/gds.js"></SCR' + 'IPT>')
-    document.writeln('<SCR' + 'IPT type="text/javascript" src="' + NEOSYSlocation + 'scripts/dbform.js"></SCR' + 'IPT>')
-}
-
-//if (!window.onload)
-//save any custom onload function to be executed by clientfunctions_windowonload when it finishes
-gwindowonload = window.onload
-window.onload = clientfunctions_windowonload
-
-//save location except if logging in
-if (typeof gnosavelocation == 'undefined' && !window.dialogArguments && NEOSYSlocation != './neosys/') {
-    //if (gdataset) neosyssetcookie('','NEOSYS',escape(location),'ll',true)
-}
-
-glogging = 0
-gstepping = 0
-
-//ensure http session is kept alive
-if (document.protocolcode != 'file') {
-    if (gkeepalivemins) window.setInterval('sessionkeepalive()', gkeepalivemins * 60 * 1000)
-}
-
-loadcache()
-
-function neosyslogout_onclick() {
+function* neosyslogout_onclick() {
 
     //cancel any automatic login
     neosyssetcookie('', 'NEOSYS', '', 'a')
 
     //decide where to login again
     var newwindowlocation = '../default.htm'
-    var system = neosysgetcookie('', 'NEOSYSsystem')
-    if (system && system != 'ADAGENCY') newwindowlocation += '??' + system
+    var system = neosysgetcookie2('', 'NEOSYSsystem',null)
+    if (system && system != 'ADAGENCY')
+        newwindowlocation += '??' + system
 
     //clear various session variable
-    dblogout()
+    yield* dblogout()
 
-    //switch to login window 
+    //switch to login window
     try {
-        window.location = newwindowlocation
+        window.location.assign(newwindowlocation)
     }
     catch (e) { }
 
@@ -437,22 +432,22 @@ function neosyslogout_onclick() {
 
 var gmsg
 var gtasks
-function neosyssecurity(task) {
+function* neosyssecurity(task) {
 
     //return empty gmsg if authorised
     gmsg = ''
 
     //look for ancient source code
     if (task.indexOf(' FILE ') >= 0)
-        neosyswarning('FILE should not be in task ' + task)
+        yield* neosyswarning('FILE should not be in task ' + task)
 
     //make sure task list is loaded (clearing cache also clears gtasks for convenience)
     if (!gtasks) {
-        db.request = 'EXECUTE\rGENERAL\rGETTASKS\rNOT'
-        if (!db.send()) {
+        db.request = 'CACHE\rEXECUTE\rGENERAL\rGETTASKS\rNOT'
+        if (!(yield* db.send())) {
             gtasks = ''
             gmsg = db.response
-            neosysinvalid(gmsg)
+            yield* neosysinvalid(gmsg)
             return false
         }
         gtasks = db.data.split(fm)[0].split(vm)
@@ -467,7 +462,7 @@ function neosyssecurity(task) {
     }
 
     //fail if task not allowed
-    //if (task.slice(0,3)=='!!!'||gtasks.neosyslocate(task)||(gstepping&&!confirm(task)))
+    //if (task.slice(0,3)=='!!!'||gtasks.neosyslocate(task)||(gstepping&&!(confirm(task))))
     if (task.slice(0, 3) == '!!!' || gtasks.neosyslocate(task)) {
         gmsg = 'Sorry ' + gusername.neosyscapitalise() + ', you are not authorised to do\r' + task.neosyscapitalise()
         return false
@@ -477,11 +472,12 @@ function neosyssecurity(task) {
 
 }
 
-function sessionkeepalive() {
+function* sessionkeepalive() {
 
     //last connection
-    var lastconnection = neosysgetcookie('', 'NEOSYSlc', 'lc')
-    if (lastconnection == 'undefined') lastconnection = ''
+    var lastconnection = neosysgetcookie2('lc', 'NEOSYSlc', '')
+    if (lastconnection == 'undefined')
+        lastconnection = ''
     lc = lastconnection
     lastconnection = lastconnection ? new Date(lastconnection) : lastconnection = new Date(0)
 
@@ -494,8 +490,8 @@ function sessionkeepalive() {
     if (time >= nextconnection && typeof db != 'undefined') {
         var tempdb = new neosysdblink()
         tempdb.request = 'KEEPALIVE'
-        tempdb.send()
-        //if (!db.send()) alert(db.response)
+        yield* tempdb.send()
+        //if (!(yield* db.send())) alert(db.response)
         window.status = time + ' Keep Alive'
     }
 
@@ -505,7 +501,7 @@ function neosyssetexpression(elementsorelementid, attributename, expression) {
 
     //check element exists
     if (!elementsorelementid)
-        return neosysinvalid('missing element in neosyssetexpression ' + attributename + ' ' + expression)
+        return yield* neosysinvalid('missing element in neosyssetexpression ' + attributename + ' ' + expression)
 
     //elements can be elementnames too
 
@@ -553,7 +549,7 @@ function neosyssetexpression(elementsorelementid, attributename, expression) {
                 }
             }
             catch (e) {
-                //TODO replace setexpression with some kind of callback events   
+                //TODO replace setexpression with some kind of callback events
             }
 
         }
@@ -561,17 +557,112 @@ function neosyssetexpression(elementsorelementid, attributename, expression) {
 
 }
 
-function neosysenabledandvisible(element) {
-    if (typeof element == 'string') element = document.getElementsByName(element)[0]
-    if (element.getAttribute('neosysreadonly'))
+var gsetexpressioninterval=[]
+function neosyssetexpression2(elementids, attributename, expression) {
+
+    var elementids2
+    if (typeof elementids=='string')
+        elementids2=elementids.split(',')
+    else
+        elementids2=elementids
+
+    var allelements=[]
+    for (var ii=0;ii<elementids2.length;++ii) {
+        var elementid=elementids2[ii]
+
+        var elements = document.getElementsByName(elementid)
+        if (!elements.length) {
+            elements = $$(elementid)
+            if (!elements)
+                try {
+                    elements = eval(elementid)
+                }
+                catch (e) { }
+            if (!elements)
+                continue
+            //$$() like "MSIE global id variables" returns array only if more than one
+            if (!elements.length)
+                elements = [elements]
+        }
+        //rearray to make sure is an array otherwise ie6 $$() seems to return a collection and concat appends all as one element on the end
+        allelements=allelements.concat(rearray(elements))
+    }
+
+    var style = attributename.slice(0, 6) == 'style:'
+    var attributepart = style ? attributename.slice(6) : attributename
+
+    neosyssetexpression2b(elementid, allelements, style, attributepart, expression)
+
+}
+
+function neosyssetexpression2b(expressionid, elements, style, attributename, expression) {
+
+    gsetexpressioninterval[expressionid]=neosyssetinterval(
+
+        //build a closure containing all the elements to be updated
+        //and to be called at intervals
+        function anon_from_neosyssetexpression2b(){
+            //NB LEAVE A SPACE BEFORE THE LEFT BRACKET to prevent converter adding yield * in front of it
+            //NB next line in yielding code is a method call and is NOT ONLY a comment
+            neosyssetexpression2c (elements, style, attributename, expression)
+            /* yield */ .next()
+
+            //In yielding code, the above only creates a generator function which has to be
+            //spurred into action by calling its next() method - below
+            //We cannot simply prefix yield * in front of it to cause it to automatically execute
+            //because it is in an anonymous function that will be called at intervals by window
+            //and if the anonymous function were to be marked function * (ie to be a yielding function
+            //known as a generator) the window call at intervals would only create a generator
+            // and not actually start the function by calling its next() method
+        }
+        ,250)//every quarter second
+}
+
+//this is called at intervals
+function* neosyssetexpression2c(elements, style, attributename, expression) {
+    //set the attribute expression for all elements
+    var result=yield* neosysevaluate(expression)
+    //console.log(expression+' is '+result+')
+    if (attributename=='disabled')
+        1==1
+    for (var ii = 0; ii < elements.length; ii++) {
+        var element=elements[ii]
+        if (style)
+            element=element.style
+        element[attributename]=result
+    }
+
+}
+
+function neosysenabledandvisible(element0,allowreadonly) {
+    var element=element0
+    if (typeof element == 'string') {
+        element = document.getElementsByName(element0)[0]
+        if (!element) {
+            element = document.getElementById(element0)
+            if (!element) {
+                element = $$(element0)
+                if (!element) {
+                    systemerror('neosysenabledandvisible() cannot getElementsByName '+element0)
+                }
+            }
+        }
+    }
+    if (!allowreadonly && element.getAttribute('neosysreadonly'))
         return false
-    while (element && element.parentNode && element.tagName != 'BODY') {
+
+    if (!element.offsetWidth||element.style.display == 'none')
+        return false
+
+    //have to check parents in msie TODO only required for older MSIE?)
+    while (isMSIE && element.parentNode && element.parentNode.tagName != 'BODY') {
+        element=element.parentNode
         if (element.style.display == 'none')
             return false
-        //if (element.runtimeStyle.display=='none') return false
-        if (element.getAttribute('disabled')) return false
-        element = element.parentNode
+        if (element.getAttribute('disabled'))
+            return false
     }
+
     return true
 }
 
@@ -582,7 +673,8 @@ function showhide(element, show) {
     if (typeof element == 'string') {
         element = $$(element)
         if (!element)
-            return neosysinvalid('element ' + elementid + ' does not exist in showhide()')
+            //return yield* neosysinvalid('element ' + elementid + ' does not exist in showhide()')
+            systemerror('showhide("'+elementid+'")', ' window element does not exist')
     }
 
     //recursive
@@ -594,25 +686,14 @@ function showhide(element, show) {
     }
 
     if (element.style) {
-        if (show) {
-            //inline doesnt line up columns in mozilla and table-row is not accepted by msie5/6/7
-            if (document.all)
-                displayvalue = 'inline'
-            else if (element.tagName == 'TR')
-                displayvalue = 'table-row'
-            else if (element.tagName == 'TD' || element.tagName == 'TH')
-                displayvalue = 'table-cell'
-            else if (element.tagName == 'TBODY')
-                displayvalue = 'table-row-group'
-            else
-                displayvalue = 'inline'
+        if (!show)
+            element.style.display = 'none'
+        else {
+            //use '' because 'inline' doesnt line up columns in mozilla and table-row etc is only accepted by msie8+
+            element.style.display = ''
         }
-        else
-            displayvalue = 'none'
-
-        element.style.display = displayvalue
     }
-
+    return true
 }
 
 function insertafter(element, newelement) {
@@ -622,39 +703,173 @@ function insertafter(element, newelement) {
 }
 
 function setinnerHTML(elementsorid, html) {
-    if (typeof elementsorid == 'string')
-        elementsorid = document.getElementsByName(elementsorid)
+    if (typeof elementsorid == 'string') {
+        elementsorid = $$(elementsorid)
+        if (elementsorid.tagName) {
+            elementsorid.innerHTML=html
+            return
+        }
+    }
     for (var i = 0; i < elementsorid.length; i++)
         elementsorid[i].innerHTML = html
 }
 
-function neosysshowmodaldialog(url, arguments, dialogstyle) {
+function blockmodalui_sync() {
 
-    //http://developer.mozilla.org/en/docs/DOM:window.showModalDialog
-    //http://msdn.microsoft.com/en-us/library/ms536759.aspx
+    unblockmodalui_sync()
 
-    if (!arguments)
-        var arguments = new Object
-    if (!arguments.gtasks)
-        arguments.gtasks = gtasks
-    //http://localhost/neosys2/jobs/timesheets.htm
-    var standardstyle = 'Center: yes; Help: no; Resizable: yes; Scroll: yes; Status: no'
-    var maxheight = window.screen.availHeight
-    var maxwidth = window.screen.availWidth
+    //YIELD//console.log('BLOCKING UI')
+
+    blocker=document.createElement('div')
+    blocker.style.width='100%'
+    blocker.style.height='100%'
+    blocker.style.background='rgba(255,255,255,0.25)'//white overlay with only 25% opacity
+    blocker.style.position='fixed'
+    blocker.style.top='0'
+    blocker.style.left='0'
+    blocker.style.zIndex='100'
+    blocker.id='uiblockerdiv'
+
+    document.body.insertBefore(blocker, null)
+
+    //keep focus off parent window and on child window or neosysdiv
+    blocker.onclick=function uiblockerdiv_onclick(){
+
+        if ($$('neosysconfirmdiv')) {
+                window.setTimeout('neosys_confirm_function3()',10)
+            //alert('Please wait for server response')
+        }
+        else if (gchildwin) {
+            var actualwin
+            if (gchildwin.lazy) {
+                actualwin=gchildwin.actual
+                //open a 'please wait' window the first time that they click the blockerdiv or they close the 'please wait' window
+                if (!actualwin||actualwin.closed) {
+                    var dialogstyle=getdialogstyle_sync(dialogstyle)
+
+                    var question = 'Processing. Please wait.'
+                    var defaultbutton = 1
+                    var dialogargs = [question, defaultbutton, 'Wait', 'Cancel']
+                    //pass the xmlhttprequestobject so it can be aborted if user clicks Cancel
+                    if (gchildwin.xhttp)
+                        dialogargs.xhttp=gchildwin.xhttp
+
+                    var dialogstyle
+
+                    //cant call neosysshowmodaldialog because that requires a global gcurrentevent variable/generator function
+                    //and that global/generator is already in use handling some current event that is yielded for async xmlhttprequest
+                    actualwin=window.open(NEOSYSlocation + 'confirm.htm','',dialogstyle)
+                    gchildwin.actual=actualwin
+
+                    if (!actualwin) {
+                        alert('Unable to show popup window - please enable popups; disable your popup blocker.')
+                        return
+                    }
+
+                    //pass arguments and callback/resume function to child window
+                    actualwin.dialogArguments=dialogargs
+
+                }
+            } else
+                actualwin=gchildwin
+
+            //focus on child window
+            window.setTimeout(function(){try{actualwin.focus()}catch(e){}},10)
+
+            //also focus on child's child recursively
+            var winuiblocker=actualwin.document.getElementById('uiblockerdiv')
+            if (winuiblocker)
+                winuiblocker.click()
+
+        }
+    }
+
+}
+
+var gchildwin
+
+function unblockmodalui_sync() {
+    //close 'please wait' window if present
+    if (gchildwin&&!gchildwin.closed&&gchildwin.actual&&!gchildwin.actual.closed)
+        gchildwin.actual.close()
+    var blocker=$$('uiblockerdiv')
+    if (blocker) {
+        //YIELD//console.log('UNBLOCKING UI')
+        neosysremovenode(blocker)
+        //console.log('parent window ui unblocked')
+    }
+}
+
+function getdialogstyle_sync(dialogstyle) {
+
+    var standardstyle = ''
+
+    standardstyle+='Center: yes'
+    standardstyle+=', Help: no'
+    standardstyle+=', Resizable: yes'
+    standardstyle+=', Scroll: yes'
+    standardstyle+=', Status: no'
+    standardstyle+=', scrollbars=1'//mozilla?
+    //standardstyle+=',modal=yes'//no longer supported in chrome
+    standardstyle+=', alwaysRaised=yes'
+
+    var max=getmaxwindow_sync()
+
+    //var maxwidth = window.outerWidth//window.innerWidth//screen.availWidth
+    //var maxheight = window.outerHeight//window.innerHeight//screen.availHeight
+    var maxwidth=max.width
+    var maxheight=max.height
+
+    //on ie6 seems to minimise
+    //maxwidth=0
+    //maxheight=0
     if (!dialogstyle) {
-        //var maxheight=window.screen.availHeight
         //var maxwidth=window.screen.availWidth
-        //var dialogstyle='DialogHeight:'+maxheight+'px; DialogWidth:'+maxwidth+'px; Center: yes; Help: yes; Resizable: yes; Status: No;'
-        ////var dialogstyle='dialogHeight: 400px; dialogWidth: 600px; dialogTop: px; dialogLeft: px; center: Yes; help: Yes; resizable: Yes; status: Yes;'
+        //var maxheight=window.screen.availHeight
+        var dialogstyle='DialogHeight:'+maxheight+'px; DialogWidth:'+maxwidth+'px; Center: yes; Help: yes; Resizable: yes; Status: No;'
+        //var dialogstyle='dialogHeight: 400px; dialogWidth: 600px; dialogTop: px; dialogLeft: px; center: Yes; help: Yes; resizable: Yes; status: Yes;'
         dialogstyle = standardstyle
+
+        if (maxwidth)
+            dialogstyle+=', DialogWidth:'+maxwidth+'px'
+        if (maxheight)
+            dialogstyle+=', DialogHeight:'+maxheight+'px'
+
+        //mozilla
+        if (maxwidth)
+            dialogstyle+=', width='+maxwidth
+        if (maxheight)
+            dialogstyle+=', height='+maxheight
+
+        if (typeof window.screenX!='undefined')
+            //dialogstyle+=', left='+window.screenX
+            dialogstyle+=', left='+max.left
+        if (typeof window.screenY!='undefined')
+            //dialogstyle+=', top='+window.screenY
+            dialogstyle+=', top='+max.top
+
         //prevents centering in ff3
         //dialogstyle+='; DialogHeight: 100px; DialogWidth: 500px'
         //manual centering (TODO calculate it from maxheight and maxwidth)
         //dialogstyle+='; DialogTop: 100px; DialogLeft: 100px'
     }
     else if (dialogstyle == 'max') {
-        dialogstyle = standardstyle + '; DialogHeight:' + maxheight + 'px; DialogWidth:' + maxwidth + 'px;'
+        dialogstyle = standardstyle + ', DialogHeight:' + max.height + 'px, DialogWidth:' + max.width + 'px;'
     }
+
+    //return with comma AND semicolon separators (MSIE requires semicolon and Firefox/Webkit require commas)
+    dialogstyle=dialogstyle+';'+dialogstyle.replace(/,/g,';')
+    return dialogstyle
+}
+
+function* neosysshowmodaldialog(url, arguments, dialogstyle) {
+
+    if (!arguments)
+        var arguments = new Object
+    if (!arguments.gtasks)
+        arguments.gtasks = gtasks
+
+    dialogstyle=getdialogstyle_sync(dialogstyle)
 
     //always send login code
     arguments.logincode = glogincode
@@ -668,7 +883,34 @@ function neosysshowmodaldialog(url, arguments, dialogstyle) {
 
         dialogArgumentsForChild = arguments
 
-        var result = window.showModalDialog(url, arguments, dialogstyle)
+        //non-yielding code with showModalDialog
+        var result
+        if (!guseyield)
+            result = window.showModalDialog(url, arguments, dialogstyle)
+
+        //yielding code
+        else {
+
+            //open the child window async
+            gchildwin = window.open(url, '', dialogstyle)
+
+            if (!gchildwin) {
+                alert('Unable to show popup window - please enable popups; disable your popup blocker.')
+                return
+            }
+
+            //pass arguments and callback/resume function to child window
+            gchildwin.dialogArguments=arguments
+
+            //auto resume if the child window disappears - every poll every n ms
+            //this will stop when it goes out of scope when this function terminates
+            window.setTimeout('neosys_autoresume()',100)
+
+            //wait here until neosys_autoresume detects that the child window is closed
+            // and passes its return value here
+            result=yield* neosys_yield('neosysshowmodaldialog '+url)
+            console.log('neosysshowmodaldialog result is '+result)
+        }
 
         //Safari doesnt return an error and looks like a Window [x] close unfortunately
         if (typeof result == 'undefined' && window.navigator.appVersion.indexOf('Safari') >= 0)
@@ -678,6 +920,7 @@ function neosysshowmodaldialog(url, arguments, dialogstyle) {
 
     }
     catch (e) {
+        console.log('caught error in neosysshowmodaldialog: '+e)
         //alert('Please enable popups for this site (1)\n\nError:'+(e.description?e.description:e))
         //alert('Please enable popups for this site (1)\n\nError:'+(e.description?e.description:e)+'\n\n'+url+'\n\n'+arguments)
         return
@@ -688,54 +931,261 @@ function neosysshowmodaldialog(url, arguments, dialogstyle) {
 
 }
 
-function displayresponsedata(request, data) {
+function* neosys_yield(source) {
+
+    blockmodalui_sync()
+
+    logevent('          >> BEFORE YIELD '+source)
+    logevent('          ... yielding ... pause this code and resume parent code')
+
+    ////////////////////////////////////////////////
+    //PAUSE HERE until something provides a result
+    //by executing geventhandler  .next(result)
+    ////////////////////////////////////////////////
+
+    ////////////////////////////////////////////////////////////////
+    //NOTE IN YIELDING CODE THE FOLLOWING LINE IS NOT ONLY A COMMENT
+    //NOTE IN NON-YIELDING CODE THE FOLLOWING LINE IS ONLY A COMMENT
+    ////////////////////////////////////////////////////////////////
+
+    /* yield */   var result = yield source
+
+    logevent('          << AFTER YIELD '+source)
+
+    return result
+
+}
+
+//called by child windows to return result to the parent before closing
+function neosyswindowclose(returnvalues) {
+
+    //window.opener.gchildwin_returnvalue = returnvalues
+    if (window.opener) {
+        window.opener.focus()//for MSEDGE
+        if (window.opener.neosys_setchildwin_returnvalue) {
+            if (typeof returnvalues=='undefined')
+                returnvalues=''
+            returnvalues.neosysisarray=true
+            window.opener.neosys_setchildwin_returnvalue(returnvalues)
+        }
+    }
+    window.returnValue = returnvalues
+    window.close()
+}
+
+//parent window function called by childwindow to return result to parent window
+var gchildwin_returnvalue
+function neosys_setchildwin_returnvalue(returnvalue) {
+    //gchildwin_returnvalue=returnvalue
+    //shallow copy array to avoid permissions issue when child windows closes in edge
+    if (returnvalue.neosysisarray) {
+        gchildwin_returnvalue=[]
+        for (var ii=0;ii<returnvalue.length;++ii) {
+            //gchildwin_returnvalue[ii]=returnvalue[ii].toString()
+            gchildwin_returnvalue[ii]=returnvalue[ii]
+        }
+    }
+    else {
+        gchildwin_returnvalue=returnvalue
+    }
+}
+
+function neosys_autoresume(){
+
+    //if child window still active then schedule another check later
+    if (gchildwin && !gchildwin.closed) {
+        //console.log('neosys_autoresume - window still present and not closed')
+        window.setTimeout('neosys_autoresume()',100)
+        return
+    }
+
+    console.log('NEOSYS_AUTORESUME since gchildwin is closed or missing')
+
+    //childwin doesnt exist or has closed
+    //get the returnvalue from it or return an empty string
+    try {
+        var returnvalue=gchildwin.returnValue
+    } catch (e){
+        gchildwin=false
+        returnvalue=''
+    }
+
+//alert('2 gchildwin_returnvalue='+gchildwin_returnvalue)
+    if (gchildwin_returnvalue) {
+        returnvalue=gchildwin_returnvalue
+//        alert('gchildwin_returnvalue='+gchildwin_returnvalue)
+        gchildwin_returnvalue=undefined
+    }
+
+    neosys_resume(returnvalue,'neosys_autoresume')
+
+}
+
+//given a result from some event, resume a yielded geventhandler function, passing it a result
+// after closing the modaluiblocker
+//1. a child window is closed
+//2. an xmlhttp action completes (ok/error/timeout/abort)
+//3. user clicks various keys while a neosysconfirmdiv is present
+function neosys_resume(value,source){
+
+    logevent(' ')
+    logevent('neosys_resume  <in '+value+' from '+source+')')
+
+    //clear ui and stop resumer before resuming
+    //because .next() will run to the next async/ui occurrence in the current event process
+    unblockmodalui_sync()
+
+    //give the result (value) to the yielded and now resuming code
+    //result = yield 'xxxxxxxxxxxxx'
+    var next=neosys_next(value,'neosys_resume from '+source)
+
+    logevent('neosys_resumed out> '+next.value+') from '+source+')')
+
+    //probably no purpose in returning this since we are not using generator functions to acquire values,
+    //only to act as suspended functions until some data they need is acquired asynchronously from neosysdiv, child window, xmlhttp
+    return next.value
+
+}
+
+function neosys_next(value,source) {
+
+    logevent('  ==> BEFORE NEXT EVENTHANDLER from '+source+' - value in:'+value+' ===')
+
+    ///////////////////////////////////////////////////////////////
+    //very important code either a) starts a "suspendable" function
+    //or b) resumes a suspended function passing a value into it
+    ///////////////////////////////////////////////////////////////
+
+    //all new events are blocked while our event handler (generator function) is not "done"
+    //"done" means that the function has returned (not yielded)
+    //this is because it is a global variable so our neosys_resume function knows what to resume
+    if (!gblockevents)
+        form_blockevents(true,source)
+
+    var next=geventhandler.next(value)
+
+    logevent('  <== AFTER NEXT EVENTHANDLER from '+source+' ===')
+    logevent('      done:'+next.done+' value out:'+next.value)
+
+    if (next.done) {
+        form_blockevents(false,source)
+        //following should not be necessary since
+        //if our event handler does not yield anywhere then it will not be created
+        //and if our event handle DOES yield then it will be cleared in neosys_resume
+        unblockmodalui_sync()
+    }
+
+    return next
+}
+
+function displayresponsedata_sync(request, data) {
+    //yield* displayresponsedata(request, data).next()
+    //hide function from converter to yield *
+    var temp=window['displayresponsedata'](request,data)
+    if (temp.next)
+        neosysneweventhandler(temp,'displayresponsedata')
+}
+
+function* displayresponsedata(request, data) {
 
     if (!data)
         data = ''
+
     db.request = request
-    if (!db.send(data)) {
-        neosysinvalid(db.response)
+    if (!(yield* db.send(data))) {
+        yield* neosysinvalid(db.response)
         return false
     }
+    if (db.data)
+        yield* neosysnote(db.data)
+    else
+        yield* neosysnote(db.response.slice(2))
 
-    neosysnote(db.data)
     return true
 
 }
 
+function openwindow_sync(request, data) {
+    //LEAVE SPACE AFTER FUNCTION NAME TO PREVENT CONVERSION TO YIELD
+    var result=openwindow (request,data)
+    if (result.next) {
+        result=neosysneweventhandler(result,'openwindow_sync '+request).value
+    }
+    return result
+}
+
 //function to simplify passing a db request (with optional data)
 //that returns a URL to be opened in an independent window
-function openwindow(request, data) {
+function* openwindow(request, data) {
 
     if (!data)
         data = ''
     db.request = request
-    if (!db.send(data)) {
-        neosysinvalid(db.response)
+    if (!(yield* db.send(data))) {
+        yield* neosysinvalid(db.response)
         return false
     }
 
     if (db.response != 'OK')
-        neosysnote(db.response.slice(3))
+        yield* neosysnote(db.response.slice(3))
 
-    if (db.data)
-        return windowopen(db.data)
-
+    if (db.data) {
+        var urls=db.data.split(fm)
+        var result
+        for (ii=0;ii<urls.length;++ii)
+            result=yield* windowopen(urls[ii])
+        return result
+    }
 }
 
-function windowopen2(url) {
-    return windowopen(url, { 'key': gvalue })
+function* windowopenkey(url, key) {
+    if (!key)
+        key=gvalue
+    return yield* windowopen(url, { 'key': key })
+}
+
+function windowopen_sync(url, parameters, style) {
+    //LEAVE SPACE AFTER FUNCTION NAME TO PREVENT CONVERSION TO YIELD
+    var result=windowopen (url, parameters, style)
+    if (result.next)
+        return result.next()
+    return result
 }
 
 var gwindowopenparameters
-function windowopen(url, parameters) {
+function* windowopen(url, parameters, style) {
 
-    if (!url) url = ''
-    if (!parameters) parameters = {}
+    url=url||''
+    parameters=parameters||''
+    style=style||''
+
+    if (url.toUpperCase().replace(/\\/g,'/').substr(0,8)=='../DATA/')
+        url = '../'+url
+
+    //if no style or "tab" parameter, windows opened from dialogs are opened in new maximised windows
+    if (style==''&&gisdialog) {
+        var max=getmaxwindow_sync()
+
+        style+=';DialogHeight:'+max.height+'px; DialogWidth:'+max.width+'px; Resizable: yes'
+        //mozilla
+        style+=',toolbar=yes,menubar=yes,resizable=yes,scrollbars=yes,status=yes'
+        style+=',width='+max.width
+        style+=',height='+max.height
+        style+=',left='+max.left
+        style+=',top='+max.top
+    }
+    //"tab" used to force opening in a tab despite being in a dialog (because the dialog is closing)
+    if (style=='tab')
+        style=''
 
     //switch to normal url from development url which doesnt have data folder (otherwise too many files)
     if (window.location.href.toString().toLowerCase().indexOf('//localhost/neosys7/') >= 0 && url.toLowerCase().slice(0, 8) == '..\\data\\')
         url = window.location.href.toString().split('/').slice(0, 3).join('/') + '/neosys/' + url.slice(3)
+
+    //normalise windows style urls with backslashes to slashes.
+    //firefox wont normalise window style relative urls like ..\ but will if they are like ../
+    // and this may cause problems for any other relative urls in the page like images
+    url=url.replace(/\\/g,'/')
 
     //these parameters are picked up by the opened window (from its parent) after it opens
     //since no way to pass parameters directly to non modal windows except in the URL
@@ -744,7 +1194,7 @@ function windowopen(url, parameters) {
     gwindowopenparameters.logincode = glogincode
     try {
 
-        var result = window.open(url)
+        var result = window.open(url,'',style)
 
         //Safari doesnt return an error and looks like a Window [x] close unfortunately
         if (typeof result == 'undefined' && window.navigator.appVersion.indexOf('Safari') >= 0)
@@ -762,7 +1212,7 @@ function windowopen(url, parameters) {
 
 //wrapper function to replace window.open()
 //to give warning if cannot open ... because of pop blockers etc.
-function neosysbreak(cmd, funcname, position) {
+function* neosysbreak(cmd, funcname, position) {
 
     if (!gstepping) return
 
@@ -774,8 +1224,9 @@ function neosysbreak(cmd, funcname, position) {
     while (cmd) {
         if (cmd != ' ') {
 
+            var result
             try {
-                var result = this.parent.eval(cmd)
+                result = this.parent.eval(cmd)
             }
             catch (e) {
                 result = e.number + ' ' + e.description
@@ -783,10 +1234,11 @@ function neosysbreak(cmd, funcname, position) {
             msg = cmd + '=\n' + result + '\n\n' + msg
 
             //display result and optionally quit
-            if (!confirm(msg)) {
+            if (!(confirm(msg))) {
                 //FF3 about:config
                 //extensions.firebug-service.breakOnErrors
-                breakrighthere
+                //breakrighthere
+                debugger
                 return
             }
 
@@ -798,15 +1250,15 @@ function neosysbreak(cmd, funcname, position) {
 function assertelement(element, funcname, varname) {
     neosysassertobject(element, funcname, varname)
     if (!element.tagName) {
-        raiseerror(1000, 'In ' + funcname + ', ' + varname + ' is not an element.')
-        return
+        return systemerror('assertelement()', 'In ' + funcname + ', ' + varname + ' is not an element.')
     }
     return true
 }
 
-function neosysnote(msg, mode) {
+function* neosysnote(msg, mode) {
+
     //if (!msg) return false
-    //allow return neosysnote() to be opposite of return neosysinvalid()
+    //allow return yield* neosysnote() to be opposite of return yield* neosysinvalid()
     if (!msg)
         return true
 
@@ -821,7 +1273,7 @@ function neosysnote(msg, mode) {
     msg = msg.toString().replace(FMre, '\r\n').replace(VMre, '\r\n')
     msg = msg.replace(/\|/, '\r\n')
 
-    neosysyesnocancel(msg, 1, 'OK', '', '', null, false, mode)
+    yield* neosysconfirm(msg, 1, 'OK', '', '', null, false, mode)
 
     return true
 
@@ -830,20 +1282,20 @@ function neosysnote(msg, mode) {
 //''''''''
 //'INVALID
 //''''''''
-function neosysinvalid(msg) {
+function* neosysinvalid(msg) {
     //displays a message if provided and returns false
-    //so you can use it like "return neosysinvalid(msg)" to save a line
-    neosysnote(msg, 'critical')
+    //so you can use it like "return yield* neosysinvalid(msg)" to save a line
+    yield* neosysnote(msg, 'critical')
     return false
 }
 
 //''''''''
 //'WARNING
 //''''''''
-function neosyswarning(msg) {
+function* neosyswarning(msg) {
     //displays a message if provided and returns true
-    //so you can use it like "return neosyswarning(msg)" to save a line 
-    return neosysnote(msg, 'warning')
+    //so you can use it like "return yield* neosyswarning(msg)" to save a line
+    return yield* neosysnote(msg, 'warning')
 }
 
 //duplicated in client.js, decide.htm and decide2.htm
@@ -857,9 +1309,7 @@ function neosys_set_style(mode, value, value2) {
     //ensure display is set to inline even if not changing color
     //if (!value) return
 
-    var rules = document.styleSheets[0].cssRules
-    if (!rules)
-        rules = document.styleSheets[0].rules
+    var rules = document.styleSheets[0].cssRules||document.styleSheets[0].rules
     var oldvalue = ''
 
     //screencolor
@@ -873,7 +1323,8 @@ function neosys_set_style(mode, value, value2) {
         //but ok in IE6 IE7 IE8b1 FF3 Saf3.0Win Saf3.1Win Opera9.5b Konqueror3.5.7
         //IE 6/7 only where there is a natural display: inline.
         //http://www.quirksmode.org/css/display.html
-        style.display = 'inline-block'
+        //style.display = 'inline-block'
+        style.display = ''
 
         //initial color is buff yellow
         if (!value)
@@ -884,7 +1335,7 @@ function neosys_set_style(mode, value, value2) {
             style.backgroundColor = value
         }
         catch (e) {
-            if (e.number == -2146827908) return neosysinvalid(value + ' is not a recognised color')
+            if (e.number == -2146827908) return yield* neosysinvalid(value + ' is not a recognised color')
             return systemerror('neosys_set_style("' + mode + '","' + value + '")', e.number + ' ' + e.description)
         }
     }
@@ -895,9 +1346,9 @@ function neosys_set_style(mode, value, value2) {
         //initial font is ... 8pt
         var basefontsize = 8
 
-        if (!value) value = 'verdana,arial,helvetica'
+        if (!value) value = 'verdana,sans-serif,arial,helvetica'
         if (!value2) value2 = 100
-        if (!Number(value2)) {
+        if (!(Number(value2))) {
             alert(value2 + ' is not a recognised font size, using 100%')
             value2 = 100
         }
@@ -915,8 +1366,8 @@ function neosys_set_style(mode, value, value2) {
                 style.fontSize = value2
             }
             catch (e) {
-                if (e.number == -2146827908) return neosysinvalid(value + ' is not a recognised font')
-                if (e.number == -2147024809) return neosysinvalid(value2 + ' is not a recognised fontsize')
+                if (e.number == -2146827908) return yield* neosysinvalid(value + ' is not a recognised font')
+                if (e.number == -2147024809) return yield* neosysinvalid(value2 + ' is not a recognised fontsize')
                 return systemerror('neosys_set_style("' + mode + '","' + value + '","' + value2 + '")', e.number + ' ' + e.description)
             }
         }
@@ -928,24 +1379,24 @@ function neosys_set_style(mode, value, value2) {
 }
 
 //called early in decide and decide2
-function clientfunctions_setstyle() {
+function* clientfunctions_setstyle() {
     //set font first since setting color changes style display from none to inline
-    neosys_set_style('screenfont', neosysgetcookie(glogincode, 'NEOSYS2', 'ff'), neosysgetcookie(glogincode, 'NEOSYS2', 'fs'))
-    neosys_set_style('screencolor', neosysgetcookie(glogincode, 'NEOSYS2', 'fc'))
+    neosys_set_style('screenfont', neosysgetcookie2('ff'), neosysgetcookie2('fs'))
+    neosys_set_style('screencolor', neosysgetcookie2('fc'))
 }
 
-function clientfunctions_getglobals() {
-    gcompanycode = neosysgetcookie(glogincode, 'NEOSYS2', 'cc')
-    gncompanies = neosysgetcookie(glogincode, 'NEOSYS2', 'nc')
-    gperiod = neosysgetcookie(glogincode, 'NEOSYS2', 'pd')
-    gbasecurr = neosysgetcookie(glogincode, 'NEOSYS2', 'bc')
-    gshowzeros = neosysgetcookie(glogincode, 'NEOSYS2', 'bc')
-    gbasefmt = neosysgetcookie(glogincode, 'NEOSYS2', 'bf')
-    gmarketcode = neosysgetcookie(glogincode, 'NEOSYS2', 'mk')
-    gmaincurrcode = neosysgetcookie(glogincode, 'NEOSYS2', 'mc')
-    gdatasetname = neosysgetcookie(glogincode, 'NEOSYS2', 'db')
-    gmenucodes = neosysgetcookie(glogincode, 'NEOSYS2', 'm')
-    gtz = neosysgetcookie(glogincode, 'NEOSYS2', 'tz').split(fm)
+function* clientfunctions_getglobals() {
+   gcompanycode = neosysgetcookie2('cc')
+    gncompanies = neosysgetcookie2('nc')
+    gperiod = neosysgetcookie2('pd')
+    gbasecurr = neosysgetcookie2('bc')
+    gshowzeros = neosysgetcookie2('bc')
+    gbasefmt = neosysgetcookie2('bf')
+    gmarketcode = neosysgetcookie2('mk')
+    gmaincurrcode = neosysgetcookie2('mc')
+    gdatasetname = neosysgetcookie2('db')
+    gmenucodes = neosysgetcookie2('m')
+    gtz = neosysgetcookie2('tz').split(fm)
     if (gtz) {
         gtz[0] = Number(gtz[0])
         if (gtz[1])
@@ -955,60 +1406,93 @@ function clientfunctions_getglobals() {
     }
     else
         gtz = [0, 0]
+
+    //support input of numbers like 999,999,999.99 or 999.999.999,99
+    //gbasefmt is MDn0, or MCn0, where n=2 or 3 for number of decimals and D/C means , or . for thousand sep
+    if (gbasefmt.substr(0,2)=='MC')
+        gthousands_regex=/\./gi
+    else
+        gthousands_regex=/,/gi
 }
 
-function clientfunctions_windowonload() {
+function* clientfunctions_windowonload() {
 
-    login('clientfunctions_windowonload')
+    ////login('clientfunctions_windowonload')
 
     if (document.getElementsByClassName)
         id2classname()
 
-    if (!glogincode) glogincode = neosysgetcookie('', 'NEOSYSlogincode', 'logincode')
-    //loginalert('wol'+glogincode)
-    gdataset = neosysgetcookie(glogincode, 'NEOSYS2', 'dataset')
+//already done in global script
+//    if (!glogincode)
+//        glogincode = neosysgetcookie2('logincode', 'NEOSYSlogincode', null)
 
-    clientfunctions_getglobals()
+    //loginalert('wol'+glogincode)
+//    gdataset = neosysgetcookie2('dataset')
+
+    yield* clientfunctions_getglobals()
 
     db = new neosysdblink
     //gusername is set in neosysdblink
 
-    clientfunctions_setstyle()
+    //In case previous window didnt successfully unlock its record in onbeforeunload
+    //Could be turned off hoping synchronous unlock in window_onunload is sufficiently reliable
+    // to avoid need for double unlocking
+    var pending=neosysgetcookie(glogincode,'NEOSYSpending')
+    if (pending){
+        neosyssetcookie(glogincode,'NEOSYSpending','')
+        console.log(pending)
+        db.request=pending
+        yield* db.send()
+    }
+
+    yield* clientfunctions_setstyle()
+
     //trigger formfunctions_onload
     if (typeof formfunctions_onload == 'function')
-        formfunctions_onload()
+        yield* formfunctions_onload()
 
-    if (document.getElementById('autofitelement')) {
-        window.setTimeout('neosysautofitwindow()', 0)
-    }
+    if (gautofitwindow&&document.getElementById('autofitwindowelement'))
+        neosyssettimeout('neosysautofitwindow()', 10)
+        //neosyssetinterval('neosysautofitwindow()', 10)
 
     if (!window.dialogArguments && (typeof gshowmenu == 'undefined' || gshowmenu) && NEOSYSlocation != './neosys/') {
 
         var ctrlalt = isMac ? 'Ctrl' : 'Alt'
 
         //button to refresh (clear cache)
-        var temp2 = document.createElement('DIV')
-        temp2.innerHTML = menubuttonhtml('refreshcache', grefreshimage, 'Refresh', 'Refresh the Cache. ' + ctrlalt + '+X', 'X')
-        document.body.insertBefore(temp2, document.body.firstChild)
+        if (typeof gshowrefreshcachebutton=='undefined'||gshowrefreshcachebutton) {
+            var temp2 = document.createElement('span')
+            temp2.innerHTML = menubuttonhtml('refreshcache', grefreshimage, '<u>R</u>efresh', 'Refresh the Cache. ' + ctrlalt + '+R', 'X')
+            document.body.insertBefore(temp2, document.body.firstChild)
+            temp2.style.float='left'
+            //if no dbform
+            if (typeof gdictfilename=='undefined')
+                addeventlistener(temp2,'click','refreshcache_onclick')
+        }
 
         //button to logout
-        var temp2 = document.createElement('DIV')
-        temp2.innerHTML = menubuttonhtml('neosyslogout', glogoutimage, '<u>L</u>ogout', 'Logout. ' + ctrlalt + '+L', 'L')
+        var temp2 = document.createElement('span')
+        temp2.innerHTML = menubuttonhtml('neosyslogout', glogoutimage, 'Lo<u>g</u>out', 'Logout. ' + ctrlalt + '+G', 'G')
         document.body.insertBefore(temp2, document.body.firstChild)
+        temp2.style.float='left'
         if (!gusername) {
             var temp = $$('neosyslogoutbutton')
             temp.innerText = 'Login'
             temp.title = 'Login. Alt+L'
         }
+        //if no dbform
+        if (typeof gdictfilename=='undefined')
+            addeventlistener(temp2,'click','neosyslogout_onclick')
 
         //button for menu
         if (gmenucodes && gmenucodes != 'EXIT2') {
-            var temp2 = document.createElement('DIV')
+            var temp2 = document.createElement('span')
+            temp2.style.float='left'
             temp2.innerHTML = menubuttonhtml('menu', gmenuimage, '<u>M</u>enu', 'Menu. ' + ctrlalt + '+M', 'M')
             document.body.insertBefore(temp2, document.body.firstChild)
 
             //div to retrieve menu structure
-            temp = document.createElement('DIV')
+            temp = document.createElement('span')
             temp.id = 'menux'
             temp.style.display = 'none'
             temp.innerHTML = '<iframe id=menuframe ie55onload="menuonload()" src="../menu.htm" tabindex=-1 height=1px marginheight=1 marginwidth=1 frameborder=0 scrolling=no></iframe>'
@@ -1016,18 +1500,31 @@ function clientfunctions_windowonload() {
             menuelement.insertBefore(temp, null)
 
             //dont rely on onload event ... poll every 100ms to see if iframe is loaded
-            gmenuonloader = window.setInterval('menuonload()', 100)
+            gmenuonloader = neosyssetinterval('menuonload()', 100)
         }
 
     }
 
     //execute any custom window onload function
     //avoid error "Can't execute code from a freed script"
+    //gwindowonload comes from any window.onload ... not used atm
     if (gwindowonload)
         try { gwindowonload() }
         catch (e) { }
 
-    logout('clientfunctions_windowonload')
+    //2nd interation seems to fit better
+    if (gautofitwindow&&document.getElementById('autofitwindowelement'))
+        neosyssettimeout('neosysautofitwindow()', 100)
+
+    //firefox on linux refuses to resize/move immediately
+    if (gautofitwindow&&document.getElementById('autofitwindowelement'))
+        neosyssettimeout('neosysautofitwindow()', 300)
+
+    //2nd interation seems to fit better
+    if (gautofitwindow&&document.getElementById('autofitwindowelement'))
+        neosyssettimeout('neosysautofitwindow()', 300)
+
+    //logout('clientfunctions_windowonload')
 
     return
 
@@ -1040,11 +1537,22 @@ function menuonload() {
     //$$('menuframe').contentDocument.getElementById('menucompleted')
     var iframe = $$('menuframe')
     idocument = iframe.contentDocument
+    var menuhtml
     if (idocument) {
-        if (!idocument.getElementById('menucompleted'))
+        if (!(idocument.getElementById('menucompleted')))
             return
 
-        temp = idocument.body.innerHTML
+        //enable neosys support menu items
+        //if (gusername=='NEOSYS') {
+            var item1=idocument.getElementById('neosyssupportmenuitem1')
+            if (item1) {
+                item1.style.display=''
+                idocument.getElementById('neosyssupportmenuitem2').style.display=''
+            }
+        //}
+
+        menuhtml = idocument.body.innerHTML
+
     }
     else {
         //menuframe=$$('menuframe')
@@ -1057,16 +1565,16 @@ function menuonload() {
         //for some reason the iframe contains the span and iframe
         //so the above does not work!!!
         //so loop through the elements of the iframe skipping menux and menuframe
-        var temp = ''
+        var menuhtml = ''
         var childNodes = menuframe.document.body.childNodes
         for (var i = 0; i < childNodes.length; i++) {
             if (childNodes[i].outerHTML && childNodes[i].id != 'menux' && childNodes[i].id != 'menuframe')
-                temp += childNodes[i].outerHTML
+                menuhtml += childNodes[i].outerHTML
         }
 
     }
 
-    login('menuonload')
+    //login('menuonload')
 
     window.clearInterval(gmenuonloader)
 
@@ -1075,7 +1583,7 @@ function menuonload() {
     gmenuloaded = true
 
     //store the menu in the menu button
-    $$('menux').innerHTML = temp
+    $$('menux').innerHTML = menuhtml
     //menux.innerHTML=temp
     var menudiv = $$('menudiv')
     var target = menudiv.parentNode.parentNode
@@ -1083,32 +1591,35 @@ function menuonload() {
 
     //enable the menu button events
     var menubuttonx = $$('menubutton')
-    menubuttonx.onclick = menuonclick
+    //neosysonclick async yield menu_onlick added by addhtmlbutton
+    //menubuttonx.onclick = menuonclick
     menubuttonx.onmouseover = menuonmouseover
     menubuttonx.onmouseoutmenuonmouseout
-    addeventlistener(menubuttonx, 'onclick', menuonclick)
-    addeventlistener(menubuttonx, 'onmouseover', menuonmouseover)
-    addeventlistener(menubuttonx, 'onmouseout', menuonmouseout)
+    //do both?!
+    //addeventlistener(menubuttonx, 'onclick', 'menuonclick')
+    //addeventlistener(menubuttonx, 'onmouseover', 'menuonmouseover')
+    //addeventlistener(menubuttonx, 'onmouseout', 'menuonmouseout')
 
-    logout('menuonload')
+    //logout('menuonload')
 
 }
 
-Array.prototype.neosysread = function neosysread(filename, key, fieldno, cache) {
+Array.prototype.neosysread = function* array_neosysread(filename, key, fieldno, cache) {
 
     //unless returning one fieldno, always return at least n fields
     //so that accessing fields that do not exist by [] returns ''
     var minnfields = 100
 
     this.neosysresponse = neosysquote(key) + ' does not exist in the ' + filename.toLowerCase() + ' file.'
-    if (key == '') return false
+    if (key == '')
+        return false
 
     if (typeof cache == 'undefined' || cache)
         db.request = 'CACHE\r'
     else
         db.request = ''
     db.request += 'READ\r' + filename + '\r' + key
-    if (!db.send()) {
+    if (!(yield* db.send())) {
         if (db.response.indexOf('NO RECORD') >= 0) {
             //var temp=filename.toLowerCase().neosyssingular().replace(/_/,' ')
             return false
@@ -1138,7 +1649,7 @@ Array.prototype.neosysread = function neosysread(filename, key, fieldno, cache) 
 }
 
 //xlate method for array of keys
-Array.prototype.neosysxlate = function arrayxlate(filename, fieldno, mode) {
+Array.prototype.neosysxlate = function* arrayxlate(filename, fieldno, mode) {
 
     var keys = this
     var results = []
@@ -1157,7 +1668,7 @@ Array.prototype.neosysxlate = function arrayxlate(filename, fieldno, mode) {
         var rec
         if (rec = readcache(cachekey)) {
             //and do xlate logic on cached record
-            results[keyn] = neosysxlatelogic(filename, (key + fm + rec).split(fm), fieldno, mode, key)
+            results[keyn] = yield* neosysxlatelogic(filename, (key + fm + rec).split(fm), fieldno, mode, key)
         }
 
         //or build a unique list of keys of records to be selected
@@ -1180,7 +1691,7 @@ Array.prototype.neosysxlate = function arrayxlate(filename, fieldno, mode) {
 
         //select the (deduplicated) records or return systemerror
         db.request = 'SELECT\r' + filename + '\r\rRECORD'
-        if (!db.send(uncachedkeys.join(fm))) {
+        if (!(yield* db.send(uncachedkeys.join(fm)))) {
             systemerror(db.response)
             this.neosysresponse = db.response
             return []
@@ -1196,7 +1707,7 @@ Array.prototype.neosysxlate = function arrayxlate(filename, fieldno, mode) {
             //do xlate logic on the record
             var keyrec = recset[ii].split(fm)
             var key = keyrec[0]
-            var result = neosysxlatelogic(filename, keyrec, fieldno, mode, key)
+            var result = yield* neosysxlatelogic(filename, keyrec, fieldno, mode, key)
 
             //store the results whereever they are needed
             var keyn = 0
@@ -1220,7 +1731,7 @@ Array.prototype.neosysxlate = function arrayxlate(filename, fieldno, mode) {
 //fieldno 0 means return whole record as simple array
 //mode can be undefined, C (means return key if no record) and SUM means add up mvs
 //zzz SHOULD return '' if no record and null if there is any error
-String.prototype.neosysxlate = function stringxlate(filename, fieldno, mode) {
+String.prototype.neosysxlate = function* stringxlate(filename, fieldno, mode) {
 
     key = this.toString()
     if (key == '') return ''
@@ -1228,14 +1739,14 @@ String.prototype.neosysxlate = function stringxlate(filename, fieldno, mode) {
     neosysassertnumeric(fieldno, 'xlate', filename + ' ' + key)
 
     var record = []
-    record.neosysread(filename, this)
+    yield* record.neosysread(filename, this)
     if (db.response.indexOf('file is not available') >= 0) systemerror('xlate', db.response)
 
-    return neosysxlatelogic(filename, record, fieldno, mode, key)
+    return yield* neosysxlatelogic(filename, record, fieldno, mode, key)
 
 }
 
-function neosysxlatelogic(filename, record, fieldno, mode, key) {
+function* neosysxlatelogic(filename, record, fieldno, mode, key) {
     if (record.length) {
         if (typeof fieldno != 'undefined') {
             if (fieldno) {
@@ -1260,43 +1771,59 @@ function neosysxlatelogic(filename, record, fieldno, mode, key) {
 
 }
 
-function neosysfilepopup(filename, cols, coln, sortselectionclause, many) {
+function* neosysfilepopup(filename, cols, coln, sortselectionclause, many, filtertitle, maxnrecs) {
     //filename is required
     //cols is required (array of arrays)
     //eg [['COMPANY_NAME','Company Name'],['COMPANY_CODE','Company Code']]
 
     //sortselectionclause is optional
     //eg 'WITH TYPE1 = "X" AND WITH = TYPE2 "Y" BY TYPE1 BY NAME'
-    if (!sortselectionclause) sortselectionclause = ''
+    if (!sortselectionclause)
+        sortselectionclause = ''
+
+    if (!filtertitle)
+        filtertitle = ''
 
     //sortselectionclause can be an array of keys
-    if (typeof sortselectionclause == 'object') sortselectionclause = sortselectionclause.join('" "').neosysquote()
+    if (typeof sortselectionclause == 'object')
+        sortselectionclause = sortselectionclause.join('" "').neosysquote()
 
     //get a list of col names sep by spaces
     var collist = ''
-    for (var i = 0; i < cols.length; i++) {
+    for (var i = 0; i < cols.length; i++)
         collist += ' ' + cols[i][0]
-    }
     collist = collist.slice(1)
-    if (!collist.split(' ').neosyslocate('ID')) collist += ' ID'
+    if (!collist.split(' ').neosyslocate('ID'))
+        collist += ' ID'
 
-    maxnrecs = 1000
+    //increased from 1000 since changelog records>1000 and no way to
+    if (typeof maxnrecs=='undefined')
+        maxnrecs = 2000
 
     //get the data from the server
     db.request = 'CACHE\rSELECT\r' + filename.toUpperCase() + '\r' + sortselectionclause + '\r' + collist + '\rXML\r' + maxnrecs
     //db.request='CACHE\rSELECT\r'+filename.toUpperCase()+'\r'+sortselectionclause+'\r'+collist+' ID'
-    if (!db.send()) {
-        neosysinvalid(db.response)
+    if (!(yield* db.send())) {
+        yield* neosysinvalid(db.response)
         return null
     }
 
     //cancel if no records found
     if (db.data.indexOf('<RECORD>') < 0) {
-        neosysinvalid('Sorry, no records found')
+        var msg='Sorry, no records found'
+        if (filtertitle)
+            msg += '\nfor ' + filtertitle
+        else if (sortselectionclause.indexOf('WITH COMPANY_CODE')>=0)
+            msg+='\nfor the chosen company'
+        yield* neosysinvalid(msg)
         return null
     }
 
-    return neosysdecide2('', db.data, cols, coln, '', many)
+    var question
+    if (filtertitle)
+        question = 'Which do you want?'+filtertitle
+
+    return yield* neosysdecide2(question, db.data, cols, coln, '', many)
 
 }
 
@@ -1314,11 +1841,12 @@ function neosysdblink() {
     this.login = neosysdblink_login
 
     //used in cache and elsewhere
-    if (!gdataset) gdataset = neosysgetcookie(glogincode, 'NEOSYS2', 'dataset')
-    gusername = neosysgetcookie(glogincode, 'NEOSYS2', 'username')
-    //alert('xyz2 NEOSYS2/username='+neosysgetcookie(glogincode,'NEOSYS2','username'))
+    if (!gdataset) gdataset = neosysgetcookie2('dataset')
+    gusername = neosysgetcookie2('username')
+    //alert('xyz2 NEOSYS2/username='+neosysgetcookie2('username'))
     //alert(document.cookie)
-    gsystem = neosysgetcookie('', 'NEOSYSsystem')
+    gsystem = neosysgetcookie2('', 'NEOSYSsystem',null)
+
     // alert(gdataset+'*'+gusername+'*'+gsystem)
     this.dataset = gdataset
     this.system = gsystem
@@ -1353,13 +1881,14 @@ function neosysdblink() {
     //otherwise setup environment for file messaging
 
     //try and get the username, password and dataset
-    this.password = neosysgetcookie(glogincode, 'NEOSYS2', 'password')
-    this.timeout = neosysgetcookie(glogincode, 'NEOSYS2', 'timeout')
+    this.password = neosysgetcookie2('password')
+    this.timeout = neosysgetcookie2('timeout')
 
     //default timeout is 10 minutes (NB GIVEWAY timeout is hard coded to 10 mins?)
     var defaulttimeoutmins = 10
-    //var defaulttimeoutmins=.25
-    if (!this.timeout) this.timeout = defaulttimeoutmins * 60 * 1000
+    //var defaulttimeoutmins=.25//15 seconds
+    if (!this.timeout)
+        this.timeout = defaulttimeoutmins * 60 * 1000
 
 
     this.send = neosysdblink_send_byfile
@@ -1370,7 +1899,7 @@ function neosysdblink() {
     }
     catch (e) {
         alert('Error: While creating Scripting.FileSystemObject\n' + e.number + ' ' + e.description)
-        window.location = NEOSYSlocation + 'securityhowto.htm'
+        window.location.assign(NEOSYSlocation + 'securityhowto.htm')
         return
     }
 
@@ -1390,7 +1919,7 @@ function neosysdblink() {
 
 }
 
-function dblogout() {
+function* dblogout() {
 
     //remove username etc
     //neosyssetcookie('','NEOSYS',gdataset,'dataset',true)
@@ -1399,7 +1928,7 @@ function dblogout() {
     //neosyssetcookie('','NEOSYS','','ll',true)
 
     neosyssetcookie(glogincode, 'NEOSYS2', '', 'username')
-    //alert('xyz NEOSYS2/username='+neosysgetcookie(glogincode,'NEOSYS2','username'))
+    //alert('xyz NEOSYS2/username='+neosysgetcookie2('username'))
 
     //remove settings
     //alert('before clear '+document.cookie)
@@ -1409,32 +1938,66 @@ function dblogout() {
 
 }
 
-function neosysdblink_login(username, password, dataset, system) {
+function* neosysdblink_login(username, password, dataset, system) {
 
     //get list of datasets from server
     var logindb = new neosysdblink
     var datasets = ''
 
-    if (!dataset && gdataset) dataset = gdataset
-    if (!dataset) dataset = neosysgetcookie('', 'NEOSYS', 'dataset')
-    if (!system) system = neosysgetcookie('', 'NEOSYSsystem')
+    if (!dataset && gdataset)
+        dataset = gdataset
+    if (!dataset)
+        dataset = neosysgetcookie2('dataset', 'NEOSYS', '')
+    if (!system)
+        system = neosysgetcookie2('', 'NEOSYSsystem',null)
     var arguments = ['', '', dataset, '', '', '', system]
     var failed = false
+
+    //maybe relogging after request to relogin (eg expired session on server)
+    if (gusername) {
+        var question='Your session has timed out\nor been lost to another login or another computer or browser\nor the server has been restarted.'
+        //current work is cleared without option to recover if detect login on another computer or browser
+        if (glocked&&gchangesmade)
+            question+='\n\nWarning! Your current work on '+gkey+' will be lost if you quit.'
+        question+='\n\nLogin again?'
+        if (!(yield* neosysyesno(question,1))) {
+
+            //switch to login window
+            neosyssettimeout('window.location.assign("../default.htm")',1)
+
+            //try to avoid unlocking on exit
+            glocked=false
+            setchangesmade(false)
+            gkey=''
+            this.requesting=false
+            db.requesting=false
+
+            yield* neosysinvalid()
+            failed = true
+            //pity there is no way to abort script without generating an error
+            //TODO avoid showing error message in catch clause if switching to default.htm
+            force_an_exit___please_ignore_this_message()
+
+            return false
+
+        }
+
+        arguments[0]=gusername
+    }
 
     while (true) {
 
         arguments[4] = datasets
-        //if (!(typeof event!='undefined'&&event.shiftKey)&&!failed&&neosysgetcookie('','NEOSYS','a')=='true')
-        if (!(typeof event != 'undefined' && event && event.shiftKey) && !failed && (neosysgetcookie('', 'NEOSYS', 'a') == 'true' || username)) {
-            arguments[0] = username ? username : neosysgetcookie('', 'NEOSYS', 'u')
-            arguments[1] = password ? password : neosysgetcookie('', 'NEOSYS', 'p')
+        if (!(typeof event != 'undefined' && event && event.shiftKey) && !failed && (neosysgetcookie2('a', 'NEOSYS', '') == 'true' || username)) {
+            arguments[0] = username ? username : neosysgetcookie2('u', 'NEOSYS', '')
+            arguments[1] = password ? password : neosysgetcookie2('p', 'NEOSYS', '')
             arguments[2] = dataset
-            arguments[5] = neosysgetcookie('', 'NEOSYS', 'a')
+            arguments[5] = neosysgetcookie2('a', 'NEOSYS', '')
             arguments[6] = system
         }
         else {
 
-            //if refreshing login  
+            //if refreshing login
             if (dataset) {
                 datasetx = new Object
                 datasetx.code = new Object
@@ -1448,8 +2011,8 @@ function neosysdblink_login(username, password, dataset, system) {
             //otherwise get all datasets
             if (!datasets) {
                 logindb.request = 'GETDATASETS'
-                if (!logindb.send()) {
-                    neosysinvalid(logindb.response)
+                if (!(yield* logindb.send())) {
+                    yield* neosysinvalid(logindb.response)
                     return 0
                 }
                 datasets = neosysxml2obj(logindb.data)
@@ -1458,23 +2021,23 @@ function neosysdblink_login(username, password, dataset, system) {
             arguments[4] = datasets
 
             url = '../default.htm'
-            //alert(arguments)
-            arguments = neosysshowmodaldialog(url, arguments)
+            arguments = yield* neosysshowmodaldialog(url, arguments)
 
         }
 
         //quit if user cancels
         if (!arguments) return 0
 
-        glogincode = arguments[2] + '*' + arguments[0] + '*'
+        glogincode = (arguments[2] + '*' + arguments[0] + '*').replace(/ /g,'')
         neosyssetcookie('', 'NEOSYSlogincode', glogincode, 'logincode')
 
         logindb.request = 'LOGIN\r' + arguments[0] + '\r' + arguments[1] + '\r' + arguments[2] + '\r' + arguments[3] + '\r\r' + arguments[5]
 
-        if (!logindb.send()) {
+        if (!(yield* logindb.send())) {
             var msg = logindb.response
-            if (!msg) msg = 'Invalid username or password'
-            neosysinvalid(msg)
+            if (!msg)
+                msg = 'Invalid username or password'
+            var response=yield* neosysinvalid(msg)
             failed = true
         }
         else {
@@ -1505,14 +2068,14 @@ function neosysdblink_login(username, password, dataset, system) {
             //temporary cookie for menu
             neosyssetcookie(glogincode, 'NEOSYS2', logindb.data)
 
-            clientfunctions_getglobals()
+            yield* clientfunctions_getglobals()
 
-            //temporary cookie for the dataset and username (and password for file protocol)   
+            //temporary cookie for the dataset and username (and password for file protocol)
             var temp = 'dataset=' + gdataset + '&username=' + gusername + '&system=' + gsystem
             if (document.protocolcode == 'file') {
                 this.password = arguments[1]
                 temp += '&password=' + this.password
-                //this.timeout=neosysgetcookie(glogincode,'NEOSYS2','timeout')
+                //this.timeout=neosysgetcookie2('timeout')
             }
             neosyssetcookie(glogincode, 'NEOSYS2', temp)
 
@@ -1523,9 +2086,9 @@ function neosysdblink_login(username, password, dataset, system) {
     }
 }
 
-function neosysdblink_send_byhttp_using_forms(data) {
+function* neosysdblink_send_byhttp_using_forms(data) {
 
-    log(this.request)
+    //log(this.request)
     //alert('neosysdblink_send_byhttp_using_forms\n...\n'+this.request+'\n...\n'+ data)
     this.data = data ? data : ''
 
@@ -1555,7 +2118,7 @@ function neosysdblink_send_byhttp_using_forms(data) {
 
         //var params='dialogHeight:100px; dialogWidth:200px; center:Yes; help:No; resizable:No; status:No'
         //params='dialogHeight: 201px; dialogWidth: 201px; dialogTop: px; dialogLeft: px; center: Yes; help: Yes; resizable: Yes; status: Yes;'
-        var reply = neosysshowmodaldialog(NEOSYSlocation + 'rs/default.htm', [this.timeout, this.request, this.data])
+        var reply = yield* neosysshowmodaldialog(NEOSYSlocation + 'rs/default.htm', [this.timeout, this.request, this.data])
         if (!reply) {
             this.data = ''
             this.response = ('ERROR: Request to server failed')
@@ -1568,8 +2131,13 @@ function neosysdblink_send_byhttp_using_forms(data) {
         this.response = reply[1].toString()
         this.data = reply[2].toString()
 
-        if (this.response.indexOf('Please login') >= 0) {
-            if (!this.login()) {
+        var lcresponse=this.response.toLowerCase()
+        if (lcresponse.indexOf('Please login') >= 0) {
+            //if (lcresponse.indexOf('automatic') >= 0) {
+            //    glocked=false
+            //    gchangesmade=false
+            //}
+            if (!(/**/ yield * this.login())) {
                 this.data = ''
                 this.response = ('ERROR: Please login')
                 this.result = ''
@@ -1600,19 +2168,21 @@ function neosysdblink_send_byhttp_using_forms(data) {
 
 }
 
-function neosysdblink_send_byhttp_using_xmlhttp(data) {
+var gxhttp
+
+function* neosysdblink_send_byhttp_using_xmlhttp(data) {
 
     //log(this.request)
 
     var ignoreresult = (typeof this.request == 'string') && (this.request.slice(0, 6) == 'RELOCK' || this.request.slice(0, 9) == 'KEEPALIVE')
     //indicate to refresher when last activity was
     if (ignoreresult)
-        neosyssetcookie('', 'NEOSYSlc', new Date, 'lc')
+        neosyssetcookie('', 'NEOSYSlc', new Date(), 'lc')
 
     //prevent reuse
     if (this.requesting) {
         this.data = ''
-        this.response = ('ERROR: ALREADY REQUESTING\r' + this.requesting + '\rxxxxxxxxxxx\r' + this.request)
+        this.response = ('ERROR: ALREADY REQUESTING:\r' + this.requesting + '\r --- \rNEW REQUEST:\r' + this.request + this.data)
         this.response = this.response.replace(/"/, "'")
         this.result = ''
         return 0
@@ -1651,6 +2221,8 @@ function neosysdblink_send_byhttp_using_xmlhttp(data) {
     var remoteprocedurecallfailed = false
     var rpcserverunavailable = false
 
+    var origrequest=this.request
+
     while (!gotresponse) {
 
         var token = glogincode
@@ -1665,7 +2237,7 @@ function neosysdblink_send_byhttp_using_xmlhttp(data) {
         //dont escape everything otherwise unicode will arrive in the database as encoded text
         //instead of being converted to system default single byte code page in server filesystem/asp
         //convert any ascii incompatible with xml text eg < > &
-        //convert the escape character "%" FIRST!
+        //convert the escape character "%" FIRST
         //also convert revelation delimiters so that they arrive unconverted
         //XMLre is something like [\x25\x3C\x3E\x26\ plus the field and value marks etc
         temp = this.data.replace(XMLXXre, function ($0) { return escape($0) })
@@ -1674,15 +2246,15 @@ function neosysdblink_send_byhttp_using_xmlhttp(data) {
         xtext += '</root>'
         //if (gusername=='NEOSYS') alert(xtext)
         /*
-        //decide microsoft or moz/netscape 
+        //decide microsoft or moz/netscape
         var moz=false
-        try
-        {
+        try {
+
         var xhttp = new ActiveXObject('Microsoft.XMLHTTP')
         //var xhttp = new ActiveXObject('Msxml2.XMLHTTP.3.0')
         }
-        catch(e)
-        {
+        catch(e) {
+
         var xhttp=new XMLHttpRequest()
         moz=true
         }
@@ -1702,44 +2274,83 @@ function neosysdblink_send_byhttp_using_xmlhttp(data) {
         var remoteprocedurecallfailed = false
         var rpcserverunavailable = false
 
-        /* moved up to before xtext creation
-        to cater for fact that username (part of glogincode and token) may not be known at point of requesting
-        while (!gotresponse)
-        {
-
-        if (request2.slice(0,7)!='RELOCK\n')
-        {
-        dbwaitingwindow=dbwaiting()
-        }
-        */
-
         var xhttp = this.XMLHTTP
         //var servererrormsg='ERROR: Could not communicate with server. Try again later\r\r'
         var servererrormsg = 'Network or server failure. (No response)\r\rPlease try again later\rand/or get technical assistance\r\r'
+        var xhttpaborted=false
+
+        //g because perhaps will be a global variable
+        //var gasynchronous=guseyield && !isMSIE && (gusername=='NEOSYS' || (typeof gdataset != 'undefined' && gdataset.slice(-4) == 'TEST'))
+        var gasynchronous=guseyield && ! (gonunload||gonbeforeunload)
+        if (gasynchronous) {
+
+            gchildwin={lazy:true}
+            //a reference to xhttp so we can call abort on it if user chooses Cancel in the popup from blockui
+            gchildwin.xhttp=xhttp
+
+            //a reference to xhttp so we can call abort on it if user chooses to close the window
+            gxhttp=xhttp
+
+            xhttp.onload = function (e) {
+                if (xhttp.readyState === 4) {
+                    if (xhttp.status === 200) {
+                        //console.log(xhttp.responseText);
+                        neosys_resume('ok','OK neosysdblink_send_byhttp_using_xmlhttp');
+                    } else {
+                        console.error(xhttp.statusText);
+                        neosys_resume('ok','OK neosysdblink_send_byhttp_using_xmlhttp '+xhttp.statusText);
+                    }
+                }
+            };
+            xhttp.onerror = function (e) {
+                console.error(xhttp.statusText);
+                neosys_resume('error','ERROR neosysdblink_send_byhttp_using_xmlhttp');
+            };
+            xhttp.ontimeout = function () {
+                console.error("The request for " + url + " timed out.");
+                neosys_resume('timeout','TIMEOUT neosysdblink_send_byhttp_using_xmlhttp');
+            };
+            xhttp.onabort = function (e) {
+                console.error('XMLHTTPREQEST ABORTED --- ' + xhttp.statusText);
+                xhttpaborted=true
+                if (!gonunload)
+                    neosys_resume('abort','ABORT neosysdblink_send_byhttp_using_xmlhttp');
+            };
+        }
 
         //open
+        console.log('gasynchronous='+gasynchronous)
 
         //send the xmldoc to the server and get the response
         try {
             //false for synchronous (wait for response before continuing to next statement)
-            xhttp.open('POST', NEOSYSlocation + 'scripts/xhttp.asp', async = ignoreresult)
+            xhttp.open('POST', NEOSYSlocation + 'scripts/xhttp.asp', async = gasynchronous || ignoreresult )
             //this was never required but inserted in the hope that it will
             //avoid unknown problems. Perhaps it is not necessary for active pages like .asp.
             xhttp.setRequestHeader("Pragma", "no-cache");
             xhttp.setRequestHeader("Cache-control", "no-cache");
-/*            //following added in attempt to force client to read bytes as utf-8 and not latin code page 1
-            xhttp.setRequestHeader("Content-Type", "text/xml; charset=UTF-8");
-            xhttp.overrideMimeType('text/xml');
-            xhttp.setRequestHeader("Accept-Charset", "utf-8");
-            xhttp.setRequestHeader("Accept-Encoding", "utf-8");
-            xhttp.setRequestHeader("Content-Transfer-Encoding", "utf-8");
-            xhttp.setRequestHeader("Transfer-Encoding", "utf-8");
-*/
             //xhttp.setRequestHeader('Content-type','application/x-www-form-urlencoded');
             //consider also putting the following in asp web pages
             //<% Response.CacheControl = "no-cache" %>
             //<% Response.AddHeader "Pragma", "no-cache" %>
             //<% Response.Expires = -1 %>
+
+            //following will asynchronously handle relock failed due to login where
+            //by preventing further relocking
+            /* actually relocking on duplicate sessions is allowed for the time being TODO block it
+            if (ignoreresult) {
+                xhttp.onreadystatechange=
+                //TODO consider what happens in cases other than 200 and no response at all
+                function() {
+                    if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+                        if (http.responseText.indexOf('Please login')>=0) {
+                            stoprelocker()
+                        }
+                    }
+                }
+            }
+            */
+
         }
         catch (e) {
             this.data = ''
@@ -1750,12 +2361,14 @@ function neosysdblink_send_byhttp_using_xmlhttp(data) {
             return 0
         }
 
-        //prevent error "object does not support property or method '.loadXML'" in MSIE 10 plus
+        //prevent error "object does not support property or method '.loadXML'" in MSIE 10 plus and warnings in other browsers
+        //https://blogs.msdn.microsoft.com/ie/2012/07/19/xmlhttprequest-responsexml-in-ie10-release-preview/
         //fails in IE6?
-        try {
-            xhttp.responseType='msxml-document'
-        } catch (e) {}
-        
+        if (isMSIE)
+            try {
+                    xhttp.responseType='msxml-document'
+            } catch (e) {}
+
         //send
 
         try {
@@ -1768,12 +2381,10 @@ function neosysdblink_send_byhttp_using_xmlhttp(data) {
 
             var timesent = new Date
             //alert('DEBUG: pre:'+thisrequest)
-  	    ///////////////
             xhttp.send(xdoc)
-	    ///////////////
             //alert('DEBUG: post:'+thisrequest)
 
-            log(action + ' ' + (new Date - timesent) + 'ms')
+            //log(action + ' ' + (new Date() - timesent) + 'ms')
             window.status = ''
 
             //force an error if ignoreresult since ignoreresult ignores all errors or success
@@ -1802,12 +2413,31 @@ function neosysdblink_send_byhttp_using_xmlhttp(data) {
             return 0
         }
 
+        //yield here and wait for .send to complete
+        if (gasynchronous) {
+
+            ///////////////////////////////////////////////////////////////
+            //PAUSE HERE until child window closes and our autoresume
+            //function calls .next(childwin.returnValue) to put into result
+            ///////////////////////////////////////////////////////////////
+            var result = yield* neosys_yield('neosysdblink_send_byhttp_using_xmlhttp : '+thisrequest)
+
+            //ignoring result since xhttp contains error codes
+            //maybe could process differently
+            //if (result=='error') {}
+            //else if (result=='timeout') {}
+            //else if (result=='abort') {}
+            //else if (result=='ok') {}
+            //else {/*unexpected result*/}
+
+        }
+
         dbready(dbwaitingwindow)
 
         //response
 
         //check for valid response
-        if (xhttp.responseXML.firstChild != null) {
+        if (xhttp.responseXML && xhttp.responseXML.firstChild != null) {
 
             //extract the response parameters
             var responsex = xhttp.responseXML.firstChild
@@ -1818,12 +2448,15 @@ function neosysdblink_send_byhttp_using_xmlhttp(data) {
                 //var result=unescape(dbgetnodevalues(responsex.childNodes[2]))
                 this.data = unescape(dbgetnodesvalue(xhttp.responseXML.getElementsByTagName('data')[0].childNodes))
                 this.response = unescape(dbgetnodesvalue(xhttp.responseXML.getElementsByTagName('response')[0].childNodes))
-
                 var result = xhttp.responseXML.getElementsByTagName('result')
                 if (result.length)
                     result = unescape(dbgetnodesvalue(result[0].childNodes))
                 else
                     result = ''
+                    //alert('result '+result+' typeof result'+typeof result)
+                    if (typeof result=='undefined') {
+                        debugger
+                    }
             }
             else {
                 //iexplorer
@@ -1833,8 +2466,11 @@ function neosysdblink_send_byhttp_using_xmlhttp(data) {
             }
 
             if (this.response.indexOf('Please login') >= 0) {
-
-                if (!this.login()) {
+//                var tt=origrequest.slice(0,5)!='LOGIN'?gusername:''
+//                tt=gusername
+//alert(origrequest+' gusername='+tt)
+                tt=''
+                if (!(/**/ yield *this.login(tt))) {
                     this.data = ''
                     this.response = ('ERROR: Please login')
                     this.result = ''
@@ -1862,12 +2498,29 @@ function neosysdblink_send_byhttp_using_xmlhttp(data) {
                 continue
             }
 
+            //aborting/unloading. try to avoid error message in caller
+            if (gonunload||gonbeforeunload||xhttpaborted) {
+                this.data = ''
+                if (xhttpaborted)
+                    this.response = 'Cancelled'
+                else
+                    this.response = ''
+                this.result = ''
+                this.requesting = false
+                return false
+            }
+
             //system failure, retry/abort?
-            var errormsg = 'System failure. Do you want to retry?'
+            var tt=origrequest.split('\r')
+            if (tt[0]=='LOGIN')
+                //remove password from message
+                tt[2]=''
+            var errormsg = 'System failure. Do you want to retry?\r'+tt.join('\r')
             if (xhttp.responseText.indexOf('ASP 0113') > -1)
                 errormsg += '\n\nThe server failed to get a response from the NEOSYS database engine'
             errormsg += '\n\n' + striptags(xhttp.responseText)
-            if (!confirm(errormsg)) {
+            console.log(errormsg)
+            if (!(confirm(errormsg))) {
                 //xxx
                 this.data = ''
                 this.response = ('ERROR: ' + unescape(xhttp.responseText))
@@ -1882,7 +2535,7 @@ function neosysdblink_send_byhttp_using_xmlhttp(data) {
     }
 
     //indicate to refresher when last activity was
-    neosyssetcookie('', 'NEOSYSlc', new Date, 'lc')
+    neosyssetcookie('', 'NEOSYSlc', new Date(), 'lc')
 
     ///if (result.split(' ')[0]=='OK' || result==1)
     if (result.split(' ')[0] == 'OK' || result == 1) {
@@ -1947,6 +2600,9 @@ function neosysfixcookie() {
 
 function neosyssetcookie(loginsessionid, name, value, subkey, permanent) {
 
+    if (glogcookie)
+        console.log('NEOSYSSETCOOKIE('+loginsessionid+', '+name+', '+value+', '+subkey+', '+permanent+')')
+
     //neosysfixcookie()
 
     //for any particular permanent cookie it must consistently be set true otherwise possible loss of following cookies including ASPSESSION
@@ -1956,7 +2612,7 @@ function neosyssetcookie(loginsessionid, name, value, subkey, permanent) {
     alert(cookie0)
     var tt=document.cookie.split('; ')
     for (var ii=0;ii<tt.length;ii++) cookie0+='\r'+ii+' '+tt[ii]
-    if (permanent&&!confirm(cookie0)) xyx
+    if (permanent&&!(confirm(cookie0))) xyx
     if (permanent&&typeof permanent!='boolean') xyxxxxxxxxx
     */
     if (!permanent)
@@ -1980,7 +2636,7 @@ function neosyssetcookie(loginsessionid, name, value, subkey, permanent) {
 
     if (subkey) {
         // crumbs are separated by ampersands
-        var crumbs = neosysgetcookie(loginsessionid, name).split('&')
+        var crumbs = neosysgetcookie2('',name,loginsessionid).split('&')
         var emptycrumbn
         for (var i2 = 0; i2 < crumbs.length; i2++) {
             var crumb0 = crumbs[i2].split('=')[0]
@@ -2044,9 +2700,24 @@ function neosyssetcookie(loginsessionid, name, value, subkey, permanent) {
 
 }
 
+function neosysgetcookie2(subkey, key, loginsessionid) {
+    if (!loginsessionid && loginsessionid !== null)
+        loginsessionid=glogincode
+    else if (loginsessionid === null)
+        loginsessionid=''
+    if (!key)
+        key='NEOSYS2'
+    var result=neosysgetcookie(loginsessionid, key, subkey)
+    ///console.log('neosysgetcookie2('+loginsessionid+', '+key+', '+subkey+')='+result)
+    return result
+}
+
 // Retrieve the value of the cookie with the specified name
 //duplicated in client.js, decide.htm and decide2.htm
 function neosysgetcookie(loginsessionid, key, subkey) {
+
+    if (glogcookie)
+        var log='neosysgetcookie('+loginsessionid+', '+key+', '+subkey+')'
 
     //var cookie0='GET COOKIE session:'+loginsessionid+' key:'+key+' subkey:'+subkey
     //alert(cookie0)
@@ -2069,7 +2740,10 @@ function neosysgetcookie(loginsessionid, key, subkey) {
             if (typeof subkey == 'undefined' || subkey == '') {
                 //return unescape(cookies[i].split('=')[1])
                 //return unescape(cookies[i].split('=').slice(1).join('='))
-                return cookies[i].split('=').slice(1).join('=')
+                var cookie=cookies[i].split('=').slice(1).join('=')
+                if (glogcookie)
+                    console.log(log+' = "'+cookie+'"')
+                return cookie
             }
 
             // crumbs are separated by ampersands
@@ -2077,16 +2751,21 @@ function neosysgetcookie(loginsessionid, key, subkey) {
             for (var i2 = 0; i2 < crumbs.length; i2++) {
                 if (crumbs[i2].split('=')[0] == subkey) {
                     //return unescape(crumbs[i2].split('=')[1])
-                    return unescape(crumbs[i2].split('=').slice(1))
+                    var cookie=unescape(crumbs[i2].split('=').slice(1))
+                    if (glogcookie)
+                        console.log(log+' = "'+cookie+'"')
+                    return cookie
                 }
             }
         }
     }
-    return ''
+if (glogcookie)
+    console.log(log+' = ""')
+return ''
 }
 
 //from "client.js" may also be copied in some "client.js" less windows
-function neosysdecide(question, data, cols, returncoln, defaultreply, many, inverted) {
+function* neosysdecide(question, data, cols, returncoln, defaultreply, many, inverted) {
     //data and cols are [[]] or [] or revstr or a;1:b;2 string
     //data cells .text property will be used if present
     //returncoln '' means return row number(s) - 1 based
@@ -2094,11 +2773,14 @@ function neosysdecide(question, data, cols, returncoln, defaultreply, many, inve
     // (data columns are usually numeric and 0 based)
     //defaultreply=if returncoln then cell(s) of returncoln otherwise 1 based rown(s)
 
-    //the data might be a db request prefixed with '@'
+    if (typeof data == 'undefined')
+        data='Yes:No'
+
+        //the data might be a db request prefixed with '@'
     if (typeof data == 'string' && data.slice(0, 1) == '@') {
         db.request = data.slice(1)
-        if (!db.send()) {
-            neosysinvalid(db.response)
+        if (!(yield* db.send())) {
+            yield* neosysinvalid(db.response)
             return null
         }
         data = db.data
@@ -2106,20 +2788,35 @@ function neosysdecide(question, data, cols, returncoln, defaultreply, many, inve
     }
 
     //abort if no records found
-    if (data == '' || data == '<records>\r\n</records>') return neosysinvalid('No records found')
+    if (data == '' || data == '<records>\r\n</records>')
+        return yield* neosysinvalid('No records found')
+
+    if (typeof data == 'string' && data.slice(0, 8) == '<records')
+        data=neosysxml2obj(data)
+
+    //xml2obj returns records in .group1
+    if (data.group1)
+        data=data.group1
 
     if (defaultreply) {
-        if (typeof defaultreply == 'string') defaultreply = defaultreply.split(':')
-        if (typeof defaultreply != 'object') defaultreply = [defaultreply]
+        if (typeof defaultreply == 'string')
+            defaultreply = defaultreply.split(':')
+        if (typeof defaultreply != 'object')
+            defaultreply = [defaultreply]
     }
 
-    if (!inverted) inverted = false
+    if (!inverted)
+        inverted = false
     var dialogargs = neosyscloneobj([question, data, cols, returncoln, defaultreply, many, inverted])
     dialogargs.logincode = glogincode
 
     //var dialogstyle='dialogHeight: 400px; dialogWidth: 600px; dialogTop: px; dialogLeft: px; center: Yes; help: Yes; resizable: Yes; status: Yes;'
 
-    var results = neosysshowmodaldialog(NEOSYSlocation + 'decide.htm', dialogargs)
+    //if (guseyield && gdataset.slice(-4)=='TEST')
+    if (guseyield)
+        var results = yield* neosysconfirm2(dialogargs)
+    else
+        var results = yield* neosysshowmodaldialog(NEOSYSlocation + 'decide.htm', dialogargs)
     if (typeof results == 'undefined')
         results = ''
 
@@ -2130,18 +2827,42 @@ function neosysdecide(question, data, cols, returncoln, defaultreply, many, inve
 function rearray(array) {
     //fix a bug where arrays returned from modaldialogs are missing the method .join()
 
-    if (!array || typeof array != 'object') return array
+    if (!array || typeof array != 'object')
+        return array
 
     var rearray = []
-    for (var i = 0; i < array.length; i++) rearray[i] = array[i]
+    for (var i = 0; i < array.length; i++)
+        rearray[i] = array[i]
 
     return rearray
 
 }
 
-function neosysdecide2(question, data, cols, returncoln, defaultreply, many) {
+function* neosysdecide2(question, data, cols, returncoln, defaultreply, many) {
 
-    //called from neosysfilepopup() and a few other places
+    //new in-window style popup
+    //if (gdataset.slice(-4)=='TEST') {
+    if (guseyield) {
+
+        //if row columns are not numeric then convert numeric return column number into named column in data rows
+        //alert('data:'+data+'\ncols:'+cols+'\nreturncoln:'+returncoln)
+        var tt=cols[returncoln]
+        if (tt&&tt[0])
+            returncoln=tt[0]
+        //empty returncoln means return row number(s) of option(s) selected
+        //if (!returncoln)
+        //    returncoln=0
+
+        var results=yield* neosysdecide(question, data, cols, returncoln, defaultreply, many)
+
+        //callers of decide2 expect reply in array
+        if (results && (typeof results=='string' || typeof results=='number'))
+            results=[results]
+
+        return results
+    }
+
+    //called from yield* neosysfilepopup() and a few other places
 
     //data is xml string
     //cols is array of [title,dictid]
@@ -2149,23 +2870,24 @@ function neosysdecide2(question, data, cols, returncoln, defaultreply, many) {
     //the data might be a db request prefixed with '@'
     if (typeof data == 'string' && data.slice(0, 1) == '@') {
         db.request = data.slice(1)
-        if (!db.send()) {
-            neosysinvalid(db.response)
+        if (!(yield* db.send())) {
+            yield* neosysinvalid(db.response)
             return null
         }
         data = db.data
 
     }
-
     //abort if no records found
-    if (data == '' || data == '<records>\r\n</records>') return neosysinvalid('No records found')
+    if (data == '' || data == '<records>\r\n</records>') return yield* neosysinvalid('No records found')
 
+    if (typeof data=='string')
+        data=unescape(data)
     var dialogargs = neosyscloneobj([question, data, cols, returncoln, defaultreply, many])
     //var dialogstyle='dialogHeight: 400px; dialogWidth: 600px; dialogTop: px; dialogLeft: px; center: Yes; help: Yes; resizable: Yes; status: Yes;'
 
     dialogargs.logincode = glogincode
 
-    var results = neosysshowmodaldialog(NEOSYSlocation + 'decide2.htm', dialogargs)
+    var results = yield* neosysshowmodaldialog(NEOSYSlocation + 'decide2.htm', dialogargs)
     if (!results)
         results = ''
 
@@ -2173,21 +2895,26 @@ function neosysdecide2(question, data, cols, returncoln, defaultreply, many) {
 
 }
 
-function setdropdown2(element, dataobj, colnames, selectedvalues, requiredvalues) {
+function* setdropdown2(element, dataobj, colnames, selectedvalues, requiredvalues, noautoselection) {
 
-    //1st element is automatically selected unless selectedvalues overrides it.
+    //1st element is automatically selected unless noautoselection (or selectedvalues overrides it)
 
-    if (!checkisdropdown(element)) return 0
+    if (!(checkisdropdown(element)))
+        return 0
 
     cleardropdown(element)
 
     //if (no(xmldata.text)) return(0)
-    if (no(dataobj.group1)) return 0
+    if (no(dataobj.group1))
+        return 0
 
     cleardropdown(element, true)
 
     var valuecolname
     var textcolname
+
+    if (typeof colnames=='string' && colnames.indexOf('\r') )
+        colnames=colnames.split('\r')
 
     if (typeof (colnames) == 'string') {
         textcolname = colnames
@@ -2196,33 +2923,38 @@ function setdropdown2(element, dataobj, colnames, selectedvalues, requiredvalues
     else {
         valuecolname = colnames[0]
         textcolname = colnames[1]
+        if (colnames[2])
+            noautoselection = colnames[2]
     }
 
     //var records=xmldata.firstChild.childNodes
     var records = dataobj.group1
 
     //var options=[]
+    var anyselected=false
 
     for (var i = 0; i < records.length; i++) {
         var cell = records[i][valuecolname]
         if (typeof (cell) == 'undefined') {
-            neosysinvalid('Error: "' + valuecolname + '" not in data line ' + i + ' for setdropdown2 for "' + element.id + '" (1)')
+            //yield* neosysinvalid('Error: "' + valuecolname + '" not in data line ' + i + ' for setdropdown2 for "' + element.id + '" (1)')
+            systemerror('Error: "' + valuecolname + '" not in data line ' + i + ' "'+records[i]+'" for setdropdown2 for "' + element.id + '" (1)')
             return (0)
         }
 
         var value = cell.text
 
         if (no(requiredvalues) || requiredvalues.neosyslocate(value)) {
-            var option1 = document.createElement('OPTION')
+            var option1 = document.createElement('option')
             option1.value = value
 
             var cell = records[i][textcolname]
             if (typeof (cell) == 'undefined') {
-                neosysinvalid('Error: "' + textcolname + '" not in data line ' + i + ' for setdropdown2 for "' + element.id + '" (2)')
+                //yield* neosysinvalid('Error: "' + textcolname + '" not in data line ' + i + ' for setdropdown2 for "' + element.id + '" (2)')
+                systemerror('Error: "' + textcolname + '" not in data line ' + i + ' for setdropdown2 for "' + element.id + '" (2)')
                 return (0)
             }
 
-            //start a new option        
+            //start a new option
             //var option='<OPTION value='+value
 
             //indicate if selected
@@ -2230,6 +2962,7 @@ function setdropdown2(element, dataobj, colnames, selectedvalues, requiredvalues
             if (selectedvalues && selectedvalues.neosyslocate(value)) {
                 //option+=' selected=true'
                 option1.selected = true
+                anyselected = true
             }
 
             var description = decodehtmlcodes(cell.text)
@@ -2248,6 +2981,13 @@ function setdropdown2(element, dataobj, colnames, selectedvalues, requiredvalues
 
     }
 
+    if (noautoselection&&!anyselected) {
+        var blankoption = document.createElement('option')
+        blankoption.value = ''
+        blankoption.innerHTML=''
+        element.insertBefore(blankoption, element.childNodes[0])
+    }
+
     //select first option if none selected
     // if (element.selectedIndex==-1) element.selectedIndex=0
 
@@ -2262,9 +3002,9 @@ function setdropdown2(element, dataobj, colnames, selectedvalues, requiredvalues
 
 function cleardropdown(element, all) {
 
-    login('cleardropdown')
+    //login('cleardropdown')
 
-    if (!checkisdropdown(element)) return (0)
+    if (!(checkisdropdown(element))) return (0)
 
     //remove existing selections (leave one but blank it to avoid "0" showing)
     while (element.childNodes.length > (all ? 0 : 1)) {
@@ -2276,15 +3016,17 @@ function cleardropdown(element, all) {
         element.childNodes[0].value = ""
         element.childNodes[0].text = ""
     }
-    logout('cleardropdown')
+    //logout('cleardropdown')
 }
 
 function cleardropdownselections(element) {
 
-    if (!checkisdropdown(element)) return (0)
+    if (!(checkisdropdown(element)))
+        return (0)
 
     //    element.selectedIndex=-1
-    if (element.childNodes.length) element.childNodes[0].selected = true
+    if (element.childNodes.length)
+        element.childNodes[0].selected = true
 
     //remove existing selections
     for (var i = 0; i < element.childNodes.length; i++) {
@@ -2296,7 +3038,7 @@ function checkisdropdown(element) {
     assertelement(element, 'checkisdropdown', 'element')
 
     if (typeof (element) != 'object' || element.tagName != 'SELECT') {
-        neosysinvalid('Error: The target is not a SELECT tag')
+        yield* neosysinvalid('Error: The target is not a SELECT tag')
         return false
     }
     return true
@@ -2315,13 +3057,13 @@ function setdropdown3(element, dropdowndata, colns, selectedvalues, requiredvalu
     //neosysrequired false means add a blank option at the beginning
 
     //element must be a select element
-    if (!checkisdropdown(element)) {
-        log('setdropdown3 - not a select element')
+    if (!(checkisdropdown(element))) {
+        //log('setdropdown3 - not a select element')
         return false
     }
 
-    //login('setdropdown3 '+element.id+' '+neosysquote(dropdowndata))
-    login('setdropdown3 ' + element.id)
+    ////login('setdropdown3 '+element.id+' '+neosysquote(dropdowndata))
+    //login('setdropdown3 ' + element.id)
 
     //dropdowndata may be an array of strings or a string with ;: seps for cols/rows respectively
     //if [] then dropdowndata are not updated otherwise existing dropdowndata are deleted
@@ -2348,11 +3090,11 @@ function setdropdown3(element, dropdowndata, colns, selectedvalues, requiredvalu
         }
     }
 
-    // if (dropdowndata.length) neosysbreak(element.id+' '+element.getAttribute('neosysrequired')+' '+dropdowndata.tostatement())
+    // if (dropdowndata.length) yield* neosysbreak(element.id+' '+element.getAttribute('neosysrequired')+' '+dropdowndata.tostatement())
 
     //colns may be array(2) being pointers into dropdowndata for option value and text
     //otherwise [0,1]
-    if (!is(colns)) colns = [0, 1]
+    if (!(is(colns))) colns = [0, 1]
     valuecoln = colns[0]
     textcoln = colns[1]
 
@@ -2366,7 +3108,7 @@ function setdropdown3(element, dropdowndata, colns, selectedvalues, requiredvalu
     if (typeof (requiredvalues) == 'undefined') requiredvalues = []
     if (typeof (requiredvalues) != 'object') requiredvalues = [requiredvalues]
 
-    //neosysinvalid(selectedvalues.join())
+    //yield* neosysinvalid(selectedvalues.join())
     //method
     ////////
 
@@ -2376,6 +3118,8 @@ function setdropdown3(element, dropdowndata, colns, selectedvalues, requiredvalu
 
         for (var i = 0; i < dropdowndata.length; i++) {
             var value = dropdowndata[i][valuecoln]
+            if (!value)
+                value=''
             if (no(requiredvalues) || requiredvalues.neosyslocate(value)) {
 
                 var text = dropdowndata[i][textcoln]
@@ -2404,7 +3148,9 @@ function setdropdown3(element, dropdowndata, colns, selectedvalues, requiredvalu
                 //if (selectedvalues.neosyslocate(option.value)) option.selected=true
                 //if (selectedvalues.neosyslocate(option.text)) option.selected=true
                 if (option.value == selectedvalue || option.text == selectedvalue) {
+                    try{
                     option.selected = true
+                    } catch (e) {}//error in ie6 sometimes
                     break
                 }
             }
@@ -2436,7 +3182,7 @@ function setdropdown3(element, dropdowndata, colns, selectedvalues, requiredvalu
     //force option 1 if no options
     // if (element.getAttribute('neosysfieldno')!='0'&&element.selectedIndex==-1) element.selectedIndex=0
 
-    logout('setdropdown3')
+    //logout('setdropdown3')
 
     return true
 
@@ -2445,7 +3191,7 @@ function setdropdown3(element, dropdowndata, colns, selectedvalues, requiredvalu
 function addoption(element, value, text) {
 
     //build an option
-    var option1 = document.createElement('OPTION')
+    var option1 = document.createElement('option')
     option1.value = value
     option1.text = text
 
@@ -2457,7 +3203,7 @@ function addoption(element, value, text) {
 
 }
 
-//pls keep this routine synchronised in decide2.htm and scripts/client.htm
+//pls keep this routine synchronised in decide2.htm and scripts/client.js
 function neosysxml2obj(xmltext) {
 
     var dataobj = new Object
@@ -2475,7 +3221,8 @@ function neosysxml2obj(xmltext) {
                 if (frag[0].slice(0, 1) != '/') {
                     //currentrow[frag[0]]=(new Object).text=frag[1]
                     var cell = new Object
-                    cell.text = frag[1]
+                    var fragdecoded=HTMLDecode(frag[1]).replace(/%25/g,'%')
+                    cell.text = fragdecoded
                     currentrow[frag[0]] = cell
                 }
             }
@@ -2487,9 +3234,11 @@ function neosysxml2obj(xmltext) {
 }
 
 
+//NOT USED ANYWHERE
 //copy any modifications to decide2.htm as well
 function neosysobj2xml(obj) {
 
+    var cr = String.fromCharCode(13)
     var xml = '<record>' + cr
     for (var propname in obj) {
         if (propname.slice(0, 5) == 'group') {
@@ -2529,24 +3278,27 @@ function neosysobj2xml(obj) {
 
 }
 
-function neosyssetdropdown(element, request, colarray, selectedvalues, xyz) {
+function* neosyssetdropdown(element, request, colarray, selectedvalues, noautoselection) {
 
-    if (!checkisdropdown(element)) return (0)
+    if (!(checkisdropdown(element)))
+        return (0)
 
     db.request = request
+    if (yield* db.send()) {
 
-    if (db.send()) {
+        //console.log('neosyssetdropdown:'+db.data)
+
         dataobj = neosysxml2obj(db.data)
 
         //xmltemp=new ActiveXObject('Microsoft.XMLDOM')
         //xmltemp.loadXML(db.data.replace(/\&/g,'+'))
         ////xmltemp.loadXML(db.data)
-        setdropdown2(element, dataobj, colarray, selectedvalues, null)
+        yield* setdropdown2(element, dataobj, colarray, selectedvalues, null, noautoselection)
         if (db.data == '' || !dataobj.group1.length)
-            element.neosysdropdown = ''
+            element.setAttribute('neosysdropdown','')
     }
     else {
-        neosysinvalid(db.response)
+        yield* neosysinvalid(db.response)
     }
     return true
 }
@@ -2554,7 +3306,7 @@ function neosyssetdropdown(element, request, colarray, selectedvalues, xyz) {
 function getdropdown0(element) {
 
     var index = element.selectedIndex
-    // neosysbreak(index)
+    // yield* neosysbreak(index)
 
     //ie5 on mac appears to use index=length sometimes (when only one option?)
     if (index >= element.length) index = 0
@@ -2567,54 +3319,73 @@ function getdropdown0(element) {
 }
 
 function neosysgetdropdown(element, mode) {
-    if (!is(mode)) mode = 'selected'//otherwise 'all'
+    if (!(is(mode)))
+        mode = 'selected'//otherwise 'all'
     var selectedvalues = []
     for (var i = 0; i < element.options.length; i++) {
         if (mode == 'all' || element.options[i].selected) {
             selectedvalues[selectedvalues.length] = element.options[i].value
-            if (mode != 'all' && !element.multiple) return (selectedvalues.join())
+            if (mode != 'all' && !element.multiple)
+                return selectedvalues.join()
         }
     }
-    if (mode != 'all' && !element.multiple) selectedvalues = selectedvalues.join()
-    return (selectedvalues)
+    if (mode != 'all' && !element.multiple)
+        selectedvalues = selectedvalues.join()
+    return selectedvalues
 }
 
-
-//this function provides a place to debug into asp client code
-//stepping out of this function allows you to step through code in client for asp
-function aspbreak() {
-    var x = ''
-}
-
-function neosysinput(question, text, texthidden) {
+function* neosysinput(question, text, texthidden) {
     if (!text) text = ''
-    return neosysyesnocancel(question, '', 'OK', '', 'Cancel', text, texthidden)
+    return yield* neosysconfirm(question, '', 'OK', '', 'Cancel', text, texthidden)
 }
 
-function neosysyesno(question, defaultbutton) {
-    return (neosysyesnocancel(question, defaultbutton, 'Yes', 'No') == 1)
+function* neosysyesno(question, defaultbutton) {
+    return ((yield* neosysconfirm(question, defaultbutton, 'Yes', 'No')) == 1)
 }
 
-function neosysokcancel(question, defaultbutton) {
-    return neosysyesnocancel(question, defaultbutton, 'OK', '', 'Cancel')
+function* neosysokcancel(question, defaultbutton) {
+    return yield* neosysconfirm(question, defaultbutton, 'OK', '', 'Cancel')
 }
 
-function neosysyesnocancel(question, defaultbutton, yesbuttontitle, nobuttontitle, cancelbuttontitle, text, texthidden, image) {
-    log('neosysyesnocancel ' + question)
+function* neosysconfirm(question, defaultbutton, yesbuttontitle, nobuttontitle, cancelbuttontitle, text, texthidden, image) {
 
+    //clean up question
+    if (!question)
+        question = 'OK to continue?'
     question = question.toString()
     if (question.slice(0, 6) == 'Error:')
-
         question = question.slice(6)
-    var dialogargs = [question, defaultbutton, yesbuttontitle, nobuttontitle, cancelbuttontitle, text, texthidden, image]
-    var dialogstyle
-    //dialogstyle=(question.indexOf('\r')>=2)
-    //?'dialogHeight: 300px; dialogWidth: 600px;'
-    //:'dialogHeight: 220px; dialogWidth: 500px;'
-    //dialogstyle+=' center: Yes; help: No; resizable: No; status: No;'
 
-    var response = neosysshowmodaldialog(NEOSYSlocation + 'confirm.htm', dialogargs, dialogstyle)
+    console.log(question)
 
+    var istextinput=typeof text != 'undefined' && text !== null
+
+    //use div to avoid opening a new window if possible
+    //if ((!gusername || gusername=='NEOSYS') && guseyield && !istextinput) {
+    if (guseyield && !istextinput) {
+
+        return yield* neosysconfirm2(question, defaultbutton, yesbuttontitle, nobuttontitle, cancelbuttontitle, text, texthidden, image)
+
+    //use separate window for popup if yield is not available eg internet explorer
+    } else {
+
+        var dialogargs = [question, defaultbutton, yesbuttontitle, nobuttontitle, cancelbuttontitle, text, texthidden, image]
+        var dialogstyle
+        //dialogstyle=(question.indexOf('\r')>=2)
+        //?'dialogHeight: 300px; dialogWidth: 600px;'
+        //:'dialogHeight: 220px; dialogWidth: 500px;'
+        //dialogstyle+=' center: Yes; help: No; resizable: No; status: No;'
+
+        var response = yield* neosysshowmodaldialog(NEOSYSlocation + 'confirm.htm', dialogargs, dialogstyle)
+    }
+
+    //text input returns a string (may be zero length) or false if clicked cancel
+    if (istextinput) {
+        if (typeof response == 'string')
+            return response
+    }
+
+    //no response treated same as cancel button (0)
     if (!response)
         response = 0
 
@@ -2623,18 +3394,18 @@ function neosysyesnocancel(question, defaultbutton, yesbuttontitle, nobuttontitl
 }
 
 function striptags(string) {
-    var temp = document.createElement('DIV')
+    var temp = document.createElement('div')
     temp.innerHTML = string
     return temp.innerText
 }
 
 /*
-function makeXMLisland(xmlelement,cmd)
-{
+function* makeXMLisland(xmlelement,cmd) {
+
 db.request=cmd+'\rXML'
-if(!db.send())
-{
-neosysinvalid(db.response)
+if(!yield* db.send()) {
+
+yield* neosysinvalid(db.response)
 return false
 }
 xmlelement.loadXML(db.data)
@@ -2650,6 +3421,7 @@ function getancestor(startelement, ancestorTag) {
 
     var ancestor = startelement.parentNode
     //while (ancestor!=null && ancestor.tagName!=ancestorTag)
+    ancestorTag=ancestorTag.toUpperCase()
     while (ancestor != null && ancestorTag.indexOf(ancestor.tagName) == -1) {
         ancestor = ancestor.parentNode
     }
@@ -2666,116 +3438,39 @@ function wstatus(msg) {
     window.status = msg
 }
 
-window.geventlog = ''
-window.geventstack = ['', '']
-window.geventdepth = 1
-
-function login(eventdesc) {
-
-    if (!glogging) return
-
-    //if (window_location.hostname!='sb_compaq') return
-
-    // geventdepth=geventdepth+1
-    geventstack = geventstack.slice(0, geventdepth + 1)
-    geventstack[geventdepth] = '}' + eventdesc
-    log(geventstack[geventdepth])
-    geventdepth = geventdepth + 1
-}
-
-function logout(eventdesc) {
-
-    //returns false to return logout('xxx')
-
-    if (!glogging) return false
-
-    geventdepth = geventdepth - 1
-    if (geventdepth < 0) geventdepth = 0
-    // window.one
-    if (geventstack[geventdepth].split(' ')[0] != '}' + eventdesc.split(' ')[0]) {
-        alert('logout does not match login\n\n' + eventdesc + ' ' + geventdepth + '\n\n' + geventstack.join('~'))
-        windowx = windowopen()
-        windowx.document.body.innerText = geventlog
-    }
-
-    geventstack[geventdepth] = '{' + eventdesc
-
-    log(geventstack[geventdepth])
-
-    return false
-
-}
-
-var gfirstlogtime
-var glastlogtime
-
-function log(entrytext) {
-
-    if (!glogging)
-        return
-
-    //log to console if present
-    if (window.console) {
-        window.console.log(entrytext)
-        return
-    }
-
-    //if (glogging>1) alert(entrytext)
-
-    //limit the log size
-    if (geventlog.length > 100000) {
-        //geventlog=geventlog.slice(geventlog.indexOf('\r',16000)+1)
-        geventlog = geventlog.slice(50000)
-    }
-
-    //work out the delay
-    var logtime = new Date()
-    if (typeof glastlogtime == 'undefined') {
-        glastlogtime = logtime
-        gfirstlogtime = logtime
-    }
-    var totlogtime = '0000000000000000' + (logtime - gfirstlogtime)
-    totlogtime = totlogtime.slice(totlogtime.length - 9)
-    var delayms = '0000000000000000' + (logtime - glastlogtime)
-    delayms = delayms.slice(delayms.length - 9)
-
-    //log it
-    geventlog += totlogtime + ' ' + delayms + neosysstr(' .', geventdepth) + entrytext + '<br />\r\n'
-
-    glastlogtime = logtime
-
-    //display it
-    if (entrytext == geventstack[geventdepth]) entrytext = ''
-    window.status = totlogtime + geventstack.join('').slice(0, 1000) + ' ' + entrytext
-
-    // if (!geventlogwindow) geventlogwindow=windowopen()
-    // geventlogwindow.document.body.innerHTML=geventlog.toString.slice(-1000)
-
-    // if (gstepping)
-    // {
-    //  //alert (entrytext)
-    //  neosysoswrite(geventlog,'c:\\debug.txt')
-    // }
-
-}
-var geventlogwindow
-
-/////////////////
-//CACHE FUNCTIONS
-/////////////////
-
 function loadcache() {
 
-    if (typeof dbcache == 'object' && dbcache != null)
-        return true
+    //if gcache available already
+    try {
+        //ensure we can still access gcache.values since permission can be denied in MSIE if parent window has been closed
+        if (typeof gcache == 'object' && gcache != null && gcache.values)
+            return true
+    } catch (e) {
+        gcache = null
+    }
 
-    login('loadcache')
+    //login('loadcache')
+    //sometimes error on accessing window.opener.gcache
+    //Error: Permission denied to access property "gcache"
+    try {
+        //if (window.opener && window.opener.gcache) {
+        if (window.opener && window.opener.gcache && gdataset && window.opener.gdataset==gdataset) {
+            gcache=window.opener.gcache
+            //ensure we can access gcache.values since permission can be denied in MSIE if parent window has been closed
+            if (gcache.values)
+                temp=true
+        }
+    } catch (e) {
+        gcache = null
+    }
 
-    //create a global variable span to hold the userdata
-    dbcache = document.createElement('SPAN')
-    dbcache.values = new Object
+    if (!gcache){
+        //create a global variable span to hold the userdata
+        gcache = document.createElement('span')
+        gcache.values = new Object
+    }
 
-    logout('loadcache - ok loaded')
+    //logout('loadcache - ok loaded')
 
     return true
 
@@ -2783,9 +3478,14 @@ function loadcache() {
 
 function showcache() {
 
-    if (!dbcache) return
+    if (!gcache) return
 
-    var values = dbcache.values
+    try {
+    var values = gcache.values
+    }
+    catch(e) {
+        return
+    }
 
     //work out the total cache size (values only)
     var cachesize = 0
@@ -2807,12 +3507,17 @@ function showcache() {
 var gcachepruneintervalsecs = 100
 var gmaxcachesize = 1024000
 var gmaxcachen = 100
-window.setInterval('trimcache()', gcachepruneintervalsecs * 1000)
+neosyssetinterval('trimcache()', gcachepruneintervalsecs * 1000)
 function trimcache() {
 
-    if (!dbcache) return
+    if (!gcache) return
 
-    var values = dbcache.values
+    try {
+    var values = gcache.values
+    }
+    catch(e) {
+        return
+    }
 
     //work out the total cache size (values only)
     var cachesize = 0
@@ -2827,7 +3532,7 @@ function trimcache() {
     var result = [cachesize, cachen]
     if (gusername == 'NEOSYS') wstatus('trimcache() cachesize:' + cachesize + ' cacheitems:' + cachen)
 
-    //delete initial keys until the size is below the desired limit 
+    //delete initial keys until the size is below the desired limit
     //hopefully the initial keys are the oldest
     for (var key in values) {
         if (cachesize <= gmaxcachesize && cachen <= gmaxcachen) break
@@ -2860,9 +3565,15 @@ function prunecache(request) {
         catch (e) { }
     }
 
-    if (!dbcache) return
+    if (!gcache) return
 
-    var values = dbcache.values
+    try {
+    var values = gcache.values
+    }
+    catch(e) {
+        return
+    }
+
     var npruned = 0
     var prunekey = cachekey(request)
 
@@ -2879,33 +3590,33 @@ function prunecache(request) {
 
 function readcache(request) {
 
-    login('readcache')
+    //login('readcache')
 
-    if (!loadcache()) {
-        logout('readcache - loadcache failed')
+    if (!(loadcache())) {
+        //logout('readcache - loadcache failed')
         return null
     }
 
     var key = cachekey(request)
     var result
-    if (dbcache.values) {
-        result = dbcache.values[key]
+    if (gcache.values) {
+        result = gcache.values[key]
 
         //delete and restore to implement simple LRU cache
-        //delete dbcache.values[key]
-        //dbcache.values[key]=result
+        //delete gcache.values[key]
+        //gcache.values[key]=result
 
     }
     else {
-        result = dbcache.getAttribute(key)
+        result = gcache.getAttribute(key)
 
         //delete and restore to implement simple LRU cache
-        //dbcache.removeAttribute(key)
-        //dbcache.addAttribute(key,result)
+        //gcache.removeAttribute(key)
+        //gcache.addAttribute(key,result)
 
     }
 
-    logout('readcache ok')
+    //logout('readcache ok')
 
     return result
 
@@ -2913,7 +3624,7 @@ function readcache(request) {
 
 function cachekey(request) {
 
-    login('cachekey')
+    //login('cachekey')
 
     //return escape(this.dataset+'\r'+this.username+'\r'+request).replace(/%/g,'_')
     // var temp=escape(gdataset+'_'+request).replace(/%/g,'_').replace(/@/g,'_AT_').replace(/\//g,'_SLASH_').replace(/\*/g,'_STAR_')
@@ -2921,7 +3632,7 @@ function cachekey(request) {
 
     //alert(temp)
 
-    logout('cachekey ' + temp)
+    //logout('cachekey ' + temp)
 
     return temp
 
@@ -2942,40 +3653,44 @@ function deletecacherecord(filename, key) {
 }
 
 function writecache(request, data) {
-    login('writecache')
+    //login('writecache')
 
-    if (!loadcache()) {
-        logout('writecache loadcache failed')
+    if (!(loadcache())) {
+        //logout('writecache loadcache failed')
         return false
     }
 
-    if (dbcache.values)
-        dbcache.values[cachekey(request)] = data
+    if (gcache.values)
+        gcache.values[cachekey(request)] = data
     else
-        dbcache.setAttribute(cachekey(request), data)
+        gcache.setAttribute(cachekey(request), data)
 
-    dbcache.cacheupdated = true
+    gcache.cacheupdated = true
 
-    logout('writecache')
+    //logout('writecache')
 
     return true
 
 }
 
 function deletecache(request) {
-    login('deletecache')
+    //login('deletecache')
 
-    if (!loadcache()) {
-        logout('deletecache loadcache failed')
+    if (!(loadcache())) {
+        //logout('deletecache loadcache failed')
         return false
     }
 
-    if (dbcache.values) delete dbcache.values[cachekey(request)]
-    else dbcache.removeAttribute(cachekey(request))
+    if (gcache.values) {
+        var cacheitem=gcache.values[cachekey(request)]
+        if (typeof cacheitem!='undefined')
+            delete gcache.values[cachekey(request)]
+    } else
+        gcache.removeAttribute(cachekey(request))
 
-    dbcache.cacheupdated = true
+    gcache.cacheupdated = true
 
-    logout('deletecache')
+    //logout('deletecache')
 
     return true
 
@@ -2983,56 +3698,56 @@ function deletecache(request) {
 
 function clearcache() {
 
-    login('clearcache')
+    //login('clearcache')
 
     //force refresh security table
     gtasks = null
 
-    if (!loadcache()) {
-        logout('clearcache loadcache failed')
+    if (!(loadcache())) {
+        //logout('clearcache loadcache failed')
         return false
     }
 
     try {
         //will fail on mac
-        if (typeof dbcache.load != 'undefined')
-            dbcache.load('emptycache')
+        if (typeof gcache.load != 'undefined')
+            gcache.load('emptycache')
 
-        dbcache.values = new Object
+        gcache.values = new Object
 
-        if (typeof dbcache.save != 'undefined')
-            dbcache.save('\neosyscache')
+        if (typeof gcache.save != 'undefined')
+            gcache.save('\neosyscache')
     }
     catch (e) {
-        logout('clearcache fail ' + e.description)
+        //logout('clearcache fail ' + e.description)
         return false
     }
 
-    dbcache.cacheupdated = false
-    logout('clearcache ok')
+    gcache.cacheupdated = false
+    //logout('clearcache ok')
 
     return true
 
 }
 
-function sorttable(event, order) {
+function* sorttable(event, order) {
 
-    if (!event)
-        event = window.event
-    eventtarget = geteventtarget(event)
+    event=getevent(event)
 
-    var colid = eventtarget.sorttableelementid
+    var colid = event.target.sorttableelementid
 
     if (typeof form_presort == 'function') {
-        //neosysevaluate('form_presort()','formfunctions_onload()')
-        if (!form_presort(colid)) return neosysinvalid()
+        //yield* neosysevaluate('yield* form_presort()','yield* formfunctions_onload()')
+        if (!(yield* form_presort(colid)))
+            return yield* neosysinvalid()
     }
 
     //determine the groupno
     var dictitem = gds.dictitem(colid)
-    if (!dictitem) return neosysinvalid()
+    if (!dictitem) return yield* neosysinvalid()
     var groupno = dictitem.groupno
-    if (!groupno) return neosysinvalid(colid + ' is not multivalued for sorting')
+    if (!groupno)
+        return yield* neosysinvalid(colid + ' is not multivalued for sorting')
 
     window.status = 'Sorting, please wait ...'
 
@@ -3045,16 +3760,15 @@ function sorttable(event, order) {
     var up2down = false
     try {
 
-        var clickedelement = event.srcElement
+        var clickedelement = event.target||event.srcElement
+
         //var clickedelement = document.getElementsByName('sortbutton_' + groupno)[0]
 
         //check if reverting from reverse to normal
         up2down = clickedelement.src.indexOf('up') >= 0
 
-        //set the order image
+        //decide the order image
         var order = (clickedelement.src.indexOf('down') >= 0) ? 'up' : 'down'
-        resetsortimages(groupno)
-        clickedelement.src = '../neosys/images/smallsort' + order + '.gif'
     }
     catch (e) {
         if (typeof order == 'unassigned')
@@ -3091,6 +3805,12 @@ function sorttable(event, order) {
         else {
             //if indented then work out prefix from higher levels
             if (sortdata.match(/(^\s+)/)) {
+
+                //refuse to sort in reverse if indented
+                if (order == 'up') {
+                    return yield* neosysinvalid('Cannot reverse sort when any data is indented')
+                }
+
                 var prefix = ''
                 var indent = RegExp.$1.length
                 for (var i = 0; i < indent; i++) {
@@ -3108,13 +3828,14 @@ function sorttable(event, order) {
 
         }
 
-        //right justify the rown number assume max 999999  
+        //right justify the rown number assume max 999999
         var temp = rown.toString()
-        temp = neosysspace(6 - temp.length) + temp
+        //temp = neosysspace(6 - temp.length) + temp
+        temp=('000000'+temp).slice(-6)
 
         //save the two column array for sorting
         //need the +temp so that indented fields sort correctly
-        data[rown] = [sortdata + temp, temp]
+        data[rown] = [sortdata + ' ' + temp, temp]
 
     }
 
@@ -3144,6 +3865,12 @@ function sorttable(event, order) {
     var oldrows = []
     for (var oldrown = 0; oldrown < tablerows.length; oldrown++) oldrows[oldrown] = tablerows[oldrown]
 
+    //change the sort image now confirmed
+    try {
+        yield* resetsortimages(groupno)
+        clickedelement.src = gimagetheme + 'smallsort' + order + '.gif'
+    } catch (e){}
+
     //reorder data and table rows
     var newdatarows = []
     for (var newrown = 0; newrown < data.length; newrown++) {
@@ -3162,9 +3889,9 @@ function sorttable(event, order) {
     gds.data['group' + groupno] = newdatarows
 
     if (typeof form_postsort == 'function') {
-        //neosysevaluate('form_postsort()','formfunctions_onload()')
-        if (!form_postsort(colid))
-            return neosysinvalid()
+        //yield* neosysevaluate('yield* form_postsort()','yield* formfunctions_onload()')
+        if (!(yield* form_postsort(colid)))
+            return yield* neosysinvalid()
     }
 
     window.status = ''
@@ -3182,8 +3909,13 @@ function menuhide(element) {
     if (!element)
         element = $$('menudiv').parentNode
 
-    if (!element.menuok)
-        okmenus = neosysgetcookie(glogincode, 'NEOSYS2', 'm').split(',')
+    //gmenucodes FINANCE,SUPPORT,MEDIAANALYSIS,MEDIA,JOBS,TIMESHEETS,HELP
+    if (!element.menuok) {
+        okmenus = neosysgetcookie2('m')
+        //if (gusername!='NEOSYS')
+        //    okmenus=okmenus.replace('FINANCE,','')
+        okmenus=okmenus.split(',')
+    }
 
     if (!element.neosysmenuaccesskeys)
         element.neosysmenuaccesskeys = []
@@ -3214,7 +3946,12 @@ function menuhide(element) {
             }
             if (child.tagName == 'A') {
                 child.onmouseover = menuonmouseover
+                //stops keys working properly
+                //child.onclick = menuonmouseover
                 child.onmouseout = menuonmouseout
+                //do both ?!
+                //addeventlistener(child,'mouseover','menuonmouseover')
+                //addeventlistener(child,'mouseout','menuonmouseout')
                 //child.onfocus=menuonmouseover
                 //child.onblur=menuonmouseout
                 child.className = 'menuitem'
@@ -3227,7 +3964,9 @@ function menuhide(element) {
                     if ((underlineelement = child.getElementsByTagName('U')).length) {
                         var menuaccesskey = underlineelement[0].innerText.neosystrim().slice(0, 1).toUpperCase()
                         var temp = element.neosysmenuaccesskeys[menuaccesskey]
-                        if (gusername == 'NEOSYS' && temp) neosysnote('Duplicate menu access key ' + menuaccesskey.neosysquote() + ' for\r' + child.innerText + '\rand\r' + temp.innerText)
+                        if (gusername == 'NEOSYS' && temp)
+                            //yield* neosysnote('Duplicate menu access key ' + menuaccesskey.neosysquote() + ' for\r' + child.innerText + '\rand\r' + temp.innerText)
+                            alert('Duplicate menu access key ' + menuaccesskey.neosysquote() + ' for \r' + child.innerText + ' \rand \r' + temp.innerText)
                         element.neosysmenuaccesskeys[menuaccesskey] = child
                     }
                 }
@@ -3255,17 +3994,15 @@ function menuhide(element) {
 
 var gnmenus = 0
 var gmenutimeout = ''
-var gselecthidden = false
 
-function menuonclick(event) {
+//menu_onclick=menuonclick
+function* menu_onclick(event) {
     menuonmouseover(event, 'click')
 }
 
 function menuonmouseover(event, menuoption) {
 
-    if (!event)
-        event = window.event
-    eventtarget = geteventtarget(event)
+    event=getevent(event)
 
     if (!gmenuloaded)
         return false
@@ -3285,26 +4022,10 @@ function menuonmouseover(event, menuoption) {
     gnmenus = 1
     window.clearTimeout(gmenutimeout)
 
-    //hide select elements as they show show through the drop down menus (dont respect z-order)
-    if (!gselecthidden) {
-        var style0 = document.styleSheets[0]
-        var rules = style0.cssRules
-        if (!rules)
-            rules = style0.rules
-        if (rules[0].selectorText != 'select') {
-            gselecthidden = true
-            //http://www.quirksmode.org/dom/w3c_css.html
-            if (style0.addRule)
-                style0.addRule('select', 'visibility:hidden', 0)
-            else
-                style0.insertRule('select {visibility:hidden}', 0)
-        }
-    }
-
     //get the menuoption
     if (!menuoption) {
-        menuoption = eventtarget
-        if (!menuoption)
+        menuoption = event.target
+        if (!menuoption||typeof menuoption != 'object')
             return
     }
     //click detected on childnode
@@ -3313,10 +4034,10 @@ function menuonmouseover(event, menuoption) {
 
     var menu = menuoption.parentNode
 
-    //window.status=new Date+' '+menu.clientLeft+' '+menu.clientWidth
+    //window.status=new Date()+' '+menu.clientLeft+' '+menu.clientWidth
     var leftoffset
     var topoffset
-    if (menuoption.id == 'menubutton' || menuoption.tagName == 'BUTTON' || menuoption.id.slice(0, 5) == 'menu_') {
+    if (menuoption.id && (menuoption.id == 'menubutton' || menuoption.tagName == 'BUTTON' || menuoption.id.slice(0, 5) == 'menu_')) {
         //  leftoffset=menuoption.offsetWidth+menuoption.offsetLeft-4
         //  topoffset=0
         //make the menu visible just beneath the menu button
@@ -3326,8 +4047,9 @@ function menuonmouseover(event, menuoption) {
     else {
         //make the menu visible just to the right of the menu option
         leftoffset = menu.offsetWidth - menu.clientLeft - 8
-        topoffset = -menu.clientTop
-        topoffset = 0
+        //topoffset = -menu.clientTop
+        //topoffset = 0
+        topoffset = menuoption.offsetTop + 5
     }
 
     menuchangeoption(menu, menuoption)
@@ -3345,7 +4067,7 @@ function menuonmouseover(event, menuoption) {
     }
     if (!submenu || submenu.className != 'menu') {
         if (!submenu)
-            submenu = eventtarget
+            submenu = event.target
         if (!submenu)
             return
     }
@@ -3360,7 +4082,7 @@ function menuonmouseover(event, menuoption) {
         submenu.style.top = topoffset + 'px'
     submenu.style.display = ''
     submenu.noWrap = true
-    //alert(submenu.outerHTML)  
+    //alert(submenu.outerHTML)
     //highlight first menu item if none highlighted
     if (keyboarding || submenu.id == 'menudiv') {
         if (!submenu.highlightedelement) {
@@ -3377,6 +4099,8 @@ function menuonmouseover(event, menuoption) {
         //simple submenu.focus doesnt work as usual ... blanks the menudiv!
         menufocus(submenu)
         submenu.onkeydown = menuonkeydown
+        //do both ?!
+        //addeventlistener(submenu,'keydown','menuonkeydown')
 
     }
 
@@ -3390,22 +4114,22 @@ function menufocus(menu) {
     //if given an element save it global and set timeout callback
     if (menu) {
         gmenuelement = menu
-        window.setTimeout('menufocus()', 1)
+        neosyssettimeout('menufocus()', 1)
         return
     }
 
-    //focus on the saved element
+    //focus on the saved element (so that keyboard events get send to menu elements)
+    //-1 to allow scripting focus without forming part of normal keyboard tab sequence
+    gmenuelement.tabIndex=-1
     try { gmenuelement.focus() } catch (e) { }
 
 }
 
 function menuonmouseout(event) {
-    if (!event)
-        event = window.event
-    eventtarget = geteventtarget(event)
+    event=getevent(event)
 
     gnmenus = 0
-    gmenutimeout = window.setTimeout('menuclose()', 1000)
+    gmenutimeout = neosyssettimeout('menuclose()', 1000)
     //window.event.srcElement.style.color='black'
 }
 
@@ -3419,42 +4143,19 @@ function menuclose() {
         xmenubutton.tabIndex = 9999
     }
 
-    //redisplay select elements
-    var style0 = document.styleSheets[0]
-    while (true) {
-
-        //rules object is live on ie7/ff3 but not safari3.1
-        var rules = style0.cssRules
-        if (!rules)
-            rules = style0.rules
-
-        if (!rules[0] || rules[0].selectorText.toLowerCase() != 'select')
-            break
-
-        gselecthidden = false
-
-        //http://www.quirksmode.org/dom/w3c_css.html
-        if (style0.removeRule)
-            style0.removeRule(0)
-        else
-            style0.deleteRule(0)
-
-    }
-
 }
 
 function menuonkeydown(event, menu, key) {
 
-    if (!event)
-        event = window.event
-    eventtarget = geteventtarget(event)
+    event=getevent(event)
 
     //usually called as an event with no parameters
     //doesnt seem to work well except called as an event
     if (!menu || !key) {
-        menu = eventtarget
+        menu = event.target
         key = event.keyCode
     }
+    //console.log('menuonkeydown '+key+' '+menu+' '+key)
 
     var menuoption = menu.highlightedelement
     if (!menuoption)
@@ -3474,13 +4175,13 @@ function menuonkeydown(event, menu, key) {
     var esckey = key == 27
     var enterkey = key == 13
 
-    //wstatus(new Date+' '+key)
+    //wstatus(new Date()+' '+key)
 
     //esc ... close menu and return focus to where it was when menu was opened
     if (esckey || (!horizontal && leftkey)) {
         if (menu.parentNode.parentNode.highlightedelement) {
             menuonmouseover(event, menu.parentNode.parentNode.highlightedelement)
-            //window.setTimeout('menuonkeydown(13)',10)
+            //neosyssettimeout('menuonkeydown(13)',10)
             //attempt to press Enter on it
             //menuonkeydown(menu.parentNode.parentNode,13)
             return neosyscancelevent(event)
@@ -3511,9 +4212,9 @@ function menuonkeydown(event, menu, key) {
                     menuoption.onclick()
                 else {
                     if (event && event.shiftKey)
-                        windowopen(menuoption.href)
+                        windowopen_sync(menuoption.href)
                     else
-                        window.location = menuoption.href
+                        window.location.assign(menuoption.href)
                 }
             }
             catch (e) { }
@@ -3544,7 +4245,7 @@ function menuonkeydown(event, menu, key) {
             while (newmenuoption && (newmenuoption = ((leftkey || upkey) ? newmenuoption.previousSibling : newmenuoption.nextSibling))) {
                 if (newmenuoption.tagName == 'A') {
 
-                    //if cursor key then break at first available menu option 
+                    //if cursor key then break at first available menu option
                     if (!alphakey)
                         break
 
@@ -3564,7 +4265,7 @@ function menuonkeydown(event, menu, key) {
             while (newmenuoption) {
                 if (newmenuoption.tagName == 'A') {
 
-                    //if cursor key then break at first available menu option 
+                    //if cursor key then break at first available menu option
                     if (!alphakey)
                         break
 
@@ -3618,16 +4319,18 @@ function menuchangeoption(menu, newmenuoption) {
     if (!true) {
         //menu.focus()
         gmenuelement = menu
-        window.setTimeout('menufocus()', 10)
+        neosyssettimeout('menufocus()', 10)
     }
     menu.onkeydown = menuonkeydown
+    //menu.addEventListener('keydown',menuonkeydown)
 
 }
 
 function menubuttonhtml(id, imagesrc, name, title, accesskey, align) {
 
-    //var tx='<span'
-    var tx = '<div'
+    var tagname='span'
+    //tagname='div'
+    var tx = '<'+tagname
 
     if (id)
         tx += ' id="' + id + 'button' + '"'
@@ -3641,18 +4344,25 @@ function menubuttonhtml(id, imagesrc, name, title, accesskey, align) {
         tx += ' title="' + title + '"'
 
     //there is no float:center?!
+    var style='white-space:nowrap'
     if (align == 'center')
-    //tx+=' style="float:'+align+'"'
-    //tx+=' style="margin:0 auto"'
-    //switch off the default from graphicbutton class?
-        tx += ' style="float:none"'
+        //tx+=' style="float:'+align+'"'
+        //tx+=' style="margin:0 auto"'
+        //switch off the default from graphicbutton class?
+        style+=';float:none;clear:both;overflow:hidden'
     else if (align)
-        tx += ' style="float:' + align + '"'
+        style+=''//';float:' + align
+    //style=''
+    if (style)
+        tx+=' style="' + style + '"'
 
     if (accesskey)
         tx += ' accesskey="' + accesskey + '"'
 
-    tx += ' onclick="' + id + '_onclick(event)"'
+    //tx += ' neosysonclick=' + id + '_onclick(event)"'
+    tx += ' neosysonclick="'
+    /* yield */ tx += 'yield * '
+    tx += id + '_onclick(event)"'
 
     tx += '>'
 
@@ -3670,8 +4380,7 @@ function menubuttonhtml(id, imagesrc, name, title, accesskey, align) {
     tx += ' ' + name
     tx += '</span>'
 
-    //tx+='</span>'
-    tx += '</div>'
+    tx += '</'+tagname+'>'
 
     //create a tiny button to capture the accesskey to prevent it from being used by the browser
     //firefox access key is shift+alt unless reconfigured in about:config
@@ -3680,7 +4389,8 @@ function menubuttonhtml(id, imagesrc, name, title, accesskey, align) {
     if (accesskey) {
         tx += '<button xtabindex=-1 style="background-color:white; height:1px; width:1px; border-style:none; margin:0px ;padding:0px"'
         tx += ' accesskey="' + accesskey + '"'
-        tx += ' onclick="' + id + '_onclick(event)"'
+        /* yield */ tx += 'yield * '
+        tx += ' neosysonclick="' + id + '_onclick(event)"'
         tx += '></button>'
     }
 
@@ -3690,56 +4400,90 @@ function menubuttonhtml(id, imagesrc, name, title, accesskey, align) {
 
 function setgraphicbutton(button, labeltext, src) {
 
-    var label = $$(button.id + '_label')
-    label.innerHTML = labeltext
+    if (labeltext) {
+        var label = $$(button.id + '_label')
+        label.innerHTML = labeltext
+    }
     if (src)
         button.getElementsByTagName('IMG')[0].src = src
 }
 
-function refreshcache_onclick() {
+function* refreshcache_onclick() {
     if (clearcache())
-        neosysnote('All NEOSYS data cached in this window has been cleared\rand will be retrieved from the server again as and when required.')
+        yield* neosysnote('All NEOSYS data cached in this window has been cleared\rand will be retrieved from the server again as and when required.')
     // \r\rN.B. NEOSYS forms and scripts will remain cached and may\rbe updated when you close and reopen all browser\rwindows - depending on the cache settings in your browser.')
     else
-        neosysnote('Cannot clear cache.')
+        yield* neosysnote('Cannot clear cache.')
     return true
 }
 
 function neosyscancelevent(event) {
 
     //should error maybe
-    if (!event)
-        event = window.event
-    if (!event)
-        return
+    event=getevent(event)
+    if (!event) {
+        //console.log('neosyscancelevent QUITTING - no event!')
+        return false
+    }
 
     event.cancelBubble = true
     event.returnValue = false
 
-    if (event.stopPropagation)
+    if (event.stopPropagation) {
+        //console.log('event.stopPropagation()')
         event.stopPropagation()
-    if (event.preventDefault)
+    }
+
+    if (event.preventDefault) {
+        //console.log('event.preventDefault()')
         event.preventDefault()
+    }
+
     event.cancel = true
 
     return false
 
 }
 
-var eventtarget
+//not really a great idea to use global when async functions could be running
+//used in getrecn and setreadonly at the moment
+var gevent
 
-function geteventtarget(event) {
+function getevent(event) {
+
+    //if not passed event then try MSIE's window.event
+    if (!event) {
+        if (window.event)
+            event=window.event
+        else
+            event=gevent
+    }
+
+    //if not given, and cannot get event then return empty object (with no target property)
+    //perhaps should throw an error
     if (!event)
-        return
-    if (event.target)
-        eventtarget = event.target;
-    else if (event.srcElement)
-        eventtarget = event.srcElement;
-    if (!eventtarget)
-        return
-    if (eventtarget.nodeType == 3) // defeat Safari bug
-        eventtarget = eventtarget.parentNode;
-    return eventtarget
+        return {}
+
+    //if no target then try MSIE's window.srcElement
+    if (!event.target&&event.srcElement)
+        event.target=event.srcElement
+
+    //if cannot find target then return empty object with target property of
+    //so if passed an element then element.target is itself. usually the caller is looking for .target
+    if (!event.target) {
+        var origevent=event
+        event={}
+        event.target=origevent
+    }
+
+    //defeat Safari 3 bug
+    if (event.target&&event.target.nodeType == 3)
+        event.target = event.target.parentNode;
+
+    //return event (with .target)
+    gevent=event
+    return event
+
 }
 
 //allows dom scan without using IE document.all(ii)
@@ -3783,7 +4527,59 @@ function id2classname(element) {
 
 }
 
+function getmaxwindow_sync() {
+
+    //maximum size is the size of the parent window
+    var parentwindow=window.opener
+    //popups within popups are limited by the original window size not the immediate parent
+    while (parentwindow&&parentwindow.opener)
+        parentwindow=parentwindow.opener
+    //if .opener not supported
+    if (!parentwindow) {
+        parentwindow=window.parent
+        while (parentwindow&&parentwindow.parent&&parentwindow!=parentwindow.parent)
+            parentwindow=parentwindow.parent
+    }
+    if (!parentwindow)
+        systemerror('cannot find window.opener or window.parent','neosysautofitwindow')
+
+/*
+    if (window.opener) {
+//        alert('movetoXY:'+window.opener.screenX+' '+window.opener.screenY+'\rresizetoWH:'+window.opener.outerWidth+' '+window.opener.outerHeight)
+        window.moveTo(window.opener.screenX, window.opener.screenY)
+        window.resizeTo(window.opener.outerWidth, window.opener.outerHeight)
+    }
+*/
+    var max={}
+    try {
+        //internet explorer gives permission denied when uploading files
+        max.width=parentwindow.outerWidth
+        max.height=parentwindow.outerHeight
+        //max.height=parentwindow.innerHeight
+        max.left=parentwindow.screenLeft||parentwindow.screenX
+        max.top=parentwindow.screenTop||parentwindow.screenY
+        //max.top=max.top+(parentwindow.outerHeight-parentwindow.innerHeight)
+        //alert('getmaxwindow_sync() max='+max.width+' '+max.height+' '+max.left+' '+max.top)
+    } catch (e) {
+    }
+    if (!max.width) {
+        max.width=window.screen.availWidth
+        max.height=window.screen.availHeight
+        max.left=0
+        max.top=0
+    }
+    max.style=';DialogHeight:'+max.height+'px; DialogWidth:'+max.width+'px;,'
+    max.style+=',width='+max.width
+    max.style+=',height='+max.height
+    max.style+=',left='+max.left//window.screenX
+    max.style+=',top='+max.top//window.screenY
+
+    return max
+}
+
 function neosysautofitwindow() {
+
+    gautofitwindowpending=false
 
     var element = $$('autofitwindowelement')
     if (!element)
@@ -3812,23 +4608,28 @@ function neosysautofitwindow() {
         newheight += 80
     }
 
+    var max=getmaxwindow_sync()
+
     //constrain to screen size
-    if (newwidth > window.screen.availWidth)
-        newwidth = window.screen.availWidth
-    if (newheight > window.screen.availHeight)
-        newheight = window.screen.availHeight
+    if (newwidth > max.width)
+        newwidth = max.width
+    if (newheight > max.height)
+        newheight = max.height
 
-    //top
-    var newtop = (window.screen.availHeight - newheight) / 2
+    //position in center
+    var newleft = max.left + (max.width - newwidth) / 2
+    var newtop = max.top + (max.height - newheight) / 2
 
-    //left
-    var newleft = (window.screen.availWidth - newwidth) / 2
-    //debug(window.resizeTo)
+console.log('autofitwindow: left:'+newleft+' top:'+newtop+' width:'+newwidth+' height:'+newheight)
+
+    //yield* debug(window.resizeTo)
     //w3c (but present in IE but doesnt work - so try both)
     //if (window.resizeTo)
     try {
         window.resizeTo(newwidth, newheight)
         window.moveTo(newleft, newtop)
+        //ff on linux wont seem to do immediately
+        window.setTimeout('try{window.moveTo('+newleft+', '+newtop+')} catch(e){}',1)
     }
     catch (e) { }
     //msie (and later versions of FF3 but setting doesnt seem to work in 3.03)
@@ -3843,40 +4644,200 @@ function neosysautofitwindow() {
 
 }
 
+var gblockevents//stops onclick event at the same time as onfocus event
+function form_blockevents(truefalse,callinfo){
+
+    var callername=''
+    if (form_blockevents.caller) {
+        callername=form_blockevents.caller.name
+    }
+
+    if (!gblockevents)
+        gblockevents=0
+
+    if (truefalse) {
+        ++gblockevents
+        logevent('-------->'+gblockevents+'         block '+callername+' '+callinfo)
+
+    } else {
+        --gblockevents
+        logevent('         '+gblockevents+'<--------unblock '+callername+' '+callinfo)
+    }
+
+    if (gblockevents<0)
+        gblockevents=0
+
+}
+
+function starteventhandler(eventfunctionname, functionx) {
+
+    //event handler function
+    //2. creates a generator (suspendable/resumable function)
+    //   of the right type for the event
+    //   (knows event generator function from closure)
+    //   and passes the event into it
+    //3. calls the generator function to start executing
+    //4. the generator function will either return (with event return value?)
+    //   or suspend and wait for some window or xmlhttp to resume it
+    //5. any window/xmlhttp that wishes the function to resume
+    //   can call geventhandler .next(data) where data is the value to be used
+    //   as the expression to the right of the yield statement
+    return function neosys_anon_sync_event_handler(event) {
+
+        event=getevent(event)
+        //YIELD//console.log('\n--- Event '+event.type+' ---')
+
+        var eventdescription=event.type+' '+event.target.tagName+' id:'+event.target.id+' gblockevents:'+gblockevents
+
+        //prevent events like onfocus being followed by onclick while
+        //onfocus is yielding to async events like window.open etc
+        //var uiblockerdiv=$$('uiblockerdiv')
+        //if (gblockevents||uiblockerdiv) {
+        if (gblockevents) {
+
+            if (event.type == 'unload' || event.type == 'beforeunload') {
+                //always call unloadevents
+                //TODO create a new gcurrentevent?
+
+            //special treatment of events while neosysconfirm is up
+            } else if ($$('neosysconfirmdiv')){
+
+                //allow mouse right click, copy of error message text etc.
+                if (event.type == 'copy')
+                    return true
+
+                if (event.type == 'keydown') {
+
+                    //allow keyboard Ctrl+c to copy error message text etc.
+                    if (event.ctrlKey && event.which==67)
+                        return true
+
+                    var keycode = event.keyCode ? event.keyCode : event.which
+                    var keyletter = String.fromCharCode(keycode).toUpperCase()
+
+                    logevent('neosys_anon_sync_event_handler+neosysconfirmdiv ' + event.target.id + ' ctrlKey:' + event.ctrlKey + ' key:' + keycode +' letter:'+keyletter)
+
+                    //FIX detection of specific keys on buttons like Y N etc
+
+                    //POSITIVE = F9 or Ctrl+Enter or SPACE some initial
+                    if (keycode == 120 || (keycode==13) || (keycode==32) || keyletter == gneosysconfirmletters[1]) {
+                        window.setTimeout('neosys_confirm_function1()',1)
+                        return neosyscancelevent(event)
+                    }
+
+                    //CANCEL = Esc or some initial
+                    else if (keycode == 27 || keyletter == gneosysconfirmletters[3]) {
+                        window.setTimeout('neosys_confirm_function3()',1)
+                        return neosyscancelevent(event)
+                    }
+
+                    //NEGATIVE = F8 or some initial
+                    else if (keycode == 119 || keyletter == gneosysconfirmletters[2]) {
+                        window.setTimeout('neosys_confirm_function2()',1)
+                        return neosyscancelevent(event)
+                    }
+                }
+            }
+
+            logevent('!!!SKIPPING event!!! '+ eventdescription + ' because gblockevents is set, and not keydown related to neosysconfirmdiv')
+            
+            return neosyscancelevent(event)
+
+        }//end of event blocking
+
+        //events are not blocked - create a new event handler
+
+        //make the global generator function (that can yield) and can be resumed by calling .next()
+        var eventhandler=functionx(event)
+        if (!eventhandler) {
+            var msg1='neosys_anon_sync_event_handler '+eventfunctionname+' '+event.target
+            var msg2='cant create functionx '+functionx.name
+            logevent(msg1+' : '+msg2)
+            //systemerror(msg1,msg2)
+
+        } else {
+
+            //start the event, result will be that provided by the FIRST yield
+            //we cant run the event to completion if there is more than one yield
+            //var next=neosys_next('neosys_anon_sync_event_handler for '+eventdescription)
+            var next=neosysneweventhandler(eventhandler,eventdescription+' in neosys_anon_sync_event_handler')
+            var result=next.value
+
+            //onbeforeunload may return text immediately so return that
+            if (result)
+                event.returnValue=result//what exactly does this do?
+            else
+                result=false
+
+//            logevent('<<<<<<<<<< '+eventdescription + ' NEW EVENT HANDLER in neosys_anon_sync_event_handler')
+//            logevent('           done:'+next.done+ ' result:'+result)
+
+            return result
+
+        }
+    }
+}
+
+var geventhandler
+var geventn=0
+
+function neosysneweventhandler(eventhandler,location) {
+
+    ++geventn
+    logevent(' ')
+    logevent('=== NEW EVENT HANDLER '+geventn+' for '+location+'===')
+    geventhandler=eventhandler
+
+    //run the generator function to first yield or completion if no yielding
+    var next=neosys_next('','neosysneweventhandler from '+location)
+
+    //code will continue immediately here after completion or yielding of the function
+    //IF the function yielded to window.open for example
+    //temp.value will be 1 and temp.done will be false
+    return next
+}
+
 function addeventlistener(element, eventname, functionx) {
+
+    if (!element)
+        systemerror('addeventlistener '+eventname+' '+functionx,'element is missing')
+
+    //logevent('addeventlistener:'+(element.id||element.name||element.tagName||window)+','+eventname+'->'+functionx)
 
     if (typeof functionx == 'string') {
         //element.setAttribute('on'+eventname,functionx+'(event)')
         //return
+        functionxname=functionx
         functionx = window[functionx]
+        if (!functionx)
+            systemerror('error: in addeventlistener '+ functionxname+' function does not exist')
+        if (guseyield)
+            functionx = starteventhandler(eventname, functionx)
     }
 
-    //if (isMSIE)
-    //{
-    // element['on'+eventname]=functionx
-    // return
-    //}
+    //normally using bubbling style but focus event doesnt bubble so we use capture style for that
+    var capture=eventname=='focus'
 
     if (element.addEventListener)
-    //native code in FF/Safari
-        element.addEventListener(eventname, functionx, true)
-    else if (element.attachEvent)
+        element.addEventListener(eventname, functionx, capture)//FF/Safari/IE9+
+    else if (element.attachEvent)//pre IE9
     //if cant attachEvent then possibly it isnt a DOM element
         element.attachEvent('on' + eventname, functionx)
     //else
     //run function in the environment of the element
     //element.attachEvent('on'+eventname,function(){functionx.call(element)})
 
+    return true
 }
 
 /*
-function neosysgetattribute(element,attributename)
-{
+function neosysgetattribute(element,attributename) {
+
 var attribute=element.getAttribute(attributename)
 if (!attribute)
 return attribute
-if (typeof attribute=='string')
-{
+if (typeof attribute=='string') {
+
 if (attribute=='true')
 return true
 else if (attribute=='false')
@@ -3887,6 +4848,2093 @@ return attribute
 }
 */
 
+//used anywhere yet?
+function SetAttribute( element, attName, attValue ) {
+
+	if ( attValue == null || attValue.length == 0 )
+		element.removeAttribute( attName, 0 ) ;			// 0 : Case Insensitive
+	else
+		element.setAttribute( attName, attValue, 0 ) ;	// 0 : Case Insensitive
+}
+function GetAttribute( element, attName, valueIfNull ) {
+
+	var oAtt = element.attributes[attName] ;
+
+	if ( oAtt == null || !oAtt.specified )
+		return valueIfNull ? valueIfNull : '' ;
+
+	var oValue = element.getAttribute( attName, 2 ) ;
+
+	if ( oValue == null )
+		oValue = oAtt.nodeValue ;
+
+	return ( oValue == null ? valueIfNull : oValue ) ;
+}
+
+function  neosysremoveelementsbyid(id) {
+    while (true) {
+        var tt=document.getElementById(id)
+        if (!tt)
+            break
+        tt.parentNode.removeChild(tt)
+    }
+}
+
 function neosysremovenode(element) {
     element.parentNode.removeChild(element)
 }
+
+function HTMLEncode(text) {
+	if ( !text )
+		return ''
+    //&amp first
+	return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+}
+
+function HTMLDecode(text) {
+	if ( !text )
+		return ''
+    //&amp; last
+	return text.replace(/&gt;/g,'>').replace(/&lt;/g,'<').replace(/&amp;/g,'&')
+}
+
+function neosysint2date(neosysdate) {
+    //problem unless automatic daylight saving time change is switched off
+    //both the following return the same date!!!
+    //zzz need to find a more reliable algorithm
+    //alert(new Date(1967,11,31+14361))
+    //alert(new Date(1967,11,31+14362))
+    //return new Date(1967,11,31+(+neosysdate))
+
+    //var date=new Date(0)
+    //date.setUTCFullYear(1967)
+    //date.setUTCMonth(11)
+    //date.setUTCDate(31+(+neosysdate))
+    //return date
+
+    return new Date(Date.UTC(1967, 11, 31 + parseInt(neosysdate, 10)))
+
+}
+
+//thin wrapper to handle timeouts with/without yielding code
+//command should be in text format so that functions will have yield * prefixed by converter to yielding code
+function neosyssettimeout( command,milliseconds) {
+    if (glogsettimeout)
+        console.log('neosyssetimeout('+command+')')
+    //if (typeof command=='string' && command.slice(0,7)=='yield * ') {
+    //    command=command.slice(7).replace(/"/g,"'")
+    if (typeof command=='string' && command.match(gyieldregex)) {
+        command=command.replace(gyieldregex,'').replace(/"/g,"'")
+        return window.setTimeout('neosystimeout_sync("'+command+'")',milliseconds)
+    } else
+        //eval directly if not prefixed by "yield * '
+        return window.setTimeout(command,milliseconds)
+}
+
+//sync function called on timeout in yielding code
+//spins off an async/yielding function
+function neosystimeout_sync(command) {
+
+    logevent('neosystimeout_sync:geventhandler.done:'+geventhandler.done)
+
+    //if another event handler is already running then defer execution for 100ms
+    if (gblockevents) {
+        window.setTimeout('neosystimeout_sync("'+command+'")',100)
+        return
+    }
+
+    //the async function should run to completion
+    // even if it pauses for multiple async operations on the way.
+    //command MUST be prefixed with "yield *" and return a generator
+    var generator=eval(command);
+    neosysneweventhandler(generator,'neosystimeout_sync() '+command)//yielding code
+    //not interested in result
+}
+
+//thin wrapper to handle timeouts with/without yielding code
+function neosyssetinterval(command,milliseconds) {
+    //if (typeof command=='string' && command.slice(0,7)=='yield * ') {
+    //    command=command.slice(7).replace(/"/g,"'")
+    if (typeof command=='string' && command.match(gyieldregex)) {
+        command=command.replace(gyieldregex,'').replace(/"/g,"'")
+        return window.setInterval('neosysinterval_sync("'+command+'")',milliseconds)
+    } else
+        return window.setInterval(command,milliseconds)
+}
+
+//sync function called at intervals in yielding code
+//spins off an async/yielding function
+function neosysinterval_sync(command) {
+
+    //if another event handler is already running then defer execution for 100ms
+    if (gblockevents) {
+        return
+    }
+
+    //the async function should run to completion
+    // even if it pauses for multiple async operations on the way.
+    //We create a new generator object each interval
+    //We do not create one generator and call its .next() each interval
+    //command MUST be prefixed with "yield *" and return a generator
+    var generator=eval(command);
+    neosysneweventhandler(generator,'neosysinterval_sync() '+command)//yielding code
+    //not interested in result
+}
+
+function systemerror(functionname, e) {
+    if (typeof functionname == 'undefined')
+        functionname = 'undefined'
+    //if error generated by user cancelling a server request then try to ignore the error
+    if (functionname=='Cancelled')
+        return
+    if (typeof e == 'undefined')
+        e = ''
+    var msg=e.toString()
+    //if (e.name)
+    //    msg+='\n'+e.name
+    //if (e.message)
+    //    msg+='\nError '+e.message
+    if (e.fileName)
+        msg+='\nFilename '+e.fileName
+    if (!e.stack && e.lineNumber)
+        msg+=' Line No. '+e.lineNumber
+    if (!e.stack && e.columnNumber)
+        msg+=' Column No. '+e.columnNumber
+    if (e.stack)
+        msg+='\n'+e.stack
+    else {
+        var stack=new Error().stack
+        if (stack)
+            msg+='\n\n'+stack.toString()//.neosysconvert('\n\r','||')
+        else {
+            var caller
+            if (arguments && arguments.callee)
+                caller=arguments.callee
+            else if (systemerror && systemerror.caller)
+                caller=systemerror.caller
+            if (caller)
+                msg+='\n'
+            while (caller) {
+                msg+='\n'+caller.toString().split('\n')[0]
+                caller=caller.caller
+           }
+        }
+    }
+    if (!gonunload)
+        alert('System Error in ' + functionname + '\n' + msg)
+    //if (gstepping||(!ginitok&&gusername=='NEOSYS')) crashhere2
+    if (gstepping || (gusername == 'NEOSYS') || (gdataset && gdataset.slice(-4) == 'TEST'))
+        neosys_javascript_system_error
+}
+
+//works like msie
+function $all(elementid, element) {
+    if (!element) {
+        var id = elementid.id ? elementid.id : elementid
+        /*
+        var result
+        if (document.querySelectorAll) {
+        var result = document.querySelectorAll('.neosysid_' + id)
+        if (!result.length)
+        result = false
+        }
+        if (!result)
+        */
+        //return document.all(id) //this returns only one element in ie8 unless in compatibility mode
+        return document.all[id]
+
+        /* doesnt solve difference in document.all in ie8 between normal and compatibility mode
+        var id = elementid.id ? elementid.id : elementid
+        var temp = window[id]
+        if (temp)
+        return temp
+        else
+        return document.all(elementid)
+
+        */
+    }
+    else
+    //should this be changed to [elementid] similar to above
+    // or is it supposed to return element it only 1 and array if more than one
+        return element.all(elementid)
+}
+
+function $class(elementid, element) {
+    var temp
+    if (element)
+        temp = element.getElementsByClassName('neosysid_' + elementid)
+    else
+        temp = document.getElementsByClassName('neosysid_' + elementid)
+    //return the element if one(
+    if (temp.length == 1)
+        return temp[0]
+    //return an array if many
+    else if (temp.length > 1)
+        return temp
+
+    //last ditch attempt to find by id
+    //NB but this doesnt respect the element argument
+    temp = document.getElementById(elementid)
+    if (temp)
+        return temp
+
+    //return undefined if not found
+    return
+}
+
+function setdisabledandhidden(element, truefalse) {
+    if (!element)
+        return
+    if (truefalse) {
+        element.disabled = true//this seems to have the effect of setting attribute disabled to "" in modern browsers!
+        element.setAttribute('disabled', 'disabled')
+        element.style.display = 'none'
+    }
+    else {
+        element.disabled = false
+        if (element.removeAttribute)
+            element.removeAttribute('disabled')
+        element.style.display = ''
+    }
+}
+
+
+//cross browser
+function* getcurrentstyle(element) {
+    if (window.getComputedStyle)
+        return document.defaultView.getComputedStyle(element,null)
+    if (element.currentStyle)
+        return element.currentStyle
+}
+
+//firefox innertext doesnt work like internet explorer and webkit (chrome/safari)
+//need BR to show as \n
+function neosys_getinnertext(element) {
+    if (element.tagName=='BR')
+        return '\n'
+    if (typeof element.nodeValue=='string')
+        return element.nodeValue
+    var nodes=element.childNodes
+    if (!nodes)
+        return ''
+    var text=''
+    for (var noden=0;noden<nodes.length;++noden) {
+    //for (var noden=0;noden<nodes.length;++noden) {
+        //alert(nodes[node].tagName+' '+nodes[node].textContent)
+        text+=neosys_getinnertext(nodes[noden])//recursive
+        //alert(text)
+    }
+    return text
+}
+
+function* neosysconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebuttonx, cancelbuttonx, text, texthidden, imagesrc) {
+
+    //performs "in-window" questions, selections and inputs
+    //replaces (or called by)
+    //neosysconfirm: questions (yes/no/cancel) and one line inputs
+    //neosysdecide/neosysdecide2: selections
+
+    var decide_args//holds popup list args if any
+
+    if (typeof questionx=='object') {
+
+        //[question, data, cols, returncoln, defaultreply, many, inverted]
+        decide_args=questionx
+        questionx=decide_args[0]
+        var decide_returnmany=decide_args[5]
+
+        //question
+        if (!questionx)
+            questionx = 'Which do you want?'
+        questionx = questionx.replace(/[\|\r\n]/g, '<br />')
+        //if (decide_returnmany)
+        //    questionx += '&nbsp;&nbsp;<span style="font-size:66%">(A=All)</span>'
+
+    } else
+        var decide_args=undefined
+
+    var nbuttons=0
+    var buttons=[]
+
+    gneosysconfirmletters=[]
+
+    //check buttons
+    if (positivebuttonx)
+        nbuttons++
+    if (negativebuttonx)
+        nbuttons++
+    if (cancelbuttonx)
+        nbuttons++
+    if (nbuttons==0) {
+        positivebuttonx='<u>Y</u>es'
+        negativebuttonx='<u>N</u>o'
+        cancelbuttonx='<u>C</u>ancel'
+        nbuttons=3
+    }
+
+    var istextinput = typeof text != 'undefined' && text != null
+
+    //create a centralised div with the appropriate buttons or input box
+    var div=document.createElement('div')
+    div.id='neosysconfirmdiv'
+    div.style.zIndex=200
+    div.style.position='fixed'
+    div.style.textAlign='center'
+    div.style.background='lightgrey'
+    div.style.border='1px solid grey'
+    div.style.padding='10px'
+    div.style.boxShadow='0px 0px 7px #666666'
+    //div.style.fontSize=25//had no effect
+    div.style.maxHeight=(window.innerHeight-50)+'px'
+    div.style.maxWidth=window.innerWidth+'px'
+    //div.style.maxHeight=(window.outerHeight-50)+'px'
+    //div.style.maxWidth=window.outerWidth+'px'
+    div.style.overflow='auto'
+
+    //image
+
+    var html=''
+    if (!imagesrc && (questionx.indexOf('!') + 1 || questionx.toLowerCase().indexOf('are you sure ') + 1 || questionx.toLowerCase().indexOf('warning') + 1))
+        imagesrc = 'warning'
+    else if (!imagesrc) {
+        if (nbuttons == 1)
+            imagesrc = 'info'
+        else
+            imagesrc = 'question1'
+    }
+    if (imagesrc) {
+        if (imagesrc == 'critical') {
+            imagesrc = 'xpcritical.gif'
+            div.style.backgroundColor = '#ffdddd'//reddish
+        }
+        if (imagesrc == 'warning') {
+            imagesrc = 'xpwarning.gif'
+            div.style.backgroundColor = '#ffff99'//yellowish
+            //darker than usual messages to distinguish from the usual buff document background color
+        }
+        if (imagesrc == 'info') {
+            imagesrc = 'xpinfo.gif'
+            div.style.backgroundColor = '#ddffdd'//greenish
+        }
+        if (imagesrc == 'question1') {
+            imagesrc = 'xpquestion.gif'
+            div.style.backgroundColor = '#ddddff'//blueish
+        }
+        if (!(imagesrc.indexOf('/') + 1 + imagesrc.indexOf('\\') + 1)) {
+            imagesrc = gimagetheme + imagesrc
+            if (window.location.href.toString().indexOf('default.htm')>=0)
+                imagesrc=imagesrc.slice(3)
+        }
+        html+='<img src="'+imagesrc+'" alt="" xstyle="display: none" height="32" width="32" />'
+    }
+    var imagehtml=html
+
+    //question
+
+    var html=''
+    questionx = questionx.replace(/\r\n/g, '\r')
+    questionx = questionx.replace(/\r\r/g, '<p />')
+    questionx = questionx.replace(/\r/g, '<br />')
+    questionx = questionx.replace(/\n/g, '<br />')
+    questionx = questionx.replace(FMre, '<br />')
+    questionx = questionx.replace(VMre, '<br />')
+    questionx = questionx.replace(SMre, '<br />')
+    questionx = questionx.replace(TMre, '<br />')
+    questionx = questionx.replace(/\|/g, '<br />')
+    var questionhtml = questionx
+
+    //buttons
+    var html=''
+    if (!decide_args) {
+        var nbuttons=0
+        if (positivebuttonx)
+            yield* addbutton('positive',1,positivebuttonx,'F9')
+        if (negativebuttonx)
+            yield* addbutton('negative',2,negativebuttonx,'F8')
+        if (cancelbuttonx)
+            yield* addbutton('cancel',3,cancelbuttonx,'Esc')
+
+        //make sure no button is default unless specified
+        if (!defaultbuttonn) {
+            if (istextinput) {
+                neosyssettimeout('focusontext()', 10)
+            }
+            else {
+                //xxtry{gbuttons[0].blur()}catch(e){}
+            }
+        }
+    }
+    var buttonshtml=html
+    html=''
+
+    function* addbutton(buttonid,buttonn,buttontext,buttonfunckey) {
+
+        nbuttons++
+
+        html+='<span id="'+buttonid+'button"'
+
+        html+=' tabindex="0"'
+        html+=' class="graphicbutton"'
+
+        //mouse events down/up/out/click
+        html+=' onmousedown="this.style.borderStyle=\'inset\'"'
+        html+=' onmouseup="this.style.borderStyle=\'outset\'"'
+        html+=' onmouseout="this.style.borderStyle=\'outset\'"'
+        html+=' onclick="neosys_confirm_function'+buttonn+'()"'
+
+        //letter
+        var letter=buttontext.match(/(<[uU]>)(.)/)
+        if (letter)
+            letter=letter[2]
+        else if (!istextinput)
+            letter=buttontext.substr(0,1)
+        if (letter) {
+            letter=letter.toUpperCase()
+            html+=' neosysletter="'+letter+'"'
+        }
+        gneosysconfirmletters[buttonn]=letter
+
+        //title
+        html+='title="Press '
+        if (letter)
+            html+=letter+' or '
+        html+=buttonfunckey+'"'
+
+        //set the button number
+        html+=' neosysbuttonnumber="'+nbuttons+'"'
+        html+=' neosysyesnocancel="'+(buttonn%3)+'"'
+
+        html+='>'+buttontext+'</span>'
+
+        //array of visible buttons
+        //buttons[buttons.length] = button
+
+        //set the default button
+        //if (buttons.length == defaultbuttonn) {
+        //    gdefaultbutton = button
+        //    window.setTimeout('gdefaultbutton.focus()', 10)
+        //}
+
+    }//end of addbutton
+
+    //template for html framework
+    var html='\
+            <table cellspacing="1" cellpadding="1">\
+            <tr align="left" width="5%">\
+                <td style="vertical-align: middle;padding: 20px">\
+                    '+imagehtml+'\
+                </td>\
+                <td>\
+                    <div class="statementclass" id="question1">\
+                    '+questionhtml+'\
+                    </div>\
+                </td>\
+            </tr>'
+
+    //add an empty table for any decide options
+    if (decide_args) {
+        html+='\
+            <tr>\
+            <td colspan=2 align="center">\
+            <table id="decide_table1" xwidth=100% xclass="neosysform" border="1" bordercolor="#d0d0d0" cellspacing="0" xcellpadding="0">\
+                <thead onclick="decide_sorttable2(event)" style="cursor: pointer">\
+                    <tr id="decide_table1head1row1">\
+                    </tr>\
+                </thead>\
+                <tbody id="decide_table1body1">\
+                </tbody>\
+            </table>\
+            </td>\
+            </tr>\
+            <tr>\
+            <td></td>\
+            <td>\
+            <button id="decide_okbutton" tabindex="0" class="graphicbutton"\
+                onmousedown="this.style.borderStyle="inset"\
+                onmouseup="this.style.borderStyle="outset"\
+                onmouseout="this.style.borderStyle="outset"\
+                title="Press Ctrl+Enter or F9">\
+                OK</button>\
+            <button id="decide_cancelbutton" tabindex="0" class="graphicbutton"\
+                onmousedown="this.style.borderStyle="inset"\
+                onmouseup="this.style.borderStyle="outset"\
+                onmouseout="this.style.borderStyle="outset"\
+                title="Press Esc">\
+                Cancel</button>\
+            </td>\
+            </tr>'
+    }
+
+    //OK/Cancel/Print buttons at the bottom
+    else {
+        html+='\
+                <tr>\
+                    <td>\
+                        &nbsp;\
+                    </td>\
+                    <td>\
+                        <p id="textinputp" style="display: none">\
+                            <input size="60" id="textinput" />\
+                        </p>\
+                        <p id="textinputphidden" style="display: none">\
+                            <input type="password" size="60" id="textinputhidden" id="textinputhidden" />\
+                        </p>\
+                        <span id="yesnocancelbuttons">\
+                            '+buttonshtml+'\
+                        </span>\
+                    </td>\
+                </tr>\
+                </table>'
+    }
+
+    //finally create the div body
+    div.innerHTML=html
+
+    //insert and centralise the div after it has autosized itself
+    document.body.insertBefore(div, null)
+
+    //build rows of decide popup
+    if (decide_args) {
+
+        //build rows, or if only one option, then obtain the response
+        /////////////////////////////////////////////////////////////
+        var response=decide_onload(decide_args)
+
+        //return only option
+        // quit if false ie failed to load eg no options
+        if (typeof response!='undefined'){
+            neosysremovenode(div)
+            return response
+        }
+
+    }
+
+    var top = window.innerHeight/2 - div.offsetHeight/2
+    var left = window.innerWidth/2 - div.offsetWidth/2
+    div.style.top = top + 'px'
+    div.style.left = left + 'px'
+
+    //if case too much to fit vertically on the screen, use scrollbars
+    //for messages show the bottom of the message
+    //for popup lists, show the top of the list
+    if (!decide_args)
+        div.scrollTop = div.scrollHeight
+
+    //div.onkeydown=function neosysconfirm_onkeydown(event) {
+    //    neosyscancelevent(event)
+    //}
+
+    //YIELD RIGHT HERE!
+    //1. hang here until something like a button click function calls geventhandler .next(response)
+    //2. keyword "yield" causes crash in internet explorer so it will be commented out in /2/ version
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+
+    var response=yield* neosys_yield('neosysconfirm2')
+
+    neosysremovenode(div)
+
+    //text input returns a string (may be zero length) or false if clicked cancel
+    if (typeof text != 'undefined' || text === null) {
+        if (typeof response == 'string')
+            return response
+    }
+
+    //no response treated same as cancel button (0) or '' if popup list
+    if (!response) {
+        if (decide_args)
+            response=''
+        else
+            response = 0
+    }
+
+    return response
+}
+
+//return 1
+function neosys_confirm_function1(event) {
+    return neosys_confirm_function(1,event)
+}
+
+//return 2
+function neosys_confirm_function2(event) {
+    return neosys_confirm_function(2,event)
+}
+
+//return 0
+function neosys_confirm_function3(event) {
+    return neosys_confirm_function(0,event)
+}
+
+function neosys_confirm_function(buttonno,event) {
+
+    console.log('neosys_confirm_function buttonno:'+buttonno)
+    event=getevent(event)
+    neosyscancelevent(event)
+    neosys_resume(buttonno,'neosys_confirm_function')
+}
+
+function decide_onload(decide_args) {
+
+    //var question = decide_args[0]
+    var data = decide_args[1]
+    var cols = decide_args[2]
+    var decide_returncolid = decide_args[3]
+    var defaultreply = decide_args[4]//must be an array with method neosyslocate
+    var decide_returnmany = decide_args[5]
+    var decide_inverted = decide_args[6]
+
+    //data
+    //[[,,,],[,,,],[,,,]] or
+    //col1.1 vm col1.2 fm col2.1 vm col2.2 etc
+    if (!data && !cols)
+        data = [['Yes'], ['No']]
+    if (data && typeof data == 'string') {
+        data = data.split(data.indexOf(fm) + 1 ? fm : ':')
+    }
+    for (ii = 0; ii < data.length; ii++) {
+        if (typeof data[ii] == 'string') {
+            data[ii] = data[ii].split(data[ii].indexOf(vm) + 1 ? vm : ';')
+        }
+        else if (typeof data[ii] == 'number')
+            data[ii] = [data[ii]]
+    }
+
+    //quit if no data
+    if (!data.length) {
+        alert('No data, no options available')
+        return false
+    }
+
+    //columns
+    //[[dictid,title],etc. or
+    //colid vm coltitle fm ... etc one per column
+    if (!cols) {
+        cols = []
+        for (var ii = 0; ii < data[0].length; ii++)
+            cols[ii] = [ii, '']
+    }
+    if (typeof cols == 'string') {
+        if (cols.indexOf(fm) < 0 && cols.indexOf(vm) < 0) {
+            cols = cols.replace(/:/g, fm)
+            cols = cols.replace(/;/g, vm)
+        }
+        cols = cols.split(fm)
+    }
+    for (ii = 0; ii < cols.length; ii++) {
+        if (typeof cols[ii] == 'string')
+            cols[ii] = cols[ii].split(vm)
+    }
+    var ncols = cols.length
+
+    //decide_returncolid
+    if (typeof decide_returncolid == 'undefined')
+        decide_returncolid = ''
+
+    //defaultreply
+
+    //returnmany
+    //returnmany=
+
+    //build the table
+
+    //build the column headings row
+    var firstselection
+
+    //get a handle on the existing heading row
+    var oRow = $$('decide_table1head1row1')
+
+    //add two columns for the check box or radio button column to the column heading
+    var oCell = document.createElement('th')
+    oCell.colSpan = 2
+    oCell.align = 'center'
+    if (decide_returnmany)
+        var tt = '<button'
+        + ' title="Press A for All"'
+        //+ ' onclick="decide_all_onclick()"'
+        + ' style="font-size:80%"'
+        + '>All</button>'
+    else
+        var tt = '&nbsp;'
+    oCell.innerHTML = tt
+    oRow.appendChild(oCell)
+
+    if (decide_returnmany)
+        oCell.getElementsByTagName('button')[0].onclick=decide_all_onclick
+
+    //add a column to show the order of selections
+    if (decide_returnmany) {
+        var oCell = document.createElement('th')
+        oCell.align = 'center'
+        if (decide_returnmany)
+        oRow.appendChild(oCell)
+    }
+
+    //add other column headings
+    for (ii = 0; ii < ncols; ii++) {
+        var oCell = document.createElement('th')
+        oCell.style.fontWeight = 'bold'
+        var title = cols[ii][1]
+        if (typeof title == 'undefined') {
+            title = cols[ii][0]
+            if (!title)
+                title = ''
+            if (parseInt(title))
+                title = ''
+            title = title.neosyscapitalise().replace(/_/gi, ' ')
+        }
+        oCell.innerHTML = title
+        oRow.appendChild(oCell)
+
+        if (!cols[ii][3] && cols[ii][2] && ( cols[ii][2] == 'DATE' || cols[ii][2] == 'TIME'))
+            cols[ii][3] = 'right'
+
+        //check colid is in data
+        //if ((!inverted&&typeof (data[0][cols[ii][0]])=='undefined')||(inverted&&typeof (data[cols[ii][0]][0])=='undefined'))
+        if ((!decide_inverted && typeof (data[0][cols[ii][0]]) == 'undefined') || (decide_inverted && typeof (data[cols[ii][0]]) == 'undefined')) {
+            //  alert(cols[ii])
+            alert('popup column "' + cols[ii][0] + '" not in popup data in decide.htm')
+            return false
+        }
+
+    }
+
+    //column heading row built
+
+    //build the table rows
+    var starttime = new Date
+    var maxsecs = 10
+
+    var table1body1x = $$('decide_table1body1')
+
+    var optionno=0
+
+    //rows
+    var nrows = decide_inverted ? data[cols[0][0]].length : data.length
+    for (rown = 0; rown < nrows; rown++) {
+
+        //break if too many rows
+        if ((new Date() - starttime) > (maxsecs * 1000)) {
+            if (!(confirm('A large popup window is taking time to prepare.\r\rClick [OK] to wait or [Cancel] to see part.')))
+                break
+            starttime = new Date
+        }
+
+        if (decide_returncolid === '') {
+            returnvalue = rown + 1
+        }
+        else {
+            returnvalue = decide_inverted ? data[decide_returncolid][rown] : data[rown][decide_returncolid]
+            if (typeof returnvalue == 'object')
+                returnvalue = returnvalue.text
+        }
+
+        //hide checkboxes on rows with nothing to return
+        var visibilityhidden=''
+        if (decide_returncolid) {
+            if (decide_returnmany)
+                //visibilityhidden = returnvalue ? '' : 'onclick="decide_checkbox_select()"'
+                visibilityhidden = ''
+            else
+                visibilityhidden = returnvalue ? '' : 'style="visibility:hidden"'
+        }
+
+        //create a new row
+        var oRow = document.createElement('tr')
+        oRow.setAttribute('decide_row',rown)
+
+        table1body1x.appendChild(oRow)
+
+        //add line number column
+        var oCell = document.createElement('td')
+        oRow.appendChild(oCell)
+        //if (decide_returnmany)
+
+        oCell.id='decide_optionno'
+        oCell.name='decide_optionno'
+        oCell.setAttribute('name','decide_optionno')
+        if (visibilityhidden) {
+            if (decide_returnmany)
+                optionno++
+            oCell.style.visibility = 'hidden'
+        }
+        else {
+            optionno++
+            oCell.setAttribute('decide_optionno',optionno)
+            oCell.innerHTML = optionno + "."
+        }
+
+        //add a check box or radio button column
+        var oCellx = document.createElement('td')
+        oRow.appendChild(oCellx)
+
+        var event_handler=undefined
+        if (decide_returnmany) {
+            oCellx.innerHTML = '<input ' + visibilityhidden + ' id="decide_selection" name="decide_selection" type="checkbox" />'
+            event_handler=decide_checkbox_select
+        }
+        else {
+            var checked = ''
+            if (!firstselection) {
+                if (!visibilityhidden) {
+                    checked = 'checked=true'
+                    firstselection = oCellx
+                }
+            }
+            //oCellx.innerHTML = '<input ' + checked + ' ' + visibilityhidden + ' id=decide_selection name=decide_selection type=radio onmousedown="decide_radio_onmousedown_sync(this)" />'
+            oCellx.innerHTML = '<input ' + checked + ' ' + visibilityhidden + ' id="decide_selection" name="decide_selection" type="radio" />'
+            event_handler=decide_radio_select
+        }
+
+        var oCellxInput=oCellx.getElementsByTagName('input')[0]
+        if (event_handler)
+            //oCellxInput.onclick=event_handler
+            oCellxInput.onmousedown=event_handler
+        //addeventlistener(oCellxInput,'click',event_handler)
+        oCellxInput.setAttribute('decide_optionno',optionno)
+
+        if (defaultreply && defaultreply.neosyslocate(returnvalue))
+            oCellx.firstChild.checked = true
+
+        oCellx.firstChild.setAttribute('decide_returnvalue',returnvalue)
+
+        var singlereturnvalue
+        if (returnvalue) {
+            if (typeof singlereturnvalue=='undefined')
+                singlereturnvalue=returnvalue
+            else
+                singlereturnvalue=false
+        }
+
+        //add a column to show the order of selections
+        if (decide_returnmany) {
+            var oCell = document.createElement('td')
+            oCell.setAttribute('name','decide_rank')
+            oCell.align = 'center'
+            oRow.appendChild(oCell)
+        }
+
+        //add the data columns for this row
+        for (coln = 0; coln < ncols; coln++) {
+            var oCell = document.createElement('td')
+            oRow.appendChild(oCell)
+
+            var colinfo = cols[coln]
+
+            if (decide_inverted) {
+                value = data[colinfo[0]][rown]
+            }
+            else {
+                value = data[rown][colinfo[0]]
+            }
+            if (typeof value == 'undefined')
+                value = ''
+            else if (typeof value == 'object')
+                value = value.text
+
+            //date conversion
+            if (colinfo[2] == 'DATE' && neosysnum(value))
+                value = DATE(value)
+
+            //time conversion
+            if (colinfo[2] == 'TIME' && neosysnum(value))
+                value = TIME(value)
+
+            //oCell.innerHTML=value
+            //use innerText otherwise things like <> in the data do not show
+            //oCell.innerText = value
+            //oCell.innerHTML = value.neosysconvert(vm+sm+tm,'   ')
+            value = value.replace(ALLFMre,'<br/>')
+            oCell.innerHTML = value
+
+            //align
+            if (colinfo[3])
+                oCell.align = colinfo[3]
+            else
+                oCell.align = 'left'
+
+            if (defaultreply) {
+                if (typeof decide_returncolid === '') {
+                    if (defaultreply.neosyslocate(rown + 1))
+                        oCellx.firstChild.checked = true
+                }
+                else {
+                    //returncolid was being treated as onscreen col preventing proper defaulting
+                    //if (value && coln === returncolid) {
+                    if (value && (colinfo[0] == decide_returncolid || Number(colinfo[0]) == decide_returncolid)) {
+                        if (defaultreply.neosyslocate(value))
+                            oCellx.firstChild.checked = true
+                    }
+                }
+            }
+
+        }
+
+        //table rows built
+
+        //table built
+
+    }
+
+    var okbutton= $$('decide_okbutton')
+    okbutton.onclick=decide_ok_onclick
+
+    var cancelbutton= $$('decide_cancelbutton')
+    cancelbutton.onclick=decide_cancel_onclick
+
+    //autoselect only one option
+    if (singlereturnvalue) {
+        if (decide_returnmany)
+            singlereturnvalue=[singlereturnvalue]
+        return singlereturnvalue
+    } else if (typeof singlereturnvalue=='undefined') {
+        alert('No data, no options available')
+        return false
+    }
+
+    //neosyssettimeout('neosysautofitwindow()', 10)
+
+    var selections = document.getElementsByName('decide_selection')
+
+    //focus on the first checked item or the first rown
+    for (var ii=0;ii<selections.length;++ii)
+        if (selections[ii].checked)
+            break
+    if (ii>=selections.length)
+        ii=0
+    //selections[ii].focus()
+    client_focuson(selections[ii])
+
+    addeventlistener(neosysconfirmdiv,'keydown',decide_document_onkeydown)
+    addeventlistener(neosysconfirmdiv,'keyup',decide_document_onkeyup)
+    addeventlistener(neosysconfirmdiv,'click',decide_document_onclick)
+    addeventlistener(neosysconfirmdiv,'dblclick',decide_document_ondblclick)
+    addeventlistener(neosysconfirmdiv,'mouseover',decide_document_onmouseover)
+    addeventlistener(neosysconfirmdiv,'mouseout',decide_document_onmouseout)
+
+    //returning undefined indicates that we need to yield and wait for decide_ok_onclick etc to resume
+    //returning false indicates some problem
+    //returning anything else indicates that there is only one option
+    return undefined
+
+    //remainder of functions is event handlers
+
+    function decide_all_onclick(event) {
+
+        selections = document.getElementsByName('decide_selection')
+        var truefalse = !selections[0].checked
+
+        //have to clear all existing ranking first
+        decide_all_clear()
+
+        var lastrank=0
+        if (truefalse) {
+            for (var ii = 0; ii < selections.length; ii++)
+                //selections[ii].checked = truefalse
+                lastrank=decide_checkbox_select(event,selections[ii],truefalse,ii,lastrank)
+        }
+    }
+
+    function decide_all_clear() {
+        selections = document.getElementsByName('decide_selection')
+        ranks = document.getElementsByName('decide_rank')
+        for (var ii = 0; ii < selections.length; ii++) {
+            var element=selections[ii]
+            element.checked=false
+            var rowtag=getancestor(element,'tr')
+            rowtag.style.fontWeight='normal'
+            ranks[ii].innerText=''
+        }
+    }
+
+    function decide_checkbox_selectone(element,checking,checkrown,ranks,lastrank) {
+
+        element.checked=checking
+
+        //var rowtag=getancestor(element,'tr')
+        rowtag=element.parentNode.parentNode
+        rowtag.style.fontWeight=checking?'bold':'normal'
+
+        if (checking) {
+            lastrank++
+            ranks[checkrown].innerText=lastrank
+        } else
+            ranks[checkrown].innerText=''
+
+        return lastrank
+    }
+
+    function decide_checkbox_select(event,element,checking,checkrown,lastrank) {
+
+        event=getevent(event)
+        if (!element)
+            element=event.target
+
+        //dont click on checkbox since mousedown will have already done the job
+        if (event.type=='click' && event.target.type=='checkbox')
+            return false
+
+        var doingall=true
+        if (typeof checkrown=='undefined') {
+            checking = !element.checked
+            doingall=false
+        }
+
+        if (typeof checking=='undefined')
+            checking = !element.checked
+
+        //find current rown and level
+        if (typeof checkrown=='undefined') {
+            var indentregex=/^[\. -]*/
+            var selection2 = document.getElementsByName('decide_selection')
+            var level
+            for (ii = 0; ii < selection2.length; ii++) {
+                if (selection2[ii] == element) {
+                    checkrown=ii
+                    level = selection2[ii].parentNode.nextSibling.nextSibling.innerText.match(indentregex)
+                    break
+                }
+            }
+        }
+
+        var ranks = document.getElementsByName('decide_rank')
+
+        //checking=determine lastrank unless provided
+        if (checking) {
+            //count selections
+            if (!doingall) {
+                lastrank=0
+                var checkupto=doingall?checkrown:ranks.length
+                for (var ii=0;ii<checkupto;++ii) {
+                    var rank=Number(ranks[ii].innerText)
+                    if (rank)
+                        lastrank++
+                }
+            }
+        }
+
+        //unchecking=reduce higher ranks
+        else {
+            var removerank=Number(ranks[checkrown].innerText)
+            for (var ii=0;ii<ranks.length;++ii) {
+                var rank=Number(ranks[ii].innerText)
+                if (rank>removerank)
+                    ranks[ii].innerText=rank-1
+            }
+        }
+
+        lastrank=decide_checkbox_selectone(element,checking,checkrown,ranks,lastrank)
+
+        //check/uncheck any following lower level rows
+        if (!doingall) {
+            for (ii = checkrown+1; ii < selection2.length; ii++) {
+                //quit once get back to the same level
+                if (selection2[ii].parentNode.nextSibling.nextSibling.innerText.match(indentregex) <= level)
+                    break
+                lastrank=decide_checkbox_selectone(selection2[ii],checking,ii,ranks,lastrank)
+                //lastrank=decide_checkbox_select(event,selection2[ii],checking,ii,lastrank)
+            }
+        }
+
+        //necessary to prevent unchecking by something unknown higher up
+        //event.cancelBubble=true
+        neosyscancelevent(event)
+
+        if (doingall)
+            return lastrank
+        else
+            return false
+    }
+
+    function decide_radio_select(event,element) {
+        event=getevent(event)
+        if (!element)
+            element=event.target
+        element.checked = true
+        decide_ok_onclick()
+        return neosyscancelevent(event)
+    }
+
+    function decide_document_onmouseover(event) {
+        return decide_document_onmouse(event,'over')
+    }
+
+    function decide_document_onmouseout(event) {
+        return decide_document_onmouse(event,'out')
+    }
+
+    function decide_document_onmouse(event,mode) {
+
+        event=getevent(event)
+        neosyscancelevent(event)
+
+        var trtag=getancestor(event.target,'tr')
+        if (!trtag)
+            return false
+        if (!trtag.getAttribute('decide_row'))
+            return false
+
+        var element=trtag.getElementsByTagName('input')[0]
+        if (!element)
+            return
+
+        if (mode=='over') {
+            trtag.setAttribute('mousesave',trtag.style.backgroundColor)
+            trtag.style.backgroundColor='lightgrey'
+        } else {
+            trtag.style.backgroundColor=trtag.getAttribute('mousesave')
+            trtag.removeAttribute('mousesave')
+        }
+
+        return
+    }
+
+    function decide_document_onclick(event,dblclick) {
+        event=getevent(event)
+
+        var trtag=getancestor(event.target,'tr')
+        var element
+        if (!trtag || !(element=trtag.getElementsByTagName('input')[0])) {
+                element=document.getElementsByName('decide_selection')[0]
+                client_focuson(element)
+                return
+        }
+
+        if (decide_returnmany)
+            decide_checkbox_select(event,element,dblclick)
+        else
+            decide_radio_select(event,element)
+
+        client_focuson(element)
+
+        return neosyscancelevent(event)
+    }
+
+    function decide_document_ondblclick(event) {
+        decide_document_onclick(event,true)
+        decide_ok_onclick()
+        return neosyscancelevent(event)
+    }
+
+    function decide_getreturnvalues(){
+
+        //NB returns row numbers 1 based not 0 based!
+        //0 means cancelled
+
+        var returnvalues = []
+        var selection2 = document.getElementsByName('decide_selection')
+        var ranks = document.getElementsByName('decide_rank')
+        for (ii = 0; ii < selection2.length; ii++) {
+            if (selection2[ii].checked) {
+                var returnvalue=selection2[ii].getAttribute('decide_returnvalue')
+                if (!decide_returnmany) {
+                    returnvalues = returnvalue
+                    break
+                }
+
+                if (returnvalue) {
+                    var rank=Number(ranks[ii].innerText)-1
+                    returnvalues[rank] = returnvalue
+                }
+            }
+        }
+
+        if (!returnvalues.length)
+            returnvalues=''
+
+        //remove empty array values
+        returnvalues=returnvalues.neosystrim('')
+
+        return returnvalues
+
+    }
+
+    function decide_ok_onclick() {
+
+        var returnvalues=decide_getreturnvalues()
+
+        //return neosyswindowclose(returnvalues)
+        neosys_resume(returnvalues,'decide_ok_onclick')
+
+    }
+
+    function decide_cancel_onclick() {
+        //return neosyswindowclose('')
+        neosys_resume('','decide_ok_onclick')
+    }
+
+    //purely to suppress any automatic checkbox ticking by the browser
+    //so we can control it in onkeydown
+    function decide_document_onkeyup(event) {
+        return neosyscancelevent(event)
+    }
+    function decide_document_onmouseup(event) {
+        return neosyscancelevent(event)
+    }
+
+    function decide_document_onkeydown(event) {
+
+        event=getevent(event)
+
+        if (typeof decide_returnmany == 'undefined')
+            decide_returnmany = ''
+
+        var keycode = event.keyCode
+
+        console.log('decide_document_onkeydown '+keycode)
+
+        //ctrl+Enter or single select
+        if (keycode == 13 && event.ctrlKey) {
+            decide_ok_onclick()
+            return neosyscancelevent(event)
+        }
+
+        //F9 is old save
+        if (keycode == 120) {
+            decide_ok_onclick()
+            return neosyscancelevent(event)
+        }
+
+        //Esc is cancel
+        if (keycode == 27) {
+            decide_cancel_onclick()
+            return neosyscancelevent(event)
+        }
+
+        //home goto top if scrollbar
+        if (keycode == 36) {
+            neosysconfirmdiv.scrollTop = 0
+            return neosyscancelevent(event)
+        }
+
+        //end goto bottom if scrollbar
+        if (keycode == 35) {
+            neosysconfirmdiv.scrollTop = neosysconfirmdiv.scrollHeight
+            return neosyscancelevent(event)
+        }
+
+        var selections = document.getElementsByName('decide_selection')
+        var options = document.getElementsByName('decide_optionno')
+
+        var element = event.target
+
+        //ctrl+enter and f9 is ok ... so is space if not !returnmany
+        if (keycode == 120 || (keycode == 13 && event.ctrlKey) || (keycode == 32 && !decide_returnmany)) {
+            decide_ok_onclick()
+            return neosyscancelevent(event)
+        }
+
+        //digits 0-9 select options 1-10
+        if (keycode >= 49 && keycode <= 57) {
+
+            var optionn = keycode - 48
+            if (optionn == 0)
+                optionn = 10
+            for (var rown=0;rown<options.length;++rown) {
+                if (options[rown].getAttribute('decide_optionno')==optionn) {
+                    if (!decide_returnmany || selections.length == 1) {
+                        //decide_ok_onclick()
+                        decide_radio_select(event,selections[rown])
+                        break
+                    }
+                    //selections[rown].checked = !selections[rown].checked
+                    //break;
+                    var element=selections[rown]
+                    decide_checkbox_select(event,element)
+                    client_focuson(element)
+                    break
+                }
+            }
+            return neosyscancelevent(event)
+        }
+
+        //enter or space - check or clear a checkbox and move down (or up if shift)
+        if (decide_returnmany && (keycode == 32 || keycode == 13) ) {
+            decide_checkbox_select(event)
+            if (event.shiftKey)
+                keycode=38//fake up
+            else
+                keycode=40//fake down
+        }
+
+        var n
+        if (element.rowIndex)
+            n = element.rowIndex
+        else if (element.parentNode && element.parentNode.rowIndex)
+            n = element.parentNode.rowIndex
+        else if (element.parentNode && element.parentNode.parentNode && element.parentNode.parentNode.rowIndex)
+            n = element.parentNode.parentNode.rowIndex
+        else
+            return
+
+        n -= 1
+
+        //pgup 33/pgdn 34/down 40/up 38/tab 9/backspace 8 keys
+        if (keycode == 33 || keycode == 34 || keycode == 40 || keycode == 38 || keycode == 9 || keycode==8) {
+
+            var direction
+            if (keycode == 34 || keycode == 40 || (keycode == 9 && !event.shiftKey)) direction = 1
+            if (keycode == 33 || keycode == 38 || (keycode == 9 && event.shiftKey || keycode == 8)) direction = -1
+            //pgdn
+            if (keycode == 34) {
+                if (event.ctrlKey) {
+                    n = selections.length - 1
+                }
+                else {
+                    if (n == (selections.length - 1))
+                        n = 0
+                    else {
+                        n += 10
+                        if (n >= (selections.length - 1))
+                            n = selections.length - 1
+                    }
+                }
+                n--
+            }
+            //pgup
+            if (keycode == 33) {
+                if (event.ctrlKey) {
+                    n = 0
+                }
+                else {
+                    if (n == 0)
+                        n = selections.length - 1
+                    else {
+                        n -= 10
+                        if (n <= 0)
+                            n = 0
+                    }
+                }
+                n++
+            }
+            var newelement = element
+            while (true) {
+
+                n += direction
+                if (n < 0) n = selections.length - 1
+                if (n >= selections.length) n = 0
+
+                newelement = selections[n]
+
+                //skip if no other suitable elements
+                if (newelement == element)
+                    return
+
+                //skip if not visible
+                if (!newelement)
+                    return false//may not be on an element
+                if (newelement.style.visibility == 'hidden')
+                    continue
+
+                //scroll to the top or bottom if on the first or last option
+                var newoptionno=newelement.getAttribute('decide_optionno')
+                if (n == 0||newoptionno==1)
+                    neosysconfirmdiv.scrollTop = 0
+                else if (n == (selections.length - 1))
+                    neosysconfirmdiv.scrollTop = neosysconfirmdiv.scrollHeight
+                break
+
+            }
+
+            newelement.focus()
+            newelement.select()
+
+            if (keycode == 8 && decide_returnmany) {
+                    decide_checkbox_select(event,newelement)
+                    return neosyscancelevent(event)
+            }
+
+            //select new radio button if pressing up/down (but not pgup/pgdn so they can scan multi-page options without changing the currently selected option)
+            if (!decide_returnmany && keycode != 33 && keycode != 34)
+                    newelement.checked = true
+
+            return neosyscancelevent(event)
+
+        }
+
+        //all following refers to many selections
+        if (!decide_returnmany) {
+            if (keycode == 13) {
+                decide_ok_onclick()
+                return neosyscancelevent(event)
+            }
+            return
+        }
+
+        //A=all or none
+        if (keycode == 65) {
+            decide_all_onclick()
+            return neosyscancelevent(event)
+        }
+
+        //del or F8 none/delete
+        if (keycode == 46 || keycode == 119) {
+            decide_all_clear()
+            return neosyscancelevent(event)
+        }
+
+    }
+
+} //of decide_onload()
+
+var gsorttable2offset=1//decide
+//var gsorttable2offset=0//decide2
+function decide_sorttable2(event) {
+
+ //locate the current element
+ event=getevent(event)
+
+ var th=event.target
+ if (th.tagName!="TH")
+    return(0)
+
+ var tableelement=th.parentElement.parentElement.parentElement
+ var tablerows=tableelement.tBodies[0].getElementsByTagName('tr')
+ var coln=th.cellIndex+gsorttable2offset
+
+ var reverse=event.target.getAttribute('sorttable2_issorted')
+ event.target.setAttribute('sorttable2_issorted',reverse?'':1)
+
+ var rown=th.parentElement.rowIndex
+ var nrows=tablerows.length
+ fromrown=0
+ uptorown=nrows-1
+
+ if (gdateformat == 'M/d/yyyy')
+  var dateformat=[2,0,1]
+ else if (gdateformat == 'yyyy/M/d')
+  var dateformat=[0,1,2]
+ else //gdateformat = 'd/M/yyyy'
+  var dateformat=[2,1,0]
+ var yy=dateformat[0]+1
+ var mm=dateformat[1]+1
+ var dd=dateformat[2]+1
+
+ var sortdata=[]
+ var dateregex=/ ?(\d{4}|\d{1,2})\/ ?(\d{1,2})\/(\d{4}|\d{2})/
+ var periodregex=/ ?(\d{1,2})\/(\d{4})/g
+ for (var ii=fromrown;ii<=uptorown;++ii){
+  var cell=tablerows[ii].cells[coln]
+  var value=(cell.textContent||cell.innerText||"").toUpperCase()
+  var match
+  while(match=value.match(dateregex)) {
+   //convert dates like n/n/yy or n/n/yyyy to sortable yyyy|mm|dd format
+   value=value.replace(dateregex,('0000'+match[yy]).slice(-4)+'|'+('00'+match[mm]).slice(-2)+'|'+('00'+match[dd]).slice(-2))
+   //console.log(value)
+  }
+
+  value=value.replace(periodregex,'$2|$1')
+
+  //natural sort
+  value=value.replace(/[-+]?[1234567890.,]+/g,function(x){if (x.slice(0,1)=='-') {y='-';x=x.slice(1)} else y='';return y+('0000000000000000000000'+x).slice(-20)})
+  //value+=('000000000000'+ii).slice(-10)//stable sort
+  //cell.setAttribute('sortvalue',value)
+  sortdata.push([value,ii])
+ }
+
+ sortdata.sort(function (a,b){if (a[0]<b[0]) return -1;if (a[0]>b[0]) return 1;return a[1]-b[1]})
+ if (reverse)
+  sortdata.reverse()
+
+ //get an array of the tablerows
+ var oldrows = []
+ for (var oldrown = 0; oldrown < tablerows.length; oldrown++)
+  oldrows[oldrown] = tablerows[oldrown]
+
+ //reorder table rows
+ var newdatarows = []
+ for (var newrown = 0; newrown < sortdata.length; ++newrown) {
+  var oldrown = sortdata[newrown][1]
+  if (newrown != oldrown)
+   tablerows[newrown].swapNode(oldrows[oldrown])
+ }
+
+}//decide_sorttable2
+
+//these functions should be removed after a while if never called
+function login(){
+    if (gusername&&gusername=='NEOSYS')
+        alert(login.caller.name+' called login')
+}
+function log(){
+    //if (gusername&&gusername=='NEOSYS')
+    //    alert(log.caller.name+' called log')
+}
+function logout(){
+    if (gusername&&gusername=='NEOSYS')
+        alert(logout.caller.name+' called logout')
+}
+
+function setdateformat() {
+
+    gfirstdayofweek = neosysgetcookie2('fd')
+    if (!gfirstdayofweek) gfirstdayofweek = 1
+    gfirstdayofweek = Number(gfirstdayofweek)
+
+    var dateformat = neosysgetcookie2('df')
+    //international and default
+    if (!dateformat || dateformat.slice(0, 2) == '31') {
+        gdatedaypos = 0
+        gdatemonthpos = 1
+        gdateyearpos = 2
+        gdateformat = 'd/M/yyyy'
+    //american
+    } else if (dateformat.slice(0, 2) == '01') {
+        gdatedaypos = 1
+        gdatemonthpos = 0
+        gdateyearpos = 2
+        gdateformat = 'M/d/yyyy'
+    }
+    //modern sortable date
+    else {
+        gdatedaypos = 2
+        gdatemonthpos = 1
+        gdateyearpos = 0
+        gdateformat = 'yyyy/M/d'
+    }
+    //console.log('setdateformat() '+gfirstdayofweek)
+    return
+}
+
+function DATE(mode, value, params) {
+
+    //gmsg='e.g. 31, 31/1, 31/1/01 or 31/1/2001'
+
+    //can handle an array of values
+    if (typeof value == 'object')
+        return neosysconvarray(DATE, mode, value, params)
+
+    //not == which would disallow 0 which is 31/12/1967
+    if (value === '')
+        return ''
+
+    if (typeof value == 'undefined') {
+        value=mode
+        mode='OCONV'
+    }
+
+    var result
+    var result2
+
+    //input conversion
+    if (mode == 'ICONV') {
+
+        //four digits are assumed to be in ddmm or mmdd format
+        if (value.match(/^\d{4}$/))
+            value = value.substr(0, 2) + '/' + value.substr(2, 2)
+
+        //five digits are assumed to be already in internal format
+        if (value.match(/^\d{5}$/))
+            return value
+
+        //six/eight digits are assumed to be in DDMMYY/MMDDYY/DDMMYYYY/MMDDYYYY format
+        if (value.match(/^(\d{6})|(\d{8})$/))
+            value = value.substr(0, 2) + '/' + value.substr(2, 2) + '/' + value.substr(4)
+
+        //assume in the format 31x1x2000
+        value = value.replace(/\W/g, ' ').split(' ').slice(0, 3)
+
+        //check day is one or two digits and force to three values (blanks if necessary)
+        if (value.length == 1) {
+            value[gdatedaypos] = value[0]
+            value[gdatemonthpos] = ''
+            value[gdateyearpos] = ''
+        }
+        else if (value.length == 2)
+            value[2] = ''
+
+        //default params
+        if (typeof params == 'undefined') params = ''
+
+        //option to not iconv (re
+        //if (params=='NOICONV')
+        //{
+        // if (value.length==1)
+        // return value[0]
+        //}
+
+        var fromto = ''
+        if (params.indexOf('=') + 1) {
+            params = params.split('=')
+            fromto = params[0]
+            var otherdateid = params[1]
+            //otherdate = yield* gds.getx(otherdateid,grecn)
+            //otherdate = getvalue(otherdateid,grecn)
+            //direct access to gds.data to get the internal date (getvalue gets the external format)
+            //should NOT be accessing gds directly but cannot use yielding .getx from non-yielding oconv/iconv
+            //TODO doesnt handle other dates in rows very well
+            var otherdate = gds.data[otherdateid]
+            if (!otherdate)
+                otherdate=gds.data['group'+ggroupno][grecn][otherdateid]
+            otherdate = otherdate.text
+            if (typeof otherdate == 'object')
+                otherdate = otherdate[0]
+
+            //params=otherdate.neosysoconv('[DATE]').neosysfield('/',2,2)
+            //get month/year
+            params = otherdate.neosysoconv('[DATE,MONTH]') + '/' + otherdate.neosysoconv('[DATE,YEAR]')
+
+        }
+
+        //split the params
+        params = params.replace(/\//g, ' ').split(' ')
+
+        //default to month parameter
+        //if (!value[1]&&!!params[0]) value[1]=params[0]
+        if (!value[gdatemonthpos] && !!params[0])
+            value[gdatemonthpos] = params[0]
+
+        //otherwise default to current month
+        if (!value[gdatemonthpos])
+            value[gdatemonthpos] = new Date().getMonth() + 1
+
+        //convert month names to month numbers
+        var monthno = parseInt(value[gdatemonthpos], 10)
+        if (isNaN(monthno)) {
+            var mthname = value[gdatemonthpos].toUpperCase()
+            var mthnamelen = mthname.length
+            for (var ii = 0; ii < 12; ++ii) {
+                if (gmonthnames[ii].slice(0, mthnamelen).toUpperCase() == mthname) {
+                    monthno = ii + 1
+                    value[gdatemonthpos] = monthno
+                    break
+                }
+            }
+        }
+
+        //default to year parameter
+        if (!value[gdateyearpos] && !!params[1])
+            value[gdateyearpos] = params[1]
+
+        //otherwise default to current year
+        if (value[gdateyearpos])
+            value[gdateyearpos] = ADDCENT(value[gdateyearpos])
+        else
+            value[gdateyearpos] = new Date().getFullYear()
+
+        //check integers
+        if (isNaN(parseInt(value[gdatedaypos], 10)) || isNaN(monthno) || isNaN(parseInt(value[gdateyearpos], 10))) {
+            gmsg = invaliddatemsg()
+            return null
+        }
+
+        //check day is one or two digits
+        if (!value[gdatedaypos].match(/^\d{1,2}$/)) {
+            gmsg = invaliddatemsg()
+            return null
+        }
+
+        /* convert to ms date
+        //try to convert to internal date format
+        result=new Date(value[2],value[1]-1,value[0])
+        if (isNaN(result)) {
+
+        gmsg=invaliddatemsg()
+        return null
+        }
+        */
+
+        //convert dates from MS base to base zero=31/12/67
+        result = (Date.UTC(value[gdateyearpos], value[gdatemonthpos] - 1, value[gdatedaypos]) - Date.UTC(1967, 11, 31)) / 24 / 60 / 60 / 1000
+
+        //prevent 6 digit years ie ge 15 oct 2241
+        //causes problem with -10000
+        //if (result.toString().length > 5) {
+        //    gmsg = invaliddatemsg()
+        //    return null
+        //}
+
+        //limit 1/1/1900 to 31/12/2099
+        if (result<-24835 || result>48213) {
+            gmsg = invaliddatemsg()
+            return null
+        }
+
+        //check that the oconv matches the iconv
+        //the above algorithm allows dom <=99 and is calculated into next months
+        result2 = DATE('OCONV', result).split('/')
+        if (parseInt(result2[gdatedaypos], 10) != parseInt(value[gdatedaypos], 10) || parseInt(result2[gdatemonthpos], 10) != parseInt(value[gdatemonthpos], 10)) {
+            gmsg = invaliddatemsg()
+            return null
+        }
+
+        //check versus/amend other date
+
+        if (fromto) {
+
+            var otherdate0 = otherdate
+
+            //<= >= and !== allow for date 0 31/12/1967
+
+            //prevent todate less than fromdate
+            if (fromto == 'TO' && result >= otherdate)
+                otherdate = result
+            if (fromto == 'FROM' && result <= otherdate)
+                otherdate = result
+
+            //if change fromdate and todate blank or same as from goldvalue
+            if (fromto == 'UPTO' && (otherdate == '' || otherdate == goldvalue))
+                otherdate = result
+
+            //update the otherdate
+            if (otherdate !== otherdate0) {
+
+                //cant call async gds.setx while oconv is not async so do it by timeout
+                //cant call setvalue either since that only updates the screen and not gds
+                //yield* gds.setx(otherdateid, grecn, otherdate)
+                neosyssettimeout('yield* gds.setx("'+otherdateid+'", '+grecn+', '+otherdate+')',1)
+            }
+
+        }
+    }
+
+    //output conversion
+    else {
+
+        //  if (value=='"') alert(value)
+        //if not digits then return unconverted
+        if (typeof value == 'string' && !value.match(/^\d*$/))
+            return value
+        //  if (value=='"') alert('x'+value)
+
+        /* convert to ms date
+        value=new Date(value)
+        if (isNaN(value)) {
+
+        gmsg=invaliddatemsg()
+        return null
+        }
+        //zzz should format it with params?
+        result=value.getDate()+'/'+(value.getMonth()+1)+'/'+value.getFullYear()
+        */
+
+        //convert from 1=1/1/67 to text DD/MM/YYYY format
+        //result=new Date(1967,11,31+parseInt(value,10))
+        result = new Date
+        result.setTime(Date.UTC(1967, 11, 31 + parseInt(value, 10)))
+
+        switch (params) {
+            case 'DOW': {
+
+                    result = ((value - 1) % 7) + 1
+                    break
+                }
+            case 'DAYNAME': {
+
+                    result = ((value - 1) % 7) + 1
+                    result = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][result - 1]
+                    break
+                }
+            case 'DAYNAME3': {
+
+                    result = ((value - 1) % 7) + 1
+                    result = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][result - 1]
+                    break
+                }
+            case 'DOM': {
+
+                    result = result.getUTCDate()
+                    break
+                }
+            case 'MONTH': {
+
+                    result = result.getUTCMonth() + 1
+                    break
+                }
+            case 'DOM2': {
+
+                    result = ('0'+result.getUTCDate()).slice(-2)
+                    break
+                }
+            case 'MONTH2': {
+
+                    result = ('0'+(result.getUTCMonth() + 1)).slice(-2)
+                    break
+                }
+            case 'YEAR': {
+
+                    result = result.getUTCFullYear()
+                    break
+                }
+            case 'YEAR2': {
+
+                    result = parseInt(result.getUTCFullYear().toString().slice(-2), 10)
+                    break
+                }
+            case 'PERIOD': {
+
+                    //returns the current month/current year eg 1/2000
+                    result = (result.getUTCMonth() + 1) + '/' + result.getUTCFullYear()
+                    break
+                }
+            case 'PERIOD2': {
+
+                    //returns the current month/current year eg 1/00
+                    result = (result.getUTCMonth() + 1) + '/' + result.getUTCFullYear().toString().slice(-2)
+                    break
+                }
+            case 'YEARPERIOD': {
+
+                    //returns the current current year.current month eg 2001.01
+                    result = result.getUTCFullYear() + '.' + ('00' + (result.getUTCMonth() + 1)).slice(-2)
+                    break
+                }
+            case 'MINIMAL': {
+
+                    result2 = []
+                    result2[gdatedaypos] = result.getUTCDate()
+                    result2[gdatemonthpos] = result.getUTCMonth() + 1
+                    result2[gdateyearpos] = result.getUTCFullYear()
+                    result = result2
+
+                    //trim same year and month
+                    var curryear = (new Date().getFullYear()).toString()
+                    if (result[gdateyearpos] == curryear) {
+                        result[gdateyearpos] = ''
+                        var currmonth = (new Date().getMonth() + 1).toString()
+                        if (result[gdatemonthpos] == currmonth) {
+                            result[gdatemonthpos] = ''
+                        }
+                    }
+                    result = result.neosysjoin('/').neosystrim('/')
+
+                    //add day of week
+                    var dow = ((value - 1) % 7) + 1
+                    result = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][dow - 1] + ' ' + result
+
+                    break
+                }
+            default: {
+
+                    result2 = []
+                    result2[gdatedaypos] = result.getUTCDate()
+                    result2[gdatemonthpos] = result.getUTCMonth() + 1
+                    result2[gdateyearpos] = result.getUTCFullYear()
+                    result = result2.join('/')
+                }
+        }
+
+    }
+
+    return result
+
+}
+
+function TIME(mode, value, params) {
+
+    gmsg = 'e.g. 12:45, 1245 12.75, 00:00, 23:59, 11:59:59, 24:00, 25:00 etc.'
+
+    var result
+
+    //can handle an array of values
+    if (typeof value == 'object')
+        return neosysconvarray(TIME, mode, value, params)
+    /*
+    //can handle an array of values
+    if (typeof(value)=='object') {
+
+    result=[]
+    for (var i=0;i<value.length;i++) {
+
+    result[i]=TIME(mode,value[i],params)
+
+    //if any conversion fails return complete failure
+    if (result[i]==null) return null
+
+    }
+    return result
+    }
+    */
+
+    //blank in .. blank out
+    if (value == '')
+      return ''
+
+    if (typeof value == 'undefined') {
+        value=mode
+        mode='OCONV'
+    }
+
+    if (mode == 'OCONV') {
+
+        //times by themselves for now are considered to be "local time" of data entry person tz could be added info
+        //DATE_TIME uses gtz
+        //value=Number(value)+gtz[0]
+
+        //also in decide.htm
+        var secs = value % 60
+        value -= secs
+        var mins = (value / 60) % 60
+        value -= 60 * mins
+        //var hours=(value/60/60)%24
+        //allow 24:00 and 25:00 etc
+        var hours = (value / 60 / 60)
+        result = ('0' + hours).slice(-2) + ':' + ('0' + mins).slice(-2)
+//        if (params.indexOf('S'))
+//         result+= ':' + ('0' + secs).slice(-2)
+
+        //result+=':'+('0'+secs).slice(-2)
+    }
+    else {
+
+        //format must be HH:MM or HH:MM:SS (":" may also be space or missing)
+        var temp = value
+        if (temp.match(/^\d{4}$/))
+            temp = temp.substr(0, 2) + ':' + temp.substr(2, 2)
+        if (temp.match(/^\d{6}$/))
+            temp = temp.substr(0, 2) + ':' + temp.substr(2, 2) + ':' + temp.substr(4, 2)
+        temp = temp.neosysconvert('. ', '::').split(':')
+        if (!temp[1]) temp[1] = '00'
+        if (!temp.join(':').match(/(^\d{1,2}:\d{1,2}$)|(^\d{1,2}:\d{1,2}:\d{1,2}$)/)) return null
+
+        //if (!temp[1]) temp[1]=0
+        if (!temp[2]) temp[2] = 0
+        temp[0] = +temp[0]
+        temp[1] = +temp[1]
+        temp[2] = +temp[2]
+        //if (temp[0]>23) return null
+        //allow up to two days eg 47:59
+        if (temp[0] > 47) return null
+        if (temp[1] > 59) return null
+        if (temp[2] > 59) return null
+
+        result = temp[0] * 60 * 60 + temp[1] * 60 + temp[2]
+        //times by themselves for now are considered to be "local time" of data entry person tz could be added info
+        //DATE_TIME uses gtz
+        //result-=gtz[0]
+
+    }
+
+    return result
+
+}
+
+function DATE_TIME(mode, value, params) {
+    if (value == '') return ''
+    if (mode == 'OCONV') {
+        if (!params) params = ''
+        params = (params + '!').split('!')
+        value = value.toString().split('.')
+        var datebit = Number(value[0])
+        var timebit
+        if (value.length < 1)
+            timebit = ''
+        else {
+            timebit = Number(value[1]) + gtz[0]
+            //assume -86400<gtz[0]<86400
+            if (timebit < 0) {
+                datebit -= 1
+                timebit += 86400
+            }
+            else if (timebit > 86400) {
+                datebit -= 1
+                timebit += 86400
+            }
+        }
+        return datebit.neosysoconv('[DATE,' + params[0] + ']') + ' ' + timebit.neosysoconv('[TIME,' + params[1] + ']')
+    }
+    else {
+        //iconv not implemented yet
+        return value
+    }
+
+}
+
+function PERIOD_OF_TIME(mode, value, params) {
+
+    if (value == '')
+        return ''
+
+    var result
+
+    //can handle an array of values
+    if (typeof value == 'object')
+        return neosysconvarray(PERIOD_OF_TIME, mode, value, params)
+    /*
+    //can handle an array of values
+    if (typeof(value)=='object') {
+
+    result=[]
+    for (var i=0;i<value.length;i++) {
+
+    result[i]=PERIOD_OF_TIME(mode,value[i],params)
+
+    //if any conversion fails return complete failure
+    if (result[i]==null) return null
+
+    }
+    return result
+    }
+    */
+
+    if (mode == 'ICONV') {
+
+        //if already numeric then simply return it
+        if (neosysnum(value)) return value
+
+        //allow slash, dash, space and comma as well as ":" for separator
+        value = value.neosysconvert('/- ,', '::::')
+
+        value = value.split(':')
+        if (value.length < 2) value[1] = 0
+
+        hours = value[0]
+        mins = value[1]
+
+        //check numeric otherwise return undefined
+        if (!(neosysnum(hours) || !neosysnum(mins))) {
+            return null
+        }
+
+        result = +hours + (+mins) / 60
+
+    }
+    else {
+
+        if (!(neosysnum(value))) {
+            //out=''
+            //status()=2
+            return null
+        }
+
+        //nothing in nothing out
+        if (value == '') return ''
+
+        value = value.toString()
+        value = value.split('.')
+        if (value[0] == '') value[0] = '0'
+        if (value.length < 2) value[1] = '0'
+
+        var result = value[0] + ':'
+        temp = value[1]
+        if (temp) temp = parseFloat('.' + temp)
+        temp = neosysround(temp * 60, 0)
+        temp = '00' + temp
+        result += temp.slice(temp.length - 2)
+
+    }
+
+    return result
+
+}
+
+var gclient_focuson_element
+function client_focuson(element) {
+    gclient_focuson_element=element
+    window.setTimeout(client_focuson2,1)
+}
+
+function client_focuson2(element) {
+    if (gclient_focuson_element&&gclient_focuson_element.focus) {
+        gclient_focuson_element.focus()
+        gclient_focuson_element=undefined
+    }
+}
+
+function logevent(msg){
+    if (!console)
+        return
+    if (glogevents)
+        console.log(msg)
+}
+
+//end of client.js

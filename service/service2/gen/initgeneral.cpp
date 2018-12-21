@@ -16,7 +16,7 @@ libraryinit()
 #include <addcent.h>
 
 #include <gen.h>
-#include <fin.h>
+//#include <fin.h>
 
 var logtime;
 var neosysid;
@@ -52,8 +52,8 @@ function main() {
 
 	call log2("-----initgeneral init", logtime);
 
-	//CREATE LABELLED COMMON
-		mv.labelledcommon[2]=new gen_common;
+	//CREATE LABELLED COMMON gen
+	mv.labelledcommon[2]=new gen_common;
 	//TODO iscommon always true?!
 	if (not iscommon(gen)) {
 		if (not iscommon(gen)) {
@@ -61,12 +61,13 @@ function main() {
 		}
 	}
 
+	//CREATE LABELED COMMON fin
 	//unfortunately general needs finance for now until some finance commons
 	//get moved into general common (and this moved into initacc)
-	mv.labelledcommon[3]=new fin_common;
-	if (not iscommon(fin)) {
-		var().stop("fin common is not initialised in " ^ thisname);
-	}
+	//mv.labelledcommon[3]=new fin_common;
+	//if (not iscommon(fin)) {
+	//	var().stop("fin common is not initialised in " ^ thisname);
+	//}
 
 /*
 gen.gcurrcompany="";
@@ -841,10 +842,10 @@ getproxy:
 	gen.glang = "";
 
 	call log2("*check for finance module", logtime);
-	if (xx.open("ACCOUNTS")) {
+	//if (xx.open("ACCOUNTS")) {
 		call log2("*initialise finance module - initacc", logtime);
 		call initacc();
-	}
+	//}
 
 	call log2("*check for agency module", logtime);
 	if (xx.open("JOBS")) {
@@ -861,7 +862,7 @@ getproxy:
 	call initcompany(gen.gcurrcompany);
 
 	//is this needed?
-	fin.currcompanycodes = gen.gcurrcompany;
+	//fin.currcompanycodes = gen.gcurrcompany;
 	//main company code
 	SYSTEM.r(37, gen.gcurrcompany);
 

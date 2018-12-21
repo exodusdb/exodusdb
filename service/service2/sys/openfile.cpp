@@ -17,7 +17,7 @@ function main(in filename, io file, in similarfilename="") {
 
 		//option to create file if it does not exist
 		var tt="";
-		if (tt.open(similarfilename)) {
+		if (similarfilename == filename or tt.open(similarfilename)) {
 			var().createfile(filename);
 		}
 	}

@@ -9,3 +9,54 @@ chown www-data:www-data -R /var/www/html/data
 cp ~/exodus/exodus.conf /etc/apache2/sites-available
 a2ensite exodus
 service apache2 restart
+
+
+#compile server
+cd ~/exodus/service/service2
+. config
+cd sys
+compile ../???/*.cpp
+
+#start server
+~/bin/server /var/www/html/
+
+######################
+#debugging server side
+######################
+
+https://jvns.ca/blog/2018/04/28/debugging-a-segfault-on-linux/
+
+#debugging server with gdb
+gdb ~/bin/server
+r/var/www/html/
+
+#debugging segfaults without running under gdb
+
+#core dump to /tmp
+sysctl -w kernel.core_pattern=/tmp/core-%e.%p.%h.%t
+sysctl kernel.core_pattern
+
+#ensure max.core.file.size unlimited
+ulimit -c unlimited
+cat /proc/$$/limits
+
+#cause the seg fault
+~/bin/server /var/www/html/
+
+#core dump will appear somewhere in /tmp
+gdb -c /tmp/tmp/core-server.17224.exodus.neosys.com.1545394890
+
+#load the symbol tables
+symbol-file ~/bin/server
+sharedlibrary
+
+#backtrace
+bt
+
+#backtrace multithreaded
+thread apply all bt full
+
+
+#building exodus library in debug mode
+cmake -DCMAKE_BUILD_TYPE=Debug .
+make

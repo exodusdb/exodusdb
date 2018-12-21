@@ -447,7 +447,7 @@ function main()
 		}
 		//get file text
 		if (verbose)
-			print("sourcefilename:");
+			print("sourcefilename=");
 		printl(srcfilename);
 		if (not text and not text.osread(srcfilename, "utf8")) {
 			if (osfile(srcfilename)) {
@@ -464,7 +464,7 @@ function main()
 			or index(text,"int main(")
 			or index(text, "program()");
 		if (verbose)
-			isprogram.outputl("Is Program:");
+			printl("Type=",isprogram?"Program":"Subroutine");
 		var outputdir;
 		var compileoptions;
 		var binfilename=filebase;
@@ -733,12 +733,12 @@ var inclusion=
 #endif
 
 		if (verbose) {
-			binfileextension.outputl("Bin file extension");
-			objfileextension.outputl("Obj file extension");
-			binfilename.outputl("Binary file:");
-			objfilename.outputl("Object file:");
-			outputdir.outputl("Output directory:");
-			compileoptions.outputl("Compile options:");
+			binfileextension.outputl("Bin file extension=");
+			objfileextension.outputl("Obj file extension=");
+			binfilename.outputl("Binary file=");
+			objfilename.outputl("Object file=");
+			outputdir.outputl("Output directory=");
+			compileoptions.outputl("Compile options=");
 		}
 
 		//record the current bin file update timestamp so we can 
@@ -826,17 +826,18 @@ var inclusion=
 
 				//How to: Embed a Manifest Inside a C/C++ Application
 				//http://msdn.microsoft.com/en-us/library/ms235591%28VS.80%29.aspx
-				//mt.exe �manifest MyApp.exe.manifest -outputresource:MyApp.exe;1
-				//mt.exe �manifest MyLibrary.dll.manifest -outputresource:MyLibrary.dll;2
+				//mt.exe manifest MyApp.exe.manifest -outputresource:MyApp.exe;1
+				//mt.exe manifest MyLibrary.dll.manifest -outputresource:MyLibrary.dll;2
 				if (SLASH_IS_BACKSLASH and PLATFORM_ ne "x64") {
 					var cmd="mt.exe";
-					if (not verbose)
+					if (not verbose) {
 						cmd^=" -nologo";
 						cmd^=" -manifest "^objfilename^".manifest";
 						cmd^=" -outputresource:"^objfilename^";"^(isprogram?"1":"2");
 						cmd^=" 1> nul >2 nul";
 						if (osshell(cmd)==0)
 							osdelete(objfilename^".manifest");
+					}
 				}
 
 				//copy the obj file to the output directory
