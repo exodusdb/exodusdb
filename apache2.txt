@@ -1,0 +1,11 @@
+apt install apache2 php and various other php packages
+
+cp -a ~/exodus/www /var/www/html/exodus
+
+mkdir -p /var/www/html/data/exodus
+echo "xyz Exodus,exodus" > /var/www/html/data
+chown www-data:www-data -R /var/www/html/data
+
+cp ~/exodus/exodus.conf /etc/apache2/sites-available
+a2ensite exodus
+service apache2 restart

@@ -5,10 +5,15 @@
 	//php.ini
 	//display_errors = off
 
+//debugging
+
 	//debug in php like this
+	//change $debugging to true
 	//tail -f /var/log/apache2/error.log
 	//also .2 and .3 files are left in interface directory if debugging
-	$debugging = false;//true;
+
+	$debugging = false;
+	//$debugging = true;
 
 //constants
 
@@ -71,14 +76,16 @@
 		$https = $_SERVER['HTTPS'];
 	else
 		$https="";
-		
+
 //request
 
 	//client delivers a request in xml format
-	$xml = simplexml_load_string($HTTP_RAW_POST_DATA);
+	//$xml = simplexml_load_string($HTTP_RAW_POST_DATA);
+	$raw_xml=file_get_contents("php://input");
+debug("POST   ---> ".$raw_xml);
 
-	//debug("POST   ---> ".$HTTP_RAW_POST_DATA);
-	debug("REQUEST :".$xml->request);
+	$xml = simplexml_load_string($raw_xml);
+debug("REQUEST :".$xml->request);
 	if ($xml->token)
 		debug("TOKEN   :".$xml->token);
 	if ($xml->database)
@@ -251,7 +258,7 @@
 			chmod($linkfilename . '.2', 0775);
 		}
 
-		//more info in request			
+		//more info in request
 		if (!$remoteaddr)
 			$remoteaddr = '';
 		if (!$remotehost)
@@ -361,7 +368,7 @@
 
 //result
 
-	if (explode(' ',$response)[0] == 'OK') 
+	if (explode(' ',$response)[0] == 'OK')
 		$result = 1;
 	else
 		$result = 0;
@@ -473,27 +480,40 @@ debug("volfilename:".$volfilename);
 		$response="Vol file is empty or cannot be read $volfilename";
 		return "";
 	}
-debug("getdatabases:".$databases);
+	debug("getdatabases text:".$databases);
+
 	//convert text format to mv format
-	$databases=str_replace("\n",$fm,$databases);
-	$databases=str_replace("\r",$fm,$databases);
-	$databases=str_replace('*',$vm,$databases);
-	$databases=str_replace(',',$sm,$databases);
+	//$databases=str_replace("\n",$fm,$databases);
+	//$databases=str_replace("\r",$linesep,$databases);
+	//$databases=str_replace('*',$vm,$databases);
+	//$databases=str_replace(',',$sm,$databases);
+	//debug("getdatabases list:".$databases);
+
+	$linesep="\n";
+	$dbsep='*';
+	$dbnamecodesep=",";
+
+	$databases=str_replace("\r",$linesep,$databases);
 
 	//the first line contains the pairs of dbname sm dbcode vm ...
-	//$databases = explode($fm,$databases)[0];
-	$databases = explode($fm,$databases)[0];
-	//$databases=explode($vm,$databases);
-	$databases=explode($vm,$databases);
+	$databases = explode($linesep,$databases)[0];
 
+	//first word of first line is an unwanted code
+	$databases = join(" ",array_slice(explode(" ",$databases),1));
+
+	//split the databases into an array
+	$databases=explode($dbsep,$databases);
+	//debug("getdatabases list1:".$databases);
+
+	//split the array into an xml list of db name and code
 	$xmltext = "<records>\r";
 	foreach ($databases as $database) {
 		//$database=explode($sm,$database.$sm);
-		$database=explode($sm,$database.$sm);
+		$database=explode($dbnamecodesep,$database.$dbnamecodesep);
 		$databasename=$database[0];
 		$databasecode=$database[1];
 
-		//skip databases that dont exist
+		//skip databases that dont exist. requests will be written there
 		if (!is_dir($datalocation . '/' . $databasecode))
 			continue;
 
