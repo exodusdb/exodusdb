@@ -1,6 +1,9 @@
 message("")
 message("--LIBEXODUS CMAKE INIT --")
 
+#works using c++14 default on Ubuntu 18.04 so no need for this
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+
 cmake_minimum_required(VERSION 2.8)
 
 #2014/06/01 exodus doesnt require c++11 but can compile using it
@@ -59,7 +62,7 @@ include_directories(. .. ${PostgreSQL_INCLUDE_DIRS} ${PostgreSQL_INCLUDE_DIR})
 
 add_library(exodus SHARED
  exodus.h exodusmacros.h mvenvironment.h mv.h mvlibs.h
- exodusfuncs.h mvexceptions.h mvimpl.h mvutf.h mvipc.h mvconfig.h
+ exodusfuncs.h mvexceptions.h mvimpl.h mvipc.h mvconfig.h
  mvlink.h mvfunctor.h program.h library.h dict.h mvprogram.h
  xfunctorf0.h xfunctorf1.h xfunctorf10.h xfunctorf11.h xfunctorf12.h
  xfunctorf13.h xfunctorf14.h xfunctorf15.h xfunctorf16.h xfunctorf17.h
@@ -76,7 +79,7 @@ add_library(exodus SHARED
 
  ConvertUTF.c howto.cpp mvarray.cpp mvdatetime.cpp  mvdebug.cpp
  mvfuncs.cpp mvioconv.cpp mvlibs.cpp
- mvutf.cpp naturalorder.cpp gettimeofday.cpp mv2.cpp mv.cpp
+ naturalorder.cpp gettimeofday.cpp mv2.cpp mv.cpp
  mvdbpostgres.cpp mvenvironment.cpp mvglobalfuncs.cpp
  mvipc.cpp mvmv.cpp mvunicode.cpp mvipc_boost.cpp mvipc_posix.cpp
  mvipc_ms.cpp mvposix.cpp MurmurHash2_64.cpp
@@ -105,7 +108,7 @@ install(TARGETS exodus DESTINATION lib)
 
 install(FILES 
  exodus.h exodusmacros.h mvenvironment.h mv.h mvlibs.h 
- exodusfuncs.h mvexceptions.h mvimpl.h mvutf.h mvipc.h mvconfig.h 
+ exodusfuncs.h mvexceptions.h mvimpl.h mvipc.h mvconfig.h 
  mvlink.h mvfunctor.h program.h library.h dict.h common.h mvprogram.h
  xfunctorf0.h xfunctorf1.h xfunctorf10.h xfunctorf11.h xfunctorf12.h 
  xfunctorf13.h xfunctorf14.h xfunctorf15.h xfunctorf16.h xfunctorf17.h 

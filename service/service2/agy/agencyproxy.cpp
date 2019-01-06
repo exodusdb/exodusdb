@@ -3,28 +3,35 @@ libraryinit()
 
 #include <readagp.h>
 #include <gethtml.h>
-//#include <budgetsheetsubs2.h>
+#include <budgetsheetsubs.h>
 #include <authorised.h>
 #include <validcode2.h>
-//#include <clientsubs.h>
+#include <clientsubs.h>
 #include <agencysubs.h>
-//#include <suppliersubs.h>
+#include <suppliersubs.h>
 #include <singular.h>
 //#include <listen3.h>
 //#include <ilesubs.h>
 //#include <makelist.h>
-//#include <convpdf.h>
+#include <select2.h>
+#include <convpdf.h>
 #include <sysmsg.h>
 #include <openfile.h>
+#include <trim2.h>
 
 #include <agy.h>
+#include <gen.h>
 #include <win.h>
 
+var stationery;
+var xx;
 var compcodes;
+var ncomps;
 var compcode;
 var html;
 var msg1;
 var msg2;
+var invnobycompany;
 var companyn2;//num
 var companyn;//num
 var tcompany;
@@ -39,17 +46,25 @@ var newfilename;
 var triggers;
 var errors;
 var adqueries;
+var filename;
+var agpfn;//num
+var iodatfn;//num
+var defaultstartno;//num
 var fileno;//num
 
 function main() {
-	//*subroutine agencyproxy(request,iodat,response)
+	//subroutine agencyproxy(request,iodat,response)
+	//c agy
 	//jbase
 
-	var().clearcommon();
+	//var().clearcommon();
 	win.valid = 1;
 	USER4 = "";
 	var printopts = "";
 	var stationery = "";
+
+	//global stationery,filename,agp.fn,iodat.fn,defaultstartno,xx
+	//global ncomps,invnobycompany
 
 	var mode = USER0.a(1).ucase();
 	win.datafile = USER0.a(2);
@@ -62,7 +77,6 @@ function main() {
 
 	//check for updates
 	//also in mediaproxy
-	var xx;
 	if (xx.read(DEFINITIONS, "PENDINGUPDATES")) {
 		execute("PENDINGUPDATES");
 	}
@@ -86,7 +100,7 @@ function main() {
 			allhtml.r(-1, "</style>");
 		}
 
-		var ncomps = compcodes.count(",") + 1;
+		ncomps = compcodes.count(",") + 1;
 		for (var compn = 1; compn <= ncomps; ++compn) {
 
 			mode = "HEAD";
@@ -126,7 +140,6 @@ function main() {
 				response='OK';
 				end;
 	*/
-
 	} else if (mode == "READAGP") {
 		USER1 = agy.agp;
 		USER3 = "OK";
@@ -162,9 +175,9 @@ function main() {
 		USER3 = "OK " ^ signatory;
 
 	} else if (mode == "GETBUDGET" or mode == "ANALYSIS2") {
-		USER1.transfer(mv.PSEUDO);
-		call budgetsheetsubs2(mode);
-		mv.PSEUDO.transfer(USER1);
+		USER1.transfer(PSEUDO);
+		call budgetsheetsubs(mode);
+		PSEUDO.transfer(USER1);
 
 	} else if (mode == "GETINVOICENUMBERS") {
 
@@ -188,7 +201,7 @@ function main() {
 		//can only get other documents by company
 		//if invoices are numbered by company
 		//because of the following .. could be changed
-		var invnobycompany = agy.agp.a(48);
+		invnobycompany = agy.agp.a(48);
 		if (invnobycompany) {
 			var compcodes;
 			if (compcodes.read(gen.companies, "%RECORDS%")) {
@@ -210,8 +223,8 @@ function main() {
 				if (not compcode) {
 					compcode = "*** ";
 				}
-			}else{
-				if (not compcode.readnext()) {
+				}else{
+				if (not readnext(compcode)) {
 					compcode = "*** ";
 				}
 			}
@@ -221,7 +234,7 @@ function main() {
 			if (invnobycompany) {
 
 				//skip if not allowed access
-				if (not(validcode2(compcode, "", "", "", ""))) {
+				if (not(validcode2(compcode, "", "", agy.brands, xx))) {
 					goto nextcomp;
 				}
 
@@ -358,17 +371,17 @@ nextcomp:
 			}
 
 			//skip if not allowed
-			if (not(authorised(mode ^ " INVOICE ACCESS", "", ""))) {
+			if (not(authorised(mode ^ " INVOICE ACCESS", xx, ""))) {
 				goto nextmoden;
 			}
-			if (not(authorised("#" ^ mode ^ " INVOICE SET NUMBER", "", "NEOSYS"))) {
+			if (not(authorised("#" ^ mode ^ " INVOICE SET NUMBER", xx, "NEOSYS"))) {
 				goto nextmoden;
 			}
 
-			var invnobycompany = agy.agp.a(48);
+			invnobycompany = agy.agp.a(48);
 
 			//nb compcode2 not used in invoice seq no key
-			var ncomps = (USER1.a(2)).count(VM) + (USER1.a(2) ne "");
+			ncomps = (USER1.a(2)).count(VM) + (USER1.a(2) ne "");
 			for (companyn = 1; companyn <= ncomps; ++companyn) {
 				compcode = USER1.a(2, companyn);
 				var nextinvno = USER1.a(4 - 1 + moden, companyn);
@@ -387,14 +400,15 @@ nextcomp:
 					invkey ^= "%";
 
 					anythingaccessed = 1;
-					nextinvno - 1.write(agy.invoices, invkey);
+
+					write(nextinvno - 1, agy.invoices, invkey);
 
 				}
 			};//companyn;
 nextmoden:
 		};//moden;
 
-		var ncomps = (USER1.a(2)).count(VM) + (USER1.a(2) ne "");
+		ncomps = (USER1.a(2)).count(VM) + (USER1.a(2) ne "");
 		for (companyn = 1; companyn <= ncomps; ++companyn) {
 
 			compcode = USER1.a(2, companyn);
@@ -408,7 +422,7 @@ nextmoden:
 		if (not(compcode ne "**")) break;;
 
 			//skip if not allowed access
-			if (not(validcode2(compcode, "", "", "", ""))) {
+			if (not(validcode2(compcode, "", "", agy.brands, xx))) {
 				goto nextcomp2;
 			}
 
@@ -429,35 +443,35 @@ nextcomp2:
 		}
 
 	} else if (mode == "INVOICEREPRINT" or mode == "REPRINTINVS") {
-		mv.PSEUDO = USER1;
+		PSEUDO = USER1;
 		//media invoices put in pdf landscape
 		//if @pseudo<21>=2 then printopts:='L'
-		stationery = mv.PSEUDO.a(11);
+		stationery = PSEUDO.a(11);
 		perform("REPRINTINVS");
 		gosub checkoutputfileexists();
 
 	} else if (mode == "INVOICELIST") {
-		mv.PSEUDO = USER1;
+		PSEUDO = USER1;
 		printopts = "L";
 		perform("LISTINVS");
 		gosub checkoutputfileexists();
 
 	} else if (mode == "INVOICEAUDIT") {
-		mv.PSEUDO = USER1;
+		PSEUDO = USER1;
 		printopts = "L";
 		perform("AUDITINVS");
 		gosub checkoutputfileexists();
 
 	} else if (mode == "LISTSUPPLIERS") {
 
-		mv.PSEUDO = USER1;
+		PSEUDO = USER1;
 		perform("LISTSUPPLIERS");
 		printopts = "L";
 		gosub checkoutputfileexists();
 
 	} else if (mode == "LISTCLIENTS") {
 		//@pseudo=iodat
-		mv.PSEUDO = USER0;
+		PSEUDO = USER0;
 		printopts = "L";
 		perform("LISTCLIENTS");
 		gosub checkoutputfileexists();
@@ -531,7 +545,7 @@ nextcomp2:
 			}
 		}
 
-		call agencysubs(mode, "", reqcompcode, allownew);
+		call agencysubs(mode, xx, reqcompcode, allownew);
 
 		if (USER4) {
 			USER4.transfer(USER3);
@@ -620,44 +634,20 @@ nextcomp2:
 		USER3 = "Sorry, there is no popup for full text search here";
 		goto errorexit;
 
-	} else if (1) {
+	} else {
 		USER3 = "System Error: " ^ (DQ ^ (USER0 ^ DQ)) ^ " unrecognised request in AGENCYPROXY";
-		goto errorexit;
 	}
-L3287:
+//L3289:
 	/////
-exit:
+	//exit:
 	/////
-	var().stop();
+	return 0;
 
 	//////////
 errorexit:
 	//////////
 	USER3 = "Error: " ^ USER3;
 	var().stop();
-
-	//////////////
-errorresponse:
-	//////////////
-	USER4.converter("|", FM);
-	USER4 = trim2(USER4, FM, "FB");
-	USER4.converter("||", FM ^ FM);
-	USER4.swapper(FM ^ FM, "\r\n");
-	USER4.swapper(FM, " ");
-	USER3 = "Error: " ^ USER4;
-	var().stop();
-
-	/////////////
-opendatafile:
-	/////////////
-	if (not(win.srcfile.open(win.datafile, ""))) {
-		USER4 = "The " ^ (DQ ^ (win.datafile ^ DQ)) ^ " file is not available";
-		goto errorresponse;
-	}
-	if (not(DICT.open("DICT", win.datafile))) {
-		USER4 = "The " ^ (DQ ^ ("DICT." ^ win.datafile ^ DQ)) ^ " file is not available";
-		goto errorresponse;
-	}
 	return 0;
 
 }
@@ -694,13 +684,15 @@ subroutine checkoutputfileexists() {
 subroutine getquery() {
 	cmd = "";
 	if (not(openfile("ADQUERIES", adqueries))) {
-		goto errorresponse;
+		gosub errorresponse();
+		var().stop();
 	}
 
 	var query;
 	if (not(query.read(adqueries, queryid))) {
 		call mssg(DQ ^ (queryid ^ DQ) ^ " is missing from ADQUERIES file");
-		goto errorresponse;
+		gosub errorresponse();
+		var().stop();
 	}
 
 	cmd = query.a(2);
@@ -711,10 +703,10 @@ subroutine getquery() {
 }
 
 subroutine getsetnumbers() {
-	var filename = "PLANS";
-	var agpfn = 71;
-	var iodatfn = 7;
-	var defaultstartno = 1;
+	filename = "PLANS";
+	agpfn = 71;
+	iodatfn = 7;
+	defaultstartno = 1;
 	gosub getsetnumber();
 
 	filename = "SCHEDULES";
@@ -764,11 +756,11 @@ subroutine getsetnumber() {
 	if (task == "PRODUCTION INVOICE") {
 		task = "PRODUCTION ESTIMATE";
 	}
-	if (not(authorised(task ^ " ACCESS"))) {
+	if (not(authorised(task ^ " ACCESS", xx))) {
 		return;
 	}
 	if (set) {
-		if (not(authorised(task ^ " SET NUMBER"))) {
+		if (not(authorised(task ^ " SET NUMBER", xx))) {
 			return;
 		}
 	}
@@ -804,7 +796,7 @@ subroutine getsetnumber() {
 			var nextfileno = USER1.a(iodatfn, companyn);
 			if (nextfileno and nextfileno.isnum()) {
 				nextfileno.writev(DEFINITIONS, filenokey, 1);
-				FLUSHNEEDED = 1;
+				
 			}
 		}
 	}else{
@@ -832,6 +824,18 @@ subroutine getsetnumber() {
 		USER1.r(iodatfn, companyn2, fileno);
 	}
 
+	return;
+
+}
+
+subroutine errorresponse() {
+	USER4.converter("|", FM);
+	USER4 = trim2(USER4, FM, "FB");
+	USER4.converter("||", FM ^ FM);
+	USER4.swapper(FM ^ FM, "\r\n");
+	USER4.swapper(FM, " ");
+	USER3 = "Error: " ^ USER4;
+	var().stop();
 	return;
 
 }

@@ -7,11 +7,13 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition.hpp>
 
+#include <boost/locale.hpp>
+
 #include <libpq-fe.h>//in postgres/include
 
 #include <exodus/mv.h>
 #include <exodus/mvenvironment.h>
-#include <exodus/mvutf.h>
+//#include <exodus/mvutf.h>
 #include <exodus/mvfunctor.h>
 
 namespace exodus
@@ -28,7 +30,8 @@ EXODUS_IPC_EXTERN boost::condition global_ipccondition;
 //definition here prevents this header from being included in more than one file
 inline std::wstring fromutf8(const char* start, const int length)
 {
-	return wstringfromUTF8((UTF8*)(start), length);
+	//return wstringfromUTF8((UTF8*)(start), length);
+	return boost::locale::conv::utf_to_utf<wchar_t>(start,start+length);
 }
 
 //this function is started as a thread by startipc()

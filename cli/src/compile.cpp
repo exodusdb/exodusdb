@@ -99,12 +99,13 @@ function main()
 		}
 		//basic compiler options
 
-		//c++11
+		//c++11/17
 		//basicoptions^=" -std=gnu++0x";//pre gcc 4.7 enables gnu extentions.
 		//basicoptions^=" -std=gnu++11";//gcc 4.7 and later  enables gnu extensions.
 		//__cplusplus is 201103L
 		//if( __cplusplus >= 201103L )
-			basicoptions^=" -std=c++11";//gcc 4.7 and later DISABLES gnu extensions
+			//basicoptions^=" -std=c++11";//gcc 4.7 and later DISABLES gnu extensions
+		basicoptions^=" -std=c++17";//gcc 4.7 and later DISABLES gnu extensions
 
 		//http://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#Warning-Options
 		basicoptions^=" -Wall";
@@ -124,7 +125,7 @@ function main()
 		//if (debugging)
 		//	linkoptions=" -lexodus-gd";
 		//else
-			linkoptions=" -lexodus";
+			linkoptions=" -lexodus -lstdc++fs";
 
 		//enable function names in backtrace
 		if (debugging)
@@ -786,7 +787,8 @@ var inclusion=
 			if (verbose) {
 			compileroutput.outputl("Compiler output:");
 			}
-			osdelete(compileoutputfilename);
+			//leave for editor
+			//osdelete(compileoutputfilename);
 			var charn=index(compileroutput, ": error:");
 			if (charn) {
 				startatlineno=compileroutput.substr(charn-9,9);

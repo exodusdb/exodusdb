@@ -2,7 +2,6 @@
 
 program()
 {
-
     //check command syntax
     //edit filename
     if (dcount(COMMAND,FM)<2)
@@ -135,7 +134,7 @@ program()
     }
 
     //editor="vi";
-    editor.swapper("nano ", "nano --const --nowrap --autoindent --suspend ");
+    editor.swapper("nano ", "nano --const --nowrap --autoindent --suspend +$LINENO ");
 
     if (editor.index("nano"))
         printl("http://www.nano-editor.org/dist/v2.1/nano.html");
@@ -275,9 +274,10 @@ program()
                 if (not startatlineno)
                     linenopattern="";
                 else
-                    linenopattern.swapper("$LINENO",startatlineno.field(",",1));
-                editcmd.swapper("$LINENO",linenopattern);
+                    linenopattern="+"^startatlineno;
+                editcmd.swapper("+$LINENO",linenopattern);
             }
+
             if (editcmd.index("$FILENAME"))
                 editcmd.swapper("$FILENAME",filename);
             else
@@ -314,12 +314,15 @@ program()
             var compiler="compile";
             var compileoptions="";
             var compilecmd=compiler ^ " " ^ filename.quote() ^ compileoptions;
+
             //capture the output
-            var compileoutputfilename=filename ^ ".2";
-            if (SLASH eq "/")
-                compilecmd ^= " 2>&1 | tee " ^ compileoutputfilename.quote();
-            else
-                compilecmd ^= " > " ^ compileoutputfilename.quote() ^ " 2>&1";
+            var compileoutputfilename=filename;
+            compileoutputfilename^=".~";
+            //var compileoutputfilename=filename ^ ".2";
+            //if (SLASH eq "/")
+            //   compilecmd ^= " 2>&1 | tee " ^ compileoutputfilename.quote();
+            //else
+            //    compilecmd ^= " > " ^ compileoutputfilename.quote() ^ " 2>&1";
 
             //call the compiler
             if (verbose)
@@ -331,9 +334,8 @@ program()
 
             //if any errors then loop back to edit again
             var errors;
-            if (osread(errors,compileoutputfilename)) {
-                osdelete(compileoutputfilename);
-
+            if (osread(errors,compileoutputfilename,"utf8")) {
+                //osdelete(compileoutputfilename);
                 if (SLASH ne "/")
                     print(errors);
 
@@ -352,12 +354,12 @@ program()
                     startatlineno=errors.substr(charn-10,10).field2("(",2);
                 }
                 if (startatlineno) {
-                    print("Press any key to re-edit at line "^startatlineno^" ... ");
+                    print("Press Enter to re-edit at line "^startatlineno^" ... ");
                     var().input("");
                     continue;
                 }
             }
-
+		print(compileoutputfilename);
             break;
         }
 

@@ -76,6 +76,7 @@ THE SOFTWARE.
 
 #include <iostream>
 #include <cstring>//for strcmp strlen
+#include <boost/locale.hpp>
 
 #include <boost/thread/tss.hpp>
 //http://beta.boost.org/doc/libs/1_41_0/doc/html/unordered.html
@@ -93,7 +94,7 @@ THE SOFTWARE.
 #include <exodus/mvimpl.h>
 #include <exodus/mv.h>
 #include <exodus/mvenvironment.h>
-#include <exodus/mvutf.h>
+//#include <exodus/mvutf.h>
 #include <exodus/mvexceptions.h>
 
 namespace exodus {
@@ -158,17 +159,23 @@ boost::thread_specific_ptr<var> tss_pgconnparams;
 boost::thread_specific_ptr<var> tss_pglasterror;
 boost::thread_specific_ptr<bool> tss_ipcstarted;
 
+
+std::wstring getresult(PGresult* result, int rown, int coln) {
+	char* starting=PQgetvalue(result,rown,coln);
+	return boost::locale::conv::utf_to_utf<wchar_t>(starting,starting+PQgetlength(result,rown,coln));
+}
+
 void var::setlasterror(const var& msg) const
 {
 	//no checking for speed
 	//THISIS(L"void var::setlasterror(const var& msg")
 	//ISSTRING(msg)
-	tss_pglasterror.reset(new var(msg));	
+	tss_pglasterror.reset(new var(msg));
 }
 
 void var::setlasterror() const
 {
-	tss_pglasterror.reset();	
+	tss_pglasterror.reset();
 }
 
 var var::getlasterror() const
@@ -185,7 +192,7 @@ static bool pqexec(const var& sql, PGresultptr& pgresult, PGconn * thread_pgconn
 bool var::sqlexec(const var& SqlToExecute) const
 {
 	var errmsg;
-	bool result = sqlexec(SqlToExecute, errmsg);
+	bool result = this->sqlexec(SqlToExecute, errmsg);
 	if (not result) {
 		this->setlasterror(errmsg);
 		if (errmsg.index(L"syntax") || GETDBTRACE)
@@ -197,7 +204,7 @@ bool var::sqlexec(const var& SqlToExecute) const
 #if defined _MSC_VER //|| defined __CYGWIN__ || defined __MINGW32__
 LONG WINAPI DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS pExcPointers) {
    LONG lDisposition = EXCEPTION_EXECUTE_HANDLER;
-   
+
    PDelayLoadInfo pDelayLoadInfo =
 	PDelayLoadInfo(pExcPointers->ExceptionRecord->ExceptionInformation[0]);
 
@@ -239,7 +246,7 @@ bool msvc_PQconnectdb(PGconn** pgconn, const std::string& conninfo)
 	}
 	__except(DelayLoadDllExceptionFilter(GetExceptionInformation()))
 	{
-		return false;		
+		return false;
 	}
 	return true;
 }
@@ -262,7 +269,7 @@ var var::build_conn_info(const var& conninfo) const
 	//if no conninfo details provided then use last connection details if any
 	if (!conninfo && tss_pgconnparams.get())
 		result = *tss_pgconnparams.get();
-	
+
 	//otherwise search for details from exodus config file
 	//if incomplete connection parameters provided
 	if (not result.index(L"host=") or 
@@ -413,7 +420,7 @@ bool var::connect(const var& conninfo)
 	//but this does
 	//this turns off the notice when creating tables with a primary key
 	//DEBUG5, DEBUG4, DEBUG3, DEBUG2, DEBUG1, LOG, NOTICE, WARNING, ERROR, FATAL, and PANIC
-	sqlexec(GETDBTRACE ? L"SET client_min_messages = LOG" : L"SET client_min_messages = WARNING");
+	this->sqlexec(GETDBTRACE ? L"SET client_min_messages = LOG" : L"SET client_min_messages = WARNING");
 
 	return true;
 }
@@ -580,10 +587,10 @@ bool var::open(const var& filename, const var& connection)
 		int resultstatus=PQresultStatus(result);
 		if (resultstatus != PGRES_TUPLES_OK)
 		{
-			this->setlasterror(L"ERROR: mvdbpostgres open(" ^ filename.quote() ^ L") failed\n" ^ var(PQerrorMessage(thread_pgconn)));
+			this->setlasterror(L"ERROR: mvdbpostgres 1 open(" ^ filename.quote() ^ L") failed\n" ^ var(PQerrorMessage(thread_pgconn)));
 			PQclear(result);
 	#		if TRACING >= 1
-			exodus::errputl(getlasterror());
+			exodus::errputl(this->getlasterror());
 	#		endif
 			return false;
 		}
@@ -591,17 +598,17 @@ bool var::open(const var& filename, const var& connection)
 		//file (table) doesnt exist
 		if (PQntuples(result) < 1)
 		{
-			this->setlasterror(L"ERROR: mvdbpostgres open(" ^ filename.quote() ^ L") failed\n" ^ var(PQerrorMessage(thread_pgconn)));
+			this->setlasterror(L"ERROR: mvdbpostgres 2 open(" ^ filename.quote() ^ L") table does not exist. failed\n" ^ var(PQerrorMessage(thread_pgconn)));
 			PQclear(result);
 			return false;
 		}
 
 		if (PQntuples(result) > 1)
 		{
-			this->setlasterror(L"ERROR: mvdbpostgres open() SELECT returned more than one record");
+			this->setlasterror(L"ERROR: mvdbpostgres 3 open() SELECT returned more than one record");
 			PQclear(result);
 	#		if TRACING >= 1
-				exodus::errputl(getlasterror());
+				exodus::errputl(this->getlasterror());
 	#		endif
 			return false;
 		}
@@ -708,7 +715,8 @@ bool var::read(const var& filehandle,const var& key)
 		return false;
 	}
 
-	*this=wstringfromUTF8((UTF8*)PQgetvalue(result, 0, 0), PQgetlength(result, 0, 0));
+	// *this=wstringfromUTF8((UTF8*)PQgetvalue(result, 0, 0), PQgetlength(result, 0, 0));
+	*this=getresult(result,0,0);
 
 	PQclear(result);
 
@@ -901,7 +909,7 @@ void var::unlockall() const
 		(*locktable).clear();
 	}
 
-	sqlexec(L"SELECT PG_ADVISORY_UNLOCK_ALL()");
+	this->sqlexec(L"SELECT PG_ADVISORY_UNLOCK_ALL()");
 }
 
 //returns success or failure but no data
@@ -917,6 +925,7 @@ bool var::sqlexec(const var& sqlcmd, var& errmsg) const
 		return false;
 	}
 
+	//log the sql command
 	if (GETDBTRACE)
 	{
 //		exodus::logputl(L"SQL:" ^ *this);
@@ -924,8 +933,8 @@ bool var::sqlexec(const var& sqlcmd, var& errmsg) const
 		if (this->unassigned())
 			temp ^= L"Unassigned variable";
 		else
-			temp ^= * this;
-        temp ^= L" " ^ sqlcmd;
+			temp ^= *this ^ L" ";
+        	temp ^= sqlcmd;
 		exodus::logputl(temp);
 	}
 
@@ -939,7 +948,7 @@ bool var::sqlexec(const var& sqlcmd, var& errmsg) const
 	//but it can execute multiple commands
 	//whereas PQexecParams is the opposite
 	pgresult = PQexec(thread_pgconn, sqlcmd.toString().c_str());
-	
+
 	if (!pgresult) {
 		errmsg=var(PQerrorMessage(thread_pgconn));
 		return false;
@@ -1298,7 +1307,7 @@ bool var::begintrans() const
 	THISISDEFINED()
 
 	//begin a transaction
-	return sqlexec(L"BEGIN");
+	return this->sqlexec(L"BEGIN");
 }
 
 bool var::rollbacktrans() const
@@ -1307,7 +1316,7 @@ bool var::rollbacktrans() const
 	THISISDEFINED()
 
 	// Rollback a transaction
-	return sqlexec(L"ROLLBACK");
+	return this->sqlexec(L"ROLLBACK");
 }
 
 bool var::committrans() const
@@ -1316,7 +1325,7 @@ bool var::committrans() const
 	THISISDEFINED()
 
 	//end (commit) a transaction
-	return sqlexec(L"END");
+	return this->sqlexec(L"END");
 }
 
 bool var::statustrans() const
@@ -1369,7 +1378,7 @@ bool var::createdb(const var& dbname, var& errmsg) const
 	//sql^=" OWNER=exodus";
 
 	//TODO this shouldnt only be for default connection
-	return sqlexec(sql,errmsg);
+	return this->sqlexec(sql,errmsg);
 
 }
 
@@ -1381,7 +1390,7 @@ bool var::deletedb(const var& dbname, var& errmsg) const
 	ISSTRING(dbname)
 
 	//var sql = L"DROP DATABASE "^dbname.convert(L". ",L"__");
-	return sqlexec(L"DROP DATABASE "^dbname, errmsg);
+	return this->sqlexec(L"DROP DATABASE "^dbname, errmsg);
 }
 
 bool var::createfile(const var& filename) const
@@ -1397,10 +1406,21 @@ bool var::createfile(const var& filename) const
 	var sql = L"CREATE";
 	//if (options.ucase().index(L"TEMPORARY")) sql ^= L" TEMPORARY";
 	//sql ^= L" TABLE " PGDATAFILEPREFIX ^ filename.convert(L".",L"_");
+	if (filename.substr(-5,5) ==L"_temp")
+		sql ^= L" TEMP ";
 	sql ^= L" TABLE " PGDATAFILEPREFIX ^ filename;
 	sql ^= L" (key bytea primary key, data bytea)";
 
-	return sqlexec(sql);
+	return this->sqlexec(sql);
+}
+
+bool var::renamefile(const var& filename, const var& newfilename) const
+{
+	THISIS(L"bool var::renamefile(const var& filename, const var& newfilename)")
+	// *this is not used
+	THISISDEFINED()
+	ISSTRING(filename)
+	return this->sqlexec(L"ALTER TABLE " PGDATAFILEPREFIX ^ filename ^ L" RENAME TO " ^ newfilename);
 }
 
 bool var::deletefile(const var& filename) const
@@ -1409,7 +1429,7 @@ bool var::deletefile(const var& filename) const
 	// *this is not used
 	THISISDEFINED()
 	ISSTRING(filename)
-	return sqlexec(L"DROP TABLE " PGDATAFILEPREFIX ^ filename);
+	return this->sqlexec(L"DROP TABLE " PGDATAFILEPREFIX ^ filename);
 }
 
 bool var::clearfile(const var& filename) const
@@ -1419,7 +1439,7 @@ bool var::clearfile(const var& filename) const
 	THISISDEFINED()
 	ISSTRING(filename)
 
-	return sqlexec(L"DELETE FROM " PGDATAFILEPREFIX ^ filename);
+	return this->sqlexec(L"DELETE FROM " PGDATAFILEPREFIX ^ filename);
 }
 
 inline void unquoter_inline(var& string)
@@ -1545,22 +1565,22 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 
             if (forsort_or_select_or_index)
                 //sqlexpression=L"exodus_extract_sort(" ^  fileexpression(mainfilename, filename,L"key") ^ L")";
-                sqlexpression=L"exodus_extract_sort(key,0,0,0)";
+                sqlexpression=L"exodus_extract_sort(" ^ mainfilename ^ L".key,0,0,0)";
             else
-                sqlexpression=L"convert_from(" ^ fileexpression(mainfilename, filename,L"key") ^ L", 'UTF8')";
-			
+                sqlexpression=L"convert_from(" ^ fileexpression(mainfilename, filename,mainfilename ^ L".key") ^ L", 'UTF8')";
+
 			var keypartn=dictrec.a(5);
 			if (keypartn)
 			{
 				sqlexpression=L"split_part(" ^ sqlexpression ^ L", '*', " ^ keypartn ^ L")";
 			}
-			
+
 			if (conversion[1]==L"D" || conversion.substr(1,5)==L"[DATE")
 				sqlexpression=L"date '1967-12-31' + " ^ sqlexpression ^ L"::integer";
-				
+
 			return sqlexpression;
 		}
-		
+
 		if (conversion.substr(1,9)==L"[DATETIME")
 			sqlexpression=L"exodus_extract_datetime(" ^ params;
 
@@ -1760,6 +1780,113 @@ var getword(var& remainingwords, const var& joinvalues=false)
 	return word1;
 }
 
+bool var::deletelist(const var& listname) const
+{
+	THISIS(L"bool var::deletelist(const var& listname) const")
+	//?allow undefined usage like var xyz=xyz.select();
+	//THISISDEFINED()
+	ISSTRING(listname)
+
+	var listfilename=L"savelist_";
+	if (listname)
+		listfilename ^= listname;
+	else
+		listfilename ^= (*this) ^ L"_" ^ getprocessn() ^ L"_tempx";
+
+	if (var().open(listfilename)) {
+		//listfilename.outputl(L"Deleted ");
+		return listfilename.deletefile(listfilename);
+	}
+	return true;//true if not existing
+}
+
+bool var::savelist(const var& listname) const
+{
+	THISIS(L"bool var::savelist(const var& listname) const")
+	//?allow undefined usage like var xyz=xyz.select();
+	//THISISDEFINED()
+	ISSTRING(listname)
+
+	int recn=0;
+	var key;
+	var mv;
+	var listfilename=L"savelist_"^listname;
+	var listfilename2=listfilename^L"_saving";
+
+	//save preselected keys into a file to be used with INNERJOIN on select()
+	if (this->selectpending()) {
+		this->deletelist(listname);
+		this->deletefile(listfilename2);
+		while (this->readnext(key,mv)) {
+			recn++;
+
+			//delete/create file on first record
+			if (recn==1) {
+				if (!this->createfile(listfilename2))
+					return false;
+				//listfilename2.outputl(L"Created ");
+			}
+
+			//save a key
+			(mv ^ FM ^ recn).write(listfilename2,key);
+			//key.outputl(L"Written=");
+		}
+		var().renamefile(listfilename2,listfilename);
+	}
+
+	return recn>0;
+}
+
+bool var::makelist(const var& listname, const var& keys) const
+{
+	THISIS(L"bool var::makelist(const var& listname) const")
+	//?allow undefined usage like var xyz=xyz.select();
+	THISISSTRING()
+	ISSTRING(listname)
+	ISSTRING(keys)
+
+	this->deletelist(listname);
+
+	int recn=0;
+	var key;
+	var mv;
+	var listfilename=L"savelist_";
+	if (listname)
+		listfilename^=listname;
+	else {
+		var listname2=(*this) ^ L"_" ^ getprocessn() ^ L"_tempx";
+		listfilename^=listname2;
+	}
+
+	//save preselected keys into a file to be used with INNERJOIN on select()
+	int nn=keys.dcount(FM);
+	//var(nn).outputl(L"nn=");
+	for (int fn1=1;fn1<nn;fn1++) {
+		var key=keys.a(fn1);
+		if (key.length()) {
+
+			//key can be key]mv
+			var mv=key.a(1,2);
+			if (mv.length())
+				key=key.a(1,1);
+
+			recn++;
+			//create file on first record
+			if (recn==1) {
+				if (!var().createfile(listfilename)) {
+					listfilename.outputl(L"Cannot create ");
+					return false;
+				}
+			}
+			//save a key
+			(mv ^ FM ^ recn).write(listfilename,key);
+		}
+	}
+
+	//listfilename.outputl(L"makelist recs:" ^ var(recn) ^ L", listfilename=");
+	return recn>0;
+}
+
 bool var::selectrecord(const var& sortselectclause) const
 {
 	THISIS(L"bool var::selectrecord(const var& sortselectclause) const")
@@ -1792,6 +1919,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		var_mvtyp=pimpl::MVTYPE_STR;
 	}
 
+	//default to ""
 	if (!(var_mvtyp&pimpl::MVTYPE_STR))
 	{
 		if (!var_mvtyp)
@@ -1831,7 +1959,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 //remainingsortselectclause.outputl(L"remainingsortselectclause=");
 
 	//sortselectclause may start with {SELECT|SSELECT {maxnrecs} filename}
-    var word1=remainingsortselectclause.field(L" ", 1);
+	var word1=remainingsortselectclause.field(L" ", 1);
 	var word2=word1.ucase();
 	if (word2==L"SELECT"||word2==L"SSELECT")
 	{
@@ -2043,7 +2171,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	{
 		if (keycodes.count(FM))
 		{
-			keycodes=L"key IN ( " ^ keycodes.swap(FM,L", ") ^ L" )";
+			keycodes=actualfilename ^ L".key IN ( " ^ keycodes.swap(FM,L", ") ^ L" )";
 
 			if (whereclause)
 				whereclause=L" AND ( " ^ whereclause ^ L" ) ";
@@ -2057,7 +2185,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	{
 		if (orderclause)
 			orderclause^=L", ";
-		orderclause^=L"key";
+		orderclause^=actualfilename ^ L".key";
 	}
 
 	if (!ismv)
@@ -2074,8 +2202,31 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		}
 	}
 
+	//if any active select, convert to a file and use as an additional filter on key
+	//or correctly named savelistfilename exists from getselect or makelist
+	var listname=(*this) ^ L"_" ^ getprocessn() ^ L"_tempx";
+	var savelistfilename=L"savelist_" ^ listname;
+//	savelistfilename.outputl(L"1 savelistfilename=");
+//	if (var(*this).open(savelistfilename))
+//		savelistfilename.outputl(L"savelistfilename opened=");
+//	var savelist1=this->savelist(listname);
+//	var savelist2=var().open(savelistfilename);
+//	savelist1.outputl(L"1 savelist1=");
+//	savelist2.outputl(L"2 savelist2=");
+//	if (savelist1 || savelist2) {
+	if (this->savelist(listname) || (savelistfilename != actualfilename && var().open(savelistfilename))) {
+		if (joins)
+			joins^=L", ";
+		joins ^= L" INNER JOIN " ^ savelistfilename ^ L" ON " ^ actualfilename ^ L".key = " ^ savelistfilename ^ L".key";
+	}
+
+	//disambiguate from any INNER JOIN key
+	actualfieldnames.swapper(L"key",actualfilename ^ L".key");
+
 	//assemble the full sql select statement:	//ALN:TODO: optimize with stringbuffer
-	var sql=L"DECLARE CURSOR1_" ^ (*this) ^ L" CURSOR FOR SELECT " ^ actualfieldnames ^ L" FROM ";
+
+	//WITH HOLD is a very significant addition
+	var sql=L"DECLARE cursor1_" ^ (*this) ^ L" CURSOR WITH HOLD FOR SELECT " ^ actualfieldnames ^ L" FROM ";
 	sql ^= PGDATAFILEPREFIX ^ actualfilename;
 	if (joins)
 		sql ^= L" " ^ joins;
@@ -2086,20 +2237,31 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	if (maxnrecs)
 		sql ^= L" LIMIT " ^ maxnrecs;
 
+//sql.outputl(L"sql=");
+
 	//DEBUG_LOG_SQL
-	if (GETDBTRACE)
-		exodus::logputl(sql);
+	//if (GETDBTRACE)
+	//	exodus::logputl(sql);
 
 	//Start a transaction block if none already - because postgres requires select to cursor to be inside one
 	//var autotrans=!statustrans();
     //if (autotrans && !begintrans()) {
 	//	return false;
 	//}
-	if (!this->statustrans())
-		throw MVDBException(L"select() must be preceeded by begintrans()");
+
+	//not required if WITH HOLD is used in ::select()'s DECLARE CURSOR
+//	if (!this->statustrans())
+//		throw MVDBException(L"select() must be preceeded by begintrans()");
 
 //	if (!sql.sqlexec())
 	if (! this->sqlexec(sql)) {
+
+		this->deletelist(listname);
+
+		sql.outputl(L"sql=");
+
+		throw MVDBException(this->getlasterror());
+
 		//if (autotrans)
 		//	rollbacktrans();
 		return false;
@@ -2124,11 +2286,22 @@ void var::clearselect() const
 	THISIS(L"void var::clearselect() const")
 	THISISSTRING()
 
-	var sql=L"CLOSE CURSOR1_";
+        ///if readnext through string
+        if ((*this)[-1]==FM) {
+                var_mvstr=L"";
+                var_mvtyp=pimpl::MVTYPE_STR;
+		return;
+        }
+
+	//clear any select list
+	var listname=(*this) ^ L"_" ^ getprocessn() ^ L"_tempx";
+	this->deletelist(listname);
+
+	var sql=L"CLOSE cursor1_";
 	if (var_mvtyp)
 		sql ^= *this;
 
-	if (! sqlexec(sql))
+	if (! this->sqlexec(sql))
 		return;
 
 	// end the transaction
@@ -2145,15 +2318,22 @@ void var::clearselect() const
 //bool readnextx(const std::wstring& cursor, PGresultptr& pgresult)
 bool readnextx(const var& cursor, PGresultptr& pgresult, PGconn* pgconn)
 {
-	var sql=L"FETCH NEXT in CURSOR1_" ^ cursor;
+
+	var sql=L"FETCH NEXT in cursor1_" ^ cursor;
+
+	//sql=L"BEGIN;" ^ sql ^ L"; END";
 
 	//execute the sql
 	//cant use sqlexec here because it returns data
 	//sqlexec();
 	if (!pqexec(sql,pgresult, pgconn)) {
+
+		var(PQresultErrorMessage(pgresult)).outputl(L"readnextx error=");
+
 		cursor.clearselect();
 		return false;
 	}
+
 
 	//close cursor if no more
 	if (PQntuples(pgresult) < 1)
@@ -2184,12 +2364,48 @@ bool var::readnext(var& key, var& valueno) const
 	THISIS(L"bool var::readnext(var& key, var& valueno) const")
 	THISISSTRING()
 
+	//readnext through string of keys if provided
+	if ((*this)[-1]==FM) {
+
+		//initialise readnext pointer to 0 (using var_mvint as pointer)
+		if ((var_mvtyp&pimpl::MVTYPE_INT) == 0) {
+			var_mvint=0;
+			var_mvtyp=var_mvtyp|pimpl::MVTYPE_INT;
+		}
+
+		//increment readnext pointer
+		var_mvint++;
+
+		//extract next key
+		key=a(var_mvint);
+
+		//key may be key]valueno
+		valueno=key.a(1,2);
+		key=key.a(1,1);
+
+		//fail if no key
+		return key.length()>0;
+	}
+
+	//if the standard select list file is available then select it, i.e. create a CURSOR, so FETCH has something to work on
+	if (not this->selectpending()) {
+		var listfilename=L"savelist_" ^ (*this) ^ L"_" ^ getprocessn() ^ L"_tempx";
+		if (var().open(listfilename)) {
+			//TODO should add BY LISTITEMNO
+			if (not selectx(L"key, mv::integer",L"select " ^ listfilename)) {
+				return L"";
+			}
+		} else {
+			return L"";
+		}
+	}
+
 	PGconn* pgconn=(PGconn*) connection();
 	if (pgconn==NULL) {
 		this->clearselect();
 		return L"";
 	}
-	
+
 	PGresultptr pgresult;
 
 	if (!readnextx(*this, pgresult, pgconn))
@@ -2225,7 +2441,8 @@ bool var::readnext(var& key, var& valueno) const
 	//char* data = PQgetvalue(result, 0, 0);
 	//int datalen = PQgetlength(result, 0, 0);
 	//key=std::string(data,datalen);
-	key=wstringfromUTF8((UTF8*)PQgetvalue(pgresult, 0, 0), PQgetlength(pgresult, 0, 0));
+	//key=wstringfromUTF8((UTF8*)PQgetvalue(pgresult, 0, 0), PQgetlength(pgresult, 0, 0));
+	key=getresult(pgresult,0,0);
 //key.output(L"key=").len().outputl(L" len=");
 
   //vn is second column	
@@ -2302,7 +2519,8 @@ bool var::readnextrecord(var& record, var& key, var& valueno) const
 	//char* data = PQgetvalue(result, 0, 0);
 	//int datalen = PQgetlength(result, 0, 0);
 	//key=std::string(data,datalen);
-	key=wstringfromUTF8((UTF8*)PQgetvalue(pgresult, 0, 0), PQgetlength(pgresult, 0, 0));
+	//key=wstringfromUTF8((UTF8*)PQgetvalue(pgresult, 0, 0), PQgetlength(pgresult, 0, 0));
+	key=getresult(pgresult,0,0);
 //TODO return zero if no mv in select because no by mv column
 	//vn is second column
 	valueno=var((int)ntohl(*(uint32_t*)PQgetvalue(pgresult, 0, 1)));
@@ -2315,7 +2533,8 @@ bool var::readnextrecord(var& record, var& key, var& valueno) const
 		throw MVException(errmsg);
 		//return false;
 	}
-	record=wstringfromUTF8((UTF8*)PQgetvalue(pgresult, 0, 2), PQgetlength(pgresult, 0, 2));
+	//record=wstringfromUTF8((UTF8*)PQgetvalue(pgresult, 0, 2), PQgetlength(pgresult, 0, 2));
+	record=getresult(pgresult,0,2);
 
 	PQclear(pgresult);
 
@@ -2403,13 +2622,54 @@ var var::listfiles() const
 	for (int filen=0; filen<nfiles; filen++)
 	{
 		if	(!PQgetisnull(result, filen, 0))
-			filenames^= FM ^ wstringfromUTF8((UTF8*)PQgetvalue(result, filen, 0), PQgetlength(result, filen, 0));
+			//filenames^= FM ^ wstringfromUTF8((UTF8*)PQgetvalue(result, filen, 0), PQgetlength(result, filen, 0));
+			filenames^= FM ^ getresult(result, filen, 0);
 	}
 	filenames.splicer(1,1,L"");
 
 	PQclear(result);
 
 	return filenames;
+}
+
+bool var::selectpending() const
+{
+	THISIS(L"var var::selectpending() const")
+	//could allow undefined usage since *this isnt used?
+	THISISSTRING()
+
+	//from http://www.alberton.info/postgresql_meta_info.html
+
+	var sql=L"SELECT name from pg_cursors where name = 'cursor1_" ^ (*this) ^ SQ;
+	//var sql=L"SELECT name from pg_cursors";
+
+	PGconn* pgconn=(PGconn*) connection();
+	if (pgconn==NULL)
+		return L"";
+
+	PGresultptr pgresult;
+
+	if (!pqexec(sql,pgresult, pgconn))
+		return L"";
+
+	var result = PQntuples(pgresult)>0;
+
+	/*
+        var names=L"";
+        int nn=PQntuples(pgresult);
+        for (var ii=0; ii<nn; ii++)
+        {
+                //if (!PQgetisnull(pgresult, ii, 0))
+                        names^= FM ^ getresult(pgresult, ii, 0);
+        }
+        //names.splicer(1,1,L"");
+	names ^= nn;
+	names.outputl(L"names=");
+	*/
+
+	PQclear(pgresult);
+
+	return result;
 }
 
 var var::listindexes(const var& filename) const
@@ -2452,7 +2712,8 @@ var var::listindexes(const var& filename) const
 	{
 		if	(!PQgetisnull(result, indexn, 0))
 		{
-			indexname=wstringfromUTF8((UTF8*)PQgetvalue(result, indexn, 0), PQgetlength(result, indexn, 0));
+			//indexname=wstringfromUTF8((UTF8*)PQgetvalue(result, indexn, 0), PQgetlength(result, indexn, 0));
+			indexname=getresult(result, indexn, 0);
 			if (indexname.substr(1,6)==L"index_")
 			{
 				tt=indexname.index(L"__");
@@ -2468,6 +2729,70 @@ var var::listindexes(const var& filename) const
 	PQclear(result);
 
 	return indexnames;
+}
+
+var var::reccount(const var& filename) const
+{
+	THISIS(L"var var::reccount(const var& filename) const")
+	//could allow undefined usage since *this isnt used?
+	THISISDEFINED()
+	ISSTRING(filename)
+
+	flushindex(filename);
+
+	var sql=L"SELECT reltuples::integer FROM pg_class WHERE relname = '" ^ filename.lcase() ^  L"';";
+
+	PGconn* pgconn=(PGconn*) connection();
+	if (pgconn==NULL)
+		return L"";
+
+	//execute command or return empty string
+	PGresultptr result;
+	if (!pqexec(sql,result,pgconn))
+		return L"";
+
+	var reccount=L"";
+        if (PQntuples(result) && PQnfields(result)>0 && !PQgetisnull(result, 0, 0))
+        {
+                reccount=var((int)ntohl(*(uint32_t*)PQgetvalue(result, 0, 0)));
+        }
+
+	PQclear(result);
+
+	return reccount;
+}
+
+var var::flushindex(const var& filename) const
+{
+	THISIS(L"var var::flushindex(const var& filename="") const")
+	//could allow undefined usage since *this isnt used?
+	THISISDEFINED()
+	ISSTRING(filename)
+
+	var sql=L"VACUUM";
+	if (filename)
+		sql^=L" "^filename.lcase();
+	sql^=L";";
+	//sql.outputl(L"sql=");
+
+	PGconn* pgconn=(PGconn*) connection();
+	if (pgconn==NULL)
+		return L"";
+
+	//execute command or return empty string
+	PGresultptr result;
+	if (!pqexec(sql,result,pgconn))
+		return L"";
+
+	var flushresult=L"";
+        if (PQntuples(result))
+        {
+                flushresult=true;
+        }
+
+	PQclear(result);
+
+	return flushresult;
 }
 
 //used for sql commands that require no parameters

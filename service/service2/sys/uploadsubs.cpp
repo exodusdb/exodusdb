@@ -3,6 +3,11 @@ libraryinit()
 
 #include <sysmsg.h>
 #include <authorised.h>
+#include <shell2.h>
+#include <dirlist2.h>
+#include <convert.h>
+#include <osbread.h>
+#include <singular.h>
 
 #include <gen.h>
 #include <win.h>
@@ -16,11 +21,10 @@ var file;
 var errors;
 var lengthx;//num
 var osfile;
-//var temposfilename83;
-var importosfilename;
+var temposfilename83;
 var fileoffset;//num
 var anycr;//num
-var lineno;//num
+var LINENO;//num
 var eof;//num
 var line;
 var ncols;
@@ -29,10 +33,9 @@ var xx;
 var recordx;
 var allowduplicate;
 var wsmsg;
-var nimported;
 
 function main(in mode) {
-
+	//c sys
 	//doesnt seem to be any limit on number of files per folder
 	//in ntfs filing system at least under win 2003 server
 	//test wrote 1,000,000 files containing the filenumber 1,2,3 etc in about 5 mins
@@ -74,7 +77,7 @@ postuploadfail:
 
 		///BREAK;
 		if (not dictid) break;;
-			var fn = (dictid ^ "_ARCHIVED").xlate(dictfilename, 2, "X");
+			var fn = dictid ^ "_ARCHIVED".xlate(dictfilename, 2, "X");
 			if (not fn or not fn.isnum()) {
 				msg = DQ ^ (dictid ^ "_ARCHIVED" ^ DQ) ^ " is missing from " ^ dictfilename ^ " in upload.subs";
 				goto postuploadfail;
@@ -82,7 +85,7 @@ postuploadfail:
 			fns.r(ii, fn);
 		};//ii;
 
-		var ii = (rec.a(fns.a(1))).count(VM) + (rec.a(fns.a(1)) ne "");
+		ii = (rec.a(fns.a(1))).count(VM) + (rec.a(fns.a(1)) ne "");
 		rec.r(fns.a(1), ii, targetfilename);
 		rec.r(fns.a(2), ii, newstatus);
 		rec.r(fns.a(3), ii, USERNAME);
@@ -96,7 +99,7 @@ postuploadfail:
 	} else if (mode.field(".", 1) == "MAKEUPLOADPATH") {
 
 		if (not(authorised("UPLOAD CREATE", msg, ""))) {
-			return invalid(msg);
+			goto EOF_440;
 		}
 
 		//additional option to check file and key is not locked
@@ -109,7 +112,8 @@ postuploadfail:
 		if (filename and ensurenotlocked) {
 			gosub lockfile();
 			if (msg) {
-				gosub unlockfile();
+				//if we cant lock then why should be unlock?
+				//gosub unlockfile
 				return invalid(msg);
 			}
 			gosub unlockfile();
@@ -120,7 +124,7 @@ postuploadfail:
 			return 0;
 		}
 
-		if ((uploadpath.substr(3, 99999)).index("..", 1)) {
+		if ((uploadpath.substr(3,99999)).index("..", 1)) {
 			msg = DQ ^ (uploadpath ^ DQ) ^ " ..  is not allowed";
 			gosub unlockfile();
 			return invalid(msg);
@@ -137,12 +141,12 @@ postuploadfail:
 		}
 
 		//ok if any files found
-		//if (var().oslistf(uploadroot ^ uploadpath ^ "*.*")) {
-		if (osdir(uploadroot ^ uploadpath)) {
+		(uploadroot ^ uploadpath ^ "*.*").initdir();
+		if (var().oslistf()) {
 			return 0;
 		}
 
-		//otherwise make the folders in parent order (TODO make it automatic all?)
+		//otherwise make the folders in parent order
 		var nsubfolders = uploadpath.count("\\");
 		for (var subfoldern = 1; subfoldern <= nsubfolders; ++subfoldern) {
 			var subfolder = uploadpath.field("\\", 1, subfoldern);
@@ -152,23 +156,21 @@ postuploadfail:
 			fullsubfolder.swapper("\\\\", "\\");
 			//osopen fullsubfolder to xx else if status() ne 2 then
 			//cannot use dos 8 characters since keys can be > 8 characters
-			//call shell2("dir " ^ fullsubfolder, errors);
-			//if (errors) {
-			if (not osdir(fullsubfolder)) {
+			call shell2("dir " ^ fullsubfolder, errors);
+			if (errors) {
 
 				//call shell('md ':uploadroot:subfolder)
 				//call mkdir(fullsubfolder:char(0),xx)
 				//call mkdir2(fullsubfolder)
 				//cannot use dos 8 characters since keys can be > 8 characters
 				//actually mkdir2 calls md so it is the same thing
-				//call shell2("md " ^ fullsubfolder, errors);
-				if (not osmkdir(fullsubfolder)) {
+				call shell2("md " ^ fullsubfolder, errors);
 
 				//check that folder was created
 				//call subdirs(fullsubfolder:\00\,result)
 				//if result else
 				//osopen fullsubfolder to xx else if status() ne 2 then
-				//if (errors) {
+				if (errors) {
 					if (USERNAME == "NEOSYS") {
 						msg = fullsubfolder;
 					}else{
@@ -192,14 +194,16 @@ postuploadfail:
 
 		//initdir uploadroot:uploadpath
 		//if dirlist() else
-		//var tt = shell2("dir " ^ (DQ ^ (uploadroot ^ uploadpath ^ DQ)) ^ " /b").ucase();
-		//if (tt == "" or tt.index("FILE NOT FOUND", 1)) {
-		if (not osfile(uploadroot ^ uploadpath)) {
+		var tt = shell2("dir " ^ (DQ ^ (uploadroot ^ uploadpath ^ DQ)) ^ " /b").ucase();
+		if (tt == "" or tt.index("FILE NOT FOUND", 1)) {
 			msg = "Error: Nothing uploaded in " ^ uploadroot ^ uploadpath;
 			return invalid(msg);
 		}
 
 	} else if (mode.field(".", 1) == "OPENUPLOAD") {
+
+		USER1 = virtualroot;
+		//data<2>=filenames
 
 		var virtualfilebase = mode.field(".", 2, 9999);
 		//fixed in UI now
@@ -215,14 +219,27 @@ postuploadfail:
 
 		//search for extensions
 		//may be only one extension now
-		var tt = uploadroot ^ virtualfilebase;
-		tt ^= "*";
-		var uploadfilenames = oslistf(tt);
+		var dirpatt = uploadroot ^ virtualfilebase;
+		if (dirpatt[-1] ne ".") {
+			dirpatt ^= ".";
+		}
+		dirpatt ^= "*";
 
-		if ((tt.substr(3, 99999)).index("..", 1)) {
-			msg = DQ ^ (tt ^ DQ) ^ " .. is not allowed";
+		if ((dirpatt.substr(3,99999)).index("..", 1)) {
+			msg = DQ ^ (dirpatt ^ DQ) ^ " .. is not allowed";
 			return invalid(msg);
 		}
+
+		//why does % come encoded as %25?
+		dirpatt.swapper("%25", "%");
+
+		if (USER0.a(3) == "NEW") {
+			var cmd = "DEL " ^ (DQ ^ (dirpatt ^ DQ));
+			osshell(cmd);
+			return 0;
+		}
+
+		var uploadfilenames = dirlist2(dirpatt);
 
 		//check one or more files exist
 		//if uploadfilenames else
@@ -234,6 +251,7 @@ postuploadfail:
 		//insert the missing virtual path
 		if (uploadfilenames) {
 			var nuploads = uploadfilenames.count(FM) + 1;
+
 			var ndeep = virtualfilebase.count("\\") + 1;
 			for (var uploadn = 1; uploadn <= nuploads; ++uploadn) {
 				var uploadfilename = uploadfilenames.a(uploadn);
@@ -241,33 +259,33 @@ postuploadfail:
 				uploadfilenames.r(uploadn, uploadfilename);
 			};//uploadn;
 			uploadfilenames.converter(FM, VM);
+
 		}
 
-		USER1 = virtualroot;
 		USER1.r(2, uploadfilenames);
 
+		//no longer required since updated in PLAN.SUBS POSTREAD
+		//since VIEW/OPENUPLOAD is no longer being called automatically after upload
 		//hack to register material uploads after uploading (relies on view after)
 		//only materials upload directly into images folder
 		//hack since a media file should not be referred to in GBP upload.subs
-		if (not(virtualfilebase.index("/", 1))) {
-			var materials;
-			if (materials.open("MATERIALS", "")) {
-				var materialid = virtualfilebase;
-				var material;
-				if (material.read(materials, materialid)) {
-					if (material.a(16) ne uploadfilenames) {
-						material.r(16, uploadfilenames);
-						//write without lock - any user updating it save will be blocked - but unlikely
-						material.write(materials, materialid);
-					}
-				}
-			}
-		}
+		//if index(virtualfilebase,'/',1) else
+		// open 'MATERIALS' to materials then
+		// materialid=virtualfilebase
+		// read material from materials,materialid then
+		// if material<16> ne uploadfilenames then
+		// material<16>=uploadfilenames
+		// *write without lock - any user updating it save will be blocked - but unlikely
+		// write material on materials,materialid
+		// end
+		// end
+		// end
+		// end
 
 	} else if (mode.field(".", 1) == "DELETEUPLOAD") {
 
 		if (not(authorised("UPLOAD DELETE", msg, ""))) {
-			return invalid(msg);
+			goto EOF_440;
 		}
 
 		//similar in VERIFY AND DELETEUPLOAD
@@ -278,24 +296,23 @@ postuploadfail:
 
 		//initdir uploadroot:uploadpath
 		//if dirlist() else
-		//var tt = shell2("dir " ^ (DQ ^ (uploadroot ^ uploadpath ^ DQ)) ^ " /b").ucase();
-		//if (tt == "" or tt.index("FILE NOT FOUND", 1)) {
-		if (not osfile(uploadroot ^ uploadpath)){
+		var tt = shell2("dir " ^ (DQ ^ (uploadroot ^ uploadpath ^ DQ)) ^ " /b").ucase();
+		if (tt == "" or tt.index("FILE NOT FOUND", 1)) {
 			msg = "Error: Nothing uploaded in " ^ uploadroot ^ uploadpath;
 			return invalid(msg);
 		}
 
-		var tt = uploadroot ^ uploadpath;
-		if ((tt.substr(3, 99999)).index("..", 1)) {
+		tt = uploadroot ^ uploadpath;
+		if ((tt.substr(3,99999)).index("..", 1)) {
 			msg = DQ ^ (tt ^ DQ) ^ " .. is not allowed";
 			return invalid(msg);
 		}
 
-		//var cmd = "DEL " ^ (DQ ^ (tt ^ DQ));
-		//osshell(cmd);
-		//if (dirlist2(uploadroot ^ uploadpath)) {
-		if (not osdelete(tt)){
-			msg = tt.quote() ^ " file cannot be deleted";
+		var cmd = "DEL " ^ (DQ ^ (tt ^ DQ));
+		osshell(cmd);
+
+		if (dirlist2(uploadroot ^ uploadpath)) {
+			msg = DQ ^ (uploadroot ^ uploadpath ^ " file cannot be deleted" ^ DQ);
 			return invalid(msg);
 		}
 
@@ -320,7 +337,7 @@ postuploadfail:
 		var validating = RECORD.a(17);
 		osfile = "";
 
-		if ((uploadpath.substr(3, 99999)).index("..", 1)) {
+		if ((uploadpath.substr(3,99999)).index("..", 1)) {
 			msg = DQ ^ (uploadpath ^ DQ) ^ " .. is not allowed";
 			return invalid(msg);
 		}
@@ -331,7 +348,7 @@ postuploadfail:
 		if (not dictfilename) {
 			dictfilename = filename;
 		}
-		if (dictfilename.substr(1, 4) ne "DICT") {
+		if (dictfilename.substr(1,4) ne "DICT") {
 			dictfilename.splicer(1, 0, "DICT.");
 		}
 		//if keydictid else keydictid='@ID'
@@ -344,7 +361,7 @@ postuploadfail:
 		file = "";
 
 		if (not importcode) {
-			importcode = field2(uploadpath,"\\", -1).ucase();
+			importcode = field2(uploadpath.ucase("\\", -1));
 		}
 		if (importcode.index(".", 1)) {
 			var tt = field2(uploadpath, ".", -1);
@@ -358,72 +375,56 @@ postuploadfail:
 		// goto invalid
 		// end
 
-		nimported = "";
-
-		/*
-		temposfilename83 = (SYSTEM.a(24) ^ var(1000000).rnd()).substr(1, 8) ^ ".$IM";
+		temposfilename83 = SYSTEM.a(24) ^ var(1000000).rnd().substr(1,8) ^ ".$IM";
 
 		msg = DQ ^ (uploadroot ^ uploadpath ^ DQ) ^ "\r\n";
 		msg = "Uploaded file cannot be found/copied" "\r\n";
 		msg ^= DQ ^ (temposfilename83 ^ DQ) ^ " file cannot be opened" ")";
+
+		var nimported = "";
 
 		//from here on goto importexit to clean up temporary file
 
 		var cmd = "COPY " ^ (DQ ^ (uploadroot ^ uploadpath ^ DQ)) ^ " " ^ temposfilename83;
 		call shell2(cmd, errors);
 		if (errors) {
-			gosub invalid();
-			gosub importexit();
-			return 1;
+			gosub invalid(msg);
+			goto importexit;
 		}
 
 		if (not osfile.osopen(temposfilename83)) {
-			gosub invalid();
-			gosub importexit();
-			return 1;
-		}
-		*/
-		importosfilename=uploadroot ^ uploadpath;
-		if (not osfile.osopen(importosfilename)) {
-			gosub invalid();
-			gosub importexit();
-			return 1;
+			gosub invalid(msg);
+			goto importexit;
 		}
 
 		fileoffset = 0;
 		anycr = 0;
-		lineno = 0;
+		LINENO = 0;
 		//cols os "name vm start vm len" etc one col per fm
 		var cols = "";
 		nimported = 0;
 
 		while (true) {
 			gosub getline();
-
-			if (not(not eof))
-				break;;
-
-			if (line and lineno >= startatrown) {
+		///BREAK;
+		if (not(not eof)) break;;
+			if (line and LINENO >= startatrown) {
 
 				//determine cols from first col heading
 				if (not cols) {
 					var offset = 1;
 					while (true) {
-
 						var tt = line.index("  ", 1);
-						if (not tt)
-							break;
-
-						cols.r(-1, line.substr(1, tt - 1) ^ VM ^ offset);
-
-						var ptr=tt;
-						while (line.substr(ptr + 1, 1) eq " " and ptr <= 999999){
-							++ptr;
-						}
+					///BREAK;
+					if (not tt) break;;
+						cols.r(-1, line.substr(1,tt - 1) ^ VM ^ offset);
+						for (var ptr = tt; ptr <= 999999; ++ptr) {
+						///BREAK;
+						if (line[ptr + 1] ne " ") break;;
+						};//ptr;
 						cols ^= VM ^ ptr;
 						offset += ptr;
 						line.splicer(1, ptr, "");
-
 					}//loop;
 					ncols = cols.count(FM) + 1;
 	//oswrite cols on 'cols'
@@ -436,15 +437,13 @@ postuploadfail:
 						if (not(file.open(filename, ""))) {
 							call fsmsg();
 							win.valid = 0;
-							gosub importexit();
-							return 1;
+							goto importexit;
 						}
 						var dictfile;
 						if (not(dictfile.open(dictfilename, ""))) {
 							call fsmsg();
 							win.valid = 0;
-							gosub importexit();
-							return 1;
+							goto importexit;
 						}
 
 						//create dictionary
@@ -457,30 +456,31 @@ postuploadfail:
 							dictrec.r(2, coln + fieldoffset);
 							dictrec.r(3, capitalise(cols.a(coln, 1)));
 							dictrec.r(10, "10");
-							var dictid = dictcolprefix ^ "_" ^ cols.a(coln, 1).convert(" ","_").ucase();
+							var dictid = dictcolprefix ^ "_" ^ .convert("_".ucase(cols.a(coln, 1)));
 
-							var conv = "";
+							var CONV = "";
 							var just = "L";
 							var nn = dictid.count("_") + 1;
 							for (var ii = 1; ii <= nn; ++ii) {
 								var word = dictid.field("_", ii);
-								if (datewords.locate(word, xx, 1)) {
-									conv = "[DATE,4*]";
+								if (datewords.locateusing(word, VM, xx)) {
+									CONV = "[DATE,4*]";
 									just = "R";
-								} else if (timewords.locate(word, xx, 1)) {
-									conv = "[TIME2,48MTS]";
+									goto 2467;
+								}
+								if (timewords.locateusing(word, VM, xx)) {
+									CONV = "[TIME2,48MTS]";
 									just = "R";
 								}
 							};//ii;
-							cols.r(coln, 4, conv);
-							dictrec.r(7, conv);
+							cols.r(coln, 4, CONV);
+							dictrec.r(7, CONV);
 							dictrec.r(9, just);
 
 							grec ^= " " ^ dictid;
 							dictrec.write(dictfile, dictid);
 						};//coln;
-						var groupdictrec="G" ^ FM ^ FM ^ grec;
-						groupdictrec.write(dictfile, dictcolprefix);
+						"G" ^ FM ^ FM ^ grec.write(dictfile, dictcolprefix);
 
 						if (keyfunction) {
 							if (not keydictid) {
@@ -499,21 +499,21 @@ postuploadfail:
 						var rec = "";
 						for (var coln = 1; coln <= ncols; ++coln) {
 							var col = cols.a(coln);
-							var cell = line.substr(col.a(1, 2), col.a(1, 3)).trimb();
+							var cell = line.substr(col.a(1, 2),col.a(1, 3)).trimb();
 							if (cell.length()) {
 								if (col.a(1, 4)) {
 									var cell0 = cell;
-									var conv = col.a(1, 4);
-									if (conv.index("TIME", 1)) {
+									var CONV = col.a(1, 4);
+									if (CONV.index("TIME", 1)) {
 										//if no : in time then assume is already seconds
 										if (cell.index(":", 1)) {
-											cell = cell.iconv(conv);
+											cell = cell.iconv(CONV);
 										}
 									}else{
-										cell = cell.iconv(conv);
+										cell = cell.iconv(CONV);
 									}
 									if (not cell.length()) {
-										call mssg(DQ ^ (cell0 ^ DQ) ^ " cannot be converted in line " ^ lineno ^ " col " ^ coln);
+										call mssg(DQ ^ (cell0 ^ DQ) ^ " cannot be converted in line " ^ LINENO ^ " col " ^ coln);
 										//indicate strange but leave workable date/time
 										cell = "00";
 									}
@@ -522,7 +522,7 @@ postuploadfail:
 							rec.r(coln + fieldoffset, cell);
 						};//coln;
 
-						key = importcode ^ "*" ^ lineno;
+						key = importcode ^ "*" ^ LINENO;
 						if (importfilenamefn) {
 							rec.r(importfilenamefn, uploadpath);
 						}
@@ -530,7 +530,7 @@ postuploadfail:
 							rec.r(importcodefn, importcode);
 						}
 						if (linenofn) {
-							rec.r(linenofn, lineno);
+							rec.r(linenofn, LINENO);
 						}
 						//TODO once (on record one) should really check that any
 						//columns defined in the keydict as {} fields EXIST in the dictfile
@@ -550,26 +550,22 @@ postuploadfail:
 
 		}//loop;
 
-		gosub importexit();
+importexit:
+		osfile.osclose();
+		temposfilename83.osdelete();
+		ANS = nimported;
 
 	} else {
 		msg = DQ ^ (mode ^ DQ) ^ " invalid mode in upload.subs";
 		return invalid(msg);
 	}
-
+//L3009:
 	return 0;
 
 }
 
-subroutine importexit(){
-	osfile.osclose();
-	//temposfilename83.osdelete();
-	ANS = nimported;
-	return;
-}
-
 subroutine getline() {
-	call osbread(line, osfile, fileoffset, lengthx);
+	call osbread(line, osfile, temposfilename83, fileoffset, lengthx);
 
 	if (not line.length()) {
 		eof = 1;
@@ -599,7 +595,7 @@ subroutine getline() {
 	fileoffset += tt;
 	line.splicer(tt, 999999, "");
 
-	lineno += 1;
+	LINENO += 1;
 	eof = 0;
 	return;
 

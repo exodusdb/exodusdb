@@ -38,6 +38,8 @@
 	Mar 2009: exodus/Steve Bush passthrough illegal utf8/32 characters 0xF9-0xFF used in pick database
 	Nov 2010: exodus/Steve Bush inline isLegalUTF8 as per suggestion (using supposedly portable INLINE macro)
 
+	Obsolete since started using certain UTF characters as field separators and normal utf converters can be used
+
     See the header file "ConvertUTF.h" for complete documentation.
 
 ------------------------------------------------------------------------ */

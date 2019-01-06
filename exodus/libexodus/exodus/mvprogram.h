@@ -100,6 +100,9 @@ DLL_PUBLIC
 	int keypressed(int delayusecs=0) const;
 	bool esctoexit() const;
 
+	bool pushselect(const var& v1, var& v2, var& v3, var& v4) const;
+	bool popselect(const var& v1, const var& v2, const var& v3, const var& v4) const;
+
 	bool oswritex(const var& str, const var& filename) const;
 	bool osbwritex(const var& str1, const var& filehandle, const var& filename, var& offset) const;
 //	bool osbreadx(var& str1, const var& filehandle, const var& filename, const int startoffset, const int length);

@@ -9,11 +9,9 @@ libraryinit()
 #include <authorised.h>
 #include <locking.h>
 #include <generalsubs2.h>
-//#include <pushselect.h>
 #include <quote2.h>
-//#include <safeselect.h>
-//#include <flushindex.h>
-//#include <popselect.h>
+#include <safeselect.h>
+#include <flushindex.h>
 #include <createjob.h>
 #include <btreeextract.h>
 #include <singular.h>
@@ -257,7 +255,10 @@ nextclient:
 
 	} else if (mode == "PREWRITE") {
 
-		gosub security();
+		gosub security(mode);
+		if (not win.valid) {
+			return 0;
+		}
 
 		//check no deleted brands are in use
 		gosub checkdeletedbrands( mode);
@@ -492,7 +493,11 @@ nextclient:
 						//if 1 then
 
 						job = "";
-						job.r(1, (var().date()).oconv("D2/E").field("/", 2) + 0 ^ "/" ^ (var().date()).oconv("D2/E").field("/", 3));
+						//job<1>=field(date() 'D2/E','/',2)+0:'/':field(date() 'D2/E','/',3)
+						tt = (var().date()).oconv("D2/E").field("/", 2) + 0;
+						tt ^= "/";
+						tt ^= (var().date()).oconv("D2/E").field("/", 3);
+						job.r(1, tt);
 						job.r(2, brandcode);
 						if ((brand.a(2).ucase()).index(brand.a(3).ucase(), 1) or (brand.a(3).ucase()).index(brand.a(2).ucase(), 1)) {
 							job.r(9, brand.a(2));
@@ -566,7 +571,10 @@ nextclient:
 
 	} else if (mode == "PREDELETE") {
 
-		gosub security();
+		gosub security(mode);
+		if (not win.valid) {
+			return 0;
+		}
 
 		RECORD = "";
 		gosub checkdeletedbrands( mode);
@@ -594,7 +602,10 @@ nextclient:
 		//call client.subs('GETVALIDBRANDS')
 
 	} else if (mode == "POSTINIT") {
-		gosub security();
+		gosub security(mode);
+		if (not win.valid) {
+			return 0;
+		}
 
 	} else if (mode == "POSTREAD") {
 
@@ -640,13 +651,16 @@ unlockclient:
 		//now lock is on client completely
 		//if validcode('BRAND %ANY%',@record<2>,msg) else goto unlockclient
 
-		gosub security();
+		gosub security(mode);
+		if (not win.valid) {
+			return 0;
+		}
 
 	} else if (1) {
 		msg = DQ ^ (mode ^ DQ) ^ " - unknown mode skipped in CLIENT.SUBS";
 		return invalid();
 	}
-//L3393:
+//L3434:
 	return 0;
 
 }

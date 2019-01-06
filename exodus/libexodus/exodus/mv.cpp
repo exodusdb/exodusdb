@@ -31,6 +31,7 @@ THE SOFTWARE.
 //or overlap the string/integer/float variables to save space
 
 #include <sstream>
+#include <boost/locale.hpp>
 
 #define MV_NO_NARROW
 
@@ -38,7 +39,7 @@ THE SOFTWARE.
 #include <limits>
 #include <exodus/mv.h>
 #include <exodus/mvimpl.h>
-#include <exodus/mvutf.h>
+//#include <exodus/mvutf.h>
 #include <exodus/mvexceptions.h>
 
 namespace exodus {
@@ -164,7 +165,8 @@ var::var(const std::wstring& str1)
 //ctor for std::string
 //just use initializers since cannot fail
 var::var(const std::string& str1)
-	: var_mvstr(wstringfromUTF8((UTF8*)str1.data(),(int)str1.length()))
+	//: var_mvstr(wstringfromUTF8((UTF8*)str1.data(),(int)str1.length()))
+	: var_mvstr(boost::locale::conv::utf_to_utf<wchar_t>(str1))
 	, var_mvtyp(pimpl::MVTYPE_STR)
 {}
 
@@ -1380,7 +1382,8 @@ std::istream& operator >> (std::istream& istream1,var& var1)
 	istream1 >> std::noskipws >> tempstr;
 
 	var1.var_mvtyp=pimpl::MVTYPE_STR;
-	var1.var_mvstr=wstringfromUTF8((UTF8*)tempstr.data(),(int)tempstr.length());
+	//var1.var_mvstr=wstringfromUTF8((UTF8*)tempstr.data(),(int)tempstr.length());
+	var1.var_mvstr=boost::locale::conv::utf_to_utf<wchar_t>(tempstr)
 	return istream1;
 }
 

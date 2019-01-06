@@ -1033,6 +1033,7 @@ public:
 	bool deletedb(const var& dbname, var& errmsg) const;
 
 	bool createfile(const var& filename) const;
+	bool renamefile(const var& filename, const var& newfilename) const;
 	bool deletefile(const var& filename) const;
 	bool clearfile(const var& filename) const;
 	var listfiles() const;
@@ -1041,11 +1042,21 @@ public:
 	bool deleteindex(const var& fieldname) const;
 	var listindexes(const var& filename DEFAULTNULL) const;
 
+	var reccount(const var& filename DEFAULTNULL) const;
+	var flushindex(const var& filename DEFAULTNULL) const;
+
 	bool open(const var& dbfilename, const var& dbconnection DEFAULTNULL);
 	void close();
 
 	bool select(const var& sortselectclause DEFAULTNULL) const;
 	void clearselect() const;
+	bool selectpending() const;
+
+	bool savelist(const var& name) const;
+	bool getlist(const var& name) const;
+	bool makelist(const var& name, const var& keys) const;
+	bool deletelist(const var& name) const;
+
 	bool readnext(var& key) const;
 	bool readnext(var& key, var& valueno) const;
 

@@ -27,45 +27,67 @@ THE SOFTWARE.
 //http://www.regular-expressions.info/
 //http://www.regular-expressions.info/unicode.html 
 
-#include <boost/regex/config.hpp>
+//show c++ version for info
+#include <boost/preprocessor/stringize.hpp>
+#pragma message "__cplusplus=" BOOST_PP_STRINGIZE(__cplusplus)
 
-//{{ to use utf8 facet
-#define BOOST_UTF8_BEGIN_NAMESPACE namespace boost { namespace filesystem { namespace detail {
-#define BOOST_UTF8_DECL
-#define BOOST_UTF8_END_NAMESPACE }}}
+#define USE_BOOST_REGEX
 
-#include <boost/detail/utf8_codecvt_facet.hpp>
+#ifndef USE_BOOST_REGEX
+#	include <regex>
+#	define std_boost std
+
+#else
+#	define std_boost boost
+#	include <boost/regex/config.hpp>
+
+//{{ use boost's utf8 facet for codecvt since it is stable
+#	define BOOST_UTF8_BEGIN_NAMESPACE namespace boost { namespace filesystem { namespace detail {
+#	define BOOST_UTF8_DECL
+#	define BOOST_UTF8_END_NAMESPACE }}}
+
+#	include <boost/detail/utf8_codecvt_facet.hpp>
 // this requires also to link with the library: libboost_filesystem-*.lib
 // For example (for debug under MSVS2008: libboost_filesystem-vc90-mt-gd-1_38.lib
 
-#undef BOOST_UTF8_END_NAMESPACE
-#undef BOOST_UTF8_DECL
-#undef BOOST_UTF8_BEGIN_NAMESPACE
+#	undef BOOST_UTF8_END_NAMESPACE
+#	undef BOOST_UTF8_DECL
+#	undef BOOST_UTF8_BEGIN_NAMESPACE
 //}}
 
-#if !defined(BOOST_HAS_ICU) && !defined(BOOST_HASNT_ICU)
-#	define BOOST_HAS_ICU
+#	if !defined(BOOST_HAS_ICU) && !defined(BOOST_HASNT_ICU)
+#		define BOOST_HAS_ICU
+#	endif
+#	ifdef BOOST_HAS_ICU
+#		pragma message "BOOST_HAS_ICU"
+#		include <boost/regex/icu.hpp>
+#	endif
+#	include <boost/regex.hpp>
+
 #endif
-#ifdef BOOST_HAS_ICU
-#	include <boost/regex/icu.hpp>
-#endif
-#include <boost/regex.hpp>
+
 #include <boost/scoped_ptr.hpp>
 #include <boost/scoped_array.hpp>
 
-//regex.assign("", boost::regex::extended|boost::regex_constants::icase);
+//regex.assign("", std_boost::regex::extended|std_boost::regex_constants::icase);
 
 //TODO check all error handling
-//http://www.ibm.com/developerworks/aix/library/au-boostfs/index.html
+//http://www.ibm.com/developerworks/aix/library/au-stdfs/index.html
 //catch(boost::filesystem::filesystem_error e) { 
 //#include <boost/filesystem.hpp>
+#define C17
+#ifdef C17
+#include <experimental/filesystem>
+namespace stdfs = std::experimental::filesystem;
+#else
 #include <boost/filesystem/convenience.hpp>
 #include <boost/filesystem/config.hpp>
 #include <boost/filesystem/exception.hpp>
 #include <boost/filesystem/fstream.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
-namespace boostfs = boost::filesystem;
+namespace stdfs = boost::filesystem;
+#endif
 #include <boost/thread/tss.hpp>
 
 //#include NullCodecvt.h
@@ -107,7 +129,7 @@ namespace boostfs = boost::filesystem;
 
 #include <exodus/mvimpl.h>
 #include <exodus/mv.h>
-#include <exodus/mvutf.h>
+//#include <exodus/mvutf.h>
 #include <exodus/mvexceptions.h>
 
 #include "mvhandles.h"
@@ -322,7 +344,7 @@ std::locale get_locale(const var& locale_name) // throw (MVException)
 		}
 	}
 }
-	
+
 bool checknotabsoluterootfolder(std::wstring dirname)
 {
 	//safety - will not rename/remove top level folders
@@ -355,15 +377,15 @@ var var::iconv_MT() const
 {
 	//ignore everything else and just get first three groups of digits "99 99 99"
 	//remove leading and trailing non-digits and replace internal strings of non-digits with single space
-	
+
 	//var time=(*this).swap(L"^\\D+|\\D+$", L"", L"r").swap(L"\\D+", L" ", L"r");
 
-	static boost::wregex surrounding_nondigits_regex(L"^\\D+|\\D+$",boost::regex::extended|boost::regex_constants::icase);
+	static std_boost::wregex surrounding_nondigits_regex(L"^\\D+|\\D+$",std_boost::regex::extended|std_boost::regex_constants::icase);
 
-	static boost::wregex inner_nondigits_regex(L"\\D+",boost::regex::extended|boost::regex_constants::icase);
+	static std_boost::wregex inner_nondigits_regex(L"\\D+",std_boost::regex::extended|std_boost::regex_constants::icase);
 
-	var time=var(boost::regex_replace(toTstring((*this)),surrounding_nondigits_regex, L""));
-	time=var(boost::regex_replace(toTstring((time)),inner_nondigits_regex, L" "));
+	var time=var(std_boost::regex_replace(toTstring((*this)),surrounding_nondigits_regex, L""));
+	time=var(std_boost::regex_replace(toTstring((time)),inner_nondigits_regex, L" "));
 
 	int hours=time.field(L" ",1).toInt();
 	int mins=time.field(L" ",2).toInt();
@@ -431,29 +453,29 @@ var& var::oconv_MC(const wchar_t* conversionchar)
 
 #ifndef BOOST_HAS_ICU
 #	define boost_mvstr toTstring((*this))
-#	define boost_regex_replace boost::regex_replace
-	static const boost::wregex
-		digits_regex		(L"\\d+"		,boost::regex::extended), // \d numeric
-		alpha_regex			(L"[^\\W\\d]+"	,boost::regex::extended), // \a alphabetic
-		alphanum_regex		(L"\\w+"		,boost::regex::extended), // \w alphanumeric
-		non_digits_regex	(L"[^\\d]+"		,boost::regex::extended), // \D non-numeric
-		non_alpha_regex		(L"[\\W\\d]+"	,boost::regex::extended), // \A non-alphabetic
-		non_alphanum_regex	(L"\\W+"		,boost::regex::extended); // \W non-alphanumeric
+#	define boost_regex_replace std_boost::regex_replace
+	static const std_boost::wregex
+		digits_regex		(L"\\d+"		,std_boost::regex::extended), // \d numeric
+		alpha_regex			(L"[^\\W\\d]+"	,std_boost::regex::extended), // \a alphabetic
+		alphanum_regex		(L"\\w+"		,std_boost::regex::extended), // \w alphanumeric
+		non_digits_regex	(L"[^\\d]+"		,std_boost::regex::extended), // \D non-numeric
+		non_alpha_regex		(L"[\\W\\d]+"	,std_boost::regex::extended), // \A non-alphabetic
+		non_alphanum_regex	(L"\\W+"		,std_boost::regex::extended); // \W non-alphanumeric
 #else
 #	define boost_mvstr var_mvstr
-#	define boost_regex_replace boost::u32regex_replace
-	static const boost::u32regex
-		digits_regex=boost::make_u32regex(L"\\d+"	,boost::regex::extended); //\d numeric
-	static const boost::u32regex
-		alpha_regex=boost::make_u32regex(L"[^\\W\\d]+"	,boost::regex::extended); // \a alphabetic
-	static const boost::u32regex
-		alphanum_regex=boost::make_u32regex(L"\\w+"	,boost::regex::extended); // \w alphanumeric
-	static const boost::u32regex
-		non_digits_regex=boost::make_u32regex(L"[^\\d]+",boost::regex::extended); // \D non-numeric
-	static const boost::u32regex
-		non_alpha_regex=boost::make_u32regex(L"[\\W\\d]+",boost::regex::extended); // \A non-alphabetic
-	static const boost::u32regex
-		non_alphanum_regex=boost::make_u32regex(L"\\W+"	,boost::regex::extended); // \W non-alphanumeric
+#	define boost_regex_replace std_boost::u32regex_replace
+	static const std_boost::u32regex
+		digits_regex=boost::make_u32regex(L"\\d+"	,std_boost::regex::extended); //\d numeric
+	static const std_boost::u32regex
+		alpha_regex=boost::make_u32regex(L"[^\\W\\d]+"	,std_boost::regex::extended); // \a alphabetic
+	static const std_boost::u32regex
+		alphanum_regex=boost::make_u32regex(L"\\w+"	,std_boost::regex::extended); // \w alphanumeric
+	static const std_boost::u32regex
+		non_digits_regex=boost::make_u32regex(L"[^\\d]+",std_boost::regex::extended); // \D non-numeric
+	static const std_boost::u32regex
+		non_alpha_regex=boost::make_u32regex(L"[\\W\\d]+",std_boost::regex::extended); // \A non-alphabetic
+	static const std_boost::u32regex
+		non_alphanum_regex=boost::make_u32regex(L"\\W+"	,std_boost::regex::extended); // \W non-alphanumeric
 #endif
 
 	//negate if /
@@ -465,7 +487,7 @@ var& var::oconv_MC(const wchar_t* conversionchar)
 			// MC/N return everything except digits i.e. remove all digits 0123456789
 			case 'N':
 			{
-				//var_mvstr=boost::regex_replace(toTstring((*this)),digits_regex, L"");
+				//var_mvstr=std_boost::regex_replace(toTstring((*this)),digits_regex, L"");
 				var_mvstr=boost_regex_replace(boost_mvstr,digits_regex, L"");
 				break;
 			}
@@ -473,14 +495,14 @@ var& var::oconv_MC(const wchar_t* conversionchar)
 			// MC/A return everything except "alphabetic" i.e remove all "alphabetic"
 			case 'A':
 			{
-				//var_mvstr=boost::regex_replace(toTstring((*this)),alpha_regex, L"");
+				//var_mvstr=std_boost::regex_replace(toTstring((*this)),alpha_regex, L"");
 				var_mvstr=boost_regex_replace(boost_mvstr,alpha_regex, L"");
 				break;
 			}
 			// MC/B return everything except "alphanumeric" remove all "alphanumeric"
 			case 'B':
 			{
-				//var_mvstr=boost::regex_replace(toTstring((*this)),alphanum_regex, L"");
+				//var_mvstr=std_boost::regex_replace(toTstring((*this)),alphanum_regex, L"");
 				var_mvstr=boost_regex_replace(boost_mvstr,alphanum_regex, L"");
 				break;
 			}
@@ -489,28 +511,28 @@ var& var::oconv_MC(const wchar_t* conversionchar)
 	}
 
 	//http://www.boost.org/doc/libs/1_37_0/libs/regex/doc/html/boost_regex/ref/regex_replace.html
-	//boost::regex_replace
+	//std_boost::regex_replace
 
 	switch (*conversionchar)
 	{
 		// MCN return only digits i.e. remove all non-digits
 		case 'N':
 		{
-			//var_mvstr=boost::regex_replace(toTstring((*this)),non_digits_regex, L"");
+			//var_mvstr=std_boost::regex_replace(toTstring((*this)),non_digits_regex, L"");
 			var_mvstr=boost_regex_replace(boost_mvstr,non_digits_regex, L"");
 			break;
 		}
 		// MCA return only "alphabetic" i.e. remove all "non-alphabetic"
 		case 'A':
 		{
-			//var_mvstr=boost::regex_replace(toTstring((*this)),non_alpha_regex, L"");
+			//var_mvstr=std_boost::regex_replace(toTstring((*this)),non_alpha_regex, L"");
 			var_mvstr=boost_regex_replace(boost_mvstr,non_alpha_regex, L"");
 			break;
 		}
 		// MCB return only "alphanumeric" i.e. remove all "non-alphanumeric"
 		case 'B':
 		{
-			//var_mvstr=boost::regex_replace(toTstring((*this)),non_alphanum_regex, L"");
+			//var_mvstr=std_boost::regex_replace(toTstring((*this)),non_alphanum_regex, L"");
 			var_mvstr=boost_regex_replace(boost_mvstr,non_alphanum_regex, L"");
 			break;
 		}
@@ -624,30 +646,30 @@ bool var::match(const var& matchstr, const var& options) const
 	//TODO automatic caching of regular expressions or new exodus datatype to handle them
 
 #ifndef BOOST_HAS_ICU
-	boost::wregex regex;
+	std_boost::wregex regex;
 	try
 	{
 		if (options.index(L"i"))
-			regex.assign(toTstring(matchstr), boost::regex::extended|boost::regex_constants::icase);
+			regex.assign(toTstring(matchstr), std_boost::regex::extended|std_boost::regex_constants::icase);
 		else
-			regex.assign(toTstring(matchstr), boost::regex::extended|boost::regex_constants::icase);
+			regex.assign(toTstring(matchstr), std_boost::regex::extended|std_boost::regex_constants::icase);
 	}
-	catch (boost::regex_error& e)
+	catch (std_boost::regex_error& e)
     {
 		throw MVException(var(e.what()).quote() ^ L" is an invalid regular expression");
 	}
 
         return regex_match(toTstring((*this)), regex);
 #else
-	boost::u32regex regex;
+	std_boost::u32regex regex;
 	try
 	{
 		if (options.index(L"i"))
-                        regex=boost::make_u32regex(matchstr.var_mvstr, boost::regex::extended|boost::regex_constants::icase);
+                        regex=boost::make_u32regex(matchstr.var_mvstr, std_boost::regex::extended|std_boost::regex_constants::icase);
 		else
-                        regex=boost::make_u32regex(matchstr.var_mvstr, boost::regex::extended);
+                        regex=boost::make_u32regex(matchstr.var_mvstr, std_boost::regex::extended);
 	}
-	catch (boost::regex_error& e)
+	catch (std_boost::regex_error& e)
     {
 		throw MVException(var(e.what()).quote() ^ L" is an invalid regular expression");
 	}
@@ -677,61 +699,78 @@ var& var::swapper(const var& what, const var& with, const var& options)
 	if (options.length()!=0)
 	{
 #ifndef BOOST_HAS_ICU
-		//http://www.boost.org/doc/libs/1_38_0/libs/regex/doc/html/boost_regex/syntax/basic_syntax.html
+		//http://www.cplusplus.com/reference/regex/basic_regex/assign/
 
+
+                //TODO automatic caching of regular expressions or new exodus datatype to handle them
+                std_boost::wregex regex;
+                try
+                {
+                        if (options==(L"ri"))
+                                regex.assign(toTstring(what), std_boost::regex::extended|std_boost::regex_constants::icase);
+                        else if (options==(L"r"))
+                                regex.assign(toTstring(what), std_boost::regex::extended);
+                        else if (options==(L"i"))
+                                regex.assign(toTstring(what), std_boost::regex::extended|std_boost::regex_constants::icase|std_boost::regex::literal);
+                        else
+                                regex.assign(toTstring(what), boost::regex_constants::literal);
+                //boost::wregex toregex_regex(with.var_mvstr, boost::regex::extended);
+                }
+                catch (std_boost::regex_error& e)
+                {
+                        throw MVException(var(e.what()).quote() ^ L" is an invalid regular expression");
+                }
+/*
 		//TODO automatic caching of regular expressions or new exodus datatype to handle them
-		boost::wregex regex;
+		std_boost::wregex regex;
 		try
 		{
-			if (options==(L"ri"))
-                                regex.assign(toTstring(what), boost::regex::extended|boost::regex_constants::icase);
-			else if (options==(L"r"))
-                                regex.assign(toTstring(what), boost::regex::extended);
-			else if (options==(L"i"))
-                                regex.assign(toTstring(what), boost::regex::extended|boost::regex_constants::icase|boost::regex::literal);
+			if (options==(L"i") || options==(L"ri"))
+                                regex.assign(toTstring(what), std_boost::regex::ECMAScript|std_boost::regex_constants::icase);
 			else
-				regex.assign(toTstring(what), boost::regex_constants::literal);
-		//boost::wregex toregex_regex(with.var_mvstr, boost::regex::extended);
+				//regex.assign(toTstring(what), std_boost::regex_constants::literal);
+				regex.assign(toTstring(what));
+		//std_boost::wregex toregex_regex(with.var_mvstr, std_boost::regex::extended);
 		}
-		catch (boost::regex_error& e)
+		catch (std_boost::regex_error& e)
 		{
 			throw MVException(var(e.what()).quote() ^ L" is an invalid regular expression");
 		}
-
+*/
 		//return regex_match(var_mvstr, expression);
 
 		//std::wostringstream outputstring(std::ios::out | std::ios::binary);
     //std::ostream_iterator<wchar_t, wchar_t> oiter(outputstring);
-		//boost::regex_replace(oiter, var_mvstr.begin(), var_mvstr.end(),regex_regex, with, boost::match_default | boost::format_all);
-                var_mvstr=var(boost::regex_replace(toTstring((*this)),regex, toTstring(with))).var_mvstr;
+		//std_boost::regex_replace(oiter, var_mvstr.begin(), var_mvstr.end(),regex_regex, with, boost::match_default | boost::format_all);
+                var_mvstr=var(std_boost::regex_replace(toTstring((*this)),regex, toTstring(with))).var_mvstr;
 
 #else
 		//http://www.boost.org/doc/libs/1_38_0/libs/regex/doc/html/boost_regex/syntax/basic_syntax.html
 
 		//TODO automatic caching of regular expressions or new exodus datatype to handle them
-		boost::u32regex regex;
+		std_boost::u32regex regex;
 		try
 		{
 			/*
 			if (options.index(L"i"))
 				regex=boost::make_u32regex(what.var_mvstr,
-					boost::regex::extended|boost::regex_constants::icase);
+					std_boost::regex::extended|std_boost::regex_constants::icase);
 			else
 				regex=boost::make_u32regex(what.var_mvstr,
-					boost::regex::extended);
-			//boost::wregex toregex_regex(with.var_mvstr, boost::regex::extended);
+					std_boost::regex::extended);
+			//std_boost::wregex toregex_regex(with.var_mvstr, std_boost::regex::extended);
 			*/
 			if (options==(L"ri"))
-				regex=boost::make_u32regex(what.var_mvstr,boost::regex::extended|boost::regex_constants::icase);
+				regex=boost::make_u32regex(what.var_mvstr,std_boost::regex::extended|std_boost::regex_constants::icase);
 			else if (options==(L"r"))
-				regex=boost::make_u32regex(what.var_mvstr,boost::regex::extended);
+				regex=boost::make_u32regex(what.var_mvstr,std_boost::regex::extended);
 			else if (options==(L"i"))
-				regex=boost::make_u32regex(what.var_mvstr,boost::regex_constants::icase|boost::regex::literal);
+				regex=boost::make_u32regex(what.var_mvstr,std_boost::regex_constants::icase|std_boost::regex::literal);
 			else
-				regex=boost::make_u32regex(what.var_mvstr,boost::regex::literal);
-		//boost::wregex toregex_regex(with.var_mvstr, boost::regex::extended);
+				regex=boost::make_u32regex(what.var_mvstr,std_boost::regex::literal);
+		//std_boost::wregex toregex_regex(with.var_mvstr, std_boost::regex::extended);
 		}
-		catch (boost::regex_error& e)
+		catch (std_boost::regex_error& e)
 		{
 			throw MVException(var(e.what()).quote() ^ L" is an invalid regular expression");
 		}
@@ -740,8 +779,8 @@ var& var::swapper(const var& what, const var& with, const var& options)
 
 		//std::wostringstream outputstring(std::ios::out | std::ios::binary);
 		//std::ostream_iterator<wchar_t, wchar_t> oiter(outputstring);
-		//boost::regex_replace(oiter, var_mvstr.begin(), var_mvstr.end(),regex_regex, with, boost::match_default | boost::format_all);
-		var_mvstr=boost::u32regex_replace(var_mvstr,regex, with.var_mvstr);
+		//std_boost::regex_replace(oiter, var_mvstr.begin(), var_mvstr.end(),regex_regex, with, boost::match_default | boost::format_all);
+		var_mvstr=std_boost::u32regex_replace(var_mvstr,regex, with.var_mvstr);
 
 #endif
 
@@ -1101,8 +1140,11 @@ bool var::osread(const char* osfilename, const var& locale)
 	bytesize = (unsigned int) myfile.gcount();
 	myfile.close();
 
-	if (failed)
+	//failure can indicate that we didnt get as many characters as requested due to
+	//utf8 encoding in file
+	if (failed && !bytesize) {
 		return false;
+	}
 
 	//ALN:JFI: actually we could use std::string 'tempstr' in place of 'memblock' by hacking
 	//	.data member and reserve() or resize(), thus avoiding buffer-to-buffer-copying
@@ -1277,7 +1319,7 @@ bool var::osrename(const var& newosdir_or_filename) const
 	THISIS(L"bool var::osrename(const var& newosdir_or_filename) const")
 	THISISSTRING()
 	ISSTRING(newosdir_or_filename)
-	
+
 	//prevent overwrite of existing file
 	//ACQUIRE
 	std::wifstream myfile;
@@ -1303,18 +1345,18 @@ bool var::oscopy(const var& to_osfilename) const
 	THISIS(L"bool var::oscopy(const var& to_osfilename) const")
 	THISISSTRING()
 	ISSTRING(to_osfilename)
-	
-    //boostfs::wpath frompathx(toTstring((*this)).c_str());
-    //boostfs::wpath topathx(toTstring(to_osfilename).c_str());
-    boostfs::path frompathx((*this).toString().c_str());
-    boostfs::path topathx(to_osfilename.toString().c_str());
+
+    //stdfs::wpath frompathx(toTstring((*this)).c_str());
+    //stdfs::wpath topathx(toTstring(to_osfilename).c_str());
+    stdfs::path frompathx((*this).toString().c_str());
+    stdfs::path topathx(to_osfilename.toString().c_str());
     try
     {
 		//will not overwrite so this is redundant
 		//option to overwrite is not in initial versions of boost copy_file
-		if (boostfs::exists(topathx)) return false;
+		if (stdfs::exists(topathx)) return false;
 
-		boostfs::copy_file(frompathx, topathx);
+		stdfs::copy_file(frompathx, topathx);
 	}
 	catch(...)
 	{
@@ -1353,28 +1395,28 @@ var var::osfile() const
 {
 	THISIS(L"var var::osfile() const")
 	THISISSTRING()
-	
+
 	//get a handle and return L"" if doesnt exist or isnt a regular file
     try
     {
 		//boost 1.33 throws an error with files containing ~ or $ chars but 1.38 doesnt
-		//boostfs::wpath pathx(toTstring((*this)).c_str());
-		boostfs::path pathx((*this).toString().c_str());
+		//stdfs::wpath pathx(toTstring((*this)).c_str());
+		stdfs::path pathx((*this).toString().c_str());
 
-        if (!boostfs::exists(pathx)) return L"";
+        if (!stdfs::exists(pathx)) return L"";
         //is_regular is only in boost > 1.34
-		//if (!boostfs::is_regular(pathx)) return L"";
-        if (boostfs::is_directory(pathx)) return L"";
+		//if (!stdfs::is_regular(pathx)) return L"";
+        if (stdfs::is_directory(pathx)) return L"";
 
         //get last write datetime
-        std::time_t last_write_time=boostfs::last_write_time(pathx);
+        std::time_t last_write_time=std::chrono::system_clock::to_time_t(stdfs::last_write_time(pathx));
         //convert to ptime
         boost::posix_time::ptime ptimex = boost::posix_time::from_time_t(last_write_time);
         //convert to mv date and time
         int mvdate, mvtime;
         ptime2mvdatetime(ptimex, mvdate, mvtime);
 
-		return int(boostfs::file_size(pathx)) ^ FM ^ mvdate ^ FM ^ int(mvtime);
+		return int(stdfs::file_size(pathx)) ^ FM ^ mvdate ^ FM ^ int(mvtime);
 
 	}
 	catch(...)
@@ -1387,16 +1429,16 @@ bool var::osmkdir() const
 {
 	THISIS(L"bool var::osmkdir() const")
 	THISISSTRING()
-	
+
     try
     {
 
 		//boost 1.33 throws an error with files containing ~ or $ chars but 1.38 doesnt
-		//boostfs::wpath pathx(toTstring((*this)).c_str());
-		boostfs::path pathx((*this).toString().c_str());
+		//stdfs::wpath pathx(toTstring((*this)).c_str());
+		stdfs::path pathx((*this).toString().c_str());
 
-		if (boostfs::exists(pathx)) return false;
-		boostfs::create_directories(pathx);
+		if (stdfs::exists(pathx)) return false;
+		stdfs::create_directories(pathx);
 	}
 	catch(...)
 	{
@@ -1409,18 +1451,18 @@ bool var::osrmdir(bool evenifnotempty) const
 {
 	THISIS(L"bool var::osrmdir(bool evenifnotempty) const")
 	THISISSTRING()
-	
+
 	//get a handle and return L"" if doesnt exist or is NOT a directory
     try
     {
 
 		//boost 1.33 throws an error with files containing ~ or $ chars but 1.38 doesnt
-		//boostfs::wpath pathx(toTstring((*this)).c_str());
-		boostfs::path pathx((*this).toString().c_str());
+		//stdfs::wpath pathx(toTstring((*this)).c_str());
+		stdfs::path pathx((*this).toString().c_str());
 
-        if (!boostfs::exists(pathx)) return false;
-        if (!boostfs::is_directory(pathx)) return false;
-		
+        if (!stdfs::exists(pathx)) return false;
+        if (!stdfs::is_directory(pathx)) return false;
+
 		if (evenifnotempty)
 		{
 
@@ -1428,10 +1470,10 @@ bool var::osrmdir(bool evenifnotempty) const
 			if (!checknotabsoluterootfolder(toWString()))
 				return false;
 
-			boostfs::remove_all(pathx);
+			stdfs::remove_all(pathx);
 		}
 		else
-			boostfs::remove(pathx);
+			stdfs::remove(pathx);
 	}
 	catch(...)
 	{
@@ -1447,18 +1489,18 @@ var var::osdir() const
 	THISISSTRING()
 
 	//get a handle and return L"" if doesnt exist or is NOT a directory
-    //boostfs::wpath pathx(toTstring((*this)).c_str());
+    //stdfs::wpath pathx(toTstring((*this)).c_str());
     try
     {
 
 		//boost 1.33 throws an error with files containing ~ or $ chars but 1.38 doesnt
-		boostfs::path pathx((*this).toString().c_str());
+		stdfs::path pathx((*this).toString().c_str());
 
-        if (!boostfs::exists(pathx)) return L"";
-        if (!boostfs::is_directory(pathx)) return L"";
+        if (!stdfs::exists(pathx)) return L"";
+        if (!stdfs::is_directory(pathx)) return L"";
 
         //get last write datetime
-        std::time_t last_write_time=boostfs::last_write_time(pathx);
+        std::time_t last_write_time=std::chrono::system_clock::to_time_t(stdfs::last_write_time(pathx));
         //convert to ptime
         boost::posix_time::ptime ptimex = boost::posix_time::from_time_t(last_write_time);
         //convert to mv date and time
@@ -1486,18 +1528,18 @@ var var::oslist(const var& path, const var& spec, const int mode) const
 	//http://www.boost.org/libs/filesystem/example/simple_ls.cpp
 
 	bool filter=false;
-	//boost::wregex re;
-	boost::regex re;
+	//std_boost::wregex re;
+	std_boost::regex re;
 	if (spec)
 	{
 		try
 		{
 			// Set up the regular expression for case-insensitivity
-			//re.assign(toTstring(spec).c_str(), boost::regex_constants::icase);
-			re.assign(spec.toString().c_str(), boost::regex_constants::icase);
+			//re.assign(toTstring(spec).c_str(), std_boost::regex_constants::icase);
+			re.assign(spec.toString().c_str(), std_boost::regex_constants::icase);
 			filter=true;
 		}
-		catch (boost::regex_error& e)
+		catch (std_boost::regex_error& e)
 		{
 			std::wcout << spec.var_mvstr << L" is not a valid regular expression: \""
 			<< e.what() << L"\"" << std::endl;
@@ -1514,35 +1556,37 @@ var var::oslist(const var& path, const var& spec, const int mode) const
 
 	var filelist=L"";
 
-#if BOOST_FILESYSTEM_VERSION >= 3
+#if BOOST_FILESYSTEM_VERSION >= 3 or defined(C17)
 #define LEAForFILENAME path().filename().string()
-#define COMMABOOSTFSNATIVE
+#define COMMAstdfsNATIVE
 #else
 #define LEAForFILENAME leaf()
-#define COMMABOOSTFSNATIVE ,boostfs::native
+#define COMMAstdfsNATIVE ,stdfs::native
 #endif
 	//get handle to folder
 	//wpath or path before boost 1.34
-	//boostfs::wpath full_path(boostfs::initial_path<boostfs::wpath>());
-    //full_path = boostfs::system_complete(boostfs::wpath(toTstring(path), boostfs::native ));
-	boostfs::path full_path(boostfs::initial_path());
-	full_path = boostfs::system_complete
+	//stdfs::wpath full_path(stdfs::initial_path<stdfs::wpath>());
+    //full_path = stdfs::system_complete(stdfs::wpath(toTstring(path), stdfs::native ));
+	//stdfs::path full_path(stdfs::initial_path());
+	//initial_path always return the cwd at the time it is first called which is almost useless
+	stdfs::path full_path(stdfs::current_path());
+	full_path = stdfs::system_complete
 		(
-			boostfs::path
+			stdfs::path
 			(
-				path.toString().c_str() COMMABOOSTFSNATIVE
+				path.toString().c_str() COMMAstdfsNATIVE
 			)
 		);
 
 	//quit if it isnt a folder
-	if (!boostfs::is_directory(full_path))
+	if (!stdfs::is_directory(full_path))
 		return filelist;
 
 	//errno=0;
-    //boostfs::wdirectory_iterator end_iter;
-    //for (boostfs::wdirectory_iterator dir_itr(full_path );
-    boostfs::directory_iterator end_iter;
-    for (boostfs::directory_iterator dir_itr(full_path );
+    //stdfs::wdirectory_iterator end_iter;
+    //for (stdfs::wdirectory_iterator dir_itr(full_path );
+    stdfs::directory_iterator end_iter;
+    for (stdfs::directory_iterator dir_itr(full_path );
           dir_itr != end_iter;
           ++dir_itr )
     {
@@ -1554,19 +1598,19 @@ var var::oslist(const var& path, const var& spec, const int mode) const
 		//to avoid compile errors on boost 1.33
 		//http://www.boost.org/doc/libs/1_33_1/libs/filesystem/doc/index.htm
         //skip unwanted items
-		if (filter&&!boost::regex_match(dir_itr->LEAForFILENAME, re))
+		if (filter&&!std_boost::regex_match(dir_itr->LEAForFILENAME, re))
 			continue;
 
 		//using .leaf instead of .status provided in boost 1.34 .. but does it work/efficiently
-        	//if (boostfs::is_directory(dir_itr->status() ) )
-		if (boostfs::is_directory(*dir_itr ) )
+        	//if (stdfs::is_directory(dir_itr->status() ) )
+		if (stdfs::is_directory(*dir_itr ) )
 		{
 			if (getfolders)
 				filelist^=FM ^ dir_itr->LEAForFILENAME;
 		}
 		//is_regular is only in boost > 1.34
-		//else if (boostfs::is_regular(dir_itr->status() ) )
-		else// if (boostfs::is_regular(dir_itr->status() ) )
+		//else if (stdfs::is_regular(dir_itr->status() ) )
+		else// if (stdfs::is_regular(dir_itr->status() ) )
 		{
 			if (getfiles)
 				filelist^=FM ^ dir_itr->LEAForFILENAME;
@@ -1621,7 +1665,8 @@ var var::oscwd() const
 	//"[Note: When portable behavior is required, use complete(). When operating system dependent behavior is required, use system_complete()."
 
 	//http://www.boost.org/doc/libs/1_38_0/libs/filesystem/doc/reference.html#Attribute-functions
-	std::string currentpath=boost::filesystem::current_path().string();
+	//std::string currentpath=boost::filesystem::current_path().string();
+	std::string currentpath=stdfs::current_path().string();
 
 	return var(currentpath).convert(L"/",SLASH);
 

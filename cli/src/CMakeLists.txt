@@ -2,7 +2,12 @@ cmake_minimum_required(VERSION 2.8)
 
 #2014/06/01 exodus doesnt require c++11 but we enable it for
 #removing this to avoid problem linking to filesystem at the moment with c++11
-#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
+#works using c++14 default on Ubuntu 18.04 so no need for this
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+
+message("")
+message("--EXODUS CLI CMAKE INIT --")
 
 include_directories(
 	../../exodus/libexodus
@@ -44,21 +49,21 @@ add_executable(configexodus configexodus.cpp)
 
 #dl is needed for dynamic link library code
 
-target_link_libraries(compile exodus ${LIBS})
-target_link_libraries(createfile exodus ${LIBS})
-target_link_libraries(createindex exodus ${LIBS})
-target_link_libraries(delete exodus ${LIBS})
-target_link_libraries(clearfile exodus ${LIBS})
-target_link_libraries(deletefile exodus ${LIBS})
-target_link_libraries(deleteindex exodus ${LIBS})
-target_link_libraries(edir exodus ${LIBS})
-target_link_libraries(edic exodus ${LIBS})
-target_link_libraries(exodus-cli exodus ${LIBS})
-target_link_libraries(list exodus ${LIBS})
-target_link_libraries(listfiles exodus ${LIBS})
-target_link_libraries(listindexes exodus ${LIBS})
-target_link_libraries(testsort exodus ${LIBS})
-target_link_libraries(configexodus exodus ${LIBS})
+target_link_libraries(compile exodus stdc++fs ${LIBS})
+target_link_libraries(createfile exodus stdc++fs ${LIBS})
+target_link_libraries(createindex exodus stdc++fs ${LIBS})
+target_link_libraries(delete exodus stdc++fs ${LIBS})
+target_link_libraries(clearfile exodus stdc++fs ${LIBS})
+target_link_libraries(deletefile exodus stdc++fs ${LIBS})
+target_link_libraries(deleteindex exodus stdc++fs ${LIBS})
+target_link_libraries(edir exodus stdc++fs ${LIBS})
+target_link_libraries(edic exodus stdc++fs ${LIBS})
+target_link_libraries(exodus-cli exodus stdc++fs ${LIBS})
+target_link_libraries(list exodus stdc++fs ${LIBS})
+target_link_libraries(listfiles exodus stdc++fs ${LIBS})
+target_link_libraries(listindexes exodus stdc++fs ${LIBS})
+target_link_libraries(testsort exodus stdc++fs ${LIBS})
+target_link_libraries(configexodus exodus stdc++fs ${LIBS})
 
 
 ### 3. INSTALL ###
@@ -79,3 +84,5 @@ listindexes
 testsort
 configexodus
  DESTINATION bin)
+
+message("--EXODUS CLI CMAKE EXIT --")

@@ -39,6 +39,7 @@ THE SOFTWARE.
 #include <iostream> //cin and cout
 #include <cmath> //for floor
 #include <cstdlib>//for exit
+#include <boost/locale.hpp>
 
 #ifndef M_PI
 //#define M_PI 3.14159265358979323846f
@@ -47,7 +48,7 @@ THE SOFTWARE.
 #endif
 
 #include <exodus/mv.h>
-#include <exodus/mvutf.h>
+//#include <exodus/mvutf.h>
 #include <exodus/mvexceptions.h>
 
 //std::ios::sync_with_stdio(false);
@@ -114,7 +115,8 @@ bool var::input()
 	}
 
 	//convert from utf8 to internal format - utf16 or utf32 depending on platform
-	var_mvstr=wstringfromUTF8((UTF8*)tempstr.data(),(int)tempstr.length());
+	//var_mvstr=wstringfromUTF8((UTF8*)tempstr.data(),(int)tempstr.length());
+	var_mvstr=boost::locale::conv::utf_to_utf<wchar_t>(tempstr);
 	var_mvtyp=pimpl::MVTYPE_STR;
 
 	return true;
@@ -367,6 +369,22 @@ std::wstring var::toWString() const
 	THISISSTRING()
 
 	return var_mvstr;
+}
+
+//DLL_PUBLIC
+std::string var::toString2() const
+{
+        if (var_mvtyp&mvtypemask)
+                return "";
+        return toString();
+}
+
+//DLL_PUBLIC
+std::string var::toString() const
+{
+	THISIS(L"std::string var::toString() const")
+	THISISSTRING()
+	return boost::locale::conv::utf_to_utf<char>(var_mvstr);
 }
 
 var var::length() const

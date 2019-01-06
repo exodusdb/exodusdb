@@ -1,6 +1,15 @@
 #include <exodus/program.h>
 #include <cassert>
 
+/* UBUNTU locale-gen
+locale-gen de_DE.UTF-8
+locale-gen en_GB.UTF-8
+locale-gen en_US.UTF-8
+locale-gen el_GR.UTF-8
+locale-gen tr_TR.UTF-8
+dpkg-reconfigure locales
+*/
+
 /*Ubuntu
  apt-cache search locale |grep -i greek
  greek turkish german
@@ -50,22 +59,32 @@ function main()
 	assert(osbread(testfilex,offsetx=0,1) eq GreekSmallGamma);
 //	assert(testfilename.osfile().a(1) eq 2);
 	var charin;
-//fails on ubuntu 13.10x64	assert(osread(charin,testfilename, "utf8"));
+//fails on ubuntu 13.10x64
+	assert(osread(charin,testfilename, "utf8"));
 	//assert(charin eq charout);
 	assert(osdelete(testfilename));
 
 	//simple test of regex and case insensitive regex swap (commonly known as replace)
-    assert(swap("abcd","b.","xyz","r").outputl() eq "axyzd");//right case to convert
-    assert(swap("abc","B.","xyz","r").outputl() eq "abc"); //wrong case to convert
-    assert(swap("abcd","B.","xyz","ri").outputl() eq "axyzd");//case insensitive converts
-    assert(swap("abc","b.","xyz","").outputl() eq "abc");//wont convert not regex
+	assert(swap("abcd","b.","xyz","r").outputl() eq "axyzd");//right case to convert
+	assert(swap("abc","B.","xyz","r").outputl() eq "abc"); //wrong case to convert
+	assert(swap("abcd","B.","xyz","ri").outputl() eq "axyzd");//case insensitive converts
+	assert(swap("abc","b.","xyz","").outputl() eq "abc");//wont convert not regex
 
 	//simple test of case sensitive/insensitive swap
-    assert(swap("abc","b","xyz","").outputl() eq "axyzc");//will convert right case
-    assert(swap("abc","B","xyz").outputl() eq "abc");//wont convert wrong case
-    assert(swap("abc","B","xyz","i").outputl() eq "axyzc");//will convert case insensitive
-    assert(swap("ab*c","B*","xyz","i").outputl() eq "axyzc");//will convert case insensitive but not regex
-    assert(swap("ab*c","B*","xyz","i").outputl() eq "axyzc");//will convert case insensitive but not regex
+	assert(swap("abc","b","xyz","").outputl() eq "axyzc");//will convert right case
+	assert(swap("abc","B","xyz").outputl() eq "abc");//wont convert wrong case
+	assert(swap("abc","B","xyz","i").outputl() eq "axyzc");//will convert case insensitive
+	assert(swap("ab*c","B*","xyz","i").outputl() eq "axyzc");//will convert case insensitive but not regex
+
+	assert(swap("abababab","ab","x").outputl() eq "xxxx");
+	assert(swap("abababab","ab","x","r").outputl() eq "xxxx");
+	assert(swap("abababab","a.","xy","r").outputl() eq "xyxyxyxy");
+
+	var text="what a lot of money";
+	text.outputl("input=");
+	text.swapper("(.) ","x$1_","r");
+	text.outputl("output=");
+	assert(text eq "whaxt_xa_loxt_oxf_money");
 
 	{	//null characters cannot be embedded in string constants in c/c++
 
@@ -311,6 +330,8 @@ function main()
 		assert(osbwrite(GreekSmallFinalSigma,tempfilename5,offset));
 		assert(osdelete(tempfilename5));
 	}
+
+	printl(oconv("ABc.123","MCN"));
 
 	assert(oconv("ABc.123","MCN") eq "123");
 	assert(oconv("ABc.123","MCA") eq "ABc");
@@ -1845,6 +1866,59 @@ while trying to match the argument list '(exodus::var, bool)'
 		osbwrite( L"THIS TEXT INTENDED FOR FILE 'FILE1.txt' BUT IT GOES TO 'FILE3.txt'", file1, off1);
 	}
 #endif
+
+    printl();
+    printl("The following section requires data created by testsort.cpp");
+    var myclients;
+    if (myclients.open("myclients")) {
+
+        var key;
+
+        //begintrans();
+
+        if (var().open("myclients"))
+                printl("Could open myclients");
+        else
+                printl("Could NOT open myclients");
+
+        printl();
+        printl("1. test full output with no selection clause or preselect");
+        myclients.select();
+        while(myclients.readnext(key)) {
+                key.outputl("t1 key=");
+        }
+
+	printl();
+        printl("2. test with default cursor (unassigned var) - select clause needs filename");
+        myclients.select("select myclients with type 'B'");
+        while(myclients.readnext(key)) {
+                key.outputl("t2 key=");
+        }
+
+        printl();
+        printl("3. tests with named cursor (assigned var) - if is file name then select clause can omit filename");
+        myclients="myclients";
+        printl("test preselect affects following select");
+        myclients.select("with type 'B'");
+        printl("Normally the following select would output all records but it only shows the preselected ones (2)");
+        myclients.select();
+        while(myclients.readnext(key)) {
+                key.outputl("t3 key=");
+        }
+
+        printl();
+        printl("4. Normally the following select would output all records but it only shows 3 keys from makelist");
+        var keys="SB1" _FM_ "JB2" _FM_ "SB001";
+        myclients.makelist("",keys);
+//      myclients.select();
+        while(myclients.readnext(key)) {
+                key.outputl("t4 key=");
+        }
+
+        //committrans();
+        //rollbacktrans();
+
+    }
 
     printl("testmain finished ok and exiting ...");
 

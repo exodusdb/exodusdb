@@ -150,10 +150,10 @@ subroutine sortselect(in file, in sortselectcmd) {
 
         printl("\nsselect the data - ", sortselectcmd);
 
-	begintrans();
+//	begintrans();
 
         if (!select(sortselectcmd)) {
-                printl("Cannot sselect");
+                printl("Cannot sselect in testsort");
                 return;
         }
 
@@ -175,7 +175,7 @@ subroutine sortselect(in file, in sortselectcmd) {
 
         }
 
-	rollbacktrans();
+//	rollbacktrans();
 }
 
 programexit()

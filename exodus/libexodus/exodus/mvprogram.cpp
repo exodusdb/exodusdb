@@ -45,6 +45,16 @@ void ExodusProgramBase::mssg(const var& msg, const var& options, var& buffer, co
 
 }
 
+bool ExodusProgramBase::pushselect(const var& v1, var& v2, var& v3, var& v4) const {
+	//TODO increment default connection number?
+	return true;
+}
+
+bool ExodusProgramBase::popselect(const var& v1, const var& v2, const var& v3, const var& v4) const {
+	//TODO increment default connection number?
+	return true;
+}
+
 var ExodusProgramBase::authorised(const var& task0) {
 	var msg;
 	return authorised(task0, msg);
