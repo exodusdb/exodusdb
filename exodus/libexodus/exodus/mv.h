@@ -173,9 +173,13 @@ namespace exodus {
 //Decided to use unicode characters 0x07F8-0x07FF instead of the classic 00F8-00FF which are latin accented characters
 //NB only unicode characters 0-07FF fit in 2 bytes when encoded as utf8. Therefore we dont like to use unicode PUA at E000-E8FF
 // *** WARNING *** extract.c implementation can only work with 2 byte long utf8 characters for seps FM VM SM
-//The six unicode characters 07F8-07FF are defined as rare characters of a rare script NKO - which exodus will be unable to handle
+//The six unicode characters 05F8-05FF are defined as unused characters in the hebrew page
+//The six unicode characters 07F8-07FF are defined as rare characters of a rare script NKO
+//both 0500 and 0700 are right to left flavoured characters so we will use the 0700 code page
 
-//would be 256 if RM was character number 255. is 07FF+1 used in var::remove()
+//WARNING libpgexodus's extract.c must know the utf-8 equivalent of 07FE etc to extract from utf-8 in a binary fashion
+
+//would be 256 if RM was character number 255. is 05FF+1 used in var::remove()
 #define LASTDELIMITERCHARNOPLUS1 0x0800
 
 //also defined in extract.c and exodusmacros.h
@@ -295,6 +299,7 @@ public:
 
 	//standard c/c++ int() in other words simply take the number to the left of the point. -1.5 becomes -1 and 1.5 becomes 1
 	int toInt() const;
+	int toLong() const;
 
     double toDouble() const;
 
@@ -937,7 +942,7 @@ public:
 	var trimf(const var trimchar) const;
 	var trimb(const var trimchar) const;
 	var fieldstore(const var& sepchar,const int fieldno,const int nfields,const var& replacement) const;
-//	var hash() const;
+	var hash(const unsigned long long modulus=0) const;
 	var unique() const;
 
 	//STRING EXTRACTION

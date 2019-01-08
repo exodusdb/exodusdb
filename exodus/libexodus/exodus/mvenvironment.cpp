@@ -140,6 +140,8 @@ bool MvEnvironment::init(const int threadno) {
 	this->VW = L"";
 	this->PW = L"";
 
+	this->RECCOUNT = L"";
+
 	//pretty obsolete nowadays
 	//environment variables may not be available until exported
 	//do set -p to find out exported variables instead of all

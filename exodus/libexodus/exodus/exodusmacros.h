@@ -236,4 +236,15 @@ typedef var& out;
 #define FILEERRORMODE mv.FILEERRORMODE
 #define FILEERROR mv.FILEERROR
 
+#define RECCOUNT mv.RECCOUNT
+
+#define MW mv.MV
+#define HW mv.HW
+#define EW mv.EW
+#define AW mv.AW
+#define PW mv.PW
+#define XW mv.XW
+#define VW mv.VW
+#define SW mv.SW
+
 #endif //EXODUSMACROS_H

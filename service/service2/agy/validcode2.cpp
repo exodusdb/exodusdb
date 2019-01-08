@@ -59,15 +59,15 @@ function main(in companycodex, in clientcodex, in brandcodex, io brands, out msg
 		brands = "";
 	}
 
-	if (not mv.VW.assigned()) {
-		mv.VW="";
-		mv.XW="";
+	if (not VW.assigned()) {
+		VW="";
+		XW="";
 	}
 	//initialise buffer if not for the same user
-	if (mv.VW.a(10) ne username) {
-		mv.VW = mv.VW.field(FM, 1, 9);
-		mv.VW.r(10, username);
-		mv.XW = mv.XW.field(FM, 1, 9);
+	if (VW.a(10) ne username) {
+		VW = VW.field(FM, 1, 9);
+		VW.r(10, username);
+		XW = XW.field(FM, 1, 9);
 	}
 
 	//one brand may appear in many companies so check company independently!
@@ -86,8 +86,8 @@ function main(in companycodex, in clientcodex, in brandcodex, io brands, out msg
 	//return quick answer if checking brands and is in buffer
 	//since remaining checks are all dependent on brand
 	if (brandcode) {
-		if (mv.VW.locate(brandcode, coden, 10 + 5)) {
-			if (mv.XW.a(10 + 5, coden)) {
+		if (VW.locate(brandcode, coden, 10 + 5)) {
+			if (XW.a(10 + 5, coden)) {
 				return 1;
 			}else{
 				return 0;
@@ -266,14 +266,14 @@ subroutine getfilepositive() {
 	}
 
 	//store space or '#' to indicate buffered result
-	positive = mv.XW.a(10, filen);
+	positive = XW.a(10, filen);
 	if (positive == "") {
 		if (authorised(taskid ^ " ACCESS", msg0, "", forcedusercode)) {
 			positive = " ";
 		}else{
 			positive = "#";
 		}
-		mv.XW.r(10, filen, positive);
+		XW.r(10, filen, positive);
 	}
 
 	//trim any buffered space to become ''
@@ -287,29 +287,29 @@ subroutine checkcode(io msg) {
 	ok = 0;
 	//if dont have general access to file then
 	//access to a specific record must be positively allowed (use # task prefix)
-	if (mv.VW.locate(code, coden, 10 + filen)) {
-		if (not(mv.XW.a(10 + filen, coden))) {
+	if (VW.locate(code, coden, 10 + filen)) {
+		if (not(XW.a(10 + filen, coden))) {
 			return;
 		}
 	}else{
 
 		//trim off first 10% of codes if buffer too big
-		if (mv.VW.length() > 50000) {
+		if (VW.length() > 50000) {
 			var oldcoden = coden;
 			coden = (coden * .9).floor();
 			var ntrim = oldcoden - coden;
-			mv.VW.r(10 + filen, mv.VW.a(10 + filen).field(VM, ntrim + 1, 999999));
-			mv.XW.r(10 + filen, mv.XW.a(10 + filen).field(VM, ntrim + 1, 999999));
+			VW.r(10 + filen, VW.a(10 + filen).field(VM, ntrim + 1, 999999));
+			XW.r(10 + filen, XW.a(10 + filen).field(VM, ntrim + 1, 999999));
 		}
 
-		mv.VW.r(10 + filen, coden, code);
+		VW.r(10 + filen, coden, code);
 		if (filen ne 5) {
 			gosub getfilepositive();
 		}
 		if (not(authorised(positive ^ taskid ^ " ACCESS " ^ (DQ ^ (code ^ DQ)), msg, "", forcedusercode))) {
 			return;
 		}
-		mv.XW.r(10 + filen, coden, 1);
+		XW.r(10 + filen, coden, 1);
 	}
 
 	ok = 1;

@@ -64,6 +64,9 @@ function main()
 	//assert(charin eq charout);
 	assert(osdelete(testfilename));
 
+	//hash
+	assert(var("xyz").hash(1000)==894);
+
 	//simple test of regex and case insensitive regex swap (commonly known as replace)
 	assert(swap("abcd","b.","xyz","r").outputl() eq "axyzd");//right case to convert
 	assert(swap("abc","B.","xyz","r").outputl() eq "abc"); //wrong case to convert
@@ -1757,7 +1760,7 @@ while trying to match the argument list '(exodus::var, bool)'
 	var nfiles=dcount(filenames2,FM);
 	for (int ii=1;ii<=nfiles;++ii) {
 		var filename=filenames2.a(ii);
-		
+
 		printl(filename);
 
 		if (not open(filename, tempfile)) {
@@ -1867,6 +1870,22 @@ while trying to match the argument list '(exodus::var, bool)'
 	}
 #endif
 
+	printl("\nReadnexting from a list of keys directly provided - MUST END IN FM");
+	var list2="aaa" _FM_ "bbb" _FM_ "ccc" _FM_;
+	var key2;
+	var mv2;
+	list2.readnext(key2,mv2);
+	printl(key2," ",mv2);
+
+	list2.readnext(key2,mv2);
+	printl(key2," ",mv2);
+
+	list2.clearselect();
+
+	list2.readnext(key2,mv2);
+	printl(key2," ",mv2);
+
+
     printl();
     printl("The following section requires data created by testsort.cpp");
     var myclients;
@@ -1920,9 +1939,16 @@ while trying to match the argument list '(exodus::var, bool)'
 
     }
 
-    printl("testmain finished ok and exiting ...");
+	printl("\nPrint out 1st 256 unicode characters and their hashes");
+	for (var ii=0;ii<256;ii++) {
+		var xx=chr(ii);
+		print(ii,":", xx, " ", xx.hash()," ");
+	}
+	printl();
 
-    return 0;
+	printl("testmain finished ok and exiting ...");
+
+	return 0;
 }
 
 //be careful not to name any subroutines the same as any variables

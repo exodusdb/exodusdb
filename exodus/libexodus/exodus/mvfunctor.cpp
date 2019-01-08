@@ -43,6 +43,8 @@ THE SOFTWARE.
 
 #define MV_NO_NARROW
 
+//WINDOWS
+
 //portable shared/dynamic library macros
 //makes linux dlopen, dlsym, dlclose syntax work on windows
 //http://www.planet-source-code.com/vb/scripts/ShowCode.asp?txtCodeId=746&lngWId=3
@@ -70,6 +72,7 @@ typedef HINSTANCE library_t;
 # define EXODUSLIBPREFIX "~/lib/lib"
 //# define EXODUSLIBPREFIX "./lib"+
 #endif
+
 
 //needed for getenv
 #include <stdlib.h>
@@ -250,6 +253,10 @@ std::cout<<"mvfunctor:openlib: in:"<<newlibraryname<<std::endl;
 	//open the library or return 0
 	//dlopen arg2 is ignored by macro on windows
 
+	//dont reopen if already opened
+	if (libraryname_==newlibraryname)
+		return true;
+
 	closelib();
 
 #ifdef dlerror
@@ -261,9 +268,19 @@ std::cout<<"mvfunctor:openlib: in:"<<newlibraryname<<std::endl;
 		#pragma warning (disable: 4996)
 		//env string is copied into string so following getenv usage is safe
 		libraryfilename_.replace(0,1, getenv("HOME"));
-
+	FILE *file;
+	if (file=fopen(libraryfilename_.c_str(),"r")) {
+		fclose(file);
+	} else {
+		libraryfilename_="lib"+newlibraryname+EXODUSLIBEXT;
+	}
 	//var(libraryfilename_).outputl();
 
+	//RTLD_NOW
+	//All necessary relocations shall be performed when the object is first loaded.
+	//This may waste some processing if relocations are performed for functions that are never referenced.
+	//This behavior may be useful for applications that need to know as soon as an object is loaded that all symbols referenced during execution are available.
+	//RTLD_LAZY|RTLD_LOCAL may be a better option
 	plibrary_=(void*) dlopen(libraryfilename_.c_str(),RTLD_NOW);
 
 #ifdef dlerror

@@ -1,9 +1,12 @@
 #include <exodus/mvprogram.h>
 #include <exodusmacros.h> //coding style is like application programming eg USERNAME not mv.USERNAME
 
+//putting various member functions into all exodus programs allows access to the mv environment variable which is also available
+//in all exodus programs.
+
 namespace exodus {
 
-//contructor with an mvenvironment
+//constructor with an mvenvironment
 DLL_PUBLIC
 ExodusProgramBase::ExodusProgramBase(MvEnvironment& inmv)
 	:mv(inmv) {
@@ -101,7 +104,7 @@ var ExodusProgramBase::authorised(const var& task0, var& msg, const var& default
 	task.trimmer();
 
 	msg = "";
-	//**CALL note(' ':TASK)
+	// **CALL note(' ':TASK)
 
 	if (task.substr(1, 2) == "..") {
 		// call note(task:'')
@@ -515,8 +518,9 @@ var ExodusProgramBase::calculate(const var& dictid) {
 		newlibfunc = true;
 		if (not DICT)
 			throw MVException(
-					L"calculate(" ^ dictid
-							^ L") DICT file variable has not been set");
+					L"calculate("
+					^ dictid
+					^ L") DICT file variable has not been set");
 		if (not cache_dictrec_.read(DICT, dictid)) {
 			//try lower case
 			if (not cache_dictrec_.read(DICT, dictid.lcase())) {
@@ -567,27 +571,10 @@ baddict:
 				return ID;
 
 		}
-/*
+
 	} else if (dicttype == L"S") {
 		//TODO deduplicate various exodusfunctorbase code spread around calculate mvipc* etc
 		if (newlibfunc) {
-			std::string str_libname = DICT.lcase().toString();
-			std::string str_funcname = dictid.toString();
-			if (!dict_exodusfunctorbase_.init(str_libname.c_str(),str_funcname.c_str()))
-				throw MVException(
-						L"calculate() Cannot find Library " ^ str_libname
-								^ L", or function " ^ str_funcname
-								^ L" is not present");
-		}
-
-		return dict_exodusfunctorbase_.calldict();
-		//return ANS;
-	}
-*/
-
-	} else if (dicttype == L"S") {
-		//TODO deduplicate various exodusfunctorbase code spread around calculate mvipc* etc
-		if (newlibfunc) {			
 			std::string str_libname;
 			if (indictmd)
 				str_libname = "dict_md";
@@ -606,10 +593,10 @@ baddict:
 
 		//define a function type (pExodusProgramBaseMemberFunction)
 		//that can call the shared library object member function
-		//with the right arguments and returning a var
+		//with the right arguments (none for dicts) and returning a var
 		typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)();
 
-		//call the shared library object main function with the right args, returning a var
+		//call the shared library object main function with the right args (none for dicts), returning a var
 		//std::cout<<"precall"<<std::endl;
 		ANS =
 				CALLMEMBERFUNCTION(*(dict_exodusfunctorbase_.pobject_),
@@ -962,199 +949,6 @@ bool ExodusProgramBase::osbwritex(const var& str1, const var& filehandle,
 	if (filename) {
 	}
 }
-/* moved to external function
-bool ExodusProgramBase::authorised(const var& task0) {
-	var msg;
-	return authorised(task0, msg, L"");
-}
-
-bool ExodusProgramBase::authorised(const var& task0, var& msg,
-		const var& defaultlock0) {
-
-	var task = task0;
-	var defaultlock = defaultlock0;
-
-	var dost;
-	dost = var().ostime();
-	//std::wcout<<dost<<std::endl;
-
-	var noadd;
-	var positive;
-	var isneosys;	//num
-	var deleting;
-	var taskn;
-	var locks;
-	var nlocks;
-	var usern;
-	var keys;
-	var temp;	//num
-
-	//if @username='neosys' or @username='steve' then call msg(task:'')
-
-	if (task[1] == L" ")
-		mssg(task.quote());
-	//each task may have many "locks", each users may have many "keys"
-	//a user must have keys to all the locks in order to pass
-
-	if (!task)
-		goto ok;
-
-	task.ucaser();
-	task.converter(RM ^ FM ^ VM ^ SVM, L"\\\\\\");
-	task.swapper(L" FILE ", L" ");
-	task.swapper(L" - ", L" ");
-	task.converter(L".", L" ");
-	task = task.trim();
-
-	msg = L"";
-	// **call note(' ':task)
-
-	if (task.substr(1, 2) == L"..") {
-		// call note(task:'')
-		return 1;
-	}
-
-	noadd = task[1] == L"!";
-	if (noadd)
-		task.splicer(1, 1, L"");
-	//if noadd else noadd=((task[-1,1]='"') and (len(userprivs)<10000))
-	if (!noadd) {
-		var lenuserprivs = SECURITY.length();
-		noadd = task[-1] == DQ || lenuserprivs > 48000;
-	}
-	positive = task[1] == L"#";
-	if (positive)
-		task.splicer(1, 1, L"");
-
-	//? as first character of task (after positive) means
-	//security is being used as a configuration and user neosys has no special privs
-	if (task[1] == L"?") {
-		isneosys = 0;
-		task.splicer(1, 1, L"");
-	} else {
-		isneosys = USERNAME == L"NEOSYS";
-	}
-
-	deleting = task.substr(1, 8) == L"%DELETE%";
-	if (deleting)
-		task.splicer(1, 8, L"");
-
-	//find the task
-//	std::wcout<<SECURITY<<std::endl;
-//	std::wcout<<task<<std::endl;
-//	std::wcout<<VM<<std::endl;
-	if (SECURITY.locate(task, taskn, 10)) {
-		if (deleting) {
-			SECURITY.eraser(10, taskn);
-			SECURITY.eraser(11, taskn);
-			writeuserprivs();
-			return 1;
-		}
-	} else {
-		if (!noadd) {
-			readuserprivs();
-			if (USERNAME == L"NEOSYS")
-				note(task ^ L"|TASK ADDED");
-			if (SECURITY.length() < 65000) {
-				if (!(SECURITY.locateby(task, L"AL", taskn, 10))) {
-					if (defaultlock.unassigned())
-						defaultlock = L"";
-					SECURITY.inserter(10, taskn, 0, task);
-					SECURITY.inserter(11, taskn, 0, defaultlock);
-					writeuserprivs();
-				}
-			}
-		}
-	}
-
-	//if no locks then pass ok unless positive locking required
-	locks = SECURITY.a(11, taskn);
-	if (locks == L"") {
-		if (positive && !isneosys) {
-			notallowed: msg = capitalise(task) ^ L"||Sorry, L"
-					^ capitalise(USERNAME)
-					^ L", you are not authorised to do |";
-			return 0;
-		} else {
-			goto ok;
-		}
-	} else {
-		if (locks == L"NOONE")
-			goto notallowed;
-	}
-
-	//if index('012',@privilege,1) then goto ok
-	if (isneosys)
-		goto ok;
-
-	//find the user (add to bottom if not found)
-	//surely this is not necessary since users are in already
-	if (!(SECURITY.locate(USERNAME, usern, 1))) {
-		if (USERNAME != L"NEOSYS" && USERNAME != APPLICATION) {
-			readuserprivs();
-			usern = (SECURITY.a(1)).dcount(VM) + 1;
-			if (SECURITY.length() < 65000) {
-				SECURITY.inserter(1, usern, 0, USERNAME);
-				SECURITY.inserter(2, usern, 0, L"");
-				writeuserprivs();
-			}
-		}
-	}
-
-	//user must have all the keys for all the locks on this task
-	//following users up to first blank line also have the same keys
-	keys = (SECURITY.a(2)).field(VM, usern, 999);
-	temp = keys.index(L"---", 1);
-	if (temp)
-		keys.splicer(temp - 1, 999, L"");
-	//convert vm to ',' in keys
-	keys.converter(L",", VM);
-	locks.converter(L",", VM);
-	nlocks = locks.count(VM) + 1;
-
-	for (int lockn = 1; lockn <= nlocks; lockn++) {
-		var lockx = locks.field(VM, lockn, 1);
-		if (keys.locate(lockx, temp, 1)) {
-			//call note(task:' ok')
-		} else {
-			msg = capitalise(task) ^ L"||Sorry, L" ^ capitalise(USERNAME)
-					^ L", you are not authorised to do |";
-			//call note(task:' ko')
-			return 0;
-		}
-	};	//lockn;
-
-	ok:
-	//call statup(2,3,task)
-	return 1;
-
-}
-
-void ExodusProgramBase::readuserprivs() {
-	//if definitions then
-	//put back in case called from fileman due to no datasets
-	//if definitions then
-	if (!SECURITY.read(DEFINITIONS, L"SECURITY"))
-		SECURITY = L"";
-	//SECURITY = SECURITY.invert();
-	// end
-	// end
-	return;
-
-}
-
-void ExodusProgramBase::writeuserprivs() {
-	SECURITY.r(9, L"");
-	//if definitions then
-	//put back in case called from fileman due to no datasets
-	//if definitions then
-	//SECURITY.invert().write(DEFINITIONS, L"SECURITY");
-	// end
-	// end
-	return;
-
-}
-*/
 
 void ExodusProgramBase::logger(const var& programname0, const var& text0) {
 
@@ -1246,209 +1040,6 @@ void ExodusProgramBase::flushindex(const var& filename) {
 			<< filename << std::endl;
 	return;
 }
-
-/*
-void ExodusProgramBase::sysmsg(const var& msg0) {
-
-	var tt;
-	var ver;
-
-	//logs a message and sends it to all the technical support emails (backup)
-	//do not call msg or note etc, otherwise may be recursive
-
-	var datasetcode = SYSTEM.a(17);
-
-	//protect the msg
-	var msg = msg0;
-
-	//log the system message first in case sendmail fails
-	logger(L"SYSMSG", msg);
-
-	//get backup parameters
-	var bakpars;
-	if (!bakpars.read(DEFINITIONS, L"BACKUP"))
-		bakpars = L"";
-	//dos backup.cfg overrides
-	if (tt.osread("BACKUP.CFG")) {
-		for (int ii = 1; ii <= 99; ii++) {
-			if (tt.a(ii))
-				bakpars.r(ii, tt.a(ii));
-		};	//ii;
-	}
-
-	//get technical emailaddrs to send to
-	//nb if any emailaddrs and neosys.com not in them
-	//then neosys will not receive any message
-	var emailaddrs = bakpars.a(6);
-	if (bakpars.a(10)) {
-		if (emailaddrs)
-			emailaddrs ^= L"/";
-		emailaddrs ^= bakpars.a(10);
-	}
-	emailaddrs = emailaddrs.field(L"/", 1, 1);
-	//if emailaddrs='' then readv emailaddrs from definitions,'replication',12 else emailaddrs=''
-	//if dir('neosys.id') and @username='neosys' then emailaddrs='backups@neosys.com'
-	//if dir('neosys.id') then emailaddrs='backups@neosys.com'
-	emailaddrs.swapper(L"backups@neosys.com", L"sysmsg@neosys.com");
-	if (emailaddrs == L"")
-		emailaddrs = L"sysmsg@neosys.com";
-
-	//determine subject
-	var subject = L"NEOSYS System Message : Datasetcode=" ^ datasetcode;
-
-	var body = L"Server=" ^ (SYSTEM.a(44)).trim();
-	body.r(-1, L"Client=" ^ STATION.trim());
-	body.r(-1, L"User=" ^ USERNAME.trim());
-	var temp = USER0;
-	temp.converter(RM ^ FM ^ VM ^ SVM ^ TM ^ STM, L"`^]}\\~");
-	body.r(-1, L"Request=" ^ temp);
-	body.r(-1, L"Message=" ^ FM ^ msg);
-	temp = USER1;
-	temp.converter(RM ^ FM ^ VM ^ SVM ^ TM ^ STM, L"`^]}\\~");
-	if (ver.osread("general\\version.dat"))
-		body.r(-1, L"NEOSYS Ver:" ^ ver.a(1));
-	body.r(-1, L"@Id=" ^ ID);
-	body.r(-1, L"Data=" ^ temp);
-	body.converter(FM ^ VM ^ SVM ^ TM ^ STM ^ L"|", L"\r\r\r\r\r\r");
-	body.swapper(L"\r", L"\r\n");
-
-	var deleteaftersend = L"";
-
-	var errormsg = L"";
-
-	//sendmail - if it fails, there will be an entry in the log
-	sendmail(emailaddrs, subject, body, L"", deleteaftersend, errormsg);
-
-	return;
-
-}
-
-var ExodusProgramBase::sendmail(const var& toaddress0, const var& subject,
-		const var& body0, const var& attachfilename, const var& deletex,
-		var& errormsg) {
-
-	var params2;
-	var bodyfilename;
-	var toaddress = toaddress0;
-
-	if (SENTENCE.field(L" ", 1, 1) == L"SENDMAIL") {
-		toaddress = SENTENCE.field(L" ", 2, 1);
-		if (!toaddress)
-			toaddress = L"steve.bush@neosys.com";
-		SENTENCE = L"";
-		sendmail(toaddress, L"test email test subject",
-				L"test body line 1\rtest body line2", L"", 0, errormsg);
-		if (errormsg)
-			mssg(errormsg);
-		var().stop();
-	}
-
-	//sendmail is silent
-	errormsg = L"";
-
-	//send mail requires confirmation if user is neosys
-	//cannot because backup in neosys.net would be interrupted
-	//declare MvLib decide
-	//if @username='neosys' then
-	// s33=system<33>
-	// q='you are neosys.|send mail to ':toaddress:'|':subject:'|':body0
-	// convert \0d0a\ to @fm in q
-	// if decide(q,'',reply) else reply=2
-	// if reply=1 else return
-	// system<33>=s33
-	// end
-
-	var params1 = L"";
-	var definitions;
-	if (definitions.open(L"DEFINITIONS")) {
-		if (!(params1.read(definitions, L"SMTP.CFG"))) {
-		}
-	}
-
-	//global override
-	params2.osread("SMTP.CFG");
-	//cut off after end of file character
-	params2 = params2.field(var().chr(26), 1, 1);
-	params2.swapper(L"\r\n", L"\r");
-	params2.converter(L"\r\n", _FM_ _FM_);
-	for (int ii = 1; ii <= 9; ii++) {
-		if (params2.a(ii))
-			params1.r(ii, params2.a(ii));
-	};	//ii;
-
-	var params = L"";
-	params.r(-1, L"fromaddress=" ^ params1.a(1));
-	params.r(-1, L"smtphostname=" ^ params1.a(2));
-	params.r(-1, L"smtpportno=" ^ params1.a(3));
-	params.r(-1, L"smtptimeoutsecs=" ^ params1.a(4));
-	params.r(-1, L"smtpusessl=" ^ params1.a(5));
-	params.r(-1, L"smtpauthtype=" ^ params1.a(6));
-	params.r(-1, L"smtpuserid=" ^ params1.a(7));
-	params.r(-1, L"smtppassword=" ^ params1.a(8));
-
-	var body = body0;
-
-	if (body.index(L" ", 1) || body.length() > 10 || body.index(L"\r", 1)
-			|| body.index(L"\n", 1)) {
-		bodyfilename = var(99999999).rnd() ^ L".TXT";
-		body.oswrite(bodyfilename);
-		bodyfilename.osclose();
-		body = L"@" ^ bodyfilename;
-	} else {
-		body.converter(DQ, L"\'");
-		bodyfilename = L"";
-	}
-
-	var paramfilename = var(99999999).rnd() ^ L".TXT";
-
-	var errorfilename = var(99999999).rnd() ^ L".$$$";
-
-	var cmd = L"START /w";
-	//option to de-bug
-	//cmd=' wscript //x'
-	cmd ^= L" sendmail.js /e " ^ errorfilename ^ L" /p " ^ paramfilename;
-
-	//params='/t ':quote(toaddress):' /s ':quote(subject):' /b ':quote(body):' /a ':quote(attachfilename)
-	//if delete then params:=' /d ':delete
-	params.r(-1, L"toaddress=" ^ toaddress.quote());
-	params.r(-1, L"subject=" ^ subject.quote());
-	params.r(-1, L"body=" ^ body.quote());
-	if (attachfilename)
-		params.r(-1, L"attachfilename=" ^ attachfilename.quote());
-	if (deletex)
-		params.r(-1, L"deleteaftersend=" ^ deletex.quote());
-	params ^= FM;
-
-	params.swapper(FM, L"\r\n");
-	params.oswrite(paramfilename);
-
-	cmd.osshell();
-
-	if (bodyfilename)
-		bodyfilename.osdelete();
-
-	paramfilename.osdelete();
-
-	if (errormsg.osread(errorfilename)) {
-		errorfilename.osdelete();
-		errormsg.converter(L"\r\n", _FM_ _FM_);
-		errormsg = errormsg.oconv(L"T#60");
-	} else {
-		errormsg = L"Unknown error in sendmail.js Failed to complete";
-		errormsg.r(-1, cmd);
-		errormsg.r(-1, params.oconv(L"T#60"));
-	}
-	errormsg.converter(TM, FM);
-
-	if ((errormsg.a(1)).trim() != L"OK") {
-		logger(L"SENDMAIL", errormsg);
-		return 0;
-	}
-
-	return 1;
-
-}
-*/
 
 var ExodusProgramBase::encrypt2(const var& encrypt0) const {
 

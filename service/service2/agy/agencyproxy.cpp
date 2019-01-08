@@ -10,9 +10,8 @@ libraryinit()
 #include <agencysubs.h>
 #include <suppliersubs.h>
 #include <singular.h>
-//#include <listen3.h>
+#include <listen3.h>
 //#include <ilesubs.h>
-//#include <makelist.h>
 #include <select2.h>
 #include <convpdf.h>
 #include <sysmsg.h>
@@ -305,7 +304,7 @@ function main() {
 			set = 0;
 			gosub getsetnumbers();
 
-nextcomp:
+nextcomp:;
 		};//companyn;
 
 		companyn2 += 1;
@@ -405,7 +404,7 @@ nextcomp:
 
 				}
 			};//companyn;
-nextmoden:
+nextmoden:;
 		};//moden;
 
 		ncomps = (USER1.a(2)).count(VM) + (USER1.a(2) ne "");
@@ -429,7 +428,7 @@ nextmoden:
 			set = 1;
 			gosub getsetnumbers();
 
-nextcomp2:
+nextcomp2:;
 		};//companyn;
 
 		//companyn2=companyn
@@ -607,7 +606,7 @@ nextcomp2:
 				call fsmsg();
 				var().stop();
 			}
-			call makelist(0, keys, file, DICT);
+			file.makelist("",keys);
 
 			var sortselect = "%SELECTLIST%";
 			if (win.datafile == "CLIENTS") {
@@ -638,10 +637,11 @@ nextcomp2:
 		USER3 = "System Error: " ^ (DQ ^ (USER0 ^ DQ)) ^ " unrecognised request in AGENCYPROXY";
 	}
 //L3289:
+
 	/////
 	//exit:
 	/////
-	return 0;
+	var().stop();
 
 	//////////
 errorexit:

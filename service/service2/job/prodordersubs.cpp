@@ -10,7 +10,7 @@ libraryinit()
 #include <btreeextract.h>
 
 #include <generalsubs.h>
-//#include <chklic.h>
+#include <chklic.h>
 #include <generalsubs2.h>
 
 #include <sysmsg.h>
@@ -488,7 +488,7 @@ subroutine defexchrate() {
 	} else if (mode == "PREWRITE") {
 
 		//prevent creating new records if no lic
-//TODO		call chklic(mode, msg);
+		call chklic(mode, msg);
 		if (msg) {
 			return invalid(msg);
 		}

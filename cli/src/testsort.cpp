@@ -45,14 +45,15 @@ function main() {
         printl("\nPrepare some dictionary records");
 
         var dictrecs =
-             "code        |F|0|Code        ||||          ||L|8"
-        _FM_ "name        |F|1|Name        ||||          ||T|15"
-        _FM_ "type        |F|2|Type        ||||          ||L|5"
-        _FM_ "date_created|F|3|Date Created||||D4        ||L|12"
-        _FM_ "time_created|F|4|Time Created||||MTH       ||L|12"
-        _FM_ "balance     |F|5|Balance     ||||MD20P     ||R|10"
-        _FM_ "timestamp   |F|6|Timestamp   ||||[DATETIME]||L|12"
-        _FM_ "@crt        |G| |code name type balance date_created time_created timestamp";
+             "code         |F|0|Code         ||||          ||L|8"
+        _FM_ "name         |F|1|Name         ||||          ||T|15"
+        _FM_ "type         |F|2|Type         ||||          ||L|5"
+        _FM_ "date_created |F|3|Date Created ||||D4        ||L|12"
+        _FM_ "time_created |F|4|Time Created ||||MTH       ||L|12"
+        _FM_ "balance      |F|5|Balance      ||||MD20P     ||R|10"
+        _FM_ "timestamp    |F|6|Timestamp    ||||[DATETIME]||L|12"
+        _FM_ "name_and_type|S| |Name and Type||||          ||L|20"
+        _FM_ "@crt         |G| |code name type name_and_type balance date_created time_created timestamp";
 
         printl("\nWrite the dictionary records to the dictionary");
 
@@ -87,6 +88,8 @@ function main() {
         var rec;
         if (not read(rec,dictfile,"balance"))
                 printl("Cant read 'balance' record from dictionary");
+
+        printl("\nNB 'name_and_type' dictionary item S type calls dict_myclients.cpp library function!");
 
         printl("\nClear the client file");
         clearfile(filename);

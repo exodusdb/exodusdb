@@ -474,7 +474,7 @@ updateversion:
 	//@sw<1> is the ADJUSTMENT to get display time from server time
 	//@sw<2> is the difference from gmt/utc to server time
 	//@sw<3> could be the adjustment to get dbtz from servertz
-	mv.SW = "";
+	SW = "";
 	//now ONLY supporting display time different from server time on gmt/utc servers
 	if (SYSTEM.a(120)) {
 		//if server not on gmt/utc and user tz is set then warning
@@ -483,9 +483,9 @@ updateversion:
 			call mssg("WARNING: User time zone ignored and|Database storing non-GMT/UTC date/time|because current server is not GMT/UTC");
 		}
 	}else{
-		mv.SW.r(1, SYSTEM.a(118));
+		SW.r(1, SYSTEM.a(118));
 		//if display time is not server/gmt/utc then adjust offset to server/gmt/utc
-		if ((mv.SW.a(1)).length()) {
+		if ((SW.a(1)).length()) {
 			//system time offset is currently automatically determined by CID()
 			//CID will tell you the current server tz
 			//but should this be recorded in the dataset in case it is moved

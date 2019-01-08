@@ -110,14 +110,13 @@ nextclient:
 			goto nextclient;
 		}
 
-		//called from agencyproxy for VAL.BRAND.NEW (entering new documents)
-
+	//called from agencyproxy for VAL.BRAND.NEW (entering new documents)
 	} else if (mode == "VAL.BRAND") {
 
 		if (win.is.length() and not win.is) {
 			if (win.isorig.length() == 0) {
 				msg = DQ ^ (win.is ^ DQ) ^ " ZERO BRAND CODE IS NOT ALLOWED";
-				return invalid();
+				return invalid(msg);
 			}
 		}
 
@@ -150,12 +149,12 @@ nextclient:
 				//prevent moving unauthorised brands
 				if (not(validcode2(brand.a(10), brand.a(1, 1), win.is, agy.brands, msg))) {
 					msg = qq ^ FM ^ FM ^ msg;
-					return invalid();
+					return invalid(msg);
 				}
 				//also in brands dict authorised
 				if (not(validcode3(brand.a(13, 1), "", "", agy.vehicles, msg))) {
 					msg = qq ^ FM ^ FM ^ msg;
-					return invalid();
+					return invalid(msg);
 				}
 
 				//q:=' for||':brand<2>:'|':brand<3>
@@ -164,7 +163,7 @@ nextclient:
 				if (not(authorised("BRAND CHANGE CLIENT", msg))) {
 					msg = qq ^ FM ^ FM ^ msg;
 					win.is = win.isorig;
-					return invalid();
+					return invalid(msg);
 				}
 
 				var otherclient;
@@ -177,7 +176,7 @@ nextclient:
 							qq.r(-1, "You could unstop the client if appropriate.");
 							qq.r(-1, DQ ^ (otherclient.a(35) ^ DQ));
 							msg = qq ^ FM ^ FM ^ msg;
-							return invalid();
+							return invalid(msg);
 						}
 					}
 				}
@@ -240,17 +239,17 @@ nextclient:
 		tt.converter(LOWERCASE ^ UPPERCASE ^ "0123456789", "");
 		if (tt ne "") {
 			msg = "PLEASE USE ONLY LETTERS AND NUMBERS FOR BRAND CODES";
-			return invalid();
+			return invalid(msg);
 		}
 		if (win.is.length() > 5 or win.is.index(" ", 1)) {
 			msg = "THE BRAND CODE MAY BE UP TO|5 CHARACTERS WITH NO SPACES";
-			return invalid();
+			return invalid(msg);
 		}
 
 	} else if (mode == "VAL.NAME") {
 		if (win.winext > win.wi and win.is == "") {
 			msg = "NAME IS REQUIRED";
-			return invalid();
+			return invalid(msg);
 		}
 
 	} else if (mode == "PREWRITE") {
@@ -296,7 +295,7 @@ nextclient:
 					if (not(locking("LOCK", "CLIENTS", otherclientcode, "", locklist, 3, msg))) {
 						gosub unlockall();
 						msg = DQ ^ (otherclientcode ^ DQ) ^ " client is in use elsewhere|Brand cannot be transferred right now||" ^ msg;
-						return invalid();
+						return invalid(msg);
 					}
 
 					otherclientcodes.r(1, -1, otherclientcode);
@@ -621,7 +620,7 @@ nextclient:
 unlockclient:
 				xx = unlockrecord(win.datafile, win.srcfile, ID);
 				//msg='SORRY YOU ARE NOT AUTHORISED|TO ACCESS THIS CLIENT'
-				gosub invalid();
+				gosub invalid(msg);
 				win.reset = 5;
 				return 0;
 			}
@@ -656,9 +655,9 @@ unlockclient:
 			return 0;
 		}
 
-	} else if (1) {
+	} else {
 		msg = DQ ^ (mode ^ DQ) ^ " - unknown mode skipped in CLIENT.SUBS";
-		return invalid();
+		return invalid(msg);
 	}
 //L3434:
 	return 0;
@@ -729,7 +728,7 @@ subroutine chkbrandused(in brandcodex) {
 			msg = DQ ^ (brandcodex ^ DQ) ^ "  brand cannot be deleted or changed|because it is in use on the following schedules:";
 			hits.converter(VM, " ");
 			msg.r(-1, hits.field(" ", 1, 5));
-			gosub invalid();
+			gosub invalid(msg);
 			return;
 		}
 	}
@@ -741,7 +740,7 @@ subroutine chkbrandused(in brandcodex) {
 			msg = DQ ^ (brandcodex ^ DQ) ^ "  brand cannot be deleted or changed|because it is in use on the following plans:";
 			hits.converter(VM, " ");
 			msg.r(-1, hits.field(" ", 1, 5));
-			gosub invalid();
+			gosub invalid(msg);
 			return;
 		}
 	}
@@ -759,7 +758,7 @@ subroutine chkbrandused(in brandcodex) {
 		if (adid) {
 			msg = DQ ^ (brandcodex ^ DQ) ^ "  brand cannot be deleted or changed|because it is in use on at least the following schedule:";
 			msg.r(-1, adid.xlate("ADS", 1, "C"));
-			gosub invalid();
+			gosub invalid(msg);
 			return;
 		}
 	}
@@ -771,7 +770,7 @@ subroutine chkbrandused(in brandcodex) {
 			msg = DQ ^ (brandcodex ^ DQ) ^ "  brand cannot be deleted or changed|because it is in use on the following jobs:";
 			hits.converter(VM, " ");
 			msg.r(-1, hits.field(" ", 1, 5));
-			gosub invalid();
+			gosub invalid(msg);
 			return;
 		}
 	}

@@ -317,6 +317,15 @@ int var::toInt() const
 	return (var_mvtyp&pimpl::MVTYPE_INT) ? int(var_mvint) : int(var_mvdbl);
 }
 
+int var::toLong() const
+{
+	THISIS(L"int var::toLong() const")
+	THISISNUMERIC()
+
+	//loss of precision if var_mvint is long long
+	return (var_mvtyp&pimpl::MVTYPE_INT) ? long(var_mvint) : long(var_mvdbl);
+}
+
 double var::toDouble() const
 {
 	THISIS(L"double var::toDouble() const")

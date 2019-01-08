@@ -208,7 +208,7 @@ deleteit:
 	cookie ^= "&bf=" ^ USER2;//base currency format
 	cookie ^= "&mk=" ^ defmarketcode;
 	cookie ^= "&mc=" ^ maincurrcode;
-	cookie ^= "&tz=" ^ mv.SW;
+	cookie ^= "&tz=" ^ SW;
 
 	//current datasetname
 	var temp = SYSTEM.a(23);

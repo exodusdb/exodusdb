@@ -4,9 +4,8 @@ libraryinit()
 #include <sysmsg.h>
 #include <authorised.h>
 #include <shell2.h>
-#include <dirlist2.h>
-#include <convert.h>
-#include <osbread.h>
+//#include <dirlist2.h>
+//#include <osbread.h>
 #include <singular.h>
 
 #include <gen.h>
@@ -17,6 +16,7 @@ libraryinit()
 var filename;
 var key;
 var msg;
+var dictfile;
 var file;
 var errors;
 var lengthx;//num
@@ -28,11 +28,11 @@ var LINENO;//num
 var eof;//num
 var line;
 var ncols;
-var dictfile;
 var xx;
 var recordx;
 var allowduplicate;
 var wsmsg;
+var cols;
 
 function main(in mode) {
 	//c sys
@@ -60,10 +60,16 @@ function main(in mode) {
 			return invalid(msg);
 		}
 
+		var dictfilename = "DICT." ^ filename;
+		var dictfile;
+		if (not(dictfile.open(dictfilename, ""))) {
+			call fsmsg();
+			var().stop();
+		}
+
 		var rec;
 		if (not(rec.read(file, key))) {
 			msg = "upload.subs cannot read " ^ filename ^ " " ^ key;
-postuploadfail:
 			gosub unlockfile();
 			call sysmsg(msg);
 			return invalid(msg);
@@ -71,21 +77,26 @@ postuploadfail:
 
 		var dictids = "VERSION*STATUS*USERNAME*DATETIME*STATION";
 		var fns = "";
-		var dictfilename = "DICT." ^ filename;
 		for (var ii = 1; ii <= 99; ++ii) {
 			var dictid = dictids.field("*", ii);
 
 		///BREAK;
 		if (not dictid) break;;
-			var fn = dictid ^ "_ARCHIVED".xlate(dictfilename, 2, "X");
+			//fn=xlate(dictfilename,dictid:'_ARCHIVED',2,'X')
+			var fn;
+			if (not(fn.readv(dictfile, dictid ^ "_ARCHIVED", 1))) {
+				fn = "";
+			}
 			if (not fn or not fn.isnum()) {
 				msg = DQ ^ (dictid ^ "_ARCHIVED" ^ DQ) ^ " is missing from " ^ dictfilename ^ " in upload.subs";
-				goto postuploadfail;
+				gosub unlockfile();
+				call sysmsg(msg);
+				return invalid(msg);
 			}
 			fns.r(ii, fn);
 		};//ii;
 
-		ii = (rec.a(fns.a(1))).count(VM) + (rec.a(fns.a(1)) ne "");
+		var ii = (rec.a(fns.a(1))).count(VM) + (rec.a(fns.a(1)) ne "");
 		rec.r(fns.a(1), ii, targetfilename);
 		rec.r(fns.a(2), ii, newstatus);
 		rec.r(fns.a(3), ii, USERNAME);
@@ -99,7 +110,8 @@ postuploadfail:
 	} else if (mode.field(".", 1) == "MAKEUPLOADPATH") {
 
 		if (not(authorised("UPLOAD CREATE", msg, ""))) {
-			goto EOF_440;
+			call invalid(msg);
+			return false;
 		}
 
 		//additional option to check file and key is not locked
@@ -141,7 +153,7 @@ postuploadfail:
 		}
 
 		//ok if any files found
-		(uploadroot ^ uploadpath ^ "*.*").initdir();
+//TODOC		(uploadroot ^ uploadpath ^ "*.*").initdir();
 		if (var().oslistf()) {
 			return 0;
 		}
@@ -194,7 +206,7 @@ postuploadfail:
 
 		//initdir uploadroot:uploadpath
 		//if dirlist() else
-		var tt = shell2("dir " ^ (DQ ^ (uploadroot ^ uploadpath ^ DQ)) ^ " /b").ucase();
+		var tt = shell2("dir " ^ (DQ ^ (uploadroot ^ uploadpath ^ DQ)) ^ " /b", errors).ucase();
 		if (tt == "" or tt.index("FILE NOT FOUND", 1)) {
 			msg = "Error: Nothing uploaded in " ^ uploadroot ^ uploadpath;
 			return invalid(msg);
@@ -239,7 +251,8 @@ postuploadfail:
 			return 0;
 		}
 
-		var uploadfilenames = dirlist2(dirpatt);
+//TODOC		var uploadfilenames = dirlist2(dirpatt);
+		var uploadfilenames = oslist(uploadroot ^ virtualfilebase, "*");
 
 		//check one or more files exist
 		//if uploadfilenames else
@@ -285,7 +298,7 @@ postuploadfail:
 	} else if (mode.field(".", 1) == "DELETEUPLOAD") {
 
 		if (not(authorised("UPLOAD DELETE", msg, ""))) {
-			goto EOF_440;
+			return invalid(msg);
 		}
 
 		//similar in VERIFY AND DELETEUPLOAD
@@ -296,7 +309,8 @@ postuploadfail:
 
 		//initdir uploadroot:uploadpath
 		//if dirlist() else
-		var tt = shell2("dir " ^ (DQ ^ (uploadroot ^ uploadpath ^ DQ)) ^ " /b").ucase();
+//TODOC		var tt = shell2("dir " ^ (DQ ^ (uploadroot ^ uploadpath ^ DQ)) ^ " /b").ucase();
+		var tt = oslist(uploadroot ^ uploadpath);
 		if (tt == "" or tt.index("FILE NOT FOUND", 1)) {
 			msg = "Error: Nothing uploaded in " ^ uploadroot ^ uploadpath;
 			return invalid(msg);
@@ -311,7 +325,8 @@ postuploadfail:
 		var cmd = "DEL " ^ (DQ ^ (tt ^ DQ));
 		osshell(cmd);
 
-		if (dirlist2(uploadroot ^ uploadpath)) {
+//TODOC		if (dirlist2(uploadroot ^ uploadpath)) {
+		if (oslist(uploadroot ^ uploadpath)) {
 			msg = DQ ^ (uploadroot ^ uploadpath ^ " file cannot be deleted" ^ DQ);
 			return invalid(msg);
 		}
@@ -361,7 +376,7 @@ postuploadfail:
 		file = "";
 
 		if (not importcode) {
-			importcode = field2(uploadpath.ucase("\\", -1));
+			importcode = field2(uploadpath,"\\", -1).ucase();
 		}
 		if (importcode.index(".", 1)) {
 			var tt = field2(uploadpath, ".", -1);
@@ -401,7 +416,7 @@ postuploadfail:
 		anycr = 0;
 		LINENO = 0;
 		//cols os "name vm start vm len" etc one col per fm
-		var cols = "";
+		cols = "";
 		nimported = 0;
 
 		while (true) {
@@ -418,7 +433,8 @@ postuploadfail:
 					///BREAK;
 					if (not tt) break;;
 						cols.r(-1, line.substr(1,tt - 1) ^ VM ^ offset);
-						for (var ptr = tt; ptr <= 999999; ++ptr) {
+						var ptr;
+						for (ptr = tt; ptr <= 999999; ++ptr) {
 						///BREAK;
 						if (line[ptr + 1] ne " ") break;;
 						};//ptr;
@@ -456,7 +472,9 @@ postuploadfail:
 							dictrec.r(2, coln + fieldoffset);
 							dictrec.r(3, capitalise(cols.a(coln, 1)));
 							dictrec.r(10, "10");
-							var dictid = dictcolprefix ^ "_" ^ .convert("_".ucase(cols.a(coln, 1)));
+							//TODOC
+							var dictid = dictcolprefix ^ "_" ^ cols.a(coln, 1);
+							dictid.ucaser().converter(" ","_");
 
 							var CONV = "";
 							var just = "L";
@@ -466,7 +484,6 @@ postuploadfail:
 								if (datewords.locateusing(word, VM, xx)) {
 									CONV = "[DATE,4*]";
 									just = "R";
-									goto 2467;
 								}
 								if (timewords.locateusing(word, VM, xx)) {
 									CONV = "[TIME2,48MTS]";
@@ -480,7 +497,7 @@ postuploadfail:
 							grec ^= " " ^ dictid;
 							dictrec.write(dictfile, dictid);
 						};//coln;
-						"G" ^ FM ^ FM ^ grec.write(dictfile, dictcolprefix);
+						write("G" ^ FM ^ FM ^ grec, dictfile, dictcolprefix);
 
 						if (keyfunction) {
 							if (not keydictid) {
@@ -559,13 +576,14 @@ importexit:
 		msg = DQ ^ (mode ^ DQ) ^ " invalid mode in upload.subs";
 		return invalid(msg);
 	}
-//L3009:
+//L3066:
 	return 0;
 
 }
 
 subroutine getline() {
-	call osbread(line, osfile, temposfilename83, fileoffset, lengthx);
+	//TODOC call osbread(line, osfile, temposfilename83, fileoffset, lengthx);
+	line=osbread(osfile, temposfilename83, fileoffset, lengthx);
 
 	if (not line.length()) {
 		eof = 1;

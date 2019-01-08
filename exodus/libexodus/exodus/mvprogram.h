@@ -136,7 +136,7 @@ private:
 	mutable var cache_dictid_;
 	mutable var cache_dictrec_;
 
-	//used by perform to call libraries
+	//used by perform to call libraries WITH NO ARGUMENTS
 	mutable ExodusFunctorBase perform_exodusfunctorbase_;
 	//TODO cache many not just one
 	mutable var cache_perform_libid_;

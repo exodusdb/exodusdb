@@ -44,6 +44,7 @@ add_executable(listindexes listindexes.cpp)
 add_executable(testsort testsort.cpp)
 add_executable(configexodus configexodus.cpp)
 
+add_library(dict_myclients SHARED dict_myclients.cpp)
 
 ### 2. LINK ###
 
@@ -84,5 +85,10 @@ listindexes
 testsort
 configexodus
  DESTINATION bin)
+
+## CMAKE_PREFIX=/usr/local/
+#install(TARGETS dict_myclients DESTINATION lib)
+#push it into /usr/lib where it can be found by dlopen
+install(TARGETS dict_myclients DESTINATION /usr/lib)
 
 message("--EXODUS CLI CMAKE EXIT --")

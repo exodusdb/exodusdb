@@ -5,7 +5,10 @@
 extern "C" {
 #endif
 
-/*
+//NB
+//WHATEVER UNICODE CHARACTERS ARE CHOSEN MUST FIT IN TWO BYTES OF UTF8 FOR THIS IMPLEMENTATION TO WORK
+
+/* code page 0200 - could be used in real text
 #define FM_ '\u02FE'
 #define VM_ '\u02FD'
 #define SM_ '\u02FC'
@@ -24,8 +27,7 @@ extern "C" {
 #define SM_UTF8 '\uCBBC'
 */
 
-//unicode characters 07FE 07FD 07FC for FM/VM/SM must fit in two byte utf8
-
+//using NKO page 0700 - sadly right to left flavoured
 #define FM_ '\u07FE'
 #define VM_ '\u07FD'
 #define SM_ '\u07FC'
@@ -43,7 +45,27 @@ extern "C" {
 #define VM_UTF8 '\uDFBD'
 #define SM_UTF8 '\uDFBC'
 
-/*
+/* code page 0500 sadly right to left flavoured too
+//using unused end of unicode page 0500
+#define FM_ '\u05FE'
+#define VM_ '\u05FD'
+#define SM_ '\u05FC'
+
+#define FM_UTF8_1 '\xD7'
+#define FM_UTF8_2 '\xBE'
+
+#define VM_UTF8_1 FM_UTF8_1
+#define VM_UTF8_2 '\xBD'
+
+#define SM_UTF8_1 FM_UTF8_1
+#define SM_UTF8_2 '\xBC'
+
+#define FM_UTF8 '\uD7BE'
+#define VM_UTF8 '\uD7BD'
+#define SM_UTF8 '\uD7BC'
+*/
+
+/* not using invalid UTF8 characters any more
 #define FM_ '\xFE'
 #define VM_ '\xFD'
 #define SM_ '\xFC'

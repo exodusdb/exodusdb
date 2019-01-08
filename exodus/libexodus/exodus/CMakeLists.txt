@@ -37,7 +37,8 @@ message(PostgreSQL_INCLUDEDIR=${PostgreSQL_INCLUDE_DIR})
 #############
 #date_time appears to be header only in later boost versions eg 55
 #find_package(Boost REQUIRED COMPONENTS filesystem date_time system regex thread)
-find_package(Boost REQUIRED COMPONENTS filesystem system regex thread)
+#find_package(Boost REQUIRED COMPONENTS filesystem system regex thread)
+find_package(Boost REQUIRED COMPONENTS system regex thread)
 message("BUT LOOKING IN /usr/local/lib and /usr/local/include FIRST!")
 
 set(Boost_USE_STATIC_LIBS        ON)
@@ -87,7 +88,7 @@ add_library(exodus SHARED
 )
 
 #set_target_properties(exodus PROPERTIES SOVERSION "${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_VERSION}")
-set_target_properties(exodus PROPERTIES SOVERSION "14.01")
+set_target_properties(exodus PROPERTIES SOVERSION "19.01")
 
 ### specify what libraries are to be linked in when building libexodus ###
 
@@ -102,7 +103,9 @@ target_link_libraries(exodus boost_filesystem -L/usr/local/lib ${Boost_LIBRARIES
 
 ### state that the output libexodus should be installed in the default system library
 
+### CMAKE_INSTALL_PREFIX defaults to /usr/local/
 install(TARGETS exodus DESTINATION lib)
+##install(TARGETS exodus DESTINATION /usr/lib)
 
 ### install some of exodus' include files so programs can be written in exodus c++ ###
 

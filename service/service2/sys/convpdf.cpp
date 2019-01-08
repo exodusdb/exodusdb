@@ -5,7 +5,9 @@ libraryinit()
 #include <shell2.h>
 
 
-function main(in printopts, out errors) {
+var printopts;
+
+function main(in printopts0, out errors) {
 	//c sys in,out
 
 	//gets filename from system<2> and updated system<2> if successful
@@ -14,11 +16,13 @@ function main(in printopts, out errors) {
 
 	var htmlfilename = SYSTEM.a(2);
 
-	var errors = "";
+	errors = "";
 
 	//X means dont convert
-	if (printopts.unassigned()) {
+	if (printopts0.unassigned()) {
 		printopts = "";
+	}else{
+		printopts = printopts0;
 	}
 	if (printopts.index("X", 1)) {
 		return 0;

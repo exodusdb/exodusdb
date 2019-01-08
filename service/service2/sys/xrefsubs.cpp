@@ -29,7 +29,7 @@ function main(in mode, in subfn, in masterfilename, io masterfile, in masterfn, 
 	if (masterfile.unassigned()) {
 		if (not(masterfile.open(masterfilename, ""))) {
 			msg = DQ ^ (masterfilename ^ DQ) ^ " file does not exist";
-			return invalid();
+			return invalid(msg);
 		}
 	}
 
@@ -138,9 +138,9 @@ nextbuild:
 		validating = 0;
 		gosub validateupdate( subfn,  masterfilename,  masterfile,  masterfn,  locklist);
 
-	} else if (1) {
+	} else {
 		msg = DQ ^ (mode ^ DQ) ^ " invalid mode in xref.subs";
-		return invalid();
+		return invalid(msg);
 	}
 //L524:
 	return 0;
@@ -163,7 +163,7 @@ subroutine validateupdate(in subfn, in masterfilename, in masterfile, in masterf
 		if (not(locking("LOCK", masterfilename, mastercode, "", locklist, 1, msg))) {
 			gosub unlockall( locklist);
 			msg = DQ ^ (mastercode ^ DQ) ^ " master record is in use elsewhere|Try again later";
-			gosub invalid();
+			gosub invalid(msg);
 			return;
 		}
 

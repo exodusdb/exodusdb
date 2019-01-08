@@ -46,16 +46,16 @@ function main(in marketcodex, in suppliercodex, in vehiclecodex, io vehicles, ou
 	}
 
 	//initialise buffer if not for the same user
-	if (mv.EW.a(10) ne USERNAME) {
-		mv.EW = mv.EW.field(FM, 1, 9);
-		mv.EW.r(10, USERNAME);
-		mv.PW = mv.PW.field(FM, 1, 9);
+	if (EW.a(10) ne USERNAME) {
+		EW = EW.field(FM, 1, 9);
+		EW.r(10, USERNAME);
+		PW = PW.field(FM, 1, 9);
 	}
 
 	//return quick answer if checking vehicles and is in buffer
 	if (vehiclecode) {
-		if (mv.EW.locate(vehiclecode, coden, 10 + 5)) {
-			if (mv.PW.a(10 + 5, coden)) {
+		if (EW.locate(vehiclecode, coden, 10 + 5)) {
+			if (PW.a(10 + 5, coden)) {
 				return 1;
 			}else{
 				return 0;
@@ -242,14 +242,14 @@ function getfilepositive() {
 	}
 
 	//store space or '#' to indicate buffered result
-	positive = mv.PW.a(10, filen);
+	positive = PW.a(10, filen);
 	if (positive == "") {
 		if (authorised(taskid ^ " ACCESS", msg0, "")) {
 			positive = " ";
 		}else{
 			positive = "#";
 		}
-		mv.PW.r(10, filen, positive);
+		PW.r(10, filen, positive);
 	}
 
 	//trim any buffered space to become ''
@@ -263,29 +263,29 @@ subroutine checkcode(io msg) {
 	ok = 0;
 	//if dont have general access to file then
 	//access to a specific record must be positively allowed (use # task prefix)
-	if (mv.EW.locate(code, coden, 10 + filen)) {
-		if (not(mv.PW.a(10 + filen, coden))) {
+	if (EW.locate(code, coden, 10 + filen)) {
+		if (not(PW.a(10 + filen, coden))) {
 			return;
 		}
 	}else{
 
 		//trim off first 10% of codes if buffer too big
-		if (mv.EW.length() > 50000) {
+		if (EW.length() > 50000) {
 			var oldcoden = coden;
 			coden = (coden * .9).floor();
 			var ntrim = oldcoden - coden;
-			mv.EW.r(10 + filen, mv.EW.a(10 + filen).field(VM, ntrim + 1, 999999));
-			mv.PW.r(10 + filen, mv.PW.a(10 + filen).field(VM, ntrim + 1, 999999));
+			EW.r(10 + filen, EW.a(10 + filen).field(VM, ntrim + 1, 999999));
+			PW.r(10 + filen, PW.a(10 + filen).field(VM, ntrim + 1, 999999));
 		}
 
-		mv.EW.r(10 + filen, coden, code);
+		EW.r(10 + filen, coden, code);
 		if (filen ne 5) {
 			gosub getfilepositive();
 		}
 		if (not(authorised(positive ^ taskid ^ " ACCESS " ^ (DQ ^ (code ^ DQ)), msg, ""))) {
 			return;
 		}
-		mv.PW.r(10 + filen, coden, 1);
+		PW.r(10 + filen, coden, 1);
 	}
 
 	ok = 1;

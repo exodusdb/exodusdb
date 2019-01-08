@@ -63,7 +63,7 @@ f2dataset:
 		}
 		ANS = datasetcode;
 		if (ANS) {
-			mv.DATA ^= ANS ^ "\r";
+			DATA ^= ANS ^ "\r";
 		}
 
 	} else if (mode == "VAL.DATASET") {
@@ -103,7 +103,7 @@ f2dataset:
 			return;
 		}
 		ANS = depts.a(reply);
-		mv.DATA ^= ANS ^ "\r";
+		DATA ^= ANS ^ "\r";
 
 	} else if (mode == "VAL.DEPARTMENT") {
 		if (win.is == "") {
@@ -239,13 +239,13 @@ badexchrate:
 	} else if (mode == "F2.CURRENCY") {
 		call catalyst("P", "POPUPS*CURRENCY");
 		if (ANS) {
-			mv.DATA ^= "" "\r";
+			DATA ^= "" "\r";
 		}
 
 	} else if (mode == "F2.CURRENCIES") {
 		call catalyst("P", "POPUPS*CURRENCIES");
 		if (ANS) {
-			mv.DATA ^= "" "\r";
+			DATA ^= "" "\r";
 		}
 
 	} else if (mode == "VAL.CURRENCY") {
@@ -273,7 +273,7 @@ badexchrate:
 		}
 		call catalyst("P", "POPUPS*" ^ tt);
 		if (ANS) {
-			mv.DATA ^= ANS ^ "\r";
+			DATA ^= ANS ^ "\r";
 		}
 		DICT = storedict;
 

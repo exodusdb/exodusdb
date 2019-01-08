@@ -1231,8 +1231,14 @@ badtype:
 		}
 
 	} else {
+
+
 		msg = DQ ^ (mode ^ DQ) ^ " MODE NOT RECOGNISED IN AGENCY.SUBS";
+
+
 		gosub invalid(msg);
+
+
 		return 0;
 	}
 

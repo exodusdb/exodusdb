@@ -726,6 +726,21 @@ bool var::read(const var& filehandle,const var& key)
 
 }
 
+var var::hash(const unsigned long long modulus) const
+{
+	THISIS(L"var var::hash() const")
+	THISISDEFINED()
+	THISISSTRING()
+	//ISNUMERIC(modulus)
+
+	//uint64_t hash64=MurmurHash64((wchar_t*)fileandkey.data(),int(fileandkey.length()*sizeof(wchar_t)),0);
+	uint64_t hash64=MurmurHash64((wchar_t*)var_mvstr.data(),int(var_mvstr.length()*sizeof(wchar_t)),0);
+	if (modulus)
+		return var_mvint=hash64 % modulus;
+	else
+		return var_mvint=hash64;
+}
+
 var var::lock(const var& key) const
 {
 	//on postgres, repeated locks for the same thing (from the same connection) succeed and stack up
