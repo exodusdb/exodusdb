@@ -247,4 +247,9 @@ typedef var& out;
 #define VW mv.VW
 #define SW mv.SW
 
+#define CRTHIGH mv.CRTHIGH
+#define CRTWIDE mv.CRTWIDE
+#define LPTRHIGH mv.LPTRHIGH
+#define LPTRWIDE mv.LPTRWIDE
+
 #endif //EXODUSMACROS_H

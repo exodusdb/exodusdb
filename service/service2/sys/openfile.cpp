@@ -1,30 +1,56 @@
 #include <exodus/library.h>
 libraryinit()
 
-function main(in filename, io file, in similarfilename="") {
+#include <openfile.h>
 
-	//opens a filename and returns file variable and true
-	//otherwise if similar file name it tries to create in same fashion
-	//otherwise 
+var autocreate;//num
+var datasetcode;
+var reply;
 
-	file = "";
+function main(in filename, io file, in similarfilename="", in autocreate0="") {
+	//c sys in,io,"",""
+	if (autocreate0.unassigned()) {
+		autocreate = 1;
+	}else{
+		autocreate = autocreate0;
+	}
+	var firsttry = 1;
+tryagain:
 
-	for (var tryn=1; tryn<=2; ++tryn) {
+	if (openfile("*" ^ filename, file, datasetcode)) {
+		return 1;
+	}
 
-		if (file.open(filename)) {
-			return true;
-		}
-
-		//option to create file if it does not exist
-		var tt="";
-		if (similarfilename == filename or tt.open(similarfilename)) {
-			var().createfile(filename);
+	if (firsttry) {
+		//user option to create file if it does not exist
+		var tt;
+		if (tt.open("FILES", "")) {
+			if (tt.read(tt, similarfilename)) {
+				var vol = tt.a(1);
+				if (not autocreate) {
+					tt = "THE " ^ (DQ ^ (filename ^ DQ)) ^ " FILE DOES NOT EXIST|DO YOU WANT TO CREATE IT ?";
+					if (not(decide(tt, "No" _VM_ "Yes", reply))) {
+						var().stop();
+					}
+					if (reply ne 2) {
+						return 0;
+					}
+				}
+				var cmd = vol ^ " DATA " ^ filename ^ " (S)";
+				execute("MAKEFILE " ^ cmd);
+				execute("ATTACH " ^ cmd);
+				firsttry = 0;
+				goto tryagain;
+			}
 		}
 	}
 
-	call mssg(filename.quote() ^ " file is missing");
-	return false;
+	var().chr(7).output();
+	call mssg("THE " ^ (DQ ^ (filename ^ DQ)) ^ " FILE IS MISSING");
+	file = "";
+	return 0;
 
 }
+
 
 libraryexit()

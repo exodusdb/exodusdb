@@ -6,7 +6,7 @@
 ExodusFunctorBase efb_openfile;
 
 //a member function with the right arguments, returning a var or void
-var openfile(in filename, io file, in similarfilename="")
+var openfile(in filename, io file, in similarfilename="", in autocreate0="")
 {
 
  //first time link to the shared lib and create/cache an object from it
@@ -17,13 +17,13 @@ var openfile(in filename, io file, in similarfilename="")
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
  //with the right arguments and returning a var or void
- typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(in,io,in);
+ typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(in,io,in,in);
 
  //call the shared library object main function with the right args,
  // returning a var or void
  return CALLMEMBERFUNCTION(*(efb_openfile.pobject_),
  ((pExodusProgramBaseMemberFunction) (efb_openfile.pmemberfunction_)))
-  (filename,file,similarfilename);
+  (filename,file,similarfilename,autocreate0);
 
 }
 //#endif

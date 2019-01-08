@@ -614,8 +614,7 @@ baddict:
 
 }
 
-bool ExodusProgramBase::unlockrecord(const var& filename, const var& file0,
-		const var& key) const {
+bool ExodusProgramBase::unlockrecord(const var& filename, const var& file0, const var& key) const {
 	var file;
 	if (file0.unassigned())
 		file = L"";
@@ -874,14 +873,12 @@ var ExodusProgramBase::otherdatasetusers(const var& param) {
 	}
 }
 
-bool ExodusProgramBase::lockrecord(const var& filename, const var& file,
-		const var& keyx) const {
+bool ExodusProgramBase::lockrecord(const var& filename, const var& file, const var& keyx) const {
 	var record;
 	return lockrecord(filename, file, keyx, record);
 }
 
-bool ExodusProgramBase::lockrecord(const var& filename, const var& file,
-		const var& keyx, const var& recordx, const int waitsecs0, const bool allowduplicate) const {
+bool ExodusProgramBase::lockrecord(const var& filename, const var& file, const var& keyx, const var& recordx, const int waitsecs0, const bool allowduplicate) const {
 
 	//linemark
 	//common /shadow.mfs/ shfilenames,shhandles,shadow.file,shsession.no,locks,spare1,spare2,spare3

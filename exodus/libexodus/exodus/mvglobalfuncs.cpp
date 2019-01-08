@@ -840,6 +840,16 @@ DLL_PUBLIC bool deletefile(const var& filename)
 	return filename.deletefile(filename);
 }
 
+DLL_PUBLIC bool clearfile(const var& filename)
+{
+	return filename.clearfile(filename);
+}
+
+DLL_PUBLIC bool renamefile(const var& filename,const var& newfilename) 
+{
+	return filename.renamefile(filename, newfilename);
+}
+
 DLL_PUBLIC bool createindex(const var& filename, const var& fieldname, const var& dictfilename)
 {
 	return filename.createindex(fieldname, dictfilename);
@@ -848,11 +858,6 @@ DLL_PUBLIC bool createindex(const var& filename, const var& fieldname, const var
 DLL_PUBLIC bool deleteindex(const var& filename, const var& fieldname)
 {
 	return filename.deleteindex(fieldname);
-}
-
-DLL_PUBLIC bool clearfile(const var& filename)
-{
-	return filename.clearfile(filename);
 }
 
 
@@ -1091,9 +1096,9 @@ DLL_PUBLIC var listfiles()
 	return var().listfiles();
 }
 
-DLL_PUBLIC var listindexes(const var& filename)
+DLL_PUBLIC var listindexes(const var& filename, const var& fieldname)
 {
-	return var().listindexes(filename);
+	return var().listindexes(filename,fieldname);
 }
 
 //one argument returns the contents

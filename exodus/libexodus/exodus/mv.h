@@ -1045,7 +1045,7 @@ public:
 
 	bool createindex(const var& fieldname,const var& dictfile DEFAULTNULL) const;
 	bool deleteindex(const var& fieldname) const;
-	var listindexes(const var& filename DEFAULTNULL) const;
+	var listindexes(const var& filename DEFAULTNULL, const var& fieldname DEFAULTNULL) const;
 
 	var reccount(const var& filename DEFAULTNULL) const;
 	var flushindex(const var& filename DEFAULTNULL) const;

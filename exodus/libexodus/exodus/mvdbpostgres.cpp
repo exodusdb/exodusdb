@@ -2687,7 +2687,7 @@ bool var::selectpending() const
 	return result;
 }
 
-var var::listindexes(const var& filename) const
+var var::listindexes(const var& filename, const var& fieldname) const
 {
 	THISIS(L"var var::listindexes(const var& filename) const")
 	//could allow undefined usage since *this isnt used?
@@ -2705,6 +2705,8 @@ var var::listindexes(const var& filename) const
 			L" WHERE";
 	if (filename)
 		sql^=L" relname = '" ^ filename.lcase() ^  L"' AND ";
+	//if (fieldname)
+	//	sql^=L" ???relname = '" ^ fieldname.lcase() ^  L"' AND ";
 	sql^=L" pg_class.oid=pg_index.indrelid"
 		 L" AND indisunique != 't'"
 		 L" AND indisprimary != 't'"
@@ -2734,7 +2736,10 @@ var var::listindexes(const var& filename) const
 				tt=indexname.index(L"__");
 				if (tt)
 				{
-					indexnames^=FM^indexname.substr(8,999999).swap(L"__",VM);
+					indexname.substrer(8,999999).swapper(L"__",VM);
+					if (fieldname && indexname.a(1,2) != fieldname)
+						continue;
+					indexnames^=FM^indexname;
 				}
 			}
 		}

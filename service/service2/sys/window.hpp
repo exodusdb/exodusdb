@@ -118,3 +118,20 @@ function note3(in msg) {
 	return 0;
 }
 
+function badchars() {
+	var msg = "";
+	if (not win.is) {
+		return 0;
+	}
+	var tt = win.is;
+	var bad = "\'" "~!@#$%^&*()_+|\\{}[]:\";,?";
+	tt.converter(bad, RM.str(bad.length()));
+	if (tt ne win.is) {
+		var t2 = win.is;
+		t2.converter(tt, "");
+		msg = "SORRY, YOU CANNOT USE|" ^ t2 ^ " CHARACTERS IN KEY FIELDS";
+		gosub invalid(msg);
+	}
+	return 0;
+}
+
