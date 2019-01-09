@@ -1,9 +1,13 @@
 #include <exodus/library.h>
 libraryinit()
 
+
+#include <gen.h>
+
 var indexingrecord;
 
-function main(in mode, in filename, in keys0, in fieldnames, in oldvalues, in newvalues, io valid, io msg) {
+function main(in mode, in filename, io keys, in fieldnames, in oldvalues, in newvalues, io valid, io msg) {
+	//c job in,in,io,in,in,in,io,io
 	//update symbolic indexed files
 	//this is designed to be called in prewrite
 	//to update the indexes of associated records
@@ -11,23 +15,33 @@ function main(in mode, in filename, in keys0, in fieldnames, in oldvalues, in ne
 	//since indexing on derived fields fails to be updated
 	//when the derived fields change
 
-	//1. CALL('LOCK' ... to lock all associated records
-	//2. CALL('UNLOCK' ... in case some associated records cannot be locked
+	//1. CALL('LOCK' - to lock all associated records
+	//2. CALL('UNLOCK' - in case some associated records cannot be locked
 	//3. CALL('INDEXINGLOCK') to lock !INDEXING
-	//4. CALL('UPDATE' ... to add to the !INDEXING record
-	//5. CALL('INDEXING' ... to unlock !INDEXING
+	//4. CALL('UPDATE' - to add to the !INDEXING record
+	//5. CALL('INDEXING' - to unlock !INDEXING
 
 	var secstowaitforindexinglock = 99;
 	var secstowaitforlock = 9;
 	var indexingkey = "0";
-	var indexingfile;
 
 	valid = 0;
 	msg = "Unknown error in UPD.SECINDEX";
 
+	var indexingfile;
+	if (not(indexingfile.open("!INDEXING", ""))) {
+		msg = "SYSTEM ERROR: " ^ (DQ ^ ("!INDEXING" ^ DQ)) ^ " file cannot be opened";
+		return 0;
+	}
+
 	if (mode == "INDEXINGLOCK") {
+		if (not(lockrecord("!INDEXING", indexingfile, indexingkey, indexingrecord, secstowaitforindexinglock))) {
+			msg = "Central !INDEXING record is in use elsewhere";
+			return 0;
+		}
 
 	} else if (mode == "INDEXINGUNLOCK") {
+		call unlockrecord("!INDEXING", indexingfile, indexingkey);
 
 	} else if (mode == "LOCK" or mode == "UNLOCK" or mode == "UPDATE") {
 
@@ -43,7 +57,6 @@ function main(in mode, in filename, in keys0, in fieldnames, in oldvalues, in ne
 		var cnt = 0;
 
 		//allow for keys to be passed as vm
-		var keys=keys0;
 		keys.converter(VM, FM);
 
 		var nkeys = keys.count(FM) + (keys ne "");
@@ -65,7 +78,8 @@ function main(in mode, in filename, in keys0, in fieldnames, in oldvalues, in ne
 				}
 
 			} else if (mode == "UNLOCK") {
-unlockrecord:
+
+				//duplicate code in UPDATE and UNLOCK
 				call unlockrecord(filename, file, keyx);
 
 			} else if (mode == "UPDATE") {
@@ -82,12 +96,15 @@ unlockrecord:
 
 				};//fieldn;
 
-				goto unlockrecord;
+				//duplicate code in UPDATE and UNLOCK
+				call unlockrecord(filename, file, keyx);
 
 			}
-
+//L486:
+			//comment
 		};//keyn;
 
+		//update
 		if (mode == "UPDATE" and upd ne "") {
 
 			var fileaccount = filename.xlate("FILES", 3, "X");
@@ -111,7 +128,7 @@ unlockrecord:
 		}
 
 	}
-
+//L631:
 	valid = 1;
 	msg = "";
 

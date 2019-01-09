@@ -128,12 +128,16 @@ public:
 
 ExodusFunctorBase();
 
+//constructor to provide everything immediately
+ExodusFunctorBase(const std::string libname, const std::string funcname, MvEnvironment& mv);
+
 //constructor to provide library and function names immediately
-ExodusFunctorBase(const std::string libname,
-				  const std::string funcname);
+ExodusFunctorBase(const std::string libname, const std::string funcname);
 
 //constructor to provide environment immediately
 ExodusFunctorBase(MvEnvironment& mv);
+
+ExodusFunctorBase& operator=(const char*);
 
 //call shared member function
 var callsmf();
@@ -165,6 +169,9 @@ public:
 	//for call or die (smf)
 	bool init(const char* libraryname, const char* functionname, MvEnvironment& mv);
 
+	//assumes name and mv setup on initialisation then opens library on first call
+	bool init();
+
 	//for dict/perform/execute (external shared member functions)
 	//forcenew used by perform/execute to delete and create new object each time
 	//so that global variables start out unassigned each time performed/executed
@@ -173,9 +180,11 @@ public:
 	//external shared global functions (not member functions)
 	bool initsgf(const char* libraryname, const char* functionname);
 
+	//TODO move to private
+	void closelib();
+
 private:
 	bool openlib(std::string libraryname);
-	void closelib();
 	bool openfunc(std::string functionname);
 	void closefunc();
 
@@ -186,19 +195,21 @@ public:
 	//only public for rather hacked mvipc getResponseToRequest()
 	mutable MvEnvironment* mv_;
 
-private:
+	//TODO move to private
 	//records the library opened so we can close and reopen new libraries automatically
 	std::string libraryname_;
-	//internal memory of the actual library file name. only used for error messages
-	std::string libraryfilename_;
-	//pointer to the shared library file
-	void* plibrary_;
 
+private:
 	//normally something like
 	//exodusprogrambasecreatedelete_
 	//or exodusprogrambasecreatedelete_{dictid}
 	//one function is used to create and delete the shared library object
 	std::string functionname_;
+
+	//internal memory of the actual library file name. only used for error messages
+	std::string libraryfilename_;
+	//pointer to the shared library file
+	void* plibrary_;
 
 protected:
 	//functioname_ is used to open a dl shared function to this point

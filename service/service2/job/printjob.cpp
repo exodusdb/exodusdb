@@ -3,71 +3,104 @@ libraryinit()
 
 #include <getmark.h>
 #include <authorised.h>
-#include <ranges.h>
-#include <jobsubs.h>
 #include <agencysubs.h>
+#include <ranges.h>
+#include <quote2.h>
+#include <safeselect.h>
+#include <initcompany.h>
 #include <validcode2.h>
 #include <validcode3.h>
-#include <initcompany.h>
+#include <timedate2.h>
 #include <addcent.h>
-#include <htmllib.h>
+#include <htmllib2.h>
+#include <getreccount.h>
+#include <select2.h>
 #include <gethtml.h>
 #include <readcss.h>
-
-#include <select2.h>
+#include <docmods.h>
+//#include <osbwritex.h>
 #include <printtx.h>
 
-#include <gen.h>
 #include <fin.h>
+#include <gen.h>
 #include <agy.h>
 #include <win.h>
 
+var printptr;//num
 var msg;
+var compcode;
 var xx;
+var tt;
 var reply;
 var temp;
+var styletx;
+var classx;
+var cols;
+var coltx;
+var style;
+var basefmt0;
+var clientmark;
+var sep;
+var tx;
+var bases;
+var statuses;
 var totalbase;//num
-var tt;
+var datax;
+var txr;
 var tag;
 var rowattribs;
 var avghourlyrate;
+var newpage;//num
+var aligned;
+var topmargin;//num
+var printfilename;
+var html;
+var printfile;
+var letterhead;
+var realpagen;//num
+var printtxmark;
+var rfmt;
+var nbodylns;//num
+var headx;
+var newpagetag;
+var css;
 
-var sep;
-var nbsp;
-var showcancelledlines;
-var ownmark;
-var tx;
-var mark;
-
-//gets parameters from PSEUDO (or SENTENCE if PSEUDO="" for testing)
 function main() {
- 
-	var html = 1;
+	//
+	//c job
+
+	//global tx,cols,style,styletx,classx,sep,basefmt0,statuses,newpage,printptr
+	//global bases
+
+	//so we can call xxxxxx.SUBS
+	//var().clearcommon();
+
+	//pdf
+	var repeatcolheads = (PSEUDO.a(4)).isnum();
+
 	var interactive = not SYSTEM.a(33);
-	nbsp = "&nbsp;";
-	sep = VM;
+	var nbsp = "&nbsp;";
 
-	showcancelledlines = 0;
+	var showcancelledlines = 0;
 
-	ownmark = "Production Management";
-	call getmark("OWN", html, ownmark);
+	var ownmark = "Production Management";
+	call getmark("OWN", 1, ownmark);
+
+	printptr = 0;
+	var cssver = 2;
 
 	if (not(authorised("JOB ACCESS", msg, ""))) {
 		call mssg(msg);
-		return 0;
+		var().stop();
 	}
-
-	if (PSEUDO.unassigned() or PSEUDO eq "") {
-		PSEUDO=SENTENCE.convert(" ",FM);
-	}
-
-	var reqsections = PSEUDO.a(3);
 
 	var timesheetparams;
 	if (not(timesheetparams.read(DEFINITIONS, "TIMESHEET.PARAMS"))) {
 		timesheetparams = "";
 	}
 
+	var reqsections = PSEUDO.a(3);
+	//convert ':' to sm in reqsections
 
 	//check securities
 	var accessbrief = 1;
@@ -80,57 +113,196 @@ function main() {
 	var accessbill = authorised("PRODUCTION ESTIMATE ACCESS", msg, "");
 
 	//suppress unwanted sections
-	//only check if some sections required because mac doesnt specify sections
-	//1=brief, 2=costs, 3=time, 4=bills
-	if (reqsections) {
-		if (not reqsections.index(1)) {
-			accessbrief = 0;
+	if (not(reqsections.index("1", 1))) {
+		accessbrief = 0;
+	}
+	if (not(reqsections.index("2", 1))) {
+		accesscost = 0;
+	}
+	if (reqsections.index("3", 1)) {
+		if (not accesstime) {
+			//personal time only
+			accesstime = 2;
 		}
-		if (not reqsections.index(2)) {
-			accesscost = 0;
-		}
-		if (not reqsections.index(3)) {
-			if (not accesstime) {
-				//personal time only
-				accesstime = 2;
-			}
-			}else{
-				accesstime = 0;
-			}
-		if (not reqsections.index(4)) {
-			accessbill = 0;
-		}
+	}else{
+		accesstime = 0;
+	}
+	if (not(reqsections.index("4", 1))) {
+		accessbill = 0;
 	}
 
-//init:
-	if (not(DICT.open("DICT_JOBS"))) {
+	/////
+	//init:
+	/////
+
+	if (not(DICT.open("dict_JOBS"))) {
 		call fsmsg();
-		return 0;
+		var().stop();
 	}
 
 	var jobversions;
 	if (not(jobversions.open("JOB_VERSIONS", ""))) {
 		call fsmsg();
-		return 0;
+		var().stop();
 	}
 
 	var jobdict = DICT;
 	var timesheetdict;
-	if (not(timesheetdict.open("DICT_TIMESHEETS"))) {
+	if (not(timesheetdict.open("dict_TIMESHEETS"))) {
 		call fsmsg();
-		return 0;
+		var().stop();
+	}
+	win.datafile = "JOBS";
+
+	//similar code in PRODINVS2 and PRINTJOB
+	var jobnos = PSEUDO.a(2);
+	if (not jobnos or jobnos.match("1A0A")) {
+		//in case non-numeric job exist
+		var job;
+		if (not(job.read(agy.jobs, jobnos))) {
+			if (jobnos.match("1A0A")) {
+				compcode = jobnos;
+			}else{
+				compcode = gen.gcurrcompany;
+			}
+			//.1 means get previous ie last one
+			call agencysubs("GETNEXTID." ^ compcode ^ ".1", xx);
+			var tt;
+			if (not(tt.read(agy.jobs, ID))) {
+				call mssg("No documents have been created yet for company " ^ compcode ^ "| or company " ^ compcode ^ " doesnt exist");
+				var().stop();
+			}
+			jobnos = ID;
+		}
 	}
 
-	var jobnos = PSEUDO.a(2);
+	//jobnos=field(field(@sentence,'(',1),' ',2)
 	if (jobnos) {
-		call ranges(jobnos, xx);
+		call ranges(jobnos);
 		if (not jobnos) {
-			return 0;
+			var().stop();
 		}
 	}
 	if (not jobnos) {
-		call mssg("Job number is required but missing");
-		return 0;
+		if (not LISTACTIVE) {
+
+				/*;
+				//jobnos=xlate('DEFINITIONS','JOBS.SK',1,'X')-1
+				call job.subs('GETLASTJOBNO');
+				jobnos=@ans;
+				if jobnos else jobnos='';
+	inpjob:
+				if interactive then;
+					call note2('Which job number(s) do you want ?||Eg "123" or "123 127" or "123 127 132"||(Press space then Enter to search)|','RCE',jobnos,'');
+				end else;
+					call msg('Job number is required but missing');
+					stop;
+					end;
+				*/
+
+			//similar code in PRODINVS2 and PRINTJOB
+			if (not jobnos or jobnos.match("1A0A")) {
+				if (jobnos.match("1A0A")) {
+					compcode = jobnos;
+				}else{
+					compcode = gen.gcurrcompany;
+				}
+				//.1 means get previous ie last one
+				call agencysubs("GETNEXTID." ^ compcode ^ ".1", xx);
+				var tt;
+				if (not(tt.read(agy.jobs, ID))) {
+					call mssg("No documents have been created yet for company " ^ compcode);
+					return 0;
+				}
+				jobnos = ID;
+			}
+
+			if (jobnos == 0x1B) {
+				var().stop();
+			}
+			if (jobnos) {
+
+				//convert range to list
+				if (jobnos.match("1N0N\" \"1N0N")) {
+
+					var fromno = jobnos.field(" ", 1);
+					var tono = jobnos.field(" ", 2);
+
+					if (fromno < tono - 1) {
+
+						if (not(decide("", "All jobs from " ^ fromno ^ " to " ^ tono ^ "" _VM_ "Only jobs " ^ fromno ^ " and " ^ tono, reply))) {
+							var().stop();
+						}
+
+						if (reply == 1) {
+
+							//limit to 1000 max
+							if (tono > fromno + 1000) {
+								tono = fromno + 1000;
+							}
+
+							var jobnox = agy.agp.a(53);
+							if (jobnox == "") {
+								jobnox = "<NUMBER>";
+							}
+							temp = gen.company.a(28);
+							if (not temp) {
+								temp = gen.gcurrcompany;
+							}
+							jobnox.swapper("<COMPANY>", temp);
+
+							jobnos = "";
+							for (var jobno = fromno; jobno <= tono; ++jobno) {
+							///BREAK;
+							if (not(jobnos.length() < 32000)) break;;
+								if (esctoexit()) {
+									var().stop();
+								}
+								var jobnox2 = jobnox;
+								jobnox2.swapper("<NUMBER>", jobno);
+								jobnos ^= " " ^ jobnox2;
+							};//jobno;
+
+						}
+
+					}
+
+				}else{
+
+					if (not(jobnos.index("-", 1))) {
+
+						call safeselect("SSELECT JOBS WITH MASTER_JOB_NO " ^ quote2(jobnos) ^ " AND WITH AUTHORISED (S)");
+
+						//error if cannot find any jobs
+						if (not LISTACTIVE) {
+							call mssg(DQ ^ (jobnos ^ DQ) ^ " - JOB NUMBER DOES NOT EXIST");
+							var().stop();
+						}
+
+						var njobnos = jobnos.count(" ") + 1;
+						if (RECCOUNT == njobnos) {
+							jobnos = "";
+						}else{
+							call agencysubs("F2.JOBS", xx);
+							jobnos = ANS;
+						}
+
+					}
+
+				}
+
+				jobnos.trimmer();
+
+				//search by job index
+			}else{
+				call agencysubs("F2.JOBS", xx);
+				if (not ANS) {
+					var().stop();
+				}
+				jobnos = ANS;
+			}
+
+		}
 	}
 
 	var jobn = 0;
@@ -140,658 +312,827 @@ function main() {
 	jobnos.trimmer();
 	jobnos.converter(FM ^ " ", " " ^ FM);
 
+	var njobs = jobnos.count(FM) + (jobnos ne "");
+
+	styletx = "";
+
+	classx = "HEAD1";
+	cols = "L7,LB,L7,LB,L7,LB";
+	gosub getcols();
+	var head1cols = coltx;
+
+	classx = "COST1";
+	cols = "C,R,R,R,L,C,L,C";
+	gosub getcols();
+	var cost1cols = coltx;
+
+	classx = "TIME1";
+	cols = "C,C,R,C,L,R";
+	if (accesstime < 2) {
+		cols ^= ",R,R";
+	}
+	gosub getcols();
+	var time1cols = coltx;
+
+	classx = "BILL1";
+	cols = "C,R,R,R,L,C,C,R,C";
+	gosub getcols();
+	var bill1cols = coltx;
+
+	//add style for all table columns (using css nth-child method)
+	style = "<style type=\"text/css\">";
+
+	//tbody td version
+	style.r(-1, styletx);
+
+	//tbody th version
+	styletx.swapper("> td:", "> th:");
+	style.r(-1, FM ^ styletx);
+
+	//thead th version
+	styletx.swapper(" > tbody > ", " > thead > ");
+	style.r(-1, FM ^ styletx);
+
+	style.r(-1, "<style>");
+
 	var personn = 1;
-	
-//nextjob:
-	while (not esctoexit()) {
-		if (jobnos) {
-			jobn += 1;
-			ID = jobnos.a(jobn);
-			if (not ID) {
-				break;
-			}
-		}else{
-			if (not var().readnext(ID)) {
-				break;
-			}
-		}
 
-		var isoldversion = 0;
-		if (not(RECORD.read(agy.jobs, ID))) {
-			if (not(RECORD.read(jobversions, ID))) {
-				call mssg(DQ ^ (ID ^ DQ) ^ " - JOB NUMBER DOES NOT EXIST");
-				continue;
-			}
-			isoldversion = 1;
+	////////
+nextjob:
+	////////
+	//if interactive then call timedelay(.2)
+	if (esctoexit()) {
+		gosub exit();
+		var().stop();
+	}
+	if (jobnos) {
+		jobn += 1;
+		ID = jobnos.a(jobn);
+		if (not ID) {
+			gosub exit();
+			var().stop();
 		}
-		MV = 0;
-
-		if (RECORD.a(14) and RECORD.a(14) ne gen.gcurrcompany) {
-			call initcompany(RECORD.a(14));
+	}else{
+		if (not readnext(ID)) {
+			gosub exit();
+			var().stop();
 		}
-	
-		var mark = "";
-		call getmark("CLIENT", html, mark);
+	}
 
-		if (not(validcode2(calculate("COMPANY_CODE"), calculate("CLIENT_CODE"), calculate("BRAND_CODE"), agy.brands, msg))) {
+	var isoldversion = 0;
+	if (not(RECORD.read(agy.jobs, ID))) {
+		if (not(RECORD.read(jobversions, ID))) {
+			call mssg(DQ ^ (ID ^ DQ) ^ " - JOB NUMBER DOES NOT EXIST");
+			goto nextjob;
+		}
+		isoldversion = 1;
+	}
+	MV = 0;
+
+	if (RECORD.a(14) and RECORD.a(14) ne gen.gcurrcompany) {
+		call initcompany(RECORD.a(14));
+	}
+
+	basefmt0 = fin.basefmt;
+	basefmt0.converter("Z", "");
+
+	call getmark("CLIENT", 1, clientmark);
+	//clientmark='<table><tr><td>':clientmark:'</td></tr></table>'
+
+	if (not(validcode2(calculate("COMPANY_CODE"), calculate("CLIENT_CODE"), calculate("BRAND_CODE"), agy.brands, msg))) {
 unauth:
-			call mssg("Job No:" ^ ID ^ "|" ^ msg);
-			continue;
-		}
+		call mssg("Job No:" ^ ID ^ "|" ^ msg);
+		goto nextjob;
+	}
 
-		if (not(validcode3(calculate("MARKET_CODE"), "", "", xx="", msg))) {
-			goto unauth;
-		}
+	if (not(validcode3(calculate("MARKET_CODE"), "", "", xx, msg))) {
+		goto unauth;
+	}
 
-	//jobinit:
+	var htmltitle = "Job";
+	var head = htmltitle;
+	if (calculate("CLOSED") == "Y") {
+		head ^= " (Closed)";
+	} else if (calculate("CLOSED") == "N") {
+		head ^= " (Reopened)";
+	}
+	if (1) {
+		head ^= " (Open)";
+	}
+	head = "<h2~style=\"margin:0px;text-align:center\">" ^ head ^ "</h2>";
+	head ^= "<span style=\"acenter\">";
+	head ^= "produced " ^ timedate2();
+	head ^= FM ^ "</span>";
+	head ^= FM ^ FM;
 
-		//if (RECORD.a(14) and RECORD.a(14) ne gen.gcurrcompany) {
-		//	call initcompany(RECORD.a(14));
-		//}
+	if (njobs == 1) {
+		htmltitle ^= " " ^ (DQ ^ (ID ^ DQ));
+		htmltitle ^= " for " ^ calculate("CLIENT_NAME");
+	}
 
-		var head = "";
-		head ^= "JOB FILE";
-		if (calculate("CLOSED") == "Y") {
-			head ^= " (Closed)";
-		} else if (calculate("CLOSED") == "N") {
-			head ^= " (Reopened)";
-		} else {
-			head ^= " (Open)";
-		}
-		head = "<H2~style=\"margin:0px;text-align:center\">" ^ head ^ "</H2>";
-		head ^= "<CENTER>";
-		head ^= "produced " ^ timedate();
-		head ^= FM ^ "</CENTER>";
-		head ^= FM ^ FM;
+	sep = VM;
 
-//		call printtx(xx,"head",head);
-//		call printtx(xx="");
+	tx = head;
+	tx.converter("~", " ");
+	head = "";
+	gosub printtx(tx);
 
-		sep = VM;
+	var tr = "<tr>";
+	var trl = "<tr class=\"aleft\">";
+	var trx = "</tr>";
+	var td = "<td>";
+	var tdx = "</td>";
 
-		tx = head;
-		tx.converter("~", " ");
-		head = "";
-		call printtx(tx);
+	var nobr = "<span style=\"white-space:nowrap\">";
+	var nobrx = "</span>";
+	var bon = "<b>";
+	var boff = "</b>";
 
-		var l18 = "";
-		var tr = "<TR>";
-		//trl='<TR ALIGN=LEFT>'
-		var trx = "</TR>";
-		var td = "<TD>";
-		var tdx = "</TD>";
+	//super table used to reprint job header on continuation pages
 
-		head ^= "<TABLE border=0 ID=\"HEADER\" ALIGN=CENTER";
-		head ^= " WIDTH=100%";
-		head ^= ">";
-		head ^= var("<COL WIDTH=7% ALIGN=LEFT><COL STYLE=\"Font-Weight:Bold\">").str(3);
-		//head:=str('<COL ALIGN=LEFT><COL STYLE="Font-Weight:Bold">',3)
+	var trs = FM ^ "<TR>";
+	var trxs = "</TR>" ^ FM;
+	//TDS=FM:'<TD style="text-align:left;padding:0px">':FM
+	var tds = "<TD style=\"text-align:left\">" ^ FM;
+	var tdxs = FM ^ "</TD>";
 
-		//tab:='<P>'
+	head.r(-1, "<table class=\"HEAD1\" style=\"width:100%\"");
+	//head:=' cellspacing="0"';*ie7
+	head ^= ">";
 
-		var tab = "";
+	head.r(-1, head1cols);
+	head.r(-1, "<tbody>");
 
-		//1st line
+	var tab = "";
 
-		tab ^= tr ^ td ^ "Client:" ^ tdx ^ td ^ calculate("CLIENT_NAME") ^ tdx ^ td;
+	//1st line
 
-		var attention = calculate("ATTENTION");
-		if (attention) {
-			tab ^= "Attention:";
-		}
-		tab ^= tdx ^ td ^ attention ^ tdx;
+	tab.r(-1, tr ^ td ^ "Client:" ^ tdx ^ td ^ calculate("CLIENT_NAME") ^ tdx ^ td);
 
-		var jobnumber = calculate("NUMBER");
-		if (not RECORD.a(29)) {
-			RECORD.r(29, "A");
-		}
-		if (isoldversion or RECORD.a(29) > "A") {
-			jobnumber ^= " (rev " ^ RECORD.a(29) ^ ")";
-		}
-		if (isoldversion) {
-			jobnumber ^= "*";
-		}
-		tab ^= td ^ "Job No:" ^ tdx ^ td ^ jobnumber ^ tdx;
-		tab ^= trx;
+	var attention = calculate("ATTENTION");
+	if (attention) {
+		tab ^= nobr ^ "Attention:" ^ nobrx;
+	}
+	tab ^= tdx ^ td ^ bon ^ attention ^ boff ^ tdx;
 
-		//2nd line
+	var jobnumber = calculate("NUMBER");
+	if (not RECORD.a(29)) {
+		RECORD.r(29, "A");
+	}
+	if (isoldversion or RECORD.a(29) > "A") {
+		jobnumber ^= " (rev " ^ RECORD.a(29) ^ ")";
+	}
+	if (isoldversion) {
+		jobnumber ^= "*";
+	}
+	tab ^= td ^ nobr ^ "Job No:" ^ nobrx ^ tdx;
+	tab ^= td ^ nobr ^ bon ^ jobnumber ^ boff ^ nobrx ^ tdx;
+	tab ^= trx;
 
-		tab ^= tr ^ td ^ "Brand:" ^ tdx ^ td ^ calculate("FULL_BRAND_NAME") ^ tdx ^ td;
+	//2nd line
 
-		//executive={EXECUTIVE_CODE}
-		var executive = calculate("EXECUTIVE_NAME");
-		if (executive) {
-			tab ^= "Executive:";
-		}
-		tab ^= tdx ^ td ^ executive ^ tdx;
+	tab.r(-1, tr ^ td ^ "Brand:" ^ tdx);
+	tab ^= td ^ calculate("FULL_BRAND_NAME") ^ tdx ^ td;
 
-		//income=sum({QUOTE_AMOUNT_BASE})
-		//cost=sum({ORDER_AMOUNT_BASE})
+	//executive={EXECUTIVE_CODE}
+	var executive = calculate("EXECUTIVE_NAME");
+	if (executive) {
+		tab ^= nobr ^ "Executive:" ^ nobrx;
+	}
+	tab ^= tdx ^ td ^ bon ^ executive ^ boff ^ tdx;
 
-		MV = 0;
+	//income=sum({QUOTE_AMOUNT_BASE})
+	//cost=sum({ORDER_AMOUNT_BASE})
 
-		var bases = calculate("ORDER_AMOUNT_BASE");
-		var statuses = calculate("ORDER_STATUS2");
-		gosub sumnotcancelled(bases, statuses, totalbase);
-		var cost = totalbase;
+	MV = 0;
 
-		bases = calculate("QUOTE_AMOUNT_BASE");
-		statuses = calculate("QUOTE_STATUS2");
-		gosub sumnotcancelled(bases, statuses, totalbase);
-		var income = totalbase;
+	bases = calculate("ORDER_AMOUNT_BASE");
+	statuses = calculate("ORDERmv.STATUS2");
+	gosub sumnotcancelled();
+	var cost = totalbase;
 
-		tab ^= td;
+	bases = calculate("QUOTE_AMOUNT_BASE");
+	statuses = calculate("QUOTEmv.STATUS2");
+	gosub sumnotcancelled();
+	var income = totalbase;
 
-		if (accesscost and accessbill) {
+	tab ^= td;
 
-			if (income) {
-				tt = (income - cost) / income * 100;
-				//garbagecollect;
-				tt = tt.oconv("MD10PZ") ^ "%";
-			}else{
-				tt = "";
-			}
-			//t={PERCENT_MARGIN2} 'MD10PZ'
-			//garbagecollect
-			//t=margin 'MD10PZ'
-			//if t then t:='%'
-			if (income.length() or cost.length()) {
-				//garbagecollect;
-				tt ^= " " ^ (income - cost).oconv(fin.basefmt) ^ agy.agp.a(2);
-			}
+	if (accesscost and accessbill) {
 
-			tab ^= "Margin:";
-			tab ^= tdx ^ td;
-			tab ^= tt;
-
-		}
-
-		tab ^= tdx ^ trx;
-
-		//3rd line
-
-		tab ^= tr ^ td ^ "<nobr>Market-Period:</nobr>" ^ tdx ^ td ^ calculate("MARKET_NAME") ^ " - " ^ addcent(calculate("PERIOD")) ^ tdx ^ td;
-
-		var prodtypedesc = calculate("PRODTYPE_DESC");
-		if (prodtypedesc) {
-			tab ^= "Type:";
-		}
-		tab ^= tdx ^ td ^ prodtypedesc ^ tdx ^ td;
-
-		//t={PERCENT_MARKUP2} 'MD10PZ'
-		//if t then t:='%'
-		if (cost) {
-			tt = (income - cost) / cost * 100;
+		if (income) {
+			tt = (income - cost) / income * 100;
 			//garbagecollect;
 			tt = tt.oconv("MD10P") ^ "%";
 		}else{
 			tt = "";
 		}
-
-		if (accesscost and accessbill) {
-			tab ^= "Markup:";
+		//tt={PERCENT_MARGIN2} 'MD10PZ'
+		//garbagecollect
+		//tt=margin 'MD10PZ'
+		//if tt then tt:='%'
+		if (income.length() or cost.length()) {
+			//garbagecollect;
+			tt ^= " " ^ nobr ^ bon ^ (income - cost).oconv(basefmt0) ^ agy.agp.a(2) ^ boff ^ nobrx;
 		}
+
+		tab ^= nobr ^ "Margin:" ^ nobrx;
 		tab ^= tdx ^ td;
-		if (accesscost and accessbill) {
-			tab ^= tt;
-		}
+		tab ^= tt;
 
-		tab ^= tdx ^ trx;
+	}
 
-		//4th line
+	tab ^= tdx ^ trx;
 
-		//tab:=tr:td:'Market:':tdx:td:{MARKET_NAME}:tdx:td
-		tab ^= tr ^ td;
+	//3rd line
 
-		var description = calculate("DESCRIPTION").a(1, 1);
-		if (description) {
-			tab ^= "Description:";
-		}
-		tab ^= tdx ^ "<TD COLSPAN=5>" ^ description ^ tdx;
+	tab.r(-1, tr ^ td ^ nobr ^ "Market-Period:" ^ nobrx ^ tdx);
+	tab ^= td ^ calculate("MARKET_NAME") ^ " - " ^ addcent(calculate("PERIOD")) ^ tdx ^ td;
 
-		tab ^= trx;
+	var prodtypedesc = calculate("PRODTYPE_DESC");
+	if (prodtypedesc) {
+		tab ^= nobr ^ "Type:" ^ nobrx;
+	}
+	tab ^= tdx ^ td ^ bon ^ prodtypedesc ^ boff ^ tdx ^ td;
 
-		//5th line
-		//brief=field({DESCRIPTION},vm,2,9999)
-		//if brief then
-		// swap vm with '<BR>':crlf in brief
-		// tab:=tr:td:'Brief:':tdx
-		// tab:='<TD COLSPAN=6>':brief:tdx:trx
-		// end
+	//t={PERCENT_MARKUP2} 'MD10PZ'
+	//if t then t:='%'
+	if (cost) {
+		tt = (income - cost) / cost * 100;
+		//garbagecollect;
+		tt = tt.oconv("MD10P") ^ "%";
+	}else{
+		tt = "";
+	}
 
-		tab.swapper("&", "&amp;");
-		//call htmllib('TABLE.MAKE',tab,t,'')
-		tab.swapper("<TR>", "<TR ALIGN=LEFT VALIGN=TOP>");
+	if (accesscost and accessbill) {
+		tab ^= nobr ^ "Markup:" ^ nobrx;
+	}
+	tab ^= tdx ^ td;
+	if (accesscost and accessbill) {
+		tab ^= bon ^ tt ^ boff;
+	}
 
-		tab ^= "</TABLE>";
+	tab ^= tdx ^ trx;
 
-		tab.swapper("\'", "\'\'");
-		head ^= tab;
+	//4th line
 
-		tx = "";
+	var description = calculate("DESCRIPTION");
 
-		//supertable heading
-		tx ^= "<TABLE border=0 WIDTH=100%><THEAD><TR><TD>";
-		tx ^= head;
-		head = "";
-		//tx:='<P><P>':mark
+	//one line description row
+	tab.r(-1, tr ^ td);
+	var description1 = description.a(1, 1);
+	//the first column is the title only if any description exists
+	if (description1) {
+		tab ^= nobr ^ "Description:" ^ nobrx;
+	}
+	//description1 fills the remaining 5 columns
+	tab ^= tdx ^ "<td colspan=5>" ^ bon ^ description1 ^ boff ^ tdx;
+	tab ^= trx;
 
-		tx ^= "</TD></TR></THEAD>";
+	tab.swapper("&", "&amp;");
+	tab.swapper("<tr>", "<tr style=\"vertical-align:top\">");
 
-		tx ^= "<TBODY>";
+	tab.r(-1, "</tbody>");
+	tab.r(-1, "</table>");
 
-		call printtx(tx);
+	tab.swapper("\'", "\'\'");
+	head.r(-1, tab);
 
-		call printtx(xx,"foot","");
-		call printtx(xx,"bottomline","");
+	//supertable heading
+	tx.r(-1, "<TABLE>");
+	if (repeatcolheads) {
+		tx.r(-1, "<THEAD>");
+	}
+	tx.r(-1, trs ^ tds);
+	tx.r(-1, head);
+	head = "";
 
-		//brief
-		description = calculate("DESCRIPTION").field(VM, 2, 9999);
+	tx.r(-1, tdxs ^ trxs);
+	if (repeatcolheads) {
+		tx.r(-1, "</THEAD>");
+		tx.r(-1, "<TBODY>");
+	}
+	gosub printtx(tx);
 
-		var l6 = "";
-		var l10 = "";
-		var l12 = "";
-		var r15 = "";
-		var r10 = "";
-		var r12 = "";
-		var l20 = "";
-		sep = VM;
+	var foot = "";
+	var bottomline = "";
 
-		tx = "";
+	sep = VM;
 
-		//5th line
-		if (accessbrief) {
-			var brief = calculate("DESCRIPTION").field(VM, 2, 9999);
-			if (brief) {
+	//5th line
+	if (accessbrief) {
+		var brief = description.field(VM, 2, 9999);
+		if (brief) {
 
-				//open superrow
-				tx = "<TR><TD><xP><xP></TD></TR>";
-				tx ^= "<TR><TD ALIGN=LEFT>";
-				call printtx(tx);
-
-				brief.swapper(VM, "<BR>" "\r\n");
-				tx = "<TABLE><TR><TD VALIGN=TOP>Brief:</TD><TD>" ^ brief ^ "</TD></TR></TABLE>";
-
-				//close superrow
-				tx ^= "</TD></TR>";
-				call printtx(tx);
-
-			}
-		}
-
-		if (accesscost and RECORD.a(4)) {
+			//gap superrow
+			tx.r(-1, trs ^ tds ^ tdxs ^ trxs);
 
 			//open superrow
-			tx = "<TR><TD><xP><xP></TD></TR>";
-			tx ^= "<TR><TD>" ^ mark;
-			mark = "";
-			call printtx(tx);
+			tx.r(-1, trs ^ tds);
 
-			tx = "";
-			tx ^= var("Order No.").oconv(l6) ^ sep;
-			tx ^= var("Date").oconv(l12) ^ sep;
-			tx ^= var("Amount").oconv(r15) ^ sep;
-			tx ^= (agy.agp.a(2) ^ " Equiv.").oconv(r12) ^ sep;
-			tx ^= var("Description").oconv(l20) ^ sep;
-			tx ^= var("Suppl.Inv").oconv(l12) ^ sep;
-			tx ^= var("Supplier").oconv(l20) ^ sep;
-			tx ^= var("Status").oconv(l12);
-			var bar = var("-").str(tx.length());
-
-			tx ^= FM;
-
-			MV = 0;
-			temp = calculate("ORDER_NO");
-			var nlines = temp.count(VM) + (temp ne "");
-			totalbase = 0;
-			for (MV = 1; MV <= nlines; ++MV) {
-
-				var status = calculate("ORDER_STATUS2");
-				var orderinvno = calculate("ORDER_INV_NO");
-				//similar logic in printjob and jobs.subs/postread
-				if (orderinvno) {
-					status = "INVOICE";
-				}
-				if (not status) {
-					status = "ISSUED";
-				}
-				var cancelled = status == "CANCELLED";
-
-				if (showcancelledlines or not cancelled) {
-					if (MV > 1) {
-						tx ^= FM;
-					}
-					tx ^= (calculate("ORDER_NO")).oconv(l6) ^ sep;
-					tx ^= (calculate("ORDER_DATE")).oconv("[DATE,*]" _VM_ "" ^ l12) ^ sep;
-					tx ^= (calculate("ORDER_AMOUNT") ^ calculate("ORDER_CURRENCY")).oconv(r15) ^ sep;
-					var orderamountbase = calculate("ORDER_AMOUNT_BASE");
-					tx ^= orderamountbase.oconv(r12) ^ sep;
-					if (not cancelled) {
-						totalbase += orderamountbase;
-					}
-					tx ^= (calculate("ORDER_DESC")).oconv(l20) ^ sep;
-					tx ^= orderinvno.oconv(l12) ^ sep;
-					tx ^= (calculate("SUPPLIER_NAME")).oconv(l20) ^ sep;
-					tx ^= capitalise(status);
-				}
-			};//MV;
-
-			if (totalbase) {
-				tx ^= FM ^ "Total" ^ sep ^ sep ^ sep ^ "<B>" ^ totalbase.oconv(fin.basefmt) ^ "</B>" ^ sep ^ sep ^ sep;
-			}
-
-			tt = "";
-			tt ^= "<table id=" "\"costs\" align=center class=neosystable";
-			tt ^= " cellpadding=1 cellspacing=0 border=1";
-			tt ^= " width=100%";
-			tt ^= ">";
-			//t:=str('<COL WIDTH=7% ALIGN=LEFT><COL STYLE="Font-Weight:Bold">',2)
-			tt ^= var("<COL ALIGN=RIGHT>").str(4);
-			tx.swapper("&", "&amp;");
-			call htmllib("TABLE.MAKE", tx, tt, 1);
-			//swap '<TR>' with '<TR VALIGN=TOP>' in tx
+			//put brief in a table
+			brief.swapper(VM, "<br/>" "\r\n");
+			tx.r(-1, "<table class=\"aleft\">");
+			tx.r(-1, tr ^ "<td style=\"vertical-align:top\">Brief:" ^ tdx ^ td ^ brief ^ tdx ^ trx);
+			tx.r(-1, "</table>");
 
 			//close superrow
-			tx ^= FM ^ "</TR></TR>";
+			tx.r(-1, tdxs ^ trxs);
 
-			//tx:='<P>'
-			call printtx(tx);
+			gosub printtx(tx);
 
 		}
+	}
 
-	//	if (accesstime and getreccount(gen.timesheets, "", "")) {
-		if (accesstime) {
+	if (accesscost and RECORD.a(4)) {
 
-			//get relevent timesheet lines by department person and date
-			//better be under 64kb!!!
-			var dictids = "DEPARTMENT2 PERSON_NAME DATE ACTIVITY_NAME DETAILS HOURS RATE AMOUNT";
+		//gap superrow
+		tx.r(-1, trs ^ tds ^ tdxs ^ trxs);
+
+		//open superrow
+		tx.r(-1, trs ^ tds);
+
+		//tx<-1>=clientmark
+		tx ^= FM ^ clientmark;
+		clientmark = "";
+
+		datax = "";
+		datax ^= "Order No." ^ sep;
+		datax ^= "Date" ^ sep;
+		datax ^= "Amount" ^ sep;
+		datax ^= agy.agp.a(2) ^ " Equiv." ^ sep;
+		datax ^= "Description" ^ sep;
+		datax ^= "Suppl.Inv" ^ sep;
+		datax ^= "Supplier" ^ sep;
+		datax ^= "Status";
+
+		datax ^= FM;
+
+		MV = 0;
+		temp = calculate("ORDER_NO");
+		var nlines = temp.count(VM) + (temp ne "");
+		totalbase = 0;
+		for (MV = 1; MV <= nlines; ++MV) {
+
+			var status = calculate("ORDERmv.STATUS2");
+			var orderinvno = calculate("ORDER_INV_NO");
+			//similar logic in printjob and jobs.subs/postread
+			if (orderinvno) {
+				status = "INVOICE";
+			}
+			if (not status) {
+				status = "ISSUED";
+			}
+			var cancelled = status == "CANCELLED";
+
+			if (showcancelledlines or not cancelled) {
+				if (MV > 1) {
+					datax ^= FM;
+				}
+				datax ^= calculate("ORDER_NO") ^ sep;
+				datax ^= (calculate("ORDER_DATE")).oconv("[DATE,*4]" _VM_ "") ^ sep;
+				datax ^= calculate("ORDER_AMOUNT") ^ calculate("ORDER_CURRENCY") ^ sep;
+				var orderamountbase = calculate("ORDER_AMOUNT_BASE");
+				datax ^= orderamountbase ^ sep;
+				if (not cancelled) {
+					totalbase += orderamountbase;
+				}
+				datax ^= calculate("ORDER_DESC") ^ sep;
+				datax ^= orderinvno ^ sep;
+				datax ^= calculate("SUPPLIER_NAME") ^ sep;
+				datax ^= capitalise(status);
+			}
+		};//MV;
+
+		if (totalbase) {
+			datax ^= FM ^ "Total" ^ sep ^ sep ^ sep ^ bon ^ totalbase.oconv(basefmt0) ^ boff ^ sep ^ sep ^ sep ^ sep;
+		}
+
+		tt = "";
+		tt ^= "<table class=\"neosystable COST1\"";
+		//tt:=' cellspacing="0"';*ie7
+		tt ^= " style=\"width:100%\"";
+		tt ^= ">";
+
+		tt.r(-1, cost1cols);
+
+		datax.swapper("&", "&amp;");
+		call htmllib2("TABLE.MAKE", datax, tt, 1);
+
+		if (not repeatcolheads) {
+			gosub removetheadtbody();
+		}
+
+		tx.r(-1, datax);
+
+		//close superrow
+		tx.r(-1, tdxs ^ trxs);
+
+		gosub printtx(tx);
+
+	}
+
+	if (accesstime and getreccount(gen.timesheets, "", "")) {
+
+		//get relevent timesheet lines by department person and date
+		//better be under 64kb!!!
+		var dictids = "DEPARTMENT2 PERSON_NAME DATE ACTIVITY_NAME DETAILS HOURS";
+		//not personal
+		if (accesstime == 1) {
+			dictids ^= " RATE AMOUNT";
+		}
+		var filename = "TIMESHEETS";
+		var linkfilename2 = "";
+		var sortselect = "WITH JOB_NO " ^ (DQ ^ (ID ^ DQ)) ^ " BY JOB_NO BY DEPARTMENT BY PERSON_CODE BY DATE";
+		if (timesheetparams.a(8)) {
+			sortselect ^= " AND WITH DATE GE " ^ (DQ ^ ((timesheetparams.a(8)).oconv("[DATE,*]") ^ DQ));
+		}
+		sortselect ^= " AND WITH AUTHORISED1";
+		//personal time only
+		if (accesstime ne 1) {
+			sortselect ^= " AND WITH PERSON_CODE " ^ (DQ ^ ("NABEEHA" ^ DQ));
+		}
+		var options = "";
+		datax = "";
+		var response = "";
+		call select2(filename, linkfilename2, sortselect, dictids, options, datax, response, "JOB_NO" _VM_ "HOURS" _VM_ "HOURS", "EQ" _VM_ "NE" _VM_ "NE", ID ^ "" _VM_ "0" _VM_ "");
+
+		if (datax) {
+
+			//gap superrow
+			tx.r(-1, trs ^ tds ^ tdxs ^ trxs);
+
+			//open superrow
+			tx.r(-1, trs ^ tds);
+
+			tx.r(-1, clientmark);
+			clientmark = "";
+
+			tx.r(-1, "<table class=\"neosystable TIME1\"");
+			//tx:=' cellspacing="0"';*ie7
+			tx ^= " style=\"width:100%\">";
+
+			tx.r(-1, time1cols);
+
+			if (repeatcolheads) {
+				tx.r(-1, "<thead>");
+			}
+
+			gosub printtx(tx);
+
+			txr = "Department" ^ sep;
+			txr ^= "Person" ^ sep;
+			txr ^= "Date" ^ sep;
+			//txr:='Code':sep
+			txr ^= "Activity" ^ sep;
+			txr ^= "Details" ^ sep;
+			txr ^= "Hours" ^ sep;
 			//not personal
-			if (accesstime == 1) {
-				dictids ^= " RATE AMOUNT";
+			if (accesstime < 2) {
+				txr ^= "Rate" ^ sep;
+				txr ^= "Amount" ^ sep;
 			}
-			var filename = "TIMESHEETS";
-			var linkfilename2 = "";
-			var sortselect = "WITH JOB_NO " ^ (DQ ^ (ID ^ DQ)) ^ " BY JOB_NO BY DEPARTMENT BY PERSON_CODE BY DATE";
-			if (timesheetparams.a(8)) {
-				sortselect ^= " AND WITH DATE GE " ^ (DQ ^ ((timesheetparams.a(8)).oconv("[DATE,*]") ^ DQ));
+			txr.splicer(-1, 1, "");
+
+			tag = "th";
+			rowattribs = "";
+			gosub printtxr();
+
+			if (repeatcolheads) {
+				tx.r(-1, "</thead>");
+				tx.r(-1, "<tbody>");
 			}
-			sortselect ^= " AND WITH AUTHORISED1";
-			//personal time only
+
+			gosub printtx(tx);
+
+			var personcoln = 2;
+			var amountcoln = 8;
+			var ratecoln = 7;
+			var hourscoln = 6;
+
+			//personal show lines immediately
+			var styledisplay = "display:none";
 			if (accesstime ne 1) {
-				sortselect ^= " AND WITH PERSON_CODE " ^ (DQ ^ ("NABEEHA" ^ DQ));
+				styledisplay = "";
 			}
-			var options = "";
-			var selecteddata = "";
-			var response = "";
-			call select2(filename, linkfilename2, sortselect, dictids, options, selecteddata, response, "JOB_NO" _VM_ "HOURS" _VM_ "HOURS", "EQ" _VM_ "NE" _VM_ "NE", ID ^ "" _VM_ "0" _VM_ "");
 
-			if (selecteddata) {
+			var nlines = datax.count(FM) + 1;
+			var totalamount = 0;
+			var totalhours = 0;
+			var personamount = 0;
+			var personhours = 0;
+			//move up so persons dont repeat if multiple jobs printed drill clicked
+			//personn=1
+			var personcode = datax.a(1, personcoln);
+			for (var ln = 1; ln <= nlines; ++ln) {
 
-				//open superrow
-				tx = "<TR><TD><xP><xP></TD></TR>";
-				tx ^= "<TR><TD>" ^ mark ^ FM;
-				mark = "";
+				txr = datax.a(ln);
+				totalamount += txr.a(1, amountcoln);
+				personamount += txr.a(1, amountcoln);
+				var hours = txr.a(1, hourscoln);
+				if (hours) {
+					//MT2 is a GBP PROGRAM!
+					personhours += (txr.a(1, hourscoln)).iconv("MT2");
+					totalhours += (txr.a(1, hourscoln)).iconv("MT2");
+					txr.swapper(VM, sep);
 
-				tx ^= "<table id=\"time\" align=center class=neosystable cellpadding=1 cellspacing=0 border=1 width=100%><thead><col><col><col align=right><col><col><col><col align=right><col align=right><col align=right>";
-				call printtx(tx);
+					tag = "td";
+					//id for pre ie8 compatibility without getElementsByClassName
+					//rowattribs='id="person':personn:'" class="person':personn:'" style="cursor:pointer; ':styledisplay:'" onclick="toggle(':"'":'person':personn:"'":')"'
+					rowattribs = "class=\"person" ^ personn ^ "\" style=\"cursor:pointer; " ^ styledisplay ^ "\" onclick=\"toggle(" "\'" "person" ^ personn ^ "\'" ")\"";
+					gosub printtxr();
 
-				tx ^= "Department" ^ sep;
-				tx ^= "Person" ^ sep;
-				tx ^= "Date" ^ sep;
-				//tx:='Code':sep
-				tx ^= "Activity" ^ sep;
-				tx ^= "Details" ^ sep;
-				tx ^= "Hours" ^ sep;
-				tx ^= "Rate" ^ sep;
-				tx ^= "Amount";
-				tag = "TH";
+				}
 
+				//person subtotal
+				if (datax.a(ln + 1, personcoln) ne personcode) {
+					if (personhours or personamount) {
+						if (personhours) {
+							avghourlyrate = (personamount / personhours).oconv("MD20PZ");
+						}else{
+							avghourlyrate = "";
+						}
+						txr = datax.a(ln, 1) ^ sep ^ capitalise(personcode) ^ sep ^ sep ^ sep ^ sep ^ personhours.oconv("MT2");
+						//not personal
+						if (accesstime < 2) {
+							txr ^= sep ^ avghourlyrate ^ sep ^ bon ^ personamount.oconv(basefmt0) ^ boff;
+						}
+
+						tag = "th";
+						//rowattribs='style="cursor:pointer" onclick="toggle(person':personn:')"'
+						rowattribs = "style=\"cursor:pointer\" onclick=\"toggle(" "\'" "person" ^ personn ^ "\'" ")\"";
+						gosub printtxr();
+
+						personhours = "";
+						personamount = "";
+					}
+					personcode = datax.a(ln + 1, personcoln);
+					personn += 1;
+				}
+
+			};//ln;
+
+			if (totalhours or totalamount) {
+				if (totalhours) {
+					avghourlyrate = (totalamount / totalhours).oconv("MD20PZ");
+				}else{
+					avghourlyrate = "";
+				}
+				txr = "Total" ^ sep ^ sep ^ sep ^ sep ^ sep ^ totalhours.oconv("MT2");
+				//not personal
+				if (accesstime < 2) {
+					txr ^= sep ^ avghourlyrate ^ sep ^ bon ^ totalamount.oconv(basefmt0) ^ boff;
+				}
+
+				tag = "th";
 				rowattribs = "";
-				gosub printtxrow(tx);
-
-				tx = "</THEAD>";
-				call printtx(tx);
-
-				var personcoln = 2;
-				var amountcoln = 8;
-				var ratecoln = 7;
-				var hourscoln = 6;
-
-				var nlines = selecteddata.count(FM) + 1;
-
-				//personal show lines immediately
-				var styledisplay = "display:none";
-				if (accesstime ne 1) {
-					styledisplay = "";
-				}
-
-				var totalamount = 0;
-				var totalhours = 0;
-				var personamount = 0;
-				var personhours = 0;
-				//var personn = 1;
-				var personcode = selecteddata.a(1, personcoln);
-				for (var ln = 1; ln <= nlines; ++ln) {
-
-					tx = selecteddata.a(ln);
-					totalamount += tx.a(1, amountcoln);
-					personamount += tx.a(1, amountcoln);
-					var hours = tx.a(1, hourscoln);
-					if (hours) {
-						//personhours += (tx.a(1, hourscoln)).iconv("[MT2U]");
-						//totalhours += (tx.a(1, hourscoln)).iconv("[MT2U]");
-						personhours += tx.a(1, hourscoln);
-						totalhours += tx.a(1, hourscoln);
-						tx.swapper(VM, sep);
-						tag = "TD";
-						//rowattribs = "ID=person" ^ personn ^ " style={cursor:hand} style=\"{display:none}\" onclick=\"toggle(" "\'" "person" ^ personn ^ "\'" ")\"";
-						//id for pre ie8 compatibility without getElementsByClassName
-						rowattribs = "id=\"person" ^ personn ^ "\" class=\"person" ^ personn ^ "\" style=\"cursor:pointer; " ^ styledisplay ^ "\" onclick=\"toggle(" "\'" "person" ^ personn ^ "\'" ")\"";
-						//rowattribs='class="person':personn:'" style="cursor:pointer; display:none" onclick="toggle(':"'":'person':personn:"'":')"'
-						gosub printtxrow(tx);
-					}
-
-					//person subtotal
-					if (selecteddata.a(ln + 1, personcoln) ne personcode) {
-						if (personhours or personamount) {
-							rowattribs = "style={cursor:hand} onclick=toggle(person" ^ personn ^ ")";
-							if (personhours) {
-								avghourlyrate = (personamount / personhours).oconv("MD20PZ");
-							}else{
-								avghourlyrate = "";
-							}
-							tx = selecteddata.a(ln, 1) ^ sep ^ capitalise(personcode) ^ sep ^ sep ^ sep ^ sep ^ personhours.oconv("MT2U");
-							//if not personal
-							 if (accesstime < 2){
-							 	tx ^= sep ^ avghourlyrate ^ sep ^ "<B>" ^ personamount.oconv(fin.basefmt) ^ "</B>";
-							 }
-							tag = "TH";
-							gosub printtxrow(tx);
-							personhours = "";
-							personamount = "";
-						}
-						personcode = selecteddata.a(ln + 1, personcoln);
-						personn += 1;
-					}
-
-				};//ln;
-
-				if (totalhours or totalamount) {
-					if (totalhours) {
-						avghourlyrate = (totalamount / totalhours).oconv("MD20PZ");
-					}else{
-						avghourlyrate = "";
-					}
-					tx = "Total" ^ sep ^ sep ^ sep ^ sep ^ sep ^ totalhours.oconv("MT2U");
-					//not personal
-					if (accesstime < 2) {
-						tx ^= sep ^ avghourlyrate ^ sep ^ "<B>" ^ totalamount.oconv(fin.basefmt) ^ "</B>";
-					}
-					tag = "TH";
-					gosub printtxrow(tx);
-				}
-
-				tx ^= "</TBODY></TABLE>";
-
-				//close superrow
-				tx ^= "</TD></TR>";
-
-				//tx:='<P>'
-				call printtx(tx);
+				gosub printtxr();
 
 			}
 
-		}
-
-		if (accessbill and RECORD.a(10)) {
-
-			//open superrow
-			tx = "<TR><TD><xP><xP></TD></TR>";
-			tx ^= "<TR><TD>" ^ mark;
-			mark = "";
-			call printtx(tx);
-
-			tx = "";
-			tx ^= var("Estimate No.").oconv(l6) ^ sep;
-			tx ^= var("Date").oconv(l12) ^ sep;
-			tx ^= var("Amount").oconv(r15) ^ sep;
-			tx ^= (agy.agp.a(2) ^ " Equiv.").oconv(r12) ^ sep;
-			tx ^= var("Description").oconv(l20) ^ sep;
-			tx ^= var("Our Invoice No.").oconv(l12) ^ sep;
-			tx ^= var("Receipt No.").oconv(l10) ^ sep;
-			tx ^= var("Amount").oconv(r12) ^ sep;
-			tx ^= var("Status").oconv(l12);
-
-			var bar = var("_").str(tx.length());
-
-			tx ^= FM;
-
-			MV = 0;
-			temp = calculate("QUOTE_NO");
-			var nlines = temp.count(VM) + (temp ne "");
-			var invnos = calculate("QUOTE_INV_NO");
-			totalbase = 0;
-			for (MV = 1; MV <= nlines; ++MV) {
-				var status = calculate("QUOTE_STATUS2");
-				var cancelled = status == "CANCELLED";
-				if (showcancelledlines or not cancelled) {
-					if (MV > 1) {
-						tx ^= FM;
-					}
-					tx ^= (calculate("QUOTE_NO")).oconv(l6) ^ sep;
-					//fix bug in selecteddata tx:=oconv({QUOTE_DATE},'[DATE,*]') 'L#12':' '
-					tx ^= ((calculate("QUOTE_DATE").a(1, 1)).oconv("[DATE,*]")).oconv(l12) ^ sep;
-					tx ^= (calculate("QUOTE_AMOUNT") ^ calculate("QUOTE_CURRENCY")).oconv(r15) ^ sep;
-					//tx:=({QUOTE_AMOUNT_BASE}) r12:sep
-					var quoteamountbase = calculate("QUOTE_AMOUNT_BASE");
-					tx ^= quoteamountbase.oconv(r12) ^ sep;
-					if (not cancelled) {
-						totalbase += quoteamountbase;
-					}
-
-					tx ^= (calculate("QUOTE_DESC")).oconv(l20) ^ sep;
-					tx ^= (calculate("QUOTE_INV_NO")).oconv(l12);
-
-					var invno = invnos.a(1, MV);
-					if (invno == "") {
-	noreceipt:
-						tx ^= VM ^ VM;
-					}else{
-						var voucher;
-						if (not(voucher.read(fin.vouchers, "INV*" ^ invno ^ "*" ^ fin.currcompany))) {
-							goto noreceipt;
-						}
-						var receipts = voucher.a(17, 1);
-						var allocamts = voucher.a(20, 1);
-						var nreceipts = receipts.count(SVM) + 1;
-						for (var receiptn = 1; receiptn <= nreceipts; ++receiptn) {
-							if (receiptn > 1) {
-								tx ^= FM ^ VM.str(6);
-							}else{
-								tx ^= sep;
-							}
-							tx ^= (receipts.a(1, 1, receiptn).field("*", 1, 2)).oconv(r10) ^ sep;
-							tx ^= ((allocamts.a(1, 1, receiptn)).oconv("[NUMBER]")).oconv(r12);
-
-						};//receiptn;
-					}
-
-					tx ^= sep ^ capitalise(status);
-
-				}
-
-			};//MV;
-
-			if (totalbase) {
-				tx ^= FM ^ "Total" ^ sep ^ sep ^ sep ^ "<B>" ^ totalbase.oconv(fin.basefmt) ^ "</B>" ^ sep ^ sep ^ sep;
-			}
-
-			tt = "";
-			tt ^= "<table id=" "\"income\" align=center class=neosystable";
-			tt ^= " cellpadding=1 cellspacing=0 border=1";
-			tt ^= " width=100%";
-			tt ^= ">";
-			//t:=str('<COL WIDTH=7% ALIGN=LEFT><COL STYLE="Font-Weight:Bold">',2)
-			tt ^= var("<col align=right>").str(4);
-			tx.swapper("&", "&amp;");
-			if (tx[1] == FM) {
-				tx.splicer(1, 1, "");
-			}
-			call htmllib("TABLE.MAKE", tx, tt, 1);
-			//swap '<TR>' with '<TR VALIGN=TOP>' in tx
+			tx.r(-1, "</tbody>" ^ FM ^ "</table>");
 
 			//close superrow
-			tx ^= "</TD></TR>";
+			tx.r(-1, tdxs ^ trxs);
 
-			//tx:='<P>'
-			call printtx(tx);
+			gosub printtx(tx);
 
 		}
 
+	}
+
+	if (accessbill and RECORD.a(10)) {
+
+		//gap superrow
+		tx.r(-1, trs ^ tds ^ tdxs ^ trxs);
+
+		//open superrow
+		tx.r(-1, trs ^ tds ^ clientmark);
+		clientmark = "";
+
+		gosub printtx(tx);
+
+		datax = "";
+		datax.r(-1, "Estimate No." ^ sep);
+		datax ^= "Date" ^ sep;
+		datax ^= "Amount" ^ sep;
+		datax ^= agy.agp.a(2) ^ " Equiv." ^ sep;
+		datax ^= "Description" ^ sep;
+		datax ^= "Our Invoice No." ^ sep;
+		datax ^= "Receipt No." ^ sep;
+		datax ^= "Amount" ^ sep;
+		datax ^= "Status";
+
+		datax ^= FM;
+
+		MV = 0;
+		temp = calculate("QUOTE_NO");
+		var nlines = temp.count(VM) + (temp ne "");
+		var invnos = calculate("QUOTE_INV_NO");
+		totalbase = 0;
+		for (MV = 1; MV <= nlines; ++MV) {
+			var status = calculate("QUOTEmv.STATUS2");
+			var cancelled = status == "CANCELLED";
+			if (showcancelledlines or not cancelled) {
+				if (MV > 1) {
+					datax ^= FM;
+				}
+				datax ^= calculate("QUOTE_NO") ^ sep;
+				//fix bug in datax datax:=oconv({QUOTE_DATE},'[DATE,*]') 'L#12':' '
+				datax ^= (calculate("QUOTE_DATE").a(1, 1)).oconv("[DATE,*]") ^ sep;
+				datax ^= calculate("QUOTE_AMOUNT") ^ calculate("QUOTE_CURRENCY") ^ sep;
+				//datax:=({QUOTE_AMOUNT_BASE}):sep
+				var quoteamountbase = calculate("QUOTE_AMOUNT_BASE");
+				datax ^= quoteamountbase ^ sep;
+				if (not cancelled) {
+					totalbase += quoteamountbase;
+				}
+
+				datax ^= calculate("QUOTE_DESC") ^ sep;
+				datax ^= calculate("QUOTE_INV_NO");
+
+				var invno = invnos.a(1, MV);
+				if (invno == "") {
+noreceipt:
+					datax ^= VM ^ VM;
+				}else{
+					var voucher;
+					if (not(voucher.read(fin.vouchers, "INV*" ^ invno ^ "*" ^ fin.currcompany))) {
+						goto noreceipt;
+					}
+					var receipts = voucher.a(17, 1);
+					var allocamts = voucher.a(20, 1);
+					var nreceipts = receipts.count(SVM) + 1;
+					for (var receiptn = 1; receiptn <= nreceipts; ++receiptn) {
+						if (receiptn > 1) {
+							datax ^= FM ^ VM.str(6);
+						}else{
+							datax ^= sep;
+						}
+						datax ^= receipts.a(1, 1, receiptn).field("*", 1, 2) ^ sep;
+						datax ^= (allocamts.a(1, 1, receiptn)).oconv("[NUMBER]");
+
+					};//receiptn;
+				}
+
+				datax ^= sep ^ capitalise(status);
+
+			}
+
+		};//MV;
+
+		if (totalbase) {
+			datax ^= FM ^ "Total" ^ sep ^ sep ^ sep ^ bon ^ totalbase.oconv(basefmt0) ^ boff ^ sep ^ sep ^ sep ^ sep ^ sep;
+		}
+
+		tt = "";
+		tt = FM ^ "<table class=\"neosystable BILL1\"";
+		//tt:=' cellspacing="0"';*ie7
+		tt ^= " style=\"width:100%\"";
+		tt ^= ">";
+
+		tt.r(-1, bill1cols);
+
+		datax.swapper("&", "&amp;");
+		if (datax[1] == FM) {
+			datax.splicer(1, 1, "");
+		}
+		call htmllib2("TABLE.MAKE", datax, tt, 1);
+
+		if (not repeatcolheads) {
+			gosub removetheadtbody();
+		}
+
+		tx.r(-1, datax);
+
+		//close superrow
+		tx.r(-1, tdxs ^ trxs);
+
+		gosub printtx(tx);
+
+	}
+
+	////////
 	//jobexit:
+	////////
 
-		//close supertable?
+	//open superrow
+	tx.r(-1, trs ^ tds);
 
-		tx ^= "</TD></TR></TABLE>";
-		tx ^= ownmark;
+	tx.r(-1, ownmark);
 
-		call printtx(tx);
+	//close superrow
+	tx.r(-1, tdxs ^ trxs);
 
-		call printtx(xx,"pagebreak");
-		var newpage = 1;
+	//close supertable
+	tx.r(-1, "</TBODY>" ^ FM ^ "</TABLE>");
 
-	}//nextjob;
+	gosub printtx(tx);
 
-//exit:
-	return 1;
+	gosub printtx(xx,"pagebreak");
+	newpage = 1;
+
+	goto nextjob;
 
 }
 
-subroutine sumnotcancelled(in bases, in statuses, out totalbase) {
+subroutine exit() {
+
+	if (printptr) {
+
+		//close whole document div
+		tx.r(-1, "</div>");
+		tx.r(-1, "</html>");
+
+		newpage = 0;
+		gosub printtx(tx);
+
+	}
+
+	var().stop();
+
+}
+
+subroutine sumnotcancelled() {
 	var nn = bases.count(VM) + (bases ne "");
 	totalbase = "";
 	for (var ii = 1; ii <= nn; ++ii) {
 		if (statuses.a(1, ii) ne "CANCELLED") {
-			var tt = bases.a(1, ii);
-			if ((tt).length()) {
+			tt = bases.a(1, ii);
+			if (tt.length()) {
 				//garbagecollect;
-				totalbase = (totalbase + bases.a(1, ii)).oconv(fin.basefmt);
+				totalbase = (totalbase + bases.a(1, ii)).oconv(basefmt0);
 			}
 		}
 	};//ii;
 	return;
+
 }
 
-subroutine printtxrow(io tx) {
-	tx.swapper("&", "&amp;");
-	tx.swapper(sep ^ sep, sep ^ nbsp ^ sep);
-	tx.swapper(sep ^ sep, sep ^ nbsp ^ sep);
-	tx.swapper(sep, "</" ^ tag ^ "><" ^ tag ^ ">");
-	tx = "<TR " ^ rowattribs ^ "><" ^ tag ^ ">" ^ tx ^ "</" ^ tag ^ "></TR>";
+subroutine printtxr() {
+	txr.swapper("&", "&amp;");
+	txr.swapper(sep, "</" ^ tag ^ "><" ^ tag ^ ">");
+
+	tx.r(-1, "<tr");
+	if (rowattribs) {
+		tx ^= " " ^ rowattribs;
+		rowattribs = "";
+	}
+	tx ^= "><" ^ tag ^ ">" ^ txr ^ "</" ^ tag ^ "></tr>";
 	rowattribs = "";
-	call printtx(tx);
+
+	gosub printtx(tx);
+
 	return;
 
 }
+
+subroutine getcols() {
+	coltx = "<colgroup>";
+
+	var ncols = cols.count(",") + 1;
+	for (var scoln = 1; scoln <= ncols; ++scoln) {
+		var fmt = cols.field(",", scoln);
+
+		if (fmt.index("L", 1)) {
+			aligned = "left";
+		} else if (fmt.index("R", 1)) {
+			aligned = "right";
+		} else {
+			aligned = "center";
+		}
+		style = "text-align:" ^ aligned;
+		if (fmt.index("7", 1)) {
+			style ^= ";width:7%";
+		}
+		if (fmt.index("B", 1)) {
+			style ^= ";font-weight:bold;";
+		}
+		coltx.r(-1, "<col style=\"" ^ style ^ "\">");
+
+		//<col> on mozilla doesnt support text-align but does support nth-child
+		if (scoln == 1) {
+			styletx ^= FM;
+		}
+		//styletx<-1>='table#':id:' > tbody > tr > td:nth-child(':scoln:'){':style:'}'
+		styletx.r(-1, "." ^ classx ^ " > tbody > tr > td:nth-child(" ^ scoln ^ "){" ^ style ^ "}");
+
+	};//scoln;
+
+	coltx ^= FM ^ "</colgroup>";
+	return;
+
+}
+
+subroutine removetheadtbody() {
+	datax.swapper("<thead>", "");
+	datax.swapper("</thead>", "");
+	datax.swapper("<tbody>", "");
+	datax.swapper("</tbody>", "");
+	return;
+
+}
+
 
 libraryexit()

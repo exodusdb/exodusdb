@@ -6,7 +6,7 @@
 ExodusFunctorBase efb_prodinvsubs;
 
 //a member function with the right arguments, returning a var or void
-var prodinvsubs(in mode)
+var prodinvsubs(in mode0)
 {
 
  //first time link to the shared lib and create/cache an object from it
@@ -23,7 +23,7 @@ var prodinvsubs(in mode)
  // returning a var or void
  return CALLMEMBERFUNCTION(*(efb_prodinvsubs.pobject_),
  ((pExodusProgramBaseMemberFunction) (efb_prodinvsubs.pmemberfunction_)))
-  (mode);
+  (mode0);
 
 }
 //#endif

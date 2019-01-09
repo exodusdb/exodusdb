@@ -24,6 +24,7 @@ libraryinit()
 
 #include <window.hpp>
 
+var allownew;
 var iaccno;
 var billcostn;//num
 var xx;
@@ -56,7 +57,11 @@ var wsmsg;
 function main(in mode, io msg, in param3="", in param4="") {
 	//c agy in,io,"",""
 
-	var allownew = param4;
+	if (param4.unassigned()) {
+		allownew = "";
+	}else{
+		allownew = param4;
+	}
 
 	//y2k2
 	if (mode.field("*", 1) == "CHECKANALYSISCODE") {
@@ -380,7 +385,7 @@ getolderjobdate:
 			gosub invalid(msg);
 			return 0;
 		}
-//L1711:
+//L1732:
 		if (doccompanycode and docdate) {
 			var doccompany;
 			if (not(doccompany.read(gen.companies, doccompanycode))) {
@@ -435,7 +440,7 @@ getolderjobdate:
 			}
 
 		}
-//L2064:
+//L2085:
 		if (compcode) {
 			call agencysubs("GETNEXTID." ^ compcode, xx);
 			win.isdflt = ID;
@@ -548,7 +553,7 @@ getolderjobdate:
 		} else {
 			filetitle = mode.field(".", 2) ^ "s";
 		}
-//L2746:
+//L2767:
 		//no search if version key
 		if (win.is.index("~", 1)) {
 			return 0;
@@ -677,7 +682,7 @@ getolderjobdate:
 				msg.r(-1, "Material code, Material description/Special instructions");
 				msg.r(-1, "Status: NOTAPPROVED, NOTBOOKED, NOTINVOICED, OPEN, CLOSED");
 			}
-//L3445:
+//L3468:
 			//jobs, production orders and invoices
 			if (module == "JOBS_MODULE") {
 				msg.r(-1, "Status: Open, Closed");
@@ -1231,14 +1236,8 @@ badtype:
 		}
 
 	} else {
-
-
 		msg = DQ ^ (mode ^ DQ) ^ " MODE NOT RECOGNISED IN AGENCY.SUBS";
-
-
 		gosub invalid(msg);
-
-
 		return 0;
 	}
 

@@ -1,7 +1,6 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <initagency.h>
 
 #include <gen.h>
 #include <agy.h>
@@ -9,14 +8,16 @@ libraryinit()
 var vn;
 
 function main() {
-	//jbase
+	//c agy
+
+	//get agp and uses company<1> to default various items
 
 	if (not(agy.agp.read(DEFINITIONS, "AGENCY.PARAMS"))) {
 		call note("AGENCY.PARAMS IS MISSING FROM DEFINITIONS");
 		var().stop();
 	}
 
-//	agy.agp.r(1, (agy.agp.a(1)).invert());
+	agy.agp.r(1, (agy.agp.a(1)).invert());
 	SYSTEM.r(14, agy.agp.a(1));
 	SYSTEM.r(36, agy.agp.a(1));
 	//always splitextras now
@@ -56,8 +57,8 @@ function main() {
 	}
 
 	//unitbillrounding
-//	PRIORITYINT.r(101, 1, agy.agp.a(32, 1));
-//	PRIORITYINT.r(101, 2, agy.agp.a(32, 2));
+	PRIORITYINT.r(101, 1, agy.agp.a(32, 1));
+	PRIORITYINT.r(101, 2, agy.agp.a(32, 2));
 
 	//various market related data is copied to agp to support old code
 	var marketcode = agy.agp.a(37);
@@ -66,14 +67,6 @@ function main() {
 		agy.agp.r(37, marketcode);
 	}
 	var market;
-
-var schedules;
-var plans;
-var clients;
-var vehicles;
-var ratecards;
-var markets;
-var brands;
 	if (market.read(agy.markets, marketcode)) {
 
 		//NB agp<13> is LAST DAY OF WEEK whereas market<10> is FIRST DAY OF WEEK
@@ -202,7 +195,7 @@ var brands;
 	if (vtyp == "") {
 		var def;
 		if (def.read(DEFINITIONS, "ALL")) {
-			if (def.locate("SI", vn, 1)) {
+			if (def.a(1).locateusing("SI", VM, vn)) {
 				vtyp = def.a(6, vn);
 			}
 		}
@@ -231,11 +224,11 @@ var brands;
 	if (vtyp == "") {
 		var def;
 		if (def.read(DEFINITIONS, "ALL")) {
-			if (def.locate("SI", vn, 1)) {
+			if (def.a(1).locateusing("SI", VM, vn)) {
 				vtyp = def.a(6, vn);
 				//try to locate second occurrence of sales invoices
 				def.r(1, vn, "");
-				if (def.locate("SI", vn, 1)) {
+				if (def.a(1).locateusing("SI", VM, vn)) {
 					vtyp = def.a(6, vn);
 				}
 			}
@@ -251,7 +244,7 @@ var brands;
 	if (vouchertype == "") {
 		var def;
 		if (def.read(DEFINITIONS, "ALL")) {
-			if (def.locate("PI", vn, 1)) {
+			if (def.a(1).locateusing("PI", VM, vn)) {
 				vouchertype = def.a(6, vn);
 			}
 		}
@@ -268,7 +261,7 @@ var brands;
 	if (vouchertype == "") {
 		var def;
 		if (def.read(DEFINITIONS, "ALL")) {
-			if (def.locate("PI", vn, 1)) {
+			if (def.a(1).locateusing("PI", VM, vn)) {
 				vouchertype = def.a(6, vn);
 			}
 		}
@@ -330,7 +323,19 @@ var brands;
 		agy.agp.r(152, 1);
 	}
 
+	//default large job purchase order size to 10000 base currency
+	if (agy.agp.a(139) == "") {
+		agy.agp.r(139, 10000);
+	}
+
+	//default tax currency is the base currency
+	if (agy.agp.a(103) == "") {
+		agy.agp.r(103, agy.agp.a(2));
+	}
+
 	return 0;
+
 }
+
 
 libraryexit()

@@ -95,6 +95,17 @@ ExodusFunctorBase::ExodusFunctorBase()
 , pmemberfunction_(NULL)
 {pobject_=0;};
 
+//constructor to provide everything immediately
+ExodusFunctorBase::ExodusFunctorBase(const std::string libname, const std::string funcname, MvEnvironment& mv)
+: mv_(&mv)
+, libraryname_(libname)
+, functionname_(funcname)
+, plibrary_(NULL)
+, pfunction_(NULL)
+, pobject_(NULL)
+, pmemberfunction_(NULL)
+{pobject_=0;}
+
 //constructor to provide library name and function immediately
 ExodusFunctorBase::ExodusFunctorBase(const std::string libname, const std::string funcname)
 : mv_(NULL)
@@ -128,6 +139,31 @@ bool ExodusFunctorBase::init(const char* newlibraryname, const char* newfunction
 {
 	mv_=&mv;
 	checkload(newlibraryname, newfunctionname);
+
+	//call a function in the library to create one of its "exodus program" objects
+	//nb we MUST call the same library to delete it
+	//so that the same memory management routine is called to create and delete it.
+	//pfunction_ return a pobject_ if pobject_ is passed in NULL (using mv as an init argument)
+	// or deletes a pobject_ if not
+
+	//generate an error here to debug
+//	pobject_->main();
+
+	pfunction_(pobject_,*mv_,pmemberfunction_);
+	//pobject_->main();
+	//((*pobject_).*(pmemberfunction_))();
+	//CALLMEMBERFUNCTION(*pobject_,pmemberfunctibon_)();
+	if (pobject_==NULL||pmemberfunction_==NULL)
+		return false;
+
+	return true;
+}
+
+//atm designed to be called once only the first time an external function is called
+//assuming library and function names and mv are already set
+bool ExodusFunctorBase::init()
+{
+	checkload(libraryname_, functionname_);
 
 	//call a function in the library to create one of its "exodus program" objects
 	//nb we MUST call the same library to delete it
@@ -211,6 +247,11 @@ bool ExodusFunctorBase::initsgf(const char* newlibraryname, const char* newfunct
 	return true;
 }
 
+ExodusFunctorBase& ExodusFunctorBase::operator=(const char* newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname;
+}
+
 bool ExodusFunctorBase::checkload(std::string newlibraryname, std::string newfunctionname)
 {
 #if TRACING >= 3
@@ -252,10 +293,6 @@ std::cout<<"mvfunctor:openlib: in:"<<newlibraryname<<std::endl;
 #endif
 	//open the library or return 0
 	//dlopen arg2 is ignored by macro on windows
-
-	//dont reopen if already opened
-	if (libraryname_==newlibraryname)
-		return true;
 
 	closelib();
 
@@ -400,7 +437,7 @@ std::cout<<"mvfunctor:closed libraryname_:" <<libraryname_<<std::endl;
 #endif
 	}
 	//record this library is no longer connected
-	libraryname_="";
+	//libraryname_="";
 }
 
 //actually this deletes any shared object created by the shared global function
@@ -419,7 +456,7 @@ std::cout<< "mvfunctor:closed functionname:" << functionname_ << std::endl;
 #endif
 	}
 	//record this function (and object) no longer exists
-	functionname_="";
+	//functionname_="";
 }
 
 }//namespace exodus

@@ -3,18 +3,25 @@ libraryinit()
 
 
 var basekey;
+var listid;
 var lists;
 var listn;//num
 var keys;
 var key;
 
-function main(io ranges0, in basekey0, in listid="") {
-	//jbase
+function main(io ranges0, in basekey0="", in listid0="") {
+	//c sys io,"",""
 
 	if (basekey0.unassigned()) {
 		basekey = "";
 	}else{
 		basekey = basekey0;
+	}
+
+	if (listid0.unassigned()) {
+		listid = "";
+	}else{
+		listid = listid0;
 	}
 
 	if (listid) {
@@ -25,7 +32,7 @@ function main(io ranges0, in basekey0, in listid="") {
 		}
 		listn = "";
 		keys = "";
-	}
+		}
 
 	var ranges = ranges0.trim();
 	//convert ',/' to ' ' in ranges
@@ -102,7 +109,7 @@ function main(io ranges0, in basekey0, in listid="") {
 					keys ^= FM ^ key;
 					//assumes key is not too long
 					if (keys.length() > 32000) {
-						gosub writelist(listid);
+						gosub writelist();
 					}
 
 				}else{
@@ -130,20 +137,22 @@ function main(io ranges0, in basekey0, in listid="") {
 makekey:
 					key = basekey;
 					key.swapper("%", temp);
+
 				} else if (basekey) {
 					temp = rangex;
 					goto makekey;
-				}else{
+
+				} else {
 					//key=prefix:i2
 					key = rangex;
 				}
-
-
+//L620:
 				keys ^= FM ^ key;
 			}
 
 		}
 
+	//nextrange:;
 	};//ii;
 
 exit:
@@ -155,7 +164,7 @@ exit:
 			if (not vnos) {
 				vnos = 1;
 			}
-			gosub writelist(listid);
+			gosub writelist();
 		}else{
 			//return '' in vnos if none found (unlikely)
 			var vnos = "";
@@ -169,7 +178,7 @@ exit:
 
 }
 
-subroutine writelist(in listid) {
+subroutine writelist() {
 	if (not keys.length()) {
 		return;
 	}

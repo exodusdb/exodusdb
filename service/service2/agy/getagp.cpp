@@ -4,7 +4,7 @@ libraryinit()
 #include <addcent.h>
 
 function main(in agpparams, in period0) {
-
+	//c agy
 	//output selected agpparam
 
 	if (agpparams == "") {
@@ -15,7 +15,7 @@ function main(in agpparams, in period0) {
 	if (nn == 1) {
 		if (agpparams.a(1, 1, 2) == "") {
 			var agpparam = agpparams.a(1, 1, 1);
-//returnsomething:
+	//returnsomething:
 			if (agpparam == "%DEFAULT%") {
 				agpparam = "";
 			}

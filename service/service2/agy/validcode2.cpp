@@ -1,9 +1,9 @@
 #include <exodus/library.h>
 libraryinit()
 
-//#include <giveway.h>
-#include <sysmsg.h>
+#include <giveway.h>
 #include <authorised.h>
+#include <sysmsg.h>
 
 var clientcode;
 var brandcode;
@@ -12,14 +12,14 @@ var code;
 var ok;//num
 var coden;//num
 var taskid;
-var msg0;
-var forcedusercode;
 var positive;
+var forcedusercode;
+var xx;
 
 function main(in companycodex, in clientcodex, in brandcodex, io brands, out msg) {
-
-	//call giveway("");
-
+	//c agy ,,,io,out
+	//global positive
+	call giveway();
 	//mostly rewritten 2011/11/05 to make more thorough and include product category
 	//(was) amazingly identical logic between validcode2 and validcode3!
 	//except brand's client and company are in different field numbers
@@ -35,14 +35,8 @@ function main(in companycodex, in clientcodex, in brandcodex, io brands, out msg
 
 	//buffering in window variables @XW and @VW for speed
 	//windows variable using up to field 10
-	//@MW menu
-	//@HW help
-	//@EW edit window?
-	//@PW popup
 	//@XW xref?
 	//@VW ?
-	//@SW SQL? using this for timezone
-	//@AW application
 
 	var companycode = companycodex;
 	if (clientcodex.unassigned()) {
@@ -54,15 +48,11 @@ function main(in companycodex, in clientcodex, in brandcodex, io brands, out msg
 		brandcode = "";
 	}else{
 		brandcode = brandcodex;
-		}
+	}
 	if (brands.unassigned()) {
 		brands = "";
 	}
 
-	if (not VW.assigned()) {
-		VW="";
-		XW="";
-	}
 	//initialise buffer if not for the same user
 	if (VW.a(10) ne username) {
 		VW = VW.field(FM, 1, 9);
@@ -77,7 +67,7 @@ function main(in companycodex, in clientcodex, in brandcodex, io brands, out msg
 	if (companycode) {
 		filen = 2;
 		code = companycode;
-		gosub checkcode(msg);
+		gosub checkcode( msg);
 		if (not ok) {
 			return 0;
 		}
@@ -86,7 +76,7 @@ function main(in companycodex, in clientcodex, in brandcodex, io brands, out msg
 	//return quick answer if checking brands and is in buffer
 	//since remaining checks are all dependent on brand
 	if (brandcode) {
-		if (VW.locate(brandcode, coden, 10 + 5)) {
+		if (VW.a(10 + 5).locateusing(brandcode, VM, coden)) {
 			if (XW.a(10 + 5, coden)) {
 				return 1;
 			}else{
@@ -108,12 +98,11 @@ function main(in companycodex, in clientcodex, in brandcodex, io brands, out msg
 			if (not(brands.open("BRANDS", ""))) {
 				call fsmsg();
 				var().stop();
-				return  0;
 			}
 		}
 		var brand;
 		if (not(brand.read(brands, brandcode))) {
-			msg = brandcode.quote() ^ " missing from brands file";
+			msg = DQ ^ (brandcode ^ DQ) ^ " missing from brands file";
 			return 0;
 		}
 
@@ -141,8 +130,18 @@ function main(in companycodex, in clientcodex, in brandcodex, io brands, out msg
 			var().stop();
 		}
 		if (not(client.read(clients, clientcode))) {
-			msg = clientcode.quote() ^ " missing from clients file";
-			return 0;
+			//allow for validating a DELETED client from CLIENT_VERSIONS
+			var versionfile;
+			if (not(versionfile.open("CLIENT_VERSIONS", ""))) {
+missingclient:
+				msg = DQ ^ (clientcode ^ DQ) ^ " missing from clients file";
+				return 0;
+			}
+
+			if (not(client.read(versionfile, clientcode))) {
+				goto missingclient;
+			}
+
 		}
 		group1clientcode = client.a(16);
 		group2clientcode = client.a(55);
@@ -164,13 +163,13 @@ function main(in companycodex, in clientcodex, in brandcodex, io brands, out msg
 		}
 
 	}
-
+//L576:
 	//check company access here if discovered from brand or client
 	if (companycode) {
 		if (companycode ne origcompanycode) {
 			filen = 2;
 			code = companycode;
-			gosub checkcode(msg);
+			gosub checkcode( msg);
 			if (not ok) {
 				return 0;
 			}
@@ -194,7 +193,7 @@ function main(in companycodex, in clientcodex, in brandcodex, io brands, out msg
 	if (group1clientcode) {
 		filen = 3;
 		code = group1clientcode;
-		gosub checkcode(msg);
+		gosub checkcode( msg);
 		if (not ok) {
 			return 0;
 		}
@@ -204,7 +203,7 @@ function main(in companycodex, in clientcodex, in brandcodex, io brands, out msg
 	if (group2clientcode) {
 		filen = 3;
 		code = group2clientcode;
-		gosub checkcode(msg);
+		gosub checkcode( msg);
 		if (not ok) {
 			return 0;
 		}
@@ -218,7 +217,7 @@ function main(in companycodex, in clientcodex, in brandcodex, io brands, out msg
 		//access to a specific product category must be positively allowed
 		filen = 4;
 		code = productcategorycode;
-		gosub checkcode(msg);
+		gosub checkcode( msg);
 		if (not ok) {
 			return 0;
 		}
@@ -228,7 +227,7 @@ function main(in companycodex, in clientcodex, in brandcodex, io brands, out msg
 	if (clientcode) {
 		filen = 3;
 		code = clientcode;
-		gosub checkcode(msg);
+		gosub checkcode( msg);
 		if (not ok) {
 			return 0;
 		}
@@ -241,53 +240,22 @@ function main(in companycodex, in clientcodex, in brandcodex, io brands, out msg
 		taskid = "BRAND";
 		positive = "";
 		code = brandcode;
-		gosub checkcode(msg);
+		gosub checkcode( msg);
 		if (not ok) {
 			return 0;
 		}
 	}
 
-	//is valid
 	return 1;
 
 }
 
-subroutine getfilepositive() {
-
-	if (filen == 2) {
-		taskid = "COMPANY";
-	} else if (filen == 3) {
-		taskid = "CLIENT";
-	} else if (filen == 4) {
-		taskid = "PRODUCT CATEGORY";
-	} else if (1) {
-		call sysmsg(DQ ^ (filen ^ DQ) ^ " filen is invalid in validcode2");
-		var().stop();
-	}
-
-	//store space or '#' to indicate buffered result
-	positive = XW.a(10, filen);
-	if (positive == "") {
-		if (authorised(taskid ^ " ACCESS", msg0, "", forcedusercode)) {
-			positive = " ";
-		}else{
-			positive = "#";
-		}
-		XW.r(10, filen, positive);
-	}
-
-	//trim any buffered space to become ''
-	positive.trimmer();
-
-	return;
-
-}
-
 subroutine checkcode(io msg) {
+	//checkcode(io msg)
 	ok = 0;
 	//if dont have general access to file then
 	//access to a specific record must be positively allowed (use # task prefix)
-	if (VW.locate(code, coden, 10 + filen)) {
+	if (VW.a(10 + filen).locateusing(code, VM, coden)) {
 		if (not(XW.a(10 + filen, coden))) {
 			return;
 		}
@@ -313,6 +281,36 @@ subroutine checkcode(io msg) {
 	}
 
 	ok = 1;
+	return;
+
+}
+
+subroutine getfilepositive() {
+	if (filen == 2) {
+		taskid = "COMPANY";
+	} else if (filen == 3) {
+		taskid = "CLIENT";
+	} else if (filen == 4) {
+		taskid = "PRODUCT CATEGORY";
+	} else {
+		call sysmsg(DQ ^ (filen ^ DQ) ^ " filen is invalid in validcode2");
+		var().stop();
+	}
+//L1143:
+	//store space or '#' to indicate buffered result
+	positive = XW.a(10, filen);
+	if (positive == "") {
+		if (authorised(taskid ^ " ACCESS", xx, "", forcedusercode)) {
+			positive = " ";
+		}else{
+			positive = "#";
+		}
+		XW.r(10, filen, positive);
+	}
+
+	//trim any buffered space to become ''
+	positive.trimmer();
+
 	return;
 
 }

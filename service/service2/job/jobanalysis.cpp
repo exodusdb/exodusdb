@@ -3,22 +3,25 @@ libraryinit()
 
 #include <btreeextract.h>
 
-#include <gen.h>
 #include <agy.h>
+#include <gen.h>
 
+var notinteractive;
+var basefmtx;
+var mode;
 var base;//num
 var type;
 var fn;//num
 var tskeys;
 
-var basefmtx;
-var mode;
-
-function main(in mode0) {
-
+function main() {
+	//c job
 	//called in jobs.subs,postread (and dict.jobs,analyse used in listjobs)
 	//updates fn 17-25
-	if (false) print(mode0);
+
+	//global mode,basefmtx,notinteractive
+
+	notinteractive = SYSTEM.a(33);
 
 	basefmtx = "MD" ^ USER2[3] ^ "0P";
 
@@ -29,10 +32,15 @@ function main(in mode0) {
 	var norders = ordernos.count(VM) + (ordernos ne "");
 	for (var ordern = 1; ordern <= norders; ++ordern) {
 
+		var orderno = ordernos.a(1, ordern);
 		var prodorder;
-		if (prodorder.read(agy.productionorders, ordernos.a(1, ordern))) {
+		if (prodorder.read(agy.productionorders, orderno)) {
 
 			if (prodorder.a(11) ne "CANCELLED") {
+				if (not prodorder.a(5)) {
+					call mssg("Exchange rate is missing on Order No. " ^ orderno);
+					var().stop();
+				}
 				//garbagecollect;
 				base = ((prodorder.a(3)).sum() / prodorder.a(5)).oconv(basefmtx);
 				costs.r(1, ordern, base);
@@ -44,7 +52,7 @@ function main(in mode0) {
 					type = "";
 				}
 				base.splicer(1, 0, "-");
-				if (base.substr(1, 2) == "--") {
+				if (base.substr(1,2) == "--") {
 					base.splicer(1, 2, "");
 				}
 				gosub analyse();
@@ -67,10 +75,17 @@ function main(in mode0) {
 	var nquotes = quotenos.count(VM) + (quotenos ne "");
 
 	for (var quoten = 1; quoten <= nquotes; ++quoten) {
+		var quoteno = quotenos.a(1, quoten);
 		var prodquote;
-		if (prodquote.read(agy.productioninvoices, quotenos.a(1, quoten))) {
+		if (prodquote.read(agy.productioninvoices, quoteno)) {
 
 			if (prodquote.a(11) ne "CANCELLED") {
+
+				if (not prodquote.a(5)) {
+					call mssg("Exchange rate is missing on Estimate No. " ^ quoteno);
+					var().stop();
+				}
+
 				//garbagecollect;
 				base = ((prodquote.a(3)).sum() / prodquote.a(5)).oconv(basefmtx);
 
@@ -189,7 +204,13 @@ subroutine gettime() {
 		var().stop();
 	}
 
+	if (not notinteractive) {
+		SYSTEM.r(33, 1);
+	}
 	call btreeextract(btreeparams, "TIMESHEETS", dicttimesheets, tskeys);
+	if (not notinteractive) {
+		SYSTEM.r(33, notinteractive);
+	}
 
 	//ZZZ really should find some way to read jobs without getting all ts
 	USER4 = "";
@@ -210,7 +231,7 @@ subroutine gettime() {
 			var tsrec;
 			if (tsrec.read(gen.timesheets, tskey)) {
 				var ntslines = (tsrec.a(2)).count(VM) + 1;
-				if (tsrec.locate(ID, MV, 1)) {
+				if (tsrec.a(1).locateusing(ID, VM, MV)) {
 onetsline:
 					var hours = tsrec.a(2, MV);
 					if (hours) {

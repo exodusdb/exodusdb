@@ -574,7 +574,7 @@ could generate the following overloads in the lib's .h header
 	var lib1(){var aaa;var bbb;return lib1(aaa,bbb);}
 
 */
-	nodefaults=0;
+					nodefaults=0;
 					for (int argn=1; argn<=nargs; ++argn) {
 						var funcarg=field(funcargsdecl,',',argn).trim();
 
@@ -602,7 +602,7 @@ could generate the following overloads in the lib's .h header
 						fieldstorer(funcargstype,',',argn,1,argtype);
 					}
 
-
+/*
 //new method using member functions to call external functions with mv environment
 var inclusion=
 "\r\n"
@@ -630,7 +630,56 @@ var inclusion=
 "\r\n  (arg1,arg2,arg3);"
 "\r\n"
 "\r\n}";
+*/
 
+//new method using member functions to call external functions with mv environment
+//using a functor class that allows library name changing
+var inclusion=
+"\r\n"
+"\r\n//a member variable/object to cache a pointer/object for the shared library function"
+"\r\n//ExodusFunctorBase efb_funcx;"
+"\r\nclass efb_funcx : private ExodusFunctorBase"
+"\r\n{"
+"\r\npublic:"
+"\r\n"
+"\r\nefb_funcx(MvEnvironment& mv) : ExodusFunctorBase(\"funcx\", \"exodusprogrambasecreatedelete_\", mv) {}"
+"\r\n"
+"\r\nefb_funcx& operator=(const char* newlibraryname) {"
+"\r\n        closelib();"
+"\r\n        libraryname_=newlibraryname;"
+"\r\n}"
+"\r\n"
+"\r\n//a member function with the right arguments, returning a var or void"
+"\r\nvar operator() (in mode)"
+"\r\n{"
+"\r\n"
+"\r\n //first time link to the shared lib and create/cache an object from it"
+"\r\n //passing current standard variables in mv"
+"\r\n //first time link to the shared lib and create/cache an object from it"
+"\r\n //passing current standard variables in mv"
+"\r\n //if (efb_getlang.pmemberfunction_==NULL)"
+"\r\n // efb_getlang.init(\"getlang\",\"exodusprogrambasecreatedelete_\",mv);"
+"\r\n if (this->pmemberfunction_==NULL)"
+"\r\n  this->init();"
+"\r\n"
+"\r\n //define a function type (pExodusProgramBaseMemberFunction)"
+"\r\n //that can call the shared library object member function"
+"\r\n //with the right arguments and returning a var or void"
+"\r\n typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(in);"
+"\r\n"
+"\r\n //call the shared library object main function with the right args,"
+"\r\n // returning a var or void"
+"\r\n //return CALLMEMBERFUNCTION(*(efb_funcx.pobject_),"
+"\r\n //((pExodusProgramBaseMemberFunction) (efb_funcx.pmemberfunction_)))"
+"\r\n // (mode);"
+"\r\n return CALLMEMBERFUNCTION(*(this->pobject_),"
+"\r\n ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))"
+"\r\n  (mode);"
+"\r\n"
+"\r\n}"
+"\r\n"
+"\r\n};"
+"\r\nefb_funcx funcx{mv};";
 					swapper(inclusion,"funcx",field2(libname, SLASH, -1));
 					//swapper(example,"exodusprogrambasecreatedelete_",funcname);
 					swapper(inclusion,"in arg1=var(), out arg2=var(), out arg3=var()",funcargsdecl2);

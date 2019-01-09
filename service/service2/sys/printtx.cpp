@@ -33,6 +33,10 @@ var printfile;
 var bodyln;
 var pagen;
 
+//arg2 mode can be commands or settings with arg3 the new value
+//commands: init/pagebreak/getprintfilename
+//settings: html/style/head/foot/bottomline/rfmt/printtxmark/letterhead/topmargin
+
 function main(io tx, in mode="", in modevalue="") {
 
 	//blank mode prints tx, other modes set parameters

@@ -46,7 +46,7 @@ libraryexit(alert_subject)
 libraryinit(analyse)
 #include <jobanalysis.h>
 function main()  {
-	call jobanalysis("");
+	call jobanalysis();
 	return "";
 }
 libraryexit(analyse)

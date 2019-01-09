@@ -6,7 +6,7 @@
 ExodusFunctorBase efb_updsecindex;
 
 //a member function with the right arguments, returning a var or void
-var updsecindex(in mode, in filename, in keys0, in fieldnames, in oldvalues, in newvalues, io valid, io msg)
+var updsecindex(in mode, in filename, io keys, in fieldnames, in oldvalues, in newvalues, io valid, io msg)
 {
 
  //first time link to the shared lib and create/cache an object from it
@@ -17,13 +17,13 @@ var updsecindex(in mode, in filename, in keys0, in fieldnames, in oldvalues, in 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
  //with the right arguments and returning a var or void
- typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(in,in,in,in,in,in,io,io);
+ typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(in,in,io,in,in,in,io,io);
 
  //call the shared library object main function with the right args,
  // returning a var or void
  return CALLMEMBERFUNCTION(*(efb_updsecindex.pobject_),
  ((pExodusProgramBaseMemberFunction) (efb_updsecindex.pmemberfunction_)))
-  (mode,filename,keys0,fieldnames,oldvalues,newvalues,valid,msg);
+  (mode,filename,keys,fieldnames,oldvalues,newvalues,valid,msg);
 
 }
 //#endif

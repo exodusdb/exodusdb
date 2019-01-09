@@ -64,6 +64,38 @@ function main()
 	//assert(charin eq charout);
 	assert(osdelete(testfilename));
 
+        //generate all 16bit unicode (BMP)
+        var tx="";
+        var tx2;
+        for (int ii=0;ii<65536;ii++)
+                tx^=chr(ii);
+
+
+        //check default utf8 output/input
+
+        //output to file (default utf8)
+        oswrite(tx,"testmain.$1");
+
+        //input from file (default utf8)
+        osread(tx2,"testmain.$1");
+
+        //check round trip no change
+        assert(tx2==tx);
+
+
+        //check specific utf8 output/input
+
+        //output to file (default utf8)
+        oswrite(tx,"testmain.$1","utf8");
+
+        //input from file (default utf8)
+        osread(tx2,"testmain.$1","utf8");
+
+        //check round trip no change
+        assert(tx2==tx);
+
+	osdelete("testmain.$1");
+
 	//hash
 	assert(var("xyz").hash(1000)==894);
 

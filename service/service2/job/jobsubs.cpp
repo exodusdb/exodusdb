@@ -2,36 +2,56 @@
 libraryinit()
 
 #include <agencysubs.h>
+#include <initcompany.h>
 #include <authorised.h>
 #include <generalsubs.h>
-//#include <updsecindex.h>
+#include <chklic.h>
+#include <updsecindex.h>
+#include <flushindex.h>
 #include <generalsubs2.h>
 #include <validcode2.h>
+#include <validjob.h>
 #include <jobanalysis.h>
 #include <updtasks.h>
-#include <singular.h>
 #include <jobsubs.h>
+#include <singular.h>
 
-#include <win.h>
 #include <gen.h>
 #include <agy.h>
+#include <win.h>
 
 #include <window.hpp>
 
+var xx;
 var msg;
-var reply;//num
 var pikeys;
+var yy;
 var otherusercode;
 var wsmsg;
 
 function main(in mode) {
-	//jbase
+	//c job
+
+	//global pikeys
 
 	var interactive = not SYSTEM.a(33);
 
-	if (mode.field("*", 1, 3) == "GETLASTJOBNO") {
-		var previous = 1;
+	if (mode == "PERPETUAL") {
 
+		if (win.orec == "" and (RECORD.a(4) or RECORD.a(5))) {
+			//gosub initrec
+			RECORD.r(4, "");
+			RECORD.r(5, "");
+			RECORD.r(6, "");
+			RECORD.r(7, "");
+			RECORD.r(10, "");
+			win.displayaction = 5;
+			win.reset = 4;
+			DATA ^= "\r";
+		}
+
+	} else if (mode.field("*", 1, 3) == "GETLASTJOBNO") {
+		var previous = 1;
 		var compcode = mode.field(".", 2);
 		//goto getnextjobno
 		var storedatafile = win.datafile;
@@ -40,7 +60,7 @@ function main(in mode) {
 		if (not(win.srcfile.open(win.datafile, ""))) {
 			call fsmsg();
 		}
-		call agencysubs("GETNEXTID." ^ compcode ^ "." ^ previous, msg);
+		call agencysubs("GETNEXTID." ^ compcode ^ "." ^ previous, xx);
 		win.datafile = storedatafile;
 		win.srcfile = storesrcfile;
 
@@ -56,12 +76,13 @@ function main(in mode) {
 
 		var compcode = mode.field(".", 4);
 		//gosub getnextjobno
-		call agencysubs("GETNEXTID." ^ compcode, msg);
 
+		if (compcode ne gen.gcurrcompany) {
+			call initcompany(compcode);
+		}
+
+		call agencysubs("GETNEXTID." ^ compcode, xx);
 		win.isdflt = ANS;
-		ANS = "";
-
-		win.registerx(1) = win.isdflt;
 
 		if (not interactive) {
 			ID = win.isdflt;
@@ -76,10 +97,7 @@ function main(in mode) {
 		var job;
 		if (job.read(win.srcfile, win.is)) {
 
-			//done in postread now
-			//declare function validcode
-			//if validcode('BRAND',job<2>,msg) else goto invalid
-			//if job<14> then if validcode('COMPANY',job<14>,msg) else goto invalid
+			//validcode2( validcode3( done in postread now
 
 		}else{
 
@@ -89,7 +107,7 @@ function main(in mode) {
 				if (nlevels == 0) {
 					if (not(authorised("JOB CREATE OWN NO", msg, "UP"))) {
 						msg = DQ ^ (ID ^ DQ) ^ " does not exist and" ^ FM ^ FM ^ msg;
-						return invalid();
+						return invalid(msg);
 					}
 				}
 			}
@@ -100,7 +118,7 @@ function main(in mode) {
 lockit:
 				if (win.is == win.registerx(1)) {
 					if (lockrecord("JOBS", win.srcfile, win.is)) {
-						var xx = unlockrecord("JOBS", win.srcfile, win.is);
+						xx = unlockrecord("JOBS", win.srcfile, win.is);
 					}else{
 						win.is += 1;
 						goto lockit;
@@ -112,7 +130,7 @@ lockit:
 		}
 
 	} else if (mode == "F2.JOBS") {
-		call agencysubs(mode, msg);
+		call agencysubs(mode, xx);
 
 	} else if (mode == "F2.BRANDS") {
 		//from the jobq template
@@ -121,7 +139,7 @@ lockit:
 		if (clientcodes) {
 			clientcodes.splicer(1, 0, ",");
 		}
-		call agencysubs("F2.BRANDS" ^ clientcodes, msg);
+		call agencysubs("F2.BRANDS" ^ clientcodes, xx);
 
 	} else if (mode == "DEF.COMPANY") {
 		var temp = agy.agp.a(19);
@@ -135,7 +153,7 @@ lockit:
 		if (win.isorig and win.is ne win.isorig) {
 			if (win.registerx(1)) {
 				msg = "YOU CANNOT CHANGE THE COMPANY AFTER|RECEIVING SUPPLIER INVOICES OR ISSUING INVOICES";
-				return invalid();
+				return invalid(msg);
 			}
 		}
 		call generalsubs("VAL.COMPANY");
@@ -145,12 +163,12 @@ lockit:
 		//check if allowed to reopen the job
 		if (win.is ne win.isorig and win.isorig == "Y") {
 			if (not(authorised("JOB REOPEN", msg, "UP"))) {
-				return invalid();
+				return invalid(msg);
 			}
 		}
 
 	} else if (mode == "DEF.EXECUTIVE") {
-		if (authorised("JOB CHANGE EXECUTIVE", msg, "UP")) {
+		if (authorised("JOB UPDATE EXECUTIVE", msg, "UP")) {
 			ANS = calculate("BRAND_CODE").xlate("BRANDS", 11, "X");
 		}else{
 			if (not win.is) {
@@ -164,10 +182,10 @@ lockit:
 	} else if (mode == "PREWRITE") {
 
 		//prevent creating new records if no lic
-//TODO		call chklic(mode, msg);
-//		if (msg) {
-//			return invalid();
-//		}
+		call chklic(mode, msg);
+		if (msg) {
+			return invalid(msg);
+		}
 
 		//if {INVOICE_NUMBER} then
 		// if {INV_DATE}='' then
@@ -180,28 +198,28 @@ lockit:
 		//check if allowed without type
 		if (not RECORD.a(3)) {
 			if (not(authorised("JOB CREATE WITHOUT TYPE", msg))) {
-				return invalid();
+				return invalid(msg);
 			}
 		}
 
 		var brand;
 		if (not(brand.read(agy.brands, calculate("BRAND_CODE")))) {
 			msg = DQ ^ (calculate("BRAND_CODE") ^ DQ) ^ " brand does not exist";
-			return invalid();
+			return invalid(msg);
 		}
 
 		call agencysubs("CHKCLOSEDPERIOD." ^ mode, msg);
 		if (msg) {
-			return invalid();
+			return invalid(msg);
 		}
 
 		//check if allowed to reopen the job
 		if (RECORD.a(7) ne win.orec.a(7) and win.orec.a(7) == "Y") {
 			if (not(authorised("JOB REOPEN", msg))) {
-				return invalid();
+				return invalid(msg);
 			}
 		}
-/*
+
 		//ensure production order and invoices index on job brand and executive
 		//are updated by moving their keys elsewhere
 		//and reinstating them in postwrite
@@ -218,25 +236,28 @@ lockit:
 				//otherwise unlock, fail and tell user to unlock assoc records and try again
 				//nb if lock fails then only the locked keys are returned to be unlocked
 				var pokeys = RECORD.a(4);
-				call updsecindex("LOCK", "PRODUCTION.ORDERS", pokeys, "", "", "", win.valid, msg);
+				call updsecindex("LOCK", "PRODUCTION_ORDERS", pokeys, "", "", "", win.valid, msg);
 				if (win.valid) {
 					pikeys = RECORD.a(10);
-					call updsecindex("LOCK", "PRODUCTION.INVOICES", pikeys, "", "", "", win.valid, msg);
+					call updsecindex("LOCK", "PRODUCTION_INVOICES", pikeys, "", "", "", win.valid, msg);
+
 					if (not win.valid) {
 unlockprodinvs:
-						call updsecindex("UNLOCK", "PRODUCTION.INVOICES", pikeys);
+						call updsecindex("UNLOCK", "PRODUCTION_INVOICES", pikeys, "", "", "", xx, yy);
 						goto unlockprodorders;
 					}
+
 				}else{
+
 unlockprodorders:
-					call updsecindex("UNLOCK", "PRODUCTION.ORDERS", pokeys);
+					call updsecindex("UNLOCK", "PRODUCTION_ORDERS", pokeys, "", "", "", xx, yy);
 					msg = "You cannot change brand or executive while|" ^ msg;
-					return invalid();
+					return invalid(msg);
 					return 0;
 				}
 
 				//lock the !indexing record as late as possible
-				call updsecindex("INDEXINGLOCK", "", "", "", "", "", win.valid, msg);
+				call updsecindex("INDEXINGLOCK", "", xx, "", "", "", win.valid, msg);
 				if (not win.valid) {
 					goto unlockprodinvs;
 				}
@@ -244,25 +265,25 @@ unlockprodorders:
 				//updates from here on so cannot abort
 				/////////////////////////////////////
 				if (pokeys) {
-					call updsecindex("UPDATE", "PRODUCTION.ORDERS", pokeys, symindexfields, oldfields, newfields);
+					call updsecindex("UPDATE", "PRODUCTION_ORDERS", pokeys, symindexfields, oldfields, newfields, xx, yy);
 				}
 				if (pikeys) {
-					call updsecindex("UPDATE", "PRODUCTION.INVOICES", pikeys, symindexfields, oldfields, newfields);
+					call updsecindex("UPDATE", "PRODUCTION_INVOICES", pikeys, symindexfields, oldfields, newfields, xx, yy);
 				}
 
 				//unlock everything
 				//(not needed now that update unlocks as it goes
-				//call upd.secindex('UNLOCK','PRODUCTION.ORDERS',pokeys)
-				//call upd.secindex('UNLOCK','PRODUCTION.INVOICES',pikeys)
+				//call upd.secindex('UNLOCK','PRODUCTION_ORDERS',pokeys)
+				//call upd.secindex('UNLOCK','PRODUCTION_INVOICES',pikeys)
 
 				//unlock the indexing record
-				call updsecindex("INDEXINGUNLOCK");
+				call updsecindex("INDEXINGUNLOCK", "", xx, "", "", "", xx, yy);
 
 				if (pokeys) {
-//					call flushindex("PRODUCTION.ORDERS");
+					call flushindex("PRODUCTION_ORDERS");
 				}
 				if (pikeys) {
-//					call flushindex("PRODUCTION.INVOICES");
+					call flushindex("PRODUCTION_INVOICES");
 				}
 
 			}
@@ -278,7 +299,7 @@ unlockprodorders:
 				RECORD.r(10, win.orec.a(10));
 			}
 		}
-*/
+
 		//record date created
 		if (not RECORD.a(54)) {
 			RECORD.r(54, var().date() ^ "." ^ (var().time()).oconv("R(0)#5"));
@@ -288,7 +309,7 @@ unlockprodorders:
 		if (brief) {
 			while (true) {
 			///BREAK;
-			if (not(brief.substr(-6, 6) == "<br />")) break;;
+			if (not(brief.substr(-6,6) == "<br />")) break;;
 				brief.splicer(-6, 6, "");
 			}//loop;
 			brief.converter(TM, VM);
@@ -320,21 +341,30 @@ unlockprodorders:
 			call generalsubs2(mode);
 
 		}
-/*
-	} else if (mode == "POSTINIT") {
-		gosub security(mode);
-		if (not win.valid) {
-			var().stop();
-		}
+	/*;
+		case mode='PREINIT';
 
-		gosub EOF_634();
+			//if security('PRODUCTION COST ACCESS',msg,'UP') else
+			// open 'ADTEMPLATES' to adtemplates else return 0
+			// read @record from adtemplates,'JOBS2' else
+			//  call fsmsg()
+			//  stop
+			//  end
+			// end
 
-		//protect the job number
-		if ((agy.agp.a(53)).index("<COMPANY>", 1)) {
-			gen.company.r(14, gen.gcurrcompany);
-			win.ww[win.registerx(9).a(14)].r(18, "FP");
-		}
-*/
+		CASE MODE='POSTINIT';
+			GOSUB SECURITY;
+			if valid else return 0;
+
+			gosub getwis;
+
+			//protect the job number
+			if index(agp<53>,'<COMPANY>',1) then;
+				company<14>=gcurr.company;
+				w(wis<14>)<18>='FP';
+				end;
+	*/
+
 	} else if (mode == "POSTREAD" or mode == "POSTREAD2") {
 
 		//option to read previous versions
@@ -343,12 +373,14 @@ unlockprodorders:
 			return 0;
 		}
 
-		call agencysubs("CHKCLOSEDPERIOD." ^ mode, msg);
-		if (msg) {
-			//comment to client
-			win.reset = -1;
-			gosub invalid();
-			gosub unlockrecordx();
+		if (win.wlocked and RECORD) {
+			call agencysubs("CHKCLOSEDPERIOD." ^ mode, msg);
+			if (msg) {
+				//comment to client
+				win.reset = -1;
+				call note(msg);
+				gosub unlockrec();
+			}
 		}
 
 		//hide costs and/or income
@@ -401,7 +433,7 @@ unlockprodorders:
 					if (not(authorised("JOB CREATE MASTER JOBS", msg, "UP"))) {
 						msg = DQ ^ (ID ^ DQ) ^ " does not exist and" ^ FM ^ FM ^ msg;
 						win.reset = 5;
-						return invalid();
+						return invalid(msg);
 					}
 
 					//prevent certain users from creating their own job numbers
@@ -411,29 +443,29 @@ unlockprodorders:
 						if (not(authorised("JOB CREATE OWN NO", msg, ""))) {
 							msg = DQ ^ (ID ^ DQ) ^ " does not exist and" ^ FM ^ FM ^ msg;
 							win.reset = 5;
-							return invalid();
+							return invalid(msg);
 						}
 					}
 
 				}else{
 
 					//check that all higher jobs exist, are authorised, and are not closed
-					for (var level = 1; level <= nlevels; ++level) {
+					for (var leveln = 1; leveln <= nlevels; ++leveln) {
 
-						var topjobno = ID.field("-", 1, level);
+						var topjobno = ID.field("-", 1, leveln);
 
 						//check higher job exists
 						var topjob;
 						if (not(topjob.read(agy.jobs, topjobno))) {
 							msg = DQ ^ (topjobno ^ DQ) ^ " Main Job does not exist.|You must create it first";
 							win.reset = 5;
-							return invalid();
+							return invalid(msg);
 						}
 
 						//check higher job access authorised
 						if (not(validcode2(topjob.a(14), "", topjob.a(2), agy.brands, msg))) {
 							win.reset = 5;
-							return invalid();
+							return invalid(msg);
 						}
 
 						//check higher job is open
@@ -443,69 +475,68 @@ unlockprodorders:
 						// goto invalid
 						// end
 
-					};//level;
+					};//leveln;
 
 				}
 
 			}
 
-			//force companycode if new record and companycode in key
-			//if wlocked and index(agp<53>,'<COMPANY>',1) then
-			if (ID == win.isdflt and win.wlocked and (agy.agp.a(53)).index("<COMPANY>", 1)) {
-				RECORD.r(14, gen.gcurrcompany);
-				RECORD.r(28, RECORD.a(14));
-				//removed so orec is ''
-				//orec<14>=r<14>
-				//orec<28>=r<14>
+			//force companycode if new record and key prefixed with company code
+			//similar code in JOB.SUBS and PLAN.SUBS
+			//PO/PI should be tied to jobs of the same company if prefixed
+			if (ID == win.isdflt and win.wlocked) {
+				var ccode2 = gen.company.a(28);
+				if (ccode2) {
+					var tt = ID;
+					tt.converter("0123456789-/", "            ");
+					if (tt.field(" ", 1) == ccode2) {
+
+						//job file company codes
+						RECORD.r(14, gen.gcurrcompany);
+						RECORD.r(28, RECORD.a(14));
+						//removed so orec is ''
+						//orec<14>=r<14>
+						//orec<28>=r<14>
+
+					}
+				}
 			}
 
-			//checks on old records
+			//checks on existing records
 		}else{
 
-			//restrict access to own jobs
-			//similar code in job.subs prodorder.subs prodinv.subs
-			//also listprodords listprodinvs listinvs
-			var executivecode = RECORD.a(8);
-			if (executivecode and executivecode ne USERNAME and executivecode ne USERNAME.xlate("USERS", 1, "X")) {
-				if (not(authorised("JOB ACCESS OTHERS", msg, "UP"))) {
-					win.reset = 5;
-					return invalid();
-				}
+			//JOB ACCESS OTHERS
+			if (not(validjob("ACCESS", ID, RECORD, msg))) {
+				win.reset = 5;
+				return invalid(msg);
 			}
 
 			//restrict access based on company and brand
 			if (not(validcode2(RECORD.a(14), "", RECORD.a(2), agy.brands, msg))) {
 				win.reset = 5;
-				return invalid();
+				return invalid(msg);
 			}
 
-			//allow update own job
-			//if wlocked and orec and orec<8>=@username then
-			// if security('JOB UPDATE OWN JOB',msg,'UP') then return 0
-			// end
-
-			//disallow updating others jobs
-			if (win.wlocked and win.orec and win.orec.a(8) ne USERNAME) {
-				if (not(authorised("JOB UPDATE - OTHERS JOBS", msg, "UP"))) {
-					if (not interactive) {
-						var xx = unlockrecord("JOBS", win.srcfile, ID);
-						win.wlocked = 0;
-						return 0;
-					}
-					win.reset = 5;
-					return invalid();
+			if (win.wlocked and win.orec) {
+				//JOB UPDATE OTHERS
+				msg = "";
+				if (not(validjob("UPDATE", ID, RECORD, msg))) {
+					win.reset = -1;
+					gosub unlockrec();
+					call note(msg);
 				}
 			}
 
 			if (win.wlocked and RECORD.a(5)) {
-				if (not(authorised("JOB CHANGE AFTER INVOICING", msg, "UP"))) {
-					var xx = unlockrecord("", win.srcfile, ID);
-					win.wlocked = 0;
+				msg = "";
+				if (not(authorised("JOB UPDATE AFTER INVOICING", msg, "UP"))) {
+					call note(msg);
+					win.reset = -1;
+					gosub unlockrec();
 				}
 			}
 
-			//x={ANALYSE}
-			call jobanalysis("");
+			call jobanalysis();
 
 		}
 
@@ -539,7 +570,7 @@ unlockprodorders:
 					}
 					while (true) {
 					///BREAK;
-					if (not(brief.substr(-6, 6) == "<br />")) break;;
+					if (not(brief.substr(-6,6) == "<br />")) break;;
 						brief.splicer(-6, 6, "");
 					}//loop;
 				}
@@ -550,7 +581,7 @@ unlockprodorders:
 			//get the quote statuses (to check if can add po's)
 			if (not win.wlocked) {
 				MV = 0;
-				RECORD.r(16, calculate("QUOTE_STATUS2"));
+				RECORD.r(16, calculate("QUOTEmv.STATUS2"));
 			}
 
 			var costids = RECORD.a(4);
@@ -566,7 +597,7 @@ unlockprodorders:
 				cost.r(1, 1, 6, calculate("ORDER_INV_DATE"));
 				cost.r(1, 1, 7, calculate("SUPPLIER_NAME"));
 
-				var status = calculate("ORDER_STATUS2");
+				var status = calculate("ORDERmv.STATUS2");
 				//similar logic in printjob and jobs.subs/postread
 				if (orderinvno) {
 					status = "INVOICE";
@@ -599,57 +630,13 @@ unlockprodorders:
 
 		}
 
-		//if not interactive then we are finised
-		///////////////////////////////////////
-		if (mode ne "POSTREAD") {
-			return 0;
-		}
-
-		//if got record then we are finished
-		///////////////////////////////////
-		//if @record then return 0
-		if (win.orec) {
-			return 0;
-		}
-
-		gosub setcompany();
-
-		//otherwise new job/copy job
-
-		win.registerx(1) = 0;
-
-		gosub setcompany2();
-
-	} else if (mode == "PREREAD") {
-
-		if (ID == "") {
-			call jobsubs("DEF.JOB.NO." ^ RECORD);
-			ID = win.isdflt;
-		}
-
 	} else if (mode == "PREDELETE") {
 
 		msg = "Jobs cannot be deleted. Change the status of all orders and estimates to cancelled.";
-		return invalid();
-
-		gosub security(mode);
-
-		//IF {INVOICE_NUMBER} OR {ORDER_NO} OR {QUOTE_NO} THEN
-		var job;
-		if (job.read(agy.jobs, ID)) {
-			if (job.a(4) or job.a(10)) {
-				msg = "YOU CANNOT DELETE JOBS WHICH|HAVE ORDERS, QUOTES OR INVOICES";
-				return invalid();
-			}
-		}
-
-		call agencysubs("CHKCLOSEDPERIOD." ^ mode, msg);
-		if (msg) {
-			return invalid();
-		}
+		return invalid(msg);
 
 	} else if (mode == "POSTWRITE") {
-//		call flushindex("JOBS");
+		call flushindex("JOBS");
 
 		if (win.orec == "") {
 
@@ -689,8 +676,8 @@ unlockprodorders:
 
 				for (var otherusern = 1; otherusern <= notherusers; ++otherusern) {
 					otherusercode = otherusercodes.a(1, otherusern);
-					if (xlate2("USERS", otherusercode, "LIVE_USER_WITH_EMAIL", "X")) {
-						var xx;
+					if (xlate("USERS", otherusercode, "LIVE_USER_WITH_EMAIL", "X")) {
+
 						call updtasks("ADD", xx, task, msg);
 						if (msg) {
 							call note(msg);
@@ -707,40 +694,51 @@ unlockprodorders:
 		call jobsubs("POSTREAD2");
 
 	} else if (mode == "POSTDELETE") {
-//		call flushindex("JOBS");
+		call flushindex("JOBS");
+
+	} else if (mode == "PRINTJOB") {
+		if (RECORD ne win.orec) {
+			msg = "Please save your changes to this job first";
+			return invalid(msg);
+		}
+
+	//printjob:
+		perform("GET NEW PRINTJOB " ^ ID);
 
 	} else {
 		msg = DQ ^ (mode ^ DQ) ^ " invalid mode in job.subs";
-		return invalid();
+		return invalid(msg);
 	}
+//L4012:
 	return 0;
 
+	/*;
+	///////////
+	setcompany:
+	///////////
+		if r<14> else return 0;
+		gosub setcompany2;
+		return 0;
+
+	////////////
+	setcompany2:
+	////////////
+		if index(agp<53>,'<COMPANY>',1) then;
+			r<14>=gcurr.company;
+			r<28>=r<14>;
+			end;
+
+		return 0;
+	*/
+
 }
 
-subroutine setcompany() {
-	if (not RECORD.a(14)) {
-		return;
-	}
-	gosub setcompany2();
-	return;
-}
-
-subroutine setcompany2() {
-	if ((agy.agp.a(53)).index("<COMPANY>", 1)) {
-		RECORD.r(14, gen.gcurrcompany);
-		RECORD.r(28, RECORD.a(14));
-	}
-	return;
-}
-
-subroutine unlockrecordx() {
-	var xx = unlockrecord(win.datafile, win.srcfile, ID);
+subroutine unlockrec() {
+	xx = unlockrecord(win.datafile, win.srcfile, ID);
 	win.wlocked = 0;
 	return;
+
 }
 
-function xlate2(in arg1, in arg2, in arg3, in arg4) {
-	return xlate(arg1, arg2, arg3, arg4);
-}
 
 libraryexit()

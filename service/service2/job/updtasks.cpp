@@ -1,10 +1,11 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <sendmail.h>
-#include <select2.h>
-#include <sysmsg.h>
 #include <updtasks.h>
+#include <select2.h>
+#include <flushindex.h>
+#include <sendmail.h>
+#include <sysmsg.h>
 
 #include <gen.h>
 #include <agy.h>
@@ -22,6 +23,7 @@ var toaddress;
 var tousercode;
 
 function main(in mode, io oldtaskid, io task, io errmsg) {
+	//c job in,io,io,io
 
 	errmsg = "";
 
@@ -71,7 +73,7 @@ function main(in mode, io oldtaskid, io task, io errmsg) {
 
 			//prevent adding duplicate tasks for the same user
 			if (taskx.a(2) == task.a(2)) {
-				if (not(var("Completed Cancelled").locateusing(taskx.a(3), " "))) {
+				if (not(var("Completed" ^ VM ^ "Cancelled").locateusing(taskx.a(3), VM, xx))) {
 					errmsg = DQ ^ (task.a(2) ^ DQ) ^ " is already " ^ taskx.a(3) ^ " on this job (" ^ newtaskid ^ ")";
 					return 0;
 				}
@@ -203,7 +205,7 @@ function main(in mode, io oldtaskid, io task, io errmsg) {
 	//update tasks file
 	//////////////////
 	task.write(tasks, newtaskid);
-	//call flushindex("TASKS");
+	call flushindex("TASKS");
 
 	//refresh the new updatetimestamp DATE_TIME
 	if (not(task.read(tasks, newtaskid))) {
@@ -249,8 +251,8 @@ function main(in mode, io oldtaskid, io task, io errmsg) {
 		var nlinks = baselinks.count(VM) + (baselinks ne "");
 		for (var linkn = 1; linkn <= nlinks; ++linkn) {
 			body.r(-1, FM ^ baselinkdescs.a(1, linkn));
-			body.r(-1, baselinks.a(1, linkn) ^ "jobs/jobs.htm?key=" ^ jobno);
-			body.r(-1, baselinks.a(1, linkn) ^ "jobs/myjobs.htm");
+			body.r(-1, baselinks.a(1, linkn) ^ "2/jobs/jobs.htm?key=" ^ jobno);
+			body.r(-1, baselinks.a(1, linkn) ^ "2/jobs/myjobs.htm");
 		};//linkn;
 
 		body.converter(FM, var().chr(10));
@@ -282,7 +284,7 @@ function main(in mode, io oldtaskid, io task, io errmsg) {
 		}
 
 		if (toaddress) {
-			gosub sendmail2(errmsg);
+			gosub sendmail( errmsg);
 		}
 
 	}
@@ -292,7 +294,7 @@ function main(in mode, io oldtaskid, io task, io errmsg) {
 }
 
 subroutine adduser() {
-	if (not(tousercodes.locateusing(tousercode, VM))) {
+	if (not(tousercodes.locateusing(tousercode, VM, xx))) {
 		tousercodes.r(1, -1, tousercode);
 		var emailaddress = tousercode.xlate("USERS", 7, "X");
 		if (emailaddress) {
@@ -303,8 +305,8 @@ subroutine adduser() {
 
 }
 
-subroutine sendmail2(io errmsg) {
-
+subroutine sendmail(io errmsg) {
+	//sendmail(io errmsg)
 	if (not toaddress) {
 		return;
 	}
