@@ -147,13 +147,9 @@ DLL_PUBLIC var ucase(const var& instring);
 DLL_PUBLIC var& lcaser(var& instring);
 DLL_PUBLIC var lcase(const var& instring);
 DLL_PUBLIC var unique(const var& instring);
-//arev character bit swapper
-//changing all the bits of exodus' 2 or 4 byte characters might make illegal unicode characters
-//could be implemented as xor xff ie bottom eight bits only and leave top bits unchanged
-//this would shuffle every unicode page but only *within* the page
-//so producing undefined but not illegal unicode bytes
-//DLL_PUBLIC var& inverter(var& instring);
-//DLL_PUBLIC var invert(const var& instring);
+//invert implemented as xor xff ie bottom eight bits only and leave top bits unchanged so keeping chars on same unicode page
+DLL_PUBLIC var& inverter(var& instring);
+DLL_PUBLIC var invert(const var& instring);
 DLL_PUBLIC var& lowerer(var& instring);
 DLL_PUBLIC var lower(const var& instring);
 DLL_PUBLIC var& raiser(var& instring);
@@ -213,7 +209,6 @@ DLL_PUBLIC bool renamefile(const var& filename, const var& newfilename);
 DLL_PUBLIC var listfiles();
 DLL_PUBLIC bool createindex(const var& filename, const var& fieldname, const var& dictfilename DEFAULTNULL);
 DLL_PUBLIC bool deleteindex(const var& filename, const var& fieldname);
-DLL_PUBLIC var listindexes(const var& filename DEFAULTNULL);
 DLL_PUBLIC var listindexes(const var& filename DEFAULTNULL, const var& fieldname DEFAULTNULL);
 DLL_PUBLIC bool begintrans();
 DLL_PUBLIC bool rollbacktrans();

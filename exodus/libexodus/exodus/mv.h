@@ -900,7 +900,7 @@ public:
 	var len() const;
 	const wchar_t* data() const;
 	bool isnum() const;
-	bool isnum_old() const;
+	//bool isnum_old() const;
 //	bool isalpha() const;
 
 	//STRING MANIPULATIONS (all return var& and are not const)
@@ -913,7 +913,7 @@ public:
 	var& unquoter();
 	var& ucaser();
 	var& lcaser();
-	//var& inverter();
+	var& inverter();
 	var& trimmer(const wchar_t* trimchar DEFAULTSPACE);
 	var& trimmerf(const wchar_t* trimchar DEFAULTSPACE);
 	var& trimmerb(const wchar_t* trimchar DEFAULTSPACE);
@@ -934,7 +934,7 @@ public:
 	var unquote() const;
 	var ucase() const;
 	var lcase() const;
-	//var invert() const;
+	var invert() const;
 	var trim(const wchar_t* trimchar DEFAULTSPACE) const;
 	var trimf(const wchar_t* trimchar DEFAULTSPACE) const;
 	var trimb(const wchar_t* trimchar DEFAULTSPACE) const;

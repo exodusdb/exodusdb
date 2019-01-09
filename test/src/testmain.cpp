@@ -427,6 +427,15 @@ function main()
 	assert(oconv(letters,"MC/N") eq letters);
 	assert(oconv(letters,"MC/B") eq "");
 
+        //check invert is reversible for the first 65535 unicode characters
+        for (var ii=0;ii<256*256;ii++) {
+                var cc=chr(ii);
+                var inverted=cc.invert();
+                var invertedtwice=invert(inverted);
+                assert(cc == invertedtwice);
+                assert(cc.oconv("HEX") == invertedtwice.oconv("HEX"));
+        }
+
 	assert(COMMAND eq "service"
 	 or COMMAND eq "main"
 	 or COMMAND eq "main2"
@@ -606,7 +615,7 @@ function main()
 	}
 
 	if (pluginok) {
-		assert(listindexes("XUSERS") eq ("xusers"^VM^"birthday"));
+		assert(listindexes("XUSERS") eq ("xusers" _VM_ "birthday"));
 		assert(listindexes() ne "");
 //ALN: do not delete to make subsequent select work::	assert(deleteindex("XUSERS","BIRTHDAY"));
 //		assert(listindexes("XUSERS") eq "");

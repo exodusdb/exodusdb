@@ -24,10 +24,10 @@ THE SOFTWARE.
 //prevent implicit conversion from cstr to wstring
 //so code must be like var x=L"xyz" instead of just "xyz"
 //to perhaps prevent conversion at runtime to the var wstring
-//optimising compilers may make this 
+//optimising compilers may make this
 #define MV_NO_NARROW
 
-//C4530: C++ exception handler used, but unwind semantics are not enabled. 
+//C4530: C++ exception handler used, but unwind semantics are not enabled.
 #ifdef _MSC_VER
 #pragma warning (disable: 4530)
 #endif
@@ -426,7 +426,7 @@ var var::trim(const var trimchar) const
 {
 	THISIS(L"var var::trim(const var trimchar) const")
 	ISSTRING(trimchar)
-	
+
 	return trim(trimchar.var_mvstr.c_str());
 }
 
@@ -434,7 +434,7 @@ var& var::trimmer(const var trimchar)
 {
 	THISIS(L"var& var::trimmer(const var trimchar)")
 	ISSTRING(trimchar)
-	
+
 	return trimmer(trimchar.var_mvstr.c_str());
 }
 
@@ -442,7 +442,7 @@ var var::trimf(const var trimchar) const
 {
 	THISIS(L"var var::trimf(const var trimchar) const")
 	ISSTRING(trimchar)
-	
+
 	return trimf(trimchar.var_mvstr.c_str());
 }
 
@@ -450,7 +450,7 @@ var& var::trimmerf(const var trimchar)
 {
 	THISIS(L"var& var::trimmerf(const var trimchar)")
 	ISSTRING(trimchar)
-	
+
 	return trimmerf(trimchar.var_mvstr.c_str());
 }
 
@@ -466,7 +466,7 @@ var& var::trimmerb(const var trimchar)
 {
 	THISIS(L"var& var::trimmerb(const var trimchar)")
 	ISSTRING(trimchar)
-	
+
 	return trimmerb(trimchar.var_mvstr.c_str());
 }
 
@@ -502,7 +502,7 @@ var var::trimb(const wchar_t* trimchar) const
 {
 	THISIS(L"var var::trimb(const wchar_t* trimchar) const")
 	THISISSTRING()
-	
+
 	return var(*this).trimmerb(trimchar);
 }
 
@@ -590,6 +590,29 @@ var& var::trimmer(const wchar_t* trimchar)
 	}
 	return *this;
 
+}
+
+var var::invert() const
+{
+	THISIS(L"var& var::invert()")
+	THISISSTRING()
+	//return var(*this).inverter();
+	var tt=*this;
+	tt.inverter();
+	return tt;
+}
+
+var& var::inverter()
+{
+	THISIS(L"var& var::inverter()")
+	THISISSTRING()
+
+	//wchar_t invertbits=-1;
+	//invert only the lower 8 bits to keep the resultant characters within the the same unicode page
+	wchar_t invertbits=255;
+	for (size_t ii = 0; ii < var_mvstr.size(); ii++)
+		//xor each w_char with the bits we want to toggle
+        	var_mvstr[ii] = var_mvstr[ii] ^ invertbits;
 }
 
 var var::ucase() const
@@ -902,7 +925,7 @@ var var::str(const int num) const
 	else if (basestrlen)
 		for (int ii=num;ii>0;--ii)
 			newstr^=var_mvstr;
-	
+
 	return newstr;
 }
 
@@ -1030,7 +1053,7 @@ cropperexit:
 
 	if (ntrailing2trim)
 		var_mvstr.erase(var_mvstr.length()-ntrailing2trim);
-	
+
 	return *this;
 }
 
@@ -1250,7 +1273,7 @@ bool var::isnum(void) const
 			wchar_t bigletter;
 			char smalletters[sizeof(wchar_t)/sizeof(char)];
 		} abcd;
-		abcd.bigletter=0x0035;	
+		abcd.bigletter=0x0035;
 		std::cout<<atoi(abcd.smalletters)<<std::endl;
 		*/
 
@@ -1277,6 +1300,7 @@ bool var::isnum(void) const
 	return true;
 }
 
+/*
 bool var::isnum_old(void) const
 {
 	THISIS(L"bool var::isnum(void) const")
@@ -1389,15 +1413,14 @@ bool var::isnum_old(void) const
 		//var_mvdbl=_wtof(var_mvstr.c_str());
 		//var_mvdbl=_wtof(var_mvstr.c_str());
 		//TODO optimise with code based on the following idea?
-		/*
-		union switchitup
-		{
-			wchar_t bigletter;
-			char smalletters[sizeof(wchar_t)/sizeof(char)];
-		} abcd;
-		abcd.bigletter=0x0035;	
-		std::cout<<atoi(abcd.smalletters)<<std::endl;
-		*/
+
+		//union switchitup
+		//{
+		//	wchar_t bigletter;
+		//	char smalletters[sizeof(wchar_t)/sizeof(char)];
+		//} abcd;
+		//abcd.bigletter=0x0035;
+		//std::cout<<atoi(abcd.smalletters)<<std::endl;
 
 		std::string result(var_mvstr.begin(),var_mvstr.end());
 		var_mvdbl=atof(result.c_str());
@@ -1414,11 +1437,10 @@ bool var::isnum_old(void) const
 		var_mvint=atoi(result.c_str());
 
 		//change to something like this? //ALN:TODO: finish and test !
-		/*
-		wchar_t * err_char;
-		var_mvint=wcstol(result.c_str(), & err_char, 10);
-		if (
-		*/
+
+		//wchar_t * err_char;
+		//var_mvint=wcstol(result.c_str(), & err_char, 10);
+		//if (
 
 		var_mvtyp=pimpl::MVTYPE_INTSTR;
 	}
@@ -1426,7 +1448,7 @@ bool var::isnum_old(void) const
 	//indicate isNumeric
 	return true;
 
-}
+}*/
 
 /////////
 // output
@@ -1436,7 +1458,7 @@ const var& var::put(std::ostream& ostream1) const
 {
 	THISIS(L"const var& var::put(std::ostream& ostream1) const")
 	THISISSTRING()
-	
+
 	//prevent output to wcout suppressing output to cout (by non-exodus routines)
 	//http://gcc.gnu.org/ml/gcc-bugs/2006-05/msg01196.html
 	//TODO optimise by calling once instead of every call to output()
@@ -1629,7 +1651,7 @@ var var::index2(const var& substrx,const int startchar1) const
 	THISIS(L"var var::index2(const var& substrx,const int startchar1) const")
 	THISISSTRING()
 	ISSTRING(substrx)
-	
+
 	//convert to a string for .find
 	std::wstring substr=substrx.var_mvstr;
 	if (substr==L"")
@@ -1651,7 +1673,7 @@ var var::index(const var& substrx,const int occurrenceno) const
 	THISIS(L"var var::index(const var& substrx,const int occurrenceno) const")
 	THISISSTRING()
 	ISSTRING(substrx)
-	
+
 	//convert to a string for .find
 	std::wstring substr=substrx.var_mvstr;
 	if (substr==L"")
@@ -2125,7 +2147,7 @@ var var::xlate(const var& filename,const var& fieldno, const wchar_t* mode) cons
 
 		if (vn>1)
 			response^=sep;
-			
+
 		//read the record
 		var key=(*this).a(1,vn);
 		var record;
@@ -2138,7 +2160,7 @@ var var::xlate(const var& filename,const var& fieldno, const wchar_t* mode) cons
 			//if (mode==L"C")
 			if (*mode==*L"C")
 				response^=*this;
-	
+
 			//no record and mode X or anything else returns ""
 			continue;
 		}
@@ -2149,13 +2171,13 @@ var var::xlate(const var& filename,const var& fieldno, const wchar_t* mode) cons
 			//numeric fieldno not zero return field
 			//if (fieldno.isnum())
 				response ^= record.a(fieldno);
-		
+
 			//non-numeric fieldno do calculate
 			//return calculate(fieldno,filename,mode);
 			continue;
-			
+
 		}
-	
+
 		//fieldno "" returns whole record
 		if (!fieldno.length()) {
 			response^=record;
@@ -2164,11 +2186,11 @@ var var::xlate(const var& filename,const var& fieldno, const wchar_t* mode) cons
 
 		//field no 0 returns key
 		response^=key;
-		
+
 	}
-	
+
 	return response;
-	
+
 }
 
 } // namespace exodus

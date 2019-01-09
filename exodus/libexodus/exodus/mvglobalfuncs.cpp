@@ -449,7 +449,6 @@ DLL_PUBLIC var unique(const var& instring)
 	return instring.unique();
 }
 
-/* AREV character bit inverter not implemented for now
 DLL_PUBLIC var& inverter(var& instring)
 {
 	return instring.inverter();
@@ -459,7 +458,6 @@ DLL_PUBLIC var invert(const var& instring)
 {
 	return instring.invert();
 }
-*/
 
 DLL_PUBLIC var& lowerer(var& instring)
 {
