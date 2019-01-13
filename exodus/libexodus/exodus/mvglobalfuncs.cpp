@@ -1099,8 +1099,8 @@ DLL_PUBLIC var listindexes(const var& filename, const var& fieldname)
 	return var().listindexes(filename,fieldname);
 }
 
-//one argument returns the contents
-DLL_PUBLIC var osgetenv(const var& name)
+//one argument returns the contents of an envvar (empty name returns the whole environment)
+DLL_PUBLIC var osgetenv(const var& name=L"")
 {
 	var temp=L"";
 	temp.osgetenv(name);

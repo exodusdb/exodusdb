@@ -3,16 +3,30 @@
 #define EXODUSDLFUNC_UPDVOUCHER2_H
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_updvoucher2;
+//ExodusFunctorBase efb_updvoucher2;
+class efb_updvoucher2 : private ExodusFunctorBase
+{
+public:
+
+efb_updvoucher2(MvEnvironment& mv) : ExodusFunctorBase("updvoucher2", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_updvoucher2& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var updvoucher2(io mode, io voucher, io vouchercode, io allocs, in username0="")
+var operator() (io mode, io voucher, io vouchercode, io allocs, in username0="")
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_updvoucher2.pmemberfunction_==NULL)
-  efb_updvoucher2.init("updvoucher2","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -21,9 +35,15 @@ var updvoucher2(io mode, io voucher, io vouchercode, io allocs, in username0="")
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_updvoucher2.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_updvoucher2.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_updvoucher2.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_updvoucher2.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   (mode,voucher,vouchercode,allocs,username0);
 
 }
+
+};
+efb_updvoucher2 updvoucher2{mv};
 //#endif

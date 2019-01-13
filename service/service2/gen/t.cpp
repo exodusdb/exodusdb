@@ -10,6 +10,8 @@ function main()
 {
 	printl("t says 'Hello World!'");
 
+	var xx=RECORD.a(2);
+
 	//CREATE LABELLED COMMON
 	mv.labelledcommon[1]=new win_common;
 	PSEUDO="";

@@ -3,16 +3,30 @@
 #define EXODUSDLFUNC_DECIDE_H
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_decide;
+//ExodusFunctorBase efb_decide;
+class efb_decide : private ExodusFunctorBase
+{
+public:
+
+efb_decide(MvEnvironment& mv) : ExodusFunctorBase("decide", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_decide& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var decide(in question0, in options0, io reply)
+var operator() (in question0, in options0, io reply)
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_decide.pmemberfunction_==NULL)
-  efb_decide.init("decide","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -21,9 +35,15 @@ var decide(in question0, in options0, io reply)
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_decide.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_decide.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_decide.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_decide.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   (question0,options0,reply);
 
 }
+
+};
+efb_decide decide{mv};
 //#endif

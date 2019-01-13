@@ -3,16 +3,30 @@
 #define EXODUSDLFUNC_UPLOADSUBS_H
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_uploadsubs;
+//ExodusFunctorBase efb_uploadsubs;
+class efb_uploadsubs : private ExodusFunctorBase
+{
+public:
+
+efb_uploadsubs(MvEnvironment& mv) : ExodusFunctorBase("uploadsubs", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_uploadsubs& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var uploadsubs(in mode)
+var operator() (in mode)
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_uploadsubs.pmemberfunction_==NULL)
-  efb_uploadsubs.init("uploadsubs","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -21,9 +35,15 @@ var uploadsubs(in mode)
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_uploadsubs.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_uploadsubs.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_uploadsubs.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_uploadsubs.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   (mode);
 
 }
+
+};
+efb_uploadsubs uploadsubs{mv};
 //#endif

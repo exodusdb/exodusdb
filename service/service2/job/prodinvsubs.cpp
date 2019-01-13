@@ -36,11 +36,14 @@ var docname;
 var copyfile;
 var versionfilename;
 var copynos;
+var copydoc;
 var nn;//num
 var vn;//num
 var taxn;
+var prodtype;
 var temp;
 var linen2;
+var analrec;
 var wsmsg;
 
 function main(in mode0) {
@@ -247,7 +250,7 @@ lockit:
 
 			//copy job description to quote description
 			if (RECORD.a(6) and job.a(9, 1)) {
-				//if decide('Get the "description" from the job ?','',reply) else return 0
+				//if decide('Get the "description" from the job ?','',reply) else return
 				reply = 1;
 				if (reply == 1) {
 					RECORD.r(6, "");
@@ -260,7 +263,7 @@ lockit:
 			//copy job brief to job details
 			var brief = job.a(9).field(VM, 2, 9999);
 			if (brief) {
-				//if decide('Use the job "brief" as the details ?','',reply) else return 0
+				//if decide('Use the job "brief" as the details ?','',reply) else return
 				reply = 1;
 				if (reply == 1) {
 					RECORD.r(8, brief);
@@ -580,7 +583,7 @@ inpjob:
 				}
 				goto canc;
 			}
-			if (not(job.read(agy.jobs, jobno))) {
+			if (not job.read(agy.jobs, jobno)) {
 				call mssg(DQ ^ (jobno ^ DQ) ^ " job number does not exist");
 				goto inpjob;
 			}
@@ -637,8 +640,7 @@ nextcopyno:
 		var copyno = copynos.field(" ", 1);
 		copynos.splicer(1, copyno.length() + 1, "");
 
-		var copydoc;
-		if (not(copydoc.read(copyfile, copyno))) {
+		if (not copydoc.read(copyfile, copyno)) {
 			//if docname='estimate' then
 			var versionfile;
 			if (versionfile.open(versionfilename, "")) {
@@ -783,12 +785,12 @@ nextcopyno2:
 
 		//check currency exists and is not stopped
 		var currcode = RECORD.a(4);
-		if (not(gen.currency.read(gen.currencies, currcode))) {
+		if (not gen.currency.read(gen.currencies, currcode)) {
 			msg = DQ ^ (currcode ^ DQ) ^ " currency does not exist";
 			return invalid(msg);
 		}
 		if (currcode ne win.orec.a(4)) {
-			tt = convert("<>", "()", gen.currency.a(1));
+			tt = gen.currency.a(1).convert("<>", "()");
 			if (gen.currency.a(25) or (tt.ucase()).index("(STOP)", 1)) {
 				msg = tt ^ FM ^ "currency is stopped" ^ FM ^ gen.currency.a(25);
 				return invalid(msg);
@@ -826,7 +828,7 @@ nextcopyno2:
 			for (var ln = 1; ln <= nlns; ++ln) {
 				var taxcodex = alltaxcodes.a(1, ln);
 				if (taxcodex.length()) {
-					if (not(fin.taxes.a(2).locateusing(taxcodex, VM, taxn))) {
+					if (not fin.taxes.a(2).locateusing(taxcodex, VM, taxn)) {
 						{}
 					}
 					if (fin.taxes.a(4, taxn) == "") {
@@ -861,7 +863,7 @@ nextcopyno2:
 
 		//ensure tax code on estimates from 1/1/2018 if registered for tax
 		if (gen.company.a(21) and calculate("DATE") >= 18264) {
-			if (not(RECORD.a(42) or RECORD.a(44))) {
+			if (not RECORD.a(42) or RECORD.a(44)) {
 				call mssg(DQ ^ (ID ^ DQ) ^ " Tax/VAT code is required on Estimates/Invoices|for " ^ gen.company.a(1) ^ ", " ^ gen.company.a(21));
 				return invalid(msg);
 			}
@@ -948,8 +950,7 @@ jobclosed:
 			}else{
 				tt = calculate("JOB_PRODUCTION_TYPE");
 				if (tt) {
-					var prodtype;
-					if (not(prodtype.read(agy.jobtypes, tt))) {
+					if (not prodtype.read(agy.jobtypes, tt)) {
 						prodtype = "";
 					}
 					if (not prodtype.a(5)) {
@@ -1085,7 +1086,7 @@ subroutine updanalysis2(in sign) {
 	if (not status) {
 		return;
 	}
-	if (var("DRAFT" _VM_ "ISSUED" _VM_ "CANCELLED" _VM_ "ON HOLD" _VM_ "INVOICED").a(1).locateusing(status, VM, xx)) {
+	if (var("DRAFT,ISSUED,CANCELLED,ON HOLD,INVOICED").locateusing(status, ",", xx)) {
 		return;
 	}
 
@@ -1121,7 +1122,7 @@ subroutine updanalysis2(in sign) {
 	var suppliercode = calculate("SUPPLIER_CODE");
 	var brandcode = calculate("BRAND_CODE");
 	var marketcode = calculate("MARKET_CODE");
-	var orderperiod = (calculate("DATE")).oconv("D2/E").substr(4,5);
+	var orderperiod = ((calculate("DATE")).oconv("D2/E")).substr(4,5);
 	var ordermthno = orderperiod.field("/", 1);
 
 	var analcompanycode = calculate("COMPANY_CODE");
@@ -1142,8 +1143,7 @@ subroutine updanalysis2(in sign) {
 				call log("PRODINV.SUBS", DQ ^ (analkey ^ DQ) ^ " could not lock analysis record while invoicing " ^ (DQ ^ (ID ^ DQ)));
 			}
 
-			var analrec;
-			if (not(analrec.read(agy.analysis, analkey))) {
+			if (not analrec.read(agy.analysis, analkey)) {
 				analrec = "";
 			}
 			//garbagecollect;
@@ -1181,7 +1181,7 @@ subroutine checkjob() {
 	}
 
 	//get the job
-	if (not(job.read(agy.jobs, win.is))) {
+	if (not job.read(agy.jobs, win.is)) {
 		msg = DQ ^ (win.is ^ DQ) ^ " JOB DOES NOT EXIST";
 		gosub invalid(msg);
 		return;
@@ -1205,7 +1205,7 @@ subroutine checkjobunlocked2() {
 	if (not jobcode) {
 		return;
 	}
-	if (not(job.read(agy.jobs, jobcode))) {
+	if (not job.read(agy.jobs, jobcode)) {
 		msg = DQ ^ (jobcode ^ DQ) ^ " job does not exist";
 		gosub invalid(msg);
 		return;

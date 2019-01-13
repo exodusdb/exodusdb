@@ -143,7 +143,7 @@ function main(in mode) {
 		// end
 
 	} else if (mode == "IMPORT") {
-		if (not text.osread("y")) {
+		if (not(text.osread("y"))) {
 			var().stop();
 		}
 		text.trimmer();

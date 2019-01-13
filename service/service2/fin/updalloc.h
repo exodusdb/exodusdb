@@ -3,16 +3,30 @@
 #define EXODUSDLFUNC_UPDALLOC_H
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_updalloc;
+//ExodusFunctorBase efb_updalloc;
+class efb_updalloc : private ExodusFunctorBase
+{
+public:
+
+efb_updalloc(MvEnvironment& mv) : ExodusFunctorBase("updalloc", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_updalloc& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var updalloc(io mode, io payment, in paymentcode, io allocs)
+var operator() (io mode, io payment, in paymentcode, io allocs)
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_updalloc.pmemberfunction_==NULL)
-  efb_updalloc.init("updalloc","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -21,9 +35,15 @@ var updalloc(io mode, io payment, in paymentcode, io allocs)
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_updalloc.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_updalloc.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_updalloc.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_updalloc.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   (mode,payment,paymentcode,allocs);
 
 }
+
+};
+efb_updalloc updalloc{mv};
 //#endif

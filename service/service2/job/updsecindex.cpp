@@ -64,7 +64,7 @@ function main(in mode, in filename, io keys, in fieldnames, in oldvalues, in new
 			var keyx = keys.a(keyn);
 
 			if (mode == "LOCK") {
-				if (not(lockrecord(filename, file, keyx, RECORD, secstowaitforlock))) {
+				if (not lockrecord(filename, file, keyx, RECORD, secstowaitforlock)) {
 
 					//!!!! return only locked keys
 					if (keyn == 1) {
@@ -101,7 +101,7 @@ function main(in mode, in filename, io keys, in fieldnames, in oldvalues, in new
 
 			}
 //L486:
-			//comment
+			//random comment to trigger correct adecom to c++ code
 		};//keyn;
 
 		//update
@@ -114,7 +114,7 @@ function main(in mode, in filename, io keys, in fieldnames, in oldvalues, in new
 			//list:= 'YYY*ADAGENCY*22:06:18 18 JAN 2004':@FM:YYY.CNT:@FM:YYY.UPD
 			indexinglist ^= filename ^ "*" ^ fileaccount ^ "*" ^ volid ^ FM ^ cnt ^ FM ^ upd;
 
-			if (not(indexingrecord.read(indexingfile, indexingkey))) {
+			if (not indexingrecord.read(indexingfile, indexingkey)) {
 				indexingrecord = "0";
 			}
 

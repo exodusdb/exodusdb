@@ -11,6 +11,7 @@ var filen;//num
 var code;
 var ok;//num
 var coden;//num
+var brand;
 var taskid;
 var positive;
 var forcedusercode;
@@ -76,7 +77,7 @@ function main(in companycodex, in clientcodex, in brandcodex, io brands, out msg
 	//return quick answer if checking brands and is in buffer
 	//since remaining checks are all dependent on brand
 	if (brandcode) {
-		if (VW.a(10 + 5).locateusing(brandcode, VM, coden)) {
+		if ((VW.a(10 + 5)).locateusing(brandcode, VM, coden)) {
 			if (XW.a(10 + 5, coden)) {
 				return 1;
 			}else{
@@ -100,8 +101,7 @@ function main(in companycodex, in clientcodex, in brandcodex, io brands, out msg
 				var().stop();
 			}
 		}
-		var brand;
-		if (not(brand.read(brands, brandcode))) {
+		if (not brand.read(brands, brandcode)) {
 			msg = DQ ^ (brandcode ^ DQ) ^ " missing from brands file";
 			return 0;
 		}
@@ -129,7 +129,7 @@ function main(in companycodex, in clientcodex, in brandcodex, io brands, out msg
 			call fsmsg();
 			var().stop();
 		}
-		if (not(client.read(clients, clientcode))) {
+		if (not client.read(clients, clientcode)) {
 			//allow for validating a DELETED client from CLIENT_VERSIONS
 			var versionfile;
 			if (not(versionfile.open("CLIENT_VERSIONS", ""))) {
@@ -138,7 +138,7 @@ missingclient:
 				return 0;
 			}
 
-			if (not(client.read(versionfile, clientcode))) {
+			if (not client.read(versionfile, clientcode)) {
 				goto missingclient;
 			}
 
@@ -255,7 +255,7 @@ subroutine checkcode(io msg) {
 	ok = 0;
 	//if dont have general access to file then
 	//access to a specific record must be positively allowed (use # task prefix)
-	if (VW.a(10 + filen).locateusing(code, VM, coden)) {
+	if ((VW.a(10 + filen)).locateusing(code, VM, coden)) {
 		if (not(XW.a(10 + filen, coden))) {
 			return;
 		}
@@ -266,8 +266,8 @@ subroutine checkcode(io msg) {
 			var oldcoden = coden;
 			coden = (coden * .9).floor();
 			var ntrim = oldcoden - coden;
-			VW.r(10 + filen, VW.a(10 + filen).field(VM, ntrim + 1, 999999));
-			XW.r(10 + filen, XW.a(10 + filen).field(VM, ntrim + 1, 999999));
+			VW.r(10 + filen, (VW.a(10 + filen)).field(VM, ntrim + 1, 999999));
+			XW.r(10 + filen, (XW.a(10 + filen)).field(VM, ntrim + 1, 999999));
 		}
 
 		VW.r(10 + filen, coden, code);

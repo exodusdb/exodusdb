@@ -727,7 +727,7 @@ bool ExodusProgramBase::openfile2(const var& filename, var& file,
 		//user option to create file if it does not exist
 		var tt;
 
-		if (file.createfile(filename)) {
+		if (filename.createfile(filename)) {
 		};
 
 		firsttry = 0;

@@ -3,16 +3,30 @@
 #define EXODUSDLFUNC_XREFSUBS_H
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_xrefsubs;
+//ExodusFunctorBase efb_xrefsubs;
+class efb_xrefsubs : private ExodusFunctorBase
+{
+public:
+
+efb_xrefsubs(MvEnvironment& mv) : ExodusFunctorBase("xrefsubs", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_xrefsubs& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var xrefsubs(in mode, in subfn, in masterfilename, io masterfile, in masterfn, io locklist)
+var operator() (in mode, in subfn, in masterfilename, io masterfile, in masterfn, io locklist)
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_xrefsubs.pmemberfunction_==NULL)
-  efb_xrefsubs.init("xrefsubs","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -21,9 +35,15 @@ var xrefsubs(in mode, in subfn, in masterfilename, io masterfile, in masterfn, i
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_xrefsubs.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_xrefsubs.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_xrefsubs.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_xrefsubs.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   (mode,subfn,masterfilename,masterfile,masterfn,locklist);
 
 }
+
+};
+efb_xrefsubs xrefsubs{mv};
 //#endif

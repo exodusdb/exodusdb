@@ -10,7 +10,9 @@ libraryinit()
 #include <gen.h>
 #include <agy.h>
 
+var job;
 var newtaskid;
+var taskx;
 var xx;
 var oldtask;
 var result;
@@ -47,8 +49,7 @@ function main(in mode, io oldtaskid, io task, io errmsg) {
 		return 0;
 	}
 
-	var job;
-	if (not(job.read(agy.jobs, jobno))) {
+	if (not job.read(agy.jobs, jobno)) {
 		job = "";
 	}
 
@@ -64,8 +65,7 @@ function main(in mode, io oldtaskid, io task, io errmsg) {
 		var jobtaskno = 1;
 		while (true) {
 			newtaskid = oldtaskid.field("*", 1) ^ "*" ^ jobtaskno;
-			var taskx;
-			if (not(taskx.read(tasks, newtaskid))) {
+			if (not taskx.read(tasks, newtaskid)) {
 				taskx = "";
 			}
 		///BREAK;
@@ -73,7 +73,7 @@ function main(in mode, io oldtaskid, io task, io errmsg) {
 
 			//prevent adding duplicate tasks for the same user
 			if (taskx.a(2) == task.a(2)) {
-				if (not(var("Completed" ^ VM ^ "Cancelled").locateusing(taskx.a(3), VM, xx))) {
+				if (not(("Completed" ^ VM ^ "Cancelled").locateusing(taskx.a(3), VM, xx))) {
 					errmsg = DQ ^ (task.a(2) ^ DQ) ^ " is already " ^ taskx.a(3) ^ " on this job (" ^ newtaskid ^ ")";
 					return 0;
 				}
@@ -104,8 +104,7 @@ function main(in mode, io oldtaskid, io task, io errmsg) {
 		//default mode UPDATE
 	}else{
 		newtaskid = oldtaskid;
-		var oldtask;
-		if (not(oldtask.read(tasks, oldtaskid))) {
+		if (not oldtask.read(tasks, oldtaskid)) {
 			oldtask = "";
 		}
 
@@ -161,7 +160,7 @@ function main(in mode, io oldtaskid, io task, io errmsg) {
 		}
 
 		//errmsg='testingfail'
-		//return 0
+		//return
 
 	}
 
@@ -208,7 +207,7 @@ function main(in mode, io oldtaskid, io task, io errmsg) {
 	call flushindex("TASKS");
 
 	//refresh the new updatetimestamp DATE_TIME
-	if (not(task.read(tasks, newtaskid))) {
+	if (not task.read(tasks, newtaskid)) {
 		{}
 	}
 
@@ -284,7 +283,7 @@ function main(in mode, io oldtaskid, io task, io errmsg) {
 		}
 
 		if (toaddress) {
-			gosub sendmail( errmsg);
+			gosub sendmailx( errmsg);
 		}
 
 	}
@@ -294,7 +293,7 @@ function main(in mode, io oldtaskid, io task, io errmsg) {
 }
 
 subroutine adduser() {
-	if (not(tousercodes.locateusing(tousercode, VM, xx))) {
+	if (not tousercodes.locateusing(tousercode, VM, xx)) {
 		tousercodes.r(1, -1, tousercode);
 		var emailaddress = tousercode.xlate("USERS", 7, "X");
 		if (emailaddress) {
@@ -305,8 +304,8 @@ subroutine adduser() {
 
 }
 
-subroutine sendmail(io errmsg) {
-	//sendmail(io errmsg)
+subroutine sendmailx(io errmsg) {
+	//sendmailx(io errmsg)
 	if (not toaddress) {
 		return;
 	}

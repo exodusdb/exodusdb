@@ -27,12 +27,15 @@ var clientcode;
 var xx;
 var vn;
 var msg;
+var brand;
 var reply;
 var oldbrandvn;
 var brandn2;
 var v69;
 var v70;
 var v71;
+var oldbrand;
+var job;
 var newbrandcodes;
 var temp;
 var brandcodex;
@@ -87,7 +90,7 @@ nextclient:
 						for (var brandaccn = 1; brandaccn <= nbrandaccs; ++brandaccn) {
 							var brandacc = brandaccs.a(1, brandaccn);
 							//proper account numbers have sm character in them
-							if (not(brandacc.index(SVM, 1))) {
+							if (not brandacc.index(SVM, 1)) {
 								client.r(19, brandaccn, "");
 								if (not(client.a(29).locateby(brandacc, "AL", vn))) {
 									client.inserter(29, vn, brandacc);
@@ -147,7 +150,7 @@ nextclient:
 				qq ^= " for||" ^ brand.a(2) ^ "|" ^ brand.a(3);
 
 				//prevent moving unauthorised brands
-				if (not(validcode2(brand.a(10), brand.a(1, 1), win.is, agy.brands, msg))) {
+				if (not validcode2(brand.a(10), brand.a(1, 1), win.is, agy.brands, msg)) {
 					msg = qq ^ FM ^ FM ^ msg;
 					return invalid(msg);
 				}
@@ -186,7 +189,7 @@ nextclient:
 				qq ^= "||Warning! It may take some time to save this client";
 				qq ^= " if there are very many historical ads for this brand";
 				//indicate OK but pass conflicting brand for user to decide
-				if (not(not SYSTEM.a(33))) {
+				if (not not SYSTEM.a(33)) {
 					USER3 = "OK " ^ qq;
 					//valid=0
 					//return the copied brand in data
@@ -421,11 +424,10 @@ nextclient:
 					}
 				};//ii;
 
-				var oldbrand;
-				if (not(oldbrand.read(agy.brands, brandcode))) {
+				if (not oldbrand.read(agy.brands, brandcode)) {
 					oldbrand = "";
 				}
-				var brand = oldbrand;
+				brand = oldbrand;
 
 				//done in prewrite now to lock all other clients first
 				//remove brand from other client if present there already
@@ -486,16 +488,15 @@ nextclient:
 					}
 					jobno ^= "-" ^ brandcode;
 
-					var job;
-					if (not(job.read(agy.jobs, jobno))) {
+					if (not job.read(agy.jobs, jobno)) {
 						//TODO enable update of "brand" jobs with new names etc
 						//if 1 then
 
 						job = "";
 						//job<1>=field(date() 'D2/E','/',2)+0:'/':field(date() 'D2/E','/',3)
-						tt = (var().date()).oconv("D2/E").field("/", 2) + 0;
+						tt = ((var().date()).oconv("D2/E")).field("/", 2) + 0;
 						tt ^= "/";
-						tt ^= (var().date()).oconv("D2/E").field("/", 3);
+						tt ^= ((var().date()).oconv("D2/E")).field("/", 3);
 						job.r(1, tt);
 						job.r(2, brandcode);
 						if ((brand.a(2).ucase()).index(brand.a(3).ucase(), 1) or (brand.a(3).ucase()).index(brand.a(2).ucase(), 1)) {
@@ -560,7 +561,7 @@ nextclient:
 					if (not(clientindex.read(clientindexfile, "INVERTED*ACNO*" ^ acno))) {
 						clientindex = "";
 					}
-					if (not(clientindex.a(1).locateusing(ID, VM, xx))) {
+					if (not clientindex.a(1).locateusing(ID, VM, xx)) {
 						clientindex.r(1, -1, ID);
 						clientindex.write(clientindexfile, "INVERTED*ACNO*" ^ acno);
 					}
@@ -669,7 +670,7 @@ subroutine deletebrands() {
 	var nbrands = brandcodes.count(VM) + (brandcodes ne "");
 	for (var brandn = 1; brandn <= nbrands; ++brandn) {
 		var brandcode = brandcodes.a(1, brandn);
-		if (not(newbrandcodes.a(1).locateusing(brandcode, VM, temp))) {
+		if (not newbrandcodes.a(1).locateusing(brandcode, VM, temp)) {
 			agy.brands.deleterecord(brandcode);
 			
 		}
@@ -690,7 +691,7 @@ subroutine checkdeletedbrands(in mode) {
 		if (mode.index("DELETE", 1)) {
 			gosub chkbrandused( brandcodex);
 		}else{
-			if (not(RECORD.a(2).locateusing(brandcodex, VM, xx))) {
+			if (not RECORD.a(2).locateusing(brandcodex, VM, xx)) {
 				gosub chkbrandused( brandcodex);
 			}
 		}
@@ -704,8 +705,7 @@ subroutine chkbrandused(in brandcodex) {
 	//chkbrandused(in brandcodex)
 
 	//always ok to delete new brands not yet saved
-	var brand;
-	if (not(brand.read(agy.brands, brandcodex))) {
+	if (not brand.read(agy.brands, brandcodex)) {
 		return;
 	}
 

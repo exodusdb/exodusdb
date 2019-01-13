@@ -98,7 +98,7 @@ subroutine updatedocuments() {
 		return;
 	}
 
-	if (not(gen.document.read(gen.documents, docid))) {
+	if (not gen.document.read(gen.documents, docid)) {
 		gen.document = "";
 	}
 
@@ -121,7 +121,7 @@ subroutine updatedocuments() {
 	gen.document.r(22, runhours);
 	gen.document.r(31, "JOB");
 	gen.document.r(32, "");
-	write(gen.document, gen.documents, docid);
+	gen.document.write(gen.documents, docid);
 
 	return;
 

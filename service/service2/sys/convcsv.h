@@ -3,16 +3,30 @@
 #define EXODUSDLFUNC_CONVCSV_H
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_convcsv;
+//ExodusFunctorBase efb_convcsv;
+class efb_convcsv : private ExodusFunctorBase
+{
+public:
+
+efb_convcsv(MvEnvironment& mv) : ExodusFunctorBase("convcsv", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_convcsv& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var convcsv(in mode, in select, in nfilters, dim& filters)
+var operator() (in mode, in select, in nfilters, dim& filters)
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_convcsv.pmemberfunction_==NULL)
-  efb_convcsv.init("convcsv","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -21,9 +35,15 @@ var convcsv(in mode, in select, in nfilters, dim& filters)
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_convcsv.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_convcsv.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_convcsv.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_convcsv.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   (mode,select,nfilters,filters);
 
 }
+
+};
+efb_convcsv convcsv{mv};
 //#endif

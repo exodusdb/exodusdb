@@ -3,16 +3,30 @@
 #define EXODUSDLFUNC_UPDVOUCHER_H
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_updvoucher;
+//ExodusFunctorBase efb_updvoucher;
+class efb_updvoucher : private ExodusFunctorBase
+{
+public:
+
+efb_updvoucher(MvEnvironment& mv) : ExodusFunctorBase("updvoucher", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_updvoucher& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var updvoucher(in mode0, io voucher, io vouchercode, io allocs)
+var operator() (in mode0, io voucher, io vouchercode, io allocs)
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_updvoucher.pmemberfunction_==NULL)
-  efb_updvoucher.init("updvoucher","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -21,9 +35,15 @@ var updvoucher(in mode0, io voucher, io vouchercode, io allocs)
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_updvoucher.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_updvoucher.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_updvoucher.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_updvoucher.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   (mode0,voucher,vouchercode,allocs);
 
 }
+
+};
+efb_updvoucher updvoucher{mv};
 //#endif

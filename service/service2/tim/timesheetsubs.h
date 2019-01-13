@@ -3,16 +3,30 @@
 #define EXODUSDLFUNC_TIMESHEETSUBS_H
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_timesheetsubs;
+//ExodusFunctorBase efb_timesheetsubs;
+class efb_timesheetsubs : private ExodusFunctorBase
+{
+public:
+
+efb_timesheetsubs(MvEnvironment& mv) : ExodusFunctorBase("timesheetsubs", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_timesheetsubs& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var timesheetsubs(in mode0)
+var operator() (in mode)
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_timesheetsubs.pmemberfunction_==NULL)
-  efb_timesheetsubs.init("timesheetsubs","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -21,9 +35,15 @@ var timesheetsubs(in mode0)
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_timesheetsubs.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_timesheetsubs.pmemberfunction_)))
-  (mode0);
+ //return CALLMEMBERFUNCTION(*(efb_timesheetsubs.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_timesheetsubs.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
+  (mode);
 
 }
+
+};
+efb_timesheetsubs timesheetsubs{mv};
 //#endif

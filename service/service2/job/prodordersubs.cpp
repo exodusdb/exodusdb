@@ -23,12 +23,14 @@ var xx;
 var msg;
 var temp;
 var jobcode;
+var job;
 var tt;
 var hits;
 var reply;
 var docname;
 var copyfile;
 var versionfilename;
+var copydoc;
 var wsmsg;
 
 function main(in mode) {
@@ -173,8 +175,7 @@ lockit:
 		}
 
 		//get the job
-		var job;
-		if (not(job.read(agy.jobs, win.is))) {
+		if (not job.read(agy.jobs, win.is)) {
 			msg = DQ ^ (win.is ^ DQ) ^ " JOB DOES NOT EXIST";
 			return invalid(msg);
 		}
@@ -188,12 +189,12 @@ lockit:
 		//copy the job description to description, and brief to details
 		//or just copy the description and brief to the details
 		if (not RECORD.a(13)) {
-			if (1) {
-				RECORD.r(6, job.a(9, 1));
-				RECORD.r(13, job.a(9).field(VM, 2, 999));
-			}else{
-				RECORD.r(13, job.a(9));
-			}
+			//if 1 then
+			RECORD.r(6, job.a(9, 1));
+			RECORD.r(13, job.a(9).field(VM, 2, 999));
+			//end else
+			// @record<13>=job<9>
+			// end
 
 			//update the internal line count for text section
 			win.displayaction = 5;
@@ -212,8 +213,8 @@ lockit:
 		for (var estimaten = 1; estimaten <= nestimates; ++estimaten) {
 			var estimate;
 			if (estimate.read(agy.productioninvoices, estimatenos.a(1, estimaten))) {
-				var inactivestatuses = "FINISHED" _VM_ "CANCELLED" _VM_ "ON HOLD" _VM_ "INVOICED";
-				if (not(inactivestatuses.a(1).locateusing(estimate.a(11), VM, xx))) {
+				var inactivestatuses = "FINISHED,CANCELLED,ON HOLD,INVOICED";
+				if (not(inactivestatuses.locateusing(estimate.a(11), ",", xx))) {
 					ok = 1;
 				}
 			}
@@ -348,7 +349,7 @@ lockit:
 
 		//restrict access based on company, brand, user etc
 		var jobno = RECORD.a(2);
-		var job = "";
+		job = "";
 		if (jobno) {
 
 			if (not(validcode2(calculate("COMPANY_CODE"), "", calculate("BRAND_CODE"), agy.brands, msg))) {
@@ -499,8 +500,7 @@ copyno:
 		if (not copyno) {
 			goto canc;
 		}
-		var copydoc;
-		if (not(copydoc.read(copyfile, copyno))) {
+		if (not copydoc.read(copyfile, copyno)) {
 			//if docname='estimate' then
 			var versionfile;
 			if (versionfile.open(versionfilename, "")) {
@@ -570,7 +570,7 @@ gotdoc:
 		msg = DQ ^ (mode ^ DQ) ^ " unrecognised mode in prodorder.subs";
 		gosub invalid(msg);
 	}
-//L3096:
+//L3074:
 	return 0;
 
 }
@@ -581,8 +581,7 @@ subroutine checkjobunlocked() {
 		return;
 	}
 
-	var job;
-	if (not(job.read(agy.jobs, jobcode))) {
+	if (not job.read(agy.jobs, jobcode)) {
 		msg = DQ ^ (jobcode ^ DQ) ^ " job does not exist";
 		gosub invalid(msg);
 		return;
@@ -591,7 +590,7 @@ subroutine checkjobunlocked() {
 	if (lockrecord("JOBS", agy.jobs, jobcode)) {
 		xx = unlockrecord("JOBS", agy.jobs, jobcode);
 	}else{
-		var lockholder = "JOBS*" ^ jobcode.xlate("LOCKS", 4, "X");
+		var lockholder = ("JOBS*" ^ jobcode).xlate("LOCKS", 4, "X");
 		if (lockholder == "") {
 			lockholder = "Someone";
 		}

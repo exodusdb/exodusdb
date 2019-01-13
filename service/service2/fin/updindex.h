@@ -3,16 +3,30 @@
 #define EXODUSDLFUNC_UPDINDEX_H
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_updindex;
+//ExodusFunctorBase efb_updindex;
+class efb_updindex : private ExodusFunctorBase
+{
+public:
+
+efb_updindex(MvEnvironment& mv) : ExodusFunctorBase("updindex", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_updindex& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var updindex(in postingsindex, in indexkey, in daterefline, in deleting)
+var operator() (in postingsindex, in indexkey, in daterefline, in deleting)
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_updindex.pmemberfunction_==NULL)
-  efb_updindex.init("updindex","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -21,9 +35,15 @@ var updindex(in postingsindex, in indexkey, in daterefline, in deleting)
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_updindex.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_updindex.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_updindex.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_updindex.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   (postingsindex,indexkey,daterefline,deleting);
 
 }
+
+};
+efb_updindex updindex{mv};
 //#endif

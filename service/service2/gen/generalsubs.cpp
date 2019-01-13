@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-//#include <ubname.h>
+#include <generalsubs.h>
 #include <daybooksubs3.h>
 #include <plansubs5.h>
 #include <jobsubs.h>
@@ -50,8 +50,11 @@ function main(in mode0) {
 	//WINDOWSTUB GENERAL.SUBS CALLSUBS,CLIENTS,CLIENT.SUBS,POSTWRITE
 	if (mode.field(",", 1) == "CALLSUBS") {
 		win.datafile = mode.field(",", 2);
-		var subname = mode.field(",", 3);
+
+		//generalsubs is the template for calling all subs with ONE ARG
+		generalsubs = mode.field(",", 3);
 		var submode = mode.field(",", 4);
+
 		if (not(win.srcfile.open(win.datafile, ""))) {
 			call fsmsg();
 			return 0;
@@ -75,12 +78,14 @@ nextrecord:
 		}
 		recordn += 1;
 		print(var().at(0), var().at(-4), recordn, ". ", ID);
-		if (not(RECORD.read(win.srcfile, ID))) {
+		if (not RECORD.read(win.srcfile, ID)) {
 			goto nextrecord;
 		}
 		win.orec = "";
-		//call client.subs('POSTWRITE')
-		//call ubname(submode);
+
+		//eq call client.subs('POSTWRITE')
+		call generalsubs(submode);
+
 		goto nextrecord;
 
 	} else if (mode == "GETDATASETS") {
@@ -103,7 +108,7 @@ nextrecord:
 
 		gosub getdatasets();
 
-		if (not(datasetcodes.a(1).locateusing(win.is, VM, xx))) {
+		if (not datasetcodes.a(1).locateusing(win.is, VM, xx)) {
 			msg = DQ ^ (win.is ^ DQ) ^ " is not a dataset";
 			return invalid(msg);
 		}
@@ -163,7 +168,7 @@ nextrecord:
 			return 0;
 		}
 		gosub getdepts();
-		if (not(depts.locateusing(win.is, FM, xx))) {
+		if (not depts.locateusing(win.is, FM, xx)) {
 			msg = DQ ^ (win.is ^ DQ) ^ " IS NOT A VALID DEPARTMENT";
 			return invalid(msg);
 		}
@@ -186,7 +191,7 @@ badexchrate:
 
 	} else if (mode.field(".", 1, 2) == "DEF.SK" or mode.field(".", 1, 2) == "DEF.SK2") {
 
-		if (not(win.wlocked or RECORD)) {
+		if (not win.wlocked or RECORD) {
 			//is.dflt=nextkey(':%SK%:':datafile,'')
 
 			//special defaults for special files
@@ -195,7 +200,7 @@ badexchrate:
 				//ratecards
 				if (win.datafile == "RATECARDS") {
 					if (not(ID.field("*", 2))) {
-						ID = ID.fieldstore("*", 2, 1, "1/1/" ^ (var().date()).oconv("D2/E").field("/", 3)).iconv("D2/E");
+						ID = ID.fieldstore("*", 2, 1, ("1/1/" ^ ((var().date()).oconv("D2/E")).field("/", 3)).iconv("D2/E"));
 						win.isdflt = ID;
 						return 0;
 					}
@@ -293,7 +298,7 @@ next:
 		if (not win.is) {
 			return 0;
 		}
-		if (not(xx.read(gen.currencies, win.is))) {
+		if (not xx.read(gen.currencies, win.is)) {
 			msg = DQ ^ (win.is ^ DQ) ^ " - currency code not on file";
 			return invalid(msg);
 		}
@@ -312,7 +317,7 @@ next:
 			return invalid(msg);
 		}
 
-		if (not(xx.read(gen.companies, win.is))) {
+		if (not xx.read(gen.companies, win.is)) {
 			msg = DQ ^ (win.is ^ DQ) ^ " - company code not on file";
 			return invalid(msg);
 		}
@@ -321,7 +326,7 @@ next:
 		if (win.is ne win.isorig) {
 
 			//do not validate if already on file
-			if (win.ww[win.wi].a(4) == 0) {
+			if (win.ww(win.wi).a(4) == 0) {
 				if (not win.wlocked and RECORD == "" and ID == "") {
 					if (RECORD.read(win.srcfile, win.is)) {
 						return 0;
@@ -345,7 +350,7 @@ next:
 		call mssg(DQ ^ (mode ^ DQ) ^ " - invalid mode ignored");
 		//valid=0
 	}
-//L1837:
+//L1842:
 	return 0;
 
 }
@@ -360,7 +365,7 @@ subroutine getdepts() {
 			text.converter("0123456789", "");
 			text.trimmer();
 			if (text and text ne "---") {
-				if (not(depts.locateusing(text, FM, deptn))) {
+				if (not depts.locateusing(text, FM, deptn)) {
 					depts.r(-1, text);
 				}
 			}
@@ -382,7 +387,7 @@ subroutine getdatasets() {
 		}
 	}
 
-	var nodata = directory.field("\r", 1)[-1] == " ";
+	var nodata = (directory.field("\r", 1))[-1] == " ";
 	//call msg(nodata:' ')
 	//convert dos text to revelation format and standardise
 	directory.ucaser();
@@ -431,7 +436,7 @@ subroutine getdatasets() {
 subroutine getuserdept2() {
 	//locate the user in the table
 	usercode = mode.field(",", 2);
-	if (not(SECURITY.a(1).locateusing(usercode, VM, usern))) {
+	if (not SECURITY.a(1).locateusing(usercode, VM, usern)) {
 		if (usercode == "NEOSYS") {
 			ANS = "NEOSYS";
 			return;

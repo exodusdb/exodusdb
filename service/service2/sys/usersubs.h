@@ -3,16 +3,30 @@
 #define EXODUSDLFUNC_USERSUBS_H
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_usersubs;
+//ExodusFunctorBase efb_usersubs;
+class efb_usersubs : private ExodusFunctorBase
+{
+public:
+
+efb_usersubs(MvEnvironment& mv) : ExodusFunctorBase("usersubs", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_usersubs& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var usersubs(in mode)
+var operator() (in mode)
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_usersubs.pmemberfunction_==NULL)
-  efb_usersubs.init("usersubs","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -21,9 +35,15 @@ var usersubs(in mode)
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_usersubs.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_usersubs.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_usersubs.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_usersubs.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   (mode);
 
 }
+
+};
+efb_usersubs usersubs{mv};
 //#endif

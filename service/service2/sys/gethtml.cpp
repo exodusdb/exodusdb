@@ -1,129 +1,134 @@
 #include <exodus/library.h>
 libraryinit()
 
+#include <date.h>
+#include <authorised.h>
+
 #include <gen.h>
 #include <agy.h>
 
-function main(in mode, out html, in companycode0="") {
-	//jbase linemark uses agp under some circumstances
-	var modex = mode;
+var modex;
+var compcode;
+var lhcompany;
+var keyx;
+var tt;
+var tdate;
+var xx;
+var div;
+var divx;
+var imagecomp;
+var textcompany;
 
-	var companycode = companycode0;
-	if (not companycode) {
-		companycode = gen.gcurrcompany;
-	}
+function main(io mode, out html, in compcode0="") {
+	//c sys io,out,""
 
-	var compcode = companycode ^ "_";
-	var keyx = "";
-nextmode:
+	//global lhcompany,modex,tt
+
+	modex = mode;
 	html = "";
-	//osread html from '..\data\':system<17>:'\':(compcode:modex<1,1>)[1,8]:'.HTM' else
-	keyx = "..\\data\\" ^ SYSTEM.a(17) ^ "\\" ^ compcode ^ modex.a(1, 1).substr(1,8) ^ ".HTM";
 
-	//no longer look for letterhead in os files
-	//osread html from keyx else
+	//returns source in MODE ie COMPANY or definitions file key
 
-	//read html from definitions,compcode:modex<1,1>:'.HTM' else
-	keyx = compcode ^ modex.a(1, 1) ^ ".HTM";
+	//TODO what about letterhead with vehicle logos?
 
-	if (not(html.read(DEFINITIONS, keyx))) {
-		//osread html from (compcode:modex<1,1>)[1,8]:'.HTM' else
-		keyx = compcode ^ modex.a(1, 1).substr(1,8) ^ ".HTM";
-
-		//no longer look for letterhead in os files
-		//osread html from keyx else
-
-		if (compcode) {
-			compcode = "";
-			goto nextmode;
-		}
-		if (modex.a(1, 2)) {
-			modex = modex.field(VM, 2, 9999);
-			compcode = companycode ^ "_";
-			goto nextmode;
-		}
-		var logofilename = "c:\\agency.gif";
-		if (not logofilename.osfile()) {
-			logofilename = "";
-		}
-		var agencynameaddress = agy.agp.a(1) ^ " " ^ SYSTEM.a(18);
-		var contacts = SYSTEM.a(19);
-		var emailaddress = SYSTEM.a(10, 2);
-		var website = SYSTEM.a(8);
-		if (website.ucase().substr(1,7) == "HTTP://") {
-			website.splicer(1, 7, "");
-		}
-
-		html = "";
-		html ^= "<table border=\"0\" width=\"100%\">";
-		html ^= "<tr>";
-
-		if (logofilename) {
-			html ^= "<td valign=\"top\">";
-			html ^= "<img src=\"file:///" ^ logofilename ^ DQ;
-			html ^= " alt=\"" ^ agy.agp.a(1) ^ DQ;
-			html ^= " width=\"100\" height=\"70\"";
-			html ^= ">";
-			html ^= "</td>";
-			html ^= "<td align=right>";
-
-			//table in a table to get left aligned text in right aligned cell
-			html ^= "<table><tr><td>";
-
-		}else{
-			html ^= "<td align=center>";
-		}
-
-		if (logofilename) {
-			html ^= "<font size=\"4\">";
-		}else{
-			html ^= "<font size=\"6\"><b>";
-		}
-		html ^= agencynameaddress;
-		html ^= "<br>";
-		html ^= "</b></font>";
-
-		html ^= "<font size=\"1\">";
-		if (emailaddress) {
-			html ^= " Email: <a href=\"mailto:" ^ emailaddress ^ "\">" ^ emailaddress ^ "</a>";
-		}
-
-		if (website) {
-			var website2 = website;
-			if (not((website2.ucase()).index("HTTP", 1))) {
-				website2 = "http://" ^ website2;
-			}
-			html ^= " Website: <a href=\"" ^ website2 ^ "\">" ^ website ^ "</a>";
-		}
-
-		html ^= " " ^ contacts;
-
-		html ^= "</font>";
-
-		//table in a table to get left aligned text in right aligned cell
-		if (logofilename) {
-			html ^= "</td>";
-			html ^= "</tr>";
-			html ^= "</table>";
-		}
-
-		html ^= "</td>";
-		html ^= "</tr>";
-		html ^= "</table>";
-
-		//end
+	if (compcode0.unassigned()) {
+		compcode = gen.gcurrcompany;
+	} else if (compcode0) {
+		compcode = compcode0;
+	} else {
+		compcode = gen.gcurrcompany;
 	}
-	//end
+//L206:
+	if (not lhcompany.read(gen.companies, compcode)) {
+		lhcompany = "";
+	}
 
-	html.swapper("%COMPANY_NAME%", gen.company.a(1));
-	html.swapper("%TAX_REGISTRATION_NO%", gen.company.a(21));
-	html.swapper("%TAX_REG_NO%", gen.company.a(21));
-	html.swapper("%COMPANY_REG_NO%", gen.company.a(59));
+	//0. get config from company file if present
 
-	//check simple HTML
-	if (html and html.count("<") ne html.count(">")) {
-		call mssg(DQ ^ (keyx ^ DQ) ^ " page header is not valid HTML");
-		html = "";
+	//otherwise old style DEFINITIONS X_HEAD,HEAD.HTM,INVHEAD.HTM etc
+	//order of searching if multiple modes like INVHEAD]HEAD
+	//where X is the compcode
+	//1. X_INVHEAD.HTM
+	//2. INVHEAD.HTM
+	//3. X_HEAD.HTM
+	//4. HEAD.HTM
+
+	//get html depending on company file config
+	//////////////////////////////////////////
+
+	mode = "Company File ";
+	gosub getcompanyconfig( html,  mode);
+
+	//otherwise get from definitions
+	///////////////////////////////
+
+	if (not html) {
+		gosub getheadhtm( html);
+		if (html) {
+			mode = "DEFINITIONS " ^ keyx;
+		}else{
+			mode = "No letterhead defined";
+		}
+
+		//normalise handcoded html so later conversions will work
+		html.swapper("<image", "<img");
+		html.swapper("<IMAGE", "<img");
+
+		//image should not have closing tag but dont bother removing it
+		//swap '</image>' with '' in html
+		//swap '</IMAGE>' with '' in html
+
+	}
+
+	//process the HTML, adding various macros
+
+	var clientmark = lhcompany.a(27).invert();
+	if (not clientmark) {
+		clientmark = agy.agp.a(1);
+	}
+	html.swapper("%AGENCY%", clientmark);
+
+	//similar code in GETHTML and AGENCYMACROS
+
+	html.swapper("%COMPANY_NAME%", lhcompany.a(1));
+	html.swapper("%TAX_REGISTRATION_NO%", lhcompany.a(21));
+	html.swapper("%TAX_REG_NO%", lhcompany.a(21));
+	html.swapper("%COMPANY_REG_NO%", lhcompany.a(59));
+
+	var datetime = var().date() ^ "." ^ var().time().oconv("R(0)#5");
+	tt = "L";
+	call date("OCONV", datetime, tt, tdate, gen.glang);
+	html.swapper("%DATE%", tdate);
+	html.swapper("%TIME%", (datetime.field(".", 2)).oconv("[TIME2]"));
+	html.swapper("%STATION%", STATION);
+
+	html.swapper("%DATAURL%", "%URL%/DATA/%DATABASE%");
+	html.swapper("%URL%", SYSTEM.a(114, 1));
+	html.swapper("%DATABASE%", SYSTEM.a(17, 1));
+
+	//check valid html .. html from company file is prechecked anyway
+
+	if (html) {
+
+		//check simple HTML
+		if (html.count("<") ne html.count(">")) {
+			call mssg(DQ ^ (keyx ^ DQ) ^ " page header is not valid HTML");
+			html = "";
+		}
+
+		//check various tags exist in equal numbers
+		//this doesnt check if they are in a correct sequence or hierarchy etc
+		var tags = "div,span,table,thead,tbody,tr,td,a,b,i,u,big,small,centre,abbr";
+		var ntags = tags.count(",") + 1;
+		var html2 = html.lcase();
+		for (var tagn = 1; tagn <= ntags; ++tagn) {
+			var tag = tags.field(",", tagn);
+			if (html2.count("<" ^ tag ^ ">") + html2.count("<" ^ tag ^ " ") ne html2.count("</" ^ tag ^ ">")) {
+				html = DQ ^ (keyx ^ DQ) ^ " has mismatched &lt;" ^ tag ^ "&gt; tags";
+				tagn = ntags;
+			}
+		};//tagn;
+
 	}
 
 	html.swapper(FM, "\r\n");
@@ -134,12 +139,236 @@ nextmode:
 		html.splicer(-1, 1, "");
 	}//loop;
 
-	var batchmode = SYSTEM.a(33);
-	if (batchmode) {
-		html.swapper("file:///c:/neosys.gif", "http://www.neosys.com/neosys.gif");
+	//presumably obsolete
+	//batchmode=system<33>
+	//if batchmode then
+	// swap 'file:///c:/neosys.gif' with 'http://www.neosys.com/neosys.gif' in html
+	// end
+
+	if (authorised("EDIT PRINTOUTS", xx)) {
+
+		//button
+		var onclick = "javascript:if (document.body.getAttribute(\'contentEditable\')) {edithtml.innerHTML=\'Edit is Off\';window.setTimeout(\'edithtml.innerHTML=\\\'\\\';edithtml.style.display=\\\'none\\\'\',1000);document.body.removeAttribute(\'contenteditable\')}";
+		onclick ^= " else {edithtml.style.display=\'\';edithtml.innerHTML=\'Edit is On\';document.body.setAttribute(\'contenteditable\',\'true\')}";
+		tt = "<button id=edithtml class=\"noprint\"";
+		tt ^= " style=\"position:fixed;top:2px;left:2px;font-size:60%;display:none\"";
+		tt ^= " onclick=" ^ (DQ ^ (onclick ^ DQ));
+		tt ^= "></button>";
+		html.splicer(1, 0, tt);
+
+		//click logos to switch on/off editing
+		onclick = "javascript:edithtml.click()";
+		html.swapper("<IMG", "<img");
+		html.swapper("<img", "<img style=\"cursor:pointer\" onclick=" ^ (DQ ^ (onclick ^ DQ)));
+
 	}
 
 	return 0;
+
+}
+
+subroutine getcompanyconfig(io html, io mode) {
+	//getcompanyconfig(io html, io mode)
+	html = "";
+
+	var ncols = 0;
+	for (var fn = 61; fn <= 66; ++fn) {
+		tt = lhcompany.a(fn);
+		if (tt) {
+			//call max(count(tt,vm)+1,ncols,ncols)
+			tt = tt.count(VM) + 1;
+			if (tt > ncols) {
+				ncols = tt;
+			}
+		}
+	};//fn;
+	if (not ncols) {
+		return;
+	}
+
+	var aligns = lhcompany.a(61);
+	var imagetypes = lhcompany.a(62);
+	var texts = lhcompany.a(63);
+	var fontsizes = lhcompany.a(64);
+	var imagecompcodes = lhcompany.a(65);
+	var textcompcodes = lhcompany.a(66);
+
+	var tab = "";
+
+	//using a table because
+	//a) to give the divs something left/center/right to float within
+	//b) to provide a central block in case of left+center+right style heads
+
+	//table columns currently forced equal to allow centralisation in the page
+	//but may need allow configuration control over the column widths
+	//in case need to allow more space in some columns and less in others
+	//eg 20% 60% 20% if the central letterhead is very wide for example
+
+	var usetable = 1;
+
+	//start a one row 100% width table to aid formatting
+	if (usetable) {
+		tab.r(-1, "<table width=100% cellspacing=0 cellpadding=0 borderpadding=0");
+		tab ^= " style=\"border-collapse:collapse\"";
+		tab ^= ">";
+		tab.r(-1, " <tr>");
+		}else{
+		tab.r(-1, "<div>");
+	}
+
+	for (var coln = 1; coln <= ncols; ++coln) {
+
+		var align = aligns.a(1, coln);
+		var imagetype = imagetypes.a(1, coln);
+		var imagecompcode = imagecompcodes.a(1, coln);
+		var text = texts.a(1, coln);
+		var fontsize = fontsizes.a(1, coln);
+		if (fontsize and fontsize.isnum()) {
+			fontsize ^= "%";
+		}
+
+		//start a new TD
+		if (usetable) {
+			tab.r(-1, "");
+			tab.r(-1, "  <td");
+			tab ^= " width=" ^ (100 / ncols).floor() ^ "%";
+			tab ^= ">";
+		}
+
+		//wrap td contents in a div if any styling
+		var divstyle = "";
+		if (align) {
+			if (align == "center") {
+				//there is no FLOAT CENTER
+				divstyle ^= "display:table;margin-left:auto;margin-right:auto;";
+			}else{
+				divstyle ^= "float:" ^ align ^ ";";
+			}
+		}
+		if (fontsize) {
+			divstyle ^= "font-size:" ^ fontsize ^ ";";
+		}
+		if (divstyle) {
+			div = FM ^ "   <div style=" ^ (DQ ^ (divstyle ^ DQ)) ^ ">";
+			divx = FM ^ "   </div>";
+		}else{
+			div = "";
+			divx = "";
+		}
+
+		//add image
+		if (imagetype or imagecompcode) {
+			tab ^= div;
+
+			//use other company image and type
+			if (imagecompcode) {
+				//get image type from the other company
+				if (not imagecomp.read(gen.companies, imagecompcode)) {
+					imagecomp = "";
+				}
+				imagetype = imagecomp.a(62, coln);
+
+				mode ^= ", Col " ^ coln ^ " image from company " ^ imagecompcode;
+
+				//use this company image and type
+			}else{
+				imagecompcode = compcode;
+			}
+
+			//FULL http path to images so EMAIL/OFFICE programs can get images
+			var url = SYSTEM.a(114, 1);
+			if (url[-1] == "/") {
+				url.splicer(-1, 1, "");
+			}
+
+			//path to uploaded company logo files
+			var imagepath = "/images/" ^ SYSTEM.a(17) ^ "/UPLOAD/COMPANIES/";
+
+			//logo_companycode_coln .jpg .png /gif
+			var imagefilename = "logo_" ^ imagecompcode ^ "_" ^ coln ^ "." ^ imagetype;
+
+			var fullimageurl = url ^ imagepath ^ imagefilename;
+			var relativeimagefilename = "../.." ^ imagepath ^ imagefilename;
+
+			tab.r(-1, "   <img src=" ^ (DQ ^ (fullimageurl ^ DQ)) ^ " alt=" ^ (DQ ^ (fullimageurl ^ DQ)));
+			var sq = "\'";
+			tab ^= " onerror=\"this.onerror=null;this.src=" ^ sq ^ relativeimagefilename ^ sq ^ ";\"";
+			tab ^= " style=\"margin:0;border:0\"";
+
+			tab ^= " />";
+			tab ^= divx;
+		}
+
+		//maybe get text from another company
+		var textcompcode = textcompcodes.a(1, coln);
+		if (textcompcode) {
+			//ignore any given text if textcompany given
+			text = "";
+			if (not textcompany.read(gen.companies, textcompcode)) {
+				textcompany = "";
+			}
+			//get text from different company SAME COLUMN NO
+			text = textcompany.a(63, coln);
+			mode ^= ", Col " ^ coln ^ " text from company " ^ textcompcode;
+		}
+
+		//add text div
+		if (text) {
+			text.swapper(TM, "<br />" "\r\n");
+			tab ^= div;
+			tab.r(-1, text);
+			tab ^= divx;
+		}
+
+		if (usetable) {
+			tab.r(-1, "  </td>");
+		}
+
+	};//coln;
+
+	if (usetable) {
+		tab.r(-1, "");
+		tab.r(-1, " </tr>");
+		tab.r(-1, "</table>");
+	}else{
+		tab.r(-1, "</div>");
+	}
+
+	html = tab;
+
+	return;
+
+}
+
+subroutine getheadhtm(io html) {
+	//getheadhtm(io html)
+	{}
+
+nextmodex:
+	//////////
+	var prefix = compcode ^ "_";
+
+nextprefix:
+	///////////
+	keyx = prefix ^ modex.a(1, 1) ^ ".HTM";
+
+	if (not html.read(DEFINITIONS, keyx)) {
+
+		//try again same mode but without company code prefix
+		if (prefix) {
+			prefix = "";
+			goto nextprefix;
+		}
+
+		//try again with next mode and with company code prefix
+		if (modex.a(1, 2)) {
+			modex = modex.field(VM, 2, 9999);
+			goto nextmodex;
+		}
+
+	}
+
+	return;
 
 }
 

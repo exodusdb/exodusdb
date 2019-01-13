@@ -91,7 +91,7 @@ nextrcard:
 			printl(temp);
 		}
 		if (agy.ratecards.open("RATECARDS", "")) {
-			write(var().date(), DEFINITIONS, "RATECARD40COLS");
+			var().date().write(DEFINITIONS, "RATECARD40COLS");
 			agy.ratecards.select();
 			var recn = "";
 nextrcard2:
@@ -267,12 +267,12 @@ nextrcard2:
 	//lookup of market names over slow links
 	if (not(xx.read(DEFINITIONS, "MARKET_VEHICLE_CODE_CLEARED"))) {
 		perform("CLEARFIELD MARKETS VEHICLE_CODE");
-		write(var().date(), DEFINITIONS, "MARKET_VEHICLE_CODE_CLEARED");
+		var().date().write(DEFINITIONS, "MARKET_VEHICLE_CODE_CLEARED");
 	}
 
 	call log2("*convert ads 50/51 X to 1", logtime);
 	var convkey = "CONVERTED*ADS";
-	if (not(fin.converted.read(DEFINITIONS, convkey))) {
+	if (not fin.converted.read(DEFINITIONS, convkey)) {
 		fin.converted = "";
 	}
 	if (fin.converted.a(1) < var("16 JUN 2010").iconv("D")) {
@@ -287,7 +287,7 @@ decideupg:
 			var oo = "Recreate - Slow for large databases";
 			oo.r(1, -1, "Patch - Quick to avoid errors but do CREATEADS later.");
 			oo.r(1, -1, "No - MUST do CREATEADS later to avoid errors!");
-			if (not(decide(qq, oo, reply))) {
+			if (not decide(qq, oo, reply)) {
 				goto decideupg;
 			}
 		}else{
@@ -304,7 +304,7 @@ decideupg:
 			//dont convert
 		}
 //L1830:
-		write(var().date(), DEFINITIONS, convkey);
+		var().date().write(DEFINITIONS, convkey);
 	}
 
 	if (not(openfile("JOB_VERSIONS", xx, "JOBS", 1))) {
@@ -407,7 +407,7 @@ convertdatelist:
 		call ossleep(1000*1);
 		goto convertdatelist;
 	}
-	if (not(xx.read(DEFINITIONS, paramkey))) {
+	if (not xx.read(DEFINITIONS, paramkey)) {
 
 		call note("Converting schedules file date format||Please wait ...", "UB", buffer, "");
 		nrecs = getreccount(agy.schedules, "", "");
@@ -444,7 +444,7 @@ nextsch2:
 				for (var fnn = 1; fnn <= 3; ++fnn) {
 					var fn = fns.a(1, fnn);
 					var dategrid = schedule.a(fn);
-					if (not(dategrid.index(SVM, 1))) {
+					if (not dategrid.index(SVM, 1)) {
 						var olddategrid = dategrid;
 
 						//make the one character one day string into a one subvalue one day string
@@ -473,7 +473,7 @@ nextsch2:
 			goto nextsch2;
 		}
 		var().clearselect();
-		write(var().date(), DEFINITIONS, paramkey);
+		var().date().write(DEFINITIONS, paramkey);
 		if (buffer) {
 			call note("", "DB", buffer, "");
 		}
@@ -487,7 +487,7 @@ nextsch2:
 	if (xx.open("ACCOUNTS", "")) {
 		if (not(xx.read(DEFINITIONS, "FIXACCNOS"))) {
 			perform("FIXACCNOS");
-			write(var().date(), DEFINITIONS, "FIXACCNOS");
+			var().date().write(DEFINITIONS, "FIXACCNOS");
 		}
 	}
 
@@ -535,7 +535,7 @@ nextsch2:
 	}
 
 	if (agy.agp ne origagp) {
-		write(agy.agp, DEFINITIONS, "AGENCY.PARAMS");
+		agy.agp.write(DEFINITIONS, "AGENCY.PARAMS");
 	}
 
 	//get agency.params
@@ -617,15 +617,15 @@ nextbrandcode:
 			}
 			goto nextbrandcode;
 		}
-		write(var().date(), DEFINITIONS, "ORPHANBRANDSFIXED");
+		var().date().write(DEFINITIONS, "ORPHANBRANDSFIXED");
 	}
 
 	call log2("*build client group members", logtime);
 	convkey = "BUILDCLIENTGROUPMEMBERS";
 	if (lockrecord("DEFINITIONS", DEFINITIONS, convkey, recordx, 999999)) {
-		if (not(xx.read(DEFINITIONS, convkey))) {
+		if (not xx.read(DEFINITIONS, convkey)) {
 			perform("WINDOWSTUB CLIENT.SUBS " ^ convkey);
-			write(var().date(), DEFINITIONS, convkey);
+			var().date().write(DEFINITIONS, convkey);
 		}
 		call unlockrecord("DEFINITIONS", DEFINITIONS, convkey);
 	}
@@ -633,9 +633,9 @@ nextbrandcode:
 	call log2("*build supplier group members", logtime);
 	convkey = "BUILDSUPPLIERGROUPMEMBERS";
 	if (lockrecord("DEFINITIONS", DEFINITIONS, convkey, recordx, 999999)) {
-		if (not(xx.read(DEFINITIONS, convkey))) {
+		if (not xx.read(DEFINITIONS, convkey)) {
 			perform("WINDOWSTUB SUPPLIER.SUBS " ^ convkey);
-			write(var().date(), DEFINITIONS, convkey);
+			var().date().write(DEFINITIONS, convkey);
 		}
 		call unlockrecord("DEFINITIONS", DEFINITIONS, convkey);
 	}
@@ -643,9 +643,9 @@ nextbrandcode:
 	call log2("*fix client 29 in 19 corruption", logtime);
 	convkey = "FIXCLIENT29IN19";
 	if (lockrecord("DEFINITIONS", DEFINITIONS, convkey, recordx, 999999)) {
-		if (not(xx.read(DEFINITIONS, convkey))) {
+		if (not xx.read(DEFINITIONS, convkey)) {
 			perform("WINDOWSTUB CLIENT.SUBS " ^ convkey);
-			write(var().date(), DEFINITIONS, convkey);
+			var().date().write(DEFINITIONS, convkey);
 		}
 		call unlockrecord("DEFINITIONS", DEFINITIONS, convkey);
 	}
@@ -997,7 +997,7 @@ nextbrandcode:
 				{}
 			}
 		};//ii;
-		write(var().date(), DEFINITIONS, "DELETEWRONGPLURALTASKS");
+		var().date().write(DEFINITIONS, "DELETEWRONGPLURALTASKS");
 	}
 
 	call log2("*delete obsolete tasks", logtime);
@@ -1013,7 +1013,7 @@ nextbrandcode:
 	call log2("*create default timesheet parameters", logtime);
 	var rec;
 	if (not(rec.read(DEFINITIONS, "TIMESHEET.PARAMS"))) {
-		write("N" ^ FM ^ 0 ^ FM ^ 16 ^ FM ^ 3 ^ FM ^ 0 ^ FM ^ "DEFAULTED", DEFINITIONS, "TIMESHEET.PARAMS");
+		("N" ^ FM ^ 0 ^ FM ^ 16 ^ FM ^ 3 ^ FM ^ 0 ^ FM ^ "DEFAULTED").write(DEFINITIONS, "TIMESHEET.PARAMS");
 	}
 
 	call log2("*setup timesheet reminder/approval autorun", logtime);
@@ -1035,7 +1035,7 @@ nextbrandcode:
 	call log2("*create the initial client account inverted index", logtime);
 	if (not(rec.read(DEFINITIONS, "CLIENTACNOINDEX"))) {
 		perform("LISTCOLLECTIONS UPDATEINDEX");
-		write(var().date(), DEFINITIONS, "CLIENTACNOINDEX");
+		var().date().write(DEFINITIONS, "CLIENTACNOINDEX");
 	}
 
 	call log2("*add languages to media type booking text", logtime);
@@ -1044,15 +1044,17 @@ nextbrandcode:
 	call log2("*add executive to vouchers analysis codes", logtime);
 	if (not(rec.read(DEFINITIONS, "CONVERSION*ADDEXEC"))) {
 		perform("ADDEXEC (U)");
-		write(var().date(), DEFINITIONS, "CONVERSION*ADDEXEC");
+		var().date().write(DEFINITIONS, "CONVERSION*ADDEXEC");
 	}
 
 	call log2("*autoconfigure TV certification codes before 9 DEC 2010", logtime);
 	var tv;
 	if (tv.read(agy.jobtypes, "TV")) {
 		if (tv.a(20) == "" and (tv.a(11)).floor() <= 15685) {
-			tv.r(20, convert(",", VM, "OK,(DNA),(ERROR),(DURATION),(COPY),(PLACEMENT)"));
-			tv.r(21, convert(",", VM, "Aired/TIME/comment,Did not Air//comment,Error/time/COMMENT,Wrong Duration/TIME/COMMENT,Wrong Copy/TIME/COMMENT,Wrong Placement/TIME/COMMENT"));
+			tt = "OK,(DNA),(ERROR),(DURATION),(COPY),(PLACEMENT)";
+			tv.r(20, tt.convert(",", VM));
+			tt = "Aired/TIME/comment,Did not Air//comment,Error/time/COMMENT,Wrong Duration/TIME/COMMENT,Wrong Copy/TIME/COMMENT,Wrong Placement/TIME/COMMENT";
+			tv.r(21, tt.convert(",", VM));
 			tv.write(agy.jobtypes, "TV");
 		}
 	}
@@ -1077,7 +1079,7 @@ nextbrandcode:
 	}
 	if (tt < 16195) {
 		perform("UPDATE BOOKING_ORDERS FIX.BOOKINGS (U)");
-		write(var().date(), DEFINITIONS, "FIX*BOOKINGS");
+		var().date().write(DEFINITIONS, "FIX*BOOKINGS");
 	}
 
 	call log2("*do any pending schedules and program updates*", logtime);

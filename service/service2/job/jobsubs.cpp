@@ -26,6 +26,7 @@ var xx;
 var msg;
 var pikeys;
 var yy;
+var topjob;
 var otherusercode;
 var wsmsg;
 
@@ -169,7 +170,7 @@ lockit:
 
 	} else if (mode == "DEF.EXECUTIVE") {
 		if (authorised("JOB UPDATE EXECUTIVE", msg, "UP")) {
-			ANS = calculate("BRAND_CODE").xlate("BRANDS", 11, "X");
+			ANS = (calculate("BRAND_CODE")).xlate("BRANDS", 11, "X");
 		}else{
 			if (not win.is) {
 				if (ANS == "") {
@@ -455,8 +456,7 @@ unlockprodorders:
 						var topjobno = ID.field("-", 1, leveln);
 
 						//check higher job exists
-						var topjob;
-						if (not(topjob.read(agy.jobs, topjobno))) {
+						if (not topjob.read(agy.jobs, topjobno)) {
 							msg = DQ ^ (topjobno ^ DQ) ^ " Main Job does not exist.|You must create it first";
 							win.reset = 5;
 							return invalid(msg);

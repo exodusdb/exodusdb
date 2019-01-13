@@ -3,16 +3,30 @@
 #define EXODUSDLFUNC_UPDBALANCES_H
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_updbalances;
+//ExodusFunctorBase efb_updbalances;
+class efb_updbalances : private ExodusFunctorBase
+{
+public:
+
+efb_updbalances(MvEnvironment& mv) : ExodusFunctorBase("updbalances", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_updbalances& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var updbalances(in balancesfile, in balanceskey, in deleting, in balanceperiod, in amount, in baseamount, in unused, in basecurrency, in vouchertype)
+var operator() (in balancesfile, in balanceskey, in deleting, in balanceperiod, in amount, in baseamount, in unused, in basecurrency, in vouchertype)
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_updbalances.pmemberfunction_==NULL)
-  efb_updbalances.init("updbalances","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -21,9 +35,15 @@ var updbalances(in balancesfile, in balanceskey, in deleting, in balanceperiod, 
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_updbalances.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_updbalances.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_updbalances.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_updbalances.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   (balancesfile,balanceskey,deleting,balanceperiod,amount,baseamount,unused,basecurrency,vouchertype);
 
 }
+
+};
+efb_updbalances updbalances{mv};
 //#endif

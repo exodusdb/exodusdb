@@ -3,16 +3,30 @@
 #define EXODUSDLFUNC_DOCMODS_H
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_docmods;
+//ExodusFunctorBase efb_docmods;
+class efb_docmods : private ExodusFunctorBase
+{
+public:
+
+efb_docmods(MvEnvironment& mv) : ExodusFunctorBase("docmods", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_docmods& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var docmods(in letterheadopts, io tx)
+var operator() (in letterheadopts, io tx)
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_docmods.pmemberfunction_==NULL)
-  efb_docmods.init("docmods","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -21,9 +35,15 @@ var docmods(in letterheadopts, io tx)
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_docmods.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_docmods.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_docmods.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_docmods.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   (letterheadopts,tx);
 
 }
+
+};
+efb_docmods docmods{mv};
 //#endif

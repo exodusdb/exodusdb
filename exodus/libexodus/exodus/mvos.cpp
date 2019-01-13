@@ -113,6 +113,10 @@ namespace stdfs = boost::filesystem;
 #include <cstdlib> //for getenv and setenv/putenv
 #include <algorithm> //for count in osrename
 
+//to get whole environment
+extern char **environ;
+#include <boost/locale.hpp>
+
 //boost changed from TIME_UTC to TIME_UTC_ (when?) to avoid a new standard TIME_UTC macro in C11 time.h
 #include <boost/version.hpp>
 #if BOOST_VERSION < 105000
@@ -818,6 +822,22 @@ bool var::osgetenv(const var& envvarname)
 	THISIS(L"bool var::osgetenv(const var& envvarname)")
 	THISISDEFINED()
 	ISSTRING(envvarname)
+
+	//return whole environment if blank envvarname
+	if (envvarname.var_mvstr.length()==0) {
+		var_mvstr=L"xxx";
+		var_mvtyp=pimpl::MVTYPE_STR;
+
+		int i = 1;
+		char *s = *environ;
+ 		for (; s; i++) {
+			//printf("%s\n", s);
+			var_mvstr.append(boost::locale::conv::utf_to_utf<wchar_t>(s));
+			var_mvstr.append(L"\n");
+			s = *(environ+i);
+		}
+		return true;
+	}
 
 	#pragma warning (disable : 4996)
 	const char* cvalue=std::getenv(envvarname.toString().c_str());

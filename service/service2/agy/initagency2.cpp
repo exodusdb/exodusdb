@@ -9,6 +9,7 @@ libraryinit()
 #include <fin.h>
 
 var typecode;
+var rec;
 
 function main(io logtime, in reloading="") {
 	//c agy io,""
@@ -79,8 +80,7 @@ function main(io logtime, in reloading="") {
 nextjobtype:
 		if (readnext(typecode)) {
 
-			var rec;
-			if (not(rec.read(agy.jobtypes, typecode))) {
+			if (not rec.read(agy.jobtypes, typecode)) {
 				goto nextjobtype;
 			}
 
@@ -121,7 +121,7 @@ nextjobtype:
 			goto nextjobtype;
 		}
 
-		write(var().date(), DEFINITIONS, "JOB_TYPES*UPDTAGSTYPES");
+		var().date().write(DEFINITIONS, "JOB_TYPES*UPDTAGSTYPES");
 	}
 
 	call log2("*autostop inactive job executives", logtime);
@@ -129,7 +129,7 @@ nextjobtype:
 		tt = "";
 	}
 	if (tt < 16968) {
-		var dom = (var().date()).oconv("D/E").field("/", 1) + 0;
+		var dom = ((var().date()).oconv("D/E")).field("/", 1) + 0;
 		var cmd = "CREATEALERT INACTJOBEXEC_ONCE JOB INACTIVEJOBEXECS:365:S {} NEOSYS (ROS)";
 		//ensure it will run sometime up to 28th, monthly
 		if (dom > 28) {
@@ -144,7 +144,7 @@ nextjobtype:
 		tt.swapper("_ONCE", "");
 		tt.swapper("{}", "7:" ^ dom);
 		perform(tt);
-		write(var().date(), DEFINITIONS, "INIT*INACTJOBEXEC");
+		var().date().write(DEFINITIONS, "INIT*INACTJOBEXEC");
 	}
 
 	call log2("*autostop inactive media executives", logtime);
@@ -152,7 +152,7 @@ nextjobtype:
 		tt = "";
 	}
 	if (tt < 16968) {
-		var dom = (var().date()).oconv("D/E").field("/", 1) + 0;
+		var dom = ((var().date()).oconv("D/E")).field("/", 1) + 0;
 		var cmd = "CREATEALERT INACTMEDIAEXEC_ONCE MEDIA INACTIVEMEDIAEXECS:365:S {} NEOSYS (ROS)";
 		//ensure it will run sometime up to 28th, monthly
 		if (dom > 28) {
@@ -167,7 +167,7 @@ nextjobtype:
 		tt.swapper("{}", "7:" ^ dom);
 		tt.swapper("_ONCE", "");
 		perform(tt);
-		write(var().date(), DEFINITIONS, "INIT*INACTMEDIAEXEC");
+		var().date().write(DEFINITIONS, "INIT*INACTMEDIAEXEC");
 	}
 
 	call log2("*autostop inactive vehicles", logtime);
@@ -175,7 +175,7 @@ nextjobtype:
 		tt = "";
 	}
 	if (tt < 16207) {
-		var dom = (var().date()).oconv("D/E").field("/", 1) + 0;
+		var dom = ((var().date()).oconv("D/E")).field("/", 1) + 0;
 		var cmd = "CREATEALERT INACTVEH_ONCE MEDIA INACTIVEVEHICLES:365:S {} NEOSYS (ROS)";
 		//ensure it will run sometime up to 28th, monthly
 		if (dom > 28) {
@@ -190,7 +190,7 @@ nextjobtype:
 		tt.swapper("_ONCE", "");
 		tt.swapper("{}", "7:" ^ dom);
 		perform(tt);
-		write(var().date(), DEFINITIONS, "INIT*INACTVEH");
+		var().date().write(DEFINITIONS, "INIT*INACTVEH");
 	}
 
 	call log2("*autoclose inactive jobs", logtime);
@@ -198,7 +198,7 @@ nextjobtype:
 		tt = "";
 	}
 	if (tt < 16230) {
-		var dom = (var().date()).oconv("D/E").field("/", 1) + 0;
+		var dom = ((var().date()).oconv("D/E")).field("/", 1) + 0;
 		var cmd = "CREATEALERT INACTJOB_ONCE JOB INACTIVEJOBS:365:C {} NEOSYS (ROS)";
 		//ensure it will run sometime up to 28th, monthly
 		if (dom > 28) {
@@ -213,7 +213,7 @@ nextjobtype:
 		tt.swapper("{}", "7:" ^ dom);
 		tt.swapper("_ONCE", "");
 		perform(tt);
-		write(var().date(), DEFINITIONS, "INIT*INACTJOB");
+		var().date().write(DEFINITIONS, "INIT*INACTJOB");
 	}
 
 	call log2("*run CREATEADS if required and before 7am and not test data", logtime);

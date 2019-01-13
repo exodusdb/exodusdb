@@ -3,16 +3,30 @@
 #define EXODUSDLFUNC_SECID_H
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_secid;
+//ExodusFunctorBase efb_secid;
+class efb_secid : private ExodusFunctorBase
+{
+public:
+
+efb_secid(MvEnvironment& mv) : ExodusFunctorBase("secid", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_secid& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var secid(in input, in max)
+var operator() (in input, in max)
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_secid.pmemberfunction_==NULL)
-  efb_secid.init("secid","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -21,9 +35,15 @@ var secid(in input, in max)
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_secid.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_secid.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_secid.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_secid.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   (input,max);
 
 }
+
+};
+efb_secid secid{mv};
 //#endif

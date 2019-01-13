@@ -2,84 +2,88 @@
 libraryinit()
 
 #include <log2.h>
-#include <initagency.h>
-#include <initgeneral2.h>//alternatively it could be performed
+#include <initgeneral2.h>
+#include <inputbox.h>
+#include <shadowmfs.h>
+#include <systemfile.h>
+#include <colortoescold.h>
 #include <otherusers.h>
+#include <getauthorisation.h>
+#include <cid.h>
+#include <readbakpars.h>
+#include <shell2.h>
+#include <trim2.h>
 #include <authorised.h>
-#include <logprocess.h>
 #include <openfile.h>
+#include <logprocess.h>
+#include <neosyslogin.h>
 #include <sysmsg.h>
 #include <initcompany.h>
-#include <initacc.h>
-#include <readbakpars.h>
-#include <usersubs.h>
-#include <addcent.h>
 
 #include <gen.h>
-//#include <fin.h>
+#include <fin.h>
 
+var lastlog;
 var logtime;
-var neosysid;
+var msg;
 var pidrec;
 var dbdate;
 var dbtime;
 var dbdatetimerequired;
-var msg;
-var reply;//num
+var reply;
 var reply2;
-var temp;
 var colors;
 var tt;//num
+var reportkey;
+var oldrecord;
+var lastdate;
+var config;
+var tt2;//num
 var smtp;
+var s33;
+var bakpars;
 var vn;
 var os;
 var ver;
+var vern;
+var cpu;
 var errors;
 var shadow;
-var log;
+var companycode;
+var market;
 var dostime;
-var bakpars;
+var reminder;
+var docid;
+var codepaging;
 var version;
 var upgradelog;
-var codepaging;
 var systemx;
-
-var xx;
+var yy;
 
 function main() {
-	//return true or false to caller to abort
-	var thisname="initgeneral";
+	//
+	//c gen
+	//global tt,tt2,s33
 
-	call log2("-----initgeneral init", logtime);
+	//!WARNING decide() returns REPLY number instead of VALUE when not interactive
 
-	//CREATE LABELLED COMMON gen
-	mv.labelledcommon[2]=new gen_common;
-	//TODO iscommon always true?!
-	if (not iscommon(gen)) {
-		if (not iscommon(gen)) {
-			var().stop("gen common is not initialised in " ^ thisname);
-		}
-	}
+	//ensure cursor on the left
+	print(var().at(0));
 
-	//CREATE LABELED COMMON fin
-	//unfortunately general needs finance for now until some finance commons
-	//get moved into general common (and this moved into initacc)
-	//mv.labelledcommon[3]=new fin_common;
-	//if (not iscommon(fin)) {
-	//	var().stop("fin common is not initialised in " ^ thisname);
-	//}
+	call log2("GETLASTLOG", lastlog);
 
-/*
-gen.gcurrcompany="";
-gen.company="";
-USERNAME="";
-if (not DEFINITIONS.open("DEFINITIONS")) {
-	var().stop("cant open DEFINITIONS");
-}
-*/
+	call log2("*Starting INIT.GENERAL --- STARTUP/RESTART ---", logtime);
+
+	//unused system variables like @user0 not @recur0
+	//http://www.sprezzatura.com/library/revmedia/attack.php
+	//@sw<10>='XYZ'
+	//@vw<10>='ABC'
+
+	//!!! do not use getenv before initialised - or shell etc which uses it
+	//gosub getenv
+	call initgeneral2("GETENV", logtime);
 
 	var resetting = PSEUDO == "RESET";
-
 	var initmode = SENTENCE.field(" ", 2);
 	PSEUDO = "";
 	//equ request to @user0
@@ -94,11 +98,10 @@ if (not DEFINITIONS.open("DEFINITIONS")) {
 	//(used to run detached processes)
 	//equ getfilename to system<2>;*TRANSACTION printfile name while performing print program
 	//equ getflag to system<3>;*1=printing program has reset setptr to prn and done its own printing
-	//equ getprintern to system<4>;*OBSOLETE SESSION default printer number
 	//equ sessionid to system<4>;*SESSION WAS system<32>
 	var sessionid = SYSTEM.a(4);
-	//equ printptr to system<5>;*used in BP and GBP/MSG3
-	//equ servermode to system<6>;1=yes OBSOLETE
+	//equ printptr to system<5>;*used in BP and GBP/MSG3. could be moved
+	//equ interruptfilename to system<6>
 	//equ html to system<7>;OBSOLETE 1=output html if possible;2=output html
 	//equ clientwebsite to system<8>;*eg www.neosys.com
 	//equ nprocessors to system<9>
@@ -120,7 +123,7 @@ if (not DEFINITIONS.open("DEFINITIONS")) {
 	//equ currdatasetcode to system<17> ;*SESSION
 	//equ outsidebackup to system<20>
 	//equ preventauth to system<21>
-	//equ sleepsecs to system<22> no longer used
+	//equ sleepsecs to system<22>
 	//equ currdatasetname to system<23>;*SESSION
 	//equ process number/connection number to system<24>;*SESSION
 
@@ -177,15 +180,30 @@ if (not DEFINITIONS.open("DEFINITIONS")) {
 	//equ connection to system<54>
 	//equ controlurl to system<55>
 	//equ httpproxy to system<56>;*httphost:port vm bypasslist vm user vm pass
-	//equ installationdesc to system<57>;*should be like hostname
+
+	//equ installationdesc to system<57>;*should be like hostname eg unilever
+	//will be used for system email sender and ddns like
+	//eg domain name eg unilever -> zoneedit UNILEVER.HOSTS.NEOSYS.COM
+	//dns is invaluable for server on dynamic ip number but useful for any server
+	//because will create automatically and adapt if and when ip changes
+	//may need to specify TTL of 60 seconds on zoneedit if created automatically
+	//because auto created domains may get default TTL eg 600 seconds/10 mins
+
 	//equ databasecodes to system<58> *multivalued
 	//equ numprocessesreq to system<59> *mv with 58
 	//equ backupreq to system<60> *mv with 58
+	//LOGON.OLD sets to 1 if "TEST", INIT.GENERAL sets to 1 if not backed up
 	//system<61> to testdata or notlivedata
 	//system<62> to copyreq mv with 58
 	//system<63> to testdatabasecode mv with 58
 	//free 63-70
 	//system<71> to system<99> used for backup.cfg details
+	//bakpars from DOS BACKUP.CFG and readbakpars. created from SYSTEM.CFG
+	//system<73>=bakpars<3> backup time from
+	//system<74>=bakpars<4> backup time upto
+	//system<76>=bckpars<6> alert email addresses
+	//system<77>=bakpars<7> backup drive
+	//system<82>=bakpars<12> backup drive for uploads/images
 	//system<99>
 	//system<100> mv times of SYSTEM.CFG,..\..\SYSTEM.CFG etc detect reconfig
 	//system<101> to system<109> used for smtp.cfg details
@@ -206,23 +224,46 @@ if (not DEFINITIONS.open("DEFINITIONS")) {
 	//system<124> to checkforupgrades 0 1 default to yes
 	//system<125> to closeafterbackups 0 1 default to yes
 	//system<126> to testcanstartprocesses 0 1 default to no
+	//system<127> to charset eg greek is windows-1253, arabic is windows-1256
+	//mode con cp -> Code page:
+	//720 -> arabic
+	//737 -> greek
+	//437 -> standard dos latin us
+	//system<128> to max nologin days
+	//system<129> to initwaitsecs default to 55
 	//see also systemconfiguration_dict.js
+	//system<130> to allpunctuation
+	//system<131> to monitor https port - default 4428
 
-	//std::wcout<<"Opening Definitions ... "<<std::flush;
-	var definitionsfilename="DEFINITIONS";
-	if (!DEFINITIONS.open(definitionsfilename))
-	{
-		if (!DEFINITIONS.createfile(definitionsfilename)||!DEFINITIONS.open(definitionsfilename))
-		{
-			std::wcerr<<"Cannot create "<<definitionsfilename<<std::endl;
-			return false;
+	call log2("*init.general obtaining exclusive access:", logtime);
+	var verbs;
+	if (verbs.open("VERBS", "")) {
+		//timeout and crash out quickly otherwise might get unlimited processes
+		//this lock is in INIT.GENERAL and MONITOR2 (to avoid starting processes)
+		var initwaitsecs = SYSTEM.a(129);
+		if (not initwaitsecs) {
+			initwaitsecs = 50 + var(10).rnd();
+		}
+		//also in LOGON.OLD and INIT.GENERAL
+		var lockkey = "INIT.GENERAL.LOGIN";
+		if (not verbs.lock( lockkey)) {
+			//np if own lock
+			if (FILEERROR ne "414") {
+				if (not(lockrecord("VERBS", verbs, "INIT.GENERAL.LOGIN", "", initwaitsecs))) {
+					msg = "INIT.GENERAL couldnt get exclusive lock. Quitting.";
+					//maybe a long upgrade process is running
+					call note(msg);
+					if (SYSTEM.a(33)) {
+						gosub failbatch();
+					}
+					perform("OFF");
+					var().logoff();
+				}
+			}
+		}
 	}
-	}
-	//std::wcout<<"OK"<<std::endl;
 
-	if (not neosysid.osread("NEOSYS.ID")) {
-		neosysid = "";
-	}
+	var neosysid = var("NEOSYS.ID").osfile();
 
 	call log2("*determine the pid if possible", logtime);
 	if (not SYSTEM.a(54)) {
@@ -246,7 +287,7 @@ if (not DEFINITIONS.open("DEFINITIONS")) {
 			dbdatetimerequired = dbdate.iconv("D") + dbtime.iconv("MT") / 86400;
 		}else{
 		}
-		if (DEFINITIONS.open("DEFINITIONS")) {
+		if (DEFINITIONS.open("DEFINITIONS", "")) {
 			var dbversion;
 			if (not(dbversion.read(DEFINITIONS, "DBVERSION"))) {
 				goto updateversion;
@@ -254,35 +295,28 @@ if (not DEFINITIONS.open("DEFINITIONS")) {
 			if (oldmethod and dbversion.a(1) == 14334.5) {
 			}
 			if (dbversion.a(1) > dbdatetimerequired) {
-				msg = "Software version " ^ (dbversion.a(1)).oconv("D") ^ " " ^ (dbversion.a(1).field(".", 2)).oconv("MTS") ^ " is incompatible with" ^ FM ^ "Database version " ^ dbdate ^ " " ^ dbtime;
+				msg = "Software version " ^ dbversion.a(1).oconv("D") ^ " " ^ (dbversion.a(1).field(".", 2)).oconv("MTS") ^ " is incompatible with" ^ FM ^ "Database version " ^ dbdate ^ " " ^ dbtime;
 				msg = msg.oconv("L#60");
 				//abort since db is advanced
-				var options;
-				var msgx;
 				if (not interactive) {
 badversion:
 					USER4 = msg;
-					gosub fail();
-
-					return false;
+					gosub failbatch();
+					var().stop();
 
 				}else{
 decideversion:
-					options = "Quit (RECOMMENDED)";
+					var options = "Quit (RECOMMENDED)";
 					options.r(-1, "Continue");
 					options.r(-1, "Mark database as version " ^ dbdate ^ " " ^ dbtime ^ " and continue");
-					if (not(decide("!" ^ msg ^ "", options, reply))) {
-						reply = 1;
-					}
+					call decide("!" ^ msg ^ "", options, reply);
 					if (reply == 1) {
 						goto badversion;
 					}
-					msgx =
-						"!WARNING *UNPREDICTABLE* CONSEQUENCES"  _FM_
-						"WHAT IS THE PASSWORD?";
-					input(msgx, reply2);
+					var msgx = "!WARNING *UNPREDICTABLE* CONSEQUENCES" ^ FM ^ FM ^ "WHAT IS THE PASSWORD?";
+					call inputbox(msgx, 20, 0, "", reply2, 0x1B);
 					if (reply2 ne "UNPREDICTABLE") {
-						call mssg("THAT IS NOT THE CORRECT PASSWORD");
+						call note("THAT IS NOT THE CORRECT PASSWORD");
 						goto decideversion;
 					}
 					if (reply == 3) {
@@ -296,8 +330,106 @@ updateversion:
 				dbversion.r(3, dbtime);
 				dbversion.write(DEFINITIONS, "DBVERSION");
 			}
+//L921:
 		}
 	}
+
+	call log2("*copy any new data records", logtime);
+	var bp;
+	if (bp.open("GBP", "")) {
+		for (var ii = 1; ii <= 9999; ++ii) {
+			var rec;
+			if (not(rec.read(bp, "$DATA." ^ ii))) {
+				rec = "";
+			}
+		///BREAK;
+		if (rec == "") break;;
+			var filename = rec.a(1);
+			var id = rec.a(2);
+			rec = rec.field(FM, 3, 99999);
+			var file;
+			if (file.open(filename, "")) {
+				rec.write(file, id);
+			}
+		};//ii;
+	}
+
+	//syslock=if revrelease()>=2.1 then 36 else 23
+
+	//place lock indicating processing (initialising actually)
+	//if interactive else call rtp57(syslock, '', '', trim(@station):system<24>, '', '', '')
+
+	//EMS MEMORY notes
+	//explanation of how to use power-on setup or emsmagic
+	//to enable EMS as good as possible
+	//NB NEOSYS memory is tested in LOGON.OLD
+	//http://www.columbia.edu/~em36/wpdos/emsxp.html
+
+	//AREV startup options
+	//http://www.revelation.com/knowledge.nsf/461ff2bd5a8ddeed852566f50065057d/3c57c588ce21daf9852563920051f70b?OpenDocument
+	//AREV adagency,neosys /X /M4096
+	// /X tells the system to use EMS memory for variable storage.
+	// /M tells the system to use EMS memory for running and executing programs.
+	// /M can also be followed by an option memory allocation amount in kilobytes.
+	//You should never allocate more than 4096K of EMS memory otherwise unstable
+	// /O tells the system to not use any EMS memory at all.
+	// /E tells the system to not use the on-board math chip and use a math chip emulator instead.
+	// /, prompts for a user name
+
+	/* no longer required since CONFIG.NT and AUTOEXEC.NT now in neosys\neosys;
+		call log2('*improve NT/XP memory configuration',logtime);
+		sys32='c:\windows\system32\';
+		osread temp from sys32:'config.nt' else;
+			sys32='c:\winnt\system32\';
+			end;
+		//improve NT/XP memory configuration
+		//autoconfigure no DOSX.EXE if no EMS
+		//always do this now since some EMS systems use normal memory for both blocks
+		//if not(get.ems('')) else
+			//remove DOSX.EXE but only if no EMS available
+			//since it can cause problems for other system programs
+			osread temp from sys32:'autoexec.nt' then;
+				temp2=temp;
+				//tt='lh %SystemRoot%\system32\mscdext.exe'
+				//tt<-1>='lh %SystemRoot%\system32\dosx'
+				//tt<-1>='lh %SystemRoot%\system32\redir'
+				//NB change case to DOSX.EXE so that if someone uncomments it
+				//it will not be converted again
+				//swap 'lh %SystemRoot%\system32\dosx' with ucase('rem neosys ':'lh %SystemRoot%\system32\dosx') in temp2
+				//now comment out ALL lh lines changing case to LH so uncommenting will work
+				swap \0A\:'lh ' with \0A\:'rem NEOSYS LH ' in temp2;
+				if temp2<>temp then call oswrite(temp2,sys32:'autoexec.nt');
+				end;
+		// end
+		osread temp from sys32:'config.nt' then;
+			temp2=temp;
+			pos1=index(temp,\0A\:'files=',1);
+			if pos1 then;
+				line=temp[pos1+1,\0D\];
+				temp2[pos1+1,len(line)]='FILES=200';
+				if temp2<>temp then call oswrite(temp2,sys32:'config.nt');
+				end;
+			end;
+	*/
+
+	call log2("*force replication system to reinitialise", logtime);
+	call shadowmfs("NEOSYSINIT", "");
+
+	call log2("*reattach data", logtime);
+	var VOLUMES = VOLUMES(0);
+	var nvolumes = VOLUMES(0).count(FM) + 1;
+	for (var volumen = 1; volumen <= nvolumes; ++volumen) {
+		var volume = VOLUMES.a(volumen);
+		if (volume.substr(1,8) == ("..\\" "DATA" "\\")) {
+			execute("ATTACH " ^ volume ^ " (S)");
+		}
+	};//volumen;
+
+	call log2("*perform RUN GBP LOGON.OLD UPGRADEVERBS", logtime);
+	perform("RUN GBP LOGON.OLD UPGRADEVERBS");
+
+	//call log2('*set workstation time to server time',logtime)
+	//call settime('')
 
 	call log2("*save the original username and station", logtime);
 	if (not SYSTEM.a(43)) {
@@ -307,76 +439,184 @@ updateversion:
 		SYSTEM.r(44, STATION.trim());
 	}
 
+	call log2("*detach merges", logtime);
+	//locate 'MERGES' in @files using fm setting xx then perform 'DETACH MERGES (S)'
+	var xx;
+	if (xx.open("MERGES", "")) {
+		perform("DETACH MERGES (S)");
+	}
+
+	call log2("*get user video table if any", logtime);
+	var temp = ENVIRONKEYS.a(2);
+	temp.converter(".", "");
+	if (colors.osread(temp ^ ".VID")) {
+		var color2;
+		if (not(color2.read(systemfile(), ENVIRONKEYS ^ ".VIDEO"))) {
+			color2 = "";
+		}
+		if (colors ne color2) {
+			colors.write(systemfile(), ENVIRONKEYS ^ ".VIDEO");
+			call colortoescold();
+		}
+	}
+	//fix monochrome video problem
+	//TEMP=CHAR(27):'C70'
+	//IF @EW<3>=TEMP AND @EW<6>=TEMP THEN @EW<3>=CHAR(27):'C07'
+
+	call log2("*setup escape sequence for standard color and background", logtime);
+	temp = HW.a(3)[4] ^ HW.a(8)[4];
+	if (temp == "00") {
+		temp = "70";
+	}
+	tt = 0x1B;
+	tt ^= "C";
+	tt ^= temp;
+	AW.r(30, tt);
+
 	call log2("*convert reports file", logtime);
-	var reports;
-	if (reports.open("REPORTS")) {
-		begintrans();
-		reports.select();
-		var reportkey;
-		while (reports.readnext(reportkey)) {
-			var reportkey;
-			if (RECORD.read(reports, reportkey)) {
-				var filename = reportkey.field("*", 1);
-				var file;
-				if (file.open(filename)) {
-					var keyx = reportkey.field("*", 2);
-					keyx.swapper("%2A", "*");
-					if (RECORD.a(1) == "%DELETED%") {
-						var rec;
-						if (rec.read(file, keyx)) {
-							//if rec<1>='NEOSYS' then delete file,keyx
-							//if rec<8>='NEOSYS' then delete file,keyx
-							file.deleterecord(keyx);
-						}
-					}else{
-						var oldrecord;
-						if (not(oldrecord.read(file, keyx))) {
-							oldrecord = "";
-						}
-						//only update documents if changed anything except update timedate
-						if (filename == "DOCUMENTS") {
-							oldrecord.r(8, RECORD.a(8));
-						}
-						if (RECORD ne oldrecord) {
-							RECORD.write(file, keyx);
+	if (SYSTEM.a(17) ne "DEVDTEST") {
+		var reports;
+		if (reports.open("REPORTS", "")) {
+			reports.select();
+nextreport:
+			if (readnext(reportkey)) {
+				if (RECORD.read(reports, reportkey)) {
+					var filename = reportkey.field("*", 1);
+					var file;
+					if (file.open(filename, "")) {
+						var keyx = reportkey.field("*", 2);
+						keyx.swapper("%2A", "*");
+						if (RECORD.a(1) == "%DELETED%") {
+							var rec;
+							if (rec.read(file, keyx)) {
+								//if rec<1>='NEOSYS' then delete file,keyx
+								//if rec<8>='NEOSYS' then delete file,keyx
+								file.deleterecord(keyx);
+								
+							}
+						}else{
+							if (not oldrecord.read(file, keyx)) {
+								oldrecord = "";
+							}
+							//only update documents if changed anything except update timedate
+							if (filename == "DOCUMENTS") {
+								oldrecord.r(8, RECORD.a(8));
+							}
+							if (RECORD ne oldrecord) {
+								RECORD.write(file, keyx);
+							}
 						}
 					}
 				}
+				goto nextreport;
 			}
 		}
-		committrans();
 	}
 
 	//if OPENFILE('DEFINITIONS',DEFINITIONS) then null
-	if (not(DEFINITIONS.open("DEFINITIONS"))) {
+	if (not(DEFINITIONS.open("DEFINITIONS", ""))) {
 		var().chr(7).output();
 		msg = "The DEFINITIONS file is missing";
 		msg.r(-1, "Did you startup using the right command file/datasettype?");
-		call mssg(msg);
+		call note(msg);
 	}
 
-	call log2("*count the number of other processes", logtime);
-	var notherusers = otherusers("").a(1);
+	var notherusers = (otherusers("")).a(1);
 
-	call log2("*check the operating system date", logtime);
-//checksysdate:
-	var config = "";
-	if (not config.osread("NEOSYS.CFG")) {
-		if (config.osread("\\lastdate.rev\\")) {
-			{}
+	call log2("*check/get authorisation", logtime);
+	if (SYSTEM.a(4) == "" and not SYSTEM.a(33)) {
+		var nusers = getauthorisation();
+		if (not nusers) {
+
+			call log2("*if batchmode then respond to response file and close", logtime);
+			if (SYSTEM.a(33)) {
+				gosub failbatch();
+				var().stop();
+			}
+
+			call log2("*inform user and close", logtime);
+			msg = var("594F552043414E4E4F5420555345204E454F53595320534F465457415245204F4E205448495320434F4D50555445527C554E54494C20594F5520484156452054484520415554484F5249534154494F4E204E554D4245522E").iconv("HEX");
+
+			var().chr(7).output().str(3);
+			call note(msg);
+			perform("OFF");
+			var().logoff();
+
 		}
+
+		call log2("*check users", logtime);
+		//if nusers lt otherusers('')+1 then
+		if (nusers < notherusers + 1) {
+			msg = var("4D4158494D554D20415554484F5249534544204E554D424552204F46205553455253204558434545444544").iconv("HEX");
+			call note(msg);
+			if (SYSTEM.a(33)) {
+				gosub failbatch();
+			}
+			perform("OFF");
+			var().logoff();
+		}
+
 	}
 
-	var lastdate = config.a(1);
-
-	call log2("*update last used date", logtime);
+	call log2("*prevent use of this program via F10", logtime);
+	if (initmode ne "LOGIN" and LEVEL ne 1 and interactive and not resetting) {
+		msg = "You cannot quit from within another program via F10.";
+		msg.r(-1, "Please quit all programs first and then try again.");
+		var().chr(7).output();
+		call note(msg);
+		var().stop();
+	}
+	/*;
+		call log2('*check the operating system date',logtime);
+	CHECKSYSDATE:
+		CONFIG='';
+		OSREAD CONFIG FROM 'NEOSYS.CFG' ELSE;
+			OSREAD CONFIG FROM '\lastdate.rev\' THEN null;
+			END;
+		LASTDATE=CONFIG<1>;
+		IF LASTDATE and interactive THEN;
+			IF DATE() LT LASTDATE OR DATE() GT (LASTDATE+14) THEN;
+				MSG='';
+				MSG<-1>="Is today's date ":OCONV(DATE(),'D4'):' ?';
+				MSG<-1>=' ';
+				MSG<-1>='(According to internal records, the';
+				MSG<-1>='computer was last used on the ':LASTDATE 'D4':",|but the computer's date is now ":DATE() 'D4':')';
+				MSG<-1>=' ';
+				MSG<-1>=' ';
+				if DECIDE(MSG,'',REPLY) ELSE EXECUTE 'OFF';logoff;
+				//if not today's date then use DOS to set it
+				IF REPLY NE 1 THEN;
+					DATA '';
+					PERFORM 'PC DATE';
+					GOTO CHECKSYSDATE;
+					END;
+				END;
+			END;
+	*/
+	call log2("*update \"last used date\"", logtime);
 	if (var().date() ne lastdate) {
 		config.r(1, var().date());
 		call oswrite(config, "NEOSYS.CFG");
 	}
 
 	call log2("*check for invalid characters in workstation name", logtime);
-	STATION.converter(SQ^DQ,"");
+	if (STATION.index("\'", 1) or STATION.index(DQ, 1)) {
+		msg = "WARNING: NEOSYS WILL NOT WORK PROPERLY BECAUSE";
+		msg ^= FM ^ "YOUR WORKSTATION NAME (" ^ STATION.trim() ^ ")";
+		msg ^= FM ^ "CONTAINS QUOTATION MARKS. PLEASE ASK YOUR ";
+		msg ^= FM ^ "TECHNICIAN TO CHANGE THE WORKSTATION NAME.";
+		var().chr(7).output();
+		call note("!" ^ msg ^ "|");
+	}
+
+	call log2("*convert SYSTEM to SYSTEM.CFG", logtime);
+	//leave old SYSTEM around in case old version of software reinstalled
+	//can be deleted manually
+	if (tt.osread("SYSTEM")) {
+		if (not(var("SYSTEM.CFG").osfile())) {
+			var(tt).oswrite("SYSTEM.CFG");
+		}
+	}
 
 	//save current system so we can restore various runtime parameters
 	//which are unfortunately stored with configuration params
@@ -388,16 +628,21 @@ updateversion:
 	if (not(SYSTEM.read(DEFINITIONS, "SYSTEM"))) {
 		SYSTEM = "";
 	}
-	gosub getsystem("SYSTEM.CFG", 2);
-	gosub getsystem("..\\..\\" "SYSTEM.CFG", 1);
+	tt = "SYSTEM.CFG";
+	tt2 = 2;
+	gosub getsystem();
+	tt = "..\\..\\" "SYSTEM.CFG";
+	tt2 = 1;
+	gosub getsystem();
 
-	//default installation group is GLOBAL
+	//! system configuration defaults
+	// installation group
 	if (not SYSTEM.a(123)) {
 		SYSTEM.r(123, "GLOBAL");
 	}
 	// upgrades yes
-	if (not SYSTEM.a(124)) {
-		SYSTEM.r(124, 2);
+	if (SYSTEM.a(124) == "") {
+		SYSTEM.r(124, 1);
 	}
 	//close after backup yes
 	if (not SYSTEM.a(125)) {
@@ -408,8 +653,8 @@ updateversion:
 		SYSTEM.r(126, 0);
 	}
 
-	call log2("*determine systemid from old smtp sender name", logtime);
 	if (not SYSTEM.a(57)) {
+		call log2("*determine systemid from old smtp sender name", logtime);
 		call osread(smtp, "..\\..\\SMTP.CFG");
 		if (not smtp.a(1)) {
 			call osread(smtp, "SMTP.CFG");
@@ -420,7 +665,7 @@ updateversion:
 			}
 		}
 		if (smtp.a(1)) {
-			var sysname = smtp.a(1).field("@", 1).lcase();
+			var sysname = (smtp.a(1).field("@", 1)).lcase();
 			//remove all punctuation
 			sysname.converter("!\"#$%^&*()_+-=[]{};:@,./<>?", "");
 			SYSTEM.r(57, sysname);
@@ -430,9 +675,20 @@ updateversion:
 		}
 	}
 
-	//force reevaluation of cid
-	//SYSTEM.r(111, "");
-	//SYSTEM.r(111, cid());
+	//call log2('*save database system parameters',logtime)
+	//dont do this anymore since copying system params from place
+	//to place is probably wrong
+	//read tt from definitions,'SYSTEM' else
+	// write system on definitions,'SYSTEM'
+	// end
+
+	call log2("*force reevaluation of cid", logtime);
+	SYSTEM.r(111, "");
+	SYSTEM.r(111, cid());
+	//try twice because was unreliable and is important
+	if (not SYSTEM.a(111)) {
+		SYSTEM.r(111, cid());
+	}
 
 	SYSTEM.r(51, APPLICATION);
 
@@ -448,7 +704,7 @@ updateversion:
 	//sessionid
 	SYSTEM.r(4, oldsystem.a(4));
 	//server mode (not interactive)
-	var s33 = SYSTEM.a(33);
+	s33 = SYSTEM.a(33);
 	//currdatasetname
 	SYSTEM.r(23, oldsystem.a(23));
 	//process/connection number
@@ -467,6 +723,10 @@ updateversion:
 
 	oldsystem = "";
 
+	//<61>=testdb (not livedb)
+	call readbakpars(bakpars);
+	SYSTEM.r(61, bakpars.a(11));
+
 	//call log2('*determine time offset')
 	//blank means dont offset - use system server timezone whatever it is
 	//NB system<118>should be configured PER DATABASE not per INSTALLATION
@@ -476,16 +736,17 @@ updateversion:
 	//@sw<3> could be the adjustment to get dbtz from servertz
 	SW = "";
 	//now ONLY supporting display time different from server time on gmt/utc servers
+	//if sysgmtoffset
 	if (SYSTEM.a(120)) {
 		//if server not on gmt/utc and user tz is set then warning
 		//since a) usertime will be server time b) database will get non-gmt date/times
-		if (SYSTEM.a(118)) {
-			call mssg("WARNING: User time zone ignored and|Database storing non-GMT/UTC date/time|because current server is not GMT/UTC");
-		}
+		//if system<118> then
+		// call note('WARNING: User time zone ignored and|Database storing non-GMT/UTC date/time|because current server is not GMT/UTC (is ':system<120>:')')
+		// end
 	}else{
 		SW.r(1, SYSTEM.a(118));
 		//if display time is not server/gmt/utc then adjust offset to server/gmt/utc
-		if ((SW.a(1)).length()) {
+		if (SW.a(1).length()) {
 			//system time offset is currently automatically determined by CID()
 			//CID will tell you the current server tz
 			//but should this be recorded in the dataset in case it is moved
@@ -517,23 +778,49 @@ updateversion:
 	call log2("*determine upload path", logtime);
 	tt = SYSTEM.a(49);
 	if (tt == "") {
-		tt="..\\images\\";
-	} else if (tt[-1] ne SLASH) {
-		tt ^= SLASH;
+		SYSTEM.r(49, "..\\images\\");
+	} else if (tt[-1] ne "\\") {
+		SYSTEM.r(49, tt ^ "\\");
 	}
-	SYSTEM.r(49, tt).convert("\\/", SLASH^SLASH);
-
-	call log2("*default form and report color", logtime);
-	if (not(SYSTEM.a(46, 1))) {
+//L3143:
+	if (not SYSTEM.a(46, 1)) {
 		SYSTEM.r(46, 1, "#FFFF80");
 	}
-	if (not(SYSTEM.a(46, 2))) {
+	if (not SYSTEM.a(46, 2)) {
 		SYSTEM.r(46, 2, "#FFFFC0");
 	}
 	//if system<46,3> else system<46,3>=''
 
 	call log2("*backup the system default style", logtime);
 	SYSTEM.r(47, SYSTEM.a(46));
+
+	//why is this called again?
+	call initgeneral2("GETENV", logtime);
+
+	call log2("*get codepage as an environment variable", logtime);
+	//will not override entries in SYSTEM.CFG
+	if (not(SYSTEM.a(12).locateusing("CODEPAGE", VM, vn))) {
+		var output = shell2("MODE CON:", xx);
+		output = trim2(output.convert("\r\n", FM ^ FM), FM);
+		var codepage = field2(output, " ", -1);
+		SYSTEM.r(12, vn, "CODEPAGE");
+		SYSTEM.r(13, vn, codepage);
+
+		if (SYSTEM.a(127) == "") {
+			tt = "";
+			if (codepage == 720) {
+				tt = "windows-1256";
+			}
+			if (codepage == 737) {
+				tt = "windows-1253";
+			}
+			SYSTEM.r(127, tt);
+		}
+
+	}
+
+	//allpunctuation
+	SYSTEM.r(130, " `~@#$%^&*()_+-=[]{};\\:\"|,./<>?\\|" "\'");
 
 	call log2("*first uses of getenv", logtime);
 	if (not(osgetenv("OS", os))) {
@@ -547,12 +834,117 @@ updateversion:
 	}
 	SYSTEM.r(9, tt);
 
+	call log2("*get windows version", logtime);
+	ver = shell2("VER", xx);
+	ver.converter(FM ^ VM, "  ");
+	ver.converter("\r\n", "  ");
+	//if index(ver,'Windows 9',1) or index(ver,'NT',1) or index(os,'NT',1) then
+	ver = ver.trim().ucase();
+	if (ver.index("WINDOWS", 1) or ver.index("NT", 1) or os.index("NT", 1)) {
+		SYSTEM.r(12, -1, "WORDSIZE");
+		SYSTEM.r(13, -1, "32");
+	}
+	ver = (ver.field(" ", 4)).field("]", 1);
+	//Windows Server 2003 5.2.3790 (24.04.2003)
+	//Windows Server 2003, SP1 5.2.3790.1180
+	//Windows Server 2003 5.2.3790.1218
+	//Windows Server 2008 6.0.6001 (27.02.2008)
+	var ver2 = ver.field(".", 1, 2);
+	if (var("5.0,5.1,5.2,6.0,6.1,6.2,6.3").locateusing(ver2, ",", vern)) {
+		ver2 = var("2000,XP,2003,2008,2008R2,2012,2012R2").field(",", vern);
+		ver = ver.fieldstore(".", 1, -2, "Win" ^ ver2);
+		ver.swapper(".6001", "");
+		ver.swapper(".6002", " SP2");
+		ver.swapper(".3790", "");
+	}
+	SYSTEM.r(12, -1, "VER");
+	SYSTEM.r(13, -1, ver.trim());
+
+	call log2("*get cpu version", logtime);
+	if (var("WMIC.CFG").osfile()) {
+		//grep "model name" /proc/cpuinfo
+		cpu = "Unknown";
+	}else{
+		cpu = shell2("WMIC CPU GET NAME", xx);
+
+		//Name
+		//Intel(R) Xeon(R) CPU E5645 @ 2.40GHz
+
+		//Name
+		//Intel(R) Xeon(TM) CPU 3.40GHz
+		//Intel(R) Xeon(TM) CPU 3.40GHz
+
+		if (cpu.substr(1,2) == "\xFF\xFE") {
+			cpu.splicer(1, 2, "");
+			cpu.converter(0x00, "");
+		}
+		cpu.swapper("(R)", "");
+		cpu.swapper("(TM)", "");
+		cpu.swapper("Intel", "");
+		cpu.swapper("CPU", "");
+		cpu.converter("-", " ");
+		var nsockets = cpu.count("\r") - 1;
+		cpu.converter("\r\n", FM ^ FM);
+		var nlogical = SYSTEM.a(9);
+		cpu = cpu.a(3).trim() ^ " ";
+		tt = nlogical / nsockets;
+		if (tt > 1) {
+			cpu ^= nsockets ^ "x" ^ tt;
+		}else{
+			cpu ^= "x" ^ nsockets;
+		}
+	}
+
+	SYSTEM.r(12, -1, "CPU");
+	SYSTEM.r(13, -1, cpu);
+
 	//done in logon.old now
 	//call log2('*check/detect current dataset',logtime)
 	//currdataset=field(definitions[index(ucase(definitions),'\':'DATA':'\',1)+6,9999],'\',1)
 	//system<17>=currdataset
 	var currdataset = SYSTEM.a(17);
+	/*;
+		call log2('*warning if too little or too much EMS memory',logtime);
+		ems.allocated=get.ems('');
+		if interactive and not(index(os,'NT',1)) and not(index(ver,'Millennium',1)) then;
+			//if ems.allocated>1024000 or ems.allocated<512000 then
+			if ems.allocated>1100000 or ems.allocated<512000 then;
+				msg='WARNING: NEOSYS may not work reliably because it|has ';
+				if ems.allocated>1024000 then;
+					msg:='been given more than';
+				end else;
+					msg:='not been given';
+					end;
+				msg:=' 1024Kb of "EMS" memory|';
+				msg:='|1. Close NEOSYS' 'L#35';
+				msg:='|2. Right click the NEOSYS icon' 'L#35';
+				msg:='|3. Choose "Properties"' 'L#35';
+				msg:='|4. click "Memory"' 'L#35';
+				msg:='|5. Set "EMS" memory to 1024' 'L#35';
+				msg:='|6. Click "OK" and restart NEOSYS' 'L#35';
+				print char(7):
+				call note('!':msg:'|');
+				end;
+			end;
 
+		call log2('*get diskfreespace',logtime);
+		reqfreemb=10;
+		freemb=(diskfreespace(drive()[1,2])/1024/1024) 'MD00';
+
+		call log2('*check if diskfreespace is sufficient',logtime);
+		//notherusers=otherusers('')+1
+		if freemb lt (reqfreemb*notherusers) then;
+		//if 1 then
+			msg='THERE IS NOT ENOUGH FREE DISK SPACE AVAILABLE';
+			msg:='||NEOSYS needs at least ':reqfreemb:'Mb PER USER|of free space on disk ':drive()[1,2]:' but';
+			msg:='|there is only ':freemb:'Mb available.';
+			if notherusers then msg:='||There is/are ':notherusers:' other users online.';
+			print char(7):
+			call note(msg:'|');
+			//stop
+			//if freemb then perform 'OFF'
+			end;
+	*/
 	call log2("*try to update upload.dll", logtime);
 	//for extn=1 to 3
 	// ext=field('net,w3c,www',',',extn)
@@ -572,20 +964,22 @@ updateversion:
 
 	call log2("*find cygwin", logtime);
 	var locations = SYSTEM.a(50);
-	locations.r(1, -1, "C:\\CYGWIN\\BIN\\" _VM_ "\\CYGWIN\\BIN\\" _VM_ "..\\..\\CYGWIN\\BIN\\");
-	var nn = locations.count(VM) + 1;
+	locations.r(1, -1, "C:\\CYGWIN\\BIN\\,\\CYGWIN\\BIN\\,..\\..\\CYGWIN\\BIN\\");
+	var nn = locations.count(",") + 1;
 	for (var ii = 1; ii <= nn; ++ii) {
-		var location = locations.a(1, ii);
+		var location = locations.field(",", ii);
 		if (location[-1] ne "\\") {
 			location ^= "\\";
 		}
-		tt = var().oslistf(location ^ "*.*");
+		//initdir location:'*.*'
+		//tt=dirlist()
+		tt = oslistf();
 		if (tt) {
 			SYSTEM.r(50, location);
 		}
-		if (tt == "") {
-		};//ii;
-	}
+	///BREAK;
+	if (not(tt == "")) break;;
+	};//ii;
 
 	/* using proxycfg;
 	The following example specifies that HTTP servers are accessed through;
@@ -601,49 +995,126 @@ updateversion:
 	call log2("*find http proxy", logtime);
 	if (SYSTEM.a(56) == "") {
 		var cmd = "proxycfg";
-		var result;
 getproxy:
-		result = cmd.osshellread().lcase();
-		tt = result.index("proxy server(s)", 1).convert("\n","\r");
+		var result = shell2(cmd, errors).lcase();
+		tt = result.index("proxy server(s)", 1);
 		if (tt) {
-			result=result.substr(tt);
-			tt = result.field(";", 1).field(var().chr(13), 1);
-			tt = tt.field(":", 2, 99).trim();
+			//tt=result[tt,';'][1,char(13)]
+			tt = result.substr(tt,9999);
+			tt = (tt.field(";", 1)).field(var().chr(13), 1);
+			tt = (tt.field(":", 2, 99)).trim();
 			tt.swapper("http=", "");
 		} else if (cmd == "proxycfg") {
 			cmd = "netsh winhttp import proxy ie";
 			goto getproxy;
+			{}
 		} else {
 			tt = "";
 		}
+		{}
 		//todo get proxybypasslist
 		SYSTEM.r(56, tt);
 	}
-
-	call log2("*put up the backup reminder", logtime);
-	var reminder = "";
-	if (not SYSTEM.a(20) and not resetting) {
-		call backupreminder(currdataset);
-	}
-
+	/*;
+		call log2('*put up the backup reminder',logtime);
+		reminder='';
+		if interactive and not(system<20>) and not(resetting) then;
+			call backupreminder(currdataset,msg);
+			if msg then call mssg(msg,'UB':FM:FM:FM:2,reminder,'');
+			end;
+	*/
 	call log2("*default date format is DD/MM/YY", logtime);
 	DATEFORMAT = "D2/E";
 
-	call log2("*get security ... also in LISTEN", logtime);
+	call log2("*get security - also in LISTEN", logtime);
 	if (not(SECURITY.read(DEFINITIONS, "SECURITY"))) {
-		if (temp.open("DICT", "DEFINITIONS")) {
+		if (temp.open("dict_DEFINITIONS")) {
 			if (SECURITY.read(temp, "SECURITY")) {
 				SECURITY.write(DEFINITIONS, "SECURITY");
 			}
 		}
 	}
-//	SECURITY = SECURITY.invert();
+	SECURITY = SECURITY.invert();
+
+	//must be before init.acc, init.agency or any task adding
+	//call security.subs2('FIXUSERPRIVS')
+
+	//call log2('*create MASTER user if no users',logtime)
+	//if userprivs<1> else
+	// userprivs<1>='MASTER'
+	// write invert(userprivs) on definitions,'SECURITY'
+	// end
+
+	//setup a few tasks in advance since failure to find task in client
+	//doesnt cause automatic addition into auth file since only disallowed
+	//tasks are sent to client for speed
+	//Failure to show all possible tasks would mean difficulty to know
+	//what tasks are available to be locked
+	//in init.xxx files per module
+	if (APPLICATION == "ACCOUNTS") {
+		tt = "GS";
+	}else{
+		tt = "NEOSYS";
+	}
+	if (not(authorised("DATABASE STOP", msg, tt))) {
+		{}
+	}
+	if (not(authorised("DATABASE RESTART", msg, tt))) {
+		{}
+	}
+	if (not(authorised("DATASET COPY", msg, tt))) {
+		{}
+	}
+	if (not(authorised("%RENAME%" "AUTHORISATION UPDATE KEYS", msg, "AUTHORISATION UPDATE GROUPS"))) {
+		{}
+	}
+	if (not(authorised("AUTHORISATION UPDATE LOCKS", msg, tt))) {
+		{}
+	}
+	if (tt == "GS") {
+		tt = "LS";
+	}
+	if (not(authorised("SYSTEM CONFIGURATION CREATE", msg, tt))) {
+		{}
+	}
+	if (not(authorised("SYSTEM CONFIGURATION UPDATE", msg, tt))) {
+		{}
+	}
+	if (not(authorised("SYSTEM CONFIGURATION DELETE", msg, tt))) {
+		{}
+	}
+	if (not(authorised("CURRENCY UPDATE DECIMALS", msg, "NEOSYS"))) {
+		{}
+	}
+	if (not(authorised("MENU SUPPORT", msg, "SUPPORT MENU ACCESS"))) {
+		{}
+	}
+	if (not(authorised("%DELETE%" "SUPPORT MENU ACCESS", xx))) {
+		{}
+	}
+	if (not(authorised("UPLOAD CREATE", xx))) {
+		{}
+	}
+	if (not(authorised("REQUESTLOG ACCESS", msg, "MENU SUPPORT"))) {
+		{}
+	}
+
+	if (not(authorised("%RENAME%" "AUTHORISATION CREATE USERS", xx, "USER CREATE"))) {
+		{}
+	}
+	if (not(authorised("%RENAME%" "AUTHORISATION DELETE USERS", xx, "USER DELETE"))) {
+		{}
+	}
+	//if security('%UPDATE%':'USER UPDATE',xx,'AUTHORISATION UPDATE') else null
+	if (not(authorised("USER UPDATE", xx, "AUTHORISATION UPDATE"))) {
+		{}
+	}
 
 	call log2("*create user file", logtime);
 	var users;
-	if (not(users.open("USERS"))) {
+	if (not(users.open("USERS", ""))) {
 
-		if (not(openfile("USERS", users, "DEFINITIONS"))) {
+		if (not(openfile("USERS", users, "DEFINITIONS", 1))) {
 			{}
 		}
 
@@ -654,6 +1125,7 @@ getproxy:
 			var USER = usercodes.a(1, usern);
 			if (not(USER.index("---", 1))) {
 				USER.writev(users, USER, 1);
+				
 			}
 		};//usern;
 
@@ -661,253 +1133,367 @@ getproxy:
 
 	call log2("*terminate old session", logtime);
 	if (sessionid ne "") {
-		call logprocess(sessionid, "LOGOFF");
+		call logprocess(sessionid, "LOGOFF", "", "", "", "");
 		SYSTEM.r(4, "");
 	}
 
 	call log2("*get user name", logtime);
+	//prevent F5
 	if (not resetting) {
-		//call neosyslogin("INIT");
-		USERNAME="SYSTEM";
+		ENVIRONSET.r(38, "");
+		call neosyslogin("INIT");
 	}
 
-	call log2("*init.general waiting for exclusive access ...", logtime);
-	var definitions;
-	if (definitions.open("DEFINITIONS")) {
-		//timeout and crash out quickly otherwise might get unlimited processes
-		//this lock is in INIT.GENERAL and MONITOR2 (to avoid starting processes)
-		if (not(lockrecord("DEFINITIONS", definitions, "INIT.GENERAL.LOGIN", "", 9))) {
-			msg = "INIT.GENERAL couldnt get exclusive lock";
-			//maybe a long upgrade process is running
-			//call sysmsg(msg)
-			//tt-=1
-			//if tt then goto locksys
-			call mssg(msg);
-			if (SYSTEM.a(33)) {
-				gosub fail();
-			}
-
-			//abort startup
-			return false;
-		}
-	}
+	//moved up before any updating
+	//call log2('*init.general obtaining exclusive access:',logtime)
 
 	call log2("*start new session", logtime);
 	sessionid = "";
-	call logprocess(sessionid, "LOGIN");
+	call logprocess(sessionid, "LOGIN", "", "", "", "");
 	SYSTEM.r(4, sessionid);
+
+	if (not SYSTEM.a(22).length()) {
+		SYSTEM.r(22, 300);
+	}
+
+	call log2("*suppress background indexing if time out is active", logtime);
+	if (SYSTEM.a(22)) {
+		INDEXTIME = 0;
+	}
+
+	call log2("*suppress words not to be indexed", logtime);
+	//see ED SYSTEM * ... ENVIRONMENT words like LTD
+	DEFAULTSTOPS = "";
+
+	//this may not be necessary now that menus are determined by authorisation
+	call log2("*get maintenance user menu if any", logtime);
+	if (xx.open("SCHEDULES", "")) {
+		temp = "ADAGENCY";
+	}else{
+		temp = "NEOSYS2";
+	}
+	ENVIRONSET.r(37, temp);
+
+	call log2("*force the F1 key to be general help (Ctrl+F1) instead of context help", logtime);
+	PRIORITYINT.r(1, var().chr(0) ^ ";");
+
+	if (authorised("USE SPECIAL KEYS", msg, "")) {
+		INTCONST.r(4, var().chr(0) ^ var("41").iconv("HEX"));
+		INTCONST.r(18, var().chr(0) ^ var("1F").iconv("HEX"));
+		INTCONST.r(26, var().chr(0) ^ var("19").iconv("HEX"));
+		PRIORITYINT.r(7, var("1F").iconv("HEX"));
+		MOVEKEYS.r(27, var("14").iconv("HEX"));
+		MOVEKEYS.r(25, var("05").iconv("HEX"));
+		//break key on
+	}else{
+		INTCONST.r(4, "");
+		INTCONST.r(18, "");
+		INTCONST.r(26, "");
+		PRIORITYINT.r(7, "");
+		MOVEKEYS.r(27, "");
+		MOVEKEYS.r(25, "");
+		//break key off
+	}
+
+	call log2("*allow/disallow F5", logtime);
+	if (authorised("USE TCL COMMAND KEY F5", msg, "")) {
+		ENVIRONSET.r(38, 1);
+		//@priority.int<2>=char(0):iconv('3F','HEX')
+	}else{
+		ENVIRONSET.r(38, "");
+		//@priority.int<2>=''
+	}
+
+	perform("ADDMFS SHADOW.MFS FILEORDER.COMMON");
 
 	call log2("*open general files", logtime);
 	var valid = 1;
-	DEFINITIONS = "";
-	if (not(openfile("ALANGUAGE", xx, "DEFINITIONS"))) {
+	//DEFINITIONS='' why was this commented out?
+	if (not(openfile("ALANGUAGE", fin.alanguage))) {
 		valid = 0;
 	}
-	if (not(openfile("COMPANIES", gen.companies, "DEFINITIONS"))) {
+	if (not(openfile("COMPANIES", gen.companies))) {
 		valid = 0;
 	}
-	if (not(openfile("CURRENCIES", gen.currencies, "DEFINITIONS"))) {
+	if (not(openfile("CURRENCIES", gen.currencies))) {
 		valid = 0;
 	}
-	//markets should be gen.markets instead of agy.markets to allow initialisation of company with market code
-	var markets;
-	if (not(openfile("MARKETS", markets, "DEFINITIONS"))) {
+	if (not(openfile("UNITS", gen.units))) {
+		valid = 0;
+		gen.units = "";
+	}
+	if (not(openfile("ADDRESSES", gen.addresses))) {
 		valid = 0;
 	}
-	if (not(openfile("UNITS", gen.units, "DEFINITIONS"))) {
-		valid = 0;
-	}
-	if (not(openfile("ADDRESSES", gen.addresses, "DEFINITIONS"))) {
-		valid = 0;
-	}
-	if (not(openfile("DOCUMENTS", gen.documents, "DEFINITIONS"))) {
+	if (not(openfile("DOCUMENTS", gen.documents, "ADDRESSES", 1))) {
 		valid = "";
 	}
-	if (not(openfile("TIMESHEETS", gen.timesheets, "DEFINITIONS"))) {
+	if (not(openfile("TIMESHEETS", gen.timesheets, "ADDRESSES", 1))) {
 		valid = "";
+	}
+	if (not(openfile("SHADOW", shadow, "COMPANIES", 1))) {
+		valid = "";
+	}
+	if (not valid) {
+		var().chr(7).output();
+		if (interactive) {
+			call note("DO NOT CONTINUE UNLESS YOU KNOW WHAT YOU ARE DOING");
+		}
 	}
 
-	if (not(openfile("CURRENCY_VERSIONS", xx, "CURRENCIES"))) {
+	if (not(openfile("CURRENCY_VERSIONS", xx, "CURRENCIES", 1))) {
 		valid = "";
 	}
-	if (xx.open("MARKETS")) {
-		if (not(openfile("MARKET_VERSIONS", xx, "MARKETS"))) {
+	if (xx.open("MARKETS", "")) {
+		if (not(openfile("MARKET_VERSIONS", xx, "MARKETS", 1))) {
 			valid = "";
 		}
 	}
-	if (not(openfile("COMPANY_VERSIONS", xx, "COMPANIES"))) {
+	if (not(openfile("COMPANY_VERSIONS", xx, "COMPANIES", 1))) {
 		valid = "";
 	}
 
 	call log2("*open processes own lists file", logtime);
-	var workdir = "NEOS" ^ (SYSTEM.a(24)).oconv("R(0)#4");
 
-	//not needed yet
-	//var workpath = "DATAVOL\\" ^ workdir ^ "\\";
-	//if (not oslistf(workpath)) {
-	//	osmkdir(workpath);
-	//}
+	var workdir = "NEOS" ^ SYSTEM.a(24).oconv("R(0)#4");
+	var workpath = "DATAVOL\\" ^ workdir ^ "\\";
 
-	call log2("*open/make/clear lists file", logtime);
+	//check/create folder
+	//initdir workpath:'REVMEDIA.*'
+	//tt=dirlist()
+	tt = oslistf(workpath ^ "REVMEDIA.*");
+	if (not tt) {
+		osshell("MD " ^ workpath);
+		perform("NM " ^ workpath ^ " " ^ var().timedate() ^ "(S)");
+	}
+
+	//attach folder
+	perform("ATTACH " ^ workpath ^ " (S)");
+
+	//check/make LISTS file
 	var lists;
-	if (not(lists.open("LISTS"))) {
-		var filename="LISTS";
-		lists.createfile(filename);
-		if (not(lists.open(filename))) {
-			call sysmsg(DQ ^ (filename ^ DQ) ^ " could not be created by INIT.GENERAL");
+	if (not(lists.open("LISTS", ""))) {
+		lists = "";
+	}
+	if (not lists.index(workpath, 1)) {
+		var cmd = "MAKEFILE " ^ workpath ^ " LISTS";
+		perform(cmd ^ " (S)");
+		if (not(lists.open("LISTS", ""))) {
+			lists = "";
+		}
+		if (not lists.index(workpath, 1)) {
+			//call note('FAILED TO MAKE LISTS FILE ON ':workpath
 		}
 	}
-	var().clearfile(lists);
 
-	call log2("*make global process and statistics files", logtime);
-	var FILENAMES = "PROCESSES" _VM_ "STATISTICS";
-	for (var ii = 1; ii <= 999; ++ii) {
-		var filename = FILENAMES.a(1, ii);
-		if (filename) {
-			//TODO lock/prevent double create with other processes
-			var file;
-			if (not(file.open(filename))) {
-				file.createfile(filename);
-				if (not(file.open(filename))) {
-					call sysmsg(DQ ^ (filename ^ DQ) ^ " could not be created by INIT.GENERAL");
-				}
-			}
-		};//ii;
+	call log2("*check lists file exists", logtime);
+	if (not(lists.open("LISTS", ""))) {
+		var().clearfile(lists);
 	}
+
+	//call log2('*check lists file are not corrupted and zero them if they are',logtime)
+	//no need since always cleared above now
+	////call checkfile'LISTS')
+
+	call log2("*check indexing, locks and processes files are not corrupted and zero them if they are", logtime);
+	//call checkfile"!INDEXING");
+	//call checkfile"LOCKS");
+	//call checkfile"PROCESSES");
+
+	call log2("*check/fix !xxx records in !xxx files", logtime);
+	//call fixindexes);
+
+	//clear out ancient expired locks
+	//TODO
+
+	/*;
+		call log2('*fix LOG file location bug',logtime);
+		//was logging per process number instead of per database
+		//due to misassociation with LISTS file instead of DEFINITIONS file
+		//will correctly reassociate IF process number remains de facto related to db
+		year=(date() 'D')[-4,4];
+		//proper place for log file is next to definitions
+		if openfile('LOG':year,log,'DEFINITIONS') then;
+			//if log file is in the work folder
+			if index(log,'DATAVOL',1) then;
+				//volume=log[-28,17]
+				//get rid of the bad file by renaming it
+				perform 'RENAMEFILE LOG':year:' LOG':year:'.BAD (S)';
+				//get back to any existing correct file
+				perform 'ATTACH ..\DATA\':system<17>:'\GENERAL LOG':year:' (S)';
+				//open/create new in the right place
+				if openfile('LOG':year,log,'DEFINITIONS') then;
+					//and copy the bad log file records to the good log file
+					perform 'COPY LOG':year:'.BAD * (SO) TO: (LOG':year;
+					end;
+				end;
+			end;
+	*/
+
+	call log2("*make global per installation files", logtime);
+	var FILENAMES = "PROCESSES,STATISTICS,REQUESTLOG";
+	for (var ii = 1; ii <= 999; ++ii) {
+		var filename = FILENAMES.field(",", ii);
+	///BREAK;
+	if (not filename) break;;
+		//TODO lock/prevent double create with other processes
+		var file;
+		if (not(file.open(filename, ""))) {
+			perform("MAKEFILE REVBOOT " ^ filename ^ " (S)");
+			perform("CONVGLOBAL REVBOOT GLOBAL " ^ filename ^ " (S)");
+			perform("DELETEFILE DICT." ^ filename ^ " (S)");
+			perform("ATTACH .\\GENERAL DICT." ^ filename ^ " (S)");
+			perform("ATTACH REVBOOT " ^ filename ^ " (S)");
+			if (not(file.open(filename, ""))) {
+				call sysmsg(DQ ^ (filename ^ DQ) ^ " could not be created by INIT.GENERAL");
+			}
+		}
+	};//ii;
 
 	call log2("*perform the autoexec task BEFORE initialising other systems", logtime);
 	if (not neosysid) {
-		if (openfile("DEFINITIONS", DEFINITIONS)) {
-			if (temp.read(DEFINITIONS, "AUTOEXEC")) {
-				perform("TASK AUTOEXEC");
+		//IF OPENFILE('DEFINITIONS',DEFINITIONS) THEN
+		if (temp.read(DEFINITIONS, "AUTOEXEC")) {
+			perform("TASK AUTOEXEC");
+		}
+		// END
+	}
+
+	call log2("*get first company for init.acc", logtime);
+	var().clearselect();
+	gen.companies.select();
+	var anyfixed = -1;
+fixnextcompany:
+	anyfixed += 1;
+	if (readnext(companycode)) {
+		if (not gen.company.read(gen.companies, companycode)) {
+			goto fixnextcompany;
+		}
+
+		var marketcode = gen.company.a(30);
+		if (marketcode) {
+			var markets;
+			if (markets.open("MARKETS", "")) {
+				if (not market.read(markets, marketcode)) {
+					msg = DQ ^ (marketcode ^ DQ) ^ " is missing from company " ^ companycode;
+					call note(msg);
+					goto fixcompany;
+				}
+			}
+		}
+
+		call log2("*remove obsolete period 13 from deloitte data", logtime);
+		if (gen.company.index("13X4WEEK,1/7,5", 1)) {
+			tt = gen.company.a(16);
+			tt.swapper("13/", "12/");
+			gen.company.r(16, tt);
+fixcompany:
+			gen.company.write(gen.companies, companycode);
+			goto fixnextcompany;
+		}
+
+		if (anyfixed) {
+			goto fixnextcompany;
+		}
+	}
+
+	call log2("*open accounts system files", logtime);
+	if (APPLICATION == "ACCOUNTS" or APPLICATION == "ADAGENCY") {
+		//open 'ACCOUNTS' to xx THEN
+		// open 'ABP' to xx THEN
+		perform("INIT.ACC");
+		// end
+	}
+	perform("MACRO ACCOUNTS");
+
+	call log2("*open advertising system files INIT.AGENCY", logtime);
+	if (xx.open("SCHEDULES", "")) {
+		if (xx.open("BP", "")) {
+			perform("INIT.AGENCY " ^ resetting);
+		}
+	}
+
+	call log2("*add new indexes", logtime);
+	if (not(listindexes("TIMESHEETS", "JOB_NO"))) {
+		if (APPLICATION == "ADAGENCY") {
+			execute("MAKEINDEX TIMESHEETS JOB_NO");
+			if (not(openfile("TIMESHEETS", gen.timesheets))) {
+				gen.timesheets = "";
 			}
 		}
 	}
 
-	call log2("*get an initial company to work with for init routines", logtime);
-	gen.companies.clearselect();
-	begintrans();
-	//TODO should be a sequence code on companies to sort the important companies first
+	call log2("*add number format to company records", logtime);
 	gen.companies.select();
-	if (not gen.companies.readnext(gen.gcurrcompany)) {
-
-		//var().stop("no companies setup - cannot start server");
-
-		gen.gcurrcompany="1";
-		var basecurrencycode="USD";
-        var marketcode="ALL";
-
-		call log2("*create initial company " ^ gen.gcurrcompany, logtime);
-		var company="";
-		company.r(1, "Company 1");//company name
-		company.r(2, "1/17");//current financial year
-		company.r(3, basecurrencycode);//base currency code
-		company.r(6, "1");
-		company.r(10,"31/12/2002");//date format
-		company.r(14,"ENGLISH");//language
-		company.r(22,"1,000.00");//number format
-		company.r(30,"ALL");//market
-		//company(36)=1;//version
-		company.write("COMPANIES",gen.gcurrcompany);
-
-		call log2("*create initial currency " ^ basecurrencycode, logtime);
-		var currency="";
-		if (!currency.read("CURRENCIES",basecurrencycode)) {
-			currency.r(1, "US Dollar");
-			currency.r(2, "cents");
-			currency.r(3, 2);//number of decimals
-			currency.r(4, date());//exchange rate date
-			currency.r(5,1);//exchange rate
-			currency.r(12,1);//reverse exchange rate
-			//currency(26,1);//version
-			currency.write("CURRENCIES",basecurrencycode);
+	var numberformat = "";
+	fin.currcompany = "";
+convcompany:
+	if (readnext(fin.currcompany)) {
+		var tempcompany;
+		if (tempcompany.read(gen.companies, fin.currcompany)) {
+			if (tempcompany.a(22) == "") {
+				if (not numberformat) {
+					call decide("Which format do you want for numbers ?||(See \"NUMBER FORMAT\" on the company file)", "1.000,00 (dot for thousands)" ^ VM ^ "1,000.00 (comma for thousands)", reply);
+					if (reply == 1) {
+						numberformat = "1.000,00";
+					}else{
+						numberformat = "1,000.00";
+					}
+				}
+				numberformat.writev(gen.companies, fin.currcompany, 22);
+				
+				goto convcompany;
+			}
 		}
-
-		call log2("*create initial market " ^ marketcode, logtime);
-		var market="";
-		if (!market.read("MARKETS",marketcode)) {
-			market.r(1,"All Markets");
-			//market(26)=1;//version
-			market.write("MARKETS",marketcode);
-		}
-
-	}
-//	gen.companies.clearselect();
-	committrans();
-	//finished selecting
-
-	if (gen.company.read(gen.companies, gen.gcurrcompany))
-		gen.company="";
-
-	gen.glang = "";
-
-	call log2("*check for finance module", logtime);
-	//if (xx.open("ACCOUNTS")) {
-		call log2("*initialise finance module - initacc", logtime);
-		call initacc();
-	//}
-
-	call log2("*check for agency module", logtime);
-	if (xx.open("JOBS")) {
-		call log2("*initialise agency module - initagency", logtime);
-		call initagency();
 	}
 
 	call log2("*get the company description", logtime);
+	gen.company = "";
 	var currperiod = "";
 	//call init.company('')
 	//change so that interactive ADAGENCY gets a company code
 	//force acquisition of language
 	gen.glang = "";
-	call initcompany(gen.gcurrcompany);
-
-	//is this needed?
-	//fin.currcompanycodes = gen.gcurrcompany;
-	//main company code
+	call initcompany(fin.currcompany);
+	fin.currcompanycodes = fin.currcompany;
+	gen.gcurrcompany = fin.currcompany;
 	SYSTEM.r(37, gen.gcurrcompany);
 
 	call log2("*check currency accounts", logtime);
-	var account,accounts;
-	if (accounts.open("ACCOUNTS")) {
-		msg = "";
-		if (not(account.read(accounts, gen.company.a(4)))) {
-			msg.r(-1, gen.company.a(4));
-		}
-		if (not(account.read(accounts, gen.company.a(5)))) {
-			msg.r(-1, gen.company.a(5));
-		}
-		if (not(account.read(accounts, gen.company.a(12)))) {
-			msg.r(-1, gen.company.a(12));
-		}
-		if (not(account.read(accounts, gen.company.a(19)))) {
-			msg.r(-1, gen.company.a(19));
-		}
-		if (msg) {
-			var().chr(7).output();
-			msg.swapper(FM, " ");
-			if (interactive) {
-				call mssg(DQ ^ (msg ^ DQ) ^ "|account missing - see company setup");
+	if (xx.open("ACCOUNTS", "")) {
+		if (xx.open("ABP", "")) {
+			msg = "";
+			if (not fin.account.read(fin.accounts, gen.company.a(4))) {
+				msg.r(-1, gen.company.a(4));
+			}
+			if (not fin.account.read(fin.accounts, gen.company.a(5))) {
+				msg.r(-1, gen.company.a(5));
+			}
+			if (not fin.account.read(fin.accounts, gen.company.a(12))) {
+				msg.r(-1, gen.company.a(12));
+			}
+			if (not fin.account.read(fin.accounts, gen.company.a(19))) {
+				msg.r(-1, gen.company.a(19));
+			}
+			if (msg) {
+				var().chr(7).output();
+				msg.swapper(FM, " ");
+				if (interactive) {
+					call note(DQ ^ (msg ^ DQ) ^ "|account missing - see company setup");
+				}
 			}
 		}
 	}
-
-  //database name
-	if (not SYSTEM.a(23))
-		SYSTEM.r(23,"Default");
-
-	//database
-	if (not SYSTEM.a(17))
-		SYSTEM.r(17,"exodus");
 
 	call log2("*ensure random key exists", logtime);
 	var datasetid;
 	if (not(datasetid.read(DEFINITIONS, "GLOBALDATASETID"))) {
 newdatasetid:
-		dostime=ostime().round(2);
+		dostime = ostime();
 		datasetid = var().date() ^ "." ^ dostime;
 		datasetid.converter(".", "");
 		datasetid = datasetid.oconv("MX");
-		datasetid = (datasetid ^ datasetid ^ datasetid ^ datasetid).substr(1, 8);
+		datasetid = (datasetid ^ datasetid ^ datasetid ^ datasetid).substr(1,8);
 adddatasetcodename:
 		datasetid.r(2, SYSTEM.a(23));
 		datasetid.r(3, SYSTEM.a(17));
@@ -920,30 +1506,24 @@ adddatasetcodename:
 	//lock database to particular computers unless logging in as NEOSYS
 	//if @username<>'NEOSYS' and datasetid<4> then
 	//lock even to NEOSYS to prevent installation where NEOSYS pass is known
-	//if (datasetid.a(4)) {
-	//	if (not(datasetid.locate(cid(), xx, 4))) {
-	//		USER4 = DQ ^ ("CANNOT USE THIS DATABASE ON THIS COMPUTER" ^ DQ);
-	//		goto failbatch;
-	//	}
-	//}
+	if (datasetid.a(4)) {
+		if (not datasetid.a(4).locateusing(cid(), VM, xx)) {
+			USER4 = DQ ^ ("CANNOT USE THIS DATABASE ON THIS COMPUTER" ^ DQ);
+			gosub failbatch();
+			var().stop();
+		}
+	}
 
-	call log2("*readbakpars and decide livedb or testdb", logtime);
-	call readbakpars(bakpars);
-	SYSTEM.r(61, bakpars.a(11));
+	//<61>=testdb (not livedb)
+	//call readbakpars(bakpars)
+	//system<61>=bakpars<11>
 
-	call log2("*suggest change globaldatasetid if changed datasetname or datasetid", logtime);
+	//suggest change globaldatasetid if changed datasetname or datasetid
 	if (datasetid.a(2) ne SYSTEM.a(23) or datasetid.a(3) ne SYSTEM.a(17)) {
-		//if (not SYSTEM.a(61) and interactive and USERNAME == "NEOSYS") {
-		if (not SYSTEM.a(61)) {
+		//if system<17>[-4,4]<>'TEST' and interactive and @username='NEOSYS' then
+		if (not SYSTEM.a(61) and interactive and USERNAME == "NEOSYS") {
 			if (datasetid.a(1) ne "1EEC633B") {
-				var question = 
-					"This database has been copied or|"
-					"the database name or code has been changed.|"
-					"Is this going to be a unique new master database?";
-				var options =
-					"Yes - Going to be a new independent database" _VM_
-					"No - just backing up, renaming or recoding the database";
-				call decide(question, options, reply, 2);
+				call decide("This database has been copied or|the database name or code has been changed.|Is this going to be a unique new master database?", "Yes - Going to be a new independent database" ^ VM ^ "No - just backing up, renaming or recoding the database", reply, 2);
 				if (reply == 1) {
 					goto newdatasetid;
 				}
@@ -953,51 +1533,63 @@ adddatasetcodename:
 	}
 	SYSTEM.r(45, datasetid.a(1));
 
-	call log2("*clean up document keys", logtime);
-	if (gen.documents.open("DOCUMENTS")) {
-		begintrans();
-		gen.documents.select();
+	//call log2('*check supported',logtime)
+	//if @username<>'NEOSYS' then
+	// locate datasetid<1> in '1DFE7C58' setting xx then
+	// if index(ucase(system<23>),'QATAR',1) then
+	// perform 'OFF'
+	// logoff
+	// end
+	// end
+	// end
 
-		var docid;
-		while (gen.documents.readnext(docid)) {
-			var docid2 = field2(docid, "\\", -1).field(".", 1);
+	call log2("*take down the backup reminder", logtime);
+	if (reminder) {
+		call mssg("", "DB", reminder, "");
+	}
+
+	if (not resetting) {
+
+		call log2("*show and update last login time", logtime);
+		var USER;
+		if (not(USER.read(DEFINITIONS, "USER*" ^ USERNAME))) {
+			USER = "";
+		}
+		if (USER.a(4) and interactive) {
+			var day = var("Mon,Tue,Wed,Thu,Fri,Sat,Sun").field(",", (USER.a(4) - 1) % 7 + 1);
+			call note("Info:||" ^ USERNAME ^ " last used " ^ currdataset ^ " on||" ^ day ^ " " ^ USER.a(4).oconv("D") ^ " at " ^ USER.a(5).oconv("MTH") ^ "||" ^ var("on workstation " ^ USER.a(6).trim()).oconv("C#40") ^ "|");
+		}
+
+		call log2("*save last login time", logtime);
+		USER.write(DEFINITIONS, "USER*" ^ USERNAME ^ "*LAST");
+
+		call log2("*update the last login time", logtime);
+		USER.r(4, var().date());
+		USER.r(5, var().time());
+		USER.r(6, STATION);
+		USER.write(DEFINITIONS, "USER*" ^ USERNAME);
+
+		//call log2('*check processes',logtime)
+		//clearselect
+		//if interactive and ems.allocated then perform 'LISTPROCESSES CHECK'
+
+	}
+
+	call log2("*clean up document keys", logtime);
+	if (gen.documents.open("DOCUMENTS", "")) {
+		gen.documents.select();
+nextdoc:
+		if (readnext(docid)) {
+			var docid2 = (field2(docid, "\\", -1)).field(".", 1);
 			if (docid2 ne docid) {
 				var doc;
 				if (doc.read(gen.documents, docid)) {
 					doc.write(gen.documents, docid2);
 					gen.documents.deleterecord(docid);
+					
 				}
 			}
-		}
-		committrans();
-	}
-
-	call log2("*save upgrade history and email notification", logtime);
-	if (version.osread("GENERAL\\VERSION.DAT")) {
-		version = version.field("\r", 1).field(0x1A, 1).trim();
-		var idate = (version.field(" ", 2, 4)).iconv("D");
-		var itime = (version.field(" ", 1)).iconv("MT");
-		call osread(upgradelog, "UPGRADE.CFG");
-		//if field2(upgradelog,crlf,-1) ne version then
-		if (field2(upgradelog, var().chr(10), -1) ne version) {
-			if (upgradelog) {
-				upgradelog ^= "\r\n";
-			}
-			upgradelog ^= version;
-			call oswrite(upgradelog, "UPGRADE.CFG");
-
-			//should only email users on live database (ie not copies that are not backedup)
-			if (not SYSTEM.a(61) and not var("NEOSYS.ID").osfile()) {
-				tt = idate.oconv("D/J") ^ " " ^ itime.oconv("MT");
-
-				if (decide("Email users about upgrade/to clear cache?|(F5 EMAILUSERS UPGRADE)|Mandatory if there are significant changes in web UI", xx) == 1) {
-
-					perform("EMAILUSERS UPGRADE " ^ version);
-				} else {
-					call sysmsg("NEOSYS Software Upgrade " ^ tt);
-				}
-			}
-
+			goto nextdoc;
 		}
 	}
 
@@ -1005,41 +1597,176 @@ adddatasetcodename:
 		perform("FINDDEADALL");
 	}
 
-/*TODO
+	if (not(VOLUMES(0).locateusing("DATAVOL", FM, xx))) {
+		//pcperform 'MD DATAVOL'
+		//call mkdir('DATAVOL':char(0),xx)
+		call osmkdir("DATAVOL");
+		perform("NM DATAVOL " ^ var().timedate() ^ "(S)");
+		perform("ATTACH DATAVOL (S)");
+	}
+
+	call log2("*convert codepage", logtime);
+	if (codepaging.osread("CODEPAGE.CFG")) {
+		var codepage;
+		if (not(codepage.read(DEFINITIONS, "PARAM*CODEPAGE"))) {
+			codepage = "0" ^ FM ^ codepaging.a(2);
+		}
+		if (codepage.a(2) == "737" and not codepage.a(1) and codepaging.a(3) == "1253") {
+			perform("CONVGREEK (U)");
+		}
+	}
+
 	call log2("*installing authorised keys", logtime);
 	perform("INSTALLAUTHKEYS (S)");
 
 	call log2("*installing authorised hosts", logtime);
 	perform("INSTALLALLOWHOSTS (S)");
-*/
+
 	call log2("*create user name index", logtime);
 	var convkey = "CONVERTED*USERNAMEINDEX";
-	if (not(xx.read(DEFINITIONS, convkey))) {
-		call usersubs("CREATEUSERNAMEINDEX");
+	if (not xx.read(DEFINITIONS, convkey)) {
+		perform("WINDOWSTUB USER.SUBS CREATEUSERNAMEINDEX");
 		var().date().write(DEFINITIONS, convkey);
 	}
 
-	call log2("*stop init.general", logtime);
-	call unlockrecord("DEFINITIONS", definitions, "INIT.GENERAL.LOGIN");
+	verbs.deleterecord("$FILEMAN");
+	
 
-	call initgeneral2("FIXURLS", logtime);
-	call initgeneral2("UPDATEIPNOS4NEOSYS", logtime);
-	call initgeneral2("CREATEALERTS", logtime);
-
-	call log2("*indicate success to LOGIN", logtime);
-	if (SYSTEM.a(33, 10)) {
-		call oswrite("OK", SYSTEM.a(33, 10) ^ ".$2");
+	call log2("*put the admenus program as the system menu file", logtime);
+	//as there is no way to have multiple menus files
+	if (APPLICATION == "ADAGENCY") {
+		perform("SETFILE .\\ADAGENCY GLOBAL ADMENUS SYS.MENUS");
 	}
 
-	//indicate successfull initialisation
-	call log2("-----initgeneral exit", logtime);
-	return true;
+	if (not resetting) {
+
+		call initgeneral2("FIXURLS", logtime);
+		call initgeneral2("UPDATEIPNOS4NEOSYS", logtime);
+		call initgeneral2("UPDATEUSERS", logtime);
+		call initgeneral2("CREATEALERTS", logtime);
+		//call init.general2('LASTLOGWARNING':fm:lastlog,logtime)
+		call initgeneral2("OSCLEANUP", logtime);
+
+		//per installation or slow things done only in live
+		//so assuming test starts first then at least test is running
+		//live systems only
+		if (not SYSTEM.a(61)) {
+			call initgeneral2("COMPRESSLOGS", logtime);
+			call initgeneral2("TRIMREQUESTLOG", logtime);
+			call initgeneral2("REORDERDBS", logtime);
+		}
+
+	}
+
+	//in INIT.GENERAL and DEFINITION.SUBS
+	//if dir('ddns.cmd') then
+	// perform 'STARTDDNS'
+	// end
+
+	//FOLLOWING MUST ALL BE DONE LAST OF ALL
+
+	call log2("*save upgrade history and email notification", logtime);
+	if (version.osread("GENERAL\\VERSION.DAT")) {
+
+		//get version installed
+		var versioninstalled = ((version.field("\r", 1)).field(0x1A, 1)).trim();
+
+		//get version last run
+		call osread(upgradelog, "UPGRADE.CFG");
+		var versionlastrun = field2(upgradelog, var().chr(10), -1);
+
+		//if changed then log and email users
+		if (versioninstalled ne versionlastrun) {
+
+			//log the upgraded version
+			if (upgradelog) {
+				upgradelog ^= "\r\n";
+			}
+			upgradelog ^= versioninstalled;
+			call oswrite(upgradelog, "UPGRADE.CFG");
+
+			//upgrade locally installed SYSOBJ files
+			call log2("*update sysobj $msg $rtp25", logtime);
+			perform("SETFILE REVBOOT SYSPROG,SALADS SYSOBJ SYSOBJ (S)");
+			perform("NCOPY GBP $MSG $RTP25 (SON) TO: (SYSOBJ)");
+
+			//make arev dos screen run at full speed-must have been done everywhere now
+			//call log2('*fixvideo',logtime)
+			//call fixvideo
+
+		}
+
+		//update software version in database
+		tt2 = "VERSION*LASTEMAILED";
+		if (not tt.read(DEFINITIONS, tt2)) {
+			tt = "";
+		}
+		if (tt ne versioninstalled) {
+			versioninstalled.write(DEFINITIONS, tt2);
+
+			//email users on live systems LISTED IN SYSTEM CONFIGURATION only
+			if (SYSTEM.a(58).locateusing(SYSTEM.a(17), VM, xx)) {
+				if (not SYSTEM.a(61)) {
+					var idate = (version.field(" ", 2, 4)).iconv("D");
+					var itime = (version.field(" ", 1)).iconv("MT");
+					tt = idate.oconv("D/J") ^ " " ^ itime.oconv("MT");
+					call decide("Email users about upgrade?|(or later on do F5 EMAILUSERS UPGRADE " ^ tt ^ ")", "", reply);
+					if (reply == 1) {
+						perform("EMAILUSERS UPGRADE " ^ tt);
+					}
+					call sysmsg("NEOSYS Software Upgrade " ^ tt);
+				}
+			}
+
+		}
+
+	}
+
+	call log2("*emailing any notifications, warnings or errors", logtime);
+	if (USER4) {
+		call sysmsg(USER4, "Messages from INIT.GENERAL");
+		USER4 = "";
+	}
+
+	call log2("*stop init.general - releasing exclusive access", logtime);
+	call unlockrecord("VERBS", verbs, "INIT.GENERAL.LOGIN");
+
+	if (not resetting) {
+
+		//perform 'REPLICATION UPDATE'
+
+		if (interactive and USERNAME ne "NEOSYS.NET") {
+			call log2("*do a few escapes then F10 HOME to initialise the menu system", logtime);
+			//do home enter home to open the first menu at the first option
+			DATA ^= var().chr(27) ^ var().chr(27) ^ var().chr(27) ^ INTCONST.a(7);
+			DATA ^= MOVEKEYS.a(15) ^ var().chr(13) ^ MOVEKEYS.a(15);
+
+			call log2("*if not interactive then start the required process", logtime);
+			//by pressing F5
+
+		}else{
+			//data char(13)
+			//chain 'RUNMENU LISTEN'
+
+			call log2("*indicate success to LOGIN", logtime);
+			if (SYSTEM.a(33, 10)) {
+				call oswrite("OK", SYSTEM.a(33, 10) ^ ".$2");
+			}
+
+			call log2("*chain to NET AUTO (" ^ SYSTEM.a(17) ^ ") INIT.GENERAL Quitting.", logtime);
+			execute("NET AUTO");
+			var().abort();
+		}
+
+	}
+
+	var().stop();
 
 }
 
-subroutine getsystem(in filename, in filen) {
-	call log2("*get " ^ filename ^ " parameters", logtime);
-	if (not systemx.osread(filename)) {
+subroutine getsystem() {
+	call log2("*get " ^ tt ^ " parameters", logtime);
+	if (not systemx.osread(tt)) {
 		return;
 	}
 
@@ -1055,64 +1782,42 @@ subroutine getsystem(in filename, in filen) {
 	//ie global installation parameters override dataset parameters
 	var ni = systemx.count(FM) + 1;
 	for (var ii = 1; ii <= ni; ++ii) {
-		if ((systemx.a(ii)).length()) {
+		if (systemx.a(ii).length()) {
 			SYSTEM.r(ii, systemx.a(ii));
 		}
 	};//ii;
 
 	//save config file time so can detect if restart required
-	SYSTEM.r(100, filen, filename.osfile().a(3));
+	SYSTEM.r(100, tt2, tt.osfile().a(3));
 
 	return;
 
 }
 
-subroutine backupreminder(in currdataset) {
-
-	//get last backup details
-	var paramrec;
-	if (not(paramrec.osread("..\\data\\" ^ currdataset ^ "\\params2"))) {
-		return;
-	}
-	var lastbackupdate = paramrec.a(2);
-
-	//skip if no backup or backup in last one day (to midnight)
-	//if lastbackupdate and lastbackupdate lt date()-1 then
-	//assume backup on same day (ie after last midnight)
-	if (not lastbackupdate or lastbackupdate ge date())
-		return;
-
-	var msg = "The last backup was ";
-	var ndays = var().date() - lastbackupdate;
-	msg ^= ndays ^ " day" ^ var("s").substr(1, ndays ne 1) ^ " ago.";
-	msg ^= "   (" ^ lastbackupdate.oconv("D") ^ ")";
-	msg.swapper("(0", "(");
-	msg.r(-1, "NEOSYS recommends that you \"BACKUP\" your data ");
-	msg.r(-1, "regularly to prevent total loss of data due to");
-	msg.r(-1, "power failure, disk damage or other accidents.");
-
-	if (msg) {
-		call mssg(msg);
-	};
-	return;
-}
-
-subroutine fail() {
-
+subroutine failbatch() {
 	msg = USER4;
 
-	call log2("*put up brief warning for three seconds and close - " ^ msg, logtime);
-	var s33 = SYSTEM.a(33);
+	tt = "*Authorisation Failure. " ^ msg;
+	tt.converter(FM, "|");
+	call log2(tt, logtime);
+
+	//onscreen message
+	s33 = SYSTEM.a(33);
 	SYSTEM.r(33, "");
-	call mssg(msg ^ "", "T3");
+	call mssg(msg ^ "", "T3", yy, "");
 	SYSTEM.r(33, s33);
 
+	//respond to user
 	msg.swapper(FM ^ FM, FM);
 	msg.converter(FM, "|");
 	call oswrite(msg, SYSTEM.a(33, 10) ^ ".$2");
-	//print char(12):char(7):@user4
+
+	//and quit
+	perform("OFF");
+	var().logoff();
 
 	return;
+
 }
 
 

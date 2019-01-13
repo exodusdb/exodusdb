@@ -219,6 +219,7 @@ typedef var& out;
 #define SECURITY mv.SECURITY
 #define SYSTEM mv.SYSTEM
 #define SESSION mv.SESSION
+#define ROLLOUTFILE mv.ROLLOUTFILE
 #define THREADNO mv.THREADNO
 
 #define INTERNALCHARS mv.INTERNALCHARS
@@ -238,18 +239,26 @@ typedef var& out;
 
 #define RECCOUNT mv.RECCOUNT
 
-#define MW mv.MV
-#define HW mv.HW
-#define EW mv.EW
 #define AW mv.AW
+#define EW mv.EW
+#define HW mv.HW
+#define MW mv.MW
 #define PW mv.PW
-#define XW mv.XW
-#define VW mv.VW
 #define SW mv.SW
+#define VW mv.VW
+#define XW mv.XW
 
 #define CRTHIGH mv.CRTHIGH
 #define CRTWIDE mv.CRTWIDE
 #define LPTRHIGH mv.LPTRHIGH
 #define LPTRWIDE mv.LPTRWIDE
+
+//obsolete
+#define ENVIRONKEYS mv.ENVIRONKEYS
+#define ENVIRONSET mv.ENVIRONSET
+#define DEFAULTSTOPS mv.DEFAULTSTOPS
+#define MOVEKEYS mv.MOVEKEYS
+#define INDEXTIME mv.INDEXTIME
+#define LEVEL mv.LEVEL
 
 #endif //EXODUSMACROS_H

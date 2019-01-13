@@ -1,6 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
+#include <trim2.h>
 
 #include <gen.h>
 
@@ -8,19 +9,24 @@ var direction;//num
 var xx;
 var daten;
 
-function main(in mode, in idate0, in usercode, in user, in marketcode, in market, in agp, out holidaytype, out workdate) {
+function main(in mode, io idate, in usercode, in userx, in marketcode, in market, in agp, out holidaytype, out workdate) {
+	//c tim ,io,,,,,,out,out
 
-	//returns holidaytype given date,user,market and global params
+	//returns holidaytype given date,userx,market and global params
 
 	//holiday type is one of the following (priority in the same order)
 	//1=weekend, 2=public, 3=personal, 4=expired login, 0=not holiday
-	
-	var idate=idate0;
-	if (false) print(marketcode);
-	if (false) print(usercode);
+
+	//prevent c++ warnings about unused variables
+	if (usercode.unassigned()) {
+		{}
+	}
+	if (marketcode.unassigned()) {
+		{}
+	}
 
 	if (mode == "GETTYPE") {
-		gosub getholidaytype(idate, user, market, agp, holidaytype);
+		gosub getholidaytype( idate,  userx,  agp,  market,  holidaytype);
 
 	} else if (mode == "GETWORKDATE") {
 
@@ -36,9 +42,9 @@ function main(in mode, in idate0, in usercode, in user, in marketcode, in market
 
 		while (true) {
 		///BREAK;
-		if (not(workdate and idate ne mindate)) break;;
+		if (not workdate and idate ne mindate) break;;
 			idate += direction;
-			gosub getholidaytype(idate, user, market, agp, holidaytype);
+			gosub getholidaytype( idate,  userx,  agp,  market,  holidaytype);
 			if (not holidaytype) {
 				workdate -= direction;
 			}
@@ -47,16 +53,17 @@ function main(in mode, in idate0, in usercode, in user, in marketcode, in market
 	} else {
 		call mssg(DQ ^ (mode ^ DQ) ^ " invalid mode in HOLIDAY()");
 	}
-
+//L192:
 	return 0;
 
 }
 
-subroutine getholidaytype(in idate, in user, in market, in agp, out holidaytype) {
+subroutine getholidaytype(in idate, in userx, in agp, in market, io holidaytype) {
+	//getholidaytype(in idate, in userx, in agp, in market, io holidaytype)
 
 	//type 4 is expired
 	//////////////////
-	if (user.a(35) and idate >= user.a(35)) {
+	if (userx.a(35) and idate >= userx.a(35)) {
 		holidaytype = 4;
 		return;
 	}
@@ -64,21 +71,23 @@ subroutine getholidaytype(in idate, in user, in market, in agp, out holidaytype)
 	//type 1 is weekends (of the user otherwise of market)
 	/////////////////////////////////////////////////////
 
-	var dow = ((idate - 1) % 7) + 1;
+	var dow = (idate - 1) % 7 + 1;
 
 	//from user
-	var weekenddows = trim(user.a(24), SVM);
+	var weekenddows = trim2(userx.a(24), SVM);
 	if (not weekenddows) {
 
 		//else from market
-		weekenddows = trim(market.a(9), SVM);
+		weekenddows = trim2(market.a(9), SVM);
 		if (not weekenddows) {
 
 			weekenddows = agp.a(95);
 
 			//else from global parameter "last day of week" plus the day before
 			if (not weekenddows) {
-				weekenddows = agp.a(13) ^ SVM ^ (((agp.a(13) - 1 - 1) % 7) + 1);
+				//weekenddows=agp<13>:sm:mod(agp<13>-1-1,7)+1
+				var tt = (agp.a(13) - 1 - 1) % 7 + 1;
+				weekenddows = agp.a(13) ^ SVM ^ tt;
 			}
 		}
 	}
@@ -95,7 +104,7 @@ subroutine getholidaytype(in idate, in user, in market, in agp, out holidaytype)
 	//if holidays else
 	// holidays=
 	// end
-	if (holidays.locate(idate, xx, 1)) {
+	if (holidays.a(1).locateusing(idate, VM, xx)) {
 		holidaytype = 2;
 		return;
 	}
@@ -104,10 +113,10 @@ subroutine getholidaytype(in idate, in user, in market, in agp, out holidaytype)
 	////////////////////////////
 
 	//personal holidays only from user currently
-	var fromdates = user.a(22);
-	var uptodates = user.a(23);
+	var fromdates = userx.a(22);
+	var uptodates = userx.a(23);
 	//from dates must be in reverse sorted order
-	if (not(fromdates.locateby(idate, "DR", daten, 1))) {
+	if (not(fromdates.a(1).locateby(idate, "DR", daten))) {
 		{}
 	}
 	var uptodate = uptodates.a(1, daten);

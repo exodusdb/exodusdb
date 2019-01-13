@@ -3,16 +3,30 @@
 #define EXODUSDLFUNC_READACCPARAMS_H
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_readaccparams;
+//ExodusFunctorBase efb_readaccparams;
+class efb_readaccparams : private ExodusFunctorBase
+{
+public:
+
+efb_readaccparams(MvEnvironment& mv) : ExodusFunctorBase("readaccparams", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_readaccparams& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var readaccparams()
+var operator() ()
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_readaccparams.pmemberfunction_==NULL)
-  efb_readaccparams.init("readaccparams","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -21,9 +35,15 @@ var readaccparams()
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_readaccparams.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_readaccparams.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_readaccparams.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_readaccparams.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   ();
 
 }
+
+};
+efb_readaccparams readaccparams{mv};
 //#endif

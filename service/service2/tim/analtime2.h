@@ -3,16 +3,30 @@
 #define EXODUSDLFUNC_ANALTIME2_H
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_analtime2;
+//ExodusFunctorBase efb_analtime2;
+class efb_analtime2 : private ExodusFunctorBase
+{
+public:
+
+efb_analtime2(MvEnvironment& mv) : ExodusFunctorBase("analtime2", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_analtime2& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var analtime2()
+var operator() ()
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_analtime2.pmemberfunction_==NULL)
-  efb_analtime2.init("analtime2","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -21,9 +35,15 @@ var analtime2()
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_analtime2.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_analtime2.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_analtime2.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_analtime2.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   ();
 
 }
+
+};
+efb_analtime2 analtime2{mv};
 //#endif

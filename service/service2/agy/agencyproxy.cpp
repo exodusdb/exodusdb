@@ -11,7 +11,6 @@ libraryinit()
 #include <suppliersubs.h>
 #include <singular.h>
 #include <listen3.h>
-#include <ilesubs.h>
 #include <select2.h>
 #include <convpdf.h>
 #include <sysmsg.h>
@@ -35,6 +34,7 @@ var companyn2;//num
 var companyn;//num
 var tcompany;
 var compcode2;
+var invno;//num
 var set;//num
 var anythingaccessed;//num
 var byyear;
@@ -45,6 +45,7 @@ var newfilename;
 var triggers;
 var errors;
 var adqueries;
+var query;
 var filename;
 var agpfn;//num
 var iodatfn;//num
@@ -191,7 +192,7 @@ function main() {
 		var reqyear = USER0.a(2);
 		if (mediabyyear or productionbyyear) {
 			if (not reqyear.length()) {
-				reqyear = (var().date()).oconv("D/").field("/", 3);
+				reqyear = ((var().date()).oconv("D/")).field("/", 3);
 				//call msg('YEAR MISSING NOT SPECIFIED IN AGENCYPROXY,GETINVOICENUMBERS')
 				//stop
 			}
@@ -237,8 +238,7 @@ function main() {
 					goto nextcomp;
 				}
 
-				var tcompany;
-				if (not(tcompany.read(gen.companies, compcode))) {
+				if (not tcompany.read(gen.companies, compcode)) {
 					goto nextcomp;
 				}
 				compcode2 = tcompany.a(28);
@@ -266,8 +266,7 @@ function main() {
 					invkey ^= "*" ^ reqyear;
 				}
 				invkey ^= "%";
-				var invno;
-				if (not(invno.readv(agy.invoices, invkey, 1))) {
+				if (not invno.readv(agy.invoices, invkey, 1)) {
 					if (mediabyyear) {
 						invno = 0;
 					}else{
@@ -288,8 +287,7 @@ function main() {
 					invkey ^= "*" ^ reqyear;
 				}
 				invkey ^= "%";
-				var invno;
-				if (not(invno.readv(agy.invoices, invkey, 1))) {
+				if (not invno.readv(agy.invoices, invkey, 1)) {
 					if (productionbyyear) {
 						invno = 0;
 					}else{
@@ -317,8 +315,7 @@ nextcomp:;
 
 		if (mediainvoiceaccess) {
 			var invkey = "%MEDIA.NO2%";
-			var invno;
-			if (not(invno.readv(agy.invoices, invkey, 1))) {
+			if (not invno.readv(agy.invoices, invkey, 1)) {
 				invno = 70000 - 1;
 			}
 			USER1.r(4, companyn2, invno + 1);
@@ -326,8 +323,7 @@ nextcomp:;
 
 		if (productioninvoiceaccess) {
 			var invkey = "%PRODUCTION.NO2%";
-			var invno;
-			if (not(invno.readv(agy.invoices, invkey, 1))) {
+			if (not invno.readv(agy.invoices, invkey, 1)) {
 				invno = 90000 - 1;
 			}
 			USER1.r(5, companyn2, invno + 1);
@@ -336,7 +332,7 @@ nextcomp:;
 		set = 0;
 		gosub getsetnumbers();
 
-		if (not(mediainvoiceaccess or productioninvoiceaccess or anythingaccessed)) {
+		if (not mediainvoiceaccess or productioninvoiceaccess or anythingaccessed) {
 			call mssg("There is nothing that you are allowed to access");
 			var().stop();
 		}
@@ -351,7 +347,7 @@ nextcomp:;
 
 		var reqyear = USER1.a(6);
 		if ((agy.agp.a(49)).index("<YEAR", 1) or (agy.agp.a(50)).index("<YEAR", 1)) {
-			if (not reqyear.match("4N")) {
+			if (not(reqyear.match("4N"))) {
 				call mssg("YEAR MISSING NOT SPECIFIED IN AGENCYPROXY,GETINVOICENUMBERS");
 				var().stop();
 			}
@@ -400,7 +396,7 @@ nextcomp:;
 
 					anythingaccessed = 1;
 
-					write(nextinvno - 1, agy.invoices, invkey);
+					(nextinvno - 1).write(agy.invoices, invkey);
 
 				}
 			};//companyn;
@@ -573,10 +569,18 @@ nextcomp2:;
 						if (USER1.read(versionsfile, win.is)) {
 							USER1.transfer(RECORD);
 							ID = win.is;
-							//call plan.subs('POSTREAD2')
+
+	//in c++ conversion
+	//all .SUBS routine must have ONE argument same as EXAMPLE clientsubs
+
+	//supplier,vehicle,brand,client,schedule,plan,job,prodorder,prodinv
+	//SORT ABP/GBP/BP F1 with @id ending '.SUBS' and with f1 starting 'SUB' 'sub'
+
+							//call client.subs('POSTREAD2')
 							call listen3(win.datafile, "POSTREAD", newfilename, triggers);
-							var filesubs = triggers.a(3);
-							call ilesubs(triggers.a(4));
+							clientsubs = triggers.a(3);
+							call clientsubs(triggers.a(4));
+
 							RECORD.transfer(USER1);
 							var().stop();
 						}
@@ -636,7 +640,7 @@ nextcomp2:;
 	} else {
 		USER3 = "System Error: " ^ (DQ ^ (USER0 ^ DQ)) ^ " unrecognised request in AGENCYPROXY";
 	}
-//L3289:
+//L3297:
 
 	/////
 	//exit:
@@ -688,8 +692,7 @@ subroutine getquery() {
 		var().stop();
 	}
 
-	var query;
-	if (not(query.read(adqueries, queryid))) {
+	if (not query.read(adqueries, queryid)) {
 		call mssg(DQ ^ (queryid ^ DQ) ^ " is missing from ADQUERIES file");
 		gosub errorresponse();
 		var().stop();
@@ -803,8 +806,7 @@ subroutine getsetnumber() {
 		if (compcode2 and compcode2 ne "**" and not filebycomp) {
 			fileno = "";
 		}else{
-			var fileno;
-			if (not(fileno.readv(DEFINITIONS, filenokey, 1))) {
+			if (not fileno.readv(DEFINITIONS, filenokey, 1)) {
 				fileno = "";
 				//get the old default without company/year for the first company only
 				if (companyn == 1) {

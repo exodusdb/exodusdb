@@ -3,27 +3,47 @@
 #define EXODUSDLFUNC_HOLIDAY_H
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_holiday;
+//ExodusFunctorBase efb_holiday;
+class efb_holiday : private ExodusFunctorBase
+{
+public:
+
+efb_holiday(MvEnvironment& mv) : ExodusFunctorBase("holiday", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_holiday& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var holiday(in mode, in idate0, in usercode, in user, in marketcode, in market, in agp, out holidaytype, out workdate)
+var operator() (in mode, io idate, in usercode, in userx, in marketcode, in market, in agp, out holidaytype, out workdate)
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_holiday.pmemberfunction_==NULL)
-  efb_holiday.init("holiday","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
  //with the right arguments and returning a var or void
- typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(in,in,in,in,in,in,in,out,out);
+ typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(in,io,in,in,in,in,in,out,out);
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_holiday.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_holiday.pmemberfunction_)))
-  (mode,idate0,usercode,user,marketcode,market,agp,holidaytype,workdate);
+ //return CALLMEMBERFUNCTION(*(efb_holiday.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_holiday.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
+  (mode,idate,usercode,userx,marketcode,market,agp,holidaytype,workdate);
 
 }
+
+};
+efb_holiday holiday{mv};
 //#endif

@@ -76,11 +76,11 @@ bool MvEnvironment::init(const int threadno) {
 	//this->COMMAND = L";//initialised in main
 	//this->OPTIONS = L";//initialised in main
 	//this->EXECPATH = L";//initialised in main
-	
+
 	//per process
 	this->ROLLOUTFILE = L"~" ^ var(threadno) ^ L".$$$";
 	this->THREADNO = threadno;
-	
+
 	//per record access
 	this->DICT = L"";
 	this->ID = L"";
@@ -120,7 +120,7 @@ bool MvEnvironment::init(const int threadno) {
 	//SW<2> is the difference from gmt/utc to server time
 	//SW<3> could be the adjustment to get dbtz from servertz
 	*/
-	
+
 	//character encoding globals
 	//MUST be the same length
 	//TODO Should not be global otherwise cannot multithread MvEnvironment
@@ -136,9 +136,12 @@ bool MvEnvironment::init(const int threadno) {
 	//old scratch variables used for various buffering
 	this->AW = L"";
 	this->EW = L"";
-	this->XW = L"";
-	this->VW = L"";
+	this->HW = L"";
+	this->MW = L"";
 	this->PW = L"";
+	//this->SW = L"";
+	this->VW = L"";
+	this->XW = L"";
 
 	this->RECCOUNT = L"";
 
@@ -154,6 +157,14 @@ bool MvEnvironment::init(const int threadno) {
 
 	this->LPTRWIDE = 132;
 	this->LPTRHIGH = 66;
+
+        //obsolete
+        this->ENVIRONKEYS=L"";
+        this->ENVIRONSET=L"";
+        this->DEFAULTSTOPS=L"";
+        this->MOVEKEYS=L"";
+        this->INDEXTIME=L"";
+	this->LEVEL=L"";
 
 	return true;
 

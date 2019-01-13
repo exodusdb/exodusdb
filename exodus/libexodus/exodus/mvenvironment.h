@@ -139,9 +139,12 @@ public:
 	//old scratch variables used for various buffering
 	var AW;
 	var EW;
-	var XW;
-	var VW;
+	var HW;
+	var MW;
 	var PW;
+	//var SW;
+	var VW;
+	var XW;
 
 	var RECCOUNT;
 
@@ -152,6 +155,14 @@ public:
 	var CRTHIGH;
 	var LPTRWIDE;
 	var LPTRHIGH;
+
+	//obsolete
+	var ENVIRONKEYS;
+	var ENVIRONSET;
+	var DEFAULTSTOPS;
+	var MOVEKEYS;
+	var INDEXTIME;
+	var LEVEL;
 
 	//define a type of object that holds many LabelledCommons
 	//typedef std::map<const char*, LabelledCommon> LabelledCommons;

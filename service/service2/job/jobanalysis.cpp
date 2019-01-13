@@ -47,8 +47,7 @@ function main() {
 
 				//decide where it should go
 				var typecode = prodorder.a(15);
-				var type;
-				if (not(type.read(agy.jobtypes, typecode))) {
+				if (not type.read(agy.jobtypes, typecode)) {
 					type = "";
 				}
 				base.splicer(1, 0, "-");
@@ -104,15 +103,13 @@ function main() {
 					var temp = prodquote.a(17, ln);
 					if (temp) {
 						typecode = temp;
-						var type;
-						if (not(type.read(agy.jobtypes, typecode))) {
+						if (not type.read(agy.jobtypes, typecode)) {
 							type = "";
 						}
 					}
 					if (not typecode) {
 						typecode = RECORD.a(3);
-						var type;
-						if (not(type.read(agy.jobtypes, typecode))) {
+						if (not type.read(agy.jobtypes, typecode)) {
 							type = "";
 						}
 					}

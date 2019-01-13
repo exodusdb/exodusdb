@@ -11,6 +11,7 @@ var coden;//num
 var filen;//num
 var code;
 var ok;//num
+var vehicle;
 var taskid;
 var positive;
 var xx;
@@ -55,7 +56,7 @@ function main(in marketcodex, in suppliercodex, in vehiclecodex, io vehicles, io
 
 	//return quick answer if checking vehicles and is in buffer
 	if (vehiclecode) {
-		if (EW.a(10 + 5).locateusing(vehiclecode, VM, coden)) {
+		if ((EW.a(10 + 5)).locateusing(vehiclecode, VM, coden)) {
 			if (PW.a(10 + 5, coden)) {
 				return 1;
 			}else{
@@ -93,8 +94,7 @@ function main(in marketcodex, in suppliercodex, in vehiclecodex, io vehicles, io
 			}
 		}
 
-		var vehicle;
-		if (not(vehicle.read(vehicles, vehiclecode))) {
+		if (not vehicle.read(vehicles, vehiclecode)) {
 
 			//allow for validating a DELETED vehicle from VEHICLE_VERSIONS
 			var versionfile;
@@ -103,7 +103,7 @@ missingvehicle:
 				msg = DQ ^ (vehiclecode ^ DQ) ^ " missing from vehicles file";
 				return 0;
 			}
-			if (not(vehicle.read(versionfile, vehiclecode))) {
+			if (not vehicle.read(versionfile, vehiclecode)) {
 				goto missingvehicle;
 			}
 
@@ -131,7 +131,7 @@ getsupplier:
 			call fsmsg();
 			var().stop();
 		}
-		if (not(supplier.read(suppliers, suppliercode))) {
+		if (not supplier.read(suppliers, suppliercode)) {
 			msg = DQ ^ (suppliercode ^ DQ) ^ " missing from suppliers file";
 			return 0;
 		}
@@ -240,7 +240,7 @@ subroutine checkcode(io msg) {
 	ok = 0;
 	//if dont have general access to file then
 	//access to a specific record must be positively allowed (use # task prefix)
-	if (EW.a(10 + filen).locateusing(code, VM, coden)) {
+	if ((EW.a(10 + filen)).locateusing(code, VM, coden)) {
 		if (not(PW.a(10 + filen, coden))) {
 			return;
 		}
@@ -251,8 +251,8 @@ subroutine checkcode(io msg) {
 			var oldcoden = coden;
 			coden = (coden * .9).floor();
 			var ntrim = oldcoden - coden;
-			EW.r(10 + filen, EW.a(10 + filen).field(VM, ntrim + 1, 999999));
-			PW.r(10 + filen, PW.a(10 + filen).field(VM, ntrim + 1, 999999));
+			EW.r(10 + filen, (EW.a(10 + filen)).field(VM, ntrim + 1, 999999));
+			PW.r(10 + filen, (PW.a(10 + filen)).field(VM, ntrim + 1, 999999));
 		}
 
 		EW.r(10 + filen, coden, code);

@@ -3,16 +3,30 @@
 #define EXODUSDLFUNC_HTMLLIB2_H
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_htmllib2;
+//ExodusFunctorBase efb_htmllib2;
+class efb_htmllib2 : private ExodusFunctorBase
+{
+public:
+
+efb_htmllib2(MvEnvironment& mv) : ExodusFunctorBase("htmllib2", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_htmllib2& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var htmllib2(in mode, io dataio, in params0="", in params20="")
+var operator() (in mode, io dataio, in params0="", in params20="")
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_htmllib2.pmemberfunction_==NULL)
-  efb_htmllib2.init("htmllib2","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -21,9 +35,15 @@ var htmllib2(in mode, io dataio, in params0="", in params20="")
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_htmllib2.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_htmllib2.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_htmllib2.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_htmllib2.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   (mode,dataio,params0,params20);
 
 }
+
+};
+efb_htmllib2 htmllib2{mv};
 //#endif

@@ -27,9 +27,15 @@ var vehiclecode;
 var suppliercode;
 var typecode;
 var marketcode;
+var xx;
 var oldkeys;
 var newkeys;
 var msg;
+var brand;
+var vehicle;
+var supplier;
+var market;
+var type;
 var oldkeyn;//num
 var wsmsg;
 
@@ -133,7 +139,7 @@ nextrow:
 		goto nextrow;
 	}
 
-	if (not(RECORD.read(analysis2, ID))) {
+	if (not RECORD.read(analysis2, ID)) {
 		goto nextrow;
 	}
 
@@ -201,13 +207,13 @@ subroutine savebudget() {
 
 	var changedyearbudgetcompany = 1;
 	var firstkey = trim2(tpseudo.a(18), VM).a(1, 1);
-	if (fullyear ne addcent(firstkey.field("*", 1))) {
+	if (fullyear ne addcent(firstkey.field("*", 1), "", "", xx)) {
 	} else if (budgetcompanycode ne firstkey.field("*", 8)) {
 	} else if (budgetcode ne firstkey.field("*", 7)) {
 	} else {
 		changedyearbudgetcompany = 0;
-		}
-//L1000:
+	}
+//L1007:
 	oldkeys = tpseudo.a(18);
 	if (changedyearbudgetcompany) {
 		oldkeys = "";
@@ -252,36 +258,31 @@ nextrec2:
 			gosub invalid(msg);
 		}
 
-		var brand;
-		if (not(brand.read(agy.brands, brandcode))) {
+		if (not brand.read(agy.brands, brandcode)) {
 			msg = DQ ^ (brandcode ^ DQ) ^ " - invalid brand code";
 			gosub invalid(msg);
 		}
 
 		if (vehiclecode) {
 
-			var vehicle;
-			if (not(vehicle.read(agy.vehicles, vehiclecode))) {
+			if (not vehicle.read(agy.vehicles, vehiclecode)) {
 				msg = DQ ^ (vehiclecode ^ DQ) ^ " - invalid vehicle code";
 				gosub invalid(msg);
 			}
 
 		}else{
 
-			var supplier;
-			if (not(supplier.read(agy.suppliers, suppliercode))) {
+			if (not supplier.read(agy.suppliers, suppliercode)) {
 				msg = DQ ^ (suppliercode ^ DQ) ^ " - invalid supplier code";
 				gosub invalid(msg);
 			}
 
-			var market;
-			if (not(market.read(agy.markets, marketcode))) {
+			if (not market.read(agy.markets, marketcode)) {
 				msg = DQ ^ (marketcode ^ DQ) ^ " - invalid market code";
 				gosub invalid(msg);
 			}
 
-			var type;
-			if (not(type.read(agy.jobtypes, typecode))) {
+			if (not type.read(agy.jobtypes, typecode)) {
 				msg = DQ ^ (typecode ^ DQ) ^ " - invalid type code";
 				gosub invalid(msg);
 			}
@@ -333,7 +334,7 @@ nextrec2:
 	if (not validate) {
 		call cropper(RECORD);
 
-		if (not(win.orec.read(analysis2, ID))) {
+		if (not win.orec.read(analysis2, ID)) {
 			win.orec = "";
 		}
 		for (var periodn = 1; periodn <= 12; ++periodn) {
@@ -385,7 +386,7 @@ subroutine savebudgetexit() {
 	//delete and deleted rows
 	if (not validate) {
 		var noldkeys = oldkeys.count(VM) + 1;
-		for (var oldkeyn = 1; oldkeyn <= noldkeys; ++oldkeyn) {
+		for (oldkeyn = 1; oldkeyn <= noldkeys; ++oldkeyn) {
 			var id = oldkeys.a(1, oldkeyn);
 			if (win.orec.read(analysis2, id)) {
 				//mode=''
@@ -410,13 +411,13 @@ subroutine savebudgetexit() {
 
 subroutine getyearbudgetcompany() {
 
-	fullyear = addcent(tpseudo.a(1));
+	fullyear = addcent(tpseudo.a(1), "", "", xx);
 
 	budgetcompanycode = tpseudo.a(2);
 
 	budgetcode = tpseudo.a(3);
 	var budgetcode2 = budgetcode.field(" ", 2);
-	budgetcode = budgetcode.field(" ", 1)[1];
+	budgetcode = (budgetcode.field(" ", 1))[1];
 	if (budgetcode2 ne 1) {
 		budgetcode ^= budgetcode2;
 	}

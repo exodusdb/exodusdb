@@ -813,7 +813,7 @@ var var::lock(const var& key) const
 		return false;
 	}
 
-	//*this=wstringfromUTF8((UTF8*)PQgetvalue(result, 0, 0), PQgetlength(result, 0, 0));
+	// *this=wstringfromUTF8((UTF8*)PQgetvalue(result, 0, 0), PQgetlength(result, 0, 0));
 
 	//std::wstring temp=wstringfromUTF8((UTF8*)PQgetvalue(result, 0, 0), PQgetlength(result, 0, 0));
 
@@ -836,7 +836,7 @@ var var::lock(const var& key) const
 	return lockedok;
 }
 
-void var::unlock(const var& key) const
+bool var::unlock(const var& key) const
 {
 
 	THISIS(L"void var::unlock(const var& key) const")
@@ -863,7 +863,7 @@ void var::unlock(const var& key) const
 	{
 		//if not in local locktable then no need to unlock on database
 		if (((*locktable).find(hash64))==(*locktable).end())
-			return;
+			return true;
 		//register that it is unlocked
 		(*locktable).erase(hash64);
 	}
@@ -877,7 +877,7 @@ void var::unlock(const var& key) const
 	//"this" is a filehandle - get its connection
 	PGconn* thread_pgconn=(PGconn*) this->connection();
 	if (!thread_pgconn)
-		return;
+		return false;
 
 	DEBUG_LOG_SQL1
 	PGresult* result = PQexecParams(thread_pgconn,
@@ -897,17 +897,17 @@ void var::unlock(const var& key) const
 		PQclear(result);//DO THIS OR SUFFER MEMORY LEAK
 		exodus::errputl(msg);
 		//throw MVException(msg);
-		return;
+		return false;
 	}
 
 	//bool unlockedok= *PQgetvalue(result, 0, 0)!=0;
 
 	PQclear(result);
 
-	return;
+	return true;
 }
 
-void var::unlockall() const
+bool var::unlockall() const
 {
 	//THISIS(L"void var::unlockall() const")
 
@@ -919,12 +919,12 @@ void var::unlockall() const
 		//if local lock table is empty then dont unlock all database
 		if ((*locktable).begin()==(*locktable).end())
 			//TODO indicate in some global variable "OWN LOCK"
-			return;
+			return true;
 		//register that it is locked
 		(*locktable).clear();
 	}
 
-	this->sqlexec(L"SELECT PG_ADVISORY_UNLOCK_ALL()");
+	return this->sqlexec(L"SELECT PG_ADVISORY_UNLOCK_ALL()");
 }
 
 //returns success or failure but no data
@@ -1362,7 +1362,7 @@ bool var::statustrans() const
 bool var::createdb(const var& dbname) const
 {
 	var errmsg;
-	return createdb(dbname,errmsg);
+	return createdb(dbname, errmsg);
 }
 
 bool var::deletedb(const var& dbname) const
@@ -1383,7 +1383,6 @@ bool var::deletedb(const var& dbname) const
 bool var::createdb(const var& dbname, var& errmsg) const
 {
 	THISIS(L"bool var::createdb(const var& dbname, var& errmsg)")
-	// *this is not used
 	THISISDEFINED()
 	ISSTRING(dbname)
 
@@ -1400,18 +1399,15 @@ bool var::createdb(const var& dbname, var& errmsg) const
 bool var::deletedb(const var& dbname, var& errmsg) const
 {
 	THISIS(L"bool var::deletedb(const var& dbname, var& errmsg)")
-	// *this is not used
 	THISISDEFINED()
 	ISSTRING(dbname)
 
-	//var sql = L"DROP DATABASE "^dbname.convert(L". ",L"__");
 	return this->sqlexec(L"DROP DATABASE "^dbname, errmsg);
 }
 
 bool var::createfile(const var& filename) const
 {
 	THISIS(L"bool var::createfile(const var& filename)")
-	// *this is not used
 	THISISDEFINED()
 	ISSTRING(filename)
 
@@ -1421,7 +1417,7 @@ bool var::createfile(const var& filename) const
 	var sql = L"CREATE";
 	//if (options.ucase().index(L"TEMPORARY")) sql ^= L" TEMPORARY";
 	//sql ^= L" TABLE " PGDATAFILEPREFIX ^ filename.convert(L".",L"_");
-	if (filename.substr(-5,5) ==L"_temp")
+	if ((*this).substr(-5,5) ==L"_temp")
 		sql ^= L" TEMP ";
 	sql ^= L" TABLE " PGDATAFILEPREFIX ^ filename;
 	sql ^= L" (key bytea primary key, data bytea)";
@@ -1432,25 +1428,25 @@ bool var::createfile(const var& filename) const
 bool var::renamefile(const var& filename, const var& newfilename) const
 {
 	THISIS(L"bool var::renamefile(const var& filename, const var& newfilename)")
-	// *this is not used
 	THISISDEFINED()
 	ISSTRING(filename)
+	ISSTRING(newfilename)
+
 	return this->sqlexec(L"ALTER TABLE " PGDATAFILEPREFIX ^ filename ^ L" RENAME TO " ^ newfilename);
 }
 
 bool var::deletefile(const var& filename) const
 {
 	THISIS(L"bool var::deletefile(const var& filename)")
-	// *this is not used
 	THISISDEFINED()
 	ISSTRING(filename)
+
 	return this->sqlexec(L"DROP TABLE " PGDATAFILEPREFIX ^ filename);
 }
 
 bool var::clearfile(const var& filename) const
 {
 	THISIS(L"bool var::clearfile(const var& filename)")
-	// *this is not used
 	THISISDEFINED()
 	ISSTRING(filename)
 
@@ -1810,7 +1806,7 @@ bool var::deletelist(const var& listname) const
 
 	if (var().open(listfilename)) {
 		//listfilename.outputl(L"Deleted ");
-		return listfilename.deletefile(listfilename);
+		return this->deletefile(listfilename);
 	}
 	return true;//true if not existing
 }
@@ -1846,7 +1842,7 @@ bool var::savelist(const var& listname) const
 			(mv ^ FM ^ recn).write(listfilename2,key);
 			//key.outputl(L"Written=");
 		}
-		var().renamefile(listfilename2,listfilename);
+		this->renamefile(listfilename2, listfilename);
 	}
 
 	return recn>0;
@@ -1888,7 +1884,7 @@ bool var::makelist(const var& listname, const var& keys) const
 			recn++;
 			//create file on first record
 			if (recn==1) {
-				if (!var().createfile(listfilename)) {
+				if (!this->createfile(listfilename)) {
 					listfilename.outputl(L"Cannot create ");
 					return false;
 				}

@@ -47,7 +47,7 @@ namespace exodus
 
 DLL_PUBLIC int exodus_main(int exodus__argc, char* exodus__argv[], MvEnvironment& mv);
 
-DLL_PUBLIC var osgetenv(const var& name);
+DLL_PUBLIC var osgetenv(const var& name=L"");
 DLL_PUBLIC bool osgetenv(const var& name, var& value);
 DLL_PUBLIC bool ossetenv(const var& name, const var& value);
 DLL_PUBLIC bool assigned(const var& var2);

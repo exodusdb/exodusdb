@@ -1,10 +1,11 @@
 #include <exodus/library.h>
 libraryinit()
 
-function main(in input0, out unitx ) {
-
-	var inputx=input0;
-
+function main(in input0, out unitx) {
+	//c gen in,out
+	//change in interface to allow expression for input0 in c++
+	//hopefull no user relying on spaces being removed from input
+	var inputx = input0;
 	inputx.converter(" ", "");
 	var temp = inputx;
 	var char1 = temp[1];
@@ -15,11 +16,13 @@ function main(in input0, out unitx ) {
 	temp.converter("0123456789.,", "            ");
 	//numlen=len(temp)-len(trimf(temp))
 	var numlen = temp.length() - (temp.trimf()).length() + (char1 == "-");
-	var numx = inputx.substr(1, numlen);
+	var numx = inputx.substr(1,numlen);
+
 	if (numx == "-") {
 		numx = "";
 	}
-	unitx = inputx.substr(numlen + 1, 99);
+
+	unitx = inputx.substr(numlen + 1,99);
 
 	//convert to decimal format
 	numx.converter(",", ".");

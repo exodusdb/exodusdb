@@ -3,16 +3,30 @@
 #define EXODUSDLFUNC_SAFESELECT_H
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_safeselect;
+//ExodusFunctorBase efb_safeselect;
+class efb_safeselect : private ExodusFunctorBase
+{
+public:
+
+efb_safeselect(MvEnvironment& mv) : ExodusFunctorBase("safeselect", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_safeselect& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var safeselect(in selectx)
+var operator() (in selectx)
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_safeselect.pmemberfunction_==NULL)
-  efb_safeselect.init("safeselect","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -21,9 +35,15 @@ var safeselect(in selectx)
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_safeselect.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_safeselect.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_safeselect.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_safeselect.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   (selectx);
 
 }
+
+};
+efb_safeselect safeselect{mv};
 //#endif

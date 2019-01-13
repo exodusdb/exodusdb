@@ -4,35 +4,30 @@ libraryinit()
 #include <sysmsg.h>
 #include <getlang.h>
 #include <addcent.h>
-#include <log2.h>
+
 #include <fin.h>
 #include <gen.h>
 
+var xx;
+var temp;
 var weeksperperiod;//num
+var ndec;//num
 var companydesc;
 var perioddesc;
 var currencydesc;
-var username;
-var datax;
-var logtime;
+var desc1;
+var desc2;
+var currencyrec;
+var convcurrency;
 
 function main(in nextcompanycode) {
+	//c gen
+	//global desc1,desc2
 
-	call log2("-----initcompany init", logtime);
-
-	call log2("default fin.currcompany", logtime);
-	if (fin.currcompany.unassigned()) {
-		fin.currcompany="";
-		fin.currcurrency="";
-		fin.converted="";
-	}
-
-	call log2("get first company", logtime);
 	if (not nextcompanycode.unassigned()) {
 
 		if (nextcompanycode) {
-			var xx;
-			if (not(xx.read(gen.companies, nextcompanycode))) {
+			if (not xx.read(gen.companies, nextcompanycode)) {
 				call sysmsg(DQ ^ (nextcompanycode ^ DQ) ^ " COMPANY IS MISSING IN INIT.COMPANY()");
 				//TODO return abort code and change all callers to handle failure
 				return 0;
@@ -43,41 +38,53 @@ function main(in nextcompanycode) {
 		fin.currcompany = nextcompanycode;
 	}
 
-	call log2("copy to globals", logtime);
+	//y2k2
 	var oldcompany = gen.company;
 	if (fin.currcompany) {
-		if (not(gen.company.read(gen.companies, fin.currcompany))) {
-			call mssg("COMPANY " ^ fin.currcompany.quote() ^ " IS MISSING - DO NOT PROCEED||USE \"SETTINGS\" TO|CHOOSE ANOTHER COMPANY|");
+		if (not gen.company.read(gen.companies, fin.currcompany)) {
+			call mssg("COMPANY " ^ (DQ ^ (fin.currcompany ^ DQ)) ^ " IS MISSING - DO NOT PROCEED||USE \"SETTINGS\" TO|CHOOSE ANOTHER COMPANY|");
 			gen.company = fin.currcompany;
 		}
 	}else{
 		gen.company = "";
-		gen.company.r(2, (var().date()).oconv("D2/E").field("/", 2, 2));
+		gen.company.r(2, ((var().date()).oconv("D2/E")).field("/", 2, 2));
 	}
 
-	call log2("clientmark", logtime);
+	//in LISTEN2 and INIT.COMPANY
+	var companystyle = gen.company.a(70);
+	if (companystyle) {
+		SYSTEM.r(46, companystyle);
+	}
+
+	//clientmark
 	if (gen.company.a(27)) {
-		//SYSTEM.r(14, (gen.company.a(27)).invert());
+		SYSTEM.r(14, (gen.company.a(27)).invert());
 		SYSTEM.r(8, "");
 	}else{
 		SYSTEM.r(14, SYSTEM.a(36));
 	}
 
-	log2("move the company to the front of the consolidated companies", logtime);
+	//if company code2 is not specified then use company code IF alphabetic
+	if (not gen.company.a(28)) {
+		if (fin.currcompany.match("0A")) {
+			gen.company.r(28, fin.currcompany);
+		}
+	}
+
+	//move the company to the front of the consolidated companies
 	if (fin.currcompanycodes.unassigned()) {
 		fin.currcompanycodes = "";
 	}
-	var cn;
-	if (fin.currcompanycodes.locateusing(fin.currcompany, VM, cn)) {
-		fin.currcompanycodes.eraser(1, cn);
+	if (fin.currcompanycodes.a(1).locateusing(fin.currcompany, VM, temp)) {
+		fin.currcompanycodes.eraser(1, temp);
 	}else{
 		fin.currcompanycodes = "";
 	}
 	fin.currcompanycodes.inserter(1, 1, fin.currcompany);
 
-	call log2("in init.company and init.general", logtime);
+	//in init.company and init.general
 
-	if (gen.glang.unassigned() or gen.glang == "" or gen.company.a(14) ne oldcompany.a(14)) {
+	if (gen.glang == "" or gen.company.a(14) ne oldcompany.a(14)) {
 		call getlang("GENERAL", "", "", fin.alanguage, gen.glang);
 		if (gen.glang.a(9)) {
 			UPPERCASE = gen.glang.a(9);
@@ -108,12 +115,11 @@ function main(in nextcompanycode) {
 
 	}
 
-	call log2("financial year dates", logtime);
+	//financial year dates
 	var financialyear = gen.company.a(6);
 	var firstmonth = financialyear.field(",", 1);
-	var temp;
 	if (firstmonth.isnum()) {
-		if (not(var("1,2,3,4,5,6,7,8,9,10,11,12").locateusing(firstmonth, ","))) {
+		if (not(var("1,2,3,4,5,6,7,8,9,10,11,12").locateusing(firstmonth, ",", temp))) {
 			firstmonth = 1;
 		}
 		fin.maxperiod = financialyear.field(",", 2);
@@ -123,7 +129,7 @@ function main(in nextcompanycode) {
 		gen.company.r(6, "[DATEPERIOD," ^ firstmonth ^ "," ^ fin.maxperiod ^ "]");
 	}else{
 		firstmonth = 1;
-		if (addcent((gen.company.a(2)).substr(-2, 2)) >= 2004 or financialyear.field(",", 1) == "WEEKLY2") {
+		if (addcent(gen.company.a(2).substr(-2,2), "", "", xx) >= 2004 or financialyear.field(",", 1) == "WEEKLY2") {
 			fin.maxperiod = 12;
 		}else{
 			//"13X4WEEK,1/7,5" could be replaced by "WEEKLY,1/7,5,4"
@@ -142,37 +148,38 @@ function main(in nextcompanycode) {
 	}
 	gen.company.r(45, firstmonth ^ "," ^ fin.maxperiod);
 
-	call log2("date format", logtime);
+	//date format
 	DATEFORMAT = "D2/E";
-	var dateformat = gen.company.a(10);
-	if (dateformat == "") {
+	DATEFORMAT = gen.company.a(10);
+	if (DATEFORMAT == "") {
 		DATEFORMAT = "D2/E";
-	} else if (dateformat.substr(1, 6) == "31/01/") {
+	} else if (DATEFORMAT.substr(1,6) == "31/01/") {
 		DATEFORMAT = "D2/E";
-	} else if (dateformat.substr(1, 6) == "31-01-") {
+	} else if (DATEFORMAT.substr(1,6) == "31-01-") {
 		DATEFORMAT = "D2-E";
-	} else if (dateformat == "31 JAN 90") {
+	} else if (DATEFORMAT == "31 JAN 90") {
 		DATEFORMAT = "D2E";
-	} else if (dateformat == "31 JAN 90.") {
+	} else if (DATEFORMAT == "31 JAN 90.") {
 		DATEFORMAT = "D2";
-	} else if (dateformat.substr(1, 6) == "01/31/") {
+	} else if (DATEFORMAT.substr(1,6) == "01/31/") {
 		DATEFORMAT = "D2/";
-	} else if (dateformat.substr(1, 6) == "01-31-") {
+	} else if (DATEFORMAT.substr(1,6) == "01-31-") {
 		DATEFORMAT = "D2-";
-	} else if (dateformat.substr(-6, 6) == "90/01/31") {
+	} else if (DATEFORMAT.substr(-6,6) == "90/01/31") {
 		DATEFORMAT = "D2J";
+
 	//CASE DATE.FORMAT='31/01/2000';@DATE.FORMAT='D2/E'
 	//CASE DATE.FORMAT='31-01-2000';@DATE.FORMAT='D2-E'
-	} else if (dateformat == "31 JAN 2000") {
+	} else if (DATEFORMAT == "31 JAN 2000") {
 		DATEFORMAT = "D2E";
-	} else if (dateformat == "31 JAN 2000.") {
+	} else if (DATEFORMAT == "31 JAN 2000.") {
 		DATEFORMAT = "D2";
-	//CASE DATE.FORMAT='01/31/2000';@DATE.FORMAT='D2/'
-	//CASE DATE.FORMAT='01-31-2000';@DATE.FORMAT='D2-'
-	//CASE DATE.FORMAT='2000/01/31';@DATE.FORMAT='D2J'
+		//CASE DATE.FORMAT='01/31/2000';@DATE.FORMAT='D2/'
+		//CASE DATE.FORMAT='01-31-2000';@DATE.FORMAT='D2-'
+		//CASE DATE.FORMAT='2000/01/31';@DATE.FORMAT='D2J'
 	}
-
-	call log2("get voucher type details", logtime);
+//L1119:
+	//get voucher type details
 	fin.definition = "";
 	if (DEFINITIONS ne "") {
 		//almost certainly by company is not implemented at any client or other code
@@ -185,7 +192,7 @@ function main(in nextcompanycode) {
 	}
 	var nvs = (fin.definition.a(1)).count(VM) + 1;
 	for (var vn = 1; vn <= nvs; ++vn) {
-		var temp = fin.definition.a(1, vn);
+		temp = fin.definition.a(1, vn);
 		if (temp) {
 			//fix prefix
 			if (fin.definition.a(6, vn) == "") {
@@ -201,11 +208,11 @@ function main(in nextcompanycode) {
 	if (not gen.company.a(5)) {
 		gen.company.r(5, gen.company.a(4));
 	}
-	call log2("if intercurrency conversion account is blank then", logtime);
+	//if intercurrency conversion account is blank then
 	//trial balance balances in base currency but not for each currency separately
 	//IF COMPANY<12> ELSE COMPANY<12>=COMPANY<4>
 
-	call log2("convert currency gain/loss/conversion accounts and vat control to internal", logtime);
+	//convert currency gain/loss/conversion accounts and vat control to internal
 	//this was not a good idea but remains compatible with older code
 	//TODO remove and change all other code
 	if (gen.company.a(4, 1, 2)) {
@@ -222,13 +229,14 @@ function main(in nextcompanycode) {
 		gen.company.r(19, gen.company.a(19, 1, 2));
 	}
 
-	call log2("initialise the vat rates", logtime);
+	//initialise the vat rates
 	fin.taxes = "";
 	if (DEFINITIONS ne "") {
 		if (not(fin.taxes.read(DEFINITIONS, "TAXES"))) {
-			fin.taxes = "Standard" _VM_ "Zero rated" _VM_ "Exempt";
-			fin.taxes.r(2, "1" _VM_ "2" _VM_ "3");
-			fin.taxes.r(3, "5" _VM_ "0" _VM_ "");
+			fin.taxes = "Standard,Zero rated,Exempt";
+			fin.taxes.r(2, "1,2,3");
+			fin.taxes.r(3, "5,0,");
+			fin.taxes.converter(",", VM);
 			fin.taxes.write(DEFINITIONS, "TAXES");
 		}
 
@@ -237,7 +245,7 @@ function main(in nextcompanycode) {
 		if (taxaccno and fin.taxes.a(4) == "") {
 			for (var ii = 1; ii <= 999; ++ii) {
 			///BREAK;
-			if (not(fin.taxes.a(1, ii))) break;;
+			if (not fin.taxes.a(1, ii)) break;;
 				fin.taxes.r(4, ii, taxaccno);
 			};//ii;
 			fin.taxes.write(DEFINITIONS, "TAXES");
@@ -245,17 +253,36 @@ function main(in nextcompanycode) {
 
 	}
 
-	call log2("initialise the period selection if the company period is different", logtime);
+	//eg 3/18
+	//print CURRPERIOD
+	//print CURRYEAR
+
+	//eg 3/18 - 3/18
+	//print FROMPERIOD
+	//print FROMYEAR
+	//print TOPERIOD
+	//print TOYEAR
+
+	//eg 1/18 - 3/18
+	//print CURRFROMPERIOD
+	//print CURRFROMYEAR
+	//print CURRTOPERIOD
+	//print CURRTOYEAR
+
 	if (fin.currperiod.unassigned()) {
 		fin.currperiod = "";
 	}
-	if (fin.currperiod == "" or oldcompany == "" or gen.company.a(2) ne oldcompany.a(2)) {
+
+	//initialise the period selection if the currperiod or company is not set
+	//initialise the period selection if the company period is different
+	//IF CURRPERIOD='' OR OLD.COMPANY='' OR COMPANY<2> NE OLD.COMPANY<2> THEN
+	if (fin.currperiod == "" or oldcompany == "") {
 		//current period is determined by system date
 		var curryearperiod = (var().date()).oconv(gen.company.a(6));
-		fin.currperiod = curryearperiod.substr(-2, 2) + 0;
-		fin.curryear = curryearperiod.substr(1, 2);
+		fin.currperiod = curryearperiod.substr(-2,2) + 0;
+		fin.curryear = curryearperiod.substr(1,2);
 		var maxyear = gen.company.a(2).field("/", 2);
-		if (addcent(fin.curryear) > addcent(maxyear)) {
+		if (addcent(fin.curryear, "", "", xx) > addcent(maxyear, "", "", xx)) {
 			fin.curryear = maxyear;
 			fin.currperiod = fin.maxperiod;
 		}
@@ -289,8 +316,7 @@ function main(in nextcompanycode) {
 
 	//get base format
 	//IF COMPANIES<>'' THEN
-	var ndec;
-	if (not(ndec.readv(gen.currencies, fin.basecurrency, 3))) {
+	if (not ndec.readv(gen.currencies, fin.basecurrency, 3)) {
 		ndec = 2;
 	}
 	//END ELSE
@@ -300,15 +326,15 @@ function main(in nextcompanycode) {
 
 	//number format (@USER2)
 	USER2 = "MC";
-	if (var("1,000.00 1000.00").locateusing(gen.company.a(22), " ")) {
+	if (var("1,000.00,1000.00").locateusing(gen.company.a(22), ",", temp)) {
 		USER2 = "MD";
 	}
 	USER2 ^= ndec ^ "0P";
-	if (var("1,000.00 1.000,00").locateusing(gen.company.a(22), " ")) {
+	if (var("1,000.00,1.000,00").locateusing(gen.company.a(22), ",", temp)) {
 		USER2 ^= ",";
 	}
 
-	call log2("build up description", logtime);
+	//build up description
 	/////////////////////
 
 	//company
@@ -316,6 +342,7 @@ function main(in nextcompanycode) {
 		companydesc = gen.company.a(1);
 	}else{
 		companydesc = "";
+		//why is this here??
 		gen.company = "";
 	}
 
@@ -325,12 +352,12 @@ function main(in nextcompanycode) {
 		if (fin.toyear == fin.fromyear) {
 	// IF TOPERIOD NE FROMPERIOD THEN PERIODDESC:='-':TOPERIOD
 			if (fin.toperiod ne fin.fromperiod) {
-				perioddesc ^= "/" ^ addcent(fin.fromyear) ^ "-" ^ fin.toperiod;
+				perioddesc ^= "/" ^ addcent(fin.fromyear, "", "", xx) ^ "-" ^ fin.toperiod;
 			}
 		}else{
-			perioddesc ^= "/" ^ addcent(fin.fromyear) ^ "-" ^ fin.toperiod;
+			perioddesc ^= "/" ^ addcent(fin.fromyear, "", "", xx) ^ "-" ^ fin.toperiod;
 		}
-		perioddesc ^= "/" ^ addcent(fin.toyear);
+		perioddesc ^= "/" ^ addcent(fin.toyear, "", "", xx);
 	}else{
 		perioddesc = "";
 	}
@@ -343,76 +370,73 @@ function main(in nextcompanycode) {
 nocurrency:
 		fin.currfmt = fin.basefmt;
 		currencydesc = "";
-		//goto currencydescexit;
+		goto currencydescexit;
+	}
 
-	} else {
-
-		var desc1 = "";
-		var desc2 = "";
-		if (fin.currcurrency) {
-			var currencyrec;
-			if (not(currencyrec.read(gen.currencies, fin.currcurrency))) {
-				currencyrec = fin.currcurrency ^ FM ^ FM ^ 2;
+	desc1 = "";
+	desc2 = "";
+	if (fin.currcurrency) {
+		if (not currencyrec.read(gen.currencies, fin.currcurrency)) {
+			currencyrec = fin.currcurrency ^ FM ^ FM ^ 2;
+		}
+		desc1 = currencyrec.a(1);
+		if (fin.currcurrency ne fin.basecurrency and fin.converted) {
+	//? in ?
+			currencydesc = gen.glang.a(4);
+			goto basedesc;
+		}
+	//? only
+		currencydesc = gen.glang.a(5);
+		fin.currfmt = "MD" ^ currencyrec.a(3) ^ "0P";
+	}else{
+		if (fin.converted) {
+			if (fin.converted == 1) {
+				fin.converted = fin.basecurrency;
 			}
-			desc1 = currencyrec.a(1);
-			if (fin.currcurrency ne fin.basecurrency and fin.converted) {
-		//? in ?
-				currencydesc = gen.glang.a(4);
-				goto basedesc;
-			}
-		//? only
-			currencydesc = gen.glang.a(5);
-			fin.currfmt = "MD" ^ currencyrec.a(3) ^ "0P";
-		}else{
-			if (fin.converted) {
-				if (fin.converted == 1) {
-					fin.converted = fin.basecurrency;
-				}
 
-			//All currencies in ?
-				currencydesc = gen.glang.a(6);
+	//All currencies in ?
+			currencydesc = gen.glang.a(6);
 basedesc:
-				//get conversion currency
-				var convcurrency;
-				if (not(convcurrency.read(gen.currencies, fin.converted))) {
-					convcurrency = fin.converted ^ FM ^ FM ^ 2;
-				}
-				desc2 = convcurrency.a(1);
-				fin.currfmt = "MD" ^ convcurrency.a(3) ^ "0P";
-			}else{
-		//All currencies unconverted
-				currencydesc = gen.glang.a(7);
+			//get conversion currency
+			if (not convcurrency.read(gen.currencies, fin.converted)) {
+				convcurrency = fin.converted ^ FM ^ FM ^ 2;
 			}
-		}
-
-		if (gen.company.a(4) == "") {
-			currencydesc = desc2;
+			desc2 = convcurrency.a(1);
+			fin.currfmt = "MD" ^ convcurrency.a(3) ^ "0P";
 		}else{
-			if (desc1) {
-				var temp = currencydesc.index("?", 1);
-				if (temp) {
-					currencydesc.splicer(temp, 1, desc1);
-				}
-			}
-			if (desc2) {
-				temp = currencydesc.index("?", 1);
-				if (temp) {
-					currencydesc.splicer(temp, 1, desc2);
-				}
+	//All currencies unconverted
+			currencydesc = gen.glang.a(7);
+		}
+	}
+
+	if (gen.company.a(4) == "") {
+		currencydesc = desc2;
+	}else{
+		if (desc1) {
+			temp = currencydesc.index("?", 1);
+			if (temp) {
+				currencydesc.splicer(temp, 1, desc1);
 			}
 		}
+		if (desc2) {
+			temp = currencydesc.index("?", 1);
+			if (temp) {
+				currencydesc.splicer(temp, 1, desc2);
+			}
+		}
+	}
 
-	}//currencydescexit:
+currencydescexit:
 
-	call log2("combine and exit", logtime);
+	//combine and exit
 	if (gen.company.a(2)) {
 		//ensure period,currency,company by removing any commas in period/curr/comp
 		fin.gendesc = perioddesc.convert(",", "-");
 		if (currencydesc) {
-			fin.gendesc ^= currencydesc.convert(",","-");
+			fin.gendesc ^= ", " ^ currencydesc.convert(",", "-");
 		}
 		if (companydesc) {
-			fin.gendesc ^= ",  " ^ companydesc.convert(",","-");
+			fin.gendesc ^= ",  " ^ companydesc.convert(",", "-");
 		}
 	}else{
 		fin.gendesc = companydesc;
@@ -421,17 +445,24 @@ basedesc:
 
 	if (not SYSTEM.a(33)) {
 
-		username=USERNAME.trim();
+		//put gendesc on the bottom line of the screen
+		if (CRTHIGH > 24) {
+			temp = CRTHIGH - 1;
+		}else{
+			temp = CRTHIGH;
+		}
+
+		var username = USERNAME.trim();
 		var s23 = SYSTEM.a(23);
 		s23.converter(" ", FM);
 		//locate 'TEST' in s23 setting x then username:='*' else
-		if (s23.locateusing("TESTDATA", FM)) {
+		if (s23.locateusing("TESTDATA", VM, xx)) {
 			username ^= "*";
 		}else{
-			if (s23.locateusing("TESTING", FM)) {
+			if (s23.locateusing("TESTING", VM, xx)) {
 				username ^= "*";
 			}else{
-				if (s23.locateusing("TRAINING", FM)) {
+				if (s23.locateusing("TRAINING", VM, xx)) {
 					username ^= "*";
 				}else{
 					if ((SYSTEM.a(17)).index("TEST", 1)) {
@@ -442,11 +473,25 @@ basedesc:
 		}
 		// end
 
+		var freespace = 80 - 3 - fin.gendesc.length() - username.length();
+		if (freespace < 0) {
+			var datax = " " ^ fin.gendesc.oconv("L#79");
+			var tt = username.length() + 1;
+			datax.splicer(-tt, tt, "|" ^ username);
+		}else{
+			var datax = " " ^ fin.gendesc ^ freespace.space() ^ " " ^ username ^ " ";
+		}
+		//CALL SCRN.IO(0,TEMP,DATAX,'0')
+
+		//remove for c++
+		//DECLARE FUNCTION ESC.TO.ATTR
+		//CALL SCRN.IO(0,TEMP,DATAX,ESC.TO.ATTR(@ENVIRON.SET<21>))
+
 	}
 
-	call log2("-----initcompany exit", logtime);
-	return var("");
+	return 1;
 
 }
+
 
 libraryexit()

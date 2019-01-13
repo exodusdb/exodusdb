@@ -30,7 +30,7 @@ function main() {
 	}
 	if (not listindexes("SUPPLIERS", "SEQUENCE.XREF") or tt.a(1) < 17532) {
 		execute("REINDEX SUPPLIERS SEQUENCE.XREF (S)");
-		write(var().date(), DEFINITIONS, "REINDEX*SUPPLIERS*SEQUENCE*XREF");
+		var().date().write(DEFINITIONS, "REINDEX*SUPPLIERS*SEQUENCE*XREF");
 	}
 
 	call log2("*add clients name index", logtime);
@@ -39,7 +39,7 @@ function main() {
 	}
 	if (not listindexes("CLIENTS", "SEQUENCE.XREF") or tt.a(1) < 17532) {
 		execute("MAKEINDEX CLIENTS SEQUENCE XREF");
-		write(var().date(), DEFINITIONS, "REINDEX*CLIENTS*SEQUENCE*XREF");
+		var().date().write(DEFINITIONS, "REINDEX*CLIENTS*SEQUENCE*XREF");
 	}
 
 	call log2("*add brands executive index", logtime);
@@ -53,7 +53,7 @@ function main() {
 	}
 	if (not listindexes("BRANDS", "SEQUENCE.XREF") or tt.a(1) < 17532) {
 		execute("MAKEINDEX BRANDS SEQUENCE XREF");
-		write(var().date(), DEFINITIONS, "REINDEX*BRANDS*SEQUENCE*XREF");
+		var().date().write(DEFINITIONS, "REINDEX*BRANDS*SEQUENCE*XREF");
 	}
 
 	call log2("*add brands executive index", logtime);
@@ -72,7 +72,7 @@ function main() {
 	}
 	if (not listindexes("JOBS", "DATE_CREATED") or tt.a(1) <= 17250) {
 		execute("REINDEX JOBS DATE_CREATED (S)");
-		write(var().date(), DEFINITIONS, "REINDEX*JOBS*DATE_CREATED");
+		var().date().write(DEFINITIONS, "REINDEX*JOBS*DATE_CREATED");
 	}
 
 	call log2("*add jobs closed index", logtime);
@@ -95,7 +95,7 @@ function main() {
 	}
 	if (not listindexes("VEHICLES", "SEQUENCE.XREF") or tt.a(1) < 17532) {
 		execute("REINDEX VEHICLES SEQUENCE.XREF (S)");
-		write(var().date(), DEFINITIONS, "REINDEX*VEHICLES*SEQUENCE*XREF");
+		var().date().write(DEFINITIONS, "REINDEX*VEHICLES*SEQUENCE*XREF");
 	}
 
 	//if indices2('VEHICLES','SEQUENCE.XREF') else
@@ -173,7 +173,7 @@ function main() {
 	var xx;
 	if (not(xx.read(DEFINITIONS, "JOBSEXECLOWERCASE"))) {
 		execute("MAKEINDEX JOBS EXECUTIVE_CODE BTREE LOWERCASE");
-		write(var().date(), DEFINITIONS, "JOBSEXECLOWERCASE");
+		var().date().write(DEFINITIONS, "JOBSEXECLOWERCASE");
 	}
 
 	call log2("*add booking.orders schedule_no index", logtime);
@@ -218,7 +218,7 @@ function main() {
 	}
 	if (tt.a(1) < 17520 or not listindexes("PRODUCTION_INVOICES", "CLIENT_ORDER_NO_PARTS")) {
 		execute("MAKEINDEX PRODUCTION_INVOICES CLIENT_ORDER_NO_PARTS");
-		write(var().date(), DEFINITIONS, "REINDEX*PRODUCTION_INVOICES*CLIENT_ORDER_NO_PARTS");
+		var().date().write(DEFINITIONS, "REINDEX*PRODUCTION_INVOICES*CLIENT_ORDER_NO_PARTS");
 	}
 
 	call log2("*add schedules client_order_no_PARTS index", logtime);
@@ -227,7 +227,7 @@ function main() {
 	}
 	if (tt.a(1) < 17520 or not listindexes("SCHEDULES", "CLIENT_ORDER_NO_PARTS")) {
 		execute("MAKEINDEX SCHEDULES CLIENT_ORDER_NO_PARTS");
-		write(var().date(), DEFINITIONS, "REINDEX*SCHEDULES*CLIENT_ORDER_NO_PARTS");
+		var().date().write(DEFINITIONS, "REINDEX*SCHEDULES*CLIENT_ORDER_NO_PARTS");
 	}
 
 	call log2("*add timesheets date index", logtime);
@@ -263,7 +263,7 @@ function main() {
 		}
 		if (not listindexes(filename, "TEXT.XREF") or tt.a(1) < 18352) {
 			execute("MAKEINDEX " ^ filename ^ " TEXT XREF");
-			write(var().date(), DEFINITIONS, "REINDEX*" ^ filename ^ "*TEXT*XREF");
+			var().date().write(DEFINITIONS, "REINDEX*" ^ filename ^ "*TEXT*XREF");
 		}
 
 	};//filen;

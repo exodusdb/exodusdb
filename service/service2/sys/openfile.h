@@ -3,16 +3,30 @@
 #define EXODUSDLFUNC_OPENFILE_H
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_openfile;
+//ExodusFunctorBase efb_openfile;
+class efb_openfile : private ExodusFunctorBase
+{
+public:
+
+efb_openfile(MvEnvironment& mv) : ExodusFunctorBase("openfile", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_openfile& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var openfile(in filename, io file, in similarfilename="", in autocreate0="")
+var operator() (in filename, io file, in similarfilename="", in autocreate0="")
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_openfile.pmemberfunction_==NULL)
-  efb_openfile.init("openfile","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -21,9 +35,15 @@ var openfile(in filename, io file, in similarfilename="", in autocreate0="")
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_openfile.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_openfile.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_openfile.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_openfile.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   (filename,file,similarfilename,autocreate0);
 
 }
+
+};
+efb_openfile openfile{mv};
 //#endif

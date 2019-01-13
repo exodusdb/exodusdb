@@ -2,19 +2,23 @@
 libraryinit()
 
 #include <authorised.h>
-//#include <openfile.h>
+#include <openfile.h>
+#include <select2.h>
+#include <timesheetsubs.h>
 #include <sysmsg.h>
 #include <holiday.h>
 #include <agencysubs.h>
-#include <select2.h>
 #include <generalsubs2.h>
+#include <safeselect.h>
+#include <chklic.h>
+#include <flushindex.h>
 #include <generalsubs.h>
-#include <timesheetsubs.h>
-#include <log2.h>
+#include <quote2.h>
+#include <singular.h>
 
-#include <win.h>
 #include <gen.h>
 #include <agy.h>
+#include <win.h>
 
 #include <window.hpp>
 
@@ -22,8 +26,7 @@ var msg;
 var usercode;
 var xml;
 var cols;
-var data;
-var reply;
+var datax;
 var idate;//num
 var timesheet;
 var getholidaytypedate;
@@ -32,22 +35,22 @@ var USER;
 var marketcode;
 var market;
 var personn;
-var activityn;//num
-var oldactivity;
-var tt;//num
+var xx;
+var tt;
 var v69;
 var v70;
 var v71;
 var jobno;
 var ln;//num
+var job;
 var userisadmin;
-var t2;
+var client;
+var priordate;
 var wsmsg;
 
-var mode;
-var logtime;
-
-function main(in mode0) {
+function main(in mode) {
+	//c tim
+	//global priordate,job
 
 	//confuses with existing msg
 	//equ msg to @user4
@@ -57,10 +60,7 @@ function main(in mode0) {
 	//equ jobs to register(5)
 	//equ security.net to register(9)
 
-	log2("-----timesheetsubs," ^ mode0^" init", logtime);
-
 	var interactive = not SYSTEM.a(33);
-	mode=mode0;
 
 	win.registerx(7) = authorised("TIMESHEET ADMINISTRATION", msg, "TA");
 	//register(8)=msg
@@ -72,7 +72,8 @@ function main(in mode0) {
 		//used to setup dos mode window
 
 		if (not(authorised("TIMESHEET ADMINISTRATION", msg, ""))) {
-			return invalid();
+			gosub invalid(msg);
+			var().stop();
 		}
 
 		gosub getregisterparams();
@@ -89,15 +90,28 @@ function main(in mode0) {
 
 		RECORD.write(DEFINITIONS, "TIMESHEET.PARAMS");
 
-	} else if (mode.substr(1, 8) == "POSTINIT") {
-
+	} else if (mode.substr(1,8) == "POSTINIT") {
 		win.valid = 1;
 		gosub security(mode);
 		if (not win.valid) {
-			return invalid();
+			return 0;
+		}
+		if (not win.valid) {
+			var().stop();
 		}
 
 		gosub getregisterparams();
+
+		if (not(openfile("JOB_TYPES", win.registerx(4)))) {
+			win.registerx(4) = "";
+		}
+		//if openfile('JOBS',jobs) else jobs=''
+
+		//flag to init.general that the timesheet is not required
+		win.registerx(6) = PSEUDO;
+		if (win.registerx(1).a(2) == "") {
+			win.registerx(6) = "";
+		}
 
 		if (mode == "POSTINIT2") {
 
@@ -106,36 +120,22 @@ function main(in mode0) {
 			cols = "CODE NAME";
 			gosub getactivities();
 
-			call log2("select users by rank user_code user_and_dept_name", logtime);
+			win.registerx(4) = "";
+			//jobs=''
+
 			if (win.registerx(7)) {
 				//equ response to @user3
-				//call select2('USERS','','BY DEPT_AND_USER_NAME WITH DEPARTMENT_CODE NE @ID','USER_CODE USER_AND_DEPT_NAME','',data,response)
-				call select2("USERS", "", "BY RANK WITH DEPARTMENT_CODE NE @ID", "USER_CODE USER_AND_DEPT_NAME", "", data, USER3, "", "", "");
-
-//printl("timesheetsubs data ", data);
-				data.transfer(win.registerx(8));
+				//call select2('USERS','','BY DEPT_AND_USER_NAME WITH DEPARTMENT_CODE NE @ID','USER_CODE USER_AND_DEPT_NAME','',datax,response)
+				call select2("USERS", "", "BY RANK WITH DEPARTMENT_CODE NE @ID", "USER_CODE USER_AND_DEPT_NAME", "", datax, USER3, "", "", "");
+				datax.transfer(win.registerx(8));
 			}
 
 			//security.net=security
-			//*except passwords
+			//!except passwords
 			//register(8)<4>=''
 
 		}
 
-/*
-	} else if (mode == "F2.PERSON") {
-		//prevent others
-		if (not win.registerx(7)) {
-			var().chr(7).output();
-			call mssg(win.registerx(8));
-			return 0;
-		}
-		if (not(decide("", SECURITY.a(1), reply))) {
-			return 0;
-		}
-		ANS = SECURITY.a(1, reply);
-		data ^= "" "\r";
-*/
 	} else if (mode.field(".", 1) == "GETNEXTTIMESHEET") {
 		ID = mode.field(".", 2, 9999);
 		call timesheetsubs("PREREAD");
@@ -144,7 +144,7 @@ function main(in mode0) {
 
 	} else if (mode == "PREREAD") {
 
-		idate = ID.field("*", 2, 999).field("~", 1);
+		idate = (ID.field("*", 2, 999)).field("~", 1);
 		if (idate) {
 
 			//skip if known date - the following is to find the next date
@@ -172,14 +172,13 @@ function main(in mode0) {
 		gosub getregisterparams();
 
 		//find last ts
-		for (idate = var().date(); idate < var().date() - 31; --idate) {
+		for (idate = var().date(); idate >= var().date() - 31; --idate) {
 			var timesheet;
 			if (not(timesheet.read(win.srcfile, ID.field("*", 1) ^ "*" ^ idate))) {
 				timesheet = "";
 			}
-			if (timesheet)
-				break;
-
+		///BREAK;
+		if (timesheet) break;;
 		};//idate;
 
 		getholidaytypedate = idate;
@@ -191,14 +190,13 @@ function main(in mode0) {
 			// - enter today (even if it is a holiday)
 			idate = var().date();
 
-			goto L1007;
-		}
-		if (timesheet and not holidaytype and (timesheet.a(2)).sum() < win.registerx(1).a(2)) {
+		} else if (timesheet and not holidaytype and (timesheet.a(2)).sum() < win.registerx(1).a(2)) {
 
 			//found incomplete timesheet
 			// - enter it
+			{}
 
-		}else{
+		} else {
 
 			//previous full working or holiday timesheet found
 			// - enter next working day after that
@@ -212,14 +210,13 @@ function main(in mode0) {
 			}
 
 		}
-L1007:
-
+//L941:
 		ID = ID.fieldstore("*", 2, 1, idate);
 
 		//case mode='DEF.PERSON'
-		// if is then return 0
+		// if is then return
 		// @ans=@username
-		// if isadmin else data is
+		// if isadmin else datax is
 
 	} else if (mode == "VAL.PERSON") {
 		if (win.is == "") {
@@ -232,10 +229,11 @@ L1007:
 		if (win.is == "---") {
 			goto baduser;
 		}
-		if (not(SECURITY.locate(win.is, personn, 1))) {
+		if (not SECURITY.a(1).locateusing(win.is, VM, personn)) {
 baduser:
 			msg = DQ ^ (win.is ^ DQ) ^ " - person not authorised";
-			return invalid(msg);
+			gosub invalid(msg);
+			return 0;
 		}
 
 		//prevent others
@@ -252,38 +250,19 @@ baduser:
 		//some people cannot do timesheets
 		if (win.registerx(1).a(1) and win.registerx(3) == "") {
 			msg = DQ ^ (win.is ^ DQ) ^ " does not do timesheets|There are no activity codes|setup for dept. " ^ (DQ ^ (win.registerx(2) ^ DQ));
-			return invalid(msg);
-		}
-
-	} else if (mode == "DEF.DATE") {
-		if (win.is) {
+			gosub invalid(msg);
 			return 0;
 		}
-		ANS = var().date();
-		if (not(win.registerx(7))) {
-			data ^= ANS.oconv("[DATE,*]") ^ "\r";
-		}
-
-	} else if (mode == "DEF.JOB") {
-		//data @username
-		//data ''
-		//data ''
-		//call agency.subs('F2.JOBS')
 
 	} else if (mode == "VAL.JOB") {
 		if (win.is == win.isorig) {
 			return 0;
 		}
 
-		var xx;
 		call agencysubs("VAL.JOB.OPEN", xx);
 		if (not win.valid) {
 			return 0;
 		}
-
-		//jobno=is
-		//gosub checkclosed
-		//if msg then goto invalid
 
 	} else if (mode == "VAL.HOURS") {
 
@@ -294,13 +273,15 @@ baduser:
 		//check numeric
 		if (not win.is.isnum()) {
 			msg = "Please enter a number of hours";
-			return invalid(msg);
+			gosub invalid(msg);
+			return 0;
 		}
 
 		//check not negative
 		if (win.is < 0) {
 			msg = "Please enter number of hours greater than 0";
-			return invalid(msg);
+			gosub invalid(msg);
+			return 0;
 		}
 
 		//check minimum time unit
@@ -309,7 +290,7 @@ baduser:
 			var is2 = (win.is / tsminhours2).floor() * tsminhours2;
 			if (is2 ne win.is) {
 				msg = "Warning: The minimum time interval is " ^ win.registerx(1).a(5) ^ " minutes";
-				gosub note(msg);
+				call note(msg);
 				win.is = is2;
 			}
 		}
@@ -326,15 +307,15 @@ baduser:
 				msg = "The total hours you have entered is " ^ tothours ^ " but|";
 				msg.r(-1, "the maximum hours allowed is " ^ win.registerx(1).a(3) ^ "|");
 				if (win.is > win.registerx(1).a(3)) {
-					return invalid(msg);
+					gosub invalid(msg);
+					return 0;
 				}
-				gosub note(msg);
+				call note(msg);
 			}
 
 		}
 
 	} else if (mode == "F2.ACTIVITY") {
-		var xx;
 		call agencysubs("F2.PRODUCTION.TYPE," ^ win.registerx(2), xx);
 
 	} else if (mode == "DEF.ACTIVITY") {
@@ -353,7 +334,76 @@ baduser:
 		// si<18>='R'
 		// w(wi)<18>='R'
 		// end
+	/*;
+		case mode='VAL.ACTIVITY';
 
+			//check required
+			if is='' and tsactivitycoderequired and wi.next>=wi then;
+				msg='activity code is required';
+				gosub invalid;
+				return 0;
+				end;
+
+			if is=is.orig then return 0;
+
+			//check is on file
+	getactivity:
+			read activity from activities,is else;
+
+				//search activity names
+				nactivities=count(activitycodes,vm)+1;
+				activitycodes2='';
+				for activityn=1 to nactivities;
+					activitycode=activitycodes<1,activityn>;
+					reado activity from activities,activitycode else activity='';
+					if index(ucase(activity<1>:' ':activitycode),is,1) then;
+						activitycodes2<1,-1>=activitycode;
+						end;
+					next activityn;
+
+				if activitycodes2='' then;
+					msg=quote(is):' - is not an activity code';
+					gosub invalid;
+					return 0;
+					end;
+
+				//user selects or cancels
+				q='Which do you want ?';
+				if count(activitycodes2,vm) then;
+					ans=pop.up(0,2,activities,activitycodes2:'','1:30:::Activity\0:4:::Code','T','',q,'','','','K');
+					if ans else valid=0;return 0;
+					is=ans;
+				end else;
+					is=activitycodes2;
+					@ans=is;
+					end;
+
+				goto getactivity;
+
+				end;
+
+			//check activity code is valid for this person
+			locate is in activitycodes<1> setting activityn else;
+				msg=quote(is):' - This activity code is|not allowed for this person';
+				gosub invalid;
+				return 0;
+				end;
+
+			//set/update the details
+			details=@record<3,@mv>;
+			if is.orig then;
+				read oldactivity from activities,is.orig else oldactivity='';
+			end else;
+				oldactivity='';
+				end;
+			if oldactivity and index(details,oldactivity<1>,1) then;
+				swap oldactivity<1> with activity<1> in details;
+			end else;
+				details=trim(details:' ':activity<1>);
+				end;
+			@record<3,@mv>=details;
+			t=3;gosub redisplay;
+	*/
 	} else if (mode == "READ") {
 
 		if (RECORD.read(gen.timesheets, ID)) {
@@ -380,6 +430,9 @@ baduser:
 		}
 
 		gosub security(mode);
+		if (not win.valid) {
+			return 0;
+		}
 
 		//check if amending in authorised period
 		if (win.wlocked) {
@@ -387,9 +440,8 @@ baduser:
 			if (msg) {
 				//comment to client
 				win.reset = -1;
-				gosub note(msg);
-				unlockrecord(win.datafile, win.srcfile, ID);
-				win.wlocked = 0;
+				call note(msg);
+				gosub unlockrec();
 			}
 		}
 
@@ -401,10 +453,20 @@ baduser:
 
 			//check if allowed to enter or edit old timesheets
 			if (win.wlocked and win.registerx(1).a(10)) {
-				var daysdelay = var().date() - ID.field("*", 2);
+
+				var fromdate = ID.field("*", 2);
+				var uptodate = var().date();
+				var daysdelay = uptodate - fromdate;
+				//exclude non-working days of any type (personal/weekend/general etc)
+				for (getholidaytypedate = fromdate; getholidaytypedate <= uptodate; ++getholidaytypedate) {
+					gosub getholidaytype();
+					if (holidaytype) {
+						daysdelay -= 1;
+					}
+				};//getholidaytypedate;
 				if (daysdelay > win.registerx(1).a(10)) {
-					msg = "Sorry, you cannot enter or edit timesheets|older than " ^ win.registerx(1).a(10) ^ " days.";
-					gosub invalid();
+					msg = "Sorry, you cannot enter or edit timesheets|older than " ^ win.registerx(1).a(10) ^ " working days.|Your timesheet administrator can.";
+					gosub invalid(msg);
 					win.wlocked = 0;
 					if (RECORD) {
 						win.reset = -1;
@@ -418,10 +480,12 @@ baduser:
 			if (win.wlocked and RECORD == "" and win.registerx(1).a(7) ne "") {
 				var daysadvance = ID.field("*", 2) - var().date();
 				if (daysadvance > win.registerx(1).a(7)) {
-					msg = "Sorry, you cannot enter or edit timesheets|more than " ^ (win.registerx(1).a(7) + 0) ^ " days in advance.";
-					unlockrecord("TIMESHEETS", win.srcfile, ID);
+					//msg='Sorry, you cannot enter or edit timesheets|more than ':tsmaxdaysadvance+0:' days in advance.'
+					tt = win.registerx(1).a(7) + 0;
+					msg = "Sorry, you cannot enter or edit timesheets|more than " ^ tt ^ " days in advance.";
+					xx = unlockrecord("TIMESHEETS", win.srcfile, ID);
 					win.wlocked = 0;
-					gosub invalid();
+					gosub invalid(msg);
 					win.reset = 5;
 				}
 			}
@@ -429,7 +493,7 @@ baduser:
 			//check if allowed to modify approved timesheets
 			if (win.wlocked and RECORD.a(8) == "APPROVED") {
 				call mssg("This timesheet is already approved and cannot be edited unless a timesheet administrator changes the status");
-				//x=unlockrecord(datafile,src.file,@id)
+				//xx=unlockrecord(datafile,src.file,@id)
 				win.wlocked = 0;
 				win.reset = -1;
 			}
@@ -451,21 +515,21 @@ baduser:
 					ndays = 7;
 				}
 
-//				call pushselect(0, v69, v70, v71);
+				call pushselect(0, v69, v70, v71);
 				var cmd = "SSELECT JOBS";
 				var minjobcreationdate = var().date() - (ndays - 1);
 				cmd ^= " WITH DATE_CREATED GE " ^ (DQ ^ (minjobcreationdate.oconv("[DATE]") ^ DQ));
 				cmd ^= " AND WITH CLOSED NE \"Y\" AND WITH AUTHORISED";
-//				call safeselect(cmd);
-				var().select(cmd);
-				var namvs = agy.tsmvfns.dcount(VM);
+				call safeselect(cmd);
+				var tamvfns = "1" _VM_ "100" _VM_ "101" _VM_ "3" _VM_ "4" _VM_ "2";
+				var namvs = tt.count(VM) + 1;
 nextjob:
-				var jobno;
-				if (var().readnext(jobno)) {
-					if (not(RECORD.locate(jobno, ln, 1))) {
+				if (readnext(jobno)) {
+					if (not RECORD.a(1).locateusing(jobno, VM, ln)) {
 						//insert a new blank line at the top
 						for (var amvn = 1; amvn <= namvs; ++amvn) {
-							var fn = agy.tsmvfns.a(1, amvn);
+							//fn=amv.fns<1,amvn>
+							var fn = tamvfns.a(1, amvn);
 							var temp = RECORD.a(fn);
 							if (temp) {
 								RECORD.inserter(fn, 1, "");
@@ -477,7 +541,7 @@ nextjob:
 					RECORD.r(3, 1, "New");
 					goto nextjob;
 				}
-//				call popselect(0, v69, v70, v71);
+				call popselect(0, v69, v70, v71);
 
 			}
 
@@ -495,9 +559,8 @@ nextjob:
 			for (var jobn = 1; jobn <= njobs; ++jobn) {
 			///BREAK;
 			if (RECORD.length() > 48000) break;;
-				var job;
 				if (job.read(agy.jobs, jobnos.a(1, jobn))) {
-					RECORD.r(100, jobn, RECORD.a(100, jobn) ^ " " ^ trimb(job.a(9, 1)));
+					RECORD.r(100, jobn, (RECORD.a(100, jobn) ^ " ").trimb() ^ job.a(9, 1));
 					var brand;
 					if (brand.read(agy.brands, job.a(2))) {
 						RECORD.r(101, jobn, brand.a(2));
@@ -509,15 +572,18 @@ nextjob:
 
 	} else if (mode == "POSTREAD") {
 		gosub security(mode);
+		if (not win.valid) {
+			return 0;
+		}
 
 		//standard users may not be able to enter or edit old timesheets
 		if (not win.registerx(7) and win.registerx(1).a(10)) {
 			var daysdelay = var().date() - ID.field("*", 2);
 			if (daysdelay > win.registerx(1).a(10)) {
-				var xx = unlockrecord("TIMESHEETS", win.srcfile, ID);
+				xx = unlockrecord("TIMESHEETS", win.srcfile, ID);
 				win.wlocked = 0;
 				msg = "Sorry, you cannot enter or edit timesheets|older than " ^ win.registerx(1).a(10) ^ " days.";
-				gosub invalid();
+				gosub invalid(msg);
 				win.reset = 5;
 			}
 		}
@@ -525,9 +591,10 @@ nextjob:
 	} else if (mode.field(".", 1) == "PREWRITE") {
 
 		//prevent creating new records if no lic
-//		call chklic(mode, msg);
+		call chklic(mode, msg);
 		if (msg) {
-			return invalid(msg);
+			gosub invalid(msg);
+			return 0;
 		}
 
 		usercode = ID.field("*", 1);
@@ -537,13 +604,15 @@ nextjob:
 		var approving = mode.field(".", 2) == "APPROVING";
 		if (approving) {
 			if (not(authorised("TIMESHEET APPROVAL", msg, "TAP"))) {
-				return invalid(msg);
+				gosub invalid(msg);
+				return 0;
 			}
 		}
 
 		call agencysubs("CHKCLOSEDPERIOD." ^ mode, msg);
 		if (msg) {
-			return invalid(msg);
+			gosub invalid(msg);
+			return 0;
 		}
 
 		//determine if it timesheet of an administrator (allowed to go under hours etc)
@@ -561,15 +630,17 @@ nextjob:
 		//removed to allow saving on timer start
 		//if tothours else
 		// msg='The total hours:minutes cannot be zero'
-		// goto invalid
+		// gosub invalid
+		// return
 		// end
-		
+
 		//check max hours (if any) always
 		if (win.registerx(1).a(3)) {
 			if (tothours > win.registerx(1).a(3)) {
 				msg = "The total hours entered is " ^ tothours ^ " but";
 				msg = " the maximum allowed is " ^ win.registerx(1).a(3);
-				return invalid(msg);
+				gosub invalid(msg);
+				return 0;
 			}
 		}
 
@@ -579,7 +650,9 @@ nextjob:
 		//check min hours (of non-timesheet admin timesheets)
 		if (not calculate("AUTOSAVED") and win.registerx(1).a(2) and tothours < win.registerx(1).a(2) and not userisadmin) {
 
-			//anybody can enter less for the current and future date but it cannot be approved
+			//anybody can enter less for the current and future dates
+			//but it cannot be approved
+			//TODO idate is users local tz date so shouldnt be checked v. server date()
 			if (idate < var().date() or approving) {
 
 				getholidaytypedate = idate;
@@ -594,8 +667,10 @@ nextjob:
 				//in TIMESHEET.SUBS and ANALTIME2
 				if (not holidaytype) {
 					msg = "The total hours entered is " ^ tothours ^ " but ";
-					msg ^= "the minimum allowed is " ^ (win.registerx(1).a(2) + 0);
-					return invalid(msg);
+					tt = win.registerx(1).a(2) + 0;
+					msg ^= "the minimum allowed is " ^ tt;
+					gosub invalid(msg);
+					return 0;
 				}
 
 			}
@@ -607,20 +682,22 @@ nextjob:
 		if (agy.clients.open("CLIENTS", "")) {
 			var clientcodes = calculate("CLIENT_CODE");
 			var nlns = clientcodes.count(VM) + 1;
-			for (var ln = 1; ln <= nlns; ++ln) {
+			for (ln = 1; ln <= nlns; ++ln) {
 				if (not RECORD.a(3, ln) and RECORD.a(2, ln)) {
 					var clientcode = clientcodes.a(1, ln);
-					var client;
-					if (not(client.read(agy.clients, clientcode))) {
-						//msg = DQ ^ (clientcode ^ DQ) ^ " is missing from the client file";
-						//return invalid(msg);
+					if (not client.read(agy.clients, clientcode)) {
 						client = "";
 					}
+					//msg=quote(clientcode):' is missing from the client file'
+					//gosub invalid
+					//return
+					//end
 					if (client.a(38)) {
 						//msg='Details are missing for ':client<1>
 						msg = client.a(1) ^ " is a \"Sundry Client\" (See Client/Brand File)";
 						msg.r(-1, FM ^ "Please enter the client name/details in line " ^ ln);
-						return invalid(msg);
+						gosub invalid(msg);
+						return 0;
 					}
 				}
 			};//ln;
@@ -632,7 +709,8 @@ nextjob:
 			for (var linen = 1; linen <= nlines; ++linen) {
 				if (RECORD.a(1, linen) and RECORD.a(4, linen) == "") {
 					msg = "Activity code is required but missing on line " ^ linen;
-					return invalid(msg);
+					gosub invalid(msg);
+					return 0;
 				}
 			};//linen;
 		}
@@ -646,7 +724,7 @@ nextjob:
 
 	} else if (mode == "POSTWRITE") {
 
-//		call flushindex("TIMESHEETS");
+		call flushindex("TIMESHEETS");
 
 		//flag to init.general that the timesheet has been entered
 		//register(6) is pseudo
@@ -656,47 +734,49 @@ nextjob:
 
 	} else if (mode == "POSTDELETE") {
 
-//		call flushindex("TIMESHEETS");
+		call flushindex("TIMESHEETS");
 
 	} else if (mode == "PREDELETE") {
 		gosub security(mode);
+		if (not win.valid) {
+			return 0;
+		}
+
+		//update version log
+		call generalsubs2(mode);
 
 	} else if (mode == "POSTAPP") {
 		PSEUDO = win.registerx(6);
 
 	} else {
 		msg = DQ ^ (mode ^ DQ) ^ " - unknown mode skipped in TIMESHEET.SUBS";
-		return invalid(msg);
+		gosub invalid(msg);
+		return 0;
 	}
-
-	log2("-----timesheetsubs," ^ mode0^" exit", logtime);
-	return 1;
-
-}
-
-function checkclosed() {
-	msg = "";
-	//check job has not been closed
-	var job;
-	if (job.read(agy.jobs, jobno)) {
-		if (job.a(7) == "Y") {
-			msg = DQ ^ (win.is ^ DQ) ^ " Job is closed";
-		}
-	}
+//L3524:
 	return 0;
 
 }
 
 subroutine getactivities() {
+	//VERY similar code in timesheet.subs and jobproxy GETACTIVITIES
+	//TODO deduplicate
+
 	//get dept
-	call generalsubs("GETUSERDEPT," ^ usercode);
-	win.registerx(2) = ANS.trim();
+	if (usercode) {
+		call generalsubs("GETUSERDEPT," ^ usercode);
+		win.registerx(2) = ANS.trim();
+	}else{
+		win.registerx(2) = "";
+	}
+
+	//departments with numbers on the end are all the same
+	//department for the sake of activities
 	win.registerx(2).converter("0123456789", "");
 
 	//select
-	//perform 'SSELECT JOB_TYPES WITH DEPARTMENT ':quote(deptcode)
-	call select2("JOB_TYPES", "", "WITH DEPARTMENT " ^ (DQ ^ (win.registerx(2) ^ DQ)), cols, xml, data, USER3);
-	win.registerx(3) = data;
+	call select2("JOB_TYPES", "", "WITH DEPARTMENT " ^ quote2(win.registerx(2)), cols, xml, datax, USER3);
+	win.registerx(3) = datax;
 
 	//convert fm to vm in activitycodes
 
@@ -744,7 +824,7 @@ subroutine getholidaytype() {
 		win.valid = 0;
 		return;
 	}
-	if (not(USER.read(users, usercode))) {
+	if (not USER.read(users, usercode)) {
 		msg = DQ ^ (usercode ^ DQ) ^ " user does not exist";
 		gosub invalid(msg);
 		return;
@@ -754,13 +834,13 @@ subroutine getholidaytype() {
 	//TODO work out first company of each user
 	//in TIMESHEET.SUBS and ANALTIME2
 	marketcode = gen.company.a(30, 1);
-	if (not(market.read(agy.markets, marketcode))) {
+	if (not market.read(agy.markets, marketcode)) {
+		market = "";
 		msg = DQ ^ (marketcode ^ DQ) ^ " Market is missing";
 		gosub invalid(msg);
 		return;
 	}
 
-	var xx;
 	call holiday("GETTYPE", getholidaytypedate, usercode, USER, marketcode, market, agy.agp, holidaytype, xx);
 
 	return;
@@ -770,13 +850,12 @@ subroutine getholidaytype() {
 subroutine getprevioustimesheet() {
 
 	//get jobs from prior date up to 31 days ago
-	var priordate;
 	for (priordate = idate - 1; priordate >= idate - 31; --priordate) {
 		if (not(timesheet.read(gen.timesheets, usercode ^ "*" ^ priordate))) {
 			timesheet = "";
 		}
-		if (timesheet)
-			break;
+	///BREAK;
+	if (timesheet) break;;
 	};//priordate;
 
 	//check if previous timesheet has sufficient hours
@@ -792,14 +871,9 @@ subroutine getprevioustimesheet() {
 			}
 
 			if (not holidaytype) {
-				msg = "Your previous timesheet ("
-					^ idate.oconv("[DATE,4*]")
-					^ ")|has only "
-					^ tothours.oconv("MT2U")
-					^ " hours on it but the|minimum allowed is "
-					^ win.registerx(1).a(2).oconv("MT2U")
-					^ ".||Please complete your|previous timesheet first.";
-				gosub invalid();
+				//MT2 is a GBP PROGRAM!
+				msg = "Your previous timesheet (" ^ idate.oconv("[DATE,4*]") ^ ")|has only " ^ tothours.oconv("MT2") ^ " hours on it but the|minimum allowed is " ^ (win.registerx(1).a(2)).oconv("MT2") ^ ".||Please complete your|previous timesheet first.";
+				gosub invalid(msg);
 				win.reset = 5;
 			}
 
@@ -809,7 +883,7 @@ subroutine getprevioustimesheet() {
 	//copy jobs from previous timesheet except closed jobs
 	if (timesheet) {
 		var dictjobs;
-		if (not(dictjobs.open("DICT", "JOBS"))) {
+		if (not(dictjobs.open("dict_JOBS"))) {
 			dictjobs = "";
 		}
 		RECORD.r(1, timesheet.a(1));
@@ -829,7 +903,6 @@ subroutine getprevioustimesheet() {
 				//dont carry forward details on sundry clients
 				//to ensure they enter details every time
 				if (dictjobs) {
-					var job;
 					if (job.read(agy.jobs, jobno)) {
 						var sundryclient = calculate("SUNDRY", dictjobs, jobno, job, 0);
 						if (sundryclient) {
@@ -842,8 +915,44 @@ subroutine getprevioustimesheet() {
 		};//linen;
 	}
 
+	//deduplicate same job/activity/details
+	//now that timer can cause multiple entries for one job/activity
+	var nfns = var("1,2,3,4,10,11").count(",") + 1;
+	var nlines = (RECORD.a(1)).count(VM) + 1;
+	for (ln = nlines; ln >= 2; --ln) {
+		//if job and activity are the same then delete the lower line
+		//different details are ignored so only the first details are retained
+		if (RECORD.a(1, ln) == RECORD.a(1, ln - 1)) {
+			if (RECORD.a(4, ln) == RECORD.a(4, ln - 1)) {
+				for (var fnn = 1; fnn <= nfns; ++fnn) {
+					var fn = var("1,2,3,4,10,11").field(",", fnn);
+					RECORD.eraser(fn, ln);
+				};//fnn;
+			}
+		}
+	};//ln;
 	return;
 
 }
+
+subroutine checkclosed() {
+	msg = "";
+	//check job has not been closed
+	if (job.read(agy.jobs, jobno)) {
+		if (job.a(7) == "Y") {
+			msg = DQ ^ (win.is ^ DQ) ^ " Job is closed";
+		}
+	}
+	return;
+
+}
+
+subroutine unlockrec() {
+	xx = unlockrecord(win.datafile, win.srcfile, ID);
+	win.wlocked = 0;
+	return;
+
+}
+
 
 libraryexit()

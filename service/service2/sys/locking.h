@@ -3,16 +3,30 @@
 #define EXODUSDLFUNC_LOCKING_H
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_locking;
+//ExodusFunctorBase efb_locking;
+class efb_locking : private ExodusFunctorBase
+{
+public:
+
+efb_locking(MvEnvironment& mv) : ExodusFunctorBase("locking", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_locking& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var locking(in mode, in lockfilename, in lockkey, in lockdesc0, io locklist, int ntries, out msg)
+var operator() (in mode, in lockfilename, in lockkey, in lockdesc0, io locklist, int ntries, out msg)
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_locking.pmemberfunction_==NULL)
-  efb_locking.init("locking","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -21,9 +35,15 @@ var locking(in mode, in lockfilename, in lockkey, in lockdesc0, io locklist, int
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_locking.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_locking.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_locking.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_locking.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   (mode,lockfilename,lockkey,lockdesc0,locklist,ntries,msg);
 
 }
+
+};
+efb_locking locking{mv};
 //#endif

@@ -1027,16 +1027,15 @@ public:
 	bool disconnect();
 	bool setdefaultconnection();
 
+	//var() is a db connection or default connection
 	bool begintrans() const;
 	bool rollbacktrans() const;
 	bool committrans() const;
 	bool statustrans() const;
-
 	bool createdb(const var& dbname) const;
 	bool deletedb(const var& dbname) const;
 	bool createdb(const var& dbname, var& errmsg) const;
 	bool deletedb(const var& dbname, var& errmsg) const;
-
 	bool createfile(const var& filename) const;
 	bool renamefile(const var& filename, const var& newfilename) const;
 	bool deletefile(const var& filename) const;
@@ -1071,8 +1070,10 @@ public:
 
 	//1=ok, 0=failed, ""=already locked
 	var lock(const var& key) const;
-	void unlock(const var& key) const;
-	void unlockall() const;
+	//void unlock(const var& key) const;
+	//void unlockall() const;
+	bool unlock(const var& key) const;
+	bool unlockall() const;
 
 	bool read(const var& filehandle, const var& key);
 	bool readv(const var& filehandle, const var& key, const int fieldno);

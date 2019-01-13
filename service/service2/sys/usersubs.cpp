@@ -3,23 +3,26 @@ libraryinit()
 
 #include <authorised.h>
 #include <sysmsg.h>
+#include <usersubs.h>
 #include <securitysubs.h>
 #include <sortarray.h>
-#include <usersubs.h>
+#include <singular.h>
 
 #include <gen.h>
 #include <fin.h>
 #include <win.h>
 
+#include <window.hpp>
+
 var msg;
 var xx;
 var usern;
+var newuser;//num
 var text;
 var wsmsg;
 
-#include <window.hpp>
-
 function main(in mode) {
+	//c sys
 
 	var users;
 	if (not(users.open("USERS", ""))) {
@@ -32,7 +35,7 @@ function main(in mode) {
 		//no longer needed and prevents access to obsolete users
 		//ie ones left in the users file after being deleted from auth table
 		//gosub getusern
-		//if valid else return 0
+		//if valid else return
 
 		//get email from userlist
 		//it is in the user file already
@@ -53,7 +56,7 @@ function main(in mode) {
 			//if security('AUTHORISATION ACCESS',msg) else goto invalid
 
 			//maybe can only update self
-			//if security('AUTHORISATION UPDATE') else
+			//if security('AUTHORISATION UPDATE',xx) else
 			if (not(authorised("USER UPDATE", xx))) {
 				win.srcfile.unlock( ID);
 				win.wlocked = 0;
@@ -92,7 +95,7 @@ function main(in mode) {
 
 	} else if (mode == "VAL.EMAIL") {
 
-		//assume email addresses in win.is
+		//assume email addresses in IS
 
 		//adminstrator email addresses
 		//tempting to also allow any domains held by admin emails but
@@ -120,7 +123,7 @@ function main(in mode) {
 					var word = sysemails.field(" ", ii);
 					word = field2(word, "@", -1);
 					//remove smtp. mailout. etc from smtp host domain
-					if (var("smtp mail mailout").locateusing(word.field(".", 1), " ")) {
+					if (var("smtp,mail,mailout").locateusing(word.field(".", 1), ",", xx)) {
 						word = word.field(".", 2, 999);
 					}
 					sysemails = sysemails.fieldstore(" ", ii, 1, word);
@@ -128,6 +131,9 @@ function main(in mode) {
 				emaildomains ^= " " ^ sysemails;
 			}
 		}
+
+		//always allow anything @neosys.com
+		emaildomains ^= " neosys.com";
 
 		if (emaildomains) {
 			//check emails
@@ -139,9 +145,9 @@ function main(in mode) {
 				var email = emails.field(";", ii);
 				if (email) {
 					var emaildomain = email.field("@", 2);
-					if (not(emaildomains.locateusing(emaildomain, " "))) {
-						if (not(emaildomains.locateusing(email, " "))) {
-							msg = DQ ^ (emaildomain ^ DQ) ^ " of " ^ (DQ ^ (email ^ DQ)) ^ " is not in the list of allowed email domains/addresses";
+					if (not(emaildomains.locateusing(emaildomain, " ", xx))) {
+						if (not(emaildomains.locateusing(email, " ", xx))) {
+							msg = "Neither " ^ (DQ ^ (emaildomain ^ DQ)) ^ " nor " ^ (DQ ^ (email ^ DQ)) ^ "|is in the list of allowed email domains/addresses";
 							return invalid(msg);
 						}
 					}
@@ -152,11 +158,20 @@ function main(in mode) {
 	//can be PREWRITE.RESETPASSWORD
 	} else if (mode.field(".", 1) == "PREWRITE") {
 
-		var resetpassword = mode.field(".", 2) == "RESETPASSWORD" or ( RECORD.a(4) and RECORD.a(4) ne win.orec.a(4));
+		var resetpassword = mode.field(".", 2) == "RESETPASSWORD";
 
-		//neosys usually not in the users list or shouldnt update security record
-		if (ID == "NEOSYS") {
-			return 0;
+		if (SECURITY.read(DEFINITIONS, "SECURITY")) {
+			SECURITY = SECURITY.invert();
+		}
+
+		if (SECURITY.a(1).locateusing(ID, VM, usern)) {
+			newuser = 0;
+			if (RECORD.a(4) and RECORD.a(4) ne win.orec.a(4)) {
+				resetpassword = 1;
+			}
+		}else{
+			newuser = 1;
+			resetpassword = 0;
 		}
 
 		if (not(lockrecord("DEFINITIONS", DEFINITIONS, "SECURITY", xx, 0))) {
@@ -168,42 +183,101 @@ function main(in mode) {
 			}
 		}
 
-		//prevent amendment of expiry date and password date in UI
+		//get the latest userprivs
+		if (not(SECURITY.read(DEFINITIONS, "SECURITY"))) {
+			msg = "SECURITY is missing from DEFINITIONS";
+			gosub unlocksec();
+			call sysmsg(msg);
+			return invalid(msg);
+		}
+		SECURITY = SECURITY.invert();
+
+		var olduserprivs = SECURITY;
+
+		//neosys usually not in the users list or shouldnt update security record
+		if (ID == "NEOSYS") {
+			return 0;
+		}
+
+		//prevent amendment of expiry date and password date in UI if not authorised
+		//also name, email and department
 		if (mode == "PREWRITE") {
-			if (win.orec.a(35)) {
-				RECORD.r(35, win.orec.a(35));
+			if (win.orec) {
+				if (not(authorised("AUTHORISATION UPDATE", xx))) {
+					//expiry date
+					if (win.orec.a(35)) {
+						RECORD.r(35, win.orec.a(35));
+					}
+					//password date
+					if (win.orec.a(36)) {
+						RECORD.r(36, win.orec.a(36));
+					}
+					//tt=@record<19>
+					//swap 'Default' with '' in tt
+					//username
+					RECORD.r(1, win.orec.a(1));
+					//department
+					RECORD.r(5, win.orec.a(5));
+					//email
+					RECORD.r(7, win.orec.a(7));
+					//department2
+					RECORD.r(21, win.orec.a(21));
+				}
+
 			}
-			if (win.orec.a(36)) {
-				RECORD.r(36, win.orec.a(36));
-			}
-			var tt = RECORD.a(19);
-			tt.swapper("Default", "");
 		}
 
 		//verify email domains
 		win.is = RECORD.a(7);
 		call usersubs("VAL.EMAIL");
 		if (not win.valid) {
-			goto unlocksecurity;
+			gosub unlocksec();
+			return 0;
+		}
+
+		//create new user in userprivs
+		if (newuser) {
+
+			var userdept = RECORD.a(21);
+			if (not userdept) {
+				msg = "USER GROUP CODE is required to create new users";
+				gosub invalid(msg);
+				gosub unlocksec();
+				return 0;
+			}
+
+			if (not SECURITY.a(1).locateusing(userdept, VM, usern)) {
+				msg = DQ ^ (userdept ^ " USER GROUP does not exist" ^ DQ);
+				gosub invalid(msg);
+				gosub unlocksec();
+				return 0;
+			}
+
+			//insert an empty user
+			for (var fn = 1; fn <= 9; ++fn) {
+				SECURITY.inserter(fn, usern, "");
+			};//fn;
+
+			var newusername = RECORD.a(1);
+			var newipnos = RECORD.a(40);
+			var newemailaddress = RECORD.a(7);
+
+			SECURITY.r(1, usern, ID);
+			//userprivs<2,usern>=newkeys
+			//userprivs<3,usern>=newexpirydate
+			//userprivs<4,usern>=newpass
+			//userprivs<5,usern>=newhourlyrate
+			SECURITY.r(6, usern, newipnos);
+			SECURITY.r(7, usern, newemailaddress);
+			SECURITY.r(8, usern, newusername);
+
 		}
 
 		gosub getusern();
 		if (not win.valid) {
-unlocksecurity:
-			call unlockrecord("DEFINITIONS", DEFINITIONS, "SECURITY");
+			gosub unlocksec();
 			return 0;
 		}
-
-		//get the latest userprivs
-		if (not(SECURITY.read(DEFINITIONS, "SECURITY"))) {
-			msg = "SECURITY is missing from DEFINITIONS";
-			call unlockrecord("DEFINITIONS", DEFINITIONS, "SECURITY");
-			call sysmsg(msg);
-			return invalid(msg);
-		}
-		//SECURITY = SECURITY.invert();
-
-		var olduserprivs = SECURITY;
 
 		if (resetpassword < 2) {
 
@@ -216,35 +290,34 @@ unlocksecurity:
 		}
 
 		//reencrypt new password
-		ANS = RECORD.a(4);
-		if (resetpassword and ANS) {
+		var ans = RECORD.a(4);
+		if ((newuser or resetpassword) and ans) {
 
-			win.is = ID ^ FM ^ ANS.a(1);
+			win.is = ID ^ FM ^ ans.a(1);
 			call securitysubs("MAKESYSREC");
-			ANS = win.is;
+			ans = win.is;
 
 			//save the encrypted bit in case we cannot update userprivs
-			RECORD.r(4, ANS.a(7));
+			RECORD.r(4, ans.a(7));
 
 			//update security if managed to lock it
 			if (resetpassword < 2) {
-				ANS.converter(FM, TM);
-				var tt = "<hidden>" ^ SVM ^ ANS;
+				ans.converter(FM, TM);
+				var tt = "<hidden>" ^ SVM ^ ans;
 				SECURITY.r(4, usern, tt);
 			}
 
 		}
 
 		if (resetpassword < 2 and SECURITY ne olduserprivs) {
-			//SECURITY.invert().write(DEFINITIONS, "SECURITY");
-			SECURITY.write(DEFINITIONS, "SECURITY");
+			SECURITY.invert().write(DEFINITIONS, "SECURITY");
 			//no need on user if on userprivs
 			RECORD.r(4, "");
 		}
 
 		//new password cause entry in users log to renable login if blocked
 		//similar in security.subs and user.subs
-		if (resetpassword) {
+		if (resetpassword or newuser) {
 			//datetime=(date():'.':time() 'R(0)#5')+0
 			var datetime = var().date() ^ "." ^ (var().time()).oconv("R(0)#5");
 			RECORD.inserter(15, 1, datetime);
@@ -269,26 +342,38 @@ unlocksecurity:
 
 		call unlockrecord("DEFINITIONS", DEFINITIONS, "SECURITY");
 
+		return 0;
+
 	} else if (mode == "CREATEUSERNAMEINDEX") {
 		win.srcfile = users;
-		begintrans();
 		win.srcfile.select();
 
-		while (win.srcfile.readnext(ID)) {
+		while (true) {
+			if (not readnext(ID)) {
+				ID = "*!%";
+			}
+		///BREAK;
+		if (not(ID ne "*!%")) break;;
 			if (not(ID[1] == "%")) {
 				if (RECORD.read(users, ID)) {
 					gosub updatemirror();
 				}
 			}
-		}
-		committrans();
+		}//loop;
+
 	} else {
 		msg = DQ ^ (mode ^ DQ) ^ " is invalid in USER.SUBS";
 		return invalid(msg);
 
 	}
-
+//L1883:
 	return 0;
+
+}
+
+subroutine unlocksec() {
+	call unlockrecord("DEFINITIONS", DEFINITIONS, "SECURITY");
+	return;
 
 }
 
@@ -297,9 +382,10 @@ subroutine getusern() {
 	if (ID == "NEOSYS") {
 		//usern remains unassigned to force an error if used later on
 	}else{
-		if (not(SECURITY.locate(ID, usern, 1))) {
+		if (not SECURITY.a(1).locateusing(ID, VM, usern)) {
 			msg = DQ ^ (ID ^ DQ) ^ " User does not exist";
 			gosub invalid(msg);
+			return;
 		}
 	}
 	return;
@@ -315,7 +401,7 @@ subroutine updatemirror() {
 	mirror = RECORD.fieldstore(FM, 31, 3, "");
 	var username = RECORD.a(1).ucase();
 	var mirrorkey = "%" ^ username ^ "%";
-	mirror.r(1, ID);//name on mirror is used to store usercode
+	mirror.r(1, ID);
 	mirror.write(win.srcfile, mirrorkey);
 	return;
 

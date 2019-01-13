@@ -3,16 +3,30 @@
 #define EXODUSDLFUNC_DICT_TIMESHEETS_H
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_dict_timesheets;
+//ExodusFunctorBase efb_dict_timesheets;
+class efb_dict_timesheets : private ExodusFunctorBase
+{
+public:
+
+efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_dict_timesheets& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var dict_timesheets()
+var operator() ()
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_dict_timesheets.pmemberfunction_==NULL)
-  efb_dict_timesheets.init("dict_timesheets","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -21,23 +35,43 @@ var dict_timesheets()
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   ();
 
 }
+
+};
+efb_dict_timesheets dict_timesheets{mv};
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_dict_timesheets;
+//ExodusFunctorBase efb_dict_timesheets;
+class efb_dict_timesheets : private ExodusFunctorBase
+{
+public:
+
+efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_dict_timesheets& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var dict_timesheets()
+var operator() ()
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_dict_timesheets.pmemberfunction_==NULL)
-  efb_dict_timesheets.init("dict_timesheets","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -46,23 +80,43 @@ var dict_timesheets()
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   ();
 
 }
+
+};
+efb_dict_timesheets dict_timesheets{mv};
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_dict_timesheets;
+//ExodusFunctorBase efb_dict_timesheets;
+class efb_dict_timesheets : private ExodusFunctorBase
+{
+public:
+
+efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_dict_timesheets& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var dict_timesheets()
+var operator() ()
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_dict_timesheets.pmemberfunction_==NULL)
-  efb_dict_timesheets.init("dict_timesheets","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -71,23 +125,43 @@ var dict_timesheets()
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   ();
 
 }
+
+};
+efb_dict_timesheets dict_timesheets{mv};
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_dict_timesheets;
+//ExodusFunctorBase efb_dict_timesheets;
+class efb_dict_timesheets : private ExodusFunctorBase
+{
+public:
+
+efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_dict_timesheets& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var dict_timesheets()
+var operator() ()
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_dict_timesheets.pmemberfunction_==NULL)
-  efb_dict_timesheets.init("dict_timesheets","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -96,23 +170,43 @@ var dict_timesheets()
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   ();
 
 }
+
+};
+efb_dict_timesheets dict_timesheets{mv};
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_dict_timesheets;
+//ExodusFunctorBase efb_dict_timesheets;
+class efb_dict_timesheets : private ExodusFunctorBase
+{
+public:
+
+efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_dict_timesheets& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var dict_timesheets()
+var operator() ()
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_dict_timesheets.pmemberfunction_==NULL)
-  efb_dict_timesheets.init("dict_timesheets","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -121,23 +215,43 @@ var dict_timesheets()
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   ();
 
 }
+
+};
+efb_dict_timesheets dict_timesheets{mv};
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_dict_timesheets;
+//ExodusFunctorBase efb_dict_timesheets;
+class efb_dict_timesheets : private ExodusFunctorBase
+{
+public:
+
+efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_dict_timesheets& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var dict_timesheets()
+var operator() ()
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_dict_timesheets.pmemberfunction_==NULL)
-  efb_dict_timesheets.init("dict_timesheets","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -146,23 +260,43 @@ var dict_timesheets()
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   ();
 
 }
+
+};
+efb_dict_timesheets dict_timesheets{mv};
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_dict_timesheets;
+//ExodusFunctorBase efb_dict_timesheets;
+class efb_dict_timesheets : private ExodusFunctorBase
+{
+public:
+
+efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_dict_timesheets& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var dict_timesheets()
+var operator() ()
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_dict_timesheets.pmemberfunction_==NULL)
-  efb_dict_timesheets.init("dict_timesheets","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -171,23 +305,43 @@ var dict_timesheets()
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   ();
 
 }
+
+};
+efb_dict_timesheets dict_timesheets{mv};
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_dict_timesheets;
+//ExodusFunctorBase efb_dict_timesheets;
+class efb_dict_timesheets : private ExodusFunctorBase
+{
+public:
+
+efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_dict_timesheets& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var dict_timesheets()
+var operator() ()
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_dict_timesheets.pmemberfunction_==NULL)
-  efb_dict_timesheets.init("dict_timesheets","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -196,23 +350,43 @@ var dict_timesheets()
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   ();
 
 }
+
+};
+efb_dict_timesheets dict_timesheets{mv};
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_dict_timesheets;
+//ExodusFunctorBase efb_dict_timesheets;
+class efb_dict_timesheets : private ExodusFunctorBase
+{
+public:
+
+efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_dict_timesheets& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var dict_timesheets()
+var operator() ()
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_dict_timesheets.pmemberfunction_==NULL)
-  efb_dict_timesheets.init("dict_timesheets","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -221,23 +395,43 @@ var dict_timesheets()
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   ();
 
 }
+
+};
+efb_dict_timesheets dict_timesheets{mv};
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_dict_timesheets;
+//ExodusFunctorBase efb_dict_timesheets;
+class efb_dict_timesheets : private ExodusFunctorBase
+{
+public:
+
+efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_dict_timesheets& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var dict_timesheets()
+var operator() ()
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_dict_timesheets.pmemberfunction_==NULL)
-  efb_dict_timesheets.init("dict_timesheets","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -246,23 +440,43 @@ var dict_timesheets()
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   ();
 
 }
+
+};
+efb_dict_timesheets dict_timesheets{mv};
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_dict_timesheets;
+//ExodusFunctorBase efb_dict_timesheets;
+class efb_dict_timesheets : private ExodusFunctorBase
+{
+public:
+
+efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_dict_timesheets& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var dict_timesheets()
+var operator() ()
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_dict_timesheets.pmemberfunction_==NULL)
-  efb_dict_timesheets.init("dict_timesheets","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -271,23 +485,43 @@ var dict_timesheets()
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   ();
 
 }
+
+};
+efb_dict_timesheets dict_timesheets{mv};
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_dict_timesheets;
+//ExodusFunctorBase efb_dict_timesheets;
+class efb_dict_timesheets : private ExodusFunctorBase
+{
+public:
+
+efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_dict_timesheets& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var dict_timesheets()
+var operator() ()
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_dict_timesheets.pmemberfunction_==NULL)
-  efb_dict_timesheets.init("dict_timesheets","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -296,23 +530,43 @@ var dict_timesheets()
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   ();
 
 }
+
+};
+efb_dict_timesheets dict_timesheets{mv};
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_dict_timesheets;
+//ExodusFunctorBase efb_dict_timesheets;
+class efb_dict_timesheets : private ExodusFunctorBase
+{
+public:
+
+efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_dict_timesheets& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var dict_timesheets()
+var operator() ()
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_dict_timesheets.pmemberfunction_==NULL)
-  efb_dict_timesheets.init("dict_timesheets","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -321,23 +575,43 @@ var dict_timesheets()
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   ();
 
 }
+
+};
+efb_dict_timesheets dict_timesheets{mv};
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_dict_timesheets;
+//ExodusFunctorBase efb_dict_timesheets;
+class efb_dict_timesheets : private ExodusFunctorBase
+{
+public:
+
+efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_dict_timesheets& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var dict_timesheets()
+var operator() ()
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_dict_timesheets.pmemberfunction_==NULL)
-  efb_dict_timesheets.init("dict_timesheets","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -346,23 +620,43 @@ var dict_timesheets()
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   ();
 
 }
+
+};
+efb_dict_timesheets dict_timesheets{mv};
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_dict_timesheets;
+//ExodusFunctorBase efb_dict_timesheets;
+class efb_dict_timesheets : private ExodusFunctorBase
+{
+public:
+
+efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_dict_timesheets& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var dict_timesheets()
+var operator() ()
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_dict_timesheets.pmemberfunction_==NULL)
-  efb_dict_timesheets.init("dict_timesheets","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -371,23 +665,43 @@ var dict_timesheets()
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   ();
 
 }
+
+};
+efb_dict_timesheets dict_timesheets{mv};
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_dict_timesheets;
+//ExodusFunctorBase efb_dict_timesheets;
+class efb_dict_timesheets : private ExodusFunctorBase
+{
+public:
+
+efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_dict_timesheets& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var dict_timesheets()
+var operator() ()
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_dict_timesheets.pmemberfunction_==NULL)
-  efb_dict_timesheets.init("dict_timesheets","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -396,23 +710,43 @@ var dict_timesheets()
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   ();
 
 }
+
+};
+efb_dict_timesheets dict_timesheets{mv};
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_dict_timesheets;
+//ExodusFunctorBase efb_dict_timesheets;
+class efb_dict_timesheets : private ExodusFunctorBase
+{
+public:
+
+efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_dict_timesheets& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var dict_timesheets()
+var operator() ()
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_dict_timesheets.pmemberfunction_==NULL)
-  efb_dict_timesheets.init("dict_timesheets","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -421,23 +755,43 @@ var dict_timesheets()
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   ();
 
 }
+
+};
+efb_dict_timesheets dict_timesheets{mv};
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_dict_timesheets;
+//ExodusFunctorBase efb_dict_timesheets;
+class efb_dict_timesheets : private ExodusFunctorBase
+{
+public:
+
+efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_dict_timesheets& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var dict_timesheets()
+var operator() ()
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_dict_timesheets.pmemberfunction_==NULL)
-  efb_dict_timesheets.init("dict_timesheets","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -446,23 +800,43 @@ var dict_timesheets()
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   ();
 
 }
+
+};
+efb_dict_timesheets dict_timesheets{mv};
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_dict_timesheets;
+//ExodusFunctorBase efb_dict_timesheets;
+class efb_dict_timesheets : private ExodusFunctorBase
+{
+public:
+
+efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_dict_timesheets& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var dict_timesheets()
+var operator() ()
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_dict_timesheets.pmemberfunction_==NULL)
-  efb_dict_timesheets.init("dict_timesheets","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -471,23 +845,43 @@ var dict_timesheets()
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   ();
 
 }
+
+};
+efb_dict_timesheets dict_timesheets{mv};
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_dict_timesheets;
+//ExodusFunctorBase efb_dict_timesheets;
+class efb_dict_timesheets : private ExodusFunctorBase
+{
+public:
+
+efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_dict_timesheets& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var dict_timesheets()
+var operator() ()
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_dict_timesheets.pmemberfunction_==NULL)
-  efb_dict_timesheets.init("dict_timesheets","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -496,23 +890,43 @@ var dict_timesheets()
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   ();
 
 }
+
+};
+efb_dict_timesheets dict_timesheets{mv};
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_dict_timesheets;
+//ExodusFunctorBase efb_dict_timesheets;
+class efb_dict_timesheets : private ExodusFunctorBase
+{
+public:
+
+efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_dict_timesheets& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var dict_timesheets()
+var operator() ()
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_dict_timesheets.pmemberfunction_==NULL)
-  efb_dict_timesheets.init("dict_timesheets","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -521,23 +935,43 @@ var dict_timesheets()
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   ();
 
 }
+
+};
+efb_dict_timesheets dict_timesheets{mv};
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_dict_timesheets;
+//ExodusFunctorBase efb_dict_timesheets;
+class efb_dict_timesheets : private ExodusFunctorBase
+{
+public:
+
+efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_dict_timesheets& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var dict_timesheets()
+var operator() ()
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_dict_timesheets.pmemberfunction_==NULL)
-  efb_dict_timesheets.init("dict_timesheets","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -546,23 +980,43 @@ var dict_timesheets()
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   ();
 
 }
+
+};
+efb_dict_timesheets dict_timesheets{mv};
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_dict_timesheets;
+//ExodusFunctorBase efb_dict_timesheets;
+class efb_dict_timesheets : private ExodusFunctorBase
+{
+public:
+
+efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_dict_timesheets& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var dict_timesheets()
+var operator() ()
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_dict_timesheets.pmemberfunction_==NULL)
-  efb_dict_timesheets.init("dict_timesheets","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -571,23 +1025,43 @@ var dict_timesheets()
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   ();
 
 }
+
+};
+efb_dict_timesheets dict_timesheets{mv};
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_dict_timesheets;
+//ExodusFunctorBase efb_dict_timesheets;
+class efb_dict_timesheets : private ExodusFunctorBase
+{
+public:
+
+efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_dict_timesheets& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var dict_timesheets()
+var operator() ()
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_dict_timesheets.pmemberfunction_==NULL)
-  efb_dict_timesheets.init("dict_timesheets","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -596,23 +1070,43 @@ var dict_timesheets()
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   ();
 
 }
+
+};
+efb_dict_timesheets dict_timesheets{mv};
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_dict_timesheets;
+//ExodusFunctorBase efb_dict_timesheets;
+class efb_dict_timesheets : private ExodusFunctorBase
+{
+public:
+
+efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_dict_timesheets& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var dict_timesheets()
+var operator() ()
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_dict_timesheets.pmemberfunction_==NULL)
-  efb_dict_timesheets.init("dict_timesheets","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -621,23 +1115,43 @@ var dict_timesheets()
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   ();
 
 }
+
+};
+efb_dict_timesheets dict_timesheets{mv};
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_dict_timesheets;
+//ExodusFunctorBase efb_dict_timesheets;
+class efb_dict_timesheets : private ExodusFunctorBase
+{
+public:
+
+efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_dict_timesheets& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var dict_timesheets()
+var operator() ()
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_dict_timesheets.pmemberfunction_==NULL)
-  efb_dict_timesheets.init("dict_timesheets","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -646,9 +1160,15 @@ var dict_timesheets()
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_dict_timesheets.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_dict_timesheets.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   ();
 
 }
+
+};
+efb_dict_timesheets dict_timesheets{mv};
 //#endif

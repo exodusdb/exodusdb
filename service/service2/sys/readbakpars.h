@@ -3,16 +3,30 @@
 #define EXODUSDLFUNC_READBAKPARS_H
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_readbakpars;
+//ExodusFunctorBase efb_readbakpars;
+class efb_readbakpars : private ExodusFunctorBase
+{
+public:
+
+efb_readbakpars(MvEnvironment& mv) : ExodusFunctorBase("readbakpars", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_readbakpars& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var readbakpars(io bakpars, in process0=var())
+var operator() (io bakpars, in process0=var())
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_readbakpars.pmemberfunction_==NULL)
-  efb_readbakpars.init("readbakpars","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -21,9 +35,15 @@ var readbakpars(io bakpars, in process0=var())
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_readbakpars.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_readbakpars.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_readbakpars.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_readbakpars.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   (bakpars,process0);
 
 }
+
+};
+efb_readbakpars readbakpars{mv};
 //#endif

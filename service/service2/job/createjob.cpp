@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-//#include <flushindex.h>
+#include <flushindex.h>
 
 #include <gen.h>
 #include <agy.h>
@@ -33,7 +33,7 @@ function main(io job, in jobno) {
 
 		call unlockrecord("JOBS", agy.jobs, jobno);
 
-//		call flushindex("JOBS");
+		call flushindex("JOBS");
 
 	}
 

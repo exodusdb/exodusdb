@@ -3,16 +3,30 @@
 #define EXODUSDLFUNC_EMAILUSERS_H
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_emailusers;
+//ExodusFunctorBase efb_emailusers;
+class efb_emailusers : private ExodusFunctorBase
+{
+public:
+
+efb_emailusers(MvEnvironment& mv) : ExodusFunctorBase("emailusers", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_emailusers& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var emailusers(in mode, in subject0, in body0, in groupids0, in jobids0, in userids0, in options, io emaillog)
+var operator() (in mode, in subject0, in body0, in groupids0, in jobids0, in userids0, in options, io emaillog)
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_emailusers.pmemberfunction_==NULL)
-  efb_emailusers.init("emailusers","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -21,9 +35,15 @@ var emailusers(in mode, in subject0, in body0, in groupids0, in jobids0, in user
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_emailusers.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_emailusers.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_emailusers.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_emailusers.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   (mode,subject0,body0,groupids0,jobids0,userids0,options,emaillog);
 
 }
+
+};
+efb_emailusers emailusers{mv};
 //#endif

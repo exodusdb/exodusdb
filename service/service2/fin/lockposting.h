@@ -3,16 +3,30 @@
 #define EXODUSDLFUNC_LOCKPOSTING_H
 
 //a member variable/object to cache a pointer/object for the shared library function
-ExodusFunctorBase efb_lockposting;
+//ExodusFunctorBase efb_lockposting;
+class efb_lockposting : private ExodusFunctorBase
+{
+public:
+
+efb_lockposting(MvEnvironment& mv) : ExodusFunctorBase("lockposting", "exodusprogrambasecreatedelete_", mv) {}
+
+efb_lockposting& operator=(const var& newlibraryname) {
+        closelib();
+        libraryname_=newlibraryname.toString();
+}
 
 //a member function with the right arguments, returning a var or void
-var lockposting(in mode, io locklist, in ntries0, io msg)
+var operator() (in mode, io locklist, in ntries0, io msg)
 {
 
  //first time link to the shared lib and create/cache an object from it
  //passing current standard variables in mv
- if (efb_lockposting.pmemberfunction_==NULL)
-  efb_lockposting.init("lockposting","exodusprogrambasecreatedelete_",mv);
+ //first time link to the shared lib and create/cache an object from it
+ //passing current standard variables in mv
+ //if (efb_getlang.pmemberfunction_==NULL)
+ // efb_getlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+ if (this->pmemberfunction_==NULL)
+  this->init();
 
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
@@ -21,9 +35,15 @@ var lockposting(in mode, io locklist, in ntries0, io msg)
 
  //call the shared library object main function with the right args,
  // returning a var or void
- return CALLMEMBERFUNCTION(*(efb_lockposting.pobject_),
- ((pExodusProgramBaseMemberFunction) (efb_lockposting.pmemberfunction_)))
+ //return CALLMEMBERFUNCTION(*(efb_lockposting.pobject_),
+ //((pExodusProgramBaseMemberFunction) (efb_lockposting.pmemberfunction_)))
+ // (mode);
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   (mode,locklist,ntries0,msg);
 
 }
+
+};
+efb_lockposting lockposting{mv};
 //#endif

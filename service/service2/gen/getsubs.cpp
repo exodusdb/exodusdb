@@ -13,12 +13,12 @@ var xx;
 var nextno;//num
 var tt;
 var temp2;
-var task;
 var taskprefix;
 var msg;
+var wsmsg;
 
 function main(in mode) {
-
+	//c gen
 	//declare function lockposting
 
 	//"where" is not really functional in the intranet system
@@ -54,6 +54,7 @@ nextdoc:
 		if (not(nextno.osread(where ^ "0"))) {
 			if (nextno.read(gen.documents, "0")) {
 				gen.documents.deleterecord("0");
+				
 			}else{
 				nextno = "";
 			}
@@ -93,7 +94,7 @@ nextdoc:
 			return 0;
 		}
 
-		task = win.orec.a(5);
+		var task = win.orec.a(5);
 		gosub gettaskprefix();
 
 		//dont know task at this point
@@ -118,14 +119,14 @@ nextdoc:
 
 			//always prevent users from editing documents designed by NEOSYS
 			if ((RECORD.a(1)).index("NEOSYS", 1) and not USERNAME.index("NEOSYS", 1)) {
-				call mssg("You cannot modify report designs created by NEOSYS|You can copy them and modify the copy");
+				call mssg("You cannot modify report designs created by NEOSYS|Use the Copy button to copy them and modify the copy");
 				xx = unlockrecord(win.datafile, win.srcfile, ID);
 				win.wlocked = 0;
 			}
 
 		}
 
-		RECORD.r(101, RECORD.a(6).raise());
+		RECORD.r(101, raise(RECORD.a(6)));
 
 		if (RECORD.a(8) == "") {
 			RECORD.r(8, RECORD.a(3) ^ "." ^ (RECORD.a(4)).oconv("R(0)#5"));
@@ -145,6 +146,8 @@ nextdoc:
 
 		}
 
+		//move fields 101 onwards into field 6 (after lowering)
+		//and remove fields 101 onwards
 		RECORD.r(6, lower(RECORD.field(FM, 101, 9999)));
 		RECORD = RECORD.field(FM, 1, 100);
 
@@ -174,7 +177,7 @@ nextdoc:
 
 	} else if (mode == "PREDELETE") {
 
-		task = win.orec.a(5);
+		var task = win.orec.a(5);
 		gosub gettaskprefix();
 
 		//user can always delete their own reports
@@ -204,19 +207,19 @@ nextdoc:
 				var key = ID;
 				key.swapper("*", "%2A");
 				key = "DOCUMENTS*" ^ key;
-				if ((xx).read(reports, key)) {
+				if (xx.read(reports, key)) {
 					var("%DELETED%").write(reports, key);
 				}
 				//delete reports,key
 			}
 		}
 
-	} else if (mode == "POSTDELETE") {
+		} else if (mode == "POSTDELETE") {
 
 	} else {
 		call mssg(DQ ^ (mode ^ DQ) ^ " is invalid in GET.SUBS");
 	}
-
+//L1041:
 	return 0;
 
 	//in get.subs and generalproxy
@@ -224,16 +227,13 @@ nextdoc:
 
 subroutine gettaskprefix() {
 	taskprefix = "";
-	task = task.field(" ", 1);
+	var task = task.field(" ", 1);
 	if (task == "ANAL") {
 		taskprefix = "BILLING REPORT";
-
 	} else if (task == "BALANCES") {
 		taskprefix = "FINANCIAL REPORT";
-
 	} else if (task == "ANALSCH") {
 		taskprefix = "BILLING REPORT";
-
 	} else {
 		taskprefix = "";
 	}

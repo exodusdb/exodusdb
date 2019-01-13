@@ -11,6 +11,7 @@ libraryinit()
 #include <validcode2.h>
 #include <validcode3.h>
 #include <timedate2.h>
+#include <printtx.h>
 #include <addcent.h>
 #include <htmllib2.h>
 #include <getreccount.h>
@@ -18,8 +19,6 @@ libraryinit()
 #include <gethtml.h>
 #include <readcss.h>
 #include <docmods.h>
-//#include <osbwritex.h>
-#include <printtx.h>
 
 #include <fin.h>
 #include <gen.h>
@@ -28,6 +27,7 @@ libraryinit()
 
 var printptr;//num
 var msg;
+var job;
 var compcode;
 var xx;
 var tt;
@@ -158,8 +158,7 @@ function main() {
 	var jobnos = PSEUDO.a(2);
 	if (not jobnos or jobnos.match("1A0A")) {
 		//in case non-numeric job exist
-		var job;
-		if (not(job.read(agy.jobs, jobnos))) {
+		if (not job.read(agy.jobs, jobnos)) {
 			if (jobnos.match("1A0A")) {
 				compcode = jobnos;
 			}else{
@@ -167,8 +166,7 @@ function main() {
 			}
 			//.1 means get previous ie last one
 			call agencysubs("GETNEXTID." ^ compcode ^ ".1", xx);
-			var tt;
-			if (not(tt.read(agy.jobs, ID))) {
+			if (not tt.read(agy.jobs, ID)) {
 				call mssg("No documents have been created yet for company " ^ compcode ^ "| or company " ^ compcode ^ " doesnt exist");
 				var().stop();
 			}
@@ -209,8 +207,7 @@ function main() {
 				}
 				//.1 means get previous ie last one
 				call agencysubs("GETNEXTID." ^ compcode ^ ".1", xx);
-				var tt;
-				if (not(tt.read(agy.jobs, ID))) {
+				if (not tt.read(agy.jobs, ID)) {
 					call mssg("No documents have been created yet for company " ^ compcode);
 					return 0;
 				}
@@ -360,7 +357,7 @@ function main() {
 	////////
 nextjob:
 	////////
-	//if interactive then call timedelay(.2)
+	//if interactive then call ossleep(1000*.2)
 	if (esctoexit()) {
 		gosub exit();
 		var().stop();
@@ -380,8 +377,8 @@ nextjob:
 	}
 
 	var isoldversion = 0;
-	if (not(RECORD.read(agy.jobs, ID))) {
-		if (not(RECORD.read(jobversions, ID))) {
+	if (not RECORD.read(agy.jobs, ID)) {
+		if (not RECORD.read(jobversions, ID)) {
 			call mssg(DQ ^ (ID ^ DQ) ^ " - JOB NUMBER DOES NOT EXIST");
 			goto nextjob;
 		}
@@ -415,8 +412,7 @@ unauth:
 		head ^= " (Closed)";
 	} else if (calculate("CLOSED") == "N") {
 		head ^= " (Reopened)";
-	}
-	if (1) {
+	} else {
 		head ^= " (Open)";
 	}
 	head = "<h2~style=\"margin:0px;text-align:center\">" ^ head ^ "</h2>";
@@ -547,7 +543,7 @@ unauth:
 	//3rd line
 
 	tab.r(-1, tr ^ td ^ nobr ^ "Market-Period:" ^ nobrx ^ tdx);
-	tab ^= td ^ calculate("MARKET_NAME") ^ " - " ^ addcent(calculate("PERIOD")) ^ tdx ^ td;
+	tab ^= td ^ calculate("MARKET_NAME") ^ " - " ^ addcent(calculate("PERIOD"), "", "", xx) ^ tdx ^ td;
 
 	var prodtypedesc = calculate("PRODTYPE_DESC");
 	if (prodtypedesc) {
@@ -940,7 +936,7 @@ unauth:
 				}
 				datax ^= calculate("QUOTE_NO") ^ sep;
 				//fix bug in datax datax:=oconv({QUOTE_DATE},'[DATE,*]') 'L#12':' '
-				datax ^= (calculate("QUOTE_DATE").a(1, 1)).oconv("[DATE,*]") ^ sep;
+				datax ^= ((calculate("QUOTE_DATE")).a(1, 1)).oconv("[DATE,*]") ^ sep;
 				datax ^= calculate("QUOTE_AMOUNT") ^ calculate("QUOTE_CURRENCY") ^ sep;
 				//datax:=({QUOTE_AMOUNT_BASE}):sep
 				var quoteamountbase = calculate("QUOTE_AMOUNT_BASE");

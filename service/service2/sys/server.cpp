@@ -42,6 +42,8 @@ programinit()
 #include <fin.h>//finance common
 #include <agy.h>//agency common
 
+#include <listen3.h>
+#include <systemsubs.h>
 #include <initgeneral.h>
 #include <select2.h>
 #include <securitysubs.h>
@@ -1602,19 +1604,14 @@ subroutine process()
 		lockdurationinmins = request4;
 		var readenvironment = request5;
 		win.templatex = readenvironment;
+		var triggers;
+		call listen3(filename,request1,newfilename,triggers);
+		var postread=triggers.a(3);
 
 		//reduce chance of using old common
 		//for (int ii=0;ii<10;ii++)
 		//	win.registerx[ii]="";
 		win.registerx="";
-
-		var library="";
-/*TODO reimplement as simple external function
-		if (!library.load(filename))
-			{};//throw MVException("MVCipc() library.load() " ^ filename.quote() ^ " unknown filename");
-*/
-		newfilename="";
-		//if (library) newfilename=library.call("GETALIAS");
 
 		//disallow read/write to unknown files
 		if (false&&newfilename == "") {
@@ -1655,11 +1652,14 @@ subroutine process()
 			return;
 		}
 
-		if (library) {
+		var keyx0=keyx;
+		var preread=triggers.a(1);
+		if (preread) {
 			keyx.transfer(ID);
-/*TODO reimplement as simple external function
-			library.call("PREREAD");
-*/
+			win.srcfile=file;
+			win.datafile=filename;
+			systemsubs=preread;
+			call systemsubs(request1);
 			DATA = "";
 			ID.transfer(keyx);
 		}

@@ -71,7 +71,7 @@ function main() {
 
 		//NB agp<13> is LAST DAY OF WEEK whereas market<10> is FIRST DAY OF WEEK
 		if (market.a(10)) {
-			agy.agp.r(13, market.a(10) - 2 % 7 + 1);
+			agy.agp.r(13, (market.a(10) - 2) % 7 + 1);
 		}
 
 		//highlight days of week for schedule grid
@@ -303,7 +303,7 @@ function main() {
 	//font size (defaulting booking order to 80% from 2011/12/02 (was 100%)
 	//agp<116>
 	for (var ii = 1; ii <= 4; ++ii) {
-		if (not(agy.agp.a(116, ii))) {
+		if (not agy.agp.a(116, ii)) {
 			agy.agp.r(116, ii, "80");
 		}
 	};//ii;
