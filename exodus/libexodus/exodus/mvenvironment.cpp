@@ -37,6 +37,8 @@
 
 namespace exodus {
 
+int getprocessno(const char* filename, int* fd);
+
 //NB do not define default copy constructor and assignment in order to force
 //derived classes to implement them since they are defined in the class header
 
@@ -165,6 +167,9 @@ bool MvEnvironment::init(const int threadno) {
         this->MOVEKEYS=L"";
         this->INDEXTIME=L"";
 	this->LEVEL=L"";
+
+	int fd;//memory leak unless closed in mvenvironment destructor;
+	this->PROCESSNO=getprocessno("/tmp/exodus", &fd);
 
 	return true;
 

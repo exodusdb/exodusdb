@@ -84,7 +84,7 @@ add_library(exodus SHARED
  mvdbpostgres.cpp mvenvironment.cpp mvglobalfuncs.cpp
  mvipc.cpp mvmv.cpp mvunicode.cpp mvipc_boost.cpp mvipc_posix.cpp
  mvipc_ms.cpp mvposix.cpp MurmurHash2_64.cpp
- mvfunctor.cpp mvprogram.cpp mvhandles.cpp mvdbconns.cpp mvos.cpp
+ mvfunctor.cpp mvprogram.cpp mvhandles.cpp mvdbconns.cpp mvos.cpp mvprocessno.cpp
 )
 
 #set_target_properties(exodus PROPERTIES SOVERSION "${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_VERSION}")

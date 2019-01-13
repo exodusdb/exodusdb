@@ -261,4 +261,6 @@ typedef var& out;
 #define INDEXTIME mv.INDEXTIME
 #define LEVEL mv.LEVEL
 
+#define PROCESSNO mv.PROCESSNO
+
 #endif //EXODUSMACROS_H
