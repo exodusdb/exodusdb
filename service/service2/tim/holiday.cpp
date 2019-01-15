@@ -1,7 +1,6 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <trim2.h>
 
 #include <gen.h>
 
@@ -42,7 +41,7 @@ function main(in mode, io idate, in usercode, in userx, in marketcode, in market
 
 		while (true) {
 		///BREAK;
-		if (not workdate and idate ne mindate) break;;
+		if (not(workdate and idate ne mindate)) break;;
 			idate += direction;
 			gosub getholidaytype( idate,  userx,  agp,  market,  holidaytype);
 			if (not holidaytype) {
@@ -63,7 +62,7 @@ subroutine getholidaytype(in idate, in userx, in agp, in market, io holidaytype)
 
 	//type 4 is expired
 	//////////////////
-	if (userx.a(35) and idate >= userx.a(35)) {
+	if (userx.a(35) and (idate >= userx.a(35))) {
 		holidaytype = 4;
 		return;
 	}
@@ -74,11 +73,11 @@ subroutine getholidaytype(in idate, in userx, in agp, in market, io holidaytype)
 	var dow = (idate - 1) % 7 + 1;
 
 	//from user
-	var weekenddows = trim2(userx.a(24), SVM);
+	var weekenddows = trim(userx.a(24), SVM);
 	if (not weekenddows) {
 
 		//else from market
-		weekenddows = trim2(market.a(9), SVM);
+		weekenddows = trim(market.a(9), SVM);
 		if (not weekenddows) {
 
 			weekenddows = agp.a(95);
@@ -120,7 +119,7 @@ subroutine getholidaytype(in idate, in userx, in agp, in market, io holidaytype)
 		{}
 	}
 	var uptodate = uptodates.a(1, daten);
-	if (uptodate and idate <= uptodates.a(1, daten)) {
+	if (uptodate and (idate <= uptodates.a(1, daten))) {
 		holidaytype = 3;
 		return;
 	}

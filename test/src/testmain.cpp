@@ -942,8 +942,97 @@ dict(AGE_IN_YEARS) {
 	for (var ii=-3; ii<=3; ++ii)
 		assert(tempstr2[ii] eq "");
 
-	var spac1="  xxx  xxx  ";
-	assert(trimmer(spac1) eq "xxx xxx");
+	var str0="  xxx  xxx  ";
+	var str1;
+
+	//global function trim/f/b
+
+	str1=str0;
+	assert(trim(str1) eq "xxx xxx");
+	assert(str1 eq str0);
+	assert(trimf(str1) eq "xxx  xxx  ");
+	assert(str1 eq str0);
+	assert(trimb(str1) eq "  xxx  xxx");
+	assert(str1 eq str0);
+
+	assert(trim(str1," ","") eq "xxx xxx");
+	assert(str1 eq str0);
+	assert(trim(str1," ","F") eq "xxx  xxx  ");
+	assert(str1 eq str0);
+	assert(trim(str1," ","B") eq "  xxx  xxx");
+	assert(str1 eq str0);
+	assert(trim(str1," ","FB") eq "xxx  xxx");
+	assert(str1 eq str0);
+
+	//member function trim/f/b
+
+	assert(str1.trim() eq "xxx xxx");
+	assert(str1 eq str0);
+	assert(str1.trimf() eq "xxx  xxx  ");
+	assert(str1 eq str0);
+	assert(str1.trimb() eq "  xxx  xxx");
+	assert(str1 eq str0);
+
+	assert(str1.trim(" ","") eq "xxx xxx");
+	assert(str1 eq str0);
+	assert(str1.trim(" ","F") eq "xxx  xxx  ");
+	assert(str1 eq str0);
+	assert(str1.trim(" ","B") eq "  xxx  xxx");
+	assert(str1 eq str0);
+	assert(str1.trim(" ","FB") eq "xxx  xxx");
+	assert(str1 eq str0);
+
+
+	//global function trimmer/f/b
+
+	str1=str0;
+	assert(trimmer(str1) eq "xxx xxx");
+	assert(str1 ne str0);
+	str1=str0;
+	assert(trimmerf(str1) eq "xxx  xxx  ");
+	assert(str1 ne str0);
+	str1=str0;
+	assert(trimmerb(str1) eq "  xxx  xxx");
+	assert(str1 ne str0);
+
+	str1=str0;
+	assert(trimmer(str1," ","") eq "xxx xxx");
+	assert(str1 ne str0);
+	str1=str0;
+	assert(trimmer(str1," ","F") eq "xxx  xxx  ");
+	assert(str1 ne str0);
+	str1=str0;
+	assert(trimmer(str1," ","B") eq "  xxx  xxx");
+	assert(str1 ne str0);
+	str1=str0;
+	assert(trimmer(str1," ","FB") eq "xxx  xxx");
+	assert(str1 ne str0);
+
+	//member function trimmer/f/b
+
+	str1=str0;
+	assert(str1.trimmer() eq "xxx xxx");
+	assert(str1 ne str0);
+	str1=str0;
+	assert(str1.trimmerf() eq "xxx  xxx  ");
+	assert(str1 ne str0);
+	str1=str0;
+	assert(str1.trimmerb() eq "  xxx  xxx");
+	assert(str1 ne str0);
+
+	str1=str0;
+	assert(str1.trimmer(" ","") eq "xxx xxx");
+	assert(str1 ne str0);
+	str1=str0;
+	assert(str1.trimmer(" ","F") eq "xxx  xxx  ");
+	assert(str1 ne str0);
+	str1=str0;
+	assert(str1.trimmer(" ","B") eq "  xxx  xxx");
+	assert(str1 ne str0);
+	str1=str0;
+	assert(str1.trimmer(" ","FB") eq "xxx  xxx");
+	assert(str1 ne str0);
+
 
 	assert(timedate().outputl("timedate()=") ne "");
 
@@ -1006,15 +1095,26 @@ dict(AGE_IN_YEARS) {
 	assert(aa2 eq "aa");
 	assert(aa3 eq "aa");
 
-	initrnd(999);
-	for (int ii=1; ii<1000; ++ii) {
-		var time=rnd(500000).mod(86400);
-//		time.outputl("Internal=")
-//			.oconv("MTHS").outputl("oconv=")
-//			.iconv("MTHS").outputl("iconv=");
-//		assert(time.oconv("MTHS").iconv("MTHS") eq time);
-//		assert(time.oconv("MTS").iconv("MTS") eq time);
-	}
+	//string seed
+        initrnd("cccc");
+        assert(rnd(1000000000)==262087803);
+
+	//slightly different string seed
+        initrnd("cccd");
+        assert(rnd(1000000000)==19706533);
+
+	//integer seed
+        initrnd(123457);
+        assert(rnd(1000000000)==466803956);
+
+	//slightly different integer seed
+        initrnd(123458);
+        assert(rnd(1000000000)==191396791);
+
+	//initrnd treats floats as integers so same result as above
+        initrnd(123458.2);
+        assert(rnd(1000000000)==191396791);
+
 	var tempinp;
 //	input("Press Enter ...",tempinp);
 	//ensure lower case sorts before uppercase (despite "A" \x41 is less than "a" \x61)
@@ -1315,10 +1415,6 @@ while trying to match the argument list '(exodus::var, bool)'
 	assert(oconv("a","T(0)#3") eq "a00");
 	assert(oconv("abcd","T(0)#3") eq ("abc"^TM^"d00"));
 
-	initrnd(999);
-	var rnd1=rnd(999);
-	//777 on win32, 802 on Ubuntu 10.04 64bit
-	assert(rnd1 eq 777 or rnd1 eq 802);
 	assert(iconv("23 59 59","MT") eq 86399);
 	assert(iconv("xx11yy12zz13P","MT") eq 83533);
 	assert(iconv("24 00 00","MT") eq "");
@@ -1626,7 +1722,7 @@ while trying to match the argument list '(exodus::var, bool)'
 	//restrict to ascii characters so size on disk=number of characters in string
 	//also restrict to size 1 2 4 8 16 etc
 	//var str1=L"1234ABC\x0160";//Note: you have to prefix strings with L if you want to put multibyte hex chars
-	var str1="1234ABCD";
+	str1="1234ABCD";
 	var filesize=1024*1024/8;
 	printl(tempdir);
 	assert(osmkdir(tempdir));
@@ -1986,6 +2082,16 @@ while trying to match the argument list '(exodus::var, bool)'
 		print(ii,":", xx, " ", xx.hash()," ");
 	}
 	printl();
+
+	printl("Checking time oconv/iconv roundtrip");
+	//initrnd(999);
+	//for (int ii=0; ii<86400; ++ii) {
+	//	var time=ii;
+	for (var itime=0; itime<86400; ++itime) {
+//		itime.outputl("itime=").oconv("MTHS").outputl("otime=").iconv("MTHS").outputl("itime=");
+		assert(itime.oconv("MTHS").iconv("MTHS") eq itime);
+		assert(itime.oconv("MTS").iconv("MTS") eq itime);
+	}
 
 	printl("testmain finished ok and exiting ...");
 

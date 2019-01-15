@@ -40,7 +40,7 @@ var market;
 var timesheet;
 var groupapprovers;
 var lasttimesheetadmin;
-var USER;
+var userx;
 var istimesheetadmin;
 var istimesheetapprover;
 var today;
@@ -65,7 +65,6 @@ var newpage;//num
 var useremail;
 var clientmark;
 var tags;
-var job;
 var userholidaytypes;
 var userholidaytype;
 var linetothours;
@@ -94,7 +93,7 @@ function main() {
 	//global idate,insufficient,usermissingdates,latestrequireddate,istimesheetadmin
 	//global usercode,linetothours,sendmailx,tt,marketcode,ccaddress,testtoaddress,testccaddress
 	//global neosystesting,printptr,istimesheetapprover,groupapprovers,lasttimesheetadmin
-	//global today
+	//global today,userx,market
 
 	printptr = 0;
 	var interactive = not SYSTEM.a(33);
@@ -301,14 +300,14 @@ function main() {
 				call mssg(DQ ^ (fromdate ^ DQ) ^ " is not a valid date");
 				var().stop();
 				}
-			period = (idate.oconv("D2/E")).substr(-5,5);
+			period = idate.oconv("D2/E").substr(-5,5);
 		}else{
 			period = "";
 		}
 
 		//input period
 		if (not period) {
-			period = ((var().date()).oconv("D/E")).field("/", 2, 2);
+			period = var().date().oconv("D/E").field("/", 2, 2);
 			if (period[1] == "0") {
 				period.splicer(1, 1, "");
 			}
@@ -337,7 +336,7 @@ inpperiod:
 		var month = period.field("/", 1);
 		for (idate = fromdate; idate <= fromdate + 9999; ++idate) {
 		///BREAK;
-		if ((idate.oconv("D/E")).field("/", 2) ne month) break;;
+		if (idate.oconv("D/E").field("/", 2) ne month) break;;
 		};//idate;
 		uptodate = idate - 1;
 
@@ -378,7 +377,7 @@ inpperiod:
 					//reverse order
 				}else{
 					if (usercode == "---") {
-						if (usercodes2 and usercodes2.substr(-3,3) ne "---") {
+						if (usercodes2 and (usercodes2.substr(-3,3) ne "---")) {
 							usercodes2 ^= VM ^ "---";
 						}
 					}else{
@@ -410,7 +409,7 @@ inpperiod:
 	//TODO work out first company of each user
 	//in TIMESHEET.SUBS and ANALTIME2
 	marketcode = gen.company.a(30, 1);
-	if (not market.read(agy.markets, marketcode)) {
+	if (not(market.read(agy.markets, marketcode))) {
 		call mssg(DQ ^ (marketcode ^ DQ) ^ " Market is missing");
 		var().stop();
 	}
@@ -437,7 +436,7 @@ inpperiod:
 	/////////
 	//inituser:
 	/////////
-	var byuserandjob = mode < 2 or reminderapproval;
+	var byuserandjob = (mode < 2) or reminderapproval;
 
 	//initialise summary by usercodes
 	var unapproveddays = "";
@@ -482,7 +481,7 @@ nextuser:
 	//usercode=usercodes<1,usern>
 	//usercode=userprivs<1,usern>
 	usercode = usercodes.a(1, usern);
-	if (usercode == "" or usercode == "---") {
+	if ((usercode == "") or (usercode == "---")) {
 
 		//deal with any timesheet approvals for the previous group
 		if (reminderapproval and printptr) {
@@ -499,8 +498,8 @@ nextuser:
 		goto nextuser;
 	}
 
-	if (not USER.read(users, usercode)) {
-		USER = usercode;
+	if (not(userx.read(users, usercode))) {
+		userx = usercode;
 	}
 
 	//determine users company and reget market if changed
@@ -513,7 +512,7 @@ nextuser:
 
 	//determine if the user is on holiday today
 	today = var().date();
-	call holiday("GETTYPE", today, usercode, USER, usermarketcode, usermarket, agy.agp, userholidaytypetoday, xx);
+	call holiday("GETTYPE", today, usercode, userx, usermarketcode, usermarket, agy.agp, userholidaytypetoday, xx);
 
 	//allow testing on holidays (ie do not skip)
 	if (neosystesting) {
@@ -522,10 +521,10 @@ nextuser:
 
 	if (byuserandjob) {
 
-		if (USER.a(35) and var().date() >= USER.a(35)) {
+		if (userx.a(35) and (var().date() >= userx.a(35))) {
 			emailaddress = "";
 		}else{
-			emailaddress = USER.a(7);
+			emailaddress = userx.a(7);
 		}
 
 		if (reminderapproval) {
@@ -571,7 +570,7 @@ nextuser:
 	}
 
 	//skip unselected users
-	if (not usercodes.a(1).locateusing(usercode, VM, xx)) {
+	if (not(usercodes.a(1).locateusing(usercode, VM, xx))) {
 		goto nextuser;
 	}
 
@@ -597,7 +596,7 @@ nextuser:
 	//determine the latest required timesheet
 	latestrequireddate = var().date();
 	tt = -timesheetparams.a(10);
-	call holiday("GETWORKDATE", latestrequireddate, usercode, USER, usermarketcode, usermarket, agy.agp, holidaytype, tt);
+	call holiday("GETWORKDATE", latestrequireddate, usercode, userx, usermarketcode, usermarket, agy.agp, holidaytype, tt);
 	//call msg(usercode:' latest required:':latestrequireddate 'D/E')
 
 	if (byuserandjob) {
@@ -632,7 +631,7 @@ nextuser:
 					var minappdays = 7;
 					minappdays = 0;
 					if (reminderapproval >= 2) {
-						if (idate < var().date() - minappdays - 1 and not firstdayn) {
+						if ((idate < var().date() - minappdays - 1) and not firstdayn) {
 							goto nextdate;
 						}
 					}
@@ -651,14 +650,14 @@ nextuser:
 			}
 
 			//record first and last dates discovered
-			if (not firstdayn or dayn < firstdayn) {
+			if (not firstdayn or (dayn < firstdayn)) {
 				firstdayn = dayn;
 			}
 			if (dayn > lastdayn) {
 				lastdayn = dayn;
 			}
 
-			var nlines = (RECORD.a(1)).count(VM) + 1;
+			var nlines = RECORD.a(1).count(VM) + 1;
 			for (MV = 1; MV <= nlines; ++MV) {
 				var hours = RECORD.a(2, MV);
 				var details = RECORD.a(3, MV);
@@ -686,7 +685,7 @@ nextuser:
 							timesheet.inserter(4, linen, "");
 						}
 					}else{
-						if (not timesheet.a(1).locateusing(jobno, VM, linen)) {
+						if (not(timesheet.a(1).locateusing(jobno, VM, linen))) {
 							timesheet.r(1, linen, jobno);
 						}
 					}
@@ -718,8 +717,8 @@ nextuser:
 			};//MV;
 
 			//check min hours
-			var tothours = (RECORD.a(2)).sum();
-			if (timesheetparams.a(2) and tothours < timesheetparams.a(2)) {
+			var tothours = RECORD.a(2).sum();
+			if (timesheetparams.a(2) and (tothours < timesheetparams.a(2))) {
 				insufficient = tothours;
 				goto insufficienthours;
 			}
@@ -734,9 +733,9 @@ insufficienthours:
 			//insufficient (or just no timesheet)
 
 			//handle missing timesheet
-			if (idate >= timesheetparams.a(8) and idate <= latestrequireddate) {
+			if ((idate >= timesheetparams.a(8)) and (idate <= latestrequireddate)) {
 				xx = "";
-				call holiday("GETTYPE", idate, usercode, USER, usermarketcode, usermarket, agy.agp, holidaytype, xx);
+				call holiday("GETTYPE", idate, usercode, userx, usermarketcode, usermarket, agy.agp, holidaytype, xx);
 
 				//handle not holiday
 				if (not holidaytype) {
@@ -760,15 +759,15 @@ nextdate:
 		if (usermissingdates and not userholidaytypetoday) {
 
 			//toaddress=user<7>
-			if (USER.a(35) and var().date() >= USER.a(35)) {
+			if (userx.a(35) and (var().date() >= userx.a(35))) {
 				toaddress = "";
 			}else{
-				toaddress = USER.a(7);
+				toaddress = userx.a(7);
 			}
 			ccaddress = "";
 
 			//invoke approver for people without emails IF any timesheets entered
-			if (toaddress == "" and timesheet.a(1)) {
+			if ((toaddress == "") and timesheet.a(1)) {
 				//toaddress=ccaddress
 				toaddress = groupapprovers;
 				ccaddress = "";
@@ -776,7 +775,7 @@ nextdate:
 
 			//missing date list
 			var missingdatelist = "";
-			var nn = (usermissingdates.a(1)).count(VM) + 1;
+			var nn = usermissingdates.a(1).count(VM) + 1;
 			for (var ii = 1; ii <= nn; ++ii) {
 				var idatemissing = usermissingdates.a(1, ii).field("*", 1);
 				missingdatelist ^= " " ^ idatemissing.oconv("[DATE,4*]");
@@ -819,7 +818,7 @@ nextdate:
 
 		//if nothing to approve then skip the user
 		//nothing has been output at this stage
-		if (not unapproveddays.sum()) {
+		if (not(unapproveddays.sum())) {
 			goto nextuser;
 		}
 
@@ -832,14 +831,14 @@ nextdate:
 		}
 
 		//dont output for admins or approvers
-		if (reminderapproval and (istimesheetadmin or istimesheetapprover)) {
+		if (reminderapproval and ((istimesheetadmin or istimesheetapprover))) {
 
 			if (istimesheetadmin) {
 				goto nextuser;
 			}
 
 			var currentdow = (var().date() - 1) % 7 + 1;
-			if (not adminapprovaldows.index(currentdow, 1)) {
+			if (not(adminapprovaldows.index(currentdow, 1))) {
 				goto nextuser;
 			}
 
@@ -874,10 +873,10 @@ userinit:
 		newpage = 1;
 		head ^= FM ^ "Name : ";
 		//useremail=user<7>
-		if (USER.a(35) and var().date() >= USER.a(35)) {
+		if (userx.a(35) and (var().date() >= userx.a(35))) {
 			useremail = "";
 		}else{
-			useremail = USER.a(7);
+			useremail = userx.a(7);
 		}
 		if (useremail) {
 			head ^= "<a href=\"mailto:" ^ useremail ^ "\">";
@@ -932,12 +931,12 @@ userinit:
 	for (var dayn = firstdayn; dayn <= lastdayn; ++dayn) {
 		colh ^= th;
 		idate = fromdate + dayn - 1;
-		var mthname2 = gen.glang.a(2).field("|", (idate.oconv("D2/E")).field("/", 2));
+		var mthname2 = gen.glang.a(2).field("|", idate.oconv("D2/E").field("/", 2));
 		if (mthname2 ne mthname) {
 			mthname = mthname2;
 			colh ^= mthname ^ nbsp;
 		}
-		colh ^= (idate.oconv("D2/E")).field("/", 1) + 0;
+		colh ^= idate.oconv("D2/E").field("/", 1) + 0;
 		colh ^= "<br>" ^ (gen.glang.a(21).field("|", (idate - 1) % 7 + 1)).substr(1,2);
 
 		//if reminderapproval then
@@ -981,7 +980,7 @@ userinit:
 	//provide a link to approve all if more than one
 	if (reminderapproval) {
 		colh ^= "<br><br>";
-		if ((totallink.a(1)).count(VM)) {
+		if (totallink.a(1).count(VM)) {
 			totallink.splicer(1, 0, usercode);
 			colh ^= "<a href=\"" ^ baselinks.a(1, 1) ^ link;
 			totallink.swapper(VM, vmx);
@@ -1002,7 +1001,7 @@ userinit:
 	head.swapper("<th", "\r\n" " <th");
 
 	//rows
-	var nlines = (timesheet.a(1)).count(VM) + 1;
+	var nlines = timesheet.a(1).count(VM) + 1;
 
 	//precalculate daytots
 	var daytots = "";
@@ -1029,23 +1028,23 @@ userinit:
 			} else {
 				tags = "";
 			}
-			if (USER.read(users, usercode)) {
+			if (userx.read(users, usercode)) {
 				//useremail=user<7>
 				//dont send email to expired logins
-				if (USER.a(35) and var().date() >= USER.a(35)) {
+				if (userx.a(35) and (var().date() >= userx.a(35))) {
 
 					//skip expired users ie dont print a line for them
-					if (not (timesheet.a(2, linen)).sum()) {
+					if (not(timesheet.a(2, linen).sum())) {
 						goto nextlinen;
 					}
 
 					useremail = "";
 				}else{
-					useremail = USER.a(7);
+					useremail = userx.a(7);
 				}
 				if (useremail) {
 					cell = "<a href=\"mailto:" ^ useremail ^ "\">";
-					cell ^= USER.a(1);
+					cell ^= userx.a(1);
 					cell ^= "</a>";
 				}
 				cell ^= " " ^ tags;
@@ -1055,21 +1054,22 @@ userinit:
 
 		if (byuserandjob) {
 			jobno = timesheet.a(1, linen);
-			if (not job.read(agy.jobs, jobno)) {
+			var job;
+			if (not(job.read(agy.jobs, jobno))) {
 				job = "";
 			}
-			tx ^= (job.a(9, 1)).oconv("[TAGHTML,td ALIGN=LEFT]");
+			tx ^= job.a(9, 1).oconv("[TAGHTML,td ALIGN=LEFT]");
 		}
 
 		//determine user holidays
-		if (not byuserandjob or linen == 1) {
+		if (not byuserandjob or (linen == 1)) {
 
 			//get the user per line
 			if (not byuserandjob) {
 				usercode = timesheet.a(1, linen);
 			}
-			if (not USER.read(users, usercode)) {
-				USER = usercode;
+			if (not(userx.read(users, usercode))) {
+				userx = usercode;
 			}
 
 			gosub getusermarket();
@@ -1080,14 +1080,14 @@ userinit:
 				//determine if the user is on holiday today
 				idate = fromdate + dayn - 1;
 				xx = "";
-				call holiday("GETTYPE", idate, usercode, USER, usermarketcode, usermarket, agy.agp, userholidaytype, xx);
+				call holiday("GETTYPE", idate, usercode, userx, usermarketcode, usermarket, agy.agp, userholidaytype, xx);
 
 				userholidaytypes.r(dayn, userholidaytype);
 			};//dayn;
 
 		}
 
-		linetothours = (timesheet.a(2, linen)).sum();
+		linetothours = timesheet.a(2, linen).sum();
 
 		//for dayn=1 to ndays
 		for (var dayn = firstdayn; dayn <= lastdayn; ++dayn) {
@@ -1139,7 +1139,7 @@ userinit:
 						COLOR = "white";
 					}
 				}else{
-					if (linetothours and hours < timesheetparams.a(2)) {
+					if (linetothours and (hours < timesheetparams.a(2))) {
 						COLOR = "white";
 					}
 				}
@@ -1157,7 +1157,7 @@ userinit:
 
 		//final column
 		//garbagecollect;
-		tx ^= (linetothours.oconv(hoursfmt)).oconv(r10) ^ trx;
+		tx ^= linetothours.oconv(hoursfmt).oconv(r10) ^ trx;
 
 		tx.swapper("<td", "\r\n" " <td");
 		tx.swapper("<th", "\r\n" " <th");
@@ -1177,14 +1177,14 @@ nextlinen:
 	//for dayn=1 to ndays
 	for (var dayn = firstdayn; dayn <= lastdayn; ++dayn) {
 		//garbagecollect;
-		var cell = ((daytots.a(dayn)).oconv(hoursfmt)).oconv(r5) ^ sep;
+		var cell = daytots.a(dayn).oconv(hoursfmt).oconv(r5) ^ sep;
 
 		var COLOR = "";
 		if (byuserandjob) {
 			userholidaytype = userholidaytypes.a(dayn);
 			if (userholidaytype == 3) {
 				COLOR = "lightgrey";
-			} else if (not userholidaytype and daytots.a(dayn) < timesheetparams.a(2)) {
+			} else if (not userholidaytype and (daytots.a(dayn) < timesheetparams.a(2))) {
 				COLOR = "white";
 			}
 		}
@@ -1195,7 +1195,7 @@ nextlinen:
 		tx ^= cell;
 	};//dayn;
 	//garbagecollect;
-	tx ^= ((daytots.sum()).oconv(hoursfmt)).oconv(r10) ^ FM;
+	tx ^= daytots.sum().oconv(hoursfmt).oconv(r10) ^ FM;
 	tx.swapper("<td", "<th");
 	tx.swapper("</td", "</th");
 	tx ^= "</TBODY></TABLE>";
@@ -1296,7 +1296,7 @@ subroutine sendreminderapproval() {
 }
 
 subroutine sendreminderapproval2() {
-	if (reminderapproval > 1 and toaddress) {
+	if ((reminderapproval > 1) and toaddress) {
 
 		toaddress.converter(FM, ";");
 		ccaddress.converter(FM, ";");
@@ -1374,7 +1374,7 @@ nottoreal:
 subroutine getusermarket() {
 	usermarketcode = marketcode;
 	usermarket = market;
-	tt = USER.a(25);
+	tt = userx.a(25);
 	if (tt) {
 		usermarketcode = tt;
 		if (usermarket.read(agy.markets, tt)) {

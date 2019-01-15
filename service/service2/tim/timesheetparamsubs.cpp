@@ -98,7 +98,7 @@ subroutine updatedocuments() {
 		return;
 	}
 
-	if (not gen.document.read(gen.documents, docid)) {
+	if (not(gen.document.read(gen.documents, docid))) {
 		gen.document = "";
 	}
 

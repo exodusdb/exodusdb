@@ -1,29 +1,23 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <log2.h>
 
 #include <gen.h>
+#include <fin.h>
 
+var progname;
+var languagecode;
+var temp;
+var question;
 var reply;
 var langkey;
 var codepage;
-var languagecode;
-var progname;
-var datatype;
-var origprogname;
-var languagefile2;
 
-var temp;
-var question;
-var logtime;
+function main(in origprogname, in languagecode0, in origdatatype, io languagefile, io lang) {
+	//c sys in,in,in,io,io
+	//global question,temp,languagecode,progname
 
-function main(in origprogname0, in languagecode0, in origdatatype, io languagefile, io lang) {
 	lang = "";
-
-	log2("getlang", logtime);
-
-	origprogname=origprogname0;
 	if (languagefile.unassigned()) {
 		languagefile = "";
 	}
@@ -32,57 +26,46 @@ function main(in origprogname0, in languagecode0, in origdatatype, io languagefi
 			return 0;
 		}
 	}
-	languagefile2=languagefile;
-	log2("origlanguagecode", logtime);
-	var origlanguagecode;
-	if (languagecode0.assigned())
-		origlanguagecode = languagecode0;
-	else
-		origlanguagecode = "";
+
+	var origlanguagecode = languagecode0;
 	if (not origlanguagecode) {
 		origlanguagecode = gen.company.a(14);
 		if (origlanguagecode == "ENGLISH") {
 			origlanguagecode = "";
 		}
 		if (not origlanguagecode) {
-			origlanguagecode = gen.gcurrcompany;
+			origlanguagecode = fin.currcompany;
 		}
 	}
 
-	log2("progname", logtime);
-	if (origprogname0.assigned())
-		progname = origprogname0;
-	else
-		progname = "";
+	progname = origprogname;
 	languagecode = origlanguagecode;
-	datatype = origdatatype;
+	var datatype = origdatatype;
 
 	lang = "";
 
-	log2("try with data type if present", logtime);
+	//try with data type if present
 	if (datatype) {
-		gosub getlang2(lang);
+		gosub getlang2( origprogname,  datatype,  languagefile,  lang);
 		if (lang) {
 			goto exit;
 		}
 	}
 
-	log2("try without data type", logtime);
+	//try without data type
 	languagecode = origlanguagecode;
 	datatype = "";
-	gosub getlang2(lang);
+	gosub getlang2( origprogname,  datatype,  languagefile,  lang);
 	if (lang) {
 		goto exit;
 	}
 
-/*
-	log2("check if user wants to continue without text", logtime);
+	//check if user wants to continue without text
 	var().chr(7).output();
 	temp = progname;
 	temp.r(-1, languagecode);
 	temp.r(-1, datatype);
-	question = temp;
-	question ^= "|TEXT IS MISSING";
+	question = temp ^ "|TEXT IS MISSING";
 	question ^= "||DO YOU WANT TO CONTINUE ?";
 	if (not(decide(question, "", reply))) {
 		var().abort();
@@ -90,9 +73,10 @@ function main(in origprogname0, in languagecode0, in origdatatype, io languagefi
 	if (reply == 2) {
 		var().abort();
 	}
-*/
 
 exit:
+/////
+
 	var custlang;
 	if (custlang.read(DEFINITIONS, "LANGUAGE*" ^ langkey)) {
 		var nn = custlang.count(FM) + 1;
@@ -108,8 +92,8 @@ exit:
 	}
 
 	//force 737 greek codepage characters so indexing is ok etc
-	if (origprogname0 == "GENERAL") {
-		codepage.osgetenv("CODEPAGE");
+	if (origprogname == "GENERAL") {
+		call osgetenv("CODEPAGE", codepage);
 
 		//greek
 		if (codepage == "737") {
@@ -120,24 +104,26 @@ getupperlower:
 			lang.r(9, codepage.a(1, 9));
 			lang.r(10, codepage.a(1, 10));
 
-			//central european including poland
-		} if (codepage == "852") {
+		//central european including poland
+		} else if (codepage == "852") {
 			if (not(codepage.read(languagefile, "GENERAL*POLISH"))) {
 				codepage = "";
 			}
 			goto getupperlower;
+			{}
 		}
+//L460:
 	}
 
 	return 0;
 
 }
 
-subroutine getlang2(io lang) {
-
+subroutine getlang2(in origprogname, in datatype, in languagefile, io lang) {
+	//getlang2(in origprogname, in datatype, in languagefile, io lang)
 	//try with language if present
 	if (languagecode) {
-		gosub getlang3(lang);
+		gosub getlang3( origprogname,  datatype,  languagefile,  lang);
 		if (lang) {
 			return;
 		}
@@ -145,13 +131,14 @@ subroutine getlang2(io lang) {
 
 	//try without language
 	languagecode = "";
-	gosub getlang3(lang);
+	gosub getlang3( origprogname,  datatype,  languagefile,  lang);
 
 	return;
 
 }
 
-subroutine getlang3(io lang) {
+subroutine getlang3(in origprogname, in datatype, in languagefile, io lang) {
+	//getlang3(in origprogname, in datatype, in languagefile, io lang)
 
 	langkey = progname;
 	if (languagecode) {
@@ -161,18 +148,17 @@ subroutine getlang3(io lang) {
 		langkey = langkey.fieldstore("*", 3, 1, datatype);
 	}
 	//CALL MSG(T)
-	if (lang.read(languagefile2, langkey)) {
+	if (lang.read(languagefile, langkey)) {
 		//convert to FM if not a format record
 		//IF orig.progname<>'SORTORDER' and LANG<8>='' then
-		if (origprogname ne "SORTORDER" and (lang.a(1)).count(VM)) {
-			lang = lang.a(1).raise();
+		if (origprogname ne "SORTORDER" and lang.a(1).count(VM)) {
+			lang = raise(lang.a(1));
 
 			//strip out English pretext
-			var chr170=chr(170);
-			if (lang.index(chr170, 1)) {
+			if (lang.index(var().chr(170), 1)) {
 				var nn = lang.count(FM) + 1;
 				for (var ii = 1; ii <= nn; ++ii) {
-					var tt = lang.a(ii).field(chr170, 2);
+					var tt = lang.a(ii).field(var().chr(170), 2);
 					if (tt) {
 						lang.r(ii, tt);
 					}

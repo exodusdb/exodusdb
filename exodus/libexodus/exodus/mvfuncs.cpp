@@ -422,49 +422,85 @@ const wchar_t* var::data() const
 }
 
 
-var var::trim(const var trimchar) const
+var var::trim(const var& trimchar) const
 {
-	THISIS(L"var var::trim(const var trimchar) const")
+	THISIS(L"var var::trim(const var& trimchar) const")
 	ISSTRING(trimchar)
 
 	return trim(trimchar.var_mvstr.c_str());
 }
 
-var& var::trimmer(const var trimchar)
+var var::trim(const var& trimchar, const var& options) const
 {
-	THISIS(L"var& var::trimmer(const var trimchar)")
+	THISIS(L"var var::trim(const var& trimchar, const var& options) const")
+	ISSTRING(trimchar)
+	ISSTRING(options)
+
+	if (options==L"F") {
+		return trimf(trimchar.var_mvstr.c_str());
+	}
+	else if (options==L"B") {
+		return trimb(trimchar.var_mvstr.c_str());
+	}
+	else if (options==L"FB") {
+		return trimf(trimchar.var_mvstr.c_str()).trimb(trimchar.var_mvstr.c_str());
+	}
+	return trim(trimchar.var_mvstr.c_str());
+}
+
+var& var::trimmer(const var& trimchar)
+{
+	THISIS(L"var& var::trimmer(const var& trimchar)")
 	ISSTRING(trimchar)
 
 	return trimmer(trimchar.var_mvstr.c_str());
 }
 
-var var::trimf(const var trimchar) const
+var& var::trimmer(const var& trimchar, const var& options)
 {
-	THISIS(L"var var::trimf(const var trimchar) const")
+	THISIS(L"var var::trimmer(const var& trimchar, const var& options) const")
+	ISSTRING(trimchar)
+	ISSTRING(options)
+
+	if (options==L"F") {
+		return trimmerf(trimchar.var_mvstr.c_str());
+	}
+	else if (options==L"B") {
+		return trimmerb(trimchar.var_mvstr.c_str());
+	}
+	else if (options==L"FB") {
+		return trimmerf(trimchar.var_mvstr.c_str()).trimmerb(trimchar.var_mvstr.c_str());
+	}
+	return trimmer(trimchar.var_mvstr.c_str());
+}
+
+var var::trimf(const var& trimchar) const
+{
+	THISIS(L"var var::trimf(const var& trimchar) const")
 	ISSTRING(trimchar)
 
 	return trimf(trimchar.var_mvstr.c_str());
 }
 
-var& var::trimmerf(const var trimchar)
+var& var::trimmerf(const var& trimchar)
 {
-	THISIS(L"var& var::trimmerf(const var trimchar)")
+	THISIS(L"var& var::trimmerf(const var& trimchar)")
 	ISSTRING(trimchar)
 
 	return trimmerf(trimchar.var_mvstr.c_str());
 }
 
-var var::trimb(const var trimchar) const
+var var::trimb(const var& trimchar) const
 {
-	THISIS(L"var var::trimb(const var trimchar) const")
+	THISIS(L"var var::trimb(const var& trimchar) const")
 	ISSTRING(trimchar)
 
 	return trimb(trimchar.var_mvstr.c_str());
 }
 
-var& var::trimmerb(const var trimchar)
+var& var::trimmerb(const var& trimchar)
 {
-	THISIS(L"var& var::trimmerb(const var trimchar)")
+	THISIS(L"var& var::trimmerb(const var& trimchar)")
 	ISSTRING(trimchar)
 
 	return trimmerb(trimchar.var_mvstr.c_str());

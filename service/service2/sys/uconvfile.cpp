@@ -5,25 +5,37 @@ libraryinit()
 
 #include <gen.h>
 
+var encoding1;
+var encoding2;
 var ii;
 var errors;
 
-function main(in inputfilename, io encoding1, io encoding2, out result, out msg) {
-	//c sys in,io,io,out,out
+function main(in inputfilename, in encoding1i, in encoding2i, out result, out msg) {
+	//c sys in,in,in,out,out
 
 	//uses the unicode uconv to convert file format
 	//
 	//http://www.microsoft.com/globaldev/reference/cphome.mspx
 
+	if (encoding1i.unassigned()) {
+		encoding1 = "";
+	}else{
+		encoding1 = encoding1i;
+	}
+	if (encoding2i.unassigned()) {
+		encoding2 = "";
+	}else{
+		encoding2 = encoding2i;
+	}
 	result = 0;
 
 	//make cygwin command
 	//look for local or cygwin wget.exe otherwise quit
 	var cmd = "uconv.exe";
-	if (not cmd.osfile()) {
+	if (not(cmd.osfile())) {
 		cmd.splicer(1, 0, SYSTEM.a(50));
 	}
-	if (not cmd.osfile()) {
+	if (not(cmd.osfile())) {
 		msg = "UCONVFILE: Cannot find " ^ cmd;
 		//indicate failed but because of lack of uconv.exe file
 		result = "";

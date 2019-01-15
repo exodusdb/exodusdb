@@ -917,9 +917,10 @@ public:
 	var& trimmer(const wchar_t* trimchar DEFAULTSPACE);
 	var& trimmerf(const wchar_t* trimchar DEFAULTSPACE);
 	var& trimmerb(const wchar_t* trimchar DEFAULTSPACE);
-	var& trimmer(const var trimchar);
-	var& trimmerf(const var trimchar);
-	var& trimmerb(const var trimchar);
+	var& trimmer(const var& trimchar);
+	var& trimmer(const var& trimchar, const var& options);
+	var& trimmerf(const var& trimchar);
+	var& trimmerb(const var& trimchar);
 	var& fieldstorer(const var& sepchar,const int fieldno, const int nfields,const var& replacement);
 	var& substrer(const int startx);
 	var& substrer(const int startx,const int length);
@@ -938,9 +939,10 @@ public:
 	var trim(const wchar_t* trimchar DEFAULTSPACE) const;
 	var trimf(const wchar_t* trimchar DEFAULTSPACE) const;
 	var trimb(const wchar_t* trimchar DEFAULTSPACE) const;
-	var trim(const var trimchar) const;
-	var trimf(const var trimchar) const;
-	var trimb(const var trimchar) const;
+	var trim(const var& trimchar) const;
+	var trim(const var& trimchar, const var& options) const;
+	var trimf(const var& trimchar) const;
+	var trimb(const var& trimchar) const;
 	var fieldstore(const var& sepchar,const int fieldno,const int nfields,const var& replacement) const;
 	var hash(const unsigned long long modulus=0) const;
 	var unique() const;

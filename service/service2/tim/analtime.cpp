@@ -24,11 +24,9 @@ var sep;
 var tr;
 var trx;
 var todate;
-var filters;
 var totalcost;//num
 var bar;
 var newjobno;
-var job;
 var usern;
 var printptr;//num
 var printfilename;
@@ -123,7 +121,7 @@ function main() {
 
 	if (interactive) {
 
-		var fromdate = (("1/" ^ ((var().date()).oconv("D2/E")).substr(4,9)).iconv("D2/E")).oconv("[DATE,*]");
+		var fromdate = (("1/" ^ var().date().oconv("D2/E").substr(4,9)).iconv("D2/E")).oconv("[DATE,*]");
 inpfromdate:
 		call note("Starting at what date ?", "RC", fromdate, "");
 		if (not fromdate) {
@@ -136,7 +134,7 @@ inpfromdate:
 		}
 
 		for (var dom = 31; dom >= 28; --dom) {
-			todate = dom ^ "/" ^ (ifromdate.oconv("D2/E")).substr(4,9);
+			todate = dom ^ "/" ^ ifromdate.oconv("D2/E").substr(4,9);
 			todate = todate.iconv("D2/E");
 			todate = todate.oconv("[DATE,*4]");
 		///BREAK;
@@ -200,8 +198,8 @@ inptodate:
 	var cmd = "SELECT TIMESHEETS";
 
 	if (ifromdate) {
-		if (timesheetparams.a(8) and ifromdate < timesheetparams.a(8)) {
-			call mssg("Timesheet analysis is only available from " ^ (timesheetparams.a(8)).oconv("[DATE,*4]"));
+		if (timesheetparams.a(8) and (ifromdate < timesheetparams.a(8))) {
+			call mssg("Timesheet analysis is only available from " ^ timesheetparams.a(8).oconv("[DATE,*4]"));
 			var().stop();
 		}
 		cmd ^= " AND WITH DATE BETWEEN " ^ (DQ ^ (ifromdate.oconv("[DATE,4*]") ^ DQ)) ^ " AND " ^ (DQ ^ (itodate.oconv("[DATE,4*]") ^ DQ));
@@ -290,31 +288,30 @@ inptodate:
 		//annoyingly cannot seem to filter multivalues in arev select
 		//so do it per multivalue (similar to LIMIT clause in NLIST)
 
-		dim filters(3, 5);
-		filters="";
+		var filters = "";
 
 		var nfilters = 1;
-		filters(1, nfilters) = "HOURS";
-		filters(3, nfilters) = "";
+		filters.r(1, nfilters, "HOURS");
+		filters.r(3, nfilters, "");
 
 		if (reqactivitycodes) {
 			nfilters += 1;
-			filters(1, nfilters) = "ACTIVITY_CODE";
-			filters(3, nfilters) = reqactivitycodes;
+			filters.r(1, nfilters, "ACTIVITY_CODE");
+			filters.r(3, nfilters, reqactivitycodes.convert(VM, SVM));
 		}
 
 		if (reqcompanycodes) {
 			nfilters += 1;
 			//look up on jobs
-			filters(1, nfilters) = "COMPANY_CODE";
-			filters(3, nfilters) = reqcompanycodes;
+			filters.r(1, nfilters, "COMPANY_CODE");
+			filters.r(3, nfilters, reqcompanycodes.convert(VM, SVM));
 		}
 
 		if (reqclientcodes) {
 			nfilters += 1;
 			//look up brand on jobs, then client on brands
-			filters(1, nfilters) = "CLIENT_CODE";
-			filters(3, nfilters) = reqclientcodes;
+			filters.r(1, nfilters, "CLIENT_CODE");
+			filters.r(3, nfilters, reqclientcodes.convert(VM, SVM));
 		}
 
 		//change output file to desired extension
@@ -322,7 +319,7 @@ inptodate:
 		sys2.splicer(-3, 3, fileformat);
 		SYSTEM.r(2, sys2);
 
-		call convcsv("SELECT TIMESHEETS", "", nfilters, filters);
+		call convcsv("SELECT TIMESHEETS", "", filters);
 
 		var().stop();
 	}
@@ -387,9 +384,9 @@ inptodate:
 
 	gosub getrec();
 
-	//////////
+//////////
 nextbreak:
-	//////////
+//////////
 	if (ID == "") {
 		gosub exit();
 		var().stop();
@@ -400,18 +397,19 @@ nextbreak:
 	//////////
 	var cost = "";
 	var jobno = newjobno;
-	if (not job.read(jobs, jobno)) {
+	var job;
+	if (not(job.read(jobs, jobno))) {
 		job = "";
 	}
 
 	var activitycodes = "";
 	while (true) {
 	///BREAK;
-	if (not(newjobno == jobno and ID)) break;;
+	if (not((newjobno == jobno) and ID)) break;;
 		var hours = RECORD.a(2, MV);
 		var activity = RECORD.a(4);
 		var username = ID.field("*", 1);
-		if (not timerates.a(1).locateusing(username, VM, usern)) {
+		if (not(timerates.a(1).locateusing(username, VM, usern))) {
 			{}
 		}
 		var rate = timerates.a(5, usern);
@@ -430,7 +428,7 @@ nextbreak:
 	//breakexit:
 	//////////
 	if (cost) {
-		tx = tr ^ (sep ^ jobno).oconv(l20) ^ " " ^ (job.a(9, 1, 1)).oconv(l40) ^ " " ^ (cost.oconv("MD20P")).oconv(r15) ^ trx;
+		tx = tr ^ (sep ^ jobno).oconv(l20) ^ " " ^ job.a(9, 1, 1).oconv(l40) ^ " " ^ (cost.oconv("MD20P")).oconv(r15) ^ trx;
 		gosub printtx(tx);
 		totalcost += cost;
 	}
@@ -479,16 +477,16 @@ subroutine getrec() {
 	{}
 
 nextrec:
-	////////
+////////
 	if (esctoexit()) {
 		var().stop();
 	}
-	if (not readnext(ID, MV)) {
+	if (not(readnext(ID, MV))) {
 		ID = "";
 		newjobno = "";
 		return;
 	}
-	if (not RECORD.read(gen.timesheets, ID)) {
+	if (not(RECORD.read(gen.timesheets, ID))) {
 		goto nextrec;
 	}
 

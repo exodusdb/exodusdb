@@ -31,7 +31,7 @@ var idate;//num
 var timesheet;
 var getholidaytypedate;
 var holidaytype;
-var USER;
+var userx;
 var marketcode;
 var market;
 var personn;
@@ -44,7 +44,6 @@ var jobno;
 var ln;//num
 var job;
 var userisadmin;
-var client;
 var priordate;
 var wsmsg;
 
@@ -93,10 +92,10 @@ function main(in mode) {
 	} else if (mode.substr(1,8) == "POSTINIT") {
 		win.valid = 1;
 		gosub security(mode);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
-		if (not win.valid) {
+		if (not(win.valid)) {
 			var().stop();
 		}
 
@@ -144,7 +143,7 @@ function main(in mode) {
 
 	} else if (mode == "PREREAD") {
 
-		idate = (ID.field("*", 2, 999)).field("~", 1);
+		idate = ID.field("*", 2, 999).field("~", 1);
 		if (idate) {
 
 			//skip if known date - the following is to find the next date
@@ -190,7 +189,7 @@ function main(in mode) {
 			// - enter today (even if it is a holiday)
 			idate = var().date();
 
-		} else if (timesheet and not holidaytype and (timesheet.a(2)).sum() < win.registerx(1).a(2)) {
+		} else if ((timesheet and not holidaytype) and (timesheet.a(2).sum() < win.registerx(1).a(2))) {
 
 			//found incomplete timesheet
 			// - enter it
@@ -202,7 +201,7 @@ function main(in mode) {
 			// - enter next working day after that
 			var nextworkingday = 1;
 
-			call holiday("GETWORKDATE", idate, usercode, USER, marketcode, market, agy.agp, holidaytype, nextworkingday);
+			call holiday("GETWORKDATE", idate, usercode, userx, marketcode, market, agy.agp, holidaytype, nextworkingday);
 
 			//never go beyond today even if today is a holiday
 			if (idate > var().date()) {
@@ -223,13 +222,13 @@ function main(in mode) {
 			win.reset = 99;
 			return 0;
 		}
-		if (win.is == "NEOSYS" and USERNAME == "NEOSYS") {
+		if ((win.is == "NEOSYS") and (USERNAME == "NEOSYS")) {
 			return 0;
 		}
 		if (win.is == "---") {
 			goto baduser;
 		}
-		if (not SECURITY.a(1).locateusing(win.is, VM, personn)) {
+		if (not(SECURITY.a(1).locateusing(win.is, VM, personn))) {
 baduser:
 			msg = DQ ^ (win.is ^ DQ) ^ " - person not authorised";
 			gosub invalid(msg);
@@ -248,7 +247,7 @@ baduser:
 		gosub getactivities();
 
 		//some people cannot do timesheets
-		if (win.registerx(1).a(1) and win.registerx(3) == "") {
+		if (win.registerx(1).a(1) and (win.registerx(3) == "")) {
 			msg = DQ ^ (win.is ^ DQ) ^ " does not do timesheets|There are no activity codes|setup for dept. " ^ (DQ ^ (win.registerx(2) ^ DQ));
 			gosub invalid(msg);
 			return 0;
@@ -260,7 +259,7 @@ baduser:
 		}
 
 		call agencysubs("VAL.JOB.OPEN", xx);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
@@ -271,7 +270,7 @@ baduser:
 		}
 
 		//check numeric
-		if (not win.is.isnum()) {
+		if (not(win.is.isnum())) {
 			msg = "Please enter a number of hours";
 			gosub invalid(msg);
 			return 0;
@@ -303,7 +302,7 @@ baduser:
 			tothours.r(1, win.mvx, win.is);
 			tothours = tothours.sum();
 
-			if (win.is > win.registerx(1).a(3) or tothours > win.registerx(1).a(3)) {
+			if ((win.is > win.registerx(1).a(3)) or (tothours > win.registerx(1).a(3))) {
 				msg = "The total hours you have entered is " ^ tothours ^ " but|";
 				msg.r(-1, "the maximum hours allowed is " ^ win.registerx(1).a(3) ^ "|");
 				if (win.is > win.registerx(1).a(3)) {
@@ -425,12 +424,12 @@ baduser:
 
 		//option to read previous versions
 		call generalsubs2(mode);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
 		gosub security(mode);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
@@ -477,7 +476,7 @@ baduser:
 			}
 
 			//check if allowed to enter advance timesheets
-			if (win.wlocked and RECORD == "" and win.registerx(1).a(7) ne "") {
+			if ((win.wlocked and (RECORD == "")) and win.registerx(1).a(7) ne "") {
 				var daysadvance = ID.field("*", 2) - var().date();
 				if (daysadvance > win.registerx(1).a(7)) {
 					//msg='Sorry, you cannot enter or edit timesheets|more than ':tsmaxdaysadvance+0:' days in advance.'
@@ -491,7 +490,7 @@ baduser:
 			}
 
 			//check if allowed to modify approved timesheets
-			if (win.wlocked and RECORD.a(8) == "APPROVED") {
+			if (win.wlocked and (RECORD.a(8) == "APPROVED")) {
 				call mssg("This timesheet is already approved and cannot be edited unless a timesheet administrator changes the status");
 				//xx=unlockrecord(datafile,src.file,@id)
 				win.wlocked = 0;
@@ -500,7 +499,7 @@ baduser:
 
 		}
 
-		if (win.wlocked and RECORD == "") {
+		if (win.wlocked and (RECORD == "")) {
 
 			gosub getprevioustimesheet();
 
@@ -511,7 +510,7 @@ baduser:
 			//get any new jobs
 			if (win.registerx(1).a(18)) {
 				var ndays = win.registerx(1).a(18);
-				if (not ndays.isnum()) {
+				if (not(ndays.isnum())) {
 					ndays = 7;
 				}
 
@@ -525,7 +524,7 @@ baduser:
 				var namvs = tt.count(VM) + 1;
 nextjob:
 				if (readnext(jobno)) {
-					if (not RECORD.a(1).locateusing(jobno, VM, ln)) {
+					if (not(RECORD.a(1).locateusing(jobno, VM, ln))) {
 						//insert a new blank line at the top
 						for (var amvn = 1; amvn <= namvs; ++amvn) {
 							//fn=amv.fns<1,amvn>
@@ -572,7 +571,7 @@ nextjob:
 
 	} else if (mode == "POSTREAD") {
 		gosub security(mode);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
@@ -624,7 +623,7 @@ nextjob:
 
 		gosub getregisterparams();
 
-		var tothours = (RECORD.a(2)).sum();
+		var tothours = RECORD.a(2).sum();
 
 		//always require some hours
 		//removed to allow saving on timer start
@@ -648,16 +647,16 @@ nextjob:
 		//but anybody can save less time for the current date
 
 		//check min hours (of non-timesheet admin timesheets)
-		if (not calculate("AUTOSAVED") and win.registerx(1).a(2) and tothours < win.registerx(1).a(2) and not userisadmin) {
+		if (((not calculate("AUTOSAVED") and win.registerx(1).a(2)) and (tothours < win.registerx(1).a(2))) and not userisadmin) {
 
 			//anybody can enter less for the current and future dates
 			//but it cannot be approved
 			//TODO idate is users local tz date so shouldnt be checked v. server date()
-			if (idate < var().date() or approving) {
+			if ((idate < var().date()) or approving) {
 
 				getholidaytypedate = idate;
 				gosub getholidaytype();
-				if (not win.valid) {
+				if (not(win.valid)) {
 					return 0;
 				}
 
@@ -685,7 +684,8 @@ nextjob:
 			for (ln = 1; ln <= nlns; ++ln) {
 				if (not RECORD.a(3, ln) and RECORD.a(2, ln)) {
 					var clientcode = clientcodes.a(1, ln);
-					if (not client.read(agy.clients, clientcode)) {
+					var client;
+					if (not(client.read(agy.clients, clientcode))) {
 						client = "";
 					}
 					//msg=quote(clientcode):' is missing from the client file'
@@ -705,9 +705,9 @@ nextjob:
 
 		//check no missing activity codes
 		if (win.registerx(1).a(1)) {
-			var nlines = (RECORD.a(1)).count(VM) + (RECORD.a(1) ne "");
+			var nlines = RECORD.a(1).count(VM) + (RECORD.a(1) ne "");
 			for (var linen = 1; linen <= nlines; ++linen) {
-				if (RECORD.a(1, linen) and RECORD.a(4, linen) == "") {
+				if (RECORD.a(1, linen) and (RECORD.a(4, linen) == "")) {
 					msg = "Activity code is required but missing on line " ^ linen;
 					gosub invalid(msg);
 					return 0;
@@ -738,7 +738,7 @@ nextjob:
 
 	} else if (mode == "PREDELETE") {
 		gosub security(mode);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
@@ -789,7 +789,7 @@ subroutine getregisterparams() {
 	// call fsmsg()
 	// stop
 	// end
-	if (not((win.registerx(1)).read(DEFINITIONS, "TIMESHEET.PARAMS"))) {
+	if (not(win.registerx(1).read(DEFINITIONS, "TIMESHEET.PARAMS"))) {
 		win.registerx(1) = "";
 		//if index(ucase(company<1>),'IMPACT',1) then
 		// register(1)<1>=1
@@ -799,7 +799,7 @@ subroutine getregisterparams() {
 		// register(1)<5>=15
 		// end
 	}
-	if (win.registerx(1).a(1) == "N" or not win.registerx(1).a(1)) {
+	if ((win.registerx(1).a(1) == "N") or not win.registerx(1).a(1)) {
 		win.registerx(1).r(1, "");
 	}
 	//pad
@@ -824,7 +824,7 @@ subroutine getholidaytype() {
 		win.valid = 0;
 		return;
 	}
-	if (not USER.read(users, usercode)) {
+	if (not(userx.read(users, usercode))) {
 		msg = DQ ^ (usercode ^ DQ) ^ " user does not exist";
 		gosub invalid(msg);
 		return;
@@ -834,14 +834,14 @@ subroutine getholidaytype() {
 	//TODO work out first company of each user
 	//in TIMESHEET.SUBS and ANALTIME2
 	marketcode = gen.company.a(30, 1);
-	if (not market.read(agy.markets, marketcode)) {
+	if (not(market.read(agy.markets, marketcode))) {
 		market = "";
 		msg = DQ ^ (marketcode ^ DQ) ^ " Market is missing";
 		gosub invalid(msg);
 		return;
 	}
 
-	call holiday("GETTYPE", getholidaytypedate, usercode, USER, marketcode, market, agy.agp, holidaytype, xx);
+	call holiday("GETTYPE", getholidaytypedate, usercode, userx, marketcode, market, agy.agp, holidaytype, xx);
 
 	return;
 
@@ -861,18 +861,18 @@ subroutine getprevioustimesheet() {
 	//check if previous timesheet has sufficient hours
 	if (timesheet and not win.registerx(7)) {
 
-		var tothours = (timesheet.a(2)).sum();
+		var tothours = timesheet.a(2).sum();
 		if (tothours < win.registerx(1).a(2)) {
 
 			getholidaytypedate = priordate;
 			gosub getholidaytype();
-			if (not win.valid) {
+			if (not(win.valid)) {
 				return;
 			}
 
 			if (not holidaytype) {
 				//MT2 is a GBP PROGRAM!
-				msg = "Your previous timesheet (" ^ idate.oconv("[DATE,4*]") ^ ")|has only " ^ tothours.oconv("MT2") ^ " hours on it but the|minimum allowed is " ^ (win.registerx(1).a(2)).oconv("MT2") ^ ".||Please complete your|previous timesheet first.";
+				msg = "Your previous timesheet (" ^ idate.oconv("[DATE,4*]") ^ ")|has only " ^ tothours.oconv("MT2") ^ " hours on it but the|minimum allowed is " ^ win.registerx(1).a(2).oconv("MT2") ^ ".||Please complete your|previous timesheet first.";
 				gosub invalid(msg);
 				win.reset = 5;
 			}
@@ -891,11 +891,11 @@ subroutine getprevioustimesheet() {
 		//@record<2>=timesheet<2>
 		RECORD.r(3, timesheet.a(3));
 		RECORD.r(4, timesheet.a(4));
-		var nlines = (RECORD.a(1)).count(VM) + (RECORD.a(1) ne "");
+		var nlines = RECORD.a(1).count(VM) + (RECORD.a(1) ne "");
 		for (var linen = nlines; linen >= 1; --linen) {
 			jobno = RECORD.a(1, linen);
 			gosub checkclosed();
-			if (jobno == "" or msg) {
+			if ((jobno == "") or msg) {
 				RECORD.eraser(1, linen);
 				RECORD.eraser(3, linen);
 				RECORD.eraser(4, linen);
@@ -918,7 +918,7 @@ subroutine getprevioustimesheet() {
 	//deduplicate same job/activity/details
 	//now that timer can cause multiple entries for one job/activity
 	var nfns = var("1,2,3,4,10,11").count(",") + 1;
-	var nlines = (RECORD.a(1)).count(VM) + 1;
+	var nlines = RECORD.a(1).count(VM) + 1;
 	for (ln = nlines; ln >= 2; --ln) {
 		//if job and activity are the same then delete the lower line
 		//different details are ignored so only the first details are retained

@@ -123,6 +123,9 @@ extern char **environ;
 #define TIME_UTC_ TIME_UTC
 #endif
 
+//for initrnd from string
+#include <MurmurHash2_64.h>
+
 //oshell capturing output needs posix popen
 #if defined(_MSC_VER) && !defined(popen)
 #define popen _popen
@@ -614,14 +617,25 @@ var var::rnd() const
 void var::initrnd() const
 {
 	THISIS(L"void var::initrnd(const var& seed) const")
-	THISISNUMERIC()
+	THISISDEFINED()
 
 	//get/init the base generator
 	random_base_generator_type* threads_random_base_generator=get_random_base_generator();
 
+	uint64_t seed;
+	if (this->isnum())
+		seed=this->toLong();
+	else {
+		//seed=0;
+	        //for (size_t ii = 0; ii < var_mvstr.size(); ii++)
+	        //        seed+=var_mvstr[ii];
+		seed=MurmurHash64((wchar_t*)var_mvstr.data(),int(var_mvstr.length()*sizeof(wchar_t)),0);
+	}
 	//set the new seed
 	//logputl(L"Seeding random number generator to " ^ (*this));
-	(*threads_random_base_generator).seed(static_cast<unsigned int>((*this).toInt() ));
+	//(*threads_random_base_generator).seed(static_cast<unsigned int>((*this).toInt() ));
+	//(*threads_random_base_generator).seed(static_cast<unsigned int>(seed));
+	(*threads_random_base_generator).seed(static_cast<uint64_t>(seed));
 }
 
 //only here really because boost regex is included here for file matching

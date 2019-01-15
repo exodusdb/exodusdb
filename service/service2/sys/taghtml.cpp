@@ -15,7 +15,7 @@ function main(in type, in in0, in mode, out output) {
 	if (output == "") {
 		var temp = mode.substr(1,2);
 		temp.ucaser();
-		if (temp == "TD" or mode == "TH") {
+		if ((temp == "TD") or (mode == "TH")) {
 			output = "&nbsp;";
 		}
 	}
@@ -36,7 +36,7 @@ function main(in type, in in0, in mode, out output) {
 		var charn = output.index("&", ii);
 	///BREAK;
 	if (not charn) break;;
-		if (not(var("nbsp" _VM_ "amp" _VM_ "lt" _VM_ "gt" _VM_ "infin").a(1).locateusing(output.substr(charn + 1,99999).field(";", 1), VM, xx))) {
+		if (not((var("nbsp,amp,lt,gt,infin").a(1)).locateusing((output.substr(charn + 1,99999)).field(";", 1), ",", xx))) {
 			output.splicer(charn, 1, "&amp;");
 		}
 	};//ii;

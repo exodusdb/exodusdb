@@ -559,32 +559,42 @@ DLL_PUBLIC var trimb(const var& instring, const wchar_t* trimchars)
 	return instring.trimb(trimchars);
 }
 
-DLL_PUBLIC var& trimmer(var& instring, const var trimchars)
+DLL_PUBLIC var& trimmer(var& instring, const var& trimchars)
 {
 	return instring.trimmer(trimchars);
 }
 
-DLL_PUBLIC var trim(const var& instring, const var trimchars)
+DLL_PUBLIC var& trimmer(var& instring, const var& trimchars, const var& options)
+{
+	return instring.trimmer(trimchars, options);
+}
+
+DLL_PUBLIC var trim(const var& instring, const var& trimchars)
 {
 	return instring.trim(trimchars);
 }
 
-DLL_PUBLIC var& trimmerf(var& instring, const var trimchars)
+DLL_PUBLIC var trim(const var& instring, const var& trimchars, const var& options)
+{
+	return instring.trim(trimchars,options);
+}
+
+DLL_PUBLIC var& trimmerf(var& instring, const var& trimchars)
 {
 	return instring.trimmerf(trimchars);
 }
 
-DLL_PUBLIC var trimf(const var& instring, const var trimchars)
+DLL_PUBLIC var trimf(const var& instring, const var& trimchars)
 {
 	return instring.trimf(trimchars);
 }
 
-DLL_PUBLIC var& trimmerb(var& instring, const var trimchars)
+DLL_PUBLIC var& trimmerb(var& instring, const var& trimchars)
 {
 	return instring.trimmerb(trimchars);
 }
 
-DLL_PUBLIC var trimb(const var& instring, const var trimchars)
+DLL_PUBLIC var trimb(const var& instring, const var& trimchars)
 {
 	return instring.trimb(trimchars);
 }
@@ -704,9 +714,9 @@ DLL_PUBLIC var rnd(const int number)
 	return var(number).rnd();
 }
 
-void DLL_PUBLIC initrnd(const int seednumber)
+void DLL_PUBLIC initrnd(const var& seed)
 {
-	var(seednumber).initrnd();
+	var(seed).initrnd();
 }
 
 DLL_PUBLIC var mod(const var& dividend, const var& divisor)

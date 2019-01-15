@@ -5,27 +5,59 @@ libraryinit()
 
 #include <gen.h>
 
+var mode;
+var datax;
+var runasusercode;
+var targetusercodes;
+var title;
 var usern;//num
 
-function main(in mode, in title0, in module, in request, in data, in runasusercode0, in targetusercodes0, io document0, io docid, out msg) {
-
-	var runasusercode = runasusercode0;
-	var targetusercodes = targetusercodes0;
-	var document;
-	var title;
-	if (document0.unassigned())
-		document = "";
-	else
-		document = document0;
-	if (title0)
-		title = title0;
-	else
-		title = document.a(1);
+function main(in mode0, in title0, in module, in request, in data0, in runasusercode0, in targetusercodes0, io document0, io docid, out msg) {
+	//c sys in,in,in,in,in,in,in,io,io,out
 
 	//creates an autorun record in documents
+	//GBP CREATEALERT mode WRITE
+	//GBP GENERAL.SUBS2 mode ASAP
+	//BP MEDIADIARY mode WRITE/ASP for media diary
+	//ABP none
+
+	//default unassigned parameters
+	if (mode0.unassigned()) {
+		mode = "";
+	}else{
+		mode = mode0;
+	}
+	if (data0.unassigned()) {
+		datax = "";
+	}else{
+		datax = data0;
+	}
+	if (runasusercode0.unassigned()) {
+		runasusercode = "";
+		}else{
+		runasusercode = runasusercode0;
+	}
+	if (targetusercodes0.unassigned()) {
+		targetusercodes = "";
+	}else{
+		targetusercodes = targetusercodes0;
+	}
+	if (document0.unassigned()) {
+		gen.document = "";
+	}else{
+		gen.document = document0;
+	}
+	if (docid.unassigned()) {
+		docid = "";
+	}
+	if (title0) {
+		title = title0;
+	}else{
+		title = gen.document.a(1);
+	}
 
 	//default runtime to once
-	if (not gen.document.field(FM, 20, 10).convert(FM, "")) {
+	if (not(gen.document.field(FM, 20, 10).convert(FM, ""))) {
 		//run once now
 		gen.document.r(27, 1);
 	}
@@ -81,14 +113,15 @@ function main(in mode, in title0, in module, in request, in data, in runasuserco
 	}
 
 	//auto targeting
+	var initialtargetusercodes = targetusercodes;
 	if (targetusercodes == "{GROUP}") {
 		var tt = runasusercode;
-		if (SECURITY.locate(tt, usern, 1)) {
+		if (SECURITY.a(1).locateusing(tt, VM, usern)) {
 			while (true) {
-				var USER;
-				if (USER.read(users, tt)) {
+				var userx;
+				if (userx.read(users, tt)) {
 					//only to users with emails
-					if (USER.a(7)) {
+					if (userx.a(7)) {
 						var seniorfirst = 1;
 						if (seniorfirst) {
 							targetusercodes.inserter(1, 1, tt);
@@ -100,7 +133,7 @@ function main(in mode, in title0, in module, in request, in data, in runasuserco
 				usern -= 1;
 				tt = SECURITY.a(1, usern);
 			///BREAK;
-			if (not(usern and tt and tt ne "---")) break;;
+			if (not((usern and tt) and tt ne "---")) break;;
 			}//loop;
 		}
 	}else{
@@ -108,15 +141,15 @@ function main(in mode, in title0, in module, in request, in data, in runasuserco
 		//check all users exist (even if they dont have emails)
 		if (targetusercodes) {
 			var nusers = targetusercodes.count(VM) + 1;
-			for (var usern = nusers; usern >= 1; --usern) {
+			for (usern = nusers; usern >= 1; --usern) {
 				var usercode = targetusercodes.a(1, usern);
-				var USER;
-				if (not(USER.read(users, usercode))) {
+				var userx;
+				if (not(userx.read(users, usercode))) {
 					if (not(usercode == "NEOSYS")) {
-						var msg = DQ ^ (usercode ^ DQ) ^ " user doesnt exist";
+						msg = DQ ^ (usercode ^ DQ) ^ " user doesnt exist";
 						return 0;
 					}
-					USER = "";
+					userx = "";
 				}
 			};//usern;
 		}
@@ -124,8 +157,8 @@ function main(in mode, in title0, in module, in request, in data, in runasuserco
 	}
 
 	//if no targets have emails then skip
-	if (targetusercodes0 and targetusercodes == "") {
-		var msg = "No target users have email addresses";
+	if (initialtargetusercodes and (targetusercodes == "")) {
+		msg = "No target users have email addresses";
 		return 0;
 	}
 
@@ -133,7 +166,7 @@ function main(in mode, in title0, in module, in request, in data, in runasuserco
 
 	gen.document.r(2, title);
 	gen.document.r(5, lower(fullrequest));
-	gen.document.r(6, lower(data));
+	gen.document.r(6, lower(datax));
 	gen.document.r(1, runasusercode);
 	gen.document.r(14, targetusercodes);
 
@@ -158,7 +191,7 @@ function main(in mode, in title0, in module, in request, in data, in runasuserco
 		docid = ID;
 		ID = saveid;
 		if (not docid) {
-			var msg = "Could not get next document number in AUTORUN2|Please try again after 1 minute";
+			msg = "Could not get next document number in AUTORUN2|Please try again after 1 minute";
 			return 0;
 		}
 	}

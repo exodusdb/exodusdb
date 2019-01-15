@@ -1,8 +1,9 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <log.h>
 #include <sendmail.h>
+#include <log.h>
+
 
 var ccaddress;
 var subject;
@@ -10,17 +11,26 @@ var body;
 var attachfilename;
 var deletex;
 var replyto;
+var params;
+var maxemailsize;
 var toaddress;
 var savesentence;
 var v5;
 var v6;
 var v8;
-var params;
+var forcedemailx;
+var tt;//num
 var params2;
+var osfilename;
+var osfilesize;//num
 var bodyfilename;
 
 function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfilename0, in delete0, out errormsg, in replyto0=var(), in params0=var()) {
-	//uses sendmail.js on windows and mailx otherwise
+	//c sys in,in,in,in,in,in,out,=var(),=var()
+
+	//uses sendmail.js
+
+	//global tt,maxemailsize,forcedemailx
 
 	if (ccaddress0.unassigned()) {
 		ccaddress = "";
@@ -39,7 +49,7 @@ function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfile
 	}
 	if (attachfilename0.unassigned()) {
 		attachfilename = "";
-		}else{
+	}else{
 		attachfilename = attachfilename0;
 	}
 	if (delete0.unassigned()) {
@@ -55,17 +65,19 @@ function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfile
 	if (params0.unassigned()) {
 		params = "";
 	}else{
-		params = replyto0;
+		params = params0;
 	}
 	if (not deletex) {
 		deletex = "";
 	}
 
+	//send files as links if too large for email to handle
+	maxemailsize = 10 * 1024 * 1024;
+
 	//sendmail is silent
 	errormsg = "";
-	var forcedemail;
 
-	if (SENTENCE.field(" ", 1) == "SENDMAIL" and toaddress0.unassigned()) {
+	if ((SENTENCE.field(" ", 1) == "SENDMAIL") and toaddress0.unassigned()) {
 		toaddress = SENTENCE.field(" ", 2);
 		if (not toaddress) {
 			toaddress = "sb2@neosys.com";
@@ -81,69 +93,66 @@ function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfile
 			errormsg.converter(TM, FM);
 			call mssg(errormsg);
 		}else{
-			var msg = "Step 1 OK. Mail for " ^ toaddress ^ " accepted by mail server.";
-			msg.r(-1, FM ^ "Step 2. Now check if actually received by recipient");
-			msg.r(-1, "to verify that the mail server can actually");
-			msg.r(-1, "deliver email to " ^ toaddress ^ FM);
+			var msg = "STEP 1 OK. Mail for " ^ toaddress ^ " accepted by mail server.";
 			params.converter("\r\n", FM);
-			msg.r(-1, "Sent using:" ^ FM ^ params);
+			msg.r(-1, FM ^ "Sent using:" ^ FM ^ params);
+			msg.r(-1, "STEP 2. Now check if actually received by recipient to verify");
+			msg.r(-1, " that the mail server can actually deliver email to " ^ toaddress);
+			msg.r(-1, " and that " ^ toaddress ^ " can receive email from the server" ^ FM);
 			msg = msg.oconv("T#75");
 			msg.converter(TM, FM);
 			call note(msg);
 		}
-		return 0;
+		var().stop();
 	}else{
-
 		toaddress = toaddress0;
 
 		//development systems ALWAYS email hardcoded SB2@NEOSYS.COM in next line
 		if (var("NEOSYS.ID").osfile()) {
-			forcedemail = "sb2@neosys.com";
+			forcedemailx = "sb2@neosys.com";
 			//toaddress=xlate('USERS','NEOSYS',7,'X')
 			//if toaddress else toaddress='sb2@neosys.com'
 			goto forcedemail;
 		}
 
-		//testdata and user neosys ... always email sysmsg@neosys.com
+		//testdata and user neosys - always email sysmsg@neosys.com
 		//if system<61> or (@username='NEOSYS' and system<17,1>[-4,4]='TEST') then
 
-		//testdata and user neosys ... always email sysmsg@neosys.com
-		if (SYSTEM.a(61) and USERNAME == "NEOSYS") {
-			forcedemail = "sysmsg@neosys.com";
+		//testdata and user neosys - always email sysmsg@neosys.com
+		if (SYSTEM.a(61) and (USERNAME == "NEOSYS")) {
+			forcedemailx = "sysmsg@neosys.com";
 
 forcedemail:
 			subject ^= " (to:" ^ toaddress;
-			toaddress = forcedemail;
+			toaddress = forcedemailx;
 			if (ccaddress) {
 				subject ^= " cc:" ^ ccaddress;
 			}
 			ccaddress = "";
 			subject ^= ")";
 
-			//each request can set a global forced email address
-			//for the duration of the request
-		//	goto 513;
+		//each request can set a global forced email address
+		//for the duration of the request
 		} else if (SYSTEM.a(117)) {
-			forcedemail = SYSTEM.a(117);
-			goto forcedemail;
+			forcedemailx = SYSTEM.a(117);
 		}
-//L513:
+//L560:
 	}
 
-	//limit neosys accounts email to chrystalla and steve
-	if (SYSTEM.index("PT9115", 1) or SYSTEM.index("1EEC633B", 1) or SYSTEM.index("PRAGMATIC", 1)) {
-		toaddress = "chrystallabush@neosys.com";
-		ccaddress = "steve.bush@neosys.com";
+	//limit development system to steve
+	if (SYSTEM.index("1EEC633B", 1)) {
+		toaddress = "steve.bush@neosys.com";
+		ccaddress = "";
 	}
 
 	//cut off any cc addresses from the toaddress (after ;;)
-	var tt = toaddress.index(";;", 1);
+	tt = toaddress.index(";;", 1);
 	if (tt) {
 		if (ccaddress) {
 			ccaddress ^= ";";
 		}
-		ccaddress ^= toaddress.substr(tt + 2, 9999);
-		toaddress = toaddress.substr(1, tt - 1);
+		ccaddress ^= toaddress.substr(tt + 2,9999);
+		toaddress = toaddress.substr(1,tt - 1);
 	}
 
 	//send mail requires confirmation if user is NEOSYS
@@ -154,7 +163,7 @@ forcedemail:
 	// q='You are NEOSYS.|Send mail to ':toaddress:'|':subject:'|':body0
 	// convert \0D0A\ to @fm in q
 	// if decide(q,'',reply) else reply=2
-	// if reply=1 else return 0
+	// if reply=1 else return
 	// system<33>=s33
 	// end
 
@@ -182,7 +191,7 @@ forcedemail:
 	};//filen;
 
 	//default neosys smtp parameters
-	if (not params1.a(1)) {
+	if (not(params1.a(1))) {
 		var sysname = SYSTEM.a(57);
 		if (not sysname) {
 			sysname = "unknown";
@@ -210,14 +219,61 @@ forcedemail:
 		params.r(-1, "replyto=" ^ replyto);
 	}
 
+	var msgsize = 0;
+
+	if (body[1] == "@") {
+
+		osfilename = body.substr(2,99999);
+		osfilesize = osfilename.osfile().a(1);
+
+		//convert to link if file is too big to email
+		if (osfilesize > maxemailsize) {
+			body = "";
+			gosub addlinks2osfilename();
+		}else{
+			msgsize += osfilesize;
+		}
+
+	}
+
+	msgsize += body.length();
+
+	//convert to links if attachfile is too big to email
+	//assumes attachfilename is in data dir accessible by web
+	if (attachfilename) {
+		attachfilename.osclose();
+
+		osfilesize = attachfilename.osfile().a(1);
+		if (osfilesize > maxemailsize) {
+			osfilename = attachfilename;
+			gosub addlinks2osfilename();
+			attachfilename = "";
+		}
+	}
+
+	//for CDO attachfilename must be full path
+	if (attachfilename) {
+
+		attachfilename.swapper("\\\\", "\\");
+		if (attachfilename.substr(1,2) == "..") {
+			attachfilename.splicer(1, 2, oscwd().field("\\", 1, oscwd().count("\\") - 1));
+		} else if (attachfilename.substr(1,2) == ".") {
+			attachfilename.splicer(1, 1, oscwd());
+		}
+		msgsize += attachfilename.osfile().a(1);
+
+		attachfilename.swapper("\\", "\\\\");
+	}
+
 	//body=body0
+	body.swapper(FM, "\r\n");
 
 	//if index(body,' ',1) or len(body)>10 or index(body,\0D\,1) or index(body,\0A\,1) then
-	if (SLASH_IS_BACKSLASH and body and body[1] ne "@") {
-		bodyfilename = "$" ^ (var("999999999999").rnd()).substr(1, 7) ^ ".TXT";
+	if (body and (body[1] ne "@")) {
+		bodyfilename = "$" ^ var(999999999).rnd().substr(1,7) ^ ".TXT";
 		//solve stupid outlook joining lines together if > 40 chars
 		//by adding tab on the end of every line
-		body.swapper("\r", "\t\n");
+		body.swapper("\r", "\t\r");
 		call oswrite(body, bodyfilename);
 		bodyfilename.osclose();
 		body = "@" ^ bodyfilename;
@@ -226,89 +282,48 @@ forcedemail:
 		bodyfilename = "";
 	}
 
-	//for CDO attachfilename must be full path
+	var paramfilename = "$" ^ var(999999999).rnd().substr(1,7) ^ ".TXT";
+
+	var errorfilename = var(999999999).rnd() ^ ".$$$";
+
+	var cmd = "START /w";
+	//option to de-bug
+	//cmd=' WSCRIPT //X'
+	cmd ^= " sendmail.js /e " ^ errorfilename ^ " /p " ^ paramfilename;
+
+	//params='/t ':quote(toaddress):' /s ':quote(subject):' /b ':quote(body):' /a ':quote(attachfilename)
+	//if delete then params:=' /d ':delete
+
+	//condition subject start standard with 'NEOSYS: '
+	if (subject.substr(1,8) ne "NEOSYS: ") {
+		if (subject.substr(1,6) == "NEOSYS") {
+			subject = subject.substr(7,9999).trimf();
+		}
+		if (subject.substr(1,7) == "System:") {
+			subject = subject.substr(8,9999).trimf();
+		}
+		subject.splicer(1, 0, "NEOSYS: ");
+	}
+
+	params.r(-1, "toaddress=" ^ (DQ ^ (toaddress ^ DQ)));
+	if (ccaddress) {
+		params.r(-1, "ccaddress=" ^ (DQ ^ (ccaddress ^ DQ)));
+	}
+	params.r(-1, "subject=" ^ (DQ ^ (subject ^ DQ)));
+	params.r(-1, "body=" ^ (DQ ^ (body ^ DQ)));
+
 	if (attachfilename) {
-		attachfilename.osclose();
-		attachfilename.swapper("\\\\", "\\");
-		if (attachfilename.substr(1, 2) == "..") {
-			attachfilename.splicer(1, 2, var().osdir().field("\\", 1, (var().osdir()).count("\\") - 1));
-		} else if (attachfilename.substr(1, 2) == ".") {
-			attachfilename.splicer(1, 1, var().osdir());
-		}
-		attachfilename.swapper("\\", "\\\\");
+		params.r(-1, "attachfilename=" ^ (DQ ^ (attachfilename ^ DQ)));
 	}
-
-	var paramfilename = "$" ^ (var("999999999999").rnd()).substr(1, 7) ^ ".TXT";
-
-	var errorfilename = var("99999999").rnd() ^ ".$$$";
-
-	var cmd;
-	if (SLASH_IS_BACKSLASH) {
-		cmd = "START /w";
-		//option to de-bug
-		//cmd=' WSCRIPT //X'
-		cmd ^= " sendmail.js /e " ^ errorfilename ^ " /p " ^ paramfilename;
-
-		//params='/t ':quote(toaddress):' /s ':quote(subject):' /b ':quote(body):' /a ':quote(attachfilename)
-		//if delete then params:=' /d ':delete
-
-		params.r(-1, "toaddress=" ^ (DQ ^ (toaddress ^ DQ)));
-		if (ccaddress) {
-			params.r(-1, "ccaddress=" ^ (DQ ^ (ccaddress ^ DQ)));
-		}
-		params.r(-1, "subject=" ^ (DQ ^ (subject ^ DQ)));
-		params.r(-1, "body=" ^ (DQ ^ (body ^ DQ)));
-
-		if (attachfilename) {
-			params.r(-1, "attachfilename=" ^ (DQ ^ (attachfilename ^ DQ)));
-		}
-		if (deletex) {
-			params.r(-1, "deleteaftersend=" ^ (DQ ^ (deletex ^ DQ)));
-		}
-		params ^= FM;
-
-		params.swapper(FM, "\r\n");
-		call oswrite(params, paramfilename);
-
-		osshell(cmd);
-		/////////////
-
-	//use mail/mailx
-	} else {
-
-		ossetenv("MAILFROM",params1.a(1));
-		if (replyto) {
-			ossetenv("replyto",replyto);
-		}
-
-		cmd="mail";
-		cmd^=" -r "^params1.a(1);//mailfrom but -r doesnt work via smtp according to man mailx
-		cmd^=" -s "^subject.quote();
-		if (ccaddress) {
-			cmd^=" -c "^ccaddress;
-		}
-		if (attachfilename) {
-			cmd^=" -a "^attachfilename;
-		}
-		cmd^=" "^toaddress;
-
-		cmd^=" 2>"^errorfilename;
-
-		print("SENDMAIL: to:" ^ toaddress);
-		if (ccaddress)
-			print(" cc:" ^ ccaddress);
-		printl(" subject:" ^ subject);
-		//cmd.outputl("cmd=");
-		//body.outputl("body=");
-		var mailresult=cmd.osshellwrite(body);
-		/////////////////////////////////////
-
-//	mailresult.outputl("mailresult=");	
-//	oswrite(mailresult,"mailresult");
-
-		//cmd^="-- -F $MAILFROM -f ${MAILFROM}@somedomain.com";
-
+	if (deletex) {
+		params.r(-1, "deleteaftersend=" ^ (DQ ^ (deletex ^ DQ)));
 	}
+	params ^= FM;
+
+	params.swapper(FM, "\r\n");
+	call oswrite(params, paramfilename);
+
+	osshell(cmd);
 
 	if (bodyfilename) {
 		bodyfilename.osdelete();
@@ -321,9 +336,7 @@ forcedemail:
 		errorfilename.osdelete();
 		errormsg.converter("\r\n", "\xFE\xFE");
 		//errormsg=errormsg 'T#60'
-	} else if (not SLASH_IS_BACKSLASH) {
-		errormsg="OK";
-	} else {
+	}else{
 		errormsg = "Unknown error in sendmail.js Failed to complete";
 		errormsg.r(-1, cmd);
 		//errormsg<-1>=params 'T#60'
@@ -336,8 +349,9 @@ forcedemail:
 	if (errormsg.a(1) == "OK") {
 		errormsg.eraser(1);
 	}else{
-		errormsg.trimmerb(FM);
-		errormsg.r(-1, FM ^ "From:     " ^ params1.a(1));
+		errormsg = trim(errormsg, FM, "B");
+		errormsg.r(-1, FM ^ "Size:     " ^ msgsize.oconv("[XBYTES]"));
+		errormsg.r(-1, "From:     " ^ params1.a(1));
 		errormsg.r(-1, "To:       " ^ toaddress);
 		if (ccaddress) {
 			errormsg.r(-1, "cc:       " ^ ccaddress);
@@ -352,13 +366,36 @@ forcedemail:
 			errormsg ^= "********";
 		}
 
-		//parameter SENDMAIL prevents log from calling sendmail recursively
 		call log("SENDMAIL", errormsg);
-
 		return 0;
 	}
 
 	return 1;
+
+}
+
+subroutine addlinks2osfilename() {
+	tt = osfilename;
+	tt.converter("\\", "/");
+	if (tt.substr(1,3) == "../") {
+		tt.splicer(1, 3, "");
+	}
+	if (body) {
+		body ^= FM;
+	}
+	body.r(-1, "Your report is too large to email. (" ^ osfilesize.oconv("[XBYTES]") ^ ", max " ^ maxemailsize.oconv("[XBYTES]") ^ ")");
+	body.r(-1, "but you can download it by clicking the following link.");
+	body.r(-1, FM ^ "*Link is only available for ONE HOUR from creation*");
+	var nlinks = SYSTEM.a(114).count(VM) + 1;
+	for (var linkn = 1; linkn <= nlinks; ++linkn) {
+		body ^= FM;
+		var linkdesc = SYSTEM.a(115, linkn);
+		if (linkdesc) {
+			body.r(-1, linkdesc);
+		}
+		body.r(-1, SYSTEM.a(114, linkn) ^ tt);
+	};//linkn;
+	return;
 
 }
 

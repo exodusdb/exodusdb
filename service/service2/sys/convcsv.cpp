@@ -1,64 +1,106 @@
 #include <exodus/library.h>
 libraryinit()
 
-//#include <makelist.h>
-//#include <dicti2a.h>
-//#include <xselect.h>
-//#include <uconvfile.h>
+#include <convcsv.h>
+#include <xselect.h>
+#include <convertercsv.h>
+#include <uconvfile.h>
 
-#include <gen.h>//only used for gen.company which should be moved to sys common
+#include <gen.h>
 
+var nfilters0;
+var nfilters;//num
+var filterfields;
+var filtervalues;
+var filters;
 var temp;//num
-var selectx;
 var tt;
 var dicthasauthorised;//num
 var keyx;
 var nkeys;//num
-var outfilename;
-var reply;
-var buffer;
-dim filenames;
-dim oconvxs;
-dim fmtxs;
-dim dictrecs;
-dim files;
-dim dictids;
-dim colgroups;
+var xfilenames;
+var oconvxs;
+var fmtxs;
+var dictrecs;
+var xfiles;
 var v69;
 var v70;
 var v71;
 var dict;
+var dictids;
+var colgroups;
+var dictid;
 var outfile;
-dim rec;
-dim mvrec;
-//var converterparams;
+var ptr;//num
+var rec;
+var mvrec;
+var converterparams;
 var result;
 var errors;
-var savelistactive;
 
-function main(in mode, in select, in nfilters, dim& filters) {
+function main(in sentence0, in select0="", in filters0="") {
+	//c sys in,"",""
 
-	if (false && mode && select && nfilters && filters(0,0)){};
+	//called from
+	//BP ANALTIME call with filters
+	//BP AUDITINVS perform then self call
+	//BP EXPORTADS ditto
+	//BP MEDIADIARY2 ditto
+	//ABP DAYBOOKS ditto
 
-	var filename = SENTENCE.field(" ", 2);
-	var file;
-	if (not(file.open(filename))) {
-		return fsmsg();
+	//global ptr
+
+	var sentencex = sentence0;
+	var selectx = select0;
+
+	if (nfilters0.unassigned()) {
+		nfilters = 0;
+	}else{
+		filterfields = filters0.a(1);
+		filtervalues = filters0.a(3);
+		nfilters = filterfields.count(FM) + (filterfields ne 0);
+	}
+	if (nfilters) {
+		dim filters(3, nfilters);
+		for (var filtern = 1; filtern <= nfilters; ++filtern) {
+			filters(1, filtern) = filterfields.a(1, filtern).convert(SVM, VM);
+			filters(3, filtern) = filtervalues.a(1, filtern).convert(SVM, VM);
+		};//filtern;
 	}
 
-	var sentencex = SENTENCE;
-	sentencex.converter(" ", VM);
-	if (sentencex.locate("SELECT", temp, 1)) {
-		selectx = SENTENCE.field(" ", temp + 1, 9999);
-		sentencex = SENTENCE.field(" ", 1, temp - 1);
-	}else{
-		sentencex = SENTENCE;
-		selectx = "";
+	//convert command line to subroutine call
+	if ((SENTENCE.field(" ", 1) == "CONVCSV") and sentencex.unassigned()) {
+
+		SENTENCE.transfer(sentencex);
+
+		//locate and remove SELECT statement from end of command
+		if (sentencex.a(1).locateusing("SELECT", " ", temp)) {
+			selectx = sentencex.field(" ", temp + 1, 9999);
+			sentencex = sentencex.field(" ", 1, temp - 1);
+		}else{
+			selectx = "";
+		}
+
+		call convcsv(sentencex, selectx);
+		return 0;
+
+	}
+
+	var filename = sentencex.field(" ", 2);
+	var file;
+	if (not(file.open(filename, ""))) {
+		call fsmsg();
+		return 0;
 	}
 
 	var normalise = sentencex.index(" NORMALISE", 1);
 	if (normalise) {
 		sentencex.swapper(" NORMALISE", "");
+	}
+
+	var firstmvonly = sentencex.index(" FIRSTMVONLY", 1);
+	if (firstmvonly) {
+		sentencex.swapper(" FIRSTMVONLY", "");
 	}
 
 	var raw = sentencex.index(" RAW", 1);
@@ -77,17 +119,20 @@ function main(in mode, in select, in nfilters, dim& filters) {
 	}else{
 		tt = filename;
 	}
-	if (not(DICT.open("dict_"^tt))) {
-		return fsmsg();
+	if (not(DICT.open("DICT", tt))) {
+		call fsmsg();
+		return 0;
 	}
 
-//	var converter = "";
-//	if (not((tt!!!).read(DEFINITIONS, "CONVERTER*" ^ filename))) {
-//		tt!!! = "";
-//	}
-//	if (tt!!!.a(1)) {
-//		converter = "CONVERTER." ^ tt!!!.a(1);
-//	}
+	//eg ABP converter.maconomy
+	convertercsv = "";
+	var hasconverter;
+	if (not(hasconverter.read(DEFINITIONS, "CONVERTER*" ^ filename))) {
+		hasconverter = "";
+	}
+	if (hasconverter.a(1)) {
+		convertercsv = "CONVERTER." ^ hasconverter.a(1);
+	}
 
 	var xx;
 	if (xx.read(DICT, "AUTHORISED")) {
@@ -124,7 +169,7 @@ function main(in mode, in select, in nfilters, dim& filters) {
 
 	if (not exportable) {
 
-		if (exportable.read(DICT, "exportable")) {
+		if (exportable.read(DICT, "EXPORTABLE")) {
 			if (exportable.a(1) == "G") {
 				exportable = exportable.a(3);
 				exportable.converter(VM ^ " ", FM ^ FM);
@@ -145,7 +190,7 @@ function main(in mode, in select, in nfilters, dim& filters) {
 
 	var exportable2 = exportable;
 
-//nextmvgroup:
+	//nextmvgroup:
 
 	if (mvgroupno) {
 		tt = keyx ^ FM ^ "LINE_NO" ^ FM;
@@ -156,86 +201,85 @@ function main(in mode, in select, in nfilters, dim& filters) {
 	exportable = tt ^ exportable2.field("%", 1);
 	exportable2 = exportable2.field("%", 2, 9999);
 
-	outfilename = SYSTEM.a(2);
+	var outfilename = SYSTEM.a(2);
 	//zzz if mvgroupno then outfilename[8,1]=mvgroupno
-	if (outfilename.lcase().substr(-4, 4) == ".htm") {
+	if ((outfilename.substr(-4,4)).ucase() == ".HTM") {
 		outfilename.splicer(-3, 3, "xls");
 		SYSTEM.r(2, outfilename);
 	}
+	var excel = (outfilename.substr(-3,3)).ucase() == "XLS";
 
-	var excel = outfilename.lcase().substr(-3, 3) == "xls";
-
-//retry:
 	outfilename.osdelete();
 	if (outfilename.osfile()) {
-		return exit2("CANNOT EXPORT BECAUSE " ^ outfilename ^ " IS ALREADY|OPEN IN ANOTHER PROGRAM, OR CANNOT BE ACCESSED");
+		var msg = "CANNOT EXPORT BECAUSE " ^ outfilename ^ " IS ALREADY|OPEN IN ANOTHER PROGRAM, OR CANNOT BE ACCESSED";
+		call mssg(msg);
+		gosub exit2();
+		return 0;
 	}
 
-	//call note2("Exporting " ^ outfilename ^ "||Please wait ...", "UB", buffer, "");
-
-	files.redim(255);
-	filenames.redim(255);
-	oconvxs.redim(255);
-	fmtxs.redim(255);
-	dictrecs.redim(255);
-	filenames="";
+	dim xfilenames(255);
+	xfilenames="";
+	dim oconvxs(255);
+	dim fmtxs(255);
+	dim dictrecs(255);
 	oconvxs="";
 	fmtxs="";
+	dim xfiles(255);
 	var nfields = 0;
-	
+
 	var selectlist = LISTACTIVE;
 	if (selectlist) {
-		savelistactive=LISTACTIVE;
+		call pushselect(0, v69, v70, v71);
 	}
 
 	if (exportable) {
-		//call makelist("", exportable, "", "");
+		var().makelist("",exportable);
 		//write exportable on lists,listkey
 		//perform 'GET-LIST ':listkey:' (S)'
 		//delete lists,listkey
-		var tt="select dict_" ^ filename ^ " " ^ exportable.swap(FM, "\" \"").quote();
-		DICT.select(tt);
 
 	}else{
-		if (filename.substr(1,4).lcase() == "dict") {
+		if (filename.substr(1,4) == "DICT") {
 			dict = "";
 		}else{
-			dict = "dict_";
+			dict = "DICT ";
 		}
-		DICT.select("select " ^ dict ^ filename ^ " BY FMC WITH FMC BETWEEN 1 AND 999999 AND WITH @ID NOT STARTING \'%\' AND WITH MASTER.FLAG (S)");
+		perform("SELECT " ^ dict ^ filename ^ " BY FMC WITH FMC BETWEEN 1 AND 9999 AND WITH @ID NOT STARTING \'%\' AND WITH MASTER.FLAG (S)");
 		if (not LISTACTIVE) {
-			return exit2(dict ^ filename ^ " has no exportable columns");
+			gosub exit2();
+			return 0;
 		}
 	}
 
-	dictids.redim(255);
-	colgroups.redim(255);
+	dim dictids(255);
+	dim colgroups(255);
 
-	dictids = "";
-	colgroups = "";
+	dictids="";
+	colgroups="";
 	var headingx = "";
 	var coln = 0;
 
-	var dictid;
-	while (DICT.readnext(dictid, MV)) {
+nextdict:
+	if (readnext(dictid, MV)) {
 
 		if (notexportable.locateusing(dictid, FM, xx)) {
-			continue;
+			goto nextdict;
 		}
 
 		if (dictid[1] == "%") {
-			continue;
+			goto nextdict;
 		}
 
 		if (dictid == "LINE_NO") {
 			coln += 1;
 			dictids(coln) = dictid;
-			headingx.r(coln, dictid);
+			headingx.r(coln, "Line No.");
 			fmtxs(coln) = "R";
 			dictrecs(coln) = "";
 		}else{
 			if (dict.read(DICT, dictid)) {
-//				call dicti2a(dict);
+				//TODO implement JBASE/PICK dict types I/A/D
+				//call dicti2a(dict)
 				coln += 1;
 				//if dict<2> matches '0N' then
 				var fn = dict.a(2);
@@ -253,7 +297,7 @@ function main(in mode, in select, in nfilters, dim& filters) {
 					var title = dict.a(3).trim();
 					title.swapper("<WBR/>", "");
 					title.swapper("<wbr/>", " ");
-					title.converter(UPPERCASE ^ "|_" _VM_ "", LOWERCASE ^ "   ");
+					title.converter(UPPERCASE ^ "|_" ^ VM, LOWERCASE ^ "   ");
 
 					//t=title[1,1]
 					//convert @lower.case to @upper.case in t
@@ -270,9 +314,11 @@ function main(in mode, in select, in nfilters, dim& filters) {
 				//extract file
 				if (dict.a(11)[1] == "<") {
 					temp = dict.a(11).substr(2,9999).field(">", 1);
-					filenames(coln) = temp;
-					if (not(files(coln).open(temp, ""))) {
-						return exit2(DQ ^ (temp ^ DQ) ^ " file cannot be found in dict " ^ (DQ ^ (dictid ^ DQ)));
+					xfilenames(coln) = temp;
+					if (not(xfiles(coln).open(temp, ""))) {
+						call mssg(DQ ^ (temp ^ DQ) ^ " file cannot be found in dict " ^ (DQ ^ (dictid ^ DQ)));
+						gosub exit2();
+						return 0;
 					}
 					var title = headingx.a(coln);
 					if (title.ucase().substr(-5,5) == " CODE") {
@@ -286,18 +332,23 @@ function main(in mode, in select, in nfilters, dim& filters) {
 					var oconvx = dict.a(7);
 
 					//force long date format
-					if (oconvx.index("DATE", 1) or oconvx[1] == "D") {
+					if (oconvx.index("DATE", 1) or (oconvx[1] == "D")) {
 						//if raw then
 						// oconvx='D4/J'
 						//end else
 						if (oconvx == "[SCH.DATES]") {
 							oconvx = "";
 						}else{
-							oconvx = "D4/E";
+							oconvx = DATEFORMAT;
+							oconvx.converter("2", "4");
 						}
 						//end
-					}
 
+					//no commas to be added to numbers
+					} else if (oconvx.substr(1,7) == "[NUMBER") {
+						oconvx = "";
+					}
+//L1731:
 					oconvxs(coln) = oconvx;
 				}
 
@@ -308,20 +359,23 @@ function main(in mode, in select, in nfilters, dim& filters) {
 			}
 			//end
 		}
-	}//nextdict
+		goto nextdict;
+	}
 	var ncols = coln;
 
 	//if @username='NEOSYS' then oswrite matunparse(dictids) on 'csv'
 
 	if (selectlist) {
-		LISTACTIVE=savelistactive;
+		call popselect(0, v69, v70, v71);
 	}
 
 	call oswrite("", outfilename);
-	if (not outfile.osopen(outfilename)) {
-		return exit2(outfilename.quote()^" file cannot be created");
+	if (not(outfile.osopen(outfilename))) {
+		call fsmsg();
+		gosub exit2();
+		return 0;
 	}
-	var ptr = 0;
+	ptr = 0;
 
 	//suppress headerrow if not required
 	if (not colheaderrow) {
@@ -332,133 +386,163 @@ function main(in mode, in select, in nfilters, dim& filters) {
 	//selectx:=' AND WITH PERSON_CODE "HARRIS"'
 		//perform 'SELECT ':filename:' ':selectx
 		tt = "SELECT " ^ filename ^ " " ^ selectx;
-		//call xselect(tt);
-		file.select(tt);
-/*		if (not LISTACTIVE) {
+		call xselect(tt);
+		if (not LISTACTIVE) {
 			outfile.osclose();
 			outfilename.osdelete();
-			return exit2("No records found");
+			call mssg("No records found");
+			return 0;
 		}
-*/
 	}else{
 		if (not LISTACTIVE) {
 			file.select();
 		}
 	}
-
 	var recn = 0;
 
-	rec.redim(ncols);
-	mvrec.redim(ncols);
+	dim rec(ncols);
+	dim mvrec(ncols);
 
-/////
-//nextrecord:
-/////
+	//oswrite matunparse(dictids) on 'DICTIDS'
 
-	//get the next key and mv
-	var mvx;
-	while (file.readnext(ID, mvx)) {
+////////
+nextrec:
+////////
 
-		//user interrupt
-		if (esctoexit()) {
-			outfile.osclose();
-			//osdelete outfilename
-			return exit2("Interrupted by User");
+	if (esctoexit()) {
+		gosub exit();
+		return 0;
+	}
+
+	//get the next key
+	var mvx = 0;
+	if (not(readnext(ID, mvx))) {
+		gosub exit();
+		return 0;
+	}
+
+	if (ID == "") {
+		goto nextrec;
+	}
+	recn += 1;
+
+	print(var().at(0), var().at(-4), recn, ". ");
+
+	//get the record
+	if (not(RECORD.read(file, ID))) {
+		goto nextrec;
+	}
+
+	MV = mvx;
+
+	if (dicthasauthorised) {
+		if (not(calculate("AUTHORISED"))) {
+			goto nextrec;
 		}
+	}
 
-		//skip "" key
-		if (ID == "") {
-			continue;
-		}
+	//find the maximum multivalue
+	var maxvn = 1;
 
-		recn += 1;
+	//skip multivalues
+	for (var filtern = 1; filtern <= nfilters; ++filtern) {
+		var value = calculate(filters(1, filtern));
+		if (filters(3, filtern).length()) {
 
-		//cout << AW.a(30)<< var().cursor(0)<< var().cursor(-4);
-		//cout << var().cursor(39, _CRTHIGH / 2)<< recn<< ". ";
-
-		//get the record
-		if (not(RECORD.read(file, ID))) {
-			continue;
-		}
-
-		//skip record if not authorised
-		if (dicthasauthorised and not calculate("AUTHORISED")) {
-			continue;
-		}
-
-		//skip zero hours in timesheets
-		//TODO get this hack into a special dictionary item like LIMIT
-		if (filename == "TIMESHEETS" and mvx and not RECORD.a(2, mvx)) {
-			continue;
-		}
-		
-		//get the data and work out maximum vn
-		mvrec = "";
-		var maxvn=0;
-		for (var coln = 1; coln <= ncols; ++coln) {
-
-			dictid = dictids(coln);
-			if (dictid eq "LINE_NO")
-				continue;
-
-			MV = mvx;
-			var cell = calculate(dictid);
-			if (not cell.length())
-				continue;
-				
-			if (oconvxs(coln)) {
-				cell = cell.oconv(oconvxs(coln));
+			//if reqvalue then skip if not matching
+			if (not(filters(3, filtern).locateusing(value, VM, xx))) {
+				goto nextrec;
 			}
 
-			mvrec(coln) = cell;
+		//no reqvalues means skip if no value present
+		} else if (not value) {
+			goto nextrec;
+		}
+//L2175:
+	};//filtern;
 
-			var temp = cell.dcount(VM);
-			if (temp > maxvn)
-				maxvn = temp;
-				
+	/*;
+		if normalise then;
+			nfields=count(@record,fm)+1;
+			for fn=1 to nfields;
+				temp=count(@record<fn>,vm)+1;
+				if temp>maxvn then maxvn=temp;
+				next fn;
+			nfields=count(@record,fm)+1;
+			end;
+	*/
+
+	for (var coln = 1; coln <= ncols; ++coln) {
+		MV = mvx;
+		dictid = dictids(coln);
+		temp = "";
+		if (dictid ne "LINE_NO" and dictrecs(coln).a(4) ne "S") {
+			temp = calculate(dictid).count(VM) + 1;
+		}
+		if (temp > maxvn) {
+			maxvn = temp;
+		}
+	};//coln;
+	//d ebug
+	//get the data
+	rec="";
+	var anydata = 0;
+	for (var coln = 1; coln <= ncols; ++coln) {
+		MV = mvx;
+		dictid = dictids(coln);
+		if (dictid == "LINE_NO") {
+		}else{
+	//if dictid='EXTRAS' then de bug
+			var cell = calculate(dictid);
+	//if len(rec)+len(cell)>65000 then de bug
+			if (cell ne "") {
+				rec(coln) = cell;
+				anydata = 1;
+			}
+		}
+	};//coln;
+
+	//normalise the data and output to csv file
+	//if rec<>'' then
+	if (anydata) {
+
+		//mat mvrec=mat rec
+		mvrec=rec;
+
+		var vn = 0;
+nextvn:
+		vn += 1;
+
+		if (esctoexit()) {
+			outfile.osclose();
+			gosub exit2();
+			return 0;
 		}
 
-		//skip if no data
-		if (not maxvn)
-			continue;
+		//conversions
+		for (var coln = 1; coln <= ncols; ++coln) {
 
-		//normalise the data and output to csv file
-		
-		//output the lines
-		for (var vn=1; vn <= maxvn; ++vn) {
-
-			rec="";
-					
-			//conversions
-			for (var coln = 1; coln <= ncols; ++coln) {
-
-				var cell;
-				
-				if (dictids(coln) == "LINE_NO") {
-					cell = vn;
-
-				//select right multivalue if multivalued field/column
-				//non-multivalued fields/columns are repeated on every line
-				}else if (colgroups(coln)) {
-						cell=mvrec(coln).a(1,vn);
-						
-				//not multivalued so repeat on every line
-				} else {
-						cell = mvrec(coln);
+			//choose the right mv
+			if (dictids(coln) == "LINE_NO") {
+				rec(coln) = vn;
+			}else{
+				mvx = colgroups(coln);
+				if (mvx) {
+					rec(coln) = mvrec(coln).a(1, vn);
 				}
-								
-				//skip empty cells
-				if (not cell.length())
-					continue;
+			}
 
-				//conversions
-				if (mvx or vn == 1) {
+			var cell = rec(coln);
+
+			if (cell ne "") {
+
+				if (mvx or (vn == 1)) {
 
 					//convert codes to names
-					if (filenames(coln) and not raw) {
+					if (xfilenames(coln) and not raw) {
 						var rec2;
-						if (rec2.read(files(coln), cell)) {
-							if (filenames(coln) == "BRANDS") {
+						if (rec2.read(xfiles(coln), cell)) {
+							if (xfilenames(coln) == "BRANDS") {
 								cell = rec2.a(2, 1);
 							}else{
 								cell = rec2.a(1);
@@ -466,138 +550,161 @@ function main(in mode, in select, in nfilters, dim& filters) {
 						}
 					}
 
+					//other conversions
+					if (oconvxs(coln)) {
+						cell = cell.oconv(oconvxs(coln));
+					}
+
 				}
 
-				//remove any initial + sign - on numbers only
 				if (cell[1] == "+") {
-					if ((cell.substr(2,9999)).isnum()) {
+					if (cell.substr(2,9999).isnum()) {
 						cell.splicer(1, 1, "");
 					}
 				}
-				
-				//a single double quote gets changed to ''
 				if (cell == DQ) {
 					cell = "\'\'";
 				}
-				
-				//swap double quotes for '' unless already double quoted
-				if (cell[1] ne DQ or cell[-1] ne DQ) {
+				if ((cell[1] ne DQ) or (cell[-1] ne DQ)) {
 					cell.swapper(DQ, "\'\'");
 				}
-				
-				//WARNING prevent cell length more than 255
 				if (cell.length() > 255) {
-					cell = cell.substr(1,250) ^ " ...";
+					cell = cell.substr(1,200) ^ " ...";
 				}
-				
-				//double quote non-numerics
-				if (fmtxs(coln) ne "R") {
+				if (fmtxs(coln) ne "R" or not cell.isnum()) {
 
-					//make sure "1-12" is not interpreted as a formula (by prefixing a space?)
+					//make sure "1-12" is not interpreted as a formula
 					if (1 or excel) {
-						if (var(".-+0123456789").index(cell[1])) {
-							if (not cell.isnum()) {
+						if (var(".-+0123456789").index(cell[1], 1)) {
+							if (not(cell.isnum())) {
 								cell.splicer(1, 0, " ");
 							}
 						}
 					}
 
-					//convert any existing double quotes to '' for T columns which are not already double quoted
 					if (cell.index(DQ, 1)) {
 						if (fmtxs(coln) == "T") {
-							if (cell[1] ne DQ or cell[-1] ne DQ) {
+							if ((cell[1] ne DQ) or (cell[-1] ne DQ)) {
 								cell.swapper(DQ, "\'\'");
 								cell = DQ ^ (cell ^ DQ);
 							}
 						}
-					//otherwise just double quote stuff
 					}else{
 						cell = DQ ^ (cell ^ DQ);
 					}
 
 				}
-
+	//gotcell:
 				rec(coln) = cell;
 
-			};//coln;
-
-			var line = rec.unparse();
-			
-			//remove trailing or all tab chars
-			line.trimmerb(FM);
-
-			//suppress output of empty amv rows
-			if (mvgroupno and nkeys) {
-				if (line.field(FM, nkeys + 2, 9999) == "") {
-					line = "";
-				}
 			}
 
-			//output one line
-			if (not line.length())
-				continue;
+		};//coln;
 
-			//remove leading equal signs in order not to confuse Excel
-			line.swapper(FM ^ "=", FM);
+		var line = rec.unparse();
+
+		//remove trailing or all tab chars
+		while (true) {
+		///BREAK;
+		if (not(line[-1] == FM)) break;;
+			line.splicer(-1, 1, "");
+		}//loop;
+
+		//suppress output of empty amv rows
+		if (mvgroupno and nkeys) {
+			if (line.field(FM, nkeys + 2, 9999) == "") {
+				line = "";
+			}
+		}
+
+		//skip zero hours in timesheets
+		//already skipped above probably
+		//if filename='TIMESHEETS' then if @record<2,vn> else line=''
+
+		//remove leading equal signs in order not to confuse Excel
+		line.swapper(FM ^ "=", FM);
+
+		//output one line
+		if (line ne "") {
 
 			//output header row if first line and not suppressed
 
 			if (headingx) {
 
-//				if (converter) {
-//					//headingx will come back converted and maybe as multiple lines
-//					//converterparams initially contains first line so heading can put some columns into heading if required
-//					//converterparams comes back with info to speed convertion of lines
-//					converterparams = line;
-//					call onverter("HEAD", headingx, converterparams, filename);
-//				}else{
+				if (hasconverter) {
+					//headingx will come back converted and maybe as multiple lines
+					//converterparams initially contains first line so heading can put some columns into heading if required
+					//converterparams comes back with info to speed convertion of lines
+					converterparams = line;
+					call convertercsv("HEAD", headingx, converterparams, filename);
+				}else{
 					headingx.converter(FM, var().chr(9));
 					headingx ^= "\r\n";
-//				}
+				}
 
-				osbwrite(headingx, outfile, ptr);
+				call osbwrite(headingx, outfile,  ptr);
+				ptr += headingx.length();
 
 				headingx = "";
 			}
 
 			//output line
 
-//			if (converter) {
-//				call @converter("LINE", line, converterparams, filename);
-//			}else{
+			if (hasconverter) {
+				call convertercsv("LINE", line, converterparams, filename);
+			}else{
 				line.swapper(FM, var().chr(9));
 				line ^= "\r\n";
-//			}
+			}
 
-			osbwrite(line, outfile, ptr);
+			call osbwrite(line, outfile,  ptr);
+			ptr += line.length();
 
-		}//next vn
+		}
 
-	}//goto nextrecord
-	
-/////
-//exit:
-/////
+		if (not firstmvonly and (vn < maxvn)) {
+			goto nextvn;
+		}
+
+	}
+
+	goto nextrec;
+
+}
+
+subroutine exit() {
 	outfile.osclose();
-//	call uconvfile(outfile, "CODEPAGE", "UTF16", result, errors);
-	//general result code
+	call uconvfile(outfile, "CODEPAGE", "UTF16", result, errors);
 	SYSTEM.r(34, 1);
-	
-//exit3:
-//	if (raw and exportable2) {
-//		mvgroupno += 1;
-//		if (mvgroupno == 1) {
-//			mvgroupno = 2;
-//		}
-//		goto nextmvgroup;
-//	}
-	return 1;
+	gosub exit3();
+	return;
+
 }
 
-function exit2(in msg="") {
-	call mssg(msg);
+subroutine exit2() {
+	//general result code
 	SYSTEM.r(34, 0);
-	return 0;
+	gosub exit3();
+	return;
+
 }
+
+subroutine exit3() {
+	//TODO reimplement multiple mv group export
+	//if raw and exportable2 then
+	// mvgroupno+=1
+	// if mvgroupno=1 then mvgroupno=2
+	// goto nextmvgroup
+	// end
+
+	if (not ptr) {
+		call mssg("No records found");
+		var().stop();
+	}
+
+	return;
+
+}
+
 
 libraryexit()
