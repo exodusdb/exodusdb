@@ -40,8 +40,8 @@ function main(in d1, in d2, out result, io lang) {
 	//dont show start and end day of month if complete calendar months
 	if (tt.a(1) == 1) {
 		//calculate end of month of stop date
-		t2 = ((t2.oconv("D2/E")).field("/", 2, 2)).iconv("[DATEPERIOD]");
-		if (tt.a(4) == (t2.oconv("D2/E")).field("/", 1)) {
+		t2 = (t2.oconv("D2/E").field("/", 2, 2)).iconv("[DATEPERIOD]");
+		if (tt.a(4) == t2.oconv("D2/E").field("/", 1)) {
 			tt.r(1, "");
 			tt.r(4, "");
 		}
@@ -56,13 +56,13 @@ function main(in d1, in d2, out result, io lang) {
 	}
 
 	//eliminate first dom if same dom
-	if (tt.a(1) == tt.a(4) and not tt.a(2) and not tt.a(3)) {
+	if (((tt.a(1) == tt.a(4)) and not tt.a(2)) and not tt.a(3)) {
 		tt.r(1, "");
 	}
 
 	//add hyphen if still a range
 	if (not(tt.substr(1,3) == (FM ^ FM ^ FM))) {
-		if (tt.a(2) == "" and tt.a(3) == "") {
+		if ((tt.a(2) == "") and (tt.a(3) == "")) {
 			tt.r(3, tt.a(3) ^ " ^ ");
 		}else{
 			tt.r(3, tt.a(3) ^ " - ");

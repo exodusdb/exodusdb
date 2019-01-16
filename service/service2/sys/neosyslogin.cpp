@@ -20,7 +20,6 @@ var now;//num
 var escx;
 var now2;//num
 var encryptx;
-var sysrec;
 var allowablechars;
 
 function main(in mode0) {
@@ -71,7 +70,7 @@ function main(in mode0) {
 	//if there is a user called MASTER with no password then login automatically
 	// unless already automatically logged in
 	ok = 0;
-	if (not SYSTEM.a(15)) {
+	if (not(SYSTEM.a(15))) {
 		if (SECURITY.a(1).locateusing("MASTER", VM, usern)) {
 			if (SECURITY.a(4, usern, 2).field(TM, 7) == "") {
 				SYSTEM.r(22, 1000000);
@@ -201,7 +200,7 @@ fail:
 	}
 
 chknameandpass:
-	///////////////
+///////////////
 	//encrypt the password
 	encryptx = password;
 	gosub makepass();
@@ -226,7 +225,7 @@ chknameandpass:
 	if (not ok) {
 		var sysrec;
 		if (sysrec.read(systemfile(), userx)) {
-			if (sysrec.a(7) == encryptx and (speed < 2 or mode == "SLEEP")) {
+			if ((sysrec.a(7) == encryptx) and (((speed < 2) or (mode == "SLEEP")))) {
 				ok = 1;
 			}
 		}
@@ -265,7 +264,8 @@ okfail:
 
 	USERNAME=(userx);
 
-	if (not sysrec.read(systemfile(), userx)) {
+	var sysrec;
+	if (not(sysrec.read(systemfile(), userx))) {
 		sysrec = "";
 	}
 	if (USERNAME == "NEOSYS") {
@@ -278,7 +278,7 @@ okfail:
 
 	//if mode='SLEEP' then
 	// call mssg('','DB',buff,'')
-	// call restorescreen(buffer,attribute)
+	// //call restorescreenbuffer,attribute)
 	// end
 	return 0;
 

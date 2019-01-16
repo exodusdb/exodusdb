@@ -4,7 +4,6 @@ libraryinit()
 #include <htmllib2.h>
 #include <log.h>
 #include <readbakpars.h>
-#include <trim2.h>
 #include <htmllib.h>
 #include <elapsedtimetext.h>
 #include <roundrobin.h>
@@ -103,7 +102,7 @@ function main(in msg0, in subject0="", in username0="") {
 	//suppress login failure messages
 	if ((APPLICATION ne "ACCOUNTS" and username ne "NEOSYS") and (subjectin.substr(1,13) == "Login Failure")) {
 		emailaddrs.swapper("sysmsg@neosys.com", "");
-		emailaddrs = trim2(emailaddrs, ";");
+		emailaddrs = trim(emailaddrs, ";");
 	}
 
 	//prevent a weird error going to users

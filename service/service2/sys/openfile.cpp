@@ -4,7 +4,6 @@ libraryinit()
 #include <openfile.h>
 
 var autocreate;//num
-var datasetcode;
 var reply;
 
 function main(in filename, io file, in similarfilename="", in autocreate0="") {
@@ -17,7 +16,7 @@ function main(in filename, io file, in similarfilename="", in autocreate0="") {
 	var firsttry = 1;
 tryagain:
 
-	if (openfile("*" ^ filename, file, datasetcode)) {
+	if (file.open(filename)) {
 		return 1;
 	}
 
@@ -36,17 +35,14 @@ tryagain:
 						return 0;
 					}
 				}
-				var cmd = vol ^ " DATA " ^ filename ^ " (S)";
-				execute("MAKEFILE " ^ cmd);
-				execute("ATTACH " ^ cmd);
+				var().createfile(filename);
 				firsttry = 0;
 				goto tryagain;
 			}
 		}
 	}
 
-	var().chr(7).output();
-	call mssg("THE " ^ (DQ ^ (filename ^ DQ)) ^ " FILE IS MISSING");
+	call note("THE " ^ (DQ ^ (filename ^ DQ)) ^ " FILE IS MISSING");
 	file = "";
 	return 0;
 

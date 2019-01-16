@@ -12,7 +12,6 @@ libraryinit()
 #include <select2.h>
 #include <prodordersubs.h>
 #include <generalsubs.h>
-#include <trim2.h>
 #include <convpdf.h>
 #include <sysmsg.h>
 #include <validjob.h>
@@ -30,7 +29,6 @@ var taskid;
 var usercodes;
 var tasks;
 var taskdata;
-var oldtask;
 var tt;
 var usercode;
 var islocked;//num
@@ -47,7 +45,6 @@ var totsize;//num
 var errors;
 var mattasks;
 var ntasks;//num
-var task;
 
 function main() {
 	//!subroutine jobsproxy(request,datax,response)
@@ -107,13 +104,13 @@ function main() {
 			var().stop();
 		}
 
-		if (not win.srcfile.lock( ID)) {
+		if (not(win.srcfile.lock( ID))) {
 			USER4 = DQ ^ (ID ^ DQ) ^ " is currently locked. Try again later";
 			gosub unlockinvalid();
 		}
 		win.wlocked = 1;
 
-		if (not RECORD.read(win.srcfile, ID)) {
+		if (not(RECORD.read(win.srcfile, ID))) {
 			USER4 = DQ ^ (ID ^ DQ) ^ " does not exist in AMENDORDERNO";
 unlockamend:
 			win.srcfile.unlock( ID);
@@ -209,7 +206,8 @@ unlockamend:
 			gosub unlockinvalid();
 		}
 
-		if (not oldtask.read(tasks, taskid)) {
+		var oldtask;
+		if (not(oldtask.read(tasks, taskid))) {
 			USER4 = DQ ^ (taskid ^ DQ) ^ " is missing from tasks";
 			gosub unlockinvalid();
 		}
@@ -226,7 +224,7 @@ unlockamend:
 		var addresponse = "";
 		if (taskdata.a(3) and taskdata.a(3) ne oldtask.a(3)) {
 			newtask.r(3, taskdata.a(3));
-			newtask.r(4, var().date() ^ "." ^ (var().time()).oconv("R(0)#5"));
+			newtask.r(4, var().date() ^ "." ^ var().time().oconv("R(0)#5"));
 			addresponse = " Status now " ^ newtask.a(3) ^ " (from " ^ oldtask.a(3) ^ ")";
 		}
 
@@ -326,12 +324,12 @@ unlockamend:
 				if (RECORD.read(gen.timesheets, ID)) {
 
 					if (RECORD.a(8) == "APPROVED") {
-						var nn = (RECORD.a(30)).count(VM) + 1;
+						var nn = RECORD.a(30).count(VM) + 1;
 						tt = RECORD.a(30, nn);
 						if (tt == USERNAME) {
 							tt = "you";
 						}
-						var detail = "It was already approved by " ^ tt ^ " on " ^ (RECORD.a(31, nn)).oconv("[DATETIME,4*]");
+						var detail = "It was already approved by " ^ tt ^ " on " ^ RECORD.a(31, nn).oconv("[DATETIME,4*]");
 						USER1.r(10, sheetn, "OK");
 						USER1.r(11, sheetn, detail);
 						htx ^= "<td>OK</td>";
@@ -364,7 +362,7 @@ approvalerror:
 						win.valid = 1;
 						call timesheetsubs("PREWRITE.APPROVING");
 
-						if (not win.valid) {
+						if (not(win.valid)) {
 							var detail = "Cannot approve";
 							USER4.transfer(detailederror);
 							goto approvalerror;
@@ -464,7 +462,7 @@ approvalerror:
 		RECORD = "";
 		RECORD.r(10, USER0.a(4));
 		call prodordersubs("VAL.SUPPINV");
-		if (not USER4 and USER3 and USER3 ne "OK") {
+		if ((not USER4 and USER3) and USER3 ne "OK") {
 			USER3.splicer(1, 0, "OK ");
 		}
 
@@ -476,13 +474,13 @@ approvalerror:
 		gosub checkoutputfileexists();
 
 	} else if (mode.field(".", 1) == "UPDATEATTACHMENTS") {
-		if (USER1 and (mode.field(".", 2)).length() == 3) {
+		if (USER1 and ((mode.field(".", 2)).length() == 3)) {
 			USER1.converter(VM, FM);
 			USER1.write(DEFINITIONS, "ENCLOSURES.PROD" ^ mode.field(".", 2));
 			USER3 = "OK";
 		}
 
-	} else if (mode == "PRINTJOB" or mode == "JOBPRINT") {
+	} else if ((mode == "PRINTJOB") or (mode == "JOBPRINT")) {
 
 		//quick printsend eg from timesheets f6 link
 		if (mode == "PRINTJOB") {
@@ -519,7 +517,7 @@ approvalerror:
 		execute("ANALTIME");
 		gosub checkoutputfileexists();
 
-	} else if (mode == "TIMESHEETPRINT" or mode == "TIMESHEETALERTS") {
+	} else if ((mode == "TIMESHEETPRINT") or (mode == "TIMESHEETALERTS")) {
 
 		PSEUDO = USER1;
 		var pseudox = USER1;
@@ -538,7 +536,7 @@ approvalerror:
 			USER1 = "";
 			USER3.swapper(FM, "\r\n");
 			//if response='' then response='OK'
-			if ((USER3 == "" or USER3 == "OK") and mode == "TIMESHEETPRINT") {
+			if (((USER3 == "") or (USER3 == "OK")) and (mode == "TIMESHEETPRINT")) {
 				USER3 = "No emails required/sent";
 			}
 		}else{
@@ -591,7 +589,7 @@ approvalerror:
 		var().stop();
 	}
 //L3367:
-	/////
+/////
 	//exit:
 	/////
 	call locking("UNLOCKALL", "", "", "", locklist, 0, xx);
@@ -630,7 +628,7 @@ subroutine opendatafile() {
 
 subroutine errorresponse() {
 	USER4.converter("|", FM);
-	USER4 = trim2(USER4, FM, "FB");
+	USER4 = trim(USER4, FM, "FB");
 	USER4.converter("||", FM ^ FM);
 	USER4.swapper(FM ^ FM, "\r\n");
 	USER4.swapper(FM, " ");
@@ -641,7 +639,7 @@ subroutine errorresponse() {
 }
 
 subroutine checkoutputfileexists() {
-	if ((SYSTEM.a(2)).osfile().a(1) > 5) {
+	if (SYSTEM.a(2).osfile().a(1) > 5) {
 
 		//convert to pdf
 		if (stationery > 2) {
@@ -721,14 +719,14 @@ subroutine addtasks2() {
 	var prevtaskids = USER1.a(5);
 
 nexttask:
-	/////////
+/////////
 
 	if (totsize > 60000) {
 		var().clearselect();
 		return;
 	}
 
-	if (not readnext(taskid)) {
+	if (not(readnext(taskid))) {
 		return;
 	}
 
@@ -736,7 +734,8 @@ nexttask:
 		goto nexttask;
 	}
 
-	if (not task.read(tasks, taskid)) {
+	var task;
+	if (not(task.read(tasks, taskid))) {
 		goto nexttask;
 	}
 

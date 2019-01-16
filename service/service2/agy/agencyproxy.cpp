@@ -15,7 +15,6 @@ libraryinit()
 #include <convpdf.h>
 #include <sysmsg.h>
 #include <openfile.h>
-#include <trim2.h>
 
 #include <agy.h>
 #include <gen.h>
@@ -34,7 +33,6 @@ var companyn2;//num
 var companyn;//num
 var tcompany;
 var compcode2;
-var invno;//num
 var set;//num
 var anythingaccessed;//num
 var byyear;
@@ -45,7 +43,6 @@ var newfilename;
 var triggers;
 var errors;
 var adqueries;
-var query;
 var filename;
 var agpfn;//num
 var iodatfn;//num
@@ -174,7 +171,7 @@ function main() {
 		signatory.swapper(TM, "<BR>");
 		USER3 = "OK " ^ signatory;
 
-	} else if (mode == "GETBUDGET" or mode == "ANALYSIS2") {
+	} else if ((mode == "GETBUDGET") or (mode == "ANALYSIS2")) {
 		USER1.transfer(PSEUDO);
 		call budgetsheetsubs(mode);
 		PSEUDO.transfer(USER1);
@@ -186,13 +183,13 @@ function main() {
 
 		var productioninvoiceaccess = authorised("PRODUCTION INVOICE ACCESS", msg2, "");
 
-		var mediabyyear = (agy.agp.a(49)).index("<YEAR", 1);
-		var productionbyyear = (agy.agp.a(50)).index("<YEAR", 1);
+		var mediabyyear = agy.agp.a(49).index("<YEAR", 1);
+		var productionbyyear = agy.agp.a(50).index("<YEAR", 1);
 
 		var reqyear = USER0.a(2);
 		if (mediabyyear or productionbyyear) {
-			if (not reqyear.length()) {
-				reqyear = ((var().date()).oconv("D/")).field("/", 3);
+			if (not(reqyear.length())) {
+				reqyear = var().date().oconv("D/").field("/", 3);
 				//call msg('YEAR MISSING NOT SPECIFIED IN AGENCYPROXY,GETINVOICENUMBERS')
 				//stop
 			}
@@ -224,7 +221,7 @@ function main() {
 					compcode = "*** ";
 				}
 				}else{
-				if (not readnext(compcode)) {
+				if (not(readnext(compcode))) {
 					compcode = "*** ";
 				}
 			}
@@ -238,7 +235,8 @@ function main() {
 					goto nextcomp;
 				}
 
-				if (not tcompany.read(gen.companies, compcode)) {
+				var tcompany;
+				if (not(tcompany.read(gen.companies, compcode))) {
 					goto nextcomp;
 				}
 				compcode2 = tcompany.a(28);
@@ -266,7 +264,8 @@ function main() {
 					invkey ^= "*" ^ reqyear;
 				}
 				invkey ^= "%";
-				if (not invno.readv(agy.invoices, invkey, 1)) {
+				var invno;
+				if (not(invno.readv(agy.invoices, invkey, 1))) {
 					if (mediabyyear) {
 						invno = 0;
 					}else{
@@ -287,7 +286,8 @@ function main() {
 					invkey ^= "*" ^ reqyear;
 				}
 				invkey ^= "%";
-				if (not invno.readv(agy.invoices, invkey, 1)) {
+				var invno;
+				if (not(invno.readv(agy.invoices, invkey, 1))) {
 					if (productionbyyear) {
 						invno = 0;
 					}else{
@@ -315,7 +315,8 @@ nextcomp:;
 
 		if (mediainvoiceaccess) {
 			var invkey = "%MEDIA.NO2%";
-			if (not invno.readv(agy.invoices, invkey, 1)) {
+			var invno;
+			if (not(invno.readv(agy.invoices, invkey, 1))) {
 				invno = 70000 - 1;
 			}
 			USER1.r(4, companyn2, invno + 1);
@@ -323,7 +324,8 @@ nextcomp:;
 
 		if (productioninvoiceaccess) {
 			var invkey = "%PRODUCTION.NO2%";
-			if (not invno.readv(agy.invoices, invkey, 1)) {
+			var invno;
+			if (not(invno.readv(agy.invoices, invkey, 1))) {
 				invno = 90000 - 1;
 			}
 			USER1.r(5, companyn2, invno + 1);
@@ -332,7 +334,7 @@ nextcomp:;
 		set = 0;
 		gosub getsetnumbers();
 
-		if (not mediainvoiceaccess or productioninvoiceaccess or anythingaccessed) {
+		if (not((mediainvoiceaccess or productioninvoiceaccess) or anythingaccessed)) {
 			call mssg("There is nothing that you are allowed to access");
 			var().stop();
 		}
@@ -346,7 +348,7 @@ nextcomp:;
 	} else if (mode == "INVOICENUMBERS") {
 
 		var reqyear = USER1.a(6);
-		if ((agy.agp.a(49)).index("<YEAR", 1) or (agy.agp.a(50)).index("<YEAR", 1)) {
+		if (agy.agp.a(49).index("<YEAR", 1) or agy.agp.a(50).index("<YEAR", 1)) {
 			if (not(reqyear.match("4N"))) {
 				call mssg("YEAR MISSING NOT SPECIFIED IN AGENCYPROXY,GETINVOICENUMBERS");
 				var().stop();
@@ -359,9 +361,9 @@ nextcomp:;
 
 			if (moden == 1) {
 				mode = "MEDIA";
-				byyear = (agy.agp.a(49)).index("<YEAR", 1);
+				byyear = agy.agp.a(49).index("<YEAR", 1);
 			}else{
-				byyear = (agy.agp.a(50)).index("<YEAR", 1);
+				byyear = agy.agp.a(50).index("<YEAR", 1);
 				mode = "PRODUCTION";
 			}
 
@@ -376,7 +378,7 @@ nextcomp:;
 			invnobycompany = agy.agp.a(48);
 
 			//nb compcode2 not used in invoice seq no key
-			ncomps = (USER1.a(2)).count(VM) + (USER1.a(2) ne "");
+			ncomps = USER1.a(2).count(VM) + (USER1.a(2) ne "");
 			for (companyn = 1; companyn <= ncomps; ++companyn) {
 				compcode = USER1.a(2, companyn);
 				var nextinvno = USER1.a(4 - 1 + moden, companyn);
@@ -403,7 +405,7 @@ nextcomp:;
 nextmoden:;
 		};//moden;
 
-		ncomps = (USER1.a(2)).count(VM) + (USER1.a(2) ne "");
+		ncomps = USER1.a(2).count(VM) + (USER1.a(2) ne "");
 		for (companyn = 1; companyn <= ncomps; ++companyn) {
 
 			compcode = USER1.a(2, companyn);
@@ -437,7 +439,7 @@ nextcomp2:;
 			call mssg("There is nothing to update or nothing|that you are authorised to update");
 		}
 
-	} else if (mode == "INVOICEREPRINT" or mode == "REPRINTINVS") {
+	} else if ((mode == "INVOICEREPRINT") or (mode == "REPRINTINVS")) {
 		PSEUDO = USER1;
 		//media invoices put in pdf landscape
 		//if @pseudo<21>=2 then printopts:='L'
@@ -639,6 +641,7 @@ nextcomp2:;
 
 	} else {
 		USER3 = "System Error: " ^ (DQ ^ (USER0 ^ DQ)) ^ " unrecognised request in AGENCYPROXY";
+		goto errorexit;
 	}
 //L3297:
 
@@ -647,9 +650,9 @@ nextcomp2:;
 	/////
 	var().stop();
 
-	//////////
+//////////
 errorexit:
-	//////////
+//////////
 	USER3 = "Error: " ^ USER3;
 	var().stop();
 	return 0;
@@ -657,7 +660,7 @@ errorexit:
 }
 
 subroutine checkoutputfileexists() {
-	if ((SYSTEM.a(2)).osfile().a(1) > 5) {
+	if (SYSTEM.a(2).osfile().a(1) > 5) {
 
 		//convert to pdf
 		if (stationery > 2) {
@@ -692,7 +695,8 @@ subroutine getquery() {
 		var().stop();
 	}
 
-	if (not query.read(adqueries, queryid)) {
+	var query;
+	if (not(query.read(adqueries, queryid))) {
 		call mssg(DQ ^ (queryid ^ DQ) ^ " is missing from ADQUERIES file");
 		gosub errorresponse();
 		var().stop();
@@ -794,7 +798,7 @@ subroutine getsetnumber() {
 	}
 
 	if (set) {
-		if (compcode2 and compcode2 ne "**" and not filebycomp) {
+		if ((compcode2 and compcode2 ne "**") and not filebycomp) {
 		}else{
 			var nextfileno = USER1.a(iodatfn, companyn);
 			if (nextfileno and nextfileno.isnum()) {
@@ -803,10 +807,11 @@ subroutine getsetnumber() {
 			}
 		}
 	}else{
-		if (compcode2 and compcode2 ne "**" and not filebycomp) {
+		if ((compcode2 and compcode2 ne "**") and not filebycomp) {
 			fileno = "";
 		}else{
-			if (not fileno.readv(DEFINITIONS, filenokey, 1)) {
+			var fileno;
+			if (not(fileno.readv(DEFINITIONS, filenokey, 1))) {
 				fileno = "";
 				//get the old default without company/year for the first company only
 				if (companyn == 1) {
@@ -832,7 +837,7 @@ subroutine getsetnumber() {
 
 subroutine errorresponse() {
 	USER4.converter("|", FM);
-	USER4 = trim2(USER4, FM, "FB");
+	USER4 = trim(USER4, FM, "FB");
 	USER4.converter("||", FM ^ FM);
 	USER4.swapper(FM ^ FM, "\r\n");
 	USER4.swapper(FM, " ");

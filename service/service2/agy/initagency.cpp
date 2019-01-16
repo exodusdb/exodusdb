@@ -272,7 +272,7 @@ nextrcard2:
 
 	call log2("*convert ads 50/51 X to 1", logtime);
 	var convkey = "CONVERTED*ADS";
-	if (not fin.converted.read(DEFINITIONS, convkey)) {
+	if (not(fin.converted.read(DEFINITIONS, convkey))) {
 		fin.converted = "";
 	}
 	if (fin.converted.a(1) < var("16 JUN 2010").iconv("D")) {
@@ -287,7 +287,7 @@ decideupg:
 			var oo = "Recreate - Slow for large databases";
 			oo.r(1, -1, "Patch - Quick to avoid errors but do CREATEADS later.");
 			oo.r(1, -1, "No - MUST do CREATEADS later to avoid errors!");
-			if (not decide(qq, oo, reply)) {
+			if (not(decide(qq, oo, reply))) {
 				goto decideupg;
 			}
 		}else{
@@ -407,7 +407,7 @@ convertdatelist:
 		call ossleep(1000*1);
 		goto convertdatelist;
 	}
-	if (not xx.read(DEFINITIONS, paramkey)) {
+	if (not(xx.read(DEFINITIONS, paramkey))) {
 
 		call note("Converting schedules file date format||Please wait ...", "UB", buffer, "");
 		nrecs = getreccount(agy.schedules, "", "");
@@ -436,7 +436,7 @@ nextsch2:
 
 				for (var fnn = 1; fnn <= 3; ++fnn) {
 					var fn = fns.a(1, fnn);
-					if ((schedule.a(fn)).index(SVM, 1)) {
+					if (schedule.a(fn).index(SVM, 1)) {
 						goto nextsch2;
 					}
 				};//fnn;
@@ -444,7 +444,7 @@ nextsch2:
 				for (var fnn = 1; fnn <= 3; ++fnn) {
 					var fn = fns.a(1, fnn);
 					var dategrid = schedule.a(fn);
-					if (not dategrid.index(SVM, 1)) {
+					if (not(dategrid.index(SVM, 1))) {
 						var olddategrid = dategrid;
 
 						//make the one character one day string into a one subvalue one day string
@@ -499,7 +499,7 @@ nextsch2:
 	var origagp = agy.agp;
 
 	//fix base currency code
-	if (agy.agp.a(2) ne "CYP" and gen.company.a(3) and agy.agp.a(2) ne gen.company.a(3)) {
+	if ((agy.agp.a(2) ne "CYP" and gen.company.a(3)) and agy.agp.a(2) ne gen.company.a(3)) {
 		call log2("*fix company base currency code in agency.params to " ^ gen.company.a(3), logtime);
 		agy.agp.r(2, gen.company.a(3));
 		//writev agp<2> on definitions,'AGENCY.PARAMS',2
@@ -515,19 +515,19 @@ nextsch2:
 	}
 
 	//make sure of currency format
-	if (not(agy.agp.a(3) == "MD20P" or agy.agp.a(3) == "MD30P" or agy.agp.a(3) == "MD00P")) {
+	if (not(((agy.agp.a(3) == "MD20P") or (agy.agp.a(3) == "MD30P")) or (agy.agp.a(3) == "MD00P"))) {
 		agy.agp.r(3, "MD20P");
 		//writev agp<3> on definitions,'AGENCY.PARAMS',3
 	}
 
 	//move booking options into new grouping
-	if ((agy.agp.a(77)).length()) {
+	if (agy.agp.a(77).length()) {
 		if (agy.agp.a(77)) {
 			agy.agp.r(79, 1, -1, "4");
 		}
 		agy.agp.r(77, "");
 	}
-	if ((agy.agp.a(78)).length()) {
+	if (agy.agp.a(78).length()) {
 		if (agy.agp.a(78)) {
 			agy.agp.r(79, 1, -1, "3");
 		}
@@ -623,7 +623,7 @@ nextbrandcode:
 	call log2("*build client group members", logtime);
 	convkey = "BUILDCLIENTGROUPMEMBERS";
 	if (lockrecord("DEFINITIONS", DEFINITIONS, convkey, recordx, 999999)) {
-		if (not xx.read(DEFINITIONS, convkey)) {
+		if (not(xx.read(DEFINITIONS, convkey))) {
 			perform("WINDOWSTUB CLIENT.SUBS " ^ convkey);
 			var().date().write(DEFINITIONS, convkey);
 		}
@@ -633,7 +633,7 @@ nextbrandcode:
 	call log2("*build supplier group members", logtime);
 	convkey = "BUILDSUPPLIERGROUPMEMBERS";
 	if (lockrecord("DEFINITIONS", DEFINITIONS, convkey, recordx, 999999)) {
-		if (not xx.read(DEFINITIONS, convkey)) {
+		if (not(xx.read(DEFINITIONS, convkey))) {
 			perform("WINDOWSTUB SUPPLIER.SUBS " ^ convkey);
 			var().date().write(DEFINITIONS, convkey);
 		}
@@ -643,7 +643,7 @@ nextbrandcode:
 	call log2("*fix client 29 in 19 corruption", logtime);
 	convkey = "FIXCLIENT29IN19";
 	if (lockrecord("DEFINITIONS", DEFINITIONS, convkey, recordx, 999999)) {
-		if (not xx.read(DEFINITIONS, convkey)) {
+		if (not(xx.read(DEFINITIONS, convkey))) {
 			perform("WINDOWSTUB CLIENT.SUBS " ^ convkey);
 			var().date().write(DEFINITIONS, convkey);
 		}
@@ -1050,7 +1050,7 @@ nextbrandcode:
 	call log2("*autoconfigure TV certification codes before 9 DEC 2010", logtime);
 	var tv;
 	if (tv.read(agy.jobtypes, "TV")) {
-		if (tv.a(20) == "" and (tv.a(11)).floor() <= 15685) {
+		if ((tv.a(20) == "") and (tv.a(11).floor() <= 15685)) {
 			tt = "OK,(DNA),(ERROR),(DURATION),(COPY),(PLACEMENT)";
 			tv.r(20, tt.convert(",", VM));
 			tt = "Aired/TIME/comment,Did not Air//comment,Error/time/COMMENT,Wrong Duration/TIME/COMMENT,Wrong Copy/TIME/COMMENT,Wrong Placement/TIME/COMMENT";
@@ -1068,7 +1068,7 @@ nextbrandcode:
 		}else{
 			agy.agp.r(112, 0);
 		}
-		(agy.agp.a(112)).writev(DEFINITIONS, "AGENCY.PARAMS", 112);
+		agy.agp.a(112).writev(DEFINITIONS, "AGENCY.PARAMS", 112);
 		
 		var().clearselect();
 	}

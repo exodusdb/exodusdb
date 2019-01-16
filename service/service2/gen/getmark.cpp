@@ -24,14 +24,14 @@ function main(in mode, in html, io mark) {
 			mark ^= " ";
 		}
 		//S o f t w a r e b y
-		mark ^= (var("7962206572617774666F53").iconv("HEX")).substr(-1,-999);
+		mark ^= var("7962206572617774666F53").iconv("HEX").substr(-1,-999);
 		if (html) {
 			mark.splicer(1, 0, "<div style=\"font-size:60%;margin:0px;text-align:left;page-break-before:avoid;page-break-after:avoid\">");
 		}
 
 		mark ^= " ";
 
-		mark ^= (var("4D4F432E5359534F454E").iconv("HEX")).substr(-1,-99);
+		mark ^= var("4D4F432E5359534F454E").iconv("HEX").substr(-1,-99);
 
 		if (html) {
 			mark ^= "</div>";
@@ -57,7 +57,7 @@ function main(in mode, in html, io mark) {
 
 		//client mark
 		if (gen.company.a(27)) {
-			mark ^= (gen.company.a(27)).invert();
+			mark ^= gen.company.a(27).invert();
 		}else{
 			mark ^= SYSTEM.a(14);
 		}

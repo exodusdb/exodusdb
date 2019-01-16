@@ -81,11 +81,11 @@ function main(in mode0) {
 
 			//backward compatible - can be deleted after all upgraded
 			//leave in case reloading ancient data
-			if (not userrec.a(17)) {
+			if (not(userrec.a(17))) {
 				var changelogkey = "USER*" ^ USERNAME;
 				if (changelog.read(DEFINITIONS, changelogkey)) {
 					userrec.r(17, changelog.a(8));
-					(userrec.a(17)).writev(users, USERNAME, 17);
+					userrec.a(17).writev(users, USERNAME, 17);
 					
 					var("").writev(DEFINITIONS, changelogkey, 8);
 					
@@ -98,7 +98,7 @@ function main(in mode0) {
 
 			//fix a problem where people were missing most changes
 			//due to sv being represented as : eg user:support:technical
-			if (mode.a(3) and mode.a(3) < 14773) {
+			if (mode.a(3) and (mode.a(3) < 14773)) {
 				mode.r(3, 14153);
 			}
 
@@ -125,7 +125,7 @@ function main(in mode0) {
 		
 
 		//build preferences from menus if not specified
-		if (not mode.a(2)) {
+		if (not(mode.a(2))) {
 
 			//tt=capitalise(menucodes)
 			//swap 'Support' with 'Technical' in tt
@@ -239,7 +239,7 @@ subroutine select() {
 		andx = " AND";
 	}
 	if (USER1.a(2)) {
-		cmd ^= andx ^ " WITH DATE GE " ^ (DQ ^ ((USER1.a(2)).oconv("[DATE,4*]") ^ DQ));
+		cmd ^= andx ^ " WITH DATE GE " ^ (DQ ^ (USER1.a(2).oconv("[DATE,4*]") ^ DQ));
 		andx = " AND";
 	}
 	if (USERNAME ne "NEOSYS") {
@@ -405,7 +405,7 @@ subroutine getversiondates() {
 	for (var ii = 1; ii <= nn; ++ii) {
 		idate = (versionlog.a(ii, 1).field(" ", 2, 3)).iconv("D");
 		//itime=iconv(field(versionlog,' ',1),'MT')
-		if (not versiondata.locateusing(idate, FM, xx)) {
+		if (not(versiondata.locateusing(idate, FM, xx))) {
 			versiondata.r(-1, idate);
 		}
 	};//ii;

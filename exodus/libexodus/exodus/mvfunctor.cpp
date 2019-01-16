@@ -273,7 +273,7 @@ std::cout<<"mvfunctor:checkload: ko:"<<newlibraryname<<std::endl;
 #if TRACING >= 3
 std::cout<<"mvfunctor:checkload: ko:"<<libraryname_<<" "<< newfunctionname<<std::endl;
 #endif
-		throw MVException(L"Unable to find "
+		throw MVException(L"Unable to find function "
 		^ var(newfunctionname)
 		^ L" in "
 		^ var(libraryfilename_));
@@ -331,7 +331,8 @@ std::cout<<"mvfunctor:openlib: in:"<<newlibraryname<<std::endl;
 #if TRACING >= 3
 std::cout<<"mvfunctor:openlib: ko:"<< newlibraryname<<std::endl;
 #endif
-		std::cerr<<libraryfilename_<<" cannot be found or cannot be opened"<<std::endl;
+		//std::cerr<<libraryfilename_<<" cannot be found or cannot be opened"<<std::endl;
+		throw MVException(var(libraryfilename_) ^ L" cannot be found or cannot be opened");
 		return false;
 	}
 
@@ -374,7 +375,8 @@ std::cout<<"mvfunctor:openfunc: in:"<<libraryname_<<" "<< newfunctionname<<std::
 #if TRACING >= 3
 std::cout<<"mvfunctor:openfunc: ko:"<<libraryname_<<" "<<newfunctionname<<std::endl;
 #endif
-		std::cerr<<functionname_<<" function cannot be found in "<<libraryfilename_<<std::endl;
+		//std::cerr<<functionname_<<" function cannot be found in "<<libraryfilename_<<std::endl;
+		throw MVException(var(functionname_) ^ L" function cannot be found in " ^ var(libraryfilename_));
 		return false;
 	}
 

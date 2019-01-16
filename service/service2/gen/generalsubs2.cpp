@@ -1,7 +1,6 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <trim2.h>
 #include <autorun2.h>
 #include <singular.h>
 #include <authorised.h>
@@ -76,17 +75,18 @@ function main(in mode0) {
 		////////////////////////////////////////
 
 		gosub getfiledefaults();
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
 		//if opening documents then look in versions file
 		//if just reading then do not
-		if (win.wlocked) {
+		//if wlocked then
+		if (1 or win.wlocked) {
 
 			//if not in version file and no ~ character in key then
 			//assume is an ordinary new record
-			if (not RECORD.read(versionfile, ID)) {
+			if (not(RECORD.read(versionfile, ID))) {
 
 				//not in versions file and no ~ in key -> ordinary new record
 				if (not(ID.index("~", 1))) {
@@ -124,18 +124,18 @@ function main(in mode0) {
 
 	} else if (mode.index("PREDELETE", 1)) {
 
-		if (not win.wlocked) {
+		if (not(win.wlocked)) {
 			return 0;
 		}
 
-		if (not win.orec) {
+		if (not(win.orec)) {
 			return 0;
 		}
 
 		RECORD = win.orec;
 
 		gosub getfiledefaults();
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
@@ -149,14 +149,14 @@ function main(in mode0) {
 
 	} else if (mode.index("PREWRITE", 1)) {
 
-		if (not win.wlocked) {
+		if (not(win.wlocked)) {
 			return 0;
 		}
 
 		//standard code to log version and updates
 
 		gosub getfiledefaults();
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
@@ -195,7 +195,7 @@ function main(in mode0) {
 					status = "AMENDED";
 				}
 			}
-//L640:
+//L643:
 			//if status='' then status='ISSUED'
 
 			if (status == "") {
@@ -247,7 +247,7 @@ function main(in mode0) {
 
 				//special case amending order no AFTER invoicing
 				//if not considered changing anything (so that the version remains)
-				if (win.datafile == "PRODUCTION_INVOICES" and (RECORD.a(34)).index("INVOICED", 1)) {
+				if ((win.datafile == "PRODUCTION_INVOICES") and RECORD.a(34).index("INVOICED", 1)) {
 					temporec.r(7, RECORD.a(7));
 				}
 
@@ -301,7 +301,7 @@ function main(in mode0) {
 
 		//this condition will suppress recording every change in the document log
 		//for timesheets
-		if (win.datafile == "TIMESHEETS" and RECORD.a(8) ne win.orec.a(8)) {
+		if ((win.datafile == "TIMESHEETS") and RECORD.a(8) ne win.orec.a(8)) {
 			//here it means add an entry in the log
 			anythingchanged = 1;
 		}
@@ -310,7 +310,7 @@ function main(in mode0) {
 
 			//backward compatible with old records without versioning
 			//save version 1 line even if record doesnt exist
-			if (win.orec and appending and logn == 1 and versionfn) {
+			if (((win.orec and appending) and (logn == 1)) and versionfn) {
 				RECORD.inserter(versionlogfn, logn, oldversion);
 				logn += 1;
 			}
@@ -322,7 +322,7 @@ function main(in mode0) {
 		//update
 		//add new executives/reactivate executives if reused
 		//TODO obtain temporary lock
-		if (win.datafile == "JOBS" or win.datafile == "SCHEDULES") {
+		if ((win.datafile == "JOBS") or (win.datafile == "SCHEDULES")) {
 			var execcode = calculate("EXECUTIVE_CODE");
 			var indexvalueskey = "INDEXVALUES*" ^ win.datafile ^ "*EXECUTIVE_CODE";
 			var indexvalues;
@@ -379,7 +379,7 @@ updindexvalues:
 				request = "REPRINTINVS";
 
 				if (status.index("PROFORMA", 1)) {
-					datax = (calculate("PROFORMA_INVOICE_NO")).a(1, 1);
+					datax = calculate("PROFORMA_INVOICE_NO").a(1, 1);
 				}else{
 					datax = calculate("INVOICE_NO");
 				}
@@ -399,7 +399,7 @@ updindexvalues:
 			request = "";
 			subject = "";
 		}
-//L1846:
+//L1849:
 		//create a onetime autorun task
 		if (module and request) {
 
@@ -408,7 +408,7 @@ updindexvalues:
 			var monitorusers = "";
 
 			//find key otherwise no monitors
-			if (not SECURITY.a(10).locateusing(task, VM, taskn)) {
+			if (not(SECURITY.a(10).locateusing(task, VM, taskn))) {
 				return 0;
 			}
 			var locks = SECURITY.a(11, taskn);
@@ -426,7 +426,7 @@ updindexvalues:
 					monitorusers ^= SVM ^ usercode;
 				}else{
 					//break between groups so we can run with the lowest user per group
-					if (usercode == "" or usercode == "---") {
+					if ((usercode == "") or (usercode == "---")) {
 						monitorusers ^= VM;
 					}
 				}
@@ -436,7 +436,7 @@ updindexvalues:
 			//in order to ensure lowest common denominator authorisations
 			var ngroups = monitorusers.count(VM) + 1;
 			for (var groupn = 1; groupn <= ngroups; ++groupn) {
-				var groupusers = trim2(monitorusers.a(1, groupn), SVM);
+				var groupusers = trim(monitorusers.a(1, groupn), SVM);
 				if (groupusers) {
 					groupusers.converter(SVM, VM);
 					call autorun2("ASAP", subject, module, request, datax, groupusers.field(VM, -1), groupusers, xx, yy, zz);
@@ -447,7 +447,7 @@ updindexvalues:
 		}
 
 	}
-//L2140:
+//L2143:
 	return 0;
 
 }
@@ -561,7 +561,7 @@ subroutine getfiledefaults() {
 		//firstversion='1'
 		//defaultstatus=''
 
-	} else if (win.datafile == "PLANS" or win.datafile == "SCHEDULES") {
+	} else if ((win.datafile == "PLANS") or (win.datafile == "SCHEDULES")) {
 		statusfn = 157;
 		versionfn = 222;
 		//firstversion='1'
@@ -601,7 +601,7 @@ subroutine getfiledefaults() {
 		gosub invalid(msg);
 		return;
 	}
-//L2861:
+//L2864:
 	userlogfn = logfn + 0;
 	datetimelogfn = logfn + 1;
 	stationlogfn = logfn + 2;
@@ -637,7 +637,7 @@ subroutine addlog() {
 
 	RECORD.inserter(userlogfn, logn, USERNAME);
 
-	var datetime = var().date() ^ "." ^ (var().time()).oconv("R(0)#5");
+	var datetime = var().date() ^ "." ^ var().time().oconv("R(0)#5");
 	RECORD.inserter(datetimelogfn, logn, datetime);
 
 	RECORD.inserter(stationlogfn, logn, STATION.trim());
@@ -652,7 +652,7 @@ subroutine addlog() {
 
 	//on large records with more than 20 log entries, trim the log to 10 entries
 	//can look at previous versions to get prior versions
-	if (RECORD.length() > 0 and (RECORD.a(userlogfn)).count(VM) >= 20) {
+	if ((RECORD.length() > 0) and (RECORD.a(userlogfn).count(VM) >= 20)) {
 		if (logn == 1) {
 			ii = 1;
 		}else{
@@ -690,7 +690,7 @@ subroutine incrementversion() {
 		} else if (var("ABCDEFGHIJKLMNOPQRSTUVWXY").index(version, 1)) {
 			version = var().chr(version.seq() + 1);
 		}
-//L3413:
+//L3416:
 		RECORD.r(versionfn, version);
 		return;
 

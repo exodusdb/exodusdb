@@ -25,13 +25,12 @@ var dbn;
 var emailresult;
 var usersordefinitions;
 var userkey;
-var USER;
+var userx;
 var newpassword;
 var xx;
 var fn;//num
 var taskprefix;
 var reportid;
-var doc;
 var logyear;
 var logfromdate;
 var loguptodate;
@@ -65,17 +64,17 @@ function main() {
 
 	} else if (mode == "PERIODTABLE") {
 
-		var year = (USER0.a(2).field("-", 1)).field("/", 2);
+		var year = USER0.a(2).field("-", 1).field("/", 2);
 		var finyear = USER0.a(3);
 
 		perform("PERIODTABLE " ^ year ^ " " ^ finyear ^ " (H)");
 
 		gosub checkoutputfileexists();
 
-	} else if (mode == "FILEMAN" and USER0.a(2) == "COPYDB") {
+	} else if ((mode == "FILEMAN") and (USER0.a(2) == "COPYDB")) {
 
 		var copydb = USER0.a(3);
-		if (not SYSTEM.a(58).locateusing(copydb, VM, dbn)) {
+		if (not(SYSTEM.a(58).locateusing(copydb, VM, dbn))) {
 			{}
 		}
 		var todb = SYSTEM.a(63, dbn);
@@ -86,7 +85,7 @@ function main() {
 
 		//ensure authorised to login to one or the other database
 		//by ensuring the user is currently logged in to one or other database
-		if (USERNAME ne "NEOSYS" and copydb ne SYSTEM.a(17) and todb ne SYSTEM.a(17)) {
+		if ((USERNAME ne "NEOSYS" and copydb ne SYSTEM.a(17)) and todb ne SYSTEM.a(17)) {
 			USER4 = "In order to copy database " ^ (DQ ^ (copydb ^ DQ)) ^ " to " ^ (DQ ^ (todb ^ DQ)) ^ ",";
 			USER4.r(-1, "you must be logged in to database " ^ (DQ ^ (copydb ^ DQ)) ^ " or " ^ (DQ ^ (todb ^ DQ)));
 			USER4.r(-1, "but you are currently logged in to database " ^ (DQ ^ (SYSTEM.a(17) ^ DQ)));
@@ -100,7 +99,7 @@ function main() {
 			var().stop();
 		}
 
-		var started = (var().time()).oconv("MTS");
+		var started = var().time().oconv("MTS");
 		var otherusersx = otherusers(copydb);
 		var log = started ^ " Started copy database " ^ copydb ^ " to " ^ todb;
 		log ^= "|" ^ started ^ " Other processes online:" ^ otherusersx.a(1);
@@ -109,7 +108,7 @@ function main() {
 
 		USER3 = USER4;
 		if (not USER3) {
-			log ^= "|" ^ (var().time()).oconv("MTS") ^ " Finished";
+			log ^= "|" ^ var().time().oconv("MTS") ^ " Finished";
 			call sysmsg(log);
 			USER3 = "OK " ^ log;
 		}
@@ -119,7 +118,7 @@ function main() {
 		var groupids = USER1.a(1);
 		var jobfunctionids = "";
 		var userids = USER1.a(2);
-		if (not groupids or jobfunctionids or userids) {
+		if (not((groupids or jobfunctionids) or userids)) {
 			call mssg("You must specify some groups or users to email");
 			var().stop();
 		}
@@ -180,7 +179,7 @@ function main() {
 			usersordefinitions = users;
 			userkey = ID;
 
-			if (emailaddress.ucase() == USER.a(7).ucase()) {
+			if (emailaddress.ucase() == userx.a(7).ucase()) {
 
 				//signify ok
 				baduseroremail = "";
@@ -194,14 +193,14 @@ function main() {
 		}else{
 			usersordefinitions = DEFINITIONS;
 			userkey = "BADUSER*" ^ ID;
-			if (not userrec.read(usersordefinitions, userkey)) {
+			if (not(userrec.read(usersordefinitions, userkey))) {
 				userrec = "";
 			}
 		}
 
 		//record historical resets/attempts
 		//datetime=(date():'.':time() 'R(0)#5')+0
-		var datetime = var().date() ^ "." ^ (var().time()).oconv("R(0)#5");
+		var datetime = var().date() ^ "." ^ var().time().oconv("R(0)#5");
 		userrec.inserter(15, 1, datetime);
 		userrec.inserter(16, 1, SYSTEM.a(40, 2));
 		userrec.inserter(18, 1, ("Password Reset " ^ baduseroremail).trim());
@@ -215,7 +214,7 @@ function main() {
 		//prewrite (locks authorisation file or fails)
 		win.valid = 1;
 		call usersubs("PREWRITE");
-		if (not win.valid) {
+		if (not(win.valid)) {
 			var().stop();
 		}
 
@@ -410,12 +409,12 @@ badsetcodepage:
 		win.wlocked = 0;
 		win.templatex = "SECURITY";
 		call securitysubs("SETUP");
-		if (not win.valid) {
+		if (not(win.valid)) {
 			var().stop();
 		}
 		//call security.subs('LISTAUTH')
 		call securitysubs(mode);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			var().stop();
 		}
 		call securitysubs("POSTAPP");
@@ -426,7 +425,7 @@ badsetcodepage:
 
 		win.templatex = "SECURITY";
 		call securitysubs("SETUP");
-		if (not win.valid) {
+		if (not(win.valid)) {
 			var().stop();
 		}
 
@@ -505,7 +504,7 @@ nextrep:
 				if (RECORD.read(gen.documents, ID)) {
 					win.orec = RECORD;
 					call getsubs("PREDELETE");
-					if (not win.valid) {
+					if (not(win.valid)) {
 						goto exit;
 					}
 
@@ -522,7 +521,8 @@ nextrep:
 
 		gosub opendocuments();
 
-		if (not doc.read(gen.documents, USER0.a(2))) {
+		var doc;
+		if (not(doc.read(gen.documents, USER0.a(2)))) {
 			call mssg("Document " ^ (DQ ^ (USER0.a(2) ^ DQ)) ^ " is missing");
 			var().stop();
 		}
@@ -537,7 +537,8 @@ nextrep:
 
 		gosub opendocuments();
 
-		if (not doc.read(gen.documents, USER0.a(2))) {
+		var doc;
+		if (not(doc.read(gen.documents, USER0.a(2)))) {
 			call mssg("Document " ^ (DQ ^ (USER0.a(2) ^ DQ)) ^ " is missing");
 			var().stop();
 		}
@@ -552,7 +553,7 @@ nextrep:
 		}
 
 		call getsubs("DEF.DOCUMENT.NO");
-		if (not win.valid) {
+		if (not(win.valid)) {
 			var().stop();
 		}
 
@@ -576,7 +577,7 @@ nextrep:
 
 		//get parameters from documents into @pseudo
 
-		if (not gen.document.read(gen.documents, USER0.a(2))) {
+		if (not(gen.document.read(gen.documents, USER0.a(2)))) {
 			USER4 = "Document " ^ (DQ ^ (USER0.a(2) ^ DQ)) ^ " does not exist";
 			call mssg(USER4);
 			var().stop();
@@ -624,7 +625,7 @@ nextrep:
 			//moved up so parameters show in any emailed error messages
 			//data=@pseudo
 			//override the saved period with a current period
-			var runtimeperiod = ((var().date()).oconv("D2/E")).substr(4,5);
+			var runtimeperiod = var().date().oconv("D2/E").substr(4,5);
 			if (runtimeperiod[1] == "0") {
 				runtimeperiod.splicer(1, 1, "");
 			}
@@ -715,21 +716,21 @@ performreport:
 
 	}
 //L3908:
-	/////
+/////
 exit:
-	/////
+/////
 	var().stop();
 
 	/*;
-	//////////
+//////////
 	errorexit:
-	//////////
+//////////
 		response='Error: ':response;
 		stop;
 
-	//////////////
+//////////////
 	errorresponse:
-	//////////////
+//////////////
 		convert '|' to fm in msg;
 		msg=trim2(msg,fm,'F');
 		msg=trim2(msg,fm,'B');
@@ -739,9 +740,9 @@ exit:
 		response='Error: ':msg;
 		stop;
 
-	/////////////
+/////////////
 	opendatafile:
-	/////////////
+/////////////
 		open datafile to src.file else;
 			msg='The ':quote(datafile ):' file is not available';
 			goto errorresponse;
@@ -756,7 +757,7 @@ exit:
 }
 
 subroutine checkoutputfileexists() {
-	if ((SYSTEM.a(2)).osfile().a(1) > 5) {
+	if (SYSTEM.a(2).osfile().a(1) > 5) {
 		USER1 = SYSTEM.a(2);
 		USER3 = "OK";
 
@@ -813,8 +814,8 @@ subroutine initlog() {
 		if (not tt2) {
 			tt2 = tt;
 		}
-		logyear = (tt.oconv("D")).substr(-4,4);
-		var logtoyear = (tt2.oconv("D")).substr(-4,4);
+		logyear = tt.oconv("D").substr(-4,4);
+		var logtoyear = tt2.oconv("D").substr(-4,4);
 		if (logyear ne logtoyear) {
 			USER3 = "Dates must be within one calendar year";
 			var().stop();

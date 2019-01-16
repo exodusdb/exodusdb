@@ -9,7 +9,6 @@ libraryinit()
 #include <fin.h>
 
 var typecode;
-var rec;
 
 function main(io logtime, in reloading="") {
 	//c agy io,""
@@ -80,7 +79,8 @@ function main(io logtime, in reloading="") {
 nextjobtype:
 		if (readnext(typecode)) {
 
-			if (not rec.read(agy.jobtypes, typecode)) {
+			var rec;
+			if (not(rec.read(agy.jobtypes, typecode))) {
 				goto nextjobtype;
 			}
 
@@ -96,6 +96,7 @@ nextjobtype:
 			} else if (tt.index("MAGAZINE", 1)) {
 				mtn = 2;
 			} else {
+				goto nextjobtype;
 			}
 //L735:
 			var orec = rec;
@@ -129,7 +130,7 @@ nextjobtype:
 		tt = "";
 	}
 	if (tt < 16968) {
-		var dom = ((var().date()).oconv("D/E")).field("/", 1) + 0;
+		var dom = var().date().oconv("D/E").field("/", 1) + 0;
 		var cmd = "CREATEALERT INACTJOBEXEC_ONCE JOB INACTIVEJOBEXECS:365:S {} NEOSYS (ROS)";
 		//ensure it will run sometime up to 28th, monthly
 		if (dom > 28) {
@@ -152,7 +153,7 @@ nextjobtype:
 		tt = "";
 	}
 	if (tt < 16968) {
-		var dom = ((var().date()).oconv("D/E")).field("/", 1) + 0;
+		var dom = var().date().oconv("D/E").field("/", 1) + 0;
 		var cmd = "CREATEALERT INACTMEDIAEXEC_ONCE MEDIA INACTIVEMEDIAEXECS:365:S {} NEOSYS (ROS)";
 		//ensure it will run sometime up to 28th, monthly
 		if (dom > 28) {
@@ -175,7 +176,7 @@ nextjobtype:
 		tt = "";
 	}
 	if (tt < 16207) {
-		var dom = ((var().date()).oconv("D/E")).field("/", 1) + 0;
+		var dom = var().date().oconv("D/E").field("/", 1) + 0;
 		var cmd = "CREATEALERT INACTVEH_ONCE MEDIA INACTIVEVEHICLES:365:S {} NEOSYS (ROS)";
 		//ensure it will run sometime up to 28th, monthly
 		if (dom > 28) {
@@ -198,7 +199,7 @@ nextjobtype:
 		tt = "";
 	}
 	if (tt < 16230) {
-		var dom = ((var().date()).oconv("D/E")).field("/", 1) + 0;
+		var dom = var().date().oconv("D/E").field("/", 1) + 0;
 		var cmd = "CREATEALERT INACTJOB_ONCE JOB INACTIVEJOBS:365:C {} NEOSYS (ROS)";
 		//ensure it will run sometime up to 28th, monthly
 		if (dom > 28) {
@@ -218,7 +219,7 @@ nextjobtype:
 
 	call log2("*run CREATEADS if required and before 7am and not test data", logtime);
 	var nyears = agy.agp.a(125);
-	if (nyears.length() and not SYSTEM.a(61) and var().time() < var("07:00").iconv("MT") and not interactive and not reloading) {
+	if ((((nyears.length() and not SYSTEM.a(61)) and (var().time() < var("07:00").iconv("MT"))) and not interactive) and not reloading) {
 
 		if (DEFINITIONS.lock( "LOCK*CREATEADS")) {
 

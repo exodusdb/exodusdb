@@ -27,7 +27,7 @@ function main(in mode) {
 		if (win.is == win.isorig) {
 			return 0;
 		}
-		if (win.is == "P" and RECORD.a(8)) {
+		if ((win.is == "P") and RECORD.a(8)) {
 			msg = "AS THIS SUPPLIER HAS SOME MEDIA VEHICLES|IT CANNOT BE CONVERTED TO A PRODUCTION ONLY SUPPLIER|IF NECESSARY CONVERT IT TO \"MP\" IE MEDIA AND PRODUCTION";
 			return invalid(msg);
 		}
@@ -44,7 +44,7 @@ function main(in mode) {
 		//if either cannot be updated due to lock
 		//then neither are updated and fails
 		call xrefsubs("WRITE", 17, win.datafile, win.srcfile, 18, locklist);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
@@ -53,7 +53,7 @@ function main(in mode) {
 
 	} else if (mode == "PREDELETE") {
 		gosub security(mode);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
@@ -73,7 +73,7 @@ function main(in mode) {
 
 		//remove from group supplier. fails if group supplier is locked
 		call xrefsubs("DELETE", 17, win.datafile, win.srcfile, 18, locklist);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
@@ -82,7 +82,7 @@ function main(in mode) {
 
 	} else if (mode == "POSTINIT") {
 		gosub security(mode);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
@@ -105,7 +105,7 @@ function main(in mode) {
 		if (win.wlocked) {
 			//tt=ucase(@record<1>:@record<15>)
 			//if index(tt,'(STOP)',1) or index(tt,'<STOP>',1) then
-			if (RECORD.a(15) or (RECORD.a(1)).index("(STOP)", 1) or (RECORD.a(1)).index("<STOP>", 1)) {
+			if ((RECORD.a(15) or RECORD.a(1).index("(STOP)", 1)) or RECORD.a(1).index("<STOP>", 1)) {
 				//if security('SUPPLIER ACCESS STOPPED',msg) else
 				if (not(authorised("SUPPLIER UPDATE TERMS", msg))) {
 					win.wlocked = 0;
@@ -120,12 +120,12 @@ function main(in mode) {
 
 		//option to read previous versions
 		call generalsubs2(mode);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
 		gosub security(mode);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
@@ -175,7 +175,7 @@ function main(in mode) {
 			}
 		};//ii;
 
-	} else if (mode == "POSTWRITE" or mode == "POSTDELETE") {
+	} else if ((mode == "POSTWRITE") or (mode == "POSTDELETE")) {
 		call flushindex("SUPPLIERS");
 
 	}

@@ -25,6 +25,10 @@
 #define programinit() \
 classinit()
 
+//SIMILAR CODE IN
+//program.h programexit
+//exodusmacros.h libraryexit()
+
 #define programexit() \
 classexit() \
 int main(int exodus__argc, char *exodus__argv[]) \
@@ -36,13 +40,31 @@ int main(int exodus__argc, char *exodus__argv[]) \
 		ExodusProgram exodusprogram1(mv); \
 		return exodusprogram1.main(); \
 	} \
-	catch (MVException except) \
+	catch (MVStop exceptionx) \
 	{ \
-		/*printl(except.description);*/ \
-		print("Aborting. Press Enter"); \
-		input(); \
-		stop(0); \
+		if (exceptionx.description.length()) \
+			exceptionx.description.outputl();\
+		if (exceptionx.description.isnum()) \
+			exit(exceptionx.description); \
+		else \
+			exit(0); \
 	} \
+	catch (MVAbort exceptionx) \
+	{ \
+		if (exceptionx.description.length()) \
+			exceptionx.description.outputl();\
+		if (exceptionx.description.isnum()) \
+			exit(exceptionx.description); \
+		else \
+			exit(1); \
+	} \
+	catch (MVException exceptionx) \
+	{ \
+		print(exceptionx.description); \
+		printl(" - Aborting."); \
+		exit(999); \
+	} \
+	return 0; \
 }
 
 //same as programexit but no try/catch block so can go into a debugger

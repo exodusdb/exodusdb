@@ -292,10 +292,10 @@ USER0="";
 		nbsp = L"";
 	}
 
-	//automatically create dict_md if it is not present so you can list dictionaries
-	if (not open(L"dict_md",dictmd)) {
-		createfile(L"dict_md");
-		if (open(L"dict_md",dictmd)) {
+	//automatically create dict_voc if it is not present so you can list dictionaries
+	if (not open(L"dict_voc",dictmd)) {
+		createfile(L"dict_voc");
+		if (open(L"dict_voc",dictmd)) {
 
 			//prepare some dictionary records
 			var dictrecs = L"";
@@ -345,8 +345,8 @@ USER0="";
 	if (sentencex.index(L" det-supp2", 1))
 		detsupp = 2;
 
-	if (not open(L"dict_md", dictmd))
-		//stop(L"Cannot open dict_md");
+	if (not open(L"dict_voc", dictmd))
+		//stop(L"Cannot open dict_voc");
 		dictmd="";
 
 
@@ -397,7 +397,7 @@ phraseinit:
 			dictfilename = filename;
 
 		if (not DICT.open(L"dict_"^dictfilename)) {
-			dictfilename = L"dict_md";
+			dictfilename = L"dict_voc";
 			DICT = dictmd;
 		}
 
@@ -709,9 +709,9 @@ dictrecexit:
 x1exit:
 ///////
 	//if no columns selected then try to use default @crt or @lptr group item
-	//if (not (coln or crtx) and (DICT ne dictmd or datafile eq L"md" or datafile eq L"dict_md")) {
+	//if (not (coln or crtx) and (DICT ne dictmd or datafile eq L"md" or datafile eq L"dict_voc")) {
 	if (not (coln or crtx) and DICT) {
-	// and ((DICT.ucase() ne dictmd.ucase()) or (filename.ucase() eq L"MD") or (filename.ucase() eq L"DICT_MD"))) {
+	// and ((DICT.ucase() ne dictmd.ucase()) or (filename.ucase() eq L"MD") or (filename.ucase() eq L"dict_voc"))) {
 
 		var words=printing ? L"@lptr,@crt" : L"@crt,@lptr";
 		for (int ii=1;ii<=2;++ii) {
@@ -1159,7 +1159,7 @@ subroutine process_one_record()
 	for (int coln = 1; coln <= ncols; coln++) {
 
 		//dont call calculate except for S items because some F items
-		//are constructed and/or exist in dict_md
+		//are constructed and/or exist in dict_voc
 		dictrec=coldict(coln);
 		if (dictrec.a(1) eq L"F") {
 			fieldno=dictrec.a(2);

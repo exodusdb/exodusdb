@@ -782,15 +782,20 @@ public:
 	var osshellwrite(const var& writestr) const;
 	bool osgetenv(const var& name);
 	bool ossetenv(const var& name) const;
-	void stop(const var& text DEFAULTNULL) const;
 
+	void stop(const var& text DEFAULTNULL) const;
 	void abort(const var& text DEFAULTNULL) const;
-//	var perform() const;
-//	var execute() const;
-	var chain() const;
-	var logoff() const;
 	var debug() const;
 	var debug(const var&) const;
+
+//done in mvprogram now since they need to pass mvenvironment
+//	var perform() const;
+//	var execute() const;
+//	chain should be similar to one of the above?
+	var chain() const;
+
+	var logoff() const;
+
 	void breakon() const;
 	void breakoff() const;
 
@@ -1063,6 +1068,7 @@ public:
 	bool makelist(const var& name, const var& keys) const;
 	bool deletelist(const var& name) const;
 
+	bool hasnext() const;
 	bool readnext(var& key) const;
 	bool readnext(var& key, var& valueno) const;
 

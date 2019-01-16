@@ -1,6 +1,7 @@
-#include <exodus/exodus.h>
+#include <exodus/program.h>
+programinit()
 
-program()
+function main()
 {
 
         var filenames=COMMAND.field(FM,2,999999);
@@ -25,9 +26,7 @@ program()
                         printl(filename);
 
         }
+        return 0;
 }
 
-
-
-
-
+programexit()

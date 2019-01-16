@@ -15,7 +15,7 @@ function main(in input0, out unitx) {
 	//convert '0123456789-.,' to ' ' in temp
 	temp.converter("0123456789.,", "            ");
 	//numlen=len(temp)-len(trimf(temp))
-	var numlen = temp.length() - (temp.trimf()).length() + (char1 == "-");
+	var numlen = temp.length() - temp.trimf().length() + (char1 == "-");
 	var numx = inputx.substr(1,numlen);
 
 	if (numx == "-") {

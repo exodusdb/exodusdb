@@ -27,7 +27,6 @@ libraryinit()
 
 var printptr;//num
 var msg;
-var job;
 var compcode;
 var xx;
 var tt;
@@ -76,7 +75,7 @@ function main() {
 	//var().clearcommon();
 
 	//pdf
-	var repeatcolheads = (PSEUDO.a(4)).isnum();
+	var repeatcolheads = PSEUDO.a(4).isnum();
 
 	var interactive = not SYSTEM.a(33);
 	var nbsp = "&nbsp;";
@@ -158,7 +157,8 @@ function main() {
 	var jobnos = PSEUDO.a(2);
 	if (not jobnos or jobnos.match("1A0A")) {
 		//in case non-numeric job exist
-		if (not job.read(agy.jobs, jobnos)) {
+		var job;
+		if (not(job.read(agy.jobs, jobnos))) {
 			if (jobnos.match("1A0A")) {
 				compcode = jobnos;
 			}else{
@@ -166,7 +166,8 @@ function main() {
 			}
 			//.1 means get previous ie last one
 			call agencysubs("GETNEXTID." ^ compcode ^ ".1", xx);
-			if (not tt.read(agy.jobs, ID)) {
+			var tt;
+			if (not(tt.read(agy.jobs, ID))) {
 				call mssg("No documents have been created yet for company " ^ compcode ^ "| or company " ^ compcode ^ " doesnt exist");
 				var().stop();
 			}
@@ -207,7 +208,8 @@ function main() {
 				}
 				//.1 means get previous ie last one
 				call agencysubs("GETNEXTID." ^ compcode ^ ".1", xx);
-				if (not tt.read(agy.jobs, ID)) {
+				var tt;
+				if (not(tt.read(agy.jobs, ID))) {
 					call mssg("No documents have been created yet for company " ^ compcode);
 					return 0;
 				}
@@ -354,9 +356,9 @@ function main() {
 
 	var personn = 1;
 
-	////////
+////////
 nextjob:
-	////////
+////////
 	//if interactive then call ossleep(1000*.2)
 	if (esctoexit()) {
 		gosub exit();
@@ -370,15 +372,15 @@ nextjob:
 			var().stop();
 		}
 	}else{
-		if (not readnext(ID)) {
+		if (not(readnext(ID))) {
 			gosub exit();
 			var().stop();
 		}
 	}
 
 	var isoldversion = 0;
-	if (not RECORD.read(agy.jobs, ID)) {
-		if (not RECORD.read(jobversions, ID)) {
+	if (not(RECORD.read(agy.jobs, ID))) {
+		if (not(RECORD.read(jobversions, ID))) {
 			call mssg(DQ ^ (ID ^ DQ) ^ " - JOB NUMBER DOES NOT EXIST");
 			goto nextjob;
 		}
@@ -472,10 +474,10 @@ unauth:
 	tab ^= tdx ^ td ^ bon ^ attention ^ boff ^ tdx;
 
 	var jobnumber = calculate("NUMBER");
-	if (not RECORD.a(29)) {
+	if (not(RECORD.a(29))) {
 		RECORD.r(29, "A");
 	}
-	if (isoldversion or RECORD.a(29) > "A") {
+	if (isoldversion or (RECORD.a(29) > "A")) {
 		jobnumber ^= " (rev " ^ RECORD.a(29) ^ ")";
 	}
 	if (isoldversion) {
@@ -742,7 +744,7 @@ unauth:
 		var linkfilename2 = "";
 		var sortselect = "WITH JOB_NO " ^ (DQ ^ (ID ^ DQ)) ^ " BY JOB_NO BY DEPARTMENT BY PERSON_CODE BY DATE";
 		if (timesheetparams.a(8)) {
-			sortselect ^= " AND WITH DATE GE " ^ (DQ ^ ((timesheetparams.a(8)).oconv("[DATE,*]") ^ DQ));
+			sortselect ^= " AND WITH DATE GE " ^ (DQ ^ (timesheetparams.a(8).oconv("[DATE,*]") ^ DQ));
 		}
 		sortselect ^= " AND WITH AUTHORISED1";
 		//personal time only
@@ -829,8 +831,8 @@ unauth:
 				var hours = txr.a(1, hourscoln);
 				if (hours) {
 					//MT2 is a GBP PROGRAM!
-					personhours += (txr.a(1, hourscoln)).iconv("MT2");
-					totalhours += (txr.a(1, hourscoln)).iconv("MT2");
+					personhours += txr.a(1, hourscoln).iconv("MT2");
+					totalhours += txr.a(1, hourscoln).iconv("MT2");
 					txr.swapper(VM, sep);
 
 					tag = "td";
@@ -936,7 +938,7 @@ unauth:
 				}
 				datax ^= calculate("QUOTE_NO") ^ sep;
 				//fix bug in datax datax:=oconv({QUOTE_DATE},'[DATE,*]') 'L#12':' '
-				datax ^= ((calculate("QUOTE_DATE")).a(1, 1)).oconv("[DATE,*]") ^ sep;
+				datax ^= (calculate("QUOTE_DATE").a(1, 1)).oconv("[DATE,*]") ^ sep;
 				datax ^= calculate("QUOTE_AMOUNT") ^ calculate("QUOTE_CURRENCY") ^ sep;
 				//datax:=({QUOTE_AMOUNT_BASE}):sep
 				var quoteamountbase = calculate("QUOTE_AMOUNT_BASE");
@@ -967,7 +969,7 @@ noreceipt:
 							datax ^= sep;
 						}
 						datax ^= receipts.a(1, 1, receiptn).field("*", 1, 2) ^ sep;
-						datax ^= (allocamts.a(1, 1, receiptn)).oconv("[NUMBER]");
+						datax ^= allocamts.a(1, 1, receiptn).oconv("[NUMBER]");
 
 					};//receiptn;
 				}

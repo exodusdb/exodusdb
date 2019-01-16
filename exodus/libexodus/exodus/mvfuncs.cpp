@@ -84,6 +84,32 @@ bool var::input(const var& prompt, const int nchars)
 		prompt.output();
 		std::cout<<std::flush;
 	}
+	if (nchars<0) {
+		var_mvstr=L"";
+		var_mvtyp=pimpl::MVTYPE_STR;
+		//while (true) {
+			int nc;
+var(L"before peek").outputl();
+			nc=std::cin.peek();
+var(L"after peek").outputl();
+
+var(nc).oconv(L"HEX").outputl(L"peek=");
+var(EOF).oconv(L"HEX").outputl(L"EOF=");
+//			if (nc==EOF)
+//				break;
+var(EOF).oconv(L"HEX").outputl();
+var(nc).oconv(L"HEX").outputl();
+			//TODO consider converting from say utf8
+			char char1;
+var(L"aaaa").outputl();
+			std::cin.get(char1);
+var(L"bbb").outputl();
+			var_mvstr+=char1;
+		//}
+var(L"ccc").outputl();
+		return true;
+	}
+
 	return input();
 
 	//evade warning: unused parameter
@@ -125,11 +151,10 @@ bool var::input()
 void var::stop(const var& text) const
 {
 	THISIS(L"void var::stop(const var& text) const")
-	ISDEFINED(text)
+	ISSTRING(text)
 
-	if (text != L"")
-	text.outputl();
-	exit(0);
+	//exit(0);
+	throw MVStop(text);
 }
 
 /*
@@ -143,11 +168,10 @@ void var::win32_abort(const var& text) const
 void var::abort(const var& text) const
 {
 	THISIS(L"void var::abort(const var& text) const")
-	ISDEFINED(text)
+	ISSTRING(text)
 
-	if (text != L"")
-	text.outputl();
-	exit(1);
+	//exit(1);
+	throw MVAbort(text);
 }
 
 bool var::assigned() const
@@ -2045,8 +2069,6 @@ var var::at(const int column) const
 {
 	//THISIS(L"var var::at(const int column) const")
 
-	//*this is not used
-
 	//hard coded for xterm at the moment
 	//http://www.xfree86.org/current/ctlseqs.html
 
@@ -2091,8 +2113,6 @@ var var::at(const int column,const int row) const
 {
 	//THISIS(L"var var::at(const int column,const int row) const")
 
-	//*this is not used
-
 	std::wstring tempstr=L"\x1B[";
 	tempstr+=intToString(row+1);
 	tempstr+=L";";
@@ -2103,14 +2123,36 @@ var var::at(const int column,const int row) const
 
 var var::getcursor() const
 {
-	//THISIS(L"var var::getcursor() const")
+	THISIS(L"var var::getcursor() const")
 
-	//*this is not used
-
-	//http://www.xfree86.org/current/ctlseqs.html
-	//"\x1b6n" report cursor position as \x1b rown ; coln R
-	std::cout<<"var::getcursor() not implemented yet "<<std::endl;
 	return L"";
+
+	/* TODO
+
+	//following works EXCEPT displays codes on screen and requires press Enter
+
+	//std::cout<<"var::getcursor() not implemented yet "<<std::endl;
+
+	//http://ascii-table.com/ansi-escape-sequences-vt-100.php
+	//esc 6n = get cursor position - DSR
+	//"\x1b6n" report cursor position as \x1b rown ; coln R
+
+	//turn echo off perhaps glibc/misc/getpass.c __tcgetattr __tcsetattr
+	//...
+
+	//output the magic ansi terminal code
+	var(L"\x1b[6n").output();
+
+	//this->ossleep(100);
+
+	//read back the response - sadly this HANGS until Enter is pressed
+	std::string tempstr;
+	std::getline(std::cin, tempstr, 'R');
+
+	//convert string to var/wstring
+	return boost::locale::conv::utf_to_utf<wchar_t>(tempstr);
+
+	*/
 }
 
 void var::setcursor() const
@@ -2119,7 +2161,8 @@ void var::setcursor() const
 
 	THISISDEFINED()
 
-	std::cout<<"var::getcursor() not implemented yet "<<std::endl;
+	//std::cout<<"var::getcursor() not implemented yet "<<std::endl;
+
 	return;
 }
 

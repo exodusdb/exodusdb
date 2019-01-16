@@ -141,7 +141,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 			var tag1 = dataio.index("<", 1);
 			var tag2 = dataio.index(">", 1);
 		///BREAK;
-		if (not(tag1 and tag1 < tag2)) break;;
+		if (not(tag1 and (tag1 < tag2))) break;;
 			dataio.splicer(tag1, tag2 - tag1 + 1, "");
 		}//loop;
 
@@ -186,7 +186,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 			osname = "XP";
 		} else if (dataio.index("Windows NT ", 1)) {
 			var tt = dataio.index("Windows NT ", 1);
-			osname = dataio.substr(tt + 11,9999).field(";", 1).field(")", 1);
+			osname = ((dataio.substr(tt + 11,9999)).field(";", 1)).field(")", 1);
 		}
 		if (dataio.index("WOW64", 1)) {
 			osname ^= "-64";
@@ -281,7 +281,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 		if (not browser) {
 			browser = iemode;
 		}
-		if (browser and iemode and iemode ne browser) {
+		if ((browser and iemode) and iemode ne browser) {
 			browser ^= " IE" ^ iemode ^ "mode";
 		}
 		if (browser) {
@@ -341,9 +341,9 @@ function main(in mode, io dataio, in params0="", in params20="") {
 	return 0;
 
 	/*;
-	/////
+/////
 	fill:
-	/////
+/////
 			//no more filling
 			return 0;
 

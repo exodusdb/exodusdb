@@ -22,7 +22,7 @@ function main(in mode0, in jobno, io job, io msg) {
 	var mode = mode0;
 
 	if (not job) {
-		if (not job.read(agy.jobs, jobno)) {
+		if (not(job.read(agy.jobs, jobno))) {
 			job = "";
 		}
 	}
@@ -30,7 +30,7 @@ function main(in mode0, in jobno, io job, io msg) {
 	var executivecode = job.a(8);
 
 	//always access own jobs or jobs with no executive
-	if (executivecode == USERNAME or not executivecode) {
+	if ((executivecode == USERNAME) or not executivecode) {
 		return 1;
 	}
 
@@ -49,7 +49,7 @@ function main(in mode0, in jobno, io job, io msg) {
 		mode = "ACCESS";
 
 		//use buffer if same user and not first record
-		if (AW.a(40) == USERNAME and RECCOUNT > 1) {
+		if ((AW.a(40) == USERNAME) and (RECCOUNT > 1)) {
 			groupusers = AW.a(41);
 
 			//get the buffer if different user or is first record
@@ -88,7 +88,7 @@ function main(in mode0, in jobno, io job, io msg) {
 		}
 
 		//fail if job not in same group
-		if (not groupusers.locateusing(executivecode, VM, xx)) {
+		if (not(groupusers.locateusing(executivecode, VM, xx))) {
 			return 0;
 		}
 

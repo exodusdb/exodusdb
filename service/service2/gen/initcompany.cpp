@@ -11,14 +11,11 @@ libraryinit()
 var xx;
 var temp;
 var weeksperperiod;//num
-var ndec;//num
 var companydesc;
 var perioddesc;
 var currencydesc;
 var desc1;
 var desc2;
-var currencyrec;
-var convcurrency;
 
 function main(in nextcompanycode) {
 	//c gen
@@ -27,7 +24,8 @@ function main(in nextcompanycode) {
 	if (not nextcompanycode.unassigned()) {
 
 		if (nextcompanycode) {
-			if (not xx.read(gen.companies, nextcompanycode)) {
+			var xx;
+			if (not(xx.read(gen.companies, nextcompanycode))) {
 				call sysmsg(DQ ^ (nextcompanycode ^ DQ) ^ " COMPANY IS MISSING IN INIT.COMPANY()");
 				//TODO return abort code and change all callers to handle failure
 				return 0;
@@ -41,13 +39,13 @@ function main(in nextcompanycode) {
 	//y2k2
 	var oldcompany = gen.company;
 	if (fin.currcompany) {
-		if (not gen.company.read(gen.companies, fin.currcompany)) {
+		if (not(gen.company.read(gen.companies, fin.currcompany))) {
 			call mssg("COMPANY " ^ (DQ ^ (fin.currcompany ^ DQ)) ^ " IS MISSING - DO NOT PROCEED||USE \"SETTINGS\" TO|CHOOSE ANOTHER COMPANY|");
 			gen.company = fin.currcompany;
 		}
 	}else{
 		gen.company = "";
-		gen.company.r(2, ((var().date()).oconv("D2/E")).field("/", 2, 2));
+		gen.company.r(2, var().date().oconv("D2/E").field("/", 2, 2));
 	}
 
 	//in LISTEN2 and INIT.COMPANY
@@ -58,14 +56,14 @@ function main(in nextcompanycode) {
 
 	//clientmark
 	if (gen.company.a(27)) {
-		SYSTEM.r(14, (gen.company.a(27)).invert());
+		SYSTEM.r(14, gen.company.a(27).invert());
 		SYSTEM.r(8, "");
 	}else{
 		SYSTEM.r(14, SYSTEM.a(36));
 	}
 
 	//if company code2 is not specified then use company code IF alphabetic
-	if (not gen.company.a(28)) {
+	if (not(gen.company.a(28))) {
 		if (fin.currcompany.match("0A")) {
 			gen.company.r(28, fin.currcompany);
 		}
@@ -84,7 +82,7 @@ function main(in nextcompanycode) {
 
 	//in init.company and init.general
 
-	if (gen.glang == "" or gen.company.a(14) ne oldcompany.a(14)) {
+	if ((gen.glang == "") or gen.company.a(14) ne oldcompany.a(14)) {
 		call getlang("GENERAL", "", "", fin.alanguage, gen.glang);
 		if (gen.glang.a(9)) {
 			UPPERCASE = gen.glang.a(9);
@@ -123,13 +121,13 @@ function main(in nextcompanycode) {
 			firstmonth = 1;
 		}
 		fin.maxperiod = financialyear.field(",", 2);
-		if (not(fin.maxperiod.match("0N") and fin.maxperiod > 0 and fin.maxperiod <= 99)) {
+		if (not((fin.maxperiod.match("0N") and (fin.maxperiod > 0)) and (fin.maxperiod <= 99))) {
 			fin.maxperiod = 12;
 		}
 		gen.company.r(6, "[DATEPERIOD," ^ firstmonth ^ "," ^ fin.maxperiod ^ "]");
 	}else{
 		firstmonth = 1;
-		if (addcent(gen.company.a(2).substr(-2,2), "", "", xx) >= 2004 or financialyear.field(",", 1) == "WEEKLY2") {
+		if ((addcent(gen.company.a(2).substr(-2,2), "", "", xx) >= 2004) or (financialyear.field(",", 1) == "WEEKLY2")) {
 			fin.maxperiod = 12;
 		}else{
 			//"13X4WEEK,1/7,5" could be replaced by "WEEKLY,1/7,5,4"
@@ -190,7 +188,7 @@ function main(in nextcompanycode) {
 			}
 		}
 	}
-	var nvs = (fin.definition.a(1)).count(VM) + 1;
+	var nvs = fin.definition.a(1).count(VM) + 1;
 	for (var vn = 1; vn <= nvs; ++vn) {
 		temp = fin.definition.a(1, vn);
 		if (temp) {
@@ -202,10 +200,10 @@ function main(in nextcompanycode) {
 	};//vn;
 	fin.basecurrency = gen.company.a(3);
 
-	if (not gen.company.a(4)) {
+	if (not(gen.company.a(4))) {
 		gen.company.r(4, gen.company.a(5));
 	}
-	if (not gen.company.a(5)) {
+	if (not(gen.company.a(5))) {
 		gen.company.r(5, gen.company.a(4));
 	}
 	//if intercurrency conversion account is blank then
@@ -242,10 +240,10 @@ function main(in nextcompanycode) {
 
 		//onetime setup of tax account number per tax code
 		//company file tax acc not used anywhere else
-		if (taxaccno and fin.taxes.a(4) == "") {
+		if (taxaccno and (fin.taxes.a(4) == "")) {
 			for (var ii = 1; ii <= 999; ++ii) {
 			///BREAK;
-			if (not fin.taxes.a(1, ii)) break;;
+			if (not(fin.taxes.a(1, ii))) break;;
 				fin.taxes.r(4, ii, taxaccno);
 			};//ii;
 			fin.taxes.write(DEFINITIONS, "TAXES");
@@ -276,9 +274,9 @@ function main(in nextcompanycode) {
 	//initialise the period selection if the currperiod or company is not set
 	//initialise the period selection if the company period is different
 	//IF CURRPERIOD='' OR OLD.COMPANY='' OR COMPANY<2> NE OLD.COMPANY<2> THEN
-	if (fin.currperiod == "" or oldcompany == "") {
+	if ((fin.currperiod == "") or (oldcompany == "")) {
 		//current period is determined by system date
-		var curryearperiod = (var().date()).oconv(gen.company.a(6));
+		var curryearperiod = var().date().oconv(gen.company.a(6));
 		fin.currperiod = curryearperiod.substr(-2,2) + 0;
 		fin.curryear = curryearperiod.substr(1,2);
 		var maxyear = gen.company.a(2).field("/", 2);
@@ -316,7 +314,8 @@ function main(in nextcompanycode) {
 
 	//get base format
 	//IF COMPANIES<>'' THEN
-	if (not ndec.readv(gen.currencies, fin.basecurrency, 3)) {
+	var ndec;
+	if (not(ndec.readv(gen.currencies, fin.basecurrency, 3))) {
 		ndec = 2;
 	}
 	//END ELSE
@@ -363,7 +362,7 @@ function main(in nextcompanycode) {
 	}
 
 	//currency
-	if (not fin.currcompany) {
+	if (not(fin.currcompany)) {
 		goto nocurrency;
 	}
 	if (gen.currencies == "") {
@@ -376,7 +375,8 @@ nocurrency:
 	desc1 = "";
 	desc2 = "";
 	if (fin.currcurrency) {
-		if (not currencyrec.read(gen.currencies, fin.currcurrency)) {
+		var currencyrec;
+		if (not(currencyrec.read(gen.currencies, fin.currcurrency))) {
 			currencyrec = fin.currcurrency ^ FM ^ FM ^ 2;
 		}
 		desc1 = currencyrec.a(1);
@@ -398,7 +398,8 @@ nocurrency:
 			currencydesc = gen.glang.a(6);
 basedesc:
 			//get conversion currency
-			if (not convcurrency.read(gen.currencies, fin.converted)) {
+			var convcurrency;
+			if (not(convcurrency.read(gen.currencies, fin.converted))) {
 				convcurrency = fin.converted ^ FM ^ FM ^ 2;
 			}
 			desc2 = convcurrency.a(1);
@@ -465,7 +466,7 @@ currencydescexit:
 				if (s23.locateusing("TRAINING", VM, xx)) {
 					username ^= "*";
 				}else{
-					if ((SYSTEM.a(17)).index("TEST", 1)) {
+					if (SYSTEM.a(17).index("TEST", 1)) {
 						username ^= "*";
 					}
 				}

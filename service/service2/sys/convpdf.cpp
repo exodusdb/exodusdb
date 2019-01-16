@@ -34,7 +34,7 @@ function main(in printopts0, out errors) {
 	}
 
 	//quit without conversion if conversion program doesnt exist
-	if (not pdfcmd.osfile()) {
+	if (not(pdfcmd.osfile())) {
 		errors = "html2pdf is not installed.|NEOSYS support has been emailed.";
 		call sysmsg(errors, "html2pdf");
 		return 0;

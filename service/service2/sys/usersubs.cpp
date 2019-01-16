@@ -65,7 +65,7 @@ function main(in mode) {
 		}
 
 		//prevent new users with punctuation characters etc
-		if (win.orec == "" and win.wlocked) {
+		if ((win.orec == "") and win.wlocked) {
 			var temp = ID;
 			temp.converter(UPPERCASE ^ "0123456789", "");
 			if (temp) {
@@ -82,7 +82,7 @@ function main(in mode) {
 			//password date default to lastlogin date
 			//if no login date then consider the account to have expired
 			//and they would not have been able to login with it.
-			if (not RECORD.a(36)) {
+			if (not(RECORD.a(36))) {
 				var lastlogindate = RECORD.a(13).field(".", 1);
 				RECORD.r(36, lastlogindate);
 			}
@@ -230,7 +230,7 @@ function main(in mode) {
 		//verify email domains
 		win.is = RECORD.a(7);
 		call usersubs("VAL.EMAIL");
-		if (not win.valid) {
+		if (not(win.valid)) {
 			gosub unlocksec();
 			return 0;
 		}
@@ -246,7 +246,7 @@ function main(in mode) {
 				return 0;
 			}
 
-			if (not SECURITY.a(1).locateusing(userdept, VM, usern)) {
+			if (not(SECURITY.a(1).locateusing(userdept, VM, usern))) {
 				msg = DQ ^ (userdept ^ " USER GROUP does not exist" ^ DQ);
 				gosub invalid(msg);
 				gosub unlocksec();
@@ -274,7 +274,7 @@ function main(in mode) {
 		}
 
 		gosub getusern();
-		if (not win.valid) {
+		if (not(win.valid)) {
 			gosub unlocksec();
 			return 0;
 		}
@@ -309,7 +309,7 @@ function main(in mode) {
 
 		}
 
-		if (resetpassword < 2 and SECURITY ne olduserprivs) {
+		if ((resetpassword < 2) and SECURITY ne olduserprivs) {
 			SECURITY.invert().write(DEFINITIONS, "SECURITY");
 			//no need on user if on userprivs
 			RECORD.r(4, "");
@@ -319,7 +319,7 @@ function main(in mode) {
 		//similar in security.subs and user.subs
 		if (resetpassword or newuser) {
 			//datetime=(date():'.':time() 'R(0)#5')+0
-			var datetime = var().date() ^ "." ^ (var().time()).oconv("R(0)#5");
+			var datetime = var().date() ^ "." ^ var().time().oconv("R(0)#5");
 			RECORD.inserter(15, 1, datetime);
 			RECORD.inserter(16, 1, SYSTEM.a(40, 2));
 
@@ -349,7 +349,7 @@ function main(in mode) {
 		win.srcfile.select();
 
 		while (true) {
-			if (not readnext(ID)) {
+			if (not(readnext(ID))) {
 				ID = "*!%";
 			}
 		///BREAK;
@@ -382,7 +382,7 @@ subroutine getusern() {
 	if (ID == "NEOSYS") {
 		//usern remains unassigned to force an error if used later on
 	}else{
-		if (not SECURITY.a(1).locateusing(ID, VM, usern)) {
+		if (not(SECURITY.a(1).locateusing(ID, VM, usern))) {
 			msg = DQ ^ (ID ^ DQ) ^ " User does not exist";
 			gosub invalid(msg);
 			return;

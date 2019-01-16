@@ -10,9 +10,7 @@ libraryinit()
 #include <gen.h>
 #include <agy.h>
 
-var job;
 var newtaskid;
-var taskx;
 var xx;
 var oldtask;
 var result;
@@ -49,7 +47,8 @@ function main(in mode, io oldtaskid, io task, io errmsg) {
 		return 0;
 	}
 
-	if (not job.read(agy.jobs, jobno)) {
+	var job;
+	if (not(job.read(agy.jobs, jobno))) {
 		job = "";
 	}
 
@@ -65,11 +64,12 @@ function main(in mode, io oldtaskid, io task, io errmsg) {
 		var jobtaskno = 1;
 		while (true) {
 			newtaskid = oldtaskid.field("*", 1) ^ "*" ^ jobtaskno;
-			if (not taskx.read(tasks, newtaskid)) {
+			var taskx;
+			if (not(taskx.read(tasks, newtaskid))) {
 				taskx = "";
 			}
 		///BREAK;
-		if (not taskx.length()) break;;
+		if (not(taskx.length())) break;;
 
 			//prevent adding duplicate tasks for the same user
 			if (taskx.a(2) == task.a(2)) {
@@ -104,7 +104,8 @@ function main(in mode, io oldtaskid, io task, io errmsg) {
 		//default mode UPDATE
 	}else{
 		newtaskid = oldtaskid;
-		if (not oldtask.read(tasks, oldtaskid)) {
+		var oldtask;
+		if (not(oldtask.read(tasks, oldtaskid))) {
 			oldtask = "";
 		}
 
@@ -112,7 +113,7 @@ function main(in mode, io oldtaskid, io task, io errmsg) {
 		var newstatus = task.a(3);
 		var oldstatus = oldtask.a(3);
 		if (newstatus ne oldstatus) {
-			if (newstatus == "Completed" or newstatus == "Cancelled" or newstatus == "Suspended") {
+			if (((newstatus == "Completed") or (newstatus == "Cancelled")) or (newstatus == "Suspended")) {
 
 				var sortselect = " WITH PARENT_TASK_ID " ^ (DQ ^ (newtaskid ^ DQ));
 				sortselect ^= " AND WITH STATUS NE \"Cancelled\"";
@@ -194,7 +195,7 @@ function main(in mode, io oldtaskid, io task, io errmsg) {
 
 	//default status time
 	if (task.a(4) == "") {
-		task.r(4, var().date() ^ "." ^ (var().time()).oconv("R(0)#5"));
+		task.r(4, var().date() ^ "." ^ var().time().oconv("R(0)#5"));
 	}
 
 	//clear copy of key
@@ -207,7 +208,7 @@ function main(in mode, io oldtaskid, io task, io errmsg) {
 	call flushindex("TASKS");
 
 	//refresh the new updatetimestamp DATE_TIME
-	if (not task.read(tasks, newtaskid)) {
+	if (not(task.read(tasks, newtaskid))) {
 		{}
 	}
 
@@ -227,7 +228,7 @@ function main(in mode, io oldtaskid, io task, io errmsg) {
 		// subject=body<1>
 		// end
 		var action = task.a(3);
-		if (oldtask.a(3) == "Suspended" and action == "Started") {
+		if ((oldtask.a(3) == "Suspended") and (action == "Started")) {
 			action = "Resumed";
 		}
 		body.r(-1, "Job " ^ jobno ^ " " ^ action);
@@ -293,7 +294,7 @@ function main(in mode, io oldtaskid, io task, io errmsg) {
 }
 
 subroutine adduser() {
-	if (not tousercodes.locateusing(tousercode, VM, xx)) {
+	if (not(tousercodes.locateusing(tousercode, VM, xx))) {
 		tousercodes.r(1, -1, tousercode);
 		var emailaddress = tousercode.xlate("USERS", 7, "X");
 		if (emailaddress) {

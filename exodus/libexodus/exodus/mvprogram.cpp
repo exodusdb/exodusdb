@@ -428,7 +428,17 @@ var ExodusProgramBase::capitalise(const var& str0, const var& mode0,
 }
 
 var ExodusProgramBase::execute(const var& sentence) {
-	return perform(sentence);
+
+	//TODO pushselect
+
+	var sentence2=sentence.fieldstore(L" ",1,1,sentence.field(L" ",1).lcase());
+
+	var result=perform(sentence);
+
+	//TODO popselect
+
+	return result;
+
 }
 
 var ExodusProgramBase::perform(const var& sentence) {
@@ -441,7 +451,9 @@ var ExodusProgramBase::perform(const var& sentence) {
 	//if (!perform_exodusfunctorbase_.mv_)
 	//	perform_exodusfunctorbase_.mv_=this;
 
-	var libid = sentence.field(L" ", 1);
+	//lowercase all library functions to aid in conversion from arev
+	//TODO remove after conversion complete
+	var libid = sentence.field(L" ", 1).lcase();
 
 	//open the library routine
 	//if (libid != cache_perform_libid_) {
@@ -473,7 +485,19 @@ var ExodusProgramBase::perform(const var& sentence) {
 	//set new perform environment
 	SENTENCE = sentence;
 
-	ANS=perform_exodusfunctorbase_.callsmf();
+	try {
+		ANS=perform_exodusfunctorbase_.callsmf();
+	}
+	catch (const MVStop& e) {
+		//stop is normal way of stopping a perform
+		//functions can call it to terminate the whole "program"
+		//without needing to setup chains of returns
+		//to exit from nested functions
+	}
+	catch (const MVAbort& e) {
+		//similar to stop for the time being
+		//maybe it should set some error flag/messages
+	}
 	////////////////////////////////////////////
 
 	//restore some environment
@@ -525,9 +549,9 @@ var ExodusProgramBase::calculate(const var& dictid) {
 			//try lower case
 			if (not cache_dictrec_.read(DICT, dictid.lcase())) {
 
-				//try dict_md
+				//try dict_voc
 				var dictmd;//TODO implement DICTMD to avoid opening
-				if (not dictmd.open("dict_md")) {
+				if (not dictmd.open("dict_voc")) {
 baddict:
 					throw MVException(
 						L"calculate("
@@ -577,7 +601,7 @@ baddict:
 		if (newlibfunc) {
 			std::string str_libname;
 			if (indictmd)
-				str_libname = "dict_md";
+				str_libname = "dict_voc";
 			else
 				str_libname = DICT.lcase().toString();
 			std::string str_funcname = (L"exodusprogrambasecreatedelete_" ^ dictid.lcase()).toString();

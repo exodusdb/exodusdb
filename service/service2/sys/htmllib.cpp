@@ -35,13 +35,13 @@ function main(in mode, io datax, in params0="", in params20="") {
 		var tt = " " ^ VM;
 		while (true) {
 		///BREAK;
-		if (not datax.index(tt, 1)) break;;
+		if (not(datax.index(tt, 1))) break;;
 			datax.swapper(tt, VM);
 		}//loop;
 		tt = " " ^ FM;
 		while (true) {
 		///BREAK;
-		if (not datax.index(tt, 1)) break;;
+		if (not(datax.index(tt, 1))) break;;
 			datax.swapper(tt, FM);
 		}//loop;
 		filler = "&nbsp;";
@@ -143,7 +143,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 			var tag1 = datax.index("<", 1);
 			var tag2 = datax.index(">", 1);
 		///BREAK;
-		if (not(tag1 and tag1 < tag2)) break;;
+		if (not(tag1 and (tag1 < tag2))) break;;
 			datax.splicer(tag1, tag2 - tag1 + 1, "");
 		}//loop;
 
@@ -283,7 +283,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 		if (not browser) {
 			browser = iemode;
 		}
-		if (browser and iemode and iemode ne browser) {
+		if ((browser and iemode) and iemode ne browser) {
 			browser ^= " IE" ^ iemode ^ "mode";
 		}
 		if (browser) {
@@ -305,7 +305,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 				tt = datax.index("Netscape", 1);
 			}
 			if (tt) {
-				browser = ((datax.substr(tt,9999).field(";", 1)).field(" ", 1)).field(")", 1);
+				browser = datax.substr(tt,9999).field(";", 1).field(" ", 1).field(")", 1);
 			}
 		}
 		if (browser.substr(-2,2) == ".0") {

@@ -15,9 +15,9 @@ function main(in input, in force0=(0)) {
 	//for force to work, the first field must have full number of vns
 	var maxnvs = 0;
 	for (var fn = 1; fn <= nfs; ++fn) {
-		var field = input.field(FM, fn);
-		if (field.length() or force) {
-			var nvs = field.count(VM) + 1;
+		var fieldx = input.field(FM, fn);
+		if (fieldx.length() or force) {
+			var nvs = fieldx.count(VM) + 1;
 			if (force) {
 				if (nvs > maxnvs) {
 					maxnvs = nvs;
@@ -26,7 +26,7 @@ function main(in input, in force0=(0)) {
 				maxnvs = nvs;
 			}
 			for (var vn = 1; vn <= maxnvs; ++vn) {
-				var cell = field.field(VM, vn);
+				var cell = fieldx.field(VM, vn);
 				if (cell.length() or force) {
 					output.r(vn, fn, cell);
 				}

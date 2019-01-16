@@ -37,17 +37,18 @@ function main() {
 		if (prodorder.read(agy.productionorders, orderno)) {
 
 			if (prodorder.a(11) ne "CANCELLED") {
-				if (not prodorder.a(5)) {
+				if (not(prodorder.a(5))) {
 					call mssg("Exchange rate is missing on Order No. " ^ orderno);
 					var().stop();
 				}
 				//garbagecollect;
-				base = ((prodorder.a(3)).sum() / prodorder.a(5)).oconv(basefmtx);
+				base = (prodorder.a(3).sum() / prodorder.a(5)).oconv(basefmtx);
 				costs.r(1, ordern, base);
 
 				//decide where it should go
 				var typecode = prodorder.a(15);
-				if (not type.read(agy.jobtypes, typecode)) {
+				var type;
+				if (not(type.read(agy.jobtypes, typecode))) {
 					type = "";
 				}
 				base.splicer(1, 0, "-");
@@ -80,13 +81,13 @@ function main() {
 
 			if (prodquote.a(11) ne "CANCELLED") {
 
-				if (not prodquote.a(5)) {
+				if (not(prodquote.a(5))) {
 					call mssg("Exchange rate is missing on Estimate No. " ^ quoteno);
 					var().stop();
 				}
 
 				//garbagecollect;
-				base = ((prodquote.a(3)).sum() / prodquote.a(5)).oconv(basefmtx);
+				base = (prodquote.a(3).sum() / prodquote.a(5)).oconv(basefmtx);
 
 				incomes.r(1, quoten, base);
 				if (prodquote.a(10) == "") {
@@ -95,7 +96,7 @@ function main() {
 					invoicedincomes.r(1, quoten, base);
 				}
 
-				var nlines = (prodquote.a(3)).count(VM) + 1;
+				var nlines = prodquote.a(3).count(VM) + 1;
 				var typecode = "";
 				for (var ln = 1; ln <= nlines; ++ln) {
 					//garbagecollect;
@@ -103,13 +104,15 @@ function main() {
 					var temp = prodquote.a(17, ln);
 					if (temp) {
 						typecode = temp;
-						if (not type.read(agy.jobtypes, typecode)) {
+						var type;
+						if (not(type.read(agy.jobtypes, typecode))) {
 							type = "";
 						}
 					}
 					if (not typecode) {
 						typecode = RECORD.a(3);
-						if (not type.read(agy.jobtypes, typecode)) {
+						var type;
+						if (not(type.read(agy.jobtypes, typecode))) {
 							type = "";
 						}
 					}
@@ -177,7 +180,7 @@ subroutine analyse() {
 	}
 
 	//show cost as positive
-	if (fn == 17 or fn == 20) {
+	if ((fn == 17) or (fn == 20)) {
 		base = -base;
 	}
 
@@ -227,7 +230,7 @@ subroutine gettime() {
 
 			var tsrec;
 			if (tsrec.read(gen.timesheets, tskey)) {
-				var ntslines = (tsrec.a(2)).count(VM) + 1;
+				var ntslines = tsrec.a(2).count(VM) + 1;
 				if (tsrec.a(1).locateusing(ID, VM, MV)) {
 onetsline:
 					var hours = tsrec.a(2, MV);
@@ -253,7 +256,7 @@ onetsline:
 	//garbagecollect;
 	RECORD.r(55, timecost.oconv(basefmtx));
 
-	if (tskeys.length() and tskeys.length() < 65000) {
+	if (tskeys.length() and (tskeys.length() < 65000)) {
 		RECORD.r(56, latesttsdate);
 	}
 

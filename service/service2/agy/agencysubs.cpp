@@ -29,13 +29,10 @@ var iaccno;
 var billcostn;//num
 var xx;
 var brandcode;
-var vehicle;
 var doccompanycode;
 var docdate;
 var docname;
-var doccompany;
 var filen;
-var companyx;
 var filetitle;
 var temp;
 var foundkeys;
@@ -54,7 +51,6 @@ var jobnos;
 var clientcode;
 var reqtype;
 var title;
-var typerec;
 var hasaccounts;
 var wsmsg;
 
@@ -104,7 +100,7 @@ function main(in mode, io msg, in param3="", in param4="") {
 		}
 
 		//check if the account requires analysis
-		if (not billcostaccs.a(2).locateusing(iaccno, VM, billcostn)) {
+		if (not(billcostaccs.a(2).locateusing(iaccno, VM, billcostn))) {
 			billcostn = 0;
 			var accounts;
 			if (not(accounts.open("ACCOUNTS", ""))) {
@@ -114,7 +110,7 @@ function main(in mode, io msg, in param3="", in param4="") {
 			var icontrolaccno;
 			if (icontrolaccno.readv(accounts, iaccno, 6)) {
 				if (icontrolaccno) {
-					if (not billcostaccs.a(2).locateusing(icontrolaccno, VM, billcostn)) {
+					if (not(billcostaccs.a(2).locateusing(icontrolaccno, VM, billcostn))) {
 						billcostn = 0;
 					}
 				}
@@ -164,7 +160,7 @@ function main(in mode, io msg, in param3="", in param4="") {
 		//income sharing seems to be missing column number in BILLCOSTACCS
 		//probably should be 1 (or 9 like rebate)
 		if (tt) {
-			if (not tt.locateusing(colno, SVM, xx)) {
+			if (not(tt.locateusing(colno, SVM, xx))) {
 field2err:
 				msg ^= " column is required and must be one of ";
 				msg ^= DQ ^ (tt ^ DQ);
@@ -187,7 +183,7 @@ field2err:
 			msg ^= "brand is required";
 			return 0;
 		}
-		if (not xx.read(agy.brands, brandcode)) {
+		if (not(xx.read(agy.brands, brandcode))) {
 			msg ^= DQ ^ (brandcode ^ DQ) ^ " brand code does not exist";
 			return 0;
 		}
@@ -197,14 +193,15 @@ field2err:
 		if (vehiclecode) {
 
 			//check account allows media
-			if (not billcostaccs.a(5, billcostn).locateusing(1, SVM, xx)) {
+			if (not(billcostaccs.a(5, billcostn).locateusing(1, SVM, xx))) {
 				//could force jobs here but best to indicate some error since unexpected
 				msg ^= "media/vehicle code must not be entered";
 				return 0;
 			}
 
 			//vehiclecode
-			if (not vehicle.read(agy.vehicles, vehiclecode)) {
+			var vehicle;
+			if (not(vehicle.read(agy.vehicles, vehiclecode))) {
 				msg ^= DQ ^ (vehiclecode ^ DQ) ^ " vehicle code does not exist";
 				return 0;
 			}
@@ -214,7 +211,7 @@ field2err:
 			//allow for unlikely case that we have an account that is allowed
 			//for all types like income sharing? not a great idea to have that
 			if (accjobtypes) {
-				if (not accjobtypes.locateusing(vehicle.a(2), SVM, xx)) {
+				if (not(accjobtypes.locateusing(vehicle.a(2), SVM, xx))) {
 					msg ^= DQ ^ (vehiclecode ^ DQ) ^ " vehicle media type " ^ (DQ ^ (vehicle.a(2) ^ DQ));
 					msg ^= " does not match account media type(s) " ^ quote2(accjobtypes);
 					return 0;
@@ -234,7 +231,7 @@ field2err:
 		}else{
 
 			//check account allows jobs - analysis field 4
-			if (not billcostaccs.a(5, billcostn).locateusing(2, SVM, xx)) {
+			if (not(billcostaccs.a(5, billcostn).locateusing(2, SVM, xx))) {
 				//TODO we should try and avoid an account being used for both media and jobs
 				msg ^= "media/vehicle is required";
 				return 0;
@@ -246,7 +243,7 @@ field2err:
 				msg ^= "market is required";
 				return 0;
 			}
-			if (not xx.read(agy.markets, marketcode)) {
+			if (not(xx.read(agy.markets, marketcode))) {
 				msg ^= DQ ^ (marketcode ^ DQ) ^ " market code does not exist";
 				return 0;
 			}
@@ -257,7 +254,7 @@ field2err:
 				msg ^= "supplier code is required";
 				return 0;
 			}
-			if (not xx.read(agy.suppliers, suppliercode)) {
+			if (not(xx.read(agy.suppliers, suppliercode))) {
 				msg ^= DQ ^ (suppliercode ^ DQ) ^ " supplier code does not exist";
 				return 0;
 			}
@@ -268,7 +265,7 @@ field2err:
 				msg ^= "job type is required";
 				return 0;
 			}
-			if (not xx.read(agy.jobtypes, typecode)) {
+			if (not(xx.read(agy.jobtypes, typecode))) {
 				msg ^= DQ ^ (typecode ^ DQ) ^ " job type code does not exist";
 				return 0;
 			}
@@ -277,7 +274,7 @@ field2err:
 			tt = billcostaccs.a(4, billcostn);
 			//is it possible that there are no types associated with an account?
 			if (tt) {
-				if (not tt.locateusing(typecode, SVM, xx)) {
+				if (not(tt.locateusing(typecode, SVM, xx))) {
 					msg ^= " type (" ^ typecode ^ ") must be ";
 					if (tt.index(SVM, 1)) {
 						tt.swapper(SVM, ", ");
@@ -319,7 +316,7 @@ field2err:
 		var mode2 = mode.field(".", 2);
 
 		if (win.datafile == "TIMESHEETS") {
-			doccompanycode = (calculate("COMPANY_CODE")).a(1, 1);
+			doccompanycode = calculate("COMPANY_CODE").a(1, 1);
 			docdate = ID.field("*", 2);
 			docname = "timesheet";
 
@@ -390,7 +387,8 @@ getolderjobdate:
 		}
 //L1732:
 		if (doccompanycode and docdate) {
-			if (not doccompany.read(gen.companies, doccompanycode)) {
+			var doccompany;
+			if (not(doccompany.read(gen.companies, doccompanycode))) {
 				msg = DQ ^ (doccompanycode ^ DQ) ^ " company code is missing";
 				win.reset = 5;
 				return invalid(msg);
@@ -476,7 +474,7 @@ getolderjobdate:
 		var keyformat = agy.agp.a(var("71,63,53,69,70").field(",", filen));
 
 		//if single letter and no complex pattern then ALLOW ANY X99999
-		if ((keyformat == "" or keyformat == "<NUMBER>") and ID.match("1A\"*\"")) {
+		if (((keyformat == "") or (keyformat == "<NUMBER>")) and (ID.match("1A\"*\""))) {
 			keyformat = ID[1] ^ "%<>";
 		}
 
@@ -491,7 +489,8 @@ getolderjobdate:
 		if (compcode == "") {
 			compcode = gen.gcurrcompany;
 		}
-		if (not companyx.read(gen.companies, compcode)) {
+		var companyx;
+		if (not(companyx.read(gen.companies, compcode))) {
 			//a company prefix might be provided and not a real company code
 			//msg=quote(compcode):' IS NOT IN COMPANY FILE'
 			//gosub note
@@ -504,7 +503,7 @@ getolderjobdate:
 		//prevent numeric company numbers being used as <COMPANY>
 		//to avoid <COMPANY><NUMBER> being merged numbers
 		if (keyformat.index("<COMPANY>", 1)) {
-			if ((companyx.a(28)).isnum()) {
+			if (companyx.a(28).isnum()) {
 				msg = "Please setup Company Prefix for company " ^ (DQ ^ (compcode ^ DQ)) ^ " in Company File first";
 				//goto invalid
 				//too deep to call msg()
@@ -515,8 +514,8 @@ getolderjobdate:
 		}
 
 		//similar code in AGENCY.SUBS,PRINTPLANS2,PRODINVS2,REPRINTINVS
-		keyformat.swapper("<YEAR>", ((var().date()).oconv("D")).field(" ", 3));
-		keyformat.swapper("<YEAR2>", (((var().date()).oconv("D")).field(" ", 3)).substr(-2,2));
+		keyformat.swapper("<YEAR>", var().date().oconv("D").field(" ", 3));
+		keyformat.swapper("<YEAR2>", var().date().oconv("D").field(" ", 3).substr(-2,2));
 		keyformat.swapper("<COMPANY>", companyx.a(28));
 		keyformat.swapper("<NUMBER>", "%");
 		keyformat.swapper("<>", "");
@@ -543,7 +542,7 @@ getolderjobdate:
 			ANS = (calculate("MARKET_CODE")).xlate("MARKETS", 5, "X");
 		}
 
-	} else if (mode == "VAL.SCHEDULE" or mode == "VAL.PLAN" or mode == "VAL.JOB" or mode == "VAL.PRODUCTION.ORDER" or mode == "VAL.PRODUCTION.INVOICE") {
+	} else if (((((mode == "VAL.SCHEDULE") or (mode == "VAL.PLAN")) or (mode == "VAL.JOB")) or (mode == "VAL.PRODUCTION.ORDER")) or (mode == "VAL.PRODUCTION.INVOICE")) {
 
 		if (mode == "VAL.PRODUCTION.ORDER") {
 			filetitle = "Purchase Orders";
@@ -641,7 +640,7 @@ getolderjobdate:
 
 			//"cannot be found" is a trigger in the client
 
-			if (win.datafile == "PLANS" or win.datafile == "SCHEDULES") {
+			if ((win.datafile == "PLANS") or (win.datafile == "SCHEDULES")) {
 				module = "MEDIA_MODULE";
 			}else{
 				module = "JOBS_MODULE";
@@ -693,7 +692,7 @@ getolderjobdate:
 			if (USERNAME == "NEOSYS") {
 				username = "NEOSYS";
 			}else{
-				username = (USERNAME.xlate("USERS", 1, "C")).field(" ", 1);
+				username = USERNAME.xlate("USERS", 1, "C").field(" ", 1);
 				username.ucaser();
 			}
 
@@ -719,7 +718,7 @@ getolderjobdate:
 
 		return 0;
 
-	} else if (mode == "VAL.VEHICLE" or mode == "VAL.VEHICLE2") {
+	} else if ((mode == "VAL.VEHICLE") or (mode == "VAL.VEHICLE2")) {
 
 		if (param3.unassigned()) {
 			reqcompcode = "";
@@ -727,9 +726,10 @@ getolderjobdate:
 			reqcompcode = param3;
 		}
 
-		if (win.is == win.isorig or win.is == "") {
+		if ((win.is == win.isorig) or (win.is == "")) {
 			return 0;
 		}
+		var vehicle;
 		if (vehicle.read(agy.vehicles, win.is)) {
 
 gotvehicle:
@@ -740,7 +740,7 @@ gotvehicle:
 				if (dictvehicles.open("DICT.VEHICLES", "")) {
 					var compcode = calculate("COMPANY_CODE", dictvehicles, win.is, vehicle, 0);
 					if (validcode2(compcode, "", "", xx, msg)) {
-						if (compcode and reqcompcode and reqcompcode ne compcode) {
+						if ((compcode and reqcompcode) and reqcompcode ne compcode) {
 							msg = "belongs to company " ^ (DQ ^ (compcode ^ DQ)) ^ " but the required company is " ^ (DQ ^ (reqcompcode ^ DQ));
 							goto badvehiclemsg;
 						}
@@ -840,7 +840,7 @@ novehiclecodes:
 		var ratecardoverride = authorised("SCHEDULE UPDATE AMOUNTS", xx, "");
 		var accessstopped = authorised("VEHICLE ACCESS STOPPED", xx, "");
 
-		if (not ratecardoverride or not accessstopped or reqcompcode) {
+		if ((not ratecardoverride or not accessstopped) or reqcompcode) {
 
 			RECORD.transfer(saver);
 			ID.transfer(saveid);
@@ -906,7 +906,7 @@ novehiclecodes:
 		return 0;
 
 	} else if (mode.substr(1,12) == "VAL.SUPPLIER") {
-		if (win.is == win.isorig or win.is == "") {
+		if ((win.is == win.isorig) or (win.is == "")) {
 			return 0;
 		}
 
@@ -953,10 +953,10 @@ gotsupplier:
 						if (suppliern[-1] == "0") {
 							call giveway();
 						}
-						if (not supplier.read(agy.suppliers, suppliercodes.a(suppliern))) {
+						if (not(supplier.read(agy.suppliers, suppliercodes.a(suppliern)))) {
 							supplier = "";
 						}
-						if (not (supplier.a(13)).index(type, 1)) {
+						if (not(supplier.a(13).index(type, 1))) {
 							suppliercodes.eraser(suppliern);
 							nsuppliers -= 1;
 							suppliern -= 1;
@@ -980,7 +980,7 @@ gotsupplier:
 		}
 
 		//check right type of supplier
-		type = (mode.field(".", 3))[1];
+		type = mode.field(".", 3)[1];
 		if (type == "N") {
 			type = "P";
 		} else if (type == "1") {
@@ -990,7 +990,7 @@ gotsupplier:
 		} else if (type == "3") {
 			type = "P";
 		}
-		if (type and not (supplier.a(13)).index(type, 1)) {
+		if (type and not supplier.a(13).index(type, 1)) {
 			if (supplier.a(13) == "P") {
 				temp = "Production";
 			}else{
@@ -1016,7 +1016,7 @@ gotsupplier:
 			indexfile = "BRANDS";
 		}
 
-		if (win.is == "" or win.is == win.isorig) {
+		if ((win.is == "") or (win.is == win.isorig)) {
 			return 0;
 		}
 		var dict = DICT;
@@ -1027,7 +1027,7 @@ gotsupplier:
 			temp = "EXECUTIVE_CODE" ^ VM ^ win.is ^ FM;
 			call btreeextract(temp, indexfile, DICT, jobnos);
 			//call btree.extract2(temp,indexfile,@dict,jobnos)
-			if (jobnos == "" and win.is ne USERNAME) {
+			if ((jobnos == "") and win.is ne USERNAME) {
 				if (win.templatex ne "JOBS" and win.templatex ne "CLIENTS") {
 					msg = DQ ^ (win.is ^ DQ) ^ " - INVALID EXECUTIVE OR HAS NOT BEEN USED";
 					return invalid(msg);
@@ -1050,7 +1050,7 @@ gotsupplier:
 			return 0;
 		}
 
-		if (win.is == win.isorig or win.is == "") {
+		if ((win.is == win.isorig) or (win.is == "")) {
 			return 0;
 		}
 
@@ -1081,7 +1081,7 @@ gotclient:
 				}
 
 				gosub findclient( msg);
-				if (not win.valid) {
+				if (not(win.valid)) {
 					return 0;
 				}
 				//nb clientcode can be mv'ed if mode ends in 'S'
@@ -1093,7 +1093,7 @@ gotclient:
 
 	} else if (mode.substr(1,9) == "VAL.BRAND") {
 
-		if (win.is == win.isorig or win.is == "") {
+		if ((win.is == win.isorig) or (win.is == "")) {
 			return 0;
 		}
 
@@ -1113,7 +1113,7 @@ gotclient:
 				//search for brands by name
 			}else{
 				gosub findbrand( msg);
-				if (not win.valid) {
+				if (not(win.valid)) {
 					return 0;
 				}
 				//nb brandcode can be mv'ed if mode ends in 'S'
@@ -1127,19 +1127,19 @@ gotclient:
 		if (win.is) {
 			return 0;
 		}
-		win.isdflt = ((var().date()).oconv("D2/E")).field("/", 2, 2);
+		win.isdflt = var().date().oconv("D2/E").field("/", 2, 2);
 		if (win.isdflt[1] == "0") {
 			win.isdflt.splicer(1, 1, "");
 		}
 
 	} else if (mode == "VAL.PERIOD") {
-		if (win.is == "" or win.is == win.isorig) {
+		if ((win.is == "") or (win.is == win.isorig)) {
 			return 0;
 		}
 
 		//default year to the year of the period
 		if (win.is.match("0N")) {
-			win.is ^= ((var().date()).oconv("D2/")).substr(6,3);
+			win.is ^= var().date().oconv("D2/").substr(6,3);
 		}
 
 		//trim leading zeroes
@@ -1154,7 +1154,7 @@ badperiod:
 			msg = "PLEASE ENTER PERIOD AS \"MONTH/YEAR\"|(EG \"1/92\")";
 			return invalid(msg);
 		}
-		var year = (win.is.field("/", 2)).substr(-2,2);
+		var year = win.is.field("/", 2).substr(-2,2);
 		if (not(year.match("2N"))) {
 			goto badperiod;
 		}
@@ -1167,15 +1167,15 @@ badperiod:
 		}
 		var nn = win.is.count(VM) + 1;
 		for (var ii = 1; ii <= nn; ++ii) {
-			if (not((win.is.a(1, ii)).match("2N\".\"2N"))) {
+			if (not(win.is.a(1, ii).match("2N\".\"2N"))) {
 				msg = DQ ^ (win.is.a(1, ii) ^ DQ) ^ " - INCORRECT FORMAT|PLEASE ENTER YEAR.PERIOD (EG 97.03)";
 				return invalid(msg);
 			}
 		};//ii;
 
-	} else if (mode.substr(1,19) == "VAL.PRODUCTION.TYPE" or mode.substr(1,14) == "VAL.MEDIA.TYPE" or mode.substr(1,18) == "VAL.MEDIAPROD.TYPE") {
+	} else if (((mode.substr(1,19) == "VAL.PRODUCTION.TYPE") or (mode.substr(1,14) == "VAL.MEDIA.TYPE")) or (mode.substr(1,18) == "VAL.MEDIAPROD.TYPE")) {
 
-		if (win.is == "" or win.is == win.isorig) {
+		if ((win.is == "") or (win.is == win.isorig)) {
 			return 0;
 		}
 
@@ -1193,7 +1193,8 @@ badperiod:
 			title = "PRODUCTION";
 		}
 
-		if (not typerec.read(agy.jobtypes, win.is)) {
+		var typerec;
+		if (not(typerec.read(agy.jobtypes, win.is))) {
 			msg = DQ ^ (win.is ^ DQ) ^ " " ^ title ^ " TYPE DOES NOT EXIST";
 			return invalid(msg);
 		}
@@ -1219,16 +1220,16 @@ badperiod:
 		gosub gethasaccounts( hasaccounts);
 		if (hasaccounts) {
 			temp = "";
-			if (mode2 == "WITHACNO" and typerec.a(5) == "" and typerec.a(6) == "") {
+			if (((mode2 == "WITHACNO") and (typerec.a(5) == "")) and (typerec.a(6) == "")) {
 badtype:
 				msg ^= "|does not have " ^ temp ^ "account numbers specified|and cannot be used until they are.";
 				return invalid(msg);
 			}
-			if (mode2 == "WITHINCOMEACNO" and typerec.a(5) == "") {
+			if ((mode2 == "WITHINCOMEACNO") and (typerec.a(5) == "")) {
 				temp = "an income ";
 				goto badtype;
 			}
-			if (mode2 == "WITHCOSTACNO" and typerec.a(6) == "") {
+			if ((mode2 == "WITHCOSTACNO") and (typerec.a(6) == "")) {
 				temp = "a cost ";
 				goto badtype;
 			}
@@ -1268,10 +1269,10 @@ subroutine getmode3(in mode, io msg, io mode3, out type) {
 		}
 	}
 
-	if (mode3 == "M" or mode3 == 2) {
+	if ((mode3 == "M") or (mode3 == 2)) {
 		mode3 = "MEDIA";
 	}
-	if (mode3 == "N" or mode3 == 3) {
+	if ((mode3 == "N") or (mode3 == 3)) {
 		mode3 = "PRODUCTION";
 	}
 	type = mode3[1];

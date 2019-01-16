@@ -163,6 +163,7 @@ public:
 	var MOVEKEYS;
 	var INDEXTIME;
 	var LEVEL;
+	var VOLUMES;
 
 	var PROCESSNO;
 

@@ -23,13 +23,13 @@ function main(in pluralnoun) {
 		} else {
 			temp.splicer(-1, 1, "");
 		}
-//L151:
+//L152:
 		//comment to help c++ decompiler
 	}else{
 
 		if (temp2[-1] == "S") {
 			//ANALYSIS, DOS
-			if (temp2.substr(-2,2) ne "IS" and temp2.substr(-2,2) ne "OS") {
+			if ((temp2.substr(-2,2) ne "IS") and (temp2.substr(-2,2) ne "OS")) {
 				temp.splicer(-1, 1, "");
 			}
 		}

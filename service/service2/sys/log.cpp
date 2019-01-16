@@ -6,56 +6,54 @@ libraryinit()
 #include <sendmail.h>
 
 
-var station;
+var programname;
+var text;
+var xstation;
 var time;
 var log;
+var xx;
 var bakpars;
 var ver;
 
 function main(in programname0, in text0) {
+	//c sys
+
 	var s33 = SYSTEM.a(33);
 
-	var programname;
-	var text;
-	if (programname0.unassigned())
+	if (programname0.unassigned()) {
 		programname = "";
-	else
+	}else{
 		programname = programname0;
-	if (text0.unassigned())
+	}
+	if (text0.unassigned()) {
 		text = "";
-	else
+	}else{
 		text = text0;
+	}
 
 	//update the log
 	///////////////
-	printl("LOG:", programname, " ", text.a(1));
-	
-	var year = ((var().date()).oconv("D")).substr(-4, 4);
+
+	var year = var().date().oconv("D").substr(-4,4);
 	if (s33) {
-		station = SYSTEM.a(40, 2);
-	}else{
-		station = STATION.trim();
-		}
-	//call dostime(time);//seconds and hundredths since midnight
-	time = ostime().round(2);
+		xstation = SYSTEM.a(40, 2);
+		}else{
+		xstation = STATION.trim();
+	}
+	time = ostime();
 
 	var text2 = lower(text);
 	text2.converter("|", VM);
-	text2.trimmer(VM);
+	text2 = trim(text2, VM);
 
 	if (openfile("LOG" ^ year, log, "DEFINITIONS")) {
 
-		var logkey;
-
-		//dont update log with same time
-		while (true) {
-			//call dostime(time);
-			time = ostime().round(2);
-			logkey = station.trim() ^ "*" ^ USERNAME ^ "*" ^ var().date() ^ "*" ^ time;
-			var xx;
-			if (not xx.read(log, logkey))
-				break;		
-			ossleep(rnd(2000));
+getlogkey:
+		time = ostime();
+		var logkey = xstation.trim() ^ "*" ^ USERNAME ^ "*" ^ var().date() ^ "*" ^ time;
+		var xx;
+		if (xx.read(log, logkey)) {
+			goto getlogkey;
 		}
 
 		var entry = programname;
@@ -71,35 +69,33 @@ function main(in programname0, in text0) {
 	call readbakpars(bakpars);
 
 	var emailaddrs = bakpars.a(14);
-	if (programname ne "SYSMSG" and programname ne "SENDMAIL" and emailaddrs) {
+	if ((programname ne "SYSMSG" and programname ne "SENDMAIL") and emailaddrs) {
 
 		//determine subject
 		var subject = "NEOSYS Log: " ^ SYSTEM.a(17) ^ " " ^ programname;
 
 		var body = "";
-		body.r(-1, "Date=" ^ (var().date()).oconv("D") ^ " " ^ time.oconv("MTS") ^ " Local");
+		body.r(-1, "Date=" ^ var().date().oconv("D") ^ " " ^ time.oconv("MTS") ^ " Local");
 		body.r(-1, "Server=" ^ SYSTEM.a(44).trim());
-		body.r(-1, "Install=" ^ var().osdir());
+		body.r(-1, "Install=" ^ oscwd());
 		if (ver.osread("general\\version.dat")) {
 			body.r(-1, "Version=" ^ ver.a(1));
 		}
 		body.r(-1, "Database=" ^ SYSTEM.a(45).trim() ^ " " ^ SYSTEM.a(17));
 		body.r(-1, "Process=" ^ SYSTEM.a(24));
 		body.r(-1, "User=" ^ USERNAME);
-		body.r(-1, "Station=" ^ station);
+		body.r(-1, "Station=" ^ xstation);
 		body.r(-1, "Source=" ^ programname);
 
 		body.r(-1, FM ^ text2);
 
 		body.converter(FM ^ VM ^ SVM ^ TM ^ STM ^ "|", "\r" "\r" "\r" "\r" "\r" "\r");
 		body.converter("\n", "");
-		body.trimmer("\r");
+		body = trim(body, "\r");
 		body.swapper("\r", "\r\n");
 
 		//sendmail - if it fails, there will be an entry in the log
-		var errormsg;
-		call sendmail(emailaddrs, "", subject, body,"","",errormsg);
-
+		call sendmail(emailaddrs, "", subject, body, "", "", xx);
 	}
 
 	//restore interactivity

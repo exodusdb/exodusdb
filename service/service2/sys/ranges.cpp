@@ -152,11 +152,11 @@ makekey:
 
 		}
 
-	//nextrange:;
+	//nextrange:
 	};//ii;
 
 exit:
-	/////
+/////
 	if (listid) {
 		if (keys) {
 			//return nlistparts in vnos to indicate success
@@ -179,7 +179,7 @@ exit:
 }
 
 subroutine writelist() {
-	if (not keys.length()) {
+	if (not(keys.length())) {
 		return;
 	}
 	keys.splicer(1, 1, "");

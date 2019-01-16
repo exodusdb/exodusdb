@@ -647,6 +647,7 @@ var inclusion=
 "\r\nefb_funcx& operator=(const var& newlibraryname) {"
 "\r\n        closelib();"
 "\r\n        libraryname_=newlibraryname.toString();"
+"\r\n        return (*this);"
 "\r\n}"
 "\r\n"
 "\r\n//a member function with the right arguments, returning a var or void"

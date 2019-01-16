@@ -54,7 +54,7 @@ function main(in mode) {
 
 	} else if (mode == "VAL.GROUP") {
 
-		if (win.is and win.is == win.isorig) {
+		if (win.is and (win.is == win.isorig)) {
 			return 0;
 		}
 
@@ -75,7 +75,7 @@ function main(in mode) {
 
 	} else if (mode == "POSTINIT") {
 		gosub security2(mode, op);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
@@ -83,13 +83,13 @@ function main(in mode) {
 
 		//option to read previous versions
 		call generalsubs2(mode);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
 		//this should be recoded to not fail if specific code access granted
 		gosub security2(mode, op);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
@@ -151,7 +151,7 @@ unlocktype:
 
 	} else if (mode == "PREDELETE") {
 		gosub security2(mode, op);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
@@ -234,7 +234,8 @@ subroutine updateacclist() {
 	billcostaccs = var().date();
 nexttype:
 	if (readnext(typecode)) {
-		if (not type.read(agy.jobtypes, typecode)) {
+		var type;
+		if (not(type.read(agy.jobtypes, typecode))) {
 			goto nexttype;
 		}
 
@@ -377,7 +378,7 @@ subroutine addacc2() {
 }
 
 subroutine addacc3() {
-	if (not billcostaccs.a(2).locateusing(acno, VM, vn)) {
+	if (not(billcostaccs.a(2).locateusing(acno, VM, vn))) {
 		billcostaccs.r(2, vn, acno);
 	}
 
@@ -392,7 +393,7 @@ subroutine addacc3() {
 
 	//fn 5/6 are bill cost stored in analysis 28/29
 	//fn 7/8 are accrued cost/work in progress stored in analysis 30/31?
-	} else if (fn >= 5 and fn <= 8) {
+	} else if ((fn >= 5) and (fn <= 8)) {
 		analfn = 23 + fn;
 
 	} else {
@@ -400,20 +401,20 @@ subroutine addacc3() {
 		return;
 	}
 //L1700:
-	if (not billcostaccs.a(3, vn).locateusing(analfn, SVM, xx)) {
+	if (not(billcostaccs.a(3, vn).locateusing(analfn, SVM, xx))) {
 		billcostaccs.r(3, vn, -1, analfn);
 	}
 	if (typecode) {
-		if (not billcostaccs.a(4, vn).locateusing(typecode, SVM, xx)) {
+		if (not(billcostaccs.a(4, vn).locateusing(typecode, SVM, xx))) {
 			billcostaccs.r(4, vn, -1, typecode);
 		}
 	}
-	if (not billcostaccs.a(5, vn).locateusing(mediaorjob, SVM, xx)) {
+	if (not(billcostaccs.a(5, vn).locateusing(mediaorjob, SVM, xx))) {
 		billcostaccs.r(5, vn, -1, mediaorjob);
 	}
 
 	if (analcoln) {
-		if (not billcostaccs.a(7, vn).locateusing(analcoln, SVM, xx)) {
+		if (not(billcostaccs.a(7, vn).locateusing(analcoln, SVM, xx))) {
 			billcostaccs.r(7, vn, -1, analcoln);
 		}
 	}

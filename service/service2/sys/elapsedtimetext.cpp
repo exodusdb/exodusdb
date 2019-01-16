@@ -45,9 +45,9 @@ function main(in fromdate, in fromtime) {
 			text ^= "s";
 		}
 	}
-	if (not hours and minutes < 5) {
+	if (not hours and (minutes < 5)) {
 		if (nsecs) {
-			if (minutes or nsecs - 10 > 0) {
+			if (minutes or (nsecs - 10 > 0)) {
 				nsecs = nsecs.oconv("MD00P");
 			}else{
 				nsecs = (nsecs.oconv("MD40P")) + 0;

@@ -173,7 +173,7 @@ function main(in mode0, out msg) {
 			return 0;
 		}
 
-		if (modulenames == "" or fromdate == "" or uptodate == "" or daysgrace == "") {
+		if ((((modulenames == "") or (fromdate == "")) or (uptodate == "")) or (daysgrace == "")) {
 			msg = "";
 			gosub syntax( msg);
 			return 0;
@@ -199,7 +199,7 @@ function main(in mode0, out msg) {
 
 		//check fromdate
 		var ifromdate = fromdate.iconv("[DATE,4*]");
-		if (not ifromdate.match("5N")) {
+		if (not(ifromdate.match("5N"))) {
 			msg = DQ ^ (fromdate ^ DQ) ^ " cannot be recognised as a date";
 			gosub syntax( msg);
 			return 0;
@@ -207,7 +207,7 @@ function main(in mode0, out msg) {
 
 		//check upto date
 		var iuptodate = uptodate.iconv("[DATE,4*]");
-		if (not iuptodate.match("5N")) {
+		if (not(iuptodate.match("5N"))) {
 			msg = DQ ^ (uptodate ^ DQ) ^ " cannot be recognised as a date";
 			gosub syntax( msg);
 			return 0;
@@ -221,7 +221,7 @@ function main(in mode0, out msg) {
 		}
 
 		//check daysgrace numeric
-		if (not daysgrace.match("1N0N")) {
+		if (not(daysgrace.match("1N0N"))) {
 			msg = DQ ^ (daysgrace ^ DQ) ^ " days grace must be numeric";
 			gosub syntax( msg);
 			return 0;
@@ -244,7 +244,7 @@ function main(in mode0, out msg) {
 		}
 
 		//if incomplete command then prompt for verificationcode
-		if (computerid == "" or cmddatasetid == "" or verification == "") {
+		if (((computerid == "") or (cmddatasetid == "")) or (verification == "")) {
 			if (computerid == "") {
 				computerid = cid();
 			}
@@ -286,7 +286,7 @@ function main(in mode0, out msg) {
 		// 1/4/2016 30/6/2016 7
 		//locate reqverification in licx<7> setting licn then
 		// msg=quote(lictext):' already added'
-		// return 0
+		// return
 		// end
 
 		for (var modulen = 1; modulen <= 9999; ++modulen) {
@@ -316,15 +316,15 @@ function main(in mode0, out msg) {
 		subject = "NEOSYS: Licence Added " ^ SYSTEM.a(17) ^ " - " ^ SYSTEM.a(23);
 		body = "Licence:     : " ^ SENTENCE.field(" ", 2, 999);
 		body.r(-1, "Verification : " ^ verification);
-		var nlics = (licx.a(1)).count(VM) + 1;
+		var nlics = licx.a(1).count(VM) + 1;
 		body ^= FM ^ FM;
 		body ^= "From          Upto          Module          Days Grace";
 		body.r(-1, "----------    ----------    --------------- ----------");
 		for (licn = 1; licn <= nlics; ++licn) {
 			body ^= FM;
-			body ^= (licx.a(2, licn)).oconv("[DATE,4]") ^ "   ";
-			body ^= " " ^ (licx.a(1, licn)).oconv("[DATE,4]") ^ "   ";
-			body ^= " " ^ (licx.a(3, licn)).oconv("L#15") ^ " ";
+			body ^= licx.a(2, licn).oconv("[DATE,4]") ^ "   ";
+			body ^= " " ^ licx.a(1, licn).oconv("[DATE,4]") ^ "   ";
+			body ^= " " ^ licx.a(3, licn).oconv("L#15") ^ " ";
 			body ^= "    " ^ licx.a(5, licn);
 		};//licn;
 		body ^= FM;
@@ -350,7 +350,7 @@ function main(in mode0, out msg) {
 	}
 
 	//ok if the neosys user
-	if (allowneosys and USERNAME == "NEOSYS") {
+	if (allowneosys and (USERNAME == "NEOSYS")) {
 		goto ok;
 	}
 
@@ -373,7 +373,7 @@ function main(in mode0, out msg) {
 		datedict = "YEAR_PERIOD";
 		chkmodulename = "JOBS";
 
-	} else if (win.datafile == "PRODUCTION_INVOICES" or win.datafile == "PRODUCTION_ORDERS") {
+	} else if ((win.datafile == "PRODUCTION_INVOICES") or (win.datafile == "PRODUCTION_ORDERS")) {
 		datedict = "DATE";
 		chkmodulename = "JOBS";
 
@@ -429,7 +429,7 @@ function main(in mode0, out msg) {
 	///BREAK;
 	if (not uptodate) break;;
 		did = licx.a(4, licn);
-		if (did == datasetid and docdate >= licx.a(2, licn)) {
+		if ((did == datasetid) and (docdate >= licx.a(2, licn))) {
 			modulename = licx.a(3, licn);
 			if (modulename == "*") {
 ok:
@@ -443,14 +443,14 @@ ok:
 	};//licn;
 
 	//ok if current date is not after last expiry date plus grace days
-	var nlics = (licx.a(1)).count(VM) + (licx ne "");
+	var nlics = licx.a(1).count(VM) + (licx ne "");
 	//find last expiry date for current module
 	var maxfinalexpirydate = "";
 	var mincommencedate = "";
 	for (licn = 1; licn <= nlics; ++licn) {
 		modulename = licx.a(3, licn);
 		did = licx.a(4, licn);
-		if (did == datasetid and (modulename == "*" or modulename == chkmodulename)) {
+		if ((did == datasetid) and (((modulename == "*") or (modulename == chkmodulename)))) {
 
 			var expirydate = licx.a(1, licn);
 			var daysgrace = licx.a(5, licn);
@@ -462,7 +462,7 @@ ok:
 			}
 
 			var commencedate = licx.a(2, licn);
-			if (commencedate < mincommencedate or not mincommencedate) {
+			if ((commencedate < mincommencedate) or not mincommencedate) {
 				mincommencedate = commencedate;
 			}
 
@@ -475,7 +475,7 @@ ok:
 		return 0;
 	}
 
-	if (var().date() <= maxfinalexpirydate and var().date() >= mincommencedate) {
+	if ((var().date() <= maxfinalexpirydate) and (var().date() >= mincommencedate)) {
 		msg = "";
 		return 0;
 	}
@@ -490,7 +490,7 @@ ok:
 	msg ^= mincommencedate.oconv("[DATE,4*]") ^ " - ";
 	msg ^= maxexpirydate.oconv("[DATE,4*]");
 	tt = var().date() - maxexpirydate;
-	msg.r(-1, " and it is now " ^ (var().date()).oconv("[DATE,4*]") ^ " - " ^ tt ^ " days after the licence expiry date");
+	msg.r(-1, " and it is now " ^ var().date().oconv("[DATE,4*]") ^ " - " ^ tt ^ " days after the licence expiry date");
 
 	return 0;
 

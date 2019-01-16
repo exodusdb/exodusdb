@@ -3,7 +3,6 @@ libraryinit()
 
 #include <log2.h>
 #include <shell2.h>
-#include <trim2.h>
 #include <sysmsg.h>
 
 #include <gen.h>
@@ -14,7 +13,6 @@ var conf;
 var errors;
 var xx;
 var userid;
-var USER;
 var usern;
 var lastdate;
 
@@ -162,7 +160,7 @@ function main(in mode, io logtime) {
 			var enventry = environment.a(ii);
 			if (enventry) {
 				tt = enventry.field("=", 1);
-				if (not SYSTEM.a(12).locateusing(tt, VM, vn)) {
+				if (not(SYSTEM.a(12).locateusing(tt, VM, vn))) {
 					SYSTEM.r(12, vn, tt);
 					SYSTEM.r(13, vn, enventry.field("=", 2, 99999));
 				}
@@ -220,7 +218,7 @@ function main(in mode, io logtime) {
 
 		call log2("*compress logs with gzip", logtime);
 		var dbcode = SYSTEM.a(17);
-		var curryear = (var().date().oconv("D")).substr(-4,4);
+		var curryear = var().date().oconv("D").substr(-4,4);
 		var minyear = 2000;
 		for (var year = curryear - 2; year >= minyear; --year) {
 			var dir = "..\\LOGS\\" ^ dbcode ^ "\\" ^ year;
@@ -256,19 +254,20 @@ nextuser:
 			if (userid[1] == "%") {
 				goto nextuser;
 			}
-			if (not USER.read(users, userid)) {
+			var userx;
+			if (not(userx.read(users, userid))) {
 				goto nextuser;
 			}
-			var origuser = USER;
-			if (not SECURITY.a(1).locateusing(userid, VM, usern)) {
+			var origuser = userx;
+			if (not(SECURITY.a(1).locateusing(userid, VM, usern))) {
 				goto nextuser;
 			}
-			USER.r(40, SECURITY.a(6, usern));
-			USER.r(41, SECURITY.a(2, usern));
+			userx.r(40, SECURITY.a(6, usern));
+			userx.r(41, SECURITY.a(2, usern));
 			origuser.r(40, origuser.a(40));
 			origuser.r(41, origuser.a(41));
-			if (USER ne origuser) {
-				USER.write(users, userid);
+			if (userx ne origuser) {
+				userx.write(users, userid);
 				//user<1>=userid
 				//write user on users,'%':userid:'%'
 			}
@@ -324,7 +323,7 @@ nextuser:
 	} else if (mode.a(1) == "LASTLOGWARNING") {
 
 		var lastlog = mode.field(FM, 2, 999);
-		lastlog = trim2(lastlog, FM);
+		lastlog = trim(lastlog, FM);
 		//first word is logfilename
 		lastlog = lastlog.field(" ", 2, 999);
 		if (not lastlog) {

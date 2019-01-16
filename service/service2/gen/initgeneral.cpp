@@ -12,7 +12,6 @@ libraryinit()
 #include <cid.h>
 #include <readbakpars.h>
 #include <shell2.h>
-#include <trim2.h>
 #include <authorised.h>
 #include <openfile.h>
 #include <logprocess.h>
@@ -35,9 +34,6 @@ var reply2;
 var colors;
 var tt;//num
 var reportkey;
-var oldrecord;
-var lastdate;
-var config;
 var tt2;//num
 var smtp;
 var s33;
@@ -50,9 +46,7 @@ var cpu;
 var errors;
 var shadow;
 var companycode;
-var market;
 var dostime;
-var reminder;
 var docid;
 var codepaging;
 var version;
@@ -246,7 +240,7 @@ function main() {
 		}
 		//also in LOGON.OLD and INIT.GENERAL
 		var lockkey = "INIT.GENERAL.LOGIN";
-		if (not verbs.lock( lockkey)) {
+		if (not(verbs.lock( lockkey))) {
 			//np if own lock
 			if (FILEERROR ne "414") {
 				if (not(lockrecord("VERBS", verbs, "INIT.GENERAL.LOGIN", "", initwaitsecs))) {
@@ -266,7 +260,7 @@ function main() {
 	var neosysid = var("NEOSYS.ID").osfile();
 
 	call log2("*determine the pid if possible", logtime);
-	if (not SYSTEM.a(54)) {
+	if (not(SYSTEM.a(54))) {
 		SYSTEM.r(54, SYSTEM.a(33));
 	}
 	var pidfilename = SYSTEM.a(54, 5) ^ ".pid";
@@ -292,7 +286,7 @@ function main() {
 			if (not(dbversion.read(DEFINITIONS, "DBVERSION"))) {
 				goto updateversion;
 			}
-			if (oldmethod and dbversion.a(1) == 14334.5) {
+			if (oldmethod and (dbversion.a(1) == 14334.5)) {
 			}
 			if (dbversion.a(1) > dbdatetimerequired) {
 				msg = "Software version " ^ dbversion.a(1).oconv("D") ^ " " ^ (dbversion.a(1).field(".", 2)).oconv("MTS") ^ " is incompatible with" ^ FM ^ "Database version " ^ dbdate ^ " " ^ dbtime;
@@ -432,10 +426,10 @@ updateversion:
 	//call settime('')
 
 	call log2("*save the original username and station", logtime);
-	if (not SYSTEM.a(43)) {
+	if (not(SYSTEM.a(43))) {
 		SYSTEM.r(43, USERNAME);
 	}
-	if (not SYSTEM.a(44)) {
+	if (not(SYSTEM.a(44))) {
 		SYSTEM.r(44, STATION.trim());
 	}
 
@@ -495,7 +489,8 @@ nextreport:
 								
 							}
 						}else{
-							if (not oldrecord.read(file, keyx)) {
+							var oldrecord;
+							if (not(oldrecord.read(file, keyx))) {
 								oldrecord = "";
 							}
 							//only update documents if changed anything except update timedate
@@ -521,10 +516,10 @@ nextreport:
 		call note(msg);
 	}
 
-	var notherusers = (otherusers("")).a(1);
+	var notherusers = otherusers("").a(1);
 
 	call log2("*check/get authorisation", logtime);
-	if (SYSTEM.a(4) == "" and not SYSTEM.a(33)) {
+	if ((SYSTEM.a(4) == "") and not SYSTEM.a(33)) {
 		var nusers = getauthorisation();
 		if (not nusers) {
 
@@ -559,21 +554,24 @@ nextreport:
 	}
 
 	call log2("*prevent use of this program via F10", logtime);
-	if (initmode ne "LOGIN" and LEVEL ne 1 and interactive and not resetting) {
+	if (((initmode ne "LOGIN" and LEVEL ne 1) and interactive) and not resetting) {
 		msg = "You cannot quit from within another program via F10.";
 		msg.r(-1, "Please quit all programs first and then try again.");
 		var().chr(7).output();
 		call note(msg);
 		var().stop();
 	}
+
+	call log2("*check the operating system date", logtime);
+	//CHECKSYSDATE:
+	var config = "";
+	if (not(config.osread("NEOSYS.CFG"))) {
+		if (config.osread("\\lastdate.rev\\")) {
+			{}
+		}
+	}
+	var lastdate = config.a(1);
 	/*;
-		call log2('*check the operating system date',logtime);
-	CHECKSYSDATE:
-		CONFIG='';
-		OSREAD CONFIG FROM 'NEOSYS.CFG' ELSE;
-			OSREAD CONFIG FROM '\lastdate.rev\' THEN null;
-			END;
-		LASTDATE=CONFIG<1>;
 		IF LASTDATE and interactive THEN;
 			IF DATE() LT LASTDATE OR DATE() GT (LASTDATE+14) THEN;
 				MSG='';
@@ -637,7 +635,7 @@ nextreport:
 
 	//! system configuration defaults
 	// installation group
-	if (not SYSTEM.a(123)) {
+	if (not(SYSTEM.a(123))) {
 		SYSTEM.r(123, "GLOBAL");
 	}
 	// upgrades yes
@@ -645,27 +643,27 @@ nextreport:
 		SYSTEM.r(124, 1);
 	}
 	//close after backup yes
-	if (not SYSTEM.a(125)) {
+	if (not(SYSTEM.a(125))) {
 		SYSTEM.r(125, 2);
 	}
 	//test should start missing processes
-	if (not SYSTEM.a(126)) {
+	if (not(SYSTEM.a(126))) {
 		SYSTEM.r(126, 0);
 	}
 
-	if (not SYSTEM.a(57)) {
+	if (not(SYSTEM.a(57))) {
 		call log2("*determine systemid from old smtp sender name", logtime);
 		call osread(smtp, "..\\..\\SMTP.CFG");
-		if (not smtp.a(1)) {
+		if (not(smtp.a(1))) {
 			call osread(smtp, "SMTP.CFG");
 		}
-		if (not smtp.a(1)) {
+		if (not(smtp.a(1))) {
 			if (not(smtp.read(DEFINITIONS, "SMTP.CFG"))) {
 				{}
 			}
 		}
 		if (smtp.a(1)) {
-			var sysname = (smtp.a(1).field("@", 1)).lcase();
+			var sysname = smtp.a(1).field("@", 1).lcase();
 			//remove all punctuation
 			sysname.converter("!\"#$%^&*()_+-=[]{};:@,./<>?", "");
 			SYSTEM.r(57, sysname);
@@ -686,7 +684,7 @@ nextreport:
 	SYSTEM.r(111, "");
 	SYSTEM.r(111, cid());
 	//try twice because was unreliable and is important
-	if (not SYSTEM.a(111)) {
+	if (not(SYSTEM.a(111))) {
 		SYSTEM.r(111, cid());
 	}
 
@@ -782,11 +780,11 @@ nextreport:
 	} else if (tt[-1] ne "\\") {
 		SYSTEM.r(49, tt ^ "\\");
 	}
-//L3143:
-	if (not SYSTEM.a(46, 1)) {
+//L3184:
+	if (not(SYSTEM.a(46, 1))) {
 		SYSTEM.r(46, 1, "#FFFF80");
 	}
-	if (not SYSTEM.a(46, 2)) {
+	if (not(SYSTEM.a(46, 2))) {
 		SYSTEM.r(46, 2, "#FFFFC0");
 	}
 	//if system<46,3> else system<46,3>=''
@@ -801,7 +799,7 @@ nextreport:
 	//will not override entries in SYSTEM.CFG
 	if (not(SYSTEM.a(12).locateusing("CODEPAGE", VM, vn))) {
 		var output = shell2("MODE CON:", xx);
-		output = trim2(output.convert("\r\n", FM ^ FM), FM);
+		output = trim(output.convert("\r\n", FM ^ FM), FM);
 		var codepage = field2(output, " ", -1);
 		SYSTEM.r(12, vn, "CODEPAGE");
 		SYSTEM.r(13, vn, codepage);
@@ -840,11 +838,11 @@ nextreport:
 	ver.converter("\r\n", "  ");
 	//if index(ver,'Windows 9',1) or index(ver,'NT',1) or index(os,'NT',1) then
 	ver = ver.trim().ucase();
-	if (ver.index("WINDOWS", 1) or ver.index("NT", 1) or os.index("NT", 1)) {
+	if ((ver.index("WINDOWS", 1) or ver.index("NT", 1)) or os.index("NT", 1)) {
 		SYSTEM.r(12, -1, "WORDSIZE");
 		SYSTEM.r(13, -1, "32");
 	}
-	ver = (ver.field(" ", 4)).field("]", 1);
+	ver = ver.field(" ", 4).field("]", 1);
 	//Windows Server 2003 5.2.3790 (24.04.2003)
 	//Windows Server 2003, SP1 5.2.3790.1180
 	//Windows Server 2003 5.2.3790.1218
@@ -973,7 +971,7 @@ nextreport:
 		}
 		//initdir location:'*.*'
 		//tt=dirlist()
-		tt = oslistf();
+		tt = oslistf(location ^ "*.*");
 		if (tt) {
 			SYSTEM.r(50, location);
 		}
@@ -1001,8 +999,8 @@ getproxy:
 		if (tt) {
 			//tt=result[tt,';'][1,char(13)]
 			tt = result.substr(tt,9999);
-			tt = (tt.field(";", 1)).field(var().chr(13), 1);
-			tt = (tt.field(":", 2, 99)).trim();
+			tt = tt.field(";", 1).field(var().chr(13), 1);
+			tt = tt.field(":", 2, 99).trim();
 			tt.swapper("http=", "");
 		} else if (cmd == "proxycfg") {
 			cmd = "netsh winhttp import proxy ie";
@@ -1122,9 +1120,9 @@ getproxy:
 		var usercodes = SECURITY.a(1);
 		var nusers = usercodes.count(VM) + (usercodes ne "");
 		for (var usern = 1; usern <= nusers; ++usern) {
-			var USER = usercodes.a(1, usern);
-			if (not(USER.index("---", 1))) {
-				USER.writev(users, USER, 1);
+			var userx = usercodes.a(1, usern);
+			if (not(userx.index("---", 1))) {
+				userx.writev(users, userx, 1);
 				
 			}
 		};//usern;
@@ -1152,7 +1150,7 @@ getproxy:
 	call logprocess(sessionid, "LOGIN", "", "", "", "");
 	SYSTEM.r(4, sessionid);
 
-	if (not SYSTEM.a(22).length()) {
+	if (not(SYSTEM.a(22).length())) {
 		SYSTEM.r(22, 300);
 	}
 
@@ -1275,13 +1273,13 @@ getproxy:
 	if (not(lists.open("LISTS", ""))) {
 		lists = "";
 	}
-	if (not lists.index(workpath, 1)) {
+	if (not(lists.index(workpath, 1))) {
 		var cmd = "MAKEFILE " ^ workpath ^ " LISTS";
 		perform(cmd ^ " (S)");
 		if (not(lists.open("LISTS", ""))) {
 			lists = "";
 		}
-		if (not lists.index(workpath, 1)) {
+		if (not(lists.index(workpath, 1))) {
 			//call note('FAILED TO MAKE LISTS FILE ON ':workpath
 		}
 	}
@@ -1366,7 +1364,7 @@ getproxy:
 fixnextcompany:
 	anyfixed += 1;
 	if (readnext(companycode)) {
-		if (not gen.company.read(gen.companies, companycode)) {
+		if (not(gen.company.read(gen.companies, companycode))) {
 			goto fixnextcompany;
 		}
 
@@ -1374,7 +1372,8 @@ fixnextcompany:
 		if (marketcode) {
 			var markets;
 			if (markets.open("MARKETS", "")) {
-				if (not market.read(markets, marketcode)) {
+				var market;
+				if (not(market.read(markets, marketcode))) {
 					msg = DQ ^ (marketcode ^ DQ) ^ " is missing from company " ^ companycode;
 					call note(msg);
 					goto fixcompany;
@@ -1398,7 +1397,7 @@ fixcompany:
 	}
 
 	call log2("*open accounts system files", logtime);
-	if (APPLICATION == "ACCOUNTS" or APPLICATION == "ADAGENCY") {
+	if ((APPLICATION == "ACCOUNTS") or (APPLICATION == "ADAGENCY")) {
 		//open 'ACCOUNTS' to xx THEN
 		// open 'ABP' to xx THEN
 		perform("INIT.ACC");
@@ -1463,16 +1462,16 @@ convcompany:
 	if (xx.open("ACCOUNTS", "")) {
 		if (xx.open("ABP", "")) {
 			msg = "";
-			if (not fin.account.read(fin.accounts, gen.company.a(4))) {
+			if (not(fin.account.read(fin.accounts, gen.company.a(4)))) {
 				msg.r(-1, gen.company.a(4));
 			}
-			if (not fin.account.read(fin.accounts, gen.company.a(5))) {
+			if (not(fin.account.read(fin.accounts, gen.company.a(5)))) {
 				msg.r(-1, gen.company.a(5));
 			}
-			if (not fin.account.read(fin.accounts, gen.company.a(12))) {
+			if (not(fin.account.read(fin.accounts, gen.company.a(12)))) {
 				msg.r(-1, gen.company.a(12));
 			}
-			if (not fin.account.read(fin.accounts, gen.company.a(19))) {
+			if (not(fin.account.read(fin.accounts, gen.company.a(19)))) {
 				msg.r(-1, gen.company.a(19));
 			}
 			if (msg) {
@@ -1507,7 +1506,7 @@ adddatasetcodename:
 	//if @username<>'NEOSYS' and datasetid<4> then
 	//lock even to NEOSYS to prevent installation where NEOSYS pass is known
 	if (datasetid.a(4)) {
-		if (not datasetid.a(4).locateusing(cid(), VM, xx)) {
+		if (not(datasetid.a(4).locateusing(cid(), VM, xx))) {
 			USER4 = DQ ^ ("CANNOT USE THIS DATABASE ON THIS COMPUTER" ^ DQ);
 			gosub failbatch();
 			var().stop();
@@ -1521,7 +1520,7 @@ adddatasetcodename:
 	//suggest change globaldatasetid if changed datasetname or datasetid
 	if (datasetid.a(2) ne SYSTEM.a(23) or datasetid.a(3) ne SYSTEM.a(17)) {
 		//if system<17>[-4,4]<>'TEST' and interactive and @username='NEOSYS' then
-		if (not SYSTEM.a(61) and interactive and USERNAME == "NEOSYS") {
+		if ((not SYSTEM.a(61) and interactive) and (USERNAME == "NEOSYS")) {
 			if (datasetid.a(1) ne "1EEC633B") {
 				call decide("This database has been copied or|the database name or code has been changed.|Is this going to be a unique new master database?", "Yes - Going to be a new independent database" ^ VM ^ "No - just backing up, renaming or recoding the database", reply, 2);
 				if (reply == 1) {
@@ -1543,31 +1542,29 @@ adddatasetcodename:
 	// end
 	// end
 
-	call log2("*take down the backup reminder", logtime);
-	if (reminder) {
-		call mssg("", "DB", reminder, "");
-	}
+	//call log2('*take down the backup reminder',logtime)
+	//if reminder then call mssg('','DB',reminder,'')
 
 	if (not resetting) {
 
 		call log2("*show and update last login time", logtime);
-		var USER;
-		if (not(USER.read(DEFINITIONS, "USER*" ^ USERNAME))) {
-			USER = "";
+		var userx;
+		if (not(userx.read(DEFINITIONS, "USER*" ^ USERNAME))) {
+			userx = "";
 		}
-		if (USER.a(4) and interactive) {
-			var day = var("Mon,Tue,Wed,Thu,Fri,Sat,Sun").field(",", (USER.a(4) - 1) % 7 + 1);
-			call note("Info:||" ^ USERNAME ^ " last used " ^ currdataset ^ " on||" ^ day ^ " " ^ USER.a(4).oconv("D") ^ " at " ^ USER.a(5).oconv("MTH") ^ "||" ^ var("on workstation " ^ USER.a(6).trim()).oconv("C#40") ^ "|");
+		if (userx.a(4) and interactive) {
+			var day = var("Mon,Tue,Wed,Thu,Fri,Sat,Sun").field(",", (userx.a(4) - 1) % 7 + 1);
+			call note("Info:||" ^ USERNAME ^ " last used " ^ currdataset ^ " on||" ^ day ^ " " ^ userx.a(4).oconv("D") ^ " at " ^ userx.a(5).oconv("MTH") ^ "||" ^ var("on workstation " ^ userx.a(6).trim()).oconv("C#40") ^ "|");
 		}
 
 		call log2("*save last login time", logtime);
-		USER.write(DEFINITIONS, "USER*" ^ USERNAME ^ "*LAST");
+		userx.write(DEFINITIONS, "USER*" ^ USERNAME ^ "*LAST");
 
 		call log2("*update the last login time", logtime);
-		USER.r(4, var().date());
-		USER.r(5, var().time());
-		USER.r(6, STATION);
-		USER.write(DEFINITIONS, "USER*" ^ USERNAME);
+		userx.r(4, var().date());
+		userx.r(5, var().time());
+		userx.r(6, STATION);
+		userx.write(DEFINITIONS, "USER*" ^ USERNAME);
 
 		//call log2('*check processes',logtime)
 		//clearselect
@@ -1593,7 +1590,7 @@ nextdoc:
 		}
 	}
 
-	if (interactive and USERNAME == "NEOSYS") {
+	if (interactive and (USERNAME == "NEOSYS")) {
 		perform("FINDDEADALL");
 	}
 
@@ -1611,7 +1608,7 @@ nextdoc:
 		if (not(codepage.read(DEFINITIONS, "PARAM*CODEPAGE"))) {
 			codepage = "0" ^ FM ^ codepaging.a(2);
 		}
-		if (codepage.a(2) == "737" and not codepage.a(1) and codepaging.a(3) == "1253") {
+		if (((codepage.a(2) == "737") and not codepage.a(1)) and (codepaging.a(3) == "1253")) {
 			perform("CONVGREEK (U)");
 		}
 	}
@@ -1624,7 +1621,7 @@ nextdoc:
 
 	call log2("*create user name index", logtime);
 	var convkey = "CONVERTED*USERNAMEINDEX";
-	if (not xx.read(DEFINITIONS, convkey)) {
+	if (not(xx.read(DEFINITIONS, convkey))) {
 		perform("WINDOWSTUB USER.SUBS CREATEUSERNAMEINDEX");
 		var().date().write(DEFINITIONS, convkey);
 	}
@@ -1669,7 +1666,7 @@ nextdoc:
 	if (version.osread("GENERAL\\VERSION.DAT")) {
 
 		//get version installed
-		var versioninstalled = ((version.field("\r", 1)).field(0x1A, 1)).trim();
+		var versioninstalled = version.field("\r", 1).field(0x1A, 1).trim();
 
 		//get version last run
 		call osread(upgradelog, "UPGRADE.CFG");
@@ -1698,7 +1695,7 @@ nextdoc:
 
 		//update software version in database
 		tt2 = "VERSION*LASTEMAILED";
-		if (not tt.read(DEFINITIONS, tt2)) {
+		if (not(tt.read(DEFINITIONS, tt2))) {
 			tt = "";
 		}
 		if (tt ne versioninstalled) {
@@ -1754,8 +1751,7 @@ nextdoc:
 			}
 
 			call log2("*chain to NET AUTO (" ^ SYSTEM.a(17) ^ ") INIT.GENERAL Quitting.", logtime);
-			execute("NET AUTO");
-			var().abort();
+			var("NET AUTO").chain();
 		}
 
 	}
@@ -1766,7 +1762,7 @@ nextdoc:
 
 subroutine getsystem() {
 	call log2("*get " ^ tt ^ " parameters", logtime);
-	if (not systemx.osread(tt)) {
+	if (not(systemx.osread(tt))) {
 		return;
 	}
 

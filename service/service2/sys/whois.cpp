@@ -24,7 +24,7 @@ function main(in mode, in ipno, out text) {
 	}
 
 	if (SENTENCE.field(" ", 1) == "WHOIS") {
-		(SENTENCE).transfer(sentencex);
+		SENTENCE.transfer(sentencex);
 		call whois("", sentencex.field(" ", 2), text);
 		call mssg(text);
 		var().stop();
@@ -47,10 +47,10 @@ function main(in mode, in ipno, out text) {
 
 	//skip 172.16-32.*.* and 100.64-127.*.*
 	ip2 = ipno.field(".", 2);
-	if (ip1 == 172 and ip2 >= 16 and ip2 <= 31) {
+	if (((ip1 == 172) and (ip2 >= 16)) and (ip2 <= 31)) {
 		goto returnzero;
 	}
-	if (ip1 == 100 and ip2 >= 64 and ip2 <= 127) {
+	if (((ip1 == 100) and (ip2 >= 64)) and (ip2 <= 127)) {
 		goto returnzero;
 	}
 

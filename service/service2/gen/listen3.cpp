@@ -23,7 +23,7 @@ function main(in filename, in mode, out newfilename, out triggers) {
 	var replacewrite = "";
 	var replacedelete = "";
 
-	if (filename == "SCHEDULES" or filename == "PLANS") {
+	if ((filename == "SCHEDULES") or (filename == "PLANS")) {
 		//preread='PLAN.SUBS5'
 		preread = "AGENCY.SUBS";
 		postread = "PLAN.SUBS";
@@ -128,7 +128,7 @@ function main(in filename, in mode, out newfilename, out triggers) {
 		postread = "USER.SUBS";
 		updatesubs = "USER.SUBS";
 
-	} else if (filename == "CHARTS" or filename == "LEDGERS") {
+	} else if ((filename == "CHARTS") or (filename == "LEDGERS")) {
 		postread = "CHART.SUBS";
 		//fix transfer accounts, split off report design, change open item '' to '0'
 		updatesubs = "CHART.SUBS";
@@ -171,7 +171,7 @@ function main(in filename, in mode, out newfilename, out triggers) {
 		return 0;
 	}
 //L857:
-	//////
+//////
 	//exit:
 	//////
 

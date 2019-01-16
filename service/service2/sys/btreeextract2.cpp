@@ -122,7 +122,7 @@ nextrec:
 			return;
 		}
 		if (merge) {
-			if (not hits.locateusing(id, VM, xx)) {
+			if (not(hits.locateusing(id, VM, xx))) {
 				hits ^= VM ^ id;
 			}
 		}else{

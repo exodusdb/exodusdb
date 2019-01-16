@@ -26,7 +26,6 @@ var xx;
 var msg;
 var pikeys;
 var yy;
-var topjob;
 var otherusercode;
 var wsmsg;
 
@@ -39,7 +38,7 @@ function main(in mode) {
 
 	if (mode == "PERPETUAL") {
 
-		if (win.orec == "" and (RECORD.a(4) or RECORD.a(5))) {
+		if ((win.orec == "") and ((RECORD.a(4) or RECORD.a(5)))) {
 			//gosub initrec
 			RECORD.r(4, "");
 			RECORD.r(5, "");
@@ -91,7 +90,7 @@ function main(in mode) {
 
 	} else if (mode == "VAL.JOB.NO") {
 
-		if (win.is == "" or win.is == win.isorig) {
+		if ((win.is == "") or (win.is == win.isorig)) {
 			return 0;
 		}
 
@@ -162,7 +161,7 @@ lockit:
 	} else if (mode == "VAL.CLOSED") {
 
 		//check if allowed to reopen the job
-		if (win.is ne win.isorig and win.isorig == "Y") {
+		if (win.is ne win.isorig and (win.isorig == "Y")) {
 			if (not(authorised("JOB REOPEN", msg, "UP"))) {
 				return invalid(msg);
 			}
@@ -172,7 +171,7 @@ lockit:
 		if (authorised("JOB UPDATE EXECUTIVE", msg, "UP")) {
 			ANS = (calculate("BRAND_CODE")).xlate("BRANDS", 11, "X");
 		}else{
-			if (not win.is) {
+			if (not(win.is)) {
 				if (ANS == "") {
 					ANS = USERNAME;
 				}
@@ -197,7 +196,7 @@ lockit:
 		//@record<9>=''
 
 		//check if allowed without type
-		if (not RECORD.a(3)) {
+		if (not(RECORD.a(3))) {
 			if (not(authorised("JOB CREATE WITHOUT TYPE", msg))) {
 				return invalid(msg);
 			}
@@ -215,7 +214,7 @@ lockit:
 		}
 
 		//check if allowed to reopen the job
-		if (RECORD.a(7) ne win.orec.a(7) and win.orec.a(7) == "Y") {
+		if (RECORD.a(7) ne win.orec.a(7) and (win.orec.a(7) == "Y")) {
 			if (not(authorised("JOB REOPEN", msg))) {
 				return invalid(msg);
 			}
@@ -242,7 +241,7 @@ lockit:
 					pikeys = RECORD.a(10);
 					call updsecindex("LOCK", "PRODUCTION_INVOICES", pikeys, "", "", "", win.valid, msg);
 
-					if (not win.valid) {
+					if (not(win.valid)) {
 unlockprodinvs:
 						call updsecindex("UNLOCK", "PRODUCTION_INVOICES", pikeys, "", "", "", xx, yy);
 						goto unlockprodorders;
@@ -259,7 +258,7 @@ unlockprodorders:
 
 				//lock the !indexing record as late as possible
 				call updsecindex("INDEXINGLOCK", "", xx, "", "", "", win.valid, msg);
-				if (not win.valid) {
+				if (not(win.valid)) {
 					goto unlockprodinvs;
 				}
 
@@ -302,8 +301,8 @@ unlockprodorders:
 		}
 
 		//record date created
-		if (not RECORD.a(54)) {
-			RECORD.r(54, var().date() ^ "." ^ (var().time()).oconv("R(0)#5"));
+		if (not(RECORD.a(54))) {
+			RECORD.r(54, var().date() ^ "." ^ var().time().oconv("R(0)#5"));
 		}
 
 		var brief = RECORD.a(9);
@@ -318,7 +317,7 @@ unlockprodorders:
 		}
 
 		//closed is now 0 for open
-		if (not RECORD.a(7).trim()) {
+		if (not(RECORD.a(7).trim())) {
 			RECORD.r(7, 0);
 		}
 
@@ -330,10 +329,10 @@ unlockprodorders:
 		RECORD.r(27, "");
 
 		//missing username etc indicates adding file archive entry
-		var ii = (RECORD.a(43)).count(VM) + (RECORD.a(43) ne "");
-		if (ii and RECORD.a(40, ii) == "") {
+		var ii = RECORD.a(43).count(VM) + (RECORD.a(43) ne "");
+		if (ii and (RECORD.a(40, ii) == "")) {
 			RECORD.r(40, ii, USERNAME);
-			RECORD.r(41, ii, var().date() ^ "." ^ (var().time()).oconv("R(0)#5"));
+			RECORD.r(41, ii, var().date() ^ "." ^ var().time().oconv("R(0)#5"));
 			RECORD.r(42, ii, STATION);
 
 		}else{
@@ -366,11 +365,11 @@ unlockprodorders:
 				end;
 	*/
 
-	} else if (mode == "POSTREAD" or mode == "POSTREAD2") {
+	} else if ((mode == "POSTREAD") or (mode == "POSTREAD2")) {
 
 		//option to read previous versions
 		call generalsubs2(mode);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
@@ -412,7 +411,7 @@ unlockprodorders:
 
 		//check if allowed to create/update/access in general
 		gosub security(mode);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			win.reset = 5;
 			return 0;
 		}
@@ -440,7 +439,7 @@ unlockprodorders:
 					//prevent certain users from creating their own job numbers
 					//uncomment when job number is not generated in the client
 					//uncommented to prevent own job number creation
-					if (RECORD == "" and not interactive and not USER3.index("RECORDKEY", 1)) {
+					if (((RECORD == "") and not interactive) and not USER3.index("RECORDKEY", 1)) {
 						if (not(authorised("JOB CREATE OWN NO", msg, ""))) {
 							msg = DQ ^ (ID ^ DQ) ^ " does not exist and" ^ FM ^ FM ^ msg;
 							win.reset = 5;
@@ -456,7 +455,8 @@ unlockprodorders:
 						var topjobno = ID.field("-", 1, leveln);
 
 						//check higher job exists
-						if (not topjob.read(agy.jobs, topjobno)) {
+						var topjob;
+						if (not(topjob.read(agy.jobs, topjobno))) {
 							msg = DQ ^ (topjobno ^ DQ) ^ " Main Job does not exist.|You must create it first";
 							win.reset = 5;
 							return invalid(msg);
@@ -484,7 +484,7 @@ unlockprodorders:
 			//force companycode if new record and key prefixed with company code
 			//similar code in JOB.SUBS and PLAN.SUBS
 			//PO/PI should be tied to jobs of the same company if prefixed
-			if (ID == win.isdflt and win.wlocked) {
+			if ((ID == win.isdflt) and win.wlocked) {
 				var ccode2 = gen.company.a(28);
 				if (ccode2) {
 					var tt = ID;
@@ -543,7 +543,7 @@ unlockprodorders:
 		if (RECORD and not interactive) {
 
 			//fix a old bug where file details where updated instead of log on first write
-			if (RECORD.a(30) == "" and RECORD.a(43) == "" and RECORD.a(40)) {
+			if (((RECORD.a(30) == "") and (RECORD.a(43) == "")) and RECORD.a(40)) {
 				for (var ii = 30; ii <= 32; ++ii) {
 					RECORD.r(ii, RECORD.a(ii + 10));
 					RECORD.r(ii + 10, "");
@@ -579,7 +579,7 @@ unlockprodorders:
 			}
 
 			//get the quote statuses (to check if can add po's)
-			if (not win.wlocked) {
+			if (not(win.wlocked)) {
 				MV = 0;
 				RECORD.r(16, calculate("QUOTEmv.STATUS2"));
 			}
@@ -654,7 +654,7 @@ unlockprodorders:
 			task.r(1, ID);
 			task.r(2, taskusercode);
 			task.r(3, "Allocated");
-			task.r(4, var().date() ^ "." ^ (var().time()).oconv("R(0)#5"));
+			task.r(4, var().date() ^ "." ^ var().time().oconv("R(0)#5"));
 
 			//parent user for job closure
 			task.r(8, agy.agp.a(106));
@@ -713,16 +713,16 @@ unlockprodorders:
 	return 0;
 
 	/*;
-	///////////
+///////////
 	setcompany:
-	///////////
+///////////
 		if r<14> else return 0;
 		gosub setcompany2;
 		return 0;
 
-	////////////
+////////////
 	setcompany2:
-	////////////
+////////////
 		if index(agp<53>,'<COMPANY>',1) then;
 			r<14>=gcurr.company;
 			r<28>=r<14>;

@@ -23,14 +23,12 @@ var xx;
 var msg;
 var temp;
 var jobcode;
-var job;
 var tt;
 var hits;
 var reply;
 var docname;
 var copyfile;
 var versionfilename;
-var copydoc;
 var wsmsg;
 
 function main(in mode) {
@@ -89,7 +87,7 @@ function main(in mode) {
 		return 0;
 
 	} else if (mode == "VAL.ORDER.NO") {
-		if (win.is == "" or win.is == win.isorig) {
+		if ((win.is == "") or (win.is == win.isorig)) {
 			return 0;
 		}
 
@@ -158,24 +156,25 @@ lockit:
 		}
 		//call agency.subs(mode)
 		call agencysubs(mode ^ temp, xx);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
 		jobcode = win.is;
 		gosub checkjobunlocked();
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
 		jobcode = win.isorig;
 		gosub checkjobunlocked();
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
 		//get the job
-		if (not job.read(agy.jobs, win.is)) {
+		var job;
+		if (not(job.read(agy.jobs, win.is))) {
 			msg = DQ ^ (win.is ^ DQ) ^ " JOB DOES NOT EXIST";
 			return invalid(msg);
 		}
@@ -188,7 +187,7 @@ lockit:
 
 		//copy the job description to description, and brief to details
 		//or just copy the description and brief to the details
-		if (not RECORD.a(13)) {
+		if (not(RECORD.a(13))) {
 			//if 1 then
 			RECORD.r(6, job.a(9, 1));
 			RECORD.r(13, job.a(9).field(VM, 2, 999));
@@ -199,7 +198,7 @@ lockit:
 			//update the internal line count for text section
 			win.displayaction = 5;
 			win.amvaction = 4;
-			win.amvvars.r(1, 3, (RECORD.a(13)).count(VM) + (RECORD.a(13) ne ""));
+			win.amvvars.r(1, 3, RECORD.a(13).count(VM) + (RECORD.a(13) ne ""));
 			win.reset = 3;
 
 		}
@@ -238,7 +237,7 @@ lockit:
 
 	//called from web interface
 	} else if (mode == "VAL.SUPPINV") {
-		if (win.is == "" or win.isorig == win.is) {
+		if ((win.is == "") or (win.isorig == win.is)) {
 			return 0;
 		}
 
@@ -306,7 +305,7 @@ lockit:
 
 	} else if (mode == "POSTINIT") {
 		gosub security(mode);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
@@ -320,7 +319,7 @@ lockit:
 
 	} else if (mode == "PREDELETE") {
 		call prodordersubs2(mode);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
@@ -332,12 +331,12 @@ lockit:
 
 		//option to read previous versions
 		call generalsubs2(mode);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
 		gosub security(mode);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
@@ -349,7 +348,7 @@ lockit:
 
 		//restrict access based on company, brand, user etc
 		var jobno = RECORD.a(2);
-		job = "";
+		var job = "";
 		if (jobno) {
 
 			if (not(validcode2(calculate("COMPANY_CODE"), "", calculate("BRAND_CODE"), agy.brands, msg))) {
@@ -385,7 +384,7 @@ lockit:
 
 		//option to prevent adding costs after job has been billed
 		//zzz but how to delete orders?
-		if (win.wlocked and calculate("JOB_CLOSED") == "Y") {
+		if (win.wlocked and (calculate("JOB_CLOSED") == "Y")) {
 			if (RECORD) {
 				if (not(authorised("PRODUCTION ORDER UPDATE AFTER JOB CLOSED", msg, ""))) {
 					win.wlocked = 0;
@@ -395,7 +394,7 @@ lockit:
 				// wlocked=0
 				// end
 			}
-			if (not win.wlocked) {
+			if (not(win.wlocked)) {
 				xx = unlockrecord(win.datafile, win.srcfile, ID);
 				if (RECORD == "") {
 					goto canc;
@@ -404,13 +403,13 @@ lockit:
 		}
 
 		//get the number of decimals
-		if (RECORD and RECORD.a(14) == "") {
+		if (RECORD and (RECORD.a(14) == "")) {
 			RECORD.r(14, calculate("NDECS"));
 			win.orec.r(14, RECORD.a(14));
 		}
 
 		//prevent certain users from creating their own quote numbers
-		if (RECORD == "" and not interactive and not USER3.index("RECORDKEY", 1)) {
+		if (((RECORD == "") and not interactive) and not USER3.index("RECORDKEY", 1)) {
 			if (not(authorised("PRODUCTION ORDER CREATE OWN NO", msg, ""))) {
 				msg = DQ ^ (ID ^ DQ) ^ " does not exist and" ^ FM ^ FM ^ msg;
 				win.reset = 5;
@@ -428,7 +427,7 @@ lockit:
 		}
 
 		//default signatory into old records
-		if (win.orec and RECORD.a(24) == "") {
+		if (win.orec and (RECORD.a(24) == "")) {
 			if (agy.agp.a(51) and agy.agp.a(51) ne "NEVER") {
 				tt = agy.agp.a(61);
 				if (tt == "") {
@@ -447,7 +446,7 @@ lockit:
 		}
 
 		//draft mode only
-		if (win.wlocked and win.orec and RECORD.a(11) ne "DRAFT") {
+		if ((win.wlocked and win.orec) and RECORD.a(11) ne "DRAFT") {
 			if (not(authorised("PRODUCTION ORDER ISSUE", xx))) {
 				//wlocked=0
 				//xx=unlockrecord(datafile,src.file,@id)
@@ -465,7 +464,7 @@ lockit:
 			}
 		}
 
-		if (RECORD or mode == "POSTREAD2") {
+		if (RECORD or (mode == "POSTREAD2")) {
 			return 0;
 		}
 
@@ -500,7 +499,8 @@ copyno:
 		if (not copyno) {
 			goto canc;
 		}
-		if (not copydoc.read(copyfile, copyno)) {
+		var copydoc;
+		if (not(copydoc.read(copyfile, copyno))) {
 			//if docname='estimate' then
 			var versionfile;
 			if (versionfile.open(versionfilename, "")) {
@@ -516,7 +516,7 @@ copyno:
 
 		jobcode = copydoc.a(2);
 		gosub checkjobunlocked();
-		if (not win.valid) {
+		if (not(win.valid)) {
 			goto copyno;
 		}
 
@@ -551,7 +551,7 @@ gotdoc:
 		//update the internal line count for text section
 		win.displayaction = 5;
 		win.amvaction = 4;
-		win.amvvars.r(1, 3, (RECORD.a(13)).count(VM) + (RECORD.a(13) ne ""));
+		win.amvvars.r(1, 3, RECORD.a(13).count(VM) + (RECORD.a(13) ne ""));
 		win.reset = 4;
 
 		RECORD.r(14, calculate("NDECS"));
@@ -563,7 +563,7 @@ gotdoc:
 			RECORD.r(2, "");
 		}
 
-	} else if (mode == "POSTWRITE" or mode == "POSTDELETE") {
+	} else if ((mode == "POSTWRITE") or (mode == "POSTDELETE")) {
 		call flushindex("PRODUCTION_ORDERS");
 
 	} else {
@@ -581,7 +581,8 @@ subroutine checkjobunlocked() {
 		return;
 	}
 
-	if (not job.read(agy.jobs, jobcode)) {
+	var job;
+	if (not(job.read(agy.jobs, jobcode))) {
 		msg = DQ ^ (jobcode ^ DQ) ^ " job does not exist";
 		gosub invalid(msg);
 		return;

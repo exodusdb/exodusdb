@@ -10,7 +10,6 @@ libraryinit()
 #include <chklic.h>
 #include <sysmsg.h>
 #include <initcompany.h>
-#include <trim2.h>
 #include <addjobacc.h>
 #include <flushindex.h>
 #include <locking.h>
@@ -36,14 +35,11 @@ var docname;
 var copyfile;
 var versionfilename;
 var copynos;
-var copydoc;
 var nn;//num
 var vn;//num
 var taxn;
-var prodtype;
 var temp;
 var linen2;
-var analrec;
 var wsmsg;
 
 function main(in mode0) {
@@ -60,7 +56,7 @@ function main(in mode0) {
 	if (mode == "PERPETUAL") {
 
 		//if copied an invoiced record then clear certain invoice info
-		if (win.orec == "" and ID and (RECORD.a(11) == "INVOICED" or RECORD.a(12) or RECORD.a(19))) {
+		if (((win.orec == "") and ID) and ((((RECORD.a(11) == "INVOICED") or RECORD.a(12)) or RECORD.a(19)))) {
 			gosub initrec();
 			win.displayaction = 5;
 			win.reset = 3;
@@ -125,7 +121,7 @@ function main(in mode0) {
 
 	} else if (mode == "VAL.QUOTE.NO") {
 
-		if (win.is == "" or win.is == win.isorig) {
+		if ((win.is == "") or (win.is == win.isorig)) {
 			return 0;
 		}
 
@@ -215,19 +211,19 @@ lockit:
 		}
 
 		gosub checkjob();
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
 		jobcode = win.is;
 		gosub checkjobunlocked2();
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
 		jobcode = win.isorig;
 		gosub checkjobunlocked2();
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
@@ -273,7 +269,7 @@ lockit:
 			//update the internal line count for text section
 			win.displayaction = 5;
 			win.amvaction = 4;
-			win.amvvars.r(1, 3, (RECORD.a(8)).count(VM) + (RECORD.a(8) ne ""));
+			win.amvvars.r(1, 3, RECORD.a(8).count(VM) + (RECORD.a(8) ne ""));
 			win.reset = 3;
 
 		}
@@ -287,7 +283,7 @@ lockit:
 		}
 
 	} else if (mode == "VAL.ATTENTION") {
-		if (win.is == "" or win.is == win.isorig) {
+		if ((win.is == "") or (win.is == win.isorig)) {
 			return 0;
 		}
 		win.is.writev(agy.brands, calculate("BRAND_CODE"), 7);
@@ -295,7 +291,7 @@ lockit:
 
 	} else if (mode == "DEF.DESCRIPTION") {
 
-		if (not win.wlocked) {
+		if (not(win.wlocked)) {
 			return 0;
 		}
 
@@ -358,7 +354,7 @@ lockit:
 			@ans=RATE;
 	*/
 	} else if (mode == "VAL.AMOUNT") {
-		if (win.is == "" or win.is == win.isorig) {
+		if ((win.is == "") or (win.is == win.isorig)) {
 			return 0;
 		}
 		var ndecs;
@@ -372,7 +368,7 @@ lockit:
 
 	} else if (mode == "POSTINIT") {
 		gosub security2(mode, op);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
@@ -380,13 +376,13 @@ lockit:
 
 		//option to read previous versions
 		call generalsubs2(mode);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
 		//check allowed to create (or prevent editing if not allowed to update)
 		gosub security2(mode, op);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
@@ -449,7 +445,7 @@ lockit:
 		}
 
 		//prevent editing if already invoiced
-		if (win.wlocked and (calculate("INVOICE_NO") or calculate("INVOICE_NO_FAILSAFE"))) {
+		if (win.wlocked and ((calculate("INVOICE_NO") or calculate("INVOICE_NO_FAILSAFE")))) {
 preventediting:
 			xx = unlockrecord(win.datafile, win.srcfile, ID);
 			win.wlocked = 0;
@@ -461,7 +457,7 @@ preventediting:
 		}
 
 		//draft mode only
-		if (win.wlocked and win.orec and RECORD.a(11) ne "DRAFT") {
+		if ((win.wlocked and win.orec) and RECORD.a(11) ne "DRAFT") {
 			if (not(authorised("PRODUCTION ESTIMATE ISSUE", xx))) {
 				win.wlocked = 0;
 				xx = unlockrecord(win.datafile, win.srcfile, ID);
@@ -483,14 +479,14 @@ preventediting:
 		}
 
 		//prevent editing if approved and not allowed to approve
-		if (win.wlocked and RECORD.a(11) == "APPROVED") {
+		if (win.wlocked and (RECORD.a(11) == "APPROVED")) {
 			if (not(authorised("PRODUCTION ESTIMATE APPROVE", msg))) {
 				goto preventediting;
 			}
 		}
 
 		//prevent certain users from creating their own quote numbers
-		if (win.wlocked and RECORD == "" and not interactive and not USER3.index("RECORDKEY", 1)) {
+		if (((win.wlocked and (RECORD == "")) and not interactive) and not USER3.index("RECORDKEY", 1)) {
 			if (not(authorised("PRODUCTION ESTIMATE CREATE OWN NO", msg))) {
 				msg = DQ ^ (ID ^ DQ) ^ " does not exist and" ^ FM ^ FM ^ msg;
 				win.reset = 5;
@@ -500,8 +496,8 @@ preventediting:
 
 		//backwards compatible with one amount and text lines separated by tm
 		//garbagecollect;
-		if (not (RECORD.a(3)).count(VM)) {
-			if ((RECORD.a(8)).count(TM)) {
+		if (not(RECORD.a(3).count(VM))) {
+			if (RECORD.a(8).count(TM)) {
 				tt = RECORD.a(8);
 				tt.converter(TM, VM);
 				tt = tt.oconv("T#60");
@@ -519,13 +515,13 @@ preventediting:
 		}
 
 		//get the number of decimals
-		if (RECORD and RECORD.a(14) == "") {
+		if (RECORD and (RECORD.a(14) == "")) {
 			RECORD.r(14, calculate("NDECS"));
 			win.orec.r(14, RECORD.a(14));
 		}
 
 		//default signatory into old records
-		if (win.orec and RECORD.a(24) == "") {
+		if (win.orec and (RECORD.a(24) == "")) {
 			if (agy.agp.a(51) and agy.agp.a(51) ne "NEVER") {
 				tt = agy.agp.a(62);
 				if (tt == "") {
@@ -543,7 +539,7 @@ preventediting:
 			RECORD.r(24, tt);
 		}
 
-		if (RECORD or mode == "POSTREAD2") {
+		if (RECORD or (mode == "POSTREAD2")) {
 			return 0;
 		}
 
@@ -583,7 +579,7 @@ inpjob:
 				}
 				goto canc;
 			}
-			if (not job.read(agy.jobs, jobno)) {
+			if (not(job.read(agy.jobs, jobno))) {
 				call mssg(DQ ^ (jobno ^ DQ) ^ " job number does not exist");
 				goto inpjob;
 			}
@@ -640,7 +636,8 @@ nextcopyno:
 		var copyno = copynos.field(" ", 1);
 		copynos.splicer(1, copyno.length() + 1, "");
 
-		if (not copydoc.read(copyfile, copyno)) {
+		var copydoc;
+		if (not(copydoc.read(copyfile, copyno))) {
 			//if docname='estimate' then
 			var versionfile;
 			if (versionfile.open(versionfilename, "")) {
@@ -656,7 +653,7 @@ nextcopyno:
 
 		jobcode = copydoc.a(2);
 		gosub checkjobunlocked2();
-		if (not win.valid) {
+		if (not(win.valid)) {
 			goto copyno;
 		}
 
@@ -666,13 +663,13 @@ nextcopyno:
 		win.isorig = "";
 		win.valid = 1;
 		call agencysubs("VAL.JOB", xx, "", "");
-		if (not win.valid) {
+		if (not(win.valid)) {
 			win.valid = 1;
 			goto nextcopyno2;
 		}
 
 gotdoc:
-		nn = (RECORD.a(8)).count(VM) + (RECORD.a(8) ne "") + 2;
+		nn = RECORD.a(8).count(VM) + (RECORD.a(8) ne "") + 2;
 		if (copyfile == win.srcfile) {
 			if (RECORD) {
 				RECORD.r(8, nn + 1, copydoc.a(8));
@@ -754,7 +751,7 @@ nextcopyno2:
 		}
 
 		//prevent f9 while locked
-		if (not win.wlocked) {
+		if (not(win.wlocked)) {
 			//msg='WLOCKED is false in PRODINV.SUBS,PREWRITE'
 			msg = "";
 			return invalid(msg);
@@ -765,7 +762,7 @@ nextcopyno2:
 			return invalid(msg);
 		}
 
-		if (RECORD.a(11) == "INVOICED" or calculate("INVOICE_NO_FAILSAFE")) {
+		if ((RECORD.a(11) == "INVOICED") or calculate("INVOICE_NO_FAILSAFE")) {
 			if (interactive) {
 				gosub printx();
 				win.valid = 0;
@@ -785,13 +782,13 @@ nextcopyno2:
 
 		//check currency exists and is not stopped
 		var currcode = RECORD.a(4);
-		if (not gen.currency.read(gen.currencies, currcode)) {
+		if (not(gen.currency.read(gen.currencies, currcode))) {
 			msg = DQ ^ (currcode ^ DQ) ^ " currency does not exist";
 			return invalid(msg);
 		}
 		if (currcode ne win.orec.a(4)) {
 			tt = gen.currency.a(1).convert("<>", "()");
-			if (gen.currency.a(25) or (tt.ucase()).index("(STOP)", 1)) {
+			if (gen.currency.a(25) or tt.ucase().index("(STOP)", 1)) {
 				msg = tt ^ FM ^ "currency is stopped" ^ FM ^ gen.currency.a(25);
 				return invalid(msg);
 			}
@@ -828,7 +825,7 @@ nextcopyno2:
 			for (var ln = 1; ln <= nlns; ++ln) {
 				var taxcodex = alltaxcodes.a(1, ln);
 				if (taxcodex.length()) {
-					if (not fin.taxes.a(2).locateusing(taxcodex, VM, taxn)) {
+					if (not(fin.taxes.a(2).locateusing(taxcodex, VM, taxn))) {
 						{}
 					}
 					if (fin.taxes.a(4, taxn) == "") {
@@ -854,7 +851,7 @@ nextcopyno2:
 
 		//get/check job
 		gosub checkjobunlocked();
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
@@ -862,8 +859,8 @@ nextcopyno2:
 		call initcompany(companycode);
 
 		//ensure tax code on estimates from 1/1/2018 if registered for tax
-		if (gen.company.a(21) and calculate("DATE") >= 18264) {
-			if (not RECORD.a(42) or RECORD.a(44)) {
+		if (gen.company.a(21) and (calculate("DATE") >= 18264)) {
+			if (not(RECORD.a(42) or RECORD.a(44))) {
 				call mssg(DQ ^ (ID ^ DQ) ^ " Tax/VAT code is required on Estimates/Invoices|for " ^ gen.company.a(1) ^ ", " ^ gen.company.a(21));
 				return invalid(msg);
 			}
@@ -890,7 +887,7 @@ jobclosed:
 		jobcode = win.orec.a(2);
 		if (jobcode and jobcode ne RECORD.a(2)) {
 			gosub checkjobunlocked2();
-			if (not win.valid) {
+			if (not(win.valid)) {
 				return 0;
 			}
 
@@ -923,7 +920,7 @@ jobclosed:
 
 		//restore jobcode and job
 		gosub checkjobunlocked();
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return invalid(msg);
 		}
 
@@ -935,7 +932,7 @@ jobclosed:
 			}
 		}
 
-		if (not RECORD.a(5)) {
+		if (not(RECORD.a(5))) {
 			msg = "Exchange rate cannot be blank or zero";
 			return invalid(msg);
 		}
@@ -944,16 +941,17 @@ jobclosed:
 		tt = RECORD.a(17);
 		if (tt.a(1, 1) == "") {
 			//loop while tt[1,1]=vm do tt[1,1]='' repeat
-			tt = trim2(tt, VM, "B");
+			tt = trim(tt, VM, "B");
 			if (tt.a(1, 1)) {
 				RECORD.r(17, 1, tt.a(1, 1));
 			}else{
 				tt = calculate("JOB_PRODUCTION_TYPE");
 				if (tt) {
-					if (not prodtype.read(agy.jobtypes, tt)) {
+					var prodtype;
+					if (not(prodtype.read(agy.jobtypes, tt))) {
 						prodtype = "";
 					}
-					if (not prodtype.a(5)) {
+					if (not(prodtype.a(5))) {
 						goto badtype;
 					}
 				}else{
@@ -973,7 +971,7 @@ badtype:
 			}
 		}
 
-		if (RECORD.index((var().chr(0)).str(4), 1)) {
+		if (RECORD.index(var().chr(0).str(4), 1)) {
 			msg = "INTERNAL ERROR IN PRODUCTION ESTIMATE/INVOICE|PLEASE GIVE THIS MESSAGE TO NEOSYS|PLEASE REDO THIS ESTIMATE/INVOICE";
 			call oswrite(RECORD, "prodinv.$$$");
 			gosub invalid(msg);
@@ -984,13 +982,13 @@ badtype:
 		//update log and version file
 		call generalsubs2(mode);
 
-	} else if (mode == "POSTWRITE" or mode == "POSTDELETE") {
+	} else if ((mode == "POSTWRITE") or (mode == "POSTDELETE")) {
 
 		gosub updanalysis();
 
 		call flushindex("PRODUCTION_INVOICES");
 
-		if (interactive and mode == "POSTWRITE") {
+		if (interactive and (mode == "POSTWRITE")) {
 			//if decide('Do you want a printout ?','',reply) else reply=2
 			reply = 1;
 			xx = unlockrecord(win.datafile, win.srcfile, ID);
@@ -1049,7 +1047,7 @@ subroutine resetlines() {
 	//update the internal line count for text section
 	win.displayaction = 5;
 	win.amvaction = 4;
-	win.amvvars.r(1, 3, (RECORD.a(8)).count(VM) + (RECORD.a(8) ne ""));
+	win.amvvars.r(1, 3, RECORD.a(8).count(VM) + (RECORD.a(8) ne ""));
 	win.reset = 4;
 	return;
 
@@ -1122,7 +1120,7 @@ subroutine updanalysis2(in sign) {
 	var suppliercode = calculate("SUPPLIER_CODE");
 	var brandcode = calculate("BRAND_CODE");
 	var marketcode = calculate("MARKET_CODE");
-	var orderperiod = ((calculate("DATE")).oconv("D2/E")).substr(4,5);
+	var orderperiod = (calculate("DATE")).oconv("D2/E").substr(4,5);
 	var ordermthno = orderperiod.field("/", 1);
 
 	var analcompanycode = calculate("COMPANY_CODE");
@@ -1143,7 +1141,8 @@ subroutine updanalysis2(in sign) {
 				call log("PRODINV.SUBS", DQ ^ (analkey ^ DQ) ^ " could not lock analysis record while invoicing " ^ (DQ ^ (ID ^ DQ)));
 			}
 
-			if (not analrec.read(agy.analysis, analkey)) {
+			var analrec;
+			if (not(analrec.read(agy.analysis, analkey))) {
 				analrec = "";
 			}
 			//garbagecollect;
@@ -1176,12 +1175,12 @@ subroutine checkjob() {
 	}
 	//call agency.subs(mode)
 	call agencysubs("VAL.JOB" ^ temp, xx, "", "");
-	if (not win.valid) {
+	if (not(win.valid)) {
 		return;
 	}
 
 	//get the job
-	if (not job.read(agy.jobs, win.is)) {
+	if (not(job.read(agy.jobs, win.is))) {
 		msg = DQ ^ (win.is ^ DQ) ^ " JOB DOES NOT EXIST";
 		gosub invalid(msg);
 		return;
@@ -1205,7 +1204,7 @@ subroutine checkjobunlocked2() {
 	if (not jobcode) {
 		return;
 	}
-	if (not job.read(agy.jobs, jobcode)) {
+	if (not(job.read(agy.jobs, jobcode))) {
 		msg = DQ ^ (jobcode ^ DQ) ^ " job does not exist";
 		gosub invalid(msg);
 		return;

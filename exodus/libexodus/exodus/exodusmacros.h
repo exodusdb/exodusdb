@@ -53,6 +53,9 @@ THE SOFTWARE.
 //sadly, passing argc argv causes gcc and -Wall -Wextra to give "warning: unused parameter �exodus__argc�"
 //so dont pass them ... they are included in mv SENTENCE/COMMAND/OPTION somehow anyway.
 //void main2(int exodus__argc, char *exodus__argv[], MvEnvironment& mv)
+//SIMILAR CODE IN
+//program.h programexit
+//exodusmacros.h libraryexit(
 #define program() \
 void main2(MvEnvironment& mv); \
 int main(int exodus__argc, char *exodus__argv[]) \
@@ -63,13 +66,31 @@ int main(int exodus__argc, char *exodus__argv[]) \
 	{ \
 		main2(mv); \
 	} \
+	catch (MVStop exceptionx) \
+	{ \
+		if (exceptionx.description.length()) \
+			exceptionx.description.outputl();\
+		if (exceptionx.description.isnum()) \
+			exit(exceptionx.description); \
+		else \
+			exit(0); \
+	} \
+	catch (MVAbort exceptionx) \
+	{ \
+		if (exceptionx.description.length()) \
+			exceptionx.description.outputl();\
+		if (exceptionx.description.isnum()) \
+			exit(exceptionx.description); \
+		else \
+			exit(1); \
+	} \
 	catch (MVException except) \
 	{ \
-		/*printl(except.description);*/ \
-		print("Aborting. Press Enter"); \
-		input(); \
-		stop(0); \
+		print(except.description); \
+		printl(" - Aborting."); \
+		exit(999); \
 	} \
+	return 0; \
 } \
 void main2(MvEnvironment& mv)
 
@@ -261,6 +282,7 @@ typedef var& out;
 #define INDEXTIME mv.INDEXTIME
 #define LEVEL mv.LEVEL
 
+#define VOLUMES mv.VOLUMES
 #define PROCESSNO mv.PROCESSNO
 
 #endif //EXODUSMACROS_H

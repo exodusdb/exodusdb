@@ -11,7 +11,6 @@ var filen;//num
 var code;
 var ok;//num
 var coden;//num
-var brand;
 var taskid;
 var positive;
 var forcedusercode;
@@ -101,7 +100,8 @@ function main(in companycodex, in clientcodex, in brandcodex, io brands, out msg
 				var().stop();
 			}
 		}
-		if (not brand.read(brands, brandcode)) {
+		var brand;
+		if (not(brand.read(brands, brandcode))) {
 			msg = DQ ^ (brandcode ^ DQ) ^ " missing from brands file";
 			return 0;
 		}
@@ -129,7 +129,7 @@ function main(in companycodex, in clientcodex, in brandcodex, io brands, out msg
 			call fsmsg();
 			var().stop();
 		}
-		if (not client.read(clients, clientcode)) {
+		if (not(client.read(clients, clientcode))) {
 			//allow for validating a DELETED client from CLIENT_VERSIONS
 			var versionfile;
 			if (not(versionfile.open("CLIENT_VERSIONS", ""))) {
@@ -138,7 +138,7 @@ missingclient:
 				return 0;
 			}
 
-			if (not client.read(versionfile, clientcode)) {
+			if (not(client.read(versionfile, clientcode))) {
 				goto missingclient;
 			}
 

@@ -27,7 +27,7 @@ function main(in alerttype0, in runasuser, out tasks, out title, out request, ou
 	}
 
 	var alerttype = alerttype0.field(":", 1);
-	var alertoptions = (alerttype0.field(":", 2, 9999)).convert(":", FM);
+	var alertoptions = alerttype0.field(":", 2, 9999).convert(":", FM);
 
 	var mode = "";
 
@@ -42,7 +42,7 @@ function main(in alerttype0, in runasuser, out tasks, out title, out request, ou
 		}
 		datax = "{TODAY-" ^ ageindays ^ "}";
 		var closing = alertoptions.a(2);
-		if (not(closing == "C" or closing == "")) {
+		if (not((closing == "C") or (closing == ""))) {
 			call mssg(DQ ^ (closing ^ DQ) ^ " parameter 2 must be C for Close or blank to List");
 			var().stop();
 		}
@@ -59,7 +59,7 @@ function main(in alerttype0, in runasuser, out tasks, out title, out request, ou
 		}
 		datax = "{TODAY-" ^ ageindays ^ "}";
 		var stopping = alertoptions.a(2);
-		if (not(stopping == "S" or stopping == "")) {
+		if (not((stopping == "S") or (stopping == ""))) {
 			call mssg(DQ ^ (stopping ^ DQ) ^ " parameter 2 must be S for Stop or blank");
 			var().stop();
 		}

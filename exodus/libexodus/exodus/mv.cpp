@@ -1472,8 +1472,8 @@ std::wstring dblToString(double double1)
 
 MVException::MVException(const var& description_) : description(description_)
 {
-	std::wcerr << L"MVException:" << description <<std::endl;
-	backtrace().convert(FM,L"\n").outputl();
+	//std::wcerr << L"MVException:" << description <<std::endl;
+	//backtrace().convert(FM,L"\n").outputl();
 }
 
 MVUnassigned		::MVUnassigned		(const var& var1)	: MVException(L"MVUnassigned:"				^ var1	){}
@@ -1481,14 +1481,16 @@ MVDivideByZero		::MVDivideByZero	(const var& var1)	: MVException(L"MVDivideByZer
 MVNonNumeric		::MVNonNumeric		(const var& var1)	: MVException(L"MVNonNumeric:"				^ var1	){}
 MVIntOverflow		::MVIntOverflow		(const var& var1)	: MVException(L"MVIntOverflow:"				^ var1	){}
 MVIntUnderflow		::MVIntUnderflow	(const var& var1)	: MVException(L"MVIntUnderflow:"			^ var1	){}
-MVUndefined			::MVUndefined		(const var& var1)	: MVException(L"MVUndefined:"				^ var1	){}
+MVUndefined			::MVUndefined		(const var& var1)	: MVException(L"MVUndefined:"			^ var1	){}
 MVOutOfMemory		::MVOutOfMemory		(const var& var1)	: MVException(L"MVOutOfMemory:"				^ var1	){}
 MVInvalidPointer	::MVInvalidPointer	(const var& var1)	: MVException(L"MVInvalidPointer:"			^ var1	){}
 MVDBException		::MVDBException		(const var& var1)	: MVException(L"MVDBException:"				^ var1	){}
 MVNotImplemented	::MVNotImplemented	(const var& var1)	: MVException(L"MVNotImplemented:"			^ var1	){}
-MVDebug				::MVDebug			(const var& var1)	: MVException(L"MVDebug"					^ var1	){}
-MVStop				::MVStop			(const var& var1)	: MVException(L"MVStop:"					^ var1 	){}
-MVAbort				::MVAbort			(const var& var1)	: MVException(L"MVAbort"					^ var1	){}
+MVDebug			::MVDebug		(const var& var1)	: MVException(L"MVDebug"				^ var1	){}
+//MVStop		::MVStop		(const var& var1)	: MVException(L"MVStop:"				^ var1 	){}
+//MVAbort		::MVAbort		(const var& var1)	: MVException(L"MVAbort"				^ var1	){}
+MVStop			::MVStop		(const var& var1)	: MVException(						var1 	){}
+MVAbort			::MVAbort		(const var& var1)	: MVException(						var1	){}
 
 MVArrayDimensionedZero	::MVArrayDimensionedZero	()					: MVException(L"MVArrayDimensionedZero:"			){}
 MVArrayIndexOutOfBounds	::MVArrayIndexOutOfBounds	(const var& var1)	: MVException(L"MVArrayIndexOutOfBounds:"	^ var1	){}

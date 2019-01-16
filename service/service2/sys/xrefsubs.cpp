@@ -66,7 +66,7 @@ nextbuild:
 
 		deleting = 1;
 		gosub validateupdate( subfn,  masterfilename,  masterfile,  masterfn,  locklist);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
@@ -84,13 +84,13 @@ nextbuild:
 
 		deleting = 1;
 		gosub validateupdate( subfn,  masterfilename,  masterfile,  masterfn,  locklist);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
 		deleting = 0;
 		gosub validateupdate( subfn,  masterfilename,  masterfile,  masterfn,  locklist);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
@@ -98,13 +98,13 @@ nextbuild:
 
 		deleting = 1;
 		gosub validateupdate( subfn,  masterfilename,  masterfile,  masterfn,  locklist);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
 		deleting = 0;
 		gosub validateupdate( subfn,  masterfilename,  masterfile,  masterfn,  locklist);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 

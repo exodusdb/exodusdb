@@ -2,7 +2,6 @@
 libraryinit()
 
 #include <openfile.h>
-#include <trim2.h>
 #include <addcent.h>
 #include <updanalysis2.h>
 #include <singular.h>
@@ -31,11 +30,6 @@ var xx;
 var oldkeys;
 var newkeys;
 var msg;
-var brand;
-var vehicle;
-var supplier;
-var market;
-var type;
 var oldkeyn;//num
 var wsmsg;
 
@@ -123,14 +117,14 @@ subroutine getbudget() {
 
 	rown = 0;
 
-	////////
+////////
 nextrow:
-	////////
-	if (not readnext(ID)) {
+////////
+	if (not(readnext(ID))) {
 		ID = "";
 	}
 
-	if (ID == "" or esctoexit()) {
+	if ((ID == "") or esctoexit()) {
 		gosub getbudgetexit();
 		return;
 	}
@@ -139,7 +133,7 @@ nextrow:
 		goto nextrow;
 	}
 
-	if (not RECORD.read(analysis2, ID)) {
+	if (not(RECORD.read(analysis2, ID))) {
 		goto nextrow;
 	}
 
@@ -201,12 +195,12 @@ subroutine savebudget() {
 	}
 
 	rown = 0;
-	var nrows = (tpseudo.a(10)).count(VM) + 1;
+	var nrows = tpseudo.a(10).count(VM) + 1;
 
 	gosub getyearbudgetcompany();
 
 	var changedyearbudgetcompany = 1;
-	var firstkey = trim2(tpseudo.a(18), VM).a(1, 1);
+	var firstkey = trim(tpseudo.a(18), VM).a(1, 1);
 	if (fullyear ne addcent(firstkey.field("*", 1), "", "", xx)) {
 	} else if (budgetcompanycode ne firstkey.field("*", 8)) {
 	} else if (budgetcode ne firstkey.field("*", 7)) {
@@ -221,9 +215,9 @@ subroutine savebudget() {
 
 	newkeys = "";
 
-	/////////
+/////////
 nextrec2:
-	/////////
+/////////
 	rown += 1;
 	if (rown > nrows) {
 		gosub savebudgetexit();
@@ -253,36 +247,41 @@ nextrec2:
 
 	if (validate) {
 
-		if (not margin.isnum()) {
+		if (not(margin.isnum())) {
 			msg = DQ ^ (margin ^ DQ) ^ " margin should be numeric but is non-numeric";
 			gosub invalid(msg);
 		}
 
-		if (not brand.read(agy.brands, brandcode)) {
+		var brand;
+		if (not(brand.read(agy.brands, brandcode))) {
 			msg = DQ ^ (brandcode ^ DQ) ^ " - invalid brand code";
 			gosub invalid(msg);
 		}
 
 		if (vehiclecode) {
 
-			if (not vehicle.read(agy.vehicles, vehiclecode)) {
+			var vehicle;
+			if (not(vehicle.read(agy.vehicles, vehiclecode))) {
 				msg = DQ ^ (vehiclecode ^ DQ) ^ " - invalid vehicle code";
 				gosub invalid(msg);
 			}
 
 		}else{
 
-			if (not supplier.read(agy.suppliers, suppliercode)) {
+			var supplier;
+			if (not(supplier.read(agy.suppliers, suppliercode))) {
 				msg = DQ ^ (suppliercode ^ DQ) ^ " - invalid supplier code";
 				gosub invalid(msg);
 			}
 
-			if (not market.read(agy.markets, marketcode)) {
+			var market;
+			if (not(market.read(agy.markets, marketcode))) {
 				msg = DQ ^ (marketcode ^ DQ) ^ " - invalid market code";
 				gosub invalid(msg);
 			}
 
-			if (not type.read(agy.jobtypes, typecode)) {
+			var type;
+			if (not(type.read(agy.jobtypes, typecode))) {
 				msg = DQ ^ (typecode ^ DQ) ^ " - invalid type code";
 				gosub invalid(msg);
 			}
@@ -299,7 +298,7 @@ nextrec2:
 	for (var periodn = 1; periodn <= 12; ++periodn) {
 
 		var bill = tpseudo.a(20 + periodn, rown);
-		if (not bill.isnum()) {
+		if (not(bill.isnum())) {
 			msg = DQ ^ (bill ^ DQ) ^ " should be numeric but is non-numeric. Period : " ^ periodn;
 			gosub invalid(msg);
 		}
@@ -310,7 +309,7 @@ nextrec2:
 
 		var cost = tpseudo.a(40 + periodn, rown);
 		if (cost) {
-			if (not cost.isnum()) {
+			if (not(cost.isnum())) {
 				msg = DQ ^ (cost ^ DQ) ^ " should be numeric but is non-numeric. Period : " ^ periodn;
 				gosub invalid(msg);
 			}
@@ -327,18 +326,18 @@ nextrec2:
 	/////////
 
 	//recalc totals
-	RECORD.r(21, ((RECORD.a(1)).sum()).oconv(basefmtz));
-	RECORD.r(22, ((RECORD.a(2)).sum()).oconv(basefmtz));
+	RECORD.r(21, RECORD.a(1).sum().oconv(basefmtz));
+	RECORD.r(22, RECORD.a(2).sum().oconv(basefmtz));
 
 	//update files
 	if (not validate) {
 		call cropper(RECORD);
 
-		if (not win.orec.read(analysis2, ID)) {
+		if (not(win.orec.read(analysis2, ID))) {
 			win.orec = "";
 		}
 		for (var periodn = 1; periodn <= 12; ++periodn) {
-			if (win.orec.a(2, periodn) == "0" and RECORD.a(2, periodn) == "") {
+			if ((win.orec.a(2, periodn) == "0") and (RECORD.a(2, periodn) == "")) {
 				RECORD.r(2, periodn, "0");
 			}
 		};//periodn;
@@ -417,7 +416,7 @@ subroutine getyearbudgetcompany() {
 
 	budgetcode = tpseudo.a(3);
 	var budgetcode2 = budgetcode.field(" ", 2);
-	budgetcode = (budgetcode.field(" ", 1))[1];
+	budgetcode = budgetcode.field(" ", 1)[1];
 	if (budgetcode2 ne 1) {
 		budgetcode ^= budgetcode2;
 	}

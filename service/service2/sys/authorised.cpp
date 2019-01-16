@@ -126,12 +126,15 @@ updateprivs:
 				}
 			}
 			goto updateprivs;
-		} else if (updating) {
+			goto updateprivs;
+		}
+		if (updating) {
 			var tt = defaultlock;
 			if (SECURITY.a(10).locateusing(defaultlock, VM, taskn2)) {
 				tt = SECURITY.a(11, taskn2);
 			}
 			SECURITY.r(11, taskn, tt);
+			goto updateprivs;
 			goto updateprivs;
 		}
 
@@ -146,7 +149,7 @@ updateprivs:
 			return 1;
 		}
 		if (not noadd) {
-			noadd = task[-1] == DQ or SECURITY.length() > 48000;
+			noadd = (task[-1] == DQ) or (SECURITY.length() > 48000);
 			//if passed a default lock then add even tasks ending like "XXXXX"
 			if (not defaultlock.unassigned()) {
 				if (defaultlock) {
@@ -230,7 +233,7 @@ notallowed:
 	}
 
 	//find the user
-	if (not SECURITY.a(1).locateusing(username, VM, usern)) {
+	if (not(SECURITY.a(1).locateusing(username, VM, usern))) {
 			/*20180312;
 			if username<>'NEOSYS' and username<>@account then;
 				gosub readuserprivs;

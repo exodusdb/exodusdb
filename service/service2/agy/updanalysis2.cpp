@@ -14,7 +14,6 @@ var locklist;
 var msg;
 var balances;
 var origbalances;
-var activity;
 
 function main(in mode0, in id, in analrecord, in orec) {
 	//c agy
@@ -101,7 +100,8 @@ subroutine updbalances2(in fn, in year, in compcode,in categorycode,in oldamount
 					call log("UPD.ANALYSIS2", msg);
 				}
 
-				if (not balances.read(fin.balances, balkey)) {
+				var balances;
+				if (not(balances.read(fin.balances, balkey))) {
 					balances = "";
 				}
 				origbalances = balances;
@@ -149,13 +149,14 @@ subroutine getacc(in mode, in id, in fn, io accno) {
 	if (typecode == "") {
 		var vehiclecode = id.field("*", 3);
 		typecode = vehiclecode.xlate("VEHICLES", 2, "X");
-		if (typecode == "" and mode == "ONE") {
+		if ((typecode == "") and (mode == "ONE")) {
 			call note(DQ ^ (ID ^ DQ) ^ " - invalid vehicle in upd.analysis2");
 		}
 	}
 
 	//get activity record
-	if (not activity.read(agy.jobtypes, typecode)) {
+	var activity;
+	if (not(activity.read(agy.jobtypes, typecode))) {
 		if (mode == "ONE") {
 			call note(DQ ^ (typecode ^ DQ) ^ " - invalid activity code in upd.analysis2");
 		}
@@ -170,7 +171,7 @@ subroutine getacc(in mode, in id, in fn, io accno) {
 		var masteractivity = "";
 		var mastertypecode = activity.a(10);
 		if (mastertypecode) {
-			if (not masteractivity.read(agy.jobtypes, mastertypecode)) {
+			if (not(masteractivity.read(agy.jobtypes, mastertypecode))) {
 				if (mode == "ONE") {
 					call note(DQ ^ (mastertypecode ^ DQ) ^ " - invalid master activity code in upd.analysis2");
 				}

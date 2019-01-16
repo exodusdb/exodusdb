@@ -1498,7 +1498,7 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 	{
 		var dictfilename;
 		if (mainfilename.substr(1,5).lcase()== L"dict_")
-			dictfilename=L"dict_md";
+			dictfilename=L"dict_voc";
 		else
 			dictfilename=L"dict_"^mainfilename;
 
@@ -1509,7 +1509,7 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 
 		if (!actualdictfile.open(dictfilename, connid))
 		{
-			dictfilename=L"dict_md";
+			dictfilename=L"dict_voc";
 			if (!actualdictfile.open(dictfilename, connid))
 			{
 
@@ -1532,7 +1532,7 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 		{
 			if (!dictrec.read(actualdictfile,fieldname.ucase()))
 			{
-				if (not dictrec.read(L"dict_md", fieldname))
+				if (not dictrec.read(L"dict_voc", fieldname))
 				{
 					if (fieldname.ucase()==L"@ID")
 						dictrec = L"F" ^ FM ^ L"0" ^ FM ^ L"Ref" ^ FM ^ FM ^ FM ^ FM ^ FM ^ FM ^ L"L" ^ FM ^ 15;
@@ -1966,6 +1966,9 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 
 	var maxnrecs=L"";
 
+	if (!sortselectclause)
+		throw MVDBException(L"sort/select statement cannot be null");
+
 	var remainingsortselectclause=sortselectclause;
 //remainingsortselectclause.outputl(L"remainingsortselectclause=");
 
@@ -2237,7 +2240,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	//assemble the full sql select statement:	//ALN:TODO: optimize with stringbuffer
 
 	//WITH HOLD is a very significant addition
-	var sql=L"DECLARE cursor1_" ^ (*this) ^ L" CURSOR WITH HOLD FOR SELECT " ^ actualfieldnames ^ L" FROM ";
+	//var sql=L"DECLARE cursor1_" ^ (*this) ^ L" CURSOR WITH HOLD FOR SELECT " ^ actualfieldnames ^ L" FROM ";
+	var sql=L"DECLARE cursor1_" ^ (*this) ^ L" SCROLL CURSOR WITH HOLD FOR SELECT " ^ actualfieldnames ^ L" FROM ";
 	sql ^= PGDATAFILEPREFIX ^ actualfilename;
 	if (joins)
 		sql ^= L" " ^ joins;
@@ -2339,8 +2343,9 @@ bool readnextx(const var& cursor, PGresultptr& pgresult, PGconn* pgconn)
 	//sqlexec();
 	if (!pqexec(sql,pgresult, pgconn)) {
 
-		var(PQresultErrorMessage(pgresult)).outputl(L"readnextx error=");
-
+		var errmsg=var(PQresultErrorMessage(pgresult));
+		PQclear(pgresult);
+		throw MVDBException(errmsg);
 		cursor.clearselect();
 		return false;
 	}
@@ -2353,6 +2358,83 @@ bool readnextx(const var& cursor, PGresultptr& pgresult, PGconn* pgconn)
 		cursor.clearselect();
 		return false;
 	}
+	return true;
+}
+
+bool var::hasnext() const
+{
+
+	//?allow undefined usage like var xyz=xyz.readnext();
+	if (var_mvtyp&mvtypemask)
+	{
+		//throw MVUndefined(L"selectx()");
+		var_mvstr=L"";
+		var_mvtyp=pimpl::MVTYPE_STR;
+	}
+
+	THISIS(L"bool var::hasnext() const")
+	THISISSTRING()
+
+	PGconn* pgconn=(PGconn*) connection();
+	if (pgconn==NULL) {
+		//this->clearselect();
+		return false;
+	}
+
+	PGresultptr pgresult;
+
+	var sql;
+
+	sql=L"FETCH NEXT FROM cursor1_" ^ var_mvstr;
+
+	//execute the sql
+	//cant use sqlexec here because we need data
+	if (!pqexec(sql,pgresult, pgconn)) {
+		var errmsg=var(PQresultErrorMessage(pgresult));
+		PQclear(pgresult);
+		throw MVDBException(errmsg);
+		//cursor.clearselect();
+		return false;
+	}
+
+	//return false if could not fetch next
+	if (PQntuples(pgresult) < 1)
+	{
+		PQclear(pgresult);
+		//cursor.clearselect();
+		return false;
+	}
+
+	PQclear(pgresult);
+
+
+	/////////////////////////////////
+	//now restore the cursor back one
+	/////////////////////////////////
+
+	sql=L"FETCH BACKWARD FROM cursor1_" ^ var_mvstr;
+
+	//execute the sql
+	//cant use sqlexec here because we need data
+	if (!pqexec(sql,pgresult, pgconn)) {
+		var errmsg=var(PQresultErrorMessage(pgresult)) ^ L" - Error fetching backward in hasnext " ^ var_mvstr;
+		PQclear(pgresult);
+		throw MVDBException(errmsg);
+		//cursor.clearselect();
+		return false;
+	}
+
+	//error if could not move back
+	/*if (PQntuples(pgresult) < 1)
+	{
+		var errmsg=L"Could not fetch backward in hasnext " ^ var_mvstr;
+		PQclear(pgresult);
+		throw MVDBException(errmsg);
+		//cursor.clearselect();
+		return false;
+	}*/
+
+	PQclear(pgresult);
 	return true;
 }
 
@@ -2414,7 +2496,7 @@ bool var::readnext(var& key, var& valueno) const
 	PGconn* pgconn=(PGconn*) connection();
 	if (pgconn==NULL) {
 		this->clearselect();
-		return L"";
+		return false;
 	}
 
 	PGresultptr pgresult;

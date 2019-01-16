@@ -72,9 +72,9 @@ function main(out localdate, out localtime, out sysdate, out systime, out utcdat
 		}
 	}
 
-	/////
+/////
 exit:
-	/////
+/////
 	if (SENTENCE == "GETDATETIME") {
 		var msg = "";
 		msg.r(-1, "User:   " ^ localdate.oconv("D"));

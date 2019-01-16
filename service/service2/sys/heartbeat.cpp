@@ -94,7 +94,7 @@ function main(in mode, in status0="") {
 
 	//2. check if should logoff
 
-	if ((SYSTEM.a(17) ^ ".END").osfile() or var("GLOBAL.END").osfile() or ("..\\..\\" ^ SYSTEM.a(123) ^ ".END").osfile()) {
+	if ((((SYSTEM.a(17) ^ ".END").osfile()) or var("GLOBAL.END").osfile()) or (("..\\..\\" ^ SYSTEM.a(123) ^ ".END").osfile())) {
 		perform("OFF");
 		var().logoff();
 	}

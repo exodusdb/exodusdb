@@ -17,7 +17,7 @@ function main() {
 		var().stop();
 	}
 
-	agy.agp.r(1, (agy.agp.a(1)).invert());
+	agy.agp.r(1, agy.agp.a(1).invert());
 	SYSTEM.r(14, agy.agp.a(1));
 	SYSTEM.r(36, agy.agp.a(1));
 	//always splitextras now
@@ -47,12 +47,12 @@ function main() {
 	}
 
 	//force CYP market code code
-	if (agy.agp.a(37) == "" and agy.agp.a(2) == "CYP") {
+	if ((agy.agp.a(37) == "") and (agy.agp.a(2) == "CYP")) {
 		agy.agp.r(37, "CYP");
 	}
 
 	//rounding Tamra
-	if (agy.agp.a(32) == "" and (gen.company.a(1)).index("Tamra", 1)) {
+	if ((agy.agp.a(32) == "") and gen.company.a(1).index("Tamra", 1)) {
 		agy.agp.r(32, "1");
 	}
 
@@ -87,7 +87,7 @@ function main() {
 		//fix market weekend from agp<95> or agp<13> if present
 		if (market.a(9) == "") {
 			var weekenddows = agy.agp.a(95);
-			if (weekenddows == "" and agy.agp.a(13)) {
+			if ((weekenddows == "") and agy.agp.a(13)) {
 				weekenddows = agy.agp.a(13);
 				if (marketcode == "UAE") {
 					weekenddows.r(1, 1, -1, agy.agp.a(13) + 1);
@@ -107,12 +107,12 @@ function main() {
 	}
 
 	//last day of week defaults to sunday
-	if (not agy.agp.a(13)) {
+	if (not(agy.agp.a(13))) {
 		agy.agp.r(13, 7);
 	}
 
 	//highlight day of week defaults to last day of week
-	if (not agy.agp.a(104)) {
+	if (not(agy.agp.a(104))) {
 		agy.agp.r(104, agy.agp.a(13));
 	}
 
@@ -126,17 +126,17 @@ function main() {
 	//following companies invoice everything
 	if (agy.agp.a(30) == "") {
 		agy.agp.r(30, 1);
-		if ((gen.company.a(1)).index("BBDO", 1)) {
+		if (gen.company.a(1).index("BBDO", 1)) {
 			agy.agp.r(30, "");
 		}
-		if ((gen.company.a(1)).index("CSS", 1)) {
+		if (gen.company.a(1).index("CSS", 1)) {
 			agy.agp.r(30, "");
 		}
 	}
 
 	//default media cost provision ledger
 	if (agy.agp.a(25) == "") {
-		if ((gen.company.a(1)).index("Impact", 1)) {
+		if (gen.company.a(1).index("Impact", 1)) {
 			agy.agp.r(25, "AL%1%");
 		}
 		//if agp<25>='' then agp<25>='ACC%1%'
@@ -286,7 +286,7 @@ function main() {
 	}
 
 	if (agy.agp.a(89) == "") {
-		if ((agy.agp.a(1).ucase()).index("ADLINE", 1)) {
+		if (agy.agp.a(1).ucase().index("ADLINE", 1)) {
 			//0/30/60/90/99999
 			//4.5/4/3.5/3/2
 			agy.agp.r(89, 0 ^ VM ^ 30 ^ VM ^ 60 ^ VM ^ 90 ^ VM ^ 9999);
@@ -303,7 +303,7 @@ function main() {
 	//font size (defaulting booking order to 80% from 2011/12/02 (was 100%)
 	//agp<116>
 	for (var ii = 1; ii <= 4; ++ii) {
-		if (not agy.agp.a(116, ii)) {
+		if (not(agy.agp.a(116, ii))) {
 			agy.agp.r(116, ii, "80");
 		}
 	};//ii;

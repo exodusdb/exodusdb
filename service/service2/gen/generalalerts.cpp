@@ -12,7 +12,7 @@ function main(in alerttype0, in runasuser, out tasks, out title, out request, ou
 	//CREATEALERT CURRUSERS GENERAL CURRUSERS 7:14 NEOSYS (ROS)
 
 	var alerttype = alerttype0.field(":", 1);
-	var alertoptions = (alerttype0.field(":", 2, 9999)).convert(":", FM);
+	var alertoptions = alerttype0.field(":", 2, 9999).convert(":", FM);
 	if (runasuser.unassigned()) {
 		{}
 	}

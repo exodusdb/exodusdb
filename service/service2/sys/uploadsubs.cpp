@@ -14,7 +14,6 @@ libraryinit()
 var filename;
 var key;
 var msg;
-var rec;
 var file;
 var ii;//num
 var errors;
@@ -63,7 +62,8 @@ function main(in mode) {
 			return invalid(msg);
 		}
 
-		if (not rec.read(file, key)) {
+		var rec;
+		if (not(rec.read(file, key))) {
 			msg = "upload.subs cannot read " ^ filename ^ " " ^ key;
 postuploadfail:
 			gosub unlockfile();
@@ -87,11 +87,11 @@ postuploadfail:
 			fns.r(ii, fn);
 		};//ii;
 
-		ii = (rec.a(fns.a(1))).count(VM) + (rec.a(fns.a(1)) ne "");
+		ii = rec.a(fns.a(1)).count(VM) + (rec.a(fns.a(1)) ne "");
 		rec.r(fns.a(1), ii, targetfilename);
 		rec.r(fns.a(2), ii, newstatus);
 		rec.r(fns.a(3), ii, USERNAME);
-		rec.r(fns.a(4), ii, var().date() ^ "." ^ (var().time()).oconv("R(0)#5"));
+		rec.r(fns.a(4), ii, var().date() ^ "." ^ var().time().oconv("R(0)#5"));
 		rec.r(fns.a(5), ii, STATION);
 
 		rec.write(file, key);
@@ -126,7 +126,7 @@ postuploadfail:
 			return 0;
 		}
 
-		if ((uploadpath.substr(3,99999)).index("..", 1)) {
+		if (uploadpath.substr(3,99999).index("..", 1)) {
 			msg = DQ ^ (uploadpath ^ DQ) ^ " ..  is not allowed";
 			gosub unlockfile();
 			return invalid(msg);
@@ -144,7 +144,7 @@ postuploadfail:
 
 		//ok if any files found
 		//initdir uploadroot:uploadpath:'*.*'
-		//if dirlist() then return 0
+		//if dirlist() then return
 		if (oslistf(uploadroot ^ uploadpath ^ "*.*")) {
 			return 0;
 		}
@@ -198,7 +198,7 @@ postuploadfail:
 		//initdir uploadroot:uploadpath
 		//if dirlist() else
 		var tt = (shell2("dir " ^ (DQ ^ (uploadroot ^ uploadpath ^ DQ)) ^ " /b", errors)).ucase();
-		if (tt == "" or tt.index("FILE NOT FOUND", 1)) {
+		if ((tt == "") or tt.index("FILE NOT FOUND", 1)) {
 			msg = "Error: Nothing uploaded in " ^ uploadroot ^ uploadpath;
 			return invalid(msg);
 		}
@@ -228,7 +228,7 @@ postuploadfail:
 		}
 		dirpatt ^= "*";
 
-		if ((dirpatt.substr(3,99999)).index("..", 1)) {
+		if (dirpatt.substr(3,99999).index("..", 1)) {
 			msg = DQ ^ (dirpatt ^ DQ) ^ " .. is not allowed";
 			return invalid(msg);
 		}
@@ -300,13 +300,13 @@ postuploadfail:
 		//initdir uploadroot:uploadpath
 		//if dirlist() else
 		var tt = (shell2("dir " ^ (DQ ^ (uploadroot ^ uploadpath ^ DQ)) ^ " /b", errors)).ucase();
-		if (tt == "" or tt.index("FILE NOT FOUND", 1)) {
+		if ((tt == "") or tt.index("FILE NOT FOUND", 1)) {
 			msg = "Error: Nothing uploaded in " ^ uploadroot ^ uploadpath;
 			return invalid(msg);
 		}
 
 		tt = uploadroot ^ uploadpath;
-		if ((tt.substr(3,99999)).index("..", 1)) {
+		if (tt.substr(3,99999).index("..", 1)) {
 			msg = DQ ^ (tt ^ DQ) ^ " .. is not allowed";
 			return invalid(msg);
 		}
@@ -340,7 +340,7 @@ postuploadfail:
 		var validating = RECORD.a(17);
 		osfile = "";
 
-		if ((uploadpath.substr(3,99999)).index("..", 1)) {
+		if (uploadpath.substr(3,99999).index("..", 1)) {
 			msg = DQ ^ (uploadpath ^ DQ) ^ " .. is not allowed";
 			return invalid(msg);
 		}
@@ -378,7 +378,7 @@ postuploadfail:
 		// goto invalid
 		// end
 
-		temposfilename83 = SYSTEM.a(24) ^ var(1000000).rnd().substr(1,8) ^ ".$IM";
+		temposfilename83 = (SYSTEM.a(24) ^ var(1000000).rnd()).substr(1,8) ^ ".$IM";
 
 		msg = DQ ^ (uploadroot ^ uploadpath ^ DQ) ^ "\r\n";
 		msg = "Uploaded file cannot be found/copied" "\r\n";
@@ -396,7 +396,7 @@ postuploadfail:
 			return 0;
 		}
 
-		if (not osfile.osopen(temposfilename83)) {
+		if (not(osfile.osopen(temposfilename83))) {
 			gosub invalid(msg);
 			gosub cleanup();
 			return 0;
@@ -412,8 +412,8 @@ postuploadfail:
 		while (true) {
 			gosub getline();
 		///BREAK;
-		if (not not eof) break;;
-			if (line and LINENO >= startatrown) {
+		if (not(not eof)) break;;
+			if (line and (LINENO >= startatrown)) {
 
 				//determine cols from first col heading
 				if (not cols) {
@@ -463,7 +463,7 @@ postuploadfail:
 							dictrec.r(2, coln + fieldoffset);
 							dictrec.r(3, capitalise(cols.a(coln, 1)));
 							dictrec.r(10, "10");
-							var dictid = dictcolprefix ^ "_" ^ (cols.a(coln, 1).convert(" ", "_")).ucase();
+							var dictid = dictcolprefix ^ "_" ^ cols.a(coln, 1).convert(" ", "_").ucase();
 
 							var CONV = "";
 							var just = "L";
@@ -487,7 +487,7 @@ postuploadfail:
 							grec ^= " " ^ dictid;
 							dictrec.write(dictfile, dictid);
 						};//coln;
-						write("G" ^ FM ^ FM ^ grec, dictfile, dictcolprefix);
+						("G" ^ FM ^ FM ^ grec).write(dictfile, dictcolprefix);
 
 						if (keyfunction) {
 							if (not keydictid) {
@@ -503,7 +503,7 @@ postuploadfail:
 
 					}else{
 
-						rec = "";
+						var rec = "";
 						for (var coln = 1; coln <= ncols; ++coln) {
 							var col = cols.a(coln);
 							var cell = line.substr(col.a(1, 2),col.a(1, 3)).trimb();
@@ -519,7 +519,7 @@ postuploadfail:
 									}else{
 										cell = cell.iconv(CONV);
 									}
-									if (not cell.length()) {
+									if (not(cell.length())) {
 										call mssg(DQ ^ (cell0 ^ DQ) ^ " cannot be converted in line " ^ LINENO ^ " col " ^ coln);
 										//indicate strange but leave workable date/time
 										cell = "00";
@@ -577,9 +577,9 @@ subroutine cleanup() {
 }
 
 subroutine getline() {
-	call osbread(line, osfile, fileoffset, lengthx);
+	call osbread(line, osfile,  fileoffset, lengthx);
 
-	if (not line.length()) {
+	if (not(line.length())) {
 		eof = 1;
 		return;
 	}
@@ -621,7 +621,7 @@ subroutine lockfile() {
 	}
 
 	var waitsecs = 3;
-	if (not lockrecord(filename, file, key, recordx, waitsecs, allowduplicate)) {
+	if (not(lockrecord(filename, file, key, recordx, waitsecs, allowduplicate))) {
 		gosub unlockfile();
 		msg = "Cannot upload at the moment because";
 		msg.r(-1, filename ^ " " ^ (DQ ^ (key ^ DQ)) ^ " is being updated by ");

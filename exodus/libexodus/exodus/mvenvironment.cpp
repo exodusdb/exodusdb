@@ -168,6 +168,8 @@ bool MvEnvironment::init(const int threadno) {
         this->INDEXTIME=L"";
 	this->LEVEL=L"";
 
+	this->VOLUMES=L"";
+
 	int fd;//memory leak unless closed in mvenvironment destructor;
 	this->PROCESSNO=getprocessno("/tmp/exodus", &fd);
 

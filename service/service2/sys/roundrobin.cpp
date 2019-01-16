@@ -1,12 +1,14 @@
 #include <exodus/library.h>
 libraryinit()
 
-//#include <esctoexit.h>
 #include <roundrobin.h>
 
 #include <gen.h>
 
-function main(in mode, in params0, io msg, io result) {
+var errormsg;
+
+function main(in mode, in params, io result, io msg) {
+	//c sys in,in,io,io
 
 	//output:
 	//empty = ok
@@ -26,34 +28,26 @@ function main(in mode, in params0, io msg, io result) {
 	//field 1 = the last minute that was updated
 	//field 2 = 60 multivalues for minutes of the hour
 
-	var params;
-	if (params0.unassigned())
-		params="";
-	else
-		params=params0;
-
 	if (mode == "TEST") {
 
 		//here we have maximum of 6 events per last 6x6 seconds
-		params = "";
-		params.r(1, 6);
-		params.r(2, 6);
-		params.r(3, 6);
-		params.r(4, "DOS");
-		params.r(5, "TEST.DAT");
-		//osdelete params<5>
+		var params2 = "";
+		params2.r(1, 6);
+		params2.r(2, 6);
+		params2.r(3, 6);
+		params2.r(4, "DOS");
+		params2.r(5, "TEST.DAT");
+		//osdelete params2<5>
 
 		printl();
 		while (true) {
 		///BREAK;
 		if (not(not esctoexit())) break;;
-			ossleep(int(rnd(3000)));
-			call roundrobin("ONEVENT", params, result, msg);
+			call ossleep(1000*var(3).rnd());
+			call roundrobin("ONEVENT", params2, result, errormsg);
 		}//loop;
 
-		return 1;
-	}
-	if (mode == "ONEVENT") {
+	} else if (mode == "ONEVENT") {
 
 		var verbs;
 		if (not(verbs.open("VERBS", ""))) {
@@ -109,7 +103,7 @@ function main(in mode, in params0, io msg, io result) {
 		roundrobin.r(1, currentperiodn);
 		var currentbreakn = currentperiodn % params.a(2) + 1;
 
-		if ((roundrobin.a(2)).sum() < params.a(3)) {
+		if (roundrobin.a(2).sum() < params.a(3)) {
 
 			result = 1;
 
@@ -134,7 +128,7 @@ function main(in mode, in params0, io msg, io result) {
 		call unlockrecord("VERBS", verbs, roundrobinlock);
 
 	}
-
+//L556:
 	return 0;
 
 }

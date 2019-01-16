@@ -1,84 +1,167 @@
 #include <exodus/library.h>
 libraryinit()
 
-var value;
-var lockmode;//num
-var unlockmode;//num
+#include <rtp57.h>
 
-function main(in databasecode="") {
+var databasecode;
+var usercode;//num
+var lockprefix;
+var result;
+var xx;
+var yy;
+var zz;
+
+function main(in databasecode0="", in usercode0="") {
+	//c sys "",""
 
 	//returns the number of other users of NEOSYS
-	//by attempting to lock process numbers in the PROCESSES file
 
-	//open PROCESSES file or indicate no other users
-	var processes = "";
-	if (processes == "") {
-		if (not(processes.open("PROCESSES", ""))) {
-			processes = 0;
-			return "";
+	//global xx,yy,result
+
+	if (SENTENCE.field(" ", 1) == "OTHERUSERS") {
+		databasecode = SENTENCE.field(" ", 2);
+	}else{
+		if (databasecode0.unassigned()) {
+			databasecode = "";
+		}else{
+			databasecode = databasecode0;
 		}
 	}
+	if (usercode0.unassigned()) {
+		usercode = "";
+	}else{
+		usercode = usercode0;
+	}
 
-	var lockprefix="processlock-";
+	var processes = "";
 
-	var ownprocessno = SYSTEM.a(24);
-	var ownlockid = lockprefix^ownprocessno;
-	var returndata = FM ^ FM ^ ownprocessno;
+	//curruserlockid.sys134=sysvar('GET',109,134)
+	var curruserlockid = PROCESSNO;
 
-	var notherprocesses = 0;
+	var returndata = 0;
 	var otherusercodes = "";
 
-	for (var processno = 1; processno <= 100; ++processno) {
+	//IF @STATION # '' THEN
 
-		var lockid = lockprefix ^ processno;
+	//we are at rev 2.0
+	//IF revRELEASE()>= 2.1 THEN
+	// lockmode=36
+	// unlockmode=37
+	//END ELSE
+	var lockmode = 23;
+	var unlockmode = 24;
+	// END
 
-		//if can lock and no process then become that processno
-		//assume no other process on this number
-		if (processes.lock(lockid)) {
-
-			//become that processno and leave it locked
-			if (not ownprocessno) {
-				ownprocessno=processno;
-				SYSTEM.r(24, processno);
-				ownlockid = lockprefix^ownprocessno;
-printl("Became process ", ownprocessno);
-			} else
-				//unlock - unused processno
-				processes.unlock(lockid);
-
-		//if cant lock
-		}else{
-
-			if (lockid == ownlockid)
-				continue;
-
-			//skip processes in wrong database
-			if (databasecode) {
-				if (processes) {
-					var process;
-					if (process.read(processes, processno)) {
-						if (process.a(17) ne databasecode) {
-							continue;
-						}
-					}else{
-						//if no process record then assume no process
-						//and failed lock because another OTHERUSERS is testing the same lock
-						//could really skip further checking since should not be
-						//any higher processes but lock fail on missing process is infrequent
-						//but does happen when with many eg 10+ processes on diff dbs
-						continue;
-					}
-				}
-			}
-			returndata.r(1, returndata.a(1)+1);
-			returndata.inserter(2,-1,processno);
-		}
-
+	if (curruserlockid.isnum()) {
+		lockprefix = "";
+	}else{
+		lockprefix = "U" ^ var("99999").substr(-4,4);
 	}
 
-	returndata.r(3, ownprocessno);
+	//FOR lockno = 1 TO RUNTIME();*SYSE3_NUSERS
+
+	for (var lockno = 1; lockno <= 100; ++lockno) {
+
+		var lockid = lockprefix ^ lockno;
+
+		//skip current user
+		if (lockid == curruserlockid) {
+			goto nextlock;
+		}
+
+		//skip 10,20,100 etc because they appear to be equivalent to
+		// their equivalents without trailing zeroes
+		if ((lockno[-1] == "0") and lockprefix) {
+			goto nextlock;
+		}
+
+		lockid = lockprefix ^ lockno;
+		//IF lockid # SYS134 THEN
+
+		//attempt to lock
+		result = "";
+		xx = "";
+		yy = "";
+		call rtp57(lockmode, "", xx, lockid, "", yy, result);
+
+		//if successful, then unlock
+		if (result) {
+			xx = "";
+			yy = "";
+			call rtp57(unlockmode, "", xx, lockid, "", yy, zz);
+			goto nextlock;
+		}
+
+		//check process records
+
+		//skip processes in wrong database or wrong usercode
+		if (databasecode or usercode) {
+
+			if (processes == "") {
+				if (not(processes.open("PROCESSES", ""))) {
+					processes = 0;
+				}
+			}
+			if (processes) {
+				var processno = lockno - (lockno / 10).floor();
+				var process;
+				if (not(process.read(processes, processno))) {
+					//if no process record then assume no process
+					//and failed lock because another OTHERUSERS is testing the same lock
+					//could really skip further checking since should not be
+					//any higher processes but lock fail on missing process is infrequent
+					//but does happen when with many eg 10+ processes on diff dbs
+					goto nextlock;
+				}
+
+				if (databasecode and process.a(17) ne databasecode) {
+					goto nextlock;
+				}
+
+				if (usercode and process.a(40, 10) ne usercode) {
+					goto nextlock;
+				}
+
+			}
+
+			//end of database or user code provided
+		}
+
+		otherusercodes.r(1, -1, lockid);
+
+		returndata += 1;
+
+nextlock:;
+	};//lockno;
+
+	returndata -= 1;
+	if (returndata < 0) {
+		returndata = 0;
+	}
+
+	if (returndata) {
+		returndata.r(2, otherusercodes);
+		returndata.r(3, curruserlockid);
+	}
+
+	for (var ii = 1; ii <= 9999; ++ii) {
+		usercode = returndata.a(2, ii);
+	///BREAK;
+	if (not usercode) break;;
+		usercode = usercode.substr(6,9999);
+		if (not(curruserlockid.isnum())) {
+			usercode -= (usercode / 10).floor();
+		}
+		returndata.r(2, ii, "PROCESS" ^ usercode);
+	};//ii;
+
+	if (SENTENCE.field(" ", 1) == "OTHERUSERS") {
+		call note(returndata.a(1) ^ " other users");
+	}
+
 	return returndata;
 
 }
+
 
 libraryexit()

@@ -135,6 +135,7 @@ forcedemail:
 		//for the duration of the request
 		} else if (SYSTEM.a(117)) {
 			forcedemailx = SYSTEM.a(117);
+			goto forcedemail;
 		}
 //L560:
 	}

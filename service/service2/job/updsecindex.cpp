@@ -43,7 +43,7 @@ function main(in mode, in filename, io keys, in fieldnames, in oldvalues, in new
 	} else if (mode == "INDEXINGUNLOCK") {
 		call unlockrecord("!INDEXING", indexingfile, indexingkey);
 
-	} else if (mode == "LOCK" or mode == "UNLOCK" or mode == "UPDATE") {
+	} else if (((mode == "LOCK") or (mode == "UNLOCK")) or (mode == "UPDATE")) {
 
 		var file;
 		if (not(file.open(filename, ""))) {
@@ -64,7 +64,7 @@ function main(in mode, in filename, io keys, in fieldnames, in oldvalues, in new
 			var keyx = keys.a(keyn);
 
 			if (mode == "LOCK") {
-				if (not lockrecord(filename, file, keyx, RECORD, secstowaitforlock)) {
+				if (not(lockrecord(filename, file, keyx, RECORD, secstowaitforlock))) {
 
 					//!!!! return only locked keys
 					if (keyn == 1) {
@@ -105,7 +105,7 @@ function main(in mode, in filename, io keys, in fieldnames, in oldvalues, in new
 		};//keyn;
 
 		//update
-		if (mode == "UPDATE" and upd ne "") {
+		if ((mode == "UPDATE") and upd ne "") {
 
 			var fileaccount = filename.xlate("FILES", 3, "X");
 			var filevolume = filename.xlate("FILES", 1, "X");
@@ -114,7 +114,7 @@ function main(in mode, in filename, io keys, in fieldnames, in oldvalues, in new
 			//list:= 'YYY*ADAGENCY*22:06:18 18 JAN 2004':@FM:YYY.CNT:@FM:YYY.UPD
 			indexinglist ^= filename ^ "*" ^ fileaccount ^ "*" ^ volid ^ FM ^ cnt ^ FM ^ upd;
 
-			if (not indexingrecord.read(indexingfile, indexingkey)) {
+			if (not(indexingrecord.read(indexingfile, indexingkey))) {
 				indexingrecord = "0";
 			}
 

@@ -3,7 +3,6 @@ libraryinit()
 
 #include <authorised.h>
 #include <sortarray.h>
-#include <trim2.h>
 #include <systemfile.h>
 #include <usersubs.h>
 #include <generalsubs.h>
@@ -599,12 +598,12 @@ function main(in mode) {
 
 					var visiblekeys = RECORD.a(2).field(VM, win.registerx(8), nn);
 					visiblekeys.converter(",", VM);
-					visiblekeys = trim2(visiblekeys, VM);
+					visiblekeys = trim(visiblekeys, VM);
 
 					var invisiblekeys = RECORD.a(2).field(VM, 1, win.registerx(8));
 					invisiblekeys ^= VM ^ RECORD.a(2).field(VM, win.registerx(9) + 1, 9999);
 					invisiblekeys.converter(",", VM);
-					invisiblekeys = trim2(invisiblekeys, VM);
+					invisiblekeys = trim(invisiblekeys, VM);
 
 					var otherkeys = "";
 					if (invisiblekeys) {
@@ -1801,30 +1800,30 @@ subroutine getemailtx() {
 	//build up log email for sysmsg
 	var tx = "";
 	for (var fieldn = 1; fieldn <= nuserfields; ++fieldn) {
-		var fieldxx = userfields.a(fieldn);
-		var fn = fieldxx.a(1, 2);
-		var old = origuserrec.a(fn).oconv(fieldxx.a(1, 3));
-		var newxx = userrec.a(fn).oconv(fieldxx.a(1, 3));
-		if (newxx ne old) {
+		var fieldx = userfields.a(fieldn);
+		var fn = fieldx.a(1, 2);
+		var old = origuserrec.a(fn).oconv(fieldx.a(1, 3));
+		var newx = userrec.a(fn).oconv(fieldx.a(1, 3));
+		if (newx ne old) {
 			var was = "was:";
 			//dedup ipnos and keys
 			if (not isnew and (((fn == 40) or (fn == 41)))) {
-				call dedup("", old, newxx, " ,");
-				if (newxx) {
-					newxx = "added " ^ newxx;
+				call dedup("", old, newx, " ,");
+				if (newx) {
+					newx = "added " ^ newx;
 				}
 				if (old) {
 					old = "removed " ^ old;
 				}
-				if (not(newxx.length())) {
-					old.transfer(newxx);
+				if (not(newx.length())) {
+					old.transfer(newx);
 				}
 				was = "";
 			}
-			if ((newxx ^ old).length()) {
-				tx.r(-1, (fieldxx.a(1, 1) ^ ":").oconv("L#10"));
-				tx ^= newxx;
-				if (old or ((newxx and not isnew))) {
+			if ((newx ^ old).length()) {
+				tx.r(-1, (fieldx.a(1, 1) ^ ":").oconv("L#10"));
+				tx ^= newx;
+				if (old or ((newx and not isnew))) {
 					tx.r(-1, was.oconv("R#10") ^ old);
 				}
 			}

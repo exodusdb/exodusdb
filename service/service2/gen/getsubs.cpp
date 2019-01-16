@@ -106,7 +106,7 @@ nextdoc:
 		// end
 
 		//user can always modify own reports
-		if (win.wlocked and RECORD.a(1) and RECORD.a(1) ne USERNAME) {
+		if ((win.wlocked and RECORD.a(1)) and RECORD.a(1) ne USERNAME) {
 
 			//check if allowed to modify
 			if (taskprefix) {
@@ -118,7 +118,7 @@ nextdoc:
 			}
 
 			//always prevent users from editing documents designed by NEOSYS
-			if ((RECORD.a(1)).index("NEOSYS", 1) and not USERNAME.index("NEOSYS", 1)) {
+			if (RECORD.a(1).index("NEOSYS", 1) and not USERNAME.index("NEOSYS", 1)) {
 				call mssg("You cannot modify report designs created by NEOSYS|Use the Copy button to copy them and modify the copy");
 				xx = unlockrecord(win.datafile, win.srcfile, ID);
 				win.wlocked = 0;
@@ -129,7 +129,7 @@ nextdoc:
 		RECORD.r(101, raise(RECORD.a(6)));
 
 		if (RECORD.a(8) == "") {
-			RECORD.r(8, RECORD.a(3) ^ "." ^ (RECORD.a(4)).oconv("R(0)#5"));
+			RECORD.r(8, RECORD.a(3) ^ "." ^ RECORD.a(4).oconv("R(0)#5"));
 		}
 
 	} else if (mode == "PREWRITE") {
@@ -164,7 +164,7 @@ nextdoc:
 		//this is also done in copygbp perhaps could be removed from there
 		//almost identical code in definition.subs and get.subs (for documents)
 		//field 10 in documents and definitions xxx*analdesign means the same
-		if (USERNAME == "NEOSYS" and RECORD.a(10)) {
+		if ((USERNAME == "NEOSYS") and RECORD.a(10)) {
 			var reports;
 			if (reports.open("REPORTS", "")) {
 				var key = ID;
@@ -191,7 +191,7 @@ nextdoc:
 			}
 
 			//always prevent users from deleting documents designed by NEOSYS
-			if ((RECORD.a(1)).index("NEOSYS", 1) and not USERNAME.index("NEOSYS", 1)) {
+			if (RECORD.a(1).index("NEOSYS", 1) and not USERNAME.index("NEOSYS", 1)) {
 				msg = "You cannot delete report designs created by NEOSYS";
 				return invalid(msg);
 			}
@@ -201,7 +201,7 @@ nextdoc:
 		//update neosys standard (in case doing this on the programming system)
 		//%DELETED% ensures that deleted NEOSYS documents get deleted
 		//on upgrading clients
-		if (USERNAME == "NEOSYS" and RECORD.a(10)) {
+		if ((USERNAME == "NEOSYS") and RECORD.a(10)) {
 			var reports;
 			if (reports.open("REPORTS", "")) {
 				var key = ID;

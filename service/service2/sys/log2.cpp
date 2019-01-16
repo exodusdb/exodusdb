@@ -5,7 +5,6 @@ libraryinit()
 
 var logfile;
 var datax;
-var tt;
 var time2;//num
 
 function main(in msg0, io time0) {
@@ -13,7 +12,7 @@ function main(in msg0, io time0) {
 
 	var interactive = not SYSTEM.a(33);
 	if (interactive) {
-//		return 0;
+		return 0;
 	}
 
 	//logfilename=field(FIELD2(@rollout.file,'\',-1),'.',1):'.LOG'
@@ -24,13 +23,13 @@ function main(in msg0, io time0) {
 		call oswrite("", logfilename);
 	}
 	var temposfilename83 = logfilename;
-	if (not logfile.osopen(logfilename)) {
+	if (not(logfile.osopen(logfilename))) {
 		return 0;
 	}
 
 	if (msg0 == "GETLASTLOG") {
 		var ptr = logfilelength - 1024;
-		call osbread(datax, logfile, tt, 1024);
+		call osbread(datax, logfile,  ptr, 1024);
 		logfile.osclose();
 		datax.converter("\r\n", FM ^ FM);
 		time0 = logfilename ^ " " ^ field2(datax, FM, -3, 3);
@@ -55,7 +54,7 @@ function main(in msg0, io time0) {
 
 	time0 = time2;
 
-	call osbwrite(entry, logfile, logfilelength);
+	call osbwrite(entry, logfile,  logfilelength);
 	logfile.osclose();
 
 	return 0;

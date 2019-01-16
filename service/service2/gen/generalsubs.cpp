@@ -70,7 +70,7 @@ function main(in mode0) {
 		}
 		var recordn = 0;
 nextrecord:
-		if (not readnext(ID)) {
+		if (not(readnext(ID))) {
 			return 0;
 		}
 		if (ID[1] == "%") {
@@ -78,7 +78,7 @@ nextrecord:
 		}
 		recordn += 1;
 		print(var().at(0), var().at(-4), recordn, ". ", ID);
-		if (not RECORD.read(win.srcfile, ID)) {
+		if (not(RECORD.read(win.srcfile, ID))) {
 			goto nextrecord;
 		}
 		win.orec = "";
@@ -108,7 +108,7 @@ nextrecord:
 
 		gosub getdatasets();
 
-		if (not datasetcodes.a(1).locateusing(win.is, VM, xx)) {
+		if (not(datasetcodes.a(1).locateusing(win.is, VM, xx))) {
 			msg = DQ ^ (win.is ^ DQ) ^ " is not a dataset";
 			return invalid(msg);
 		}
@@ -168,13 +168,13 @@ nextrecord:
 			return 0;
 		}
 		gosub getdepts();
-		if (not depts.locateusing(win.is, FM, xx)) {
+		if (not(depts.locateusing(win.is, FM, xx))) {
 			msg = DQ ^ (win.is ^ DQ) ^ " IS NOT A VALID DEPARTMENT";
 			return invalid(msg);
 		}
 
 	} else if (mode == "VAL.EXCH.RATE") {
-		if (win.is.substr(1,2) == "1/" or win.is[1] == "/") {
+		if ((win.is.substr(1,2) == "1/") or (win.is[1] == "/")) {
 			tt = win.is.field("/", 2);
 			if (tt and tt.isnum()) {
 				win.is = ((1 / win.is.substr(3,99)).oconv("MD90P")) + 0;
@@ -184,14 +184,14 @@ badexchrate:
 				return invalid(msg);
 			}
 		}else{
-			if (not win.is.isnum()) {
+			if (not(win.is.isnum())) {
 				goto badexchrate;
 			}
 		}
 
-	} else if (mode.field(".", 1, 2) == "DEF.SK" or mode.field(".", 1, 2) == "DEF.SK2") {
+	} else if ((mode.field(".", 1, 2) == "DEF.SK") or (mode.field(".", 1, 2) == "DEF.SK2")) {
 
-		if (not win.wlocked or RECORD) {
+		if (not(win.wlocked or RECORD)) {
 			//is.dflt=nextkey(':%SK%:':datafile,'')
 
 			//special defaults for special files
@@ -200,7 +200,7 @@ badexchrate:
 				//ratecards
 				if (win.datafile == "RATECARDS") {
 					if (not(ID.field("*", 2))) {
-						ID = ID.fieldstore("*", 2, 1, ("1/1/" ^ ((var().date()).oconv("D2/E")).field("/", 3)).iconv("D2/E"));
+						ID = ID.fieldstore("*", 2, 1, ("1/1/" ^ var().date().oconv("D2/E").field("/", 3)).iconv("D2/E"));
 						win.isdflt = ID;
 						return 0;
 					}
@@ -214,7 +214,7 @@ badexchrate:
 				}
 
 				//schedules
-				if (win.datafile == "PLANS" or win.datafile == "SCHEDULES") {
+				if ((win.datafile == "PLANS") or (win.datafile == "SCHEDULES")) {
 					call plansubs5("DEF.REF." ^ mode.field(".", 3, 999));
 					win.isdflt = ID;
 					return 0;
@@ -289,16 +289,16 @@ next:
 	} else if (mode == "DEF.CURRENCY") {
 		if (win.is == "") {
 			win.is = gen.company.a(3);
-			if ((gen.company.a(1).ucase()).index("Promopub", 1)) {
+			if (gen.company.a(1).ucase().index("Promopub", 1)) {
 				win.is = "AED";
 			}
 		}
 
 	} else if (mode == "VAL.CURRENCY") {
-		if (not win.is) {
+		if (not(win.is)) {
 			return 0;
 		}
-		if (not xx.read(gen.currencies, win.is)) {
+		if (not(xx.read(gen.currencies, win.is))) {
 			msg = DQ ^ (win.is ^ DQ) ^ " - currency code not on file";
 			return invalid(msg);
 		}
@@ -309,7 +309,7 @@ next:
 		}
 
 	} else if (mode == "VAL.COMPANY") {
-		if (not win.is) {
+		if (not(win.is)) {
 			return 0;
 		}
 
@@ -317,7 +317,7 @@ next:
 			return invalid(msg);
 		}
 
-		if (not xx.read(gen.companies, win.is)) {
+		if (not(xx.read(gen.companies, win.is))) {
 			msg = DQ ^ (win.is ^ DQ) ^ " - company code not on file";
 			return invalid(msg);
 		}
@@ -327,7 +327,7 @@ next:
 
 			//do not validate if already on file
 			if (win.ww(win.wi).a(4) == 0) {
-				if (not win.wlocked and RECORD == "" and ID == "") {
+				if ((not win.wlocked and (RECORD == "")) and (ID == "")) {
 					if (RECORD.read(win.srcfile, win.is)) {
 						return 0;
 					}
@@ -357,15 +357,15 @@ next:
 
 subroutine getdepts() {
 	depts = "";
-	nusers = (SECURITY.a(1)).count(VM) + 1;
+	nusers = SECURITY.a(1).count(VM) + 1;
 	for (usern = 2; usern <= nusers + 1; ++usern) {
 		var text = SECURITY.a(1, usern);
-		if (text == "---" or text == "") {
+		if ((text == "---") or (text == "")) {
 			text = SECURITY.a(1, usern - 1);
 			text.converter("0123456789", "");
 			text.trimmer();
 			if (text and text ne "---") {
-				if (not depts.locateusing(text, FM, deptn)) {
+				if (not(depts.locateusing(text, FM, deptn))) {
 					depts.r(-1, text);
 				}
 			}
@@ -380,14 +380,14 @@ subroutine getdatasets() {
 	var dospath = oscwd().substr(1,2) ^ "..\\data\\";
 
 	var dosfilename = APPLICATION ^ ".vol";
-	if (not directory.osread(dosfilename)) {
+	if (not(directory.osread(dosfilename))) {
 		if (not(directory.osread(APPLICATION ^ ".vox"))) {
 			call mssg(APPLICATION ^ ".vol is missing");
 			var().stop();
 		}
 	}
 
-	var nodata = (directory.field("\r", 1))[-1] == " ";
+	var nodata = directory.field("\r", 1)[-1] == " ";
 	//call msg(nodata:' ')
 	//convert dos text to revelation format and standardise
 	directory.ucaser();
@@ -436,7 +436,7 @@ subroutine getdatasets() {
 subroutine getuserdept2() {
 	//locate the user in the table
 	usercode = mode.field(",", 2);
-	if (not SECURITY.a(1).locateusing(usercode, VM, usern)) {
+	if (not(SECURITY.a(1).locateusing(usercode, VM, usern))) {
 		if (usercode == "NEOSYS") {
 			ANS = "NEOSYS";
 			return;
@@ -447,7 +447,7 @@ subroutine getuserdept2() {
 	}
 
 	//locate divider, or usern+1
-	nusers = (SECURITY.a(1)).count(VM) + 1;
+	nusers = SECURITY.a(1).count(VM) + 1;
 	for (usern = 1; usern <= nusers; ++usern) {
 	///BREAK;
 	if (SECURITY.a(1, usern) == "---") break;;

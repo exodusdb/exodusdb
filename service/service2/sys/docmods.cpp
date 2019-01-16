@@ -6,7 +6,7 @@ function main(in letterheadopts, io tx) {
 
 	//html2pdf.exe messes up repeating headers on continuation pages
 	//so turn thead into additional tbody
-	if (not letterheadopts.isnum()) {
+	if (not(letterheadopts.isnum())) {
 
 		//swap 'THEAD>' with 'thead>' in tx
 		//swap 'TBODY>' with 'body>' in tx

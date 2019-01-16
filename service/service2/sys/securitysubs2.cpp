@@ -228,11 +228,11 @@ deletetask:
 						if (not(menux.isnum())) {
 
 							var usercode = newuserprivs.a(1, usern);
-							var USER;
-							if (USER.read(users, usercode)) {
-								if (USER.a(34) == "") {
-									USER.r(34, menux);
-									USER.write(users, usercode);
+							var userx;
+							if (userx.read(users, usercode)) {
+								if (userx.a(34) == "") {
+									userx.r(34, menux);
+									userx.write(users, usercode);
 								}
 							}
 

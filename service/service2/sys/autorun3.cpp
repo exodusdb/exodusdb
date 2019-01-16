@@ -1,7 +1,6 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <trim2.h>
 #include <holiday.h>
 #include <systemalerts.h>
 #include <authorised.h>
@@ -21,7 +20,6 @@ var docn;//num
 var docid;
 var xx;
 var forceemail;
-var USER;
 var toaddress;
 var useraddress;
 var marketcode;
@@ -130,7 +128,7 @@ function main(in docids0, in options0) {
 	var ndocsprocessed = 0;
 
 nextdoc:
-	////////
+////////
 
 	if (locked) {
 		call unlockrecord("DOCUMENTS", gen.documents, docid);
@@ -152,20 +150,20 @@ nextdoc:
 			return 0;
 		}
 	}else{
-		if (not readnext(docid)) {
+		if (not(readnext(docid))) {
 			gosub exit( lockfilename, lockfile, lockkey);
 			return 0;
 		}
 	}
 
 readdoc:
-	////////
+////////
 	//to save processing time, dont lock initially until looks like it needs processing
 	//then lock/read/check again in case other processes doing the same
 	//depending on the autorunkey then this may be redundant
 
 	//get document
-	if (not gen.document.read(gen.documents, docid)) {
+	if (not(gen.document.read(gen.documents, docid))) {
 		printl(DQ ^ (docid ^ DQ), " document doesnt exist in AUTORUN3");
 		call ossleep(1000*1);
 		goto nextdoc;
@@ -173,7 +171,7 @@ readdoc:
 
 	//only do saved and enabled documents for now
 	//0/1 saved disabled/enabled. Blank=Ordinary documents
-	if (not gen.document.a(12)) {
+	if (not(gen.document.a(12))) {
 		goto nextdoc;
 	}
 
@@ -183,7 +181,7 @@ readdoc:
 
 	//determine current datetime
 currdatetime:
-	/////////////
+/////////////
 	var itime = var().time();
 	var idate = var().date();
 	//handle rare case where passes midnight between time() and date()
@@ -216,7 +214,7 @@ currdatetime:
 		//26 date
 		//27 max number of times
 
-		var restrictions = trim2(gen.document.field(FM, 21, 7), FM, "B");
+		var restrictions = trim(gen.document.field(FM, 21, 7), FM, "B");
 		restrictions.converter(",", VM);
 
 		//skip if no restrictions applied yet
@@ -226,7 +224,7 @@ currdatetime:
 
 		//only run scheduled reports on live data (but do run queued reports)
 		//queued reports have only maxtimes=1 set
-		if (restrictions ne (FM.str(6) ^ 1) and not islivedb and not var("NEOSYS.ID").osfile()) {
+		if (((restrictions ne (FM.str(6) ^ 1)) and not islivedb) and not var("NEOSYS.ID").osfile()) {
 			if (logging) {
 				printl("scheduled report but not live db");
 			}
@@ -236,7 +234,7 @@ currdatetime:
 		//hour of day restrictions
 		var hours = restrictions.a(2);
 		if (hours ne "") {
-			var hournow = (itime.oconv("MT")).substr(1,2) + 0;
+			var hournow = itime.oconv("MT").substr(1,2) + 0;
 
 			//if one hour then treat it as a minimum hour
 			if (hours.isnum()) {
@@ -252,7 +250,7 @@ currdatetime:
 
 				//or specific multiple hours
 			}else{
-				if (not hours.locateusing(hournow, VM, xx)) {
+				if (not(hours.locateusing(hournow, VM, xx))) {
 					if (logging) {
 						printl("wrong hour");
 					}
@@ -305,7 +303,7 @@ preventsameday:
 
 		//date restrictions
 		if (restrictions.a(6)) {
-			if (not restrictions.a(6).locateusing(idate, VM, xx)) {
+			if (not(restrictions.a(6).locateusing(idate, VM, xx))) {
 				if (logging) {
 					printl("wrong date");
 				}
@@ -351,17 +349,18 @@ preventsameday:
 	//if not(forceemail) and @username='NEOSYS' then forceemail=devATneosys
 	//report is always run as the document owning user
 	var runasusercode = gen.document.a(1);
-	if (not USER.read(users, runasusercode)) {
+	var userx;
+	if (not(userx.read(users, runasusercode))) {
 		if (not(runasusercode == "NEOSYS")) {
 			printl("runas user ", runasusercode, " doesnt exist");
 			goto nextdoc;
 		}
-		USER = "";
+		userx = "";
 	}
 	//allow running as NEOSYS and emailing to sysmsg@neosys.com
-	if (USER.a(7) == "" and runasusercode == "NEOSYS") {
-		USER = "NEOSYS";
-		USER.r(7, sysmsgatneosys);
+	if ((userx.a(7) == "") and (runasusercode == "NEOSYS")) {
+		userx = "NEOSYS";
+		userx.r(7, sysmsgatneosys);
 	}
 
 	//HAS RECIPIENTS
@@ -381,7 +380,7 @@ preventsameday:
 	var ccaddress = "";
 	var usercodes = gen.document.a(14);
 	if (usercodes == "") {
-		toaddress = USER.a(7);
+		toaddress = userx.a(7);
 	}else{
 		toaddress = "";
 		var nusers = usercodes.count(VM) + 1;
@@ -390,43 +389,43 @@ preventsameday:
 
 			//get the user record
 			var usercode = usercodes.a(1, usern);
-			if (not USER.read(users, usercode)) {
+			if (not(userx.read(users, usercode))) {
 				if (not(usercode == "NEOSYS")) {
 					goto nextuser;
 				}
-				USER = "NEOSYS";
+				userx = "NEOSYS";
 			}
 
 			//skip if user has no email address
-			if (USER.a(7) == "" and usercode == "NEOSYS") {
-				USER.r(7, sysmsgatneosys);
+			if ((userx.a(7) == "") and (usercode == "NEOSYS")) {
+				userx.r(7, sysmsgatneosys);
 			}
-			useraddress = USER.a(7);
+			useraddress = userx.a(7);
 			if (useraddress) {
 
 				//if running as NEOSYS always add user NEOSYS
 				//regardless of holidays - to allow testing on weekends etc
 				//if usercode='NEOSYS' then
-				if (USERNAME == "NEOSYS" and usercode == "NEOSYS") {
+				if ((USERNAME == "NEOSYS") and (usercode == "NEOSYS")) {
 					goto adduseraddress;
 
 					//optionally skip people on holiday (even NEOSYS unless running as NEOSYS)
 				}else{
 
-					marketcode = USER.a(25);
+					marketcode = userx.a(25);
 					if (not marketcode) {
 						marketcode = gen.company.a(30, 1);
 					}
 					market = marketcode;
 					if (markets) {
-						if (not market.read(markets, marketcode)) {
+						if (not(market.read(markets, marketcode))) {
 							{}
 						}
 					}
 
 					idate = var().date();
 					agp = "";
-					call holiday("GETTYPE", idate, usercode, USER, marketcode, market, agp, holidaytype, workdate);
+					call holiday("GETTYPE", idate, usercode, userx, marketcode, market, agp, holidaytype, workdate);
 
 					if (not holidaytype) {
 adduseraddress:
@@ -521,7 +520,7 @@ nextuser:;
 	//override the saved period with a current period
 
 	//get today's period
-	var runtimeperiod = (var().date().oconv("D2/E")).substr(4,5);
+	var runtimeperiod = var().date().oconv("D2/E").substr(4,5);
 	if (runtimeperiod[1] == "0") {
 		runtimeperiod.splicer(1, 1, "");
 	}
@@ -592,7 +591,7 @@ nextsign:
 		subject ^= ": %RESULT%" ^ gen.document.a(2);
 
 		//email it
-		if (USER3.substr(1,2) ne "OK" or printfilename.osfile().a(1) < 10) {
+		if (USER3.substr(1,2) ne "OK" or (printfilename.osfile().a(1) < 10)) {
 
 			//plain "OK" with no file means nothing to email
 			if (USER3 == "OK") {
@@ -772,7 +771,7 @@ subroutine exec2() {
 	}
 
 	//no records are not system errors
-	if (USER3.substr(1,9) == "No record" or USER3.substr(1,7) == "No item") {
+	if ((USER3.substr(1,9) == "No record") or (USER3.substr(1,7) == "No item")) {
 		USER3.splicer(1, 0, "OK ");
 		USER4 = "";
 	}
@@ -784,7 +783,7 @@ subroutine exec2() {
 	}
 
 	//send errors to neosys
-	if (USER3 == "" or USER3.substr(1,2) ne "OK") {
+	if ((USER3 == "") or USER3.substr(1,2) ne "OK") {
 		if (not USER3) {
 			USER3 = "No response from " ^ voccmd;
 		}

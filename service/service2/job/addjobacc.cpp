@@ -7,8 +7,6 @@ libraryinit()
 #include <agy.h>
 
 var xx;
-var jobx;
-var brand;
 
 function main(in addaccmode, in jobno, io msg) {
 	//c job in,in,io
@@ -29,13 +27,15 @@ function main(in addaccmode, in jobno, io msg) {
 		return 0;
 	}
 
-	if (not jobx.read(agy.jobs, jobno)) {
+	var jobx;
+	if (not(jobx.read(agy.jobs, jobno))) {
 		msg = DQ ^ (jobno ^ DQ) ^ " - JOB IS MISSING";
 		return 0;
 	}
 
 	//get the brand
-	if (not brand.read(agy.brands, jobx.a(2))) {
+	var brand;
+	if (not(brand.read(agy.brands, jobx.a(2)))) {
 		msg = "JOB " ^ (DQ ^ (jobno ^ DQ)) ^ " - BRAND " ^ (DQ ^ (jobx.a(2) ^ DQ)) ^ " IS MISSING";
 		return 0;
 	}

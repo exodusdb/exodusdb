@@ -8,7 +8,6 @@ libraryinit()
 #include <locking.h>
 #include <sysmsg.h>
 #include <addjobacc.h>
-#include <trim2.h>
 #include <initcompany.h>
 #include <lockposting.h>
 #include <getagp.h>
@@ -30,7 +29,6 @@ var invnobycompany;
 var msg;
 var locklist;
 var tt;
-var prodtype;
 var currcode;
 var taxn;//num
 var newrec;
@@ -43,10 +41,8 @@ var supplier;
 var jobno;
 var job;
 var xx;
-var prodinv;
 var orderourinvno;
 var isinvoiced;//num
-var tinv;
 var prodtypecodes;
 var amounts;
 var amountbases;
@@ -94,8 +90,6 @@ var analfn;//num
 var voucherln;//num
 var linecurrencycode;
 var analn;//num
-var analrec;
-var brand;
 var wsmsg;
 
 function main(in mode) {
@@ -147,7 +141,7 @@ function main(in mode) {
 			if (not(authorised("PRODUCTION ORDER ISSUE", msg))) {
 				return invalid(msg);
 			}
-			if (agy.agp.a(139) and calculate("TOTAL_BASE") >= agy.agp.a(139)) {
+			if (agy.agp.a(139) and (calculate("TOTAL_BASE") >= agy.agp.a(139))) {
 				if (not(authorised("PRODUCTION ORDER ISSUE LARGE", msg))) {
 					return invalid(msg);
 				}
@@ -176,10 +170,11 @@ function main(in mode) {
 			}else{
 				tt = calculate("JOB_PRODUCTION_TYPE");
 				if (tt) {
-					if (not prodtype.read(agy.jobtypes, tt)) {
+					var prodtype;
+					if (not(prodtype.read(agy.jobtypes, tt))) {
 						prodtype = "";
 					}
-					if (not prodtype.a(5)) {
+					if (not(prodtype.a(5))) {
 						goto badtype;
 					}
 				}else{
@@ -193,13 +188,13 @@ badtype:
 		//check currency exists and is not stopped
 		currcode = RECORD.a(4);
 		if (currcode ne win.orec.a(4)) {
-			if (not gen.currency.read(gen.currencies, currcode)) {
+			if (not(gen.currency.read(gen.currencies, currcode))) {
 				msg = DQ ^ (currcode ^ DQ) ^ " currency does not exist";
 				return invalid(msg);
 			}
 			tt = gen.currency.a(1);
 			tt.converter("<>", "()");
-			if (gen.currency.a(25) or (tt.ucase()).index("(STOP)", 1)) {
+			if (gen.currency.a(25) or tt.ucase().index("(STOP)", 1)) {
 				msg = tt ^ FM ^ "currency is stopped" ^ FM ^ gen.currency.a(25);
 				return invalid(msg);
 			}
@@ -219,7 +214,7 @@ badtype:
 			for (var ln = 1; ln <= nlns; ++ln) {
 				var taxcodex = alltaxcodes.a(1, ln);
 				if (taxcodex.length()) {
-					if (not fin.taxes.a(2).locateusing(taxcodex, VM, taxn)) {
+					if (not(fin.taxes.a(2).locateusing(taxcodex, VM, taxn))) {
 						{}
 					}
 					if (fin.taxes.a(4, taxn) == "") {
@@ -254,7 +249,7 @@ badtype:
 			gosub validate();
 			RECORD = saverecord;
 			win.orec = saveorec;
-			if (not win.valid) {
+			if (not(win.valid)) {
 				gosub unlockall();
 				return 0;
 			}
@@ -266,7 +261,7 @@ badtype:
 		gosub validate();
 		RECORD = saverecord;
 		win.orec = saveorec;
-		if (not win.valid) {
+		if (not(win.valid)) {
 			gosub unlockall();
 			return 0;
 		}
@@ -282,7 +277,7 @@ badtype:
 
 			//call validate again to setup ... should not fail
 			gosub validate();
-			if (not win.valid) {
+			if (not(win.valid)) {
 				RECORD = saverecord;
 				win.orec = saveorec;
 				gosub unlockall();
@@ -292,7 +287,7 @@ badtype:
 			gosub update();
 			RECORD = saverecord;
 			win.orec = saveorec;
-			if (not win.valid) {
+			if (not(win.valid)) {
 				gosub unlockall();
 				return 0;
 			}
@@ -307,7 +302,7 @@ badtype:
 
 		//call validate again to setup - should never fail
 		gosub validate();
-		if (not win.valid) {
+		if (not(win.valid)) {
 			RECORD = saverecord;
 			win.orec = saveorec;
 			gosub unlockall();
@@ -315,7 +310,7 @@ badtype:
 		}
 
 		gosub update();
-		if (not win.valid) {
+		if (not(win.valid)) {
 			RECORD = saverecord;
 			win.orec = saveorec;
 			gosub unlockall();
@@ -349,14 +344,14 @@ subroutine validate() {
 	marketcode = calculate("MARKET_CODE");
 
 	//needed for account number
-	if (not supplier.read(agy.suppliers, suppliercode)) {
+	if (not(supplier.read(agy.suppliers, suppliercode))) {
 		msg = DQ ^ (suppliercode ^ DQ) ^ " supplier does not exist";
 		gosub errexit();
 		return;
 	}
 
 	gosub validateorderestimate();
-	if (not win.valid) {
+	if (not(win.valid)) {
 		return;
 	}
 
@@ -377,8 +372,8 @@ subroutine validate() {
 
 	//make sure inv no and date are entered ... or neither
 	//if (@record<7>='' and @record<9><>'') or (@record<7><>'' and @record<9>='') then
-	var t1 = RECORD.a(7) == "" and RECORD.a(9) ne "";
-	var t2 = RECORD.a(7) ne "" and RECORD.a(9) == "";
+	var t1 = (RECORD.a(7) == "") and RECORD.a(9) ne "";
+	var t2 = RECORD.a(7) ne "" and (RECORD.a(9) == "");
 	if (t1 or t2) {
 		msg = "BOTH INVOICE NUMBER AND DATE MUST BE ENTERED OR NEITHER";
 		gosub errexit();
@@ -401,7 +396,8 @@ subroutine validate() {
 	if (orderestno) {
 		//get invoice number from estimate (in case they changed estimate number)
 		//isinvoiced=(xlate('PRODUCTION_INVOICES',orderestno,10,'X') ne '')
-		if (not prodinv.read(agy.productioninvoices, orderestno)) {
+		var prodinv;
+		if (not(prodinv.read(agy.productioninvoices, orderestno))) {
 			msg = DQ ^ (orderestno ^ DQ) ^ " estimate is missing in PRODORDER.SUBS";
 			call sysmsg(msg);
 			gosub errexit();
@@ -427,7 +423,8 @@ subroutine validate() {
 			if (agy.agp.a(48)) {
 				invkey = invkey.fieldstore("*", 3, 1, calculate("COMPANY_CODE"));
 			}
-			if (not tinv.read(agy.invoices, invkey)) {
+			var tinv;
+			if (not(tinv.read(agy.invoices, invkey))) {
 				msg = DQ ^ (invkey ^ DQ) ^ " missing from invoices";
 				call sysmsg(msg);
 				gosub errexit();
@@ -450,7 +447,7 @@ subroutine validate() {
 	}
 
 	//check can add an account
-	if (not deleting and (isinvoiced or calculate("SUPP_INV_NO"))) {
+	if (not deleting and ((isinvoiced or calculate("SUPP_INV_NO")))) {
 		call addjobacc("VALIDATE", jobno, msg);
 		if (msg) {
 			gosub errexit();
@@ -569,16 +566,16 @@ subroutine validate() {
 	RECORD.r(43, utaxamounts);
 
 	//garbagecollect;
-	amount = (amounts.sum()).oconv(fin.currfmt);
-	amountbase = (amountbases.sum()).oconv(agy.agp.a(3));
+	amount = amounts.sum().oconv(fin.currfmt);
+	amountbase = amountbases.sum().oconv(agy.agp.a(3));
 
 	//calculate tax on supplier invoices
 	if (calculate("SUPP_INV_NO") and utaxcodes) {
 
 		//calculate total taxamount and taxamountbase
 		//garbagecollect;
-		taxamount = (taxamounts.sum()).oconv(fin.currfmt);
-		taxamountbase = (taxamountbases.sum()).oconv(agy.agp.a(3));
+		taxamount = taxamounts.sum().oconv(fin.currfmt);
+		taxamountbase = taxamountbases.sum().oconv(agy.agp.a(3));
 
 		//dont calculate tax on cost accruals (or reversal of accruals during po2pi)
 	}else{
@@ -603,9 +600,9 @@ subroutine validate() {
 	}
 
 	//get the production type record
-	firstprodtypecode = (trim2(calculate("OLD_PRODUCTION_TYPE"), VM, "F")).a(1, 1);
+	firstprodtypecode = trim(calculate("OLD_PRODUCTION_TYPE"), VM, "F").a(1, 1);
 	//multitype
-	if (not firstprodtype.read(agy.jobtypes, firstprodtypecode)) {
+	if (not(firstprodtype.read(agy.jobtypes, firstprodtypecode))) {
 		msg = DQ ^ (firstprodtypecode ^ DQ) ^ " production type is missing";
 		gosub errexit();
 		return;
@@ -643,8 +640,8 @@ subroutine validate() {
 	call initcompany(companycode);
 
 	//ensure tax code on purchase invoices from 1/1/2018 if registered for tax
-	if (gen.company.a(21) and calculate("INV_DATE") >= 18264 and not deleting) {
-		if (not RECORD.a(42) or RECORD.a(44)) {
+	if ((gen.company.a(21) and (calculate("INV_DATE") >= 18264)) and not deleting) {
+		if (not(RECORD.a(42) or RECORD.a(44))) {
 			msg = DQ ^ (ID ^ DQ) ^ " Tax/VAT code is required because|" ^ gen.company.a(1) ^ " has Tax Reg.No." ^ gen.company.a(21);
 			gosub errexit();
 			return;
@@ -654,7 +651,7 @@ subroutine validate() {
 	//if outstanding order then update relevant analysis column
 	if (calculate("SUPP_INV_NO") == "") {
 
-		var orderperiod = ((calculate("DATE")).oconv("D2/E")).substr(4,5);
+		var orderperiod = (calculate("DATE")).oconv("D2/E").substr(4,5);
 
 		//multitype
 		analperiod = orderperiod;
@@ -670,7 +667,7 @@ subroutine validate() {
 	///////////////////////////////////////////////////////////////
 	//no postings for purchase orders if the job has not been closed
 	///////////////////////////////////////////////////////////////
-	if (calculate("SUPP_INV_NO") == "" and not isinvoiced) {
+	if ((calculate("SUPP_INV_NO") == "") and not isinvoiced) {
 		return;
 	}
 
@@ -714,7 +711,7 @@ subroutine validate() {
 			temp ^= "**" ^ companycode;
 		}
 
-		if (not tt.read(agy.invoices, temp)) {
+		if (not(tt.read(agy.invoices, temp))) {
 			invoicekey ^= "." ^ ii;
 			//if bycompany then invoice.key:='**':company.code
 			if (invnobycompany) {
@@ -728,7 +725,7 @@ subroutine validate() {
 	//determine and lock the audit.key
 	auditkey = "%PRODUCTION%";
 	if (invnobycompany) {
-		if (not tt.read(agy.invoices, auditkey)) {
+		if (not(tt.read(agy.invoices, auditkey))) {
 			auditkey.splicer(-1, 0, "*" ^ gen.gcurrcompany);
 		}
 		tt = "";
@@ -789,7 +786,7 @@ subroutine validate() {
 		//analdate=our.inv.date
 
 		//multitype
-		analperiod = (accountingdate.oconv("D2/E")).substr(4,5);
+		analperiod = accountingdate.oconv("D2/E").substr(4,5);
 		if (analperiod[1] == "0") {
 			analperiod.splicer(1, 1, "");
 		}
@@ -823,7 +820,7 @@ subroutine validate() {
 		}
 	}
 
-	if (agy.agp.a(102) and calculate("SUPP_INV_NO") and not calculate("SUPP_ACNO")) {
+	if ((agy.agp.a(102) and calculate("SUPP_INV_NO")) and not calculate("SUPP_ACNO")) {
 		msg = "You must setup the supplier A/c No. on the Supplier File|before entering supplier invoices for";
 		msg ^= FM ^ FM ^ (DQ ^ (calculate("SUPPLIER_NAME") ^ DQ)) ^ " (" ^ calculate("SUPPLIER_CODE") ^ ")" ^ FM;
 		msg ^= FM ^ "(Finance journals are to be posted directly)";
@@ -852,7 +849,7 @@ subroutine update() {
 
 	//no postings for purchase orders if the job has not been closed
 	///////////////////////////////////////////////////////////////
-	if (calculate("SUPP_INV_NO") == "" and not isinvoiced) {
+	if ((calculate("SUPP_INV_NO") == "") and not isinvoiced) {
 		goto updatenoinvoice;
 	}
 
@@ -893,8 +890,8 @@ subroutine update() {
 
 		//prepare first line to supplier/wip
 		//garbagecollect;
-		amount = (amounts.sum()).oconv(fin.currfmt);
-		amountbase = (amountbases.sum()).oconv(agy.agp.a(3));
+		amount = amounts.sum().oconv(fin.currfmt);
+		amountbase = amountbases.sum().oconv(agy.agp.a(3));
 		taxcode = "";
 		taxamount = "";
 		taxamountbase = "";
@@ -948,7 +945,7 @@ creditcostspertype:
 						lineprodtypecode = tt;
 					}
 					if (lineprodtypecode ne currlineprodtypecode) {
-						if (not lineprodtype.read(agy.jobtypes, lineprodtypecode)) {
+						if (not(lineprodtype.read(agy.jobtypes, lineprodtypecode))) {
 							//should never get here since all are checked in validation
 							lineprodtype = "";
 						}
@@ -967,7 +964,7 @@ creditcostspertype:
 						accno = lineprodtype.a(6);
 						if (accno and lineprodtype.a(9)) {
 							//add company code
-							accno.r(1, 1, 1, (accno.a(1, 1, 1)).fieldstore(",", 2, 1, lineprodtype.a(9)));
+							accno.r(1, 1, 1, accno.a(1, 1, 1).fieldstore(",", 2, 1, lineprodtype.a(9)));
 						}
 						//if accno='' then ACCNO=lineprodtype<5>
 						if (accno == "") {
@@ -1006,8 +1003,8 @@ creditcostspertype:
 				if (utaxcodes == "") {
 					accno = wipaccno;
 					//garbagecollect;
-					amount = (amounts.sum()).oconv(fin.currfmt);
-					amountbase = (amountbases.sum()).oconv(agy.agp.a(3));
+					amount = amounts.sum().oconv(fin.currfmt);
+					amountbase = amountbases.sum().oconv(agy.agp.a(3));
 					taxcode = "";
 					taxamount = "";
 					taxamountbase = "";
@@ -1067,7 +1064,7 @@ creditcostspertype:
 					if (jobno.isnum()) {
 						accno.splicer(1, 0, jobaccnoprefix);
 					}
-					if (not accno.a(1, 1, 2)) {
+					if (not(accno.a(1, 1, 2))) {
 						accno.r(1, 1, 2, accno.a(1, 1, 1));
 					}
 				}
@@ -1084,7 +1081,7 @@ creditcostspertype:
 	//update invoice index
 	/////////////////////
 
-	if (not invindex.read(agy.invoices, auditkey)) {
+	if (not(invindex.read(agy.invoices, auditkey))) {
 		invindex = "";
 	}
 	//discard the first/oldest 100 entries if inv index too large
@@ -1138,7 +1135,7 @@ creditcostspertype:
 		//multitype
 		//strip off some of the analkeys to suit the invoice analcode format
 		var analcodes = "";
-		var nanalkeys = (costanalysis.a(1)).count(VM) + 1;
+		var nanalkeys = costanalysis.a(1).count(VM) + 1;
 		for (var analkeyn = 1; analkeyn <= nanalkeys; ++analkeyn) {
 			analcodes.r(1, analkeyn, costanalysis.a(1, analkeyn).field("*", 5, 2));
 		};//analkeyn;
@@ -1263,10 +1260,10 @@ subroutine addline() {
 		//6 supplier code (jobs)
 		//7 job type code (jobs)
 		//8 executive code
-		analysiscodex = analysiscodex.fieldstore("*", 8, 1, (calculate("EXECUTIVE_CODE")).ucase());
+		analysiscodex = analysiscodex.fieldstore("*", 8, 1, calculate("EXECUTIVE_CODE").ucase());
 	}
 
-	if (accno and accno.a(1, 1, 2) == "") {
+	if (accno and (accno.a(1, 1, 2) == "")) {
 		accno.r(1, 1, 2, accno.a(1, 1, 1).field(",", 1));
 	}
 
@@ -1286,9 +1283,9 @@ subroutine addline() {
 		while (true) {
 			xx = split(voucher.a(10, voucherln), linecurrencycode);
 			//until voucher<8,voucherln>='' or (voucher<8,voucherln>=accno and line.currency.code=currency.code and voucherln>minconsolidatelinen) do
-			tt = voucher.a(8, voucherln) == accno and linecurrencycode == currencycode and voucherln > minconsolidatelinen;
+			tt = ((voucher.a(8, voucherln) == accno) and (linecurrencycode == currencycode)) and (voucherln > minconsolidatelinen);
 		///BREAK;
-		if (voucher.a(8, voucherln) == "" or tt) break;;
+		if ((voucher.a(8, voucherln) == "") or tt) break;;
 nextvline:
 			voucherln += 1;
 		}//loop;
@@ -1318,7 +1315,7 @@ nextvline:
 newvoucherline:
 		while (true) {
 		///BREAK;
-		if (not voucher.a(10, voucherln)) break;;
+		if (not(voucher.a(10, voucherln))) break;;
 			voucherln += 1;
 		}//loop;
 		if (details) {
@@ -1433,7 +1430,7 @@ subroutine lockandaccumulateanalysis() {
 		tt = prodtypecodes.a(1, amountn);
 		if (tt and tt ne currprodtypecode) {
 			//check exists
-			if (not currprodtype.read(agy.jobtypes, tt)) {
+			if (not(currprodtype.read(agy.jobtypes, tt))) {
 				msg = DQ ^ (tt ^ DQ) ^ " production type is missing";
 				//gosub errexit
 				return;
@@ -1449,7 +1446,7 @@ subroutine lockandaccumulateanalysis() {
 			//TODO ensure job brand/market code changes cannot happen or are handled
 			var analkey = analperiod.field("/", 2) ^ "*" ^ brandcode ^ "**" ^ marketcode ^ "*" ^ suppliercode ^ "*" ^ currprodtypecode;
 			analkey = analkey.fieldstore("*", 8, 1, companycode);
-			if (not curranalysis.a(1).locateusing(analkey, VM, analn)) {
+			if (not(curranalysis.a(1).locateusing(analkey, VM, analn))) {
 				curranalysis.r(1, analn, analkey);
 			}
 
@@ -1477,18 +1474,19 @@ subroutine updateanalysis() {
 
 	//needs curranalysis and analfn
 
-	if (not curranalysis.a(1)) {
+	if (not(curranalysis.a(1))) {
 		return;
 	}
 
 	var analmth = curranalysis.a(2).field("/", 1);
 
-	var nanals = (curranalysis.a(1)).count(VM) + 1;
+	var nanals = curranalysis.a(1).count(VM) + 1;
 	for (analn = 1; analn <= nanals; ++analn) {
 
 		var analkey = curranalysis.a(1, analn);
 
-		if (not analrec.read(agy.analysis, analkey)) {
+		var analrec;
+		if (not(analrec.read(agy.analysis, analkey))) {
 			analrec = "";
 		}
 
@@ -1506,19 +1504,20 @@ subroutine validateorderestimate() {
 
 	//get currency for exch rate update
 	currcode = RECORD.a(4);
-	if (not gen.currency.read(gen.currencies, currcode)) {
+	if (not(gen.currency.read(gen.currencies, currcode))) {
 		msg = DQ ^ (currcode ^ DQ) ^ " currency does not exist";
 		gosub errexit();
 		return;
 	}
 
 	jobno = calculate("JOB_NO");
-	if (not job.read(agy.jobs, jobno)) {
+	if (not(job.read(agy.jobs, jobno))) {
 		msg = "JOB NUMBER " ^ jobno ^ " IS MISSING";
 		gosub errexit();
 		return;
 	}
-	if (not brand.read(agy.brands, job.a(2))) {
+	var brand;
+	if (not(brand.read(agy.brands, job.a(2)))) {
 		msg = DQ ^ (job.a(2) ^ " - BRAND IS MISSING" ^ DQ);
 		gosub errexit();
 		return;
@@ -1531,7 +1530,7 @@ subroutine validateorderestimate() {
 			RECORD.r(5, 1);
 		}
 	}
-	if (not RECORD.a(5)) {
+	if (not(RECORD.a(5))) {
 		msg = "Exchange rate cannot be blank or zero";
 		gosub errexit();
 		return;
@@ -1539,7 +1538,7 @@ subroutine validateorderestimate() {
 
 	//check production type exists
 	//if @record<15>='' then
-	if (trim2(calculate("OLD_PRODUCTION_TYPE"), VM) == "") {
+	if (trim(calculate("OLD_PRODUCTION_TYPE"), VM) == "") {
 		msg = "Production type is required";
 		gosub errexit();
 		return;

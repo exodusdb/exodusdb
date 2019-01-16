@@ -2,7 +2,6 @@
 libraryinit()
 
 #include <xrefsubs.h>
-#include <trim2.h>
 #include <generalsubs.h>
 #include <validcode2.h>
 #include <validcode3.h>
@@ -27,15 +26,12 @@ var clientcode;
 var xx;
 var vn;
 var msg;
-var brand;
 var reply;
 var oldbrandvn;
 var brandn2;
 var v69;
 var v70;
 var v71;
-var oldbrand;
-var job;
 var newbrandcodes;
 var temp;
 var brandcodex;
@@ -57,7 +53,7 @@ function main(in mode) {
 
 		if (win.curramvgroup == 1) {
 
-			if (win.amvaction == 2 or win.amvaction == 3) {
+			if ((win.amvaction == 2) or (win.amvaction == 3)) {
 				win.valid = 0;
 				win.amvaction = 0;
 				return 0;
@@ -90,7 +86,7 @@ nextclient:
 						for (var brandaccn = 1; brandaccn <= nbrandaccs; ++brandaccn) {
 							var brandacc = brandaccs.a(1, brandaccn);
 							//proper account numbers have sm character in them
-							if (not brandacc.index(SVM, 1)) {
+							if (not(brandacc.index(SVM, 1))) {
 								client.r(19, brandaccn, "");
 								if (not(client.a(29).locateby(brandacc, "AL", vn))) {
 									client.inserter(29, vn, brandacc);
@@ -98,8 +94,8 @@ nextclient:
 							}
 						};//brandaccn;
 
-						client.r(19, trim2(client.a(19), VM, "B"));
-						client.r(29, trim2(client.a(29), VM));
+						client.r(19, trim(client.a(19), VM, "B"));
+						client.r(29, trim(client.a(29), VM));
 
 						if (client ne origclient) {
 							//print ' ':clientcode:
@@ -124,7 +120,7 @@ nextclient:
 		}
 
 		//0 is equal to 00 and 000 !
-		if (win.is == win.isorig and win.is.length() == win.isorig.length()) {
+		if ((win.is == win.isorig) and (win.is.length() == win.isorig.length())) {
 			return 0;
 		}
 
@@ -134,7 +130,7 @@ nextclient:
 
 			var brandcode = win.isorig;
 			gosub chkbrandused( brandcodex);
-			if (not win.valid) {
+			if (not(win.valid)) {
 				return 0;
 			}
 
@@ -150,7 +146,7 @@ nextclient:
 				qq ^= " for||" ^ brand.a(2) ^ "|" ^ brand.a(3);
 
 				//prevent moving unauthorised brands
-				if (not validcode2(brand.a(10), brand.a(1, 1), win.is, agy.brands, msg)) {
+				if (not(validcode2(brand.a(10), brand.a(1, 1), win.is, agy.brands, msg))) {
 					msg = qq ^ FM ^ FM ^ msg;
 					return invalid(msg);
 				}
@@ -189,7 +185,7 @@ nextclient:
 				qq ^= "||Warning! It may take some time to save this client";
 				qq ^= " if there are very many historical ads for this brand";
 				//indicate OK but pass conflicting brand for user to decide
-				if (not not SYSTEM.a(33)) {
+				if (not(not SYSTEM.a(33))) {
 					USER3 = "OK " ^ qq;
 					//valid=0
 					//return the copied brand in data
@@ -244,13 +240,13 @@ nextclient:
 			msg = "PLEASE USE ONLY LETTERS AND NUMBERS FOR BRAND CODES";
 			return invalid(msg);
 		}
-		if (win.is.length() > 5 or win.is.index(" ", 1)) {
+		if ((win.is.length() > 5) or win.is.index(" ", 1)) {
 			msg = "THE BRAND CODE MAY BE UP TO|5 CHARACTERS WITH NO SPACES";
 			return invalid(msg);
 		}
 
 	} else if (mode == "VAL.NAME") {
-		if (win.winext > win.wi and win.is == "") {
+		if ((win.winext > win.wi) and (win.is == "")) {
 			msg = "NAME IS REQUIRED";
 			return invalid(msg);
 		}
@@ -258,25 +254,25 @@ nextclient:
 	} else if (mode == "PREWRITE") {
 
 		gosub security(mode);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
 		//check no deleted brands are in use
 		gosub checkdeletedbrands( mode);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
 		//lock old and new group clients
 		//group1
 		call xrefsubs("PREWRITE", 16, "CLIENTS", win.srcfile, 29, locklist);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 		//group2
 		call xrefsubs("PREWRITE", 55, "CLIENTS", win.srcfile, 56, locklist);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
@@ -410,7 +406,7 @@ nextclient:
 			if (brandcode ne "") {
 				var brandname = RECORD.a(3, brandn);
 				//build the brand code heirarchy
-				var leveln = brandname.length() - (brandname.trimf()).length() + 1;
+				var leveln = brandname.length() - brandname.trimf().length() + 1;
 				//cut off any lower levels
 				if (leveln > 1) {
 					brandlevels = brandlevels.field(VM, 1, leveln - 1);
@@ -424,10 +420,11 @@ nextclient:
 					}
 				};//ii;
 
-				if (not oldbrand.read(agy.brands, brandcode)) {
+				var oldbrand;
+				if (not(oldbrand.read(agy.brands, brandcode))) {
 					oldbrand = "";
 				}
-				brand = oldbrand;
+				var brand = oldbrand;
 
 				//done in prewrite now to lock all other clients first
 				//remove brand from other client if present there already
@@ -488,18 +485,19 @@ nextclient:
 					}
 					jobno ^= "-" ^ brandcode;
 
-					if (not job.read(agy.jobs, jobno)) {
+					var job;
+					if (not(job.read(agy.jobs, jobno))) {
 						//TODO enable update of "brand" jobs with new names etc
 						//if 1 then
 
 						job = "";
 						//job<1>=field(date() 'D2/E','/',2)+0:'/':field(date() 'D2/E','/',3)
-						tt = ((var().date()).oconv("D2/E")).field("/", 2) + 0;
+						tt = var().date().oconv("D2/E").field("/", 2) + 0;
 						tt ^= "/";
-						tt ^= ((var().date()).oconv("D2/E")).field("/", 3);
+						tt ^= var().date().oconv("D2/E").field("/", 3);
 						job.r(1, tt);
 						job.r(2, brandcode);
-						if ((brand.a(2).ucase()).index(brand.a(3).ucase(), 1) or (brand.a(3).ucase()).index(brand.a(2).ucase(), 1)) {
+						if (brand.a(2).ucase().index(brand.a(3).ucase(), 1) or brand.a(3).ucase().index(brand.a(2).ucase(), 1)) {
 							job.r(9, brand.a(2));
 						}else{
 							job.r(9, brand.a(3) ^ ", " ^ brand.a(2));
@@ -561,7 +559,7 @@ nextclient:
 					if (not(clientindex.read(clientindexfile, "INVERTED*ACNO*" ^ acno))) {
 						clientindex = "";
 					}
-					if (not clientindex.a(1).locateusing(ID, VM, xx)) {
+					if (not(clientindex.a(1).locateusing(ID, VM, xx))) {
 						clientindex.r(1, -1, ID);
 						clientindex.write(clientindexfile, "INVERTED*ACNO*" ^ acno);
 					}
@@ -572,13 +570,13 @@ nextclient:
 	} else if (mode == "PREDELETE") {
 
 		gosub security(mode);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
 		RECORD = "";
 		gosub checkdeletedbrands( mode);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
@@ -603,7 +601,7 @@ nextclient:
 
 	} else if (mode == "POSTINIT") {
 		gosub security(mode);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
@@ -611,7 +609,7 @@ nextclient:
 
 		//option to read previous versions
 		call generalsubs2(mode);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
@@ -635,7 +633,7 @@ unlockclient:
 		if (win.wlocked) {
 			//tt=ucase(@record<1>:@record<35>)
 			//if index(tt,'(STOP)',1) or index(tt,'<STOP>',1) then
-			if (RECORD.a(35) or (RECORD.a(1)).index("(STOP)", 1) or (RECORD.a(1)).index("<STOP>", 1)) {
+			if ((RECORD.a(35) or RECORD.a(1).index("(STOP)", 1)) or RECORD.a(1).index("<STOP>", 1)) {
 				//CLIENT CREATE STOPPED prevents people from create new documents
 				//schedule/orders etc. for to the stopped clients
 				//if security('CLIENT ACCESS STOPPED',msg,'CLIENT CREATE STOPPED') else
@@ -652,7 +650,7 @@ unlockclient:
 		//if validcode('BRAND %ANY%',@record<2>,msg) else goto unlockclient
 
 		gosub security(mode);
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
@@ -670,7 +668,7 @@ subroutine deletebrands() {
 	var nbrands = brandcodes.count(VM) + (brandcodes ne "");
 	for (var brandn = 1; brandn <= nbrands; ++brandn) {
 		var brandcode = brandcodes.a(1, brandn);
-		if (not newbrandcodes.a(1).locateusing(brandcode, VM, temp)) {
+		if (not(newbrandcodes.a(1).locateusing(brandcode, VM, temp))) {
 			agy.brands.deleterecord(brandcode);
 			
 		}
@@ -691,7 +689,7 @@ subroutine checkdeletedbrands(in mode) {
 		if (mode.index("DELETE", 1)) {
 			gosub chkbrandused( brandcodex);
 		}else{
-			if (not RECORD.a(2).locateusing(brandcodex, VM, xx)) {
+			if (not(RECORD.a(2).locateusing(brandcodex, VM, xx))) {
 				gosub chkbrandused( brandcodex);
 			}
 		}
@@ -705,7 +703,8 @@ subroutine chkbrandused(in brandcodex) {
 	//chkbrandused(in brandcodex)
 
 	//always ok to delete new brands not yet saved
-	if (not brand.read(agy.brands, brandcodex)) {
+	var brand;
+	if (not(brand.read(agy.brands, brandcodex))) {
 		return;
 	}
 
@@ -750,7 +749,7 @@ subroutine chkbrandused(in brandcodex) {
 	if (agy.ads.open("ADS", "")) {
 		call pushselect(0, v69, v70, v71);
 		call safeselect("SELECT 10 ADS with BRAND_AND_DATE STARTING " ^ (DQ ^ (brandcodex ^ "*" ^ DQ)) ^ " (S)");
-		if (not readnext(adid)) {
+		if (not(readnext(adid))) {
 			adid = "";
 		}
 		hits = LISTACTIVE;

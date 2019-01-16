@@ -11,7 +11,6 @@ var coden;//num
 var filen;//num
 var code;
 var ok;//num
-var vehicle;
 var taskid;
 var positive;
 var xx;
@@ -94,7 +93,8 @@ function main(in marketcodex, in suppliercodex, in vehiclecodex, io vehicles, io
 			}
 		}
 
-		if (not vehicle.read(vehicles, vehiclecode)) {
+		var vehicle;
+		if (not(vehicle.read(vehicles, vehiclecode))) {
 
 			//allow for validating a DELETED vehicle from VEHICLE_VERSIONS
 			var versionfile;
@@ -103,7 +103,7 @@ missingvehicle:
 				msg = DQ ^ (vehiclecode ^ DQ) ^ " missing from vehicles file";
 				return 0;
 			}
-			if (not vehicle.read(versionfile, vehiclecode)) {
+			if (not(vehicle.read(versionfile, vehiclecode))) {
 				goto missingvehicle;
 			}
 
@@ -131,7 +131,7 @@ getsupplier:
 			call fsmsg();
 			var().stop();
 		}
-		if (not supplier.read(suppliers, suppliercode)) {
+		if (not(supplier.read(suppliers, suppliercode))) {
 			msg = DQ ^ (suppliercode ^ DQ) ^ " missing from suppliers file";
 			return 0;
 		}

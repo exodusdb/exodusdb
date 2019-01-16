@@ -24,7 +24,7 @@ function main(io job, in jobno) {
 
 		job.r(statusfn, defaultstatus);
 		job.r(versionfn + 1, USERNAME);
-		job.r(versionfn + 2, var().date() ^ "." ^ (var().time()).oconv("R(0)#5"));
+		job.r(versionfn + 2, var().date() ^ "." ^ var().time().oconv("R(0)#5"));
 		job.r(versionfn + 3, STATION.trim());
 		job.r(versionfn + 4, firstversion);
 		job.r(versionfn + 5, defaultstatus);

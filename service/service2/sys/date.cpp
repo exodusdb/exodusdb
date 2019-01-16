@@ -30,10 +30,10 @@ function main(in type, io in0, io mode, out output, in glang="") {
 		//dont oconv 1 or 2 digits as they are probably day of month being converted
 		// to proper dates
 		//IF len(IN0) gt 2 and IN0 MATCHES '0N' OR IN0 MATCHES '"-"0N' OR IN0 MATCHES '0N.0N' THEN
-		if (in0.length() > 2 and in0.match("0N")) {
+		if ((in0.length() > 2) and in0.match("0N")) {
 			goto ok;
 		}
-		if (in0.match("\"-\"0N") or in0.match("0N.0N")) {
+		if ((in0.match("\"-\"0N")) or in0.match("0N.0N")) {
 ok:
 			//language specific (date format could be a pattern in lang?)
 			if (mode == "L") {
@@ -67,8 +67,8 @@ ok:
 			output = in0;
 		}
 	} else if (type == "ICONV") {
-		if (in0.match("0N") and in0 <= 31) {
-			in0 ^= (var().date().oconv("D")).substr(4,9);
+		if (in0.match("0N") and (in0 <= 31)) {
+			in0 ^= var().date().oconv("D").substr(4,9);
 		}
 		output = in0.iconv(mode);
 	}

@@ -16,8 +16,6 @@ var tdate;
 var xx;
 var div;
 var divx;
-var imagecomp;
-var textcompany;
 
 function main(io mode, out html, in compcode0="") {
 	//c sys io,out,""
@@ -39,7 +37,7 @@ function main(io mode, out html, in compcode0="") {
 		compcode = gen.gcurrcompany;
 	}
 //L206:
-	if (not lhcompany.read(gen.companies, compcode)) {
+	if (not(lhcompany.read(gen.companies, compcode))) {
 		lhcompany = "";
 	}
 
@@ -135,7 +133,7 @@ function main(io mode, out html, in compcode0="") {
 	html = html.field(var().chr(26), 1);
 	while (true) {
 	///BREAK;
-	if (not(html and var("\r\n").index(html[-1], 1))) break;;
+	if (not(html and (var("\r\n").index(html[-1], 1)))) break;;
 		html.splicer(-1, 1, "");
 	}//loop;
 
@@ -263,7 +261,8 @@ subroutine getcompanyconfig(io html, io mode) {
 			//use other company image and type
 			if (imagecompcode) {
 				//get image type from the other company
-				if (not imagecomp.read(gen.companies, imagecompcode)) {
+				var imagecomp;
+				if (not(imagecomp.read(gen.companies, imagecompcode))) {
 					imagecomp = "";
 				}
 				imagetype = imagecomp.a(62, coln);
@@ -304,7 +303,8 @@ subroutine getcompanyconfig(io html, io mode) {
 		if (textcompcode) {
 			//ignore any given text if textcompany given
 			text = "";
-			if (not textcompany.read(gen.companies, textcompcode)) {
+			var textcompany;
+			if (not(textcompany.read(gen.companies, textcompcode))) {
 				textcompany = "";
 			}
 			//get text from different company SAME COLUMN NO
@@ -345,14 +345,14 @@ subroutine getheadhtm(io html) {
 	{}
 
 nextmodex:
-	//////////
+//////////
 	var prefix = compcode ^ "_";
 
 nextprefix:
-	///////////
+///////////
 	keyx = prefix ^ modex.a(1, 1) ^ ".HTM";
 
-	if (not html.read(DEFINITIONS, keyx)) {
+	if (not(html.read(DEFINITIONS, keyx))) {
 
 		//try again same mode but without company code prefix
 		if (prefix) {

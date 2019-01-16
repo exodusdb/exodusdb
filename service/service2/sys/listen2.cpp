@@ -1,11 +1,10 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <listen2.h>
-#include <sysmsg.h>
 #include <encrypt2.h>
 #include <authorised.h>
 #include <whois.h>
+#include <sysmsg.h>
 #include <systemfile.h>
 #include <securitysubs.h>
 #include <usersubs.h>
@@ -13,17 +12,6 @@ libraryinit()
 #include <safeselect.h>
 #include <loginnet.h>
 #include <openfile.h>
-#include <singular.h>
-//#include <collectixvals.h>
-//#include <v119.h>
-#include <invertarray.h>
-#include <htmllib2.h>
-#include <select2.h>
-#include <trim2.h>
-#include <rtp57.h>
-#include <listen4.h>
-#include <otherusers.h>
-#include <readbakpars.h>
 #include <initcompany.h>
 
 #include <gen.h>
@@ -31,18 +19,8 @@ libraryinit()
 #include <agy.h>
 #include <win.h>
 
-var filename;
-var processes;
-var tt;
-var xx;
-var inpath;
-var yy;
-var zz;
-var tdd;
-var pattern;
-var ageinsecs;//num
-var patchfile;
 var usern;//num
+var xx;
 var userencrypt0;
 var validips;
 var addvalidips;
@@ -52,7 +30,6 @@ var maxnologindays;//num
 var lastlogindate;
 var whoistx;
 var body;
-var sysrec;
 var text;
 var usersordefinitions;
 var userkey;
@@ -60,23 +37,15 @@ var newpassword;
 var emailsubject;
 var lastuserid;
 var ucomps;
-var statistic;
 var userrec;
 var locks;
-var flag;
-var stopn;
-var lockid;
-var dostime;//num
-var bakpars;
-var styles2;
 var fields;
-var msg2;
-var fileattributes;
-var filetime;
 
-function main(in request1, in request2in="", in request3in="", in request4in="", in request5in="", in request6in="") {
-	//c sys in,"","","","",""
-	//jbase
+function main(in request1, in request2, in request3, in request4, io request5, in request6="") {
+	//c sys in,in,in,in,io,""
+
+	//handles VALIDATE,BECOMEUSERANDCONNECTION,LOGIN and RESPOND
+
 	//global ii,userencrypt0,passwordexpired,lastlogindate,maxnologindays,validips
 	//global filetime,fileattributes
 
@@ -88,299 +57,16 @@ function main(in request1, in request2in="", in request3in="", in request4in="",
 	// defaulting or value based arguments and setting them
 	// and this means calling listen2 would require passing variables for all
 	//in the few cases listen2 need to respond to caller, it sets @ans
-	var request2 = request2in;
-	var request3 = request3in;
-	var request4 = request4in;
-	var request5 = request5in;
-	var request6 = request6in;
+	//if unassigned(request2in) then requestin='' else request2=request2in
+	//if unassigned(request3in) then requestin='' else request3=request3in
+	//if unassigned(request4in) then requestin='' else request4=request4in
+	//if unassigned(request5in) then requestin='' else request5=request5in
+	//if unassigned(request6in) then requestin='' else request6=request6in
 	var logx = request2;
 
 	var isdevsys = var("NEOSYS.ID").osfile();
 
-	if (request1 == "RUNS") {
-
-		//db start commands
-		//initdir '*.RUN'
-		//filenamesx=dirlist()
-		var filenamesx = oslistf("*.RUN");
-
-		for (var filen = 1; filen <= 9999; ++filen) {
-			filename = filenamesx.a(filen);
-		///BREAK;
-		if (not filename) break;;
-			if (lockrecord("PROCESSES", processes, "START*" ^ filename)) {
-				if (tt.osread(filename)) {
-					tt.converter("\r\n", FM);
-					//dont start if there is a database stop command
-					if (not((tt.a(1) ^ ".END").osfile())) {
-						if (tt.a(5)) {
-							//garbagecollect;
-							tt = "CMD /C START NEOSYS.JS /system " ^ tt.a(5) ^ " /database " ^ tt.a(1) ^ " /pid " ^ tt.a(6);
-							printl(var().at(0), var().at(-4), (var().time()).oconv("MTS"), " ", tt);
-							tt.osshell();
-						}
-						filename.osdelete();
-					}
-				}
-				xx = unlockrecord("", processes, "START*" ^ filename);
-			}
-		};//filen;
-
-	} else if (request1 == "DELETEOLDFILES2") {
-
-		inpath = request3;
-		//delete old response and temp files every 1 minute
-		tt = "DELETEOLDFILES";
-		tt = "";
-		var t2 = "*.4";
-		call listen2(tt, t2, inpath, tt, yy, zz);
-		t2 = "*.5";
-		call listen2(tt, t2, inpath, tt, yy, zz);
-		//call listen2(tt,'*.$2','.\',tt,yy,zz)
-		//shell2 cannot/does not delete its tempfiles due to wget remaining in background
-		var t60 = 60;
-		t2 = "VDM*.tmp";
-		call listen2(tt, t2, ".\\", t60, yy, zz);
-		t2 = "*.$$*";
-		call listen2(tt, tdd, ".\\", t60, yy, zz);
-
-	} else if (request1 == "DELETEOLDFILES") {
-
-		pattern = request2;
-		inpath = request3;
-
-		//delete files older than x
-		ageinsecs = request4;
-		if (not ageinsecs) {
-			ageinsecs = SYSTEM.a(28);
-		}
-		if (ageinsecs == "") {
-			ageinsecs = 60 * 60;
-		}
-
-		gosub deleteoldfiles();
-
-	} else if (request1 == "CHECKRESTART") {
-
-		//return result in @ans
-
-		var s100 = SYSTEM.a(100);
-
-		if (SYSTEM.index(0x00, 1)) {
-			var(SYSTEM).oswrite("SYSTEM.BAD");
-			call sysmsg("Corrupt SYSTEM record in LISTEN - RESTARTING");
-			ANS = "CORRUPTSYSTEM";
-			SYSTEM.converter(0x00, "");
-restart:
-			ANS = "RESTART " ^ ANS;
-			return 0;
-		}
-
-		//detect system parameter changes and restart
-		//this has the effect of detecting corruption in system which inserts lines
-		tt = "SYSTEM.CFG";
-		if (tt.osfile().a(3) ne s100.a(1, 2)) {
-			ANS = tt;
-			goto restart;
-		}
-		tt = "..\\..\\" "SYSTEM.CFG";
-		if (tt.osfile().a(3) ne s100.a(1, 1)) {
-			ANS = tt;
-			goto restart;
-		}
-
-		//check for upgrade to LISTEN
-		var gbp;
-		if (gbp.open("GBP", "")) {
-			var listen;
-			if (listen.read(gbp, "$LISTEN")) {
-				listen = field2(listen, FM, -1);
-				if (s100.a(1, 3)) {
-					if (s100.a(1, 3) ne listen) {
-						ANS = "$LISTEN";
-						goto restart;
-					}
-				}else{
-					SYSTEM.r(100, 3, listen);
-				}
-			}
-		}
-		ANS = "";
-		return 0;
-
-	} else if (request1 == "PATCHANDRUNONCE") {
-
-		//never patch and run on development systems (therefore can only test elsewhere)
-		//or on test systems which can be patched via dataset.1 if needed
-		//TODO work out a way to ensure both live and test programs are updated
-		if (SYSTEM.a(61) or isdevsys) {
-nopatch:
-			ANS = "";
-			return 0;
-		}
-
-		//1. patchcode=PATCH - cannot be used to patch data (only system)
-		// since it may be picked up by any databases listening process
-		//2. patchcode=databasecode - can be used to patch one database (and system)
-		//3. no way to patch all databases datafiles
-		var patchcode = request2;
-		processes = request3;
-
-		//if patch appears then install it
-		var patchfilename = patchcode ^ ".1";
-		var patchfiledir = patchfilename.osfile();
-		if (not patchfiledir) {
-			goto nopatch;
-		}
-
-		//if patching blocked (eg failed to delete last time) then also quit
-		var blockpatchfilename = patchfilename;
-		blockpatchfilename.splicer(-1, 1, "X");
-		if (blockpatchfilename.osfile()) {
-			goto nopatch;
-		}
-
-		//ensure patch file is complete
-		if (not patchfile.osopen(patchfilename)) {
-			goto nopatch;
-		}
-
-		tt = patchfilename.osfile().a(1) - 18;
-		tt.osbread(patchfile, tt, 18);
-		if (tt ne ("!" ^ FM ^ "!END!OF!INSTALL!")) {
-			goto nopatch;
-		}
-
-		//installation wide lock on it
-		if (not(lockrecord("", processes, patchfilename))) {
-			goto nopatch;
-		}
-
-		//ensure that we only ever runonce something just loaded from a patch
-		var runoncekey = "$" ^ patchcode ^ ".RUNONCE";
-		DEFINITIONS.deleterecord(runoncekey);
-		
-
-		//indicate patched/may need restart
-		ANS = 1;
-
-		if (not isdevsys) {
-
-			var cmd = "INSTALL " ^ patchcode ^ " " ^ oscwd().substr(1,2) ^ " (IO)";
-			printl(cmd);
-			perform(cmd);
-
-			//17/12/2009
-			//tt='Size:':patchfiledir<1>:' ':patchfiledir<2> '[DATE,4*]':' ':patchfiledir<3> 'MTS'
-			//call sysmsg(cmd:fm:tt)
-
-		}
-
-		//prevent it being installed again
-		(patchfilename ^ "O").osdelete();
-		("CMD /C REN " ^ patchfilename ^ " " ^ patchfilename ^ "O").osshell();
-		patchfilename.osdelete();
-
-		//if cannot delete then put a blocker on it
-		if (patchfilename.osfile()) {
-			var(var().date() ^ FM ^ var().time()).oswrite(blockpatchfilename);
-		}
-
-		//if $PATCH.RUNONCE or $datasetcode.RUNONCE appears in definitions
-		//if the runonce record appears in the definitions then
-		//run it, save it and delete it
-		var runonce;
-		if (runonce.read(DEFINITIONS, runoncekey)) {
-			if (not isdevsys) {
-				perform("RUN DEFINITIONS " ^ runoncekey.substr(2,9999));
-			}
-			runonce.write(DEFINITIONS, runoncekey ^ "*LAST");
-			DEFINITIONS.deleterecord(runoncekey);
-			
-		}
-		runonce = "";
-
-		//trigger other processes to restart by updating SYSTEM.CFG
-		if (tt.osread("SYSTEM.CFG")) {
-			var(tt).oswrite("SYSTEM.CFG");
-		}
-
-		//release
-		call unlockrecord("", processes, patchfilename);
-
-		//indicate patches applied and may need restart
-		ANS = 1;
-		return 0;
-
-	} else if (request1 == "CONVLOG") {
-
-		//assumes at least 0-31 and 128-255 encoded like $hh
-
-		//reserve/use special characters for field separators
-		logx.swapper("^", "%5E");
-		logx.swapper("]", "%5D");
-		logx.swapper("\\", "%5C");
-		logx.swapper("[", "%5B");
-		logx.swapper("%FE", "^");
-		logx.swapper("%FD", "]");
-		logx.swapper("%FC", "\\");
-		logx.swapper("%FB", "[");
-		logx.swapper(RM, "%FF");
-		//swap fm with '^' in logx
-		//swap vm with ']' in logx
-		//swap sm with '\' in logx
-		//swap tm with "[" in logx
-		logx.converter("\xFE\x22\x20\x5F\x56\x4D\x5F\x20\x22\x22\x20\x5F\x53\x4D\x5F\x20\x22\x22\x20\x5F\x54\x4D\x5F\x20\x22", "^]\\[");
-		//fefdfcfb=char(254):char(253):char(252):char(251)
-		//convert fefdfcfb to '^]\[' in logx
-		logx.swapper(STM, "%FA");
-
-		logx.swapper("%20", " ");
-		//does not seem to format in XML
-		//swap '%20' with '&nbsp;' in logx
-
-		logx.swapper("&", "&amp;");
-		logx.swapper(DQ, "&quot;");
-		logx.swapper("<", "&lt;");
-		logx.swapper(">", "&gt;");
-		logx.swapper("%26", "&amp;");
-		logx.swapper("%22", "&quot;");
-		logx.swapper("%3C", "&lt;");
-		logx.swapper("%3E", "&gt;");
-
-	} else if (request1 == "PROCESSINIT") {
-
-		//put username and database on the bottom line of the screen
-		var username = USERNAME.trim();
-	//username=rnd(1000000)
-		var s23 = SYSTEM.a(23);
-		var s17 = SYSTEM.a(17);
-		s23.converter(" ", FM);
-		//locate 'TEST' in s23 setting xx then username:='*' else
-		if (s23.locateusing("TESTDATA", VM, xx)) {
-			username ^= "*";
-		}else{
-			if (s23.locateusing("TESTING", VM, xx)) {
-				username ^= "*";
-			}else{
-				if (s23.locateusing("TRAINING", VM, xx)) {
-					username ^= "*";
-				}else{
-					if (s17.index("TEST", 1)) {
-						username ^= "*";
-					}
-				}
-			}
-		}
-		// end
-		var bottomline = (s17 ^ " " ^ SYSTEM.a(24)).oconv("L#40") ^ username.oconv("R#40");
-		gosub printbottomline();
-
-	} else if (request1 == "PROCESSEXIT") {
-		var bottomline = var(80).space();
-		gosub printbottomline();
-
-	} else if (request1.a(1) == "VALIDATE") {
+	if (request1.a(1) == "VALIDATE") {
 
 		var username = request2;
 		var password = request3;
@@ -392,19 +78,19 @@ nopatch:
 		//2. email addresses are not secret and usernames are guessable
 		//3. magic character in password on logins causes password reset if email
 		//as the password. Therefore NO @ characters in passwords
-		var passwordreset = word2 == "LOGIN" and password.index("@", 1);
+		var passwordreset = (word2 == "LOGIN") and password.index("@", 1);
 
 		//determine username from emailaddress
 		//only for users with single, unique emails
 		if (passwordreset) {
-			tt = SECURITY.ucase();
+			var tt = SECURITY.ucase();
 			//password is email address when resetting
 			if (tt.a(7).locateusing(password.ucase(), VM, usern)) {
 				//only if email address occurs more than once
 				tt = tt.a(7);
 				tt.r(1, usern, "");
 				tt.converter("; ", VM);
-				if (not tt.locateusing(password.ucase(), VM, xx)) {
+				if (not(tt.locateusing(password.ucase(), VM, xx))) {
 					username = SECURITY.a(1, usern);
 				}
 			}
@@ -449,11 +135,11 @@ nopatch:
 
 		var encrypt0 = encrypt2(password ^ "");
 
-		var USER = "";
+		var userx = "";
 		var users;
 		if (users.open("USERS", "")) {
 			//NEOSYS may have no user record
-			if (not USER.read(users, username)) {
+			if (not(userx.read(users, username))) {
 				{}
 			}
 		}
@@ -461,7 +147,7 @@ nopatch:
 		//NB if "NEOSYS" is in Auth File then some user restrictions apply eg password/ips
 
 		//check username exists
-		if (not SECURITY.a(1).locateusing(username, VM, usern)) {
+		if (not(SECURITY.a(1).locateusing(username, VM, usern))) {
 			usern = 0;
 		}
 
@@ -471,7 +157,7 @@ nopatch:
 			//obtained from userprivs
 			if (users) {
 
-				if (not USER) {
+				if (not userx) {
 					goto validateexit;
 				}
 
@@ -481,7 +167,7 @@ nopatch:
 				//different response to good versus bad usernames
 				//which would allow detection of valid usernames
 				for (var failn = 1; failn <= 999999; ++failn) {
-					tt = USER.a(18, failn);
+					var tt = userx.a(18, failn);
 				///BREAK;
 				if (not(tt ne "" and tt.substr(1,2) ne "OK")) break;;
 				};//failn;
@@ -491,7 +177,7 @@ nopatch:
 				// end
 
 				//check account expiry
-				if (USER.a(35) and var().date() >= USER.a(35)) {
+				if (userx.a(35) and (var().date() >= userx.a(35))) {
 
 					realreason = "Login user account expired";
 
@@ -517,7 +203,7 @@ nopatch:
 			//use the password on the user if present by preference
 			//because new password might not have been put on authorisation file
 			//if the file was locked at the time user reset their password
-			userencrypt0 = USER.a(4, 1);
+			userencrypt0 = userx.a(4, 1);
 			if (userencrypt0 == "") {
 				//TODO remove all encrypted passwords from userprivs and put all on user
 				//in PREWRITE new security
@@ -560,7 +246,7 @@ passfail:
 				//default users valid ipnos if not defined (or cached)
 				if (not validips) {
 
-					var nn = (SECURITY.a(6)).count(VM) + 1;
+					var nn = SECURITY.a(6).count(VM) + 1;
 
 					//get ipnos of group user
 					for (ii = usern + 1; ii <= nn; ++ii) {
@@ -640,7 +326,7 @@ passfail:
 				}
 
 checkip:
-	////////
+////////
 
 				//check is ip no is allowed - or exit
 				ipno = connection.a(1, 2);
@@ -668,14 +354,14 @@ invalidip:
 					//prevent NEOSYS from using CONFIGURED fully formed LAN ips
 					//which are deemed to be NAT routers possibly providing WAN access
 					//but NEOSYS should not have unrestricted access from WAN
-					if (username == "NEOSYS" and not (SYSTEM.a(17)).index("DEMO", 1)) {
+					if ((username == "NEOSYS") and not SYSTEM.a(17).index("DEMO", 1)) {
 						if (ip2 == "192.168") {
 neosyslocalip:
 							if (validips.locateusing(ipno, " ", xx)) {
 								goto invalidip;
 							}
 						}else{
-							tt = ipno.field(".", 1);
+							var tt = ipno.field(".", 1);
 							if (tt == "10") {
 								goto neosyslocalip;
 							}
@@ -700,11 +386,11 @@ neosyslocalip:
 
 					//indicate ok but excessive failures to the user/sysadmins
 					invalidlogin = "Too many login failures - " ^ (DQ ^ (username ^ DQ)) ^ " is blocked";
-					if (USER.a(7)) {
+					if (userx.a(7)) {
 						invalidlogin ^= "|" ^ (DQ ^ (username ^ DQ)) ^ " can and must get a new password unless the account is expired";
 						invalidlogin ^= "|by clicking Password Reset on the NEOSYS Login screen";
 						invalidlogin ^= "|and entering one of their email addresses as follows:";
-						invalidlogin ^= "|" ^ USER.a(7);
+						invalidlogin ^= "|" ^ userx.a(7);
 					}else{
 						invalidlogin ^= "|and has no email address assigned. An administrator must provide a new password for the user";
 					}
@@ -716,7 +402,7 @@ neosyslocalip:
 
 				if (username ne "NEOSYS") {
 
-					var passworddate = USER.a(36);
+					var passworddate = userx.a(36);
 
 					//check password not expired if expiry days is configured
 					var passwordexpirydays = SECURITY.a(25);
@@ -725,7 +411,7 @@ neosyslocalip:
 						//use the last login date if no password date (backward compatible)
 						//if no last login date then treat as password expired
 						if (not passworddate) {
-							passworddate = USER.a(13);
+							passworddate = userx.a(13);
 						}
 
 						//int() to ignore time of day so expiring in one day means they can
@@ -745,7 +431,7 @@ neosyslocalip:
 
 					if (maxnologindays) {
 
-						lastlogindate = USER.a(13);
+						lastlogindate = userx.a(13);
 
 						//if password was reset more recently than last login date then use that
 						if (passworddate > lastlogindate) {
@@ -790,28 +476,28 @@ passwordexpired:
 					//
 					//if session number agrees then dont test anything else
 					//this will allow ip number to change due to network proxy etc
-					if (connection.a(1, 5) ne USER.a(39, 5) and username ne "NEOSYS") {
+					if (connection.a(1, 5) ne userx.a(39, 5) and username ne "NEOSYS") {
 
 						//the word "automatic" hardcoded in browser to unlock and lose any work
-						tt = "You have been automatically logged out due to another login as " ^ (DQ ^ (username ^ DQ));
+						var tt = "You have been automatically logged out due to another login as " ^ (DQ ^ (username ^ DQ));
 						tt.r(-1, "Please login or try again later.");
 
 						//refuse browser change
-						if (connection.a(1, 6) ne USER.a(39, 6)) {
+						if (connection.a(1, 6) ne userx.a(39, 6)) {
 							invalidlogin = tt;
 							realreason = "Duplicate login.";
 							goto validateexit;
 						}
 
 						//refuse http/https change
-						if (connection.a(1, 4) ne USER.a(39, 4)) {
+						if (connection.a(1, 4) ne userx.a(39, 4)) {
 							invalidlogin = tt;
 							realreason = "Duplicate login .";
 							goto validateexit;
 						}
 
 						//refuse ip number change
-						if (connection.a(1, 2) ne USER.a(39, 2)) {
+						if (connection.a(1, 2) ne userx.a(39, 2)) {
 							invalidlogin = tt;
 							realreason = "Duplicate login";
 							goto validateexit;
@@ -828,19 +514,19 @@ passwordexpired:
 				if (word2 == "LOGIN") {
 					if (username ne "NEOSYS" or isdevsys) {
 
-						var ulogins = USER.a(18);
+						var ulogins = userx.a(18);
 						if (ulogins.locateusing("OK", VM, xx)) {
 
 							//if ipno unrestricted
-							if (validips == " " or isdevsys) {
+							if ((validips == " ") or isdevsys) {
 
 								//find a previous SUCCESSFUL login from same ipnet (ip part 1 & 2 only)
 								var isnewipnet = 1;
 								var ipno12 = ipno.field(".", 1, 2);
-								var uipnos = USER.a(16);
+								var uipnos = userx.a(16);
 								var nn = uipnos.count(VM);
 								for (ii = 1; ii <= nn; ++ii) {
-									if (ulogins.a(1, ii) == "OK" and uipnos.a(1, ii).field(".", 1, 2) == ipno12) {
+									if ((ulogins.a(1, ii) == "OK") and (uipnos.a(1, ii).field(".", 1, 2) == ipno12)) {
 										isnewipnet = 0;
 									}
 								///BREAK;
@@ -859,7 +545,7 @@ passwordexpired:
 
 										body = "This is an automated email from your NEOSYS database " ^ SYSTEM.a(17, 1);
 										body ^= " recording a successful login from the ip number " ^ ipno;
-										body.r(-1, "by " ^ USER.a(1) ^ " (" ^ username ^ ")");
+										body.r(-1, "by " ^ userx.a(1) ^ " (" ^ username ^ ")");
 										//not in the last 100 login ips
 										body.r(-1, FM ^ "You will not be notified of any further successful logins by " ^ username ^ " from this ip number for a while.");
 
@@ -867,7 +553,7 @@ passwordexpired:
 											gosub addwhoistx();
 										}
 
-										var subject = "Login on " ^ ipno ^ " of " ^ USER.a(1) ^ " - " ^ username;
+										var subject = "Login on " ^ ipno ^ " of " ^ userx.a(1) ^ " - " ^ username;
 										call sysmsg(body, subject, username);
 
 									}
@@ -890,7 +576,7 @@ passwordexpired:
 								gosub addwhoistx();
 							}
 
-							var subject = "First login of " ^ USER.a(1) ^ " - " ^ username;
+							var subject = "First login of " ^ userx.a(1) ^ " - " ^ username;
 
 							call sysmsg(body, subject, username);
 						}
@@ -908,7 +594,8 @@ passwordexpired:
 		} else if (username == "NEOSYS") {
 
 			//check for (NEOSYS) user and password in revelation system file
-			if (not sysrec.read(systemfile(), username)) {
+			var sysrec;
+			if (not(sysrec.read(systemfile(), username))) {
 				goto validateexit;
 			}
 
@@ -931,14 +618,15 @@ passwordexpired:
 
 		//3. not in users file and not NEOSYS
 		} else {
+			goto validateexit;
 		}
-//L4212:
+//L2600:
 validateexit:
-	/////////////
+/////////////
 		request5 = invalidlogin;
 
 validateexit2:
-	//////////////
+//////////////
 		//save invalid logins in userfile (definitions file for bad usernames)
 		//should only check on LOGIN requests?
 		if (invalidlogin) {
@@ -955,11 +643,11 @@ validateexit2:
 				text = invalidlogin;
 
 				if (failn > maxnfails) {
-					tt = failn + 1;
+					var tt = failn + 1;
 					realreason = "Too many consecutive login failures: " ^ tt ^ ", max is " ^ maxnfails;
 					invalidlogin ^= "\r\n" ^ (DQ ^ (username ^ DQ)) ^ " login is disabled pending password reset by an administrator";
-					if (USER.a(7)) {
-						invalidlogin ^= "\r\n" "or user requesting a password reset to " ^ USER.a(7);
+					if (userx.a(7)) {
+						invalidlogin ^= "\r\n" "or user requesting a password reset to " ^ userx.a(7);
 					}
 				}
 
@@ -1006,7 +694,7 @@ validateexit2:
 					usersordefinitions = DEFINITIONS;
 					userkey = "BADUSER*" ^ username;
 					realreason = "Invalid usercode";
-					if (not RECORD.read(usersordefinitions, userkey)) {
+					if (not(RECORD.read(usersordefinitions, userkey))) {
 						RECORD = "";
 					}
 				}
@@ -1015,12 +703,12 @@ validateexit2:
 				if (passwordreset ne 2) {
 
 					//datetime=(date():'.':time() 'R(0)#5')+0
-					var datetime = var().date() ^ "." ^ (var().time()).oconv("R(0)#5");
+					var datetime = var().date() ^ "." ^ var().time().oconv("R(0)#5");
 					RECORD.inserter(15, 1, datetime);
 					RECORD.inserter(16, 1, connection.a(1, 2));
 					text.swapper("username and/or ", "");
 
-					tt = text.field("|", 1);
+					var tt = text.field("|", 1);
 					if (tt.length() > 80) {
 						tt.splicer(81, 999999, "...");
 					}
@@ -1047,7 +735,7 @@ validateexit2:
 					win.valid = 1;
 					win.orec = RECORD;
 					call usersubs("PREWRITE.RESETPASSWORD");
-					if (not win.valid) {
+					if (not(win.valid)) {
 						USER4.transfer(request5);
 						return 0;
 					}
@@ -1056,7 +744,7 @@ validateexit2:
 
 				//trim long user records
 				if (RECORD.length() > 5000) {
-					var nitems = (RECORD.a(15)).count(VM) + 1;
+					var nitems = RECORD.a(15).count(VM) + 1;
 					RECORD.r(15, RECORD.a(15).field(VM, 1, nitems - 5));
 					RECORD.r(16, RECORD.a(16).field(VM, 1, nitems - 5));
 					RECORD.r(18, RECORD.a(18).field(VM, 1, nitems - 5));
@@ -1103,7 +791,7 @@ validateexit2:
 					request5 ^= "login as user code " ^ (DQ ^ (username ^ DQ)) ^ " to database " ^ (DQ ^ (SYSTEM.a(17, 1) ^ DQ)).oconv(":</b>");
 
 				}
-//L5253:
+//L3610:
 				//users file exists
 			}
 
@@ -1138,14 +826,14 @@ validateexit2:
 						}else{
 							USER4 ^= lastuserid;
 						}
-						USER4 ^= " on " ^ (lastuser.a(13)).oconv("[DATETIME,4*,MTS]") ^ ")";
+						USER4 ^= " on " ^ lastuser.a(13).oconv("[DATETIME,4*,MTS]") ^ ")";
 					}
 					var().clearselect();
 				}
 				body = USER4;
 
 				//add whoistx info for non-private ip nos with no prior successful login
-				if (lastuser == "" or isdevsys) {
+				if ((lastuser == "") or isdevsys) {
 					call whois("", fromipno, whoistx);
 					ipno = fromipno;
 					gosub addwhoistx();
@@ -1165,7 +853,7 @@ validateexit2:
 			//NEOSYS may not have user record
 			//perhaps we need to switch back to users last company every request
 			//in which case even neosys could avoid random companies
-			ucomps = USER.a(33);
+			ucomps = userx.a(33);
 			gosub switchcompany();
 
 			//record stats per database/sessionid/username/ip per hour
@@ -1176,9 +864,10 @@ validateexit2:
 				key ^= "*" ^ username;
 				key ^= "*" ^ connection.a(1, 3);
 				key ^= "*" ^ var().date();
-				tt = (var().time() / 3600).floor() + 1;
+				var tt = (var().time() / 3600).floor() + 1;
 				key ^= "*" ^ tt;
-				if (not statistic.read(statistics, key)) {
+				var statistic;
+				if (not(statistic.read(statistics, key))) {
 					statistic = "";
 				}
 				//to avoid garbagecollect delay required to avoid MD conversion bug
@@ -1237,12 +926,12 @@ validateexit2:
 		if (users.open("USERS", "")) {
 
 			//allow for NEOSYS not in users - all others should be but if not then create
-			if (not userrec.read(users, username)) {
+			if (not(userrec.read(users, username))) {
 				userrec = "";
 			}
 
 			//convert old data
-			if (userrec.a(13) ne userrec.a(15, 1) and userrec.a(18) == "") {
+			if (userrec.a(13) ne userrec.a(15, 1) and (userrec.a(18) == "")) {
 				if (userrec.a(15) and not userrec.a(18)) {
 					userrec.r(18, "OK");
 				}
@@ -1253,7 +942,7 @@ validateexit2:
 
 			//save current login
 			//datetime=(date():'.':time() 'R(0)#5')+0
-			var datetime = var().date() ^ "." ^ (var().time()).oconv("R(0)#5");
+			var datetime = var().date() ^ "." ^ var().time().oconv("R(0)#5");
 			userrec.r(13, datetime);
 			userrec.r(14, SYSTEM.a(40, 2));
 
@@ -1319,371 +1008,11 @@ validateexit2:
 
 		//indicate that response has been made
 		SYSTEM.r(2, "");
-/*
-	} else if (request1.substr(1,14) == "GETINDEXVALUES") {
-
-		USER1 = "";
-		filename = request2;
-		var fieldname = request3;
-		var prefix = request4;
-		var sortby = request5;
-		if (sortby) {
-			if (not(var("AL,AR,DL,DR").locateusing(sortby, ",", xx))) {
-				USER3 = "Invalid sortby " ^ (DQ ^ (sortby ^ DQ)) ^ " in LISTEN,GETINDEXVALUES";
-				return 0;
-			}
-		}
-		var active = request6;
-
-		if (filename == "BATCHES") {
-		}else{
-			gosub fileaccesscheck();
-			if (USER3) {
-				return 0;
-			}
-		}
-
-		//security check
-		var temp = filename;
-
-		//zzz
-		if (temp == "BATCHES") {
-			temp = "JOURNAL";
-		}
-
-		if (not(authorised(singular(temp) ^ " LIST", USER4, ""))) {
-			USER3 = USER4;
-			return 0;
-		}
-
-getvalues:
-		call collectixvals(filename, fieldname, prefix);
-		PSEUDO.transfer(USER1);
-		if (USER1[1] == FM) {
-			USER1.splicer(1, 1, "");
-		}
-		USER3 = "OK";
-
-		if (sortby and USER1) {
-			USER1.converter(FM, RM);
-			USER1 ^= RM;
-			call v119("S", "", sortby[1], sortby[2], USER1, flag);
-			USER1.converter(RM, FM);
-			USER1.splicer(-1, 1, "");
-		}
-
-		var execstoplist;
-		if (execstoplist.read(DEFINITIONS, "INDEXVALUES*" ^ filename ^ "*" ^ fieldname)) {
-
-			//execs will be in field 1
-			//stopped reason will be in parallel in field 2
-			//stopped execs will be at the end
-			USER1.converter(FM, VM);
-
-			//remove or move any stopped execs to the end and add reason
-			var nn = USER1.count(VM) + 1;
-			var nn2 = nn;
-			for (ii = 1; ii <= nn; ++ii) {
-				var execcode = USER1.a(1, ii);
-				if (execstoplist.a(1).locateusing(execcode, VM, stopn)) {
-					var reason = execstoplist.a(2, stopn);
-					if (reason) {
-						USER1.eraser(1, ii);
-						USER1.eraser(2, ii);
-						if (not active) {
-							USER1.r(1, nn2, execcode);
-							USER1.r(2, nn2, reason);
-						}
-						ii -= 1;
-						nn -= 1;
-					}
-				}
-			};//ii;
-
-			//show inactive if none are active
-			if (USER1 == "" and active) {
-				active = "";
-				goto getvalues;
-			}
-
-			//1=force vm to ensure xml has empty not missing tags
-			USER1.r(2, 1, USER1.a(2, 1));
-			USER1 = invertarray(USER1, 1);
-
-		}
-
-		if (USER0.index("RECORD", 1)) {
-			USER1 = invertarray(USER1, 1);
-
-		} else if (USER0.index("XML", 1)) {
-			if (USER1) {
-				call htmllib2("STRIPTAGS", USER1);
-				USER1.swapper(FM, "</" ^ fieldname ^ ">" "</record>" "\r\n" "<record><" ^ fieldname ^ ">");
-				USER1.splicer(1, 0, "<record><" ^ fieldname ^ ">");
-				USER1 ^= "</" ^ fieldname ^ ">" "</record>";
-				if (USER1.index(VM, 1)) {
-					USER1.swapper("</" ^ fieldname ^ ">", "</STOPPED>");
-					USER1.swapper(VM, "</" ^ fieldname ^ ">" "<STOPPED>");
-				}
-			}
-			USER1.splicer(1, 0, "<records>");
-			USER1 ^= "</records>";
-		} else {
-			//convert fm to vm in iodat
-		}
-//L7246:
-*/
-	//also called from financeproxy to return voucher details for popup
-	} else if (request1 == "SELECT") {
-
-		var filename0 = request2;
-		filename = filename0.field(" ", 1);
-		var sortselect = request3;
-		var dictids = request4;
-		var options = request5;
-		var maxnrecs = request6;
-
-		if (not(sortselect.index("%SELECTLIST%", 1))) {
-			var().clearselect();
-		}
-
-		var file;
-		if (not(file.open(filename, ""))) {
-			USER3 = DQ ^ (filename ^ DQ) ^ " file does not exist in LISTEN SELECT";
-			return 0;
-		}
-
-		gosub fileaccesscheck();
-		if (USER3) {
-			return 0;
-		}
-
-		//get the current program stack
-		//programstack=program.stack(nostack)
-
-		//and data passed to SELECT is assumed to be a selectlist
-
-		if (USER1) {
-			var().makelist("",USER1);
-			sortselect ^= "%SELECTLIST%";
-			USER1 = "";
-		}
-
-		call select2(filename0, SYSTEM.a(2), sortselect, dictids, options, USER1, USER3, "", "", "", maxnrecs);
-		//restore the program stack although this is done in LISTEN per request
-		//arev has a limit on 299 "programs" and dictionary entries count as 1 each!
-		//call program.stack(programstack)
-
-		if (USER4) {
-			USER3 = trim2(USER4.a(1), FM);
-		}else{
-			USER1 = "%DIRECTOUTPUT%";
-			//response='OK'
-		}
-
-	} else if (request1 == "LISTLOCKS") {
-
-		gosub getdostime();
-
-		/*;
-
-			msg='';
-
-			filename='LOCKS';
-			//sortselect='BY DATETIME_EXPIRES'
-			sortselect='BY USER';
-			sortselect:=' WITH DATETIME_EXPIRES >= ':dostime;
-			dictids='USER STATION FILENAME KEY';
-			options='';
-			msg='';
-
-			call select2(filename,'',sortselect,dictids,options,select2data,select2response,'','','');
-
-			//abort to net program which will clear the lists file
-			if msg then stop;
-
-		*/
-
-		if (not(openfile("LOCKS", locks))) {
-			call mssg("LISTEN2 CANNOT OPEN LOCKS FILE");
-			return 0;
-		}
-
-		locks.select();
-		var select2data = "";
-		var nlocks = 0;
-nextlock:
-		if (readnext(lockid)) {
-			var lockx;
-			if (lockx.read(locks, lockid)) {
-				if (lockx.a(1) < dostime) {
-					goto nextlock;
-				}
-				nlocks += 1;
-				select2data.r(nlocks, 1, lockx.a(4) ^ VM ^ lockx.a(3) ^ VM ^ lockid.field("*", 1) ^ VM ^ lockid.field("*", 2, 999));
-				goto nextlock;
-			}
-		}
-
-		if (tracing) {
-			printl();
-		}else{
-			print(var().at(0, 1));
-		}
-		var nn = select2data.count(FM);
-		var maxlines = 20;
-		if (not tracing) {
-			nn = maxlines;
-			if (nn > maxlines) {
-				nn = maxlines;
-			}
-			printl("+------Active-------+");
-		}
-		if (tracing) {
-			printl(var("User").oconv("L#19"), " ", var("Station").oconv("L#19"), " ", var("File").oconv("L#19"), " ", var("Record").oconv("L#19"));
-		}
-		for (ii = 1; ii <= nn; ++ii) {
-		///BREAK;
-		if (tracing and nn > 20) break;;
-			var row = select2data.a(ii);
-			if (not tracing) {
-				print("|");
-			}
-			tt = row.a(1, 1).trim();
-			if (not tracing) {
-				tt ^= " " ^ row.a(1, 3);
-			}
-			print(tt.oconv("L#19"));
-			if (not tracing) {
-				printl("|");
-			}
-			if (tracing) {
-				printl(" ", (row.a(1, 2)).oconv("L#19"), " ", (row.a(1, 3)).oconv("L#19"), " ", (row.a(1, 4)).oconv("L#19"));
-			}
-		};//ii;
-
-		if (not tracing) {
-			printl("+-------------------+");
-		}
-
-		select2data = "";
-		var select2response = "";
-
-	} else if (request1 == "UNLOCKLONGPROCESS") {
-
-		//IF revRELEASE()>= 2.1 THEN
-		// lockmode=36
-		// unlockmode=37
-		//END ELSE
-		var lockmode = 23;
-		var unlockmode = 24;
-		// END
-
-		//NB ZZZ will hang if is not locked eg via unlock all
-		//unlock long process unlimited cpu time flag
-		tt = SYSTEM.a(48);
-		if (tt) {
-			//unlock in request loop using lockkey stored in system<48> by giveway
-			//lock first to avoid hanging if try to unlock when not locked
-			call rtp57(lockmode, "", xx, tt, "", yy, zz);
-			call rtp57(unlockmode, "", xx, tt, "", yy, zz);
-			SYSTEM.r(48, "");
-		}
-
-	} else if (request1 == "STOPDB") {
-
-		//check authorised
-		tt = request2;
-		if (not tt) {
-			tt = "STOP";
-		}
-		if (not(authorised("DATABASE " ^ tt, USER4, "LS"))) {
-			USER3 = "Error: " ^ USER4;
-			return 0;
-		}
-
-		if (request3.osfile() or request4.osfile()) {
-			//response='Error: Database already stopped/stopping'
-			call listen4(19, USER3);
-
-		}else{
-
-			call oswrite("", request3);
-
-			//stop server
-			if (request2.index("ALL", 1)) {
-				call oswrite("", request4);
-			}
-
-			//wait up to 30 seconds for other users to quit
-			var timex = var().time();
-			while (true) {
-			///BREAK;
-			if (not(otherusers().a(1) and (var().time() - timex).abs() < 30)) break;;
-				call ossleep(1000*1);
-			}//loop;
-
-			USER1 = "";
-
-			var otherusersx = otherusers();
-			if (otherusersx) {
-				//response='Error: Could not terminate ':otherusersx<1>:' processes|':otherusersx<2>
-				call listen4(20, USER3, otherusersx);
-				request3.osdelete();
-			}else{
-				osshell("NET STOP NEOSYSSERVICE");
-
-				if (request2.substr(1,7) == "RESTART") {
-					request3.osdelete();
-					osshell("NET START NEOSYSSERVICE");
-				}
-
-				USER3 = "OK";
-			}
-
-			if (request2.index("ALL", 1)) {
-				request4.osdelete();
-			}
-		}
-
-	} else if (request1 == "BACKUP") {
-
-		//similar code in LISTEN and LISTEN2
-
-		//gosub getbakpars
-		call readbakpars(bakpars);
-
-		//backup may respond to user itself if it starts
-		USER4 = "";
-		perform("FILEMAN BACKUP " ^ SYSTEM.a(17) ^ " " ^ bakpars.a(7));
-
-		//if backup has already responded to user
-		//then quit and indicate to calling program that a backup has been done
-		//user will be emailed
-		if (SYSTEM.a(2) == "") {
-			PSEUDO = "BACKUP2 " ^ bakpars.a(7);
-			if (USER4) {
-				var().stop();
-			}
-		}
-
-		USER3 = USER4;
-		USER3.converter(FM ^ VM, "\r\r");
-
-		call sysmsg(USER3, "NEOSYS Backup");
-
-		if ((USER3.ucase()).index("SUCCESS", 1)) {
-			USER3.splicer(1, 0, "OK ");
-		}
-
-		//note: if backup did not respond already then the requestexit will
-		//respond as usual with the error message from backup
-		USER1 = "";
 
 	} else {
 		printl(DQ ^ (request1 ^ DQ), " invalid request in LISTEN2");
 	}
-//L8482:
+//L4861:
 	return 0;
 
 }
@@ -1697,7 +1026,7 @@ subroutine becomeuserandconnection(in request2, in request4) {
 	USERNAME=(username);
 
 	//set @station
-	tt = connection.a(1, 2);
+	var tt = connection.a(1, 2);
 	if (connection.a(1, 3) ne tt) {
 		tt ^= "_" ^ connection.a(1, 3);
 	}
@@ -1726,7 +1055,8 @@ subroutine becomeuserandconnection(in request2, in request4) {
 
 			var styles = userrec.a(19);
 			styles.swapper("Default", "");
-			if (not styles2.readv(users, userrec.a(21), 19)) {
+			var styles2;
+			if (not(styles2.readv(users, userrec.a(21), 19))) {
 				styles2 = "";
 			}
 
@@ -1762,7 +1092,7 @@ subroutine becomeuserandconnection(in request2, in request4) {
 				}
 
 				//departmental default
-				if (not tt2.length()) {
+				if (not(tt2.length())) {
 					tt2 = styles2.a(1, vn);
 				}
 
@@ -1785,49 +1115,6 @@ subroutine becomeuserandconnection(in request2, in request4) {
 
 }
 
-subroutine getdostime() {
-	dostime = ostime();
-	//convert to Windows based date/time (ndays since 1/1/1900)
-	//31/12/67 in rev date() format equals 24837 in windows date format
-	dostime = 24837 + var().date() + dostime / 24 / 3600;
-	return;
-
-}
-
-subroutine fileaccesscheck() {
-	USER3 = "";
-
-	var securityfilename = filename;
-	if (filename == "BATCHES") {
-		securityfilename = "JOURNALS";
-	}
-
-	//security check
-	//dont check markets and companies because really must have access to some
-	//and eliminates need for clumsy task COMPANY ACCESS PARTIAL task
-	if (not(var("MENUS,ADMENUS").locateusing(filename, ",", xx))) {
-		var temp = securityfilename;
-		temp.converter(".", " ");
-		temp = singular(temp);
-		if (not(authorised(temp ^ " ACCESS", USER4, ""))) {
-			//we could use securityfilename LIST instead of securityfilename ACCESS PARTIAL clumsy
-			//ie list without general access means there are some records
-			//specifically allowed
-			if (not(authorised("!#" ^ temp ^ " ACCESS PARTIAL", msg2, ""))) {
-				//if there is an authorised dictionary item then leave it up to that
-				if (not((var("AUTHORISED").xlate("DICT." ^ filename, 8, "X")).index("ALLOWPARTIALACCESS", 1))) {
-					USER3 = USER4;
-					return;
-				}
-			}
-		}
-		USER4 = "";
-	}
-
-	return;
-
-}
-
 subroutine addwhoistx() {
 	if (whoistx) {
 		body.r(-1, FM ^ "\"whois\" ip number " ^ ipno ^ " information:");
@@ -1839,92 +1126,12 @@ subroutine addwhoistx() {
 }
 
 subroutine switchcompany() {
-	if (not ucomps.locateusing(gen.gcurrcompany, VM, xx)) {
-		tt = ucomps.a(1, 1);
-		if (xx.read(gen.companies, tt)) {
-			call initcompany(tt);
+	if (not(ucomps.locateusing(gen.gcurrcompany, VM, xx))) {
+		var tc = ucomps.a(1, 1);
+		if (xx.read(gen.companies, tc)) {
+			call initcompany(tc);
 		}
 	}
-	return;
-
-}
-
-subroutine printbottomline() {
-	if (CRTHIGH > 24) {
-		yy = CRTHIGH - 1;
-	}else{
-		yy = CRTHIGH;
-	}
-	//CALL SCRN.IO(0,yy,bottomline[1,80],ESC.TO.ATTR(@ENVIRON.SET<21>))
-	return;
-
-}
-
-subroutine deleteoldfiles() {
-
-	var deletetime = var().date() * 24 * 60 * 60 + var().time() - ageinsecs;
-
-	var filespec = (inpath ^ pattern).ucase();
-
-	//failsafe - only allow delete .* in data folder
-	if (filespec.substr(-2,2) == ".*") {
-		if (not filespec.index("\\D" "ATA\\", 1)) {
-			return;
-		}
-	}
-
-	//for each suitable file
-	//initdir filespec
-	//filenamesx=dirlist()
-	var filenamesx = oslistf(filespec);
-
-	while (true) {
-	///BREAK;
-	if (not filenamesx) break;;
-
-		//get the file time
-		var filename0 = filenamesx.field(FM, 1);
-		filenamesx.splicer(1, (filenamesx.field(FM, 1)).length() + 1, "");
-		if (not filenamesx) {
-			filenamesx = var().oslistf();
-		}
-
-		filename = inpath ^ filename0;
-
-		//replaced by databasecode.SVR
-		if (filename0 == "GLOBAL.SVR") {
-			goto deleteit;
-		}
-
-		if (not(var(".JPG,.PNG,.GIF,.SVR").locateusing(filename.substr(-4,4), ",", xx))) {
-
-			//a file ending .4 is a request to delete the .2 and .3 files
-			if (filename.substr(-2,2) == ".4") {
-				filename.osdelete();
-				filename.splicer(-1, 1, "2");
-				filename.osdelete();
-				filename.splicer(-1, 1, "3");
-				filename.osdelete();
-
-			}else{
-				if (filename.substr(-4,4) == ".TMP") {
-					goto deleteit;
-				}
-				//and delete it if older than the cut off time
-				//and has a file extension (ie leave PARAMS and PARAMS2)
-				fileattributes = filename.osfile();
-				filetime = fileattributes.a(2) * 24 * 60 * 60 + fileattributes.a(3);
-				if ((filename.substr(-4,4)).index(".", 1) and filetime <= deletetime) {
-deleteit:
-					filename.osdelete();
-				}else{
-				}
-			}
-
-		}
-
-	}//loop;
-
 	return;
 
 }
