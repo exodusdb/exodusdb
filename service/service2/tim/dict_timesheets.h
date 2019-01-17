@@ -13,6 +13,7 @@ efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "e
 efb_dict_timesheets& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -58,6 +59,7 @@ efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "e
 efb_dict_timesheets& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -103,6 +105,7 @@ efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "e
 efb_dict_timesheets& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -148,6 +151,7 @@ efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "e
 efb_dict_timesheets& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -193,6 +197,7 @@ efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "e
 efb_dict_timesheets& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -238,6 +243,7 @@ efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "e
 efb_dict_timesheets& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -283,6 +289,7 @@ efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "e
 efb_dict_timesheets& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -328,6 +335,7 @@ efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "e
 efb_dict_timesheets& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -373,6 +381,7 @@ efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "e
 efb_dict_timesheets& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -418,6 +427,7 @@ efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "e
 efb_dict_timesheets& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -463,6 +473,7 @@ efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "e
 efb_dict_timesheets& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -508,6 +519,7 @@ efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "e
 efb_dict_timesheets& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -553,6 +565,7 @@ efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "e
 efb_dict_timesheets& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -598,6 +611,7 @@ efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "e
 efb_dict_timesheets& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -643,6 +657,7 @@ efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "e
 efb_dict_timesheets& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -688,6 +703,7 @@ efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "e
 efb_dict_timesheets& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -733,6 +749,7 @@ efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "e
 efb_dict_timesheets& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -778,6 +795,7 @@ efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "e
 efb_dict_timesheets& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -823,6 +841,7 @@ efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "e
 efb_dict_timesheets& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -868,6 +887,7 @@ efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "e
 efb_dict_timesheets& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -913,6 +933,7 @@ efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "e
 efb_dict_timesheets& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -958,6 +979,7 @@ efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "e
 efb_dict_timesheets& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -1003,6 +1025,7 @@ efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "e
 efb_dict_timesheets& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -1048,6 +1071,7 @@ efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "e
 efb_dict_timesheets& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -1093,6 +1117,7 @@ efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "e
 efb_dict_timesheets& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -1138,6 +1163,7 @@ efb_dict_timesheets(MvEnvironment& mv) : ExodusFunctorBase("dict_timesheets", "e
 efb_dict_timesheets& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void

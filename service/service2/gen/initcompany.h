@@ -13,6 +13,7 @@ efb_initcompany(MvEnvironment& mv) : ExodusFunctorBase("initcompany", "exoduspro
 efb_initcompany& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void

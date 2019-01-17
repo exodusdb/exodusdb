@@ -13,6 +13,7 @@ efb_validcode2(MvEnvironment& mv) : ExodusFunctorBase("validcode2", "exodusprogr
 efb_validcode2& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void

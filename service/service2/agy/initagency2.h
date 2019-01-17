@@ -13,6 +13,7 @@ efb_initagency2(MvEnvironment& mv) : ExodusFunctorBase("initagency2", "exoduspro
 efb_initagency2& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void

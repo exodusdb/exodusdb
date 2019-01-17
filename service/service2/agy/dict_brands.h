@@ -13,6 +13,7 @@ efb_dict_brands(MvEnvironment& mv) : ExodusFunctorBase("dict_brands", "exoduspro
 efb_dict_brands& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -58,6 +59,7 @@ efb_dict_brands(MvEnvironment& mv) : ExodusFunctorBase("dict_brands", "exoduspro
 efb_dict_brands& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -103,6 +105,7 @@ efb_dict_brands(MvEnvironment& mv) : ExodusFunctorBase("dict_brands", "exoduspro
 efb_dict_brands& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -148,6 +151,7 @@ efb_dict_brands(MvEnvironment& mv) : ExodusFunctorBase("dict_brands", "exoduspro
 efb_dict_brands& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -193,6 +197,7 @@ efb_dict_brands(MvEnvironment& mv) : ExodusFunctorBase("dict_brands", "exoduspro
 efb_dict_brands& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -238,6 +243,7 @@ efb_dict_brands(MvEnvironment& mv) : ExodusFunctorBase("dict_brands", "exoduspro
 efb_dict_brands& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -283,6 +289,7 @@ efb_dict_brands(MvEnvironment& mv) : ExodusFunctorBase("dict_brands", "exoduspro
 efb_dict_brands& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -328,6 +335,7 @@ efb_dict_brands(MvEnvironment& mv) : ExodusFunctorBase("dict_brands", "exoduspro
 efb_dict_brands& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -373,6 +381,7 @@ efb_dict_brands(MvEnvironment& mv) : ExodusFunctorBase("dict_brands", "exoduspro
 efb_dict_brands& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -418,6 +427,7 @@ efb_dict_brands(MvEnvironment& mv) : ExodusFunctorBase("dict_brands", "exoduspro
 efb_dict_brands& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -463,6 +473,7 @@ efb_dict_brands(MvEnvironment& mv) : ExodusFunctorBase("dict_brands", "exoduspro
 efb_dict_brands& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -508,6 +519,7 @@ efb_dict_brands(MvEnvironment& mv) : ExodusFunctorBase("dict_brands", "exoduspro
 efb_dict_brands& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -553,6 +565,7 @@ efb_dict_brands(MvEnvironment& mv) : ExodusFunctorBase("dict_brands", "exoduspro
 efb_dict_brands& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void

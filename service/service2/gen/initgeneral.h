@@ -13,6 +13,7 @@ efb_initgeneral(MvEnvironment& mv) : ExodusFunctorBase("initgeneral", "exoduspro
 efb_initgeneral& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void

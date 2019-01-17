@@ -13,6 +13,7 @@ efb_generalsubs2(MvEnvironment& mv) : ExodusFunctorBase("generalsubs2", "exodusp
 efb_generalsubs2& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void

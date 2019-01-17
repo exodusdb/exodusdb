@@ -13,6 +13,7 @@ efb_dict_users(MvEnvironment& mv) : ExodusFunctorBase("dict_users", "exodusprogr
 efb_dict_users& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -58,6 +59,7 @@ efb_dict_users(MvEnvironment& mv) : ExodusFunctorBase("dict_users", "exodusprogr
 efb_dict_users& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void

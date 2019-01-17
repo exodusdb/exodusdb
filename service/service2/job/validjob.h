@@ -13,6 +13,7 @@ efb_validjob(MvEnvironment& mv) : ExodusFunctorBase("validjob", "exodusprogramba
 efb_validjob& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void

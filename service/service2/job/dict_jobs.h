@@ -13,6 +13,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -58,6 +59,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -103,6 +105,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -148,6 +151,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -193,6 +197,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -238,6 +243,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -283,6 +289,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -328,6 +335,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -373,6 +381,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -418,6 +427,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -463,6 +473,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -508,6 +519,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -553,6 +565,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -598,6 +611,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -643,6 +657,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -688,6 +703,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -733,6 +749,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -778,6 +795,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -823,6 +841,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -868,6 +887,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -913,6 +933,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -958,6 +979,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -1003,6 +1025,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -1048,6 +1071,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -1093,6 +1117,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -1138,6 +1163,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -1183,6 +1209,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -1228,6 +1255,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -1273,6 +1301,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -1318,6 +1347,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -1363,6 +1393,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -1408,6 +1439,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -1453,6 +1485,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -1498,6 +1531,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -1543,6 +1577,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -1588,6 +1623,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -1633,6 +1669,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -1678,6 +1715,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -1723,6 +1761,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -1768,6 +1807,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -1813,6 +1853,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -1858,6 +1899,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -1903,6 +1945,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -1948,6 +1991,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -1993,6 +2037,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -2038,6 +2083,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -2083,6 +2129,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -2128,6 +2175,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -2173,6 +2221,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -2218,6 +2267,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -2263,6 +2313,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -2308,6 +2359,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -2353,6 +2405,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -2398,6 +2451,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -2443,6 +2497,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -2488,6 +2543,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -2533,6 +2589,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -2578,6 +2635,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -2623,6 +2681,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -2668,6 +2727,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -2713,6 +2773,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -2758,6 +2819,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -2803,6 +2865,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -2848,6 +2911,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -2893,6 +2957,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -2938,6 +3003,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -2983,6 +3049,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -3028,6 +3095,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -3073,6 +3141,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -3118,6 +3187,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -3163,6 +3233,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -3208,6 +3279,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -3253,6 +3325,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -3298,6 +3371,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -3343,6 +3417,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -3388,6 +3463,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -3433,6 +3509,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -3478,6 +3555,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -3523,6 +3601,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -3568,6 +3647,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -3613,6 +3693,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -3658,6 +3739,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -3703,6 +3785,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -3748,6 +3831,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -3793,6 +3877,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -3838,6 +3923,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -3883,6 +3969,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -3928,6 +4015,7 @@ efb_dict_jobs(MvEnvironment& mv) : ExodusFunctorBase("dict_jobs", "exodusprogram
 efb_dict_jobs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void

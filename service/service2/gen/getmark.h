@@ -13,6 +13,7 @@ efb_getmark(MvEnvironment& mv) : ExodusFunctorBase("getmark", "exodusprogrambase
 efb_getmark& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void

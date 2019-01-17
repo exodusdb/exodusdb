@@ -13,6 +13,7 @@ efb_prodordersubs2(MvEnvironment& mv) : ExodusFunctorBase("prodordersubs2", "exo
 efb_prodordersubs2& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void

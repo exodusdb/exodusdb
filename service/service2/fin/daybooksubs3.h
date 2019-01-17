@@ -13,6 +13,7 @@ efb_daybooksubs3(MvEnvironment& mv) : ExodusFunctorBase("daybooksubs3", "exodusp
 efb_daybooksubs3& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void

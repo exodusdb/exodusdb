@@ -137,13 +137,14 @@ function main(io tx, in mode="", in modevalue="") {
 
 		if (letterhead.unassigned()) {
 			if (html) {
-				call gethtml("HEAD", letterhead, "");
+				var mode = "HEAD";
+				call gethtml(mode, letterhead, "");
 			}else{
 				letterhead = "";
 			}
 		}
 
-		pagelns = mv.LPTRHIGH - 1;
+		pagelns = LPTRHIGH - 1;
 		bodyln = 0;
 		realpagen = 0;
 		pagen = 0;
@@ -291,7 +292,7 @@ subroutine convoptions() {
 		var optionchars = "";
 		while (true) {
 			optioncharn += 1;
-			var optionchar = temp[optioncharn];			
+			var optionchar = temp[optioncharn];
 			if (not(optionchar ne "" and optionchar ne "\'")) {
 				break;
 			}

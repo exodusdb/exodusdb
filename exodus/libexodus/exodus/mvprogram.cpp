@@ -488,15 +488,21 @@ var ExodusProgramBase::perform(const var& sentence) {
 	try {
 		ANS=perform_exodusfunctorbase_.callsmf();
 	}
+	catch (const MVUndefined& e) {
+		//if return "" is missing then default ANS to ""
+		ANS=L"";
+	}
 	catch (const MVStop& e) {
 		//stop is normal way of stopping a perform
 		//functions can call it to terminate the whole "program"
 		//without needing to setup chains of returns
 		//to exit from nested functions
+		ANS=L"";
 	}
 	catch (const MVAbort& e) {
 		//similar to stop for the time being
 		//maybe it should set some error flag/messages
+		ANS=L"";
 	}
 	////////////////////////////////////////////
 

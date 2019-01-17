@@ -13,6 +13,7 @@ efb_initagencyindexes(MvEnvironment& mv) : ExodusFunctorBase("initagencyindexes"
 efb_initagencyindexes& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void

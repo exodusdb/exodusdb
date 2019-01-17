@@ -410,10 +410,10 @@ updateversion:
 	call shadowmfs("NEOSYSINIT", "");
 
 	call log2("*reattach data", logtime);
-	var VOLUMES = VOLUMES(0);
-	var nvolumes = VOLUMES(0).count(FM) + 1;
+	var volumesx = VOLUMES;
+	var nvolumes = VOLUMES.count(FM) + 1;
 	for (var volumen = 1; volumen <= nvolumes; ++volumen) {
-		var volume = VOLUMES.a(volumen);
+		var volume = volumesx.a(volumen);
 		if (volume.substr(1,8) == ("..\\" "DATA" "\\")) {
 			execute("ATTACH " ^ volume ^ " (S)");
 		}
@@ -901,6 +901,7 @@ nextreport:
 	//currdataset=field(definitions[index(ucase(definitions),'\':'DATA':'\',1)+6,9999],'\',1)
 	//system<17>=currdataset
 	var currdataset = SYSTEM.a(17);
+
 	/*;
 		call log2('*warning if too little or too much EMS memory',logtime);
 		ems.allocated=get.ems('');
@@ -943,6 +944,7 @@ nextreport:
 			//if freemb then perform 'OFF'
 			end;
 	*/
+
 	call log2("*try to update upload.dll", logtime);
 	//for extn=1 to 3
 	// ext=field('net,w3c,www',',',extn)
@@ -1329,9 +1331,9 @@ getproxy:
 	*/
 
 	call log2("*make global per installation files", logtime);
-	var FILENAMES = "PROCESSES,STATISTICS,REQUESTLOG";
+	var filenamesx = "PROCESSES,STATISTICS,REQUESTLOG";
 	for (var ii = 1; ii <= 999; ++ii) {
-		var filename = FILENAMES.field(",", ii);
+		var filename = filenamesx.field(",", ii);
 	///BREAK;
 	if (not filename) break;;
 		//TODO lock/prevent double create with other processes
@@ -1594,7 +1596,7 @@ nextdoc:
 		perform("FINDDEADALL");
 	}
 
-	if (not(VOLUMES(0).locateusing("DATAVOL", FM, xx))) {
+	if (not(VOLUMES.locateusing("DATAVOL", FM, xx))) {
 		//pcperform 'MD DATAVOL'
 		//call mkdir('DATAVOL':char(0),xx)
 		call osmkdir("DATAVOL");
@@ -1757,6 +1759,7 @@ nextdoc:
 	}
 
 	var().stop();
+	return 0;
 
 }
 

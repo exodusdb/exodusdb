@@ -944,32 +944,33 @@ DLL_PUBLIC bool insertrecord(const var& record, const var& filehandle,const var&
 
 DLL_PUBLIC bool select(const var& sortselectclause)
 {
-	return var(L"default").select(sortselectclause);
+	return var(L"").select(sortselectclause);
 }
 
 void DLL_PUBLIC clearselect()
 {
-	var(L"default").clearselect();
+	var(L"").clearselect();
 }
 
 DLL_PUBLIC bool readnext(var& key)
 {
-	return var(L"default").readnext(key);
+	return var(L"").readnext(key);
 }
 
 DLL_PUBLIC bool readnext(var& key, var& valueno)
 {
-	return var(L"default").readnext(key,valueno);
+	var result=var(L"").readnext(key,valueno);
+	return result;
 }
 
 DLL_PUBLIC bool selectrecord(const var& sortselectclause)
 {
-	return var(L"default").selectrecord(sortselectclause);
+	return var(L"").selectrecord(sortselectclause);
 }
 
 DLL_PUBLIC bool readnextrecord(var& record, var& key)
 {
-	return var(L"default").readnextrecord(record, key);
+	return var(L"").readnextrecord(record, key);
 }
 
 DLL_PUBLIC var xlate(const var& filename, const var& key, const var& fieldno, const wchar_t* mode)

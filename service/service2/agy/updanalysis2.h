@@ -13,6 +13,7 @@ efb_updanalysis2(MvEnvironment& mv) : ExodusFunctorBase("updanalysis2", "exodusp
 efb_updanalysis2& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void

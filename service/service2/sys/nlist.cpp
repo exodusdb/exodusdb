@@ -315,7 +315,7 @@ function main() {
 	nblocks = 0;
 	blockn = 0;
 
-	if (LISTACTIVE) {
+	if (var("").hasnext()) {
 		fromdate = "";
 		fromtime = "";
 	}else{
@@ -1372,7 +1372,7 @@ nextdict:
 		if ((ss.count(" ") > 2) or keylist) {
 
 			//preselect if sselect is by any mv fields since that ignores maxnrecs
-			if (not LISTACTIVE) {
+			if (not var("").hasnext()) {
 				if (preselect) {
 					call xselect(ss.field(" ", 1, 3) ^ " (S)");
 				}
@@ -1383,13 +1383,13 @@ nextdict:
 			call xselect(ss ^ " (S)");
 			//call mssg('','DB',buffer,'')
 
-			if (not LISTACTIVE) {
+			if (not var("").hasnext()) {
 				//the words "No record" is hardcoded in autorun and maybe elsewhere
 				call mssg("No records found");
 				var().stop();
 			}
 
-			if (not LISTACTIVE) {
+			if (not var("").hasnext()) {
 				if (html) {
 					tx ^= "</tbody></table>";
 				}
@@ -1399,7 +1399,7 @@ nextdict:
 			}
 
 		}else{
-			if (not LISTACTIVE) {
+			if (not var("").hasnext()) {
 				srcfile.select();
 			}
 		}

@@ -2,7 +2,7 @@ message("")
 message("--LIBEXODUS CMAKE INIT --")
 
 #works using c++14 default on Ubuntu 18.04 so no need for this
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+##SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 
 cmake_minimum_required(VERSION 2.8)
 

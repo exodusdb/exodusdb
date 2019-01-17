@@ -13,6 +13,7 @@ efb_lockposting(MvEnvironment& mv) : ExodusFunctorBase("lockposting", "exoduspro
 efb_lockposting& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void

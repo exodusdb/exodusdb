@@ -13,6 +13,7 @@ efb_mediaalerts(MvEnvironment& mv) : ExodusFunctorBase("mediaalerts", "exoduspro
 efb_mediaalerts& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void

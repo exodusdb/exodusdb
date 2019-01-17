@@ -13,6 +13,7 @@ efb_readagp(MvEnvironment& mv) : ExodusFunctorBase("readagp", "exodusprogrambase
 efb_readagp& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void

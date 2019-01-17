@@ -13,6 +13,7 @@ efb_plansubs3(MvEnvironment& mv) : ExodusFunctorBase("plansubs3", "exodusprogram
 efb_plansubs3& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void

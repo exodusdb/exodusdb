@@ -13,6 +13,7 @@ efb_jobanalysis(MvEnvironment& mv) : ExodusFunctorBase("jobanalysis", "exoduspro
 efb_jobanalysis& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void

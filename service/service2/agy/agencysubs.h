@@ -13,6 +13,7 @@ efb_agencysubs(MvEnvironment& mv) : ExodusFunctorBase("agencysubs", "exodusprogr
 efb_agencysubs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void

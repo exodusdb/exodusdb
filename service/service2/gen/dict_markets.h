@@ -13,6 +13,7 @@ efb_dict_markets(MvEnvironment& mv) : ExodusFunctorBase("dict_markets", "exodusp
 efb_dict_markets& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -58,6 +59,7 @@ efb_dict_markets(MvEnvironment& mv) : ExodusFunctorBase("dict_markets", "exodusp
 efb_dict_markets& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -103,6 +105,7 @@ efb_dict_markets(MvEnvironment& mv) : ExodusFunctorBase("dict_markets", "exodusp
 efb_dict_markets& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -148,6 +151,7 @@ efb_dict_markets(MvEnvironment& mv) : ExodusFunctorBase("dict_markets", "exodusp
 efb_dict_markets& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
@@ -193,6 +197,7 @@ efb_dict_markets(MvEnvironment& mv) : ExodusFunctorBase("dict_markets", "exodusp
 efb_dict_markets& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void

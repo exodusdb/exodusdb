@@ -13,6 +13,7 @@ efb_timesheetsubs(MvEnvironment& mv) : ExodusFunctorBase("timesheetsubs", "exodu
 efb_timesheetsubs& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void

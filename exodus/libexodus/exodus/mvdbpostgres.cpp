@@ -170,19 +170,25 @@ void var::setlasterror(const var& msg) const
 	//no checking for speed
 	//THISIS(L"void var::setlasterror(const var& msg")
 	//ISSTRING(msg)
-	tss_pglasterror.reset(new var(msg));
+
+	//tcache_get (tc_idx=12) at malloc.c:2943
+	//2943    malloc.c: No such file or directory.
+	//You have heap corruption somewhere -- someone is running off the end of an array or dereferencing an invalid pointer or using some object after it has been freed.
+	//EVADE error for now by commenting next line
+
+	//tss_pglasterror.reset(new var(msg));
 }
 
 void var::setlasterror() const
 {
-	tss_pglasterror.reset();
+	//tss_pglasterror.reset();
 }
 
 var var::getlasterror() const
 {
-	if (tss_pglasterror.get())
-		return *tss_pglasterror.get();
-	else
+	//if (tss_pglasterror.get())
+	//	return *tss_pglasterror.get();
+	//else
 		return L"";
 }
 
@@ -1966,9 +1972,6 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 
 	var maxnrecs=L"";
 
-	if (!sortselectclause)
-		throw MVDBException(L"sort/select statement cannot be null");
-
 	var remainingsortselectclause=sortselectclause;
 //remainingsortselectclause.outputl(L"remainingsortselectclause=");
 
@@ -2003,6 +2006,11 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 			throw MVUnassigned(L"select() unassigned filehandle and sort/select clause doesnt start \"SELECT filename\"");
 		actualfilename=*this;
 		dictfilename=*this;
+
+		//optionally get filename from the current var
+		if (!actualfilename) {
+			throw MVDBException(L"select() filehandle is missing and sort/select clause doesnt start \"SELECT filename\"");
+		}
 	}
 
 	static const var valuechars(L"\"'.0123456789-+");
@@ -2331,10 +2339,13 @@ void var::clearselect() const
 //NB global not member function
 //	To make it var:: privat member -> pollute mv.h with PGresultptr :(
 //bool readnextx(const std::wstring& cursor, PGresultptr& pgresult)
-bool readnextx(const var& cursor, PGresultptr& pgresult, PGconn* pgconn)
+bool readnextx(const var& cursor, PGresultptr& pgresult, PGconn* pgconn, bool clearselect_onfail, bool forwards)
 {
-
-	var sql=L"FETCH NEXT in cursor1_" ^ cursor;
+	var sql;
+	if (forwards)
+		sql=L"FETCH NEXT in cursor1_" ^ cursor;
+	else
+		sql=L"FETCH BACKWARD in cursor1_" ^ cursor;
 
 	//sql=L"BEGIN;" ^ sql ^ L"; END";
 
@@ -2343,26 +2354,53 @@ bool readnextx(const var& cursor, PGresultptr& pgresult, PGconn* pgconn)
 	//sqlexec();
 	if (!pqexec(sql,pgresult, pgconn)) {
 
+		//var errmsg=var(PQresultErrorMessage(pgresult));
+		//PQclear(pgresult);
+		//throw MVDBException(errmsg);
+		//cursor.clearselect();
+		//return false;
+
 		var errmsg=var(PQresultErrorMessage(pgresult));
+		char* sqlstate = PQresultErrorField(pgresult, PG_DIAG_SQLSTATE);
+
 		PQclear(pgresult);
+
+		if (clearselect_onfail) {
+			cursor.clearselect();
+		}
+		//return false if cursor simply doesnt exist
+		//34000 - "ERROR:  cursor "cursor1_" does not exist"
+		if (var(sqlstate) == L"34000")
+			return false;
+
+		//any other error
 		throw MVDBException(errmsg);
-		cursor.clearselect();
-		return false;
+
+		//return false;
 	}
 
-
-	//close cursor if no more
-	if (PQntuples(pgresult) < 1)
+	//false and optionally close cursor if no more
+	if (forwards && PQntuples(pgresult) < 1)
 	{
 		PQclear(pgresult);
-		cursor.clearselect();
+		if (clearselect_onfail) {
+			cursor.clearselect();
+		}
 		return false;
 	}
+
+	//DO NOT clear since the result is needed by the caller
+	//PQclear(pgresult);
+
+	//true = found a new key/record
 	return true;
 }
 
 bool var::hasnext() const
 {
+
+	var xx;
+	return this->readnext(xx);
 
 	//?allow undefined usage like var xyz=xyz.readnext();
 	if (var_mvtyp&mvtypemask)
@@ -2375,6 +2413,19 @@ bool var::hasnext() const
 	THISIS(L"bool var::hasnext() const")
 	THISISSTRING()
 
+	//readnext through string of keys if provided
+	if ((*this)[-1]==FM) {
+		return true;
+	}
+
+	//if the standard select list file is available then select it, i.e. create a CURSOR, so FETCH has something to work on
+	if (not this->selectpending()) {
+		var listfilename=L"savelist_" ^ (*this) ^ L"_" ^ getprocessn() ^ L"_tempx";
+		if (var().open(listfilename)) {
+			true;
+		}
+	}
+
 	PGconn* pgconn=(PGconn*) connection();
 	if (pgconn==NULL) {
 		//this->clearselect();
@@ -2383,25 +2434,8 @@ bool var::hasnext() const
 
 	PGresultptr pgresult;
 
-	var sql;
-
-	sql=L"FETCH NEXT FROM cursor1_" ^ var_mvstr;
-
-	//execute the sql
-	//cant use sqlexec here because we need data
-	if (!pqexec(sql,pgresult, pgconn)) {
-		var errmsg=var(PQresultErrorMessage(pgresult));
-		PQclear(pgresult);
-		throw MVDBException(errmsg);
-		//cursor.clearselect();
-		return false;
-	}
-
-	//return false if could not fetch next
-	if (PQntuples(pgresult) < 1)
+	if (!readnextx(*this, pgresult, pgconn, false, true))
 	{
-		PQclear(pgresult);
-		//cursor.clearselect();
 		return false;
 	}
 
@@ -2412,29 +2446,18 @@ bool var::hasnext() const
 	//now restore the cursor back one
 	/////////////////////////////////
 
-	sql=L"FETCH BACKWARD FROM cursor1_" ^ var_mvstr;
+	PGresultptr pgresult2;
 
-	//execute the sql
-	//cant use sqlexec here because we need data
-	if (!pqexec(sql,pgresult, pgconn)) {
-		var errmsg=var(PQresultErrorMessage(pgresult)) ^ L" - Error fetching backward in hasnext " ^ var_mvstr;
-		PQclear(pgresult);
-		throw MVDBException(errmsg);
-		//cursor.clearselect();
+	if (!readnextx(*this, pgresult2, pgconn, false, false))
+	{
+		//should always be able to move the cursor backwards if could move it forwards in the code above
+		//hasnext=false
 		return false;
 	}
 
-	//error if could not move back
-	/*if (PQntuples(pgresult) < 1)
-	{
-		var errmsg=L"Could not fetch backward in hasnext " ^ var_mvstr;
-		PQclear(pgresult);
-		throw MVDBException(errmsg);
-		//cursor.clearselect();
-		return false;
-	}*/
+	PQclear(pgresult2);
 
-	PQclear(pgresult);
+	//hasnext=true
 	return true;
 }
 
@@ -2501,18 +2524,19 @@ bool var::readnext(var& key, var& valueno) const
 
 	PGresultptr pgresult;
 
-	if (!readnextx(*this, pgresult, pgconn))
+	if (!readnextx(*this, pgresult, pgconn, true, true))
 	{
 		// end the transaction and quit
 		// no more
 		//committrans();
 
-        //already done in readnextx
-        //this->clearselect();
+		//already done in readnextx
+		//this->clearselect();
 
 		return false;
 	}
-/* abortive code to handle unescaping returned hex/escape data	//avoid the need for this by calling pqexecparams flagged for binary
+
+	/* abortive code to handle unescaping returned hex/escape data	//avoid the need for this by calling pqexecparams flagged for binary
 	//even in the case where there are no parameters and pqexec could be used.
 
 	//eg 90001 is 9.0.1
@@ -2600,7 +2624,7 @@ bool var::readnextrecord(var& record, var& key, var& valueno) const
 	if (pgconn==NULL)
 		return L"";
 
-	if (!readnextx(*this, pgresult, pgconn))
+	if (!readnextx(*this, pgresult, pgconn, true, true))
 	{
 		// end the transaction
 		// no more

@@ -6,7 +6,7 @@ set(CPACK_PACKAGE_VERSION 14.01.1)
 INCLUDE(CPack)
 
 #works using c++14 default on Ubuntu 18.04 so no need for this
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+##SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 
 #allow exodus executable and exodus library
 #cmake_policy(SET CMP0002 OLD)

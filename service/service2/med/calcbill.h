@@ -13,6 +13,7 @@ efb_calcbill(MvEnvironment& mv) : ExodusFunctorBase("calcbill", "exodusprogramba
 efb_calcbill& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void

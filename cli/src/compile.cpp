@@ -855,7 +855,7 @@ var inclusion=
 			ncompilationfailures++;
 			errputl(oscwd());
 			objfilename.errputl("Error: Cannot output file ");
-			var("Press Enter").input();
+			//var("Press Enter").input();
 			continue;
 		}
 

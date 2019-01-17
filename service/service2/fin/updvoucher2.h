@@ -13,6 +13,7 @@ efb_updvoucher2(MvEnvironment& mv) : ExodusFunctorBase("updvoucher2", "exoduspro
 efb_updvoucher2& operator=(const var& newlibraryname) {
         closelib();
         libraryname_=newlibraryname.toString();
+        return (*this);
 }
 
 //a member function with the right arguments, returning a var or void
