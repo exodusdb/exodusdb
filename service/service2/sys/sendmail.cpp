@@ -177,9 +177,9 @@ forcedemail:
 	}
 
 	//global override
-	var FILENAMES = "SMTP.CFG" ^ VM ^ "..\\..\\SMTP.CFG";
+	var filenamesx = "SMTP.CFG" ^ VM ^ "..\\..\\SMTP.CFG";
 	for (var filen = 1; filen <= 2; ++filen) {
-		call osread(params2, FILENAMES.a(1, filen));
+		call osread(params2, filenamesx.a(1, filen));
 		//cut off after end of file character
 		params2 = params2.field(var().chr(26), 1);
 		params2.swapper("\r\n", "\r");

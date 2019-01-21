@@ -57,7 +57,7 @@ var vouchermvfns="";
 
 #define fin_common_no 3
 //#define fin (*((fin_common*) mv.labelledcommon[fin_common_no]))
-fin_common&& fin=reinterpret_cast<fin_common&&> (mv.labelledcommon[fin_common_no]);
-#define fin_isdefined (mv.labelledcommon[fin_common_no] != NULL)
+fin_common&& fin=reinterpret_cast<fin_common&&> (*mv.labelledcommon[fin_common_no]);
+//#define fin_isdefined (mv.labelledcommon[fin_common_no] != NULL)
 
 #endif//NEO_FIN_H

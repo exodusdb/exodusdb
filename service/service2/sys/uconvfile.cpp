@@ -7,6 +7,7 @@ libraryinit()
 
 var encoding1;
 var encoding2;
+var exe;
 var ii;
 var errors;
 
@@ -31,7 +32,12 @@ function main(in inputfilename, in encoding1i, in encoding2i, out result, out ms
 
 	//make cygwin command
 	//look for local or cygwin wget.exe otherwise quit
-	var cmd = "uconv.exe";
+	if (oscwd().index(":", 1)) {
+		exe = ".exe";
+	}else{
+		exe = "";
+	}
+	var cmd = "uconv" ^ exe;
 	if (not(cmd.osfile())) {
 		cmd.splicer(1, 0, SYSTEM.a(50));
 	}

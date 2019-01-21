@@ -80,7 +80,7 @@ var::~var()
 //CONSTRUCTORS
 //////////////
 
-//default ctor to allow definition unassigned "var mv";
+//default constructor to allow definition unassigned "var mv";
 var::var()
 : var_mvtyp(pimpl::MVTYPE_UNA)
 {
@@ -101,33 +101,49 @@ var::var()
 	//not a pointer anymore for speed
 	//priv=new pimpl;
 
-	//moved here from pimpl ctor
+	//moved here from pimpl constructor
 	//moved up to initializer
 	//var_mvtyp=pimpl::MVTYPE_UNA;
 
 }
 
-//copy ctor
+//copy constructor
 //dont use initializers - check if copiedvar is assigned first
 //(could initialise and check after but this feels bad due to loss of target)
-var::var(const var& copiedvar)
+var::var(const var& rhs_var)
 {
-	THISIS(L"var::var(const var& copiedvar)")
+	THISIS(L"var::var(const var& rhs_var)")
 
 	//do first since initializer is copiedvar
-	ISASSIGNED(copiedvar)
+	ISASSIGNED(rhs_var)
 
 	//not a pointer anymore for speed
 	//priv=new pimpl;
 
-	//identical in copy ctor and load and call
-	var_mvtyp=copiedvar.var_mvtyp;
-	var_mvstr=copiedvar.var_mvstr;
-	var_mvint=copiedvar.var_mvint;
-	var_mvdbl=copiedvar.var_mvdbl;
+	//identical in copy constructor and load and call
+	var_mvtyp=rhs_var.var_mvtyp;
+	var_mvstr=rhs_var.var_mvstr;
+	var_mvint=rhs_var.var_mvint;
+	var_mvdbl=rhs_var.var_mvdbl;
 }
 
-//ctor for wchar_t
+//move constructor
+var::var(const var&& rhs) noexcept
+{
+	//THISIS(L"var::var(const var&& rhs)")
+	//ISASSIGNED(rhs)
+
+	//using std::swap;
+	//swap(var_mvstr,rhs.var_mvstr);
+	using std::move;
+	var_mvstr=move(rhs.var_mvstr);
+	//just grab the rest
+	var_mvdbl=rhs.var_mvdbl;
+	var_mvint=rhs.var_mvint;
+	var_mvtyp=rhs.var_mvtyp;
+}
+
+//constructor for wchar_t
 //would just use initializers since cannot fail
 //(except cannot seem to init wstring from wchar_t!)
 var::var(const wchar_t char1)
@@ -136,7 +152,7 @@ var::var(const wchar_t char1)
 	var_mvtyp=pimpl::MVTYPE_STR;
 }
 
-//ctor for wide c_str
+//constructor for wide c_str
 //use initializers since cannot fail
 var::var(const wchar_t* cstr1)
 {
@@ -155,14 +171,14 @@ var::var(const wchar_t* cstr1)
 	var_mvtyp=pimpl::MVTYPE_STR;
 }
 
-//ctor for std::wstring
+//constructor for std::wstring
 //just use initializers since cannot fail
 var::var(const std::wstring& str1)
 	: var_mvstr(str1)
 	, var_mvtyp(pimpl::MVTYPE_STR)
 {}
 
-//ctor for std::string
+//constructor for std::string
 //just use initializers since cannot fail
 var::var(const std::string& str1)
 	//: var_mvstr(wstringfromUTF8((UTF8*)str1.data(),(int)str1.length()))
@@ -170,28 +186,28 @@ var::var(const std::string& str1)
 	, var_mvtyp(pimpl::MVTYPE_STR)
 {}
 
-//ctor for bool
+//constructor for bool
 //just use initializers since cannot fail
 var::var(const bool bool1)
 	: var_mvint(bool1)
 	, var_mvtyp(pimpl::MVTYPE_INT)
 {}
 
-//ctor for int
+//constructor for int
 //just use initializers since cannot fail
 var::var(const int int1)
 	: var_mvint(int1)
 	, var_mvtyp(pimpl::MVTYPE_INT)
 {}
 
-//ctor for long long
+//constructor for long long
 //just use initializers since cannot fail
 var::var(const long long longlong1)
 	: var_mvint(longlong1)
 	, var_mvtyp(pimpl::MVTYPE_INT)
 {}
 
-//ctor for double
+//constructor for double
 //just use initializers since cannot fail
 var::var(const double double1)
     : var_mvdbl(double1)
@@ -321,6 +337,7 @@ var::operator const wchar_t*()
 //UNARY OPERATORS
 /////////////////
 
+//copy assignment
 //=var
 //The assignment operator should always return a reference to *this.
 //cant be (const var& rhs) because seems to cause a problem with var1=var2 in function parameters
@@ -338,6 +355,48 @@ var& var::operator = (const var& rhs)
 
 	//copy everything across
 	var_mvstr=rhs.var_mvstr;
+	var_mvdbl=rhs.var_mvdbl;
+	var_mvint=rhs.var_mvint;
+	var_mvtyp=rhs.var_mvtyp;
+
+	return *this;
+
+}
+/* sadly cant use this idiom since it is ambiguous with move constructor
+var& var::operator = (var rhs) noexcept
+{
+//	THISIS(L"var& var::operator = (var rhs)")
+//	THISISDEFINED()
+
+	//copy-and-swap idiom
+	//1. create a temporary copy of the variable to be copied BEFORE even arriving in this routine
+	//2. swap this and temporary copy
+	//3. what was this is now in the temp will now be destructed correctly on exit
+	using std::swap;
+	swap(var_mvstr,rhs.var_mvstr);
+	//just grab the rest
+	var_mvdbl=rhs.var_mvdbl;
+	var_mvint=rhs.var_mvint;
+	var_mvtyp=rhs.var_mvtyp;
+
+	return *this;
+
+}
+*/
+
+//move assignment
+var& var::operator = (const var&& rhs) noexcept
+{
+//	THISIS(L"var& var::operator = (var rhs)")
+//	THISISDEFINED()
+
+	//copy-and-swap idiom
+	//1. create a temporary copy of the variable to be copied BEFORE even arriving in this routine
+	//2. swap this and temporary copy
+	//3. what was this is now in the temp will now be destructed correctly on exit
+	using std::swap;
+	swap(var_mvstr,rhs.var_mvstr);
+	//just grab the rest
 	var_mvdbl=rhs.var_mvdbl;
 	var_mvint=rhs.var_mvint;
 	var_mvtyp=rhs.var_mvtyp;
@@ -1367,7 +1426,7 @@ DLL_PUBLIC
 	THISIS(L"std::ostream& operator << (std::ostream& ostream1, const var& var1)")
 	ISSTRING(var1)
 
-	//use toString() to avoid creating a ctor which logs here recursively
+	//use toString() to avoid creating a constructor which logs here recursively
 	//should this use a ut16/32 -> UTF8 code facet? or convert to UTF8 and output to ostream?
 	ostream1 << var1.toString();
 	return ostream1;
@@ -1396,7 +1455,7 @@ DLL_PUBLIC
 	THISIS(L"std::wostream& operator << (std::wostream& wostream1, const var& var1)")
 	ISSTRING(var1)
 
-	//use toWString() to avoid creating a ctor which logs here recursively
+	//use toWString() to avoid creating a constructor which logs here recursively
 	//should this use a ut16/32 -> UTF8 code facet? or convert to UTF8 and output to ostream?
 	wostream1 << var1.var_mvstr;
 	return wostream1;

@@ -18,6 +18,7 @@ programinit()
 //ExodusFunctorF0<int> xyz;
 
 var verbose;
+var silent;
 var debugging;
 var optimise;
 var posix;
@@ -35,6 +36,7 @@ function main()
 
 	//extract options
 	verbose=index(OPTIONS.ucase(),"V");
+	silent=index(OPTIONS.ucase(),"S");
 	debugging=not index(OPTIONS.ucase(),"R");//no symbols for backtrace
 	//the backtrace seems to work fine with release mode at least in vs2005
 	optimise=index(OPTIONS.ucase(),"O");//prevents backtrace
@@ -449,7 +451,8 @@ function main()
 		//get file text
 		if (verbose)
 			print("sourcefilename=");
-		printl(srcfilename);
+		if (not silent)
+			printl(srcfilename);
 		if (not text and not text.osread(srcfilename, "utf8")) {
 			if (osfile(srcfilename)) {
 				srcfilename.errputl("Cant read/convert srcfile:");

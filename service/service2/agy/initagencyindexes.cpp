@@ -250,9 +250,9 @@ function main() {
 		execute("MAKEINDEX MATERIALS FIRST_APPEARANCE_DATE");
 	}
 
-	var FILENAMES = "PLANS,SCHEDULES,JOBS,PRODUCTION_ORDERS,PRODUCTION_INVOICES";
-	for (var filen = 1; filen <= FILENAMES.count(",") + 1; ++filen) {
-		var filename = FILENAMES.field(",", filen);
+	var filenamesx = "PLANS,SCHEDULES,JOBS,PRODUCTION_ORDERS,PRODUCTION_INVOICES";
+	for (var filen = 1; filen <= filenamesx.count(",") + 1; ++filen) {
+		var filename = filenamesx.field(",", filen);
 
 		call log2("*add text index to " ^ filename, logtime);
 		//warning this could be skipped if the file is large
@@ -268,6 +268,7 @@ function main() {
 
 	};//filen;
 
+	return "";
 }
 
 

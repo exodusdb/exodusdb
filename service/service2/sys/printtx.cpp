@@ -38,7 +38,7 @@ var pagen;
 //settings: html/style/head/foot/bottomline/rfmt/printtxmark/letterhead/topmargin
 
 function main(io tx, in mode="", in modevalue="") {
-
+printl("Hello from printtx");
 	//blank mode prints tx, other modes set parameters
 	if (mode) {
 

@@ -1178,7 +1178,8 @@ int exodus_main(int exodus__argc, char *exodus__argv[], MvEnvironment& mv)
 
 	mv.EXECPATH=getexecpath();
 	if (not mv.EXECPATH) {
-		mv.EXECPATH=var(exodus__argv[0]);
+		if (exodus__argc)
+			mv.EXECPATH=var(exodus__argv[0]);
 		if (not mv.EXECPATH.index(SLASH))
 			mv.EXECPATH.splicer(1,0,oscwd()^SLASH);
 	}

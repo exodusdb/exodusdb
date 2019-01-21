@@ -132,6 +132,7 @@ function main() {
 
 	return 0;
 
+	return "";
 }
 
 subroutine analyse() {

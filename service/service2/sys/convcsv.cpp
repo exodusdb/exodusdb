@@ -12,28 +12,28 @@ var nfilters0;
 var nfilters;//num
 var filterfields;
 var filtervalues;
-var filters;
+dim filters;
 var temp;//num
 var tt;
 var dicthasauthorised;//num
 var keyx;
 var nkeys;//num
-var xfilenames;
-var oconvxs;
-var fmtxs;
-var dictrecs;
-var xfiles;
+dim xfilenames;
+dim oconvxs;
+dim fmtxs;
+dim dictrecs;
+dim xfiles;
 var v69;
 var v70;
 var v71;
 var dict;
-var dictids;
-var colgroups;
+dim dictids;
+dim colgroups;
 var dictid;
 var outfile;
 var ptr;//num
-var rec;
-var mvrec;
+dim rec;
+dim mvrec;
 var converterparams;
 var result;
 var errors;
@@ -61,7 +61,7 @@ function main(in sentence0, in select0="", in filters0="") {
 		nfilters = filterfields.count(FM) + (filterfields ne 0);
 	}
 	if (nfilters) {
-		dim filters(3, nfilters);
+		filters.redim(3, nfilters);
 		for (var filtern = 1; filtern <= nfilters; ++filtern) {
 			filters(1, filtern) = filterfields.a(1, filtern).convert(SVM, VM);
 			filters(3, filtern) = filtervalues.a(1, filtern).convert(SVM, VM);
@@ -217,14 +217,14 @@ function main(in sentence0, in select0="", in filters0="") {
 		return 0;
 	}
 
-	dim xfilenames(255);
+	xfilenames.redim(255);
 	xfilenames="";
-	dim oconvxs(255);
-	dim fmtxs(255);
-	dim dictrecs(255);
+	oconvxs.redim(255);
+	fmtxs.redim(255);
+	dictrecs.redim(255);
 	oconvxs="";
 	fmtxs="";
-	dim xfiles(255);
+	xfiles.redim(255);
 	var nfields = 0;
 
 	var selectlist = LISTACTIVE;
@@ -251,8 +251,8 @@ function main(in sentence0, in select0="", in filters0="") {
 		}
 	}
 
-	dim dictids(255);
-	dim colgroups(255);
+	dictids.redim(255);
+	colgroups.redim(255);
 
 	dictids="";
 	colgroups="";
@@ -400,8 +400,8 @@ nextdict:
 	}
 	var recn = 0;
 
-	dim rec(ncols);
-	dim mvrec(ncols);
+	rec.redim(ncols);
+	mvrec.redim(ncols);
 
 	//oswrite matunparse(dictids) on 'DICTIDS'
 

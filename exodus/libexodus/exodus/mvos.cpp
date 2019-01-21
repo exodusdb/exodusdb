@@ -1673,7 +1673,7 @@ var var::oslist(const var& path, const var& spec, const int mode) const
 	return filelist;
 }
 
-var var::oscwd(const var& newpath) const
+bool var::oscwd(const var& newpath) const
 {
 	THISIS(L"var var::oscwd(const var& newpath) const")
 	//doesnt use *this - should syntax be changed to setcwd? and getcwd()?
@@ -1685,7 +1685,18 @@ var var::oscwd(const var& newpath) const
 	//until we have a reliable way to detect boost version
 	//boost::filesystem::current_path(newpath.toString());
 
-	return oscwd();
+	//return oscwd();
+
+	try {
+		stdfs::current_path(newpath.toString());
+	}
+	catch (...) {
+		//filesystem error: cannot set current path: No such file or directory
+		//ignore all errors
+		return false;
+	}
+
+	return true;
 
 }
 

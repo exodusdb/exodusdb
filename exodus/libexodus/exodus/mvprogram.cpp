@@ -1265,6 +1265,10 @@ var ExodusProgramBase::AT(const int x, const int y) const {
 	return var().at(x, y);
 }
 
+var ExodusProgramBase::handlefilename(const var& handle) {
+	return handle.a(1);
+}
+
 var ExodusProgramBase::getuserdept(const var& usercode) {
 	//locate the user in the list of users
 	var usern;

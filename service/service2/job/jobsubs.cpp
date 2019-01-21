@@ -581,7 +581,7 @@ unlockprodorders:
 			//get the quote statuses (to check if can add po's)
 			if (not(win.wlocked)) {
 				MV = 0;
-				RECORD.r(16, calculate("QUOTEmv.STATUS2"));
+				RECORD.r(16, calculate("QUOTESTATUS2"));
 			}
 
 			var costids = RECORD.a(4);
@@ -597,7 +597,7 @@ unlockprodorders:
 				cost.r(1, 1, 6, calculate("ORDER_INV_DATE"));
 				cost.r(1, 1, 7, calculate("SUPPLIER_NAME"));
 
-				var status = calculate("ORDERmv.STATUS2");
+				var status = calculate("ORDERSTATUS2");
 				//similar logic in printjob and jobs.subs/postread
 				if (orderinvno) {
 					status = "INVOICE";
@@ -622,7 +622,7 @@ unlockprodorders:
 				bill.r(1, 1, 4, calculate("QUOTE_DESC"));
 				bill.r(1, 1, 5, calculate("QUOTE_INV_NO"));
 				bill.r(1, 1, 6, calculate("QUOTE_INV_DATE"));
-				bill.r(1, 1, 8, calculate("QUOTEmv.STATUS2"));
+				bill.r(1, 1, 8, calculate("QUOTESTATUS2"));
 				bill.r(1, 1, 9, calculate("QUOTE_PROFORMA_NO"));
 				RECORD.r(27, MV, bill);
 
@@ -668,13 +668,13 @@ unlockprodorders:
 			//add automatic child task(s) for other departments/users
 			var otherusercodes = "";
 			if (otherusercodes) {
-				var notherusers = otherusercodes.count(VM);
+				var nother = otherusercodes.count(VM);
 
 				//connect subtask to main task
 				task.r(7, taskid);
 				task.r(2, otherusercode);
 
-				for (var otherusern = 1; otherusern <= notherusers; ++otherusern) {
+				for (var otherusern = 1; otherusern <= nother; ++otherusern) {
 					otherusercode = otherusercodes.a(1, otherusern);
 					if (xlate("USERS", otherusercode, "LIVE_USER_WITH_EMAIL", "X")) {
 

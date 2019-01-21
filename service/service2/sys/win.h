@@ -148,7 +148,7 @@ win_common(){
 
 #define win_common_no 1
 //#define win (*((win_common*) mv.labelledcommon[win_common_no]))
-win_common&& win=reinterpret_cast<win_common&&> (mv.labelledcommon[win_common_no]);
-#define win_isdefined (mv.labelledcommon[win_common_no] != NULL)
+win_common&& win=reinterpret_cast<win_common&&> (*mv.labelledcommon[win_common_no]);
+//#define win_isdefined (mv.labelledcommon[win_common_no] != NULL)
 
 #endif //EXO_WIN_H

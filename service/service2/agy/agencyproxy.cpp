@@ -657,6 +657,7 @@ errorexit:
 	var().stop();
 	return 0;
 
+	return "";
 }
 
 subroutine checkoutputfileexists() {

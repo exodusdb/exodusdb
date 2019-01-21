@@ -125,6 +125,8 @@ DLL_PUBLIC
 	var AT(const int code) const;
 	var AT(const int x, const int y) const;
 
+	var handlefilename(const var& handle);
+
     //was MVDB
 	var getuserdept(const var& usercode);
 

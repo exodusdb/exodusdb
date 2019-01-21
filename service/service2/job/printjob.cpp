@@ -505,12 +505,12 @@ unauth:
 	MV = 0;
 
 	bases = calculate("ORDER_AMOUNT_BASE");
-	statuses = calculate("ORDERmv.STATUS2");
+	statuses = calculate("ORDERSTATUS2");
 	gosub sumnotcancelled();
 	var cost = totalbase;
 
 	bases = calculate("QUOTE_AMOUNT_BASE");
-	statuses = calculate("QUOTEmv.STATUS2");
+	statuses = calculate("QUOTESTATUS2");
 	gosub sumnotcancelled();
 	var income = totalbase;
 
@@ -673,7 +673,7 @@ unauth:
 		totalbase = 0;
 		for (MV = 1; MV <= nlines; ++MV) {
 
-			var status = calculate("ORDERmv.STATUS2");
+			var status = calculate("ORDERSTATUS2");
 			var orderinvno = calculate("ORDER_INV_NO");
 			//similar logic in printjob and jobs.subs/postread
 			if (orderinvno) {
@@ -930,7 +930,7 @@ unauth:
 		var invnos = calculate("QUOTE_INV_NO");
 		totalbase = 0;
 		for (MV = 1; MV <= nlines; ++MV) {
-			var status = calculate("QUOTEmv.STATUS2");
+			var status = calculate("QUOTESTATUS2");
 			var cancelled = status == "CANCELLED";
 			if (showcancelledlines or not cancelled) {
 				if (MV > 1) {
@@ -1033,6 +1033,7 @@ noreceipt:
 
 	goto nextjob;
 
+	return "";
 }
 
 subroutine exit() {

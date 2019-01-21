@@ -222,18 +222,18 @@ function main(in mode, io logtime) {
 		var minyear = 2000;
 		for (var year = curryear - 2; year >= minyear; --year) {
 			var dir = "..\\LOGS\\" ^ dbcode ^ "\\" ^ year;
-			var FILENAMES = "..\\LOGS\\" ^ dbcode ^ "\\" ^ year ^ "\\*.XML";
+			var filenamesx = "..\\LOGS\\" ^ dbcode ^ "\\" ^ year ^ "\\*.XML";
 
 			// initdir filenames
 			//while dirlist()
-			tt = oslistf(FILENAMES);
+			tt = oslistf(filenamesx);
 		///BREAK;
 		if (not tt) break;;
-			FILENAMES.converter("\\", "/");
+			filenamesx.converter("\\", "/");
 			var cygwinbin = SYSTEM.a(50);
 
-			var cmd = cygwinbin ^ "gzip " ^ FILENAMES;
-			call log2("*compress logs with gzip " ^ FILENAMES, logtime);
+			var cmd = cygwinbin ^ "gzip " ^ filenamesx;
+			call log2("*compress logs with gzip " ^ filenamesx, logtime);
 			printl(cmd);
 			call shell2(cmd, xx);
 

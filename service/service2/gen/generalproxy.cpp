@@ -754,6 +754,7 @@ exit:
 		return 0;
 	*/
 
+	return "";
 }
 
 subroutine checkoutputfileexists() {

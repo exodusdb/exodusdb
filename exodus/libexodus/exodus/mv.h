@@ -20,6 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+
 //prevent swig perl linking errors about win32_abort win32_select win32_connect
 #if defined(SWIGPERL)
 #if defined connect
@@ -301,7 +302,7 @@ public:
 	int toInt() const;
 	int toLong() const;
 
-    double toDouble() const;
+	double toDouble() const;
 
 	std::wstring toWString() const;
 
@@ -313,61 +314,77 @@ public:
 	//CONSTRUCTORS
 	//////////////
 
-	//default ctor to allow plain unassigned "var mv;" syntax
+	//default constructor to allow plain unassigned "var mv;" syntax
 	var();
 
-	//copy ctor
+	//copy constructor
 	var(const var& var1);
+	//var(var var1);
 
-	//ctor for wchar_t*
+	//move constructor
+	var(const var&& var1) noexcept;
+
+	//copy assignment
+	//=var
+	//The assignment operator should always return a reference to *this.
+	//cant be (const var& var1) because seems to cause a problem with var1=var2 in function parameters
+	//unfortunately causes problem of passing var by value and thereby unnecessary contruction
+	//see also ^= etc
+	var& operator=(const var& var1);
+	//var& operator=(var var1) noexcept;
+
+	//move assigment
+	var& operator=(const var&& var1) noexcept;
+
+	//constructor for wchar_t*
 	//place first before wchar_t so SWIG isnt tempted to use char to acquire strings resulting in ONE character strings)
 	var(const wchar_t* wcstr1);
 
-	//ctor for wchar_t
+	//constructor for wchar_t
 #ifndef SWIG
 	var(const wchar_t wchar1);
 #endif
-	//ctor for block of wchar_t
+	//constructor for block of wchar_t
 	//to be implemented?
 	//var(const wchar_t* cstr1, const size_t int1);
 
 #ifndef SWIGJAVA
-	//ctor for char*
+	//constructor for char*
 	//place first before char so SWIG isnt tempted to use char to acquire strings resulting in ONE character strings)
 	MV_CONSTRUCTION_FROM_CHAR_EXPLICIT
 	var(const char* cstr1);
 #endif
 
-	//ctor for char to create
+	//constructor for char to create
 #ifndef SWIG
 	MV_CONSTRUCTION_FROM_CHAR_EXPLICIT
 	var(const char char1);
 #endif
-	//ctor for char memory block
+	//constructor for char memory block
 	MV_CONSTRUCTION_FROM_CHAR_EXPLICIT
 	var(const char* cstr1, const size_t int1);
 
-	//ctor for std::wstring
+	//constructor for std::wstring
 	var(const std::wstring& wstr1);
 
 	//swig java duplicates this with var(std::wstring&) above
 #if !defined(SWIGJAVA) && !defined(SWIGCSHARP)
-	//ctor for std::string
+	//constructor for std::string
 	var(const std::string& str1);
 #endif
 
-	//ctor for bool (dont allow this if no constructor for char* otherwise " " is converted to 1 in widechar only compilations
+	//constructor for bool (dont allow this if no constructor for char* otherwise " " is converted to 1 in widechar only compilations
 	MV_CONSTRUCTION_FROM_CHAR_EXPLICIT
 	var(const bool bool1);
 
-	//ctor for int
+	//constructor for int
 	var(const int int1);
 
-	//ctor for long long
+	//constructor for long long
 	var(const long long longlong1);
 
-    //ctor for double
-    var(const double double1);
+	//constructor for double
+	var(const double double1);
 
 	//AUTOMATIC CONVERSIONS TO bool, void* and int
 	//////////////////////////////////////////////
@@ -393,7 +410,7 @@ public:
 	//therefore have chosen to make both bool and int "const" since they dont make
 	//and changes to the base object.
 	operator int() const;
-	
+
 	//remove because causes "ambiguous" with -short_wchar on linux
 	//operator unsigned int() const;
 
@@ -494,18 +511,11 @@ public:
 	//UNARY OPERATORS
 	/////////////////
 
-	//=var
-	//The assignment operator should always return a reference to *this.
-	//cant be (const var& var1) because seems to cause a problem with var1=var2 in function parameters
-	//unfortunately causes problem of passing var by value and thereby unnecessary contruction
-	//see also ^= etc
-	var& operator=(const var& var1);
-
 	//=int
 	var& operator= (const int int1);
 
-    //=double
-    var& operator= (const double double1);
+	//=double
+	var& operator= (const double double1);
 
 	//=wchar_t
 	var& operator= (const wchar_t char2);
@@ -522,8 +532,8 @@ public:
 	//=int
 	var& operator^= (const int int1);
 
-    //=double
-    var& operator^= (const double double1);
+	//=double
+	var& operator^= (const double double1);
 
 	//=wchar_t
 	var& operator^= (const wchar_t char2);
@@ -534,27 +544,27 @@ public:
 	//=string
 	var& operator^= (const std::wstring string2);
 
-    /*
-    //postfix returning void so cannot be used in expressions (avoid unreadable programs)
+	/*
+	//postfix returning void so cannot be used in expressions (avoid unreadable programs)
 	void operator++ (int);
 	void operator-- (int);
 
-    //TODO: since preventing pre and postfix in expressions then force only use of prefix version since it is faster
+	//TODO: since preventing pre and postfix in expressions then force only use of prefix version since it is faster
 
-    //prefix returning void so cannot be used in expressions (avoid unreadable programs)
+	//prefix returning void so cannot be used in expressions (avoid unreadable programs)
 	void operator++ ();
 	void operator-- ();
-    */
+	*/
 
-    //postfix
+	//postfix
 	var operator++ (int);
 	var operator-- (int);
 
-    //prefix
+	//prefix
 	var& operator++ ();
 	var& operator-- ();
 
-    //+=var
+	//+=var
 	var& operator+= (const var& var1);
 
 	//-=var
@@ -576,72 +586,86 @@ public:
 	DLL_PUBLIC friend  var operator+ (const var&,const var&);
 	DLL_PUBLIC friend  var operator+ (const var&,const wchar_t*);
 	DLL_PUBLIC friend  var operator+ (const var&,const int);
-    DLL_PUBLIC friend  var operator+ (const var&,const double);
+	DLL_PUBLIC friend  var operator+ (const var&,const double);
 	DLL_PUBLIC friend  var operator+ (const var&,const bool);
 	DLL_PUBLIC friend  var operator+ (const wchar_t*,const var&);
 	DLL_PUBLIC friend  var operator+ (const int,const var&);
-    DLL_PUBLIC friend  var operator+ (const double,const var&);
+	DLL_PUBLIC friend  var operator+ (const double,const var&);
 	DLL_PUBLIC friend  var operator+ (const bool,const var&);
 
 	DLL_PUBLIC friend  var operator- (const var&,const var&);
 	DLL_PUBLIC friend  var operator- (const var&,const wchar_t*);
 	DLL_PUBLIC friend  var operator- (const var&,const int);
-    DLL_PUBLIC friend  var operator- (const var&,const double);
+	DLL_PUBLIC friend  var operator- (const var&,const double);
 	DLL_PUBLIC friend  var operator- (const var&,const bool);
 	DLL_PUBLIC friend  var operator- (const wchar_t*,const var&);
 	DLL_PUBLIC friend  var operator- (const int,const var&);
-    DLL_PUBLIC friend  var operator- (const double,const var&);
+	DLL_PUBLIC friend  var operator- (const double,const var&);
 	DLL_PUBLIC friend  var operator- (const bool,const var&);
 
 	DLL_PUBLIC friend  var operator* (const var&,const var&);
 	DLL_PUBLIC friend  var operator* (const var&,const wchar_t*);
 	DLL_PUBLIC friend  var operator* (const var&,const int);
-    DLL_PUBLIC friend  var operator* (const var&,const double);
+	DLL_PUBLIC friend  var operator* (const var&,const double);
 	DLL_PUBLIC friend  var operator* (const var&,const bool);
 	DLL_PUBLIC friend  var operator* (const wchar_t*,const var&);
 	DLL_PUBLIC friend  var operator* (const int,const var&);
-    DLL_PUBLIC friend  var operator* (const double,const var&);
+	DLL_PUBLIC friend  var operator* (const double,const var&);
 	DLL_PUBLIC friend  var operator* (const bool,const var&);
 
 	DLL_PUBLIC friend  var operator/ (const var&,const var&);
 	DLL_PUBLIC friend  var operator/ (const var&,const wchar_t*);
 	DLL_PUBLIC friend  var operator/ (const var&,const int);
-    DLL_PUBLIC friend  var operator/ (const var&,const double);
+	DLL_PUBLIC friend  var operator/ (const var&,const double);
 	//disallow divide by boolean to prevent possible runtime divide by zero
 	//DLL_PUBLIC friend  var operator/ (const var&,const bool);
 	DLL_PUBLIC friend  var operator/ (const wchar_t*,const var&);
 	DLL_PUBLIC friend  var operator/ (const int,const var&);
-    DLL_PUBLIC friend  var operator/ (const double,const var&);
+	DLL_PUBLIC friend  var operator/ (const double,const var&);
 	DLL_PUBLIC friend  var operator/ (const bool,const var&);
 
 	DLL_PUBLIC friend  var operator% (const var&,const var&);
 	DLL_PUBLIC friend  var operator% (const var&,const wchar_t*);
 	DLL_PUBLIC friend  var operator% (const var&,const int);
-    DLL_PUBLIC friend  var operator% (const var&,const double);
+	DLL_PUBLIC friend  var operator% (const var&,const double);
 	//disallow divide by boolean to prevent possible runtime divide by zero
 	//DLL_PUBLIC friend  var operator/ (const var&,const bool);
 	DLL_PUBLIC friend  var operator% (const var&,const bool);
 	DLL_PUBLIC friend  var operator% (const wchar_t*,const var&);
 	DLL_PUBLIC friend  var operator% (const int,const var&);
-    DLL_PUBLIC friend  var operator% (const double,const var&);
+	DLL_PUBLIC friend  var operator% (const double,const var&);
 	DLL_PUBLIC friend  var operator% (const bool,const var&);
 
 	//NB do NOT allow concat with bool or vice versa - find reason why
 	DLL_PUBLIC friend  var operator^ (const var&,const var&);
 	DLL_PUBLIC friend  var operator^ (const var&,const wchar_t*);
 	DLL_PUBLIC friend  var operator^ (const var&,const int);
-    DLL_PUBLIC friend  var operator^ (const var&,const double);
+	DLL_PUBLIC friend  var operator^ (const var&,const double);
 	DLL_PUBLIC friend  var operator^ (const wchar_t*,const var&);
 	DLL_PUBLIC friend  var operator^ (const int,const var&);
-    DLL_PUBLIC friend  var operator^ (const double,const var&);
+	DLL_PUBLIC friend  var operator^ (const double,const var&);
 
+#ifdef SPACESHIP_OPERATOR
+// spaceship operator in c++17? eliminates need to define all six < > <= >= == != operators
+	DLL_PUBLIC friend  bool operator<=> (const var&,const var&);
+	DLL_PUBLIC friend  bool operator<=> (const var&,const wchar_t*);
+	DLL_PUBLIC friend  bool operator<=> (const var&,const int);
+	DLL_PUBLIC friend  bool operator<=> (const var&,const double);
+	DLL_PUBLIC friend  bool operator<=> (const wchar_t*,const var&);
+	DLL_PUBLIC friend  bool operator<=> (const int,const var&);
+	DLL_PUBLIC friend  bool operator<=> (const double,const var&);
+//#ifndef MV_NO_NARROW
+	DLL_PUBLIC friend  bool operator<=> (const var&,const char*);
+	DLL_PUBLIC friend  bool operator<=> (const char*,const var&);
+//#endif
+#else
 	DLL_PUBLIC friend  bool operator< (const var&,const var&);
 	DLL_PUBLIC friend  bool operator< (const var&,const wchar_t*);
 	DLL_PUBLIC friend  bool operator< (const var&,const int);
-    DLL_PUBLIC friend  bool operator< (const var&,const double);
+	DLL_PUBLIC friend  bool operator< (const var&,const double);
 	DLL_PUBLIC friend  bool operator< (const wchar_t*,const var&);
 	DLL_PUBLIC friend  bool operator< (const int,const var&);
-    DLL_PUBLIC friend  bool operator< (const double,const var&);
+	DLL_PUBLIC friend  bool operator< (const double,const var&);
 //#ifndef MV_NO_NARROW
 	DLL_PUBLIC friend  bool operator< (const var&,const char*);
 	DLL_PUBLIC friend  bool operator< (const char*,const var&);
@@ -650,10 +674,10 @@ public:
 	DLL_PUBLIC friend  bool operator<= (const var&,const var&);
 	DLL_PUBLIC friend  bool operator<= (const var&,const wchar_t*);
 	DLL_PUBLIC friend  bool operator<= (const var&,const int);
-    DLL_PUBLIC friend  bool operator<= (const var&,const double);
+	DLL_PUBLIC friend  bool operator<= (const var&,const double);
 	DLL_PUBLIC friend  bool operator<= (const wchar_t*,const var&);
 	DLL_PUBLIC friend  bool operator<= (const int,const var&);
-    DLL_PUBLIC friend  bool operator<= (const double,const var&);
+	DLL_PUBLIC friend  bool operator<= (const double,const var&);
 //#ifndef MV_NO_NARROW
 	DLL_PUBLIC friend  bool operator<= (const var&,const char*);
 	DLL_PUBLIC friend  bool operator<= (const char*,const var&);
@@ -662,10 +686,10 @@ public:
 	DLL_PUBLIC friend  bool operator> (const var&,const var&);
 	DLL_PUBLIC friend  bool operator> (const var&,const wchar_t*);
 	DLL_PUBLIC friend  bool operator> (const var&,const int);
-    DLL_PUBLIC friend  bool operator> (const var&,const double);
+	DLL_PUBLIC friend  bool operator> (const var&,const double);
 	DLL_PUBLIC friend  bool operator> (const wchar_t*,const var&);
 	DLL_PUBLIC friend  bool operator> (const int,const var&);
-    DLL_PUBLIC friend  bool operator> (const double,const var&);
+	DLL_PUBLIC friend  bool operator> (const double,const var&);
 //#ifndef MV_NO_NARROW
 	DLL_PUBLIC friend  bool operator> (const var&,const char*);
 	DLL_PUBLIC friend  bool operator> (const char*,const var&);
@@ -674,10 +698,10 @@ public:
 	DLL_PUBLIC friend  bool operator>= (const var&,const var&);
 	DLL_PUBLIC friend  bool operator>= (const var&,const wchar_t*);
 	DLL_PUBLIC friend  bool operator>= (const var&,const int);
-    DLL_PUBLIC friend  bool operator>= (const var&,const double);
+	DLL_PUBLIC friend  bool operator>= (const var&,const double);
 	DLL_PUBLIC friend  bool operator>= (const wchar_t*,const var&);
 	DLL_PUBLIC friend  bool operator>= (const int,const var&);
-    DLL_PUBLIC friend  bool operator>= (const double,const var&);
+	DLL_PUBLIC friend  bool operator>= (const double,const var&);
 //#ifndef MV_NO_NARROW
 	DLL_PUBLIC friend  bool operator>= (const var&,const char*);
 	DLL_PUBLIC friend  bool operator>= (const char*,const var&);
@@ -686,11 +710,11 @@ public:
 	DLL_PUBLIC friend  bool operator== (const var&,const var&);
 	DLL_PUBLIC friend  bool operator== (const var&,const wchar_t*);
 	DLL_PUBLIC friend  bool operator== (const var&,const int);
-    DLL_PUBLIC friend  bool operator== (const var&,const double);
+	DLL_PUBLIC friend  bool operator== (const var&,const double);
 	DLL_PUBLIC friend  bool operator== (const var&,const bool);
 	DLL_PUBLIC friend  bool operator== (const wchar_t*,const var&);
 	DLL_PUBLIC friend  bool operator== (const int,const var&);
-    DLL_PUBLIC friend  bool operator== (const double,const var&);
+	DLL_PUBLIC friend  bool operator== (const double,const var&);
 	DLL_PUBLIC friend  bool operator== (const bool,const var&);
 //#ifndef MV_NO_NARROW
 	DLL_PUBLIC friend  bool operator== (const var&,const char*);
@@ -700,17 +724,17 @@ public:
 	DLL_PUBLIC friend  bool operator!= (const var&,const var&);
 	DLL_PUBLIC friend  bool operator!= (const var&,const wchar_t*);
 	DLL_PUBLIC friend  bool operator!= (const var&,const int);
-    DLL_PUBLIC friend  bool operator!= (const var&,const double);
+	DLL_PUBLIC friend  bool operator!= (const var&,const double);
 	DLL_PUBLIC friend  bool operator!= (const var&,const bool);
 	DLL_PUBLIC friend  bool operator!= (const wchar_t*,const var&);
 	DLL_PUBLIC friend  bool operator!= (const int,const var&);
-    DLL_PUBLIC friend  bool operator!= (const double,const var&);
+	DLL_PUBLIC friend  bool operator!= (const double,const var&);
 	DLL_PUBLIC friend  bool operator!= (const bool,const var&);
 //#ifndef MV_NO_NARROW
 	DLL_PUBLIC friend  bool operator!= (const var&,const char*);
 	DLL_PUBLIC friend  bool operator!= (const char*,const var&);
 //#endif
-
+#endif
 	//unary operators +var -var !var
 	DLL_PUBLIC friend  var operator+ (const var&);
 	DLL_PUBLIC friend  var operator- (const var&);
@@ -755,7 +779,7 @@ public:
 	bool osrmdir(bool evenifnotempty=false) const;
 	//TODO check for threadsafe
 	var oscwd() const;
-	var oscwd(const var& path) const;
+	bool oscwd(const var& newpath) const;
 	void osflush() const;
 
 	//TODO add performance enhancing char* argumented versions of many os functions
@@ -1020,9 +1044,12 @@ public:
 	//should these be like extract, replace, insert, delete
 	//locate(fieldno, valueno, subvalueno,target,setting,by DEFAULTNULL)
 	bool locate(const var& target, var& setting, const int fieldno=0,const int valueno=0) const;
-	//passing "by" as a string for speed
-	bool locateby(const var& target, const char* ordercode, var& setting, const int fieldno=0,const int valueno=0) const;
-	bool locateby(const var& target, const var& ordercode, var& setting, const int fieldno=0,const int valueno=0) const;
+	//locateby without fieldno or valueno arguments uses character VM
+	bool locateby(const var& target, const char* ordercode, var& setting) const;
+	bool locateby(const var& target, const var& ordercode, var& setting) const;
+	//locateby with fieldno=0 uses character FM
+	bool locateby(const var& target, const char* ordercode, var& setting, const int fieldno,const int valueno=0) const;
+	bool locateby(const var& target, const var& ordercode, var& setting, const int fieldno,const int valueno=0) const;
 	bool locateusing(const var& target, const var& usingchar, var& setting, const int fieldno=0, const int valueno=0, const int subvalueno=0) const;
 	bool locateusing(const var& target, const var& usingchar) const;
 	var sum(const var& sepchar) const;
@@ -1107,6 +1134,8 @@ public:
 	//bool selftest() const;
 	var version() const;
 
+	var& setifunassigned(const var& defaultvalue=L"");
+
 private:
 
 	//make this direct for speed. var is a library and not intended to change often and the
@@ -1167,7 +1196,7 @@ private:
 
 	//bool locatex(std::wstring locatestring,)
 	//locate within extraction
-	bool locatex(const std::wstring& target,const char ordercode,const wchar_t usingchar,var& setting, int fieldno=0,int valueno=0,const int subvalueno=0) const;
+	bool locatex(const std::wstring& target,const char* ordercode,const wchar_t usingchar,var& setting, int fieldno=0,int valueno=0,const int subvalueno=0) const;
 	//hardcore std::wstring locate function given a section of a std::wstring and all parameters
 	bool locateat(const std::wstring& target,size_t start_pos,size_t end_pos,const wchar_t order,const var& usingchar,var& setting)const;
 

@@ -1091,6 +1091,7 @@ nextbrandcode:
 
 	var().stop();
 
+	return "";
 }
 
 

@@ -335,6 +335,7 @@ function main() {
 
 	return 0;
 
+	return "";
 }
 
 

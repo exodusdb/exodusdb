@@ -1231,6 +1231,7 @@ nextlinen:
 
 	return 0;
 
+	return "";
 }
 
 subroutine exit() {

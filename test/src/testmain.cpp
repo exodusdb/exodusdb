@@ -70,6 +70,13 @@ function main()
         for (int ii=0;ii<65536;ii++)
                 tx^=chr(ii);
 
+	var lbvn;
+	//no fieldno/value given means using character VM
+	assert(var("1" _VM_ "10" _VM_ "2" _VM_ "B").locateby("A","AL",lbvn)||lbvn==4);
+	//fieldno given means search in that field using character VM
+	assert(var("1" _VM_ "10" _VM_ "2" _VM_ "B").locateby("A","AL",lbvn,1)||lbvn==4);
+	//fieldno given and =0 means search whole string using character FM
+	assert(var("1" _FM_ "10" _FM_ "2" _FM_ "B").locateby("A","AL",lbvn,0)||lbvn==4);
 
         //check default utf8 output/input
 

@@ -27,7 +27,7 @@ var accounting="";
 
 #define gen_common_no 2
 //#define gen (*((gen_common*) mv.labelledcommon[gen_common_no]))
-gen_common&& gen=reinterpret_cast<gen_common&&> (mv.labelledcommon[gen_common_no]);
-#define gen_isdefined (mv.labelledcommon[gen_common_no] != NULL)
+gen_common&& gen=reinterpret_cast<gen_common&&> (*mv.labelledcommon[gen_common_no]);
+//#define gen_isdefined (mv.labelledcommon[gen_common_no] != NULL)
 
 #endif//EXO_GEN_H

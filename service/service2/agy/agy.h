@@ -37,7 +37,7 @@ var tsmvfns="";
 
 #define agy_common_no 4
 //#define agy (*((agy_common*) mv.labelledcommon[agy_common_no]))
-agy_common&& agy=reinterpret_cast<agy_common&&> (mv.labelledcommon[agy_common_no]);
-#define agy_isdefined (mv.labelledcommon[agy_common_no] != NULL)
+agy_common&& agy=reinterpret_cast<agy_common&&> (*mv.labelledcommon[agy_common_no]);
+//#define agy_isdefined (mv.labelledcommon[agy_common_no] != NULL)
 
 #endif //NEO_FIN_H

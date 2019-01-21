@@ -2,14 +2,6 @@
 libraryinit()
 
 
-var inp;
-var crlf;
-var align;
-var ncols;
-var coln;//num
-var tt;
-var otherstyle;
-
 function main(in mode, in tableid, in in0, out outx) {
 	//c sys in,in,in,out
 
@@ -20,16 +12,16 @@ function main(in mode, in tableid, in in0, out outx) {
 		{}
 	}
 
-	inp = in0.trim().lcase();
+	var inp = in0.trim().lcase();
 
-	crlf = "\r\n";
+	var crlf = "\r\n";
 
 	outx = crlf ^ "<style type=\"text/css\">" ^ crlf;
-	align = "left";
+	var align = "left";
 
-	ncols = inp.count(VM) + 1;
-	for (coln = 1; coln <= ncols; ++coln) {
-		tt = inp.a(1, coln);
+	var ncols = inp.count(VM) + 1;
+	for (var coln = 1; coln <= ncols; ++coln) {
+		var tt = inp.a(1, coln);
 
 		if (tt.index("left", 1)) {
 			align = "left";
@@ -41,7 +33,7 @@ function main(in mode, in tableid, in in0, out outx) {
 			align = "center";
 		}
 
-		otherstyle = tt.field(DQ, 2);
+		var otherstyle = tt.field(DQ, 2);
 		otherstyle.converter("{}", "");
 		otherstyle.trimmer();
 		if (otherstyle[1] ne ";") {

@@ -43,7 +43,7 @@ var cmd;
 var cmd2;
 var totsize;//num
 var errors;
-var mattasks;
+dim mattasks;
 var ntasks;//num
 
 function main() {
@@ -596,6 +596,7 @@ approvalerror:
 	var().stop();
 	return 0;
 
+	return "";
 }
 
 subroutine opendatafile() {
@@ -679,7 +680,7 @@ subroutine addtasks() {
 	}
 
 	var maxtaskfn = 100;
-	dim mattasks(maxtaskfn);
+	mattasks.redim(maxtaskfn);
 
 	var fullcmd = cmd ^ cmd2;
 	fullcmd ^= " AND WITH STATUS NE \"Completed\" AND WITH STATUS NE \"Cancelled\"";

@@ -1761,6 +1761,7 @@ nextdoc:
 	var().stop();
 	return 0;
 
+	return "";
 }
 
 subroutine getsystem() {

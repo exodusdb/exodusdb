@@ -665,6 +665,14 @@ bool var::read(const var& filehandle,const var& key)
 		return true;
 	}
 
+	//asking to read DOS file! do osread using key as osfilename!
+	if (filehandle == L"") {
+		var errmsg=L"read(...) filename not specified, probably not opened.";
+		this->setlasterror(errmsg);
+		throw MVException(errmsg);
+		return false;
+	}
+
 	const char* paramValues[1];
 	int		 paramLengths[1];
 	int		 paramFormats[1];
@@ -951,7 +959,7 @@ bool var::sqlexec(const var& sqlcmd, var& errmsg) const
 	{
 //		exodus::logputl(L"SQL:" ^ *this);
 		var temp(L"SQL:");
-		if (this->unassigned())
+		if (const_cast<var&>(*this).setifunassigned())
 			temp ^= L"Unassigned variable";
 		else
 			temp ^= *this ^ L" ";
@@ -1964,6 +1972,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	var keycodes=L"";
 	var bykey=0;
 	var wordn;
+	var distinctfieldnames=L"";
 
 	var whereclause=L"";//exodus_call('NAME', "^ filename ^ L".data, " ^ filename ^ L".key,0,0) <> '' AND ";
 	var orderclause=L"";
@@ -1977,12 +1986,12 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 
 	//sortselectclause may start with {SELECT|SSELECT {maxnrecs} filename}
 	var word1=remainingsortselectclause.field(L" ", 1);
-	var word2=word1.ucase();
-	if (word2==L"SELECT"||word2==L"SSELECT")
+	var ucword=word1.ucase();
+	if (ucword==L"SELECT"||ucword==L"SSELECT")
 	{
-        remainingsortselectclause.substrer(word2.length()+2);
+        remainingsortselectclause.substrer(ucword.length()+2);
 
-		if (word2==L"SSELECT")
+		if (ucword==L"SSELECT")
 			bykey=1;
 
 		//discard it and get the second word which is either max number of records or filename
@@ -2021,7 +2030,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	{
 
 		word1=getword(remainingsortselectclause);
-		word2=word1.ucase();
+		ucword=word1.ucase();
 
 		//options - last word enclosed in () or {}
 		//ignore options (last word and surrounded by brackets)
@@ -2041,7 +2050,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		}
 
 		//using filename
-		if (word2==L"USING" && remainingsortselectclause)
+		if (ucword==L"USING" && remainingsortselectclause)
 		{
 			dictfilename=getword(remainingsortselectclause);
 			if (!dictfile.open(L"dict_"^dictfilename))
@@ -2053,29 +2062,48 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 			continue;
 		}
 
-		//by or by-dsnd
-        if (word2==L"BY" || word2==L"BY-DSND")
+		//distinct fieldname (returns a field instead of the key)
+		if (ucword==L"DISTINCT" && remainingsortselectclause)
 		{
-			if (orderclause)
-				orderclause^=L", ";
 
-            var dictexpression=getdictexpression(actualfilename,actualfilename,dictfilename,dictfile,getword(remainingsortselectclause),joins,ismv,true);
+			var distinctfieldname=getword(remainingsortselectclause);
+			var distinctexpression=getdictexpression(actualfilename,actualfilename,dictfilename,dictfile,distinctfieldname,joins,ismv,false);
+			var naturalsort_distinctexpression=getdictexpression(actualfilename,actualfilename,dictfilename,dictfile,distinctfieldname,joins,ismv,true);
+
+			if (true) {
+				//this produces the right values but in random order
+				//it use any index on the distinct field so it works on large indexed files
+				//select distinct is really only useful on INDEXED fields unless the file is small
+				distinctfieldnames=L"DISTINCT " ^ distinctexpression;
+			} else {
+				//this produces the right results in the right order
+				//BUT DOES IS USE INDEXES AND ACT VERY FAST??
+				distinctfieldnames=L"DISTINCT ON (" ^ naturalsort_distinctexpression ^ L") " ^ distinctexpression;
+				orderclause^=L", " ^ naturalsort_distinctexpression;
+			}
+			continue;
+		}
+
+		//by or by-dsnd
+		if (ucword==L"BY" || ucword==L"BY-DSND")
+		{
+			var dictexpression=getdictexpression(actualfilename,actualfilename,dictfilename,dictfile,getword(remainingsortselectclause),joins,ismv,true);
 
 //dictexpression.outputl(L"dictexpression=");
 //orderclause.outputl(L"orderclause=");
 
-            orderclause ^= dictexpression;
+			orderclause ^= L", " ^ dictexpression;
 
-			if (word2==L"BY-DSND")
+			if (ucword==L"BY-DSND")
 				orderclause^=L" DESC";
 
 			continue;
 		}
 
 		//subexpressions (,),and,or
-		if (var(L"( ) AND OR").locateusing(word2,L" "))
+		if (var(L"( ) AND OR").locateusing(ucword,L" "))
 		{
-			whereclause ^= L" " ^ word2;
+			whereclause ^= L" " ^ ucword;
 			continue;
 		}
 
@@ -2083,39 +2111,40 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		//with dictid 1 2 3
 		//with dictid between x and y
 		//TODO:without (same as "with xxx not a and b and c")
-		if (word2==L"WITH")
+		if (ucword==L"WITH")
 		{
 
 			//add the dictionary id
 			word1=getword(remainingsortselectclause);
-			var dictexpression=getdictexpression(actualfilename,actualfilename,dictfilename,dictfile,word1,joins,ismv,true);
+			var sortable=false;//because indexes are NOT created sortable (exodus_sort()
+			var dictexpression=getdictexpression(actualfilename,actualfilename,dictfilename,dictfile,word1,joins,ismv,false);
 			var usingnaturalorder=dictexpression.index(L"exodus_extract_sort");
 			whereclause ^= L" " ^ dictexpression;
 
 			//get the word/values after the dictid
 			word1=getword(remainingsortselectclause, true);
-			word2=word1.ucase();
+			ucword=word1.ucase();
 
-			if (word2==L"BETWEEN")
+			if (ucword==L"BETWEEN")
 			{
 				//get and append "from" value
-				word2=getword(remainingsortselectclause);
+				ucword=getword(remainingsortselectclause);
 				if (usingnaturalorder)
-					word2=naturalorder(word2.toString());
-				whereclause ^= L" BETWEEN " ^ word2;
+					ucword=naturalorder(ucword.toString());
+				whereclause ^= L" BETWEEN " ^ ucword;
 
 				//get, check, discard "and"
-				word2=getword(remainingsortselectclause).ucase();
-				if (word2 != L"AND")
+				ucword=getword(remainingsortselectclause).ucase();
+				if (ucword != L"AND")
 				{
 					exodus::errputl(L"ERROR: mvdbpostgres SELECT STATEMENT SYNTAX IS 'between x *and* y'");
 					return L"";
 				}
 
 				//get and append "to" value
-				word2=getword(remainingsortselectclause);
+				ucword=getword(remainingsortselectclause);
 
-				whereclause ^= L" AND " ^ word2;
+				whereclause ^= L" AND " ^ ucword;
 
 				continue;
 			}
@@ -2123,23 +2152,23 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 			//starting, ending, containing, like
 			var startingpercent=L"";
 			var endingpercent=L"";
-			if (word2==L"CONTAINING")
+			if (ucword==L"CONTAINING")
 			{
-				word2=L"LIKE";
+				ucword=L"LIKE";
 				startingpercent=L"%";
 				endingpercent=L"%";
 			}
-			else if (word2==L"STARTING")
+			else if (ucword==L"STARTING")
 			{
-				word2=L"LIKE";
+				ucword=L"LIKE";
 				endingpercent=L"%";
 			}
-			else if (word2==L"ENDING")
+			else if (ucword==L"ENDING")
 			{
-				word2=L"LIKE";
+				ucword=L"LIKE";
 				startingpercent=L"%";
 			}
-			if (word2==L"LIKE")
+			if (ucword==L"LIKE")
 			{
 
 				word1=getword(remainingsortselectclause);
@@ -2162,26 +2191,26 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 			//comparison operators
 			//convert neosys relational operators to standard relational operators
 			var aliasno;
-			if (var(L"EQ NE NOT GT LT GE LE").locateusing(word2,L" ",aliasno))
+			if (var(L"EQ NE NOT GT LT GE LE").locateusing(ucword,L" ",aliasno))
 			{
-				word2=var(L"= <> <> > < >= <=").field(L" ",aliasno);
+				ucword=var(L"= <> <> > < >= <=").field(L" ",aliasno);
 			}
-			if (var(L"= <> > < >= <=").locateusing(word2,L" ",aliasno))
+			if (var(L"= <> > < >= <=").locateusing(ucword,L" ",aliasno))
 			{
-				whereclause ^= L" " ^ word2 ^ L" ";
-				word2=getword(remainingsortselectclause, true);
+				whereclause ^= L" " ^ ucword ^ L" ";
+				ucword=getword(remainingsortselectclause, true);
 			}
 			else
 			{
 				//if value follows dictionary id without a relational operator then insert =
-				if (word2[1]==L"'")
+				if (ucword[1]==L"'")
 					whereclause ^= L" = ";
 			}
 
 			//append value(s)
 			if (usingnaturalorder)
-				word2=naturalorder(word2.toString());
-			whereclause ^= word2;
+				ucword=naturalorder(ucword.toString());
+			whereclause ^= ucword;
 
 		}
 
@@ -2205,9 +2234,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	//sselect add by key on the end of any specific order bys
 	if (bykey)
 	{
-		if (orderclause)
-			orderclause^=L", ";
-		orderclause^=actualfilename ^ L".key";
+		orderclause^=L", " ^ actualfilename ^ L".key";
 	}
 
 	if (!ismv)
@@ -2245,6 +2272,11 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	//disambiguate from any INNER JOIN key
 	actualfieldnames.swapper(L"key",actualfilename ^ L".key");
 
+	//DISTINCT has special fieldnames
+	if (distinctfieldnames) {
+		actualfieldnames=distinctfieldnames;
+	}
+
 	//assemble the full sql select statement:	//ALN:TODO: optimize with stringbuffer
 
 	//WITH HOLD is a very significant addition
@@ -2256,7 +2288,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	if (whereclause)
 		sql ^= L" WHERE " ^ whereclause;
 	if (orderclause)
-		sql ^= L" ORDER BY " ^ orderclause;
+		sql ^= L" ORDER BY " ^ orderclause.substr(3);
 	if (maxnrecs)
 		sql ^= L" LIMIT " ^ maxnrecs;
 
@@ -2294,7 +2326,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	//allow select to be an assignment where filename becomes the cursor name
 	//if actual file is in the sortselectclause
 	//blank doesnt result in assignment so it can be used as a default "anonymous" cursor
-	if (unassigned())
+	if (this->unassigned())
 	{
 		//(*this)=actualfilename;
 		//changed to allow select to be const so allowing file vars to be passed as const ("in") function parameters
@@ -2304,10 +2336,30 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	return true;
 }
 
+var& var::setifunassigned(const var& defaultvalue/*=""*/) {
+
+	THISIS(L"var& var::setifunassigned(const var& defaultvalue) const")
+	THISISDEFINED()
+	ISASSIGNED(defaultvalue)
+
+	//?allow undefined usage like var xyz=xyz.readnext();
+	//if (var_mvtyp&mvtypemask)
+	if (this->unassigned())
+	{
+		//throw MVUndefined(L"selectx()");
+		//var_mvstr=L"";
+		//var_mvtyp=pimpl::MVTYPE_STR;
+		*this=defaultvalue;
+	}
+	return *this;
+}
 void var::clearselect() const
 {
-	THISIS(L"void var::clearselect() const")
-	THISISSTRING()
+	//THISIS(L"void var::clearselect() const")
+	//THISISSTRING()
+
+	//default cursor is ""
+	const_cast<var&>(*this).setifunassigned(L"");
 
         ///if readnext through string
         if ((*this)[-1]==FM) {
@@ -2361,20 +2413,33 @@ bool readnextx(const var& cursor, PGresultptr& pgresult, PGconn* pgconn, bool cl
 		//return false;
 
 		var errmsg=var(PQresultErrorMessage(pgresult));
-		char* sqlstate = PQresultErrorField(pgresult, PG_DIAG_SQLSTATE);
+		var sqlstate = var(PQresultErrorField(pgresult, PG_DIAG_SQLSTATE));
 
 		PQclear(pgresult);
 
 		if (clearselect_onfail) {
 			cursor.clearselect();
 		}
-		//return false if cursor simply doesnt exist
+
+		//if cursor simply doesnt exist then see if a savelist one is available and enable it
 		//34000 - "ERROR:  cursor "cursor1_" does not exist"
-		if (var(sqlstate) == L"34000")
+		if (forwards && sqlstate == L"34000") {
 			return false;
+			//if the standard select list file is available then select it, i.e. create a CURSOR, so FETCH has something to work on
+			var listfilename=L"savelist_" ^ cursor ^ L"_" ^ getprocessn() ^ L"_tempx";
+			if (not var().open(listfilename))
+				return false;
+			//TODO should add BY LISTITEMNO
+			if (not cursor.select(L"select " ^ listfilename))
+				return false;
+			if (GETDBTRACE)
+				exodus::logputl(L"DBTRACE: ::readnextx(...) found standard selectfile " ^ listfilename);
+
+			return readnextx(cursor, pgresult, pgconn, clearselect_onfail, forwards);
+		}
 
 		//any other error
-		throw MVDBException(errmsg);
+		throw MVDBException(errmsg ^ L" sqlstate= " ^ sqlstate.quote());
 
 		//return false;
 	}
@@ -2402,16 +2467,11 @@ bool var::hasnext() const
 	var xx;
 	return this->readnext(xx);
 
-	//?allow undefined usage like var xyz=xyz.readnext();
-	if (var_mvtyp&mvtypemask)
-	{
-		//throw MVUndefined(L"selectx()");
-		var_mvstr=L"";
-		var_mvtyp=pimpl::MVTYPE_STR;
-	}
+	//THISIS(L"bool var::hasnext() const")
+	//THISISSTRING()
 
-	THISIS(L"bool var::hasnext() const")
-	THISISSTRING()
+	//default cursor is ""
+	const_cast<var&>(*this).setifunassigned(L"");
 
 	//readnext through string of keys if provided
 	if ((*this)[-1]==FM) {
@@ -2469,6 +2529,13 @@ bool var::readnext(var& key) const
 
 bool var::readnext(var& key, var& valueno) const
 {
+
+	//default cursor is ""
+	const_cast<var&>(*this).setifunassigned(L"");
+
+	if (GETDBTRACE)
+		exodus::logputl(L"DBTRACE: ::readnext(key,valueno)");
+
 	//?allow undefined usage like var xyz=xyz.readnext();
 	if (var_mvtyp&mvtypemask)
 	{
@@ -2501,19 +2568,6 @@ bool var::readnext(var& key, var& valueno) const
 
 		//fail if no key
 		return key.length()>0;
-	}
-
-	//if the standard select list file is available then select it, i.e. create a CURSOR, so FETCH has something to work on
-	if (not this->selectpending()) {
-		var listfilename=L"savelist_" ^ (*this) ^ L"_" ^ getprocessn() ^ L"_tempx";
-		if (var().open(listfilename)) {
-			//TODO should add BY LISTITEMNO
-			if (not selectx(L"key, mv::integer",L"select " ^ listfilename)) {
-				return L"";
-			}
-		} else {
-			return L"";
-		}
 	}
 
 	PGconn* pgconn=(PGconn*) connection();
@@ -2605,6 +2659,9 @@ bool var::readnextrecord(var& record, var& key) const
 bool var::readnextrecord(var& record, var& key, var& valueno) const
 {
 
+	//default cursor is ""
+	const_cast<var&>(*this).setifunassigned(L"");
+
 	//?allow undefined usage like var xyz=xyz.readnext();
 	if (var_mvtyp&mvtypemask || !var_mvtyp)
 	{
@@ -2681,7 +2738,8 @@ bool var::createindex(const var& fieldname, const var& dictfile) const
 	//throws if cannot find dict file or record
 	var joins=L"";//throw away - cant index on joined fields at the moment
 	var ismv;
-	var dictexpression=getdictexpression(filename,filename,actualdictfile,actualdictfile,fieldname,joins,ismv,true);
+	var sortable=false;
+	var dictexpression=getdictexpression(filename,filename,actualdictfile,actualdictfile,fieldname,joins,ismv,false);
 
 	var sql=L"create index index__" ^ filename ^ L"__" ^ fieldname ^ L" on " ^ filename;
 	sql^=L" (";
@@ -2751,9 +2809,12 @@ var var::listfiles() const
 
 bool var::selectpending() const
 {
-	THISIS(L"var var::selectpending() const")
+	//THISIS(L"var var::selectpending() const")
 	//could allow undefined usage since *this isnt used?
-	THISISSTRING()
+	//THISISSTRING()
+
+	//default cursor is ""
+	const_cast<var&>(*this).setifunassigned(L"");
 
 	//from http://www.alberton.info/postgresql_meta_info.html
 

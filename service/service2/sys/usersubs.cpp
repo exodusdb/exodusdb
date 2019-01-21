@@ -334,7 +334,7 @@ function main(in mode) {
 		}
 
 		//sort holidays in reverse order
-		call sortarray(RECORD, 22 ^ VM ^ 23, "D", "R");
+		call sortarray(RECORD, 22 ^ VM ^ 23, "DR");
 
 	} else if (mode == "POSTWRITE") {
 
@@ -366,7 +366,7 @@ function main(in mode) {
 		return invalid(msg);
 
 	}
-//L1883:
+//L1880:
 	return 0;
 
 }

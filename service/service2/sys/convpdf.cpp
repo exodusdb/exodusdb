@@ -12,7 +12,12 @@ function main(in printopts0, out errors) {
 
 	//gets filename from system<2> and updated system<2> if successful
 
-	var pdfcmd = "c:\\windows\\html2pdf.exe";
+//WARNING TODO: check trigraph following;
+	var exe = oscwd().index(":", 1) ? var(".exe") : var("");
+	var pdfcmd = "html2pdf";
+	if (exe) {
+		pdfcmd = "c:\\windows\\" ^ pdfcmd ^ exe;
+	}
 
 	var htmlfilename = SYSTEM.a(2);
 
@@ -21,7 +26,7 @@ function main(in printopts0, out errors) {
 	//X means dont convert
 	if (printopts0.unassigned()) {
 		printopts = "";
-	}else{
+		}else{
 		printopts = printopts0;
 	}
 	if (printopts.index("X", 1)) {

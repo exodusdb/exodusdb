@@ -1,8 +1,11 @@
 #include <exodus/library.h>
 libraryinit()
 
-//function main(io array, in fns, in order0="", in justification0="") {
-function main(io array, in fns, in order="A", in justification="L") {
+var orderby;//num
+var newvn;
+
+function main(io array, in fns=0, in orderby0="") {
+	//c sys io,0,""
 
 	//sorts one or more parallel mved fields in a record
 	//WARNING cannot have character zero in the data
@@ -13,55 +16,48 @@ function main(io array, in fns, in order="A", in justification="L") {
 	//eg AA would sort the first two fns ascending
 	//justification is L or R for left (text) or right (numberic)
 
-	//TODO only sorts on first field at the moment
+	//MULTIPLE SORTS NOT SUPPORTED CURRENTLY
+	//MULTIPLE FIELDS WILL BE SORTED IN PARALLEL ON THE FIRST FIELD ONLY
 
-	var orderby=order^justification;
-//printl(orderby);
-
-	var nfns = fns.dcount(VM);
-	var fn;
-
-	var sortfn=fns.a(1,1);
-	var sortablefield=array.a(sortfn);
-	var sortedfield="";
-
-	//TODO speed up from current slow insertion sort
-
-	//save current array
-	var oarray=array;
-
-	var nv=sortablefield.dcount(VM);
-	var tt;
-	for (var fnn=2;fnn<=nfns;++fnn) {
-		fn=fns.a(1,fnn);
-
-		//clear existing field
-		array.r(fn,"");
-
-		//work out maximum mv and clear fields
-		tt=oarray.a(fn).dcount(VM);
-		if (tt>nv)
-			nv=tt;
+	if (orderby0.unassigned()) {
+		orderby = 0;
+	}else{
+		orderby = orderby0;
 	}
 
-	var element;
-	var newvn;
-	for (var oldvn=1;oldvn<=nv;++oldvn){
-		element=sortablefield.a(1,oldvn);
+	var nfns = fns.count(VM) + 1;
 
-		sortedfield.locateby(element,orderby,newvn,1);
+	var sortfn = fns.a(1, 1);
+	var unsorted = array.a(sortfn);
+	var sorted = "";
 
-//printt(sortedfield,tt,orderby,newvn);
-		sortedfield.inserter(1,newvn,element);
-//printt(sortedfield.oconv("HEX"));printl();
-
-		for (var fnn=2;fnn<=nfns;++fnn) {
-			fn=fns.a(1,fnn);
-			array.inserter(fn,newvn,oarray.a(fn,oldvn));
+	//insert into a new array without other fields for speed
+	var newarray = "";
+	var nv = unsorted.count(VM) + (unsorted ne "");
+	for (var vn = 1; vn <= nv; ++vn) {
+		var value = unsorted.a(1, vn);
+		if (not(sorted.locateby(value, orderby, newvn))) {
+			{}
 		}
-	}
+		sorted.inserter(1, newvn, value);
 
-	array.r(sortfn,sortedfield);
+		//insert any parallel fields
+		for (var fnn = 2; fnn <= nfns; ++fnn) {
+			var fn = fns.a(1, fnn);
+			var othervalue = array.a(fn, vn);
+			newarray.inserter(fn, newvn, othervalue);
+		};//fnn;
+
+	};//vn;
+
+	array.r(sortfn, sorted);
+
+	//put any parallel fields back into the original array
+	for (var fnn = 2; fnn <= nfns; ++fnn) {
+		var fn = fns.a(1, fnn);
+		array.r(fn, newarray.a(fn));
+	};//fnn;
+
 	return 0;
 
 }

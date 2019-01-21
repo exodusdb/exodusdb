@@ -8,6 +8,10 @@ var acode;
 function main(in aa, io bb) {
 	//c sys in,io
 
+	//BP ADXTAB addunits2 sm
+	//BP ANALSCH addunits vm
+	//GBP NLIST addunits vm
+
 	if (aa == "") {
 		return 0;
 	}
@@ -28,6 +32,7 @@ function main(in aa, io bb) {
 		var bcode = "";
 
 		var nb = bb.count(VM) + (bb ne "");
+		//cause assist c++ decompiler to lift bn out of loop
 		var bn = 1;
 		for (var bn = 1; bn <= nb; ++bn) {
 			var bnum = split(bb.a(1, bn), bcode);

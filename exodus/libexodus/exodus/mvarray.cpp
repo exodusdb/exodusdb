@@ -60,6 +60,7 @@ dim::dim(int rows, int cols)
 {
 	if (rows == 0 || cols == 0)
 		throw MVArrayDimensionedZero();
+	delete[] data_;
 	data_ = new var[rows * cols + 1];
 }
 
@@ -89,27 +90,26 @@ bool dim::write(const var& filehandle, const var& key) const
 bool dim::redim(int rows, int cols)
 {
 
-  if (rows == 0 || cols == 0)
-    throw MVArrayDimensionedZero();
+	if (rows == 0 || cols == 0)
+		throw MVArrayDimensionedZero();
 
-  //how exception safe is this?
+	//how exception safe is this?
 
-  //create new data first
-  var* newdata;
-  newdata = new var[rows * cols + 1];
+	//1. create new data first
+	var* newdata;
+	newdata = new var[rows * cols + 1];
 
-  //only then delete the old data
-  if (initialised_)
-	  delete[] data_;
+	//2. only then delete the old data
+	delete[] data_;
 
-  //and point to the new data
-  initialised_=true;
-  data_ =  newdata;
+	//3. and point to the new data
+	data_ =  newdata;
 
-  nrows_=rows;
-  ncols_=cols;
+	initialised_=true;
+	nrows_=rows;
+	ncols_=cols;
 
-  return true;
+	return true;
 
 }
 

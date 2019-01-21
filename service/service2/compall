@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -x
+set -e
+
+for MODULE in sys gen agy job tim
+do
+#	cp ~/arev/$MODULE/*.cpp ../$MODULE/
+	compile ../$MODULE/*.cpp {S}
+done

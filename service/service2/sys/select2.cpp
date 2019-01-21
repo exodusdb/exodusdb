@@ -13,7 +13,7 @@ var dictids;
 var options;
 var maxnrecs;
 var nlimitfields;//num
-var hexx;
+dim hexx;
 var useactivelist;//num
 var v69;
 var v70;
@@ -86,7 +86,7 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 	datax = "";
 
 	if (linkfilename2) {
-		dim hexx(8);
+		hexx.redim(8);
 		//changed to allow language characters to pass through x80-xF9
 		for (var ii = 249; ii <= 255; ++ii) {
 			hexx(ii - 249) = "%" ^ (ii.oconv("MX")).oconv("R(0)#2");
@@ -207,7 +207,7 @@ nocommon:
 
 	}
 
-	if (not(openfile("DICT.VOC", dictvoc))) {
+	if (not(openfile("dict_voc", dictvoc))) {
 		dictvoc = "";
 	}
 
@@ -526,11 +526,13 @@ selectnext:
 	}
 
 	//get next if output to file or space for more data
+	//goto selectnext
 	if (xml or (datax.length() < 64000)) {
 		goto selectnext;
 	}
 
-	//goto selectnext
+	gosub exit();
+	return 0;
 
 }
 

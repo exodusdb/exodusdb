@@ -13,7 +13,7 @@ function main(in msgno, io msg, in params0="") {
 
 	switch (msgno.toInt()) {
 
-default:
+	default:
 		//should never get here
 		msg = DQ ^ (msgno ^ DQ) ^ " unknown message no in LISTEN4";
 		return 0;
@@ -116,9 +116,9 @@ default:
 		msg.r(-1, "INTERNAL ERROR Closing current NEOSYS server process");
 		return 0;
 
-			}
+	}
 
-		return 0;
+	return 0;
 
 }
 

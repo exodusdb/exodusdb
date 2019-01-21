@@ -7,10 +7,13 @@ libraryinit()
 #include <gen.h>
 
 var sentencex;
+var ip12;
 var ip1;
 var ip2;
 var allowedips;
 var xx;
+var cmd;
+var exe;
 var errors;
 
 function main(in mode, in ipno, out text) {
@@ -34,7 +37,7 @@ function main(in mode, in ipno, out text) {
 	//medialine lan is 100.100.100.* iana "carrier grade NAT"
 	//test in order of frequency installed at clients
 
-	var ip12 = ipno.field(".", 1, 2);
+	ip12 = ipno.field(".", 1, 2);
 	if (ip12 == "192.168") {
 		goto returnzero;
 	}
@@ -70,10 +73,12 @@ returnzero:
 		return 0;
 	}
 
-	var cmd = SYSTEM.a(50);
+	cmd = SYSTEM.a(50);
 
 	//check cygwin whois present otherwise quit
-	if (not((cmd ^ "whois.exe").osfile())) {
+//WARNING TODO: check trigraph following;
+	exe = oscwd().index(":", 1) ? var(".exe") : var("");
+	if (not((cmd ^ "whois" ^ exe).osfile())) {
 		text = "whois command is not installed";
 		return 0;
 	}

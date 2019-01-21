@@ -253,7 +253,7 @@ bool var::locate(const var& target, var& setting, const int fieldno/*=0*/,const 
 	//else if (valueno<=0) *usingchar=VM_;
 	//else *usingchar=SM_;
 
-	return locatex(target.var_mvstr,0,usingchar,setting,fieldno,valueno,0);
+	return locatex(target.var_mvstr,"",usingchar,setting,fieldno,valueno,0);
 }
 
 ///////////////////////////////////////////
@@ -261,7 +261,7 @@ bool var::locate(const var& target, var& setting, const int fieldno/*=0*/,const 
 ///////////////////////////////////////////
 
 //this version caters for the rare syntax where the order is given as a variable
-bool var::locateby(const var& target,const var& ordercode, var& setting, const int fieldno/*=0*/, const int valueno/*=0*/)const
+bool var::locateby(const var& target,const var& ordercode, var& setting, const int fieldno, const int valueno/*=0*/)const
 {
 	THISIS(L"bool var::locateby(const var& target,const var& ordercode, var& setting, const int fieldno/*=0*/, const int valueno/*=0*/)const")
 	ISSTRING(ordercode)
@@ -269,9 +269,19 @@ bool var::locateby(const var& target,const var& ordercode, var& setting, const i
 	return locateby(target,ordercode.toString().c_str(), setting, fieldno, valueno);
 }
 
+//no fieldno or valueno means locate using character VM
+//this version caters for the rare syntax where the order is given as a variable
+bool var::locateby(const var& target,const var& ordercode, var& setting)const
+{
+	THISIS(L"bool var::locateby(const var& target,const var& ordercode, var& setting) const")
+	ISSTRING(ordercode)
+
+	return locateby(target,ordercode.toString().c_str(), setting);
+}
+
 //specialised const wchar_t version of ordercode for speed of usual syntax where ordermode is given as string
 //it avoids the conversion from string to var and back again
-bool var::locateby(const var& target,const char* ordercode, var& setting, const int fieldno/*=0*/, const int valueno/*=0*/) const
+bool var::locateby(const var& target,const char* ordercode, var& setting, const int fieldno, const int valueno/*=0*/) const
 {
 	THISIS(L"bool var::locateby(const var& target,const char* ordercode, var& setting, const int fieldno/*=0*/, const int valueno/*=0*/) const")
 	THISISSTRING()
@@ -294,6 +304,70 @@ bool var::locateby(const var& target,const char* ordercode, var& setting, const 
 	//else if (valueno<=0) usingchar=VM_;
 	//else usingchar=SM_;
 
+	return locatex(target.var_mvstr,ordercode,usingchar,setting,fieldno,valueno,0);
+}
+
+//no fieldno or valueno means locate using character VM
+//specialised const wchar_t version of ordercode for speed of usual syntax where ordermode is given as string
+//it avoids the conversion from string to var and back again
+bool var::locateby(const var& target,const char* ordercode, var& setting) const
+{
+	THISIS(L"bool var::locateby(const var& target,const char* ordercode, var& setting, const int fieldno/*=0*/, const int valueno/*=0*/) const")
+	THISISSTRING()
+	ISSTRING(target)
+	ISDEFINED(setting)
+
+	//TODO either make a "locatefrom" version of the above where the locate STARTS its search from the
+	//last numbered subvalue (add a new parameter), value or field.
+	//OR possibly modify this function to understand a negative number as "start from" instead of "within this"
+
+	//determine locate by field, value or subvalue depending on the parameters as follows:
+	//if value number is given then locate in subvalues of that value
+	//if field number is given then locate in values of that field
+	//otherwise locate in fields of the string
+	wchar_t usingchar=VM_;
+
+	return locatex(target.var_mvstr,ordercode,usingchar,setting,0,0,0);
+
+}
+
+///////////////////////////////////////////
+//LOCATE USING
+///////////////////////////////////////////
+
+bool var::locateusing(const var& target,const var& usingchar) const
+{
+	THISIS(L"bool var::locateusing(const var& target,const var& usingchar) const")
+	THISISSTRING()
+	ISSTRING(target)
+	ISSTRING(usingchar)
+	//ISDEFINED(setting)
+
+	var setting=L"";
+	return locatex(target.var_mvstr,"",usingchar.var_mvstr.c_str()[0],setting,0,0,0);
+}
+
+bool var::locateusing(const var& target,const var& usingchar, var& setting, const int fieldno/*=0*/,const int valueno/*=0*/, const int subvalueno/*=0*/) const
+{
+	THISIS(L"bool var::locateusing(const var& target,const var& usingchar, var& setting, const int fieldno/*=0*/,const int valueno/*=0*/, const int subvalueno/*=0*/) const")
+	THISISSTRING()
+	ISSTRING(target)
+	ISSTRING(usingchar)
+	ISDEFINED(setting)
+
+	return locatex(target.var_mvstr,"",usingchar.var_mvstr.c_str()[0],setting,fieldno,valueno,subvalueno);
+
+}
+
+//locate within extraction
+bool var::locatex(const std::wstring& target,const char* ordercode,const wchar_t usingchar,var& setting, int fieldno,int valueno,const int subvalueno) const
+{
+	//private - assume everything is defined/assigned correctly
+
+	//any negatives at all returns ""
+	//done inline since unusual
+	//if (fieldno<0||valueno<0||subvalueno<0) return var(L"")
+
 	char ordermode;
 	if (strlen(ordercode)==0)
 		ordermode=0;
@@ -311,45 +385,6 @@ bool var::locateby(const var& target,const char* ordercode, var& setting, const 
 		//add two and divide by two to get the order no AL=1 AR=2 DL=3 DR=4
 		ordermode=(ordermode+2)>>1;
 	}
-	return locatex(target.var_mvstr,ordermode,usingchar,setting,fieldno,valueno,0);
-}
-
-///////////////////////////////////////////
-//LOCATE USING
-///////////////////////////////////////////
-
-bool var::locateusing(const var& target,const var& usingchar) const
-{
-	THISIS(L"bool var::locateusing(const var& target,const var& usingchar) const")
-	THISISSTRING()
-	ISSTRING(target)
-	ISSTRING(usingchar)
-	//ISDEFINED(setting)
-
-	var setting=L"";
-	return locatex(target.var_mvstr,0,usingchar.var_mvstr.c_str()[0],setting,0,0,0);
-}
-
-bool var::locateusing(const var& target,const var& usingchar, var& setting, const int fieldno/*=0*/,const int valueno/*=0*/, const int subvalueno/*=0*/) const
-{
-	THISIS(L"bool var::locateusing(const var& target,const var& usingchar, var& setting, const int fieldno/*=0*/,const int valueno/*=0*/, const int subvalueno/*=0*/) const")
-	THISISSTRING()
-	ISSTRING(target)
-	ISSTRING(usingchar)
-	ISDEFINED(setting)
-
-	return locatex(target.var_mvstr,0,usingchar.var_mvstr.c_str()[0],setting,fieldno,valueno,subvalueno);
-
-}
-
-//locate within extraction
-bool var::locatex(const std::wstring& target,const char ordercode,const wchar_t usingchar,var& setting, int fieldno,int valueno,const int subvalueno) const
-{
-	//private - assume everything is defined/assigned correctly
-
-	//any negatives at all returns ""
-	//done inline since unusual
-	//if (fieldno<0||valueno<0||subvalueno<0) return var(L"")
 
 	//zero means all, negative return L""
 	//if (fieldno<=0)     (but locate x<0> using VM should work too
@@ -364,7 +399,7 @@ bool var::locatex(const std::wstring& target,const char ordercode,const wchar_t 
 
 		if (valueno||subvalueno) fieldno=1; else
 		{
-			return locateat(target,(size_t) 0,var_mvstr.length(),ordercode,usingchar,setting);
+			return locateat(target,(size_t) 0,var_mvstr.length(),ordermode,usingchar,setting);
 		}
 	}
 
@@ -389,7 +424,8 @@ bool var::locatex(const std::wstring& target,const char ordercode,const wchar_t 
 	//find the end of the field (or string)
 	std::wstring::size_type field_end_pos;
 	field_end_pos=var_mvstr.find(FM_ ,start_pos);
-	if (field_end_pos==std::wstring::npos) field_end_pos=var_mvstr.length();
+	if (field_end_pos==std::wstring::npos)
+		field_end_pos=var_mvstr.length();
 
 	//FIND VALUE
 
@@ -408,7 +444,7 @@ bool var::locatex(const std::wstring& target,const char ordercode,const wchar_t 
 			return !target.length();
 		}
 		if (subvalueno) valueno=1; else
-			return locateat(target,start_pos,field_end_pos,ordercode,usingchar,setting);
+			return locateat(target,start_pos,field_end_pos,ordermode,usingchar,setting);
 	}
 
 	//find the starting position of the value or return L""
@@ -452,7 +488,7 @@ bool var::locatex(const std::wstring& target,const char ordercode,const wchar_t 
 
 	//zero means all, negative means ""
 	if (subvalueno==0)
-		return locateat(target,start_pos,value_end_pos,ordercode,usingchar,setting);
+		return locateat(target,start_pos,value_end_pos,ordermode,usingchar,setting);
 	if (subvalueno<0)
 	{
 		setting=1;
@@ -488,10 +524,10 @@ bool var::locatex(const std::wstring& target,const char ordercode,const wchar_t 
 	subvalue_end_pos=var_mvstr.find(SM_ ,start_pos);
 	if (subvalue_end_pos==std::wstring::npos||subvalue_end_pos>value_end_pos)
 	{
-	       	return locateat(target,start_pos,value_end_pos,ordercode,usingchar,setting);
+	       	return locateat(target,start_pos,value_end_pos,ordermode,usingchar,setting);
 	}
 
-	return locateat(target,start_pos,subvalue_end_pos,ordercode,usingchar,setting);
+	return locateat(target,start_pos,subvalue_end_pos,ordermode,usingchar,setting);
 
 }
 
@@ -583,12 +619,6 @@ bool var::locateat(const std::wstring& target,size_t start_pos,size_t end_pos,co
 				//AR Ascending Right Justified
 				case L'\x02':
 					value=var_mvstr.substr(start_pos,nextstart_pos-start_pos);
-	//what is this?!
-	if (!value.isnum())
-	{
-		setting=-999;
-		return false;
-	}
 					if (value>=target2)
 					{
 						setting=valuen2;
@@ -618,12 +648,6 @@ bool var::locateat(const std::wstring& target,size_t start_pos,size_t end_pos,co
 				//DR Descending Right Justified
 				case L'\x04':
 					value=var_mvstr.substr(start_pos,nextstart_pos-start_pos);
-	//what is this?!
-	if (!value.isnum())
-	{
-		setting=-999;
-		return false;
-	}
 					if (value<=target2)
 					{
 						setting=valuen2;
@@ -683,12 +707,6 @@ bool var::locateat(const std::wstring& target,size_t start_pos,size_t end_pos,co
 //				if (!targetlen&&nextstart_pos==start_pos) break;
 
 				value=var_mvstr.substr(start_pos,nextstart_pos-start_pos);
-	//what is this?!
-	if (!value.isnum())
-	{
-		setting=-999;
-		return false;
-	}
 				if (value>=target2)
 				{
 					setting=valuen2;
@@ -720,12 +738,6 @@ bool var::locateat(const std::wstring& target,size_t start_pos,size_t end_pos,co
 //				if (!targetlen&&nextstart_pos==start_pos) break;
 
 				value=var_mvstr.substr(start_pos,nextstart_pos-start_pos);
-	//what is this?!
-	if (!value.isnum())
-	{
-		setting=-999;
-		return false;
-	}
 				if (value<=target2)
 				{
 					setting=valuen2;

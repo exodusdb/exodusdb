@@ -514,7 +514,7 @@ function main(in mode) {
 		}
 
 		//sort the tasks
-		call sortarray(SECURITY, "10" ^ VM ^ "11");
+		call sortarray(SECURITY, "10" ^ VM ^ "11", "AL");
 
 		win.registerx(7) = SECURITY;
 
@@ -1430,7 +1430,7 @@ function main(in mode) {
 		return invalid(msg);
 
 	}
-//L6116:
+//L6119:
 	return 0;
 
 }
@@ -1627,7 +1627,7 @@ subroutine newpass3() {
 		call note("W123", "", xx, userx);
 		return;
 	}
-//L6611:
+//L6614:
 	var v12 = 0;
 
 	/*;
@@ -1839,7 +1839,7 @@ subroutine getemailtx() {
 		} else {
 			//emailtx:=' *AMENDED*'
 		}
-//L7508:
+//L7511:
 		//always show user name, if different from user code
 		if ((origuserrec.a(1) == userrec.a(1)) and userrec.a(1) ne userx) {
 			emailtx.r(-1, var("User Name:").oconv("L#10") ^ userrec.a(1));
