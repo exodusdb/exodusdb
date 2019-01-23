@@ -150,19 +150,14 @@ void main2(MvEnvironment& mv)
 #define call
 #define gosub
 
-#define oldclassinit() \
-class ExodusProgram : public ExodusProgramBase {
-
-#define oldclassexit() \
-public: \
-	/*constructor with one arg of MvEnvironment mv */ \
-	ExodusProgram(MvEnvironment& mv):ExodusProgramBase(mv){} \
-};
-
-//version to allow multiple named "exodus classes"
+//class init
+//allow multiple named "exodus classes" useful for dictionary item programs where each dict item becomes a separate class with its own "main" entry point
 #define classinit(CLASSNAME) \
 class CLASSNAME##ExodusProgram : public ExodusProgramBase {
 
+//class exit
+//insert a constructor function accepting an mvenvironment just before the class exit
+//and then insert the class termination "};"
 #define classexit(CLASSNAME) \
 public: \
 	CLASSNAME##ExodusProgram(MvEnvironment& mv):ExodusProgramBase(mv){} \
@@ -179,9 +174,9 @@ public: \
 //Can be declared in exodus namespace which is useful since "in" and "out" could easily
 //occur in other libraries.
 namespace exodus {
-typedef const var& in;
-typedef var& io;
-typedef var& out;
+	typedef const var& in;
+	typedef var& io;
+	typedef var& out;
 }
 
 //forcibly redefine "eq" even if already previously defined in some other library like iostream

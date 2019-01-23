@@ -47,7 +47,7 @@ function main(in addaccmode, in jobno, io msg) {
 	//year 99
 	var params = period.field("/", 2);
 	//period 01-12
-	params.r(2, (period.field("/", 1)).oconv("R(0)#2"));
+	params.r(2, period.field("/", 1).oconv("R(0)#2"));
 	//quarter 1-4
 	params.r(3, ((period.field("/", 1) - 1) / 3).floor() + 1);
 	//company code

@@ -1,28 +1,31 @@
 #include <exodus/library.h>
 libraryinit()
 
-var balances;
+var vn;
+var sn;//num
 
-function main(in balancesfile, in balanceskey, in deleting, in balanceperiod, in amount, in baseamount, in unused, in basecurrency, in vouchertype) {
+function main(in balancesfile, in balanceskey, in deleting, in balanceperiod, in amount, in baseamount, in xxxxxx, in basecurrency, in vouchertype) {
+	//c fin
 	//y2k
 	var currencycode = balanceskey.field("*", 4);
-	if (false) print(unused);
 
-//updatebalances:
-
+	////////////////
+updatebalances:
+	////////////////
 	//TRANSACTION CURRENCY RECORD
 	//A) PART1 - CURRENCY
 	//LOCK BALANCES.FILE,BALANCES.KEY ELSE
 	// CALL MSG('TRYING TO LOCK BALANCES FILE ':BALANCES.KEY,'T1','','')
 	// GOTO UPDATE.BALANCES
 	// END
+	var balances;
 	if (not(balances.read(balancesfile, balanceskey))) {
 		balances = "";
 	}
 
 	//backward compatibility
 	//calculate average unit cost (relevent for noncurrency only)
-	if (currencycode ne basecurrency and balances.a(18) == "") {
+	if (currencycode ne basecurrency and (balances.a(18) == "")) {
 		var quantity = (balances.a(1) - balances.a(2)).oconv("MD40PZ");
 		var cost = (balances.a(11) - balances.a(12)).oconv("MD40PZ");
 		if (quantity and cost) {
@@ -31,9 +34,9 @@ function main(in balancesfile, in balanceskey, in deleting, in balanceperiod, in
 		}
 	}
 
-//	var fn = 1;
-//	var addamount = amount;
-	gosub add(1, amount, vouchertype, balanceperiod, deleting);
+	var fn = 1;
+	var addamount = amount;
+	gosub add();
 
 	///////////////
 	//if this is base currency then we have finished
@@ -51,7 +54,9 @@ function main(in balancesfile, in balanceskey, in deleting, in balanceperiod, in
 	//PART3 - BASE EQUIVALENT STORED IN THE SAME RECORD
 	//////
 
-	gosub add(11, baseamount, vouchertype, balanceperiod, deleting);
+	fn = 11;
+	addamount = baseamount;
+	gosub add();
 
 	//recalculate average unit cost (relevent for noncurrency only)
 	var quantity = (balances.a(1) - balances.a(2)).oconv("MD40PZ");
@@ -75,7 +80,7 @@ function main(in balancesfile, in balanceskey, in deleting, in balanceperiod, in
 	//PART2 - TOTAL OTHER CURRENCIES CONVERTED STORED IN BASE CURRENCY RECORD
 	//////
 	var foreignbalanceskey = balanceskey.fieldstore("*", 4, 1, basecurrency);
-//lockbase:
+lockbase:
 	// LOCK BALANCES.FILE,FOREIGN.BALANCES.KEY ELSE
 	// CALL MSG('TRYING TO LOCK BALANCES FILE ':FOREIGN.BALANCES.KEY,'T1','','')
 	// GOTO LOCK.BASE
@@ -84,12 +89,13 @@ function main(in balancesfile, in balanceskey, in deleting, in balanceperiod, in
 		balances = "";
 	}
 
-	gosub add(6, baseamount, vouchertype, balanceperiod, deleting);
+	fn = 6;
+	addamount = baseamount;
+	gosub add();
 
 	//list of other currencies stored in base currency record
 	if (not deleting) {
-		var vn;
-		if (not(balances.locateby(currencycode, "AL", vn, 16))) {
+		if (not(balances.a(16).locateby(currencycode, "AL", vn))) {
 			balances.inserter(16, vn, currencycode);
 		}
 	}
@@ -102,18 +108,17 @@ function main(in balancesfile, in balanceskey, in deleting, in balanceperiod, in
 
 }
 
-subroutine add(in fn0, in addamount0, in vouchertype, in balanceperiod, in deleting) {
-	var fn=fn0;
-	var addamount=addamount0;
-	var sn;
+subroutine add() {
 	if (vouchertype) {
-		if (not(balances.locate(vouchertype, sn, 17, 1))) {
+		if (not(balances.a(17, 1).locateusing(vouchertype, var().chr(252), sn))) {
 			if (balanceperiod) {
-				balances.r(17, 1, sn, vouchertype);
+				balances.r(17, 1, -1, vouchertype);
 			}
 		}
-	} else
-		sn = 1;
+		goto 453;
+	}
+	sn = 1;
+//L453:
 
 	//decide debit or credit side independently for amount and base
 	//(no negative numbers in the balances record)

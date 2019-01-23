@@ -62,7 +62,7 @@ THE SOFTWARE.
 #	define Tstring string
 #	define toTstring(item) item.toString()
 #else
-#	define toTstring(item) item.var_mvstr
+#	define toTstring(item) item.var_str
 #	define Tstring wstring
 #endif
 
@@ -99,10 +99,10 @@ THE SOFTWARE.
 //n=0 gives 1235
 //n=-2 gives 1200
 //storage could be changed to integer if n<=0 or left probably better since likely to be added to other similar ints thereafter
-//if (var_mvdbl>=0)
-//	var_mvdbl=long long int(var_mvdbl+0.5)
+//if (var_dbl>=0)
+//	var_dbl=long long int(var_dbl+0.5)
 //else
-//	var_mvdbl=long long int(var_mvdbl-0.5);
+//	var_dbl=long long int(var_dbl-0.5);
 
 //pimpl forward declaration
 //#ifdef _DEBUG
@@ -278,9 +278,17 @@ As a result, symmetric operators like + and - are generally implemented as non-m
 */
 
 //the destructor is public non-virtual (supposedly to save space)
-//TODO check sizeof var with virtual destructor
-//since this class has no virtual functions it should still be save to derive from it and do delete()
+//since this class has no virtual functions
+//IT SHOULD BE ABLE TO DERIVE FROM IT AND DO DELETE()
 //http://www.parashift.com/c++-faq-lite/virtual-functions.html#faq-20.7
+
+//on linux, size is 56 bytes
+//wstring:  32
+//int:      4
+//double:   8
+//wchar_t:  4
+//var:      56
+
 //class var
 class DLL_PUBLIC var
 {
@@ -288,11 +296,14 @@ class DLL_PUBLIC var
 protected:
 
 public:
+
 	//destructor to (NOT VIRTUAL to save space since not expected to be a base class)
 	//protected to prevent deriving from var since wish to save space and not provide virtual destructor
 	//http://www.gotw.ca/publications/mill18.htm
+	//virtual ~var();
 	~var();
 
+public:
 	//CONVERSIONS
 	/////////////
 
@@ -758,7 +769,7 @@ public:
 #	define DEFAULTVM =VM_
 #endif
 	//SYSTEM FILE/DIRECTORY OPERATIONS
-	//TODO cache osfilehandles somehow (use var_mvint?)
+	//TODO cache osfilehandles somehow (use var_int?)
 	bool osopen() const;
 	bool osopen(const var& filename, const var& locale DEFAULTNULL) const;
 	var& osbread(const var& osfilevar, var& startoffset, const int length);
@@ -1148,14 +1159,16 @@ private:
 #ifdef _MSC_VER
 	#pragma warning( disable: 4251 )
 #endif
-	mutable std::wstring var_mvstr;
+	mutable std::wstring var_str;
 #ifdef _MSC_VER
 	#pragma warning( 4: 4251 )
 #endif
-	mutable mvint_t var_mvint;
-    mutable double var_mvdbl;
+	mutable mvint_t var_int;
+	mutable double var_dbl;
 	//initialise type last
-	mutable wchar_t var_mvtyp;
+	mutable wchar_t var_typ;
+
+private:
 
 	void createString() const;
 
@@ -1165,7 +1178,7 @@ private:
 	bool selectx(const var& fieldnames, const var& sortselectclause) const;
 
 	// retrieves cid from *this, or uses default connection, or autoconnect with default connection string
-	// On return *this contains connection ID and type pimpl::MVTYPE_NANSTR_DBCONN
+	// On return *this contains connection ID and type pimpl::VARTYP_NANSTR_DBCONN
 	int connection_id() const;
 
 	// finds connection of this variable:
@@ -1207,8 +1220,8 @@ private:
 
 	friend class dim;
 
-	bool THIS_IS_DBCONN() const	{ return (this->var_mvtyp & pimpl::MVTYPE_DBCONN) != 0; }
-	bool THIS_IS_OSFILE() const	{ return (this->var_mvtyp & pimpl::MVTYPE_OSFILE) != 0; }
+	bool THIS_IS_DBCONN() const	{ return (this->var_typ & pimpl::VARTYP_DBCONN) != 0; }
+	bool THIS_IS_OSFILE() const	{ return (this->var_typ & pimpl::VARTYP_OSFILE) != 0; }
 
 }; //of class "var"
 

@@ -9,7 +9,7 @@ function main(in type, io in0, io mode, out output, in glang="") {
 		output = "";
 		return 0;
 	}
-	var nospaces = mode.index("*", 1);
+	var nospaces = mode.index("*");
 	if (nospaces) {
 		mode.converter("*", "");
 	}

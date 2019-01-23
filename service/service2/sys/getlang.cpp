@@ -155,7 +155,7 @@ subroutine getlang3(in origprogname, in datatype, in languagefile, io lang) {
 			lang = raise(lang.a(1));
 
 			//strip out English pretext
-			if (lang.index(var().chr(170), 1)) {
+			if (lang.index(var().chr(170))) {
 				var nn = lang.count(FM) + 1;
 				for (var ii = 1; ii <= nn; ++ii) {
 					var tt = lang.a(ii).field(var().chr(170), 2);

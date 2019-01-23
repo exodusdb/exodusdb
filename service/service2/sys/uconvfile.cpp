@@ -32,7 +32,7 @@ function main(in inputfilename, in encoding1i, in encoding2i, out result, out ms
 
 	//make cygwin command
 	//look for local or cygwin wget.exe otherwise quit
-	if (oscwd().index(":", 1)) {
+	if (oscwd().index(":")) {
 		exe = ".exe";
 	}else{
 		exe = "";

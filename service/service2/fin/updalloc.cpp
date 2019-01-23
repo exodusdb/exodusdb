@@ -3,7 +3,7 @@ libraryinit()
 
 #include <split.h>
 #include <addcent.h>
-//#include <updvoucher3.h>
+#include <updvoucher3.h>
 #include <updvoucher.h>
 
 #include <fin.h>
@@ -20,15 +20,8 @@ var revalvoucherpointer;
 var revaldate;
 var revalpayln;
 
-var origmode;
-var invoicepointer;
-var paymentpointer;
-var payn;
-var invln;
-var acc;
-var invoicecode;
-
 function main(io mode, io payment, in paymentcode, io allocs) {
+	//c fin io,io,in,io
 	//y2k
 
 	//mode
@@ -36,11 +29,13 @@ function main(io mode, io payment, in paymentcode, io allocs) {
 	//REALLOC
 	//UNPOST (like blank but doesnt write invoices or complain if invoices are unposted
 
-//init:
+/////
+init:
+/////
 
-	origmode = mode;
+	var origmode = mode;
 	//CURR.YEARPERIOD=CURRYEAR:('00':CURRPERIOD)[-2,2]
-	var currtoyearperiod = fin.currtoyear ^ var("00" ^ fin.currtoperiod).substr(-2, 2);
+	var currtoyearperiod = fin.currtoyear ^ ("00" ^ fin.currtoperiod).substr(-2,2);
 
 	//get the payment voucher if necessary
 	if (not payment) {
@@ -54,304 +49,326 @@ function main(io mode, io payment, in paymentcode, io allocs) {
 			if (mode ne "UNPOSTED") {
 				call mssg("SYSTEM ERROR IN UPD.ALLOC|PAYMENT VOUCHER " ^ (DQ ^ (paymentcode ^ DQ)) ^ " IS NOT POSTED/DELETED|(ALLOCATION NOT DONE)");
 			}
-			return exit();
+			goto nextinv;
 		}
 	}
 
 	//payment voucher period/year (from voucher date if not specified)
 	var paymentyearperiod = payment.a(16);
 	if (not paymentyearperiod) {
-		paymentyearperiod = ((payment.a(2)).oconv("HEX")).oconv(gen.company.a(6));
+		//garbagecollect;
+		paymentyearperiod = payment.a(2).oconv("HEX").oconv(gen.company.a(6));
 	}
 
-//initpay:
-	var npays = (allocs.a(1)).count(VM) + 1;
+////////
+initpay:
+////////
+	var npays = allocs.a(1).count(VM) + 1;
+	var payn = 0;
 
-//nextpay:
-	for (var payn=1; payn<=npays; ++payn) {
+////////
+nextpay:
+////////
+	payn += 1;
+	if (payn > npays) {
+		goto exit;
+	}
 
-		if (not(allocs.a(1, payn))) {
-			continue;//next pay
+	if (not(allocs.a(1, payn))) {
+		goto nextpay;
+	}
+
+	//skip lines of other companies (not necessary?)
+	var acc = payment.a(8, payn, 2);
+	if (not acc) {
+		acc = payment.a(8, payn, 1);
+	}
+	var acccompany = acc.field(",", 2);
+	if (acccompany and mode ne "UNPOSTED") {
+		if (acccompany ne fin.currcompany) {
+			goto nextpay;
 		}
+	}
 
-		//skip lines of other companies (not necessary?)
-		acc = payment.a(8, payn, 2);
-		if (not acc) {
-			acc = payment.a(8, payn, 1);
-		}
-		var acccompany = acc.field(",", 2);
-		if (acccompany and mode ne "UNPOSTED") {
-			if (acccompany ne fin.currcompany) {
-				continue; //nextpay;
-			}
-		}
+////////
+payinit:
+////////
+	var paymentpointer = paymentcode.field("*", 1, 2);
+	if (payn > 1) {
+		paymentpointer ^= "*" ^ payn;
+	}
 
-//payinit:
+	var ninvs = allocs.a(1, payn).count(SVM) + 1;
 
-		paymentpointer = paymentcode.field("*", 1, 2);
-		if (payn > 1) {
-			paymentpointer ^= "*" ^ payn;
-		}
+	//see if foreign currency
+	var amount = split(payment.a(10, payn), currcode);
+	var temp = payment.a(19, payn);
+	//IF TEMP THEN AMOUNT-=SUM(TEMP)
+	if (temp) {
+		amount = (amount - temp.sum()).oconv("MD40P");
+	}
+	var foreign = currcode ne fin.basecurrency;
 
-		var ninvs = (allocs.a(1, payn)).count(SVM) + 1;
-
-		//see if foreign currency
-		var amount = split(payment.a(10, payn), currcode);
-		var temp = payment.a(19, payn);
-		//IF TEMP THEN AMOUNT-=SUM(TEMP)
+	//if foreign currency the calculate allocations in base amount
+	if (foreign) {
+		var baseamount = payment.a(11, payn);
+		temp = payment.a(20, payn);
+		//IF TEMP THEN BASE.AMOUNT-=SUM(TEMP)
+		//garbagecollect;
 		if (temp) {
-			amount = (amount - temp.sum()).oconv("MD40P");
+			baseamount = (baseamount - temp.sum()).oconv(fin.basefmt);
 		}
-		var foreign = currcode ne fin.basecurrency;
-
-		//if foreign currency the calculate allocations in base amount
-		if (foreign) {
-			var baseamount = payment.a(11, payn);
-			temp = payment.a(20, payn);
-			//IF TEMP THEN BASE.AMOUNT-=SUM(TEMP)
-			//garbagecollect;
-			if (temp) {
-				baseamount = (baseamount - temp.sum()).oconv(fin.basefmt);
-			}
-			for (var invn = 1; invn <= ninvs; ++invn) {
-				var allocamount = allocs.a(2, payn, invn);
-				if (amount) {
-					tt = (baseamount * (allocamount / amount)).oconv(fin.basefmt);
-				}else{
-					tt = 0;
-				}
-				allocs.r(3, payn, invn, tt);
-			};//invn;
-
-			//if currency completely allocated then ensure that base is
-			//by adding any rounding errors to the first allocation
-			if (not(amount - (allocs.a(2, payn)).sum())) {
-				temp = baseamount - (allocs.a(3, payn)).sum();
-				//garbagecollect;
-				//IF TEMP THEN ALLOCS<3,PAYN,1>=ALLOCS<3,PAYN,1>+TEMP
-				//sjb971111
-				if (temp) {
-					allocs.r(3, payn, 1, (allocs.a(3, payn, 1) + temp).oconv(fin.basefmt));
-				}
-			}
-		}
-
-
-//nextinv:
-		for (var invn=1; invn<= ninvs; ++invn) {
-
-			//get the invoice and line number
-			invoicepointer = allocs.a(1, payn, invn);
-			invoicecode = invoicepointer.field("*", 1, 2) ^ "*" ^ fin.currcompany;
-			if (not invoicecode) {
-				continue;//nextinv//nextinv
-			}
-			//IF field(INVOICE.CODE,'*',1) EQ 'RV' THEN GOTO NEXTINV
-			//skip unallocated mass revaluations in open item accounts
-			if (invoicecode == "RV") {
-				continue;//nextinv
-			}
-			invln = invoicepointer.field("*", 3);
-			if (not invln) {
-				invln = 1;
-			}
-			if (invoicecode == paymentcode) {
-				//N.B. make sure all changes to PAYMENT are copied to INVOICE and vice versa
-				selfalloc = 1;
-				invoice = payment;
-			}else{
-				selfalloc = 0;
-				var invoice;
-				if (not(invoice.read(fin.vouchers, invoicecode))) {
-					if (mode ne "UNPOSTED") {
-						call mssg("SYSTEM ERROR IN UPD.ALLOC|INVOICE VOUCHER " ^ (DQ ^ (invoicecode ^ DQ)) ^ " IS MISSING|(ALLOCATION NOT DONE)");
-					}
-					continue;//nextinv
-				}
-				//if invoice<7,1>='D' and mode<>'UNPOSTED' then
-				if (invoice.a(7, 1) == "D") {
-					if (mode ne "UNPOSTED") {
-						call mssg("SYSTEM ERROR IN UPD.ALLOC|INVOICE VOUCHER " ^ (DQ ^ (invoicecode ^ DQ)) ^ " IS NOT POSTED/DELETED|(ALLOCATION NOT DONE)");
-					}
-					continue;//nextinv
-				}
-			}
-
-//invinit:
-
+		for (var invn = 1; invn <= ninvs; ++invn) {
 			var allocamount = allocs.a(2, payn, invn);
-
-			//get the base allocation and the gain/loss in base
-			if (not foreign) {
-				allocbase = allocamount;
-				gainbase = "";
+			if (amount) {
+				tt = (baseamount * (allocamount / amount)).oconv(fin.basefmt);
 			}else{
-				//calculate base allocation as a proportion of the unallocated base
-				//get currency outstanding
-				allocbase = allocs.a(3, payn, invn);
-				var unallocamount = split(invoice.a(10, invln), temp);
-				temp = invoice.a(19, invln);
-				if (temp) {
-					unallocamount -= temp.sum();
-				}
-				//get the base amount outstanding
-				var unallocbase = invoice.a(11, invln);
-				temp = invoice.a(20, invln);
-				if (temp) {
-					unallocbase -= temp.sum();
-				}
-
-				//calculate the proportion
-				//garbagecollect;
-				unallocamount = -unallocamount;
-				if (allocamount - unallocamount) {
-					if (unallocamount) {
-						tt = (-(unallocbase * allocamount / unallocamount)).oconv(fin.basefmt);
-					}else{
-						tt = 0;
-					}
-					var invallocbase = tt;
-					gainbase = (invallocbase - allocbase).oconv(fin.basefmt);
-
-					//adjust inv alloc base if rounding difference
-					if (gainbase.abs() <= .01) {
-						invallocbase = (invallocbase - gainbase).oconv(fin.basefmt);
-						gainbase = 0;
-					}
-
-				}else{
-					var invallocbase = -unallocbase;
-					gainbase = (invallocbase - allocbase).oconv(fin.basefmt);
-				}
+				tt = 0;
 			}
+			allocs.r(3, payn, invn, tt);
+		};//invn;
 
-			//determine the allocation period as the higher of the two voucher periods
-			// and not before the closed period
-			//**removed 23/2/93 (and, if reallocating, not less than the current period)
-			var invoiceyearperiod = invoice.a(16);
-			if (not invoiceyearperiod) {
-				invoiceyearperiod = ((invoice.a(2)).oconv("HEX")).oconv(gen.company.a(6));
-			}
-			if (addcent(invoiceyearperiod) > addcent(paymentyearperiod)) {
-				allocyearperiod = invoiceyearperiod;
-			}else{
-				allocyearperiod = paymentyearperiod;
-			}
-
-			//reinstated 20070616 to prevent way back allocations esp. to avoid revaluation
-			if (origmode == "REALLOC") {
-				//IF addcent(ALLOC.YEARPERIOD) LT addcent(CURR.YEARPERIOD) THEN
-				// ALLOC.YEARPERIOD=CURR.YEARPERIOD
-				if (addcent(allocyearperiod) < addcent(currtoyearperiod)) {
-					allocyearperiod = currtoyearperiod;
-				}
-			}
-
-			//5 feb 97 alloc period cannot be before closed period
-			var minperiod = gen.company.a(16);
-			if (minperiod) {
-				var minyear = minperiod.substr(-2, 2);
-				minperiod = minperiod.field("/", 1) + 1;
-				if (minperiod > fin.maxperiod) {
-					minperiod = 1;
-					minyear = (minyear + 1).oconv("R(0)#2");
-				}
-				var minyearperiod = minyear ^ var("00" ^ minperiod).substr(-2, 2);
-				if (addcent(allocyearperiod) < addcent(minyearperiod)) {
-					allocyearperiod = minyearperiod;
-				}
-			}
-
-			//cross allocate the invoice and payment
-
-			//a) the invoice
+		//if currency completely allocated then ensure that base is
+		//by adding any rounding errors to the first allocation
+		if (not(amount - allocs.a(2, payn).sum())) {
+			temp = baseamount - allocs.a(3, payn).sum();
 			//garbagecollect;
-			temp = invoice.a(17, invln);
-			var invaln = temp.count(SVM) + (temp ne "") + 1;
-			invoice.r(17, invln, invaln, paymentpointer);
-			invoice.r(19, invln, invaln, -allocamount);
-			invoice.r(20, invln, invaln, (-allocbase).oconv(fin.basefmt));
-			if (invoiceyearperiod ne allocyearperiod) {
-				invoice.r(23, invln, invaln, allocyearperiod);
+			//IF TEMP THEN ALLOCS<3,PAYN,1>=ALLOCS<3,PAYN,1>+TEMP
+			//sjb971111
+			if (temp) {
+				allocs.r(3, payn, 1, (allocs.a(3, payn, 1) + temp).oconv(fin.basefmt));
 			}
-			if (selfalloc) {
-				payment = invoice;
+		}
+	}
+
+////////
+initinv:
+////////
+	var invn = 0;
+
+////////
+nextinv:
+////////
+	invn += 1;
+	if (invn > ninvs) {
+		goto payexit;
+	}
+
+	//get the invoice and line number
+	var invoicepointer = allocs.a(1, payn, invn);
+	var invoicecode = invoicepointer.field("*", 1, 2) ^ "*" ^ fin.currcompany;
+	if (not invoicecode) {
+		goto nextinv;
+	}
+	//IF field(INVOICE.CODE,'*',1) EQ 'RV' THEN GOTO NEXTINV
+	//skip unallocated mass revaluations in open item accounts
+	if (invoicecode == "RV") {
+		goto nextinv;
+	}
+	var invln = invoicepointer.field("*", 3);
+	if (not invln) {
+		invln = 1;
+	}
+	if (invoicecode == paymentcode) {
+		//N.B. make sure all changes to PAYMENT are copied to INVOICE and vice versa
+		selfalloc = 1;
+		invoice = payment;
+	}else{
+		selfalloc = 0;
+		var invoice;
+		if (not(invoice.read(fin.vouchers, invoicecode))) {
+			if (mode ne "UNPOSTED") {
+				call mssg("SYSTEM ERROR IN UPD.ALLOC|INVOICE VOUCHER " ^ (DQ ^ (invoicecode ^ DQ)) ^ " IS MISSING|(ALLOCATION NOT DONE)");
 			}
-
-			//b) the payment
-			var existingalloc = payment.a(17, payn);
-			var invn2 = existingalloc.count(SVM) + (existingalloc ne "") + 1;
-			payment.r(17, payn, invn2, allocs.a(1, payn, invn));
-			payment.r(19, payn, invn2, allocamount);
-			payment.r(20, payn, invn2, allocbase);
-			if (paymentyearperiod ne allocyearperiod) {
-				payment.r(23, payn, invn2, allocyearperiod);
+			goto nextinv;
+		}
+		//if invoice<7,1>='D' and mode<>'UNPOSTED' then
+		if (invoice.a(7, 1) == "D") {
+			if (mode ne "UNPOSTED") {
+				call mssg("SYSTEM ERROR IN UPD.ALLOC|INVOICE VOUCHER " ^ (DQ ^ (invoicecode ^ DQ)) ^ " IS NOT POSTED/DELETED|(ALLOCATION NOT DONE)");
 			}
-			if (selfalloc) {
-				invoice = payment;
-			}
+			goto nextinv;
+		}
+	}
 
-			//revalue the invoice if necessary
-			if (gainbase) {
+////////
+invinit:
+////////
+	var allocamount = allocs.a(2, payn, invn);
 
-				//the additional posting may be done in two ways
-
-				//A) if the allocation period is the same as the payment period
-				//either 1) the payment base amount is adjusted and allocated
-				//or 2) an extra line is posted to the account and allocated
-				//in either case an extra line is added to the voucher
-				// of base currency only to the exchange gain/loss account
-
-				//(this method avoids a base currency entry on the open item account
-				//but if already posted will require reposting)
-
-				//B) if the allocation period is NOT the same as the allocated voucher
-				//a base currency only posting is made between this account and the
-				//gain/loss account to balance the allocation made
-				//this is similar to the method used in revaluation)
-
-				if (paymentyearperiod == allocyearperiod and gen.company.a(11) < 2) {
-					gosub sameperiod(mode,payment);
-				}else{
-					gosub diffperiod(payment);
-				}
-
-			//8) adjust the invoice base outstanding by allocation to the above item
-				//garbagecollect;
-				invaln += 1;
-				invoice.r(17, invln, invaln, revalvoucherpointer);
-				invoice.r(19, invln, invaln, "0");
-				invoice.r(20, invln, invaln, (-gainbase).oconv(fin.basefmt));
-				if (invoiceyearperiod ne allocyearperiod) {
-					invoice.r(23, invln, invaln, allocyearperiod);
-				}
-				if (selfalloc) {
-					payment = invoice;
-				}
-			}
-
-//invexit:
-			//write the invoice back to file
-			if (not selfalloc and mode ne "UNPOSTED") {
-				//write invoice on vouchers,invoice.code;
-				//call updvoucher3(mode, fin.vouchers, invoice, invoicecode);
-			}
-
+	//get the base allocation and the gain/loss in base
+	if (not foreign) {
+		allocbase = allocamount;
+		gainbase = "";
+	}else{
+		//calculate base allocation as a proportion of the unallocated base
+		//get currency outstanding
+		allocbase = allocs.a(3, payn, invn);
+		var unallocamount = split(invoice.a(10, invln), temp);
+		temp = invoice.a(19, invln);
+		if (temp) {
+			unallocamount -= temp.sum();
+		}
+		//get the base amount outstanding
+		var unallocbase = invoice.a(11, invln);
+		temp = invoice.a(20, invln);
+		if (temp) {
+			unallocbase -= temp.sum();
 		}
 
-//payexit:
+		//calculate the proportion
+		//garbagecollect;
+		unallocamount = -unallocamount;
+		if (allocamount - unallocamount) {
+			if (unallocamount) {
+				tt = (-(unallocbase * allocamount / unallocamount)).oconv(fin.basefmt);
+			}else{
+				tt = 0;
+			}
+			var invallocbase = tt;
+			gainbase = (invallocbase - allocbase).oconv(fin.basefmt);
 
-	}//next pay
+			//adjust inv alloc base if rounding difference
+			if (gainbase.abs() <= .01) {
+				invallocbase = (invallocbase - gainbase).oconv(fin.basefmt);
+				gainbase = 0;
+			}
 
-	return exit();
+		}else{
+			var invallocbase = -unallocbase;
+			gainbase = (invallocbase - allocbase).oconv(fin.basefmt);
+		}
+	}
 
-}
+	//determine the allocation period as the higher of the two voucher periods
+	// and not before the closed period
+	//!*removed 23/2/93 (and, if reallocating, not less than the current period)
+	var invoiceyearperiod = invoice.a(16);
+	if (not invoiceyearperiod) {
+		//garbagecollect;
+		invoiceyearperiod = invoice.a(2).oconv("HEX").oconv(gen.company.a(6));
+	}
+	if (addcent(invoiceyearperiod) > addcent(paymentyearperiod)) {
+		allocyearperiod = invoiceyearperiod;
+	}else{
+		allocyearperiod = paymentyearperiod;
+	}
 
-function exit(){
+	//reinstated 20070616 to prevent way back allocations esp. to avoid revaluation
+	if (origmode == "REALLOC") {
+		//IF addcent(ALLOC.YEARPERIOD) LT addcent(CURR.YEARPERIOD) THEN
+		// ALLOC.YEARPERIOD=CURR.YEARPERIOD
+		if (addcent(allocyearperiod) < addcent(currtoyearperiod)) {
+			allocyearperiod = currtoyearperiod;
+		}
+	}
+
+	//5 feb 97 alloc period cannot be before closed period
+	var minperiod = gen.company.a(16);
+	if (minperiod) {
+		var minyear = minperiod.substr(-2,2);
+		minperiod = minperiod.field("/", 1) + 1;
+		if (minperiod > fin.maxperiod) {
+			minperiod = 1;
+			minyear = (minyear + 1).oconv("R(0)#2");
+		}
+		var minyearperiod = minyear ^ ("00" ^ minperiod).substr(-2,2);
+		if (addcent(allocyearperiod) < addcent(minyearperiod)) {
+			allocyearperiod = minyearperiod;
+		}
+	}
+
+	//cross allocate the invoice and payment
+
+	//a) the invoice
+	//garbagecollect;
+	temp = invoice.a(17, invln);
+	var invaln = temp.count(SVM) + (temp ne "") + 1;
+	invoice.r(17, invln, invaln, paymentpointer);
+	invoice.r(19, invln, invaln, -allocamount);
+	invoice.r(20, invln, invaln, (-allocbase).oconv(fin.basefmt));
+	if (invoiceyearperiod ne allocyearperiod) {
+		invoice.r(23, invln, invaln, allocyearperiod);
+	}
+	if (selfalloc) {
+		payment = invoice;
+	}
+
+	//b) the payment
+	var existingalloc = payment.a(17, payn);
+	var invn2 = existingalloc.count(SVM) + (existingalloc ne "") + 1;
+	payment.r(17, payn, invn2, allocs.a(1, payn, invn));
+	payment.r(19, payn, invn2, allocamount);
+	payment.r(20, payn, invn2, allocbase);
+	if (paymentyearperiod ne allocyearperiod) {
+		payment.r(23, payn, invn2, allocyearperiod);
+	}
+	if (selfalloc) {
+		invoice = payment;
+	}
+
+	//revalue the invoice if necessary
+	if (gainbase) {
+
+		//the additional posting may be done in two ways
+
+		//A) if the allocation period is the same as the payment period
+		//either 1) the payment base amount is adjusted and allocated
+		//or 2) an extra line is posted to the account and allocated
+		//in either case an extra line is added to the voucher
+		// of base currency only to the exchange gain/loss account
+
+		//(this method avoids a base currency entry on the open item account
+		//but if already posted will require reposting)
+
+		//B) if the allocation period is NOT the same as the allocated voucher
+		//a base currency only posting is made between this account and the
+		//gain/loss account to balance the allocation made
+		//this is similar to the method used in revaluation)
+
+		if ((paymentyearperiod == allocyearperiod) and (gen.company.a(11) < 2)) {
+			gosub sameperiod();
+		}else{
+			gosub diffperiod();
+		}
+
+	//8) adjust the invoice base outstanding by allocation to the above item
+		//garbagecollect;
+		invaln += 1;
+		invoice.r(17, invln, invaln, revalvoucherpointer);
+		invoice.r(19, invln, invaln, "0");
+		invoice.r(20, invln, invaln, (-gainbase).oconv(fin.basefmt));
+		if (invoiceyearperiod ne allocyearperiod) {
+			invoice.r(23, invln, invaln, allocyearperiod);
+		}
+		if (selfalloc) {
+			payment = invoice;
+		}
+	}
+
+////////
+invexit:
+////////
+	//write the invoice back to file
+	if (not selfalloc and mode ne "UNPOSTED") {
+		//write invoice on vouchers,invoice.code
+		call updvoucher3(mode, fin.vouchers, invoice, invoicecode);
+	}
+	goto nextinv;
+
+////////
+payexit:
+////////
+	goto nextpay;
+
+/////
+exit:
+/////
 	return 0;
+
 }
 
-subroutine diffperiod(in payment) {
+subroutine diffperiod() {
 	//post a base currency only journal
 	// 1. DB ACCNO BASE 0XXX
 	// 2. CR REALISED GAIN/LOSS " "
@@ -362,18 +379,20 @@ subroutine diffperiod(in payment) {
 		//or today if today if less but still in same period
 		revaldate = allocyearperiod.iconv(gen.company.a(6));
 		if (revaldate > var().date()) {
-			if ((var().date()).oconv(gen.company.a(6)) == allocyearperiod) {
+			if (var().date().oconv(gen.company.a(6)) == allocyearperiod) {
 				revaldate = var().date();
 			}
 		}
 	}else{
 		revalvoucher.r(16, allocyearperiod);
-		revaldate = (payment.a(2)).oconv("HEX");
+		//garbagecollect;
+		revaldate = payment.a(2).oconv("HEX");
 	}
 
+	//garbagecollect;
 	revalvoucher.r(2, revaldate.iconv("HEX"));
 	revalvoucher.r(8, acc ^ VM ^ gen.company.a(4));
-	var temp = "0" ^ currcode;
+	temp = "0" ^ currcode;
 	revalvoucher.r(10, temp ^ VM ^ temp);
 	//garbagecollect;
 	revalvoucher.r(11, gainbase ^ VM ^ (-gainbase).oconv(fin.basefmt));
@@ -387,8 +406,7 @@ subroutine diffperiod(in payment) {
 	revalvoucher.r(19, "0");
 	revalvoucher.r(20, gainbase);
 	var revalvouchercode = "RV**" ^ fin.currcompany;
-	var xx="";
-	call updvoucher("", revalvoucher, revalvouchercode,xx);
+	call updvoucher("", revalvoucher, revalvouchercode, "");
 
 	//the invoice will point back to the reval voucher
 	revalvoucherpointer = revalvouchercode.field("*", 1, 2);
@@ -396,18 +414,25 @@ subroutine diffperiod(in payment) {
 
 }
 
-subroutine sameperiod(io mode, io payment) {
-
+subroutine sameperiod() {
 	//indicate to the calling program that the voucher is adjusted
 	if (origmode == "REALLOC") {
 		mode = "";
 	}
 
-	var npaylns = payment.a(8).dcount(VM);
+	var npaylns = payment.a(8).count(VM) + 1;
 
 	//post the gain to the account and allocate the gain to the invoice
 	//(either adjust the line directly or add a new line)
-	if (gen.company.a(11)) {
+	//IF COMPANY<11> THEN
+	//taxcode=payment<24,reval.pay.ln+1>
+	//IF COMPANY<11> or taxcode THEN
+	//now ALWAYS add a separate line
+	//so that journal printout is does not differ from voucher generated
+	//especially important when VAT posted in the next line
+	//since this line will be used to generate the NET amount on TAX/VAT RETURN
+	var addsepline = 1;
+	if (addsepline) {
 		npaylns += 1;
 		revalpayln = npaylns;
 		payment.r(8, revalpayln, acc);
@@ -418,7 +443,7 @@ subroutine sameperiod(io mode, io payment) {
 		payment.r(11, revalpayln, (payment.a(11, revalpayln) + gainbase).oconv(fin.basefmt));
 	}
 	//allocation
-	var temp = payment.a(17, revalpayln);
+	temp = payment.a(17, revalpayln);
 	temp = temp.count(SVM) + (temp ne "") + 1;
 	payment.r(17, revalpayln, temp, invoicepointer);
 	payment.r(19, revalpayln, temp, "0");

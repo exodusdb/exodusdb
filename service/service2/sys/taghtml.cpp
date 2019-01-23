@@ -7,7 +7,7 @@ function main(in type, in in0, in mode, out output) {
 	//c sys in,in,in,out
 
 	//prevent c++ var not used
-	if (0 or type) {
+	if (var(0) or type) {
 		{}
 	}
 
@@ -25,7 +25,7 @@ function main(in type, in in0, in mode, out output) {
 
 	if (output[1] == "-") {
 		if (mode == "TD") {
-			if (var("1234567890").index(output[2], 1)) {
+			if (var("1234567890").index(output[2])) {
 				output = "<NOBR>" ^ output ^ "</NOBR>";
 			}
 		}
@@ -36,7 +36,7 @@ function main(in type, in in0, in mode, out output) {
 		var charn = output.index("&", ii);
 	///BREAK;
 	if (not charn) break;;
-		if (not((var("nbsp,amp,lt,gt,infin").a(1)).locateusing((output.substr(charn + 1,99999)).field(";", 1), ",", xx))) {
+		if (not(var("nbsp,amp,lt,gt,infin").locateusing((output.substr(charn + 1,99999)).field(";", 1), ",", xx))) {
 			output.splicer(charn, 1, "&amp;");
 		}
 	};//ii;

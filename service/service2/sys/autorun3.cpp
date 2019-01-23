@@ -76,7 +76,7 @@ function main(in docids0, in options0) {
 	//logging=@username='NEOSYS'
 	var logging = 0;
 
-	var suppressemail = options.index("S", 1);
+	var suppressemail = options.index("S");
 
 	var users;
 	if (not(users.open("USERS", ""))) {
@@ -539,12 +539,12 @@ nextuser:;
 	USER1.swapper("{90DAYSAGO}", var().date() - 90);
 	USER1.swapper("{YESTERDAY}", var().date() - 1);
 	USER1.swapper("{TOMORROW}", var().date() + 1);
-	if (USER1.index("{2WORKINGDAYSAGO}", 1)) {
+	if (USER1.index("{2WORKINGDAYSAGO}")) {
 		daysago = 2;
 		gosub getdaysago();
 		USER1.swapper("{2WORKINGDAYSAGO}", xdate);
 	}
-	if (USER1.index("{3WORKINGDAYSAGO}", 1)) {
+	if (USER1.index("{3WORKINGDAYSAGO}")) {
 		daysago = 3;
 		gosub getdaysago();
 		USER1.swapper("{3WORKINGDAYSAGO}", xdate);
@@ -561,7 +561,7 @@ nextuser:;
 	//and {TODAY+999} to today+999
 	var sign = "-";
 nextsign:
-	tt = USER1.index("{TODAY" ^ sign, 1);
+	tt = USER1.index("{TODAY" ^ sign);
 	if (tt) {
 		var t2 = (USER1.substr(tt + 1,999999)).field("}", 1);
 		USER1.swapper("{" ^ t2 ^ "}", var().date() + t2.substr(6,999999));
@@ -603,7 +603,7 @@ nextsign:
 			if (USER3.substr(1,6) == "Error:") {
 				USER3.splicer(1, 6, "Result:");
 			}
-			if (USER3.index("Error", 1)) {
+			if (USER3.index("Error")) {
 				subject ^= " ERROR";
 				var(USER3).oswrite("xyz.xyz");
 			}
@@ -632,7 +632,7 @@ nextsign:
 			//if ucase(printfilename[-4,4])='.XLS' then
 			//locate ucase(field2(printfilename,'.',-1)) in 'XLS,CSV' using ',' setting xx then
 			tt = (field2(printfilename, ".", -1)).ucase();
-			if (tt.index("HTM", 1) and gen.document.a(33) ne "2") {
+			if (tt.index("HTM") and gen.document.a(33) ne "2") {
 				//insert body from file
 				body = "@" ^ printfilename;
 				subject ^= " in " ^ timetext;
@@ -758,14 +758,14 @@ subroutine exec2() {
 
 	//detect memory corruption?
 	//@user4='R18.6'
-	if (USER4.index("R18.6", 1)) {
+	if (USER4.index("R18.6")) {
 		var halt = 1;
 		USER4.r(-1, "Corrupt temporary file. Restart Needed.");
 		USER4.r(-1, "NEOSYS.NET TERMINATED");
 	}
 
 	//convert error message
-	if (USER4.index(" IN INDEX.REDUCER AT ", 1) or USER4.index(" IN RTP21 AT ", 1)) {
+	if (USER4.index(" IN INDEX.REDUCER AT ") or USER4.index(" IN RTP21 AT ")) {
 		//@user4='Please select fewer records and/or simplify your request'
 		call listen4(17, USER4);
 	}
@@ -777,7 +777,7 @@ subroutine exec2() {
 	}
 
 	//send errors to neosys
-	if (USER4.index("An internal error", 1) or USER4.index("Error:", 1)) {
+	if (USER4.index("An internal error") or USER4.index("Error:")) {
 		USER4.transfer(USER3);
 		goto sysmsgit;
 	}
@@ -849,7 +849,7 @@ subroutine exit(in lockfilename,in lockfile,in lockkey) {
 subroutine fmtresp() {
 
 	//trim everything after <ESC> (why?)
-	tt = USER3.index("<ESC>", 1);
+	tt = USER3.index("<ESC>");
 	if (tt) {
 		USER3 = USER3.substr(1,tt - 1);
 	}
@@ -879,7 +879,7 @@ subroutine getdaysago() {
 	xdate = var().date();
 	while (true) {
 		xdate -= 1;
-		if (not(weekend.index((xdate - 1) % 7 + 1, 1))) {
+		if (not(weekend.index((xdate - 1) % 7 + 1))) {
 			daysago -= 1;
 		}
 	///BREAK;

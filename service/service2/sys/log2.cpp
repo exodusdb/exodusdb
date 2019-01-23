@@ -43,7 +43,7 @@ function main(in msg0, io time0) {
 
 	var entry = var().date().oconv("D2-J");
 	entry ^= " " ^ time2.oconv("MTS");
-	entry ^= (time2.field(".", 2)).oconv("MD20P");
+	entry ^= time2.field(".", 2).oconv("MD20P");
 	entry ^= " " ^ (time2 - time0).oconv("MD20P");
 	//entry:=sep:sep:sep:sep
 	entry ^= " " ^ msg0;

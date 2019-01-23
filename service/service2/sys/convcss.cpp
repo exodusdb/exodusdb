@@ -23,13 +23,13 @@ function main(in mode, in tableid, in in0, out outx) {
 	for (var coln = 1; coln <= ncols; ++coln) {
 		var tt = inp.a(1, coln);
 
-		if (tt.index("left", 1)) {
+		if (tt.index("left")) {
 			align = "left";
 		}
-		if (tt.index("right", 1)) {
+		if (tt.index("right")) {
 			align = "right";
 		}
-		if (tt.index("center", 1)) {
+		if (tt.index("center")) {
 			align = "center";
 		}
 

@@ -14,8 +14,8 @@ var hashcode;//num
 var errors;
 var log;
 
-function main(in mode, in request, in tempfilename, in data0, out msg) {
-	//c sys in,in,in,in,out
+function main(in mode, in request, in tempfilename, out datax, out msg) {
+	//c sys in,in,in,out,out
 
 	//mode is WRITE or READ
 	//request is required sent to the server and
@@ -28,8 +28,6 @@ function main(in mode, in request, in tempfilename, in data0, out msg) {
 	//http://www.gnu.org/software/wget/manual/wget.html
 	//windows version at http://users.ugent.be/~bpuype/wget/
 
-	var datax = data0;
-
 	var post = 1;
 	//cleanup=0;*@username<>'NEOSYS'
 	var cleanup = mode == "READ";
@@ -40,13 +38,13 @@ function main(in mode, in request, in tempfilename, in data0, out msg) {
 	if (not tempfilename) {
 		msg = "tempfilename parameter is missing";
 		return 0;
-	}
+		}
 
 	//make cygwin command
 	var wgetrc = "";
 	//look for local or cygwin wget.exe otherwise quit
 //WARNING TODO: check trigraph following;
-	var exe = oscwd().index(":", 1) ? var(".exe") : var("");
+	var exe = oscwd().index(":") ? var(".exe") : var("");
 	var cmd = SYSTEM.a(50) ^ "wget" ^ exe;
 	if (cmd.osfile()) {
 		httpsbug = 0;
@@ -214,7 +212,7 @@ function main(in mode, in request, in tempfilename, in data0, out msg) {
 			}else{
 				wgetrc.r(-1, "user=" ^ httpuser);
 				wgetrc.r(-1, "password=" ^ httppass);
-				}
+			}
 			}
 
 		if (cleanup) {
@@ -234,7 +232,7 @@ function main(in mode, in request, in tempfilename, in data0, out msg) {
 		if (post) {
 
 			if (params) {
-				if (cmd.index(" -N ", 1)) {
+				if (cmd.index(" -N ")) {
 					params = "?data=" ^ params;
 				}else{
 					var datafilename = tempfilename ^ ".$DA";
@@ -308,7 +306,7 @@ function main(in mode, in request, in tempfilename, in data0, out msg) {
 
 			//garbagecollect;
 			var().osflush();
-			var("cmd /c " ^ cmdfilename).osshell();
+			("cmd /c " ^ cmdfilename).osshell();
 			var().osflush();
 
 			printl("done");
@@ -393,7 +391,7 @@ badresponse:
 		msg = "";
 
 	}
-//L1924:
+//L1916:
 	return 1;
 
 }

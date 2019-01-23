@@ -1,30 +1,30 @@
 #include <exodus/library.h>
 libraryinit()
 
+
 #include <agy.h>
 #include <gen.h>
-#include <win.h>
 
 var xx;
 var suppliername;
+var medianame;
 var vn2;
 var vn;
+var spec;
+var sizemult;//num
 var fn;//num
 var ln2;
 var perc;
 var lang;
 
-#include <window.hpp>//after win
-
-function main(in modex) {
-	//jbase
+function main(in mode) {
+	//c med
 	//garbagecollect;
-	//**$INSERT GBP,AREV.COMMON*** without this can be called from any program
+	//!*$INSERT GBP,AREV.COMMON*** without this can be called from any program
 
 	var interactive = not SYSTEM.a(33);
-	var mode=modex;
 
-	if (mode.substr(1, 8) == "SHOWTOTS" or (mode.field(",", 1)).index("GETFREE", 1)) {
+	if ((mode.substr(1,8) == "SHOWTOTS") or mode.field(",", 1).index("GETFREE")) {
 
 		//pass through schedule adding up paid and free spots by vehicle
 		var array = "";
@@ -35,10 +35,10 @@ function main(in modex) {
 		//array<5> is free amount
 		//array<6> is vehicle type 'TV Radio etc
 		//array<7> is suppliernames
-		var nlines = (RECORD.a(20)).count(VM) + 1;
+		var nlines = RECORD.a(20).count(VM) + 1;
 
 		//option to value paid ads at gross or net (usually gross)
-		var netonly = mode.substr(1, 3) == "NET";
+		var netonly = mode.substr(1,3) == "NET";
 		if (netonly) {
 			mode.splicer(1, 3, "");
 		}
@@ -54,7 +54,7 @@ function main(in modex) {
 			}
 			//11/7/97
 			if (reqvehicles) {
-				if (not(reqvehicles.locate(vehiclecode, xx, 1))) {
+				if (not(reqvehicles.a(1).locateusing(vehiclecode, VM, xx))) {
 					vehiclecode = "";
 				}
 			}
@@ -76,7 +76,6 @@ function main(in modex) {
 					}else{
 						suppliername = vehicle.a(1);
 					}
-					var medianame;
 					if (not(medianame.readv(agy.jobtypes, vehicle.a(2), 1))) {
 						medianame = "";
 					}
@@ -85,7 +84,7 @@ function main(in modex) {
 					//locate suppliername in array<7> setting vn2 else
 					// array<7,-1>=suppliername
 					// end
-					if (not(array.locate(suppliername, vn2, 7))) {
+					if (not(array.a(7).locateusing(suppliername, VM, vn2))) {
 						array.inserter(7, vn2, suppliername);
 						array.inserter(2, vn2, "");
 						array.inserter(3, vn2, "");
@@ -103,7 +102,7 @@ function main(in modex) {
 					// array<1,vn>=suppliername
 					// array<6,vn>=vehicle<2>;*media type code
 					// end
-					if (not(array.locateby(suppliername, "AL", vn, 1))) {
+					if (not(array.a(1).locateby(suppliername, "AL", vn))) {
 						array.inserter(1, vn, suppliername);
 						array.inserter(4, vn, "");
 						array.inserter(5, vn, "");
@@ -112,24 +111,35 @@ function main(in modex) {
 
 					//gross unit bill
 					var gunitbill = RECORD.a(37, lnx);
-					//multiply by size if any
-					var size2 = RECORD.a(21, lnx).field("*", 2).field(",", 1);
-					//if size matches '1N0N"X"1N0N' or size matches '0N"."0N"X"1N0N' or size matches '1N0N"X"0N"."0N' then
-					// garbagecollect
-					// gunitbill=OCONV(gunitbill*field(size,'X',1)*field(size,'X',2),FMTX)
-					// end
-					if (size2) {
-						size2.converter("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "                          ");
-						size2.trimmer();
-						var sizea = size2.field(" ", 1);
-						var sizeb = size2.field(" ", 2);
-						if (sizea and sizeb and sizea.isnum() and sizeb.isnum()) {
-							//garbagecollect;
-							gunitbill = (gunitbill * sizea * sizeb).oconv("MD" ^ RECORD.a(1) ^ "0P");
-						}
+						/*;
+						//sizemult: multiply by size if any
+						//getsize
+						size2=field(field(@record<21,LNX>,'*',2),',',1);
+						//if size matches '1N0N"X"1N0N' or size matches '0N"."0N"X"1N0N' or size matches '1N0N"X"0N"."0N' then
+						// garbagecollect
+						// gunitbill=OCONV(gunitbill*field(size,'X',1)*field(size,'X',2),FMTX)
+						// end
+						if size2 then;
+							convert 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' to '                          ' in size2;
+							size2=trim(size2);
+							sizea=field(size2,' ',1);
+							sizeb=field(size2,' ',2);
+							if sizeb else sizeb=1;
+							if sizea and sizeb and num(sizea) and num(sizeb) then;
+								garbagecollect;
+								gunitbill=OCONV(gunitbill*sizea*sizeb,FMTX);
+								end;
+							end;
+						*/
+
+					spec = RECORD.a(21, lnx);
+					gosub getsize();
+					if (sizemult ne 1) {
+						//garbagecollect;
+						gunitbill = (gunitbill * sizemult).oconv("MD" ^ RECORD.a(1) ^ "0P");
 					}
 
-					var freenumber = (RECORD.a(71, lnx)).sum();
+					var freenumber = RECORD.a(71, lnx).sum();
 					number -= freenumber;
 
 addup:
@@ -142,25 +152,22 @@ addup:
 							unitvalue = gunitbill;
 						}
 						fn = 2;
-						//990611 different extras are now analysed separately
-						//case extras='OFFER' or extras='PACKAGE'
-						//do nothing
-
+					//990611 different extras are now analysed separately
+					//case extras='OFFER' or extras='PACKAGE'
+					//do nothing
 					} else if (not unitbill and gunitbill) {
 						//if no unit bill then use the gross bill as the value of free spots
 						unitvalue = gunitbill;
 						fn = 4;
 						vn2 = vn;
-
 					} else if (unitbill and not gunitbill) {
-						//if net bill but no gross bill then
-						// consider as OFFER not to be included in the paid or free spots
-						//do nothing
-
-					} else  {
+					//if net bill but no gross bill then
+					// consider as OFFER not to be included in the paid or free spots
+					//do nothing
+					} else {
 						//if no gross or net bill then do nothing
 					}
-
+//L802:
 					//add up
 					if (unitvalue) {
 
@@ -184,14 +191,14 @@ addup:
 				}
 			}
 		};//lnx;
-		nlines = (array.a(1)).count(VM) + 1;
+		nlines = array.a(1).count(VM) + 1;
 
 		//either return the free ads text for schedule/plan printing program
 		//11/7/97
 		//if mode='GETFREE' then
 		if (mode.field(",", 1) == "GETFREE") {
 			var html = 1;
-			ANS = "";
+			var ans = "";
 
 			//free percentage
 			//only for "cost to client", *assume that it is in "cost to agency"
@@ -205,7 +212,7 @@ addup:
 			for (var lnx = 1; lnx <= nlines; ++lnx) {
 
 				suppliername = array.a(1, lnx).field("|", 1);
-				if (not(array.locate(suppliername.field("|", 1), ln2, 7))) {
+				if (not(array.a(7).locateusing(suppliername.field("|", 1), VM, ln2))) {
 					{}
 				}
 
@@ -234,16 +241,17 @@ addup:
 						nfree = nfree.oconv("R#5");
 					}
 
-					var freevalue = (array.a(5, lnx)).oconv(USER2.substr(1, 2) ^ "20P,");
+					var freevalue = array.a(5, lnx).oconv(USER2.substr(1,2) ^ "20P,");
 					if (not html) {
 						freevalue = freevalue.oconv("R#12");
 					}
 
 					var wording = " " ^ extras ^ " ad";
-					if (array.a(4, lnx) == 1)
-						wording^=" ";
-					else
-						wording^="s";
+					if (array.a(4, lnx) == 1) {
+						wording ^= " ";
+					}else{
+						wording ^= "s";
+					}
 					wording = wording.oconv("L#15");
 					wording ^= " = " ^ freevalue;
 
@@ -264,34 +272,34 @@ addup:
 					//either build one line in html
 					if (html) {
 						//swap '=' with '=':vm in wording
-						ANS ^= FM;
+						ans ^= FM;
 						if (nreqvehicles ne 1) {
-							ANS ^= suppliername ^ VM ^ medium ^ VM;
+							ans ^= suppliername ^ VM ^ medium ^ VM;
 						}
-						ANS ^= extras ^ VM;
-						ANS ^= nfree ^ VM ^ freevalue;
+						ans ^= extras ^ VM;
+						ans ^= nfree ^ VM ^ freevalue;
 						if (anyperc) {
-							ANS ^= VM ^ perc;
+							ans ^= VM ^ perc;
 						}
 
 						//or build one line in text
 					}else{
-						ANS ^= FM;
+						ans ^= FM;
 
 						//supplier name
-						ANS ^= suppliername;
+						ans ^= suppliername;
 
 						//medium
-						ANS ^= medium;
+						ans ^= medium;
 
 						//number of free ads
-						ANS ^= nfree;
+						ans ^= nfree;
 
 						//wording and value of free ads
-						ANS ^= wording;
+						ans ^= wording;
 
 						if (anyperc) {
-							ANS ^= perc.oconv("R#6");
+							ans ^= perc.oconv("R#6");
 						}
 					}
 
@@ -303,10 +311,10 @@ addup:
 
 			};//lnx;
 
-			if (ANS.count(FM) > 1) {
+			if (ans.count(FM) > 1) {
 
 				//if any free ad value
-				if ((array.a(5)).sum()) {
+				if (array.a(5).sum()) {
 
 					suppliername = "Total";
 					if (not html) {
@@ -318,23 +326,23 @@ addup:
 						medium = medium.oconv("L#15") ^ " ";
 					}
 
-					var nfree = (array.a(4)).sum();
+					var nfree = array.a(4).sum();
 					if (not html) {
 						nfree = nfree.oconv("R#5");
 					}
 
-					var freevalue = ((array.a(5)).sum()).oconv(USER2.substr(1, 2) ^ "20P,");
+					var freevalue = array.a(5).sum().oconv(USER2.substr(1,2) ^ "20P,");
 					if (not html) {
 						freevalue = freevalue.oconv("R#12");
 					}
 
 					var extras = "Unpaid";
 					var wording = " " ^ extras ^ " ad";
-					if (array.a(4).sum() == 1)
-						wording^=" ";
-					else
-						wording^="s";
-
+					if (array.a(4).sum() == 1) {
+						wording ^= " ";
+					}else{
+						wording ^= "s";
+					}
 					wording = wording.oconv("L#15");
 					wording ^= " = " ^ freevalue;
 
@@ -351,40 +359,40 @@ addup:
 
 					//either build the total line in html
 					if (html) {
-						ANS ^= FM;
+						ans ^= FM;
 						if (nreqvehicles ne 1) {
-							ANS ^= suppliername ^ VM ^ medium ^ VM;
+							ans ^= suppliername ^ VM ^ medium ^ VM;
 							extras = " ";
 						}else{
 							extras = "Total";
 						}
-						ANS ^= extras ^ VM;
-						ANS ^= nfree ^ VM ^ freevalue;
+						ans ^= extras ^ VM;
+						ans ^= nfree ^ VM ^ freevalue;
 						if (anyperc) {
-							ANS ^= VM ^ perc;
+							ans ^= VM ^ perc;
 						}
 
 						//or build the total line in text
 					}else{
-						ANS ^= FM;
+						ans ^= FM;
 
 						//supplier name
-						ANS ^= suppliername;
+						ans ^= suppliername;
 
 						//medium
-						ANS ^= medium;
+						ans ^= medium;
 
 						//number of free ads
-						ANS ^= nfree;
+						ans ^= nfree;
 
 						//wording and value of free ads
-						ANS ^= wording;
+						ans ^= wording;
 
 						//free percentage
 						//only for "cost to client", *assume that it is in "cost to agency"
 						//mode if the net unit bills are the same as the net unit costs
 						if (anyperc) {
-							ANS ^= perc.oconv("R#6");
+							ans ^= perc.oconv("R#6");
 						}
 					}
 
@@ -393,16 +401,17 @@ addup:
 			}
 
 			//build and insert the title row
-			ANS.splicer(1, 1, "");
-			if (html and ANS) {
+			ans.splicer(1, 1, "");
+			if (html and ans) {
 				var tt = "";
 				if (nreqvehicles ne 1) {
 	//Supplier
 	//Vehicle
-					if (agy.agp.a(2) == "CYP")
-						tt^=lang.a(3);
-					else
-						tt^=lang.a(1);
+					if (agy.agp.a(2) == "CYP") {
+						tt ^= lang.a(3);
+					}else{
+						tt ^= lang.a(1);
+					}
 	//Medium
 					tt ^= VM ^ lang.a(127) ^ VM;
 				}
@@ -419,10 +428,10 @@ addup:
 					tt ^= VM ^ lang.a(130);
 				}
 				tt ^= FM;
-				ANS.splicer(1, 0, tt);
+				ans.splicer(1, 0, tt);
 			}
 
-			ANS.transfer(ANS);
+			ans.transfer(ANS);
 
 			//////
 			return 0;
@@ -438,49 +447,46 @@ addup:
 		for (var lnx = 1; lnx <= nlines; ++lnx) {
 
 			//if array<5,LNX> then
-			if (1) {
 
-				var tx = "";
+			var tx = "";
 
-				//print the vehicle name, medium and type of free ads
-				suppliername = array.a(1, lnx);
-				if (not(array.locate(suppliername.field("|", 1), ln2, 7))) {
-					{}
-				}
-				if (not msg.index( suppliername.field("|", 1).substr(1, 13) )) {
-					tx ^= (array.a(2, ln2)).oconv("R#10") ^ " ";
-					tx ^= (array.a(3, ln2)).oconv("R#10") ^ " ";
+			//print the vehicle name, medium and type of free ads
+			suppliername = array.a(1, lnx);
+			if (not(array.a(7).locateusing(suppliername.field("|", 1), VM, ln2))) {
+				{}
+			}
+			if (not msg.index(suppliername.field("|", 1).substr(1,13))) {
+				tx ^= array.a(2, ln2).oconv("R#10") ^ " ";
+				tx ^= array.a(3, ln2).oconv("R#10") ^ " ";
+			}else{
+				tx ^= var(22).space();
+			}
+
+			//free ads
+			if (array.a(4, lnx)) {
+				tx ^= array.a(4, lnx).oconv("R#10") ^ " ";
+				tx ^= array.a(5, lnx).oconv("R#10") ^ " ";
+				if (array.a(3, ln2)) {
+					perc = (100 * array.a(5, lnx) / array.a(3, ln2)).oconv("MD00P") ^ "%1%";
 				}else{
-					tx ^= var(22).space();
+					//perc='100%1%'
+					perc = "All unpaid";
 				}
+				tx ^= perc.oconv("R#10");
 
-				//free ads
-				if (array.a(4, lnx)) {
-					tx ^= (array.a(4, lnx)).oconv("R#10") ^ " ";
-					tx ^= (array.a(5, lnx)).oconv("R#10") ^ " ";
-					if (array.a(3, ln2)) {
-						perc = (100 * array.a(5, lnx) / array.a(3, ln2)).oconv("MD00P") ^ "%1%";
-					}else{
-						//perc='100%1%'
-						perc = "All unpaid";
-					}
-					tx ^= perc.oconv("R#10");
+				//no free
+			}else{
+				tx ^= var(30).space();
+			}
 
-					//no free
-				}else{
-					tx ^= var(30).space();
-				}
+			//if anything to print then print
+			if (tx.trim()) {
 
-				//if anything to print then print
-				if (tx.trim()) {
+				var tx2 = "";
+				tx2 ^= suppliername.field("|", 1).oconv("L#13") ^ " ";
+				tx2 ^= suppliername.field("|", 3).oconv("L#7") ^ " ";
 
-					var tx2 = "";
-					tx2 ^= (suppliername.field("|", 1)).oconv("L#13") ^ " ";
-					tx2 ^= (suppliername.field("|", 3)).oconv("L#7") ^ " ";
-
-					msg.r(-1, tx2 ^ tx);
-
-				}
+				msg.r(-1, tx2 ^ tx);
 
 			}
 		};//lnx;
@@ -489,12 +495,12 @@ addup:
 		if (nlines > 1) {
 			var tx = var("TOTAL").oconv("L#13") ^ " ";
 			tx ^= var("").oconv("L#7") ^ " ";
-			tx ^= ((array.a(2)).sum()).oconv("R#10") ^ " ";
+			tx ^= array.a(2).sum().oconv("R#10") ^ " ";
 			//garbagecollect;
-			tx ^= (((array.a(3)).sum()).oconv("MD" ^ RECORD.a(1) ^ "0P")).oconv("R#10") ^ " ";
-			if ((array.a(4)).sum()) {
-				tx ^= ((array.a(4)).sum()).oconv("R#10") ^ " ";
-				tx ^= (((array.a(5)).sum()).oconv("MD" ^ RECORD.a(1) ^ "0P")).oconv("R#10") ^ " ";
+			tx ^= (array.a(3).sum().oconv("MD" ^ RECORD.a(1) ^ "0P")).oconv("R#10") ^ " ";
+			if (array.a(4).sum()) {
+				tx ^= array.a(4).sum().oconv("R#10") ^ " ";
+				tx ^= (array.a(5).sum().oconv("MD" ^ RECORD.a(1) ^ "0P")).oconv("R#10") ^ " ";
 				perc = "";
 				//if sum(array<3>) then
 				// perc=OCONV(100*sum(array<5>)/sum(array<3>)),'MD00P'):'%1%'
@@ -509,8 +515,7 @@ addup:
 		}
 
 		msg ^= FM;
-		//call note(msg, "", "", "%");
-		call note(msg);
+		call note(msg, "", "", "%");
 
 	}
 

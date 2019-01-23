@@ -276,7 +276,7 @@ function main(in mode0, out msg) {
 			return 0;
 		}
 
-		if (options.index("O", 1)) {
+		if (options.index("O")) {
 			licx = "";
 		}
 
@@ -395,7 +395,7 @@ function main(in mode0, out msg) {
 	if (tt.match("5N")) {
 		docdate = tt;
 		dateorperiod = 1;
-	} else if (tt.index(".", 1)) {
+	} else if (tt.index(".")) {
 		docdate = (tt ^ ".31").iconv("DJ");
 		if (not docdate) {
 			docdate = (tt ^ ".30").iconv("DJ");
@@ -404,13 +404,13 @@ function main(in mode0, out msg) {
 			docdate = (tt ^ ".28").iconv("DJ");
 		}
 		dateorperiod = 2;
-	} else if (tt.index("/", 1)) {
-		docdate = var("31/" ^ tt).iconv("D/E");
+	} else if (tt.index("/")) {
+		docdate = ("31/" ^ tt).iconv("D/E");
 		if (not docdate) {
-			docdate = var("30/" ^ tt).iconv("D/E");
+			docdate = ("30/" ^ tt).iconv("D/E");
 		}
 		if (not docdate) {
-			docdate = var("28/" ^ tt).iconv("D/E");
+			docdate = ("28/" ^ tt).iconv("D/E");
 		}
 		dateorperiod = 2;
 	} else {

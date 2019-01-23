@@ -130,19 +130,19 @@ function main(in mode0) {
 			//tt=capitalise(menucodes)
 			//swap 'Support' with 'Technical' in tt
 			//mode<2>=tt
-			if (menucodes.index("FINANCE", 1)) {
+			if (menucodes.index("FINANCE")) {
 				mode.r(2, -1, "Finance");
 			}
-			if (menucodes.index("MEDIA", 1)) {
+			if (menucodes.index("MEDIA")) {
 				mode.r(2, -1, "Media");
 			}
-			if (menucodes.index("JOBS", 1)) {
+			if (menucodes.index("JOBS")) {
 				mode.r(2, -1, "Jobs");
 			}
-			if (menucodes.index("TIMESHEETS", 1)) {
+			if (menucodes.index("TIMESHEETS")) {
 				mode.r(2, -1, "Timesheets");
 			}
-			if (menucodes.index("SUPPORT", 1)) {
+			if (menucodes.index("SUPPORT")) {
 				mode.r(2, -1, "Technical");
 			}
 
@@ -389,8 +389,8 @@ subroutine list() {
 subroutine getcurrentversiondatetime() {
 	//get currently installed version date
 	var temp = var(".\\GENERAL\\VERSION.DAT").xlate("DOS", 1, "X");
-	currentversiondatetime = (temp.trim().field(" ", 2, 999)).iconv("D");
-	currentversiondatetime ^= "." ^ ((temp.trim().field(" ", 1)).iconv("MT")).oconv("R(0)#5");
+	currentversiondatetime = temp.trim().field(" ", 2, 999).iconv("D");
+	currentversiondatetime ^= "." ^ temp.trim().field(" ", 1).iconv("MT").oconv("R(0)#5");
 	return;
 
 }
@@ -403,7 +403,7 @@ subroutine getversiondates() {
 	var nn = versionlog.count(FM) + (versionlog ne "");
 	var versiondata = "";
 	for (var ii = 1; ii <= nn; ++ii) {
-		idate = (versionlog.a(ii, 1).field(" ", 2, 3)).iconv("D");
+		idate = versionlog.a(ii, 1).field(" ", 2, 3).iconv("D");
 		//itime=iconv(field(versionlog,' ',1),'MT')
 		if (not(versiondata.locateusing(idate, FM, xx))) {
 			versiondata.r(-1, idate);

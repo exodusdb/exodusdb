@@ -17,7 +17,7 @@ efb_updbalances& operator=(const var& newlibraryname) {
 }
 
 //a member function with the right arguments, returning a var or void
-var operator() (in balancesfile, in balanceskey, in deleting, in balanceperiod, in amount, in baseamount, in unused, in basecurrency, in vouchertype)
+var operator() (in balancesfile, in balanceskey, in deleting, in balanceperiod, in amount, in baseamount, in xxxxxx, in basecurrency, in vouchertype)
 {
 
  //first time link to the shared lib and create/cache an object from it
@@ -41,7 +41,7 @@ var operator() (in balancesfile, in balanceskey, in deleting, in balanceperiod, 
  // (mode);
  return CALLMEMBERFUNCTION(*(this->pobject_),
  ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
-  (balancesfile,balanceskey,deleting,balanceperiod,amount,baseamount,unused,basecurrency,vouchertype);
+  (balancesfile,balanceskey,deleting,balanceperiod,amount,baseamount,xxxxxx,basecurrency,vouchertype);
 
 }
 

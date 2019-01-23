@@ -93,7 +93,7 @@ THE SOFTWARE.
 #include <exodus/mvdbconns.h>		// placed as last include, causes boost header compiler errors
 #include <exodus/mvimpl.h>
 #include <exodus/mv.h>
-#include <exodus/mvenvironment.h>
+//#include <exodus/mvenvironment.h>
 //#include <exodus/mvutf.h>
 #include <exodus/mvexceptions.h>
 
@@ -162,6 +162,27 @@ std::wstring getresult(PGresult* pgresult, int rown, int coln) {
 	return boost::locale::conv::utf_to_utf<wchar_t>(starting,starting+PQgetlength(pgresult,rown,coln));
 }
 
+class Resultclearer {
+
+//Save pgresultptr in this class and to guarantee that it will be PQClear'ed on function exit
+//Resultclearer clearer(pgresult);
+
+public:
+
+Resultclearer(PGresult* pgresult) : pgresult_(pgresult) {
+	//var(L"Got pgresult ... ").output();
+}
+
+~Resultclearer(){
+	//var(L"Cleared pgresult").outputl();
+	if (pgresult_ != nullptr)
+		PQclear(pgresult_);
+}
+
+private:
+	PGresult* pgresult_=nullptr;
+};
+
 void var::setlasterror(const var& msg) const
 {
 	//no checking for speed
@@ -189,7 +210,7 @@ var var::getlasterror() const
 		return L"";
 }
 
-typedef PGresult* 	PGresultptr;
+typedef PGresult* PGresultptr;
 static bool getpgresult(const var& sql, PGresultptr& pgresult, PGconn * thread_pgconn);
 
 bool var::sqlexec(const var& sql) const
@@ -275,7 +296,7 @@ var var::build_conn_info(const var& conninfo) const
 
 	//otherwise search for details from exodus config file
 	//if incomplete connection parameters provided
-	if (not result.index(L"host=") or 
+	if (not result.index(L"host=") or
 		not result.index(L"port=") or
 		not result.index(L"dbname=") or
 		not result.index(L"user=") or
@@ -395,15 +416,15 @@ bool var::connect(const var& conninfo)
 	#endif
 
 	//save a new connection handle
-	var_mvint = mv_connections_cache.add_connection(pgconn);
-	var_mvstr = conninfo.var_mvstr;
-	var_mvtyp = pimpl::MVTYPE_NANSTR_DBCONN;
+	var_int = mv_connections_cache.add_connection(pgconn);
+	var_str = conninfo.var_str;
+	var_typ = pimpl::VARTYP_NANSTR_DBCONN;
 
 	//set default connection
 	//ONLY IF THERE ISNT ONE ALREADY
 	int* connid=tss_pgconnids.get();
 	if (connid==NULL)
-		tss_pgconnids.reset(new int((int)var_mvint));
+		tss_pgconnids.reset(new int((int)var_int));
 
 	//save last connection string (used in startipc())
 	tss_pgconnparams.reset(new var(conninfo2));
@@ -438,7 +459,7 @@ bool var::setdefaultconnection()
 		MVException(L"is not a valid connection in setdefaultconnection()");
 
 	//save current connection handle number as thread specific handle no
-	tss_pgconnids.reset(new int((int) var_mvint));
+	tss_pgconnids.reset(new int((int) var_int));
 
 	return true;
 
@@ -448,7 +469,7 @@ int var::connection_id() const
 {
 	//first return connection id if this is a connection handle
 	if (THIS_IS_DBCONN())
-		return (int) var_mvint;
+		return (int) var_int;
 
 	//otherwise return thread default connection id
 	int* connid=tss_pgconnids.get();
@@ -463,15 +484,15 @@ int var::connection_id() const
 		if (conn1.connect())
 		{
 			conn1.setdefaultconnection();
-			connid2=(int) conn1.var_mvint;
+			connid2=(int) conn1.var_int;
 		}
 	}
 
 	//turn this into a db connection (int holds the connection number)
 	//leave any string in place but prevent it being used a number
-	var_mvint = connid2;
-	//var_mvstr = L""; does it ever need initialising?
-	var_mvtyp = pimpl::MVTYPE_NANSTR_DBCONN;
+	var_int = connid2;
+	//var_str = L""; does it ever need initialising?
+	var_typ = pimpl::VARTYP_NANSTR_DBCONN;
 
 	return connid2;
 }
@@ -517,12 +538,12 @@ bool var::disconnect()
 
 	if (THIS_IS_DBCONN())
 	{
-		mv_connections_cache.del_connection((int) var_mvint);
-		var_mvtyp=pimpl::MVTYPE_UNA;
+		mv_connections_cache.del_connection((int) var_int);
+		var_typ=pimpl::VARTYP_UNA;
 		//if we happen to be disconnecting the same connection as the default connection
 		//then reset the default connection so that it will be reconnected to the next connect
 		//this is rather too smart but will probably do what people expect
-		if (default_connid && *default_connid==var_mvint)
+		if (default_connid && *default_connid==var_int)
 			tss_pgconnids.reset();
 	}
 	else
@@ -586,10 +607,12 @@ bool var::open(const var& filename, const var& connection)
 			paramFormats,
 			1);	  /* ask for binary results */
 
+		Resultclearer clearer(pgresult);
+
 		if (PQresultStatus(pgresult) != PGRES_TUPLES_OK)
 		{
 			var errmsg=L"ERROR: mvdbpostgres 1 open(" ^ filename.quote() ^ L") failed\n" ^ var(PQerrorMessage(thread_pgconn));
-			PQclear(pgresult);
+//			PQclear(pgresult);
 			this->setlasterror(errmsg);
 #			if TRACING >= 1
 			exodus::errputl(errmsg);
@@ -601,7 +624,7 @@ bool var::open(const var& filename, const var& connection)
 		if (PQntuples(pgresult) < 1)
 		{
 			var errmsg=L"ERROR: mvdbpostgres 2 open(" ^ filename.quote() ^ L") table does not exist. failed\n" ^ var(PQerrorMessage(thread_pgconn));
-			PQclear(pgresult);
+//			PQclear(pgresult);
 			this->setlasterror(errmsg);
 			return false;
 		}
@@ -609,7 +632,7 @@ bool var::open(const var& filename, const var& connection)
 		if (PQntuples(pgresult) > 1)
 		{
 			var errmsg=L"ERROR: mvdbpostgres 3 open() SELECT returned more than one record";
-			PQclear(pgresult);
+//			PQclear(pgresult);
 			this->setlasterror(errmsg);
 #			if TRACING >= 1
 			exodus::errputl(errmsg);
@@ -617,15 +640,15 @@ bool var::open(const var& filename, const var& connection)
 			return false;
 		}
 
-		PQclear(pgresult);
+//		PQclear(pgresult);
 		this->setlasterror();
 
 	}//of not DOS
 
 	//save the filename and memorise the current connection for this file var
-	var_mvstr=filename.var_mvstr;
-	var_mvint = connection.var_mvint;
-	var_mvtyp = pimpl::MVTYPE_NANSTR_DBCONN;
+	var_str=filename.var_str;
+	var_int = connection.var_int;
+	var_typ = pimpl::VARTYP_NANSTR_DBCONN;
 
 	return true;
 }
@@ -635,7 +658,7 @@ void var::close()
 	THISIS(L"void var::close()")
 	THISISSTRING()
 /*TODO
-	if (var_mvtyp!=MVTYPE_UNA) QMClose(var_mvint);
+	if (var_typ!=VARTYP_UNA) QMClose(var_int);
 */
 }
 
@@ -646,7 +669,7 @@ bool var::readv(const var& filehandle, const var& key, const int fieldno)
 	if (!read(filehandle,key))
 		return false;
 
-	var_mvstr=a(fieldno).var_mvstr;
+	var_str=a(fieldno).var_str;
 	return true;
 }
 
@@ -701,12 +724,14 @@ bool var::read(const var& filehandle,const var& key)
 		paramFormats,
 		1);	  /* ask for binary results */
 
+	Resultclearer clearer(pgresult);
+
 	if (PQresultStatus(pgresult) != PGRES_TUPLES_OK)
  	{
 		var errmsg=L"read(" ^ filehandle.quote() ^ L", " ^ key.quote()
 			^ L") - probably file not opened or doesnt exist\n"
 			^ var(PQerrorMessage(thread_pgconn));
-		PQclear(pgresult);
+		//PQclear(pgresult);
 		this->setlasterror(errmsg);
 		throw MVException(errmsg);
 		//return false;
@@ -714,14 +739,14 @@ bool var::read(const var& filehandle,const var& key)
 
 	if (PQntuples(pgresult) < 1)
 	{
-		PQclear(pgresult);
+		//PQclear(pgresult);
 		this->setlasterror(L"ERROR: mvdbpostgres read() record does not exist " ^ key.quote());
 		return false;
 	}
 
 	if (PQntuples(pgresult) > 1)
  	{
-		PQclear(pgresult);
+		//PQclear(pgresult);
 		var errmsg=L"ERROR: mvdbpostgres read() SELECT returned more than one record";
 		exodus::errputl(errmsg);
 		this->setlasterror(errmsg);
@@ -731,7 +756,7 @@ bool var::read(const var& filehandle,const var& key)
 	// *this=wstringfromUTF8((UTF8*)PQgetvalue(pgresult, 0, 0), PQgetlength(pgresult, 0, 0));
 	*this=getresult(pgresult,0,0);
 
-	PQclear(pgresult);
+	//PQclear(pgresult);
 
 	this->setlasterror();
 
@@ -747,11 +772,11 @@ var var::hash(const unsigned long long modulus) const
 	//ISNUMERIC(modulus)
 
 	//uint64_t hash64=MurmurHash64((wchar_t*)fileandkey.data(),int(fileandkey.length()*sizeof(wchar_t)),0);
-	uint64_t hash64=MurmurHash64((wchar_t*)var_mvstr.data(),int(var_mvstr.length()*sizeof(wchar_t)),0);
+	uint64_t hash64=MurmurHash64((wchar_t*)var_str.data(),int(var_str.length()*sizeof(wchar_t)),0);
 	if (modulus)
-		return var_mvint=hash64 % modulus;
+		return var_int=hash64 % modulus;
 	else
-		return var_mvint=hash64;
+		return var_int=hash64;
 }
 
 var var::lock(const var& key) const
@@ -766,9 +791,9 @@ var var::lock(const var& key) const
 	THISISDEFINED()
 	ISSTRING(key)
 
-	std::wstring fileandkey=var_mvstr;
+	std::wstring fileandkey=var_str;
 	fileandkey.append(L" ");
-	fileandkey.append(key.var_mvstr);
+	fileandkey.append(key.var_str);
 
 	//TODO .. provide endian identical version
 	//required if and when exodus processes connect to postgres on a DIFFERENT host
@@ -809,19 +834,21 @@ var var::lock(const var& key) const
 	DEBUG_LOG_SQL1
 	PGresult* pgresult = PQexecParams(thread_pgconn,
 						//TODO: parameterise filename
-					   sql,
-					   1,	   /* one param */
-					   NULL,	/* let the backend deduce param type */
-					   paramValues,
-					   paramLengths,
-					   paramFormats,
-					   1);	  /* ask for binary pgresults */
+						sql,
+						1,	   /* one param */
+						NULL,	/* let the backend deduce param type */
+						paramValues,
+						paramLengths,
+						paramFormats,
+						1);	  /* ask for binary pgresults */
+
+	Resultclearer clearer(pgresult);
 
 	if (PQresultStatus(pgresult) != PGRES_TUPLES_OK || PQntuples(pgresult) != 1)
  	{
 		var errmsg=L"lock(" ^ (*this) ^ L", " ^ key ^ L")\n" ^ var(PQerrorMessage(thread_pgconn)) ^ L"\n"
 			^ L"PQresultStatus=" ^ var(PQresultStatus(pgresult)) ^ L", PQntuples=" ^ var(PQntuples(pgresult));
-		PQclear(pgresult);//DO THIS OR SUFFER MEMORY LEAK
+		//PQclear(pgresult);//DO THIS OR SUFFER MEMORY LEAK
 		exodus::errputl(errmsg);
 		//throw MVException(msg);
 		return false;
@@ -833,7 +860,7 @@ var var::lock(const var& key) const
 
 	bool lockedok= *PQgetvalue(pgresult, 0, 0)!=0;
 
-	PQclear(pgresult);
+	//PQclear(pgresult);
 
 	//add it to the local lock table so we can detect double locking locally
 	//since postgres will stack up repeated locks by the same process
@@ -858,9 +885,9 @@ bool var::unlock(const var& key) const
 	THISISDEFINED()
 	ISSTRING(key)
 
-	std::wstring fileandkey=var_mvstr;
+	std::wstring fileandkey=var_str;
 	fileandkey.append(L" ");
-	fileandkey.append(key.var_mvstr);
+	fileandkey.append(key.var_str);
 
 	//TODO .. provide endian identical version
 	//required if and when exodus processes connect to postgres on a DIFFERENT host
@@ -907,11 +934,13 @@ bool var::unlock(const var& key) const
 					   paramFormats,
 					   1);	  /* ask for binary results */
 
+	Resultclearer clearer(pgresult);
+
 	if (PQresultStatus(pgresult) != PGRES_TUPLES_OK || PQntuples(pgresult) != 1)
  	{
 		var errmsg=L"unlock(" ^ (*this) ^ L", " ^ key ^ L")\n" ^ var(PQerrorMessage(thread_pgconn)) ^ L"\n"
 			^ L"PQresultStatus=" ^ var(PQresultStatus(pgresult)) ^ L", PQntuples=" ^ var(PQntuples(pgresult));
-		PQclear(pgresult);//DO THIS OR SUFFER MEMORY LEAK
+		//PQclear(pgresult);//DO THIS OR SUFFER MEMORY LEAK
 		exodus::errputl(errmsg);
 		//throw MVException(msg);
 		return false;
@@ -919,7 +948,7 @@ bool var::unlock(const var& key) const
 
 	//bool unlockedok= *PQgetvalue(pgresult, 0, 0)!=0;
 
-	PQclear(pgresult);
+	//PQclear(pgresult);
 
 	return true;
 }
@@ -972,23 +1001,23 @@ bool var::sqlexec(const var& sqlcmd, var& errmsg) const
 	//will contain any pgresult IF successful
 	//MUST do PQclear(pgresult) after using it;
 
-	PGresult* pgresult;
-
 	//NB PQexec cannot be told to return binary results
 	//but it can execute multiple commands
 	//whereas PQexecParams is the opposite
-	pgresult = PQexec(thread_pgconn, sqlcmd.toString().c_str());
+	PGresult* pgresult = PQexec(thread_pgconn, sqlcmd.toString().c_str());
+
+	Resultclearer clearer(pgresult);
 
 	if (PQresultStatus(pgresult) != PGRES_COMMAND_OK) {
 		var sqlstate = var(PQresultErrorField(pgresult, PG_DIAG_SQLSTATE));
-		PQclear(pgresult);//essential
+		//PQclear(pgresult);//essential
 		//sql state 42P03 = duplicate_cursor
 		errmsg=var(PQerrorMessage(thread_pgconn)) ^ L" sqlstate:" ^ sqlstate;
 		return false;
 	}
 
 	errmsg=var(PQntuples(pgresult));
-	PQclear(pgresult);//essential
+	//PQclear(pgresult);//essential
 	return true;
 
 }
@@ -1012,7 +1041,7 @@ bool var::writev(const var& filehandle,const var& key,const int fieldno) const
 		record=L"";
 
 	//replace the field
-	record.r(fieldno,var_mvstr);
+	record.r(fieldno,var_str);
 
 	//write it back
 	record.write(filehandle,key);
@@ -1078,23 +1107,25 @@ bool var::write(const var& filehandle, const var& key) const
 					   paramLengths,
 					   paramFormats,
 					   1);				// ask for binary results
+	Resultclearer clearer(pgresult);
+
 	if (PQresultStatus(pgresult) != PGRES_COMMAND_OK)
 	{
 #if TRACING >= 1
 		exodus::errputl(L"ERROR: mvdbpostgres write() failed: PQresultStatus=" ^ var(PQresultStatus(pgresult)) ^ L" " ^ var(PQerrorMessage(thread_pgconn)));
 #endif
-		PQclear(pgresult);
+		//PQclear(pgresult);
 		return false;
 	}
 
 	//if not updated 1 then fail
 	if (strcmp(PQcmdTuples(pgresult),"1") != 0)
 	{
-		PQclear(pgresult);
+		//PQclear(pgresult);
  		return false;
 	}
 
-	PQclear(pgresult);
+	//PQclear(pgresult);
 	return true;
 
 }
@@ -1142,6 +1173,7 @@ bool var::updaterecord(const var& filehandle,const var& key) const
 		paramLengths,
 		paramFormats,	// bytea
 		1);				// ask for binary results
+	Resultclearer clearer(pgresult);
 
 	if (PQresultStatus(pgresult) != PGRES_COMMAND_OK)
 	{
@@ -1150,7 +1182,7 @@ bool var::updaterecord(const var& filehandle,const var& key) const
 				^ var(PQntuples(pgresult)) ^ L" "
 				^ var(PQerrorMessage(thread_pgconn)));
 #		endif
-		PQclear(pgresult);
+		//PQclear(pgresult);
 		return false;
 	}
 
@@ -1162,11 +1194,11 @@ bool var::updaterecord(const var& filehandle,const var& key) const
 				^ var(PQntuples(pgresult)) ^ L" "
 				^ var(PQerrorMessage(thread_pgconn)));
 #		endif
-		PQclear(pgresult);
+		//PQclear(pgresult);
  		return false;
 	}
 
-	PQclear(pgresult);
+	//PQclear(pgresult);
 	return true;
 
 }
@@ -1214,6 +1246,7 @@ bool var::insertrecord(const var& filehandle,const var& key) const
 		paramLengths,
 		paramFormats,	// bytea
 		1);				// ask for binary results
+	Resultclearer clearer(pgresult);
 
 	if (PQresultStatus(pgresult) != PGRES_COMMAND_OK)
 	{
@@ -1222,18 +1255,18 @@ bool var::insertrecord(const var& filehandle,const var& key) const
 				^ var(PQntuples(pgresult)) ^ L" "
 				^ var(PQerrorMessage(thread_pgconn)));
 #		endif
-		PQclear(pgresult);
+		//PQclear(pgresult);
 		return false;
 	}
 
 	//if not updated 1 then fail
 	if (strcmp(PQcmdTuples(pgresult),"1") != 0)
 	{
-		PQclear(pgresult);
+		//PQclear(pgresult);
  		return false;
 	}
 
-	PQclear(pgresult);
+	//PQclear(pgresult);
 	return true;
 
 }
@@ -1256,7 +1289,7 @@ bool var::deleterecord(const var& key) const
 	paramLengths[0] = int(key2.length());
 	paramFormats[0] = 1;//binary
 
-	var sql=L"DELETE FROM " ^ var_mvstr ^ L" WHERE KEY = $1";
+	var sql=L"DELETE FROM " ^ var_str ^ L" WHERE KEY = $1";
 
 	PGconn* thread_pgconn=(PGconn*) this->connection();
 	if (!thread_pgconn)
@@ -1271,6 +1304,7 @@ bool var::deleterecord(const var& key) const
 		paramLengths,
 		paramFormats,
 		1);	  /* ask for binary results */
+	Resultclearer clearer(pgresult);
 
 	if (PQresultStatus(pgresult) != PGRES_COMMAND_OK)
 	{
@@ -1279,21 +1313,21 @@ bool var::deleterecord(const var& key) const
 				^ var(PQntuples(pgresult)) ^ L" "
 				^ var(PQerrorMessage(thread_pgconn)));
 #		endif
-		PQclear(pgresult);
+		//PQclear(pgresult);
 		return false;
 	}
 
 	//if not updated 1 then fail
 	if (strcmp(PQcmdTuples(pgresult),"1") != 0)
 	{
-		PQclear(pgresult);
+		//PQclear(pgresult);
 #		if TRACING >= 3
-			exodus::logputl(L"var::deleterecord failed. Record does not exist " ^ var_mvstr ^ L" " ^ key);
+			exodus::logputl(L"var::deleterecord failed. Record does not exist " ^ var_str ^ L" " ^ key);
 #		endif
 		return false;
 	}
 
-	PQclear(pgresult);
+	//PQclear(pgresult);
 
 	return true;
 }
@@ -1488,7 +1522,7 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 		// we should open it through the same connection, as this->was opened, not any default connection
 		int connid = 0;
 		if (THIS_IS_DBCONN())
-			connid = (int) var_mvint;
+			connid = (int) var_int;
 
 		if (!actualdictfile.open(dictfilename, connid))
 		{
@@ -1536,7 +1570,7 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 		var conversion=dictrec.a(7);
 		var fieldno=dictrec.a(2);
 		var params;
-		var ismv1=dictrec.a(4)[1] eq L"M";
+		var ismv1=dictrec.a(4)[1] == L"M";
 		if (fieldno)
 			if (ismv1)
 			{
@@ -1789,6 +1823,8 @@ bool var::deletelist(const var& listname) const
 
 	if (var().open(listfilename)) {
 		//listfilename.outputl(L"Deleted ");
+		if (GETDBTRACE)
+			exodus::logputl(L"DBTRACE: ::deletelist(" ^ listname ^ L")");
 		return this->deletefile(listfilename);
 	}
 	return true;//true if not existing
@@ -1809,8 +1845,15 @@ bool var::savelist(const var& listname) const
 
 	//save preselected keys into a file to be used with INNERJOIN on select()
 	if (this->selectpending()) {
+
 		this->deletelist(listname);
-		this->deletefile(listfilename2);
+
+		if (var(*this).open(listfilename2))
+			var(*this).deletefile(listfilename2);
+
+		if (GETDBTRACE)
+			exodus::logputl(L"DBTRACE: ::savelist(" ^ listname ^ L")");
+
 		while (this->readnext(key,mv)) {
 			recn++;
 
@@ -1825,7 +1868,8 @@ bool var::savelist(const var& listname) const
 			(mv ^ FM ^ recn).write(listfilename2,key);
 			//key.outputl(L"Written=");
 		}
-		this->renamefile(listfilename2, listfilename);
+		if (recn)
+			this->renamefile(listfilename2, listfilename);
 	}
 
 	return recn>0;
@@ -1908,26 +1952,26 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	//private - and arguments are left unchecked for speed
 
 	//?allow undefined usage like var xyz=xyz.select();
-	if (var_mvtyp&mvtypemask)
+	if (var_typ&mvtypemask)
 	{
 		//throw MVUndefined(L"selectx()");
-		var_mvstr=L"";
-		var_mvtyp=pimpl::MVTYPE_STR;
+		var_str=L"";
+		var_typ=pimpl::VARTYP_STR;
 	}
 
 	//default to ""
-	if (!(var_mvtyp&pimpl::MVTYPE_STR))
+	if (!(var_typ&pimpl::VARTYP_STR))
 	{
-		if (!var_mvtyp)
+		if (!var_typ)
 		{
-			var_mvstr=L"";
-			var_mvtyp=pimpl::MVTYPE_STR;
+			var_str=L"";
+			var_typ=pimpl::VARTYP_STR;
 		}
 		else
 			this->createString();
 	}
 
-	// Note that MVTYPE_DBCONN bit is still preserved in var_mvtyp
+	// Note that VARTYP_DBCONN bit is still preserved in var_typ
 
 	//TODO only do this if cursor already exists
 	//clearselect();
@@ -2222,7 +2266,6 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		}
 	}
 
-	/**
 	//if any active select, convert to a file and use as an additional filter on key
 	//or correctly named savelistfilename exists from getselect or makelist
 	var listname=(*this) ^ L"_" ^ getprocessn() ^ L"_tempx";
@@ -2231,7 +2274,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		if (joins)
 			joins^=L", ";
 		joins ^= L" INNER JOIN " ^ savelistfilename ^ L" ON " ^ actualfilename ^ L".key = " ^ savelistfilename ^ L".key";
-	}**/
+	}
 
 	//disambiguate from any INNER JOIN key
 	actualfieldnames.swapper(L"key",actualfilename ^ L".key");
@@ -2276,7 +2319,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	var errmsg;
 	if (! this->sqlexec(sql,errmsg)) {
 
-		/**this->deletelist(listname);**/
+		this->deletelist(listname);
 
 		//TODO handle duplicate_cursor sqlstate 42P03
 		sql.outputl(L"sql=");
@@ -2298,12 +2341,12 @@ var& var::setifunassigned(const var& defaultvalue/*=""*/) {
 	ISASSIGNED(defaultvalue)
 
 	//?allow undefined usage like var xyz=xyz.readnext();
-	//if (var_mvtyp&mvtypemask)
+	//if (var_typ&mvtypemask)
 	if (this->unassigned())
 	{
 		//throw MVUndefined(L"setifunassigned( ^ defaultvalue ^L")");
-		//var_mvstr=L"";
-		//var_mvtyp=pimpl::MVTYPE_STR;
+		//var_str=L"";
+		//var_typ=pimpl::VARTYP_STR;
 		*this=defaultvalue;
 	}
 	return *this;
@@ -2318,8 +2361,8 @@ void var::clearselect() const
 
         ///if readnext through string
         if ((*this)[-1]==FM) {
-                var_mvstr=L"";
-                var_mvtyp=pimpl::MVTYPE_STR;
+                var_str=L"";
+                var_typ=pimpl::VARTYP_STR;
 		return;
         }
 
@@ -2327,11 +2370,13 @@ void var::clearselect() const
 	if (not this->selectpending())
 		return;
 
-	//clear any select list
-	/**
 	var listname=(*this) ^ L"_" ^ getprocessn() ^ L"_tempx";
+
+	if (GETDBTRACE)
+		exodus::logputl(L"DBTRACE: ::clearselect() for " ^ listname);
+
+	//clear any select list
 	this->deletelist(listname);
-	**/
 
 	var sql=L"";
 	//var sql^=L"BEGIN ;";
@@ -2354,7 +2399,7 @@ void var::clearselect() const
 //NB global not member function
 //	To make it var:: privat member -> pollute mv.h with PGresultptr :(
 //bool readnextx(const std::wstring& cursor, PGresultptr& pgresult)
-//NB if return true then MUST DO PQclear(pgresult)
+//NB caller MUST ALWAYS do PQclear(pgresult) even bool false
 //called by readnext/readnextrecord (and perhaps hasnext/select to implement LISTACTIVE)
 bool readnextx(const var& cursor, PGresultptr& pgresult, PGconn* pgconn, bool clearselect_onfail, bool forwards)
 {
@@ -2380,7 +2425,7 @@ bool readnextx(const var& cursor, PGresultptr& pgresult, PGconn* pgconn, bool cl
 		var errmsg=var(PQresultErrorMessage(pgresult));
 		var sqlstate = var(PQresultErrorField(pgresult, PG_DIAG_SQLSTATE));
 
-		PQclear(pgresult);
+		//PQclear(pgresult);
 
 		if (clearselect_onfail) {
 			cursor.clearselect();
@@ -2400,7 +2445,7 @@ bool readnextx(const var& cursor, PGresultptr& pgresult, PGconn* pgconn, bool cl
 			if (not cursor.select(L"select " ^ listfilename))
 				return false;
 			if (GETDBTRACE)
-				exodus::logputl(L"DBTRACE: ::readnextx(...) found standard selectfile " ^ listfilename);
+				exodus::logputl(L"DBTRACE: readnextx(...) found standard selectfile " ^ listfilename);
 
 			return readnextx(cursor, pgresult, pgconn, clearselect_onfail, forwards);
 			**/
@@ -2415,7 +2460,7 @@ bool readnextx(const var& cursor, PGresultptr& pgresult, PGconn* pgconn, bool cl
 	//false and optionally close cursor if no more
 	if (forwards && PQntuples(pgresult) < 1)
 	{
-		PQclear(pgresult);
+		//PQclear(pgresult);
 		if (clearselect_onfail) {
 			cursor.clearselect();
 		}
@@ -2461,13 +2506,14 @@ bool var::hasnext() const
 	}
 
 	PGresultptr pgresult;
+	bool ok=readnextx(*this, pgresult, pgconn, false, true);
 
-	if (!readnextx(*this, pgresult, pgconn, false, true))
-	{
+	Resultclearer clearer(pgresult);
+
+	if (!ok)
 		return false;
-	}
 
-	PQclear(pgresult);
+	//PQclear(pgresult);
 
 
 	/////////////////////////////////
@@ -2475,15 +2521,17 @@ bool var::hasnext() const
 	/////////////////////////////////
 
 	PGresultptr pgresult2;
+	ok=readnextx(*this, pgresult2, pgconn, false, false);
 
-	if (!readnextx(*this, pgresult2, pgconn, false, false))
-	{
+	Resultclearer clearer2(pgresult2);
+
+	if (!ok) {
 		//should always be able to move the cursor backwards if could move it forwards in the code above
 		//hasnext=false
 		return false;
 	}
 
-	PQclear(pgresult2);
+	//PQclear(pgresult2);
 
 	//hasnext=true
 	return true;
@@ -2499,11 +2547,11 @@ bool var::readnext(var& key, var& valueno) const
 {
 
 	//?allow undefined usage like var xyz=xyz.readnext();
-	if (var_mvtyp&mvtypemask)
+	if (var_typ&mvtypemask)
 	{
 		//throw MVUndefined(L"readnext()");
-		var_mvstr=L"";
-		var_mvtyp=pimpl::MVTYPE_STR;
+		var_str=L"";
+		var_typ=pimpl::VARTYP_STR;
 	}
 
 	//default cursor is ""
@@ -2518,17 +2566,17 @@ bool var::readnext(var& key, var& valueno) const
 	//readnext through string of keys if provided
 	if ((*this)[-1]==FM) {
 
-		//initialise readnext pointer to 0 (using var_mvint as pointer)
-		if ((var_mvtyp&pimpl::MVTYPE_INT) == 0) {
-			var_mvint=0;
-			var_mvtyp=var_mvtyp|pimpl::MVTYPE_INT;
+		//initialise readnext pointer to 0 (using var_int as pointer)
+		if ((var_typ&pimpl::VARTYP_INT) == 0) {
+			var_int=0;
+			var_typ=var_typ|pimpl::VARTYP_INT;
 		}
 
 		//increment readnext pointer
-		var_mvint++;
+		var_int++;
 
 		//extract next key
-		key=a(var_mvint);
+		key=a(var_int);
 
 		//key may be key]valueno
 		valueno=key.a(1,2);
@@ -2545,9 +2593,11 @@ bool var::readnext(var& key, var& valueno) const
 	}
 
 	PGresultptr pgresult;
+	bool ok=readnextx(*this, pgresult, pgconn, true, true);
 
-	if (!readnextx(*this, pgresult, pgconn, true, true))
-	{
+	Resultclearer clearer(pgresult);
+
+	if (not ok) {
 		// end the transaction and quit
 		// no more
 		//committrans();
@@ -2588,13 +2638,12 @@ bool var::readnext(var& key, var& valueno) const
 
   //vn is second column	
 	//record is third column
-	if (PQnfields(pgresult)>1){
+	if (PQnfields(pgresult)>1)
 		valueno=var((int)ntohl(*(uint32_t*)PQgetvalue(pgresult, 0, 1)));
-	} else {
+	else
 		valueno=0;
-	}
 
-	PQclear(pgresult);
+	//PQclear(pgresult);
 
 	return true;
 
@@ -2627,11 +2676,11 @@ bool var::readnextrecord(var& record, var& key, var& valueno) const
 {
 
 	//?allow undefined usage like var xyz=xyz.readnextrecord();
-	if (var_mvtyp&mvtypemask || !var_mvtyp)
+	if (var_typ&mvtypemask || !var_typ)
 	{
 		//throw MVUndefined(L"readnextrecord()");
-		var_mvstr=L"";
-		var_mvtyp=pimpl::MVTYPE_STR;
+		var_str=L"";
+		var_typ=pimpl::VARTYP_STR;
 	}
 
 	//default cursor is ""
@@ -2642,14 +2691,16 @@ bool var::readnextrecord(var& record, var& key, var& valueno) const
 	ISDEFINED(key)
 	ISDEFINED(record)
 
-	PGresultptr pgresult;
-
 	PGconn* pgconn=(PGconn*) connection();
 	if (pgconn==NULL)
 		return L"";
 
-	if (!readnextx(*this, pgresult, pgconn, true, true))
-	{
+	PGresultptr pgresult;
+	bool ok=readnextx(*this, pgresult, pgconn, true, true);
+
+	Resultclearer clearer(pgresult);
+
+	if (!ok) {
 		// end the transaction
 		// no more
 		//committrans();
@@ -2679,7 +2730,7 @@ bool var::readnextrecord(var& record, var& key, var& valueno) const
 	//record=wstringfromUTF8((UTF8*)PQgetvalue(pgresult, 0, 2), PQgetlength(pgresult, 0, 2));
 	record=getresult(pgresult,0,2);
 
-	PQclear(pgresult);
+	//PQclear(pgresult);
 
 	return true;
 
@@ -2757,8 +2808,11 @@ var var::listfiles() const
 		return L"";
 
 	PGresultptr pgresult;
+	bool ok=getpgresult(sql,pgresult, pgconn);
 
-	if (!getpgresult(sql,pgresult, pgconn))
+	Resultclearer clearer(pgresult);
+
+	if (!ok)
 		return L"";
 
 	var filenames=L"";
@@ -2770,7 +2824,7 @@ var var::listfiles() const
 	}
 	filenames.splicer(1,1,L"");
 
-	PQclear(pgresult);
+	//PQclear(pgresult);
 
 	return filenames;
 }
@@ -2794,14 +2848,19 @@ bool var::selectpending() const
 		return L"";
 
 	PGresultptr pgresult;
+	bool ok=getpgresult(sql,pgresult, pgconn);
 
-	if (!getpgresult(sql,pgresult, pgconn))
+	Resultclearer clearer(pgresult);
+
+	if (!ok)
 		return L"";
 
 	//MUST PQclear(pgresult) on path below
 
-	var ok = PQntuples(pgresult)>0;
+	ok = PQntuples(pgresult)>0;
 
+	if (GETDBTRACE)
+		exodus::logputl(L"DBTRACE: ::selectpending() is " ^ var(ok));
 	/*
         var names=L"";
         int nn=PQntuples(pgresult);
@@ -2815,7 +2874,7 @@ bool var::selectpending() const
 	names.outputl(L"names=");
 	*/
 
-	PQclear(pgresult);
+	//PQclear(pgresult);
 
 	return ok;
 }
@@ -2851,7 +2910,11 @@ var var::listindexes(const var& filename, const var& fieldname) const
 
 	//execute command or return empty string
 	PGresultptr pgresult;
-	if (!getpgresult(sql,pgresult,pgconn))
+	bool ok=getpgresult(sql,pgresult,pgconn);
+
+	Resultclearer clearer(pgresult);
+
+	if (!ok)
 		return L"";
 
 	//MUST PQclear(pgresult) below
@@ -2881,7 +2944,7 @@ var var::listindexes(const var& filename, const var& fieldname) const
 	}
 	indexnames.splicer(1,1,L"");
 
-	PQclear(pgresult);
+	//PQclear(pgresult);
 
 	return indexnames;
 }
@@ -2904,7 +2967,11 @@ var var::reccount(const var& filename) const
 
 	//execute command or return empty string
 	PGresultptr pgresult;
-	if (!getpgresult(sql,pgresult,pgconn))
+	bool ok=getpgresult(sql,pgresult,pgconn);
+
+	Resultclearer clearer(pgresult);
+
+	if (!ok)
 		return L"";
 
 	//MUST PQclear(pgresult) below
@@ -2915,7 +2982,7 @@ var var::reccount(const var& filename) const
                 reccount=var((int)ntohl(*(uint32_t*)PQgetvalue(pgresult, 0, 0)));
         }
 
-	PQclear(pgresult);
+	//PQclear(pgresult);
 
 	return reccount;
 }
@@ -2939,7 +3006,11 @@ var var::flushindex(const var& filename) const
 
 	//execute command or return empty string
 	PGresultptr pgresult;
-	if (!getpgresult(sql,pgresult,pgconn))
+	bool ok=getpgresult(sql,pgresult,pgconn);
+
+	Resultclearer clearer(pgresult);
+
+	if (!ok)
 		return L"";
 
 	//MUST PQclear(pgresult) below
@@ -2950,14 +3021,15 @@ var var::flushindex(const var& filename) const
                 flushresult=true;
         }
 
-	PQclear(pgresult);
+	//PQclear(pgresult);
 
 	return flushresult;
 }
 
 //used for sql commands that require no parameters
-//returns 1 for success and PGresult points to pgresult WHICH MUST BE PQclear(pgresult)'ed
-//returns 0 for failure and no need to PQclear(pgresult)
+//returns 1 for success
+//returns 0 for failure
+//NB in either case caller MUST PQclear(pgresult)
 static bool getpgresult(const var& sql, PGresultptr& pgresult, PGconn * thread_pgconn)
 {
 	DEBUG_LOG_SQL
@@ -2986,6 +3058,9 @@ static bool getpgresult(const var& sql, PGresultptr& pgresult, PGconn * thread_p
 		paramLengths,
 		paramFormats,
 		1);	  /* ask for binary results */
+
+	//NO! pgresult is returned to caller to extract any data AND call PQclear(pgresult)
+	//Resultclearer clearer(pgresult);
 
 	if (!pgresult) {
 
@@ -3039,13 +3114,13 @@ static bool getpgresult(const var& sql, PGresultptr& pgresult, PGconn * thread_p
 
 			//this is defaulted above for safety
 			//retcode=0;
-			PQclear(pgresult);
+			//PQclear(pgresult);
 			return false;
 
 		}
 
 	//should never get here
-	PQclear(pgresult);
+	//PQclear(pgresult);
 
 	}
 

@@ -85,8 +85,8 @@ bool var::input(const var& prompt, const int nchars)
 		std::cout<<std::flush;
 	}
 	if (nchars<0) {
-		var_mvstr=L"";
-		var_mvtyp=pimpl::MVTYPE_STR;
+		var_str=L"";
+		var_typ=pimpl::VARTYP_STR;
 		//while (true) {
 			int nc;
 var(L"before peek").outputl();
@@ -104,7 +104,7 @@ var(nc).oconv(L"HEX").outputl();
 var(L"aaaa").outputl();
 			std::cin.get(char1);
 var(L"bbb").outputl();
-			var_mvstr+=char1;
+			var_str+=char1;
 		//}
 var(L"ccc").outputl();
 		return true;
@@ -125,8 +125,8 @@ bool var::input()
 
 	if (std::cin.eof())
 	{
-		var_mvstr=L"";
-		var_mvtyp=pimpl::MVTYPE_STR;
+		var_str=L"";
+		var_typ=pimpl::VARTYP_STR;
 		return false;
 	}
 
@@ -135,15 +135,15 @@ bool var::input()
 	//pressing crtl+d indicates eof on unix or ctrl+Z on dos/windows?
 	if (std::cin.eof())
 	{
-		var_mvstr=L"";
-		var_mvtyp=pimpl::MVTYPE_STR;
+		var_str=L"";
+		var_typ=pimpl::VARTYP_STR;
 		return false;
 	}
 
 	//convert from utf8 to internal format - utf16 or utf32 depending on platform
-	//var_mvstr=wstringfromUTF8((UTF8*)tempstr.data(),(int)tempstr.length());
-	var_mvstr=boost::locale::conv::utf_to_utf<wchar_t>(tempstr);
-	var_mvtyp=pimpl::MVTYPE_STR;
+	//var_str=wstringfromUTF8((UTF8*)tempstr.data(),(int)tempstr.length());
+	var_str=boost::locale::conv::utf_to_utf<wchar_t>(tempstr);
+	var_typ=pimpl::VARTYP_STR;
 
 	return true;
 }
@@ -183,10 +183,10 @@ bool var::assigned() const
 	//which is possible (in syntax like var xx.osread()?)
 	//and also when passing default variables to functions in the functors on gcc
 	//THISISDEFINED()
-	if (!this||(*this).var_mvtyp&mvtypemask)
+	if (!this||(*this).var_typ&mvtypemask)
 		return false;
 
-	return var_mvtyp!=pimpl::MVTYPE_UNA;
+	return var_typ!=pimpl::VARTYP_UNA;
 }
 
 bool var::unassigned() const
@@ -195,10 +195,10 @@ bool var::unassigned() const
 
 	//see explanation above in assigned
 	//THISISDEFINED()
-	if (!this||((*this).var_mvtyp&mvtypemask))
+	if (!this||((*this).var_typ&mvtypemask))
 		return true;
 
-	return !var_mvtyp;
+	return !var_typ;
 }
 
 //pick int() is actually the same as floor. using integer() instead of int() because int is a reserved word in c/c++ for int datatype
@@ -219,14 +219,14 @@ var var::integer() const
 	 1.0=1
 	*/
 
-	if (var_mvtyp&pimpl::MVTYPE_INT)
-		return var_mvint;
+	if (var_typ&pimpl::VARTYP_INT)
+		return var_int;
 
 	//could save the integer conversion here but would require mentality to save BOTH int and double
 	//currently its possible since space is reserved for both but this may change
 
 	//floor
-	return std::floor(var_mvdbl);
+	return std::floor(var_dbl);
 
 }
 
@@ -236,14 +236,14 @@ var var::floor() const
 	THISIS(L"var var::floor() const")
 	THISISNUMERIC()
 
-	if (var_mvtyp&pimpl::MVTYPE_INT)
-		return var_mvint;
+	if (var_typ&pimpl::VARTYP_INT)
+		return var_int;
 
 	//could save the integer conversion here but would require mentality to save BOTH int and double
 	//currently its possible since space is reserved for both but this may change
 
 	//floor
-	return std::floor(var_mvdbl);
+	return std::floor(var_dbl);
 
 }
 
@@ -268,15 +268,15 @@ var var::round(const int ndecimals) const
 	THISISNUMERIC()
 
 	double result;
-	if (var_mvtyp&pimpl::MVTYPE_INT)
+	if (var_typ&pimpl::VARTYP_INT)
 	{
 		if (not ndecimals)
-			return var_mvint;
-		//loss of precision if var_mvint is long long
-		result=int(var_mvint);
+			return var_int;
+		//loss of precision if var_int is long long
+		result=int(var_int);
 	}
 	else
-		result=var_mvdbl;
+		result=var_dbl;
 
 	//scale it up (or down)
 	double scale=pow(10.0,ndecimals);
@@ -308,18 +308,18 @@ bool var::toBool() const
 	{
 		//doubles are true unless zero
 		//check double first dbl on guess that tests will be most often on financial numbers
-		if (var_mvtyp&pimpl::MVTYPE_DBL)
-			return (bool)(var_mvdbl!=0);
+		if (var_typ&pimpl::VARTYP_DBL)
+			return (bool)(var_dbl!=0);
 
 		//ints are true except for zero
-		if (var_mvtyp&pimpl::MVTYPE_INT)
-			return (bool)(var_mvint!=0);
+		if (var_typ&pimpl::VARTYP_INT)
+			return (bool)(var_int!=0);
 
 		//non-numeric strings are true unless zero length
-		if (var_mvtyp&pimpl::MVTYPE_NAN)
-			return (bool)(var_mvstr.length()!=0);
+		if (var_typ&pimpl::VARTYP_NAN)
+			return (bool)(var_str.length()!=0);
 
-		if (!(var_mvtyp))
+		if (!(var_typ))
 		{
 			THISISASSIGNED()
 			throw MVUnassigned(L"toBool()");
@@ -337,8 +337,8 @@ int var::toInt() const
 	THISIS(L"int var::toInt() const")
 	THISISNUMERIC()
 
-	//loss of precision if var_mvint is long long
-	return (var_mvtyp&pimpl::MVTYPE_INT) ? int(var_mvint) : int(var_mvdbl);
+	//loss of precision if var_int is long long
+	return (var_typ&pimpl::VARTYP_INT) ? int(var_int) : int(var_dbl);
 }
 
 int var::toLong() const
@@ -346,8 +346,8 @@ int var::toLong() const
 	THISIS(L"int var::toLong() const")
 	THISISNUMERIC()
 
-	//loss of precision if var_mvint is long long
-	return (var_mvtyp&pimpl::MVTYPE_INT) ? long(var_mvint) : long(var_mvdbl);
+	//loss of precision if var_int is long long
+	return (var_typ&pimpl::VARTYP_INT) ? long(var_int) : long(var_dbl);
 }
 
 double var::toDouble() const
@@ -355,7 +355,7 @@ double var::toDouble() const
 	THISIS(L"double var::toDouble() const")
 	THISISNUMERIC()
 
-	return (var_mvtyp&pimpl::MVTYPE_INT) ? double(var_mvint) : var_mvdbl;
+	return (var_typ&pimpl::VARTYP_INT) ? double(var_int) : var_dbl;
 }
 
 void var::createString() const
@@ -365,33 +365,33 @@ void var::createString() const
 	//to avoid wasting time doing multiple calls to ISDEFINED
 	THISISDEFINED()
 
-	switch (var_mvtyp)
+	switch (var_typ)
 	{
 		//skip this test for speed and only call the function if required
 		//str already. no action required
 		//put this first guessing that toWString is most often called on strings;
-		//case pimpl::MVTYPE_STR:
+		//case pimpl::VARTYP_STR:
 		//	return;
 
 		//int - create string from int
-		case pimpl::MVTYPE_INT:
-			//loss of precision if var_mvint is long long
-			var_mvstr=intToString(int(var_mvint));
+		case pimpl::VARTYP_INT:
+			//loss of precision if var_int is long long
+			var_str=intToString(int(var_int));
 			break;
 
 		//dbl - create string from dbl
-		case pimpl::MVTYPE_DBL:
-			var_mvstr=dblToString(var_mvdbl);
+		case pimpl::VARTYP_DBL:
+			var_str=dblToString(var_dbl);
 			break;
 
 		//unassigned - throw
-		case pimpl::MVTYPE_UNA:
+		case pimpl::VARTYP_UNA:
 			throw MVUnassigned(L"createString()");
 
 		default:
 			//arrives here only after int or dbl has been converted to string
 			//add the "string available" bit flag using the "bitor equals" operator
-			var_mvtyp|=pimpl::MVTYPE_STR;
+			var_typ|=pimpl::VARTYP_STR;
 	}
 
 }
@@ -401,13 +401,13 @@ std::wstring var::toWString() const
 	THISIS(L"std::wstring var::toWString() const")
 	THISISSTRING()
 
-	return var_mvstr;
+	return var_str;
 }
 
 //DLL_PUBLIC
 std::string var::toString2() const
 {
-        if (var_mvtyp&mvtypemask)
+        if (var_typ&mvtypemask)
                 return "";
         return toString();
 }
@@ -417,7 +417,7 @@ std::string var::toString() const
 {
 	THISIS(L"std::string var::toString() const")
 	THISISSTRING()
-	return boost::locale::conv::utf_to_utf<char>(var_mvstr);
+	return boost::locale::conv::utf_to_utf<char>(var_str);
 }
 
 var var::length() const
@@ -425,7 +425,7 @@ var var::length() const
 	THISIS(L"var var::length() const")
 	THISISSTRING()
 
-	return int(var_mvstr.length());
+	return int(var_str.length());
 }
 
 //synonym for length for compatibility with pick's len()
@@ -434,7 +434,7 @@ var var::len() const
 	THISIS(L"var var::len() const")
 	THISISSTRING()
 
-	return int(var_mvstr.length());
+	return int(var_str.length());
 }
 
 const wchar_t* var::data() const
@@ -442,7 +442,7 @@ const wchar_t* var::data() const
 	THISIS(L"const wchar_t* var::data() const")
 	THISISSTRING()
 
-	return var_mvstr.data();
+	return var_str.data();
 }
 
 
@@ -451,7 +451,7 @@ var var::trim(const var& trimchar) const
 	THISIS(L"var var::trim(const var& trimchar) const")
 	ISSTRING(trimchar)
 
-	return trim(trimchar.var_mvstr.c_str());
+	return trim(trimchar.var_str.c_str());
 }
 
 var var::trim(const var& trimchar, const var& options) const
@@ -461,15 +461,15 @@ var var::trim(const var& trimchar, const var& options) const
 	ISSTRING(options)
 
 	if (options==L"F") {
-		return trimf(trimchar.var_mvstr.c_str());
+		return trimf(trimchar.var_str.c_str());
 	}
 	else if (options==L"B") {
-		return trimb(trimchar.var_mvstr.c_str());
+		return trimb(trimchar.var_str.c_str());
 	}
 	else if (options==L"FB") {
-		return trimf(trimchar.var_mvstr.c_str()).trimb(trimchar.var_mvstr.c_str());
+		return trimf(trimchar.var_str.c_str()).trimb(trimchar.var_str.c_str());
 	}
-	return trim(trimchar.var_mvstr.c_str());
+	return trim(trimchar.var_str.c_str());
 }
 
 var& var::trimmer(const var& trimchar)
@@ -477,7 +477,7 @@ var& var::trimmer(const var& trimchar)
 	THISIS(L"var& var::trimmer(const var& trimchar)")
 	ISSTRING(trimchar)
 
-	return trimmer(trimchar.var_mvstr.c_str());
+	return trimmer(trimchar.var_str.c_str());
 }
 
 var& var::trimmer(const var& trimchar, const var& options)
@@ -487,15 +487,15 @@ var& var::trimmer(const var& trimchar, const var& options)
 	ISSTRING(options)
 
 	if (options==L"F") {
-		return trimmerf(trimchar.var_mvstr.c_str());
+		return trimmerf(trimchar.var_str.c_str());
 	}
 	else if (options==L"B") {
-		return trimmerb(trimchar.var_mvstr.c_str());
+		return trimmerb(trimchar.var_str.c_str());
 	}
 	else if (options==L"FB") {
-		return trimmerf(trimchar.var_mvstr.c_str()).trimmerb(trimchar.var_mvstr.c_str());
+		return trimmerf(trimchar.var_str.c_str()).trimmerb(trimchar.var_str.c_str());
 	}
-	return trimmer(trimchar.var_mvstr.c_str());
+	return trimmer(trimchar.var_str.c_str());
 }
 
 var var::trimf(const var& trimchar) const
@@ -503,7 +503,7 @@ var var::trimf(const var& trimchar) const
 	THISIS(L"var var::trimf(const var& trimchar) const")
 	ISSTRING(trimchar)
 
-	return trimf(trimchar.var_mvstr.c_str());
+	return trimf(trimchar.var_str.c_str());
 }
 
 var& var::trimmerf(const var& trimchar)
@@ -511,7 +511,7 @@ var& var::trimmerf(const var& trimchar)
 	THISIS(L"var& var::trimmerf(const var& trimchar)")
 	ISSTRING(trimchar)
 
-	return trimmerf(trimchar.var_mvstr.c_str());
+	return trimmerf(trimchar.var_str.c_str());
 }
 
 var var::trimb(const var& trimchar) const
@@ -519,7 +519,7 @@ var var::trimb(const var& trimchar) const
 	THISIS(L"var var::trimb(const var& trimchar) const")
 	ISSTRING(trimchar)
 
-	return trimb(trimchar.var_mvstr.c_str());
+	return trimb(trimchar.var_str.c_str());
 }
 
 var& var::trimmerb(const var& trimchar)
@@ -527,7 +527,7 @@ var& var::trimmerb(const var& trimchar)
 	THISIS(L"var& var::trimmerb(const var& trimchar)")
 	ISSTRING(trimchar)
 
-	return trimmerb(trimchar.var_mvstr.c_str());
+	return trimmerb(trimchar.var_str.c_str());
 }
 
 var var::trimf(const wchar_t* trimchar) const
@@ -544,7 +544,7 @@ var& var::trimmerf(const wchar_t* trimchar)
 	THISISSTRING()
 
 	std::wstring::size_type start_pos;
-	start_pos=var_mvstr.find_first_not_of(trimchar);
+	start_pos=var_str.find_first_not_of(trimchar);
 
 	if (start_pos==std::wstring::npos)
 	{
@@ -552,8 +552,8 @@ var& var::trimmerf(const wchar_t* trimchar)
 		return *this;
 	}
 
-	//return var(var_mvstr.substr(start_pos));
-	var_mvstr.erase(0,start_pos);
+	//return var(var_str.substr(start_pos));
+	var_str.erase(0,start_pos);
 	return *this;
 
 }
@@ -572,7 +572,7 @@ var& var::trimmerb(const wchar_t* trimchar)
 	THISISSTRING()
 
 	std::wstring::size_type end_pos;
-	end_pos=var_mvstr.find_last_not_of(trimchar);
+	end_pos=var_str.find_last_not_of(trimchar);
 
 	if (end_pos==std::wstring::npos)
 	{
@@ -580,8 +580,8 @@ var& var::trimmerb(const wchar_t* trimchar)
 		return *this;
 	}
 
-	//return var(var_mvstr.substr(0,end_pos+1));
-	var_mvstr.erase(end_pos+1);
+	//return var(var_str.substr(0,end_pos+1));
+	var_str.erase(end_pos+1);
 
 	return *this;
 
@@ -607,7 +607,7 @@ var& var::trimmer(const wchar_t* trimchar)
 
 	//find the first non blank
 	std::wstring::size_type start_pos;
-	start_pos=var_mvstr.find_first_not_of(trimchar);
+	start_pos=var_str.find_first_not_of(trimchar);
 
 	//if all blanks return empty string
 	if (start_pos==std::wstring::npos)
@@ -617,33 +617,33 @@ var& var::trimmer(const wchar_t* trimchar)
 	}
 
 	//erase leading spaces
-	if (start_pos!=0) var_mvstr.erase(0,start_pos);
+	if (start_pos!=0) var_str.erase(0,start_pos);
 
 	//find the last non blank
 	std::wstring::size_type end_pos;
-	//end_pos=var_mvstr.find_last_not_of(trimchar);
-	end_pos=var_mvstr.find_last_not_of(trimchar,var_mvstr.length()-1);
+	//end_pos=var_str.find_last_not_of(trimchar);
+	end_pos=var_str.find_last_not_of(trimchar,var_str.length()-1);
 
 	//erase trailing spaces
-	var_mvstr.erase(end_pos+1);
+	var_str.erase(end_pos+1);
 
 	//find the starting position of any embedded spaces
 	start_pos=std::wstring::npos;
 	while (true)
 	{
 		//find a space
-		start_pos=var_mvstr.find_last_of(trimchar,start_pos);
+		start_pos=var_str.find_last_of(trimchar,start_pos);
 
 		//if no (more) spaces then return the string
 		if (start_pos==std::wstring::npos||start_pos<=0) return *this;
 
 		//find the first non-space thereafter
-		end_pos=var_mvstr.find_last_not_of(trimchar,start_pos-1);
+		end_pos=var_str.find_last_not_of(trimchar,start_pos-1);
 
 		//if first non space character is not one before the space
 		if (end_pos<start_pos-1)
 		{
-			var_mvstr.erase(end_pos+1,start_pos-end_pos-1);
+			var_str.erase(end_pos+1,start_pos-end_pos-1);
 		}
 		if (end_pos<=0) break;
 		start_pos=end_pos-1;
@@ -670,9 +670,9 @@ var& var::inverter()
 	//wchar_t invertbits=-1;
 	//invert only the lower 8 bits to keep the resultant characters within the the same unicode page
 	wchar_t invertbits=255;
-	for (size_t ii = 0; ii < var_mvstr.size(); ii++)
+	for (size_t ii = 0; ii < var_str.size(); ii++)
 		//xor each w_char with the bits we want to toggle
-        	var_mvstr[ii] = var_mvstr[ii] ^ invertbits;
+        	var_str[ii] = var_str[ii] ^ invertbits;
 }
 
 var var::ucase() const
@@ -730,9 +730,9 @@ var var::seq() const
 	THISIS(L"var var::seq() const")
 	THISISSTRING()
 
-	if (var_mvstr.length()==0) return 0;
+	if (var_str.length()==0) return 0;
 
-	return (int) (unsigned int) var_mvstr[0];
+	return (int) (unsigned int) var_str[0];
 
 }
 
@@ -757,8 +757,8 @@ var& var::quoter()
 	THISISSTRING()
 
 	//NB this is std::wstring "replace" not var field replace
-	var_mvstr.replace(0,0,L"\"");
-	var_mvstr+=L'"';
+	var_str.replace(0,0,L"\"");
+	var_str+=L'"';
 	return *this;
 
 }
@@ -777,8 +777,8 @@ var& var::squoter()
 	THISISSTRING()
 
 	//NB this is std::wstring "replace" not var field replace
-	var_mvstr.replace(0,0,L"'");
-	var_mvstr+=L'\'';
+	var_str.replace(0,0,L"'");
+	var_str+=L'\'';
 	return *this;
 
 }
@@ -800,24 +800,24 @@ var& var::unquoter()
 	//also removes a SINGLE " or ' on the grounds that you probably want to eliminate all such characters
 
 	//no change if no length
-	size_t len=var_mvstr.length();
+	size_t len=var_str.length();
 	if (!len)
 		return *this;
 
-	wchar_t char0=var_mvstr[0];
+	wchar_t char0=var_str[0];
 
 	//no change if not starting " or '
 	if (char0!=L'\"' && char0!=L'\'')
 		return *this;
 
 	//no change if terminating character ne starting character
-	if (var_mvstr[len-1]!=char0)
+	if (var_str[len-1]!=char0)
 		return *this;
 
 	//erase first (and last character if more than one)
-	var_mvstr.erase(0,1);
+	var_str.erase(0,1);
 	if (len)
-		var_mvstr.erase(len-2,1);
+		var_str.erase(len-2,1);
 
 	return *this;
 
@@ -846,7 +846,7 @@ var& var::splicer(const int start1,const int length,const var& newstr)
 	ISSTRING(newstr)
 
 	//prepare a new var
-	//functionmode var newmv=var(var_mvstr);
+	//functionmode var newmv=var(var_str);
 	//proceduremode
 
 //TODO make sure start and length work like REVELATION and HANDLE NEGATIVE LENGTH!
@@ -854,7 +854,7 @@ var& var::splicer(const int start1,const int length,const var& newstr)
 	if (start1>0) start1b=start1;
 	else if (start1<0)
     {
-        start1b=int(var_mvstr.length())+start1+1;
+        start1b=int(var_str.length())+start1+1;
         if (start1b<1) start1b=1;
     }
 	else start1b=1;
@@ -875,7 +875,7 @@ var& var::splicer(const int start1,const int length,const var& newstr)
 		}
 	}
 
-	var_mvstr.replace(start1b-1,lengthb,newstr.var_mvstr);
+	var_str.replace(start1b-1,lengthb,newstr.var_str);
 
 	return *this;
 
@@ -888,7 +888,7 @@ var& var::splicer(const int start1, const var& newstr)
 	ISSTRING(newstr)
 
 	//prepare a new var
-	//functionmode var newmv=var(var_mvstr);
+	//functionmode var newmv=var(var_str);
 	//proceduremode
 
 //TODO make sure start and length work like REVELATION and HANDLE NEGATIVE LENGTH!
@@ -896,12 +896,12 @@ var& var::splicer(const int start1, const var& newstr)
 	if (start1>0) start1b=start1;
 	else if (start1<0)
     {
-        start1b=int(var_mvstr.length())+start1+1;
+        start1b=int(var_str.length())+start1+1;
         if (start1b<1) start1b=1;
     }
 	else start1b=1;
 
-	var_mvstr.replace(start1b-1,var_mvstr.length(),newstr.var_mvstr);
+	var_str.replace(start1b-1,var_str.length(),newstr.var_str);
 
 	return *this;
 
@@ -914,14 +914,14 @@ var& var::transfer(var& var2)
 	THISISDEFINED()
 	ISDEFINED(var2)
 
-	var_mvstr.swap(var2.var_mvstr);
-	var2.var_mvtyp=var_mvtyp;
-	var2.var_mvint=var_mvint;
-	var2.var_mvdbl=var_mvdbl;
+	var_str.swap(var2.var_str);
+	var2.var_typ=var_typ;
+	var2.var_int=var_int;
+	var2.var_dbl=var_dbl;
 
-	var_mvstr=L"";
-	var_mvint=0;
-	var_mvtyp=pimpl::MVTYPE_INTSTR;
+	var_str=L"";
+	var_int=0;
+	var_typ=pimpl::VARTYP_INTSTR;
 
 	return var2;
 }
@@ -933,10 +933,10 @@ var& var::clone(var& var2)
 	THISISDEFINED()
 	ISDEFINED(var2)
 
-	var_mvtyp=var2.var_mvtyp;
-	var_mvstr=var2.var_mvstr;
-	var_mvint=var2.var_mvint;
-	var_mvdbl=var2.var_mvdbl;
+	var_typ=var2.var_typ;
+	var_str=var2.var_str;
+	var_int=var2.var_int;
+	var_dbl=var2.var_dbl;
 
 	return var2;
 }
@@ -950,22 +950,22 @@ const var& var::exchange(const var& var2) const
 	ISDEFINED(var2)
 
 	//intermediary copies of var2
-	int mvtypex=var2.var_mvtyp;
-	mvint_t mvintx=var2.var_mvint;
-	double mvdblx=var2.var_mvdbl;
+	int mvtypex=var2.var_typ;
+	mvint_t mvintx=var2.var_int;
+	double mvdblx=var2.var_dbl;
 
 	//do string first since it is the largest and most likely to fail
-	var_mvstr.swap(var2.var_mvstr);
+	var_str.swap(var2.var_str);
 
 	//copy mv to var2
-	var2.var_mvtyp=var_mvtyp;
-	var2.var_mvint=var_mvint;
-	var2.var_mvdbl=var_mvdbl;
+	var2.var_typ=var_typ;
+	var2.var_int=var_int;
+	var2.var_dbl=var_dbl;
 
 	//copy intermediaries to mv
-	var_mvtyp=mvtypex;
-	var_mvint=mvintx;
-	var_mvdbl=mvdblx;
+	var_typ=mvtypex;
+	var_int=mvintx;
+	var_dbl=mvdblx;
 
 	return var2;
 }
@@ -979,12 +979,12 @@ var var::str(const int num) const
 	if (num<0)
 		return newstr;
 
-	int basestrlen=int(var_mvstr.length());
+	int basestrlen=int(var_str.length());
 	if (basestrlen==1)
-		newstr.var_mvstr.resize(num,var_mvstr.at(0));
+		newstr.var_str.resize(num,var_str.at(0));
 	else if (basestrlen)
 		for (int ii=num;ii>0;--ii)
-			newstr^=var_mvstr;
+			newstr^=var_str;
 
 	return newstr;
 }
@@ -997,7 +997,7 @@ var var::space() const
 	var newstr=L"";
 	int nspaces=(*this).round().toInt();
 	if (nspaces>0)
-		newstr.var_mvstr.resize(nspaces,L' ');
+		newstr.var_str.resize(nspaces,L' ');
 
 	return newstr;
 }
@@ -1046,8 +1046,8 @@ var& var::cropper()
 
 	std::wstring newstr=L"";
 
-	std::wstring::reverse_iterator iter=var_mvstr.rbegin();
-	std::wstring::reverse_iterator iterend=var_mvstr.rend();
+	std::wstring::reverse_iterator iter=var_str.rbegin();
+	std::wstring::reverse_iterator iterend=var_str.rend();
 
 	//move the REVERSE iterator backwards to the first non-field character
 	int ntrailing2trim=0;
@@ -1060,7 +1060,7 @@ var& var::cropper()
 	//all separator characters - return empty string
 	if (iter == iterend)
 	{
-		var_mvstr=newstr;
+		var_str=newstr;
 		return *this;
 	}
 
@@ -1102,17 +1102,17 @@ cropperexit:
 	{
 		std::wstring::reverse_iterator newiter=newstr.rbegin();
 		std::wstring::reverse_iterator newiterend=newstr.rend();
-		std::wstring::iterator olditer=var_mvstr.begin();
+		std::wstring::iterator olditer=var_str.begin();
 
 		while (newiter!=newiterend)
 			(*olditer++)=(*newiter++);
 
-		var_mvstr.erase(newstr.length(),ncropped);
+		var_str.erase(newstr.length(),ncropped);
 
 	}
 
 	if (ntrailing2trim)
-		var_mvstr.erase(var_mvstr.length()-ntrailing2trim);
+		var_str.erase(var_str.length()-ntrailing2trim);
 
 	return *this;
 }
@@ -1176,17 +1176,17 @@ var& var::converter(const var& oldchars,const var& newchars)
 	while (true)
 	{
 		//locate (backwards) any of the from characters
-		pos=var_mvstr.find_last_of(oldchars.var_mvstr,pos);
+		pos=var_str.find_last_of(oldchars.var_str,pos);
 
 		if (pos==std::wstring::npos) break;
 
 		//find which from character we have found
-		int fromcharn=int(oldchars.var_mvstr.find(var_mvstr[pos]));
+		int fromcharn=int(oldchars.var_str.find(var_str[pos]));
 
-		if (fromcharn<int(newchars.var_mvstr.length()))
-		 var_mvstr.replace(pos,1,newchars.var_mvstr.substr(fromcharn,1));
+		if (fromcharn<int(newchars.var_str.length()))
+		 var_str.replace(pos,1,newchars.var_str.substr(fromcharn,1));
 		else
-		 var_mvstr.erase(pos,1);
+		 var_str.erase(pos,1);
 
 		if (pos==0) break;
 		pos--;
@@ -1222,16 +1222,16 @@ bool var::isnum(void) const
 	THISISDEFINED()
 
 	//is numeric already
-	if (var_mvtyp&pimpl::MVTYPE_INTDBL)
+	if (var_typ&pimpl::VARTYP_INTDBL)
 		return true;
 
 	//is known not numeric already
 	//maybe put this first if comparison operations on strings are more frequent than numeric operations on numbers
-	if (var_mvtyp&pimpl::MVTYPE_NAN)
+	if (var_typ&pimpl::VARTYP_NAN)
 		return false;
 
 	//not assigned error
-	if (!var_mvtyp)
+	if (!var_typ)
 		throw MVUnassigned(L"isnum()");
 
 	//if not a number and not unassigned then it is an unknown string
@@ -1247,15 +1247,15 @@ bool var::isnum(void) const
 
 	// Suggestion: statistically, non numeric strings are postfixed by numbers but not prefixed.
 	// Example, natural names for DB tables are CUSTOMERS1 and REPORT2009, but not 1CUSTOMER and 2009REPORT
-//	for (int ii=(int)var_mvstr.length()-1;ii>=0;--ii)
-	for (int ii=0; ii < (int)var_mvstr.length(); ii++)
+//	for (int ii=(int)var_str.length()-1;ii>=0;--ii)
+	for (int ii=0; ii < (int)var_str.length(); ii++)
 	{
-		wchar_t cc=var_mvstr[ii];
+		wchar_t cc=var_str[ii];
 		// + 2B		- 2D
 		// . 2E		number 30-39
 		if (cc > '9')		// for sure not a number
 		{
-			var_mvtyp=pimpl::MVTYPE_NANSTR;
+			var_typ=pimpl::VARTYP_NANSTR;
 			return false;
 		}
 		if (cc >= '0')
@@ -1269,7 +1269,7 @@ bool var::isnum(void) const
 				case L'.':
 					if (point)	// 2nd point - is non-numeric
 					{
-						var_mvtyp=pimpl::MVTYPE_NANSTR;
+						var_typ=pimpl::VARTYP_NANSTR;
 						return false;
 					}
 					point=true;
@@ -1280,14 +1280,14 @@ bool var::isnum(void) const
 					//non-numeric if +/- is not the first character or is the only character
 					if (ii)
 					{
-						var_mvtyp=pimpl::MVTYPE_NANSTR;
+						var_typ=pimpl::VARTYP_NANSTR;
 						return false;
 					}
 					break;
 
 				//any other character mean non-numeric
 				default:
-					var_mvtyp=pimpl::MVTYPE_NANSTR;
+					var_typ=pimpl::VARTYP_NANSTR;
 					return false;
 			}
 		}
@@ -1308,24 +1308,24 @@ bool var::isnum(void) const
 	if (!digit)
 	{
 		//must be at least one digit unless zero length string
-		if (var_mvstr.length())
+		if (var_str.length())
 		// goto nan;
 		{
-			var_mvtyp=pimpl::MVTYPE_NANSTR;
+			var_typ=pimpl::VARTYP_NANSTR;
 			return false;
 		}
 
 		//zero length string is integer 0
-		var_mvint=0;
-		var_mvtyp=pimpl::MVTYPE_INTSTR;
+		var_int=0;
+		var_typ=pimpl::VARTYP_INTSTR;
 		return true;
 	}
 
 	//get and save the number as int or double
 	if (point)
 	{
-		//var_mvdbl=_wtof(var_mvstr.c_str());
-		//var_mvdbl=_wtof(var_mvstr.c_str());
+		//var_dbl=_wtof(var_str.c_str());
+		//var_dbl=_wtof(var_str.c_str());
 		//TODO optimise with code based on the following idea?
 		/*
 		union switchitup
@@ -1340,21 +1340,21 @@ bool var::isnum(void) const
 		// http://www.globalyzer.com/gi/help/gihelp/unsafeMethod/atof.htm :
 		// "... _wtof is supported only on Windows platforms"
 		// "... Recommended Replacements: ANSI UTF-16 wcstod"
-///		std::string result(var_mvstr.begin(),var_mvstr.end());
-///		var_mvdbl=atof(result.c_str());
-		var_mvdbl=wcstod(var_mvstr.c_str(), 0);
-		var_mvtyp=pimpl::MVTYPE_DBLSTR;
+///		std::string result(var_str.begin(),var_str.end());
+///		var_dbl=atof(result.c_str());
+		var_dbl=wcstod(var_str.c_str(), 0);
+		var_typ=pimpl::VARTYP_DBLSTR;
 	}
 	else
 	{
-		//var_mvint=_wtoi(var_mvstr.c_str());
+		//var_int=_wtoi(var_str.c_str());
 		//TODO optimise
 
 		//change from
-///		std::string result(var_mvstr.begin(),var_mvstr.end());
-///		var_mvint=atoi(result.c_str());
-		var_mvint=wcstol(var_mvstr.c_str(), 0, 10);
-		var_mvtyp=pimpl::MVTYPE_INTSTR;
+///		std::string result(var_str.begin(),var_str.end());
+///		var_int=atoi(result.c_str());
+		var_int=wcstol(var_str.c_str(), 0, 10);
+		var_typ=pimpl::VARTYP_INTSTR;
 	}
 	//indicate isNumeric
 	return true;
@@ -1369,16 +1369,16 @@ bool var::isnum_old(void) const
 	THISISDEFINED()
 
 	//is numeric already
-	if (var_mvtyp&pimpl::MVTYPE_INTDBL)
+	if (var_typ&pimpl::VARTYP_INTDBL)
 		return true;
 
 	//is known not numeric already
 	//maybe put this first if comparison operations on strings are more frequent than numeric operations on numbers
-	if (var_mvtyp&pimpl::MVTYPE_NAN)
+	if (var_typ&pimpl::VARTYP_NAN)
 		return false;
 
 	//not assigned error
-	if (!var_mvtyp)
+	if (!var_typ)
 		throw MVUnassigned(L"isnum()");
 
 	//if not a number and not unassigned then it is an unknown string
@@ -1391,10 +1391,10 @@ bool var::isnum_old(void) const
 	//NB going backwards - for speed?
 	//TODO: check if going backwards is slow for variable width multi-byte character strings
 	//and replace with forward scanning
-	for (int ii=(int)var_mvstr.length()-1;ii>=0;--ii)
+	for (int ii=(int)var_str.length()-1;ii>=0;--ii)
 	{
 
-		wchar_t cc=var_mvstr[ii];
+		wchar_t cc=var_str[ii];
 
 		//check > 9 first on guess that non-numeric string characters will be after '9'
 		//to evade the || < '0' test as well
@@ -1423,14 +1423,14 @@ bool var::isnum_old(void) const
 					//if (ii) goto nan;
 					if (ii)
 					{
-						var_mvtyp=pimpl::MVTYPE_NANSTR;
+						var_typ=pimpl::VARTYP_NANSTR;
 						return false;
 					}
 					break;
 
 				//any other character mean non-numeric
 				default:
-					var_mvtyp=pimpl::MVTYPE_NANSTR;
+					var_typ=pimpl::VARTYP_NANSTR;
 					return false;
 			}
 		}
@@ -1453,16 +1453,16 @@ bool var::isnum_old(void) const
 	if (!digit)
 	{
 		//must be at least one digit unless zero length string
-		if (var_mvstr.length())
+		if (var_str.length())
 		// goto nan;
 		{
-			var_mvtyp=pimpl::MVTYPE_NANSTR;
+			var_typ=pimpl::VARTYP_NANSTR;
 			return false;
 		}
 
 		//zero length string is integer 0
-		var_mvint=0;
-		var_mvtyp=pimpl::MVTYPE_INTSTR;
+		var_int=0;
+		var_typ=pimpl::VARTYP_INTSTR;
 		return true;
 
 	}
@@ -1470,8 +1470,8 @@ bool var::isnum_old(void) const
 	//get and save the number as int or double
 	if (point)
 	{
-		//var_mvdbl=_wtof(var_mvstr.c_str());
-		//var_mvdbl=_wtof(var_mvstr.c_str());
+		//var_dbl=_wtof(var_str.c_str());
+		//var_dbl=_wtof(var_str.c_str());
 		//TODO optimise with code based on the following idea?
 
 		//union switchitup
@@ -1482,27 +1482,27 @@ bool var::isnum_old(void) const
 		//abcd.bigletter=0x0035;
 		//std::cout<<atoi(abcd.smalletters)<<std::endl;
 
-		std::string result(var_mvstr.begin(),var_mvstr.end());
-		var_mvdbl=atof(result.c_str());
-		var_mvtyp=pimpl::MVTYPE_DBLSTR;
+		std::string result(var_str.begin(),var_str.end());
+		var_dbl=atof(result.c_str());
+		var_typ=pimpl::VARTYP_DBLSTR;
 	}
 	else		//ALN:TODO: long int wcstol (const wchar_t *restrict string, wchar_t **restrict tailptr, int base)
 	{			//ALN:TODO: ... should be OK here
 
-		//var_mvint=_wtoi(var_mvstr.c_str());
+		//var_int=_wtoi(var_str.c_str());
 		//TODO optimise
 
 		//change from
-		std::string result(var_mvstr.begin(),var_mvstr.end());
-		var_mvint=atoi(result.c_str());
+		std::string result(var_str.begin(),var_str.end());
+		var_int=atoi(result.c_str());
 
 		//change to something like this? //ALN:TODO: finish and test !
 
 		//wchar_t * err_char;
-		//var_mvint=wcstol(result.c_str(), & err_char, 10);
+		//var_int=wcstol(result.c_str(), & err_char, 10);
 		//if (
 
-		var_mvtyp=pimpl::MVTYPE_INTSTR;
+		var_typ=pimpl::VARTYP_INTSTR;
 	}
 
 	//indicate isNumeric
@@ -1649,7 +1649,7 @@ var var::dcount(const var& substrx) const
 	THISISSTRING()
 	ISSTRING(substrx)
 
-	if (var_mvstr.length()==0)
+	if (var_str.length()==0)
 		return 0;
 
 	return count(substrx)+1;
@@ -1667,7 +1667,7 @@ var var::count(const var& substrx) const
 	THISISSTRING()
 	ISSTRING(substrx)
 
-	std::wstring substr=substrx.var_mvstr;
+	std::wstring substr=substrx.var_str;
 	if (substr==L"")
 		return 0;
 
@@ -1676,7 +1676,7 @@ var var::count(const var& substrx) const
 	int fieldno=0;
 	while (true)
 	{
-		start_pos=var_mvstr.find(substr,start_pos);
+		start_pos=var_str.find(substr,start_pos);
 		//past of of string?
 		if (start_pos==std::wstring::npos)
 			return fieldno;
@@ -1696,7 +1696,7 @@ var var::count(const wchar_t charx) const
 	int fieldno=0;
 	while (true)
 	{
-		start_pos=var_mvstr.find_first_of(charx, start_pos);
+		start_pos=var_str.find_first_of(charx, start_pos);
 		//past of of string?
 		if (start_pos==std::wstring::npos)
 			return fieldno;
@@ -1713,13 +1713,13 @@ var var::index2(const var& substrx,const int startchar1) const
 	ISSTRING(substrx)
 
 	//convert to a string for .find
-	std::wstring substr=substrx.var_mvstr;
+	std::wstring substr=substrx.var_str;
 	if (substr==L"")
 		return var(0);
 
 	//find the starting position of the field or return L""
 	std::wstring::size_type start_pos=startchar1-1;
-	start_pos=var_mvstr.find(substr,start_pos);
+	start_pos=var_str.find(substr,start_pos);
 
 	//past of of string?
 	if (start_pos==std::wstring::npos) return var(0);
@@ -1735,7 +1735,7 @@ var var::index(const var& substrx,const int occurrenceno) const
 	ISSTRING(substrx)
 
 	//convert to a string for .find
-	std::wstring substr=substrx.var_mvstr;
+	std::wstring substr=substrx.var_str;
 	if (substr==L"")
 		return var(0);
 
@@ -1748,7 +1748,7 @@ var var::index(const var& substrx,const int occurrenceno) const
 	{
 
 		//find the starting position of the field or return L""
-		start_pos=var_mvstr.find(substr,start_pos);
+		start_pos=var_str.find(substr,start_pos);
 
 		//past of of string?
 		if (start_pos==std::wstring::npos)
@@ -1850,17 +1850,17 @@ var var::abs() const
 	THISIS(L"var var::abs() const")
 	THISISNUMERIC()
 
-	if (var_mvtyp&pimpl::MVTYPE_INT)
+	if (var_typ&pimpl::VARTYP_INT)
 	{
-		if (var_mvint<0) return -var_mvint;
-		return var_mvint;
+		if (var_int<0) return -var_int;
+		return var_int;
 	}
-	if (var_mvtyp&pimpl::MVTYPE_DBL)
+	if (var_typ&pimpl::VARTYP_DBL)
 	{
-		if (var_mvdbl<0) return -var_mvdbl;
-		return std::floor(var_mvdbl);
+		if (var_dbl<0) return -var_dbl;
+		return std::floor(var_dbl);
 	}
-	throw MVException(L"abs(unknown mvtype=" ^ var(var_mvtyp) ^ L")");
+	throw MVException(L"abs(unknown mvtype=" ^ var(var_typ) ^ L")");
 }
 
 var var::mod(const var& divisor) const
@@ -1869,55 +1869,55 @@ var var::mod(const var& divisor) const
 	THISISNUMERIC()
 	ISNUMERIC(divisor)
 
-	if (var_mvtyp&pimpl::MVTYPE_INT)
+	if (var_typ&pimpl::VARTYP_INT)
 	{
-		if (divisor.var_mvtyp&pimpl::MVTYPE_INT)
+		if (divisor.var_typ&pimpl::VARTYP_INT)
 		{
-			if ((var_mvint<0 && divisor.var_mvint>=0) || (divisor.var_mvint<0 && var_mvint>=0))
+			if ((var_int<0 && divisor.var_int>=0) || (divisor.var_int<0 && var_int>=0))
 				//multivalue version of mod
-				return (var_mvint%divisor.var_mvint)+divisor.var_mvint;
+				return (var_int%divisor.var_int)+divisor.var_int;
 			else
-				return var_mvint%divisor.var_mvint;
+				return var_int%divisor.var_int;
 		}
 		else
 		{
 
-			var_mvdbl=double(var_mvint);
+			var_dbl=double(var_int);
 			//following would cache the double value but is it worth it?
-			//var_mvtyp=var_mvtyp&pimpl::MVTYPE_DBL;
+			//var_typ=var_typ&pimpl::VARTYP_DBL;
 
-			if ((var_mvint<0 && divisor.var_mvdbl>=0) || (divisor.var_mvdbl<0 && var_mvint>=0))
+			if ((var_int<0 && divisor.var_dbl>=0) || (divisor.var_dbl<0 && var_int>=0))
 				//multivalue version of mod
-				return fmod(var_mvdbl,divisor.var_mvdbl)+divisor.var_mvdbl;
+				return fmod(var_dbl,divisor.var_dbl)+divisor.var_dbl;
 			else
-				return fmod(var_mvdbl,divisor.var_mvdbl);
+				return fmod(var_dbl,divisor.var_dbl);
 		}
 	}
 	else
 	{
-		if (divisor.var_mvtyp&pimpl::MVTYPE_INT)
+		if (divisor.var_typ&pimpl::VARTYP_INT)
 		{
-			divisor.var_mvdbl=double(divisor.var_mvint);
+			divisor.var_dbl=double(divisor.var_int);
 			//following would cache the double value but is it worth it?
-			//divisor.var_mvtyp=divisor.var_mvtyp&pimpl::MVTYPE_DBL;
+			//divisor.var_typ=divisor.var_typ&pimpl::VARTYP_DBL;
 
-			if ((var_mvdbl<0 && divisor.var_mvint>=0) || (divisor.var_mvint<0 && var_mvdbl>=0))
+			if ((var_dbl<0 && divisor.var_int>=0) || (divisor.var_int<0 && var_dbl>=0))
 				//multivalue version of mod
-				return fmod(var_mvdbl,divisor.var_mvdbl)+divisor.var_mvdbl;
+				return fmod(var_dbl,divisor.var_dbl)+divisor.var_dbl;
 			else
-				return fmod(var_mvdbl,divisor.var_mvdbl);
+				return fmod(var_dbl,divisor.var_dbl);
 		}
 		else
 		{
-			//return fmod(double(var_mvint),divisor.var_mvdbl);
-			if ((var_mvdbl<0 && divisor.var_mvdbl>=0) || (divisor.var_mvdbl<0 && var_mvdbl>=0))
+			//return fmod(double(var_int),divisor.var_dbl);
+			if ((var_dbl<0 && divisor.var_dbl>=0) || (divisor.var_dbl<0 && var_dbl>=0))
 				//multivalue version of mod
-				return fmod(var_mvdbl,divisor.var_mvdbl)+divisor.var_mvdbl;
+				return fmod(var_dbl,divisor.var_dbl)+divisor.var_dbl;
 			else
-				return fmod(var_mvdbl,divisor.var_mvdbl);
+				return fmod(var_dbl,divisor.var_dbl);
 		}
 	}
-	//throw MVException(L"abs(unknown mvtype=" ^ var(var_mvtyp) ^ L")");
+	//throw MVException(L"abs(unknown mvtype=" ^ var(var_typ) ^ L")");
 }
 
 var var::mod(const int divisor) const
@@ -1925,26 +1925,26 @@ var var::mod(const int divisor) const
 	THISIS(L"var var::mod(const int divisor) const")
 	THISISNUMERIC()
 
-	if (var_mvtyp&pimpl::MVTYPE_INT)
+	if (var_typ&pimpl::VARTYP_INT)
 	{
-			if ((var_mvint<0 && divisor>=0) || (divisor<0 && var_mvint>=0))
+			if ((var_int<0 && divisor>=0) || (divisor<0 && var_int>=0))
 				//multivalue version of mod
-				return (var_mvint%divisor)+divisor;
+				return (var_int%divisor)+divisor;
 			else
-				return var_mvint%divisor;
+				return var_int%divisor;
 	}
 	else
 	{
-			if ((var_mvdbl<0 && divisor>=0) || (divisor<0 && var_mvdbl>=0))
+			if ((var_dbl<0 && divisor>=0) || (divisor<0 && var_dbl>=0))
 			{
 				//multivalue version of mod
 				double divisor2=double(divisor);
-				return fmod(var_mvdbl,divisor2)+divisor2;
+				return fmod(var_dbl,divisor2)+divisor2;
 			}
 			else
-				return fmod(var_mvdbl,double(divisor));
+				return fmod(var_dbl,double(divisor));
 	}
-	//throw MVException(L"abs(unknown mvtype=" ^ var(var_mvtyp) ^ L")");
+	//throw MVException(L"abs(unknown mvtype=" ^ var(var_typ) ^ L")");
 }
 
 /*
@@ -1957,13 +1957,13 @@ var var::sin() const
 	THISIS(L"var var::sin() const")
 	THISISNUMERIC()
 
-	if (var_mvtyp&pimpl::MVTYPE_DBL)
-		return std::sin(var_mvdbl*M_PI/180);
+	if (var_typ&pimpl::VARTYP_DBL)
+		return std::sin(var_dbl*M_PI/180);
 
-//	if (var_mvtyp&pimpl::MVTYPE_INT)
-		return std::sin(double(var_mvint)*M_PI/180);
+//	if (var_typ&pimpl::VARTYP_INT)
+		return std::sin(double(var_int)*M_PI/180);
 
-	throw MVException(L"sin(unknown mvtype=" ^ var(var_mvtyp) ^ L")");
+	throw MVException(L"sin(unknown mvtype=" ^ var(var_typ) ^ L")");
 }
 
 var var::cos() const
@@ -1971,13 +1971,13 @@ var var::cos() const
 	THISIS(L"var var::cos() const")
 	THISISNUMERIC()
 
-	if (var_mvtyp&pimpl::MVTYPE_DBL)
-		return std::cos(var_mvdbl*M_PI/180);
+	if (var_typ&pimpl::VARTYP_DBL)
+		return std::cos(var_dbl*M_PI/180);
 
-//	if (var_mvtyp&pimpl::MVTYPE_INT)
-		return std::cos(double(var_mvint)*M_PI/180);
+//	if (var_typ&pimpl::VARTYP_INT)
+		return std::cos(double(var_int)*M_PI/180);
 
-	throw MVException(L"cos(unknown mvtype=" ^ var(var_mvtyp) ^ L")");
+	throw MVException(L"cos(unknown mvtype=" ^ var(var_typ) ^ L")");
 }
 
 var var::tan() const
@@ -1985,13 +1985,13 @@ var var::tan() const
 	THISIS(L"var var::tan() const")
 	THISISNUMERIC()
 
-	if (var_mvtyp&pimpl::MVTYPE_DBL)
-		return std::tan(var_mvdbl*M_PI/180);
+	if (var_typ&pimpl::VARTYP_DBL)
+		return std::tan(var_dbl*M_PI/180);
 
-//	if (var_mvtyp&pimpl::MVTYPE_INT)
-		return std::tan(double(var_mvint)*M_PI/180);
+//	if (var_typ&pimpl::VARTYP_INT)
+		return std::tan(double(var_int)*M_PI/180);
 
-	throw MVException(L"tan(unknown mvtype=" ^ var(var_mvtyp) ^ L")");
+	throw MVException(L"tan(unknown mvtype=" ^ var(var_typ) ^ L")");
 }
 
 var var::atan() const
@@ -1999,13 +1999,13 @@ var var::atan() const
 	THISIS(L"var var::atan() const")
 	THISISNUMERIC()
 
-	if (var_mvtyp&pimpl::MVTYPE_DBL)
-		return std::atan(var_mvdbl)/M_PI*180;
+	if (var_typ&pimpl::VARTYP_DBL)
+		return std::atan(var_dbl)/M_PI*180;
 
-//	if (var_mvtyp&pimpl::MVTYPE_INT)
-		return std::atan(double(var_mvint))/M_PI*180;
+//	if (var_typ&pimpl::VARTYP_INT)
+		return std::atan(double(var_int))/M_PI*180;
 
-	throw MVException(L"sin(unknown mvtype=" ^ var(var_mvtyp) ^ L")");
+	throw MVException(L"sin(unknown mvtype=" ^ var(var_typ) ^ L")");
 }
 
 var var::loge() const
@@ -2013,13 +2013,13 @@ var var::loge() const
 	THISIS(L"var var::loge() const")
 	THISISNUMERIC()
 
-	if (var_mvtyp&pimpl::MVTYPE_DBL)
-		return std::log(var_mvdbl);
+	if (var_typ&pimpl::VARTYP_DBL)
+		return std::log(var_dbl);
 
-//	if (var_mvtyp&pimpl::MVTYPE_INT)
-		return std::log(double(var_mvint));
+//	if (var_typ&pimpl::VARTYP_INT)
+		return std::log(double(var_int));
 
-	throw MVException(L"loge(unknown mvtype=" ^ var(var_mvtyp) ^ L")");
+	throw MVException(L"loge(unknown mvtype=" ^ var(var_typ) ^ L")");
 }
 
 var var::sqrt() const
@@ -2027,13 +2027,13 @@ var var::sqrt() const
 	THISIS(L"var var::sqrt() const")
 	THISISNUMERIC()
 
-	if (var_mvtyp&pimpl::MVTYPE_DBL)
-		return std::sqrt(var_mvdbl);
+	if (var_typ&pimpl::VARTYP_DBL)
+		return std::sqrt(var_dbl);
 
-//	if (var_mvtyp&pimpl::MVTYPE_INT)
-		return std::sqrt(double(var_mvint));
+//	if (var_typ&pimpl::VARTYP_INT)
+		return std::sqrt(double(var_int));
 
-	throw MVException(L"sqrt(unknown mvtype=" ^ var(var_mvtyp) ^ L")");
+	throw MVException(L"sqrt(unknown mvtype=" ^ var(var_typ) ^ L")");
 }
 
 var var::pwr(const var& exponent) const
@@ -2042,13 +2042,13 @@ var var::pwr(const var& exponent) const
 	THISISNUMERIC()
 	ISNUMERIC(exponent)
 
-	if (var_mvtyp&pimpl::MVTYPE_DBL)
-		return std::pow(var_mvdbl,exponent.toDouble());
+	if (var_typ&pimpl::VARTYP_DBL)
+		return std::pow(var_dbl,exponent.toDouble());
 
-//	if (var_mvtyp&pimpl::MVTYPE_INT)
-		return std::pow(double(var_mvint),exponent.toDouble());
+//	if (var_typ&pimpl::VARTYP_INT)
+		return std::pow(double(var_int),exponent.toDouble());
 
-	throw MVException(L"pow(unknown mvtype=" ^ var(var_mvtyp) ^ L")");
+	throw MVException(L"pow(unknown mvtype=" ^ var(var_typ) ^ L")");
 }
 
 var var::exp() const
@@ -2056,13 +2056,13 @@ var var::exp() const
 	THISIS(L"var var::exp() const")
 	THISISNUMERIC()
 
-	if (var_mvtyp&pimpl::MVTYPE_DBL)
-		return std::exp(var_mvdbl);
+	if (var_typ&pimpl::VARTYP_DBL)
+		return std::exp(var_dbl);
 
-//	if (var_mvtyp&pimpl::MVTYPE_INT)
-		return std::exp(double(var_mvint));
+//	if (var_typ&pimpl::VARTYP_INT)
+		return std::exp(double(var_int));
 
-	throw MVException(L"exp(unknown mvtype=" ^ var(var_mvtyp) ^ L")");
+	throw MVException(L"exp(unknown mvtype=" ^ var(var_typ) ^ L")");
 }
 
 var var::at(const int column) const
@@ -2190,7 +2190,7 @@ var var::xlate(const var& filename,const var& fieldno, const var& mode) const
 	THISIS(L"var var::xlate(const var& filename,const var& fieldno, const var& mode) const")
 	ISSTRING(mode)
 
-	return xlate(filename,fieldno,mode.var_mvstr.c_str());
+	return xlate(filename,fieldno,mode.var_str.c_str());
 }
 
 //TODO provide a version with int fieldno to handle the most frequent case

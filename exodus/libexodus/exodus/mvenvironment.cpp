@@ -96,7 +96,7 @@ bool MvEnvironment::init(const int threadno) {
 	this->FILES = L"";
 
 	//per configuration
-	this->DEFINITIONS = L"";
+	this->DEFINITIONS = L"definitions";
 	this->SYSTEM = L"";
 	this->SECURITY = L"";
 

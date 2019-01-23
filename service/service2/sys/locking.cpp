@@ -38,7 +38,7 @@ function main(in mode, in lockfilename, in lockkey, in lockdesc0, io locklist, i
 
 	var interactive = not SYSTEM.a(33);
 
-	if (0 and (USERNAME == "NEOSYS")) {
+	if (var(0) and (USERNAME == "NEOSYS")) {
 		printl(mode, " ", lockfilename, " ", lockkey, " ", locklist);
 		xx.input();
 	}

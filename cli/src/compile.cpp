@@ -21,6 +21,7 @@ var verbose;
 var silent;
 var debugging;
 var optimise;
+var generateheadersonly;
 var posix;
 var windows;
 
@@ -40,12 +41,13 @@ function main()
 	debugging=not index(OPTIONS.ucase(),"R");//no symbols for backtrace
 	//the backtrace seems to work fine with release mode at least in vs2005
 	optimise=index(OPTIONS.ucase(),"O");//prevents backtrace
+	generateheadersonly=index(OPTIONS.ucase(),"H");//prevents backtrace
 
 	//extract filenames
 	var filenames=field(command,FM,2,999999999);
 	var nfiles=dcount(filenames,FM);
 	if (not filenames)
-		abort("Syntax is compile filename ... {options}\nOptions are R=Release O=Optimise V=Verbose");
+		abort("Syntax is compile filename ... {options}\nOptions are R=Release (No symbols), O=Optimise (No back trace/debugging), V=Verbose, S=Silent, H=Generate headers only");
 
 	//source extensions
 	var src_extensions="cpp cxx cc";
@@ -453,12 +455,37 @@ function main()
 			print("sourcefilename=");
 		if (not silent)
 			printl(srcfilename);
-		if (not text and not text.osread(srcfilename, "utf8")) {
-			if (osfile(srcfilename)) {
-				srcfilename.errputl("Cant read/convert srcfile:");
-				errputl(" Encoding issue? non-utf8/ascii characters?) in ");
-			} else
-				srcfilename.errputl("srcfile doesnt exist: ");
+
+		if (not osfile(srcfilename)) {
+			srcfilename.errputl("srcfile doesnt exist: ");
+			continue;
+		}
+
+		var alllocales="utf8 en_US.iso88591 en_GB.iso88591";
+		var locales="";
+		var nlocales=dcount(alllocales," ");
+		var locale;
+		var origlocale=getxlocale();
+		for (var localen=1;localen<=nlocales;localen++) {
+
+			//check all but utf8 and skip those not existing
+			//use dpkg-reconfigure locales to get more
+			locale=alllocales.field(" ",localen);
+			if (locale ne "utf8") {
+				if (not setxlocale(locale))
+					continue;
+				setxlocale(origlocale);
+			}
+
+			locales^=" " ^ locale;
+
+			if (text.osread(srcfilename, locale))
+				break;
+		}
+		if (not text) {
+			srcfilename.errput("Cant read/convert srcfile:");
+			errputl(" Encoding issue? unusual characters? - tried " ^ locales);
+			errputl("Use 'dpkg-reconfigure locale' to get more");
 			continue;
 		}
 
@@ -761,13 +788,29 @@ var inclusion=
 
 			if (verbose)
 				print("header file "^headerfilename^" ");
-			if (osread(headerfilename) ne headertext) {
-				oswrite(headertext,headerfilename);
-				if (verbose)
+
+			//check if changed
+			var headertext2;
+			osread(headertext2,headerfilename,locale);
+			if (headertext2 ne headertext) {
+
+				//over/write if changed
+				oswrite(headertext,headerfilename,locale);
+
+				//verify written ok
+				osread(headertext2,headerfilename,locale);
+				if (headertext2 ne headertext)
+					printl("Could not accurately update " ^ headerfilename ^ " locale " ^ locale);
+				else if (verbose)
 					printl("generated or updated.");
+
 			} else if (verbose)
 					printl("already generated and is up to date.");
 		}
+
+		//skip compilation if generateheadersonly option
+		if (generateheadersonly)
+			continue;
 
 #if EXODUS_EXPORT_USING_DEF
 		//add .def file to linker so that functions get exported without "c++ name decoration"
@@ -831,7 +874,8 @@ var inclusion=
 		///////////////////
 		if (verbose)
 			printl(compilecmd);
-		osshell(compilecmd);
+		if (osshell(compilecmd))
+			stop();
 
 		//handle compiler output
 		var compileroutput;

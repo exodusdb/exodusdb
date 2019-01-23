@@ -1,28 +1,32 @@
 #include <exodus/library.h>
 libraryinit()
 
+#include <sysmsg.h>
 #include <initcompany.h>
+#include <updvoucher.h>
 #include <addcent.h>
 #include <updalloc.h>
-#include <updvoucher.h>
 #include <updvoucher2.h>
 #include <nextkey.h>
 #include <split.h>
-#include <sysmsg.h>
 #include <giveway.h>
 #include <updindex.h>
 #include <updbalances.h>
+#include <authorised.h>
 
 #include <fin.h>
 #include <gen.h>
 
 var ncompanies;//num
+var othercompanycode;
 var mindigits;
 var prefix;
 var vtypen;
 var vtypeserialno;//num
+var lastno;//num
 var internalvouchertype;
 var balanceperiod;//num
+var cursor;
 var baseamount;//num
 var amount;//num
 var currencycode;
@@ -33,50 +37,26 @@ var account2flag;//num
 var analrec;
 var tt;//num
 var accname;
-//var noncurrency;//num
-var prevnoncurrency;
-var netamount;
+var msg;
+var noncurrency;//num
+var netbaseamount;//num
 var taxcurr;
 var controlamount;
-var transferaccount;
 var vn;//num
+var otherintercompanyacc;
+var intercompanyacc;
 var curr;
 var svn;
 var rate;//num
 var base;//num
-var intercompanyacc;
-var otherintercompanyacc;
 var reqcurr;
+var othercompany;
 var fmt;
 var gainlossacno;
+var status;
 
-var deleting;
-var doctype;
-var origcompany;
-var year;
-var period;
-var voucherno;
-var vouchertype;
-var voucherdate;
-var yearperiod;
-var indexentrypart1;
-var updfollowing;
-var intercompany;
-var accs;
-var naccs;
-var nlns;
-var nlines;
-
-var companycodes;
-var mvoucher;
-var currs;
-var ncurrs;
-var unitcodes;
-var rates;
-var locks;
-
-function main(in mode0, io voucher, io vouchercode, io allocs) {
-
+function main(in mode, io voucher, io vouchercode, io allocs) {
+	//c fin in,io,io,io
 	//garbagecollect;
 	//y2k *NB if add multivalue fields don't forget to delete them at XXX
 
@@ -86,13 +66,13 @@ function main(in mode0, io voucher, io vouchercode, io allocs) {
 	//DELETE FOR AMEND same as above
 	//REALLOC the existing voucher may or may not need to be reposted
 	//DELETE FOR AMEND REALLOC any intercompany vouchers are not unposted/deleted
-	var mode = mode0;
 	var origmode = mode;
-	updfollowing = "";
+	var updfollowing = "";
 
 	//extract voucher type
-	vouchertype = vouchercode.field("*", 1);
+	var vouchertype = vouchercode.field("*", 1);
 
+	var locks;
 	if (not(locks.open("LOCKS", ""))) {
 		call sysmsg("CANNOT OPEN LOCKS IN UPD.VOUCHER");
 		locks = "";
@@ -104,17 +84,17 @@ function main(in mode0, io voucher, io vouchercode, io allocs) {
 	//current multivalued fields are:
 	// 3,5,8,10,11,17,19,20,23,24,30,34 in VOUCHER
 	// and 1,2,3 in ALLOCS
-	intercompany = mode.index("INTERCOMPANY", 1);
+	var intercompany = mode.index("INTERCOMPANY");
 	if (intercompany) {
 		mode.splicer(intercompany, 12, "");
 	}
 
 	//change to voucher company if different and save CURR.COMPANY
-	origcompany = fin.currcompany;
+	var origcompany = fin.currcompany;
 	var vouchercompany = vouchercode.field("*", 3);
 	if (fin.currcompany) {
 		if (vouchercompany) {
-			if (not(vouchercompany eq fin.currcompany)) {
+			if (not(vouchercompany == fin.currcompany)) {
 				//CURR.COMPANY=VOUCHER.COMPANY
 				call initcompany(vouchercompany);
 			}
@@ -134,35 +114,35 @@ function main(in mode0, io voucher, io vouchercode, io allocs) {
 
 	//voucher period/year (from voucher date if not specified)
 	//garbagecollect;
-	voucherdate = (voucher.a(2)).oconv("HEX");
-	yearperiod = voucher.a(16);
+	var voucherdate = voucher.a(2).oconv("HEX");
+	var yearperiod = voucher.a(16);
 	if (not yearperiod) {
 		yearperiod = voucherdate.oconv(gen.company.a(6));
 	}
-	period = yearperiod.substr(-2, 2);
-	year = yearperiod.substr(1, 2);
+	var period = yearperiod.substr(-2,2);
+	var year = yearperiod.substr(1,2);
 
 	//delete indexes and balances and mark as deleted
 	//(ZZZ cancelled vouchers should be left in the indexes
 	// and skipped by all reporting programs)
 	////////////////////////////////////////
-	if (mode.substr(1, 6) eq "DELETE") {
+	if (mode.substr(1,6) == "DELETE") {
 
 		//if voucher not provided then get from file
+		//IF VOUCHER ELSE READ VOUCHER FROM VOUCHERS,VOUCHER.CODE ELSE VOUCHER=''
 		if (not voucher) {
 			if (not(voucher.read(fin.vouchers, vouchercode))) {
-				return exit();
+				goto exit;
 			}
 		}
-		doctype = voucher.a(29);
+		var doctype = voucher.a(29);
 
 		//this should probably be after deleting any intercompany vouchers
 		//but since unposted voucher are not split into intercompany vouchers ATM
 		//then it doesnt matter ATM
 		if (voucher.a(7, 1) == "D") {
 			//call upd.voucher2('DELETE',voucher,voucher.code,allocs)
-
-			return exit();
+			goto exit;
 		}
 
 		voucher.r(7, 1, "D");
@@ -174,37 +154,35 @@ function main(in mode0, io voucher, io vouchercode, io allocs) {
 			if (othercompanies) {
 				ncompanies = othercompanies.count(VM) + 1;
 				for (var companyn = 1; companyn <= ncompanies; ++companyn) {
-					var othercompanycode = othercompanies.a(1, companyn);
+					othercompanycode = othercompanies.a(1, companyn);
 					var vouchercode2 = vouchertype ^ "*" ^ fin.currcompany ^ ":" ^ vouchercode.field("*", 2) ^ "*" ^ othercompanycode;
 					//allow for old system XX999 voucher number construction
 					var xx;
 					if (not(xx.read(fin.vouchers, vouchercode2))) {
 						vouchercode2 = vouchertype ^ "*" ^ fin.currcompany ^ vouchercode.field("*", 2) ^ "*" ^ othercompanycode;
 					}
-					var xx2="",yy2="";
-					call updvoucher(mode, xx2, vouchercode2, yy2);
+					call updvoucher(mode, "", vouchercode2, "");
 					//actually delete the voucher from the file
 					//otherwise change of inter company and reposting can leave
 					//vouchers in the file (marked "D")
 					fin.vouchers.deleterecord(vouchercode2);
+					
 				};//companyn;
 			}
 		}
 
 		//delete the voucher
-		deleting=true;
-		gosub process(mode, voucher, vouchercode);
-
-		return writevoucher(voucher, vouchercode);
-
+		var deleting = 1;
+		gosub process();
+		goto writevoucher;
 		//DELETE VOUCHERS,VOUCHER.CODE
 		//GOTO EXIT
 	}
 
 	//if voucher number blank then get next one automatically
 	///////////////////////////////////////////////////////
-	voucherno = vouchercode.field("*", 2);
-	if (voucherno eq "") {
+	var voucherno = vouchercode.field("*", 2);
+	if (voucherno == "") {
 nextvoucherno:
 		var seqkey = "<TYPE>*<COMPANY>";
 
@@ -212,26 +190,26 @@ nextvoucherno:
 		//default is YYNNNN
 		//to get old put just N
 		var pattern = fin.accparams.a(17);
-		if (addcent(year) >= 2011 and pattern) {
+		if ((addcent(year) >= 2011) and pattern) {
 
 			//TODO ensure that PP is prefixed by YY ALWAYS in format
-			if (pattern.index("Y", 1)) {
+			if (pattern.index("Y")) {
 				seqkey ^= "*<YEAR>";
 			}
-			if (pattern.index("P", 1)) {
+			if (pattern.index("P")) {
 				seqkey ^= "*<PERIOD>";
 			}
 			mindigits = pattern.count("N");
 			prefix = pattern;
 
 			var companyserialno = gen.company.a(46);
-			if (companyserialno eq "") {
+			if (companyserialno == "") {
 				companyserialno = 0;
 			}
 
-			if (fin.definition.locate(vouchertype, vtypen, 6)) {
+			if (fin.definition.a(6).locateusing(vouchertype, VM, vtypen)) {
 				vtypeserialno = fin.definition.a(11, vtypen);
-				if (vtypeserialno eq "") {
+				if (vtypeserialno == "") {
 					vtypeserialno = 0;
 				}
 			}else{
@@ -257,17 +235,16 @@ nextvoucherno:
 		seqkey.swapper("<PERIOD>", period);
 		seqkey = "%" ^ seqkey ^ "%";
 		if (not(lockrecord("", fin.vouchers, seqkey))) {
-			call mssg("WAITING TO GET NEXT VOUCHER NUMBER", "T");
+			call mssg("WAITING TO GET NEXT VOUCHER NUMBER", "T", "", "");
 			goto nextvoucherno;
 		}
-		var lastno;
 		if (not(lastno.readv(fin.vouchers, seqkey, 1))) {
 			lastno = 1;
 		}
 		(lastno + 1).write(fin.vouchers, seqkey);
 		var xx = unlockrecord("", fin.vouchers, seqkey);
 
-		if (mindigits and lastno.length() < mindigits) {
+		if (mindigits and (lastno.length() < mindigits)) {
 			lastno = lastno.oconv("R(0)#" ^ mindigits);
 		}
 
@@ -284,24 +261,22 @@ nextvoucherno:
 		oldvoucher = "";
 	}
 	voucherno = vouchercode.field("*", 2);
-	doctype = voucher.a(29);
+	var doctype = voucher.a(29);
 
 	//check each line for other companies
 	//remove ,CURR.COMPANY from account number if found
 	//if intercompany then delete other companies
 	//otherwise build up mv COMPANY.CODES and NCOMPANIES
-	gosub othercompanies(voucher, allocs);
+	gosub other.companies();
 
 	//if one company (or others stripped) then perform any allocations
 	/////////////////////////////////////////////////////////////////
-	if (ncompanies eq 1) {
+	if (ncompanies == 1) {
 		if (allocs) {
-			var paymentcode=vouchercode;
-			call updalloc(mode, voucher, paymentcode, allocs);
+			call updalloc(mode, voucher, vouchercode, allocs);
 			//if mode no longer REALLOC then the voucher needs reposting
-			if (mode eq "REALLOC") {
-
-				return writevoucher(voucher, vouchercode);
+			if (mode == "REALLOC") {
+				goto writevoucher;
 			}
 		}
 	}
@@ -310,51 +285,53 @@ nextvoucherno:
 	//before multi company postings
 	/////////////////////////////////////////
 	if (oldvoucher) {
-		if (oldvoucher.a(7, 1) eq "D") {
+		//nb old.voucher MUST be preserved for saving in voucher.versions
+		if (oldvoucher.a(7, 1) == "D") {
 			voucher.r(7, 1, "R");
 			//remove any previous indexes
-			var deletemode="DELETE";
-			var xx="";
-			call updvoucher2(deletemode, oldvoucher, vouchercode, xx);
+			call updvoucher2("DELETE", oldvoucher ^ "", vouchercode, "");
 		}else{
 			voucher.r(7, 1, "A");
 			//remove any previous indexes and balances
 			var temp = "DELETE FOR AMEND";
-			if (origmode eq "REALLOC") {
+			if (origmode == "REALLOC") {
 				temp ^= " REALLOC";
 			}
-			var xx="";
-			call updvoucher(temp, oldvoucher, vouchercode, xx);
+			call updvoucher(temp, oldvoucher ^ "", vouchercode, "");
 		}
 	}
 
-	//multi company/multi currency balancing (not for stock vouchers)
-	////////////////////////////////////////////////////////////////
-	//accumulate amounts by currency by company (in MVOUCHER)
+	//multi currency and multi company balancing
+	///////////////////////////////////////////
+	//accumulate amounts by currency by company (in compcurrtots)
 	//and add base amount if missing (look up the exchange rate)
-	gosub companyandcurrencytotals(voucher);
+	gosub company.and.currency.totals();
 
+	//multi company vouchers
+	///////////////////////
 	if (ncompanies > 1) {
-		gosub multicompany(mode, voucher, vouchercode, allocs);
-		return exit();
+		gosub multicompany();
+		goto exit;
 	}
 
 	//add lines for exchange gains and losses
-	//except for stock and non accounts type vouchers eg orders
-	if (voucher.a(4) ne "S" and doctype eq "") {
-		gosub addgainloss(voucher);
-	}
+	////////////////////////////////////////
+	gosub add.gainloss();
 
 	//post to index and balance files
 	////////////////////////////////
-	deleting=false;
-	gosub process(mode, voucher, vouchercode);
+	var deleting = 0;
+	gosub process();
 
-	return writevoucher(voucher, vouchercode);
+	//////////////
+writevoucher:
+	//////////////
 
-}
-
-function writevoucher(in voucher, in vouchercode) {
+	//dont add log unless deleting for amending or allocating
+	//could addlog if REALLOC if stop adding log in voucherx.subs/general.subs2
+	if (not mode) {
+		gosub addlog();
+	}
 
 	//cant call upd.voucher3 here since we need to update indexes
 	//so if reposting any vouchers then we have to ensure
@@ -362,24 +339,24 @@ function writevoucher(in voucher, in vouchercode) {
 	//therefore simply DELETE any record in lock file!
 	if (locks) {
 		locks.deleterecord("VOUCHERS*" ^ vouchercode);
+		
 	}
 	voucher.write(fin.vouchers, vouchercode);
 
-	return exit();
-
-}
-
-function exit() {
-
+	/////
+exit:
+	/////
 	if (fin.currcompany ne origcompany) {
 		//CURR.COMPANY=ORIG.COMPANY
 		call initcompany(origcompany);
 	}
 	return 0;
 
+	//////////////////////////////////////////////////////////////////////////////
+
 }
 
-subroutine process(in mode, io voucher, io vouchercode) {
+subroutine process() {
 
 	//check if open new year run on another workstation
 	var temp;
@@ -391,6 +368,7 @@ subroutine process(in mode, io voucher, io vouchercode) {
 
 	//moved up to allow year to be part of automatic voucher no
 	//voucher period/year (from voucher date if not specified)
+	//garbagecollect;
 	//voucherdate=oconv(voucher<2>,'HEX')
 	//YEARPERIOD=VOUCHER<16>
 	//IF YEARPERIOD ELSE
@@ -419,7 +397,7 @@ subroutine process(in mode, io voucher, io vouchercode) {
 		analmth += 12;
 		analyear -= 1;
 	}
-	analyear = analyear.substr(-2, 2);
+	analyear = analyear.substr(-2,2);
 
 	var analysis;
 	if (not(analysis.open("ANALYSIS", ""))) {
@@ -434,19 +412,28 @@ subroutine process(in mode, io voucher, io vouchercode) {
 		var batchid = nextkey(nextkeyparam, "");
 		batchid = batchid.fieldstore("*", 3, 1, batchid.field("*", 3) - 1);
 		var newbatch = 0;
-		var batch;
 		if (not(lockrecord("BATCHES", fin.batches, batchid))) {
 			goto newbatch;
 		}
+		var batch;
 		if (batch.read(fin.batches, batchid)) {
-			//add to last batch if same day/period and LIST type batch
+
+			//consider adding to an autobatch (list of voucher numbers)
+
+			//only add to the last batch if it is an autobatch (no dates)
 			if (batch.a(2)) {
 				goto newbatch;
 			}
-			if (batch.a(23) ne ((period + 0) ^ "/" ^ year)) {
+
+			//only add to the last batch if batch and voucher periods match
+			if (batch.a(23) ne (period + 0 ^ "/" ^ year)) {
 				goto newbatch;
 			}
-			if (gen.company.a(25) ne "PERIOD" and batch.a(26) ne voucherdate) {
+
+			//only add to the last batch if it was created today
+			//no longer supporting company<25> configuration 'PERIOD'
+			//if company<25>#'PERIOD' and field(batch<26,1>,'.',1) ne date() then goto newbatch
+			if (batch.a(26, 1).field(".", 1) ne var().date()) {
 				goto newbatch;
 			}
 
@@ -460,13 +447,30 @@ newbatch:
 				goto newbatch;
 			}
 			batch = "";
-			batch.r(23, (period + 0) ^ "/" ^ year);
-			batch.r(26, voucherdate);
+			batch.r(23, period + 0 ^ "/" ^ year);
+			//batch<26>=voucherdate
+
+			//create or insert version history
+			//dont increment versions when adding to existing generate batches
+			//to avoid wasting space in versions file for no purpose
+			//since amended batches are no longer considered generated
+			var version = batch.a(41);
+			if (not version) {
+				version = 1;
+			}
+			batch.r(41, version);
+			batch.inserter(24, 1, "");
+			batch.inserter(25, 1, "GENERATED");
+			batch.inserter(26, 1, var().date() ^ "." ^ var().time().oconv("R(0)#5"));
+			batch.inserter(27, 1, STATION.trim());
+			batch.inserter(28, 1, version);
+			batch.inserter(29, 1, "POSTED");
+
 		}
 
 		//update the batch
 		voucherno = vouchercode.field("*", 2);
-		if (not(batch.locate(voucherno, temp, 1))) {
+		if (not(batch.a(1).locateusing(voucherno, VM, temp))) {
 			batch.r(1, -1, voucherno);
 		}
 		batch.write(fin.batches, batchid);
@@ -479,7 +483,7 @@ newbatch:
 	}
 
 	//voucher index entry starts with date*voucher type
-	indexentrypart1 = var("\x00\x00\x00" ^ voucher.a(2)).substr(-fin.hexdatesize, fin.hexdatesize);
+	var indexentrypart1 = (var().chr(0) ^ var().chr(0) ^ var().chr(0) ^ voucher.a(2)).substr(-fin.hexdatesize,fin.hexdatesize);
 	indexentrypart1 ^= vouchertype ^ STM;
 
 	//convert voucher number to special format
@@ -489,6 +493,7 @@ newbatch:
 		temp = convvoucherno;
 		temp.converter("0123456789", "");
 		if (not temp) {
+			//garbagecollect;
 			temp = convvoucherno.iconv("HEX");
 			convvoucherno = var().chr(239 + temp.length()) ^ temp;
 		}
@@ -498,21 +503,24 @@ newbatch:
 	indexentrypart1 ^= convvoucherno ^ STM;
 
 	//opening balance type voucher ?
-	if (fin.definition.locate(vouchertype, temp, 6)) {
+	if (fin.definition.a(6).locateusing(vouchertype, VM, temp)) {
 		internalvouchertype = fin.definition.a(1, temp);
 	}else{
 		internalvouchertype = vouchertype;
 	}
-	if (vouchertype.substr(1, 2) eq "OB" or internalvouchertype.substr(1, 2) eq "OB") {
+	if ((vouchertype.substr(1,2) == "OB") or (internalvouchertype.substr(1,2) == "OB")) {
 		balanceperiod = 0;
 	}else{
 		balanceperiod = period + 0;
 	}
 
-//lines:
+lines:
+	//////
+	var accs = voucher.a(8);
+	var nlines = accs.count(VM) + (accs ne "");
 
-	accs = voucher.a(8);
-	nlines = accs.count(VM) + (accs ne "");
+	printl();
+	var().getcursor();
 
 	//postings
 	/////////
@@ -539,22 +547,21 @@ newbatch:
 		acc = accs.a(1, ln);
 		taxcode = voucher.a(24, ln);
 
-		var analysiscode;
-
-		if (not(acc or curramount or baseamount)) {
-			continue;//next ln;
+		if (not((acc or curramount) or baseamount)) {
+			goto postnextln;
 		}
 		account2flag = 0;
-		gosub postacc(mode, vouchercode, voucher, ln);
+		gosub postacc();
 
-		analysiscode = voucher.a(37, ln);
+		var analysiscode = voucher.a(37, ln);
 		if (analysis and analysiscode) {
 
 			//eg 28/29 bill/cost xx/yy wip/acc
 			var analfn = analysiscode.field("*", 1);
 
-			//eg 1/2/3/4/5/6/7 gross/load/disc/comm/fee/tax/other
-			//currently always 1 in manual entries and 1/2 for media/jobs in automated
+			//eg 1/2/3/4/5/6/7 gross/load/disc/comm/fee/tax/other/net/avr
+			//currently always 1 or 9 in manual entries
+			//might have been 1/2 for media/jobs in automated entries by mistake
 			var analcoln = analysiscode.field("*", 2);
 
 			var analkey = analyear ^ "*" ^ analysiscode.field("*", 3, 5);
@@ -575,7 +582,7 @@ newbatch:
 				}
 
 				//billings are credits to income and are negative (unless credit note)
-				if (analfn eq 28) {
+				if (analfn == 28) {
 					tt = -baseamount;
 				}else{
 					tt = baseamount;
@@ -602,14 +609,12 @@ newbatch:
 		//or rather substitute with the ~ account name place holder
 		temp = voucher.a(3, ln);
 		if (temp) {
-			if (temp eq accname) {
+			if (temp == accname) {
 				voucher.r(3, ln, "");
-				
-			} else if (temp.substr(-accname.length(), accname.length()) eq accname) {
+			} else if (temp.substr(-accname.length(),accname.length()) == accname) {
 				temp.splicer(-accname.length(), accname.length(), "~");
 				voucher.r(3, ln, temp);
-				
-			} else if (temp.substr(1, accname.length()) eq accname) {
+			} else if (temp.substr(1,accname.length()) == accname) {
 				temp.splicer(1, accname.length(), "~");
 				voucher.r(3, ln, temp);
 			}
@@ -635,15 +640,16 @@ newbatch:
 		// call upd.voucher.wip(jobinfo,deleting,voucher.code,ln,voucherdate,base.amount)
 		// end
 
-	}
+postnextln:
+	};//ln;
 
 	return;
 
 }
 
-subroutine postacc(in mode, in vouchercode, io voucher, in ln) {
+subroutine postacc() {
 
-	if (not giveway()) {
+	if (not(giveway(""))) {
 		{}
 	}
 
@@ -682,12 +688,12 @@ subroutine postacc(in mode, in vouchercode, io voucher, in ln) {
 			//VOUCHER<5?8,LN>=ACC
 		}else{
 			var().chr(7).output();
-			var msg = "SYSTEM ERROR IN UPD.VOUCHER - GET TECHNICAL ASSISTANCE IMMEDIATELY|| POSTING VOUCHER " ^ vouchercode;
+			msg = "SYSTEM ERROR IN UPD.VOUCHER - GET TECHNICAL ASSISTANCE IMMEDIATELY|| POSTING VOUCHER " ^ vouchercode;
 			msg ^= "||THE ACCOUNT " ^ (DQ ^ (acc ^ DQ)) ^ " IS MISSING";
 			if (account2flag) {
-				msg ^= "|*** POSTED TO ZZZ999 ACCOUNT ***";
+				msg ^= "|*** POSTED TO " ^ ("ZZZ999" ^ SVM ^ "ZZZ999").a(1, 1, 1) ^ " ACCOUNT ***";
 				call mssg(msg);
-				acc = "ZZZ999";
+				acc = "ZZZ999" ^ SVM ^ "ZZZ999";
 				fin.account = "";
 			}else{
 				msg ^= "|*** POSTED TO EXCHANGE GAIN/LOSSES ACCOUNT ***";
@@ -695,8 +701,8 @@ subroutine postacc(in mode, in vouchercode, io voucher, in ln) {
 				acc = gen.company.a(4);
 				if (not(fin.account.read(fin.accounts, acc))) {
 					var().chr(7).output();
-					call mssg("NO EXCHANGE GAINS/LOSSES ACCOUNT|*** POSTED TO ZZZ999 ACCOUNT ***");
-					acc = "ZZZ999";
+					call mssg("NO EXCHANGE GAINS/LOSSES ACCOUNT|*** POSTED TO " ^ ("ZZZ999" ^ SVM ^ "ZZZ999").a(1, 1, 1) ^ " ACCOUNT ***");
+					acc = "ZZZ999" ^ SVM ^ "ZZZ999";
 					fin.account = "";
 				}
 			}
@@ -716,7 +722,7 @@ subroutine postacc(in mode, in vouchercode, io voucher, in ln) {
 	}
 
 	//blank lines of stock vouchers do not get posted at all
-	if (voucher.a(4) eq "S") {
+	if (voucher.a(4) == "S") {
 		if (not(amount or baseamount)) {
 			return;
 		}
@@ -735,15 +741,16 @@ subroutine postacc(in mode, in vouchercode, io voucher, in ln) {
 	}
 
 	//show details on screen
-	//print (var().cursor(1, 20), var().cursor(-4), " ");
-	if (mode eq "DELETE") {
+	//PRINT @(1,20):@(-4):' ':
+	cursor.setcursor();
+	if (mode == "DELETE") {
 		print("DELETING ");
-	} else if (mode.substr(1, 16) eq "DELETE FOR AMEND") {
-		print("AMENDING ", "   ", ln, ". ", accname.substr(1, 40), " ");
+	} else if (mode.substr(1,16) == "DELETE FOR AMEND") {
+		print("AMENDING ");
 	}
-	var temp = vouchercode;
+	temp = vouchercode;
 	temp.converter("*", "-");
-	print(temp);
+	print(temp, "   ", ln, ". ", accname.substr(1,40), " ");
 
 	//!!! also in loadreplication and upd.voucher2
 
@@ -761,7 +768,7 @@ subroutine postacc(in mode, in vouchercode, io voucher, in ln) {
 
 		var indexkey = yearperiod ^ "*" ^ acc ^ "*" ^ fin.currcompany;
 		//1) balance forward index if necessary
-		if (balancetype ne "O" and internalvouchertype.substr(1, 2) ne "OB" and vouchertype.substr(1, 2) ne "OB") {
+		if ((balancetype ne "O" and internalvouchertype.substr(1,2) ne "OB") and vouchertype.substr(1,2) ne "OB") {
 	// IF BALANCE.TYPE NE 'O' THEN
 			call updindex(fin.voucherindex, indexkey, indexentry, deleting);
 		}
@@ -769,13 +776,12 @@ subroutine postacc(in mode, in vouchercode, io voucher, in ln) {
 		if (balancetype ne "B") {
 			call updindex(fin.voucherindex, "*" ^ indexkey.field("*", 2, 99), indexentry, deleting);
 			//flag line as open item so easier to update documents payable elsewhere
-			if (voucher.a(20, ln) eq "" and not account2flag) {
+			if ((voucher.a(20, ln) == "") and not account2flag) {
 				voucher.r(20, ln, SVM);
 			}
 		}
 	}
 
-	var noncurrency;
 	//check if units or currency
 	if (not account2flag) {
 		if (gen.currency.read(gen.currencies, currencycode)) {
@@ -801,16 +807,19 @@ subroutine postacc(in mode, in vouchercode, io voucher, in ln) {
 		var taxbaseamount = baseamount;
 		call updbalances(fin.balances, taxbalanceskey, deleting, balanceperiod, taxamount, taxbaseamount, "", fin.basecurrency, vouchertype);
 
-		//nett amount assumed to be previous line of voucher
+		//net amount in fn 70, 71 otherwise assumed to be previous line of voucher
+		//also in CHK.POST
 		taxbalanceskey = taxbalanceskey.fieldstore("*", 5, 1, "NET");
-		var netbaseamount = voucher.a(11, ln - 1) + 0;
-		if (prevnoncurrency) {
-			netamount = netbaseamount;
-			taxbalanceskey = taxbalanceskey.fieldstore("*", 4, 1, fin.basecurrency);
+		var netamount = voucher.a(70, ln);
+		if (netamount.length()) {
+			netbaseamount = voucher.a(71, ln);
 		}else{
-			netamount = split(voucher.a(10, ln - 1), taxcurr);
-			taxbalanceskey = taxbalanceskey.fieldstore("*", 4, 1, taxcurr);
+			netamount = voucher.a(10, ln - 1);
+			netbaseamount = voucher.a(11, ln - 1);
 		}
+		netamount = split(netamount, taxcurr);
+		netbaseamount += 0;
+		taxbalanceskey = taxbalanceskey.fieldstore("*", 4, 1, taxcurr);
 		call updbalances(fin.balances, taxbalanceskey, deleting, balanceperiod, netamount, netbaseamount, "", fin.basecurrency, vouchertype);
 	}
 
@@ -827,7 +836,7 @@ subroutine postacc(in mode, in vouchercode, io voucher, in ln) {
 		call updbalances(fin.balances, controlbalanceskey, deleting, balanceperiod, controlamount, baseamount, "", fin.basecurrency, vouchertype);
 	}
 
-	prevnoncurrency = noncurrency;
+	var prevnoncurrency = noncurrency;
 	//update balances of following year(s) if voucher year less than current year
 	//check maximum year
 	var maxyear = gen.company.a(2).substr(-2,2);
@@ -836,18 +845,18 @@ subroutine postacc(in mode, in vouchercode, io voucher, in ln) {
 
 		//for opening balances in prior years the user can choose to update
 		// following years or not.
-		if (updfollowing eq "") {
-			if (internalvouchertype.substr(1, 2) eq "OB" or vouchertype.substr(1, 2) eq "OB") {
+		if (updfollowing == "") {
+			if ((internalvouchertype.substr(1,2) == "OB") or (vouchertype.substr(1,2) == "OB")) {
 updfollowing:
 				var reply = 2;
-				var msg = "DO YOU WANT TO UPDATE THE OPENING|";
+				msg = "DO YOU WANT TO UPDATE THE OPENING|";
 				msg ^= "BALANCES OF THE FOLLOWING YEAR(S)";
 				if (not(decide(msg, "", reply))) {
 					var().chr(7).output();
 					call mssg("YOU MUST ANSWER \"YES\" OR \"NO\"");
 					goto updfollowing;
 				}
-				updfollowing = reply eq 1;
+				updfollowing = reply == 1;
 			}else{
 				updfollowing = 1;
 			}
@@ -859,7 +868,7 @@ updfollowing:
 			//get forward account and it's control account (if any)
 			var transferacc = fin.account.a(12);
 			//if no transfer a/c then check control a/c if any
-			if (transferacc eq "") {
+			if (transferacc == "") {
 				if (controlacc) {
 					if (not(transferacc.readv(fin.accounts, controlacc, 12))) {
 						{}
@@ -872,552 +881,725 @@ updfollowing:
 					//allow transfer a/c to be different from internal account
 					if (transferaccount.read(fin.accounts, "." ^ transferacc)) {
 						transferacc = transferaccount.a(10);
-
-					//cant find transfer account, therefore don't carry forward
 					}else{
+						//cant find transfer account, therefore don't carry forward
+						goto postaccexit;
 
-						gosub postaccexit(lineorigcompany);
-						return;
-					}
+								}else{
+								}else{
+					transferacc = acc;
+					transferaccount = fin.account;
 				}
-			}else{
-				transferacc = acc;
-				transferaccount = fin.account;
+				var transfercontrolacc = transferaccount.a(6);
+
+				//loop through the years
+				//990508 LOOP WHILE addcent(NEXTYEAR) LE addcent(curryear) DO
+				while (true) {
+				///BREAK;
+				if (not(addcent(nextyear) <= addcent(maxyear))) break;;
+					//1) update balances
+					var nextyearbalanceskey = nextyear ^ "*" ^ transferacc ^ "*" ^ fin.currcompany ^ "*" ^ currencycode;
+					if (doctype) {
+						nextyearbalanceskey = nextyearbalanceskey.fieldstore("*", 5, 1, doctype);
+					}
+					call updbalances(fin.balances, nextyearbalanceskey, deleting, 0, amount, baseamount, "", fin.basecurrency, vouchertype);
+					//2) update control
+					if (transfercontrolacc and not doctype) {
+						var controlbalanceskey = nextyear ^ "*" ^ transfercontrolacc ^ "*" ^ fin.currcompany ^ "*";
+						if (noncurrency) {
+							controlbalanceskey ^= fin.basecurrency;
+							controlamount = baseamount;
+						}else{
+							controlbalanceskey ^= currencycode;
+							controlamount = amount;
+						}
+						call updbalances(fin.balances, controlbalanceskey, deleting, 0, controlamount, baseamount, "", fin.basecurrency, vouchertype);
+					}
+					nextyear = (nextyear + 1).oconv("R(0)#2");
+				}//loop;
+
 			}
-			var transfercontrolacc = transferaccount.a(6);
-
-			//loop through the years
-			//990508 LOOP WHILE addcent(NEXTYEAR) LE addcent(curryear) DO
-			while (true) {
-			///BREAK;
-			if (not(addcent(nextyear) <= addcent(maxyear))) break;;
-				//1) update balances
-				var nextyearbalanceskey = nextyear ^ "*" ^ transferacc ^ "*" ^ fin.currcompany ^ "*" ^ currencycode;
-				if (doctype) {
-					nextyearbalanceskey = nextyearbalanceskey.fieldstore("*", 5, 1, doctype);
-				}
-				call updbalances(fin.balances, nextyearbalanceskey, deleting, 0, amount, baseamount, "", fin.basecurrency, vouchertype);
-				//2) update control
-				if (transfercontrolacc and not doctype) {
-					var controlbalanceskey = nextyear ^ "*" ^ transfercontrolacc ^ "*" ^ fin.currcompany ^ "*";
-					if (noncurrency) {
-						controlbalanceskey ^= fin.basecurrency;
-						controlamount = baseamount;
-					}else{
-						controlbalanceskey ^= currencycode;
-						controlamount = amount;
-					}
-					call updbalances(fin.balances, controlbalanceskey, deleting, 0, controlamount, baseamount, "", fin.basecurrency, vouchertype);
-				}
-				nextyear = (nextyear + 1).oconv("R(0)#2");
-			}//loop;
-
 		}
-	}
 
-	gosub postaccexit(lineorigcompany);
-	return;
-}
+postaccexit:
+		//restore orig company if necessary
+		if (fin.currcompany ne lineorigcompany) {
+			//CURR.COMPANY=LINE.ORIG.COMPANY
+			call initcompany(lineorigcompany);
+		}
 
-subroutine postaccexit(in lineorigcompany){
+		print(" ok");
+		return;
 
-	//restore orig company if necessary
-	if (fin.currcompany ne lineorigcompany) {
-		//CURR.COMPANY=LINE.ORIG.COMPANY
-		call initcompany(lineorigcompany);
-	}
+	////////////////
+othercompanies:
+	////////////////
+		accs = voucher.a(8);
+		var naccs = accs.count(VM) + (accs ne "");
 
-	print(" ok");
-	return;
+		var companycodes = fin.currcompany;
+		ncompanies = 1;
 
-}
+		var maindesc = voucher.a(3);
+		for (var ln = 1; ln <= naccs; ++ln) {
 
-subroutine othercompanies(io voucher, io allocs) {
-	accs = voucher.a(8);
-	naccs = accs.count(VM) + (accs ne "");
-	var companycodes = fin.currcompany;
-	ncompanies = 1;
-	var maindesc = voucher.a(3);
-	for (var ln = 1; ln <= naccs; ++ln) {
-		acc = accs.a(1, ln, 1);
-		var acccompany = acc.field(",", 2);
-		if (acccompany) {
+			acc = accs.a(1, ln, 1);
+			acccompany = acc.field(",", 2);
+			if (acccompany) {
 
-			//current company
-			if (acccompany eq fin.currcompany) {
-				//remove it from the account number
-				if (intercompany) {
-					voucher.r(8, ln, 1, acc.field(",", 1));
+				//current company
+				if (acccompany == fin.currcompany) {
+					//remove it from the account number
+					if (intercompany) {
+						voucher.r(8, ln, 1, acc.field(",", 1));
+					}
+
+					//other company
+				}else{
+
+					//build a list of company codes starting with curr.company
+					if (not intercompany) {
+						//if not INTERCOMPANY then add into mv COMPANY.CODES
+						if (not(companycodes.a(1).locateusing(acccompany, VM, vn))) {
+							companycodes.r(1, vn, acccompany);
+							ncompanies += 1;
+						}
+
+						//if INTERCOMPANY then remove the line from VOUCHER and ALLOCS
+					}else{
+						accs.eraser(1, ln);
+						var nn = "3" _VM_ "5" _VM_ "8" _VM_ "10" _VM_ "11" _VM_ "17" _VM_ "19" _VM_ "20" _VM_ "23" _VM_ "24" _VM_ "26" _VM_ "27" _VM_ "30" _VM_ "34" _VM_ "37" _VM_ "70" _VM_ "71".count(VM) + 1;
+						for (var ii = 1; ii <= nn; ++ii) {
+							//3 5 8 10 11 17 19 20 23 24 26 27 30 34?
+							voucher.eraser("3" _VM_ "5" _VM_ "8" _VM_ "10" _VM_ "11" _VM_ "17" _VM_ "19" _VM_ "20" _VM_ "23" _VM_ "24" _VM_ "26" _VM_ "27" _VM_ "30" _VM_ "34" _VM_ "37" _VM_ "70" _VM_ "71".a(1, ii), ln);
+						};//ii;
+						if (allocs) {
+							allocs.eraser(1, ln);
+							allocs.eraser(2, ln);
+							allocs.eraser(3, ln);
+						}
+						naccs -= 1;
+						ln -= 1;
+					}
+
 				}
+			}
+		};//ln;
 
-				//other company
+		//fix description on intercompany vouchers
+		//TODO looks like this will not work in all cases
+		if (intercompany) {
+			if (maindesc.a(1, 1)) {
+				voucher.r(3, 1, maindesc.a(1, 1));
 			}else{
-				if (not intercompany) {
-					//if not INTERCOMPANY then add into mv COMPANY.CODES
-					if (not(companycodes.locate(acccompany, vn, 1))) {
-						companycodes.r(1, vn, acccompany);
+				if (maindesc.a(1, 2)) {
+					voucher.r(3, 2, maindesc.a(1, 2));
+				}
+			}
+		}
+
+		return;
+
+	////////////////////////////
+companyandcurrencytotals:
+	////////////////////////////
+		//compcurrtots
+		//field N is company N
+		//multivalues 10 and 11 are currency and base amount respectively
+		//subvalue N is currency N
+
+		//CURRS (NCURRS)
+		//subvalue N is currency N
+
+		//RATES
+		//subvalue N is exchange rate N
+
+		var currs = "";
+		var ncurrs = 0;
+		var rates = "";
+		var compcurrtots = "";
+
+		//allocation may have added some accounts so get again
+		accs = voucher.a(8);
+		naccs = accs.count(VM) + (accs ne "");
+
+		for (var ln = 1; ln <= naccs; ++ln) {
+			acc = accs.a(1, ln, 1);
+			var companyn = 1;
+			othercompanycode = acc.field(",", 2);
+			if (othercompanycode) {
+
+				//if a company code is specified, and not posting ic voucher
+				//build the list of company codes
+
+	//? IF INTERCOMPANY AND OTHER.COMPANY.CODE NE CURR.COMPANY ELSE
+	//it is a bit weird adding curr.company code to company.codes at this point
+	//but left as is in case company.codes isnt initialised to curr.company
+	//eg what happens if ALL postings are to other companies in one voucher?
+				if (not intercompany or (othercompanycode == fin.currcompany)) {
+
+					if (not(companycodes.a(1).locateusing(othercompanycode, VM, companyn))) {
+						companycodes.r(1, companyn, othercompanycode);
 						ncompanies += 1;
 					}
-				}else{
-					//XXX if INTERCOMPANY then remove the line from VOUCHER and ALLOCS
-					accs.eraser(1, ln);
-					var nn = fin.vouchermvfns.count(VM) + 1;
-					for (var ii = 1; ii <= nn; ++ii) {
-						voucher.eraser(fin.vouchermvfns.a(1, ii), ln);
-					};//ii;
-					if (allocs) {
-						allocs.eraser(1, ln);
-						allocs.eraser(2, ln);
-						allocs.eraser(3, ln);
-					}
-					naccs -= 1;
-					ln -= 1;
-				}
 
-			}
-		}
-	};//ln;
-	if (intercompany and voucher.a(4) ne "S") {
-		if (maindesc.a(1, 1)) {
-			voucher.r(3, 1, maindesc.a(1, 1));
-		}else{
-			if (maindesc.a(1, 2)) {
-				voucher.r(3, 2, maindesc.a(1, 2));
-			}
-		}
-	}
-	return;
+					//NEW FOR TAX/VAT ENTRIES TO GET NET REPORTED CORRECTLY
+					// TODO could/should this done for ALL I/C postings?
+					//
+					//IF posting to another company and there is a posting to
+					// CURRENT company tax/vat on the FOLLOWING line
+					// then INSERT A DUPLICATE of the CURRENT line but to intercompany a/c
+					//this ensures that VAT postings are always preceded by a posting
+					// of the net amount - since the the current line is goint to be deleted
+					//also insert a reversal of the inserted line but into the other company
+					//
+					//NB any NET/NET_BASE existing in field 70/71 will be used by preference
+					//in UPD.VOUCHER tax/net, CHK.VOUCHERS, LISTTAX etc
+					//field 70/71 currently is only filled for bugs where PRIOR LINE NET missing
+					//
+					//the pair of inserted lines will reduce the amounts in the compcurrtots
+					//maybe to zero so probably there are no additional I/C lines added
+					//in the multicompany routine
 
-}
+					if (othercompanycode ne fin.currcompany) {
 
-subroutine companyandcurrencytotals(io voucher) {
-	//MVOUCHER
-	//field N is company N
-	//multivalues 10 and 11 are currency and base amount respectively
-	//subvalue N is currency N
+						var nextln = ln + 1;
+						var taxcodex = voucher.a(24, nextln);
+						if (taxcodex.length()) {
 
-	//CURRS (NCURRS)
-	//subvalue N is currency N
+							//taxcompcode should always be the same as the net line before it
+							//since there is no way for user to enter the taxaccno
+							var taxcompcode = accs.a(1, nextln, 1).field(",", 2);
+							if ((taxcompcode == "") or (taxcompcode == fin.currcompany)) {
 
-	//RATES
-	//subvalue N is exchange rate N
+								//insert a pair of voucher lines after the current line and before the tax line
+								//to act as the NET AMOUNT line for the tax line
+								for (var pairn = 1; pairn <= 2; ++pairn) {
+									accs.inserter(1, nextln, "");
+									var nn = "3" _VM_ "5" _VM_ "8" _VM_ "10" _VM_ "11" _VM_ "17" _VM_ "19" _VM_ "20" _VM_ "23" _VM_ "24" _VM_ "26" _VM_ "27" _VM_ "30" _VM_ "34" _VM_ "37" _VM_ "70" _VM_ "71".count(VM) + 1;
+									for (var ii = 1; ii <= nn; ++ii) {
+										//3 5 8 10 11 17 19 20 23 24 26 27 30 34?
+										voucher.inserter("3" _VM_ "5" _VM_ "8" _VM_ "10" _VM_ "11" _VM_ "17" _VM_ "19" _VM_ "20" _VM_ "23" _VM_ "24" _VM_ "26" _VM_ "27" _VM_ "30" _VM_ "34" _VM_ "37" _VM_ "70" _VM_ "71".a(1, ii), nextln, "");
+									};//ii;
+									if (allocs) {
+										allocs.inserter(1, nextln, "");
+										allocs.inserter(2, nextln, "");
+										allocs.inserter(3, nextln, "");
+									}
+									naccs += 1;
+								};//pairn;
 
-	currs = "";
-	ncurrs = 0;
-	unitcodes = "";
-	rates = "";
-	mvoucher = "";
+								//copy the current line into the FIRST inserted voucher line
+								// except post to the other intercompany account and REVERSED
+								gosub getotherintercompanyacc();
+								voucher.r(8, nextln, otherintercompanyacc ^ "," ^ othercompanycode);
+								accs.r(1, nextln, voucher.a(8, nextln));
+								tt = "-" ^ voucher.a(10, ln);
+								if (tt.substr(1,2) == "--") {
+									tt.splicer(1, 2, "");
+								}
+								voucher.r(10, nextln, tt);
+								tt = "-" ^ voucher.a(11, ln);
+								if (tt.substr(1,2) == "--") {
+									tt.splicer(1, 2, "");
+								}
+								voucher.r(11, nextln, tt);
 
-	//allocation may have added some accounts so get again
-	accs = voucher.a(8);
-	naccs = accs.count(VM) + (accs ne "");
+								//copy the current line into the SECOND inserted voucher line
+								// except post to the intercompany account
+								//this line will provide the NET for tax reporting
+								nextln += 1;
+								gosub getintercompanyacc();
+								voucher.r(8, nextln, intercompanyacc ^ "," ^ fin.currcompany);
+								accs.r(1, nextln, voucher.a(8, nextln));
+								voucher.r(10, nextln, voucher.a(10, ln));
+								voucher.r(11, nextln, voucher.a(11, ln));
 
-	//nextln
-	for (var ln = 1; ln <= naccs; ++ln) {
-		acc = accs.a(1, ln, 1);
-		var companyn = 1;
-		var othercompanycode = acc.field(",", 2);
-		if (othercompanycode) {
-			if (not(intercompany and othercompanycode ne fin.currcompany)) {
-				if (not(companycodes.locate(othercompanycode, companyn, 1))) {
-					companycodes.r(1, companyn, othercompanycode);
-					ncompanies += 1;
-				}
-			}
-		}else{
-			if (ncompanies > 1) {
-				voucher.r(8, ln, 1, acc ^ "," ^ fin.currcompany);
-			}
-		}
-
-		amount = split(voucher.a(10, ln), curr);
-		baseamount = voucher.a(11, ln);
-unitline:
-		if (not(currs.locate(curr, svn, 1, 1))) {
-
-			//for stock vouchers, amount=base amount
-			if (voucher.a(4) eq "S") {
-				if (curr ne fin.basecurrency) {
-					var xx;
-					if (unitcodes.locate(curr, xx, 1)) {
-unitline2:
-						amount = baseamount;
-						curr = fin.basecurrency;
-						goto unitline;
-						//goto nextln
-					}else{
-						if (not(gen.currency.read(gen.currencies, curr))) {
-							unitcodes.r(1, -1, curr);
-							//goto nextln
-							goto unitline2;
+							}
 						}
 					}
+
+				}
+
+				//add this company code to every account that doesnt have one
+			}else{
+				if (ncompanies > 1) {
+					voucher.r(8, ln, 1, acc ^ "," ^ fin.currcompany);
 				}
 			}
 
-			currs.r(1, 1, svn, curr);
-			ncurrs += 1;
-		}
+			amount = split(voucher.a(10, ln), curr);
+			baseamount = voucher.a(11, ln);
 
-		//calculate base amount if not specified
-		//(SJB 23/8/93 ALLOW 0 BASE) IF BASE.AMOUNT ELSE
-		if (baseamount eq "") {
-			if (curr eq fin.basecurrency) {
-				baseamount = amount;
-			}else{
-				rate = rates.a(1, 1, svn);
-				if (not rate) {
-					if (not(gen.currency.read(gen.currencies, curr))) {
-						gen.currency = "";
-					}
-					var voucherdate2 = (voucher.a(2)).oconv("HEX");
-					if (not(gen.currency.locateby(voucherdate2, "DR", vn, 4))) {
-						{}
-					}
-					rate = gen.currency.a(5, vn);
+			//build a list of currencies found
+			if (not(currs.a(1, 1).locateusing(curr, SVM, svn))) {
+				currs.r(1, 1, svn, curr);
+				ncurrs += 1;
+			}
+
+			//calculate base amount if not specified
+			//(SJB 23/8/93 ALLOW 0 BASE) IF BASE.AMOUNT ELSE
+			if (baseamount == "") {
+				if (curr == fin.basecurrency) {
+					baseamount = amount;
+				}else{
+					rate = rates.a(1, 1, svn);
 					if (not rate) {
-						rate = gen.currency.a(5, vn - 1);
+						if (not(gen.currency.read(gen.currencies, curr))) {
+							gen.currency = "";
+						}
+						//garbagecollect;
+						var voucherdate2 = voucher.a(2).oconv("HEX");
+						if (not(gen.currency.a(4).locateby(voucherdate2, "DR", vn))) {
+							{}
+						}
+						rate = gen.currency.a(5, vn);
+						if (not rate) {
+							rate = gen.currency.a(5, vn - 1);
+						}
+						rates.r(1, 1, svn, rate);
 					}
-					rates.r(1, 1, svn, rate);
+					if (rate) {
+						//garbagecollect;
+						baseamount = (amount / rate).oconv(fin.basefmt);
+					}else{
+						baseamount = "";
+					}
 				}
-				if (rate) {
-					//garbagecollect;
-					baseamount = (amount / rate).oconv(fin.basefmt);
-				}else{
-					baseamount = "";
-				}
+				voucher.r(11, ln, baseamount);
 			}
-			voucher.r(11, ln, baseamount);
-		}
-		//garbagecollect;
-		mvoucher.r(companyn, 10, svn, 0 + ((mvoucher.a(companyn, 10, svn) + amount).oconv("MD40P")));
-		mvoucher.r(companyn, 11, svn, (mvoucher.a(companyn, 11, svn) + baseamount).oconv(fin.basefmt));
-//nextln:
-	};//ln;
 
-	return;
+			//save the amount and base amount per company and currency
+			//garbagecollect;
+			compcurrtots.r(companyn, 10, svn, 0 + ((compcurrtots.a(companyn, 10, svn) + amount).oconv("MD40P")));
+			compcurrtots.r(companyn, 11, svn, (compcurrtots.a(companyn, 11, svn) + baseamount).oconv(fin.basefmt));
+
+		};//ln;
+
+		return;
 
 }
 
-subroutine multicompany(io mode, io voucher, io vouchercode, io allocs) {
+subroutine multicompany() {
 
-	//post separate vouchers for each company if necessary
-	//
-	// VOUCHER VOUCHER IN A VOUCHER IN B VOUCHER IN C
-	// ------- ------------ ------------ ------------
-	// COMPANY A 100 100 84 16
-	// COMPANY B -80 -84 -80
-	// COMPANY C -15 -16 -15
-	// GAINLOSS 0 -4 -1
-	//
-	//If voucher does'nt balance then gains and losses are distributed
-	// to the other companies 100 x 80/95 = 84.
-	//Note that B in A (-84) is the same as A in B,
-	// and C in A (-16) is the same as A in C,
-	// in other words the inter company accounts match
+		//post separate vouchers for each company if necessary
+		//
+		// VOUCHER VOUCHER IN A VOUCHER IN B VOUCHER IN C
+		// ------- ------------ ------------ ------------
+		// COMPANY A 100 100 84 16
+		// COMPANY B -80 -84 -80
+		// COMPANY C -15 -16 -15
+		// GAINLOSS 0 -4 -1
+		//
+		//If voucher does'nt balance then gains and losses are distributed
+		// to the other companies 100 x 80/95 = 84.
+		//Note that B in A (-84) is the same as A in B,
+		// and C in A (-16) is the same as A in C,
+		// in other words the inter company accounts match
 
-	var intercompanyaccs = "";
-	var otherintercompanyaccs = "";
-	var currbatchno = voucher.a(12);
+		var intercompanyaccs = "";
+		var otherintercompanyaccs = "";
+		var currbatchno = voucher.a(12);
 
-	//get the total amount posted to OTHER companies for each currency
-	//get second company total
-	var tototheramounts = mvoucher.a(2, 10);
-	var tototherbases = mvoucher.a(2, 11);
-	//add other companies if more than 2
-	for (var companyn = 3; companyn <= ncompanies; ++companyn) {
-		for (var currn = 1; currn <= ncurrs; ++currn) {
-			curr = currs.a(1, 1, currn);
-			//garbagecollect;
-			tototheramounts.r(1, 1, currn, (tototheramounts.a(1, 1, currn) + mvoucher.a(companyn, 10, currn)).oconv("MD40P"));
-			tototherbases.r(1, 1, currn, (tototherbases.a(1, 1, currn) + mvoucher.a(companyn, 11, currn)).oconv(fin.basefmt));
-		};//currn;
-	};//companyn;
+		//get the total amount posted to OTHER companies for each currency
+		//get second company total
+		var tototheramounts = compcurrtots.a(2, 10);
+		var tototherbases = compcurrtots.a(2, 11);
+		//add other companies if more than 2
+		for (var companyn = 3; companyn <= ncompanies; ++companyn) {
+			for (var currn = 1; currn <= ncurrs; ++currn) {
+				curr = currs.a(1, 1, currn);
+				//garbagecollect;
+				tototheramounts.r(1, 1, currn, (tototheramounts.a(1, 1, currn) + compcurrtots.a(companyn, 10, currn)).oconv("MD40P"));
+				tototherbases.r(1, 1, currn, (tototherbases.a(1, 1, currn) + compcurrtots.a(companyn, 11, currn)).oconv(fin.basefmt));
+			};//currn;
+		};//companyn;
 
-	//for each other company for each currency two identical postings are made:
-	//1) in this companies account in the other companies books
-	//2) in the other companies account in this companies books
-	for (var companyn = 2; companyn <= ncompanies; ++companyn) {
-		var othercompanycode = companycodes.a(1, companyn);
-		for (var currn = 1; currn <= ncurrs; ++currn) {
-			curr = currs.a(1, 1, currn);
+		//for each other company for each currency two identical postings are made:
+		//1) in this companies account in the other companies books
+		//2) in the other companies account in this companies books
+		for (var companyn = 2; companyn <= ncompanies; ++companyn) {
+			othercompanycode = companycodes.a(1, companyn);
+			for (var currn = 1; currn <= ncurrs; ++currn) {
+				curr = currs.a(1, 1, currn);
 
-			if (ncompanies <= 2 or ncurrs > 1) {
-				amount = -(mvoucher.a(companyn, 10, currn));
-				base = -(mvoucher.a(companyn, 11, currn));
+				if ((ncompanies <= 2) or (ncurrs > 1)) {
+					amount = -(compcurrtots.a(companyn, 10, currn));
+					base = -(compcurrtots.a(companyn, 11, currn));
 
-				//if there is more than one other company
-				//then any exchange gains and losses are proportioned
-			}else{
-
-				amount = mvoucher.a(1, 10, currn);
-				var tototheramount = tototheramounts.a(1, 1, currn);
-				var otheramount = mvoucher.a(companyn, 10, currn);
-
-				base = mvoucher.a(1, 11, currn);
-				var tototherbase = tototherbases.a(1, 1, currn);
-				var otherbase = mvoucher.a(companyn, 11, currn);
-
-				//if not(amount) and not(tot.other.amount) and not(base) and not(tot.other.base) then
-				if (not amount and not base) {
-
-					//cater for debit company 2 credit company 3 and nothing in current company
-					//other wise get no voucher in current company and dr/cr exchange in the other vouchers
-					if (otheramount or otherbase) {
-						amount = "-" ^ otheramount;
-						if (amount.substr(1, 2) eq "--") {
-							amount.splicer(1, 2, "");
-						}
-						base = "-" ^ otherbase;
-						if (base.substr(1, 2) eq "--") {
-							base.splicer(1, 2, "");
-						}
-					}
-
+					//if there is more than one other company
+					//then any exchange gains and losses are proportioned
 				}else{
 
-					if (not amount) {
-						//nothing in current company so no intercompany
-						
-					} else if (not tototheramount) {
-						//nothing in other companies so proportion the amount equally
-						amount = amount / (ncompanies - 1);
-						
-					} else if (not otheramount) {
-						amount = "";
+					amount = compcurrtots.a(1, 10, currn);
+					var tototheramount = tototheramounts.a(1, 1, currn);
+					var otheramount = compcurrtots.a(companyn, 10, currn);
 
-					} else {
-						//proportion the amount according to the other company amounts
-						if (otheramount - tototheramount) {
-							amount = amount * otheramount / tototheramount;
+					base = compcurrtots.a(1, 11, currn);
+					var tototherbase = tototherbases.a(1, 1, currn);
+					var otherbase = compcurrtots.a(companyn, 11, currn);
+
+					//if not(amount) and not(tot.other.amount) and not(base) and not(tot.other.base) then
+					if (not amount and not base) {
+
+						//cater for debit company 2 credit company 3 and nothing in current company
+						//other wise get no voucher in current company and dr/cr exchange in the other vouchers
+						if (otheramount or otherbase) {
+							amount = "-" ^ otheramount;
+							if (amount.substr(1,2) == "--") {
+								amount.splicer(1, 2, "");
+							}
+							base = "-" ^ otherbase;
+							if (base.substr(1,2) == "--") {
+								base.splicer(1, 2, "");
+							}
 						}
-					}
 
-					if (not base) {
+					}else{
+
+						if (not amount) {
+						//nothing in current company so no intercompany
+						} else if (not tototheramount) {
+							//nothing in other companies so proportion the amount equally
+							amount = amount / (ncompanies - 1);
+						} else if (not otheramount) {
+							amount = "";
+						} else {
+							//proportion the amount according to the other company amounts
+							if (otheramount - tototheramount) {
+								amount = amount * otheramount / tototheramount;
+							}
+						}
+//L6467:
+						if (not base) {
 						//nothing in current company so use - amount in other company
 						//BASE=-OTHER.BASE
-						
-					} else if (not tototherbase) {
-						//nothing in other companies so proportion the amount equally
-						//garbagecollect;
-						base = (base / (ncompanies - 1)).oconv(fin.basefmt);
-						
-					} else if (not otherbase) {
-						base = "";
-
-					} else {
-						//proportion the amount according to the other company amounts
-						if (otherbase - tototherbase) {
+						} else if (not tototherbase) {
+							//nothing in other companies so proportion the amount equally
 							//garbagecollect;
-							base = (base * otherbase / tototherbase).oconv(fin.basefmt);
+							base = (base / (ncompanies - 1)).oconv(fin.basefmt);
+						} else if (not otherbase) {
+							base = "";
+						} else {
+							//proportion the amount according to the other company amounts
+							if (otherbase - tototherbase) {
+								//garbagecollect;
+								base = (base * otherbase / tototherbase).oconv(fin.basefmt);
+							}
 						}
 					}
+
 				}
 
-			}
+				if (amount or base) {
 
-			if (amount or base) {
-
-				if (amount) {
-					var temp;
-					var ndecs;
-					if (temp.read(gen.currencies, curr)) {
-						ndecs = temp.a(3);
-					} else
-						ndecs = 2;
-					amount = amount.oconv("MD" ^ ndecs ^ "0P");
-				}
-
-				//get other company's inter company account in this company's books
-				var oicn;
-				if (gen.company.locate(othercompanycode, oicn, 7)) {
-					intercompanyacc = gen.company.a(8, oicn, 2);
-				}else{
-					var().chr(7).output();
-					var msg = "SYSTEM ERROR IN UPD.VOUCHER|THE INTER COMPANY ACCOUNT FOR COMPANY " ^ (DQ ^ (othercompanycode ^ DQ));
-					msg ^= "|IN THE accounts OF " ^ gen.company.a(1) ^ " IS MISSING.||THE EXCHANGE GAINS/LOSSES ACCOUNT WILL BE USED";
-					call mssg(msg);
-					intercompanyacc = gen.company.a(4);
-				}
-
-				//get this company's inter company account in other company's books
-				var othercompany;
-				if (not(othercompany.read(gen.companies, othercompanycode))) {
-					call mssg(DQ ^ (othercompanycode ^ DQ) ^ " OTHER COMPANY IS MISSING");
-					othercompany = "";
-				}
-				var cicn;
-				if (othercompany.locate(fin.currcompany, cicn, 7)) {
-					otherintercompanyacc = othercompany.a(8, cicn, 2);
-				}else{
-					otherintercompanyacc = "";
-				}
-				if (not otherintercompanyacc) {
-					var().chr(7).output();
-					var msg = "SYSTEM ERROR IN UPD.VOUCHER|THE INTER COMPANY ACCOUNT FOR COMPANY " ^ (DQ ^ (fin.currcompany ^ DQ));
-					msg ^= "|IN THE accounts OF " ^ (DQ ^ (othercompany.a(1) ^ DQ)) ^ " IS MISSING.||THE EXCHANGE GAINS/LOSSES ACCOUNT WILL BE USED";
-					call mssg(msg);
-					otherintercompanyacc = othercompany.a(4);
-				}
-
-				//if other company is mainly a different currency then convert
-				//if a rate can be found
-				var othercompanyamount = amount;
-				var othercompanycurr = curr;
-				reqcurr = othercompany.a(15);
-				if (reqcurr and curr ne reqcurr) {
-					gosub getrate();
-					if (rate) {
-						//garbagecollect;
-						othercompanyamount = (base * rate).oconv(fmt);
-						othercompanycurr = reqcurr;
+					if (amount) {
+						if (temp.read(gen.currencies, curr)) {
+							var ndecs = temp.a(3);
+							goto 6609;
+						}
+						var ndecs = 2;
+						amount = amount.oconv("MD" ^ ndecs ^ "0P");
 					}
-				}
 
-				//if this company uses mainly another currency then convert
-				reqcurr = gen.company.a(15);
-				if (reqcurr and curr ne reqcurr) {
-					gosub getrate();
-					if (rate) {
-						//garbagecollect;
-						amount = (base * rate).oconv(fmt);
-						curr = reqcurr;
+					gosub getintercompanyacc();
+
+					gosub getotherintercompanyacc();
+
+					//if other company is mainly a different currency then convert
+					//if a rate can be found
+					var othercompanyamount = amount;
+					var othercompanycurr = curr;
+					reqcurr = othercompany.a(15);
+					if (reqcurr and curr ne reqcurr) {
+						gosub getrate();
+						if (rate) {
+							//garbagecollect;
+							othercompanyamount = (base * rate).oconv(fmt);
+							othercompanycurr = reqcurr;
+						}
 					}
+
+					//if this company uses mainly another currency then convert
+					reqcurr = gen.company.a(15);
+					if (reqcurr and curr ne reqcurr) {
+						gosub getrate();
+						if (rate) {
+							//garbagecollect;
+							amount = (base * rate).oconv(fmt);
+							curr = reqcurr;
+						}
+					}
+
+					//add two lines to the voucher
+
+					//posting in other company to its account for this company
+					naccs += 1;
+					voucher.r(8, naccs, otherintercompanyacc ^ "," ^ othercompanycode);
+					voucher.r(10, naccs, othercompanyamount ^ othercompanycurr);
+					voucher.r(11, naccs, base);
+
+					//posting in this company to its account for the other company
+					//will be posted when we post the main voucher
+					//Maybe dont do this if we post the original other company lines
+					//directly to the intercompany account instead of deleting them
+					naccs += 1;
+					voucher.r(8, naccs, intercompanyacc ^ "," ^ fin.currcompany);
+					voucher.r(10, naccs, -amount ^ curr);
+					//garbagecollect;
+					voucher.r(11, naccs, (-base).oconv(fin.basefmt));
+
 				}
 
-				//add two lines to the voucher
-				naccs += 1;
-				voucher.r(8, naccs, otherintercompanyacc ^ "," ^ othercompanycode);
-				voucher.r(10, naccs, othercompanyamount ^ othercompanycurr);
-				voucher.r(11, naccs, base);
+			};//currn;
 
-				naccs += 1;
-				voucher.r(8, naccs, intercompanyacc ^ "," ^ fin.currcompany);
-				voucher.r(10, naccs, -amount ^ curr);
-				//garbagecollect;
-				voucher.r(11, naccs, (-base).oconv(fin.basefmt));
-			}
+			/////////////////////////////////////////////////////////
+			//post the combination voucher to the other company
+			/////////////////////////////////////////////////////////
 
-		};//currn;
+			//force addition to/creation of a batch in the other company
+			voucher.r(12, "");
 
-		//post the combination voucher to the other company
-		//(prevent the subroutine from changing parameters by :'')
-		voucher.r(12, "");
-		var icmode=mode^"INTERCOMPANY";
-		var icvoucher=voucher;
-		var icvouchercode = vouchertype ^ "*" ^ origcompany ^ ":" ^ voucherno ^ "*" ^ othercompanycode;
-		var icallocs=allocs;
-		call updvoucher(icmode, icvoucher, icvouchercode, icallocs);
+			//create a unique voucher no for the other company posting - in the format C:NNNNNN
+			//based on the current company code C and voucher no NNNNNN
+			var vouchercode2 = vouchertype ^ "*" ^ origcompany ^ ":" ^ voucherno ^ "*" ^ othercompanycode;
 
-	};//companyn;
+			//!!! PREVENT THE SUBROUTINE CHANGING PARAMETERS - PASS VALUES NOT VARIABLES (use :'')
 
-	//save the combination voucher for de-bugging (VCHRNO=CURR.COMPANY:VOUCHER.NO)
-	//WRITE VOUCHER ON VOUCHERS,FIELDSTORE(VOUCHER.CODE,'*',2,1,CURR.COMPANY:VOUCHER.NO)
+			call updvoucher(mode ^ "INTERCOMPANY", voucher ^ "", vouchercode2, allocs ^ "");
 
-	//post the voucher to the current company
-	voucher.r(9, companycodes.field(VM, 2, 9999));
-	voucher.r(12, currbatchno);
-	var icmode=mode^"INTERCOMPANY";
-	call updvoucher(icmode, voucher, vouchercode, allocs);
-	return;
+		};//companyn;
+
+		//save the combination voucher for de-bugging (VCHRNO=CURR.COMPANY:VOUCHER.NO)
+		//WRITE VOUCHER ON VOUCHERS,FIELDSTORE(VOUCHER.CODE,'*',2,1,CURR.COMPANY:VOUCHER.NO)
+
+		////////////////////////////////////////
+		//post the voucher to the current company
+		////////////////////////////////////////
+
+		//save a list of other company codes posted
+		voucher.r(9, companycodes.field(VM, 2, 9999));
+
+		//restore our batch no
+		voucher.r(12, currbatchno);
+
+		call updvoucher(mode ^ "INTERCOMPANY", voucher, vouchercode, allocs);
+
+		return;
 
 }
 
-subroutine addgainloss(io voucher) {
-	//for each currency that does not balance (currencywise) then
-	//add posting to exchange gains/losses
-	//oswrite mvoucher on 'xy'
-
-	var companyn = 1;
-
-	//garbagecollect;
-	var gainlossamt = -((mvoucher.a(companyn, 11)).sum()).oconv("MD40P");
-
-	var temp = mvoucher.a(companyn, 10);
-	temp.converter(SVM ^ "0.", "");
-	if (temp) {
-revalit:
-
-		//exchange GAIN a/c
-		if (gainlossamt < 0) {
-			gainlossacno = gen.company.a(4);
-
-		//exchange LOSS a/c
-		} else if (gainlossamt > 0) {
-			gainlossacno = gen.company.a(5);
-
-		//intercurrency conversion a/c
+subroutine getintercompanyacc() {
+		//get this company's intercompany account for the other company
+		if (gen.company.a(7).locateusing(othercompanycode, VM, temp)) {
+			intercompanyacc = gen.company.a(8, temp, 2);
 		}else{
-			gainlossacno = gen.company.a(12);
+			msg = "SYSTEM ERROR IN UPD.VOUCHER|THE INTER COMPANY ACCOUNT FOR COMPANY " ^ (DQ ^ (othercompanycode ^ DQ));
+			msg ^= "|IN THE accounts OF " ^ gen.company.a(1) ^ " IS MISSING.||THE " ^ ("ZZZ999" ^ SVM ^ "ZZZ999").a(1, 1, 1) ^ " ACCOUNT WILL BE USED";
+			call mssg(msg);
+			//INTER.COMPANY.ACC=COMPANY<4>
+			intercompanyacc = "ZZZ999" ^ SVM ^ "ZZZ999";
 		}
+		return;
 
-		//failsafe (should sysmsg but not nice to block posting really)
-		if (not gainlossacno)
-			gainlossacno = "ZZZ999" ^ SM ^ "ZZZ999";
+}
 
-		if (intercompany) {
-			gainlossacno ^= "," ^ fin.currcompany;
+subroutine getotherintercompanyacc() {
+		//get the other company's intercompany account for this company
+		if (not(othercompany.read(gen.companies, othercompanycode))) {
+			call mssg(DQ ^ (othercompanycode ^ DQ) ^ " OTHER COMPANY IS MISSING");
+			othercompany = "";
 		}
-
-		for (var currn = 1; currn <= ncurrs; ++currn) {
-			amount = mvoucher.a(companyn, 10, currn);
-			base = mvoucher.a(companyn, 11, currn);
-			if (amount or base) {
-				naccs += 1;
-				voucher.r(8, naccs, gainlossacno);
-				voucher.r(10, naccs, -amount ^ currs.a(1, 1, currn));
-				voucher.r(11, naccs, -base);
-			}
+		if (othercompany.a(7).locateusing(fin.currcompany, VM, temp)) {
+			otherintercompanyacc = othercompany.a(8, temp, 2);
+		}else{
+			otherintercompanyacc = "";
 		}
+		if (not otherintercompanyacc) {
+			msg = "SYSTEM ERROR IN UPD.VOUCHER|THE INTER COMPANY ACCOUNT FOR COMPANY " ^ (DQ ^ (fin.currcompany ^ DQ));
+			msg ^= "|IN THE accounts OF " ^ (DQ ^ (othercompany.a(1) ^ DQ)) ^ " IS MISSING.||THE " ^ ("ZZZ999" ^ SVM ^ "ZZZ999").a(1, 1, 1) ^ " ACCOUNT WILL BE USED";
+			call mssg(msg);
+			//OTHER.INTER.COMPANY.ACC=OTHER.COMPANY<4>
+			otherintercompanyacc = "ZZZ999" ^ SVM ^ "ZZZ999";
+		}
+		return;
 
-		//no currency amounts so must be a base imbalance
-	}else{
+	/////////////
+addgainloss:
+	/////////////
+		//for each currency that does not balance (currencywise) then
+		//add posting to exchange gains/losses
+		//oswrite compcurrtots on 'xy'
 
-		//if currency balances but base does not then
-		//add postings to exchange gains/losses
-		//unless there is only one currency and the difference
-		//is no more than 2 cents
-		//in which case adjust base on the first line
-		temp = mvoucher.a(companyn, 11);
+		companyn = 1;
+
+		//garbagecollect;
+		var gainlossamt = -(compcurrtots.a(companyn, 11).sum().oconv("MD40P"));
+
+		temp = compcurrtots.a(companyn, 10);
 		temp.converter(SVM ^ "0.", "");
 		if (temp) {
-			//IF NCURRS GT 1 THEN GOTO revalit
-			//TEMP=SUM(MVOUCHER<COMPANYN,11>)
-			//IF ABS(TEMP) GT 0.02 THEN GOTO revalit
-			if (ncurrs > 1 or gainlossamt.abs() > .02) {
-				goto revalit;
+revalit:
+
+			//exchange gain a/c
+			if (gainlossamt < 0) {
+				gainlossacno = gen.company.a(4);
+
+				//exchange loss a/c
+				goto 7428;
 			}
-			//garbagecollect;
-			//VOUCHER<11,1>=((VOUCHER<11,1>-TEMP) 'MD40P')+0
-			voucher.r(11, 1, ((voucher.a(11, 1) + gainlossamt).oconv("MD40P")) + 0);
+			if (gainlossamt > 0) {
+				gainlossacno = gen.company.a(5);
+
+				//intercurrency conversion a/c
+			}else{
+				gainlossacno = gen.company.a(12);
+			}
+//L7428:
+
+			if (not gainlossacno) {
+				gainlossacno = "ZZZ999" ^ SVM ^ "ZZZ999";
+			}
+
+			if (intercompany) {
+				gainlossacno ^= "," ^ fin.currcompany;
+			}
+
+			for (var currn = 1; currn <= ncurrs; ++currn) {
+				amount = compcurrtots.a(companyn, 10, currn);
+				base = compcurrtots.a(companyn, 11, currn);
+				if (amount or base) {
+					naccs += 1;
+					voucher.r(8, naccs, gainlossacno);
+					voucher.r(10, naccs, -amount ^ currs.a(1, 1, currn));
+					voucher.r(11, naccs, -base);
+				}
+			};//currn;
+
+			//no currency amounts so must be a base imbalance
+		}else{
+
+			//if currency balances but base does not then
+			//add postings to exchange gains/losses
+			//unless there is only one currency and the difference
+			//is no more than 2 cents
+			//in which case adjust base on the first line
+			temp = compcurrtots.a(companyn, 11);
+			temp.converter(SVM ^ "0.", "");
+			if (temp) {
+				//IF NCURRS GT 1 THEN GOTO revalit
+				//TEMP=SUM(compcurrtots<COMPANYN,11>)
+				//IF ABS(TEMP) GT 0.02 THEN GOTO revalit
+
+				if ((ncurrs > 1) or (gainlossamt.abs() > .02)) {
+					goto revalit;
+				}
+
+				//garbagecollect;
+				//VOUCHER<11,1>=((VOUCHER<11,1>-TEMP) 'MD40P')+0
+				voucher.r(11, 1, ((voucher.a(11, 1) + gainlossamt).oconv("MD40P")) + 0);
+			}
+
 		}
-	}
-	return;
+
+		return;
+
 }
 
 subroutine getrate() {
-	//get exchange rate and format given required currency
-	if (reqcurr eq fin.basecurrency) {
-		rate = 1;
-		fmt = fin.basefmt;
-	}else{
-		if (not(gen.currency.read(gen.currencies, reqcurr))) {
-			gen.currency = "";
+		//get exchange rate and format given required currency
+		if (reqcurr == fin.basecurrency) {
+			rate = 1;
+			fmt = fin.basefmt;
+		}else{
+			if (not(gen.currency.read(gen.currencies, reqcurr))) {
+				gen.currency = "";
+			}
+			if (not(gen.currency.a(4).locateby(voucherdate, "DR", vn))) {
+				{}
+			}
+			rate = gen.currency.a(5, vn);
+			if (not rate) {
+				rate = gen.currency.a(5, vn - 1);
+			}
+			var ndecs = gen.currency.a(3);
+			if (not ndecs) {
+				ndecs = 2;
+			}
+			fmt = "MD" ^ ndecs ^ "0P";
 		}
-		if (not(gen.currency.locateby(voucherdate, "DR", vn, 4))) {
-			{}
+
+		return;
+
+}
+
+subroutine addlog() {
+		var versionfn = 59;
+		var statusfn = 7;
+
+		var logfn = 60;
+		var userlogfn = 60;
+		var datetimelogfn = 61;
+		var stationlogfn = 62;
+		var versionlogfn = 63;
+		var statuslogfn = 64;
+
+		//first 16 fields include all main details excluding allocations
+		tt = oldvoucher.field(FM, 1, 16);
+		tt.r(9, voucher.a(9));
+		var changed = tt ne voucher.field(FM, 1, 16);
+
+		var oldversion = voucher.a(versionfn);
+		var version = oldversion + changed;
+
+		if (version == 1) {
+			status = "POSTED";
+		}else{
+			//NEOSYS and special user can repost without record
+			if (authorised("#JOURNAL REPOST WITHOUT RECORD", msg, "NEOSYS")) {
+
+				return;
+
+			}
+			status = "REPOSTED";
 		}
-		rate = gen.currency.a(5, vn);
-		if (not rate) {
-			rate = gen.currency.a(5, vn - 1);
+
+		voucher.r(versionfn, version);
+
+		//logn=r<logfn+0>
+		//logn=count(logn,vm)+(logn<>'')+1
+		//to be consistent with journal versions in reverse order
+		var logn = 1;
+		//ologn=logn-1
+
+	//copied in general.subs2 and productionproxy and upd.voucher
+
+		voucher.inserter(userlogfn, logn, USERNAME);
+
+		var datetime = var().date() ^ "." ^ var().time().oconv("R(0)#5");
+		voucher.inserter(datetimelogfn, logn, datetime);
+
+		voucher.inserter(stationlogfn, logn, STATION.trim());
+
+		if (versionfn) {
+			voucher.inserter(versionlogfn, logn, version);
 		}
-		var ndecs = gen.currency.a(3);
-		if (not ndecs) {
-			ndecs = 2;
+
+		if (statusfn) {
+			voucher.inserter(statuslogfn, logn, status);
 		}
-		fmt = "MD" ^ ndecs ^ "0P";
-	}
-	return;
+
+		//save old version in VOUCHER_VERSIONS
+		if ((version > 1) and version ne oldversion) {
+			var voucherversions;
+			if (voucherversions.open("VOUCHER_VERSIONS", "")) {
+				tt = vouchercode ^ "~" ^ oldversion;
+				oldvoucher.write(voucherversions, tt);
+			}
+		}
+
+		return;
+
 }
 
 

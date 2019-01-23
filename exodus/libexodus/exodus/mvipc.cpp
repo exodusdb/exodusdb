@@ -51,7 +51,7 @@ THE SOFTWARE.
 #define EXODUS_IPC_EXTERN
 #include <exodus/mvipc.h>
 
-#include <exodus/mvenvironment.h>
+//#include <exodus/mvenvironment.h>
 #include <exodus/mvexceptions.h>
 
 //using namespace exodus;

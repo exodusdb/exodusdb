@@ -146,7 +146,7 @@ int MVipc(const int environmentn, var& pgconnparams)
 	LPTSTR lpszPipename = (LPTSTR) wexoduspipename.c_str();
 
 	//create a LPTSTR holding object that will automatically delete then LPTSTR when goes out of scope
-//	_totchar texoduspipename(texoduspipename.var_mvstr.c_str());
+//	_totchar texoduspipename(texoduspipename.var_str.c_str());
 	//mbstowcs(texoduspipename, (LPTSTR)exoduspipename.toString().c_str(), wcslen(exoduspipename.toString().c_str())+1);
 	//wcscpy(texoduspipename, (LPTSTR)exoduspipename.toString().c_str());
 
@@ -460,7 +460,7 @@ ZeroMemory(Pipe,size);
 
 	/*
 			//bytes to write to pipe
-			memcpy(pipe->chReply,reply.var_mvstr.data(),nbytes);
+			memcpy(pipe->chReply,reply.var_str.data(),nbytes);
 			//number of bytes to write to pipe
 			pipe->cbToWrite=int(reply.length())*sizeof(TCHAR);
 	*/

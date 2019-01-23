@@ -170,7 +170,7 @@ public:
 	//define a type of object that holds many LabelledCommons
 	//typedef std::map<const char*, LabelledCommon> LabelledCommons;
 	//typedef std::map<std::string, boost::any> labelledcommons;
-	LabelledCommon* labelledcommon[99];
+	LabelledCommon* labelledcommon[99]={0};
 
 };
 

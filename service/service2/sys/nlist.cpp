@@ -13,7 +13,7 @@ libraryinit()
 #include <elapsedtimetext.h>
 #include <sendmail.h>
 #include <gethtml.h>
-#include <readcss.h>
+#include <getcss.h>
 #include <docmods.h>
 #include <timedate2.h>
 
@@ -388,10 +388,10 @@ function main() {
 	idsupp = "";
 	dblspc = "";
 	detsupp = 0;
-	if (sentencex.index(" DET-SUPP", 1)) {
+	if (sentencex.index(" DET-SUPP")) {
 		detsupp = 1;
 	}
-	if (sentencex.index(" DET-SUPP2", 1)) {
+	if (sentencex.index(" DET-SUPP2")) {
 		detsupp = 2;
 	}
 	gtotsupp = "";
@@ -629,7 +629,7 @@ nextkey:
 				gosub getword();
 				ss ^= " " ^ word;
 				if (limitx) {
-					if ((DQ ^ "\'").index(word[1], 1)) {
+					if ((DQ ^ "\'").index(word[1])) {
 						if (word[1] == word[-1]) {
 							word = word.substr(2,word.length() - 2);
 						}
@@ -727,7 +727,7 @@ nextkey:
 
 		gosub getquotedword2();
 
-		if ((DQ ^ "\'").index(nextword[1], 1)) {
+		if ((DQ ^ "\'").index(nextword[1])) {
 			title = word;
 			gosub getquotedword2();
 			value = word;
@@ -845,7 +845,7 @@ nextkey:
 
 	} else if (word == "EMAIL_CC") {
 		gosub getword();
-		if ((DQ ^ "\'").index(word[1], 1)) {
+		if ((DQ ^ "\'").index(word[1])) {
 			emailcc = word.substr(2,word.length() - 2);
 			nextemailcc = emailcc;
 		}else{
@@ -854,7 +854,7 @@ nextkey:
 
 	} else if (word == "EMAIL_SUBJECT") {
 		gosub getword();
-		if ((DQ ^ "\'").index(word[1], 1)) {
+		if ((DQ ^ "\'").index(word[1])) {
 			emailsubject = word.substr(2,word.length() - 2);
 			nextemailsubject = emailsubject;
 		}else{
@@ -863,7 +863,7 @@ nextkey:
 
 	} else if (dictrec) {
 
-		if (var("FSDIA").index(dictrec.a(1), 1)) {
+		if (var("FSDIA").index(dictrec.a(1))) {
 
 			//pick format dictionary
 			//if index('DI',dictrec<1>,1) then
@@ -946,7 +946,7 @@ nextkey:
 					gosub getword();
 
 					//zzz break options
-					tt = word.index("B", 1);
+					tt = word.index("B");
 					if (tt) {
 
 						//suppress columns that appear in the heading
@@ -959,7 +959,7 @@ nextkey:
 						for (tt = 1; tt <= 9999; ++tt) {
 							charx = word[tt];
 						///BREAK;
-						if (not(charx.length() and var("0123456789,").index(charx, 1))) break;;
+						if (not(charx.length() and var("0123456789,").index(charx))) break;;
 							tt2 ^= charx;
 						};//tt;
 
@@ -1260,7 +1260,7 @@ x1exit:
 	}else{
 		while (true) {
 		///BREAK;
-		if (not(colhdg and (var(" " ^ FM).index(colhdg[-1], 1)))) break;;
+		if (not(colhdg and ((" " ^ FM).index(colhdg[-1])))) break;;
 			colhdg.splicer(-1, 1, "");
 		}//loop;
 	}
@@ -1857,7 +1857,7 @@ subroutine getquotedword() {
 
 subroutine getquotedword2() {
 	gosub getword();
-	if (((DQ ^ "\'").index(word[1], 1)) and (word[1] == word[-1])) {
+	if (((DQ ^ "\'").index(word[1])) and (word[1] == word[-1])) {
 		word.splicer(1, 1, "");
 		word.splicer(-1, 1, "");
 	}else{
@@ -1933,7 +1933,7 @@ getword2b:
 	//otherwise scan up to the next space char
 	startcharn = charn;
 	charx = sentencex[charn];
-	if (var("\'" ^ DQ).index(charx, 1)) {
+	if (("\'" ^ DQ).index(charx)) {
 		searchchar = charx;
 	}else{
 		searchchar = " ";
@@ -1965,10 +1965,10 @@ getword2b:
 	if ((word[1] == "(") and (word[-1] == ")")) {
 		tt = word;
 		//option (N) no letterhead
-		if (tt.index("N", 1)) {
+		if (tt.index("N")) {
 			letterhead = "";
 		}
-		if (tt.index("NN", 1)) {
+		if (tt.index("NN")) {
 			rawtable = 1;
 			bottomline = "";
 		}
@@ -2093,7 +2093,7 @@ subroutine printbreaks() {
 				//underline2=if breakleveln>=nbreaks then bar else underline
 //WARNING TODO: check trigraph following;
 				underline2 = (leveln == 1) ? underline : bar;
-				if (not((tx.substr(-2,2)).index("-", 1))) {
+				if (not((tx.substr(-2,2)).index("-"))) {
 					if (tx[-1] ne FM) {
 						tx ^= FM;
 					}
@@ -2257,7 +2257,7 @@ subroutine printbreaks() {
 
 		//option to suppress the current level
 		//or if this is the first record cannot be any totals before it.
-		if ((not anycell or breakopts.a(leveln).index("X", 1)) or (recn == 1)) {
+		if ((not anycell or breakopts.a(leveln).index("X")) or (recn == 1)) {
 			tx = storetx;
 		}
 
@@ -2380,7 +2380,7 @@ subroutine emailing() {
 		return;
 	}
 
-	if ((DQ ^ "\'").index(emailtoid[1], 1)) {
+	if ((DQ ^ "\'").index(emailtoid[1])) {
 		nextemailto = emailtoid.substr(2,emailtoid.length() - 2);
 	}else{
 		nextemailto = calculate(emailtoid);
@@ -2418,7 +2418,7 @@ subroutine emailing() {
 		}else{
 			//tt3='NEOSYS: ':field(head<1,1,1>,"'",1)
 			tt3 = head.a(1, 1, 1).field("\'", 1);
-			if (tt3.index(">", 1)) {
+			if (tt3.index(">")) {
 				tt3 = field2(tt3, ">", -1);
 			}
 			tt3 = "NEOSYS: " ^ tt3;

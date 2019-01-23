@@ -184,7 +184,7 @@ int var::localeAwareCompare(const std::wstring& str1, const std::wstring& str2) 
 
 var& var::localeAwareChangeCase(const int lowerupper)
 {
-	if (var_mvstr.length()==0)
+	if (var_str.length()==0)
 		return *this;
 
 #if defined(_MSC_VER) && defined(UNICODE)
@@ -210,7 +210,7 @@ var& var::localeAwareChangeCase(const int lowerupper)
 	*/
 
 	//uppercasing can double the number of characters (eg german b to SS) can it triple?
-	int buffersize=(int) var_mvstr.length()*2+2;
+	int buffersize=(int) var_str.length()*2+2;
 	boost::scoped_array<TCHAR> buffer(new TCHAR [buffersize]);
 	if (buffer==0)
 		throw MVException(var(L"Out of memory in changecase(). Need ")^int(buffersize)^L" characters");
@@ -225,8 +225,8 @@ var& var::localeAwareChangeCase(const int lowerupper)
 	int outputsize=LCMapStringW(
 		GetThreadLocale(),
 		tolowerupper,
-		(TCHAR*)var_mvstr.data(),
-		(int) var_mvstr.length(),
+		(TCHAR*)var_str.data(),
+		(int) var_str.length(),
 		buffer.get(),
 		(int) buffersize);
 
@@ -240,7 +240,7 @@ var& var::localeAwareChangeCase(const int lowerupper)
 			return converter(LOWERCASE_, UPPERCASE_);
 	}
 
-	var_mvstr=std::wstring(buffer.get(),outputsize);
+	var_str=std::wstring(buffer.get(),outputsize);
 
 	return *this;
 
@@ -254,19 +254,19 @@ var& var::localeAwareChangeCase(const int lowerupper)
 	//for now only fairly simple one for one conversion
 #if 0
 	if (lowerupper==1)
-		boost::to_lower(var_mvstr);
+		boost::to_lower(var_str);
 	else if (lowerupper==2)
-		boost::to_upper(var_mvstr);
+		boost::to_upper(var_str);
 
 	return *this;
 #else
-	size_t  length=var_mvstr.length();
+	size_t  length=var_str.length();
 	if (lowerupper==1)
 		for (size_t ptr=0; ptr<length; ++ptr)
-			var_mvstr[ptr]=towlower(var_mvstr[ptr]);
+			var_str[ptr]=towlower(var_str[ptr]);
 	else if (lowerupper==2)
 		for (size_t ptr=0; ptr<length; ++ptr)
-			var_mvstr[ptr]=towupper(var_mvstr[ptr]);
+			var_str[ptr]=towupper(var_str[ptr]);
 
 	return *this;
 #endif

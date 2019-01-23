@@ -194,7 +194,7 @@ programinit()
 function main() {
 /////////////////
 USER0="";
-	printer1.init(mv);
+	printer1.init();
 
 	//@sentence='LIST 10 SCHEDULES BY VEHICLE_CODE with vehicle_code "kjh kjh" VEHICLE_NAME BREAK-ON VEHICLE_CODE BREAK-ON VEHICLE_CODE TOTAL PRICE (SX)'
 	//@sentence='list markets code name'
@@ -953,10 +953,10 @@ x1exit:
 	if (dblspc)
 		head ^= FM;
 	orighead = head;
-	printer1.setheadfoot(mv,head,foot);
+	printer1.setheadfoot(head,foot);
 
-	//required before select()
-	begintrans();
+	//to speed up report?
+	//begintrans();
 
 //////////
 //initrec:
@@ -967,10 +967,13 @@ x1exit:
 		//call mssg('Selecting records, please wait.||(Press Esc or F10 to interrupt)','UB',buffer,'')
 		//perform ss:' (S)'
 		//call perf(ss:' (S)')
-		selectedok=filename.select(ss);
+		//selectedok=filename.select(ss);
+		//default cursor
+		selectedok=var().select(ss);
 
 	} else {
-		if (LISTACTIVE)
+		//if (LISTACTIVE)
+		if (0)
 			selectedok=true;
 		else
 			selectedok=srcfile.select(ss);
@@ -1004,7 +1007,7 @@ x1exit:
 
 	printer1.printtx(mv, tx);
 
-	printer1.close(mv);
+	printer1.close();
 
 	return 0;
 }
@@ -1031,12 +1034,12 @@ subroutine process_all_records()
 
 		//limit number of records (allow one more to avoid double closing since nrecs limited in select clause as well
 		if (maxnrecs and recn >= (maxnrecs+1))
-			filename.clearselect();
+			clearselect();
 
 		//readnext key
 		FILEERRORMODE = 1;
 		FILEERROR = L"";
-		if (not filename.readnext(ID, MV)) {
+		if (not readnext(ID, MV)) {
 
 			FILEERRORMODE = 0;
 			/* treat all errors as just "no more records"
@@ -1765,8 +1768,9 @@ subroutine addunits(in newunits, out totunits)
 
 }
 
-subroutine dicti2a(out dictrec)
+subroutine dicti2a(var& dictx)
 {
+	dictx="";
 	return;
 }
 

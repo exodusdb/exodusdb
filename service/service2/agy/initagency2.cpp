@@ -8,6 +8,7 @@ libraryinit()
 #include <agy.h>
 #include <fin.h>
 
+var tt;
 var typecode;
 
 function main(io logtime, in reloading="") {
@@ -19,7 +20,6 @@ function main(io logtime, in reloading="") {
 	//y2k2
 
 	call log2("*add tags/subtypes to digital/magazine media types", logtime);
-	var tt;
 	if (not(tt.readv(DEFINITIONS, "JOB_TYPES*UPDTAGSTYPES", 1))) {
 		tt = "";
 	}
@@ -91,9 +91,9 @@ nextjobtype:
 
 			//determine interesting media types
 			tt = rec.a(1).ucase();
-			if (tt.index("DIGITAL", 1) or tt.index("INTERNET", 1)) {
+			if (tt.index("DIGITAL") or tt.index("INTERNET")) {
 				mtn = 1;
-			} else if (tt.index("MAGAZINE", 1)) {
+			} else if (tt.index("MAGAZINE")) {
 				mtn = 2;
 			} else {
 				goto nextjobtype;

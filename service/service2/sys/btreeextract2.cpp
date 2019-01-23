@@ -85,7 +85,7 @@ function main(in cmd, in filename, in dictfile, out hits, out msg) {
 					word.converter("]", "");
 				}
 				textcmd ^= withwithout ^ fieldname ^ containing ^ " " ^ (DQ ^ (word ^ DQ));
-				if (fieldname.index(".XREF", 1)) {
+				if (fieldname.index(".XREF")) {
 					fieldname.swapper(".XREF", "");
 					containing = " CONTAINING";
 				}

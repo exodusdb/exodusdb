@@ -30,6 +30,7 @@ var usern;//num
 var depts;
 var reply;
 var tt;
+var no;//num
 var nusers;//num
 var deptn;
 var directory;
@@ -258,7 +259,6 @@ badexchrate:
 			}
 
 			//convert SK in datafile to SK in definitions
-			var no;
 			if (not(no.readv(DEFINITIONS, win.datafile ^ ".SK", 1))) {
 				if (no.readv(win.srcfile, "%SK%", 1)) {
 					win.srcfile.deleterecord("%SK%");
@@ -289,7 +289,7 @@ next:
 	} else if (mode == "DEF.CURRENCY") {
 		if (win.is == "") {
 			win.is = gen.company.a(3);
-			if (gen.company.a(1).ucase().index("Promopub", 1)) {
+			if (gen.company.a(1).ucase().index("Promopub")) {
 				win.is = "AED";
 			}
 		}
@@ -392,14 +392,14 @@ subroutine getdatasets() {
 	//convert dos text to revelation format and standardise
 	directory.ucaser();
 	directory = directory.substr(1,0x1A).trim();
-	var dosformat = directory.index(var().chr(13), 1);
+	var dosformat = directory.index(var().chr(13));
 	directory.converter(" " ^ FM ^ "\r\n", FM ^ " " " " " ");
 	directory.trimmer();
 	directory.converter(" " ^ FM, FM ^ " ");
 	var nvols = directory.count(FM) + 1;
 
 	datasetparams = directory.a(1);
-	if (not(datasetparams.index(",", 1))) {
+	if (not(datasetparams.index(","))) {
 		//CALL MSG('LINE 1 OF THE DOS FILE ':DOS.FILENAME:' IS INVALID')
 		//STOP
 	}

@@ -43,7 +43,6 @@ function main(in mode, io logtime) {
 
 		call log2("*createalert currusers", logtime);
 
-		var tt;
 		if (not(tt.readv(DEFINITIONS, "INIT*CREATEALERT*CURRUSERS", 1))) {
 			tt = "";
 		}
@@ -186,10 +185,10 @@ function main(in mode, io logtime) {
 			tt = baselinks.a(1, linkn);
 			if (tt) {
 				var tt2 = (field2(tt, "/", -1)).ucase();
-				if (tt2.index(".HTM", 1)) {
+				if (tt2.index(".HTM")) {
 					tt.splicer(-tt2.length(), tt2.length(), "");
 				}
-				if (not(var("\\/").index(tt[-1], 1))) {
+				if (not(var("\\/").index(tt[-1]))) {
 					tt ^= "/";
 				}
 				baselinks.r(1, linkn, tt);
@@ -205,7 +204,7 @@ function main(in mode, io logtime) {
 		if (not(conf.osread("..\\LOGS\\neosys.ini"))) {
 			conf = "";
 		}
-		if (not(conf.index("NOTREQ", 1))) {
+		if (not(conf.index("NOTREQ"))) {
 
 			var cmd = "compact /C /S /F ..\\LOGS ..\\LOGS\\*.*";
 			var(cmd ^ " DONE,NOTREQ").oswrite("..\\LOGS\\neosys.ini");
@@ -330,13 +329,13 @@ nextuser:
 			return 0;
 		}
 
-		if (lastlog.index("UPGRADEVERBS", 1)) {
+		if (lastlog.index("UPGRADEVERBS")) {
 			return 0;
 		}
 
 		//email anything unexpected
-		if (not(lastlog.index("Quitting.", 1))) {
-			if (not(lastlog.index("*chain to NET AUTO", 1))) {
+		if (not(lastlog.index("Quitting."))) {
+			if (not(lastlog.index("*chain to NET AUTO"))) {
 				call sysmsg("Unexpected last log entry||" ^ lastlog, "Unexpected Log", "NEOSYS");
 			}
 		}
@@ -347,7 +346,7 @@ nextuser:
 		var temps = oslistf("..VDM*.TMP");
 		var ntemps = temps.count(FM) + (temps ne "");
 		for (var tempn = 1; tempn <= ntemps; ++tempn) {
-			var("..\\" ^ temps.a(tempn)).osdelete();
+			("..\\" ^ temps.a(tempn)).osdelete();
 		};//tempn;
 
 	} else {

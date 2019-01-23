@@ -90,7 +90,7 @@ function main(in alerttype0, in runasuser, out tasks, out title, out request, ou
 	//global costcolumns,billcolumns,whichcosts,currencybase,mode,orderby
 
 	var alerttype = alerttype0.field(":", 1);
-	var alertoptions = (alerttype0.field(":", 2, 9999)).convert(":", FM);
+	var alertoptions = alerttype0.field(":", 2, 9999).convert(":", FM);
 
 	if (runasuser.unassigned()) {
 		{}
@@ -102,8 +102,8 @@ function main(in alerttype0, in runasuser, out tasks, out title, out request, ou
 	toexec = "";
 	byexec = "";
 
-	toexec = alertoptions.index("TOEXEC", 1);
-	byexec = alertoptions.index("BYEXEC", 1);
+	toexec = alertoptions.index("TOEXEC");
+	byexec = alertoptions.index("BYEXEC");
 	if (toexec) {
 		alertoptions.swapper("TOEXEC", "");
 	}
@@ -125,7 +125,7 @@ function main(in alerttype0, in runasuser, out tasks, out title, out request, ou
 		}
 		datax = "{TODAY-" ^ ageindays ^ "}";
 		var stopping = alertoptions.a(2);
-		if (not(stopping == "S" or stopping == "")) {
+		if (not((stopping == "S") or (stopping == ""))) {
 			call mssg(DQ ^ (stopping ^ DQ) ^ " parameter 2 must be S for Stop or blank");
 			var().stop();
 		}
@@ -142,7 +142,7 @@ function main(in alerttype0, in runasuser, out tasks, out title, out request, ou
 		}
 		datax = "{TODAY-" ^ ageindays ^ "}";
 		var stopping = alertoptions.a(2);
-		if (not(stopping == "S" or stopping == "")) {
+		if (not((stopping == "S") or (stopping == ""))) {
 			call mssg(DQ ^ (stopping ^ DQ) ^ " parameter 2 must be S for Stop or blank");
 			var().stop();
 		}
@@ -221,7 +221,7 @@ function main(in alerttype0, in runasuser, out tasks, out title, out request, ou
 		gosub mediadiary( title,  datax);
 
 		//default order by client
-		if (not datax.a(16)) {
+		if (not(datax.a(16))) {
 			datax.r(16, "CLIENT_NAME");
 			datax.r(42, 2);
 		}
@@ -373,7 +373,7 @@ subroutine mediadiarydata(io title, io datax) {
 	var no = 2;
 	var all = 3;
 
-	if (mode == "" or mode == "PROGRESS") {
+	if ((mode == "") or (mode == "PROGRESS")) {
 		approved = yes;
 
 		booked = all;

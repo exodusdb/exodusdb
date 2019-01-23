@@ -95,7 +95,7 @@ function main(in mode0, in subject0, in body0, in groupids0, in jobids0, in user
 	/////
 	//if target and options='' or index(options,'U',1) then
 	// end
-	var groupword = options.index("W", 1);
+	var groupword = options.index("W");
 	nsent = 0;
 
 	subject = subject0;
@@ -103,7 +103,7 @@ function main(in mode0, in subject0, in body0, in groupids0, in jobids0, in user
 
 	//read fromuser from users,@username else fromuser=''
 	replyto = "";
-	if (options.index("R", 1)) {
+	if (options.index("R")) {
 		if (((USERNAME == "NEOSYS") or (USERNAME == "ADAGENCY")) or (USERNAME == "ACCOUNTS")) {
 			replyto = "support@neosys.com";
 		}else{
@@ -198,7 +198,7 @@ nextuser:
 		if (groupword) {
 			//eq search for MEDIA in user department like MEDIA BUYER
 			for (var groupn = 1; groupn <= ngroups; ++groupn) {
-				ok = userx.a(5).index(groupids.a(1, groupn), 1);
+				ok = userx.a(5).index(groupids.a(1, groupn));
 			///BREAK;
 			if (not(not ok)) break;;
 			};//groupn;
@@ -266,7 +266,7 @@ exit:
 
 	while (true) {
 	///BREAK;
-	if (not(var("." ^ VM ^ FM).index(emaillog[-1], 1))) break;;
+	if (not(("." ^ VM ^ FM).index(emaillog[-1]))) break;;
 		emaillog.splicer(-1, 1, "");
 	}//loop;
 
@@ -286,7 +286,7 @@ exit:
 
 	while (true) {
 	///BREAK;
-	if (not(var("." ^ VM ^ FM).index(emaillog[-1], 1))) break;;
+	if (not(("." ^ VM ^ FM).index(emaillog[-1]))) break;;
 		emaillog.splicer(-1, 1, "");
 	}//loop;
 

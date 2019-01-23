@@ -2,8 +2,10 @@
 libraryinit()
 
 #include <addcent.h>
-#include <updvoucher.h>
 #include <updvoucher2.h>
+#include <executeas.h>
+#include <updvoucher.h>
+#include <flushindex.h>
 #include <daybooksubs3.h>
 #include <sysmsg.h>
 #include <updalloc.h>
@@ -29,28 +31,9 @@ var batchid;
 var currencycode;
 var currencycompanytags;
 var vn;
-var amountbase;
-var accno1;
-var accno2;
-var details;
-var outputfile;
 
-var interactive;
-var vouchertype;
-var voucherno;
-var origvoucherno;
-var vouchercompanycode;
-var voucherdate;
-var reference;
-var yearperiod;
-var period;
-var year;
-var fullyear;
-var fullperiod;
-var username;
-
-function main(io mode, io voucher, io vouchercode, io allocs, in username0="") {
-
+function main(io mode, io voucher, io vouchercode, io allocs, in username="") {
+	//c fin io,io,io,io,""
 	//this program takes a voucher from a batch or adds it to an unposted batch
 	//and ensures that it is entering in the voucher index file
 	//but marked as deleted so that standard programs skip them
@@ -78,19 +61,22 @@ function main(io mode, io voucher, io vouchercode, io allocs, in username0="") {
 	//DELETE - remove an unposted voucher basically
 	//anything else - add to an existing unposted batch or create a new one if too big
 
-	interactive = not SYSTEM.a(33);
+	var interactive = not SYSTEM.a(33);
 	//garbagecollect;
 
+	call cropper(voucher);
+
 	//extract various info from the voucher
-	vouchertype = vouchercode.field("*", 1);
-	voucherno = vouchercode.field("*", 2);
-	origvoucherno = voucherno;
-	vouchercompanycode = vouchercode.field("*", 3);
-	voucherdate = ((voucher.a(2)).oconv("HEX")) + 0;
-	reference = voucher.a(13);
+	var vouchertype = vouchercode.field("*", 1);
+	var voucherno = vouchercode.field("*", 2);
+	var origvoucherno = voucherno;
+	var vouchercompanycode = vouchercode.field("*", 3);
+	//garbagecollect;
+	var voucherdate = (voucher.a(2).oconv("HEX")) + 0;
+	var reference = voucher.a(13);
 
 	//opening balance type voucher ?
-	if (fin.definition.locate(vouchertype, temp, 6)) {
+	if (fin.definition.a(6).locateusing(vouchertype, VM, temp)) {
 		internalvouchertype = fin.definition.a(1, temp);
 		//DR means that voucher is to be reversed if posted instead of saved in batch
 		if (var("JO,OB,TR,RV").locateusing(internalvouchertype, ",", xx)) {
@@ -107,7 +93,7 @@ function main(io mode, io voucher, io vouchercode, io allocs, in username0="") {
 	}
 
 	//voucher period/year (from voucher date if not specified)
-	yearperiod = voucher.a(16);
+	var yearperiod = voucher.a(16);
 	if (not yearperiod) {
 		if (gen.company.a(6)) {
 			yearperiod = voucherdate.oconv(gen.company.a(6));
@@ -117,17 +103,17 @@ function main(io mode, io voucher, io vouchercode, io allocs, in username0="") {
 		}
 		voucher.r(16, yearperiod);
 	}
-	period = yearperiod.substr(-2, 2);
-	year = yearperiod.substr(1, 2);
-	fullperiod = (period + 0) ^ "/" ^ year;
+	var period = yearperiod.substr(-2,2);
+	var year = yearperiod.substr(1,2);
+	var fullperiod = period + 0 ^ "/" ^ year;
 
 	//prevent period older than closed period
 	var closedperiod = gen.company.a(16);
 	if (closedperiod) {
-		var tt = addcent(closedperiod.substr(-2, 2)) ^ ("00" ^ closedperiod.field("/", 1)).substr(-2, 2);
-		if (tt >= (addcent(fullperiod.substr(-2, 2)) ^ ("00" ^ fullperiod.field("/", 1)).substr(-2, 2))) {
+		var tt = addcent(closedperiod.substr(-2,2)) ^ ("00" ^ closedperiod.field("/", 1)).substr(-2,2);
+		if (tt >= (addcent(fullperiod.substr(-2,2)) ^ ("00" ^ fullperiod.field("/", 1)).substr(-2,2))) {
 			period = closedperiod.field("/", 1) + 1;
-			year = closedperiod.substr(-2, 2);
+			year = closedperiod.substr(-2,2);
 			if (period > fin.maxperiod) {
 				period = (period - fin.maxperiod).oconv("R(0)#2");
 				year = (year + 1).oconv("R(0)#2");
@@ -137,16 +123,9 @@ function main(io mode, io voucher, io vouchercode, io allocs, in username0="") {
 		}
 	}
 
-	if (username0.unassigned()) {
-		username = "";
-	} else
-		username = username0;
-	if (not username)
-		username=USERNAME;
-
 	//garbagecollect;
-	if (fin.batches.open("BATCHES")) {
-		gosub postdirect(mode, voucher, vouchercode, allocs);
+	if (fin.batches.open("BATCHES", "")) {
+		gosub postdirect();
 	}else{
 	// GOSUB POSTINDIRECT
 	}
@@ -155,13 +134,13 @@ function main(io mode, io voucher, io vouchercode, io allocs, in username0="") {
 
 }
 
-subroutine postdirect(io mode, io voucher, io vouchercode, io allocs) {
+subroutine postdirect() {
 	//daybook styles are
 	//1=journal (one account per line)
 	//2=invoice (main account per line)
 	//3=cashbook (main account per batch)
 
-	if (fin.definition.locate(vouchertype, typen, 6)) {
+	if (fin.definition.a(6).locateusing(vouchertype, VM, typen)) {
 		type = fin.definition.a(1, typen);
 	}else{
 		type = "";
@@ -170,16 +149,16 @@ subroutine postdirect(io mode, io voucher, io vouchercode, io allocs) {
 		type = vouchertype;
 	}
 
-	if (type == "RE" or type == "PA" or type == "PP" or type == "PC") {
+	if ((((type == "RE") or (type == "PA")) or (type == "PP")) or (type == "PC")) {
 		daybookstyle = 3;
 
-	} else if (type == "SI" or type == "CN" or type == "PI" or type == "PC" or type == "INV" or type == "PIN") {
+	} else if ((((((type == "SI") or (type == "CN")) or (type == "PI")) or (type == "PC")) or (type == "INV")) or (type == "PIN")) {
 		daybookstyle = 2;
 
 	} else {
 		daybookstyle = 1;
 	}
-
+//L769:
 	var deleting = mode == "DELETE";
 
 	var voucherx;
@@ -214,8 +193,7 @@ subroutine postdirect(io mode, io voucher, io vouchercode, io allocs) {
 			//delete the existing voucher first
 			//in case resaving an unposted batch
 			//or the voucher is *also* in another unposted batch
-			var deletemode="DELETE";
-			call updvoucher2(deletemode, voucherx, vouchercode, allocs);
+			call updvoucher2("DELETE", voucherx, vouchercode, allocs);
 
 		}
 
@@ -245,10 +223,10 @@ subroutine postdirect(io mode, io voucher, io vouchercode, io allocs) {
 			if (base) {
 				base.splicer(1, 0, "-");
 			}
-			if (amount.substr(1, 2) == "--") {
+			if (amount.substr(1,2) == "--") {
 				amount.splicer(1, 2, "");
 			}
-			if (base.substr(1, 2) == "--") {
+			if (base.substr(1,2) == "--") {
 				base.splicer(1, 2, "");
 			}
 
@@ -263,17 +241,18 @@ subroutine postdirect(io mode, io voucher, io vouchercode, io allocs) {
 	//voucher.no comes back with fake voucher number
 	//voucher.code comes back with fake voucher number
 	////////////////////////////////////
-	if (mode ne "DELETE" and voucher.a(12) == "") {
+	if (mode ne "DELETE" and (voucher.a(12) == "")) {
 		var origvouchercode = vouchercode;
 
 		if (vtypereverse) {
 			voucherunreversed = voucher;
-			gosub reversevoucher(voucher);
+			gosub reversevoucher();
 		}
 
-		gosub addtobatch(mode, voucher, vouchercode, allocs);
+		gosub addtobatch();
 
 		if (vtypereverse) {
+			voucherunreversed.r(12, voucher.a(12));
 			voucher = voucherunreversed;
 		}
 
@@ -288,16 +267,15 @@ subroutine postdirect(io mode, io voucher, io vouchercode, io allocs) {
 				//V=validate
 				postcmd ^= "V";
 			}
-			
+			if (username.unassigned()) {
+				username = "";
+			}
 			USER4 = "";
 
-			//call executeas(postcmd, USERNAME);
-			USERNAME.exchange(username);
-			perform(postcmd);
-			username.exchange(USERNAME);
+			call executeas(postcmd, username);
 
 			//and post if validated ok
-			if ((USER4.ucase()).index("OK TO POST", 1)) {
+			if (USER4.ucase().index("OK TO POST")) {
 				vouchercode = origvouchercode;
 				//mark not unposted and force addition to existing or new batch
 				voucher.r(7, "");
@@ -308,15 +286,17 @@ subroutine postdirect(io mode, io voucher, io vouchercode, io allocs) {
 				// gosub reversevoucher
 				// end
 
-				var xx="";
-				call updvoucher(xx, voucher, vouchercode, allocs);
-//				call flushindex("VOUCHERS");
+				call updvoucher("", voucher, vouchercode, allocs);
+				call flushindex("VOUCHERS");
 
 				fin.batches.deleterecord(batchid);
+				
 				call daybooksubs3("RAISE.UNPOSTED.MINIMUM*" ^ batchid.field("*", 2));
-//				call flushindex("BATCHES");
+				call flushindex("BATCHES");
 
-			} else if ((USER4.ucase()).index("POSTED OK", 1)) {
+				goto 1349;
+			}
+			if (USER4.ucase().index("POSTED OK")) {
 				//execute postcmd
 
 			}else{
@@ -326,6 +306,7 @@ subroutine postdirect(io mode, io voucher, io vouchercode, io allocs) {
 				//still expect errors like "year must be opened before posting" in new year
 				call sysmsg(USER4);
 			}
+//L1349:
 
 			//dont leave good or bad messages around in case it gets returned to the UI
 			USER4 = "";
@@ -341,12 +322,11 @@ subroutine postdirect(io mode, io voucher, io vouchercode, io allocs) {
 	yearperiod = voucher.a(16);
 	if (not yearperiod) {
 		//garbagecollect;
-		yearperiod = ((voucher.a(2)).oconv("HEX")).oconv(gen.company.a(6));
+		yearperiod = voucher.a(2).oconv("HEX").oconv(gen.company.a(6));
 	}
 
 	if (allocs) {
-		var unpostedmode="UNPOSTED";
-		call updalloc(unpostedmode, voucher, vouchercode, allocs);
+		call updalloc("UNPOSTED", voucher, vouchercode, allocs);
 	}
 
 	//by this time they are only internal account numbers
@@ -355,7 +335,7 @@ subroutine postdirect(io mode, io voucher, io vouchercode, io allocs) {
 	var naccs = accnos.count(VM) + 1;
 	for (var accn = 1; accn <= naccs; ++accn) {
 
-		if (not giveway()) {
+		if (not(giveway(""))) {
 			{}
 		}
 
@@ -389,7 +369,7 @@ subroutine postdirect(io mode, io voucher, io vouchercode, io allocs) {
 			if (not summaryacc) {
 
 				//voucher index entry starts with date*voucher type
-				var indexentrypart1 = var("\00\00\00" ^ voucher.a(2)).substr(-fin.hexdatesize, fin.hexdatesize);
+				var indexentrypart1 = (var().chr(0) ^ var().chr(0) ^ var().chr(0) ^ voucher.a(2)).substr(-fin.hexdatesize,fin.hexdatesize);
 				indexentrypart1 ^= vouchertype ^ STM;
 
 				//convert voucher number to special format
@@ -399,6 +379,7 @@ subroutine postdirect(io mode, io voucher, io vouchercode, io allocs) {
 					temp = convvoucherno;
 					temp.converter("0123456789", "");
 					if (not temp) {
+						//garbagecollect;
 						temp = convvoucherno.iconv("HEX");
 						convvoucherno = var().chr(239 + temp.length()) ^ temp;
 					}
@@ -436,7 +417,7 @@ subroutine postdirect(io mode, io voucher, io vouchercode, io allocs) {
 				var indexkey = yearperiod ^ "*" ^ origaccno ^ "*" ^ linecompanycode;
 
 				//1) balance forward index if necessary
-				if (balancetype ne "O" and internalvouchertype.substr(1, 2) ne "OB" and vouchertype.substr(1, 2) ne "OB") {
+				if ((balancetype ne "O" and internalvouchertype.substr(1,2) ne "OB") and vouchertype.substr(1,2) ne "OB") {
 					call updindex(fin.voucherindex, indexkey, indexentry, deleting);
 				}
 
@@ -444,7 +425,7 @@ subroutine postdirect(io mode, io voucher, io vouchercode, io allocs) {
 				if (balancetype ne "B") {
 					call updindex(fin.voucherindex, "*" ^ indexkey.field("*", 2, 99), indexentry, deleting);
 					//flag line as open item so easier to update documents payable elsewhere
-					if (voucher.a(20, accn) == "" and not account2flag) {
+					if ((voucher.a(20, accn) == "") and not account2flag) {
 						voucher.r(20, accn, SVM);
 					}
 				}
@@ -452,12 +433,13 @@ subroutine postdirect(io mode, io voucher, io vouchercode, io allocs) {
 				//add currency to balance record so "all currencies unconverted" ledger works
 				//or just an empty balance record if base currency
 				if (not deleting) {
-					var balkey = yearperiod.substr(1, 2) ^ "*" ^ origaccno ^ "*" ^ linecompanycode ^ "*" ^ fin.basecurrency;
+					var balkey = yearperiod.substr(1,2) ^ "*" ^ origaccno ^ "*" ^ linecompanycode ^ "*" ^ fin.basecurrency;
+					//put zeros on empty balance records to ensure ledger account unposted doesnt skip
 					var balances;
 					if (not(balances.read(fin.balances, balkey))) {
-						balances = "";
+						balances = 0 ^ FM ^ 0;
 					}
-					if (not(balances.locateby(currencycode, "AL", vn, 16))) {
+					if (not(balances.a(16).locateby(currencycode, "AL", vn))) {
 						if (currencycode ne fin.basecurrency) {
 							balances.inserter(16, vn, currencycode);
 							//put a record there too
@@ -475,11 +457,20 @@ subroutine postdirect(io mode, io voucher, io vouchercode, io allocs) {
 	if (deleting) {
 
 		fin.vouchers.deleterecord(vouchercode);
+		
 
 		//if deleting then assume deleting/posting a batch
 		//so no need to remove it from the batch below
 		return;
 
+	}else{
+		var version = voucher.a(59) + 1;
+		voucher.r(59, version);
+		voucher.inserter(60, 1, USERNAME);
+		voucher.inserter(61, 1, var().date() ^ "." ^ var().time().oconv("R(0)#5"));
+		voucher.inserter(62, 1, STATION.trim());
+		voucher.inserter(63, 1, version);
+		voucher.inserter(64, 1, "UNPOSTED");
 	}
 
 	//write before, and after if updated
@@ -489,42 +480,43 @@ subroutine postdirect(io mode, io voucher, io vouchercode, io allocs) {
 
 }
 
-subroutine addtobatch(io mode, io voucher, io vouchercode, io allocs) {
+subroutine addtobatch() {
 
 	//this is all to do with adding/updating the batch
 	//which does not apply if the voucher has come from an unposted batch
 	//look at last unposted batch
+
+	//get the next unused batch no
 	var nextkeyparam = ":%" ^ vouchercompanycode ^ "*" ^ vouchertype ^ "*U%:BATCHES:" ^ vouchercompanycode ^ "*" ^ vouchertype ^ "*%*U";
 	batchid = nextkey(nextkeyparam, "");
+
+	//and subtract 1 to get the last entered unposted batch no
 	batchid = batchid.fieldstore("*", 3, 1, batchid.field("*", 3) - 1);
+
 	var newbatch = 0;
-	var batch;
-	var vnos;
 	if (mode == "POST") {
 		goto newbatch;
 	}
 	if (not(lockrecord("BATCHES", fin.batches, batchid))) {
 		goto newbatch;
 	}
+	var batch;
 	if (batch.read(fin.batches, batchid)) {
-		//add to last batch if same period
-		if (batch.a(23) ne ((period + 0) ^ "/" ^ year)) {
+
+		//add to last batch if same period, not edited and < 3000 bytes
+		if (batch.a(23) ne (period + 0 ^ "/" ^ year)) {
 			goto newbatch;
 		}
-		if (batch.a(25)) {
+		if (batch.a(25, 1) ne "GENERATED") {
 			goto newbatch;
 		}
-		//7/11/98 if len(batch)>16000 then goto newbatch
-		if (batch.length() > 10000) {
-			goto newbatch;
-		}
-		if (not interactive and batch.length() > 3000) {
+		if (batch.length() > 3000) {
 			goto newbatch;
 		}
 
-		//dont add to batch if allocating to an unposted voucher in the same batch
+		//dont add to last batch if allocating to an unposted voucher in the same batch
 		//otherwise will not be able to post the batch without removing the allocation
-		vnos = batch.a(1);
+		var vnos = batch.a(1);
 		if (vnos) {
 			allocs = voucher.a(17);
 			if (allocs) {
@@ -536,7 +528,7 @@ subroutine addtobatch(io mode, io voucher, io vouchercode, io allocs) {
 					if (alloc) {
 						if (alloc.field("*", 1) == vtype) {
 							//skip out if found
-							if (vnos.locate(alloc.field("*", 2), xx, 1)) {
+							if (vnos.locateusing(alloc.field("*", 2), VM, xx)) {
 								goto newbatch;
 							}
 						}
@@ -548,16 +540,34 @@ subroutine addtobatch(io mode, io voucher, io vouchercode, io allocs) {
 		//make a new batch
 	}else{
 newbatch:
-		var xx = unlockrecord("BATCHES", fin.batches, batchid);
+		xx = unlockrecord("BATCHES", fin.batches, batchid);
 		newbatch = 1;
 		batchid = nextkey(nextkeyparam, "");
 		if (not(lockrecord("BATCHES", fin.batches, batchid))) {
 			goto newbatch;
 		}
 		batch = "";
-		batch.r(23, (period + 0) ^ "/" ^ year);
+		batch.r(23, period + 0 ^ "/" ^ year);
+
 	}
+
 	var batchno = batchid.field("*", 3);
+
+	//create or insert version history
+	//dont increment versions when adding to existing generate batches
+	//to avoid wasting space in versions file for no purpose
+	//since amended batches are no longer considered generated
+	var version = batch.a(41);
+	if (not version) {
+		version = 1;
+	}
+	batch.r(41, version);
+	batch.inserter(24, 1, "E");
+	batch.inserter(25, 1, "GENERATED");
+	batch.inserter(26, 1, var().date() ^ "." ^ var().time().oconv("R(0)#5"));
+	batch.inserter(27, 1, STATION.trim());
+	batch.inserter(28, 1, version);
+	batch.inserter(29, 1, "UNPOSTED");
 
 	//add the voucher into the batch
 
@@ -579,15 +589,15 @@ newbatch:
 	}
 
 	//voucher header
-	var batchln = (batch.a(2)).count(VM) + (batch.a(2) ne "") + 1;
+	var batchln = batch.a(2).count(VM) + (batch.a(2) ne "") + 1;
 	batch.r(1, batchln, origvoucherno);
 	batch.r(2, batchln, voucherdate);
 	batch.r(10, batchln, reference);
 
 	//get full internal and external accounts for the batch
 	//and make voucher internal account numbers only
-	var accnos = voucher.a(8);
-	var naccs = accnos.count(VM) + 1;
+	accnos = voucher.a(8);
+	naccs = accnos.count(VM) + 1;
 	for (var accn = 1; accn <= naccs; ++accn) {
 
 		var accno = accnos.a(1, accn);
@@ -640,8 +650,7 @@ newbatch:
 			//why? because cant post base amount only lines to open item accounts
 			//why? because 0 currency amounts cannot be allocated and must be revalued to zero
 			if (fin.account.a(8) ne "B") {
-				var xx;
-				if (not split(voucher.a(10, accn),xx)) {
+				if (not split(voucher.a(10, accn))) {
 					if (voucher.a(11, accn)) {
 
 						//get the gain/loss account number
@@ -682,7 +691,7 @@ newbatch:
 		if (desc == "") {
 			if (accnos.a(1, 1, 2)) {
 				if (fin.account.read(fin.accounts, accnos.a(1, 1, 2))) {
-					desc = desc ^ " " ^ fin.account.a(1).trim();
+					desc = (desc ^ " " ^ fin.account.a(1)).trim();
 				}
 			}
 		}
@@ -710,7 +719,7 @@ newbatch:
 		allocvouchers.converter(SVM, ",");
 		var allocamounts = voucher.a(19, voucherln);
 	///BREAK;
-	if (not(accno or amount or base or tax or taxbase)) break;;
+	if (not((((accno or amount) or base) or tax) or taxbase)) break;;
 		//garbagecollect;
 		//reverse the amounts if necessary
 		if (daybookstyle ne 1) {
@@ -726,16 +735,16 @@ newbatch:
 			if (taxbase.length()) {
 				taxbase.splicer(1, 0, "-");
 			}
-			if (amount.substr(1, 2) == "--") {
+			if (amount.substr(1,2) == "--") {
 				amount.splicer(1, 2, "");
 			}
-			if (base.substr(1, 2) == "--") {
+			if (base.substr(1,2) == "--") {
 				base.splicer(1, 2, "");
 			}
-			if (tax.substr(1, 2) == "--") {
+			if (tax.substr(1,2) == "--") {
 				tax.splicer(1, 2, "");
 			}
-			if (taxbase.substr(1, 2) == "--") {
+			if (taxbase.substr(1,2) == "--") {
 				taxbase.splicer(1, 2, "");
 			}
 		}
@@ -780,7 +789,7 @@ newbatch:
 			if (not(fin.account.read(fin.accounts, acno))) {
 				fin.account = "";
 			}
-			temp = temp ^ " " ^ fin.account.a(1).trim();
+			temp = (temp ^ " " ^ fin.account.a(1)).trim();
 		}
 		if (temp) {
 			batch.r(9, batchln, temp);
@@ -804,9 +813,9 @@ newbatch:
 	if (newbatch) {
 		temp = nextkey(nextkeyparam, "");
 	}
-	var xx = unlockrecord("BATCHES", fin.batches, batchid);
+	xx = unlockrecord("BATCHES", fin.batches, batchid);
 
-//	call flushindex("BATCHES");
+	call flushindex("BATCHES");
 
 	//send the batch number back to the calling program
 	voucher.r(12, batchid.field("*", 3));
@@ -815,48 +824,24 @@ newbatch:
 
 }
 
-/*
-	/////////////
-postindirect:
-	/////////////
-	var line = origvoucherno.oconv("L#15");
-	line ^= (voucherdate.oconv("D2/E")).oconv("L#15");
-	line ^= reference.oconv("L#15");
-	line ^= amount.oconv("R#15");
-	line ^= currencycode.oconv("R#15");
-	line ^= amountbase.oconv("R#15");
-	line ^= accno1.oconv("L#15");
-	line ^= accno2.oconv("L#15");
-	line ^= details;
-	line ^= "\r\n";
-
-	//journal file
-	//LOCK FILE ZZZZ
-	var outputfilename = vouchercompanycode ^ "." ^ vouchertype;
-	if (not outputfile.osopen(outputfilename)) {
-		call oswrite("", outputfilename);
-		if (not outputfile.osopen(outputfilename)) {
-			var msg = DQ ^ (outputfilename ^ DQ) ^ " - CANNOT OPEN THE OUTPUT FILE";
-			call mssg(msg);
-		}
-	}
-	call osbwrite(line, outputfile, outputfilename, outputfilename.osfile().a(1));
-	outputfile.osclose();
-
-	return;
-
-}*/
-
-subroutine reversevoucher(io voucher) {
-	gosub reverse(voucher, 10);
-	gosub reverse(voucher, 11);
-	gosub reverse(voucher, 19);
-	gosub reverse(voucher, 20);
+subroutine reversevoucher() {
+	var fn = 10;
+	gosub reverse();
+	fn = 11;
+	gosub reverse();
+	fn = 19;
+	gosub reverse();
+	fn = 19;
+	gosub reverse();
+	fn = 26;
+	gosub reverse();
+	fn = 27;
+	gosub reverse();
 	return;
 
 }
 
-subroutine reverse(io voucher, in fn) {
+subroutine reverse() {
 	var amounts = voucher.a(fn);
 	if (not amounts) {
 		return;
@@ -865,7 +850,7 @@ subroutine reverse(io voucher, in fn) {
 	for (var ln = 1; ln <= nlns; ++ln) {
 		amount = amounts.a(1, ln);
 		if (amount) {
-			gosub reverse2(amount);
+			gosub reverse2();
 			amounts.r(1, ln, amount);
 		}
 	};//ln;
@@ -874,7 +859,7 @@ subroutine reverse(io voucher, in fn) {
 
 }
 
-subroutine reverse2(io amount) {
+subroutine reverse2() {
 	if (not amount) {
 		return;
 	}
@@ -893,5 +878,6 @@ subroutine reverse2(io amount) {
 	return;
 
 }
+
 
 libraryexit()

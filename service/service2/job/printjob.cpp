@@ -17,7 +17,7 @@ libraryinit()
 #include <getreccount.h>
 #include <select2.h>
 #include <gethtml.h>
-#include <readcss.h>
+#include <getcss.h>
 #include <docmods.h>
 
 #include <fin.h>
@@ -112,13 +112,13 @@ function main() {
 	var accessbill = authorised("PRODUCTION ESTIMATE ACCESS", msg, "");
 
 	//suppress unwanted sections
-	if (not(reqsections.index("1", 1))) {
+	if (not(reqsections.index("1"))) {
 		accessbrief = 0;
 	}
-	if (not(reqsections.index("2", 1))) {
+	if (not(reqsections.index("2"))) {
 		accesscost = 0;
 	}
-	if (reqsections.index("3", 1)) {
+	if (reqsections.index("3")) {
 		if (not accesstime) {
 			//personal time only
 			accesstime = 2;
@@ -126,7 +126,7 @@ function main() {
 	}else{
 		accesstime = 0;
 	}
-	if (not(reqsections.index("4", 1))) {
+	if (not(reqsections.index("4"))) {
 		accessbill = 0;
 	}
 
@@ -268,7 +268,7 @@ function main() {
 
 				}else{
 
-					if (not(jobnos.index("-", 1))) {
+					if (not(jobnos.index("-"))) {
 
 						call safeselect("SSELECT JOBS WITH MASTER_JOB_NO " ^ quote2(jobnos) ^ " AND WITH AUTHORISED (S)");
 
@@ -505,12 +505,12 @@ unauth:
 	MV = 0;
 
 	bases = calculate("ORDER_AMOUNT_BASE");
-	statuses = calculate("ORDERSTATUS2");
+	statuses = calculate("ORDER_STATUS2");
 	gosub sumnotcancelled();
 	var cost = totalbase;
 
 	bases = calculate("QUOTE_AMOUNT_BASE");
-	statuses = calculate("QUOTESTATUS2");
+	statuses = calculate("QUOTE_STATUS2");
 	gosub sumnotcancelled();
 	var income = totalbase;
 
@@ -673,7 +673,7 @@ unauth:
 		totalbase = 0;
 		for (MV = 1; MV <= nlines; ++MV) {
 
-			var status = calculate("ORDERSTATUS2");
+			var status = calculate("ORDER_STATUS2");
 			var orderinvno = calculate("ORDER_INV_NO");
 			//similar logic in printjob and jobs.subs/postread
 			if (orderinvno) {
@@ -689,7 +689,7 @@ unauth:
 					datax ^= FM;
 				}
 				datax ^= calculate("ORDER_NO") ^ sep;
-				datax ^= (calculate("ORDER_DATE")).oconv("[DATE,*4]" _VM_ "") ^ sep;
+				datax ^= calculate("ORDER_DATE").oconv("[DATE,*4]" _VM_ "") ^ sep;
 				datax ^= calculate("ORDER_AMOUNT") ^ calculate("ORDER_CURRENCY") ^ sep;
 				var orderamountbase = calculate("ORDER_AMOUNT_BASE");
 				datax ^= orderamountbase ^ sep;
@@ -930,7 +930,7 @@ unauth:
 		var invnos = calculate("QUOTE_INV_NO");
 		totalbase = 0;
 		for (MV = 1; MV <= nlines; ++MV) {
-			var status = calculate("QUOTESTATUS2");
+			var status = calculate("QUOTE_STATUS2");
 			var cancelled = status == "CANCELLED";
 			if (showcancelledlines or not cancelled) {
 				if (MV > 1) {
@@ -938,7 +938,7 @@ unauth:
 				}
 				datax ^= calculate("QUOTE_NO") ^ sep;
 				//fix bug in datax datax:=oconv({QUOTE_DATE},'[DATE,*]') 'L#12':' '
-				datax ^= (calculate("QUOTE_DATE").a(1, 1)).oconv("[DATE,*]") ^ sep;
+				datax ^= calculate("QUOTE_DATE").a(1, 1).oconv("[DATE,*]") ^ sep;
 				datax ^= calculate("QUOTE_AMOUNT") ^ calculate("QUOTE_CURRENCY") ^ sep;
 				//datax:=({QUOTE_AMOUNT_BASE}):sep
 				var quoteamountbase = calculate("QUOTE_AMOUNT_BASE");
@@ -1094,18 +1094,18 @@ subroutine getcols() {
 	for (var scoln = 1; scoln <= ncols; ++scoln) {
 		var fmt = cols.field(",", scoln);
 
-		if (fmt.index("L", 1)) {
+		if (fmt.index("L")) {
 			aligned = "left";
-		} else if (fmt.index("R", 1)) {
+		} else if (fmt.index("R")) {
 			aligned = "right";
 		} else {
 			aligned = "center";
 		}
 		style = "text-align:" ^ aligned;
-		if (fmt.index("7", 1)) {
+		if (fmt.index("7")) {
 			style ^= ";width:7%";
 		}
-		if (fmt.index("B", 1)) {
+		if (fmt.index("B")) {
 			style ^= ";font-weight:bold;";
 		}
 		coltx.r(-1, "<col style=\"" ^ style ^ "\">");

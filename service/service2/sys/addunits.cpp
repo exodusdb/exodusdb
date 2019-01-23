@@ -40,8 +40,8 @@ function main(in aa, io bb) {
 			if (bcode == acode) {
 				//garbagecollect;
 				if (bnum.length() or anum.length()) {
-					var ndecs = (anum.field(".", 2)).length();
-					var bndecs = (bnum.field(".", 2)).length();
+					var ndecs = anum.field(".", 2).length();
+					var bndecs = bnum.field(".", 2).length();
 					if (bndecs > ndecs) {
 						ndecs = bndecs;
 					}

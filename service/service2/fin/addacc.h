@@ -17,7 +17,7 @@ efb_addacc& operator=(const var& newlibraryname) {
 }
 
 //a member function with the right arguments, returning a var or void
-var operator() (in mode, io ledgercode, in newaccno0, in newaccount, in sortorder, in params0, out msg)
+var operator() (in mode, io ledgercode, in newaccno0, in newaccount, in sortorder, in params, out msg)
 {
 
  //first time link to the shared lib and create/cache an object from it
@@ -41,7 +41,7 @@ var operator() (in mode, io ledgercode, in newaccno0, in newaccount, in sortorde
  // (mode);
  return CALLMEMBERFUNCTION(*(this->pobject_),
  ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
-  (mode,ledgercode,newaccno0,newaccount,sortorder,params0,msg);
+  (mode,ledgercode,newaccno0,newaccount,sortorder,params,msg);
 
 }
 

@@ -23,7 +23,7 @@ function main(in mode, in previous0="") {
 	var prefix = mode.field(":", 4);
 
 	if (actfilename == "") {
-		var temp = seqkey.index(".SK", 1);
+		var temp = seqkey.index(".SK");
 		if (temp) {
 			actfilename = seqkey.substr(1,temp - 1);
 		}else{
@@ -96,7 +96,7 @@ checkrec:
 		keyx = result;
 		if (prefix) {
 			keyx = prefix;
-			if (prefix.index("%", 1)) {
+			if (prefix.index("%")) {
 				keyx.swapper("%", result);
 			}else{
 				keyx ^= result;

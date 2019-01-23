@@ -53,7 +53,7 @@ function main(io colhdg, in thproperties, in nobase0) {
 			}
 
 			//t2='<th style="background-color:':thcolor:'"'
-			if (thproperties.index(FM, 1)) {
+			if (thproperties.index(FM)) {
 				thprop = thproperties.a(coln);
 			}
 			t2 = "\r\n" " <th " ^ thprop;

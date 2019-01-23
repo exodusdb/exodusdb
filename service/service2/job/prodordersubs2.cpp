@@ -194,7 +194,7 @@ badtype:
 			}
 			tt = gen.currency.a(1);
 			tt.converter("<>", "()");
-			if (gen.currency.a(25) or tt.ucase().index("(STOP)", 1)) {
+			if (gen.currency.a(25) or tt.ucase().index("(STOP)")) {
 				msg = tt ^ FM ^ "currency is stopped" ^ FM ^ gen.currency.a(25);
 				return invalid(msg);
 			}
@@ -651,7 +651,7 @@ subroutine validate() {
 	//if outstanding order then update relevant analysis column
 	if (calculate("SUPP_INV_NO") == "") {
 
-		var orderperiod = (calculate("DATE")).oconv("D2/E").substr(4,5);
+		var orderperiod = calculate("DATE").oconv("D2/E").substr(4,5);
 
 		//multitype
 		analperiod = orderperiod;
@@ -1337,7 +1337,7 @@ newvoucherline:
 		if (taxamount.abs() < .0001) {
 			taxamount = "0";
 		}
-		if (taxamount.index("E-", 1)) {
+		if (taxamount.index("E-")) {
 			taxamount = "0";
 		}
 		//voucher<26,voucherln>=taxamount
@@ -1350,7 +1350,7 @@ newvoucherline:
 		if (taxamountbase.abs() < .0001) {
 			taxamountbase = "0";
 		}
-		if (taxamountbase.index("E-", 1)) {
+		if (taxamountbase.index("E-")) {
 			taxamountbase = "0";
 		}
 		//voucher<27,voucherln>=taxamountbase

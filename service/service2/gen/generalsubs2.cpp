@@ -64,7 +64,7 @@ function main(in mode0) {
 	//begin case
 	//case mode='POSTINIT'
 
-	if (mode.index("POSTREAD", 1)) {
+	if (mode.index("POSTREAD")) {
 
 		//if in main file then nothing to do
 		if (RECORD ne "") {
@@ -82,14 +82,14 @@ function main(in mode0) {
 		//if opening documents then look in versions file
 		//if just reading then do not
 		//if wlocked then
-		if (1 or win.wlocked) {
+		if (var(1) or win.wlocked) {
 
 			//if not in version file and no ~ character in key then
 			//assume is an ordinary new record
 			if (not(RECORD.read(versionfile, ID))) {
 
 				//not in versions file and no ~ in key -> ordinary new record
-				if (not(ID.index("~", 1))) {
+				if (not(ID.index("~"))) {
 					return 0;
 				}
 
@@ -99,7 +99,7 @@ function main(in mode0) {
 			}
 
 			//if found a deleted record, return it (still locked so they can save it)
-			if (versionsepchar and not ID.index(versionsepchar, 1)) {
+			if (versionsepchar and not ID.index(versionsepchar)) {
 				win.orec = RECORD;
 				return 0;
 			}
@@ -116,13 +116,13 @@ function main(in mode0) {
 
 		//change ~ to * to try and prevent ~ appearing in multipart key date fields
 		//to allow dates to be presented correctly
-		if (ID.index("*", 1)) {
+		if (ID.index("*")) {
 			ID.converter("~", "*");
 		}
 
 		//allow to pass usual security checks
 
-	} else if (mode.index("PREDELETE", 1)) {
+	} else if (mode.index("PREDELETE")) {
 
 		if (not(win.wlocked)) {
 			return 0;
@@ -147,7 +147,7 @@ function main(in mode0) {
 
 		RECORD = "";
 
-	} else if (mode.index("PREWRITE", 1)) {
+	} else if (mode.index("PREWRITE")) {
 
 		if (not(win.wlocked)) {
 			return 0;
@@ -247,7 +247,7 @@ function main(in mode0) {
 
 				//special case amending order no AFTER invoicing
 				//if not considered changing anything (so that the version remains)
-				if ((win.datafile == "PRODUCTION_INVOICES") and RECORD.a(34).index("INVOICED", 1)) {
+				if ((win.datafile == "PRODUCTION_INVOICES") and RECORD.a(34).index("INVOICED")) {
 					temporec.r(7, RECORD.a(7));
 				}
 
@@ -372,13 +372,13 @@ updindexvalues:
 			subject = "Estimate " ^ ID ^ calculate("VERSION") ^ " " ^ status2 ^ " (" ^ calculate("EXECUTIVE_NAME") ^ ") " ^ calculate("DESCRIPTION");
 
 			status = status2.ucase();
-			if (status.index("INVOICE", 1) or status.index("PROFORMA", 1)) {
+			if (status.index("INVOICE") or status.index("PROFORMA")) {
 
 				//reprint invoice or proforma (risk of confusion due to no option autodetect)
 				module = "AGENCY";
 				request = "REPRINTINVS";
 
-				if (status.index("PROFORMA", 1)) {
+				if (status.index("PROFORMA")) {
 					datax = calculate("PROFORMA_INVOICE_NO").a(1, 1);
 				}else{
 					datax = calculate("INVOICE_NO");
@@ -468,7 +468,7 @@ subroutine getfiledefaults() {
 
 	versionfilename = singular(win.datafile) ^ "_VERSIONS";
 	if (not(versionfile.open(versionfilename, ""))) {
-		if (not(ID.index("~", 1))) {
+		if (not(ID.index("~"))) {
 			return;
 		}
 		msg = versionfilename ^ " file is missing";
@@ -687,7 +687,7 @@ subroutine incrementversion() {
 			version = "V27";
 		} else if (version.isnum()) {
 			version += 1;
-		} else if (var("ABCDEFGHIJKLMNOPQRSTUVWXY").index(version, 1)) {
+		} else if (var("ABCDEFGHIJKLMNOPQRSTUVWXY").index(version)) {
 			version = var().chr(version.seq() + 1);
 		}
 //L3416:

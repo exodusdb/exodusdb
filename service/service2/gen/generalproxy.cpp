@@ -675,7 +675,7 @@ performreport:
 			cmd ^= " xAND WITH ALLUPPERCASE [] " ^ (DQ ^ (logsearch ^ DQ));
 		}
 		cmd ^= " ID-SUPP";
-		var temp = cmd.index("xAND", 1);
+		var temp = cmd.index("xAND");
 		if (temp) {
 			cmd.splicer(temp, 5, "");
 		}

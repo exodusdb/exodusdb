@@ -302,7 +302,7 @@ nextrec2:
 			msg = DQ ^ (bill ^ DQ) ^ " should be numeric but is non-numeric. Period : " ^ periodn;
 			gosub invalid(msg);
 		}
-		if (bill.index(".", 1)) {
+		if (bill.index(".")) {
 			bill = bill.oconv(basefmtz);
 		}
 		RECORD.r(1, periodn, bill);
@@ -313,7 +313,7 @@ nextrec2:
 				msg = DQ ^ (cost ^ DQ) ^ " should be numeric but is non-numeric. Period : " ^ periodn;
 				gosub invalid(msg);
 			}
-			if (cost.index(".", 1)) {
+			if (cost.index(".")) {
 				cost = cost.oconv(basefmtz);
 			}
 			RECORD.r(2, periodn, cost);

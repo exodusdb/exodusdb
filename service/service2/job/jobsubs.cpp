@@ -169,7 +169,7 @@ lockit:
 
 	} else if (mode == "DEF.EXECUTIVE") {
 		if (authorised("JOB UPDATE EXECUTIVE", msg, "UP")) {
-			ANS = (calculate("BRAND_CODE")).xlate("BRANDS", 11, "X");
+			ANS = calculate("BRAND_CODE").xlate("BRANDS", 11, "X");
 		}else{
 			if (not(win.is)) {
 				if (ANS == "") {
@@ -439,7 +439,7 @@ unlockprodorders:
 					//prevent certain users from creating their own job numbers
 					//uncomment when job number is not generated in the client
 					//uncommented to prevent own job number creation
-					if (((RECORD == "") and not interactive) and not USER3.index("RECORDKEY", 1)) {
+					if (((RECORD == "") and not interactive) and not USER3.index("RECORDKEY")) {
 						if (not(authorised("JOB CREATE OWN NO", msg, ""))) {
 							msg = DQ ^ (ID ^ DQ) ^ " does not exist and" ^ FM ^ FM ^ msg;
 							win.reset = 5;
@@ -564,7 +564,7 @@ unlockprodorders:
 					// swap tm with '</p><p>' in tt
 					// brief=field(brief,tm,1,1):tm:'<p>':tt:'</p>'
 					// end
-					if (not(tt.index("<br />", 1))) {
+					if (not(tt.index("<br />"))) {
 						tt.swapper(TM, "<br />");
 						brief = brief.field(TM, 1) ^ TM ^ tt;
 					}
@@ -581,7 +581,7 @@ unlockprodorders:
 			//get the quote statuses (to check if can add po's)
 			if (not(win.wlocked)) {
 				MV = 0;
-				RECORD.r(16, calculate("QUOTESTATUS2"));
+				RECORD.r(16, calculate("QUOTE_STATUS2"));
 			}
 
 			var costids = RECORD.a(4);
@@ -597,7 +597,7 @@ unlockprodorders:
 				cost.r(1, 1, 6, calculate("ORDER_INV_DATE"));
 				cost.r(1, 1, 7, calculate("SUPPLIER_NAME"));
 
-				var status = calculate("ORDERSTATUS2");
+				var status = calculate("ORDER_STATUS2");
 				//similar logic in printjob and jobs.subs/postread
 				if (orderinvno) {
 					status = "INVOICE";
@@ -622,7 +622,7 @@ unlockprodorders:
 				bill.r(1, 1, 4, calculate("QUOTE_DESC"));
 				bill.r(1, 1, 5, calculate("QUOTE_INV_NO"));
 				bill.r(1, 1, 6, calculate("QUOTE_INV_DATE"));
-				bill.r(1, 1, 8, calculate("QUOTESTATUS2"));
+				bill.r(1, 1, 8, calculate("QUOTE_STATUS2"));
 				bill.r(1, 1, 9, calculate("QUOTE_PROFORMA_NO"));
 				RECORD.r(27, MV, bill);
 

@@ -7,7 +7,7 @@
 // Requirement 1. Current threadwise default connection id: tss_pgconnids.get();
 // Requirement 2. When open(filename) - if filename is 'only' STR variable, store current connection within
 // Requirement 3. read/write: if filename is 'only' STR variable, use default connection
-// Requirement 4. 'filename' variable with stored connection has special mvtyp bit = MVTYPE_DBCONN
+// Requirement 4. 'filename' variable with stored connection has special mvtyp bit = VARTYP_DBCONN
 // Requirement 5. NO ! There is connection table, where all connection variables should be registered (at 2 and 3)
 // Requirement 6. No action is performed in destructor of 'filename' variable
 // Requirement 7. disconnect() without parameters closes current (default) connection

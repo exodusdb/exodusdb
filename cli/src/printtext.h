@@ -29,20 +29,20 @@ public:
 
 	var html;
 
-    void init(MvEnvironment& mv){}
+	void init(){}
 
-	void printnext(MvEnvironment& mv, io bodyln, io pagen) {
+	void printnext(io bodyln, io pagen) {
 		bodyln = 999;
 		pagen = 0;
 		return;
 	}
 
-	void setheadfoot(MvEnvironment& mv, in newhead, in newfoot) {
+	void setheadfoot(in newhead, in newfoot) {
 		head=newhead;
 		foot=newfoot;
 	}
 
-	void close(MvEnvironment& mv) {
+	void close() {
 		printfilename.osclose();
 	}
 
@@ -266,7 +266,10 @@ css=""
 	}
 
 	void getmark(in mode, in html, io printtxmark) {
-		printtxmark="";
+		if (mode or html)
+			printtxmark="";
+		else
+			printtxmark="";
 		return;
 	}
 

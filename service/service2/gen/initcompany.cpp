@@ -11,6 +11,7 @@ libraryinit()
 var xx;
 var temp;
 var weeksperperiod;//num
+var ndec;//num
 var companydesc;
 var perioddesc;
 var currencydesc;
@@ -314,7 +315,6 @@ function main(in nextcompanycode) {
 
 	//get base format
 	//IF COMPANIES<>'' THEN
-	var ndec;
 	if (not(ndec.readv(gen.currencies, fin.basecurrency, 3))) {
 		ndec = 2;
 	}
@@ -414,13 +414,13 @@ basedesc:
 		currencydesc = desc2;
 	}else{
 		if (desc1) {
-			temp = currencydesc.index("?", 1);
+			temp = currencydesc.index("?");
 			if (temp) {
 				currencydesc.splicer(temp, 1, desc1);
 			}
 		}
 		if (desc2) {
-			temp = currencydesc.index("?", 1);
+			temp = currencydesc.index("?");
 			if (temp) {
 				currencydesc.splicer(temp, 1, desc2);
 			}
@@ -466,7 +466,7 @@ currencydescexit:
 				if (s23.locateusing("TRAINING", VM, xx)) {
 					username ^= "*";
 				}else{
-					if (SYSTEM.a(17).index("TEST", 1)) {
+					if (SYSTEM.a(17).index("TEST")) {
 						username ^= "*";
 					}
 				}

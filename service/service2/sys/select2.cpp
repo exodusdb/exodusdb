@@ -80,8 +80,8 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 		nlimitfields = limitfields.count(VM) + (limitfields ne "");
 	}
 
-	var xml = options.index("XML", 1);
-	var rawread = options.index("RAW", 1);
+	var xml = options.index("XML");
+	var rawread = options.index("RAW");
 
 	datax = "";
 
@@ -89,13 +89,13 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 		hexx.redim(8);
 		//changed to allow language characters to pass through x80-xF9
 		for (var ii = 249; ii <= 255; ++ii) {
-			hexx(ii - 249) = "%" ^ (ii.oconv("MX")).oconv("R(0)#2");
+			hexx(ii - 249) = "%" ^ ii.oconv("MX").oconv("R(0)#2");
 		};//ii;
 	}
 
 	var crlf2 = "\r\n";
 	//crlf2=''
-	useactivelist = sortselect.index("%SELECTLIST%", 1);
+	useactivelist = sortselect.index("%SELECTLIST%");
 	sortselect.swapper("%SELECTLIST%", "");
 	if (not LISTACTIVE) {
 		useactivelist = 0;
@@ -178,7 +178,7 @@ nocommon:
 	//if trim(@station)='SBCP1800' then cmd='SELECT 10 ':filename
 
 	//check no @ in xml dict ids because cannot return xml tag with @
-	if (xml and dictids.index("@", 1)) {
+	if (xml and dictids.index("@")) {
 		response = "Error: XML dictids cannot contain @ characters in SELECT2";
 
 		//abort
@@ -285,8 +285,8 @@ nocommon:
 
 		var xx;
 		if (xx.read(DICT, "AUTHORISED")) {
-			if (not(sortselect.index(" WITH AUTHORISED", 1))) {
-				if (var(" " ^ sortselect).index(" WITH ", 1)) {
+			if (not(sortselect.index(" WITH AUTHORISED"))) {
+				if ((" " ^ sortselect).index(" WITH ")) {
 					sortselect ^= " AND";
 				}
 				sortselect ^= " WITH AUTHORISED";
@@ -296,7 +296,7 @@ nocommon:
 		//if not sorted then try use %RECORDS% if present and <200 chars
 		var records = "";
 		//if @list.active or index(' ':sortselect,' BY ',1) or index(sortselect,'WITH AUTHORISED',1) else
-		if (not(LISTACTIVE or (var(" " ^ sortselect).index(" BY ", 1)))) {
+		if (not(LISTACTIVE or ((" " ^ sortselect).index(" BY ")))) {
 			if (records.read(file, "%RECORDS%")) {
 				if (records.length() < 200) {
 					records.swapper(FM, "\" \"");
@@ -312,7 +312,7 @@ nocommon:
 
 		//handle invalid cmd
 		//R18.1 is normal 'No records found' message
-		if (USER4 and not USER4.index("R18.1", 1)) {
+		if (USER4 and not USER4.index("R18.1")) {
 			if (USER4.field(" ", 1) == "W156") {
 				USER4 = DQ ^ (USER4.field(" ", 2) ^ DQ) ^ " is not in the dictionary.||" ^ cmd ^ " " ^ sortselect;
 			}

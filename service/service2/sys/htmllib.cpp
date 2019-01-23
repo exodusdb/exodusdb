@@ -35,13 +35,13 @@ function main(in mode, io datax, in params0="", in params20="") {
 		var tt = " " ^ VM;
 		while (true) {
 		///BREAK;
-		if (not(datax.index(tt, 1))) break;;
+		if (not(datax.index(tt))) break;;
 			datax.swapper(tt, VM);
 		}//loop;
 		tt = " " ^ FM;
 		while (true) {
 		///BREAK;
-		if (not(datax.index(tt, 1))) break;;
+		if (not(datax.index(tt))) break;;
 			datax.swapper(tt, FM);
 		}//loop;
 		filler = "&nbsp;";
@@ -84,7 +84,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 		var nlines = datax.count(FM) + 1;
 		var lastline = datax.a(nlines);
 	//Total
-		if (lastline.index("<TD>" ^ gen.glang.a(28), 1)) {
+		if (lastline.index("<TD>" ^ gen.glang.a(28))) {
 			lastline.swapper("TD>", "TH>");
 			lastline.swapper("td>", "th>");
 			datax.r(nlines, lastline);
@@ -140,8 +140,8 @@ function main(in mode, io datax, in params0="", in params20="") {
 
 	} else if (mode == "STRIPTAGS") {
 		while (true) {
-			var tag1 = datax.index("<", 1);
-			var tag2 = datax.index(">", 1);
+			var tag1 = datax.index("<");
+			var tag2 = datax.index(">");
 		///BREAK;
 		if (not(tag1 and (tag1 < tag2))) break;;
 			datax.splicer(tag1, tag2 - tag1 + 1, "");
@@ -172,31 +172,31 @@ function main(in mode, io datax, in params0="", in params20="") {
 		//similar code in INIT.GENERAL and HTMLLIB
 		//name can be CLIENT OS or SERVER OS
 		var osname = "";
-		if (datax.index("NT 10.0", 1)) {
+		if (datax.index("NT 10.0")) {
 			osname = "10";
-		} else if (datax.index("NT 6.3", 1)) {
+		} else if (datax.index("NT 6.3")) {
 			osname = "8.1";
-		} else if (datax.index("NT 6.2", 1)) {
+		} else if (datax.index("NT 6.2")) {
 			osname = "8";
-		} else if (datax.index("NT 6.1", 1)) {
+		} else if (datax.index("NT 6.1")) {
 			osname = "7";
-		} else if (datax.index("NT 6.0", 1)) {
+		} else if (datax.index("NT 6.0")) {
 			osname = "Vista/2008";
-		} else if (datax.index("NT 5.2", 1)) {
+		} else if (datax.index("NT 5.2")) {
 			osname = "XP-64";
-		} else if (datax.index("NT 5.1", 1)) {
+		} else if (datax.index("NT 5.1")) {
 			osname = "XP";
-		} else if (datax.index("Windows NT ", 1)) {
-			var tt = datax.index("Windows NT ", 1);
+		} else if (datax.index("Windows NT ")) {
+			var tt = datax.index("Windows NT ");
 			osname = ((datax.substr(tt + 11,9999)).field(";", 1)).field(")", 1);
 		}
-		if (datax.index("WOW64", 1)) {
+		if (datax.index("WOW64")) {
 			osname ^= "-64";
 		}
 		if (osname) {
 			osname = "Win" ^ osname;
 			//add touch if Windows but not Windows Phone
-			if (datax.index("Touch", 1)) {
+			if (datax.index("Touch")) {
 				osname ^= " Touch";
 			}
 		}
@@ -204,38 +204,38 @@ function main(in mode, io datax, in params0="", in params20="") {
 		if (not osname) {
 			var tt = 0;
 			if (not tt) {
-				tt = datax.index("Android ", 1);
+				tt = datax.index("Android ");
 			}
 			if (not tt) {
-				tt = datax.index("Android", 1);
+				tt = datax.index("Android");
 			}
 			if (not tt) {
-				tt = datax.index("iPhone OS", 1);
+				tt = datax.index("iPhone OS");
 			}
 			if (not tt) {
-				tt = datax.index("CPU OS", 1);
+				tt = datax.index("CPU OS");
 			}
 			if (not tt) {
-				tt = datax.index("Mac OS", 1);
+				tt = datax.index("Mac OS");
 			}
 			if (not tt) {
-				tt = datax.index("Windows Phone ", 1);
+				tt = datax.index("Windows Phone ");
 				if (tt) {
 					datax.splicer(tt, 13, "WinPhone");
 				}
 			}
 			if (not tt) {
-				tt = datax.index("Linux", 1);
+				tt = datax.index("Linux");
 			}
 			if (not tt) {
-				tt = datax.index("CrOS", 1);
+				tt = datax.index("CrOS");
 			}
 			if (tt) {
 				osname = datax.substr(tt,9999);
 				if (osname.substr(1,4) == "CPU ") {
 					osname.splicer(1, 3, "iPad");
 				}
-				tt = osname.index(" like ", 1);
+				tt = osname.index(" like ");
 				if (tt) {
 					osname.splicer(tt, 9999, "");
 				}
@@ -250,13 +250,13 @@ function main(in mode, io datax, in params0="", in params20="") {
 
 		//Trident tells you the actual browser software for MS
 		var browser = "";
-		if (datax.index("Trident/7.0", 1)) {
+		if (datax.index("Trident/7.0")) {
 			browser = "11";
-		} else if (datax.index("Trident/6.0", 1)) {
+		} else if (datax.index("Trident/6.0")) {
 			browser = "10";
-		} else if (datax.index("Trident/5.0", 1)) {
+		} else if (datax.index("Trident/5.0")) {
 			browser = "9";
-		} else if (datax.index("Trident/4.0", 1)) {
+		} else if (datax.index("Trident/4.0")) {
 			browser = "8";
 		}
 //L1363:
@@ -267,15 +267,15 @@ function main(in mode, io datax, in params0="", in params20="") {
 		//MSIE 7.0 Windows Internet Explorer 7 or IE7 Compatibility View/Browser Mode
 		//MSIE 6.0 Microsoft Internet Explorer 6
 		var iemode = "";
-		if (datax.index("MSIE 10.0", 1)) {
+		if (datax.index("MSIE 10.0")) {
 			iemode = "10";
-		} else if (datax.index("MSIE 9.0", 1)) {
+		} else if (datax.index("MSIE 9.0")) {
 			iemode = "9";
-		} else if (datax.index("MSIE 8.0", 1)) {
+		} else if (datax.index("MSIE 8.0")) {
 			iemode = "8";
-		} else if (datax.index("MSIE 7.0", 1)) {
+		} else if (datax.index("MSIE 7.0")) {
 			iemode = "7";
-		} else if (datax.index("MSIE 6.0", 1)) {
+		} else if (datax.index("MSIE 6.0")) {
 			iemode = "6";
 		}
 //L1472:
@@ -291,18 +291,18 @@ function main(in mode, io datax, in params0="", in params20="") {
 		}
 
 		if (not browser) {
-			var tt = datax.index("Chrome", 1);
+			var tt = datax.index("Chrome");
 			if (not tt) {
-				tt = datax.index("Firefox", 1);
+				tt = datax.index("Firefox");
 			}
 			if (not tt) {
-				tt = datax.index("Safari", 1);
+				tt = datax.index("Safari");
 			}
 			if (not tt) {
-				tt = datax.index("Opera", 1);
+				tt = datax.index("Opera");
 			}
 			if (not tt) {
-				tt = datax.index("Netscape", 1);
+				tt = datax.index("Netscape");
 			}
 			if (tt) {
 				browser = datax.substr(tt,9999).field(";", 1).field(" ", 1).field(")", 1);

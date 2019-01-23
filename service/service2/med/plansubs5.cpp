@@ -1,32 +1,47 @@
-#ifdef ascascascascsac
-
-
-
 #include <exodus/library.h>
 libraryinit()
 
+#include <createjob.h>
+#include <authorised.h>
+#include <htmllib.h>
+#include <sendmail.h>
+#include <sysmsg.h>
 #include <plansubs9.h>
+#include <locking.h>
 #include <plansubs3.h>
+#include <evaluatesubs.h>
+#include <pop_up.h>
 #include <agencysubs.h>
 #include <generalsubs.h>
 #include <accountingsubs.h>
 #include <addcent.h>
 #include <plansubs2.h>
 #include <addacc.h>
+#include <getreccount.h>
 #include <singular.h>
 
 #include <agy.h>
 #include <gen.h>
 #include <win.h>
 
+#include <window.hpp>
+
+var tt;
+var attachfilename;
+var deletex;
+var errormsg;
+var replyto;
+var params;
+var newvalue;
+var oldvalue;
 var msg;
 var lockdesc;
 var lockkey;
 var otherln;
 var rating;
 var ratingn;//num
-var tt;
 var xx;
+var compcode;
 var reply;//num
 var defyear;//num
 var stopdate;//num
@@ -36,17 +51,221 @@ var m2;//num
 var t2;
 var lgrcd;
 var accno;
+var wsmsg;
 
 function main(in mode) {
+	//c med
 	//garbagecollect;
 
 	//y2k2 *jbase
 
-	if (mode == "IMPORT") {
+	if (mode == "CREATEJOB") {
 
-		goto 4271;
-	}
-	if (mode == "CHK.RATES") {
+		//skip if automatic creation of media jobs is not configured
+		var jobjobtypecode = agy.agp.a(9999);
+		//TEST only ATM
+		if (not jobjobtypecode and (SYSTEM.a(17).substr(-4,4) ne "TEST")) {
+			return 0;
+		}
+
+		//skip if job already exists
+		//TODO resolve potential issue when job, plan or schedule numbers overlap
+		//usually plan and schedule numbers are NOT numeric
+		//whereas job number often are, or are prefixed
+		//MAYBE configure one or both with different prefixes
+		var job;
+		if (job.read(agy.jobs, ID)) {
+			return 0;
+		}
+
+		job = "";
+		job.r(2, calculate("BRAND_CODE"));
+		job.r(14, calculate("COMPANY_CODE"));
+		job.r(8, calculate("EXECUTIVE_NAME"));
+		tt = "Media";
+		var tt2 = calculate("CAMPAIGN_DESCRIPTION");
+		if (tt2) {
+			tt ^= ", " ^ tt2;
+		}
+		job.r(9, tt);
+		job.r(1, calculate("PERIOD"));
+		job.r(54, var().date());
+		job.r(3, jobjobtypecode);
+		job.r(12, calculate("MARKET_CODE"));
+
+		call createjob(job, ID);
+
+	} else if (mode == "EMAIL.CHANGES") {
+
+		//changes to approved schedules get emailed, but not unapproved schedules
+		if (not(calculate("APPROVAL_DATE"))) {
+			return 0;
+		}
+
+		//test only ATM
+		if (not(SYSTEM.a(17).substr(-4,4) == "TEST")) {
+			return 0;
+		}
+		if (not(var("NEOSYS.ID").osfile())) {
+			return 0;
+		}
+
+		var tx = "";
+		var anychanges = "";
+
+		//document header
+		////////////////
+
+		var head = 1;
+		var ln = 0;
+		var oln = 0;
+		var dictids = "DOCUMENT_NO,CLIENT_AND_BRAND,DATE_RANGE,MARKET_NAME,CAMPAIGN_DESCRIPTION";
+		gosub changes();
+
+		//new or changed document lines
+		//////////////////////////////
+
+		head = 0;
+		var nlns = RECORD.a(20).count(VM) + 1;
+		var nolns = win.orec.a(20).count(VM) + 1;
+		var lnids = RECORD.a(160);
+		var olnids = win.orec.a(160);
+		dictids = "VEHICLE_NAME,DATELIST,SPEC,LOADING,DETAILS,FLAGS,NUMBER";
+		var tt2 = "";
+		if (authorised("MEDIA INVOICE ACCESS")) {
+			dictids ^= ",UNIT_BILL,FREE_NUMBER";
+			tt2 ^= ",UNIT_BILL";
+		}
+		if (authorised("MEDIA COST ACCESS")) {
+			dictids ^= ",UNIT_COST,COST_FREE_NUMBER";
+			tt2 ^= ",UNIT_COST";
+		}
+		dictids ^= tt2;
+
+		//search for matching lines
+		for (var ln = 1; ln <= nlns; ++ln) {
+			var lnid = lnids.a(1, ln);
+			if (not(olnids.locateusing(lnid, VM, oln))) {
+				oln = 0;
+			}
+			gosub changes();
+		};//ln;
+
+		//deleted lines
+		//////////////
+
+		var anydeleted = 0;
+		//search for deleted lines
+		for (var oln = 1; oln <= nolns; ++oln) {
+			var olnid = olnids.a(1, ln);
+			if (not(lnids.locateusing(olnid, VM, ln))) {
+				ln = 0;
+				gosub changes();
+			}
+		};//oln;
+
+		if (anychanges) {
+
+			//DATELIST can return html tags
+			call htmllib("STRIPTAGS", tx);
+			call htmllib("DECODEHTML", tx);
+
+			var toaddress = "sb2@neosys.com";
+			var ccaddress = "";
+			var subject = "NEOSYS: Changes in Schedule " ^ ID;
+			var body = tx;
+			body.swapper(FM, "\r\n");
+
+			call sendmail(toaddress, ccaddress, subject, body, attachfilename, deletex, errormsg, replyto, params);
+
+			if (errormsg) {
+				call sysmsg(errormsg ^ FM ^ FM ^ tx);
+			}
+
+		}
+
+		return 0;
+
+}
+
+subroutine changes() {
+		var tx2 = "";
+		var lnchanges = 0;
+
+		var ndictids = dictids.count(",") + (dictids ne "");
+		for (var dictidn = 1; dictidn <= ndictids; ++dictidn) {
+
+			MV = ln;
+			var dictid = dictids.field(",", dictidn);
+
+			if (head or ln) {
+				newvalue = calculate(dictid);
+			}else{
+				newvalue = "";
+			}
+
+			if (head or oln) {
+				oldvalue = calculate(dictid, DICT, ID, win.orec, oln);
+				}else{
+				oldvalue = "";
+			}
+
+			if ((not ln or (dictidn <= 2)) or newvalue ne oldvalue) {
+
+				var dictrec;
+				if (not(dictrec.read(DICT, dictid))) {
+					dictrec = FM ^ FM ^ dictid;
+				}
+
+				//oconv
+				tt = dictrec.a(7);
+				if (tt) {
+					if (newvalue) {
+						newvalue = newvalue.oconv(tt);
+					}
+					if (oldvalue) {
+						oldvalue = newvalue.oconv(tt);
+					}
+				}
+
+				if (head or newvalue ne oldvalue) {
+
+					//no "was:' line for delete lines
+					if (oln and not ln) {
+						newvalue = oldvalue;
+						oldvalue = "";
+						if (not anydeleted) {
+							anydeleted = 1;
+							tx2 ^= FM ^ FM ^ "*DELETED LINES*" ^ FM;
+						}
+					}
+
+					var title = dictrec.a(3);
+					title.converter(VM ^ SVM, "  ");
+					tx2 ^= FM ^ title.oconv("L#20") ^ " : " ^ newvalue;
+
+					if (newvalue ne oldvalue) {
+						lnchanges += 1;
+						//dont print "was:" line for new or deleted lines
+						if (ln and oln) {
+							tx2 ^= FM ^ var("was").oconv("R#20") ^ " : " ^ oldvalue;
+						}
+					}
+
+				}
+
+			}
+
+		};//dictidn;
+
+		if (not ln or lnchanges) {
+			anychanges += lnchanges;
+			tx.r(-1, tx2);
+		}
+
+		return;
+
+	} else if (mode == "CHK.RATES") {
 
 		//check rates
 		var currcode = RECORD.a(13);
@@ -62,13 +281,13 @@ function main(in mode) {
 				if (rate ne 1) {
 					//msg='Exchange rate must be 1|Please refresh exchange rates'
 					call plansubs9(11, msg, ln ^ FM ^ vehiclecurrcode);
-					goto EOF_393;
+					return invalid(msg);
 				}
 			}else{
 				if (rate == 1) {
 					//msg='Exchange rate must not be 1|Please refresh exchange rates'
 					call plansubs9(12, msg, ln ^ FM ^ vehiclecurrcode);
-					goto EOF_393;
+					return invalid(msg);
 				}
 			}
 
@@ -77,29 +296,27 @@ function main(in mode) {
 				if (costrate ne 1) {
 					//msg='Cost exchange rate for ... must be 1|Please refresh exchange rates'
 					call plansubs9(13, msg, ln ^ FM ^ vehiclecurrcode ^ FM ^ agy.agp.a(2));
-					goto EOF_393;
+					return invalid(msg);
 				}
 			}else{
 				if (costrate == 1) {
 					//msg='Cost exchange rate for ... must not be 1|Please refresh exchange rates'
 					call plansubs9(14, msg, ln ^ FM ^ vehiclecurrcode ^ FM ^ agy.agp.a(2));
-					goto EOF_393;
+					return invalid(msg);
 				}
 			}
 
 		};//ln;
 
-		goto 4271;
-	}
-	if (mode.field(".", 1) == "DELETEMOVED") {
+	} else if (mode.field(".", 1) == "DELETEMOVED") {
 
 		//determine if any lines being moved and quit if not
 		var lnids = RECORD.a(160);
 		if (not lnids) {
-			return 0;
+			return;
 		}
-		if (not(lnids.index(":", 1))) {
-			return 0;
+		if (not(lnids.index(":"))) {
+			return;
 		}
 
 		var mode2 = mode.field(".", 2);
@@ -109,14 +326,14 @@ function main(in mode) {
 
 		//clear the list of locked keys
 		if (mode2 == "PREWRITE") {
-			win.registerx[7] = "";
+			win.registerx(7) = "";
 		}
 
 		var nlns = lnids.count(VM) + (lnids ne "");
 		for (var ln = 1; ln <= nlns; ++ln) {
 
 			var lnid = lnids.a(1, ln);
-			if (not(lnid.index(":", 1))) {
+			if (not(lnid.index(":"))) {
 				goto nextmoveln;
 			}
 
@@ -126,10 +343,10 @@ function main(in mode) {
 			//make sure that we update all other records or none
 			if (mode2 == "PREWRITE") {
 				var ntries = 1;
-				if (not(locking("LOCK", win.datafile, otherkey, lockdesc, win.registerx[7], ntries, msg))) {
+				if (not(locking("LOCK", win.datafile, otherkey, lockdesc, win.registerx(7), ntries, msg))) {
 cantmove:
-					call locking("UNLOCKALL", win.datafile, lockkey, lockdesc, win.registerx[7], "", "");
-					goto EOF_393;
+					call locking("UNLOCKALL", win.datafile, lockkey, lockdesc, win.registerx(7), "", "");
+					return invalid(msg);
 				}
 			}
 
@@ -187,7 +404,7 @@ cantmove:
 					for (var fnn = 1; fnn <= nfns; ++fnn) {
 						otherrec.eraser(amvfns.a(1, fnn), otherln);
 					};//fnn;
-					}
+				}
 
 				//delete all/some of the lines ads
 				var adid = otherkey ^ "*" ^ othervehiclecode ^ "*" ^ otherlnid;
@@ -205,6 +422,7 @@ cantmove:
 							///BREAK;
 							if (not ad) break;;
 								agy.ads.deleterecord(adid);
+								
 							};//daten;
 						}
 					}
@@ -224,34 +442,30 @@ nextmoveln:
 			//update new pointers without : marks
 			RECORD.write(win.srcfile, ID);
 
-			call locking("UNLOCKALL", win.datafile, lockkey, lockdesc, win.registerx[7], "", "");
+			call locking("UNLOCKALL", win.datafile, lockkey, lockdesc, win.registerx(7), "", "");
 
 		}
 
-		goto 4271;
-	}
-	if (mode == "VAL.TIME") {
+	} else if (mode == "VAL.TIME") {
 		if (win.is == win.isorig) {
-			return 0;
+			return;
 		}
 		call plansubs3("CHECKCOINCIDENCE");
 		RECORD.r(win.si.a(4), win.mvx, win.is);
 		call evaluatesubs("EVALUATE LINE");
 		DATA = "";
 
-		goto 4271;
-	}
-	if (mode == "F2.TIME") {
+	} else if (mode == "F2.TIME") {
 		if (not(agy.ratings.open("RATINGS", ""))) {
 			agy.ratings = "";
 		}
 		var progcode = RECORD.a(110) ^ ".rev";
 		var axis;
 		if (not(axis.read(agy.ratings, progcode))) {
-			if (not axis.osread(progcode)) {
-				if (not axis.osread("x3")) {
+			if (not(axis.osread(progcode))) {
+				if (not(axis.osread("x3"))) {
 					msg = "PROGRAM LIST IS NOT AVAILABLE";
-					goto EOF_393;
+					return invalid(msg);
 				}
 			}
 		}
@@ -266,16 +480,16 @@ nextmoveln:
 			var nsubs = line.count(VM) + (line ne "");
 			for (var subn = 1; subn <= nsubs; ++subn) {
 				var subline = line.a(1, subn);
-				if (vehiclecode == subline.substr(1, 9).trim()) {
+				if (vehiclecode == subline.substr(1,9).trim()) {
 					//idate=iconv(subline<1,1,2>,'DE')
 					var idate = subline.a(1, 1, 2);
-					var dayofweekn = idate - 1 % 7 + 1;
+					var dayofweekn = (idate - 1) % 7 + 1;
 					var dayofweek = var("Mon,Tue,Wed,Thu,Fri,Sat,Sun").field(",", dayofweekn);
 					subline.r(1, 1, 2, dayofweek);
 					subline.converter(SVM ^ VM, VM ^ FM);
 					if (agy.ratings) {
 						if (dayofweekn ne lastdow) {
-							var ratingkey = var("SURVEY_CODE1").calculate() ^ "*" ^ var("TARGET1").calculate() ^ "*" ^ vehiclecode ^ "*" ^ dayofweekn;
+							var ratingkey = calculate("SURVEY_CODE1") ^ "*" ^ calculate("TARGET1") ^ "*" ^ vehiclecode ^ "*" ^ dayofweekn;
 							var rating;
 							if (not(rating.read(agy.ratings, ratingkey))) {
 								rating = "";
@@ -284,54 +498,52 @@ nextmoveln:
 							lastdow = dayofweekn;
 						}
 						if (rating) {
-							var itime = (subline.substr(10, 5)).iconv("[TIME2]");
-							if (not(rating.a(111).locatebyusing(itime, "AR", ratingn, VM))) {
+							var itime = subline.substr(10,5).iconv("[TIME2]");
+							if (not(rating.a(111).locateby(itime, "AR", ratingn))) {
 								ratingn -= 1;
 							}
 							var ratingperc = rating.a(106, ratingn);
 							subline.r(1, 4, ratingperc);
 						}
 					}
-					options ^= FM ^ subline.substr(10, 9999);
+					options ^= FM ^ subline.substr(10,9999);
 				}
 			};//subn;
 		};//ii;
 		options.splicer(1, 1, "");
 
-		var params = "1:10:L:MTH:Time\\2:10:L::Day\\3:30:L::Program";
+		params = "1:10:L:MTH:Time\\2:10:L::Day\\3:30:L::Program";
 		var question = "Which time/program do you want ?";
 		if (agy.ratings) {
-			question ^= FM ^ "|(Ratings are for " ^ (DQ ^ (var("TARGET1").calculate() ^ DQ)) ^ " / " ^ (DQ ^ (var("SURVEY_CODE1").calculate() ^ DQ)) ^ ")";
+			question ^= FM ^ "|(Ratings are for " ^ (DQ ^ (calculate("TARGET1") ^ DQ)) ^ " / " ^ (DQ ^ (calculate("SURVEY_CODE1") ^ DQ)) ^ ")";
 			params ^= "\\4:7:R::Rating%";
 		}else{
-			if (var("TARGET1").calculate()) {
+			if (calculate("TARGET1")) {
 				question ^= "|(Ratings are not available because survey analysis";
-				question ^= "|has not been done for \"" ^ var("TARGET1").calculate() ^ "\" / \"" ^ var("SURVEY_CODE1").calculate() ^ "\")";
+				question ^= "|has not been done for \"" ^ calculate("TARGET1") ^ "\" / \"" ^ calculate("SURVEY_CODE1") ^ "\")";
 			}
 		}
 		var optionn = pop_up(0, 0, "", options, params, "R", "", question, "", "", "", "P");
 		if (not optionn) {
 			ANS = win.is;
-			return 0;
+			return;
 		}
 
-		var starttime = (options.a(optionn, 1)).iconv("[TIME2]");
+		var starttime = options.a(optionn, 1).iconv("[TIME2]");
 		var programx = options.a(optionn, 3);
-		RECORD.r(23, win.mvx, (RECORD.a(23, win.mvx)).fieldstore("/", 1, 1, starttime.oconv("[TIME2]")));
-		RECORD.r(23, win.mvx, (RECORD.a(23, win.mvx)).fieldstore("/", 3, 1, programx));
-		tt = win.registerx[1].a(23);
+		RECORD.r(23, win.mvx, RECORD.a(23, win.mvx).fieldstore("/", 1, 1, starttime.oconv("[TIME2]")));
+		RECORD.r(23, win.mvx, RECORD.a(23, win.mvx).fieldstore("/", 3, 1, programx));
+		tt = win.registerx(1).a(23);
 		gosub r();
 		ANS = ((starttime / (15 * 60)).floor() * 15 * 60).oconv("[TIME2]");
 
-		goto 4271;
-	}
-	if (mode == "DEF.CURRENCY") {
-		win.isdflt = var("MARKET_CODE").calculate().xlate("MARKETS", 5, "X");
+	} else if (mode == "DEF.CURRENCY") {
+		win.isdflt = calculate("MARKET_CODE").xlate("MARKETS", 5, "X");
 
 		//convert to invoice currency of the client
 		var client;
-		if (not(client.read(agy.clients, var("CLIENT_CODE").calculate()))) {
-			return 0;
+		if (not(client.read(agy.clients, calculate("CLIENT_CODE")))) {
+			return;
 		}
 
 		var invcurr = client.a(11);
@@ -347,11 +559,9 @@ nextmoveln:
 		if (win.isdflt == "") {
 			win.isdflt = agy.agp.a(2);
 		}
-		win.registerx[10] = win.isdflt;
+		win.registerx(10) = win.isdflt;
 
-		goto 4271;
-	}
-	if (mode == "F2.PLANS" or mode == "F2.SCHEDULES") {
+	} else if ((mode == "F2.PLANS") or (mode == "F2.SCHEDULES")) {
 		call agencysubs(mode);
 
 	/*;
@@ -360,20 +570,18 @@ nextmoveln:
 			tstore=is.dflt;
 	*/
 
-		goto 4271;
-	}
-	if (mode == "VAL.REF") {
-		if (win.is == "" or win.is == win.isorig) {
-			return 0;
+	} else if (mode == "VAL.REF") {
+		if ((win.is == "") or (win.is == win.isorig)) {
+			return;
 		}
 
 		//check no bad characters on new records
 		var xx;
-		if (not(xx.reado(win.srcfile, win.is))) {
+		if (not(xx.read(win.srcfile, win.is))) {
 
 			//in case sombody else just used the next key
 lockit:
-			if (win.is == win.registerx[10]) {
+			if (win.is == win.registerx(10)) {
 				if (lockrecord(win.datafile, win.srcfile, win.is)) {
 					xx = unlockrecord(win.datafile, win.srcfile, win.is);
 				}else{
@@ -385,11 +593,11 @@ lockit:
 			}
 
 			win.is.trimmerf();
-			if (win.is.index(" ", 1)) {
+			if (win.is.index(" ")) {
 				msg = "SORRY, YOU CANNOT USE SPACES HERE";
-				gosub EOF_393();
+				gosub invalid(msg);
 			}else{
-				gosub EOF_480();
+				gosub badchars();
 			}
 		}
 
@@ -403,42 +611,45 @@ lockit:
 	//4. AGENCY.SUBS call GENERAL.SUBS('DEF.SK2') pattern NOT <NUMBER>
 	// @ans=nextkey(params,previous) pattern IS <NUMBER>
 	} else if (mode.field(".", 1, 2) == "DEF.REF") {
-		//call general.subs('DEF.SK')
+		//from call general.subs('DEF.SK') /sk2?
 
 		if (win.wlocked or RECORD) {
-			return 0;
+			return;
 		}
 
 		var previous = 0;
 
-		//var compcode = mode.field(".", 3);
 		//try to use single letter key as sequential key IF IS COMPANY CODE
 		//why was the following commented out?
-		if (ID.length() == 2 and ID[-1] == "*" and ID[1].xlate("COMPANIES", 1, "X")) {
+		if (((ID.length() == 2) and (ID[-1] == "*")) and ((ID[1]).xlate("COMPANIES", 1, "X"))) {
 			compcode = ID[1];
 			//can this really happen (see step 0)
-		} else if (ID.length() == 1) {
+			goto 3776;
+		}
+		if (ID.length() == 1) {
 			compcode = ID;
 		}else{
 			//read environment (company code expected TODO should be checked)
 			compcode = mode.field(".", 3);
 		}
+//L3776:
 
 		//end else
 		// compcode=field(mode,'.',3)
 		// end
 		//gosub getnextref
+
 		call agencysubs("GETNEXTID." ^ compcode);
 
 		win.isdflt = ANS;
 		ANS = "";
-		win.registerx[10] = win.isdflt;
+		win.registerx(10) = win.isdflt;
 
 		if (not(not SYSTEM.a(33))) {
 			ID = win.isdflt;
 		}
 
-		return 0;
+		return;
 	/*;
 	///////////
 	getnextref:
@@ -461,7 +672,7 @@ lockit:
 			//SK2 (not SK) to prevent endless loop when GENERAL.SUBS calls this routine
 			call GENERAL.SUBS('DEF.SK2');
 			@ans=is.dflt;
-			return 0;
+			return;
 			end;
 
 		//determine company prefix
@@ -492,7 +703,7 @@ lockit:
 		params=keyfilename:':':seqkeyformat:':':seqkeyfilename:':':keyformat;
 		@ans=nextkey(params,previous);
 
-		return 0;
+		return;
 	*/
 
 	/* replaced with call printplans8('CREATEACC');
@@ -504,14 +715,14 @@ lockit:
 			call printplans8('ADDACC.WIP');
 	*/
 
-	if (mode == "F2.PERIOD") {
+	} else if (mode == "F2.PERIOD") {
 		gosub checkchange();
-	}else if (not win.valid) {
-			return 0;
+		if (not(win.valid)) {
+			return;
 		}
 
-		var period = (var().date()).oconv("D2/E").field("/", 2) + 0;
-		var year = (var().date()).oconv("D2/E").field("/", 3);
+		var period = var().date().oconv("D2/E").field("/", 2) + 0;
+		var year = var().date().oconv("D2/E").field("/", 3);
 		var options = "";
 		for (var ii = 1; ii <= 12; ++ii) {
 			options.r(-1, period ^ "/" ^ year);
@@ -523,29 +734,28 @@ lockit:
 			}
 		};//ii;
 		if (not(decide("", options, reply))) {
-			return 0;
+			return;
 		}
 		ANS = options.a(reply);
 		DATA ^= "" "\r";
 
-		goto 4271;
 	} else if (mode == "DEF.PERIOD") {
 		if (win.is) {
-			return 0;
+			return;
 		}
-		win.isdflt = (var().date()).oconv("D2/E").field("/", 2, 2);
+		win.isdflt = var().date().oconv("D2/E").field("/", 2, 2);
 		if (win.isdflt[1] == "0") {
 			win.isdflt.splicer(1, 1, "");
 		}
 
-	if (mode.substr(1, 10) == "VAL.PERIOD") {
+	} else if (mode.substr(1,10) == "VAL.PERIOD") {
 
-	}else if (win.is == "" or win.is == win.isorig) {
-			return 0;
+		if ((win.is == "") or (win.is == win.isorig)) {
+			return;
 		}
 		gosub checkchange();
-		if (not win.valid) {
-			return 0;
+		if (not(win.valid)) {
+			return;
 		}
 
 		//default to 2 decimal places
@@ -558,12 +768,12 @@ lockit:
 		//default year to the year of the period
 		if (win.is.match("0N")) {
 			if (mode == "VAL.PERIOD2") {
-				defyear = var("PERIOD").calculate().field("/", 2);
-				if (win.is < var("PERIOD").calculate().field("/", 1)) {
+				defyear = calculate("PERIOD").field("/", 2);
+				if (win.is < calculate("PERIOD").field("/", 1)) {
 					defyear += 1;
 				}
 			}else{
-				defyear = ((var().date()).oconv("D2/")).substr(7, 2);
+				defyear = var().date().oconv("D2/").substr(7,2);
 			}
 			win.is ^= "/" ^ defyear;
 		}
@@ -575,23 +785,23 @@ lockit:
 
 		//check month/year format
 		var month = win.is.field("/", 1);
-		if (not(var("1" _VM_ "2" _VM_ "3" _VM_ "4" _VM_ "5" _VM_ "6" _VM_ "7" _VM_ "8" _VM_ "9" _VM_ "10" _VM_ "11" _VM_ "12").a(1).locateusing(month, VM, tt))) {
+		if (not(var("1,2,3,4,5,6,7,8,9,10,11,12").locateusing(month, ",", tt))) {
 badperiod:
 			msg = "PLEASE ENTER PERIOD AS \"MONTH/YEAR\"|(EG \"1/92\" or \"1/1992\")";
-			goto EOF_393;
+			return invalid(msg);
 		}
 		var year = win.is.field("/", 2);
 		if (year.match("4N")) {
-			year = year.substr(-2, 2);
+			year = year.substr(-2,2);
 			win.is = month ^ "/" ^ year;
 		}
-		if (not year.match("2N")) {
+		if (not(year.match("2N"))) {
 			goto badperiod;
 		}
 
 		gosub protectmonths();
-		if (not win.valid) {
-			return 0;
+		if (not(win.valid)) {
+			return;
 		}
 
 		//T=WIS<22>
@@ -603,7 +813,7 @@ badperiod:
 
 			//check that there are not too many dates
 			var ndays = stopdate - startdate + 1;
-			var nlines = (RECORD.a(22)).count(VM) + 1;
+			var nlines = RECORD.a(22).count(VM) + 1;
 			var first = 1;
 			for (var lnx = 1; lnx <= nlines; ++lnx) {
 				var dates = RECORD.a(22, lnx);
@@ -620,13 +830,13 @@ checkndates:
 					//decide how to handle excess dates
 					if (first) {
 						first = 0;
-						var options = "Remove them" _VM_ "Extend the schedule into the next month" _VM_ "Cancel";
+						var options = "Remove them|Extend the schedule into the next month|Cancel";
 						if (not(decide("Some ads will now fall on or after " ^ (stopdate + 1).oconv("[DATE,4*]") ^ "|What do you want to do ?", options, reply))) {
 							reply = 3;
 						}
 						if (reply == 3) {
 							win.valid = 0;
-							return 0;
+							return;
 						}
 					}
 
@@ -639,7 +849,7 @@ checkndates:
 
 					//count number of ads
 					//smdates unconverted
-					tt = dates.substr(1, ndays).trimb();
+					tt = dates.substr(1,ndays).trimb();
 					tt.converter(UPPERCASE, var("1").str(tt.length()));
 					var nads = "";
 					for (var ii = 1; ii <= 9; ++ii) {
@@ -647,7 +857,7 @@ checkndates:
 					};//ii;
 
 					//put the trimmed dates back
-					RECORD.r(22, lnx, dates.substr(1, ndays).trimb());
+					RECORD.r(22, lnx, dates.substr(1,ndays).trimb());
 
 					//change the number of ads
 					RECORD.r(39, lnx, nads);
@@ -670,33 +880,27 @@ checkndates:
 
 		win.displayaction = 5;
 
-		goto 4271;
-	}
-	if (mode == "PROTECTMONTHS") {
+	} else if (mode == "PROTECTMONTHS") {
 		gosub protectmonths();
 
-		goto 4271;
-	}
-	if (mode == "DEF.STARTDATE") {
+	} else if (mode == "DEF.STARTDATE") {
 
-		goto 4271;
-	}
-	if (mode == "VAL.STARTDATE") {
-		if (not win.is.isnum()) {
+	} else if (mode == "VAL.STARTDATE") {
+		if (not(win.is.isnum())) {
 			win.is = win.is.iconv("[DATE]");
 		}
 		if (win.is == win.isorig) {
-			return 0;
+			return;
 		}
 		gosub checkchange();
-		if (not win.valid) {
-			return 0;
+		if (not(win.valid)) {
+			return;
 		}
 
 		//check not after stop date
 		if (win.is > RECORD.a(25)) {
 			msg = "\"START DATE\" CANNOT BE AFTER THE \"STOP DATE\"";
-			goto EOF_393;
+			return invalid(msg);
 		}
 
 		//check max 35 days
@@ -709,39 +913,35 @@ checkndates:
 			}
 			if (reply == 2) {
 				win.valid = 0;
-				return 0;
+				return;
 			}
 			RECORD.r(25, maxdate);
-			tt = win.registerx[1].a(25);
+			tt = win.registerx(1).a(25);
 			gosub r();
 		}
 
 		//redisplay the dates
-		tt = win.registerx[1].a(22);
+		tt = win.registerx(1).a(22);
 		gosub r();
 
-		goto 4271;
-	}
-	if (mode == "DEF.STOPDATE") {
+	} else if (mode == "DEF.STOPDATE") {
 
-		goto 4271;
-	}
-	if (mode == "VAL.STOPDATE") {
-		if (not win.is.isnum()) {
+	} else if (mode == "VAL.STOPDATE") {
+		if (not(win.is.isnum())) {
 			win.is = win.is.iconv("[DATE]");
 		}
 		if (win.is == win.isorig) {
-			return 0;
+			return;
 		}
 		gosub checkchange();
-		if (not win.valid) {
-			return 0;
+		if (not(win.valid)) {
+			return;
 		}
 
 		//check not before start date
 		if (win.is < RECORD.a(10)) {
 			msg = "\"STOP DATE\" CANNOT BE BEFORE THE \"START DATE\"";
-			goto EOF_393;
+			return invalid(msg);
 		}
 
 		//check max 35 days (5 weeks)
@@ -755,34 +955,34 @@ checkndates:
 			if (reply == 2) {
 				win.isorig = "";
 				win.valid = 0;
-				return 0;
+				return;
 			}
 			RECORD.r(10, mindate);
-			tt = win.registerx[1].a(10);
+			tt = win.registerx(1).a(10);
 			gosub r();
 		}
 
 		//redisplay the dates
-		tt = win.registerx[1].a(22);
+		tt = win.registerx(1).a(22);
 		gosub r();
 
-	if (mode == "DEF.COMPANY") {
+	} else if (mode == "DEF.COMPANY") {
 		var temp = "";
-	}else if (temp == "") {
-			temp = var("CLIENT_ACCNO").calculate().a(1, 1, 1).field(",", 2);
+		if (temp == "") {
+			temp = calculate("CLIENT_ACCNO").a(1, 1, 1).field(",", 2);
 		}
 		if (temp) {
 			win.isdflt = temp;
 		}else{
-			if (not((agy.agp.a(1).ucase()).index("PANGULF", 1))) {
+			if (not(agy.agp.a(1).ucase().index("PANGULF"))) {
 				call generalsubs("DEF.COMPANY");
 			}
 		}
 
-	if (mode == "VAL.COMPANY") {
+	} else if (mode == "VAL.COMPANY") {
 
-	}else if (win.is == win.isorig) {
-			return 0;
+		if (win.is == win.isorig) {
+			return;
 		}
 
 		//prevent change of company after invoicing
@@ -792,34 +992,34 @@ checkndates:
 			var newcompanycode = win.is;
 
 			//allow conversion of old data to company code "1" promopub
-			//if (oldcompanycode='' and newcompanycode=1) then return 0
+			//if (oldcompanycode='' and newcompanycode=1) then return
 
 			if (oldcompanycode and newcompanycode ne oldcompanycode) {
 				msg = "SORRY, YOU CANNOT CHANGE THE|COMPANY CODE AFTER INVOICING";
-				goto EOF_393;
+				return invalid(msg);
 			}
 
 		}
 
 		call generalsubs("VAL.COMPANY");
 
-	if (mode == "VAL.ACCNO") {
+	} else if (mode == "VAL.ACCNO") {
 
-	}else if (win.is == win.isorig) {
-			return 0;
+		if (win.is == win.isorig) {
+			return;
 		}
 
 		//company code is no longer allowed in the account number
-		if (win.is.index(",", 1)) {
+		if (win.is.index(",")) {
 			msg = "Please enter the company code in the company code field";
-			goto EOF_393;
+			return invalid(msg);
 		}
 
 		call accountingsubs("VAL.ACCNO");
 
 	}
-L4271:
-	return 0;
+//L5534:
+	return;
 
 }
 
@@ -829,12 +1029,12 @@ subroutine protectmonths() {
 	}
 
 	//work out which months/columns are to be used
-	if (win.wi == win.registerx[1].a(12)) {
+	if (win.wi == win.registerx(1).a(12)) {
 		m1 = win.is;
 	}else{
 		m1 = RECORD.a(12);
 	}
-	if (win.wi == win.registerx[1].a(15)) {
+	if (win.wi == win.registerx(1).a(15)) {
 		m2 = win.is;
 	}else{
 		m2 = RECORD.a(15);
@@ -852,11 +1052,11 @@ subroutine protectmonths() {
 		var nn = m2 - m1 + 12 * (y2 - y1) + 1;
 		if (nn < 1) {
 			msg = "THE STARTING MONTH CANNOT BE|AFTER THE ENDING MONTH";
-			goto EOF_393;
+			return invalid(msg);
 		}
 		if (nn > 12) {
 			msg = "THE ENDING MONTH CANNOT BE MORE THAN|12 MONTHS AFTER THE STARTING MONTH";
-			goto EOF_393;
+			return invalid(msg);
 		}
 	}
 
@@ -864,20 +1064,20 @@ subroutine protectmonths() {
 		m2 += 12;
 	}
 	//month fns are different for date plans
-force error here TODO: check trigraph following;
-	var basefn = (win.registerx[1].a(140 + 1)) ? (140) : (170);
+//WARNING TODO: check trigraph following;
+	var basefn = (win.registerx(1).a(140 + 1)) ? var(140) : var(170);
 
 	//check that there is no data in the unused columns
 	if (mode ne "PROTECTMONTHS") {
 		for (var mm = m1; mm <= m1 + 11; ++mm) {
-			var modmth = mm - 1 % 12 + 1;
+			var modmth = (mm - 1) % 12 + 1;
 			var unused = mm > m2;
 			if (unused) {
 				tt = RECORD.a(140 + modmth) ^ RECORD.a(170 + modmth);
 				tt.converter(VM, "");
 				if (tt) {
-					msg = "There are some ads in month " ^ mm - 1 % 12 + 1 ^ "|Please clear them first";
-					goto EOF_393;
+					msg = "There are some ads in month " ^ (mm - 1) % 12 + 1 ^ "|Please clear them first";
+					return invalid(msg);
 				}
 			}
 		};//mm;
@@ -885,12 +1085,12 @@ force error here TODO: check trigraph following;
 
 	//hide/unhide the unused/used columns
 	for (var mm = m1; mm <= m1 + 11; ++mm) {
-		var modmth = mm - 1 % 12 + 1;
+		var modmth = (mm - 1) % 12 + 1;
 		var unused = mm > m2;
-		var fn = win.registerx[1].a(basefn + modmth);
+		var fn = win.registerx(1).a(basefn + modmth);
 		if (fn) {
-force error here TODO: check trigraph following;
-			win.ww[fn] = win.ww[fn] ? (18) : (0.replace(0, if (unused) {, "P", "O"));
+//WARNING TODO: check trigraph following;
+			win.ww(fn) = win.ww(fn) ? var(18) : (var(0).replace(0, if (unused) {, "P", "O"));
 		}
 	};//mm;
 
@@ -925,10 +1125,10 @@ subroutine getstartstop2() {
 
 subroutine setstartstop() {
 	RECORD.r(10, startdate);
-	tt = win.registerx[1].a(10);
+	tt = win.registerx(1).a(10);
 	gosub r();
 	RECORD.r(25, stopdate);
-	tt = win.registerx[1].a(25);
+	tt = win.registerx(1).a(25);
 	gosub r();
 	return;
 
@@ -936,12 +1136,12 @@ subroutine setstartstop() {
 
 subroutine checkchange() {
 	if (not(authorised("SCHEDULE UPDATE PLAN", msg, ""))) {
-		goto EOF_393;
+		goto badchars;
 	}
 
 	if (RECORD.a(4)) {
 		msg = "YOU CANNOT CHANGE THIS BECAUSE THE|SCHEDULE HAS ALREADY BEEN INVOICED";
-		goto EOF_393;
+		return invalid(msg);
 	}
 
 checkchangebooking:
@@ -949,7 +1149,7 @@ checkchangebooking:
 	tt.converter(VM, "");
 	if (tt) {
 		msg = "YOU CANNOT CHANGE THIS BECAUSE BOOKING|ORDERS HAVE ALREADY BEEN ISSUED";
-		goto EOF_393;
+		return invalid(msg);
 	}
 	return;
 
@@ -966,7 +1166,7 @@ subroutine r() {
 	if (not tt) {
 		return;
 	}
-	//call note(t:' ':w.cnt:' ':w(t)<5>)
+	//call note(tt:' ':w.cnt:' ':w(tt)<5>)
 	if (not(win.redisplaylist.locateusing(tt, FM, t2))) {
 		win.redisplaylist.r(-1, tt);
 	}
@@ -981,23 +1181,23 @@ addacc:
 		return;
 	}
 	var sortorder = "NAME";
-	period = var("PERIOD").calculate();
+	period = calculate("PERIOD");
 	//accname='Sch ':@id:' ':trim({CLIENT_CODE}:' ':{BRAND_CODE}:' ':{PERIOD}:' ':{MARKET_CODE})
-	var accname = var("CLIENT_CODE").calculate() ^ " " ^ var("BRAND_CODE").calculate() ^ " " ^ var("PERIOD").calculate().trim();
+	var accname = (calculate("CLIENT_CODE") ^ " " ^ calculate("BRAND_CODE") ^ " " ^ calculate("PERIOD")).trim();
 
 	//virtually identical in addjobacc plan.subs5 printplans6
 	//year 99
-	var params = period.field("/", 2);
+	params = period.field("/", 2);
 	//calendar period 01-12
-	params.r(2, (period.field("/", 1)).oconv("R(0)#2"));
+	params.r(2, period.field("/", 1).oconv("R(0)#2"));
 	//calendar quarter 1-4
 	params.r(3, ((period.field("/", 1) - 1) / 3).floor() + 1);
 	//company code
 	params.r(4, gen.gcurrcompany);
 
 	var addaccmode = "ADD";
-	if (FILES[0].locateusing("ABP", FM, xx)) {
-		if (FILES[0].locateusing("ACCOUNTS", FM, xx)) {
+	if (FILES(0).locateusing("ABP", FM, xx)) {
+		if (FILES(0).locateusing("ACCOUNTS", FM, xx)) {
 			call addacc(addaccmode, lgrcd, accno, accname, sortorder, params, msg);
 			//if msg then
 			//changed to prevent messages occuring while batch updating schedules
@@ -1018,11 +1218,10 @@ addacc:
 smdatesunconverted:
 	///////////////////
 	msg = "NOT SUPPORTED IN DOS VERSION ANYMORE";
-	goto EOF_393;
+	return invalid(msg);
 	return;
 
 }
 
 
 libraryexit()
-#endif

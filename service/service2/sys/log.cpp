@@ -2,7 +2,7 @@
 libraryinit()
 
 #include <openfile.h>
-#include <readbakpars.h>
+#include <getbackpars.h>
 #include <sendmail.h>
 
 
@@ -66,7 +66,7 @@ getlogkey:
 	/////////////////////////////
 
 	//get backup parameters
-	call readbakpars(bakpars);
+	call getbackpars(bakpars);
 
 	var emailaddrs = bakpars.a(14);
 	if ((programname ne "SYSMSG" and programname ne "SENDMAIL") and emailaddrs) {

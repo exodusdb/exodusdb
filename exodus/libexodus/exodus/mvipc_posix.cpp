@@ -19,7 +19,7 @@ using namespace std;
 
 #define EXODUS_IPC_EXTERN extern
 #include <exodus/mvipc.h>
-#include <exodus/mvfunctor.h>
+//#include <exodus/mvfunctor.h>
 
 //#define BUFSIZE 1048576
 //cant be bigger than process stacksize .. this LIMITS boost messaging
@@ -50,7 +50,7 @@ void respondToRequests(int sock, const std::string& socketpath, ExodusFunctorBas
 		#if TRACING >= 3
 			wprintf(L"---------------------------------\nMVipc: accepting on socket %d\n",sock);
 		#endif
-		
+
 		/*server waits for a connection*/
 		struct sockaddr_in from;
 		fromlen = sizeof(from);
@@ -66,7 +66,7 @@ void respondToRequests(int sock, const std::string& socketpath, ExodusFunctorBas
 		#if TRACING >= 3
 			wprintf(L"---------------------------------\nMVipc: reading %d byte size from socket %d\n",sizeof(int),sock2);
 		#endif
-		
+
 		int nn;
 
 		if ((nn=read(sock2,chRequest,sizeof(int)))<0)
@@ -79,14 +79,14 @@ void respondToRequests(int sock, const std::string& socketpath, ExodusFunctorBas
 		#if TRACING >= 3
 			wprintf(L"---------------------------------\nMVipc() read  %d bytes from socket\n",nn);
 		#endif
-		
+
 		int request_size=62;//((int)chRequest)+sizeof(int);
 
 		//log
 		#if TRACING >= 3
 			wprintf(L"---------------------------------\nMVipc: reading %d more bytes from data socket\n",request_size-sizeof(int));
 		#endif
-		
+
 		if ((nn=read(sock2,chRequest+sizeof(int),request_size-sizeof(int)))<0)
 		{
 			std::cout << "mvipc: error " << errno << " " << strerror(errno) << " reading data from socket " << socketpath << std::endl;
@@ -98,7 +98,7 @@ void respondToRequests(int sock, const std::string& socketpath, ExodusFunctorBas
 			wprintf(L"---------------------------------\nMVipc() read  %d more bytes from socket\n",nn);
 		#endif
 */
-		
+
 		//log
 		#if TRACING >= 3
 			wprintf(L"---------------------------------\nMVipc: reading upto %d bytes from data socket\n",sizeof(chRequest));
@@ -216,7 +216,7 @@ int MVipc(const int environmentn, var& pgconnparams)
 	#if TRACING >= 3
 		wprintf(L"---------------------------------\nMVipc: bound socket %s\n",socketpath.c_str());
 	#endif
-		
+
 	//indicate to waiting/paused parent thread that the pipe is open
 	//(the pipe is not actually waiting until the next step)
 	//scoped so that the scoped_lock is automatically released after the notification
@@ -233,7 +233,7 @@ int MVipc(const int environmentn, var& pgconnparams)
 	}
 
 	respondToRequests(sock,socketpath,exodusfunctorbase);
-	
+
 	std::cout << "stopped responding to socket " << socketpath << std::endl;
 
 	closeipcqueues(sock, socketpath);

@@ -12,9 +12,12 @@
 #include <libpq-fe.h>//in postgres/include
 
 #include <exodus/mv.h>
+
+//needed to access functorbase.mv.ID and RECORD MV
 #include <exodus/mvenvironment.h>
-//#include <exodus/mvutf.h>
 #include <exodus/mvfunctor.h>
+
+//#include <exodus/mvutf.h>
 
 namespace exodus
 {

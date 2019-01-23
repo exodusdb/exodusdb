@@ -144,12 +144,12 @@ function main(in mode) {
 		call log2("*fix an error", logtime);
 		while (true) {
 		///BREAK;
-		if (not(t10.index("MEDIA MEDIA ", 1))) break;;
+		if (not(t10.index("MEDIA MEDIA "))) break;;
 			t10.swapper("MEDIA MEDIA ", "MEDIA ");
 		}//loop;
 		while (true) {
 		///BREAK;
-		if (not(t10.index("PRODUCTION PRODUCTION ", 1))) break;;
+		if (not(t10.index("PRODUCTION PRODUCTION "))) break;;
 			t10.swapper("PRODUCTION PRODUCTION ", "PRODUCTION ");
 		}//loop;
 

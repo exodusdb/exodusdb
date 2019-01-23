@@ -74,7 +74,7 @@ function main(in sentence0, in select0="", in filters0="") {
 		SENTENCE.transfer(sentencex);
 
 		//locate and remove SELECT statement from end of command
-		if (sentencex.a(1).locateusing("SELECT", " ", temp)) {
+		if (sentencex.locateusing("SELECT", " ", temp)) {
 			selectx = sentencex.field(" ", temp + 1, 9999);
 			sentencex = sentencex.field(" ", 1, temp - 1);
 		}else{
@@ -93,23 +93,23 @@ function main(in sentence0, in select0="", in filters0="") {
 		return 0;
 	}
 
-	var normalise = sentencex.index(" NORMALISE", 1);
+	var normalise = sentencex.index(" NORMALISE");
 	if (normalise) {
 		sentencex.swapper(" NORMALISE", "");
 	}
 
-	var firstmvonly = sentencex.index(" FIRSTMVONLY", 1);
+	var firstmvonly = sentencex.index(" FIRSTMVONLY");
 	if (firstmvonly) {
 		sentencex.swapper(" FIRSTMVONLY", "");
 	}
 
-	var raw = sentencex.index(" RAW", 1);
+	var raw = sentencex.index(" RAW");
 	if (raw) {
 		sentencex.swapper(" RAW", "");
 	}
 	var mvgroupno = "";
 
-	var colheaderrow = not sentencex.index(" NOCOLHEADER", 1);
+	var colheaderrow = not sentencex.index(" NOCOLHEADER");
 	if (not colheaderrow) {
 		sentencex.swapper(" NOCOLHEADER", "");
 	}
@@ -174,7 +174,7 @@ function main(in sentence0, in select0="", in filters0="") {
 				exportable = exportable.a(3);
 				exportable.converter(VM ^ " ", FM ^ FM);
 			}
-			keyx = exportable.substr(1,exportable.index(FM ^ FM, 1) - 1);
+			keyx = exportable.substr(1,exportable.index(FM ^ FM) - 1);
 			nkeys = keyx.count(FM) + 1;
 			if (nkeys > 2) {
 				//call msg('Key field(s) should be followed by a blank line or space in EXPORTABLE')
@@ -332,7 +332,7 @@ nextdict:
 					var oconvx = dict.a(7);
 
 					//force long date format
-					if (oconvx.index("DATE", 1) or (oconvx[1] == "D")) {
+					if (oconvx.index("DATE") or (oconvx[1] == "D")) {
 						//if raw then
 						// oconvx='D4/J'
 						//end else
@@ -348,7 +348,7 @@ nextdict:
 					} else if (oconvx.substr(1,7) == "[NUMBER") {
 						oconvx = "";
 					}
-//L1731:
+//L1728:
 					oconvxs(coln) = oconvx;
 				}
 
@@ -458,7 +458,7 @@ nextrec:
 		} else if (not value) {
 			goto nextrec;
 		}
-//L2175:
+//L2172:
 	};//filtern;
 
 	/*;
@@ -574,15 +574,15 @@ nextvn:
 				if (fmtxs(coln) ne "R" or not cell.isnum()) {
 
 					//make sure "1-12" is not interpreted as a formula
-					if (1 or excel) {
-						if (var(".-+0123456789").index(cell[1], 1)) {
+					if (var(1) or excel) {
+						if (var(".-+0123456789").index(cell[1])) {
 							if (not(cell.isnum())) {
 								cell.splicer(1, 0, " ");
 							}
 						}
 					}
 
-					if (cell.index(DQ, 1)) {
+					if (cell.index(DQ)) {
 						if (fmtxs(coln) == "T") {
 							if ((cell[1] ne DQ) or (cell[-1] ne DQ)) {
 								cell.swapper(DQ, "\'\'");

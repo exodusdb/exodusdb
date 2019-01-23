@@ -40,7 +40,7 @@ function main(in d1, in d2, out result, io lang) {
 	//dont show start and end day of month if complete calendar months
 	if (tt.a(1) == 1) {
 		//calculate end of month of stop date
-		t2 = (t2.oconv("D2/E").field("/", 2, 2)).iconv("[DATEPERIOD]");
+		t2 = t2.oconv("D2/E").field("/", 2, 2).iconv("[DATEPERIOD]");
 		if (tt.a(4) == t2.oconv("D2/E").field("/", 1)) {
 			tt.r(1, "");
 			tt.r(4, "");

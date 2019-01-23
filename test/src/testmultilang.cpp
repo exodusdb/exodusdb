@@ -20,18 +20,19 @@ function main()
 	buf.osread( "utf8.html", "utf8");		// read with boost_utf8-facet
 	buf.oswrite( "utf8utf8.html", "utf8");	// write with boost_utf8_facet
 	printl( "Check that 'utf8.html', 'utf8copy.html', 'utf8utf8.html' in working directory - identical");
-	print( "Press any good key to continue ...");
+	printl( "Press Enter to continue ...");
 	char c = getchar();
 
 	// and chinese page
 	buf.osread( "calblur8.html", "utf8");
 	buf.oswrite( "calblur8utf8.html", "utf8");
 	printl( "Check that 'calblur8.html' and 'calblur8utf8.html' in working directory - identical");
-	print( "Press any good key to continue ...");
+	printl( "Press Enter to continue ...");
 	c = getchar();
+	printl(c);
 
 //  this code fragment tests locale specific characters IO with narrow files (1 char = 1 byte codepages)
-	var EN_RU_UA_txt1 = L"[English language][Русский язык][Українська мова]\n";
+	var EN_RU_UA_txt1 = "[English language][Русский язык][Українська мова]\n";
 	var EN_RU_UA_txt2;
 	var EN_RU_UA_file = "test_EN_RU_UA.txt";
 //	oswrite( EN_RU_UA_txt1, EN_RU_UA_file, 1058);
@@ -41,7 +42,7 @@ function main()
 	EN_RU_UA_txt1.outputl( "Written   text:");
 	EN_RU_UA_txt2.outputl( "Read back text:");
 
-	print( "Press any good key to continue ...");
+	printl( "Press Enter to continue ...");
 	c = getchar();
 
 //  Do it again, dynamically changing locale to Greek
@@ -54,7 +55,7 @@ function main()
 	EN_GREEK_txt1.outputl( "Written   text:");
 	EN_GREEK_txt2.outputl( "Read back text:");
 
-	print( "Press any good key to continue ...");
+	printl( "Press Enter good key to continue ...");
 	c = getchar();
 
 // Test throwing MvException on wrong locale name
@@ -62,7 +63,7 @@ function main()
 //	oswrite( EN_GREEK_txt1, EN_GREEK_file, "some_bad_locale");
 
 //  this code fragment tests locale specific characters IO with UTF8 files
-	var MIXTURE_txt1 = L"[English][Русский][Українська][Greek Char:\\u03A3][\u03A3]\n";
+	var MIXTURE_txt1 = "[English][Русский][Українська][Greek Char:\\u03A3][\u03A3]\n";
 	var MIXTURE_txt2;
 	var MIXTURE_file = "test_MIXTURE.txt";
 	oswrite( MIXTURE_txt1, MIXTURE_file, "utf8");
@@ -71,7 +72,7 @@ function main()
 	MIXTURE_txt1.outputl( "Written   text:");
 	MIXTURE_txt2.outputl( "Read back text:");
 
-	print( "Press any good key to continue ...");
+	printl( "Press Enter key to continue ...");
 	c = getchar();
 
 //  this code fragment tests positioning in UTF8 files
@@ -110,7 +111,7 @@ function main()
 	position = 5;
 	assert( osbwrite( L"1234567890", OUTPUT_file, position));
 	assert( osbwrite( L"1234567890\n", OUTPUT_file, position));
-	assert( osbwrite( L"Фраза із 22 символів", OUTPUT_file, position));
+	assert( osbwrite( "Фраза із 22 символів", OUTPUT_file, position));
 	assert( osbwrite( L"\n1234567890", OUTPUT_file, position));
 	assert( osbwrite( L"1234567890\n", OUTPUT_file, position));
 	position = 10;
@@ -122,8 +123,8 @@ function main()
 	position = 5;
 	assert( osbwrite( L"1234567890", OUTPUT_file, position));
 	assert( osbwrite( L"1234567890\n", OUTPUT_file, position));
-	assert( osbwrite( L"Фраза із 22 символів", OUTPUT_file, position));
-	assert( osbwrite( L"Фраза из 22 символов", OUTPUT_file, position));
+	assert( osbwrite( "Фраза із 22 символів", OUTPUT_file, position));
+	assert( osbwrite( "Фраза из 22 символов", OUTPUT_file, position));
 	assert( osbwrite( L"\n1234567890", OUTPUT_file, position));
 	assert( osbwrite( L"1234567890\n", OUTPUT_file, position));
 	position = 10;

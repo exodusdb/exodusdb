@@ -3,7 +3,7 @@
 set -x
 set -e
 
-for MODULE in sys gen agy job tim
+for MODULE in sys gen fin agy med job tim
 do
 	cp ~/arev/$MODULE/*.cpp ../$MODULE/
 #	compile ../$MODULE/*.cpp {S}

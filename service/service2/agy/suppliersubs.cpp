@@ -105,7 +105,7 @@ function main(in mode) {
 		if (win.wlocked) {
 			//tt=ucase(@record<1>:@record<15>)
 			//if index(tt,'(STOP)',1) or index(tt,'<STOP>',1) then
-			if ((RECORD.a(15) or RECORD.a(1).index("(STOP)", 1)) or RECORD.a(1).index("<STOP>", 1)) {
+			if ((RECORD.a(15) or RECORD.a(1).index("(STOP)")) or RECORD.a(1).index("<STOP>")) {
 				//if security('SUPPLIER ACCESS STOPPED',msg) else
 				if (not(authorised("SUPPLIER UPDATE TERMS", msg))) {
 					win.wlocked = 0;

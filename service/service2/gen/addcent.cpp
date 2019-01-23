@@ -28,13 +28,13 @@ function main(in type, in in0, in mode, out outx) {
 
 	if (type == "ICONV") {
 
-		if (inx.index("/", 1)) {
+		if (inx.index("/")) {
 			//12/2014 -> 12/14
 			var mth = inx.field("/", 1);
 			var yr = inx.field("/", 2);
 			outx = mth ^ "/" ^ yr.substr(-2,2);
 
-		} else if (inx.index(".", 1)) {
+		} else if (inx.index(".")) {
 			var yr = inx.field(".", 1);
 			var mth = inx.field(".", 2);
 			outx = yr.substr(-2,2) ^ "." ^ mth;
@@ -73,8 +73,8 @@ function main(in type, in in0, in mode, out outx) {
 		return outx;
 	}
 
-	if (inx.index(".", 1)) {
-		var prefix = (inx.field(".", 1)).oconv("[ADDCENT]") ^ ".";
+	if (inx.index(".")) {
+		var prefix = inx.field(".", 1).oconv("[ADDCENT]") ^ ".";
 		outx = prefix ^ inx.field(".", 2);
 		//goto exit
 		return outx;
@@ -93,7 +93,7 @@ function main(in type, in in0, in mode, out outx) {
 	var prefix = "";
 
 	//range of periods 1/98-3/98
-	if (inx.index("-", 1)) {
+	if (inx.index("-")) {
 		outx = addcent(inx.field("-", 1), "", "", xx);
 		outx ^= "-" ^ addcent(inx.field("-", 2), "", "", xx);
 		//goto exit
@@ -101,7 +101,7 @@ function main(in type, in in0, in mode, out outx) {
 	}
 
 	//remove any prefixed period number '1/99'
-	if (inx.index("/", 1)) {
+	if (inx.index("/")) {
 		prefix = inx.field("/", 1) ^ "/";
 		inx = inx.field("/", 2);
 	}

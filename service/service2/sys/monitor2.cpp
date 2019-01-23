@@ -3,7 +3,7 @@ libraryinit()
 
 #include <cid.h>
 #include <monitor2b.h>
-#include <readbakpars.h>
+#include <getbackpars.h>
 #include <shell2.h>
 #include <diskfreespace.h>
 #include <getdatetime.h>
@@ -303,7 +303,7 @@ nextprocess:
 		if ((statusn == 1) or (((backuprequired.a(1, dbasen) == "") and (statusn <= 3)))) {
 
 			//get the bakpars for a specific process
-			call readbakpars(bakpars, RECORD);
+			call getbackpars(bakpars, RECORD);
 
 			//not suppressed and not test (non-live)
 			backuprequired.r(1, dbasen, not bakpars.a(9) and not bakpars.a(11));
@@ -653,10 +653,10 @@ nextdbasen:;
 
 	};//backupdriven;
 	//oswrite descriptions on 'DESCRIPS'
-	if (descriptions.index("!!", 1) and (status0123 < 2)) {
+	if (descriptions.index("!!") and (status0123 < 2)) {
 		status0123 = 2;
 	}
-	if (descriptions.index("!", 1) and (status0123 < 1)) {
+	if (descriptions.index("!") and (status0123 < 1)) {
 		status0123 = 1;
 	}
 
@@ -664,7 +664,7 @@ nextdbasen:;
 
 	//add neosys version for info
 	call osread(versionnote, "general\\version.dat");
-	versiondate = (versionnote.trim().field(" ", 2, 3)).iconv("D");
+	versiondate = versionnote.trim().field(" ", 2, 3).iconv("D");
 	hostdescriptions ^= "Ver" ^ versiondate.oconv("D2/J") ^ "-" ^ versionnote.field(" ", 1).field(":", 1, 2);
 
 	//dont allow upgrades by test databases
@@ -701,12 +701,12 @@ nextdbasen:;
 				tt = upgradefilename;
 				tt.splicer(-3, 3, "$wg");
 				call osread(wgetoutput, tt);
-				if (wgetoutput.ucase().index(" NO NEWER ", 1) or wgetoutput.index("100%", 1)) {
+				if (wgetoutput.ucase().index(" NO NEWER ") or wgetoutput.index("100%")) {
 					upgradefiledir = upgradefilename83.osfile();
 					hostdescriptions ^= " - Upg" ^ upgradefiledir.a(2).oconv("D2/J") ^ "-" ^ upgradefiledir.a(3).oconv("MT");
 					upgradeready = 1;
-				} else if (wgetoutput.ucase().index(" ERROR 404", 1)) {
-				} else if (wgetoutput.ucase().index(" failed: Unknown host.", 1)) {
+				} else if (wgetoutput.ucase().index(" ERROR 404")) {
+				} else if (wgetoutput.ucase().index(" failed: Unknown host.")) {
 					printl("DNS cant resolve upgrade host name");
 				} else {
 					if (not(var("NEOSYS.ID").osfile())) {

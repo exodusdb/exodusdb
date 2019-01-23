@@ -28,7 +28,7 @@ function main(in input0, out unitx) {
 	numx.converter(",", ".");
 	var nn = numx.count(".");
 	for (var ii = 1; ii <= nn - 1; ++ii) {
-		var tt = numx.index(".", 1);
+		var tt = numx.index(".");
 		numx.splicer(tt, 1, "");
 	};//ii;
 

@@ -126,7 +126,7 @@ postuploadfail:
 			return 0;
 		}
 
-		if (uploadpath.substr(3,99999).index("..", 1)) {
+		if (uploadpath.substr(3,99999).index("..")) {
 			msg = DQ ^ (uploadpath ^ DQ) ^ " ..  is not allowed";
 			gosub unlockfile();
 			return invalid(msg);
@@ -198,7 +198,7 @@ postuploadfail:
 		//initdir uploadroot:uploadpath
 		//if dirlist() else
 		var tt = (shell2("dir " ^ (DQ ^ (uploadroot ^ uploadpath ^ DQ)) ^ " /b", errors)).ucase();
-		if ((tt == "") or tt.index("FILE NOT FOUND", 1)) {
+		if ((tt == "") or tt.index("FILE NOT FOUND")) {
 			msg = "Error: Nothing uploaded in " ^ uploadroot ^ uploadpath;
 			return invalid(msg);
 		}
@@ -213,7 +213,7 @@ postuploadfail:
 		//convert '\/:*?<>|' to '--------' in virtualfilebase
 		//convert '"' to "'" in virtualfilebase
 
-		if (virtualfilebase.index("\\", 1)) {
+		if (virtualfilebase.index("\\")) {
 			//uploadpath=field(virtualfilebase,'\',1,count(virtualfilebase,'\'))
 		}else{
 			//uploadpath='*'
@@ -228,7 +228,7 @@ postuploadfail:
 		}
 		dirpatt ^= "*";
 
-		if (dirpatt.substr(3,99999).index("..", 1)) {
+		if (dirpatt.substr(3,99999).index("..")) {
 			msg = DQ ^ (dirpatt ^ DQ) ^ " .. is not allowed";
 			return invalid(msg);
 		}
@@ -300,13 +300,13 @@ postuploadfail:
 		//initdir uploadroot:uploadpath
 		//if dirlist() else
 		var tt = (shell2("dir " ^ (DQ ^ (uploadroot ^ uploadpath ^ DQ)) ^ " /b", errors)).ucase();
-		if ((tt == "") or tt.index("FILE NOT FOUND", 1)) {
+		if ((tt == "") or tt.index("FILE NOT FOUND")) {
 			msg = "Error: Nothing uploaded in " ^ uploadroot ^ uploadpath;
 			return invalid(msg);
 		}
 
 		tt = uploadroot ^ uploadpath;
-		if (tt.substr(3,99999).index("..", 1)) {
+		if (tt.substr(3,99999).index("..")) {
 			msg = DQ ^ (tt ^ DQ) ^ " .. is not allowed";
 			return invalid(msg);
 		}
@@ -340,7 +340,7 @@ postuploadfail:
 		var validating = RECORD.a(17);
 		osfile = "";
 
-		if (uploadpath.substr(3,99999).index("..", 1)) {
+		if (uploadpath.substr(3,99999).index("..")) {
 			msg = DQ ^ (uploadpath ^ DQ) ^ " .. is not allowed";
 			return invalid(msg);
 		}
@@ -366,7 +366,7 @@ postuploadfail:
 		if (not importcode) {
 			importcode = (field2(uploadpath, "\\", -1)).ucase();
 		}
-		if (importcode.index(".", 1)) {
+		if (importcode.index(".")) {
 			var tt = field2(uploadpath, ".", -1);
 			importcode.splicer(-tt.length() - 1, 999, "");
 		}
@@ -419,7 +419,7 @@ postuploadfail:
 				if (not cols) {
 					var offset = 1;
 					while (true) {
-						var tt = line.index("  ", 1);
+						var tt = line.index("  ");
 					///BREAK;
 					if (not tt) break;;
 						cols.r(-1, line.substr(1,tt - 1) ^ VM ^ offset);
@@ -511,9 +511,9 @@ postuploadfail:
 								if (col.a(1, 4)) {
 									var cell0 = cell;
 									var CONV = col.a(1, 4);
-									if (CONV.index("TIME", 1)) {
+									if (CONV.index("TIME")) {
 										//if no : in time then assume is already seconds
-										if (cell.index(":", 1)) {
+										if (cell.index(":")) {
 											cell = cell.iconv(CONV);
 										}
 									}else{
@@ -592,11 +592,11 @@ subroutine getline() {
 		}
 	}
 
-	var tt = line.index("\r", 1);
+	var tt = line.index("\r");
 	if (tt) {
 		anycr = 1;
 	}else{
-		tt = line.index("\n", 1);
+		tt = line.index("\n");
 		//assume if no cr/lf then we are at the end of the file
 		//TODO should really increase the lengthx
 		if (not tt) {

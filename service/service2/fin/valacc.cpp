@@ -3,6 +3,7 @@ libraryinit()
 
 #include <btreeextract.h>
 #include <giveway.h>
+#include <pop_up.h>
 #include <authorised.h>
 
 #include <fin.h>
@@ -17,23 +18,20 @@ var vn;
 var reply;//num
 var ok;//num
 var buff;
+var ledgername;
 var accno2;
 var msg0;
 var positive;
-var acctype;
 
-function main(io mode, io is, io isorig, in validaccs, io msg, in acctype0) {
+function main(io mode, io is, io isorig, in validaccs, io msg, in acctype) {
+	//c fin io,io,io,in,io
+	if (acctype.unassigned()) {
+		acctype = "";
+	}
+	//jbase
 	//y2k
 	//returns true if is a valid account
 	//otherwise returns false with error message in MSG
-	if (acctype0.unassigned()) {
-		acctype = "";
-	} else {
-		acctype = acctype0;
-	}
-
-	//defeat compiler warning unused
-	if (false) print(isorig);
 
 	var autogetmany = mode == "AUTOGETMANY";
 	if (autogetmany) {
@@ -44,8 +42,8 @@ function main(io mode, io is, io isorig, in validaccs, io msg, in acctype0) {
 	if (many) {
 		mode = "";
 	}
-
-	var ss = many ? "(s)" : "";
+//WARNING TODO: check trigraph following;
+	var ss = many ? var("(s)") : var("");
 
 	var remotecall = SYSTEM.a(33);
 	var interactive = mode ne "";
@@ -102,7 +100,7 @@ chkacc:
 
 			//if interactive and not(remotecall) then
 			//no message if batch validation
-			if (interactive and not remotecall and mode ne 1) {
+			if ((interactive and not remotecall) and mode ne 1) {
 				//print char(7):
 				call note("NOTE: " ^ isaccno ^ " HAS BEEN CHANGED TO " ^ fin.account.a(10));
 			}
@@ -123,11 +121,10 @@ badacc:
 			isaccno.ucaser();
 
 			//try to use indexes
-			//if (indices2("ACCOUNTS", "UPPERCASE_NAME.XREF")) {
-			if (true) {
+			if (listindexes("ACCOUNTS", "UPPERCASE_NAME.XREF")) {
 				var acclist = "";
 				var storedict = DICT;
-				if (DICT.open("DICT", "ACCOUNTS")) {
+				if (DICT.open("dict_ACCOUNTS")) {
 					plussign = isaccno[-1] == "+";
 					if (plussign) {
 						isaccno.splicer(-1, 1, "");
@@ -156,35 +153,32 @@ badacc:
 					var acclist2 = "";
 					for (var accn = 1; accn <= 9999; ++accn) {
 						accno = acclist.a(accn);
-
-						///BREAK;
-						if (not(accno and acclist2.length() < 30000))
-							break;;
-
+					///BREAK;
+					if (not(accno and (acclist2.length() < 30000))) break;;
 						if (not interactive) {
-							if (giveway()) {
+							if (giveway("")) {
 								{}
 							}
 						}
 						if (plussign) {
-							if (accno.substr(1, isaccno.length()) ne isaccno) {
+							if (accno.substr(1,isaccno.length()) ne isaccno) {
 								goto nextaccno;
 							}
 						}
 						if (accno[1] ne ".") {
-							if (not(acclist2.locateby(accno, "AL", posn))) {
+							if (not(acclist2.locatebyusing(accno, "AL", posn, FM))) {
 
 								//skip wrong ledgers
-								if (var("CHART,STOCK,JOB").locateusing(validaccs.substr(1, 5), ",")) {
+								if ("CHART" _VM_ "STOCK" _VM_ "JOB".a(1).locateusing(validaccs.substr(1,5), VM, xx)) {
 									if (not(fin.account.read(fin.accounts, accno))) {
 										fin.account = "";
 									}
-									if (validaccs.substr(1, 5) == "CHART") {
-										if (not(validaccs.substr(7, 9999).locate(fin.account.a(2), vn))) {
+									if (validaccs.substr(1,5) == "CHART") {
+										if (not(validaccs.substr(7,9999).locateusing(fin.account.a(2), FM, vn))) {
 											accno = "";
 										}
 									}else{
-										if (not(fin.account.a(23).field(";", 2) == validaccs.substr(1, 5))) {
+										if (not(fin.account.a(23).field(";", 2) == validaccs.substr(1,5))) {
 											accno = "";
 										}
 									}
@@ -204,7 +198,7 @@ badacc:
 										}
 									}else{
 										if (fin.account.a(8) ne acctype) {
-											if (not(fin.account.a(8) == "" and acctype == "O")) {
+											if (not((fin.account.a(8) == "") and (acctype == "O"))) {
 												accno = "";
 											}
 										}
@@ -217,8 +211,8 @@ badacc:
 
 							}
 						}
-nextaccno:;
-					}
+nextaccno:
+					};//accn;
 
 					if (acclist2 == "") {
 						goto accname;
@@ -247,31 +241,27 @@ nextaccno:;
 							}
 						}
 
-						//var yy = _CRTHIGH / 2 - acclist.count(FM) / 2 - 4;
-						//if (yy < 0) {
-						//	yy = 0;
-						//}
+						var yy = CRTHIGH / 2 - acclist.count(FM) / 2 - 4;
+						if (yy < 0) {
+							yy = 0;
+						}
 
 						if (not remotecall) {
 							//print char(7):
-							//accno = pop_up(0, yy, fin.accounts, acclist, params, "T", many, "Which account" ^ ss ^ " do you want ?", "", "", "1", "K");
+							accno = pop_up(0, yy, fin.accounts, acclist, params, "T", many, "Which account" ^ ss ^ " do you want ?", "", "", "1", "K");
 						}else{
 							naccs = acclist.count(FM) + 1;
 							acclist2 = "";
-							var accn;
-							for (accn = 1; accn <= naccs; ++accn) {
+							for (var accn = 1; accn <= naccs; ++accn) {
 								if (fin.account.read(fin.accounts, acclist.a(accn))) {
 									accno = fin.account.a(10);
-									gosub checkaccountauthorised(msg);
+									gosub checkaccountauthorised();
 									if (ok) {
 										acclist2 ^= FM ^ accno ^ VM ^ fin.account.a(1) ^ VM ^ fin.account.a(2) ^ VM ^ fin.account.a(5);
 									}
 								}
-
-								///BREAK;
-								if (not(acclist2.length() < 32000))
-									break;;
-
+							///BREAK;
+							if (not(acclist2.length() < 32000)) break;;
 							};//accn;
 							acclist2.splicer(1, 1, "");
 
@@ -287,7 +277,7 @@ nextaccno:;
 						if (many) {
 							//n=count(accno,fm)+1
 							//for i=1 to n
-							// read acc from accounts,accno<i> then accno<i>=acc<10>
+							// reado acc from accounts,accno<i> then accno<i>=acc<10>
 							// next i
 							accno.converter(FM, TM);
 							is = SVM ^ accno;
@@ -298,7 +288,7 @@ nextaccno:;
 					//get the account
 					var acc;
 					if (not(acc.read(fin.accounts, accno))) {
-//missingacc:
+missingacc:
 						//print char(7):
 						call mssg(DQ ^ (accno ^ DQ) ^ " account is missing|(try rebuilding indexes)");
 						return 0;
@@ -357,19 +347,19 @@ nextacc:
 					}
 					var acc;
 					if (acc.read(fin.accounts, accno)) {
-						temp = acc.a(1).ucase();
+						temp = acc.a(1);
+						temp.ucaser();
 						//PRINT TEMP
-						if (temp.index(isaccno, 1)) {
-							var ledgername;
+						if (temp.index(isaccno)) {
 							if (not(ledgername.readv(fin.ledgers, acc.a(2), 1))) {
 								ledgername = "";
 							}
 							if (accno[1] == ".") {
-								accno2 = accno.substr(2, 99);
+								accno2 = accno.substr(2,99);
 							}else{
 								accno2 = acc.a(10);
 							}
-							if (not(rejectedaccnos.locate(accno2, temp, 1))) {
+							if (not(rejectedaccnos.a(1).locateusing(accno2, VM, temp))) {
 								//print char(7):
 								if (not(decide(acc.a(1) ^ " (" ^ accno2 ^ ")|" ^ ledgername ^ "||" "IS THIS THE ONE YOU WANT ?", "", reply))) {
 									call mssg("", "DB", buff, "");
@@ -409,45 +399,42 @@ nextacc:
 
 	//check if valid account/ledger
 	if (validaccs == "*") {
-		//valid accs "*" allows all accounts, including job accounts
-
-	} else if (validaccs == "STOCK" or validaccs == "JOB" or validaccs == "") {
+	//valid accs "*" allows all accounts, including job accounts
+	} else if (((validaccs == "STOCK") or (validaccs == "JOB")) or (validaccs == "")) {
 		//valid accs "" means not job account
-
 		if (not(fin.account.a(23).field(";", 2) == validaccs)) {
-			var tt = validaccs ? (validaccs) : "VALID";
+//WARNING TODO: check trigraph following;
+			var tt = validaccs ? validaccs : var("VALID");
 			msg = DQ ^ (is.a(1, 1, 1) ^ DQ) ^ " - is not a " ^ tt ^ " account";
 			return 0;
 		}
-
-	} else if (validaccs.substr(1, 5) == "CHART") {
-		if (not(validaccs.substr(7, 9999).locate(fin.account.a(2), vn))) {
+	} else if (validaccs.substr(1,5) == "CHART") {
+		if (not(validaccs.substr(7,9999).locateusing(fin.account.a(2), FM, vn))) {
 			msg = DQ ^ (is.a(1, 1, 1) ^ DQ) ^ " - Account is in the wrong ledger." ^ FM ^ "(See Journal Setup)";
 			return 0;
 		}
-
 	} else {
-		if (not(validaccs.locate(is.a(1, 1, 1).field(",", 1), vn))) {
-			if (not(validaccs.locate(is.a(1, 1, 2).field(",", 1), vn))) {
+		if (not(validaccs.locateusing(is.a(1, 1, 1).field(",", 1), FM, vn))) {
+			if (not(validaccs.locateusing(is.a(1, 1, 2).field(",", 1), FM, vn))) {
 				msg = DQ ^ (is.a(1, 1, 1) ^ DQ) ^ " - Account is not allowed here." ^ FM ^ "(See Journal Setup)";
 				return 0;
 			}
 		}
 	}
-
+//L2283:
 	//account is set
 	accno = is.a(1, 1, 1).field(",", 1);
-	gosub checkaccountauthorised(msg);
+	gosub checkaccountauthorised();
 
 	return ok;
 
 }
 
-subroutine checkaccountauthorised(io msg) {
+subroutine checkaccountauthorised() {
 	ok = 0;
 
 	//positive account access trumps ledger restrictions
-	if (not(authorised("#ACCOUNT ACCESS " ^ accno.quote(), msg, ""))) {
+	if (not(authorised("#ACCOUNT ACCESS " ^ (DQ ^ (accno ^ DQ)), msg, ""))) {
 
 		var ledgercode = fin.account.a(2);
 		if (authorised("LEDGER ACCESS", msg0, "")) {

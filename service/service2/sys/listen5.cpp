@@ -14,7 +14,7 @@ libraryinit()
 #include <rtp57.h>
 #include <listen4.h>
 #include <otherusers.h>
-#include <readbakpars.h>
+#include <getbackpars.h>
 
 #include <gen.h>
 #include <fin.h>
@@ -148,7 +148,7 @@ function main(in request1, in request2in="", in request3in="", in request4in="",
 	} else if (request1 == "CHECKRESTART") {
 
 		//check for corruption in system record
-		if (SYSTEM.index(0x00, 1)) {
+		if (SYSTEM.index(0x00)) {
 			var(SYSTEM).oswrite("SYSTEM.BAD");
 			call sysmsg("Corrupt SYSTEM record in LISTEN - RESTARTING");
 			ANS = "CORRUPTSYSTEM";
@@ -364,7 +364,7 @@ nopatch:
 				if (s23.locateusing("TRAINING", VM, xx)) {
 					username ^= "*";
 				}else{
-					if (s17.index("TEST", 1)) {
+					if (s17.index("TEST")) {
 						username ^= "*";
 					}
 				}
@@ -472,16 +472,16 @@ getvalues:
 
 		}
 
-		if (USER0.index("RECORD", 1)) {
+		if (USER0.index("RECORD")) {
 			USER1 = invertarray(USER1, 1);
 
-		} else if (USER0.index("XML", 1)) {
+		} else if (USER0.index("XML")) {
 			if (USER1) {
 				call htmllib2("STRIPTAGS", USER1);
 				USER1.swapper(FM, "</" ^ fieldname ^ ">" "</record>" "\r\n" "<record><" ^ fieldname ^ ">");
 				USER1.splicer(1, 0, "<record><" ^ fieldname ^ ">");
 				USER1 ^= "</" ^ fieldname ^ ">" "</record>";
-				if (USER1.index(VM, 1)) {
+				if (USER1.index(VM)) {
 					USER1.swapper("</" ^ fieldname ^ ">", "</STOPPED>");
 					USER1.swapper(VM, "</" ^ fieldname ^ ">" "<STOPPED>");
 				}
@@ -502,7 +502,7 @@ getvalues:
 		var options = request5;
 		var maxnrecs = request6;
 
-		if (not(sortselect.index("%SELECTLIST%", 1))) {
+		if (not(sortselect.index("%SELECTLIST%"))) {
 			var().clearselect();
 		}
 
@@ -671,7 +671,7 @@ nextlock:
 			call oswrite("", request3);
 
 			//stop server
-			if (request2.index("ALL", 1)) {
+			if (request2.index("ALL")) {
 				call oswrite("", request4);
 			}
 
@@ -701,7 +701,7 @@ nextlock:
 				USER3 = "OK";
 			}
 
-			if (request2.index("ALL", 1)) {
+			if (request2.index("ALL")) {
 				request4.osdelete();
 			}
 		}
@@ -711,7 +711,7 @@ nextlock:
 		//similar code in LISTEN and LISTEN2
 
 		//gosub getbakpars
-		call readbakpars(bakpars);
+		call getbackpars(bakpars);
 
 		//backup may respond to user itself if it starts
 		USER4 = "";
@@ -732,7 +732,7 @@ nextlock:
 
 		call sysmsg(USER3, "NEOSYS Backup");
 
-		if (USER3.ucase().index("SUCCESS", 1)) {
+		if (USER3.ucase().index("SUCCESS")) {
 			USER3.splicer(1, 0, "OK ");
 		}
 
@@ -778,7 +778,7 @@ subroutine fileaccesscheck() {
 			//specifically allowed
 			if (not(authorised("!#" ^ temp ^ " ACCESS PARTIAL", msg2, ""))) {
 				//if there is an authorised dictionary item then leave it up to that
-				if (not((var("AUTHORISED").xlate("DICT." ^ filename, 8, "X")).index("ALLOWPARTIALACCESS", 1))) {
+				if (not((var("AUTHORISED").xlate("DICT." ^ filename, 8, "X")).index("ALLOWPARTIALACCESS"))) {
 					USER3 = USER4;
 					return;
 				}
@@ -810,7 +810,7 @@ subroutine deleteoldfiles() {
 
 	//failsafe - only allow delete .* in data folder
 	if (filespec.substr(-2,2) == ".*") {
-		if (not filespec.index("\\D" "ATA\\", 1)) {
+		if (not filespec.index("\\D" "ATA\\")) {
 			return;
 		}
 	}
@@ -856,7 +856,7 @@ subroutine deleteoldfiles() {
 				//and has a file extension (ie leave PARAMS and PARAMS2)
 				fileattributes = filename.osfile();
 				filetime = fileattributes.a(2) * 24 * 60 * 60 + fileattributes.a(3);
-				if (((filename.substr(-4,4)).index(".", 1)) and (filetime <= deletetime)) {
+				if (((filename.substr(-4,4)).index(".")) and (filetime <= deletetime)) {
 deleteit:
 					filename.osdelete();
 				}else{

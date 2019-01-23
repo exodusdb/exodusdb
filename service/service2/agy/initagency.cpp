@@ -24,6 +24,7 @@ var certificates;
 var programs;
 var productcategories;
 var tasks;
+var fileloc;
 var reply;//num
 var schid;
 var recordx;
@@ -222,7 +223,6 @@ nextrcard2:
 	if (not(bookingtexts.open("_TEXTS", ""))) {
 		var filesx;
 		if (filesx.open("FILES", "")) {
-			var fileloc;
 			if (fileloc.readv(filesx, "BOOKING_ORDERS", 1)) {
 				//avgbosize=5000
 				//no point to more than 1000 unless make frame size >1000
@@ -436,7 +436,7 @@ nextsch2:
 
 				for (var fnn = 1; fnn <= 3; ++fnn) {
 					var fn = fns.a(1, fnn);
-					if (schedule.a(fn).index(SVM, 1)) {
+					if (schedule.a(fn).index(SVM)) {
 						goto nextsch2;
 					}
 				};//fnn;
@@ -444,7 +444,7 @@ nextsch2:
 				for (var fnn = 1; fnn <= 3; ++fnn) {
 					var fn = fns.a(1, fnn);
 					var dategrid = schedule.a(fn);
-					if (not(dategrid.index(SVM, 1))) {
+					if (not(dategrid.index(SVM))) {
 						var olddategrid = dategrid;
 
 						//make the one character one day string into a one subvalue one day string

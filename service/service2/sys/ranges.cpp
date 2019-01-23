@@ -64,7 +64,7 @@ function main(io ranges0, in basekey0="", in listid0="") {
 		while (true) {
 			var lastchar = prefix[-1];
 		///BREAK;
-		if (not(var("0123456789").index(lastchar, 1))) break;;
+		if (not(var("0123456789").index(lastchar))) break;;
 			startx.splicer(1, 0, lastchar);
 			prefix.splicer(-1, 1, "");
 		}//loop;
@@ -82,7 +82,7 @@ function main(io ranges0, in basekey0="", in listid0="") {
 			while (true) {
 				var lastchar = tt[-1];
 			///BREAK;
-			if (not(var("0123456789").index(lastchar, 1))) break;;
+			if (not(var("0123456789").index(lastchar))) break;;
 				finish.splicer(1, 0, lastchar);
 				tt.splicer(-1, 1, "");
 			}//loop;

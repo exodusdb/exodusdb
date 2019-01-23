@@ -17,7 +17,7 @@ efb_updvoucher2& operator=(const var& newlibraryname) {
 }
 
 //a member function with the right arguments, returning a var or void
-var operator() (io mode, io voucher, io vouchercode, io allocs, in username0="")
+var operator() (io mode, io voucher, io vouchercode, io allocs, in username="")
 {
 
  //first time link to the shared lib and create/cache an object from it
@@ -41,7 +41,7 @@ var operator() (io mode, io voucher, io vouchercode, io allocs, in username0="")
  // (mode);
  return CALLMEMBERFUNCTION(*(this->pobject_),
  ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
-  (mode,voucher,vouchercode,allocs,username0);
+  (mode,voucher,vouchercode,allocs,username);
 
 }
 

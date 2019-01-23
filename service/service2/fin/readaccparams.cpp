@@ -1,34 +1,34 @@
 #include <exodus/library.h>
 libraryinit()
 
+
 #include <gen.h>
 #include <fin.h>
 
 function main() {
-
+	//c fin
 	if (not(fin.accparams.read(DEFINITIONS, "ACC.PARAMS"))) {
-		if (not fin.accparams.osread("ACCOUNTS.CFG")) {
+		if (not(fin.accparams.osread("ACCOUNTS.CFG"))) {
 			fin.accparams = "";
 		}
 	}
 	if (fin.accparams.a(11) == "") {
 		fin.accparams.r(11, "Budget");
 		fin.accparams.r(12, "F/cast");
-		if ((gen.company.a(1)).index("Impact", 1)) {
+		if (gen.company.a(1).index("Impact")) {
 			fin.accparams.r(11, 3, "Plan");
 			fin.accparams.r(12, 2, "Apr F/c" _VM_ "Jul F/c" _VM_ "Oct F/c");
 		}
 		for (var ii = 2; ii <= 10; ++ii) {
 			for (var fn = 11; fn <= 12; ++fn) {
 				if (not(fin.accparams.a(fn, ii + 1))) {
-					fin.accparams.r(fn, ii + 1,
-						fin.accparams.a(fn, 1) ^ " " ^ ii);
+					fin.accparams.r(fn, ii + 1, fin.accparams.a(fn, 1) ^ " " ^ ii);
 				}
 			};//fn;
 		};//ii;
 	}
 
-	if (fin.accparams.a(16) eq "" and APPLICATION ne "ACCOUNTS") {
+	if ((fin.accparams.a(16) == "") and (APPLICATION == "ADAGENCY")) {
 		fin.accparams.r(16, "ALL");
 	}
 	if (fin.accparams.a(16, 1) == "ALL") {
@@ -44,7 +44,7 @@ function main() {
 		fin.accparams.r(16, tt2);
 	}
 
-	if (fin.accparams.a(16) == "" and APPLICATION ne "ACCOUNTS") {
+	if ((fin.accparams.a(16) == "") and (APPLICATION == "ADAGENCY")) {
 
 		fin.accparams.r(16, 3, "Brand");
 		//acc.params<16,4>='Vehicle'
@@ -121,6 +121,8 @@ function main() {
 	}
 	return 0;
 
+	return "";
 }
+
 
 libraryexit()

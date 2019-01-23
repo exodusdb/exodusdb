@@ -3,7 +3,7 @@ libraryinit()
 
 #include <htmllib2.h>
 #include <log.h>
-#include <readbakpars.h>
+#include <getbackpars.h>
 #include <htmllib.h>
 #include <elapsedtimetext.h>
 #include <roundrobin.h>
@@ -79,7 +79,7 @@ function main(in msg0, in subject0="", in username0="") {
 	call log("SYSMSG", logmsg);
 
 	//get backup parameters
-	call readbakpars(bakpars);
+	call getbackpars(bakpars);
 
 	//get technical emailaddrs to send to
 	//nb if any emailaddrs and neosys.com not in them
@@ -107,7 +107,7 @@ function main(in msg0, in subject0="", in username0="") {
 
 	//prevent a weird error going to users
 	var addhw = 0;
-	if (msg.index("The process cannot access the file because it is being", 1)) {
+	if (msg.index("The process cannot access the file because it is being")) {
 		addhw = 1;
 		emailaddrs = "";
 		subjectin ^= " V2";
@@ -148,7 +148,7 @@ function main(in msg0, in subject0="", in username0="") {
 	//determine subject
 	//subject='NEOSYS System Message: ':datasetcode
 	var subject = "NEOSYS System: " ^ datasetcode;
-	var tt = msg.index("ERROR NO:", 1);
+	var tt = msg.index("ERROR NO:");
 	if (tt) {
 		subject ^= " " ^ msg.substr(tt,9999).a(1, 1, 1);
 	}
@@ -183,7 +183,7 @@ function main(in msg0, in subject0="", in username0="") {
 		}
 		if (useremail) {
 			//if user email is not in the list of people being sent to then
-			if (emailaddrs.lcase().index(useremail, 1)) {
+			if (emailaddrs.lcase().index(useremail)) {
 				//body<-1>='Email:' l9:useremail
 			}else{
 				ccaddrs = useremail;

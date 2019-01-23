@@ -8,7 +8,7 @@ libraryinit()
 #include <printtx.h>
 #include <sendmail.h>
 #include <gethtml.h>
-#include <readcss.h>
+#include <getcss.h>
 #include <docmods.h>
 
 #include <gen.h>
@@ -134,10 +134,10 @@ function main() {
 		tt = baselinks.a(1, linkn);
 		if (tt) {
 			var tt2 = (field2(tt, "/", -1)).ucase();
-			if (tt2.index(".HTM", 1)) {
+			if (tt2.index(".HTM")) {
 				tt.splicer(-tt2.length(), tt2.length(), "");
 			}
-			if (not(var("\\/").index(tt[-1], 1))) {
+			if (not(var("\\/").index(tt[-1]))) {
 				tt ^= "/";
 			}
 			baselinks.r(1, linkn, tt);
@@ -243,7 +243,7 @@ function main() {
 	var tdx = "</td>";
 
 	//remove options
-	var temp = SENTENCE.index(" (P", 1);
+	var temp = SENTENCE.index(" (P");
 	if (temp) {
 		SENTENCE = SENTENCE.substr(1,temp - 1);
 	}
@@ -322,7 +322,7 @@ inpperiod:
 		}
 
 		//convert fromdate to period
-		fromdate = var("1/" ^ period).iconv("D/E");
+		fromdate = ("1/" ^ period).iconv("D/E");
 		if (not fromdate) {
 			var().chr(7).output();
 			call mssg(DQ ^ (period ^ DQ) ^ " must be month/year");
@@ -531,7 +531,7 @@ nextuser:
 
 			//record timesheet admins (depending on day of week)
 			var currentdow = (var().date() - 1) % 7 + 1;
-			if (adminapprovaldows.index(currentdow, 1)) {
+			if (adminapprovaldows.index(currentdow)) {
 				if (istimesheetadmin) {
 					if (emailaddress) {
 						lasttimesheetadmin = emailaddress;
@@ -838,7 +838,7 @@ nextdate:
 			}
 
 			var currentdow = (var().date() - 1) % 7 + 1;
-			if (not(adminapprovaldows.index(currentdow, 1))) {
+			if (not(adminapprovaldows.index(currentdow))) {
 				goto nextuser;
 			}
 

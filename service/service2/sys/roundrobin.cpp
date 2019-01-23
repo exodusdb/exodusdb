@@ -76,7 +76,7 @@ function main(in mode, in params, io result, io msg) {
 		if (not(roundrobin.read(roundrobinfile, params.a(5)))) {
 			roundrobin = "";
 		}
-		if (roundrobin.index(0x00, 1)) {
+		if (roundrobin.index(0x00)) {
 			roundrobin.converter(0x00, "");
 			var(var().date() ^ FM ^ var().time()).oswrite("RRR");
 		}
@@ -116,7 +116,7 @@ function main(in mode, in params, io result, io msg) {
 
 		//garbagecollect;
 
-		if (roundrobin.index(0x00, 1)) {
+		if (roundrobin.index(0x00)) {
 			roundrobin.converter(0x00, "");
 			var(var().date() ^ FM ^ var().time()).oswrite("RRW");
 		}

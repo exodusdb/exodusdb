@@ -17,7 +17,7 @@ efb_lockposting& operator=(const var& newlibraryname) {
 }
 
 //a member function with the right arguments, returning a var or void
-var operator() (in mode, io locklist, in ntries0, io msg)
+var operator() (in mode, io locklist, in ntries, io msg)
 {
 
  //first time link to the shared lib and create/cache an object from it
@@ -41,7 +41,7 @@ var operator() (in mode, io locklist, in ntries0, io msg)
  // (mode);
  return CALLMEMBERFUNCTION(*(this->pobject_),
  ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
-  (mode,locklist,ntries0,msg);
+  (mode,locklist,ntries,msg);
 
 }
 

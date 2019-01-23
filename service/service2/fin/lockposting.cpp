@@ -3,30 +3,28 @@ libraryinit()
 
 #include <locking.h>
 
-function main(in mode, io locklist, in ntries0, io msg) {
+function main(in mode, io locklist, in ntries, io msg) {
+	//c fin in,io,in,io
 
 	if (locklist.unassigned()) {
 		locklist = "";
 	}
-
-	var ntries;
-	if (ntries0.unassigned()) {
+	if (ntries.unassigned()) {
 		ntries = "";
 	}
-		ntries = ntries0;
-	if (not ntries) {
-		ntries = 99;
-	}
-
 	msg = "";
 
 	var lockfilename = "VOUCHERS";
 	var lockkey = "*";
 
 	var lockdesc = "FINANCIAL POSTING";
+	if (not ntries) {
+		ntries = 99;
+	}
 
 	if (mode == "LOCK") {
 
+		//relock so if we have already locked then no problem ie relock succeeds
 		if (not(locking("RELOCK", lockfilename, lockkey, lockdesc, locklist, ntries, msg))) {
 			return 0;
 		}
@@ -43,7 +41,7 @@ function main(in mode, io locklist, in ntries0, io msg) {
 		return 0;
 
 	}
-
+//L176:
 	return 1;
 
 }

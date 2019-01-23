@@ -201,7 +201,7 @@ var var::iconv_D(const wchar_t* conversion) const
 
 	int month=0;
 
-	const wchar_t* iter=var_mvstr.c_str();
+	const wchar_t* iter=var_str.c_str();
 	while (*iter!='\0')
 	{
 

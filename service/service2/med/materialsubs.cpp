@@ -1,16 +1,17 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <giveway.h>
 #include <authorised.h>
-#include <singular.h>
 #include <materialsubs.h>
+#include <giveway.h>
+#include <flushindex.h>
+#include <singular.h>
 
 #include <gen.h>
 #include <agy.h>
 #include <win.h>
 
-#include <window.hpp>//after win
+#include <window.hpp>
 
 var msg;
 var imagelocation;
@@ -29,6 +30,7 @@ var reply;//num
 var wsmsg;
 
 function main(in mode) {
+	//c med
 	//jbase
 	var interactive = not SYSTEM.a(33);
 
@@ -39,13 +41,13 @@ function main(in mode) {
 	if (mode == "DELETEMATERIAL") {
 
 		if (not(authorised("MATERIAL DELETE", msg, ""))) {
-			return invalid(msg);
+			goto EOF_442;
 		}
 		gosub getimagelocation();
 
 		var materialcode = PSEUDO.a(1);
 
-		if (not(oslist(imagelocation ^ materialcode))) {
+		if (not(oslistf(imagelocation ^ materialcode))) {
 			msg = DQ ^ (imagelocation ^ materialcode ^ " file cannot be found" ^ DQ);
 			return invalid(msg);
 		}
@@ -53,7 +55,7 @@ function main(in mode) {
 		var cmd = "DEL " ^ (DQ ^ (imagelocation ^ materialcode ^ DQ));
 		osshell(cmd);
 
-		if (oslist(imagelocation ^ materialcode)) {
+		if (oslistf(imagelocation ^ materialcode)) {
 			msg = DQ ^ (imagelocation ^ materialcode ^ " file cannot be deleted" ^ DQ);
 			return invalid(msg);
 		}
@@ -77,13 +79,13 @@ function main(in mode) {
 		call materialsubs("GETMATERIALCHAIN-" ^ materialno ^ "-" ^ brandcode);
 		materialno = field2(ANS.a(1), VM, -1);
 		ANS = "";
-		if (not win.valid) {
+		if (not(win.valid)) {
 			return 0;
 		}
 
 		//search for extensions
 		var imagefilename = imagelocation ^ materialno;
-		var imagefilenames = oslist(imagefilename ^ ".*");
+		var imagefilenames = oslistf(imagefilename ^ ".*");
 
 		//check one or more files exist
 		if (not imagefilenames) {
@@ -99,7 +101,7 @@ function main(in mode) {
 		//select extensions if many .jpg .gif .mpg etc.
 		//and build the imagefile
 		var nimages = imagefilenames.count(FM) + 1;
-		if (nimages > 1 and interactive) {
+		if ((nimages > 1) and interactive) {
 			if (interactive) {
 				if (not(decide("", imagefilenames ^ "", imagefilen))) {
 					return 0;
@@ -156,13 +158,11 @@ function main(in mode) {
 		//add any materials in date grid not in the list
 		var dategrid = schedule.a(22);
 		//smdates
-		dategrid.converter(" " _SM_ _VM_ "1234567890", "");
+		dategrid.converter(SVM ^ VM ^ " 1234567890", "");
 
 		for (var ii = 1; ii <= dategrid.length(); ++ii) {
-			var mdn;
-			var materialletter=dategrid[ii];
-			if (not(materialdata.locate(materialletter, mdn, 1))) {
-				materialdata.r(1, -1, materialletter);
+			if (not(materialdata.a(1).locateusing(dategrid[ii], VM, xx))) {
+				materialdata.r(1, -1, dategrid[ii]);
 			}
 		};//ii;
 
@@ -200,8 +200,8 @@ function main(in mode) {
 		while (true) {
 
 			if (not interactive) {
-				if (not giveway()) {
-					{}
+				if (giveway("")) {
+					var().stop();
 				}
 			}
 
@@ -211,7 +211,7 @@ function main(in mode) {
 			//check not in self referencing chain of materials
 			//and save the chain of materialnos
 			if (schid) {
-				if (materialnos.locateusing(materialno, VM, chainn)) {
+				if (materialnos.a(1).locateusing(materialno, VM, chainn)) {
 					msg = "Material " ^ (DQ ^ (materialno ^ DQ)) ^ " refers back to|the same material on plan/schedule " ^ (DQ ^ (schids.a(1, chainn) ^ DQ));
 					return invalid(msg);
 				}else{
@@ -228,7 +228,7 @@ function main(in mode) {
 						//check the material brand
 						matbrandcode = material.a(3);
 						gosub confirmbrand();
-						if (not win.valid) {
+						if (not(win.valid)) {
 							return 0;
 						}
 
@@ -244,9 +244,9 @@ function main(in mode) {
 			}
 
 		///BREAK;
-		if (schid == "" or letter == "") break;;
+		if ((schid == "") or (letter == "")) break;;
 
-			if ((win.templatex == "PLANS" or win.templatex == "SCHEDULES") and schid == ID) {
+			if (((win.templatex == "PLANS") or (win.templatex == "SCHEDULES")) and (schid == ID)) {
 				doc = RECORD;
 			}else{
 				var doc;
@@ -261,11 +261,11 @@ function main(in mode) {
 			}
 
 			//locate the material in the prior schedule
-			if (not(doc.locate(letter, matn, 184))) {
+			if (not(doc.a(184).locateusing(letter, VM, matn))) {
 
 				if (interactive) {
 					var lettersources = "X" ^ doc.a(184) ^ doc.a(22) ^ doc.field(FM, 171, 13);
-					if (not(lettersources.index(letter, 1))) {
+					if (not(lettersources.index(letter))) {
 						msg = "Material " ^ (DQ ^ (letter ^ DQ)) ^ " is not used in " ^ docname ^ " " ^ (DQ ^ (schid ^ DQ));
 						return invalid(msg);
 					}
@@ -275,7 +275,7 @@ function main(in mode) {
 			//check brand agrees
 			matbrandcode = doc.a(11);
 			gosub confirmbrand();
-			if (not win.valid) {
+			if (not(win.valid)) {
 				return 0;
 			}
 
@@ -290,37 +290,43 @@ function main(in mode) {
 
 	} else if (mode == "PREDELETE") {
 		gosub security(mode);
+		if (not(win.valid)) {
+			return 0;
+		}
 
-	} else if (mode == "POSTDELETE" or mode == "POSTWRITE") {
-		//call flushindex("MATERIALS");
+	} else if ((mode == "POSTDELETE") or (mode == "POSTWRITE")) {
+		call flushindex("MATERIALS");
 
 	} else if (mode == "POSTINIT") {
 		gosub security(mode);
+		if (not(win.valid)) {
+			return 0;
+		}
 
 	} else if (mode == "POSTREAD") {
 		gosub security(mode);
+		if (not(win.valid)) {
+			return 0;
+		}
 
-	} else if (1) {
+	} else {
 		msg = DQ ^ (mode ^ DQ) ^ "INVALID MODE IN MATERIAL.SUBS";
 	}
-
+//L1735:
 	return 0;
 
 }
 
 subroutine confirmbrand() {
-	/*
-	if (brandcode == "" or matbrandcode == brandcode) {
+	if ((brandcode == "") or (matbrandcode == brandcode)) {
 		return;
 	}
-	if (not(decide2("WARNING:|" ^ capitalise(docname) ^ " " ^ (DQ ^ (ID ^ DQ)) ^ " is for brand " ^ (DQ ^ (brandcode ^ DQ)) ^ "|but material " ^ (DQ ^ (materialno ^ DQ)) ^ " was for brand " ^ (DQ ^ (matbrandcode ^ DQ)), "OK" _VM_ "Cancel", reply, 2))) {
+	if (not(decide("WARNING:|" ^ capitalise(docname) ^ " " ^ (DQ ^ (ID ^ DQ)) ^ " is for brand " ^ (DQ ^ (brandcode ^ DQ)) ^ "|but material " ^ (DQ ^ (materialno ^ DQ)) ^ " was for brand " ^ (DQ ^ (matbrandcode ^ DQ)), "OK" _VM_ "Cancel", reply, 2))) {
 		reply = 0;
 	}
 	if (reply ne 1) {
 		win.valid = 0;
 	}
-	*/
-	win.valid = 0;
 	return;
 
 }
@@ -335,8 +341,8 @@ subroutine getimagelocation() {
 	if (imagelocation[-1] ne "\\") {
 		imagelocation ^= "\\";
 	}
-	if (imagelocation.substr(1, 2) == "..") {
-		var parentdir = var().osdir();
+	if (imagelocation.substr(1,2) == "..") {
+		var parentdir = oscwd();
 		parentdir.splicer(-1, 1, "");
 		//t=field2(parentdir,'\',-1)
 		//parentdir[-len(t)-1,len(t)+1]=''
@@ -345,7 +351,8 @@ subroutine getimagelocation() {
 	}
 
 	//check image directory exists
-	if (not var().oslistf(imagelocation, "*.*")) {
+	(imagelocation ^ "*.*").initdir();
+	if (not(var().oslistf())) {
 		msg = "Before you can view material images|the images must be scanned and|saved in the directory " ^ imagelocation ^ "|as files like .jpg .gif .mpg etc.";
 		call mssg(msg);
 
@@ -354,7 +361,7 @@ subroutine getimagelocation() {
 		temp.splicer(-1, 1, "");
 		//suspend 'md ':temp
 		//call mkdir(temp:char(0),xx)
-		temp.osmkdir();
+		call osmkdir(temp);
 
 		return;
 

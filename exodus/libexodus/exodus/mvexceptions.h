@@ -44,21 +44,21 @@ THE SOFTWARE.
 //Unhandled exception at 0x0065892c in service.exe: 0xC0000005: Access violation writing location 0xcccccccc.
 //other words ccould be ISCONSTRUCTED or ISALIVE
 #define ISDEFINED(VARNAME) \
-	if (VARNAME.var_mvtyp&mvtypemask) \
+	if (VARNAME.var_typ&mvtypemask) \
 	throw MVUndefined(var(#VARNAME) ^ L" in " ^ var(functionname)); \
 
 //includes isdefined
 #define ISASSIGNED(VARNAME) \
 	ISDEFINED(VARNAME) \
-	if (!VARNAME.var_mvtyp) \
+	if (!VARNAME.var_typ) \
 	throw MVUnassigned(var(#VARNAME) ^ L" in " ^ var(functionname)); \
 
 //includes isdefined directly and checks assigned if not string
 #define ISSTRING(VARNAME) \
 	ISDEFINED(VARNAME) \
-	if (!(VARNAME.var_mvtyp&pimpl::MVTYPE_STR)) \
+	if (!(VARNAME.var_typ&pimpl::VARTYP_STR)) \
 	{ \
-		if (!VARNAME.var_mvtyp) \
+		if (!VARNAME.var_typ) \
 		throw MVUnassigned(var(#VARNAME) ^ L" in " ^ var(functionname)); \
 		VARNAME.createString(); \
 	}; \
@@ -74,21 +74,21 @@ THE SOFTWARE.
 
 //see long comment on ISDEFINED
 #define THISISDEFINED() \
-	if (!this||(*this).var_mvtyp&mvtypemask) \
+	if (!this||(*this).var_typ&mvtypemask) \
 		throw MVUndefined(L"var in " ^ var(functionname)); \
 
 //includes isdefined
 #define THISISASSIGNED() \
 	THISISDEFINED() \
-	if (!(*this).var_mvtyp) \
+	if (!(*this).var_typ) \
 		throw MVUnassigned(L"var in " ^ var(functionname)); \
 
 //includes isdefined directly and checks assigned if not string
 #define THISISSTRING() \
 	THISISDEFINED() \
-	if (!((*this).var_mvtyp&pimpl::MVTYPE_STR)) \
+	if (!((*this).var_typ&pimpl::VARTYP_STR)) \
 	{ \
-		if (!(*this).var_mvtyp) \
+		if (!(*this).var_typ) \
 			throw MVUnassigned(L"var in " ^ var(functionname)); \
 		(*this).createString(); \
 	}; \

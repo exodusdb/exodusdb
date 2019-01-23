@@ -60,7 +60,6 @@ dim::dim(int rows, int cols)
 {
 	if (rows == 0 || cols == 0)
 		throw MVArrayDimensionedZero();
-	delete[] data_;
 	data_ = new var[rows * cols + 1];
 }
 
@@ -238,7 +237,7 @@ var dim::unparse() const
 
 	for (int ii=2;ii<=arraysize;++ii)
 	{
-		//output.var_mvstr.push_back(FM_);//bug if first field is numeric since string hasnt been constructed yet
+		//output.var_str.push_back(FM_);//bug if first field is numeric since string hasnt been constructed yet
 		output^=_FM_;
 		output^=data_[ii];
 	}

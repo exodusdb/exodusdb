@@ -17,7 +17,7 @@ efb_calcbill& operator=(const var& newlibraryname) {
 }
 
 //a member function with the right arguments, returning a var or void
-var operator() (io grossbill, in size, in extrasx, in unused, io msg, in roundingx, io mult, io amounts)
+var operator() (io grossbill, in spec, in extras2, in unused, io msg, in roundingx, io sizemult, io amounts)
 {
 
  //first time link to the shared lib and create/cache an object from it
@@ -41,7 +41,7 @@ var operator() (io grossbill, in size, in extrasx, in unused, io msg, in roundin
  // (mode);
  return CALLMEMBERFUNCTION(*(this->pobject_),
  ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
-  (grossbill,size,extrasx,unused,msg,roundingx,mult,amounts);
+  (grossbill,spec,extras2,unused,msg,roundingx,sizemult,amounts);
 
 }
 

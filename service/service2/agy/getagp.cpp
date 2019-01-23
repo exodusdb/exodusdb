@@ -25,7 +25,7 @@ function main(in agpparams, in period0) {
 		}
 	}
 
-	var reqyearperiod = addcent(period0.field("/", 2), "", "", xx) ^ "." ^ (period0.field("/", 1)).oconv("R(0)#2");
+	var reqyearperiod = addcent(period0.field("/", 2), "", "", xx) ^ "." ^ period0.field("/", 1).oconv("R(0)#2");
 
 	//look for most effective period
 	var latestyearperiod = "";

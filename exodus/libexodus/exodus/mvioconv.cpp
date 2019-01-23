@@ -44,7 +44,7 @@ var var::iconv(const var& convstr) const
 	THISIS(L"var var::iconv(const var& convstr) const")
 	ISSTRING(convstr)
 
-	return iconv(convstr.var_mvstr.c_str());
+	return iconv(convstr.var_str.c_str());
 }
 
 /**
@@ -63,7 +63,7 @@ var var::iconv(const wchar_t* convstr) const
 	THISISSTRING()
 
 	//empty string in, empty string out
-	if (var_mvtyp&pimpl::MVTYPE_STR && var_mvstr.length()==0)
+	if (var_typ&pimpl::VARTYP_STR && var_str.length()==0)
 		return L"";
 
 	//REMOVE the remove logic out of the L# R# and T# here
@@ -87,7 +87,7 @@ var var::iconv(const wchar_t* convstr) const
 				part=remove(charn, terminator);
 				//if len(part) or terminator then
 
-				if (part.var_mvtyp&pimpl::MVTYPE_STR && part.var_mvstr.length()==0)
+				if (part.var_typ&pimpl::VARTYP_STR && part.var_str.length()==0)
 					{}
 				else
 					output ^= part.iconv_D(convstr);
@@ -113,7 +113,7 @@ var var::iconv(const wchar_t* convstr) const
 				//if len(part) or terminator then
 
 				//null string
-				if (part.var_mvtyp&pimpl::MVTYPE_STR && part.var_mvstr.length()==0)
+				if (part.var_typ&pimpl::VARTYP_STR && part.var_str.length()==0)
 					{}
 
 				//do convstr on a number
@@ -166,7 +166,7 @@ var var::iconv(const wchar_t* convstr) const
 		case L'[':
 
 			//empty string in, empty string out
-			if (var_mvtyp&pimpl::MVTYPE_STR && var_mvstr.length()==0)
+			if (var_typ&pimpl::VARTYP_STR && var_str.length()==0)
 				return L"";
 
 			//check following first character
@@ -211,7 +211,7 @@ var var::iconv(const wchar_t* convstr) const
 		//HEX
 		case L'H':
 			//empty string in, empty string out
-			if (var_mvtyp&pimpl::MVTYPE_STR && var_mvstr.length()==0)
+			if (var_typ&pimpl::VARTYP_STR && var_str.length()==0)
 				return L"";
 
 //TODO allow high end separators in without conversion (instead of failing as non-hex digits)
@@ -274,8 +274,8 @@ var var::oconv_T(const var& format) const
 
 	//get padding character from "L(?)" or space
 	wchar_t fillchar;
-	if (format.var_mvstr.length()>=4 && format.var_mvstr[1]==L'(' && format.var_mvstr[3]==L')')
-		fillchar=format.var_mvstr[2];
+	if (format.var_str.length()>=4 && format.var_str[1]==L'(' && format.var_str[3]==L')')
+		fillchar=format.var_str[2];
 	else
 		fillchar=L' ';
 
@@ -304,8 +304,8 @@ var var::oconv_T(const var& format) const
 
 				//output ^= part;
 				//output ^= var(width-partlen).space();
-				part.var_mvstr.resize(width,fillchar);
-				output ^= part.var_mvstr;
+				part.var_str.resize(width,fillchar);
+				output ^= part.var_str;
 
 				if (!terminator)
 					break;
@@ -567,8 +567,8 @@ var var::oconv_LR(const var& format) const
 
 	//get padding character from "L(?)" or space
 	wchar_t fillchar;
-	if (format.var_mvstr.length()>=4 && format.var_mvstr[1]==L'(' && format.var_mvstr[3]==L')')
-		fillchar=format.var_mvstr[2];
+	if (format.var_str.length()>=4 && format.var_str[1]==L'(' && format.var_str[3]==L')')
+		fillchar=format.var_str[2];
 	else
 		fillchar=L' ';
 
@@ -593,21 +593,21 @@ var var::oconv_LR(const var& format) const
 				if (just == L"L") {
 					//output ^= part;
 					//output ^= remaining.space();
-					part.var_mvstr.resize(width,fillchar);
+					part.var_str.resize(width,fillchar);
 					output ^= part;
 				} else {
 					//output ^= remaining.space();
 					//output ^= part;
-					part.var_mvstr.insert(0,remaining,fillchar);
+					part.var_str.insert(0,remaining,fillchar);
 					output ^= part;
 				}
 			} else {
 				if (just == L"L")
 					//output ^= part.substr(1,width);
-					output ^= part.var_mvstr.substr(0,width);
+					output ^= part.var_str.substr(0,width);
 				else
 					//output ^= part.substr(-width);
-					output ^= part.var_mvstr.substr(part.var_mvstr.length()-width,width);
+					output ^= part.var_str.substr(part.var_str.length()-width,width);
 			}
 		}
 
@@ -628,7 +628,7 @@ var var::oconv(const var& conversion) const
 	THISISDEFINED()
 	ISSTRING(conversion)
 
-	return oconv(conversion.var_mvstr.c_str());
+	return oconv(conversion.var_str.c_str());
 
 }
 
@@ -661,7 +661,7 @@ var var::oconv(const wchar_t* conversion) const
 				part=remove(charn, terminator);
 				//if len(part) or terminator then
 
-				if (part.var_mvtyp&pimpl::MVTYPE_STR && part.var_mvstr.length()==0)
+				if (part.var_typ&pimpl::VARTYP_STR && part.var_str.length()==0)
 					{}
 				else if (!part.isnum())
 					output ^= part;
@@ -689,7 +689,7 @@ var var::oconv(const wchar_t* conversion) const
 				//if len(part) or terminator then
 
 				//null string
-				if (part.var_mvtyp&pimpl::MVTYPE_STR && part.var_mvstr.length()==0)
+				if (part.var_typ&pimpl::VARTYP_STR && part.var_str.length()==0)
 					{}
 
 				//MC
@@ -744,7 +744,7 @@ var var::oconv(const wchar_t* conversion) const
 		case L'[':
 
 			//empty string in, empty string out
-			if (var_mvtyp&pimpl::MVTYPE_STR && var_mvstr.length()==0)
+			if (var_typ&pimpl::VARTYP_STR && var_str.length()==0)
 				return L"";
 
 			++conversionchar;
@@ -800,7 +800,7 @@ var var::oconv(const wchar_t* conversion) const
 		case L'H':
 
 			//empty string in, empty string out
-			if (var_mvtyp&pimpl::MVTYPE_STR && var_mvstr.length()==0)
+			if (var_typ&pimpl::VARTYP_STR && var_str.length()==0)
 				return L"";
 
 			//check 2nd character is E, 3rd character is X and next character is null, or a digit
@@ -865,7 +865,7 @@ var var::oconv_HEX(const int ioratio) const
 	for (int charn=0;charn<nchars;++charn)
 	{
 		ss.width(ioratio);//must be called every time
-		ss << int((*this).var_mvstr[charn]);
+		ss << int((*this).var_str[charn]);
 	}
 	return ss.str();
 
@@ -873,7 +873,7 @@ var var::oconv_HEX(const int ioratio) const
 
 //use macro to ensure inlined instead of using "inline" function
 #define ADD_NYBBLE_OR_FAIL \
-	nybble=var_mvstr[posn++]; \
+	nybble=var_str[posn++]; \
 	if (nybble<L'0') \
 		return L""; \
 	if (nybble<=L'9') \
@@ -893,7 +893,7 @@ var var::iconv_HEX(const int ioratio) const
 	//8 hex digits to one wchar of size 4
 
 	//empty string in, empty string out
-	size_t endposn=var_mvstr.length();
+	size_t endposn=var_str.length();
 	if (!endposn)
 		return L"";
 

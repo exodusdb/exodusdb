@@ -255,7 +255,7 @@ notallowed:
 	//user must have all the keys for all the locks on this task
 	//following users up to first blank line also have the same keys
 	var keys = SECURITY.a(2).field(VM, usern, 65535);
-	var temp = keys.index("---", 1);
+	var temp = keys.index("---");
 	if (temp) {
 		keys.splicer(temp - 1, 65535, "");
 	}

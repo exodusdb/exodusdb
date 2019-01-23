@@ -13,7 +13,7 @@ function main(in printopts0, out errors) {
 	//gets filename from system<2> and updated system<2> if successful
 
 //WARNING TODO: check trigraph following;
-	var exe = oscwd().index(":", 1) ? var(".exe") : var("");
+	var exe = oscwd().index(":") ? var(".exe") : var("");
 	var pdfcmd = "html2pdf";
 	if (exe) {
 		pdfcmd = "c:\\windows\\" ^ pdfcmd ^ exe;
@@ -29,7 +29,7 @@ function main(in printopts0, out errors) {
 		}else{
 		printopts = printopts0;
 	}
-	if (printopts.index("X", 1)) {
+	if (printopts.index("X")) {
 		return 0;
 	}
 
@@ -53,7 +53,7 @@ function main(in printopts0, out errors) {
 	pdfcmd ^= " --footer-left [page]/[topage]";
 	// end
 
-	if (printopts.index("L", 1)) {
+	if (printopts.index("L")) {
 		pdfcmd ^= " -O landscape";
 	}
 

@@ -86,7 +86,7 @@ nextclient:
 						for (var brandaccn = 1; brandaccn <= nbrandaccs; ++brandaccn) {
 							var brandacc = brandaccs.a(1, brandaccn);
 							//proper account numbers have sm character in them
-							if (not(brandacc.index(SVM, 1))) {
+							if (not(brandacc.index(SVM))) {
 								client.r(19, brandaccn, "");
 								if (not(client.a(29).locateby(brandacc, "AL", vn))) {
 									client.inserter(29, vn, brandacc);
@@ -240,7 +240,7 @@ nextclient:
 			msg = "PLEASE USE ONLY LETTERS AND NUMBERS FOR BRAND CODES";
 			return invalid(msg);
 		}
-		if ((win.is.length() > 5) or win.is.index(" ", 1)) {
+		if ((win.is.length() > 5) or win.is.index(" ")) {
 			msg = "THE BRAND CODE MAY BE UP TO|5 CHARACTERS WITH NO SPACES";
 			return invalid(msg);
 		}
@@ -497,7 +497,7 @@ nextclient:
 						tt ^= var().date().oconv("D2/E").field("/", 3);
 						job.r(1, tt);
 						job.r(2, brandcode);
-						if (brand.a(2).ucase().index(brand.a(3).ucase(), 1) or brand.a(3).ucase().index(brand.a(2).ucase(), 1)) {
+						if (brand.a(2).ucase().index(brand.a(3).ucase()) or brand.a(3).ucase().index(brand.a(2).ucase())) {
 							job.r(9, brand.a(2));
 						}else{
 							job.r(9, brand.a(3) ^ ", " ^ brand.a(2));
@@ -633,7 +633,7 @@ unlockclient:
 		if (win.wlocked) {
 			//tt=ucase(@record<1>:@record<35>)
 			//if index(tt,'(STOP)',1) or index(tt,'<STOP>',1) then
-			if ((RECORD.a(35) or RECORD.a(1).index("(STOP)", 1)) or RECORD.a(1).index("<STOP>", 1)) {
+			if ((RECORD.a(35) or RECORD.a(1).index("(STOP)")) or RECORD.a(1).index("<STOP>")) {
 				//CLIENT CREATE STOPPED prevents people from create new documents
 				//schedule/orders etc. for to the stopped clients
 				//if security('CLIENT ACCESS STOPPED',msg,'CLIENT CREATE STOPPED') else
@@ -686,7 +686,7 @@ subroutine checkdeletedbrands(in mode) {
 	var nbrandsx = brandcodesx.count(VM) + (brandcodesx ne "");
 	for (var brandnx = 1; brandnx <= nbrandsx; ++brandnx) {
 		brandcodex = brandcodesx.a(1, brandnx);
-		if (mode.index("DELETE", 1)) {
+		if (mode.index("DELETE")) {
 			gosub chkbrandused( brandcodex);
 		}else{
 			if (not(RECORD.a(2).locateusing(brandcodex, VM, xx))) {

@@ -6,11 +6,10 @@ libraryinit()
 #include <inputbox.h>
 #include <shadowmfs.h>
 #include <systemfile.h>
-#include <colortoescold.h>
 #include <otherusers.h>
 #include <getauthorisation.h>
 #include <cid.h>
-#include <readbakpars.h>
+#include <getbackpars.h>
 #include <shell2.h>
 #include <authorised.h>
 #include <openfile.h>
@@ -289,7 +288,7 @@ function main() {
 			if (oldmethod and (dbversion.a(1) == 14334.5)) {
 			}
 			if (dbversion.a(1) > dbdatetimerequired) {
-				msg = "Software version " ^ dbversion.a(1).oconv("D") ^ " " ^ (dbversion.a(1).field(".", 2)).oconv("MTS") ^ " is incompatible with" ^ FM ^ "Database version " ^ dbdate ^ " " ^ dbtime;
+				msg = "Software version " ^ dbversion.a(1).oconv("D") ^ " " ^ dbversion.a(1).field(".", 2).oconv("MTS") ^ " is incompatible with" ^ FM ^ "Database version " ^ dbdate ^ " " ^ dbtime;
 				msg = msg.oconv("L#60");
 				//abort since db is advanced
 				if (not interactive) {
@@ -450,7 +449,7 @@ updateversion:
 		}
 		if (colors ne color2) {
 			colors.write(systemfile(), ENVIRONKEYS ^ ".VIDEO");
-			call colortoescold();
+			//call colortoescold);
 		}
 	}
 	//fix monochrome video problem
@@ -598,7 +597,7 @@ nextreport:
 	}
 
 	call log2("*check for invalid characters in workstation name", logtime);
-	if (STATION.index("\'", 1) or STATION.index(DQ, 1)) {
+	if (STATION.index("\'") or STATION.index(DQ)) {
 		msg = "WARNING: NEOSYS WILL NOT WORK PROPERLY BECAUSE";
 		msg ^= FM ^ "YOUR WORKSTATION NAME (" ^ STATION.trim() ^ ")";
 		msg ^= FM ^ "CONTAINS QUOTATION MARKS. PLEASE ASK YOUR ";
@@ -722,7 +721,7 @@ nextreport:
 	oldsystem = "";
 
 	//<61>=testdb (not livedb)
-	call readbakpars(bakpars);
+	call getbackpars(bakpars);
 	SYSTEM.r(61, bakpars.a(11));
 
 	//call log2('*determine time offset')
@@ -838,7 +837,7 @@ nextreport:
 	ver.converter("\r\n", "  ");
 	//if index(ver,'Windows 9',1) or index(ver,'NT',1) or index(os,'NT',1) then
 	ver = ver.trim().ucase();
-	if ((ver.index("WINDOWS", 1) or ver.index("NT", 1)) or os.index("NT", 1)) {
+	if ((ver.index("WINDOWS") or ver.index("NT")) or os.index("NT")) {
 		SYSTEM.r(12, -1, "WORDSIZE");
 		SYSTEM.r(13, -1, "32");
 	}
@@ -997,7 +996,7 @@ nextreport:
 		var cmd = "proxycfg";
 getproxy:
 		var result = shell2(cmd, errors).lcase();
-		tt = result.index("proxy server(s)", 1);
+		tt = result.index("proxy server(s)");
 		if (tt) {
 			//tt=result[tt,';'][1,char(13)]
 			tt = result.substr(tt,9999);
@@ -1123,7 +1122,7 @@ getproxy:
 		var nusers = usercodes.count(VM) + (usercodes ne "");
 		for (var usern = 1; usern <= nusers; ++usern) {
 			var userx = usercodes.a(1, usern);
-			if (not(userx.index("---", 1))) {
+			if (not(userx.index("---"))) {
 				userx.writev(users, userx, 1);
 				
 			}
@@ -1275,13 +1274,13 @@ getproxy:
 	if (not(lists.open("LISTS", ""))) {
 		lists = "";
 	}
-	if (not(lists.index(workpath, 1))) {
+	if (not(lists.index(workpath))) {
 		var cmd = "MAKEFILE " ^ workpath ^ " LISTS";
 		perform(cmd ^ " (S)");
 		if (not(lists.open("LISTS", ""))) {
 			lists = "";
 		}
-		if (not(lists.index(workpath, 1))) {
+		if (not(lists.index(workpath))) {
 			//call note('FAILED TO MAKE LISTS FILE ON ':workpath
 		}
 	}
@@ -1384,7 +1383,7 @@ fixnextcompany:
 		}
 
 		call log2("*remove obsolete period 13 from deloitte data", logtime);
-		if (gen.company.index("13X4WEEK,1/7,5", 1)) {
+		if (gen.company.index("13X4WEEK,1/7,5")) {
 			tt = gen.company.a(16);
 			tt.swapper("13/", "12/");
 			gen.company.r(16, tt);
@@ -1556,7 +1555,7 @@ adddatasetcodename:
 		}
 		if (userx.a(4) and interactive) {
 			var day = var("Mon,Tue,Wed,Thu,Fri,Sat,Sun").field(",", (userx.a(4) - 1) % 7 + 1);
-			call note("Info:||" ^ USERNAME ^ " last used " ^ currdataset ^ " on||" ^ day ^ " " ^ userx.a(4).oconv("D") ^ " at " ^ userx.a(5).oconv("MTH") ^ "||" ^ var("on workstation " ^ userx.a(6).trim()).oconv("C#40") ^ "|");
+			call note("Info:||" ^ USERNAME ^ " last used " ^ currdataset ^ " on||" ^ day ^ " " ^ userx.a(4).oconv("D") ^ " at " ^ userx.a(5).oconv("MTH") ^ "||" ^ ("on workstation " ^ userx.a(6).trim()).oconv("C#40") ^ "|");
 		}
 
 		call log2("*save last login time", logtime);
@@ -1706,8 +1705,8 @@ nextdoc:
 			//email users on live systems LISTED IN SYSTEM CONFIGURATION only
 			if (SYSTEM.a(58).locateusing(SYSTEM.a(17), VM, xx)) {
 				if (not SYSTEM.a(61)) {
-					var idate = (version.field(" ", 2, 4)).iconv("D");
-					var itime = (version.field(" ", 1)).iconv("MT");
+					var idate = version.field(" ", 2, 4).iconv("D");
+					var itime = version.field(" ", 1).iconv("MT");
 					tt = idate.oconv("D/J") ^ " " ^ itime.oconv("MT");
 					call decide("Email users about upgrade?|(or later on do F5 EMAILUSERS UPGRADE " ^ tt ^ ")", "", reply);
 					if (reply == 1) {

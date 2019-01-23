@@ -42,7 +42,7 @@ function main(in mode0, in id, in analrecord, in orec) {
 	if (categorycode == "") {
 		return 0;
 	}
-	if (not(var("BF").index(categorycode[1], 1))) {
+	if (not(var("BF").index(categorycode[1]))) {
 		return 0;
 	}
 

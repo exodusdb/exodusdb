@@ -30,6 +30,7 @@ var msg;
 var jobcode;
 var job;
 var reply;//num
+var ndecs;
 var tt;
 var docname;
 var copyfile;
@@ -176,7 +177,7 @@ lockit:
 			}
 
 			win.is.trimmerf();
-			if (win.is.index(" ", 1)) {
+			if (win.is.index(" ")) {
 				msg = "SORRY, YOU CANNOT USE SPACES HERE";
 				gosub invalid(msg);
 			}else{
@@ -357,7 +358,6 @@ lockit:
 		if ((win.is == "") or (win.is == win.isorig)) {
 			return 0;
 		}
-		var ndecs;
 		if (not(ndecs.readv(gen.currencies, calculate("CURR_CODE"), 3))) {
 			ndecs = "2";
 		}
@@ -486,7 +486,7 @@ preventediting:
 		}
 
 		//prevent certain users from creating their own quote numbers
-		if (((win.wlocked and (RECORD == "")) and not interactive) and not USER3.index("RECORDKEY", 1)) {
+		if (((win.wlocked and (RECORD == "")) and not interactive) and not USER3.index("RECORDKEY")) {
 			if (not(authorised("PRODUCTION ESTIMATE CREATE OWN NO", msg))) {
 				msg = DQ ^ (ID ^ DQ) ^ " does not exist and" ^ FM ^ FM ^ msg;
 				win.reset = 5;
@@ -504,7 +504,7 @@ preventediting:
 				tt.converter(TM, VM);
 				while (true) {
 				///BREAK;
-				if (not(tt.index(" " ^ VM, 1))) break;;
+				if (not(tt.index(" " ^ VM))) break;;
 					tt.swapper(" " ^ VM, VM);
 				}//loop;
 				RECORD.r(8, tt);
@@ -788,7 +788,7 @@ nextcopyno2:
 		}
 		if (currcode ne win.orec.a(4)) {
 			tt = gen.currency.a(1).convert("<>", "()");
-			if (gen.currency.a(25) or tt.ucase().index("(STOP)", 1)) {
+			if (gen.currency.a(25) or tt.ucase().index("(STOP)")) {
 				msg = tt ^ FM ^ "currency is stopped" ^ FM ^ gen.currency.a(25);
 				return invalid(msg);
 			}
@@ -971,7 +971,7 @@ badtype:
 			}
 		}
 
-		if (RECORD.index(var().chr(0).str(4), 1)) {
+		if (RECORD.index(var().chr(0).str(4))) {
 			msg = "INTERNAL ERROR IN PRODUCTION ESTIMATE/INVOICE|PLEASE GIVE THIS MESSAGE TO NEOSYS|PLEASE REDO THIS ESTIMATE/INVOICE";
 			call oswrite(RECORD, "prodinv.$$$");
 			gosub invalid(msg);
@@ -1060,7 +1060,7 @@ subroutine updanalysis() {
 	gosub updanalysis2( sign);
 
 	//remove old analysis
-	if (mode.index("DELETE", 1) or win.orec) {
+	if (mode.index("DELETE") or win.orec) {
 		sign = -1;
 
 		var storerecord = RECORD;
@@ -1120,7 +1120,7 @@ subroutine updanalysis2(in sign) {
 	var suppliercode = calculate("SUPPLIER_CODE");
 	var brandcode = calculate("BRAND_CODE");
 	var marketcode = calculate("MARKET_CODE");
-	var orderperiod = (calculate("DATE")).oconv("D2/E").substr(4,5);
+	var orderperiod = calculate("DATE").oconv("D2/E").substr(4,5);
 	var ordermthno = orderperiod.field("/", 1);
 
 	var analcompanycode = calculate("COMPANY_CODE");

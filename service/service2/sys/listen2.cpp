@@ -39,6 +39,7 @@ var lastuserid;
 var ucomps;
 var userrec;
 var locks;
+var styles2;
 var fields;
 
 function main(in request1, in request2, in request3, in request4, io request5, in request6="") {
@@ -78,7 +79,7 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 		//2. email addresses are not secret and usernames are guessable
 		//3. magic character in password on logins causes password reset if email
 		//as the password. Therefore NO @ characters in passwords
-		var passwordreset = (word2 == "LOGIN") and password.index("@", 1);
+		var passwordreset = (word2 == "LOGIN") and password.index("@");
 
 		//determine username from emailaddress
 		//only for users with single, unique emails
@@ -237,7 +238,7 @@ passfail:
 				validips = SECURITY.a(6, usern);
 
 				//+ in user ipnos means add to group user ip ranges
-				if (validips.index("+", 1)) {
+				if (validips.index("+")) {
 					validips.transfer(addvalidips);
 				}else{
 					addvalidips = "";
@@ -256,7 +257,7 @@ passfail:
 					validips = SECURITY.a(6, ii);
 
 					//+ in group ipnos means add to system config ip ranges
-					if (validips.index("+", 1)) {
+					if (validips.index("+")) {
 						addvalidips ^= " " ^ validips;
 						validips = "";
 					}
@@ -266,7 +267,7 @@ passfail:
 						validips = SYSTEM.a(39);
 
 						//+ in system config ipnos means add traditional private LAN ip ranges
-						if (validips.index("+", 1)) {
+						if (validips.index("+")) {
 							addvalidips ^= " " ^ validips;
 							validips = "";
 						}
@@ -354,7 +355,7 @@ invalidip:
 					//prevent NEOSYS from using CONFIGURED fully formed LAN ips
 					//which are deemed to be NAT routers possibly providing WAN access
 					//but NEOSYS should not have unrestricted access from WAN
-					if ((username == "NEOSYS") and not SYSTEM.a(17).index("DEMO", 1)) {
+					if ((username == "NEOSYS") and not SYSTEM.a(17).index("DEMO")) {
 						if (ip2 == "192.168") {
 neosyslocalip:
 							if (validips.locateusing(ipno, " ", xx)) {
@@ -1055,7 +1056,6 @@ subroutine becomeuserandconnection(in request2, in request4) {
 
 			var styles = userrec.a(19);
 			styles.swapper("Default", "");
-			var styles2;
 			if (not(styles2.readv(users, userrec.a(21), 19))) {
 				styles2 = "";
 			}

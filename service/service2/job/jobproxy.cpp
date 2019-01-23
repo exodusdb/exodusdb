@@ -474,7 +474,7 @@ approvalerror:
 		gosub checkoutputfileexists();
 
 	} else if (mode.field(".", 1) == "UPDATEATTACHMENTS") {
-		if (USER1 and ((mode.field(".", 2)).length() == 3)) {
+		if (USER1 and (mode.field(".", 2).length() == 3)) {
 			USER1.converter(VM, FM);
 			USER1.write(DEFINITIONS, "ENCLOSURES.PROD" ^ mode.field(".", 2));
 			USER3 = "OK";
@@ -686,7 +686,7 @@ subroutine addtasks() {
 	fullcmd ^= " AND WITH STATUS NE \"Completed\" AND WITH STATUS NE \"Cancelled\"";
 	fullcmd ^= " AND WITH AUTHORISED";
 
-	tt = fullcmd.index(" AND WITH ", 1);
+	tt = fullcmd.index(" AND WITH ");
 	if (tt) {
 		fullcmd.splicer(tt, 4, "");
 	}

@@ -10,7 +10,7 @@ function main(in alerttype0, in runasuser, out task, out title, out request, out
 	//CREATEALERT COLLECT FINANCE COLLECTION 8,12,17 usercode
 
 	var alerttype = alerttype0.field(":", 1);
-	var alertoptions = (alerttype0.field(":", 2, 9999)).convert(":", FM);
+	var alertoptions = alerttype0.field(":", 2, 9999).convert(":", FM);
 
 	if (runasuser.unassigned()) {
 		{}

@@ -68,7 +68,7 @@ nextdoc:
 		}else{
 			tt = "DOC";
 		}
-		var temp = tt ^ var("00000" ^ nextno).oconv("R#5");
+		var temp = tt ^ ("00000" ^ nextno).oconv("R#5");
 
 		//skip to next file if already exists
 		if (temp2.osopen(where ^ temp)) {
@@ -118,7 +118,7 @@ nextdoc:
 			}
 
 			//always prevent users from editing documents designed by NEOSYS
-			if (RECORD.a(1).index("NEOSYS", 1) and not USERNAME.index("NEOSYS", 1)) {
+			if (RECORD.a(1).index("NEOSYS") and not USERNAME.index("NEOSYS")) {
 				call mssg("You cannot modify report designs created by NEOSYS|Use the Copy button to copy them and modify the copy");
 				xx = unlockrecord(win.datafile, win.srcfile, ID);
 				win.wlocked = 0;
@@ -191,7 +191,7 @@ nextdoc:
 			}
 
 			//always prevent users from deleting documents designed by NEOSYS
-			if (RECORD.a(1).index("NEOSYS", 1) and not USERNAME.index("NEOSYS", 1)) {
+			if (RECORD.a(1).index("NEOSYS") and not USERNAME.index("NEOSYS")) {
 				msg = "You cannot delete report designs created by NEOSYS";
 				return invalid(msg);
 			}

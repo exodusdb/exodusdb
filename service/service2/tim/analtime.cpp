@@ -9,7 +9,7 @@ libraryinit()
 #include <getmark.h>
 #include <printtx.h>
 #include <gethtml.h>
-#include <readcss.h>
+#include <getcss.h>
 #include <docmods.h>
 
 #include <gen.h>
@@ -263,7 +263,7 @@ inptodate:
 	*/
 
 	//remove the first AND
-	temp = cmd.index("AND WITH", 1);
+	temp = cmd.index("AND WITH");
 	if (temp) {
 		cmd.splicer(temp, 4, "");
 	}
@@ -428,7 +428,7 @@ nextbreak:
 	//breakexit:
 	//////////
 	if (cost) {
-		tx = tr ^ (sep ^ jobno).oconv(l20) ^ " " ^ job.a(9, 1, 1).oconv(l40) ^ " " ^ (cost.oconv("MD20P")).oconv(r15) ^ trx;
+		tx = tr ^ (sep ^ jobno).oconv(l20) ^ " " ^ job.a(9, 1, 1).oconv(l40) ^ " " ^ cost.oconv("MD20P").oconv(r15) ^ trx;
 		gosub printtx(tx);
 		totalcost += cost;
 	}
@@ -446,7 +446,7 @@ subroutine exit() {
 	}
 	tx ^= FM;
 
-	var tx2 = tr ^ (sep ^ "TOTAL COST").oconv(l20) ^ sep ^ var("").oconv(l40) ^ sep ^ (totalcost.oconv("MD20P")).oconv(r15) ^ FM;
+	var tx2 = tr ^ (sep ^ "TOTAL COST").oconv(l20) ^ sep ^ var("").oconv(l40) ^ sep ^ totalcost.oconv("MD20P").oconv(r15) ^ FM;
 
 	if (html) {
 		tx2.swapper("<TD", "<TH");

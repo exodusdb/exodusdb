@@ -57,7 +57,7 @@ binary), one to three backups are required to find the beginning of the characte
 DLL_PUBLIC
 std::string var::toString2() const
 {
-	if (var_mvtyp&mvtypemask)
+	if (var_typ&mvtypemask)
 		return "";
 	return toString();
 }
@@ -67,22 +67,22 @@ std::string var::toString() const
 {
 	THISIS(L"std::string var::toString() const")
     THISISSTRING()
-	int length = (int) var_mvstr.length();
+	int length = (int) var_str.length();
 
 	//TODO! convert from internal UTF16/32 to external UTF8
 
 	//allow for max 4 bytes per single utf8 byte (utf16 max bytes is four)
 	if (sizeof(wchar_t)==4)
 	{
-		return stringfromUTF32((UTF32*)((*this).var_mvstr.data()), length);	//ALN:TODO: try to move it into
+		return stringfromUTF32((UTF32*)((*this).var_str.data()), length);	//ALN:TODO: try to move it into
 	}																			// var::toUTF8
 	else if (sizeof(wchar_t)==2)
 	{
-		return stringfromUTF16((UTF16*)((*this).var_mvstr.data() ), length);
+		return stringfromUTF16((UTF16*)((*this).var_str.data() ), length);
 	}
 	else if (sizeof(wchar_t)==1)
 	{
-		std::string result(var_mvstr.begin(),var_mvstr.end());
+		std::string result(var_str.begin(),var_str.end());
 		return result;
 	}
 	else

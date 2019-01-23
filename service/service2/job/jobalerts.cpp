@@ -78,11 +78,11 @@ function main(in alerttype0, in runasuser, out tasks, out title, out request, ou
 		var uptodate = "{TODAY}";
 		var orderby = "";
 		var emailtarget = "";
-		if (alertoptions.index("TOEXEC", 1)) {
+		if (alertoptions.index("TOEXEC")) {
 			alertoptions.swapper("TOEXEC", "");
 			orderby = 1;
 			emailtarget = "EXECUTIVE";
-		} else if (alertoptions.index("BYEXEC", 1)) {
+		} else if (alertoptions.index("BYEXEC")) {
 			alertoptions.swapper("BYEXEC", "");
 			orderby = 1;
 		}

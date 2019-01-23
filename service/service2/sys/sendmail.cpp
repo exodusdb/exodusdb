@@ -141,13 +141,13 @@ forcedemail:
 	}
 
 	//limit development system to steve
-	if (SYSTEM.index("1EEC633B", 1)) {
+	if (SYSTEM.index("1EEC633B")) {
 		toaddress = "steve.bush@neosys.com";
 		ccaddress = "";
 	}
 
 	//cut off any cc addresses from the toaddress (after ;;)
-	tt = toaddress.index(";;", 1);
+	tt = toaddress.index(";;");
 	if (tt) {
 		if (ccaddress) {
 			ccaddress ^= ";";

@@ -127,7 +127,7 @@ lockit:
 			}
 
 			win.is.trimmerf();
-			if (win.is.index(" ", 1)) {
+			if (win.is.index(" ")) {
 				msg = "SORRY, YOU CANNOT USE SPACES HERE";
 				gosub invalid(msg);
 			}else{
@@ -409,7 +409,7 @@ lockit:
 		}
 
 		//prevent certain users from creating their own quote numbers
-		if (((RECORD == "") and not interactive) and not USER3.index("RECORDKEY", 1)) {
+		if (((RECORD == "") and not interactive) and not USER3.index("RECORDKEY")) {
 			if (not(authorised("PRODUCTION ORDER CREATE OWN NO", msg, ""))) {
 				msg = DQ ^ (ID ^ DQ) ^ " does not exist and" ^ FM ^ FM ^ msg;
 				win.reset = 5;

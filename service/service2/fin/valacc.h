@@ -17,7 +17,7 @@ efb_valacc& operator=(const var& newlibraryname) {
 }
 
 //a member function with the right arguments, returning a var or void
-var operator() (io mode, io is, io isorig, in validaccs, io msg, in acctype0)
+var operator() (io mode, io is, io isorig, in validaccs, io msg, in acctype)
 {
 
  //first time link to the shared lib and create/cache an object from it
@@ -41,7 +41,7 @@ var operator() (io mode, io is, io isorig, in validaccs, io msg, in acctype0)
  // (mode);
  return CALLMEMBERFUNCTION(*(this->pobject_),
  ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
-  (mode,is,isorig,validaccs,msg,acctype0);
+  (mode,is,isorig,validaccs,msg,acctype);
 
 }
 

@@ -9,7 +9,7 @@
 
 #define EXODUS_IPC_EXTERN extern
 #include <exodus/mvipc.h>
-#include <exodus/mvfunctor.h>
+//#include <exodus/mvfunctor.h>
 
 //#define BUFSIZE 1048576
 //cant be bigger than process stacksize .. this LIMITS boost messaging
@@ -54,7 +54,7 @@ void respondToRequests(boost::interprocess::message_queue& request_queue, boost:
 		#if TRACING >= 3
 			wprintf(L"---------------------------------\nMVipc() read  %d bytes from pipe\n",request_size);
 		#endif
-		
+
 		//determine a response
 		getResponseToRequest(chRequest,request_size,0,response,exodusfunctorbase);
 
@@ -123,7 +123,7 @@ int MVipc(const int environmentn, var& pgconnparams)
 	//AFTER opening the database connection
 	setenvironmentn(environmentn);
 	var processn=getprocessn();
-		
+
 	//this is a dict library caller
 	//TODO check if possible to have no environment;
 	//*COPY in mvipc_posix.cpp mvipc_boost.cpp mvipc_win.cpp
@@ -138,7 +138,7 @@ int MVipc(const int environmentn, var& pgconnparams)
 		mv->init(environmentn);
 	}
 	ExodusFunctorBase exodusfunctorbase(*mv);
-	
+
 	//"\\\\.\\pipe\\exoduspipexyz"
 	//strings of MS tchars
 	//typedef basic_string<TCHAR> tstring;
@@ -192,7 +192,7 @@ int MVipc(const int environmentn, var& pgconnparams)
 			}
 
 			respondToRequests(request_queue,response_queue,exodusfunctorbase);
-			
+
 			std::clog << "finished responding to queue " << requestqueuename<<std::endl;
 
 		}

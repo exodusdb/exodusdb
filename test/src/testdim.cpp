@@ -7,8 +7,9 @@ programinit()
 function main()
 {
 {
-   std::locale locE ( "Ukrainian_Ukraine.1251" );	// en-US
-   std::locale loc ( "Greek_Greece.1253" );	// en-US
+   //std::locale locE ( "Ukrainian_Ukraine.1251" );	// en-US
+   //std::locale loc ( "Greek_Greece.1253" );	// en-US
+   std::locale loc;
    std::locale loc1;
    std::cout << "The initial locale is: " << loc1.name( ) << std::endl;
    std::locale loc2 = std::locale::global ( loc );
@@ -16,7 +17,8 @@ function main()
    std::cout << "The current locale is: " << loc3.name( ) << std::endl;
    std::cout << "The previous locale was: " << loc2.name( ) << std::endl;
 }
-    std::locale mylocale("de");
+	//std::locale mylocale("de");
+	std::locale mylocale("C");
 
 	///// STEP1. Test on default (Ukrainian) locale
 	var locale0 = getxlocale().outputl("Original Locale=");
@@ -44,7 +46,6 @@ L"[16:55:08] neosys: one й\n";
 	oswrite( test, test_file);
 	test_file.osclose();
 
-	testback;
 	testback.osread( test_file);
 	test.outputl( "What was in test variable:");
 	testback.outputl( "What was read:");
@@ -75,23 +76,27 @@ L"[16:55:08] neosys: one й\n";
 	var tempfilename5 = "tempfilename5.txt";
 	oswrite("",tempfilename5);
 
-//	 assert( osbwrite("78",tempfilename5,2));
-	 assert( osbwrite("78",tempfilename5,var(2)));
+//	assert( osbwrite("78",tempfilename5,2));
+	var offset=2;
+	assert( osbwrite("78",tempfilename5,offset));
 
-	 osclose(tempfilename5);
-	 osdelete(tempfilename5);
+	osclose(tempfilename5);
+	osdelete(tempfilename5);
 
 	tempfilename5 = "tempfilename6.txt";
 	oswrite("",tempfilename5);
-	assert(osbwrite("This is written from 10th byte", tempfilename5, var(10)));
+	offset=10;
+	assert(osbwrite("This is written from 10th byte", tempfilename5, offset));
 
 	tempfilename5 = "tempfilename7.txt";
 	oswrite("",tempfilename5);
-	assert(osbwrite("This is written from 0th byte", tempfilename5, var(0)));
+	offset=0;
+	assert(osbwrite("This is written from 0th byte", tempfilename5, offset));
 
 	tempfilename5 = "tempfilename8.txt";
 	oswrite("",tempfilename5);
-	assert(osbwrite("Just to test dynamically grown handle cache table", tempfilename5, var(0)));
+	offset=0;
+	assert(osbwrite("Just to test dynamically grown handle cache table", tempfilename5, offset));
 
 	// Use any file with size 2-10Mb
 	var stroustrup = "Stroustrup B. - The C++ programming language (3rd edition) (1997).pdf";
@@ -104,7 +109,8 @@ L"[16:55:08] neosys: one й\n";
 	for( int i = 0; i < 3459406 / 5; i += 5)
 	{
 		var buf;
-		buf.osbread( stroustrup, var(i), 5);
+		offset=i;
+		buf.osbread( stroustrup, offset, 5);
 //		if( buf == L"C")
 //			CppCounter ++;
 //		print( var(i)^L" "^CppCounter^L"\r");
@@ -118,9 +124,10 @@ L"[16:55:08] neosys: one й\n";
 
 	stroustrup.osclose();
 
-	printl( L"");
-	print( L"Print any key to execute other types of tests ...");
+	printl();
+	printl("Press Enter to execute other types of tests ...");
 	int c = getchar();
+	var(c).outputl("char=");
 
 	var counting = "counting.txt";
 	print( L"Start of osbwrite() benchmark: ");
@@ -130,7 +137,8 @@ L"[16:55:08] neosys: one й\n";
 	{
 		var buf(i);
 		buf ^= L"\n";
-		buf.osbwrite( counting, var(i));
+		offset=i;
+		buf.osbwrite( counting, offset);
 	}
 	end = end.timedate();
 	print( L"End of  osbwrite()  benchmark: ");
@@ -141,7 +149,8 @@ L"[16:55:08] neosys: one й\n";
 
 	counting.osclose();
 
-	print( L"Print any key to execute other types of tests ...");
+	printl();
+	printl( L"Press any key to execute other types of tests ...");
 	c = getchar();
 
 	dim a9;

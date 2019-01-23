@@ -97,7 +97,7 @@ function main(io mode, out html, in compcode0="") {
 	tt = "L";
 	call date("OCONV", datetime, tt, tdate, gen.glang);
 	html.swapper("%DATE%", tdate);
-	html.swapper("%TIME%", (datetime.field(".", 2)).oconv("[TIME2]"));
+	html.swapper("%TIME%", datetime.field(".", 2).oconv("[TIME2]"));
 	html.swapper("%STATION%", STATION);
 
 	html.swapper("%DATAURL%", "%URL%/DATA/%DATABASE%");
@@ -133,7 +133,7 @@ function main(io mode, out html, in compcode0="") {
 	html = html.field(var().chr(26), 1);
 	while (true) {
 	///BREAK;
-	if (not(html and (var("\r\n").index(html[-1], 1)))) break;;
+	if (not(html and (var("\r\n").index(html[-1])))) break;;
 		html.splicer(-1, 1, "");
 	}//loop;
 

@@ -9,21 +9,15 @@ libraryinit()
 var sortkey;
 var value;
 var indent;
-var ledgertype;
 
-var vn;
-var accs;
-var naccs;
-var naccs2;
-
-function main(in mode, io ledgercode, in newaccno0, in newaccount, in sortorder, in params0, out msg) {
+function main(in mode, io ledgercode, in newaccno0, in newaccount, in sortorder, in params, out msg) {
+	//c fin in,io,in,in,in,in,out
 	//y2k
 	//chartmv.fns must be changed in all places in ABP and ABP2
 	var interactive = not SYSTEM.a(33);
 	var newaccno = newaccno0.a(1, 1, 1);
 	//if newaccno<1,1,2>='' then newaccno<1,1,2>=newaccno<1,1,1>
 	var newaccname = newaccount.a(1);
-	var params=params0;
 
 	var update = mode == "ADD";
 	msg = "";
@@ -35,7 +29,7 @@ function main(in mode, io ledgercode, in newaccno0, in newaccount, in sortorder,
 	// msg=''
 	//preexist:
 	// msg=quote(newaccno):msg:' ACCOUNT NUMBER ALREADY EXISTS'
-	// return 0
+	// return
 	// end
 
 	if (fin.account.read(fin.accounts, newaccno)) {
@@ -48,7 +42,7 @@ function main(in mode, io ledgercode, in newaccno0, in newaccount, in sortorder,
 	//make the ledger code
 	var origledgercode = ledgercode;
 	var origparams = params;
-	gosub expandledgercodeparams(ledgercode, params);
+	gosub expandledgercodeparams();
 
 	//if chart doesnt exist then walk back through the years
 	//zzz should walk back through quarters or periods too but isnt implemented
@@ -57,15 +51,41 @@ function main(in mode, io ledgercode, in newaccno0, in newaccount, in sortorder,
 	if (not(tt.read(fin.charts, ledgercode))) {
 		var targetledgercode = ledgercode;
 
-		//contruct prior year ledgercode
+		//contruct prior year ledgercode (1st period if periodwise)
+		params.r(2, "01");
 getprevledgercode:
-		params.r(1, (addcent(params.a(1)) - 1).substr(-2, 2));
+		params.r(1, (addcent(params.a(1)) - 1).substr(-2,2));
 		ledgercode = origledgercode;
-		gosub expandledgercodeparams(ledgercode, params);
+		gosub expandledgercodeparams();
 
 		//just quit if back to original code after searching backwards through 07-06
 		if (ledgercode == targetledgercode) {
-			ledgercode = targetledgercode;
+
+			ledgercode = origledgercode;
+			params = "";
+			gosub expandledgercodeparams();
+			var chart;
+			if (chart.read(fin.charts, ledgercode)) {
+				tt = chart.a(1);
+				if (origledgercode.index("<YEAR>")) {
+					tt ^= " " ^ addcent(params.a(1));
+				}
+				if (origledgercode.index("<PERIOD>")) {
+					tt ^= "." ^ params.a(2);
+				}
+				if (origledgercode.index("<QUARTER>")) {
+					tt ^= " Q" ^ params.a(3);
+				}
+				chart.r(1, tt);
+				if (origledgercode.index("<COMPANY>")) {
+					chart.r(6, params.a(4));
+				}
+
+				ledgercode = targetledgercode;
+				gosub createchart();
+			}else{
+				ledgercode = targetledgercode;
+			}
 
 		}else{
 
@@ -78,7 +98,7 @@ getprevledgercode:
 			//found previous chart so create new chart
 
 			//change previous year if in chart name
-			var tt = chart.a(1);
+			tt = chart.a(1);
 			tt.swapper(addcent(params.a(1)), addcent(origparams.a(1)));
 			tt.swapper(params.a(1), origparams.a(1));
 			chart.r(1, tt);
@@ -86,7 +106,7 @@ getprevledgercode:
 			ledgercode = targetledgercode;
 			//zzz should really lock to prevent create unless exclusive
 			//but will not really cause a problem probs
-			gosub createchart(chart, ledgercode);
+			gosub createchart();
 
 		}
 
@@ -141,7 +161,7 @@ nextledgerno:
 		//ledgerno+=1
 		goto nextledgerno;
 	}
-//foundledger:
+foundledger:
 
 	//check that the ledger exists and get the chart
 	if (not chart) {
@@ -164,7 +184,7 @@ lockit:
 	//add new chart if existing is too big
 
 	//if interactive and len(chart)>32000 and newledgercode then
-	if (chart.length() > 32000 and newledgercode) {
+	if ((chart.length() > 32000) and newledgercode) {
 
 		//unlock the old chart because we are going to create a new one
 		var xx = unlockrecord("CHARTS", fin.charts, ledgercode);
@@ -173,7 +193,7 @@ lockit:
 		ledgercode = newledgercode;
 		newledgercode = "";
 
-		gosub createchart(chart, ledgercode);
+		gosub createchart();
 
 		goto lockit;
 
@@ -211,15 +231,15 @@ lockit:
 	}
 
 	//calc the number of lines
-	accs = chart.a(4);
-	naccs = accs.count(VM) + (accs ne "");
-	naccs2 = (chart.a(3)).count(VM) + (chart.a(3) ne "");
+	var accs = chart.a(4);
+	var naccs = accs.count(VM) + (accs ne "");
+	var naccs2 = chart.a(3).count(VM) + (chart.a(3) ne "");
 	if (naccs2 > naccs) {
 		naccs = naccs2;
 	}
 
 	//default to the end of the ledger
-	vn = naccs + 1;
+	var vn = naccs + 1;
 
 	//find value number to insert at
 	if (sortorder) {
@@ -240,12 +260,12 @@ lockit:
 					accn = naccs;
 
 					//insert a blank line
-					var nn = fin.chartmvfns.dcount(VM);
+					var nn = "3" _VM_ "4" _VM_ "7" _VM_ "8" _VM_ "10" _VM_ "11" _VM_ "12" _VM_ "14" _VM_ "21" _VM_ "22" _VM_ "24" _VM_ "25" _VM_ "27" _VM_ "29" _VM_ "32" _VM_ "33".count(VM) + 1;
 					for (var ii = 1; ii <= nn; ++ii) {
-						var tt = fin.chartmvfns.a(1, ii);
+						tt = "3" _VM_ "4" _VM_ "7" _VM_ "8" _VM_ "10" _VM_ "11" _VM_ "12" _VM_ "14" _VM_ "21" _VM_ "22" _VM_ "24" _VM_ "25" _VM_ "27" _VM_ "29" _VM_ "32" _VM_ "33".a(1, ii);
 						if (tt) {
 							chart.inserter(tt, vn, "");
-							}
+						}
 					};//ii;
 
 				}
@@ -260,7 +280,7 @@ lockit:
 	}else{
 		//indent like previous line
 		var temp = chart.a(3, vn - 1);
-		indent = (temp.length() - (temp.trimf()).length()).space();
+		indent = (temp.length() - temp.trimf().length()).space();
 		//if no account number on previous line then indent by one more
 		if (chart.a(4, vn - 1) == "") {
 			indent ^= " ";
@@ -306,19 +326,41 @@ lockit:
 	}
 
 exit:
-	/////
+/////
 	var xx = unlockrecord("CHARTS", fin.charts, ledgercode);
 
 	return 0;
-
+	/*;
+/////////////////
+	updateledgertype:
+/////////////////
+		//why isnt this called from anywhere?
+		//ledger.type @id delete
+		KEY='LEDGER.TYPE.':LEDGER.TYPE;
+		READ REC FROM DEFINITIONS,'LEDGER.TYPE.':LEDGER.TYPE ELSE REC='';
+		//LOCATE @ID IN REC<1> SETTING t THEN
+		LOCATE ID IN REC<1> SETTING t THEN;
+			IF DELETE THEN;
+				REC=DELETE(REC,1,t,0);
+				WRITE REC ON DEFINITIONS,KEY;
+				END;
+		END ELSE;
+			IF DELETE ELSE;
+				//REC<1,-1>=@ID
+				REC<1,-1>=ID;
+				WRITE REC ON DEFINITIONS,KEY;
+				END;
+			END;
+		return 0;
+	*/
 }
 
-subroutine expandledgercodeparams(io ledgercode, in params) {
+subroutine expandledgercodeparams() {
 
 	//old format numbered params
 	for (var ii = 1; ii <= 999; ++ii) {
 		var paramno = "%" ^ ii ^ "%";
-		var ptr = ledgercode.index(paramno, 1);
+		var ptr = ledgercode.index(paramno);
 	///BREAK;
 	if (not ptr) break;;
 		ledgercode.splicer(ptr, paramno.length(), params.a(ii));
@@ -335,12 +377,12 @@ subroutine expandledgercodeparams(io ledgercode, in params) {
 
 }
 
-subroutine createchart(io chart, in ledgercode) {
+subroutine createchart() {
 
 	//clear the last chart record to make a new chart record
-	var nmvfns = fin.chartmvfns.dcount(VM);
+	var nmvfns = "3" _VM_ "4" _VM_ "7" _VM_ "8" _VM_ "10" _VM_ "11" _VM_ "12" _VM_ "14" _VM_ "21" _VM_ "22" _VM_ "24" _VM_ "25" _VM_ "27" _VM_ "29" _VM_ "32" _VM_ "33".count(VM) + 1;
 	for (var fnn = 1; fnn <= nmvfns; ++fnn) {
-		chart.r(fin.chartmvfns.a(1, fnn), "");
+		chart.r("3" _VM_ "4" _VM_ "7" _VM_ "8" _VM_ "10" _VM_ "11" _VM_ "12" _VM_ "14" _VM_ "21" _VM_ "22" _VM_ "24" _VM_ "25" _VM_ "27" _VM_ "29" _VM_ "32" _VM_ "33".a(1, fnn), "");
 	};//fnn;
 
 	chart.write(fin.charts, ledgercode);

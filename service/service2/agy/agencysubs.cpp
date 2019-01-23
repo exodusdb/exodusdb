@@ -27,6 +27,7 @@ libraryinit()
 var allownew;
 var iaccno;
 var billcostn;//num
+var icontrolaccno;
 var xx;
 var brandcode;
 var doccompanycode;
@@ -107,7 +108,6 @@ function main(in mode, io msg, in param3="", in param4="") {
 				call fsmsg();
 				var().stop();
 			}
-			var icontrolaccno;
 			if (icontrolaccno.readv(accounts, iaccno, 6)) {
 				if (icontrolaccno) {
 					if (not(billcostaccs.a(2).locateusing(icontrolaccno, VM, billcostn))) {
@@ -137,7 +137,7 @@ function main(in mode, io msg, in param3="", in param4="") {
 		var tt = billcostaccs.a(3, billcostn);
 		if (not(tt.locateusing(analysiscode.field("*", 1), SVM, xx))) {
 			//could be BILL and COST for some accounts
-			if (tt.index(SVM, 1)) {
+			if (tt.index(SVM)) {
 				tt.swapper(28, "28 for Bill");
 				tt.swapper(29, "29 for Cost");
 				tt.swapper(30, "30 for Accrued Cost");
@@ -276,7 +276,7 @@ field2err:
 			if (tt) {
 				if (not(tt.locateusing(typecode, SVM, xx))) {
 					msg ^= " type (" ^ typecode ^ ") must be ";
-					if (tt.index(SVM, 1)) {
+					if (tt.index(SVM)) {
 						tt.swapper(SVM, ", ");
 						msg ^= "one of " ^ tt;
 					}else{
@@ -326,7 +326,7 @@ field2err:
 			//docdate=iconv('1/':@record<12>,'D2/E')
 			//check LATEST date on plan (so they can work on multimonth plans)
 			//TODO closed periods should be locked in the plan data entry screen
-			docdate = var("28/" ^ RECORD.a(15)).iconv("D2/E");
+			docdate = ("28/" ^ RECORD.a(15)).iconv("D2/E");
 			docname = "plan";
 
 		} else if (win.datafile == "SCHEDULES") {
@@ -340,7 +340,7 @@ field2err:
 
 		} else if (win.datafile == "JOBS") {
 			doccompanycode = RECORD.a(14);
-			docdate = var("1/" ^ RECORD.a(1)).iconv("D2/E");
+			docdate = ("1/" ^ RECORD.a(1)).iconv("D2/E");
 			docname = "job";
 
 		} else if (win.datafile == "PRODUCTION_ORDERS") {
@@ -462,7 +462,7 @@ getolderjobdate:
 
 		call readagp();
 
-		if (not((var("PLANS,SCHEDULES,JOBS,PRODUCTION_ORDERS,PRODUCTION_INVOICES").a(1)).locateusing(win.datafile, ",", filen))) {
+		if (not(var("PLANS,SCHEDULES,JOBS,PRODUCTION_ORDERS,PRODUCTION_INVOICES").locateusing(win.datafile, ",", filen))) {
 			msg = "File " ^ (DQ ^ (win.datafile ^ DQ)) ^ " is invalid in AGENCY.SUBS,GETNEXTID";
 			return invalid(msg);
 		}
@@ -502,7 +502,7 @@ getolderjobdate:
 
 		//prevent numeric company numbers being used as <COMPANY>
 		//to avoid <COMPANY><NUMBER> being merged numbers
-		if (keyformat.index("<COMPANY>", 1)) {
+		if (keyformat.index("<COMPANY>")) {
 			if (companyx.a(28).isnum()) {
 				msg = "Please setup Company Prefix for company " ^ (DQ ^ (compcode ^ DQ)) ^ " in Company File first";
 				//goto invalid
@@ -539,7 +539,7 @@ getolderjobdate:
 
 	} else if (mode == "DEF.CURRENCY") {
 		if (win.is == "") {
-			ANS = (calculate("MARKET_CODE")).xlate("MARKETS", 5, "X");
+			ANS = calculate("MARKET_CODE").xlate("MARKETS", 5, "X");
 		}
 
 	} else if (((((mode == "VAL.SCHEDULE") or (mode == "VAL.PLAN")) or (mode == "VAL.JOB")) or (mode == "VAL.PRODUCTION.ORDER")) or (mode == "VAL.PRODUCTION.INVOICE")) {
@@ -553,9 +553,9 @@ getolderjobdate:
 		} else {
 			filetitle = mode.field(".", 2) ^ "s";
 		}
-//L2767:
+//L2764:
 		//no search if version key
-		if (win.is.index("~", 1)) {
+		if (win.is.index("~")) {
 			return 0;
 		}
 
@@ -621,7 +621,7 @@ getolderjobdate:
 		// end
 		//suppress maximum message
 		//similar code in LISTSCHED and AGENCY.SUBS
-		if (USER4.index("maximum", 1)) {
+		if (USER4.index("maximum")) {
 			USER4 = "Too many records found. Some may have been excluded.";
 		}
 
@@ -629,7 +629,7 @@ getolderjobdate:
 
 			//maybe a new key
 			//if not(index(is,' ',1)) and len(is)<3 then
-			if (not win.is.index(" ", 1)) {
+			if (not win.is.index(" ")) {
 				ANS = win.is;
 
 				//trigger in the client
@@ -682,7 +682,7 @@ getolderjobdate:
 				msg.r(-1, "Material code, Material description/Special instructions");
 				msg.r(-1, "Status: NOTAPPROVED, NOTBOOKED, NOTINVOICED, OPEN, CLOSED");
 			}
-//L3464:
+//L3461:
 			//jobs, production orders and invoices
 			if (module == "JOBS_MODULE") {
 				msg.r(-1, "Status: Open, Closed");
@@ -956,7 +956,7 @@ gotsupplier:
 						if (not(supplier.read(agy.suppliers, suppliercodes.a(suppliern)))) {
 							supplier = "";
 						}
-						if (not(supplier.a(13).index(type, 1))) {
+						if (not(supplier.a(13).index(type))) {
 							suppliercodes.eraser(suppliern);
 							nsuppliers -= 1;
 							suppliern -= 1;
@@ -990,7 +990,7 @@ gotsupplier:
 		} else if (type == "3") {
 			type = "P";
 		}
-		if (type and not supplier.a(13).index(type, 1)) {
+		if (type and not supplier.a(13).index(type)) {
 			if (supplier.a(13) == "P") {
 				temp = "Production";
 			}else{
@@ -1149,7 +1149,7 @@ gotclient:
 
 		//check month/year format
 		var month = win.is.field("/", 1);
-		if (not((var("1,2,3,4,5,6,7,8,9,10,11,12").a(1)).locateusing(month, ",", temp))) {
+		if (not(var("1,2,3,4,5,6,7,8,9,10,11,12").locateusing(month, ",", temp))) {
 badperiod:
 			msg = "PLEASE ENTER PERIOD AS \"MONTH/YEAR\"|(EG \"1/92\")";
 			return invalid(msg);
@@ -1389,7 +1389,7 @@ subroutine openversionfile(io msg) {
 
 	var versionfilename = singular(win.datafile) ^ "_VERSIONS";
 	if (not(versionfile.open(versionfilename, ""))) {
-		if (not(ID.index("~", 1))) {
+		if (not(ID.index("~"))) {
 			return;
 		}
 		msg = versionfilename ^ " file is missing";

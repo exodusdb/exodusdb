@@ -9,67 +9,63 @@ var perc;//num
 var amount;//num
 var grossbillplus1;
 
-function main(io grossbill, in size, in extrasx, in unused, io msg, in roundingx, io mult, io amounts) {
+function main(io grossbill, in spec, in extras2, in unused, io msg, in roundingx, io sizemult, io amounts) {
+	//c med io,in,in,in,io,in,io,io
 	//MUST be kept in EXACT/CAREFUL sync with function schedule_calcbill in client
 	amounts = "";
 	//y2k *jbase
-	var ndecs = (grossbill.field(".", 2)).length();
-	var currfmt = "MD" ^ ndecs ^ "0P";
-
-	if (false) {
-		var x=unused;
-		x=roundingx;
-	}
+	var ndecs = grossbill.field(".", 2).length();
+	var origfmt = "MD" ^ ndecs ^ "0P";
 
 	//new method is to round on each calculation
 	//only really effects bahrain and amounts with three decimal places
 	//roundfinally=0;* or 1 to agree with how the intranet works
 	var roundfinally = 1;
-/*
+
 	if (rounding.unassigned()) {
 		roundingx = agy.agp.a(32, 1);
 		rounding = roundingx;
 		//if rounding='' and ndecs=3 then rounding=.1
-		if (rounding == "" and ndecs == 3) {
-			rounding = mv.PRIORITYINT.a(101, 1);
+		if ((rounding == "") and (ndecs == 3)) {
+			rounding = PRIORITYINT.a(101, 1);
 		}
 	}else{
 		rounding = roundingx;
 	}
-*/
+
 	msg = "";
 
-	var extras = extrasx;
-	extras.swapper(",", ",\x0B");
+	var extras = extras2;
+	extras.swapper(",", "," ^ 0x1B);
 	extras.converter("/Xx", ",");
 
-	//multiply by size if any
-	/*;
-		T=@UPPER.CASE:@LOWER.CASE;
-		CONVERT 'Xx' TO '' IN T;
-		CONVERT T TO '' IN SIZE;
-		if index(size,'X',1) and num(field(size,'X',1)) and num(field(size,'X',2)) then;
-		//IF SIZE MATCHES '1N0N"X"1N0N' THEN
-			mult=FIELD(SIZE,'X',1)*FIELD(SIZE,'X',2);
-			grossbill=OCONV(grossbill*mult,CURRFMT);
-			//NB return grossbill as sized
-		end else;
-			mult=1;
+		/*;
+		//sizemult: x size
+		//return sizemult and grossbill.sized
+		sizemult=1;
+		//getsize
+		size=field(field(field(spec,'~',1),'*',2),',',1);
+		if size then;
+			convert 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' to '                          ' in size;
+			size=trim(size);
+			sizea=field(size,' ',1);
+			if sizea and num(sizea) then;
+				sizeb=field(size,' ',2);
+				if num(sizeb) then;
+					if sizeb else sizeb=1;
+					sizemult=sizea*sizeb;
+					garbagecollect;
+					grossbill=oconv(grossbill*sizemult,origfmt);
+					//NB return grossbill as sized
+					end;
+				end;
 			end;
-	*/
-	var size2 = size;
-	mult = 1;
-	if (size2) {
-		size2.converter("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "                          ");
-		size2.trimmer();
-		var sizea = size2.field(" ", 1);
-		var sizeb = size2.field(" ", 2);
-		if (sizea and sizeb and sizea.isnum() and sizeb.isnum()) {
-			mult = sizea * sizeb;
-			//garbagecollect;
-			grossbill = (grossbill * mult).oconv(currfmt);
-			//NB return grossbill as sized
-		}
+		*/
+
+	gosub getsize();
+	if (sizemult ne 1) {
+		//garbagecollect;
+		grossbill = (grossbill * sizemult).oconv(origfmt);
 	}
 
 	//initialise unit bill to be same as gross unit bill
@@ -80,9 +76,9 @@ function main(io grossbill, in size, in extrasx, in unused, io msg, in roundingx
 	//allow spaces so comments come after first space
 	//CONVERT ' ' TO '' IN EXTRAS
 
-	//*various types of free ads
+	//!various types of free ads
 	//t=extras[1,1]
-	//*convert @lower.case to @upper.case in t
+	//!convert @lower.case to @upper.case in t
 	//if t matches '1A' then extras='-100%'
 
 	if (extras) {
@@ -105,41 +101,34 @@ function main(io grossbill, in size, in extrasx, in unused, io msg, in roundingx
 				extra = "-100%";
 			}
 
-			var origextra;
-			var plus1;
-			var but1;
-			var minimum;
-
-			//if extra<>'' then locate extra in 'FREE?free?Free?'<1> setting x then extra='-100%'
-			//if ucase(extra)='FREE' then extra='-100%'
 			if (extra[1] == "=") {
-				if ((extra.substr(2, 9999)).isnum()) {
+				if (extra.substr(2,9999).isnum()) {
 					prevnetbill = netbill;
-					netbill = extra.substr(2, 9999);
+					netbill = extra.substr(2,9999);
 					goto gotnewnet;
 				}
 			}
 			if (extra) {
 
-				origextra = extra;
+				var origextra = extra;
 
 				if (extra[1] == "+") {
 					extra.splicer(1, 1, "");
 				}
 
-				plus1 = 0;
-				but1 = 0;
-				if (extra.index("G", 1)) {
+				var plus1 = 0;
+				var but1 = 0;
+				if (extra.index("G")) {
 					gross = 1;
 				}else{
-					if (extra.index("g", 1)) {
+					if (extra.index("g")) {
 						gross = 1;
 						if (extran > 1) {
 							plus1 = 1;
 						}
 					}else{
 						gross = 0;
-						if (extran > 1 and extra.index("n", 1)) {
+						if ((extran > 1) and extra.index("n")) {
 							but1 = 1;
 						}
 					}
@@ -147,10 +136,10 @@ function main(io grossbill, in size, in extrasx, in unused, io msg, in roundingx
 				//Xx not needed but here for safety?
 				extra.converter("NnGgXx", "");
 
-				minimum = "";
-				if (extra.index(">", 1)) {
+				var minimum = "";
+				if (extra.index(">")) {
 					minimum = extra.field(">", 2);
-					if (not minimum.isnum()) {
+					if (not(minimum.isnum())) {
 						minimum = "";
 						msg.r(-1, DQ ^ (origextra ^ DQ) ^ " - MINIMUM SHOULD BE NUMERIC");
 					}
@@ -198,14 +187,20 @@ function main(io grossbill, in size, in extrasx, in unused, io msg, in roundingx
 
 						prevnetbill = netbill;
 						amount = amount * extra / 100;
+						//garbagecollect;
 						if (rounding and not roundfinally) {
-							amount = (((amount / rounding).oconv("MD00P")) * rounding).oconv(currfmt);
+							amount = (((amount / rounding).oconv("MD00P")) * rounding).oconv(origfmt);
 						}else{
-							amount = amount.oconv(currfmt);
+							amount = amount.oconv(origfmt);
 						}
 					}else{
 						prevnetbill = netbill;
 						amount = extra;
+						var ndecs2 = amount.field(".", 2).length();
+						if (ndecs2 > ndecs) {
+							ndecs = ndecs2;
+							origfmt = "MD" ^ ndecs ^ "0P";
+						}
 					}
 
 					if (minimum) {
@@ -215,10 +210,12 @@ function main(io grossbill, in size, in extrasx, in unused, io msg, in roundingx
 					}
 
 					netbill += amount;
-					amounts.r(breakn, (amounts.a(breakn) + amount).oconv(currfmt));
+					//garbagecollect;
+					amounts.r(breakn, (amounts.a(breakn) + amount).oconv(origfmt));
 
 gotnewnet:
-					netbill = netbill.oconv(currfmt);
+					//garbagecollect;
+					netbill = netbill.oconv(origfmt);
 				}else{
 					msg.r(-1, DQ ^ (origextra ^ DQ) ^ " - EXTRA SHOULD BE NUMERIC");
 				}
@@ -233,7 +230,8 @@ gotnewnet:
 	//now rounding on each calculation so that split amounts
 	//agree with the net unit bill
 	if (rounding and roundfinally) {
-		netbill = (((netbill / rounding).oconv("MD00P")) * rounding).oconv(currfmt);
+		//garbagecollect;
+		netbill = (((netbill / rounding).oconv("MD00P")) * rounding).oconv(origfmt);
 	}
 
 	return netbill;

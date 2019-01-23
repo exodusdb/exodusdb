@@ -194,10 +194,10 @@ function main() {
 	call log2("*remove quickdex from MATERIALS file", logtime);
 	var filesx;
 	if (filesx.open("FILES", "")) {
-		if ((var("MATERIALS").xlate("FILES", 4, "X")).index("QUICKDEX", 1)) {
+		if (var("MATERIALS").xlate("FILES", 4, "X").index("QUICKDEX")) {
 			call quickdexer("MATERIALS", "L", 1, "");
 		}
-		if ((var("MATERIALS").xlate("FILES", 4, "X")).index("RIGHTDEX", 1)) {
+		if (var("MATERIALS").xlate("FILES", 4, "X").index("RIGHTDEX")) {
 			call quickdexer("MATERIALS", "R", 1, "");
 		}
 	}

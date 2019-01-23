@@ -52,7 +52,7 @@ function main() {
 	}
 
 	//rounding Tamra
-	if ((agy.agp.a(32) == "") and gen.company.a(1).index("Tamra", 1)) {
+	if ((agy.agp.a(32) == "") and gen.company.a(1).index("Tamra")) {
 		agy.agp.r(32, "1");
 	}
 
@@ -126,17 +126,17 @@ function main() {
 	//following companies invoice everything
 	if (agy.agp.a(30) == "") {
 		agy.agp.r(30, 1);
-		if (gen.company.a(1).index("BBDO", 1)) {
+		if (gen.company.a(1).index("BBDO")) {
 			agy.agp.r(30, "");
 		}
-		if (gen.company.a(1).index("CSS", 1)) {
+		if (gen.company.a(1).index("CSS")) {
 			agy.agp.r(30, "");
 		}
 	}
 
 	//default media cost provision ledger
 	if (agy.agp.a(25) == "") {
-		if (gen.company.a(1).index("Impact", 1)) {
+		if (gen.company.a(1).index("Impact")) {
 			agy.agp.r(25, "AL%1%");
 		}
 		//if agp<25>='' then agp<25>='ACC%1%'
@@ -286,7 +286,7 @@ function main() {
 	}
 
 	if (agy.agp.a(89) == "") {
-		if (agy.agp.a(1).ucase().index("ADLINE", 1)) {
+		if (agy.agp.a(1).ucase().index("ADLINE")) {
 			//0/30/60/90/99999
 			//4.5/4/3.5/3/2
 			agy.agp.r(89, 0 ^ VM ^ 30 ^ VM ^ 60 ^ VM ^ 90 ^ VM ^ 9999);

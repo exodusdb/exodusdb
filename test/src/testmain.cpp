@@ -45,6 +45,18 @@ function main()
 	printl("----------------------------------------------");
 	printl("Using Exodus library version:"^var().version());
 
+	printl("sizeof");
+	printl("char:     ",(int)sizeof(char));
+	printl("string:   ",(int)sizeof(std::string));
+	printl("long:     ",(int)sizeof(long));
+	printl("long long:",(int)sizeof(long long));
+	printl();
+	printl("wstring:  ",(int)sizeof(std::wstring));
+	printl("int:      ",(int)sizeof(int));
+	printl("double:   ",(int)sizeof(double));
+	printl("wchar_t:  ",(int)sizeof(wchar_t));
+	printl("var:      ",(int)sizeof(var));
+
 	var errmsg;
 	//if (not createdb("steve",errmsg))
 	//	errmsg.outputl();
@@ -1774,16 +1786,6 @@ while trying to match the argument list '(exodus::var, bool)'
 	assert(var("0")<var(".5"));
 
 	var ss;
-	printl("sizeof");
-	printl("char:     ",(int)sizeof(char));
-	printl("wchar_t:  ",(int)sizeof(wchar_t));
-	printl("string:   ",(int)sizeof(std::string));
-	printl("wstring:  ",(int)sizeof(std::wstring));
-	printl("int:      ",(int)sizeof(int));
-	printl("long:     ",(int)sizeof(long));
-	printl("long long:",(int)sizeof(long long));
-	printl("double:   ",(int)sizeof(double));
-	printl("var:      ",(int)sizeof(var));
 
 	var tconv=FM.oconv("T#20");
 	assert(tconv eq (L"                    " _FM_ L"                    "));
@@ -2018,12 +2020,14 @@ while trying to match the argument list '(exodus::var, bool)'
 	var list2="aaa" _FM_ "bbb" _FM_ "ccc" _FM_;
 	var key2;
 	var mv2;
-	list2.readnext(key2,mv2);
-	printl(key2," ",mv2);
 
 	list2.readnext(key2,mv2);
 	printl(key2," ",mv2);
 
+	list2.readnext(key2,mv2);
+	printl(key2," ",mv2);
+
+	printl("\nOne left but doing clearselect");
 	list2.clearselect();
 
 	list2.readnext(key2,mv2);

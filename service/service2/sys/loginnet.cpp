@@ -11,13 +11,13 @@ libraryinit()
 #include <fin.h>
 #include <agy.h>
 
+var menuid;
 var taskn;//num
 var xx;
 var menun2;
 var compcodex;
 var yy;
 var paramrec;
-var currdataset;
 
 function main(in dataset, in username, io cookie, io msg, io authcompcodes) {
 	//c sys in,in,io,io,io
@@ -38,7 +38,6 @@ function main(in dataset, in username, io cookie, io msg, io authcompcodes) {
 	var oldmenus = "";
 	var users;
 	if (users.open("USERS", "")) {
-		var menuid;
 		if (menuid.readv(users, username, 34)) {
 			if (menuid) {
 				var menufile;
@@ -119,7 +118,7 @@ deleteit:
 	};//menun;
 
 	//if they have MENU then ANALYSIS=MEDIAANALYSIS
-	if (menus.index("MEDIA", 1)) {
+	if (menus.index("MEDIA")) {
 		menus.swapper("ANALYSIS", "MEDIAANALYSIS");
 	}
 
@@ -249,7 +248,7 @@ nextcomp:
 
 	//call backupreminder(dataset,msg)
 
-	if (not(paramrec.osread("..\\data\\" ^ currdataset ^ "\\params2"))) {
+	if (not(paramrec.osread("..\\data\\" ^ dataset ^ "\\params2"))) {
 		return 0;
 	}
 	var lastbackupdate = paramrec.a(2);
