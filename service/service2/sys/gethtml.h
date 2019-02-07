@@ -45,6 +45,20 @@ var operator() (io mode, out html, in compcode0="")
 
 }
 
+var operator() (io mode, in html=var(), in compcode0="") {
+ var html_out;
+ if (html.assigned()) html_out=html;
+ return operator()(mode,html_out,compcode0);
+}
+
+var operator() ( in mode=var(), in html=var(), in compcode0="") {
+ var html_out;
+ if (html.assigned()) html_out=html;
+ var mode_io;
+ if (mode.assigned()) mode_io=mode;
+ return operator()(mode_io,html_out,compcode0);
+}
+
 };
 efb_gethtml gethtml{mv};
 //#endif

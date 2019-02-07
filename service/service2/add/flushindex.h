@@ -44,7 +44,6 @@ var operator() (in filename="")
   (filename);
 
 }
-
 };
 efb_flushindex flushindex{mv};
 //#endif

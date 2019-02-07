@@ -45,6 +45,12 @@ var operator() (in cmd, in filename, in dictfile, out hits)
 
 }
 
+var operator() (in cmd, in filename, in dictfile, in hits=var()) {
+ var hits_out;
+ if (hits.assigned()) hits_out=hits;
+ return operator()(cmd,filename,dictfile,hits_out);
+}
+
 };
 efb_btreeextract btreeextract{mv};
 //#endif

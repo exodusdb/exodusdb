@@ -44,7 +44,6 @@ var operator() (in mode0)
   (mode0);
 
 }
-
 };
 efb_generalsubs2 generalsubs2{mv};
 //#endif

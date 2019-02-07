@@ -137,7 +137,7 @@ deleteit:
 
 	var allcomps;
 	if (not(allcomps.read(gen.companies, "%RECORDS%"))) {
-		gen.companies.select();
+		select(gen.companies);
 		allcomps = "";
 nextcomp:
 		if (readnext(compcodex)) {

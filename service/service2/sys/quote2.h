@@ -44,7 +44,6 @@ var operator() (in string0)
   (string0);
 
 }
-
 };
 efb_quote2 quote2{mv};
 //#endif

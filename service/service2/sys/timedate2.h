@@ -44,7 +44,6 @@ var operator() (in localdate0="", in localtime0="")
   (localdate0,localtime0);
 
 }
-
 };
 efb_timedate2 timedate2{mv};
 //#endif

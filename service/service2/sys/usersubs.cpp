@@ -346,7 +346,7 @@ function main(in mode) {
 
 	} else if (mode == "CREATEUSERNAMEINDEX") {
 		win.srcfile = users;
-		win.srcfile.select();
+		select(win.srcfile);
 
 		while (true) {
 			if (not(readnext(ID))) {

@@ -17,7 +17,7 @@ efb_autorun3& operator=(const var& newlibraryname) {
 }
 
 //a member function with the right arguments, returning a var or void
-var operator() (in docids0, in options0)
+var operator() (in docids0="", in options0="")
 {
 
  //first time link to the shared lib and create/cache an object from it
@@ -44,7 +44,6 @@ var operator() (in docids0, in options0)
   (docids0,options0);
 
 }
-
 };
 efb_autorun3 autorun3{mv};
 //#endif

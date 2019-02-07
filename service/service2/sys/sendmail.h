@@ -45,6 +45,12 @@ var operator() (in toaddress0, in ccaddress0, in subject0, in body0, in attachfi
 
 }
 
+var operator() (in toaddress0, in ccaddress0, in subject0, in body0, in attachfilename0, in delete0, in errormsg=var(), in replyto0=var(), in params0=var()) {
+ var errormsg_out;
+ if (errormsg.assigned()) errormsg_out=errormsg;
+ return operator()(toaddress0,ccaddress0,subject0,body0,attachfilename0,delete0,errormsg_out,replyto0,params0);
+}
+
 };
 efb_sendmail sendmail{mv};
 //#endif

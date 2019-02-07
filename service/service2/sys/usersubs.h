@@ -44,7 +44,6 @@ var operator() (in mode)
   (mode);
 
 }
-
 };
 efb_usersubs usersubs{mv};
 //#endif

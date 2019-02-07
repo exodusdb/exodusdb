@@ -45,6 +45,20 @@ var operator() (in origprogname, in languagecode0, in origdatatype, io languagef
 
 }
 
+var operator() (in origprogname, in languagecode0, in origdatatype, io languagefile, in lang=var()) {
+ var lang_io;
+ if (lang.assigned()) lang_io=lang;
+ return operator()(origprogname,languagecode0,origdatatype,languagefile,lang_io);
+}
+
+var operator() (in origprogname, in languagecode0, in origdatatype, in languagefile=var(), in lang=var()) {
+ var lang_io;
+ if (lang.assigned()) lang_io=lang;
+ var languagefile_io;
+ if (languagefile.assigned()) languagefile_io=languagefile;
+ return operator()(origprogname,languagecode0,origdatatype,languagefile_io,lang_io);
+}
+
 };
 efb_getlang getlang{mv};
 //#endif

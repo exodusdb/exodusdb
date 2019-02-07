@@ -45,6 +45,12 @@ var operator() (in mode, io datax, in params0="", in params20="")
 
 }
 
+var operator() (in mode, in datax=var(), in params0="", in params20="") {
+ var datax_io;
+ if (datax.assigned()) datax_io=datax;
+ return operator()(mode,datax_io,params0,params20);
+}
+
 };
 efb_htmllib htmllib{mv};
 //#endif

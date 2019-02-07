@@ -44,7 +44,6 @@ var operator() (in input)
   (input);
 
 }
-
 };
 efb_reverse reverse{mv};
 //#endif

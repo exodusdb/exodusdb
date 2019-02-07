@@ -45,6 +45,12 @@ var operator() (in question0, in options0, io reply)
 
 }
 
+var operator() (in question0, in options0, in reply=var()) {
+ var reply_io;
+ if (reply.assigned()) reply_io=reply;
+ return operator()(question0,options0,reply_io);
+}
+
 };
 efb_decide decide{mv};
 //#endif

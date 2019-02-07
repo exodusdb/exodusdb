@@ -45,6 +45,12 @@ var operator() (in mode, io line, in params, in filename)
 
 }
 
+var operator() (in mode, in line, in params, in filename) {
+ var line_io;
+ if (line.assigned()) line_io=line;
+ return operator()(mode,line_io,params,filename);
+}
+
 };
 efb_convertercsv convertercsv{mv};
 //#endif

@@ -44,7 +44,6 @@ var operator() (in programname0, in text0)
   (programname0,text0);
 
 }
-
 };
 efb_log log{mv};
 //#endif

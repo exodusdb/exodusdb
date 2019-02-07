@@ -44,7 +44,6 @@ var operator() (in input, in force0=(0))
   (input,force0);
 
 }
-
 };
 efb_invertarray invertarray{mv};
 //#endif

@@ -45,6 +45,12 @@ var operator() (in task0, out msg, in defaultlock="", in username0="")
 
 }
 
+var operator() (in task0, in msg=var(), in defaultlock="", in username0="") {
+ var msg_out;
+ if (msg.assigned()) msg_out=msg;
+ return operator()(task0,msg_out,defaultlock,username0);
+}
+
 };
 efb_authorised authorised{mv};
 //#endif

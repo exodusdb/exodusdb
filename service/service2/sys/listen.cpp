@@ -1,7 +1,6 @@
 #include <exodus/library.h>
 libraryinit()
 
-//#include <dont>
 #include <listen5.h>
 #include <openfile.h>
 #include <getbackpars.h>
@@ -28,6 +27,7 @@ libraryinit()
 #include <fin.h>
 #include <win.h>
 
+var logfilename;
 var portno;//num
 var lastmonitortime;//num
 var lastautorun;//num
@@ -72,7 +72,6 @@ var request1;
 var locks;
 var onactive;//num
 var bakpars;
-var logfilename;
 var datex;
 var logpath;
 var xx;
@@ -84,7 +83,6 @@ var logx;
 var linkfilename1;
 var replyfilename;
 var stack;
-var nostack;
 var lastrequestdate;
 var lastrequesttime;
 var breaktime;
@@ -101,12 +99,14 @@ var buffer;
 var reply;
 var patched;//num
 var dow;
+var logtime;
 var requestdate;
 var requesttime;//num
 var nlinkfiles;
 var linkfilen;//num
 var linkfile1;
 var timex;
+var offset;//num
 var ntries;//num
 var listenfailure;//num
 var connection;
@@ -123,6 +123,7 @@ var request5;
 var request6;
 var responsetime;//num
 var rawresponse;
+var yy;
 var req6up;
 var anydata;//num
 var linkfilename2;
@@ -178,22 +179,23 @@ var printfilename;
 var user4x;
 var printfile;
 var fileerrorx;
+var timeouttime;//num
+var timeoutdate;//num
+var srcfile2;
+var newsessionid;
+var state;//num
+var lockrec;
+var masterlockkey;
+var sublockrec;
+var lockduration;//num
 var code;//num
 var nextbfs;
 var handle;
 var keyorfilename;
 var fmc;//num
-var state;//num
-var timeouttime;//num
-var timeoutdate;//num
-var srcfile2;
-var newsessionid;
-var lockrec;
-var masterlockkey;
-var sublockrec;
-var lockduration;//num
 var msg0;
 var positive;
+var posmsg;
 var dictfile;
 var compcode;
 var logid;
@@ -212,6 +214,8 @@ function main() {
 	//ed ub
 
 	//var().clearcommon();
+
+	logfilename = "";
 
 	portno = 5700;
 	if (SYSTEM.a(38)) {
@@ -273,9 +277,9 @@ function main() {
 		hexx(ii) = "%" ^ ii.oconv("MX").oconv("R(0)#2");
 	};//ii;
 
-/////
-init:
-/////
+	/////
+	//init:
+	/////
 
 	//discover the server name
 	//servername=field(getdrivepath(drive()[1,2])[3,9999],'\',1)
@@ -380,7 +384,6 @@ init:
 	call getbackpars(bakpars);
 
 	//open an XML log file
-	logfilename = "";
 	datex = var().date().oconv("D.");
 	//if 1 then
 	logpath = "..\\LOGS\\" ^ datasetcode ^ "\\" ^ datex.substr(-4,4);
@@ -442,7 +445,8 @@ init:
 	//limit on 299 "programs" and dictionary entries count as 1!!!
 	//see "arev stack and rtp documentation.htm"
 	//and http://www.revelation.com/knowledge.nsf/07dbcbabb6b3e379852566f50064cf25/daca1813e510f571852563b6006a9b9c?OpenDocument
-	stack = programstack(nostack);
+	stack = "";
+	//call programstackstack);
 
 ////////////
 nextrequest:
@@ -495,7 +499,7 @@ nextsearch:
 nextsearch0:
 ////////////
 	//restore the program stack
-	xx = programstack(stack);
+	//call programstackstack);
 
 	//clear out @EW, @PW, @VW and @XW globals for PER REQUEST GLOBAL BUFFERS
 
@@ -535,7 +539,9 @@ nextsearch0:
 	print(var().at(0));
 	//print time() '[TIME2,MTS]':
 	//similar in LISTEN and AUTORUN
-	print(var().time().oconv("MTS"), " ", datasetcode, " ", processno, " ", nrequests, " ", memspace(999999).oconv("MD13P"), " Listening", " ", elapsedtimetext(lastrequestdate, lastrequesttime), " : ", var().at(-4));
+	print(var().time().oconv("MTS"), " ", datasetcode, " ", processno, " ", nrequests, " ", memspace(999999).oconv("MD13P"));
+
+	print(" Listening", " ", elapsedtimetext(lastrequestdate, lastrequesttime), " : ", var().at(-4));
 
 	call unlockrecord("PROCESSES", processes, processno);
 
@@ -785,7 +791,7 @@ nextsearch0:
 	}
 	if ((var().time() >= bakpars.a(3)) and (var().time() <= bakpars.a(4))) {
 
-		//call log2('LISTEN: Backup time for ':datasetcode)
+		//call log2('LISTEN: Backup time for ':datasetcode,logtime)
 
 		//delay closedown randomly to avoid conflict with identically configured processes
 		call ossleep(1000*var(10).rnd());
@@ -794,23 +800,23 @@ nextsearch0:
 
 		//optionally perform backup and/or shutdown and not backed up today
 		if (bakpars.a(9)) {
-			//call log2('Backup is disabled')
+			//call log2('Backup is disabled',logtime)
 
 		} else if (var().date() == bakpars.a(1)) {
-			//call log2('Backup already done today')
+			//call log2('Backup already done today',logtime)
 
 		} else if (bakpars.a(11)) {
-			call log2("backup is suppressed. Quitting.");
+			call log2("backup is suppressed. Quitting.", logtime);
 			perform("OFF");
 			var().logoff();
 
 		} else if (not bakpars.a(5).index(dow)) {
-			call log2("Not right day of week " ^ bakpars.a(5) ^ " Logging off");
+			call log2("Not right day of week " ^ bakpars.a(5) ^ " Logging off", logtime);
 			perform("OFF");
 			var().logoff();
 
 		} else {
-			//call log2('Preventing further automatic backups today')
+			//call log2('Preventing further automatic backups today',logtime)
 			((var().date() + var().time() / 86400).oconv("MD50P")).writev(DEFINITIONS, "BACKUP", 1);
 			
 
@@ -818,7 +824,7 @@ backup:
 			//similar code in LISTEN and LISTEN2
 			USER4 = "";
 			cmd = "FILEMAN BACKUP " ^ datasetcode ^ " " ^ bakpars.a(7) ^ " SYSTEM";
-			call log2("Attempting backup " ^ cmd);
+			call log2("Attempting backup " ^ cmd, logtime);
 			perform(cmd);
 
 			//quit and indicate to calling program that a backup has been done
@@ -834,7 +840,7 @@ backup:
 			}
 
 		}
-//L2906:
+//L2904:
 	}
 
 	call listen5("DELETEOLDFILES", "*.*", inpath, "", "");
@@ -860,7 +866,7 @@ gotlink:
 
 		//lock it to prevent other listeners from processing it
 		//unlock locks,'REQUEST*':linkfilename1
-		if (not(lockrecord("", locks, "REQUEST*" ^ linkfilename1, "", ""))) {
+		if (not(lockrecord("", locks, "REQUEST*" ^ linkfilename1, xx))) {
 			if (tracing) {
 				printl("CANNOT LOCK LOCKS,", DQ ^ ("REQUEST*" ^ linkfilename1 ^ DQ));
 			}
@@ -883,7 +889,8 @@ gotlink:
 readlink1:
 		USER0 = "";
 		//osbread request from linkfile1 at 0 length 256*256-4
-		call osbread(USER0, linkfile1,  0, 256 * 256 - 4);
+		offset = 0;
+		call osbread(USER0, linkfile1,  offset, 256 * 256 * 4);
 
 		//if cannot read it then try again
 		if ((USER0 == "") and (var().time() == timex)) {
@@ -920,7 +927,7 @@ readlink1:
 
 		//lock the replyfilename to prevent other listeners from processing it
 		//unlock locks,'REQUEST*':replyfilename
-		if (not(lockrecord("", locks, "REQUEST*" ^ replyfilename, "", ""))) {
+		if (not(lockrecord("", locks, "REQUEST*" ^ replyfilename, xx))) {
 			//if tracing then print 'CANNOT LOCK LOCKS,':quote('REQUEST*':replyfilename)
 			goto nextlinkfile;
 		}
@@ -1060,7 +1067,7 @@ subroutine requestinit() {
 
 		logx = USER0;
 		//gosub convlogx
-		call listen3("CONVLOGX", logx);
+		call listen3("CONVLOGX", logx, xx, yy);
 		logx.converter("^", FM);
 		logx.r(1, request1);
 		if (logx.a(1)) {
@@ -1291,7 +1298,8 @@ cannotopenlinkfile2:
 	SYSTEM.r(2, linkfilename2);
 
 	//get the current program stack
-	//stack=program.stack(nostack)
+	//stack=""
+	//call program.stack(stack)
 	RECORD = "";
 	ID = "";
 	MV = 0;
@@ -1304,7 +1312,7 @@ cannotopenlinkfile2:
 
 	//restore the program stack
 	//limit on 299 "programs" and dictionary entries count as 1!!!
-	//xx=program.stack(stack)
+	//call program.stack(stack)
 
 	//goto requestexit
 
@@ -1324,7 +1332,7 @@ cannotopenlinkfile2:
 	var().unlockall();
 
 	//in case any select list left open
-	var().clearselect();
+	clearselect();
 
 	if (USER3 == "") {
 		call listen4(1, USER3);
@@ -1487,8 +1495,9 @@ cannotopenlinkfile2:
 	//trace responded
 	responsetime = ostime();
 	if (tracing) {
-		//tt=program.stack(nostack)
-		//tt=count(stack,fm)+1:'/':count(tt,fm)+1
+		//tt=''
+		//call program.stack(tt)
+		//tt=count(tt,fm)+1:'/':count(tt,fm)+1
 		tt = " " ^ ((responsetime - requesttime) % 86400).oconv("[NUMBER,2]") ^ "s ";
 		//seconds
 		tt ^= rawresponse.a(1, 1).field("|", 1).a(1, 1);
@@ -1618,16 +1627,9 @@ subroutine process() {
 
 		filename2 = singular(newfilename);
 		filename2.converter(".", " ");
-		//if security(filename2:' ACCESS',msg0,'') else
-		// if security('#':filename2:' ACCESS ':quote(keyx),msg2,'') else
-		// transfer msg0 to response
-		// gosub fmtresp
-		// return
-		// end
-		// end
 		//if postread else
 		secmode = "ACCESS";
-		gosub filesecurity(mode);
+		gosub filesecurity();
 		if (not ok) {
 			return;
 		}
@@ -1992,18 +1994,10 @@ noupdate:
 		//double check allowed access to file
 		//if prewrite else
 		secmode = "ACCESS";
-		gosub filesecurity(mode);
+		gosub filesecurity();
 		if (not ok) {
 			return;
 		}
-		// end
-
-		//if security(filename2:' ACCESS',msg0,'') else
-		// if security('#':filename2:' ACCESS ':quote(keyx),msg2,'') else
-		// transfer msg0 to response
-		// gosub fmtresp
-		// return
-		// end
 		// end
 
 		//simulate window environment
@@ -2016,7 +2010,7 @@ noupdate:
 		//not really needed because pre/post code should assume that it is wlocked
 		//but some code does not know that (eg postread called from postwrite)
 		win.wlocked = sessionid;
-		win.saverec = not request1 == "DELETE";
+		win.saverec = request1 ne "DELETE";
 		win.deleterec = request1 == "DELETE";
 
 		//trim excess field and value marks
@@ -2233,7 +2227,7 @@ badwrite:
 			// end
 			//if predelete else
 			secmode = "DELETE";
-			gosub filesecurity(mode);
+			gosub filesecurity();
 			if (not ok) {
 				return;
 			}
@@ -2284,11 +2278,9 @@ badwrite:
 		}
 
 		//even postwrite/postdelete can now set invalid (to indicate invalid mode etc)
-		if (win.valid) {
-			USER3 = "OK";
-			goto 9556;
-		}
-		USER3 = "Error:";
+		//if valid then response='OK' else response='Error:'
+//WARNING TODO: check trigraph following;
+		USER3 = win.valid ? "OK" : "Error:";
 
 		if (request1 ne "DELETE") {
 			tt = ID;
@@ -2400,12 +2392,8 @@ badproxy:
 			}
 
 			//send errors to neosys
-			if ((USER4 ^ user4x).index("INTERNAL ERROR")) {
-sysmsg:
+			if (((USER4 ^ user4x).index("INTERNAL ERROR")) or user4x.index("DAMAGED FILE")) {
 				call sysmsg(USER4);
-			} else if (user4x.index("DAMAGED FILE")) {
-				/*case*/ goto Lsysmsg;
-				goto sysmsg;
 			}
 
 		}
@@ -2545,40 +2533,6 @@ subroutine fmtresp() {
 
 	return;
 
-///////
-lockit:
-///////
-	//attempt to lock the record
-	//bypass ordinary lock,file,key process otherwise
-	//the lock record will be checked - and in this case
-	//we our own lock record to be present
-	code = 5;
-	nextbfs = "";
-	handle = file;
-	//<AREV>
-	//handle=handle[-1,'B':vm]
-	handle = field2(handle, VM, -1);
-	//</AREV>
-	keyorfilename = keyx;
-	fmc = 2;
-	gosub lockit2( code,  nextbfs,  handle,  keyorfilename,  fmc,  record,  status);
-	return;
-
-}
-
-subroutine lockit2(in code, in nextbfs, in handle, in keyorfilename, in fmc, io record, io status) {
-	//lockit2(in code, in nextbfs, in handle, in keyorfilename, in fmc, io record, io status)
-	call rtp57(code, nextbfs, handle, keyorfilename, fmc, RECORD, state);
-	return;
-
-/////////
-unlockit:
-/////////
-	//unlock file,keyx
-	code = 6;
-	gosub lockit2();
-	return;
-
 }
 
 subroutine gettimeouttime() {
@@ -2616,7 +2570,7 @@ subroutine properlk() {
 
 	//dont pass the filename because that causes persistent lock checking
 	//in jbase version of lockrecord()
-	if (not(lockrecord("", srcfile2, keyx, "", ""))) {
+	if (not(lockrecord("", srcfile2, keyx, xx))) {
 		if (STATUS ne 1) {
 			win.valid = 0;
 			//response='Error: ':quote(keyx):' CANNOT BE WRITTEN BECAUSE IT IS LOCKED ELSEWHERE'
@@ -2658,13 +2612,7 @@ subroutine lock() {
 
 	//lockmins is the number of minutes to retain the lock
 	//default to 5 mins. lock extension is done every 5/1.1 mins by the user interface
-	if (lockmins.unassigned()) {
-		lockmins = 5;
-	}
-	if (not(lockmins.isnum())) {
-		lockmins = 5;
-	}
-	if (not lockmins) {
+	if ((lockmins.unassigned() or not lockmins.isnum()) or not lockmins) {
 		lockmins = 5;
 	}
 
@@ -2689,7 +2637,7 @@ subroutine lock() {
 	if (request1 == "RELOCK") {
 		gosub lockit();
 	}else{
-		if (lockrecord(filename, file, keyx, "", "")) {
+		if (lockrecord(filename, file, keyx, xx)) {
 			state = 1;
 		}else{
 			state = 0;
@@ -2786,8 +2734,12 @@ nolock:
 	lockrec = "";
 	lockrec.r(1, lockduration + dostime);
 	lockrec.r(2, dostime);
-//WARNING TODO: check trigraph following;
-	lockrec = lockrec ? var(3) : (var(0).replace(0, if (connection) {, connection.a(1, 2), STATION));
+	//lockrec<3>=if connection then connection<1,2> else @station
+	if (connection) {
+		lockrec.r(3, connection.a(1, 2));
+	}else{
+		lockrec.r(3, STATION);
+	}
 	lockrec.r(4, USERNAME);
 	lockrec.r(5, newsessionid);
 	lockrec.r(6, masterlock);
@@ -2811,6 +2763,40 @@ lockexit:
 		file.unlock( keyx);
 	}
 
+	return;
+
+}
+
+subroutine lockit() {
+	//attempt to lock the record
+	//bypass ordinary lock,file,key process otherwise
+	//the lock record will be checked - and in this case
+	//we our own lock record to be present
+	code = 5;
+	nextbfs = "";
+	handle = file;
+	//<AREV>
+	//handle=handle[-1,'B':vm]
+	handle = field2(handle, VM, -1);
+	//</AREV>
+	keyorfilename = keyx;
+	fmc = 2;
+	gosub lockit2( code,  nextbfs,  handle,  keyorfilename,  fmc,  state);
+	return;
+
+}
+
+subroutine unlockit() {
+	//unlock file,keyx
+	code = 6;
+	gosub lockit2( code,  nextbfs,  handle,  keyorfilename,  fmc,  state);
+	return;
+
+}
+
+subroutine lockit2(in code, in nextbfs, in handle, in keyorfilename, in fmc, io state) {
+	//lockit2(in code, in nextbfs, in handle, in keyorfilename, in fmc, io state)
+	call rtp57(code, nextbfs, handle, keyorfilename, fmc, xx, state);
 	return;
 
 }
@@ -2915,7 +2901,7 @@ subroutine flagserveractive() {
 
 subroutine writelogx() {
 	//gosub convlogx
-	call listen3("CONVLOGX", logx);
+	call listen3("CONVLOGX", logx, xx, yy);
 	gosub writelogx2();
 	return;
 
@@ -2945,6 +2931,7 @@ subroutine writelogx3() {
 }
 
 subroutine filesecurity() {
+	//filesecurity()
 	ok = 1;
 	if (keyx.index("*")) {
 		return;
@@ -2954,13 +2941,13 @@ subroutine filesecurity() {
 	}else{
 		positive = "#";
 	}
-	if (not(authorised(positive ^ filename2 ^ " " ^ secmode ^ " " ^ (DQ ^ (keyx ^ DQ)), msg2, ""))) {
+	if (not(authorised(positive ^ filename2 ^ " " ^ secmode ^ " " ^ (DQ ^ (keyx ^ DQ)), posmsg))) {
 		//!*use the FILENAME ACCESS/DELETE "ID" message because gives clue
 		//!*that they may be allowed to access other records
 		if (positive) {
 			msg0.transfer(USER3);
 		}else{
-			msg2.transfer(USER3);
+			posmsg.transfer(USER3);
 		}
 		ok = 0;
 		gosub fmtresp();

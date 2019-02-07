@@ -395,7 +395,7 @@ nextdict:
 		}
 	}else{
 		if (not LISTACTIVE) {
-			file.select();
+			select(file);
 		}
 	}
 	var recn = 0;

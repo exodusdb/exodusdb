@@ -44,7 +44,6 @@ var operator() (in mode)
   (mode);
 
 }
-
 };
 efb_securitysubs2 securitysubs2{mv};
 //#endif

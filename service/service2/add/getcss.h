@@ -45,6 +45,12 @@ var operator() (io css, in version="")
 
 }
 
+var operator() ( in css=var(), in version="") {
+ var css_io;
+ if (css.assigned()) css_io=css;
+ return operator()(css_io,version);
+}
+
 };
 efb_getcss getcss{mv};
 //#endif

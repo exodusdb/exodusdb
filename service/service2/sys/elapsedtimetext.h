@@ -44,7 +44,6 @@ var operator() (in fromdate, in fromtime)
   (fromdate,fromtime);
 
 }
-
 };
 efb_elapsedtimetext elapsedtimetext{mv};
 //#endif

@@ -536,7 +536,7 @@ function main(in mode) {
 			for (var taskn = ntasks; taskn >= 1; --taskn) {
 				var task = tasks.a(1, taskn);
 //WARNING TODO: check trigraph following;
-				var temp = (task.substr(1,10) == "DOCUMENT: ") ? var("#") : var("");
+				var temp = (task.substr(1,10) == "DOCUMENT: ") ? "#" : "";
 				if (not(authorised("!" ^ temp ^ task, msg, ""))) {
 					RECORD.eraser(10, taskn);
 					RECORD.eraser(11, taskn);

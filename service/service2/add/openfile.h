@@ -17,7 +17,7 @@ efb_openfile& operator=(const var& newlibraryname) {
 }
 
 //a member function with the right arguments, returning a var or void
-var operator() (in filename, io file, in similarfilename="", in autocreate0="")
+var operator() (in filename, io file, in similarfilename="", in autocreate="")
 {
 
  //first time link to the shared lib and create/cache an object from it
@@ -41,8 +41,14 @@ var operator() (in filename, io file, in similarfilename="", in autocreate0="")
  // (mode);
  return CALLMEMBERFUNCTION(*(this->pobject_),
  ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
-  (filename,file,similarfilename,autocreate0);
+  (filename,file,similarfilename,autocreate);
 
+}
+
+var operator() (in filename, in file=var(), in similarfilename="", in autocreate="") {
+ var file_io;
+ if (file.assigned()) file_io=file;
+ return operator()(filename,file_io,similarfilename,autocreate);
 }
 
 };

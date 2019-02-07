@@ -45,6 +45,20 @@ var operator() (in mode, in subfn, in masterfilename, io masterfile, in masterfn
 
 }
 
+var operator() (in mode, in subfn, in masterfilename, io masterfile, in masterfn, in locklist=var()) {
+ var locklist_io;
+ if (locklist.assigned()) locklist_io=locklist;
+ return operator()(mode,subfn,masterfilename,masterfile,masterfn,locklist_io);
+}
+
+var operator() (in mode, in subfn, in masterfilename, in masterfile, in masterfn, in locklist=var()) {
+ var locklist_io;
+ if (locklist.assigned()) locklist_io=locklist;
+ var masterfile_io;
+ if (masterfile.assigned()) masterfile_io=masterfile;
+ return operator()(mode,subfn,masterfilename,masterfile_io,masterfn,locklist_io);
+}
+
 };
 efb_xrefsubs xrefsubs{mv};
 //#endif

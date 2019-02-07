@@ -44,7 +44,6 @@ var operator() (in mode, in status0="")
   (mode,status0);
 
 }
-
 };
 efb_heartbeat heartbeat{mv};
 //#endif

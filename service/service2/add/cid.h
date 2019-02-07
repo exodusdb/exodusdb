@@ -44,7 +44,6 @@ var operator() ()
   ();
 
 }
-
 };
 efb_cid cid{mv};
 //#endif

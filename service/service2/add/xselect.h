@@ -44,7 +44,6 @@ var operator() (in cmd)
   (cmd);
 
 }
-
 };
 efb_xselect xselect{mv};
 //#endif

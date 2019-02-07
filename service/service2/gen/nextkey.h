@@ -44,7 +44,6 @@ var operator() (in mode, in previous0="")
   (mode,previous0);
 
 }
-
 };
 efb_nextkey nextkey{mv};
 //#endif

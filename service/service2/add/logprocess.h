@@ -45,6 +45,12 @@ var operator() (io processid, in processcategory0, in sparevar="", in processpar
 
 }
 
+var operator() ( in processid, in processcategory0, in sparevar="", in processparameters0="", in processresult0="", in processcomments0="") {
+ var processid_io;
+ if (processid.assigned()) processid_io=processid;
+ return operator()(processid_io,processcategory0,sparevar,processparameters0,processresult0,processcomments0);
+}
+
 };
 efb_logprocess logprocess{mv};
 //#endif

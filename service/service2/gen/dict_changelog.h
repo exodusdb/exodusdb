@@ -44,7 +44,6 @@ var operator() ()
   ();
 
 }
-
 };
 efb_dict_changelog dict_changelog{mv};
 
@@ -90,7 +89,6 @@ var operator() ()
   ();
 
 }
-
 };
 efb_dict_changelog dict_changelog{mv};
 //#endif

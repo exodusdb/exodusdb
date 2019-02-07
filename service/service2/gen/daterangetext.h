@@ -45,6 +45,20 @@ var operator() (in d1, in d2, out result, io lang)
 
 }
 
+var operator() (in d1, in d2, out result, in lang=var()) {
+ var lang_io;
+ if (lang.assigned()) lang_io=lang;
+ return operator()(d1,d2,result,lang_io);
+}
+
+var operator() (in d1, in d2, in result=var(), in lang=var()) {
+ var lang_io;
+ if (lang.assigned()) lang_io=lang;
+ var result_out;
+ if (result.assigned()) result_out=result;
+ return operator()(d1,d2,result_out,lang_io);
+}
+
 };
 efb_daterangetext daterangetext{mv};
 //#endif

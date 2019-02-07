@@ -6,45 +6,33 @@ libraryinit()
 var autocreate;//num
 var reply;
 
-function main(in filename, io file, in similarfilename="", in autocreate0="") {
-	//c sys in,io,"",""
-	if (autocreate0.unassigned()) {
-		autocreate = 1;
-	}else{
-		autocreate = autocreate0;
-	}
-	var firsttry = 1;
-tryagain:
+function main(in filename, io file, in similarfilename="", in autocreate="") {
+
+	//evade compiler warning
+	if (false&&autocreate) {};
 
 	if (file.open(filename)) {
-		return 1;
+		return true;
 	}
 
-	if (firsttry) {
-		//user option to create file if it does not exist
-		var tt;
-		if (tt.open("FILES", "")) {
-			if (tt.read(tt, similarfilename)) {
-				var vol = tt.a(1);
-				if (not autocreate) {
-					tt = "THE " ^ (DQ ^ (filename ^ DQ)) ^ " FILE DOES NOT EXIST|DO YOU WANT TO CREATE IT ?";
-					if (not(decide(tt, "No" _VM_ "Yes", reply))) {
-						var().stop();
-					}
-					if (reply ne 2) {
-						return 0;
-					}
-				}
-				var().createfile(filename);
-				firsttry = 0;
-				goto tryagain;
-			}
-		}
+	//option to create file if it does not exist
+	if (not similarfilename or not var().open(similarfilename)) {
+		call note(filename.quote() ^ " ERROR: FILE IS MISSING OR CANNOT BE ACCESSED");
+		return false;
 	}
 
-	call note("THE " ^ (DQ ^ (filename ^ DQ)) ^ " FILE IS MISSING");
-	file = "";
-	return 0;
+	if (not var().createfile(filename)) {
+		call note(filename.quote() ^ " ERROR: FILE CANNOT BE CREATED");
+		return false;
+	}
+
+	if (file.open(filename)) {
+		call note(filename.quote() ^ " WARNING: FILE CREATED AND OPENED");
+		return true;
+	}
+
+	call note(filename.quote() ^ " ERROR: FILE CREATED BUT CANNOT BE OPENED");
+	return false;
 
 }
 

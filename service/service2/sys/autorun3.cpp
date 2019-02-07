@@ -46,8 +46,8 @@ var requeststarttime;//num
 var requeststoptime;//num
 var printfile;
 
-function main(in docids0, in options0) {
-	//c sys
+function main(in docids0="", in options0="") {
+	//c sys "",""
 
 	//LISTEN calls this every minute
 	//print 'autorun'
@@ -122,7 +122,7 @@ function main(in docids0, in options0) {
 		docids.swapper(",", FM);
 		docn = 0;
 	}else{
-		gen.documents.select();
+		select(gen.documents);
 	}
 	var locked = 0;
 	var ndocsprocessed = 0;

@@ -45,6 +45,12 @@ var operator() (in msg0, io time0)
 
 }
 
+var operator() (in msg0, in time0=var()) {
+ var time0_io;
+ if (time0.assigned()) time0_io=time0;
+ return operator()(msg0,time0_io);
+}
+
 };
 efb_log2 log2{mv};
 //#endif

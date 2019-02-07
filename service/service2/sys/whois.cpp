@@ -77,7 +77,7 @@ returnzero:
 
 	//check cygwin whois present otherwise quit
 //WARNING TODO: check trigraph following;
-	exe = oscwd().index(":") ? var(".exe") : var("");
+	exe = oscwd().index(":") ? ".exe" : "";
 	if (not((cmd ^ "whois" ^ exe).osfile())) {
 		text = "whois command is not installed";
 		return 0;

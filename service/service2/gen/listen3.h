@@ -45,6 +45,20 @@ var operator() (in filename, in mode, out newfilename, out triggers)
 
 }
 
+var operator() (in filename, in mode, out newfilename, in triggers=var()) {
+ var triggers_out;
+ if (triggers.assigned()) triggers_out=triggers;
+ return operator()(filename,mode,newfilename,triggers_out);
+}
+
+var operator() (in filename, in mode, in newfilename=var(), in triggers=var()) {
+ var triggers_out;
+ if (triggers.assigned()) triggers_out=triggers;
+ var newfilename_out;
+ if (newfilename.assigned()) newfilename_out=newfilename;
+ return operator()(filename,mode,newfilename_out,triggers_out);
+}
+
 };
 efb_listen3 listen3{mv};
 //#endif

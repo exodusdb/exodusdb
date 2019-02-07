@@ -44,7 +44,6 @@ var operator() (in filename, in mode, in v3, in v4)
   (filename,mode,v3,v4);
 
 }
-
 };
 efb_quickdexer quickdexer{mv};
 //#endif

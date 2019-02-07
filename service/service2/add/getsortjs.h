@@ -45,6 +45,12 @@ var operator() (io tx)
 
 }
 
+var operator() ( in tx=var()) {
+ var tx_io;
+ if (tx.assigned()) tx_io=tx;
+ return operator()(tx_io);
+}
+
 };
 efb_getsortjs getsortjs{mv};
 //#endif

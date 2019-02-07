@@ -44,7 +44,6 @@ var operator() ()
   ();
 
 }
-
 };
 efb_get get{mv};
 //#endif

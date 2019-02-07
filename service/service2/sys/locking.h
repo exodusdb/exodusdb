@@ -45,6 +45,20 @@ var operator() (in mode, in lockfilename, in lockkey, in lockdesc0, io locklist,
 
 }
 
+var operator() (in mode, in lockfilename, in lockkey, in lockdesc0, io locklist, in ntries0, in msg=var()) {
+ var msg_out;
+ if (msg.assigned()) msg_out=msg;
+ return operator()(mode,lockfilename,lockkey,lockdesc0,locklist,ntries0,msg_out);
+}
+
+var operator() (in mode, in lockfilename, in lockkey, in lockdesc0, in locklist, in ntries0, in msg=var()) {
+ var msg_out;
+ if (msg.assigned()) msg_out=msg;
+ var locklist_io;
+ if (locklist.assigned()) locklist_io=locklist;
+ return operator()(mode,lockfilename,lockkey,lockdesc0,locklist_io,ntries0,msg_out);
+}
+
 };
 efb_locking locking{mv};
 //#endif

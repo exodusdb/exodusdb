@@ -45,6 +45,12 @@ var operator() (in mode, io logtime)
 
 }
 
+var operator() (in mode, in logtime=var()) {
+ var logtime_io;
+ if (logtime.assigned()) logtime_io=logtime;
+ return operator()(mode,logtime_io);
+}
+
 };
 efb_initgeneral2 initgeneral2{mv};
 //#endif

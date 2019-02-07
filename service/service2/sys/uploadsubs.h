@@ -44,7 +44,6 @@ var operator() (in mode)
   (mode);
 
 }
-
 };
 efb_uploadsubs uploadsubs{mv};
 //#endif

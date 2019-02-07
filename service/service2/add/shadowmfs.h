@@ -44,7 +44,6 @@ var operator() (in mode, in options)
   (mode,options);
 
 }
-
 };
 efb_shadowmfs shadowmfs{mv};
 //#endif

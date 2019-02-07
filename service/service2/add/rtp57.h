@@ -45,6 +45,30 @@ var operator() (in code, in fs, io handle, in keyorfilename, in fmc, io record, 
 
 }
 
+var operator() (in code, in fs, io handle, in keyorfilename, in fmc, io record, in status=var()) {
+ var status_io;
+ if (status.assigned()) status_io=status;
+ return operator()(code,fs,handle,keyorfilename,fmc,record,status_io);
+}
+
+var operator() (in code, in fs, io handle, in keyorfilename, in fmc, in record=var(), in status=var()) {
+ var status_io;
+ if (status.assigned()) status_io=status;
+ var record_io;
+ if (record.assigned()) record_io=record;
+ return operator()(code,fs,handle,keyorfilename,fmc,record_io,status_io);
+}
+
+var operator() (in code, in fs, in handle, in keyorfilename, in fmc, in record=var(), in status=var()) {
+ var status_io;
+ if (status.assigned()) status_io=status;
+ var record_io;
+ if (record.assigned()) record_io=record;
+ var handle_io;
+ if (handle.assigned()) handle_io=handle;
+ return operator()(code,fs,handle_io,keyorfilename,fmc,record_io,status_io);
+}
+
 };
 efb_rtp57 rtp57{mv};
 //#endif

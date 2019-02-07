@@ -45,6 +45,12 @@ var operator() (in request1, in request2, in request3, in request4, io request5,
 
 }
 
+var operator() (in request1, in request2, in request3, in request4, in request5=var(), in request6="") {
+ var request5_io;
+ if (request5.assigned()) request5_io=request5;
+ return operator()(request1,request2,request3,request4,request5_io,request6);
+}
+
 };
 efb_listen2 listen2{mv};
 //#endif

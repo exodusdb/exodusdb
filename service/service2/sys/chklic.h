@@ -45,6 +45,12 @@ var operator() (in mode0, out msg)
 
 }
 
+var operator() (in mode0, in msg=var()) {
+ var msg_out;
+ if (msg.assigned()) msg_out=msg;
+ return operator()(mode0,msg_out);
+}
+
 };
 efb_chklic chklic{mv};
 //#endif

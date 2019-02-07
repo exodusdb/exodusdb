@@ -45,6 +45,12 @@ var operator() (in msgno, io msg, in params0="")
 
 }
 
+var operator() (in msgno, in msg=var(), in params0="") {
+ var msg_io;
+ if (msg.assigned()) msg_io=msg;
+ return operator()(msgno,msg_io,params0);
+}
+
 };
 efb_listen4 listen4{mv};
 //#endif

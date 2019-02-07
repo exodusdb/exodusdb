@@ -44,7 +44,6 @@ var operator() (in instr, in sepchars, in stoplist, in mode)
   (instr,sepchars,stoplist,mode);
 
 }
-
 };
 efb_xref xref{mv};
 //#endif

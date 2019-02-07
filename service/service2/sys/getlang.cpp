@@ -7,9 +7,6 @@ libraryinit()
 
 var progname;
 var languagecode;
-var temp;
-var question;
-var reply;
 var langkey;
 var codepage;
 
@@ -61,18 +58,14 @@ function main(in origprogname, in languagecode0, in origdatatype, io languagefil
 	}
 
 	//check if user wants to continue without text
-	var().chr(7).output();
-	temp = progname;
-	temp.r(-1, languagecode);
-	temp.r(-1, datatype);
-	question = temp ^ "|TEXT IS MISSING";
-	question ^= "||DO YOU WANT TO CONTINUE ?";
-	if (not(decide(question, "", reply))) {
-		var().abort();
-	}
-	if (reply == 2) {
-		var().abort();
-	}
+	//PRINT CHAR(7):
+	//TEMP=PROGNAME
+	//TEMP<-1>=LANGUAGECODE
+	//TEMP<-1>=DATATYPE
+	//QUESTION=TEMP:'|TEXT IS MISSING'
+	//QUESTION:='||DO YOU WANT TO CONTINUE ?'
+	//IF DECIDE(QUESTION,'',REPLY) ELSE ABORT
+	//IF REPLY=2 THEN ABORT
 
 exit:
 /////
@@ -112,7 +105,7 @@ getupperlower:
 			goto getupperlower;
 			{}
 		}
-//L460:
+//L403:
 	}
 
 	return 0;

@@ -45,6 +45,12 @@ var operator() (out bakpars, in process0=var())
 
 }
 
+var operator() ( in bakpars=var(), in process0=var()) {
+ var bakpars_out;
+ if (bakpars.assigned()) bakpars_out=bakpars;
+ return operator()(bakpars_out,process0);
+}
+
 };
 efb_getbackpars getbackpars{mv};
 //#endif

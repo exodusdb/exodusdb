@@ -45,6 +45,12 @@ var operator() (in type, in in0, in mode, out output)
 
 }
 
+var operator() (in type, in in0, in mode, in output=var()) {
+ var output_out;
+ if (output.assigned()) output_out=output;
+ return operator()(type,in0,mode,output_out);
+}
+
 };
 efb_taghtml taghtml{mv};
 //#endif

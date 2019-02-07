@@ -44,7 +44,6 @@ var operator() (in nextcompanycode)
   (nextcompanycode);
 
 }
-
 };
 efb_initcompany initcompany{mv};
 //#endif

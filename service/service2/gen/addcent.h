@@ -45,6 +45,12 @@ var operator() (in type, in in0, in mode, out outx)
 
 }
 
+var operator() (in type, in in0, in mode, in outx=var()) {
+ var outx_out;
+ if (outx.assigned()) outx_out=outx;
+ return operator()(type,in0,mode,outx_out);
+}
+
 };
 efb_addcent addcent{mv};
 //#endif

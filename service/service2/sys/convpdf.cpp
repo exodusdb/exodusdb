@@ -13,7 +13,7 @@ function main(in printopts0, out errors) {
 	//gets filename from system<2> and updated system<2> if successful
 
 //WARNING TODO: check trigraph following;
-	var exe = oscwd().index(":") ? var(".exe") : var("");
+	var exe = oscwd().index(":") ? ".exe" : "";
 	var pdfcmd = "html2pdf";
 	if (exe) {
 		pdfcmd = "c:\\windows\\" ^ pdfcmd ^ exe;

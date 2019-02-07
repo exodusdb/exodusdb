@@ -829,7 +829,7 @@ validateexit2:
 						}
 						USER4 ^= " on " ^ lastuser.a(13).oconv("[DATETIME,4*,MTS]") ^ ")";
 					}
-					var().clearselect();
+					clearselect();
 				}
 				body = USER4;
 

@@ -45,6 +45,30 @@ var operator() (in dataset, in username, io cookie, io msg, io authcompcodes)
 
 }
 
+var operator() (in dataset, in username, io cookie, io msg, in authcompcodes=var()) {
+ var authcompcodes_io;
+ if (authcompcodes.assigned()) authcompcodes_io=authcompcodes;
+ return operator()(dataset,username,cookie,msg,authcompcodes_io);
+}
+
+var operator() (in dataset, in username, io cookie, in msg=var(), in authcompcodes=var()) {
+ var authcompcodes_io;
+ if (authcompcodes.assigned()) authcompcodes_io=authcompcodes;
+ var msg_io;
+ if (msg.assigned()) msg_io=msg;
+ return operator()(dataset,username,cookie,msg_io,authcompcodes_io);
+}
+
+var operator() (in dataset, in username, in cookie=var(), in msg=var(), in authcompcodes=var()) {
+ var authcompcodes_io;
+ if (authcompcodes.assigned()) authcompcodes_io=authcompcodes;
+ var msg_io;
+ if (msg.assigned()) msg_io=msg;
+ var cookie_io;
+ if (cookie.assigned()) cookie_io=cookie;
+ return operator()(dataset,username,cookie_io,msg_io,authcompcodes_io);
+}
+
 };
 efb_loginnet loginnet{mv};
 //#endif

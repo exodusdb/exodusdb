@@ -45,6 +45,30 @@ var operator() (in mode0, in title0, in module, in request, in data0, in runasus
 
 }
 
+var operator() (in mode0, in title0, in module, in request, in data0, in runasusercode0, in targetusercodes0, io document0, io docid, in msg=var()) {
+ var msg_out;
+ if (msg.assigned()) msg_out=msg;
+ return operator()(mode0,title0,module,request,data0,runasusercode0,targetusercodes0,document0,docid,msg_out);
+}
+
+var operator() (in mode0, in title0, in module, in request, in data0, in runasusercode0, in targetusercodes0, io document0, in docid=var(), in msg=var()) {
+ var msg_out;
+ if (msg.assigned()) msg_out=msg;
+ var docid_io;
+ if (docid.assigned()) docid_io=docid;
+ return operator()(mode0,title0,module,request,data0,runasusercode0,targetusercodes0,document0,docid_io,msg_out);
+}
+
+var operator() (in mode0, in title0, in module, in request, in data0, in runasusercode0, in targetusercodes0, in document0=var(), in docid=var(), in msg=var()) {
+ var msg_out;
+ if (msg.assigned()) msg_out=msg;
+ var docid_io;
+ if (docid.assigned()) docid_io=docid;
+ var document0_io;
+ if (document0.assigned()) document0_io=document0;
+ return operator()(mode0,title0,module,request,data0,runasusercode0,targetusercodes0,document0_io,docid_io,msg_out);
+}
+
 };
 efb_autorun2 autorun2{mv};
 //#endif

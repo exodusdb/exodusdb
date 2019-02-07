@@ -44,7 +44,6 @@ var operator() (in string0)
   (string0);
 
 }
-
 };
 efb_xmlquote xmlquote{mv};
 //#endif

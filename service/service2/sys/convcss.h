@@ -45,6 +45,12 @@ var operator() (in mode, in tableid, in in0, out outx)
 
 }
 
+var operator() (in mode, in tableid, in in0, in outx=var()) {
+ var outx_out;
+ if (outx.assigned()) outx_out=outx;
+ return operator()(mode,tableid,in0,outx_out);
+}
+
 };
 efb_convcss convcss{mv};
 //#endif

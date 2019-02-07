@@ -45,6 +45,20 @@ var operator() (in mode, in request, in tempfilename, out datax, out msg)
 
 }
 
+var operator() (in mode, in request, in tempfilename, out datax, in msg=var()) {
+ var msg_out;
+ if (msg.assigned()) msg_out=msg;
+ return operator()(mode,request,tempfilename,datax,msg_out);
+}
+
+var operator() (in mode, in request, in tempfilename, in datax=var(), in msg=var()) {
+ var msg_out;
+ if (msg.assigned()) msg_out=msg;
+ var datax_out;
+ if (datax.assigned()) datax_out=datax;
+ return operator()(mode,request,tempfilename,datax_out,msg_out);
+}
+
 };
 efb_monitor2b monitor2b{mv};
 //#endif

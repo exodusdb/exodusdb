@@ -45,6 +45,72 @@ var operator() (out localdate, out localtime, out sysdate, out systime, out utcd
 
 }
 
+var operator() (out localdate, out localtime, out sysdate, out systime, out utcdate, in utctime=var()) {
+ var utctime_out;
+ if (utctime.assigned()) utctime_out=utctime;
+ return operator()(localdate,localtime,sysdate,systime,utcdate,utctime_out);
+}
+
+var operator() (out localdate, out localtime, out sysdate, out systime, in utcdate=var(), in utctime=var()) {
+ var utctime_out;
+ if (utctime.assigned()) utctime_out=utctime;
+ var utcdate_out;
+ if (utcdate.assigned()) utcdate_out=utcdate;
+ return operator()(localdate,localtime,sysdate,systime,utcdate_out,utctime_out);
+}
+
+var operator() (out localdate, out localtime, out sysdate, in systime=var(), in utcdate=var(), in utctime=var()) {
+ var utctime_out;
+ if (utctime.assigned()) utctime_out=utctime;
+ var utcdate_out;
+ if (utcdate.assigned()) utcdate_out=utcdate;
+ var systime_out;
+ if (systime.assigned()) systime_out=systime;
+ return operator()(localdate,localtime,sysdate,systime_out,utcdate_out,utctime_out);
+}
+
+var operator() (out localdate, out localtime, in sysdate=var(), in systime=var(), in utcdate=var(), in utctime=var()) {
+ var utctime_out;
+ if (utctime.assigned()) utctime_out=utctime;
+ var utcdate_out;
+ if (utcdate.assigned()) utcdate_out=utcdate;
+ var systime_out;
+ if (systime.assigned()) systime_out=systime;
+ var sysdate_out;
+ if (sysdate.assigned()) sysdate_out=sysdate;
+ return operator()(localdate,localtime,sysdate_out,systime_out,utcdate_out,utctime_out);
+}
+
+var operator() (out localdate, in localtime=var(), in sysdate=var(), in systime=var(), in utcdate=var(), in utctime=var()) {
+ var utctime_out;
+ if (utctime.assigned()) utctime_out=utctime;
+ var utcdate_out;
+ if (utcdate.assigned()) utcdate_out=utcdate;
+ var systime_out;
+ if (systime.assigned()) systime_out=systime;
+ var sysdate_out;
+ if (sysdate.assigned()) sysdate_out=sysdate;
+ var localtime_out;
+ if (localtime.assigned()) localtime_out=localtime;
+ return operator()(localdate,localtime_out,sysdate_out,systime_out,utcdate_out,utctime_out);
+}
+
+var operator() ( in localdate=var(), in localtime=var(), in sysdate=var(), in systime=var(), in utcdate=var(), in utctime=var()) {
+ var utctime_out;
+ if (utctime.assigned()) utctime_out=utctime;
+ var utcdate_out;
+ if (utcdate.assigned()) utcdate_out=utcdate;
+ var systime_out;
+ if (systime.assigned()) systime_out=systime;
+ var sysdate_out;
+ if (sysdate.assigned()) sysdate_out=sysdate;
+ var localtime_out;
+ if (localtime.assigned()) localtime_out=localtime;
+ var localdate_out;
+ if (localdate.assigned()) localdate_out=localdate;
+ return operator()(localdate_out,localtime_out,sysdate_out,systime_out,utcdate_out,utctime_out);
+}
+
 };
 efb_getdatetime getdatetime{mv};
 //#endif

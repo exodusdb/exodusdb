@@ -45,6 +45,12 @@ var operator() (io tx, in mode="", in modevalue="")
 
 }
 
+var operator() ( in tx=var(), in mode="", in modevalue="") {
+ var tx_io;
+ if (tx.assigned()) tx_io=tx;
+ return operator()(tx_io,mode,modevalue);
+}
+
 };
 efb_printtx printtx{mv};
 //#endif

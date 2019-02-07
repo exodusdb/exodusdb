@@ -45,6 +45,12 @@ var operator() (in input0, out unitx)
 
 }
 
+var operator() (in input0, in unitx=var()) {
+ var unitx_out;
+ if (unitx.assigned()) unitx_out=unitx;
+ return operator()(input0,unitx_out);
+}
+
 };
 efb_split split{mv};
 //#endif

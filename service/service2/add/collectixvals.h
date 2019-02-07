@@ -44,7 +44,6 @@ var operator() (in filename, in dictid, in prefix="", in orderby="")
   (filename,dictid,prefix,orderby);
 
 }
-
 };
 efb_collectixvals collectixvals{mv};
 //#endif

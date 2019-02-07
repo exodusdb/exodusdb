@@ -45,6 +45,12 @@ var operator() (io ranges0, in basekey0="", in listid0="")
 
 }
 
+var operator() ( in ranges0=var(), in basekey0="", in listid0="") {
+ var ranges0_io;
+ if (ranges0.assigned()) ranges0_io=ranges0;
+ return operator()(ranges0_io,basekey0,listid0);
+}
+
 };
 efb_ranges ranges{mv};
 //#endif

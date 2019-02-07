@@ -45,6 +45,12 @@ var operator() (in mode, in html, io mark)
 
 }
 
+var operator() (in mode, in html, in mark=var()) {
+ var mark_io;
+ if (mark.assigned()) mark_io=mark;
+ return operator()(mode,html,mark_io);
+}
+
 };
 efb_getmark getmark{mv};
 //#endif

@@ -1342,7 +1342,7 @@ x1exit:
 	//work out assoc mv fns for limits
 	if (nlimits) {
 		call pushselect(0, v69, v70, v71);
-		DICT.select();
+		select(DICT);
 nextdict:
 		if (readnext(dictid)) {
 			if (not(dictrec.read(DICT, dictid))) {
@@ -1400,7 +1400,7 @@ nextdict:
 
 	}else{
 		if (not LISTACTIVE) {
-			srcfile.select();
+			select(srcfile);
 		}
 	}
 	recn = "";
@@ -1422,14 +1422,14 @@ nextrec:
 		}
 		tx ^= "*** incomplete - interrupted ***";
 		gosub printtx(tx);
-		var().clearselect();
+		clearselect();
 		goto x2bexit;
 	}
 
 	//limit number of records
 	if (maxnrecs) {
 		if (recn >= maxnrecs) {
-			var().clearselect();
+			clearselect();
 		}
 	}
 
@@ -1853,6 +1853,9 @@ x2bexit:
 
 subroutine getquotedword() {
 	lastword = word;
+	gosub getquotedword();
+	return;
+
 }
 
 subroutine getquotedword2() {
@@ -2201,7 +2204,7 @@ subroutine printbreaks() {
 				if ((detsupp < 2) and not anytotals) {
 					//cell=nbsp
 					cell = "";
-				}
+					}
 
 			//other columns are blank
 			} else {

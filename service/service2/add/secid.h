@@ -44,7 +44,6 @@ var operator() (in input, in max)
   (input,max);
 
 }
-
 };
 efb_secid secid{mv};
 //#endif

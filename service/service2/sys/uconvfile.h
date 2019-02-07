@@ -45,6 +45,20 @@ var operator() (in inputfilename, in encoding1i, in encoding2i, out result, out 
 
 }
 
+var operator() (in inputfilename, in encoding1i, in encoding2i, out result, in msg=var()) {
+ var msg_out;
+ if (msg.assigned()) msg_out=msg;
+ return operator()(inputfilename,encoding1i,encoding2i,result,msg_out);
+}
+
+var operator() (in inputfilename, in encoding1i, in encoding2i, in result=var(), in msg=var()) {
+ var msg_out;
+ if (msg.assigned()) msg_out=msg;
+ var result_out;
+ if (result.assigned()) result_out=result;
+ return operator()(inputfilename,encoding1i,encoding2i,result_out,msg_out);
+}
+
 };
 efb_uconvfile uconvfile{mv};
 //#endif

@@ -45,6 +45,12 @@ var operator() (io array, in fns=0, in orderby0="")
 
 }
 
+var operator() ( in array=var(), in fns=0, in orderby0="") {
+ var array_io;
+ if (array.assigned()) array_io=array;
+ return operator()(array_io,fns,orderby0);
+}
+
 };
 efb_sortarray sortarray{mv};
 //#endif

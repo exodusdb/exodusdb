@@ -45,6 +45,12 @@ var operator() (in printopts0, out errors)
 
 }
 
+var operator() (in printopts0, in errors=var()) {
+ var errors_out;
+ if (errors.assigned()) errors_out=errors;
+ return operator()(printopts0,errors_out);
+}
+
 };
 efb_convpdf convpdf{mv};
 //#endif

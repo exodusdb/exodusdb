@@ -109,18 +109,13 @@ var nips;//num
 var maxips;//num
 var upgflagfile;
 
-function main(in mode) {
-	//c sys in
+function main() {
+	//c sys
 
 	//global all
 
 	//NB the PROCESSES file is central to all databases in one installation
 	//so this update of the monitor covers all the installations running processes
-
-	//evade c++ compiler warning variable not used
-	if (mode.unassigned()) {
-		{}
-	}
 
 	//monitor every three minutes so there are 3 checks within the monitor 10 min
 	checkinterval = 180;
@@ -226,7 +221,7 @@ function main(in mode) {
 	delusagetime = var().date() - 31;
 
 	if (statistics.open("STATISTICS", "")) {
-		statistics.select();
+		select(statistics);
 nextstatistic:
 		if (readnext(ID)) {
 			if (not(RECORD.read(statistics, ID))) {
@@ -262,7 +257,7 @@ nextstatistic:
 	}
 
 	//get the number of processes by database and status
-	processes.select();
+	select(processes);
 	processcount = "";
 	backuprequired = "";
 	//checkeddrives=''
@@ -327,7 +322,7 @@ nextprocess:
 					tt.r(1, 1, 3, bakpars.a(3));
 				}
 				backuprequired.r(1, dbasen, tt);
-				}
+			}
 
 		}
 
@@ -871,6 +866,7 @@ gotip:
 
 	return 0;
 
+	return "";
 }
 
 

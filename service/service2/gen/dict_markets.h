@@ -44,7 +44,6 @@ var operator() ()
   ();
 
 }
-
 };
 efb_dict_markets dict_markets{mv};
 
@@ -90,7 +89,6 @@ var operator() ()
   ();
 
 }
-
 };
 efb_dict_markets dict_markets{mv};
 
@@ -136,7 +134,6 @@ var operator() ()
   ();
 
 }
-
 };
 efb_dict_markets dict_markets{mv};
 
@@ -182,7 +179,6 @@ var operator() ()
   ();
 
 }
-
 };
 efb_dict_markets dict_markets{mv};
 
@@ -228,7 +224,6 @@ var operator() ()
   ();
 
 }
-
 };
 efb_dict_markets dict_markets{mv};
 //#endif

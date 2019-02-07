@@ -45,6 +45,20 @@ var operator() (in filenamex, in linkfilename2, in sortselect0, in dictids0, in 
 
 }
 
+var operator() (in filenamex, in linkfilename2, in sortselect0, in dictids0, in options0, io datax, in response=var(), in limitfields="", in limitchecks="", in limitvalues="", in maxnrecs0=0) {
+ var response_io;
+ if (response.assigned()) response_io=response;
+ return operator()(filenamex,linkfilename2,sortselect0,dictids0,options0,datax,response_io,limitfields,limitchecks,limitvalues,maxnrecs0);
+}
+
+var operator() (in filenamex, in linkfilename2, in sortselect0, in dictids0, in options0, in datax=var(), in response=var(), in limitfields="", in limitchecks="", in limitvalues="", in maxnrecs0=0) {
+ var response_io;
+ if (response.assigned()) response_io=response;
+ var datax_io;
+ if (datax.assigned()) datax_io=datax;
+ return operator()(filenamex,linkfilename2,sortselect0,dictids0,options0,datax_io,response_io,limitfields,limitchecks,limitvalues,maxnrecs0);
+}
+
 };
 efb_select2 select2{mv};
 //#endif

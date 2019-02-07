@@ -45,6 +45,20 @@ var operator() (in mode, io list1, io list2, in seps)
 
 }
 
+var operator() (in mode, io list1, in list2, in seps) {
+ var list2_io;
+ if (list2.assigned()) list2_io=list2;
+ return operator()(mode,list1,list2_io,seps);
+}
+
+var operator() (in mode, in list1, in list2, in seps) {
+ var list2_io;
+ if (list2.assigned()) list2_io=list2;
+ var list1_io;
+ if (list1.assigned()) list1_io=list1;
+ return operator()(mode,list1_io,list2_io,seps);
+}
+
 };
 efb_dedup dedup{mv};
 //#endif

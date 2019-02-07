@@ -45,6 +45,12 @@ var operator() (io colhdg, in thproperties, in nobase0)
 
 }
 
+var operator() ( in colhdg, in thproperties, in nobase0) {
+ var colhdg_io;
+ if (colhdg.assigned()) colhdg_io=colhdg;
+ return operator()(colhdg_io,thproperties,nobase0);
+}
+
 };
 efb_colrowspan colrowspan{mv};
 //#endif

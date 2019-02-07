@@ -44,7 +44,6 @@ var operator() (in filename,in v2, in v3)
   (filename,v2,v3);
 
 }
-
 };
 efb_getreccount getreccount{mv};
 //#endif

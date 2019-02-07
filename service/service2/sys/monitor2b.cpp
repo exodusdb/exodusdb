@@ -44,7 +44,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 	var wgetrc = "";
 	//look for local or cygwin wget.exe otherwise quit
 //WARNING TODO: check trigraph following;
-	var exe = oscwd().index(":") ? var(".exe") : var("");
+	var exe = oscwd().index(":") ? ".exe" : "";
 	var cmd = SYSTEM.a(50) ^ "wget" ^ exe;
 	if (cmd.osfile()) {
 		httpsbug = 0;

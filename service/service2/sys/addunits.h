@@ -45,6 +45,12 @@ var operator() (in aa, io bb)
 
 }
 
+var operator() (in aa, in bb=var()) {
+ var bb_io;
+ if (bb.assigned()) bb_io=bb;
+ return operator()(aa,bb_io);
+}
+
 };
 efb_addunits addunits{mv};
 //#endif

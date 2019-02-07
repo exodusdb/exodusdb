@@ -45,6 +45,12 @@ var operator() (in letterheadopts, io tx)
 
 }
 
+var operator() (in letterheadopts, in tx=var()) {
+ var tx_io;
+ if (tx.assigned()) tx_io=tx;
+ return operator()(letterheadopts,tx_io);
+}
+
 };
 efb_docmods docmods{mv};
 //#endif

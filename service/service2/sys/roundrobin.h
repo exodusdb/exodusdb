@@ -45,6 +45,20 @@ var operator() (in mode, in params, io result, io msg)
 
 }
 
+var operator() (in mode, in params, io result, in msg=var()) {
+ var msg_io;
+ if (msg.assigned()) msg_io=msg;
+ return operator()(mode,params,result,msg_io);
+}
+
+var operator() (in mode, in params, in result=var(), in msg=var()) {
+ var msg_io;
+ if (msg.assigned()) msg_io=msg;
+ var result_io;
+ if (result.assigned()) result_io=result;
+ return operator()(mode,params,result_io,msg_io);
+}
+
 };
 efb_roundrobin roundrobin{mv};
 //#endif

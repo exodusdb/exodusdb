@@ -45,6 +45,12 @@ var operator() (in mode0, in subject0, in body0, in groupids0, in jobids0, in us
 
 }
 
+var operator() (in mode0, in subject0, in body0, in groupids0, in jobids0, in userids0, in options, in emaillog=var()) {
+ var emaillog_io;
+ if (emaillog.assigned()) emaillog_io=emaillog;
+ return operator()(mode0,subject0,body0,groupids0,jobids0,userids0,options,emaillog_io);
+}
+
 };
 efb_emailusers emailusers{mv};
 //#endif

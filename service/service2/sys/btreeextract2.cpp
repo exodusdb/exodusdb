@@ -34,7 +34,7 @@ function main(in cmd, in filename, in dictfile, out hits, out msg) {
 	}
 
 	call pushselect(0, v69, v70, v71);
-	var().clearselect();
+	clearselect();
 
 	var fieldname = cmd.a(1, 1);
 	var texts = cmd.field(VM, 2, 9999);
@@ -99,7 +99,7 @@ function main(in cmd, in filename, in dictfile, out hits, out msg) {
 
 	};//textn;
 
-	var().clearselect();
+	clearselect();
 	call popselect(0, v69, v70, v71);
 
 	return 0;
@@ -118,7 +118,7 @@ subroutine addhits(io hits) {
 nextrec:
 	if (readnext(id)) {
 		if (hits.length() + id.length() > 65500) {
-			var().clearselect();
+			clearselect();
 			return;
 		}
 		if (merge) {

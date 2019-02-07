@@ -44,7 +44,6 @@ var operator() (in pluralnoun)
   (pluralnoun);
 
 }
-
 };
 efb_singular singular{mv};
 //#endif

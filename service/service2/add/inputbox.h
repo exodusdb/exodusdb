@@ -45,6 +45,12 @@ var operator() (in msg, in maxlen, in show, in allowablechars, io data, in escx)
 
 }
 
+var operator() (in msg, in maxlen, in show, in allowablechars, in data, in escx) {
+ var data_io;
+ if (data.assigned()) data_io=data;
+ return operator()(msg,maxlen,show,allowablechars,data_io,escx);
+}
+
 };
 efb_inputbox inputbox{mv};
 //#endif

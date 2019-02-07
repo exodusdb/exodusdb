@@ -45,6 +45,42 @@ var operator() (in alerttype0, in runasuser, out tasks, out title, out request, 
 
 }
 
+var operator() (in alerttype0, in runasuser, out tasks, out title, out request, in datax=var()) {
+ var datax_out;
+ if (datax.assigned()) datax_out=datax;
+ return operator()(alerttype0,runasuser,tasks,title,request,datax_out);
+}
+
+var operator() (in alerttype0, in runasuser, out tasks, out title, in request=var(), in datax=var()) {
+ var datax_out;
+ if (datax.assigned()) datax_out=datax;
+ var request_out;
+ if (request.assigned()) request_out=request;
+ return operator()(alerttype0,runasuser,tasks,title,request_out,datax_out);
+}
+
+var operator() (in alerttype0, in runasuser, out tasks, in title=var(), in request=var(), in datax=var()) {
+ var datax_out;
+ if (datax.assigned()) datax_out=datax;
+ var request_out;
+ if (request.assigned()) request_out=request;
+ var title_out;
+ if (title.assigned()) title_out=title;
+ return operator()(alerttype0,runasuser,tasks,title_out,request_out,datax_out);
+}
+
+var operator() (in alerttype0, in runasuser, in tasks=var(), in title=var(), in request=var(), in datax=var()) {
+ var datax_out;
+ if (datax.assigned()) datax_out=datax;
+ var request_out;
+ if (request.assigned()) request_out=request;
+ var title_out;
+ if (title.assigned()) title_out=title;
+ var tasks_out;
+ if (tasks.assigned()) tasks_out=tasks;
+ return operator()(alerttype0,runasuser,tasks_out,title_out,request_out,datax_out);
+}
+
 };
 efb_generalalerts generalalerts{mv};
 //#endif

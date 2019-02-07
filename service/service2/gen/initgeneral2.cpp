@@ -246,8 +246,8 @@ function main(in mode, io logtime) {
 		if (not(users.open("USERS", ""))) {
 			return 0;
 		}
-		var().clearselect();
-		users.select();
+		clearselect();
+		select(users);
 nextuser:
 		if (readnext(userid)) {
 			if (userid[1] == "%") {

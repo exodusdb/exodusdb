@@ -44,7 +44,6 @@ var operator() (in password)
   (password);
 
 }
-
 };
 efb_encrypt2 encrypt2{mv};
 //#endif

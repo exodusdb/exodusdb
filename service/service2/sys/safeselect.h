@@ -44,7 +44,6 @@ var operator() (in selectx)
   (selectx);
 
 }
-
 };
 efb_safeselect safeselect{mv};
 //#endif

@@ -503,7 +503,7 @@ getvalues:
 		var maxnrecs = request6;
 
 		if (not(sortselect.index("%SELECTLIST%"))) {
-			var().clearselect();
+			clearselect();
 		}
 
 		var file;
@@ -568,7 +568,7 @@ getvalues:
 			return 0;
 		}
 
-		locks.select();
+		select(locks);
 		var select2data = "";
 		var nlocks = 0;
 nextlock:

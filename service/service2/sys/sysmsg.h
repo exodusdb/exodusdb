@@ -44,7 +44,6 @@ var operator() (in msg0, in subject0="", in username0="")
   (msg0,subject0,username0);
 
 }
-
 };
 efb_sysmsg sysmsg{mv};
 //#endif

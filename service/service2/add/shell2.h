@@ -45,6 +45,12 @@ var operator() (in cmd,out errors)
 
 }
 
+var operator() (in cmd, in errors=var()) {
+ var errors_out;
+ if (errors.assigned()) errors_out=errors;
+ return operator()(cmd,errors_out);
+}
+
 };
 efb_shell2 shell2{mv};
 //#endif

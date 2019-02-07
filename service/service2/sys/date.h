@@ -45,6 +45,30 @@ var operator() (in type, io in0, io mode, out output, in glang="")
 
 }
 
+var operator() (in type, io in0, io mode, in output=var(), in glang="") {
+ var output_out;
+ if (output.assigned()) output_out=output;
+ return operator()(type,in0,mode,output_out,glang);
+}
+
+var operator() (in type, io in0, in mode=var(), in output=var(), in glang="") {
+ var output_out;
+ if (output.assigned()) output_out=output;
+ var mode_io;
+ if (mode.assigned()) mode_io=mode;
+ return operator()(type,in0,mode_io,output_out,glang);
+}
+
+var operator() (in type, in in0=var(), in mode=var(), in output=var(), in glang="") {
+ var output_out;
+ if (output.assigned()) output_out=output;
+ var mode_io;
+ if (mode.assigned()) mode_io=mode;
+ var in0_io;
+ if (in0.assigned()) in0_io=in0;
+ return operator()(type,in0_io,mode_io,output_out,glang);
+}
+
 };
 efb_date date{mv};
 //#endif

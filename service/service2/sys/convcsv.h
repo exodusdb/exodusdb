@@ -44,7 +44,6 @@ var operator() (in sentence0, in select0="", in filters0="")
   (sentence0,select0,filters0);
 
 }
-
 };
 efb_convcsv convcsv{mv};
 //#endif

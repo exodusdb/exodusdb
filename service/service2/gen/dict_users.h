@@ -44,7 +44,6 @@ var operator() ()
   ();
 
 }
-
 };
 efb_dict_users dict_users{mv};
 
@@ -90,7 +89,6 @@ var operator() ()
   ();
 
 }
-
 };
 efb_dict_users dict_users{mv};
 //#endif

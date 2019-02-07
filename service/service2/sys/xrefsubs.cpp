@@ -38,7 +38,7 @@ function main(in mode, in subfn, in masterfilename, io masterfile, in masterfn, 
 		//zzz build updates masterfile without locking
 		//so should be run exclusively
 
-		var().clearselect();
+		clearselect();
 		perform("SELECT " ^ win.datafile ^ " (S)");
 		if (not LISTACTIVE) {
 			return 0;

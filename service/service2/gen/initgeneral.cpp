@@ -16,6 +16,8 @@ libraryinit()
 #include <logprocess.h>
 #include <neosyslogin.h>
 #include <sysmsg.h>
+#include <initacc.h>
+#include <initagency.h>
 #include <initcompany.h>
 
 #include <gen.h>
@@ -56,6 +58,8 @@ var yy;
 function main() {
 	//
 	//c gen
+
+	//$insert gbp,arev.common2
 	//global tt,tt2,s33
 
 	//!WARNING decide() returns REPLY number instead of VALUE when not interactive
@@ -323,7 +327,7 @@ updateversion:
 				dbversion.r(3, dbtime);
 				dbversion.write(DEFINITIONS, "DBVERSION");
 			}
-//L921:
+//L923:
 		}
 	}
 
@@ -470,7 +474,7 @@ updateversion:
 	if (SYSTEM.a(17) ne "DEVDTEST") {
 		var reports;
 		if (reports.open("REPORTS", "")) {
-			reports.select();
+			select(reports);
 nextreport:
 			if (readnext(reportkey)) {
 				if (RECORD.read(reports, reportkey)) {
@@ -507,7 +511,6 @@ nextreport:
 		}
 	}
 
-	//if OPENFILE('DEFINITIONS',DEFINITIONS) then null
 	if (not(DEFINITIONS.open("DEFINITIONS", ""))) {
 		var().chr(7).output();
 		msg = "The DEFINITIONS file is missing";
@@ -779,7 +782,7 @@ nextreport:
 	} else if (tt[-1] ne "\\") {
 		SYSTEM.r(49, tt ^ "\\");
 	}
-//L3184:
+//L3185:
 	if (not(SYSTEM.a(46, 1))) {
 		SYSTEM.r(46, 1, "#FFFF80");
 	}
@@ -1203,25 +1206,27 @@ getproxy:
 		//@priority.int<2>=''
 	}
 
-	perform("ADDMFS SHADOW.MFS FILEORDER.COMMON");
+	if (VOLUMES) {
+		perform("ADDMFS SHADOW.MFS FILEORDER.COMMON");
+	}
 
 	call log2("*open general files", logtime);
 	var valid = 1;
 	//DEFINITIONS='' why was this commented out?
-	if (not(openfile("ALANGUAGE", fin.alanguage))) {
+	if (not(openfile("ALANGUAGE", fin.alanguage, "DEFINITIONS"))) {
 		valid = 0;
 	}
-	if (not(openfile("COMPANIES", gen.companies))) {
+	if (not(openfile("COMPANIES", gen.companies, "DEFINITIONS"))) {
 		valid = 0;
 	}
-	if (not(openfile("CURRENCIES", gen.currencies))) {
+	if (not(openfile("CURRENCIES", gen.currencies, "COMPANIES"))) {
 		valid = 0;
 	}
-	if (not(openfile("UNITS", gen.units))) {
+	if (not(openfile("UNITS", gen.units, "CURRENCIES"))) {
 		valid = 0;
 		gen.units = "";
 	}
-	if (not(openfile("ADDRESSES", gen.addresses))) {
+	if (not(openfile("ADDRESSES", gen.addresses, "COMPANIES"))) {
 		valid = 0;
 	}
 	if (not(openfile("DOCUMENTS", gen.documents, "ADDRESSES", 1))) {
@@ -1262,7 +1267,7 @@ getproxy:
 	//tt=dirlist()
 	tt = oslistf(workpath ^ "REVMEDIA.*");
 	if (not tt) {
-		osshell("MD " ^ workpath);
+		osshell("mkdir " ^ workpath);
 		perform("NM " ^ workpath ^ " " ^ var().timedate() ^ "(S)");
 	}
 
@@ -1351,16 +1356,14 @@ getproxy:
 
 	call log2("*perform the autoexec task BEFORE initialising other systems", logtime);
 	if (not neosysid) {
-		//IF OPENFILE('DEFINITIONS',DEFINITIONS) THEN
 		if (temp.read(DEFINITIONS, "AUTOEXEC")) {
 			perform("TASK AUTOEXEC");
 		}
-		// END
 	}
 
 	call log2("*get first company for init.acc", logtime);
-	var().clearselect();
-	gen.companies.select();
+	clearselect();
+	select(gen.companies);
 	var anyfixed = -1;
 fixnextcompany:
 	anyfixed += 1;
@@ -1399,32 +1402,20 @@ fixcompany:
 
 	call log2("*open accounts system files", logtime);
 	if ((APPLICATION == "ACCOUNTS") or (APPLICATION == "ADAGENCY")) {
-		//open 'ACCOUNTS' to xx THEN
-		// open 'ABP' to xx THEN
-		perform("INIT.ACC");
-		// end
+		call initacc();
 	}
-	perform("MACRO ACCOUNTS");
+	if (VOLUMES) {
+		perform("MACRO ACCOUNTS");
+	}
 
 	call log2("*open advertising system files INIT.AGENCY", logtime);
-	if (xx.open("SCHEDULES", "")) {
-		if (xx.open("BP", "")) {
-			perform("INIT.AGENCY " ^ resetting);
-		}
-	}
-
-	call log2("*add new indexes", logtime);
-	if (not(listindexes("TIMESHEETS", "JOB_NO"))) {
-		if (APPLICATION == "ADAGENCY") {
-			execute("MAKEINDEX TIMESHEETS JOB_NO");
-			if (not(openfile("TIMESHEETS", gen.timesheets))) {
-				gen.timesheets = "";
-			}
-		}
+	if (APPLICATION == "ADAGENCY") {
+		call initagency();
 	}
 
 	call log2("*add number format to company records", logtime);
-	gen.companies.select();
+	clearselect();
+	select(gen.companies);
 	var numberformat = "";
 	fin.currcompany = "";
 convcompany:
@@ -1575,7 +1566,7 @@ adddatasetcodename:
 
 	call log2("*clean up document keys", logtime);
 	if (gen.documents.open("DOCUMENTS", "")) {
-		gen.documents.select();
+		select(gen.documents);
 nextdoc:
 		if (readnext(docid)) {
 			var docid2 = (field2(docid, "\\", -1)).field(".", 1);
@@ -1595,45 +1586,52 @@ nextdoc:
 		perform("FINDDEADALL");
 	}
 
-	if (not(VOLUMES.locateusing("DATAVOL", FM, xx))) {
-		//pcperform 'MD DATAVOL'
-		//call mkdir('DATAVOL':char(0),xx)
-		call osmkdir("DATAVOL");
-		perform("NM DATAVOL " ^ var().timedate() ^ "(S)");
-		perform("ATTACH DATAVOL (S)");
-	}
-
-	call log2("*convert codepage", logtime);
-	if (codepaging.osread("CODEPAGE.CFG")) {
-		var codepage;
-		if (not(codepage.read(DEFINITIONS, "PARAM*CODEPAGE"))) {
-			codepage = "0" ^ FM ^ codepaging.a(2);
-		}
-		if (((codepage.a(2) == "737") and not codepage.a(1)) and (codepaging.a(3) == "1253")) {
-			perform("CONVGREEK (U)");
+	if (VOLUMES) {
+		if (not(VOLUMES.locateusing("DATAVOL", FM, xx))) {
+			//pcperform 'MD DATAVOL'
+			//call mkdir('DATAVOL':char(0),xx)
+			call osmkdir("DATAVOL");
+			perform("NM DATAVOL " ^ var().timedate() ^ "(S)");
+			perform("ATTACH DATAVOL (S)");
 		}
 	}
 
-	call log2("*installing authorised keys", logtime);
-	perform("INSTALLAUTHKEYS (S)");
+	//windows stuff
+	if (VOLUMES) {
 
-	call log2("*installing authorised hosts", logtime);
-	perform("INSTALLALLOWHOSTS (S)");
+		call log2("*convert codepage", logtime);
+		if (codepaging.osread("CODEPAGE.CFG")) {
+			var codepage;
+			if (not(codepage.read(DEFINITIONS, "PARAM*CODEPAGE"))) {
+				codepage = "0" ^ FM ^ codepaging.a(2);
+			}
+			if (((codepage.a(2) == "737") and not codepage.a(1)) and (codepaging.a(3) == "1253")) {
+				perform("CONVGREEK (U)");
+			}
+		}
+
+		call log2("*installing authorised keys", logtime);
+		perform("INSTALLAUTHKEYS (S)");
+
+		call log2("*installing authorised hosts", logtime);
+		perform("INSTALLALLOWHOSTS (S)");
+
+		verbs.deleterecord("$FILEMAN");
+		
+
+		call log2("*put the admenus program as the system menu file", logtime);
+		//as there is no way to have multiple menus files
+		if (APPLICATION == "ADAGENCY") {
+			perform("SETFILE .\\ADAGENCY GLOBAL ADMENUS SYS.MENUS");
+		}
+
+	}
 
 	call log2("*create user name index", logtime);
 	var convkey = "CONVERTED*USERNAMEINDEX";
 	if (not(xx.read(DEFINITIONS, convkey))) {
 		perform("WINDOWSTUB USER.SUBS CREATEUSERNAMEINDEX");
 		var().date().write(DEFINITIONS, convkey);
-	}
-
-	verbs.deleterecord("$FILEMAN");
-	
-
-	call log2("*put the admenus program as the system menu file", logtime);
-	//as there is no way to have multiple menus files
-	if (APPLICATION == "ADAGENCY") {
-		perform("SETFILE .\\ADAGENCY GLOBAL ADMENUS SYS.MENUS");
 	}
 
 	if (not resetting) {

@@ -44,7 +44,6 @@ var operator() (in databasecode0="", in usercode0="")
   (databasecode0,usercode0);
 
 }
-
 };
 efb_otherusers otherusers{mv};
 //#endif

@@ -44,7 +44,6 @@ var operator() ()
   ();
 
 }
-
 };
 efb_giveway giveway{mv};
 //#endif

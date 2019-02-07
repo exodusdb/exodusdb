@@ -45,6 +45,30 @@ var operator() (in mode, in filename, io keys, in fieldnames, in oldvalues, in n
 
 }
 
+var operator() (in mode, in filename, io keys, in fieldnames, in oldvalues, in newvalues, io valid, in msg=var()) {
+ var msg_io;
+ if (msg.assigned()) msg_io=msg;
+ return operator()(mode,filename,keys,fieldnames,oldvalues,newvalues,valid,msg_io);
+}
+
+var operator() (in mode, in filename, io keys, in fieldnames, in oldvalues, in newvalues, in valid=var(), in msg=var()) {
+ var msg_io;
+ if (msg.assigned()) msg_io=msg;
+ var valid_io;
+ if (valid.assigned()) valid_io=valid;
+ return operator()(mode,filename,keys,fieldnames,oldvalues,newvalues,valid_io,msg_io);
+}
+
+var operator() (in mode, in filename, in keys, in fieldnames, in oldvalues, in newvalues, in valid=var(), in msg=var()) {
+ var msg_io;
+ if (msg.assigned()) msg_io=msg;
+ var valid_io;
+ if (valid.assigned()) valid_io=valid;
+ var keys_io;
+ if (keys.assigned()) keys_io=keys;
+ return operator()(mode,filename,keys_io,fieldnames,oldvalues,newvalues,valid_io,msg_io);
+}
+
 };
 efb_updsecindex updsecindex{mv};
 //#endif

@@ -67,7 +67,7 @@ function main(in mode0) {
 		printl();
 		printl("GENERAL.SUBS ", mode);
 		if (not LISTACTIVE) {
-			win.srcfile.select();
+			select(win.srcfile);
 		}
 		var recordn = 0;
 nextrecord:

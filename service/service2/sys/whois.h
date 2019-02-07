@@ -45,6 +45,12 @@ var operator() (in mode, in ipno, out text)
 
 }
 
+var operator() (in mode, in ipno, in text=var()) {
+ var text_out;
+ if (text.assigned()) text_out=text;
+ return operator()(mode,ipno,text_out);
+}
+
 };
 efb_whois whois{mv};
 //#endif
