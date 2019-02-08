@@ -480,10 +480,24 @@ var ExodusProgramBase::perform(const var& sentence) {
 
 	//save some environment
 	var savesentence;
+	var savecommand;
+	var saveoptions;
 	savesentence.transfer(SENTENCE);
+	savecommand.transfer(COMMAND);
+	saveoptions.transfer(OPTIONS);
 
 	//set new perform environment
 	SENTENCE = sentence;
+	COMMAND = sentence;
+	OPTIONS = "";
+        //similar code in exodus_main() and mvprogram.cpp:perform()
+        var lastchar=COMMAND[-1];
+        if (lastchar==")")
+                OPTIONS=COMMAND.field2(L"(",-1);
+        else if (lastchar=="}")
+                OPTIONS=COMMAND.field2(L"{",-1);
+        if (OPTIONS)
+                COMMAND.splicer(-(OPTIONS.length()+2),OPTIONS.length()+2, L"");
 
 	try {
 		ANS=perform_exodusfunctorbase_.callsmf();
@@ -508,7 +522,9 @@ var ExodusProgramBase::perform(const var& sentence) {
 
 	//restore some environment
 	//std::cout<<"pretransfer"<<std::endl;
-	savesentence.transfer(SENTENCE);
+	SENTENCE.transfer(savesentence);
+	COMMAND.transfer(savecommand);
+	OPTIONS.transfer(saveoptions);
 	//std::cout<<"posttransfer"<<std::endl;
 
 	return ANS;
@@ -711,71 +727,6 @@ void ExodusProgramBase::setprivilege(const var& var1) {
 
 }
 
-bool ExodusProgramBase::openfile(const var& filename0, var& file) const {
-	if (filename0.unassigned())
-		throw MVException(L"filename0");
-	var filename = filename0;
-	var xx;
-
-	var nomsg = filename[1] == L"*";
-	if (nomsg)
-		filename.splicer(1, 1, L"");
-	open: if (file.open(filename)) {
-
-//		if (!(FILES.locateusing(filename, FM, xx)))
-//			FILES.r(-1, filename);
-
-		return 1;
-	} else {
-		if (filename == L"MD") {
-			filename = L"MD";
-			goto open;
-		}
-		if (!nomsg) {
-			std::wcout << var().chr(7);
-			mssg(L"The " ^ filename.quote() ^ L" file is missing");
-		}
-		file = L"";
-		return 0;
-	}
-
-}
-
-bool ExodusProgramBase::openfile2(const var& filename, var& file,
-		const var& similarfilename, const var& autocreate) const {
-
-	var reply;
-	//if (autocreate.unassigned())
-	//	autocreate = 1;
-	var firsttry = 1;
-	tryagain:
-
-	if (openfile(L"*" ^ filename, file))
-		return 1;
-
-	if (firsttry) {
-		//user option to create file if it does not exist
-		var tt;
-
-		if (filename.createfile(filename)) {
-		};
-
-		firsttry = 0;
-		goto tryagain;
-	}
-
-	std::wcout << var().chr(7);
-	var temp = L"THE " ^ filename.quote() ^ L" FILE IS MISSING";
-	mssg(temp);
-	file = L"";
-	return 0;
-
-	//evade warning: unused parameter
-	if (similarfilename || autocreate) {
-	}
-	return 0;
-}
-
 var ExodusProgramBase::decide(const var& question, const var& options) const {
 	var reply = L"";
 	var buffer;
@@ -942,6 +893,7 @@ bool ExodusProgramBase::lockrecord(const var& filename, const var& file, const v
 
 }
 
+/*
 //bool ExodusProgramBase::osbreadx(var& str1, const var& filehandle, const var& filename, const int startoffset, const int length)
 bool ExodusProgramBase::osbreadx(var& str1, const var& filehandle,
 		const var& filename, var& startoffset, const int length) {
@@ -976,52 +928,7 @@ bool ExodusProgramBase::osbwritex(const var& str1, const var& filehandle,
 	if (filename) {
 	}
 }
-
-void ExodusProgramBase::logger(const var& programname0, const var& text0) {
-
-	var log;
-	var time;
-	var programname = programname0;
-	var text = text0;
-	//turn off interactivity. why?
-	var s33 = SYSTEM.a(33);
-	SYSTEM.r(33, L"");
-
-	if (programname.unassigned())
-		programname = L"";
-	if (text.unassigned())
-		text = L"";
-
-	var year = ((var().date()).oconv(L"D")).substr(-4, 4);
-	if (openfile2(L"LOG" ^ year, log, L"LISTS")) {
-		var entry = programname;
-		var text2 = text.lower();
-		text2.converter(L"|", VM);
-		entry.r(2, text2);
-
-		if (s33) {
-			var station = SYSTEM.a(40, 2);
-		} else {
-			var station = STATION.trim();
-		}
-
-		getlogkey: time = var().ostime();
-		var logkey = STATION.trim() ^ L"*" ^ USERNAME ^ L"*"
-				^ var().date() ^ L"*" ^ time;
-		var xx;
-		if (xx.read(log, logkey))
-			goto getlogkey;
-
-		entry.r(2, entry.a(2).trim(VM));
-		entry.write(log, logkey);
-	}
-
-	//restore interactivity
-	SYSTEM.r(33, s33);
-
-	return;
-
-}
+*/
 
 var ExodusProgramBase::singular(const var& pluralnoun) {
 
@@ -1267,6 +1174,10 @@ var ExodusProgramBase::AT(const int x, const int y) const {
 
 var ExodusProgramBase::handlefilename(const var& handle) {
 	return handle.a(1);
+}
+
+var ExodusProgramBase::memspace(const var& requiredmemory) {
+	return 999999999;
 }
 
 var ExodusProgramBase::getuserdept(const var& usercode) {

@@ -773,7 +773,9 @@ public:
 	bool osopen() const;
 	bool osopen(const var& filename, const var& locale DEFAULTNULL) const;
 	var& osbread(const var& osfilevar, var& startoffset, const int length);
+	var& osbread(const var& osfilevar, const var& startoffset, const int length);
 	bool osbwrite(const var& osfilevar, var& startoffset) const;
+	bool osbwrite(const var& osfilevar, const var& startoffset) const;
 	void osclose() const;
 	bool osread(const var& osfilename, const var& locale DEFAULTNULL);
 	bool oswrite(const var& osfilename, const var& locale DEFAULTNULL) const;

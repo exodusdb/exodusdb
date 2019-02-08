@@ -61,9 +61,14 @@ DLL_PUBLIC void ossleep(const int milliseconds);
 DLL_PUBLIC var ostime();
 DLL_PUBLIC bool osopen(const var& osfilename, var& osfilevar, const var& locale DEFAULTNULL);
 DLL_PUBLIC void osclose(const var& osfilevar);
+
 DLL_PUBLIC var osbread(const var& osfilevar, var& startoffset, const int length);
 DLL_PUBLIC bool osbread(var& data, const var& osfilevar, var& startoffset, const int length);
 DLL_PUBLIC bool osbwrite(const var& data, const var& osfilevar, var& startoffset);
+
+DLL_PUBLIC var osbread(const var& osfilevar, const var& startoffset, const int length);
+DLL_PUBLIC bool osbread(var& data, const var& osfilevar, const var& startoffset, const int length);
+DLL_PUBLIC bool osbwrite(const var& data, const var& osfilevar, const var& startoffset);
 
 DLL_PUBLIC bool osread(var& data, const var& osfilename, const var& locale DEFAULTNULL);
 DLL_PUBLIC var osread(const var& osfilename);

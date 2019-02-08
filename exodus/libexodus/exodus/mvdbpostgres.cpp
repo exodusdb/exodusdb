@@ -444,7 +444,7 @@ bool var::connect(const var& conninfo)
 	//but this does
 	//this turns off the notice when creating tables with a primary key
 	//DEBUG5, DEBUG4, DEBUG3, DEBUG2, DEBUG1, LOG, NOTICE, WARNING, ERROR, FATAL, and PANIC
-	this->sqlexec(GETDBTRACE ? L"SET client_min_messages = LOG" : L"SET client_min_messages = WARNING");
+	this->sqlexec(var(L"SET client_min_messages = ") ^ (GETDBTRACE  ? L"LOG" : L"WARNING"));
 
 	return true;
 }
@@ -728,9 +728,12 @@ bool var::read(const var& filehandle,const var& key)
 
 	if (PQresultStatus(pgresult) != PGRES_TUPLES_OK)
  	{
-		var errmsg=L"read(" ^ filehandle.quote() ^ L", " ^ key.quote()
-			^ L") - probably file not opened or doesnt exist\n"
-			^ var(PQerrorMessage(thread_pgconn));
+		var sqlstate = var(PQresultErrorField(pgresult, PG_DIAG_SQLSTATE));
+		var errmsg=L"read(" ^ filehandle.quote() ^ L", " ^ key.quote() ^ L")";
+		if (sqlstate == L"42P01")
+			errmsg ^= L" File doesnt exist";
+		else
+			errmsg ^= var(PQerrorMessage(thread_pgconn)) ^ L" sqlstate:" ^ sqlstate;;
 		//PQclear(pgresult);
 		this->setlasterror(errmsg);
 		throw MVException(errmsg);
@@ -1434,7 +1437,7 @@ bool var::createfile(const var& filename) const
 	var sql = L"CREATE";
 	//if (options.ucase().index(L"TEMPORARY")) sql ^= L" TEMPORARY";
 	//sql ^= L" TABLE " ^ filename.convert(L".",L"_");
-	if ((*this).substr(-5,5) ==L"_temp")
+	if (filename.substr(-5,5) ==L"_temp")
 		sql ^= L" TEMP ";
 	sql ^= L" TABLE " ^ filename;
 	sql ^= L" (key bytea primary key, data bytea)";
@@ -1912,7 +1915,7 @@ bool var::makelist(const var& listname, const var& keys) const
 			//create file on first record
 			if (recn==1) {
 				if (!this->createfile(listfilename)) {
-					listfilename.outputl(L"Cannot create ");
+					listfilename.errputl(L"Cannot create ");
 					return false;
 				}
 			}
@@ -2004,7 +2007,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	var ucword=word1.ucase();
 	if (ucword==L"SELECT"||ucword==L"SSELECT")
 	{
-        remainingsortselectclause.substrer(ucword.length()+2);
+		remainingsortselectclause.substrer(ucword.length()+2);
 
 		if (ucword==L"SSELECT")
 			bykey=1;
@@ -2030,6 +2033,12 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 			throw MVUnassigned(L"select() unassigned filehandle and sort/select clause doesnt start \"SELECT filename\"");
 		actualfilename=*this;
 		dictfilename=*this;
+
+		//assume sortselectclause is a simple filename
+		if (!actualfilename) {
+			actualfilename=getword(remainingsortselectclause);
+			dictfilename=actualfilename;
+		}
 
 		//optionally get filename from the current var
 		if (!actualfilename) {
@@ -2131,6 +2140,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 
 			//add the dictionary id
 			word1=getword(remainingsortselectclause);
+			ucword=word1.ucase();
 			var sortable=false;//because indexes are NOT created sortable (exodus_sort()
 			var dictexpression=getdictexpression(actualfilename,actualfilename,dictfilename,dictfile,word1,joins,ismv,false);
 			var usingnaturalorder=dictexpression.index(L"exodus_extract_sort");
@@ -2458,7 +2468,7 @@ bool readnextx(const var& cursor, PGresultptr& pgresult, PGconn* pgconn, bool cl
 	}
 
 	//false and optionally close cursor if no more
-	if (forwards && PQntuples(pgresult) < 1)
+	if (forwards && (PQntuples(pgresult) < 1))
 	{
 		//PQclear(pgresult);
 		if (clearselect_onfail) {
@@ -2477,8 +2487,8 @@ bool readnextx(const var& cursor, PGresultptr& pgresult, PGconn* pgconn, bool cl
 bool var::hasnext() const
 {
 
-	var xx;
-	return this->readnext(xx);
+	//var xx;
+	//return this->readnext(xx);
 
 	//THISIS(L"bool var::hasnext() const")
 	//THISISSTRING()
@@ -2492,12 +2502,12 @@ bool var::hasnext() const
 	}
 
 	//if the standard select list file is available then select it, i.e. create a CURSOR, so FETCH has something to work on
-	if (not this->selectpending()) {
-		var listfilename=L"savelist_" ^ (*this) ^ L"_" ^ getprocessn() ^ L"_tempx";
-		if (var().open(listfilename)) {
-			true;
-		}
-	}
+	//if (not this->selectpending()) {
+	//	var listfilename=L"savelist_" ^ (*this) ^ L"_" ^ getprocessn() ^ L"_tempx";
+	//	if (var().open(listfilename)) {
+	//		true;
+	//	}
+	//}
 
 	PGconn* pgconn=(PGconn*) connection();
 	if (pgconn==NULL) {
@@ -2514,7 +2524,6 @@ bool var::hasnext() const
 		return false;
 
 	//PQclear(pgresult);
-
 
 	/////////////////////////////////
 	//now restore the cursor back one
@@ -2760,7 +2769,7 @@ bool var::createindex(const var& fieldname, const var& dictfile) const
 	var ismv;
 	var sortable=false;
 	var dictexpression=getdictexpression(filename,filename,actualdictfile,actualdictfile,fieldname,joins,ismv,false);
-
+//dictexpression.outputl(L"dictexp=");stop();
 	var sql=L"create index index__" ^ filename ^ L"__" ^ fieldname ^ L" on " ^ filename;
 	sql^=L" (";
 	sql^=dictexpression;
@@ -2923,6 +2932,7 @@ var var::listindexes(const var& filename, const var& fieldname) const
 	var indexname;
 	var indexnames=L"";
 	int nindexes=PQntuples(pgresult);
+	var lc_fieldname=fieldname.lcase();
 	for (int indexn=0; indexn<nindexes; indexn++)
 	{
 		if	(!PQgetisnull(pgresult, indexn, 0))
@@ -2935,14 +2945,18 @@ var var::listindexes(const var& filename, const var& fieldname) const
 				if (tt)
 				{
 					indexname.substrer(8,999999).swapper(L"__",VM);
-					if (fieldname && indexname.a(1,2) != fieldname)
+					if (fieldname && indexname.a(1,2) != lc_fieldname)
 						continue;
-					indexnames^=FM^indexname;
+
+					//indexnames^=FM^indexname;
+					var fn;
+					if (not indexnames.locateby(indexname,L"AL",fn,0))
+						indexnames.inserter(fn,indexname);
 				}
 			}
 		}
 	}
-	indexnames.splicer(1,1,L"");
+	//indexnames.splicer(1,1,L"");
 
 	//PQclear(pgresult);
 

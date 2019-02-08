@@ -83,8 +83,6 @@ DLL_PUBLIC
 	bool fsmsg(const var& msg="") const;//always returns false so can be used like return fsmsg();
 	var sysvar(const var& var1,const var& var2,const var& mv3,const var& mv4);
 	void setprivilege(const var& var1);
-	bool openfile(const var& filename, var& file) const;
-	bool openfile2(const var& filename, var& file, const var& similarfilename, const var& autocreate=L"") const;
 
 	//NB does not return record yet
 	bool lockrecord(const var& filename, const var& file, const var& keyx, const var& recordx, const int waitsecs=0, const bool allowduplicate=false) const;
@@ -103,10 +101,10 @@ DLL_PUBLIC
 	bool pushselect(const var& v1, var& v2, var& v3, var& v4) const;
 	bool popselect(const var& v1, const var& v2, const var& v3, const var& v4) const;
 
-	bool oswritex(const var& str, const var& filename) const;
-	bool osbwritex(const var& str1, const var& filehandle, const var& filename, var& offset) const;
+//	bool oswritex(const var& str, const var& filename) const;
+//	bool osbwritex(const var& str1, const var& filehandle, const var& filename, var& offset) const;
 //	bool osbreadx(var& str1, const var& filehandle, const var& filename, const int startoffset, const int length);
-	bool osbreadx(var& str1, const var& filehandle, const var& filename, var& startoffset, const int length);
+//	bool osbreadx(var& str1, const var& filehandle, const var& filename, var& startoffset, const int length);
 
 	//moved to external function
 	//bool authorised(const var& task, var& msg, const var& defaultlock=L"");
@@ -116,7 +114,6 @@ DLL_PUBLIC
 	//void sysmsg(const var& msg);
 	//var sendmail(const var& toaddress, const var& subject, const var& body0, const var& attachfilename, const var& deletex, var& errormsg);
 
-	void logger(const var& programname, const var& logtext);
 	var singular(const var& pluralnoun);
 	void flushindex(const var& filename);
 	var encrypt2(const var& encrypt0) const;
@@ -126,6 +123,7 @@ DLL_PUBLIC
 	var AT(const int x, const int y) const;
 
 	var handlefilename(const var& handle);
+	var memspace(const var& requiredmemspace);
 
     //was MVDB
 	var getuserdept(const var& usercode);

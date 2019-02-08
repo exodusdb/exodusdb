@@ -632,6 +632,63 @@ could generate the following overloads in the lib's .h header
 						fieldstorer(funcargstype,',',argn,1,argtype);
 					}
 
+					//develop additional function calls to allow constants to be provided for io/out arguments
+					// ie allow out variables to be ignored if not required
+					//funcargdecl2 example:	in arg1=var(), out arg2=var(), out arg3=var()
+					//funcargstype example:	in,out,out
+					//funcargs example: 	arg1,arg2,arg3
+					var add_funcargsdecl=funcargsdecl2;
+					var add_funcargs=funcargs;
+					var add_vars="";
+					var add_funcs="";
+					var can_default=true;
+
+					//check arguments backwards, from right to left
+					for (int argn=nargs; argn > 0; --argn) {
+
+						//work out the variable name and default
+						var vname = funcargs.field(",", argn);
+
+						//io out cannot at the moment have defaults TODO
+						var vdefault = funcargsdecl2.field(",",argn).field("=", 2);
+
+						var vtype=funcargstype.field(",",argn);
+
+						if (vtype ne "io" and vtype ne "out") {
+							//prevent next left argument from defaulting
+							can_default=vdefault ne "";
+
+						//only process io/out arguments
+						} else {
+
+							//can default const var&
+							if (!vdefault)
+								vdefault = "var()";
+
+							//change the type of the incoming argument to allow constants
+							var new_inargdecl = " in "^vname;
+							if (can_default and vdefault)
+								new_inargdecl ^= "=" ^ vdefault;
+							add_funcargsdecl.fieldstorer(",", argn, 1, new_inargdecl);
+
+							//build a new non-constant variable name
+							var vname2 = vname ^ "_" ^ vtype;
+							// assign the incoming constant to it
+							add_vars ^= " var " ^ vname2 ^ ";\r\n";
+							add_vars ^= " if ("^vname ^ ".assigned()) " ^ vname2 ^ "=" ^ vname ^ ";\r\n";
+							// use it as an argument to the standard function
+							add_funcargs.fieldstorer(",", argn, 1, vname2);
+
+							//append a new function that calls the standard function
+							add_funcs ^= "\r\n\r\nvar operator() (" ^ add_funcargsdecl ^ ") {";
+							add_funcs ^= "\r\n" ^ add_vars;
+							add_funcs ^= " return operator()(" ^ add_funcargs ^ ");";
+							add_funcs ^= "\r\n}";
+						}
+					}
+					if (add_funcs)
+						add_funcs ^= "\r\n";
+
 /*
 //new method using member functions to call external functions with mv environment
 var inclusion=
@@ -708,7 +765,7 @@ var inclusion=
 "\r\n  (arg1,arg2,arg3);"
 "\r\n"
 "\r\n}"
-"\r\n"
+"{additional_funcs}"
 "\r\n};"
 "\r\nefb_funcx funcx{mv};";
 					swapper(inclusion,"funcx",field2(libname, SLASH, -1));
@@ -718,6 +775,7 @@ var inclusion=
 					swapper(inclusion,"arg1,arg2,arg3",funcargs);
 					swapper(inclusion,"varorvoid", returnsvarorvoid);
 					swapper(inclusion,"callorreturn", callorreturn);
+					swapper(inclusion,"{additional_funcs}", add_funcs);
 
 					var usepredefinedfunctor=nargs<=EXODUS_FUNCTOR_MAXNARGS;
 					if (useclassmemberfunctions) {

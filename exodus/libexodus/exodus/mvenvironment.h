@@ -71,107 +71,111 @@ public:
 //keep in sync both 1) declaration in class and 2) construction initialisation
 
 	//per user
-	var USERNAME;
-	var PRIVILEGE;
+	var USERNAME = L"";
+	var PRIVILEGE = L"";
 
 	//per application
-	var APPLICATION;
+	var APPLICATION = L"";
 
 	//per host
-	var STATION;
+	var STATION = L"";
 
 	//per execution
-	var COMMAND;
-	var OPTIONS;
-	var EXECPATH;
+	var COMMAND = L"";
+	var OPTIONS = L"";
+	var EXECPATH = L"";
 
-	//per process
-	var ROLLOUTFILE;
-	var THREADNO;
+	//per process - set in init()
+	var ROLLOUTFILE = L"";
+	var THREADNO = L"";
 
 	//per db access
-	var DICT;
-	var ID;
-	var RECORD;
-	var MV;
-	var LISTACTIVE;
-	var SESSION;
-	var STATUS;
-	var FILEERROR;
-	var FILEERRORMODE;
-	var FILES;
+	var DICT = L"";
+	var ID = L"";
+	var RECORD = L"";
+	var MV = L"";
+	var LISTACTIVE = L"";
+	var SESSION = L"";
+	var STATUS = L"";
+	var FILEERROR = L"";
+	var FILEERRORMODE = L"";
+	var FILES = L"";
 
 	//per configuration
-	var DEFINITIONS;
-	var SYSTEM;
-	var SECURITY;
+	var DEFINITIONS = L"definitions";
+	var SYSTEM = L"";
+	var SECURITY = L"";
 
 	//per request
-	var SENTENCE;
-	var PSEUDO;
-	var DATA;
-	var ANS;
+	var SENTENCE = L"";
+	var PSEUDO = L"";
+	var DATA = L"";
+	var ANS = L"";
 
 	//temporary application globals
-	var USER0;
-	var USER1;
+	var USER0 = L"";
+	var USER1 = L"";
 	//var USER2;//temp moved section
-	var USER3;
-	var USER4;
+	var USER3 = L"";
+	var USER4 = L"";
 
 	//i18n/l10n - internationalisation/localisation
-	var DATEFORMAT;
-	var USER2;
-	var SW;
+	var DATEFORMAT = L"D/E";//international date format
+	var USER2 = L"MD20P,";//base currency format
+	var SW = L"";
 
 	//encoding globals
 	//MUST be the same length
 	//TODO Should not be global otherwise cannot multithread MvEnvironment
-	var LOWERCASE;
-	var UPPERCASE;
-	var INTERNALCHARS;
-	var EXTERNALCHARS;
+	var LOWERCASE = LOWERCASE_;
+	var UPPERCASE = UPPERCASE_;
+	var INTERNALCHARS = L"\x11\x12\x13\x14\x15\x16\x17";
+	var EXTERNALCHARS = _SSTM_ _STM_ _TM_ _SM_ _VM_ _FM_ _RM_;
 
-	var TCLSTACK;
-	var INTCONST;
-	var PRIORITYINT;
+	var TCLSTACK = L"";
+	var INTCONST = L"";
+	var PRIORITYINT = L"";
 
 	//old scratch variables used for various buffering
-	var AW;
-	var EW;
-	var HW;
-	var MW;
-	var PW;
-	//var SW;
-	var VW;
-	var XW;
+	var AW = L"";
+	var EW = L"";
+	var HW = L"";
+	var MW = L"";
+	var PW = L"";
+	//var SW;//moved section
+	var VW = L"";
+	var XW = L"";
 
-	var RECCOUNT;
+	var RECCOUNT = L"";
 
 	//pretty obsolete nowadays
 	//environment variables may not be available until exported
 	//do set -p to find out exported variables instead of all
-	var CRTWIDE;
-	var CRTHIGH;
-	var LPTRWIDE;
-	var LPTRHIGH;
+	var CRTWIDE = 80;
+	var CRTHIGH = 25;
+	var LPTRWIDE = 132;
+	var LPTRHIGH = 66;
 
 	//obsolete
-	var ENVIRONKEYS;
-	var ENVIRONSET;
-	var DEFAULTSTOPS;
-	var MOVEKEYS;
-	var INDEXTIME;
-	var LEVEL;
-	var VOLUMES;
+	var ENVIRONKEYS = L"";
+	var ENVIRONSET = L"";
+	var DEFAULTSTOPS = L"";
+	var MOVEKEYS = L"";
+	var INDEXTIME = L"";
+	var LEVEL = L"";
+	var VOLUMES = L"";
 
-	var PROCESSNO;
+	//set in init()
+	var PROCESSNO = L"";
 
 	//define a type of object that holds many LabelledCommons
 	//typedef std::map<const char*, LabelledCommon> LabelledCommons;
 	//typedef std::map<std::string, boost::any> labelledcommons;
 	LabelledCommon* labelledcommon[99]={0};
 
+	//used to maintain locks per process eg on ~/tmp/exodus
+	//init() opens it. destructor closes it
+        int processnolockfd=0;
 };
 
 }

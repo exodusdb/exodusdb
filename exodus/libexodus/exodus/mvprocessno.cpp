@@ -12,7 +12,7 @@ int getprocessno(const char* filename, int* fd)
 
 	*fd = open(filename, O_RDWR | O_CREAT);
 	if (*fd == -1)
-		printf("File doesnt exist\n");
+		printf("getprocessno file %s doesnt exist\n",filename);
 
 
 	for (int ii=1;ii<1000;ii++) {
@@ -51,6 +51,7 @@ int getprocessno(const char* filename, int* fd)
 	}
 
 	//close if cannot get 1st 1000 numbers
+	printf("getprocessno tried all possible locks and failed\n");
 	close (*fd);
 	*fd=0;
 
@@ -58,8 +59,10 @@ int getprocessno(const char* filename, int* fd)
 }
 
 //should be called in mvenvironment destructor
-void releaseprocess(int fd) {
-	close(fd);
+void releaseprocess(int* fd) {
+	close(*fd);
+	*fd=0;
 }
 
 }//namespace
+

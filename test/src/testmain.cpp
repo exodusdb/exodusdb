@@ -57,6 +57,41 @@ function main()
 	printl("wchar_t:  ",(int)sizeof(wchar_t));
 	printl("var:      ",(int)sizeof(var));
 
+        var t1="aa";
+        assert(t1.inserter(-1,"xyz").convert(FM^VM,"^]")=="aa^xyz");
+        t1="aa";
+        assert(t1.inserter(0,"xyz").convert(FM^VM,"^]")=="xyz^aa");
+        t1="aa";
+        assert(t1.inserter(1,"xyz").convert(FM^VM,"^]")=="xyz^aa");
+        t1="aa";
+        assert(t1.inserter(2,"xyz").convert(FM^VM,"^]")=="aa^xyz");
+        t1="aa";
+        assert(t1.inserter(3,"xyz").convert(FM^VM,"^]")=="aa^^xyz");
+        t1="aa";
+        assert(t1.inserter(1,1,"xyz").convert(FM^VM,"^]")=="xyz]aa");
+        t1="aa";
+        assert(t1.inserter(2,1,"xyz").convert(FM^VM,"^]")=="aa^xyz");
+        t1="aa";
+        assert(t1.inserter(2,2,"xyz").convert(FM^VM,"^]")=="aa^]xyz");
+
+        t1="";
+        assert(t1.inserter(-1,"xyz").convert(FM^VM,"^]")=="xyz");
+        t1="";
+        assert(t1.inserter(0,"xyz").convert(FM^VM,"^]")=="xyz");
+        t1="";
+        assert(t1.inserter(1,"xyz").convert(FM^VM,"^]")=="xyz");
+        t1="";
+        assert(t1.inserter(2,"xyz").convert(FM^VM,"^]")=="^xyz");
+        t1="";
+        assert(t1.inserter(3,"xyz").convert(FM^VM,"^]")=="^^xyz");
+        t1="";
+        assert(t1.inserter(1,1,"xyz").convert(FM^VM,"^]")=="xyz");
+        t1="";
+        assert(t1.inserter(2,1,"xyz").convert(FM^VM,"^]")=="^xyz");
+        t1="";
+        assert(t1.inserter(2,2,"xyz").convert(FM^VM,"^]")=="^]xyz");
+        t1="";
+
 	var errmsg;
 	//if (not createdb("steve",errmsg))
 	//	errmsg.outputl();
@@ -118,6 +153,12 @@ function main()
 	//hash
 	assert(var("xyz").hash(1000)==894);
 
+	//test regex group and use group in replace
+	//replace char+space with x+char+dash
+	//TODO add g option
+        var text="what a lot of money";
+        assert(text.swap("(.) ","x$1-","r")=="whaxt-xa-loxt-oxf-money");
+
 	//simple test of regex and case insensitive regex swap (commonly known as replace)
 	assert(swap("abcd","b.","xyz","r").outputl() eq "axyzd");//right case to convert
 	assert(swap("abc","B.","xyz","r").outputl() eq "abc"); //wrong case to convert
@@ -133,12 +174,6 @@ function main()
 	assert(swap("abababab","ab","x").outputl() eq "xxxx");
 	assert(swap("abababab","ab","x","r").outputl() eq "xxxx");
 	assert(swap("abababab","a.","xy","r").outputl() eq "xyxyxyxy");
-
-	var text="what a lot of money";
-	text.outputl("input=");
-	text.swapper("(.) ","x$1_","r");
-	text.outputl("output=");
-	assert(text eq "whaxt_xa_loxt_oxf_money");
 
 	{	//null characters cannot be embedded in string constants in c/c++
 
@@ -1890,17 +1925,17 @@ while trying to match the argument list '(exodus::var, bool)'
 
 //	var().connectlocal("");
 
-	var filenames2="JOBS";
-	filenames2^=FM^"PRODUCTION_ORDERS";
-	filenames2^=FM^"PRODUCTION_INVOICES";
-	filenames2^=FM^"COMPANIES";
-	filenames2^=FM^"BRANDS";
-	filenames2^=FM^"CLIENTS";
-	filenames2^=FM^"VEHICLES";
-	filenames2^=FM^"SUPPLIERS";
-	filenames2^=FM^"CURRENCIES";
-	filenames2^=FM^"MARKETS";
-	filenames2^=FM^"ADS";
+	var filenames2="MY_JOBS";
+	filenames2^=FM^"MY_PRODUCTION_ORDERS";
+	filenames2^=FM^"MY_PRODUCTION_INVOICES";
+	filenames2^=FM^"MY_COMPANIES";
+	filenames2^=FM^"MY_BRANDS";
+	filenames2^=FM^"MY_CLIENTS";
+	filenames2^=FM^"MY_VEHICLES";
+	filenames2^=FM^"MY_SUPPLIERS";
+	filenames2^=FM^"MY_CURRENCIES";
+	filenames2^=FM^"MY_MARKETS";
+	filenames2^=FM^"MY_ADS";
 
 	printl();
 	var nfiles=dcount(filenames2,FM);
@@ -1914,9 +1949,9 @@ while trying to match the argument list '(exodus::var, bool)'
 			assert(createfile(filename));
 		}
 
-		if (not open("dict_"^filename, tempfile)) {
-			assert(createfile("dict_"^filename));
+		if (not open("dict_"^filename.lcase(), tempfile)) {
 			printl("creating dict_"^filename);
+			assert(createfile("dict_"^filename));
 		}
 
 	}
@@ -1924,53 +1959,40 @@ while trying to match the argument list '(exodus::var, bool)'
 //	var().stop();
 
 	var ads;
-	if (!ads.open("ADS"))
+	if (!ads.open("MY_ADS"))
 	{
-		var().createfile("ADS");
-		if (!ads.open("ADS"))
-			printl("Cannot create ADS");
-			//abort("Cannot create ADS");
+		var().createfile("MY_ADS");
+		if (!ads.open("MY_ADS"))
+			printl("Cannot create MY_ADS");
+			//abort("Cannot create MY_ADS");
 	}
 
-	write("F"^FM^0^FM^"Currency Code"^FM^FM^FM^FM^FM^FM^"L"^"10","DICT_CURRENCIES","CURRENCY_CODE");
-	write("F"^FM^1^FM^"Currency Name"^FM^FM^FM^FM^FM^FM^"T"^"20","DICT_CURRENCIES","CURRENCY_NAME");
-	write("F"^FM^1^FM^"Market Code"^FM^FM^FM^FM^FM^FM^"L"^"10","DICT_MARKETS","CODE");
-	write("F"^FM^1^FM^"Market Name"^FM^FM^FM^FM^FM^FM^"T"^"20","DICT_MARKETS","NAME");
+	write("F"^FM^0^FM^"Currency Code"^FM^FM^FM^FM^FM^FM^"L"^"10","DICT_MY_CURRENCIES","CURRENCY_CODE");
+	write("F"^FM^1^FM^"Currency Name"^FM^FM^FM^FM^FM^FM^"T"^"20","DICT_MY_CURRENCIES","CURRENCY_NAME");
+	write("F"^FM^1^FM^"Market Code"^FM^FM^FM^FM^FM^FM^"L"^"10","DICT_MY_MARKETS","CODE");
+	write("F"^FM^1^FM^"Market Name"^FM^FM^FM^FM^FM^FM^"T"^"20","DICT_MY_MARKETS","NAME");
 
 	var dictrec="";
 	dictrec.r(1,"F");
 	dictrec.r(2,"3");
 	dictrec.r(3,"Brand Code");
-	if (not dictrec.write("DICT_ADS","BRAND_CODE"))
+	if (not dictrec.write("DICT_MY_ADS","BRAND_CODE"))
 		printl("cannot write dict_ads, BRAND_CODE");
 	if (not ads.createindex("BRAND_CODE")) {
-//		printl("Creating ADS BRAND_CODE Index");
+//		printl("Creating MY_ADS BRAND_CODE Index");
 		printl("Index creation failed");
 	}
 	if (not ads.deleteindex("BRAND_CODE")) {
-		printl("Deleting ADS BRAND_CODE Index");
+		printl("Deleting MY_ADS BRAND_CODE Index");
 		printl("Index deletion failed");
 	}
 
-//DBTRACE=1;
-	var changelog, locks, users, accessible_columns;
-	if (not open("CHANGELOG",changelog))
-								assert(createfile("CHANGELOG"));
-	if (not open("LOCKS",locks))
-								assert(createfile("LOCKS"));
-	if (not open("USERS",users))
-								assert(createfile("USERS"));
-    if (not open("ACCESSIBLECOLUMNS",accessible_columns))
-								assert(createfile("ACCESSIBLECOLUMNS"));
-	var market;
-	market.read("MARKETS","PAN");
-
 //	var("").select("MARKETS","WITH CURRENCY_NAME = '' AND WITH AUTHORISED");
 //	var("").selectrecord("MARKETS","WITH AUTHORISED");
-//	var("").select("ADS","WITH AUTHORISED");
-//	ads.select("ADS","BY MARKET_CODE WITH MARKET_CODE 'BAH'");
-//	ads.selectrecord("ADS","BY MARKET_CODE");
-//	var().selectrecord("ADS");
+//	var("").select("MY_ADS","WITH AUTHORISED");
+//	ads.select("MY_ADS","BY MARKET_CODE WITH MARKET_CODE 'BAH'");
+//	ads.selectrecord("MY_ADS","BY MARKET_CODE");
+//	var().selectrecord("MY_ADS");
 //	var("").select("SCHEDULES","WITH AUTHORISED");
 //	var("").select("SCHEDULES","");
 	//MvLibs mvlibs;
@@ -1979,7 +2001,7 @@ while trying to match the argument list '(exodus::var, bool)'
 //	cin>>ii;
 	var record;
 	begintrans();
-	if (ads.selectrecord("SELECT ADS")) {
+	if (ads.selectrecord("SELECT MY_ADS")) {
 		while (ii<3&&ads.readnextrecord(record,key))
 		{
 			++ii;

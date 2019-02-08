@@ -1303,10 +1303,13 @@ var& var::inserter(const int fieldno,const int valueno,const int subvalueno,cons
 	THISISSTRING()
 	ISSTRING(insertion)
 
-	//return whole thing if replace 0,0,0
+	//0,0,0 is like 1,0,0
 	if (fieldno==0&&valueno==0&&subvalueno==0)
 	{
-		var_str.insert(0,insertion.var_str+FM_);
+		if (var_str.length())
+			var_str.insert(0,insertion.var_str+FM_);
+		else
+			var_str=insertion.var_str;
 		return *this;
 	}
 
@@ -1320,14 +1323,14 @@ var& var::inserter(const int fieldno,const int valueno,const int subvalueno,cons
 	if (fieldno<0)
 	{
 		//append a FM_ only if there is existing data
-		if (var_str.length()!=0) var_str+=FM_;
+		if (var_str.length()!=0)
+			var_str+=FM_;
 		pad=true;
 		start_pos=var_str.length();
 		field_end_pos=start_pos;
 	}
 	else
 	{
-
 		//find the starting position of the field or append enough FM_ to satisfy
 		int fieldn2=1;
 		while (fieldn2<fieldno)
@@ -1355,7 +1358,8 @@ var& var::inserter(const int fieldno,const int valueno,const int subvalueno,cons
 		else
 		{
 			field_end_pos=var_str.find(FM_ ,start_pos);
-			if (field_end_pos==std::wstring::npos) field_end_pos=var_str.length();
+			if (field_end_pos==std::wstring::npos)
+				field_end_pos=var_str.length();
 		}
 
 	}
@@ -1377,7 +1381,8 @@ var& var::inserter(const int fieldno,const int valueno,const int subvalueno,cons
 	}
 	else if (valueno==0&&subvalueno==0)
 	{
-		if (!pad) var_str.insert(start_pos,_FM_);
+		if (!pad && var_str.length())
+			var_str.insert(start_pos,_FM_);
 		var_str.insert(start_pos,insertion.var_str);
 		return *this;
 
@@ -1429,7 +1434,8 @@ var& var::inserter(const int fieldno,const int valueno,const int subvalueno,cons
 	}
 	else if (subvalueno==0)
 	{
-		if (!pad&&(start_pos<field_end_pos||valueno>1)) var_str.insert(start_pos,_VM_);
+		if (!pad&&(start_pos<field_end_pos||valueno>1))
+			var_str.insert(start_pos,_VM_);
 		var_str.insert(start_pos,insertion.var_str);
 		return *this;
 
@@ -1463,7 +1469,8 @@ var& var::inserter(const int fieldno,const int valueno,const int subvalueno,cons
 
 	}
 
-	if (!pad&&(start_pos<value_end_pos||subvalueno>1)) var_str.insert(start_pos,_SM_);
+	if (!pad&&(start_pos<value_end_pos||subvalueno>1))
+		var_str.insert(start_pos,_SM_);
 	var_str.insert(start_pos,insertion.var_str);
 
 	return *this;

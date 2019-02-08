@@ -38,6 +38,7 @@
 namespace exodus {
 
 int getprocessno(const char* filename, int* fd);
+void releaseprocess(int* fd);
 
 //NB do not define default copy constructor and assignment in order to force
 //derived classes to implement them since they are defined in the class header
@@ -57,6 +58,9 @@ MvEnvironment::~MvEnvironment() {
 	}
 	//std::wcout<<L"OK"<<std::endl;
 
+	//a file handle to make unique locks
+	if (processnolockfd!=0)
+		releaseprocess(&processnolockfd);
 }
 
 //keep in sync both 1) declaration in class and 2) contruction initialisation
@@ -64,88 +68,9 @@ bool MvEnvironment::init(const int threadno) {
 
 	//std::wcout<<L"MvEnvironment::init("<<threadno<<L")"<<std::endl;
 
-	//per user
-	this->USERNAME = L"";
-	this->PRIVILEGE = L"";
-
-	//per application
-	this->APPLICATION = L"";
-
-	//per host
-	this->STATION = L"";
-
-	//per execution
-	//this->COMMAND = L";//initialised in main
-	//this->OPTIONS = L";//initialised in main
-	//this->EXECPATH = L";//initialised in main
-
 	//per process
 	this->ROLLOUTFILE = L"~" ^ var(threadno) ^ L".$$$";
 	this->THREADNO = threadno;
-
-	//per record access
-	this->DICT = L"";
-	this->ID = L"";
-	this->RECORD = L"";
-	this->MV = L"";
-	this->LISTACTIVE = 0;
-	//this->SESSION = L"";//leave to be initialised in main() or on demand
-	this->STATUS = L"";
-	this->FILEERROR = L"";
-	this->FILEERRORMODE = L"";
-	this->FILES = L"";
-
-	//per configuration
-	this->DEFINITIONS = L"definitions";
-	this->SYSTEM = L"";
-	this->SECURITY = L"";
-
-	//per request
-	this->SENTENCE = L"";
-	this->PSEUDO = L"";
-	this->DATA = L"";
-	this->ANS = L"";
-
-	//temporary application globals
-	this->USER0 = L"";
-	this->USER1 = L"";
-	//var USER2 = L"";//temp moved section. can be recreated here when proper name created there
-	this->USER3 = L"";
-	this->USER4 = L"";
-
-	//i18n/l10n - internationalisation/localisation
-	this->DATEFORMAT = L"D/E";
-	this->USER2 = L"MD20P,";//base currency format
-	this->SW = L"";//timezone
-	/* from initgeneral
-	//SW<1> is the ADJUSTMENT to get display time from server time
-	//SW<2> is the difference from gmt/utc to server time
-	//SW<3> could be the adjustment to get dbtz from servertz
-	*/
-
-	//character encoding globals
-	//MUST be the same length
-	//TODO Should not be global otherwise cannot multithread MvEnvironment
-	this->LOWERCASE = LOWERCASE_;
-	this->UPPERCASE = UPPERCASE_;
-	this->INTERNALCHARS = L"\x11\x12\x13\x14\x15\x16\x17";
-	this->EXTERNALCHARS = _SSTM_ _STM_ _TM_ _SM_ _VM_ _FM_ _RM_;
-
-	this->TCLSTACK = L"";
-	this->INTCONST = L"";
-	this->PRIORITYINT = L"";
-
-	//old scratch variables used for various buffering
-	this->AW = L"";
-	this->EW = L"";
-	this->HW = L"";
-	this->MW = L"";
-	this->PW = L"";
-	//this->SW = L"";
-	this->VW = L"";
-	this->XW = L"";
-
-	this->RECCOUNT = L"";
 
 	//pretty obsolete nowadays
 	//environment variables may not be available until exported
@@ -157,21 +82,7 @@ bool MvEnvironment::init(const int threadno) {
 	if (not this->CRTHIGH)
 		this->CRTHIGH = 25;
 
-	this->LPTRWIDE = 132;
-	this->LPTRHIGH = 66;
-
-        //obsolete
-        this->ENVIRONKEYS=L"";
-        this->ENVIRONSET=L"";
-        this->DEFAULTSTOPS=L"";
-        this->MOVEKEYS=L"";
-        this->INDEXTIME=L"";
-	this->LEVEL=L"";
-
-	this->VOLUMES=L"";
-
-	int fd;//memory leak unless closed in mvenvironment destructor;
-	this->PROCESSNO=getprocessno("/tmp/exodus", &fd);
+	this->PROCESSNO=getprocessno("/tmp/exodus", &processnolockfd);
 
 	return true;
 

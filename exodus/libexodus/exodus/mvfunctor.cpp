@@ -332,7 +332,7 @@ std::cout<<"mvfunctor:openlib: in:"<<newlibraryname<<std::endl;
 std::cout<<"mvfunctor:openlib: ko:"<< newlibraryname<<std::endl;
 #endif
 		//std::cerr<<libraryfilename_<<" cannot be found or cannot be opened"<<std::endl;
-		throw MVException(var(libraryfilename_) ^ L" cannot be found or cannot be opened");
+		throw MVException(var(libraryfilename_) ^ L" cannot be found or cannot be linked/wrong version");
 		return false;
 	}
 

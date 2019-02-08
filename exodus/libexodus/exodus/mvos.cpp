@@ -1216,6 +1216,12 @@ bool var::oswrite(const var& osfilename, const var& locale) const
 
 }
 
+//a version that accepts a const startoffset ie ignores return value
+bool var::osbwrite(const var& osfilevar, const var& startoffset) const
+{
+	return this->osbwrite(osfilevar,const_cast<var&>(startoffset));
+}
+
 bool var::osbwrite(const var& osfilevar, var& startoffset) const
 {
 	//osfilehandle is just the filename but buffers the "file number" in the mvint too
@@ -1261,10 +1267,21 @@ bool var::osbwrite(const var& osfilevar, var& startoffset) const
 	return true;
 }
 
+//a version that ignores output of offset
+var& var::osbread(const var& osfilevar, const var& startoffset, const int bytesize)
+{
+	//var startoffset_nonconst;
+	//if (startoffset.assigned())
+	//	startoffset_nonconst=startoffset;
+	return this->osbread(osfilevar, const_cast<var&>(startoffset), bytesize);
+}
+
 var& var::osbread(const var& osfilevar, var& startoffset, const int bytesize)
 {
 	THISIS(L"var& var::osbread(const var& osfilevar, const int startoffset, const int size")
 	THISISDEFINED()
+	ISASSIGNED(startoffset)
+
 	//will be done if necessary in osopenx()
 	//ISSTRING(osfilename)
 

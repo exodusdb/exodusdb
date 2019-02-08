@@ -248,6 +248,7 @@ namespace exodus {
 #define DATEFORMAT mv.DATEFORMAT
 #define PRIVILEGE mv.PRIVILEGE
 #define FILES mv.FILES
+#define TCLSTACK mv.TCLSTACK
 #define INTCONST mv.INTCONST
 #define STATUS mv.STATUS
 #define PRIORITYINT mv.PRIORITYINT

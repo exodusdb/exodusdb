@@ -109,6 +109,16 @@ DLL_PUBLIC var osbread(const var& filehandle, var& startoffset, const int length
 	return data;
 }
 
+//3 argument version assignment statement format BUT ALLOWING STARTOFFSET TO BE A CONSTANT ie output ignored
+//x=osbread(file,postition,length)
+//DLL_PUBLIC var osbread(const var& filehandle, const int startoffset, const int length)
+DLL_PUBLIC var osbread(const var& filehandle, const var& startoffset, const int length)
+{
+	var data;
+	data.osbread(filehandle, const_cast<var&>(startoffset), length);
+	return data;
+}
+
 //4 argument version for statement format
 //osbread(data from x at y length z)
 //DLL_PUBLIC var& osbread(var& data, const var& filehandle, const int startoffset, const int length)
@@ -123,6 +133,22 @@ var& osbread(var& data, const var& filehandle, var& startoffset, const int lengt
 DLL_PUBLIC bool osbwrite(const var& data, const var& filehandle, var& startoffset)
 {
 	return data.osbwrite(filehandle, startoffset);
+}
+
+//4 argument version for statement format BUT ALLOWING STARTOFFSET TO BE A CONSTANT ie output ignored
+//osbread(data from x at y length z)
+//DLL_PUBLIC var& osbread(var& data, const var& filehandle, const int startoffset, const int length)
+DLL_PUBLIC
+var& osbread(var& data, const var& filehandle, const var& startoffset, const int length)
+{
+	//perhaps we can return book for success/failure despite the fact that it is a filehandle supposedly ok
+	data.osbread(filehandle, const_cast<var&>(startoffset), length);
+	return data;
+}
+
+DLL_PUBLIC bool osbwrite(const var& data, const var& filehandle, const var& startoffset)
+{
+	return data.osbwrite(filehandle, const_cast<var&>(startoffset));
 }
 
 //two argument version returns success/failure to be used in if statement
@@ -1194,7 +1220,7 @@ int exodus_main(int exodus__argc, char *exodus__argv[], MvEnvironment& mv)
 	EXECPATH2=mv.EXECPATH;
 
 	mv.SENTENCE=L"";			//ALN:TODO: hm, again, char->var-> op=(var)
-	//SB #define MV_NO_NARROW disallows accidental narrow now
+ 	//SB #define MV_NO_NARROW disallows accidental narrow now
 	mv.COMMAND=L"";
 	mv.OPTIONS=L"";
 
@@ -1224,6 +1250,7 @@ int exodus_main(int exodus__argc, char *exodus__argv[], MvEnvironment& mv)
 	mv.COMMAND.splicer(1,1,L"");
 
 	//options are in either (XXX) or {XXX} at the end of the command.
+	//similar code in exodus_main() and mvprogram.cpp:perform()
 	var lastchar=mv.COMMAND[-1];
 	if (lastchar==")")
 		mv.OPTIONS=mv.COMMAND.field2(L"(",-1);
