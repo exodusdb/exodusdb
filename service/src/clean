@@ -1,0 +1,19 @@
+#!/bin/bash
+
+rm -I -f */*~ */*.2 */eevalt.cpp
+rm -I -f *~ *.2 eevalt.cpp 2>/dev/null
+
+rm -I -f ./*/{1,2,3,4,5,6,7,8,9,0}*\$
+rm -I -f {1,2,3,4,5,6,7,8,9,0}*\$
+
+rm -I -f */NLOG */LOG */NEOSYS.CFG
+rm -I -f NLOG LOG NEOSYS.CFG
+
+rm -I -rf */DATAVOL\\*
+rm -I -rf DATAVOL\\*
+
+rm -I -f arev/*
+
+rm -I -f nano.save ./*/nano.save
+rm -I -f sselect.lst ./*/sselect.lst
+rm -I -f eeval.cpp2 ./*/eeval.cpp2

@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -x
+#set -e
+
+#generate all headers
+compile ../???/*.cpp {H}
+
+for MODULE in add sys gen agy job tim
+do
+#	cp ~/arev/$MODULE/*.cpp ../$MODULE/
+	compile ../$MODULE/*.cpp {$1}
+done
+
+compile ../fin/initacc ../fin/readaccparams
+
