@@ -221,12 +221,19 @@ namespace exodus {
 #define USERNAME mv.USERNAME
 #define APPLICATION mv.APPLICATION
 #define SENTENCE mv.SENTENCE
+#define CHAIN mv.CHAIN
 
 #define	USER0 mv.USER0
 #define USER1 mv.USER1
 #define USER2 mv.USER2
 #define USER3 mv.USER3
 #define USER4 mv.USER4
+
+#define	RECUR0 mv.RECUR0
+#define RECUR1 mv.RECUR1
+#define RECUR2 mv.RECUR2
+#define RECUR3 mv.RECUR3
+#define RECUR4 mv.RECUR4
 
 #define EXECPATH mv.EXECPATH
 #define COMMAND mv.COMMAND
@@ -246,6 +253,7 @@ namespace exodus {
 
 #define STATION mv.STATION
 #define DATEFORMAT mv.DATEFORMAT
+#define BASEFORMAT mv.BASEFORMAT
 #define PRIVILEGE mv.PRIVILEGE
 #define FILES mv.FILES
 #define TCLSTACK mv.TCLSTACK

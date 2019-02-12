@@ -14,6 +14,7 @@ int getprocessno(const char* filename, int* fd)
 	if (*fd == -1)
 		printf("getprocessno file %s doesnt exist\n",filename);
 
+	//processno starts at 1 not 0
 
 	for (int ii=1;ii<1000;ii++) {
 

@@ -84,6 +84,7 @@ public:
 	var COMMAND = L"";
 	var OPTIONS = L"";
 	var EXECPATH = L"";
+	var CHAIN = L"";
 
 	//per process - set in init()
 	var ROLLOUTFILE = L"";
@@ -115,13 +116,20 @@ public:
 	//temporary application globals
 	var USER0 = L"";
 	var USER1 = L"";
-	//var USER2;//temp moved section
+	var USER2 = L"MD20P,";//was base currency format
 	var USER3 = L"";
 	var USER4 = L"";
 
-	//i18n/l10n - internationalisation/localisation
+	//per execute level temporary application global
+	var RECUR0 = L"";
+	var RECUR1 = L"";
+	var RECUR2 = L"";
+	var RECUR3 = L"";
+	var RECUR4 = L"";
+
+	//i18n/l10n - basic internationalisation/localisation
 	var DATEFORMAT = L"D/E";//international date format
-	var USER2 = L"MD20P,";//base currency format
+	var BASEFORMAT = L"MD20P,";//base currency format
 	var SW = L"";
 
 	//encoding globals
@@ -133,7 +141,8 @@ public:
 	var EXTERNALCHARS = _SSTM_ _STM_ _TM_ _SM_ _VM_ _FM_ _RM_;
 
 	var TCLSTACK = L"";
-	var INTCONST = L"";
+	//INTCONST=keyboard constants 1:esc 2:f5 7:f10
+	var INTCONST = L"0x1A" _FM_ L"{f5?}" _FM_ _FM_ _FM_ _FM_ _FM_ "{f10?}";
 	var PRIORITYINT = L"";
 
 	//old scratch variables used for various buffering

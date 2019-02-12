@@ -56,6 +56,7 @@ DLL_PUBLIC
 	var capitalise(const var& str0, const var& mode=var(), const var& wordseps=var()) const;
 
 	var perform(const var& sentence);
+	void chain(const var& libraryname);
 	var execute(const var& sentence);
 
 	//given dictid reads dictrec from DICT file and extracts from RECORD/ID or calls library called dict+DICT function dictid

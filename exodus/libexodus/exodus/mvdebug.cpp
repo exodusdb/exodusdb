@@ -351,14 +351,16 @@ void SIGINT_handler (int sig)
 		continue;
 		var cmd1=cmd[1].ucase();
 
-		if (cmd1 == "C")
+		if (cmd1 == "C") {
 			break;
 
-		else if (cmd1=="E")
+		} else if (cmd1=="E") {
 
-			var().abort("Aborted. User interrupt");
+			//var().abort("Aborted. User interrupt");
+			printf("Aborted. User interrupt\n");
+			exit(1);
 
-		else if (cmd1=="B")
+		} else if (cmd1=="B")
 
 			//duplicated in init and B
 			backtrace().convert(FM,"\n").outputl();

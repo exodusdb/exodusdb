@@ -39,6 +39,8 @@ THE SOFTWARE.
 // external subroutines since external subroutines are implemented in exodus
 // as member functions which require special coding to be called from global functions
 
+//#define TRACING 5
+
 #include <iostream>
 
 #define MV_NO_NARROW
@@ -247,6 +249,7 @@ bool ExodusFunctorBase::initsgf(const char* newlibraryname, const char* newfunct
 	return true;
 }
 
+//arev xxx="functionname"; call @xxx
 ExodusFunctorBase& ExodusFunctorBase::operator=(const char* newlibraryname) {
         closelib();
         libraryname_=newlibraryname;
@@ -332,7 +335,7 @@ std::cout<<"mvfunctor:openlib: in:"<<newlibraryname<<std::endl;
 std::cout<<"mvfunctor:openlib: ko:"<< newlibraryname<<std::endl;
 #endif
 		//std::cerr<<libraryfilename_<<" cannot be found or cannot be opened"<<std::endl;
-		throw MVException(var(libraryfilename_) ^ L" cannot be found or cannot be linked/wrong version");
+		throw MVException(var(libraryfilename_) ^ L" cannot be found or cannot be linked/wrong version. Run with LD_DEBUG=libs for more info");
 		return false;
 	}
 

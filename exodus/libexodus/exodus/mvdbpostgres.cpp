@@ -1011,7 +1011,8 @@ bool var::sqlexec(const var& sqlcmd, var& errmsg) const
 
 	Resultclearer clearer(pgresult);
 
-	if (PQresultStatus(pgresult) != PGRES_COMMAND_OK) {
+	if (PQresultStatus(pgresult) != PGRES_COMMAND_OK && PQresultStatus(pgresult) != PGRES_TUPLES_OK) {
+		int xx=PQresultStatus(pgresult);
 		var sqlstate = var(PQresultErrorField(pgresult, PG_DIAG_SQLSTATE));
 		//PQclear(pgresult);//essential
 		//sql state 42P03 = duplicate_cursor

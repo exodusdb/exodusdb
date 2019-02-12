@@ -137,6 +137,8 @@ ExodusFunctorBase(const std::string libname, const std::string funcname);
 //constructor to provide environment immediately
 ExodusFunctorBase(MvEnvironment& mv);
 
+//to allow function name to be assigned a name and this name is the name of the library called
+//arev call @
 ExodusFunctorBase& operator=(const char*);
 
 //call shared member function

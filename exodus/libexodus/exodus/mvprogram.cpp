@@ -435,10 +435,16 @@ var ExodusProgramBase::execute(const var& sentence) {
 
 	var result=perform(sentence);
 
+
 	//TODO popselect
 
 	return result;
 
+}
+
+void ExodusProgramBase::chain(const var& libraryname) {
+	CHAIN=libraryname;
+	var().stop();
 }
 
 var ExodusProgramBase::perform(const var& sentence) {
@@ -453,18 +459,45 @@ var ExodusProgramBase::perform(const var& sentence) {
 
 	//lowercase all library functions to aid in conversion from arev
 	//TODO remove after conversion complete
-	var libid = sentence.field(L" ", 1).lcase();
 
-	//open the library routine
-	//if (libid != cache_perform_libid_) {
+	perform_exodusfunctorbase_.mv_ = (&mv);
 
-		//if (!perform_exodusfunctorbase_.mv_)
-			perform_exodusfunctorbase_.mv_ = (&mv);
+	//save some environment
+	var savesentence;
+	var savecommand;
+	var saveoptions;
+	var saverecur0;
+	var saverecur1;
+	var saverecur2;
+	var saverecur3;
+	var saverecur4;
+	SENTENCE.transfer(savesentence);
+	COMMAND.transfer(savecommand);
+	OPTIONS.transfer(saveoptions);
+	RECUR0.transfer(saverecur0);
+	RECUR0.transfer(saverecur1);
+	RECUR0.transfer(saverecur2);
+	RECUR0.transfer(saverecur3);
+	RECUR0.transfer(saverecur4);
 
+	SENTENCE = sentence;
+	while (SENTENCE) {
+
+		//set new perform environment
+		COMMAND = SENTENCE;
+		OPTIONS = "";
+	        //similar code in exodus_main() and mvprogram.cpp:perform()
+	        var lastchar=COMMAND[-1];
+	        if (lastchar==")")
+	                OPTIONS=COMMAND.field2(L"(",-1);
+	        else if (lastchar=="}")
+	                OPTIONS=COMMAND.field2(L"{",-1);
+	        if (OPTIONS)
+	                COMMAND.splicer(-(OPTIONS.length()+2),OPTIONS.length()+2, L"");
+
+		//load the shared library file
+		var libid = SENTENCE.field(L" ", 1).lcase();
 		std::string str_libname = libid.toString();
-		//std::string str_funcname="main";
-		//if (!exodusfunctorbase_.init(str_libname.c_str(),str_funcname.c_str()))
-		//	throw MVException(L"perform() Cannot find Library "^str_libname^L", or function "^str_funcname^L" is not present");
 		if (!perform_exodusfunctorbase_.initsmf(
 			str_libname.c_str(),
 			"exodusprogrambasecreatedelete_",
@@ -473,59 +506,47 @@ var ExodusProgramBase::perform(const var& sentence) {
 			USER4^=L"perform() Cannot find shared library \"" ^ str_libname
 				^ L"\", or \"libraryexit()\" is not present in it.";
 			//throw MVException(USER4);
-			return "";
+			//return "";
+			break;
 		}
-	//	cache_perform_libid_ = libid;
-	//}
 
-	//save some environment
-	var savesentence;
-	var savecommand;
-	var saveoptions;
+		//call the shared library exodus object's main function
+		try {
+			ANS=perform_exodusfunctorbase_.callsmf();
+		}
+		catch (const MVUndefined& e) {
+			//if return "" is missing then default ANS to ""
+			ANS=L"";
+		}
+		catch (const MVStop& e) {
+			//stop is normal way of stopping a perform
+			//functions can call it to terminate the whole "program"
+			//without needing to setup chains of returns
+			//to exit from nested functions
+			ANS=L"";
+		}
+		catch (const MVAbort& e) {
+			//similar to stop for the time being
+			//maybe it should set some error flag/messages
+			ANS=L"";
+		}
+
+		//chain is a kind of optional follow controlled by the library function
+		// to perform another function after the first
+		//go round again if anything in CHAIN
+		CHAIN.transfer(SENTENCE);
+
+	}
+
+	//restore some environment
 	savesentence.transfer(SENTENCE);
 	savecommand.transfer(COMMAND);
 	saveoptions.transfer(OPTIONS);
-
-	//set new perform environment
-	SENTENCE = sentence;
-	COMMAND = sentence;
-	OPTIONS = "";
-        //similar code in exodus_main() and mvprogram.cpp:perform()
-        var lastchar=COMMAND[-1];
-        if (lastchar==")")
-                OPTIONS=COMMAND.field2(L"(",-1);
-        else if (lastchar=="}")
-                OPTIONS=COMMAND.field2(L"{",-1);
-        if (OPTIONS)
-                COMMAND.splicer(-(OPTIONS.length()+2),OPTIONS.length()+2, L"");
-
-	try {
-		ANS=perform_exodusfunctorbase_.callsmf();
-	}
-	catch (const MVUndefined& e) {
-		//if return "" is missing then default ANS to ""
-		ANS=L"";
-	}
-	catch (const MVStop& e) {
-		//stop is normal way of stopping a perform
-		//functions can call it to terminate the whole "program"
-		//without needing to setup chains of returns
-		//to exit from nested functions
-		ANS=L"";
-	}
-	catch (const MVAbort& e) {
-		//similar to stop for the time being
-		//maybe it should set some error flag/messages
-		ANS=L"";
-	}
-	////////////////////////////////////////////
-
-	//restore some environment
-	//std::cout<<"pretransfer"<<std::endl;
-	SENTENCE.transfer(savesentence);
-	COMMAND.transfer(savecommand);
-	OPTIONS.transfer(saveoptions);
-	//std::cout<<"posttransfer"<<std::endl;
+	saverecur0.transfer(RECUR0);
+	saverecur1.transfer(RECUR1);
+	saverecur2.transfer(RECUR2);
+	saverecur3.transfer(RECUR3);
+	saverecur4.transfer(RECUR4);
 
 	return ANS;
 
@@ -1210,4 +1231,5 @@ var ExodusProgramBase::getuserdept(const var& usercode) {
 }
 
 }//of namespace exodus
+
 

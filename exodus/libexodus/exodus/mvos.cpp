@@ -902,6 +902,11 @@ bool var::ossetenv(const var& envvarname) const
 
 }
 
+var var::suspend() const
+{
+	return this->osshell();
+}
+
 var var::osshell() const
 {
 	THISIS(L"var var::osshell() const")
@@ -910,7 +915,8 @@ var var::osshell() const
 	THISISSTRING()
 
 	//breakoff();
-	int shellresult=system(toString().c_str());
+	//while converting from DOS convert all backslashes to forward slashes on linux or leave as if exodus on windows
+	int shellresult=system(this->to_path_string().c_str());
 	//breakon();
 
 	return shellresult;
@@ -928,7 +934,7 @@ var var::osshellread() const
 	//fflush?
 
 	//"r" means read
-	std::FILE *cmd=popen(toString().c_str(), "r");
+	std::FILE *cmd=popen(this->to_path_string().c_str(), "r");
 	//return a code to indicate program failure. but can this ever happen?
 	if (cmd==NULL)
 		return 1;
@@ -960,30 +966,17 @@ var var::osshellwrite(const var& writestr) const
 	ISSTRING(writestr)
 
 	//"w" means read
-	std::FILE *cmd=popen(toString().c_str(), "w");
+	std::FILE *cmd=popen(this->to_path_string().c_str(), "w");
 	//return a code to indicate program failure. but can this ever happen?
 	if (cmd==NULL)
 		return 1;
+
+	//decided not to convert slashes here .. may be the wrong decision
 	fputs(writestr.toString().c_str(),cmd);
 
 	//return the process termination status (pity cant do this for read too)
 	return pclose(cmd);
 
-}
-
-var var::suspend() const
-{
-	//THISIS(L"var var::suspend() const")
-
-	//breakoff();
-	//use dummy to avoid warning in gcc4 "warning: ignoring return value of int system(const char*), declared with attribute warn_unused_result"
-	int dummy=system(toString().c_str());
-	//breakon();
-
-	return L"";
-
-	//evade warning: unused variable 'dummy'
-	if (dummy) {};
 }
 
 void var::osflush() const
@@ -1076,7 +1069,7 @@ std::wfstream* var::osopenx(const var& osfilename, const var& locale) const
 
 		//open the file for i/o (fail if the file doesnt exist and do NOT delete any existing file)
 		//binary and in/out to allow reading and writing from same file handle
-		pmyfile->open(osfilename.toString().c_str(), std::ios::out | std::ios::in | std::ios::binary);
+		pmyfile->open(osfilename.to_path_string().c_str(), std::ios::out | std::ios::in | std::ios::binary);
 		if (! (*pmyfile))
 		{
 			delete pmyfile;
@@ -1106,7 +1099,7 @@ bool var::osread(const var& osfilename, const var& locale)
 	//will be checked by nested osread
 	//THISISDEFINED()
 	ISSTRING(osfilename)
-	return osread(osfilename.toString().c_str(), locale);
+	return osread(osfilename.to_path_string().c_str(), locale);
 }
 
 bool var::osread(const char* osfilename, const var& locale)
@@ -1204,7 +1197,7 @@ bool var::oswrite(const var& osfilename, const var& locale) const
 
 	//although the stream works with wchar_t, its parameter file name is narrow char *
 	//delete any previous file,
-	myfile.open(osfilename.toString().c_str(), std::ios::trunc | std::ios::out | std::ios::binary);
+	myfile.open(osfilename.to_path_string().c_str(), std::ios::trunc | std::ios::out | std::ios::binary);
 	if (!myfile)
 		return false;
 
@@ -1375,7 +1368,7 @@ bool var::osrename(const var& newosdir_or_filename) const
 	//ACQUIRE
 	std::wifstream myfile;
 	//binary?
-	myfile.open(newosdir_or_filename.toString().c_str(), std::ios::binary );
+	myfile.open(newosdir_or_filename.to_path_string().c_str(), std::ios::binary );
 	if (myfile)
 	{
 		//RELEASE
@@ -1387,7 +1380,7 @@ bool var::osrename(const var& newosdir_or_filename) const
 	if (!checknotabsoluterootfolder(toWString()))
 		return false;
 
-	return !std::rename(toString().c_str(),newosdir_or_filename.toString().c_str());
+	return !std::rename(this->to_path_string().c_str(),newosdir_or_filename.to_path_string().c_str());
 
 }
 
@@ -1397,10 +1390,8 @@ bool var::oscopy(const var& to_osfilename) const
 	THISISSTRING()
 	ISSTRING(to_osfilename)
 
-    //stdfs::wpath frompathx(toTstring((*this)).c_str());
-    //stdfs::wpath topathx(toTstring(to_osfilename).c_str());
-    stdfs::path frompathx((*this).toString().c_str());
-    stdfs::path topathx(to_osfilename.toString().c_str());
+    stdfs::path frompathx(this->to_path_string().c_str());
+    stdfs::path topathx(to_osfilename.to_path_string().c_str());
     try
     {
 		//will not overwrite so this is redundant
@@ -1429,7 +1420,7 @@ bool var::osdelete(const var& osfilename) const
 	THISISDEFINED()
 	ISSTRING(osfilename)
 	osfilename.osclose();		// in case this is cached opened file handle
-	return !std::remove(osfilename.toString().c_str());
+	return !std::remove(osfilename.to_path_string().c_str());
 }
 
 var var::oslistf(const var& path, const var& spec) const
@@ -1442,30 +1433,55 @@ var var::oslistd(const var& path, const var& spec) const
 	return oslist(path, spec, 2);
 }
 
+const std::string var::to_path_string() const
+{
+	if (this->index(L" ")) {
+
+#if defined WIN32 || defined _WIN32
+        var part=this->field(L" ",1).convert(L"/",SLASH);
+#else
+        //printf("path=%s\n",this->convert(L"\\",SLASH).toString().c_str());
+        var part=this->field(L" ",1).convert(L"\\",SLASH);
+#endif
+        var rest=this->field(L" ",2,999999);
+        if (rest.length())
+                part^=L" " ^ rest;
+        return part.toString();
+
+	} else {
+
+#if defined WIN32 || defined _WIN32
+	return this->convert(L"/",SLASH).toString();
+#else
+	return this->convert(L"\\",SLASH).toString();
+#endif
+
+	}
+}
+
 var var::osfile() const
 {
 	THISIS(L"var var::osfile() const")
 	THISISSTRING()
 
 	//get a handle and return L"" if doesnt exist or isnt a regular file
-    try
-    {
+	try
+	{
 		//boost 1.33 throws an error with files containing ~ or $ chars but 1.38 doesnt
-		//stdfs::wpath pathx(toTstring((*this)).c_str());
-		stdfs::path pathx((*this).toString().c_str());
+		stdfs::path pathx(this->to_path_string().c_str());
 
-        if (!stdfs::exists(pathx)) return L"";
-        //is_regular is only in boost > 1.34
-		//if (!stdfs::is_regular(pathx)) return L"";
-        if (stdfs::is_directory(pathx)) return L"";
+		if (!stdfs::exists(pathx)) return L"";
+		//is_regular is only in boost > 1.34
+			//if (!stdfs::is_regular(pathx)) return L"";
+		if (stdfs::is_directory(pathx)) return L"";
 
-        //get last write datetime
-        std::time_t last_write_time=std::chrono::system_clock::to_time_t(stdfs::last_write_time(pathx));
-        //convert to ptime
-        boost::posix_time::ptime ptimex = boost::posix_time::from_time_t(last_write_time);
-        //convert to mv date and time
-        int mvdate, mvtime;
-        ptime2mvdatetime(ptimex, mvdate, mvtime);
+		//get last write datetime
+		std::time_t last_write_time=std::chrono::system_clock::to_time_t(stdfs::last_write_time(pathx));
+		//convert to ptime
+		boost::posix_time::ptime ptimex = boost::posix_time::from_time_t(last_write_time);
+		//convert to mv date and time
+		int mvdate, mvtime;
+		ptime2mvdatetime(ptimex, mvdate, mvtime);
 
 		return int(stdfs::file_size(pathx)) ^ FM ^ mvdate ^ FM ^ int(mvtime);
 
@@ -1485,8 +1501,7 @@ bool var::osmkdir() const
     {
 
 		//boost 1.33 throws an error with files containing ~ or $ chars but 1.38 doesnt
-		//stdfs::wpath pathx(toTstring((*this)).c_str());
-		stdfs::path pathx((*this).toString().c_str());
+		stdfs::path pathx(this->to_path_string().c_str());
 
 		if (stdfs::exists(pathx)) return false;
 		stdfs::create_directories(pathx);
@@ -1508,8 +1523,7 @@ bool var::osrmdir(bool evenifnotempty) const
     {
 
 		//boost 1.33 throws an error with files containing ~ or $ chars but 1.38 doesnt
-		//stdfs::wpath pathx(toTstring((*this)).c_str());
-		stdfs::path pathx((*this).toString().c_str());
+		stdfs::path pathx(this->to_path_string().c_str());
 
         if (!stdfs::exists(pathx)) return false;
         if (!stdfs::is_directory(pathx)) return false;
@@ -1540,23 +1554,25 @@ var var::osdir() const
 	THISISSTRING()
 
 	//get a handle and return L"" if doesnt exist or is NOT a directory
-    //stdfs::wpath pathx(toTstring((*this)).c_str());
-    try
-    {
+	//stdfs::wpath pathx(toTstring((*this)).c_str());
+	try
+	{
 
 		//boost 1.33 throws an error with files containing ~ or $ chars but 1.38 doesnt
-		stdfs::path pathx((*this).toString().c_str());
+		stdfs::path pathx(this->to_path_string().c_str());
 
-        if (!stdfs::exists(pathx)) return L"";
-        if (!stdfs::is_directory(pathx)) return L"";
+		if (!stdfs::exists(pathx))
+			return L"";
+		if (!stdfs::is_directory(pathx))
+			return L"";
 
-        //get last write datetime
-        std::time_t last_write_time=std::chrono::system_clock::to_time_t(stdfs::last_write_time(pathx));
-        //convert to ptime
-        boost::posix_time::ptime ptimex = boost::posix_time::from_time_t(last_write_time);
-        //convert to mv date and time
-        int mvdate, mvtime;
-        ptime2mvdatetime(ptimex, mvdate, mvtime);
+		//get last write datetime
+		std::time_t last_write_time=std::chrono::system_clock::to_time_t(stdfs::last_write_time(pathx));
+		//convert to ptime
+		boost::posix_time::ptime ptimex = boost::posix_time::from_time_t(last_write_time);
+		//convert to mv date and time
+		int mvdate, mvtime;
+		ptime2mvdatetime(ptimex, mvdate, mvtime);
 
 		return L"" ^ FM ^ mvdate ^ FM ^ int(mvtime);
 
@@ -1623,10 +1639,7 @@ var var::oslist(const var& path, const var& spec, const int mode) const
 	stdfs::path full_path(stdfs::current_path());
 	full_path = stdfs::system_complete
 		(
-			stdfs::path
-			(
-				path.toString().c_str() COMMAstdfsNATIVE
-			)
+			stdfs::path(path.to_path_string().c_str() COMMAstdfsNATIVE)
 		);
 
 	//quit if it isnt a folder

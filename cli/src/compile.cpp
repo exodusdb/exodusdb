@@ -641,8 +641,78 @@ could generate the following overloads in the lib's .h header
 					var add_funcargs=funcargs;
 					var add_vars="";
 					var add_funcs="";
+					var add_func="";
 					var can_default=true;
 
+					//build nargs additional functions to cater for optional arguments in arev
+
+					for (int maxargn=1; maxargn <= nargs; ++maxargn) {
+
+						var inbound_args="";
+						var outbound_args="";
+						var func_body="";
+						var skip_func=false;
+
+						//build a function with fewer arguments than the full set
+						for (int argn=1; argn <= nargs; ++argn) {
+
+							//work out the variable name and default
+							var argname = funcargs.field(",", argn);
+							var argname2=argname;
+
+							//work out the argtype
+							var argtype=funcargstype.field(",",argn);
+
+							//io/out cannot at the moment have defaults
+							var argdefault = funcargsdecl2.field(",",argn).field("=", 2);
+
+							//do not generate functions for numbers of arguments that are equivalent to defaulted arguments in main function
+							if (argdefault ne "" and argn eq maxargn){
+								skip_func=true;
+								break;
+							}
+
+							if (argn<maxargn) {
+								inbound_args ^= ", " ^ argtype ^ " " ^ argname;
+								if (argdefault ne "") {
+									//build a new non-constant dummy variable name to be used as unassigned argument to the real function
+									argname2 = argname ^ "_" ^ argtype;
+									//declare it
+									func_body ^= " var " ^ argname2;
+									//default it. arev doesnt have a "default" for missing args other than "var()" ie unassigned
+									if (argdefault ne "" and argdefault ne "var()")
+										func_body ^= " = " ^ argdefault;
+									func_body ^= ";\r\n";
+								}
+							} else {
+								//build a new non-constant dummy variable name to be used as unassigned argument to the real function
+								argname2 = argname ^ "_" ^ argtype;
+								//declare it
+								func_body ^= " var " ^ argname2;
+								//default it. arev doesnt have a "default" for missing args other than "var()" ie unassigned
+								if (argdefault ne "" and argdefault ne "var()")
+									func_body ^= " = " ^ argdefault;
+								func_body ^= ";\r\n";
+							}
+							outbound_args ^= ", " ^ argname2;
+						}
+
+						//functions are not generated in some cases
+						if (skip_func)
+							continue;
+
+						//remove initial commas
+						inbound_args.substrer(3);
+						outbound_args.substrer(3);
+
+						//build a function with all the new arguments and dummy variables
+						add_func ^= "\r\n\r\nvar operator() (" ^ inbound_args ^ ") {";
+						add_func ^= "\r\n" ^ func_body;
+						add_func ^= " return operator()(" ^ outbound_args ^ ");";
+						add_func ^= "\r\n}";
+					}
+
+					/*
 					//check arguments backwards, from right to left
 					for (int argn=nargs; argn > 0; --argn) {
 
@@ -654,12 +724,13 @@ could generate the following overloads in the lib's .h header
 
 						var vtype=funcargstype.field(",",argn);
 
-						if (vtype ne "io" and vtype ne "out") {
-							//prevent next left argument from defaulting
-							can_default=vdefault ne "";
-
+						//if (vtype ne "io" and vtype ne "out") {
+						//	//prevent next left argument from defaulting
+						//	can_default=vdefault ne "";
+						//
 						//only process io/out arguments
-						} else {
+						//} else
+						{
 
 							//can default const var&
 							if (!vdefault)
@@ -671,21 +742,36 @@ could generate the following overloads in the lib's .h header
 								new_inargdecl ^= "=" ^ vdefault;
 							add_funcargsdecl.fieldstorer(",", argn, 1, new_inargdecl);
 
-							//build a new non-constant variable name
-							var vname2 = vname ^ "_" ^ vtype;
-							// assign the incoming constant to it
-							add_vars ^= " var " ^ vname2 ^ ";\r\n";
-							add_vars ^= " if ("^vname ^ ".assigned()) " ^ vname2 ^ "=" ^ vname ^ ";\r\n";
-							// use it as an argument to the standard function
-							add_funcargs.fieldstorer(",", argn, 1, vname2);
+							//build a new non-constant dummy variable name to be used as io/out argument of the real function
+							if (vtype eq "out" or vtype eq "io") {
+								var vname2 = vname ^ "_" ^ vtype;
+								//1. assign ie copy the incoming constant to it
+								add_vars ^= " var " ^ vname2 ^ ";\r\n";
+								add_vars ^= " if ("^vname ^ ".assigned()) " ^ vname2 ^ "=" ^ vname ^ ";\r\n";
+								//2. use it as an argument to the standard function
+								add_funcargs.fieldstorer(",", argn, 1, vname2);
+							}
+							//build a new function that calls the standard function
 
-							//append a new function that calls the standard function
-							add_funcs ^= "\r\n\r\nvar operator() (" ^ add_funcargsdecl ^ ") {";
-							add_funcs ^= "\r\n" ^ add_vars;
-							add_funcs ^= " return operator()(" ^ add_funcargs ^ ");";
-							add_funcs ^= "\r\n}";
+							//if the argument is an io/out type, and is not the first argument, then output (append) any function built to date
+							//but do not build a new function with the modified argument (it will be built when arg=1 or an earlier arg is type io/out)
+							if (argn>1 and (vtype eq "out" or vtype eq "io")) {
+								add_funcs ^= add_func;
+								add_func="";//in case two io/out args next to each other? TODO check if two io/out next to each other works ok
+
+							//if the argument is an "in" type, or is argument 1, then build a function with all the modified arguments so far
+							//REPLACING and previously built function, but do not actually output it, since multiple earlier "in" args may be defaulted.
+							} else {
+								//build a function with all the new arguments and dummy variables
+								add_func = "\r\n\r\nvar operator() (" ^ add_funcargsdecl ^ ") {";
+								add_func ^= "\r\n" ^ add_vars;
+								add_func ^= " return operator()(" ^ add_funcargs ^ ");";
+								add_func ^= "\r\n}";
+							}
 						}
 					}
+					*/
+					add_funcs^=add_func;
 					if (add_funcs)
 						add_funcs ^= "\r\n";
 

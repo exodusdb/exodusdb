@@ -95,7 +95,7 @@ DLL_PUBLIC void osshellwrite(const var& writestr, const var& command);
 DLL_PUBLIC void stop(const var& text DEFAULTNULL);
 DLL_PUBLIC void abort(const var& text);//dont confuse with abort() which is standard c/c++
 DLL_PUBLIC var execute(const var& command);
-DLL_PUBLIC var chain(const var& command);
+//DLL_PUBLIC var chain(const var& command);
 DLL_PUBLIC var logoff();
 DLL_PUBLIC void debug();
 

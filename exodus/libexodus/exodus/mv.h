@@ -829,7 +829,7 @@ public:
 //	var perform() const;
 //	var execute() const;
 //	chain should be similar to one of the above?
-	var chain() const;
+//	var chain() const;
 
 	var logoff() const;
 
@@ -1214,6 +1214,8 @@ private:
 	bool locatex(const std::wstring& target,const char* ordercode,const wchar_t usingchar,var& setting, int fieldno=0,int valueno=0,const int subvalueno=0) const;
 	//hardcore std::wstring locate function given a section of a std::wstring and all parameters
 	bool locateat(const std::wstring& target,size_t start_pos,size_t end_pos,const wchar_t order,const var& usingchar,var& setting)const;
+
+	const std::string to_path_string() const;
 
 	int localeAwareCompare(const std::wstring& str1, const std::wstring& str2) const;
 	var& localeAwareChangeCase(const int lowerupper);

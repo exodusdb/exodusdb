@@ -1791,14 +1791,14 @@ var var::index(const var& substrx,const int occurrenceno) const
 //	return L"";
 //}
 
-var var::chain() const
-{
-	THISIS(L"var var::chain() const")
-	THISISSTRING()
-
-	std::cout<<"var::chain not implemented yet "<<toString()<<std::endl;
-	return L"";
-}
+//var var::chain() const
+//{
+//	THISIS(L"var var::chain() const")
+//	THISISSTRING()
+//
+//	std::cout<<"var::chain not implemented yet "<<toString()<<std::endl;
+//	return L"";
+//}
 
 var var::debug() const
 {

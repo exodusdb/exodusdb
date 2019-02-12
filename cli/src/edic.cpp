@@ -40,14 +40,16 @@ program()
     }
 
     //look for nano in release directory during exodus development
-    if (not editor) {
+    //if (not editor) {
+    if (not editor and SLASH eq "\\") {
         nanopath="..\\..\\release\\cygwin\\bin\\nano.exe";
         if (nanopath.osfile())
             editor="..\\..\\release\\cygwin\\bin\\nano $LINENO'$FILENAME'";
         else {
             nanopath="..\\"^nanopath;
-            if (nanopath.osfile())
+            if (nanopath.osfile()) {
                 editor="..\\..\\..\\release\\cygwin\\bin\\nano $LINENO'$FILENAME'";
+            }
         }
     }
 
@@ -179,10 +181,12 @@ program()
             //question^="\n3=main(), 4=simple so/dll\n";
             question^="\n"^basefilename.quote()^" does not exist. Create what? (1-2) ";
             while (true) {
+
                 if (basefilename.substr(1,5).lcase() eq "dict_")
                     progtype=5;
                 else
                     progtype.input(question);
+
                 if (progtype eq 2)
                     progtype="classlib";
                 else if (progtype eq 3)
@@ -246,9 +250,12 @@ program()
 
             }
 
+            //ensure ends in eol
             if (blankfile[1] ne "\n")
                 blankfile^="\n";
-            if (SLASH ne "/")
+
+            //convert to DOS format on Windows
+            if (SLASH eq "\\")
                 blankfile.swapper("\n","\r\n");
 
             if (not oswrite(blankfile,filename))
@@ -286,7 +293,10 @@ program()
             //call the editor
             if (verbose)
                 printl(editcmd);
+
+            /////////////////
             osshell(editcmd);
+            /////////////////
 
             //if the file hasnt been updated
             var fileinfo2=osfile(filename);
@@ -327,7 +337,10 @@ program()
             //call the compiler
             if (verbose)
                 printl(compilecmd);
+
+            ////////////////////
             osshell(compilecmd);
+            ////////////////////
 
             //var tt;
             //tt.inputl("Press Enter ...");

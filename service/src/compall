@@ -12,5 +12,4 @@ do
 	compile ../$MODULE/*.cpp {$1}
 done
 
-compile ../fin/initacc ../fin/readaccparams
-
+compile ../fin/initacc ../fin/readaccparams  {$1}

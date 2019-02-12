@@ -298,10 +298,10 @@ void DLL_PUBLIC abort(const var& text)
 //	return command.execute();
 //}
 
-DLL_PUBLIC var chain(const var& command)
-{
-	return command.chain();
-}
+//DLL_PUBLIC var chain(const var& command)
+//{
+//	return command.chain();
+//}
 
 DLL_PUBLIC var logoff()
 {
