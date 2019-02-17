@@ -39,6 +39,7 @@ namespace exodus {
 
 int getprocessno(const char* filename, int* fd);
 void releaseprocess(int* fd);
+std::string mvgethostname();
 
 //NB do not define default copy constructor and assignment in order to force
 //derived classes to implement them since they are defined in the class header
@@ -84,48 +85,10 @@ bool MvEnvironment::init(const int threadno) {
 
 	this->PROCESSNO=getprocessno("/tmp/exodus", &processnolockfd);
 
+	this->STATION=var(mvgethostname()).field(L".",1);
+
 	return true;
 
 }
-
-/*bool MvEnvironment::lockrecord(const var& filename, const var& file,
-		const var& keyx, const var& recordx, const var& waitsecs0, const bool allowduplicate) const {
-
-	//linemark
-	//common /shadow.mfs/ shfilenames,shhandles,shadow.file,shsession.no,locks,spare1,spare2,spare3
-
-	var waitsecs;
-	if (waitsecs0.unassigned())
-		waitsecs = 0;
-	else
-		waitsecs = waitsecs0;
-
-	//nb case where we do not wish to wai
-	//wait
-	// 0 fail immediately (eg looking for next batch/nextkey)
-	// 9 wait for 9 seconds
-	// - wait for a default number of seconds
-	// * wait infinite number of seconds
-	//if index(file,'message',1) else de bug
-	lock: if (file.lock(keyx)) {
-		return 1;
-	} else {
-		if (waitsecs) {
-			var().ossleep(1000);
-			waitsecs -= 1;
-			goto lock;
-		}
-		return 0;
-	}
-
-	//should not get here
-	return 0;
-
-	//evade warning: unused parameter
-	if (filename || recordx) {
-	}
-	return 0;
-
-}*/
 
 }	//of namespace exodus

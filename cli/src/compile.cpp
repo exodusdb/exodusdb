@@ -132,8 +132,9 @@ function main()
 			linkoptions=" -lexodus -lstdc++fs";
 
 		//enable function names in backtrace
+		//nopie to prevent ALSR preventing backtrace
 		if (debugging)
-			basicoptions^=" -g -rdynamic";
+			basicoptions^=" -no-pie -g -rdynamic";
 
 		//optimiser unfortunately prevents backtrace
 		if (optimise)

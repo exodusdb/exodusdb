@@ -868,6 +868,7 @@ public:
 	void setprompt() const;
 
 	//STANDARD INPUT
+	bool hasinput();
 	bool input();
 	bool input(const var& prompt, const int int1=0);
 	bool eof() const;
@@ -1685,11 +1686,19 @@ var DLL_PUBLIC getexecpath();
 
 //mv exceptions
 
+//MVStop is similar to MVException
+//but doesnt get stack since stop() is called commonly and normally
+class DLL_PUBLIC MVStop
+{public: MVStop (const var& var1 DEFAULTNULL);
+		var description;
+};
+
 //provide a public base exception for all other exceptions so exodus programmers can catch mv exceptions generally
 class DLL_PUBLIC MVException
 {
 public: MVException(const var& description);
 		var description;
+		var stack;
 };
 
 //individual exceptions are made public so exodus programmers can catch specific errors or even stop/abort/debug if they want
@@ -1704,7 +1713,7 @@ class DLL_PUBLIC MVInvalidPointer       : public MVException {public: MVInvalidP
 class DLL_PUBLIC MVDBException          : public MVException {public: MVDBException          (const var& var1    );};
 class DLL_PUBLIC MVNotImplemented       : public MVException {public: MVNotImplemented       (const var& var1    );};
 class DLL_PUBLIC MVDebug                : public MVException {public: MVDebug                (const var& var1 DEFAULTNULL);};
-class DLL_PUBLIC MVStop                 : public MVException {public: MVStop                 (const var& var1 DEFAULTNULL);};
+//class DLL_PUBLIC MVStop                 : public MVException {public: MVStop                 (const var& var1 DEFAULTNULL);};
 class DLL_PUBLIC MVAbort                : public MVException {public: MVAbort                (const var& var1 DEFAULTNULL);};
 class DLL_PUBLIC MVArrayDimensionedZero : public MVException {public: MVArrayDimensionedZero (                   );};
 class DLL_PUBLIC MVArrayIndexOutOfBounds: public MVException {public: MVArrayIndexOutOfBounds(const var& var1    );};

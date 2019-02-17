@@ -60,8 +60,8 @@ int main(int exodus__argc, char *exodus__argv[]) \
 	} \
 	catch (MVException exceptionx) \
 	{ \
-		print(exceptionx.description); \
-		printl(" - Aborting."); \
+                printl(exceptionx.description, " - Aborting."); \
+                printl(exceptionx.stack.convert(FM,L"\n")); \
 		exit(999); \
 	} \
 	return 0; \

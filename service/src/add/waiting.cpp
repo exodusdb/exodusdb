@@ -20,6 +20,10 @@ function main() {
 
         for (var ii=0;ii<=(1000/sleepms*waitsecs);ii++) {
 
+		//quit if any key pressed
+		if (var().hasinput())
+			break;
+
 		//look for required file
                 var filenames=oslist(filename);
 

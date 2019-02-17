@@ -71,6 +71,11 @@ bool var::eof() const
 	return (std::cin.eof());
 }
 
+bool var::hasinput() {
+	bool haskey(void);
+	return haskey();
+}
+
 //for nchars, use int instead of var to trigger error at point of calling not here
 bool var::input(const var& prompt, const int nchars)
 {
@@ -84,36 +89,58 @@ bool var::input(const var& prompt, const int nchars)
 		prompt.output();
 		std::cout<<std::flush;
 	}
+
 	if (nchars<0) {
+
 		var_str=L"";
 		var_typ=pimpl::VARTYP_STR;
-		//while (true) {
-			int nc;
-var(L"before peek").outputl();
-			nc=std::cin.peek();
-var(L"after peek").outputl();
 
-var(nc).oconv(L"HEX").outputl(L"peek=");
-var(EOF).oconv(L"HEX").outputl(L"EOF=");
-//			if (nc==EOF)
-//				break;
-var(EOF).oconv(L"HEX").outputl();
-var(nc).oconv(L"HEX").outputl();
+		char char1;
+		while (true) {
+			int nc;
 			//TODO consider converting from say utf8
-			char char1;
-var(L"aaaa").outputl();
-			std::cin.get(char1);
-var(L"bbb").outputl();
+			int getkey(void);
+			//quit if error or EOF
+			char1=getkey();
+			if (char1<0)
+				break;
 			var_str+=char1;
-		//}
-var(L"ccc").outputl();
-		return true;
+		}
+		return var_str.length()>0;
+	} else if (nchars>0) {
+
+		var_str=L"";
+		var_typ=pimpl::VARTYP_STR;
+
+		char char1;
+		while (true) {
+			int nc;
+			//TODO consider converting from say utf8
+			int getkey(void);
+			char1=getkey();
+
+			//try again after a short delay if no key and not enough characters yet
+			if (char1<0) {
+				this->ossleep(10);
+				continue;
+			}
+
+			//Enter/Return key always returns whatever has been entered so far
+			if (char1<0 || char1==0x0d)
+				break;
+
+			//add the character to the output
+			var_str+=char1;
+
+			//quit if got the desired number of characters
+			if (var_str.length()>=nchars)
+				break;
+
+		}
+		return var_str.length()>0;
 	}
 
-	return input();
-
-	//evade warning: unused parameter
-	if (nchars) {};
+	return this->input();
 }
 
 bool var::input()
@@ -121,31 +148,21 @@ bool var::input()
 	THISIS(L"bool var::inputl()")
 	THISISDEFINED()
 
-	std::string tempstr;
-
-	if (std::cin.eof())
-	{
-		var_str=L"";
-		var_typ=pimpl::VARTYP_STR;
-		return false;
-	}
-
-	std::getline(std::cin,tempstr);
+	var_str=L"";
+	var_typ=pimpl::VARTYP_STR;
 
 	//pressing crtl+d indicates eof on unix or ctrl+Z on dos/windows?
 	if (std::cin.eof())
-	{
-		var_str=L"";
-		var_typ=pimpl::VARTYP_STR;
 		return false;
-	}
+
+	std::string temp_std_string1;
+	std::getline(std::cin,temp_std_string1);
 
 	//convert from utf8 to internal format - utf16 or utf32 depending on platform
 	//var_str=wstringfromUTF8((UTF8*)tempstr.data(),(int)tempstr.length());
-	var_str=boost::locale::conv::utf_to_utf<wchar_t>(tempstr);
-	var_typ=pimpl::VARTYP_STR;
+	var_str=boost::locale::conv::utf_to_utf<wchar_t>(temp_std_string1);
 
-	return true;
+	return var_str.length()>0;
 }
 
 void var::stop(const var& text) const

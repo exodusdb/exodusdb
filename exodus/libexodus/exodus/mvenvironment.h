@@ -142,7 +142,7 @@ public:
 
 	var TCLSTACK = L"";
 	//INTCONST=keyboard constants 1:esc 2:f5 7:f10
-	var INTCONST = L"0x1A" _FM_ L"{f5?}" _FM_ _FM_ _FM_ _FM_ _FM_ "{f10?}";
+	var INTCONST = L"\x1b" _FM_ L"{f5?}" _FM_ _FM_ _FM_ _FM_ _FM_ "{f10?}";
 	var PRIORITYINT = L"";
 
 	//old scratch variables used for various buffering

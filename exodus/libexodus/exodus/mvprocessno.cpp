@@ -1,10 +1,19 @@
-#include <stdlib.h>
+//#include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <errno.h>
+//#include <errno.h>
 #include <stdio.h>
+#include <string>
 
 namespace exodus {
+
+//here because unistd.h available
+std::string mvgethostname() {
+	char hostname[1024];
+	hostname[1023] = '\0';
+	gethostname(hostname, 1023);
+	return hostname;
+}
 
 int getprocessno(const char* filename, int* fd)
 {
@@ -27,11 +36,11 @@ int getprocessno(const char* filename, int* fd)
 		fl.l_len = 1;
 		if (fcntl(*fd, F_SETLK, &fl) == -1) {
 
-			if (errno == EACCES || errno == EAGAIN) {
-				//printf("Already locked by another process\n");
-        		} else {
-				/* Handle unexpected error */;
-			}
+//			if (errno == EACCES || errno == EAGAIN) {
+//				//printf("Already locked by another process\n");
+//        		} else {
+//				/* Handle unexpected error */;
+//			}
 
 		} else {
 
