@@ -1217,6 +1217,7 @@ private:
 	bool locateat(const std::wstring& target,size_t start_pos,size_t end_pos,const wchar_t order,const var& usingchar,var& setting)const;
 
 	const std::string to_path_string() const;
+	const std::string to_cmd_string() const;
 
 	int localeAwareCompare(const std::wstring& str1, const std::wstring& str2) const;
 	var& localeAwareChangeCase(const int lowerupper);

@@ -7,7 +7,7 @@ function main() {
 	//waiting filepattern seconds milliseconds globalend newfilename newfilepath portno?
 	//eg for a database called devdtest and process 3
 	//waiting ../data/devdtest/*.1 10 10 ../../global.end neos0000.3 ../data/devdtest/ 5700
-        var filename=field(SENTENCE," ",2);
+        var filepattern=field(SENTENCE," ",2);
         var waitsecs=field(SENTENCE," ",3);
         var sleepms=field(SENTENCE," ",4);
         var globalendfilename=field(SENTENCE," ",5);
@@ -25,31 +25,32 @@ function main() {
 			break;
 
 		//look for required file
-                var filenames=oslist(filename);
+                var filenames=oslist(filepattern);
 
-		//do loop if no file
-                if (!filenames) {
+                if (filenames) {
 
-		//if exists and not renaming then quit
-                } else if (!newfilename) {
-                        break;
+			//if not renaming then quit
+                	if (!newfilename)
+                        	break;
 
-		//if exists and renaming then rename and quit, or process loop if cannot rename
-		} else {
+			//delete any existing newfilename in case left from some crash
+			if (osfile(newfilename)) {
+				if (not osdelete(newfilename))
+				printl("Could not delete existing file ", newfilename);
+			}
 
-	                var oldfilename=filenames.a(1);
-	                printl("Found file ",oldfilename);
+			//if renaming then rename and quit, or process loop if cannot rename
 
 			//rename and quit
+	                var oldfilename=filepattern.fieldstore(SLASH,-1,1,filenames.a(1));
 	                if (osrename(oldfilename,newfilename)) {
-	                        printl("File renamed from ",oldfilename, " to ", newfilename);
+	                        //printl("File renamed from ",oldfilename, " to ", newfilename);
 	                        break;
-
-			//process another loop if cannot rename, presumably because another process renamed first
-	                } else {
-	                        printl("File not renamed from ",oldfilename, " to ", newfilename);
-	                        //printl("Get Last Error reports %d\n", GetLastError ());
 			}
+
+			printl("File not renamed from ",oldfilename, " to ", newfilename);
+	                //printl("Get Last Error reports %d\n", GetLastError ());
+
 		}
 
                 //quit if database.END exists

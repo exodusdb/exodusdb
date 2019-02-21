@@ -915,8 +915,7 @@ var var::osshell() const
 	THISISSTRING()
 
 	//breakoff();
-	//while converting from DOS convert all backslashes to forward slashes on linux or leave as if exodus on windows
-	int shellresult=system(this->to_path_string().c_str());
+	int shellresult=system(this->to_cmd_string().c_str());
 	//breakon();
 
 	return shellresult;
@@ -934,12 +933,12 @@ var var::osshellread() const
 	//fflush?
 
 	//"r" means read
-	std::FILE *cmd=popen(this->to_path_string().c_str(), "r");
+	std::FILE *cmd=popen(this->to_cmd_string().c_str(), "r");
 	//return a code to indicate program failure. but can this ever happen?
 	if (cmd==NULL)
 		return 1;
 	//TODO buffer overflow check
-    char cstr1[1024]={0x0};
+	char cstr1[1024]={0x0};
 	while (std::fgets(cstr1, sizeof(cstr1), cmd) !=NULL) {
 		//std::printf("%s\n", result);
 		//cannot trust that standard input is convertable from utf8
@@ -966,7 +965,7 @@ var var::osshellwrite(const var& writestr) const
 	ISSTRING(writestr)
 
 	//"w" means read
-	std::FILE *cmd=popen(this->to_path_string().c_str(), "w");
+	std::FILE *cmd=popen(this->to_cmd_string().c_str(), "w");
 	//return a code to indicate program failure. but can this ever happen?
 	if (cmd==NULL)
 		return 1;
@@ -1457,6 +1456,16 @@ const std::string var::to_path_string() const
 	}
 }
 
+const std::string var::to_cmd_string() const{
+
+	//while converting from DOS convert all backslashes in first word to forward slashes on linux or leave as if exodus on windows
+
+	if (this->index(L"\\"))
+		this->errputl(L"WARNING BACKSLASHES IN OS COMMAND:");
+
+	return this->field(L" ",1).to_path_string() + " " + this->field(L" ",2,999999).toString();
+}
+
 var var::osfile() const
 {
 	THISIS(L"var var::osfile() const")
@@ -1468,10 +1477,12 @@ var var::osfile() const
 		//boost 1.33 throws an error with files containing ~ or $ chars but 1.38 doesnt
 		stdfs::path pathx(this->to_path_string().c_str());
 
-		if (!stdfs::exists(pathx)) return L"";
+		if (!stdfs::exists(pathx))
+			return L"";
 		//is_regular is only in boost > 1.34
-			//if (!stdfs::is_regular(pathx)) return L"";
-		if (stdfs::is_directory(pathx)) return L"";
+		//if (!stdfs::is_regular(pathx)) return L"";
+		if (stdfs::is_directory(pathx))
+			return L"";
 
 		//get last write datetime
 		std::time_t last_write_time=std::chrono::system_clock::to_time_t(stdfs::last_write_time(pathx));
@@ -1581,16 +1592,44 @@ var var::osdir() const
 	};
 }
 
-var var::oslist(const var& path, const var& spec, const int mode) const
+var var::oslist(const var& path0, const var& spec0, const int mode) const
 {
 	THISIS(L"var var::oslist(const var& path, const var& spec, const int mode) const")
 	THISISDEFINED()
-	ISSTRING(path)
-	ISSTRING(spec)
+	ISSTRING(path0)
+	ISSTRING(spec0)
 
 	//returns an fm separated list of files and/or folders
 
 	//http://www.boost.org/libs/filesystem/example/simple_ls.cpp
+
+	var path;
+	var spec;
+	if (spec0.length()) {
+		path=path0;
+		spec=spec0;
+	}
+	//file globbing can and must be passed as tail end of path
+	//perhaps could use <glob.h> in linux instead of regex
+	else {
+		spec=path0.field2(SLASH,-1);
+		path=path0.substr(1,path0.length()-spec.length());
+
+                //escape all the regex special characters that are found in the strint
+                //except the * ? which are glob special characters
+                //regex concept here is ([specialchars]) replace with \$1 where $1 will be any of the special chars
+                //note inside brackets, only  ^ - and ] are special characters inside [] char alternative
+                //to include a ] in the list of characters inside [] it must be the first character like []otherchars]
+                //of course all back slashes must be doubled up in c++ source code
+                spec.swapper(L"([][\\\\(){}|^$.+])",L"\\\\$1",L"r");
+
+                //glob * becomes .* in regex matching any number of any characters
+                spec.swapper(L"*",L".*");
+
+                //glob ? becomes . in regex matching any one character
+                spec.swapper(L"?",L".");
+
+	}
 
 	bool filter=false;
 	//std_boost::wregex re;
@@ -1620,7 +1659,6 @@ var var::oslist(const var& path, const var& spec, const int mode) const
 		getfiles=false;
 
 	var filelist=L"";
-
 #if BOOST_FILESYSTEM_VERSION >= 3 or defined(C17)
 #define LEAForFILENAME path().filename().string()
 #define COMMAstdfsNATIVE
@@ -1631,7 +1669,7 @@ var var::oslist(const var& path, const var& spec, const int mode) const
 	//get handle to folder
 	//wpath or path before boost 1.34
 	//stdfs::wpath full_path(stdfs::initial_path<stdfs::wpath>());
-    //full_path = stdfs::system_complete(stdfs::wpath(toTstring(path), stdfs::native ));
+	//full_path = stdfs::system_complete(stdfs::wpath(toTstring(path), stdfs::native ));
 	//stdfs::path full_path(stdfs::initial_path());
 	//initial_path always return the cwd at the time it is first called which is almost useless
 	stdfs::path full_path(stdfs::current_path());
@@ -1645,21 +1683,21 @@ var var::oslist(const var& path, const var& spec, const int mode) const
 		return filelist;
 
 	//errno=0;
-    //stdfs::wdirectory_iterator end_iter;
-    //for (stdfs::wdirectory_iterator dir_itr(full_path );
-    stdfs::directory_iterator end_iter;
-    for (stdfs::directory_iterator dir_itr(full_path );
-          dir_itr != end_iter;
-          ++dir_itr )
-    {
-	try
-	{
+	//stdfs::wdirectory_iterator end_iter;
+	//for (stdfs::wdirectory_iterator dir_itr(full_path );
+	stdfs::directory_iterator end_iter;
+	for (stdfs::directory_iterator dir_itr(full_path );
+		dir_itr != end_iter;
+		++dir_itr )
+		{
+		try
+		{
 
 		//dir_itr->path().leaf()  changed to dir_itr->leaf() in three places
 		//also is_directory(dir_itr->status()) changed to is_directory(*dir_itr)
 		//to avoid compile errors on boost 1.33
 		//http://www.boost.org/doc/libs/1_33_1/libs/filesystem/doc/index.htm
-        //skip unwanted items
+		//skip unwanted items
 		if (filter&&!std_boost::regex_match(dir_itr->LEAForFILENAME, re))
 			continue;
 

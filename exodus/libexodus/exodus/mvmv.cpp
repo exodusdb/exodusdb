@@ -159,7 +159,13 @@ var& var::fieldstorer(const var& sepchar0,const int fieldnx,const int nfieldsx, 
 		return *this;
 	}
 
-	int fieldno=fieldnx>0?fieldnx:1;
+	int fieldno;
+	if (fieldnx>0)
+		fieldno=fieldnx;
+	else if (fieldnx<0)
+		fieldno=this->count(sepchar0) + 1 + fieldnx + 1;
+	else
+		fieldno=1;
 
 	int nfields=nfieldsx>0?nfieldsx:-nfieldsx;
 
