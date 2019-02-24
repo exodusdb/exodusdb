@@ -3,6 +3,13 @@ libraryinit()
 
 function main() {
 
+	//syntax is:
+	//makefile volumename filename
+	//or
+	//makefile filename
+
+	//volumename is ignored
+
 	var command=COMMAND.convert(FM," ").lcase();
 
 	printl(command);
@@ -13,7 +20,7 @@ function main() {
 
 	printl(command);
 
-	//something like DATAVOL\NEOS0001 will be ignored
+	//something like DATAVOL\NEOS0001 or REVBOOT will be ignored
 	var volname=field(command," ",2);
 
 	var filename=field(command," ",3);

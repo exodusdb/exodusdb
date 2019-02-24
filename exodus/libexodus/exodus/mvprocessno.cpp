@@ -15,6 +15,42 @@ std::string mvgethostname() {
 	return hostname;
 }
 
+bool processno_islocked2(int processno, int* fd) {
+
+		/* Make a non-blocking request to place a write lock
+		on 1 byte at offset processno of testfile */
+
+		struct flock fl;
+		fl.l_type = F_WRLCK;
+		fl.l_whence = SEEK_SET;
+		fl.l_start = processno;
+		fl.l_len = 1;
+
+		//process cannot be locked, return true to indicate processno is active
+		if (fcntl(*fd, F_SETLK, &fl) == -1) {
+
+			if (errno == EACCES || errno == EAGAIN) {
+				//printf("Already locked by another process\n");
+        		} else {
+				/* Handle unexpected error */;
+			}
+			return true;
+
+		//process can be locked, return false to indicate processno is active
+		} else {
+
+			//unlock it immediately
+			fl.l_type = F_UNLCK;
+			fl.l_whence = SEEK_SET;
+			fl.l_start = processno;
+			fl.l_len = 1;
+			if (fcntl(*fd, F_SETLK, &fl) == -1) {
+            			/* Handle error */;
+			}
+			return false;
+		}
+}
+
 int getprocessno(const char* filename, int* fd)
 {
 	struct flock fl;
@@ -28,7 +64,7 @@ int getprocessno(const char* filename, int* fd)
 	for (int ii=1;ii<1000;ii++) {
 
 		/* Make a non-blocking request to place a write lock
-		on bytes 100-109 of testfile */
+		on 1 byte at offset processno of testfile */
 
 		fl.l_type = F_WRLCK;
 		fl.l_whence = SEEK_SET;

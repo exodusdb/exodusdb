@@ -13,6 +13,11 @@ function main() {
         mv.labelledcommon[fin_common_no]=new fin_common;
         mv.labelledcommon[agy_common_no]=new agy_common;
 
+	createfile("VOC");
+	createfile("DEFINITIONS");
+	createfile("PROCESSES");
+	createfile("REQUESTLOG");
+
         //batch mode
         SYSTEM.r(33,1,"1");
 

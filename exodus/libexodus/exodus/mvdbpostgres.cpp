@@ -194,19 +194,19 @@ void var::setlasterror(const var& msg) const
 	//You have heap corruption somewhere -- someone is running off the end of an array or dereferencing an invalid pointer or using some object after it has been freed.
 	//EVADE error for now by commenting next line
 
-	//tss_pglasterror.reset(new var(msg));
+	tss_pglasterror.reset(new var(msg));
 }
 
 void var::setlasterror() const
 {
-	//tss_pglasterror.reset();
+	tss_pglasterror.reset();
 }
 
 var var::getlasterror() const
 {
-	//if (tss_pglasterror.get())
-	//	return *tss_pglasterror.get();
-	//else
+	if (tss_pglasterror.get())
+		return *tss_pglasterror.get();
+	else
 		return L"";
 }
 
@@ -581,7 +581,7 @@ bool var::open(const var& filename, const var& connection)
 		int		paramFormats[1];
 
 		//$1=table_name
-		std::string filename2=filename.lcase().toString();
+		std::string filename2=filename.lcase().convert(L".",L"_").toString();
 		paramValues[0] = filename2.c_str();
 		paramLengths[0] = int(filename2.length());
 		paramFormats[0] = 1;//binary
@@ -669,7 +669,7 @@ bool var::readv(const var& filehandle, const var& key, const int fieldno)
 	if (!read(filehandle,key))
 		return false;
 
-	var_str=a(fieldno).var_str;
+	var_str=this->a(fieldno).var_str;
 	return true;
 }
 
@@ -682,7 +682,7 @@ bool var::read(const var& filehandle,const var& key)
 
 	//asking to read DOS file! do osread using key as osfilename!
 	if (filehandle == L"DOS") {
-		(*this).osread(key.convert(L"\\",SLASH));
+		(*this).osread(key);//.convert(L"\\",SLASH));
 		return true;
 	}
 
@@ -706,7 +706,7 @@ bool var::read(const var& filehandle,const var& key)
 	paramLengths[0]=int(key2.length());
 	paramFormats[0]=1;
 
-	var sql=L"SELECT data FROM " ^ filehandle ^ L" WHERE key = $1";
+	var sql=L"SELECT data FROM " ^ filehandle.convert(L".",L"_") ^ L" WHERE key = $1";
 
 	//get filehandle specific connection or fail
 	PGconn* thread_pgconn = (PGconn*) filehandle.connection();
@@ -729,7 +729,7 @@ bool var::read(const var& filehandle,const var& key)
 	if (PQresultStatus(pgresult) != PGRES_TUPLES_OK)
  	{
 		var sqlstate = var(PQresultErrorField(pgresult, PG_DIAG_SQLSTATE));
-		var errmsg=L"read(" ^ filehandle.quote() ^ L", " ^ key.quote() ^ L")";
+		var errmsg=L"read(" ^ filehandle.convert(L".",L"_").quote() ^ L", " ^ key.quote() ^ L")";
 		if (sqlstate == L"42P01")
 			errmsg ^= L" File doesnt exist";
 		else
@@ -794,7 +794,7 @@ var var::lock(const var& key) const
 	THISISDEFINED()
 	ISSTRING(key)
 
-	std::wstring fileandkey=var_str;
+	std::wstring fileandkey=this->convert(L".",L"_").var_str;
 	fileandkey.append(L" ");
 	fileandkey.append(key.var_str);
 
@@ -1069,7 +1069,7 @@ bool var::write(const var& filehandle, const var& key) const
 
 	//asking to write DOS file! do osread!
 	if (filehandle == L"DOS") {
-		this->oswrite(key.convert(L"\\",SLASH));
+		this->oswrite(key);//.convert(L"\\",SLASH));
 		return true;
 	}
 
@@ -1093,7 +1093,7 @@ bool var::write(const var& filehandle, const var& key) const
 
 	var sql;
 
-	sql = L" INSERT INTO " ^ filehandle ^ L" (key,data) values( $1 , $2)";
+	sql = L" INSERT INTO " ^ filehandle.convert(L".",L"_") ^ L" (key,data) values( $1 , $2)";
 	sql ^= L" ON CONFLICT (key)";
 	sql ^= L" DO UPDATE SET data = $2";
 
@@ -1161,7 +1161,7 @@ bool var::updaterecord(const var& filehandle,const var& key) const
 	paramLengths[1] = int(data2.length());
 	paramFormats[1] = 1;//binary
 
-	var sql = L"UPDATE " ^ filehandle ^ L" SET data = $2 WHERE key = $1";
+	var sql = L"UPDATE " ^ filehandle.convert(L".",L"_") ^ L" SET data = $2 WHERE key = $1";
 
 	PGconn* thread_pgconn=(PGconn*) filehandle.connection();
 	if (!thread_pgconn)
@@ -1234,7 +1234,7 @@ bool var::insertrecord(const var& filehandle,const var& key) const
 	paramLengths[1] = int(data2.length());
 	paramFormats[1] = 1;//binary
 
-	var sql = L"INSERT INTO " ^ filehandle ^ L" (key,data) values( $1 , $2)";
+	var sql = L"INSERT INTO " ^ filehandle.convert(L".",L"_") ^ L" (key,data) values( $1 , $2)";
 
 	PGconn* thread_pgconn=(PGconn*) filehandle.connection();
 	if (!thread_pgconn)

@@ -646,7 +646,7 @@ baddict:
 			if (indictmd)
 				str_libname = "dict_voc";
 			else
-				str_libname = DICT.lcase().toString();
+				str_libname = DICT.lcase().convert(L".",L"_").toString();
 			std::string str_funcname = (L"exodusprogrambasecreatedelete_" ^ dictid.lcase()).toString();
 			if (!dict_exodusfunctorbase_.initsmf(str_libname.c_str(),str_funcname.c_str()))
 				throw MVException(

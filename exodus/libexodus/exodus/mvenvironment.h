@@ -68,6 +68,8 @@ public:
 
 	bool init(const int threadno);
 
+	bool processno_islocked(int processno);
+
 //keep in sync both 1) declaration in class and 2) construction initialisation
 
 	//per user

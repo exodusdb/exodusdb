@@ -38,6 +38,8 @@
 namespace exodus {
 
 int getprocessno(const char* filename, int* fd);
+bool processno_islocked2(int processno, int* fd);
+
 void releaseprocess(int* fd);
 std::string mvgethostname();
 
@@ -89,6 +91,10 @@ bool MvEnvironment::init(const int threadno) {
 
 	return true;
 
+}
+
+bool MvEnvironment::processno_islocked(int processno) {
+	return processno_islocked2(processno, &processnolockfd);
 }
 
 }	//of namespace exodus
