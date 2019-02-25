@@ -187,6 +187,7 @@ namespace exodus {
 
 //leading and trailing _ wchar* versions of classic pick delimiters
 //_RM_, _RM and RM_ versions (wchar*, char* and wchar respectively)
+//also in ADECOM
 #define _RM_ L"\u07FF"	//Record Mark
 #define _FM_ L"\u07FE"	//Field Mark
 #define _VM_ L"\u07FD"	//Value Mark
@@ -870,7 +871,7 @@ public:
 	//STANDARD INPUT
 	bool hasinput();
 	bool input();
-	bool input(const var& prompt, const int int1=0);
+	bool input(const var& prompt, const int nchars=0);
 	bool eof() const;
 
 #if defined __MINGW32__
@@ -885,10 +886,10 @@ public:
 	//VARIABLE CONTROL
 	bool assigned() const;
 	bool unassigned() const;
-	var& transfer(var& var2);
+	var& transfer(var& destinationvar);
 	const var& exchange(const var& var2) const;
-	var& clone(var& var2);
-/*no implemented yet
+	var clone() const;
+	/*no implemented yet
 	var addressof() const;
 	void clear();
 	void clearcommon();
@@ -896,7 +897,8 @@ public:
 //	var bitor(const var) const;
 //	var bitxor(const var) const;
 	var bitnot() const;
-*/
+	*/
+
 	//MATH/BOOLEAN
 	var abs() const;
 	var mod(const var& divisor) const;
@@ -989,6 +991,10 @@ public:
 	var fieldstore(const var& sepchar,const int fieldno,const int nfields,const var& replacement) const;
 	var hash(const unsigned long long modulus=0) const;
 	var unique() const;
+
+	//CONVERT TO DIM
+	//see also dim.split()
+	dim split() const;
 
 	//STRING EXTRACTION
 	//[x,y]
@@ -1405,7 +1411,7 @@ public:
 
 	bool redim(int nrows, int ncols=1);
 
-	var unparse() const;
+	var join() const;
 
 	// parenthesis operators often come in pairs
 	var& operator() (int rowno, int colno=1);
@@ -1422,22 +1428,23 @@ public:
 	//http://www.gotw.ca/publications/mill18.htm
 	~dim();
 
-	dim& operator= (const dim& dim1);
+	dim& operator= (const dim& sourcedim);
 
 	//=var
 	//The assignment operator should always return a reference to *this.
 	//cant be (const var& var1) because seems to cause a problem with var1=var2 in function parameters
 	//unfortunately causes problem of passing var by value and thereby unnecessary contruction
 	//see also ^= etc
-	dim& operator= (const var& var1);
-	dim& operator= (const int int1);
-    dim& operator= (const double dbl1);
+	dim& operator= (const var& sourcevar);
+	dim& operator= (const int sourceint);
+	dim& operator= (const double sourcedbl);
 
 	//allow default construction for class variables later resized in class methods
 	dim();
 
+	//see also var::split
 	//return the number of fields
-	var parse(const var& var1);
+	var split(const var& var1);
 
 	bool read(const var& filehandle, const var& key);
 
@@ -1447,11 +1454,14 @@ public:
 	//dim dimarray2();
 	//
 
+	//move constructor
+	dim(dim&& sourcedim) noexcept;
+
 private:
 
-	// Disable copy constructor (why?)
+	// Disable copy constructor (why? to stop inefficient copies?)
 	// Copy constructor
-	dim(const dim& m);
+	dim(const dim& sourcedim);
 
 	dim& init(const var& var1);
 

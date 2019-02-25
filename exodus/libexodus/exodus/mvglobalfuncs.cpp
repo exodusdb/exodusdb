@@ -635,14 +635,19 @@ DLL_PUBLIC bool matwrite(const dim& dimrecord, const var& filehandle,const var& 
 	return dimrecord.write(filehandle,key);
 }
 
-DLL_PUBLIC var matparse(const var& dynarray, dim& intodimarray)
+DLL_PUBLIC var split(const var& sourcevar, dim& destinationdim)
 {
-	return intodimarray.parse(dynarray);
+	return destinationdim.split(sourcevar);
 }
 
-DLL_PUBLIC var matunparse(const dim& dimarray)
+DLL_PUBLIC dim split(const var& sourcevar)
 {
-	return dimarray.unparse();
+	return sourcevar.split();
+}
+
+DLL_PUBLIC var join(const dim& sourcedim)
+{
+	return sourcedim.join();
 }
 
 DLL_PUBLIC var chr(const var& integer)

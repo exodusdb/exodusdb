@@ -924,38 +924,38 @@ var& var::splicer(const int start1, const var& newstr)
 
 }
 
-var& var::transfer(var& var2)
+var& var::transfer(var& destinationvar)
 {
-	THISIS(L"var& var::transfer(var& var2)")
+	THISIS(L"var& var::transfer(var& destinationvar)")
 	//transfer even unassigned vars (but not uninitialised ones)
 	THISISDEFINED()
-	ISDEFINED(var2)
+	ISDEFINED(destinationvar)
 
-	var_str.swap(var2.var_str);
-	var2.var_typ=var_typ;
-	var2.var_int=var_int;
-	var2.var_dbl=var_dbl;
+	destinationvar.var_str.swap(var_str);
+	destinationvar.var_typ=var_typ;
+	destinationvar.var_int=var_int;
+	destinationvar.var_dbl=var_dbl;
 
 	var_str=L"";
 	var_int=0;
 	var_typ=pimpl::VARTYP_INTSTR;
 
-	return var2;
+	return destinationvar;
 }
 
-var& var::clone(var& var2)
+var var::clone() const
 {
-	THISIS(L"var& var::clone(var& var2)")
+	THISIS(L"var var::clone(var& destinationvar)")
 	//clone even unassigned vars (but not uninitialised ones)
 	THISISDEFINED()
-	ISDEFINED(var2)
 
-	var_typ=var2.var_typ;
-	var_str=var2.var_str;
-	var_int=var2.var_int;
-	var_dbl=var2.var_dbl;
+	var clone;
+	clone.var_typ=var_typ;
+	clone.var_str=var_str;
+	clone.var_int=var_int;
+	clone.var_dbl=var_dbl;
 
-	return var2;
+	return clone;
 }
 
 //kind of const needed in calculatex

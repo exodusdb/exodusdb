@@ -35,18 +35,31 @@ THE SOFTWARE.
 namespace exodus
 {
 
-//includes dim::matparse
+//includes dim::split
 
 //and var::field,field2,locate,extract,erase,replace,insert,substr,splice,remove
 
 ///////
-//PARSE
+//SPLIT
 ///////
 
-//var.matparse(dimarray2)
-var dim::parse(const var& var1)
+//dim=var.split()
+dim var::split() const {
+	THISIS(L"var var::split() const")
+	THISISSTRING()
+
+	//should use dim's move constructor to place the array directly in place avoiding a slow deep copy
+	//and perhaps even copy/move elision to not even copy the base dim object (which contains a pointer to an array of vars)
+	dim tempdim2;
+	tempdim2.split(*this);
+	return tempdim2;
+}
+
+//number=dim.split(varstr)
+//returns number of elements
+var dim::split(const var& var1)
 {
-	//THISIS(L"var dim::parse(const var& var1)")
+	//THISIS(L"var dim::split(const var& var1)")
 	//ISSTRING(var1)
 
 	(*this).redim(var1.count(FM_)+1);

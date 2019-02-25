@@ -245,8 +245,9 @@ DLL_PUBLIC var xlate(const var& filename, const var& key, const var& fieldno, co
 DLL_PUBLIC var xlate(const var& filename, const var& key, const var& fieldno, const var& mode);
 DLL_PUBLIC var remove(const var& fromstr, var& startx, var& delimiterno);
 
-DLL_PUBLIC var matparse(const var& dynarray, dim& intodimarray);
-DLL_PUBLIC var matunparse(const dim& dimarray);
+DLL_PUBLIC var split(const var& sourcevar, dim& destinationdim);
+DLL_PUBLIC dim split(const var& sourcevar);
+DLL_PUBLIC var join(const dim& sourcedim);
 
 DLL_PUBLIC var replace(const var& instring, const int fieldno, const int valueno, const int subvalueno, const var& replacement);
 DLL_PUBLIC var replace(const var& instring, const int fieldno, const int valueno, const var& replacement);

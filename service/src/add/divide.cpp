@@ -8,14 +8,14 @@ function main(in numerators, in denominator, in sep) {
 		return numerators;
 	}
 	dim output;
-	var nn=output.parse(numerators.convert(sep,FM));
+	var nn=output.split(numerators.convert(sep,FM));
 	for (int ii=1;ii<nn;++ii) {
 		//null or zero elements remain null or zero
 		if (output(ii)) {
 			output(ii)=output(ii)/denominator;
 		}
 	}
-	return output.unparse().convert(FM,sep);
+	return output.join().convert(FM,sep);
 }
 
 

@@ -1599,7 +1599,7 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
                 //sqlexpression=L"exodus_extract_sort(" ^  fileexpression(mainfilename, filename,L"key") ^ L")";
                 sqlexpression=L"exodus_extract_sort(" ^ mainfilename ^ L".key,0,0,0)";
             else
-                sqlexpression=L"convert_from(" ^ fileexpression(mainfilename, filename,mainfilename ^ L".key") ^ L", 'UTF8')";
+                sqlexpression=L"convert_from(" ^ fileexpression(mainfilename, filename, L"key") ^ L", 'UTF8')";
 
 			var keypartn=dictrec.a(5);
 			if (keypartn)
@@ -2151,6 +2151,11 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 			word1=getword(remainingsortselectclause, true);
 			ucword=word1.ucase();
 
+			if (ucword==L"NOT")
+			{
+				whereclause ^= L" NOT ";
+				ucword=getword(remainingsortselectclause);
+			}
 			if (ucword==L"BETWEEN")
 			{
 				//get and append "from" value
@@ -2198,6 +2203,10 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 			{
 
 				word1=getword(remainingsortselectclause);
+				// _ and % are like ? and * in globbing in sql LIKE
+				//if present in the search criteria, they need to be escaped with TWO backslashes.
+				word1.swapper(L"_",L"\\\\_");
+				word1.swapper(L"%",L"\\\\%");
 				if (endingpercent)
 				{
 					word1.swapper(L"'" ^ FM, L"%'" ^ FM);

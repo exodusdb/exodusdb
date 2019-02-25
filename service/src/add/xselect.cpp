@@ -10,7 +10,7 @@ function main(in cmd) {
 		printl();
 		print(cmd, ":");
 	}
-	var().select(cmd);
+	select(cmd);
 	if (SYSTEM.a(33)) {
 		print("done");
 	}

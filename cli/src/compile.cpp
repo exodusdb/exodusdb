@@ -454,7 +454,7 @@ function main()
 		//get file text
 		if (verbose)
 			print("sourcefilename=");
-		if (not silent)
+		else if (not silent)
 			printl(srcfilename);
 
 		if (not osfile(srcfilename)) {
@@ -528,7 +528,7 @@ function main()
 		var headertext="";
 		converter(text,crlf,FM^FM);
 		dim text2;
-		var nlines=matparse(text,text2);
+		var nlines=split(text,text2);
 
 #if EXODUS_EXPORT_USING_DEF
 		var deftext="";
@@ -1274,7 +1274,7 @@ function set_environment() {
 		//printl(result);
 
 		dim vars;
-		var nvars=matparse(result.converter("\r\n",FM^FM),vars);
+		var nvars=split(result.converter("\r\n",FM^FM),vars);
 		for (var varn=1;varn<=nvars;++varn) {
 			ossetenv(
 				field(vars(varn),'=',1)

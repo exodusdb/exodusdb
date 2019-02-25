@@ -52,6 +52,14 @@ dim::~dim()
 	delete[] data_;
 }
 
+//move contructor
+dim::dim(dim&& sourcedim) noexcept {
+	nrows_=sourcedim.nrows_;
+	ncols_=sourcedim.ncols_;
+	initialised_=sourcedim.ncols_;
+	data_=sourcedim.data_;
+}
+
 dim::dim(int rows, int cols)
 	: nrows_ (rows)
 	, ncols_ (cols)
@@ -72,7 +80,8 @@ bool dim::read(const var& filehandle, const var& key)
 	var temprecord;
 	if (!temprecord.read(filehandle,key))
 		return false;
-	(*this).parse(temprecord);
+	//this->split(temprecord);
+	(*this)=temprecord.split();
 	return true;
 }
 
@@ -82,7 +91,7 @@ bool dim::write(const var& filehandle, const var& key) const
 	ISSTRING(filehandle)
 	ISSTRING(key)
 
-	var temprecord=(*this).unparse();
+	var temprecord=this->join();
 	return temprecord.write(filehandle,key);
 }
 
@@ -147,41 +156,42 @@ var& dim::operator() (int rowno, int colno) const
 
 }
 
-dim& dim::init(const var& var1)
+dim& dim::init(const var& sourcevar)
 {
 	if (!initialised_)
 		throw MVArrayNotDimensioned();
 	int arraysize=nrows_*ncols_+1;
 	for (int ii=0;ii<arraysize;ii++)
-		data_[ii]=var1;
+		data_[ii]=sourcevar;
 	return *this;
 }
 
-dim& dim::operator=(const dim& dim2)
+dim& dim::operator=(const dim& sourcedim)
 {
-
 	//cannot copy an undimensioned array
-	if (!dim2.initialised_)
+	if (!sourcedim.initialised_)
 		throw MVArrayNotDimensioned();
 
 	//can copy to an undimensioned array (duplicates the dimensions)
 	if (!initialised_)
 	{
-		(*this).redim(dim2.nrows_,dim2.ncols_);
+		(*this).redim(sourcedim.nrows_,sourcedim.ncols_);
 
 		//fast copy without rows and cols
 		int ncells=nrows_*ncols_+1;
 		for (int celln=0;celln<ncells;++celln)
-				(data_[celln]).clone(dim2.data_[celln]);
+				//(data_[celln]).clone(sourcedim.data_[celln]);
+				data_[celln]=sourcedim.data_[celln].clone();
 		return *this;
 
 	}
 
 	//element 0,0 is extra in the 1 based world of mv dimensioned arrays
-	(data_[0]).clone(dim2.data_[0]);
+	//(data_[0]).clone(sourcedim.data_[0]);
+	data_[0]=sourcedim.data_[0].clone();
 
-	int maxrown=dim2.nrows_;
-	int maxcoln=dim2.ncols_;
+	int maxrown=sourcedim.nrows_;
+	int maxcoln=sourcedim.ncols_;
 	for (int rown=0;rown<nrows_;++rown)
 	{
 		int index=rown*ncols_;
@@ -191,7 +201,8 @@ dim& dim::operator=(const dim& dim2)
 			if (rown<maxrown&&coln<maxcoln)
 			{
 				int fromindex=rown*maxcoln+1;
-				(data_[index]).clone(dim2.data_[fromindex]);
+				//(data_[index]).clone(sourcedim.data_[fromindex]);
+				data_[index]=sourcedim.data_[fromindex].clone();
 			}
 			else data_[index]=L"";
 		}
@@ -201,31 +212,31 @@ dim& dim::operator=(const dim& dim2)
 	return *this;
 }
 
-dim& dim::operator=(const var& var1)
+dim& dim::operator=(const var& sourcevar)
 {
 	if (!initialised_)
 		throw MVArrayNotDimensioned();
-	init(var1);
+	init(sourcevar);
 	return *this;
 }
 
-dim& dim::operator=(const int int1)
+dim& dim::operator=(const int sourceint)
 {
 	if (!initialised_)
 		throw MVArrayNotDimensioned();
-	init(int1);
+	init(sourceint);
 	return *this;
 }
 
-dim& dim::operator=(const double dbl1)
+dim& dim::operator=(const double sourcedbl)
 {
 	if (!initialised_)
 		throw MVArrayNotDimensioned();
-	init(dbl1);
+	init(sourcedbl);
 	return *this;
 }
 
-var dim::unparse() const
+var dim::join() const
 {
 	if (!initialised_)
 		throw MVArrayNotDimensioned();

@@ -194,7 +194,7 @@ var var::iconv(const wchar_t* convstr) const
 					//return iconv_MT(L"MT");
 					return iconv_MT();
 					break;
-					
+
 				//passed only one [ character!
 				case L'\0':
 					return (*this);
@@ -638,6 +638,7 @@ var var::oconv(const var& conversion) const
 var var::oconv(const wchar_t* conversion) const
 {
 	THISIS(L"var var::oconv(const wchar_t* conversion) const")
+	//TODO this should be THISISASSIGNED since no point converting numbers to strings for many oconvs
 	THISISSTRING()
 
 	//REMOVE the remove logic out of the L# R# and T# here
@@ -748,7 +749,7 @@ var var::oconv(const wchar_t* conversion) const
 				return L"";
 
 			++conversionchar;
-			
+
 			//check second character
 			switch (*conversionchar)
 			{
@@ -829,6 +830,16 @@ var var::oconv(const wchar_t* conversion) const
 				break;
 			}
 
+			break;
+
+		case L'B':
+			//empty string in, empty string out
+			if (var_typ&pimpl::VARTYP_STR && var_str.length()==0)
+				return L"";
+			if (this->toBool())
+				return var(conversion).substr(2).field(L",",1);
+			else
+				return var(conversion).substr(2).field(L",",2);
 			break;
 
 		//empty conversion string - no conversion

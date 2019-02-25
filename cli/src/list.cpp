@@ -132,7 +132,7 @@ var td;
 var tdx;
 var tt;
 var nbsp;
-var dictmd;
+var dict_voc;
 var decimalchar;
 
 //when exodus gets a non-destructive redim then this max columns restriction will be removed
@@ -293,9 +293,9 @@ USER0="";
 	}
 
 	//automatically create dict_voc if it is not present so you can list dictionaries
-	if (not open(L"dict_voc",dictmd)) {
+	if (not open(L"dict_voc",dict_voc)) {
 		createfile(L"dict_voc");
-		if (open(L"dict_voc",dictmd)) {
+		if (open(L"dict_voc",dict_voc)) {
 
 			//prepare some dictionary records
 			var dictrecs = L"";
@@ -324,7 +324,7 @@ USER0="";
 				if (key.a(1)=="F")
 					rec.r(28,0,0,1);//master
 				//printl(key ^ L": " ^ rec);
-				write(rec.convert(L"|",FM), dictmd, key);
+				write(rec.convert(L"|",FM), dict_voc, key);
 			}
 		}
 	}
@@ -345,9 +345,9 @@ USER0="";
 	if (sentencex.index(L" det-supp2", 1))
 		detsupp = 2;
 
-	if (not open(L"dict_voc", dictmd))
+	if (not open(L"dict_voc", dict_voc))
 		//stop(L"Cannot open dict_voc");
-		dictmd="";
+		dict_voc="";
 
 
 //initphrase:
@@ -398,7 +398,7 @@ phraseinit:
 
 		if (not DICT.open(L"dict_"^dictfilename)) {
 			dictfilename = L"dict_voc";
-			DICT = dictmd;
+			DICT = dict_voc;
 		}
 
 		//add the filename to the sort/select command
@@ -581,10 +581,10 @@ phraseinit:
 			word.swapper(L"[DATE]", L"[DATE,*]");
 		coldict(coln).r(7, word);
 
-	} else if (word eq L"id-supp") {
+	} else if (word eq L"id-supp" or word eq L"IS" ) {
 		idsupp = 1;
 
-	} else if (word eq L"dbl-spc") {
+	} else if (word eq L"dbl-spc" or word eq L"DB") {
 		dblspc = 1;
 
 	} else if (dictrec) {
@@ -709,9 +709,9 @@ dictrecexit:
 x1exit:
 ///////
 	//if no columns selected then try to use default @crt or @lptr group item
-	//if (not (coln or crtx) and (DICT ne dictmd or datafile eq L"md" or datafile eq L"dict_voc")) {
+	//if (not (coln or crtx) and (DICT ne dict_voc or datafile eq L"md" or datafile eq L"dict_voc")) {
 	if (not (coln or crtx) and DICT) {
-	// and ((DICT.ucase() ne dictmd.ucase()) or (filename.ucase() eq L"MD") or (filename.ucase() eq L"dict_voc"))) {
+	// and ((DICT.ucase() ne dict_voc.ucase()) or (filename.ucase() eq L"MD") or (filename.ucase() eq L"dict_voc"))) {
 
 		var words=printing ? L"@lptr,@crt" : L"@crt,@lptr";
 		for (int ii=1;ii<=2;++ii) {
@@ -749,7 +749,7 @@ x1exit:
 		//set column 1 @ID
 		colname(1) = L"@" L"id";
 		if (not DICT or not coldict(1).read(DICT, L"@" L"id")) {
-			if (not dictmd or not coldict(1).read(dictmd, L"@" L"ID"))
+			if (not dict_voc or not coldict(1).read(dict_voc, L"@" L"ID"))
 				coldict(1) = L"F" ^ FM ^ L"0" ^ FM ^ L"Ref" ^ FM ^ FM ^ FM ^ FM ^ FM ^ FM ^ L"L" ^ FM ^ 15;
 		}
 		if (html)
@@ -969,14 +969,16 @@ x1exit:
 		//call perf(ss:' (S)')
 		//selectedok=filename.select(ss);
 		//default cursor
-		selectedok=var().select(ss);
+		//selectedok=var().select(ss);
+		selectedok=select(ss);
 
 	} else {
 		//if (LISTACTIVE)
 		if (0)
 			selectedok=true;
 		else
-			selectedok=srcfile.select(ss);
+			//selectedok=srcfile.select(ss);
+			selectedok=select(ss);
 	}
 
 	if (not selectedok) {
@@ -1479,7 +1481,7 @@ subroutine getwordexit()
 		}
 	} else {
 		dictrec = L"";
-		if (dictmd and dictrec.read(dictmd, word)) {
+		if (dict_voc and dictrec.read(dict_voc, word)) {
 			if (dictrec.a(1) eq L"RLIST") {
 				if (dictrec.a(4))
 					word = dictrec.a(4);

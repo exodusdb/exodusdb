@@ -8,7 +8,7 @@ function main(in multipliers, in multiplicand, in sep) {
 		return multipliers;
 	}
 	dim output;
-	var nn=output.parse(multipliers.convert(sep,FM));
+	var nn=output.split(multipliers.convert(sep,FM));
 	for (int ii=1;ii<nn;++ii) {
 		//return null if null
 		//return zero if multiplicand is zero
@@ -16,7 +16,7 @@ function main(in multipliers, in multiplicand, in sep) {
 			output(ii)=output(ii)*multiplicand;
 		}
 	}
-	return output.unparse().convert(FM,sep);
+	return output.join().convert(FM,sep);
 }
 
 
