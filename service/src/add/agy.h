@@ -1,13 +1,6 @@
-#ifndef NEO_AGY_H
-
 #include <exodus/common.h>
 
-class agy_common : public LabelledCommon{
-public:
-
-agy_common(){
-	tsmvfns="1" _VM_ "100" _VM_ "101" _VM_ "3" _VM_ "4" _VM_ "2";
-}
+commoninit(agy,4)
 
 var schedules="";
 var plans="";
@@ -31,8 +24,11 @@ var unusedxyzz="";
 var ads="";
 var surveys="";
 var validcodes="";
-var tsmvfns="";
+var tsmvfns="1" _VM_ "100" _VM_ "101" _VM_ "3" _VM_ "4" _VM_ "2";
 
+commonexit(agy,4)
+
+/*
 };
 
 #define agy_common_no 4
@@ -41,3 +37,4 @@ agy_common&& agy=reinterpret_cast<agy_common&&> (*mv.labelledcommon[agy_common_n
 //#define agy_isdefined (mv.labelledcommon[agy_common_no] != NULL)
 
 #endif //NEO_FIN_H
+*/

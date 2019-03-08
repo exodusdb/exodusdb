@@ -1209,16 +1209,16 @@ bool var::oswrite(const var& osfilename, const var& locale) const
 }
 
 //a version that accepts a const startoffset ie ignores return value
-bool var::osbwrite(const var& osfilevar, const var& startoffset) const
+bool var::osbwrite(const var& osfilevar, const var& startoffset, const bool adjust) const
 {
 	return this->osbwrite(osfilevar,const_cast<var&>(startoffset));
 }
 
-bool var::osbwrite(const var& osfilevar, var& startoffset) const
+bool var::osbwrite(const var& osfilevar, var& startoffset, const bool adjust) const
 {
 	//osfilehandle is just the filename but buffers the "file number" in the mvint too
 
-	THISIS(L"bool var::osbwrite(const var& osfilevar, var& startoffset) const")
+	THISIS(L"bool var::osbwrite(const var& osfilevar, var& startoffset, const bool adjust=true) const")
 	THISISSTRING()
 	//test the following only if necessary in osopenx
 	//ISSTRING(osfilename)
@@ -1260,7 +1260,7 @@ bool var::osbwrite(const var& osfilevar, var& startoffset) const
 }
 
 //a version that ignores output of offset
-var& var::osbread(const var& osfilevar, const var& startoffset, const int bytesize)
+var& var::osbread(const var& osfilevar, const var& startoffset, const int bytesize, const bool adjust)
 {
 	//var startoffset_nonconst;
 	//if (startoffset.assigned())
@@ -1268,9 +1268,9 @@ var& var::osbread(const var& osfilevar, const var& startoffset, const int bytesi
 	return this->osbread(osfilevar, const_cast<var&>(startoffset), bytesize);
 }
 
-var& var::osbread(const var& osfilevar, var& startoffset, const int bytesize)
+var& var::osbread(const var& osfilevar, var& startoffset, const int bytesize, const bool adjust)
 {
-	THISIS(L"var& var::osbread(const var& osfilevar, const int startoffset, const int size")
+	THISIS(L"var& var::osbread(const var& osfilevar, const int startoffset, const int size, const bool adjust=true")
 	THISISDEFINED()
 	ISASSIGNED(startoffset)
 
@@ -1442,6 +1442,15 @@ const std::string var::to_path_string() const
 #else
        		//printf("path=%s\n",this->convert(L"\\",SLASH).toString().c_str());
         	var part=this->field(L" ",1).convert(L"\\",SLASH);
+
+		//very similar code below
+		//standardise on ALL AND ONLY lower case os file and path names
+		//in order to allow uppercase, will have to find and remove all uppercase in the old source code
+		var lcpart=part.lcase();
+		if (lcpart!=part) {
+			part.outputl(L"WARNING - UPPERCASE OS=");
+			part=lcpart;
+		}
 #endif
         	return part.toString() + " " + part2.toString();
 
@@ -1450,6 +1459,15 @@ const std::string var::to_path_string() const
 #if defined WIN32 || defined _WIN32
 		return this->convert(L"/",SLASH).toString();
 #else
+		//very similar code above
+		//standardise on ALL AND ONLY lower case os file and path names
+		//in order to allow uppercase, will have to find and remove all uppercase in the old source code
+		var lcthis=this->lcase();
+		if (lcthis!=(*this)) {
+			(*this).outputl(L"WARNING - UPPERCASE OS=");
+			return lcthis.convert(L"\\",SLASH).toString();
+		}
+
 		return this->convert(L"\\",SLASH).toString();
 #endif
 

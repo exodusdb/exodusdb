@@ -99,6 +99,8 @@ void DLL_PUBLIC osclose(const var& osfilevar)
 	osfilevar.osclose();
 }
 
+/* suppressing because too easy to write the a 3 arg version when you meant the 4 arg version
+
 //3 argument version assignment statement format
 //x=osbread(file,postition,length)
 //DLL_PUBLIC var osbread(const var& filehandle, const int startoffset, const int length)
@@ -118,37 +120,38 @@ DLL_PUBLIC var osbread(const var& filehandle, const var& startoffset, const int 
 	data.osbread(filehandle, const_cast<var&>(startoffset), length);
 	return data;
 }
+*/
 
 //4 argument version for statement format
 //osbread(data from x at y length z)
 //DLL_PUBLIC var& osbread(var& data, const var& filehandle, const int startoffset, const int length)
 DLL_PUBLIC
-var& osbread(var& data, const var& filehandle, var& startoffset, const int length)
+var& osbread(var& data, const var& filehandle, var& startoffset, const int length, const bool adjust)
 {
 	//perhaps we can return book for success/failure despite the fact that it is a filehandle supposedly ok
-	data.osbread(filehandle, startoffset, length);
+	data.osbread(filehandle, startoffset, length, adjust);
 	return data;
 }
 
-DLL_PUBLIC bool osbwrite(const var& data, const var& filehandle, var& startoffset)
+DLL_PUBLIC bool osbwrite(const var& data, const var& filehandle, var& startoffset, const bool adjust=true)
 {
-	return data.osbwrite(filehandle, startoffset);
+	return data.osbwrite(filehandle, startoffset, adjust);
 }
 
 //4 argument version for statement format BUT ALLOWING STARTOFFSET TO BE A CONSTANT ie output ignored
 //osbread(data from x at y length z)
 //DLL_PUBLIC var& osbread(var& data, const var& filehandle, const int startoffset, const int length)
 DLL_PUBLIC
-var& osbread(var& data, const var& filehandle, const var& startoffset, const int length)
+var& osbread(var& data, const var& filehandle, const var& startoffset, const int length, const bool adjust)
 {
 	//perhaps we can return book for success/failure despite the fact that it is a filehandle supposedly ok
-	data.osbread(filehandle, const_cast<var&>(startoffset), length);
+	data.osbread(filehandle, const_cast<var&>(startoffset), length, adjust);
 	return data;
 }
 
-DLL_PUBLIC bool osbwrite(const var& data, const var& filehandle, const var& startoffset)
+DLL_PUBLIC bool osbwrite(const var& data, const var& filehandle, const var& startoffset, const bool adjust)
 {
-	return data.osbwrite(filehandle, const_cast<var&>(startoffset));
+	return data.osbwrite(filehandle, const_cast<var&>(startoffset),adjust);
 }
 
 //two argument version returns success/failure to be used in if statement
@@ -937,6 +940,12 @@ DLL_PUBLIC bool open(const var& filename, var& filehandle)
 	return filehandle.open(filename);
 }
 
+DLL_PUBLIC bool open(const var& filename)
+{
+	var filehandle;
+	return filehandle.open(filename);
+}
+
 DLL_PUBLIC bool read(var& record, const var& filehandle, const var& key)
 {
 	return record.read(filehandle,key);
@@ -1257,12 +1266,20 @@ int exodus_main(int exodus__argc, char *exodus__argv[], MvEnvironment& mv)
 	//options are in either (XXX) or {XXX} at the end of the command.
 	//similar code in exodus_main() and mvprogram.cpp:perform()
 	var lastchar=mv.COMMAND[-1];
-	if (lastchar==")")
-		mv.OPTIONS=mv.COMMAND.field2(L"(",-1);
+	//if (lastchar==")")
+	//	mv.OPTIONS=mv.COMMAND.field2(L"(",-1);
+	//else if (lastchar=="}")
+	//	mv.OPTIONS=mv.COMMAND.field2(L"{",-1);
+	//if (mv.OPTIONS)
+	//	mv.COMMAND.splicer(-(len(mv.OPTIONS)+2),len(mv.OPTIONS)+2, L"");
+	//var lastchar=mv.COMMAND[-1];
+	if (lastchar==")") {
+		mv.OPTIONS=L"(" ^ mv.COMMAND.field2(L"(",-1);
+	}
 	else if (lastchar=="}")
-		mv.OPTIONS=mv.COMMAND.field2(L"{",-1);
+		mv.OPTIONS=L"{" ^ mv.COMMAND.field2(L"{",-1);
 	if (mv.OPTIONS)
-		mv.COMMAND.splicer(-(len(mv.OPTIONS)+2),len(mv.OPTIONS)+2, L"");
+		mv.COMMAND.splicer(-(mv.OPTIONS.length()),mv.OPTIONS.length(), L"");
 
 	var temp;
 	//DBTRACE=osgetenv(L"EXO_DBTRACE",temp)?1:-1;

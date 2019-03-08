@@ -53,6 +53,7 @@ function main() {
         _FM_ "balance      |F|5|Balance      ||||MD20P     ||R|10"
         _FM_ "timestamp    |F|6|Timestamp    ||||[DATETIME]||L|12"
         _FM_ "name_and_type|S| |Name and Type||||          ||L|20"
+        _FM_ "name_and_code|S| |Name and Code||||          ||L|20"
         _FM_ "@crt         |G| |code name type name_and_type balance date_created time_created timestamp";
 
         printl("\nWrite the dictionary records to the dictionary");

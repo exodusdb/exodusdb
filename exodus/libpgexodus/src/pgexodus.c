@@ -276,6 +276,14 @@ exodus_call(PG_FUNCTION_ARGS)
 	int32 nresponsebytes;
 	bytea* output;
 
+	/////////////////////
+	//DONT CALL ANYTHING!
+	/////////////////////
+	nresponsebytes=0;
+	output = (bytea*) palloc(VARHDRSZ+nresponsebytes+4);
+	SET_VARSIZE(output,VARHDRSZ+nresponsebytes);
+	PG_RETURN_BYTEA_P(output);
+
 	//calculate length of pipe data
 	//total length
 	int32 nrequestbytes=sizeof(int32);
@@ -385,8 +393,40 @@ exodus_call(PG_FUNCTION_ARGS)
 	////elog(WARNING, "exodus_call: callexodus()");
 	if (!callexodus(serverid2, prequest, nrequestbytes, presponse, &nresponsebytes))
 	{
+		//convert tablename to cstr
+		char tablename2[4096];
+		memset(tablename2,0,4096);
+		memcpy((void *) (tablename2)	// destination
+		   ,(void *) VARDATA(tablename)	// starting from
+		   ,VARSIZE(tablename)-VARHDRSZ	// how many bytes
+		   );
+		//elog(ERROR, "pgexodus tablename '%s'", tablename2);
+
+		//convert dictkey to cstr
+		char dictkey2[4096];
+		memset(dictkey2,0,4096);
+		memcpy((void *) (dictkey2)	// destination
+		   ,(void *) VARDATA(dictkey)	// starting from
+		   ,VARSIZE(dictkey)-VARHDRSZ	// how many bytes
+		   );
+		//elog(ERROR, "pgexodus dictkey '%s'", dictkey2);
+
+		//convert datakey to cstr
+		char datakey2[4096];
+		memset(datakey2,0,4096);
+		memcpy((void *) (datakey2)	// destination
+		   ,(void *) VARDATA(datakey)	// starting from
+		   ,VARSIZE(datakey)-VARHDRSZ	// how many bytes
+		   );
+		//elog(ERROR, "pgexodus dictkey '%s'", dictkey2);
+
 		//elog(ERROR, "pgexodus exodus_call: Failed with %s ", presponse);
-		elog(ERROR, "pgexodus exodus_call failed. (%s)", presponse);
+
+		//SHOULD NOT BE COMMENTED OUT!
+		//but getting a very mysterious error when writing NEW client records:
+		//file=dict_clients dictid=sequence id=Z response=Cannot connect to /tmp/exodusservice......
+		elog(ERROR, "pgexodus exodus_call failed. file=%s dictid=%s id=%s response=%s", tablename2,dictkey2,datakey2,presponse);
+
 		pfree(prequest);
 		pfree(presponse);
 		PG_RETURN_NULL();

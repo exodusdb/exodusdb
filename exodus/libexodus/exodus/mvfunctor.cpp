@@ -39,6 +39,7 @@ THE SOFTWARE.
 // external subroutines since external subroutines are implemented in exodus
 // as member functions which require special coding to be called from global functions
 
+#define TRACING 0
 //#define TRACING 5
 
 #include <iostream>
@@ -190,7 +191,7 @@ bool ExodusFunctorBase::init()
 bool ExodusFunctorBase::initsmf(const char* newlibraryname, const char* newfunctionname, const bool forcenew) 
 {
 #if TRACING >= 3
-std::cout<<"mvfunctor:initsmf: in:"<<newlibraryname<<" "<<newfunctionname<<std::endl;
+std::cout<<"mvfunctor:initsmf: in>"<<newlibraryname<<" "<<newfunctionname<<std::endl;
 #endif
 	if (newlibraryname!=libraryname_ && !openlib(newlibraryname)) {
 		return false;
@@ -228,7 +229,7 @@ std::cout<<"mvfunctor:initsmf: ko: no pobject_"<<libraryname_<<" "<<functionname
 	}
 
 #if TRACING >= 3
-std::cout<<"mvfunctor:initsmf: ok:"<<libraryname_<<" "<<functionname_<<std::endl;
+std::cout<<"mvfunctor:initsmf: ok<"<<libraryname_<<" "<<functionname_<<std::endl;
 #endif
 	return true;
 }
@@ -258,7 +259,7 @@ ExodusFunctorBase& ExodusFunctorBase::operator=(const char* newlibraryname) {
 bool ExodusFunctorBase::checkload(std::string newlibraryname, std::string newfunctionname)
 {
 #if TRACING >= 3
-std::cout<<"mvfunctor:checkload: in:"<< newlibraryname<<" "<< newfunctionname<<std::endl;
+std::cout<<"mvfunctor:checkload: in>"<< newlibraryname<<" "<< newfunctionname<<std::endl;
 #endif
 	//find the library or fail
 	if (not openlib(newlibraryname))
@@ -284,7 +285,7 @@ std::cout<<"mvfunctor:checkload: ko:"<<libraryname_<<" "<< newfunctionname<<std:
 	}
 
 #if TRACING >= 3
-std::cout<<"mvfunctor:checkload: ok:"<<libraryname_<<" "<<functionname_<<std::endl;
+std::cout<<"mvfunctor:checkload: ok<"<<libraryname_<<" "<<functionname_<<std::endl;
 #endif
 	return true;
 }
@@ -292,7 +293,7 @@ std::cout<<"mvfunctor:checkload: ok:"<<libraryname_<<" "<<functionname_<<std::en
 bool ExodusFunctorBase::openlib(std::string newlibraryname)
 {
 #if TRACING >= 3
-std::cout<<"mvfunctor:openlib: in:"<<newlibraryname<<std::endl;
+std::cout<<"mvfunctor:openlib: in>"<<newlibraryname<<std::endl;
 #endif
 	//open the library or return 0
 	//dlopen arg2 is ignored by macro on windows
@@ -331,9 +332,9 @@ std::cout<<"mvfunctor:openlib: in:"<<newlibraryname<<std::endl;
 
 	if (plibrary_==NULL)
 	{
-#if TRACING >= 3
-std::cout<<"mvfunctor:openlib: ko:"<< newlibraryname<<std::endl;
-#endif
+//#if TRACING >= 3
+std::cerr<<"mvfunctor:openlib: ko:"<< libraryfilename_<<std::endl;
+//#endif
 		//std::cerr<<libraryfilename_<<" cannot be found or cannot be opened"<<std::endl;
 		throw MVException(var(libraryfilename_) ^ L" cannot be found or cannot be linked/wrong version. Run with LD_DEBUG=libs for more info");
 		return false;
@@ -341,7 +342,7 @@ std::cout<<"mvfunctor:openlib: ko:"<< newlibraryname<<std::endl;
 
 	libraryname_=newlibraryname;
 #if TRACING >= 3
-std::cout<<"mvfunctor:openlib: ok:"<<libraryname_<<std::endl;
+std::cout<<"mvfunctor:openlib: ok<"<<libraryname_<<std::endl;
 #endif
 	return true;
 }
@@ -349,7 +350,7 @@ std::cout<<"mvfunctor:openlib: ok:"<<libraryname_<<std::endl;
 bool ExodusFunctorBase::openfunc(std::string newfunctionname)
 {
 #if TRACING >= 3
-std::cout<<"mvfunctor:openfunc: in:"<<libraryname_<<" "<< newfunctionname<<std::endl;
+std::cout<<"mvfunctor:openfunc: in>"<<libraryname_<<" "<< newfunctionname<<std::endl;
 #endif
 	//find the function and return true/false
 	//pfunction_ = (EXODUSFUNCTYPE) dlsym(plibrary_, functionname_.c_str());
@@ -385,7 +386,7 @@ std::cout<<"mvfunctor:openfunc: ko:"<<libraryname_<<" "<<newfunctionname<<std::e
 
 	functionname_=newfunctionname;
 #if TRACING >= 3
-std::cout<<"mvfunctor:openfunc: ok:"<<libraryname_<<" "<< functionname_<<std::endl;
+std::cout<<"mvfunctor:openfunc: ok<"<<libraryname_<<" "<< functionname_<<std::endl;
 #endif
 	return true;
 
@@ -400,7 +401,7 @@ var ExodusFunctorBase::callsgf()
 	typedef var (*ExodusDynamic)(MvEnvironment& mv);
 
 #if TRACING >= 3
-std::cout<<"mvfunctor:callsgf: in:"<<libraryname_<<" "<< functionname_<<std::endl;
+std::cout<<"mvfunctor:callsgf: in>"<<libraryname_<<" "<< functionname_<<std::endl;
 #endif
 	//call the function via its pointer
 	return ((ExodusDynamic) pfunction_)(*mv_);
@@ -416,7 +417,7 @@ var ExodusFunctorBase::callsmf()
 	typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)();
 
 #if TRACING >= 3
-std::cout<<"mvfunctor:callsmf: in:" << libraryname_<< " " << functionname_<<std::endl;
+std::cout<<"mvfunctor:callsmf: in>" << libraryname_<< " " << functionname_<<std::endl;
 #endif
 	//call the shared library object main function with the right args, returning a var
 	return CALLMEMBERFUNCTION(*(

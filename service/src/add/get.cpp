@@ -56,7 +56,8 @@ function main() {
 	SYSTEM.r(3, "");
 
 	//put up a message
-	print("Making a new document/report " ^ SYSTEM.a(2) ^ ":");
+	if (not OPTIONS.index("S"))
+		print("Making a new document/report " ^ SYSTEM.a(2) ^ ":");
 
 	var timestarted = var().time();
 

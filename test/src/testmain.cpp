@@ -57,6 +57,25 @@ function main()
 	printl("wchar_t:  ",(int)sizeof(wchar_t));
 	printl("var:      ",(int)sizeof(var));
 
+	//testing .mv(+ - * / :)
+	var m1="1" _VM_ "2" _VM_ _VM_ "4";
+	var m2="100" _VM_ "200" _VM_ "300"; 
+
+	m1.convert(VM,"]").outputl("m1=");
+	m2.convert(VM,"]").outputl("m2=");
+
+	m1.mv("+",m2).convert(VM,"]").outputl("xxxx=");
+	assert(m1.mv("+",m2).convert(VM,"]")=="101]202]300]4");
+	assert(m1.mv("-",m2).convert(VM,"]")=="-99]-198]-300]4");
+	assert(m1.mv("*",m2).convert(VM,"]")=="100]400]0]0");
+	assert(m1.mv(":",m2).convert(VM,"]")=="1100]2200]300]4");
+
+	printl();
+	m2.r(1,4,400);
+	m2.convert(VM,"]").outputl("m2=");
+	assert(m1.mv("/",m2).convert(VM,"]")=="0.01]0.01]0]0.01");
+
+	//testing inserter
         var t1="aa";
         assert(t1.inserter(-1,"xyz").convert(FM^VM,"^]")=="aa^xyz");
         t1="aa";
@@ -103,7 +122,8 @@ function main()
 	assert(oswrite(charout,testfilename, "utf8"));
 	var offsetx,testfilex;
 	assert(osopen(testfilename,testfilex));
-	assert(osbread(testfilex,offsetx=0,1) eq GreekSmallGamma);
+	var testosread;
+	assert(testosread.osbread(testfilex,offsetx=0,1) eq GreekSmallGamma);
 //	assert(testfilename.osfile().a(1) eq 2);
 	var charin;
 //fails on ubuntu 13.10x64
@@ -401,8 +421,8 @@ function main()
 	offset=2;
 	assert(osbwrite("78",tempfilename5,offset));
 	offset=2;
-	var v78=osbread( tempfilename5, offset, 2);
-	assert(v78 eq "78");
+	var v78;
+	assert(v78.osbread(tempfilename5, offset, 2) eq "78");
 
 	assert(osread(record5,tempfilename5));
 	assert(record5.oconv("HEX2") eq "00003738");
@@ -1092,12 +1112,12 @@ dict(AGE_IN_YEARS) {
 
 	dim a9;
 	var a10;
-	assert(matparse("xx"^FM^"bb",a9) eq 2);
-	assert(matunparse(a9) eq ("xx" ^FM^ "bb"));
+	assert(split("xx"^FM^"bb",a9) eq 2);
+	assert(join(a9) eq ("xx" ^FM^ "bb"));
 
 	dim dx(3);
 	dx=1;
-	assert(dx.unparse().outputl()==(1^FM^1^FM^1));
+	assert(dx.join().outputl()==(1^FM^1^FM^1));
 
 	var r[2];
 	assert(unassigned(r[0]));
@@ -1130,10 +1150,10 @@ dict(AGE_IN_YEARS) {
 	}
 	printl();
 
-	assert(a7.parse("xx"^FM^"bb") eq 2);
+	assert(a7.split("xx"^FM^"bb") eq 2);
 	assert(a7(1) eq "xx");
 	assert(a7(2) eq "bb");
-	assert(a7.unparse() eq ("xx"^FM^"bb"));
+	assert(a7.join() eq ("xx"^FM^"bb"));
 
 	dim arrx(2,2),arry;
 	arrx(1,1)="xx";
@@ -2151,7 +2171,8 @@ function accrest() {
         var offset=0;
         var blocksize=50000;
         while (true) {
-                var block=osbread(infile,offset,blocksize);
+                var block;
+                block.osbread(infile,offset,blocksize);
  //printl(offset," ",len(block));
                 if (not len(block))
                         break;

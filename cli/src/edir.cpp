@@ -62,7 +62,7 @@ program()
         //put the record on a temp file in order to edit it
         var temposfilename=filename^ "~" ^ key;
         var invalidfilechars=L"\"\'\u00A3$%^&*(){}[]:;#<>?,./\\|";
-        temposfilename.converter(invalidfilechars,str("-",len(invalidfilechars)));
+        temposfilename.lcaser().converter(invalidfilechars,str("-",len(invalidfilechars)));
         temposfilename^=".tmp";
         oswrite(record,temposfilename);
 

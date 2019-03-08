@@ -1,15 +1,6 @@
-#ifndef NEO_FIN_H
-
 #include <exodus/common.h>
 
-class fin_common : public LabelledCommon{
-public:
-
-//default contructor
-fin_common(){
- chartmvfns = "3" _VM_ "4" _VM_ "7" _VM_ "8" _VM_ "10" _VM_ "11" _VM_ "12" _VM_ "14" _VM_ "21" _VM_ "22" _VM_ "24" _VM_ "25" _VM_ "27" _VM_ "29" _VM_ "32" _VM_ "33";
- vouchermvfns = "3" _VM_ "5" _VM_ "8" _VM_ "10" _VM_ "11" _VM_ "17" _VM_ "19" _VM_ "20" _VM_ "23" _VM_ "24" _VM_ "30" _VM_ "34" _VM_ "37";
-}
+commoninit(fin,3)
 
 var accounts="";
 var balances="";
@@ -50,14 +41,16 @@ var collections="";
 var zx3="";
 var zx4="";
 var hexdatesize="";
-var chartmvfns="";
-var vouchermvfns="";
+var chartmvfns = "3" _VM_ "4" _VM_ "7" _VM_ "8" _VM_ "10" _VM_ "11" _VM_ "12" _VM_ "14" _VM_ "21" _VM_ "22" _VM_ "24" _VM_ "25" _VM_ "27" _VM_ "29" _VM_ "32" _VM_ "33";
+var vouchermvfns = "3" _VM_ "5" _VM_ "8" _VM_ "10" _VM_ "11" _VM_ "17" _VM_ "19" _VM_ "20" _VM_ "23" _VM_ "24" _VM_ "30" _VM_ "34" _VM_ "37";
 
+commonexit(fin,3)
+
+/*
 };
 
 #define fin_common_no 3
 //#define fin (*((fin_common*) mv.labelledcommon[fin_common_no]))
 fin_common&& fin=reinterpret_cast<fin_common&&> (*mv.labelledcommon[fin_common_no]);
 //#define fin_isdefined (mv.labelledcommon[fin_common_no] != NULL)
-
-#endif//NEO_FIN_H
+*/

@@ -1677,6 +1677,96 @@ var var::operator[](const int charno) const
 
 }
 
+/////////////////////////////////////
+//MV (multivalued +++ --- *** /// :::
+/////////////////////////////////////
+
+//performs an operation + - * / : on two multivalued strings in parallel
+//returning a multivalued string of the results
+var var::mv(const char* opcode, const var& var2) const
+{
+	THISIS(L"var var::multivalued(const char* opcode, const var& var2) const")
+	THISISSTRING()
+	ISSTRING(var2)
+
+	//p1a and p1b are pointers to start and end of a value in var1 (this)
+	std::wstring::size_type p1a=0;
+	std::wstring::size_type p1b=0;
+
+	//p2a and p2b are pointers to start and end of a value in var2
+	std::wstring::size_type p2a=0;
+	std::wstring::size_type p2b=0;
+
+	var outstr=L"";
+	var mv1;
+	var mv2;
+
+	while (true) {
+
+		//find the end of a value in var1 (this)
+		if (p1a != std::wstring::npos) {
+			p1b=var_str.find_first_of(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_ _SSTM_,p1a);
+			mv1=var(var_str.substr(p1a,p1b-p1a));
+			p1a=p1b;
+		} else {
+			mv1=L"";
+		}
+
+		//find the end of a value in var2
+		if (p2a != std::wstring::npos) {
+			p2b=var2.var_str.find_first_of(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_ _SSTM_,p2a);
+			mv2=var(var2.var_str.substr(p2a,p2b-p2a));
+			p2a=p2b;
+		} else {
+			mv2=L"";
+		}
+
+		switch (opcode[0]) {
+
+		case '+':
+			outstr^=mv1+mv2;
+			break;
+
+		case '-':
+			outstr^=mv1-mv2;
+			break;
+
+		case '*':
+			outstr^=mv1*mv2;
+			break;
+
+		case '/':
+			//if mv is anything except empty or zero
+			//OR if mv is empty and mv2 is not empty or zero
+			//may trigger non-numeric or div-by-zero errors
+			//1. if both empty then result is empty
+			//2. empty or zero, divided by zero, is empty or zero
+			if (mv1 || (mv1==L"" && mv2))
+				mv1=mv1/mv2;
+			outstr^=mv1;
+			break;
+
+		case ':':
+			outstr^=mv1^mv2;
+			break;
+		}
+
+		//quit if at end of both strings
+		if (p1a == std::wstring::npos && p2a == std::wstring::npos)
+			break;
+
+		outstr^=VM;
+
+		//skip over separator char
+		if (p1a != std::wstring::npos)
+			p1a++;
+		if (p2a != std::wstring::npos)
+			p2a++;
+	}
+
+	return outstr;
+}
+
 ////////
 //REMOVE
 ////////
@@ -1699,7 +1789,7 @@ var var::remove(var& startchar1, var& delimiterno) const
 	//start_pos variable is zero based standard c++ logic
 	if (long(start_pos)<0)
 		start_pos=0;
-		
+
 	//domain check
 	//handle after end of string
 	if (start_pos>=var_str.length())

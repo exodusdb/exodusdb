@@ -12,13 +12,11 @@ function main() {
 
 	var command=COMMAND.convert(FM," ").lcase();
 
-	printl(command);
-
 	command.swapper(" data "," ");
 	command.swapper(" dict "," dict_");
 	command.swapper(" dict."," dict_");
 
-	printl(command);
+	//printl(command);
 
 	//something like DATAVOL\NEOS0001 or REVBOOT will be ignored
 	var volname=field(command," ",2);
@@ -30,7 +28,9 @@ function main() {
 	}
 	var file;
 	//TODO support volume in createfile
-	return osshell("createfile " ^ filename ^ " " ^ OPTIONS);
+	var oscmd="createfile " ^ filename ^ "{S}";// ^ " " ^ OPTIONS;
+	//oscmd.outputl("oscmd=");
+	return osshell(oscmd);
 }
 
 libraryexit()

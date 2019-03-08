@@ -7,15 +7,15 @@ programinit()
 function main()
 {
 {
-   //std::locale locE ( "Ukrainian_Ukraine.1251" );	// en-US
-   //std::locale loc ( "Greek_Greece.1253" );	// en-US
-   std::locale loc;
-   std::locale loc1;
-   std::cout << "The initial locale is: " << loc1.name( ) << std::endl;
-   std::locale loc2 = std::locale::global ( loc );
-   std::locale loc3;
-   std::cout << "The current locale is: " << loc3.name( ) << std::endl;
-   std::cout << "The previous locale was: " << loc2.name( ) << std::endl;
+	//std::locale locE ( "Ukrainian_Ukraine.1251" );	// en-US
+	//std::locale loc ( "Greek_Greece.1253" );	// en-US
+	std::locale loc;
+	std::locale loc1;
+	std::cout << "The initial locale is: " << loc1.name( ) << std::endl;
+	std::locale loc2 = std::locale::global ( loc );
+	std::locale loc3;
+	std::cout << "The current locale is: " << loc3.name( ) << std::endl;
+	std::cout << "The previous locale was: " << loc2.name( ) << std::endl;
 }
 	//std::locale mylocale("de");
 	std::locale mylocale("C");
@@ -24,8 +24,8 @@ function main()
 	var locale0 = getxlocale().outputl("Original Locale=");
 
 	var test = L"[English language][Русский язык][Українська мова]\n"
-L"can you write one A\n"
-L"[16:55:08] neosys: one й\n";
+		L"can you write one A\n"
+		L"[16:55:08] neosys: one й\n";
 	var test_file = "test_1.txt";
 	oswrite( test, test_file);
 	test_file.osclose();
@@ -110,7 +110,7 @@ L"[16:55:08] neosys: one й\n";
 	{
 		var buf;
 		offset=i;
-		buf.osbread( stroustrup, offset, 5);
+		buf.osbread( stroustrup.lcase(), offset, 5);
 //		if( buf == L"C")
 //			CppCounter ++;
 //		print( var(i)^L" "^CppCounter^L"\r");
@@ -155,8 +155,8 @@ L"[16:55:08] neosys: one й\n";
 
 	dim a9;
 	var a10;
-	assert(matparse("xx"^FM^"bb",a9) eq 2);
-	assert(matunparse(a9) eq ("xx" ^FM^ "bb"));
+	assert(split("xx"^FM^"bb",a9) eq 2);
+	assert(join(a9) eq ("xx" ^FM^ "bb"));
 
 	var r[2];
 	assert(unassigned(r[0]));
@@ -188,10 +188,10 @@ L"[16:55:08] neosys: one й\n";
 //		printl();
 	}
 
-	assert(a7.parse("xx"^FM^"bb") eq 2);
+	assert(a7.split("xx"^FM^"bb") eq 2);
 	assert(a7(1) eq "xx");
 	assert(a7(2) eq "bb");
-	assert(a7.unparse() eq ("xx"^FM^"bb"));
+	assert(a7.join() eq ("xx"^FM^"bb"));
 
 	dim arrx(2,2),arry;
 	arrx(1,1)="xx";

@@ -162,6 +162,20 @@ program()
 
         var iscompilable=filename.field2(".",-1)[1].lcase() ne "h";
 
+	//search paths and convert to absolute filename
+	//similar code in edic.cpp and compile.cpp
+	if (not(osfile(filename)) and not(filename.index(SLASH))) {
+		var paths=osgetenv("CPLUS_INCLUDE_PATH").convert(";",":");
+		var npaths=dcount(paths,":");
+		for (var pathn=1;pathn<npaths;pathn++) {
+			var filename2=paths.field(":",pathn) ^ "/" ^ filename;
+			if (osfile(filename2)) {
+				filename=filename2;
+				break;
+			}
+		}
+	}
+
         //make absolute in case EDITOR changes current working directory
         var editcmd=editor;
         if (editcmd.index("$ABSOLUTEFILENAME")) {

@@ -25,7 +25,7 @@ THE SOFTWARE.
 #else
 #define TRACING 2
 #endif
-
+//#define TRACING 5
 
 //C4530: C++ exception handler used, but unwind semantics are not enabled. 
 //#pragma warning (disable: 4530)
@@ -186,7 +186,7 @@ void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsec
 //TODO find a way to pass filename into mv of dictionary routine
 //		var filename=fromutf8(prequest+sizeof(int),**plength);
 		std::string str_libname(prequest+sizeof(int),**plength);
-		//TODO deduplicate code to contruct library name duplicated in ::calculate and mvipc
+		//TODO deduplicate code to construct library name duplicated in ::calculate and mvipc
 		str_libname.insert(0,"dict_");
 		prequest+=*prequest+sizeof(int);
 
@@ -242,8 +242,14 @@ void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsec
 		else
 			reply=library.call(filename,dictkey);
 */
-std::wcerr<<L"mvipc: " << str_libname.c_str() << L" " << str_funcname.c_str()<<std::endl;
-		if (not exodusfunctorbase.initsmf(str_libname.c_str(),str_funcname.c_str()))
+		//std::wcerr<<L"mvipc: " << str_libname.c_str() << L" " << str_funcname.c_str()<<std::endl;
+		//if (not exodusfunctorbase.initsmf(str_libname.c_str(),str_funcname.c_str()))
+		std::string prefixed_funcname="exodusprogrambasecreatedelete_" + str_funcname;
+		#if TRACING >= 3
+			//hangs?
+			//std::wcerr<<L"mvipc: " << str_libname.c_str() << L" " << prefixed_funcname.c_str()<<std::endl;
+		#endif
+		if (not exodusfunctorbase.initsmf(str_libname.c_str(),prefixed_funcname.c_str()))
 		/////////////////////////////////////////////////////////////////////////////
 		{
 			var reply=response^L"Cannot find Library "^str_libname^L", or function "^str_funcname^L" is not present";
@@ -269,11 +275,18 @@ std::wcerr<<L"mvipc: " << str_libname.c_str() << L" " << str_funcname.c_str()<<s
 				//typedef var (*ExodusDynamic)(MvEnvironment& mvx);
 				//((ExodusDynamic) exodusfunctorbase.pfunction_)(exodusfunctorbase.mv_);
 
-				exodusfunctorbase.callsmf();
+				exodusfunctorbase.mv_->ANS=exodusfunctorbase.callsmf();
 				/////////////////////////////
+				#if TRACING >= 3
+					std::wcerr<<"mvipc: called callsmf successfully "<<std::endl;
+				#endif
 
 				//dictionary subroutines return return in mv ANS.
 				response=exodusfunctorbase.mv_->ANS.toString();
+
+				#if TRACING >= 3
+					std::wcerr<<"mvipc: got ANS "<<std::endl;
+				#endif
 
 				//optionally limit the number of bytes of the reply sent
 				int nresponsebytes=(int)response.length();

@@ -162,6 +162,9 @@ std::wstring getresult(PGresult* pgresult, int rown, int coln) {
 	return boost::locale::conv::utf_to_utf<wchar_t>(starting,starting+PQgetlength(pgresult,rown,coln));
 }
 
+//used to detect sselect command words that are values like quoted words or plain numbers. eg "xxx" 'xxx' 123 .123 +123 -123
+static const var valuechars(L"\"'.0123456789-+");
+
 class Resultclearer {
 
 //Save pgresultptr in this class and to guarantee that it will be PQClear'ed on function exit
@@ -489,7 +492,7 @@ int var::connection_id() const
 	}
 
 	//turn this into a db connection (int holds the connection number)
-	//leave any string in place but prevent it being used a number
+	//leave any string in place but prevent it being used as a number
 	var_int = connid2;
 	//var_str = L""; does it ever need initialising?
 	var_typ = pimpl::VARTYP_NANSTR_DBCONN;
@@ -695,13 +698,19 @@ bool var::read(const var& filehandle,const var& key)
 	}
 
 	//$parameter array
-	const char* paramValues[1];
-	int		 paramLengths[1];
-	int		 paramFormats[1];
+	const char*	paramValues[1];
+	int		paramLengths[1];
+	int		paramFormats[1];
 	//uint32_t	binaryIntVal;
 
+	//lower case key if reading from dictionary
+	std::string key2;
+	//if (filehandle.substr(1,5).lcase()==L"dict_")
+	//	key2=key.lcase().toString();
+	//else
+		key2=key.toString();
+
 	//$1=key
-	std::string key2=key.toString();
 	paramValues[0]=key2.c_str();
 	paramLengths[0]=int(key2.length());
 	paramFormats[0]=1;
@@ -1058,8 +1067,7 @@ bool var::writev(const var& filehandle,const var& key,const int fieldno) const
 bool var::write(const var& filehandle,const var& key) const {}
 */
 
-//there is no "update if present or insert if not" command in postgres
-//sql2003 "merge" http://en.wikipedia.org/wiki/Upsert
+//"update if present or insert if not" is handled in postgres using ON CONFLICT clause
 bool var::write(const var& filehandle, const var& key) const
 {
 	THISIS(L"bool var::write(const var& filehandle, const var& key) const")
@@ -1077,9 +1085,9 @@ bool var::write(const var& filehandle, const var& key) const
 	std::string data2=(*this).toString();
 
 	//a 2 parameter array
-	const char* paramValues[2];
-	int		 paramLengths[2];
-	int		 paramFormats[2];
+	const char*	paramValues[2];
+	int		paramLengths[2];
+	int		paramFormats[2];
 
 	//$1 key
 	paramValues[0] = key2.data();
@@ -1092,6 +1100,10 @@ bool var::write(const var& filehandle, const var& key) const
 	paramFormats[1] = 1;//binary
 
 	var sql;
+
+	//Note cannot use postgres PREPARE/EXECUTE with parameterised filename
+	//but performance gain is probably not great since the sql we use to read and write is quite simple
+	//(could PREPARE once per file/table)
 
 	sql = L" INSERT INTO " ^ filehandle.convert(L".",L"_") ^ L" (key,data) values( $1 , $2)";
 	sql ^= L" ON CONFLICT (key)";
@@ -1511,9 +1523,10 @@ inline var fileexpression(const var& mainfilename, const var& filename, const va
 	//return "coalesce(L" ^ expression ^", ''::bytea)";
 }
 
-var var::getdictexpression(const var& mainfilename, const var& filename, const var& dictfilename, const var& dictfile, const var& fieldname, var& joins, var& ismv, bool forsort_or_select_or_index) const
+var var::getdictexpression(const var& mainfilename, const var& filename, const var& dictfilename, const var& dictfile, const var& fieldname0, var& joins, var& ismv, bool forsort_or_select_or_index) const
 {
 
+	var fieldname=fieldname0.convert(L".",L"_");
 	var actualdictfile=dictfile;
 	if (!actualdictfile)
 	{
@@ -1549,11 +1562,14 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 	var dictrec;
 	if (!dictrec.read(actualdictfile,fieldname))
 	{
+		//try lowercase
 		if (!dictrec.read(actualdictfile,fieldname.lcase()))
 		{
+			//try uppercase
 			if (!dictrec.read(actualdictfile,fieldname.ucase()))
 			{
-				if (not dictrec.read(L"dict_voc", fieldname))
+				//try in voc lowercase
+				if (not dictrec.read(L"dict_voc", fieldname.lcase()))
 				{
 					if (fieldname.ucase()==L"@ID")
 						dictrec = L"F" ^ FM ^ L"0" ^ FM ^ L"Ref" ^ FM ^ FM ^ FM ^ FM ^ FM ^ FM ^ L"L" ^ FM ^ 15;
@@ -1731,11 +1747,10 @@ exodus_call:
 var getword(var& remainingwords, const var& joinvalues=false)
 {
 
-	//gets the next word (or series of words separated by FM while they are numbers or quoted strings)
+	//gets the next word
+	//optionally: a series of words separated by FM while they are numbers or quoted strings)
 	//converts to sql quoted strings
 	//and clips them from the input string
-
-	static const var valuechars(L"\"'.0123456789-+");
 
 	var word1=remainingwords.field(L" ",1);
 	remainingwords=remainingwords.field(L" ",2,99999);
@@ -1761,7 +1776,7 @@ var getword(var& remainingwords, const var& joinvalues=false)
 
 	tosqlstring(word1);
 
-	//grab multiple values (numbers or strings) separated by FM
+	//grab multiple values (numbers or quoted words) into one list, separated by FM
 	if (joinvalues && valuechars.index(word1[1]))
 	{
 		word1 = SQ ^ word1.unquote() ^ SQ;
@@ -1785,7 +1800,7 @@ var getword(var& remainingwords, const var& joinvalues=false)
 		{
 			tosqlstring(nextword);
 			if (word1!=L"")
-				word1^=FM;
+				word1^=FM_;
 			word1 ^= SQ ^ nextword.unquote() ^ SQ;
 
 			remainingwords=remainingwords.field(L" ",2,99999);
@@ -1954,7 +1969,6 @@ bool var::select(const var& sortselectclause) const
 bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 {
 	//private - and arguments are left unchecked for speed
-
 	//?allow undefined usage like var xyz=xyz.select();
 	if (var_typ&mvtypemask)
 	{
@@ -1974,6 +1988,9 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		else
 			this->createString();
 	}
+
+	if (GETDBTRACE)
+		sortselectclause.logputl(L"sortselectclause=");
 
 	// Note that VARTYP_DBCONN bit is still preserved in var_typ
 
@@ -2000,8 +2017,14 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 
 	var maxnrecs=L"";
 
-	var remainingsortselectclause=sortselectclause;
+	var remainingsortselectclause=sortselectclause.trimb();
 //remainingsortselectclause.outputl(L"remainingsortselectclause=");
+
+	//remove trailing options eg (S) or {S}
+	var lastword=remainingsortselectclause.field2(L" ",-1);
+	if ((lastword[1]==L"(" && lastword[-1]==L")") || (lastword[1]==L"{" && lastword[-1]==L"}")) {
+		remainingsortselectclause.splicer(-lastword.length()-1,999,L"");
+	}
 
 	//sortselectclause may start with {SELECT|SSELECT {maxnrecs} filename}
 	var word1=remainingsortselectclause.field(L" ", 1);
@@ -2047,21 +2070,18 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		}
 	}
 
-	static const var valuechars(L"\"'.0123456789-+");
-
-//remainingsortselectclause.outputl(L"remainingsortselectclause=");
-
 	while (remainingsortselectclause.length())
 	{
 
 		word1=getword(remainingsortselectclause);
 		ucword=word1.ucase();
 
+		//(S) etc
 		//options - last word enclosed in () or {}
 		//ignore options (last word and surrounded by brackets)
 		if (!remainingsortselectclause.length() && (word1[1]==L"(" && word1[-1]==L")") || (word1[1] == L"{" && word1[-1] == L"}"))
 		{
-//		word1.outputl(L"skipping last word in () options ");
+			//word1.outputl(L"skipping last word in () options ");
 			continue;
 		}
 
@@ -2154,7 +2174,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 			if (ucword==L"NOT")
 			{
 				whereclause ^= L" NOT ";
-				ucword=getword(remainingsortselectclause);
+				ucword=getword(remainingsortselectclause, true);
 			}
 			if (ucword==L"BETWEEN")
 			{
@@ -2202,7 +2222,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 			if (ucword==L"LIKE")
 			{
 
-				word1=getword(remainingsortselectclause);
+				word1=getword(remainingsortselectclause, true);
 				// _ and % are like ? and * in globbing in sql LIKE
 				//if present in the search criteria, they need to be escaped with TWO backslashes.
 				word1.swapper(L"_",L"\\\\_");
@@ -2242,9 +2262,27 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 					whereclause ^= L" = ";
 			}
 
+			//if no values then put the next word back onto the front of the remainingsortselectclause
+			if (ucword and !valuechars.index(ucword[1])) {
+				if (remainingsortselectclause!=L"")
+					ucword^=L" ";
+				remainingsortselectclause.splice(1,0,ucword);
+				ucword=L"";
+			}
+
+			//if no values follow then assume we are testing for not ""
+			//TODO we should be testing for not "" and not 0
+			if (!ucword)
+				ucword=L" <> ''";
+
 			//append value(s)
 			if (usingnaturalorder)
 				ucword=naturalorder(ucword.toString());
+
+			//multiple values
+			if (ucword.index(FM))
+				ucword = L" in ( " ^ ucword.swap(FM_, L" ") ^ L" )";
+
 			whereclause ^= ucword;
 
 		}
@@ -2762,7 +2800,7 @@ bool var::createindex(const var& fieldname, const var& dictfile) const
 	ISSTRING(fieldname)
 	ISSTRING(dictfile)
 
-	var filename=*this;
+	var filename=(*this);
 
 	//actual dictfile to use is either given or defaults to that of the filename
 	var actualdictfile;
@@ -2779,8 +2817,33 @@ bool var::createindex(const var& fieldname, const var& dictfile) const
 	var ismv;
 	var sortable=false;
 	var dictexpression=getdictexpression(filename,filename,actualdictfile,actualdictfile,fieldname,joins,ismv,false);
-//dictexpression.outputl(L"dictexp=");stop();
-	var sql=L"create index index__" ^ filename ^ L"__" ^ fieldname ^ L" on " ^ filename;
+	//dictexpression.outputl(L"dictexp=");stop();
+
+	var sql;
+
+	//index on calculated columns causes an additional column to be created
+	if (dictexpression.index(L"exodus_call")) {
+
+		//add a new index field
+		var index_fieldname=L"index_" ^ fieldname;
+		sql=L"alter table " ^ filename ^ L" add " ^ index_fieldname ^ L" bytea";
+		if (not var().sqlexec(sql)) {
+			sql.outputl(L"sql failed ");
+			return false;
+		}
+
+		//update the new index field for all records
+		sql=L"update " ^ filename ^ L" set " ^ index_fieldname ^ L" = " ^ dictexpression;
+		sql.outputl(L"sql=");
+		if (not var().sqlexec(sql)) {
+			sql.outputl(L"sql failed ");
+			return false;
+		}
+		dictexpression=index_fieldname;
+	}
+
+	//create postgres index
+	sql=L"create index index__" ^ filename ^ L"__" ^ fieldname ^ L" on " ^ filename;
 	sql^=L" (";
 	sql^=dictexpression;
 	sql^=L")";
@@ -2794,9 +2857,15 @@ bool var::deleteindex(const var& fieldname) const
 	THISISSTRING()
 	ISSTRING(fieldname)
 
-	//var filename=*this;
-	var sql=L"drop index index__" ^ *this ^ L"__" ^ fieldname;
+	//delete the index field (actually only present on calculated field indexes so ignore result)
+	//deleting the index field automatically deletes the index
+	var index_fieldname=L"index_" ^ fieldname;
+	if (var().sqlexec(L"alter table " ^ (*this) ^ L" drop " ^ index_fieldname))
+		return true;
 
+	//delete the index
+	//var filename=*this;
+	var sql=L"drop index index__" ^ (*this) ^ L"__" ^ fieldname;
 	return this->sqlexec(sql);
 }
 

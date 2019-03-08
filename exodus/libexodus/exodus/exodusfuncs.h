@@ -59,24 +59,26 @@ DLL_PUBLIC var time();
 DLL_PUBLIC var timedate();
 DLL_PUBLIC void ossleep(const int milliseconds);
 DLL_PUBLIC var ostime();
+
 DLL_PUBLIC bool osopen(const var& osfilename, var& osfilevar, const var& locale DEFAULTNULL);
 DLL_PUBLIC void osclose(const var& osfilevar);
 
-DLL_PUBLIC var osbread(const var& osfilevar, var& startoffset, const int length);
-DLL_PUBLIC bool osbread(var& data, const var& osfilevar, var& startoffset, const int length);
-DLL_PUBLIC bool osbwrite(const var& data, const var& osfilevar, var& startoffset);
+//DLL_PUBLIC var osbread(const var& osfilevar, var& startoffset, const int length);
+//DLL_PUBLIC var osbread(const var& osfilevar, const var& startoffset, const int length);
+DLL_PUBLIC bool osbread(var& data, const var& osfilevar, var& startoffset, const int length, const bool adjust=true);
+DLL_PUBLIC bool osbread(var& data, const var& osfilevar, const var& startoffset, const int length, const bool adjust=true);
 
-DLL_PUBLIC var osbread(const var& osfilevar, const var& startoffset, const int length);
-DLL_PUBLIC bool osbread(var& data, const var& osfilevar, const var& startoffset, const int length);
-DLL_PUBLIC bool osbwrite(const var& data, const var& osfilevar, const var& startoffset);
+DLL_PUBLIC bool osbwrite(const var& data, const var& osfilevar, var& startoffset, const bool adjust=true);
+DLL_PUBLIC bool osbwrite(const var& data, const var& osfilevar, const var& startoffset, const bool adjust=true);
 
+DLL_PUBLIC bool oswrite(const var& data,const var& osfilename, const var& locale DEFAULTNULL);
 DLL_PUBLIC bool osread(var& data, const var& osfilename, const var& locale DEFAULTNULL);
 DLL_PUBLIC var osread(const var& osfilename);
-DLL_PUBLIC bool oswrite(const var& data,const var& osfilename, const var& locale DEFAULTNULL);
 
 DLL_PUBLIC bool osdelete(const var& osfilename);
 DLL_PUBLIC bool osrename(const var& oldosdir_or_filename, const var& newosdir_or_filename);
 DLL_PUBLIC bool oscopy(const var& fromosdir_or_filename, const var& newosdir_or_filename);
+
 DLL_PUBLIC var oslist(const var& path DEFAULTDOT, const var& wildcard DEFAULTNULL, const int mode=0);
 DLL_PUBLIC var oslistf(const var& path DEFAULTDOT, const var& wildcard DEFAULTNULL);
 DLL_PUBLIC var oslistd(const var& path DEFAULTDOT, const var& wildcard DEFAULTNULL);
@@ -224,7 +226,8 @@ DLL_PUBLIC bool lock(const var& filehandle, const var& key);
 DLL_PUBLIC void unlock(const var& filehandle, const var& key);
 DLL_PUBLIC void unlockall();
 DLL_PUBLIC bool open(const var& filename, var& filehandle);
-DLL_PUBLIC bool open(const var& dictdata, const var& filename, var& filehandle);
+DLL_PUBLIC bool open(const var& filename);
+//DLL_PUBLIC bool open(const var& dictdata, const var& filename, var& filehandle);
 DLL_PUBLIC bool read(var& record, const var& filehandle, const var& key);
 DLL_PUBLIC bool matread(dim& dimrecord, const var& filehandle, const var& key);
 DLL_PUBLIC bool readv(var& record, const var& filehandle, const var& key, const var& fieldnumber);
@@ -305,6 +308,12 @@ void print(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg
 template<class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10>
 void print(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9, T10 arg10)
 { print(arg1); print(arg2); print(arg3); print(arg4); print(arg5); print(arg6); print(arg7); print(arg8); print(arg9); print(arg10);}
+template<class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10, class T11>
+void print(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9, T10 arg10, T11 arg11)
+{ print(arg1); print(arg2); print(arg3); print(arg4); print(arg5); print(arg6); print(arg7); print(arg8); print(arg9); print(arg10); print(arg11);}
+template<class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10, class T11, class T12>
+void print(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9, T10 arg10, T11 arg11, T12 arg12)
+{ print(arg1); print(arg2); print(arg3); print(arg4); print(arg5); print(arg6); print(arg7); print(arg8); print(arg9); print(arg10); print(arg11); print(arg12);}
 
 template<class T1, class T2>
 void printt(T1 arg1, T2 arg2)
@@ -333,6 +342,12 @@ void printt(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 ar
 template<class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10>
 void printt(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9, T10 arg10)
 { printt(arg1); printt(arg2); printt(arg3); printt(arg4); printt(arg5); printt(arg6); printt(arg7); printt(arg8); printt(arg9); printt(arg10);}
+template<class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10, class T11>
+void printt(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9, T10 arg10, T11 arg11)
+{ printt(arg1); printt(arg2); printt(arg3); printt(arg4); printt(arg5); printt(arg6); printt(arg7); printt(arg8); printt(arg9); printt(arg10); printt(arg11);}
+template<class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10, class T11, class T12>
+void printt(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9, T10 arg10, T11 arg11, T12 arg12)
+{ printt(arg1); printt(arg2); printt(arg3); printt(arg4); printt(arg5); printt(arg6); printt(arg7); printt(arg8); printt(arg9); printt(arg10); printt(arg11); printt(arg12);}
 
 template<class T1, class T2>
 void printl(T1 arg1, T2 arg2)
@@ -361,6 +376,12 @@ void printl(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 ar
 template<class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10>
 void printl(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9, T10 arg10)
 { print(arg1); print(arg2); print(arg3); print(arg4); print(arg5); print(arg6); print(arg7); print(arg8); print(arg9); printl(arg10);}
+template<class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10, class T11>
+void printl(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9, T10 arg10, T11 arg11)
+{ print(arg1); print(arg2); print(arg3); print(arg4); print(arg5); print(arg6); print(arg7); print(arg8); print(arg9); print(arg10); printl(arg11);}
+template<class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10, class T11, class T12>
+void printl(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9, T10 arg10, T11 arg11, T12 arg12)
+{ print(arg1); print(arg2); print(arg3); print(arg4); print(arg5); print(arg6); print(arg7); print(arg8); print(arg9); print(arg10); print(arg11); printl(arg12);}
 
 }//namespace exodus
 

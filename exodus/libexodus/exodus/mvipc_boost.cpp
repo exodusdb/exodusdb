@@ -2,7 +2,7 @@
 #ifdef EXODUS_IPC_BOOST
 
 //replaced by windows version because of permissions issues in windows
-//replaced by ipc_posix because that is portable enough on non-windows platforms
+//REPLACED by ipc_posix because that is portable enough on non-windows platforms
 
 //http://www.boost.org/doc/libs/1_39_0/doc/html/interprocess/acknowledgements_notes.html
 #include <boost/interprocess/ipc/message_queue.hpp>

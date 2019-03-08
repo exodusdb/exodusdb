@@ -488,12 +488,13 @@ var ExodusProgramBase::perform(const var& sentence) {
 		OPTIONS = "";
 	        //similar code in exodus_main() and mvprogram.cpp:perform()
 	        var lastchar=COMMAND[-1];
-	        if (lastchar==")")
-	                OPTIONS=COMMAND.field2(L"(",-1);
+	        if (lastchar==")") {
+	                OPTIONS=L"(" ^ COMMAND.field2(L"(",-1);
+		}
 	        else if (lastchar=="}")
-	                OPTIONS=COMMAND.field2(L"{",-1);
+	                OPTIONS=L"{" ^ COMMAND.field2(L"{",-1);
 	        if (OPTIONS)
-	                COMMAND.splicer(-(OPTIONS.length()+2),OPTIONS.length()+2, L"");
+	                COMMAND.splicer(-(OPTIONS.length()),OPTIONS.length(), L"");
 
 		//load the shared library file
 		var libid = SENTENCE.field(L" ", 1).lcase();
@@ -913,43 +914,6 @@ bool ExodusProgramBase::lockrecord(const var& filename, const var& file, const v
 	return true;
 
 }
-
-/*
-//bool ExodusProgramBase::osbreadx(var& str1, const var& filehandle, const var& filename, const int startoffset, const int length)
-bool ExodusProgramBase::osbreadx(var& str1, const var& filehandle,
-		const var& filename, var& startoffset, const int length) {
-	//convert from external to internal "codepage"
-	//park the high characters in the low place
-	return str1.osbread(filehandle, startoffset, length).converter(
-			EXTERNALCHARS, INTERNALCHARS);
-
-	//evade warning: unused parameter
-	if (filename) {
-	}
-}
-
-bool ExodusProgramBase::oswritex(const var& str1, const var& filename) const {
-	//convert from internal to external "codepage"
-	//move parked characters to high characters
-	//(any field seps in the output will already have been escaped like %fe)
-	var default_locale(L"");
-	return str1.convert(INTERNALCHARS, EXTERNALCHARS).oswrite(filename,
-			default_locale);
-}
-
-bool ExodusProgramBase::osbwritex(const var& str1, const var& filehandle,
-		const var& filename, var& offset) const {
-	//convert from internal to external "codepage"
-	//move parked characters to high characters
-	//(any field seps in the output will already have been escaped like %fe)
-	return str1.convert(INTERNALCHARS, EXTERNALCHARS).osbwrite(filehandle,
-			offset);
-
-	//evade warning: unused parameter
-	if (filename) {
-	}
-}
-*/
 
 var ExodusProgramBase::singular(const var& pluralnoun) {
 

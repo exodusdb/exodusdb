@@ -44,10 +44,10 @@ bool callexodus(const char* serverid, const char* request, const int nrequestbyt
 	socketpath+=serverid;
 
 	/*prepare a socket*/
-    int s;
-    //int newsock;
-    //int fromlen;
-    s = socket(AF_UNIX, SOCK_STREAM, 0);
+	int s;
+	//int newsock;
+	//int fromlen;
+	s = socket(AF_UNIX, SOCK_STREAM, 0);
 
 	/*connect to the socket or fail*/
 	struct sockaddr_un server;
@@ -66,7 +66,7 @@ bool callexodus(const char* serverid, const char* request, const int nrequestbyt
     }
 
 	/*send the request*/
-    if (write(s,request,nrequestbytes)<0)
+	if (write(s,request,nrequestbytes)<0)
 	{
 		sprintf(response,"pgexodus failure '%d' writing socket '%s'",errno,socketpath.c_str());
 		return 0;

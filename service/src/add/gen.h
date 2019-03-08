@@ -1,9 +1,6 @@
-#ifndef EXO_GEN_H
-
 #include <exodus/common.h>
 
-class gen_common : public LabelledCommon{
-public:
+commoninit(gen,2)
 
 var address="";
 var addresses="addresses";
@@ -22,6 +19,9 @@ var _security="";
 var glang="";
 var accounting="";
 
+commonexit(gen,2)
+
+/*
 };
 
 #define gen_common_no 2
@@ -44,3 +44,4 @@ gen_common&& gen=reinterpret_cast<gen_common&&> (*mv.labelledcommon[gen_common_n
 //#define gen_isdefined (mv.labelledcommon[gen_common_no] != NULL)
 
 #endif//EXO_GEN_H
+*/

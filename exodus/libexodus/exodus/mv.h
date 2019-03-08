@@ -773,10 +773,10 @@ public:
 	//TODO cache osfilehandles somehow (use var_int?)
 	bool osopen() const;
 	bool osopen(const var& filename, const var& locale DEFAULTNULL) const;
-	var& osbread(const var& osfilevar, var& startoffset, const int length);
-	var& osbread(const var& osfilevar, const var& startoffset, const int length);
-	bool osbwrite(const var& osfilevar, var& startoffset) const;
-	bool osbwrite(const var& osfilevar, const var& startoffset) const;
+	var& osbread(const var& osfilevar, var& startoffset, const int length, const bool adjust=true);
+	var& osbread(const var& osfilevar, const var& startoffset, const int length, const bool adjust=true);
+	bool osbwrite(const var& osfilevar, var& startoffset, const bool adjust=true) const;
+	bool osbwrite(const var& osfilevar, const var& startoffset, const bool adjust=true) const;
 	void osclose() const;
 	bool osread(const var& osfilename, const var& locale DEFAULTNULL);
 	bool oswrite(const var& osfilename, const var& locale DEFAULTNULL) const;
@@ -992,7 +992,7 @@ public:
 	var hash(const unsigned long long modulus=0) const;
 	var unique() const;
 
-	//CONVERT TO DIM
+	//CONVERT TO DIM (returns a dim)
 	//see also dim.split()
 	dim split() const;
 
@@ -1019,16 +1019,22 @@ public:
 	//NB parameters are not const
 	//?return the starting position of a substr starting at character nn or 0 if not found
 
+	var sum(const var& sepchar) const;
+	var sum() const;
+
 	var lower() const;
 	var raise() const;
 	var crop() const;
+
+	var remove(var& startx, var& delimiterno) const;
+
+	//multivalued + - * / :
+	var mv(const char* opcode, const var& var2) const;
 
 	//mutable versions update and return source
 	var& lowerer();
 	var& raiser();
 	var& cropper();
-
-	var remove(var& startx, var& delimiterno) const;
 
 	//mutable versions update and return source
 	//-er version to update too?
@@ -1045,10 +1051,20 @@ public:
 
 	var erase(const int fieldno, const int valueno=0, const int subvalueno=0) const;
 
+	//.a(...) stands for .attribute(...) or extract(...)
+	//pick/revelation
+	// xxx=yyy<10>";
+	//becomes c++
+	// xxx=yyy.a(10);
 	var a(const int fieldno,const int valueno=0,const int subvalueno=0) const;
 	var extract(const int fieldno,const int valueno=0,const int subvalueno=0) const;
 
 	//mutable versions update and return source
+	//r stands for "replacer" abbreviated due to high incidience in code
+	//pick/revelation
+	// xyz<10>="abc";
+	//becomes c++
+	//  xyz.r(10,"abc");
 	var& r(const int fieldno,const int valueno,const int subvalueno,const var& replacement);
 	var& r(const int fieldno,const int valueno,const var& replacement);
 	var& r(const int fieldno,const var& replacement);
@@ -1072,8 +1088,6 @@ public:
 	bool locateby(const var& target, const var& ordercode, var& setting, const int fieldno,const int valueno=0) const;
 	bool locateusing(const var& target, const var& usingchar, var& setting, const int fieldno=0, const int valueno=0, const int subvalueno=0) const;
 	bool locateusing(const var& target, const var& usingchar) const;
-	var sum(const var& sepchar) const;
-	var sum() const;
 
 	//var FILE I/O
 

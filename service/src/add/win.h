@@ -1,10 +1,8 @@
-#ifndef EXO_WIN_H
-
 #include <exodus/common.h>
 
-class win_common : public LabelledCommon{
-public:
+commoninit(win,1)
 
+//default constructor
 win_common(){
 	registerx.redim(10);
 	registerx="";
@@ -144,6 +142,9 @@ win_common(){
  var labelcnt="";
  dim registerx;
 
+commonexit(win,1)
+
+/*
 };
 
 #define win_common_no 1
@@ -152,3 +153,4 @@ win_common&& win=reinterpret_cast<win_common&&> (*mv.labelledcommon[win_common_n
 //#define win_isdefined (mv.labelledcommon[win_common_no] != NULL)
 
 #endif //EXO_WIN_H
+*/

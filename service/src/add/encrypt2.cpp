@@ -3,7 +3,7 @@ libraryinit()
 
 function main(in password) {
 	//TODO
-	return password;
+	return invert(password);
 }
 
 libraryexit()

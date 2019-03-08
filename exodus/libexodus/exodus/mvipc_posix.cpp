@@ -30,6 +30,7 @@ using namespace std;
 #else
 #define TRACING 3
 #endif
+//#define TRACING 5
 namespace exodus {
 
 void respondToRequests(int sock, const std::string& socketpath, ExodusFunctorBase& exodusfunctorbase)
@@ -119,8 +120,13 @@ void respondToRequests(int sock, const std::string& socketpath, ExodusFunctorBas
 		//determine a response
 		getResponseToRequest(chRequest,nn,0,response,exodusfunctorbase);
 
+		//log
+		#if TRACING >= 3
+			wprintf(L"---------------------------------\nMVipc() writing response %d bytes to socket\n",response.size());
+		#endif
+
 		//send a response
-		if (write(sock2,response.data(),response.length())<0)
+		if (write(sock2,response.c_str(),response.size())<0)
 		{
 			std::cout << "mvipc: error" << errno << " " << strerror(errno) << " writing socket " << socketpath << std::endl;
 			continue;

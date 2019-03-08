@@ -134,6 +134,7 @@ function main()
 		//enable function names in backtrace
 		//nopie to prevent ALSR preventing backtrace
 		if (debugging)
+			//basicoptions^=" -g -rdynamic";
 			basicoptions^=" -no-pie -g -rdynamic";
 
 		//optimiser unfortunately prevents backtrace
@@ -451,6 +452,19 @@ function main()
 			srcfilename^="."^default_extension;
 
 		}
+	        //search paths and convert to absolute filename
+	        //similar code in edic.cpp and compile.cpp
+	        if (not(osfile(srcfilename)) and not(srcfilename.index(SLASH))) {
+	                var paths=osgetenv("CPLUS_INCLUDE_PATH").convert(";",":");
+	                var npaths=dcount(paths,":");
+	                for (var pathn=1;pathn<npaths;pathn++) {
+	                        var srcfilename2=paths.field(":",pathn) ^ "/" ^ srcfilename;
+	                        if (osfile(srcfilename2)) {
+	                                srcfilename=srcfilename2;
+	                                break;
+	                        }
+	                }
+	        }
 		//get file text
 		if (verbose)
 			print("sourcefilename=");

@@ -299,19 +299,19 @@ USER0="";
 
 			//prepare some dictionary records
 			var dictrecs = L"";
-			dictrecs  =      L"@id   |F|0 |Id     |S|||||L|20";
-			dictrecs ^= FM ^ L"type  |F|1 |Type   |S|||||L|4";
-			dictrecs ^= FM ^ L"fmc   |F|2 |Field  |S|||||R|3";
-			dictrecs ^= FM ^ L"title |F|3 |Title  |M|||||T|20";
-			dictrecs ^= FM ^ L"sm    |F|4 |SM     |S|||||L|1";
-			dictrecs ^= FM ^ L"part  |F|5 |Part   |S|||||R|2";
-			dictrecs ^= FM ^ L"conv  |F|7 |Convert|S|||||T|20";
-			dictrecs ^= FM ^ L"just  |F|9 |Justify|S|||||L|3";
-			dictrecs ^= FM ^ L"length|F|10|Length |S|||||R|6";
-			dictrecs ^= FM ^ L"master|F|28|Master |S|||||L|1";
-			dictrecs ^= FM ^ L"@crt  |G|  |"
-			"type fmc part title sm conv just length master"
-			" by type by fmc by part by @id";
+			dictrecs  =      L"@ID   |F|0 |Id     |S|||||L|20";
+			dictrecs ^= FM ^ L"TYPE  |F|1 |Type   |S|||||L|4";
+			dictrecs ^= FM ^ L"FMC   |F|2 |Field  |S|||||R|3";
+			dictrecs ^= FM ^ L"TITLE |F|3 |Title  |M|||||T|20";
+			dictrecs ^= FM ^ L"SM    |F|4 |SM     |S|||||L|1";
+			dictrecs ^= FM ^ L"PART  |F|5 |Part   |S|||||R|2";
+			dictrecs ^= FM ^ L"CONV  |F|7 |Convert|S|||||T|20";
+			dictrecs ^= FM ^ L"JUST  |F|9 |Justify|S|||||L|3";
+			dictrecs ^= FM ^ L"LENGTH|F|10|Length |S|||||R|6";
+			dictrecs ^= FM ^ L"MASTER|F|28|Master |S|||||L|1";
+			dictrecs ^= FM ^ L"@CRT  |G|  |"
+			"TYPE FMC PART TITLE SM CONV JUST LENGTH MASTER"
+			" by TYPE by FMC by PART by @ID";
 
 			//write the dictionary records to the dictionary
 			var nrecs=dictrecs.dcount(FM);
@@ -415,18 +415,18 @@ phraseinit:
 		gosub getword();		//var(L"GETLIST " ^ word).perform();
 		perform(L"getlist "^word);
 
-	} else if (word eq L"and" or word eq L"or") {
+	} else if (word.lcase() eq L"and" or word.lcase() eq L"or") {
 		ss ^= L" " ^ word;
 
 	} else if (word eq L"(" or word eq L")") {
 		ss ^= L" " ^ word;
 
-	} else if (word eq L"by" or word eq L"by-dsnd") {
+	} else if (word.lcase() eq L"by" or word.lcase() eq L"by-dsnd") {
 		ss ^= L" " ^ word;
 		gosub getword();
 		ss ^= L" " ^ word;
 
-	} else if (word eq L"with not" or word eq L"with" or word eq L"without" or word eq L"limit") {
+	} else if (word eq L"with not" or word.lcase() eq L"with" or word.lcase() eq L"without" or word eq L"limit") {
 		ss ^= L" " ^ word;
 
 		var limit = word eq L"limit";
@@ -713,7 +713,7 @@ x1exit:
 	if (not (coln or crtx) and DICT) {
 	// and ((DICT.ucase() ne dict_voc.ucase()) or (filename.ucase() eq L"MD") or (filename.ucase() eq L"dict_voc"))) {
 
-		var words=printing ? L"@lptr,@crt" : L"@crt,@lptr";
+		var words=printing ? L"@LPTR,@CRT" : L"@CRT,@LPTR";
 		for (int ii=1;ii<=2;++ii) {
 			word = words.field(L",",ii);
 			if (not xx.read(DICT, word)) {
@@ -747,8 +747,8 @@ x1exit:
 		};//coln;
 
 		//set column 1 @ID
-		colname(1) = L"@" L"id";
-		if (not DICT or not coldict(1).read(DICT, L"@" L"id")) {
+		colname(1) = L"@ID";
+		if (not DICT or not coldict(1).read(DICT, L"@ID")) {
 			if (not dict_voc or not coldict(1).read(dict_voc, L"@" L"ID"))
 				coldict(1) = L"F" ^ FM ^ L"0" ^ FM ^ L"Ref" ^ FM ^ FM ^ FM ^ FM ^ FM ^ FM ^ L"L" ^ FM ^ 15;
 		}
