@@ -5,8 +5,8 @@ programinit()
 #include <gen.h>
 #include <fin.h>
 #include <agy.h>
-#include <booking.h>
-#include <booking2.h>
+#include <bkg.h>
+#include <bkg2.h>
 
 function main() {
 
@@ -15,8 +15,8 @@ function main() {
         mv.labelledcommon[2]=new gen_common;
         mv.labelledcommon[3]=new fin_common;
         mv.labelledcommon[4]=new agy_common;
-        mv.labelledcommon[5]=new booking_common;
-        mv.labelledcommon[6]=new booking2_common;
+        mv.labelledcommon[5]=new bkg_common;
+        mv.labelledcommon[6]=new bkg2_common;
 
 	//cat ~/arev/dic/*.SQL | psql -h 127.0.0.1 -U exodus exodus
 

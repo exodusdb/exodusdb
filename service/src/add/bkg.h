@@ -1,5 +1,5 @@
 #include <exodus/common.h>
-commoninit(booking,5)
+commoninit(bkg,5)
 
 var costs="";
 var lang="";
@@ -103,4 +103,4 @@ var dategridfmt="";
 var startcol="";
 var endcol="";
 
-commonexit(booking,5)
+commonexit(bkg,5)

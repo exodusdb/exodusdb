@@ -1,5 +1,5 @@
 #include <exodus/common.h>
-commoninit(booking2,6)
+commoninit(bkg2,6)
 
 var orderno="";
 var updrequired="";
@@ -30,5 +30,7 @@ var bookingcurrfmt="";
 var disallowx="";
 var reqlinemode="";
 var tt="";
+var xglang="";
+var bookingcurrcode="";
 
-commonexit(booking2,6)
+commonexit(bkg2,6)

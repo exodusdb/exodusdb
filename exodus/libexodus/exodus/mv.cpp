@@ -1550,8 +1550,10 @@ MVNotImplemented	::MVNotImplemented	(const var& var1)	: MVException(L"MVNotImple
 MVDebug			::MVDebug		(const var& var1)	: MVException(L"MVDebug"				^ var1	){}
 //MVStop		::MVStop		(const var& var1)	: MVException(L"MVStop:"				^ var1 	){}
 //MVAbort		::MVAbort		(const var& var1)	: MVException(L"MVAbort"				^ var1	){}
+//MVAbortAll		::MVAbortAll		(const var& var1)	: MVException(L"MVAbortAll"				^ var1	){}
 MVStop			::MVStop		(const var& var1)	: description(						var1	){}
 MVAbort			::MVAbort		(const var& var1)	: MVException(						var1	){}
+MVAbortAll		::MVAbortAll		(const var& var1)	: MVException(						var1	){}
 
 MVArrayDimensionedZero	::MVArrayDimensionedZero ()			: MVException(L"MVArrayDimensionedZero:"			){}
 MVArrayIndexOutOfBounds	::MVArrayIndexOutOfBounds (const var& var1)	: MVException(L"MVArrayIndexOutOfBounds:" 		^ var1	){}

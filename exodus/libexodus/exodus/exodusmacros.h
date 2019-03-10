@@ -84,6 +84,15 @@ int main(int exodus__argc, char *exodus__argv[]) \
 		else \
 			exit(1); \
 	} \
+	catch (MVAbortAll exceptionx) \
+	{ \
+		if (exceptionx.description.length()) \
+			exceptionx.description.outputl();\
+		if (exceptionx.description.isnum()) \
+			exit(exceptionx.description); \
+		else \
+			exit(2); \
+	} \
 	catch (MVException exceptionx) \
 	{ \
 		printl(exceptionx.description, " - Aborting."); \

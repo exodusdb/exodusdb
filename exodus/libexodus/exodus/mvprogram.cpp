@@ -486,15 +486,15 @@ var ExodusProgramBase::perform(const var& sentence) {
 		//set new perform environment
 		COMMAND = SENTENCE;
 		OPTIONS = "";
-	        //similar code in exodus_main() and mvprogram.cpp:perform()
-	        var lastchar=COMMAND[-1];
-	        if (lastchar==")") {
-	                OPTIONS=L"(" ^ COMMAND.field2(L"(",-1);
+		//similar code in exodus_main() and mvprogram.cpp:perform()
+		var lastchar=COMMAND[-1];
+		if (lastchar==")") {
+			OPTIONS=L"(" ^ COMMAND.field2(L"(",-1);
 		}
-	        else if (lastchar=="}")
-	                OPTIONS=L"{" ^ COMMAND.field2(L"{",-1);
-	        if (OPTIONS)
-	                COMMAND.splicer(-(OPTIONS.length()),OPTIONS.length(), L"");
+		else if (lastchar=="}")
+			OPTIONS=L"{" ^ COMMAND.field2(L"{",-1);
+		if (OPTIONS)
+			COMMAND.splicer(-(OPTIONS.length()),OPTIONS.length(), L"");
 
 		//load the shared library file
 		var libid = SENTENCE.field(L" ", 1).lcase();
@@ -529,6 +529,12 @@ var ExodusProgramBase::perform(const var& sentence) {
 		catch (const MVAbort& e) {
 			//similar to stop for the time being
 			//maybe it should set some error flag/messages
+			ANS=L"";
+		}
+		catch (const MVAbortAll& e) {
+			//similar to stop for the time being
+			//maybe it should set some error flag/messages
+			//and abort multiple levels of perform?
 			ANS=L"";
 		}
 

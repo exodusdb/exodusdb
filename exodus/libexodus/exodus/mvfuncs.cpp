@@ -191,6 +191,15 @@ void var::abort(const var& text) const
 	throw MVAbort(text);
 }
 
+void var::abortall(const var& text) const
+{
+	THISIS(L"void var::abortall(const var& text) const")
+	ISSTRING(text)
+
+	//exit(1);
+	throw MVAbort(text);
+}
+
 bool var::assigned() const
 {
 	//THISIS(L"bool var::assigned() const")
