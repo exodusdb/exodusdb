@@ -1,4 +1,7 @@
-#include <exodus/exodus.h>
+#include <exodus/program.h>
+programinit()
+
+function main() {
 
 const var EXODUS_FUNCTOR_MAXNARGS=20;
 //var outfilename="genfunctors.h";
@@ -33,6 +36,10 @@ var foot=
         "};\n"
         "#endif\n"
         ;
+
+	return 0;
+}
+
 /*
 * output one templated class to implementing a functor
 * mode: [in] is "function" (default) or "subroutine"
@@ -102,6 +109,7 @@ subroutine genfunctor(in mode, in nargs)
         printl(outputfilename);
         oswrite(text,outputfilename);
 
+	return 0;
 }
 
 //change to program to run as command line
@@ -115,3 +123,5 @@ subroutine genfunctors()
         }
 
 }
+
+programexit()

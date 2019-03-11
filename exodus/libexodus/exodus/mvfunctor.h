@@ -36,7 +36,7 @@ binary is automatically loaded the first time that the function is called.
 
 #include <exodus/exodus.h>
 #include "lib1.h"
-program(){
+exodusprogram(){
  subr3("xyz");
 }
 

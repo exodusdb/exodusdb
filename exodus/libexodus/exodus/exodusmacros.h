@@ -48,7 +48,7 @@ THE SOFTWARE.
 //(regrettably eq is defined in global namespace in some libraries)
 
 //capture global SENTENCE in wrapper function exodus_main
-//main calls main2 so that opening { is required after program() macro
+//main calls main2 so that opening { is required after exodusprogram() macro
 //TODO get exodus_main to call main2 directly - need to pass it a function pointer
 //sadly, passing argc argv causes gcc and -Wall -Wextra to give "warning: unused parameter �exodus__argc�"
 //so dont pass them ... they are included in mv SENTENCE/COMMAND/OPTION somehow anyway.
@@ -56,7 +56,7 @@ THE SOFTWARE.
 //SIMILAR CODE IN
 //program.h programexit
 //exodusmacros.h libraryexit(
-#define program() \
+#define exodusprogram() \
 void main2(MvEnvironment& mv); \
 int main(int exodus__argc, char *exodus__argv[]) \
 { \

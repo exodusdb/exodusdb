@@ -1,7 +1,9 @@
-#include <exodus/exodus.h>
+#include <exodus/program.h>
 
-program()
-{
+programinit()
+
+
+function main() {
 
         var filename=COMMAND.a(2);
         var fieldname=COMMAND.a(3);
@@ -19,6 +21,7 @@ program()
         }
         if (not silent)
                 printl(filename ^ " " ^ fieldname ^ " index");
-
+	return 0;
 }
 
+programexit()

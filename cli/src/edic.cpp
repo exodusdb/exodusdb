@@ -1,7 +1,7 @@
-#include <exodus/exodus.h>
+#include <exodus/program.h>
+programinit()
 
-program()
-{
+function main() {
     //check command syntax
     //edit filename
     if (dcount(COMMAND,FM)<2)
@@ -391,4 +391,8 @@ program()
         }
 
     }
+    return 0;
 }
+
+programexit()
+

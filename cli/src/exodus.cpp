@@ -20,10 +20,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include <exodus/exodus.h>
+#include <exodus/program.h>
+programinit()
 
-program()
-{
+
+function main() {
 
         printl("Exodus Copyright (c) 2009 steve.bush@neosys.com");
         printl("http://www.opensource.org/licenses/mit-license.php");
@@ -179,4 +180,7 @@ program()
         } else
                 stop("Cannot find SHELL or ComSpec in environment");
 
+	return 0;
 }
+
+programexit()

@@ -1,12 +1,11 @@
 #include <exodus/program.h>
+programinit()
 
 //for the sake of multivalue gurus new to exodus programming this is written
 //with multivalue-mimicking "everything is a global function" syntax
 //instead of exodus's oo-style syntax "xxx.yyy().zzz()".
 
 var filename="myclients";
-
-programinit()
 
 function main() {
 

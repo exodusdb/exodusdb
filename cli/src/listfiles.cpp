@@ -1,6 +1,9 @@
-#include <exodus/exodus.h>
+#include <exodus/program.h>
+programinit()
 
-program()
-{
+function main() {
         printl(listfiles().convert(FM,"\n"));
 }
+
+programexit()
+

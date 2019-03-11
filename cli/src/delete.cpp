@@ -1,7 +1,8 @@
-#include <exodus/exodus.h>
+#include <exodus/program.h>
 
-program()
-{
+programinit()
+
+function main() {
 
         var filename=COMMAND.a(2);
 
@@ -38,5 +39,7 @@ program()
 
         if (not silent)
                 printl(ndeleted^" record(s) deleted.");
+	return 0;
 }
 
+programexit()

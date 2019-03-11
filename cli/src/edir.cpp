@@ -1,7 +1,7 @@
-#include <exodus/exodus.h>
+#include <exodus/program.h>
+programinit()
 
-program()
-{
+function main() {
         //hard coded editor at the moment
         //http://www.nano-editor.org/docs.php
         var editor="nano";
@@ -115,4 +115,7 @@ program()
                         }
                 }
         }
+        return 0;
 }
+
+programexit()
