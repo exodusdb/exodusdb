@@ -162,45 +162,6 @@ var var::iconv(const wchar_t* convstr) const
 			return output;
 			break;
 
-		//[NUMBER [DATE [TIME
-		case L'[':
-
-			//empty string in, empty string out
-			if (var_typ&pimpl::VARTYP_STR && var_str.length()==0)
-				return L"";
-
-			//check following first character
-			//(could be \0 since convstr is char*)
-			switch (convstr[1])
-			{
-				//[NUMBER
-				case L'N':
-					//non-numeric returned unconverted
-					//if (!isnum())
-					//	return *this;
-
-					//return oconv_MD(convstr);
-					//TODO workout options after [NUMBER,
-					return *this;
-					break;
-
-				//[DATE
-				case L'D':
-					return iconv_D(L"D");
-					break;
-
-				//[TIME
-				case L'T':
-					//return iconv_MT(L"MT");
-					return iconv_MT();
-					break;
-
-				//passed only one [ character!
-				case L'\0':
-					return (*this);
-					break;
-			}
-
 		//L#, R#, T#
 		case L'L':
 		case L'R':
@@ -242,6 +203,12 @@ var var::iconv(const wchar_t* convstr) const
 				break;
 			}
 
+			break;
+
+		//custom conversion should not be called via ::oconv
+		case L'[':
+
+			throw MVException(L"Custom conversions like (" ^ var(convstr) ^ L") must be called like a function iconv(input,conversion) not like a method, input.iconv(conversion)" );
 			break;
 
 		//empty convstr string - no conversion
@@ -315,62 +282,62 @@ var var::oconv_T(const var& format) const
 				continue;
 			}
 
-		
+
 
 			nwords = part.count(L" ") + 1;
 
 			for (int wordn = 1; wordn <= nwords; wordn++) {
-	
+
 				var word = part.field(L" ", wordn, 1);
-	
+
 				int wordlen = word.length();
-	
+
 				if (wordn > 1) {
 					if (!wordlen)
 						continue;
 					output ^= TM;
 				}
-	
+
 				//long words get tm inserted every width characters
 				for (int ii = 1; ii <= wordlen; ii+=width) {
 					if (ii > 1)
 						output ^= TM;
 					output ^= word.substr(ii, width);
 				};//ii;
-	
+
 				int remaining = width - (wordlen % width);
-	
+
 				if (wordlen == 0 or remaining not_eq width) {
-	
+
 					if (remaining <= 1) {
 						if (remaining)
 							output ^= fillchar;
 					}else{
-	
+
 						//try to squeeze in following words into the remaining space
 						while (remaining > 1 && wordn<nwords) {
 							var nextword = part.field(L" ", wordn + 1, 1);
-	
+
 							int nextwordlen=nextword.length();
 							if (nextwordlen + 1 > remaining)
 								break;
-	
+
 							wordn += 1;
 							output ^= fillchar;
 							output ^= nextword;
 							remaining -= nextwordlen + 1;
 						}//loop;
-	
+
 						//output ^= var(remaining).space();
 						spacing.resize(remaining,fillchar);
 						output ^= spacing;
 
 					}
-	
+
 				}
-	
+
 			};//wordn;
-	
+
 		}
 
 		if (!terminator)
@@ -741,49 +708,6 @@ var var::oconv(const wchar_t* conversion) const
 			return output;
 			break;
 
-		//[NUMBER [DATE [TIME
-		case L'[':
-
-			//empty string in, empty string out
-			if (var_typ&pimpl::VARTYP_STR && var_str.length()==0)
-				return L"";
-
-			++conversionchar;
-
-			//check second character
-			switch (*conversionchar)
-			{
-				//[NUMBER
-				case L'N':
-					//non-numeric returned unconverted
-					//if (!isnum())
-					//	return *this;
-
-					//return oconv_MD(conversion);
-					//TODO workout options after [NUMBER,
-					return *this;
-					break;
-
-				//[DATE
-				case L'D':
-					if (!isnum())
-						return *this;
-
-					return oconv_D(L"D");
-					break;
-
-				//[TIME
-				case L'T':
-					if (!isnum())
-						return *this;
-
-					//return oconv_MT(L"MT");
-					//point to the remainder of the conversion (may be nothing if just MT)
-					return oconv_MT(++conversionchar);
-					break;
-			}
-			break;
-
 		//L#, R#
 		//format even empty strings
 		case L'L':
@@ -841,6 +765,13 @@ var var::oconv(const wchar_t* conversion) const
 			else
 				return var(conversion).substr(2).field(L",",2);
 			break;
+
+		//custom conversion should not be called via ::oconv
+		case L'[':
+
+			throw MVException(L"Custom conversions like (" ^ var(conversion) ^ L") must be called like a function oconv(input,conversion) not like a method, input.oconv(conversion)" );
+			break;
+
 
 		//empty conversion string - no conversion
 		case L'\0':

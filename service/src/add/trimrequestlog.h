@@ -4,7 +4,7 @@
 
 //a member variable/object to cache a pointer/object for the shared library function
 //ExodusFunctorBase efb_trimrequestlog;
-class efb_trimrequestlog : private ExodusFunctorBase
+class efb_trimrequestlog : public ExodusFunctorBase
 {
 public:
 

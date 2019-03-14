@@ -4,7 +4,7 @@
 
 //a member variable/object to cache a pointer/object for the shared library function
 //ExodusFunctorBase efb_getsortjs;
-class efb_getsortjs : private ExodusFunctorBase
+class efb_getsortjs : public ExodusFunctorBase
 {
 public:
 

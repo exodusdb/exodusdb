@@ -11,6 +11,13 @@ class ExodusProgramBase
 
 public:
 
+typedef const var& in;
+typedef var& io;
+typedef var& out;
+
+#include <exodus/ioconv_custom.h>
+
+
 DLL_PUBLIC
 	ExodusProgramBase(MvEnvironment& inmv);
 
@@ -128,6 +135,9 @@ DLL_PUBLIC
 
     //was MVDB
 	var getuserdept(const var& usercode);
+
+	var oconv(const var& input, const var& conversion);
+	var iconv(const var& input, const var& conversion);
 
 private:
 

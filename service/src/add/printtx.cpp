@@ -304,7 +304,7 @@ subroutine convoptions() {
 			if (optionchar == "T") {
 				newoptions ^= timedate();
 			} else if (optionchar == "D") {
-				newoptions ^= (var().date()).oconv("[DATE,*]");
+				newoptions ^= oconv(date(),"[DATE,*]");
 			} else if (optionchar == "P") {
 				newoptions ^= pagen + 1;
 			} else if (optionchar == "L") {

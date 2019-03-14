@@ -57,7 +57,7 @@ function main()
 
 	printl("-- Exodus Postgres Configuration ---");
 
-        printl(var("Input options and connect to postgres").oconv("L#40"));
+        printl(oconv("Input options and connect to postgres","L#40"));
 	var serverconn;
         var adminconn=input_adminconn(oldconn,serverconn);
 	if (not adminconn)
@@ -92,7 +92,7 @@ function main()
 		if (not saveconfig[1].ucase().index("Y"))
 			break;
 
-		var("Saving user configuration in .exodus").oconv("L#40").output();
+		oconv("Saving user configuration in .exodus","L#40").output();
 		var userconn=serverconn^" dbname="^dbname^" user="^dbusername^" password="^dbuserpass;
 		if (oswrite(userconn,configfilename)) {
 			printl("done!");
@@ -241,12 +241,12 @@ function create_db(in dbname, in dbusername)
 
 function configure_via_connection(in adminconn, in dbname, in dbusername, in dbuserpass)
 {
-        print(("Creating new user "^ dbusername^ " ... ").oconv("L#40"));
+        print(oconv("Creating new user "^ dbusername^ " ... ","L#40"));
         if (not create_dbuser(dbusername,dbuserpass))
                 //stop();
                 printl("Error: Could not create user ",dbusername);
 
-        print(("Creating new database "^ dbname^ " ... ").oconv("L#40"));
+        print(oconv("Creating new database "^ dbname^ " ... ","L#40"));
         if (not create_db(dbname,dbusername))
                 //stop();
                 printl("Error: Could not create database ",dbname);
@@ -255,7 +255,7 @@ function configure_via_connection(in adminconn, in dbname, in dbusername, in dbu
 	disconnect();
 	printl("done!");
 
-        print(var("Connecting to new database ... ").oconv("L#40"));
+        print(oconv("Connecting to new database ... ","L#40"));
 	var connstr2=adminconn^" dbname="^dbname;
 
 	//^" user="^dbusername^" password="^dbuserpass;
@@ -352,7 +352,7 @@ function configure_via_connection(in adminconn, in dbname, in dbusername, in dbu
 	disconnect();
 	printl("done!");
 
-        print(var("Connecting to template1 database ... ").oconv("L#40"));
+        print(oconv("Connecting to template1 database ... ","L#40"));
 		var connstr3=adminconn^" dbname=template1";
         if (not connect(connstr3))
                 stop("Stopping. Cannot connect to template1 database");

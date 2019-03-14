@@ -201,10 +201,11 @@ DLL_PUBLIC var index(const var& instring, const var& substr,const int occurrence
 DLL_PUBLIC var index2(const var& instring, const var& substr,const int startcharno=1);
 DLL_PUBLIC var field(const var& instring, const var& substrx,const int fieldnx,const int nfieldsx=1);
 DLL_PUBLIC var field2(const var& instring, const var& substrx,const int fieldnx,const int nfieldsx=1);
-DLL_PUBLIC var oconv(const var& instring, const wchar_t* conversion);
-DLL_PUBLIC var oconv(const var& instring, const var& conversion);
-DLL_PUBLIC var iconv(const var& instring, const wchar_t* conversion);
-DLL_PUBLIC var iconv(const var& instring, const var& conversion);
+//moved to mvprogram to allow custom conversions like "[DATE]"
+//DLL_PUBLIC var oconv(const var& instring, const wchar_t* conversion);
+//DLL_PUBLIC var oconv(const var& instring, const var& conversion);
+//DLL_PUBLIC var iconv(const var& instring, const wchar_t* conversion);
+//DLL_PUBLIC var iconv(const var& instring, const var& conversion);
 DLL_PUBLIC bool connect(const var& connectionstring DEFAULTNULL);
 DLL_PUBLIC bool disconnect();
 DLL_PUBLIC bool createdb(const var& dbname);

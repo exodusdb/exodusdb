@@ -4,7 +4,7 @@
 
 //a member variable/object to cache a pointer/object for the shared library function
 //ExodusFunctorBase efb_rtp57;
-class efb_rtp57 : private ExodusFunctorBase
+class efb_rtp57 : public ExodusFunctorBase
 {
 public:
 

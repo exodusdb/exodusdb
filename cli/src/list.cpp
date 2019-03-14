@@ -862,7 +862,7 @@ x1exit:
 				coltags ^= L" />";
 			} else {
 				for (var ii = 1; ii <= 9; ++ii)
-					colheading.r(ii, colheading.a(ii) ^ (coldict(coln).a(3, ii)).oconv(coldict(coln).a(11)) ^ L" ");
+					colheading.r(ii, colheading.a(ii) ^ oconv(coldict(coln).a(3, ii),coldict(coln).a(11)) ^ L" ");
 			}
 		}
 	}
@@ -882,7 +882,7 @@ x1exit:
 			t2 = L"";
 		else
 			t2 = L"(" ^ t2 ^ L")";
-		colheading.swapper(L"(Base)", t2.oconv(tt));
+		colheading.swapper(L"(Base)", oconv(t2,tt));
 		colheading.swapper(L"%BASE%", company.a(3));
 	}
 
@@ -1184,7 +1184,7 @@ subroutine process_one_record()
 			cell=calculate(colname(coln));
 
 		if (not html and dictrec.a(9) == L"T")
-			mcol(coln)=cell.oconv(dictrec.a(11));
+			mcol(coln)=oconv(cell,dictrec.a(11));
 		else
 			mcol(coln)=cell;
 
@@ -1302,7 +1302,7 @@ subroutine process_one_record()
 				//oconv
 				var oconvx = coldict(coln).a(7);
 				if (oconvx) {
-					tt = tt.oconv(oconvx);
+					tt = oconv(tt,oconvx);
 
 					//prevent html folding of numbers on minus sign
 					if (html) {
@@ -1318,7 +1318,7 @@ subroutine process_one_record()
 
 					//non-html format to fixed with with spaces
 					if (not html)
-						tt = tt.oconv(coldict(coln).a(11));
+						tt = oconv(tt,coldict(coln).a(11));
 
 					//html blank is nbsp
 					if (tt eq L"")
@@ -1601,7 +1601,7 @@ subroutine printbreaks()
 				//format it
 				var oconvx = coldict(coln).a(7);
 				if (oconvx)
-					cell = cell.oconv(oconvx);
+					cell = oconv(cell,oconvx);
 
 				if (html) {
 					if (cell eq L"")
@@ -1620,7 +1620,7 @@ subroutine printbreaks()
 				cell = breakvalue(coln);
 				var oconvx = coldict(coln).a(7);
 				if (oconvx)
-					cell = cell.oconv(oconvx);
+					cell = oconv(cell,oconvx);
 
 				//store the new break value
 				breakvalue(coln) = scol(coln);
@@ -1629,7 +1629,7 @@ subroutine printbreaks()
 					newhead = orighead;
 					temp = scol(coln);
 					if (oconvx)
-						temp = temp.oconv(oconvx);
+						temp = oconv(temp,oconvx);
 					temp.swapper(SQ, L"\'\'");
 					newhead.swapper(L"\'B\'", temp);
 				}
@@ -1654,7 +1654,7 @@ subroutine printbreaks()
 			if (wcol(coln)) {
 				if (not html) {
 					cell = cell.substr(1, wcol(coln));
-					cell = cell.oconv(coldict(coln).a(11));
+					cell = oconv(cell,coldict(coln).a(11));
 					tx ^= cell ^ tdx;
 				} else {
 					tx ^= L"<td";

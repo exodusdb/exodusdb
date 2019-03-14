@@ -81,11 +81,11 @@ add_library(exodus SHARED
 
  ConvertUTF.c howto.cpp mvarray.cpp mvdatetime.cpp  mvdebug.cpp
  mvfuncs.cpp mvioconv.cpp
- naturalorder.cpp gettimeofday.cpp mv2.cpp mv.cpp
+ naturalorder.cpp gettimeofday.cpp mv2.cpp mv.cpp mvprogram.cpp
  mvdbpostgres.cpp mvenvironment.cpp mvglobalfuncs.cpp
  mvipc.cpp mvmv.cpp mvunicode.cpp mvipc_boost.cpp mvipc_posix.cpp
  mvipc_ms.cpp mvposix.cpp MurmurHash2_64.cpp
- mvfunctor.cpp mvprogram.cpp mvhandles.cpp mvdbconns.cpp mvos.cpp mvprocessno.cpp getkey.cpp haskey.cpp
+ mvfunctor.cpp mvhandles.cpp mvdbconns.cpp mvos.cpp mvprocessno.cpp getkey.cpp haskey.cpp
 )
 
 #set_target_properties(exodus PROPERTIES SOVERSION "${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_VERSION}")
@@ -122,7 +122,7 @@ install(FILES
  xfunctors12.h xfunctors13.h xfunctors14.h xfunctors15.h xfunctors16.h
  xfunctors17.h xfunctors18.h xfunctors19.h xfunctors2.h xfunctors20.h
  xfunctors3.h xfunctors4.h xfunctors5.h xfunctors6.h xfunctors7.h
- xfunctors8.h xfunctors9.h
+ xfunctors8.h xfunctors9.h ioconv_custom.h
 DESTINATION include/exodus)
 
 message("--LIBEXODUS CMAKE EXIT --")

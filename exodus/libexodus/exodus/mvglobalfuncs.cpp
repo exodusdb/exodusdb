@@ -818,6 +818,7 @@ DLL_PUBLIC var field2(const var& instring, const var& substrx,const int fieldnx,
 	return instring.field2(substrx, fieldnx,nfieldsx);
 }
 
+/* moved to mvprogram to allow custom conversions like "[DATE]"
 DLL_PUBLIC var oconv(const var& instring, const wchar_t* conversion)
 {
 	return instring.oconv(conversion);
@@ -837,7 +838,7 @@ DLL_PUBLIC var iconv(const var& instring, const var& conversion)
 {
 	return instring.iconv(conversion);
 }
-
+*/
 
 DLL_PUBLIC bool connect(const var& connectioninfo)
 {

@@ -4,7 +4,7 @@
 
 //a member variable/object to cache a pointer/object for the shared library function
 //ExodusFunctorBase efb_flushindex;
-class efb_flushindex : private ExodusFunctorBase
+class efb_flushindex : public ExodusFunctorBase
 {
 public:
 

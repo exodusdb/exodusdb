@@ -1200,6 +1200,65 @@ var ExodusProgramBase::getuserdept(const var& usercode) {
 
 }
 
+var ExodusProgramBase::oconv(const var& input, const var& conversion) {
+
+	//call user conversion routine
+	//almost identical code in var::oconv and var::iconv
+	//ENSURE synchronised if you change it
+
+	//either call custom conversion routines
+	if (conversion[1] == L"[") {
+
+		//extract any params
+		var mode=conversion.field(L",",2,9999).field(L"]",1);
+
+		//set the function name
+		ioconv_custom=conversion.substr(2).field(L",",1).field(L"]",1).lcase();
+
+		//wire up the current environment
+		ioconv_custom.mv_ = (&mv);
+
+		//and call it
+		var output;
+		call ioconv_custom(L"OCONV",input,mode,output);
+		return output;
+
+	//or call standard conversion methods
+	} else {
+		return input.oconv(conversion);
+	}
+}
+
+var ExodusProgramBase::iconv(const var& input, const var& conversion) {
+
+	//call user conversion routine
+	//almost identical code in var::oconv and var::iconv
+	//ENSURE synchronised if you change it
+
+	//either call custom conversion routines
+	if (conversion[1] == L"[") {
+
+		//extract any params
+		var mode=conversion.field(L",",2,9999).field(L"]",1);
+
+		//set the function name
+		ioconv_custom=conversion.substr(2).field(L",",1).field(L"]",1).lcase();
+
+		//wire up the current environment
+		ioconv_custom.mv_ = (&mv);
+
+		//and call it
+		var output;
+		call ioconv_custom(L"ICONV",input,mode,output);
+		return output;
+
+	//or call standard conversion methods
+	} else {
+		return input.iconv(conversion);
+	}
+}
+
+
 }//of namespace exodus
 
 

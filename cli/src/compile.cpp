@@ -822,11 +822,12 @@ var inclusion=
 
 //new method using member functions to call external functions with mv environment
 //using a functor class that allows library name changing
+//public inheritance only so we can directly access mv in mvprogram.cpp for oconv/iconv. should perhaps be private inheritance and mv set using .init(mv)
 var inclusion=
 "\r\n"
 "\r\n//a member variable/object to cache a pointer/object for the shared library function"
 "\r\n//ExodusFunctorBase efb_funcx;"
-"\r\nclass efb_funcx : private ExodusFunctorBase"
+"\r\nclass efb_funcx : public ExodusFunctorBase"
 "\r\n{"
 "\r\npublic:"
 "\r\n"

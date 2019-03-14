@@ -1656,6 +1656,11 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 	}
 	else if (dicttype==L"S")
 	{
+		sqlexpression=dictrec.a(17);
+		if (sqlexpression) {
+			return sqlexpression;
+		}
+
 		var functionx=dictrec.a(8).trim();
 		if (functionx.substr(1,11).ucase()==L"@ANS=XLATE(")
 		{
@@ -1688,7 +1693,7 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 
 				//determine the join details
 				var fromdictexpression;
-				if (xlatefromfieldname.substr(1,8)==L"@RECORD<")
+				if (xlatefromfieldname.substr(1,8).ucase()==L"@RECORD<")
 				{
 					fromdictexpression=L"exodus_extract_bytea(";
 					fromdictexpression ^= fileexpression(mainfilename, filename,L"data");

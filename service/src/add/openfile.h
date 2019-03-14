@@ -4,7 +4,7 @@
 
 //a member variable/object to cache a pointer/object for the shared library function
 //ExodusFunctorBase efb_openfile;
-class efb_openfile : private ExodusFunctorBase
+class efb_openfile : public ExodusFunctorBase
 {
 public:
 
