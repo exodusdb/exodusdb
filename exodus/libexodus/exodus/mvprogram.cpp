@@ -33,15 +33,16 @@ void ExodusProgramBase::mssg(const var& msg, const var& options) const {
 void ExodusProgramBase::mssg(const var& msg, const var& options, var& buffer, const var& params) const {
 
 	//var interactive = !SYSTEM.a(33);
+	var msg1=msg.convert(L"|" ^ FM ^ VM ^ SM, L"\n\n\n\n");
 
-	std::wcout << msg;
+	std::wcout << msg1;
 
 	if (USER4.length() > 8000) {
-		var msg2="Aborted MSG()>8000";
+		var msg2=L"Aborted MSG()>8000";
 		std::wcout << msg2;
 		USER4 ^= FM ^ msg2;
 	} else {
-		USER4.r(-1, msg);
+		USER4.r(-1, msg1);
 	}
 
 	std::wcout << std::endl;
@@ -557,6 +558,30 @@ var ExodusProgramBase::perform(const var& sentence) {
 
 	return ANS;
 
+}
+
+var ExodusProgramBase::xlate(const var& filename, const var& key, const var& fieldno_or_name, const var& mode) {
+
+	//handle non-numeric field_no ie dictionary field/column name
+	if (not fieldno_or_name.isnum()) {
+
+		//get the whole record
+		var record=key.xlate(filename, L"", mode);
+
+		//handle record not found and mode C
+		if (mode == L"C" && record == key)
+			return key;
+
+		//handle record not found and mode X
+		if (not record.length())
+			return record;
+
+		//use calculate()
+		return calculate(fieldno_or_name,L"dict_" ^ filename, key, record);
+
+	}
+
+        return key.xlate(filename, fieldno_or_name, mode);
 }
 
 var ExodusProgramBase::calculate(const var& dictid, const var& dictfile, const var& id, const var& record, const var& mvno) {
@@ -1257,7 +1282,6 @@ var ExodusProgramBase::iconv(const var& input, const var& conversion) {
 		return input.iconv(conversion);
 	}
 }
-
 
 }//of namespace exodus
 

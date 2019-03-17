@@ -71,6 +71,7 @@ DLL_PUBLIC
 	var calculate(const var& dictid);
 	var calculate(const var& dictid, const var& dictfile, const var& id, const var& record, const var& mv=0);
 
+	var xlate(const var& filename, const var& key, const var& fieldno_or_name, const var& mode);
 	//moved to exodusprogrambase
 	//var perform(const var& sentence);
 

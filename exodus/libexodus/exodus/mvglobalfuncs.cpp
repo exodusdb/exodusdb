@@ -1013,6 +1013,7 @@ DLL_PUBLIC bool readnextrecord(var& record, var& key)
 	return var().readnextrecord(record, key);
 }
 
+/*
 DLL_PUBLIC var xlate(const var& filename, const var& key, const var& fieldno, const wchar_t* mode)
 {
 	return key.xlate(filename, fieldno, mode);
@@ -1022,6 +1023,7 @@ DLL_PUBLIC var xlate(const var& filename, const var& key, const var& fieldno, co
 {
 	return key.xlate(filename, fieldno, mode);
 }
+*/
 
 DLL_PUBLIC var remove(const var& fromstr, var& startx, var& delimiterno)
 {

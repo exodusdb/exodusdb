@@ -2275,9 +2275,11 @@ var var::xlate(const var& filename,const var& fieldno, const wchar_t* mode) cons
 
 			//numeric fieldno not zero return field
 			//if (fieldno.isnum())
-				response ^= record.a(fieldno);
 
-			//non-numeric fieldno do calculate
+			//throw non-numeric error if fieldno not numeric
+			response ^= record.a(fieldno);
+
+			//non-numeric fieldno - cannot call calculate from here
 			//return calculate(fieldno,filename,mode);
 			continue;
 

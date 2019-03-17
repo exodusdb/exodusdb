@@ -1842,8 +1842,11 @@ bool var::deletelist(const var& listname) const
 	var listfilename=L"savelist_";
 	if (listname)
 		listfilename ^= listname;
-	else
-		listfilename ^= (*this) ^ L"_" ^ getprocessn() ^ L"_tempx";
+	else {
+		if (this->assigned())
+			listfilename ^= (*this);
+		listfilename ^= L"_" ^ getprocessn() ^ L"_tempx";
+	}
 
 	if (var().open(listfilename)) {
 		//listfilename.outputl(L"Deleted ");
@@ -1903,7 +1906,7 @@ bool var::makelist(const var& listname, const var& keys) const
 {
 	THISIS(L"bool var::makelist(const var& listname) const")
 	//?allow undefined usage like var xyz=xyz.select();
-	THISISSTRING()
+	THISISDEFINED()
 	ISSTRING(listname)
 	ISSTRING(keys)
 
@@ -1916,7 +1919,13 @@ bool var::makelist(const var& listname, const var& keys) const
 	if (listname)
 		listfilename^=listname;
 	else {
-		var listname2=(*this) ^ L"_" ^ getprocessn() ^ L"_tempx";
+		//var listname2=(*this) ^ L"_" ^ getprocessn() ^ L"_tempx";
+		var listname2;
+		if (this->assigned())
+			listname2=(*this);
+		else
+			listname2=L"";
+		listname2 ^= L"_" ^ getprocessn() ^ L"_tempx";
 		listfilename^=listname2;
 	}
 
@@ -2160,13 +2169,21 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		//with dictid eq/starting/ending/containing/like 1 2 3
 		//with dictid 1 2 3
 		//with dictid between x and y
-		//TODO:without (same as "with xxx not a and b and c")
-		if (ucword==L"WITH")
+		if (ucword==L"WITH" || ucword==L"WITHOUT")
 		{
 
-			//add the dictionary id
+			var without=ucword==L"WITHOUT";
+
+			//get the dictionary id
 			word1=getword(remainingsortselectclause);
 			ucword=word1.ucase();
+
+
+			//skip AUTHORISED for now since too complicated to calculate in database ATM
+			if (ucword==L"AUTHORISED")
+				continue;
+
+			//add the dictionary id
 			var sortable=false;//because indexes are NOT created sortable (exodus_sort()
 			var dictexpression=getdictexpression(actualfilename,actualfilename,dictfilename,dictfile,word1,joins,ismv,false);
 			var usingnaturalorder=dictexpression.index(L"exodus_extract_sort");
@@ -2180,7 +2197,10 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 			{
 				whereclause ^= L" NOT ";
 				ucword=getword(remainingsortselectclause, true);
+			} else if (without) {
+				whereclause ^= L" NOT ";
 			}
+
 			if (ucword==L"BETWEEN")
 			{
 				//get and append "from" value
