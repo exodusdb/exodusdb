@@ -20,6 +20,13 @@ function main() {
 
 	//cat ~/arev/dic/*.SQL | psql -h 127.0.0.1 -U exodus exodus
 
+	//gen.addresses="addresses";
+	//gen.timesheets="timesheets";
+	//gen.companies="companies";
+	//gen.currencies="currencies";
+	//gen.documents="documents";
+	//gen.units="units";
+
 	createfile("VOC");
 	createfile("DEFINITIONS");
 	createfile("PROCESSES");

@@ -968,8 +968,8 @@ public:
 	var& trimmerf(const var& trimchar);
 	var& trimmerb(const var& trimchar);
 	var& fieldstorer(const var& sepchar,const int fieldno, const int nfields,const var& replacement);
-	var& substrer(const int startx);
-	var& substrer(const int startx,const int length);
+	var& substrer(const int startindex);
+	var& substrer(const int startindex,const int length);
 
 	//STRING FILTERS
 	var convert(const var& oldchars,const var& newchars) const;
@@ -1000,8 +1000,10 @@ public:
 	//STRING EXTRACTION
 	//[x,y]
 	//var.s(start,length) substring
-	var substr(const int startx) const;
-	var substr(const int startx,const int length) const;
+	var substr(const int startindex) const;
+	var substr(const int startindex,const int length) const;
+	var substr(const int startindex, const var& delimiterchars, var& endindex) const;
+	var remove(var& startindex, var& delimiterno) const;
 	var index(const var& substr,const int occurrenceno=1) const;
 	var index2(const var& substr,const int startchar1=1) const;
 	var field(const var& substrx,const int fieldnx,const int nfieldsx=1) const;
@@ -1027,8 +1029,6 @@ public:
 	var raise() const;
 	var crop() const;
 
-	var remove(var& startx, var& delimiterno) const;
-
 	//multivalued + - * / :
 	var mv(const char* opcode, const var& var2) const;
 
@@ -1039,7 +1039,7 @@ public:
 
 	//mutable versions update and return source
 	//-er version to update too?
-	//var& remover(var& startx,var& length) const;
+	//var& remover(var& startindex,var& length) const;
 
 	var replace(const int fieldno,const int valueno,const int subvalueno,const var& replacement) const;
 	var replace(const int fieldno,const int valueno,const var& replacement) const;

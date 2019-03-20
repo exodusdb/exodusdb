@@ -2,12 +2,6 @@
 
 commoninit(win,1)
 
-//default constructor
-win_common(){
-	registerx.redim(10);
-	registerx="";
-}
-
  var srcfile="";
  var srcdict="";
  var xrefwindow="";
@@ -117,7 +111,7 @@ win_common(){
  var labelimage="";
  var wenv="";
  var winext="";
- var ww="";
+ dim ww;
  var vspvx="";
  var virtualon="";
  var ringnext="";

@@ -118,7 +118,7 @@ public:
 	//temporary application globals
 	var USER0 = L"";
 	var USER1 = L"";
-	var USER2 = L"MD20P,";//was base currency format
+	var USER2 = L"";//was base currency format
 	var USER3 = L"";
 	var USER4 = L"";
 
@@ -130,8 +130,8 @@ public:
 	var RECUR4 = L"";
 
 	//i18n/l10n - basic internationalisation/localisation
-	var DATEFORMAT = L"D/E";//international date format
-	var BASEFORMAT = L"MD20P,";//base currency format
+	var DATEFMT = L"D/E";//international date format
+	var BASEFMT = L"MD20P,";//base currency format
 	var SW = L"";
 
 	//encoding globals
@@ -146,6 +146,8 @@ public:
 	//INTCONST=keyboard constants 1:esc 2:f5 7:f10
 	var INTCONST = L"\x1b" _FM_ L"{f5?}" _FM_ _FM_ _FM_ _FM_ _FM_ "{f10?}";
 	var PRIORITYINT = L"";
+	var COL1;
+	var COL2;
 
 	//old scratch variables used for various buffering
 	var AW = L"";

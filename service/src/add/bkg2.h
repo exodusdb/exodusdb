@@ -32,5 +32,9 @@ var reqlinemode="";
 var tt="";
 var xglang="";
 var bookingcurrcode="";
+var showtax="";
+var taxperc="";
+var totaltax="";
+var canctotaltax="";
 
 commonexit(bkg2,6)

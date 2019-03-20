@@ -6,6 +6,6 @@ set -x
 for MODULE in sys gen fin agy med job tim
 do
 	mkdir -p  ../$MODULE
-	cp ~/arev/$MODULE/*.cpp ~/arev/$MODULE/*common.h ../$MODULE/
+	cp ~/arev/$MODULE/*.cpp ~/arev/$MODULE/*.h ../$MODULE/
 #	compile ../$MODULE/*.cpp {S}
 done

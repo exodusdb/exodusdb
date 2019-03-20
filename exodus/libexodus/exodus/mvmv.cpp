@@ -1501,41 +1501,41 @@ var& var::inserter(const int fieldno,const int valueno,const int subvalueno,cons
 //SUBSTR
 ////////
 
-var var::substr(const int startx) const
+var var::substr(const int startindex1) const
 {
-	THISIS(L"var var::substr(const int startx) const")
+	THISIS(L"var var::substr(const int startindex1) const")
 	THISISSTRING()
 
-	return var(*this).substrer(startx);
+	return var(*this).substrer(startindex1);
 
 }
 
 //[x,y]
 //var.s(start,length) substring
-var var::substr(const int startx,const int length) const
+var var::substr(const int startindex1,const int length) const
 {
-	THISIS(L"var var::substr(const int startx,const int length) const")
+	THISIS(L"var var::substr(const int startindex1,const int length) const")
 	THISISSTRING()
 
-	return var(*this).substrer(startx,length);
+	return var(*this).substrer(startindex1,length);
 
 }
 
-var& var::substrer(const int startx)
+var& var::substrer(const int startindex1)
 {
-	THISIS(L"var& var::substrer(const int startx) const")
+	THISIS(L"var& var::substrer(const int startindex1) const")
 	THISISSTRING()
 
 	//TODO look at using erase to speed up
-	return substrer(startx,(int) var_str.length());
+	return substrer(startindex1,(int) var_str.length());
 
 }
 
 //[x,y]
 //var.s(start,length) substring
-var& var::substrer(const int startx,const int length)
+var& var::substrer(const int startindex1,const int length)
 {
-	THISIS(L"var& var::substrer(const int startx,const int length) const")
+	THISIS(L"var& var::substrer(const int startindex1,const int length) const")
 	THISISSTRING()
 
 	//return L"" for ""
@@ -1548,7 +1548,7 @@ var& var::substrer(const int startx,const int length)
 		return *this;
 	}
 
-	int start=startx;
+	int start=startindex1;
 
 	//negative length means reverse the string
 	if (length<=0)
@@ -1689,17 +1689,19 @@ var var::mv(const char* opcode, const var& var2) const
 	THISISSTRING()
 	ISSTRING(var2)
 
-	//p1a and p1b are pointers to start and end of a value in var1 (this)
+	//p1a and p1b are zero based indexes of first and last+1 characters of a value in var1 (this)
 	std::wstring::size_type p1a=0;
 	std::wstring::size_type p1b=0;
 
-	//p2a and p2b are pointers to start and end of a value in var2
+	//p2a and p2b the same for var2 (arg)
 	std::wstring::size_type p2a=0;
 	std::wstring::size_type p2b=0;
 
 	var outstr=L"";
 	var mv1;
 	var mv2;
+	var sepchar1=VM;
+	var sepchar2=VM;
 
 	while (true) {
 
@@ -1708,6 +1710,7 @@ var var::mv(const char* opcode, const var& var2) const
 			p1b=var_str.find_first_of(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_ _SSTM_,p1a);
 			mv1=var(var_str.substr(p1a,p1b-p1a));
 			p1a=p1b;
+			sepchar1=var_str[p1b];
 		} else {
 			mv1=L"";
 		}
@@ -1717,6 +1720,7 @@ var var::mv(const char* opcode, const var& var2) const
 			p2b=var2.var_str.find_first_of(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_ _SSTM_,p2a);
 			mv2=var(var2.var_str.substr(p2a,p2b-p2a));
 			p2a=p2b;
+			sepchar2=var_str[p1b];
 		} else {
 			mv2=L"";
 		}
@@ -1755,7 +1759,7 @@ var var::mv(const char* opcode, const var& var2) const
 		if (p1a == std::wstring::npos && p2a == std::wstring::npos)
 			break;
 
-		outstr^=VM;
+		outstr^=sepchar1;
 
 		//skip over separator char
 		if (p1a != std::wstring::npos)
@@ -1768,23 +1772,74 @@ var var::mv(const char* opcode, const var& var2) const
 }
 
 ////////
+//SUBSTR upto any specified characters - very similar to var::remove
+////////
+
+//returns the characters up to the next delimiter
+//also returns the index of the next delimiter discovered or 1 after the string if none
+//NOTE startindex1 is 1 based not 0. anything less than 1 is treated as 1
+var var::substr(const int startindex1, const var& delimiterchars, var& endindex) const
+{
+	THISIS(L"var var::substr(const int startindex1, var& delimiterchars, var& endindex) const")
+	THISISSTRING()
+	ISSTRING(delimiterchars)
+
+	std::wstring::size_type start_pos=startindex1-1;
+
+	//domain check min startindex1
+	//handle before start of string
+	//startindex1 arg is 1 based per mv/pick standard
+	//remove treats anything below 1 as 1
+	//start_pos variable is zero based standard c++ logic
+	if (long(start_pos)<0)
+		start_pos=0;
+
+	//domain check max startindex1
+	//handle after end of string
+	if (start_pos>=var_str.length())
+	{
+		endindex=int(var_str.length()+1);
+		return L"";
+	}
+
+	//find the end of the field (or string)
+	std::wstring::size_type end_pos;
+	end_pos=var_str.find_first_of(delimiterchars.var_str,start_pos);
+
+	//past of of string?
+	if (end_pos==std::wstring::npos)
+	{
+		endindex=int(var_str.length()+1);
+		return var(var_str.substr(start_pos,var_str.length()-start_pos));
+	}
+
+	//return the index of the dicovered delimiter
+	//unlike remove which returns the index of one AFTER the discovered delimiter
+	endindex=int(end_pos+1);
+
+	//extract and return the substr as well
+	return var(var_str.substr(start_pos,end_pos-start_pos));
+
+}
+
+////////
 //REMOVE
 ////////
 
 //returns the characters up to the next delimiter
-//NOTE startchar1 is 1 based not 0. anything less than 1 is treated as 1
-var var::remove(var& startchar1, var& delimiterno) const
+//NOTE startindex1 is 1 based not 0. anything less than 1 is treated as 1
+var var::remove(var& startindex1, var& delimiterno) const
 {
-	THISIS(L"var var::remove(var& startchar1, var& delimiterno) const")
+	THISIS(L"var var::remove(var& startindex1, var& delimiterno) const")
 	THISISSTRING()
-	ISNUMERIC(startchar1)
+	ISNUMERIC(startindex1)
 	ISDEFINED(delimiterno)
 
-	std::wstring::size_type start_pos=startchar1.toInt()-1;
+	std::wstring::size_type start_pos=startindex1.toInt()-1;
 
 	//domain check
 	//handle before start of string
-	//startchar1 arg is 1 based per mv/pick standard
+	//startindex1 arg is 1 based per mv/pick standard
 	//remove treats anything below 1 as 1
 	//start_pos variable is zero based standard c++ logic
 	if (long(start_pos)<0)
@@ -1805,7 +1860,7 @@ var var::remove(var& startchar1, var& delimiterno) const
 	//past of of string?
 	if (end_pos==std::wstring::npos)
 	{
-		startchar1=(int) (var_str.length()+2);
+		startindex1=(int) (var_str.length()+2);
 		delimiterno=0;
 		return var(var_str.substr(start_pos,var_str.length()-start_pos));
 	}
@@ -1815,7 +1870,7 @@ var var::remove(var& startchar1, var& delimiterno) const
 	delimiterno=int(*_RM_)-int(var_str[end_pos])+1;
 
 	//point 1 after (next separator/or one character after the string)
-	startchar1=int(end_pos+2);
+	startindex1=int(end_pos+2);
 
 	//extract and return the substr as well
 	return var(var_str.substr(start_pos,end_pos-start_pos));

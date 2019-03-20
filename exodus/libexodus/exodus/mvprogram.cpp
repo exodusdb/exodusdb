@@ -98,7 +98,7 @@ var ExodusProgramBase::authorised(const var& task0, var& msg, const var& default
 	}
 
 	task.ucaser();
-	task.converter(RM ^ FM ^ VM ^ SVM, "\\\\\\");
+	task.converter(RM ^ FM ^ VM ^ SM, "\\\\\\");
 	task.swapper(" FILE ", " ");
 	task.swapper(" - ", " ");
 	task.converter(".", " ");

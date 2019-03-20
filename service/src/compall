@@ -6,7 +6,7 @@
 echo --------------Generate all headers--------------
 compile ../???/*.cpp {HS}
 
-for MODULE in add sys gen agy job tim
+for MODULE in add sys gen agy med job tim
 do
 #	cp ~/arev/$MODULE/*.cpp ../$MODULE/
 	echo --------------Compile $MODULE ------------------
