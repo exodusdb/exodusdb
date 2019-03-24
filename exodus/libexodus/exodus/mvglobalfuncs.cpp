@@ -1105,32 +1105,60 @@ DLL_PUBLIC var& eraser(var& instring, const int fieldno, const int valueno, cons
 	return instring.eraser(fieldno, valueno, subvalueno);
 }
 
+
+DLL_PUBLIC bool locate(const var& target, const var& instring)
+{
+	return instring.locate(target);
+}
+
+DLL_PUBLIC bool locate(const var& target, const var& instring, var& setting)
+{
+	return instring.locate(target, setting);
+}
+
 DLL_PUBLIC bool locate(const var& target, const var& instring, var& setting, const int fieldno, const int valueno)
 {
-	return instring.locate(target,setting,fieldno,valueno);
+	return instring.locate(target, setting, fieldno, valueno);
 }
 
-DLL_PUBLIC bool locateby(const var& target, const var& instring, const wchar_t* ordercode, var& setting, const int fieldno,const int 
-valueno)
+
+DLL_PUBLIC bool locateby(const char* ordercode, const var& target, const var& instring, var& setting)
 {
-	return instring.locateby(target,ordercode,setting,fieldno,valueno);
+	return instring.locateby(ordercode, target, setting);
 }
 
-DLL_PUBLIC bool locateby(const var& target, const var& instring, const var& ordercode, var& setting, const int fieldno,const int valueno)
+DLL_PUBLIC bool locateby(const char* ordercode, const var& target, const var& instring, var& setting, const int fieldno,const int valueno)
 {
-	return instring.locateby(target,ordercode,setting,fieldno,valueno);
+	return instring.locateby(ordercode, target, setting, fieldno, valueno);
 }
 
-DLL_PUBLIC bool locateusing(const var& target, const var& instring, const var& usingchar, var& setting, const int fieldno, const int 
-valueno, const int subvalueno)
+
+DLL_PUBLIC bool locateby(const var& ordercode, const var& target, const var& instring, var& setting)
 {
-	return instring.locateusing(target, usingchar, setting, fieldno, valueno, subvalueno);
+	return instring.locateby(ordercode, target, setting);
 }
 
-DLL_PUBLIC bool locateusing(const var& target, const var& instring, const var& usingchar)
+DLL_PUBLIC bool locateby(const var& ordercode, const var& target, const var& instring, var& setting, const int fieldno,const int valueno)
 {
-	return instring.locateusing(target, usingchar);
+	return instring.locateby(ordercode, target, setting, fieldno, valueno);
 }
+
+
+DLL_PUBLIC bool locateusing(const var& usingchar, const var& target, const var& instring)
+{
+	return instring.locateusing(usingchar, target);
+}
+
+DLL_PUBLIC bool locateusing(const var& usingchar, const var& target, const var& instring, var& setting)
+{
+	return instring.locateusing(usingchar, target, setting);
+}
+
+DLL_PUBLIC bool locateusing(const var& usingchar, const var& target, const var& instring, var& setting, const int fieldno, const int valueno, const int subvalueno)
+{
+	return instring.locateusing(usingchar, target, setting, fieldno, valueno, subvalueno);
+}
+
 
 DLL_PUBLIC var sum(const var& instring, const var& sepchar)
 {

@@ -735,15 +735,25 @@ var var::unique() const
         //linemark
         var result = L"";
         var start = 0;
-	var bit,term,xx;
+	var bit;
+	var delimiter;
+	var sepchar=VM;
+	bool founddelimiter=false;
         while (true) {
-                bit=(*this).remove(start, term);
+
+                bit=this->remove(start, delimiter);
+
+		if (!founddelimiter && delimiter)
+			//sepchar=RM_-int(delimiter)+1;
+			sepchar=var().chr(RM.seq()-delimiter+1);
+
                 if (bit.length()) {
-                        if (not(result.locateusing(bit, VM, xx))) {
-                                result ^= bit ^ VM;
+                        if (not(result.locateusing(sepchar,bit))) {
+                                if (delimiter)
+					result ^= bit ^ sepchar;
                         }
                 }
-		if (not term)
+		if (not delimiter)
 			break;
         }//loop;
         result.splicer(-1, 1, L"");
@@ -875,18 +885,24 @@ var& var::splicer(const int start1,const int length,const var& newstr)
 	//functionmode var newmv=var(var_str);
 	//proceduremode
 
-//TODO make sure start and length work like REVELATION and HANDLE NEGATIVE LENGTH!
+	//TODO make sure start and length work like REVELATION and HANDLE NEGATIVE LENGTH!
+
 	int start1b;
-	if (start1>0) start1b=start1;
+	if (start1>0) {
+		start1b=start1;
+	}
 	else if (start1<0)
-    {
-        start1b=int(var_str.length())+start1+1;
-        if (start1b<1) start1b=1;
-    }
-	else start1b=1;
+	{
+		start1b=int(var_str.length())+start1+1;
+        	if (start1b<1)
+			start1b=1;
+	}
+	else
+		start1b=1;
 
 	int lengthb;
-	if (length>=0) lengthb=length;
+	if (length>=0)
+		lengthb=length;
 	else {
 		//cannot go before start of string
 		if ((start1b+length)<=0)
@@ -901,7 +917,10 @@ var& var::splicer(const int start1,const int length,const var& newstr)
 		}
 	}
 
-	var_str.replace(start1b-1,lengthb,newstr.var_str);
+	if (start1b>var_str.length())
+		var_str+=newstr.var_str;
+	else
+		var_str.replace(start1b-1,lengthb,newstr.var_str);
 
 	return *this;
 
@@ -919,15 +938,21 @@ var& var::splicer(const int start1, const var& newstr)
 
 //TODO make sure start and length work like REVELATION and HANDLE NEGATIVE LENGTH!
 	int start1b;
-	if (start1>0) start1b=start1;
+	if (start1>0)
+		start1b=start1;
 	else if (start1<0)
-    {
-        start1b=int(var_str.length())+start1+1;
-        if (start1b<1) start1b=1;
-    }
-	else start1b=1;
+	{
+		start1b=int(var_str.length())+start1+1;
+		if (start1b<1)
+			start1b=1;
+    	}
+	else
+		start1b=1;
 
-	var_str.replace(start1b-1,var_str.length(),newstr.var_str);
+	if (start1b>var_str.length())
+		var_str+=newstr.var_str;
+	else
+		var_str.replace(start1b-1,var_str.length(),newstr.var_str);
 
 	return *this;
 
@@ -1041,6 +1066,54 @@ var& var::cropper()
 	THISIS(L"var& var::cropper()")
 	THISISSTRING()
 
+	std::wstring newstr=L"";
+
+	std::wstring::iterator iter=var_str.begin();
+	std::wstring::iterator iterend=var_str.end();
+
+	while (iter != iterend) {
+
+		wchar_t charx=(*iter);
+		++iter;
+
+		//simply append ordinary characters
+		if (charx<SSTM_ || charx>RM_)
+		{
+			newstr.push_back(charx);
+			continue;
+		}
+
+		//found a separator
+
+		//remove any lower separators from the end of the string
+		while (!newstr.empty()) {
+			wchar_t lastchar=newstr.back();
+			if (lastchar >= SSTM_ && lastchar < charx)
+				newstr.pop_back();
+			else
+				break;
+		}
+
+		//append the separator
+		newstr.push_back(charx);
+	}
+
+	//remove any trailing separators
+	while (!newstr.empty() && newstr.back()>=SSTM_ && newstr.back()<=RM_) {
+		newstr.pop_back();
+	}
+
+	var_str=newstr;
+	//swap(var_str,newstr);
+
+	return *this;
+}
+/*
+var& var::cropper()
+{
+	THISIS(L"var& var::cropper()")
+	THISISSTRING()
+
 	//aaaFbbbFVSSccc
 	//aaaFbbbFVSSccc
 
@@ -1075,6 +1148,7 @@ var& var::cropper()
 	std::wstring::reverse_iterator iter=var_str.rbegin();
 	std::wstring::reverse_iterator iterend=var_str.rend();
 
+	//skip all trailing separators
 	//move the REVERSE iterator backwards to the first non-field character
 	int ntrailing2trim=0;
 	while (iter!=iterend && (*iter)>=SSTM_ && (*iter)<=RM_)
@@ -1142,7 +1216,7 @@ cropperexit:
 
 	return *this;
 }
-
+*/
 var var::lower() const
 {
 	THISIS(L"var var::lower() const")

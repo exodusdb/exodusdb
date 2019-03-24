@@ -57,6 +57,142 @@ function main()
 	printl("wchar_t:  ",(int)sizeof(wchar_t));
 	printl("var:      ",(int)sizeof(var));
 
+	assert(crop(VM ^ FM) eq "");
+	assert(crop("xxx" ^ VM ^ FM) eq "xxx");
+	assert(crop("aaa" ^ VM ^ FM ^ "bbb") eq ("aaa" ^ FM ^ "bbb"));
+	assert(crop("aaa" ^ FM ^ "bbb" ^ FM ^ VM ^ SM ^ SM ^ FM ^ "ddd") eq ("aaa" ^ FM ^ "bbb" ^ FM ^ FM ^ "ddd"));
+	assert(crop("aaa" ^ FM ^ "bbb" ^ FM ^ VM ^ SM ^ SM ^ FM ^ RM ^ "ddd") eq ("aaa" ^ FM ^ "bbb" ^ RM ^ "ddd"));
+
+        assert(crop("aa" _VM_ _FM_ "bb" _FM_)=="aa" _FM_ "bb");
+        assert(crop("aa" _SM_ _VM_ _FM_ "bb" _FM_)=="aa" _FM_ "bb");
+        assert(crop(_FM_ "aa" _VM_ _FM_ "bb" _FM_)==_FM_ "aa" _FM_ "bb");
+        assert(crop(_FM_ "aa" _VM_ _FM_ "bb" _FM_ _VM_)==_FM_ "aa" _FM_ "bb");
+        assert(crop(_FM_ "aa" _VM_ _FM_ _VM_ "bb" _FM_ _VM_)==_FM_ "aa" _FM_ _VM_ "bb");
+        assert(crop(_FM_ "aa" _VM_ _FM_ "bb" _FM_ _RM_)==_FM_ "aa" _FM_ "bb");
+        assert(crop(_FM_ _RM_ "aa" _VM_ _FM_ "bb" _FM_ _RM_)==_RM_ "aa" _FM_ "bb");
+
+        var locii;
+        var locxx="1 2 3 10 20 30 100 200 300";
+        var locxd="300 200 100 30 20 10 3 2 1";
+        locxx.converter(" ",VM);
+        locxd.converter(" ",VM);
+	var ar="AR";
+	var locsep=",";
+
+        assert(locxx.locate(10)==1);
+
+        locxx.locate(30,locii);
+        assert(locii==6);
+
+        locxx.locate(31,locii);
+        assert(locii==10);
+
+        locxx.locate(30,locii,1);
+        assert(locii==6);
+
+        locxx.locate(31,locii,1);
+        assert(locii==10);
+
+        locxx.locate(31,locii,2);
+        assert(locii==1);
+
+        locxx.locateby(ar,21,locii);
+        assert(locii==6);
+
+        locxx.locateby("AR",21,locii);
+        assert(locii==6);
+
+        locxx.locateby("AL",21,locii);
+        assert(locii==3);
+
+        locxd.locateby("DR",21,locii);
+        assert(locii==5);
+
+        locxd.locateby("DL",21,locii);
+        assert(locii==2);
+
+        locxx.converter(VM,",");
+        locxd.converter(VM,",");
+
+        assert(locxx.locateusing(",",30)==1);
+        assert(locxx.locateusing(",",31)==0);
+
+        locxx.locateusing(",",30,locii);
+        assert(locii==6);
+
+        locxx.locateusing(locsep,30,locii);
+        assert(locii==6);
+
+
+        locxx.converter(",",VM);
+        locxd.converter(",",VM);
+
+        assert(locate(10,locxx)==1);
+
+        locate(30,locxx,locii);
+        assert(locii==6);
+
+        locate(31,locxx,locii);
+        assert(locii==10);
+
+        locate(30,locxx,locii,1);
+        assert(locii==6);
+
+        locate(31,locxx,locii,1);
+        assert(locii==10);
+
+        locate(31,locxx,locii,2);
+        assert(locii==1);
+
+        locateby(ar,21,locxx,locii);
+        assert(locii==6);
+
+        locateby("AR",21,locxx,locii);
+        assert(locii==6);
+
+        locateby("AL",21,locxx,locii);
+        assert(locii==3);
+
+        locateby("DR",21,locxd,locii);
+        assert(locii==5);
+
+        locateby("DL",21,locxd,locii);
+        assert(locii==2);
+
+        locxx.converter(VM,",");
+        locxd.converter(VM,",");
+
+        assert(locateusing(",",30,locxx)==1);
+        assert(locateusing(",",31,locxx)==0);
+
+        locateusing(",",30,locxx,locii);
+        assert(locii==6);
+
+        locateusing(locsep,30,locxx,locii);
+        assert(locii==6);
+
+
+        var aaa="11"^VM^VM^"13"^VM^FM^"21";
+        var bbb="1011"^VM^VM^"1013";
+
+        assert(aaa.mv(":",bbb).convert(_VM_ _FM_, L"]^")=="111011]]131013]^21");
+        assert(aaa.mv("+",bbb).convert(_VM_ _FM_, L"]^")=="1022]0]1026]0^21");
+        assert(aaa.mv("-",bbb).convert(_VM_ _FM_, L"]^")=="-1000]0]-1000]0^21");
+        assert(aaa.mv("*",bbb).convert(_VM_ _FM_, L"]^")=="11121]0]13169]0^0");
+
+        assert(bbb.mv(":",aaa).convert(_VM_ _FM_, L"]^")=="101111]]101313]^21");
+        assert(bbb.mv("+",aaa).convert(_VM_ _FM_, L"]^")=="1022]0]1026]0^21");
+        assert(bbb.mv("-",aaa).convert(_VM_ _FM_, L"]^")=="1000]0]1000]0^-21");
+        assert(bbb.mv("*",aaa).convert(_VM_ _FM_, L"]^")=="11121]0]13169]0^0");
+
+        aaa="11"  ^VM^VM^"13"  ^VM^FM^"21";
+        bbb="1011"^VM^"0"^VM^"1013"^VM^FM^"2011";
+        assert(aaa.mv("/",bbb).oconv("MD90P").convert(_VM_ _FM_, L"]^")=="0.010880317]0.000000000]0.012833169]0.000000000^0.010442566");
+
+        aaa=""^VM^"" ^VM^"0"^VM^"0"^VM;
+        bbb=""^VM^"0"^VM^""^VM^"0"^VM^""^VM^"0"^VM^""^VM^"0";
+        assert(aaa.mv("/",bbb).convert(_VM_ _FM_, L"]^")=="0]0]0]0]0]0]0]0");
+
 	//testing .mv(+ - * / :)
 	var m1="1" _VM_ "2" _VM_ _VM_ "4";
 	var m2="100" _VM_ "200" _VM_ "300"; 
@@ -139,11 +275,11 @@ function main()
 
 	var lbvn;
 	//no fieldno/value given means using character VM
-	assert(var("1" _VM_ "10" _VM_ "2" _VM_ "B").locateby("A","AL",lbvn)||lbvn==4);
+	assert(var("1" _VM_ "10" _VM_ "2" _VM_ "B").locateby("AL","A",lbvn)||lbvn==4);
 	//fieldno given means search in that field using character VM
-	assert(var("1" _VM_ "10" _VM_ "2" _VM_ "B").locateby("A","AL",lbvn,1)||lbvn==4);
+	assert(var("1" _VM_ "10" _VM_ "2" _VM_ "B").locateby("AL","A",lbvn,1)||lbvn==4);
 	//fieldno given and =0 means search whole string using character FM
-	assert(var("1" _FM_ "10" _FM_ "2" _FM_ "B").locateby("A","AL",lbvn,0)||lbvn==4);
+	assert(var("1" _FM_ "10" _FM_ "2" _FM_ "B").locateby("AL","A",lbvn,0)||lbvn==4);
 
         //check default utf8 output/input
 
@@ -1545,13 +1681,6 @@ while trying to match the argument list '(exodus::var, bool)'
 	//undefined
 	//var conn1=conn1.connect();
 
-	//assert(crop(VM ^ FM) eq "");
-	//assert(crop("xxx" ^ VM ^ FM) eq "xxx");
-	assert(crop("aaa" ^ VM ^ FM ^ "bbb") eq ("aaa" ^ FM ^ "bbb"));
-	assert(crop("aaa" ^ VM ^ FM ^ "bbb") eq ("aaa" ^ FM ^ "bbb"));
-	assert(crop("aaa" ^ FM ^ "bbb" ^ FM ^ VM ^ SM ^ SM ^ FM ^ "ddd") eq ("aaa" ^ FM ^ "bbb" ^ FM ^ FM ^ "ddd"));
-	assert(crop("aaa" ^ FM ^ "bbb" ^ FM ^ VM ^ SM ^ SM ^ FM ^ RM ^ "ddd") eq ("aaa" ^ FM ^ "bbb" ^ RM ^ "ddd"));
-
 	assert(space(-11) eq "");
 	assert(var("x").str(-7) eq "");
 
@@ -1855,8 +1984,8 @@ while trying to match the argument list '(exodus::var, bool)'
 	assert(regtest.match(regex1,"r"));
 
 	//test redimensioning
-	dim aaa(10);
-	aaa.redim(20,30);
+	dim aaaa(10);
+	aaaa.redim(20,30);
 
 	var sentence=sentence();
 

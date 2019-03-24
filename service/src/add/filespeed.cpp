@@ -1,9 +1,6 @@
 #include <exodus/program.h>
 programinit()
 
-
-#include <gen.h>
-
 var tempfilename;
 var rec;
 var tempfile;

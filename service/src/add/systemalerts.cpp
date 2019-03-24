@@ -1,9 +1,6 @@
 #include <exodus/library.h>
 libraryinit()
 
-
-//#include <gen.h>
-
 //used as a template to call the actual functions like generalalerts, financealerts, mediaalerts, jobalerts
 
 function main(in alerttype0, in runasuser, out tasks, out title, out request, out datax) {

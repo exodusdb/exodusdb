@@ -1,9 +1,6 @@
 #include <exodus/library.h>
 libraryinit()
 
-
-#include <gen.h>
-
 var processcategory;
 var processrec;
 var processparameters;

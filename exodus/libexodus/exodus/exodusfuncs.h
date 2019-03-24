@@ -274,11 +274,26 @@ DLL_PUBLIC var& inserter(var& instring, const int fieldno, const int valueno, co
 DLL_PUBLIC var& inserter(var& instring, const int fieldno, const var& insertion);
 
 DLL_PUBLIC var& eraser(var& instring, const int fieldno, const int valueno=0, const int subvalueno=0);
-DLL_PUBLIC bool locate(const var& instring, const var& target, var& setting, const int fieldno=0,const int valueno=0);
-DLL_PUBLIC bool locateby(const var& instring, const var& target, const wchar_t* ordercode, var& setting, const int fieldno=0,const int valueno=0);
-DLL_PUBLIC bool locateby(const var& instring, const var& target, const var& ordercode, var& setting, const int fieldno=0,const int valueno=0);
-DLL_PUBLIC bool locateusing(const var& instring, const var& target, const var& usingchar, var& setting, const int fieldno=0, const int valueno=0, const int subvalueno=0);
-DLL_PUBLIC bool locateusing(const var& instring, const var& target, const var& usingchar);
+
+//locate & locateby without fieldno or valueno arguments uses character VM as separator character
+//locate & locateby with fieldno=0 uses character FM
+//locate & locateby with fieldno>0 uses character VM
+//locate & locateby with valueno>0 uses character SM
+
+DLL_PUBLIC bool locate(const var& target, const var& instring);
+DLL_PUBLIC bool locate(const var& target, const var& instring, var& setting);
+DLL_PUBLIC bool locate(const var& target, const var& instring, var& setting, const int fieldno,const int valueno=0);
+
+DLL_PUBLIC bool locateby(const char* ordercode, const var& target, const var& instring, var& setting);
+DLL_PUBLIC bool locateby(const char* ordercode, const var& target, const var& instring, var& setting, const int fieldno,const int valueno=0);
+
+DLL_PUBLIC bool locateby(const var& ordercode, const var& target, const var& instring, var& setting);
+DLL_PUBLIC bool locateby(const var& ordercode, const var& target, const var& instring, var& setting, const int fieldno,const int valueno=0);
+
+DLL_PUBLIC bool locateusing(const var& usingchar, const var& target, const var& instring);
+DLL_PUBLIC bool locateusing(const var& usingchar, const var& target, const var& instring, var& setting);
+DLL_PUBLIC bool locateusing(const var& usingchar, const var& target, const var& instring, var& setting, const int fieldno, const int valueno=0, const int subvalueno=0);
+
 DLL_PUBLIC var sum(const var& instring, const var& sepchar);
 DLL_PUBLIC var sum(const var& instring);
 

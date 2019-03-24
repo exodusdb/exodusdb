@@ -117,7 +117,7 @@ function main() {
 				var homedir=osgetenv("USERPROFILE");
 				if (homedir) {
 					var bindir=homedir^"\\Exodus\\bin";
-					if (not newpath.locateusing(bindir,";"))
+					if (not newpath.locateusing(";",bindir))
 						newpath^=";"^bindir;
 				}
 

@@ -257,7 +257,18 @@ var& var::fieldstorer(const var& sepchar0,const int fieldnx,const int nfieldsx, 
 //LOCATE
 ///////////////////////////////////////////
 
-bool var::locate(const var& target, var& setting, const int fieldno/*=0*/,const int valueno/*=0*/) const
+//default locate using VM
+bool var::locate(const var& target, var& setting) const
+{
+	THISIS(L"bool var::locate(const var& target, var& setting, const int fieldno/*=0*/,const int valueno/*=0*/) const")
+	THISISSTRING()
+	ISSTRING(target)
+	ISDEFINED(setting)
+
+	return locatex(target.var_str,"",VM_,setting,0,0,0);
+}
+
+bool var::locate(const var& target, var& setting, const int fieldno,const int valueno/*=0*/) const
 {
 	THISIS(L"bool var::locate(const var& target, var& setting, const int fieldno/*=0*/,const int valueno/*=0*/) const")
 	THISISSTRING()
@@ -275,34 +286,69 @@ bool var::locate(const var& target, var& setting, const int fieldno/*=0*/,const 
 	return locatex(target.var_str,"",usingchar,setting,fieldno,valueno,0);
 }
 
+//without setting
+bool var::locate(const var& target) const
+{
+	THISIS(L"bool var::locate(const var& target")
+	THISISSTRING()
+	ISSTRING(target)
+
+	var setting;
+	return locatex(target.var_str,"",VM_,setting,0,0,0);
+}
+
 ///////////////////////////////////////////
 //LOCATE BY
 ///////////////////////////////////////////
 
 //this version caters for the rare syntax where the order is given as a variable
-bool var::locateby(const var& target,const var& ordercode, var& setting, const int fieldno, const int valueno/*=0*/)const
+bool var::locateby(const var& ordercode, const var& target, var& setting, const int fieldno, const int valueno/*=0*/)const
 {
-	THISIS(L"bool var::locateby(const var& target,const var& ordercode, var& setting, const int fieldno/*=0*/, const int valueno/*=0*/)const")
+	THISIS(L"bool var::locateby(const var& ordercode, const var& target, var& setting, const int fieldno, const int valueno/*=0*/)const")
 	ISSTRING(ordercode)
 
-	return locateby(target,ordercode.toString().c_str(), setting, fieldno, valueno);
+	return locateby(ordercode.toString().c_str(), target, setting, fieldno, valueno);
 }
 
 //no fieldno or valueno means locate using character VM
 //this version caters for the rare syntax where the order is given as a variable
-bool var::locateby(const var& target,const var& ordercode, var& setting)const
+bool var::locateby(const var& ordercode, const var& target, var& setting)const
 {
-	THISIS(L"bool var::locateby(const var& target,const var& ordercode, var& setting) const")
+	THISIS(L"bool var::locateby(const var& ordercode, const var& target, var& setting) const")
 	ISSTRING(ordercode)
 
-	return locateby(target,ordercode.toString().c_str(), setting);
+	return locateby(ordercode.toString().c_str(), target, setting);
+}
+
+//no fieldno or valueno means locate using character VM
+//specialised const wchar_t version of ordercode for speed of usual syntax where ordermode is given as string
+//it avoids the conversion from string to var and back again
+bool var::locateby(const char* ordercode, const var& target, var& setting) const
+{
+	THISIS(L"bool var::locateby(const char* ordercode, const var& target, var& setting) const")
+	THISISSTRING()
+	ISSTRING(target)
+	ISDEFINED(setting)
+
+	//TODO either make a "locatefrom" version of the above where the locate STARTS its search from the
+	//last numbered subvalue (add a new parameter), value or field.
+	//OR possibly modify this function to understand a negative number as "start from" instead of "within this"
+
+	//determine locate by field, value or subvalue depending on the parameters as follows:
+	//if value number is given then locate in subvalues of that value
+	//if field number is given then locate in values of that field
+	//otherwise locate in fields of the string
+	wchar_t usingchar=VM_;
+
+	return locatex(target.var_str, ordercode, usingchar, setting, 0, 0, 0);
+
 }
 
 //specialised const wchar_t version of ordercode for speed of usual syntax where ordermode is given as string
 //it avoids the conversion from string to var and back again
-bool var::locateby(const var& target,const char* ordercode, var& setting, const int fieldno, const int valueno/*=0*/) const
+bool var::locateby(const char* ordercode, const var& target, var& setting, const int fieldno, const int valueno/*=0*/) const
 {
-	THISIS(L"bool var::locateby(const var& target,const char* ordercode, var& setting, const int fieldno/*=0*/, const int valueno/*=0*/) const")
+	THISIS(L"bool var::locateby(const char* ordercode, const var& target, var& setting, const int fieldno, const int valueno/*=0*/) const")
 	THISISSTRING()
 	ISSTRING(target)
 	ISDEFINED(setting)
@@ -323,15 +369,28 @@ bool var::locateby(const var& target,const char* ordercode, var& setting, const 
 	//else if (valueno<=0) usingchar=VM_;
 	//else usingchar=SM_;
 
-	return locatex(target.var_str,ordercode,usingchar,setting,fieldno,valueno,0);
+	return locatex(target.var_str, ordercode, usingchar, setting, fieldno, valueno, 0);
 }
 
-//no fieldno or valueno means locate using character VM
+///////////////////////////////////////////
+//LOCATE BY USING
+///////////////////////////////////////////
+
+//this version caters for the rare syntax where the order is given as a variable
+bool var::locatebyusing(const var& ordercode, const var& usingchar, const var& target, var& setting, const int fieldno/*=0*/, const int valueno/*=0*/)const
+{
+	THISIS(L"bool var::locatebyusing(const var& ordercode, const var& usingchar, const var& target, var& setting, const int fieldno, const int valueno/*=0*/)const")
+	ISSTRING(ordercode)
+	ISSTRING(usingchar)
+
+	return locatebyusing(ordercode.toString().c_str(), usingchar.toString().c_str(), target, setting, fieldno, valueno);
+}
+
 //specialised const wchar_t version of ordercode for speed of usual syntax where ordermode is given as string
 //it avoids the conversion from string to var and back again
-bool var::locateby(const var& target,const char* ordercode, var& setting) const
+bool var::locatebyusing(const char* ordercode, const char* usingchar, const var& target, var& setting, const int fieldno/*=0*/, const int valueno/*=0*/) const
 {
-	THISIS(L"bool var::locateby(const var& target,const char* ordercode, var& setting, const int fieldno/*=0*/, const int valueno/*=0*/) const")
+	THISIS(L"bool var::locateby(const char* ordercode, const var& target, var& setting, const int fieldno, const int valueno/*=0*/) const")
 	THISISSTRING()
 	ISSTRING(target)
 	ISDEFINED(setting)
@@ -344,19 +403,17 @@ bool var::locateby(const var& target,const char* ordercode, var& setting) const
 	//if value number is given then locate in subvalues of that value
 	//if field number is given then locate in values of that field
 	//otherwise locate in fields of the string
-	wchar_t usingchar=VM_;
 
-	return locatex(target.var_str,ordercode,usingchar,setting,0,0,0);
-
+	return locatex(target.var_str, ordercode, usingchar[0], setting, fieldno, valueno, 0);
 }
 
 ///////////////////////////////////////////
 //LOCATE USING
 ///////////////////////////////////////////
 
-bool var::locateusing(const var& target,const var& usingchar) const
+bool var::locateusing(const var& usingchar, const var& target) const
 {
-	THISIS(L"bool var::locateusing(const var& target,const var& usingchar) const")
+	THISIS(L"bool var::locateusing(const var& usingchar, const var& target) const")
 	THISISSTRING()
 	ISSTRING(target)
 	ISSTRING(usingchar)
@@ -366,9 +423,9 @@ bool var::locateusing(const var& target,const var& usingchar) const
 	return locatex(target.var_str,"",usingchar.var_str.c_str()[0],setting,0,0,0);
 }
 
-bool var::locateusing(const var& target,const var& usingchar, var& setting, const int fieldno/*=0*/,const int valueno/*=0*/, const int subvalueno/*=0*/) const
+bool var::locateusing(const var& usingchar, const var& target, var& setting, const int fieldno,const int valueno/*=0*/, const int subvalueno/*=0*/) const
 {
-	THISIS(L"bool var::locateusing(const var& target,const var& usingchar, var& setting, const int fieldno/*=0*/,const int valueno/*=0*/, const int subvalueno/*=0*/) const")
+	THISIS(L"bool var::locateusing(const var& usingchar, const var& target, var& setting, const int fieldno,const int valueno/*=0*/, const int subvalueno/*=0*/) const")
 	THISISSTRING()
 	ISSTRING(target)
 	ISSTRING(usingchar)
@@ -1689,40 +1746,50 @@ var var::mv(const char* opcode, const var& var2) const
 	THISISSTRING()
 	ISSTRING(var2)
 
-	//p1a and p1b are zero based indexes of first and last+1 characters of a value in var1 (this)
-	std::wstring::size_type p1a=0;
-	std::wstring::size_type p1b=0;
-
-	//p2a and p2b the same for var2 (arg)
-	std::wstring::size_type p2a=0;
-	std::wstring::size_type p2b=0;
-
 	var outstr=L"";
 	var mv1;
 	var mv2;
-	var sepchar1=VM;
-	var sepchar2=VM;
+	wchar_t sepchar1=VM_;
+	wchar_t sepchar2=VM_;
+
+	//pointers into this->var_str
+	//p1a and p1b are zero based indexes of first and last+1 characters of a value in var1 (this)
+	std::wstring::size_type p1a=0;
+	std::wstring::size_type p1b;
+
+	//pointers into var2.var_str
+	//p2a and p2b are zero based indexes of first and last+1 characters of a value in var2
+	std::wstring::size_type p2a=0;
+	std::wstring::size_type p2b;
 
 	while (true) {
 
+		wchar_t sepchar1_prior=sepchar1;
+
 		//find the end of a value in var1 (this)
-		if (p1a != std::wstring::npos) {
-			p1b=var_str.find_first_of(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_ _SSTM_,p1a);
-			mv1=var(var_str.substr(p1a,p1b-p1a));
+		if (sepchar1 <= sepchar2) {
+getnextp1:
+			p1b=this->var_str.find_first_of(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_ _SSTM_,p1a);
+			if (p1b==std::wstring::npos) {
+				sepchar1=RM_+1;
+			} else {
+				sepchar1=this->var_str[p1b];
+			}
+			mv1=var(this->var_str.substr(p1a,p1b-p1a));//.outputl(L"mv1=");
 			p1a=p1b;
-			sepchar1=var_str[p1b];
-		} else {
-			mv1=L"";
 		}
 
-		//find the end of a value in var2
-		if (p2a != std::wstring::npos) {
+		//find the end of a value in var1 (this)
+		if (sepchar2 <= sepchar1_prior) {
+getnextp2:
 			p2b=var2.var_str.find_first_of(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_ _SSTM_,p2a);
-			mv2=var(var2.var_str.substr(p2a,p2b-p2a));
+			if (p2b==std::wstring::npos) {
+				sepchar2=RM_+1;
+			} else {
+				sepchar2=var2.var_str[p2b];
+			}
+			mv2=var(var2.var_str.substr(p2a,p2b-p2a));//.outputl(L"mv2=");
 			p2a=p2b;
-			sepchar2=var_str[p1b];
-		} else {
-			mv2=L"";
 		}
 
 		switch (opcode[0]) {
@@ -1745,8 +1812,10 @@ var var::mv(const char* opcode, const var& var2) const
 			//may trigger non-numeric or div-by-zero errors
 			//1. if both empty then result is empty
 			//2. empty or zero, divided by zero, is empty or zero
-			if (mv1 || (mv1==L"" && mv2))
+			if (mv1)
 				mv1=mv1/mv2;
+			else
+				mv1=0;
 			outstr^=mv1;
 			break;
 
@@ -1755,17 +1824,32 @@ var var::mv(const char* opcode, const var& var2) const
 			break;
 		}
 
-		//quit if at end of both strings
-		if (p1a == std::wstring::npos && p2a == std::wstring::npos)
-			break;
+		if (sepchar1==sepchar2) {
 
-		outstr^=sepchar1;
+			//if both pointers past end of their strings then we are done
+			if (sepchar1>RM_)
+				break;
 
-		//skip over separator char
-		if (p1a != std::wstring::npos)
+			outstr^=sepchar1;
+			//outstr.convert(_VM_ _FM_, L"]^").outputl(L"= outstr=");
 			p1a++;
-		if (p2a != std::wstring::npos)
 			p2a++;
+
+		} else if (sepchar1<sepchar2) {
+			outstr^=sepchar1;
+			//outstr.convert(_VM_ _FM_, L"]^").outputl(L"< outstr=");
+			mv2=L"";
+			p1a++;
+			sepchar1_prior=sepchar1;
+			goto getnextp1;
+		} else {
+			outstr^=sepchar2;
+			//outstr.convert(_VM_ _FM_, L"]^").outputl(L"> outstr=");
+			mv1=L"";
+			p2a++;
+			goto getnextp2;
+		}
+
 	}
 
 	return outstr;

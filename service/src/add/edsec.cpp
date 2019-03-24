@@ -1,9 +1,6 @@
 #include <exodus/program.h>
 programinit()
 
-
-#include <gen.h>
-
 function main() {
 	//c
 	//typically fewer keys/locks than number of users and numnber of tasks

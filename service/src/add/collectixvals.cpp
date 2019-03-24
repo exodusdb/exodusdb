@@ -35,7 +35,7 @@ function main(in filename, in dictid, in prefix="", in orderby="") {
 		//accumulate the index values
 		if (orderby) {
 			var indexn;
-			if (not(indexvalues.locateby(indexvalue, orderby, indexn)))
+			if (not(indexvalues.locateby(orderby, indexvalue, indexn)))
 				indexvalues.inserter(1, indexn, indexvalue);
 		} else
 			indexvalues ^= FM ^ indexvalue;

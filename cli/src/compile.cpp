@@ -426,11 +426,11 @@ function main()
 		//check/add the default file extension
 		srcfilename.trimmerb(".");
 		var fileext=srcfilename.field2(".",-1).lcase();
-		if (src_extensions.locateusing(fileext," ")) {
+		if (src_extensions.locateusing(" ",fileext)) {
 			filebase=srcfilename.splice(-len(fileext)-1,"");
 
 			//skip non-compilable files
-		} else if (noncompilable_extensions.locateusing(fileext," ")) {
+		} else if (noncompilable_extensions.locateusing(" ",fileext)) {
 			//errputln(srcfilename^" "^fileext^" is not compilable");
 			continue;
 
@@ -630,7 +630,7 @@ could generate the following overloads in the lib's .h header
 
 						//default all if all are var (in io out)
 						if (nodefaults) {
-							if (var("in io out").locateusing(funcarg.field(" ",1)," "))
+							if (var("in io out").locateusing(" ",funcarg.field(" ",1)))
 								fieldstorer(funcargsdecl2,",",argn,1,funcarg^"=var()");
 							else
 								//reset to original if anything except in io out

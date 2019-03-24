@@ -1,22 +1,22 @@
 #include <exodus/program.h>
 programinit()
 
-#include <win.h>
-#include <gen.h>
-#include <fin.h>
-#include <agy.h>
-#include <bkg.h>
-#include <bkg2.h>
+#include <win_common.h>
+#include <gen_common.h>
+#include <fin_common.h>
+#include <agy_common.h>
+#include <bkg_common.h>
+#include <pp_common.h>
 
 function main() {
 
 	//NB numbers and names MUST match those in the matching common .h files
-        mv.labelledcommon[1]=new win_common;
-        mv.labelledcommon[2]=new gen_common;
-        mv.labelledcommon[3]=new fin_common;
-        mv.labelledcommon[4]=new agy_common;
-        mv.labelledcommon[5]=new bkg_common;
-        mv.labelledcommon[6]=new bkg2_common;
+        mv.labelledcommon[win_common_no]=new win_common;
+        mv.labelledcommon[gen_common_no]=new gen_common;
+        mv.labelledcommon[fin_common_no]=new fin_common;
+        mv.labelledcommon[agy_common_no]=new agy_common;
+        mv.labelledcommon[bkg_common_no]=new bkg_common;
+        mv.labelledcommon[pp_common_no]=new pp_common;
 
 	//cat ~/arev/dic/*.SQL | psql -h 127.0.0.1 -U exodus exodus
 

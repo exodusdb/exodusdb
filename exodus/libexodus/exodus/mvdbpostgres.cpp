@@ -2160,7 +2160,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		}
 
 		//subexpressions (,),and,or
-		if (var(L"( ) AND OR").locateusing(ucword,L" "))
+		if (var(L"( ) AND OR").locateusing(L" ",ucword) && whereclause)
 		{
 			whereclause ^= L" " ^ ucword;
 			continue;
@@ -2271,11 +2271,11 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 			//comparison operators
 			//convert neosys relational operators to standard relational operators
 			var aliasno;
-			if (var(L"EQ NE NOT GT LT GE LE").locateusing(ucword,L" ",aliasno))
+			if (var(L"EQ NE NOT GT LT GE LE").locateusing(L" ",ucword,aliasno))
 			{
 				ucword=var(L"= <> <> > < >= <=").field(L" ",aliasno);
 			}
-			if (var(L"= <> > < >= <=").locateusing(ucword,L" ",aliasno))
+			if (var(L"= <> > < >= <=").locateusing(L" ",ucword,aliasno))
 			{
 				whereclause ^= L" " ^ ucword ^ L" ";
 				ucword=getword(remainingsortselectclause, true);
@@ -3054,7 +3054,7 @@ var var::listindexes(const var& filename, const var& fieldname) const
 
 					//indexnames^=FM^indexname;
 					var fn;
-					if (not indexnames.locateby(indexname,L"AL",fn,0))
+					if (not indexnames.locateby(L"AL",indexname,fn,0))
 						indexnames.inserter(fn,indexname);
 				}
 			}

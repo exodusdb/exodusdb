@@ -1,9 +1,6 @@
 #include <exodus/library.h>
 libraryinit()
 
-
-#include <gen.h>
-
 var docrep;
 var scrn;
 var temp;
@@ -88,7 +85,7 @@ nooutput:
 		var offset = 0;
 		call osbread(temp, prnfile,  offset, 1024);
 		//convert \200d0a0c1a\ to '' in temp
-		temp.converter(var("200D0A0C1A").iconv("HEX"), "");
+		temp.converter(var("200D0A0C1A").iconv("HEX2"), "");
 		if (temp == "") {
 			goto nooutput;
 		}

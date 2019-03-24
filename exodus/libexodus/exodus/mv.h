@@ -1080,15 +1080,23 @@ public:
 
 	//should these be like extract, replace, insert, delete
 	//locate(fieldno, valueno, subvalueno,target,setting,by DEFAULTNULL)
-	bool locate(const var& target, var& setting, const int fieldno=0,const int valueno=0) const;
+	bool locate(const var& target) const;
+	bool locate(const var& target, var& setting) const;
+	bool locate(const var& target, var& setting, const int fieldno,const int valueno=0) const;
+
+	bool locateusing(const var& usingchar, const var& target, var& setting, const int fieldno=0, const int valueno=0, const int subvalueno=0) const;
+	bool locateusing(const var& usingchar, const var& target) const;
+
 	//locateby without fieldno or valueno arguments uses character VM
-	bool locateby(const var& target, const char* ordercode, var& setting) const;
-	bool locateby(const var& target, const var& ordercode, var& setting) const;
+	bool locateby(const char* ordercode, const var& target, var& setting) const;
+	bool locateby(const var& ordercode, const var& target, var& setting) const;
 	//locateby with fieldno=0 uses character FM
-	bool locateby(const var& target, const char* ordercode, var& setting, const int fieldno,const int valueno=0) const;
-	bool locateby(const var& target, const var& ordercode, var& setting, const int fieldno,const int valueno=0) const;
-	bool locateusing(const var& target, const var& usingchar, var& setting, const int fieldno=0, const int valueno=0, const int subvalueno=0) const;
-	bool locateusing(const var& target, const var& usingchar) const;
+	bool locateby(const char* ordercode, const var& target, var& setting, const int fieldno,const int valueno=0) const;
+	bool locateby(const var& ordercode, const var& target, var& setting, const int fieldno,const int valueno=0) const;
+
+	//locatebyusing
+	bool locatebyusing(const char* ordercode, const char* usingchar, const var& target, var& setting, const int fieldno=0,const int valueno=0) const;
+	bool locatebyusing(const var& ordercode, const var& usingchar, const var& target, var& setting, const int fieldno=0,const int valueno=0) const;
 
 	//var FILE I/O
 
@@ -1426,7 +1434,7 @@ public:
 
 	bool redim(int nrows, int ncols=1);
 
-	var join() const;
+	var join(const var& sepchar=FM_) const;
 
 	// parenthesis operators often come in pairs
 	var& operator() (int rowno, int colno=1);

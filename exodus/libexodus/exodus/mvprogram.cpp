@@ -150,7 +150,7 @@ var ExodusProgramBase::authorised(const var& task0, var& msg, const var& default
 	}
 
 	//find the task
-	if (SECURITY.locate(task, taskn, 10)) {
+	if (SECURITY.a(10).locate(task, taskn)) {
 		if (deleting) {
 			SECURITY.eraser(10, taskn);
 			SECURITY.eraser(11, taskn);
@@ -159,7 +159,7 @@ updateprivs:
 			return 1;
 		} else if (renaming) {
 			//delete any existing rename target task
-			if (SECURITY.locate(defaultlock, taskn2, 10)) {
+			if (SECURITY.a(10).locate(defaultlock, taskn2)) {
 				SECURITY.eraser(10, taskn2);
 				SECURITY.eraser(11, taskn2);
 				if (taskn2 < taskn) {
@@ -173,7 +173,7 @@ updateprivs:
 			goto updateprivs;
 		} else if (updating) {
 			var tt = defaultlock;
-			if (SECURITY.locate(defaultlock, taskn2, 10)) {
+			if (SECURITY.a(10).locate(defaultlock, taskn2)) {
 				tt = SECURITY.a(11, taskn2);
 			}
 			SECURITY.r(11, taskn, tt);
@@ -193,10 +193,10 @@ updateprivs:
 			//if (SECURITY.length() < 65000) {
 			if (true) {
 var x=var();
-				if (not(SECURITY.locateby(task, "AL", taskn, 10))) {
+				if (not(SECURITY.a(10).locateby("AL", task, taskn))) {
 					var newlock=defaultlock;
 					//get locks on default task if present otherwise new locks are none
-					if (newlock and SECURITY.locate(newlock, xx, 10)) {
+					if (newlock and SECURITY.a(10).locate(newlock)) {
 						newlock = SECURITY.a(11, xx);
 					}
 					SECURITY.inserter(10, taskn, task);
@@ -243,7 +243,7 @@ notallowed:
 
 	//find the user (add to bottom if not found)
 	//surely this is not necessary since users are in already
-	if (not(SECURITY.locate(username, usern, 1))) {
+	if (not(SECURITY.a(1).locate(username, usern))) {
 		if (username != "NEOSYS" and username != APPLICATION) {
 			gosub readuserprivs();
 			usern = (SECURITY.a(1)).count(VM) + (SECURITY.a(1) != "") + 1;
@@ -281,7 +281,7 @@ notallowed:
 	for (var lockn = 1; lockn <= nlocks; ++lockn) {
 		//LOCKx=FIELD(LOCKS,vm,LOCKN)
 		var lockx = locks.field(" ", lockn);
-		if (keys.locateusing(lockx, " ", temp)) {
+		if (keys.locateusing(" ",lockx)) {
 			//call note(task:' ok')
 		} else
 		//MSG=capitalise(TASK):'||Sorry, ':capitalise(msgusername):', you are not authorised to do this.|'
@@ -562,29 +562,56 @@ var ExodusProgramBase::perform(const var& sentence) {
 
 var ExodusProgramBase::xlate(const var& filename, const var& key, const var& fieldno_or_name, const var& mode) {
 
-	//handle non-numeric field_no ie dictionary field/column name
-	if (not fieldno_or_name.isnum()) {
+	//TODO implement additional MV argument
 
-		//get the whole record
-		var record=key.xlate(filename, L"", mode);
+	//key can be multivalued and multivalued result will be returned
+	var results="";
+	var nkeys=key.dcount(VM);
 
-		//handle record not found and mode C
-		if (mode == L"C" && record == key)
-			return key;
+	for (var keyn=1;keyn<=nkeys;++keyn) {
 
-		//handle record not found and mode X
-		if (not record.length())
-			return record;
+		var keyx=key.a(1,keyn);
 
-		//use calculate()
-		return calculate(fieldno_or_name,L"dict_" ^ filename, key, record);
+		//handle non-numeric field_no ie dictionary field/column name
+		if (not fieldno_or_name.isnum()) {
 
+			//get the whole record
+			var record=keyx.xlate(filename, L"", mode);
+
+			//TODO what if key is multivalued?
+
+			//handle record not found and mode C
+			if (mode == L"C" && record == keyx) {
+				results.r(keyn,key);
+				continue;
+			}
+
+			//handle record not found and mode X
+			if (not record.length()) {
+				results.r(keyn,L"");
+				continue;
+			}
+
+			//use calculate()
+			var result=calculate(fieldno_or_name,L"dict_" ^ filename, keyx, record);
+			if (nkeys>1)
+				result.lowerer();
+			results.r(keyn,result);
+			continue;
+
+		}
+
+		//ordinary numeric or "" fieldno
+		results.r(keyn,keyx.xlate(filename, fieldno_or_name, mode));
 	}
 
-        return key.xlate(filename, fieldno_or_name, mode);
+	return results;
 }
 
 var ExodusProgramBase::calculate(const var& dictid, const var& dictfile, const var& id, const var& record, const var& mvno) {
+
+	//TODO how is it possible to exchange when the variable is const?
+
 	DICT.exchange(dictfile);
 	ID.exchange(id);
 	RECORD.exchange(record);
@@ -1068,7 +1095,7 @@ var ExodusProgramBase::loginnet(const var& dataset, const var& username,
 		menuid = L"ADAGENCY";
 
 	} else {
-		if (!(SECURITY.locate(username, usern, 1))) {
+		if (!(SECURITY.a(1).locate(username, usern))) {
 			msg = L"Error: " ^ username.quote() ^ L" user is missing";
 			return false;
 		}
@@ -1094,7 +1121,7 @@ var ExodusProgramBase::loginnet(const var& dataset, const var& username,
 	var menucodes = menu.a(6) ^ VM ^ L"HELP";
 	//remove local support menu
 	if (!authorised(L"SUPPORT MENU ACCESS", msg, L"LS")) {
-		if (menucodes.locate(L"GENERAL", menun, 1))
+		if (menucodes.a(1).locate(L"GENERAL", menun))
 			menucodes.eraser(1, menun, 0);
 	}
 	menucodes.converter(VM ^ L".", L",_");
@@ -1151,7 +1178,7 @@ var ExodusProgramBase::loginnet(const var& dataset, const var& username,
 	 //markets is not open in finance only module
 	 //readv maincurrcode from markets,defmarketcode,5 else maincurrcode=''
 	 var maincurrcode = L"";
-	 if (FILES[0].locateusing(L"MARKETS", FM, xx))
+	 if (FILES[0].locateusing(FM,L"MARKETS", FM))
 	 maincurrcode = defmarketcode.xlate(L"MARKETS", 5, L"X");
 
 	 if (maincurrcode.unassigned())
@@ -1199,7 +1226,7 @@ var ExodusProgramBase::memspace(const var& requiredmemory) {
 var ExodusProgramBase::getuserdept(const var& usercode) {
 	//locate the user in the list of users
 	var usern;
-	if (!(SECURITY.locate(usercode, usern, 1))) {
+	if (!(SECURITY.a(1).locate(usercode, usern))) {
 		if (usercode == L"NEOSYS") {
 			ANS = L"NEOSYS";
 			return ANS;

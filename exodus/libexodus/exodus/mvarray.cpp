@@ -101,6 +101,10 @@ bool dim::redim(int rows, int cols)
 	if (rows == 0 || cols == 0)
 		throw MVArrayDimensionedZero();
 
+	//do nothing if no change
+	if (initialised_ && rows==nrows_ && cols==ncols_)
+		return true;
+
 	//how exception safe is this?
 
 	//1. create new data first
@@ -236,7 +240,7 @@ dim& dim::operator=(const double sourcedbl)
 	return *this;
 }
 
-var dim::join() const
+var dim::join(const var& sepchar) const
 {
 	if (!initialised_)
 		throw MVArrayNotDimensioned();
@@ -249,7 +253,8 @@ var dim::join() const
 	for (int ii=2;ii<=arraysize;++ii)
 	{
 		//output.var_str.push_back(FM_);//bug if first field is numeric since string hasnt been constructed yet
-		output^=_FM_;
+		//output^=_FM_;
+		output^=sepchar;
 		output^=data_[ii];
 	}
 

@@ -447,14 +447,14 @@ phraseinit:
 			limits.r(1, nlimits, word);
 
 		//negate next comparision
-		if (var(L"not,ne,<>").locateusing(nextword, L",", xx)) {
+		if (var(L"not,ne,<>").locateusing(L",", nextword, xx)) {
 			nextword = L"not";
 			gosub getword();
 			ss ^= L" " ^ word;
 		}
 
 		//comparision
-		if (var(L"match,eq,ne,gt,lt,ge,le,[,],[]").locateusing(nextword, L",", xx)) {
+		if (var(L"match,eq,ne,gt,lt,ge,le,[,],[]").locateusing(L",", nextword, xx)) {
 			gosub getword();
 			ss ^= L" " ^ word;
 			if (limit)
@@ -603,8 +603,8 @@ phraseinit:
 
 			//suppress untotalled columns if doing detsupp2
 			if (detsupp eq 2) {
-				//if (var(L"JL,JUSTLEN,CH,COL,HEAD,OC,OCONV").locateusing(nextword, L",", xx)) {
-				if (var(L"justlen,colhead,oconv").locateusing(nextword, L",", xx)) {
+				//if (var(L"JL,JUSTLEN,CH,COL,HEAD,OC,OCONV").locateusing(L",", nextword, xx)) {
+				if (var(L"justlen,colhead,oconv").locateusing(L",", nextword, xx)) {
 					gosub getword();
 					gosub getword();
 				}
@@ -1100,7 +1100,7 @@ subroutine process_all_records()
 					if (temp eq L"")
 						temp = L"\"\"";
 					//locate temp in (limits<3,limitn>)<1,1> using sm setting x else
-					if (not limits.a(3, limitn).locateusing(temp, SVM, xx)) {
+					if (not limits.a(3, limitn).locateusing(SVM, temp, xx)) {
 						for (var fn = 1; fn <= nfns; fn++) {
 							var varalues = RECORD.a(fn);
 							if (varalues.count(VM))
@@ -1363,7 +1363,7 @@ subroutine getword()
 
 		gosub getword2();
 
-		if (word.length() and ignorewords.locateusing(word, VM)) {
+		if (word.length() and ignorewords.locate(word)) {
 			continue;
 		}
 		break;
@@ -1643,7 +1643,7 @@ subroutine printbreaks()
 
 				if (1 or detsupp < 2) {
 					cell = oldbreakvalue(coln);
-					if (breakcolns.locateusing(coln, FM, colbreakn)) {
+					if (breakcolns.locateusing(FM, coln, colbreakn)) {
 						if (colbreakn < leveln)
 							cell = L"Total";
 					}

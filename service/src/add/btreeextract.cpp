@@ -5,8 +5,6 @@ libraryinit()
 //#include <safeselect.h>
 //#include <popselect.h>
 
-#include <gen.h>
-
 function main(in cmd, in filename, in dictfile, out hits) {
 
 	//replacement for simple btree.extract functions using SELECT command
