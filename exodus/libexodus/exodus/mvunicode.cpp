@@ -187,6 +187,9 @@ var& var::localeAwareChangeCase(const int lowerupper)
 	if (var_str.length()==0)
 		return *this;
 
+	//for safety do this regardless of any changes
+	var_typ=pimpl::VARTYP_STR;
+
 #if defined(_MSC_VER) && defined(UNICODE)
 
 	//TODO http://stackoverflow.com/questions/1767946/getthreadlocale-returns-different-value-than-getuserdefaultlcid

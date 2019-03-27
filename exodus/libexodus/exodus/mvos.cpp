@@ -424,6 +424,9 @@ var& var::oconv_MC(const wchar_t* conversionchar)
 	if (*conversionchar==L'\0')
 		return (*this);
 
+	//in case changes to/from numeric
+	var_typ&=pimpl::VARTYP_NOTNUMFLAGS;
+
 	//form of unicode specific regular expressions
 	//http://www.regular-expressions.info/unicode.html
 
@@ -714,6 +717,9 @@ var& var::swapper(const var& what, const var& with, const var& options)
 	ISSTRING(with)
 	ISSTRING(options)
 
+        //in case changes to/from numeric
+        var_typ&=pimpl::VARTYP_NOTNUMFLAGS;
+
 	if (options.length()!=0)
 	{
 #ifndef BOOST_HAS_ICU
@@ -837,10 +843,11 @@ bool var::osgetenv(const var& envvarname)
 	THISISDEFINED()
 	ISSTRING(envvarname)
 
+	var_typ=pimpl::VARTYP_STR;
+
 	//return whole environment if blank envvarname
 	if (envvarname.var_str.length()==0) {
 		var_str=L"xxx";
-		var_typ=pimpl::VARTYP_STR;
 
 		int i = 1;
 		char *s = *environ;
@@ -858,12 +865,10 @@ bool var::osgetenv(const var& envvarname)
 	if (cvalue==0)
 	{
 		var_str=L"";
-		var_typ=pimpl::VARTYP_STR;
 		return false;
 	}
 	else
 		*this=var(cvalue);
-	var_typ=pimpl::VARTYP_STR;
 	return true;
 }
 

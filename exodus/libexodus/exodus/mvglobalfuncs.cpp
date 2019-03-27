@@ -983,36 +983,6 @@ DLL_PUBLIC bool insertrecord(const var& record, const var& filehandle,const var&
 	return record.insertrecord(filehandle, key);
 }
 
-DLL_PUBLIC bool select(const var& sortselectclause)
-{
-	return var().select(sortselectclause);
-}
-
-void DLL_PUBLIC clearselect()
-{
-	var().clearselect();
-}
-
-DLL_PUBLIC bool readnext(var& key)
-{
-	return var().readnext(key);
-}
-
-DLL_PUBLIC bool readnext(var& key, var& valueno)
-{
-	return var().readnext(key,valueno);
-}
-
-DLL_PUBLIC bool selectrecord(const var& sortselectclause)
-{
-	return var().selectrecord(sortselectclause);
-}
-
-DLL_PUBLIC bool readnextrecord(var& record, var& key)
-{
-	return var().readnextrecord(record, key);
-}
-
 /*
 DLL_PUBLIC var xlate(const var& filename, const var& key, const var& fieldno, const wchar_t* mode)
 {

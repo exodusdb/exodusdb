@@ -887,6 +887,8 @@ public:
 	//VARIABLE CONTROL
 	bool assigned() const;
 	bool unassigned() const;
+	var& unassigned(const var& defaultvalue);
+
 	var& transfer(var& destinationvar);
 	const var& exchange(const var& var2) const;
 	var clone() const;
@@ -1176,8 +1178,6 @@ public:
 
 	//bool selftest() const;
 	var version() const;
-
-	var& setifunassigned(const var& defaultvalue=L"");
 
 private:
 

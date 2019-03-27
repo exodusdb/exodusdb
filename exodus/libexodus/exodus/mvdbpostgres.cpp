@@ -1596,10 +1596,16 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 			{
 				ismv=true;
 				var sqlexpression=L"mv_field_" ^ fieldno;
-				var phrase=L"unnest(regexp_split_to_array(split_part(convert_from(data,'UTF8'),'" ^ FM ^ L"'," ^ fieldno ^ L"),'"^VM^L"'))"
-					//L" with ordinality as t( " ^ sqlexpression ^ L", pg_ordinal_mv)";
-					L" with ordinality as t( " ^ sqlexpression ^ L", mv)";
-				joins ^= L", " ^ phrase;
+
+				//postgres splitpart(what,separator,partno) is exactly like exodus field and extract functions (except separator can be more than one character)
+				//could use exodus_extract_text instead of split_part here
+				var phrase=L"unnest(regexp_split_to_array(split_part(convert_from(data,'UTF8'),'" ^ FM ^ L"'," ^ fieldno ^ L"),'"^VM^L"'))";
+				phrase^=L" with ordinality as table" ^ fieldno ^ L"( " ^ sqlexpression ^ L", mv)";
+
+				//dont include more than once, in case order by and filter on the same field
+				if (!joins.index(phrase))
+					joins ^= L", " ^ phrase;
+
 				return sqlexpression;
 			}
 			else
@@ -1717,11 +1723,14 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 				}
 
 				//add the join
-				var join=L"LEFT JOIN " ^ xlatetofilename ^ L" ON " ^ fromdictexpression ^ L" = " ^ xlatetofilename ^ L".key";
-				if (!joins.index(join)) {
+				var join_part1=L"\nLEFT JOIN\n " ^ xlatetofilename ^ L" ON ";
+				var join_part2=fromdictexpression ^ L" = " ^ xlatetofilename ^ L".key";
+				//only allow one join per file for now.
+				//TODO allow multiple joins to the same file via different keys
+				if (!joins.index(join_part1)) {
 					if (joins)
 						joins^=L", ";
-					joins^=join;
+					joins^=join_part1 ^ join_part2;
 				}
 
 			} else {
@@ -2031,8 +2040,9 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 
 	var maxnrecs=L"";
 
-	var remainingsortselectclause=sortselectclause.trimb();
-//remainingsortselectclause.outputl(L"remainingsortselectclause=");
+	//TODO only convert \t\r\n outside single and double quotes
+	var remainingsortselectclause=sortselectclause.convert(L"\t\r\n",L"   ").trim();
+	//remainingsortselectclause.outputl(L"remainingsortselectclause=");
 
 	//remove trailing options eg (S) or {S}
 	var lastword=remainingsortselectclause.field2(L" ",-1);
@@ -2049,40 +2059,19 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 
 		if (ucword==L"SSELECT")
 			bykey=1;
-
-		//discard it and get the second word which is either max number of records or filename
-		actualfilename=getword(remainingsortselectclause);
-
-		//the second word can be a limiting number of records
-		if (actualfilename.length() and actualfilename.isnum())
-		{
-			maxnrecs=actualfilename;
-			actualfilename=getword(remainingsortselectclause);
-		}
-
-		dictfilename=actualfilename;
-
 	}
 
-	//optionally get filename from the current var
-	if (!actualfilename)
+	//discard it and get the second word which is either max number of records or filename
+	actualfilename=getword(remainingsortselectclause);
+
+	//the second word can be a limiting number of records
+	if (actualfilename.length() and actualfilename.isnum())
 	{
-		if (!assigned())
-			throw MVUnassigned(L"select() unassigned filehandle and sort/select clause doesnt start \"SELECT filename\"");
-		actualfilename=*this;
-		dictfilename=*this;
-
-		//assume sortselectclause is a simple filename
-		if (!actualfilename) {
-			actualfilename=getword(remainingsortselectclause);
-			dictfilename=actualfilename;
-		}
-
-		//optionally get filename from the current var
-		if (!actualfilename) {
-			throw MVDBException(L"select() filehandle is missing and sort/select clause doesnt start \"SELECT filename\"");
-		}
+		maxnrecs=actualfilename;
+		actualfilename=getword(remainingsortselectclause);
 	}
+
+	dictfilename=actualfilename;
 
 	while (remainingsortselectclause.length())
 	{
@@ -2148,10 +2137,10 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		{
 			var dictexpression=getdictexpression(actualfilename,actualfilename,dictfilename,dictfile,getword(remainingsortselectclause),joins,ismv,true);
 
-//dictexpression.outputl(L"dictexpression=");
-//orderclause.outputl(L"orderclause=");
+			//dictexpression.outputl(L"dictexpression=");
+			//orderclause.outputl(L"orderclause=");
 
-			orderclause ^= L", " ^ dictexpression;
+			orderclause ^= L",\n " ^ dictexpression;
 
 			if (ucword==L"BY-DSND")
 				orderclause^=L" DESC";
@@ -2162,7 +2151,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		//subexpressions (,),and,or
 		if (var(L"( ) AND OR").locateusing(L" ",ucword) && whereclause)
 		{
-			whereclause ^= L" " ^ ucword;
+			whereclause ^= L"\n " ^ ucword;
 			continue;
 		}
 
@@ -2180,8 +2169,11 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 
 
 			//skip AUTHORISED for now since too complicated to calculate in database ATM
-			if (ucword==L"AUTHORISED")
+			if (ucword==L"AUTHORISED") {
+				if (whereclause.substr(-4,4) == L" AND")
+					whereclause.splicer(-4,4,L"");
 				continue;
+			}
 
 			//add the dictionary id
 			var sortable=false;//because indexes are NOT created sortable (exodus_sort()
@@ -2323,7 +2315,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 			keycodes=actualfilename ^ L".key IN ( " ^ keycodes.swap(FM,L", ") ^ L" )";
 
 			if (whereclause)
-				whereclause=L" AND ( " ^ whereclause ^ L" ) ";
+				whereclause^=L"\n AND ( " ^ keycodes ^ L" ) ";
 			else
 				whereclause=keycodes;
 		}
@@ -2356,7 +2348,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	if (this->savelist(listname) || (savelistfilename != actualfilename && var().open(savelistfilename))) {
 		if (joins)
 			joins^=L", ";
-		joins ^= L" INNER JOIN " ^ savelistfilename ^ L" ON " ^ actualfilename ^ L".key = " ^ savelistfilename ^ L".key";
+		joins ^= L" \nINNER JOIN\n " ^ savelistfilename ^ L" ON " ^ actualfilename ^ L".key = " ^ savelistfilename ^ L".key";
 	}
 
 	//disambiguate from any INNER JOIN key
@@ -2371,18 +2363,19 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 
 	//WITH HOLD is a very significant addition
 	//var sql=L"DECLARE cursor1_" ^ (*this) ^ L" CURSOR WITH HOLD FOR SELECT " ^ actualfieldnames ^ L" FROM ";
-	var sql=L"DECLARE cursor1_" ^ (*this) ^ L" SCROLL CURSOR WITH HOLD FOR SELECT " ^ actualfieldnames ^ L" FROM ";
-	sql ^= actualfilename;
+	var sql=L"DECLARE\n cursor1_" ^ (*this) ^ L" SCROLL CURSOR WITH HOLD FOR";
+	sql ^= L" \nSELECT\n " ^ actualfieldnames;
+	sql ^= L" \nFROM\n " ^ actualfilename;
 	if (joins)
 		sql ^= L" " ^ joins;
 	if (whereclause)
-		sql ^= L" WHERE " ^ whereclause;
+		sql ^= L" \nWHERE \n" ^ whereclause;
 	if (orderclause)
-		sql ^= L" ORDER BY " ^ orderclause.substr(3);
+		sql ^= L" \nORDER BY \n" ^ orderclause.substr(3);
 	if (maxnrecs)
-		sql ^= L" LIMIT " ^ maxnrecs;
+		sql ^= L" \nLIMIT\n " ^ maxnrecs;
 
-//sql.outputl(L"sql=");
+	//sql.outputl(L"sql=");
 
 	//DEBUG_LOG_SQL
 	//if (GETDBTRACE)
@@ -2390,15 +2383,14 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 
 	//Start a transaction block if none already - because postgres requires select to cursor to be inside one
 	//var autotrans=!statustrans();
-    //if (autotrans && !begintrans()) {
+	//if (autotrans && !begintrans()) {
 	//	return false;
 	//}
 
 	//not required if WITH HOLD is used in ::select()'s DECLARE CURSOR
-//	if (!this->statustrans())
-//		throw MVDBException(L"select() must be preceeded by begintrans()");
+	//if (!this->statustrans())
+	//	throw MVDBException(L"select() must be preceeded by begintrans()");
 
-//	if (!sql.sqlexec())
 	var errmsg;
 	if (! this->sqlexec(sql,errmsg)) {
 
@@ -2417,30 +2409,13 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	return true;
 }
 
-var& var::setifunassigned(const var& defaultvalue/*=""*/) {
-
-	THISIS(L"var& var::setifunassigned(const var& defaultvalue) const")
-	THISISDEFINED()
-	ISASSIGNED(defaultvalue)
-
-	//?allow undefined usage like var xyz=xyz.readnext();
-	//if (var_typ&mvtypemask)
-	if (this->unassigned())
-	{
-		//throw MVUndefined(L"setifunassigned( ^ defaultvalue ^L")");
-		//var_str=L"";
-		//var_typ=pimpl::VARTYP_STR;
-		*this=defaultvalue;
-	}
-	return *this;
-}
 void var::clearselect() const
 {
 	//THISIS(L"void var::clearselect() const")
 	//THISISSTRING()
 
 	//default cursor is ""
-	const_cast<var&>(*this).setifunassigned(L"");
+	const_cast<var&>(*this).unassigned(L"");
 
         ///if readnext through string
         if ((*this)[-1]==FM) {
@@ -2567,7 +2542,7 @@ bool var::hasnext() const
 	//THISISSTRING()
 
 	//default cursor is ""
-	const_cast<var&>(*this).setifunassigned(L"");
+	const_cast<var&>(*this).unassigned(L"");
 
 	//readnext through string of keys if provided
 	if ((*this)[-1]==FM) {
@@ -2637,7 +2612,7 @@ bool var::readnext(var& key, var& valueno) const
 	}
 
 	//default cursor is ""
-	const_cast<var&>(*this).setifunassigned(L"");
+	const_cast<var&>(*this).unassigned(L"");
 
 	if (GETDBTRACE)
 		exodus::logputl(L"DBTRACE: ::readnext(key,valueno)");
@@ -2766,7 +2741,7 @@ bool var::readnextrecord(var& record, var& key, var& valueno) const
 	}
 
 	//default cursor is ""
-	const_cast<var&>(*this).setifunassigned(L"");
+	const_cast<var&>(*this).unassigned(L"");
 
 	THISIS(L"bool var::readnextrecord(var& record, var& key) const")
 	THISISSTRING()
@@ -2949,7 +2924,7 @@ bool var::selectpending() const
 	//THISISSTRING()
 
 	//default cursor is ""
-	const_cast<var&>(*this).setifunassigned(L"");
+	const_cast<var&>(*this).unassigned(L"");
 
 	//from http://www.alberton.info/postgresql_meta_info.html
 

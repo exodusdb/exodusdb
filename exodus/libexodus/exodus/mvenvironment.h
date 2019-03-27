@@ -181,6 +181,8 @@ public:
 	//set in init()
 	var PROCESSNO = L"";
 
+	var CURSOR = L"1";
+
 	//define a type of object that holds many LabelledCommons
 	//typedef std::map<const char*, LabelledCommon> LabelledCommons;
 	//typedef std::map<std::string, boost::any> labelledcommons;

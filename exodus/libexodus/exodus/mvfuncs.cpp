@@ -209,7 +209,8 @@ bool var::assigned() const
 	//which is possible (in syntax like var xx.osread()?)
 	//and also when passing default variables to functions in the functors on gcc
 	//THISISDEFINED()
-	if (!this||(*this).var_typ&mvtypemask)
+
+	if (!this||(*this).var_typ & mvtypemask)
 		return false;
 
 	return var_typ!=pimpl::VARTYP_UNA;
@@ -217,14 +218,35 @@ bool var::assigned() const
 
 bool var::unassigned() const
 {
-	//THISIS(L"bool var::unassigned() const")
-
 	//see explanation above in assigned
+	//THISIS(L"bool var::unassigned() const")
 	//THISISDEFINED()
-	if (!this||((*this).var_typ&mvtypemask))
+
+	if (!this||((*this).var_typ & mvtypemask))
 		return true;
 
 	return !var_typ;
+}
+
+var& var::unassigned(const var& defaultvalue) {
+
+	//see explanation above in assigned
+        //THISISDEFINED()
+
+        THISIS(L"var& var::unassigned(const var& defaultvalue) const")
+        ISASSIGNED(defaultvalue)
+
+        //?allow undefined usage like var xyz=xyz.readnext();
+        //if (var_typ & mvtypemask)
+
+        if (this->unassigned())
+        {
+                //throw MVUndefined(L"unassigned( ^ defaultvalue ^L")");
+                //var_str=L"";
+                //var_typ=pimpl::VARTYP_STR;
+                *this=defaultvalue;
+        }
+        return *this;
 }
 
 //pick int() is actually the same as floor. using integer() instead of int() because int is a reserved word in c/c++ for int datatype
@@ -245,7 +267,7 @@ var var::integer() const
 	 1.0=1
 	*/
 
-	if (var_typ&pimpl::VARTYP_INT)
+	if (var_typ & pimpl::VARTYP_INT)
 		return var_int;
 
 	//could save the integer conversion here but would require mentality to save BOTH int and double
@@ -262,7 +284,7 @@ var var::floor() const
 	THISIS(L"var var::floor() const")
 	THISISNUMERIC()
 
-	if (var_typ&pimpl::VARTYP_INT)
+	if (var_typ & pimpl::VARTYP_INT)
 		return var_int;
 
 	//could save the integer conversion here but would require mentality to save BOTH int and double
@@ -294,7 +316,7 @@ var var::round(const int ndecimals) const
 	THISISNUMERIC()
 
 	double result;
-	if (var_typ&pimpl::VARTYP_INT)
+	if (var_typ & pimpl::VARTYP_INT)
 	{
 		if (not ndecimals)
 			return var_int;
@@ -334,15 +356,15 @@ bool var::toBool() const
 	{
 		//doubles are true unless zero
 		//check double first dbl on guess that tests will be most often on financial numbers
-		if (var_typ&pimpl::VARTYP_DBL)
+		if (var_typ & pimpl::VARTYP_DBL)
 			return (bool)(var_dbl!=0);
 
 		//ints are true except for zero
-		if (var_typ&pimpl::VARTYP_INT)
+		if (var_typ & pimpl::VARTYP_INT)
 			return (bool)(var_int!=0);
 
 		//non-numeric strings are true unless zero length
-		if (var_typ&pimpl::VARTYP_NAN)
+		if (var_typ & pimpl::VARTYP_NAN)
 			return (bool)(var_str.length()!=0);
 
 		if (!(var_typ))
@@ -364,7 +386,7 @@ int var::toInt() const
 	THISISNUMERIC()
 
 	//loss of precision if var_int is long long
-	return (var_typ&pimpl::VARTYP_INT) ? int(var_int) : int(var_dbl);
+	return (var_typ & pimpl::VARTYP_INT) ? int(var_int) : int(var_dbl);
 }
 
 int var::toLong() const
@@ -373,7 +395,7 @@ int var::toLong() const
 	THISISNUMERIC()
 
 	//loss of precision if var_int is long long
-	return (var_typ&pimpl::VARTYP_INT) ? long(var_int) : long(var_dbl);
+	return (var_typ & pimpl::VARTYP_INT) ? long(var_int) : long(var_dbl);
 }
 
 double var::toDouble() const
@@ -381,44 +403,40 @@ double var::toDouble() const
 	THISIS(L"double var::toDouble() const")
 	THISISNUMERIC()
 
-	return (var_typ&pimpl::VARTYP_INT) ? double(var_int) : var_dbl;
+	//return double by preference
+	return (var_typ & pimpl::VARTYP_DBL) ? double(var_dbl) : double(var_int);
 }
 
+//mainly called in ISSTRING when not already a string
 void var::createString() const
 {
-	THISIS(L"void var::createString() const")
+	//THISIS(L"void var::createString() const")
 	//TODO ensure ISDEFINED is called everywhere in advance
 	//to avoid wasting time doing multiple calls to ISDEFINED
-	THISISDEFINED()
+	//THISISDEFINED()
 
-	switch (var_typ)
-	{
-		//skip this test for speed and only call the function if required
-		//str already. no action required
-		//put this first guessing that toWString is most often called on strings;
-		//case pimpl::VARTYP_STR:
-		//	return;
-
-		//int - create string from int
-		case pimpl::VARTYP_INT:
-			//loss of precision if var_int is long long
-			var_str=intToString(int(var_int));
-			break;
-
-		//dbl - create string from dbl
-		case pimpl::VARTYP_DBL:
-			var_str=dblToString(var_dbl);
-			break;
-
-		//unassigned - throw
-		case pimpl::VARTYP_UNA:
-			throw MVUnassigned(L"createString()");
-
-		default:
-			//arrives here only after int or dbl has been converted to string
-			//add the "string available" bit flag using the "bitor equals" operator
-			var_typ|=pimpl::VARTYP_STR;
+	//dbl - create string from dbl
+	if (var_typ & pimpl::VARTYP_DBL) {
+		var_str=dblToString(var_dbl);
+		var_typ|=pimpl::VARTYP_STR;
+		return;
 	}
+
+	//int - create string from int
+	if (var_typ & pimpl::VARTYP_INT) {
+		//loss of precision if var_int is long long
+		var_str=intToString(int(var_int));
+		var_typ|=pimpl::VARTYP_STR;
+		return;
+	}
+	//already a string (unlikely since only called when not a string)
+	if (var_typ & pimpl::VARTYP_STR) {
+		return;
+	}
+
+	//treat any other case as unassigned
+	//(usually var_typ & pimpl::VARTYP_UNA)
+	throw MVUnassigned(L"createString()");
 
 }
 
@@ -433,7 +451,7 @@ std::wstring var::toWString() const
 //DLL_PUBLIC
 std::string var::toString2() const
 {
-        if (var_typ&mvtypemask)
+        if (var_typ & mvtypemask)
                 return "";
         return toString();
 }
@@ -580,6 +598,10 @@ var& var::trimmerf(const wchar_t* trimchar)
 
 	//return var(var_str.substr(start_pos));
 	var_str.erase(0,start_pos);
+
+	//clear numeric flags in case changed from/to numeric
+	var_typ&=pimpl::VARTYP_NOTNUMFLAGS;
+
 	return *this;
 
 }
@@ -608,6 +630,9 @@ var& var::trimmerb(const wchar_t* trimchar)
 
 	//return var(var_str.substr(0,end_pos+1));
 	var_str.erase(end_pos+1);
+
+        //clear numeric flags in case changed from/to numeric
+        var_typ&=pimpl::VARTYP_NOTNUMFLAGS;
 
 	return *this;
 
@@ -653,6 +678,10 @@ var& var::trimmer(const wchar_t* trimchar)
 	//erase trailing spaces
 	var_str.erase(end_pos+1);
 
+	//for speed and safety do this once, regardless of any trimming actually done
+        //clear numeric flags in case changed from/to numeric
+        var_typ&=pimpl::VARTYP_NOTNUMFLAGS;
+
 	//find the starting position of any embedded spaces
 	start_pos=std::wstring::npos;
 	while (true)
@@ -661,7 +690,8 @@ var& var::trimmer(const wchar_t* trimchar)
 		start_pos=var_str.find_last_of(trimchar,start_pos);
 
 		//if no (more) spaces then return the string
-		if (start_pos==std::wstring::npos||start_pos<=0) return *this;
+		if (start_pos==std::wstring::npos||start_pos<=0)
+			return *this;
 
 		//find the first non-space thereafter
 		end_pos=var_str.find_last_not_of(trimchar,start_pos-1);
@@ -671,7 +701,8 @@ var& var::trimmer(const wchar_t* trimchar)
 		{
 			var_str.erase(end_pos+1,start_pos-end_pos-1);
 		}
-		if (end_pos<=0) break;
+		if (end_pos<=0)
+			break;
 		start_pos=end_pos-1;
 	}
 	return *this;
@@ -693,12 +724,16 @@ var& var::inverter()
 	THISIS(L"var& var::inverter()")
 	THISISSTRING()
 
+        //clear numeric flags in case changed from/to numeric
+        var_typ&=pimpl::VARTYP_NOTNUMFLAGS;
+
 	//wchar_t invertbits=-1;
 	//invert only the lower 8 bits to keep the resultant characters within the the same unicode page
 	wchar_t invertbits=255;
 	for (size_t ii = 0; ii < var_str.size(); ii++)
 		//xor each w_char with the bits we want to toggle
         	var_str[ii] = var_str[ii] ^ invertbits;
+	return *this;
 }
 
 var var::ucase() const
@@ -710,6 +745,10 @@ var& var::ucaser()
 {
 	THISIS(L"var& var::ucaser()")
 	THISISSTRING()
+
+	//cannot chaneg to/from numeric
+        //clear numeric flags in case changed from/to numeric
+        //var_typ&=pimpl::VARTYP_NOTNUMFLAGS;
 
 	return localeAwareChangeCase(2);
 }
@@ -723,6 +762,10 @@ var& var::lcaser()
 {
 	THISIS(L"var& var::lcaser()")
 	THISISSTRING()
+
+	//cannot change to/from numeric
+        //clear numeric flags in case changed from/to numeric
+        //var_typ&=pimpl::VARTYP_NOTNUMFLAGS;
 
 	return localeAwareChangeCase(1);
 }
@@ -766,7 +809,8 @@ var var::seq() const
 	THISIS(L"var var::seq() const")
 	THISISSTRING()
 
-	if (var_str.length()==0) return 0;
+	if (var_str.length()==0)
+		return 0;
 
 	return (int) (unsigned int) var_str[0];
 
@@ -792,6 +836,9 @@ var& var::quoter()
 	THISIS(L"var& var::quoter()")
 	THISISSTRING()
 
+        //clear numeric flags in case changed from numeric
+        var_typ&=pimpl::VARTYP_NOTNUMFLAGS;
+
 	//NB this is std::wstring "replace" not var field replace
 	var_str.replace(0,0,L"\"");
 	var_str+=L'"';
@@ -812,6 +859,9 @@ var& var::squoter()
 	THISIS(L"var& var::squoter()")
 	THISISSTRING()
 
+        //clear numeric flags in case changed from numeric
+        var_typ&=pimpl::VARTYP_NOTNUMFLAGS;
+
 	//NB this is std::wstring "replace" not var field replace
 	var_str.replace(0,0,L"'");
 	var_str+=L'\'';
@@ -831,6 +881,9 @@ var& var::unquoter()
 {
 	THISIS(L"var& var::unquoter()")
 	THISISSTRING()
+
+        //clear numeric flags in case changed to numeric
+        var_typ&=pimpl::VARTYP_NOTNUMFLAGS;
 
 	//removes MATCHING beginning and terminating " or ' characters
 	//also removes a SINGLE " or ' on the grounds that you probably want to eliminate all such characters
@@ -917,6 +970,9 @@ var& var::splicer(const int start1,const int length,const var& newstr)
 		}
 	}
 
+        //clear numeric flags in case changed from/to numeric
+        var_typ&=pimpl::VARTYP_NOTNUMFLAGS;
+
 	if (start1b>var_str.length())
 		var_str+=newstr.var_str;
 	else
@@ -949,6 +1005,9 @@ var& var::splicer(const int start1, const var& newstr)
 	else
 		start1b=1;
 
+        //clear numeric flags in case changed from/to numeric
+        var_typ&=pimpl::VARTYP_NOTNUMFLAGS;
+
 	if (start1b>var_str.length())
 		var_str+=newstr.var_str;
 	else
@@ -971,8 +1030,7 @@ var& var::transfer(var& destinationvar)
 	destinationvar.var_dbl=var_dbl;
 
 	var_str=L"";
-	var_int=0;
-	var_typ=pimpl::VARTYP_INTSTR;
+	var_typ=pimpl::VARTYP_STR;
 
 	return destinationvar;
 }
@@ -1103,120 +1161,15 @@ var& var::cropper()
 		newstr.pop_back();
 	}
 
+        //clear numeric flags in case changed from/to numeric
+        var_typ&=pimpl::VARTYP_NOTNUMFLAGS;
+
 	var_str=newstr;
 	//swap(var_str,newstr);
 
 	return *this;
 }
-/*
-var& var::cropper()
-{
-	THISIS(L"var& var::cropper()")
-	THISISSTRING()
 
-	//aaaFbbbFVSSccc
-	//aaaFbbbFVSSccc
-
-	//aaaFbbbFVSSFRdd
-	//aaaFbbb     Rdd
-
-	//considered several strategies
-
-	//scan forwards and copy to a new string
-	//could not work out an simple efficient algorithm
-	//the only simple algorithm was to always check the last characters on the growing new string
-	//and if like VM VM when adding FM then trim the last characters
-	//this wouldnt be efficient in the common case of many excess VMs since then would be all added and then all trimmed
-
-	//scan backwards and mark characters to be deleted and then copy only the non-marked characters to a new string
-	//problem to decide what character to use as deletion character - if hardcoded it would prevent that forever from being used in data
-	//otherwise to scan the whole string for a non-occuring character to use as a deletion character
-
-	//scan backwards copying the characters (backwards) to a new string skipping the VM in the case of VM FM sequences
-	//at the end IF there have been any skips then reverse the string into the result
-
-	//a LAZY version that only copies to newstr what necessary (imagine a string with trailing marks and a few fields to be cropped from the middle 
-    //xxxxxxCxxxCxxxxCxxxxCyyyyyyyyyyyyyyyZZZ
-	//newstr will only contain the xxxxxxxxxxxxxx bit (reversed)
-	//yyyyyyyyyyyy is the tail of the original string which hasnt any cropping done in it but EXCLUDING any trailing marks
-	//to get the full cropped string back you need to
-	//1) reverse(newstr) ie xxx
-	//2) concat yyy ie originalstring.substr(croppoint onwards excluding zzz)
-
-	std::wstring newstr=L"";
-
-	std::wstring::reverse_iterator iter=var_str.rbegin();
-	std::wstring::reverse_iterator iterend=var_str.rend();
-
-	//skip all trailing separators
-	//move the REVERSE iterator backwards to the first non-field character
-	int ntrailing2trim=0;
-	while (iter!=iterend && (*iter)>=SSTM_ && (*iter)<=RM_)
-	{
-		++ntrailing2trim;
-		++iter;
-	}
-
-	//all separator characters - return empty string
-	if (iter == iterend)
-	{
-		var_str=newstr;
-		return *this;
-	}
-
-	int ncropped=0;
-
-	do
-	{
-		wchar_t lastchar=*iter;
-
-		if (ncropped)
-			newstr+=lastchar;
-
-		++iter;
-
-		//skip over lower preceeding separators (ge VM before FM)
-		//remember we are iterating in REVERSER
-		//so ++iter moves to the character to the LEFT not right
-		do
-		{
-			if (iter == iterend )
-				goto cropperexit;
-
-			if ((*iter) < SSTM_ || (*iter) >= lastchar )
-				break;
-
-			++ncropped;
-
-			++iter;
-
-		} while (true);
-
-	} while (true);
-
-cropperexit:
-
-	//IF anything was cropped then reverse the new string back into the beginning of the old string
-	//and delete the gap
-	if (ncropped)
-	{
-		std::wstring::reverse_iterator newiter=newstr.rbegin();
-		std::wstring::reverse_iterator newiterend=newstr.rend();
-		std::wstring::iterator olditer=var_str.begin();
-
-		while (newiter!=newiterend)
-			(*olditer++)=(*newiter++);
-
-		var_str.erase(newstr.length(),ncropped);
-
-	}
-
-	if (ntrailing2trim)
-		var_str.erase(var_str.length()-ntrailing2trim);
-
-	return *this;
-}
-*/
 var var::lower() const
 {
 	THISIS(L"var var::lower() const")
@@ -1230,7 +1183,7 @@ var& var::lowerer()
 	THISIS(L"var& var::lowerer()")
 	THISISSTRING()
 
-	converter(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_,
+	this->converter(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_,
 			  _FM_ _VM_ _SM_ _TM_ _STM_ _SSTM_);
 
 	return *this;
@@ -1249,7 +1202,7 @@ var& var::raiser()
 	THISIS(L"var& var::raiser()")
 	THISISSTRING()
 
-	converter(_FM_ _VM_ _SM_ _TM_ _STM_ _SSTM_,
+	this->converter(_FM_ _VM_ _SM_ _TM_ _STM_ _SSTM_,
 			  _RM_ _FM_ _VM_ _SM_ _TM_ _STM_);
 
 	return *this;
@@ -1260,7 +1213,9 @@ var var::convert(const var& oldchars,const var& newchars) const
 	THISIS(L"var var::convert(const var& oldchars,const var& newchars) const")
 	THISISSTRING()
 
-	return var(*this).converter(oldchars,newchars);
+	//return var(*this).converter(oldchars,newchars);
+	var temp=var(*this).converter(oldchars,newchars);
+	return temp;
 }
 
 var& var::converter(const var& oldchars,const var& newchars)
@@ -1273,22 +1228,28 @@ var& var::converter(const var& oldchars,const var& newchars)
 	std::wstring::size_type
 	pos=std::wstring::npos;
 
+        //clear numeric flags in case changed from/to numeric
+        var_typ&=pimpl::VARTYP_NOTNUMFLAGS;
+
 	while (true)
 	{
 		//locate (backwards) any of the from characters
+		//because we might be removing characters
 		pos=var_str.find_last_of(oldchars.var_str,pos);
 
-		if (pos==std::wstring::npos) break;
+		if (pos==std::wstring::npos)
+			break;
 
 		//find which from character we have found
 		int fromcharn=int(oldchars.var_str.find(var_str[pos]));
 
 		if (fromcharn<int(newchars.var_str.length()))
-		 var_str.replace(pos,1,newchars.var_str.substr(fromcharn,1));
+			var_str.replace(pos,1,newchars.var_str.substr(fromcharn,1));
 		else
-		 var_str.erase(pos,1);
+			var_str.erase(pos,1);
 
-		if (pos==0) break;
+		if (pos==0)
+			break;
 		pos--;
 	}
 
@@ -1322,12 +1283,12 @@ bool var::isnum(void) const
 	THISISDEFINED()
 
 	//is numeric already
-	if (var_typ&pimpl::VARTYP_INTDBL)
+	if (var_typ & pimpl::VARTYP_INTDBL)
 		return true;
 
 	//is known not numeric already
 	//maybe put this first if comparison operations on strings are more frequent than numeric operations on numbers
-	if (var_typ&pimpl::VARTYP_NAN)
+	if (var_typ & pimpl::VARTYP_NAN)
 		return false;
 
 	//not assigned error
@@ -1459,156 +1420,6 @@ bool var::isnum(void) const
 	//indicate isNumeric
 	return true;
 }
-
-/*
-bool var::isnum_old(void) const
-{
-	THISIS(L"bool var::isnum(void) const")
-	//TODO make isnum private and ensure ISDEFINED is checked before all calls to isnum
-	//to save the probably double check here
-	THISISDEFINED()
-
-	//is numeric already
-	if (var_typ&pimpl::VARTYP_INTDBL)
-		return true;
-
-	//is known not numeric already
-	//maybe put this first if comparison operations on strings are more frequent than numeric operations on numbers
-	if (var_typ&pimpl::VARTYP_NAN)
-		return false;
-
-	//not assigned error
-	if (!var_typ)
-		throw MVUnassigned(L"isnum()");
-
-	//if not a number and not unassigned then it is an unknown string
-
-	bool point=false;
-	bool digit=false;
-
-	//otherwise find test
-	//a number is optional minus followed by digits and max of one decimal point
-	//NB going backwards - for speed?
-	//TODO: check if going backwards is slow for variable width multi-byte character strings
-	//and replace with forward scanning
-	for (int ii=(int)var_str.length()-1;ii>=0;--ii)
-	{
-
-		wchar_t cc=var_str[ii];
-
-		//check > 9 first on guess that non-numeric string characters will be after '9'
-		//to evade the || < '0' test as well
-		//note: high end characters appear negative and crash isdigit
-		//could this be solved by defining wchar_t as unsigned wchar_t?
-//			if (!isdigit(cc))
-		if (cc>'9'||cc<'0')
-		{
-
-			//check non-digit characters
-			switch (cc)
-			{
-				case L'.':
-
-					//more than one point is non-numeric
-					if (point) return false;
-
-					//indicate point has been found
-					point=true;
-					break;
-
-				case L'-':
-				case L'+':
-
-					//non-numeric if +/- is not the first character or is the only character
-					//if (ii) goto nan;
-					if (ii)
-					{
-						var_typ=pimpl::VARTYP_NANSTR;
-						return false;
-					}
-					break;
-
-				//any other character mean non-numeric
-				default:
-					var_typ=pimpl::VARTYP_NANSTR;
-					return false;
-			}
-		}
-		else
-			digit=true;
-	}
-
-	//strategy:
-	//Only test the length of string once in the relatively common cases (ie where
-	//the string fails numeric testing or there is at least one digit in the string)
-	//Only in the rarer cases of the string being zero length
-	//(or being one of special cases + - . +. -.) will the length be checked twice
-	// digit=false
-	// test length zero so no loop
-	// if (!digit)
-	//  test length zero again
-
-	//perhaps slightly unusual cases here
-	//zero length string and strings like + - . +. -.
-	if (!digit)
-	{
-		//must be at least one digit unless zero length string
-		if (var_str.length())
-		// goto nan;
-		{
-			var_typ=pimpl::VARTYP_NANSTR;
-			return false;
-		}
-
-		//zero length string is integer 0
-		var_int=0;
-		var_typ=pimpl::VARTYP_INTSTR;
-		return true;
-
-	}
-
-	//get and save the number as int or double
-	if (point)
-	{
-		//var_dbl=_wtof(var_str.c_str());
-		//var_dbl=_wtof(var_str.c_str());
-		//TODO optimise with code based on the following idea?
-
-		//union switchitup
-		//{
-		//	wchar_t bigletter;
-		//	char smalletters[sizeof(wchar_t)/sizeof(char)];
-		//} abcd;
-		//abcd.bigletter=0x0035;
-		//std::cout<<atoi(abcd.smalletters)<<std::endl;
-
-		std::string result(var_str.begin(),var_str.end());
-		var_dbl=atof(result.c_str());
-		var_typ=pimpl::VARTYP_DBLSTR;
-	}
-	else		//ALN:TODO: long int wcstol (const wchar_t *restrict string, wchar_t **restrict tailptr, int base)
-	{			//ALN:TODO: ... should be OK here
-
-		//var_int=_wtoi(var_str.c_str());
-		//TODO optimise
-
-		//change from
-		std::string result(var_str.begin(),var_str.end());
-		var_int=atoi(result.c_str());
-
-		//change to something like this? //ALN:TODO: finish and test !
-
-		//wchar_t * err_char;
-		//var_int=wcstol(result.c_str(), & err_char, 10);
-		//if (
-
-		var_typ=pimpl::VARTYP_INTSTR;
-	}
-
-	//indicate isNumeric
-	return true;
-
-}*/
 
 /////////
 // output
@@ -1870,36 +1681,6 @@ var var::index(const var& substrx,const int occurrenceno) const
 
 }
 
-//moved to mvprogram
-//var var::perform() const
-//{
-//	THISIS(L"var var::perform() const")
-//	THISISSTRING()
-
-//	std::cout<<"var::perform not implemented yet "<<toString()<<std::endl;
-//	return L"";
-//}
-
-//moved to mvprogram
-//var var::execute() const
-//{
-//	THISIS(L"var var::execute() const")
-//	THISISSTRING()
-//
-//	std::cout<<"var::execute not implemented yet. perform instead"<<toString()<<std::endl;
-//	return (*this).perform();
-//	return L"";
-//}
-
-//var var::chain() const
-//{
-//	THISIS(L"var var::chain() const")
-//	THISISSTRING()
-//
-//	std::cout<<"var::chain not implemented yet "<<toString()<<std::endl;
-//	return L"";
-//}
-
 var var::debug() const
 {
 	//THISIS(L"var var::debug() const")
@@ -1950,12 +1731,12 @@ var var::abs() const
 	THISIS(L"var var::abs() const")
 	THISISNUMERIC()
 
-	if (var_typ&pimpl::VARTYP_INT)
+	if (var_typ & pimpl::VARTYP_INT)
 	{
 		if (var_int<0) return -var_int;
 		return var_int;
 	}
-	if (var_typ&pimpl::VARTYP_DBL)
+	if (var_typ & pimpl::VARTYP_DBL)
 	{
 		if (var_dbl<0) return -var_dbl;
 		return std::floor(var_dbl);
@@ -1969,9 +1750,9 @@ var var::mod(const var& divisor) const
 	THISISNUMERIC()
 	ISNUMERIC(divisor)
 
-	if (var_typ&pimpl::VARTYP_INT)
+	if (var_typ & pimpl::VARTYP_INT)
 	{
-		if (divisor.var_typ&pimpl::VARTYP_INT)
+		if (divisor.var_typ & pimpl::VARTYP_INT)
 		{
 			if ((var_int<0 && divisor.var_int>=0) || (divisor.var_int<0 && var_int>=0))
 				//multivalue version of mod
@@ -1984,7 +1765,7 @@ var var::mod(const var& divisor) const
 
 			var_dbl=double(var_int);
 			//following would cache the double value but is it worth it?
-			//var_typ=var_typ&pimpl::VARTYP_DBL;
+			//var_typ=var_typ & pimpl::VARTYP_DBL;
 
 			if ((var_int<0 && divisor.var_dbl>=0) || (divisor.var_dbl<0 && var_int>=0))
 				//multivalue version of mod
@@ -1995,11 +1776,11 @@ var var::mod(const var& divisor) const
 	}
 	else
 	{
-		if (divisor.var_typ&pimpl::VARTYP_INT)
+		if (divisor.var_typ & pimpl::VARTYP_INT)
 		{
 			divisor.var_dbl=double(divisor.var_int);
 			//following would cache the double value but is it worth it?
-			//divisor.var_typ=divisor.var_typ&pimpl::VARTYP_DBL;
+			//divisor.var_typ=divisor.var_typ & pimpl::VARTYP_DBL;
 
 			if ((var_dbl<0 && divisor.var_int>=0) || (divisor.var_int<0 && var_dbl>=0))
 				//multivalue version of mod
@@ -2025,7 +1806,7 @@ var var::mod(const int divisor) const
 	THISIS(L"var var::mod(const int divisor) const")
 	THISISNUMERIC()
 
-	if (var_typ&pimpl::VARTYP_INT)
+	if (var_typ & pimpl::VARTYP_INT)
 	{
 			if ((var_int<0 && divisor>=0) || (divisor<0 && var_int>=0))
 				//multivalue version of mod
@@ -2057,10 +1838,10 @@ var var::sin() const
 	THISIS(L"var var::sin() const")
 	THISISNUMERIC()
 
-	if (var_typ&pimpl::VARTYP_DBL)
+	if (var_typ & pimpl::VARTYP_DBL)
 		return std::sin(var_dbl*M_PI/180);
 
-//	if (var_typ&pimpl::VARTYP_INT)
+//	if (var_typ & pimpl::VARTYP_INT)
 		return std::sin(double(var_int)*M_PI/180);
 
 	throw MVException(L"sin(unknown mvtype=" ^ var(var_typ) ^ L")");
@@ -2071,10 +1852,10 @@ var var::cos() const
 	THISIS(L"var var::cos() const")
 	THISISNUMERIC()
 
-	if (var_typ&pimpl::VARTYP_DBL)
+	if (var_typ & pimpl::VARTYP_DBL)
 		return std::cos(var_dbl*M_PI/180);
 
-//	if (var_typ&pimpl::VARTYP_INT)
+//	if (var_typ & pimpl::VARTYP_INT)
 		return std::cos(double(var_int)*M_PI/180);
 
 	throw MVException(L"cos(unknown mvtype=" ^ var(var_typ) ^ L")");
@@ -2085,10 +1866,10 @@ var var::tan() const
 	THISIS(L"var var::tan() const")
 	THISISNUMERIC()
 
-	if (var_typ&pimpl::VARTYP_DBL)
+	if (var_typ & pimpl::VARTYP_DBL)
 		return std::tan(var_dbl*M_PI/180);
 
-//	if (var_typ&pimpl::VARTYP_INT)
+//	if (var_typ & pimpl::VARTYP_INT)
 		return std::tan(double(var_int)*M_PI/180);
 
 	throw MVException(L"tan(unknown mvtype=" ^ var(var_typ) ^ L")");
@@ -2099,10 +1880,10 @@ var var::atan() const
 	THISIS(L"var var::atan() const")
 	THISISNUMERIC()
 
-	if (var_typ&pimpl::VARTYP_DBL)
+	if (var_typ & pimpl::VARTYP_DBL)
 		return std::atan(var_dbl)/M_PI*180;
 
-//	if (var_typ&pimpl::VARTYP_INT)
+//	if (var_typ & pimpl::VARTYP_INT)
 		return std::atan(double(var_int))/M_PI*180;
 
 	throw MVException(L"sin(unknown mvtype=" ^ var(var_typ) ^ L")");
@@ -2113,10 +1894,10 @@ var var::loge() const
 	THISIS(L"var var::loge() const")
 	THISISNUMERIC()
 
-	if (var_typ&pimpl::VARTYP_DBL)
+	if (var_typ & pimpl::VARTYP_DBL)
 		return std::log(var_dbl);
 
-//	if (var_typ&pimpl::VARTYP_INT)
+//	if (var_typ & pimpl::VARTYP_INT)
 		return std::log(double(var_int));
 
 	throw MVException(L"loge(unknown mvtype=" ^ var(var_typ) ^ L")");
@@ -2127,10 +1908,10 @@ var var::sqrt() const
 	THISIS(L"var var::sqrt() const")
 	THISISNUMERIC()
 
-	if (var_typ&pimpl::VARTYP_DBL)
+	if (var_typ & pimpl::VARTYP_DBL)
 		return std::sqrt(var_dbl);
 
-//	if (var_typ&pimpl::VARTYP_INT)
+//	if (var_typ & pimpl::VARTYP_INT)
 		return std::sqrt(double(var_int));
 
 	throw MVException(L"sqrt(unknown mvtype=" ^ var(var_typ) ^ L")");
@@ -2142,10 +1923,10 @@ var var::pwr(const var& exponent) const
 	THISISNUMERIC()
 	ISNUMERIC(exponent)
 
-	if (var_typ&pimpl::VARTYP_DBL)
+	if (var_typ & pimpl::VARTYP_DBL)
 		return std::pow(var_dbl,exponent.toDouble());
 
-//	if (var_typ&pimpl::VARTYP_INT)
+//	if (var_typ & pimpl::VARTYP_INT)
 		return std::pow(double(var_int),exponent.toDouble());
 
 	throw MVException(L"pow(unknown mvtype=" ^ var(var_typ) ^ L")");
@@ -2156,10 +1937,10 @@ var var::exp() const
 	THISIS(L"var var::exp() const")
 	THISISNUMERIC()
 
-	if (var_typ&pimpl::VARTYP_DBL)
+	if (var_typ & pimpl::VARTYP_DBL)
 		return std::exp(var_dbl);
 
-//	if (var_typ&pimpl::VARTYP_INT)
+//	if (var_typ & pimpl::VARTYP_INT)
 		return std::exp(double(var_int));
 
 	throw MVException(L"exp(unknown mvtype=" ^ var(var_typ) ^ L")");

@@ -238,12 +238,14 @@ DLL_PUBLIC bool writev(const var& record, const var& filehandle,const var& key,c
 DLL_PUBLIC bool deleterecord(const var& filehandle, const var& key);
 DLL_PUBLIC bool updaterecord(const var& record, const var& filehandle,const var& key);
 DLL_PUBLIC bool insertrecord(const var& record, const var& filehandle,const var& key);
-DLL_PUBLIC bool select(const var& sortselectclause DEFAULTNULL);
-DLL_PUBLIC void clearselect();
-DLL_PUBLIC bool readnext(var& key);
-DLL_PUBLIC bool readnext(var& key, var& valueno);
-DLL_PUBLIC bool selectrecord(const var& sortselectclause DEFAULTNULL);
-DLL_PUBLIC bool readnextrecord(var& record, var& key);
+
+//moved to mvprogram so they have access to default cursor
+//DLL_PUBLIC bool select(const var& sortselectclause DEFAULTNULL);
+//DLL_PUBLIC void clearselect();
+//DLL_PUBLIC bool readnext(var& key);
+//DLL_PUBLIC bool readnext(var& key, var& valueno);
+//DLL_PUBLIC bool selectrecord(const var& sortselectclause DEFAULTNULL);
+//DLL_PUBLIC bool readnextrecord(var& record, var& key);
 
 DLL_PUBLIC var xlate(const var& filename, const var& key, const var& fieldno, const wchar_t* mode);
 DLL_PUBLIC var xlate(const var& filename, const var& key, const var& fieldno, const var& mode);

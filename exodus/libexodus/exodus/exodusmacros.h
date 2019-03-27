@@ -300,5 +300,6 @@ namespace exodus {
 
 #define VOLUMES mv.VOLUMES
 #define PROCESSNO mv.PROCESSNO
+#define CURSOR mv.CURSOR
 
 #endif //EXODUSMACROS_H

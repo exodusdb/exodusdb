@@ -19,6 +19,110 @@ DLL_PUBLIC
 ExodusProgramBase::~ExodusProgramBase() {
 };
 
+
+bool ExodusProgramBase::select(const var& sortselectclause)
+{
+	return CURSOR.select(sortselectclause);
+}
+
+void ExodusProgramBase::clearselect()
+{
+	CURSOR.clearselect();
+}
+
+bool ExodusProgramBase::readnext(var& key)
+{
+	return CURSOR.readnext(key);
+}
+
+bool ExodusProgramBase::readnext(var& key, var& valueno)
+{
+	return CURSOR.readnext(key,valueno);
+}
+
+bool ExodusProgramBase::selectrecord(const var& sortselectclause)
+{
+	return CURSOR.selectrecord(sortselectclause);
+}
+
+bool ExodusProgramBase::readnextrecord(var& record, var& key)
+{
+	return CURSOR.readnextrecord(record, key);
+}
+
+bool ExodusProgramBase::pushselect(const var& v1, var& v2, var& v3, var& v4) {
+	//CURSOR.quote().outputl("CURSOR=");
+	//CURSOR++;
+	//CURSOR has connection number hidden in it, so it cannot be used as an ordinary variable ATM
+	CURSOR.transfer(v2);
+	CURSOR=var().date() ^ L"_" ^ (var().ostime().convert(L".",L"_"));
+	return true;
+
+/*
+SUBROUTINE PUSH.SELECT(V1, V2, V3, V4)
+11 NULL
+12 *STOPLINECOUNT
+13 *STARTLINECOUNT
+14 *STOPLINECOUNT
+15 *STARTLINECOUNT
+16 TRANSFER SYS109_27 TO V2
+20 V3 = SYS109_63
+24 V3 := @RM : SYS109_99
+33 V3 := @RM : SYS109_140
+42 V3 := @RM : SYS109_64
+51 V3 := @RM : SYS109_61_FILEHANDLE
+60 V3 := @RM : SYS109_87
+69 V3 := @RM : SYS109_65
+78 V3 := @RM : SYS109_66
+87 V3 := @RM : SYS109_135_MAPNAME
+96 V3 := @RM : SYS109_79
+105 V4 = SYS109_58
+109 SYS109_63 = 0
+113 SYS109_100 += 1
+119 RETURN
+*/
+
+}
+
+bool ExodusProgramBase::popselect(const var& v1, var& v2, var& v3, var& v4) {
+	//CURSOR.quote().outputl("CURSOR=");
+	//CURSOR--;
+	v2.transfer(CURSOR);
+	return true;
+/*
+SUBROUTINE POP.SELECT(V1, V2, V3, V4)
+11 NULL
+12 *STOPLINECOUNT
+13 *STARTLINECOUNT
+14 *STOPLINECOUNT
+15 *STARTLINECOUNT
+16 TRANSFER V2 TO SYS109_27
+20 SYS109_63 = V3[1, @RM]
+28 V3[1, COL2()]=''
+35 SYS109_99 = V3[1, @RM]
+43 V3[1, COL2()]=''
+50 SYS109_140 = V3[1, @RM]
+58 V3[1, COL2()]=''
+65 SYS109_64 = V3[1, @RM]
+73 V3[1, COL2()]=''
+80 SYS109_61_FILEHANDLE = V3[1, @RM]
+88 V3[1, COL2()]=''
+95 SYS109_87 = V3[1, @RM]
+103 V3[1, COL2()]=''
+110 SYS109_65 = V3[1, @RM]
+118 V3[1, COL2()]=''
+125 SYS109_66 = V3[1, @RM]
+133 V3[1, COL2()]=''
+140 SYS109_135_MAPNAME = V3[1, @RM]
+148 V3[1, COL2()]=''
+155 SYS109_79 = V3[1, @RM]
+163 SYS109_58 = V4
+167 SYS109_100 -= 1
+173 RETURN
+*/
+}
+
+
 void ExodusProgramBase::note(const var& msg, const var& options) const {
 	var buffer = L"";
 	mssg(msg, options, buffer);
@@ -47,16 +151,6 @@ void ExodusProgramBase::mssg(const var& msg, const var& options, var& buffer, co
 
 	std::wcout << std::endl;
 
-}
-
-bool ExodusProgramBase::pushselect(const var& v1, var& v2, var& v3, var& v4) const {
-	//TODO increment default connection number?
-	return true;
-}
-
-bool ExodusProgramBase::popselect(const var& v1, const var& v2, const var& v3, const var& v4) const {
-	//TODO increment default connection number?
-	return true;
 }
 
 var ExodusProgramBase::authorised(const var& task0) {

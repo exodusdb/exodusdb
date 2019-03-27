@@ -50,6 +50,16 @@ DLL_PUBLIC
 	//so that ID RECORD etc. continue to appear to the application programmer to be "threadsafe global" variables
 	MvEnvironment& mv;
 
+	//work on CURSOR
+	bool select(const var& sortselectclause DEFAULTNULL);
+	void clearselect();
+	bool readnext(var& key);
+	bool readnext(var& key, var& valueno);
+	bool selectrecord(const var& sortselectclause DEFAULTNULL);
+	bool readnextrecord(var& record, var& key);
+	bool pushselect(const var& v1, var& v2, var& v3, var& v4);
+	bool popselect(const var& v1, var& v2, var& v3, var& v4);
+
 	void note(const var& msg, const var& options="") const;
 	void note(const var& msg, const var& options, var& buffer, const var& params="") const;
 	void mssg(const var& msg, const var& options="") const;
@@ -106,9 +116,6 @@ DLL_PUBLIC
 	//void ostime(var& ostimenow) const;
 	int keypressed(int delayusecs=0) const;
 	bool esctoexit() const;
-
-	bool pushselect(const var& v1, var& v2, var& v3, var& v4) const;
-	bool popselect(const var& v1, const var& v2, const var& v3, const var& v4) const;
 
 //	bool oswritex(const var& str, const var& filename) const;
 //	bool osbwritex(const var& str1, const var& filehandle, const var& filename, var& offset) const;
