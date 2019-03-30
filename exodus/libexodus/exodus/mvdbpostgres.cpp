@@ -583,6 +583,7 @@ bool var::open(const var& filename, const var& connection)
 		int		paramLengths[1];
 		int		paramFormats[1];
 
+		//filename.outputl(L"filename=");
 		//$1=table_name
 		std::string filename2=filename.lcase().convert(L".",L"_").toString();
 		paramValues[0] = filename2.c_str();
@@ -1494,6 +1495,16 @@ inline void unquoter_inline(var& string)
 				string=string.substr(2,string.length()-2);
 }
 
+inline void tosqldate(var& datestr,const var& dateformat)
+{
+	//TODO! create global date format accessible from select
+	var idate=datestr.iconv(L"D/E");
+	if (idate)
+		datestr=idate.oconv(L"DJ");
+	else
+		throw MVException(datestr^L" cannot be recognised as a date");
+}
+
 inline void tosqlstring(var& string1)
 {
 	//convert to sql style strings
@@ -1651,10 +1662,12 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 			sqlexpression=L"exodus_extract_sort(" ^  params;
 
 		else if (conversion==L"[NUMBER,0]" || dictrec.a(11)==L"0N" || dictrec.a(11).substr(1,3)==L"0N_")
-			sqlexpression=L"cast( exodus_extract_text(" ^ params ^ L" as integer)";
+			//sqlexpression=L"cast( exodus_extract_text(" ^ params ^ L" as integer)";
+			sqlexpression=L"exodus_extract_number(" ^ params;
 
-		else if (conversion.substr(1,2)==L"MD" || conversion.substr(1,7)==L"[NUMBER" || dictrec.a(12)==L"FLOAT" || dictrec.a(11).index(L"0N"))
-				sqlexpression=L"cast( exodus_extract_text(" ^ params ^ L" as float)";
+		else if (conversion.substr(1,2)==L"MD" || conversion.substr(1,7)==L"[NUMBER" || dictrec.a(12)==L"FLOAT" || dictrec.a(11).index(L"0N") || dictrec.a(9) == L"R")
+				//sqlexpression=L"cast( exodus_extract_text(" ^ params ^ L" as float)";
+				sqlexpression=L"exodus_extract_number(" ^ params;
 
 		else
 			sqlexpression=L"exodus_extract_text(" ^ params;
@@ -2000,6 +2013,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		var_typ=pimpl::VARTYP_STR;
 	}
 
+	sortselectclause.outputl(L"sortselectclause=");
+
 	//default to ""
 	if (!(var_typ&pimpl::VARTYP_STR))
 	{
@@ -2076,6 +2091,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	while (remainingsortselectclause.length())
 	{
 
+		remainingsortselectclause.outputl(L"remainingsortselectclause=");
 		word1=getword(remainingsortselectclause);
 		ucword=word1.ucase();
 
@@ -2149,7 +2165,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		}
 
 		//subexpressions (,),and,or
-		if (var(L"( ) AND OR").locateusing(L" ",ucword) && whereclause)
+		if (var(L"( ) AND OR").locateusing(L" ",ucword))
 		{
 			whereclause ^= L"\n " ^ ucword;
 			continue;
@@ -2161,147 +2177,229 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		if (ucword==L"WITH" || ucword==L"WITHOUT")
 		{
 
-			var without=ucword==L"WITHOUT";
+			var negative=ucword==L"WITHOUT";
 
 			//get the dictionary id
 			word1=getword(remainingsortselectclause);
-			ucword=word1.ucase();
-
 
 			//skip AUTHORISED for now since too complicated to calculate in database ATM
-			if (ucword==L"AUTHORISED") {
-				if (whereclause.substr(-4,4) == L" AND")
+			if (word1.ucase()==L"AUTHORISED") {
+				if (whereclause.substr(-4,4).ucase() == L" AND")
 					whereclause.splicer(-4,4,L"");
 				continue;
 			}
 
-			//add the dictionary id
+			//process the dictionary id
 			var sortable=false;//because indexes are NOT created sortable (exodus_sort()
 			var dictexpression=getdictexpression(actualfilename,actualfilename,dictfilename,dictfile,word1,joins,ismv,false);
 			var usingnaturalorder=dictexpression.index(L"exodus_extract_sort");
+
+			//add the dictid expression
 			whereclause ^= L" " ^ dictexpression;
 
 			//get the word/values after the dictid
 			word1=getword(remainingsortselectclause, true);
-			ucword=word1.ucase();
 
-			if (ucword==L"NOT")
+			if (word1.ucase()==L"NOT")
 			{
-				whereclause ^= L" NOT ";
-				ucword=getword(remainingsortselectclause, true);
-			} else if (without) {
-				whereclause ^= L" NOT ";
+				negative=!negative;
+				word1=getword(remainingsortselectclause,true);
 			}
 
-			if (ucword==L"BETWEEN")
+			//between x and y
+			/////////////////
+
+			if (word1.ucase()==L"BETWEEN")
 			{
-				//get and append "from" value
-				ucword=getword(remainingsortselectclause);
+
+				if (negative)
+					whereclause ^= L" not ";
+
+				//get and append first value
+				word1=getword(remainingsortselectclause);
 				if (usingnaturalorder)
-					ucword=naturalorder(ucword.toString());
-				whereclause ^= L" BETWEEN " ^ ucword;
+					word1=naturalorder(word1.toString());
+				whereclause ^= L" BETWEEN " ^ word1;
 
-				//get, check, discard "and"
-				ucword=getword(remainingsortselectclause).ucase();
-				if (ucword != L"AND")
+				//get and append second value
+				word1=getword(remainingsortselectclause).ucase();
+				if (word1.ucase() == L"AND")
 				{
-					exodus::errputl(L"ERROR: mvdbpostgres SELECT STATEMENT SYNTAX IS 'between x *and* y'");
-					return L"";
+					//discard intermediate "AND"
+					word1=getword(remainingsortselectclause).ucase();
 				}
-
-				//get and append "to" value
-				ucword=getword(remainingsortselectclause);
-
-				whereclause ^= L" AND " ^ ucword;
+				if (usingnaturalorder)
+					word1=naturalorder(word1.toString());
+				whereclause ^= L" AND " ^ word1;
 
 				continue;
 			}
 
-			//starting, ending, containing, like
-			var startingpercent=L"";
-			var endingpercent=L"";
-			if (ucword==L"CONTAINING")
+			//starting, ending, containing = like
+			/////////////////////////////////////
+
+			var prefix=L"";
+			var postfix=L"";
+			if (word1.ucase()==L"CONTAINING" or word1==L"[]")
 			{
-				ucword=L"LIKE";
-				startingpercent=L"%";
-				endingpercent=L"%";
+				prefix=L".*";
+				postfix=L".*";
 			}
-			else if (ucword==L"STARTING")
+			else if (word1.ucase()==L"STARTING" or word1==L"]")
 			{
-				ucword=L"LIKE";
-				endingpercent=L"%";
+				prefix=L"^";
+				postfix=L".*";
 			}
-			else if (ucword==L"ENDING")
+			else if (word1.ucase()==L"ENDING" or word1==L"[")
 			{
-				ucword=L"LIKE";
-				startingpercent=L"%";
+				prefix=L".*";
+				postfix=L"$";
 			}
-			if (ucword==L"LIKE")
+			/*implement using posix regular string matching
+			~ 	Matches regular expression, case sensitive 	'thomas' ~ '.*thomas.*'
+			~* 	Matches regular expression, case insensitive 	'thomas' ~* '.*Thomas.*'
+			!~ 	Does not match regular expression, case sensitive 	'thomas' !~ '.*Thomas.*'
+			!~* 	Does not match regular expression, case insensitive 	'thomas' !~* '.*vadim.*'
+			*/
+			if (prefix || postfix)
 			{
 
+				//get value or values
 				word1=getword(remainingsortselectclause, true);
-				// _ and % are like ? and * in globbing in sql LIKE
+
+				//escape any posix special characters;
+				// [\^$.|?*+()
 				//if present in the search criteria, they need to be escaped with TWO backslashes.
-				word1.swapper(L"_",L"\\\\_");
-				word1.swapper(L"%",L"\\\\%");
-				if (endingpercent)
-				{
-					word1.swapper(L"'" ^ FM, L"%'" ^ FM);
-					word1.splicer(-1,0,L"%");
+				word1.swapper(L"\\",L"\\\\");
+				var special=L"[^$.|?*+()";
+				for (int ii=special.length();ii>0;--ii) {
+					if (special.index(word1[ii]))
+						word1.splicer(ii,0,L"\\");
 				}
-				if (startingpercent)
-				{
-					word1.swapper(FM ^ L"'", FM ^ L"'%");
-					word1.splicer(2,0,L"%");
-				}
+				word1.swapper(L"'" _FM_ L"'", postfix ^ L"'" _FM_ L"'" ^ prefix);
+				word1.splicer(-1,0,postfix);
+				word1.splicer(2,0,prefix);
 
-				whereclause ^= L" LIKE " ^ word1;
+				//push the regex operator ~ and values back on the sortselectclause for further processing
+				remainingsortselectclause.splicer(1,0,word1.convert(FM,L" ")^L" ");
 
-				continue;
+				word1=L"~";
 			}
 
-			//comparison operators
+			//"normal" comparative filtering
+			////////////////////////////////
+
+
+			//1) Acquire operator - or empty if not present
+
+			var op=L"";
+
 			//convert neosys relational operators to standard relational operators
 			var aliasno;
-			if (var(L"EQ NE NOT GT LT GE LE").locateusing(L" ",ucword,aliasno))
+			if (var(L"EQ NE NOT GT LT GE LE").locateusing(L" ",word1.ucase(),aliasno))
 			{
-				ucword=var(L"= <> <> > < >= <=").field(L" ",aliasno);
+				word1=var(L"= <> <> > < >= <=").field(L" ",aliasno);
 			}
-			if (var(L"= <> > < >= <=").locateusing(L" ",ucword,aliasno))
+			if (var(L"= <> > < >= <= ~ ~* !~ !~* LIKE").locateusing(L" ",word1,aliasno))
 			{
-				whereclause ^= L" " ^ ucword ^ L" ";
-				ucword=getword(remainingsortselectclause, true);
-			}
-			else
-			{
-				//if value follows dictionary id without a relational operator then insert =
-				if (ucword[1]==L"'")
-					whereclause ^= L" = ";
+				//is an operator
+				op=word1;
+				//get another word (or words)
+				word1=getword(remainingsortselectclause, true);
 			}
 
-			//if no values then put the next word back onto the front of the remainingsortselectclause
-			if (ucword and !valuechars.index(ucword[1])) {
-				if (remainingsortselectclause!=L"")
-					ucword^=L" ";
-				remainingsortselectclause.splice(1,0,ucword);
-				ucword=L"";
+			//2) Acquire value(s) - or empty if not present
+
+			//word1 at this point may be empty, contain a value or the first word of an unrelated clause
+
+			//if word1 unrelated to current phrase
+			if (word1.length() && !valuechars.index(word1[1])) {
+				//push back and treat as missing value
+				remainingsortselectclause.splicer(1,0,word1 ^ L" ");
+				//simulate no given value
+				word1=L"";
 			}
 
-			//if no values follow then assume we are testing for not ""
-			//TODO we should be testing for not "" and not 0
-			if (!ucword)
-				ucword=L" <> ''";
+			var value=word1;
 
-			//append value(s)
+			//missing op and value mean NOT '' or NOT 0 or NOT NULL
+			//WITH CLIENT_TYPE
+			if (op==L"" && value==L"") {
+				op=L"<>";
+				value=L"''";
+			}
+
+			//missing op means =
+			//WITH CLIENT_TYPE "X"
+			if (op==L"") {
+				op=L"=";
+			}
+
+			//missing value means error in sql
+			//WITH CLIENT_TYPE =
+			if (value==L"") {
+				//value=L"";
+			}
+
+			//op and value(s) are now set
+
+			//natural order value(s)
 			if (usingnaturalorder)
-				ucword=naturalorder(ucword.toString());
+				value=naturalorder(value.toString());
+
+			//without xxx = "abc"
+			//with xxx not = "abc"
+
+			//notword.outputl(L"notword=");
+			//ucword.outputl(L"ucword=");
+
+			//invert comparison if "without" or "not"
+			if (negative && var(L"= <> > < >= <= ~ ~* !~ !~*").locateusing(L" ",op,aliasno)) {
+				//op.outputl(L"op entered:");
+				negative=false;
+				op=var(L"<> = <= >= < > !~ !~* ~ ~*").field(L" ",aliasno);
+				//op.outputl(L"op reversed:");
+			}
 
 			//multiple values
-			if (ucword.index(FM))
-				ucword = L" in ( " ^ ucword.swap(FM_, L" ") ^ L" )";
+			if (value.index(FM)) {
+				value.swapper(FM_, L", ");
 
-			whereclause ^= ucword;
+				if (op==L"=") {
+					op= L"in";
+					value = L"( " ^ value ^ L" )";
+				}
+				else if (op==L"<>") {
+					op=L"not in";
+					value = L"( " ^ value ^ L" )";
+				}
+				else {
+					value=L"ANY(ARRAY[" ^ value ^ L"])";
+				}
+			}
 
+			//testing for "" may become testing for null
+			// for date and time which are returned as null for empty string
+			else if (value == L"''") {
+				if 	(
+					dictexpression.index(L"extract_date")
+					|| dictexpression.index(L"extract_time")
+					) {
+					if (op==L"=")
+						op=L"is";
+					else
+						op=L"is not";
+					value=L"null";
+				}
+				//currently number returns 0 for empty string
+				//|| dictexpression.index(L"extract_number")
+				else if (dictexpression.index(L"extract_number")) {
+					value=L"'0'";
+				}
+			}
+
+			whereclause ^= L" " ^ op ^ L" " ^ value;
+			//whereclause.outputl(L"whereclause");
 		}
 
 	}//getword loop
@@ -2374,7 +2472,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		sql ^= L" \nORDER BY \n" ^ orderclause.substr(3);
 	if (maxnrecs)
 		sql ^= L" \nLIMIT\n " ^ maxnrecs;
-
+sql.outputl();
 	//sql.outputl(L"sql=");
 
 	//DEBUG_LOG_SQL
