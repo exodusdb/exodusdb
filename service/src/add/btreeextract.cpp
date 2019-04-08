@@ -13,12 +13,11 @@ function main(in cmd, in filename, in dictfile, out hits) {
 	//eg cmd contains "SEQUENCE.XREF" VM XYZ]&ABC] FM
 	//finds records which contain words starting with XYZ *AND* ABC
 
-	//TODO implement separate cursor
-	//var v69;
-	//var v70;
-	//var v71;
-	//call pushselect(0, v69, v70, v71);
-	//var().clearselect();
+	//separate cursor
+	var v69;
+	var v70;
+	var v71;
+	call pushselect(0, v69, v70, v71);
 
 	hits="";
 
@@ -34,7 +33,6 @@ function main(in cmd, in filename, in dictfile, out hits) {
 		var selectcmd = "SELECT " ^ filename ^ " WITH " ^ fieldname ^ " " ^ quote(part) ^ " (S)";
 		//call safeselect(select);
 		select(selectcmd);
-
 		///BREAK;
 		if (not LISTACTIVE) break;;
 
@@ -45,7 +43,7 @@ function main(in cmd, in filename, in dictfile, out hits) {
 		hits = VM;
 nextrec:
 		var key;
-		if (var().readnext(key)) {
+		if (readnext(key)) {
 			if (hits.length() + key.length() < 65500) {
 				hits ^= VM ^ key;
 				goto nextrec;
@@ -53,8 +51,8 @@ nextrec:
 		}
 	}
 
-	var().clearselect();
-	//call popselect(0, v69, v70, v71);
+	clearselect();
+	call popselect(0, v69, v70, v71);
 
 	return 0;
 

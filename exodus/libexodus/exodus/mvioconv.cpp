@@ -124,22 +124,23 @@ var var::iconv(const wchar_t* convstr) const
 					switch (*conversionchar)
 					{
 
-						//MD
+						//MD MC - Decimal places
 						case L'D':
-
-							throw MVException(L"iconv(MD) not implemented yet");
-//							output ^= part.iconv_MD(convstr);
-							break;
-
-						//MC iconv is same as oconv!
 						case L'C':
-							output ^= part.oconv_MC(conversionchar);
+
+							throw MVException(L"iconv MD and MC are not implemented yet");
+//							output ^= part.iconv_MD(convstr);
 							break;
 
 						//MT
 						case L'T':
 							//output ^= part.iconv_MT(convstr);
 							output ^= part.iconv_MT();
+							break;
+
+						//MR - replace iconv is same as oconv!
+						case L'R':
+							output ^= part.oconv_MR(conversionchar);
 							break;
 
 						//MX number to hex (not string to hex)
@@ -150,6 +151,7 @@ var var::iconv(const wchar_t* convstr) const
 							output ^= ss.str();
 
 							break;
+
 					}
 
 				}
@@ -162,11 +164,13 @@ var var::iconv(const wchar_t* convstr) const
 			return output;
 			break;
 
-		//L#, R#, T#
+		//iconv L#, R#, T#, C# do nothing
 		case L'L':
 		case L'R':
 		case L'T':
-			return L"";
+		case L'C':
+			//return L"";
+			return convstr;
 			break;
 
 		//HEX
@@ -205,7 +209,7 @@ var var::iconv(const wchar_t* convstr) const
 
 			break;
 
-		//custom conversion should not be called via ::oconv
+		//custom io conversions should not be called via ::iconv or ::oconv since they have no access to mv environment required to call external subroutines
 		case L'[':
 
 			throw MVException(L"Custom conversions like (" ^ var(convstr) ^ L") must be called like a function iconv(input,conversion) not like a method, input.iconv(conversion)" );
@@ -217,7 +221,8 @@ var var::iconv(const wchar_t* convstr) const
 	}
 
 	//TODO implement
-	std::wcout<<L"iconv "<<convstr<< L" not implemented yet "<<std::endl;
+	//std::wcout<<L"iconv "<<convstr<< L" not implemented yet "<<std::endl;
+	throw MVException(L"iconv " ^ var(convstr) ^ L" not implemented yet ");
 
 	return *this;
 
@@ -363,11 +368,12 @@ var var::oconv_MD(const wchar_t* conversion) const
 	if (!isnum()||convlen<=2)
 		return *this;
 
-	//default conversions
+	//default conversion options
 	int ndecimals=-1;
 	int movedecs=-1;
 	bool dontmovepoint=false;
 	bool septhousands=false;
+	bool forcezero=false;
 	wchar_t trailer=L'\0';
 	wchar_t prefixchar=L'\0';
 
@@ -432,19 +438,28 @@ var var::oconv_MD(const wchar_t* conversion) const
 				trailer=L'-';
 				break;
 
+			case L'Z':
+				forcezero=true;
+				break;
+
 			default:
 				if (prefixchar==L'\0')
 					prefixchar=nextchar;
 				break;
 			}
 		//move to next character if any otherwise break
-		if (charn>=convlen) break;
+		if (charn>=convlen)
+			break;
 		charn++;
 			nextchar=conversion[charn];
 	}
 
 convert:
-	var newmv=*this;
+
+	if (!forcezero && this->length()==0)
+		return L"";
+
+	var newmv=(*this);
 
 	//move decimals
 	if (!dontmovepoint&&movedecs)
@@ -464,8 +479,11 @@ convert:
 		if (part1len>3)
 		{
 			var thousandsep=(conversion[1]==L'C') ? L'.' : L',';
-			for (int ii=part1len-2;ii>1;ii-=3)
+			var minii=part1[1]==L"-"?2:1;
+			for (int ii=part1len-2;ii>minii;ii-=3)
+			{
 				part1.splicer(ii,0,thousandsep);
+			}
 		}
 	}
 
@@ -519,7 +537,7 @@ convert:
 
 }
 
-var var::oconv_LR(const var& format) const
+var var::oconv_LRC(const var& format) const
 {
 
 	//TODO convert to C instead of var for speed
@@ -557,24 +575,34 @@ var var::oconv_LR(const var& format) const
 
 			remaining=width-part.length();
 			if (remaining>0) {
-				if (just == L"L") {
+				if (just == L"L")
+				{
 					//output ^= part;
 					//output ^= remaining.space();
 					part.var_str.resize(width,fillchar);
 					output ^= part;
-				} else {
+				} else if (just == L"R")
+				{
 					//output ^= remaining.space();
 					//output ^= part;
 					part.var_str.insert(0,remaining,fillchar);
 					output ^= part;
+				} else //"C"
+				{
+					part.var_str.insert(0,remaining/2,fillchar);
+					output ^= part;
+					output.var_str.resize(width,fillchar);
 				}
 			} else {
-				if (just == L"L")
-					//output ^= part.substr(1,width);
-					output ^= part.var_str.substr(0,width);
-				else
-					//output ^= part.substr(-width);
+				if (just == L"R")
+				{
+					//take the last n characters
 					output ^= part.var_str.substr(part.var_str.length()-width,width);
+				} else //L or C
+				{
+					//take the first n characters
+					output ^= part.var_str.substr(0,width);
+				}
 			}
 		}
 
@@ -657,14 +685,18 @@ var var::oconv(const wchar_t* conversion) const
 				//if len(part) or terminator then
 
 				//null string
-				if (part.var_typ&pimpl::VARTYP_STR && part.var_str.length()==0)
-					{}
+				//if (part.var_typ&pimpl::VARTYP_STR && part.var_str.length()==0)
+				//	{}
+				bool notemptystring=!(part.var_typ&pimpl::VARTYP_STR && part.var_str.length()==0);
 
-				//MC
-				else if (*conversionchar==L'C')
-					output ^= part.oconv_MC(++conversionchar);
+				//MR ... character replacement
+				if (*conversionchar==L'R')
+				{
+					if (notemptystring)
+						output ^= part.oconv_MR(++conversionchar);
+				}
 
-				//non-numeric are left unconverted
+				//non-numeric are left unconverted for MD/MT/MX
 				else if (!part.isnum())
 					output ^= part;
 
@@ -675,25 +707,31 @@ var var::oconv(const wchar_t* conversion) const
 					//check second character
 					switch (*conversionchar)
 					{
-						//MD
+						//MD and MC - decimal places
 						case L'D':
-						case L'R':
-
+						case L'C':
+							//may treat empty string as zero
 							output ^= part.oconv_MD(conversion);
 							break;
 
-						//MT
+						//MT - time
 						case L'T':
 							//point to the remainder of the conversion after the MT
-							output ^= part.oconv_MT(++conversionchar);
+							if (notemptystring)
+							{
+								output ^= part.oconv_MT(++conversionchar);
+							}
+
 							break;
 
-						//MX number to hex (not string to hex)
+						//MX - number to hex (not string to hex)
 						case L'X':
-
-							std::wostringstream ss;
-							ss <<std::hex<<std::uppercase<<part.round().toInt();
-							output ^= ss.str();
+							if (notemptystring)
+							{
+								std::wostringstream ss;
+								ss <<std::hex<<std::uppercase<<part.round().toInt();
+								output ^= ss.str();
+							}
 
 							break;
 					}
@@ -708,11 +746,12 @@ var var::oconv(const wchar_t* conversion) const
 			return output;
 			break;
 
-		//L#, R#
+		//L#, R#, C#
 		//format even empty strings
 		case L'L':
 		case L'R':
-			return oconv_LR(conversion);
+		case L'C':
+			return oconv_LRC(conversion);
 			break;
 
 		//T#
@@ -779,7 +818,8 @@ var var::oconv(const wchar_t* conversion) const
 	}
 
 	//TODO implement
-	std::wcout<<L"oconv "<<conversion<< L" not implemented yet "<<std::endl;
+	//std::wcout<<L"oconv "<<conversion<< L" not implemented yet "<<std::endl;
+	throw MVException(L"oconv " ^ var(conversion) ^ L" not implemented yet ");
 
 	//unknown conversions are simply ignored in AREV
 	return *this;

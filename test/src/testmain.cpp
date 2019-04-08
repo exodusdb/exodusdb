@@ -416,8 +416,18 @@ function main()
 	//assert(setxlocale("fr_FR.utf8"));
 	//assert(setxlocale(1036));
 	var xx3="1234.5678";
-	printl(xx3+1);
-	printl(oconv(xx3,"MD20P"));
+	assert(xx3+1==1235.5678);
+
+	assert(oconv(xx3,"MD20P")=="1234.57");
+	assert(oconv(1234.567,"MD20P")=="1234.57");
+	assert(oconv("1234.567","MD20P")=="1234.57");
+
+	assert(oconv("","MD20P")=="");
+	assert(oconv("","MD20PZ")=="0.00");
+	assert(oconv(_VM_ "0" _VM_ _VM_,"MD20PZ")=="0.00" _VM_ "0.00" _VM_ "0.00" _VM_ "0.00");
+
+	assert(oconv(1234.567,"MC20PZ")=="1234,57");
+
 	//input();
 	//stop();
 
@@ -576,17 +586,18 @@ function main()
 		assert(osdelete(tempfilename5));
 	}
 
-	printl(oconv("ABc.123","MCN"));
+	//character replacement
+	printl(oconv("ABc.123","MRN"));
 
-	assert(oconv("ABc.123","MCN") eq "123");
-	assert(oconv("ABc.123","MCA") eq "ABc");
-	assert(oconv("ABc.123","MCB") eq "ABc123");
-	assert(oconv("ABc.123","MC/N") eq "ABc.");
-	assert(oconv("ABc.123","MC/A") eq ".123");
-	assert(oconv("ABc.123","MC/B") eq ".");
+	assert(oconv("ABc.123","MRN") eq "123");
+	assert(oconv("ABc.123","MRA") eq "ABc");
+	assert(oconv("ABc.123","MRB") eq "ABc123");
+	assert(oconv("ABc.123","MR/N") eq "ABc.");
+	assert(oconv("ABc.123","MR/A") eq ".123");
+	assert(oconv("ABc.123","MR/B") eq ".");
 
-	assert(oconv("ABc.123","MCL") eq "abc.123");
-	assert(oconv("ABc.123","MCU") eq "ABC.123");
+	assert(oconv("ABc.123","MRL") eq "abc.123");
+	assert(oconv("ABc.123","MRU") eq "ABC.123");
 
 	//test unicode regular expressions
 
@@ -630,23 +641,23 @@ function main()
 	var letters=lowercase^uppercase;
 	var digits=ArabicIndicDigitZero;//(Decimal Digit)
 
-	assert(oconv(punctuation,"MCA") eq "");//extract only alphabetic
-	assert(oconv(punctuation,"MCN") eq "");//extract only numeric
-	assert(oconv(punctuation,"MCB") eq "");//extract only alphanumeric
-	assert(oconv(punctuation,"MC/A") eq punctuation);//extract non-alphabetic
-	assert(oconv(punctuation,"MC/N") eq punctuation);//extract non-numeric
-	assert(oconv(punctuation,"MC/B") eq punctuation);//extract non-alphanumeric
+	assert(oconv(punctuation,"MRA") eq "");//extract only alphabetic
+	assert(oconv(punctuation,"MRN") eq "");//extract only numeric
+	assert(oconv(punctuation,"MRB") eq "");//extract only alphanumeric
+	assert(oconv(punctuation,"MR/A") eq punctuation);//extract non-alphabetic
+	assert(oconv(punctuation,"MR/N") eq punctuation);//extract non-numeric
+	assert(oconv(punctuation,"MR/B") eq punctuation);//extract non-alphanumeric
 
-	assert(oconv(digits,"MCA") eq "");
-	assert(oconv(digits,"MC/A") eq digits);
+	assert(oconv(digits,"MRA") eq "");
+	assert(oconv(digits,"MR/A") eq digits);
 //#ifndef __APPLE__
-	assert(oconv(digits,"MCN") eq digits);
-	assert(oconv(digits,"MCB") eq digits);
-	assert(oconv(digits,"MC/N") eq "");
-	assert(oconv(digits,"MC/B") eq "");
+	assert(oconv(digits,"MRN") eq digits);
+	assert(oconv(digits,"MRB") eq digits);
+	assert(oconv(digits,"MR/N") eq "");
+	assert(oconv(digits,"MR/B") eq "");
 //#endif
-	assert(oconv("abc .DEF","MCU") eq "ABC .DEF");
-	assert(oconv("abc .DEF","MCL") eq "abc .def");
+	assert(oconv("abc .DEF","MRU") eq "ABC .DEF");
+	assert(oconv("abc .DEF","MRL") eq "abc .def");
 
 	//uppercase/lowecase conversion only works for ascii at the moment
 	//case conversion is perhaps generally done in order to do case insensitive
@@ -655,19 +666,26 @@ function main()
 	//assert(oconv(lowercase,"MCU") eq uppercase);
 	//assert(oconv(uppercase,"MCL") eq lowercase);
 
-	//no change
-	assert(oconv(uppercase,"MCU") eq uppercase);
-	assert(oconv(lowercase,"MCL") eq lowercase);
+	//printl(lowercase).;
+	//printl(oconv(lowercase,"MRU"));
+	//printl(uppercase);
+	//printl(oconv(uppercase,"MRL"));
+	//assert(oconv(lowercase,"MRU") eq uppercase);
+	//assert(oconv(uppercase,"MRL") eq lowercase);
 
-	oconv(letters,"MCA").outputl("Expected:"^letters^" Actual:");
-	oconv(letters,"MCN").outputl("Expected:\"\" Actual:");
-	oconv(letters,"MCB").outputl("Expected:"^letters^" Actual:");
-	assert(oconv(letters,"MCA") eq letters);
-	assert(oconv(letters,"MCN") eq "");
-	assert(oconv(letters,"MCB") eq letters);
-	assert(oconv(letters,"MC/A") eq "");
-	assert(oconv(letters,"MC/N") eq letters);
-	assert(oconv(letters,"MC/B") eq "");
+	//no change
+	assert(oconv(uppercase,"MRU") eq uppercase);
+	assert(oconv(lowercase,"MRL") eq lowercase);
+
+	oconv(letters,"MRA").outputl("Expected:"^letters^" Actual:");
+	oconv(letters,"MRN").outputl("Expected:\"\" Actual:");
+	oconv(letters,"MRB").outputl("Expected:"^letters^" Actual:");
+	assert(oconv(letters,"MRA") eq letters);
+	assert(oconv(letters,"MRN") eq "");
+	assert(oconv(letters,"MRB") eq letters);
+	assert(oconv(letters,"MR/A") eq "");
+	assert(oconv(letters,"MR/N") eq letters);
+	assert(oconv(letters,"MR/B") eq "");
 
         //check invert is reversible for the first 65535 unicode characters
         for (var ii=0;ii<256*256;ii++) {
@@ -678,6 +696,7 @@ function main()
                 assert(cc.oconv("HEX") == invertedtwice.oconv("HEX"));
         }
 
+	COMMAND.outputl("COMMAND-");
 	assert(COMMAND eq "service"
 	 or COMMAND eq "main"
 	 or COMMAND eq "main2"
@@ -726,6 +745,7 @@ function main()
 		//	createfile/deletefile
 		connect();			// global connection
 		var file = "NANOTABLE";
+		deletefile(file);
 		assert( createfile( file));
 		file.lock( "1");
 		file.lock( "2");
@@ -750,6 +770,8 @@ function main()
 		assert(conn3.connect("dbname="^dbname3));
 		assert(not table2.open("TABLE2",conn2));
 		assert(not table3.open("TABLE3",conn3));
+		printl(table2);
+		printl(table3);
 		assert(conn2.createfile(table2));
 		assert(conn3.createfile(table3));
 		assert(not table2.open(table2,conn3));
@@ -1625,6 +1647,16 @@ while trying to match the argument list '(exodus::var, bool)'
 	assert(oconv("a","T(0)#3") eq "a00");
 	assert(oconv("abcd","T(0)#3") eq ("abc"^TM^"d00"));
 
+	assert(oconv("ab","C#-2") eq "ab");
+	assert(oconv("ab","C#-1") eq "ab");
+	assert(oconv("ab","C#0") eq "");
+	assert(oconv("ab","C#1") eq "a");
+	assert(oconv("ab","C#2") eq "ab");
+	assert(oconv("ab","C#3") eq "ab ");
+	assert(oconv("ab","C#4") eq " ab ");
+	assert(oconv("ab","C#5") eq " ab  ");
+	assert(oconv("ab","C(0)#5") eq "0ab00");
+
 	assert(iconv("23 59 59","MT") eq 86399);
 	assert(iconv("xx11yy12zz13P","MT") eq 83533);
 	assert(iconv("24 00 00","MT") eq "");
@@ -2265,7 +2297,7 @@ while trying to match the argument list '(exodus::var, bool)'
 	}
 	printl();
 
-	printl("Checking time oconv/iconv roundtrip");
+	printl("Checking time oconv/iconv roundtrip for time (seconds) =0 to 86400");
 	//initrnd(999);
 	//for (int ii=0; ii<86400; ++ii) {
 	//	var time=ii;

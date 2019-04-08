@@ -13,6 +13,12 @@ function main(in filename, in dictid, in prefix="", in orderby="") {
 		stop();
 	}
 
+        //separate cursor
+        var v69;
+        var v70;
+        var v71;
+        call pushselect(0, v69, v70, v71);
+
 	var cmd = "SELECT " ^ filename ^ " DISTINCT " ^ dictid;
 	if (prefix)
 		cmd ^= " WITH " ^ dictid ^ " STARTING " ^ prefix.quote();
@@ -49,6 +55,9 @@ function main(in filename, in dictid, in prefix="", in orderby="") {
 
 	//return value in PSEUDO
 	transfer(indexvalues, PSEUDO);
+
+        clearselect();
+        call popselect(0, v69, v70, v71);
 
 	return 0;
 

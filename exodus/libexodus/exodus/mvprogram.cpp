@@ -30,6 +30,11 @@ void ExodusProgramBase::clearselect()
 	CURSOR.clearselect();
 }
 
+bool ExodusProgramBase::hasnext()
+{
+	return CURSOR.hasnext();
+}
+
 bool ExodusProgramBase::readnext(var& key)
 {
 	return CURSOR.readnext(key);
@@ -343,7 +348,7 @@ notallowed:
 			usern = (SECURITY.a(1)).count(VM) + (SECURITY.a(1) != "") + 1;
 			if (SECURITY.length() < 65000) {
 				var users;
-				if (not(users.open("USERS", ""))) {
+				if (not(users.open("USERS"))) {
 					goto notallowed;
 				}
 				var USER;
@@ -412,7 +417,6 @@ var ExodusProgramBase::capitalise(const var& str0, const var& mode0,
 	var string2;
 
 	if (mode0.unassigned() || mode0 == L"CAPITALISE") {
-
 		string2 = str0;
 		//convert @upper.case to @lower.case in string2
 		int nn = string2.length();
@@ -687,7 +691,7 @@ var ExodusProgramBase::xlate(const var& filename, const var& key, const var& fie
 			}
 
 			//use calculate()
-			var result=calculate(fieldno_or_name,L"dict_" ^ filename, keyx, record);
+			var result=calculate(fieldno_or_name,L"dict_" ^ filename.a(1), keyx, record);
 			if (nkeys>1)
 				result.lowerer();
 			results.r(keyn,result);
@@ -799,7 +803,7 @@ baddict:
 			if (indictmd)
 				str_libname = "dict_voc";
 			else
-				str_libname = DICT.lcase().convert(L".",L"_").toString();
+				str_libname = DICT.a(1).lcase().convert(L".",L"_").toString();
 			std::string str_funcname = (L"exodusprogrambasecreatedelete_" ^ dictid.lcase()).toString();
 			if (!dict_exodusfunctorbase_.initsmf(str_libname.c_str(),str_funcname.c_str()))
 				throw MVException(

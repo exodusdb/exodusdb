@@ -384,9 +384,9 @@ var var::iconv_MT() const
 
 }
 
-//OCONV_MC can be moved back to mvioconv.cpp if it stops using regular expressions
+//OCONV_MR can be moved back to mvioconv.cpp if it stops using regular expressions
 //regular expressions for ICONV_MC
-var& var::oconv_MC(const wchar_t* conversionchar)
+var& var::oconv_MR(const wchar_t* conversionchar)
 {
 	//conversionchar arrives pointing to 3rd character (eg A in MCA)
 

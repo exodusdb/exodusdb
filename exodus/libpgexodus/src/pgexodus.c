@@ -670,7 +670,9 @@ exodus_extract_date(PG_FUNCTION_ARGS)
 
 	//convert the c str to an int
 	pickdate=outlen;
-	pickdate=pg_atoi(intstr,4,'.');
+	//this will error if not a valid integer
+	//pickdate=pg_atoi(intstr,4,'.');
+	pickdate=atoi(intstr);
 
 	//pick date 0 is 31/12/1967
 	//pg date 0 is 31/12/1999
@@ -712,7 +714,9 @@ exodus_extract_time(PG_FUNCTION_ARGS)
 	intstr[outlen]='\0';
 
 	//convert the c str to an int
-	picktime=pg_atoi(intstr,4,'.');
+	//this will error if not a valid integer
+	//picktime=pg_atoi(intstr,4,'.');
+	picktime=atoi(intstr);
 
     #define SIZEOFINTERVAL 12
 	//prepare a new output

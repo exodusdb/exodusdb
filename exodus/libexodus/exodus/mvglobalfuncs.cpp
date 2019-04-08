@@ -845,7 +845,7 @@ DLL_PUBLIC bool connect(const var& connectioninfo)
 	var conn1;
 	if (not conn1.connect(connectioninfo))
 		return false;
-	return conn1.setdefaultconnection();
+	return conn1.setdefaultconnectionid();
 }
 
 DLL_PUBLIC bool disconnect()

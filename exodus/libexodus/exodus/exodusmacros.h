@@ -225,7 +225,7 @@ namespace exodus {
 #define PSEUDO mv.PSEUDO
 #define DATA mv.DATA
 //#define LISTACTIVE mv.LISTACTIVE
-#define LISTACTIVE var().hasnext()
+#define LISTACTIVE hasnext()
 
 #define USERNAME mv.USERNAME
 #define APPLICATION mv.APPLICATION

@@ -53,6 +53,7 @@ DLL_PUBLIC
 	//work on CURSOR
 	bool select(const var& sortselectclause DEFAULTNULL);
 	void clearselect();
+	bool hasnext();
 	bool readnext(var& key);
 	bool readnext(var& key, var& valueno);
 	bool selectrecord(const var& sortselectclause DEFAULTNULL);

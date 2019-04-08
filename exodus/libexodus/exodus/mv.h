@@ -769,72 +769,6 @@ public:
 #	define DEFAULTSPACE =L" "
 #	define DEFAULTVM =VM_
 #endif
-	//SYSTEM FILE/DIRECTORY OPERATIONS
-	//TODO cache osfilehandles somehow (use var_int?)
-	bool osopen() const;
-	bool osopen(const var& filename, const var& locale DEFAULTNULL) const;
-	var& osbread(const var& osfilevar, var& startoffset, const int length, const bool adjust=true);
-	var& osbread(const var& osfilevar, const var& startoffset, const int length, const bool adjust=true);
-	bool osbwrite(const var& osfilevar, var& startoffset, const bool adjust=true) const;
-	bool osbwrite(const var& osfilevar, const var& startoffset, const bool adjust=true) const;
-	void osclose() const;
-	bool osread(const var& osfilename, const var& locale DEFAULTNULL);
-	bool oswrite(const var& osfilename, const var& locale DEFAULTNULL) const;
-	bool osdelete() const;
-	bool osdelete(const var& osfilename) const;
-	bool osrename(const var& newosdir_or_filename) const;
-	bool oscopy(const var& to_osfilename) const;
-	var oslist(const var& path DEFAULTDOT, const var& wildcard DEFAULTNULL, const int mode=0) const;
-	var oslistf(const var& path DEFAULTDOT, const var& wildcard DEFAULTNULL) const;
-	var oslistd(const var& path DEFAULTDOT, const var& wildcard DEFAULTNULL) const;
-	var osfile() const;
-	var osdir() const;
-	bool osmkdir() const;
-	bool osrmdir(bool evenifnotempty=false) const;
-	//TODO check for threadsafe
-	var oscwd() const;
-	bool oscwd(const var& newpath) const;
-	void osflush() const;
-
-	//TODO add performance enhancing char* argumented versions of many os functions
-	//to avoid unnecessary conversion to and from var format
-	//same again but this time allowing native strings without needing automatic conversion of var->char*
-	//this is to only to avoid convertion too and from var
-	//but will usage of hard coded filenames etc really be in fast loops
-	//and performance related? perhaps only provide
-	bool osread(const char* osfilename, const var& locale DEFAULTNULL);
-
-	//libraries and subroutines/functions
-/* replaced by  #include funcname.h
-	bool load(const var& libraryname) const;
-	var call(const wchar_t* libraryname, const char* functionname) const;
-	var call(const var& libraryname, const var& functionname) const;
-	var call(const char* functionname) const;
-	var call(const var& functionname) const;
-	var call() const;
-*/
-	//OS PROCESSING
-	var suspend() const;
-	var osshell() const;
-	var osshellread() const;
-	var osshellwrite(const var& writestr) const;
-	bool osgetenv(const var& name);
-	bool ossetenv(const var& name) const;
-
-	void stop(const var& text DEFAULTNULL) const;
-	void abort(const var& text DEFAULTNULL) const;
-	void abortall(const var& text DEFAULTNULL) const;
-	var debug() const;
-	var debug(const var&) const;
-
-//done in mvprogram now since they need to pass mvenvironment
-//	var perform() const;
-//	var execute() const;
-//	chain should be similar to one of the above?
-//	var chain() const;
-
-	var logoff() const;
-
 	void breakon() const;
 	void breakoff() const;
 
@@ -1104,7 +1038,8 @@ public:
 
 	bool connect(const var& conninfo DEFAULTNULL);
 	bool disconnect();
-	bool setdefaultconnection();
+	int getdefaultconnectionid() const;
+	bool setdefaultconnectionid() const;
 
 	//var() is a db connection or default connection
 	bool begintrans() const;
@@ -1128,12 +1063,11 @@ public:
 	var reccount(const var& filename DEFAULTNULL) const;
 	var flushindex(const var& filename DEFAULTNULL) const;
 
-	bool open(const var& dbfilename, const var& dbconnection DEFAULTNULL);
+	bool open(const var& dbfilename, const var& connection DEFAULTNULL);
 	void close();
 
 	bool select(const var& sortselectclause DEFAULTNULL) const;
 	void clearselect() const;
-	bool selectpending() const;
 
 	bool savelist(const var& name) const;
 	bool getlist(const var& name) const;
@@ -1160,8 +1094,8 @@ public:
 	bool write(const var& filehandle,const var& key) const;
 	bool writev(const var& filehandle,const var& key,const int fieldno) const;
 	bool deleterecord(const var& key) const;
-	bool updaterecord(const var& file,const var& key) const;
-	bool insertrecord(const var& file,const var& key) const;
+	bool updaterecord(const var& filehandle,const var& key) const;
+	bool insertrecord(const var& filehandle,const var& key) const;
 
 	var getlasterror() const;
 
@@ -1178,6 +1112,72 @@ public:
 
 	//bool selftest() const;
 	var version() const;
+
+	//SYSTEM FILE/DIRECTORY OPERATIONS
+	//TODO cache osfilehandles somehow (use var_int?)
+	bool osopen() const;
+	bool osopen(const var& filename, const var& locale DEFAULTNULL) const;
+	var& osbread(const var& osfilevar, var& startoffset, const int length, const bool adjust=true);
+	var& osbread(const var& osfilevar, const var& startoffset, const int length, const bool adjust=true);
+	bool osbwrite(const var& osfilevar, var& startoffset, const bool adjust=true) const;
+	bool osbwrite(const var& osfilevar, const var& startoffset, const bool adjust=true) const;
+	void osclose() const;
+	bool osread(const var& osfilename, const var& locale DEFAULTNULL);
+	bool oswrite(const var& osfilename, const var& locale DEFAULTNULL) const;
+	bool osdelete() const;
+	bool osdelete(const var& osfilename) const;
+	bool osrename(const var& newosdir_or_filename) const;
+	bool oscopy(const var& to_osfilename) const;
+	var oslist(const var& path DEFAULTDOT, const var& wildcard DEFAULTNULL, const int mode=0) const;
+	var oslistf(const var& path DEFAULTDOT, const var& wildcard DEFAULTNULL) const;
+	var oslistd(const var& path DEFAULTDOT, const var& wildcard DEFAULTNULL) const;
+	var osfile() const;
+	var osdir() const;
+	bool osmkdir() const;
+	bool osrmdir(bool evenifnotempty=false) const;
+	//TODO check for threadsafe
+	var oscwd() const;
+	bool oscwd(const var& newpath) const;
+	void osflush() const;
+
+	//TODO add performance enhancing char* argumented versions of many os functions
+	//to avoid unnecessary conversion to and from var format
+	//same again but this time allowing native strings without needing automatic conversion of var->char*
+	//this is to only to avoid convertion too and from var
+	//but will usage of hard coded filenames etc really be in fast loops
+	//and performance related? perhaps only provide
+	bool osread(const char* osfilename, const var& locale DEFAULTNULL);
+
+	//libraries and subroutines/functions
+/* replaced by  #include funcname.h
+	bool load(const var& libraryname) const;
+	var call(const wchar_t* libraryname, const char* functionname) const;
+	var call(const var& libraryname, const var& functionname) const;
+	var call(const char* functionname) const;
+	var call(const var& functionname) const;
+	var call() const;
+*/
+	//OS PROCESSING
+	var suspend() const;
+	var osshell() const;
+	var osshellread() const;
+	var osshellwrite(const var& writestr) const;
+	bool osgetenv(const var& name);
+	bool ossetenv(const var& name) const;
+
+	void stop(const var& text DEFAULTNULL) const;
+	void abort(const var& text DEFAULTNULL) const;
+	void abortall(const var& text DEFAULTNULL) const;
+	var debug() const;
+	var debug(const var&) const;
+
+//done in mvprogram now since they need to pass mvenvironment
+//	var perform() const;
+//	var execute() const;
+//	chain should be similar to one of the above?
+//	var chain() const;
+
+	var logoff() const;
 
 private:
 
@@ -1207,14 +1207,18 @@ private:
 	void setlasterror(const var& msg) const;
 	void setlasterror() const;
 
+	bool cursorexists() const;
 	bool selectx(const var& fieldnames, const var& sortselectclause) const;
 
 	// retrieves cid from *this, or uses default connection, or autoconnect with default connection string
 	// On return *this contains connection ID and type pimpl::VARTYP_NANSTR_DBCONN
-	int connection_id() const;
+	int getconnectionid_ordefault() const;
+	int getconnectionid() const;
 
 	// finds connection of this variable:
 	// if this is not filename SQLOPENED variable, returns thread default connection or attempts a default connect()
+	//returning a void pointer in order to not have to include postgres headers in mv.h
+	//will have to be cast to (PGconn *)
 	void* connection() const;
 
 	// gets lock_table, associated with connection, associated with this object
@@ -1225,14 +1229,22 @@ private:
 	var getdictexpression(const var& mainfilename, const var& filename, const var& dictfilename, const var& dictfile, const var& fieldname, var& joins, var& ismv, bool forsort_or_select_or_index=false) const;
 
 	//TODO check if can speed up by returning reference to converted self like MC
-	var oconv_LR(const var& format) const;
+	//left/right justification
+	var oconv_LRC(const var& format) const;
+	//text justification
 	var oconv_T(const var& format) const;
+	//date
 	var oconv_D(const wchar_t* conversion) const;
+	//time
 	var oconv_MT(const wchar_t* conversion) const;
+	//decimal
 	var oconv_MD(const wchar_t* conversion) const;
-	var& oconv_MC(const wchar_t* conversion);
+	//character replacement
+	var& oconv_MR(const wchar_t* conversion);
+	//hex
 	var oconv_HEX(const int ioratio) const;
 
+	//faster primitive arguments
 	var iconv_D(const wchar_t* conversion) const;
 	//var iconv_MT(const wchar_t* conversion) const;
 	var iconv_MT() const;

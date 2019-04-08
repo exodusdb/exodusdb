@@ -504,14 +504,14 @@ var var::oconv_MT(const wchar_t* conversion) const
 {
 	//conversion points to the character AFTER MT - which may be \0
 	//MT, MTH, MTS, MTx, MTHx, MTSx MTHS MTHSx where x is a sep char
-	
+
 	//MT2... also a 2 digit may be inserted in all cases just after MT
 	//to indicate that the input is in hours (either decimal or int)
-	
+
 	//MT2U... also a U letter may be inserted in all cases instead of
 	//or after 2 to indicate that the output is not limited to 24 hours
 	//and can be 25:59 or even 1200:59
-	
+
 	//defaults
 	bool twelvehour=false;
 	bool unlimited=false;//incompatible with twelvehour
@@ -528,7 +528,7 @@ var var::oconv_MT(const wchar_t* conversion) const
 
 	//interpret conversion characters
 	} else {
-	
+
 		//first may be an 2 to indicate input is integer or decimal hours
 		//if so, convert by *3600 to seconds
 		if (*conversionchar==L'2')
@@ -547,7 +547,7 @@ var var::oconv_MT(const wchar_t* conversion) const
 			++conversionchar;
 			unlimited=true;
 		}
-		
+
 		//next may be an H to indicate AM/PM
 		if (*conversionchar==L'H')
 		{
@@ -588,7 +588,7 @@ var var::oconv_MT(const wchar_t* conversion) const
 		if (timesecs<0)
 				timesecs+=86400;
 	}
-	
+
 	int hours=timesecs/3600;
 	int mins=timesecs%3600/60;
 	int secs=timesecs%60;
