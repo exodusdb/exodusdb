@@ -1860,11 +1860,11 @@ getnextp2:
 ////////
 
 //returns the characters up to the next delimiter
-//also returns the index of the next delimiter discovered or 1 after the string if none
+//also returns the index of the next delimiter discovered or 1 after the string if none (like COL2() in arev)
 //NOTE startindex1 is 1 based not 0. anything less than 1 is treated as 1
-var var::substr(const int startindex1, const var& delimiterchars, var& endindex) const
+var var::substr(const int startindex1, const var& delimiterchars, int& endindex) const
 {
-	THISIS(L"var var::substr(const int startindex1, var& delimiterchars, var& endindex) const")
+	THISIS(L"var var::substr(const int startindex1, var& delimiterchars, int& endindex) const")
 	THISISSTRING()
 	ISSTRING(delimiterchars)
 

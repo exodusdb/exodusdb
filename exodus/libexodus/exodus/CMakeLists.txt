@@ -79,11 +79,11 @@ add_library(exodus SHARED
  ConvertUTF.h NullCodecvt.h TConvert.h gettimeofday.h neo.h mvconfig.h
  MurmurHash2_64.h mvhandles.h mvdbconns.h
 
- ConvertUTF.c howto.cpp mvarray.cpp mvdatetime.cpp  mvdebug.cpp
+ ConvertUTF.c howto.cpp mv.cpp mvmv.cpp mvprogram.cpp mvarray.cpp mvdatetime.cpp  mvdebug.cpp
  mvfuncs.cpp mvioconv.cpp
- naturalorder.cpp gettimeofday.cpp mv2.cpp mv.cpp mvprogram.cpp
+ naturalorder.cpp gettimeofday.cpp mv2.cpp
  mvdbpostgres.cpp mvenvironment.cpp mvglobalfuncs.cpp
- mvipc.cpp mvmv.cpp mvunicode.cpp mvipc_boost.cpp mvipc_posix.cpp
+ mvipc.cpp mvunicode.cpp mvipc_boost.cpp mvipc_posix.cpp
  mvipc_ms.cpp mvposix.cpp MurmurHash2_64.cpp
  mvfunctor.cpp mvhandles.cpp mvdbconns.cpp mvos.cpp mvprocessno.cpp getkey.cpp haskey.cpp
 )

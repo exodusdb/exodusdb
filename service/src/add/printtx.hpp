@@ -113,7 +113,8 @@ subroutine printtx() {
 	if (((bodyln == ntxlns) or (bodyln > nbodylns)) or newpage) {
 
 		if (((html and not(newpage)) and (pagen > 0)) and (bodyln < 999999)) {
-			goto printtx2;
+			gosub printtx2();
+			return;
 		}
 
 		gosub getheadfoot();
@@ -165,7 +166,11 @@ subroutine printtx() {
 		bodyln = ntxlns;
 	}
 
-printtx2:
+	gosub printtx2();
+	return;
+}
+
+subroutine printtx2() {
 	if (html) {
 		if (not(printptr)) {
 

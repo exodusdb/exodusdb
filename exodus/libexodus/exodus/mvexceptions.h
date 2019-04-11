@@ -74,29 +74,49 @@ THE SOFTWARE.
 
 //see long comment on ISDEFINED
 #define THISISDEFINED() \
-	if (!this||(*this).var_typ&mvtypemask) \
+	if (!this||this->var_typ&mvtypemask) \
 		throw MVUndefined(L"var in " ^ var(functionname)); \
 
 //includes isdefined
 #define THISISASSIGNED() \
 	THISISDEFINED() \
-	if (!(*this).var_typ) \
+	if (!this->var_typ) \
 		throw MVUnassigned(L"var in " ^ var(functionname)); \
 
 //includes isdefined directly and checks assigned if not string
 #define THISISSTRING() \
 	THISISDEFINED() \
-	if (!((*this).var_typ&pimpl::VARTYP_STR)) \
+	if (!(this->var_typ&pimpl::VARTYP_STR)) \
 	{ \
-		if (!(*this).var_typ) \
+		if (!this->var_typ) \
 			throw MVUnassigned(L"var in " ^ var(functionname)); \
-		(*this).createString(); \
+		this->createString(); \
 	}; \
 
 //includes isassigned
 #define THISISNUMERIC() \
 	THISISASSIGNED() \
-	if (!(*this).isnum()) \
-	throw MVNonNumeric(var(functionname) ^ L" : var is " ^ (*this).substr(1,20).quote()); \
+	if (!this->isnum()) \
+	throw MVNonNumeric(var(functionname) ^ L" : var is " ^ this->substr(1,20).quote()); \
+
+//includes isassigned
+#define THISISDECIMAL() \
+	THISISASSIGNED() \
+	if (!this->isnum()) \
+		throw MVNonNumeric(var(functionname) ^ L" : var is " ^ this->substr(1,20).quote()); \
+	if (! var_typ & pimpl::VARTYP_DBL) { \
+		var_dbl=double(var_int); \
+		var_typ|=pimpl::VARTYP_DBL; \
+	} \
+
+//includes isassigned
+#define THISISINTEGER() \
+	THISISASSIGNED() \
+	if (!this->isnum()) \
+		throw MVNonNumeric(var(functionname) ^ L" : var is " ^ this->substr(1,20).quote()); \
+	if (! var_typ & pimpl::VARTYP_INT) { \
+		var_dbl=mvint_t(var_dbl); \
+		var_typ|=pimpl::VARTYP_INT; \
+	} \
 
 #endif /*MVEXCEPTIONS_H*/

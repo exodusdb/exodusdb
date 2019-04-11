@@ -258,6 +258,7 @@ var::operator const char*() const
 }
 */
 
+#ifndef HASLONGLONGOP
 var::operator int() const
 {
 	THISIS(L"var::operator int() const")
@@ -284,6 +285,16 @@ var::operator int() const
 	throw MVNonNumeric(L"int(L" ^ substr(1,20) ^ L")");
 
 }
+#else
+
+var::operator int&() const
+{
+	THISIS(L"var::operator long long&()")
+	THISISINTEGER()
+	return &var_int;
+}
+
+#endif
 
 //remove because causes "ambiguous" with -short_wchar on linux
 /*
@@ -343,9 +354,9 @@ var::operator const wchar_t*()
 //cant be (const var& rhs) because seems to cause a problem with var1=var2 in function parameters
 //unfortunately causes problem of passing var by value and thereby unnecessary contruction
 //see also ^= etc
-var& var::operator = (const var& rhs)
+var& var::operator= (const var& rhs)
 {
-	THISIS(L"var& var::operator = (const var& rhs)")
+	THISIS(L"var& var::operator= (const var& rhs)")
 	THISISDEFINED()
 	ISASSIGNED(rhs)
 
@@ -363,9 +374,9 @@ var& var::operator = (const var& rhs)
 
 }
 /* sadly cant use this idiom since it is ambiguous with move constructor
-var& var::operator = (var rhs) noexcept
+var& var::operator= (var rhs) noexcept
 {
-//	THISIS(L"var& var::operator = (var rhs)")
+//	THISIS(L"var& var::operator= (var rhs)")
 //	THISISDEFINED()
 
 	//copy-and-swap idiom
@@ -385,9 +396,9 @@ var& var::operator = (var rhs) noexcept
 */
 
 //move assignment
-var& var::operator = (const var&& rhs) noexcept
+var& var::operator= (const var&& rhs) noexcept
 {
-//	THISIS(L"var& var::operator = (var rhs)")
+//	THISIS(L"var& var::operator= (var rhs)")
 //	THISISDEFINED()
 
 	//copy-and-swap idiom
@@ -407,9 +418,9 @@ var& var::operator = (const var&& rhs) noexcept
 
 //=int
 //The assignment operator should always return a reference to *this.
-var& var::operator = (const int int1)
+var& var::operator= (const int int1)
 {
-	//THISIS(L"var& var::operator = (const int int1)")
+	//THISIS(L"var& var::operator= (const int int1)")
 	//protect against unlikely syntax as follows:
 	//var undefinedassign=undefinedassign=123';
 	// !!RISK NOT CHECKING TO SPEED THINGS UP SINCE SEEMS TO WORK IN MSVC AND GCC
@@ -423,9 +434,9 @@ var& var::operator = (const int int1)
 
 //=double
 //The assignment operator should always return a reference to *this.
-var& var::operator = (const double double1)
+var& var::operator= (const double double1)
 {
-    //THISIS(L"var& var::operator = (const double double1)")
+    //THISIS(L"var& var::operator= (const double double1)")
 	//protect against unlikely syntax as follows:
 	//var undefinedassign=undefinedassign=9.9';
 	// !!RISK NOT CHECKING TO SPEED THINGS UP SINCE SEEMS TO WORK IN MSVC AND GCC
@@ -439,10 +450,10 @@ var& var::operator = (const double double1)
 
 //=wchar_t
 //The assignment operator should always return a reference to *this.
-var& var::operator = (const wchar_t char2)
+var& var::operator= (const wchar_t char2)
 {
 	
-	THISIS(L"var& var::operator = (const wchar_t char2)")
+	THISIS(L"var& var::operator= (const wchar_t char2)")
 	//protect against unlikely syntax as follows:
 	//var undefinedassign=undefinedassign=L'X';
 	//this causes crash due to bad memory access due to setting string that doesnt exist
@@ -459,9 +470,9 @@ var& var::operator = (const wchar_t char2)
 
 //=wchar_t*
 //The assignment operator should always return a reference to *this.
-var& var::operator = (const wchar_t* char2)
+var& var::operator= (const wchar_t* char2)
 {
-	THISIS(L"var& var::operator = (const wchar_t* char2)")
+	THISIS(L"var& var::operator= (const wchar_t* char2)")
 	//protect against unlikely syntax as follows:
 	//var undefinedassign=undefinedassign=L"xxx";
 	//this causes crash due to bad memory access due to setting string that doesnt exist
@@ -476,10 +487,10 @@ var& var::operator = (const wchar_t* char2)
 
 //=std::wstring
 //The assignment operator should always return a reference to *this.
-var& var::operator = (const std::wstring string2)
+var& var::operator= (const std::wstring string2)
 {
 	
-	THISIS(L"var& var::operator = (const wchar_t* char2)")
+	THISIS(L"var& var::operator= (const wchar_t* char2)")
 	//protect against unlikely syntax as follows:
 	//var undefinedassign=undefinedassign=std::wstring(L"xxx"";
 	//this causes crash due to bad memory access due to setting string that doesnt exist
@@ -494,9 +505,9 @@ var& var::operator = (const std::wstring string2)
 
 //^=var
 //The assignment operator should always return a reference to *this.
-var& var::operator ^=(const var& rhs)
+var& var::operator^=(const var& rhs)
 {
-	THISIS(L"var& var::operator ^=(const var& rhs)")
+	THISIS(L"var& var::operator^=(const var& rhs)")
 	THISISSTRING()
 	ISSTRING(rhs)
 
@@ -509,9 +520,9 @@ var& var::operator ^=(const var& rhs)
 
 //^=int
 //The assignment operator should always return a reference to *this.
-var& var::operator ^= (const int int1)
+var& var::operator^= (const int int1)
 {
-	THISIS(L"var& var::operator ^= (const int int1)")
+	THISIS(L"var& var::operator^= (const int int1)")
 	THISISSTRING()
 
 	//var_str+=var(int1).var_str;
@@ -523,9 +534,9 @@ var& var::operator ^= (const int int1)
 
 //^=double
 //The assignment operator should always return a reference to *this.
-var& var::operator ^= (const double double1)
+var& var::operator^= (const double double1)
 {
-    THISIS(L"var& var::operator ^= (const double double1)")
+    THISIS(L"var& var::operator^= (const double double1)")
 	THISISSTRING()
 
 	//var_str+=var(int1).var_str;
@@ -537,9 +548,9 @@ var& var::operator ^= (const double double1)
 
 //^=wchar_t
 //The assignment operator should always return a reference to *this.
-var& var::operator ^= (const wchar_t char1)
+var& var::operator^= (const wchar_t char1)
 {
-	THISIS(L"var& var::operator ^= (const wchar_t char1)")
+	THISIS(L"var& var::operator^= (const wchar_t char1)")
 	THISISSTRING()
 
 	//var_str+=var(int1).var_str;
@@ -551,9 +562,9 @@ var& var::operator ^= (const wchar_t char1)
 
 //^=wchar_t*
 //The assignment operator should always return a reference to *this.
-var& var::operator ^= (const wchar_t* char1)
+var& var::operator^= (const wchar_t* char1)
 {
-	THISIS(L"var& var::operator ^= (const wchar_t* char1)")
+	THISIS(L"var& var::operator^= (const wchar_t* char1)")
 	THISISSTRING()
 
 	//var_str+=var(int1).var_str;
@@ -566,9 +577,9 @@ var& var::operator ^= (const wchar_t* char1)
 
 //^=std::wstring
 //The assignment operator should always return a reference to *this.
-var& var::operator ^= (const std::wstring string1)
+var& var::operator^= (const std::wstring string1)
 {
-	THISIS(L"var& var::operator ^= (const std::wstring string1)")
+	THISIS(L"var& var::operator^= (const std::wstring string1)")
 	THISISSTRING()
 
 	//var_str+=var(int1).var_str;
@@ -583,9 +594,9 @@ var& var::operator ^= (const std::wstring string1)
 
 //not returning void so is usable in expressions
 //int argument indicates that this is POSTFIX override v++
-var var::operator ++ (int)
+var var::operator++ (int)
 {
-	THISIS(L"var var::operator ++ (int)")
+	THISIS(L"var var::operator++ (int)")
     //full check done below to avoid double checking number type
 	THISISDEFINED()
 
@@ -593,7 +604,7 @@ tryagain:
 	if (var_typ&pimpl::VARTYP_INT)
 	{
         if (var_int==std::numeric_limits<mvint_t>::max())
-            throw MVIntOverflow(L"operator ++");
+            throw MVIntOverflow(L"operator++");
 		var_int++;
 		var_typ=pimpl::VARTYP_INT;//reset to one unique type
 	}
@@ -624,10 +635,10 @@ tryagain:
 
 //not returning void so is usable in expressions
 //int argument indicates that this is POSTFIX override v--
-var var::operator -- (int)
+var var::operator-- (int)
 {
 
-	THISIS(L"var var::operator -- (int)")
+	THISIS(L"var var::operator-- (int)")
     //full check done below to avoid double checking number type
 	THISISDEFINED()
 
@@ -666,10 +677,10 @@ tryagain:
 
 //not returning void so is usable in expressions
 //no argument indicates that this is prefix override ++var
-var& var::operator ++ ()
+var& var::operator++ ()
 {
 
-	THISIS(L"var var::operator ++ ()")
+	THISIS(L"var var::operator++ ()")
     //full check done below to avoid double checking number type
 	THISISDEFINED()
 
@@ -707,9 +718,9 @@ tryagain:
 
 //not returning void so is usable in expressions
 //no argument indicates that this is prefix override --var
-var& var::operator -- ()
+var& var::operator-- ()
 {
-	THISIS(L"var& var::operator -- ()")
+	THISIS(L"var& var::operator-- ()")
     //full check done below to avoid double checking number type
 	THISISDEFINED()
 
@@ -740,10 +751,90 @@ tryagain:
 
 }
 
-//+=var
-var& var::operator += (const var& rhs)
+// not handled by inbuilt conversion of var to long long& on the rhs
+
+#ifdef HASLONGLONGOP
+
+//+=var (very similar to version with on rhs)
+//provided to disambiguate syntax like var1+=var2
+var& var::operator+= (int int1)
 {
-	THISIS(L"var& var::operator += (const var& rhs)")
+	THISIS(L"var& var::operator+= (int int1)")
+	THISISDEFINED()
+
+tryagain:
+
+	//int target
+	if (var_typ&pimpl::VARTYP_INT)
+	{
+		var_int+=int1;
+		var_typ=pimpl::VARTYP_INT;//reset to one unique type
+		return *this;
+	}
+
+	//dbl target
+	else if (var_typ&pimpl::VARTYP_DBL)
+	{
+		//+= int or dbl from source
+		var_dbl+=int1;
+		var_typ=pimpl::VARTYP_DBL;//reset to one unique type
+		return *this;
+	}
+
+	//last case(s) should be much less frequent since result of attempt to
+	//convert strings to number is cached and only needs to be done once
+
+	//nan (dont bother with this here because it is exceptional and will be caught below anyway
+	//else if (var_typ&pimpl::VARTYP_NAN)
+	//	throw MVNonNumeric(L"var::+= " ^ *this);
+
+	//try to convert to numeric
+	if (isnum())
+		goto tryagain;
+
+ 	THISISNUMERIC()
+	throw MVNonNumeric(substr(1,20) ^ L"+= ");
+}
+
+//-=var (very similar to version with on rhs)
+//provided to disambiguate syntax like var1+=var2
+var& var::operator-= (int int1)
+{
+	THISIS(L"var& var::operator-= (int int1)")
+	THISISDEFINED()
+
+tryagain:
+	//int target
+	if (var_typ&pimpl::VARTYP_INT)
+	{
+		var_int-=int1;
+		var_typ=pimpl::VARTYP_INT;//reset to one unique type
+		return *this;
+	}
+
+	//dbl target
+	else if (var_typ&pimpl::VARTYP_DBL)
+	{
+		var_dbl-=int1;
+		var_typ=pimpl::VARTYP_DBL;//reset to one unique type
+		return *this;
+	}
+
+	//try to convert to numeric
+	if (isnum())
+		goto tryagain;
+
+	THISISNUMERIC()
+	throw MVNonNumeric(substr(1,20) ^ L"-= ");
+
+}
+
+#else
+
+//+=var
+var& var::operator+= (const var& rhs)
+{
+	THISIS(L"var& var::operator+= (const var& rhs)")
 	THISISDEFINED()
 	ISNUMERIC(rhs)
 
@@ -781,13 +872,6 @@ tryagain:
 	//else if (var_typ&pimpl::VARTYP_NAN)
 	//	throw MVNonNumeric(L"var::+= " ^ *this);
 
-	//unassigned
-	else if (!(var_typ))
-	{
-		//throw MVUnassigned(L"+=");
-		THISISNUMERIC()
-	}
-
 	//try to convert to numeric
 	if (isnum())
 		goto tryagain;
@@ -797,9 +881,9 @@ tryagain:
 }
 
 //-=var
-var& var::operator -= (const var& rhs)
+var& var::operator-= (const var& rhs)
 {
-	THISIS(L"var& var::operator -= (const var& rhs)")
+	THISIS(L"var& var::operator-= (const var& rhs)")
 	THISISDEFINED()
 	ISNUMERIC(rhs)
 
@@ -837,13 +921,6 @@ tryagain:
 	//else if (var_typ&pimpl::VARTYP_NAN)
 	//	throw MVNonNumeric(L"var::-= " ^ *this);
 
-	//unassigned
-	else if (!(var_typ))
-	{
-		//throw MVUnassigned(L"-=");
-		THISISNUMERIC()
-
-	}
 	//try to convert to numeric
 	if (isnum())
 		goto tryagain;
@@ -852,6 +929,8 @@ tryagain:
 	throw MVNonNumeric(substr(1,20) ^ L"-= ");
 
 }
+
+#endif
 
 //almost identical between MVeq and MVlt except where noted
 DLL_PUBLIC bool MVeq(const var& lhs,const var& rhs)
@@ -1217,9 +1296,9 @@ DLL_PUBLIC var operator+(const var& var1)
 }
 
 //-var (identical to +var above except for two additional - signs)
-DLL_PUBLIC var operator -(const var& var1)
+DLL_PUBLIC var operator-(const var& var1)
 {
-	THISIS(L"var operator -(const var& var1)")
+	THISIS(L"var operator-(const var& var1)")
 	ISDEFINED(var1)
 
 	do
@@ -1249,9 +1328,9 @@ DLL_PUBLIC var operator -(const var& var1)
 }
 
 //!var
-bool operator !(const var& var1)
+bool operator!(const var& var1)
 {
-	THISIS(L"bool operator !(const var& var1)")
+	THISIS(L"bool operator!(const var& var1)")
 	ISASSIGNED(var1)
 
 	//might need converting to work on void pointer
@@ -1432,9 +1511,9 @@ DLL_PUBLIC
 	return ostream1;
 }
 
-std::istream& operator >> (std::istream& istream1,var& var1)
+std::istream& operator>> (std::istream& istream1,var& var1)
 {
-	THISIS(L"std::istream& operator >> (std::istream& istream1,var& var1)")
+	THISIS(L"std::istream& operator>> (std::istream& istream1,var& var1)")
 	ISDEFINED(var1)
 
 	std::string tempstr;
@@ -1450,9 +1529,9 @@ std::istream& operator >> (std::istream& istream1,var& var1)
 
 //allow use of wcout<<var
 DLL_PUBLIC
-	std::wostream& operator << (std::wostream& wostream1, const var& var1)
+	std::wostream& operator<< (std::wostream& wostream1, const var& var1)
 {
-	THISIS(L"std::wostream& operator << (std::wostream& wostream1, const var& var1)")
+	THISIS(L"std::wostream& operator<< (std::wostream& wostream1, const var& var1)")
 	ISSTRING(var1)
 
 	//use toWString() to avoid creating a constructor which logs here recursively
@@ -1462,9 +1541,9 @@ DLL_PUBLIC
 }
 
 //#ifdef false //allow use of cin>>var
-std::wistream& operator >> (std::wistream& wistream1,var& var1)
+std::wistream& operator>> (std::wistream& wistream1,var& var1)
 {
-	THISIS(L"std::wistream& operator >> (std::wistream& wistream1,var& var1)")
+	THISIS(L"std::wistream& operator>> (std::wistream& wistream1,var& var1)")
 	ISDEFINED(var1)
 
 	var1.var_typ=pimpl::VARTYP_STR;

@@ -398,6 +398,7 @@ public:
 	//constructor for double
 	var(const double double1);
 
+
 	//AUTOMATIC CONVERSIONS TO bool, void* and int
 	//////////////////////////////////////////////
 
@@ -463,6 +464,14 @@ public:
 	//allow the use of any cstring function
 	//var::operator const wchar_t*();
 
+
+	//provide a reference to the (long long) int inside a var
+	//This allows passing by reference to the guts of var for speed
+	//it is safe because changing the int has no side effects
+//#define HASLONGLONGOP
+#ifdef HASLONGLONGOP
+	operator int&() const;
+#endif
 	//EXPLICIT CONVERSIONS TO
 	/////////////////////////
 
@@ -576,11 +585,19 @@ public:
 	var& operator++ ();
 	var& operator-- ();
 
+//#define HASLONGLONGOP
+#ifdef HASLONGLONGOP
+	//+=var
+	var& operator+= (int int1);
+	//-=var
+	var& operator-= (int int1);
+#else
+	//not handled by inbuilt conversion of var to int
 	//+=var
 	var& operator+= (const var& var1);
-
 	//-=var
 	var& operator-= (const var& var1);
+#endif
 
 	DLL_PUBLIC friend var MVadd(const var&,const var&);
 	DLL_PUBLIC friend var MVsub(const var&,const var&);
@@ -938,7 +955,7 @@ public:
 	//var.s(start,length) substring
 	var substr(const int startindex) const;
 	var substr(const int startindex,const int length) const;
-	var substr(const int startindex, const var& delimiterchars, var& endindex) const;
+	var substr(const int startindex, const var& delimiterchars, int& endindex) const;
 	var remove(var& startindex, var& delimiterno) const;
 	var index(const var& substr,const int occurrenceno=1) const;
 	var index2(const var& substr,const int startchar1=1) const;
