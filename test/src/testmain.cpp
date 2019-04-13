@@ -48,14 +48,39 @@ function main()
 	printl("sizeof");
 	printl("char:     ",(int)sizeof(char));
 	printl("string:   ",(int)sizeof(std::string));
+	printl("int:      ",(int)sizeof(int));
 	printl("long:     ",(int)sizeof(long));
-	printl("long long:",(int)sizeof(long long));
 	printl();
 	printl("wstring:  ",(int)sizeof(std::wstring));
-	printl("int:      ",(int)sizeof(int));
+	printl("long long:",(int)sizeof(long long));
 	printl("double:   ",(int)sizeof(double));
 	printl("wchar_t:  ",(int)sizeof(wchar_t));
 	printl("var:      ",(int)sizeof(var));
+
+	var d1=1.2;
+	d1++;
+	assert(d1==2.2);
+	++d1;
+	assert(d1==3.2);
+
+	var i1=1;
+	i1++;
+	assert(i1==2.0);
+	++i1;
+	assert(i1==3.0);
+
+	d1=1.2;
+	d1+=1;
+	assert(d1==2.2);
+	d1+=1.1;
+	assert(d1!=3.3);//very slightly different due to binary representation of 1.2+1+1.1
+	assert(d1.toString()==3.3);//strange that this compiles and works
+
+	i1=1;
+	i1+=1;
+	assert(i1==2.0);
+	i1+=1.1;
+	assert(i1==3.1);
 
 	assert(crop(VM ^ FM) eq "");
 	assert(crop("xxx" ^ VM ^ FM) eq "xxx");
@@ -187,6 +212,7 @@ function main()
 
         aaa="11"  ^VM^VM^"13"  ^VM^FM^"21";
         bbb="1011"^VM^"0"^VM^"1013"^VM^FM^"2011";
+        printl(aaa.mv("/",bbb).oconv("MD90P").convert(_VM_ _FM_, L"]^"));
         assert(aaa.mv("/",bbb).oconv("MD90P").convert(_VM_ _FM_, L"]^")=="0.010880317]0.000000000]0.012833169]0.000000000^0.010442566");
 
         aaa=""^VM^"" ^VM^"0"^VM^"0"^VM;
@@ -961,7 +987,7 @@ dict(AGE_IN_YEARS) {
 	assert(nn.toString() eq "0.1");
 
 	//test remove
-	
+
 	var rem="abc"^FM^"xyz";
 	var ptr=2;
 	var sep;
@@ -1006,7 +1032,8 @@ dict(AGE_IN_YEARS) {
 		var x1=x1^=1;
 		var undefx=undefx++;
 		var z=z+1;
-		var xx=xx.operator++();
+		//var xx=xx.operator++();
+		var xx=xx++;
 	}
 	catch (MVException except) {
 		print(except.description);

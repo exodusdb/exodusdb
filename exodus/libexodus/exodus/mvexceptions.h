@@ -63,7 +63,7 @@ THE SOFTWARE.
 		VARNAME.createString(); \
 	}; \
 
-//includes isassigned
+//includes isassigned which includes ISDEFINED
 #define ISNUMERIC(VARNAME) \
 	ISASSIGNED(VARNAME) \
 	if (!VARNAME.isnum()) \
@@ -93,29 +93,29 @@ THE SOFTWARE.
 		this->createString(); \
 	}; \
 
-//includes isassigned
+//includes isassigned which includes ISDEFINED
 #define THISISNUMERIC() \
 	THISISASSIGNED() \
 	if (!this->isnum()) \
 	throw MVNonNumeric(var(functionname) ^ L" : var is " ^ this->substr(1,20).quote()); \
 
-//includes isassigned
+//includes isassigned which includes ISDEFINED
 #define THISISDECIMAL() \
 	THISISASSIGNED() \
 	if (!this->isnum()) \
 		throw MVNonNumeric(var(functionname) ^ L" : var is " ^ this->substr(1,20).quote()); \
-	if (! var_typ & pimpl::VARTYP_DBL) { \
+	if (!(var_typ & pimpl::VARTYP_DBL)) { \
 		var_dbl=double(var_int); \
 		var_typ|=pimpl::VARTYP_DBL; \
 	} \
 
-//includes isassigned
+//includes isassigned which includes ISDEFINED
 #define THISISINTEGER() \
 	THISISASSIGNED() \
 	if (!this->isnum()) \
 		throw MVNonNumeric(var(functionname) ^ L" : var is " ^ this->substr(1,20).quote()); \
-	if (! var_typ & pimpl::VARTYP_INT) { \
-		var_dbl=mvint_t(var_dbl); \
+	if (!(var_typ & pimpl::VARTYP_INT)) { \
+		var_int=mvint_t(var_dbl); \
 		var_typ|=pimpl::VARTYP_INT; \
 	} \
 

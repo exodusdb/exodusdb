@@ -256,10 +256,10 @@ var var::integer() const
 	THISISNUMERIC()
 
 	/*pick integer means floor()
-	-1.0=1
-	-0.9=1
-	-0.5=1
-	-0.1=1
+	-1.0=-1
+	-0.9=-1
+	-0.5=-1
+	-0.1=-1
 	 0  =0
 	 0.1=0
 	 0.5=0
@@ -267,31 +267,21 @@ var var::integer() const
 	 1.0=1
 	*/
 
+	//prefer int
 	if (var_typ & pimpl::VARTYP_INT)
 		return var_int;
 
-	//could save the integer conversion here but would require mentality to save BOTH int and double
-	//currently its possible since space is reserved for both but this may change
-
 	//floor
-	return std::floor(var_dbl);
+	var_int=std::floor(var_dbl);
+	var_typ|=pimpl::VARTYP_INT;
+	return var_int;
 
 }
 
 //integer and floor are the same
 var var::floor() const
 {
-	THISIS(L"var var::floor() const")
-	THISISNUMERIC()
-
-	if (var_typ & pimpl::VARTYP_INT)
-		return var_int;
-
-	//could save the integer conversion here but would require mentality to save BOTH int and double
-	//currently its possible since space is reserved for both but this may change
-
-	//floor
-	return std::floor(var_dbl);
+	return this->integer();
 
 }
 
@@ -316,15 +306,16 @@ var var::round(const int ndecimals) const
 	THISISNUMERIC()
 
 	double result;
-	if (var_typ & pimpl::VARTYP_INT)
+	//prefer double
+	if (var_typ & pimpl::VARTYP_DBL)
+		result=var_dbl;
+	else
 	{
 		if (not ndecimals)
 			return var_int;
 		//loss of precision if var_int is long long
 		result=int(var_int);
 	}
-	else
-		result=var_dbl;
 
 	//scale it up (or down)
 	double scale=pow(10.0,ndecimals);
@@ -354,18 +345,20 @@ bool var::toBool() const
 	//identical code in void* and bool except returns void* and bool respectively
 	do
 	{
-		//doubles are true unless zero
-		//check double first dbl on guess that tests will be most often on financial numbers
-		if (var_typ & pimpl::VARTYP_DBL)
-			return (bool)(var_dbl!=0);
-
 		//ints are true except for zero
 		if (var_typ & pimpl::VARTYP_INT)
 			return (bool)(var_int!=0);
 
 		//non-numeric strings are true unless zero length
 		if (var_typ & pimpl::VARTYP_NAN)
-			return (bool)(var_str.length()!=0);
+			//return (bool)(var_str.length()!=0);
+			return !var_str.empty();
+
+		//doubles are true unless zero
+		//check double first dbl on guess that tests will be most often on financial numbers
+		//TODO should we consider very small numbers to be the same as zero?
+		if (var_typ & pimpl::VARTYP_DBL)
+			return (bool)(var_dbl!=0);
 
 		if (!(var_typ))
 		{
@@ -416,6 +409,7 @@ void var::createString() const
 	//THISISDEFINED()
 
 	//dbl - create string from dbl
+	//prefer double
 	if (var_typ & pimpl::VARTYP_DBL) {
 		var_str=dblToString(var_dbl);
 		var_typ|=pimpl::VARTYP_STR;
@@ -1731,16 +1725,20 @@ var var::abs() const
 	THISIS(L"var var::abs() const")
 	THISISNUMERIC()
 
-	if (var_typ & pimpl::VARTYP_INT)
-	{
-		if (var_int<0) return -var_int;
-		return var_int;
-	}
+	//prefer double
 	if (var_typ & pimpl::VARTYP_DBL)
 	{
-		if (var_dbl<0) return -var_dbl;
+		if (var_dbl<0)
+			return -var_dbl;
 		return std::floor(var_dbl);
 	}
+	else
+	{
+		if (var_int<0)
+			return -var_int;
+		return var_int;
+	}
+	//cannot get here
 	throw MVException(L"abs(unknown mvtype=" ^ var(var_typ) ^ L")");
 }
 
@@ -1750,17 +1748,39 @@ var var::mod(const var& divisor) const
 	THISISNUMERIC()
 	ISNUMERIC(divisor)
 
-	if (var_typ & pimpl::VARTYP_INT)
+	//NB using c++ % operator which until c++11 had undefined behaviour if divisor was negative
+	//from c++11 % the sign of the result after a negative divisor is always the same as the dividend
+
+	//prefer double dividend
+	if (var_typ & pimpl::VARTYP_DBL)
 	{
-		if (divisor.var_typ & pimpl::VARTYP_INT)
+		//prefer double divisor
+		if (divisor.var_typ & pimpl::VARTYP_DBL)
 		{
-			if ((var_int<0 && divisor.var_int>=0) || (divisor.var_int<0 && var_int>=0))
+			//return fmod(double(var_int),divisor.var_dbl);
+			if ((var_dbl<0 && divisor.var_dbl>=0) || (divisor.var_dbl<0 && var_dbl>=0))
 				//multivalue version of mod
-				return (var_int%divisor.var_int)+divisor.var_int;
+				return fmod(var_dbl,divisor.var_dbl)+divisor.var_dbl;
 			else
-				return var_int%divisor.var_int;
+				return fmod(var_dbl,divisor.var_dbl);
 		}
 		else
+		{
+			divisor.var_dbl=double(divisor.var_int);
+			//following would cache the double value but is it worth it?
+			//divisor.var_typ=divisor.var_typ & pimpl::VARTYP_DBL;
+
+			if ((var_dbl<0 && divisor.var_int>=0) || (divisor.var_int<0 && var_dbl>=0))
+				//multivalue version of mod
+				return fmod(var_dbl,divisor.var_dbl)+divisor.var_dbl;
+			else
+				return fmod(var_dbl,divisor.var_dbl);
+		}
+	}
+	else
+	{
+		//prefer double divisor
+		if (divisor.var_typ & pimpl::VARTYP_DBL)
 		{
 
 			var_dbl=double(var_int);
@@ -1773,32 +1793,17 @@ var var::mod(const var& divisor) const
 			else
 				return fmod(var_dbl,divisor.var_dbl);
 		}
-	}
-	else
-	{
-		if (divisor.var_typ & pimpl::VARTYP_INT)
-		{
-			divisor.var_dbl=double(divisor.var_int);
-			//following would cache the double value but is it worth it?
-			//divisor.var_typ=divisor.var_typ & pimpl::VARTYP_DBL;
-
-			if ((var_dbl<0 && divisor.var_int>=0) || (divisor.var_int<0 && var_dbl>=0))
-				//multivalue version of mod
-				return fmod(var_dbl,divisor.var_dbl)+divisor.var_dbl;
-			else
-				return fmod(var_dbl,divisor.var_dbl);
-		}
 		else
 		{
-			//return fmod(double(var_int),divisor.var_dbl);
-			if ((var_dbl<0 && divisor.var_dbl>=0) || (divisor.var_dbl<0 && var_dbl>=0))
+			if ((var_int<0 && divisor.var_int>=0) || (divisor.var_int<0 && var_int>=0))
 				//multivalue version of mod
-				return fmod(var_dbl,divisor.var_dbl)+divisor.var_dbl;
+				return (var_int % divisor.var_int)+divisor.var_int;
 			else
-				return fmod(var_dbl,divisor.var_dbl);
+				return var_int % divisor.var_int;
 		}
 	}
-	//throw MVException(L"abs(unknown mvtype=" ^ var(var_typ) ^ L")");
+	//cannot get here
+	throw MVException(L"mod(unknown mvtype=" ^ var(var_typ) ^ L")");
 }
 
 var var::mod(const int divisor) const
@@ -1806,15 +1811,10 @@ var var::mod(const int divisor) const
 	THISIS(L"var var::mod(const int divisor) const")
 	THISISNUMERIC()
 
-	if (var_typ & pimpl::VARTYP_INT)
-	{
-			if ((var_int<0 && divisor>=0) || (divisor<0 && var_int>=0))
-				//multivalue version of mod
-				return (var_int%divisor)+divisor;
-			else
-				return var_int%divisor;
-	}
-	else
+	//see ::mod(const var& divisor) for comments about c++11 % operator
+
+	//prefer double dividend
+	if (var_typ & pimpl::VARTYP_DBL)
 	{
 			if ((var_dbl<0 && divisor>=0) || (divisor<0 && var_dbl>=0))
 			{
@@ -1825,7 +1825,16 @@ var var::mod(const int divisor) const
 			else
 				return fmod(var_dbl,double(divisor));
 	}
-	//throw MVException(L"abs(unknown mvtype=" ^ var(var_typ) ^ L")");
+	else
+	{
+			if ((var_int<0 && divisor>=0) || (divisor<0 && var_int>=0))
+				//multivalue version of mod
+				return (var_int % divisor)+divisor;
+			else
+				return var_int % divisor;
+	}
+	//cannot get here
+	throw MVException(L"mod(unknown mvtype=" ^ var(var_typ) ^ L")");
 }
 
 /*
@@ -1838,12 +1847,13 @@ var var::sin() const
 	THISIS(L"var var::sin() const")
 	THISISNUMERIC()
 
+	//prefer double
 	if (var_typ & pimpl::VARTYP_DBL)
 		return std::sin(var_dbl*M_PI/180);
-
-//	if (var_typ & pimpl::VARTYP_INT)
+	else
 		return std::sin(double(var_int)*M_PI/180);
 
+	//cannot get here
 	throw MVException(L"sin(unknown mvtype=" ^ var(var_typ) ^ L")");
 }
 
@@ -1852,12 +1862,13 @@ var var::cos() const
 	THISIS(L"var var::cos() const")
 	THISISNUMERIC()
 
+	//prefer double
 	if (var_typ & pimpl::VARTYP_DBL)
 		return std::cos(var_dbl*M_PI/180);
-
-//	if (var_typ & pimpl::VARTYP_INT)
+	else
 		return std::cos(double(var_int)*M_PI/180);
 
+	//cannot get here
 	throw MVException(L"cos(unknown mvtype=" ^ var(var_typ) ^ L")");
 }
 
@@ -1866,12 +1877,13 @@ var var::tan() const
 	THISIS(L"var var::tan() const")
 	THISISNUMERIC()
 
+	//prefer double
 	if (var_typ & pimpl::VARTYP_DBL)
 		return std::tan(var_dbl*M_PI/180);
-
-//	if (var_typ & pimpl::VARTYP_INT)
+	else
 		return std::tan(double(var_int)*M_PI/180);
 
+	//cannot get here
 	throw MVException(L"tan(unknown mvtype=" ^ var(var_typ) ^ L")");
 }
 
@@ -1880,13 +1892,14 @@ var var::atan() const
 	THISIS(L"var var::atan() const")
 	THISISNUMERIC()
 
+	//prefer double
 	if (var_typ & pimpl::VARTYP_DBL)
 		return std::atan(var_dbl)/M_PI*180;
-
-//	if (var_typ & pimpl::VARTYP_INT)
+	else
 		return std::atan(double(var_int))/M_PI*180;
 
-	throw MVException(L"sin(unknown mvtype=" ^ var(var_typ) ^ L")");
+	//cannot get here
+	throw MVException(L"atan(unknown mvtype=" ^ var(var_typ) ^ L")");
 }
 
 var var::loge() const
@@ -1894,12 +1907,13 @@ var var::loge() const
 	THISIS(L"var var::loge() const")
 	THISISNUMERIC()
 
+	//prefer double
 	if (var_typ & pimpl::VARTYP_DBL)
 		return std::log(var_dbl);
-
-//	if (var_typ & pimpl::VARTYP_INT)
+	else
 		return std::log(double(var_int));
 
+	//cannot get here
 	throw MVException(L"loge(unknown mvtype=" ^ var(var_typ) ^ L")");
 }
 
@@ -1908,6 +1922,7 @@ var var::sqrt() const
 	THISIS(L"var var::sqrt() const")
 	THISISNUMERIC()
 
+	//prefer double
 	if (var_typ & pimpl::VARTYP_DBL)
 		return std::sqrt(var_dbl);
 
@@ -1923,12 +1938,13 @@ var var::pwr(const var& exponent) const
 	THISISNUMERIC()
 	ISNUMERIC(exponent)
 
+	//prefer double
 	if (var_typ & pimpl::VARTYP_DBL)
 		return std::pow(var_dbl,exponent.toDouble());
-
-//	if (var_typ & pimpl::VARTYP_INT)
+	else
 		return std::pow(double(var_int),exponent.toDouble());
 
+	//cannot get here
 	throw MVException(L"pow(unknown mvtype=" ^ var(var_typ) ^ L")");
 }
 
@@ -1937,12 +1953,13 @@ var var::exp() const
 	THISIS(L"var var::exp() const")
 	THISISNUMERIC()
 
+	//prefer double
 	if (var_typ & pimpl::VARTYP_DBL)
 		return std::exp(var_dbl);
-
-//	if (var_typ & pimpl::VARTYP_INT)
+	else
 		return std::exp(double(var_int));
 
+	//cannot get here
 	throw MVException(L"exp(unknown mvtype=" ^ var(var_typ) ^ L")");
 }
 

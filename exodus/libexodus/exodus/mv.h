@@ -422,8 +422,10 @@ public:
 	//and C++ uses bool and int conversion in certain cases to convert to int and bool
 	//therefore have chosen to make both bool and int "const" since they dont make
 	//and changes to the base object.
+#define HASINTREFOP
+#ifndef HASINTREFOP
 	operator int() const;
-
+#endif
 	//remove because causes "ambiguous" with -short_wchar on linux
 	//operator unsigned int() const;
 
@@ -468,9 +470,9 @@ public:
 	//provide a reference to the (long long) int inside a var
 	//This allows passing by reference to the guts of var for speed
 	//it is safe because changing the int has no side effects
-//#define HASLONGLONGOP
-#ifdef HASLONGLONGOP
+#ifdef HASINTREFOP
 	operator int&() const;
+	operator double&() const;
 #endif
 	//EXPLICIT CONVERSIONS TO
 	/////////////////////////
@@ -577,6 +579,8 @@ public:
 	void operator-- ();
 	*/
 
+#ifndef HASINTREFOP
+#else
 	//postfix
 	var operator++ (int);
 	var operator-- (int);
@@ -584,14 +588,13 @@ public:
 	//prefix
 	var& operator++ ();
 	var& operator-- ();
-
-//#define HASLONGLONGOP
-#ifdef HASLONGLONGOP
 	//+=var
 	var& operator+= (int int1);
+	var& operator+= (double dbl1);
 	//-=var
 	var& operator-= (int int1);
-#else
+	var& operator-= (double dbl1);
+
 	//not handled by inbuilt conversion of var to int
 	//+=var
 	var& operator+= (const var& var1);

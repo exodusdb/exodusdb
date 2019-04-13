@@ -258,7 +258,7 @@ var::operator const char*() const
 }
 */
 
-#ifndef HASLONGLONGOP
+#ifndef HASINTREFOP
 var::operator int() const
 {
 	THISIS(L"var::operator int() const")
@@ -285,15 +285,27 @@ var::operator int() const
 	throw MVNonNumeric(L"int(L" ^ substr(1,20) ^ L")");
 
 }
-#else
 
+#else
 var::operator int&() const
 {
-	THISIS(L"var::operator long long&()")
+	THISIS(L"var::operator int&()")
 	THISISINTEGER()
-	return &var_int;
+	//TODO check that converting mvint_t (which is long long) to int doesnt cause any practical problems) PROBABLY WILL!
+	//since we are returning a non const reference which allows callers to set the int directly then clear any decimal and string cache flags
+	//which would be invalid after setting the int alone
+	var_typ=pimpl::VARTYP_INT;
+	return (int&) var_int;
 }
-
+var::operator double&() const
+{
+	THISIS(L"var::operator double&()")
+	THISISDECIMAL()
+	//since we are returning a non const reference which allows callers to set the dbl directly then clear any int and string cache flags
+	//which would be invalid after setting the dbl alone
+	var_typ=pimpl::VARTYP_DBL;
+	return (double&) var_dbl;
+}
 #endif
 
 //remove because causes "ambiguous" with -short_wchar on linux
@@ -590,6 +602,11 @@ var& var::operator^= (const std::wstring string1)
 }
 
 
+// not handled by inbuilt conversion of var to long long& on the rhs
+
+#ifndef HASINTREFOP
+#else
+
 //You must *not* make the postfix version return the 'this' object by reference; you have been warned.
 
 //not returning void so is usable in expressions
@@ -601,10 +618,11 @@ var var::operator++ (int)
 	THISISDEFINED()
 
 tryagain:
+	//prefer int since ++ nearly always on integers
 	if (var_typ&pimpl::VARTYP_INT)
 	{
-        if (var_int==std::numeric_limits<mvint_t>::max())
-            throw MVIntOverflow(L"operator++");
+		if (var_int==std::numeric_limits<mvint_t>::max())
+			throw MVIntOverflow(L"operator++");
 		var_int++;
 		var_typ=pimpl::VARTYP_INT;//reset to one unique type
 	}
@@ -619,12 +637,10 @@ tryagain:
 		if (isnum())
 			goto tryagain;
 
-		//throw MVNonNumeric(L"(L" ^ substr(1,20) ^ L")++");
 		THISISNUMERIC()
 	}
 	else
 	{
-		//throw MVUnassigned(L"var++");
 		THISISNUMERIC()
 	}
 
@@ -637,14 +653,12 @@ tryagain:
 //int argument indicates that this is POSTFIX override v--
 var var::operator-- (int)
 {
-
 	THISIS(L"var var::operator-- (int)")
     //full check done below to avoid double checking number type
 	THISISDEFINED()
 
-	if (var_typ&mvtypemask)
-		throw MVUndefined(L"var--");
 tryagain:
+	//prefer int since -- nearly always on integers
 	if (var_typ&pimpl::VARTYP_INT)
 	{
 		var_int--;
@@ -661,12 +675,10 @@ tryagain:
 		if (isnum())
 			goto tryagain;
 
-		//throw MVNonNumeric(L"(L" ^ substr(1,20) ^ L")--");
 		THISISNUMERIC()
 	}
 	else
 	{
-		//throw MVUnassigned(L"()--");
 		THISISNUMERIC()
 	}
 
@@ -679,14 +691,16 @@ tryagain:
 //no argument indicates that this is prefix override ++var
 var& var::operator++ ()
 {
-
 	THISIS(L"var var::operator++ ()")
     //full check done below to avoid double checking number type
 	THISISDEFINED()
 
 tryagain:
+	//prefer int since -- nearly always on integers
 	if (var_typ&pimpl::VARTYP_INT)
 	{
+		if (var_int==std::numeric_limits<mvint_t>::max())
+			throw MVIntOverflow(L"operator++");
 		var_int++;
 		var_typ=pimpl::VARTYP_INT;//reset to one unique type
 	}
@@ -701,13 +715,11 @@ tryagain:
 		if (isnum())
 			goto tryagain;
 
-		//throw MVNonNumeric(L"++(L" ^ substr(1,20) ^ L")");
-		THISISDEFINED()
+		THISISNUMERIC()
 	}
 	else
 	{
-		throw MVUnassigned(L"++()");
-		THISISDEFINED()
+		THISISNUMERIC()
 	}
 
 	//OK to return *this in prefix ++
@@ -725,6 +737,7 @@ var& var::operator-- ()
 	THISISDEFINED()
 
 tryagain:
+	//prefer int since -- nearly always on integers
 	if (var_typ&pimpl::VARTYP_INT)
 	{
 		var_int--;
@@ -741,19 +754,17 @@ tryagain:
 		if (isnum())
 			goto tryagain;
 
-		throw MVNonNumeric(L"--(L" ^ substr(1,20) ^ L")");
+		THISISNUMERIC()
 	}
 	else
-		throw MVUnassigned(L"--()");
+	{
+		THISISNUMERIC()
+	}
 
 	//OK to return *this in prefix --
 	return *this;
 
 }
-
-// not handled by inbuilt conversion of var to long long& on the rhs
-
-#ifdef HASLONGLONGOP
 
 //+=var (very similar to version with on rhs)
 //provided to disambiguate syntax like var1+=var2
@@ -764,20 +775,21 @@ var& var::operator+= (int int1)
 
 tryagain:
 
-	//int target
-	if (var_typ&pimpl::VARTYP_INT)
-	{
-		var_int+=int1;
-		var_typ=pimpl::VARTYP_INT;//reset to one unique type
-		return *this;
-	}
-
 	//dbl target
-	else if (var_typ&pimpl::VARTYP_DBL)
+	//prefer double
+	if (var_typ&pimpl::VARTYP_DBL)
 	{
 		//+= int or dbl from source
 		var_dbl+=int1;
 		var_typ=pimpl::VARTYP_DBL;//reset to one unique type
+		return *this;
+	}
+
+	//int target
+	else if (var_typ&pimpl::VARTYP_INT)
+	{
+		var_int+=int1;
+		var_typ=pimpl::VARTYP_INT;//reset to one unique type
 		return *this;
 	}
 
@@ -804,19 +816,20 @@ var& var::operator-= (int int1)
 	THISISDEFINED()
 
 tryagain:
-	//int target
-	if (var_typ&pimpl::VARTYP_INT)
-	{
-		var_int-=int1;
-		var_typ=pimpl::VARTYP_INT;//reset to one unique type
-		return *this;
-	}
-
 	//dbl target
-	else if (var_typ&pimpl::VARTYP_DBL)
+	//prefer double
+	if (var_typ&pimpl::VARTYP_DBL)
 	{
 		var_dbl-=int1;
 		var_typ=pimpl::VARTYP_DBL;//reset to one unique type
+		return *this;
+	}
+
+	//int target
+	else if (var_typ&pimpl::VARTYP_INT)
+	{
+		var_int-=int1;
+		var_typ=pimpl::VARTYP_INT;//reset to one unique type
 		return *this;
 	}
 
@@ -829,7 +842,18 @@ tryagain:
 
 }
 
-#else
+//allow varx+=1.5 to compile
+var& var::operator+= (double dbl1)
+{
+	(*this)+=var(dbl1);
+	return *this;
+}
+
+var& var::operator-= (double dbl1)
+{
+	(*this)-=var(dbl1);
+	return *this;
+}
 
 //+=var
 var& var::operator+= (const var& rhs)
@@ -840,8 +864,18 @@ var& var::operator+= (const var& rhs)
 
 tryagain:
 
+	//dbl target
+	//prefer double
+	if (var_typ&pimpl::VARTYP_DBL)
+	{
+		//+= int or dbl from source
+		var_dbl+=(rhs.var_typ&pimpl::VARTYP_INT)?rhs.var_int:rhs.var_dbl;
+		var_typ=pimpl::VARTYP_DBL;//reset to one unique type
+		return *this;
+	}
+
 	//int target
-	if (var_typ&pimpl::VARTYP_INT)
+	else if (var_typ&pimpl::VARTYP_INT)
 	{
 		//int source
 		if (rhs.var_typ&pimpl::VARTYP_INT)
@@ -852,15 +886,6 @@ tryagain:
 		}
 		//dbl source, convert target to dbl
 		var_dbl=var_int+rhs.var_dbl;
-		var_typ=pimpl::VARTYP_DBL;//reset to one unique type
-		return *this;
-	}
-
-	//dbl target
-	else if (var_typ&pimpl::VARTYP_DBL)
-	{
-		//+= int or dbl from source
-		var_dbl+=(rhs.var_typ&pimpl::VARTYP_INT)?rhs.var_int:rhs.var_dbl;
 		var_typ=pimpl::VARTYP_DBL;//reset to one unique type
 		return *this;
 	}
@@ -996,6 +1021,7 @@ DLL_PUBLIC bool MVeq(const var& lhs,const var& rhs)
 	}
 
 	//2. both numerical strings
+	//exact match on decimal numbers is often inaccurate since they are approximations of real numbers
 	if (lhs.isnum()&&rhs.isnum())
 	{
 		if (lhs.var_typ&pimpl::VARTYP_INT)
@@ -1069,7 +1095,7 @@ DLL_PUBLIC bool MVlt(const var& lhs,const var& rhs)
 				return true;
 			}
 		}
-	
+
 	}
 	else
 	{
