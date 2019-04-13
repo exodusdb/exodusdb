@@ -56,7 +56,7 @@ function main()
 	var default_extension="cpp";
 
 	var compiler;
-	var basicoptions="";
+	var basicoptions=osgetenv("CPP_OPTIONS");
 	var linkoptions=false;
 	var manifest;
 	var binoptions;
