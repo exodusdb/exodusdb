@@ -57,32 +57,63 @@ dim var::split() const {
 
 //number=dim.split(varstr)
 //returns number of elements
-var dim::split(const var& var1)
+var dim::split(const var& str1)
 {
-	//THISIS(L"var dim::split(const var& var1)")
-	//ISSTRING(var1)
+	THISIS(L"var dim::split(const var& var1)")
+	ISSTRING(str1)
 
-	(*this).redim(var1.count(FM_)+1);
+	//maybe automatically dimension to the size of the string
+	if (!this->initialised_)
+		this->redim(str1.count(FM_)+1);
 
-	//find the starting position of the field or return L""
-	std::wstring::size_type start_pos=0;
-	int fieldno=1;
-	for (;;)
+	//empty string just fills array with empty string
+	if (str1.length()==0)
 	{
-		std::wstring::size_type next_pos;
-		next_pos=var1.var_str.find(FM_,start_pos);
+		(*this)=L"";
+		return this->nrows_;
+	}
 
-		data_[fieldno]=var1.var_str.substr(start_pos,next_pos-start_pos);
+	//start at the beginning and look for FM delimiters
+	std::wstring::size_type start_pos=0;
+	std::wstring::size_type next_pos;
+	int fieldno;
+	for (fieldno=1;fieldno<=this->nrows_;)
+	{
 
-		//past of of string?
+		//find the next FM delimiter
+		next_pos=str1.var_str.find(FM_,start_pos);
+
+		//not found - past end of string?
 		if (next_pos==std::wstring::npos)
+		{
+			this->data_[fieldno]=str1.var_str.substr(start_pos);
 			break;
+		}
+
+		//fill an element with a field
+		this->data_[fieldno]=str1.var_str.substr(start_pos,next_pos-start_pos);
 
 		start_pos=next_pos+1;
 		fieldno++;
 	}
 
-	return fieldno;
+	int nfields=fieldno;
+
+	//stuff any excess fields into the last element
+	if (next_pos!=std::wstring::npos)
+	{
+		this->data_[this->nrows_]^=FM^str1.var_str.substr(start_pos);
+	}
+	else
+	{
+
+		++fieldno;
+		//fill any remaining array elements with empty string
+		for (;fieldno<=(this->nrows_);++fieldno)
+			this->data_[fieldno]=L"";
+	}
+
+	return nfields;
 }
 
 ///////////////////////////////////////////

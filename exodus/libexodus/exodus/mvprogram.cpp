@@ -1375,56 +1375,76 @@ var ExodusProgramBase::oconv(const var& input, const var& conversion) {
 	//almost identical code in var::oconv and var::iconv
 	//ENSURE synchronised if you change it
 
-	//either call custom conversion routines
-	if (conversion[1] == L"[") {
+	var result=input;
+	var ptr=1;
+	var delimiter;
+	do {
 
-		//extract any params
-		var mode=conversion.field(L",",2,9999).field(L"]",1);
+		var subconversion=conversion.remove(ptr,delimiter);
 
-		//set the function name
-		ioconv_custom=conversion.substr(2).field(L",",1).field(L"]",1).lcase();
+		//either call custom conversion routines
+		if (subconversion[1] == L"[") {
 
-		//wire up the current environment
-		ioconv_custom.mv_ = (&mv);
+			//extract any params
+			var mode=subconversion.field(L",",2,9999).field(L"]",1);
 
-		//and call it
-		var output;
-		call ioconv_custom(L"OCONV",input,mode,output);
-		return output;
+			//set the function name
+			ioconv_custom=subconversion.substr(2).field(L",",1).field(L"]",1).lcase();
 
-	//or call standard conversion methods
-	} else {
-		return input.oconv(conversion);
-	}
+			//wire up the current environment
+			ioconv_custom.mv_ = (&mv);
+
+			//and call it
+			var output;
+			call ioconv_custom(L"OCONV",result,mode,output);
+			result=output;
+
+		//or call standard conversion methods
+		} else {
+			result=result.oconv(subconversion);
+		}
+	} while (delimiter);
+
+	return result;
 }
 
 var ExodusProgramBase::iconv(const var& input, const var& conversion) {
 
 	//call user conversion routine
-	//almost identical code in var::oconv and var::iconv
+	//almost identical code in var::iconv and var::iconv
 	//ENSURE synchronised if you change it
 
-	//either call custom conversion routines
-	if (conversion[1] == L"[") {
+	var result=input;
+	var ptr=1;
+	var delimiter;
+	do {
 
-		//extract any params
-		var mode=conversion.field(L",",2,9999).field(L"]",1);
+		var subconversion=conversion.remove(ptr,delimiter);
 
-		//set the function name
-		ioconv_custom=conversion.substr(2).field(L",",1).field(L"]",1).lcase();
+		//either call custom conversion routines
+		if (subconversion[1] == L"[") {
 
-		//wire up the current environment
-		ioconv_custom.mv_ = (&mv);
+			//extract any params
+			var mode=subconversion.field(L",",2,9999).field(L"]",1);
 
-		//and call it
-		var output;
-		call ioconv_custom(L"ICONV",input,mode,output);
-		return output;
+			//set the function name
+			ioconv_custom=subconversion.substr(2).field(L",",1).field(L"]",1).lcase();
 
-	//or call standard conversion methods
-	} else {
-		return input.iconv(conversion);
-	}
+			//wire up the current environment
+			ioconv_custom.mv_ = (&mv);
+
+			//and call it
+			var output;
+			call ioconv_custom(L"ICONV",result,mode,output);
+			result=output;
+
+		//or call standard conversion methods
+		} else {
+			result=result.iconv(subconversion);
+		}
+	} while (delimiter);
+
+	return result;
 }
 
 }//of namespace exodus

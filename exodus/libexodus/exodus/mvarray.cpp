@@ -71,6 +71,9 @@ dim::dim(int rows, int cols)
 	data_ = new var[rows * cols + 1];
 }
 
+//dim split is defined in mvmv.cpp
+//var dim::split(const var& str1)
+
 bool dim::read(const var& filehandle, const var& key)
 {
 	THISIS(L"bool dim::matread(const var& filehandle, const var& key)")
@@ -80,8 +83,16 @@ bool dim::read(const var& filehandle, const var& key)
 	var temprecord;
 	if (!temprecord.read(filehandle,key))
 		return false;
-	//this->split(temprecord);
-	(*this)=temprecord.split();
+
+	//dont use following because it redimensions the array to the actual number of fields found
+	//and this causes redim to clear the array when redim is in common.h and called repetitively in subroutines
+	//(*this)=temprecord.split();
+
+	this->split(temprecord);
+
+	//var(nrows_).outputl(L"nrows now=");
+
+	//this->join(L"|").outputl(L"read=");
 	return true;
 }
 
@@ -104,6 +115,8 @@ bool dim::redim(int rows, int cols)
 	//do nothing if no change
 	if (initialised_ && rows==nrows_ && cols==ncols_)
 		return true;
+
+	//(var(initialised_)^L" "^var(nrows_)^L" "^var(ncols_)^L" -> "^var(rows)^L" "^var(cols)).outputl(L"redim=");
 
 	//how exception safe is this?
 

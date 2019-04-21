@@ -9,6 +9,7 @@ programinit()
 #include <pp_common.h>
 #include <md_common.h>
 #include <lg_common.h>
+#include <ba_common.h>
 
 function main() {
 
@@ -21,6 +22,7 @@ function main() {
         mv.labelledcommon[pp_common_no]=new pp_common;
         mv.labelledcommon[md_common_no]=new md_common;
         mv.labelledcommon[lg_common_no]=new lg_common;
+        mv.labelledcommon[ba_common_no]=new ba_common;
 
 	//cat ~/arev/dic/*.SQL | psql -h 127.0.0.1 -U exodus exodus
 
