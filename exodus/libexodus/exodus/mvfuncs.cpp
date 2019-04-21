@@ -1686,9 +1686,11 @@ var var::debug() const
 
 #ifdef raise
 	raise(SIGTRAP);
+#else
+	for(var ii=0; ii<3;ii++) {__asm__("int3");}
 #endif
 
-	throw MVDebug();
+	//throw MVDebug();
 	return L"";
 }
 

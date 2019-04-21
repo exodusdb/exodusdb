@@ -1086,17 +1086,19 @@ public:
 	bool open(const var& dbfilename, const var& connection DEFAULTNULL);
 	void close();
 
-	bool select(const var& sortselectclause DEFAULTNULL) const;
-	void clearselect() const;
+	bool select(const var& sortselectclause DEFAULTNULL);
+	void clearselect();
 
-	bool savelist(const var& name) const;
-	bool getlist(const var& name) const;
-	bool makelist(const var& name, const var& keys) const;
-	bool deletelist(const var& name) const;
+	bool savelist(const var& listname);
+	bool getlist(const var& listname);
+	bool makelist(const var& listname, const var& keys);
+	bool deletelist(const var& listname) const;
+
+	bool saveselect(const var& filename);
 
 	bool hasnext() const;
-	bool readnext(var& key) const;
-	bool readnext(var& key, var& valueno) const;
+	bool readnext(var& key);
+	bool readnext(var& key, var& valueno);
 
 	bool selectrecord(const var& sortselectclause DEFAULTNULL) const;
 	bool readnextrecord(var& record, var& key) const;

@@ -176,43 +176,11 @@ dim& dim::operator=(const dim& sourcedim)
 	if (!sourcedim.initialised_)
 		throw MVArrayNotDimensioned();
 
-	//can copy to an undimensioned array (duplicates the dimensions)
-	if (!initialised_)
-	{
-		(*this).redim(sourcedim.nrows_,sourcedim.ncols_);
+	this->redim(sourcedim.nrows_,sourcedim.ncols_);
 
-		//fast copy without rows and cols
-		int ncells=nrows_*ncols_+1;
-		for (int celln=0;celln<ncells;++celln)
-				//(data_[celln]).clone(sourcedim.data_[celln]);
-				data_[celln]=sourcedim.data_[celln].clone();
-		return *this;
-
-	}
-
-	//element 0,0 is extra in the 1 based world of mv dimensioned arrays
-	//(data_[0]).clone(sourcedim.data_[0]);
-	data_[0]=sourcedim.data_[0].clone();
-
-	int maxrown=sourcedim.nrows_;
-	int maxcoln=sourcedim.ncols_;
-	for (int rown=0;rown<nrows_;++rown)
-	{
-		int index=rown*ncols_;
-		for (int coln=1;coln<=ncols_;++coln)
-		{
-			++index;
-			if (rown<maxrown&&coln<maxcoln)
-			{
-				int fromindex=rown*maxcoln+1;
-				//(data_[index]).clone(sourcedim.data_[fromindex]);
-				data_[index]=sourcedim.data_[fromindex].clone();
-			}
-			else data_[index]=L"";
-		}
-
-	}
-
+	int ncells=nrows_*ncols_+1;
+	for (int celln=0;celln<ncells;++celln)
+		data_[celln]=sourcedim.data_[celln].clone();
 	return *this;
 }
 
@@ -248,13 +216,28 @@ var dim::join(const var& sepchar) const
 	if (!arraysize)
 		return L"";
 
-	var output=data_[1];
-
-	for (int ii=2;ii<=arraysize;++ii)
+	//find last element with any data
+	int nn;
+	for (nn=arraysize;nn>0;--nn)
 	{
-		//output.var_str.push_back(FM_);//bug if first field is numeric since string hasnt been constructed yet
-		//output^=_FM_;
-		output^=sepchar;
+		if (data_[nn].assigned() && data_[nn].length())
+			 break;
+	}
+
+	//get the first element at least to ensure
+	//at least first element is assigned - even if it is an empty string
+	var output=L"";
+	//ensuring converted to a string
+	output^=data_[1];
+
+	//if no elements
+	if (!nn)
+		return output;
+
+	//append any additional elements
+	for (int ii=2;ii<=nn;++ii)
+	{
+		output.var_str.push_back(FM_);
 		output^=data_[ii];
 	}
 

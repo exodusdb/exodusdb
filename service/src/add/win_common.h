@@ -30,8 +30,11 @@ commoninit(win,win_common_no)
 	var curramvgroup = "";
 	var mvx = "";
 	var amvaction = "";
-
-	dim ww {1};
+	var perproc = "";
+	var reproc = "";
+	var postproc = "";
+	var preproc = "";
+	dim ww {100};
 	dim registerx {10};
 
 commonexit(win,win_common_no)

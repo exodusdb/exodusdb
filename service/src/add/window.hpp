@@ -118,8 +118,9 @@ function note3(in msg) {
 	return 0;
 }
 
-function badchars() {
-	var msg = "";
+function badchars(io msg) {
+	//var msg = "";
+	msg = "";
 	if (not win.is) {
 		return 0;
 	}

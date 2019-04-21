@@ -11,7 +11,7 @@ function main()
 
 		//"modern" methods (member functions)
 		//var silent=OPTIONS.ucase().index("S"));
-		
+
         if (not filenames)
                 stop("Syntax is clearfile filename filename ...\ndict files are named dict_filename");
 

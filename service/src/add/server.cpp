@@ -8,6 +8,7 @@ programinit()
 #include <bkg_common.h>
 #include <pp_common.h>
 #include <md_common.h>
+#include <lg_common.h>
 
 function main() {
 
@@ -19,6 +20,7 @@ function main() {
         mv.labelledcommon[bkg_common_no]=new bkg_common;
         mv.labelledcommon[pp_common_no]=new pp_common;
         mv.labelledcommon[md_common_no]=new md_common;
+        mv.labelledcommon[lg_common_no]=new lg_common;
 
 	//cat ~/arev/dic/*.SQL | psql -h 127.0.0.1 -U exodus exodus
 
@@ -52,6 +54,9 @@ function main() {
 	var databasecode="exodus";
 	SYSTEM.r(17,databasecode);
 
+	//process no
+	SYSTEM.r(24,PROCESSNO);
+	
 	//create database dir
 	var datadir="../data/";
 	var databasedir=datadir ^ databasecode;
@@ -65,7 +70,7 @@ function main() {
 		createfile("MARKETS");
 	}
 	select("MARKETS");
-	if (var().hasnext())
+	if (hasnext())
 		clearselect();
 	else
 		write("All Markets","MARKETS","ALL");

@@ -61,6 +61,11 @@ DLL_PUBLIC
 	bool pushselect(const var& v1, var& v2, var& v3, var& v4);
 	bool popselect(const var& v1, var& v2, var& v3, var& v4);
 
+	bool savelist(const var& listname);
+	bool getlist(const var& listname);
+	bool makelist(const var& listname, const var& keys);
+	bool deletelist(const var& listname);
+
 	void note(const var& msg, const var& options="") const;
 	void note(const var& msg, const var& options, var& buffer, const var& params="") const;
 	void mssg(const var& msg, const var& options="") const;

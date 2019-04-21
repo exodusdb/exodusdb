@@ -1985,132 +1985,39 @@ var getword(var& remainingwords, var& ucword)
 	return word1;
 }
 
-bool var::deletelist(const var& listname) const
+bool var::saveselect(const var& filename)
 {
-	THISIS(L"bool var::deletelist(const var& listname) const")
+	THISIS(L"bool var::saveselect(const var& filename) const")
 	//?allow undefined usage like var xyz=xyz.select();
 	//THISISDEFINED()
-	ISSTRING(listname)
-
-	var listfilename=L"savelist_";
-	if (listname)
-		listfilename ^= listname;
-	else {
-		if (this->assigned())
-			listfilename ^= (*this);
-		listfilename ^= L"_" ^ getprocessn() ^ L"_tempx";
-	}
-
-	if (var().open(listfilename)) {
-		//listfilename.outputl(L"Deleted ");
-		if (GETDBTRACE)
-			exodus::logputl(L"DBTRACE: ::deletelist(" ^ listname ^ L")");
-		return this->deletefile(listfilename);
-	}
-	return true;//true if not existing
-}
-
-bool var::savelist(const var& listname) const
-{
-	THISIS(L"bool var::savelist(const var& listname) const")
-	//?allow undefined usage like var xyz=xyz.select();
-	//THISISDEFINED()
-	ISSTRING(listname)
+	ISSTRING(filename)
 
 	if (GETDBTRACE)
-		exodus::logputl(L"DBTRACE: ::savelist(" ^ listname ^ L")");
+		exodus::logputl(L"DBTRACE: ::saveselect(" ^ filename ^ L")");
 
 	int recn=0;
 	var key;
 	var mv;
-	var listfilename=L"savelist_"^listname;
 
 	//save preselected keys into a file to be used with INNERJOIN on select()
 
-	//this should not throw if the list does not exist
-	this->deletelist(listname);
+	//this should not throw if the select does not exist
+	this->deletefile(filename);
 
-	//clear or create any existing savelist file with the same name
-	var listfilename_part=listfilename^L"_saving";
-	if (!this->createfile(listfilename_part))
-			throw MVDBException(L"savelist cannot create file " ^ listfilename_part);
-	var listfile_part;
-	if (!listfile_part.open(listfilename_part,(*this)))
-			throw MVDBException(L"savelist cannot open file " ^ listfilename_part);
+	//clear or create any existing saveselect file with the same name
+	if (!this->createfile(filename))
+			throw MVDBException(L"saveselect cannot create file " ^ filename);
+	var file;
+	if (!file.open(filename,(*this)))
+			throw MVDBException(L"saveselect cannot open file " ^ filename);
 
 	while (this->readnext(key,mv)) {
 		recn++;
 
 		//save a key
-		(mv ^ FM ^ recn).write(listfile_part,key);
-		//key.outputl(L"Written=");
-	}
-	if (recn)
-	{
-		this->renamefile(listfilename_part, listfilename);
-	}
-	else
-	{
-		this->deletefile(listfilename_part);
-		exodus::logputl(L"DBTRACE: ::savelist(" ^ listname ^ L") Error: no active selection to save");
+		(mv ^ FM ^ recn).write(file,key);
 	}
 
-	return recn>0;
-}
-
-bool var::makelist(const var& listname, const var& keys) const
-{
-	THISIS(L"bool var::makelist(const var& listname) const")
-	//?allow undefined usage like var xyz=xyz.select();
-	THISISDEFINED()
-	ISSTRING(listname)
-	ISSTRING(keys)
-
-	this->deletelist(listname);
-
-	int recn=0;
-	var key;
-	var mv;
-	var listfilename=L"savelist_";
-	if (listname)
-		listfilename^=listname;
-	else {
-		//var listname2=(*this) ^ L"_" ^ getprocessn() ^ L"_tempx";
-		var listname2;
-		if (this->assigned())
-			listname2=(*this);
-		else
-			listname2=L"";
-		listname2 ^= L"_" ^ getprocessn() ^ L"_tempx";
-		listfilename^=listname2;
-	}
-
-	//save preselected keys into a file to be used with INNERJOIN on select()
-	int nn=keys.dcount(FM);
-	//var(nn).outputl(L"nn=");
-	for (int fn1=1;fn1<nn;fn1++) {
-		var key=keys.a(fn1);
-		if (key.length()) {
-
-			//key can be key]mv
-			var mv=key.a(1,2);
-			if (mv.length())
-				key=key.a(1,1);
-
-			recn++;
-			//create file on first record
-			if (recn==1) {
-				if (!this->createfile(listfilename)) {
-					listfilename.errputl(L"Cannot create ");
-					return false;
-				}
-			}
-			//save a key
-			(mv ^ FM ^ recn).write(listfilename,key);
-		}
-	}
-
-	//listfilename.outputl(L"makelist recs:" ^ var(recn) ^ L", listfilename=");
 	return recn>0;
 }
 
@@ -2125,7 +2032,7 @@ bool var::selectrecord(const var& sortselectclause) const
 	return this->selectx(L"key, mv::integer, data",sortselectclause);
 }
 
-bool var::select(const var& sortselectclause) const
+bool var::select(const var& sortselectclause)
 {
 	THISIS(L"bool var::select(const var& sortselectclause) const")
 	//?allow undefined usage like var xyz=xyz.select();
@@ -2135,7 +2042,7 @@ bool var::select(const var& sortselectclause) const
 	return this->selectx(L"key, mv::integer",sortselectclause);
 }
 
-//currently only called from select and selectrecord
+//currently only called from select, selectrecord and getlist
 bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 {
 	//private - and arguments are left unchecked for speed
@@ -2661,12 +2568,13 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	//if any active select, convert to a file and use as an additional filter on key
 	//or correctly named savelistfilename exists from getselect or makelist
 	var listname=L"";
-	if (this->hasnext()) {
-		listname=(*this).a(1) ^ L"_" ^ getprocessn() ^ L"_tempx";
-		this->savelist(listname);
-		var savelistfilename=L"savelist_" ^ listname;
-		joins ^= L" \nINNER JOIN\n " ^ savelistfilename ^ L" ON " ^ actualfilename ^ L".key = " ^ savelistfilename ^ L".key";
-	}
+	//see also listname below
+//	if (this->hasnext()) {
+//		listname=(*this).a(1) ^ L"_" ^ getprocessn() ^ L"_tempx";
+//		this->savelist(listname);
+//		var savelistfilename=L"savelist_" ^ listname;
+//		joins ^= L" \nINNER JOIN\n " ^ savelistfilename ^ L" ON " ^ actualfilename ^ L".key = " ^ savelistfilename ^ L".key";
+//	}
 
 	//disambiguate from any INNER JOIN key
 	actualfieldnames.swapper(L"key",actualfilename ^ L".key");
@@ -2734,7 +2642,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	return true;
 }
 
-void var::clearselect() const
+void var::clearselect()
 {
 	//THISIS(L"void var::clearselect() const")
 	//THISISSTRING()
@@ -2852,6 +2760,185 @@ bool readnextx(const var& cursor, PGresultptr& pgresult, PGconn* pgconn, bool fo
 	return true;
 }
 
+bool var::deletelist(const var& listname) const
+{
+	THISIS(L"bool var::deletelist(const var& listname) const")
+	//?allow undefined usage like var xyz=xyz.select();
+	//THISISDEFINED()
+	ISSTRING(listname)
+
+	//open the lists file on the same connection
+	var lists=*this;
+	if (!lists.open(L"LISTS"))
+		throw MVDBException(L"LISTS file cannot be opened");
+
+	//initial block of keys are stored with no suffix (i.e. no *1)
+	lists.deleterecord(listname);
+
+	//supplementary blocks of keys are stored with suffix *2, *3 etc)
+	for (int listno=2;;++listno)
+	{
+		var xx;
+		if (!xx.read(lists,listname^L"*"^listno))
+			break;
+		lists.deleterecord(listname^L"*"^listno);
+	}
+
+	return true;
+}
+
+bool var::savelist(const var& listname)
+{
+
+	THISIS(L"bool var::savelist(const var& listname)")
+	//?allow undefined usage like var xyz=xyz.select();
+	//THISISDEFINED()
+	ISSTRING(listname)
+
+	if (GETDBTRACE)
+		exodus::logputl(L"DBTRACE: ::savelist(" ^ listname ^ L")");
+
+	//open the lists file on the same connection
+	var lists=*this;
+	if (!lists.open(L"LISTS"))
+		throw MVDBException(L"LISTS file cannot be opened");
+
+	//this should not throw if the list does not exist
+	this->deletelist(listname);
+
+	var listno=1;
+	var listkey=listname;
+	var block=L"";
+	static int maxblocksize=1024*1024;
+
+	var key;
+	var mv;
+	while (this->readnext(key,mv)) {
+
+		//append the key
+		block.var_str.append(key.var_str);
+
+		//append SM + mvno if mvno present
+		if (mv)
+		{
+			block.var_str.push_back(VM_);
+			block.var_str.append(mv.var_str);
+		}
+
+		//save a block of keys if more than a certain size (1MB)
+		if (block.length()>maxblocksize)
+		{
+			//save the block
+			block.write(lists,listkey);
+
+			//prepare the next block
+			listno++;
+			listkey=listname^L"*"^listno;
+			block=L"";
+			continue;
+		}
+
+		//append a FM separator since lists use FM
+		block.var_str.push_back(FM_);
+	}
+
+	//write the block
+	if (block.length()>1)
+	{
+		block.write(lists,listkey);
+		listno++;
+	}
+
+	return listno>0;
+}
+
+bool var::getlist(const var& listname)
+{
+	THISIS(L"bool var::getlist(const var& listname) const")
+	//?allow undefined usage like var xyz=xyz.select();
+	//THISISDEFINED()
+	ISSTRING(listname)
+
+	if (GETDBTRACE)
+		exodus::logputl(L"DBTRACE: ::savelist(" ^ listname ^ L")");
+
+	int recn=0;
+	var key;
+	var mv;
+	var listfilename=L"savelist_"^listname.field(L" ",1);
+	listfilename.converter(L"-.*/",L"____");
+	//return this->selectx(L"key, mv::integer",listfilename);
+
+	//open the lists file on the same connection
+	var lists=*this;
+	if (!lists.open(L"LISTS"))
+		throw MVDBException(L"LISTS file cannot be opened");
+
+	var keys;
+	if (!keys.read(lists,listname))
+		//throw MVDBException(listname.quote() ^ L" list does not exist.");
+		return false;
+
+	//provide first block of keys for readnext
+	this->r(3,listname);
+
+	//list number for readnext to get next block of keys from lists file
+	//suffix for first block is nothing (not *1) and then *2, *3 etc
+	this->r(4,1);
+
+	//key pointer for readnext to remove next key from the block of keys
+	this->r(5,0);
+
+	//keys separated by vm. each key may be followed by a sm and the mv no for readnext
+	this->r(6,keys.lowerer());
+
+	return true;
+}
+
+//MAKELIST would be much better called MAKESELECT
+//since the most common usage is to omit listname in which case the keys will be used to simulate a SELECT statement
+//Making a list can be done simply by writing the keys into the list file without using this function
+bool var::makelist(const var& listname, const var& keys)
+{
+	THISIS(L"bool var::makelist(const var& listname)")
+	//?allow undefined usage like var xyz=xyz.select();
+	THISISDEFINED()
+	ISSTRING(listname)
+	ISSTRING(keys)
+
+	//this is not often used since can be achieved by writing keys to lists file directly
+	if (listname)
+	{
+		this->deletelist(listname);
+
+		//open the lists file on the same connection
+		var lists=*this;
+		if (!lists.open(L"LISTS"))
+			throw MVDBException(L"LISTS file cannot be opened");
+		keys.write(lists,listname);
+		return true;
+	}
+
+	//provide a block of keys for readnext
+
+	//listid in the lists file must be set for readnext to work, but not exist in the file
+	//readnext will look for %MAKELIST%*2 in the lists file when it reaches the end of the block of keys provided
+	//and must not find it
+	this->r(3,L"%MAKELIST%");
+
+	//list number for readnext to get next block of keys from lists file
+	//suffix for first block is nothing (not *1) and then *2, *3 etc
+	this->r(4,1);
+
+	//key pointer for readnext to remove next key from the block of keys
+	this->r(5,0);
+
+	//keys separated by vm. each key may be followed by a sm and the mv no for readnext
+	this->r(6,keys.lower());
+
+	return true;
+}
+
 bool var::hasnext() const
 {
 
@@ -2865,8 +2952,39 @@ bool var::hasnext() const
 	const_cast<var&>(*this).unassigned(L"");
 
 	//readnext through string of keys if provided
-	if ((*this)[-1]==FM) {
+	//Note: code similarity between hasnext and readnext
+	var listid=this->a(3);
+	if (listid)
+	{
+		var keyno=this->a(5);
+		keyno++;
+
+		var key_and_mv=this->a(6,keyno);
+
+		//true if we have another key
+		if (key_and_mv.length())
+			return true;
+
+		//otherwise try and get another block
+		var lists=*this;
+		if (!lists.open(L"LISTS"))
+			throw MVDBException(L"LISTS file cannot be opened");
+		var listno=this->a(4);
+		listno++;
+		listid.fieldstorer(L"*",2,1,listno);
+
+		//if no more blocks of keys then return false
+		var block;
+		if (!block.read(lists,listid))
+			return false;
+
+		//might as well cache the next block for the next readnext
+		const_cast<var&>(*this).r(4,listno);
+		const_cast<var&>(*this).r(5,0);
+		const_cast<var&>(*this).r(6,block.lowerer());
+
 		return true;
+
 	}
 
 	PGconn* pgconn=(PGconn*) this->connection();
@@ -2880,10 +2998,10 @@ bool var::hasnext() const
 
 	Resultclearer clearer(pgresult);
 
-	if (!ok) {
-		this->clearselect();
-		return false;
-	}
+	//if (!ok) {
+	//	this->clearselect();
+	//	return false;
+	//}
 
 	//PQclear(pgresult);
 
@@ -2908,13 +3026,13 @@ bool var::hasnext() const
 	return true;
 }
 
-bool var::readnext(var& key) const
+bool var::readnext(var& key)
 {
 	var valueno;
 	return readnext(key, valueno);
 }
 
-bool var::readnext(var& key, var& valueno) const
+bool var::readnext(var& key, var& valueno)
 {
 
 	//?allow undefined usage like var xyz=xyz.readnext();
@@ -2932,26 +3050,51 @@ bool var::readnext(var& key, var& valueno) const
 	THISISSTRING()
 
 	//readnext through string of keys if provided
-	if ((*this)[-1]==FM) {
+	//Note: code similarity between hasnext and readnext
+	var listid=this->a(3);
+	if (listid)
+	{
+		while (true)
+		{
+			var keyno=this->a(5);
+			keyno++;
 
-		//initialise readnext pointer to 0 (using var_int as pointer)
-		if ((var_typ&pimpl::VARTYP_INT) == 0) {
-			var_int=0;
-			var_typ=var_typ|pimpl::VARTYP_INT;
+			var key_and_mv=this->a(6,keyno);
+
+			//if no more keys, try to get next block of keys, otherwise return false
+			if (key_and_mv.length()==0)
+			{
+
+				//makelist provides one block of keys and nothing in the lists file
+				if (listid==L"%MAKELIST%")
+					return false;
+
+				var lists=*this;
+				if (!lists.open(L"LISTS"))
+					throw MVDBException(L"LISTS file cannot be opened");
+
+				var listno=this->a(4);
+				listno++;
+				listid.fieldstorer(L"*",2,1,listno);
+
+				var block;
+				if (!block.read(lists,listid))
+					return false;
+
+				this->r(4,listno);
+				this->r(5,0);
+				this->r(6,block.lowerer());
+				continue;
+			}
+
+			//bump up the key no pointer
+			this->r(5,keyno);
+
+			//extract and return the key (and mv if present)
+			key=key_and_mv.a(1,1,1);
+			valueno=key_and_mv.a(1,1,2);
+			return true;
 		}
-
-		//increment readnext pointer
-		var_int++;
-
-		//extract next key
-		key=a(var_int);
-
-		//key may be key]valueno
-		valueno=key.a(1,2);
-		key=key.a(1,1);
-
-		//fail if no key
-		return key.length()>0;
 	}
 
 	PGconn* pgconn=(PGconn*) this->connection();
@@ -3067,13 +3210,13 @@ bool var::readnextrecord(var& record, var& key, var& valueno) const
 
 	Resultclearer clearer(pgresult);
 
-	if (!ok) {
-		// end the transaction
-		// no more
-		//committrans();
-		this->clearselect();
-		return false;
-	}
+	//if (!ok) {
+	//	// end the transaction
+	//	// no more
+	//	//committrans();
+	//	this->clearselect();
+	//	return false;
+	//}
 
 	//MUST call PQclear(pgresult) on all paths below
 

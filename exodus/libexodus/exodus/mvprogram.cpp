@@ -19,10 +19,29 @@ DLL_PUBLIC
 ExodusProgramBase::~ExodusProgramBase() {
 };
 
-
 bool ExodusProgramBase::select(const var& sortselectclause)
 {
 	return CURSOR.select(sortselectclause);
+}
+
+bool ExodusProgramBase::savelist(const var& listname)
+{
+	return CURSOR.savelist(listname.field(L" ",1));
+}
+
+bool ExodusProgramBase::getlist(const var& listname)
+{
+	return CURSOR.getlist(listname.field(L" ",1));
+}
+
+bool ExodusProgramBase::makelist(const var& listname, const var& keys)
+{
+	return CURSOR.makelist(listname.field(L" ",1), keys);
+}
+
+bool ExodusProgramBase::deletelist(const var& listname)
+{
+	return CURSOR.deletelist(listname.field(L" ",1));
 }
 
 void ExodusProgramBase::clearselect()
