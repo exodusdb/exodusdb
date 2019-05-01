@@ -410,18 +410,19 @@ bool var::locateby(const char* ordercode, const var& target, var& setting, const
 //this version caters for the rare syntax where the order is given as a variable
 bool var::locatebyusing(const var& ordercode, const var& usingchar, const var& target, var& setting, const int fieldno/*=0*/, const int valueno/*=0*/)const
 {
-	THISIS(L"bool var::locatebyusing(const var& ordercode, const var& usingchar, const var& target, var& setting, const int fieldno, const int valueno/*=0*/)const")
+	THISIS(L"bool var::locatebyusing(const var& ordercode, const var& usingchar, const var& target, var& setting, const int fieldno//*=0*//, const int valueno//*=0*//)const")
 	ISSTRING(ordercode)
 	ISSTRING(usingchar)
 
-	return locatebyusing(ordercode.toString().c_str(), usingchar.toString().c_str(), target, setting, fieldno, valueno);
+	//return locatebyusing(ordercode.toString().c_str(), usingchar.toString().c_str(), target, setting, fieldno, valueno);
+	return locatex(target.var_str, ordercode.toString().c_str(), usingchar.var_str[0], setting, fieldno, valueno, 0);
 }
 
 //specialised const wchar_t version of ordercode for speed of usual syntax where ordermode is given as string
 //it avoids the conversion from string to var and back again
 bool var::locatebyusing(const char* ordercode, const char* usingchar, const var& target, var& setting, const int fieldno/*=0*/, const int valueno/*=0*/) const
 {
-	THISIS(L"bool var::locateby(const char* ordercode, const var& target, var& setting, const int fieldno, const int valueno/*=0*/) const")
+	THISIS(L"bool var::locatebyusing(const char* ordercode, const char* usingchar, const var& target, var& setting, const int fieldno//*=0*//, const int valueno//*=0*//) const")
 	THISISSTRING()
 	ISSTRING(target)
 	ISDEFINED(setting)
@@ -454,9 +455,9 @@ bool var::locateusing(const var& usingchar, const var& target) const
 	return locatex(target.var_str,"",usingchar.var_str.c_str()[0],setting,0,0,0);
 }
 
-bool var::locateusing(const var& usingchar, const var& target, var& setting, const int fieldno,const int valueno/*=0*/, const int subvalueno/*=0*/) const
+bool var::locateusing(const var& usingchar, const var& target, var& setting, const int fieldno/*=0*/,const int valueno/*=0*/, const int subvalueno/*=0*/) const
 {
-	THISIS(L"bool var::locateusing(const var& usingchar, const var& target, var& setting, const int fieldno,const int valueno/*=0*/, const int subvalueno/*=0*/) const")
+	THISIS(L"bool var::locateusing(const var& usingchar, const var& target, var& setting, const int fieldno/*=0*/, const int valueno/*=0*/, const int subvalueno/*=0*/) const")
 	THISISSTRING()
 	ISSTRING(target)
 	ISSTRING(usingchar)
@@ -467,7 +468,7 @@ bool var::locateusing(const var& usingchar, const var& target, var& setting, con
 }
 
 //locate within extraction
-bool var::locatex(const std::wstring& target,const char* ordercode,const wchar_t usingchar,var& setting, int fieldno,int valueno,const int subvalueno) const
+bool var::locatex(const std::wstring& target, const char* ordercode, const wchar_t usingchar, var& setting, int fieldno, int valueno, const int subvalueno) const
 {
 	//private - assume everything is defined/assigned correctly
 

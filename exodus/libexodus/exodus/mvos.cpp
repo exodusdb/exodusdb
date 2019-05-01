@@ -1483,7 +1483,9 @@ const std::string var::to_cmd_string() const{
 
 	//while converting from DOS convert all backslashes in first word to forward slashes on linux or leave as if exodus on windows
 
-	if (this->index(L"\\"))
+	//warning if any backslashes unless at least one of them is followed by $ which indicates valid usage as an escape character
+	//aiming to recode all old windows-only code
+	if (this->index(L"\\") && !this->index(L"\\$"))
 		this->errputl(L"WARNING BACKSLASHES IN OS COMMAND:");
 
 	return this->field(L" ",1).to_path_string() + " " + this->field(L" ",2,999999).toString();

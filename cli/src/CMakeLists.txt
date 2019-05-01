@@ -24,6 +24,8 @@ link_directories(${CMAKE_CURRENT_SOURCE_DIR}../../exodus/libexodus/exodus)
 #target_link_libraries(
 #install(
 
+### DONT FORGET TO ADD TO ALL STAGES (1, 2 AND 3) ###
+
 add_executable(compile compile.cpp)
 add_executable(createfile createfile.cpp)
 add_executable(createindex createindex.cpp)
@@ -40,6 +42,7 @@ set_target_properties(exodus-cli PROPERTIES OUTPUT_NAME exodus)
 
 add_executable(list list.cpp printtext.h)
 add_executable(listfiles listfiles.cpp)
+add_executable(listdict listdict.cpp)
 add_executable(listindexes listindexes.cpp)
 add_executable(testsort testsort.cpp)
 add_executable(configexodus configexodus.cpp)
@@ -62,6 +65,7 @@ target_link_libraries(edic exodus stdc++fs ${LIBS})
 target_link_libraries(exodus-cli exodus stdc++fs ${LIBS})
 target_link_libraries(list exodus stdc++fs ${LIBS})
 target_link_libraries(listfiles exodus stdc++fs ${LIBS})
+target_link_libraries(listdict exodus stdc++fs ${LIBS})
 target_link_libraries(listindexes exodus stdc++fs ${LIBS})
 target_link_libraries(testsort exodus stdc++fs ${LIBS})
 target_link_libraries(configexodus exodus stdc++fs ${LIBS})
@@ -81,6 +85,7 @@ edic
 exodus-cli
 list
 listfiles
+listdict
 listindexes
 testsort
 configexodus

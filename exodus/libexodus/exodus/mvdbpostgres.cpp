@@ -788,6 +788,46 @@ bool var::read(const var& filehandle,const var& key)
 		return false;
 	}
 
+	//reading a magic special key returns all keys in the file in natural order
+	if (key==L"%RECORDS%")
+	{
+		var sql=L"SELECT key from " ^ filehandle.a(1).convert(L".",L"_") ^ L";";
+
+		PGconn* pgconn=(PGconn*) this->connection();
+		if (pgconn==NULL)
+			return L"";
+
+		PGresultptr pgresult;
+		bool ok=getpgresult(sql,pgresult, pgconn);
+
+		Resultclearer clearer(pgresult);
+
+		if (!ok)
+			return L"";
+
+		(*this)=L"";
+		var keyn;
+		int ntuples=PQntuples(pgresult);
+		for (int tuplen=0; tuplen<ntuples; tuplen++) {
+			if (!PQgetisnull(pgresult, tuplen, 0)) {
+				//filenames^= FM ^ wstringfromUTF8((UTF8*)PQgetvalue(pgresult, filen, 0), PQgetlength(pgresult, filen, 0));
+				var key=getresult(pgresult, tuplen, 0);
+				if (this->length()<=65535)
+				{
+					if (!this->locatebyusing(L"AR",FM_,key,keyn))
+						this->inserter(keyn,key);
+				}
+				else
+				{
+					this->var_str.push_back(FM_);
+					this->var_str.append(key.var_str);
+				}
+			}
+		}
+		this->setlasterror();
+		return true;
+	}
+
 	//$parameter array
 	const char*	paramValues[1];
 	int		paramLengths[1];

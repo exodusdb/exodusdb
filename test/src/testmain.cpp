@@ -57,6 +57,22 @@ function main()
 	printl("wchar_t:  ",(int)sizeof(wchar_t));
 	printl("var:      ",(int)sizeof(var));
 
+
+	//multivalued conversions performed one after the other
+	assert(oconv(1234.567,"MD20P" _VM_ "[NUMBER]" _VM_ "[TAGHTML,TD]")=="<TD>1,234.57</TD>");
+
+        var sort="a" _FM_ "b" _FM_ "d";
+        var sortn;
+        sort.locatebyusing("AL",FM,"b",sortn);
+        assert(sortn==2);
+        sort.locatebyusing("AL",FM,"c",sortn);
+        assert(sortn==3);
+
+        sort.locateusing(FM,"b",sortn);
+        assert(sortn==2);
+        sort.locateusing(FM,"c",sortn);
+        assert(sortn==4);
+
 	var d1=1.2;
 	d1++;
 	assert(d1==2.2);
