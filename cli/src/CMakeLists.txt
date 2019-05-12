@@ -35,6 +35,7 @@ add_executable(deletefile deletefile.cpp)
 add_executable(deleteindex deleteindex.cpp)
 add_executable(edir edir.cpp)
 add_executable(edic edic.cpp)
+add_executable(dict2sql dict2sql.cpp)
 
 #name is name only ... input and output files are exodus
 add_executable(exodus-cli exodus.cpp)
@@ -62,6 +63,7 @@ target_link_libraries(deletefile exodus stdc++fs ${LIBS})
 target_link_libraries(deleteindex exodus stdc++fs ${LIBS})
 target_link_libraries(edir exodus stdc++fs ${LIBS})
 target_link_libraries(edic exodus stdc++fs ${LIBS})
+target_link_libraries(dict2sql exodus stdc++fs ${LIBS})
 target_link_libraries(exodus-cli exodus stdc++fs ${LIBS})
 target_link_libraries(list exodus stdc++fs ${LIBS})
 target_link_libraries(listfiles exodus stdc++fs ${LIBS})
@@ -82,6 +84,7 @@ deletefile
 deleteindex
 edir
 edic
+dict2sql
 exodus-cli
 list
 listfiles

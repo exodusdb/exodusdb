@@ -793,7 +793,7 @@ bool var::read(const var& filehandle,const var& key)
 	{
 		var sql=L"SELECT key from " ^ filehandle.a(1).convert(L".",L"_") ^ L";";
 
-		PGconn* pgconn=(PGconn*) this->connection();
+		PGconn* pgconn=(PGconn*) filehandle.connection();
 		if (pgconn==NULL)
 			return L"";
 
@@ -1711,21 +1711,29 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 	if (!dictrec.read(actualdictfile,fieldname))
 	{
 		//try lowercase
-		if (!dictrec.read(actualdictfile,fieldname.lcase()))
+		fieldname.lcaser();
+		if (!dictrec.read(actualdictfile,fieldname))
 		{
 			//try uppercase
-			if (!dictrec.read(actualdictfile,fieldname.ucase()))
+			fieldname.ucaser();
+			if (!dictrec.read(actualdictfile,fieldname))
 			{
 				//try in voc lowercase
-				if (not dictrec.read(L"dict_voc", fieldname.lcase()))
+				fieldname.lcaser();
+				if (not dictrec.read(L"dict_voc",fieldname))
 				{
-					if (fieldname.ucase()==L"@ID")
-						dictrec = L"F" ^ FM ^ L"0" ^ FM ^ L"Ref" ^ FM ^ FM ^ FM ^ FM ^ FM ^ FM ^ L"L" ^ FM ^ 15;
-					else
+					//try in voc uppercase
+					fieldname.ucaser();
+					if (not dictrec.read(L"dict_voc", fieldname))
 					{
-						throw MVDBException(L"getdictexpression() cannot read " ^ fieldname.quote() ^ L" from " ^ actualdictfile.convert(FM,L"^").quote() ^ L" or dict_voc");
-		//				exodus::errputl(L"ERROR: mvdbpostgres getdictexpression() cannot read " ^ fieldname.quote() ^ L" from " ^ actualdictfile.quote());
-						return L"";
+						if (fieldname==L"@ID" || fieldname==L"ID")
+							dictrec = L"F" ^ FM ^ L"0" ^ FM ^ L"Ref" ^ FM ^ FM ^ FM ^ FM ^ FM ^ FM ^ L"L" ^ FM ^ 15;
+						else
+						{
+							throw MVDBException(L"getdictexpression() cannot read " ^ fieldname.quote() ^ L" from " ^ actualdictfile.convert(FM,L"^").quote() ^ L" or dict_voc");
+		//					exodus::errputl(L"ERROR: mvdbpostgres getdictexpression() cannot read " ^ fieldname.quote() ^ L" from " ^ actualdictfile.quote());
+							return L"";
+						}
 					}
 				}
 			}
@@ -1746,7 +1754,6 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 		var params;
 		var ismv1=dictrec.a(4)[1] == L"M";
 		if (fieldno) {
-
 
 			//TODO implement multivalue unnest for symbolic fields as well
 			if (ismv1)
@@ -1781,7 +1788,7 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 
 				//dont include more than once, in case order by and filter on the same field
 				if (!joins.index(phrase))
-					joins ^= L", " ^ phrase;
+					joins ^= L"\n" ^ phrase;
 
 				return sqlexpression;
 			}
@@ -1801,7 +1808,7 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 				//sqlexpression=L"exodus_extract_sort(" ^  fileexpression(mainfilename, filename,L"key") ^ L")";
 				sqlexpression=L"exodus_extract_sort(" ^ mainfilename ^ L".key,0,0,0)";
 			else
-		sqlexpression=L"convert_from(" ^ fileexpression(mainfilename, filename, L"key") ^ L", 'UTF8')";
+			sqlexpression=L"convert_from(" ^ fileexpression(mainfilename, filename, L"key") ^ L", 'UTF8')";
 
 			//multipart key
 			var keypartn=dictrec.a(5);
@@ -1848,6 +1855,11 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 		}
 
 		var functionx=dictrec.a(8).trim();
+		if (functionx.index(L"/" L"*plsql")) {
+			sqlexpression=actualdictfile.a(1) ^ L"_" ^ fieldname ^ L"(" ^ mainfilename ^ L".key, " ^ mainfilename ^ L".data)";
+			return sqlexpression;
+		}
+
 		if (functionx.substr(1,11).ucase()==L"@ANS=XLATE(")
 		{
 			functionx.splicer(1,11,L"");
@@ -1909,7 +1921,7 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 				//TODO allow multiple joins to the same file via different keys
 				if (!joins.index(join_part1)) {
 					if (joins)
-						joins^=L", ";
+						joins^=L"\n";
 					joins^=join_part1 ^ join_part2;
 				}
 
@@ -1923,6 +1935,7 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 exodus_call:
 			sqlexpression=L"'" ^ fieldname ^ L"'";
 			sqlexpression=L"exodus_call('exodusservice-" ^ getprocessn() ^ L"." ^ getenvironmentn() ^ L"'::bytea, '" ^ dictfilename.lcase() ^ L"'::bytea, '" ^ fieldname.lcase() ^ L"'::bytea, "^ filename ^ L".key, " ^ filename ^ L".data,0,0)";
+			sqlexpression.outputl(L"sqlexpression=");
 			//TODO apply naturalorder conversion by passing forsort_or_select_or_index option to exodus_call
 		}
 	}
@@ -2276,8 +2289,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		//subexpression combination
 		else if (ucword==L"AND" || ucword==L"OR")
 		{
-			//dont start with AND or OR (or after any bracketed subclause)
-			if (whereclause && !var(L")}").index(whereclause[-1]))
+			//dont start with AND or OR
+			if (whereclause)
 				whereclause ^= L"\n " ^ ucword;
 			continue;
 		}
@@ -2569,7 +2582,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 			}
 
 			whereclause ^= L" " ^ op ^ L" " ^ value;
-			//whereclause.outputl(L"whereclause");
+			//whereclause.outputl(L"whereclause=");
 		}
 
 	}//getword loop
@@ -2622,6 +2635,10 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	//DISTINCT has special fieldnames
 	if (distinctfieldnames)
 		actualfieldnames=distinctfieldnames;
+
+	//remove redundant clauses
+	whereclause.swapper(L"\n AND true",L"");
+	whereclause.swapper(L"true\n AND ",L"");
 
 	//assemble the full sql select statement:	//ALN:TODO: optimize with stringbuffer
 
@@ -3034,35 +3051,29 @@ bool var::hasnext() const
 	}
 
 	PGresultptr pgresult;
-	bool ok=readnextx(*this, pgresult, pgconn, true);
+	bool ok=readnextx(*this, pgresult, pgconn, /*forwards=*/ true);
 
 	Resultclearer clearer(pgresult);
 
-	//if (!ok) {
-	//	this->clearselect();
-	//	return false;
-	//}
-
-	//PQclear(pgresult);
+	if (!ok) {
+		//this->clearselect();
+		return false;
+	}
 
 	/////////////////////////////////
 	//now restore the cursor back one
 	/////////////////////////////////
 
 	PGresultptr pgresult2;
-	ok=readnextx(*this, pgresult2, pgconn, false);
+	ok=readnextx(*this, pgresult2, pgconn, /*forwards=*/ false);
 
 	Resultclearer clearer2(pgresult2);
 
-	if (!ok) {
-		//should always be able to move the cursor backwards if could move it forwards in the code above
-		//hasnext=false
-		return false;
-	}
+	//Note that moving backwards on the first record fails because it returns no rows since it moves the cursor to point ONE BEFORE the first row
+	//if (!ok) {
+	//	return true;
+	//}
 
-	//PQclear(pgresult2);
-
-	//hasnext=true
 	return true;
 }
 
@@ -3144,7 +3155,7 @@ bool var::readnext(var& key, var& valueno)
 	}
 
 	PGresultptr pgresult;
-	bool ok=readnextx(*this, pgresult, pgconn, true);
+	bool ok=readnextx(*this, pgresult, pgconn, /*forwards=*/ true);
 
 	Resultclearer clearer(pgresult);
 
@@ -3246,7 +3257,7 @@ bool var::readnextrecord(var& record, var& key, var& valueno) const
 		return L"";
 
 	PGresultptr pgresult;
-	bool ok=readnextx(*this, pgresult, pgconn, true);
+	bool ok=readnextx(*this, pgresult, pgconn, /*forwards=*/ true);
 
 	Resultclearer clearer(pgresult);
 
@@ -3567,10 +3578,12 @@ var var::flushindex(const var& filename) const
 
 	var sql=L"VACUUM";
 	if (filename)
-		sql^=L" "^filename.lcase();
+		//attribute 1 in case passed a filehandle instead of just filename
+		sql^=L" "^filename.a(1).lcase();
 	sql^=L";";
 	//sql.outputl(L"sql=");
 
+	//TODO perhaps should get connection from filehandle if passed a filehandle
 	PGconn* pgconn=(PGconn*) this->connection();
 	if (pgconn==NULL)
 		return L"";
@@ -3678,7 +3691,7 @@ static bool getpgresult(const var& sql, PGresultptr& pgresult, PGconn * thread_p
 		default:
 
 //#if TRACING >= 1
-			if (sql.field(L" ",1,2) !="FETCH NEXT") {
+			if (sql.field(L" ",1) !="FETCH") {
 				exodus::errputl(L"ERROR: mvdbpostgres pqexec "^var(sql));
 				exodus::errputl(L"ERROR: mvdbpostgres pqexec "^var(PQresStatus(PQresultStatus(pgresult))) ^ L": " ^ var(PQresultErrorMessage(pgresult)));
 			}

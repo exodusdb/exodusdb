@@ -1,9 +1,8 @@
 #include <exodus/library.h>
 libraryinit()
 
-function main(in filename="") {
-	if (filename)
-		flushindex(filename);
+function main() {
+	printl(SENTENCE);
 	return 0;
 }
 

@@ -10,6 +10,7 @@ programinit()
 #include <md_common.h>
 #include <lg_common.h>
 #include <ba_common.h>
+#include <ab_common.h>
 
 function main() {
 
@@ -23,6 +24,7 @@ function main() {
         mv.labelledcommon[md_common_no]=new md_common;
         mv.labelledcommon[lg_common_no]=new lg_common;
         mv.labelledcommon[ba_common_no]=new ba_common;
+        mv.labelledcommon[ab_common_no]=new ab_common;
 
 	//cat ~/arev/dic/*.SQL | psql -h 127.0.0.1 -U exodus exodus
 
@@ -58,7 +60,10 @@ function main() {
 
 	//process no
 	SYSTEM.r(24,PROCESSNO);
-	
+
+	//f5 key
+	PRIORITYINT.r(2,"x");
+
 	//create database dir
 	var datadir="../data/";
 	var databasedir=datadir ^ databasecode;

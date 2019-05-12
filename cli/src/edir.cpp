@@ -31,6 +31,7 @@ function main() {
 
         var filename=COMMAND.a(2);
         var key=COMMAND.a(3);
+        var fieldno=COMMAND.a(4);
 
         //connect to the database
         if (not connect())
@@ -42,29 +43,32 @@ function main() {
                 stop("Cannot open file " ^ filename);
 
         //get the record from the database
-        var record;
-        if (not read(record,file,key)) {
+        var origrecord;
+        if (not read(origrecord,file,key)) {
                 //check if exists in upper or lower case
                 var key2=key.ucase();
                 if (key2 eq key)
                         key2.lcaser();
-                if (read(record,file,key2))
+                if (read(origrecord,file,key2))
                         key=key2;
                 else
-                        record="";
+                        origrecord="";
         }
 
-        //convert to text format
-        record.swapper("\\","\\\\");
-        record.swapper("\n","\\n");
-        record.swapper(FM,"\n");
+        var text=origrecord.a(fieldno);
+        var sepchar=fieldno ? VM : FM;
 
-        //put the record on a temp file in order to edit it
+        //convert to text format
+        text.swapper("\\","\\\\");
+        text.swapper("\n","\\n");
+        text.swapper(sepchar,"\n");
+
+        //put the text on a temp file in order to edit it
         var temposfilename=filename^ "~" ^ key;
         var invalidfilechars=L"\"\'\u00A3$%^&*(){}[]:;#<>?,./\\|";
         temposfilename.lcaser().converter(invalidfilechars,str("-",len(invalidfilechars)));
         temposfilename^=".tmp";
-        oswrite(record,temposfilename);
+        oswrite(text,temposfilename);
 
         //record file update timedate
         var fileinfo=osfile(temposfilename);
@@ -83,28 +87,30 @@ function main() {
                 osdelete(temposfilename);
         } else {
                 //file has been edited
-                var record2;
-                osread(record2,temposfilename);
+                var text2;
+                osread(text2,temposfilename);
 
                 //remove trailing lf or cr or crlf
-                trimmerb(record2,"\r\n");
+                trimmerb(text2,"\r\n");
 
                 //convert to record format
-                record2.swapper("\n",FM);
-                record2.swapper("\\n","\n");
-                record2.swapper("\\\\","\\");
+                text2.swapper("\n",sepchar);
+                text2.swapper("\\n","\n");
+                text2.swapper("\\\\","\\");
 
-                if (record2 ne record) {
+                if (text2 ne text) {
 
                         //print("Ok to update? ");
                         //var reply=inputl();
                         var reply="Y";
 
+			var newrecord=fieldno ? origrecord.r(fieldno,text2) : text2;
+
                         //keep trying to update - perhaps futilely
                         //at least temp file will be left in the directory
                         while (ucase(reply)[1] eq "Y" and true) {
 
-                                if (write(record2,file,key)) {
+                                if (write(newrecord,file,key)) {
                                         printl(filename^" written "^key);
                                         osdelete(temposfilename);
                                         break;

@@ -161,16 +161,18 @@ void ExodusProgramBase::mssg(const var& msg, const var& options) const {
 void ExodusProgramBase::mssg(const var& msg, const var& options, var& buffer, const var& params) const {
 
 	//var interactive = !SYSTEM.a(33);
-	var msg1=msg.convert(L"|" ^ FM ^ VM ^ SM, L"\n\n\n\n");
+	var msg1=msg.convert(L"|" ^ FM ^ VM ^ SM, L"\n\n\n\n").trim(L"\n");
 
 	std::wcout << msg1;
 
-	if (USER4.length() > 8000) {
-		var msg2=L"Aborted MSG()>8000";
-		std::wcout << msg2;
-		USER4 ^= FM ^ msg2;
-	} else {
-		USER4.r(-1, msg1);
+	if (!options.index(L"U")) {
+		if (USER4.length() > 8000) {
+			var msg2=L"Aborted MSG()>8000";
+			std::wcout << msg2;
+			USER4 ^= FM ^ msg2;
+		} else {
+			USER4.r(-1, msg1);
+		}
 	}
 
 	std::wcout << std::endl;
@@ -547,14 +549,14 @@ var ExodusProgramBase::capitalise(const var& str0, const var& mode0,
 
 var ExodusProgramBase::execute(const var& sentence) {
 
-	//TODO pushselect
+	var v1,v2,v3,v4;
+	pushselect(v1, v2, v3, v4);
 
 	var sentence2=sentence.fieldstore(L" ",1,1,sentence.field(L" ",1).lcase());
 
 	var result=perform(sentence);
 
-
-	//TODO popselect
+	popselect(v1, v2, v3, v4);
 
 	return result;
 
