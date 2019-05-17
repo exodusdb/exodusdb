@@ -1,3 +1,5 @@
+//2018 OBSOLETE AND NOT USED - REPLACED BY boost::locale::conv:utf_to_utf
+
 /*
 Copyright (c) 2009 steve.bush@neosys.com
 
@@ -19,8 +21,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-
-//2018 OBSOLETE AND NOT USED - REPLACED BY boost::locale::conv:utf_to_utf
 
 //C4530: C++ exception handler used, but unwind semantics are not enabled. 
 #pragma warning (disable: 4530)

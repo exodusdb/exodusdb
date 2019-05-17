@@ -1658,19 +1658,21 @@ inline var fileexpression(const var& mainfilename, const var& filename, const va
 	//evade warning: unused parameter mainfilename
 	if (false && mainfilename) {}
 
-	var expression=filename ^ L"." ^ keyordata;
-	return expression;
+	//if (filename == mainfilename)
+	//	return keyordata;
+	//else
+		return filename ^ L"." ^ keyordata;
 
 	//if you dont use STRICT in the postgres function declaration/definitions then NULL parameters do not abort functions
 
 	//use COALESCE function in case this is a joined but missing record (and therefore null)
 	//in MYSQL this is the ISNULL expression?
-	//fromdictexpression=L"exodus_extract_bytea(coalesce(L" ^ filename ^ L".data,''::bytea), " ^ xlatefromfieldname.substr(9);
+	//xlatekeyexpression=L"exodus_extract_bytea(coalesce(L" ^ filename ^ L".data,''::bytea), " ^ xlatefromfieldname.substr(9);
 	//if (filename==mainfilename) return expression;
 	//return "coalesce(L" ^ expression ^", ''::bytea)";
 }
 
-var var::getdictexpression(const var& mainfilename, const var& filename, const var& dictfilename, const var& dictfile, const var& fieldname0, var& joins, var& ismv, bool forsort_or_select_or_index) const
+var var::getdictexpression(const var& mainfilename, const var& filename, const var& dictfilename, const var& dictfile, const var& fieldname0, var& joins, var& froms, var& selects, var& ismv, bool forsort_or_select_or_index) const
 {
 
 	var fieldname=fieldname0.convert(L".",L"_");
@@ -1747,59 +1749,14 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 	var isinteger=conversion==L"[NUMBER,0]" || dictrec.a(11)==L"0N" || dictrec.a(11).substr(1,3)==L"0N_";
 	var isdecimal=conversion.substr(1,2)==L"MD" || conversion.substr(1,7)==L"[NUMBER" || dictrec.a(12)==L"FLOAT" || dictrec.a(11).index(L"0N") || dictrec.a(9) == L"R";
 	var isnumeric=isinteger || isdecimal;
+	var ismv1=dictrec.a(4)[1] == L"M";
+	var fromjoin=false;
 
 	var sqlexpression;
 	if (dicttype==L"F")
 	{
-		var params;
-		var ismv1=dictrec.a(4)[1] == L"M";
-		if (fieldno) {
-
-			//TODO implement multivalue unnest for symbolic fields as well
-			if (ismv1)
-			{
-				ismv=true;
-				var sqlexpression=L"mv_field_" ^ fieldno;
-
-				//postgres splitpart(what,separator,partno) is exactly like exodus field and extract functions (except separator can be more than one character)
-				//could use exodus_extract_text instead of split_part here
-
-				//use POSTGRESQL "unnest" to explode multivalues
-				//var phrase=L"unnest(regexp_split_to_array(split_part(convert_from(data,'UTF8'),'" ^ FM ^ L"'," ^ fieldno ^ L"),'"^VM^L"')::float8[])";
-
-				//convert from bytea to text
-				var phrase=L"convert_from(data,'UTF8')";
-
-				//extract field from record
-				phrase=L"split_part(" ^ phrase ^ L",'" ^ FM ^ L"'," ^ fieldno ^ L")";
-
-				//convert multivalues to array
-				phrase=L"string_to_array(" ^ phrase ^ L",'" ^ VM ^ L"'";
-				//Note 3rd argument '' means convert empty multivalues to NULL in the array
-				// otherwise conversion to float will fail
-				if (isnumeric)
-					phrase^=L",'')::float8[]";
-				else
-					phrase^=L")";
-
-				//unnest array into multiple output rows
-				phrase=L"unnest(" ^ phrase ^ L")";
-				phrase^=L" with ordinality as table" ^ fieldno ^ L"( " ^ sqlexpression ^ L", mv)";
-
-				//dont include more than once, in case order by and filter on the same field
-				if (!joins.index(phrase))
-					joins ^= L"\n" ^ phrase;
-
-				return sqlexpression;
-			}
-			else
-			{
-				params=fileexpression(mainfilename, filename, L"data") ^ L"," ^ fieldno ^ L", 0, 0)";
-			}
-		}
-
-		//fieldno=0 or empty
-		else
+		//key field
+		if (!fieldno)
 		{
 
 			var isdate=conversion[1]==L"D" || conversion.substr(1,5)==L"[DATE";
@@ -1825,85 +1782,112 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 			return sqlexpression;
 		}
 
+		var extractargs=fileexpression(mainfilename, filename, L"data") ^ L"," ^ fieldno ^ L", 0, 0)";
+
 		if (conversion.substr(1,9)==L"[DATETIME")
-			sqlexpression=L"exodus_extract_datetime(" ^ params;
+			sqlexpression=L"exodus_extract_datetime(" ^ extractargs;
 
 		else if (conversion[1]==L"D" || conversion.substr(1,5)==L"[DATE")
-			sqlexpression=L"exodus_extract_date(" ^ params;
+			sqlexpression=L"exodus_extract_date(" ^ extractargs;
 
 		else if (conversion.substr(1,2)==L"MT" || conversion.substr(1,5)==L"[TIME")
-			sqlexpression=L"exodus_extract_time(" ^  params;
+			sqlexpression=L"exodus_extract_time(" ^  extractargs;
 
 		//for now (until we have a extract_number/integer/float) that doesnt fail on non-numeric like cast "as integer" and "as float" does
 		//note that we could use exodus_extract_sort for EVERYTHING inc dates/time/numbers etc.
 		//but its large size is perhaps a disadvantage
 		else if (forsort_or_select_or_index)
-			sqlexpression=L"exodus_extract_sort(" ^  params;
+			sqlexpression=L"exodus_extract_sort(" ^  extractargs;
 
 		else if (isnumeric)
-			sqlexpression=L"exodus_extract_number(" ^ params;
+			sqlexpression=L"exodus_extract_number(" ^ extractargs;
 
 		else
-			sqlexpression=L"exodus_extract_text(" ^ params;
+			sqlexpression=L"exodus_extract_text(" ^ extractargs;
 
 	}
 	else if (dicttype==L"S")
 	{
-		sqlexpression=dictrec.a(17);
-		if (sqlexpression) {
-			return sqlexpression;
-		}
 
 		var functionx=dictrec.a(8).trim();
-		if (functionx.index(L"/" L"*plsql")) {
-			sqlexpression=actualdictfile.a(1) ^ L"_" ^ fieldname ^ L"(" ^ mainfilename ^ L".key, " ^ mainfilename ^ L".data)";
-			return sqlexpression;
+
+		//sql expression available
+		sqlexpression=dictrec.a(17);
+		if (sqlexpression) {
+			//return sqlexpression;
 		}
 
-		if (functionx.substr(1,11).ucase()==L"@ANS=XLATE(")
+		//sql function available
+		//eg dict_schedules_PROGRAM_POSITION(key bytea, data bytea)
+		else if (functionx.index(L"/" L"*plsql")) {
+
+			//plsql function name assumed to be like "dictfilename_FIELDNAME()"
+			sqlexpression=actualdictfile.a(1) ^ L"_" ^ fieldname ^ L"(";
+
+			//function arguments are (key,data)
+			sqlexpression^=fileexpression(mainfilename, filename, L"key");
+			sqlexpression^=L", ";
+			sqlexpression^=fileexpression(mainfilename, filename, L"data");
+			sqlexpression^=L")::bytea";
+
+			//return sqlexpression;
+		}
+
+		//simple join
+		else if (functionx.substr(1,11).ucase()==L"@ANS=XLATE(")
 		{
 			functionx.splicer(1,11,L"");
-			var xlatetofilename=functionx.field(L",",1).trim();
-			unquoter_inline(xlatetofilename);
+			//allow for <1,@mv> in arg3 by removing comma
+			functionx.swapper(L",@mv",L"|@mv");
+
+			//arg1 filename
+			var xlatetargetfilename=functionx.field(L",",1).trim().convert(L".",L"_");
+			unquoter_inline(xlatetargetfilename);
+
+			//arg2 key
 			var xlatefromfieldname=functionx.field(L",",2).trim();
-			var xlatetofieldname=functionx.field(L",",3).trim();
+
+			//arg3 target field number/name
+			var xlatetargetfieldname=functionx.field(L",",3).trim();
+
+			//arg4 mode X or C
 			var xlatemode=functionx.field(L",",4).trim().convert(L"'\" )",L"");
+
 			//if the fourth field is 'X', L"X", L"C" or 'C' then
 			//assume we have a good simple xlate functionx and can convert to a JOIN
 			if (xlatemode==L"X" || xlatemode==L"C")
 			{
 
-
-				//determine the expression in the xlate file
-				var& todictexpression=sqlexpression;
-				if (xlatetofieldname.isnum())
+				//determine the expression in the xlate target file
+				//var& todictexpression=sqlexpression;
+				if (xlatetargetfieldname.isnum())
 				{
-					todictexpression=L"exodus_extract_text(" ^ fileexpression(mainfilename, xlatetofilename, L"data") ^ L", " ^ xlatetofieldname ^ L", 0, 0)";
+					sqlexpression=L"exodus_extract_text(" ^ fileexpression(mainfilename, xlatetargetfilename, L"data") ^ L", " ^ xlatetargetfieldname ^ L", 0, 0)";
 				}
 				else
 				{
-					var dictxlatetofile=xlatetofilename;
-					//if (!dictxlatetofile.open(L"DICT",xlatetofilename))
-					//	throw MVDBException(L"getdictexpression() DICT" ^ xlatetofilename ^ L" file cannot be opened");
+					//var dictxlatetofile=xlatetargetfilename;
+					//if (!dictxlatetofile.open(L"DICT",xlatetargetfilename))
+					//	throw MVDBException(L"getdictexpression() DICT" ^ xlatetargetfilename ^ L" file cannot be opened");
 					//var ismv;
-					todictexpression=getdictexpression(filename,xlatetofilename, dictxlatetofile, dictxlatetofile, xlatetofieldname, joins, ismv, forsort_or_select_or_index);
+					sqlexpression=getdictexpression(filename,xlatetargetfilename, xlatetargetfilename, xlatetargetfilename, xlatetargetfieldname, joins, froms, selects, ismv, forsort_or_select_or_index);
 				}
 
 				//determine the join details
-				var fromdictexpression;
+				var xlatekeyexpression;
 				if (xlatefromfieldname.substr(1,8).ucase()==L"@RECORD<")
 				{
-					fromdictexpression=L"exodus_extract_bytea(";
-					fromdictexpression ^= fileexpression(mainfilename, filename,L"data");
-					fromdictexpression ^= L", " ^ xlatefromfieldname.substr(9);
-					fromdictexpression.splicer(-1,1,L"");
-					fromdictexpression ^= var(L", 0").str(3-fromdictexpression.count(',')) ^ L")";
+					xlatekeyexpression=L"exodus_extract_bytea(";
+					xlatekeyexpression ^= filename ^ L".data";
+					xlatekeyexpression ^= L", " ^ xlatefromfieldname.substr(9);
+					xlatekeyexpression.splicer(-1,1,L"");
+					xlatekeyexpression ^= var(L", 0").str(3-xlatekeyexpression.count(',')) ^ L")";
 				}
 //TODO				if (xlatefromfieldname.substr(1,8)==L"FIELD(@ID)
 				else if (xlatefromfieldname[1]==L"{")
 				{
 					xlatefromfieldname=xlatefromfieldname.substr(2).splicer(-1,1,L"");
-					fromdictexpression=getdictexpression(filename, filename, dictfilename, dictfile, xlatefromfieldname, joins, ismv);
+					xlatekeyexpression=getdictexpression(filename, filename, dictfilename, dictfile, xlatefromfieldname, joins, froms, selects, ismv);
 				}
 				else
 				{
@@ -1914,22 +1898,33 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 					return L"";
 				}
 
+				fromjoin=true;
+
+				//joins needs to follow "FROM mainfilename" clause
+				//except for joins based on mv fields which need to follow the unnest function
+				var joinsectionn=ismv ? 2 : 1;
+
 				//add the join
-				var join_part1=L"\nLEFT JOIN\n " ^ xlatetofilename ^ L" ON ";
-				var join_part2=fromdictexpression ^ L" = " ^ xlatetofilename ^ L".key";
+				var join_part1=L"\nLEFT JOIN\n " ^ xlatetargetfilename ^ L" ON ";
+				//var join_part2=xlatekeyexpression ^ L"::bytea = " ^ xlatetargetfilename ^ L".key";
+				var join_part2=xlatetargetfilename ^ L".key = " ^ xlatekeyexpression ^ L"::bytea";
 				//only allow one join per file for now.
 				//TODO allow multiple joins to the same file via different keys
-				if (!joins.index(join_part1)) {
-					if (joins)
-						joins^=L"\n";
-					joins^=join_part1 ^ join_part2;
-				}
+				if (!joins.a(joinsectionn).index(join_part1))
+					joins.r(joinsectionn,-1,join_part1 ^ join_part2);
 
 			} else {
 				//not xlate X or C
 				goto exodus_call;
 			}
 		}
+
+		//FOLLOWING IS CURRENTLY DISABLED
+		//if we get here then we were unable to work out any sql expression or function
+		//so originally we instructed postgres to CALL EXODUS VIA IPC to run exodus subroutines in the context of the calling program.
+		//exodus mvdbpostgres.cpp setup a separate listening thread with a separate pgconnection before calling postgres.
+		//BUT exodus subroutines cannot make request to the db while it is handling a request FROM the db - unless it were to setup ANOTHER threada and pgconnection to handle it.
+		//this is also perhaps SLOW since it has to copy the whole RECORD and ID etc to exodus via IPC for every call!
 		else
 		{
 exodus_call:
@@ -1937,6 +1932,8 @@ exodus_call:
 			sqlexpression=L"exodus_call('exodusservice-" ^ getprocessn() ^ L"." ^ getenvironmentn() ^ L"'::bytea, '" ^ dictfilename.lcase() ^ L"'::bytea, '" ^ fieldname.lcase() ^ L"'::bytea, "^ filename ^ L".key, " ^ filename ^ L".data,0,0)";
 			sqlexpression.outputl(L"sqlexpression=");
 			//TODO apply naturalorder conversion by passing forsort_or_select_or_index option to exodus_call
+
+			return sqlexpression;
 		}
 	}
 	else
@@ -1948,6 +1945,59 @@ exodus_call:
 #endif
 		return L"";
 	}
+
+	//unnest multivalued fields into multiple output rows
+	if (ismv1) {
+
+		ismv=true;
+
+		var from=sqlexpression;
+		//use the fieldname as a sql column name
+		sqlexpression=fieldname;
+
+		//convert multivalues to array
+		if (from.substr(-7)==L"::bytea")
+			from.splicer(-7,7,L"");
+
+//fieldname.outputl(L"fieldname=");
+//filename.outputl(L"filename=");
+//mainfilename.outputl(L"mainfilename=");
+
+
+		//if a mv field requires a join then add it to the SELECT clause
+		//since not known currently how to to do mv joins in the FROM clause
+		//Note the join clause should already have been added to the JOINS for the FROM clause
+		if (fromjoin) {
+
+			//unnest in select clause
+			//from=L"unnest(" ^ from ^ L")";
+			//as FIELDNAME
+			from^=L" as " ^ fieldname;
+
+			//dont include more than once, in case order by and filter on the same field
+			if (!selects.a(1).index(from))
+				selects ^= L", " ^ from;
+
+		} else {
+
+			//var from=L"string_to_array(" ^ sqlexpression ^ L",'" ^ VM ^ L"'";
+			from=L"string_to_array(" ^from ^ L", chr(2045)";
+			//Note 3rd argument '' means convert empty multivalues to NULL in the array
+			// otherwise conversion to float will fail
+			if (isnumeric)
+				from^=L",'')::float8[]";
+			else
+				from^=L")";
+
+			//insert with SMs since expression can contain VMs
+			if (!froms.a(2).locate(fieldname)) {
+				froms.r(2,-1,fieldname);
+				froms.r(3,-1,from);
+			}
+		}
+
+	}
+
 	return sqlexpression;
 }
 
@@ -2142,6 +2192,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	var whereclause=L"";
 	var orderclause=L"";
 	var joins=L"";
+	var froms=L"";
+	var selects=L"";
 	var ismv=false;
 
 	var maxnrecs=L"";
@@ -2251,8 +2303,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		{
 
 			var distinctfieldname=getword(remainingsortselectclause,xx);
-			var distinctexpression=getdictexpression(actualfilename,actualfilename,dictfilename,dictfile,distinctfieldname,joins,ismv,false);
-			var naturalsort_distinctexpression=getdictexpression(actualfilename,actualfilename,dictfilename,dictfile,distinctfieldname,joins,ismv,true);
+			var distinctexpression=getdictexpression(actualfilename,actualfilename,dictfilename,dictfile,distinctfieldname,joins,froms,selects,ismv,false);
+			var naturalsort_distinctexpression=getdictexpression(actualfilename,actualfilename,dictfilename,dictfile,distinctfieldname,joins,froms,selects,ismv,true);
 
 			if (true) {
 				//this produces the right values but in random order
@@ -2273,7 +2325,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		{
 			//next word must be dictid
 			var dictid=getword(remainingsortselectclause,xx);
-			var dictexpression=getdictexpression(actualfilename,actualfilename,dictfilename,dictfile,dictid,joins,ismv,true);
+			var dictexpression=getdictexpression(actualfilename,actualfilename,dictfilename,dictfile,dictid,joins,froms,selects,ismv,true);
 
 			//dictexpression.outputl(L"dictexpression=");
 			//orderclause.outputl(L"orderclause=");
@@ -2330,7 +2382,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 
 			//process the dictionary id
 			var sortable=false;//because indexes are NOT created sortable (exodus_sort()
-			var dictexpression=getdictexpression(actualfilename,actualfilename,dictfilename,dictfile,word1,joins,ismv,false);
+			var dictexpression=getdictexpression(actualfilename,actualfilename,dictfilename,dictfile,word1,joins,froms,selects,ismv,false);
 			var usingnaturalorder=dictexpression.index(L"exodus_extract_sort");
 			var dictid=word1;
 
@@ -2646,9 +2698,24 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	//var sql=L"DECLARE cursor1_" ^ (*this) ^ L" CURSOR WITH HOLD FOR SELECT " ^ actualfieldnames ^ L" FROM ";
 	var sql=L"DECLARE\n cursor1_" ^ this->a(1) ^ L" SCROLL CURSOR WITH HOLD FOR";
 	sql ^= L" \nSELECT\n " ^ actualfieldnames;
+	if (selects) {
+		sql^=selects;
+	}
 	sql ^= L" \nFROM\n " ^ actualfilename;
-	if (joins)
-		sql ^= L" " ^ joins;
+	if (joins.a(1))
+		sql ^= L" " ^ joins.a(1).convert(VM,L"");
+	if (froms){
+		//unnest
+		sql^=L",\n unnest(\n  " ^ froms.a(3).swap(VM,L",\n  ") ^ L")";
+		//as fake tablename
+		sql^=L"\n with ordinality as mvtable1";
+		//brackets allow providing column names for use elsewhere
+		//and renaming of automatic column "ORDINAL" to "mv" for use in SELECT key,mv ... sql statement
+		sql^=L"( " ^ froms.a(2).swap(VM,L", ") ^ L", mv)";
+
+	}
+	if (joins.a(2))
+		sql ^= L" " ^ joins.a(2).convert(VM,L"");
 	if (whereclause)
 		sql ^= L" \nWHERE \n" ^ whereclause;
 	if (orderclause)
@@ -3319,9 +3386,11 @@ bool var::createindex(const var& fieldname, const var& dictfile) const
 
 	//throws if cannot find dict file or record
 	var joins=L"";//throw away - cant index on joined fields at the moment
+	var froms=L"";//throw away - cant index on multi-valued fields at the moment
+	var selects=L"";
 	var ismv;
 	var sortable=false;
-	var dictexpression=getdictexpression(filename,filename,actualdictfile,actualdictfile,fieldname,joins,ismv,false);
+	var dictexpression=getdictexpression(filename,filename,actualdictfile,actualdictfile,fieldname,joins,froms,selects,ismv,false);
 	//dictexpression.outputl(L"dictexp=");stop();
 
 	var sql;
