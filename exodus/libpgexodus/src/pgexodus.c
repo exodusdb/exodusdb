@@ -168,7 +168,7 @@ extern int no_such_variable
 
 /* POSTGRES INTERFACE
 	PG_ARGISNULL(0) tells you if passed a null
-	PG_GETARG_BYTEA_P(n) gives you a pointer to the data structure of parameter n
+	PG_GETARG_TEXT_P(n) gives you a pointer to the data structure of parameter n
 	VARDATA() gives you a pointer to the data region of a struct.
 	VARSIZE() gives you the total size of the structure
 	VARHDRSZ
@@ -200,47 +200,47 @@ but the above will not allow simple unload or updating the DLL without stopping 
 
 -- cut and paste the following SQL to register the functions into postgres --
 
-CREATE OR REPLACE FUNCTION exodus_call(bytea, bytea, bytea, bytea, bytea, int4, int4) RETURNS bytea
+CREATE OR REPLACE FUNCTION exodus_call(text, text, text, text, text, int4, int4) RETURNS text
 AS 'pgexodus', 'exodus_call' LANGUAGE C IMMUTABLE;
 
 CREATE OR REPLACE FUNCTION exodus_extract_bytea(bytea, int4, int4, int4)
 RETURNS bytea AS 'pgexodus', 'exodus_extract_bytea' LANGUAGE C IMMUTABLE;
 
-CREATE OR REPLACE FUNCTION exodus_extract_text(bytea, int4, int4, int4) RETURNS text
+CREATE OR REPLACE FUNCTION exodus_extract_text(text, int4, int4, int4) RETURNS text
 AS 'pgexodus', 'exodus_extract_text' LANGUAGE C IMMUTABLE;
 
-CREATE OR REPLACE FUNCTION exodus_extract_sort(bytea, int4, int4, int4) RETURNS text
+CREATE OR REPLACE FUNCTION exodus_extract_sort(text, int4, int4, int4) RETURNS text
 AS 'pgexodus', 'exodus_extract_sort' LANGUAGE C IMMUTABLE;
 
 -- Remaining functions are STRICT therefore never get called with NULLS
 -- also return NULL if passed zero length strings
 
-CREATE OR REPLACE FUNCTION exodus_extract_text2(bytea, int4, int4, int4) RETURNS text
+CREATE OR REPLACE FUNCTION exodus_extract_text2(text, int4, int4, int4) RETURNS text
 AS 'pgexodus', 'exodus_extract_text2' LANGUAGE C IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION exodus_extract_date(bytea, int4, int4, int4) RETURNS date
+CREATE OR REPLACE FUNCTION exodus_extract_date(text, int4, int4, int4) RETURNS date
 AS 'pgexodus', 'exodus_extract_date' LANGUAGE C IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION exodus_extract_time(bytea, int4, int4, int4) RETURNS time
+CREATE OR REPLACE FUNCTION exodus_extract_time(text, int4, int4, int4) RETURNS time
 AS 'pgexodus', 'exodus_extract_time' LANGUAGE C IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION exodus_extract_datetime(bytea, int4, int4, int4) RETURNS timestamp
+CREATE OR REPLACE FUNCTION exodus_extract_datetime(text, int4, int4, int4) RETURNS timestamp
 AS 'pgexodus', 'exodus_extract_datetime' LANGUAGE C IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION exodus_extract_float8(bytea, int4, int4, int4) RETURNS float8
+CREATE OR REPLACE FUNCTION exodus_extract_float8(text, int4, int4, int4) RETURNS float8
 AS 'pgexodus', 'exodus_extract_float8' LANGUAGE C IMMUTABLE STRICT;
 
 TO REMOVE THE ABOVE DO THE FOLLOWING AS POSTGRES SUPERUSER CONNECTED TO EXODUS DATABASE
 
-drop FUNCTION exodus_call(bytea, bytea, bytea, bytea, bytea, int4, int4) cascade;
+drop FUNCTION exodus_call(text, text, text, text, text, int4, int4) cascade;
 drop FUNCTION exodus_extract_bytea(bytea, int4, int4, int4) cascade;
-drop FUNCTION exodus_extract_text(bytea, int4, int4, int4) cascade;
-drop FUNCTION exodus_extract_sort(bytea, int4, int4, int4) cascade;
-drop FUNCTION exodus_extract_text2(bytea, int4, int4, int4) cascade;
-drop FUNCTION exodus_extract_date(bytea, int4, int4, int4) cascade;
-drop FUNCTION exodus_extract_time(bytea, int4, int4, int4) cascade;
-drop FUNCTION exodus_extract_datetime(bytea, int4, int4, int4) cascade;
-drop FUNCTION exodus_extract_float8(bytea, int4, int4, int4) cascade;
+drop FUNCTION exodus_extract_text(text, int4, int4, int4) cascade;
+drop FUNCTION exodus_extract_sort(text, int4, int4, int4) cascade;
+drop FUNCTION exodus_extract_text2(text, int4, int4, int4) cascade;
+drop FUNCTION exodus_extract_date(text, int4, int4, int4) cascade;
+drop FUNCTION exodus_extract_time(text, int4, int4, int4) cascade;
+drop FUNCTION exodus_extract_datetime(text, int4, int4, int4) cascade;
+drop FUNCTION exodus_extract_float8(text, int4, int4, int4) cascade;
 
 */
 
@@ -303,11 +303,11 @@ exodus_call(PG_FUNCTION_ARGS)
 #define MAXREPLYBYTES 1048576
 
 	//get a pointer to the first parameter (0)
-	bytea *serverid = PG_GETARG_BYTEA_P(0);
-	bytea *tablename = PG_GETARG_BYTEA_P(1);
-	bytea *dictkey = PG_GETARG_BYTEA_P(2);
-	bytea *datakey = PG_GETARG_BYTEA_P(3);
-	bytea *data = PG_GETARG_BYTEA_P(4);
+	text *serverid = PG_GETARG_BYTEA_P(0);
+	text *tablename = PG_GETARG_TEXT_P(1);
+	text *dictkey = PG_GETARG_TEXT_P(2);
+	text *datakey = PG_GETARG_TEXT_P(3);
+	text *data = PG_GETARG_TEXT_P(4);
 	int32 valueno = PG_GETARG_INT32(5);
 	int32 subvalueno = PG_GETARG_INT32(6);
 
@@ -317,15 +317,15 @@ exodus_call(PG_FUNCTION_ARGS)
 	char serverid2[4096];
 	char* presponse;
 	int32 nresponsebytes;
-	bytea* output;
+	text* output;
 
 	/////////////////////
 	//DONT CALL ANYTHING!
 	/////////////////////
 	nresponsebytes=0;
-	output = (bytea*) palloc(VARHDRSZ+nresponsebytes+4);
+	output = (text*) palloc(VARHDRSZ+nresponsebytes+4);
 	SET_VARSIZE(output,VARHDRSZ+nresponsebytes);
-	PG_RETURN_BYTEA_P(output);
+	PG_RETURN_TEXT_P(output);
 
 	//calculate length of pipe data
 	//total length
@@ -479,7 +479,7 @@ exodus_call(PG_FUNCTION_ARGS)
 
 	//elog(WARNING, "exodus_call: palloc'ing");
 	//prepare a new output
-	output = (bytea*) palloc(VARHDRSZ+nresponsebytes+4);
+	output = (text*) palloc(VARHDRSZ+nresponsebytes+4);
 
 	//set the complete size of the output
 	//elog(WARNING, "exodus_call: initialising palloc'ed structure");
@@ -498,7 +498,7 @@ exodus_call(PG_FUNCTION_ARGS)
 	pfree(presponse);
 
 	//elog(WARNING, "exodus_call: returning response");
-	PG_RETURN_BYTEA_P(output);
+	PG_RETURN_TEXT_P(output);
 
 };
 
@@ -555,12 +555,12 @@ Datum
 exodus_extract_text(PG_FUNCTION_ARGS)
 {
 
-	//PG_GETARG_BYTEA_P(n) gives you a pointer to the data structure of parameter n
+	//PG_GETARG_TEXT_P(n) gives you a pointer to the data structure of parameter n
 	//VARDATA() gives you a pointer to the data region of a struct.
 	//VARSIZE() gives you the total size of the structure
 	//VARHDRSZ
 
-	bytea* output;
+	text* output;
 
 	GETINPUTSTARTLENGTH
 /*
@@ -603,7 +603,7 @@ Datum
 exodus_extract_text2(PG_FUNCTION_ARGS)
 {
 
-	//PG_GETARG_BYTEA_P(n) gives you a pointer to the data structure of parameter n
+	//PG_GETARG_TEXT_P(n) gives you a pointer to the data structure of parameter n
 	//VARDATA() gives you a pointer to the data region of a struct.
 	//VARSIZE() gives you the total size of the structure
 	//VARHDRSZ
@@ -638,7 +638,7 @@ Datum
 exodus_extract_date(PG_FUNCTION_ARGS)
 {
 
-	//PG_GETARG_BYTEA_P(n) gives you a pointer to the data structure of parameter n
+	//PG_GETARG_TEXT_P(n) gives you a pointer to the data structure of parameter n
 	//VARDATA() gives you a pointer to the data region of a struct.
 	//VARSIZE() gives you the total size of the structure
 	//VARHDRSZ
@@ -686,7 +686,7 @@ Datum
 exodus_extract_time(PG_FUNCTION_ARGS)
 {
 
-	//PG_GETARG_BYTEA_P(n) gives you a pointer to the data structure of parameter n
+	//PG_GETARG_TEXT_P(n) gives you a pointer to the data structure of parameter n
 	//VARDATA() gives you a pointer to the data region of a struct.
 	//VARSIZE() gives you the total size of the structure
 	//VARHDRSZ
@@ -739,7 +739,7 @@ Datum
 exodus_extract_datetime(PG_FUNCTION_ARGS)
 {
 
-	//PG_GETARG_BYTEA_P(n) gives you a pointer to the data structure of parameter n
+	//PG_GETARG_TEXT_P(n) gives you a pointer to the data structure of parameter n
 	//VARDATA() gives you a pointer to the data region of a struct.
 	//VARSIZE() gives you the total size of the structure
 	//VARHDRSZ
@@ -784,7 +784,7 @@ Datum
 exodus_extract_number(PG_FUNCTION_ARGS)
 {
 
-	//PG_GETARG_BYTEA_P(n) gives you a pointer to the data structure of parameter n
+	//PG_GETARG_TEXT_P(n) gives you a pointer to the data structure of parameter n
 	//VARDATA() gives you a pointer to the data region of a struct.
 	//VARSIZE() gives you the total size of the structure
 	//VARHDRSZ
@@ -853,12 +853,12 @@ Datum
 exodus_extract_sort(PG_FUNCTION_ARGS)
 {
 
-	//PG_GETARG_BYTEA_P(n) gives you a pointer to the data structure of parameter n
+	//PG_GETARG_TEXT_P(n) gives you a pointer to the data structure of parameter n
 	//VARDATA() gives you a pointer to the data region of a struct.
 	//VARSIZE() gives you the total size of the structure
 	//VARHDRSZ
 
-	bytea* output;
+	text* output;
 	int nextrachars;
 	char* inputiter;
 	char* inputlast;

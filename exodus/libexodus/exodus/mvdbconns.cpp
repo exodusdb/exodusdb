@@ -29,7 +29,7 @@ int MvConnectionsCache::add_connection(CACHED_CONNECTION conn_to_cache)
 	boost::mutex::scoped_lock lock(mvconnections_mutex);
 
 	connection_id++;
-	conntbl[connection_id] = MvConnectionEntry(conn_to_cache, new LockTable);
+	conntbl[connection_id] = MvConnectionEntry(conn_to_cache, new LockTable, new RecordCache);
 	return connection_id;
 }
 
@@ -45,6 +45,39 @@ UNORDERED_SET_FOR_LOCKTABLE * MvConnectionsCache::get_lock_table(int index) cons
 	boost::mutex::scoped_lock lock(mvconnections_mutex);
 	CONN_MAP::const_iterator iter = conntbl.find(index);
 	return (UNORDERED_SET_FOR_LOCKTABLE *)(iter == conntbl.end() ? 0 : iter->second.plock_table);
+}
+
+RecordCache* MvConnectionsCache::get_recordcache(int index) const
+{
+	boost::mutex::scoped_lock lock(mvconnections_mutex);
+	CONN_MAP::const_iterator iter = conntbl.find(index);
+	return (RecordCache *)(iter == conntbl.end() ? 0 : iter->second.precordcache);
+}
+
+std::wstring MvConnectionsCache::readrecord(const int connid, const std::wstring filename, const std::wstring key) const
+{
+	auto precordcache=get_recordcache(connid);
+	std::wstring filenameandkey=filename + L"|" + key;
+	auto cacheentry=precordcache->find(filenameandkey);
+	if (cacheentry==precordcache->end())
+		return L"";
+
+	return precordcache->at(filenameandkey);
+}
+
+void MvConnectionsCache::writerecord(const int connid, const std::wstring filename, const std::wstring key, const std::wstring record)
+{
+	auto precordcache=get_recordcache(connid);
+	std::wstring filenameandkey=filename + L"|" + key;
+	(*precordcache)[filenameandkey]=record;
+	return;
+}
+
+void MvConnectionsCache::clearrecordcache(const int connid)
+{
+	auto precordcache=get_recordcache(connid);
+	precordcache->clear();
+	return;
 }
 
 void MvConnectionsCache::del_connection(int index)
@@ -70,6 +103,7 @@ MvConnectionsCache::~MvConnectionsCache()
 	{
 //		del((CACHED_CONNECTION) ix->second.connection);
 		delete ix->second.plock_table;
+		delete ix->second.precordcache;
 	}
 
 	//not sure what this comment means .. scoped lock is designed to autounlock

@@ -766,9 +766,9 @@ var ExodusProgramBase::calculate(const var& dictid) {
 					L"calculate("
 					^ dictid
 					^ L") DICT file variable has not been set");
-		if (not cache_dictrec_.read(DICT, dictid)) {
+		if (not cache_dictrec_.reado(DICT, dictid)) {
 			//try lower case
-			if (not cache_dictrec_.read(DICT, dictid.lcase())) {
+			if (not cache_dictrec_.reado(DICT, dictid.lcase())) {
 
 				//try dict_voc
 				var dictmd;//TODO implement DICTMD to avoid opening
@@ -780,9 +780,9 @@ baddict:
 						^ L") dictionary record not in DICT "
 						^ DICT.quote());
 				}
-				if (not cache_dictrec_.read(dictmd, dictid)) {
+				if (not cache_dictrec_.reado(dictmd, dictid)) {
 					//try lower case
-					if (not cache_dictrec_.read(dictmd, dictid.lcase())) {
+					if (not cache_dictrec_.reado(dictmd, dictid.lcase())) {
 						goto baddict;
 					}
 				}
@@ -794,6 +794,7 @@ baddict:
 		newlibfunc = false;
 
 	var dicttype = cache_dictrec_(1);
+	bool ismv=cache_dictrec_(4)[1]==L"M";
 
 	//F type dictionaries
 	if (dicttype == L"F") {
@@ -804,11 +805,14 @@ baddict:
 			return L"";
 
 		//field no > 0
-		if (fieldno)
-			return RECORD(fieldno, MV);
+		if (fieldno) {
+			if (ismv)
+				return RECORD(fieldno, MV);
+			else
+				return RECORD(fieldno);
 
 		//field no 0
-		else {
+		} else {
 			var keypart = cache_dictrec_(5);
 			if (keypart && keypart.isnum())
 				return ID.field(L"*", keypart);
@@ -833,6 +837,13 @@ baddict:
 								^ L" is not present");
 		}
 
+		//for single valued fields, inform the called routine that MV is 0
+		int savedMV;
+		if (!ismv) {
+			savedMV=MV;
+			MV=0;
+		}
+
 		//return dict_exodusfunctorbase_.calldict();
 		//return ANS;
 
@@ -847,6 +858,10 @@ baddict:
 				CALLMEMBERFUNCTION(*(dict_exodusfunctorbase_.pobject_),
 						((pExodusProgramBaseMemberFunction) (dict_exodusfunctorbase_.pmemberfunction_)))();
 		//std::cout<<"postcall"<<std::endl;
+
+		//restore the MV if necessary
+		if (!ismv)
+			MV=savedMV;
 
 		return ANS;
 

@@ -62,6 +62,8 @@ namespace exodus {
 typedef PGconn * CACHED_CONNECTION;
 typedef void (* DELETER_AND_DESTROYER )(CACHED_CONNECTION/*, UNORDERED_SET_FOR_LOCKTABLE * */);
 
+typedef std::unordered_map<std::wstring, std::wstring> RecordCache;
+
 class MvConnectionEntry		// used as 'second' in pair, stored in connection map
 {
   public:
@@ -70,8 +72,8 @@ class MvConnectionEntry		// used as 'second' in pair, stored in connection map
 	MvConnectionEntry()
 		: flag(0), connection(0), plock_table(0), extra(0)
 	{}
-	MvConnectionEntry(CACHED_CONNECTION connection_, UNORDERED_SET_FOR_LOCKTABLE * LockTable_)
-		: flag(0), connection(connection_), plock_table(LockTable_), extra(0)
+	MvConnectionEntry(CACHED_CONNECTION connection_, UNORDERED_SET_FOR_LOCKTABLE * LockTable_, RecordCache* RecordCache_)
+		: flag(0), connection(connection_), plock_table(LockTable_), extra(0), precordcache(RecordCache_)
 	{}
 
 	//1=entry is in use
@@ -87,6 +89,8 @@ class MvConnectionEntry		// used as 'second' in pair, stored in connection map
 
 	//?
 	int extra;
+
+	RecordCache * precordcache;
 
 };
 
@@ -107,6 +111,10 @@ class MvConnectionsCache
 	//observers
 	CACHED_CONNECTION get_connection(int index) const;
 	UNORDERED_SET_FOR_LOCKTABLE * get_lock_table(int index) const;
+	RecordCache * get_recordcache(int index) const;
+	std::wstring readrecord(const int connid, const std::wstring filename, const std::wstring key) const;
+	void writerecord(const int connid, const std::wstring filename, const std::wstring key, const std::wstring record);
+	void clearrecordcache(const int connid);
 
   private:
 

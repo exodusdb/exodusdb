@@ -716,9 +716,9 @@ x1exit:
 		var words=printing ? L"@LPTR,@CRT" : L"@CRT,@LPTR";
 		for (int ii=1;ii<=2;++ii) {
 			word = words.field(L",",ii);
-			if (not xx.read(DICT, word)) {
+			if (not xx.reado(DICT, word)) {
 				//word.ucaser().outputl();
-				if (not xx.read(DICT, word)) {
+				if (not xx.reado(DICT, word)) {
 					//word.outputl("word not found:");
 					word = L"";
 				}
@@ -748,8 +748,8 @@ x1exit:
 
 		//set column 1 @ID
 		colname(1) = L"@ID";
-		if (not DICT or not coldict(1).read(DICT, L"@ID")) {
-			if (not dict_voc or not coldict(1).read(dict_voc, L"@" L"ID"))
+		if (not DICT or not coldict(1).reado(DICT, L"@ID")) {
+			if (not dict_voc or not coldict(1).reado(dict_voc, L"@" L"ID"))
 				coldict(1) = L"F" ^ FM ^ L"0" ^ FM ^ L"Ref" ^ FM ^ FM ^ FM ^ FM ^ FM ^ FM ^ L"L" ^ FM ^ 15;
 		}
 		if (html)
@@ -1072,7 +1072,7 @@ subroutine process_all_records()
 
 		//read the actual record (TODO sb modify select statement to return the actual columns required)
 		//or skip if disappeared
-		if (not RECORD.read(srcfile, ID))
+		if (not RECORD.reado(srcfile, ID))
 			continue;
 
 		//designed to filter multivalues which are not selected properly
@@ -1468,7 +1468,7 @@ subroutine getwordexit()
 {
 
 	//standardise
-	if (DICT ne L"" and dictrec.read(DICT, word)) {
+	if (DICT ne L"" and dictrec.reado(DICT, word)) {
 		if (dictrec.a(1) eq L"G") {
 			tt = dictrec.a(3);
 			tt.converter(VM, L" ");
@@ -1481,7 +1481,7 @@ subroutine getwordexit()
 		}
 	} else {
 		dictrec = L"";
-		if (dict_voc and dictrec.read(dict_voc, word)) {
+		if (dict_voc and dictrec.reado(dict_voc, word)) {
 			if (dictrec.a(1) eq L"RLIST") {
 				if (dictrec.a(4))
 					word = dictrec.a(4);

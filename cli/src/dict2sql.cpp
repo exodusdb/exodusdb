@@ -1,19 +1,36 @@
 #include <exodus/program.h>
 programinit()
 
+var dictfilename;
+var dictfile;
+
 function main() {
 
-	var dictfilename=field(SENTENCE," ",2).lcase();
+	dictfilename=field(SENTENCE," ",2).lcase();
 	if (dictfilename.substr(1,5) ne "dict_")
 		dictfilename.splicer(1,0,"dict_");
-	var dictfile;
+	dictfile;
 	if (!open(dictfilename,dictfile)) {
 		call fsmsg();
 		stop();
 	}
 
-	//get the dict record
 	var dictid=field(SENTENCE," ",3);
+	if (dictid)
+		makelist("",dictid);
+	else
+		select(dictfilename);
+
+	while (readnext(dictid)) {
+		doone(dictid);
+	}
+
+	return 0;
+}
+
+subroutine doone(io dictid) {
+
+	//get the dict record
 	var dictrec;
 	if (!dictrec.read(dictfile,dictid)) {
 		dictid.ucaser();
@@ -23,8 +40,10 @@ function main() {
 
 	//remove anything before sql code
 	var pos=index(dictrec,"/" "*plsql");
-	if (!pos)
-		stop(quote(dictfilename)^" "^quote(dictid)^" does not have any plsql section");
+	if (!pos) {
+		//stop(quote(dictfilename)^" "^quote(dictid)^" does not have any plsql section");
+		return;
+	}
 	var sql=dictrec.substr(pos+8);
 
 	//remove anything after sql code
@@ -36,7 +55,7 @@ function main() {
 	sql.converter(VM,"\n");
 
 	var plsql=R"V0G0N(
-CREATE OR REPLACE FUNCTION $functionname(key bytea, data bytea)
+CREATE OR REPLACE FUNCTION $functionname(key text, data text)
 RETURNS text AS
 $$
 DECLARE
@@ -63,14 +82,15 @@ COST 10;
 	var functionname=dictfilename^"_"^dictid;
 	plsql.swapper("$functionname",functionname);
 
-	plsql.outputl();
+	dictid.outputl();
+	//plsql.outputl();
 
 	var errmsg;
 	var().sqlexec(plsql,errmsg);
 
 	if (errmsg)
 		errmsg.outputl();
-	return 0;
+	return;
 }
 
 programexit()

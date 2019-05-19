@@ -86,7 +86,7 @@ THE SOFTWARE.
 //#include <postgresql/libpq-fe.h>//in postgres/include
 #include <libpq-fe.h>//in postgres/include
 
-#include <arpa/inet.h>//for ntohl()
+//#include <arpa/inet.h>//for ntohl()
 #define MV_NO_NARROW
 
 //#include "MurmurHash2_64.h"			// it has included in mvdbconns.h (uint64_t defined)
@@ -138,8 +138,8 @@ bool getdbtrace()
 // on samples in src/tutorial/funcs_new.c)
 
 //SQL EXAMPLES
-//create or replace view testview as select exodus_extract_bytea(data,1,0,0) as field1 from test;
-//create index testfield1 on test (exodus_extract_bytea(data,1,0,0));
+//create or replace view testview as select exodus_extract_text(data,1,0,0) as field1 from test;
+//create index testfield1 on test (exodus_extract_text(data,1,0,0));
 //select * from testview where field1  > 'aaaaaaaaa';
 //analyse;
 //explain select * from testview where field1  > 'aaaaaaaaa';
@@ -670,14 +670,14 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/)
 		//$ parameter array
 		const char*	paramValues[1];
 		int		paramLengths[1];
-		int		paramFormats[1];
+		//int		paramFormats[1];
 
 		//filename.outputl(L"filename=");
 		//$1=table_name
 		std::string filename2=filename.lcase().convert(L".",L"_").toString();
 		paramValues[0] = filename2.c_str();
 		paramLengths[0] = int(filename2.length());
-		paramFormats[0] = 1;//binary
+		//paramFormats[0] = 1;//binary
 
 		//avoid any errors because ANY errors while a transaction is in progress cause failure of the whole transaction
 		//TODO should perhaps prepare pg parameters for repeated speed
@@ -697,8 +697,10 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/)
 			NULL,	/* let the backend deduce param type */
 			paramValues,
 			paramLengths,
-			paramFormats,
-			1);	  /* ask for binary results */
+			0,			//text arguments
+			0);			//text results
+			//paramFormats,
+			//1);	  /* ask for binary results */
 
 		Resultclearer clearer(pgresult);
 
@@ -767,6 +769,35 @@ bool var::readv(const var& filehandle, const var& key, const int fieldno)
 	return true;
 }
 
+bool var::reado(const var& filehandle, const var& key)
+{
+	//THISIS(L"bool var::reado(const var& filehandle, const var& key, const int fieldno)")
+
+	//check cache first, and return any cached record
+	//virtually identical code in read and write
+	int connid = filehandle.getconnectionid_ordefault();
+	if (!connid)
+		throw MVDBException(L"getconnectionid() failed");
+	std::wstring cachedrecord=mv_connections_cache.readrecord(connid,filehandle.a(1).var_str,key.var_str);
+	if (!cachedrecord.empty())
+	{
+		//key.outputl(L"cache read " ^ filehandle.a(1) ^ L"=");
+		(*this)=cachedrecord;
+		this->setlasterror();
+		return true;
+	}
+
+	//ordinary read
+	if (!read(filehandle,key))
+		return false;
+
+	//save in cache only when allowing read from cache
+	//so that ordinary reads dont cause caching for safety
+	mv_connections_cache.writerecord(connid,filehandle.a(1).var_str,key.var_str,var_str);
+
+	return true;
+}
+
 bool var::read(const var& filehandle,const var& key)
 {
 	THISIS(L"bool var::read(const var& filehandle,const var& key)")
@@ -808,8 +839,10 @@ bool var::read(const var& filehandle,const var& key)
 		(*this)=L"";
 		var keyn;
 		int ntuples=PQntuples(pgresult);
-		for (int tuplen=0; tuplen<ntuples; tuplen++) {
-			if (!PQgetisnull(pgresult, tuplen, 0)) {
+		for (int tuplen=0; tuplen<ntuples; tuplen++)
+		{
+			if (!PQgetisnull(pgresult, tuplen, 0))
+			{
 				//filenames^= FM ^ wstringfromUTF8((UTF8*)PQgetvalue(pgresult, filen, 0), PQgetlength(pgresult, filen, 0));
 				var key=getresult(pgresult, tuplen, 0);
 				if (this->length()<=65535)
@@ -828,10 +861,15 @@ bool var::read(const var& filehandle,const var& key)
 		return true;
 	}
 
+	//get filehandle specific connection or fail
+	PGconn* thread_pgconn = (PGconn*) filehandle.connection();
+	if (!thread_pgconn)
+		return false;
+
 	//$parameter array
 	const char*	paramValues[1];
 	int		paramLengths[1];
-	int		paramFormats[1];
+	//int		paramFormats[1];
 	//uint32_t	binaryIntVal;
 
 	//lower case key if reading from dictionary
@@ -844,14 +882,9 @@ bool var::read(const var& filehandle,const var& key)
 	//$1=key
 	paramValues[0]=key2.c_str();
 	paramLengths[0]=int(key2.length());
-	paramFormats[0]=1;
+	//paramFormats[0]=1;
 
 	var sql=L"SELECT data FROM " ^ filehandle.a(1).convert(L".",L"_") ^ L" WHERE key = $1";
-
-	//get filehandle specific connection or fail
-	PGconn* thread_pgconn = (PGconn*) filehandle.connection();
-	if (!thread_pgconn)
-		return false;
 
 	DEBUG_LOG_SQL1
 	PGresult* pgresult = PQexecParams(thread_pgconn,
@@ -861,8 +894,10 @@ bool var::read(const var& filehandle,const var& key)
 		NULL,	/* let the backend deduce param type */
 		paramValues,
 		paramLengths,
-		paramFormats,
-		1);	  /* ask for binary results */
+		0,			//text arguments
+		0);			//text results
+		//paramFormats,
+		//1);	  /* ask for binary results */
 
 	Resultclearer clearer(pgresult);
 
@@ -898,8 +933,6 @@ bool var::read(const var& filehandle,const var& key)
 
 	// *this=wstringfromUTF8((UTF8*)PQgetvalue(pgresult, 0, 0), PQgetlength(pgresult, 0, 0));
 	*this=getresult(pgresult,0,0);
-
-	//PQclear(pgresult);
 
 	this->setlasterror();
 
@@ -965,7 +998,7 @@ var var::lock(const var& key) const
 	//$1=advisory_lock
 	paramValues[0]=(char*)&hash64;
 	paramLengths[0]=sizeof(uint64_t);
-	paramFormats[0]=1;
+	paramFormats[0]=1;//binary
 
 	const char* sql="SELECT PG_TRY_ADVISORY_LOCK($1)";
 
@@ -1074,14 +1107,14 @@ bool var::unlock(const var& key) const
 		(var(sql) ^ L" " ^ fileandkey).logputl(L"SQL:");
 
 	PGresult* pgresult = PQexecParams(thread_pgconn,
-						//TODO: parameterise filename
-					   sql,
-					   1,	   /* one param */
-					   NULL,	/* let the backend deduce param type */
-					   paramValues,
-					   paramLengths,
-					   paramFormats,
-					   1);	  /* ask for binary results */
+					//TODO: parameterise filename
+					sql,
+					1,	   /* one param */
+					NULL,	/* let the backend deduce param type */
+					paramValues,
+					paramLengths,
+					paramFormats,
+					1);	  /* ask for binary results */
 
 	Resultclearer clearer(pgresult);
 
@@ -1224,17 +1257,17 @@ bool var::write(const var& filehandle, const var& key) const
 	//a 2 parameter array
 	const char*	paramValues[2];
 	int		paramLengths[2];
-	int		paramFormats[2];
+	//int		paramFormats[2];
 
 	//$1 key
 	paramValues[0] = key2.data();
 	paramLengths[0] = int(key2.length());
-	paramFormats[0] = 1;//binary
+	//paramFormats[0] = 1;//binary
 
 	//$2 data
 	paramValues[1] = data2.data();
 	paramLengths[1] = int(data2.length());
-	paramFormats[1] = 1;//binary
+	//paramFormats[1] = 1;//binary
 
 	var sql;
 
@@ -1252,14 +1285,16 @@ bool var::write(const var& filehandle, const var& key) const
 
 	DEBUG_LOG_SQL1
 	PGresult* pgresult = PQexecParams(thread_pgconn,
-						//TODO: parameterise filename
-					   sql.toString().c_str(),
-					   2,				// two params (key and data)
-					   NULL,			// let the backend deduce param type
-					   paramValues,
-					   paramLengths,
-					   paramFormats,
-					   1);				// ask for binary results
+					//TODO: parameterise filename
+					sql.toString().c_str(),
+					2,				// two params (key and data)
+					NULL,			// let the backend deduce param type
+					paramValues,
+					paramLengths,
+					0,			//text arguments
+					0);			//text results
+					//paramFormats,
+					//1);				// ask for binary results
 	Resultclearer clearer(pgresult);
 
 	if (PQresultStatus(pgresult) != PGRES_COMMAND_OK)
@@ -1277,6 +1312,13 @@ bool var::write(const var& filehandle, const var& key) const
 		//PQclear(pgresult);
  		return false;
 	}
+
+	//update cache
+	//virtually identical code in read and write/update/insert/delete
+	int connid = filehandle.getconnectionid_ordefault();
+	if (!connid)
+		throw MVDBException(L"getconnectionid() failed");
+	mv_connections_cache.writerecord(connid,filehandle.a(1).var_str,key.var_str,var_str);
 
 	//PQclear(pgresult);
 	return true;
@@ -1298,17 +1340,17 @@ bool var::updaterecord(const var& filehandle,const var& key) const
 	//a 2 parameter array
 	const char* paramValues[2];
 	int		 paramLengths[2];
-	int		 paramFormats[2];
+	//int		 paramFormats[2];
 
 	//$1=key
 	paramValues[0] = key2.data();
 	paramLengths[0] = int(key2.length());
-	paramFormats[0] = 1;//binary
+	//paramFormats[0] = 1;//binary
 
 	//$2=data
 	paramValues[1] = data2.data();
 	paramLengths[1] = int(data2.length());
-	paramFormats[1] = 1;//binary
+	//paramFormats[1] = 1;//binary
 
 	var sql = L"UPDATE " ^ filehandle.a(1).convert(L".",L"_") ^ L" SET data = $2 WHERE key = $1";
 
@@ -1320,12 +1362,14 @@ bool var::updaterecord(const var& filehandle,const var& key) const
 	PGresult* pgresult = PQexecParams(thread_pgconn,
 		//TODO: parameterise filename
 							  sql.toString().c_str(),
-		2,				// two params (key and data)
+		2,			// two params (key and data)
 		NULL,			// let the backend deduce param type
 		paramValues,
 		paramLengths,
-		paramFormats,	// bytea
-		1);				// ask for binary results
+		0,			//text arguments
+		0);			//text results
+		//paramFormats,	// bytea
+		//1);				// ask for binary results
 	Resultclearer clearer(pgresult);
 
 	if (PQresultStatus(pgresult) != PGRES_COMMAND_OK)
@@ -1351,6 +1395,13 @@ bool var::updaterecord(const var& filehandle,const var& key) const
  		return false;
 	}
 
+	//update cache
+	//virtually identical code in read and write/update/insert/delete
+	int connid = filehandle.getconnectionid_ordefault();
+	if (!connid)
+		throw MVDBException(L"getconnectionid() failed");
+	mv_connections_cache.writerecord(connid,filehandle.a(1).var_str,key.var_str,var_str);
+
 	//PQclear(pgresult);
 	return true;
 
@@ -1371,17 +1422,17 @@ bool var::insertrecord(const var& filehandle,const var& key) const
 	//a 2 parameter array
 	const char* paramValues[2];
 	int		 paramLengths[2];
-	int		 paramFormats[2];
+	//int		 paramFormats[2];
 
 	//$1=key
 	paramValues[0] = key2.data();
 	paramLengths[0] = int(key2.length());
-	paramFormats[0] = 1;//binary
+	//paramFormats[0] = 1;//binary
 
 	//$2=data
 	paramValues[1] = data2.data();
 	paramLengths[1] = int(data2.length());
-	paramFormats[1] = 1;//binary
+	//paramFormats[1] = 1;//binary
 
 	var sql = L"INSERT INTO " ^ filehandle.a(1).convert(L".",L"_") ^ L" (key,data) values( $1 , $2)";
 
@@ -1397,8 +1448,10 @@ bool var::insertrecord(const var& filehandle,const var& key) const
 		NULL,			// let the backend deduce param type
 		paramValues,
 		paramLengths,
-		paramFormats,	// bytea
-		1);				// ask for binary results
+		0,			//text arguments
+		0);			//text results
+		//paramFormats,	// bytea
+		//1);				// ask for binary results
 	Resultclearer clearer(pgresult);
 
 	if (PQresultStatus(pgresult) != PGRES_COMMAND_OK)
@@ -1419,6 +1472,13 @@ bool var::insertrecord(const var& filehandle,const var& key) const
  		return false;
 	}
 
+	//update cache
+	//virtually identical code in read and write/update/insert/delete
+	int connid = filehandle.getconnectionid_ordefault();
+	if (!connid)
+		throw MVDBException(L"getconnectionid() failed");
+	mv_connections_cache.writerecord(connid,filehandle.a(1).var_str,key.var_str,var_str);
+
 	//PQclear(pgresult);
 	return true;
 
@@ -1435,12 +1495,12 @@ bool var::deleterecord(const var& key) const
 	//a one parameter array
 	const char* paramValues[1];
 	int		 paramLengths[1];
-	int		 paramFormats[1];
+	//int		 paramFormats[1];
 
 	//$1=key
 	paramValues[0] = key2.data();
 	paramLengths[0] = int(key2.length());
-	paramFormats[0] = 1;//binary
+	//paramFormats[0] = 1;//binary
 
 	var sql=L"DELETE FROM " ^ this->a(1) ^ L" WHERE KEY = $1";
 
@@ -1455,8 +1515,10 @@ bool var::deleterecord(const var& key) const
 		NULL,	/* let the backend deduce param type */
 		paramValues,
 		paramLengths,
-		paramFormats,
-		1);	  /* ask for binary results */
+		0,			//text arguments
+		0);			//text results
+		//paramFormats,
+		//1);	  /* ask for binary results */
 	Resultclearer clearer(pgresult);
 
 	if (PQresultStatus(pgresult) != PGRES_COMMAND_OK)
@@ -1482,7 +1544,26 @@ bool var::deleterecord(const var& key) const
 
 	//PQclear(pgresult);
 
+	//update cache (set to "" for delete)
+	//virtually identical code in read and write/update/insert/delete
+	int connid = this->getconnectionid_ordefault();
+	if (!connid)
+		throw MVDBException(L"getconnectionid() failed");
+	mv_connections_cache.writerecord(connid,this->a(1).var_str,key.var_str,L"");
+
 	return true;
+}
+
+void var::clearcache() const
+{
+	THISIS(L"bool var::clearcache() const")
+	THISISDEFINED()
+
+	int connid = this->getconnectionid_ordefault();
+	if (!connid)
+		throw MVDBException(L"getconnectionid() failed");
+	mv_connections_cache.clearrecordcache(connid);
+	return;
 }
 
 // If this is opened SQL connection, pass connection ID to sqlexec
@@ -1490,6 +1571,8 @@ bool var::begintrans() const
 {
 	THISIS(L"bool var::begintrans() const")
 	THISISDEFINED()
+
+	this->clearcache();
 
 	//begin a transaction
 	return this->sqlexec(L"BEGIN");
@@ -1500,6 +1583,8 @@ bool var::rollbacktrans() const
 	THISIS(L"bool var::rollbacktrans() const")
 	THISISDEFINED()
 
+	this->clearcache();
+
 	// Rollback a transaction
 	return this->sqlexec(L"ROLLBACK");
 }
@@ -1508,6 +1593,8 @@ bool var::committrans() const
 {
 	THISIS(L"bool var::committrans() const")
 	THISISDEFINED()
+
+	this->clearcache();
 
 	//end (commit) a transaction
 	return this->sqlexec(L"END");
@@ -1590,7 +1677,8 @@ bool var::createfile(const var& filename) const
 	if (filename.substr(-5,5) ==L"_temp")
 		sql ^= L" TEMP ";
 	sql ^= L" TABLE " ^ filename;
-	sql ^= L" (key bytea primary key, data bytea)";
+	//sql ^= L" (key bytea primary key, data bytea)";
+	sql ^= L" (key text primary key, data text)";
 
 	return this->sqlexec(sql);
 }
@@ -1667,9 +1755,9 @@ inline var fileexpression(const var& mainfilename, const var& filename, const va
 
 	//use COALESCE function in case this is a joined but missing record (and therefore null)
 	//in MYSQL this is the ISNULL expression?
-	//xlatekeyexpression=L"exodus_extract_bytea(coalesce(L" ^ filename ^ L".data,''::bytea), " ^ xlatefromfieldname.substr(9);
+	//xlatekeyexpression=L"exodus_extract_text(coalesce(L" ^ filename ^ L".data,''::text), " ^ xlatefromfieldname.substr(9);
 	//if (filename==mainfilename) return expression;
-	//return "coalesce(L" ^ expression ^", ''::bytea)";
+	//return "coalesce(L" ^ expression ^", ''::text)";
 }
 
 var var::getdictexpression(const var& mainfilename, const var& filename, const var& dictfilename, const var& dictfile, const var& fieldname0, var& joins, var& froms, var& selects, var& ismv, bool forsort_or_select_or_index) const
@@ -1765,7 +1853,8 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 				//sqlexpression=L"exodus_extract_sort(" ^  fileexpression(mainfilename, filename,L"key") ^ L")";
 				sqlexpression=L"exodus_extract_sort(" ^ mainfilename ^ L".key,0,0,0)";
 			else
-			sqlexpression=L"convert_from(" ^ fileexpression(mainfilename, filename, L"key") ^ L", 'UTF8')";
+			//sqlexpression=L"convert_from(" ^ fileexpression(mainfilename, filename, L"key") ^ L", 'UTF8')";
+			sqlexpression=fileexpression(mainfilename, filename, L"key");
 
 			//multipart key
 			var keypartn=dictrec.a(5);
@@ -1818,7 +1907,7 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 		}
 
 		//sql function available
-		//eg dict_schedules_PROGRAM_POSITION(key bytea, data bytea)
+		//eg dict_schedules_PROGRAM_POSITION(key text, data text)
 		else if (functionx.index(L"/" L"*plsql")) {
 
 			//plsql function name assumed to be like "dictfilename_FIELDNAME()"
@@ -1828,7 +1917,8 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 			sqlexpression^=fileexpression(mainfilename, filename, L"key");
 			sqlexpression^=L", ";
 			sqlexpression^=fileexpression(mainfilename, filename, L"data");
-			sqlexpression^=L")::bytea";
+			sqlexpression^=L")";
+			//sqlexpression^=L"::bytea";
 
 			//return sqlexpression;
 		}
@@ -1836,6 +1926,8 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 		//simple join
 		else if (functionx.substr(1,11).ucase()==L"@ANS=XLATE(")
 		{
+			functionx=functionx.a(1,1);
+
 			functionx.splicer(1,11,L"");
 			//allow for <1,@mv> in arg3 by removing comma
 			functionx.swapper(L",@mv",L"|@mv");
@@ -1877,7 +1969,8 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 				var xlatekeyexpression;
 				if (xlatefromfieldname.substr(1,8).ucase()==L"@RECORD<")
 				{
-					xlatekeyexpression=L"exodus_extract_bytea(";
+					//xlatekeyexpression=L"exodus_extract_bytea(";
+					xlatekeyexpression=L"exodus_extract_text(";
 					xlatekeyexpression ^= filename ^ L".data";
 					xlatekeyexpression ^= L", " ^ xlatefromfieldname.substr(9);
 					xlatekeyexpression.splicer(-1,1,L"");
@@ -1905,13 +1998,16 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 				var joinsectionn=ismv ? 2 : 1;
 
 				//add the join
-				var join_part1=L"\nLEFT JOIN\n " ^ xlatetargetfilename ^ L" ON ";
-				//var join_part2=xlatekeyexpression ^ L"::bytea = " ^ xlatetargetfilename ^ L".key";
-				var join_part2=xlatetargetfilename ^ L".key = " ^ xlatekeyexpression ^ L"::bytea";
+				var join_part1=L"\n  LEFT JOIN\n   " ^ xlatetargetfilename ^ L" ON ";
+				//var join_part2=xlatekeyexpression ^ L"::text = " ^ xlatetargetfilename ^ L".key";
+				//var join_part2=xlatetargetfilename ^ L".key = " ^ xlatekeyexpression ^ L"::bytea";
+				var join_part2=xlatetargetfilename ^ L".key = " ^ xlatekeyexpression;
 				//only allow one join per file for now.
 				//TODO allow multiple joins to the same file via different keys
 				if (!joins.a(joinsectionn).index(join_part1))
 					joins.r(joinsectionn,-1,join_part1 ^ join_part2);
+
+				return sqlexpression;
 
 			} else {
 				//not xlate X or C
@@ -1929,7 +2025,8 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 		{
 exodus_call:
 			sqlexpression=L"'" ^ fieldname ^ L"'";
-			sqlexpression=L"exodus_call('exodusservice-" ^ getprocessn() ^ L"." ^ getenvironmentn() ^ L"'::bytea, '" ^ dictfilename.lcase() ^ L"'::bytea, '" ^ fieldname.lcase() ^ L"'::bytea, "^ filename ^ L".key, " ^ filename ^ L".data,0,0)";
+			//sqlexpression=L"exodus_call('exodusservice-" ^ getprocessn() ^ L"." ^ getenvironmentn() ^ L"'::bytea, '" ^ dictfilename.lcase() ^ L"'::bytea, '" ^ fieldname.lcase() ^ L"'::bytea, "^ filename ^ L".key, " ^ filename ^ L".data,0,0)";
+			sqlexpression=L"exodus_call('exodusservice-" ^ getprocessn() ^ L"." ^ getenvironmentn() ^ L"', '" ^ dictfilename.lcase() ^ L"', '" ^ fieldname.lcase() ^ L"', "^ filename ^ L".key, " ^ filename ^ L".data,0,0)";
 			sqlexpression.outputl(L"sqlexpression=");
 			//TODO apply naturalorder conversion by passing forsort_or_select_or_index option to exodus_call
 
@@ -1956,8 +2053,8 @@ exodus_call:
 		sqlexpression=fieldname;
 
 		//convert multivalues to array
-		if (from.substr(-7)==L"::bytea")
-			from.splicer(-7,7,L"");
+		//if (from.substr(-7)==L"::bytea")
+		//	from.splicer(-7,7,L"");
 
 //fieldname.outputl(L"fieldname=");
 //filename.outputl(L"filename=");
@@ -1968,6 +2065,8 @@ exodus_call:
 		//since not known currently how to to do mv joins in the FROM clause
 		//Note the join clause should already have been added to the JOINS for the FROM clause
 		if (fromjoin) {
+
+			//this code should never execute as joined mv fields now return the plain sql expression. we assume they are used in WHERE and ORDER BY clauses
 
 			//unnest in select clause
 			//from=L"unnest(" ^ from ^ L")";
@@ -2706,9 +2805,9 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		sql ^= L" " ^ joins.a(1).convert(VM,L"");
 	if (froms){
 		//unnest
-		sql^=L",\n unnest(\n  " ^ froms.a(3).swap(VM,L",\n  ") ^ L")";
+		sql^=L",\n unnest(\n  " ^ froms.a(3).swap(VM,L",\n  ") ^ L"\n )";
 		//as fake tablename
-		sql^=L"\n with ordinality as mvtable1";
+		sql^=L" with ordinality as mvtable1";
 		//brackets allow providing column names for use elsewhere
 		//and renaming of automatic column "ORDINAL" to "mv" for use in SELECT key,mv ... sql statement
 		sql^=L"( " ^ froms.a(2).swap(VM,L", ") ^ L", mv)";
@@ -3267,7 +3366,8 @@ bool var::readnext(var& key, var& valueno)
   //vn is second column	
 	//record is third column
 	if (PQnfields(pgresult)>1)
-		valueno=var((int)ntohl(*(uint32_t*)PQgetvalue(pgresult, 0, 1)));
+		//valueno=var((int)ntohl(*(uint32_t*)PQgetvalue(pgresult, 0, 1)));
+		valueno=getresult(pgresult,0,1);
 	else
 		valueno=0;
 
@@ -3345,8 +3445,10 @@ bool var::readnextrecord(var& record, var& key, var& valueno) const
 	//key=wstringfromUTF8((UTF8*)PQgetvalue(pgresult, 0, 0), PQgetlength(pgresult, 0, 0));
 	key=getresult(pgresult,0,0);
 //TODO return zero if no mv in select because no by mv column
+
 	//vn is second column
-	valueno=var((int)ntohl(*(uint32_t*)PQgetvalue(pgresult, 0, 1)));
+	//valueno=var((int)ntohl(*(uint32_t*)PQgetvalue(pgresult, 0, 1)));
+	valueno=getresult(pgresult,0,1);
 
 	//record is third column
 	if (PQnfields(pgresult)<3) {
@@ -3400,7 +3502,8 @@ bool var::createindex(const var& fieldname, const var& dictfile) const
 
 		//add a new index field
 		var index_fieldname=L"index_" ^ fieldname;
-		sql=L"alter table " ^ filename ^ L" add " ^ index_fieldname ^ L" bytea";
+		//sql=L"alter table " ^ filename ^ L" add " ^ index_fieldname ^ L" bytea";
+		sql=L"alter table " ^ filename ^ L" add " ^ index_fieldname ^ L" text";
 		if (not var().sqlexec(sql)) {
 			sql.outputl(L"sql failed ");
 			return false;
@@ -3628,10 +3731,11 @@ var var::reccount(const var& filename) const
 	//MUST PQclear(pgresult) below
 
 	var reccount=L"";
-if (PQntuples(pgresult) && PQnfields(pgresult)>0 && !PQgetisnull(pgresult, 0, 0))
-{
-reccount=var((int)ntohl(*(uint32_t*)PQgetvalue(pgresult, 0, 0)));
-}
+	if (PQntuples(pgresult) && PQnfields(pgresult)>0 && !PQgetisnull(pgresult, 0, 0))
+	{
+		//reccount=var((int)ntohl(*(uint32_t*)PQgetvalue(pgresult, 0, 0)));
+		reccount=getresult(pgresult, 0, 0);
+	}
 
 	//PQclear(pgresult);
 
@@ -3697,7 +3801,7 @@ static bool getpgresult(const var& sql, PGresultptr& pgresult, PGconn * thread_p
 	//parameter array but no parameters
 	const char* paramValues[1];
 	int		 paramLengths[1];
-	int		 paramFormats[1];
+	//int		 paramFormats[1];
 
 	//PGresult*
 	//will contain any pgresult IF successful
@@ -3709,8 +3813,10 @@ static bool getpgresult(const var& sql, PGresultptr& pgresult, PGconn * thread_p
 		NULL,	/* let the backend deduce param type */
 		paramValues,
 		paramLengths,
-		paramFormats,
-		1);	  /* ask for binary results */
+		0,			//text arguments
+		0);			//text results
+		//paramFormats,
+		//1);	  /* ask for binary results */
 
 	//NO! pgresult is returned to caller to extract any data AND call PQclear(pgresult)
 	//Resultclearer clearer(pgresult);

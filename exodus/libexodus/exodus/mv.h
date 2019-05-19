@@ -1066,6 +1066,7 @@ public:
 	bool rollbacktrans() const;
 	bool committrans() const;
 	bool statustrans() const;
+	void clearcache() const;
 	bool createdb(const var& dbname) const;
 	bool deletedb(const var& dbname) const;
 	bool createdb(const var& dbname, var& errmsg) const;
@@ -1112,6 +1113,7 @@ public:
 	bool unlockall() const;
 
 	bool read(const var& filehandle, const var& key);
+	bool reado(const var& filehandle, const var& key);
 	bool readv(const var& filehandle, const var& key, const int fieldno);
 	bool write(const var& filehandle,const var& key) const;
 	bool writev(const var& filehandle,const var& key,const int fieldno) const;

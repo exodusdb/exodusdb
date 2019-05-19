@@ -2130,7 +2130,7 @@ var var::xlate(const var& filename,const var& fieldno, const wchar_t* mode) cons
 		//read the record
 		var key=(*this).a(1,vn);
 		var record;
-		if (!record.read(file,key))
+		if (!record.reado(file,key))
 		{
 			//if record doesnt exist then "", or original key if mode is "C"
 

@@ -97,7 +97,11 @@ function main() {
 
 	//kick off with initgeneral
         var cmd=SENTENCE.field(" ",2,9999);
-        if (not cmd)
+        if (cmd) {
+        	//sadly cannot access common in subroutine that they are created in
+		//gen.companies="COMPANIES";
+        }
+        else
                 cmd=SENTENCE="initgeneral LOGIN";
         perform(cmd);
 
