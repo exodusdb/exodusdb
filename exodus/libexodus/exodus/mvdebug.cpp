@@ -436,7 +436,7 @@ void SIGINT_handler (int sig)
 		//if (!cmd.input("Interrupted. (C)ontinue (E)xit (B)acktrace (A)bort ?"))
 		fprintf(stderr,"Interrupted. (C)ontinue (E)xit (B)acktrace (A)bort ?");
 		if (!cmd.input())
-			continue;
+			break;
 
 		//only look at first character in uppercase
 		var cmd1=cmd[1].ucase();

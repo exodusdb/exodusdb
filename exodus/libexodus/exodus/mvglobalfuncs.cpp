@@ -952,6 +952,11 @@ DLL_PUBLIC bool read(var& record, const var& filehandle, const var& key)
 	return record.read(filehandle,key);
 }
 
+DLL_PUBLIC bool reado(var& record, const var& filehandle, const var& key)
+{
+	return record.reado(filehandle,key);
+}
+
 DLL_PUBLIC bool readv(var& record, const var& filehandle, const var& key, const var& fieldnumber)
 {
 	return record.readv(filehandle,key,fieldnumber);

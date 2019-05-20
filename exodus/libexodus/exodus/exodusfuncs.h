@@ -230,6 +230,7 @@ DLL_PUBLIC bool open(const var& filename, var& filehandle);
 DLL_PUBLIC bool open(const var& filename);
 //DLL_PUBLIC bool open(const var& dictdata, const var& filename, var& filehandle);
 DLL_PUBLIC bool read(var& record, const var& filehandle, const var& key);
+DLL_PUBLIC bool reado(var& record, const var& filehandle, const var& key);
 DLL_PUBLIC bool matread(dim& dimrecord, const var& filehandle, const var& key);
 DLL_PUBLIC bool readv(var& record, const var& filehandle, const var& key, const var& fieldnumber);
 DLL_PUBLIC bool write(const var& record, const var& filehandle,const var& key);

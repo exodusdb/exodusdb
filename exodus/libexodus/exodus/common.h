@@ -19,6 +19,7 @@ public:
 #define commonexit(COMMON_NAME,COMMON_NO) \
 }; \
 COMMON_NAME##_common&& COMMON_NAME=reinterpret_cast<COMMON_NAME##_common&&> (*mv.labelledcommon[COMMON_NO]);
+//if (!COMMON_NAME) mv.labelledcommon[COMMON_NO]=new COMMON_NAME##_common;
 
 /*
 //works but is hard to to debug since there is no variable gen

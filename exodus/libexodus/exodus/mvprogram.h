@@ -4,6 +4,8 @@
 #include <exodus/mvenvironment.h>
 //#include <exodus/mvfunctor.h>
 
+#include <unordered_map>
+
 namespace exodus {
 
 class ExodusProgramBase
@@ -156,10 +158,11 @@ DLL_PUBLIC
 private:
 
 	//used by calculate to call dict libraries
-	mutable ExodusFunctorBase dict_exodusfunctorbase_;
+	mutable ExodusFunctorBase* dict_exodusfunctorbase_;
 	//TODO cache many not just one
 	mutable var cache_dictid_;
 	mutable var cache_dictrec_;
+	std::unordered_map<std::string,ExodusFunctorBase*> dict_function_cache;
 
 	//used by perform to call libraries WITH NO ARGUMENTS
 	mutable ExodusFunctorBase perform_exodusfunctorbase_;

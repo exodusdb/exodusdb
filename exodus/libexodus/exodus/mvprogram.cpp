@@ -4,6 +4,8 @@
 //putting various member functions into all exodus programs allows access to the mv environment variable which is also available
 //in all exodus programs.
 
+//#include <unordered_map>
+
 namespace exodus {
 
 //constructor with an mvenvironment
@@ -12,6 +14,7 @@ ExodusProgramBase::ExodusProgramBase(MvEnvironment& inmv)
 	:mv(inmv) {
 	cache_dictid_ = L"";
 	cache_perform_libid_ = L"";
+	dict_exodusfunctorbase_=NULL;
 }
 
 //destructor
@@ -752,10 +755,6 @@ var ExodusProgramBase::calculate(const var& dictid) {
 
 	//return ID^L"*"^dictid;
 
-	//wire up the the library linker to have the current mvenvironment
-	//if (!dict_exodusfunctorbase_.mv_)
-		dict_exodusfunctorbase_.mv_ = (&mv);
-
 	//get the dictionary record so we know how to extract the correct field or call the right library
 	bool newlibfunc;
 	bool indictmd=false;
@@ -824,17 +823,38 @@ baddict:
 	} else if (dicttype == L"S") {
 		//TODO deduplicate various exodusfunctorbase code spread around calculate mvipc* etc
 		if (newlibfunc) {
+
 			std::string str_libname;
 			if (indictmd)
 				str_libname = "dict_voc";
 			else
 				str_libname = DICT.a(1).lcase().convert(L".",L"_").toString();
-			std::string str_funcname = (L"exodusprogrambasecreatedelete_" ^ dictid.lcase()).toString();
-			if (!dict_exodusfunctorbase_.initsmf(str_libname.c_str(),str_funcname.c_str()))
-				throw MVException(
+
+			//get from cache
+			std::string cachekey=dictid.lcase().toString()+"_"+str_libname;
+			dict_exodusfunctorbase_=dict_function_cache[cachekey];
+			//if (dict_exodusfunctorbase_) {
+			//	delete dict_exodusfunctorbase_;
+			//	dict_exodusfunctorbase_=NULL;
+			//}
+
+			//if not in cache then create new one
+			if (!dict_exodusfunctorbase_)
+			{
+				//var(cachekey).outputl(L"cachekey=");
+				dict_exodusfunctorbase_=new ExodusFunctorBase;
+				dict_function_cache[cachekey]=dict_exodusfunctorbase_;
+				//wire up the the library linker to have the current mvenvironment
+				//if (!dict_exodusfunctorbase_.mv_)
+				dict_exodusfunctorbase_->mv_ = (&mv);
+
+				std::string str_funcname = (L"exodusprogrambasecreatedelete_" ^ dictid.lcase()).toString();
+				if (!dict_exodusfunctorbase_->initsmf(str_libname.c_str(),str_funcname.c_str()))
+					throw MVException(
 						L"calculate() Cannot find Library " ^ str_libname
-								^ L", or function " ^ dictid.lcase()
-								^ L" is not present");
+						^ L", or function " ^ dictid.lcase()
+						^ L" is not present");
+			}
 		}
 
 		//for single valued fields, inform the called routine that MV is 0
@@ -855,8 +875,8 @@ baddict:
 		//call the shared library object main function with the right args (none for dicts), returning a var
 		//std::cout<<"precall"<<std::endl;
 		ANS =
-				CALLMEMBERFUNCTION(*(dict_exodusfunctorbase_.pobject_),
-						((pExodusProgramBaseMemberFunction) (dict_exodusfunctorbase_.pmemberfunction_)))();
+				CALLMEMBERFUNCTION(*(dict_exodusfunctorbase_->pobject_),
+						((pExodusProgramBaseMemberFunction) (dict_exodusfunctorbase_->pmemberfunction_)))();
 		//std::cout<<"postcall"<<std::endl;
 
 		//restore the MV if necessary
@@ -1402,6 +1422,9 @@ var ExodusProgramBase::oconv(const var& input, const var& conversion) {
 		//either call custom conversion routines
 		if (subconversion[1] == L"[") {
 
+			//var("*").logput();
+			//return 1;
+
 			//extract any params
 			var mode=subconversion.field(L",",2,9999).field(L"]",1);
 
@@ -1428,7 +1451,7 @@ var ExodusProgramBase::oconv(const var& input, const var& conversion) {
 var ExodusProgramBase::iconv(const var& input, const var& conversion) {
 
 	//call user conversion routine
-	//almost identical code in var::iconv and var::iconv
+	//almost identical code in var::oconv and var::iconv
 	//ENSURE synchronised if you change it
 
 	var result=input;

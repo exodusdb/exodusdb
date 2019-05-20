@@ -933,6 +933,8 @@ bool var::read(const var& filehandle,const var& key)
 
 	// *this=wstringfromUTF8((UTF8*)PQgetvalue(pgresult, 0, 0), PQgetlength(pgresult, 0, 0));
 	*this=getresult(pgresult,0,0);
+	// *this=PQgetvalue(pgresult,0,0);
+	// *this=var(L" ").str(100);
 
 	this->setlasterror();
 
@@ -3394,13 +3396,13 @@ bool var::readnext(var& key, var& valueno)
 
 }
 
-bool var::readnextrecord(var& record, var& key) const
+bool var::readnextrecord(var& record, var& key)
 {
 	var valueno=0;
 	return readnextrecord(record, key, valueno);
 }
 
-bool var::readnextrecord(var& record, var& key, var& valueno) const
+bool var::readnextrecord(var& record, var& key, var& valueno)
 {
 
 	//?allow undefined usage like var xyz=xyz.readnextrecord();
@@ -3428,13 +3430,13 @@ bool var::readnextrecord(var& record, var& key, var& valueno) const
 
 	Resultclearer clearer(pgresult);
 
-	//if (!ok) {
-	//	// end the transaction
-	//	// no more
-	//	//committrans();
-	//	this->clearselect();
-	//	return false;
-	//}
+	if (!ok) {
+		// end the transaction
+		// no more
+		//committrans();
+		this->clearselect();
+		return false;
+	}
 
 	//MUST call PQclear(pgresult) on all paths below
 

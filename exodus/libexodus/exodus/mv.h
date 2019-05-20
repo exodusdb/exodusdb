@@ -1102,8 +1102,8 @@ public:
 	bool readnext(var& key, var& valueno);
 
 	bool selectrecord(const var& sortselectclause DEFAULTNULL) const;
-	bool readnextrecord(var& record, var& key) const;
-	bool readnextrecord(var& record, var& key, var& valueno) const;
+	bool readnextrecord(var& record, var& key);
+	bool readnextrecord(var& record, var& key, var& valueno);
 
 	//1=ok, 0=failed, ""=already locked
 	var lock(const var& key) const;
