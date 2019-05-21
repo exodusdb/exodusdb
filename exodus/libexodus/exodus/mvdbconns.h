@@ -62,7 +62,7 @@ namespace exodus {
 typedef PGconn * CACHED_CONNECTION;
 typedef void (* DELETER_AND_DESTROYER )(CACHED_CONNECTION/*, UNORDERED_SET_FOR_LOCKTABLE * */);
 
-typedef std::unordered_map<std::wstring, std::wstring> RecordCache;
+typedef std::unordered_map<std::string, std::string> RecordCache;
 
 class MvConnectionEntry		// used as 'second' in pair, stored in connection map
 {
@@ -112,8 +112,8 @@ class MvConnectionsCache
 	CACHED_CONNECTION get_connection(int index) const;
 	UNORDERED_SET_FOR_LOCKTABLE * get_lock_table(int index) const;
 	RecordCache * get_recordcache(int index) const;
-	std::wstring readrecord(const int connid, const std::wstring filename, const std::wstring key) const;
-	void writerecord(const int connid, const std::wstring filename, const std::wstring key, const std::wstring record);
+	std::string readrecord(const int connid, const std::string filename, const std::string key) const;
+	void writerecord(const int connid, const std::string filename, const std::string key, const std::string record);
 	void clearrecordcache(const int connid);
 
   private:

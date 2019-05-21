@@ -54,21 +54,21 @@ RecordCache* MvConnectionsCache::get_recordcache(int index) const
 	return (RecordCache *)(iter == conntbl.end() ? 0 : iter->second.precordcache);
 }
 
-std::wstring MvConnectionsCache::readrecord(const int connid, const std::wstring filename, const std::wstring key) const
+std::string MvConnectionsCache::readrecord(const int connid, const std::string filename, const std::string key) const
 {
 	auto precordcache=get_recordcache(connid);
-	std::wstring filenameandkey=filename + L"|" + key;
+	std::string filenameandkey=filename + "|" + key;
 	auto cacheentry=precordcache->find(filenameandkey);
 	if (cacheentry==precordcache->end())
-		return L"";
+		return "";
 
 	return precordcache->at(filenameandkey);
 }
 
-void MvConnectionsCache::writerecord(const int connid, const std::wstring filename, const std::wstring key, const std::wstring record)
+void MvConnectionsCache::writerecord(const int connid, const std::string filename, const std::string key, const std::string record)
 {
 	auto precordcache=get_recordcache(connid);
-	std::wstring filenameandkey=filename + L"|" + key;
+	std::string filenameandkey=filename + "|" + key;
 	(*precordcache)[filenameandkey]=record;
 	return;
 }

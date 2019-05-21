@@ -13,17 +13,20 @@ function main() {
 	//global testtime,tempfile,rec
 
 	//declare function esc.to.exit
-	var deletefile = 1;
+	var deletefilex = 1;
 
-	if (deletefile) {
+	var usetransaction=true;
+
+	if (deletefilex) {
 		tempfilename = "BENCHMARK" ^ SYSTEM.a(24);
 	}else{
 		tempfilename = "BENCHMARK.FILESPEED";
 	}
 
+
 	//locate tempfilename in @files using @fm setting x then
-	if (deletefile) {
-		perform("DELETEFILE " ^ tempfilename ^ " (S)");
+	if (deletefilex) {
+		deletefile(tempfilename ^ " (S)");
 	}
 	clearselect();
 	// end
@@ -50,7 +53,7 @@ function main() {
 	var maxtime = "";
 	var avgtime = "";
 	printl(var().chr(12), "writing then deleting ", nreps, " x ", recsize, " byte records ", ntests, " times");
-	printl("     Test" , "\x09" , "Time" , "\x09" , "Min." , "\x09" , "Avg." , "\x09" , "Max.");
+	printl("     Test" , "\t" , "Time" , "\t" , "Min." , "\t" , "Avg." , "\t" , "Max.");
 	var minspeed = 0;
 	var maxspeed = 0;
 	var avgspeed = 0;
@@ -71,7 +74,7 @@ nexttest:
 	}
 
 	//PERFORM 'MAKEFILE ':TEMPFILENAME:' ':recsize:' ':N:' (S)'
-	perform("MAKEFILE " ^ tempfilename ^ " (S)");
+	createfile(tempfilename ^ " (S)");
 	//perform 'SELECT ':tempfilename
 
 	//garbagecollect;
@@ -88,7 +91,8 @@ nexttest:
 
 	starttime = ostime();
 
-	begintrans();
+	if (usetransaction)
+		begintrans();
 
 	//print
 	//print 'Writing 1Kb records'
@@ -110,7 +114,8 @@ nexttest:
 		tempfile.deleterecord(ii);
 	};//ii;
 
-	committrans();
+	if (usetransaction)
+		committrans();
 
 	endtime = ostime();
 
@@ -128,11 +133,11 @@ nexttest:
 	minspeed = (1 / maxtime).oconv("MD20P");
 	avgspeed = (1 / avgtime).oconv("MD20P");
 	maxspeed = (1 / mintime).oconv("MD20P");
-	printl(" ", testn, ". " , "\x09" , testtime.oconv("MD20P") , "\x09" , minspeed , "\x09" , avgspeed , "\x09" , maxspeed);
+	printl(" ", testn, ". " , "\t" , testtime.oconv("MD20P") , "\t" , minspeed , "\t" , avgspeed , "\t" , maxspeed);
 
 	//call note(endtime-starttime:' Seconds')
-	if (deletefile) {
-		perform("DELETEFILE " ^ tempfilename ^ " (S)");
+	if (deletefilex) {
+		deletefile(tempfilename ^ " (S)");
 	}
 
 	goto nexttest;
@@ -140,8 +145,8 @@ nexttest:
 /////
 exit:
 /////
-	if (deletefile) {
-		perform("DELETEFILE " ^ tempfilename ^ " (S)");
+	if (deletefilex) {
+		deletefile(tempfilename ^ " (S)");
 	}
 
 	//msg=''

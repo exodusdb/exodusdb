@@ -31,7 +31,7 @@ THE SOFTWARE.
 
 //to insert code at front of every var member function
 #define THISIS(OBJECT) \
-	static const wchar_t* functionname=OBJECT;
+	static const char* functionname=OBJECT;
 
 //TRY TO PREVENT var abc=abc+1; at runtime since compilers DONT BLOCK IT!!
 //prevent var x=f(x); of any kind since compilers dont block it but runtime behaviour is undefined
@@ -45,13 +45,13 @@ THE SOFTWARE.
 //other words ccould be ISCONSTRUCTED or ISALIVE
 #define ISDEFINED(VARNAME) \
 	if (VARNAME.var_typ&mvtypemask) \
-	throw MVUndefined(var(#VARNAME) ^ L" in " ^ var(functionname)); \
+	throw MVUndefined(var(#VARNAME) ^ " in " ^ var(functionname)); \
 
 //includes isdefined
 #define ISASSIGNED(VARNAME) \
 	ISDEFINED(VARNAME) \
 	if (!VARNAME.var_typ) \
-	throw MVUnassigned(var(#VARNAME) ^ L" in " ^ var(functionname)); \
+	throw MVUnassigned(var(#VARNAME) ^ " in " ^ var(functionname)); \
 
 //includes isdefined directly and checks assigned if not string
 #define ISSTRING(VARNAME) \
@@ -59,7 +59,7 @@ THE SOFTWARE.
 	if (!(VARNAME.var_typ&pimpl::VARTYP_STR)) \
 	{ \
 		if (!VARNAME.var_typ) \
-		throw MVUnassigned(var(#VARNAME) ^ L" in " ^ var(functionname)); \
+		throw MVUnassigned(var(#VARNAME) ^ " in " ^ var(functionname)); \
 		VARNAME.createString(); \
 	}; \
 
@@ -67,21 +67,21 @@ THE SOFTWARE.
 #define ISNUMERIC(VARNAME) \
 	ISASSIGNED(VARNAME) \
 	if (!VARNAME.isnum()) \
-		throw MVNonNumeric(var(functionname) ^ L" : " ^ var(#VARNAME) ^ L" is " ^ VARNAME.substr(1,20).quote()); \
+		throw MVNonNumeric(var(functionname) ^ " : " ^ var(#VARNAME) ^ " is " ^ VARNAME.substr(1,20).quote()); \
 
 //in some bizarre case we cant show contents of variable so put the following line instead of the last one above	
-//	throw MVNonNumeric(var(functionname) ^ L" : " ^ var(#VARNAME));
+//	throw MVNonNumeric(var(functionname) ^ " : " ^ var(#VARNAME));
 
 //see long comment on ISDEFINED
 #define THISISDEFINED() \
 	if (!this||this->var_typ&mvtypemask) \
-		throw MVUndefined(L"var in " ^ var(functionname)); \
+		throw MVUndefined("var in " ^ var(functionname)); \
 
 //includes isdefined
 #define THISISASSIGNED() \
 	THISISDEFINED() \
 	if (!this->var_typ) \
-		throw MVUnassigned(L"var in " ^ var(functionname)); \
+		throw MVUnassigned("var in " ^ var(functionname)); \
 
 //includes isdefined directly and checks assigned if not string
 #define THISISSTRING() \
@@ -89,7 +89,7 @@ THE SOFTWARE.
 	if (!(this->var_typ&pimpl::VARTYP_STR)) \
 	{ \
 		if (!this->var_typ) \
-			throw MVUnassigned(L"var in " ^ var(functionname)); \
+			throw MVUnassigned("var in " ^ var(functionname)); \
 		this->createString(); \
 	}; \
 
@@ -97,13 +97,13 @@ THE SOFTWARE.
 #define THISISNUMERIC() \
 	THISISASSIGNED() \
 	if (!this->isnum()) \
-	throw MVNonNumeric(var(functionname) ^ L" : var is " ^ this->substr(1,20).quote()); \
+	throw MVNonNumeric(var(functionname) ^ " : var is " ^ this->substr(1,20).quote()); \
 
 //includes isassigned which includes ISDEFINED
 #define THISISDECIMAL() \
 	THISISASSIGNED() \
 	if (!this->isnum()) \
-		throw MVNonNumeric(var(functionname) ^ L" : var is " ^ this->substr(1,20).quote()); \
+		throw MVNonNumeric(var(functionname) ^ " : var is " ^ this->substr(1,20).quote()); \
 	if (!(var_typ & pimpl::VARTYP_DBL)) { \
 		var_dbl=double(var_int); \
 		var_typ|=pimpl::VARTYP_DBL; \
@@ -113,7 +113,7 @@ THE SOFTWARE.
 #define THISISINTEGER() \
 	THISISASSIGNED() \
 	if (!this->isnum()) \
-		throw MVNonNumeric(var(functionname) ^ L" : var is " ^ this->substr(1,20).quote()); \
+		throw MVNonNumeric(var(functionname) ^ " : var is " ^ this->substr(1,20).quote()); \
 	if (!(var_typ & pimpl::VARTYP_INT)) { \
 		var_int=mvint_t(var_dbl); \
 		var_typ|=pimpl::VARTYP_INT; \

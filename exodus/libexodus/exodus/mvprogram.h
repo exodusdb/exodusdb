@@ -104,7 +104,7 @@ DLL_PUBLIC
 
 	//moved to mvprogram
 	//var capitalise(const var& str0, const var& mode=var(), const var& wordseps=var()) const;
-	////var capitalise(const var& str0, const var& mode=L"", const var& wordseps=L"") const;
+	////var capitalise(const var& str0, const var& mode="", const var& wordseps="") const;
 
 	void debug() const;
 	bool fsmsg(const var& msg="") const;//always returns false so can be used like return fsmsg();
@@ -131,7 +131,7 @@ DLL_PUBLIC
 //	bool osbreadx(var& str1, const var& filehandle, const var& filename, var& startoffset, const int length);
 
 	//moved to external function
-	//bool authorised(const var& task, var& msg, const var& defaultlock=L"");
+	//bool authorised(const var& task, var& msg, const var& defaultlock="");
 	//bool authorised(const var& task);
 	//void readuserprivs();
 	//void writeuserprivs();

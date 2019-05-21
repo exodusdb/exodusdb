@@ -169,11 +169,11 @@ DLL_PUBLIC var osread(const var& osfilename)
 	if (data.osread(osfilename))
 		return data;
 	else
-		return L"";
+		return "";
 }
 
 //oswrite x on y else
-DLL_PUBLIC bool oswrite(const var& data, const var& osfilename, const var& locale=L"")
+DLL_PUBLIC bool oswrite(const var& data, const var& osfilename, const var& locale="")
 {
 	return data.oswrite(osfilename,locale);
 }
@@ -420,7 +420,7 @@ DLL_PUBLIC void input(const var& prompt, var& inputfield)
 
 DLL_PUBLIC void inputn(var& inputfield, const int nchars)
 {
-	inputfield.input(L"", nchars);
+	inputfield.input("", nchars);
 }
 
 DLL_PUBLIC var len(const var& var1)
@@ -443,12 +443,12 @@ DLL_PUBLIC var convert(const var& instring, const var& oldchars, const var& newc
 	return instring.convert(oldchars,newchars);
 }
 
-DLL_PUBLIC var& swapper(var& instring, const var& from, const var& to, const var& options=L"")
+DLL_PUBLIC var& swapper(var& instring, const var& from, const var& to, const var& options="")
 {
 	return instring.swapper(from, to, options);
 }
 
-DLL_PUBLIC var swap(const var& instring, const var& from, const var& to, const var& options=L"")
+DLL_PUBLIC var swap(const var& instring, const var& from, const var& to, const var& options="")
 {
 	return instring.swap(from,to,options);
 }
@@ -558,32 +558,32 @@ DLL_PUBLIC var cropper(var& instring)
 	return instring.cropper();
 }
 
-DLL_PUBLIC var& trimmer(var& instring, const wchar_t* trimchars)
+DLL_PUBLIC var& trimmer(var& instring, const char* trimchars)
 {
 	return instring.trimmer(trimchars);
 }
 
-DLL_PUBLIC var trim(const var& instring, const wchar_t* trimchars)
+DLL_PUBLIC var trim(const var& instring, const char* trimchars)
 {
 	return instring.trim(trimchars);
 }
 
-DLL_PUBLIC var& trimmerf(var& instring, const wchar_t* trimchars)
+DLL_PUBLIC var& trimmerf(var& instring, const char* trimchars)
 {
 	return instring.trimmerf(trimchars);
 }
 
-DLL_PUBLIC var trimf(const var& instring, const wchar_t* trimchars)
+DLL_PUBLIC var trimf(const var& instring, const char* trimchars)
 {
 	return instring.trimf(trimchars);
 }
 
-DLL_PUBLIC var& trimmerb(var& instring, const wchar_t* trimchars)
+DLL_PUBLIC var& trimmerb(var& instring, const char* trimchars)
 {
 	return instring.trimmerb(trimchars);
 }
 
-DLL_PUBLIC var trimb(const var& instring, const wchar_t* trimchars)
+DLL_PUBLIC var trimb(const var& instring, const char* trimchars)
 {
 	return instring.trimb(trimchars);
 }
@@ -819,7 +819,7 @@ DLL_PUBLIC var field2(const var& instring, const var& substrx,const int fieldnx,
 }
 
 /* moved to mvprogram to allow custom conversions like "[DATE]"
-DLL_PUBLIC var oconv(const var& instring, const wchar_t* conversion)
+DLL_PUBLIC var oconv(const var& instring, const char* conversion)
 {
 	return instring.oconv(conversion);
 }
@@ -829,7 +829,7 @@ DLL_PUBLIC var oconv(const var& instring, const var& conversion)
 	return instring.oconv(conversion);
 }
 
-DLL_PUBLIC var iconv(const var& instring, const wchar_t* conversion)
+DLL_PUBLIC var iconv(const var& instring, const char* conversion)
 {
 	return instring.iconv(conversion);
 }
@@ -875,17 +875,17 @@ DLL_PUBLIC bool deletedb(const var& dbname, var& errmsg)
 
 DLL_PUBLIC bool createfile(const var& filename)
 {
-	return filename.createfile(filename);
+	return filename.createfile(filename.field(" ",1));
 }
 
 DLL_PUBLIC bool deletefile(const var& filename) 
 {
-	return filename.deletefile(filename);
+	return filename.deletefile(filename.field(" ",1));
 }
 
 DLL_PUBLIC bool clearfile(const var& filename)
 {
-	return filename.clearfile(filename);
+	return filename.clearfile(filename.field(" ",1));
 }
 
 DLL_PUBLIC bool renamefile(const var& filename,const var& newfilename) 
@@ -989,7 +989,7 @@ DLL_PUBLIC bool insertrecord(const var& record, const var& filehandle,const var&
 }
 
 /*
-DLL_PUBLIC var xlate(const var& filename, const var& key, const var& fieldno, const wchar_t* mode)
+DLL_PUBLIC var xlate(const var& filename, const var& key, const var& fieldno, const char* mode)
 {
 	return key.xlate(filename, fieldno, mode);
 }
@@ -1156,9 +1156,9 @@ DLL_PUBLIC var listindexes(const var& filename, const var& fieldname)
 }
 
 //one argument returns the contents of an envvar (empty name returns the whole environment)
-DLL_PUBLIC var osgetenv(const var& name=L"")
+DLL_PUBLIC var osgetenv(const var& name="")
 {
-	var temp=L"";
+	var temp="";
 	temp.osgetenv(name);
 	return temp;
 }
@@ -1218,7 +1218,7 @@ int exodus_main(int exodus__argc, char *exodus__argv[], MvEnvironment& mv)
 	global_environments.resize(6);
 	int environmentn=0;
 	mv.init(environmentn);
-	//mv.DICT.outputl(L"DICT=");
+	//mv.DICT.outputl("DICT=");
 	global_environments[environmentn]=&mv;
 
 	mv.EXECPATH=getexecpath();
@@ -1233,16 +1233,16 @@ int exodus_main(int exodus__argc, char *exodus__argv[], MvEnvironment& mv)
 	//if (not EXECPATH.index(SLASH) && not EXECPATH.index(":"))
 	//{
 	//	EXECPATH.splicer(0,0,oscwd()^SLASH);
-	//	if (SLASH==L"\\")
-	//		EXECPATH.converter(L"/",L"\\");
+	//	if (SLASH=="\\")
+	//		EXECPATH.converter("/","\\");
 	//}
 	//leave a copy where backtrace can get at it
 	EXECPATH2=mv.EXECPATH;
 
-	mv.SENTENCE=L"";			//ALN:TODO: hm, again, char->var-> op=(var)
+	mv.SENTENCE="";			//ALN:TODO: hm, again, char->var-> op=(var)
  	//SB #define MV_NO_NARROW disallows accidental narrow now
-	mv.COMMAND=L"";
-	mv.OPTIONS=L"";
+	mv.COMMAND="";
+	mv.OPTIONS="";
 
 	//reconstructs complete original sentence unfortunately quote marks will have been lost unless escaped
 	//needs to go after various exodus definitions
@@ -1255,40 +1255,40 @@ int exodus_main(int exodus__argc, char *exodus__argv[], MvEnvironment& mv)
 		{
 			word=word.field2(SLASH,-1);
 			//remove trailing ".exe"
-			if (word.lcase().substr(-4) == L".exe")
-				word.splicer(-4,4,L"");
+			if (word.lcase().substr(-4) == ".exe")
+				word.splicer(-4,4,"");
 		} else
-			mv.SENTENCE^=L" ";
+			mv.SENTENCE^=" ";
 
 		//put back quotes if any spaces
-		if (word.index(L" "))
+		if (word.index(" "))
 			word.quoter();
 
 		mv.SENTENCE^=word;
 		mv.COMMAND^=FM^word;
 	}
-	mv.COMMAND.splicer(1,1,L"");
+	mv.COMMAND.splicer(1,1,"");
 
 	//options are in either (XXX) or {XXX} at the end of the command.
 	//similar code in exodus_main() and mvprogram.cpp:perform()
 	var lastchar=mv.COMMAND[-1];
 	//if (lastchar==")")
-	//	mv.OPTIONS=mv.COMMAND.field2(L"(",-1);
+	//	mv.OPTIONS=mv.COMMAND.field2("(",-1);
 	//else if (lastchar=="}")
-	//	mv.OPTIONS=mv.COMMAND.field2(L"{",-1);
+	//	mv.OPTIONS=mv.COMMAND.field2("{",-1);
 	//if (mv.OPTIONS)
-	//	mv.COMMAND.splicer(-(len(mv.OPTIONS)+2),len(mv.OPTIONS)+2, L"");
+	//	mv.COMMAND.splicer(-(len(mv.OPTIONS)+2),len(mv.OPTIONS)+2, "");
 	//var lastchar=mv.COMMAND[-1];
 	if (lastchar==")") {
-		mv.OPTIONS=L"(" ^ mv.COMMAND.field2(L"(",-1);
+		mv.OPTIONS="(" ^ mv.COMMAND.field2("(",-1);
 	}
 	else if (lastchar=="}")
-		mv.OPTIONS=L"{" ^ mv.COMMAND.field2(L"{",-1);
+		mv.OPTIONS="{" ^ mv.COMMAND.field2("{",-1);
 	if (mv.OPTIONS)
-		mv.COMMAND.splicer(-(mv.OPTIONS.length()),mv.OPTIONS.length(), L"");
+		mv.COMMAND.splicer(-(mv.OPTIONS.length()),mv.OPTIONS.length(), "");
 
 	var temp;
-	//DBTRACE=osgetenv(L"EXO_DBTRACE",temp)?1:-1;
+	//DBTRACE=osgetenv("EXO_DBTRACE",temp)?1:-1;
 
 	//would have to passed in as a function pointer
 	//main2(exodus__argc, exodus__argv);

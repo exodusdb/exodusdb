@@ -17,25 +17,25 @@ dpkg-reconfigure locales
 */
 
 //non-ASCII unicode characters
-var GreekQuestionMark		=L"\u037E";//GREEK QUESTION MARK (Punctuation)
-var GreekCapitalGamma		=L"\u0393";//GREEK CAPITAL LETTER GAMMA (Letter) (Uppercase)
-var GreekSmallGamma		=L"\u03B3";//GREEK SMALL LETTER GAMMA (Letter) (Lowercase)
-var ArabicIndicDigitZero	=L"\u0660";//ARABIC-INDIC DIGIT ZERO (Decimal Digit)
+var GreekQuestionMark		="\u037E";//GREEK QUESTION MARK (Punctuation)
+var GreekCapitalGamma		="\u0393";//GREEK CAPITAL LETTER GAMMA (Letter) (Uppercase)
+var GreekSmallGamma		="\u03B3";//GREEK SMALL LETTER GAMMA (Letter) (Lowercase)
+var ArabicIndicDigitZero	="\u0660";//ARABIC-INDIC DIGIT ZERO (Decimal Digit)
 
-var GreekSmallAlpha         =L"\u03B1";//GREEK SMALL LETTER ALPHA
-var GreekSmallFinalSigma    =L"\u03C2";//GREEK SMALL LETTER FINAL SIGMA
-var GreekSmallSigma         =L"\u03C3";//GREEK SMALL LETTER SIGMA
-var GreekCapitalSigma       =L"\u03A3";//GREEK CAPITAL LETTER SIGMA
-var GreekCapitalAlpha       =L"\u0391";//GREEK CAPITAL LETTER ALPHA
+var GreekSmallAlpha         ="\u03B1";//GREEK SMALL LETTER ALPHA
+var GreekSmallFinalSigma    ="\u03C2";//GREEK SMALL LETTER FINAL SIGMA
+var GreekSmallSigma         ="\u03C3";//GREEK SMALL LETTER SIGMA
+var GreekCapitalSigma       ="\u03A3";//GREEK CAPITAL LETTER SIGMA
+var GreekCapitalAlpha       ="\u0391";//GREEK CAPITAL LETTER ALPHA
 var Greek_sas               =GreekSmallSigma^GreekSmallAlpha^GreekSmallFinalSigma;
 var Greek_SAS               =GreekCapitalSigma^GreekCapitalAlpha^GreekCapitalSigma;
 
-var TurkishCapitalDottedI   =L"\u0130";
-var TurkishSmallDotlessI    =L"\u0131";
+var TurkishCapitalDottedI   ="\u0130";
+var TurkishSmallDotlessI    ="\u0131";
 var LatinSmallI             ="i";
 var LatinCapitalI           ="I";
 
-var GermanEszet             =L"\u00DF";//German
+var GermanEszet             ="\u00DF";//German
 
 programinit()
 
@@ -46,15 +46,14 @@ function main()
 	printl("Using Exodus library version:"^var().version());
 
 	printl("sizeof");
-	printl("char:     ",(int)sizeof(char));
-	printl("string:   ",(int)sizeof(std::string));
 	printl("int:      ",(int)sizeof(int));
 	printl("long:     ",(int)sizeof(long));
+	printl("float:    ",(int)sizeof(float));
 	printl();
-	printl("wstring:  ",(int)sizeof(std::wstring));
+	printl("string:   ",(int)sizeof(std::string));
 	printl("long long:",(int)sizeof(long long));
 	printl("double:   ",(int)sizeof(double));
-	printl("wchar_t:  ",(int)sizeof(wchar_t));
+	printl("char:     ",(int)sizeof(char));
 	printl("var:      ",(int)sizeof(var));
 
 
@@ -216,24 +215,24 @@ function main()
         var aaa="11"^VM^VM^"13"^VM^FM^"21";
         var bbb="1011"^VM^VM^"1013";
 
-        assert(aaa.mv(":",bbb).convert(_VM_ _FM_, L"]^")=="111011]]131013]^21");
-        assert(aaa.mv("+",bbb).convert(_VM_ _FM_, L"]^")=="1022]0]1026]0^21");
-        assert(aaa.mv("-",bbb).convert(_VM_ _FM_, L"]^")=="-1000]0]-1000]0^21");
-        assert(aaa.mv("*",bbb).convert(_VM_ _FM_, L"]^")=="11121]0]13169]0^0");
+        assert(aaa.mv(":",bbb).convert(_VM_ _FM_, "]^")=="111011]]131013]^21");
+        assert(aaa.mv("+",bbb).convert(_VM_ _FM_, "]^")=="1022]0]1026]0^21");
+        assert(aaa.mv("-",bbb).convert(_VM_ _FM_, "]^")=="-1000]0]-1000]0^21");
+        assert(aaa.mv("*",bbb).convert(_VM_ _FM_, "]^")=="11121]0]13169]0^0");
 
-        assert(bbb.mv(":",aaa).convert(_VM_ _FM_, L"]^")=="101111]]101313]^21");
-        assert(bbb.mv("+",aaa).convert(_VM_ _FM_, L"]^")=="1022]0]1026]0^21");
-        assert(bbb.mv("-",aaa).convert(_VM_ _FM_, L"]^")=="1000]0]1000]0^-21");
-        assert(bbb.mv("*",aaa).convert(_VM_ _FM_, L"]^")=="11121]0]13169]0^0");
+        assert(bbb.mv(":",aaa).convert(_VM_ _FM_, "]^")=="101111]]101313]^21");
+        assert(bbb.mv("+",aaa).convert(_VM_ _FM_, "]^")=="1022]0]1026]0^21");
+        assert(bbb.mv("-",aaa).convert(_VM_ _FM_, "]^")=="1000]0]1000]0^-21");
+        assert(bbb.mv("*",aaa).convert(_VM_ _FM_, "]^")=="11121]0]13169]0^0");
 
         aaa="11"  ^VM^VM^"13"  ^VM^FM^"21";
         bbb="1011"^VM^"0"^VM^"1013"^VM^FM^"2011";
-        printl(aaa.mv("/",bbb).oconv("MD90P").convert(_VM_ _FM_, L"]^"));
-        assert(aaa.mv("/",bbb).oconv("MD90P").convert(_VM_ _FM_, L"]^")=="0.010880317]0.000000000]0.012833169]0.000000000^0.010442566");
+        printl(aaa.mv("/",bbb).oconv("MD90P").convert(_VM_ _FM_, "]^"));
+        assert(aaa.mv("/",bbb).oconv("MD90P").convert(_VM_ _FM_, "]^")=="0.010880317]0.000000000]0.012833169]0.000000000^0.010442566");
 
         aaa=""^VM^"" ^VM^"0"^VM^"0"^VM;
         bbb=""^VM^"0"^VM^""^VM^"0"^VM^""^VM^"0"^VM^""^VM^"0";
-        assert(aaa.mv("/",bbb).convert(_VM_ _FM_, L"]^")=="0]0]0]0]0]0]0]0");
+        assert(aaa.mv("/",bbb).convert(_VM_ _FM_, "]^")=="0]0]0]0]0]0]0]0");
 
 	//testing .mv(+ - * / :)
 	var m1="1" _VM_ "2" _VM_ _VM_ "4";
@@ -295,13 +294,39 @@ function main()
 	//if (not deletedb("steve",errmsg))
 	//	errmsg.outputl();
 
-	var testfilename="VM.txt";
+	var testfilename="vm.txt";
 	var charout=GreekSmallGamma;//VM;
 	assert(oswrite(charout,testfilename, "utf8"));
 	var offsetx,testfilex;
 	assert(osopen(testfilename,testfilex));
 	var testosread;
-	assert(testosread.osbread(testfilex,offsetx=0,1) eq GreekSmallGamma);
+//assert(testosread.osbread(testfilex,offsetx=0,1) eq GreekSmallGamma);
+
+	oswrite(charout^charout,testfilename);
+	testosread.osbread(testfilex,offsetx=0,1).outputl("osbread=");
+	testosread.outputl("testosbread=");
+	testosread.length().outputl("testosbread.len=");
+	testosread.oconv("HEX2").outputl("testosbread.hex=");
+	offsetx.outputl("offset=");
+
+	testosread.osbread(testfilex,offsetx=0,2).outputl("osbread=");
+	testosread.outputl("testosbread=");
+	testosread.length().outputl("testosbread.len=");
+	testosread.oconv("HEX2").outputl("testosbread.hex=");
+	offsetx.outputl("offset=");
+
+	testosread.osbread(testfilex,offsetx=0,3).outputl("osbread=");
+	testosread.outputl("testosbread=");
+	testosread.length().outputl("testosbread.len=");
+	testosread.oconv("HEX2").outputl("testosbread.hex=");
+	offsetx.outputl("offset=");
+
+	testosread.osbread(testfilex,offsetx=0,4).outputl("osbread=");
+	testosread.outputl("testosbread=");
+	testosread.length().outputl("testosbread.len=");
+	testosread.oconv("HEX2").outputl("testosbread.hex=");
+	offsetx.outputl("offset=");
+
 //	assert(testfilename.osfile().a(1) eq 2);
 	var charin;
 //fails on ubuntu 13.10x64
@@ -375,10 +400,10 @@ function main()
 
 	{	//null characters cannot be embedded in string constants in c/c++
 
-		var data=L"\xFF\x30\x00\x32";
+		var data="\xFF\x30\x00\x32";
 		assert(len(data) eq 2);
 		//wont compile
-		//data=L"\u0032";
+		//data="\u0032";
 		//cant put unicode in narrow character strings
 		//data="\u0330";
 	}
@@ -412,7 +437,7 @@ function main()
 	{
 
 		//greek lowercase gamma and uppercase sigma
-		var greek2=L"\u03B3\u03A3";
+		var greek2="\u03B3\u03A3";
 		assert(greek2[1].seq()=947);
 		assert(greek2[2].seq()=931);
 
@@ -443,7 +468,7 @@ function main()
 		//verify utf-8 bytes
 		if (nbinarychars eq 256) {
 			osread(data,tempfilename5,"C");
-			assert(data eq L"\u00ce\u00b3\u00ce\u00a3");
+			assert(data eq "\u00ce\u00b3\u00ce\u00a3");
 		}
 
 		printl("greek utf8 tested ok");
@@ -567,7 +592,7 @@ function main()
 		assert(rec2 eq Greek_sas);
 		//check raw read as latin
 		assert(rec2.osread(greektestfilename,"C"));
-		var rec3=L"\xF3\xE1\xF2";
+		var rec3="\xF3\xE1\xF2";
 		assert(rec2 eq rec3);//greek code page characters
 
 	}
@@ -599,7 +624,7 @@ function main()
 	//osdelete(tempfilename5); //make sure the file doesnt exist
 	assert(not osfile(tempfilename5) or osdelete(tempfilename5));
 	var offset=2;
-	assert(not osbwrite(L"34",tempfilename5,offset));
+	assert(not osbwrite("34",tempfilename5,offset));
 	osclose(tempfilename5);
 
 	//check we can osbwrite to an existent file beyond end of file
@@ -649,7 +674,7 @@ function main()
 	unicode^=GreekQuestionMark;
 	unicode^=GreekCapitalGamma;
 	unicode^=GreekSmallGamma;
-	unicode^=L"ABc-123.456";//some LATIN characters and punctuation
+	unicode^="ABc-123.456";//some LATIN characters and punctuation
 
 	var status2 = oswrite( unicode, "GreekUTF-8File.txt", "utf8");
 
@@ -755,27 +780,27 @@ function main()
 		//!!! EXCEPT if default connection is empty then it sets it
 		//default connection is empty to start with
 		//OR if you disconnect a connection with the same number (ie the same connection)
-		assert(conn1.connect( L""));
+		assert(conn1.connect( ""));
 	}		// one connection is lost here (hangs)
 
 	{
 		var conn1;
-		conn1.connect( L"");
+		conn1.connect( "");
 		conn1.disconnect();
 	}
 	var dbname2="exodus2b";
 	var dbname3="exodus3b";
 	{
 		var conn1;
-		conn1.connect( L"");			// creates new connection with default parameters (connection string)
+		conn1.connect( "");			// creates new connection with default parameters (connection string)
 
 		//remove any existing test databases
 		conn1.deletedb( dbname2);
 		conn1.deletedb( dbname3);
 
 		//verify CANNOT connect to non-existent deleted database2
-		assert(not conn1.connect(L"dbname="^dbname2));
-		assert(not conn1.connect(L"dbname="^dbname3));
+		assert(not conn1.connect("dbname="^dbname2));
+		assert(not conn1.connect("dbname="^dbname3));
 
 		conn1.disconnect();
 
@@ -832,8 +857,8 @@ function main()
 	{
 		printl("Go through table2 in exodus2 db and through table3 in exodus3 db");
 		var conn2, conn3;
-		assert(conn2.connect( L"dbname="^dbname2));
-		assert(conn3.connect( L"dbname="^dbname3));
+		assert(conn2.connect( "dbname="^dbname2));
+		assert(conn3.connect( "dbname="^dbname3));
 		var table2,table3;
 		assert( table2.open( "TABLE2",conn2));
 		assert( table3.open( "TABLE3",conn3));
@@ -878,7 +903,7 @@ function main()
 		printl("remove any test databases");
 		//connect to exodus first cant delete db if connected to it.
 		var conn1;
-		assert(conn1.connect(L"dbname=exodus"));
+		assert(conn1.connect("dbname=exodus"));
 		assert(conn1.deletedb(dbname2));
 		assert(conn1.deletedb(dbname3));
 		conn1.disconnect();
@@ -1741,11 +1766,11 @@ while trying to match the argument list '(exodus::var, bool)'
 	var temp3="c";
 	var temp2("c");
 	var temp1="abc";
-	//var temp2=temp2=L"xxx";
+	//var temp2=temp2="xxx";
 
 	//undefined behaviour but decided to allow it in order not to slow down all copy construction
 	//show cause MVUndefined and not simply crash do to assigning an uninitialised string
-	//var undefinedassign=undefinedassign=L"xxx";
+	//var undefinedassign=undefinedassign="xxx";
 
 	//undefined behaviour but decided to allow it in order not to slow down all copy construction
 	//var undefinedassign2=undefinedassign2=11;
@@ -1940,8 +1965,8 @@ while trying to match the argument list '(exodus::var, bool)'
 	assert(var(9).oconv("MT2US").outputl() eq "09:00:00");
 	assert(var(-9).oconv("MT2US").outputl() eq "-09:00:00");
 
-//	assert(oconv(FM ^ L"\x0035","HEX4") eq "00FE0035");
-	assert(oconv(FM ^ L"\x0035","HEX4") eq "07FE0035");
+//	assert(oconv(FM ^ "\x0035","HEX4") eq "00FE0035");
+	assert(oconv(FM ^ "\x0035","HEX4") eq "07FE0035");
 	assert(oconv(FM,"HEX4") eq "07FE");
 
 	printl();
@@ -1999,7 +2024,7 @@ while trying to match the argument list '(exodus::var, bool)'
 	//check writing a 1Mb file
 	//restrict to ascii characters so size on disk=number of characters in string
 	//also restrict to size 1 2 4 8 16 etc
-	//var str1=L"1234ABC\x0160";//Note: you have to prefix strings with L if you want to put multibyte hex chars
+	//var str1="1234ABC\x0160";//Note: you have to prefix strings with L if you want to put multibyte hex chars
 	str1="1234ABCD";
 	var filesize=1024*1024/8;
 	printl(tempdir);
@@ -2047,7 +2072,7 @@ while trying to match the argument list '(exodus::var, bool)'
 	var ss;
 
 	var tconv=FM.oconv("T#20");
-	assert(tconv eq (L"                    " _FM_ L"                    "));
+	assert(tconv eq ("                    " _FM_ "                    "));
 	tconv="xxxxx/xxxxx xxx" ^ FM ^ "xx";
 	tconv=tconv.oconv("T#8");
 	assert(tconv eq ("xxxxx/xx" ^ TM ^ "xxx xxx " ^ FM ^ "xx      "));
@@ -2191,9 +2216,9 @@ while trying to match the argument list '(exodus::var, bool)'
 			//abort("Cannot create MY_ADS");
 	}
 
-	write("F"^FM^0^FM^"Currency Code"^FM^FM^FM^FM^FM^FM^"L"^"10","DICT_MY_CURRENCIES","CURRENCY_CODE");
+	write("F"^FM^0^FM^"Currency Code"^FM^FM^FM^FM^FM^FM^""^"10","DICT_MY_CURRENCIES","CURRENCY_CODE");
 	write("F"^FM^1^FM^"Currency Name"^FM^FM^FM^FM^FM^FM^"T"^"20","DICT_MY_CURRENCIES","CURRENCY_NAME");
-	write("F"^FM^1^FM^"Market Code"^FM^FM^FM^FM^FM^FM^"L"^"10","DICT_MY_MARKETS","CODE");
+	write("F"^FM^1^FM^"Market Code"^FM^FM^FM^FM^FM^FM^""^"10","DICT_MY_MARKETS","CODE");
 	write("F"^FM^1^FM^"Market Name"^FM^FM^FM^FM^FM^FM^"T"^"20","DICT_MY_MARKETS","NAME");
 
 	var dictrec="";
@@ -2241,24 +2266,24 @@ while trying to match the argument list '(exodus::var, bool)'
 #ifdef FILE_IO_CACHED_HANDLES_EXCLUDED
 	{	// test to reproduce cached_handles error
 		var file1( "FILE1.txt");
-		oswrite( L"", file1);
+		oswrite( "", file1);
 		var off1 = 0;
-		osbwrite( L"This text is written to the file 'FILE1.txt'", file1, off1);
+		osbwrite( "This text is written to the file 'FILE1.txt'", file1, off1);
 
 		var file2( "FILE2.txt");
-		oswrite( L"", file2);
+		oswrite( "", file2);
 		var off2 = 0;
-		osbwrite( L"This text is written to the file 'FILE2.txt'", file2, off2);
+		osbwrite( "This text is written to the file 'FILE2.txt'", file2, off2);
 
 		var file1x = file1;		// wicked copy of file handle
 		file1x.osclose();		// we could even do: var( file1).osclose();
 
 		var file3( "FILE3.txt");
-		oswrite( L"", file3);
+		oswrite( "", file3);
 		var off3 = 0;
-		osbwrite( L"This text is written to the file 'FILE3.txt'", file3, off3);
+		osbwrite( "This text is written to the file 'FILE3.txt'", file3, off3);
 
-		osbwrite( L"THIS TEXT INTENDED FOR FILE 'FILE1.txt' BUT IT GOES TO 'FILE3.txt'", file1, off1);
+		osbwrite( "THIS TEXT INTENDED FOR FILE 'FILE1.txt' BUT IT GOES TO 'FILE3.txt'", file1, off1);
 	}
 #endif
 
@@ -2369,7 +2394,7 @@ function accrest() {
         if (not osopen(infilename,infile))
                 abort("Cant read "^infilename);
 
-        var fms=FM^VM^SM^TM^STM^SSTM;
+        var fms=FM^VM^SM^TM^STM;
         var visibles="^]\???";
         var EOL="\r\n";
         var offset=0;

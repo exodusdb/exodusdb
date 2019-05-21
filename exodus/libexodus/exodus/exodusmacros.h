@@ -207,7 +207,6 @@ namespace exodus {
 #define _SM "\u07FC"
 #define _TM "\u07FB"
 #define _STM "\u07FA"
-#define _SSTM "\u07F9"
 
 //aliases for different multivalue implementations
 #define _IM _RM

@@ -73,93 +73,93 @@ public:
 //keep in sync both 1) declaration in class and 2) construction initialisation
 
 	//per user
-	var USERNAME = L"";
-	var PRIVILEGE = L"";
+	var USERNAME = "";
+	var PRIVILEGE = "";
 
 	//per application
-	var APPLICATION = L"";
+	var APPLICATION = "";
 
 	//per host
-	var STATION = L"";
+	var STATION = "";
 
 	//per execution
-	var COMMAND = L"";
-	var OPTIONS = L"";
-	var EXECPATH = L"";
-	var CHAIN = L"";
+	var COMMAND = "";
+	var OPTIONS = "";
+	var EXECPATH = "";
+	var CHAIN = "";
 
 	//per process - set in init()
-	var ROLLOUTFILE = L"";
-	var THREADNO = L"";
+	var ROLLOUTFILE = "";
+	var THREADNO = "";
 
 	//per db access
-	var DICT = L"";
-	var ID = L"";
-	var RECORD = L"";
-	var MV = L"";
-	var LISTACTIVE = L"";
-	var SESSION = L"";
-	var STATUS = L"";
-	var FILEERROR = L"";
-	var FILEERRORMODE = L"";
-	var FILES = L"";
+	var DICT = "";
+	var ID = "";
+	var RECORD = "";
+	var MV = "";
+	var LISTACTIVE = "";
+	var SESSION = "";
+	var STATUS = "";
+	var FILEERROR = "";
+	var FILEERRORMODE = "";
+	var FILES = "";
 
 	//per configuration
-	var DEFINITIONS = L"definitions";
-	var SYSTEM = L"";
-	var SECURITY = L"";
+	var DEFINITIONS = "definitions";
+	var SYSTEM = "";
+	var SECURITY = "";
 
 	//per request
-	var SENTENCE = L"";
-	var PSEUDO = L"";
-	var DATA = L"";
-	var ANS = L"";
+	var SENTENCE = "";
+	var PSEUDO = "";
+	var DATA = "";
+	var ANS = "";
 
 	//temporary application globals
-	var USER0 = L"";
-	var USER1 = L"";
-	var USER2 = L"";//was base currency format
-	var USER3 = L"";
-	var USER4 = L"";
+	var USER0 = "";
+	var USER1 = "";
+	var USER2 = "";//was base currency format
+	var USER3 = "";
+	var USER4 = "";
 
 	//per execute level temporary application global
-	var RECUR0 = L"";
-	var RECUR1 = L"";
-	var RECUR2 = L"";
-	var RECUR3 = L"";
-	var RECUR4 = L"";
+	var RECUR0 = "";
+	var RECUR1 = "";
+	var RECUR2 = "";
+	var RECUR3 = "";
+	var RECUR4 = "";
 
 	//i18n/l10n - basic internationalisation/localisation
-	var DATEFMT = L"D/E";//international date format
-	var BASEFMT = L"MD20P,";//base currency format
-	var SW = L"";
+	var DATEFMT = "D/E";//international date format
+	var BASEFMT = "MD20P,";//base currency format
+	var SW = "";
 
 	//encoding globals
 	//MUST be the same length
 	//TODO Should not be global otherwise cannot multithread MvEnvironment
 	var LOWERCASE = LOWERCASE_;
 	var UPPERCASE = UPPERCASE_;
-	var INTERNALCHARS = L"\x11\x12\x13\x14\x15\x16\x17";
-	var EXTERNALCHARS = _SSTM_ _STM_ _TM_ _SM_ _VM_ _FM_ _RM_;
+	//var INTERNALCHARS = "x12\x13\x14\x15\x16\x17";
+	//var EXTERNALCHARS = _STM_ _TM_ _SM_ _VM_ _FM_ _RM_;
 
-	var TCLSTACK = L"";
+	var TCLSTACK = "";
 	//INTCONST=keyboard constants 1:esc 2:f5 7:f10
-	var INTCONST = L"\x1b" _FM_ L"{f5?}" _FM_ _FM_ _FM_ _FM_ _FM_ "{f10?}";
-	var PRIORITYINT = L"";
+	var INTCONST = "\x1b" _FM_ "{f5?}" _FM_ _FM_ _FM_ _FM_ _FM_ "{f10?}";
+	var PRIORITYINT = "";
 	int COL1=0;
 	int COL2=0;
 
 	//old scratch variables used for various buffering
-	var AW = L"";
-	var EW = L"";
-	var HW = L"";
-	var MW = L"";
-	var PW = L"";
+	var AW = "";
+	var EW = "";
+	var HW = "";
+	var MW = "";
+	var PW = "";
 	//var SW;//moved section
-	var VW = L"";
-	var XW = L"";
+	var VW = "";
+	var XW = "";
 
-	var RECCOUNT = L"";
+	var RECCOUNT = "";
 
 	//pretty obsolete nowadays
 	//environment variables may not be available until exported
@@ -170,18 +170,18 @@ public:
 	var LPTRHIGH = 66;
 
 	//obsolete
-	var ENVIRONKEYS = L"";
-	var ENVIRONSET = L"";
-	var DEFAULTSTOPS = L"";
-	var MOVEKEYS = L"";
-	var INDEXTIME = L"";
-	var LEVEL = L"";
-	var VOLUMES = L"";
+	var ENVIRONKEYS = "";
+	var ENVIRONSET = "";
+	var DEFAULTSTOPS = "";
+	var MOVEKEYS = "";
+	var INDEXTIME = "";
+	var LEVEL = "";
+	var VOLUMES = "";
 
 	//set in init()
-	var PROCESSNO = L"";
+	var PROCESSNO = "";
 
-	var CURSOR = L"1";
+	var CURSOR = "1";
 
 	//define a type of object that holds many LabelledCommons
 	//typedef std::map<const char*, LabelledCommon> LabelledCommons;

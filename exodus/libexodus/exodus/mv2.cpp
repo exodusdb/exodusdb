@@ -37,56 +37,33 @@ namespace exodus {
 //use initializers since cannot fail (but could find how to init the char1)
 var::var(const char char1):
 	var_typ(pimpl::VARTYP_STR)
-	//,var_str(const_cast<wchar_t>char1)
+	//,var_str(const_cast<char_t>char1)
 {
 	//cannot fail
-	//THISIS(L"var::var(const char char1)")
+	//THISIS("var::var(const char char1)")
 
 	//not a pointer anymore for speed
 	//priv=new pimpl;
 
 	//var_typ=pimpl::VARTYP_STR;
-	wchar_t widechar=char1;
-	var_str=widechar;
-}
-
-//ctor for c_str
-//dont use initialisers and protect against null pointer
-var::var(const char* cstr1)
-{
-
-	//not a pointer anymore for speed
-	//priv=new pimpl;
-
-	//protect against null pointer
-	if (cstr1==0)
-	{
-		//THISIS(L"var::var(const char* cstr1)")
-		throw MVInvalidPointer(L"Null pointer in var(const char*)");
-	}
-
-	std::string str1=cstr1;
-	//dont convert from UTF8 to speed execution of programs written with strings like aaa="xxx" instead of aaa=L"xxx"
-	//therefore requires manual conversion of any c strings from other sources eg operating system
-	var_str=std::wstring(str1.begin(),str1.end());
-
-	var_typ=pimpl::VARTYP_STR;
+	var_str=char1;
 }
 
 //ctor for memory block
-//dont use initialisers and TODO protect against out of memory in expansion to wstring
+//dont use initialisers and TODO protect against out of memory in expansion to string
 var::var(const char* cstr1, const size_t int1)
 {
 	//cannot fail
-	//THISIS(L"var::var(const char* cstr1, const size_t int1)")
+	//THISIS("var::var(const char* cstr1, const size_t int1)")
 
 	//TODO optimise and UTF conversion
 	//var_typ=pimpl::VARTYP_STR;
 	std::string cstr2(cstr1,int1);
-	var_str=std::wstring(cstr2.begin(),cstr2.end());
+	var_str=std::string(cstr2.begin(),cstr2.end());
 	var_typ=pimpl::VARTYP_STR;
 }
 
+/*duplicates
 //comparisons with narrow characters
 
 bool operator== (const var&    var1    ,const char*  char2   ){return MVeq(var1,var(char2));}
@@ -106,5 +83,5 @@ bool operator > (const char*  char1  ,const var&    var2     ){return MVlt(var2,
 
 bool operator <=(const var&    var1    ,const char*  char2   ){return !MVlt(var(char2),var1);}
 bool operator <=(const char*  char1  ,const var&    var2     ){return !MVlt(var2,var(char1));}
-
+*/
 }// of namespace exodus

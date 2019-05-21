@@ -14,32 +14,32 @@ function security(in mode)
 function security2(in mode, in op0)
 {
 //	win.valid = 1;
-	var op=op0.convert(L"_.", L"  ");
-	var op2 = L"";
+	var op=op0.convert("_.", "  ");
+	var op2 = "";
 	if (op[-1] == DQ) {
-//		op2 = (op.substr(-2, L"B\"")).quote();
+//		op2 = (op.substr(-2, "B\"")).quote();
 		op2=op.field2(DQ,-2);
-		op.splicer(-op2.length(), op2.length(), L"");
-		op2.splicer(1, 0, L" ");
+		op.splicer(-op2.length(), op2.length(), "");
+		op2.splicer(1, 0, " ");
 	}
-	if (mode.index(L"INIT", 1)) {
+	if (mode.index("INIT", 1)) {
 		var msg;
-		if (!(authorised(op ^ L" ACCESS" ^ op2, msg, L"")))
+		if (!(authorised(op ^ " ACCESS" ^ op2, msg, "")))
 			return invalid(msg);
 
-	}else if (mode.index(L"READ", 1) || mode.index(L"WRITE", 1)) {
+	}else if (mode.index("READ", 1) || mode.index("WRITE", 1)) {
 		if (!win.wlocked) {
-			op ^= L" ACCESS";
+			op ^= " ACCESS";
 		}else{
 			if (win.orec) {
-				op ^= L" UPDATE";
+				op ^= " UPDATE";
 			}else{
-				op ^= L" CREATE";
+				op ^= " CREATE";
 			}
 		}
 		var msg;
-		if (!(authorised(op ^ op2, msg, L""))) {
-			if (win.orec == L"" || !win.wlocked) {
+		if (!(authorised(op ^ op2, msg, ""))) {
+			if (win.orec == "" || !win.wlocked) {
 				invalid();
 				win.reset = 5;
 			}
@@ -49,9 +49,9 @@ function security2(in mode, in op0)
 			}
 		}
 
-	}else if (mode.index(L"DELETE", 1)) {
+	}else if (mode.index("DELETE", 1)) {
 		var msg;
-		if (!(authorised(op ^ L" DELETE" ^ op2, msg, L"")))
+		if (!(authorised(op ^ " DELETE" ^ op2, msg, "")))
 			return invalid(msg);
 
 	}else if (1) {
@@ -62,9 +62,9 @@ function security2(in mode, in op0)
 
 function security3(in op, in op2)
 {
-	var op2b=op2.assigned()?op2:L"";
+	var op2b=op2.assigned()?op2:"";
 	var msg;
-	if (!(authorised(op ^ op2b, msg, L"")))
+	if (!(authorised(op ^ op2b, msg, "")))
 		return invalid(msg);
 
 	return true;
@@ -72,12 +72,12 @@ function security3(in op, in op2)
 
 function invalidq(in msg)
 {
-	return invalid(msg.splice(1, 0, (win.is.a(1, 1, 1)).quote() ^ L" "));
+	return invalid(msg.splice(1, 0, (win.is.a(1, 1, 1)).quote() ^ " "));
 }
 
 function invalid()
 {
-	return invalid(L"");
+	return invalid("");
 }
 
 function invalid(in msg)

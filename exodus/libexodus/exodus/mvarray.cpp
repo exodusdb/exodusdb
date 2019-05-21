@@ -76,7 +76,7 @@ dim::dim(int rows, int cols)
 
 bool dim::read(const var& filehandle, const var& key)
 {
-	THISIS(L"bool dim::matread(const var& filehandle, const var& key)")
+	THISIS("bool dim::matread(const var& filehandle, const var& key)")
 	ISSTRING(filehandle)
 	ISSTRING(key)
 
@@ -90,15 +90,15 @@ bool dim::read(const var& filehandle, const var& key)
 
 	this->split(temprecord);
 
-	//var(nrows_).outputl(L"nrows now=");
+	//var(nrows_).outputl("nrows now=");
 
-	//this->join(L"|").outputl(L"read=");
+	//this->join("|").outputl("read=");
 	return true;
 }
 
 bool dim::write(const var& filehandle, const var& key) const
 {
-	THISIS(L"bool dim::matwrite(const var& filehandle, const var& key) const")
+	THISIS("bool dim::matwrite(const var& filehandle, const var& key) const")
 	ISSTRING(filehandle)
 	ISSTRING(key)
 
@@ -116,7 +116,7 @@ bool dim::redim(int rows, int cols)
 	if (initialised_ && rows==nrows_ && cols==ncols_)
 		return true;
 
-	//(var(initialised_)^L" "^var(nrows_)^L" "^var(ncols_)^L" -> "^var(rows)^L" "^var(cols)).outputl(L"redim=");
+	//(var(initialised_)^" "^var(nrows_)^" "^var(ncols_)^" -> "^var(rows)^" "^var(cols)).outputl("redim=");
 
 	//how exception safe is this?
 
@@ -145,9 +145,9 @@ var& dim::operator() (int rowno, int colno)
 
 	//check bounds
 	if (rowno > nrows_)
-		throw MVArrayIndexOutOfBounds(L"row:" ^ var(rowno) ^ L" > " ^ nrows_);
+		throw MVArrayIndexOutOfBounds("row:" ^ var(rowno) ^ " > " ^ nrows_);
 	if (colno > ncols_)
-		throw MVArrayIndexOutOfBounds(L"col:" ^ var(colno) ^ L" > " ^ ncols_);
+		throw MVArrayIndexOutOfBounds("col:" ^ var(colno) ^ " > " ^ ncols_);
 
 	if (rowno ==0 || colno == 0 )
 		return data_[0];
@@ -160,9 +160,9 @@ var& dim::operator() (int rowno, int colno) const
 
 	//check bounds
 	if (rowno > nrows_ || rowno < 0)
-		throw MVArrayIndexOutOfBounds(L"row:" ^ var(rowno) ^ L" > " ^ nrows_);
+		throw MVArrayIndexOutOfBounds("row:" ^ var(rowno) ^ " > " ^ nrows_);
 	if (colno > ncols_ || colno < 0)
-		throw MVArrayIndexOutOfBounds(L"col:" ^ var(colno) ^ L" > " ^ ncols_);
+		throw MVArrayIndexOutOfBounds("col:" ^ var(colno) ^ " > " ^ ncols_);
 
 	if (rowno ==0 || colno == 0 )
 	{
@@ -227,7 +227,7 @@ var dim::join(const var& sepchar) const
 		throw MVArrayNotDimensioned();
 	int arraysize=nrows_*ncols_;
 	if (!arraysize)
-		return L"";
+		return "";
 
 	//find last element with any data
 	int nn;
@@ -239,7 +239,7 @@ var dim::join(const var& sepchar) const
 
 	//get the first element at least to ensure
 	//at least first element is assigned - even if it is an empty string
-	var output=L"";
+	var output="";
 	//ensuring converted to a string
 	output^=data_[1];
 

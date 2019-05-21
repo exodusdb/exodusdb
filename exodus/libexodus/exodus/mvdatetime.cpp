@@ -27,28 +27,28 @@ THE SOFTWARE.
 
 #define PICK_UNIX_DAY_OFFSET -732
 
-const wchar_t* shortmths=L"JAN\0FEB\0MAR\0APR\0MAY\0JUN\0JUL\0AUG\0SEP\0OCT\0NOV\0DEC\0";
-const wchar_t* longmths=
-				L"\0JANUARY\0  "
-				L"\0FEBRUARY\0 "
-				L"\0MARCH\0    "
-				L"\0APRIL\0    "
-				L"\0MAY\0      "
-				L"\0JUNE\0     "
-				L"\0JULY\0     "
-				L"\0AUGUST\0   "
-				L"\0SEPTEMBER\0"
-				L"\0OCTOBER\0  "
-				L"\0NOVEMBER\0 "
-				L"\0DECEMBER\0 ";
-const wchar_t* longdayofweeks=
-				L"MONDAY\0   "
-				L"TUESDAY\0  "
-				L"WEDNESDAY\0"
-				L"THURSDAY\0 "
-				L"FRIDAY\0   "
-				L"SATURDAY\0 "
-				L"SUNDAY\0   ";
+const char* shortmths="JAN\0FEB\0MAR\0APR\0MAY\0JUN\0JUL\0AUG\0SEP\0OCT\0NOV\0DEC\0";
+const char* longmths=
+				"\0JANUARY\0  "
+				"\0FEBRUARY\0 "
+				"\0MARCH\0    "
+				"\0APRIL\0    "
+				"\0MAY\0      "
+				"\0JUNE\0     "
+				"\0JULY\0     "
+				"\0AUGUST\0   "
+				"\0SEPTEMBER\0"
+				"\0OCTOBER\0  "
+				"\0NOVEMBER\0 "
+				"\0DECEMBER\0 ";
+const char* longdayofweeks=
+				"MONDAY\0   "
+				"TUESDAY\0  "
+				"WEDNESDAY\0"
+				"THURSDAY\0 "
+				"FRIDAY\0   "
+				"SATURDAY\0 "
+				"SUNDAY\0   ";
 
 #include "boost/date_time/gregorian/gregorian.hpp"
 #include "boost/date_time/posix_time/posix_time.hpp"
@@ -115,7 +115,7 @@ var var::timedate() const
 
 	//TODO make this rely on a single timestamp instead of time and date
 	//to avoid the slight chance of time and date being called different sides of midnight
-	return time().oconv_MT(L"S") ^ L" " ^ date().oconv_D(L"D");
+	return time().oconv_MT("S") ^ " " ^ date().oconv_D("D");
 }
 
 var var::ostime() const
@@ -142,7 +142,7 @@ var var::ostime() const
 // pressed, or -1 for no key pressed
 int var::keypressed(int delayusecs) const
 {
-    wchar_t keypressed;
+    char keypressed;
     struct timeval waittime;
     int num_chars_read;
     struct fd_set mask;
@@ -164,7 +164,7 @@ int var::keypressed(int delayusecs) const
 }
 */
 
-var var::iconv_D(const wchar_t* conversion) const
+var var::iconv_D(const char* conversion) const
 {
 
 	//should perhaps ONLY implement only ISO8601 which is in xml
@@ -175,8 +175,8 @@ var var::iconv_D(const wchar_t* conversion) const
 	bool dayfirst=false;
 
 	//1st character must be D otherwise no conversion
-	const wchar_t* conversionchar=conversion;
-	if (*conversionchar!=L'D')
+	const char* conversionchar=conversion;
+	if (*conversionchar!='D')
 		return *this;
 	++conversionchar;
 
@@ -185,10 +185,10 @@ var var::iconv_D(const wchar_t* conversion) const
 
 		switch (*conversionchar)
 		{
-			case L'E':
+			case 'E':
 				dayfirst=true;
 				break;
-			case L'S':
+			case 'S':
 				yearfirst=true;
 				break;
 		}
@@ -201,7 +201,7 @@ var var::iconv_D(const wchar_t* conversion) const
 
 	int month=0;
 
-	const wchar_t* iter=var_str.c_str();
+	const char* iter=var_str.c_str();
 	while (*iter!='\0')
 	{
 
@@ -213,7 +213,7 @@ var var::iconv_D(const wchar_t* conversion) const
 
 			//fail to convert if too many parts (should be only three really)
 			if (partn>=maxparts)
-				return L"";
+				return "";
 
 			do
 			{
@@ -226,7 +226,7 @@ var var::iconv_D(const wchar_t* conversion) const
 
 		else if (::isalpha(*iter))
 		{
-			std::wstring word;
+			std::string word;
 			do
 			{
 				word.push_back(toupper(*iter++));
@@ -236,8 +236,8 @@ var var::iconv_D(const wchar_t* conversion) const
 			//determine the month or return "" to indicate failure
 			for (int ii=0;ii<12*4;ii+=4)
 			{
-				if (wcscmp(
-					(wchar_t*)(shortmths+ii),
+				if (strcmp(
+					(char*)(shortmths+ii),
 					word.c_str())==0)
 				{
 					month=ii/4+1;
@@ -245,7 +245,7 @@ var var::iconv_D(const wchar_t* conversion) const
 				}
 			}
 			if (month==0)
-				return L"";
+				return "";
 
 			continue;
 		}
@@ -263,7 +263,7 @@ var var::iconv_D(const wchar_t* conversion) const
 	{
 		//fail if day or year missing
 		if (partn<1)
-			return L"";
+			return "";
 
 		if (yearfirst)
 		{
@@ -280,7 +280,7 @@ var var::iconv_D(const wchar_t* conversion) const
 	{
 		//fail if missing three parts for year, month and day
 		if (partn<2)
-			return L"";
+			return "";
 
 		if (yearfirst)
 		{
@@ -317,12 +317,12 @@ var var::iconv_D(const wchar_t* conversion) const
 	}
 	catch (...)
 	{
-		return L"";
+		return "";
 	}
 
 }
 
-var var::oconv_D(const wchar_t* conversion) const
+var var::oconv_D(const char* conversion) const
 {
 
 	//by this time it is known to be a number and not an empty string
@@ -341,11 +341,11 @@ var var::oconv_D(const wchar_t* conversion) const
 	bool yearfirst=false;
 	bool dayfirst=false;
 	//bool leadingzeros=true;
-	wchar_t sepchar=L' ';
+	char sepchar=' ';
 
 	//1st character must be D otherwise no conversion
-	const wchar_t* conversionchar=conversion;
-	if (*conversionchar!=L'D')
+	const char* conversionchar=conversion;
+	if (*conversionchar!='D')
 		return *this;
 	++conversionchar;
 
@@ -356,9 +356,9 @@ var var::oconv_D(const wchar_t* conversion) const
 	{
 
 		//digits anywhere indicate size of year
-		if ((*conversionchar)<=L'9' && (*conversionchar)>=L'0')
+		if ((*conversionchar)<='9' && (*conversionchar)>='0')
 		{
-			yeardigits=(*conversionchar)-L'0';
+			yeardigits=(*conversionchar)-'0';
 			++conversionchar;
 			continue;
 		}
@@ -367,13 +367,13 @@ var var::oconv_D(const wchar_t* conversion) const
 		switch (*conversionchar)
 		{
 
-			case L'E':
+			case 'E':
 				dayfirst=true;
 				break;
 
 			//DM returns month number
 			//DMA returns full month name
-			case L'M':
+			case 'M':
 				++conversionchar;
 				if (*conversionchar=='A')
 					return &longmths[ymd.month*11-10];
@@ -381,7 +381,7 @@ var var::oconv_D(const wchar_t* conversion) const
 
 			//DW returns day of week number number 1-7 Mon-Sun
 			//DWA returns the day of week name
-			case L'W':
+			case 'W':
 				//calculate directly from pick date (construction of date above is wasted time)
 				//there appears to be only a name of day of week accessor in boost date and no number of day of accessor
 				dow=(((*this).floor()-1)%7)+1;
@@ -392,36 +392,36 @@ var var::oconv_D(const wchar_t* conversion) const
 
 			//DY year (four digits or D2Y works too)
 			//DYn formatted
-			case L'Y':
+			case 'Y':
 				yearfirst=true;
 				//yearonly=true;
 				//allow trailing digit as well to control ndigits
 				++conversionchar;
-				if ((*conversionchar)<=L'9' && (*conversionchar)>=L'0')
-					yeardigits=(*conversionchar)-L'0';
+				if ((*conversionchar)<='9' && (*conversionchar)>='0')
+					yeardigits=(*conversionchar)-'0';
 				--conversionchar;
 				break;
 
 			//DD day of month
-			case L'D':
+			case 'D':
 				return var(ymd.day);
 
 			//DQ returns quarter number
-			case L'Q':
+			case 'Q':
 				return var(int((ymd.month-1)/3)+1);
 
 			//DJ returns day of year
-			case L'J':
+			case 'J':
 				return int(desired_date.day_of_year());
 
 			//iso year format - at the beginning
-			case L'S':
+			case 'S':
 				//alphamonth=false;
 				yearfirst=true;
 				break;
 
 			//DL LAST day of month
-			case L'L':
+			case 'L':
 				return var(desired_date.end_of_month().day());
 
 			default:
@@ -433,13 +433,13 @@ var var::oconv_D(const wchar_t* conversion) const
 		++conversionchar;
 	}
 
-	std::wstringstream ss;
-	ss.fill(L'0');
+	std::stringstream ss;
+	ss.fill('0');
 
 	//trim the right n year digits since width() will pad but not cut (is this really the C++ way?)
-	std::wstringstream yearstream;
+	std::stringstream yearstream;
 	yearstream<<ymd.year;
-        std::Tstring yearstring=yearstream.str();
+        std::string yearstring=yearstream.str();
 	int yearstringerase=int(yearstring.length()-yeardigits);
 	if (yearstringerase>0)
 		yearstring.erase(0,yearstringerase);
@@ -500,7 +500,7 @@ var var::oconv_D(const wchar_t* conversion) const
 
 }
 
-var var::oconv_MT(const wchar_t* conversion) const
+var var::oconv_MT(const char* conversion) const
 {
 	//conversion points to the character AFTER MT - which may be \0
 	//MT, MTH, MTS, MTx, MTHx, MTSx MTHS MTHSx where x is a sep char
@@ -517,8 +517,8 @@ var var::oconv_MT(const wchar_t* conversion) const
 	bool unlimited=false;//incompatible with twelvehour
 	bool showsecs=false;
 	bool decimalhours=false;
-	wchar_t sepchar=L':';
-	const wchar_t* conversionchar=conversion;
+	char sepchar=':';
+	const char* conversionchar=conversion;
 	int timesecs;
 
 	//guess 1st option is most often zero/ie most conversions are MT only and short circuit
@@ -531,7 +531,7 @@ var var::oconv_MT(const wchar_t* conversion) const
 
 		//first may be an 2 to indicate input is integer or decimal hours
 		//if so, convert by *3600 to seconds
-		if (*conversionchar==L'2')
+		if (*conversionchar=='2')
 		{
 			++conversionchar;
 			timesecs=(3600*(*this)).round();
@@ -542,28 +542,28 @@ var var::oconv_MT(const wchar_t* conversion) const
 		}
 
 		//first may be a U to indicate unlimited hours
-		if (*conversionchar==L'U')
+		if (*conversionchar=='U')
 		{
 			++conversionchar;
 			unlimited=true;
 		}
 
 		//next may be an H to indicate AM/PM
-		if (*conversionchar==L'H')
+		if (*conversionchar=='H')
 		{
 			++conversionchar;
 			twelvehour=true;
 		}
 
 		//next may be an S to show seconds
-		if (*conversionchar==L'S')
+		if (*conversionchar=='S')
 		{
 			++conversionchar;
 			showsecs=true;
 		}
 /* dont allow H after S
 		//next may be an H to indicate unlimited time eg 25:00
-		if (*conversionchar==L'H')
+		if (*conversionchar=='H')
 		{
 			++conversionchar;
 			twelvehour=true;
@@ -614,20 +614,20 @@ var var::oconv_MT(const wchar_t* conversion) const
 	var newmv;
 	if (unlimited) {
 	  if (negative)
-	  	newmv=L"-";
+	  	newmv="-";
 	  else
-	  	newmv=L"";
+	  	newmv="";
 		if (hours<10)
-			newmv^=L"0";
+			newmv^="0";
 		newmv^=hours;
 	} else
-		newmv=(L"00"^var(hours)).substr(-2);
+		newmv=("00"^var(hours)).substr(-2);
 
 	//separator
 	newmv^=sepchar;
 
 	//two digit minutes
-	newmv^=(L"00"^var(mins)).substr(-2);
+	newmv^=("00"^var(mins)).substr(-2);
 
 	if (showsecs)
 	{
@@ -636,16 +636,16 @@ var var::oconv_MT(const wchar_t* conversion) const
 		newmv^=sepchar;
 
 		//two digit seconds
-		newmv^=(L"00"^var(secs)).substr(-2);
+		newmv^=("00"^var(secs)).substr(-2);
 	}
 
 	//AM/PM
 	if (twelvehour)
 	{
 		if (am)
-			newmv^=L"AM";
+			newmv^="AM";
 		else
-			newmv^=L"PM";
+			newmv^="PM";
 	}
 
 	return newmv;

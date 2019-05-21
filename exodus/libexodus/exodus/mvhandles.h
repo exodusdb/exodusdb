@@ -30,19 +30,19 @@ class MvHandleEntry
 	MvHandleEntry();
 	DELETER_AND_DESTROYER deleter;	// =0 means that slot is empty
 	CACHED_HANDLE handle;
-	std::wstring extra;
+	std::string extra;
 };
 
 class MvHandlesCache
 {
   public:
 	MvHandlesCache();
-	int add_handle(CACHED_HANDLE handle_to_opened_file, DELETER_AND_DESTROYER del, std::wstring name);
+	int add_handle(CACHED_HANDLE handle_to_opened_file, DELETER_AND_DESTROYER del, std::string name);
 	//MvHandleEntry & operator [] (int idx)
 	//{ 
 	//	return conntbl[ idx];
 	//}
-	CACHED_HANDLE get_handle(int index, std::wstring name);
+	CACHED_HANDLE get_handle(int index, std::string name);
 	void del_handle(int index);
    virtual ~MvHandlesCache();
 

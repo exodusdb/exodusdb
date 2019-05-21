@@ -12,8 +12,8 @@ namespace exodus {
 DLL_PUBLIC
 ExodusProgramBase::ExodusProgramBase(MvEnvironment& inmv)
 	:mv(inmv) {
-	cache_dictid_ = L"";
-	cache_perform_libid_ = L"";
+	cache_dictid_ = "";
+	cache_perform_libid_ = "";
 	dict_exodusfunctorbase_=NULL;
 }
 
@@ -29,22 +29,22 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 
 bool ExodusProgramBase::savelist(const var& listname)
 {
-	return CURSOR.savelist(listname.field(L" ",1));
+	return CURSOR.savelist(listname.field(" ",1));
 }
 
 bool ExodusProgramBase::getlist(const var& listname)
 {
-	return CURSOR.getlist(listname.field(L" ",1));
+	return CURSOR.getlist(listname.field(" ",1));
 }
 
 bool ExodusProgramBase::makelist(const var& listname, const var& keys)
 {
-	return CURSOR.makelist(listname.field(L" ",1), keys);
+	return CURSOR.makelist(listname.field(" ",1), keys);
 }
 
 bool ExodusProgramBase::deletelist(const var& listname)
 {
-	return CURSOR.deletelist(listname.field(L" ",1));
+	return CURSOR.deletelist(listname.field(" ",1));
 }
 
 void ExodusProgramBase::clearselect()
@@ -82,7 +82,7 @@ bool ExodusProgramBase::pushselect(const var& v1, var& v2, var& v3, var& v4) {
 	//CURSOR++;
 	//CURSOR has connection number hidden in it, so it cannot be used as an ordinary variable ATM
 	CURSOR.transfer(v2);
-	CURSOR=var().date() ^ L"_" ^ (var().ostime().convert(L".",L"_"));
+	CURSOR=var().date() ^ "_" ^ (var().ostime().convert(".","_"));
 	return true;
 
 /*
@@ -151,34 +151,34 @@ SUBROUTINE POP.SELECT(V1, V2, V3, V4)
 
 
 void ExodusProgramBase::note(const var& msg, const var& options) const {
-	var buffer = L"";
+	var buffer = "";
 	mssg(msg, options, buffer);
 }
 void ExodusProgramBase::note(const var& msg, const var& options, var& buffer, const var& params) const {
 	mssg(msg, options, buffer, params);
 }
 void ExodusProgramBase::mssg(const var& msg, const var& options) const {
-	var buffer = L"";
+	var buffer = "";
 	mssg(msg, options, buffer);
 }
 void ExodusProgramBase::mssg(const var& msg, const var& options, var& buffer, const var& params) const {
 
 	//var interactive = !SYSTEM.a(33);
-	var msg1=msg.convert(L"|" ^ FM ^ VM ^ SM, L"\n\n\n\n").trim(L"\n");
+	var msg1=msg.convert("|" ^ FM ^ VM ^ SM, "\n\n\n\n").trim("\n");
 
-	std::wcout << msg1;
+	std::cout << msg1;
 
-	if (!options.index(L"U")) {
+	if (!options.index("U")) {
 		if (USER4.length() > 8000) {
-			var msg2=L"Aborted MSG()>8000";
-			std::wcout << msg2;
+			var msg2="Aborted MSG()>8000";
+			std::cout << msg2;
 			USER4 ^= FM ^ msg2;
 		} else {
 			USER4.r(-1, msg1);
 		}
 	}
 
-	std::wcout << std::endl;
+	std::cout << std::endl;
 
 }
 
@@ -316,7 +316,7 @@ updateprivs:
 			//if (SECURITY.length() < 65000) {
 			if (true) {
 var x=var();
-				if (not(SECURITY.a(10).locateby("AL", task, taskn))) {
+				if (not(SECURITY.a(10).locateby("A", task, taskn))) {
 					var newlock=defaultlock;
 					//get locks on default task if present otherwise new locks are none
 					if (newlock and SECURITY.a(10).locate(newlock)) {
@@ -440,17 +440,17 @@ var ExodusProgramBase::capitalise(const var& str0, const var& mode0,
 
 	var string2;
 
-	if (mode0.unassigned() || mode0 == L"CAPITALISE") {
+	if (mode0.unassigned() || mode0 == "CAPITALISE") {
 		string2 = str0;
 		//convert @upper.case to @lower.case in string2
 		int nn = string2.length();
-		var numx = var(L"1234567890").index(string2[1], 1);
+		var numx = var("1234567890").index(string2[1], 1);
 		var cap = 1;
 		var wordseps;
 		var inquotes = 0;
 		//wordseps=' /-.()&'
 		if (wordseps0.unassigned())
-			wordseps = L" .()&_" _RM_ _FM_ _VM_ _SM_ _TM_ _STM_ _SSTM_;
+			wordseps = " .()&_" _RM_ _FM_ _VM_ _SM_ _TM_ _STM_;
 		else
 			wordseps = wordseps0;
 		for (int ii = 1; ii <= nn; ii++) {
@@ -459,14 +459,14 @@ var ExodusProgramBase::capitalise(const var& str0, const var& mode0,
 			if (inquotes) {
 				inquotes = tt != inquotes;
 			} else {
-				if (tt == DQ && (string2.count(DQ) > 1 || tt == L"\'")
-						&& string2.count(L"\'") > 1) {
+				if (tt == DQ && (string2.count(DQ) > 1 || tt == "\'")
+						&& string2.count("\'") > 1) {
 					inquotes = tt;
 				} else {
 					if (wordseps.index(tt, 1)) {
 						cap = 1;
-						if (tt == L" ")
-							numx = var(L"1234567890").index(
+						if (tt == " ")
+							numx = var("1234567890").index(
 									string2.substr(ii + 1, 1), 1);
 					} else {
 						if (cap || numx) {
@@ -483,48 +483,48 @@ var ExodusProgramBase::capitalise(const var& str0, const var& mode0,
 
 		};	//ii;
 
-		string2.swapper(L"\'S ", L"\'s ");
-		if (string2.substr(-2, 2) == L"\'S")
-			string2.splicer(-2, 2, L"\'s");
+		string2.swapper("\'S ", "\'s ");
+		if (string2.substr(-2, 2) == "\'S")
+			string2.splicer(-2, 2, "\'s");
 
-	} else if (mode0 == L"QUOTE") {
+	} else if (mode0 == "QUOTE") {
 		string2 = str0;
-		if (string2 != L"") {
-			string2.converter(FM ^ VM ^ SVM ^ TM, L"    ");
-			string2.swapper(L" ", L"\" \"");
+		if (string2 != "") {
+			string2.converter(FM ^ VM ^ SVM ^ TM, "    ");
+			string2.swapper(" ", "\" \"");
 			string2 = string2.quote();
 		}
 
-	} else if (mode0 == L"UPPERCASE") {
+	} else if (mode0 == "UPPERCASE") {
 		string2 = str0;
 		string2.converter(LOWERCASE, UPPERCASE);
 
-	} else if (mode0 == L"LOWERCASE") {
+	} else if (mode0 == "LOWERCASE") {
 		string2 = str0;
 		string2.converter(UPPERCASE, LOWERCASE);
 
 
-	} else if (mode0.substr(1, 5) == L"PARSE") {
+	} else if (mode0.substr(1, 5) == "PARSE") {
 
-		var uppercase = mode0.index(L"UPPERCASE", 1);
+		var uppercase = mode0.index("UPPERCASE", 1);
 
 		string2 = str0;
 
 		//convert to uppercase
-		var quoted = L"";
+		var quoted = "";
 		for (int ii = 1; ii <= 99999; ii++) {
 			var tt = string2.substr(ii, 1);
 			//BREAK;
-			if (!(tt != L""))
+			if (!(tt != ""))
 				break;;
 			if (tt == quoted) {
-				quoted = L"";
+				quoted = "";
 			} else {
 				if (!quoted) {
-					if ((DQ ^ L"\'").index(tt, 1)) {
+					if ((DQ ^ "\'").index(tt, 1)) {
 						quoted = tt;
 					} else {
-						if (tt == L" ") {
+						if (tt == " ") {
 							tt = FM;
 							string2.splicer(ii, 1, tt);
 						} else {
@@ -538,10 +538,10 @@ var ExodusProgramBase::capitalise(const var& str0, const var& mode0,
 			}
 		};	//ii;
 
-		if (mode0.index(L"TRIM", 1)) {
-			string2.converter(L" " _FM_, _FM_ L" ");
+		if (mode0.index("TRIM", 1)) {
+			string2.converter(" " _FM_, _FM_ " ");
 			string2 = string2.trim();
-			string2.converter(L" " _FM_, _FM_ L" ");
+			string2.converter(" " _FM_, _FM_ " ");
 		}
 
 	}
@@ -555,7 +555,7 @@ var ExodusProgramBase::execute(const var& sentence) {
 	var v1,v2,v3,v4;
 	pushselect(v1, v2, v3, v4);
 
-	var sentence2=sentence.fieldstore(L" ",1,1,sentence.field(L" ",1).lcase());
+	var sentence2=sentence.fieldstore(" ",1,1,sentence.field(" ",1).lcase());
 
 	var result=perform(sentence);
 
@@ -571,10 +571,10 @@ void ExodusProgramBase::chain(const var& libraryname) {
 }
 
 var ExodusProgramBase::perform(const var& sentence) {
-	//THISIS(L"var ExodusProgramBase::perform(const var& sentence)")
+	//THISIS("var ExodusProgramBase::perform(const var& sentence)")
 	//ISSTRING(sentence)
 
-	//return ID^L"*"^dictid;
+	//return ID^"*"^dictid;
 
 	//wire up the the library linker to have the current mvenvironment
 	//if (!perform_exodusfunctorbase_.mv_)
@@ -612,23 +612,23 @@ var ExodusProgramBase::perform(const var& sentence) {
 		//similar code in exodus_main() and mvprogram.cpp:perform()
 		var lastchar=COMMAND[-1];
 		if (lastchar==")") {
-			OPTIONS=L"(" ^ COMMAND.field2(L"(",-1);
+			OPTIONS="(" ^ COMMAND.field2("(",-1);
 		}
 		else if (lastchar=="}")
-			OPTIONS=L"{" ^ COMMAND.field2(L"{",-1);
+			OPTIONS="{" ^ COMMAND.field2("{",-1);
 		if (OPTIONS)
-			COMMAND.splicer(-(OPTIONS.length()),OPTIONS.length(), L"");
+			COMMAND.splicer(-(OPTIONS.length()),OPTIONS.length(), "");
 
 		//load the shared library file
-		var libid = SENTENCE.field(L" ", 1).lcase();
+		var libid = SENTENCE.field(" ", 1).lcase();
 		std::string str_libname = libid.toString();
 		if (!perform_exodusfunctorbase_.initsmf(
 			str_libname.c_str(),
 			"exodusprogrambasecreatedelete_",
 			true //forcenew each perform/execute
 			)) {
-			USER4^=L"perform() Cannot find shared library \"" ^ str_libname
-				^ L"\", or \"libraryexit()\" is not present in it.";
+			USER4^="perform() Cannot find shared library \"" ^ str_libname
+				^ "\", or \"libraryexit()\" is not present in it.";
 			//throw MVException(USER4);
 			//return "";
 			break;
@@ -640,25 +640,25 @@ var ExodusProgramBase::perform(const var& sentence) {
 		}
 		catch (const MVUndefined& e) {
 			//if return "" is missing then default ANS to ""
-			ANS=L"";
+			ANS="";
 		}
 		catch (const MVStop& e) {
 			//stop is normal way of stopping a perform
 			//functions can call it to terminate the whole "program"
 			//without needing to setup chains of returns
 			//to exit from nested functions
-			ANS=L"";
+			ANS="";
 		}
 		catch (const MVAbort& e) {
 			//similar to stop for the time being
 			//maybe it should set some error flag/messages
-			ANS=L"";
+			ANS="";
 		}
 		catch (const MVAbortAll& e) {
 			//similar to stop for the time being
 			//maybe it should set some error flag/messages
 			//and abort multiple levels of perform?
-			ANS=L"";
+			ANS="";
 		}
 
 		//chain is a kind of optional follow controlled by the library function
@@ -698,24 +698,24 @@ var ExodusProgramBase::xlate(const var& filename, const var& key, const var& fie
 		if (not fieldno_or_name.isnum()) {
 
 			//get the whole record
-			var record=keyx.xlate(filename, L"", mode);
+			var record=keyx.xlate(filename, "", mode);
 
 			//TODO what if key is multivalued?
 
 			//handle record not found and mode C
-			if (mode == L"C" && record == keyx) {
+			if (mode == "C" && record == keyx) {
 				results.r(keyn,key);
 				continue;
 			}
 
 			//handle record not found and mode X
 			if (not record.length()) {
-				results.r(keyn,L"");
+				results.r(keyn,"");
 				continue;
 			}
 
 			//use calculate()
-			var result=calculate(fieldno_or_name,L"dict_" ^ filename.a(1), keyx, record);
+			var result=calculate(fieldno_or_name,"dict_" ^ filename.a(1), keyx, record);
 			if (nkeys>1)
 				result.lowerer();
 			results.r(keyn,result);
@@ -750,10 +750,10 @@ var ExodusProgramBase::calculate(const var& dictid, const var& dictfile, const v
 }
 
 var ExodusProgramBase::calculate(const var& dictid) {
-	//THISIS(L"var ExodusProgramBase::calculate(const var& dictid)")
+	//THISIS("var ExodusProgramBase::calculate(const var& dictid)")
 	//ISSTRING(dictid)
 
-	//return ID^L"*"^dictid;
+	//return ID^"*"^dictid;
 
 	//get the dictionary record so we know how to extract the correct field or call the right library
 	bool newlibfunc;
@@ -762,9 +762,9 @@ var ExodusProgramBase::calculate(const var& dictid) {
 		newlibfunc = true;
 		if (not DICT)
 			throw MVException(
-					L"calculate("
+					"calculate("
 					^ dictid
-					^ L") DICT file variable has not been set");
+					^ ") DICT file variable has not been set");
 		if (not cache_dictrec_.reado(DICT, dictid)) {
 			//try lower case
 			if (not cache_dictrec_.reado(DICT, dictid.lcase())) {
@@ -774,9 +774,9 @@ var ExodusProgramBase::calculate(const var& dictid) {
 				if (not dictmd.open("dict_voc")) {
 baddict:
 					throw MVException(
-						L"calculate("
+						"calculate("
 						^ dictid
-						^ L") dictionary record not in DICT "
+						^ ") dictionary record not in DICT "
 						^ DICT.quote());
 				}
 				if (not cache_dictrec_.reado(dictmd, dictid)) {
@@ -793,15 +793,15 @@ baddict:
 		newlibfunc = false;
 
 	var dicttype = cache_dictrec_(1);
-	bool ismv=cache_dictrec_(4)[1]==L"M";
+	bool ismv=cache_dictrec_(4)[1]=="M";
 
 	//F type dictionaries
-	if (dicttype == L"F") {
+	if (dicttype == "F") {
 
 		//check field number is numeric
 		var fieldno = cache_dictrec_(2);
 		if (!fieldno.isnum())
-			return L"";
+			return "";
 
 		//field no > 0
 		if (fieldno) {
@@ -814,13 +814,13 @@ baddict:
 		} else {
 			var keypart = cache_dictrec_(5);
 			if (keypart && keypart.isnum())
-				return ID.field(L"*", keypart);
+				return ID.field("*", keypart);
 			else
 				return ID;
 
 		}
 
-	} else if (dicttype == L"S") {
+	} else if (dicttype == "S") {
 		//TODO deduplicate various exodusfunctorbase code spread around calculate mvipc* etc
 		if (newlibfunc) {
 
@@ -828,7 +828,7 @@ baddict:
 			if (indictmd)
 				str_libname = "dict_voc";
 			else
-				str_libname = DICT.a(1).lcase().convert(L".",L"_").toString();
+				str_libname = DICT.a(1).lcase().convert(".","_").toString();
 
 			//get from cache
 			std::string cachekey=dictid.lcase().toString()+"_"+str_libname;
@@ -841,19 +841,19 @@ baddict:
 			//if not in cache then create new one
 			if (!dict_exodusfunctorbase_)
 			{
-				//var(cachekey).outputl(L"cachekey=");
+				//var(cachekey).outputl("cachekey=");
 				dict_exodusfunctorbase_=new ExodusFunctorBase;
 				dict_function_cache[cachekey]=dict_exodusfunctorbase_;
 				//wire up the the library linker to have the current mvenvironment
 				//if (!dict_exodusfunctorbase_.mv_)
 				dict_exodusfunctorbase_->mv_ = (&mv);
 
-				std::string str_funcname = (L"exodusprogrambasecreatedelete_" ^ dictid.lcase()).toString();
+				std::string str_funcname = ("exodusprogrambasecreatedelete_" ^ dictid.lcase()).toString();
 				if (!dict_exodusfunctorbase_->initsmf(str_libname.c_str(),str_funcname.c_str()))
 					throw MVException(
-						L"calculate() Cannot find Library " ^ str_libname
-						^ L", or function " ^ dictid.lcase()
-						^ L" is not present");
+						"calculate() Cannot find Library " ^ str_libname
+						^ ", or function " ^ dictid.lcase()
+						^ " is not present");
 			}
 		}
 
@@ -873,11 +873,11 @@ baddict:
 		typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)();
 
 		//call the shared library object main function with the right args (none for dicts), returning a var
-		//std::cout<<"precall"<<std::endl;
+		//std::cout<<"precal"<<std::endl;
 		ANS =
 				CALLMEMBERFUNCTION(*(dict_exodusfunctorbase_->pobject_),
 						((pExodusProgramBaseMemberFunction) (dict_exodusfunctorbase_->pmemberfunction_)))();
-		//std::cout<<"postcall"<<std::endl;
+		//std::cout<<"postcal"<<std::endl;
 
 		//restore the MV if necessary
 		if (!ismv)
@@ -888,20 +888,20 @@ baddict:
 	}
 
 	throw MVException(
-			L"calculate(" ^ dictid ^ L") " ^ DICT ^ L" Invalid dictionary type "
+			"calculate(" ^ dictid ^ ") " ^ DICT ^ " Invalid dictionary type "
 					^ dicttype.quote());
-	return L"";
+	return "";
 
 }
 
 bool ExodusProgramBase::unlockrecord(const var& filename, const var& file0, const var& key) const {
 	var file;
 	if (file0.unassigned())
-		file = L"";
+		file = "";
 	else
 		file = file0;
 
-	if (file == L"") {
+	if (file == "") {
 		var().unlockall();
 		return 1;
 	}
@@ -925,8 +925,8 @@ bool ExodusProgramBase::unlockrecord(const var& filename, const var& file0, cons
 void ExodusProgramBase::debug() const {
 
 	var reply;
-	std::wcout << L"debug():";
-	if (SLASH == L"/")
+	std::cout << "debug():";
+	if (SLASH == "/")
 		asm("int $3");
 	//cin>>reply;
 	return;
@@ -941,10 +941,10 @@ bool ExodusProgramBase::fsmsg(const var& msg) const {
 var ExodusProgramBase::sysvar(const var& var1, const var& var2, const var& var3,
 		const var& var4) {
 
-	std::wcout << L"sysvar() do nothing:";
+	std::cout << "sysvar() do nothing:";
 //	var reply;
 //	cin>>reply;
-	return L"";
+	return "";
 
 	//evade warning: unused parameter
 	if (var1 || var2 || var3 || var4) {
@@ -954,7 +954,7 @@ var ExodusProgramBase::sysvar(const var& var1, const var& var2, const var& var3,
 void ExodusProgramBase::setprivilege(const var& var1) {
 
 	PRIVILEGE = var1;
-	std::wcout << L"setprivilege(" << var1 << L") do nothing" << std::endl;
+	std::cout << "setprivilege(" << var1 << ") do nothing" << std::endl;
 //	var reply;
 //	cin>>reply;
 	return;
@@ -962,7 +962,7 @@ void ExodusProgramBase::setprivilege(const var& var1) {
 }
 
 var ExodusProgramBase::decide(const var& question, const var& options) const {
-	var reply = L"";
+	var reply = "";
 	var buffer;
 	return decide(question, options, reply, buffer);
 }
@@ -975,7 +975,7 @@ var ExodusProgramBase::decide(const var& questionx, const var& optionsx, var& re
 	var options = optionsx;
 	var question = questionx;
 
-	options.converter(VM ^ L"|", FM ^ FM);
+	options.converter(VM ^ "|", FM ^ FM);
 	if (!interactive) {
 		if (defaultreply) {
 			reply = defaultreply;
@@ -985,28 +985,28 @@ var ExodusProgramBase::decide(const var& questionx, const var& optionsx, var& re
 		return options.a(reply);
 	}
 
-	question.converter(VM ^ L"|", FM ^ FM);
+	question.converter(VM ^ "|", FM ^ FM);
 	question.swapper(FM, var().chr(13) ^ var().chr(10));
-	std::wcout << question << std::endl;
+	std::cout << question << std::endl;
 
-//	var noptions = options.count(FM) + (options != L"");
+//	var noptions = options.count(FM) + (options != "");
 	var noptions = options.dcount(FM);
 	for (int optionn = 1; optionn <= noptions; optionn++)
-		std::wcout << optionn << L". " << options.a(optionn) << std::endl;
+		std::cout << optionn << ". " << options.a(optionn) << std::endl;
 
 	inp: reply.input();
-	if (reply == L"" || reply >= 1 || reply <= noptions) {
+	if (reply == "" || reply >= 1 || reply <= noptions) {
 		return reply;
 	} else {
 		goto inp;
 	}
 
-	return L"";
+	return "";
 
 }
 
 void ExodusProgramBase::savescreen(var& origscrn, var& origattr) const {
-	std::wcout << L"ExodusProgramBase::savescreen not implemented" << std::endl;
+	std::cout << "ExodusProgramBase::savescreen not implemented" << std::endl;
 
 	//evade warning: unused parameter
 	if (origscrn || origattr) {
@@ -1022,7 +1022,7 @@ int ExodusProgramBase::keypressed(int delayusecs) const {
 	/* will not compile on mingw because unlike cygwin
 	 * mingw is close to windows and windows select only works on sockets
 	 * should be easy to reimplement in another way
-	 *wchar_t keypressed;
+	 *char keypressed;
 	 struct timeval waittime;
 	 int nummv.charsmv.read;
 	 struct fdmv.set mask;
@@ -1049,13 +1049,13 @@ int ExodusProgramBase::keypressed(int delayusecs) const {
 }
 
 bool ExodusProgramBase::esctoexit() const {
-	wchar_t keypress = keypressed();
+	char keypress = keypressed();
 	if (keypress != 0x1B) {
 //		cin.putback(keypress);
 		return false;
 	}
 
-	std::wcout << L"Paused. Press Enter to resume or Ctrl+C to cancel:"
+	std::cout << "Paused. Press Enter to resume or Ctrl+C to cancel:"
 			<< std::endl;
 
 	while (true) {
@@ -1071,8 +1071,8 @@ bool ExodusProgramBase::esctoexit() const {
 }
 
 var ExodusProgramBase::otherusers(const var& param) {
-	std::wcout << L"ExodusProgramBase::otherusers not implemented yet";
-	return var(L"");
+	std::cout << "ExodusProgramBase::otherusers not implemented yet";
+	return var("");
 
 	//evade warning: unused parameter
 	if (param) {
@@ -1080,8 +1080,8 @@ var ExodusProgramBase::otherusers(const var& param) {
 }
 
 var ExodusProgramBase::otherdatasetusers(const var& param) {
-	std::wcout << L"ExodusProgramBase::otherdatausers not implemented yet";
-	return var(L"");
+	std::cout << "ExodusProgramBase::otherdatausers not implemented yet";
+	return var("");
 
 	//evade warning: unused parameter
 	if (param) {
@@ -1109,7 +1109,7 @@ bool ExodusProgramBase::lockrecord(const var& filename, const var& file, const v
 
 	lock:
 		var locked=file.lock(keyx);
-		if (locked || allowduplicate && locked eq L"") {
+		if (locked || allowduplicate && locked eq "") {
 			return 1;
 		} else {
 			if (waitsecs) {
@@ -1131,33 +1131,33 @@ var ExodusProgramBase::singular(const var& pluralnoun) {
 
 	var temp = pluralnoun;
 
-	if (temp.substr(-2, 2) == L"ES") {
+	if (temp.substr(-2, 2) == "ES") {
 
 		//companies=company
-		if (temp.substr(-3, 3) == L"IES") {
-			temp.splicer(-3, 3, L"Y");
+		if (temp.substr(-3, 3) == "IES") {
+			temp.splicer(-3, 3, "Y");
 
 			//addresses=address
 
-		} else if (temp.substr(-4, 4) == L"SSES") {
-			temp.splicer(-2, 2, L"");
+		} else if (temp.substr(-4, 4) == "SSES") {
+			temp.splicer(-2, 2, "");
 
-		} else if (temp.substr(-4, 4) == L"SHES") {
-			temp.splicer(-2, 2, L"");
+		} else if (temp.substr(-4, 4) == "SHES") {
+			temp.splicer(-2, 2, "");
 
-		} else if (temp.substr(-4, 4) == L"CHES") {
-			temp.splicer(-2, 2, L"");
+		} else if (temp.substr(-4, 4) == "CHES") {
+			temp.splicer(-2, 2, "");
 
 		} else if (1) {
-			temp.splicer(-1, 1, L"");
+			temp.splicer(-1, 1, "");
 		}
 
 	} else {
 
-		if (temp[-1] == L"S") {
+		if (temp[-1] == "S") {
 			//analysis, dos
-			if (temp.substr(-2, 2) != L"IS" && temp.substr(-2, 2) != L"OS")
-				temp.splicer(-1, 1, L"");
+			if (temp.substr(-2, 2) != "IS" && temp.substr(-2, 2) != "OS")
+				temp.splicer(-1, 1, "");
 		}
 
 	}
@@ -1167,7 +1167,7 @@ var ExodusProgramBase::singular(const var& pluralnoun) {
 }
 
 void ExodusProgramBase::flushindex(const var& filename) {
-	std::wcout << L"ExodusProgramBase::std::flushindex not implemented yet, "
+	std::cout << "ExodusProgramBase::std::flushindex not implemented yet, "
 			<< filename << std::endl;
 	return;
 }
@@ -1180,10 +1180,10 @@ var ExodusProgramBase::encrypt2(const var& encrypt0) const {
 	//pass1
 	while (true) {
 		//BREAK;
-		if (!(encrypt != L""))
+		if (!(encrypt != ""))
 			break;;
 		encryptkey = (encryptkey % 390001) * (encrypt[1]).seq() + 1;
-		encrypt.splicer(1, 1, L"");
+		encrypt.splicer(1, 1, "");
 	}	//loop;
 
 	//pass2
@@ -1205,19 +1205,19 @@ var ExodusProgramBase::xmlquote(const var& string0) const {
 
 	if (string0.unassigned()) {
 		//de bug
-		string1 = L"UNASSIGNED";
+		string1 = "UNASSIGNED";
 	} else {
 		string1 = string0;
 	}
 
-	string1.swapper(L"&", L"&amp;");
-	string1.swapper(DQ, L"&quot;");
-	string1.swapper(L"<", L"&lt;");
-	string1.swapper(L">", L"&gt;");
+	string1.swapper("&", "&amp;");
+	string1.swapper(DQ, "&quot;");
+	string1.swapper("<", "&lt;");
+	string1.swapper(">", "&gt;");
 
-	string1.converter(DQ, L"\'");
-	string1.swapper(VM, L"\" \"");
-	string1.swapper(FM, L"\" \"");
+	string1.converter(DQ, "\'");
+	string1.swapper(VM, "\" \"");
+	string1.swapper(FM, "\" \"");
 	return string1.quote();
 
 }
@@ -1235,94 +1235,94 @@ var ExodusProgramBase::loginnet(const var& dataset, const var& username,
 	var xx;
 
 	//this is a custom login routine called from listen2
-	cookie = L"";
+	cookie = "";
 	var menus;
-	if (!menus.open(L"ADMENUS")) {
-		if (!menus.open(L"MENUS") && username != L"NEOSYS") {
-			msg = L"Error: Cannot open MENUS file";
+	if (!menus.open("ADMENUS")) {
+		if (!menus.open("MENUS") && username != "NEOSYS") {
+			msg = "Error: Cannot open MENUS file";
 			return false;
 		}
 	}
 
 	//return allowable menus
-	if (username == L"NEOSYS") {
-		menuid = L"ADAGENCY";
+	if (username == "NEOSYS") {
+		menuid = "ADAGENCY";
 
 	} else {
 		if (!(SECURITY.a(1).locate(username, usern))) {
-			msg = L"Error: " ^ username.quote() ^ L" user is missing";
+			msg = "Error: " ^ username.quote() ^ " user is missing";
 			return false;
 		}
 		menuid = SECURITY.a(3, usern);
 	}
 
-	var menu = L"";
+	var menu = "";
 	if (!menu.read(menus, menuid)) {
-		if (username == L"NEOSYS") {
-			if (!menu.read(menus, L"NEOSYS")) {
+		if (username == "NEOSYS") {
+			if (!menu.read(menus, "NEOSYS")) {
 				menu =
 						FM ^ FM ^ FM ^ FM ^ FM
-								^ L"MEDIA|ADPRODUCTION|ACCS|ANALMENU|TIMESHEETS|FILESMENU|GENERAL|EXIT2";
-				menu = menu.converter(L"|", VM);
+								^ "MEDIA|ADPRODUCTION|ACCS|ANALMENU|TIMESHEETS|FILESMENU|GENERAL|EXIT2";
+				menu = menu.converter("|", VM);
 			}
 		}
 	}
 	if (!menu) {
-		msg = L"Error: " ^ menuid.quote() ^ L" menu is missing";
+		msg = "Error: " ^ menuid.quote() ^ " menu is missing";
 		return false;
 	}
 
-	var menucodes = menu.a(6) ^ VM ^ L"HELP";
+	var menucodes = menu.a(6) ^ VM ^ "HELP";
 	//remove local support menu
-	if (!authorised(L"SUPPORT MENU ACCESS", msg, L"LS")) {
-		if (menucodes.a(1).locate(L"GENERAL", menun))
+	if (!authorised("SUPPORT MENU ACCESS", msg, "LS")) {
+		if (menucodes.a(1).locate("GENERA", menun))
 			menucodes.eraser(1, menun, 0);
 	}
-	menucodes.converter(VM ^ L".", L",_");
+	menucodes.converter(VM ^ ".", ",_");
 
 	//prepare session cookie
-	cookie = L"m=" ^ menucodes;
+	cookie = "m=" ^ menucodes;
 
 	return true;
 
 	/* custom login per application
-	 var compcode = L"";
+	 var compcode = "";
 
 	 var temp;
-	 if (!(temp.read(companies, L"%RECORDS%"))) {
+	 if (!(temp.read(companies, "%RECORDS%"))) {
 	 companies.select();
-	 temp = L"";
+	 temp = "";
 	 nextcomp:
 	 var compcodex;
-	 if (var(L"").readnext(compcodex)) {
+	 if (var("").readnext(compcodex)) {
 	 temp.replace(-1, 0, 0, compcodex);
 	 goto nextcomp;
 	 }
 	 }
 
-	 if (APPLICATION ne L"ACCOUNTS") {
+	 if (APPLICATION ne "ACCOUNTS") {
 	 for (int ii = 1; ii <= 9999; ii++) {
 	 compcode = temp.a(ii);
 	 //until validcode('company',compcode)
 	 //BREAK;
-	 if (validcode2(compcode, L"", L"")) break;;
+	 if (validcode2(compcode, "", "")) break;;
 	 };//ii;
 	 }else{
 	 compcode = temp.a(1);
 	 }
 
 	 if (!compcode) {
-	 msg = L"Error: You are not authorised to access any companies";
+	 msg = "Error: You are not authorised to access any companies";
 	 return false;
 	 }
 
 	 var tempcompany;
 	 if (!tempcompany.read(companies, compcode)) {
-	 msg = L"Error: " ^ compcode.quote() ^ L" company code is missing";
+	 msg = "Error: " ^ compcode.quote() ^ " company code is missing";
 	 return;
 	 }
 
-	 company = L"";
+	 company = "";
 	 initcompany(compcode);
 
 	 force error here TODO: check trigraph following;
@@ -1331,29 +1331,29 @@ var ExodusProgramBase::loginnet(const var& dataset, const var& username,
 
 	 //markets is not open in finance only module
 	 //readv maincurrcode from markets,defmarketcode,5 else maincurrcode=''
-	 var maincurrcode = L"";
-	 if (FILES[0].locateusing(FM,L"MARKETS", FM))
-	 maincurrcode = defmarketcode.xlate(L"MARKETS", 5, L"X");
+	 var maincurrcode = "";
+	 if (FILES[0].locateusing(FM,"MARKETS", FM))
+	 maincurrcode = defmarketcode.xlate("MARKETS", 5, "X");
 
 	 if (maincurrcode.unassigned())
-	 maincurrcode = L"";
-	 if (maincurrcode == L"")
+	 maincurrcode = "";
+	 if (maincurrcode == "")
 	 maincurrcode = basecurrency;
 
-	 cookie ^= L"&cc=" ^ compcode;
-	 cookie ^= L"&pd=" ^ currperiod ^ L"/" ^ addcent(curryear);
-	 cookie ^= L"&bc=" ^ basecurrency;
-	 cookie ^= L"&bf=" ^ USER2;
-	 cookie ^= L"&mk=" ^ defmarketcode;
-	 cookie ^= L"&mc=" ^ maincurrcode;
+	 cookie ^= "&cc=" ^ compcode;
+	 cookie ^= "&pd=" ^ currperiod ^ "/" ^ addcent(curryear);
+	 cookie ^= "&bc=" ^ basecurrency;
+	 cookie ^= "&bf=" ^ USER2;
+	 cookie ^= "&mk=" ^ defmarketcode;
+	 cookie ^= "&mc=" ^ maincurrcode;
 	 temp = SYSTEM.a(23);
-	 temp.swap(L"&", L" and ");
-	 cookie ^= L"&db=" ^ temp;
+	 temp.swap("&", " and ");
+	 cookie ^= "&db=" ^ temp;
 
 	 backupreminder(dataset, msg);
 
-	 changelogsubs(L"WHATSNEW" ^ FM ^ menucodes);
-	 cookie ^= L"&wn=" ^ ANS;
+	 changelogsubs("WHATSNEW" ^ FM ^ menucodes);
+	 cookie ^= "&wn=" ^ ANS;
 
 	 */
 
@@ -1381,11 +1381,11 @@ var ExodusProgramBase::getuserdept(const var& usercode) {
 	//locate the user in the list of users
 	var usern;
 	if (!(SECURITY.a(1).locate(usercode, usern))) {
-		if (usercode == L"NEOSYS") {
-			ANS = L"NEOSYS";
+		if (usercode == "NEOSYS") {
+			ANS = "NEOSYS";
 			return ANS;
 		} else {
-			ANS = L"";
+			ANS = "";
 			return ANS;
 		}
 	}
@@ -1395,7 +1395,7 @@ var ExodusProgramBase::getuserdept(const var& usercode) {
 	var usernx;
 	for (usernx = 1; usernx <= nusers; usernx++) {
 		//BREAK;
-		if (SECURITY.a(1, usernx) == L"---")
+		if (SECURITY.a(1, usernx) == "---")
 			break;;
 	};	//usern;
 
@@ -1420,23 +1420,23 @@ var ExodusProgramBase::oconv(const var& input, const var& conversion) {
 		var subconversion=conversion.remove(ptr,delimiter);
 
 		//either call custom conversion routines
-		if (subconversion[1] == L"[") {
+		if (subconversion[1] == "[") {
 
 			//var("*").logput();
 			//return 1;
 
 			//extract any params
-			var mode=subconversion.field(L",",2,9999).field(L"]",1);
+			var mode=subconversion.field(",",2,9999).field("]",1);
 
 			//set the function name
-			ioconv_custom=subconversion.substr(2).field(L",",1).field(L"]",1).lcase();
+			ioconv_custom=subconversion.substr(2).field(",",1).field("]",1).lcase();
 
 			//wire up the current environment
 			ioconv_custom.mv_ = (&mv);
 
 			//and call it
 			var output;
-			call ioconv_custom(L"OCONV",result,mode,output);
+			call ioconv_custom("OCONV",result,mode,output);
 			result=output;
 
 		//or call standard conversion methods
@@ -1462,20 +1462,20 @@ var ExodusProgramBase::iconv(const var& input, const var& conversion) {
 		var subconversion=conversion.remove(ptr,delimiter);
 
 		//either call custom conversion routines
-		if (subconversion[1] == L"[") {
+		if (subconversion[1] == "[") {
 
 			//extract any params
-			var mode=subconversion.field(L",",2,9999).field(L"]",1);
+			var mode=subconversion.field(",",2,9999).field("]",1);
 
 			//set the function name
-			ioconv_custom=subconversion.substr(2).field(L",",1).field(L"]",1).lcase();
+			ioconv_custom=subconversion.substr(2).field(",",1).field("]",1).lcase();
 
 			//wire up the current environment
 			ioconv_custom.mv_ = (&mv);
 
 			//and call it
 			var output;
-			call ioconv_custom(L"ICONV",result,mode,output);
+			call ioconv_custom("ICONV",result,mode,output);
 			result=output;
 
 		//or call standard conversion methods

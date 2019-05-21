@@ -163,7 +163,7 @@ void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsec
 	else if (totlength!=int(request_size))
 	{
 		var reply=response^L" Only "^int(request_size)^L" bytes read. Should be "^totlength;
-		std::wcerr<<reply<<std::endl;
+		std::cerr<<reply<<std::endl;
 		response=reply.toString();
 		return;
 	}
@@ -171,7 +171,7 @@ void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsec
 	else if (!exodusfunctorbase.mv_)
 	{
 		var reply=response^L" MvEnvironment is not initialised";
-		std::wcerr<<reply<<std::endl;
+		std::cerr<<reply<<std::endl;
 		response=reply.toString();
 		return;
 	}
@@ -200,12 +200,14 @@ void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsec
 		//var datakey=fromutf8(prequest+sizeof(int),**plength);
 		//NB if you no longer access mv_ directly here
 		//then make mv_ private in ExodusFunctorBase
-		exodusfunctorbase.mv_->ID=fromutf8(prequest+sizeof(int),**plength);
+		//exodusfunctorbase.mv_->ID=fromutf8(prequest+sizeof(int),**plength);
+		exodusfunctorbase.mv_->ID=std::string(prequest+sizeof(int),**plength);
 		prequest+=*prequest+sizeof(int);
 
 		//record data into mv RECORD
 		//var data=fromutf8(prequest+sizeof(int),**plength);
-		exodusfunctorbase.mv_->RECORD=fromutf8(prequest+sizeof(int),**plength);
+		//exodusfunctorbase.mv_->RECORD=fromutf8(prequest+sizeof(int),**plength);
+		exodusfunctorbase.mv_->RECORD=std::string(prequest+sizeof(int),**plength);
 		prequest+=*prequest+sizeof(int);
 
 		//valueno into mv MV
@@ -242,18 +244,18 @@ void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsec
 		else
 			reply=library.call(filename,dictkey);
 */
-		//std::wcerr<<L"mvipc: " << str_libname.c_str() << L" " << str_funcname.c_str()<<std::endl;
+		//std::cerr<<L"mvipc: " << str_libname.c_str() << L" " << str_funcname.c_str()<<std::endl;
 		//if (not exodusfunctorbase.initsmf(str_libname.c_str(),str_funcname.c_str()))
 		std::string prefixed_funcname="exodusprogrambasecreatedelete_" + str_funcname;
 		#if TRACING >= 3
 			//hangs?
-			//std::wcerr<<L"mvipc: " << str_libname.c_str() << L" " << prefixed_funcname.c_str()<<std::endl;
+			//std::cerr<<L"mvipc: " << str_libname.c_str() << L" " << prefixed_funcname.c_str()<<std::endl;
 		#endif
 		if (not exodusfunctorbase.initsmf(str_libname.c_str(),prefixed_funcname.c_str()))
 		/////////////////////////////////////////////////////////////////////////////
 		{
 			var reply=response^L"Cannot find Library "^str_libname^L", or function "^str_funcname^L" is not present";
-			std::wcerr<<reply<<std::endl;
+			std::cerr<<reply<<std::endl;
 			response=reply.toString();
 			return;
 		}
@@ -278,14 +280,14 @@ void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsec
 				exodusfunctorbase.mv_->ANS=exodusfunctorbase.callsmf();
 				/////////////////////////////
 				#if TRACING >= 3
-					std::wcerr<<"mvipc: called callsmf successfully "<<std::endl;
+					std::cerr<<"mvipc: called callsmf successfully "<<std::endl;
 				#endif
 
 				//dictionary subroutines return return in mv ANS.
 				response=exodusfunctorbase.mv_->ANS.toString();
 
 				#if TRACING >= 3
-					std::wcerr<<"mvipc: got ANS "<<std::endl;
+					std::cerr<<"mvipc: got ANS "<<std::endl;
 				#endif
 
 				//optionally limit the number of bytes of the reply sent
@@ -293,7 +295,7 @@ void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsec
 				if (maxresponsechars&&nresponsebytes>maxresponsechars)
 				{
 					var reply=var(L"NEOSYS_IPC_ERROR: Response bytes) " ^ var(nresponsebytes) ^ L" too many for ipc buffer bytes " ^ var(maxresponsechars))^ " while calling "^str_libname^", "^str_funcname;
-					std::wcerr<<reply<<std::endl;
+					std::cerr<<reply<<std::endl;
 					response=reply.toString();
 					return;
 				}
@@ -304,14 +306,14 @@ void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsec
 			catch (MVException mve)
 			{
 				var reply=response^"ERROR: Calling "^str_libname^", "^str_funcname^L". ERROR: "^mve.description;
-				std::wcerr<<reply<<std::endl;
+				std::cerr<<reply<<std::endl;
 				response=reply.toString();
 				return;
 			}
 			catch (...)
 			{
 				var reply=response^"ERROR: Calling "^str_libname^", "^str_funcname;
-				std::wcerr<<reply<<std::endl;
+				std::cerr<<reply<<std::endl;
 				response=reply.toString();
 				return;
 			}

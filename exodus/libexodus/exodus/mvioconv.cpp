@@ -28,12 +28,13 @@ THE SOFTWARE.
 #include <iostream> //for wcout
 #include <sstream> //for conv MX
 #include <cmath>
+#include <string.h>
 
 #include <exodus/mvimpl.h>
 #include <exodus/mv.h>
 #include <exodus/mvexceptions.h>
 
-static const int HEX_PER_WCHAR=sizeof(wchar_t)*2;
+static const int HEX_PER_CHAR=sizeof(char)*2;
 //using namespace std;
 
 namespace exodus
@@ -41,7 +42,7 @@ namespace exodus
 
 var var::iconv(const var& convstr) const
 {
-	THISIS(L"var var::iconv(const var& convstr) const")
+	THISIS("var var::iconv(const var& convstr) const")
 	ISSTRING(convstr)
 
 	return iconv(convstr.var_str.c_str());
@@ -57,29 +58,29 @@ A string containing a conversion instruction
 The result in internal format
 
 */
-var var::iconv(const wchar_t* convstr) const
+var var::iconv(const char* convstr) const
 {
-	THISIS(L"var var::iconv(const wchar_t* convstr) const")
+	THISIS("var var::iconv(const char* convstr) const")
 	THISISSTRING()
 
 	//empty string in, empty string out
 	if (var_typ&pimpl::VARTYP_STR && var_str.length()==0)
-		return L"";
+		return "";
 
 	//REMOVE the remove logic out of the L# R# and T# here
 
 	var part;
 	var charn = 1;
 	var terminator;
-	var output = L"";
+	var output = "";
 
-	const wchar_t* conversionchar=convstr;
+	const char* conversionchar=convstr;
 
 	//check first character
 	switch (*conversionchar)
 	{
 		//D
-		case L'D':
+		case 'D':
 
 			do  {
 
@@ -101,7 +102,7 @@ var var::iconv(const wchar_t* convstr) const
 			break;
 
 		//MD, MC, MT, MX
-		case L'M':
+		case 'M':
 
 			//point to 2nd character
 			++conversionchar;
@@ -125,28 +126,28 @@ var var::iconv(const wchar_t* convstr) const
 					{
 
 						//MD MC - Decimal places
-						case L'D':
-						case L'C':
+						case 'D':
+						case 'C':
 
-							throw MVException(L"iconv MD and MC are not implemented yet");
+							throw MVException("iconv MD and MC are not implemented yet");
 //							output ^= part.iconv_MD(convstr);
 							break;
 
 						//MT
-						case L'T':
+						case 'T':
 							//output ^= part.iconv_MT(convstr);
 							output ^= part.iconv_MT();
 							break;
 
 						//MR - replace iconv is same as oconv!
-						case L'R':
+						case 'R':
 							output ^= part.oconv_MR(conversionchar);
 							break;
 
 						//MX number to hex (not string to hex)
-						case L'X':
-							throw MVNotImplemented(L"iconv('MX')");
-							std::wostringstream ss;
+						case 'X':
+							throw MVNotImplemented("iconv('MX')");
+							std::ostringstream ss;
 							ss <<std::hex<<std::uppercase<<part.round().toInt();
 							output ^= ss.str();
 
@@ -165,19 +166,19 @@ var var::iconv(const wchar_t* convstr) const
 			break;
 
 		//iconv L#, R#, T#, C# do nothing
-		case L'L':
-		case L'R':
-		case L'T':
-		case L'C':
-			//return L"";
+		case 'L':
+		case 'R':
+		case 'T':
+		case 'C':
+			//return "";
 			return convstr;
 			break;
 
 		//HEX
-		case L'H':
+		case 'H':
 			//empty string in, empty string out
 			if (var_typ&pimpl::VARTYP_STR && var_str.length()==0)
-				return L"";
+				return "";
 
 //TODO allow high end separators in without conversion (instead of failing as non-hex digits)
 
@@ -189,16 +190,16 @@ var var::iconv(const wchar_t* convstr) const
 
 				switch (*conversionchar)
 				{
-					case L'\0':
-						return iconv_HEX(HEX_PER_WCHAR);
+					case '\0':
+						return iconv_HEX(HEX_PER_CHAR);
 						break;
-					case L'2':
+					case '2':
 						return iconv_HEX(2);
 						break;
-					case L'4':
+					case '4':
 						return iconv_HEX(4);
 						break;
-					case L'8':
+					case '8':
 						return iconv_HEX(8);
 						break;
 				}
@@ -210,19 +211,19 @@ var var::iconv(const wchar_t* convstr) const
 			break;
 
 		//custom io conversions should not be called via ::iconv or ::oconv since they have no access to mv environment required to call external subroutines
-		case L'[':
+		case '[':
 
-			throw MVException(L"Custom conversions like (" ^ var(convstr) ^ L") must be called like a function iconv(input,conversion) not like a method, input.iconv(conversion)" );
+			throw MVException("Custom conversions like (" ^ var(convstr) ^ ") must be called like a function iconv(input,conversion) not like a method, input.iconv(conversion)" );
 			break;
 
 		//empty convstr string - no conversion
-		case L'\0':
+		case '\0':
 			return (*this);
 	}
 
 	//TODO implement
-	//std::wcout<<L"iconv "<<convstr<< L" not implemented yet "<<std::endl;
-	throw MVException(L"iconv " ^ var(convstr) ^ L" not implemented yet ");
+	//std::wcout<<"iconv "<<convstr<< " not implemented yet "<<std::endl;
+	throw MVException("iconv " ^ var(convstr) ^ " not implemented yet ");
 
 	return *this;
 
@@ -233,9 +234,9 @@ var var::oconv_T(const var& format) const
 
 	//expecting only "T#99" with no mask at the moment
 
-	var just = (format.field(L"#", 1, 1))[1];
+	var just = (format.field("#", 1, 1))[1];
 
-	var width2 = format.field(L"#", 2, 1);
+	var width2 = format.field("#", 2, 1);
 
 	//leave unconverted if non-numeric width
 	if (!width2.isnum())
@@ -245,18 +246,18 @@ var var::oconv_T(const var& format) const
 	int width=width2;
 
 	//get padding character from "L(?)" or space
-	wchar_t fillchar;
-	if (format.var_str.length()>=4 && format.var_str[1]==L'(' && format.var_str[3]==L')')
+	char fillchar;
+	if (format.var_str.length()>=4 && format.var_str[1]=='(' && format.var_str[3]==')')
 		fillchar=format.var_str[2];
 	else
-		fillchar=L' ';
+		fillchar=' ';
 
-	var output = L"";
+	var output = "";
 
 	var terminator;
 	int nwords;
 	var charn = 1;
-	std::wstring spacing;
+	std::string spacing;
 
 	//process each part between high sep chars
 	while (true) {
@@ -267,7 +268,7 @@ var var::oconv_T(const var& format) const
 		if (width) {
 
 			//more complex processing folding on spaces
-			//part.converter(TM,L" ");
+			//part.converter(TM," ");
 			part.trimmerf().trimmerb();
 
 			//simple processing if part is less than width
@@ -289,11 +290,11 @@ var var::oconv_T(const var& format) const
 
 
 
-			nwords = part.count(L" ") + 1;
+			nwords = part.count(" ") + 1;
 
 			for (int wordn = 1; wordn <= nwords; wordn++) {
 
-				var word = part.field(L" ", wordn, 1);
+				var word = part.field(" ", wordn, 1);
 
 				int wordlen = word.length();
 
@@ -321,7 +322,7 @@ var var::oconv_T(const var& format) const
 
 						//try to squeeze in following words into the remaining space
 						while (remaining > 1 && wordn<nwords) {
-							var nextword = part.field(L" ", wordn + 1, 1);
+							var nextword = part.field(" ", wordn + 1, 1);
 
 							int nextwordlen=nextword.length();
 							if (nextwordlen + 1 > remaining)
@@ -356,7 +357,7 @@ var var::oconv_T(const var& format) const
 
 }
 
-var var::oconv_MD(const wchar_t* conversion) const
+var var::oconv_MD(const char* conversion) const
 {
 
 	//http://www.d3ref.com/index.php?token=basic.masking.function
@@ -364,7 +365,7 @@ var var::oconv_MD(const wchar_t* conversion) const
 	//TODO implement nextchar as a pointer to eliminate charn and convlen
 
 	//not numeric or plain MD does no conversion
-	size_t convlen=wcslen(conversion);
+	size_t convlen=strlen(conversion);
 	if (!isnum()||convlen<=2)
 		return *this;
 
@@ -374,14 +375,14 @@ var var::oconv_MD(const wchar_t* conversion) const
 	bool dontmovepoint=false;
 	bool septhousands=false;
 	bool forcezero=false;
-	wchar_t trailer=L'\0';
-	wchar_t prefixchar=L'\0';
+	char trailer='\0';
+	char prefixchar='\0';
 
 	//get pointer to the third character (after the MD/MC bit)
 	size_t charn=2;
 
 	//get the first (next) character
-	wchar_t nextchar=conversion[charn];
+	char nextchar=conversion[charn];
 
 	//following up to two digits are ndecimals, or ndecimals and movedecimals
 	//look for a digit
@@ -418,32 +419,32 @@ var var::oconv_MD(const wchar_t* conversion) const
 	{
 		switch (nextchar)
 		{
-			case L'P':
+			case 'P':
 				dontmovepoint=true;
 				break;
 
-			case L',':
+			case ',':
 				septhousands=true;
 				break;
 
-			case L'D':
-				trailer=L'D';
+			case 'D':
+				trailer='D';
 				break;
 
-			case L'C':
-				trailer=L'C';
+			case 'C':
+				trailer='C';
 				break;
 
-			case L'-':
-				trailer=L'-';
+			case '-':
+				trailer='-';
 				break;
 
-			case L'Z':
+			case 'Z':
 				forcezero=true;
 				break;
 
 			default:
-				if (prefixchar==L'\0')
+				if (prefixchar=='\0')
 					prefixchar=nextchar;
 				break;
 			}
@@ -457,7 +458,7 @@ var var::oconv_MD(const wchar_t* conversion) const
 convert:
 
 	if (!forcezero && this->length()==0)
-		return L"";
+		return "";
 
 	var newmv=(*this);
 
@@ -468,8 +469,8 @@ convert:
 	//rounding
 	newmv=newmv.round(ndecimals);
 
-	var part1=newmv.field(L".",1);
-	var part2=newmv.field(L".",2);
+	var part1=newmv.field(".",1);
+	var part2=newmv.field(".",2);
 	int part2len=part2.length();
 
 	//thousand separators
@@ -478,8 +479,8 @@ convert:
 		int part1len=part1.length();
 		if (part1len>3)
 		{
-			var thousandsep=(conversion[1]==L'C') ? L'.' : L',';
-			var minii=part1[1]==L"-"?2:1;
+			var thousandsep=(conversion[1]=='C') ? '.' : ',';
+			var minii=part1[1]=="-"?2:1;
 			for (int ii=part1len-2;ii>minii;ii-=3)
 			{
 				part1.splicer(ii,0,thousandsep);
@@ -491,7 +492,7 @@ convert:
 	if (ndecimals>0)
 	{
 		//append decimal point
-		part1^=(conversion[1]==L'C')?L',':L'.';
+		part1^=(conversion[1]=='C')?',':'.';
 
 		part1^=part2^std::string(ndecimals-part2len,'0');
 	}
@@ -499,38 +500,38 @@ convert:
 	//trailing minus, DB or CR
 	switch (trailer)
 	{
-		case L'\0':
+		case '\0':
 			break;
 
-		case L'-':
-			if (part1[1]==L"-")
+		case '-':
+			if (part1[1]=="-")
 			{
-				part1.splicer(1,1,L"");
-				part1^=L"-";
+				part1.splicer(1,1,"");
+				part1^="-";
 			}
-			else part1^=L" ";
+			else part1^=" ";
 			break;
 
-		case L'C':
-			if (part1[1]==L"-")
+		case 'C':
+			if (part1[1]=="-")
 			{
-				part1.splicer(1,1,L"");
-				part1^=L"CR";
+				part1.splicer(1,1,"");
+				part1^="CR";
 			}
-			else part1^=L"DR";
+			else part1^="DR";
 			break;
 
-		case L'D':
-			if (part1[1]==L"-")
+		case 'D':
+			if (part1[1]=="-")
 			{
-				part1.splicer(1,1,L"");
-				part1^=L"DR";
+				part1.splicer(1,1,"");
+				part1^="DR";
 			}
-			else part1^=L"CR";
+			else part1^="CR";
 			break;
 	}
 
-	if (prefixchar!=L'\0')
+	if (prefixchar!='\0')
 		part1.splicer(1,0,prefixchar);
 
 	return part1;
@@ -543,21 +544,21 @@ var var::oconv_LRC(const var& format) const
 	//TODO convert to C instead of var for speed
 	//and implement full mask options eg L#2-#3-#4 etc
 
-	var varwidth = format.field(L"#", 2, 1);
-	var just = (format.field(L"#", 1, 1))[1];
+	var varwidth = format.field("#", 2, 1);
+	var just = (format.field("#", 1, 1))[1];
 
 	if (!varwidth.isnum())
 		return *this;
 	int width=varwidth.toInt();
 
 	//get padding character from "L(?)" or space
-	wchar_t fillchar;
-	if (format.var_str.length()>=4 && format.var_str[1]==L'(' && format.var_str[3]==L')')
+	char fillchar;
+	if (format.var_str.length()>=4 && format.var_str[1]=='(' && format.var_str[3]==')')
 		fillchar=format.var_str[2];
 	else
-		fillchar=L' ';
+		fillchar=' ';
 
-	var output = L"";
+	var output = "";
 	var terminator;
 
 	var part;
@@ -575,13 +576,13 @@ var var::oconv_LRC(const var& format) const
 
 			remaining=width-part.length();
 			if (remaining>0) {
-				if (just == L"L")
+				if (just == "")
 				{
 					//output ^= part;
 					//output ^= remaining.space();
 					part.var_str.resize(width,fillchar);
 					output ^= part;
-				} else if (just == L"R")
+				} else if (just == "R")
 				{
 					//output ^= remaining.space();
 					//output ^= part;
@@ -594,7 +595,7 @@ var var::oconv_LRC(const var& format) const
 					output.var_str.resize(width,fillchar);
 				}
 			} else {
-				if (just == L"R")
+				if (just == "R")
 				{
 					//take the last n characters
 					output ^= part.var_str.substr(part.var_str.length()-width,width);
@@ -619,7 +620,7 @@ var var::oconv_LRC(const var& format) const
 
 var var::oconv(const var& conversion) const
 {
-	THISIS(L"var var::oconv(const var& conversion) const")
+	THISIS("var var::oconv(const var& conversion) const")
 	THISISDEFINED()
 	ISSTRING(conversion)
 
@@ -627,12 +628,12 @@ var var::oconv(const var& conversion) const
 
 }
 
-//fast version for common programming example where conversion is provided as a hard coded L Wstring
-//but application programs source code is usually going to usually be "D2" and not L"D2" so provide a narrow char* version?
-//possibly most oconvs will come from variables (eg read from dicts) so will be wstring format
-var var::oconv(const wchar_t* conversion) const
+//fast version for common programming example where conversion is provided as a hard coded string
+//but application programs source code is usually going to usually be "D2" and not "D2" so provide a narrow char* version?
+//possibly most oconvs will come from variables (eg read from dicts) so will be string format
+var var::oconv(const char* conversion) const
 {
-	THISIS(L"var var::oconv(const wchar_t* conversion) const")
+	THISIS("var var::oconv(const char* conversion) const")
 	//TODO this should be THISISASSIGNED since no point converting numbers to strings for many oconvs
 	THISISSTRING()
 
@@ -641,15 +642,15 @@ var var::oconv(const wchar_t* conversion) const
 	var part;
 	var charn = 1;
 	var terminator;
-	var output = L"";
+	var output = "";
 
-	const wchar_t* conversionchar=conversion;
+	const char* conversionchar=conversion;
 
 	//check first character
 	switch (*conversionchar)
 	{
 		//D
-		case L'D':
+		case 'D':
 
 			do  {
 
@@ -673,7 +674,7 @@ var var::oconv(const wchar_t* conversion) const
 			break;
 
 		//MD, MC, MT, MX, ML, MR
-		case L'M':
+		case 'M':
 
 			//point to 2nd character
 			++conversionchar;
@@ -690,7 +691,7 @@ var var::oconv(const wchar_t* conversion) const
 				bool notemptystring=!(part.var_typ&pimpl::VARTYP_STR && part.var_str.length()==0);
 
 				//MR ... character replacement
-				if (*conversionchar==L'R')
+				if (*conversionchar=='R')
 				{
 					if (notemptystring)
 						output ^= part.oconv_MR(++conversionchar);
@@ -708,14 +709,14 @@ var var::oconv(const wchar_t* conversion) const
 					switch (*conversionchar)
 					{
 						//MD and MC - decimal places
-						case L'D':
-						case L'C':
+						case 'D':
+						case 'C':
 							//may treat empty string as zero
 							output ^= part.oconv_MD(conversion);
 							break;
 
 						//MT - time
-						case L'T':
+						case 'T':
 							//point to the remainder of the conversion after the MT
 							if (notemptystring)
 							{
@@ -725,10 +726,10 @@ var var::oconv(const wchar_t* conversion) const
 							break;
 
 						//MX - number to hex (not string to hex)
-						case L'X':
+						case 'X':
 							if (notemptystring)
 							{
-								std::wostringstream ss;
+								std::ostringstream ss;
 								ss <<std::hex<<std::uppercase<<part.round().toInt();
 								output ^= ss.str();
 							}
@@ -748,24 +749,24 @@ var var::oconv(const wchar_t* conversion) const
 
 		//L#, R#, C#
 		//format even empty strings
-		case L'L':
-		case L'R':
-		case L'C':
+		case 'L':
+		case 'R':
+		case 'C':
 			return oconv_LRC(conversion);
 			break;
 
 		//T#
 		//format even empty strings
-		case L'T':
+		case 'T':
 			return oconv_T(conversion);
 			break;
 
 		//HEX (unlike arev it converts high separator characters)
-		case L'H':
+		case 'H':
 
 			//empty string in, empty string out
 			if (var_typ&pimpl::VARTYP_STR && var_str.length()==0)
-				return L"";
+				return "";
 
 			//check 2nd character is E, 3rd character is X and next character is null, or a digit
 			if ((*(++conversionchar)=='E') && (*(++conversionchar)=='X'))
@@ -775,16 +776,16 @@ var var::oconv(const wchar_t* conversion) const
 
 				switch (*conversionchar)
 				{
-					case L'\0':
-						return oconv_HEX(HEX_PER_WCHAR);
+					case '\0':
+						return oconv_HEX(HEX_PER_CHAR);
 						break;
-					case L'2':
+					case '2':
 						return oconv_HEX(2);
 						break;
-					case L'4':
+					case '4':
 						return oconv_HEX(4);
 						break;
-					case L'8':
+					case '8':
 						return oconv_HEX(8);
 						break;
 				}
@@ -795,31 +796,31 @@ var var::oconv(const wchar_t* conversion) const
 
 			break;
 
-		case L'B':
+		case 'B':
 			//empty string in, empty string out
 			if (var_typ&pimpl::VARTYP_STR && var_str.length()==0)
-				return L"";
+				return "";
 			if (this->toBool())
-				return var(conversion).substr(2).field(L",",1);
+				return var(conversion).substr(2).field(",",1);
 			else
-				return var(conversion).substr(2).field(L",",2);
+				return var(conversion).substr(2).field(",",2);
 			break;
 
 		//custom conversion should not be called via ::oconv
-		case L'[':
+		case '[':
 
-			throw MVException(L"Custom conversions like (" ^ var(conversion) ^ L") must be called like a function oconv(input,conversion) not like a method, input.oconv(conversion)" );
+			throw MVException("Custom conversions like (" ^ var(conversion) ^ ") must be called like a function oconv(input,conversion) not like a method, input.oconv(conversion)" );
 			break;
 
 
 		//empty conversion string - no conversion
-		case L'\0':
+		case '\0':
 			return (*this);
 	}
 
 	//TODO implement
-	//std::wcout<<L"oconv "<<conversion<< L" not implemented yet "<<std::endl;
-	throw MVException(L"oconv " ^ var(conversion) ^ L" not implemented yet ");
+	//std::wcout<<"oconv "<<conversion<< " not implemented yet "<<std::endl;
+	throw MVException("oconv " ^ var(conversion) ^ " not implemented yet ");
 
 	//unknown conversions are simply ignored in AREV
 	return *this;
@@ -828,6 +829,7 @@ var var::oconv(const wchar_t* conversion) const
 var var::oconv_HEX(const int ioratio) const
 {
 
+	//this needs rewritting because we have changed from wstring to string for internal coding
 	//decided to output 8 fixed hex digits per character to represent the full range of unicode characters regardless of platform
 	//1. output 8 fixed hex digits per character to represent
 	//logic is that this would be consistent and easy to postprocess programmatically and visually
@@ -838,7 +840,7 @@ var var::oconv_HEX(const int ioratio) const
 	//3. convert to utf16 and represent each byte pair as four hex digits
 	//4. convert as 1. or 3 depending on platform (word length 4 or 2 chars)
 
-	std::wostringstream ss;
+/*	std::ostringstream ss;
 	int nchars=length();
 	ss.flags (std::ios::right | std::ios::hex | std::ios::uppercase);
 	//ss.setbase(16) useful to set numerically instead of ios::hex
@@ -850,21 +852,34 @@ var var::oconv_HEX(const int ioratio) const
 		ss << int((*this).var_str[charn]);
 	}
 	return ss.str();
+*/
 
+	char const hex_chars[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+
+	std::string result;
+	int nchars=this->length();
+	for (int charn=0;charn<nchars;++charn)
+	{
+		char const byte = this->var_str[charn];
+		result += hex_chars[ ( byte & 0xF0 ) >> 4 ];
+    		result += hex_chars[ ( byte & 0x0F ) >> 0 ];
+	}
+
+	return result;
 }
 
 //use macro to ensure inlined instead of using "inline" function
 #define ADD_NYBBLE_OR_FAIL \
 	nybble=var_str[posn++]; \
-	if (nybble<L'0') \
-		return L""; \
-	if (nybble<=L'9') \
-		nybble-=L'0'; \
-	else if (nybble>=L'A'&&nybble<=L'F') \
-		nybble-=L'7'; \
-	else if (nybble>=L'a'&&nybble<=L'f') \
-		nybble-=L'W'; \
-	else return L""; \
+	if (nybble<'0') \
+		return ""; \
+	if (nybble<='9') \
+		nybble-='0'; \
+	else if (nybble>='A'&&nybble<='F') \
+		nybble-='7'; \
+	else if (nybble>='a'&&nybble<='f') \
+		nybble-='W'; \
+	else return ""; \
 	outchar+=nybble; \
 
 var var::iconv_HEX(const int ioratio) const
@@ -877,9 +892,9 @@ var var::iconv_HEX(const int ioratio) const
 	//empty string in, empty string out
 	size_t endposn=var_str.length();
 	if (!endposn)
-		return L"";
+		return "";
 
-	std::wstring textstr=L"";
+	std::string textstr="";
 
 	size_t posn=0;
 
@@ -889,7 +904,7 @@ var var::iconv_HEX(const int ioratio) const
 	if (!ratio)
 		ratio=ioratio;
 
-	wchar_t nybble;
+	char nybble;
 	do
 	{
 		unsigned int outchar=0;

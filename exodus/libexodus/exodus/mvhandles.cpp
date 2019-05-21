@@ -21,7 +21,7 @@ MvHandlesCache::MvHandlesCache()
 	: conntbl(HANDLES_CACHE_SIZE)
 {}
 
-int MvHandlesCache::add_handle(CACHED_HANDLE handle_to_cache, DELETER_AND_DESTROYER del, std::wstring name)
+int MvHandlesCache::add_handle(CACHED_HANDLE handle_to_cache, DELETER_AND_DESTROYER del, std::string name)
 {
 	assert(del);
 	boost::mutex::scoped_lock lock(mvhandles_mutex);
@@ -40,7 +40,7 @@ int MvHandlesCache::add_handle(CACHED_HANDLE handle_to_cache, DELETER_AND_DESTRO
 	return ix;
 }
 
-CACHED_HANDLE MvHandlesCache::get_handle(int index, std::wstring name)
+CACHED_HANDLE MvHandlesCache::get_handle(int index, std::string name)
 {
 	boost::mutex::scoped_lock lock(mvhandles_mutex);
 	return (conntbl[index].deleter == HANDLE_ENTRY_FREE) || (conntbl[index].extra != name)

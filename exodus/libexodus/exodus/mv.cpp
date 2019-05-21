@@ -74,7 +74,8 @@ var::~var()
 	//this could be removed in production code perhaps
 	//set all unused bits to 1 to ease detection of usage of uninitialised variables (bad c++ syntax like var x=x+1;
 	//set all used bits to 0 to increase chance of detecting unassigned variables
-	var_typ=(wchar_t)0xFFFFFFF0;
+	//var_typ=(char)0xFFFFFFF0;
+	var_typ=0xF0;
 }
 
 //CONSTRUCTORS
@@ -92,11 +93,11 @@ var::var()
 
 	//so the following test is put everywhere to protect against this type of accidental programming
 	//if (var_typ&mvtypemask)
-	//	throw MVUndefined(L"funcname()");
+	//	throw MVUndefined("funcname()");
 	//should really ensure a magic number and not just HOPE for some binary digits above bottom four 0-15 decimal 1111binary
 	//this could be removed in production code perhaps
 
-	//debuggCONSTRUCT&&wcout<<L"CONSTRUCT: var()\n";
+	//debuggCONSTRUCT&&cout<<"CONSTRUCT: var()\n";
 
 	//not a pointer anymore for speed
 	//priv=new pimpl;
@@ -112,7 +113,7 @@ var::var()
 //(could initialise and check after but this feels bad due to loss of target)
 var::var(const var& rhs_var)
 {
-	THISIS(L"var::var(const var& rhs_var)")
+	THISIS("var::var(const var& rhs_var)")
 
 	//do first since initializer is copiedvar
 	ISASSIGNED(rhs_var)
@@ -130,7 +131,7 @@ var::var(const var& rhs_var)
 //move constructor
 var::var(const var&& rhs) noexcept
 {
-	//THISIS(L"var::var(const var&& rhs)")
+	//THISIS("var::var(const var&& rhs)")
 	//ISASSIGNED(rhs)
 
 	//using std::swap;
@@ -143,18 +144,9 @@ var::var(const var&& rhs) noexcept
 	var_typ=rhs.var_typ;
 }
 
-//constructor for wchar_t
-//would just use initializers since cannot fail
-//(except cannot seem to init wstring from wchar_t!)
-var::var(const wchar_t char1)
-{
-	var_str=char1;
-	var_typ=pimpl::VARTYP_STR;
-}
-
-//constructor for wide c_str
+//constructor for char*
 //use initializers since cannot fail
-var::var(const wchar_t* cstr1)
+var::var(const char* cstr1)
 {
 
 	//not a pointer anymore for speed
@@ -163,28 +155,30 @@ var::var(const wchar_t* cstr1)
 	//protect against null pointer
 	if (cstr1==0)
 	{
-		//THISIS(L"var::var(const wchar_t* cstr1)")
-		throw MVInvalidPointer(L"Null pointer in var(const char*)");
+		//THISIS("var::var(const char* cstr1)")
+		throw MVInvalidPointer("Null pointer in var(const char*)");
 	}
 
 	var_str=cstr1;
 	var_typ=pimpl::VARTYP_STR;
 }
 
-//constructor for std::wstring
+//constructor for xstring
 //just use initializers since cannot fail
-var::var(const std::wstring& str1)
+var::var(const xstring& str1)
 	: var_str(str1)
 	, var_typ(pimpl::VARTYP_STR)
 {}
 
+#if 0
 //constructor for std::string
 //just use initializers since cannot fail
 var::var(const std::string& str1)
 	//: var_str(wstringfromUTF8((UTF8*)str1.data(),(int)str1.length()))
-	: var_str(boost::locale::conv::utf_to_utf<wchar_t>(str1))
+	: var_str(boost::locale::conv::utf_to_utf<char>(str1))
 	, var_typ(pimpl::VARTYP_STR)
 {}
+#endif
 
 //constructor for bool
 //just use initializers since cannot fail
@@ -223,15 +217,15 @@ var::var(const double double1)
 
 //allow conversion to string (IS THIS USED FOR ANYTHING AT THE MOMENT?
 //allows the usage of any string function
-//operator const std::wstring()
+//operator const xstring()
    	//{
-//	//debuggCONVERT&& wcout<<L"CONVERT: operator const std::wstring() returns '"<<var_str<<L"'\n";
+//	//debuggCONVERT&& cout<<"CONVERT: operator const xstring() returns '"<<var_str<<"'\n";
 //	return var_str;
 //}
 
 var::operator void*() const
 {
-	THISIS(L"var::operator void*() const")
+	THISIS("var::operator void*() const")
 	//could be skipped for speed if can be proved there is no way in c++ syntax that would result in
 	//an attempt to convert an uninitialised object to void*
 	//since there is a bool conversion when does c++ use automatic conversion to void*
@@ -261,7 +255,7 @@ var::operator const char*() const
 #ifndef HASINTREFOP
 var::operator int() const
 {
-	THISIS(L"var::operator int() const")
+	THISIS("var::operator int() const")
 	THISISDEFINED()
 
 	do
@@ -272,24 +266,24 @@ var::operator int() const
 		if (var_typ&pimpl::VARTYP_DBL)
 			return int(var_dbl);
 		if (var_typ&pimpl::VARTYP_NAN)
-			throw MVNonNumeric(L"int(" ^ substr(1,20) ^ L")");
+			throw MVNonNumeric("int(" ^ substr(1,20) ^ ")");
 		if (!(var_typ))
 		{
 			THISISASSIGNED()
-			throw MVUnassigned(L"int(var)");
+			throw MVUnassigned("int(var)");
 		}
 	}
 	while (isnum());//must be string - try to convert to numeric and go round again
 
 	THISISNUMERIC()
-	throw MVNonNumeric(L"int(L" ^ substr(1,20) ^ L")");
+	throw MVNonNumeric("int(" ^ substr(1,20) ^ ")");
 
 }
 
 #else
 var::operator int&() const
 {
-	THISIS(L"var::operator int&()")
+	THISIS("var::operator int&()")
 	THISISINTEGER()
 	//TODO check that converting mvint_t (which is long long) to int doesnt cause any practical problems) PROBABLY WILL!
 	//since we are returning a non const reference which allows callers to set the int directly then clear any decimal and string cache flags
@@ -299,7 +293,7 @@ var::operator int&() const
 }
 var::operator double&() const
 {
-	THISIS(L"var::operator double&()")
+	THISIS("var::operator double&()")
 	THISISDECIMAL()
 	//since we are returning a non const reference which allows callers to set the dbl directly then clear any int and string cache flags
 	//which would be invalid after setting the dbl alone
@@ -312,7 +306,7 @@ var::operator double&() const
 /*
 var::operator unsigned int() const
 {
-	THISIS(L"var::operator int() const")
+	THISIS("var::operator int() const")
 	THISISDEFINED()
 
 	do
@@ -323,18 +317,18 @@ var::operator unsigned int() const
 		if (var_typ&pimpl::VARTYP_DBL)
 			return int(var_dbl);
 		if (var_typ&pimpl::VARTYP_NAN)
-			throw MVNonNumeric(L"int(" ^ substr(1,20) ^ L")");
+			throw MVNonNumeric("int(" ^ substr(1,20) ^ ")");
 		if (!(var_typ))
 		{
 			THISISASSIGNED()
-			throw MVUnassigned(L"int(var)");
+			throw MVUnassigned("int(var)");
 		}
 	}
 	//must be string - try to convert to numeric
 	while (isnum());
 
 	THISISNUMERIC()
-	throw MVNonNumeric(L"int(L" ^ substr(1,20) ^ L")");
+	throw MVNonNumeric("int(" ^ substr(1,20) ^ ")");
 
 }
 */
@@ -348,11 +342,11 @@ var::operator size_t() const
 */
 
 /*
-var::operator const wchar_t*()
+var::operator const char*()
 {
 	if (var_typ&mvtypemask)
-		throw MVUndefined(L"const wchar_t*()");
-	wcout<<L"CONVERT: operator const wchar_t*() returns '"<<var_str.c_str()<<L"'\n";
+		throw MVUndefined("const char*()");
+	cout<<"CONVERT: operator const char*() returns '"<<var_str.c_str()<<"'\n";
 	return var_str.c_str();
 }
 */
@@ -368,7 +362,7 @@ var::operator const wchar_t*()
 //see also ^= etc
 var& var::operator= (const var& rhs)
 {
-	THISIS(L"var& var::operator= (const var& rhs)")
+	THISIS("var& var::operator= (const var& rhs)")
 	THISISDEFINED()
 	ISASSIGNED(rhs)
 
@@ -388,7 +382,7 @@ var& var::operator= (const var& rhs)
 /* sadly cant use this idiom since it is ambiguous with move constructor
 var& var::operator= (var rhs) noexcept
 {
-//	THISIS(L"var& var::operator= (var rhs)")
+//	THISIS("var& var::operator= (var rhs)")
 //	THISISDEFINED()
 
 	//copy-and-swap idiom
@@ -410,7 +404,7 @@ var& var::operator= (var rhs) noexcept
 //move assignment
 var& var::operator= (const var&& rhs) noexcept
 {
-//	THISIS(L"var& var::operator= (var rhs)")
+//	THISIS("var& var::operator= (var rhs)")
 //	THISISDEFINED()
 
 	//copy-and-swap idiom
@@ -432,7 +426,7 @@ var& var::operator= (const var&& rhs) noexcept
 //The assignment operator should always return a reference to *this.
 var& var::operator= (const int int1)
 {
-	//THISIS(L"var& var::operator= (const int int1)")
+	//THISIS("var& var::operator= (const int int1)")
 	//protect against unlikely syntax as follows:
 	//var undefinedassign=undefinedassign=123';
 	// !!RISK NOT CHECKING TO SPEED THINGS UP SINCE SEEMS TO WORK IN MSVC AND GCC
@@ -448,7 +442,7 @@ var& var::operator= (const int int1)
 //The assignment operator should always return a reference to *this.
 var& var::operator= (const double double1)
 {
-    //THISIS(L"var& var::operator= (const double double1)")
+    //THISIS("var& var::operator= (const double double1)")
 	//protect against unlikely syntax as follows:
 	//var undefinedassign=undefinedassign=9.9';
 	// !!RISK NOT CHECKING TO SPEED THINGS UP SINCE SEEMS TO WORK IN MSVC AND GCC
@@ -460,12 +454,12 @@ var& var::operator= (const double double1)
 	return *this;
 }
 
-//=wchar_t
+//=char
 //The assignment operator should always return a reference to *this.
-var& var::operator= (const wchar_t char2)
+var& var::operator= (const char char2)
 {
 	
-	THISIS(L"var& var::operator= (const wchar_t char2)")
+	THISIS("var& var::operator= (const char char2)")
 	//protect against unlikely syntax as follows:
 	//var undefinedassign=undefinedassign=L'X';
 	//this causes crash due to bad memory access due to setting string that doesnt exist
@@ -480,13 +474,13 @@ var& var::operator= (const wchar_t char2)
 	return *this;
 }
 
-//=wchar_t*
+//=char*
 //The assignment operator should always return a reference to *this.
-var& var::operator= (const wchar_t* char2)
+var& var::operator= (const char* char2)
 {
-	THISIS(L"var& var::operator= (const wchar_t* char2)")
+	THISIS("var& var::operator= (const char* char2)")
 	//protect against unlikely syntax as follows:
-	//var undefinedassign=undefinedassign=L"xxx";
+	//var undefinedassign=undefinedassign="xxx";
 	//this causes crash due to bad memory access due to setting string that doesnt exist
 	//slows down all string settings so consider NOT CHECKING in production code
 	THISISDEFINED()
@@ -497,14 +491,14 @@ var& var::operator= (const wchar_t* char2)
 	return *this;
 }
 
-//=std::wstring
+//=xstring
 //The assignment operator should always return a reference to *this.
-var& var::operator= (const std::wstring string2)
+var& var::operator= (const xstring string2)
 {
 	
-	THISIS(L"var& var::operator= (const wchar_t* char2)")
+	THISIS("var& var::operator= (const char* char2)")
 	//protect against unlikely syntax as follows:
-	//var undefinedassign=undefinedassign=std::wstring(L"xxx"";
+	//var undefinedassign=undefinedassign=xstring("xxx"";
 	//this causes crash due to bad memory access due to setting string that doesnt exist
 	//slows down all string settings so consider NOT CHECKING in production code
 	THISISDEFINED()
@@ -519,7 +513,7 @@ var& var::operator= (const std::wstring string2)
 //The assignment operator should always return a reference to *this.
 var& var::operator^=(const var& rhs)
 {
-	THISIS(L"var& var::operator^=(const var& rhs)")
+	THISIS("var& var::operator^=(const var& rhs)")
 	THISISSTRING()
 	ISSTRING(rhs)
 
@@ -534,7 +528,7 @@ var& var::operator^=(const var& rhs)
 //The assignment operator should always return a reference to *this.
 var& var::operator^= (const int int1)
 {
-	THISIS(L"var& var::operator^= (const int int1)")
+	THISIS("var& var::operator^= (const int int1)")
 	THISISSTRING()
 
 	//var_str+=var(int1).var_str;
@@ -548,7 +542,7 @@ var& var::operator^= (const int int1)
 //The assignment operator should always return a reference to *this.
 var& var::operator^= (const double double1)
 {
-    THISIS(L"var& var::operator^= (const double double1)")
+    THISIS("var& var::operator^= (const double double1)")
 	THISISSTRING()
 
 	//var_str+=var(int1).var_str;
@@ -558,11 +552,11 @@ var& var::operator^= (const double double1)
 	return *this;
 }
 
-//^=wchar_t
+//^=char
 //The assignment operator should always return a reference to *this.
-var& var::operator^= (const wchar_t char1)
+var& var::operator^= (const char char1)
 {
-	THISIS(L"var& var::operator^= (const wchar_t char1)")
+	THISIS("var& var::operator^= (const char char1)")
 	THISISSTRING()
 
 	//var_str+=var(int1).var_str;
@@ -572,26 +566,26 @@ var& var::operator^= (const wchar_t char1)
 	return *this;
 }
 
-//^=wchar_t*
+//^=char*
 //The assignment operator should always return a reference to *this.
-var& var::operator^= (const wchar_t* char1)
+var& var::operator^= (const char* char1)
 {
-	THISIS(L"var& var::operator^= (const wchar_t* char1)")
+	THISIS("var& var::operator^= (const char* char1)")
 	THISISSTRING()
 
 	//var_str+=var(int1).var_str;
-	//var_str+=std::wstring(char1);
+	//var_str+=xstring(char1);
 	var_str+=char1;
 	var_typ=pimpl::VARTYP_STR;//reset to one unique type
 
 	return *this;
 }
 
-//^=std::wstring
+//^=xstring
 //The assignment operator should always return a reference to *this.
-var& var::operator^= (const std::wstring string1)
+var& var::operator^= (const xstring string1)
 {
-	THISIS(L"var& var::operator^= (const std::wstring string1)")
+	THISIS("var& var::operator^= (const xstring string1)")
 	THISISSTRING()
 
 	//var_str+=var(int1).var_str;
@@ -613,7 +607,7 @@ var& var::operator^= (const std::wstring string1)
 //int argument indicates that this is POSTFIX override v++
 var var::operator++ (int)
 {
-	THISIS(L"var var::operator++ (int)")
+	THISIS("var var::operator++ (int)")
     //full check done below to avoid double checking number type
 	THISISDEFINED()
 
@@ -622,7 +616,7 @@ tryagain:
 	if (var_typ&pimpl::VARTYP_INT)
 	{
 		if (var_int==std::numeric_limits<mvint_t>::max())
-			throw MVIntOverflow(L"operator++");
+			throw MVIntOverflow("operator++");
 		var_int++;
 		var_typ=pimpl::VARTYP_INT;//reset to one unique type
 	}
@@ -653,7 +647,7 @@ tryagain:
 //int argument indicates that this is POSTFIX override v--
 var var::operator-- (int)
 {
-	THISIS(L"var var::operator-- (int)")
+	THISIS("var var::operator-- (int)")
     //full check done below to avoid double checking number type
 	THISISDEFINED()
 
@@ -691,7 +685,7 @@ tryagain:
 //no argument indicates that this is prefix override ++var
 var& var::operator++ ()
 {
-	THISIS(L"var var::operator++ ()")
+	THISIS("var var::operator++ ()")
     //full check done below to avoid double checking number type
 	THISISDEFINED()
 
@@ -700,7 +694,7 @@ tryagain:
 	if (var_typ&pimpl::VARTYP_INT)
 	{
 		if (var_int==std::numeric_limits<mvint_t>::max())
-			throw MVIntOverflow(L"operator++");
+			throw MVIntOverflow("operator++");
 		var_int++;
 		var_typ=pimpl::VARTYP_INT;//reset to one unique type
 	}
@@ -732,7 +726,7 @@ tryagain:
 //no argument indicates that this is prefix override --var
 var& var::operator-- ()
 {
-	THISIS(L"var& var::operator-- ()")
+	THISIS("var& var::operator-- ()")
     //full check done below to avoid double checking number type
 	THISISDEFINED()
 
@@ -770,7 +764,7 @@ tryagain:
 //provided to disambiguate syntax like var1+=var2
 var& var::operator+= (int int1)
 {
-	THISIS(L"var& var::operator+= (int int1)")
+	THISIS("var& var::operator+= (int int1)")
 	THISISDEFINED()
 
 tryagain:
@@ -798,21 +792,21 @@ tryagain:
 
 	//nan (dont bother with this here because it is exceptional and will be caught below anyway
 	//else if (var_typ&pimpl::VARTYP_NAN)
-	//	throw MVNonNumeric(L"var::+= " ^ *this);
+	//	throw MVNonNumeric("var::+= " ^ *this);
 
 	//try to convert to numeric
 	if (isnum())
 		goto tryagain;
 
  	THISISNUMERIC()
-	throw MVNonNumeric(substr(1,20) ^ L"+= ");
+	throw MVNonNumeric(substr(1,20) ^ "+= ");
 }
 
 //-=var (very similar to version with on rhs)
 //provided to disambiguate syntax like var1+=var2
 var& var::operator-= (int int1)
 {
-	THISIS(L"var& var::operator-= (int int1)")
+	THISIS("var& var::operator-= (int int1)")
 	THISISDEFINED()
 
 tryagain:
@@ -838,7 +832,7 @@ tryagain:
 		goto tryagain;
 
 	THISISNUMERIC()
-	throw MVNonNumeric(substr(1,20) ^ L"-= ");
+	throw MVNonNumeric(substr(1,20) ^ "-= ");
 
 }
 
@@ -858,7 +852,7 @@ var& var::operator-= (double dbl1)
 //+=var
 var& var::operator+= (const var& rhs)
 {
-	THISIS(L"var& var::operator+= (const var& rhs)")
+	THISIS("var& var::operator+= (const var& rhs)")
 	THISISDEFINED()
 	ISNUMERIC(rhs)
 
@@ -895,20 +889,20 @@ tryagain:
 
 	//nan (dont bother with this here because it is exceptional and will be caught below anyway
 	//else if (var_typ&pimpl::VARTYP_NAN)
-	//	throw MVNonNumeric(L"var::+= " ^ *this);
+	//	throw MVNonNumeric("var::+= " ^ *this);
 
 	//try to convert to numeric
 	if (isnum())
 		goto tryagain;
 
  	THISISNUMERIC()
-	throw MVNonNumeric(substr(1,20) ^ L"+= ");
+	throw MVNonNumeric(substr(1,20) ^ "+= ");
 }
 
 //-=var
 var& var::operator-= (const var& rhs)
 {
-	THISIS(L"var& var::operator-= (const var& rhs)")
+	THISIS("var& var::operator-= (const var& rhs)")
 	THISISDEFINED()
 	ISNUMERIC(rhs)
 
@@ -944,14 +938,14 @@ tryagain:
 
 	//nan (dont bother with this here because it is exceptional and will be caught below anyway
 	//else if (var_typ&pimpl::VARTYP_NAN)
-	//	throw MVNonNumeric(L"var::-= " ^ *this);
+	//	throw MVNonNumeric("var::-= " ^ *this);
 
 	//try to convert to numeric
 	if (isnum())
 		goto tryagain;
 
 	THISISNUMERIC()
-	throw MVNonNumeric(substr(1,20) ^ L"-= ");
+	throw MVNonNumeric(substr(1,20) ^ "-= ");
 
 }
 
@@ -960,7 +954,7 @@ tryagain:
 //almost identical between MVeq and MVlt except where noted
 DLL_PUBLIC bool MVeq(const var& lhs,const var& rhs)
 {
-	THISIS(L"bool MVeq(const var& lhs,const var& rhs)")
+	THISIS("bool MVeq(const var& lhs,const var& rhs)")
 	ISDEFINED(lhs)
 	ISDEFINED(rhs)
 
@@ -994,7 +988,7 @@ DLL_PUBLIC bool MVeq(const var& lhs,const var& rhs)
 			{
 				if (!rhs.var_typ)
 				{
-					//throw MVUnassigned(L"eq(rhs)");
+					//throw MVUnassigned("eq(rhs)");
 					ISASSIGNED(rhs)
 				}
 				//different from MVlt
@@ -1011,7 +1005,7 @@ DLL_PUBLIC bool MVeq(const var& lhs,const var& rhs)
 		{
 			if (!lhs.var_typ)
 			{
-				//throw MVUnassigned(L"eq(lhs)");
+				//throw MVUnassigned("eq(lhs)");
 				ISASSIGNED(lhs)
 			}
 			//SAME as MVlt
@@ -1054,7 +1048,7 @@ DLL_PUBLIC bool MVeq(const var& lhs,const var& rhs)
 //almost identical between MVeq and MVlt except where noted
 DLL_PUBLIC bool MVlt(const var& lhs,const var& rhs)
 {
-	THISIS(L"bool MVlt(const var& lhs,const var& rhs)")
+	THISIS("bool MVlt(const var& lhs,const var& rhs)")
 	ISDEFINED(lhs)
 	ISDEFINED(rhs)
 
@@ -1088,7 +1082,7 @@ DLL_PUBLIC bool MVlt(const var& lhs,const var& rhs)
 			{
 				if (!rhs.var_typ)
 				{
-					//throw MVUnassigned(L"eq(rhs)");
+					//throw MVUnassigned("eq(rhs)");
 					ISASSIGNED(rhs)
 				}
 				//different from MVeq
@@ -1105,7 +1099,7 @@ DLL_PUBLIC bool MVlt(const var& lhs,const var& rhs)
 		{
 			if (!lhs.var_typ)
 			{
-				//throw MVUnassigned(L"eq(lhs)");
+				//throw MVUnassigned("eq(lhs)");
 				ISASSIGNED(lhs)
 			}
 			//SAME as MVeq
@@ -1149,7 +1143,7 @@ DLL_PUBLIC bool MVlt(const var& lhs,const var& rhs)
  //this is the var<int version for speed
 DLL_PUBLIC bool MVlt(const var& lhs,const int int2)
 {
-	THISIS(L"bool MVlt(const var& lhs,const int int2)")
+	THISIS("bool MVlt(const var& lhs,const int int2)")
 	ISDEFINED(lhs)
 
 	//NB empty string is always less than anything except another empty string
@@ -1195,7 +1189,7 @@ DLL_PUBLIC bool MVlt(const var& lhs,const int int2)
  //this is the int<var version for speed
 DLL_PUBLIC bool MVlt(const int int1,const var& rhs)
 {
-	THISIS(L"bool MVlt(const int int1,const var& rhs)")
+	THISIS("bool MVlt(const int int1,const var& rhs)")
 	ISDEFINED(rhs)
 
 	//NB empty string is always less than anything except another empty string
@@ -1236,62 +1230,62 @@ DLL_PUBLIC bool MVlt(const int int1,const var& rhs)
 
 //== and !=
 DLL_PUBLIC bool operator== (const var&     lhs    ,const var&     rhs     ){return  MVeq(lhs		,rhs          );}
-DLL_PUBLIC bool operator== (const var&     lhs    ,const wchar_t* char2   ){return  MVeq(lhs		,var(char2)   );}
+DLL_PUBLIC bool operator== (const var&     lhs    ,const char* char2   ){return  MVeq(lhs		,var(char2)   );}
 DLL_PUBLIC bool operator== (const var&     lhs    ,const int      int2    ){return  MVeq(lhs		,var(int2)    );}
 DLL_PUBLIC bool operator== (const var&     lhs    ,const double   double2 ){return  MVeq(lhs		,var(double2) );}
 DLL_PUBLIC bool operator== (const var&     lhs    ,const bool     bool2   ){return  MVeq(lhs		,var(bool2)   );}
-DLL_PUBLIC bool operator== (const wchar_t* char1  ,const var&     rhs     ){return  MVeq(rhs		,var(char1)   );}
+DLL_PUBLIC bool operator== (const char* char1  ,const var&     rhs     ){return  MVeq(rhs		,var(char1)   );}
 DLL_PUBLIC bool operator== (const int      int1   ,const var&     rhs     ){return  MVeq(rhs		,var(int1)    );}
 DLL_PUBLIC bool operator== (const double   double1,const var&     rhs     ){return  MVeq(rhs		,var(double1) );}
 DLL_PUBLIC bool operator== (const bool     bool1  ,const var&     rhs     ){return  MVeq(rhs		,var(bool1)   );}
 
 DLL_PUBLIC bool operator!= (const var&     lhs    ,const var&     rhs     ){return !MVeq(lhs		,rhs          );}
-DLL_PUBLIC bool operator!= (const var&     lhs    ,const wchar_t* char2   ){return !MVeq(lhs		,var(char2)	  );}
+DLL_PUBLIC bool operator!= (const var&     lhs    ,const char* char2   ){return !MVeq(lhs		,var(char2)	  );}
 DLL_PUBLIC bool operator!= (const var&     lhs    ,const int      int2    ){return !MVeq(lhs		,var(int2)    );}
 DLL_PUBLIC bool operator!= (const var&     lhs    ,const double   double2 ){return !MVeq(lhs		,var(double2) );}
 DLL_PUBLIC bool operator!= (const var&     lhs    ,const bool     bool2   ){return !MVeq(lhs		,var(bool2)   );}
-DLL_PUBLIC bool operator!= (const wchar_t* char1  ,const var&     rhs     ){return !MVeq(rhs		,var(char1)   );}
+DLL_PUBLIC bool operator!= (const char* char1  ,const var&     rhs     ){return !MVeq(rhs		,var(char1)   );}
 DLL_PUBLIC bool operator!= (const int      int1   ,const var&     rhs     ){return !MVeq(rhs		,var(int1)    );}
 DLL_PUBLIC bool operator!= (const double   double1,const var&     rhs     ){return !MVeq(rhs		,var(double1) );}
 DLL_PUBLIC bool operator!= (const bool     bool1  ,const var&     rhs     ){return !MVeq(rhs		,var(bool1)   );}
 
 //< V<= > >=
 DLL_PUBLIC bool operator<  (const var&     lhs    ,const var&     rhs     ){return  MVlt(lhs         ,rhs         );}
-DLL_PUBLIC bool operator<  (const var&     lhs    ,const wchar_t* char2   ){return  MVlt(lhs         ,var(char2)  );}
+DLL_PUBLIC bool operator<  (const var&     lhs    ,const char* char2   ){return  MVlt(lhs         ,var(char2)  );}
 DLL_PUBLIC bool operator<  (const var&     lhs    ,const int      int2    ){return  MVlt(lhs         ,int2        );}
 DLL_PUBLIC bool operator<  (const var&     lhs    ,const double   double2 ){return  MVlt(lhs         ,var(double2));}
-DLL_PUBLIC bool operator<  (const wchar_t* char1  ,const var&     rhs     ){return  MVlt(var(char1)  ,rhs         );}
+DLL_PUBLIC bool operator<  (const char* char1  ,const var&     rhs     ){return  MVlt(var(char1)  ,rhs         );}
 DLL_PUBLIC bool operator<  (const int      int1   ,const var&     rhs     ){return  MVlt(int1        ,rhs         );}
 DLL_PUBLIC bool operator<  (const double   double1,const var&     rhs     ){return  MVlt(var(double1),rhs         );}
 
 DLL_PUBLIC bool operator>= (const var&     lhs    ,const var&     rhs     ){return !MVlt(lhs         ,rhs         );}
-DLL_PUBLIC bool operator>= (const var&     lhs    ,const wchar_t* char2   ){return !MVlt(lhs         ,var(char2)  );}
+DLL_PUBLIC bool operator>= (const var&     lhs    ,const char* char2   ){return !MVlt(lhs         ,var(char2)  );}
 DLL_PUBLIC bool operator>= (const var&     lhs    ,const int      int2    ){return !MVlt(lhs         ,int2        );}
 DLL_PUBLIC bool operator>= (const var&     lhs    ,const double   double2 ){return !MVlt(lhs         ,var(double2));}
-DLL_PUBLIC bool operator>= (const wchar_t* char1  ,const var&     rhs     ){return !MVlt(var(char1)  ,rhs         );}
+DLL_PUBLIC bool operator>= (const char* char1  ,const var&     rhs     ){return !MVlt(var(char1)  ,rhs         );}
 DLL_PUBLIC bool operator>= (const int      int1   ,const var&     rhs     ){return !MVlt(int1        ,rhs         );}
 DLL_PUBLIC bool operator>= (const double   double1,const var&     rhs     ){return !MVlt(var(double1),rhs         );}
 
 DLL_PUBLIC bool operator>  (const var&     lhs    ,const var&     rhs     ){return  MVlt(rhs         ,lhs         );}
-DLL_PUBLIC bool operator>  (const var&     lhs    ,const wchar_t* char2   ){return  MVlt(var(char2)  ,lhs         );}
+DLL_PUBLIC bool operator>  (const var&     lhs    ,const char* char2   ){return  MVlt(var(char2)  ,lhs         );}
 DLL_PUBLIC bool operator>  (const var&     lhs    ,const int      int2    ){return  MVlt(int2        ,lhs         );}
 DLL_PUBLIC bool operator>  (const var&     lhs    ,const double   double2 ){return  MVlt(var(double2),lhs         );}
-DLL_PUBLIC bool operator>  (const wchar_t* char1  ,const var&     rhs     ){return  MVlt(rhs         ,var(char1)  );}
+DLL_PUBLIC bool operator>  (const char* char1  ,const var&     rhs     ){return  MVlt(rhs         ,var(char1)  );}
 DLL_PUBLIC bool operator>  (const int      int1   ,const var&     rhs     ){return  MVlt(rhs         ,int1        );}
 DLL_PUBLIC bool operator>  (const double   double1,const var&     rhs     ){return  MVlt(rhs         ,var(double1));}
 
 DLL_PUBLIC bool operator<= (const var&     lhs    ,const var&     rhs     ){return !MVlt(rhs         ,lhs         );}
-DLL_PUBLIC bool operator<= (const var&     lhs    ,const wchar_t* char2   ){return !MVlt(var(char2)  ,lhs         );}
+DLL_PUBLIC bool operator<= (const var&     lhs    ,const char* char2   ){return !MVlt(var(char2)  ,lhs         );}
 DLL_PUBLIC bool operator<= (const var&     lhs    ,const int      int2    ){return !MVlt(int2        ,lhs         );}
 DLL_PUBLIC bool operator<= (const var&     lhs    ,const double   double2 ){return !MVlt(var(double2),lhs         );}
-DLL_PUBLIC bool operator<= (const wchar_t* char1  ,const var&     rhs     ){return !MVlt(rhs         ,var(char1)  );}
+DLL_PUBLIC bool operator<= (const char* char1  ,const var&     rhs     ){return !MVlt(rhs         ,var(char1)  );}
 DLL_PUBLIC bool operator<= (const int      int1   ,const var&     rhs     ){return !MVlt(rhs         ,int1        );}
 DLL_PUBLIC bool operator<= (const double   double1,const var&     rhs     ){return !MVlt(rhs         ,var(double1));}
 
 //+var
 DLL_PUBLIC var operator+(const var& var1)
 {
-	THISIS(L"var operator+(const var& var1)")
+	THISIS("var operator+(const var& var1)")
 	ISDEFINED(var1)
 
 	do
@@ -1308,7 +1302,7 @@ DLL_PUBLIC var operator+(const var& var1)
 		if (!var1.var_typ)
 		{
 			ISASSIGNED(var1)
-			throw MVUnassigned(L"+()");
+			throw MVUnassigned("+()");
 		}
 	}
 	//must be string - try to convert to numeric
@@ -1317,14 +1311,14 @@ DLL_PUBLIC var operator+(const var& var1)
 	//non-numeric
 	ISNUMERIC(var1)
 	//will never get here
-	throw MVNonNumeric(L"+(L" ^ var1.substr(1,20) ^ L")");
+	throw MVNonNumeric("+(" ^ var1.substr(1,20) ^ ")");
 
 }
 
 //-var (identical to +var above except for two additional - signs)
 DLL_PUBLIC var operator-(const var& var1)
 {
-	THISIS(L"var operator-(const var& var1)")
+	THISIS("var operator-(const var& var1)")
 	ISDEFINED(var1)
 
 	do
@@ -1341,7 +1335,7 @@ DLL_PUBLIC var operator-(const var& var1)
 		if (!var1.var_typ)
 		{
 			ISASSIGNED(var1)
-			throw MVUnassigned(L"+()");
+			throw MVUnassigned("+()");
 		}
 	}
 	//must be string - try to convert to numeric
@@ -1350,13 +1344,13 @@ DLL_PUBLIC var operator-(const var& var1)
 	//non-numeric
 	ISNUMERIC(var1)
 	//will never get here
-	throw MVNonNumeric(L"+(L" ^ var1.substr(1,20) ^ L")");
+	throw MVNonNumeric("+(" ^ var1.substr(1,20) ^ ")");
 }
 
 //!var
 bool operator!(const var& var1)
 {
-	THISIS(L"bool operator!(const var& var1)")
+	THISIS("bool operator!(const var& var1)")
 	ISASSIGNED(var1)
 
 	//might need converting to work on void pointer
@@ -1368,7 +1362,7 @@ bool operator!(const var& var1)
 
 var MVadd(const var& lhs,const var& rhs)
 {
-	THISIS(L"var MVadd(const var& lhs,const var& rhs)")
+	THISIS("var MVadd(const var& lhs,const var& rhs)")
 	ISNUMERIC(lhs)
 	ISNUMERIC(rhs)
 
@@ -1383,7 +1377,7 @@ var MVadd(const var& lhs,const var& rhs)
 
 var MVsub(const var& lhs,const var& rhs)
 {
-	THISIS(L"var MVsub(const var& lhs,const var& rhs)")
+	THISIS("var MVsub(const var& lhs,const var& rhs)")
 	ISNUMERIC(lhs)
 	ISNUMERIC(rhs)
 
@@ -1398,7 +1392,7 @@ var MVsub(const var& lhs,const var& rhs)
 
 var MVmul(const var& lhs,const var& rhs)
 {
-	THISIS(L"var MVmul(const var& lhs,const var& rhs)")
+	THISIS("var MVmul(const var& lhs,const var& rhs)")
 	ISNUMERIC(lhs)
 	ISNUMERIC(rhs)
 
@@ -1413,7 +1407,7 @@ var MVmul(const var& lhs,const var& rhs)
 
 var MVdiv(const var& lhs,const var& rhs)
 {
-	THISIS(L"var MVdiv(const var& lhs,const var& rhs)")
+	THISIS("var MVdiv(const var& lhs,const var& rhs)")
 	ISNUMERIC(lhs)
 	ISNUMERIC(rhs)
 
@@ -1421,7 +1415,7 @@ var MVdiv(const var& lhs,const var& rhs)
 
     double bottom=(rhs.var_typ&pimpl::VARTYP_INT) ? double(rhs.var_int) : rhs.var_dbl;
 	if (!bottom)
-		throw MVDivideByZero(L"div('" ^ lhs.substr(1,20) ^ L"', '" ^ rhs.substr(1,20) ^ L"')");
+		throw MVDivideByZero("div('" ^ lhs.substr(1,20) ^ "', '" ^ rhs.substr(1,20) ^ "')");
 
     double top=(lhs.var_typ&pimpl::VARTYP_INT) ? double(lhs.var_int) : lhs.var_dbl;
 	return top/bottom;
@@ -1429,7 +1423,7 @@ var MVdiv(const var& lhs,const var& rhs)
 
 var MVmod(const var& lhs,const var& rhs)
 {
-	THISIS(L"var MVmod(const var& lhs,const var& rhs)")
+	THISIS("var MVmod(const var& lhs,const var& rhs)")
 	ISNUMERIC(lhs)
 	ISNUMERIC(rhs)
 
@@ -1437,13 +1431,13 @@ var MVmod(const var& lhs,const var& rhs)
 	if (lhs.var_typ&pimpl::VARTYP_INT && rhs.var_typ&pimpl::VARTYP_INT)
 	{
 		if (!rhs.var_int)
-			throw MVDivideByZero(L"div('" ^ lhs.substr(1,20) ^ L"', '" ^ rhs.substr(1,20) ^ L"')");
+			throw MVDivideByZero("div('" ^ lhs.substr(1,20) ^ "', '" ^ rhs.substr(1,20) ^ "')");
 		return lhs.var_int%rhs.var_int;
 	}
 
     double bottom=(rhs.var_typ&pimpl::VARTYP_INT) ? double(rhs.var_int) : rhs.var_dbl;
 	if (!bottom)
-		throw MVDivideByZero(L"div('" ^ lhs.substr(1,20) ^ L"', '" ^ rhs.substr(1,20) ^ L"')");
+		throw MVDivideByZero("div('" ^ lhs.substr(1,20) ^ "', '" ^ rhs.substr(1,20) ^ "')");
 
     double top=(lhs.var_typ&pimpl::VARTYP_INT) ? double(lhs.var_int) : lhs.var_dbl;
 	return neosysmodulus(top,bottom);
@@ -1453,7 +1447,7 @@ var MVmod(const var& lhs,const var& rhs)
 //slightly wrong precedence but at least we have a reliable concat operator to replace the + which is now reserved for ADDITION
 var MVcat(const var& lhs,const var& rhs)
 {
-	THISIS(L"var MVcat(const var& lhs,const var& rhs)")
+	THISIS("var MVcat(const var& lhs,const var& rhs)")
 	ISSTRING(lhs)
 	ISSTRING(rhs)
 
@@ -1461,53 +1455,53 @@ var MVcat(const var& lhs,const var& rhs)
 }
 
 DLL_PUBLIC var operator+ (const var&     lhs    ,const var&     rhs     ){return MVadd(lhs         ,rhs         );}
-DLL_PUBLIC var operator+ (const var&     lhs    ,const wchar_t* char2   ){return MVadd(lhs         ,var(char2)  );}
+DLL_PUBLIC var operator+ (const var&     lhs    ,const char* char2   ){return MVadd(lhs         ,var(char2)  );}
 DLL_PUBLIC var operator+ (const var&     lhs    ,const int      int2    ){return MVadd(lhs         ,var(int2)   );}
 DLL_PUBLIC var operator+ (const var&     lhs    ,const double   double2 ){return MVadd(lhs         ,var(double2));}
 DLL_PUBLIC var operator+ (const var&     lhs    ,const bool     bool2   ){return MVadd(lhs         ,var(bool2)  );}
-DLL_PUBLIC var operator+ (const wchar_t* char1  ,const var&     rhs     ){return MVadd(var(char1)  ,rhs         );}
+DLL_PUBLIC var operator+ (const char* char1  ,const var&     rhs     ){return MVadd(var(char1)  ,rhs         );}
 DLL_PUBLIC var operator+ (const int      int1   ,const var&     rhs     ){return MVadd(var(int1)   ,rhs         );}
 DLL_PUBLIC var operator+ (const double   double1,const var&     rhs     ){return MVadd(var(double1),rhs         );}
 DLL_PUBLIC var operator+ (const bool     bool1  ,const var&     rhs     ){return MVadd(var(bool1)  ,rhs         );}
 
 DLL_PUBLIC var operator- (const var&     lhs    ,const var&     rhs     ){return MVsub(lhs         ,rhs         );}
-DLL_PUBLIC var operator- (const var&     lhs    ,const wchar_t* char2   ){return MVsub(lhs         ,var(char2)  );}
+DLL_PUBLIC var operator- (const var&     lhs    ,const char* char2   ){return MVsub(lhs         ,var(char2)  );}
 DLL_PUBLIC var operator- (const var&     lhs    ,const int      int2    ){return MVsub(lhs         ,var(int2)   );}
 DLL_PUBLIC var operator- (const var&     lhs    ,const double   double2 ){return MVsub(lhs         ,var(double2));}
 DLL_PUBLIC var operator- (const var&     lhs    ,const bool     bool2   ){return MVsub(lhs         ,var(bool2)  );}
-DLL_PUBLIC var operator- (const wchar_t* char1  ,const var&     rhs     ){return MVsub(var(char1)  ,rhs         );}
+DLL_PUBLIC var operator- (const char* char1  ,const var&     rhs     ){return MVsub(var(char1)  ,rhs         );}
 DLL_PUBLIC var operator- (const int      int1   ,const var&     rhs     ){return MVsub(var(int1)   ,rhs         );}
 DLL_PUBLIC var operator- (const double   double1,const var&     rhs     ){return MVsub(var(double1),rhs         );}
 DLL_PUBLIC var operator- (const bool     bool1  ,const var&     rhs     ){return MVsub(var(bool1)  ,rhs         );}
 
 DLL_PUBLIC var operator* (const var&     lhs    ,const var&     rhs     ){return MVmul(lhs         ,rhs         );}
-DLL_PUBLIC var operator* (const var&     lhs    ,const wchar_t* char2   ){return MVmul(lhs         ,var(char2)  );}
+DLL_PUBLIC var operator* (const var&     lhs    ,const char* char2   ){return MVmul(lhs         ,var(char2)  );}
 DLL_PUBLIC var operator* (const var&     lhs    ,const int      int2    ){return MVmul(lhs         ,var(int2)   );}
 DLL_PUBLIC var operator* (const var&     lhs    ,const double   double2 ){return MVmul(lhs         ,var(double2));}
 DLL_PUBLIC var operator* (const var&     lhs    ,const bool     bool2   ){return MVmul(lhs         ,var(bool2)  );}
-DLL_PUBLIC var operator* (const wchar_t* char1  ,const var&     rhs     ){return MVmul(var(char1)  ,rhs         );}
+DLL_PUBLIC var operator* (const char* char1  ,const var&     rhs     ){return MVmul(var(char1)  ,rhs         );}
 DLL_PUBLIC var operator* (const int      int1   ,const var&     rhs     ){return MVmul(var(int1)   ,rhs         );}
 DLL_PUBLIC var operator* (const double   double1,const var&     rhs     ){return MVmul(var(double1),rhs         );}
 DLL_PUBLIC var operator* (const bool     bool1  ,const var&     rhs     ){return MVmul(var(bool1)  ,rhs         );}
 
 DLL_PUBLIC var operator/ (const var&     lhs    ,const var&     rhs     ){return MVdiv(lhs         ,rhs         );}
-DLL_PUBLIC var operator/ (const var&     lhs    ,const wchar_t* char2   ){return MVdiv(lhs         ,var(char2)  );}
+DLL_PUBLIC var operator/ (const var&     lhs    ,const char* char2   ){return MVdiv(lhs         ,var(char2)  );}
 DLL_PUBLIC var operator/ (const var&     lhs    ,const int      int2    ){return MVdiv(lhs         ,var(int2)   );}
 DLL_PUBLIC var operator/ (const var&     lhs    ,const double   double2 ){return MVdiv(lhs         ,var(double2));}
 //disallow divide by boolean to prevent possible runtime divide by zero
 //DLL_PUBLIC var operator/ (const var&     lhs    ,const bool     bool2   ){return MVdiv(lhs,var(bool2)  );}
-DLL_PUBLIC var operator/ (const wchar_t* char1  ,const var&     rhs     ){return MVdiv(var(char1)  ,rhs         );}
+DLL_PUBLIC var operator/ (const char* char1  ,const var&     rhs     ){return MVdiv(var(char1)  ,rhs         );}
 DLL_PUBLIC var operator/ (const int      int1   ,const var&     rhs     ){return MVdiv(var(int1)   ,rhs         );}
 DLL_PUBLIC var operator/ (const double   double1,const var&     rhs     ){return MVdiv(var(double1),rhs         );}
 DLL_PUBLIC var operator/ (const bool     bool1  ,const var&     rhs     ){return MVdiv(var(bool1)  ,rhs         );}
 
 DLL_PUBLIC var operator% (const var&     lhs    ,const var&     rhs     ){return MVmod(lhs         ,rhs         );}
-DLL_PUBLIC var operator% (const var&     lhs    ,const wchar_t* char2   ){return MVmod(lhs         ,var(char2)  );}
+DLL_PUBLIC var operator% (const var&     lhs    ,const char* char2   ){return MVmod(lhs         ,var(char2)  );}
 DLL_PUBLIC var operator% (const var&     lhs    ,const int      int2    ){return MVmod(lhs         ,var(int2)   );}
 DLL_PUBLIC var operator% (const var&     lhs    ,const double   double2 ){return MVmod(lhs         ,var(double2));}
 //disallow divide by boolean to prevent possible runtime divide by zero
 //DLL_PUBLIC var operator% (const var&     lhs    ,const bool    bool2   ){return MVmod(lhs,var(bool2)  );}
-DLL_PUBLIC var operator% (const wchar_t* char1  ,const var&     rhs     ){return MVmod(var(char1)  ,rhs         );}
+DLL_PUBLIC var operator% (const char* char1  ,const var&     rhs     ){return MVmod(var(char1)  ,rhs         );}
 DLL_PUBLIC var operator% (const int      int1   ,const var&     rhs     ){return MVmod(var(int1)   ,rhs         );}
 DLL_PUBLIC var operator% (const double   double1,const var&     rhs     ){return MVmod(var(double1),rhs         );}
 DLL_PUBLIC var operator% (const bool     bool1  ,const var&     rhs     ){return MVmod(var(bool1)  ,rhs         );}
@@ -1515,20 +1509,20 @@ DLL_PUBLIC var operator% (const bool     bool1  ,const var&     rhs     ){return
 //NB do *NOT* support concatenate with bool or vice versa!!!
 //to avoid compiler doing wrong precendence issue between ^ and logical operators
 DLL_PUBLIC var operator^ (const var&     lhs    ,const var&     rhs     ){return MVcat(lhs         ,rhs         );}
-DLL_PUBLIC var operator^ (const var&     lhs    ,const wchar_t* char2   ){return MVcat(lhs         ,var(char2)  );}
+DLL_PUBLIC var operator^ (const var&     lhs    ,const char* char2   ){return MVcat(lhs         ,var(char2)  );}
 DLL_PUBLIC var operator^ (const var&     lhs    ,const int      int2    ){return MVcat(lhs         ,var(int2)   );}
 DLL_PUBLIC var operator^ (const var&     lhs    ,const double   double2 ){return MVcat(lhs         ,var(double2));}
-DLL_PUBLIC var operator^ (const wchar_t* char1  ,const var&     rhs     ){return MVcat(var(char1)  ,rhs         );}
+DLL_PUBLIC var operator^ (const char* char1  ,const var&     rhs     ){return MVcat(var(char1)  ,rhs         );}
 DLL_PUBLIC var operator^ (const int      int1   ,const var&     rhs     ){return MVcat(var(int1)   ,rhs         );}
 DLL_PUBLIC var operator^ (const double   double1,const var&     rhs     ){return MVcat(var(double1),rhs         );}
 
 
-#if defined __MINGW32__
+//#if defined __MINGW32__
 //allow use of cout<<var
 DLL_PUBLIC
-	std::ostream& operator << (std::ostream& ostream1, const var& var1)
+	std::ostream& operator<< (std::ostream& ostream1, const var& var1)
 {
-	THISIS(L"std::ostream& operator << (std::ostream& ostream1, const var& var1)")
+	THISIS("std::ostream& operator<< (std::ostream& ostream1, const var& var1)")
 	ISSTRING(var1)
 
 	//use toString() to avoid creating a constructor which logs here recursively
@@ -1539,7 +1533,7 @@ DLL_PUBLIC
 
 std::istream& operator>> (std::istream& istream1,var& var1)
 {
-	THISIS(L"std::istream& operator>> (std::istream& istream1,var& var1)")
+	THISIS("std::istream& operator>> (std::istream& istream1,var& var1)")
 	ISDEFINED(var1)
 
 	std::string tempstr;
@@ -1547,37 +1541,12 @@ std::istream& operator>> (std::istream& istream1,var& var1)
 
 	var1.var_typ=pimpl::VARTYP_STR;
 	//var1.var_str=wstringfromUTF8((UTF8*)tempstr.data(),(int)tempstr.length());
-	var1.var_str=boost::locale::conv::utf_to_utf<wchar_t>(tempstr)
+	//var1.var_str=boost::locale::conv::utf_to_utf<char>(tempstr)
+	var1.var_str=tempstr;
 	return istream1;
 }
 
-#else
-
-//allow use of wcout<<var
-DLL_PUBLIC
-	std::wostream& operator<< (std::wostream& wostream1, const var& var1)
-{
-	THISIS(L"std::wostream& operator<< (std::wostream& wostream1, const var& var1)")
-	ISSTRING(var1)
-
-	//use toWString() to avoid creating a constructor which logs here recursively
-	//should this use a ut16/32 -> UTF8 code facet? or convert to UTF8 and output to ostream?
-	wostream1 << var1.var_str;
-	return wostream1;
-}
-
-//#ifdef false //allow use of cin>>var
-std::wistream& operator>> (std::wistream& wistream1,var& var1)
-{
-	THISIS(L"std::wistream& operator>> (std::wistream& wistream1,var& var1)")
-	ISDEFINED(var1)
-
-	var1.var_typ=pimpl::VARTYP_STR;
-	wistream1 >> std::noskipws >> var1.var_str;
-	return wistream1;
-}
-//#endif //allow use of std::wcin>>var
-#endif
+//#endif
 
 inline double neosysmodulus(const double top,const double bottom)
 {
@@ -1585,7 +1554,7 @@ inline double neosysmodulus(const double top,const double bottom)
 }
 
 //TODO ensure locale doesnt produce like 123.456,78
-std::wstring intToString(int int1)
+xstring intToString(int int1)
 {
 	
 	//TODO test ostringstream type creation speed and of slow then
@@ -1606,11 +1575,11 @@ std::wstring intToString(int int1)
     //useful for float2string
 
     //NB plain stringstream causes a memory leak in msvc8 before sp1
-	std::wostringstream ss;
+	std::ostringstream ss;
 	ss << int1;
-	//debuggFUNCTION&& wcout<<L"intToString(int "<<int1<<L") returns '"<<s<<L"'\n";
+	//debuggFUNCTION&& cout<<"intToString(int "<<int1<<") returns '"<<s<<"'\n";
 #ifdef NARROW_IO
-	return std::wstring(ss.str().begin(),ss.str().end());
+	return xstring(ss.str().begin(),ss.str().end());
 #else
     return ss.str();
 #endif
@@ -1618,16 +1587,16 @@ std::wstring intToString(int int1)
 
 //TODO ensure locale doesnt produce like 123.456,78
 //see 1997 http://www.cantrip.org/locale.html
-std::wstring dblToString(double double1)
+xstring dblToString(double double1)
 {
 	//see intToString for choice of ostringstream for implementation
 	//NB plain stringstream causes a memory leak in msvc8 before sp1
-	std::wostringstream ss;
+	std::ostringstream ss;
 	ss.precision(10);
 	ss << double1;
-	//debuggFUNCTION&& wcout<<L"dblToString(int "<<double1<<L") returns '"<<s<<L"'\n";
+	//debuggFUNCTION&& cout<<"dblToString(int "<<double1<<") returns '"<<s<<"'\n";
 #ifdef NARROW_IO
-	return std::wstring(ss.str().begin(),ss.str().end());
+	return xstring(ss.str().begin(),ss.str().end());
 #else
 	return ss.str();
 #endif
@@ -1642,26 +1611,26 @@ MVException::MVException(const var& description_) : description(description_)
 	stack=backtrace();
 }
 
-MVUnassigned		::MVUnassigned		(const var& var1)	: MVException(L"MVUnassigned:"				^ var1	){}
-MVDivideByZero		::MVDivideByZero	(const var& var1)	: MVException(L"MVDivideByZero:"			^ var1	){}
-MVNonNumeric		::MVNonNumeric		(const var& var1)	: MVException(L"MVNonNumeric:"				^ var1	){}
-MVIntOverflow		::MVIntOverflow		(const var& var1)	: MVException(L"MVIntOverflow:"				^ var1	){}
-MVIntUnderflow		::MVIntUnderflow	(const var& var1)	: MVException(L"MVIntUnderflow:"			^ var1	){}
-MVUndefined		::MVUndefined		(const var& var1)	: MVException(L"MVUndefined:"				^ var1	){}
-MVOutOfMemory		::MVOutOfMemory		(const var& var1)	: MVException(L"MVOutOfMemory:"				^ var1	){}
-MVInvalidPointer	::MVInvalidPointer	(const var& var1)	: MVException(L"MVInvalidPointer:"			^ var1	){}
-MVDBException		::MVDBException		(const var& var1)	: MVException(L"MVDBException:"				^ var1	){}
-MVNotImplemented	::MVNotImplemented	(const var& var1)	: MVException(L"MVNotImplemented:"			^ var1	){}
-MVDebug			::MVDebug		(const var& var1)	: MVException(L"MVDebug"				^ var1	){}
-//MVStop		::MVStop		(const var& var1)	: MVException(L"MVStop:"				^ var1 	){}
-//MVAbort		::MVAbort		(const var& var1)	: MVException(L"MVAbort"				^ var1	){}
-//MVAbortAll		::MVAbortAll		(const var& var1)	: MVException(L"MVAbortAll"				^ var1	){}
+MVUnassigned		::MVUnassigned		(const var& var1)	: MVException("MVUnassigned:"				^ var1	){}
+MVDivideByZero		::MVDivideByZero	(const var& var1)	: MVException("MVDivideByZero:"			^ var1	){}
+MVNonNumeric		::MVNonNumeric		(const var& var1)	: MVException("MVNonNumeric:"				^ var1	){}
+MVIntOverflow		::MVIntOverflow		(const var& var1)	: MVException("MVIntOverflow:"				^ var1	){}
+MVIntUnderflow		::MVIntUnderflow	(const var& var1)	: MVException("MVIntUnderflow:"			^ var1	){}
+MVUndefined		::MVUndefined		(const var& var1)	: MVException("MVUndefined:"				^ var1	){}
+MVOutOfMemory		::MVOutOfMemory		(const var& var1)	: MVException("MVOutOfMemory:"				^ var1	){}
+MVInvalidPointer	::MVInvalidPointer	(const var& var1)	: MVException("MVInvalidPointer:"			^ var1	){}
+MVDBException		::MVDBException		(const var& var1)	: MVException("MVDBException:"				^ var1	){}
+MVNotImplemented	::MVNotImplemented	(const var& var1)	: MVException("MVNotImplemented:"			^ var1	){}
+MVDebug			::MVDebug		(const var& var1)	: MVException("MVDebug"				^ var1	){}
+//MVStop		::MVStop		(const var& var1)	: MVException("MVStop:"				^ var1 	){}
+//MVAbort		::MVAbort		(const var& var1)	: MVException("MVAbort"				^ var1	){}
+//MVAbortAll		::MVAbortAll		(const var& var1)	: MVException("MVAbortAl"				^ var1	){}
 MVStop			::MVStop		(const var& var1)	: description(						var1	){}
 MVAbort			::MVAbort		(const var& var1)	: MVException(						var1	){}
 MVAbortAll		::MVAbortAll		(const var& var1)	: MVException(						var1	){}
 
-MVArrayDimensionedZero	::MVArrayDimensionedZero ()			: MVException(L"MVArrayDimensionedZero:"			){}
-MVArrayIndexOutOfBounds	::MVArrayIndexOutOfBounds (const var& var1)	: MVException(L"MVArrayIndexOutOfBounds:" 		^ var1	){}
-MVArrayNotDimensioned	::MVArrayNotDimensioned	()			: MVException(L"MVArrayNotDimensioned"				){}
+MVArrayDimensionedZero	::MVArrayDimensionedZero ()			: MVException("MVArrayDimensionedZero:"			){}
+MVArrayIndexOutOfBounds	::MVArrayIndexOutOfBounds (const var& var1)	: MVException("MVArrayIndexOutOfBounds:" 		^ var1	){}
+MVArrayNotDimensioned	::MVArrayNotDimensioned	()			: MVException("MVArrayNotDimensioned"				){}
 
 } // namespace exodus

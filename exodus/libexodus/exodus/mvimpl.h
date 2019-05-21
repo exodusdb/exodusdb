@@ -25,28 +25,28 @@ class pimpl
 
 public:
 	//throw an exception if used an unassigned variable
-	static const wchar_t VARTYP_UNA=0x0;
+	static const char VARTYP_UNA=0x0;
 
 	//assigned string unknown if numeric or not
-	static const wchar_t VARTYP_STR=0x1;
+	static const char VARTYP_STR=0x1;
 
 	//indicated known non-numeric string
-	static const wchar_t VARTYP_NAN=0x2;
+	static const char VARTYP_NAN=0x2;
 
 	//above here is numeric
-	static const wchar_t VARTYP_INT=0x4;
-	static const wchar_t VARTYP_DBL=0x8;
-	static const wchar_t VARTYP_OSFILE=0x10;
-	static const wchar_t VARTYP_DBCONN=0x20;
+	static const char VARTYP_INT=0x4;
+	static const char VARTYP_DBL=0x8;
+	static const char VARTYP_OSFILE=0x10;
+	static const char VARTYP_DBCONN=0x20;
 
-	static const wchar_t VARTYP_INTDBL=VARTYP_INT|VARTYP_DBL;
-	static const wchar_t VARTYP_INTSTR=VARTYP_INT|VARTYP_STR;
-	static const wchar_t VARTYP_DBLSTR=VARTYP_DBL|VARTYP_STR;
-	static const wchar_t VARTYP_NANSTR=VARTYP_NAN|VARTYP_STR;
-	static const wchar_t VARTYP_NOTNUMFLAGS=~(VARTYP_INT|VARTYP_DBL|VARTYP_NAN);
+	static const char VARTYP_INTDBL=VARTYP_INT|VARTYP_DBL;
+	static const char VARTYP_INTSTR=VARTYP_INT|VARTYP_STR;
+	static const char VARTYP_DBLSTR=VARTYP_DBL|VARTYP_STR;
+	static const char VARTYP_NANSTR=VARTYP_NAN|VARTYP_STR;
+	static const char VARTYP_NOTNUMFLAGS=~(VARTYP_INT|VARTYP_DBL|VARTYP_NAN);
 
-	static const wchar_t VARTYP_NANSTR_OSFILE=VARTYP_NANSTR | VARTYP_OSFILE;
-	static const wchar_t VARTYP_NANSTR_DBCONN=VARTYP_NANSTR | VARTYP_DBCONN;
+	static const char VARTYP_NANSTR_OSFILE=VARTYP_NANSTR | VARTYP_OSFILE;
+	static const char VARTYP_NANSTR_DBCONN=VARTYP_NANSTR | VARTYP_DBCONN;
 /* moved to default contructor
 	//default ctor initialise to "unassigned"
 	pimpl() : mvtype(VARTYP_UNA) {};

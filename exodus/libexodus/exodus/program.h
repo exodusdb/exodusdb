@@ -70,7 +70,7 @@ int main(int exodus__argc, char *exodus__argv[]) \
 	catch (MVException exceptionx) \
 	{ \
                 printl(exceptionx.description, " - Aborting."); \
-                printl(exceptionx.stack.convert(FM,L"\n")); \
+                printl(exceptionx.stack.convert(FM,"\n")); \
 		exit(999); \
 	} \
 	return 0; \

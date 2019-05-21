@@ -96,7 +96,7 @@ qt strings are unicode
 */
 
 //#include <boost/algorithm/string.hpp>
-#include <wctype.h>
+//#include <wctype.h>
 
 #if defined(_MSC_VER)
 #define WIN32_LEAN_AND_MEAN
@@ -122,7 +122,7 @@ qt strings are unicode
 
 namespace exodus {
 
-int var::localeAwareCompare(const std::wstring& str1, const std::wstring& str2) const
+int var::localeAwareCompare(const std::string& str1, const std::string& str2) const
 {
 	if (str1.length()==0&&str2.length()==0)
 		return 0;
@@ -153,7 +153,7 @@ int var::localeAwareCompare(const std::wstring& str1, const std::wstring& str2) 
 	case CSTR_EQUAL:
 		return 0;
 	default:
-		throw MVException(L"localeAwareCompare(" ^ str1 ^ L", " ^ str2 ^ L")\n");
+		throw MVException("localeAwareCompare(" ^ str1 ^ ", " ^ str2 ^ ")\n");
 	}
 
 #elif defined(__APPLE__)
@@ -175,7 +175,8 @@ int var::localeAwareCompare(const std::wstring& str1, const std::wstring& str2) 
 #elif defined(strcoll)
 #elif !defined(XYZZZZ)
 //	setlocale (LC_COLLATE, "en_US.UTF-8");
-	return wcscoll(str1.c_str(),str2.c_str());
+//	return wcscoll(str1.c_str(),str2.c_str());
+	return strcoll(str1.c_str(),str2.c_str());
 #else
 #error stop here
 	return str1.compare(str2);
@@ -216,7 +217,7 @@ var& var::localeAwareChangeCase(const int lowerupper)
 	int buffersize=(int) var_str.length()*2+2;
 	boost::scoped_array<TCHAR> buffer(new TCHAR [buffersize]);
 	if (buffer==0)
-		throw MVException(var(L"Out of memory in changecase(). Need ")^int(buffersize)^L" characters");
+		throw MVException(var("Out of memory in changecase(). Need ")^int(buffersize)^" characters");
 
 	int tolowerupper=LCMAP_LINGUISTIC_CASING;
 	if (lowerupper==1) 
@@ -243,7 +244,7 @@ var& var::localeAwareChangeCase(const int lowerupper)
 			return converter(LOWERCASE_, UPPERCASE_);
 	}
 
-	var_str=std::wstring(buffer.get(),outputsize);
+	var_str=std::string(buffer.get(),outputsize);
 
 	return *this;
 
@@ -266,10 +267,10 @@ var& var::localeAwareChangeCase(const int lowerupper)
 	size_t  length=var_str.length();
 	if (lowerupper==1)
 		for (size_t ptr=0; ptr<length; ++ptr)
-			var_str[ptr]=towlower(var_str[ptr]);
+			var_str[ptr]=tolower(var_str[ptr]);
 	else if (lowerupper==2)
 		for (size_t ptr=0; ptr<length; ++ptr)
-			var_str[ptr]=towupper(var_str[ptr]);
+			var_str[ptr]=toupper(var_str[ptr]);
 
 	return *this;
 #endif
@@ -312,7 +313,7 @@ bool var::setxlocale() const
 	return SetThreadLocale((*this).toInt())!=NULL;
 
 #else
-	THISIS(L"bool var::setxlocale() const")
+	THISIS("bool var::setxlocale() const")
 	THISISSTRING()
 
 	//make a thread local locale if not done already

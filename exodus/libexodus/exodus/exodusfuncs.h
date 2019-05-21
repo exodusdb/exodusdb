@@ -35,9 +35,9 @@ THE SOFTWARE.
 #       define DEFAULTSPACE
 #       define DEFAULTVM
 #else
-#       define DEFAULTNULL =L""
-#       define DEFAULTDOT =L"."
-#       define DEFAULTSPACE =L" "
+#       define DEFAULTNULL =""
+#       define DEFAULTDOT ="."
+#       define DEFAULTSPACE =" "
 #       define DEFAULTVM =VM_
 #endif
 
@@ -47,7 +47,7 @@ namespace exodus
 
 DLL_PUBLIC int exodus_main(int exodus__argc, char* exodus__argv[], MvEnvironment& mv);
 
-DLL_PUBLIC var osgetenv(const var& name=L"");
+DLL_PUBLIC var osgetenv(const var& name="");
 DLL_PUBLIC bool osgetenv(const var& name, var& value);
 DLL_PUBLIC bool ossetenv(const var& name, const var& value);
 DLL_PUBLIC bool assigned(const var& var2);
@@ -169,13 +169,13 @@ DLL_PUBLIC var& unquoter(var& instring);
 DLL_PUBLIC var unquote(const var& instring);
 DLL_PUBLIC var& fieldstorer(var& instring, const var& sepchar,const int fieldno, const int nfields,const var& replacement);
 DLL_PUBLIC var fieldstore(const var& instring, const var& sepchar,const int fieldno, const int nfields,const var& replacement);
-DLL_PUBLIC var& trimmer(var& instring, const wchar_t* trimchars DEFAULTSPACE);
+DLL_PUBLIC var& trimmer(var& instring, const char* trimchars DEFAULTSPACE);
 DLL_PUBLIC var& trimmer(var& instring, const var& trimchars, const var& options);
-DLL_PUBLIC var trim(const var& instring, const wchar_t* trimchars DEFAULTSPACE);
-DLL_PUBLIC var& trimmerf(var& instring, const wchar_t* trimchars DEFAULTSPACE);
-DLL_PUBLIC var trimf(const var& instring, const wchar_t* trimchars DEFAULTSPACE);
-DLL_PUBLIC var& trimmerb(var& instring, const wchar_t* trimchars DEFAULTSPACE);
-DLL_PUBLIC var trimb(const var& instring, const wchar_t* trimchars DEFAULTSPACE);
+DLL_PUBLIC var trim(const var& instring, const char* trimchars DEFAULTSPACE);
+DLL_PUBLIC var& trimmerf(var& instring, const char* trimchars DEFAULTSPACE);
+DLL_PUBLIC var trimf(const var& instring, const char* trimchars DEFAULTSPACE);
+DLL_PUBLIC var& trimmerb(var& instring, const char* trimchars DEFAULTSPACE);
+DLL_PUBLIC var trimb(const var& instring, const char* trimchars DEFAULTSPACE);
 DLL_PUBLIC var& trimmer(var& instring, const var& trimchars);
 DLL_PUBLIC var trim(const var& instring, const var& trimchars);
 DLL_PUBLIC var trim(const var& instring, const var& trimchars, const var& options);
@@ -202,9 +202,9 @@ DLL_PUBLIC var index2(const var& instring, const var& substr,const int startchar
 DLL_PUBLIC var field(const var& instring, const var& substrx,const int fieldnx,const int nfieldsx=1);
 DLL_PUBLIC var field2(const var& instring, const var& substrx,const int fieldnx,const int nfieldsx=1);
 //moved to mvprogram to allow custom conversions like "[DATE]"
-//DLL_PUBLIC var oconv(const var& instring, const wchar_t* conversion);
+//DLL_PUBLIC var oconv(const var& instring, const char* conversion);
 //DLL_PUBLIC var oconv(const var& instring, const var& conversion);
-//DLL_PUBLIC var iconv(const var& instring, const wchar_t* conversion);
+//DLL_PUBLIC var iconv(const var& instring, const char* conversion);
 //DLL_PUBLIC var iconv(const var& instring, const var& conversion);
 DLL_PUBLIC bool connect(const var& connectionstring DEFAULTNULL);
 DLL_PUBLIC bool disconnect();
@@ -248,7 +248,7 @@ DLL_PUBLIC bool insertrecord(const var& record, const var& filehandle,const var&
 //DLL_PUBLIC bool selectrecord(const var& sortselectclause DEFAULTNULL);
 //DLL_PUBLIC bool readnextrecord(var& record, var& key);
 
-DLL_PUBLIC var xlate(const var& filename, const var& key, const var& fieldno, const wchar_t* mode);
+DLL_PUBLIC var xlate(const var& filename, const var& key, const var& fieldno, const char* mode);
 DLL_PUBLIC var xlate(const var& filename, const var& key, const var& fieldno, const var& mode);
 DLL_PUBLIC var remove(const var& fromstr, var& startx, var& delimiterno);
 

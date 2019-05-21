@@ -67,21 +67,21 @@ DLL files may be explicitly loaded at run-time, a process referred to simply as 
 	var myfunction;
 	if (!myfunction.load("mydll"))
 	{
- 	throw MVException(L"cannot load mydll");
+ 	throw MVException("cannot load mydll");
 	}
 	
 	//error checking linking not implemented yet
 	var myfunction;
 	if (!myfunction.link("myfunction"))
 	{
- 	throw MVException(L"cannot link  myfunction");
+ 	throw MVException("cannot link  myfunction");
 	}
 	
 	//error checking loading and linking in one step
 	var myfunction;
 	if (!myfunction.link("mydll","myfunction"))
 	{
- 	throw MVException(L"cannot link mydll, myfunction");
+ 	throw MVException("cannot link mydll, myfunction");
 	}
 	
 */
