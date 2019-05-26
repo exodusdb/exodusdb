@@ -39,9 +39,21 @@ THE SOFTWARE.
 #include <iostream> //cin and cout
 #include <cmath> //for floor
 #include <cstdlib>//for exit
-//#include <boost/locale.hpp>
-#include <codecvt>
-#include <locale>
+#include <boost/locale.hpp>
+//#include <codecvt>
+//#include <locale>
+#include <algorithm>
+
+//#include "ConvertUTF.h"
+
+/*
+Binary    Hex          Comments
+0xxxxxxx  0x00..0x7F   Only byte of a 1-byte character encoding
+10xxxxxx  0x80..0xBF   Continuation bytes (1-3 continuation bytes)
+110xxxxx  0xC0..0xDF   First byte of a 2-byte character encoding
+1110xxxx  0xE0..0xEF   First byte of a 3-byte character encoding
+11110xxx  0xF0..0xF4   First byte of a 4-byte character encoding
+*/
 
 #ifndef M_PI
 //#define M_PI 3.14159265358979323846f
@@ -157,13 +169,7 @@ bool var::input()
 	if (std::cin.eof())
 		return false;
 
-	std::string temp_std_string1;
-	std::getline(std::cin,temp_std_string1);
-
-	//convert from utf8 to internal format - utf16 or utf32 depending on platform
-	//var_str=wstringfromUTF8((UTF8*)tempstr.data(),(int)tempstr.length());
-	//var_str=boost::locale::conv::utf_to_utf<char>(temp_std_string1);
-	var_str=temp_std_string1;
+	std::getline(std::cin,var_str);
 
 	return var_str.length()>0;
 }
@@ -691,40 +697,68 @@ var& var::trimmer(const char* trimchar)
 
 }
 
+//virtually identical code for invert and textinvert
 var var::invert() const
 {
 	THISIS("var& var::invert()")
 	THISISSTRING()
-	//return var(*this).inverter();
 	var tt=*this;
 	tt.inverter();
 	return tt;
 }
 
+//virtually identical code for invert and textinvert
+var var::textinvert() const
+{
+	THISIS("var& var::textinvert()")
+	THISISSTRING()
+	var tt=*this;
+	tt.textinverter();
+	return tt;
+}
+
+//inverts bits of ASCII bytes - ignoring multibyte unicode
 var& var::inverter()
 {
 	THISIS("var& var::inverter()")
 	THISISSTRING()
 
+	//clear numeric flags in case changed from/to numeric
+	var_typ&=pimpl::VARTYP_NOTNUMFLAGS;
+
+	//only transform bytes 0-127
+	std::transform(var_str.begin(), var_str.end(), var_str.begin(),
+                   [](char32_t c) -> char32_t { return (c>127) ? c : (c ^ char32_t(127)); });
+
+	return *this;
+}
+
+//inverts lower 8 bits of UTF8 codepoints
+//THROWS on invalid UTF8 bytes
+var& var::textinverter()
+{
+	THISIS("var& var::textinverter()")
+	THISISSTRING()
+
 	//xor each unicode code point, with the bits we want to toggle ... ie the bottom 8
 	//since we will keep inversion within the same 256 byte pages of unicode codepoints
+	//TODO invert directly in the UTF8 bytes - requires some cleverness
 
-        //clear numeric flags in case changed from/to numeric
-        var_typ&=pimpl::VARTYP_NOTNUMFLAGS;
+	//clear numeric flags in case changed from/to numeric
+	var_typ&=pimpl::VARTYP_NOTNUMFLAGS;
 
-	//create a converter between string/bytes and wstring/char32
-	std::wstring_convert<std::codecvt_utf8<char32_t>,char32_t> converter;
-
-	//convert to four bytes per code point
-	std::u32string widestring = converter.from_bytes(var_str);
+	//convert to char32.t string - four bytes per code point
+	std::u32string wstring1=boost::locale::conv::utf_to_utf<char32_t>(var_str);
 
 	//invert only the lower 8 bits to keep the resultant code points within the same unicode 256 byte page
-	char32_t invertbits=255;
-	for (size_t ii = 0; ii < widestring.length(); ii++)
-		widestring[ii] = widestring[ii] ^ invertbits;
+	//char32_t invertbits=255;
+	//for (size_t ii = 0; ii < wstring1.length(); ii++)
+	//	wstring1[ii] = wstring1[ii] ^ invertbits;
+	std::transform(wstring1.begin(), wstring1.end(), wstring1.begin(),
+                   [](char32_t c) -> char32_t { return c ^ char32_t(255); });
 
 	//convert back to utf8
-	var_str=converter.to_bytes(widestring);
+	var_str=boost::locale::conv::utf_to_utf<char>(wstring1);
 
 	return *this;
 }
@@ -744,6 +778,15 @@ var& var::ucaser()
         //var_typ&=pimpl::VARTYP_NOTNUMFLAGS;
 
 	return localeAwareChangeCase(2);
+/*
+int32_t ucasemap_utf8ToLower 	( 	const UCaseMap *  	csm,
+		char *  	dest,
+		int32_t  	destCapacity,
+		const char *  	src,
+		int32_t  	srcLength,
+		UErrorCode *  	pErrorCode 
+	) 	
+*/
 }
 
 var var::lcase() const
@@ -797,7 +840,8 @@ var var::unique() const
 
 }
 
-var var::seq() const
+//BINARY - 1st byte
+const var var::seq() const
 {
 	THISIS("var var::seq() const")
 	THISISSTRING()
@@ -805,15 +849,102 @@ var var::seq() const
 	if (var_str.length()==0)
 		return 0;
 
-	return (int) (unsigned int) var_str[0];
+	int byteno=var_str[0];
+	if (byteno>=0)
+		return byteno;
+	else
+		return byteno+256;
 
 }
 
-var var::chr(const int int1) const
+//UTF8 - 1st UTF code point
+const var var::textseq() const
+{
+	THISIS("var var::textseq() const")
+	THISISSTRING()
+/*
+	if (var_str.length()==0)
+		return 0;
+
+	int byteno=var_str[0];
+	if (byteno>=0)
+		return byteno;
+	else
+		return byteno+256;
+*/
+	//get four bytes from input string since in UTF8 a unicode code point may occupy up to 4 bytes
+	std::basic_string<char32_t> str1=boost::locale::conv::utf_to_utf<char32_t>(var_str.substr(0,4));
+
+	return int(uint32_t(str1[0]));
+}
+
+//only returns BINARY bytes 0-255 (128-255) cannot be stored in the database unless with other bytes making up UTF8
+var var::chr(const int charno) const
+{
+	return char(charno % 256);
+}
+
+//returns unicode 1-4 byte sequences (in utf8)
+var var::textchr(const int utf_codepoint) const
 {
 	//doesnt use *this at all (do we need a version that does?)
 
-	return var((char) int1);
+	//return var((char) int1);
+
+	std::wstring wstr1;
+	wstr1.push_back(wchar_t(uint32_t(utf_codepoint)));
+	return boost::locale::conv::utf_to_utf<char>(wstr1);
+
+/*
+	//make a converter
+	std::wstring_convert<std::codecvt_utf8<char32_t>,char32_t> converter;
+
+	//make a one character wide string;
+	std::u32string wstring1 {uint32_t(int1)};
+
+	//convert to utf8 and return
+	std::string result=converter.to_bytes(wstring1);
+	return result;
+*/
+
+/*	//using code from ConvertUTF.c
+
+	#define CONV_INT_TO_UTF8_MAX_OUTPUT_BYTES 4
+
+	const UTF32   u32_char    = uint(utf_codepoint);
+	const UTF32*  u32_ptr     = &u32_char;
+
+	UTF8   utf8_bytes[CONV_INT_TO_UTF8_MAX_OUTPUT_BYTES] = {0};
+	UTF8*  utf8_ptr      = &utf8_bytes[0];
+
+	//ConversionResult ConvertUTF32toUTF8 (
+	//        const UTF32** sourceStart, const UTF32* sourceEnd, 
+	//        UTF8** targetStart, UTF8* targetEnd, ConversionFlags flags);
+
+	ConversionFlags flags;
+	ConversionResult result=ConvertUTF32toUTF8 (
+		&u32_ptr, u32_ptr+1,
+		&utf8_ptr, &utf8_bytes[CONV_INT_TO_UTF8_MAX_OUTPUT_BYTES], flags);
+
+	//std::cout << "'" << utf8_bytes << "'" << std::endl;
+	return std::string((char*)(utf8_bytes));
+*/
+
+/*
+	//create a converter between string/bytes and wstring/char32
+	std::wstring_convert<std::codecvt_utf8<char32_t>,char32_t> converter;
+
+	//convert to four bytes per code point
+	std::u32string wstring1 = converter.from_bytes(var_str);
+
+	//invert only the lower 8 bits to keep the resultant code points within the same unicode 256 byte page
+	char32_t invertbits=255;
+	for (size_t ii = 0; ii < wstring1.length(); ii++)
+		wstring1[ii] = wstring1[ii] ^ invertbits;
+
+	//convert back to utf8
+	var_str=converter.to_bytes(wstring1);
+*/
 }
 
 var var::quote() const
@@ -1176,7 +1307,8 @@ var& var::lowerer()
 	THISIS("var& var::lowerer()")
 	THISISSTRING()
 
-	//note: rotate lowest character to highest
+	//note: rotate lowest sep to highest
+	///TODO consider converting lowest sep to char 0
 	this->converter(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_,
 			  _FM_ _VM_ _SM_ _TM_ _STM_ _RM_);
 
@@ -1196,7 +1328,8 @@ var& var::raiser()
 	THISIS("var& var::raiser()")
 	THISISSTRING()
 
-	//note: rotate lowest character to highest
+	//note: rotate highest sep to lowest
+	//TODO consider converting highest sep to char 0
 	this->converter(_FM_ _VM_ _SM_ _TM_ _STM_ _RM_,
 			  _RM_ _FM_ _VM_ _SM_ _TM_ _STM_);
 
@@ -1220,8 +1353,7 @@ var& var::converter(const var& oldchars,const var& newchars)
 	ISSTRING(oldchars)
 	ISSTRING(newchars)
 
-	std::string::size_type
-	pos=std::string::npos;
+	std::string::size_type pos=std::string::npos;
 
         //clear numeric flags in case changed from/to numeric
         var_typ&=pimpl::VARTYP_NOTNUMFLAGS;
@@ -1251,6 +1383,46 @@ var& var::converter(const var& oldchars,const var& newchars)
 	return *this;
 
 }
+
+/*
+var& var::textconverter(const var& oldchars,const var& newchars)
+{
+	THISIS("var& var::converter(const var& oldchars,const var& newchars)")
+	THISISSTRING()
+	ISSTRING(oldchars)
+	ISSTRING(newchars)
+
+	std::string::size_type pos=std::string::npos;
+
+        //clear numeric flags in case changed from/to numeric
+        var_typ&=pimpl::VARTYP_NOTNUMFLAGS;
+
+	while (true)
+	{
+		//locate (backwards) any of the from characters
+		//because we might be removing characters
+		pos=var_str.find_last_of(oldchars.var_str,pos);
+
+		if (pos==std::string::npos)
+			break;
+
+		//find which from character we have found
+		int fromcharn=int(oldchars.var_str.find(var_str[pos]));
+
+		if (fromcharn<int(newchars.var_str.length()))
+			var_str.replace(pos,1,newchars.var_str.substr(fromcharn,1));
+		else
+			var_str.erase(pos,1);
+
+		if (pos==0)
+			break;
+		pos--;
+	}
+
+	return *this;
+
+}
+*/
 
 //numeric is one of four regular expressions or zero length string
 //^$			zero length string
@@ -1435,8 +1607,9 @@ const var& var::put(std::ostream& ostream1) const
 	}
 
 	//verify conversion to UTF8
-	std::string tempstr=(*this).toString();
-	ostream1.write(tempstr.data(),(std::streamsize) tempstr.length());
+	//std::string tempstr=(*this).toString();
+
+	ostream1.write(var_str.data(),(std::streamsize) var_str.length());
 	return *this;
 }
 

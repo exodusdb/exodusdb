@@ -63,7 +63,7 @@ var dim::split(const var& str1)
 	ISSTRING(str1)
 
 	//maybe automatically dimension to the size of the string
-	if (!this->initialised_)
+	//if (!this->initialised_)
 		this->redim(str1.count(FM_)+1);
 
 	//empty string just fills array with empty string

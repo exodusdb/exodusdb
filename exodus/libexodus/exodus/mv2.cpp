@@ -36,8 +36,8 @@ namespace exodus {
 //ctor for char
 //use initializers since cannot fail (but could find how to init the char1)
 var::var(const char char1):
-	var_typ(pimpl::VARTYP_STR)
-	//,var_str(const_cast<char_t>char1)
+	var_typ(pimpl::VARTYP_STR),
+	var_str(1,char1)
 {
 	//cannot fail
 	//THISIS("var::var(const char char1)")
@@ -46,7 +46,7 @@ var::var(const char char1):
 	//priv=new pimpl;
 
 	//var_typ=pimpl::VARTYP_STR;
-	var_str=char1;
+	//var_str=char1;
 }
 
 //ctor for memory block

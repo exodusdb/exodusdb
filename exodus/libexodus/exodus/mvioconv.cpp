@@ -576,7 +576,7 @@ var var::oconv_LRC(const var& format) const
 
 			remaining=width-part.length();
 			if (remaining>0) {
-				if (just == "")
+				if (just == "L")
 				{
 					//output ^= part;
 					//output ^= remaining.space();

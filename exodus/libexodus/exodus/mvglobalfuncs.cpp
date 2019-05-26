@@ -488,6 +488,16 @@ DLL_PUBLIC var invert(const var& instring)
 	return instring.invert();
 }
 
+DLL_PUBLIC var& textinverter(var& instring)
+{
+	return instring.textinverter();
+}
+
+DLL_PUBLIC var textinvert(const var& instring)
+{
+	return instring.textinvert();
+}
+
 DLL_PUBLIC var& lowerer(var& instring)
 {
 	return instring.lowerer();
@@ -663,6 +673,16 @@ DLL_PUBLIC var chr(const int integer)
 	return var().chr(integer);
 }
 
+DLL_PUBLIC var textchr(const var& integer)
+{
+	return var().textchr(integer);
+}
+
+DLL_PUBLIC var textchr(const int integer)
+{
+	return var().textchr(integer);
+}
+
 DLL_PUBLIC bool match(const var& instring, const var& matchstr)
 {
 	return instring.match(matchstr);
@@ -671,6 +691,11 @@ DLL_PUBLIC bool match(const var& instring, const var& matchstr)
 DLL_PUBLIC var seq(const var& char1)
 {
 	return char1.seq();
+}
+
+DLL_PUBLIC var textseq(const var& char1)
+{
+	return char1.textseq();
 }
 
 DLL_PUBLIC var str(const var& instring, const int number)

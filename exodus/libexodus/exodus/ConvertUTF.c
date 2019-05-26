@@ -34,18 +34,12 @@
     Jan 2004: updated switches in from-UTF8 conversions.
     Oct 2004: updated to use UNI_MAX_LEGAL_UTF32 in UTF-32 conversions.
 
-	Sep 2007: exodus/Steve Bush passthrough illegal utf8/16 characters 0xF9-0xFF used in pick database
-	Mar 2009: exodus/Steve Bush passthrough illegal utf8/32 characters 0xF9-0xFF used in pick database
-	Nov 2010: exodus/Steve Bush inline isLegalUTF8 as per suggestion (using supposedly portable INLINE macro)
-
-	Obsolete since started using certain UTF characters as field separators and normal utf converters can be used
-
     See the header file "ConvertUTF.h" for complete documentation.
 
 ------------------------------------------------------------------------ */
 
 
-#include <exodus/ConvertUTF.h>
+#include "ConvertUTF.h"
 #ifdef CVTUTF_DEBUG
 #include <stdio.h>
 #endif
@@ -215,13 +209,6 @@ static const UTF8 firstByteMark[7] = { 0x00, 0x00, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC 
  * into an inline function.
  */
 
-/*exodus*/
-#ifdef _MSC_VER
-  #define INLINE __forceinline // use __forceinline (VC++ specific)
-#else
-  #define INLINE inline // use standard inline
-#endif
-
 /* --------------------------------------------------------------------- */
 
 ConversionResult ConvertUTF16toUTF8 (
@@ -267,24 +254,7 @@ ConversionResult ConvertUTF16toUTF8 (
 	}
 	/* Figure out how many bytes the result will require */
 	if (ch < (UTF32)0x80) {	     bytesToWrite = 1;
-
-	/*Sep 2007: exodus/Steve Bush passthrough illegal utf8/16 characters 0xF9-0xFF used in pick database*/
-/*	} else if (ch < (UTF32)0x800) {     bytesToWrite = 2;*/
-	} else if (ch < (UTF32)0x800) {
-		if (ch>=249&&ch<=255)
-		{
-			//bytesToWrite=1;
-			if ((target+1) > targetEnd) {
-				source = oldSource; /* Back up source pointer! */
-				result = targetExhausted;
-				break;
-			}
-			*target++ =  (UTF8)ch;
-			continue;
-		}
-		else
-			bytesToWrite = 2;
-
+	} else if (ch < (UTF32)0x800) {     bytesToWrite = 2;
 	} else if (ch < (UTF32)0x10000) {   bytesToWrite = 3;
 	} else if (ch < (UTF32)0x110000) {  bytesToWrite = 4;
 	} else {			    bytesToWrite = 3;
@@ -322,8 +292,6 @@ ConversionResult ConvertUTF16toUTF8 (
  * definition of UTF-8 goes up to 4-byte sequences.
  */
 
-INLINE /*exodus*/
-
 static Boolean isLegalUTF8(const UTF8 *source, int length) {
     UTF8 a;
     const UTF8 *srcptr = source+length;
@@ -355,9 +323,6 @@ static Boolean isLegalUTF8(const UTF8 *source, int length) {
  * Exported function to return whether a UTF-8 sequence is legal or not.
  * This is not used here; it's just exported.
  */
-
-INLINE /*exodus*/
-
 Boolean isLegalUTF8Sequence(const UTF8 *source, const UTF8 *sourceEnd) {
     int length = trailingBytesForUTF8[*source]+1;
     if (source+length > sourceEnd) {
@@ -377,23 +342,11 @@ ConversionResult ConvertUTF8toUTF16 (
     while (source < sourceEnd) {
 	UTF32 ch = 0;
 	unsigned short extraBytesToRead = trailingBytesForUTF8[*source];
-
-/*	Sep 2007: exodus/Steve Bush passthrough illegal utf8/16 characters 0xF9-0xFF used in pick database*/
-	if (*source>=249)
-	{
-		*target++ = *source;//UNI_REPLACEMENT_CHAR;
-		++source;
-		continue;
-	};
-
 	if (source + extraBytesToRead >= sourceEnd) {
 	    result = sourceExhausted; break;
 	}
 	/* Do this check whether lenient or strict */
 	if (! isLegalUTF8(source, extraBytesToRead+1)) {
-
-
-
 	    result = sourceIllegal;
 	    break;
 	}
@@ -478,29 +431,12 @@ ConversionResult ConvertUTF32toUTF8 (
 	 * illegally large UTF32 things (> Plane 17) into replacement chars.
 	 */
 	if (ch < (UTF32)0x80) {	     bytesToWrite = 1;
-
-/*	Mar 2009: exodus/Steve Bush passthrough illegal utf8/32 characters 0xF9-0xFF used in pick database*/
-/*	} else if (ch < (UTF32)0x800) {     bytesToWrite = 2;*/
-	} else if (ch < (UTF32)0x800) {
-		if (ch>=249&&ch<=255)
-		{
-			//bytesToWrite=1;
-			if ((target+1) > targetEnd) {
-				--source; /* Back up source pointer! */
-				result = targetExhausted;
-				break;
-			}
-			*target++ =  (UTF8)ch;
-			continue;
-		}
-		else
-			bytesToWrite = 2;
-
+	} else if (ch < (UTF32)0x800) {     bytesToWrite = 2;
 	} else if (ch < (UTF32)0x10000) {   bytesToWrite = 3;
 	} else if (ch <= UNI_MAX_LEGAL_UTF32) {  bytesToWrite = 4;
 	} else {			    bytesToWrite = 3;
 					    ch = UNI_REPLACEMENT_CHAR;
-					    //exodus   result = sourceIllegal2;
+					    result = sourceIllegal;
 	}
 	
 	target += bytesToWrite;
@@ -532,17 +468,6 @@ ConversionResult ConvertUTF8toUTF32 (
     while (source < sourceEnd) {
 	UTF32 ch = 0;
 	unsigned short extraBytesToRead = trailingBytesForUTF8[*source];
-
-/*	Mar 2009: exodus/Steve Bush passthrough illegal utf8/32 characters 0xF9-0xFF used in pick database*/
-	if (*source>=249)
-	{
-		*target++ = *source++;
-		// ch=*source;
-		// *target++ = ch;
-		//++source;
-		continue;
-	};
-
 	if (source + extraBytesToRead >= sourceEnd) {
 	    result = sourceExhausted; break;
 	}

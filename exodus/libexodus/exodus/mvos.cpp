@@ -66,8 +66,8 @@ THE SOFTWARE.
 
 #endif
 
-#include <boost/scoped_ptr.hpp>
-#include <boost/scoped_array.hpp>
+//#include <boost/scoped_ptr.hpp>
+//#include <boost/scoped_array.hpp>
 
 //regex.assign("", std_boost::regex::extended|std_boost::regex_constants::icase);
 
@@ -75,19 +75,8 @@ THE SOFTWARE.
 //http://www.ibm.com/developerworks/aix/library/au-stdfs/index.html
 //catch(boost::filesystem::filesystem_error e) { 
 //#include <boost/filesystem.hpp>
-#define C17
-#ifdef C17
 #include <experimental/filesystem>
 namespace stdfs = std::experimental::filesystem;
-#else
-#include <boost/filesystem/convenience.hpp>
-#include <boost/filesystem/config.hpp>
-#include <boost/filesystem/exception.hpp>
-#include <boost/filesystem/fstream.hpp>
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/path.hpp>
-namespace stdfs = boost::filesystem;
-#endif
 #include <boost/thread/tss.hpp>
 
 //#include NullCodecvt.h
@@ -115,13 +104,13 @@ namespace stdfs = boost::filesystem;
 
 //to get whole environment
 extern char **environ;
-#include <boost/locale.hpp>
+//#include <boost/locale.hpp>
 
 //boost changed from TIME_UTC to TIME_UTC_ (when?) to avoid a new standard TIME_UTC macro in C11 time.h
-#include <boost/version.hpp>
-#if BOOST_VERSION < 105000
-#define TIME_UTC_ TIME_UTC
-#endif
+//#include <boost/version.hpp>
+//#if BOOST_VERSION < 105000
+//#define TIME_UTC_ TIME_UTC
+//#endif
 
 //for initrnd from string
 #include <MurmurHash2_64.h>
@@ -163,8 +152,12 @@ void exodus_once_func()
 	//.utf8 causes a utf-8 to wchar conversion when converting string to wstring by iterators .begin() .end()
 	//and we want to be able to control conversion more accurately than an automatic conversion
 	//en_US is missing from Ubuntu. en_IN is available on Ubuntu and Centos but not MacOSX
-	if (!setlocale (LC_COLLATE, "en_US.utf8"))
-		{};
+	//if (!setlocale (LC_COLLATE, "en_US.utf8"))
+	if (!setlocale (LC_ALL, "en_US.utf8"))
+	{
+		std::cout << "Cannot setlocale LC_COLLATE to en_US.utf8" << std::endl;
+	};
+	//std::cout << std::cout.getloc().name() << std::endl;
 }
 
 /* Ubuntu 8.04 locale -a
@@ -1151,7 +1144,8 @@ bool var::osread(const char* osfilename, const var& locale)
 	}
 
 	//get file size * wchar memory to load the file or fail
-	boost::scoped_array<char> memblock(new char [bytesize]);
+	//boost::scoped_array<char> memblock(new char [bytesize]);
+	std::unique_ptr<char[]> memblock(new char[bytesize]);
 	if (memblock==0)
 	{
 		throw MVOutOfMemory("Could not obtain "^var(int(bytesize*sizeof(char)))^" bytes of memory to read "^var(osfilename));
@@ -1234,6 +1228,8 @@ bool var::osbwrite(const var& osfilevar, var& startoffset, const bool adjust) co
 	if (pmyfile == 0)
 		return false;
 
+std::cout << pmyfile->getloc().name();
+
 	//NB seekp goes by bytes regardless of the fact that it is a wide stream
 	//myfile.seekp (startoffset*sizeof(char));
 	//startoffset should be in bytes except for fixed multibyte code pages like UTF16 and UTF32
@@ -1242,7 +1238,7 @@ bool var::osbwrite(const var& osfilevar, var& startoffset, const bool adjust) co
 	//NB but write length goes by number of wide characters (not bytes)
 	pmyfile->write(var_str.data(),int(var_str.length()));
 
-	//on windows, wfstream will try to convert to current locale codepage so
+	//on windows, fstream will try to convert to current locale codepage so
 	//if you are trying to write an exodus string containing a GREEK CAPITAL GAMMA
 	//unicode \x0393 and current codepage is *NOT* CP1253 (Greek)
 	//then c++ wiofstream cannot convert \x0393 to a single byte (in CP1253)
@@ -1273,6 +1269,70 @@ var& var::osbread(const var& osfilevar, const var& startoffset, const int bytesi
 	//	startoffset_nonconst=startoffset;
 	return this->osbread(osfilevar, const_cast<var&>(startoffset), bytesize);
 }
+
+ssize_t count_excess_UTF8_bytes(std::string& str)
+{
+
+	// Scans backward from the end of string.
+	const char* cptr = &str.back();
+	int num = 1;
+	int numBytesToTruncate = 0;
+
+	for (int i = 0; 6 > i; ++i)
+	{
+		numBytesToTruncate += 1;
+		if ((*cptr & 0x80) == 0x80)
+		{
+			// If char bit starts with 1xxxxxxx
+			// It's a part of unicode character!
+			// Find the first byte in the unicode character!
+
+			//if ((*cptr & 0xFC) == 0xFC) { if (num == 6) { return 0; } break; }
+			//if ((*cptr & 0xF8) == 0xF8) { if (num == 5) { return 0; } break; }
+
+			// If char binary is 11110000, it means it's a 4 bytes long unicode.
+			if ((*cptr & 0xF0) == 0xF0)
+			{
+				if (num == 4)
+				{
+					return 0;
+				}
+				break;
+			}
+
+			// If char binary is 11100000, it means it's a 3 bytes long unicode.
+			if ((*cptr & 0xE0) == 0xE0)
+			{
+				if (num == 3)
+				{
+					return 0;
+				}
+				break;
+			}
+
+			if ((*cptr & 0xC0) == 0xC0)
+			{
+				if (num == 2)
+				{
+					return 0;
+				}
+				break;
+			}
+
+			num += 1;
+
+		} else {
+			// If char bit does not start with 1, nothing to truncate!
+			return 0;
+		}
+
+		cptr -= 1;
+
+	}//next char
+
+	return numBytesToTruncate;
+}
+
 
 var& var::osbread(const var& osfilevar, var& startoffset, const int bytesize, const bool adjust)
 {
@@ -1319,7 +1379,8 @@ var(int(maxsize)).outputl("maxsize=");
 //var((int) pmyfile->tellg()).outputl("2 tellg=");
 
 	//get a memory block to read into
-	boost::scoped_array<char> memblock(new char [bytesize]);
+	//boost::scoped_array<char> memblock(new char [bytesize]);
+	std::unique_ptr<char[]> memblock(new char[bytesize]);
 	if (memblock==0)
 		throw MVOutOfMemory("Could not obtain "^var(int(bytesize*sizeof(char)))^" bytes of memory to read "^osfilevar);
 		//return *this;
@@ -1345,6 +1406,18 @@ var(int(maxsize)).outputl("maxsize=");
 	//	#pragma warning( disable: 4244 )
 	//warning C4244: '=' : conversion from 'std::streamoff' to 'unsigned int', possible loss of data
 	var_str.assign(memblock.get(), (unsigned int) pmyfile->gcount());
+
+	//trim off any excess utf8 bytes if utf8
+//	var(pmyfile->getloc().name()).outputl(L"loc name=");;
+	if (pmyfile->getloc().name()!="C")
+	{
+		int nextrabytes=count_excess_UTF8_bytes(var_str);
+		if (nextrabytes)
+		{
+			startoffset-=nextrabytes;
+			var_str.resize(var_str.length() - nextrabytes);
+		}
+	}
 
 	return *this;
 
@@ -1685,13 +1758,13 @@ var var::oslist(const var& path0, const var& spec0, const int mode) const
 		getfiles=false;
 
 	var filelist="";
-#if BOOST_FILESYSTEM_VERSION >= 3 or defined(C17)
+//#if BOOST_FILESYSTEM_VERSION >= 3 or defined(C17)
 #define LEAForFILENAME path().filename().string()
 #define COMMAstdfsNATIVE
-#else
-#define LEAForFILENAME leaf()
-#define COMMAstdfsNATIVE ,stdfs::native
-#endif
+//#else
+//#define LEAForFILENAME leaf()
+//#define COMMAstdfsNATIVE ,stdfs::native
+//#endif
 	//get handle to folder
 	//wpath or path before boost 1.34
 	//stdfs::wpath full_path(stdfs::initial_path<stdfs::wpath>());

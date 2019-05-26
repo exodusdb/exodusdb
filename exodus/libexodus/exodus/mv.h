@@ -266,7 +266,7 @@ namespace exodus {
 
 class dim;
 class var__extractreplace;
-class PFstream;
+//class PFstream;
 
 #ifndef SWIG
 
@@ -902,13 +902,20 @@ public:
 
 	//STRING CREATION
 //	var chr() const;
+	//version 1 chr - only char 0 - 255 returned in a single byte
+	//bytes 128-255 are not valid utf-8 so cannot be written to database/postgres
 	var chr(const int num) const;
+	//version 2 textchr - returns utf8 byte sequences for all unicode code points
+	//not uint so to get utf codepoints > 2^63 must provide negative ints
+	//not providing implicit constructor from var to uint due to getting ambigious conversions since int and uint are parallel priority in c++ implicit conversions
+	var textchr(const int num) const;
 	var str(const int num) const;
 	var space() const;
 
 	//STRING INFO
 	bool match(const var& matchstr,const var& options DEFAULTNULL) const;
-	var seq() const;
+	const var seq() const;
+	const var textseq() const;
 	var dcount(const var& substrx) const;
 	var count(const var& substrx) const;
 #ifndef SWIGPERL
@@ -933,7 +940,8 @@ public:
 	var& unquoter();
 	var& ucaser();
 	var& lcaser();
-	var& inverter();
+	var& inverter();//ASCII
+	var& textinverter();//UTF8
 	var& trimmer(const char* trimchar DEFAULTSPACE);
 	var& trimmerf(const char* trimchar DEFAULTSPACE);
 	var& trimmerb(const char* trimchar DEFAULTSPACE);
@@ -955,7 +963,8 @@ public:
 	var unquote() const;
 	var ucase() const;
 	var lcase() const;
-	var invert() const;
+	var invert() const;//ASCII
+	var textinvert() const;//UTF8
 	var trim(const char* trimchar DEFAULTSPACE) const;
 	var trimf(const char* trimchar DEFAULTSPACE) const;
 	var trimb(const char* trimchar DEFAULTSPACE) const;
