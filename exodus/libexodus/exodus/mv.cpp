@@ -31,14 +31,12 @@ THE SOFTWARE.
 //or overlap the string/integer/float variables to save space
 
 #include <sstream>
-#include <boost/locale.hpp>
+#include <limits>
 
 #define MV_NO_NARROW
 
 #define EXO_MV_CPP //indicates globals are to be defined (omit extern keyword)
-#include <limits>
 #include <exodus/mv.h>
-#include <exodus/mvimpl.h>
 //#include <exodus/mvutf.h>
 #include <exodus/mvexceptions.h>
 
@@ -75,7 +73,7 @@ var::~var()
 	//set all unused bits to 1 to ease detection of usage of uninitialised variables (bad c++ syntax like var x=x+1;
 	//set all used bits to 0 to increase chance of detecting unassigned variables
 	//var_typ=(char)0xFFFFFFF0;
-	var_typ=0xF0;
+	var_typ=VARTYP_DESTRUCTED;
 }
 
 //CONSTRUCTORS
@@ -83,7 +81,7 @@ var::~var()
 
 //default constructor to allow definition unassigned "var mv";
 var::var()
-: var_typ(pimpl::VARTYP_UNA)
+: var_typ(VARTYP_UNA)
 {
 	//int xyz=3;
 	//WARNING neither initialisers nor constructors are called in the following case !!!
@@ -92,7 +90,7 @@ var::var()
 	//and not even a compiler warning in msvc8 or g++4.1.2
 
 	//so the following test is put everywhere to protect against this type of accidental programming
-	//if (var_typ&mvtypemask)
+	//if (var_typ&VARTYP_MASK)
 	//	throw MVUndefined("funcname()");
 	//should really ensure a magic number and not just HOPE for some binary digits above bottom four 0-15 decimal 1111binary
 	//this could be removed in production code perhaps
@@ -104,108 +102,109 @@ var::var()
 
 	//moved here from pimpl constructor
 	//moved up to initializer
-	//var_typ=pimpl::VARTYP_UNA;
+	//var_typ=VARTYP_UNA;
 
 }
 
 //copy constructor
-//dont use initializers - check if copiedvar is assigned first
-//(could initialise and check after but this feels bad due to loss of target)
-var::var(const var& rhs_var)
+var::var(const var& rhs)
+	: var_typ(rhs.var_typ)
+	, var_str(rhs.var_str)
+	, var_int(rhs.var_int)
+	, var_dbl(rhs.var_dbl)
 {
-	THISIS("var::var(const var& rhs_var)")
-
-	//do first since initializer is copiedvar
-	ISASSIGNED(rhs_var)
+	//checking after copy for speed
+	//use initializers for speed and only check afterwards if copiedvar was assigned
+	THISIS("var::var(const var& rhs)")
+	ISASSIGNED(rhs)
 
 	//not a pointer anymore for speed
 	//priv=new pimpl;
-
-	//identical in copy constructor and load and call
-	var_typ=rhs_var.var_typ;
-	var_str=rhs_var.var_str;
-	var_int=rhs_var.var_int;
-	var_dbl=rhs_var.var_dbl;
 }
 
 //move constructor
 var::var(const var&& rhs) noexcept
+	: var_str(std::move(rhs.var_str))
+	, var_int(rhs.var_int)
+	, var_dbl(rhs.var_dbl)
+	, var_typ(rhs.var_typ)
 {
+	//skip this for speed since temporararies are unlikely to be unassigned
 	//THISIS("var::var(const var&& rhs)")
 	//ISASSIGNED(rhs)
-
-	//using std::swap;
-	//swap(var_str,rhs.var_str);
-	using std::move;
-	var_str=move(rhs.var_str);
-	//just grab the rest
-	var_dbl=rhs.var_dbl;
-	var_int=rhs.var_int;
-	var_typ=rhs.var_typ;
 }
 
 //constructor for char*
-//use initializers since cannot fail
+//use initializers since cannot fail unless out of memory
 var::var(const char* cstr1)
+	: var_str(cstr1)
+	, var_typ(VARTYP_STR)
 {
 
 	//not a pointer anymore for speed
 	//priv=new pimpl;
 
 	//protect against null pointer
+	//probably already crashed from var_str initialiser above
 	if (cstr1==0)
 	{
 		//THISIS("var::var(const char* cstr1)")
 		throw MVInvalidPointer("Null pointer in var(const char*)");
 	}
 
-	var_str=cstr1;
-	var_typ=pimpl::VARTYP_STR;
+	//var_str=cstr1;
+	//var_typ=VARTYP_STR;
 }
 
-//constructor for xstring
-//just use initializers since cannot fail
-var::var(const xstring& str1)
-	: var_str(str1)
-	, var_typ(pimpl::VARTYP_STR)
-{}
-
-#if 0
 //constructor for std::string
-//just use initializers since cannot fail
+//just use initializers since cannot fail unless out of memory
 var::var(const std::string& str1)
-	//: var_str(wstringfromUTF8((UTF8*)str1.data(),(int)str1.length()))
-	: var_str(boost::locale::conv::utf_to_utf<char>(str1))
-	, var_typ(pimpl::VARTYP_STR)
+	//this would validate all strings as being UTF8?
+	//: var_str(boost::locale::conv::utf_to_utf<char>(str1))
+	: var_str(str1)
+	, var_typ(VARTYP_STR)
 {}
-#endif
 
 //constructor for bool
 //just use initializers since cannot fail
-var::var(const bool bool1)
+var::var(const bool bool1) noexcept
 	: var_int(bool1)
-	, var_typ(pimpl::VARTYP_INT)
+	, var_typ(VARTYP_INT)
 {}
 
 //constructor for int
 //just use initializers since cannot fail
-var::var(const int int1)
+var::var(const int int1) noexcept
 	: var_int(int1)
-	, var_typ(pimpl::VARTYP_INT)
+	, var_typ(VARTYP_INT)
 {}
 
 //constructor for long long
 //just use initializers since cannot fail
-var::var(const long long longlong1)
+var::var(const long long longlong1) noexcept
 	: var_int(longlong1)
-	, var_typ(pimpl::VARTYP_INT)
+	, var_typ(VARTYP_INT)
 {}
 
 //constructor for double
 //just use initializers since cannot fail
-var::var(const double double1)
-    : var_dbl(double1)
-    , var_typ(pimpl::VARTYP_DBL)
+var::var(const double double1) noexcept
+	: var_dbl(double1)
+	, var_typ(VARTYP_DBL)
+{}
+
+//ctor for char
+//use initializers since cannot fail (but could find how to init the char1)
+var::var(const char char1) noexcept
+	: var_str(1,char1)
+	, var_typ(VARTYP_STR)
+{}
+
+//ctor for memory block
+//dont use initialisers and TODO protect against out of memory in expansion to string
+var::var(const char* charstart, const size_t nchars)
+	: var_str(charstart,nchars)
+	, var_typ(VARTYP_STR)
 {}
 
 //EXPLICIT AND AUTOMATIC CONVERSIONS
@@ -217,9 +216,9 @@ var::var(const double double1)
 
 //allow conversion to string (IS THIS USED FOR ANYTHING AT THE MOMENT?
 //allows the usage of any string function
-//operator const xstring()
+//operator const std::string()
    	//{
-//	//debuggCONVERT&& cout<<"CONVERT: operator const xstring() returns '"<<var_str<<"'\n";
+//	//debuggCONVERT&& cout<<"CONVERT: operator const std::string() returns '"<<var_str<<"'\n";
 //	return var_str;
 //}
 
@@ -261,11 +260,11 @@ var::operator int() const
 	do
 	{
 		//prioritise int since conversion to int perhaps more likely to be an int already
-		if (var_typ&pimpl::VARTYP_INT)
+		if (var_typ&VARTYP_INT)
 			return (int) var_int;
-		if (var_typ&pimpl::VARTYP_DBL)
+		if (var_typ&VARTYP_DBL)
 			return int(var_dbl);
-		if (var_typ&pimpl::VARTYP_NAN)
+		if (var_typ&VARTYP_NAN)
 			throw MVNonNumeric("int(" ^ substr(1,20) ^ ")");
 		if (!(var_typ))
 		{
@@ -288,7 +287,7 @@ var::operator int&() const
 	//TODO check that converting mvint_t (which is long long) to int doesnt cause any practical problems) PROBABLY WILL!
 	//since we are returning a non const reference which allows callers to set the int directly then clear any decimal and string cache flags
 	//which would be invalid after setting the int alone
-	var_typ=pimpl::VARTYP_INT;
+	var_typ=VARTYP_INT;
 	return (int&) var_int;
 }
 var::operator double&() const
@@ -297,7 +296,7 @@ var::operator double&() const
 	THISISDECIMAL()
 	//since we are returning a non const reference which allows callers to set the dbl directly then clear any int and string cache flags
 	//which would be invalid after setting the dbl alone
-	var_typ=pimpl::VARTYP_DBL;
+	var_typ=VARTYP_DBL;
 	return (double&) var_dbl;
 }
 #endif
@@ -312,11 +311,11 @@ var::operator unsigned int() const
 	do
 	{
 		//prioritise int since conversion to int perhaps more likely to be an int already
-		if (var_typ&pimpl::VARTYP_INT)
+		if (var_typ&VARTYP_INT)
 			return var_int;
-		if (var_typ&pimpl::VARTYP_DBL)
+		if (var_typ&VARTYP_DBL)
 			return int(var_dbl);
-		if (var_typ&pimpl::VARTYP_NAN)
+		if (var_typ&VARTYP_NAN)
 			throw MVNonNumeric("int(" ^ substr(1,20) ^ ")");
 		if (!(var_typ))
 		{
@@ -344,7 +343,7 @@ var::operator size_t() const
 /*
 var::operator const char*()
 {
-	if (var_typ&mvtypemask)
+	if (var_typ&VARTYP_MASK)
 		throw MVUndefined("const char*()");
 	cout<<"CONVERT: operator const char*() returns '"<<var_str.c_str()<<"'\n";
 	return var_str.c_str();
@@ -433,7 +432,7 @@ var& var::operator= (const int int1)
 	//THISISDEFINED()
 
 	var_int=int1;
-	var_typ=pimpl::VARTYP_INT;//reset to one unique type
+	var_typ=VARTYP_INT;//reset to one unique type
 
 	return *this;
 }
@@ -449,7 +448,7 @@ var& var::operator= (const double double1)
 	//THISISDEFINED()
 
 	var_dbl=double1;
-	var_typ=pimpl::VARTYP_DBL;//reset to one unique type
+	var_typ=VARTYP_DBL;//reset to one unique type
 
 	return *this;
 }
@@ -469,7 +468,7 @@ var& var::operator= (const char char2)
 						//ALN:TODO: argumentation: var with mvtyp=0 is NOT defined
 
 	var_str=char2;
-	var_typ=pimpl::VARTYP_STR;//reset to one unique type
+	var_typ=VARTYP_STR;//reset to one unique type
 
 	return *this;
 }
@@ -486,24 +485,24 @@ var& var::operator= (const char* char2)
 	THISISDEFINED()
 	
 	var_str=char2;
-	var_typ=pimpl::VARTYP_STR;//reset to one unique type
+	var_typ=VARTYP_STR;//reset to one unique type
 
 	return *this;
 }
 
-//=xstring
+//=std::string
 //The assignment operator should always return a reference to *this.
-var& var::operator= (const xstring string2)
+var& var::operator= (const std::string string2)
 {
 	
 	THISIS("var& var::operator= (const char* char2)")
 	//protect against unlikely syntax as follows:
-	//var undefinedassign=undefinedassign=xstring("xxx"";
+	//var undefinedassign=undefinedassign=std::string("xxx"";
 	//this causes crash due to bad memory access due to setting string that doesnt exist
 	//slows down all string settings so consider NOT CHECKING in production code
 	THISISDEFINED()
 	var_str=string2;
-	var_typ=pimpl::VARTYP_STR;//reset to one unique type
+	var_typ=VARTYP_STR;//reset to one unique type
 
 	return *this;
 }
@@ -519,7 +518,7 @@ var& var::operator^=(const var& rhs)
 
 	//tack it onto our string
 	var_str+=rhs.var_str;
-	var_typ=pimpl::VARTYP_STR;//reset to one unique type
+	var_typ=VARTYP_STR;//reset to one unique type
 
 	return *this;
 }
@@ -533,7 +532,7 @@ var& var::operator^= (const int int1)
 
 	//var_str+=var(int1).var_str;
 	var_str+=intToString(int1);
-	var_typ=pimpl::VARTYP_STR;//reset to one unique type
+	var_typ=VARTYP_STR;//reset to one unique type
 
 	return *this;
 }
@@ -547,7 +546,7 @@ var& var::operator^= (const double double1)
 
 	//var_str+=var(int1).var_str;
 	var_str+=dblToString(double1);
-	var_typ=pimpl::VARTYP_STR;//reset to one unique type
+	var_typ=VARTYP_STR;//reset to one unique type
 
 	return *this;
 }
@@ -561,7 +560,7 @@ var& var::operator^= (const char char1)
 
 	//var_str+=var(int1).var_str;
 	var_str+=char1;
-	var_typ=pimpl::VARTYP_STR;//reset to one unique type
+	var_typ=VARTYP_STR;//reset to one unique type
 
 	return *this;
 }
@@ -574,23 +573,23 @@ var& var::operator^= (const char* char1)
 	THISISSTRING()
 
 	//var_str+=var(int1).var_str;
-	//var_str+=xstring(char1);
+	//var_str+=std::string(char1);
 	var_str+=char1;
-	var_typ=pimpl::VARTYP_STR;//reset to one unique type
+	var_typ=VARTYP_STR;//reset to one unique type
 
 	return *this;
 }
 
-//^=xstring
+//^=std::string
 //The assignment operator should always return a reference to *this.
-var& var::operator^= (const xstring string1)
+var& var::operator^= (const std::string string1)
 {
-	THISIS("var& var::operator^= (const xstring string1)")
+	THISIS("var& var::operator^= (const std::string string1)")
 	THISISSTRING()
 
 	//var_str+=var(int1).var_str;
 	var_str+=string1;
-	var_typ=pimpl::VARTYP_STR;//reset to one unique type
+	var_typ=VARTYP_STR;//reset to one unique type
 
 	return *this;
 }
@@ -613,19 +612,19 @@ var var::operator++ (int)
 
 tryagain:
 	//prefer int since ++ nearly always on integers
-	if (var_typ&pimpl::VARTYP_INT)
+	if (var_typ&VARTYP_INT)
 	{
 		if (var_int==std::numeric_limits<mvint_t>::max())
 			throw MVIntOverflow("operator++");
 		var_int++;
-		var_typ=pimpl::VARTYP_INT;//reset to one unique type
+		var_typ=VARTYP_INT;//reset to one unique type
 	}
-	else if (var_typ&pimpl::VARTYP_DBL)
+	else if (var_typ&VARTYP_DBL)
 	{
 		var_dbl++;
-		var_typ=pimpl::VARTYP_DBL;//reset to one unique type
+		var_typ=VARTYP_DBL;//reset to one unique type
 	}
-	else if (var_typ&pimpl::VARTYP_STR)
+	else if (var_typ&VARTYP_STR)
 	{
 		//try to convert to numeric
 		if (isnum())
@@ -653,17 +652,17 @@ var var::operator-- (int)
 
 tryagain:
 	//prefer int since -- nearly always on integers
-	if (var_typ&pimpl::VARTYP_INT)
+	if (var_typ&VARTYP_INT)
 	{
 		var_int--;
-		var_typ=pimpl::VARTYP_INT;//reset to one unique type
+		var_typ=VARTYP_INT;//reset to one unique type
 	}
-	else if (var_typ&pimpl::VARTYP_DBL)
+	else if (var_typ&VARTYP_DBL)
 	{
 		var_dbl--;
-		var_typ=pimpl::VARTYP_DBL;//reset to one unique type
+		var_typ=VARTYP_DBL;//reset to one unique type
 	}
-	else if (var_typ&pimpl::VARTYP_STR)
+	else if (var_typ&VARTYP_STR)
 	{
 		//try to convert to numeric
 		if (isnum())
@@ -691,19 +690,19 @@ var& var::operator++ ()
 
 tryagain:
 	//prefer int since -- nearly always on integers
-	if (var_typ&pimpl::VARTYP_INT)
+	if (var_typ&VARTYP_INT)
 	{
 		if (var_int==std::numeric_limits<mvint_t>::max())
 			throw MVIntOverflow("operator++");
 		var_int++;
-		var_typ=pimpl::VARTYP_INT;//reset to one unique type
+		var_typ=VARTYP_INT;//reset to one unique type
 	}
-	else if (var_typ&pimpl::VARTYP_DBL)
+	else if (var_typ&VARTYP_DBL)
 	{
 		var_dbl++;
-		var_typ=pimpl::VARTYP_DBL;//reset to one unique type
+		var_typ=VARTYP_DBL;//reset to one unique type
 	}
-	else if (var_typ&pimpl::VARTYP_STR)
+	else if (var_typ&VARTYP_STR)
 	{
 		//try to convert to numeric
 		if (isnum())
@@ -732,17 +731,17 @@ var& var::operator-- ()
 
 tryagain:
 	//prefer int since -- nearly always on integers
-	if (var_typ&pimpl::VARTYP_INT)
+	if (var_typ&VARTYP_INT)
 	{
 		var_int--;
-		var_typ=pimpl::VARTYP_INT;//reset to one unique type
+		var_typ=VARTYP_INT;//reset to one unique type
 	}
-	else if (var_typ&pimpl::VARTYP_DBL)
+	else if (var_typ&VARTYP_DBL)
 	{
 		var_dbl--;
-		var_typ=pimpl::VARTYP_DBL;//reset to one unique type
+		var_typ=VARTYP_DBL;//reset to one unique type
 	}
-	else if (var_typ&pimpl::VARTYP_STR)
+	else if (var_typ&VARTYP_STR)
 	{
 		//try to convert to numeric
 		if (isnum())
@@ -771,19 +770,19 @@ tryagain:
 
 	//dbl target
 	//prefer double
-	if (var_typ&pimpl::VARTYP_DBL)
+	if (var_typ&VARTYP_DBL)
 	{
 		//+= int or dbl from source
 		var_dbl+=int1;
-		var_typ=pimpl::VARTYP_DBL;//reset to one unique type
+		var_typ=VARTYP_DBL;//reset to one unique type
 		return *this;
 	}
 
 	//int target
-	else if (var_typ&pimpl::VARTYP_INT)
+	else if (var_typ&VARTYP_INT)
 	{
 		var_int+=int1;
-		var_typ=pimpl::VARTYP_INT;//reset to one unique type
+		var_typ=VARTYP_INT;//reset to one unique type
 		return *this;
 	}
 
@@ -791,7 +790,7 @@ tryagain:
 	//convert strings to number is cached and only needs to be done once
 
 	//nan (dont bother with this here because it is exceptional and will be caught below anyway
-	//else if (var_typ&pimpl::VARTYP_NAN)
+	//else if (var_typ&VARTYP_NAN)
 	//	throw MVNonNumeric("var::+= " ^ *this);
 
 	//try to convert to numeric
@@ -812,18 +811,18 @@ var& var::operator-= (int int1)
 tryagain:
 	//dbl target
 	//prefer double
-	if (var_typ&pimpl::VARTYP_DBL)
+	if (var_typ&VARTYP_DBL)
 	{
 		var_dbl-=int1;
-		var_typ=pimpl::VARTYP_DBL;//reset to one unique type
+		var_typ=VARTYP_DBL;//reset to one unique type
 		return *this;
 	}
 
 	//int target
-	else if (var_typ&pimpl::VARTYP_INT)
+	else if (var_typ&VARTYP_INT)
 	{
 		var_int-=int1;
-		var_typ=pimpl::VARTYP_INT;//reset to one unique type
+		var_typ=VARTYP_INT;//reset to one unique type
 		return *this;
 	}
 
@@ -860,27 +859,27 @@ tryagain:
 
 	//dbl target
 	//prefer double
-	if (var_typ&pimpl::VARTYP_DBL)
+	if (var_typ&VARTYP_DBL)
 	{
 		//+= int or dbl from source
-		var_dbl+=(rhs.var_typ&pimpl::VARTYP_INT)?rhs.var_int:rhs.var_dbl;
-		var_typ=pimpl::VARTYP_DBL;//reset to one unique type
+		var_dbl+=(rhs.var_typ&VARTYP_INT)?rhs.var_int:rhs.var_dbl;
+		var_typ=VARTYP_DBL;//reset to one unique type
 		return *this;
 	}
 
 	//int target
-	else if (var_typ&pimpl::VARTYP_INT)
+	else if (var_typ&VARTYP_INT)
 	{
 		//int source
-		if (rhs.var_typ&pimpl::VARTYP_INT)
+		if (rhs.var_typ&VARTYP_INT)
 		{
 			var_int+=rhs.var_int;
-			var_typ=pimpl::VARTYP_INT;//reset to one unique type
+			var_typ=VARTYP_INT;//reset to one unique type
 			return *this;
 		}
 		//dbl source, convert target to dbl
 		var_dbl=var_int+rhs.var_dbl;
-		var_typ=pimpl::VARTYP_DBL;//reset to one unique type
+		var_typ=VARTYP_DBL;//reset to one unique type
 		return *this;
 	}
 
@@ -888,7 +887,7 @@ tryagain:
 	//convert strings to number is cached and only needs to be done once
 
 	//nan (dont bother with this here because it is exceptional and will be caught below anyway
-	//else if (var_typ&pimpl::VARTYP_NAN)
+	//else if (var_typ&VARTYP_NAN)
 	//	throw MVNonNumeric("var::+= " ^ *this);
 
 	//try to convert to numeric
@@ -909,27 +908,27 @@ var& var::operator-= (const var& rhs)
 tryagain:
 
 	//int target
-	if (var_typ&pimpl::VARTYP_INT)
+	if (var_typ&VARTYP_INT)
 	{
 		//int source
-		if (rhs.var_typ&pimpl::VARTYP_INT)
+		if (rhs.var_typ&VARTYP_INT)
 		{
 			var_int-=rhs.var_int;
-			var_typ=pimpl::VARTYP_INT;//reset to one unique type
+			var_typ=VARTYP_INT;//reset to one unique type
 			return *this;
 		}
 		//dbl source, convert target to dbl
 		var_dbl=var_int-rhs.var_dbl;
-		var_typ=pimpl::VARTYP_DBL;//reset to one unique type
+		var_typ=VARTYP_DBL;//reset to one unique type
 		return *this;
 	}
 
 	//dbl target
-	else if (var_typ&pimpl::VARTYP_DBL)
+	else if (var_typ&VARTYP_DBL)
 	{
 		//-= int or dbl from source
-		var_dbl-=(rhs.var_typ&pimpl::VARTYP_INT)?rhs.var_int:rhs.var_dbl;
-		var_typ=pimpl::VARTYP_DBL;//reset to one unique type
+		var_dbl-=(rhs.var_typ&VARTYP_INT)?rhs.var_int:rhs.var_dbl;
+		var_typ=VARTYP_DBL;//reset to one unique type
 		return *this;
 	}
 
@@ -937,7 +936,7 @@ tryagain:
 	//convert strings to number is cached and only needs to be done once
 
 	//nan (dont bother with this here because it is exceptional and will be caught below anyway
-	//else if (var_typ&pimpl::VARTYP_NAN)
+	//else if (var_typ&VARTYP_NAN)
 	//	throw MVNonNumeric("var::-= " ^ *this);
 
 	//try to convert to numeric
@@ -961,9 +960,9 @@ DLL_PUBLIC bool MVeq(const var& lhs,const var& rhs)
 	//NB empty string is always less than anything except another empty string
 
 	//1. both empty or identical strings returns eq. one empty results false
-	if (lhs.var_typ&pimpl::VARTYP_STR)
+	if (lhs.var_typ&VARTYP_STR)
 	{
-		if (rhs.var_typ&pimpl::VARTYP_STR)
+		if (rhs.var_typ&VARTYP_STR)
 		{
 			//we have two strings
 			//if they are both the same (including both empty) then eq is true
@@ -1001,7 +1000,7 @@ DLL_PUBLIC bool MVeq(const var& lhs,const var& rhs)
 	{
 		//if lhs isnt a string and rhs is an empty string then return eq false
 		//(after checking that lhs is actually assigned)
-		if ((rhs.var_typ&pimpl::VARTYP_STR) && (rhs.var_str.length()==0))
+		if ((rhs.var_typ&VARTYP_STR) && (rhs.var_str.length()==0))
 		{
 			if (!lhs.var_typ)
 			{
@@ -1018,16 +1017,16 @@ DLL_PUBLIC bool MVeq(const var& lhs,const var& rhs)
 	//exact match on decimal numbers is often inaccurate since they are approximations of real numbers
 	if (lhs.isnum()&&rhs.isnum())
 	{
-		if (lhs.var_typ&pimpl::VARTYP_INT)
+		if (lhs.var_typ&VARTYP_INT)
 		{
-			if (rhs.var_typ&pimpl::VARTYP_INT)
+			if (rhs.var_typ&VARTYP_INT)
 				//different from MVlt
 				return (lhs.var_int==rhs.var_int);
 			else
 				//different from MVlt
 				return (lhs.var_int==rhs.var_dbl);
 		}
-		if (rhs.var_typ&pimpl::VARTYP_INT)
+		if (rhs.var_typ&VARTYP_INT)
 			//different from MVlt
 			return (lhs.var_dbl==rhs.var_int);
 		else
@@ -1036,9 +1035,9 @@ DLL_PUBLIC bool MVeq(const var& lhs,const var& rhs)
 	}
 
 	//3. either non-numerical strings
-	if (!(lhs.var_typ&pimpl::VARTYP_STR))
+	if (!(lhs.var_typ&VARTYP_STR))
 		lhs.createString();
-	if (!(rhs.var_typ&pimpl::VARTYP_STR))
+	if (!(rhs.var_typ&VARTYP_STR))
 		rhs.createString();
 	//different from MVlt
 	return lhs.var_str==rhs.var_str;
@@ -1055,9 +1054,9 @@ DLL_PUBLIC bool MVlt(const var& lhs,const var& rhs)
 	//NB empty string is always less than anything except another empty string
 
 	//1. both empty or identical strings returns eq. one empty results false
-	if (lhs.var_typ&pimpl::VARTYP_STR)
+	if (lhs.var_typ&VARTYP_STR)
 	{
-		if (rhs.var_typ&pimpl::VARTYP_STR)
+		if (rhs.var_typ&VARTYP_STR)
 		{
 			//we have two strings
 			//if they are both the same (including both empty) then eq is true
@@ -1095,7 +1094,7 @@ DLL_PUBLIC bool MVlt(const var& lhs,const var& rhs)
 	{
 		//if lhs isnt a string and rhs is an empty string then return eq false
 		//after checking that lhs is actually assigned
-		if ((rhs.var_typ&pimpl::VARTYP_STR) && (rhs.var_str.length()==0))
+		if ((rhs.var_typ&VARTYP_STR) && (rhs.var_str.length()==0))
 		{
 			if (!lhs.var_typ)
 			{
@@ -1111,16 +1110,16 @@ DLL_PUBLIC bool MVlt(const var& lhs,const var& rhs)
 	//2. both numerical strings
 	if (lhs.isnum()&&rhs.isnum())
 	{
-		if (lhs.var_typ&pimpl::VARTYP_INT)
+		if (lhs.var_typ&VARTYP_INT)
 		{
-			if (rhs.var_typ&pimpl::VARTYP_INT)
+			if (rhs.var_typ&VARTYP_INT)
 				//different from MVeq
 				return (lhs.var_int<rhs.var_int);
 			else
 				//different from MVeq
                 return (double(lhs.var_int)<rhs.var_dbl);
 		}
-		if (rhs.var_typ&pimpl::VARTYP_INT)
+		if (rhs.var_typ&VARTYP_INT)
 			//different from MVeq
 			return (lhs.var_dbl<rhs.var_int);
 		else
@@ -1129,9 +1128,9 @@ DLL_PUBLIC bool MVlt(const var& lhs,const var& rhs)
 	}
 
 	//3. either or both non-numerical strings
-	if (!(lhs.var_typ&pimpl::VARTYP_STR))
+	if (!(lhs.var_typ&VARTYP_STR))
 		lhs.createString();
-	if (!(rhs.var_typ&pimpl::VARTYP_STR))
+	if (!(rhs.var_typ&VARTYP_STR))
 		rhs.createString();
 	//different from MVeq
 	//return lhs.var_str<rhs.var_str;
@@ -1149,7 +1148,7 @@ DLL_PUBLIC bool MVlt(const var& lhs,const int int2)
 	//NB empty string is always less than anything except another empty string
 
 	//1. both empty or identical strings returns eq. one empty results false
-	if (lhs.var_typ&pimpl::VARTYP_STR)
+	if (lhs.var_typ&VARTYP_STR)
 	{
 		//if rhs isnt a string and lhs is empty then eq is false
 		//after checking that rhs is actually assigned
@@ -1163,11 +1162,11 @@ DLL_PUBLIC bool MVlt(const var& lhs,const int int2)
 	//2. both numerical strings
 	do
 	{
-		if (lhs.var_typ&pimpl::VARTYP_INT)
+		if (lhs.var_typ&VARTYP_INT)
 				//different from MVeq
 				return (lhs.var_int<int2);
 
-		if (lhs.var_typ&pimpl::VARTYP_DBL)
+		if (lhs.var_typ&VARTYP_DBL)
 			//different from MVeq
 			return (lhs.var_dbl<int2);
 	}
@@ -1175,7 +1174,7 @@ DLL_PUBLIC bool MVlt(const var& lhs,const int int2)
 	while (lhs.isnum());
 
 	//3. either or both non-numerical strings
-	if (!(lhs.var_typ&pimpl::VARTYP_STR))
+	if (!(lhs.var_typ&VARTYP_STR))
 	{
 		//lhs.createString();
 		ISSTRING(lhs)
@@ -1195,7 +1194,7 @@ DLL_PUBLIC bool MVlt(const int int1,const var& rhs)
 	//NB empty string is always less than anything except another empty string
 
 	//1. both empty or identical strings returns eq. one empty results false
-	if (rhs.var_typ&pimpl::VARTYP_STR)
+	if (rhs.var_typ&VARTYP_STR)
 	{
 		if (rhs.var_str.length()==0)
 			//SAME as MVeq
@@ -1206,10 +1205,10 @@ DLL_PUBLIC bool MVlt(const int int1,const var& rhs)
 	//2. both numerical strings
 	do
 	{
-		if (rhs.var_typ&pimpl::VARTYP_INT)
+		if (rhs.var_typ&VARTYP_INT)
 			//different from MVeq
 			return (int1<rhs.var_int);
-		if (rhs.var_typ&pimpl::VARTYP_DBL)
+		if (rhs.var_typ&VARTYP_DBL)
 			//different from MVeq
 			return (int1<rhs.var_dbl);
 	}
@@ -1217,7 +1216,7 @@ DLL_PUBLIC bool MVlt(const int int1,const var& rhs)
 	while (rhs.isnum());
 
 	//3. either or both non-numerical strings
-	if (!(rhs.var_typ&pimpl::VARTYP_STR))
+	if (!(rhs.var_typ&VARTYP_STR))
 	{
 		//lhs.createString();
 		ISSTRING(rhs)
@@ -1291,11 +1290,11 @@ DLL_PUBLIC var operator+(const var& var1)
 	do
 	{
 		//int
-		if (var1.var_typ&pimpl::VARTYP_INT)
+		if (var1.var_typ&VARTYP_INT)
 			return var1.var_int;
 
 		//dbl
-		if (var1.var_typ&pimpl::VARTYP_DBL)
+		if (var1.var_typ&VARTYP_DBL)
 			return var1.var_dbl;
 
 		//unassigned
@@ -1324,11 +1323,11 @@ DLL_PUBLIC var operator-(const var& var1)
 	do
 	{
 		//int
-		if (var1.var_typ&pimpl::VARTYP_INT)
+		if (var1.var_typ&VARTYP_INT)
 			return -var1.var_int;
 
 		//dbl
-		if (var1.var_typ&pimpl::VARTYP_DBL)
+		if (var1.var_typ&VARTYP_DBL)
 			return -var1.var_dbl;
 
 		//unassigned
@@ -1366,13 +1365,13 @@ var MVadd(const var& lhs,const var& rhs)
 	ISNUMERIC(lhs)
 	ISNUMERIC(rhs)
 
-	if (lhs.var_typ&pimpl::VARTYP_INT)
-		if (rhs.var_typ&pimpl::VARTYP_INT)
+	if (lhs.var_typ&VARTYP_INT)
+		if (rhs.var_typ&VARTYP_INT)
 			return lhs.var_int + rhs.var_int;//only this returns an int, the following both return doubles
 		else
-			return	lhs.var_int + ((rhs.var_typ&pimpl::VARTYP_INT) ? rhs.var_int : rhs.var_dbl);
+			return	lhs.var_int + ((rhs.var_typ&VARTYP_INT) ? rhs.var_int : rhs.var_dbl);
 	else
-		return	lhs.var_dbl + ((rhs.var_typ&pimpl::VARTYP_INT) ? rhs.var_int : rhs.var_dbl);
+		return	lhs.var_dbl + ((rhs.var_typ&VARTYP_INT) ? rhs.var_int : rhs.var_dbl);
 }
 
 var MVsub(const var& lhs,const var& rhs)
@@ -1381,13 +1380,13 @@ var MVsub(const var& lhs,const var& rhs)
 	ISNUMERIC(lhs)
 	ISNUMERIC(rhs)
 
-	if (lhs.var_typ&pimpl::VARTYP_INT)
-		if (rhs.var_typ&pimpl::VARTYP_INT)
+	if (lhs.var_typ&VARTYP_INT)
+		if (rhs.var_typ&VARTYP_INT)
 			return lhs.var_int - rhs.var_int;//only this returns an int, the following both return doubles
 		else
-			return	lhs.var_int - ((rhs.var_typ&pimpl::VARTYP_INT) ? rhs.var_int : rhs.var_dbl);
+			return	lhs.var_int - ((rhs.var_typ&VARTYP_INT) ? rhs.var_int : rhs.var_dbl);
 	else
-		return	lhs.var_dbl - ((rhs.var_typ&pimpl::VARTYP_INT) ? rhs.var_int : rhs.var_dbl);
+		return	lhs.var_dbl - ((rhs.var_typ&VARTYP_INT) ? rhs.var_int : rhs.var_dbl);
 }
 
 var MVmul(const var& lhs,const var& rhs)
@@ -1396,13 +1395,13 @@ var MVmul(const var& lhs,const var& rhs)
 	ISNUMERIC(lhs)
 	ISNUMERIC(rhs)
 
-	if (lhs.var_typ&pimpl::VARTYP_INT)
-		if (rhs.var_typ&pimpl::VARTYP_INT)
+	if (lhs.var_typ&VARTYP_INT)
+		if (rhs.var_typ&VARTYP_INT)
 			return lhs.var_int * rhs.var_int;//only this returns an int, the following both return doubles
 		else
-			return	lhs.var_int * ((rhs.var_typ&pimpl::VARTYP_INT) ? rhs.var_int : rhs.var_dbl);
+			return	lhs.var_int * ((rhs.var_typ&VARTYP_INT) ? rhs.var_int : rhs.var_dbl);
 	else
-		return	lhs.var_dbl * ((rhs.var_typ&pimpl::VARTYP_INT) ? rhs.var_int : rhs.var_dbl);
+		return	lhs.var_dbl * ((rhs.var_typ&VARTYP_INT) ? rhs.var_int : rhs.var_dbl);
 }
 
 var MVdiv(const var& lhs,const var& rhs)
@@ -1413,11 +1412,11 @@ var MVdiv(const var& lhs,const var& rhs)
 
     //always returns a double
 
-    double bottom=(rhs.var_typ&pimpl::VARTYP_INT) ? double(rhs.var_int) : rhs.var_dbl;
+    double bottom=(rhs.var_typ&VARTYP_INT) ? double(rhs.var_int) : rhs.var_dbl;
 	if (!bottom)
 		throw MVDivideByZero("div('" ^ lhs.substr(1,20) ^ "', '" ^ rhs.substr(1,20) ^ "')");
 
-    double top=(lhs.var_typ&pimpl::VARTYP_INT) ? double(lhs.var_int) : lhs.var_dbl;
+    double top=(lhs.var_typ&VARTYP_INT) ? double(lhs.var_int) : lhs.var_dbl;
 	return top/bottom;
 }
 
@@ -1428,18 +1427,18 @@ var MVmod(const var& lhs,const var& rhs)
 	ISNUMERIC(rhs)
 
 	//integer version;
-	if (lhs.var_typ&pimpl::VARTYP_INT && rhs.var_typ&pimpl::VARTYP_INT)
+	if (lhs.var_typ&VARTYP_INT && rhs.var_typ&VARTYP_INT)
 	{
 		if (!rhs.var_int)
 			throw MVDivideByZero("div('" ^ lhs.substr(1,20) ^ "', '" ^ rhs.substr(1,20) ^ "')");
 		return lhs.var_int%rhs.var_int;
 	}
 
-    double bottom=(rhs.var_typ&pimpl::VARTYP_INT) ? double(rhs.var_int) : rhs.var_dbl;
+    double bottom=(rhs.var_typ&VARTYP_INT) ? double(rhs.var_int) : rhs.var_dbl;
 	if (!bottom)
 		throw MVDivideByZero("div('" ^ lhs.substr(1,20) ^ "', '" ^ rhs.substr(1,20) ^ "')");
 
-    double top=(lhs.var_typ&pimpl::VARTYP_INT) ? double(lhs.var_int) : lhs.var_dbl;
+    double top=(lhs.var_typ&VARTYP_INT) ? double(lhs.var_int) : lhs.var_dbl;
 	return neosysmodulus(top,bottom);
 }
 
@@ -1539,8 +1538,8 @@ std::istream& operator>> (std::istream& istream1,var& var1)
 	std::string tempstr;
 	istream1 >> std::noskipws >> tempstr;
 
-	var1.var_typ=pimpl::VARTYP_STR;
-	//var1.var_str=wstringfromUTF8((UTF8*)tempstr.data(),(int)tempstr.length());
+	var1.var_typ=VARTYP_STR;
+	//this would verify all input is valid utf8
 	//var1.var_str=boost::locale::conv::utf_to_utf<char>(tempstr)
 	var1.var_str=tempstr;
 	return istream1;
@@ -1554,7 +1553,7 @@ inline double neosysmodulus(const double top,const double bottom)
 }
 
 //TODO ensure locale doesnt produce like 123.456,78
-xstring intToString(int int1)
+std::string intToString(int int1)
 {
 	
 	//TODO test ostringstream type creation speed and of slow then
@@ -1579,7 +1578,7 @@ xstring intToString(int int1)
 	ss << int1;
 	//debuggFUNCTION&& cout<<"intToString(int "<<int1<<") returns '"<<s<<"'\n";
 #ifdef NARROW_IO
-	return xstring(ss.str().begin(),ss.str().end());
+	return std::string(ss.str().begin(),ss.str().end());
 #else
     return ss.str();
 #endif
@@ -1587,7 +1586,7 @@ xstring intToString(int int1)
 
 //TODO ensure locale doesnt produce like 123.456,78
 //see 1997 http://www.cantrip.org/locale.html
-xstring dblToString(double double1)
+std::string dblToString(double double1)
 {
 	//see intToString for choice of ostringstream for implementation
 	//NB plain stringstream causes a memory leak in msvc8 before sp1
@@ -1596,7 +1595,7 @@ xstring dblToString(double double1)
 	ss << double1;
 	//debuggFUNCTION&& cout<<"dblToString(int "<<double1<<") returns '"<<s<<"'\n";
 #ifdef NARROW_IO
-	return xstring(ss.str().begin(),ss.str().end());
+	return std::string(ss.str().begin(),ss.str().end());
 #else
 	return ss.str();
 #endif

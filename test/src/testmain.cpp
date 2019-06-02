@@ -35,7 +35,7 @@ var TurkishSmallDotlessI    ="\u0131";
 var LatinSmallI             ="i";
 var LatinCapitalI           ="I";
 
-var GermanEszet             ="\u00DF";//German
+var GermanEszet             ="ß";//"\u00DF";//German
 
 programinit()
 
@@ -56,9 +56,68 @@ function main()
 	printl("char:     ",(int)sizeof(char));
 	printl("var:      ",(int)sizeof(var));
 
+	//replacing unicode style numbers characters using javascript style regex
+	assert(var("Ⅻ").replace(R"(\p{Number})","yes")=="yes");
+	assert(var("⅝").replace(R"(\p{Number})","yes")=="yes");
+
+	//test glob matching using * ? eg *.* and *.??? etc
+        assert(var("test.htm").match("*.htm","w")==1);
+        assert(var("test.html").match("*.htm","w")==0);
+        assert(var("test.htm").match("t*.???","w")==1);
+        assert(var("test.htm").match("t.???","w")==0);
+        assert(var("test.htm").match("x.???","w")==0);
+        assert(var("testx.htm").match("*x.???","w")==1);
+        assert(var("test.html").match("t*.???","w")==0);
+        assert(var("test.html").match("*t?h*","w")==1);
+
+	//multibyte sep index
+        var greek5x2="αβγδεαβγδε";
+        assert(greek5x2.index("β")==3);
+        assert(greek5x2.index("β",2)==13);
+
+	//multibyte sep field
+	var greek5x2f2=field(greek5x2,"β",2);
+        assert(greek5x2f2=="γδεα");
+        assert(greek5x2f2.length()==8);
+        assert(greek5x2f2.oconv("HEX")=="CEB3CEB4CEB5CEB1");
+
+	//multibyte sep fieldstore
+        var greekstr2=fieldstore(greek5x2,"β",2,1,"xxx");
+        assert(greekstr2=="αβxxxβγδε");
+        assert(greekstr2.length()==15);
+
+        greekstr2=fieldstore(greek5x2,"β",2,1,"1β2β3");
+        assert(greekstr2=="αβ1βγδε");
+
+        greekstr2=fieldstore(greek5x2,"β",2,-1,"1β2β3");
+        assert(greekstr2=="αβ1β2β3βγδε");
+
+        var greek5x4="αβγδεαβγδεαβγδεαβγδε";
+        assert(fieldstore(greek5x4,"β",2,3,"ζ")=="αβζβββγδε");
+        assert(fieldstore(greek5x4,"β",2,-3,"ζ")=="αβζβγδε");
+
+	//text four byte utf8
+	var chinesechar=textchr(171416);
+	assert(chinesechar=="𩶘");
+	printl(chinesechar);
+	assert(textseq(chinesechar^"abcd")=171416);
+	assert(oconv(chinesechar,"HEX")=="F0A9B698");
+
 	printl(textchr(915));
 	assert(textchr(915)==GreekCapitalGamma);
 	assert(textseq(GreekCapitalGamma)==915);
+
+	//text three byte utf8
+	var euro="€";
+	assert(euro==textchr(8364));
+	assert(textseq(euro)==8364);
+	assert(textseq(euro^"abc")==8364);
+	assert(oconv(euro,"HEX")=="E282AC");
+
+	//multibyte locate using
+        var setting;
+        assert(greek5x4.locateusing("β","γδεα",setting));
+        assert(setting==2);
 
 	//multivalued conversions performed one after the other
 	assert(oconv(1234.567,"MD20P" _VM_ "[NUMBER]" _VM_ "[TAGHTML,TD]")=="<TD>1,234.57</TD>");
@@ -411,23 +470,23 @@ function main()
 	//replace char+space with x+char+dash
 	//TODO add g option
         var text="what a lot of money";
-        assert(text.swap("(.) ","x$1-","r")=="whaxt-xa-loxt-oxf-money");
+        assert(text.replace("(.) ","x$1-")=="whaxt-xa-loxt-oxf-money");
 
 	//simple test of regex and case insensitive regex swap (commonly known as replace)
-	assert(swap("abcd","b.","xyz","r").outputl() eq "axyzd");//right case to convert
-	assert(swap("abc","B.","xyz","r").outputl() eq "abc"); //wrong case to convert
-	assert(swap("abcd","B.","xyz","ri").outputl() eq "axyzd");//case insensitive converts
-	assert(swap("abc","b.","xyz","").outputl() eq "abc");//wont convert not regex
+	assert(replace("abcd","b.","xyz").outputl() eq "axyzd");//right case to convert
+	assert(replace("abc","B.","xyz").outputl() eq "abc"); //wrong case to convert
+	assert(replace("abcd","B.","xyz","i").outputl() eq "axyzd");//case insensitive converts
+	assert(replace("abc","b.","xyz","l").outputl() eq "abc");//literal wont convert
 
 	//simple test of case sensitive/insensitive swap
-	assert(swap("abc","b","xyz","").outputl() eq "axyzc");//will convert right case
+	assert(swap("abc","b","xyz").outputl() eq "axyzc");//will convert right case
 	assert(swap("abc","B","xyz").outputl() eq "abc");//wont convert wrong case
-	assert(swap("abc","B","xyz","i").outputl() eq "axyzc");//will convert case insensitive
-	assert(swap("ab*c","B*","xyz","i").outputl() eq "axyzc");//will convert case insensitive but not regex
+	assert(replace("abc","B","xyz","i").outputl() eq "axyzc");//will convert case insensitive
+	assert(replace("ab*c","B*","xyz","il").outputl() eq "axyzc");//will convert case insensitive but not regex
 
 	assert(swap("abababab","ab","x").outputl() eq "xxxx");
-	assert(swap("abababab","ab","x","r").outputl() eq "xxxx");
-	assert(swap("abababab","a.","xy","r").outputl() eq "xyxyxyxy");
+	assert(replace("abababab","ab","x").outputl() eq "xxxx");//regex
+	assert(replace("abababab","a.","xy").outputl() eq "xyxyxyxy");//regex
 
 	{	//null characters cannot be embedded in string constants in c/c++
 
@@ -588,11 +647,13 @@ function main()
 	//check Eszet (like a Beta) uppercases to SS
 	if (setxlocale(german_standard)) {
 		assert(setxlocale(german_standard));
-		//FAILS in Windows XPSP3UK
-		//if (not SLASH_IS_BACKSLASH)
-		//	assert(ucase(GermanEszet) eq "SS");
-		GermanEszet.oconv("HEX4").oconv("T#4").outputl("German Eszet:");
-		ucase(GermanEszet).oconv("HEX4").oconv("T#4").outputl("Uppercased German Eszet:");
+		GermanEszet.outputl("German Eszet:");
+		ucase(GermanEszet).outputl("Uppercased German Eszet:");
+		lcase(ucase(GermanEszet)).outputl("Lowercased German Eszet:");
+		GermanEszet.oconv("HEX").outputl("German Eszet:");
+		ucase(GermanEszet).oconv("HEX").outputl("Uppercased German Eszet:");
+		//assert(ucase(lcase(GermanEszet))==GermanEszet);
+		assert(ucase(GermanEszet) eq "SS");
 	}
 	//in Greek Locale
 	//convert word ending in "capital sigma" lower cases to "lower final sigma"
@@ -601,12 +662,14 @@ function main()
 		assert(setxlocale(greek_gr));
 		Greek_sas       .outputl("Greek_sas=");
 		ucase(Greek_sas).outputl("ucased   =");
+		lcase(Greek_SAS).outputl("lcased   =");
 		lcase(Greek_SAS).oconv("HEX").outputl();
 
 		//ucase doesnt do languages TODO
 		//assert(ucase(Greek_sas) eq Greek_SAS);
 		//FAILS in Windows XPSP3UK and linux
-		//assert(lcase(Greek_SAS) eq Greek_sas);
+		assert(lcase(Greek_SAS) eq Greek_sas);
+		assert(ucase(Greek_sas) eq Greek_SAS);
 	}
 	//NB a codepage is a 256 x one byte map of characters selected from all unicode characters depending on locale
 
@@ -734,7 +797,7 @@ function main()
 	//swap(unicode,"\\p{L}","?","ri").oconv("HEX4").outputl();
 	//p(L} is regular expression for Unicode Letter
 	if (SLASH_IS_BACKSLASH)
-		assert(swap(unicode,"\\pL","?","ri") eq expect);
+		assert(replace(unicode,"\\pL","?","ri") eq expect);
 	//but what is its inverse?
 	//assert(swap(unicode,"\\PL","?","ri") eq expect);
 
@@ -791,62 +854,53 @@ function main()
 	assert(oconv(letters,"MR/N") eq letters);
 	assert(oconv(letters,"MR/B") eq "");
 
-	auto testinvert=[](var cc, bool istext)
+	auto testinvert=[](var cc)
         {
-        	var inverted;
-        	var invertedtwice;
-		if (istext) {
-	                inverted=cc.textinvert();
-        	        invertedtwice=textinvert(inverted);
-                } else {
-                	inverted=cc.invert();
-                	invertedtwice=invert(inverted);
+	        var inverted=cc.invert();
+        	var invertedtwice=invert(inverted);
+                if (cc eq inverted or cc ne invertedtwice) {
+
+                	cc				.outputl("original      =");
+                	inverted			.outputl("inverted      =");
+                	invertedtwice			.outputl("inverted twice=");
+
+                	cc.oconv("HEX")			.outputl("original hex  =");
+                	inverted.oconv("HEX")		.outputl("inverted hex  =");
+                	invertedtwice.oconv("HEX")	.outputl("invertedx2 hex=");
+
+                	cc.textseq()			.outputl("original seq  =");
+                	inverted.textseq()		.outputl("inverted seq  =");
+                	invertedtwice.textseq()		.outputl("invertedx2 seq=");
+
+                	cc.len()			.outputl("original len  =");
+                	inverted.len()			.outputl("inverted len  =");
+                	invertedtwice.len()		.outputl("invertedx2 len=");
+
+                	stop();
                 }
-                if ((not istext and cc == inverted and cc.seq()<=127) || cc != invertedtwice) {
-                	cc.outputl("original=");
-                	inverted.outputl("inverted=");
-                	invertedtwice.outputl("inverted twice=");
-                	cc.oconv("HEX").outputl("original=");
-                	inverted.oconv("HEX").outputl("inverted=-");
-                	invertedtwice.oconv("HEX").outputl("inverted twice=");
-                	cc.seq().outputl("seq=");
-                	inverted.seq().outputl("inverted seq=");
-                	invertedtwice.seq().outputl("inverted twice seq=");
-                }
-		//var xx;xx.input();
-		if (not istext and cc.seq()<=127)
-			assert(cc != inverted);
 		assert(cc == invertedtwice);
 		assert(cc.oconv("HEX") == invertedtwice.oconv("HEX"));
         };
 
         //check invert works and is reversible for the first 65535 unicode characters
-	testinvert("␚ ␛ ␜ ␝ ␞ ␟",true);
+	testinvert("␚ ␛ ␜ ␝ ␞ ␟");
 
         //check invert is reversible for all bytes (only ASCII bytes are inverted)
-        for (var ii=0;ii<=255;ii++) {
-                var cc=chr(ii);
-                testinvert(cc,false);
-/*                var inverted=cc.invert();
-                var invertedtwice=invert(inverted);
-                if (cc != invertedtwice) {
-                	ii.outputl();
-                	cc.outputl();
-                	inverted.outputl();
-                	invertedtwice.outputl();
-                	cc.oconv("HEX").outputl();
-                	inverted.oconv("HEX").outputl();
-                	invertedtwice.oconv("HEX").outputl();
-                	cc.seq().outputl();
-                	inverted.seq().outputl();
-                	invertedtwice.seq().outputl();
-                }
-                if (ii<=127)
-                	assert(cc != inverted);
-                assert(cc == invertedtwice);
-                assert(cc.oconv("HEX") == invertedtwice.oconv("HEX"));
-*/
+        for (var ii=0;ii<=0x1FFFF;ii++) {
+                var cc=textchr(ii);
+                if (cc.len())
+                	testinvert(cc);
+                else if (ii < 0xD800 or ii > 0xDFFF )
+			printl(ii);
         }
+
+        //check unicode is invalid from 0xD800-0xDFF (UTF16 encoding) and 0x110000 onwards
+        assert(textchr(0xD7FF)!="");
+        assert(textchr(0xD800)=="");
+        assert(textchr(0xDFFF)=="");
+        assert(textchr(0xE000)!="");
+        assert(textchr(0x10FFFF)!="");
+        assert(textchr(0x110000)=="");
 
 	COMMAND.outputl("COMMAND-");
 	assert(COMMAND eq "service"
@@ -1125,26 +1179,26 @@ dict(AGE_IN_YEARS) {
 	//|999|0
 	//|999|0
 
-	var result=rem.remove(ptr,sep);
+	var result=rem.substr2(ptr,sep);
 	assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "bc|5|2");
 
-	result=rem.remove(ptr,sep);
+	result=rem.substr2(ptr,sep);
 	assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "xyz|9|0");
 
 	ptr=0;
 
-	result=rem.remove(ptr,sep);
+	result=rem.substr2(ptr,sep);
 	assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "abc|5|2");
 
-	result=rem.remove(ptr,sep);
+	result=rem.substr2(ptr,sep);
 	assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "xyz|9|0");
 
 	ptr=999;
 
-	result=rem.remove(ptr,sep);
+	result=rem.substr2(ptr,sep);
 	assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "|999|0");
 
-	result=rem.remove(ptr,sep);
+	result=rem.substr2(ptr,sep);
 	assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "|999|0");
 
 	//test unquote
@@ -1486,31 +1540,29 @@ dict(AGE_IN_YEARS) {
         initrnd("cccc");
         printl(rnd(1000000000));
         initrnd("cccc");
-        //assert(rnd(1000000000)==262087803);
-        assert(rnd(1000000000)==296282593);
+        assert(rnd(1000000000)==231348803);
 
 	//slightly different string seed
         initrnd("cccd");
         printl(rnd(1000000000));
         initrnd("cccd");
-        //assert(rnd(1000000000)==19706533);
-        assert(rnd(1000000000)==932228231);
+        assert(rnd(1000000000)==610052346);
 
 	//integer seed
-        initrnd(123457);
-        printl(rnd(1000000000));
+        //initrnd(123457);
+        //printl(rnd(1000000000));
         initrnd(123457);
         assert(rnd(1000000000)==466803956);
 
 	//slightly different integer seed
-        initrnd(123458);
-        printl(rnd(1000000000));
+        //initrnd(123458);
+        //printl(rnd(1000000000));
         initrnd(123458);
         assert(rnd(1000000000)==191396791);
 
 	//initrnd treats floats as integers so same result as above
-        initrnd(123458.2);
-        printl(rnd(1000000000));
+        //initrnd(123458.2);
+        //printl(rnd(1000000000));
         initrnd(123458.2);
         assert(rnd(1000000000)==191396791);
 
@@ -1530,9 +1582,9 @@ dict(AGE_IN_YEARS) {
 	assert(da1(2,2,2) eq extract(da1,2,2,2));//this extracts field 2, value 2, subvalue 2
 
 	//this wont work
-	replace(da1,3,"x");//or this
-	replace(da1,3,3,"x");//or this
-	replace(da1,3,3,3,"x");//or this
+	pickreplace(da1,3,"x");//or this
+	pickreplace(da1,3,3,"x");//or this
+	pickreplace(da1,3,3,3,"x");//or this
 	insert(da1,3,"x");//or this
 	insert(da1,3,3,"x");//or this
 	insert(da1,3,3,3,"x");//or this
@@ -1566,17 +1618,17 @@ dict(AGE_IN_YEARS) {
 	da1="f1" ^FM^ "f2";
 	assert(inserter(da1, 2, 1, 1, "I211") eq ( "f1" ^FM^ "I211" ^SM^ "f2"));
 
-	//erase (delete) field 1
+	//remove (delete) field 1
 	da1="f1" ^FM^ "f2";
-	assert(eraser(da1, 1) eq ( "f2"));
+	assert(remover(da1, 1) eq ( "f2"));
 
-	//erase (delete) field 1, value 2
+	//remove (delete) field 1, value 2
 	da1="f1" ^VM^ "f1v2" ^VM^ "f1v3" ^FM^ "f2";
-	assert(eraser(da1, 1, 2) eq ("f1" ^VM^ "f1v3" ^FM^ "f2"));
+	assert(remover(da1, 1, 2) eq ("f1" ^VM^ "f1v3" ^FM^ "f2"));
 
-	//erase (delete) field 1, value 2, subvalue 2
+	//remove (delete) field 1, value 2, subvalue 2
 	da1="f1" ^VM^ "f1v2s1" ^SM^ "f1v2s2" ^SM^ "f1v2s3" ^VM^ "f1v3" ^FM^ "f2";
-	assert(eraser(da1, 1, 2, 2) eq ("f1" ^VM^ "f1v2s1" ^SM^ "f1v2s3" ^VM^ "f1v3" ^FM^ "f2"));
+	assert(remover(da1, 1, 2, 2) eq ("f1" ^VM^ "f1v2s1" ^SM^ "f1v2s3" ^VM^ "f1v3" ^FM^ "f2"));
 
 	var tempfile=SLASH^"129834192784";
 	if (osopen(tempfile,tempfile))
@@ -1830,7 +1882,7 @@ while trying to match the argument list '(exodus::var, bool)'
 	assert(iconv("24 00 00","MT") eq "");
 
 	//http://www.regular-expressions.info/examples.html
-	assert(swap("Steve Bush Bash bish","B.","Ru","ri") eq "Steve Rush Rush Rush");
+	assert(replace("Steve Bush Bash bish","B.","Ru","ri") eq "Steve Rush Rush Rush");
 
 	assert(oconv("Aa019KK","HEX") eq "41613031394B4B");
 	assert(oconv("Aa019KK","HEX2") eq "41613031394B4B");
@@ -2168,8 +2220,12 @@ while trying to match the argument list '(exodus::var, bool)'
 	//test regular expression
 	//four digits followed by dash or space) three times ... followed by four digits
 	var regex1="(\\d{4}[- ]){3}\\d{4}";
-	var regtest="1247-1234-1234-1234";
-	assert(regtest.match(regex1,"r"));
+	assert(var("1247-1234-1234-1234").match(regex1,"r"));
+	assert(var("1247 1234-1234-1234").match(regex1,"r"));
+	assert(var("1247.1234-1234-1234").match(regex1,"r")==0);
+
+	assert(var("Unicode table CJK 1: Chinese 文字- Kanji 漢字- Hanja 漢字(UTF-8)").match(".*文字.*漢字\\(UTF-8\\)")==1);
+	assert(var("Unicode table CJK 1: Chinese 文字- Kanji 漢字- Hanja 漢字(UTF-8)").match(".*文字.*漢 字\\(UTF-8\\)")==0);
 
 	//test redimensioning
 	dim aaaa(10);

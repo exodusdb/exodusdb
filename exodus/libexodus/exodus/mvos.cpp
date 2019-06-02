@@ -92,9 +92,6 @@ namespace stdfs = std::experimental::filesystem;
 //for rnd and initrnd
 #include <boost/random.hpp>
 
-//for exodus_once
-#include <boost/thread/once.hpp>
-
 //#include <istream>
 //#include <ostream>
 #include <locale>
@@ -113,7 +110,7 @@ extern char **environ;
 //#endif
 
 //for initrnd from string
-#include <MurmurHash2_64.h>
+//#include <MurmurHash2_64.h>
 
 //oshell capturing output needs posix popen
 #if defined(_MSC_VER) && !defined(popen)
@@ -123,12 +120,18 @@ extern char **environ;
 
 #define MV_NO_NARROW
 
-#include <exodus/mvimpl.h>
 #include <exodus/mv.h>
 //#include <exodus/mvutf.h>
 #include <exodus/mvexceptions.h>
 
 #include "mvhandles.h"
+
+#include <iostream>
+#include <locale>
+
+//for exodus_once
+#include <boost/thread/once.hpp>
+
 
 //#include "exodus/NullCodecvt.h"//used to prevent wifstream and wofstream widening/narrowing binary input/output to/from internal char
 
@@ -380,12 +383,12 @@ var var::iconv_MT() const
 
 	//var time=(*this).swap("^\\D+|\\D+$", "", "r").swap("\\D+", " ", "r");
 
-	static std_boost::regex surrounding_nondigits_regex("^\\D+|\\D+$",std_boost::regex::extended|std_boost::regex_constants::icase);
+	static std_boost::regex surrounding_nondigits_regex("^\\D+|\\D+$",std_boost::regex_constants::icase);
 
-	static std_boost::regex inner_nondigits_regex("\\D+",std_boost::regex::extended|std_boost::regex_constants::icase);
+	static std_boost::regex inner_nondigits_regex("\\D+",std_boost::regex_constants::icase);
 
-	var time=var(std_boost::regex_replace(toTstring((*this)),surrounding_nondigits_regex, ""));
-	time=var(std_boost::regex_replace(toTstring((time)),inner_nondigits_regex, " "));
+	var time=var(std_boost::regex_replace(var_str,surrounding_nondigits_regex, ""));
+	time=var(std_boost::regex_replace(time.var_str,inner_nondigits_regex, " "));
 
 	int hours=time.field(" ",1).toInt();
 	int mins=time.field(" ",2).toInt();
@@ -418,7 +421,7 @@ var& var::oconv_MR(const char* conversionchar)
 		return (*this);
 
 	//in case changes to/from numeric
-	var_typ&=pimpl::VARTYP_NOTNUMFLAGS;
+	var_typ&=VARTYP_NOTNUMFLAGS;
 
 	//form of unicode specific regular expressions
 	//http://www.regular-expressions.info/unicode.html
@@ -458,27 +461,27 @@ var& var::oconv_MR(const char* conversionchar)
 #	define boost_mvstr toTstring((*this))
 #	define boost_regex_replace std_boost::regex_replace
 	static const std_boost::regex
-		digits_regex		("\\d+"		,std_boost::regex::extended), // \d numeric
-		alpha_regex			("[^\\W\\d]+"	,std_boost::regex::extended), // \a alphabetic
-		alphanum_regex		("\\w+"		,std_boost::regex::extended), // \w alphanumeric
-		non_digits_regex	("[^\\d]+"		,std_boost::regex::extended), // \D non-numeric
-		non_alpha_regex		("[\\W\\d]+"	,std_boost::regex::extended), // \A non-alphabetic
-		non_alphanum_regex	("\\W+"		,std_boost::regex::extended); // \W non-alphanumeric
+		digits_regex		("\\d+"		), // \d numeric
+		alpha_regex		("[^\\W\\d]+"	), // \a alphabetic
+		alphanum_regex		("\\w+"		), // \w alphanumeric
+		non_digits_regex	("[^\\d]+"	), // \D non-numeric
+		non_alpha_regex		("[\\W\\d]+"	), // \A non-alphabetic
+		non_alphanum_regex	("\\W+"		); // \W non-alphanumeric
 #else
 #	define boost_mvstr var_str
 #	define boost_regex_replace std_boost::u32regex_replace
 	static const std_boost::u32regex
-		digits_regex=boost::make_u32regex("\\d+"	,std_boost::regex::extended); //\d numeric
+		digits_regex=boost::make_u32regex("\\d+"	); //\d numeric
 	static const std_boost::u32regex
-		alpha_regex=boost::make_u32regex("[^\\W\\d]+"	,std_boost::regex::extended); // \a alphabetic
+		alpha_regex=boost::make_u32regex("[^\\W\\d]+"	); // \a alphabetic
 	static const std_boost::u32regex
-		alphanum_regex=boost::make_u32regex("\\w+"	,std_boost::regex::extended); // \w alphanumeric
+		alphanum_regex=boost::make_u32regex("\\w+"	); // \w alphanumeric
 	static const std_boost::u32regex
-		non_digits_regex=boost::make_u32regex("[^\\d]+",std_boost::regex::extended); // \D non-numeric
+		non_digits_regex=boost::make_u32regex("[^\\d]+"	); // \D non-numeric
 	static const std_boost::u32regex
-		non_alpha_regex=boost::make_u32regex("[\\W\\d]+",std_boost::regex::extended); // \A non-alphabetic
+		non_alpha_regex=boost::make_u32regex("[\\W\\d]+"); // \A non-alphabetic
 	static const std_boost::u32regex
-		non_alphanum_regex=boost::make_u32regex("\\W+"	,std_boost::regex::extended); // \W non-alphanumeric
+		non_alphanum_regex=boost::make_u32regex("\\W+"	); // \W non-alphanumeric
 #endif
 
 	//negate if /
@@ -618,14 +621,18 @@ void var::initrnd() const
 	//get/init the base generator
 	random_base_generator_type* threads_random_base_generator=get_random_base_generator();
 
+	//seed from number
 	uint64_t seed;
 	if (this->isnum())
+	{
 		seed=this->toLong();
-	else {
-		//seed=0;
-	        //for (size_t ii = 0; ii < var_str.size(); ii++)
-	        //        seed+=var_str[ii];
-		seed=MurmurHash64((char*)var_str.data(),int(var_str.length()*sizeof(char)),0);
+
+	//seed from string
+	} else {
+		seed=1;
+	        for (size_t ii = 0; ii < var_str.size(); ii++)
+	                seed*=var_str[ii];
+		//seed=MurmurHash64((char*)var_str.data(),int(var_str.length()*sizeof(char)),0);
 	}
 	//set the new seed
 	//logputl("Seeding random number generator to " ^ (*this));
@@ -634,194 +641,168 @@ void var::initrnd() const
 	(*threads_random_base_generator).seed(static_cast<uint64_t>(seed));
 }
 
+std_boost::regex_constants::syntax_option_type get_regex_options(const var& options)
+{
+	//determine options from string
+	std_boost::regex_constants::syntax_option_type regex_options=std_boost::regex_constants::normal;
+	if (options.index("i"))
+		regex_options|=std_boost::regex_constants::icase;
+	if (options.index("l"))
+		regex_options|=std_boost::regex_constants::literal;
+
+	return regex_options;
+}
+
 //only here really because boost regex is included here for file matching
 bool var::match(const var& matchstr, const var& options) const
 {
+	//VISUALISE REGULAR EXPRESSIONS GRAPHICALLY!
+	https://www.debuggex.com/
+
 	THISIS("bool var::match(const var& matchstr, const var& options) const")
 	THISISSTRING()
 	ISSTRING(matchstr)
 
-	//TODO fully implement (w=wildcard)
+	//wild cards like
+	// *.* or *.???
+	// *abcde
+	// abcde*
 	if (options.index("w"))
 	{
-		if (matchstr==""||var_str==matchstr||matchstr=="*.*")
-			{}
-		else if (matchstr[1]=="*"&&substr(-matchstr.length()+1)==matchstr[2])
-			{}
-		else if (matchstr[-1]=="*"&&substr(1,matchstr.length()-1)==matchstr.substr(1,matchstr.length()-1))
-			{}
-		else
-			return false;
-		return true;
+
+		//rules of glob - converting glob to regex
+
+		//0. the following regexe special characters are not special so, if present in match expression, they must be escaped
+		//https://stackoverflow.com/questions/1252992/how-to-escape-a-string-for-use-in-boost-regex
+		//const std_boost::regex esc("[.^$|()\\[\\]{}*+?\\\\]");
+		//allow * and ? in glob expressions
+		const std_boost::regex regex_special_chars {R"raw([.^$|()\[\]{}+\\])raw"};
+		const std::string replacement_for_regex_special = R"raw(\\$&)raw";
+		std::string matchstr2 = regex_replace
+		(
+			matchstr.var_str,
+			regex_special_chars,
+			replacement_for_regex_special
+		);
+
+		//1. force to match whole string
+		var matchstr3 = "^" ^ matchstr2 ^ "$";
+
+		//2. * matches zero or more characters like .* in regex
+		matchstr3.swapper("*",".*");
+
+		//3. ? matches any one character
+		matchstr3.swapper("?",".");
+
+		//having created a suitable regex str, recursively call match with it
+		return this->match(matchstr3);
+
 	}
+
+	//TODO automatic caching of regular expressions or new exodus datatype to handle them
+
+	/*
+	//using ECMAScript grammar. It's the default grammar and offers far more features that the other grammars.
+	Most C++ references talk as if C++11 implements regular expressions as defined in the ECMA-262v3 and POSIX standards.
+	But in reality the C++ implementation is very loosely based these standards. The syntax is quite close.
+	The only significant differences are that std::regex supports POSIX classes even in ECMAScript mode,
+	and that it is a bit peculiar about which characters must be escaped (like curly braces and closing square brackets)
+	and which must not be escaped (like letters).
+
+	But there are important differences in the actual behavior of this syntax.
+	The caret and dollar always match at embedded line breaks in std::regex, while in JavaScript and POSIX this is an option.
+	Backreferences to non-participating groups fail to match as in most regex flavors, while in JavaScript they find a zero-length match.
+	In JavaScript, \d and \w are ASCII-only while \s matches all Unicode whitespace.
+	This is odd, but all modern browsers follow the spec. In std::regex all the shorthands are ASCII-only when using strings of char.
+	*/
+
+	std_boost::u32regex regex;
+	try
+	{
+		regex=boost::make_u32regex(matchstr.var_str, get_regex_options(options));
+	}
+	catch (std_boost::regex_error& e)
+	{
+		throw MVException(var(e.what()).quote() ^ " is an invalid regular expression");
+	}
+
+	return u32regex_match(var_str, regex);
+
+}
+
+var var::swap(const var& what, const var& with) const
+{
+	var newmv=*this;
+	return newmv.swapper(what,with);
+}
+
+var& var::swapper(const var& what, const var& with)
+{
+	THISIS("var& var::swapper(const var& what, const var& with)")
+	THISISSTRING()
+	ISSTRING(what)
+	ISSTRING(with)
+
+        //in case changes to/from numeric
+	var_typ&=VARTYP_NOTNUMFLAGS;
+
+	//nothing to do if oldstr is ""
+	if (what.var_str.empty())
+		return *this;
+
+	//find the starting position of the field or return
+	std::string::size_type start_pos=0;
+	while (true)
+	{
+		start_pos=var_str.find(what.var_str,start_pos);
+		//past of of string?
+		if (start_pos==std::string::npos)
+			return *this;
+		var_str.replace(start_pos,what.var_str.length(),with.var_str);
+		start_pos+=with.var_str.length();
+	}
+
+	return *this;
+}
+
+
+//only here really because boost regex is included here for file matching
+var var::replace(const var& regexstr, const var& replacementstr, const var& options) const
+{
+	var newmv=*this;
+	return newmv.replacer(regexstr,replacementstr,options);
+}
+
+var& var::replacer(const var& regexstr, const var& replacementstr, const var& options)
+{
+	THISIS("var& var::replacer(const var& regexstr, const var& replacementstr, const var& options)")
+	THISISSTRING()
+	ISSTRING(regexstr)
+	ISSTRING(replacementstr)
+	ISSTRING(options)
+
+        //in case changes to/from numeric
+	var_typ&=VARTYP_NOTNUMFLAGS;
 
 	//http://www.boost.org/doc/libs/1_38_0/libs/regex/doc/html/boost_regex/syntax/basic_syntax.html
 
 	//TODO automatic caching of regular expressions or new exodus datatype to handle them
-
-#ifndef BOOST_HAS_ICU
-	std_boost::regex regex;
-	try
-	{
-		if (options.index("i"))
-			regex.assign(toTstring(matchstr), std_boost::regex::extended|std_boost::regex_constants::icase);
-		else
-			regex.assign(toTstring(matchstr), std_boost::regex::extended|std_boost::regex_constants::icase);
-	}
-	catch (std_boost::regex_error& e)
-    {
-		throw MVException(var(e.what()).quote() ^ " is an invalid regular expression");
-	}
-
-        return regex_match(toTstring((*this)), regex);
-#else
 	std_boost::u32regex regex;
 	try
 	{
-		if (options.index("i"))
-                        regex=boost::make_u32regex(matchstr.var_str, std_boost::regex::extended|std_boost::regex_constants::icase);
-		else
-                        regex=boost::make_u32regex(matchstr.var_str, std_boost::regex::extended);
+		regex=boost::make_u32regex(regexstr.var_str, get_regex_options(options));
 	}
 	catch (std_boost::regex_error& e)
-    {
+	{
 		throw MVException(var(e.what()).quote() ^ " is an invalid regular expression");
 	}
 
-        return u32regex_match(var_str, regex);
-#endif
+	//return regex_match(var_str, expression);
 
-}
-
-var var::swap(const var& what, const var& with, const var& options) const
-{
-	THISIS("var var::swap(const var& what, const var& with) const")
-	THISISSTRING()
-
-	return var(*this).swapper(what,with,options);
-}
-
-//only here really because boost regex is included here for file matching
-var& var::swapper(const var& what, const var& with, const var& options)
-{
-	THISIS("var& var::swapper_regex(const var& regex, const var& with, const var& options)")
-	THISISSTRING()
-	ISSTRING(what)
-	ISSTRING(with)
-	ISSTRING(options)
-
-        //in case changes to/from numeric
-        var_typ&=pimpl::VARTYP_NOTNUMFLAGS;
-
-	if (options.length() != 0)
-	{
-#ifndef BOOST_HAS_ICU
-		//http://www.cplusplus.com/reference/regex/basic_regex/assign/
-
-
-                //TODO automatic caching of regular expressions or new exodus datatype to handle them
-                std_boost::regex regex;
-                try
-                {
-                        if (options==("ri"))
-                                regex.assign(toTstring(what), std_boost::regex::extended|std_boost::regex_constants::icase);
-                        else if (options==("r"))
-                                regex.assign(toTstring(what), std_boost::regex::extended);
-                        else if (options==("i"))
-                                regex.assign(toTstring(what), std_boost::regex::extended|std_boost::regex_constants::icase|std_boost::regex::literal);
-                        else
-                                regex.assign(toTstring(what), boost::regex_constants::literal);
-                //boost::regex toregex_regex(with.var_str, boost::regex::extended);
-                }
-                catch (std_boost::regex_error& e)
-                {
-                        throw MVException(var(e.what()).quote() ^ " is an invalid regular expression");
-                }
-/*
-		//TODO automatic caching of regular expressions or new exodus datatype to handle them
-		std_boost::regex regex;
-		try
-		{
-			if (options==("i") || options==("ri"))
-                                regex.assign(toTstring(what), std_boost::regex::ECMAScript|std_boost::regex_constants::icase);
-			else
-				//regex.assign(toTstring(what), std_boost::regex_constants::literal);
-				regex.assign(toTstring(what));
-		//std_boost::regex toregex_regex(with.var_str, std_boost::regex::extended);
-		}
-		catch (std_boost::regex_error& e)
-		{
-			throw MVException(var(e.what()).quote() ^ " is an invalid regular expression");
-		}
-*/
-		//return regex_match(var_str, expression);
-
-		//std::ostringstream outputstring(std::ios::out | std::ios::binary);
-    //std::ostream_iterator<char, char> oiter(outputstring);
-		//std_boost::regex_replace(oiter, var_str.begin(), var_str.end(),regex_regex, with, boost::match_default | boost::format_all);
-                var_str=var(std_boost::regex_replace(toTstring((*this)),regex, toTstring(with))).var_str;
-
-#else
-		//http://www.boost.org/doc/libs/1_38_0/libs/regex/doc/html/boost_regex/syntax/basic_syntax.html
-
-		//TODO automatic caching of regular expressions or new exodus datatype to handle them
-		std_boost::u32regex regex;
-		try
-		{
-			/*
-			if (options.index("i"))
-				regex=boost::make_u32regex(what.var_str,
-					std_boost::regex::extended|std_boost::regex_constants::icase);
-			else
-				regex=boost::make_u32regex(what.var_str,
-					std_boost::regex::extended);
-			//std_boost::regex toregex_regex(with.var_str, std_boost::regex::extended);
-			*/
-			if (options==("ri"))
-				regex=boost::make_u32regex(what.var_str,std_boost::regex::extended|std_boost::regex_constants::icase);
-			else if (options==("r"))
-				regex=boost::make_u32regex(what.var_str,std_boost::regex::extended);
-			else if (options==("i"))
-				regex=boost::make_u32regex(what.var_str,std_boost::regex_constants::icase|std_boost::regex::literal);
-			else
-				regex=boost::make_u32regex(what.var_str,std_boost::regex::literal);
-		//std_boost::regex toregex_regex(with.var_str, std_boost::regex::extended);
-		}
-		catch (std_boost::regex_error& e)
-		{
-			throw MVException(var(e.what()).quote() ^ " is an invalid regular expression");
-		}
-
-		//return regex_match(var_str, expression);
-
-		//std::ostringstream outputstring(std::ios::out | std::ios::binary);
-		//std::ostream_iterator<char, char> oiter(outputstring);
-		//std_boost::regex_replace(oiter, var_str.begin(), var_str.end(),regex_regex, with, boost::match_default | boost::format_all);
-		var_str=std_boost::u32regex_replace(var_str,regex, with.var_str);
-
-#endif
-
-	}
-	else
-	{
-		std::string str1=what.var_str;
-		std::string str2=with.var_str;
-
-		//nothing to do if oldstr is ""
-		if (str1=="")
-			return *this;
-
-		//find the starting position of the field or return
-		std::string::size_type start_pos=0;
-		while (true)
-		{
-			start_pos=var_str.find(str1,start_pos);
-			//past of of string?
-			if (start_pos==std::string::npos) return *this;
-			var_str.replace(start_pos,str1.length(),str2);
-			start_pos+=str2.length();
-		}
-	}
+	//std::ostringstream outputstring(std::ios::out | std::ios::binary);
+	//std::ostream_iterator<char, char> oiter(outputstring);
+	//std_boost::regex_replace(oiter, var_str.begin(), var_str.end(),regex_regex, with, boost::match_default | boost::format_all);
+	var_str=std_boost::u32regex_replace(var_str,regex, replacementstr.var_str);
 
 	return *this;
 }
@@ -836,7 +817,7 @@ bool var::osgetenv(const var& envvarname)
 	THISISDEFINED()
 	ISSTRING(envvarname)
 
-	var_typ=pimpl::VARTYP_STR;
+	var_typ=VARTYP_STR;
 
 	//return whole environment if blank envvarname
 	if (envvarname.var_str.length()==0) {
@@ -1031,9 +1012,9 @@ std::fstream* var::osopenx(const var& osfilename, const var& locale) const
 		pmyfile = (std::fstream *) mv_handles_cache.get_handle((int) this->var_int, this->var_str);
 		if (pmyfile == 0)		// nonvalid handle
 		{
-			this->var_int = 0;
-//			this->var_typ ^= pimpl::VARTYP_OSFILE;	// clear bit
-			this->var_typ ^= pimpl::VARTYP_OSFILE | pimpl::VARTYP_INT;	//only STR bit should remains
+			var_int = 0;
+//			var_typ ^= VARTYP_OSFILE;	// clear bit
+			var_typ ^= VARTYP_OSFILE | VARTYP_INT;	//only STR bit should remains
 		}
 	}
 
@@ -1078,7 +1059,7 @@ std::fstream* var::osopenx(const var& osfilename, const var& locale) const
 		//and NAN to prevent isnum trashing mvint in the possible case that the osfilename is an integer
 		//can addhandle fail?
 		this->var_int = mv_handles_cache.add_handle(pmyfile, del_fstream, osfilename.var_str);
-		this->var_typ = pimpl::VARTYP_NANSTR_OSFILE;
+		this->var_typ = VARTYP_NANSTR_OSFILE;
 		this->var_str = osfilename.var_str;
 	}
 
@@ -1113,7 +1094,7 @@ bool var::osread(const char* osfilename, const var& locale)
 
 	//osread returns empty string in any case
 	var_str="";
-	var_typ=pimpl::VARTYP_STR;
+	var_typ=VARTYP_STR;
 
 	//what is the purpose of the following?
 	//RAW IO to prevent locale conversion if writing narrow string to wide stream or vice versa
@@ -1345,7 +1326,7 @@ var& var::osbread(const var& osfilevar, var& startoffset, const int bytesize, co
 
 	//default is to return empty string in any case
 	var_str="";
-	var_typ=pimpl::VARTYP_STR;
+	var_typ=VARTYP_STR;
 
 	//strange case request to read 0 bytes
 	if (bytesize<=0)
@@ -1431,7 +1412,7 @@ void var::osclose() const
 	{
 		mv_handles_cache.del_handle((int) var_int);
 		var_int = 0L;
-		var_typ ^= pimpl::VARTYP_OSFILE | pimpl::VARTYP_INT;	//only STR bit should remains
+		var_typ ^= VARTYP_OSFILE | VARTYP_INT;	//only STR bit should remains
 	}
 	// in all other cases, the files should be closed.
 }
@@ -1720,7 +1701,7 @@ var var::oslist(const var& path0, const var& spec0, const int mode) const
                 //note inside brackets, only  ^ - and ] are special characters inside [] char alternative
                 //to include a ] in the list of characters inside [] it must be the first character like []otherchars]
                 //of course all back slashes must be doubled up in c++ source code
-                spec.swapper("([][\\\\(){}|^$.+])","\\\\$1","r");
+                spec.replacer("([][\\\\(){}|^$.+])","\\\\$1");
 
                 //glob * becomes .* in regex matching any number of any characters
                 spec.swapper("*",".*");

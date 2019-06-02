@@ -147,18 +147,17 @@ DLL_PUBLIC var len(const var& var2);
 DLL_PUBLIC var length(const var& var2);
 DLL_PUBLIC var& converter(var& instring, const var& oldchars, const var& newchars);
 DLL_PUBLIC var convert(const var& instring, const var& oldchars, const var& newchars);
-DLL_PUBLIC var& swapper(var& instring, const var& oldstr, const var& newstr, const var& options DEFAULTNULL);
-DLL_PUBLIC var swap(const var& instring, const var& oldstr, const var& newstr, const var& options DEFAULTNULL);
+DLL_PUBLIC var& swapper(var& instring, const var& oldstr, const var& newstr);
+DLL_PUBLIC var swap(const var& instring, const var& oldstr, const var& newstr);
+DLL_PUBLIC var& replacer(var& instring, const var& oldstr, const var& newstr, const var& options DEFAULTNULL);
+DLL_PUBLIC var replace(const var& instring, const var& oldstr, const var& newstr, const var& options DEFAULTNULL);
 DLL_PUBLIC var& ucaser(var& instring);
 DLL_PUBLIC var ucase(const var& instring);
 DLL_PUBLIC var& lcaser(var& instring);
 DLL_PUBLIC var lcase(const var& instring);
 DLL_PUBLIC var unique(const var& instring);
-//invert implemented as xor xff ie bottom eight bits only and leave top bits unchanged so keeping chars on same unicode page
 DLL_PUBLIC var& inverter(var& instring);
 DLL_PUBLIC var invert(const var& instring);
-DLL_PUBLIC var& textinverter(var& instring);
-DLL_PUBLIC var textinvert(const var& instring);
 DLL_PUBLIC var& lowerer(var& instring);
 DLL_PUBLIC var lower(const var& instring);
 DLL_PUBLIC var& raiser(var& instring);
@@ -255,15 +254,15 @@ DLL_PUBLIC bool insertrecord(const var& record, const var& filehandle,const var&
 
 DLL_PUBLIC var xlate(const var& filename, const var& key, const var& fieldno, const char* mode);
 DLL_PUBLIC var xlate(const var& filename, const var& key, const var& fieldno, const var& mode);
-DLL_PUBLIC var remove(const var& fromstr, var& startx, var& delimiterno);
+DLL_PUBLIC var substr2(const var& fromstr, var& startx, var& delimiterno);
 
 DLL_PUBLIC var split(const var& sourcevar, dim& destinationdim);
 DLL_PUBLIC dim split(const var& sourcevar);
 DLL_PUBLIC var join(const dim& sourcedim);
 
-DLL_PUBLIC var replace(const var& instring, const int fieldno, const int valueno, const int subvalueno, const var& replacement);
-DLL_PUBLIC var replace(const var& instring, const int fieldno, const int valueno, const var& replacement);
-DLL_PUBLIC var replace(const var& instring, const int fieldno, const var& replacement);
+DLL_PUBLIC var pickreplace(const var& instring, const int fieldno, const int valueno, const int subvalueno, const var& replacement);
+DLL_PUBLIC var pickreplace(const var& instring, const int fieldno, const int valueno, const var& replacement);
+DLL_PUBLIC var pickreplace(const var& instring, const int fieldno, const var& replacement);
 
 DLL_PUBLIC var extract(const var& instring, const int fieldno=0, const int valueno=0, const int subvalueno=0);
 
@@ -271,7 +270,8 @@ DLL_PUBLIC var insert(const var& instring, const int fieldno, const int valueno,
 DLL_PUBLIC var insert(const var& instring, const int fieldno, const int valueno, const var& insertion);
 DLL_PUBLIC var insert(const var& instring, const int fieldno, const var& insertion);
 
-DLL_PUBLIC var erase(const var& instring, const int fieldno, const int valueno=0, const int subvalueno=0);
+//DLL_PUBLIC var erase(const var& instring, const int fieldno, const int valueno=0, const int subvalueno=0);
+DLL_PUBLIC var remove(const var& instring, const int fieldno, const int valueno=0, const int subvalueno=0);
 
 DLL_PUBLIC var& replacer(var& instring, const int fieldno, const int valueno, const int subvalueno, const var& replacement);
 DLL_PUBLIC var& replacer(var& instring, const int fieldno, const int valueno, const var& replacement);
@@ -281,7 +281,8 @@ DLL_PUBLIC var& inserter(var& instring, const int fieldno, const int valueno, co
 DLL_PUBLIC var& inserter(var& instring, const int fieldno, const int valueno, const var& insertion);
 DLL_PUBLIC var& inserter(var& instring, const int fieldno, const var& insertion);
 
-DLL_PUBLIC var& eraser(var& instring, const int fieldno, const int valueno=0, const int subvalueno=0);
+//DLL_PUBLIC var& eraser(var& instring, const int fieldno, const int valueno=0, const int subvalueno=0);
+DLL_PUBLIC var& remover(var& instring, const int fieldno, const int valueno=0, const int subvalueno=0);
 
 //locate & locateby without fieldno or valueno arguments uses character VM as separator character
 //locate & locateby with fieldno=0 uses character FM

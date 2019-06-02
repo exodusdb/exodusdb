@@ -44,7 +44,7 @@ THE SOFTWARE.
 //Unhandled exception at 0x0065892c in service.exe: 0xC0000005: Access violation writing location 0xcccccccc.
 //other words ccould be ISCONSTRUCTED or ISALIVE
 #define ISDEFINED(VARNAME) \
-	if (VARNAME.var_typ&mvtypemask) \
+	if (VARNAME.var_typ&VARTYP_MASK) \
 	throw MVUndefined(var(#VARNAME) ^ " in " ^ var(functionname)); \
 
 //includes isdefined
@@ -56,7 +56,7 @@ THE SOFTWARE.
 //includes isdefined directly and checks assigned if not string
 #define ISSTRING(VARNAME) \
 	ISDEFINED(VARNAME) \
-	if (!(VARNAME.var_typ&pimpl::VARTYP_STR)) \
+	if (!(VARNAME.var_typ & VARTYP_STR)) \
 	{ \
 		if (!VARNAME.var_typ) \
 		throw MVUnassigned(var(#VARNAME) ^ " in " ^ var(functionname)); \
@@ -69,12 +69,12 @@ THE SOFTWARE.
 	if (!VARNAME.isnum()) \
 		throw MVNonNumeric(var(functionname) ^ " : " ^ var(#VARNAME) ^ " is " ^ VARNAME.substr(1,20).quote()); \
 
-//in some bizarre case we cant show contents of variable so put the following line instead of the last one above	
+//in some bizarre case we cant show contents of variable so put the following line instead of the last one above
 //	throw MVNonNumeric(var(functionname) ^ " : " ^ var(#VARNAME));
 
 //see long comment on ISDEFINED
 #define THISISDEFINED() \
-	if (!this||this->var_typ&mvtypemask) \
+	if (!this||this->var_typ&VARTYP_MASK) \
 		throw MVUndefined("var in " ^ var(functionname)); \
 
 //includes isdefined
@@ -86,7 +86,7 @@ THE SOFTWARE.
 //includes isdefined directly and checks assigned if not string
 #define THISISSTRING() \
 	THISISDEFINED() \
-	if (!(this->var_typ&pimpl::VARTYP_STR)) \
+	if (!(this->var_typ & VARTYP_STR)) \
 	{ \
 		if (!this->var_typ) \
 			throw MVUnassigned("var in " ^ var(functionname)); \
@@ -104,9 +104,9 @@ THE SOFTWARE.
 	THISISASSIGNED() \
 	if (!this->isnum()) \
 		throw MVNonNumeric(var(functionname) ^ " : var is " ^ this->substr(1,20).quote()); \
-	if (!(var_typ & pimpl::VARTYP_DBL)) { \
-		var_dbl=double(var_int); \
-		var_typ|=pimpl::VARTYP_DBL; \
+	if (!(var_typ & VARTYP_DBL)) { \
+		var_dbl = double(var_int); \
+		var_typ |= VARTYP_DBL; \
 	} \
 
 //includes isassigned which includes ISDEFINED
@@ -114,9 +114,9 @@ THE SOFTWARE.
 	THISISASSIGNED() \
 	if (!this->isnum()) \
 		throw MVNonNumeric(var(functionname) ^ " : var is " ^ this->substr(1,20).quote()); \
-	if (!(var_typ & pimpl::VARTYP_INT)) { \
-		var_int=mvint_t(var_dbl); \
-		var_typ|=pimpl::VARTYP_INT; \
+	if (!(var_typ & VARTYP_INT)) { \
+		var_int = mvint_t(var_dbl); \
+		var_typ |= VARTYP_INT; \
 	} \
 
 #endif /*MVEXCEPTIONS_H*/

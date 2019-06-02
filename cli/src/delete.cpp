@@ -1,3 +1,4 @@
+
 #include <exodus/program.h>
 
 programinit()
@@ -6,8 +7,8 @@ function main() {
 
         var filename=COMMAND.a(2);
 
-        var itemids=erase(COMMAND,1,0,0);
-        eraser(itemids,1,0,0);
+        var itemids=remove(COMMAND,1,0,0);
+        remover(itemids,1,0,0);
 
         var silent=index(ucase(OPTIONS),"S");
 

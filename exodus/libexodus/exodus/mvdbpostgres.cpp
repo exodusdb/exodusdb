@@ -77,7 +77,6 @@ THE SOFTWARE.
 
 #include <iostream>
 #include <cstring>//for strcmp strlen
-//#include <boost/locale.hpp>
 
 #include <boost/thread/tss.hpp>
 //http://beta.boost.org/doc/libs/1_41_0/doc/html/unordered.html
@@ -89,10 +88,9 @@ THE SOFTWARE.
 //#include <arpa/inet.h>//for ntohl()
 #define MV_NO_NARROW
 
-//#include "MurmurHash2_64.h"			// it has included in mvdbconns.h (uint64_t defined)
+#include "MurmurHash2_64.h"			// it has included in mvdbconns.h (uint64_t defined)
 
 #include <exodus/mvdbconns.h>		// placed as last include, causes boost header compiler errors
-#include <exodus/mvimpl.h>
 #include <exodus/mv.h>
 //#include <exodus/mvenvironment.h>
 //#include <exodus/mvutf.h>
@@ -100,7 +98,7 @@ THE SOFTWARE.
 
 namespace exodus {
 
-bool startipc();
+//bool startipc();
 
 // Deleter function to close connection and connection cache object
 static void connection_DELETER_AND_DESTROYER(CACHED_CONNECTION con_)
@@ -155,12 +153,10 @@ bool getdbtrace()
 boost::thread_specific_ptr<int> tss_pgconnids;
 boost::thread_specific_ptr<var> tss_pgconnparams;
 boost::thread_specific_ptr<var> tss_pglasterror;
-boost::thread_specific_ptr<bool> tss_ipcstarted;
+//boost::thread_specific_ptr<bool> tss_ipcstarted;
 
 
 std::string getresult(PGresult* pgresult, int rown, int coln) {
-	//char* starting=PQgetvalue(pgresult,rown,coln);
-	//return boost::locale::conv::utf_to_utf<wchar_t>(starting,starting+PQgetlength(pgresult,rown,coln));
 	return std::string(PQgetvalue(pgresult,rown,coln),PQgetlength(pgresult,rown,coln));
 }
 
@@ -205,6 +201,7 @@ void var::setlasterror(const var& msg) const
 void var::setlasterror() const
 {
 	tss_pglasterror.reset();
+	
 }
 
 var var::getlasterror() const
@@ -552,7 +549,7 @@ int var::getconnectionid_ordefault() const
 	//leave any string in place but prevent it being used as a number
 	//var_int = connid2;
 	////var_str = ""; does it ever need initialising?
-	//var_typ = pimpl::VARTYP_NANSTR_DBCONN;
+	//var_typ = VARTYP_NANSTR_DBCONN;
 
 	//save the connection id
 	//this->r(2,connid2);
@@ -632,7 +629,7 @@ bool var::disconnect()
 	if (connid)
 	{
 		mv_connections_cache.del_connection((int) connid);
-		var_typ=pimpl::VARTYP_UNA;
+		var_typ=VARTYP_UNA;
 		//if we happen to be disconnecting the same connection as the default connection
 		//then reset the default connection so that it will be reconnected to the next connect
 		//this is rather too smart but will probably do what people expect
@@ -844,7 +841,6 @@ bool var::read(const var& filehandle,const var& key)
 		{
 			if (!PQgetisnull(pgresult, tuplen, 0))
 			{
-				//filenames^= FM ^ stringfromUTF8((UTF8*)PQgetvalue(pgresult, filen, 0), PQgetlength(pgresult, filen, 0));
 				var key=getresult(pgresult, tuplen, 0);
 				if (this->length()<=65535)
 				{
@@ -932,10 +928,7 @@ bool var::read(const var& filehandle,const var& key)
 		return false;
 	}
 
-	// *this=stringfromUTF8((UTF8*)PQgetvalue(pgresult, 0, 0), PQgetlength(pgresult, 0, 0));
 	*this=getresult(pgresult,0,0);
-	// *this=PQgetvalue(pgresult,0,0);
-	// *this=var(" ").str(100);
 
 	this->setlasterror();
 
@@ -949,6 +942,8 @@ var var::hash(const unsigned long long modulus) const
 	THISISDEFINED()
 	THISISSTRING()
 	//ISNUMERIC(modulus)
+
+	//https://softwareengineering.stackexchange.com/questions/49550/which-hashing-algorithm-is-best-for-uniqueness-and-speed
 
 	//uint64_t hash64=MurmurHash64((wchar_t*)fileandkey.data(),int(fileandkey.length()*sizeof(wchar_t)),0);
 	uint64_t hash64=MurmurHash64((char*)var_str.data(),int(var_str.length()*sizeof(char)),0);
@@ -1036,13 +1031,7 @@ var var::lock(const var& key) const
 		return false;
 	}
 
-	// *this=stringfromUTF8((UTF8*)PQgetvalue(pgresult, 0, 0), PQgetlength(pgresult, 0, 0));
-
-	//std::string temp=stringfromUTF8((UTF8*)PQgetvalue(pgresult, 0, 0), PQgetlength(pgresult, 0, 0));
-
 	bool lockedok= *PQgetvalue(pgresult, 0, 0)!=0;
-
-	//PQclear(pgresult);
 
 	//add it to the local lock table so we can detect double locking locally
 	//since postgres will stack up repeated locks by the same process
@@ -2028,8 +2017,9 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 		{
 exodus_call:
 			sqlexpression="'" ^ fieldname ^ "'";
-			//sqlexpression="exodus_call('exodusservice-" ^ getprocessn() ^ "." ^ getenvironmentn() ^ "'::bytea, '" ^ dictfilename.lcase() ^ "'::bytea, '" ^ fieldname.lcase() ^ "'::bytea, "^ filename ^ ".key, " ^ filename ^ ".data,0,0)";
-			sqlexpression="exodus_call('exodusservice-" ^ getprocessn() ^ "." ^ getenvironmentn() ^ "', '" ^ dictfilename.lcase() ^ "', '" ^ fieldname.lcase() ^ "', "^ filename ^ ".key, " ^ filename ^ ".data,0,0)";
+			int environmentn=1;//getenvironmentn()
+			//sqlexpression="exodus_call('exodusservice-" ^ getprocessn() ^ "." ^ environmentn ^ "'::bytea, '" ^ dictfilename.lcase() ^ "'::bytea, '" ^ fieldname.lcase() ^ "'::bytea, "^ filename ^ ".key, " ^ filename ^ ".data,0,0)";
+			sqlexpression="exodus_call('exodusservice-" ^ getprocessn() ^ "." ^ environmentn ^ "', '" ^ dictfilename.lcase() ^ "', '" ^ fieldname.lcase() ^ "', "^ filename ^ ".key, " ^ filename ^ ".data,0,0)";
 			sqlexpression.outputl("sqlexpression=");
 			//TODO apply naturalorder conversion by passing forsort_or_select_or_index option to exodus_call
 
@@ -2252,23 +2242,23 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 {
 	//private - and arguments are left unchecked for speed
 	//?allow undefined usage like var xyz=xyz.select();
-	if (var_typ&mvtypemask)
+	if (var_typ&VARTYP_MASK)
 	{
 		//throw MVUndefined("selectx()");
 		var_str="";
-		var_typ=pimpl::VARTYP_STR;
+		var_typ=VARTYP_STR;
 	}
 
 	//fieldnames.outputl("fieldnames=");
 	//sortselectclause.outputl("sortselectclause=");
 
 	//default to ""
-	if (!(var_typ&pimpl::VARTYP_STR))
+	if (!(var_typ&VARTYP_STR))
 	{
 		if (!var_typ)
 		{
 			var_str="";
-			var_typ=pimpl::VARTYP_STR;
+			var_typ=VARTYP_STR;
 		}
 		else
 			this->createString();
@@ -2879,7 +2869,7 @@ void var::clearselect()
 	///if readnext through string
 	if ((*this)[-1]==FM) {
 		var_str="";
-		var_typ=pimpl::VARTYP_STR;
+		var_typ=VARTYP_STR;
 		return;
 	}
 
@@ -3257,11 +3247,11 @@ bool var::readnext(var& key, var& valueno)
 {
 
 	//?allow undefined usage like var xyz=xyz.readnext();
-	if (var_typ&mvtypemask)
+	if (var_typ&VARTYP_MASK)
 	{
 		//throw MVUndefined("readnext()");
 		var_str="";
-		var_typ=pimpl::VARTYP_STR;
+		var_typ=VARTYP_STR;
 	}
 
 	//default cursor is ""
@@ -3363,7 +3353,6 @@ bool var::readnext(var& key, var& valueno)
 	//char* data = PQgetvalue(pgresult, 0, 0);
 	//int datalen = PQgetlength(pgresult, 0, 0);
 	//key=std::string(data,datalen);
-	//key=stringfromUTF8((UTF8*)PQgetvalue(pgresult, 0, 0), PQgetlength(pgresult, 0, 0));
 	key=getresult(pgresult,0,0);
 //key.output("key=").len().outputl(" len=");
 
@@ -3408,11 +3397,11 @@ bool var::readnextrecord(var& record, var& key, var& valueno)
 {
 
 	//?allow undefined usage like var xyz=xyz.readnextrecord();
-	if (var_typ&mvtypemask || !var_typ)
+	if (var_typ&VARTYP_MASK || !var_typ)
 	{
 		//throw MVUndefined("readnextrecord()");
 		var_str="";
-		var_typ=pimpl::VARTYP_STR;
+		var_typ=VARTYP_STR;
 	}
 
 	//default cursor is ""
@@ -3446,7 +3435,6 @@ bool var::readnextrecord(var& record, var& key, var& valueno)
 	//char* data = PQgetvalue(pgresult, 0, 0);
 	//int datalen = PQgetlength(pgresult, 0, 0);
 	//key=std::string(data,datalen);
-	//key=stringfromUTF8((UTF8*)PQgetvalue(pgresult, 0, 0), PQgetlength(pgresult, 0, 0));
 	key=getresult(pgresult,0,0);
 //TODO return zero if no mv in select because no by mv column
 
@@ -3462,7 +3450,6 @@ bool var::readnextrecord(var& record, var& key, var& valueno)
 		throw MVException(errmsg);
 		//return false;
 	}
-	//record=stringfromUTF8((UTF8*)PQgetvalue(pgresult, 0, 2), PQgetlength(pgresult, 0, 2));
 	record=getresult(pgresult,0,2);
 
 	//PQclear(pgresult);
@@ -3588,7 +3575,6 @@ var var::listfiles() const
 	int nfiles=PQntuples(pgresult);
 	for (int filen=0; filen<nfiles; filen++) {
 		if (!PQgetisnull(pgresult, filen, 0))
-			//filenames^= FM ^ stringfromUTF8((UTF8*)PQgetvalue(pgresult, filen, 0), PQgetlength(pgresult, filen, 0));
 			filenames^= FM ^ getresult(pgresult, filen, 0);
 	}
 	filenames.splicer(1,1,"");
@@ -3681,7 +3667,6 @@ var var::listindexes(const var& filename, const var& fieldname) const
 	{
 		if	(!PQgetisnull(pgresult, indexn, 0))
 		{
-			//indexname=stringfromUTF8((UTF8*)PQgetvalue(pgresult, indexn, 0), PQgetlength(pgresult, indexn, 0));
 			indexname=getresult(pgresult, indexn, 0);
 			if (indexname.substr(1,6)=="index_")
 			{

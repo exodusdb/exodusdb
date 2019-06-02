@@ -4,7 +4,7 @@ message("--LIBEXODUS CMAKE INIT --")
 
 #works using c++14 default on Ubuntu 18.04 so no need for this
 ##SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg")
+##SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg")
 
 cmake_minimum_required(VERSION 2.8)
 
@@ -40,7 +40,7 @@ message(PostgreSQL_INCLUDEDIR=${PostgreSQL_INCLUDE_DIR})
 #date_time appears to be header only in later boost versions eg 55
 #find_package(Boost REQUIRED COMPONENTS filesystem date_time system regex thread)
 #find_package(Boost REQUIRED COMPONENTS filesystem system regex thread)
-find_package(Boost REQUIRED COMPONENTS system regex thread)
+find_package(Boost REQUIRED COMPONENTS system regex thread locale)
 message("BUT LOOKING IN /usr/local/lib and /usr/local/include FIRST!")
 
 set(Boost_USE_STATIC_LIBS        ON)
@@ -77,16 +77,25 @@ add_library(exodus SHARED
  xfunctors3.h xfunctors4.h xfunctors5.h xfunctors6.h xfunctors7.h
  xfunctors8.h xfunctors9.h
 
- ConvertUTF.h NullCodecvt.h TConvert.h gettimeofday.h neo.h mvconfig.h
+# ConvertUTF.h
+# NullCodecvt.h TConvert.h
+ gettimeofday.h neo.h mvconfig.h
  MurmurHash2_64.h mvhandles.h mvdbconns.h
 
- ConvertUTF.c howto.cpp mv.cpp mvmv.cpp mvprogram.cpp mvarray.cpp mvdatetime.cpp  mvdebug.cpp
+# mvutf.cpp
+# ConvertUTF.c
+ mvlocale.cpp
+ mvos.cpp
+ howto.cpp mv.cpp mvmv.cpp mvprogram.cpp mvarray.cpp mvdatetime.cpp  mvdebug.cpp
  mvfuncs.cpp mvioconv.cpp
- naturalorder.cpp gettimeofday.cpp mv2.cpp
+ naturalorder.cpp gettimeofday.cpp
  mvdbpostgres.cpp mvenvironment.cpp mvglobalfuncs.cpp
- mvipc.cpp mvunicode.cpp mvipc_boost.cpp mvipc_posix.cpp
- mvipc_ms.cpp mvposix.cpp MurmurHash2_64.cpp
- mvfunctor.cpp mvhandles.cpp mvdbconns.cpp mvos.cpp mvprocessno.cpp getkey.cpp haskey.cpp
+# mvipc.cpp mvipc_boost.cpp mvipc_posix.cpp mvipc_ms.cpp
+ mvunicode.cpp
+ mvposix.cpp
+ MurmurHash2_64.cpp
+ mvfunctor.cpp mvhandles.cpp mvdbconns.cpp mvprocessno.cpp
+ getkey.cpp haskey.cpp
 )
 
 #set_target_properties(exodus PROPERTIES SOVERSION "${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_VERSION}")

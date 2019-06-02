@@ -25,7 +25,6 @@ THE SOFTWARE.
 //C4530: C++ exception handler used, but unwind semantics are not enabled. 
 #pragma warning (disable: 4530)
 
-#include <exodus/mvimpl.h>
 #include <exodus/mv.h>
 #include <exodus/mvexceptions.h>
 

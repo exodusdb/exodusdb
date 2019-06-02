@@ -11,7 +11,7 @@ function main(in instr, in sepchars, in stoplist, in mode) {
 		var xx;
 		for (var ii=outstr.dcount(VM);ii>0;--ii) {
 			if (stoplist.locate(outstr.a(1,ii),xx)) {
-				outstr.eraser(1,ii);
+				outstr.remover(1,ii);
 			}
 		}
 	}

@@ -25,7 +25,7 @@ function main() {
 					);
 
                 //switch to edic if only one argument
-                osshell(COMMAND.replace(1,0,0,"edic").convert(FM," "));
+                osshell(COMMAND.pickreplace(1,0,0,"edic").convert(FM," "));
                 stop();
         }
 

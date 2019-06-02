@@ -47,7 +47,6 @@ THE SOFTWARE.
 //C4530: C++ exception handler used, but unwind semantics are not enabled. 
 #pragma warning (disable: 4530)
 
-#include <exodus/mvimpl.h>
 #include <exodus/mv.h>
 
 //Simple implementation of an additional output to the console:
@@ -82,7 +81,6 @@ public:
 			exodus::var linetext=filename.field2(exodus::SLASH,-1) ^ ":" ^ lineno;
 			exodus::var filetext;
 	//ALN:NOTE: .osread could itself throw exception and we will have loop :(
-	// Changed to read directly with default locale. If no locale specified (as it was in original version of the code)
 			if (filetext.osread(filename))
 //			if (filetext.osread(filename, L""))		// avoid to read C++ source as UTF8
 			{

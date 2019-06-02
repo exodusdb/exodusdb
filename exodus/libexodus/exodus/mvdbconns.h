@@ -21,6 +21,7 @@
 #  define MVDBCONNS_H
 
 #include <map>
+#include <unordered_map>
 #include <libpq-fe.h>//in postgres/include
 #include <boost/thread/mutex.hpp>
 
@@ -49,8 +50,6 @@
 #  include <map>
 #  define UNORDERED_SET_FOR_LOCKTABLE std::map<uint64_t,int>
 #endif
-
-#include "MurmurHash2_64.h"
 
 //typedef boost::unordered_set<uint64_t> LockTable; 
 //typedef UNORDERED_SET_FOR_LOCKTABLE<uint64_t> LockTable;

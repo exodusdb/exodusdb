@@ -30,7 +30,6 @@ THE SOFTWARE.
 #include <cmath>
 #include <string.h>
 
-#include <exodus/mvimpl.h>
 #include <exodus/mv.h>
 #include <exodus/mvexceptions.h>
 
@@ -64,7 +63,7 @@ var var::iconv(const char* convstr) const
 	THISISSTRING()
 
 	//empty string in, empty string out
-	if (var_typ&pimpl::VARTYP_STR && var_str.length()==0)
+	if (var_typ&VARTYP_STR && var_str.length()==0)
 		return "";
 
 	//REMOVE the remove logic out of the L# R# and T# here
@@ -85,10 +84,11 @@ var var::iconv(const char* convstr) const
 			do  {
 
 				//very similar subfield remove code for most conversions except TLR which always format "" and []
-				part=remove(charn, terminator);
+				//part=remove(charn, terminator);
+				part=this->substr2(charn, terminator);
 				//if len(part) or terminator then
 
-				if (part.var_typ&pimpl::VARTYP_STR && part.var_str.length()==0)
+				if (part.var_typ&VARTYP_STR && part.var_str.length()==0)
 					{}
 				else
 					output ^= part.iconv_D(convstr);
@@ -110,11 +110,12 @@ var var::iconv(const char* convstr) const
 			while (true) {
 
 				//very similar subfield remove code for most conversions except TLR which always format "" and []
-				part=remove(charn, terminator);
+				//part=remove(charn, terminator);
+				part=this->substr2(charn, terminator);
 				//if len(part) or terminator then
 
 				//null string
-				if (part.var_typ&pimpl::VARTYP_STR && part.var_str.length()==0)
+				if (part.var_typ&VARTYP_STR && part.var_str.length()==0)
 					{}
 
 				//do convstr on a number
@@ -177,7 +178,7 @@ var var::iconv(const char* convstr) const
 		//HEX
 		case 'H':
 			//empty string in, empty string out
-			if (var_typ&pimpl::VARTYP_STR && var_str.length()==0)
+			if (var_typ&VARTYP_STR && var_str.length()==0)
 				return "";
 
 //TODO allow high end separators in without conversion (instead of failing as non-hex digits)
@@ -263,7 +264,8 @@ var var::oconv_T(const var& format) const
 	while (true) {
 
 		//extract characters up to the next high separator character
-		var part=remove(charn, terminator);
+		//var part=remove(charn, terminator);
+		var part=this->substr2(charn, terminator);
 
 		if (width) {
 
@@ -566,7 +568,8 @@ var var::oconv_LRC(const var& format) const
 	var charn = 1;
 	while (true) {
 
-		part=remove(charn, terminator);
+		//part=remove(charn, terminator);
+		part=this->substr2(charn, terminator);
 		//if len(part) or terminator then
 
 		//TODO optimise with pos1() and pos2()
@@ -655,10 +658,11 @@ var var::oconv(const char* conversion) const
 			do  {
 
 				//very similar subfield remove code for most conversions except TLR which always format "" and []
-				part=remove(charn, terminator);
+				//part=remove(charn, terminator);
+				part=this->substr2(charn, terminator);
 				//if len(part) or terminator then
 
-				if (part.var_typ&pimpl::VARTYP_STR && part.var_str.length()==0)
+				if (part.var_typ&VARTYP_STR && part.var_str.length()==0)
 					{}
 				else if (!part.isnum())
 					output ^= part;
@@ -682,13 +686,14 @@ var var::oconv(const char* conversion) const
 			while (true) {
 
 				//very similar subfield remove code for most conversions except TLR which always format "" and []
-				part=remove(charn, terminator);
+				//part=remove(charn, terminator);
+				part=this->substr2(charn, terminator);
 				//if len(part) or terminator then
 
 				//null string
-				//if (part.var_typ&pimpl::VARTYP_STR && part.var_str.length()==0)
+				//if (part.var_typ&VARTYP_STR && part.var_str.length()==0)
 				//	{}
-				bool notemptystring=!(part.var_typ&pimpl::VARTYP_STR && part.var_str.length()==0);
+				bool notemptystring=!(part.var_typ&VARTYP_STR && part.var_str.length()==0);
 
 				//MR ... character replacement
 				if (*conversionchar=='R')
@@ -765,7 +770,7 @@ var var::oconv(const char* conversion) const
 		case 'H':
 
 			//empty string in, empty string out
-			if (var_typ&pimpl::VARTYP_STR && var_str.length()==0)
+			if (var_typ&VARTYP_STR && var_str.length()==0)
 				return "";
 
 			//check 2nd character is E, 3rd character is X and next character is null, or a digit
@@ -798,7 +803,7 @@ var var::oconv(const char* conversion) const
 
 		case 'B':
 			//empty string in, empty string out
-			if (var_typ&pimpl::VARTYP_STR && var_str.length()==0)
+			if (var_typ&VARTYP_STR && var_str.length()==0)
 				return "";
 			if (this->toBool())
 				return var(conversion).substr(2).field(",",1);

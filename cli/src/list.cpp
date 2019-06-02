@@ -1104,7 +1104,7 @@ subroutine process_all_records()
 						for (var fn = 1; fn <= nfns; fn++) {
 							var varalues = RECORD.a(fn);
 							if (varalues.count(VM))
-								RECORD.eraser(fn, varx, 0);
+								RECORD.remover(fn, varx, 0);
 						};//fn;
 					}
 				};//varx;

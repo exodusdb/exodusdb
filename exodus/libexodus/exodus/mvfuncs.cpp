@@ -20,12 +20,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-//for high performance exodus library code
-//prevent implicit conversion from cstr to string
-//so code must be like var x="xyz" instead of just "xyz"
-//to perhaps prevent conversion at runtime to the var string
-//optimising compilers may make this
-#define MV_NO_NARROW
+/* UTF-8 bytewise encoding
+Binary    Hex          Comments
+0xxxxxxx  0x00..0x7F   Only byte of a 1-byte character encoding
+10xxxxxx  0x80..0xBF   Continuation bytes (1-3 continuation bytes)
+110xxxxx  0xC0..0xDF   First byte of a 2-byte character encoding
+1110xxxx  0xE0..0xEF   First byte of a 3-byte character encoding
+11110xxx  0xF0..0xF4   First byte of a 4-byte character encoding
+*/
 
 //C4530: C++ exception handler used, but unwind semantics are not enabled.
 #ifdef _MSC_VER
@@ -39,21 +41,9 @@ THE SOFTWARE.
 #include <iostream> //cin and cout
 #include <cmath> //for floor
 #include <cstdlib>//for exit
+#include <memory>//for unique_ptr
+
 #include <boost/locale.hpp>
-//#include <codecvt>
-//#include <locale>
-#include <algorithm>
-
-//#include "ConvertUTF.h"
-
-/*
-Binary    Hex          Comments
-0xxxxxxx  0x00..0x7F   Only byte of a 1-byte character encoding
-10xxxxxx  0x80..0xBF   Continuation bytes (1-3 continuation bytes)
-110xxxxx  0xC0..0xDF   First byte of a 2-byte character encoding
-1110xxxx  0xE0..0xEF   First byte of a 3-byte character encoding
-11110xxx  0xF0..0xF4   First byte of a 4-byte character encoding
-*/
 
 #ifndef M_PI
 //#define M_PI 3.14159265358979323846f
@@ -71,6 +61,35 @@ bool desynced_with_stdio=false;
 //TODO check that all string increase operations dont crash the system
 
 namespace exodus {
+
+//exodus uses one locale per thread instead of global
+thread_local std::locale tls_boost_locale1;
+
+inline
+void init_boost_locale1()
+{
+	if (tls_boost_locale1.name()!="*")
+	{
+		boost::locale::generator generator1;
+		tls_boost_locale1=generator1("");
+	}
+}
+
+int var::localeAwareCompare(const std::string& str1, const std::string& str2) const
+{
+	//https://www.boost.org/doc/libs/1_70_0/libs/locale/doc/html/collation.html
+	//eg ensure lower case sorts before uppercase (despite "A" \x41 is less than "a" \x61)
+	init_boost_locale1();
+
+	//Primary – ignore accents and character case, comparing base letters only. For example "facade" and "Façade" are the same.
+	//Secondary – ignore character case but consider accents. "facade" and "façade" are different but "Façade" and "façade" are the same.
+	//Tertiary – consider both case and accents: "Façade" and "façade" are different. Ignore punctuation.
+	//Quaternary – consider all case, accents, and punctuation. The words must be identical in terms of Unicode representation.
+	//Identical – as quaternary, but compare code points as well.
+	#define COMP_LEVEL identical
+
+	return std::use_facet<boost::locale::collator<char> >(tls_boost_locale1).compare(boost::locale::collator_base::COMP_LEVEL,str1,str2);
+}
 
 var var::version() const
 {
@@ -107,12 +126,11 @@ bool var::input(const var& prompt, const int nchars)
 	if (nchars<0) {
 
 		var_str="";
-		var_typ=pimpl::VARTYP_STR;
+		var_typ=VARTYP_STR;
 
 		char char1;
 		while (true) {
 			int nc;
-			//TODO consider converting from say utf8
 			int getkey(void);
 			//quit if error or EOF
 			char1=getkey();
@@ -124,12 +142,11 @@ bool var::input(const var& prompt, const int nchars)
 	} else if (nchars>0) {
 
 		var_str="";
-		var_typ=pimpl::VARTYP_STR;
+		var_typ=VARTYP_STR;
 
 		char char1;
 		while (true) {
 			int nc;
-			//TODO consider converting from say utf8
 			int getkey(void);
 			char1=getkey();
 
@@ -163,7 +180,7 @@ bool var::input()
 	THISISDEFINED()
 
 	var_str="";
-	var_typ=pimpl::VARTYP_STR;
+	var_typ=VARTYP_STR;
 
 	//pressing crtl+d indicates eof on unix or ctrl+Z on dos/windows?
 	if (std::cin.eof())
@@ -219,10 +236,10 @@ bool var::assigned() const
 	//and also when passing default variables to functions in the functors on gcc
 	//THISISDEFINED()
 
-	if (!this||(*this).var_typ & mvtypemask)
+	if (!this||(*this).var_typ & VARTYP_MASK)
 		return false;
 
-	return var_typ!=pimpl::VARTYP_UNA;
+	return var_typ!=VARTYP_UNA;
 }
 
 bool var::unassigned() const
@@ -231,7 +248,7 @@ bool var::unassigned() const
 	//THISIS("bool var::unassigned() const")
 	//THISISDEFINED()
 
-	if (!this||((*this).var_typ & mvtypemask))
+	if (!this||((*this).var_typ & VARTYP_MASK))
 		return true;
 
 	return !var_typ;
@@ -246,13 +263,13 @@ var& var::unassigned(const var& defaultvalue) {
         ISASSIGNED(defaultvalue)
 
         //?allow undefined usage like var xyz=xyz.readnext();
-        //if (var_typ & mvtypemask)
+        //if (var_typ & VARTYP_MASK)
 
         if (this->unassigned())
         {
                 //throw MVUndefined("unassigned( ^ defaultvalue ^")");
                 //var_str="";
-                //var_typ=pimpl::VARTYP_STR;
+                //var_typ=VARTYP_STR;
                 *this=defaultvalue;
         }
         return *this;
@@ -277,12 +294,12 @@ var var::integer() const
 	*/
 
 	//prefer int
-	if (var_typ & pimpl::VARTYP_INT)
+	if (var_typ & VARTYP_INT)
 		return var_int;
 
 	//floor
 	var_int=std::floor(var_dbl);
-	var_typ|=pimpl::VARTYP_INT;
+	var_typ|=VARTYP_INT;
 	return var_int;
 
 }
@@ -316,7 +333,7 @@ var var::round(const int ndecimals) const
 
 	double result;
 	//prefer double
-	if (var_typ & pimpl::VARTYP_DBL)
+	if (var_typ & VARTYP_DBL)
 		result=var_dbl;
 	else
 	{
@@ -355,18 +372,18 @@ bool var::toBool() const
 	do
 	{
 		//ints are true except for zero
-		if (var_typ & pimpl::VARTYP_INT)
+		if (var_typ & VARTYP_INT)
 			return (bool)(var_int!=0);
 
 		//non-numeric strings are true unless zero length
-		if (var_typ & pimpl::VARTYP_NAN)
+		if (var_typ & VARTYP_NAN)
 			//return (bool)(var_str.length()!=0);
 			return !var_str.empty();
 
 		//doubles are true unless zero
 		//check double first dbl on guess that tests will be most often on financial numbers
 		//TODO should we consider very small numbers to be the same as zero?
-		if (var_typ & pimpl::VARTYP_DBL)
+		if (var_typ & VARTYP_DBL)
 			return (bool)(var_dbl!=0);
 
 		if (!(var_typ))
@@ -388,7 +405,7 @@ int var::toInt() const
 	THISISNUMERIC()
 
 	//loss of precision if var_int is long long
-	return (var_typ & pimpl::VARTYP_INT) ? int(var_int) : int(var_dbl);
+	return (var_typ & VARTYP_INT) ? int(var_int) : int(var_dbl);
 }
 
 int var::toLong() const
@@ -397,7 +414,7 @@ int var::toLong() const
 	THISISNUMERIC()
 
 	//loss of precision if var_int is long long
-	return (var_typ & pimpl::VARTYP_INT) ? long(var_int) : long(var_dbl);
+	return (var_typ & VARTYP_INT) ? long(var_int) : long(var_dbl);
 }
 
 double var::toDouble() const
@@ -406,7 +423,7 @@ double var::toDouble() const
 	THISISNUMERIC()
 
 	//return double by preference
-	return (var_typ & pimpl::VARTYP_DBL) ? double(var_dbl) : double(var_int);
+	return (var_typ & VARTYP_DBL) ? double(var_dbl) : double(var_int);
 }
 
 //mainly called in ISSTRING when not already a string
@@ -419,26 +436,26 @@ void var::createString() const
 
 	//dbl - create string from dbl
 	//prefer double
-	if (var_typ & pimpl::VARTYP_DBL) {
+	if (var_typ & VARTYP_DBL) {
 		var_str=dblToString(var_dbl);
-		var_typ|=pimpl::VARTYP_STR;
+		var_typ|=VARTYP_STR;
 		return;
 	}
 
 	//int - create string from int
-	if (var_typ & pimpl::VARTYP_INT) {
+	if (var_typ & VARTYP_INT) {
 		//loss of precision if var_int is long long
 		var_str=intToString(int(var_int));
-		var_typ|=pimpl::VARTYP_STR;
+		var_typ|=VARTYP_STR;
 		return;
 	}
 	//already a string (unlikely since only called when not a string)
-	if (var_typ & pimpl::VARTYP_STR) {
+	if (var_typ & VARTYP_STR) {
 		return;
 	}
 
 	//treat any other case as unassigned
-	//(usually var_typ & pimpl::VARTYP_UNA)
+	//(usually var_typ & VARTYP_UNA)
 	throw MVUnassigned("createString()");
 
 }
@@ -477,6 +494,33 @@ const char* var::data() const
 	return var_str.data();
 }
 
+
+DLL_PUBLIC
+std::u32string var::to_u32string() const
+{
+	//for speed, dont validate
+	//THISIS("std::u32string var::to_u32string() const")
+	//THISISSTRING()
+
+	//1.4 secs per 10,000,000 var=var copies of 3 byte ASCII strings
+	//simple var=var copy of the following data
+
+	//14.9 secs round trips u8->u32->u8 per 10,000,000 on vm7
+	//SKIPS/TRIMS OUT any bad utf8
+	return boost::locale::conv::utf_to_utf<char32_t>(var_str);
+}
+
+DLL_PUBLIC
+void var::from_u32string(std::u32string u32_source) const
+{
+	//for speed, dont validate
+	//THISIS("void var::from_u32tring() const")
+	//THISISDEFINED()
+	var_typ=VARTYP_STR;
+
+	var_str=boost::locale::conv::utf_to_utf<char>(u32_source);
+
+}
 
 var var::trim(const var& trimchar) const
 {
@@ -588,7 +632,7 @@ var& var::trimmerf(const char* trimchar)
 	var_str.erase(0,start_pos);
 
 	//clear numeric flags in case changed from/to numeric
-	var_typ&=pimpl::VARTYP_NOTNUMFLAGS;
+	var_typ&=VARTYP_NOTNUMFLAGS;
 
 	return *this;
 
@@ -620,7 +664,7 @@ var& var::trimmerb(const char* trimchar)
 	var_str.erase(end_pos+1);
 
         //clear numeric flags in case changed from/to numeric
-        var_typ&=pimpl::VARTYP_NOTNUMFLAGS;
+        var_typ&=VARTYP_NOTNUMFLAGS;
 
 	return *this;
 
@@ -668,7 +712,7 @@ var& var::trimmer(const char* trimchar)
 
 	//for speed and safety do this once, regardless of any trimming actually done
         //clear numeric flags in case changed from/to numeric
-        var_typ&=pimpl::VARTYP_NOTNUMFLAGS;
+        var_typ&=VARTYP_NOTNUMFLAGS;
 
 	//find the starting position of any embedded spaces
 	start_pos=std::string::npos;
@@ -697,7 +741,6 @@ var& var::trimmer(const char* trimchar)
 
 }
 
-//virtually identical code for invert and textinvert
 var var::invert() const
 {
 	THISIS("var& var::invert()")
@@ -707,37 +750,10 @@ var var::invert() const
 	return tt;
 }
 
-//virtually identical code for invert and textinvert
-var var::textinvert() const
-{
-	THISIS("var& var::textinvert()")
-	THISISSTRING()
-	var tt=*this;
-	tt.textinverter();
-	return tt;
-}
-
-//inverts bits of ASCII bytes - ignoring multibyte unicode
+//inverts lower 8 bits of UTF8 codepoints
 var& var::inverter()
 {
 	THISIS("var& var::inverter()")
-	THISISSTRING()
-
-	//clear numeric flags in case changed from/to numeric
-	var_typ&=pimpl::VARTYP_NOTNUMFLAGS;
-
-	//only transform bytes 0-127
-	std::transform(var_str.begin(), var_str.end(), var_str.begin(),
-                   [](char32_t c) -> char32_t { return (c>127) ? c : (c ^ char32_t(127)); });
-
-	return *this;
-}
-
-//inverts lower 8 bits of UTF8 codepoints
-//THROWS on invalid UTF8 bytes
-var& var::textinverter()
-{
-	THISIS("var& var::textinverter()")
 	THISISSTRING()
 
 	//xor each unicode code point, with the bits we want to toggle ... ie the bottom 8
@@ -745,20 +761,17 @@ var& var::textinverter()
 	//TODO invert directly in the UTF8 bytes - requires some cleverness
 
 	//clear numeric flags in case changed from/to numeric
-	var_typ&=pimpl::VARTYP_NOTNUMFLAGS;
+	var_typ&=VARTYP_NOTNUMFLAGS;
 
 	//convert to char32.t string - four bytes per code point
-	std::u32string wstring1=boost::locale::conv::utf_to_utf<char32_t>(var_str);
+	std::u32string u32string1=to_u32string();
 
 	//invert only the lower 8 bits to keep the resultant code points within the same unicode 256 byte page
-	//char32_t invertbits=255;
-	//for (size_t ii = 0; ii < wstring1.length(); ii++)
-	//	wstring1[ii] = wstring1[ii] ^ invertbits;
-	std::transform(wstring1.begin(), wstring1.end(), wstring1.begin(),
-                   [](char32_t c) -> char32_t { return c ^ char32_t(255); });
+	for (auto & c: u32string1)
+		c ^= char32_t(255);;
 
 	//convert back to utf8
-	var_str=boost::locale::conv::utf_to_utf<char>(wstring1);
+	this->from_u32string(u32string1);
 
 	return *this;
 }
@@ -773,19 +786,41 @@ var& var::ucaser()
 	THISIS("var& var::ucaser()")
 	THISISSTRING()
 
+	//changing case should not really require this
+	//var_typ=VARTYP_STR;
+
 	//cannot chaneg to/from numeric
         //clear numeric flags in case changed from/to numeric
-        //var_typ&=pimpl::VARTYP_NOTNUMFLAGS;
+        //var_typ&=VARTYP_NOTNUMFLAGS;
 
-	return localeAwareChangeCase(2);
+	//optimise for ASCII
+	//try ASCII uppercase to start with for speed
+	//this may not be correct for all locales. eg Turkish I i İ ı mixing Latin and Turkish letters.
+	bool allASCII;
+	for (char& c : var_str) {
+		allASCII=(c & ~0x7f) == 0;
+		if (!allASCII)
+			break;
+		c=std::toupper(c);
+	}
+	if (allASCII)
+		return *this;
+
+	init_boost_locale1();
+
+	var_str=boost::locale::to_upper(var_str,tls_boost_locale1);
+
+	return *this;
+
 /*
-int32_t ucasemap_utf8ToLower 	( 	const UCaseMap *  	csm,
+int32_t ucasemap_utf8ToLower (
+		const UCaseMap *  	csm,
 		char *  	dest,
 		int32_t  	destCapacity,
 		const char *  	src,
 		int32_t  	srcLength,
-		UErrorCode *  	pErrorCode 
-	) 	
+		UErrorCode *  	pErrorCode
+	)
 */
 }
 
@@ -801,9 +836,29 @@ var& var::lcaser()
 
 	//cannot change to/from numeric
         //clear numeric flags in case changed from/to numeric
-        //var_typ&=pimpl::VARTYP_NOTNUMFLAGS;
+        //var_typ&=VARTYP_NOTNUMFLAGS;
 
-	return localeAwareChangeCase(1);
+	//return localeAwareChangeCase(1);
+
+	//optimise for ASCII
+	//try ASCII uppercase to start with for speed
+	//this may not be correct for all locales. eg Turkish I i İ ı mixing Latin and Turkish letters.
+	bool allASCII;
+	for (char& c : var_str) {
+		allASCII=(c & ~0x7f) == 0;
+		if (!allASCII)
+			break;
+		c=std::tolower(c);
+	}
+	if (allASCII)
+		return *this;
+
+	init_boost_locale1();
+
+	var_str=boost::locale::to_lower(var_str,tls_boost_locale1);
+
+	return *this;
+
 }
 
 var var::unique() const
@@ -820,7 +875,8 @@ var var::unique() const
 	bool founddelimiter=false;
         while (true) {
 
-                bit=this->remove(start, delimiter);
+                //bit=this->remove(start, delimiter);
+                bit=this->substr2(start, delimiter);
 
 		if (!founddelimiter && delimiter)
 			//sepchar=RM_-int(delimiter)+1;
@@ -873,7 +929,7 @@ const var var::textseq() const
 		return byteno+256;
 */
 	//get four bytes from input string since in UTF8 a unicode code point may occupy up to 4 bytes
-	std::basic_string<char32_t> str1=boost::locale::conv::utf_to_utf<char32_t>(var_str.substr(0,4));
+	std::u32string str1=boost::locale::conv::utf_to_utf<char32_t>(var_str.substr(0,4));
 
 	return int(uint32_t(str1[0]));
 }
@@ -885,66 +941,20 @@ var var::chr(const int charno) const
 }
 
 //returns unicode 1-4 byte sequences (in utf8)
+//returns empty string for some invalid unicode points like 0xD800 to 0xDFFF which is reserved for UTF16
+//0x110000 ... is invalid too
 var var::textchr(const int utf_codepoint) const
 {
 	//doesnt use *this at all (do we need a version that does?)
 
 	//return var((char) int1);
 
+	if (!utf_codepoint)
+		return std::string("\0",1);
+
 	std::wstring wstr1;
 	wstr1.push_back(wchar_t(uint32_t(utf_codepoint)));
 	return boost::locale::conv::utf_to_utf<char>(wstr1);
-
-/*
-	//make a converter
-	std::wstring_convert<std::codecvt_utf8<char32_t>,char32_t> converter;
-
-	//make a one character wide string;
-	std::u32string wstring1 {uint32_t(int1)};
-
-	//convert to utf8 and return
-	std::string result=converter.to_bytes(wstring1);
-	return result;
-*/
-
-/*	//using code from ConvertUTF.c
-
-	#define CONV_INT_TO_UTF8_MAX_OUTPUT_BYTES 4
-
-	const UTF32   u32_char    = uint(utf_codepoint);
-	const UTF32*  u32_ptr     = &u32_char;
-
-	UTF8   utf8_bytes[CONV_INT_TO_UTF8_MAX_OUTPUT_BYTES] = {0};
-	UTF8*  utf8_ptr      = &utf8_bytes[0];
-
-	//ConversionResult ConvertUTF32toUTF8 (
-	//        const UTF32** sourceStart, const UTF32* sourceEnd, 
-	//        UTF8** targetStart, UTF8* targetEnd, ConversionFlags flags);
-
-	ConversionFlags flags;
-	ConversionResult result=ConvertUTF32toUTF8 (
-		&u32_ptr, u32_ptr+1,
-		&utf8_ptr, &utf8_bytes[CONV_INT_TO_UTF8_MAX_OUTPUT_BYTES], flags);
-
-	//std::cout << "'" << utf8_bytes << "'" << std::endl;
-	return std::string((char*)(utf8_bytes));
-*/
-
-/*
-	//create a converter between string/bytes and wstring/char32
-	std::wstring_convert<std::codecvt_utf8<char32_t>,char32_t> converter;
-
-	//convert to four bytes per code point
-	std::u32string wstring1 = converter.from_bytes(var_str);
-
-	//invert only the lower 8 bits to keep the resultant code points within the same unicode 256 byte page
-	char32_t invertbits=255;
-	for (size_t ii = 0; ii < wstring1.length(); ii++)
-		wstring1[ii] = wstring1[ii] ^ invertbits;
-
-	//convert back to utf8
-	var_str=converter.to_bytes(wstring1);
-*/
 }
 
 var var::quote() const
@@ -961,7 +971,7 @@ var& var::quoter()
 	THISISSTRING()
 
         //clear numeric flags in case changed from numeric
-        var_typ&=pimpl::VARTYP_NOTNUMFLAGS;
+        var_typ&=VARTYP_NOTNUMFLAGS;
 
 	//NB this is std::string "replace" not var field replace
 	var_str.replace(0,0,"\"");
@@ -984,7 +994,7 @@ var& var::squoter()
 	THISISSTRING()
 
         //clear numeric flags in case changed from numeric
-        var_typ&=pimpl::VARTYP_NOTNUMFLAGS;
+        var_typ&=VARTYP_NOTNUMFLAGS;
 
 	//NB this is std::string "replace" not var field replace
 	var_str.replace(0,0,"'");
@@ -1007,7 +1017,7 @@ var& var::unquoter()
 	THISISSTRING()
 
         //clear numeric flags in case changed to numeric
-        var_typ&=pimpl::VARTYP_NOTNUMFLAGS;
+        var_typ&=VARTYP_NOTNUMFLAGS;
 
 	//removes MATCHING beginning and terminating " or ' characters
 	//also removes a SINGLE " or ' on the grounds that you probably want to eliminate all such characters
@@ -1095,7 +1105,7 @@ var& var::splicer(const int start1,const int length,const var& newstr)
 	}
 
         //clear numeric flags in case changed from/to numeric
-        var_typ&=pimpl::VARTYP_NOTNUMFLAGS;
+        var_typ&=VARTYP_NOTNUMFLAGS;
 
 	if (start1b>var_str.length())
 		var_str+=newstr.var_str;
@@ -1130,7 +1140,7 @@ var& var::splicer(const int start1, const var& newstr)
 		start1b=1;
 
         //clear numeric flags in case changed from/to numeric
-        var_typ&=pimpl::VARTYP_NOTNUMFLAGS;
+        var_typ&=VARTYP_NOTNUMFLAGS;
 
 	if (start1b>var_str.length())
 		var_str+=newstr.var_str;
@@ -1154,7 +1164,7 @@ var& var::transfer(var& destinationvar)
 	destinationvar.var_dbl=var_dbl;
 
 	var_str="";
-	var_typ=pimpl::VARTYP_STR;
+	var_typ=VARTYP_STR;
 
 	return destinationvar;
 }
@@ -1183,7 +1193,7 @@ const var& var::exchange(const var& var2) const
 	ISDEFINED(var2)
 
 	//intermediary copies of var2
-	int mvtypex=var2.var_typ;
+	VARTYP mvtypex=var2.var_typ;
 	mvint_t mvintx=var2.var_int;
 	double mvdblx=var2.var_dbl;
 
@@ -1286,7 +1296,7 @@ var& var::cropper()
 	}
 
         //clear numeric flags in case changed from/to numeric
-        var_typ&=pimpl::VARTYP_NOTNUMFLAGS;
+        var_typ&=VARTYP_NOTNUMFLAGS;
 
 	var_str=newstr;
 	//swap(var_str,newstr);
@@ -1346,6 +1356,53 @@ var var::convert(const var& oldchars,const var& newchars) const
 	return temp;
 }
 
+bool is_ascii(std::string string1)
+{
+	//optimise for ASCII
+	//try ASCII uppercase to start with for speed
+	//this may not be correct for all locales. eg Turkish I i İ ı mixing Latin and Turkish letters.
+	for (char& c : string1)
+	{
+		if ((c & ~0x7f) != 0)
+			return false;
+	}
+	return true;
+}
+
+template <class T>
+void converter_helper(T& var_str, const T& oldchars, const T& newchars)
+{
+	typename T::size_type pos=T::npos;
+
+	while (true)
+	{
+		//locate (backwards) any of the from characters
+		//because we might be removing characters
+		//and it is faster to remove last character first
+		pos=var_str.find_last_of(oldchars,pos);
+
+		if (pos==T::npos)
+			break;
+
+		//find which from character we have found
+		int fromcharn=int(oldchars.find(var_str[pos]));
+
+		if (fromcharn<int(newchars.length()))
+			var_str.replace(pos,1,newchars.substr(fromcharn,1));
+		else
+			var_str.erase(pos,1);
+
+		if (pos==0)
+			break;
+
+		pos--;
+	}
+	return;
+}
+
+//replaces in a string, a list of characters with another list of characters respectively
+//if the target list is shorter than the source list of characters then characters are deleted
+//
 var& var::converter(const var& oldchars,const var& newchars)
 {
 	THISIS("var& var::converter(const var& oldchars,const var& newchars)")
@@ -1353,33 +1410,29 @@ var& var::converter(const var& oldchars,const var& newchars)
 	ISSTRING(oldchars)
 	ISSTRING(newchars)
 
-	std::string::size_type pos=std::string::npos;
+	//clear numeric flags in case changed from/to numeric
+	var_typ&=VARTYP_NOTNUMFLAGS;
 
-        //clear numeric flags in case changed from/to numeric
-        var_typ&=pimpl::VARTYP_NOTNUMFLAGS;
-
-	while (true)
+	//all ASCII -> bytewise conversion
+	if (is_ascii(oldchars.var_str) && is_ascii(newchars.var_str))
 	{
-		//locate (backwards) any of the from characters
-		//because we might be removing characters
-		pos=var_str.find_last_of(oldchars.var_str,pos);
+		converter_helper(var_str,oldchars.var_str,newchars.var_str);
 
-		if (pos==std::string::npos)
-			break;
+	//any non-ASCI -> convert to wide before conversion, then back again
+	} else {
 
-		//find which from character we have found
-		int fromcharn=int(oldchars.var_str.find(var_str[pos]));
+		//convert everything to from UTF8 to wide string
+		std::u32string u32_var_str=this->to_u32string();
+		std::u32string u32_oldchars=oldchars.to_u32string();
+		std::u32string u32_newchars=newchars.to_u32string();
 
-		if (fromcharn<int(newchars.var_str.length()))
-			var_str.replace(pos,1,newchars.var_str.substr(fromcharn,1));
-		else
-			var_str.erase(pos,1);
+		//convert the wide characters
+		converter_helper(u32_var_str,u32_oldchars,u32_newchars);
 
-		if (pos==0)
-			break;
-		pos--;
+		//convert the string back to UTF8 from wide string
+		this->from_u32string(u32_var_str);
+
 	}
-
 	return *this;
 
 }
@@ -1395,7 +1448,7 @@ var& var::textconverter(const var& oldchars,const var& newchars)
 	std::string::size_type pos=std::string::npos;
 
         //clear numeric flags in case changed from/to numeric
-        var_typ&=pimpl::VARTYP_NOTNUMFLAGS;
+        var_typ&=VARTYP_NOTNUMFLAGS;
 
 	while (true)
 	{
@@ -1450,12 +1503,12 @@ bool var::isnum(void) const
 	THISISDEFINED()
 
 	//is numeric already
-	if (var_typ & pimpl::VARTYP_INTDBL)
+	if (var_typ & VARTYP_INTDBL)
 		return true;
 
 	//is known not numeric already
 	//maybe put this first if comparison operations on strings are more frequent than numeric operations on numbers
-	if (var_typ & pimpl::VARTYP_NAN)
+	if (var_typ & VARTYP_NAN)
 		return false;
 
 	//not assigned error
@@ -1483,7 +1536,7 @@ bool var::isnum(void) const
 		// . 2E		number 30-39
 		if (cc > '9')		// for sure not a number
 		{
-			var_typ=pimpl::VARTYP_NANSTR;
+			var_typ=VARTYP_NANSTR;
 			return false;
 		}
 		if (cc >= '0')
@@ -1497,7 +1550,7 @@ bool var::isnum(void) const
 				case '.':
 					if (point)	// 2nd point - is non-numeric
 					{
-						var_typ=pimpl::VARTYP_NANSTR;
+						var_typ=VARTYP_NANSTR;
 						return false;
 					}
 					point=true;
@@ -1508,14 +1561,14 @@ bool var::isnum(void) const
 					//non-numeric if +/- is not the first character or is the only character
 					if (ii)
 					{
-						var_typ=pimpl::VARTYP_NANSTR;
+						var_typ=VARTYP_NANSTR;
 						return false;
 					}
 					break;
 
 				//any other character mean non-numeric
 				default:
-					var_typ=pimpl::VARTYP_NANSTR;
+					var_typ=VARTYP_NANSTR;
 					return false;
 			}
 		}
@@ -1539,13 +1592,13 @@ bool var::isnum(void) const
 		if (var_str.length())
 		// goto nan;
 		{
-			var_typ=pimpl::VARTYP_NANSTR;
+			var_typ=VARTYP_NANSTR;
 			return false;
 		}
 
 		//zero length string is integer 0
 		var_int=0;
-		var_typ=pimpl::VARTYP_INTSTR;
+		var_typ=VARTYP_INTSTR;
 		return true;
 	}
 
@@ -1571,7 +1624,7 @@ bool var::isnum(void) const
 ///		std::string result(var_str.begin(),var_str.end());
 ///		var_dbl=atof(result.c_str());
 		var_dbl=strtod(var_str.c_str(), 0);
-		var_typ=pimpl::VARTYP_DBLSTR;
+		var_typ=VARTYP_DBLSTR;
 	}
 	else
 	{
@@ -1582,7 +1635,7 @@ bool var::isnum(void) const
 ///		std::string result(var_str.begin(),var_str.end());
 ///		var_int=atoi(result.c_str());
 		var_int=strtol(var_str.c_str(), 0, 10);
-		var_typ=pimpl::VARTYP_INTSTR;
+		var_typ=VARTYP_INTSTR;
 	}
 	//indicate isNumeric
 	return true;
@@ -1746,20 +1799,22 @@ var var::count(const var& substrx) const
 	THISISSTRING()
 	ISSTRING(substrx)
 
-	std::string substr=substrx.var_str;
-	if (substr=="")
+	if (substrx.var_str=="")
 		return 0;
+
+	std::string::size_type substr_len=substrx.var_str.length();
 
 	//find the starting position of the field or return ""
 	std::string::size_type start_pos=0;
 	int fieldno=0;
 	while (true)
 	{
-		start_pos=var_str.find(substr,start_pos);
+		start_pos=var_str.find(substrx.var_str,start_pos);
 		//past of of string?
 		if (start_pos==std::string::npos)
 			return fieldno;
-		start_pos++;
+		//start_pos++;
+		start_pos+=substr_len;
 		fieldno++;
 	}
 
@@ -1791,17 +1846,16 @@ var var::index2(const var& substrx,const int startchar1) const
 	THISISSTRING()
 	ISSTRING(substrx)
 
-	//convert to a string for .find
-	std::string substr=substrx.var_str;
-	if (substr=="")
+	if (substrx.var_str=="")
 		return var(0);
 
 	//find the starting position of the field or return ""
 	std::string::size_type start_pos=startchar1-1;
-	start_pos=var_str.find(substr,start_pos);
+	start_pos=var_str.find(substrx.var_str,start_pos);
 
 	//past of of string?
-	if (start_pos==std::string::npos) return var(0);
+	if (start_pos==std::string::npos)
+		return var(0);
 
 	return var((int)start_pos+1);
 
@@ -1813,12 +1867,11 @@ var var::index(const var& substrx,const int occurrenceno) const
 	THISISSTRING()
 	ISSTRING(substrx)
 
-	//convert to a string for .find
-	std::string substr=substrx.var_str;
-	if (substr=="")
+	if (substrx.var_str=="")
 		return var(0);
 
 	std::string::size_type start_pos=0;
+	std::string::size_type substr_len=substrx.var_str.length();
 
 	//negative and 0th occurrence mean the first
 	int countdown=occurrenceno>=1?occurrenceno:1;
@@ -1827,7 +1880,7 @@ var var::index(const var& substrx,const int occurrenceno) const
 	{
 
 		//find the starting position of the field or return ""
-		start_pos=var_str.find(substr,start_pos);
+		start_pos=var_str.find(substrx.var_str,start_pos);
 
 		//past of of string?
 		if (start_pos==std::string::npos)
@@ -1840,7 +1893,8 @@ var var::index(const var& substrx,const int occurrenceno) const
 			return ((int)start_pos+1);
 
 		//skip to character after substr (not just next character)
-		start_pos+=substr.length();
+		//start_pos++;
+		start_pos+=substr_len;
 
 	}
 
@@ -1902,7 +1956,7 @@ var var::abs() const
 	THISISNUMERIC()
 
 	//prefer double
-	if (var_typ & pimpl::VARTYP_DBL)
+	if (var_typ & VARTYP_DBL)
 	{
 		if (var_dbl<0)
 			return -var_dbl;
@@ -1928,10 +1982,10 @@ var var::mod(const var& divisor) const
 	//from c++11 % the sign of the result after a negative divisor is always the same as the dividend
 
 	//prefer double dividend
-	if (var_typ & pimpl::VARTYP_DBL)
+	if (var_typ & VARTYP_DBL)
 	{
 		//prefer double divisor
-		if (divisor.var_typ & pimpl::VARTYP_DBL)
+		if (divisor.var_typ & VARTYP_DBL)
 		{
 			//return fmod(double(var_int),divisor.var_dbl);
 			if ((var_dbl<0 && divisor.var_dbl>=0) || (divisor.var_dbl<0 && var_dbl>=0))
@@ -1944,7 +1998,7 @@ var var::mod(const var& divisor) const
 		{
 			divisor.var_dbl=double(divisor.var_int);
 			//following would cache the double value but is it worth it?
-			//divisor.var_typ=divisor.var_typ & pimpl::VARTYP_DBL;
+			//divisor.var_typ=divisor.var_typ & VARTYP_DBL;
 
 			if ((var_dbl<0 && divisor.var_int>=0) || (divisor.var_int<0 && var_dbl>=0))
 				//multivalue version of mod
@@ -1956,12 +2010,12 @@ var var::mod(const var& divisor) const
 	else
 	{
 		//prefer double divisor
-		if (divisor.var_typ & pimpl::VARTYP_DBL)
+		if (divisor.var_typ & VARTYP_DBL)
 		{
 
 			var_dbl=double(var_int);
 			//following would cache the double value but is it worth it?
-			//var_typ=var_typ & pimpl::VARTYP_DBL;
+			//var_typ=var_typ & VARTYP_DBL;
 
 			if ((var_int<0 && divisor.var_dbl>=0) || (divisor.var_dbl<0 && var_int>=0))
 				//multivalue version of mod
@@ -1990,7 +2044,7 @@ var var::mod(const int divisor) const
 	//see ::mod(const var& divisor) for comments about c++11 % operator
 
 	//prefer double dividend
-	if (var_typ & pimpl::VARTYP_DBL)
+	if (var_typ & VARTYP_DBL)
 	{
 			if ((var_dbl<0 && divisor>=0) || (divisor<0 && var_dbl>=0))
 			{
@@ -2024,7 +2078,7 @@ var var::sin() const
 	THISISNUMERIC()
 
 	//prefer double
-	if (var_typ & pimpl::VARTYP_DBL)
+	if (var_typ & VARTYP_DBL)
 		return std::sin(var_dbl*M_PI/180);
 	else
 		return std::sin(double(var_int)*M_PI/180);
@@ -2039,7 +2093,7 @@ var var::cos() const
 	THISISNUMERIC()
 
 	//prefer double
-	if (var_typ & pimpl::VARTYP_DBL)
+	if (var_typ & VARTYP_DBL)
 		return std::cos(var_dbl*M_PI/180);
 	else
 		return std::cos(double(var_int)*M_PI/180);
@@ -2054,7 +2108,7 @@ var var::tan() const
 	THISISNUMERIC()
 
 	//prefer double
-	if (var_typ & pimpl::VARTYP_DBL)
+	if (var_typ & VARTYP_DBL)
 		return std::tan(var_dbl*M_PI/180);
 	else
 		return std::tan(double(var_int)*M_PI/180);
@@ -2069,7 +2123,7 @@ var var::atan() const
 	THISISNUMERIC()
 
 	//prefer double
-	if (var_typ & pimpl::VARTYP_DBL)
+	if (var_typ & VARTYP_DBL)
 		return std::atan(var_dbl)/M_PI*180;
 	else
 		return std::atan(double(var_int))/M_PI*180;
@@ -2084,7 +2138,7 @@ var var::loge() const
 	THISISNUMERIC()
 
 	//prefer double
-	if (var_typ & pimpl::VARTYP_DBL)
+	if (var_typ & VARTYP_DBL)
 		return std::log(var_dbl);
 	else
 		return std::log(double(var_int));
@@ -2099,10 +2153,10 @@ var var::sqrt() const
 	THISISNUMERIC()
 
 	//prefer double
-	if (var_typ & pimpl::VARTYP_DBL)
+	if (var_typ & VARTYP_DBL)
 		return std::sqrt(var_dbl);
 
-//	if (var_typ & pimpl::VARTYP_INT)
+//	if (var_typ & VARTYP_INT)
 		return std::sqrt(double(var_int));
 
 	throw MVException("sqrt(unknown mvtype=" ^ var(var_typ) ^ ")");
@@ -2115,7 +2169,7 @@ var var::pwr(const var& exponent) const
 	ISNUMERIC(exponent)
 
 	//prefer double
-	if (var_typ & pimpl::VARTYP_DBL)
+	if (var_typ & VARTYP_DBL)
 		return std::pow(var_dbl,exponent.toDouble());
 	else
 		return std::pow(double(var_int),exponent.toDouble());
@@ -2130,7 +2184,7 @@ var var::exp() const
 	THISISNUMERIC()
 
 	//prefer double
-	if (var_typ & pimpl::VARTYP_DBL)
+	if (var_typ & VARTYP_DBL)
 		return std::exp(var_dbl);
 	else
 		return std::exp(double(var_int));

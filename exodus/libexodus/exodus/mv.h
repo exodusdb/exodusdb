@@ -21,6 +21,9 @@ THE SOFTWARE.
 */
 
 
+#ifndef MV_H
+#define MV_H 1
+
 //prevent swig perl linking errors about win32_abort win32_select win32_connect
 #if defined(SWIGPERL)
 #if defined connect
@@ -34,11 +37,8 @@ THE SOFTWARE.
 #endif
 #endif
 
-#ifndef MV_H
-#define MV_H 1
-
-#define EXODUS_RELEASE "11.5"
-#define EXODUS_PATCH "11.5.0"
+#define EXODUS_RELEASE "19.5"
+#define EXODUS_PATCH "19.5.0"
 
 //if installing with autotools then for latest version of boost and other installation macro
 //download the snapshot from here. AX_BOOST_DATE_TIME etc
@@ -47,24 +47,6 @@ THE SOFTWARE.
 //http://stackoverflow.com/questions/538134/exporting-functions-from-a-dll-with-dllexport
 //Using dllimport and dllexport in C++ Classes
 //http://msdn.microsoft.com/en-us/library/81h27t8c(VS.80).aspx
-
-#ifdef __MINGW32__
-#	define NARROW_IO
-#	define wcout cout
-#	define wostringstream ostringstream
-#	define wstringstream stringstream
-#	define wcerr cerr
-#	define wofstream ofstream
-#	define wifstream ifstream
-#	define wpath path
-#	define wregex regex
-#	define wdirectory_iterator directory_iterator
-#	define Tstring string
-#	define toTstring(item) item.toString()
-#else
-#	define toTstring(item) item.var_str
-#	define Tstring wstring
-#endif
 
 #if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
 #	ifdef BUILDING_LIBRARY
@@ -104,22 +86,6 @@ THE SOFTWARE.
 //else
 //	var_dbl=long long int(var_dbl-0.5);
 
-//pimpl forward declaration
-//#ifdef _DEBUG
-//forced now that pimpl isnt private OR even a pointer!
-#if 1
-	//IF was private pointer then only required for debugging
-	//and couldcan be commented out in production code
-#ifdef SWIG
-#	include "mvimpl.h"
-#else
-#	include <exodus/mvimpl.h>
-#endif
-
-#else
-	class pimpl;
-#endif
-
 /*		gcc	msc
 was for 32bit (needs revising after int became long long (64bit/8byte even in 32bit impl)
 sizeof
@@ -131,9 +97,7 @@ int:	4	4
 double:	8	8
 var:	20	48
 */
-//static const unsigned int mvtypemask=0xffffff80;
-static const char mvtypemask=0x80;
-//static const unsigned int mvtypemask=0xfffffff0;
+
 /* this has been resolved somehow without removing the automatic conversion to int:
 Remove automatic conversion to int which takes precedence over the automatic conversion to bool
 and therefore causes a non-numeric error if you include a non-numeric value in an if statement like
@@ -143,7 +107,9 @@ and therefore causes a non-numeric error if you include a non-numeric value in a
 
 */
 
-//#include <iostream>
+//only for some emergency debugging
+#include <iostream>
+
 #include <iosfwd>
 #include <string>
 #include <vector>
@@ -161,8 +127,6 @@ and therefore causes a non-numeric error if you include a non-numeric value in a
 
 //http://www.viva64.com/content/articles/64-bit-development/?f=20_issues_of_porting_C++_code_on_the_64-bit_platform.html
 typedef long long mvint_t;
-typedef std::string xstring;
-typedef char xchar;
 
 namespace exodus {
 
@@ -175,8 +139,6 @@ namespace exodus {
 #define LASTDELIMITERCHARNOPLUS1 0x20
 
 //also defined in extract.c and exodusmacros.h
-
-#if 1
 
 //leading and trailing _ char* versions of classic pick delimiters
 //also in ADECOM
@@ -211,58 +173,9 @@ namespace exodus {
 #define DQ_ '\"'
 #define SQ_ '\''
 
-#else //old wstring UTF16/UTF32 version
-
-//leading and trailing _ wchar* versions of classic pick delimiters
-//_RM_, _RM and RM_ versions (wchar*, char* and wchar respectively)
-//also in ADECOM
-#define _RM_ L"\u07FF"	//Record Mark
-#define _FM_ L"\u07FE"	//Field Mark
-#define _VM_ L"\u07FD"	//Value Mark
-#define _SM_ L"\u07FC"	//Subvalue Mark
-#define _TM_ L"\u07FB"	//Text Mark
-#define _STM_ L"\u07FA"	//Subtext Mark
-#define _SSTM_ L"\u07F9" //SubSubtext Mark
-
-//aliases for different implementations of multivalue
-#define _IM_ _RM_
-#define _AM_ _FM_
-#define _SVM_ _SM_
-
-#define _DQ_ L"\""
-#define _SQ_ L"\'"
-
-//trailing _ wchar versions of classic pick delimiters
-//_RM_, _RM and RM_ versions (wchar*, char* and wchar respectively)
-#define RM_ L'\u07FF'	//Record Mark
-#define FM_ L'\u07FE'	//Field Mark
-#define VM_ L'\u07FD'	//Value Mark
-#define SM_ L'\u07FC'	//Subvalue Mark
-#define TM_ L'\u07FB'	//Text Mark
-#define STM_ L'\u07FA'	//Subtext Mark
-#define SSTM_ L'\u07F9' //SubSubtext Mark
-
-//aliases for different implementations of multivalue
-#define IM_ RM_
-#define AM_ FM_
-#define SVM_ SM_
-
-#define DQ_ L'\"'
-#define SQ_ L'\''
-
-#endif
-
 //the argument for utf16 http://www.unicode.org/notes/tn12/ (utf8/32 cannot handle binary because of illegal byte sequences)
 //win32/java/icu/python is utf16 but situation is not so clear on unix (where char is 32bit)
 //but see http://std.dkuug.dk/JTC1/SC22/WG14/www/docs/n1040.pdf for <uchar.h>
-
-//default to allow conversion from char to allow writing xx="abc" instead of xx=L"abc" because ease of use comes first for the application programmer
-//but dont allow it in the library itself because performance comes first
-#ifdef MV_NO_NARROW
-	#define MV_CONSTRUCTION_FROM_CHAR_EXPLICIT explicit
-#else
-	#define MV_CONSTRUCTION_FROM_CHAR_EXPLICIT
-#endif
 
 class dim;
 class var__extractreplace;
@@ -271,10 +184,10 @@ class var__extractreplace;
 #ifndef SWIG
 
 //TODO ensure locale doesnt produce like 123.456,78
-xstring intToString(int int1);
+std::string intToString(int int1);
 
 //TODO ensure locale doesnt produce like 123.456,78
-xstring dblToString(double double1);
+std::string dblToString(double double1);
 
 #endif
 
@@ -314,11 +227,141 @@ As a result, symmetric operators like + and - are generally implemented as non-m
 //http://www.parashift.com/c++-faq-lite/virtual-functions.html#faq-20.7
 
 //on linux, size is 56 bytes
-//wstring:  32
-//int:      4
-//double:   8
-//char:  4
-//var:      56
+//string:	32
+//int:		8
+//double:	8
+//char:		4
+//var:		56
+
+#include <cstdint>
+
+class VARTYP
+{
+public:
+	//constructors from uint and it
+	//VARTYP(uint rhs) {flags=rhs;std::cout<<"uint32 ctor "<< rhs << std::endl;};
+	//VARTYP(int rhs) {flags=rhs;std::cout<<"int ctor "<< rhs << std::endl;if (rhs==9999) throw "kjhkjhkkjh";};
+	VARTYP(uint rhs) : flags_(rhs) {};
+
+	//copy constructor
+	//VARTYP(const VARTYP& rhs) {flags=rhs.flags;std::cout<<"copy ctor "<< rhs.flags << std::endl;};
+	VARTYP(const VARTYP& rhs) : flags_(rhs.flags_) {};
+
+	//default constructor
+	//VARTYP() : flags(0) {};
+	//VARTYP() {flags=0;std::cout<<"def ctor1"<<std::endl;};
+	//VARTYP() : flags{} {std::cout<<"def ctor2"<<std::endl;};
+	//VARTYP() flags(0) {};
+
+	//assign
+	VARTYP& operator = (const uint newflags) {flags_=newflags;};
+
+	//bitwise mutators
+	VARTYP& operator ^= (const uint rhs) {flags_ ^= rhs;return *this;};
+	VARTYP& operator |= (const uint rhs) {flags_ |= rhs;return *this;};
+	VARTYP& operator &= (const uint rhs) {flags_ &= rhs;return *this;};
+
+	//logical comparison
+	bool operator == (const uint rhs) const {return flags_ == rhs;};
+	bool operator != (const uint rhs) const {return flags_ != rhs;};
+	bool operator == (const VARTYP rhs) const {return flags_ == rhs.flags_;};
+	bool operator != (const VARTYP rhs) const {return flags_ != rhs.flags_;};
+
+	//bitwise accessors
+	VARTYP operator &  (const uint rhs) const {return uint(flags_ &  rhs);};
+	VARTYP operator |  (const uint rhs) const {return uint(flags_ |  rhs);};
+	VARTYP operator ~  () const {return VARTYP(~flags_);};
+
+	//boolean - not explicit so we can do "if (var_type==something)"
+	operator bool() const {return flags_!=0;};
+
+//private:
+	//initialisation
+	//mutable
+	uint flags_ {0};
+
+};
+
+//WARNING these VARTYP constants must be initialised before any var variables are
+//NOT they are declared inline which presumably makes them the same in all compilation units
+//but it also seems to ensure that they are initialised BEFORE any var variables
+//theoretically they should be because C++ says 
+//this is mandatory because initialising var variables REQUIRES these constants to be available with their correct values
+//otherwise any such var, when used later on, will throw Unassigned Variable Used since its var_typ will be zero
+
+#if 1
+
+//#define THISIS(OBJECT) \
+//        static const char* functionname=OBJECT;
+
+#define VTC(VARNAME,VARVALUE) \
+	inline const uint VARNAME {VARVALUE};
+
+//throw an exception if used an unassigned variable
+//inline const VARTYP VARTYP_UNA =0x0;
+VTC(VARTYP_UNA,0x0)
+
+//assigned string - unknown if numeric or not
+VTC(VARTYP_STR,0x1)
+
+//indicated known non-numeric string
+VTC(VARTYP_NAN,0x2)
+
+//all following are numeric
+VTC(VARTYP_INT,0x4)
+VTC(VARTYP_DBL,0x8)
+VTC(VARTYP_OSFILE,0x10)
+VTC(VARTYP_DBCONN,0x20)
+
+VTC(VARTYP_DESTRUCTED,0xFFFFF0)
+
+//const char mvtypemask=0x80;
+VTC(VARTYP_MASK,0x80)
+
+//flag combinations
+VTC(VARTYP_INTDBL,VARTYP_INT | VARTYP_DBL)
+VTC(VARTYP_INTSTR,VARTYP_INT | VARTYP_STR)
+VTC(VARTYP_DBLSTR,VARTYP_DBL | VARTYP_STR)
+VTC(VARTYP_NANSTR,VARTYP_NAN | VARTYP_STR)
+VTC(VARTYP_NOTNUMFLAGS,~(VARTYP_INT | VARTYP_DBL | VARTYP_NAN))
+
+VTC(VARTYP_NANSTR_OSFILE,VARTYP_NANSTR | VARTYP_OSFILE)
+VTC(VARTYP_NANSTR_DBCONN,VARTYP_NANSTR | VARTYP_DBCONN)
+
+#else
+
+//throw an exception if used an unassigned variable
+//#define VARTYP VARTYP_UNA =0x0;
+inline const VARTYP_UNA =0x0;
+
+//assigned string - unknown if numeric or not
+inline const VARTYP VARTYP_STR =0x1;
+
+//indicated known non-numeric string
+inline const VARTYP VARTYP_NAN =0x2;
+
+//all following are numeric
+inline const VARTYP VARTYP_INT {0x4};
+inline const VARTYP VARTYP_DBL {0x8};
+inline const VARTYP VARTYP_OSFILE {0x10};
+inline const VARTYP VARTYP_DBCONN {0x20};
+
+inline const VARTYP VARTYP_DESTRUCTED {0xFFFFF0};
+
+//const char mvtypemask=0x80;
+inline const VARTYP VARTYP_MASK {0x80};
+
+//flag combinations
+inline const VARTYP VARTYP_INTDBL =VARTYP_INT | VARTYP_DBL;
+inline const VARTYP VARTYP_INTSTR =VARTYP_INT | VARTYP_STR;
+inline const VARTYP VARTYP_DBLSTR =VARTYP_DBL | VARTYP_STR;
+inline const VARTYP VARTYP_NANSTR =VARTYP_NAN | VARTYP_STR;
+inline const VARTYP VARTYP_NOTNUMFLAGS =~(VARTYP_INT|VARTYP_DBL|VARTYP_NAN);
+
+inline const VARTYP VARTYP_NANSTR_OSFILE =VARTYP_NANSTR | VARTYP_OSFILE;
+inline const VARTYP VARTYP_NANSTR_DBCONN =VARTYP_NANSTR | VARTYP_DBCONN;
+
+#endif
 
 //class var
 class DLL_PUBLIC var
@@ -346,7 +389,8 @@ public:
 
 	double toDouble() const;
 
-	xstring toWString() const;
+	std::u32string to_u32string() const;
+	void from_u32string(std::u32string) const;
 
 	std::string toString() const;
 
@@ -388,13 +432,13 @@ public:
 	//constructor for char to create
 #ifndef SWIG
 //	MV_CONSTRUCTION_FROM_CHAR_EXPLICIT
-	var(const char char1);
+	var(const char char1) noexcept;
 #endif
 	//constructor for char memory block
 //	MV_CONSTRUCTION_FROM_CHAR_EXPLICIT
 	var(const char* cstr1, const size_t int1);
 
-	//swig java duplicates this with var(xstring&) above
+	//swig java duplicates this with var(std::string&) above
 #if !defined(SWIGJAVA) && !defined(SWIGCSHARP)
 	//constructor for std::string
 	var(const std::string& str1);
@@ -402,19 +446,19 @@ public:
 
 	//constructor for bool (dont allow this if no constructor for char* otherwise " " is converted to 1 in widechar only compilations
 //	MV_CONSTRUCTION_FROM_CHAR_EXPLICIT
-	var(const bool bool1);
+	var(const bool bool1) noexcept;
 
 	//constructor for int
-	var(const int int1);
+	var(const int int1) noexcept;
 
 //suppressing for now since ambiguous with int
 //#if 0
 	//constructor for long long
-	var(const long long longlong1);
+	var(const long long longlong1) noexcept;
 //#endif
 
 	//constructor for double
-	var(const double double1);
+	var(const double double1) noexcept;
 
 
 	//AUTOMATIC CONVERSIONS TO bool, void* and int
@@ -461,6 +505,9 @@ public:
 //msvc (at least) cant do without this since it seems unwilling to convert void* as a bool
 //therefore we include it and restrict indexing on ints and not var eg for (int ii=0 .... instead of for (var ii=0 ...
 //#ifndef _MSVC
+	//explicit new in c++11 still allows implicit conversion in places where bool is definitely required ie in if (xx) or aa && bb
+	//but we do not use is because allowing implicit conversion to bool in argument lists is convenient
+	//explicit
 	operator bool() const;
 //#endif
 
@@ -494,16 +541,6 @@ public:
 #endif
 	//EXPLICIT CONVERSIONS TO
 	/////////////////////////
-
-	//wstring - replicates toWString()
-	//would allow the usage of any xstring function but may result
-	//in a lot of compilation failures due to "ambiguous overload"
-	//unfortunately there is no "explicit" keyword as for constructors - coming in C++0X
-	//for now prevent this to ensure efficient programming
-	//maybe optionally allow them using a compiler macro?
-	#ifndef MV_NO_NARROW
-		operator xstring() const;
-	#endif
 
 	//string - replicates toString()
 	//would allow the usage of any std::string function but may result
@@ -565,7 +602,7 @@ public:
 	var& operator= (const char* char2);
 
 	//=string
-	var& operator= (const xstring string2);
+	var& operator= (const std::string string2);
 
 	//=var
 	var& operator^=(const var& var1);
@@ -583,7 +620,7 @@ public:
 	var& operator^= (const char* char2);
 
 	//=string
-	var& operator^= (const xstring string2);
+	var& operator^= (const std::string string2);
 
 	/*
 	//postfix returning void so cannot be used in expressions (avoid unreadable programs)
@@ -704,10 +741,8 @@ public:
 	DLL_PUBLIC friend  bool operator<=> (const char*,const var&);
 	DLL_PUBLIC friend  bool operator<=> (const int,const var&);
 	DLL_PUBLIC friend  bool operator<=> (const double,const var&);
-//#ifndef MV_NO_NARROW
 	DLL_PUBLIC friend  bool operator<=> (const var&,const char*);
 	DLL_PUBLIC friend  bool operator<=> (const char*,const var&);
-//#endif
 #else
 	DLL_PUBLIC friend  bool operator< (const var&,const var&);
 	DLL_PUBLIC friend  bool operator< (const var&,const char*);
@@ -716,10 +751,8 @@ public:
 	DLL_PUBLIC friend  bool operator< (const char*,const var&);
 	DLL_PUBLIC friend  bool operator< (const int,const var&);
 	DLL_PUBLIC friend  bool operator< (const double,const var&);
-//#ifndef MV_NO_NARROW
 	DLL_PUBLIC friend  bool operator< (const var&,const char*);
 	DLL_PUBLIC friend  bool operator< (const char*,const var&);
-//#endif
 
 	DLL_PUBLIC friend  bool operator<= (const var&,const var&);
 	DLL_PUBLIC friend  bool operator<= (const var&,const char*);
@@ -728,10 +761,8 @@ public:
 	DLL_PUBLIC friend  bool operator<= (const char*,const var&);
 	DLL_PUBLIC friend  bool operator<= (const int,const var&);
 	DLL_PUBLIC friend  bool operator<= (const double,const var&);
-//#ifndef MV_NO_NARROW
 	DLL_PUBLIC friend  bool operator<= (const var&,const char*);
 	DLL_PUBLIC friend  bool operator<= (const char*,const var&);
-//#endif
 
 	DLL_PUBLIC friend  bool operator> (const var&,const var&);
 	DLL_PUBLIC friend  bool operator> (const var&,const char*);
@@ -740,10 +771,8 @@ public:
 	DLL_PUBLIC friend  bool operator> (const char*,const var&);
 	DLL_PUBLIC friend  bool operator> (const int,const var&);
 	DLL_PUBLIC friend  bool operator> (const double,const var&);
-//#ifndef MV_NO_NARROW
 	DLL_PUBLIC friend  bool operator> (const var&,const char*);
 	DLL_PUBLIC friend  bool operator> (const char*,const var&);
-//#endif
 
 	DLL_PUBLIC friend  bool operator>= (const var&,const var&);
 	DLL_PUBLIC friend  bool operator>= (const var&,const char*);
@@ -752,10 +781,8 @@ public:
 	DLL_PUBLIC friend  bool operator>= (const char*,const var&);
 	DLL_PUBLIC friend  bool operator>= (const int,const var&);
 	DLL_PUBLIC friend  bool operator>= (const double,const var&);
-//#ifndef MV_NO_NARROW
 	DLL_PUBLIC friend  bool operator>= (const var&,const char*);
 	DLL_PUBLIC friend  bool operator>= (const char*,const var&);
-//#endif
 
 	DLL_PUBLIC friend  bool operator== (const var&,const var&);
 	DLL_PUBLIC friend  bool operator== (const var&,const char*);
@@ -766,10 +793,8 @@ public:
 	DLL_PUBLIC friend  bool operator== (const int,const var&);
 	DLL_PUBLIC friend  bool operator== (const double,const var&);
 	DLL_PUBLIC friend  bool operator== (const bool,const var&);
-//#ifndef MV_NO_NARROW
 	DLL_PUBLIC friend  bool operator== (const var&,const char*);
 	DLL_PUBLIC friend  bool operator== (const char*,const var&);
-//#endif
 
 	DLL_PUBLIC friend  bool operator!= (const var&,const var&);
 	DLL_PUBLIC friend  bool operator!= (const var&,const char*);
@@ -780,10 +805,8 @@ public:
 	DLL_PUBLIC friend  bool operator!= (const int,const var&);
 	DLL_PUBLIC friend  bool operator!= (const double,const var&);
 	DLL_PUBLIC friend  bool operator!= (const bool,const var&);
-//#ifndef MV_NO_NARROW
 	DLL_PUBLIC friend  bool operator!= (const var&,const char*);
 	DLL_PUBLIC friend  bool operator!= (const char*,const var&);
-//#endif
 #endif
 	//unary operators +var -var !var
 	DLL_PUBLIC friend  var operator+ (const var&);
@@ -847,13 +870,9 @@ public:
 	bool input(const var& prompt, const int nchars=0);
 	bool eof() const;
 
-#if defined __MINGW32__
 	DLL_PUBLIC friend std::istream& operator>> (std::istream& istream1, var& var1);
 	DLL_PUBLIC friend  std::ostream& operator<< (std::ostream& ostream1, const var& var1);
-#else
-	DLL_PUBLIC friend std::istream& operator>> (std::istream& istream1, var& var1);
-	DLL_PUBLIC friend  std::ostream& operator<< (std::ostream& ostream1, const var& var1);
-#endif
+
 	//friend bool operator<<(const var&);
 
 	//VARIABLE CONTROL
@@ -864,6 +883,7 @@ public:
 	var& transfer(var& destinationvar);
 	const var& exchange(const var& var2) const;
 	var clone() const;
+
 	/*no implemented yet
 	var addressof() const;
 	void clear();
@@ -904,18 +924,18 @@ public:
 //	var chr() const;
 	//version 1 chr - only char 0 - 255 returned in a single byte
 	//bytes 128-255 are not valid utf-8 so cannot be written to database/postgres
-	var chr(const int num) const;
+	var chr(const int num) const;//ASCII
 	//version 2 textchr - returns utf8 byte sequences for all unicode code points
 	//not uint so to get utf codepoints > 2^63 must provide negative ints
 	//not providing implicit constructor from var to uint due to getting ambigious conversions since int and uint are parallel priority in c++ implicit conversions
-	var textchr(const int num) const;
+	var textchr(const int num) const;//UTF8
 	var str(const int num) const;
 	var space() const;
 
 	//STRING INFO
 	bool match(const var& matchstr,const var& options DEFAULTNULL) const;
-	const var seq() const;
-	const var textseq() const;
+	const var seq() const;//ASCII
+	const var textseq() const;//TEXT
 	var dcount(const var& substrx) const;
 	var count(const var& substrx) const;
 #ifndef SWIGPERL
@@ -927,21 +947,19 @@ public:
 	var len() const;
 	const char* data() const;
 	bool isnum() const;
-	//bool isnum_old() const;
-//	bool isalpha() const;
 
-	//STRING MANIPULATIONS (all return var& and are not const)
+	//STRING MUTATION (all return var& and are not const)
 	var& converter(const var& oldchars,const var& newchars);
-	var& swapper(const var& oldstr,const var& newstr,const var& options DEFAULTNULL);
+	var& swapper(const var& whatstr,const var& withstr);
+	var& replacer(const var& regexstr, const var& replacementstr, const var& options DEFAULTNULL);
 	var& splicer(const int start1,const int length,const var& str);
 	var& splicer(const int start1,const var& str);
 	var& quoter();
 	var& squoter();
 	var& unquoter();
-	var& ucaser();
-	var& lcaser();
-	var& inverter();//ASCII
-	var& textinverter();//UTF8
+	var& ucaser();//utf8
+	var& lcaser();//utf8
+	var& inverter();//utf8
 	var& trimmer(const char* trimchar DEFAULTSPACE);
 	var& trimmerf(const char* trimchar DEFAULTSPACE);
 	var& trimmerb(const char* trimchar DEFAULTSPACE);
@@ -955,16 +973,16 @@ public:
 
 	//STRING FILTERS
 	var convert(const var& oldchars,const var& newchars) const;
-	var swap(const var& oldstr,const var& newstr,const var& options DEFAULTNULL) const;
+	var swap(const var& whatstr,const var& withstr) const;
+	var replace(const var& regexstr, const var& replacementstr, const var& options DEFAULTNULL) const;
 	var splice(const int start1,const int length,const var& str) const;
 	var splice(const int start1,const var& str) const;
 	var quote() const;
 	var squote() const;
 	var unquote() const;
-	var ucase() const;
-	var lcase() const;
-	var invert() const;//ASCII
-	var textinvert() const;//UTF8
+	var ucase() const;//utf8
+	var lcase() const;//utf8
+	var invert() const;//utf8
 	var trim(const char* trimchar DEFAULTSPACE) const;
 	var trimf(const char* trimchar DEFAULTSPACE) const;
 	var trimb(const char* trimchar DEFAULTSPACE) const;
@@ -980,16 +998,38 @@ public:
 	//see also dim.split()
 	dim split() const;
 
-	//STRING EXTRACTION
-	//[x,y]
-	//var.s(start,length) substring
+	//STRING EXTRACTION varx[x,y] -> varx.substr(start,length)
+
+	//NOTE char=byte ... NOT utf-8 code point
+	//NOTE 1 based indexing. byte 1 = first byte as per mv conventions for all indexing (except offset in osbread)
+	//NOTE start byte may be negative to count backwards -1=last byte
+
+	//v1 - returns bytes from some char number up to the end of the string
+	//equivalent to substr(x) from javascript except it is 1 based
 	var substr(const int startindex) const;
+
+	//v2 - returns a given number of bytes starting from some byte
+	//both start and length can be negative
+	//negative length extracts characters up to the starting byte IN REVERSE 'abcde'.substr(4,-3) -> 'dcb'
 	var substr(const int startindex,const int length) const;
+
+	//v3 - returns bytes from some byte number upto the first of a given list of bytes
+	//this is something like std::string::find_first_of but doesnt return the delimiter found
 	var substr(const int startindex, const var& delimiterchars, int& endindex) const;
-	var remove(var& startindex, var& delimiterno) const;
+
+	//a weird one. was named "remove" in pick. notably used in nlist to print parallel columns of mixed combinations of multivalues/subvalues and text marks
+	// correctly lined up mv to mv, sv to sv, tm to tm even when particular columns were missing some vm/sm/tm
+	//it is like substr(startindex,delimiterbytes,endindex) except that the delimiter bytes are hard coded as the usual RM/FM/VM/SM/TM/STM
+	// except that it updates the startstopindex to point one after found delimiter byte and returns the delimiter no (1-6)
+	//if no delimiter byte is found then it returns bytes up to the end of the string, sets startstopindex to after tne end of the string and returns delimiter no 0
+	//NOTE that it does NOT remove anything from the source string
+	//var remove(var& startindex, var& delimiterno) const;
+	var substr2(var& startstopindex, var& delimiterno) const;
+
 	var index(const var& substr,const int occurrenceno=1) const;
 	var index2(const var& substr,const int startchar1=1) const;
 	var field(const var& substrx,const int fieldnx,const int nfieldsx=1) const;
+	//version that treats fieldn -1 as the last field, -2 the penultimate field etc. - TODO should probably make field() do this
 	var field2(const var& substrx,const int fieldnx,const int nfieldsx=1) const;
 
 	//I/O CONVERSION
@@ -1024,16 +1064,18 @@ public:
 	//-er version to update too?
 	//var& remover(var& startindex,var& length) const;
 
-	var replace(const int fieldno,const int valueno,const int subvalueno,const var& replacement) const;
-	var replace(const int fieldno,const int valueno,const var& replacement) const;
-	var replace(const int fieldno,const var& replacement) const;
+	var pickreplace(const int fieldno,const int valueno,const int subvalueno,const var& replacement) const;
+	var pickreplace(const int fieldno,const int valueno,const var& replacement) const;
+	var pickreplace(const int fieldno,const var& replacement) const;
 
 	var insert(const int fieldno,const int valueno,const int subvalueno,const var& insertion) const;
 //to be implemented?
 //	var insert(const int fieldno,const int valueno,const var& insertion) const;
 //	var insert(const int fieldno,const var& insertion) const;
 
-	var erase(const int fieldno, const int valueno=0, const int subvalueno=0) const;
+	///remove() was delete() in pick/arev
+	//var erase(const int fieldno, const int valueno=0, const int subvalueno=0) const;
+	var remove(const int fieldno, const int valueno=0, const int subvalueno=0) const;
 
 	//.a(...) stands for .attribute(...) or extract(...)
 	//pick/revelation
@@ -1057,7 +1099,8 @@ public:
 	var& inserter(const int fieldno,const int valueno,const var& insertion);
 	var& inserter(const int fieldno,const var& insertion);
 
-	var& eraser(const int fieldno, const int valueno=0, const int subvalueno=0);
+	//var& eraser(const int fieldno, const int valueno=0, const int subvalueno=0);
+	var& remover(const int fieldno, const int valueno=0, const int subvalueno=0);
 	//-er version could be extract and erase in one go
 	//var& extracter(int fieldno,int valueno=0,int subvalueno=0) const;
 
@@ -1242,14 +1285,14 @@ private:
 #ifdef _MSC_VER
 	#pragma warning( disable: 4251 )
 #endif
-	mutable xstring var_str;
+	mutable std::string var_str;
 #ifdef _MSC_VER
 	#pragma warning( 4: 4251 )
 #endif
 	mutable mvint_t var_int;
 	mutable double var_dbl;
 	//initialise type last
-	mutable char var_typ;
+	mutable VARTYP var_typ;
 
 private:
 
@@ -1262,7 +1305,7 @@ private:
 	bool selectx(const var& fieldnames, const var& sortselectclause) const;
 
 	// retrieves cid from *this, or uses default connection, or autoconnect with default connection string
-	// On return *this contains connection ID and type pimpl::VARTYP_NANSTR_DBCONN
+	// On return *this contains connection ID and type VARTYP_NANSTR_DBCONN
 	int getconnectionid_ordefault() const;
 	int getconnectionid() const;
 
@@ -1302,24 +1345,20 @@ private:
 	var iconv_MD(const char* conversion) const;
 	var iconv_HEX(const int ioratio) const;
 
-	//bool locatex(xstring locatestring,)
-	//locate within extraction
-	bool locatex(const xstring& target,const char* ordercode,const char usingchar,var& setting, int fieldno=0,int valueno=0,const int subvalueno=0) const;
-	//hardcore xstring locate function given a section of a xstring and all parameters
-	bool locateat(const xstring& target,size_t start_pos,size_t end_pos,const char order,const var& usingchar,var& setting)const;
-
 	const std::string to_path_string() const;
 	const std::string to_cmd_string() const;
 
-	int localeAwareCompare(const xstring& str1, const xstring& str2) const;
+	int localeAwareCompare(const std::string& str1, const std::string& str2) const;
 	var& localeAwareChangeCase(const int lowerupper);
 
 	std::fstream* osopenx(const var& osfilename, const var& locale) const;
 
 	friend class dim;
 
-	bool THIS_IS_DBCONN() const	{ return (this->var_typ & pimpl::VARTYP_DBCONN) != 0; }
-	bool THIS_IS_OSFILE() const	{ return (this->var_typ & pimpl::VARTYP_OSFILE) != 0; }
+	bool THIS_IS_DBCONN() const	{ return ((this->var_typ & VARTYP_DBCONN) != VARTYP_UNA); }
+	bool THIS_IS_OSFILE() const	{ return ((this->var_typ & VARTYP_OSFILE) != VARTYP_UNA); }
+	//bool THIS_IS_DBCONN() const	{ return this->var_typ & VARTYP_DBCONN; }
+	//bool THIS_IS_OSFILE() const	{ return this->var_typ & VARTYP_OSFILE; }
 
 }; //of class "var"
 
@@ -1404,7 +1443,7 @@ DLL_PUBLIC double neosysmodulus(const double v1,const double v2);
 
 DLL_PUBLIC var MVmod(const var& var1,const var& var2);
 
-//var^var reassign logical xor to be xstring concatenate!!!
+//var^var reassign logical xor to be std::string concatenate!!!
 DLL_PUBLIC var MVcat(const var& var1,const var& var2);
 
 DLL_PUBLIC var operator+ (const var&    var1    ,const var&    var2     );
@@ -1570,72 +1609,30 @@ private:
 
 }; //of class "dim"
 
-/*
-class DLL_PUBLIC var__extractreplace : private var
-{
-
-public:
-
-var__extractreplace(in var1, int fieldno, int valueno, int subvalueno)
-	:
-	_var1(var1),
-	_fieldn(fieldno),
-	_valuen(valueno),
-	_subvaluen(subvalueno)
-	;
-
-	//destructor to (NOT VIRTUAL to save space since not expected to be a base class)
-	//protected to prevent deriving from var since wish to save space and not provide virtual destructor
-	//http://www.gotw.ca/publications/mill18.htm
-	~var__extractreplace();
-
-	//automatic conversion to var
-	//must be on the RHS so do an extract
-	operator var() const;
-
-	//assignment
-	//must be on the LHS so do the replacement
-	var operator= (const var& var1);
-
-private:
-
-	// Disable copy constructor (why?)
-	// Copy constructor
-	var__extractreplace(const var__extractreplace& m);
-
-	var& _var1
-	int _fieldn;
-	int _valuen;
-	int _subvaluen;
-
-}; //of class var__extractreplace
-*/
-
 //must be after class declaration
-#ifdef SWIG
-//swig cant handle these as wide character L"" for some reason
-static const var FM = _FM;
-static const var VM = _VM;
-static const var SM = _SM;
-static const var SVM = _SVM;
-static const var TM = _TM;
-static const var STM = _STM;
 
-static const var IM = _IM;
-static const var RM = _RM;
-static const var AM = _AM;
+inline const var FM =  _FM_;
+inline const var VM =  _VM_;
+inline const var SM =  _SM_;
+inline const var SVM = _SVM_;
+inline const var TM  = _TM_;
+inline const var STM = _STM_;
 
-static const var DQ = _DQ;
-static const var SQ = _SQ;
+inline const var IM = _IM_;
+inline const var RM = _RM_;
+inline const var AM = _AM_;
+
+inline const var DQ = _DQ_;
+inline const var SQ = _SQ_;
 
 #if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
-const var SLASH = "\\";
-static const char SLASH_ = '\\';
-#define SLASH_IS_BACKSLASH true
+	inline const var SLASH = "\\";
+	inline const char SLASH_ = '\\';
+	#define SLASH_IS_BACKSLASH true
 #else
-const var SLASH = "/";
-static const char SLASH_ = '/';
-#define SLASH_IS_BACKSLASH false
+	inline const var SLASH = "/";
+	inline const char SLASH_ = '/';
+	#define SLASH_IS_BACKSLASH false
 #endif
 
 //being global const means that ucase() and lcase()
@@ -1643,65 +1640,23 @@ static const char SLASH_ = '/';
 //perhaps make a version of ucase/lcase that
 //receives an MvEnvironment in the parameters.
 //CF LOWERCASE which is
-const var LOWERCASE_="abcdefghijklmnopqrstuvwxyz";
-const var UPPERCASE_="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+inline const var LOWERCASE_="abcdefghijklmnopqrstuvwxyz";
+inline const var UPPERCASE_="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 #if defined(_WIN64) or defined(_LP64)
-const var PLATFORM_="x64";
+	inline const var PLATFORM_="x64";
 #else
-const var PLATFORM_="x86";
+	inline const var PLATFORM_="x86";
 #endif
 
-/////
-#else
-/////
+//#ifndef EXO_MV_CPP
+//	extern
+//	DLL_PUBLIC int DBTRACE;
+//#else
+//	DLL_PUBLIC int DBTRACE=false;
+//#endif
 
-static const var FM = _FM_;
-static const var VM = _VM_;
-static const var SM = _SM_;
-static const var SVM = _SVM_;
-static const var TM = _TM_;
-static const var STM = _STM_;
-
-static const var IM = _IM_;
-static const var RM = _RM_;
-static const var AM = _AM_;
-
-static const var DQ = _DQ_;
-static const var SQ = _SQ_;
-
-#if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
-const var SLASH = "\\";
-static const char SLASH_ = '\\';
-#define SLASH_IS_BACKSLASH true
-#else
-const var SLASH = "/";
-static const char SLASH_ = '/';
-#define SLASH_IS_BACKSLASH false
-#endif
-
-//being global const means that ucase() and lcase()
-//can only be fixed for ASCII
-//perhaps make a version of ucase/lcase that
-//receives an MvEnvironment in the parameters.
-//CF LOWERCASE which is
-const var LOWERCASE_="abcdefghijklmnopqrstuvwxyz";
-const var UPPERCASE_="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-#if defined(_WIN64) or defined(_LP64)
-const var PLATFORM_="x64";
-#else
-const var PLATFORM_="x86";
-#endif
-
-#endif
-
-#ifndef EXO_MV_CPP
-extern
-DLL_PUBLIC int DBTRACE;
-#else
-DLL_PUBLIC int DBTRACE=false;
-#endif
+DLL_PUBLIC inline int DBTRACE=false;
 
 //following are all not thread safe since they are at global scope and not const
 //perhaps they should be moved on to MvEnvironment mv
@@ -1749,12 +1704,13 @@ DLL_PUBLIC exodus::var SENTENCE="";
 */
 
 //this is left a global copy for backtrace to get at it
-#ifndef EXO_MV_CPP
-extern
-DLL_PUBLIC exodus::var EXECPATH2;
-#else
-DLL_PUBLIC exodus::var EXECPATH2="";
-#endif
+//#ifndef EXO_MV_CPP
+//	extern
+//	DLL_PUBLIC exodus::var EXECPATH2;
+//#else
+//	DLL_PUBLIC exodus::var EXECPATH2="";
+//#endif
+DLL_PUBLIC inline exodus::var EXECPATH2="";
 
 void DLL_PUBLIC output(const var& var1);
 void DLL_PUBLIC outputl(const var& var1 DEFAULTNULL);
@@ -1769,7 +1725,7 @@ void DLL_PUBLIC logputl(const var& var1 DEFAULTNULL);
 var DLL_PUBLIC backtrace();
 
 #ifndef SWIG
-std::string naturalorder(const std::string& string1);
+	std::string naturalorder(const std::string& string1);
 #endif
 
 int DLL_PUBLIC getenvironmentn();
@@ -1784,16 +1740,17 @@ var DLL_PUBLIC getexecpath();
 //MVStop is similar to MVException
 //but doesnt get stack since stop() is called commonly and normally
 class DLL_PUBLIC MVStop
-{public: MVStop (const var& var1 DEFAULTNULL);
-		var description;
+{
+public: MVStop (const var& var1 DEFAULTNULL);
+	var description;
 };
 
 //provide a public base exception for all other exceptions so exodus programmers can catch mv exceptions generally
 class DLL_PUBLIC MVException
 {
 public: MVException(const var& description);
-		var description;
-		var stack;
+	var description;
+	var stack;
 };
 
 //individual exceptions are made public so exodus programmers can catch specific errors or even stop/abort/debug if they want

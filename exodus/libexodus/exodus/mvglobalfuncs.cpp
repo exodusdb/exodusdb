@@ -443,14 +443,26 @@ DLL_PUBLIC var convert(const var& instring, const var& oldchars, const var& newc
 	return instring.convert(oldchars,newchars);
 }
 
-DLL_PUBLIC var& swapper(var& instring, const var& from, const var& to, const var& options="")
+DLL_PUBLIC var& swapper(var& instring, const var& from, const var& to)
 {
-	return instring.swapper(from, to, options);
+	return instring.swapper(from, to);
 }
 
-DLL_PUBLIC var swap(const var& instring, const var& from, const var& to, const var& options="")
+DLL_PUBLIC var swap(const var& instring, const var& from, const var& to)
 {
-	return instring.swap(from,to,options);
+	var newstring=instring;
+	return newstring.swap(from, to);
+}
+
+DLL_PUBLIC var& replacer(var& instring, const var& regexstr, const var& replacementstr, const var& options="")
+{
+	return instring.replacer(regexstr, replacementstr, options);
+}
+
+DLL_PUBLIC var replace(const var& instring, const var& regexstr, const var& replacementstr, const var& options="")
+{
+	var newstring=instring;
+	return newstring.replacer(regexstr, replacementstr, options);
 }
 
 DLL_PUBLIC var& ucaser(var& instring)
@@ -486,16 +498,6 @@ DLL_PUBLIC var& inverter(var& instring)
 DLL_PUBLIC var invert(const var& instring)
 {
 	return instring.invert();
-}
-
-DLL_PUBLIC var& textinverter(var& instring)
-{
-	return instring.textinverter();
-}
-
-DLL_PUBLIC var textinvert(const var& instring)
-{
-	return instring.textinvert();
 }
 
 DLL_PUBLIC var& lowerer(var& instring)
@@ -947,7 +949,7 @@ DLL_PUBLIC bool committrans()
 
 DLL_PUBLIC bool lock(const var& filehandle, const var& key)
 {
-	return filehandle.lock(key);
+	return (bool) filehandle.lock(key);
 }
 
 void DLL_PUBLIC unlock(const var& filehandle, const var& key)
@@ -1025,24 +1027,26 @@ DLL_PUBLIC var xlate(const var& filename, const var& key, const var& fieldno, co
 }
 */
 
-DLL_PUBLIC var remove(const var& fromstr, var& startx, var& delimiterno)
+//DLL_PUBLIC var remove(const var& fromstr, var& startx, var& delimiterno)
+DLL_PUBLIC var substr2(const var& fromstr, var& startx, var& delimiterno)
 {
-	return fromstr.remove(startx,delimiterno);
+	//return fromstr.remove(startx,delimiterno);
+	return fromstr.substr2(startx,delimiterno);
 }
 
-DLL_PUBLIC var replace(const var& instring, const int fieldno, const int valueno, const int subvalueno, const var& replacement)
+DLL_PUBLIC var pickreplace(const var& instring, const int fieldno, const int valueno, const int subvalueno, const var& replacement)
 {
-	return instring.replace(fieldno, valueno, subvalueno, replacement);
+	return instring.pickreplace(fieldno, valueno, subvalueno, replacement);
 }
 
-DLL_PUBLIC var replace(const var& instring, const int fieldno, const int valueno, const var& replacement)
+DLL_PUBLIC var pickreplace(const var& instring, const int fieldno, const int valueno, const var& replacement)
 {
-	return instring.replace(fieldno, valueno, 0, replacement);
+	return instring.pickreplace(fieldno, valueno, 0, replacement);
 }
 
-DLL_PUBLIC var replace(const var& instring, const int fieldno, const var& replacement)
+DLL_PUBLIC var pickreplace(const var& instring, const int fieldno, const var& replacement)
 {
-	return instring.replace(fieldno, 0, 0, replacement);
+	return instring.pickreplace(fieldno, 0, 0, replacement);
 }
 
 DLL_PUBLIC var extract(const var& instring, const int fieldno, const int valueno, const int subvalueno)
@@ -1065,9 +1069,11 @@ DLL_PUBLIC var insert(const var& instring, const int fieldno, const var& inserti
 	return instring.insert(fieldno, 0, 0, insertion);
 }
 
-DLL_PUBLIC var erase(const var& instring, const int fieldno, const int valueno, const int subvalueno)
+//DLL_PUBLIC var erase(const var& instring, const int fieldno, const int valueno, const int subvalueno)
+DLL_PUBLIC var remove(const var& instring, const int fieldno, const int valueno, const int subvalueno)
 {
-	return instring.erase(fieldno, valueno, subvalueno);
+	//return instring.erase(fieldno, valueno, subvalueno);
+	return instring.remove(fieldno, valueno, subvalueno);
 }
 
 DLL_PUBLIC var& replacer(var& instring, const int fieldno, const int valueno, const int subvalueno, const var& replacement)
@@ -1100,9 +1106,11 @@ DLL_PUBLIC var& inserter(var& instring, const int fieldno, const var& insertion)
 	return instring.inserter(fieldno, 0, 0, insertion);
 }
 
-DLL_PUBLIC var& eraser(var& instring, const int fieldno, const int valueno, const int subvalueno)
+//DLL_PUBLIC var& eraser(var& instring, const int fieldno, const int valueno, const int subvalueno)
+DLL_PUBLIC var& remover(var& instring, const int fieldno, const int valueno, const int subvalueno)
 {
-	return instring.eraser(fieldno, valueno, subvalueno);
+	//return instring.eraser(fieldno, valueno, subvalueno);
+	return instring.remover(fieldno, valueno, subvalueno);
 }
 
 

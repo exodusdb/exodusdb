@@ -275,16 +275,20 @@ var ExodusProgramBase::authorised(const var& task0, var& msg, const var& default
 	//find the task
 	if (SECURITY.a(10).locate(task, taskn)) {
 		if (deleting) {
-			SECURITY.eraser(10, taskn);
-			SECURITY.eraser(11, taskn);
+			//SECURITY.eraser(10, taskn);
+			//SECURITY.eraser(11, taskn);
+			SECURITY.remover(10, taskn);
+			SECURITY.remover(11, taskn);
 updateprivs:
 			gosub writeuserprivs();
 			return 1;
 		} else if (renaming) {
 			//delete any existing rename target task
 			if (SECURITY.a(10).locate(defaultlock, taskn2)) {
-				SECURITY.eraser(10, taskn2);
-				SECURITY.eraser(11, taskn2);
+				//SECURITY.eraser(10, taskn2);
+				//SECURITY.eraser(11, taskn2);
+				SECURITY.remover(10, taskn2);
+				SECURITY.remover(11, taskn2);
 				if (taskn2 < taskn) {
 					taskn -= 1;
 				}
@@ -1090,7 +1094,7 @@ var ExodusProgramBase::otherdatasetusers(const var& param) {
 
 bool ExodusProgramBase::lockrecord(const var& filename, const var& file, const var& keyx) const {
 	var record;
-	return lockrecord(filename, file, keyx, record);
+	return (bool) lockrecord(filename, file, keyx, record);
 }
 
 bool ExodusProgramBase::lockrecord(const var& filename, const var& file, const var& keyx, const var& recordx, const int waitsecs0, const bool allowduplicate) const {
@@ -1276,7 +1280,8 @@ var ExodusProgramBase::loginnet(const var& dataset, const var& username,
 	//remove local support menu
 	if (!authorised("SUPPORT MENU ACCESS", msg, "LS")) {
 		if (menucodes.a(1).locate("GENERA", menun))
-			menucodes.eraser(1, menun, 0);
+			//menucodes.eraser(1, menun, 0);
+			menucodes.remover(1, menun, 0);
 	}
 	menucodes.converter(VM ^ ".", ",_");
 
@@ -1417,7 +1422,8 @@ var ExodusProgramBase::oconv(const var& input, const var& conversion) {
 	var delimiter;
 	do {
 
-		var subconversion=conversion.remove(ptr,delimiter);
+		//var subconversion=conversion.remove(ptr,delimiter);
+		var subconversion=conversion.substr2(ptr,delimiter);
 
 		//either call custom conversion routines
 		if (subconversion[1] == "[") {
@@ -1459,7 +1465,8 @@ var ExodusProgramBase::iconv(const var& input, const var& conversion) {
 	var delimiter;
 	do {
 
-		var subconversion=conversion.remove(ptr,delimiter);
+		//var subconversion=conversion.remove(ptr,delimiter);
+		var subconversion=conversion.substr2(ptr,delimiter);
 
 		//either call custom conversion routines
 		if (subconversion[1] == "[") {
