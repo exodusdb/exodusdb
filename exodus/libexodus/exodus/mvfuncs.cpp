@@ -43,8 +43,6 @@ Binary    Hex          Comments
 #include <cstdlib>//for exit
 #include <memory>//for unique_ptr
 
-#include <boost/locale.hpp>
-
 #ifndef M_PI
 //#define M_PI 3.14159265358979323846f
 #define M_PI 3.14159265
@@ -54,6 +52,7 @@ Binary    Hex          Comments
 #include <exodus/mv.h>
 //#include <exodus/mvutf.h>
 #include <exodus/mvexceptions.h>
+#include <exodus/mvlocale.h>
 
 //std::ios::sync_with_stdio(false);
 bool desynced_with_stdio=false;
@@ -61,19 +60,6 @@ bool desynced_with_stdio=false;
 //TODO check that all string increase operations dont crash the system
 
 namespace exodus {
-
-//exodus uses one locale per thread instead of global
-thread_local std::locale tls_boost_locale1;
-
-inline
-void init_boost_locale1()
-{
-	if (tls_boost_locale1.name()!="*")
-	{
-		boost::locale::generator generator1;
-		tls_boost_locale1=generator1("");
-	}
-}
 
 int var::localeAwareCompare(const std::string& str1, const std::string& str2) const
 {
@@ -897,7 +883,7 @@ var var::unique() const
 }
 
 //BINARY - 1st byte
-const var var::seq() const
+var var::seq() const
 {
 	THISIS("var var::seq() const")
 	THISISSTRING()
@@ -914,7 +900,7 @@ const var var::seq() const
 }
 
 //UTF8 - 1st UTF code point
-const var var::textseq() const
+var var::textseq() const
 {
 	THISIS("var var::textseq() const")
 	THISISSTRING()

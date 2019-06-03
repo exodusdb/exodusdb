@@ -84,7 +84,7 @@ add_library(exodus SHARED
 
 # mvutf.cpp
 # ConvertUTF.c
- mvlocale.cpp
+# mvlocale.cpp
  mvos.cpp
  howto.cpp mv.cpp mvmv.cpp mvprogram.cpp mvarray.cpp mvdatetime.cpp  mvdebug.cpp
  mvfuncs.cpp mvioconv.cpp

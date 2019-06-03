@@ -56,19 +56,56 @@ function main()
 	printl("char:     ",(int)sizeof(char));
 	printl("var:      ",(int)sizeof(var));
 
+	//match returning what it finds
+
+	//groups
+	var csvline1="abcdef abcdef";
+	var csvre1="(bc).(ef)";
+	assert(match(csvline1,csvre1).convert(FM^VM,"^]")=="bcdef]bc]ef^bcdef]bc]ef");
+
+	//no groups
+	var csvline2="abcdef abcdef";
+	var csvre2="bc.ef";
+	assert(match(csvline2,csvre2).convert(FM^VM,"^]")=="bcdef^bcdef");
+
+	//not asserted but a complicated CSV match
+	var csvline=R"(123,2.99,AMO024,Title,"Description, more info",,123987564)";
+	var csvre=R"tag((?:^|,)(?=[^"]|(")?)"?((?(1)[^"]*|[^,"]*))"?(?=,|$))tag";
+	assert(match(csvline,csvre).convert(FM^VM,"^]")==R"raw(123]]123^,2.99]]2.99^,AMO024]]AMO024^,Title]]Title^,"Description, more info"]"]Description, more info^,^,123987564]]123987564)raw");
+
+	//unicode case insensitive finding
+	assert(match("αβγδεΑΒΓΔΕ","(Α).(γδ)","i").convert(FM^VM,"^]")=="αβγδ]α]γδ^ΑΒΓΔ]Α]ΓΔ");
+	//unicode case sensitive NOT finding
+	assert(match("αβγδεΑΒΓΔΕ","(Α).(γδ)","").convert(FM^VM,"^]")=="");
+
 	//replacing unicode style numbers characters using javascript style regex
 	assert(var("Ⅻ").replace(R"(\p{Number})","yes")=="yes");
 	assert(var("⅝").replace(R"(\p{Number})","yes")=="yes");
 
 	//test glob matching using * ? eg *.* and *.??? etc
-        assert(var("test.htm").match("*.htm","w")==1);
-        assert(var("test.html").match("*.htm","w")==0);
-        assert(var("test.htm").match("t*.???","w")==1);
-        assert(var("test.htm").match("t.???","w")==0);
-        assert(var("test.htm").match("x.???","w")==0);
-        assert(var("testx.htm").match("*x.???","w")==1);
-        assert(var("test.html").match("t*.???","w")==0);
-        assert(var("test.html").match("*t?h*","w")==1);
+        assert(var("test.htm").match("*.*","w")		=="test.htm");
+        assert(var("test.htm").match("*","w")		=="test.htm");
+        assert(var("test.htm").match(".*","w")		=="");
+        assert(var("test.htm").match(".","w")		=="");
+        assert(var("test.htm").match("*.","w")		=="");
+        assert(var("test.htm").match("*.htm","w")	=="test.htm");
+        assert(var("test.html").match("*.htm","w")	=="");
+        assert(var("test.htm").match("t*.???","w")	="test.htm");
+        assert(var("test.htm").match("t.???","w")	=="");
+        assert(var("test.htm").match("x.???","w")	=="");
+        assert(var("testx.htm").match("*x.???","w")	=="testx.htm");
+        assert(var("test.html").match("t*.???","w")	=="");
+        assert(var("test.html").match("*t?h*","w")	=="test.html");
+
+	//test regular expression
+	//four digits followed by dash or space) three times ... followed by four digits
+	var regex1="(\\d{4}[- ]){3}\\d{4}";
+	assert(var("1247-1234-1234-1234").match(regex1,"r").convert(FM^VM,"^]")=="1247-1234-1234-1234]1234-");
+	assert(var("1247.1234-1234-1234").match(regex1,"r")=="");
+
+	printl(var("Unicode table CJK 1: Chinese 文字- Kanji 漢字- Hanja 漢字(UTF-8)").match("文字.*漢字\\(UTF"));
+	assert(var("Unicode table CJK 1: Chinese 文字- Kanji 漢字- Hanja 漢字(UTF-8)").match("文字.*漢字\\(UTF")=="文字- Kanji 漢字- Hanja 漢字(UTF");
+	assert(var("Unicode table CJK 1: Chinese 文字- Kanji 漢字- Hanja 漢字(UTF-8)").match(".*文字.*漢 字\\(UTF-8\\)")=="");
 
 	//multibyte sep index
         var greek5x2="αβγδεαβγδε";
@@ -2216,16 +2253,6 @@ while trying to match the argument list '(exodus::var, bool)'
 	tconv="xxxxx/xxxxx xxx" ^ FM ^ "xx";
 	tconv=tconv.oconv("T#8");
 	assert(tconv eq ("xxxxx/xx" ^ TM ^ "xxx xxx " ^ FM ^ "xx      "));
-
-	//test regular expression
-	//four digits followed by dash or space) three times ... followed by four digits
-	var regex1="(\\d{4}[- ]){3}\\d{4}";
-	assert(var("1247-1234-1234-1234").match(regex1,"r"));
-	assert(var("1247 1234-1234-1234").match(regex1,"r"));
-	assert(var("1247.1234-1234-1234").match(regex1,"r")==0);
-
-	assert(var("Unicode table CJK 1: Chinese 文字- Kanji 漢字- Hanja 漢字(UTF-8)").match(".*文字.*漢字\\(UTF-8\\)")==1);
-	assert(var("Unicode table CJK 1: Chinese 文字- Kanji 漢字- Hanja 漢字(UTF-8)").match(".*文字.*漢 字\\(UTF-8\\)")==0);
 
 	//test redimensioning
 	dim aaaa(10);

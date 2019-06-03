@@ -190,7 +190,7 @@ DLL_PUBLIC var chr(const var& integer);
 DLL_PUBLIC var chr(const int integer);
 DLL_PUBLIC var textchr(const var& integer);
 DLL_PUBLIC var textchr(const int integer);
-DLL_PUBLIC bool match(const var& instring, const var& matchstr, const var& options DEFAULTNULL);
+DLL_PUBLIC var match(const var& instring, const var& matchstr, const var& options DEFAULTNULL);
 DLL_PUBLIC var seq(const var& char1);
 DLL_PUBLIC var textseq(const var& char1);
 DLL_PUBLIC var str(const var& instring, const int number);

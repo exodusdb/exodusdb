@@ -685,9 +685,9 @@ DLL_PUBLIC var textchr(const int integer)
 	return var().textchr(integer);
 }
 
-DLL_PUBLIC bool match(const var& instring, const var& matchstr)
+DLL_PUBLIC var match(const var& instring, const var& matchstr, const var& options)
 {
-	return instring.match(matchstr);
+	return instring.match(matchstr,options);
 }
 
 DLL_PUBLIC var seq(const var& char1)

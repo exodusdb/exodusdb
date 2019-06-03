@@ -641,20 +641,44 @@ void var::initrnd() const
 	(*threads_random_base_generator).seed(static_cast<uint64_t>(seed));
 }
 
-std_boost::regex_constants::syntax_option_type get_regex_options(const var& options)
+int get_regex_syntax_flags(const var& options)
 {
 	//determine options from string
-	std_boost::regex_constants::syntax_option_type regex_options=std_boost::regex_constants::normal;
-	if (options.index("i"))
-		regex_options|=std_boost::regex_constants::icase;
-	if (options.index("l"))
-		regex_options|=std_boost::regex_constants::literal;
 
-	return regex_options;
+	//default
+	//ECMAScript	Use the Modified ECMAScript regular expression grammar
+	//collate	Character ranges of the form "[a-b]" will be locale sensitive.
+	int regex_syntax_flags=std_boost::regex_constants::collate;
+
+	//i = icase
+	if (options.index("i"))
+		regex_syntax_flags|=std_boost::regex_constants::icase;
+
+	//m = multiline (TODO should be present c++17 onwards)
+	//Specifies that ^ shall match the beginning of a line and $ shall match the end of a line, if the ECMAScript engine is selected. 
+	//if (options.index("m"))
+	//	regex_syntax_flags|=std_boost::regex_constants::multiline;
+
+	//b = basic (withdrawn after c++17?)
+	//Use the basic POSIX regular expression grammar
+	//if (options.index("b"))
+	//	regex_syntax_flags|=std_boost::regex_constants::basic;
+
+	//e = extended
+	//Use the extended POSIX regular expression grammar
+	if (options.index("e"))
+		regex_syntax_flags|=std_boost::regex_constants::extended;
+
+	//l - literal TODO manually implement
+	//ignore all usual regex special characters
+	if (options.index("l"))
+		regex_syntax_flags|=std_boost::regex_constants::literal;
+
+	return regex_syntax_flags;
 }
 
-//only here really because boost regex is included here for file matching
-bool var::match(const var& matchstr, const var& options) const
+//should be in mvfuncs.cpp - here really because boost regex is included here for file matching
+var var::match(const var& matchstr, const var& options) const
 {
 	//VISUALISE REGULAR EXPRESSIONS GRAPHICALLY!
 	https://www.debuggex.com/
@@ -716,20 +740,113 @@ bool var::match(const var& matchstr, const var& options) const
 	This is odd, but all modern browsers follow the spec. In std::regex all the shorthands are ASCII-only when using strings of char.
 	*/
 
+	// U32REGEX/MATCH/SEARCH/REPLACE/TOKEN_ITERATOR ARE THIN ITERATOR WRAPPERS TO MAKE UTF8 ETC APPEAR LIKE UTF32
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	//u32regex etc come from <boost/regex/icu.hpp>
+	//the header <boost/regex/icu.hpp> provides a series of thin wrappers around these algorithms,
+	// called u32regex_match, u32regex_search, and u32regex_replace. These wrappers use iterator-adapters internally 
+	//to make external UTF-8 or UTF-16 data look as though it's really a UTF-32 sequence, that can then be passed on to the "real" algorithm. 
+	//https://www.boost.org/doc/libs/1_70_0/libs/regex/doc/html/boost_regex/ref/non_std_strings/icu/unicode_algo.html
+
+	//ICU in BOOST REGEX
+	//https://www.boost.org/doc/libs/1_34_1/libs/regex/doc/icu_strings.html
+
 	std_boost::u32regex regex;
 	try
 	{
-		regex=boost::make_u32regex(matchstr.var_str, get_regex_options(options));
+		regex=boost::make_u32regex(matchstr.var_str, get_regex_syntax_flags(options));
 	}
 	catch (std_boost::regex_error& e)
 	{
 		throw MVException(var(e.what()).quote() ^ " is an invalid regular expression");
 	}
 
-	return u32regex_match(var_str, regex);
+/*
+	//create iterators to matches
+	//https://www.boost.org/doc/libs/1_70_0/libs/regex/doc/html/boost_regex/ref/non_std_strings/icu/unicode_iter.html
+	//auto iter {std_boost::make_u32regex_token_iterator(var_str,regex)};
+	const int subs[] = {1, 2, 3, 0};
+	boost::u32regex_token_iterator<std::string::const_iterator> iter {std_boost::make_u32regex_token_iterator(var_str,regex,subs)};
+	decltype(iter) end {};
 
+	//cycle through matches, appending whatever is found to the output
+	std::string found="";
+	int ii {0};
+	while (iter != end)
+	{
+		std::cout<< ++ii << " " <<*iter<<std::endl;
+		//std::cout<<(*iter).first<<std::endl;
+		//std::cout << iter->size() << std::endl;
+		found.append(*iter);
+		found.push_back(FM_);
+		++iter;
+	}
+*/
+	std::string found;
+
+	//https://stackoverflow.com/questions/26320987/what-is-the-difference-between-regex-token-iterator-and-regex-iterator
+	//boost::u32regex_token_iterator<std::string::const_iterator>
+	//	iter {std_boost::make_u32regex_token_iterator(var_str,regex,{0,1,2,3,4,etc or -1})};
+	//token_iterator allow you to access none-matching parts of the string for parsing stuff but
+	//doesnt return an iterator with an array of groups
+
+	// construct our iterators:
+	boost::u32regex_iterator<std::string::const_iterator>
+		iter {std_boost::make_u32regex_iterator(var_str,regex)};
+	decltype(iter)
+		end {};
+	std::for_each(iter, end,
+		//using declarative functional style "for_each with lambda" instead of old fashioned "while (iter!=end)" loop
+		[&found] (auto what)
+		{
+			for (int groupn=0;groupn<=what.size();++groupn)
+			{
+				//std::cout<< what[0] << std::endl;
+				found.append(what[groupn]);
+				found.push_back(VM_);
+			}
+			if (!found.empty())
+				while (found.back()==VM_)
+					found.pop_back();
+			found.push_back(FM_);
+		}
+	);
+
+	if (!found.empty())
+		found.pop_back();
+
+	return found;
+
+/*	std_boost::smatch
+		smatch1;
+	//return u32regex_match(var_str, regex);
+	while (u32regex_search(
+		var_str,
+		smatch1,
+		regex,
+		std_boost::regex_constants::match_default))
+	{
+		std::cout << smatch1.str() << '\n';
+		for (size_t i = 0; i < smatch1.size(); ++i)
+		{
+			//std::cout << i << ": " << smatch1[i] << '\n';
+			found.append(smatch1[i]);
+			//separate groups by VM
+			found.push_back(VM_);
+		}
+		//separate matches by FM
+		if (!found.empty())
+			found.back()=FM_;
+	}
+	if (!found.empty())
+		found.pop_back();
+
+	return found;
+*/
 }
 
+//simple case sensitive substr replacement
 var var::swap(const var& what, const var& with) const
 {
 	var newmv=*this;
@@ -765,7 +882,6 @@ var& var::swapper(const var& what, const var& with)
 	return *this;
 }
 
-
 //only here really because boost regex is included here for file matching
 var var::replace(const var& regexstr, const var& replacementstr, const var& options) const
 {
@@ -790,7 +906,7 @@ var& var::replacer(const var& regexstr, const var& replacementstr, const var& op
 	std_boost::u32regex regex;
 	try
 	{
-		regex=boost::make_u32regex(regexstr.var_str, get_regex_options(options));
+		regex=boost::make_u32regex(regexstr.var_str, get_regex_syntax_flags(options));
 	}
 	catch (std_boost::regex_error& e)
 	{

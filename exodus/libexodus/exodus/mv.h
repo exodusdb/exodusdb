@@ -933,9 +933,10 @@ public:
 	var space() const;
 
 	//STRING INFO
-	bool match(const var& matchstr,const var& options DEFAULTNULL) const;
-	const var seq() const;//ASCII
-	const var textseq() const;//TEXT
+	//bool match(const var& matchstr,const var& options DEFAULTNULL) const;
+	var match(const var& matchstr,const var& options DEFAULTNULL) const;
+	var seq() const;//ASCII
+	var textseq() const;//TEXT
 	var dcount(const var& substrx) const;
 	var count(const var& substrx) const;
 #ifndef SWIGPERL
