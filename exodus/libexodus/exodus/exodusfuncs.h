@@ -71,8 +71,8 @@ DLL_PUBLIC bool osbread(var& data, const var& osfilevar, const var& startoffset,
 DLL_PUBLIC bool osbwrite(const var& data, const var& osfilevar, var& startoffset, const bool adjust=true);
 DLL_PUBLIC bool osbwrite(const var& data, const var& osfilevar, const var& startoffset, const bool adjust=true);
 
-DLL_PUBLIC bool oswrite(const var& data,const var& osfilename, const var& locale DEFAULTNULL);
-DLL_PUBLIC bool osread(var& data, const var& osfilename, const var& locale DEFAULTNULL);
+DLL_PUBLIC bool oswrite(const var& data,const var& osfilename, const var& codepage DEFAULTNULL);
+DLL_PUBLIC bool osread(var& data, const var& osfilename, const var& codepage DEFAULTNULL);
 DLL_PUBLIC var osread(const var& osfilename);
 
 DLL_PUBLIC bool osdelete(const var& osfilename);
@@ -139,9 +139,9 @@ DLL_PUBLIC var getprompt();
 DLL_PUBLIC void setprompt(const var& prompt);
 
 DLL_PUBLIC var input();
-DLL_PUBLIC void input(var& intostr);
-DLL_PUBLIC void input(const var& prompt, var& intostr);
-DLL_PUBLIC void inputn(var& intostr, const int nchars);
+DLL_PUBLIC var input(var& intostr);
+DLL_PUBLIC var input(const var& prompt, var& intostr);
+DLL_PUBLIC var inputn(var& intostr, const int nchars);
 
 DLL_PUBLIC var len(const var& var2);
 DLL_PUBLIC var length(const var& var2);

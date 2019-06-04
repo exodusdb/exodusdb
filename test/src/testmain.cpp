@@ -17,21 +17,35 @@ dpkg-reconfigure locales
 */
 
 //non-ASCII unicode characters
-var GreekQuestionMark		="\u037E";//GREEK QUESTION MARK (Punctuation)
-var GreekCapitalGamma		="\u0393";//GREEK CAPITAL LETTER GAMMA (Letter) (Uppercase)
-var GreekSmallGamma		="\u03B3";//GREEK SMALL LETTER GAMMA (Letter) (Lowercase)
-var ArabicIndicDigitZero	="\u0660";//ARABIC-INDIC DIGIT ZERO (Decimal Digit)
 
-var GreekSmallAlpha         ="\u03B1";//GREEK SMALL LETTER ALPHA
-var GreekSmallFinalSigma    ="\u03C2";//GREEK SMALL LETTER FINAL SIGMA
-var GreekSmallSigma         ="\u03C3";//GREEK SMALL LETTER SIGMA
-var GreekCapitalSigma       ="\u03A3";//GREEK CAPITAL LETTER SIGMA
-var GreekCapitalAlpha       ="\u0391";//GREEK CAPITAL LETTER ALPHA
-var Greek_sas               =GreekSmallSigma^GreekSmallAlpha^GreekSmallFinalSigma;
-var Greek_SAS               =GreekCapitalSigma^GreekCapitalAlpha^GreekCapitalSigma;
+var ArabicIndicDigits		="٠١٢٣٤٥٦٧٨٩";
+var alldigits=
+"Western	: 0 1 2 3 4 5 6 7 8 9  \n"
+"Arabic		: ٠ ١ ٢ ٣ ٤ ٥ ٦ ٧ ٨ ٩  \n"
+"Devanagari	: ० १ २ ३ ४ ५ ६ ७ ८ ९  \n"
+"Gujarati 	: ૦ ૧ ૨ ૩ ૪ ૫ ૬ ૭ ૮ ૯  \n"
+"Punjabi 	: ੦ ੧ ੨ ੩ ੪ ੫ ੬ ੭ ੮ ੯  \n"
+"Bengali 	: ০ ১ ২ ৩ ৪ ৫ ৬ ৭ ৮ ৯  \n"
+"Odia 		: ୦ ୧ ୨ ୩ ୪ ୫ ୬ ୭ ୮ ୯  \n"
+"Telugu 	: ౦ ౧ ౨ ౩ ౪ ౫ ౬ ౭ ౮ ౯  \n"
+"Kannada 	: ೦ ೧ ೨ ೩ ೪ ೫ ೬ ೭ ೮ ೯  \n"
+"Tamil 		: ௦ ௧ ௨ ௩ ௪ ௫ ௬ ௭ ௮ ௯  \n"
+"Malayalam 	: ൦ ൧ ൨ ൩ ൪ ൫ ൬ ൭ ൮ ൯  \n";
 
-var TurkishCapitalDottedI   ="\u0130";
-var TurkishSmallDotlessI    ="\u0131";
+var GreekSmallAlpha         ="α";//\u03B1";//GREEK SMALL LETTER ALPHA
+var GreekSmallFinalSigma    ="ς";//\u03C2";//GREEK SMALL LETTER FINAL SIGMA
+var GreekSmallSigma         ="σ";//\u03C3";//GREEK SMALL LETTER SIGMA
+var GreekCapitalSigma       ="Σ";//\u03A3";//GREEK CAPITAL LETTER SIGMA
+var GreekCapitalAlpha       ="Α";//\u0391";//GREEK CAPITAL LETTER ALPHA
+var Greek_sas               ="σας";//GreekSmallSigma^GreekSmallAlpha^GreekSmallFinalSigma;
+var Greek_SAS               ="ΣΑΣ";//GreekCapitalSigma^GreekCapitalAlpha^GreekCapitalSigma;
+var GreekQuestionMark		=";";//\u037E";//GREEK QUESTION MARK (Punctuation)
+var GreekCapitalGamma		="Γ";//\u0393";//GREEK CAPITAL LETTER GAMMA (Letter) (Uppercase)
+var GreekSmallGamma		="γ";//\u03B3";//GREEK SMALL LETTER GAMMA (Letter) (Lowercase)
+var ArabicIndicDigitZero	="٠";//\u0660";//ARABIC-INDIC DIGIT ZERO (Decimal Digit)
+
+var TurkishCapitalDottedI   ="İ";//\u0130";
+var TurkishSmallDotlessI    ="ı";//\u0131";
 var LatinSmallI             ="i";
 var LatinCapitalI           ="I";
 
@@ -395,7 +409,7 @@ function main()
 
 	var testfilename="vm.txt";
 	var charout=GreekSmallGamma;//VM;
-	assert(oswrite(charout,testfilename, "utf8"));
+	assert(oswrite(charout,testfilename));
 	var offsetx,testfilex;
 	assert(osopen(testfilename,testfilex));
 	var testosread;
@@ -442,9 +456,60 @@ function main()
 //	assert(testfilename.osfile().a(1) eq 2);
 	var charin;
 //fails on ubuntu 13.10x64
-	assert(osread(charin,testfilename, "utf8"));
+	assert(osread(charin,testfilename));
 	//assert(charin eq charout);
 	assert(osdelete(testfilename));
+
+	//check osread/write with and without conversion to codepages
+
+        //cyrillic ISO-8859-5 cp bytes
+        var cp_allo1{"\xB0\xDB\xDB\xDE"};
+
+        //output binary unconverted
+        oswrite(cp_allo1,"cp_allo.txt");
+        assert(cp_allo1.oconv("HEX").outputl("cp_allo1=")=="B0DBDBDE");
+
+        //hexdump -C cp_allo.txt
+        //00000000  b0 db db de
+        //00000004
+
+        //check that we can read binary back in unconverted
+        var cp_allo2=osread("cp_allo.txt");
+        assert(cp_allo2.oconv("HEX").outputl("cp_allo2=")=="B0DBDBDE");
+
+        //read in from binary cyrillic codepage text converting to utf8
+        var utf8_allo3;
+        if (not utf8_allo3.osread("cp_allo.txt","ISO-8859-5"))
+                stop("cant read cp_allo.txt with cp ISO-8859-5");
+        assert(utf8_allo3.length()==8);
+        assert(utf8_allo3.oconv("HEX")=="D090D0BBD0BBD0BE");
+        assert(utf8_allo3=="Алло");
+
+        //output utf8 convering to ISO-8859-5
+        oswrite(utf8_allo3,"cp_allo4.txt","ISO-8859-5");
+/*
+root@exodus:~/exodus/exodus/libexodus/exodus# hexdump cp_allo4.txt -C
+00000000  b0 db db de                                       |....|
+00000004
+*/
+        //read back in binary to check that out output did convert from utf to cyrillic
+        var cp_allo5;
+        osread(cp_allo5,"cp_allo4.txt");
+        assert(cp_allo5==cp_allo1);
+
+/*
+root@exodus:~/exodus/exodus/libexodus/exodus# hexdump utf8_allo4.txt -C
+00000000  d0 90 d0 bb d0 bb d0 be                           |........|
+00000008
+*/
+
+	var lbvn;
+	//no fieldno/value given means using character VM
+	assert(var("1" _VM_ "10" _VM_ "2" _VM_ "B").locateby("AL","A",lbvn)||lbvn==4);
+	//fieldno given means search in that field using character VM
+	assert(var("1" _VM_ "10" _VM_ "2" _VM_ "B").locateby("AL","A",lbvn,1)||lbvn==4);
+	//fieldno given and =0 means search whole string using character FM
+	assert(var("1" _FM_ "10" _FM_ "2" _FM_ "B").locateby("AL","A",lbvn,0)||lbvn==4);
 
         assert(seq(chr(-513))==255);
         assert(seq(chr(-512))==0);
@@ -459,42 +524,21 @@ function main()
         assert(seq(chr(512))==0);
         assert(seq(chr(513))==1);
 
-        //test all 16bit unicode (BMP)
+        //test all 8 bit bytes can be written and read
         var tx="";
         var tx2;
         for (int ii=0;ii<65536;ii++)
                 tx^=chr(ii);
 
-	var lbvn;
-	//no fieldno/value given means using character VM
-	assert(var("1" _VM_ "10" _VM_ "2" _VM_ "B").locateby("AL","A",lbvn)||lbvn==4);
-	//fieldno given means search in that field using character VM
-	assert(var("1" _VM_ "10" _VM_ "2" _VM_ "B").locateby("AL","A",lbvn,1)||lbvn==4);
-	//fieldno given and =0 means search whole string using character FM
-	assert(var("1" _FM_ "10" _FM_ "2" _FM_ "B").locateby("AL","A",lbvn,0)||lbvn==4);
-
-        //check default utf8 output/input
-
-        //output to file (default utf8)
+        //output to binary - check roundtrip
         oswrite(tx,"testmain.$1");
-
-        //input from file (default utf8)
         osread(tx2,"testmain.$1");
-
-        //check round trip no change
         assert(tx2==tx);
 
-
-        //check specific utf8 output/input
-
-        //output to file (default utf8)
-        oswrite(tx,"testmain.$1","utf8");
-
-        //input from file (default utf8)
-        osread(tx2,"testmain.$1","utf8");
-
-        //check round trip no change
-        assert(tx2==tx);
+        //read as codepage
+        //oswrite(tx,"testmain.$1","ISO-8859-5");
+        osread(tx2,"testmain.$1","ISO-8859-5");
+        //assert(tx2==tx);
 
 	osdelete("testmain.$1");
 
@@ -549,12 +593,12 @@ function main()
 		assert(len(data) eq nbinarychars);
 
 		//check can write characters 1-255 out as bytes using C locale
-		oswrite(data,"x.txt","C");
+		oswrite(data,"x.txt");
 		assert(osfile("x.txt")(1) eq nbinarychars);
 
 		//check can read in bytes as characters using C locale
 		var data2;
-		osread(data2,"x.txt","C");
+		osread(data2,"x.txt");
 		assert(data2 eq data);
 	}
 
@@ -698,6 +742,7 @@ function main()
 	if (hasgreeklocale) {
 		assert(setxlocale(greek_gr));
 		Greek_sas       .outputl("Greek_sas=");
+		Greek_SAS       .outputl("Greek_SAS=");
 		ucase(Greek_sas).outputl("ucased   =");
 		lcase(Greek_SAS).outputl("lcased   =");
 		lcase(Greek_SAS).oconv("HEX").outputl();
@@ -705,7 +750,6 @@ function main()
 		//ucase doesnt do languages TODO
 		//assert(ucase(Greek_sas) eq Greek_SAS);
 		//FAILS in Windows XPSP3UK and linux
-		assert(lcase(Greek_SAS) eq Greek_sas);
 		assert(ucase(Greek_sas) eq Greek_SAS);
 	}
 	//NB a codepage is a 256 x one byte map of characters selected from all unicode characters depending on locale
@@ -815,12 +859,8 @@ function main()
 
 	var status2 = oswrite( unicode, "GreekUTF-8File.txt", "utf8");
 
-#ifndef __APPLE__
-	if (hasgreeklocale) {
-		var status1 = oswrite( unicode, "GreekLocalFile.txt", greek_gr_locale);
-		var status3 = oswrite( unicode, "GreekEnglFile.txt", english_usuk_locale);
-	}
-#endif
+	var status1 = oswrite( unicode, "GreekLocalFile.txt");
+	var status3 = oswrite( unicode, "GreekEnglFile.txt");
 
 	//test swapping "letters" (i.e. alphabet) with "?"
 	//We expect the question mark to remain as it is,

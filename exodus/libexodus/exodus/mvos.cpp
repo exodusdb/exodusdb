@@ -27,6 +27,23 @@ THE SOFTWARE.
 //http://www.regular-expressions.info/
 //http://www.regular-expressions.info/unicode.html 
 
+//#include <istream>
+//#include <ostream>
+#include <iostream>
+#include <locale>
+#include <fstream>
+#include <cstdlib> //for getenv and setenv/putenv
+#include <algorithm> //for count in osrename
+
+#include <boost/locale.hpp>
+
+//TODO check all error handling
+//http://www.ibm.com/developerworks/aix/library/au-stdfs/index.html
+//catch(boost::filesystem::filesystem_error e) { 
+//#include <boost/filesystem.hpp>
+#include <experimental/filesystem>
+namespace stdfs = std::experimental::filesystem;
+
 //show c++ version for info
 #include <boost/preprocessor/stringize.hpp>
 #pragma message "__cplusplus=" BOOST_PP_STRINGIZE(__cplusplus)
@@ -71,12 +88,6 @@ THE SOFTWARE.
 
 //regex.assign("", std_boost::regex::extended|std_boost::regex_constants::icase);
 
-//TODO check all error handling
-//http://www.ibm.com/developerworks/aix/library/au-stdfs/index.html
-//catch(boost::filesystem::filesystem_error e) { 
-//#include <boost/filesystem.hpp>
-#include <experimental/filesystem>
-namespace stdfs = std::experimental::filesystem;
 #include <boost/thread/tss.hpp>
 
 //#include NullCodecvt.h
@@ -92,16 +103,23 @@ namespace stdfs = std::experimental::filesystem;
 //for rnd and initrnd
 #include <boost/random.hpp>
 
-//#include <istream>
-//#include <ostream>
-#include <locale>
-#include <fstream>
-#include <cstdlib> //for getenv and setenv/putenv
-#include <algorithm> //for count in osrename
+//for exodus_once
+#include <boost/thread/once.hpp>
+
+
+//#include "exodus/NullCodecvt.h"//used to prevent wifstream and wofstream widening/narrowing binary input/output to/from internal char
+
+//traditional Unix file I/O interface declared in <fcntl.h>
+// (under Unix and Linux) or <out.h> (Windows)
+
+//FindFile family of Win32 SDK functions such as
+// FindFirstFileEx, FindNextFile and CloseFind
+
+//see http://www.boost.org/libs/filesystem/test/wide_test.cpp
+//for boost filesystem wide operations and UTF8
 
 //to get whole environment
 extern char **environ;
-//#include <boost/locale.hpp>
 
 //boost changed from TIME_UTC to TIME_UTC_ (when?) to avoid a new standard TIME_UTC macro in C11 time.h
 //#include <boost/version.hpp>
@@ -125,24 +143,6 @@ extern char **environ;
 #include <exodus/mvexceptions.h>
 
 #include "mvhandles.h"
-
-#include <iostream>
-#include <locale>
-
-//for exodus_once
-#include <boost/thread/once.hpp>
-
-
-//#include "exodus/NullCodecvt.h"//used to prevent wifstream and wofstream widening/narrowing binary input/output to/from internal char
-
-//traditional Unix file I/O interface declared in <fcntl.h>
-// (under Unix and Linux) or <out.h> (Windows)
-
-//FindFile family of Win32 SDK functions such as
-// FindFirstFileEx, FindNextFile and CloseFind
-
-//see http://www.boost.org/libs/filesystem/test/wide_test.cpp
-//for boost filesystem wide operations and UTF8
 
 boost::once_flag exodus_once_flag=BOOST_ONCE_INIT;
 
@@ -1188,38 +1188,66 @@ std::fstream* var::osopenx(const var& osfilename, const var& locale) const
 //popen("iconv -f utf-32 -t utf-16 <sourcefile","r",filehandle) followed by progressive reads
 //use utf-16 or utf-32 depending on windows or unix
 
-bool var::osread(const var& osfilename, const var& locale)
+/* typical code pages on Linux (see "iconv -l")
+ISO-8859-2
+ISO-8859-3
+ISO-8859-5
+ISO-8859-6
+ISO-8859-7
+ISO-8859-8
+ISO-8859-9
+EUC-JP
+EUC-KR
+ISO-8859-13
+ISO-8859-15
+GBK
+GB18030
+UTF-8
+GB2312
+BIG5
+KOI8-R
+KOI8-U
+CP1251
+TIS-620
+WINDOWS-31J
+WINDOWS-936
+WINDOWS-1250
+WINDOWS-1251
+WINDOWS-1252
+WINDOWS-1253
+WINDOWS-1254
+WINDOWS-1255
+WINDOWS-1256
+WINDOWS-1257
+WINDOWS-1258
+*/
+
+bool var::osread(const var& osfilename, const var& codepage)
 {
-	THISIS("bool var::osread(const var& osfilename)")
+	THISIS("bool var::osread(const var& osfilename, const var& codepage="")")
 	//will be checked by nested osread
 	//THISISDEFINED()
 	ISSTRING(osfilename)
-	return osread(osfilename.to_path_string().c_str(), locale);
+	return osread(osfilename.to_path_string().c_str(), codepage);
 }
 
-bool var::osread(const char* osfilename, const var& locale)
+bool var::osread(const char* osfilename, const var& codepage)
 {
 
-	//osread unicode eg FM fails on ubuntu linux 13.10 x64 for some reason
-	//oswrite works! ... use osbreadx 9999999 as workaround
-	//maybe try vector/pushback instead of file.read(
-	//http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/codecvt.html
-
-	THISIS("bool var::osread(const var& osfilename)")
+	THISIS("bool var::osread(const var& osfilename, const var& codepage="")")
 	THISISDEFINED()
 
 	//osread returns empty string in any case
 	var_str="";
 	var_typ=VARTYP_STR;
 
-	//what is the purpose of the following?
-	//RAW IO to prevent locale conversion if writing narrow string to wide stream or vice versa
-	//imbue BEFORE opening or after flushing
-	//myfile.imbue(std::locale(std::locale::classic(), new NullCodecvt));
-
-	//get a file structure configured to the right locale (locale provides a CodeCvt facet)
+	//get a file structure
 	std::ifstream myfile;
-	myfile.imbue(get_locale(locale));
+
+	//configured to the right locale (locale provides a CodeCvt facet)
+	//imbue BEFORE opening or after flushing
+	//does this really do anything??
+	//myfile.imbue(get_locale(locale));
 
 	//open in binary (and position "at end" to find the file size with tellg)
 	myfile.open(osfilename, std::ios::binary | std::ios::in | std::ios::ate );
@@ -1228,6 +1256,7 @@ bool var::osread(const char* osfilename, const var& locale)
 
 	//determine the file size since we are going to read it all
 	//NB tellg and seekp goes by bytes regardless of normal/wide stream
+	//max file size 4GB?
 	unsigned int bytesize;
 	//	#pragma warning( disable: 4244 )
 	//warning C4244: '=' : conversion from 'std::streamoff' to 'unsigned int', possible loss of data
@@ -1240,10 +1269,20 @@ bool var::osread(const char* osfilename, const var& locale)
 		return	true;
 	}
 
+	//reserve memory - now reading directly into var_str
 	//get file size * wchar memory to load the file or fail
 	//boost::scoped_array<char> memblock(new char [bytesize]);
-	std::unique_ptr<char[]> memblock(new char[bytesize]);
-	if (memblock==0)
+	//std::unique_ptr<char[]> memblock(new char[bytesize]);
+	//if (memblock==0)
+	try
+	{
+		//emergency memory - will be deleted at } - useful if OOM
+		std::unique_ptr<char[]> emergencymemory(new char[16384]);
+
+		//resize the string to receive the whole file
+		var_str.resize(bytesize);
+	}
+	catch (std::bad_alloc& ex)
 	{
 		throw MVOutOfMemory("Could not obtain "^var(int(bytesize*sizeof(char)))^" bytes of memory to read "^var(osfilename));
 		//myfile.close();
@@ -1252,33 +1291,38 @@ bool var::osread(const char* osfilename, const var& locale)
 
 	//read the file into the reserved memory block
 	myfile.seekg (0, std::ios::beg);
-	myfile.read (memblock.get(), (unsigned int) bytesize);
+	//myfile.read (memblock.get(), (unsigned int) bytesize);
+	myfile.read (var_str.data(), (unsigned int) bytesize);
 
 	bool failed = myfile.fail();
 
-	// NOTE: in "utf8" mode, number of read characters in memblock is less then requested.
-	//		As such, to prevent garbage in tail of returned string, do:
+	//in case we didnt read the whole file for some reason, remove garbage in the end of the string
 	//	#pragma warning( disable: 4244 )
 	//warning C4244: '=' : conversion from 'std::streamoff' to 'unsigned int', possible loss of data
 	bytesize = (unsigned int) myfile.gcount();
+	var_str.resize(bytesize);
 	myfile.close();
 
-	//failure can indicate that we didnt get as many characters as requested due to
-	//utf8 encoding in file
+	//failure can indicate that we didnt get as many characters as requested
 	if (failed && ! bytesize) {
 		return false;
 	}
 
 	//ALN:JFI: actually we could use std::string 'tempstr' in place of 'memblock' by hacking
 	//	.data member and reserve() or resize(), thus avoiding buffer-to-buffer-copying
-	var_str=std::string(memblock.get(), (unsigned int) bytesize);
+	//var_str=std::string(memblock.get(), (unsigned int) bytesize);
+	//SJB Done 20190604
+
+	if (codepage)
+		//var_str=boost::locale::conv::to_utf<char>(var_str,"ISO-8859-5")};
+		var_str=boost::locale::conv::to_utf<char>(var_str,codepage);
 
 	return true;
 }
 
-bool var::oswrite(const var& osfilename, const var& locale) const
+bool var::oswrite(const var& osfilename, const var& codepage) const
 {
-	THISIS("bool var::oswrite(const var& osfilename) const")
+	THISIS("bool var::oswrite(const var& osfilename, const var& codepage="") const")
 	THISISSTRING()
 	ISSTRING(osfilename)
 
@@ -1287,18 +1331,25 @@ bool var::oswrite(const var& osfilename, const var& locale) const
 	//imbue BEFORE opening or after flushing
 	//myfile.imbue(std::locale(std::locale::classic(), new NullCodecvt));
 
-	//get a file structure configured to the right locale (locale provides a CodeCvt facet)
+	//get a file structure
 	std::ofstream myfile;
-	myfile.imbue(get_locale(locale));
+	//myfile.imbue(get_locale(locale));
 
-	//although the stream works with char, its parameter file name is narrow char *
 	//delete any previous file,
 	myfile.open(osfilename.to_path_string().c_str(), std::ios::trunc | std::ios::out | std::ios::binary);
 	if (! myfile)
 		return false;
 
 	//write out the full string or fail
-	myfile.write(var_str.data(), int(var_str.length()));
+	if (codepage)
+	{
+		std::string tempstr=
+			boost::locale::conv::from_utf<char>(var_str,codepage);
+		myfile.write(tempstr.data(), int(tempstr.length()));
+
+	} else {
+		myfile.write(var_str.data(), int(var_str.length()));
+	}
 	bool failed = myfile.fail();
 	myfile.close();
 	return ! failed;
@@ -1325,7 +1376,7 @@ bool var::osbwrite(const var& osfilevar, var& startoffset, const bool adjust) co
 	if (pmyfile == 0)
 		return false;
 
-std::cout << pmyfile->getloc().name();
+//std::cout << pmyfile->getloc().name();
 
 	//NB seekp goes by bytes regardless of the fact that it is a wide stream
 	//myfile.seekp (startoffset*sizeof(char));

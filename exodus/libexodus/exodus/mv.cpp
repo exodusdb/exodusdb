@@ -216,11 +216,12 @@ var::var(const char* charstart, const size_t nchars)
 
 //allow conversion to string (IS THIS USED FOR ANYTHING AT THE MOMENT?
 //allows the usage of any string function
-//operator const std::string()
-   	//{
-//	//debuggCONVERT&& cout<<"CONVERT: operator const std::string() returns '"<<var_str<<"'\n";
-//	return var_str;
-//}
+var::operator std::string() const
+{
+	THISIS("var::operator std::string")
+	THISISSTRING()
+	return var_str;
+}
 
 var::operator void*() const
 {

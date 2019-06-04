@@ -77,7 +77,7 @@ DLL_PUBLIC var timedate()
 	return var().timedate();
 }
 
-void DLL_PUBLIC ossleep(const int milliseconds)
+DLL_PUBLIC void ossleep(const int milliseconds)
 {
 	var().ossleep(milliseconds);
 }
@@ -94,7 +94,7 @@ DLL_PUBLIC bool osopen(const var& osfilename, var& osfilevar, const var& locale)
 }
 
 //osclose x
-void DLL_PUBLIC osclose(const var& osfilevar)
+DLL_PUBLIC void osclose(const var& osfilevar)
 {
 	osfilevar.osclose();
 }
@@ -157,9 +157,9 @@ DLL_PUBLIC bool osbwrite(const var& data, const var& filehandle, const var& star
 //two argument version returns success/failure to be used in if statement
 //target variable first to be like "osread x from y else" and "read x from y else"
 //unfortunately different from osgetenv which is the reverse
-DLL_PUBLIC bool osread(var& data, const var& osfilename, const var& locale)
+DLL_PUBLIC bool osread(var& data, const var& osfilename, const var& codepage)
 {
-	return data.osread(osfilename,locale);
+	return data.osread(osfilename,codepage);
 }
 
 //one argument returns the contents directly to be used in assignments
@@ -173,9 +173,9 @@ DLL_PUBLIC var osread(const var& osfilename)
 }
 
 //oswrite x on y else
-DLL_PUBLIC bool oswrite(const var& data, const var& osfilename, const var& locale="")
+DLL_PUBLIC bool oswrite(const var& data, const var& osfilename, const var& codepage="")
 {
-	return data.oswrite(osfilename,locale);
+	return data.oswrite(osfilename,codepage);
 }
 
 //if osdelete x else
@@ -241,7 +241,7 @@ DLL_PUBLIC var oscwd(const var& dirname)
 	return dirname.oscwd(dirname);
 }
 
-void DLL_PUBLIC osflush()
+DLL_PUBLIC void osflush()
 {
 	return var().osflush();
 }
@@ -281,12 +281,12 @@ DLL_PUBLIC void osshellwrite(const var& writestr, const var& command)
 	command.osshellwrite(writestr);
 }
 
-void DLL_PUBLIC stop(const var& text)
+DLL_PUBLIC void stop(const var& text)
 {
 	text.stop(text);
 }
 
-void DLL_PUBLIC abort(const var& text)
+DLL_PUBLIC void abort(const var& text)
 {
 	var().abort(text);
 }
@@ -311,61 +311,61 @@ DLL_PUBLIC var logoff()
 	return var().logoff();
 }
 
-void DLL_PUBLIC debug()
+DLL_PUBLIC void debug()
 {
 	var().debug();
 }
 
 
-void DLL_PUBLIC print(const var& var1)
+DLL_PUBLIC void print(const var& var1)
 {
 	var1.output();
 }
 
-void DLL_PUBLIC printl(const var& var1)
+DLL_PUBLIC void printl(const var& var1)
 {
 	var1.outputl();
 }
 
-void DLL_PUBLIC printt(const var& var1)
+DLL_PUBLIC void printt(const var& var1)
 {
 	var1.outputt();
 }
 
 
-void DLL_PUBLIC output(const var& var1)
+DLL_PUBLIC void output(const var& var1)
 {
 	var1.output();
 }
 
-void DLL_PUBLIC outputl(const var& var1)
+DLL_PUBLIC void outputl(const var& var1)
 {
 	var1.outputl();
 }
 
-void DLL_PUBLIC outputt(const var& var1)
+DLL_PUBLIC void outputt(const var& var1)
 {
 	var1.outputt();
 }
 
 
-void DLL_PUBLIC errput(const var& var1)
+DLL_PUBLIC void errput(const var& var1)
 {
 	var1.errput();
 }
 
-void DLL_PUBLIC errputl(const var& var1)
+DLL_PUBLIC void errputl(const var& var1)
 {
 	var1.errputl();
 }
 
 
-void DLL_PUBLIC logput(const var& var1)
+DLL_PUBLIC void logput(const var& var1)
 {
 	var1.logput();
 }
 
-void DLL_PUBLIC logputl(const var& var1)
+DLL_PUBLIC void logputl(const var& var1)
 {
 	var1.logputl();
 }
@@ -386,7 +386,7 @@ DLL_PUBLIC var getcursor()
 	return var().getcursor();
 }
 
-void DLL_PUBLIC setcursor(const var& cursor)
+DLL_PUBLIC void setcursor(const var& cursor)
 {
 	cursor.setcursor();
 }
@@ -396,7 +396,7 @@ DLL_PUBLIC var getprompt()
 	return var().getprompt();
 }
 
-void DLL_PUBLIC setprompt(const var& prompt)
+DLL_PUBLIC void setprompt(const var& prompt)
 {
 	prompt.setprompt();
 }
@@ -408,19 +408,19 @@ DLL_PUBLIC var input()
 	return temp;
 }
 
-DLL_PUBLIC void input(var& inputfield)
+DLL_PUBLIC bool input(var& inputfield)
 {
-	inputfield.input();
+	return inputfield.input();
 }
 
-DLL_PUBLIC void input(const var& prompt, var& inputfield)
+DLL_PUBLIC bool input(const var& prompt, var& inputfield)
 {
-	inputfield.input(prompt);
+	return inputfield.input(prompt);
 }
 
-DLL_PUBLIC void inputn(var& inputfield, const int nchars)
+DLL_PUBLIC bool inputn(var& inputfield, const int nchars)
 {
-	inputfield.input("", nchars);
+	return inputfield.input("", nchars);
 }
 
 DLL_PUBLIC var len(const var& var1)
@@ -775,7 +775,7 @@ DLL_PUBLIC var rnd(const int number)
 	return var(number).rnd();
 }
 
-void DLL_PUBLIC initrnd(const var& seed)
+DLL_PUBLIC void initrnd(const var& seed)
 {
 	var(seed).initrnd();
 }
@@ -952,12 +952,12 @@ DLL_PUBLIC bool lock(const var& filehandle, const var& key)
 	return (bool) filehandle.lock(key);
 }
 
-void DLL_PUBLIC unlock(const var& filehandle, const var& key)
+DLL_PUBLIC void unlock(const var& filehandle, const var& key)
 {
 	filehandle.unlock(key);
 }
 
-void DLL_PUBLIC unlockall()
+DLL_PUBLIC void unlockall()
 {
 	var().unlockall();
 }

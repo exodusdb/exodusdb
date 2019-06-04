@@ -125,6 +125,7 @@ bool var::input(const var& prompt, const int nchars)
 			var_str+=char1;
 		}
 		return var_str.length()>0;
+
 	} else if (nchars>0) {
 
 		var_str="";
@@ -174,7 +175,9 @@ bool var::input()
 
 	std::getline(std::cin,var_str);
 
-	return var_str.length()>0;
+	//return true if not at end of file even if input empty string
+	//return var_str.length()>0;
+	return true;
 }
 
 void var::stop(const var& text) const

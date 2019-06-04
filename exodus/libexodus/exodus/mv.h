@@ -547,9 +547,7 @@ public:
 	//in a lot of compilation failures due to "ambiguous overload"
 	//unfortunately there is no "explicit" keyword as for constructors - coming in C++0X
 	//for now prevent this to ensure efficient programming
-	#ifndef MV_NO_NARROW
-		operator std::string() const;
-	#endif
+	operator std::string() const;
 
 	//allow conversion to char (takes first char or char 0 if zero length string)
 	//would allow the usage of any char function but may result
@@ -1217,8 +1215,8 @@ public:
 	bool osbwrite(const var& osfilevar, var& startoffset, const bool adjust=true) const;
 	bool osbwrite(const var& osfilevar, const var& startoffset, const bool adjust=true) const;
 	void osclose() const;
-	bool osread(const var& osfilename, const var& locale DEFAULTNULL);
-	bool oswrite(const var& osfilename, const var& locale DEFAULTNULL) const;
+	bool osread(const var& osfilename, const var& codepage DEFAULTNULL);
+	bool oswrite(const var& osfilename, const var& codepage DEFAULTNULL) const;
 	bool osdelete() const;
 	bool osdelete(const var& osfilename) const;
 	bool osrename(const var& newosdir_or_filename) const;
@@ -1241,7 +1239,7 @@ public:
 	//this is to only to avoid convertion too and from var
 	//but will usage of hard coded filenames etc really be in fast loops
 	//and performance related? perhaps only provide
-	bool osread(const char* osfilename, const var& locale DEFAULTNULL);
+	bool osread(const char* osfilename, const var& codepage DEFAULTNULL);
 
 	//libraries and subroutines/functions
 /* replaced by  #include funcname.h
