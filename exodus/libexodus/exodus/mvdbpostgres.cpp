@@ -672,7 +672,7 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/)
 
 		//filename.outputl("filename=");
 		//$1=table_name
-		std::string filename2=filename.lcase().convert(".","_").toString();
+		std::string filename2=filename.normalize().lcase().convert(".","_").toString();
 		paramValues[0] = filename2.c_str();
 		paramLengths[0] = int(filename2.length());
 		//paramFormats[0] = 1;//binary
@@ -738,7 +738,7 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/)
 
 		//save the filename and connection no
 		//memorise the current connection for this file var
-		(*this)=filename ^ FM ^ connection.getconnectionid();
+		(*this)=filename2 ^ FM ^ connection.getconnectionid();
 
 		//outputl("opened filehandle");
 
@@ -870,14 +870,15 @@ bool var::read(const var& filehandle,const var& key)
 	//uint32_t	binaryIntVal;
 
 	//lower case key if reading from dictionary
-	std::string key2;
+	//std::string key2;
 	//if (filehandle.substr(1,5).lcase()=="dict_")
 	//	key2=key.lcase().toString();
 	//else
-		key2=key.toString();
+	//	key2=key.toString();
+	std::string key2=key.normalize();
 
 	//$1=key
-	paramValues[0]=key2.c_str();
+	paramValues[0]=key2.data();
 	paramLengths[0]=int(key2.length());
 	//paramFormats[0]=1;
 
@@ -945,6 +946,9 @@ var var::hash(const unsigned long long modulus) const
 
 	//https://softwareengineering.stackexchange.com/questions/49550/which-hashing-algorithm-is-best-for-uniqueness-and-speed
 
+	//not normalizing for speed
+	//std::string tempstr=this->normalize();
+
 	//uint64_t hash64=MurmurHash64((wchar_t*)fileandkey.data(),int(fileandkey.length()*sizeof(wchar_t)),0);
 	uint64_t hash64=MurmurHash64((char*)var_str.data(),int(var_str.length()*sizeof(char)),0);
 	if (modulus)
@@ -967,7 +971,7 @@ var var::lock(const var& key) const
 
 	std::string fileandkey=this->a(1).convert(".","_").var_str;
 	fileandkey.append(" ");
-	fileandkey.append(key.var_str);
+	fileandkey.append(key.normalize().var_str);
 
 	//TODO .. provide endian identical version
 	//required if and when exodus processes connect to postgres on a DIFFERENT host
@@ -1058,7 +1062,7 @@ bool var::unlock(const var& key) const
 
 	std::string fileandkey=this->a(1).var_str;
 	fileandkey.append(" ");
-	fileandkey.append(key.var_str);
+	fileandkey.append(key.normalize().var_str);
 
 	//TODO .. provide endian identical version
 	//required if and when exodus processes connect to postgres on a DIFFERENT host
@@ -1243,8 +1247,10 @@ bool var::write(const var& filehandle, const var& key) const
 		return true;
 	}
 
-	std::string key2=key.toString();
-	std::string data2=(*this).toString();
+	//std::string key2=key.toString();
+	//std::string data2=(*this).toString();
+	std::string key2=key.normalize();
+	std::string data2=(*this).normalize();
 
 	//a 2 parameter array
 	const char*	paramValues[2];
@@ -1252,6 +1258,7 @@ bool var::write(const var& filehandle, const var& key) const
 	//int		paramFormats[2];
 
 	//$1 key
+	//paramValues[0] = key2.data();
 	paramValues[0] = key2.data();
 	paramLengths[0] = int(key2.length());
 	//paramFormats[0] = 1;//binary
@@ -1326,8 +1333,10 @@ bool var::updaterecord(const var& filehandle,const var& key) const
 	ISSTRING(filehandle)
 	ISSTRING(key)
 
-	std::string key2=key.toString();
-	std::string data2=(*this).toString();
+	//std::string key2=key.toString();
+	//std::string data2=(*this).toString();
+	std::string key2=key.normalize();
+	std::string data2=(*this).normalize();
 
 	//a 2 parameter array
 	const char* paramValues[2];
@@ -1408,8 +1417,10 @@ bool var::insertrecord(const var& filehandle,const var& key) const
 	ISSTRING(filehandle)
 	ISSTRING(key)
 
-	std::string key2=key.toString();
-	std::string data2=(*this).toString();
+	//std::string key2=key.toString();
+	//std::string data2=(*this).toString();
+	std::string key2=key.normalize();
+	std::string data2=(*this).normalize();
 
 	//a 2 parameter array
 	const char* paramValues[2];
@@ -1482,7 +1493,8 @@ bool var::deleterecord(const var& key) const
 	THISISSTRING()
 	ISSTRING(key)
 
-	std::string key2=key.toString();
+	//std::string key2=key.toString();
+	std::string key2=key.normalize();
 
 	//a one parameter array
 	const char* paramValues[1];

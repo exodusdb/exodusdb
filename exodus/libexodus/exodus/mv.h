@@ -958,6 +958,9 @@ public:
 	var& unquoter();
 	var& ucaser();//utf8
 	var& lcaser();//utf8
+	var& tcaser();//utf8
+	var& fcaser();//utf8
+	var& normalizer();//utf8
 	var& inverter();//utf8
 	var& trimmer(const char* trimchar DEFAULTSPACE);
 	var& trimmerf(const char* trimchar DEFAULTSPACE);
@@ -981,6 +984,9 @@ public:
 	var unquote() const;
 	var ucase() const;//utf8
 	var lcase() const;//utf8
+	var tcase() const;//utf8
+	var fcase() const;//utf8
+	var normalize() const;//utf8
 	var invert() const;//utf8
 	var trim(const char* trimchar DEFAULTSPACE) const;
 	var trimf(const char* trimchar DEFAULTSPACE) const;

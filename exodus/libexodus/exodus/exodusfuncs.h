@@ -155,6 +155,10 @@ DLL_PUBLIC var& ucaser(var& instring);
 DLL_PUBLIC var ucase(const var& instring);
 DLL_PUBLIC var& lcaser(var& instring);
 DLL_PUBLIC var lcase(const var& instring);
+DLL_PUBLIC var& tcaser(var& instring);
+DLL_PUBLIC var fcase(const var& instring);
+DLL_PUBLIC var& tcaser(var& instring);
+DLL_PUBLIC var fcase(const var& instring);
 DLL_PUBLIC var unique(const var& instring);
 DLL_PUBLIC var& inverter(var& instring);
 DLL_PUBLIC var invert(const var& instring);
@@ -377,33 +381,43 @@ void printt(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 ar
 template<class T1, class T2>
 void printl(T1 arg1, T2 arg2)
 { print(arg1); printl(arg2);}
+
 template<class T1, class T2, class T3>
 void printl(T1 arg1, T2 arg2, T3 arg3)
 { print(arg1); print(arg2); printl(arg3);}
+
 template<class T1, class T2, class T3, class T4>
 void printl(T1 arg1, T2 arg2, T3 arg3, T4 arg4)
 { print(arg1); print(arg2); print(arg3); printl(arg4);}
+
 template<class T1, class T2, class T3, class T4, class T5>
 void printl(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
 { print(arg1); print(arg2); print(arg3); print(arg4); printl(arg5);}
+
 template<class T1, class T2, class T3, class T4, class T5, class T6>
 void printl(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
 { print(arg1); print(arg2); print(arg3); print(arg4); print(arg5); printl(arg6);}
+
 template<class T1, class T2, class T3, class T4, class T5, class T6, class T7>
 void printl(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
 { print(arg1); print(arg2); print(arg3); print(arg4); print(arg5); print(arg6); printl(arg7);}
+
 template<class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
 void printl(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8)
 { print(arg1); print(arg2); print(arg3); print(arg4); print(arg5); print(arg6); print(arg7); printl(arg8);}
+
 template<class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 void printl(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9)
 { print(arg1); print(arg2); print(arg3); print(arg4); print(arg5); print(arg6); print(arg7); print(arg8); printl(arg9); }
+
 template<class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10>
 void printl(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9, T10 arg10)
 { print(arg1); print(arg2); print(arg3); print(arg4); print(arg5); print(arg6); print(arg7); print(arg8); print(arg9); printl(arg10);}
+
 template<class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10, class T11>
 void printl(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9, T10 arg10, T11 arg11)
 { print(arg1); print(arg2); print(arg3); print(arg4); print(arg5); print(arg6); print(arg7); print(arg8); print(arg9); print(arg10); printl(arg11);}
+
 template<class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10, class T11, class T12>
 void printl(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9, T10 arg10, T11 arg11, T12 arg12)
 { print(arg1); print(arg2); print(arg3); print(arg4); print(arg5); print(arg6); print(arg7); print(arg8); print(arg9); print(arg10); print(arg11); printl(arg12);}

@@ -17,13 +17,13 @@ function main() {
 
         var file;
         if (not open(filename,file))
-                abort(filename^" file does not exist.");
+                abort(filename.quote()^" file does not exist.");
 
         var sep=0;
         var posn=1;
         var ndeleted=0;
         do {
-                var itemid=remove(itemids,posn,sep);
+                var itemid=substr2(itemids,posn,sep);
 
                 if (itemid=="*") {
                         clearfile(file);

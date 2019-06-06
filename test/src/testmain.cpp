@@ -70,6 +70,75 @@ function main()
 	printl("char:     ",(int)sizeof(char));
 	printl("var:      ",(int)sizeof(var));
 
+	assert(var("top of the world").tcase()=="Top Of The World");
+	printl(var("top of the world").tcase().fcase());
+
+	// test normalization
+
+	//NFD - Decomposed Normal Form
+	//NFC - Compact Normal Form
+	var decomp_a="\x61\xCC\x81";//"á";
+	var compact_a="\xC3\xA1";//"á";
+
+	assert(decomp_a=="á");
+	assert(compact_a=="á");
+
+	assert(decomp_a.oconv("HEX")=="61CC81");
+	assert(compact_a.oconv("HEX")=="C3A1");
+
+	//test normalize (to NFC)
+	assert(decomp_a != compact_a);
+	assert(decomp_a.normalize() == compact_a);
+	assert(decomp_a.normalize().oconv("HEX")=="C3A1");
+
+	//test read/write/delete normalization
+	//exodus will normalize everything being written to the database because otherwise kind of duplicate keys can exist because
+	//postgres says the following is false ... because one is a single unicode code unit and the other is two combined into one for presentation
+	//SELECT 'á' = 'á';
+
+	var filename="testmain_temp1";
+
+	var trec;
+	deletefile(filename);
+	createfile(filename);
+
+	//test write decomp can be read by compact and deleted by compact
+	write("temp",filename,decomp_a);
+	assert(read(trec,filename,compact_a));
+	assert(trec=="temp");
+	deleterecord(filename,compact_a);
+	assert(not read(trec,filename,compact_a));
+
+	//test write compact can be read by decomp and deleted by decomp
+	write("temp",filename,compact_a);
+	trec="";
+	assert(read(trec,filename,decomp_a));
+
+	//check on invalid utf-8
+
+	//should except on a abaft about above afore after along amid among an apud as aside at atop below but by circa down for from given in into lest like mid midst minus near next of off on onto out ov$
+	var utftest,utftest2;
+	var utftestfilename="utf-8-test.txt";
+
+        //osread invalid utf8 should read without change
+        //will be unwritable to database which only accepts utf8 key and data
+        osread(utftest,utftestfilename);
+        utftest.len().outputl("len=");
+        assert(len(utftest)==osfile(utftestfilename).a(1));
+
+        //check invalif utf8 has no change oswrite/osread round trip
+        oswrite(utftest,utftestfilename^".2");
+        osread(utftest2,utftestfilename^".2");
+        assert(utftest2=utftest);
+
+        //check invalid utf has no change on ucase/lcase round trip
+        assert(lcase(ucase(utftest))==lcase(utftest));
+        assert(ucase(lcase(utftest))==ucase(utftest));
+
+        //check what normalize() does on invalid utf
+        var fixed_utftest=utftest.normalize();
+        assert(fixed_utftest.len()==22400);
+
 	//match returning what it finds
 
 	//groups

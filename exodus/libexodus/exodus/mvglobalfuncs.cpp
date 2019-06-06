@@ -485,6 +485,36 @@ DLL_PUBLIC var lcase(const var& instring)
 	return instring.lcase();
 }
 
+DLL_PUBLIC var& tcaser(var& instring)
+{
+	return instring.tcaser();
+}
+
+DLL_PUBLIC var tcase(const var& instring)
+{
+	return instring.tcase();
+}
+
+DLL_PUBLIC var& fcaser(var& instring)
+{
+	return instring.fcaser();
+}
+
+DLL_PUBLIC var fcase(const var& instring)
+{
+	return instring.fcase();
+}
+
+DLL_PUBLIC var& normalizer(var& instring)
+{
+	return instring.normalizer();
+}
+
+DLL_PUBLIC var normalize(const var& instring)
+{
+	return instring.normalize();
+}
+
 DLL_PUBLIC var unique(const var& instring)
 {
 	return instring.unique();

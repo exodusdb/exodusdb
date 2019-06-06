@@ -765,6 +765,7 @@ var& var::inverter()
 	return *this;
 }
 
+//upper case
 var var::ucase() const
 {
 	return var(*this).ucaser();
@@ -813,6 +814,7 @@ int32_t ucasemap_utf8ToLower (
 */
 }
 
+//lower case
 var var::lcase() const
 {
 	return var(*this).lcaser();
@@ -845,6 +847,106 @@ var& var::lcaser()
 	init_boost_locale1();
 
 	var_str=boost::locale::to_lower(var_str,tls_boost_locale1);
+
+	return *this;
+
+}
+
+//title case
+var var::tcase() const
+{
+	return var(*this).tcaser();
+}
+
+var& var::tcaser()
+{
+	THISIS("var& var::tcaser()")
+	THISISSTRING()
+
+	init_boost_locale1();
+
+	//should not title 1 2 or 3 letter words or perhaps just a list of exceptions as follows:
+	//a abaft about above afore after along amid among an apud as aside at atop below but by circa down for from given in into lest like mid midst minus near next of off on onto out over pace past per plus pro qua round sans save since than thru till times to under until unto up upon via vice with worth the and nor or yet so
+	//or
+	//a an as at but by circa for from in into like mid of on onto out over per pro qua sans than thru to until unto up upon via vice with the and nor or yet so
+
+	var_str=boost::locale::to_title(var_str,tls_boost_locale1);
+
+	return *this;
+
+}
+
+//fold case - prepare for indexing/searching
+//https://www.w3.org/International/wiki/Case_folding
+// Note that accents are sometimes significant and sometime not. e.g. in French
+//  cote (rating)
+//  coté (highly regarded)
+//  côte (coast)
+//  côté (side)
+var var::fcase() const
+{
+	return var(*this).fcaser();
+}
+
+var& var::fcaser()
+{
+	THISIS("var& var::fcaser()")
+	THISISSTRING()
+
+	init_boost_locale1();
+
+	var_str=boost::locale::fold_case(var_str,tls_boost_locale1);
+
+	return *this;
+
+}
+
+inline
+bool is_ascii(const std::string& string1)
+{
+	//optimise for ASCII
+	//try ASCII uppercase to start with for speed
+	//this may not be correct for all locales. eg Turkish I i İ ı mixing Latin and Turkish letters.
+	for (const char& c : string1)
+	{
+		if ((c & ~0x7f) != 0)
+			return false;
+	}
+	return true;
+}
+
+// *** USED TO NORMALISE ALL KEYS BEFORE READING OR WRITING ***
+// *** otherwise can have two record with similar keys á and á
+//postgres gives FALSE for the following:
+//SELECT 'á' = 'á';
+
+//normalise (unicode NFC, C=Compact ... norm_nfc)
+//see "Unicode Normalization Forms" https://unicode.org/reports/tr15/
+//"It is crucial that Normalization Forms remain stable over time. That is, if a string that does not
+// have any unassigned characters is normalized under one version of Unicode,
+// it must remain normalized under all future versions of Unicode."
+var var::normalize() const
+{
+	return var(*this).normalizer();
+}
+
+var& var::normalizer()
+{
+	THISIS("var& var::normalizer()")
+	THISISSTRING()
+
+	//optimise for ASCII which needs no normalisation
+	if (is_ascii(var_str))
+		return (*this);
+
+	init_boost_locale1();
+
+	//TODO see if the quick way to check if already in NFC format
+	//is available in some library or if it is already built into boost locale normalize
+	//because checking for being in normal form is very fast according to unicode docs
+
+	//norm_nfc
+	var_str=boost::locale::normalize(var_str,boost::locale::norm_nfc,tls_boost_locale1);
 
 	return *this;
 
@@ -1343,19 +1445,6 @@ var var::convert(const var& oldchars,const var& newchars) const
 	//return var(*this).converter(oldchars,newchars);
 	var temp=var(*this).converter(oldchars,newchars);
 	return temp;
-}
-
-bool is_ascii(std::string string1)
-{
-	//optimise for ASCII
-	//try ASCII uppercase to start with for speed
-	//this may not be correct for all locales. eg Turkish I i İ ı mixing Latin and Turkish letters.
-	for (char& c : string1)
-	{
-		if ((c & ~0x7f) != 0)
-			return false;
-	}
-	return true;
 }
 
 template <class T>

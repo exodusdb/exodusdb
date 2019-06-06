@@ -1235,7 +1235,7 @@ subroutine process_one_record()
 				//number up to the next pick field, value, subvalue or other separator character.
 				//It doesnt actually "remove" any text but it does also move the pointer up
 				//ready for the next extraction and tells you what the next separator character is
-				icol(coln)=mcol(coln).remove(pcol(coln), ccol(coln));
+				icol(coln)=mcol(coln).substr2(pcol(coln), ccol(coln));
 
 				scol(coln) = icol(coln);
 			}
