@@ -20,86 +20,96 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-//DOESNT SEEM TO BE USED ANYWHERE EXCEPT service/markets/market.cpp Is it obsolete?
+// DOESNT SEEM TO BE USED ANYWHERE EXCEPT service/markets/market.cpp Is it obsolete?
 #ifndef EXO_H
 #define EXO_H 1
 
 #ifndef EXODUS_POSIX
 #define WIN32_LEAN_AND_MEAN
-#include <windows.h>
 #include <exodus/mv.h>
 #include <exodus/mvenvironment.h>
+#include <windows.h>
 
-//http://msdn2.microsoft.com/en-us/library/28d6s79h(VS.80).aspx
+// http://msdn2.microsoft.com/en-us/library/28d6s79h(VS.80).aspx
 /*
-Module-definition (.def) files provide the linker with information about exports, attributes, and other information about the program to be linked. A .def file is most useful when building a DLL. Because there are linker options that can be used instead of module-definition statements, .def files are generally not necessary. You can also use __declspec(dllexport) as a way to specify exported functions.
+Module-definition (.def) files provide the linker with information about exports, attributes, and
+other information about the program to be linked. A .def file is most useful when building a DLL.
+Because there are linker options that can be used instead of module-definition statements, .def
+files are generally not necessary. You can also use __declspec(dllexport) as a way to specify
+exported functions.
 */
 
-//http://en.wikipedia.org/wiki/Dynamic_link_library
+// http://en.wikipedia.org/wiki/Dynamic_link_library
 
 /* http://en.wikipedia.org/wiki/Dynamic_link_library
-DLL files may be explicitly loaded at run-time, a process referred to simply as run-time dynamic linking by Microsoft, by using the LoadLibrary (or LoadLibraryEx) API function. The GetProcAddress API function is used to lookup exported symbols by name, and FreeLibrary � to unload the DLL. These functions are analogous to dlopen, dlsym, and dlclose in the POSIX standard API.
+DLL files may be explicitly loaded at run-time, a process referred to simply as run-time dynamic
+linking by Microsoft, by using the LoadLibrary (or LoadLibraryEx) API function. The GetProcAddress
+API function is used to lookup exported symbols by name, and FreeLibrary � to unload the DLL. These
+functions are analogous to dlopen, dlsym, and dlclose in the POSIX standard API.
 */
 
-//Allocating and freeing memory across module boundaries
-//http://blogs.msdn.com/oldnewthing/archive/2006/09/15/755966.aspx
+// Allocating and freeing memory across module boundaries
+// http://blogs.msdn.com/oldnewthing/archive/2006/09/15/755966.aspx
 
-//http://www.icynorth.com/development/createdlltutorial.html
-// Export this function - cannot use C linkage to pass UDT User Defined Types (anything other than POD Plain Old Data)
-//use .def file?
+// http://www.icynorth.com/development/createdlltutorial.html
+// Export this function - cannot use C linkage to pass UDT User Defined Types (anything other than
+// POD Plain Old Data)
+// use .def file?
 
 /*
 	//dynamic execution via function table (not implemented yet)
 	//will throw if not found
 	var().call("myfunction")
-	
+	
 	//dynamic execution
 	//will throw if not found
 	var().call("mydll","myfunction")
-	
+	
 	//dynamic linking with caching
 	//will throw if not found
 	var myfunction;
 	myfunction.call("mydll","myfunction")
 	myfunction.call()
- 	
+	
 	//error checking loading
 	var myfunction;
 	if (!myfunction.load("mydll"))
 	{
- 	throw MVException("cannot load mydll");
+	throw MVException("cannot load mydll");
 	}
-	
+	
 	//error checking linking not implemented yet
 	var myfunction;
 	if (!myfunction.link("myfunction"))
 	{
- 	throw MVException("cannot link  myfunction");
+	throw MVException("cannot link  myfunction");
 	}
-	
+	
 	//error checking loading and linking in one step
 	var myfunction;
 	if (!myfunction.link("mydll","myfunction"))
 	{
- 	throw MVException("cannot link mydll, myfunction");
+	throw MVException("cannot link mydll, myfunction");
 	}
-	
+	
 */
 
-//warning C4190: 'XXX' has C-linkage specified, but returns UDT 'YYY' which is incompatible with C
-#pragma warning (disable: 4190)
+// warning C4190: 'XXX' has C-linkage specified, but returns UDT 'YYY' which is incompatible with C
+#pragma warning(disable : 4190)
 
-//this is not needed since it is automatically generated if missing
-BOOL APIENTRY DllMain(HANDLE hModule, DWORD dwReason, LPVOID lpReserved){return TRUE;};
+// this is not needed since it is automatically generated if missing
+BOOL APIENTRY DllMain(HANDLE hModule, DWORD dwReason, LPVOID lpReserved) { return TRUE; };
 
 extern "C"
 {
 
-#define function(funcname) exodus::var __declspec(dllexport) funcname(exodus::MvEnvironment& env){
+#define function(funcname)                                                                         \
+	exodus::var __declspec(dllexport) funcname(exodus::MvEnvironment& env)                     \
+	{
 
 #define functionexit }
 
 #define libraryexit }
 
 #endif EXODUS_POSIX
-#endif //EXO_H
+#endif // EXO_H

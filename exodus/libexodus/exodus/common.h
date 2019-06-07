@@ -1,25 +1,32 @@
 #define BUILDING_LIBRARY
 #include <exodus/exodus.h>
 
-//a common section is a just a class section that can be instantiated by other programs.
+// a common section is a just a class section that can be instantiated by other programs.
 
-//common can have MULTIPLE commoninit/exit sections and all are publically available
-//by including the libraryfilename.h file name in other programs and libraries.
+// common can have MULTIPLE commoninit/exit sections and all are publically available
+// by including the libraryfilename.h file name in other programs and libraries.
 
 #undef subroutine
 #undef function
-#define subroutine public: void
-#define function public: var
+#define subroutine                                                                                 \
+      public:                                                                                      \
+	void
+#define function                                                                                   \
+      public:                                                                                      \
+	var
 
-//a common section is just a class plus a definition into the common array
-#define commoninit(COMMON_NAME,COMMON_NO) \
-class COMMON_NAME##_common : public LabelledCommon{ \
-public:
+// a common section is just a class plus a definition into the common array
+#define commoninit(COMMON_NAME, COMMON_NO)                                                         \
+	class COMMON_NAME##_common : public LabelledCommon                                         \
+	{                                                                                          \
+	      public:
 
-#define commonexit(COMMON_NAME,COMMON_NO) \
-}; \
-COMMON_NAME##_common&& COMMON_NAME=reinterpret_cast<COMMON_NAME##_common&&> (*mv.labelledcommon[COMMON_NO]);
-//if (!COMMON_NAME) mv.labelledcommon[COMMON_NO]=new COMMON_NAME##_common;
+#define commonexit(COMMON_NAME, COMMON_NO)                                                         \
+	}                                                                                          \
+	;                                                                                          \
+	COMMON_NAME##_common&& COMMON_NAME =                                                       \
+	    reinterpret_cast<COMMON_NAME##_common&&>(*mv.labelledcommon[COMMON_NO]);
+// if (!COMMON_NAME) mv.labelledcommon[COMMON_NO]=new COMMON_NAME##_common;
 
 /*
 //works but is hard to to debug since there is no variable gen
@@ -34,7 +41,8 @@ COMMON_NAME##_common&& COMMON_NAME=reinterpret_cast<COMMON_NAME##_common&&> (*mv
 //and if you try to reset it later, it tried to swap out nothing, causing segfault
 gen_common&& gen=reinterpret_cast<gen_common&&> (*mv.labelledcommon[gen_common_no]);
 
-//could use pointers but syntax is ugly gen->companies (and adecom must not recognise -> as an operator)
+//could use pointers but syntax is ugly gen->companies (and adecom must not recognise -> as an
+operator)
 //gen_common*
 
 //#define gen_isdefined (mv.labelledcommon[gen_common_no] != NULL)

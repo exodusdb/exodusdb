@@ -22,56 +22,50 @@ THE SOFTWARE.
 
 #define MV_NO_NARROW
 
-//C4530: C++ exception handler used, but unwind semantics are not enabled. 
-#pragma warning (disable: 4530)
+// C4530: C++ exception handler used, but unwind semantics are not enabled.
+#pragma warning(disable : 4530)
 
 #include <exodus/mv.h>
 #include <exodus/mvexceptions.h>
 
-//based on http://geneura.ugr.es/~jmerelo/c++-faq/operator-overloading.html#faq-13.8
+// based on http://geneura.ugr.es/~jmerelo/c++-faq/operator-overloading.html#faq-13.8
 
-//one based two dimensional array but (0,0) is a separate element set or got if either or both index is zero
+// one based two dimensional array but (0,0) is a separate element set or got if either or both
+// index is zero
 
-namespace exodus {
-
-//was declared private to prevent it being called but somehow still "dim xyz();" still compiles although with a warning
-//now public to allow usage in class variables
-dim::dim()
-   : nrows_ (1)
-   , ncols_ (1)
-   , initialised_(false)
-   //data_ <--initialized below (after the 'if/throw' statement)
+namespace exodus
 {
- //throw MVArrayDimensionedZero();
- data_ = new var[nrows_ * ncols_ + 1];
-}
 
-dim::~dim()
+// was declared private to prevent it being called but somehow still "dim xyz();" still compiles
+// although with a warning now public to allow usage in class variables
+dim::dim() : nrows_(1), ncols_(1), initialised_(false)
+// data_ <--initialized below (after the 'if/throw' statement)
 {
-	delete[] data_;
+	// throw MVArrayDimensionedZero();
+	data_ = new var[nrows_ * ncols_ + 1];
 }
 
-//move contructor
-dim::dim(dim&& sourcedim) noexcept {
-	nrows_=sourcedim.nrows_;
-	ncols_=sourcedim.ncols_;
-	initialised_=sourcedim.ncols_;
-	data_=sourcedim.data_;
+dim::~dim() { delete[] data_; }
+
+// move contructor
+dim::dim(dim&& sourcedim) noexcept
+{
+	nrows_ = sourcedim.nrows_;
+	ncols_ = sourcedim.ncols_;
+	initialised_ = sourcedim.ncols_;
+	data_ = sourcedim.data_;
 }
 
-dim::dim(int rows, int cols)
-	: nrows_ (rows)
-	, ncols_ (cols)
-	, initialised_(true)
-	//data_ <--initialized below (after the 'if/throw' statement)
+dim::dim(int rows, int cols) : nrows_(rows), ncols_(cols), initialised_(true)
+// data_ <--initialized below (after the 'if/throw' statement)
 {
 	if (rows == 0 || cols == 0)
 		throw MVArrayDimensionedZero();
 	data_ = new var[rows * cols + 1];
 }
 
-//dim split is defined in mvmv.cpp
-//var dim::split(const var& str1)
+// dim split is defined in mvmv.cpp
+// var dim::split(const var& str1)
 
 bool dim::read(const var& filehandle, const var& key)
 {
@@ -80,18 +74,19 @@ bool dim::read(const var& filehandle, const var& key)
 	ISSTRING(key)
 
 	var temprecord;
-	if (!temprecord.read(filehandle,key))
+	if (!temprecord.read(filehandle, key))
 		return false;
 
-	//dont use following because it redimensions the array to the actual number of fields found
-	//and this causes redim to clear the array when redim is in common.h and called repetitively in subroutines
+	// dont use following because it redimensions the array to the actual number of fields found
+	// and this causes redim to clear the array when redim is in common.h and called
+	// repetitively in subroutines
 	//(*this)=temprecord.split();
 
 	this->split(temprecord);
 
-	//var(nrows_).outputl("nrows now=");
+	// var(nrows_).outputl("nrows now=");
 
-	//this->join("|").outputl("read=");
+	// this->join("|").outputl("read=");
 	return true;
 }
 
@@ -101,8 +96,8 @@ bool dim::write(const var& filehandle, const var& key) const
 	ISSTRING(filehandle)
 	ISSTRING(key)
 
-	var temprecord=this->join();
-	return temprecord.write(filehandle,key);
+	var temprecord = this->join();
+	return temprecord.write(filehandle, key);
 }
 
 bool dim::redim(int rows, int cols)
@@ -111,88 +106,87 @@ bool dim::redim(int rows, int cols)
 	if (rows == 0 || cols == 0)
 		throw MVArrayDimensionedZero();
 
-	//do nothing if no change
-	if (initialised_ && rows==nrows_ && cols==ncols_)
+	// do nothing if no change
+	if (initialised_ && rows == nrows_ && cols == ncols_)
 		return true;
 
-	//(var(initialised_)^" "^var(nrows_)^" "^var(ncols_)^" -> "^var(rows)^" "^var(cols)).outputl("redim=");
+	//(var(initialised_)^" "^var(nrows_)^" "^var(ncols_)^" -> "^var(rows)^"
+	//"^var(cols)).outputl("redim=");
 
-	//how exception safe is this?
+	// how exception safe is this?
 
-	//1. create new data first
+	// 1. create new data first
 	var* newdata;
 	newdata = new var[rows * cols + 1];
 
-	//2. only then delete the old data
+	// 2. only then delete the old data
 	delete[] data_;
 
-	//3. and point to the new data
-	data_ =  newdata;
+	// 3. and point to the new data
+	data_ = newdata;
 
-	initialised_=true;
-	nrows_=rows;
-	ncols_=cols;
+	initialised_ = true;
+	nrows_ = rows;
+	ncols_ = cols;
 
 	return true;
-
 }
 
-//the same () function is called regardless of being on LHS or RHS
-//second version is IDENTICAL except for lack of const (used only on "const dim")
-var& dim::operator() (int rowno, int colno)
+// the same () function is called regardless of being on LHS or RHS
+// second version is IDENTICAL except for lack of const (used only on "const dim")
+var& dim::operator()(int rowno, int colno)
 {
 
-	//check bounds
+	// check bounds
 	if (rowno > nrows_)
 		throw MVArrayIndexOutOfBounds("row:" ^ var(rowno) ^ " > " ^ nrows_);
 	if (colno > ncols_)
 		throw MVArrayIndexOutOfBounds("col:" ^ var(colno) ^ " > " ^ ncols_);
 
-	if (rowno ==0 || colno == 0 )
+	if (rowno == 0 || colno == 0)
 		return data_[0];
 
-	return data_[ncols_*(rowno-1) + colno];
+	return data_[ncols_ * (rowno - 1) + colno];
 }
 
-var& dim::operator() (int rowno, int colno) const
+var& dim::operator()(int rowno, int colno) const
 {
 
-	//check bounds
+	// check bounds
 	if (rowno > nrows_ || rowno < 0)
 		throw MVArrayIndexOutOfBounds("row:" ^ var(rowno) ^ " > " ^ nrows_);
 	if (colno > ncols_ || colno < 0)
 		throw MVArrayIndexOutOfBounds("col:" ^ var(colno) ^ " > " ^ ncols_);
 
-	if (rowno ==0 || colno == 0 )
+	if (rowno == 0 || colno == 0)
 	{
 		return (data_)[0];
 	}
 
-	return data_[ncols_*(rowno-1) + colno];
-
+	return data_[ncols_ * (rowno - 1) + colno];
 }
 
 dim& dim::init(const var& sourcevar)
 {
 	if (!initialised_)
 		throw MVArrayNotDimensioned();
-	int arraysize=nrows_*ncols_+1;
-	for (int ii=0;ii<arraysize;ii++)
-		data_[ii]=sourcevar;
+	int arraysize = nrows_ * ncols_ + 1;
+	for (int ii = 0; ii < arraysize; ii++)
+		data_[ii] = sourcevar;
 	return *this;
 }
 
 dim& dim::operator=(const dim& sourcedim)
 {
-	//cannot copy an undimensioned array
+	// cannot copy an undimensioned array
 	if (!sourcedim.initialised_)
 		throw MVArrayNotDimensioned();
 
-	this->redim(sourcedim.nrows_,sourcedim.ncols_);
+	this->redim(sourcedim.nrows_, sourcedim.ncols_);
 
-	int ncells=nrows_*ncols_+1;
-	for (int celln=0;celln<ncells;++celln)
-		data_[celln]=sourcedim.data_[celln].clone();
+	int ncells = nrows_ * ncols_ + 1;
+	for (int celln = 0; celln < ncells; ++celln)
+		data_[celln] = sourcedim.data_[celln].clone();
 	return *this;
 }
 
@@ -224,36 +218,36 @@ var dim::join(const var& sepchar) const
 {
 	if (!initialised_)
 		throw MVArrayNotDimensioned();
-	int arraysize=nrows_*ncols_;
+	int arraysize = nrows_ * ncols_;
 	if (!arraysize)
 		return "";
 
-	//find last element with any data
+	// find last element with any data
 	int nn;
-	for (nn=arraysize;nn>0;--nn)
+	for (nn = arraysize; nn > 0; --nn)
 	{
 		if (data_[nn].assigned() && data_[nn].length())
-			 break;
+			break;
 	}
 
-	//get the first element at least to ensure
-	//at least first element is assigned - even if it is an empty string
-	var output="";
-	//ensuring converted to a string
-	output^=data_[1];
+	// get the first element at least to ensure
+	// at least first element is assigned - even if it is an empty string
+	var output = "";
+	// ensuring converted to a string
+	output ^= data_[1];
 
-	//if no elements
+	// if no elements
 	if (!nn)
 		return output;
 
-	//append any additional elements
-	for (int ii=2;ii<=nn;++ii)
+	// append any additional elements
+	for (int ii = 2; ii <= nn; ++ii)
 	{
 		output.var_str.push_back(FM_);
-		output^=data_[ii];
+		output ^= data_[ii];
 	}
 
 	return output;
 }
 
-}//of namespace exodus
+} // namespace exodus

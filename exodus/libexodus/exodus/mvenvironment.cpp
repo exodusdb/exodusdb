@@ -20,9 +20,9 @@
  THE SOFTWARE.
  */
 
-//C4530: C++ exception handler used, but unwind semantics are not enabled. 
+// C4530: C++ exception handler used, but unwind semantics are not enabled.
 #ifdef _MSC_VER
-#pragma warning (disable: 4530)
+#pragma warning(disable : 4530)
 #endif
 
 #define MV_NO_NARROW
@@ -31,11 +31,12 @@
 #define EXO_MVENVIRONMENT_CPP
 #include <exodus/mvenvironment.h>
 
-//avoid this unless absolutely necessary then possible to move this file out of exodus var library
+// avoid this unless absolutely necessary then possible to move this file out of exodus var library
 //(stick to throwing MVException with a suitable error message)
 //#include <exodus/mvexceptions.h>
 
-namespace exodus {
+namespace exodus
+{
 
 int getprocessno(const char* filename, int* fd);
 bool processno_islocked2(int processno, int* fd);
@@ -43,58 +44,62 @@ bool processno_islocked2(int processno, int* fd);
 void releaseprocess(int* fd);
 std::string mvgethostname();
 
-//NB do not define default copy constructor and assignment in order to force
-//derived classes to implement them since they are defined in the class header
+// NB do not define default copy constructor and assignment in order to force
+// derived classes to implement them since they are defined in the class header
 
-//destructor
-MvEnvironment::~MvEnvironment() {
+// destructor
+MvEnvironment::~MvEnvironment()
+{
 
-	//std::wcout<<L"MvEnvironment: Closing Definitions ... "<<std::flush;
-	if (this->DEFINITIONS.assigned() && this->DEFINITIONS) {
+	// std::wcout<<L"MvEnvironment: Closing Definitions ... "<<std::flush;
+	if (this->DEFINITIONS.assigned() && this->DEFINITIONS)
+	{
 		this->DEFINITIONS.close();
 	}
-	//std::wcout<<L"OK"<<std::endl;
+	// std::wcout<<L"OK"<<std::endl;
 
-	//std::wcout<<L"MvEnvironment: Disconnecting DB ... "<<std::flush;
-	if (this->SESSION.assigned() && this->SESSION) {
+	// std::wcout<<L"MvEnvironment: Disconnecting DB ... "<<std::flush;
+	if (this->SESSION.assigned() && this->SESSION)
+	{
 		this->SESSION.close();
 	}
-	//std::wcout<<L"OK"<<std::endl;
+	// std::wcout<<L"OK"<<std::endl;
 
-	//a file handle to make unique locks
-	if (processnolockfd!=0)
+	// a file handle to make unique locks
+	if (processnolockfd != 0)
 		releaseprocess(&processnolockfd);
 }
 
-//keep in sync both 1) declaration in class and 2) contruction initialisation
-bool MvEnvironment::init(const int threadno) {
+// keep in sync both 1) declaration in class and 2) contruction initialisation
+bool MvEnvironment::init(const int threadno)
+{
 
-	//std::wcout<<L"MvEnvironment::init("<<threadno<<L")"<<std::endl;
+	// std::wcout<<L"MvEnvironment::init("<<threadno<<L")"<<std::endl;
 
-	//per process
+	// per process
 	this->ROLLOUTFILE = L"~" ^ var(threadno) ^ L".$$$";
 	this->THREADNO = threadno;
 
-	//pretty obsolete nowadays
-	//environment variables may not be available until exported
-	//do set -p to find out exported variables instead of all
+	// pretty obsolete nowadays
+	// environment variables may not be available until exported
+	// do set -p to find out exported variables instead of all
 	this->CRTWIDE.osgetenv(L"COLUMNS");
 	this->CRTHIGH.osgetenv(L"LINES");
 	if (not this->CRTWIDE)
-		this->CRTWIDE= 80;
+		this->CRTWIDE = 80;
 	if (not this->CRTHIGH)
 		this->CRTHIGH = 25;
 
-	this->PROCESSNO=getprocessno("/tmp/exodus", &processnolockfd);
+	this->PROCESSNO = getprocessno("/tmp/exodus", &processnolockfd);
 
-	this->STATION=var(mvgethostname()).field(L".",1);
+	this->STATION = var(mvgethostname()).field(L".", 1);
 
 	return true;
-
 }
 
-bool MvEnvironment::processno_islocked(int processno) {
+bool MvEnvironment::processno_islocked(int processno)
+{
 	return processno_islocked2(processno, &processnolockfd);
 }
 
-}	//of namespace exodus
+} // namespace exodus

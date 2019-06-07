@@ -23,6 +23,6 @@ THE SOFTWARE.
 #ifndef GETTIMEOFDAY
 #define GETTIMEOFDAY 1
 
-   void gettimeofday(struct timeval* p, void* tz /* IGNORED */);
+void gettimeofday(struct timeval* p, void* tz /* IGNORED */);
 
 #endif /*GETTIMEOFDAY_*/

@@ -24,75 +24,76 @@ THE SOFTWARE.
 #define _POSIX_SOURCE
 #endif
 
-//for debugging
+// for debugging
 //#define TRACING
 
 #ifdef _POSIX_SOURCE
-	#include <config.h>
+#include <config.h>
 
-	#include <cstdlib>
-	#include <iostream>
-	#include <string>
-	#include <stdio.h>
-//defined in config.h but config.h created by ./configure (automake tools not cmake)
+#include <cstdlib>
+#include <iostream>
+#include <stdio.h>
+#include <string>
+// defined in config.h but config.h created by ./configure (automake tools not cmake)
 //#ifdef HAVE_BACKTRACE
-	#include <execinfo.h>
+#include <execinfo.h>
 //#endif
-        //for getpid
-        #include <unistd.h>
+// for getpid
+#include <unistd.h>
 #endif
-	//for signal
-	#include <signal.h>
+// for signal
+#include <signal.h>
 
-//C4530: C++ exception handler used, but unwind semantics are not enabled. 
-#pragma warning (disable: 4530)
+// C4530: C++ exception handler used, but unwind semantics are not enabled.
+#pragma warning(disable : 4530)
 
 #include <exodus/mv.h>
 
-//Simple implementation of an additional output to the console:
+// Simple implementation of an additional output to the console:
 #ifdef _MSC_VER
 #include <exodus/StackWalker.h>
 class MyStackWalker : public StackWalker
 {
-public:
+      public:
+	exodus::var returnlines = "";
 
-	exodus::var returnlines="";
-
-	MyStackWalker() : StackWalker(), returnlines("")
-	{}
+	MyStackWalker() : StackWalker(), returnlines("") {}
 
 	MyStackWalker(DWORD dwProcessId, HANDLE hProcess)
-	: StackWalker(dwProcessId, hProcess), returnlines("")
-	{}
+	    : StackWalker(dwProcessId, hProcess), returnlines("")
+	{
+	}
 	virtual void OnOutput(LPCSTR szText)
 	{
-		//fprintf(stderr,szText);
+		// fprintf(stderr,szText);
 
-		//fprintf(stderr,"fgets:%s", path);
-		exodus::var line=exodus::var(szText).convert("\x0d\x0a","");//.outputl("path=");
-		exodus::var filename=line.field(":",1,2);//.outputl("filename=");
-		exodus::var lineno=filename.field2(" ",-1);//.outputl("lineno=");
-		filename.splicer(-(lineno.length()+1),999999,"");
-		lineno.substrer(2,lineno.length()-2);
-		if (filename.index("stackwalker.cpp")||filename.index("debug.cpp")||filename.index("crtexe.c"))
+		// fprintf(stderr,"fgets:%s", path);
+		exodus::var line = exodus::var(szText).convert("\x0d\x0a", ""); //.outputl("path=");
+		exodus::var filename = line.field(":", 1, 2);  //.outputl("filename=");
+		exodus::var lineno = filename.field2(" ", -1); //.outputl("lineno=");
+		filename.splicer(-(lineno.length() + 1), 999999, "");
+		lineno.substrer(2, lineno.length() - 2);
+		if (filename.index("stackwalker.cpp") || filename.index("debug.cpp") ||
+		    filename.index("crtexe.c"))
 			return;
-		if (lineno.isnum()&&lineno)
+		if (lineno.isnum() && lineno)
 		{
-			exodus::var linetext=filename.field2(exodus::SLASH,-1) ^ ":" ^ lineno;
+			exodus::var linetext = filename.field2(exodus::SLASH, -1) ^ ":" ^ lineno;
 			exodus::var filetext;
-	//ALN:NOTE: .osread could itself throw exception and we will have loop :(
+			// ALN:NOTE: .osread could itself throw exception and we will have loop :(
 			if (filetext.osread(filename))
-//			if (filetext.osread(filename, L""))		// avoid to read C++ source as UTF8
+			//			if (filetext.osread(filename, L""))		//
+			//avoid to read C++ source as UTF8
 			{
-				linetext^=": " ^ filetext.field("\x0A",lineno).trimf(" \t");
+				linetext ^= ": " ^ filetext.field("\x0A", lineno).trimf(" \t");
 				if (linetext.index("backtrace("))
 					return;
 			}
-			//outputl(linetext);
-			returnlines^=exodus::FM^linetext;
+			// outputl(linetext);
+			returnlines ^= exodus::FM ^ linetext;
 		}
 
-//		StackWalker::OnOutput(szText);
+		//		StackWalker::OnOutput(szText);
 	}
 };
 #endif
@@ -101,383 +102,389 @@ public:
 #define NOBACKTRACE
 #endif
 
-namespace exodus {
+namespace exodus
+{
 
 void addbacktraceline(const var& sourcefilename, const var& lineno, var& returnlines)
 {
 
-//#ifdef TRACING
-//	sourcefilename.outputl("SOURCEFILENAME=");
-//	lineno.outputl("LINENO=");
-//#endif
+	//#ifdef TRACING
+	//	sourcefilename.outputl("SOURCEFILENAME=");
+	//	lineno.outputl("LINENO=");
+	//#endif
 
 	if (not lineno || not lineno.isnum())
 		return;
 
-	var linetext=sourcefilename.field2(SLASH,-1) ^ ":" ^ lineno;
+	var linetext = sourcefilename.field2(SLASH, -1) ^ ":" ^ lineno;
 
-	//get the source file text
+	// get the source file text
 	var filetext;
-	if (filetext.osread(sourcefilename)) {
+	if (filetext.osread(sourcefilename))
+	{
 	}
 
-	//change DOS/WIN and MAC line ends to lf only
-	filetext.swapper("\x0D\x0A","\x0A").converter("\x0D","\x0A");
+	// change DOS/WIN and MAC line ends to lf only
+	filetext.swapper("\x0D\x0A", "\x0A").converter("\x0D", "\x0A");
 
-	//extract the source line
-	var line=filetext.field("\x0A",lineno).trimf(" \t");
+	// extract the source line
+	var line = filetext.field("\x0A", lineno).trimf(" \t");
 
-	//suppress confusing and unhelpful exodus macros
-	if (
-		(line == "programexit()" || line == "libraryexit()" || line == "classexit()")
-	or
-		(line == "}" && sourcefilename.substr(-2,2) == ".h")
-	or
-		(line == "")
-	)
+	// suppress confusing and unhelpful exodus macros
+	if ((line == "programexit()" || line == "libraryexit()" || line == "classexit()") or
+	    (line == "}" && sourcefilename.substr(-2, 2) == ".h") or (line == ""))
 		return;
 
 #ifdef TRACING
-		line.errputl();
+	line.errputl();
 #endif
 
-	//outputl(linetext);
-	linetext^=": " ^ line;
+	// outputl(linetext);
+	linetext ^= ": " ^ line;
 
-	returnlines^=FM^linetext;
+	returnlines ^= FM ^ linetext;
 
 	return;
 }
 
-
-//http://www.delorie.com/gnu/docs/glibc/libc_665.html
+// http://www.delorie.com/gnu/docs/glibc/libc_665.html
 var backtrace()
 {
 
-	var returnlines="";
+	var returnlines = "";
 	var("backtrace()").errputl();
 
 #ifdef _MSC_VER
-	//logputl("backtrace() not implemented on windows yet");
-	//var().abort("");
+	// logputl("backtrace() not implemented on windows yet");
+	// var().abort("");
 	MyStackWalker sw;
 	sw.ShowCallstack();
 	return sw.returnlines;
 #elif !defined(HAVE_BACKTRACE)
-	fprintf(stderr,"backtrace() not available\n");
+	fprintf(stderr, "backtrace() not available\n");
 	return L"";
 #else
 
-	var internaladdresses="";
+	var internaladdresses = "";
 
 #define BACKTRACE_MAXADDRESSES 500
-	void *addresses[BACKTRACE_MAXADDRESSES];
+	void* addresses[BACKTRACE_MAXADDRESSES];
 
+	/* example of TRACE from osx 64
+	Stack frames: 8
+	Backtrace 0: 0x10000c313
+	0   libexodus-11.5.0.dylib              0x000000010000c313 _ZN6exodus9backtraceEv + 99
+	Backtrace 1: 0x10001ec51
+	1   libexodus-11.5.0.dylib              0x000000010001ec51
+	_ZN6exodus11MVExceptionC2ERKNS_3varE + 129 Backtrace 2: 0x10001f314 2 libexodus-11.5.0.dylib
+	0x000000010001f314 _ZN6exodus12MVUnassignedC2ERKNS_3varE + 52 Backtrace 3: 0x10000e193 3
+	libexodus-11.5.0.dylib              0x000000010000e193 _ZNK6exodus3var3putERSo + 243
+	Backtrace 4: 0x10000e322
+	4   libexodus-11.5.0.dylib              0x000000010000e322 _ZNK6exodus3var7outputlEv + 34
+	Backtrace 5: 0x10000143f
+	5   steve                               0x000000010000143f _ZN13ExodusProgram4mainEv + 77
+	Backtrace 6: 0x1000010e6
+	6   steve                               0x00000001000010e6 main + 99
+	Backtrace 7: 0x100000f64
+	7   steve                               0x0000000100000f64 start + 52
+	*/
 
-/* example of TRACE from osx 64
-Stack frames: 8
-Backtrace 0: 0x10000c313
-0   libexodus-11.5.0.dylib              0x000000010000c313 _ZN6exodus9backtraceEv + 99
-Backtrace 1: 0x10001ec51
-1   libexodus-11.5.0.dylib              0x000000010001ec51 _ZN6exodus11MVExceptionC2ERKNS_3varE + 129
-Backtrace 2: 0x10001f314
-2   libexodus-11.5.0.dylib              0x000000010001f314 _ZN6exodus12MVUnassignedC2ERKNS_3varE + 52
-Backtrace 3: 0x10000e193
-3   libexodus-11.5.0.dylib              0x000000010000e193 _ZNK6exodus3var3putERSo + 243
-Backtrace 4: 0x10000e322
-4   libexodus-11.5.0.dylib              0x000000010000e322 _ZNK6exodus3var7outputlEv + 34
-Backtrace 5: 0x10000143f
-5   steve                               0x000000010000143f _ZN13ExodusProgram4mainEv + 77
-Backtrace 6: 0x1000010e6
-6   steve                               0x00000001000010e6 main + 99
-Backtrace 7: 0x100000f64
-7   steve                               0x0000000100000f64 start + 52
-*/
-
-	//TODO autodetect if addr2line or dwalfdump/dSYM is available
-
-
+	// TODO autodetect if addr2line or dwalfdump/dSYM is available
 
 #ifdef __APPLE__
 	int size = ::backtrace(addresses, BACKTRACE_MAXADDRESSES);
-	char **strings = backtrace_symbols(addresses, size);
-//fprintf(stderr,"Stack frames: %d\n", size);
+	char** strings = backtrace_symbols(addresses, size);
+	// fprintf(stderr,"Stack frames: %d\n", size);
 
-	for(int i = 0; i < size; i++) {
+	for (int i = 0; i < size; i++)
+	{
 
 #ifdef TRACING
-		//each string is like:
-		//6   steve                               0x00000001000010e6 main + 99
+		// each string is like:
+		// 6   steve                               0x00000001000010e6 main + 99
 		//////////////////////////////////////////////////////////////////////
-		fprintf(stderr,"%s\n", strings[i]);
+		fprintf(stderr, "%s\n", strings[i]);
 #endif
-		//parse one string for object filename and offset
-		var onestring=var(strings[i]).trim();
-		var objectfilename=onestring.field(L" ",2);
-		var objectoffset=onestring.field(L" ",3);
+		// parse one string for object filename and offset
+		var onestring = var(strings[i]).trim();
+		var objectfilename = onestring.field(L" ", 2);
+		var objectoffset = onestring.field(L" ", 3);
 
-		//looking for a dwarfdump line like this:
-		//Line table file: 'steve.cpp' line 14, column 0 with start address 0x000000010000109e
+		// looking for a dwarfdump line like this:
+		// Line table file: 'steve.cpp' line 14, column 0 with start address
+		// 0x000000010000109e
 		//////////////////////////////////////////////////////////////////////////////////////
 
-		//get a dwarfdump line containing source filename and line number
-		var debugfilename=objectfilename^".dSYM";
-		var cmd=L"dwarfdump "^debugfilename^L" --lookup "^objectoffset^L" |grep \"Line table file: \" 2> /dev/null";
-		var result=cmd.osshellread();
+		// get a dwarfdump line containing source filename and line number
+		var debugfilename = objectfilename ^ ".dSYM";
+		var cmd = L"dwarfdump " ^ debugfilename ^ L" --lookup " ^ objectoffset ^
+			  L" |grep \"Line table file: \" 2> /dev/null";
+		var result = cmd.osshellread();
 #ifdef TRACING
-	cmd.outputl("CMD=");
-	result.outputl("RESULT=");
+		cmd.outputl("CMD=");
+		result.outputl("RESULT=");
 #endif
 		if (not result)
 			continue;
 
-		//parse the dwarfdump line for source filename and line number
-		var sourcefilename=result.field("'",2);
-		var lineno=result.field("'",3).trim().field(" ",2).field(",",1);
+		// parse the dwarfdump line for source filename and line number
+		var sourcefilename = result.field("'", 2);
+		var lineno = result.field("'", 3).trim().field(" ", 2).field(",", 1);
 
-		addbacktraceline(sourcefilename,lineno,returnlines);
-
+		addbacktraceline(sourcefilename, lineno, returnlines);
 	}
 
 	free(strings);
 
 	return returnlines.substr(2);
 
-
-
-//not __APPLE_ probably LINUX
+// not __APPLE_ probably LINUX
 #else
 
 	int size = ::backtrace(addresses, BACKTRACE_MAXADDRESSES);
-	char **strings = backtrace_symbols(addresses, size);
+	char** strings = backtrace_symbols(addresses, size);
 
-	for(int ii = 0; ii < size; ii++)
+	for (int ii = 0; ii < size; ii++)
 	{
 
-                #ifdef TRACING
-		        fprintf(stderr,"Backtrace %d: %p \"%s\"\n", ii, addresses[ii],strings[ii]);
-                        //Backtrace 0: 0x7f9d247cf9fd "/usr/local/lib/libexodus.so.19.01(_ZN6exodus9backtraceEv+0x62) [0x7f9d247cf9fd]"
-                        //Backtrace 5: 0x7f638280e3f6 "/root/lib/libl1.so(+0xa3f6) [0x7f638280e3f6]"
-                #endif
+#ifdef TRACING
+		fprintf(stderr, "Backtrace %d: %p \"%s\"\n", ii, addresses[ii], strings[ii]);
+		// Backtrace 0: 0x7f9d247cf9fd
+		// "/usr/local/lib/libexodus.so.19.01(_ZN6exodus9backtraceEv+0x62) [0x7f9d247cf9fd]"
+		// Backtrace 5: 0x7f638280e3f6 "/root/lib/libl1.so(+0xa3f6) [0x7f638280e3f6]"
+#endif
 
-                //objdump --stop-address=0xa3f6 -l --disassemble ~/lib/libl1.so |grep cpp|tail -n1
+		// objdump --stop-address=0xa3f6 -l --disassemble ~/lib/libl1.so |grep cpp|tail -n1
 
-		var objfilename=var(strings[ii]).field("(",1).field(" ",1).field("[",1);
-		var objaddress=var(strings[ii]).field("[",2).field("]",1);
-		if (objaddress.length()>9)
-			objaddress=var(strings[ii]).field("(",2).field(")",1).field("+",2);
+		var objfilename = var(strings[ii]).field("(", 1).field(" ", 1).field("[", 1);
+		var objaddress = var(strings[ii]).field("[", 2).field("]", 1);
+		if (objaddress.length() > 9)
+			objaddress = var(strings[ii]).field("(", 2).field(")", 1).field("+", 2);
 
-		#ifdef TRACING
-			objfilename.errput("objfilename=");
-			objaddress.errputl(" objaddress=");
-		#endif
+#ifdef TRACING
+		objfilename.errput("objfilename=");
+		objaddress.errputl(" objaddress=");
+#endif
 
-		//if (objfilename == objfilename.convert("/\\:",""))
-		if (not objfilename.osfile()) {
-			//loadable program
-			var temp="which " ^ objfilename.field2(SLASH,-1);
-			temp=temp.osshellread().field("\n",1).field("\r",1);
+		// if (objfilename == objfilename.convert("/\\:",""))
+		if (not objfilename.osfile())
+		{
+			// loadable program
+			var temp = "which " ^ objfilename.field2(SLASH, -1);
+			temp = temp.osshellread().field("\n", 1).field("\r", 1);
 			if (temp)
-				objfilename=temp;
+				objfilename = temp;
 			else
-				//things like what?
+				// things like what?
 				continue;
 		}
 
-                if (objaddress[1] != "0" || objaddress[2] != "x")
-                        continue;
+		if (objaddress[1] != "0" || objaddress[2] != "x")
+			continue;
 
-		var startaddress=objaddress.splice(-3,3,"000");
-                //var temp="objdump -S --start-address=" ^ startaddress ^ " --stop-address=" ^ objaddress ^ " --disassemble -l " ^ objfilename;
-                var temp="objdump --start-address=" ^ startaddress ^ " --stop-address=" ^ objaddress ^ " --disassemble -l " ^ objfilename;
-		#ifdef TRACING
-			temp.errputl("");
-		#endif
+		var startaddress = objaddress.splice(-3, 3, "000");
+		// var temp="objdump -S --start-address=" ^ startaddress ^ " --stop-address=" ^
+		// objaddress ^ " --disassemble -l " ^ objfilename;
+		var temp = "objdump --start-address=" ^ startaddress ^ " --stop-address=" ^
+			   objaddress ^ " --disassemble -l " ^ objfilename;
+#ifdef TRACING
+		temp.errputl("");
+#endif
 
 		////////////////////////
-                temp=temp.osshellread();
+		temp = temp.osshellread();
 		////////////////////////
 
-                temp.converter("\r\n",_FM_ _FM_);
+		temp.converter("\r\n", _FM_ _FM_);
 
-                //find the last line containing .cpp
-                ///root/exodus/exodus/libexodus/exodus/l1.cpp:7 (discriminator 3)
-                var nn2=temp.dcount(FM);
-                var line="";
-		var linesource="";
-                for (var ii2=1;ii2<nn2;++ii2) {
-                        if (temp.a(ii2).index(".cpp")) {
-                                line=temp.a(ii2);
-				linesource=temp.a(ii2+1);
+		// find the last line containing .cpp
+		/// root/exodus/exodus/libexodus/exodus/l1.cpp:7 (discriminator 3)
+		var nn2 = temp.dcount(FM);
+		var line = "";
+		var linesource = "";
+		for (var ii2 = 1; ii2 < nn2; ++ii2)
+		{
+			if (temp.a(ii2).index(".cpp"))
+			{
+				line = temp.a(ii2);
+				linesource = temp.a(ii2 + 1);
 			}
-                }
+		}
 
-		#ifdef TRACING
-			if (line)
-				line.errputl("line=");
-		#endif
+#ifdef TRACING
+		if (line)
+			line.errputl("line=");
+#endif
 
-                //append the source line text and number to the output
-                if (line) {
-                        var sourcefilename=line.field(":",1);
-                        var lineno=line.field(":",2).field(" ",1);
-        		addbacktraceline(sourcefilename,lineno,returnlines);
-			//returnlines^=FM^sourcefilename.field2(SLASH,-1) ^ ":" ^ lineno ^ " " ^ linesource;
-                }
+		// append the source line text and number to the output
+		if (line)
+		{
+			var sourcefilename = line.field(":", 1);
+			var lineno = line.field(":", 2).field(" ", 1);
+			addbacktraceline(sourcefilename, lineno, returnlines);
+			// returnlines^=FM^sourcefilename.field2(SLASH,-1) ^ ":" ^ lineno ^ " " ^
+			// linesource;
+		}
 
-                //trying another way
-		//char syscom[1024];
-		//syscom[0] = '\0';
-		//snprintf(syscom, 1024, "eu-addr2line '%p' --pid=%d > /dev/stderr\n", strings[ii], getpid());
+		// trying another way
+		// char syscom[1024];
+		// syscom[0] = '\0';
+		// snprintf(syscom, 1024, "eu-addr2line '%p' --pid=%d > /dev/stderr\n", strings[ii],
+		// getpid());
 		////snprintf(syscom, 1024, "eu-addr2line '%p' --pid=%d \n", strings[ii], getpid());
-                //printf("syscom %s\n",syscom);
-		//if (system(syscom) != 0)
+		// printf("syscom %s\n",syscom);
+		// if (system(syscom) != 0)
 		//	fprintf(stderr, "eu-addr2line failed\n");
 	}
 
 	free(strings);
-/*
-	FILE *fp;
-	//int status;
-	char path[1024*1024];
+	/*
+		FILE *fp;
+		//int status;
+		char path[1024*1024];
 
-	var binaryfilename=EXECPATH2.field(" ",1);
-	//if (binaryfilename == binaryfilename.convert("/\\:",""))
-	if (not binaryfilename.osdir())
-	{
-		var temp="which " ^ binaryfilename.field2(SLASH,-1);
-		temp=temp.osshellread().field("\n",1).field("\r",1);
-		if (temp)
-			binaryfilename=temp;
-	}
+		var binaryfilename=EXECPATH2.field(" ",1);
+		//if (binaryfilename == binaryfilename.convert("/\\:",""))
+		if (not binaryfilename.osdir())
+		{
+			var temp="which " ^ binaryfilename.field2(SLASH,-1);
+			temp=temp.osshellread().field("\n",1).field("\r",1);
+			if (temp)
+				binaryfilename=temp;
+		}
 
-#ifdef __APPLE__
-	var oscmd="atos -o " ^ binaryfilename.quote() ^ " " ^ internaladdresses;
-#else
+	#ifdef __APPLE__
+		var oscmd="atos -o " ^ binaryfilename.quote() ^ " " ^ internaladdresses;
+	#else
 
-	///////////////////////////////////////////////////////////////////////////////////
-	//NOTE WELL ... PIE/ALSR may prevent addr2line from identifying source line numbers
-	//https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=860394#15
-	//solved by adding -no-pie to exodus compile options in compile.cpp
-	///////////////////////////////////////////////////////////////////////////////////
+		///////////////////////////////////////////////////////////////////////////////////
+		//NOTE WELL ... PIE/ALSR may prevent addr2line from identifying source line numbers
+		//https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=860394#15
+		//solved by adding -no-pie to exodus compile options in compile.cpp
+		///////////////////////////////////////////////////////////////////////////////////
 
-	var oscmd="addr2line -e " ^ binaryfilename.quote() ^ " " ^ internaladdresses;
-#endif
-	//oscmd.outputl();
+		var oscmd="addr2line -e " ^ binaryfilename.quote() ^ " " ^ internaladdresses;
+	#endif
+		//oscmd.outputl();
 
-#ifdef TRACING
-	fprintf(stderr,"EXECPATH = %s\n",EXECPATH2.toString().c_str());
-	fprintf(stderr,"executing %s\n",oscmd.toString().c_str());
-#endif
+	#ifdef TRACING
+		fprintf(stderr,"EXECPATH = %s\n",EXECPATH2.toString().c_str());
+		fprintf(stderr,"executing %s\n",oscmd.toString().c_str());
+	#endif
 
-	//Open the command for reading
-	fp = popen(oscmd.toString().c_str(), "r");
-	if (fp == NULL)
-	{
-		fprintf(stderr,"Failed to run command\n" );
-		return L"";
-	}
+		//Open the command for reading
+		fp = popen(oscmd.toString().c_str(), "r");
+		if (fp == NULL)
+		{
+			fprintf(stderr,"Failed to run command\n" );
+			return L"";
+		}
 
-#ifdef TRACING
-	fprintf(stderr,"reading output of addr2line\n");
-#endif
+	#ifdef TRACING
+		fprintf(stderr,"reading output of addr2line\n");
+	#endif
 
-	//Read the output a line at a time - output it.
-	while (fgets(path, sizeof(path)-1, fp) != NULL)
-	{
+		//Read the output a line at a time - output it.
+		while (fgets(path, sizeof(path)-1, fp) != NULL)
+		{
 
-#ifdef TRACING
-		fprintf(stderr,"fgets:%s", path);
-#endif
+	#ifdef TRACING
+			fprintf(stderr,"fgets:%s", path);
+	#endif
 
-		var path2=var(path).convert("\x0d\x0a","");//.outputl("path=");
-		var sourcefilename=path2.field(":",1);//.outputl("filename=");
-		var lineno=path2.field(":",2).field(" ",1).field("(",1);//.outputl("lineno=");
+			var path2=var(path).convert("\x0d\x0a","");//.outputl("path=");
+			var sourcefilename=path2.field(":",1);//.outputl("filename=");
+			var lineno=path2.field(":",2).field("
+	",1).field("(",1);//.outputl("lineno=");
 
-#ifdef TRACING
-		sourcefilename.errput("sourcefilename: ");
-		lineno.errputl(" lineno:");
-#endif
-		addbacktraceline(sourcefilename,lineno,returnlines);
-	}
+	#ifdef TRACING
+			sourcefilename.errput("sourcefilename: ");
+			lineno.errputl(" lineno:");
+	#endif
+			addbacktraceline(sourcefilename,lineno,returnlines);
+		}
 
-	//close
-	pclose(fp);
-*/
+		//close
+		pclose(fp);
+	*/
 	return returnlines.substr(2);
 #endif
 
 #endif
-
 }
 
-void SIGINT_handler (int sig)
+void SIGINT_handler(int sig)
 {
-	//ignore more of this signal
-	//var().breakoff()
-	//faster/safer
+	// ignore more of this signal
+	// var().breakoff()
+	// faster/safer
 	signal(sig, SIG_IGN);
 
-	//duplicated in init and B
-	//backtrace().convert(FM,"\n").outputl();
+	// duplicated in init and B
+	// backtrace().convert(FM,"\n").outputl();
 
-	//separate our prompting onto a new line
+	// separate our prompting onto a new line
 	outputl();
 
 	for (;;)
 	{
 
-		//printf ("\nInterrupted. (C)ontinue (E)nd (B)acktrace\n");
+		// printf ("\nInterrupted. (C)ontinue (E)nd (B)acktrace\n");
 
-		//output("? ");
+		// output("? ");
 		var cmd;
-		//if (!cmd.input("Interrupted. (C)ontinue (E)xit (B)acktrace (A)bort ?"))
-		fprintf(stderr,"Interrupted. (C)ontinue (E)xit (B)acktrace (A)bort ?");
+		// if (!cmd.input("Interrupted. (C)ontinue (E)xit (B)acktrace (A)bort ?"))
+		fprintf(stderr, "Interrupted. (C)ontinue (E)xit (B)acktrace (A)bort ?");
 		if (!cmd.input())
 			break;
 
-		//only look at first character in uppercase
-		var cmd1=cmd[1].ucase();
+		// only look at first character in uppercase
+		var cmd1 = cmd[1].ucase();
 
-		//continue
-		if (cmd1 == "C") {
+		// continue
+		if (cmd1 == "C")
+		{
 			break;
 
-		//exit ... unfortunately to the caller at the moment.
-		//TODO flag to caller(s) to exit
-		} else if (cmd1=="E") {
+			// exit ... unfortunately to the caller at the moment.
+			// TODO flag to caller(s) to exit
+		}
+		else if (cmd1 == "E")
+		{
 
-			//var().abort("Aborted. User interrupt");
-			fprintf(stderr,"Aborted. User interrupt\n");
+			// var().abort("Aborted. User interrupt");
+			fprintf(stderr, "Aborted. User interrupt\n");
 			exit(1);
+		}
+		else if (cmd1 == "B")
+		{
 
-		} else if (cmd1=="B") {
-
-			//duplicated in init and B
-			backtrace().convert(FM,"\n").outputl();
-
-		} else if (cmd1=="A") {
-			//fprintf(stderr,"To continue from here in GDB: \"signal 0\"\n");
-			raise(SIGABRT); 
-			//breakpoint();
+			// duplicated in init and B
+			backtrace().convert(FM, "\n").outputl();
+		}
+		else if (cmd1 == "A")
+		{
+			// fprintf(stderr,"To continue from here in GDB: \"signal 0\"\n");
+			raise(SIGABRT);
+			// breakpoint();
 		}
 	}
 
-	//stop ignoreing this signal
-	//var().breakon()
-	//faster/safer
+	// stop ignoreing this signal
+	// var().breakon()
+	// faster/safer
 	signal(SIGINT, SIGINT_handler);
 }
 
 void var::breakoff() const
 {
-	//ignore more of this signal
+	// ignore more of this signal
 	signal(SIGINT, SIG_IGN);
 }
 
 void var::breakon() const
 {
-	signal(SIGINT,  SIGINT_handler); /* this line will redirect ctrl+c signal*/
+	signal(SIGINT, SIGINT_handler); /* this line will redirect ctrl+c signal*/
 }
 
-}//namespace exodus
+} // namespace exodus

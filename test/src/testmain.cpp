@@ -2639,12 +2639,14 @@ while trying to match the argument list '(exodus::var, bool)'
 	//initrnd(999);
 	//for (int ii=0; ii<86400; ++ii) {
 	//	var time=ii;
+	var started=ostime();
 	for (var itime=0; itime<86400; ++itime) {
 //		itime.outputl("itime=").oconv("MTHS").outputl("otime=").iconv("MTHS").outputl("itime=");
 		assert(itime.oconv("MTHS").iconv("MTHS") eq itime);
 		assert(itime.oconv("MTS").iconv("MTS") eq itime);
 	}
-
+	var stopped=ostime();
+	printl(stopped-started," seconds");
 	printl("testmain finished ok and exiting ...");
 
 	return 0;
@@ -2654,6 +2656,8 @@ while trying to match the argument list '(exodus::var, bool)'
 function internal_subroutine_xyz(in xyzz)
 {
 	printl("internal_subroutine_xyz(in xyzz)");
+	//var xx;
+	//printl(xx);
 	assert(xyzz(2,2,2) eq "b22");
 	return 1;
 }

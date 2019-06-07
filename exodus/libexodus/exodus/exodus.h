@@ -24,23 +24,23 @@ THE SOFTWARE.
 #define EXODUS_H 1
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
-//NOTE exodus.h MUST be included LAST to avoid its macros causing problems in standard libraries
+// NOTE exodus.h MUST be included LAST to avoid its macros causing problems in standard libraries
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
-//must be before exodus macros and functions otherwise lots of errors
-//from standard libararies which are included here
-#include <exodus/mvfunctor.h>
+// must be before exodus macros and functions otherwise lots of errors
+// from standard libararies which are included here
 #include <exodus/mvenvironment.h>
+#include <exodus/mvfunctor.h>
 #include <exodus/mvprogram.h>
 
-//always last to avoid conflicting definitions
-#include <exodus/exodusmacros.h>
+// always last to avoid conflicting definitions
 #include <exodus/exodusfuncs.h>
+#include <exodus/exodusmacros.h>
 
-//it usually poor practice to "pollute" the global space of the header user
-//but in this case the header user is an exodus application programmer
-//may not be using any other includes
-//to avoid pollution, simply directly include the above headers as desired instead.
+// it usually poor practice to "pollute" the global space of the header user
+// but in this case the header user is an exodus application programmer
+// may not be using any other includes
+// to avoid pollution, simply directly include the above headers as desired instead.
 using namespace exodus;
 
-#endif //EXODUS_H
+#endif // EXODUS_H

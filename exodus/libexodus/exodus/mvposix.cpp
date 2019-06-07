@@ -5,18 +5,13 @@
 
 #include <exodus/mv.h>
 
-namespace exodus {
-
-var getprocessn()
+namespace exodus
 {
-	return var((int) getpid());
-}
 
-var getexecpath()
-{
-	return "";
-}
+var getprocessn() { return var((int)getpid()); }
 
-}//of namespace exodus
+var getexecpath() { return ""; }
+
+} // namespace exodus
 
 #endif

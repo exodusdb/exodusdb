@@ -31,68 +31,66 @@ THE SOFTWARE.
 #include <exodus/mv.h>
 #include <exodus/mvfunctor.h>
 
-//for labelled commons if not using array
+// for labelled commons if not using array
 //#include <map>
 //#include <boost/any.hpp>
 
 namespace exodus
 {
 
-const static int NTHREADS=1;
+const static int NTHREADS = 1;
 
-//to avoid gcc 4 "warning: type attributes are honored only at type definition"
-//dont declare DLL_PUBLIC on forward declarations
-//class DLL_PUBLIC MvEnvironment;
+// to avoid gcc 4 "warning: type attributes are honored only at type definition"
+// dont declare DLL_PUBLIC on forward declarations
+// class DLL_PUBLIC MvEnvironment;
 class MvEnvironment;
 
 #ifdef EXO_MVENVIRONMENT_CPP
-	//plus 1 to allow for main thread to have its own
-	DLL_PUBLIC
-	std::vector<MvEnvironment*> global_environments(NTHREADS+1);
+// plus 1 to allow for main thread to have its own
+DLL_PUBLIC
+std::vector<MvEnvironment*> global_environments(NTHREADS + 1);
 #else
-	extern
-	DLL_PUBLIC
-	std::vector<MvEnvironment*> global_environments;
+extern DLL_PUBLIC std::vector<MvEnvironment*> global_environments;
 #endif
 
-class LabelledCommon{
-	public:
-	virtual ~LabelledCommon(){}
+class LabelledCommon
+{
+      public:
+	virtual ~LabelledCommon() {}
 };
 
 class DLL_PUBLIC MvEnvironment
 {
-public:
-
+      public:
 	virtual ~MvEnvironment();
 
 	bool init(const int threadno);
 
 	bool processno_islocked(int processno);
 
-//keep in sync both 1) declaration in class and 2) construction initialisation
+	// keep in sync both 1) declaration in class and 2) construction initialisation
 
-	//per user
+	// per user
 	var USERNAME = "";
 	var PRIVILEGE = "";
 
-	//per application
+	// per application
 	var APPLICATION = "";
 
-	//per host
+	// per host
 	var STATION = "";
 
-	//per execution
+	// per execution
 	var COMMAND = "";
 	var OPTIONS = "";
 	var EXECPATH = "";
 	var CHAIN = "";
 
-	//per process - set in init()
+	// per process - set in init()
 	var ROLLOUTFILE = "";
 	var THREADNO = "";
 
-	//per db access
+	// per db access
 	var DICT = "";
 	var ID = "";
 	var RECORD = "";
@@ -104,72 +102,72 @@ public:
 	var FILEERRORMODE = "";
 	var FILES = "";
 
-	//per configuration
+	// per configuration
 	var DEFINITIONS = "definitions";
 	var SYSTEM = "";
 	var SECURITY = "";
 
-	//per request
+	// per request
 	var SENTENCE = "";
 	var PSEUDO = "";
 	var DATA = "";
 	var ANS = "";
 
-	//temporary application globals
+	// temporary application globals
 	var USER0 = "";
 	var USER1 = "";
-	var USER2 = "";//was base currency format
+	var USER2 = ""; // was base currency format
 	var USER3 = "";
 	var USER4 = "";
 
-	//per execute level temporary application global
+	// per execute level temporary application global
 	var RECUR0 = "";
 	var RECUR1 = "";
 	var RECUR2 = "";
 	var RECUR3 = "";
 	var RECUR4 = "";
 
-	//i18n/l10n - basic internationalisation/localisation
-	var DATEFMT = "D/E";//international date format
-	var BASEFMT = "MD20P,";//base currency format
+	// i18n/l10n - basic internationalisation/localisation
+	var DATEFMT = "D/E";    // international date format
+	var BASEFMT = "MD20P,"; // base currency format
 	var SW = "";
 
-	//encoding globals
-	//MUST be the same length
-	//TODO Should not be global otherwise cannot multithread MvEnvironment
+	// encoding globals
+	// MUST be the same length
+	// TODO Should not be global otherwise cannot multithread MvEnvironment
 	var LOWERCASE = LOWERCASE_;
 	var UPPERCASE = UPPERCASE_;
-	//var INTERNALCHARS = "x12\x13\x14\x15\x16\x17";
-	//var EXTERNALCHARS = _STM_ _TM_ _SM_ _VM_ _FM_ _RM_;
+	// var INTERNALCHARS = "x12\x13\x14\x15\x16\x17";
+	// var EXTERNALCHARS = _STM_ _TM_ _SM_ _VM_ _FM_ _RM_;
 
 	var TCLSTACK = "";
-	//INTCONST=keyboard constants 1:esc 2:f5 7:f10
+	// INTCONST=keyboard constants 1:esc 2:f5 7:f10
 	var INTCONST = "\x1b" _FM_ "{f5?}" _FM_ _FM_ _FM_ _FM_ _FM_ "{f10?}";
 	var PRIORITYINT = "";
-	int COL1=0;
-	int COL2=0;
+	int COL1 = 0;
+	int COL2 = 0;
 
-	//old scratch variables used for various buffering
+	// old scratch variables used for various buffering
 	var AW = "";
 	var EW = "";
 	var HW = "";
 	var MW = "";
 	var PW = "";
-	//var SW;//moved section
+	// var SW;//moved section
 	var VW = "";
 	var XW = "";
 
 	var RECCOUNT = "";
 
-	//pretty obsolete nowadays
-	//environment variables may not be available until exported
-	//do set -p to find out exported variables instead of all
+	// pretty obsolete nowadays
+	// environment variables may not be available until exported
+	// do set -p to find out exported variables instead of all
 	var CRTWIDE = 80;
 	var CRTHIGH = 25;
 	var LPTRWIDE = 132;
 	var LPTRHIGH = 66;
 
-	//obsolete
+	// obsolete
 	var ENVIRONKEYS = "";
 	var ENVIRONSET = "";
 	var DEFAULTSTOPS = "";
@@ -178,21 +176,21 @@ public:
 	var LEVEL = "";
 	var VOLUMES = "";
 
-	//set in init()
+	// set in init()
 	var PROCESSNO = "";
 
 	var CURSOR = "1";
 
-	//define a type of object that holds many LabelledCommons
-	//typedef std::map<const char*, LabelledCommon> LabelledCommons;
-	//typedef std::map<std::string, boost::any> labelledcommons;
-	LabelledCommon* labelledcommon[99]={0};
+	// define a type of object that holds many LabelledCommons
+	// typedef std::map<const char*, LabelledCommon> LabelledCommons;
+	// typedef std::map<std::string, boost::any> labelledcommons;
+	LabelledCommon* labelledcommon[99] = {0};
 
-	//used to maintain locks per process eg on ~/tmp/exodus
-	//init() opens it. destructor closes it
-        int processnolockfd=0;
+	// used to maintain locks per process eg on ~/tmp/exodus
+	// init() opens it. destructor closes it
+	int processnolockfd = 0;
 };
 
-}
+} // namespace exodus
 
 #endif /*MVENVIRONMENT_H*/

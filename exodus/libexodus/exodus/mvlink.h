@@ -1,4 +1,4 @@
-//functionality replaced by mvfunctor - scheduled for deletion
+// functionality replaced by mvfunctor - scheduled for deletion
 #if 0
 /*
 

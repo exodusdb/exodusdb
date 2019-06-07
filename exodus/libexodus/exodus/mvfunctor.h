@@ -34,8 +34,8 @@ This header file is generated AUTOMATICALLY by the command "compile lib1"
 To use the function all we have to do is include the lib1.h file. The library
 binary is automatically loaded the first time that the function is called.
 
-#include <exodus/exodus.h>
 #include "lib1.h"
+#include <exodus/exodus.h>
 exodusprogram(){
  subr3("xyz");
 }
@@ -61,8 +61,8 @@ subroutine sub1(args...) {
 ...
 }
 
-To use and call the above functions in a program or another library you just need to include the header file
-which is automatically generated when you do "compile lib1"
+To use and call the above functions in a program or another library you just need to include the
+header file which is automatically generated when you do "compile lib1"
 
 #include "lib1.h"
 
@@ -76,33 +76,34 @@ That way you can forget the new exodus concept of "library" which is not a tradi
 #define MVFUNCTOR_H
 
 #if defined(_WIN32) || defined(_MSC_VER) || defined(__CYGWIN__) || defined(__MINGW32__)
-# define EXODUSLIBEXT ".dll"
+#define EXODUSLIBEXT ".dll"
 #else
-# define EXODUSLIBEXT ".so"
+#define EXODUSLIBEXT ".so"
 #endif
 
 #include <exodus/mv.h>
 
-//MvEnvironment and ExodusProgramBase are forward declared classes (see below)
-//because they only exist as pointers or references in mvfunctor.
-//and MvEnvironment contains an actual ExodusFunctorBase
+// MvEnvironment and ExodusProgramBase are forward declared classes (see below)
+// because they only exist as pointers or references in mvfunctor.
+// and MvEnvironment contains an actual ExodusFunctorBase
 //#include <exodus/mvenvironment.h>
 //#include <exodus/mvprogram.h>
 
-//good programming practice to prevent many white hairs
-//http://www.parashift.com/c++-faq-lite/pointers-to-members.html#faq-33.6
-#define CALLMEMBERFUNCTION(object,ptrToMember)  ((object).*(ptrToMember)) 
+// good programming practice to prevent many white hairs
+// http://www.parashift.com/c++-faq-lite/pointers-to-members.html#faq-33.6
+#define CALLMEMBERFUNCTION(object, ptrToMember) ((object).*(ptrToMember))
 
-namespace exodus {
-//using namespace exodus;
+namespace exodus
+{
+// using namespace exodus;
 
 class ExodusProgramBase;
 class MvEnvironment;
 
-//pExodusProgramBase - "pointer to exodus program" type
+// pExodusProgramBase - "pointer to exodus program" type
 typedef ExodusProgramBase* pExodusProgramBase;
 
-//pExodusProgramBaseMemberFunction - "pointer to exodus program" member function
+// pExodusProgramBaseMemberFunction - "pointer to exodus program" member function
 typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)();
 
 /*
@@ -113,118 +114,115 @@ typedef ExodusProgram* pExodusProgram;
 typedef var (ExodusProgram::*pExodusProgramMemberFunction)();
 */
 
-//ExodusProgramCreateDeleteFunction - pointer to global function that creates and deletes exodus programs
-typedef void (*ExodusProgramBaseCreateDeleteFunction)
-(
-	pExodusProgramBase&,
-	MvEnvironment&,
-	pExodusProgramBaseMemberFunction&
-);
+// ExodusProgramCreateDeleteFunction - pointer to global function that creates and deletes exodus
+// programs
+typedef void (*ExodusProgramBaseCreateDeleteFunction)(pExodusProgramBase&, MvEnvironment&,
+						      pExodusProgramBaseMemberFunction&);
 
 class DLL_PUBLIC ExodusFunctorBase
 {
 
-public:
+      public:
+	ExodusFunctorBase();
 
-ExodusFunctorBase();
+	// constructor to provide everything immediately
+	ExodusFunctorBase(const std::string libname, const std::string funcname, MvEnvironment& mv);
 
-//constructor to provide everything immediately
-ExodusFunctorBase(const std::string libname, const std::string funcname, MvEnvironment& mv);
+	// constructor to provide library and function names immediately
+	ExodusFunctorBase(const std::string libname, const std::string funcname);
 
-//constructor to provide library and function names immediately
-ExodusFunctorBase(const std::string libname, const std::string funcname);
+	// constructor to provide environment immediately
+	ExodusFunctorBase(MvEnvironment& mv);
 
-//constructor to provide environment immediately
-ExodusFunctorBase(MvEnvironment& mv);
+	// to allow function name to be assigned a name and this name is the name of the library
+	// called arev call @
+	ExodusFunctorBase& operator=(const char*);
 
-//to allow function name to be assigned a name and this name is the name of the library called
-//arev call @
-ExodusFunctorBase& operator=(const char*);
+	// call shared member function
+	var callsmf();
 
-//call shared member function
-var callsmf();
+	// call shared global function
+	var callsgf();
 
-//call shared global function
-var callsgf();
+	/*
+	//constructor to provide library and function names immediately
+	ExodusFunctorBase(const std::string libname,const std::string funcname);
+	*/
 
-/*
-//constructor to provide library and function names immediately
-ExodusFunctorBase(const std::string libname,const std::string funcname);
-*/
+	// destructors of base classes must be virtual (if derived classes are going to be
+	// new/deleted?) otherwise the destructor of the derived class is not called when it should
+	// be
+	virtual ~ExodusFunctorBase();
 
-//destructors of base classes must be virtual (if derived classes are going to be new/deleted?)
-//otherwise the destructor of the derived class is not called when it should be
-virtual ~ExodusFunctorBase();
+	// use void* to speed compilation of exodus applications on windows by avoiding
+	// inclusion of windows.h here BUT SEE ...
+	// Can I convert a pointer-to-function to a void*? NO!
+	// http://www.parashift.com/c++-faq-lite/pointers-to-members.html#faq-33.11
+	// In the implementation cast to HINSTANCE and
+	// conversion between function pointer and void* is not legal c++ and only works
+	// on architectures that have data and functions in the same address space
+	// since void* is pointer to data space and function is pointer to function space
+	//(having said that ... posix dlsym returns a void* for the address of the function!)
+	// void* pfunction_;
 
-//use void* to speed compilation of exodus applications on windows by avoiding
-//inclusion of windows.h here BUT SEE ...
-//Can I convert a pointer-to-function to a void*? NO!
-//http://www.parashift.com/c++-faq-lite/pointers-to-members.html#faq-33.11
-//In the implementation cast to HINSTANCE and 
-//conversion between function pointer and void* is not legal c++ and only works
-//on architectures that have data and functions in the same address space
-//since void* is pointer to data space and function is pointer to function space
-//(having said that ... posix dlsym returns a void* for the address of the function!)
-//void* pfunction_;
-
-public:
-	//for call or die (smf)
+      public:
+	// for call or die (smf)
 	bool init(const char* libraryname, const char* functionname, MvEnvironment& mv);
 
-	//assumes name and mv setup on initialisation then opens library on first call
+	// assumes name and mv setup on initialisation then opens library on first call
 	bool init();
 
-	//for dict/perform/execute (external shared member functions)
-	//forcenew used by perform/execute to delete and create new object each time
-	//so that global variables start out unassigned each time performed/executed
-	bool initsmf(const char* libraryname, const char* functionname, const bool forcenew=false);
+	// for dict/perform/execute (external shared member functions)
+	// forcenew used by perform/execute to delete and create new object each time
+	// so that global variables start out unassigned each time performed/executed
+	bool initsmf(const char* libraryname, const char* functionname,
+		     const bool forcenew = false);
 
-	//external shared global functions (not member functions)
+	// external shared global functions (not member functions)
 	bool initsgf(const char* libraryname, const char* functionname);
 
-	//TODO move to private
+	// TODO move to private
 	void closelib();
 
-private:
+      private:
 	bool openlib(std::string libraryname);
 	bool openfunc(std::string functionname);
 	void closefunc();
 
-protected:
+      protected:
 	bool checkload(std::string libraryname, std::string functionname);
 
-public:
-	//only public for rather hacked mvipc getResponseToRequest()
+      public:
+	// only public for rather hacked mvipc getResponseToRequest()
 	mutable MvEnvironment* mv_;
 
-	//TODO move to private
-	//records the library opened so we can close and reopen new libraries automatically
+	// TODO move to private
+	// records the library opened so we can close and reopen new libraries automatically
 	std::string libraryname_;
 
-private:
-	//normally something like
-	//exodusprogrambasecreatedelete_
-	//or exodusprogrambasecreatedelete_{dictid}
-	//one function is used to create and delete the shared library object
+      private:
+	// normally something like
+	// exodusprogrambasecreatedelete_
+	// or exodusprogrambasecreatedelete_{dictid}
+	// one function is used to create and delete the shared library object
 	std::string functionname_;
 
-	//internal memory of the actual library file name. only used for error messages
+	// internal memory of the actual library file name. only used for error messages
 	std::string libraryfilename_;
-	//pointer to the shared library file
+	// pointer to the shared library file
 	void* plibrary_;
 
-protected:
-	//functioname_ is used to open a dl shared function to this point
+      protected:
+	// functioname_ is used to open a dl shared function to this point
 	ExodusProgramBaseCreateDeleteFunction pfunction_;
 
-public:
-	//holds the 
-	//not used if functor is calling global functions in the shared object
+      public:
+	// holds the
+	// not used if functor is calling global functions in the shared object
 	pExodusProgramBase pobject_;
 	pExodusProgramBaseMemberFunction pmemberfunction_;
-
 };
 
-}//namespace exodus
+} // namespace exodus
 
-#endif //MVFUNCTOR_H
+#endif // MVFUNCTOR_H
