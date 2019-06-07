@@ -937,7 +937,7 @@ bool var::locateusing(const var& usingchar, const var& target, var& setting,
 
 var var::operator()(int fieldno, int valueno, int subvalueno) const
 {
-	std::cout << "var" << std::endl;
+	//std::cout << "var" << std::endl;
 	return a(fieldno, valueno, subvalueno);
 }
 

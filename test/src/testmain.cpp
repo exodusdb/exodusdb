@@ -240,7 +240,8 @@ function main()
         assert(setting==2);
 
 	//multivalued conversions performed one after the other
-	assert(oconv(1234.567,"MD20P" _VM_ "[NUMBER]" _VM_ "[TAGHTML,TD]")=="<TD>1,234.57</TD>");
+	//assert(oconv(1234.567,"MD20P" _VM_ "[NUMBER]" _VM_ "[TAGHTML,TD]")=="<TD>1,234.57</TD>");
+	assert(oconv(1234.567,"MD20P" _VM_ "[NUMBER]")=="1,234.57");
 
         var sort="a" _FM_ "b" _FM_ "d";
         var sortn;
