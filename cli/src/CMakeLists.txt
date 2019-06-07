@@ -48,7 +48,10 @@ add_executable(listindexes listindexes.cpp)
 add_executable(testsort testsort.cpp)
 add_executable(configexodus configexodus.cpp)
 
+# libs #
+
 add_library(dict_myclients SHARED dict_myclients.cpp)
+add_library(number SHARED number.cpp)
 
 ### 2. LINK ###
 
@@ -64,6 +67,7 @@ target_link_libraries(deleteindex exodus stdc++fs ${LIBS})
 target_link_libraries(edir exodus stdc++fs ${LIBS})
 target_link_libraries(edic exodus stdc++fs ${LIBS})
 target_link_libraries(dict2sql exodus stdc++fs ${LIBS})
+target_link_libraries(number exodus stdc++fs ${LIBS})
 target_link_libraries(exodus-cli exodus stdc++fs ${LIBS})
 target_link_libraries(list exodus stdc++fs ${LIBS})
 target_link_libraries(listfiles exodus stdc++fs ${LIBS})
@@ -73,7 +77,7 @@ target_link_libraries(testsort exodus stdc++fs ${LIBS})
 target_link_libraries(configexodus exodus stdc++fs ${LIBS})
 
 
-### 3. INSTALL ###
+### 3. INSTALL BIN ###
 
 install(TARGETS compile
 createfile
@@ -94,9 +98,11 @@ testsort
 configexodus
  DESTINATION bin)
 
+### 4. INSTALL LIB ###
+
 ## CMAKE_PREFIX=/usr/local/
 #install(TARGETS dict_myclients DESTINATION lib)
 #push it into /usr/lib where it can be found by dlopen
-install(TARGETS dict_myclients DESTINATION /usr/lib)
+install(TARGETS dict_myclients number DESTINATION /usr/lib)
 
 message("--EXODUS CLI CMAKE EXIT --")
