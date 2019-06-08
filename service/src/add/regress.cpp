@@ -17,7 +17,7 @@ function main() {
 	var delimiter;
 	int ln;
 	while (true) {
-		ln++;
+		++ln;
 		if (not(mod(ln,1000)))
 			printl(ln);
 		var line=data.substr2(ix,delimiter);

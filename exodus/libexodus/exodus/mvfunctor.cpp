@@ -322,6 +322,8 @@ bool ExodusFunctorBase::openlib(std::string newlibraryname)
 	dlerror();
 #endif
 
+	//look for lib file in ~/lib/libXXXXXX.so
+	//otherwise just default library libXXXXXX.so
 	libraryfilename_ = EXODUSLIBPREFIX + newlibraryname + EXODUSLIBEXT;
 	if (libraryfilename_[0] == '~')
 #pragma warning(disable : 4996)

@@ -5,6 +5,7 @@ cmake_minimum_required(VERSION 2.8)
 
 #works using c++14 default on Ubuntu 18.04 so no need for this
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -rdynamic")
 
 message("")
 message("--EXODUS CLI CMAKE INIT --")
@@ -26,6 +27,8 @@ link_directories(${CMAKE_CURRENT_SOURCE_DIR}../../exodus/libexodus/exodus)
 
 ### DONT FORGET TO ADD TO ALL STAGES (1, 2 AND 3) ###
 
+# bin #
+
 add_executable(compile compile.cpp)
 add_executable(createfile createfile.cpp)
 add_executable(createindex createindex.cpp)
@@ -36,11 +39,6 @@ add_executable(deleteindex deleteindex.cpp)
 add_executable(edir edir.cpp)
 add_executable(edic edic.cpp)
 add_executable(dict2sql dict2sql.cpp)
-
-#name is name only ... input and output files are exodus
-add_executable(exodus-cli exodus.cpp)
-set_target_properties(exodus-cli PROPERTIES OUTPUT_NAME exodus)
-
 add_executable(list list.cpp printtext.h)
 add_executable(listfiles listfiles.cpp)
 add_executable(listdict listdict.cpp)
@@ -48,7 +46,11 @@ add_executable(listindexes listindexes.cpp)
 add_executable(testsort testsort.cpp)
 add_executable(configexodus configexodus.cpp)
 
-# libs #
+#name is name only ... input and output files are exodus
+add_executable(exodus-cli exodus.cpp)
+set_target_properties(exodus-cli PROPERTIES OUTPUT_NAME exodus)
+
+# lib #
 
 add_library(dict_myclients SHARED dict_myclients.cpp)
 add_library(number SHARED number.cpp)

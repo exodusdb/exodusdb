@@ -1,13 +1,18 @@
 #include <exodus/library.h>
 libraryinit()
 
+//var fmtx;
+//var input1;//num
+//var delim;//num
+//var output1;
+
+function main(in type, in input0, in ndecs0, out output) {
+	//c sys in,in,in,out
+
 var fmtx;
 var input1;//num
 var delim;//num
 var output1;
-
-function main(in type, in input0, in ndecs0, out output) {
-	//c sys in,in,in,out
 
 	var ndecs = ndecs0;
 	var input = input0;
