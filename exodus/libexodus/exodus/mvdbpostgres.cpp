@@ -2251,6 +2251,7 @@ var getword(var& remainingwords, var& ucword)
 	tosqlstring(word1);
 
 	// grab multiple values (numbers or quoted words) into one list, separated by FM
+	//value chars are " ' 0-9 . + -
 	if (joinvalues && valuechars.index(word1[1]))
 	{
 		word1 = SQ ^ word1.unquote() ^ SQ;
@@ -2422,18 +2423,18 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	// filename can be omitted if calling like filename.select(...) or filehandle.select(...)
 	// nnn is optional limit to number of records returned
 	// TODO only convert \t\r\n outside single and double quotes
-	var remainingsortselectclause = sortselectclause.a(1).convert("\t\r\n", "   ").trim();
-	// remainingsortselectclause.outputl("remainingsortselectclause=");
+	var remaining = sortselectclause.a(1).convert("\t\r\n", "   ").trim();
+	// remaining.outputl("remaining=");
 
 	// remove trailing options eg (S) or {S}
-	var lastword = remainingsortselectclause.field2(" ", -1);
+	var lastword = remaining.field2(" ", -1);
 	if ((lastword[1] == "(" && lastword[-1] == ")") ||
 	    (lastword[1] == "{" && lastword[-1] == "}"))
 	{
-		remainingsortselectclause.splicer(-lastword.length() - 1, 999, "");
+		remaining.splicer(-lastword.length() - 1, 999, "");
 	}
 
-	var firstucword = remainingsortselectclause.field(" ", 1).ucase();
+	var firstucword = remaining.field(" ", 1).ucase();
 
 	// sortselectclause may start with {SELECT|SSELECT {maxnrecs} filename}
 	if (firstucword == "SELECT" || firstucword == "SSELECT")
@@ -2442,9 +2443,9 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 			bykey = 1;
 
 		// remove it
-		var xx = getword(remainingsortselectclause, xx);
+		var xx = getword(remaining, xx);
 
-		firstucword = remainingsortselectclause.field(" ", 1).ucase();
+		firstucword = remaining.field(" ", 1).ucase();
 	}
 
 	// the second word can be a limiting number of records
@@ -2453,9 +2454,9 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		maxnrecs = firstucword;
 
 		// remove it
-		var xx = getword(remainingsortselectclause, xx);
+		var xx = getword(remaining, xx);
 
-		firstucword = remainingsortselectclause.field(" ", 1).ucase();
+		firstucword = remaining.field(" ", 1).ucase();
 	}
 
 	// the next word can be the filename if not one of the select clause words
@@ -2465,7 +2466,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		actualfilename = firstucword;
 		dictfilename = actualfilename;
 		// remove it
-		var xx = getword(remainingsortselectclause, firstucword);
+		var xx = getword(remaining, firstucword);
 	}
 
 	// actualfilename.outputl("actualfilename=");
@@ -2475,20 +2476,20 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		throw MVDBException("filename missing from select statement:" ^ sortselectclause);
 	}
 
-	while (remainingsortselectclause.length())
+	while (remaining.length())
 	{
 
-		// remainingsortselectclause.outputl("remainingsortselectclause=");
+		// remaining.outputl("remaining=");
 		// whereclause.outputl("whereclause=");
 		// orderclause.outputl("orderclause=");
 
 		var ucword;
-		var word1 = getword(remainingsortselectclause, ucword);
+		var word1 = getword(remaining, ucword);
 
 		//(S) etc
 		// options - last word enclosed in () or {}
 		// ignore options (last word and surrounded by brackets)
-		if (!remainingsortselectclause.length() && (word1[1] == "(" && word1[-1] == ")") ||
+		if (!remaining.length() && (word1[1] == "(" && word1[-1] == ")") ||
 		    (word1[1] == "{" && word1[-1] == "}"))
 		{
 			// word1.outputl("skipping last word in () options ");
@@ -2496,6 +2497,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		}
 
 		// numbers or strings without leading clauses like with ... mean record keys
+		//value chars are " ' 0-9 . + -
 		else if (valuechars.index(word1[1]))
 		{
 			if (keycodes)
@@ -2505,9 +2507,9 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		}
 
 		// using filename
-		else if (ucword == "USING" && remainingsortselectclause)
+		else if (ucword == "USING" && remaining)
 		{
-			dictfilename = getword(remainingsortselectclause, xx);
+			dictfilename = getword(remaining, xx);
 			if (!dictfile.open("dict_" ^ dictfilename))
 			{
 				throw MVDBException("select() dict_" ^ dictfilename ^
@@ -2519,10 +2521,10 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		}
 
 		// distinct fieldname (returns a field instead of the key)
-		else if (ucword == "DISTINCT" && remainingsortselectclause)
+		else if (ucword == "DISTINCT" && remaining)
 		{
 
-			var distinctfieldname = getword(remainingsortselectclause, xx);
+			var distinctfieldname = getword(remaining, xx);
 			var distinctexpression = getdictexpression(
 			    actualfilename, actualfilename, dictfilename, dictfile,
 			    distinctfieldname, joins, froms, selects, ismv, false);
@@ -2554,7 +2556,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		else if (ucword == "BY" || ucword == "BY-DSND")
 		{
 			// next word must be dictid
-			var dictid = getword(remainingsortselectclause, xx);
+			var dictid = getword(remaining, xx);
 			var dictexpression =
 			    getdictexpression(actualfilename, actualfilename, dictfilename,
 					      dictfile, dictid, joins, froms, selects, ismv, true);
@@ -2594,16 +2596,16 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 			var negative = ucword == "WITHOUT";
 
 			// next word must be the NOT/NO or the dictionary id
-			word1 = getword(remainingsortselectclause, ucword);
+			word1 = getword(remaining, ucword);
 
 			// can negate before (and after) dictionary word
 			// eg WITH NO INVOICE_NO
 			if (ucword == "NOT" || ucword == "NO")
 			{
 				negative = !negative;
-				// word1=getword(remainingsortselectclause,true);
+				// word1=getword(remaining,true);
 				// remove NOT or NO
-				word1 = getword(remainingsortselectclause, ucword);
+				word1 = getword(remaining, ucword);
 			}
 
 			// skip AUTHORISED for now since too complicated to calculate in database
@@ -2628,15 +2630,15 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 			whereclause ^= " " ^ dictexpression;
 
 			// the words after the dictid can be NOT/NO or values
-			// word1=getword(remainingsortselectclause, true);
-			word1 = getword(remainingsortselectclause, ucword);
+			// word1=getword(remaining, true);
+			word1 = getword(remaining, ucword);
 
 			if (ucword == "NOT" || ucword == "NO")
 			{
 				negative = !negative;
-				// word1=getword(remainingsortselectclause,true);
+				// word1=getword(remaining,true);
 				// remove NOT/NO and acquire any values
-				word1 = getword(remainingsortselectclause, ucword);
+				word1 = getword(remaining, ucword);
 			}
 
 			// between x and y
@@ -2646,15 +2648,15 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 			{
 
 				// get and append first value
-				word1 = getword(remainingsortselectclause, ucword);
+				word1 = getword(remaining, ucword);
 
 				// get and append second value
-				var word2 = getword(remainingsortselectclause, xx);
+				var word2 = getword(remaining, xx);
 
 				// discard any optional intermediate "AND"
 				if (word2.ucase() == "AND")
 				{
-					word2 = getword(remainingsortselectclause, xx);
+					word2 = getword(remaining, xx);
 				}
 
 				// check we have two values (in word1 and word2)
@@ -2721,8 +2723,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 			{
 
 				// get value or values
-				// word1=getword(remainingsortselectclause, true);
-				word1 = getword(remainingsortselectclause, ucword);
+				// word1=getword(remaining, true);
+				word1 = getword(remaining, ucword);
 
 				// escape any posix special characters;
 				// [\^$.|?*+()
@@ -2740,7 +2742,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 				word1.splicer(2, 0, prefix);
 
 				// push values back on the sortselectclause for further processing
-				remainingsortselectclause.splicer(1, 0,
+				remaining.splicer(1, 0,
 								  word1.convert(FM, " ") ^ " ");
 
 				// use regular expression operator
@@ -2769,7 +2771,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 				// is an operator
 				op = ucword;
 				// get another word (or words)
-				word1 = getword(remainingsortselectclause, ucword);
+				word1 = getword(remaining, ucword);
 			}
 
 			// 2) Acquire value(s) - or empty if not present
@@ -2781,7 +2783,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 			if (ucword.length() && !valuechars.index(ucword[1]))
 			{
 				// push back and treat as missing value
-				remainingsortselectclause.splicer(1, 0, ucword ^ " ");
+				remaining.splicer(1, 0, ucword ^ " ");
 				// simulate no given value
 				word1 = "";
 				ucword = "";
@@ -3012,6 +3014,10 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		// if (autotrans)
 		//	rollbacktrans();
 		return false;
+	}
+
+	if (sql.index("MATERIALS")) {
+		sql.outputl();
 	}
 
 	return true;

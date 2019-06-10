@@ -256,7 +256,7 @@ printtx2:
 			if (htmltitle[1] == "<") {
 				htmltitle = htmltitle.field(">", 2).field("<", 1);
 			}
-			tx.splicer(1, 0, "<html><head><title>" ^ htmltitle ^ "</title>" ^ FM ^ css ^ "</head><body style=\"background-color:#ffffff\"><div align=\"center\" style=\"text-align:center\">\n");
+			tx.splicer(1, 0, "<html><head>" ^ FM ^ "<meta charset=\"utf-8\" /> " ^ FM ^ "<title>" ^ htmltitle ^ "</title>" ^ FM ^ css ^ "</head><body style=\"background-color:#ffffff\"><div align=\"center\" style=\"text-align:center\">\n");
 			tx.splicer(1, 0, "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">");
 			css = "";
 		}

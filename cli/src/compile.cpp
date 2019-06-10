@@ -56,7 +56,11 @@ function main()
 	var default_extension="cpp";
 
 	var compiler;
-	var basicoptions=osgetenv("CPP_OPTIONS");
+	var basicoptions;
+	if (basicoptions=osgetenv("CPP_OPTIONS")) {
+		if (verbose)
+			printl("Using CPP_OPTIONS environment variable "^basicoptions.quote());
+	}
 	var linkoptions=false;
 	var manifest;
 	var binoptions;

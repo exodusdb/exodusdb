@@ -194,7 +194,7 @@ subroutine printtx2() {
 				htmltitle = htmltitle.field(">", 2).field("<", 1);
 			}
 
-			tx.splicer(1, 0, "<!DOCTYPE html>" ^ FM ^ "<html>" ^ FM ^ "<head>" ^ FM ^ "<title>" ^ htmltitle ^ "</title>" ^ FM ^ ptx_css ^ "</head><body style=\"background-color:#ffffff\"><div align=\"center\">" ^ FM);
+			tx.splicer(1, 0, "<!DOCTYPE html>" ^ FM ^ "<html>" ^ FM ^ "<head>" ^ FM ^ "<meta charset=\"utf-8\" /> " ^ FM ^ "<title>" ^ htmltitle ^ "</title>" ^ FM ^ ptx_css ^ "</head><body style=\"background-color:#ffffff\"><div align=\"center\">" ^ FM);
 
 			call docmods("", tx);
 
