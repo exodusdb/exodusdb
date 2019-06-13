@@ -1,5 +1,5 @@
 #include <exodus/mvprogram.h>
-#include <exodusmacros.h> //coding style is like application programming eg USERNAME not mv.USERNAME
+#include <exodus/exodusmacros.h> //coding style is like application programming eg USERNAME not mv.USERNAME
 
 // putting various member functions into all exodus programs allows access to the mv environment
 // variable which is also available in all exodus programs.
@@ -24,7 +24,220 @@ ExodusProgramBase::~ExodusProgramBase(){};
 
 bool ExodusProgramBase::select(const var& sortselectclause)
 {
-	return CURSOR.select(sortselectclause);
+	CURSOR.r(10,"");
+
+	if (!CURSOR.select(sortselectclause))
+		return false;
+
+	//secondary sort/select on fields that could be calculated by the database
+
+	//any calculated fields pending secondary sort/select are stuffed in a(10)
+	var calc_fields=CURSOR.a(10).raise();
+	if (!calc_fields)
+		return true;
+
+	CURSOR.r(10,"");
+
+	//ONLY TEST MATERIALS FOR NOW
+	if (!calc_fields.ucase().index("MATERIALS"))
+		return true;
+
+	//debug
+	//calc_fields.convert(FM^VM^SM,"   ").outputl("calc=");
+
+	var sortselectclause2=sortselectclause;
+
+	//prepare to create a temporary sql table
+	//DROP TABLE IF EXISTS SELECT_TEMP;
+	//CREATE TABLE SELECT_TEMP(
+	// KEY TEXT PRIMARY KEY,
+	// EXECUTIVE_CODE TEXT)
+	var temptablename="SELECT_TEMP_CURSOR_" ^ CURSOR.a(1);
+	var createtablesql = "DROP TABLE IF EXISTS " ^ temptablename ^ ";\n";
+	createtablesql ^= "CREATE TEMPORARY TABLE " ^ temptablename ^ "(\n";
+	createtablesql ^= " KEY TEXT PRIMARY KEY,\n";
+
+	//prepare to insert sql records
+	// INSERT INTO books (id, title, author_id, subject_id)
+	// VALUES (41472, 'Practical PostgreSQL', 1212, 4);
+	var baseinsertsql = "INSERT INTO " ^ temptablename ^ "(KEY,";
+
+	//parse the fields for speed
+	//FIRST_APPEARANCE_DATE>='9/6/2019'
+	//UPLOADS=''
+	//AUTHORISED<>''
+	//DEADLINE<='10/6/2019'
+	int nfields=calc_fields.a(1).dcount(VM);
+	dim dictids(nfields);
+	dim opnos(nfields);
+	dim values(nfields);
+	dim values2(nfields);
+	for (int fieldn=1;fieldn<=nfields;++fieldn) {
+
+		//dictids
+
+		var dictid=calc_fields.a(1,fieldn);
+		dictids(fieldn)=dictid;
+
+		//add colons to the end of every calculated field in the sselect clause
+		//so that 2nd stage select knows that these fields are available in the
+		//temporary parallel file
+		sortselectclause2.replacer("\\b" ^ dictid ^ "\\b",dictid ^ ":");
+
+		//ops
+
+		//turn ops into numbers for speed
+		var op=calc_fields.a(2,fieldn);
+		var opno;
+		if (! op)
+			opno=0;
+		else if (not var("= <> > < >= <= ~ ~* !~ !~* >< >!<").locateusing(" ", op, opno))
+			throw MVException(op.quote() ^ " unknown op in sql select");
+		opnos(fieldn)=opno;
+
+		//values
+
+		var value=calc_fields.a(3,fieldn).unquote();
+		if (dictid.substr(-4,4)=="DATE")
+			value=iconv(value,"D");
+		values(fieldn)=value;
+
+		var value2=calc_fields.a(4,fieldn).unquote();
+		if (dictid.substr(-4,4)=="DATE")
+			value2=iconv(value2,"D");
+		values2(fieldn)=value2;
+
+		//sql temp table column
+		createtablesql ^= " " ^ dictid ^ " TEXT,";
+
+		//sql insert column
+		baseinsertsql ^= dictid ^ ",";
+
+		//debug
+		dictid.outputt();
+		op.outputt();
+		value.outputt();
+		outputl();
+	}
+
+	if (baseinsertsql[-1] == ",") {
+
+		baseinsertsql.splicer(-1,1,")");
+		baseinsertsql ^= " VALUES (";
+
+		createtablesql.splicer(-1,1,")");
+		//createtablesql.outputl();
+
+		//create the temporary table
+		CURSOR.sqlexec(createtablesql);
+	}
+	else
+		baseinsertsql="";
+
+	//open the dictionary
+	var dictfilename=calc_fields.a(5,1);
+	if (dictfilename.substr(1,5)!="dict_")
+		dictfilename="dict_"^dictfilename;
+	if (!DICT.open(dictfilename)) {
+		throw MVDBException(dictfilename.quote() ^ " cannot be opened");
+	}
+
+	int maxnrecs=calc_fields.a(6);
+	int recn=0;
+
+nextrecord:
+	while(CURSOR.readnextrecord(RECORD,ID,MV)) {
+
+		bool ok=true;
+
+		var insertsql=baseinsertsql ^ ID.squote() ^ ",";
+
+		for (int fieldn=1;fieldn<=nfields;++fieldn) {
+
+			var value=calculate(dictids(fieldn));
+
+			//debug
+			value.outputl(dictids(fieldn) ^ " value=");
+
+			switch (int(opnos(fieldn))) {
+				case 0:
+					break;
+				case 1:
+					ok = value == values(fieldn);
+					break;
+				case 2:
+					ok = value != values(fieldn);
+					break;
+				case 3:
+					ok = value > values(fieldn);
+					break;
+				case 4:
+					ok = value < values(fieldn);
+					break;
+				case 5:
+					ok = value >= values(fieldn);
+					break;
+				case 6:
+					ok = value <= values(fieldn);
+					break;
+				case 7:
+					ok = value.match(values(fieldn));
+					break;
+				case 8:
+					ok = value.match(values(fieldn),"i");
+					break;
+				case 9:
+					ok = ! value.match(values(fieldn));
+					break;
+				case 10:
+					ok = ! value.match(values(fieldn),"i");
+					break;
+				case 11:
+					ok = ! value >= values(fieldn) && value <= values2(fieldn);
+					break;
+				case 12:
+					ok = ! value < values(fieldn) || value > values2(fieldn);
+					break;
+			}
+			if (!ok) {
+				//debug
+				//value.outputl("FAILED=");
+				break;
+			}
+
+			//VALUES (41472, 'Practical PostgreSQL', 1212, 4);
+			value.squoter();
+			insertsql ^= " " ^ value ^ ",";
+
+		}
+
+		//skip if failed to match
+		if (!ok) {
+			//ID.outputl("failed ");
+			continue;
+		}
+
+		//ID.outputl("passed ");
+
+		insertsql.splicer(-1,1,")");
+
+		//insertsql.outputl();
+
+		CURSOR.sqlexec(insertsql);
+
+		//limit number of records returned
+		++recn;
+		if (maxnrecs && recn>maxnrecs) {
+			CURSOR.clearselect();
+			//break;
+		}
+
+	}
+
+	//sortselectclause2.outputl();
+
+	return CURSOR.select(sortselectclause2);
+
 }
 
 bool ExodusProgramBase::savelist(const var& listname)
@@ -1249,7 +1462,7 @@ bool ExodusProgramBase::lockrecord(const var& filename, const var& file, const v
 
 lock:
 	var locked = file.lock(keyx);
-	if (locked || allowduplicate && locked eq "")
+	if (locked || (allowduplicate && locked eq ""))
 	{
 		return 1;
 	}

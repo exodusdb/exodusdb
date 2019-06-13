@@ -265,6 +265,7 @@ ExodusFunctorBase& ExodusFunctorBase::operator=(const char* newlibraryname)
 		closelib();
 		libraryname_ = newlibraryname;
 	}
+	return (*this);
 }
 
 bool ExodusFunctorBase::checkload(std::string newlibraryname, std::string newfunctionname)
@@ -329,8 +330,8 @@ bool ExodusFunctorBase::openlib(std::string newlibraryname)
 #pragma warning(disable : 4996)
 		// env string is copied into string so following getenv usage is safe
 		libraryfilename_.replace(0, 1, getenv("HOME"));
-	FILE* file;
-	if (file = fopen(libraryfilename_.c_str(), "r"))
+	FILE* file=fopen(libraryfilename_.c_str(), "r");
+	if (file)
 	{
 		fclose(file);
 	}

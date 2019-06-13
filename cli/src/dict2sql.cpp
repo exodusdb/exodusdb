@@ -9,7 +9,6 @@ function main() {
 	dictfilename=field(SENTENCE," ",2).lcase();
 	if (dictfilename.substr(1,5) ne "dict_")
 		dictfilename.splicer(1,0,"dict_");
-	dictfile;
 	if (!open(dictfilename,dictfile)) {
 		call fsmsg();
 		stop();

@@ -56,11 +56,9 @@ function main()
 	var default_extension="cpp";
 
 	var compiler;
-	var basicoptions;
-	if (basicoptions=osgetenv("CPP_OPTIONS")) {
-		if (verbose)
-			printl("Using CPP_OPTIONS environment variable "^basicoptions.quote());
-	}
+	var basicoptions=osgetenv("CPP_OPTIONS");
+	if (basicoptions and verbose)
+		printl("Using CPP_OPTIONS environment variable "^basicoptions.quote());
 	var linkoptions=false;
 	var manifest;
 	var binoptions;
@@ -89,11 +87,11 @@ function main()
 		if (verbose)
 			printl("Posix environment detected.");
 
-		if (compiler=osgetenv("EXO_CXX")) {
+		if ((compiler=osgetenv("EXO_CXX"))) {
 			if (verbose)
 				printl("Using EXO_CXX environment variable for compiler "^compiler.quote());
 		}
-		else if (compiler=osgetenv("CXX")) {
+		else if ((compiler=osgetenv("CXX"))) {
 			if (verbose)
 				printl("Using CXX environment variable for compiler "^compiler.quote());
 		} else {

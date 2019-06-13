@@ -1744,15 +1744,15 @@ dict(AGE_IN_YEARS) {
 
 	//replace field 2 with "R2"
 	da1="";
-	assert(replacer(da1, 2, "R2") eq ( FM ^ "R2"));
+	assert(pickreplacer(da1, 2, "R2") eq ( FM ^ "R2"));
 
 	//replace field 2, value 3 with "R22"
 	da1="";
-	assert(replacer(da1, 2, 3, "R23") eq ( FM ^VM^VM^ "R23"));
+	assert(pickreplacer(da1, 2, 3, "R23") eq ( FM ^VM^VM^ "R23"));
 
 	//replace field 2, value 3, subvalue 4 with "R234"
 	da1="";
-	assert(replacer(da1, 2, 3, 4, "R234") eq ( FM^ VM^VM^ SM^SM^SM^ "R234"));
+	assert(pickreplacer(da1, 2, 3, 4, "R234") eq ( FM^ VM^VM^ SM^SM^SM^ "R234"));
 
 	//insert "I2" at field 2
 	da1="f1" ^FM^ "f2";

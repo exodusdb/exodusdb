@@ -66,6 +66,8 @@ namespace exodus
 /////////////
 var::~var()
 {
+	//std::cout << "dtor:" << var_str << std::endl;
+
 	// not a pimpl style pointer anymore for speed
 	// delete priv;
 
@@ -84,6 +86,8 @@ var::~var()
 // default constructor to allow definition unassigned "var mv";
 var::var() : var_typ(VARTYP_UNA)
 {
+	//std::cout << "ctor()" << std::endl;
+
 	// int xyz=3;
 	// WARNING neither initialisers nor constructors are called in the following case !!!
 	// var xxx=xxx.somefunction()
@@ -103,6 +107,7 @@ var::var() : var_typ(VARTYP_UNA)
 	// moved here from pimpl constructor
 	// moved up to initializer
 	// var_typ=VARTYP_UNA;
+
 }
 
 // copy constructor
@@ -122,6 +127,8 @@ var::var(const var& rhs)
     : var_str(std::move(rhs.var_str)), var_int(rhs.var_int), var_dbl(rhs.var_dbl),
       var_typ(rhs.var_typ)
 {
+	//std::cout << "copy ctor var&" << std::endl;
+
 	// skip this for speed since temporararies are unlikely to be unassigned
 	// THISIS("var::var(const var&& rhs)")
 	// ISASSIGNED(rhs)
@@ -142,6 +149,8 @@ var::var(const char* cstr1) : var_str(cstr1), var_typ(VARTYP_STR)
 		// THISIS("var::var(const char* cstr1)")
 		throw MVInvalidPointer("Null pointer in var(const char*)");
 	}
+
+	//std::cout << "ctor char* :" <<var_str << std::endl;
 
 	// var_str=cstr1;
 	// var_typ=VARTYP_STR;

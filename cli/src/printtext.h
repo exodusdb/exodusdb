@@ -282,7 +282,7 @@ css=""
 		//swap "'T'" with timedate2() in temp
 		//swap "''" with "" in temp
 		var optioncharn;
-		while (optioncharn = temp.index("\'", 1)) {
+		while ((optioncharn = temp.index("\'", 1))) {
 
 			var optionchars = "";
 			while (true) {

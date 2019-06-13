@@ -771,19 +771,19 @@ DLL_PUBLIC var remove(const var& instring, const int fieldno, const int valueno,
 	return instring.remove(fieldno, valueno, subvalueno);
 }
 
-DLL_PUBLIC var& replacer(var& instring, const int fieldno, const int valueno, const int subvalueno,
+DLL_PUBLIC var& pickreplacer(var& instring, const int fieldno, const int valueno, const int subvalueno,
 			 const var& replacement)
 {
 	return instring.r(fieldno, valueno, subvalueno, replacement);
 }
 
-DLL_PUBLIC var& replacer(var& instring, const int fieldno, const int valueno,
+DLL_PUBLIC var& pickreplacer(var& instring, const int fieldno, const int valueno,
 			 const var& replacement)
 {
 	return instring.r(fieldno, valueno, 0, replacement);
 }
 
-DLL_PUBLIC var& replacer(var& instring, const int fieldno, const var& replacement)
+DLL_PUBLIC var& pickreplacer(var& instring, const int fieldno, const var& replacement)
 {
 	return instring.r(fieldno, 0, 0, replacement);
 }

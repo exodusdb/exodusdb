@@ -228,7 +228,7 @@ bool var::assigned() const
 	// called! which is possible (in syntax like var xx.osread()?) and also when passing default
 	// variables to functions in the functors on gcc THISISDEFINED()
 
-	if (!this || (*this).var_typ & VARTYP_MASK)
+	if (this->var_typ & VARTYP_MASK)
 		return false;
 
 	return var_typ != VARTYP_UNA;
@@ -240,7 +240,7 @@ bool var::unassigned() const
 	// THISIS("bool var::unassigned() const")
 	// THISISDEFINED()
 
-	if (!this || ((*this).var_typ & VARTYP_MASK))
+	if (this->var_typ & VARTYP_MASK)
 		return true;
 
 	return !var_typ;
@@ -789,7 +789,7 @@ var& var::ucaser()
 	// try ASCII uppercase to start with for speed
 	// this may not be correct for all locales. eg Turkish I i İ ı mixing Latin and Turkish
 	// letters.
-	bool allASCII;
+	bool allASCII=false;
 	for (char& c : var_str)
 	{
 		allASCII = (c & ~0x7f) == 0;
@@ -836,7 +836,7 @@ var& var::lcaser()
 	// try ASCII uppercase to start with for speed
 	// this may not be correct for all locales. eg Turkish I i İ ı mixing Latin and Turkish
 	// letters.
-	bool allASCII;
+	bool allASCII=false;
 	for (char& c : var_str)
 	{
 		allASCII = (c & ~0x7f) == 0;

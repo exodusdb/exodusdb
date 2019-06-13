@@ -28,7 +28,7 @@ THE SOFTWARE.
 //#define TRACING
 
 #ifdef _POSIX_SOURCE
-#include <config.h>
+#include "config.h"
 
 #include <cstdlib>
 #include <iostream>

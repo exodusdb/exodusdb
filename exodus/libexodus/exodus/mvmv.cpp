@@ -74,7 +74,7 @@ var dim::split(const var& str1)
 
 	// start at the beginning and look for FM delimiters
 	std::string::size_type start_pos = 0;
-	std::string::size_type next_pos;
+	std::string::size_type next_pos = 0;
 	int fieldno;
 	for (fieldno = 1; fieldno <= this->nrows_;)
 	{
@@ -1271,7 +1271,7 @@ var& var::r(const int fieldno, const int valueno, const var& replacement)
 
 var& var::r(const int fieldno, const var& replacement)
 {
-	THISIS("var var::replacer(const int fieldno,const var& replacement)")
+	THISIS("var var::r(const int fieldno,const var& replacement)")
 	THISISSTRING()
 
 	return r(fieldno, 0, 0, replacement);
@@ -1279,7 +1279,7 @@ var& var::r(const int fieldno, const var& replacement)
 
 var& var::r(int fieldno, int valueno, int subvalueno, const var& replacement)
 {
-	THISIS("var& var::replacer(int fieldno,int valueno,int subvalueno,const var& replacement)")
+	THISIS("var& var::r(int fieldno,int valueno,int subvalueno,const var& replacement)")
 	THISISSTRING()
 	ISSTRING(replacement)
 
@@ -1600,7 +1600,8 @@ var& var::inserter(const int fieldno, const int valueno, const int subvalueno, c
 			value_end_pos++;
 		}
 		start_pos = value_end_pos;
-		subvalue_end_pos = value_end_pos;
+		//not required
+		//subvalue_end_pos = value_end_pos;
 		pad = true;
 	}
 	else if (subvalueno == 0)
@@ -1632,10 +1633,11 @@ var& var::inserter(const int fieldno, const int valueno, const int subvalueno, c
 			subvaluen2++;
 		}
 
+		//not required
 		// find the end of the subvalue (or string)
-		subvalue_end_pos = var_str.find(SM_, start_pos);
-		if (subvalue_end_pos == std::string::npos || subvalue_end_pos > value_end_pos)
-			subvalue_end_pos = value_end_pos;
+		//subvalue_end_pos = var_str.find(SM_, start_pos);
+		//if (subvalue_end_pos == std::string::npos || subvalue_end_pos > value_end_pos)
+		//	subvalue_end_pos = value_end_pos;
 	}
 
 	if (!pad && (start_pos < value_end_pos || subvalueno > 1))

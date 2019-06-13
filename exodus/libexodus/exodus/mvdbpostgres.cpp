@@ -1219,7 +1219,7 @@ bool var::sqlexec(const var& sqlcmd, var& errmsg) const
 	if (PQresultStatus(pgresult) != PGRES_COMMAND_OK &&
 	    PQresultStatus(pgresult) != PGRES_TUPLES_OK)
 	{
-		int xx = PQresultStatus(pgresult);
+		//int xx = PQresultStatus(pgresult);
 		var sqlstate = var(PQresultErrorField(pgresult, PG_DIAG_SQLSTATE));
 		// PQclear(pgresult);//essential
 		// sql state 42P03 = duplicate_cursor
@@ -1842,6 +1842,15 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 		}
 	}
 
+	//if doing 2nd pass then calculated fields have been placed in a parallel temporary file
+	//and their column names appended with a colon (:)
+	var calculated=fieldname[-1]==":";
+	if (calculated) {
+		fieldname.splicer(-1,1,"");
+		//create a pseudo look up ... except that SELECT_TEMP_CURSOR_n has the fields stored in sql columns and not in the usual data column
+		calculated="@ANS=XLATE(\"SELECT_TEMP_CURSOR_" ^ this->a(1) ^ "\",@ID," ^ fieldname ^ ",\"X\")";
+	}
+
 	// given a file and dictionary id
 	// returns a postgres sql expression like (texta(filename.data,99,0,0))
 	// using one of the neosys backend functions installed in postgres like textextract,
@@ -1887,6 +1896,12 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 				}
 			}
 		}
+	}
+
+	//create a pseudo look up. to trigger JOIN logic to the table that we stored
+	//Note that SELECT_TEMP has the fields stored in sql columns and not in the usual data column
+	if (calculated) {
+		dictrec.r(8,"@ANS=XLATE(\"SELECT_TEMP_CURSOR_" ^ this->a(1) ^ "\",@ID," ^ fieldname ^ ",\"X\")");
 	}
 
 	var dicttype = dictrec.a(1);
@@ -2032,6 +2047,11 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 							   "data") ^
 					    ", " ^ xlatetargetfieldname ^ ", 0, 0)";
 				}
+				//calculated fields exist as sql columns in a parallel temporary table
+				else if (calculated)
+				{
+					sqlexpression=xlatetargetfilename ^ "." ^ xlatetargetfieldname;
+				}
 				else
 				{
 					// var dictxlatetofile=xlatetargetfilename;
@@ -2066,6 +2086,10 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 					xlatekeyexpression = getdictexpression(
 					    filename, filename, dictfilename, dictfile,
 					    xlatefromfieldname, joins, froms, selects, ismv);
+				}
+				else if (xlatefromfieldname == "@ID")
+				{
+					xlatekeyexpression = filename ^ ".key";
 				}
 				else
 				{
@@ -2341,7 +2365,7 @@ bool var::saveselect(const var& filename)
 	return recn > 0;
 }
 
-bool var::selectrecord(const var& sortselectclause) const
+bool var::selectrecord(const var& sortselectclause)
 {
 	THISIS("bool var::selectrecord(const var& sortselectclause) const")
 	//?allow undefined usage like var xyz=xyz.select();
@@ -2363,7 +2387,7 @@ bool var::select(const var& sortselectclause)
 }
 
 // currently only called from select, selectrecord and getlist
-bool var::selectx(const var& fieldnames, const var& sortselectclause) const
+bool var::selectx(const var& fieldnames, const var& sortselectclause)
 {
 	// private - and arguments are left unchecked for speed
 	//?allow undefined usage like var xyz=xyz.select();
@@ -2416,6 +2440,11 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	var maxnrecs = "";
 	var xx; // throwaway return value
 
+	//prepare to save calculated fields that cannot be calculated by postgresql for secondary processing
+	var calc_fields="";
+	var ncalc_fields=0;
+	this->r(10,"");
+
 	// sortselect clause can be a filehandle in which case we extract the filename from field1
 	// omitted if filename.select() or filehandle.select()
 	// cursor.select(...) where ...
@@ -2448,7 +2477,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		firstucword = remaining.field(" ", 1).ucase();
 	}
 
-	// the second word can be a limiting number of records
+	// the second word can be a number to limit the number of records selected
 	if (firstucword.length() and firstucword.isnum())
 	{
 		maxnrecs = firstucword;
@@ -2489,8 +2518,14 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		//(S) etc
 		// options - last word enclosed in () or {}
 		// ignore options (last word and surrounded by brackets)
-		if (!remaining.length() && (word1[1] == "(" && word1[-1] == ")") ||
-		    (word1[1] == "{" && word1[-1] == "}"))
+		if (!remaining.length()
+		    &&
+		    (
+			(word1[1] == "(" && word1[-1] == ")")
+			||
+			(word1[1] == "{" && word1[-1] == "}")
+		    )
+		   )
 		{
 			// word1.outputl("skipping last word in () options ");
 			continue;
@@ -2564,6 +2599,16 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 			// dictexpression.outputl("dictexpression=");
 			// orderclause.outputl("orderclause=");
 
+			// no filtering in database on calculated items
+			//save then for secondary filtering
+			if (dictexpression.index("exodus_call"))
+			//if (dictexpression == "true")
+			{
+				++ncalc_fields;
+				calc_fields.r(1,ncalc_fields,dictid);
+				continue;
+			}
+
 			orderclause ^= ",\n " ^ dictexpression;
 
 			if (ucword == "BY-DSND")
@@ -2624,10 +2669,10 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 			var dictid = word1;
 
 			// add the dictid expression
-			if (dictexpression.index("exodus_cal"))
-				dictexpression = "true";
+			//if (dictexpression.index("exodus_call"))
+			//	dictexpression = "true";
 
-			whereclause ^= " " ^ dictexpression;
+			//whereclause ^= " " ^ dictexpression;
 
 			// the words after the dictid can be NOT/NO or values
 			// word1=getword(remaining, true);
@@ -2669,8 +2714,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 				}
 
 				// no filtering on calculated items
-				// if (dictexpression.index("exodus_cal"))
-				if (dictexpression == "true")
+				if (dictexpression.index("exodus_call"))
+				//if (dictexpression == "true")
 				{
 					continue;
 				}
@@ -2680,6 +2725,24 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 					word1 = naturalorder(word1.toString());
 					word2 = naturalorder(word2.toString());
 				}
+
+				// no filtering in database on calculated items
+				//save then for secondary filtering
+				if (dictexpression.index("exodus_call"))
+				{
+					var opid=negative?">!<":"><";
+
+					++ncalc_fields;
+					calc_fields.r(1,ncalc_fields,dictid);
+					calc_fields.r(2,ncalc_fields,opid);
+					calc_fields.r(3,ncalc_fields,word1);
+					calc_fields.r(4,ncalc_fields,word2);
+
+					whereclause ^= " true";
+					continue;
+				}
+
+				whereclause ^= " " ^ dictexpression;
 
 				if (negative)
 					whereclause ^= " not ";
@@ -2875,14 +2938,23 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 				}
 			}
 
-			// no filtering on calculated items
-			// if (dictexpression.index("exodus_cal"))
-			if (dictexpression == "true")
+			// no filtering in database on calculated items
+			//save then for secondary filtering
+			if (dictexpression.index("exodus_call"))
+			//if (dictexpression == "true")
 			{
+				++ncalc_fields;
+				calc_fields.r(1,ncalc_fields,dictid);
+				calc_fields.r(2,ncalc_fields,op);
+				calc_fields.r(3,ncalc_fields,value);
+
+				//place holder to be removed before issuing actual sql command
+				whereclause ^= " true";
+
 				continue;
 			}
 
-			whereclause ^= " " ^ op ^ " " ^ value;
+			whereclause ^= " " ^ dictexpression ^ " " ^ op ^ " " ^ value;
 			// whereclause.outputl("whereclause=");
 		}
 
@@ -2897,7 +2969,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 			keycodes = actualfilename ^ ".key IN ( " ^ keycodes.swap(FM, ", ") ^ " )";
 
 			if (whereclause)
-				whereclause ^= "\n AND ( " ^ keycodes ^ " ) ";
+				//whereclause ^= "\n AND ( " ^ keycodes ^ " ) ";
+				whereclause = keycodes ^ "\n AND " ^ whereclause;
 			else
 				whereclause = keycodes;
 		}
@@ -2906,6 +2979,10 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 	// sselect add by key on the end of any specific order bys
 	if (bykey)
 		orderclause ^= ", " ^ actualfilename ^ ".key";
+
+	//if calculated fields then secondary sort/select is going to use readnextrecord, so add the data column if missing
+	if (calc_fields && actualfieldnames.substr(-6) != ", data")
+		actualfieldnames^=", data";
 
 	if (!ismv)
 	{
@@ -2933,6 +3010,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 
 	// disambiguate from any INNER JOIN key
 	actualfieldnames.swapper("key", actualfilename ^ ".key");
+	actualfieldnames.swapper("data", actualfilename ^ ".data");
 
 	// DISTINCT has special fieldnames
 	if (distinctfieldnames)
@@ -2971,12 +3049,16 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		sql ^= " " ^ joins.a(2).convert(VM, "");
 	if (whereclause)
 		sql ^= " \nWHERE \n" ^ whereclause;
-	if (orderclause)
+
+	// no ordering if any calculated items - save all ordering for secondary sort/select
+	if (orderclause && ! calc_fields)
 		sql ^= " \nORDER BY \n" ^ orderclause.substr(3);
-	if (maxnrecs)
+
+	// no limit initially if any calculated items - limit will be done in secondary sort/select
+	if (maxnrecs && ! calc_fields)
 		sql ^= " \nLIMIT\n " ^ maxnrecs;
 
-	// sql.outputl("sql=");
+	//sql.outputl("sql=");
 
 	// DEBUG_LOG_SQL
 	// if (GETDBTRACE)
@@ -2993,6 +3075,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		var errmsg;
 		if (!this->sqlexec(sql, errmsg))
 		{
+
+
 			if (errmsg)
 				errmsg.outputl("::selectx: " ^ sql ^ "\n" ^ errmsg);
 			// return false;
@@ -3016,8 +3100,12 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) const
 		return false;
 	}
 
-	if (sql.index("MATERIALS")) {
-		sql.outputl();
+	//sort/select on calculated items may be done in mvprogram::calculate
+	//which can call calculate() and has access to mv.RECORD, mv.ID etc
+	if (calc_fields) {
+		calc_fields.r(5,dictfilename.lower());
+		calc_fields.r(6,maxnrecs);
+		this->r(10,calc_fields.lower());
 	}
 
 	return true;
@@ -3032,10 +3120,13 @@ void var::clearselect()
 	const_cast<var&>(*this).unassigned("");
 
 	/// if readnext through string
-	if ((*this)[-1] == FM)
+	//3/4/5/6 setup in makelist. cleared in clearselect
+	if (this->a(3) == "%MAKELIST%")
 	{
-		var_str = "";
-		var_typ = VARTYP_STR;
+		this->r(6,"");
+		this->r(5,"");
+		this->r(4,"");
+		this->r(3,"");
 		return;
 	}
 
@@ -3049,6 +3140,9 @@ void var::clearselect()
 	if (not this->cursorexists())
 		return;
 
+	// clear any select list
+	this->deletelist(listname);
+
 	var sql = "";
 	// sql^="DECLARE BEGIN ";
 	sql ^= "CLOSE cursor1_";
@@ -3057,8 +3151,7 @@ void var::clearselect()
 	// sql^="\nEXCEPTION WHEN\n invalid_cursor_name\n THEN";
 	// sql^="\nEND";
 
-	// clear any select list
-	this->deletelist(listname);
+	//sql.output();
 
 	var errors;
 	if (!this->sqlexec(sql, errors))
@@ -3310,6 +3403,7 @@ bool var::makelist(const var& listname, const var& keys)
 	}
 
 	// provide a block of keys for readnext
+	//3/4/5/6 setup in makelist. cleared in clearselect
 
 	// listid in the lists file must be set for readnext to work, but not exist in the file
 	// readnext will look for %MAKELIST%*2 in the lists file when it reaches the end of the
@@ -3320,7 +3414,7 @@ bool var::makelist(const var& listname, const var& keys)
 	// suffix for first block is nothing (not *1) and then *2, *3 etc
 	this->r(4, 1);
 
-	// key pointer for readnext to remove next key from the block of keys
+	// key pointer for readnext to find next key from the block of keys
 	this->r(5, 0);
 
 	// keys separated by vm. each key may be followed by a sm and the mv no for readnext
@@ -3399,7 +3493,8 @@ bool var::hasnext() const
 	/////////////////////////////////
 
 	PGresultptr pgresult2;
-	ok = readnextx(*this, pgresult2, pgconn, /*forwards=*/false);
+	//ok =
+	readnextx(*this, pgresult2, pgconn, /*forwards=*/false);
 
 	Resultclearer clearer2(pgresult2);
 

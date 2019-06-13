@@ -1312,7 +1312,7 @@ class DLL_PUBLIC var
 	bool readnext(var& key);
 	bool readnext(var& key, var& valueno);
 
-	bool selectrecord(const var& sortselectclause DEFAULTNULL) const;
+	bool selectrecord(const var& sortselectclause DEFAULTNULL);
 	bool readnextrecord(var& record, var& key);
 	bool readnextrecord(var& record, var& key, var& valueno);
 
@@ -1409,7 +1409,7 @@ class DLL_PUBLIC var
 	void setlasterror() const;
 
 	bool cursorexists() const;
-	bool selectx(const var& fieldnames, const var& sortselectclause) const;
+	bool selectx(const var& fieldnames, const var& sortselectclause);
 
 	// retrieves cid from *this, or uses default connection, or autoconnect with default
 	// connection string On return *this contains connection ID and type VARTYP_NANSTR_DBCONN

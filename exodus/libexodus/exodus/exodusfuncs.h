@@ -297,11 +297,11 @@ DLL_PUBLIC var insert(const var& instring, const int fieldno, const var& inserti
 DLL_PUBLIC var remove(const var& instring, const int fieldno, const int valueno = 0,
 		      const int subvalueno = 0);
 
-DLL_PUBLIC var& replacer(var& instring, const int fieldno, const int valueno, const int subvalueno,
+DLL_PUBLIC var& pickreplacer(var& instring, const int fieldno, const int valueno, const int subvalueno,
 			 const var& replacement);
-DLL_PUBLIC var& replacer(var& instring, const int fieldno, const int valueno,
+DLL_PUBLIC var& pickreplacer(var& instring, const int fieldno, const int valueno,
 			 const var& replacement);
-DLL_PUBLIC var& replacer(var& instring, const int fieldno, const var& replacement);
+DLL_PUBLIC var& pickreplacer(var& instring, const int fieldno, const var& replacement);
 
 DLL_PUBLIC var& inserter(var& instring, const int fieldno, const int valueno, const int subvalueno,
 			 const var& insertion);

@@ -53,7 +53,7 @@ void MvHandlesCache::del_handle(int index)
 	if (conntbl[index].deleter)
 	{
 		conntbl[index].deleter(conntbl[index].handle);
-		conntbl[index].handle;
+		//conntbl[index].handle;
 	}
 	conntbl[index].deleter = 0; //	HANDLE_ENTRY_FREE
 }

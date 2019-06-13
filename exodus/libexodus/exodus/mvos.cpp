@@ -1311,6 +1311,8 @@ bool var::osread(const char* osfilename, const var& codepage)
 	// read the file into the reserved memory block
 	myfile.seekg(0, std::ios::beg);
 	// myfile.read (memblock.get(), (unsigned int) bytesize);
+	//myfile.read(&var_str[0], (unsigned int)bytesize);
+	//c++17 provides non-const access to data() :)
 	myfile.read(var_str.data(), (unsigned int)bytesize);
 
 	bool failed = myfile.fail();

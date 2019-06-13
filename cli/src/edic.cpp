@@ -367,9 +367,9 @@ function main() {
                     print(errors);
 
                 startatlineno="";
-                var charn;
                 //gnu style error lines
-                if (charn=index(errors, ": error:")) {
+                var charn=index(errors, ": error:");
+                if (charn) {
                     startatlineno=errors.substr(charn-9,9);
 
                     //printl(startatlineno);
@@ -377,7 +377,7 @@ function main() {
                     //printl(startatlineno);
                     //msvc style error lines
                     //test.cpp(6) : error C2143: syntax error : missing ';' before '}'
-                } else if (charn=index(errors,") : error ")) {
+                } else if ((charn=index(errors,") : error "))) {
                     startatlineno=errors.substr(charn-10,10).field2("(",2);
                 }
                 if (startatlineno) {
