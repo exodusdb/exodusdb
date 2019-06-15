@@ -1449,47 +1449,60 @@ var MVcat(const var& lhs, const var& rhs)
 	return lhs.var_str + rhs.var_str;
 }
 
+//PLUS
 DLL_PUBLIC var operator+(const var& lhs, const var& rhs) { return MVadd(lhs, rhs); }
 DLL_PUBLIC var operator+(const var& lhs, const char* char2) { return MVadd(lhs, var(char2)); }
 DLL_PUBLIC var operator+(const var& lhs, const int int2) { return MVadd(lhs, var(int2)); }
 DLL_PUBLIC var operator+(const var& lhs, const double double2) { return MVadd(lhs, var(double2)); }
-DLL_PUBLIC var operator+(const var& lhs, const bool bool2) { return MVadd(lhs, var(bool2)); }
+//DLL_PUBLIC var operator+(const var& lhs, const bool bool2) { return MVadd(lhs, var(bool2)); }
 DLL_PUBLIC var operator+(const char* char1, const var& rhs) { return MVadd(var(char1), rhs); }
 DLL_PUBLIC var operator+(const int int1, const var& rhs) { return MVadd(var(int1), rhs); }
 DLL_PUBLIC var operator+(const double double1, const var& rhs) { return MVadd(var(double1), rhs); }
-DLL_PUBLIC var operator+(const bool bool1, const var& rhs) { return MVadd(var(bool1), rhs); }
-
-//optimise for temporaries
-//DLL_PUBLIC var operator+(var&& lhs, const var& rhs) { return lhs+=rhs; }
-//DLL_PUBLIC var operator+(var&& lhs, const char* char2) { return lhs+=char2; }
-//DLL_PUBLIC var operator+(var&& lhs, const int int2) { return lhs+=int2; }
-//DLL_PUBLIC var operator+(var&& lhs, const double double2) { return lhs+=double2; }
+//DLL_PUBLIC var operator+(const bool bool1, const var& rhs) { return MVadd(var(bool1), rhs); }
+//rvalues
+DLL_PUBLIC var operator+(var&& lhs, const var& rhs) { return lhs+=rhs; }
+DLL_PUBLIC var operator+(var&& lhs, const char* char2) { return lhs+=char2; }
+DLL_PUBLIC var operator+(var&& lhs, const int int2) { return lhs+=int2; }
+DLL_PUBLIC var operator+(var&& lhs, const double double2) { return lhs+=double2; }
 //DLL_PUBLIC var operator+(var&& lhs, const bool bool2) { return lhs+=bool2; }
 //DLL_PUBLIC var operator+(const char* char1, var&& rhs) { return rhs+=char1; }
 //DLL_PUBLIC var operator+(const int int1, var&& rhs) { return rhs+=int1; }
 //DLL_PUBLIC var operator+(const double double1, var&& rhs) { return rhs+=double1; }
 //DLL_PUBLIC var operator+(const bool bool1, var&& rhs) { return rhs+=bool1; }
 
+//MINUS
 DLL_PUBLIC var operator-(const var& lhs, const var& rhs) { return MVsub(lhs, rhs); }
 DLL_PUBLIC var operator-(const var& lhs, const char* char2) { return MVsub(lhs, var(char2)); }
 DLL_PUBLIC var operator-(const var& lhs, const int int2) { return MVsub(lhs, var(int2)); }
 DLL_PUBLIC var operator-(const var& lhs, const double double2) { return MVsub(lhs, var(double2)); }
-DLL_PUBLIC var operator-(const var& lhs, const bool bool2) { return MVsub(lhs, var(bool2)); }
+//DLL_PUBLIC var operator-(const var& lhs, const bool bool2) { return MVsub(lhs, var(bool2)); }
 DLL_PUBLIC var operator-(const char* char1, const var& rhs) { return MVsub(var(char1), rhs); }
 DLL_PUBLIC var operator-(const int int1, const var& rhs) { return MVsub(var(int1), rhs); }
 DLL_PUBLIC var operator-(const double double1, const var& rhs) { return MVsub(var(double1), rhs); }
-DLL_PUBLIC var operator-(const bool bool1, const var& rhs) { return MVsub(var(bool1), rhs); }
+//DLL_PUBLIC var operator-(const bool bool1, const var& rhs) { return MVsub(var(bool1), rhs); }
+//rvalues
+DLL_PUBLIC var operator-(var&& lhs, const var& rhs) { return lhs-=rhs; }
+DLL_PUBLIC var operator-(var&& lhs, const char* char2) { return lhs-=char2; }
+DLL_PUBLIC var operator-(var&& lhs, const int int2) { return lhs-=int2; }
+DLL_PUBLIC var operator-(var&& lhs, const double double2) { return lhs-=double2; }
 
+//MULTIPLY
 DLL_PUBLIC var operator*(const var& lhs, const var& rhs) { return MVmul(lhs, rhs); }
 DLL_PUBLIC var operator*(const var& lhs, const char* char2) { return MVmul(lhs, var(char2)); }
 DLL_PUBLIC var operator*(const var& lhs, const int int2) { return MVmul(lhs, var(int2)); }
 DLL_PUBLIC var operator*(const var& lhs, const double double2) { return MVmul(lhs, var(double2)); }
-DLL_PUBLIC var operator*(const var& lhs, const bool bool2) { return MVmul(lhs, var(bool2)); }
+//DLL_PUBLIC var operator*(const var& lhs, const bool bool2) { return MVmul(lhs, var(bool2)); }
 DLL_PUBLIC var operator*(const char* char1, const var& rhs) { return MVmul(var(char1), rhs); }
 DLL_PUBLIC var operator*(const int int1, const var& rhs) { return MVmul(var(int1), rhs); }
 DLL_PUBLIC var operator*(const double double1, const var& rhs) { return MVmul(var(double1), rhs); }
-DLL_PUBLIC var operator*(const bool bool1, const var& rhs) { return MVmul(var(bool1), rhs); }
+//DLL_PUBLIC var operator*(const bool bool1, const var& rhs) { return MVmul(var(bool1), rhs); }
+//rvalues - pending implementation of var*=
+//DLL_PUBLIC var operator*(var&& lhs, const var& rhs) { return lhs*=rhs; }
+//DLL_PUBLIC var operator*(var&& lhs, const char* char2) { return lhs*=char2; }
+//DLL_PUBLIC var operator*(var&& lhs, const int int2) { return lhs*=int2; }
+//DLL_PUBLIC var operator*(var&& lhs, const double double2) { return lhs*=double2; }
 
+//DIVIDE
 DLL_PUBLIC var operator/(const var& lhs, const var& rhs) { return MVdiv(lhs, rhs); }
 DLL_PUBLIC var operator/(const var& lhs, const char* char2) { return MVdiv(lhs, var(char2)); }
 DLL_PUBLIC var operator/(const var& lhs, const int int2) { return MVdiv(lhs, var(int2)); }
@@ -1500,8 +1513,9 @@ DLL_PUBLIC var operator/(const var& lhs, const double double2) { return MVdiv(lh
 DLL_PUBLIC var operator/(const char* char1, const var& rhs) { return MVdiv(var(char1), rhs); }
 DLL_PUBLIC var operator/(const int int1, const var& rhs) { return MVdiv(var(int1), rhs); }
 DLL_PUBLIC var operator/(const double double1, const var& rhs) { return MVdiv(var(double1), rhs); }
-DLL_PUBLIC var operator/(const bool bool1, const var& rhs) { return MVdiv(var(bool1), rhs); }
+//DLL_PUBLIC var operator/(const bool bool1, const var& rhs) { return MVdiv(var(bool1), rhs); }
 
+//MODULO
 DLL_PUBLIC var operator%(const var& lhs, const var& rhs) { return MVmod(lhs, rhs); }
 DLL_PUBLIC var operator%(const var& lhs, const char* char2) { return MVmod(lhs, var(char2)); }
 DLL_PUBLIC var operator%(const var& lhs, const int int2) { return MVmod(lhs, var(int2)); }
@@ -1512,8 +1526,9 @@ DLL_PUBLIC var operator%(const var& lhs, const double double2) { return MVmod(lh
 DLL_PUBLIC var operator%(const char* char1, const var& rhs) { return MVmod(var(char1), rhs); }
 DLL_PUBLIC var operator%(const int int1, const var& rhs) { return MVmod(var(int1), rhs); }
 DLL_PUBLIC var operator%(const double double1, const var& rhs) { return MVmod(var(double1), rhs); }
-DLL_PUBLIC var operator%(const bool bool1, const var& rhs) { return MVmod(var(bool1), rhs); }
+//DLL_PUBLIC var operator%(const bool bool1, const var& rhs) { return MVmod(var(bool1), rhs); }
 
+//CONCATENATE
 // NB do *NOT* support concatenate with bool or vice versa!!!
 // to avoid compiler doing wrong precendence issue between ^ and logical operators
 DLL_PUBLIC var operator^(const var& lhs, const var& rhs) { return MVcat(lhs, rhs); }

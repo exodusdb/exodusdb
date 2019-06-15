@@ -712,31 +712,41 @@ class DLL_PUBLIC var
 	DLL_PUBLIC friend var operator+(const var&, const char*);
 	DLL_PUBLIC friend var operator+(const var&, const int);
 	DLL_PUBLIC friend var operator+(const var&, const double);
-	DLL_PUBLIC friend var operator+(const var&, const bool);
+	//DLL_PUBLIC friend var operator+(const var&, const bool);
 	DLL_PUBLIC friend var operator+(const char*, const var&);
 	DLL_PUBLIC friend var operator+(const int, const var&);
 	DLL_PUBLIC friend var operator+(const double, const var&);
-	DLL_PUBLIC friend var operator+(const bool, const var&);
+	//DLL_PUBLIC friend var operator+(const bool, const var&);
+	//rvalues
+	DLL_PUBLIC friend var operator+(var&&, const var&);
+	DLL_PUBLIC friend var operator+(var&&, const char*);
+	DLL_PUBLIC friend var operator+(var&&, const int);
+	DLL_PUBLIC friend var operator+(var&&, const double);
 
 	DLL_PUBLIC friend var operator-(const var&, const var&);
 	DLL_PUBLIC friend var operator-(const var&, const char*);
 	DLL_PUBLIC friend var operator-(const var&, const int);
 	DLL_PUBLIC friend var operator-(const var&, const double);
-	DLL_PUBLIC friend var operator-(const var&, const bool);
+	//DLL_PUBLIC friend var operator-(const var&, const bool);
 	DLL_PUBLIC friend var operator-(const char*, const var&);
 	DLL_PUBLIC friend var operator-(const int, const var&);
 	DLL_PUBLIC friend var operator-(const double, const var&);
-	DLL_PUBLIC friend var operator-(const bool, const var&);
+	//DLL_PUBLIC friend var operator-(const bool, const var&);
+	//rvalues
+	DLL_PUBLIC friend var operator+(var&&, const var&);
+	DLL_PUBLIC friend var operator+(var&&, const char*);
+	DLL_PUBLIC friend var operator+(var&&, const int);
+	DLL_PUBLIC friend var operator+(var&&, const double);
 
 	DLL_PUBLIC friend var operator*(const var&, const var&);
 	DLL_PUBLIC friend var operator*(const var&, const char*);
 	DLL_PUBLIC friend var operator*(const var&, const int);
 	DLL_PUBLIC friend var operator*(const var&, const double);
-	DLL_PUBLIC friend var operator*(const var&, const bool);
+	//DLL_PUBLIC friend var operator*(const var&, const bool);
 	DLL_PUBLIC friend var operator*(const char*, const var&);
 	DLL_PUBLIC friend var operator*(const int, const var&);
 	DLL_PUBLIC friend var operator*(const double, const var&);
-	DLL_PUBLIC friend var operator*(const bool, const var&);
+	//DLL_PUBLIC friend var operator*(const bool, const var&);
 
 	DLL_PUBLIC friend var operator/(const var&, const var&);
 	DLL_PUBLIC friend var operator/(const var&, const char*);
@@ -747,7 +757,7 @@ class DLL_PUBLIC var
 	DLL_PUBLIC friend var operator/(const char*, const var&);
 	DLL_PUBLIC friend var operator/(const int, const var&);
 	DLL_PUBLIC friend var operator/(const double, const var&);
-	DLL_PUBLIC friend var operator/(const bool, const var&);
+	//DLL_PUBLIC friend var operator/(const bool, const var&);
 
 	DLL_PUBLIC friend var operator%(const var&, const var&);
 	DLL_PUBLIC friend var operator%(const var&, const char*);
@@ -759,7 +769,7 @@ class DLL_PUBLIC var
 	DLL_PUBLIC friend var operator%(const char*, const var&);
 	DLL_PUBLIC friend var operator%(const int, const var&);
 	DLL_PUBLIC friend var operator%(const double, const var&);
-	DLL_PUBLIC friend var operator%(const bool, const var&);
+	//DLL_PUBLIC friend var operator%(const bool, const var&);
 
 	// NB do NOT allow concat with bool or vice versa - find reason why
 	DLL_PUBLIC friend var operator^(const var&, const var&);
@@ -1614,16 +1624,23 @@ DLL_PUBLIC var MVmod(const var& var1, const var& var2);
 // var^var reassign logical xor to be std::string concatenate!!!
 DLL_PUBLIC var MVcat(const var& var1, const var& var2);
 
+//PLUS
 DLL_PUBLIC var operator+(const var& var1, const var& var2);
 DLL_PUBLIC var operator+(const var& var1, const char* char2);
 DLL_PUBLIC var operator+(const var& var1, const int int2);
 DLL_PUBLIC var operator+(const var& var1, const double double2);
-DLL_PUBLIC var operator+(const var& var1, const bool bool1);
+//DLL_PUBLIC var operator+(const var& var1, const bool bool1);
 DLL_PUBLIC var operator+(const char* char1, const var& var2);
 DLL_PUBLIC var operator+(const int int1, const var& var2);
 DLL_PUBLIC var operator+(const double double1, const var& var2);
-DLL_PUBLIC var operator+(const bool bool1, const var& var2);
+//DLL_PUBLIC var operator+(const bool bool1, const var& var2);
+//rvalues
+DLL_PUBLIC var operator+(var&& var1, const var& var2);
+DLL_PUBLIC var operator+(var&& var1, const char* char2);
+DLL_PUBLIC var operator+(var&& var1, const int int2);
+DLL_PUBLIC var operator+(var&& var1, const double double2);
 
+//MINUS
 DLL_PUBLIC var operator-(const var& var1, const var& var2);
 DLL_PUBLIC var operator-(const var& var1, const char* char2);
 DLL_PUBLIC var operator-(const var& var1, const int int2);
@@ -1631,7 +1648,13 @@ DLL_PUBLIC var operator-(const var& var1, const double double2);
 DLL_PUBLIC var operator-(const char* char1, const var& var2);
 DLL_PUBLIC var operator-(const int int1, const var& var2);
 DLL_PUBLIC var operator-(const double double1, const var& var2);
+//rvalues
+DLL_PUBLIC var operator-(var&& var1, const var& var2);
+DLL_PUBLIC var operator-(var&& var1, const char* char2);
+DLL_PUBLIC var operator-(var&& var1, const int int2);
+DLL_PUBLIC var operator-(var&& var1, const double double2);
 
+//MULTIPLY
 DLL_PUBLIC var operator*(const var& var1, const var& var2);
 DLL_PUBLIC var operator*(const var& var1, const char* char2);
 DLL_PUBLIC var operator*(const var& var1, const int int2);
@@ -1640,6 +1663,7 @@ DLL_PUBLIC var operator*(const char* char1, const var& var2);
 DLL_PUBLIC var operator*(const int int1, const var& var2);
 DLL_PUBLIC var operator*(const double double1, const var& var2);
 
+//DIVIDE
 DLL_PUBLIC var operator/(const var& var1, const var& var2);
 DLL_PUBLIC var operator/(const var& var1, const char* char2);
 DLL_PUBLIC var operator/(const var& var1, const int int2);
@@ -1648,6 +1672,7 @@ DLL_PUBLIC var operator/(const char* char1, const var& var2);
 DLL_PUBLIC var operator/(const int int1, const var& var2);
 DLL_PUBLIC var operator/(const double double1, const var& var2);
 
+//MODULO
 DLL_PUBLIC var operator%(const var& var1, const var& var2);
 DLL_PUBLIC var operator%(const var& var1, const char* char2);
 DLL_PUBLIC var operator%(const var& var1, const int int2);
