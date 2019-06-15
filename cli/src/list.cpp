@@ -1730,7 +1730,7 @@ subroutine addstr()
 	if (str3.length() < str1.length())
 		str3 ^= space(str1.length() - str2.length());
 	for (var ii = 1; ii <= str1.length(); ii++) {
-		var char1 = str1[ii].trim();
+		var char1 = var(str1[ii]).trim();
 		if (char1 ne "") {
 			var char2 = str3[ii];
 			if (char2 eq " ") {

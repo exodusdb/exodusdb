@@ -188,7 +188,7 @@ var var::field(const var& substrx, const int fieldnx, const int nfieldsx) const
 // FIELDSTORE(x,y,z)
 // var.fieldstore(substr,fieldno,nfields,replacement)
 var var::fieldstore(const var& sepchar, const int fieldnx, const int nfieldsx,
-		    const var& replacementx) const
+		    const var& replacementx) const&
 {
 	THISIS("var var::fieldstore(const var& sepchar,const int fieldnx,const int nfieldsx, const "
 	       "var& replacementx) const")
@@ -198,6 +198,14 @@ var var::fieldstore(const var& sepchar, const int fieldnx, const int nfieldsx,
 	return newmv.fieldstorer(sepchar, fieldnx, nfieldsx, replacementx);
 }
 
+// on temporary
+var& var::fieldstore(const var& sepchar, const int fieldnx, const int nfieldsx,
+		    const var& replacementx) &&
+{
+	return this->fieldstorer(sepchar, fieldnx, nfieldsx, replacementx);
+}
+
+// in-place
 var& var::fieldstorer(const var& sepchar0, const int fieldnx, const int nfieldsx,
 		      const var& replacementx)
 {
@@ -1444,32 +1452,60 @@ var& var::r(int fieldno, int valueno, int subvalueno, const var& replacement)
 ///////////////////////////////////////////
 
 var var::insert(const int fieldno, const int valueno, const int subvalueno,
-		const var& insertion) const
+		const var& insertion) const&
 {
 	THISIS("var var::insert(const int fieldno,const int valueno,const int subvalueno,const "
 	       "var& insertion) const")
 	THISISSTRING()
 
-	var newmv = *this;
-	return newmv.inserter(fieldno, valueno, subvalueno, insertion);
+	var newmv = var(*this).inserter(fieldno, valueno, subvalueno, insertion);
+	return newmv;
 }
 
+// given only field and value numbers
+var var::insert(const int fieldno, const int valueno, const var& insertion) const&
+{
+	return this->insert(fieldno, valueno, 0, insertion);
+}
+
+// given only field number
+var var::insert(const int fieldno, const var& insertion) const&
+{
+	return this->insert(fieldno, 0, 0, insertion);
+}
+
+// on temporary
+var& var::insert(const int fieldno, const int valueno, const int subvalueno,
+		const var& insertion) &&
+{
+	return this->inserter(fieldno, valueno, subvalueno, insertion);
+}
+
+// on temporary - given only field and value number
+var& var::insert(const int fieldno, const int valueno, const var& insertion) &&
+{
+	return this->inserter(fieldno, valueno, 0, insertion);
+}
+
+// on temporary - given only field number
+var& var::insert(const int fieldno, const var& insertion) &&
+{
+	return this->inserter(fieldno, 0, 0, insertion);
+}
+
+// in-place - given field and value no
 var& var::inserter(const int fieldno, const int valueno, const var& insertion)
 {
-	THISIS("var var::inserter(const int fieldno,const int valueno,const var& insertion")
-	THISISSTRING()
-
-	return inserter(fieldno, valueno, 0, insertion);
+	return this->inserter(fieldno, valueno, 0, insertion);
 }
 
+// in-place given only field no
 var& var::inserter(const int fieldno, const var& insertion)
 {
-	THISIS("var var::inserter(const int fieldno,const var& insertion")
-	THISISSTRING()
-
-	return inserter(fieldno, 0, 0, insertion);
+	return this->inserter(fieldno, 0, 0, insertion);
 }
 
+//in-place - given everything
 var& var::inserter(const int fieldno, const int valueno, const int subvalueno, const var& insertion)
 {
 	THISIS("var& var::inserter(const int fieldno,const int valueno,const int subvalueno,const "
@@ -1651,7 +1687,7 @@ var& var::inserter(const int fieldno, const int valueno, const int subvalueno, c
 // SUBSTR
 ////////
 
-var var::substr(const int startindex1) const
+var var::substr(const int startindex1) const&
 {
 	THISIS("var var::substr(const int startindex1) const")
 	THISISSTRING()
@@ -1659,9 +1695,15 @@ var var::substr(const int startindex1) const
 	return var(*this).substrer(startindex1);
 }
 
+// on temporary
+var& var::substr(const int startindex1) &&
+{
+	return this->substrer(startindex1);
+}
+
 //[x,y]
 // var.s(start,length) substring
-var var::substr(const int startindex1, const int length) const
+var var::substr(const int startindex1, const int length) const&
 {
 	THISIS("var var::substr(const int startindex1,const int length) const")
 	THISISSTRING()
@@ -1669,6 +1711,13 @@ var var::substr(const int startindex1, const int length) const
 	return var(*this).substrer(startindex1, length);
 }
 
+// on temporary
+var& var::substr(const int startindex1, const int length) &&
+{
+	return this->substrer(startindex1, length);
+}
+
+// in-place
 var& var::substrer(const int startindex1)
 {
 	THISIS("var& var::substrer(const int startindex1) const")
@@ -1774,10 +1823,22 @@ var& var::substrer(const int startindex1, const int length)
 	return *this;
 }
 
+/*
+var_brackets_proxy var::operator[](int charno) const&
+{
+        std::cout << "lvalue" <<std::endl;
+        return var_brackets_proxy{var_str,charno};
+}
+
 //[x]
+var var::operator[](int charno) &&
+{
+*/
+
 // var.c(charno) character
 var var::operator[](const int charno) const
 {
+	//std::cout << "rvalue" <<std::endl;
 	THISIS("var var::operator[](const int charno) const")
 	THISISSTRING()
 

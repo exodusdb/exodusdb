@@ -1459,6 +1459,17 @@ DLL_PUBLIC var operator+(const int int1, const var& rhs) { return MVadd(var(int1
 DLL_PUBLIC var operator+(const double double1, const var& rhs) { return MVadd(var(double1), rhs); }
 DLL_PUBLIC var operator+(const bool bool1, const var& rhs) { return MVadd(var(bool1), rhs); }
 
+//optimise for temporaries
+//DLL_PUBLIC var operator+(var&& lhs, const var& rhs) { return lhs+=rhs; }
+//DLL_PUBLIC var operator+(var&& lhs, const char* char2) { return lhs+=char2; }
+//DLL_PUBLIC var operator+(var&& lhs, const int int2) { return lhs+=int2; }
+//DLL_PUBLIC var operator+(var&& lhs, const double double2) { return lhs+=double2; }
+//DLL_PUBLIC var operator+(var&& lhs, const bool bool2) { return lhs+=bool2; }
+//DLL_PUBLIC var operator+(const char* char1, var&& rhs) { return rhs+=char1; }
+//DLL_PUBLIC var operator+(const int int1, var&& rhs) { return rhs+=int1; }
+//DLL_PUBLIC var operator+(const double double1, var&& rhs) { return rhs+=double1; }
+//DLL_PUBLIC var operator+(const bool bool1, var&& rhs) { return rhs+=bool1; }
+
 DLL_PUBLIC var operator-(const var& lhs, const var& rhs) { return MVsub(lhs, rhs); }
 DLL_PUBLIC var operator-(const var& lhs, const char* char2) { return MVsub(lhs, var(char2)); }
 DLL_PUBLIC var operator-(const var& lhs, const int int2) { return MVsub(lhs, var(int2)); }
@@ -1512,6 +1523,11 @@ DLL_PUBLIC var operator^(const var& lhs, const double double2) { return MVcat(lh
 DLL_PUBLIC var operator^(const char* char1, const var& rhs) { return MVcat(var(char1), rhs); }
 DLL_PUBLIC var operator^(const int int1, const var& rhs) { return MVcat(var(int1), rhs); }
 DLL_PUBLIC var operator^(const double double1, const var& rhs) { return MVcat(var(double1), rhs); }
+//rvalues
+DLL_PUBLIC var operator^(var&& lhs, const var& rhs) { return lhs^=rhs; }
+DLL_PUBLIC var operator^(var&& lhs, const char* char2) { return lhs^=char2; }
+DLL_PUBLIC var operator^(var&& lhs, const int int2) { return lhs^=int2; }
+DLL_PUBLIC var operator^(var&& lhs, const double double2) { return lhs^=double2; }
 
 //#if defined __MINGW32__
 // allow use of cout<<var

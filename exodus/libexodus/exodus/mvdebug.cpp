@@ -439,7 +439,7 @@ void SIGINT_handler(int sig)
 			break;
 
 		// only look at first character in uppercase
-		var cmd1 = cmd[1].ucase();
+		var cmd1 = var(cmd[1]).ucase();
 
 		// continue
 		if (cmd1 == "C")

@@ -511,7 +511,7 @@ void var::from_u32string(std::u32string u32_source) const
 	var_str = boost::locale::conv::utf_to_utf<char>(u32_source);
 }
 
-var var::trim(const var& trimchar) const
+var var::trim(const var& trimchar) const&
 {
 	THISIS("var var::trim(const var& trimchar) const")
 	ISSTRING(trimchar)
@@ -519,7 +519,7 @@ var var::trim(const var& trimchar) const
 	return trim(trimchar.var_str.c_str());
 }
 
-var var::trim(const var& trimchar, const var& options) const
+var var::trim(const var& trimchar, const var& options) const&
 {
 	THISIS("var var::trim(const var& trimchar, const var& options) const")
 	ISSTRING(trimchar)
@@ -569,7 +569,7 @@ var& var::trimmer(const var& trimchar, const var& options)
 	return trimmer(trimchar.var_str.c_str());
 }
 
-var var::trimf(const var& trimchar) const
+var var::trimf(const var& trimchar) const&
 {
 	THISIS("var var::trimf(const var& trimchar) const")
 	ISSTRING(trimchar)
@@ -585,7 +585,7 @@ var& var::trimmerf(const var& trimchar)
 	return trimmerf(trimchar.var_str.c_str());
 }
 
-var var::trimb(const var& trimchar) const
+var var::trimb(const var& trimchar) const&
 {
 	THISIS("var var::trimb(const var& trimchar) const")
 	ISSTRING(trimchar)
@@ -601,7 +601,8 @@ var& var::trimmerb(const var& trimchar)
 	return trimmerb(trimchar.var_str.c_str());
 }
 
-var var::trimf(const char* trimchar) const
+//trimf() - trim leading spaces/character
+var var::trimf(const char* trimchar) const&
 {
 	THISIS("var var::trimf(const char* trimchar) const")
 	THISISSTRING()
@@ -609,6 +610,13 @@ var var::trimf(const char* trimchar) const
 	return var(*this).trimmerf(trimchar);
 }
 
+// on temporary
+var& var::trimf(const char* trimchar) &&
+{
+	return this->trimmerf(trimchar);
+}
+
+// in-place
 var& var::trimmerf(const char* trimchar)
 {
 	THISIS("var& var::trimmerf(const char* trimchar)")
@@ -632,7 +640,8 @@ var& var::trimmerf(const char* trimchar)
 	return *this;
 }
 
-var var::trimb(const char* trimchar) const
+// trimb() - trim backward (trailing) spaces/character
+var var::trimb(const char* trimchar) const&
 {
 	THISIS("var var::trimb(const char* trimchar) const")
 	THISISSTRING()
@@ -640,6 +649,13 @@ var var::trimb(const char* trimchar) const
 	return var(*this).trimmerb(trimchar);
 }
 
+// on temporary
+var& var::trimb(const char* trimchar) &&
+{
+	return this->trimmerb(trimchar);
+}
+
+// in-place
 var& var::trimmerb(const char* trimchar)
 {
 	THISIS("var& var::trimmerb(const char* trimchar)")
@@ -663,14 +679,22 @@ var& var::trimmerb(const char* trimchar)
 	return *this;
 }
 
-var var::trim(const char* trimchar) const
+//trim() - remove leading, trailing and excess internal spaces/character
+var var::trim(const char* trimchar) const&
 {
-	THISIS("var var::trim(const char* trimchar) const")
+	THISIS("var var::trim(const char* trimchar) const&")
 	THISISSTRING()
 
 	return var(*this).trimmer(trimchar);
 }
 
+// on temporary
+var& var::trim(const char* trimchar) &&
+{
+	return this->trimmer(trimchar);
+}
+
+// in-place
 var& var::trimmer(const char* trimchar)
 {
 
@@ -733,7 +757,8 @@ var& var::trimmer(const char* trimchar)
 	return *this;
 }
 
-var var::invert() const
+// invert() - inverts lower 8 bits of UTF8 codepoints (not bytes)
+var var::invert() const&
 {
 	THISIS("var& var::invert()")
 	THISISSTRING()
@@ -742,7 +767,13 @@ var var::invert() const
 	return tt;
 }
 
-// inverts lower 8 bits of UTF8 codepoints
+// on temporary
+var& var::invert() &&
+{
+	return this->inverter();
+}
+
+// in-place
 var& var::inverter()
 {
 	THISIS("var& var::inverter()")
@@ -770,9 +801,19 @@ var& var::inverter()
 	return *this;
 }
 
-// upper case
-var var::ucase() const { return var(*this).ucaser(); }
+// ucase() - upper case
+var var::ucase() const&
+{
+	return var(*this).ucaser();
+}
 
+// on temporary
+var& var::ucase() &&
+{
+	return this->ucaser();
+}
+
+// in-place
 var& var::ucaser()
 {
 	THISIS("var& var::ucaser()")
@@ -818,9 +859,19 @@ var& var::ucaser()
 	*/
 }
 
-// lower case
-var var::lcase() const { return var(*this).lcaser(); }
+// lcase() - lower case
+var var::lcase() const&
+{
+	return var(*this).lcaser();
+}
 
+// on temporary
+var& var::lcase() &&
+{
+	return this->lcaser();
+}
+
+// in-place
 var& var::lcaser()
 {
 	THISIS("var& var::lcaser()")
@@ -854,9 +905,19 @@ var& var::lcaser()
 	return *this;
 }
 
-// title case
-var var::tcase() const { return var(*this).tcaser(); }
+// tcase() - title case
+var var::tcase() const&
+{
+	return var(*this).tcaser();
+}
 
+// on temporary
+var& var::tcase() &&
+{
+	return this->tcaser();
+}
+
+// in-place
 var& var::tcaser()
 {
 	THISIS("var& var::tcaser()")
@@ -877,6 +938,7 @@ var& var::tcaser()
 	return *this;
 }
 
+// fcase()
 // fold case - prepare for indexing/searching
 // https://www.w3.org/International/wiki/Case_folding
 // Note that accents are sometimes significant and sometime not. e.g. in French
@@ -884,8 +946,18 @@ var& var::tcaser()
 //  coté (highly regarded)
 //  côte (coast)
 //  côté (side)
-var var::fcase() const { return var(*this).fcaser(); }
+var var::fcase() const&
+{
+	return var(*this).fcaser();
+}
 
+// on temporary
+var& var::fcase() &&
+{
+	return this->fcaser();
+}
+
+// in-place
 var& var::fcaser()
 {
 	THISIS("var& var::fcaser()")
@@ -917,14 +989,25 @@ inline bool is_ascii(const std::string& string1)
 // postgres gives FALSE for the following:
 // SELECT 'á' = 'á';
 
+// normalise()
 // normalise (unicode NFC, C=Compact ... norm_nfc)
 // see "Unicode Normalization Forms" https://unicode.org/reports/tr15/
 //"It is crucial that Normalization Forms remain stable over time. That is, if a string that does
 // not
 // have any unassigned characters is normalized under one version of Unicode,
 // it must remain normalized under all future versions of Unicode."
-var var::normalize() const { return var(*this).normalizer(); }
+var var::normalize() const&
+{
+	return var(*this).normalizer();
+}
 
+// on temporary
+var& var::normalize() &&
+{
+	return this->normalizer();
+}
+
+// in-place
 var& var::normalizer()
 {
 	THISIS("var& var::normalizer()")
@@ -957,6 +1040,7 @@ var var::unique() const
 	var bit;
 	var delimiter;
 	var sepchar = VM;
+	int RMseq_plus1=RM.seq()+1;
 	// bool founddelimiter = false;
 	while (true)
 	{
@@ -967,7 +1051,7 @@ var var::unique() const
 		// if (!founddelimiter && delimiter)
 		if (delimiter)
 			// sepchar=RM_-int(delimiter)+1;
-			sepchar = var().chr(RM.seq() - delimiter + 1);
+			sepchar = var().chr(RMseq_plus1 - delimiter);
 
 		if (bit.length())
 		{
@@ -980,7 +1064,8 @@ var var::unique() const
 		if (not delimiter)
 			break;
 	} // loop;
-	result.splicer(-1, 1, "");
+	//result.splicer(-1, 1, "");
+	result.var_str.pop_back();
 	return result;
 }
 
@@ -1043,7 +1128,8 @@ var var::textchr(const int utf_codepoint) const
 	return boost::locale::conv::utf_to_utf<char>(wstr1);
 }
 
-var var::quote() const
+// quote() - wrap with double quotes
+var var::quote() const&
 {
 	THISIS("var var::quote() const")
 	THISISSTRING()
@@ -1051,6 +1137,13 @@ var var::quote() const
 	return var(*this).quoter();
 }
 
+// on temporary
+var& var::quote() &&
+{
+	return this->quoter();
+}
+
+// in-place
 var& var::quoter()
 {
 	THISIS("var& var::quoter()")
@@ -1065,7 +1158,8 @@ var& var::quoter()
 	return *this;
 }
 
-var var::squote() const
+// squoter() - wrap with single quotes
+var var::squote() const&
 {
 	THISIS("var var::squote() const")
 	THISISSTRING()
@@ -1073,6 +1167,13 @@ var var::squote() const
 	return var(*this).squoter();
 }
 
+// on temporary
+var& var::squote() &&
+{
+	return this->squoter();
+}
+
+// in-place
 var& var::squoter()
 {
 	THISIS("var& var::squoter()")
@@ -1087,7 +1188,8 @@ var& var::squoter()
 	return *this;
 }
 
-var var::unquote() const
+//unquote() - remove outer double or single quotes
+var var::unquote() const&
 {
 	THISIS("var var::unquote() const")
 	THISISSTRING()
@@ -1095,6 +1197,13 @@ var var::unquote() const
 	return var(*this).unquoter();
 }
 
+// on temporary
+var& var::unquote() &&
+{
+	return this->unquoter();
+}
+
+// in-place
 var& var::unquoter()
 {
 	THISIS("var& var::unquoter()")
@@ -1130,7 +1239,8 @@ var& var::unquoter()
 	return *this;
 }
 
-var var::splice(const int start1, const int length, const var& newstr) const
+//splice() remove/replace/insert part of a string with another string
+var var::splice(const int start1, const int length, const var& newstr) const&
 {
 	THISIS("var var::splice(const int start1,const int length,const var& newstr) const")
 	THISISSTRING()
@@ -1138,7 +1248,14 @@ var var::splice(const int start1, const int length, const var& newstr) const
 	return var(*this).splicer(start1, length, newstr);
 }
 
-var var::splice(const int start1, const var& newstr) const
+// on temporary
+var& var::splice(const int start1, const int length, const var& newstr) &&
+{
+	return this->splicer(start1, length, newstr);
+}
+
+// splice() remove/replace/insert part of a string (up to the end) with another string
+var var::splice(const int start1, const var& newstr) const&
 {
 	THISIS("var var::splice(const int start1,const var& newstr) const")
 	THISISSTRING()
@@ -1146,6 +1263,13 @@ var var::splice(const int start1, const var& newstr) const
 	return var(*this).splicer(start1, newstr);
 }
 
+// on temporary
+var& var::splice(const int start1, const var& newstr) &&
+{
+	return this->splicer(start1, newstr);
+}
+
+// in-place
 var& var::splicer(const int start1, const int length, const var& newstr)
 {
 	THISIS("var& var::splicer(const int start1,const int length,const var& newstr)")
@@ -1201,6 +1325,7 @@ var& var::splicer(const int start1, const int length, const var& newstr)
 	return *this;
 }
 
+// in-place
 var& var::splicer(const int start1, const var& newstr)
 {
 	THISIS("var& var::splicer(const int start1, const var& newstr)")
@@ -1329,7 +1454,8 @@ var var::space() const
 	return newstr;
 }
 
-var var::crop() const
+//crop() - remove superfluous FM, VM etc.
+var var::crop() const&
 {
 	THISIS("var var::crop() const")
 	THISISSTRING()
@@ -1337,6 +1463,13 @@ var var::crop() const
 	return var(*this).cropper();
 }
 
+// on temporary
+var& var::crop() &&
+{
+	return this->cropper();
+}
+
+// in-place
 var& var::cropper()
 {
 	THISIS("var& var::cropper()")
@@ -1391,7 +1524,8 @@ var& var::cropper()
 	return *this;
 }
 
-var var::lower() const
+// lower() drops FM to VM, VM to SM etc.
+var var::lower() const&
 {
 	THISIS("var var::lower() const")
 	THISISSTRING()
@@ -1399,6 +1533,13 @@ var var::lower() const
 	return var(*this).lowerer();
 }
 
+// on temporary
+var& var::lower() &&
+{
+	return this->lowerer();
+}
+
+// in-place
 var& var::lowerer()
 {
 	THISIS("var& var::lowerer()")
@@ -1411,7 +1552,8 @@ var& var::lowerer()
 	return *this;
 }
 
-var var::raise() const
+// raise() lifts VM to FM, SM to VM etc.
+var var::raise() const&
 {
 	THISIS("var var::raise() const")
 	THISISSTRING()
@@ -1419,6 +1561,13 @@ var var::raise() const
 	return var(*this).raiser();
 }
 
+// on temporary
+var& var::raise() &&
+{
+	return this->raiser();
+}
+
+// in-place
 var& var::raiser()
 {
 	THISIS("var& var::raiser()")
@@ -1431,7 +1580,9 @@ var& var::raiser()
 	return *this;
 }
 
-var var::convert(const var& oldchars, const var& newchars) const
+// convert() - replaces one by one in string, a list of characters with another list of characters
+// if the target list is shorter than the source list of characters then characters are deleted
+var var::convert(const var& oldchars, const var& newchars) const&
 {
 	THISIS("var var::convert(const var& oldchars,const var& newchars) const")
 	THISISSTRING()
@@ -1439,6 +1590,12 @@ var var::convert(const var& oldchars, const var& newchars) const
 	// return var(*this).converter(oldchars,newchars);
 	var temp = var(*this).converter(oldchars, newchars);
 	return temp;
+}
+
+// on temporary
+var& var::convert(const var& oldchars, const var& newchars) &&
+{
+	return this->converter(oldchars, newchars);
 }
 
 template <class T> void converter_helper(T& var_str, const T& oldchars, const T& newchars)
@@ -1471,9 +1628,7 @@ template <class T> void converter_helper(T& var_str, const T& oldchars, const T&
 	return;
 }
 
-// replaces in a string, a list of characters with another list of characters respectively
-// if the target list is shorter than the source list of characters then characters are deleted
-//
+// in-place
 var& var::converter(const var& oldchars, const var& newchars)
 {
 	THISIS("var& var::converter(const var& oldchars,const var& newchars)")

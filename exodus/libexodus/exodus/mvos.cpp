@@ -45,8 +45,8 @@ THE SOFTWARE.
 namespace stdfs = std::experimental::filesystem;
 
 // show c++ version for info
-#include <boost/preprocessor/stringize.hpp>
-#pragma message "__cplusplus=" BOOST_PP_STRINGIZE(__cplusplus)
+//#include <boost/preprocessor/stringize.hpp>
+//#pragma message "__cplusplus=" BOOST_PP_STRINGIZE(__cplusplus)
 
 #define USE_BOOST_REGEX
 
@@ -85,7 +85,7 @@ namespace stdfs = std::experimental::filesystem;
 #define BOOST_HAS_ICU
 #endif
 #ifdef BOOST_HAS_ICU
-#pragma message "BOOST_HAS_ICU"
+//#pragma message "BOOST_HAS_ICU"
 #include <boost/regex/icu.hpp>
 #endif
 #include <boost/regex.hpp>
@@ -861,12 +861,19 @@ var var::match(const var& matchstr, const var& options) const
 }
 
 // simple case sensitive substr replacement
-var var::swap(const var& what, const var& with) const
+var var::swap(const var& what, const var& with) const&
 {
 	var newmv = *this;
 	return newmv.swapper(what, with);
 }
 
+// on temporaries
+var& var::swap(const var& what, const var& with) &&
+{
+	return this->swapper(what, with);
+}
+
+// in-place
 var& var::swapper(const var& what, const var& with)
 {
 	THISIS("var& var::swapper(const var& what, const var& with)")
@@ -896,13 +903,21 @@ var& var::swapper(const var& what, const var& with)
 	return *this;
 }
 
+//regex based string replacement
 // only here really because boost regex is included here for file matching
-var var::replace(const var& regexstr, const var& replacementstr, const var& options) const
+var var::replace(const var& regexstr, const var& replacementstr, const var& options) const&
 {
 	var newmv = *this;
 	return newmv.replacer(regexstr, replacementstr, options);
 }
 
+// on temporary
+var& var::replace(const var& regexstr, const var& replacementstr, const var& options) &&
+{
+	return this->replacer(regexstr, replacementstr, options);
+}
+
+// in-place
 var& var::replacer(const var& regexstr, const var& replacementstr, const var& options)
 {
 	THISIS("var& var::replacer(const var& regexstr, const var& replacementstr, const var& "

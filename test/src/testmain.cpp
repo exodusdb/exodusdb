@@ -1,60 +1,60 @@
 #include <exodus/program.h>
 #include <cassert>
 
-/* UBUNTU locale-gen
-locale-gen de_DE.UTF-8
-locale-gen en_GB.UTF-8
-locale-gen en_US.UTF-8
-locale-gen el_GR.UTF-8
-locale-gen tr_TR.UTF-8
-dpkg-reconfigure locales
-*/
-
-/*Ubuntu
- apt-cache search locale |grep -i greek
- greek turkish german
- apt-get install language-support-el language-support-tr language-support-de
-*/
-
-//non-ASCII unicode characters
-
-var ArabicIndicDigits		="٠١٢٣٤٥٦٧٨٩";
-var alldigits=
-"Western	: 0 1 2 3 4 5 6 7 8 9  \n"
-"Arabic		: ٠ ١ ٢ ٣ ٤ ٥ ٦ ٧ ٨ ٩  \n"
-"Devanagari	: ० १ २ ३ ४ ५ ६ ७ ८ ९  \n"
-"Gujarati 	: ૦ ૧ ૨ ૩ ૪ ૫ ૬ ૭ ૮ ૯  \n"
-"Punjabi 	: ੦ ੧ ੨ ੩ ੪ ੫ ੬ ੭ ੮ ੯  \n"
-"Bengali 	: ০ ১ ২ ৩ ৪ ৫ ৬ ৭ ৮ ৯  \n"
-"Odia 		: ୦ ୧ ୨ ୩ ୪ ୫ ୬ ୭ ୮ ୯  \n"
-"Telugu 	: ౦ ౧ ౨ ౩ ౪ ౫ ౬ ౭ ౮ ౯  \n"
-"Kannada 	: ೦ ೧ ೨ ೩ ೪ ೫ ೬ ೭ ೮ ೯  \n"
-"Tamil 		: ௦ ௧ ௨ ௩ ௪ ௫ ௬ ௭ ௮ ௯  \n"
-"Malayalam 	: ൦ ൧ ൨ ൩ ൪ ൫ ൬ ൭ ൮ ൯  \n";
-
-var GreekSmallAlpha         ="α";//\u03B1";//GREEK SMALL LETTER ALPHA
-var GreekSmallFinalSigma    ="ς";//\u03C2";//GREEK SMALL LETTER FINAL SIGMA
-var GreekSmallSigma         ="σ";//\u03C3";//GREEK SMALL LETTER SIGMA
-var GreekCapitalSigma       ="Σ";//\u03A3";//GREEK CAPITAL LETTER SIGMA
-var GreekCapitalAlpha       ="Α";//\u0391";//GREEK CAPITAL LETTER ALPHA
-var Greek_sas               ="σας";//GreekSmallSigma^GreekSmallAlpha^GreekSmallFinalSigma;
-var Greek_SAS               ="ΣΑΣ";//GreekCapitalSigma^GreekCapitalAlpha^GreekCapitalSigma;
-var GreekQuestionMark		=";";//\u037E";//GREEK QUESTION MARK (Punctuation)
-var GreekCapitalGamma		="Γ";//\u0393";//GREEK CAPITAL LETTER GAMMA (Letter) (Uppercase)
-var GreekSmallGamma		="γ";//\u03B3";//GREEK SMALL LETTER GAMMA (Letter) (Lowercase)
-var ArabicIndicDigitZero	="٠";//\u0660";//ARABIC-INDIC DIGIT ZERO (Decimal Digit)
-
-var TurkishCapitalDottedI   ="İ";//\u0130";
-var TurkishSmallDotlessI    ="ı";//\u0131";
-var LatinSmallI             ="i";
-var LatinCapitalI           ="I";
-
-var GermanEszet             ="ß";//"\u00DF";//German
-
 programinit()
 
 function main()
 {
+
+	/* UBUNTU locale-gen
+	locale-gen de_DE.UTF-8
+	locale-gen en_GB.UTF-8
+	locale-gen en_US.UTF-8
+	locale-gen el_GR.UTF-8
+	locale-gen tr_TR.UTF-8
+	dpkg-reconfigure locales
+	*/
+
+	/*Ubuntu
+	 apt-cache search locale |grep -i greek
+	 greek turkish german
+	 apt-get install language-support-el language-support-tr language-support-de
+	*/
+
+	//non-ASCII unicode characters
+
+	var ArabicIndicDigits		="٠١٢٣٤٥٦٧٨٩";
+	var alldigits=
+	"Western	: 0 1 2 3 4 5 6 7 8 9  \n"
+	"Arabic		: ٠ ١ ٢ ٣ ٤ ٥ ٦ ٧ ٨ ٩  \n"
+	"Devanagari	: ० १ २ ३ ४ ५ ६ ७ ८ ९  \n"
+	"Gujarati 	: ૦ ૧ ૨ ૩ ૪ ૫ ૬ ૭ ૮ ૯  \n"
+	"Punjabi 	: ੦ ੧ ੨ ੩ ੪ ੫ ੬ ੭ ੮ ੯  \n"
+	"Bengali 	: ০ ১ ২ ৩ ৪ ৫ ৬ ৭ ৮ ৯  \n"
+	"Odia 		: ୦ ୧ ୨ ୩ ୪ ୫ ୬ ୭ ୮ ୯  \n"
+	"Telugu 	: ౦ ౧ ౨ ౩ ౪ ౫ ౬ ౭ ౮ ౯  \n"
+	"Kannada 	: ೦ ೧ ೨ ೩ ೪ ೫ ೬ ೭ ೮ ೯  \n"
+	"Tamil 		: ௦ ௧ ௨ ௩ ௪ ௫ ௬ ௭ ௮ ௯  \n"
+	"Malayalam 	: ൦ ൧ ൨ ൩ ൪ ൫ ൬ ൭ ൮ ൯  \n";
+
+	var GreekSmallAlpha         ="α";//\u03B1";//GREEK SMALL LETTER ALPHA
+	var GreekSmallFinalSigma    ="ς";//\u03C2";//GREEK SMALL LETTER FINAL SIGMA
+	var GreekSmallSigma         ="σ";//\u03C3";//GREEK SMALL LETTER SIGMA
+	var GreekCapitalSigma       ="Σ";//\u03A3";//GREEK CAPITAL LETTER SIGMA
+	var GreekCapitalAlpha       ="Α";//\u0391";//GREEK CAPITAL LETTER ALPHA
+	var Greek_sas               ="σας";//GreekSmallSigma^GreekSmallAlpha^GreekSmallFinalSigma;
+	var Greek_SAS               ="ΣΑΣ";//GreekCapitalSigma^GreekCapitalAlpha^GreekCapitalSigma;
+	var GreekQuestionMark		=";";//\u037E";//GREEK QUESTION MARK (Punctuation)
+	var GreekCapitalGamma		="Γ";//\u0393";//GREEK CAPITAL LETTER GAMMA (Letter) (Uppercase)
+	var GreekSmallGamma		="γ";//\u03B3";//GREEK SMALL LETTER GAMMA (Letter) (Lowercase)
+	var ArabicIndicDigitZero	="٠";//\u0660";//ARABIC-INDIC DIGIT ZERO (Decimal Digit)
+
+	var TurkishCapitalDottedI   ="İ";//\u0130";
+	var TurkishSmallDotlessI    ="ı";//\u0131";
+	var LatinSmallI             ="i";
+	var LatinCapitalI           ="I";
+
+	var GermanEszet             ="ß";//"\u00DF";//German
 
 	printl("----------------------------------------------");
 	printl("Using Exodus library version:"^var().version());
@@ -79,6 +79,10 @@ function main()
 	//NFC - Compact Normal Form
 	var decomp_a="\x61\xCC\x81";//"á";
 	var compact_a="\xC3\xA1";//"á";
+
+	//should NOT compile since it has no effect
+	// and convert defined as NODISCARD
+	//decomp_a.convert("v","y");
 
 	assert(decomp_a=="á");
 	assert(compact_a=="á");

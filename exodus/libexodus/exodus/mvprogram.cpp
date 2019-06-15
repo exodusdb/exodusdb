@@ -1549,7 +1549,7 @@ var ExodusProgramBase::encrypt2(const var& encrypt0) const
 		if (!(encrypt != ""))
 			break;
 		;
-		encryptkey = (encryptkey % 390001) * (encrypt[1]).seq() + 1;
+		encryptkey = (encryptkey % 390001) * (var(encrypt[1])).seq() + 1;
 		encrypt.splicer(1, 1, "");
 	} // loop;
 

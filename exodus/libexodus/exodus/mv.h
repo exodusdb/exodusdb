@@ -126,6 +126,8 @@ and therefore causes a non-numeric error if you include a non-numeric value in a
 // http://www.viva64.com/content/articles/64-bit-development/?f=20_issues_of_porting_C++_code_on_the_64-bit_platform.html
 typedef long long mvint_t;
 
+#define	ND [[nodiscard]]
+
 namespace exodus
 {
 
@@ -240,6 +242,8 @@ although convention recommends making the temporary inside the function).
 // var:		56
 
 #include <cstdint>
+
+class var_brackets_proxy;
 
 class VARTYP
 {
@@ -609,7 +613,12 @@ class DLL_PUBLIC var
 	//////////////
 
 	// extract a character first=1 last=-1 etc
-	var operator[](int charno) const;
+	/* sadly this all works EXCEPT that var[99].anymethod doesnt work
+	so would have to implement all var methods on the proxy object
+	var_brackets_proxy operator[](int charno) const&;
+	var operator[](int charno) &&;
+	*/
+	var operator[](const int charno) const;
 
 	// UNARY OPERATORS
 	/////////////////
@@ -760,6 +769,11 @@ class DLL_PUBLIC var
 	DLL_PUBLIC friend var operator^(const char*, const var&);
 	DLL_PUBLIC friend var operator^(const int, const var&);
 	DLL_PUBLIC friend var operator^(const double, const var&);
+	//rvalues
+	DLL_PUBLIC friend var operator^(var&&, const var&);
+	DLL_PUBLIC friend var operator^(var&&, const char*);
+	DLL_PUBLIC friend var operator^(var&&, const int);
+	DLL_PUBLIC friend var operator^(var&&, const double);
 
 #ifdef SPACESHIP_OPERATOR
 	// spaceship operator in c++17? eliminates need to define all six < > <= >= == != operators
@@ -1031,37 +1045,83 @@ class DLL_PUBLIC var
 	var& substrer(const int startindex);
 	var& substrer(const int startindex, const int length);
 
-	// STRING FILTERS
-	/////////////////
+	var& lowerer();
+	var& raiser();
+	var& cropper();
+
+	// SAME ON TEMPORARIES
+	//////////////////////
+
+	var& convert(const var& oldchars, const var& newchars) &&;
+	var& swap(const var& whatstr, const var& withstr) &&;
+	var& replace(const var& regexstr, const var& replacementstr,
+		      const var& options DEFAULTNULL) &&;
+	var& splice(const int start1, const int length, const var& str) &&;
+	var& splice(const int start1, const var& str) &&;
+	var& quote() &&;
+	var& squote() &&;
+	var& unquote() &&;
+	var& ucase() &&;     // utf8
+	var& lcase() &&;     // utf8
+	var& tcase() &&;     // utf8
+	var& fcase() &&;     // utf8
+	var& normalize() &&; // utf8
+	var& invert() &&;   // utf8
+	var& trim(const char* trimchar DEFAULTSPACE) &&;
+	var& trimf(const char* trimchar DEFAULTSPACE) &&;
+	var& trimb(const char* trimchar DEFAULTSPACE) &&;
+	var& trim(const var& trimchar) &&;
+	var& trim(const var& trimchar, const var& options) &&;
+	var& trimf(const var& trimchar) &&;
+	var& trimb(const var& trimchar) &&;
+	var& fieldstore(const var& sepchar, const int fieldno, const int nfields,
+			 const var& replacement) &&;
+	var& substr(const int startindex) &&;
+	var& substr(const int startindex, const int length) &&;
+
+	var& lower() &&;
+	var& raise() &&;
+	var& crop() &&;
+
+	// SAME BUT NON-MUTATING
+	////////////////////////
 
 	// all are const
 
-	var convert(const var& oldchars, const var& newchars) const;
-	var swap(const var& whatstr, const var& withstr) const;
-	var replace(const var& regexstr, const var& replacementstr,
-		    const var& options DEFAULTNULL) const;
-	var splice(const int start1, const int length, const var& str) const;
-	var splice(const int start1, const var& str) const;
-	var quote() const;
-	var squote() const;
-	var unquote() const;
-	var ucase() const;     // utf8
-	var lcase() const;     // utf8
-	var tcase() const;     // utf8
-	var fcase() const;     // utf8
-	var normalize() const; // utf8
-	var invert() const;    // utf8
-	var trim(const char* trimchar DEFAULTSPACE) const;
-	var trimf(const char* trimchar DEFAULTSPACE) const;
-	var trimb(const char* trimchar DEFAULTSPACE) const;
-	var trim(const var& trimchar) const;
-	var trim(const var& trimchar, const var& options) const;
-	var trimf(const var& trimchar) const;
-	var trimb(const var& trimchar) const;
-	var fieldstore(const var& sepchar, const int fieldno, const int nfields,
-		       const var& replacement) const;
+	ND var convert(const var& oldchars, const var& newchars) const&;
+	ND var swap(const var& whatstr, const var& withstr) const&;
+	ND var replace(const var& regexstr, const var& replacementstr,
+		    const var& options DEFAULTNULL) const&;
+	ND var splice(const int start1, const int length, const var& str) const&;
+	ND var splice(const int start1, const var& str) const&;
+	ND var quote() const&;
+	ND var squote() const&;
+	ND var unquote() const&;
+	ND var ucase() const&;	// utf8
+	ND var lcase() const&;	// utf8
+	ND var tcase() const&;	// utf8
+	ND var fcase() const&;	// utf8
+	ND var normalize() const&;	// utf8
+	ND var invert() const&;	// utf8
+	ND var trim(const char* trimchar DEFAULTSPACE) const&;
+	ND var trimf(const char* trimchar DEFAULTSPACE) const&;
+	ND var trimb(const char* trimchar DEFAULTSPACE) const&;
+	ND var trim(const var& trimchar) const&;
+	ND var trim(const var& trimchar, const var& options) const&;
+	ND var trimf(const var& trimchar) const&;
+	ND var trimb(const var& trimchar) const&;
+	ND var fieldstore(const var& sepchar, const int fieldno, const int nfields,
+		       const var& replacement) const&;
+
+	ND var lower() const&;
+	ND var raise() const&;
+	ND var crop() const&;
+
+	// OTHER STRING ACCESS
+	//////////////////////
+
 	var hash(const unsigned long long modulus = 0) const;
-	var unique() const;
+	ND var unique() const;
 
 	// CONVERT TO DIM (returns a dim)
 	// see also dim.split()
@@ -1075,13 +1135,13 @@ class DLL_PUBLIC var
 
 	// v1 - returns bytes from some char number up to the end of the string
 	// equivalent to substr(x) from javascript except it is 1 based
-	var substr(const int startindex) const;
+	var substr(const int startindex) const&;
 
 	// v2 - returns a given number of bytes starting from some byte
 	// both start and length can be negative
 	// negative length extracts characters up to the starting byte IN REVERSE
 	// 'abcde'.substr(4,-3) -> 'dcb'
-	var substr(const int startindex, const int length) const;
+	var substr(const int startindex, const int length) const&;
 
 	// v3 - returns bytes from some byte number upto the first of a given list of bytes
 	// this is something like std::string::find_first_of but doesnt return the delimiter found
@@ -1123,45 +1183,47 @@ class DLL_PUBLIC var
 	// something better it was called replace() in pick/arev but we are now using "replace()" to
 	// change substrings using regex (similar to the old pick swap function) its mutator function
 	// is .r()
-	var pickreplace(const int fieldno, const int valueno, const int subvalueno,
+	ND var pickreplace(const int fieldno, const int valueno, const int subvalueno,
 			const var& replacement) const;
-	var pickreplace(const int fieldno, const int valueno, const var& replacement) const;
-	var pickreplace(const int fieldno, const var& replacement) const;
+	ND var pickreplace(const int fieldno, const int valueno, const var& replacement) const;
+	ND var pickreplace(const int fieldno, const var& replacement) const;
 
 	// cf mutator inserter()
-	var insert(const int fieldno, const int valueno, const int subvalueno,
-		   const var& insertion) const;
-	// to be implemented?
-	//	var insert(const int fieldno,const int valueno,const var& insertion) const;
-	//	var insert(const int fieldno,const var& insertion) const;
+	ND var insert(const int fieldno, const int valueno, const int subvalueno,
+		   const var& insertion) const&;
+	ND var insert(const int fieldno, const int valueno, const var& insertion) const&;
+	ND var insert(const int fieldno, const var& insertion) const&;
 
 	/// remove() was delete() in pick/arev
 	// var erase(const int fieldno, const int valueno=0, const int subvalueno=0) const;
-	var remove(const int fieldno, const int valueno = 0, const int subvalueno = 0) const;
+	ND var remove(const int fieldno, const int valueno = 0, const int subvalueno = 0) const;
 
 	//.a(...) stands for .attribute(...) or extract(...)
 	// pick/revelation
 	// xxx=yyy<10>";
 	// becomes c++
 	// xxx=yyy.a(10);
-	var a(const int fieldno, const int valueno = 0, const int subvalueno = 0) const;
-	var extract(const int fieldno, const int valueno = 0, const int subvalueno = 0) const;
+	ND var a(const int fieldno, const int valueno = 0, const int subvalueno = 0) const;
+	ND var extract(const int fieldno, const int valueno = 0, const int subvalueno = 0) const;
+
+	// SAME AS ABOVE ON TEMPORARIES
+	///////////////////////////////
+
+	var& insert(const int fieldno, const int valueno, const int subvalueno,
+		   const var& insertion) &&;
+	var& insert(const int fieldno, const int valueno, const var& insertion) &&;
+	var& insert(const int fieldno, const var& insertion) &&;
 
 	// MV STRING FILTERS
 	////////////////////
 
-	var sum(const var& sepchar) const;
-	var sum() const;
-
-	// cf mutators lowerer(), raiser(), cropper()
-	var lower() const;
-	var raise() const;
-	var crop() const;
+	ND var sum(const var& sepchar) const;
+	ND var sum() const;
 
 	// binary ops + - * / : on mv strings 10]20]30
 	// e.g. var("10]20]30").mv("+","2]3]4")
 	// result is "12]23]34"
-	var mv(const char* opcode, const var& var2) const;
+	ND var mv(const char* opcode, const var& var2) const;
 
 	// MV STRING MUTATORS
 	////////////////////
@@ -1187,11 +1249,6 @@ class DLL_PUBLIC var
 	var& remover(const int fieldno, const int valueno = 0, const int subvalueno = 0);
 	//-er version could be extract and erase in one go
 	// var& extracter(int fieldno,int valueno=0,int subvalueno=0) const;
-
-	// mutable versions update and return source
-	var& lowerer();
-	var& raiser();
-	var& cropper();
 
 	// MV STRING LOCATORS
 	////////////////////
@@ -1624,6 +1681,11 @@ DLL_PUBLIC var operator^(const var& var1, const double double2);
 DLL_PUBLIC var operator^(const char* char1, const var& var2);
 DLL_PUBLIC var operator^(const int int1, const var& var2);
 DLL_PUBLIC var operator^(const double double1, const var& var2);
+//rvalues
+DLL_PUBLIC var operator^(var&& var1, const var& var2);
+DLL_PUBLIC var operator^(var&& var1, const char* char2);
+DLL_PUBLIC var operator^(var&& var1, const int int2);
+DLL_PUBLIC var operator^(var&& var1, const double double2);
 
 // allow use of wcout<<var
 // shouldnt this be disallowed and only output to cout with conversion to utf8 allowed?
@@ -1637,6 +1699,19 @@ DLL_PUBLIC std::ostream& operator<<(std::ostream& o, const var& var1);
 //#ifdef false //allow use of cin>>var
 // wistream& operator>> (wistream& i,var var1);
 //#endif //allow use of cin>>var
+
+class DLL_PUBLIC var_brackets_proxy
+{
+public:
+	std::string& str1;
+	mutable	int charindex1;
+
+	//implicit conversion to var
+	operator var() const;
+
+	//operator assign a char
+	void operator=(char char1);
+};
 
 class DLL_PUBLIC dim
 {

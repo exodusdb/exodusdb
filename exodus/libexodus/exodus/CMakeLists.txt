@@ -5,6 +5,7 @@ message("--LIBEXODUS CMAKE INIT --")
 ##SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 ##SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg")
 ##SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wc++17-extensions")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-undef")
 
 cmake_minimum_required(VERSION 2.8)
 
@@ -64,38 +65,17 @@ include_directories(. .. ${PostgreSQL_INCLUDE_DIRS} ${PostgreSQL_INCLUDE_DIR})
 ### define an output called exodus of type shared library and list all its source files###
 
 add_library(exodus SHARED
- exodus.h exodusmacros.h mvenvironment.h mv.h
- exodusfuncs.h mvexceptions.h mvimpl.h mvipc.h mvconfig.h
- mvlink.h mvfunctor.h program.h library.h dict.h mvprogram.h
- xfunctorf0.h xfunctorf1.h xfunctorf10.h xfunctorf11.h xfunctorf12.h
- xfunctorf13.h xfunctorf14.h xfunctorf15.h xfunctorf16.h xfunctorf17.h
- xfunctorf18.h xfunctorf19.h xfunctorf2.h xfunctorf20.h xfunctorf3.h
- xfunctorf4.h xfunctorf5.h xfunctorf6.h xfunctorf7.h xfunctorf8.h
- xfunctorf9.h xfunctors0.h xfunctors1.h xfunctors10.h xfunctors11.h
- xfunctors12.h xfunctors13.h xfunctors14.h xfunctors15.h xfunctors16.h
- xfunctors17.h xfunctors18.h xfunctors19.h xfunctors2.h xfunctors20.h
- xfunctors3.h xfunctors4.h xfunctors5.h xfunctors6.h xfunctors7.h
- xfunctors8.h xfunctors9.h
-
-# ConvertUTF.h
-# NullCodecvt.h TConvert.h
- gettimeofday.h neo.h mvconfig.h
- MurmurHash2_64.h mvhandles.h mvdbconns.h
-
 # mvutf.cpp
 # ConvertUTF.c
 # mvlocale.cpp
- mvos.cpp
- howto.cpp mv.cpp mvmv.cpp mvprogram.cpp mvarray.cpp mvdatetime.cpp  mvdebug.cpp
+ mv.cpp mvmv.cpp mvprogram.cpp mvarray.cpp mvdatetime.cpp mvdebug.cpp
  mvfuncs.cpp mvioconv.cpp
- naturalorder.cpp gettimeofday.cpp
  mvdbpostgres.cpp mvenvironment.cpp mvglobalfuncs.cpp
+ mvos.cpp mvunicode.cpp mvposix.cpp mvfunctor.cpp mvbrackets.cpp
 # mvipc.cpp mvipc_boost.cpp mvipc_posix.cpp mvipc_ms.cpp
- mvunicode.cpp
- mvposix.cpp
- MurmurHash2_64.cpp
- mvfunctor.cpp mvhandles.cpp mvdbconns.cpp mvprocessno.cpp
- getkey.cpp haskey.cpp
+ MurmurHash2_64.cpp naturalorder.cpp gettimeofday.cpp
+ mvhandles.cpp mvdbconns.cpp mvprocessno.cpp
+ getkey.cpp haskey.cpp howto.cpp
 )
 
 #set_target_properties(exodus PROPERTIES SOVERSION "${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_VERSION}")
