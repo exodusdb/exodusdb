@@ -31,17 +31,17 @@ subroutine printtx() {
 			html = printfilename.lcase().index(".htm");
 		}
 		var ownprintfile = 0;
-		if (printfilename == "") {
-			printfilename = var(999999999).rnd().substr(-8,8);
-			//printfilename:=if html then '.htm' else '.txt'
-			if (html) {
-				printfilename ^= ".htm";
-			}else{
-				printfilename ^= ".txt";
-			}
-			SYSTEM.r(2, printfilename);
-			ownprintfile = 1;
-		}
+		//if (printfilename == "") {
+		//	printfilename = var(999999999).rnd().substr(-8,8);
+		//	//printfilename:=if html then '.htm' else '.txt'
+		//	if (html) {
+		//		printfilename ^= ".htm";
+		//	}else{
+		//		printfilename ^= ".txt";
+		//	}
+		//	SYSTEM.r(2, printfilename);
+		//	ownprintfile = 1;
+		//}
 
 		//change the file extension to HTM
 		if (html and ((printfilename.substr(-4,4)).lcase() ne ".htm")) {
@@ -58,10 +58,12 @@ subroutine printtx() {
 		}
 
 		//open printout file
-		call oswrite("", printfilename);
-		if (not(printfile.osopen(printfilename))) {
-			call mssg("SYSTEM ERROR - CANNOT OPEN PRINTFILE " ^ (DQ ^ (printfilename ^ DQ)));
-			var().stop();
+		if (printfilename) {
+			call oswrite("", printfilename);
+			if (not(printfile.osopen(printfilename))) {
+				call mssg("SYSTEM ERROR - CANNOT OPEN PRINTFILE " ^ (DQ ^ (printfilename ^ DQ)));
+				var().stop();
+			}
 		}
 
 		if (letterhead.unassigned()) {
@@ -82,12 +84,11 @@ subroutine printtx() {
 			bottomline = "";
 			if (html) {
 				bottomline ^= "</tbody></table>";
+				call getmark("OWN", html, printtxmark);
+				bottomline.r(-1, printtxmark);
+				//line below document on screen but not on print
+				//bottomline<-1>='<hr class="pagedivider noprint"/>'
 			}
-			call getmark("OWN", html, printtxmark);
-			bottomline.r(-1, printtxmark);
-			//line below document on screen but not on print
-			//bottomline<-1>='<hr class="pagedivider noprint"/>'
-
 		}
 
 		if (rfmt.unassigned()) {
@@ -203,7 +204,12 @@ subroutine printtx2() {
 	}
 
 	tx.swapper(FM, "\r\n");
-	call osbwrite(tx, printfile,  printptr, 1);
+	if (printfilename)
+		call osbwrite(tx, printfile,  printptr, 1);
+	else {
+		tx.output();
+		printptr+=tx.length();
+	}
 
 	tx = "";
 	newpage = 0;

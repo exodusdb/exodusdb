@@ -85,6 +85,8 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 		var dictid=calc_fields.a(1,fieldn);
 		dictids(fieldn)=dictid;
 
+		var sqlcolid=dictid^"_calc";
+
 		//add colons to the end of every calculated field in the sselect clause
 		//so that 2nd stage select knows that these fields are available in the
 		//temporary parallel file
@@ -114,10 +116,10 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 		values2(fieldn)=value2;
 
 		//sql temp table column
-		createtablesql ^= " " ^ dictid ^ " TEXT,";
+		createtablesql ^= " " ^ sqlcolid ^ " TEXT,";
 
 		//sql insert column
-		baseinsertsql ^= dictid ^ ",";
+		baseinsertsql ^= sqlcolid ^ ",";
 
 		//debug
 		//dictid.outputt();
@@ -150,7 +152,7 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 		baseinsertsql="";
 
 	//open the dictionary
-	if (dictfilename.substr(1,5)!="dict_")
+	if (dictfilename.substr(1,5).lcase()!="dict_")
 		dictfilename="dict_"^dictfilename;
 	if (!DICT.open(dictfilename)) {
 		throw MVDBException(dictfilename.quote() ^ " cannot be opened");
@@ -220,7 +222,7 @@ nextrecord:
 			}
 
 			//VALUES (41472, 'Practical PostgreSQL', 1212, 4);
-			value.squoter();
+			value.swapper("'","''").squoter();
 			insertsql ^= " " ^ value ^ ",";
 
 		}

@@ -1807,6 +1807,8 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 			   var& selects, var& ismv, bool forsort) const
 {
 
+	ismv=false;
+
 	var fieldname = fieldname0.convert(".", "_");
 	var actualdictfile = dictfile;
 	if (!actualdictfile)
@@ -1848,7 +1850,7 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 	if (calculated) {
 		fieldname.splicer(-1,1,"");
 		//create a pseudo look up ... except that SELECT_TEMP_CURSOR_n has the fields stored in sql columns and not in the usual data column
-		calculated="@ANS=XLATE(\"SELECT_TEMP_CURSOR_" ^ this->a(1) ^ "\",@ID," ^ fieldname ^ ",\"X\")";
+		calculated="@ANS=XLATE(\"SELECT_TEMP_CURSOR_" ^ this->a(1) ^ "\",@ID," ^ fieldname ^ "_calc,\"X\")";
 	}
 
 	// given a file and dictionary id
@@ -1901,7 +1903,7 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 	//create a pseudo look up. to trigger JOIN logic to the table that we stored
 	//Note that SELECT_TEMP has the fields stored in sql columns and not in the usual data column
 	if (calculated) {
-		dictrec.r(8,"@ANS=XLATE(\"SELECT_TEMP_CURSOR_" ^ this->a(1) ^ "\",@ID," ^ fieldname ^ ",\"X\")");
+		dictrec.r(8,calculated);
 	}
 
 	var dicttype = dictrec.a(1);
@@ -2669,6 +2671,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 			var usingnaturalorder = dictexpression.index("exodus_extract_sort");
 			var dictid = word1;
 
+			var dictexpression_isarray=dictexpression.index("string_to_array(");
+
 			// add the dictid expression
 			//if (dictexpression.index("exodus_call"))
 			//	dictexpression = "true";
@@ -2773,48 +2777,10 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 				prefix = ".*";
 				postfix = "$";
 			}
-			/*implement using posix regular string matching
-			~ 	Matches regular expression, case sensitive 	'thomas' ~
-			'.*thomas.*'
-			~* 	Matches regular expression, case insensitive 	'thomas' ~*
-			'.*Thomas.*'
-			!~ 	Does not match regular expression, case sensitive 'thomas' !~
-			'.*Thomas.*'
-			!~* 	Does not match regular expression, case insensitive 'thomas' !~*
-			'.*vadim.*'
-			*/
 			if (prefix || postfix)
-			{
-
-				// get value or values
-				// word1=getword(remaining, true);
 				word1 = getword(remaining, ucword);
 
-				// escape any posix special characters;
-				// [\^$.|?*+()
-				// if present in the search criteria, they need to be escaped with
-				// TWO backslashes.
-				word1.swapper("\\", "\\\\");
-				var special = "[^$.|?*+()";
-				for (int ii = special.length(); ii > 0; --ii)
-				{
-					if (special.index(word1[ii]))
-						word1.splicer(ii, 0, "\\");
-				}
-				word1.swapper("'" _FM_ "'", postfix ^ "'" _FM_ "'" ^ prefix);
-				word1.splicer(-1, 0, postfix);
-				word1.splicer(2, 0, prefix);
-
-				// push values back on the sortselectclause for further processing
-				remaining.splicer(1, 0,
-								  word1.convert(FM, " ") ^ " ");
-
-				// use regular expression operator
-				word1 = "~";
-				ucword = word1;
-			}
-
-			//"norma" comparative filtering
+			//"normal" comparative filtering
 			////////////////////////////////
 
 			// 1) Acquire operator - or empty if not present
@@ -2836,6 +2802,59 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 				op = ucword;
 				// get another word (or words)
 				word1 = getword(remaining, ucword);
+			}
+
+			//values like "[xxx" "xxx]" and "[xxx]" -> ENDING, STARTING, CONTAINING
+			if (word1[1] == "'")
+			{
+				if (word1[2] == "[")
+				{
+					word1.splicer(2, 1, "");
+					prefix = ".*";
+					postfix = "$";
+				}
+				if (word1[-2] == "]")
+				{
+					word1.splicer(-2, 1, "");
+					if (!prefix)
+						prefix = "^";
+					postfix = ".*";
+				}
+				ucword=word1.ucase();
+			}
+
+			/*implement using posix regular string matching
+			~ 	Matches regular expression, case sensitive 	'thomas' ~
+			'.*thomas.*'
+			~* 	Matches regular expression, case insensitive 	'thomas' ~*
+			'.*Thomas.*'
+			!~ 	Does not match regular expression, case sensitive 'thomas' !~
+			'.*Thomas.*'
+			!~* 	Does not match regular expression, case insensitive 'thomas' !~*
+			'.*vadim.*'
+			*/
+
+			if (prefix || postfix)
+			{
+
+				// escape any posix special characters;
+				// [\^$.|?*+()
+				// if present in the search criteria, they need to be escaped with
+				// TWO backslashes.
+				word1.swapper("\\", "\\\\");
+				var special = "[^$.|?*+()";
+				for (int ii = special.length(); ii > 0; --ii)
+				{
+					if (special.index(word1[ii]))
+						word1.splicer(ii, 0, "\\");
+				}
+				word1.swapper("'" _FM_ "'", postfix ^ "'" _FM_ "'" ^ prefix);
+				word1.splicer(-1, 0, postfix);
+				word1.splicer(2, 0, prefix);
+
+				// use regular expression operator
+				op = "~";
+				ucword = word1;
 			}
 
 			// 2) Acquire value(s) - or empty if not present
@@ -2888,21 +2907,26 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 			// ucword.outputl("ucword=");
 
 			// invert comparison if "without" or "not"
-			if (negative &&
-			    var("= <> > < >= <= ~ ~* !~ !~*").locateusing(" ", op, aliasno))
-			{
-				// op.outputl("op entered:");
-				negative = false;
-				op = var("<> = <= >= < > !~ !~* ~ ~*").field(" ", aliasno);
-				// op.outputl("op reversed:");
-			}
+			//if (negative &&
+			//    var("= <> > < >= <= ~ ~* !~ !~*").locateusing(" ", op, aliasno))
+			//{
+			//	// op.outputl("op entered:");
+			//	negative = false;
+			//	op = var("<> = <= >= < > !~ !~* ~ ~*").field(" ", aliasno);
+			//	// op.outputl("op reversed:");
+			//}
 
 			// multiple values
 			if (value.index(FM))
 			{
 				value.swapper(FM_, ", ");
 
-				if (op == "=")
+				if (dictexpression_isarray)
+				{
+					//lhs is an array ("multivalues" in postgres)
+					//dont convert rhs to in() or any()
+				}
+				else if (op == "=")
 				{
 					op = "in";
 					value = "( " ^ value ^ " )";
@@ -2957,11 +2981,15 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 
 			//if selecting a mv array then convert right hand side to array
 			//(can only handle = operator at the moment)
-			if (dictexpression.index("string_to_array(") && op == "=")
+			if (dictexpression_isarray && (op == "=" or op == "!="))
 			{
 				op = "&&";//overlap
 				value = "'{" ^ value.convert("'","\"") ^ "}'";
 			}
+
+			//negate
+			if (negative)
+				whereclause ^= " not";
 
 			whereclause ^= " " ^ dictexpression ^ " " ^ op ^ " " ^ value;
 			// whereclause.outputl("whereclause=");

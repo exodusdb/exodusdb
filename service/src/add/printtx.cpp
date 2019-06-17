@@ -45,7 +45,7 @@ function main(io tx, in mode="", in modevalue="") {
 		//clear existing output
 		if (mode eq "init") {
 			printptr=0;
-			if (printfilename.assigned()) {
+			if (printfilename.assigned() && printfilename) {
 				printfilename.osdelete();
 			}
 
@@ -107,15 +107,15 @@ function main(io tx, in mode="", in modevalue="") {
 			html = printfilename.lcase().index(".htm");
 		}
 		var ownprintfile = 0;
-		if (printfilename == "") {
-			printfilename = var("9999999999").rnd().substr(-8,8);
-			printfilename = printfilename ^ (html ? ".htm" : ".txt");
-			SYSTEM.r(2, printfilename);
-			ownprintfile = 1;
-		}
+		//if (printfilename == "") {
+		//	printfilename = var("9999999999").rnd().substr(-8,8);
+		//	printfilename = printfilename ^ (html ? ".htm" : ".5~txt");
+		//	SYSTEM.r(2, printfilename);
+		//	ownprintfile = 1;
+		//}
 
 		//change the file extension to HTM
-		if (html and printfilename.substr(-4,4).lcase() ne ".htm") {
+		if (html and printfilename and printfilename.substr(-4,4).lcase() ne ".htm") {
 
 			printfilename.osclose();
 			printfilename.osdelete();
@@ -129,10 +129,12 @@ function main(io tx, in mode="", in modevalue="") {
 		}
 
 		//open printout file
-		call oswrite("", printfilename);
-		if (not printfile.osopen(printfilename)) {
-			call mssg("SYSTEM ERROR - CANNOT OPEN PRINTFILE " ^ (DQ ^ (printfilename ^ DQ)));
-			return 0;
+		if (printfilename) {
+			call oswrite("", printfilename);
+			if (not printfile.osopen(printfilename)) {
+				call mssg("SYSTEM ERROR - CANNOT OPEN PRINTFILE " ^ (DQ ^ (printfilename ^ DQ)));
+				return 0;
+			}
 		}
 
 		if (letterhead.unassigned()) {
@@ -263,9 +265,13 @@ printtx2:
 	}
 	tx.swapper(FM, "\r\n");
 	var result=1;
-	if (not osbwrite(tx, printfile, printptr)) {
-		call mssg("printtx: osbwritefailed to write tx on "^printfile^" "^printptr);
-		result = 0;
+	if (printfilename) {
+		if (not osbwrite(tx, printfile, printptr)) {
+			call mssg("printtx: osbwritefailed to write tx on "^printfile^" "^printptr);
+			result = 0;
+	} else
+		tx.outputl();
+		printptr+=tx.length();
 	}
 
 	tx = "";

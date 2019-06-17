@@ -87,8 +87,10 @@ COST 10;
 	var errmsg;
 	var().sqlexec(plsql,errmsg);
 
-	if (errmsg)
+	if (errmsg) {
+		plsql.outputl();
 		errmsg.outputl();
+	}
 	return;
 }
 
