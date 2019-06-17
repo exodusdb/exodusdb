@@ -126,12 +126,12 @@ bool getdbtrace()
 #define DEBUG_LOG_SQL                                                                              \
 	if (GETDBTRACE)                                                                            \
 	{                                                                                          \
-		exodus::logputl("SQL:" ^ var(sql));                                                \
+		sql.logputl("SQL:");                                                               \
 	}
 #define DEBUG_LOG_SQL1                                                                             \
 	if (GETDBTRACE)                                                                            \
 	{                                                                                          \
-		exodus::logputl("SQL:" ^ var(sql).swap("$1", "'" ^ var(paramValues[0]) ^ "'"));    \
+		sql.swap("$1", "'" ^ var(paramValues[0]).squote()).logputl("SQL1:");               \
 	}
 //#else
 //#define DEBUG_LOG_SQL
@@ -373,7 +373,7 @@ bool var::connect(const var& conninfo)
 	var conninfo2 = build_conn_info(conninfo);
 
 	if (GETDBTRACE)
-		exodus::logputl("DBTRACE:" ^ conninfo2);
+		conninfo2.logputl("DBTRACE:");
 
 	PGconn* pgconn;
 	for (;;)
@@ -384,9 +384,9 @@ bool var::connect(const var& conninfo)
 #if TRACING >= 1
 			var libname = "libpq.dl";
 			// var libname="libpq.so";
-			exodus::errputl(
+			var(
 			    "ERROR: mvdbpostgres connect() Cannot load shared library " ^ libname ^
-			    ". Verify configuration PATH contains postgres's \\bin.");
+			    ". Verify configuration PATH contains postgres's \\bin.").errputl();
 #endif
 			return false;
 		};
@@ -407,11 +407,11 @@ bool var::connect(const var& conninfo)
 	if (PQstatus(pgconn) != CONNECTION_OK)
 	{
 #if TRACING >= 3
-		exodus::errputl("ERROR: mvdbpostgres connect() Connection to database failed: " ^
-				var(PQerrorMessage(pgconn)));
+		var("ERROR: mvdbpostgres connect() Connection to database failed: " ^
+				var(PQerrorMessage(pgconn))).errputl();
 		// if (not conninfo2)
-		exodus::errputl("ERROR: mvdbpostgres connect() Postgres connection configuration "
-				"missing or incorrect. Please login.");
+		var("ERROR: mvdbpostgres connect() Postgres connection configuration "
+				"missing or incorrect. Please login.").errputl();
 #endif
 
 		// required even if connect fails according to docs
@@ -430,7 +430,7 @@ bool var::connect(const var& conninfo)
 
 // at this point we have good new connection to database
 #if TRACING >= 3
-	exodus::logputl("var::connect() Connection to database succeeded.");
+	var("var::connect() Connection to database succeeded.").logputl();
 #endif
 
 	// save a new connection handle
@@ -730,7 +730,7 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/)
 			//			PQclear(pgresult);
 			this->setlasterror(errmsg);
 #if TRACING >= 1
-			exodus::errputl(errmsg);
+			var(errmsg).errputl();
 #endif
 			return false;
 		}
@@ -753,7 +753,7 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/)
 			//			PQclear(pgresult);
 			this->setlasterror(errmsg);
 #if TRACING >= 1
-			exodus::errputl(errmsg);
+			errmsg.errputl();
 #endif
 			return false;
 		}
@@ -953,7 +953,7 @@ bool var::read(const var& filehandle, const var& key)
 	{
 		// PQclear(pgresult);
 		var errmsg = "ERROR: mvdbpostgres read() SELECT returned more than one record";
-		exodus::errputl(errmsg);
+		errmsg.errputl();
 		this->setlasterror(errmsg);
 		return false;
 	}
@@ -1060,7 +1060,7 @@ var var::lock(const var& key) const
 			     var(PQresultStatus(pgresult)) ^ ", PQntuples=" ^
 			     var(PQntuples(pgresult));
 		// PQclear(pgresult);//DO THIS OR SUFFER MEMORY LEAK
-		exodus::errputl(errmsg);
+		errmsg.errputl();
 		// throw MVException(msg);
 		return false;
 	}
@@ -1150,7 +1150,7 @@ bool var::unlock(const var& key) const
 			     var(PQresultStatus(pgresult)) ^ ", PQntuples=" ^
 			     var(PQntuples(pgresult));
 		// PQclear(pgresult);//DO THIS OR SUFFER MEMORY LEAK
-		exodus::errputl(errmsg);
+		errmsg.errputl();
 		// throw MVException(msg);
 		return false;
 	}
@@ -1203,7 +1203,7 @@ bool var::sqlexec(const var& sqlcmd, var& errmsg) const
 		if (this->assigned())
 			temp ^= this->convert(_FM_, "^") ^ " ";
 		temp ^= sqlcmd;
-		exodus::logputl(temp);
+		temp.logputl();
 	}
 
 	// will contain any pgresult IF successful
@@ -1330,10 +1330,10 @@ bool var::write(const var& filehandle, const var& key) const
 	if (PQresultStatus(pgresult) != PGRES_COMMAND_OK)
 	{
 #if TRACING >= 1
-		exodus::errputl("ERROR: mvdbpostgres write(" ^ filehandle.convert(_FM_, "^") ^
+		var("ERROR: mvdbpostgres write(" ^ filehandle.convert(_FM_, "^") ^
 				", " ^ key ^ ") failed: PQresultStatus=" ^
 				var(PQresultStatus(pgresult)) ^ " " ^
-				var(PQerrorMessage(thread_pgconn)));
+				var(PQerrorMessage(thread_pgconn))).errputl();
 #endif
 		// PQclear(pgresult);
 		return false;
@@ -1408,9 +1408,9 @@ bool var::updaterecord(const var& filehandle, const var& key) const
 	if (PQresultStatus(pgresult) != PGRES_COMMAND_OK)
 	{
 #if TRACING >= 1
-		exodus::errputl("ERROR: mvdbpostgres update(" ^ filehandle.convert(_FM_, "^") ^
+		var("ERROR: mvdbpostgres update(" ^ filehandle.convert(_FM_, "^") ^
 				", " ^ key ^ ") Failed: " ^ var(PQntuples(pgresult)) ^ " " ^
-				var(PQerrorMessage(thread_pgconn)));
+				var(PQerrorMessage(thread_pgconn))).errputl();
 #endif
 		// PQclear(pgresult);
 		return false;
@@ -1420,9 +1420,9 @@ bool var::updaterecord(const var& filehandle, const var& key) const
 	if (strcmp(PQcmdTuples(pgresult), "1") != 0)
 	{
 #if TRACING >= 3
-		exodus::errputl("ERROR: mvdbpostgres update(" ^ filehandle.convert(_FM_, "^") ^
+		var("ERROR: mvdbpostgres update(" ^ filehandle.convert(_FM_, "^") ^
 				", " ^ key ^ ") Failed: " ^ var(PQntuples(pgresult)) ^ " " ^
-				var(PQerrorMessage(thread_pgconn)));
+				var(PQerrorMessage(thread_pgconn))).errputl();
 #endif
 		// PQclear(pgresult);
 		return false;
@@ -1492,10 +1492,10 @@ bool var::insertrecord(const var& filehandle, const var& key) const
 	if (PQresultStatus(pgresult) != PGRES_COMMAND_OK)
 	{
 #if TRACING >= 3
-		exodus::errputl("ERROR: mvdbpostgres insertrecord(" ^
+		var("ERROR: mvdbpostgres insertrecord(" ^
 				filehandle.convert(_FM_, "^") ^ ", " ^ key ^ ") Failed: " ^
 				var(PQntuples(pgresult)) ^ " " ^
-				var(PQerrorMessage(thread_pgconn)));
+				var(PQerrorMessage(thread_pgconn))).errputl();
 #endif
 		// PQclear(pgresult);
 		return false;
@@ -1557,9 +1557,9 @@ bool var::deleterecord(const var& key) const
 	if (PQresultStatus(pgresult) != PGRES_COMMAND_OK)
 	{
 #if TRACING >= 1
-		exodus::errputl("ERROR: mvdbpostgres deleterecord(" ^ this->convert(_FM_, "^") ^
+		var("ERROR: mvdbpostgres deleterecord(" ^ this->convert(_FM_, "^") ^
 				", " ^ key ^ ") Failed: " ^ var(PQntuples(pgresult)) ^ " " ^
-				var(PQerrorMessage(thread_pgconn)));
+				var(PQerrorMessage(thread_pgconn))).errputl();
 #endif
 		// PQclear(pgresult);
 		return false;
@@ -1570,8 +1570,8 @@ bool var::deleterecord(const var& key) const
 	{
 		// PQclear(pgresult);
 #if TRACING >= 3
-		exodus::logputl("var::deleterecord(" ^ this->convert(_FM_, "^") ^ ", " ^ key ^
-				") failed. Record does not exist");
+		var("var::deleterecord(" ^ this->convert(_FM_, "^") ^ ", " ^ key ^
+				") failed. Record does not exist").errputl();
 #endif
 		return false;
 	}
@@ -1803,8 +1803,8 @@ inline var fileexpression(const var& mainfilename, const var& filename, const va
 }
 
 var var::getdictexpression(const var& mainfilename, const var& filename, const var& dictfilename,
-			   const var& dictfile, const var& fieldname0, var& joins, var& froms,
-			   var& selects, var& ismv, bool forsort_or_select_or_index) const
+			   const var& dictfile, const var& fieldname0, var& joins, var& unnests,
+			   var& selects, var& ismv, bool forsort) const
 {
 
 	var fieldname = fieldname0.convert(".", "_");
@@ -1833,9 +1833,9 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 				throw MVDBException("getdictexpression() cannot open " ^
 						    dictfilename.quote());
 #if TRACING >= 1
-				exodus::errputl(
+				var(
 				    "ERROR: mvdbpostgres getdictexpression() cannot open " ^
-				    dictfilename.quote());
+				    dictfilename.quote()).errputl();
 #endif
 				return "";
 			}
@@ -1926,7 +1926,7 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 
 			var isdate = conversion[1] == "D" || conversion.substr(1, 5) == "[DATE";
 
-			if (forsort_or_select_or_index && !isdate)
+			if (forsort && !isdate)
 				// sqlexpression="exodus_extract_sort(" ^
 				// fileexpression(mainfilename, filename,"key") ^ ")";
 				sqlexpression =
@@ -1970,7 +1970,7 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 		// non-numeric like cast "as integer" and "as float" does note that we could use
 		// exodus_extract_sort for EVERYTHING inc dates/time/numbers etc. but its large size
 		// is perhaps a disadvantage
-		else if (forsort_or_select_or_index)
+		else if (forsort)
 			sqlexpression = "exodus_extract_sort(" ^ extractargs;
 
 		else if (isnumeric)
@@ -2061,8 +2061,8 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 					// ismv;
 					sqlexpression = getdictexpression(
 					    filename, xlatetargetfilename, xlatetargetfilename,
-					    xlatetargetfilename, xlatetargetfieldname, joins, froms,
-					    selects, ismv, forsort_or_select_or_index);
+					    xlatetargetfilename, xlatetargetfieldname, joins, unnests,
+					    selects, ismv, forsort);
 				}
 
 				// determine the join details
@@ -2085,7 +2085,7 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 					    xlatefromfieldname.substr(2).splicer(-1, 1, "");
 					xlatekeyexpression = getdictexpression(
 					    filename, filename, dictfilename, dictfile,
-					    xlatefromfieldname, joins, froms, selects, ismv);
+					    xlatefromfieldname, joins, unnests, selects, ismv);
 				}
 				else if (xlatefromfieldname == "@ID")
 				{
@@ -2097,10 +2097,10 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 					// filename.quote() ^ " " ^ fieldname.quote() ^ " - INVALID
 					// DICTIONARY EXPRESSION - " ^ dictrec.a(8).quote());
 #if TRACING >= 1
-					exodus::errputl("ERROR: mvdbpostgres getdictexpression() " ^
+					var("ERROR: mvdbpostgres getdictexpression() " ^
 							filename.quote() ^ " " ^ fieldname.quote() ^
 							" - INVALID DICTIONARY EXPRESSION - " ^
-							dictrec.a(8).quote());
+							dictrec.a(8).quote()).errputl();
 #endif
 					return "";
 				}
@@ -2157,8 +2157,8 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 					environmentn ^ "', '" ^ dictfilename.lcase() ^ "', '" ^
 					fieldname.lcase() ^ "', " ^ filename ^ ".key, " ^ filename ^
 					".data,0,0)";
-			sqlexpression.outputl("sqlexpression=");
-			// TODO apply naturalorder conversion by passing forsort_or_select_or_index
+			//sqlexpression.outputl("sqlexpression=");
+			// TODO apply naturalorder conversion by passing forsort
 			// option to exodus_call
 
 			return sqlexpression;
@@ -2170,9 +2170,9 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 		// throw  MVDBException("getdictexpression(" ^ filename.quote() ^ ", " ^
 		// fieldname.quote() ^ ") invalid dictionary type " ^ dicttype.quote());
 #if TRACING >= 1
-		exodus::errputl("ERROR: mvdbpostgres getdictexpression(" ^ filename.quote() ^ ", " ^
+		var("ERROR: mvdbpostgres getdictexpression(" ^ filename.quote() ^ ", " ^
 				fieldname.quote() ^ ") invalid dictionary type " ^
-				dicttype.quote());
+				dicttype.quote()).errputl();
 #endif
 		return "";
 	}
@@ -2183,56 +2183,61 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 
 		ismv = true;
 
-		var from = sqlexpression;
-		// use the fieldname as a sql column name
-		sqlexpression = fieldname;
+		// var from="string_to_array(" ^ sqlexpression ^ ",'" ^ VM ^ "'";
+		sqlexpression = "string_to_array(" ^ sqlexpression ^ ", chr(29)";
 
-		// convert multivalues to array
-		// if (from.substr(-7)=="::bytea")
-		//	from.splicer(-7,7,"");
-
-		// fieldname.outputl("fieldname=");
-		// filename.outputl("filename=");
-		// mainfilename.outputl("mainfilename=");
-
-		// if a mv field requires a join then add it to the SELECT clause
-		// since not known currently how to to do mv joins in the FROM clause
-		// Note the join clause should already have been added to the JOINS for the FROM
-		// clause
-		if (fromjoin)
-		{
-
-			// this code should never execute as joined mv fields now return the plain
-			// sql expression. we assume they are used in WHERE and ORDER BY clauses
-
-			// unnest in select clause
-			// from="unnest(" ^ from ^ ")";
-			// as FIELDNAME
-			from ^= " as " ^ fieldname;
-
-			// dont include more than once, in case order by and filter on the same
-			// field
-			if (!selects.a(1).index(from))
-				selects ^= ", " ^ from;
-		}
+		// Note 3rd argument '' means convert empty multivalues to NULL in the array
+		// otherwise conversion to float will fail
+		if (isnumeric)
+			sqlexpression ^= ",'')::float8[]";
 		else
+			sqlexpression ^= ")";
+
+		if (forsort)
 		{
 
-			// var from="string_to_array(" ^ sqlexpression ^ ",'" ^ VM ^ "'";
-			from = "string_to_array(" ^ from ^ ", chr(2045)";
-			// Note 3rd argument '' means convert empty multivalues to NULL in the array
-			// otherwise conversion to float will fail
-			if (isnumeric)
-				from ^= ",'')::float8[]";
-			else
-				from ^= ")";
+			// use the fieldname as a sql column name
 
-			// insert with SMs since expression can contain VMs
-			if (!froms.a(2).locate(fieldname))
+			// convert multivalues to array
+			// if (from.substr(-7)=="::bytea")
+			//	from.splicer(-7,7,"");
+
+			// fieldname.outputl("fieldname=");
+			// filename.outputl("filename=");
+			// mainfilename.outputl("mainfilename=");
+
+			// if a mv field requires a join then add it to the SELECT clause
+			// since not known currently how to to do mv joins in the FROM clause
+			// Note the join clause should already have been added to the JOINS for the FROM
+			// clause
+			if (fromjoin)
 			{
-				froms.r(2, -1, fieldname);
-				froms.r(3, -1, from);
+
+				// this code should never execute as joined mv fields now return the plain
+				// sql expression. we assume they are used in WHERE and ORDER BY clauses
+
+				// unnest in select clause
+				// from="unnest(" ^ from ^ ")";
+				// as FIELDNAME
+				sqlexpression ^= " as " ^ fieldname;
+
+				// dont include more than once, in case order by and filter on the same
+				// field
+				if (!selects.a(1).index(sqlexpression))
+					selects ^= ", " ^ sqlexpression;
 			}
+			else
+			{
+
+				// insert with SMs since expression can contain VMs
+				if (!unnests.a(2).locate(fieldname))
+				{
+					unnests.r(2, -1, fieldname);
+					unnests.r(3, -1, sqlexpression);
+				}
+			}
+
+			sqlexpression = fieldname;
 		}
 	}
 
@@ -2336,7 +2341,7 @@ bool var::saveselect(const var& filename)
 	ISSTRING(filename)
 
 	if (GETDBTRACE)
-		exodus::logputl("DBTRACE: ::saveselect(" ^ filename ^ ")");
+		var("DBTRACE: ::saveselect(" ^ filename ^ ")").logputl();
 
 	int recn = 0;
 	var key;
@@ -2416,10 +2421,6 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 	if (GETDBTRACE)
 		sortselectclause.logputl("sortselectclause=");
 
-	// DEBUG_LOG_SQL
-	if (GETDBTRACE)
-		exodus::logputl(sortselectclause);
-
 	var actualfilename = this->a(1);
 	// actualfilename.outputl("actualfilename=");
 	var dictfilename = actualfilename;
@@ -2433,7 +2434,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 	var whereclause = "";
 	var orderclause = "";
 	var joins = "";
-	var froms = "";
+	var unnests = "";
 	var selects = "";
 	var ismv = false;
 
@@ -2562,10 +2563,10 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 			var distinctfieldname = getword(remaining, xx);
 			var distinctexpression = getdictexpression(
 			    actualfilename, actualfilename, dictfilename, dictfile,
-			    distinctfieldname, joins, froms, selects, ismv, false);
+			    distinctfieldname, joins, unnests, selects, ismv, false);
 			var naturalsort_distinctexpression = getdictexpression(
 			    actualfilename, actualfilename, dictfilename, dictfile,
-			    distinctfieldname, joins, froms, selects, ismv, true);
+			    distinctfieldname, joins, unnests, selects, ismv, true);
 
 			if (true)
 			{
@@ -2594,7 +2595,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 			var dictid = getword(remaining, xx);
 			var dictexpression =
 			    getdictexpression(actualfilename, actualfilename, dictfilename,
-					      dictfile, dictid, joins, froms, selects, ismv, true);
+					      dictfile, dictid, joins, unnests, selects, ismv, true);
 
 			// dictexpression.outputl("dictexpression=");
 			// orderclause.outputl("orderclause=");
@@ -2660,11 +2661,11 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 			//}
 
 			// process the dictionary id
-			var sortable =
+			var forsort =
 			    false; // because indexes are NOT created sortable (exodus_sort()
 			var dictexpression =
 			    getdictexpression(actualfilename, actualfilename, dictfilename,
-					      dictfile, word1, joins, froms, selects, ismv, false);
+					      dictfile, word1, joins, unnests, selects, ismv, forsort);
 			var usingnaturalorder = dictexpression.index("exodus_extract_sort");
 			var dictid = word1;
 
@@ -2954,6 +2955,14 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 				continue;
 			}
 
+			//if selecting a mv array then convert right hand side to array
+			//(can only handle = operator at the moment)
+			if (dictexpression.index("string_to_array(") && op == "=")
+			{
+				op = "&&";//overlap
+				value = "'{" ^ value.convert("'","\"") ^ "}'";
+			}
+
 			whereclause ^= " " ^ dictexpression ^ " " ^ op ^ " " ^ value;
 			// whereclause.outputl("whereclause=");
 		}
@@ -2984,7 +2993,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 	if (calc_fields && actualfieldnames.substr(-6) != ", data")
 		actualfieldnames^=", data";
 
-	if (!ismv)
+	//remove mv::integer if no unnesting (sort on mv fields)
+	if (!unnests)
 	{
 		// sql ^= ", 0 as mv";
 		if (actualfieldnames.index("mv::integer, data"))
@@ -3034,17 +3044,20 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 	sql ^= " \nFROM\n " ^ actualfilename;
 	if (joins.a(1))
 		sql ^= " " ^ joins.a(1).convert(VM, "");
-	if (froms)
+
+	//mv fields get added to the FROM clause like "unnest() as xyz" allowing the use of xyz in WHERE/ORDER BY
+	if (unnests)
 	{
 		// unnest
-		sql ^= ",\n unnest(\n  " ^ froms.a(3).swap(VM, ",\n  ") ^ "\n )";
+		sql ^= ",\n unnest(\n  " ^ unnests.a(3).swap(VM, ",\n  ") ^ "\n )";
 		// as fake tablename
 		sql ^= " with ordinality as mvtable1";
 		// brackets allow providing column names for use elsewhere
-		// and renaming of automatic column "ORDINA" to "mv" for use in SELECT key,mv ...
+		// and renaming of automatic column "ORDINAL" to "mv" for use in SELECT key,mv ...
 		// sql statement
-		sql ^= "( " ^ froms.a(2).swap(VM, ", ") ^ ", mv)";
+		sql ^= "( " ^ unnests.a(2).swap(VM, ", ") ^ ", mv)";
 	}
+
 	if (joins.a(2))
 		sql ^= " " ^ joins.a(2).convert(VM, "");
 	if (whereclause)
@@ -3277,7 +3290,7 @@ bool var::savelist(const var& listname)
 	ISSTRING(listname)
 
 	if (GETDBTRACE)
-		exodus::logputl("DBTRACE: ::savelist(" ^ listname ^ ")");
+		("DBTRACE: ::savelist(" ^ listname ^ ")").logputl();
 
 	// open the lists file on the same connection
 	var lists = *this;
@@ -3342,7 +3355,7 @@ bool var::getlist(const var& listname)
 	ISSTRING(listname)
 
 	if (GETDBTRACE)
-		exodus::logputl("DBTRACE: ::savelist(" ^ listname ^ ")");
+		var("DBTRACE: ::savelist(" ^ listname ^ ")").logputl();
 
 	int recn = 0;
 	var key;
@@ -3735,7 +3748,7 @@ bool var::createindex(const var& fieldname, const var& dictfile) const
 	ISSTRING(fieldname)
 	ISSTRING(dictfile)
 
-	var filename = (*this);
+	var filename = (*this).a(1);
 
 	// actual dictfile to use is either given or defaults to that of the filename
 	var actualdictfile;
@@ -3749,20 +3762,29 @@ bool var::createindex(const var& fieldname, const var& dictfile) const
 
 	// throws if cannot find dict file or record
 	var joins = ""; // throw away - cant index on joined fields at the moment
-	var froms = ""; // throw away - cant index on multi-valued fields at the moment
+	var unnests = ""; // throw away - cant index on multi-valued fields at the moment
 	var selects = "";
 	var ismv;
-	var sortable = false;
+	var forsort = false;
 	var dictexpression = getdictexpression(filename, filename, actualdictfile, actualdictfile,
-					       fieldname, joins, froms, selects, ismv, false);
+					       fieldname, joins, unnests, selects, ismv, forsort);
 	// dictexpression.outputl("dictexp=");stop();
+
+	//mv fields return in unnests, not dictexpression
+	//if (unnests)
+	//{
+	//	dictexpression = unnests.a(3);
+	//}
 
 	var sql;
 
 	// index on calculated columns causes an additional column to be created
-	if (dictexpression.index("exodus_cal"))
+	if (dictexpression.index("exodus_call"))
 	{
+		("ERROR: Cannot create index on " ^ filename ^ " for calculated field " ^ fieldname).errputl();
+		return false;
 
+	/*
 		// add a new index field
 		var index_fieldname = "index_" ^ fieldname;
 		// sql="alter table " ^ filename ^ " add " ^ index_fieldname ^ " bytea";
@@ -3782,10 +3804,13 @@ bool var::createindex(const var& fieldname, const var& dictfile) const
 			return false;
 		}
 		dictexpression = index_fieldname;
+	*/
 	}
 
 	// create postgres index
-	sql = "create index index__" ^ filename ^ "__" ^ fieldname ^ " on " ^ filename;
+	sql = "CREATE INDEX index__" ^ filename ^ "__" ^ fieldname ^ " ON " ^ filename;
+	if (ismv)
+		sql ^= " USING GIN";
 	sql ^= " (";
 	sql ^= dictexpression;
 	sql ^= ")";
@@ -3802,12 +3827,12 @@ bool var::deleteindex(const var& fieldname) const
 	// delete the index field (actually only present on calculated field indexes so ignore
 	// result) deleting the index field automatically deletes the index
 	var index_fieldname = "index_" ^ fieldname;
-	if (var().sqlexec("alter table " ^ (*this) ^ " drop " ^ index_fieldname))
+	if (var().sqlexec("alter table " ^ this->a(1) ^ " drop " ^ index_fieldname))
 		return true;
 
 	// delete the index
 	// var filename=*this;
-	var sql = "drop index index__" ^ (*this) ^ "__" ^ fieldname;
+	var sql = "drop index index__" ^ this->a(1) ^ "__" ^ fieldname;
 	return this->sqlexec(sql);
 }
 
@@ -4088,7 +4113,7 @@ static bool getpgresult(const var& sql, PGresultptr& pgresult, PGconn* thread_pg
 	if (!pgresult)
 	{
 #if TRACING >= 1
-		exodus::errputl("ERROR: mvdbpostgres PQexec command failed, no error code: ");
+		var("ERROR: mvdbpostgres PQexec command failed, no error code: ").errputl();
 #endif
 
 		// PQclear(pgresult);
@@ -4104,11 +4129,11 @@ static bool getpgresult(const var& sql, PGresultptr& pgresult, PGconn* thread_pg
 			str_res = PQcmdTuples(pgresult);
 			if (strlen(str_res) > 0)
 			{
-				exodus::logputl("Command executed OK, " ^ var(str_res) ^ " rows.");
+				var("Command executed OK, " ^ var(str_res) ^ " rows.").logputl();
 			}
 			else
 			{
-				exodus::logputl("Command executed OK, 0 rows.");
+				var("Command executed OK, 0 rows.").logputl();
 			}
 #endif
 
@@ -4117,8 +4142,8 @@ static bool getpgresult(const var& sql, PGresultptr& pgresult, PGconn* thread_pg
 		case PGRES_TUPLES_OK:
 
 #if TRACING >= 3
-			exodus::logputl(sql ^ "\nSelect executed OK, " ^ var(PQntuples(pgresult)) ^
-					" rows found.");
+			var(sql ^ "\nSelect executed OK, " ^ var(PQntuples(pgresult)) ^
+					" rows found.").logputl();
 #endif
 
 			return PQntuples(pgresult) > 0;
@@ -4126,9 +4151,9 @@ static bool getpgresult(const var& sql, PGresultptr& pgresult, PGconn* thread_pg
 		case PGRES_NONFATAL_ERROR:
 
 			//#if TRACING >= 1
-			exodus::errputl("ERROR: mvdbpostgres SQL non-fatal error code " ^
+			var("ERROR: mvdbpostgres SQL non-fatal error code " ^
 					var(PQresStatus(PQresultStatus(pgresult))) ^ ", " ^
-					var(PQresultErrorMessage(pgresult)));
+					var(PQresultErrorMessage(pgresult))).errputl();
 			//#endif
 
 			return true;
@@ -4138,10 +4163,10 @@ static bool getpgresult(const var& sql, PGresultptr& pgresult, PGconn* thread_pg
 			//#if TRACING >= 1
 			if (sql.field(" ", 1) != "FETCH")
 			{
-				exodus::errputl("ERROR: mvdbpostgres pqexec " ^ var(sql));
-				exodus::errputl("ERROR: mvdbpostgres pqexec " ^
+				var("ERROR: mvdbpostgres pqexec " ^ var(sql)).errputl();
+				var("ERROR: mvdbpostgres pqexec " ^
 						var(PQresStatus(PQresultStatus(pgresult))) ^ ": " ^
-						var(PQresultErrorMessage(pgresult)));
+						var(PQresultErrorMessage(pgresult))).errputl();
 			}
 			//#endif
 

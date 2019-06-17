@@ -34,8 +34,8 @@ function main() {
         var fieldno=COMMAND.a(4);
 
         //connect to the database
-        if (not connect())
-                stop("Please login");
+        //if (not connect())
+        //        stop("Please login");
 
         //check the file exists
         var file;

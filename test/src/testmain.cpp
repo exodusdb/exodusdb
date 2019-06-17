@@ -285,6 +285,53 @@ function main()
 	i1+=1.1;
 	assert(i1==3.1);
 
+        //no args
+        print();
+        printt();
+        printl();
+
+        output();
+        outputt();
+        outputl();
+
+        logput();
+        logputl();
+
+        errput();
+        errputl();
+
+        //one arg
+
+        print(1);
+        printt(2);
+        printl(3);
+
+        output(1);
+        outputt(2);
+        outputl(3);
+
+        logput(1);
+        logputl(2);
+
+        errput(1);
+        errputl(2);
+
+        //two args
+
+        print("print",1);
+        printt("printt",2);
+        printl("printl",3);
+
+        output("output",1);
+        outputt("outputt",2);
+        outputl("outputl",3);
+
+        logput("logput",1);
+        logputl("logputl",2);
+
+        errput("errput",1);
+        errputl("errputl",2);
+
 	assert(crop(VM ^ FM) eq "");
 	assert(crop("xxx" ^ VM ^ FM) eq "xxx");
 	assert(crop("aaa" ^ VM ^ FM ^ "bbb") eq ("aaa" ^ FM ^ "bbb"));

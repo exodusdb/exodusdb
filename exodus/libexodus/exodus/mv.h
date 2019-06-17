@@ -1922,15 +1922,15 @@ DLL_PUBLIC exodus::var SENTENCE="";
 //#endif
 DLL_PUBLIC inline exodus::var EXECPATH2 = "";
 
-void DLL_PUBLIC output(const var& var1);
-void DLL_PUBLIC outputl(const var& var1 DEFAULTNULL);
-void DLL_PUBLIC outputt(const var& var1 DEFAULTNULL);
+//void DLL_PUBLIC output(const var& var1);
+//void DLL_PUBLIC outputl(const var& var1 DEFAULTNULL);
+//void DLL_PUBLIC outputt(const var& var1 DEFAULTNULL);
 
-void DLL_PUBLIC errput(const var& var1);
-void DLL_PUBLIC errputl(const var& var1 DEFAULTNULL);
+//void DLL_PUBLIC errput(const var& var1);
+//void DLL_PUBLIC errputl(const var& var1 DEFAULTNULL);
 
-void DLL_PUBLIC logput(const var& var1);
-void DLL_PUBLIC logputl(const var& var1 DEFAULTNULL);
+//void DLL_PUBLIC logput(const var& var1);
+//void DLL_PUBLIC logputl(const var& var1 DEFAULTNULL);
 
 var DLL_PUBLIC backtrace();
 

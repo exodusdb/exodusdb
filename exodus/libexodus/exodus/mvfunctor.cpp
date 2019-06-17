@@ -83,7 +83,7 @@ typedef void* library_t;
 #include <stdlib.h>
 
 #include <exodus/mvfunctor.h>
-
+#include <exodus/mvenvironment.h>
 namespace exodus
 {
 
@@ -322,6 +322,15 @@ bool ExodusFunctorBase::openlib(std::string newlibraryname)
 #ifdef dlerror
 	dlerror();
 #endif
+	//look for library in cache
+        auto cacheentry = mv_->dlopen_cache.find(newlibraryname);
+        if (cacheentry != mv_->dlopen_cache.end())
+	{
+		//std::cout << "using dlopen cache for " << newlibraryname << std::endl;
+		plibrary_=mv_->dlopen_cache.at(newlibraryname);
+		libraryname_ = newlibraryname;
+		return true;
+	}
 
 	//look for lib file in ~/lib/libXXXXXX.so
 	//otherwise just default library libXXXXXX.so
@@ -330,6 +339,7 @@ bool ExodusFunctorBase::openlib(std::string newlibraryname)
 #pragma warning(disable : 4996)
 		// env string is copied into string so following getenv usage is safe
 		libraryfilename_.replace(0, 1, getenv("HOME"));
+
 	FILE* file=fopen(libraryfilename_.c_str(), "r");
 	if (file)
 	{
@@ -366,6 +376,9 @@ bool ExodusFunctorBase::openlib(std::string newlibraryname)
 				  L"LD_DEBUG=libs for more info");
 		return false;
 	}
+
+	//cache the dlopen result
+	mv_->dlopen_cache[newlibraryname] = plibrary_;
 
 	libraryname_ = newlibraryname;
 
@@ -472,7 +485,10 @@ void ExodusFunctorBase::closelib()
 	// close any existing connection to the library
 	if (plibrary_ != NULL)
 	{
-		dlclose((library_t)plibrary_);
+
+		//TODO close all libraries in mvenvironment destructor
+		//dlclose((library_t)plibrary_);
+
 		// record the library share no longer exists
 		plibrary_ = NULL;
 

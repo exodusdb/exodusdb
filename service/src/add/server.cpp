@@ -95,15 +95,12 @@ function main() {
 	var rec="";
 	write(rec.r(7,invert("ALSOWINE")),"DEFINITIONS","NEOSYS");
 
-	//kick off with initgeneral
+	//kick off with initgeneral or some custom command
         var cmd=SENTENCE.field(" ",2,9999);
-        if (cmd) {
-        	//sadly cannot access common in subroutine that they are created in
-		//gen.companies="COMPANIES";
-        }
+        if (cmd)
+        	perform(cmd);
         else
-                cmd=SENTENCE="initgeneral LOGIN";
-        perform(cmd);
+		perform("initgeneral LOGIN");
 
         return 0;
 }

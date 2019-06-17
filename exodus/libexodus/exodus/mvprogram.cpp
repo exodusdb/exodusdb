@@ -39,13 +39,19 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 	CURSOR.r(10,"");
 
 	//ONLY TEST MATERIALS FOR NOW
-	if (!calc_fields.ucase().index("MATERIALS"))
-		return true;
+	//if (!calc_fields.ucase().index("MATERIALS"))
+	//	return true;
 
 	//debug
 	//calc_fields.convert(FM^VM^SM,"   ").outputl("calc=");
 
 	var sortselectclause2=sortselectclause;
+
+	var dictfilename=calc_fields.a(5,1);
+
+	//debugging
+	var calc_fields_file="";
+	calc_fields_file.open("calc_fields");
 
 	//prepare to create a temporary sql table
 	//DROP TABLE IF EXISTS SELECT_TEMP;
@@ -114,10 +120,19 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 		baseinsertsql ^= dictid ^ ",";
 
 		//debug
-		dictid.outputt();
-		op.outputt();
-		value.outputt();
-		outputl();
+		//dictid.outputt();
+		//op.outputt();
+		//value.outputt();
+		//var("").outputl();
+
+		//debug
+		if (calc_fields_file)
+		{
+			var key=dictfilename^"*"^dictid;
+			var rec=sortselectclause^FM^op^FM^value^FM^value2;
+			rec.write(calc_fields_file,key);
+			key.outputl("written to calc_fields ");
+		}
 	}
 
 	if (baseinsertsql[-1] == ",") {
@@ -135,7 +150,6 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 		baseinsertsql="";
 
 	//open the dictionary
-	var dictfilename=calc_fields.a(5,1);
 	if (dictfilename.substr(1,5)!="dict_")
 		dictfilename="dict_"^dictfilename;
 	if (!DICT.open(dictfilename)) {
@@ -157,7 +171,7 @@ nextrecord:
 			var value=calculate(dictids(fieldn));
 
 			//debug
-			value.outputl(dictids(fieldn) ^ " value=");
+			//value.outputl(dictids(fieldn) ^ " value=");
 
 			switch (int(opnos(fieldn))) {
 				case 0:
@@ -234,7 +248,7 @@ nextrecord:
 
 	}
 
-	//sortselectclause2.outputl();
+	sortselectclause2.outputl();
 
 	return CURSOR.select(sortselectclause2);
 

@@ -109,9 +109,9 @@ DLL_PUBLIC void debug();
 DLL_PUBLIC bool setxlocale(const var& locale);
 DLL_PUBLIC var getxlocale();
 
-void print(const var& var2);
-void printl(const var& var2 DEFAULTNULL);
-void printt(const var& var2 DEFAULTNULL);
+//void print(const var& var2);
+//void printl(const var& var2 DEFAULTNULL);
+//void printt(const var& var2 DEFAULTNULL);
 
 // MATH/BOOLEAN
 DLL_PUBLIC var abs(const var& num1);
@@ -343,389 +343,78 @@ DLL_PUBLIC bool locateusing(const var& usingchar, const var& target, const var& 
 DLL_PUBLIC var sum(const var& instring, const var& sepchar);
 DLL_PUBLIC var sum(const var& instring);
 
-template <class T1, class T2> void print(T1 arg1, T2 arg2)
+//print()
+template<typename... Printable>
+DLL_PUBLIC void print(Printable... value)
 {
-	print(arg1);
-	print(arg2);
-}
-template <class T1, class T2, class T3> void print(T1 arg1, T2 arg2, T3 arg3)
-{
-	print(arg1);
-	print(arg2);
-	print(arg3);
-}
-template <class T1, class T2, class T3, class T4> void print(T1 arg1, T2 arg2, T3 arg3, T4 arg4)
-{
-	print(arg1);
-	print(arg2);
-	print(arg3);
-	print(arg4);
-}
-template <class T1, class T2, class T3, class T4, class T5>
-void print(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
-{
-	print(arg1);
-	print(arg2);
-	print(arg3);
-	print(arg4);
-	print(arg5);
-}
-template <class T1, class T2, class T3, class T4, class T5, class T6>
-void print(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
-{
-	print(arg1);
-	print(arg2);
-	print(arg3);
-	print(arg4);
-	print(arg5);
-	print(arg6);
-}
-template <class T1, class T2, class T3, class T4, class T5, class T6, class T7>
-void print(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
-{
-	print(arg1);
-	print(arg2);
-	print(arg3);
-	print(arg4);
-	print(arg5);
-	print(arg6);
-	print(arg7);
-}
-template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
-void print(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8)
-{
-	print(arg1);
-	print(arg2);
-	print(arg3);
-	print(arg4);
-	print(arg5);
-	print(arg6);
-	print(arg7);
-	print(arg8);
-}
-template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
-void print(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9)
-{
-	print(arg1);
-	print(arg2);
-	print(arg3);
-	print(arg4);
-	print(arg5);
-	print(arg6);
-	print(arg7);
-	print(arg8);
-	print(arg9);
-}
-template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9,
-	  class T10>
-void print(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9,
-	   T10 arg10)
-{
-	print(arg1);
-	print(arg2);
-	print(arg3);
-	print(arg4);
-	print(arg5);
-	print(arg6);
-	print(arg7);
-	print(arg8);
-	print(arg9);
-	print(arg10);
-}
-template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9,
-	  class T10, class T11>
-void print(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9,
-	   T10 arg10, T11 arg11)
-{
-	print(arg1);
-	print(arg2);
-	print(arg3);
-	print(arg4);
-	print(arg5);
-	print(arg6);
-	print(arg7);
-	print(arg8);
-	print(arg9);
-	print(arg10);
-	print(arg11);
-}
-template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9,
-	  class T10, class T11, class T12>
-void print(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9,
-	   T10 arg10, T11 arg11, T12 arg12)
-{
-	print(arg1);
-	print(arg2);
-	print(arg3);
-	print(arg4);
-	print(arg5);
-	print(arg6);
-	print(arg7);
-	print(arg8);
-	print(arg9);
-	print(arg10);
-	print(arg11);
-	print(arg12);
+	(var(value).output(), ...);
 }
 
-template <class T1, class T2> void printt(T1 arg1, T2 arg2)
+//printl()
+template<typename... Printable>
+DLL_PUBLIC void printl(Printable... value)
 {
-	printt(arg1);
-	printt(arg2);
-}
-template <class T1, class T2, class T3> void printt(T1 arg1, T2 arg2, T3 arg3)
-{
-	printt(arg1);
-	printt(arg2);
-	printt(arg3);
-}
-template <class T1, class T2, class T3, class T4> void printt(T1 arg1, T2 arg2, T3 arg3, T4 arg4)
-{
-	printt(arg1);
-	printt(arg2);
-	printt(arg3);
-	printt(arg4);
-}
-template <class T1, class T2, class T3, class T4, class T5>
-void printt(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
-{
-	printt(arg1);
-	printt(arg2);
-	printt(arg3);
-	printt(arg4);
-	printt(arg5);
-}
-template <class T1, class T2, class T3, class T4, class T5, class T6>
-void printt(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
-{
-	printt(arg1);
-	printt(arg2);
-	printt(arg3);
-	printt(arg4);
-	printt(arg5);
-	printt(arg6);
-}
-template <class T1, class T2, class T3, class T4, class T5, class T6, class T7>
-void printt(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
-{
-	printt(arg1);
-	printt(arg2);
-	printt(arg3);
-	printt(arg4);
-	printt(arg5);
-	printt(arg6);
-	printt(arg7);
-}
-template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
-void printt(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8)
-{
-	printt(arg1);
-	printt(arg2);
-	printt(arg3);
-	printt(arg4);
-	printt(arg5);
-	printt(arg6);
-	printt(arg7);
-	printt(arg8);
-}
-template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
-void printt(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9)
-{
-	printt(arg1);
-	printt(arg2);
-	printt(arg3);
-	printt(arg4);
-	printt(arg5);
-	printt(arg6);
-	printt(arg7);
-	printt(arg8);
-	printt(arg9);
-}
-template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9,
-	  class T10>
-void printt(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9,
-	    T10 arg10)
-{
-	printt(arg1);
-	printt(arg2);
-	printt(arg3);
-	printt(arg4);
-	printt(arg5);
-	printt(arg6);
-	printt(arg7);
-	printt(arg8);
-	printt(arg9);
-	printt(arg10);
-}
-template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9,
-	  class T10, class T11>
-void printt(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9,
-	    T10 arg10, T11 arg11)
-{
-	printt(arg1);
-	printt(arg2);
-	printt(arg3);
-	printt(arg4);
-	printt(arg5);
-	printt(arg6);
-	printt(arg7);
-	printt(arg8);
-	printt(arg9);
-	printt(arg10);
-	printt(arg11);
-}
-template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9,
-	  class T10, class T11, class T12>
-void printt(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9,
-	    T10 arg10, T11 arg11, T12 arg12)
-{
-	printt(arg1);
-	printt(arg2);
-	printt(arg3);
-	printt(arg4);
-	printt(arg5);
-	printt(arg6);
-	printt(arg7);
-	printt(arg8);
-	printt(arg9);
-	printt(arg10);
-	printt(arg11);
-	printt(arg12);
+	(var(value).output(), ...);
+	var("").outputl();
 }
 
-template <class T1, class T2> void printl(T1 arg1, T2 arg2)
+//printt()
+template<typename... Printable>
+DLL_PUBLIC void printt(Printable... value)
 {
-	print(arg1);
-	printl(arg2);
+	(var(value).outputt(), ...);
 }
 
-template <class T1, class T2, class T3> void printl(T1 arg1, T2 arg2, T3 arg3)
+//output same as print()
+template<typename... Printable>
+DLL_PUBLIC void output(Printable... value)
 {
-	print(arg1);
-	print(arg2);
-	printl(arg3);
+	(var(value).output(), ...);
 }
 
-template <class T1, class T2, class T3, class T4> void printl(T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+//outputl() same as printl()
+template<typename... Printable>
+DLL_PUBLIC void outputl(Printable... value)
 {
-	print(arg1);
-	print(arg2);
-	print(arg3);
-	printl(arg4);
+	(var(value).output(), ...);
+	var("").outputl();
 }
 
-template <class T1, class T2, class T3, class T4, class T5>
-void printl(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
+//outputt() same as printt()
+template<typename... Printable>
+DLL_PUBLIC void outputt(Printable... value)
 {
-	print(arg1);
-	print(arg2);
-	print(arg3);
-	print(arg4);
-	printl(arg5);
+	(var(value).outputt(), ...);
 }
 
-template <class T1, class T2, class T3, class T4, class T5, class T6>
-void printl(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
+//errput()
+template<typename... Printable>
+DLL_PUBLIC void errput(Printable... value)
 {
-	print(arg1);
-	print(arg2);
-	print(arg3);
-	print(arg4);
-	print(arg5);
-	printl(arg6);
+	(var(value).errput(), ...);
 }
 
-template <class T1, class T2, class T3, class T4, class T5, class T6, class T7>
-void printl(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
+//errputl()
+template<typename... Printable>
+DLL_PUBLIC void errputl(Printable... value)
 {
-	print(arg1);
-	print(arg2);
-	print(arg3);
-	print(arg4);
-	print(arg5);
-	print(arg6);
-	printl(arg7);
+	(var(value).errput(), ...);
+	var("").errputl();
 }
 
-template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
-void printl(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8)
+//logput()
+template<typename... Printable>
+DLL_PUBLIC void logput(Printable... value)
 {
-	print(arg1);
-	print(arg2);
-	print(arg3);
-	print(arg4);
-	print(arg5);
-	print(arg6);
-	print(arg7);
-	printl(arg8);
+	(var(value).logput(), ...);
 }
 
-template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
-void printl(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9)
+//logputl()
+template<typename... Printable>
+DLL_PUBLIC void logputl(Printable... value)
 {
-	print(arg1);
-	print(arg2);
-	print(arg3);
-	print(arg4);
-	print(arg5);
-	print(arg6);
-	print(arg7);
-	print(arg8);
-	printl(arg9);
-}
-
-template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9,
-	  class T10>
-void printl(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9,
-	    T10 arg10)
-{
-	print(arg1);
-	print(arg2);
-	print(arg3);
-	print(arg4);
-	print(arg5);
-	print(arg6);
-	print(arg7);
-	print(arg8);
-	print(arg9);
-	printl(arg10);
-}
-
-template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9,
-	  class T10, class T11>
-void printl(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9,
-	    T10 arg10, T11 arg11)
-{
-	print(arg1);
-	print(arg2);
-	print(arg3);
-	print(arg4);
-	print(arg5);
-	print(arg6);
-	print(arg7);
-	print(arg8);
-	print(arg9);
-	print(arg10);
-	printl(arg11);
-}
-
-template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9,
-	  class T10, class T11, class T12>
-void printl(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9,
-	    T10 arg10, T11 arg11, T12 arg12)
-{
-	print(arg1);
-	print(arg2);
-	print(arg3);
-	print(arg4);
-	print(arg5);
-	print(arg6);
-	print(arg7);
-	print(arg8);
-	print(arg9);
-	print(arg10);
-	print(arg11);
-	printl(arg12);
+	(var(value).logput(), ...);
+	var("").logputl();
 }
 
 } // namespace exodus

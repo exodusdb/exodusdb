@@ -102,17 +102,10 @@ install(TARGETS exodus DESTINATION lib)
 
 install(FILES
  exodus.h exodusmacros.h mvenvironment.h mv.h
- exodusfuncs.h mvexceptions.h mvimpl.h mvipc.h mvconfig.h
- mvlink.h mvfunctor.h program.h library.h dict.h common.h mvprogram.h
- xfunctorf0.h xfunctorf1.h xfunctorf10.h xfunctorf11.h xfunctorf12.h
- xfunctorf13.h xfunctorf14.h xfunctorf15.h xfunctorf16.h xfunctorf17.h
- xfunctorf18.h xfunctorf19.h xfunctorf2.h xfunctorf20.h xfunctorf3.h
- xfunctorf4.h xfunctorf5.h xfunctorf6.h xfunctorf7.h xfunctorf8.h
- xfunctorf9.h xfunctors0.h xfunctors1.h xfunctors10.h xfunctors11.h
- xfunctors12.h xfunctors13.h xfunctors14.h xfunctors15.h xfunctors16.h
- xfunctors17.h xfunctors18.h xfunctors19.h xfunctors2.h xfunctors20.h
- xfunctors3.h xfunctors4.h xfunctors5.h xfunctors6.h xfunctors7.h
- xfunctors8.h xfunctors9.h ioconv_custom.h
+ exodusfuncs.h mvexceptions.h
+ #mvimpl.h mvipc.h mvconfig.h mvlink.h
+ mvfunctor.h program.h library.h dict.h common.h mvprogram.h
+ ioconv_custom.h
 DESTINATION include/exodus)
 
 message("--LIBEXODUS CMAKE EXIT --")

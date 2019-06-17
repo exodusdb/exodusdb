@@ -140,8 +140,9 @@ function main()
 			basicoptions^=" -no-pie -g -rdynamic";
 
 		//optimiser unfortunately prevents backtrace
-		if (optimise)
-			basicoptions^=" -O1";
+		//if (optimise)
+		//	basicoptions^=" -O1";
+		//	basicoptions^=" -O3";
 
 		//how to output to a named file
 		outputoption=" -o ";

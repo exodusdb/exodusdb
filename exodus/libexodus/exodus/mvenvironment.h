@@ -26,6 +26,7 @@ THE SOFTWARE.
 #undef eq
 #include <iostream>
 #include <vector>
+#include <unordered_map>
 #define eq ==
 
 #include <exodus/mv.h>
@@ -189,6 +190,9 @@ class DLL_PUBLIC MvEnvironment
 	// used to maintain locks per process eg on ~/tmp/exodus
 	// init() opens it. destructor closes it
 	int processnolockfd = 0;
+
+	std::unordered_map<std::string, void*> dlopen_cache;
+
 };
 
 } // namespace exodus

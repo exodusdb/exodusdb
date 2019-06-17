@@ -15,7 +15,7 @@ function main(in list1, in infix, in list2) {
 	var nl2=list2.dcount(VM);
 	var nn=nl2>nl2?nl2:nl1;
 	var output="";
-	for (var ii=1;ii<=nn;++nn) {
+	for (var ii=1;ii<=nn;++ii) {
 		output^=list1.a(1,ii) ^ infix ^ list2.a(1,ii) ^ VM;
 	}
 	output.splicer(-1,1,"");

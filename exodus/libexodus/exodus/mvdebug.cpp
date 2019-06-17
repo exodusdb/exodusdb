@@ -424,7 +424,7 @@ void SIGINT_handler(int sig)
 	// backtrace().convert(FM,"\n").outputl();
 
 	// separate our prompting onto a new line
-	outputl();
+	var("").outputl();
 
 	for (;;)
 	{

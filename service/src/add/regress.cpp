@@ -15,7 +15,7 @@ function main() {
 	var bit=data.substr(1,100);
 	var ix=0;
 	var delimiter;
-	int ln;
+	int ln=0;
 	while (true) {
 		++ln;
 		if (not(mod(ln,1000)))

@@ -244,26 +244,6 @@ DLL_PUBLIC var logoff() { return var().logoff(); }
 
 DLL_PUBLIC void debug() { var().debug(); }
 
-DLL_PUBLIC void print(const var& var1) { var1.output(); }
-
-DLL_PUBLIC void printl(const var& var1) { var1.outputl(); }
-
-DLL_PUBLIC void printt(const var& var1) { var1.outputt(); }
-
-DLL_PUBLIC void output(const var& var1) { var1.output(); }
-
-DLL_PUBLIC void outputl(const var& var1) { var1.outputl(); }
-
-DLL_PUBLIC void outputt(const var& var1) { var1.outputt(); }
-
-DLL_PUBLIC void errput(const var& var1) { var1.errput(); }
-
-DLL_PUBLIC void errputl(const var& var1) { var1.errputl(); }
-
-DLL_PUBLIC void logput(const var& var1) { var1.logput(); }
-
-DLL_PUBLIC void logputl(const var& var1) { var1.logputl(); }
-
 DLL_PUBLIC var at(const int columnorcode) { return var().at(columnorcode); }
 
 DLL_PUBLIC var at(const var& column, const var& row) { return var().at(column, row); }
