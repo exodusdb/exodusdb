@@ -6,28 +6,29 @@ var dictfile;
 
 function main() {
 
-	dictfilename=field(SENTENCE," ",2).lcase();
+	dictfilename=COMMAND.a(2).lcase();
 	if (dictfilename.substr(1,5) ne "dict_")
 		dictfilename.splicer(1,0,"dict_");
 	if (!open(dictfilename,dictfile)) {
 		call fsmsg();
 		stop();
 	}
+	var  verbose=index(OPTIONS,'V');
 
-	var dictid=field(SENTENCE," ",3);
+	var dictid=COMMAND.a(3);
 	if (dictid)
 		makelist("",dictid);
 	else
 		select(dictfilename);
 
 	while (readnext(dictid)) {
-		doone(dictid);
+		doone(dictid,verbose);
 	}
 
 	return 0;
 }
 
-subroutine doone(io dictid) {
+subroutine doone(io dictid, in verbose) {
 
 	//get the dict record
 	var dictrec;
@@ -38,7 +39,7 @@ subroutine doone(io dictid) {
 	}
 
 	//remove anything before sql code
-	var pos=index(dictrec,"/" "*plsql");
+	var pos=index(dictrec,"/" "*pgsql");
 	if (!pos) {
 		//stop(quote(dictfilename)^" "^quote(dictid)^" does not have any plsql section");
 		return;
@@ -83,6 +84,9 @@ COST 10;
 
 	dictid.outputl();
 	//plsql.outputl();
+
+	if (verbose)
+		plsql.outputl();
 
 	var errmsg;
 	var().sqlexec(plsql,errmsg);

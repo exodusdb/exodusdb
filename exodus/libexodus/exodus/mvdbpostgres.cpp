@@ -1995,8 +1995,7 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 
 		// sql function available
 		// eg dict_schedules_PROGRAM_POSITION(key text, data text)
-		else if (functionx.index("/"
-					 "*plsq"))
+		else if (functionx.index("/" "*pgsql"))
 		{
 
 			// plsql function name assumed to be like "dictfilename_FIELDNAME()"
@@ -2423,7 +2422,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 	if (GETDBTRACE)
 		sortselectclause.logputl("sortselectclause=");
 
-	var actualfilename = this->a(1);
+	var actualfilename = this->a(1).convert(".","_");
 	// actualfilename.outputl("actualfilename=");
 	var dictfilename = actualfilename;
 	var actualfieldnames = fieldnames;

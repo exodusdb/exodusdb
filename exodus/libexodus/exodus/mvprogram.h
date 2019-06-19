@@ -164,6 +164,8 @@ class ExodusProgramBase
 	var oconv(const var& input, const var& conversion);
 	var iconv(const var& input, const var& conversion);
 
+	var invertarray(const var& input, const var& force0=(0));
+
       private:
 	// used by calculate to call dict libraries
 	mutable ExodusFunctorBase* dict_exodusfunctorbase_;

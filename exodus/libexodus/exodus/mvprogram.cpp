@@ -83,14 +83,15 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 		//dictids
 
 		var dictid=calc_fields.a(1,fieldn);
-		dictids(fieldn)=dictid;
-
-		var sqlcolid=dictid^"_calc";
 
 		//add colons to the end of every calculated field in the sselect clause
 		//so that 2nd stage select knows that these fields are available in the
 		//temporary parallel file
 		sortselectclause2.replacer("\\b" ^ dictid ^ "\\b",dictid ^ ":");
+
+		dictid.converter(".","_");
+		dictids(fieldn)=dictid;
+		var sqlcolid=dictid^"_calc";
 
 		//ops
 
@@ -1899,6 +1900,39 @@ var ExodusProgramBase::iconv(const var& input, const var& conversion)
 	} while (delimiter);
 
 	return result;
+}
+
+var ExodusProgramBase::invertarray(const var& input, const var& force0/*=0*/)
+{
+        //c sys in,=(0)
+
+	var force=force0.unassigned() ? var(0) : force0;
+
+        var output = "";
+        var nfs = input.count(FM) + (input ne "");
+        //for force to work, the first field must have full number of vns
+        var maxnvs = 0;
+        for (var fn = 1; fn <= nfs; ++fn) {
+                var fieldx = input.field(FM, fn);
+                if (fieldx.length() or force) {
+                        var nvs = fieldx.count(VM) + 1;
+                        if (force) {
+                                if (nvs > maxnvs) {
+                                        maxnvs = nvs;
+                                }
+                        }else{
+                                maxnvs = nvs;
+                        }
+                        for (var vn = 1; vn <= maxnvs; ++vn) {
+                                var cell = fieldx.field(VM, vn);
+                                if (cell.length() or force) {
+                                        output.r(vn, fn, cell);
+                                }
+                        };//vn;
+                }
+        };//fn;
+
+        return output;
 }
 
 } // namespace exodus

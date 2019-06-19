@@ -200,11 +200,8 @@ but the above will not allow simple unload or updating the DLL without stopping 
 
 -- cut and paste the following SQL to register the functions into postgres --
 
-CREATE OR REPLACE FUNCTION exodus_call(text, text, text, text, text, int4, int4) RETURNS text
-AS 'pgexodus', 'exodus_call' LANGUAGE C IMMUTABLE;
-
-CREATE OR REPLACE FUNCTION exodus_extract_bytea(bytea, int4, int4, int4)
-RETURNS bytea AS 'pgexodus', 'exodus_extract_bytea' LANGUAGE C IMMUTABLE;
+CREATE OR REPLACE FUNCTION exodus_count(text, text) RETURNS integer
+AS 'pgexodus', 'exodus_count' LANGUAGE C IMMUTABLE;
 
 CREATE OR REPLACE FUNCTION exodus_extract_text(text, int4, int4, int4) RETURNS text
 AS 'pgexodus', 'exodus_extract_text' LANGUAGE C IMMUTABLE;
@@ -227,20 +224,27 @@ AS 'pgexodus', 'exodus_extract_time' LANGUAGE C IMMUTABLE STRICT;
 CREATE OR REPLACE FUNCTION exodus_extract_datetime(text, int4, int4, int4) RETURNS timestamp
 AS 'pgexodus', 'exodus_extract_datetime' LANGUAGE C IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION exodus_extract_float8(text, int4, int4, int4) RETURNS float8
-AS 'pgexodus', 'exodus_extract_float8' LANGUAGE C IMMUTABLE STRICT;
+CREATE OR REPLACE FUNCTION exodus_extract_number(text, int4, int4, int4) RETURNS float8
+AS 'pgexodus', 'exodus_extract_number' LANGUAGE C IMMUTABLE STRICT;
+
+-- CREATE OR REPLACE FUNCTION exodus_call(text, text, text, text, text, int4, int4) RETURNS text
+-- AS 'pgexodus', 'exodus_call' LANGUAGE C IMMUTABLE;
+
+-- CREATE OR REPLACE FUNCTION exodus_extract_bytea(bytea, int4, int4, int4)
+-- RETURNS bytea AS 'pgexodus', 'exodus_extract_bytea' LANGUAGE C IMMUTABLE;
 
 TO REMOVE THE ABOVE DO THE FOLLOWING AS POSTGRES SUPERUSER CONNECTED TO EXODUS DATABASE
 
-drop FUNCTION exodus_call(text, text, text, text, text, int4, int4) cascade;
-drop FUNCTION exodus_extract_bytea(bytea, int4, int4, int4) cascade;
+drop FUNCTION exodus_count(text, text) cascade;
 drop FUNCTION exodus_extract_text(text, int4, int4, int4) cascade;
 drop FUNCTION exodus_extract_sort(text, int4, int4, int4) cascade;
 drop FUNCTION exodus_extract_text2(text, int4, int4, int4) cascade;
 drop FUNCTION exodus_extract_date(text, int4, int4, int4) cascade;
 drop FUNCTION exodus_extract_time(text, int4, int4, int4) cascade;
 drop FUNCTION exodus_extract_datetime(text, int4, int4, int4) cascade;
-drop FUNCTION exodus_extract_float8(text, int4, int4, int4) cascade;
+drop FUNCTION exodus_extract_number(text, int4, int4, int4) cascade;
+-- drop FUNCTION exodus_call(text, text, text, text, text, int4, int4) cascade;
+-- drop FUNCTION exodus_extract_bytea(text, int4, int4, int4) cascade;
 
 */
 
@@ -293,6 +297,29 @@ To ensure that a dynamically loaded object file is not loaded into an incompatib
 #ifdef PG_MODULE_MAGIC
 PG_MODULE_MAGIC;
 #endif
+
+PG_FUNCTION_INFO_V1(exodus_count);
+
+Datum
+exodus_count(PG_FUNCTION_ARGS)
+{
+	text *arg1 = PG_GETARG_TEXT_P(0);
+	text *arg2 = PG_GETARG_TEXT_P(1);
+
+	char* instring=VARDATA(arg1);
+	int nn=VARSIZE(arg1);
+
+	//only count the 1st char of the sep at the moment
+	int sepchar=*VARDATA(arg2);
+	int count=0;
+	for (int ii=0;ii<nn;++ii)
+	{
+		if (instring[ii] == sepchar)
+			count++;
+	}
+
+	PG_RETURN_INT32(count);
+}
 
 PG_FUNCTION_INFO_V1(exodus_call);
 
