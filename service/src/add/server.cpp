@@ -41,13 +41,6 @@ function main() {
 	createfile("REQUESTLOG");
 	createfile("SYS_MESSAGES");
 
-        //batch mode
-        SYSTEM.r(33,1,"1");
-
-        //user
-        SYSTEM.r(33,2,"NEOSYS");
-        SYSTEM.r(33,3,"NEOSYS");
-
         //module
         APPLICATION="ADAGENCY";
 
@@ -99,8 +92,15 @@ function main() {
         var cmd=SENTENCE.field(" ",2,9999);
         if (cmd)
         	perform(cmd);
-        else
+        else {
+		//batch mode
+		SYSTEM.r(33,1,"1");
+		//user
+		SYSTEM.r(33,2,"NEOSYS");
+		SYSTEM.r(33,3,"NEOSYS");
+
 		perform("initgeneral LOGIN");
+	}
 
         return 0;
 }

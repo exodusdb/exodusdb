@@ -166,6 +166,9 @@ class ExodusProgramBase
 
 	var invertarray(const var& input, const var& force0=(0));
 
+	var elapsedtimetext(const var& fromdate, const var& fromtime);
+	var elapsedtimetext(const var& fromdate, const var& fromtime, var& uptodate, var& uptotime);
+
       private:
 	// used by calculate to call dict libraries
 	mutable ExodusFunctorBase* dict_exodusfunctorbase_;

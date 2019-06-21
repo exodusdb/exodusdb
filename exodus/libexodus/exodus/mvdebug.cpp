@@ -152,7 +152,7 @@ var backtrace()
 {
 
 	var returnlines = "";
-	var("backtrace()").errputl();
+	//var("backtrace()").errputl();
 
 #ifdef _MSC_VER
 	// logputl("backtrace() not implemented on windows yet");

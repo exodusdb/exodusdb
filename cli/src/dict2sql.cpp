@@ -1,37 +1,59 @@
 #include <exodus/program.h>
 programinit()
 
+var verbose;
 var dictfilename;
 var dictfile;
+var dictrec;
 
 function main() {
 
-	dictfilename=COMMAND.a(2).lcase();
-	if (dictfilename.substr(1,5) ne "dict_")
-		dictfilename.splicer(1,0,"dict_");
-	if (!open(dictfilename,dictfile)) {
-		call fsmsg();
-		stop();
-	}
-	var  verbose=index(OPTIONS,'V');
-
+	var filenames=COMMAND.a(2).lcase();
 	var dictid=COMMAND.a(3);
-	if (dictid)
-		makelist("",dictid);
-	else
-		select(dictfilename);
+	verbose=index(OPTIONS,'V');
 
-	while (readnext(dictid)) {
-		doone(dictid,verbose);
+	if (filenames)
+	{
+		if (filenames.substr(1,5) ne "dict_")
+			filenames.splicer(1,0,"dict_");
 	}
+	else
+		filenames=var().listfiles();
+
+	int nfiles=dcount(filenames,FM);
+	for (int filen=1;filen<=nfiles;++filen)
+		onefile(filenames.a(filen),dictid);
 
 	return 0;
 }
 
-subroutine doone(io dictid, in verbose) {
+subroutine onefile(in dictfilename, in reqdictid)
+{
+
+	if (dictfilename.substr(1,5) ne "dict_")
+		return;
+
+	if (!open(dictfilename,dictfile)) {
+		call fsmsg();
+		abort();
+	}
+
+	if (reqdictid)
+		makelist("",reqdictid);
+	else
+		select(dictfilename);
+
+	var dictid;
+	while (readnext(dictid)) {
+		onedictid(dictfilename, dictid);
+	}
+
+	return;
+}
+
+subroutine onedictid(in dictfilename, io dictid) {
 
 	//get the dict record
-	var dictrec;
 	if (!dictrec.read(dictfile,dictid)) {
 		dictid.ucaser();
 		if (!dictrec.read(dictfile,dictid))
@@ -45,6 +67,8 @@ subroutine doone(io dictid, in verbose) {
 		return;
 	}
 	var sql=dictrec.substr(pos+8);
+
+	printl(dictfilename, " ",dictid);
 
 	//remove anything after sql code
 	pos=index(sql,"*" "/");
@@ -81,9 +105,6 @@ COST 10;
 	//set the function name
 	var functionname=dictfilename^"_"^dictid;
 	plsql.swapper("$functionname",functionname);
-
-	dictid.outputl();
-	//plsql.outputl();
 
 	if (verbose)
 		plsql.outputl();
