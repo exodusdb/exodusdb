@@ -1031,7 +1031,7 @@ dictrecexit:;
 			if (VOLUMES) {
 				tt ^= "|Please correct the word by retyping it|or pressing [F4] to edit it.|Press [Esc] to re-start.|";
 			}else{
-				tt ^= "|Replace with? (Enter to cancel):";
+				tt ^= " Replace with? (Enter to cancel):";
 			}
 		}
 		call mssg(tt, "RCE", word, word);

@@ -475,7 +475,7 @@ int var::getdefaultconnectionid() const
 	if (connid && *connid != 0)
 	{
 		//(var("getdefaultconnection found default thread connection id ") ^
-		//*connid).outputl();
+		// *connid).outputl();
 		return *connid;
 	}
 	else
@@ -685,6 +685,9 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/)
 	if (filename != "DOS")
 	{
 
+		std::string filename2 = filename.normalize().lcase().convert(".", "_").toString();
+
+/*
 		//$ parameter array
 		const char* paramValues[1];
 		int paramLengths[1];
@@ -692,7 +695,6 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/)
 
 		// filename.outputl("filename=");
 		//$1=table_name
-		std::string filename2 = filename.normalize().lcase().convert(".", "_").toString();
 		paramValues[0] = filename2.c_str();
 		paramLengths[0] = int(filename2.length());
 		// paramFormats[0] = 1;//binary
@@ -713,13 +715,13 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/)
 		DEBUG_LOG_SQL1
 		PGresult* pgresult = PQexecParams(thread_pgconn,
 						  // TODO: parameterise filename
-						  sql.toString().c_str(), 1, /* one param */
-						  NULL, /* let the backend deduce param type */
+						  sql.toString().c_str(), 1, // one param
+						  NULL, // let the backend deduce param type
 						  paramValues, paramLengths,
 						  0,  // text arguments
 						  0); // text results
 		// paramFormats,
-		// 1);	  /* ask for binary results */
+		// 1);	  // ask for binary results
 
 		Resultclearer clearer(pgresult);
 
@@ -757,8 +759,18 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/)
 #endif
 			return false;
 		}
+*/
 
-		//		PQclear(pgresult);
+		//check filename2 is a valid table or view etc.
+		var sql="select '" ^ filename2 ^ "'::regclass";
+		if (! this->sqlexec(sql))
+		{
+			var errmsg = "ERROR: mvdbpostgres 2 open(" ^ filename.quote() ^
+				     ") table does not exist.";
+			this->setlasterror(errmsg);
+			return false;
+		}
+
 		this->setlasterror();
 
 		// save the filename and connection no
@@ -2835,6 +2847,13 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 
 			if (prefix || postfix)
 			{
+
+				//postgres match matches anything in the string unless ^ and/or $ are present
+				// so .* is not necessary in prefix and postfix
+				if (prefix==".*")
+					prefix="";
+				if (postfix==".*")
+					postfix="";
 
 				// escape any posix special characters;
 				// [\^$.|?*+()
