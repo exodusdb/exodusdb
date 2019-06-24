@@ -1620,6 +1620,9 @@ std::string dblToString(double double1)
 	// NB plain stringstream causes a memory leak in msvc8 before sp1
 	std::ostringstream ss;
 	ss.precision(10);
+	if (std::abs(double1)<0.00000000001)
+		return "0.0";
+
 	ss << double1;
 	// debuggFUNCTION&& cout<<"dblToString(int "<<double1<<") returns '"<<s<<"'\n";
 #ifdef NARROW_IO

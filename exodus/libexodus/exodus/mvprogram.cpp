@@ -398,7 +398,7 @@ void ExodusProgramBase::mssg(const var& msg, const var& options, var& buffer,
 	std::cout << msg1;
 
 	//R=Reply required in buffer
-	if (true || options.index("R"))
+	if (options.index("R"))
 	{
 		buffer="";
 		if (interactive)

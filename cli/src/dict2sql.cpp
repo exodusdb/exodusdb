@@ -87,26 +87,28 @@ subroutine onefile(in dictfilename, in reqdictid, io viewsql)
 
 subroutine onedictid(in dictfilename, io dictid) {
 
-	//get the dict record
-	if (!dictrec.read(dictfile,dictid)) {
+	//get the dict source code
+	var sourcecode;
+	if (not sourcecode.readv(dictfile,dictid,8)) {
 		dictid.ucaser();
-		if (!dictrec.read(dictfile,dictid))
+		if (!sourcecode.readv(dictfile,dictid,8))
 			stop(quote(dictid)^" cannot be read in "^quote(dictfilename));
 	}
 
 	//remove anything before sql code
-	var pos=index(dictrec,"/" "*pgsql");
+	var pos=index(sourcecode,"/" "*pgsql");
 	if (!pos) {
 		//stop(quote(dictfilename)^" "^quote(dictid)^" does not have any plsql section");
 		return;
 	}
-	var sql=dictrec.substr(pos+8);
+	var sql=sourcecode.substr(pos+8);
 
 	printl(dictfilename, " ",dictid);
 
 	//remove anything after sql code
 	pos=index(sql,"*" "/");
-	sql=sql.substr(1,pos-1);
+	if (pos)
+		sql=sql.substr(1,pos-1);
 
 	//convert to text
 	sql.trimmerf(VM).trimmerb(VM);
@@ -117,7 +119,7 @@ CREATE OR REPLACE FUNCTION $functionname(key text, data text)
 RETURNS text AS
 $$
 DECLARE
-$sqldeclare
+ans text;
 BEGIN
 
 $sqlcode
@@ -130,15 +132,11 @@ SECURITY DEFINER
 COST 10;
 	)V0G0N";
 
-	plsql.swapper("$sqlcode",sql);
-
-	//create declaration section
-	var sqldeclare="ans text;";
-	plsql.swapper("$sqldeclare",sqldeclare);
-
 	//set the function name
 	var functionname=dictfilename^"_"^dictid;
 	plsql.swapper("$functionname",functionname);
+
+	plsql.swapper("$sqlcode",sql);
 
 	if (verbose)
 		plsql.outputl();

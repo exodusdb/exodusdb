@@ -65,7 +65,7 @@ function main() {
 
         //put the text on a temp file in order to edit it
         var temposfilename=filename^ "~" ^ key;
-        var invalidfilechars=L"\"\'\u00A3$%^&*(){}[]:;#<>?,./\\|";
+        var invalidfilechars="\"\'\u00A3$%^&*(){}[]:;#<>?,./\\|";
         temposfilename.lcaser().converter(invalidfilechars,str("-",len(invalidfilechars)));
         temposfilename^=".tmp";
         oswrite(text,temposfilename);

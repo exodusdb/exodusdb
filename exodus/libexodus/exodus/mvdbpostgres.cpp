@@ -1,3 +1,5 @@
+//https://wiki.postgresql.org/wiki/Don't_Do_This
+
 /*
 Copyright (c) 2009 steve.bush@neosys.com
 
@@ -1925,8 +1927,10 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 	var isinteger = conversion == "[NUMBER,0]" || dictrec.a(11) == "0N" ||
 			dictrec.a(11).substr(1, 3) == "0N_";
 	var isdecimal = conversion.substr(1, 2) == "MD" || conversion.substr(1, 7) == "[NUMBER" ||
-			dictrec.a(12) == "FLOAT" || dictrec.a(11).index("0N") ||
-			dictrec.a(9) == "R";
+			dictrec.a(12) == "FLOAT" || dictrec.a(11).index("0N");
+			//dont assume things that are R are numeric
+			//eg period 1/19 is right justified but not numeric and sql select will crash if ::float8 is used
+			//||dictrec.a(9) == "R";
 	var isnumeric = isinteger || isdecimal;
 	var ismv1 = dictrec.a(4)[1] == "M";
 	var fromjoin = false;
@@ -2126,8 +2130,9 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 				var joinsectionn = ismv ? 2 : 1;
 
 				// add the join
-				var join_part1 =
-				    "\n  LEFT JOIN\n   " ^ xlatetargetfilename ^ " ON ";
+				var join_part1 = "\n  ";
+				join_part1 ^= calculated?"RIGHT":"LEFT";
+				join_part1 ^= " JOIN\n   " ^ xlatetargetfilename ^ " ON ";
 				// var join_part2=xlatekeyexpression ^ "::text = " ^
 				// xlatetargetfilename ^ ".key"; var join_part2=xlatetargetfilename
 				// ^
@@ -2440,11 +2445,12 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 	var actualfieldnames = fieldnames;
 	var dictfile = "";
 	var keycodes = "";
-	var bykey = 0;
+	bool bykey = false;
 	var wordn;
 	var distinctfieldnames = "";
 
 	var whereclause = "";
+	bool orwith=false;
 	var orderclause = "";
 	var joins = "";
 	var unnests = "";
@@ -2483,7 +2489,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 	if (firstucword == "SELECT" || firstucword == "SSELECT")
 	{
 		if (firstucword == "SSELECT")
-			bykey = 1;
+			bykey = true;
 
 		// remove it
 		var xx = getword(remaining, xx);
@@ -2504,7 +2510,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 
 	// the next word can be the filename if not one of the select clause words
 	// override any filename in the cursor variable
-	if (firstucword && not var("BY WITH ( { USING DISTINCT").locateusing(" ", firstucword))
+	if (firstucword && not var("BY BY-DSND WITH WITHOUT ( { USING DISTINCT").locateusing(" ", firstucword))
 	{
 		actualfilename = firstucword;
 		dictfilename = actualfilename;
@@ -2529,9 +2535,9 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 		var ucword;
 		var word1 = getword(remaining, ucword);
 
-		//(S) etc
+		// skip options (last word and surrounded by brackets)
+		// (S) etc
 		// options - last word enclosed in () or {}
-		// ignore options (last word and surrounded by brackets)
 		if (!remaining.length()
 		    &&
 		    (
@@ -2637,8 +2643,11 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 			// dont start with AND or OR
 			if (whereclause)
 				whereclause ^= "\n " ^ ucword;
+			if (ucword=="OR")
+				orwith=true;
 			continue;
 		}
+
 		// subexpression grouping
 		else if (ucword == "(" || ucword == ")")
 		{
@@ -2884,6 +2893,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 			if (ucword.length() && !valuechars.index(ucword[1]))
 			{
 				// push back and treat as missing value
+				// remaining[1,0]=ucword:' '
 				remaining.splicer(1, 0, ucword ^ " ");
 				// simulate no given value
 				word1 = "";
@@ -2924,16 +2934,6 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 			// notword.outputl("notword=");
 			// ucword.outputl("ucword=");
 
-			// invert comparison if "without" or "not"
-			//if (negative &&
-			//    var("= <> > < >= <= ~ ~* !~ !~*").locateusing(" ", op, aliasno))
-			//{
-			//	// op.outputl("op entered:");
-			//	negative = false;
-			//	op = var("<> = <= >= < > !~ !~* ~ ~*").field(" ", aliasno);
-			//	// op.outputl("op reversed:");
-			//}
-
 			// multiple values
 			if (value.index(FM))
 			{
@@ -2971,7 +2971,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 						op = "is";
 					else
 						op = "is not";
-					value = "nul";
+					value = "null";
 				}
 				// currently number returns 0 for empty string
 				//|| dictexpression.index("extract_number")
@@ -2986,6 +2986,16 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 			if (dictexpression.index("exodus_call"))
 			//if (dictexpression == "true")
 			{
+				// invert comparison if "without" or "not" for calculated fields
+				if (negative &&
+				    var("= <> > < >= <= ~ ~* !~ !~*").locateusing(" ", op, aliasno))
+				{
+					// op.outputl("op entered:");
+					negative = false;
+					op = var("<> = <= >= < > !~ !~* ~ ~*").field(" ", aliasno);
+					// op.outputl("op reversed:");
+				}
+
 				++ncalc_fields;
 				calc_fields.r(1,ncalc_fields,dictid);
 				calc_fields.r(2,ncalc_fields,op);
@@ -3011,12 +3021,17 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 
 			whereclause ^= " " ^ dictexpression ^ " " ^ op ^ " " ^ value;
 			// whereclause.outputl("whereclause=");
-		}
+
+		}//with/without
 
 	} // getword loop
 
-	// prefix specified keys into where clause
+	if (calc_fields && orwith)
+	{
+		throw MVDBException("OR not allowed with sort/select calculated fields");
+	}
 
+	// prefix specified keys into where clause
 	if (keycodes)
 	{
 		if (keycodes.count(FM))
@@ -3076,22 +3091,27 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 	whereclause.swapper("\n AND true", "");
 	whereclause.swapper("true\n AND ", "");
 
-	// assemble the full sql select statement:	//ALN:TODO: optimize with stringbuffer
+	// assemble the full sql select statement:
 
+	//DECLARE - cursor
 	// WITH HOLD is a very significant addition
 	// var sql="DECLARE cursor1_" ^ (*this) ^ " CURSOR WITH HOLD FOR SELECT " ^ actualfieldnames
 	// ^ " FROM ";
 	var sql = "DECLARE\n cursor1_" ^ this->a(1) ^ " SCROLL CURSOR WITH HOLD FOR";
+
+	//SELECT - field/column names
 	sql ^= " \nSELECT\n " ^ actualfieldnames;
 	if (selects)
-	{
 		sql ^= selects;
-	}
+
+	//FROM - filename and any specially related files
 	sql ^= " \nFROM\n " ^ actualfilename;
 	if (joins.a(1))
 		sql ^= " " ^ joins.a(1).convert(VM, "");
 
+	//UNNEST - mv fields
 	//mv fields get added to the FROM clause like "unnest() as xyz" allowing the use of xyz in WHERE/ORDER BY
+	//should only be one unnest (parallel mvs if more than one) since it is not clear how sselect by mv by mv2 should work if they are not in parallel
 	if (unnests)
 	{
 		// unnest
@@ -3104,15 +3124,19 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 		sql ^= "( " ^ unnests.a(2).swap(VM, ", ") ^ ", mv)";
 	}
 
+	//JOIN - related files
 	if (joins.a(2))
 		sql ^= " " ^ joins.a(2).convert(VM, "");
+
+	//WHERE - excludes calculated fields if doing stage 1 of a two stage sort/select
 	if (whereclause)
 		sql ^= " \nWHERE \n" ^ whereclause;
 
-	// no ordering if any calculated items - save all ordering for secondary sort/select
+	//ORDER - suppressed if doing stage 1 of a two stage sort/select
 	if (orderclause && ! calc_fields)
 		sql ^= " \nORDER BY \n" ^ orderclause.substr(3);
 
+	//LIMIT - number of records returned
 	// no limit initially if any calculated items - limit will be done in secondary sort/select
 	if (maxnrecs && ! calc_fields)
 		sql ^= " \nLIMIT\n " ^ maxnrecs;

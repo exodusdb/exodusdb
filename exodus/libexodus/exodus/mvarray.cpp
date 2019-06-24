@@ -110,6 +110,9 @@ bool dim::redim(int rows, int cols)
 	if (initialised_ && rows == nrows_ && cols == ncols_)
 		return true;
 
+	//std::cout<<"rows:"<<rows<<" "<<nrows_<<std::endl;
+	//std::cout<<"cols:"<<cols<<" "<<ncols_<<std::endl;
+
 	//(var(initialised_)^" "^var(nrows_)^" "^var(ncols_)^" -> "^var(rows)^"
 	//"^var(cols)).outputl("redim=");
 

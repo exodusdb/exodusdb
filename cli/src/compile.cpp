@@ -212,7 +212,7 @@ function main()
 				searched^="\nEXO_PATH is "^exoduspath;
 			else {
 				searched^="\nEXO_PATH environment variable is not set";
-				exoduspath=L"\\Program Files\\exodus\\" EXODUS_RELEASE L"\\";
+				exoduspath="\\Program Files\\exodus\\" EXODUS_RELEASE "\\";
 				if (not osdir(exoduspath)) {
 					searched^="\n" ^ exoduspath;
 					exoduspath.splicer(1,0,"C:");

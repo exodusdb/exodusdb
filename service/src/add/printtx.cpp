@@ -269,7 +269,8 @@ printtx2:
 		if (not osbwrite(tx, printfile, printptr)) {
 			call mssg("printtx: osbwritefailed to write tx on "^printfile^" "^printptr);
 			result = 0;
-	} else
+		}
+	} else {
 		tx.outputl();
 		printptr+=tx.length();
 	}
