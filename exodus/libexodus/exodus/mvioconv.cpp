@@ -864,7 +864,7 @@ var var::oconv(const char* conversion) const
 	return *this;
 }
 
-var var::oconv_HEX(const int ioratio) const
+var var::oconv_HEX([[maybe_unused]] const int ioratio) const
 {
 
 	// this needs rewritting because we have changed from wstring to string for internal coding
@@ -956,24 +956,31 @@ var var::iconv_HEX(const int ioratio) const
 		case 8:
 			ADD_NYBBLE_OR_FAIL
 			outchar <<= 4;
+			[[fallthrough]];
 		case 7:
 			ADD_NYBBLE_OR_FAIL
 			outchar <<= 4;
+			[[fallthrough]];
 		case 6:
 			ADD_NYBBLE_OR_FAIL
 			outchar <<= 4;
+			[[fallthrough]];
 		case 5:
 			ADD_NYBBLE_OR_FAIL
 			outchar <<= 4;
+			[[fallthrough]];
 		case 4:
 			ADD_NYBBLE_OR_FAIL
 			outchar <<= 4;
+			[[fallthrough]];
 		case 3:
 			ADD_NYBBLE_OR_FAIL
 			outchar <<= 4;
+			[[fallthrough]];
 		case 2:
 			ADD_NYBBLE_OR_FAIL
 			outchar <<= 4;
+			[[fallthrough]];
 		case 1:
 			ADD_NYBBLE_OR_FAIL
 			// no shift on last nybble in since it is loaded into the right (right) four

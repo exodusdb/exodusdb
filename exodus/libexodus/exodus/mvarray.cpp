@@ -243,11 +243,28 @@ var dim::join(const var& sepchar) const
 	if (!nn)
 		return output;
 
-	// append any additional elements
-	for (int ii = 2; ii <= nn; ++ii)
+	//when sepchar is one byte (usual case), use push_back for speed
+	if (sepchar.length()==1)
 	{
-		output.var_str.push_back(FM_);
-		output ^= data_[ii];
+		char sepbyte=*sepchar[1].data();
+
+		// append any additional elements
+		for (int ii = 2; ii <= nn; ++ii)
+		{
+			output.var_str.push_back(sepbyte);
+			output ^= data_[ii];
+		}
+	}
+	else
+	{
+		std::string sepstring=sepchar;
+
+		// append any additional elements
+		for (int ii = 2; ii <= nn; ++ii)
+		{
+			output.var_str += sepstring;
+			output ^= data_[ii];
+		}
 	}
 
 	return output;

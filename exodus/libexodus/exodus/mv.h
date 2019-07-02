@@ -306,6 +306,7 @@ class VARTYP
 	// private:
 	// initialisation
 	// mutable
+	//TODO check if initialisation required here or can speed up by removing and assuming set everywhere required
 	uint flags_{0};
 };
 
@@ -318,9 +319,6 @@ class VARTYP
 // Variable Used since its var_typ will be zero
 
 #if 1
-
-//#define THISIS(OBJECT) \
-//        static const char* functionname=OBJECT;
 
 #define VTC(VARNAME, VARVALUE) inline const uint VARNAME{VARVALUE};
 
@@ -340,11 +338,6 @@ VTC(VARTYP_DBL, 0x8)
 VTC(VARTYP_OSFILE, 0x10)
 VTC(VARTYP_DBCONN, 0x20)
 
-VTC(VARTYP_DESTRUCTED, 0xFFFFF0)
-
-// const char mvtypemask=0x80;
-VTC(VARTYP_MASK, 0x80)
-
 // flag combinations
 VTC(VARTYP_INTDBL, VARTYP_INT | VARTYP_DBL)
 VTC(VARTYP_INTSTR, VARTYP_INT | VARTYP_STR)
@@ -354,6 +347,12 @@ VTC(VARTYP_NOTNUMFLAGS, ~(VARTYP_INT | VARTYP_DBL | VARTYP_NAN))
 
 VTC(VARTYP_NANSTR_OSFILE, VARTYP_NANSTR | VARTYP_OSFILE)
 VTC(VARTYP_NANSTR_DBCONN, VARTYP_NANSTR | VARTYP_DBCONN)
+
+//VTC(VARTYP_DESTRUCTED, 0xFFFFF0)
+
+// const char mvtypemask=0x80;
+//VTC(VARTYP_MASK, 0x80)
+VTC(VARTYP_MASK, ~(VARTYP_STR | VARTYP_NAN | VARTYP_INT | VARTYP_DBL | VARTYP_OSFILE | VARTYP_OSFILE | VARTYP_DBCONN))
 
 #else
 
@@ -1388,12 +1387,10 @@ class DLL_PUBLIC var
 
 	bool osopen() const;
 	bool osopen(const var& filename, const var& locale DEFAULTNULL) const;
-	var& osbread(const var& osfilevar, var& startoffset, const int length,
-		     const bool adjust = true);
-	var& osbread(const var& osfilevar, const var& startoffset, const int length,
-		     const bool adjust = true);
-	bool osbwrite(const var& osfilevar, var& startoffset, const bool adjust = true) const;
-	bool osbwrite(const var& osfilevar, const var& startoffset, const bool adjust = true) const;
+	bool osbread(const var& osfilevar, var& offset, const int length);
+	bool osbread(const var& osfilevar, const var& offset, const int length);
+	bool osbwrite(const var& osfilevar, var& offset) const;
+	bool osbwrite(const var& osfilevar, const var& offset) const;
 	void osclose() const;
 	bool osread(const var& osfilename, const var& codepage DEFAULTNULL);
 	bool oswrite(const var& osfilename, const var& codepage DEFAULTNULL) const;

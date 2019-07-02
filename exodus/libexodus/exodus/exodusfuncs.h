@@ -63,17 +63,19 @@ DLL_PUBLIC var ostime();
 DLL_PUBLIC bool osopen(const var& osfilename, var& osfilevar, const var& locale DEFAULTNULL);
 DLL_PUBLIC void osclose(const var& osfilevar);
 
-// DLL_PUBLIC var osbread(const var& osfilevar, var& startoffset, const int length);
-// DLL_PUBLIC var osbread(const var& osfilevar, const var& startoffset, const int length);
-DLL_PUBLIC bool osbread(var& data, const var& osfilevar, var& startoffset, const int length,
-			const bool adjust = true);
-DLL_PUBLIC bool osbread(var& data, const var& osfilevar, const var& startoffset, const int length,
-			const bool adjust = true);
+//DLL_PUBLIC bool osbread(var& data, const var& osfilevar, var& offset, const int length,
+//			const bool adjust = true);
+//DLL_PUBLIC bool osbread(var& data, const var& osfilevar, const var& offset, const int length,
+//			const bool adjust = true);
 
-DLL_PUBLIC bool osbwrite(const var& data, const var& osfilevar, var& startoffset,
-			 const bool adjust = true);
-DLL_PUBLIC bool osbwrite(const var& data, const var& osfilevar, const var& startoffset,
-			 const bool adjust = true);
+//DLL_PUBLIC bool osbwrite(const var& data, const var& osfilevar, var& offset,
+//			 const bool adjust = true);
+//DLL_PUBLIC bool osbwrite(const var& data, const var& osfilevar, const var& offset,
+//			 const bool adjust = true);
+DLL_PUBLIC bool osbread(var& data, const var& osfilevar, var& offset, const int length);
+DLL_PUBLIC bool osbread(var& data, const var& osfilevar, const var& offset, const int length);
+DLL_PUBLIC bool osbwrite(const var& data, const var& osfilevar, var& offset);
+DLL_PUBLIC bool osbwrite(const var& data, const var& osfilevar, const var& offset);
 
 DLL_PUBLIC bool oswrite(const var& data, const var& osfilename, const var& codepage DEFAULTNULL);
 DLL_PUBLIC bool osread(var& data, const var& osfilename, const var& codepage DEFAULTNULL);

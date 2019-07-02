@@ -815,7 +815,7 @@ var var::match(const var& matchstr, const var& options) const
 		      // using declarative functional style "for_each with lambda" instead of old
 		      // fashioned "while (iter!=end)" loop
 		      [&found](auto what) {
-			      for (int groupn = 0; groupn <= what.size(); ++groupn)
+			      for (int groupn = 0; uint(groupn) <= what.size(); ++groupn)
 			      {
 				      // std::cout<< what[0] << std::endl;
 				      found.append(what[groupn]);
@@ -1120,7 +1120,7 @@ bool var::osopen() const
 	if (THIS_IS_OSFILE())
 		osclose();
 
-	return osopenx(*this, "") != 0;
+	return this->osopenx(*this, "") != 0;
 }
 
 bool var::osopen(const var& osfilename, const var& locale) const
@@ -1134,7 +1134,7 @@ bool var::osopen(const var& osfilename, const var& locale) const
 	if (THIS_IS_OSFILE())
 		osclose();
 
-	return osopenx(osfilename, locale) != 0;
+	return this->osopenx(osfilename, locale) != 0;
 }
 
 static void del_fstream(void* handle) { delete (std::fstream*)handle; }
@@ -1394,17 +1394,19 @@ bool var::oswrite(const var& osfilename, const var& codepage) const
 	return !failed;
 }
 
-// a version that accepts a const startoffset ie ignores return value
-bool var::osbwrite(const var& osfilevar, const var& startoffset, const bool adjust) const
+// a version that accepts a const offset ie ignores return value
+//bool var::osbwrite(const var& osfilevar, const var& offset, const bool adjust) const
+bool var::osbwrite(const var& osfilevar, const var& offset) const
 {
-	return this->osbwrite(osfilevar, const_cast<var&>(startoffset));
+	return this->osbwrite(osfilevar, const_cast<var&>(offset));
 }
 
-bool var::osbwrite(const var& osfilevar, var& startoffset, const bool adjust) const
+//bool var::osbwrite(const var& osfilevar, var& offset, const bool adjust) const
+bool var::osbwrite(const var& osfilevar, var& offset) const
 {
 	// osfilehandle is just the filename but buffers the "file number" in the mvint too
 
-	THISIS("bool var::osbwrite(const var& osfilevar, var& startoffset, const bool adjust=true) "
+	THISIS("bool var::osbwrite(const var& osfilevar, var& offset) "
 	       "const")
 	THISISSTRING()
 	// test the following only if necessary in osopenx
@@ -1418,10 +1420,10 @@ bool var::osbwrite(const var& osfilevar, var& startoffset, const bool adjust) co
 	// std::cout << pmyfile->getloc().name();
 
 	// NB seekp goes by bytes regardless of the fact that it is a wide stream
-	// myfile.seekp (startoffset*sizeof(char));
-	// startoffset should be in bytes except for fixed multibyte code pages like UTF16 and UTF32
+	// myfile.seekp (offset*sizeof(char));
+	// offset should be in bytes except for fixed multibyte code pages like UTF16 and UTF32
 	pmyfile->seekp(
-	    static_cast<long>(startoffset.var_int)); // avoid warning, see comments to seekg()
+	    static_cast<long>(offset.var_int)); // avoid warning, see comments to seekg()
 
 	// NB but write length goes by number of wide characters (not bytes)
 	pmyfile->write(var_str.data(), int(var_str.length()));
@@ -1438,7 +1440,7 @@ bool var::osbwrite(const var& osfilevar, var& startoffset, const bool adjust) co
 	}
 
 	// pass back the file pointer offset
-	startoffset = (int)pmyfile->tellp();
+	offset = (int)pmyfile->tellp();
 
 	// although slow, ensure immediate visibility of osbwrites
 	pmyfile->flush();
@@ -1450,13 +1452,14 @@ bool var::osbwrite(const var& osfilevar, var& startoffset, const bool adjust) co
 }
 
 // a version that ignores output of offset
-var& var::osbread(const var& osfilevar, const var& startoffset, const int bytesize,
-		  const bool adjust)
+//var& var::osbread(const var& osfilevar, const var& offset, const int bytesize,
+//		  const bool adjust)
+bool var::osbread(const var& osfilevar, const var& offset, const int bytesize)
 {
-	// var startoffset_nonconst;
-	// if (startoffset.assigned())
-	//	startoffset_nonconst=startoffset;
-	return this->osbread(osfilevar, const_cast<var&>(startoffset), bytesize);
+	// var offset_nonconst;
+	// if (offset.assigned())
+	//	offset_nonconst=offset;
+	return this->osbread(osfilevar, const_cast<var&>(offset), bytesize);
 }
 
 ssize_t count_excess_UTF8_bytes(std::string& str)
@@ -1523,12 +1526,12 @@ ssize_t count_excess_UTF8_bytes(std::string& str)
 	return numBytesToTruncate;
 }
 
-var& var::osbread(const var& osfilevar, var& startoffset, const int bytesize, const bool adjust)
+//var& var::osbread(const var& osfilevar, var& offset, const int bytesize, const bool adjust)
+bool var::osbread(const var& osfilevar, var& offset, const int bytesize)
 {
-	THISIS("var& var::osbread(const var& osfilevar, const int startoffset, const int size, "
-	       "const bool adjust=true")
+	THISIS("bool var::osbread(const var& osfilevar, const int offset, const int bytesize")
 	THISISDEFINED()
-	ISASSIGNED(startoffset)
+	ISNUMERIC(offset)
 
 	// will be done if necessary in osopenx()
 	// ISSTRING(osfilename)
@@ -1539,12 +1542,12 @@ var& var::osbread(const var& osfilevar, var& startoffset, const int bytesize, co
 
 	// strange case request to read 0 bytes
 	if (bytesize <= 0)
-		return *this;
+		return true;
 
 	// get the buffered file handle/open on the fly
 	std::fstream* pmyfile = osfilevar.osopenx(osfilevar, "");
 	if (pmyfile == 0)
-		return *this;
+		return false;
 	/*
 		//NB all file sizes are in bytes NOT characters despite this being a wide character
 	fstream
@@ -1553,19 +1556,19 @@ var& var::osbread(const var& osfilevar, var& startoffset, const int bytesize, co
 
 	var(int(maxsize)).outputl("maxsize=");
 		//return "" if start reading past end of file
-		if ((unsigned long)(int)startoffset>=maxsize)	// past EOF
+		if ((unsigned long)(int)offset>=maxsize)	// past EOF
 			return *this;
 
 	*/
-	// seek to the startoffset
-	// if (pmyfile->tellg() != static_cast<long> (startoffset.var_int))
+	// seek to the offset
+	// if (pmyfile->tellg() != static_cast<long> (offset.var_int))
 	{
 		if (pmyfile->fail())
 			pmyfile->clear();
-		// pmyfile->seekg (static_cast<long> (startoffset.var_int), std::ios::beg);	//
+		// pmyfile->seekg (static_cast<long> (offset.var_int), std::ios::beg);	//
 		// 'std::streampos' usually 'long' seekg always seems to result in tellg being -1 in
 		// linux (Ubunut 10.04 64bit)
-		pmyfile->rdbuf()->pubseekpos(static_cast<long>(startoffset.var_int));
+		pmyfile->rdbuf()->pubseekpos(static_cast<long>(offset.var_int));
 	}
 	// var((int) pmyfile->tellg()).outputl("2 tellg=");
 
@@ -1587,9 +1590,9 @@ var& var::osbread(const var& osfilevar, var& startoffset, const int bytesize, co
 		pmyfile->seekg(0, std::ios::end);
 	}
 
-	// update the startoffset function argument
+	// update the offset function argument
 	// if (readsize > 0)
-	startoffset = (int)pmyfile->tellg();
+	offset = (int)pmyfile->tellg();
 
 	// transfer the memory block to this variable's string
 	//(is is possible to read directly into string data() avoiding a memory copy?
@@ -1606,12 +1609,12 @@ var& var::osbread(const var& osfilevar, var& startoffset, const int bytesize, co
 		int nextrabytes = count_excess_UTF8_bytes(var_str);
 		if (nextrabytes)
 		{
-			startoffset -= nextrabytes;
+			offset -= nextrabytes;
 			var_str.resize(var_str.length() - nextrabytes);
 		}
 	}
 
-	return *this;
+	return true;
 }
 
 void var::osclose() const

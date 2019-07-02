@@ -116,6 +116,7 @@ function main()
 		//http://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#Warning-Options
 		basicoptions^=" -Wall";
 		basicoptions^=" -Wextra";
+		basicoptions^=" -Wno-unknown-pragmas";
 
 		//not available on gcc 4.1.2 TODO work out gcc version
 		//basicoptions^=" -Wno-unused-parameters"; //dont want if functions dont use their parameters

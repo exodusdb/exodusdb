@@ -15,7 +15,7 @@ var_brackets_proxy::operator var() const
 			charindex1=1;
 	}
 	//off end - return ""
-	else if (charindex1>str1.length())
+	else if (uint(charindex1)>str1.length())
 		return "";
 
 	//within range
@@ -34,7 +34,7 @@ void var_brackets_proxy::operator=(char char1)
 			charindex1=1;
 	}
 	//off end - return ""
-	else if (charindex1>str1.length())
+	else if (uint(charindex1)>str1.length())
 	{
 		str1.push_back(char1);
 	} else

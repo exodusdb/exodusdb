@@ -210,7 +210,7 @@ subroutine printtx2() {
 #endif
 	tx.swapper(FM, "\r\n");
 	if (printfilename)
-		call osbwrite(tx, printfile,  printptr, 1);
+		call osbwrite(tx, printfile,  printptr);
 	else {
 		tx.output();
 		printptr+=tx.length();

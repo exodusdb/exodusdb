@@ -19,7 +19,7 @@ namespace exodus
 
 MvConnectionsCache::MvConnectionsCache(DELETER_AND_DESTROYER del_)
     // see important NOTE_OSX in header
-    : del(del_), connection_id(0), mvconnections_mutex(), conntbl()
+    : del(del_), connection_id(0), conntbl(), mvconnections_mutex()
 {
 }
 

@@ -50,7 +50,7 @@ bool haskey(void)
 
 	struct pollfd pfds[1];
 	int ret;
-	char c;
+	//char c;
 
 	/* See if there is data available */
 	pfds[0].fd = 0;

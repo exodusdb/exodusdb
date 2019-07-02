@@ -1625,7 +1625,7 @@ var& var::inserter(const int fieldno, const int valueno, const int subvalueno, c
 	}
 
 	////////// FIND SUBVALUE  //////////////////////
-	std::string::size_type subvalue_end_pos;
+	//std::string::size_type subvalue_end_pos;
 
 	// zero means all, negative means append one sv ... regardless of subvalueno
 	if (subvalueno < 0)

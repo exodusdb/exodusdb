@@ -362,7 +362,7 @@ function main() {
             //if any errors then loop back to edit again
             var errors;
             if (osread(errors,compileoutputfilename,"utf8")) {
-                //osdelete(compileoutputfilename);
+                osdelete(compileoutputfilename);
                 if (SLASH ne "/")
                     print(errors);
 

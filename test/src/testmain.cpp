@@ -542,20 +542,22 @@ function main()
 	oswrite(charout^charout,testfilename);
 
 	//check reading 1 byte results in nothing
-	assert(testosread.osbread(testfilex,offsetx=0,1)=="");
+	testosread.osbread(testfilex,offsetx=0,1);
 	assert(testosread.length()==0);
 	assert(testosread.oconv("HEX2")=="");
 	assert(offsetx==0);
 
 	//check reading 2 bytes results in 1 unicode character (2 bytes)
-	assert(testosread.osbread(testfilex,offsetx=0,2)==charout);
+	testosread.osbread(testfilex,offsetx=0,2);
+	assert(testosread==charout);
 	assert(testosread.length()==2);
 	assert(testosread.oconv("HEX2")=="CEB3");
 	assert(offsetx==2);
 
 	//check reading 3 bytes results in 1 unicode character (2 bytes)
 	offsetx=0;
-	assert(testosread.osbread(testfilex,offsetx,3)==charout);
+	testosread.osbread(testfilex,offsetx,3);
+	assert(testosread==charout);
 	assert(testosread.length()==2);
 	assert(testosread.oconv("HEX2")=="CEB3");
 	printl(offsetx);
@@ -563,14 +565,16 @@ function main()
 
 	//check reading 4 bytes results in 2 unicode characters (4 bytes)
 	offsetx=0;
-	assert(testosread.osbread(testfilex,offsetx,4)==(charout^charout));
+	testosread.osbread(testfilex,offsetx,4);
+	assert(testosread==(charout^charout));
 	assert(testosread.length()==4);
 	assert(testosread.oconv("HEX2")=="CEB3CEB3");
 	assert(offsetx==4);
 
 	//check reading 5 bytes results in 2 unicode characters (4 bytes)
 	offsetx=0;
-	assert(testosread.osbread(testfilex,offsetx,5)==(charout^charout));
+	testosread.osbread(testfilex,offsetx,5);
+	assert(testosread==(charout^charout));
 	assert(testosread.length()==4);
 	assert(testosread.oconv("HEX2")=="CEB3CEB3");
 	assert(offsetx==4);
@@ -747,12 +751,18 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump utf8_allo4.txt -C
 		//test reading from beyond end of file - returns ""
 		//offset2 is BYTE OFFSET NOT CHARACTER OFFSET!!!
 		var data,offset2;
-		assert(data.osbread(tempfile,offset2=4,2) eq "");
+		data.osbread(tempfile,offset2=4,2);
+		assert(data eq "");
 
 		//reading from middle of utf8 sequence -> invalid data TODO check valid UTF8
-		data.osbread(tempfile,offset2=3,2).oconv("HEX").outputl("test reading from middle of utf8 byte sequence test=");
+		data.osbread(tempfile,offset2=3,2);
+		assert(data.oconv("HEX")=="A3");
+		data.osbread(tempfile,offset2=1,2);
+		assert(data.oconv("HEX")=="B3");
+		data.osbread(tempfile,offset2=2,2);
+		data.oconv("HEX").outputl("test reading from middle of utf8 byte sequence test=");
 		//assert(data.osbread(tempfile,offset2=3,2) eq "");
-
+stop();
 		//test reading in C/binary mode (not UTF8)
 		assert(osopen(tempfilename5,tempfile,"C"));
 		assert(data.osbread(tempfile,offset2=0,1) eq greek2[1]);
@@ -938,7 +948,8 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump utf8_allo4.txt -C
 	assert(osbwrite("78",tempfilename5,offset));
 	offset=2;
 	var v78;
-	assert(v78.osbread(tempfilename5, offset, 2) eq "78");
+	v78.osbread(tempfilename5, offset, 2);
+	assert(v78 eq "78");
 
 	assert(osread(record5,tempfilename5));
 	assert(record5.oconv("HEX2") eq "00003738");

@@ -72,7 +72,8 @@ THE SOFTWARE.
 
 // see long comment on ISDEFINED
 #define THISISDEFINED()                                                                            \
-	if (!this || this->var_typ & VARTYP_MASK)                                                  \
+	/*std::cout<< functionname << " " <<var_typ<<std::endl;*/                                  \
+	if (/*(!this) ||*/ this->var_typ & VARTYP_MASK)                                            \
 		throw MVUndefined("var in " ^ var(functionname));
 
 // includes isdefined

@@ -64,67 +64,39 @@ DLL_PUBLIC bool osopen(const var& osfilename, var& osfilevar, const var& locale)
 // osclose x
 DLL_PUBLIC void osclose(const var& osfilevar) { osfilevar.osclose(); }
 
-/* suppressing because too easy to write the a 3 arg version when you meant the 4 arg version
-
-//3 argument version assignment statement format
-//x=osbread(file,postition,length)
-//DLL_PUBLIC var osbread(const var& filehandle, const int startoffset, const int length)
-DLL_PUBLIC var osbread(const var& filehandle, var& startoffset, const int length)
-{
-	var data;
-	data.osbread(filehandle, startoffset, length);
-	return data;
-}
-
-//3 argument version assignment statement format BUT ALLOWING STARTOFFSET TO BE A CONSTANT ie output
-ignored
-//x=osbread(file,postition,length)
-//DLL_PUBLIC var osbread(const var& filehandle, const int startoffset, const int length)
-DLL_PUBLIC var osbread(const var& filehandle, const var& startoffset, const int length)
-{
-	var data;
-	data.osbread(filehandle, const_cast<var&>(startoffset), length);
-	return data;
-}
-*/
-
 // 4 argument version for statement format
 // osbread(data from x at y length z)
-// DLL_PUBLIC var& osbread(var& data, const var& filehandle, const int startoffset, const int
+// DLL_PUBLIC var& osbread(var& data, const var& filehandle, const int offset, const int
 // length)
-DLL_PUBLIC
-var& osbread(var& data, const var& filehandle, var& startoffset, const int length,
-	     const bool adjust)
+//var& osbread(var& data, const var& filehandle, var& offset, const int length,
+//	     const bool adjust)
+DLL_PUBLIC bool osbread(var& data, const var& filehandle, var& offset, const int length)
 {
-	// perhaps we can return book for success/failure despite the fact that it is a filehandle
-	// supposedly ok
-	data.osbread(filehandle, startoffset, length, adjust);
-	return data;
+	return data.osbread(filehandle, offset, length);
 }
 
-DLL_PUBLIC bool osbwrite(const var& data, const var& filehandle, var& startoffset,
-			 const bool adjust = true)
-{
-	return data.osbwrite(filehandle, startoffset, adjust);
-}
-
-// 4 argument version for statement format BUT ALLOWING STARTOFFSET TO BE A CONSTANT ie output
+// 4 argument version for statement format BUT ALLOWING offset TO BE A CONSTANT ie output
 // ignored osbread(data from x at y length z) DLL_PUBLIC var& osbread(var& data, const var&
-// filehandle, const int startoffset, const int length)
-DLL_PUBLIC
-var& osbread(var& data, const var& filehandle, const var& startoffset, const int length,
-	     const bool adjust)
+// filehandle, const int offset, const int length)
+//var& osbread(var& data, const var& filehandle, const var& offset, const int length,
+//	     const bool adjust)
+DLL_PUBLIC bool osbread(var& data, const var& filehandle, const var& offset, const int length)
 {
-	// perhaps we can return book for success/failure despite the fact that it is a filehandle
-	// supposedly ok
-	data.osbread(filehandle, const_cast<var&>(startoffset), length, adjust);
-	return data;
+	return data.osbread(filehandle, const_cast<var&>(offset), length);
 }
 
-DLL_PUBLIC bool osbwrite(const var& data, const var& filehandle, const var& startoffset,
-			 const bool adjust)
+//DLL_PUBLIC bool osbwrite(const var& data, const var& filehandle, var& offset,
+//			 const bool adjust = true)
+DLL_PUBLIC bool osbwrite(const var& data, const var& filehandle, var& offset)
 {
-	return data.osbwrite(filehandle, const_cast<var&>(startoffset), adjust);
+	return data.osbwrite(filehandle, offset);
+}
+
+//DLL_PUBLIC bool osbwrite(const var& data, const var& filehandle, const var& offset,
+//			 const bool adjust)
+DLL_PUBLIC bool osbwrite(const var& data, const var& filehandle, const var& offset)
+{
+	return data.osbwrite(filehandle, const_cast<var&>(offset));
 }
 
 // two argument version returns success/failure to be used in if statement

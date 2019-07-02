@@ -12,6 +12,8 @@ programinit()
 #include <ba_common.h>
 #include <ab_common.h>
 
+var xx;
+
 function main() {
 
 	//NB numbers and names MUST match those in the matching common .h files

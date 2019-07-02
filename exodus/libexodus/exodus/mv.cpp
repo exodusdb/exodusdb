@@ -77,14 +77,15 @@ var::~var()
 	// unused bits to 1 to ease detection of usage of uninitialised variables (bad c++ syntax
 	// like var x=x+1; set all used bits to 0 to increase chance of detecting unassigned
 	// variables var_typ=(char)0xFFFFFFF0;
-	var_typ = VARTYP_DESTRUCTED;
+	var_typ = VARTYP_MASK;
 }
 
 // CONSTRUCTORS
 //////////////
 
 // default constructor to allow definition unassigned "var mv";
-var::var() : var_typ(VARTYP_UNA)
+var::var()
+    : var_typ(VARTYP_UNA)
 {
 	//std::cout << "ctor()" << std::endl;
 
@@ -112,19 +113,24 @@ var::var() : var_typ(VARTYP_UNA)
 
 // copy constructor
 var::var(const var& rhs)
-    : var_typ(rhs.var_typ), var_str(rhs.var_str), var_int(rhs.var_int),
-      var_dbl(rhs.var_dbl){
+    : var_str(rhs.var_str),
+      var_int(rhs.var_int),
+      var_dbl(rhs.var_dbl),
+      var_typ(rhs.var_typ)
+{
 	  // checking after copy for speed
 	  // use initializers for speed and only check afterwards if copiedvar was assigned
 	  THISIS("var::var(const var& rhs)") ISASSIGNED(rhs)
 
 	  // not a pointer anymore for speed
 	  // priv=new pimpl;
-      }
+}
 
-      // move constructor
-      var::var(const var&& rhs) noexcept
-    : var_str(std::move(rhs.var_str)), var_int(rhs.var_int), var_dbl(rhs.var_dbl),
+// move constructor
+var::var(const var&& rhs) noexcept
+    : var_str(std::move(rhs.var_str)),
+      var_int(rhs.var_int),
+      var_dbl(rhs.var_dbl),
       var_typ(rhs.var_typ)
 {
 	//std::cout << "copy ctor var&" << std::endl;
@@ -136,7 +142,9 @@ var::var(const var& rhs)
 
 // constructor for char*
 // use initializers since cannot fail unless out of memory
-var::var(const char* cstr1) : var_str(cstr1), var_typ(VARTYP_STR)
+var::var(const char* cstr1)
+    : var_str(cstr1),
+      var_typ(VARTYP_STR)
 {
 
 	// not a pointer anymore for speed
@@ -161,36 +169,51 @@ var::var(const char* cstr1) : var_str(cstr1), var_typ(VARTYP_STR)
 var::var(const std::string& str1)
     // this would validate all strings as being UTF8?
     //: var_str(boost::locale::conv::utf_to_utf<char>(str1))
-    : var_str(str1), var_typ(VARTYP_STR)
-{
-}
+    : var_str(str1),
+      var_typ(VARTYP_STR)
+{}
 
 // constructor for bool
 // just use initializers since cannot fail
-var::var(const bool bool1) noexcept : var_int(bool1), var_typ(VARTYP_INT) {}
+var::var(const bool bool1) noexcept
+    : var_int(bool1),
+      var_typ(VARTYP_INT)
+{}
 
 // constructor for int
 // just use initializers since cannot fail
-var::var(const int int1) noexcept : var_int(int1), var_typ(VARTYP_INT) {}
+var::var(const int int1) noexcept
+    : var_int(int1),
+      var_typ(VARTYP_INT)
+{}
 
 // constructor for long long
 // just use initializers since cannot fail
-var::var(const long long longlong1) noexcept : var_int(longlong1), var_typ(VARTYP_INT) {}
+var::var(const long long longlong1) noexcept
+    : var_int(longlong1),
+      var_typ(VARTYP_INT)
+{}
 
 // constructor for double
 // just use initializers since cannot fail
-var::var(const double double1) noexcept : var_dbl(double1), var_typ(VARTYP_DBL) {}
+var::var(const double double1) noexcept
+    : var_dbl(double1),
+      var_typ(VARTYP_DBL)
+{}
 
 // ctor for char
 // use initializers since cannot fail (but could find how to init the char1)
-var::var(const char char1) noexcept : var_str(1, char1), var_typ(VARTYP_STR) {}
+var::var(const char char1) noexcept
+    : var_str(1, char1),
+      var_typ(VARTYP_STR)
+{}
 
 // ctor for memory block
 // dont use initialisers and TODO protect against out of memory in expansion to string
 var::var(const char* charstart, const size_t nchars)
-    : var_str(charstart, nchars), var_typ(VARTYP_STR)
-{
-}
+    : var_str(charstart, nchars),
+      var_typ(VARTYP_STR)
+{}
 
 // EXPLICIT AND AUTOMATIC CONVERSIONS
 ////////////////////////////////////
@@ -224,8 +247,10 @@ var::operator void*() const
 // supposed to be replaced with automatic void() and made explicit but just seems to force int
 // conversion during "if (var)" necessary to allow var to be used standalone in "if (xxx)" but see
 // mv.h for discussion of using void* instead of bool #ifndef _MSC_VER
-var::operator bool() const { return toBool(); }
-//#endif
+var::operator bool() const
+{
+	return toBool();
+}
 
 /*
 var::operator const char*() const
@@ -1620,7 +1645,12 @@ std::string dblToString(double double1)
 	// NB plain stringstream causes a memory leak in msvc8 before sp1
 	std::ostringstream ss;
 	ss.precision(10);
-	if (std::abs(double1)<0.00000000001)
+
+	//std::cout << abs(double1) << std::endl;
+	//std::cout << double(0.000'000'001) << std::endl;
+	//std::cout << (std::abs(double1)<double(0.000'000'001)) << std::endl;
+
+	if (std::abs(double1)<double(0.000'000'000'1))
 		return "0.0";
 
 	ss << double1;

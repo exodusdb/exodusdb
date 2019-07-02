@@ -3427,7 +3427,7 @@ bool var::getlist(const var& listname)
 	if (GETDBTRACE)
 		var("DBTRACE: ::savelist(" ^ listname ^ ")").logputl();
 
-	int recn = 0;
+	//int recn = 0;
 	var key;
 	var mv;
 	var listfilename = "savelist_" ^ listname.field(" ", 1);

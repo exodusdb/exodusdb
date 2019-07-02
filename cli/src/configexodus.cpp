@@ -80,7 +80,7 @@ function main()
         getinput("New user password",dbuserpass);
 
 	//if (SLASH eq "\\")
-		configure_via_connection(adminconn, dbname, dbusername, dbuserpass);
+	//	configure_via_connection(adminconn, dbname, dbusername, dbuserpass);
 	//else
 	//	configure_via_script(adminconn, dbname, dbusername, dbuserpass);
 
@@ -356,7 +356,7 @@ function configure_via_connection(in adminconn, in dbname, in dbusername, in dbu
 		var connstr3=adminconn^" dbname=template1";
         if (not connect(connstr3))
                 stop("Stopping. Cannot connect to template1 database");
-		printl("done!");
+	printl("done!");
 
         print(oconv("Add pgexodus postgres plugin ... ","L#40"));
         if (not add_pgexodus_postgres_plugin())
@@ -364,13 +364,13 @@ function configure_via_connection(in adminconn, in dbname, in dbusername, in dbu
 
         print(oconv("Detaching from template1 database ... ","L#40"));
 		disconnect();
-		printl("done!");
+	printl("done!");
 
 	return true;
 }
 
-function configure_via_script(in adminconn, in dbname, in dbusername, in dbuserpass) {
-	return true;
-}
+//function configure_via_script(in adminconn, in dbname, in dbusername, in dbuserpass) {
+//	return true;
+//}
 
 programexit()

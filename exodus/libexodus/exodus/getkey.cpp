@@ -24,7 +24,8 @@ int getkey(void)
 	char ch=0;
 	int error;
 	struct termios oldAttr, newAttr;
-	int oldFlags, newFlags;
+	int oldFlags;
+	//int newFlags;
 	struct timeval tv;
 	int fd = fileno(stdin);
 

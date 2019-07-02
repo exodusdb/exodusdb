@@ -162,7 +162,7 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 	int maxnrecs=calc_fields.a(6);
 	int recn=0;
 
-nextrecord:
+//nextrecord:
 	while(CURSOR.readnextrecord(RECORD,ID,MV)) {
 
 		bool ok=true;
@@ -204,16 +204,16 @@ nextrecord:
 					ok = value.match(values(fieldn),"i");
 					break;
 				case 9:
-					ok = ! value.match(values(fieldn));
+					ok = ! (value.match(values(fieldn)));
 					break;
 				case 10:
-					ok = ! value.match(values(fieldn),"i");
+					ok = ! (value.match(values(fieldn),"i"));
 					break;
 				case 11:
-					ok = ! value >= values(fieldn) && value <= values2(fieldn);
+					ok = ! (value >= values(fieldn) && value <= values2(fieldn));
 					break;
 				case 12:
-					ok = ! value < values(fieldn) || value > values2(fieldn);
+					ok = ! (value < values(fieldn) || value > values2(fieldn));
 					break;
 			}
 			if (!ok) {
@@ -295,8 +295,9 @@ bool ExodusProgramBase::readnextrecord(var& record, var& key)
 	return CURSOR.readnextrecord(record, key);
 }
 
-bool ExodusProgramBase::pushselect(const var& v1, var& v2, var& v3, var& v4)
+bool ExodusProgramBase::pushselect([[maybe_unused]] const var& v1, var& v2, [[maybe_unused]] var& v3, [[maybe_unused]] var& v4)
 {
+
 	// CURSOR.quote().outputl("CURSOR=");
 	// CURSOR++;
 	// CURSOR has connection number hidden in it, so it cannot be used as an ordinary variable
@@ -330,7 +331,7 @@ bool ExodusProgramBase::pushselect(const var& v1, var& v2, var& v3, var& v4)
 	*/
 }
 
-bool ExodusProgramBase::popselect(const var& v1, var& v2, var& v3, var& v4)
+bool ExodusProgramBase::popselect([[maybe_unused]] const var& v1, var& v2, [[maybe_unused]] var& v3, [[maybe_unused]] var& v4)
 {
 	// CURSOR.quote().outputl("CURSOR=");
 	// CURSOR--;
@@ -1790,9 +1791,15 @@ var ExodusProgramBase::AT(const int x, const int y) const
 	return var().at(x, y);
 }
 
-var ExodusProgramBase::handlefilename(const var& handle) { return handle.a(1); }
+var ExodusProgramBase::handlefilename(const var& handle)
+{
+	return handle.a(1);
+}
 
-var ExodusProgramBase::memspace(const var& requiredmemory) { return 999999999; }
+var ExodusProgramBase::memspace([[maybe_unused]] const var& requiredmemory)
+{
+	return 999999999;
+}
 
 var ExodusProgramBase::getuserdept(const var& usercode)
 {

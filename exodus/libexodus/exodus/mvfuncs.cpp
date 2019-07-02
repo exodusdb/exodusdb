@@ -119,7 +119,7 @@ bool var::input(const var& prompt, const int nchars)
 
 		while (true)
 		{
-			int nc;
+			//int nc;
 			int getkey(void);
 			// quit if error or EOF
 			char char1 = getkey();
@@ -137,7 +137,7 @@ bool var::input(const var& prompt, const int nchars)
 
 		while (true)
 		{
-			int nc;
+			//int nc;
 			int getkey(void);
 			char char1 = getkey();
 
@@ -156,7 +156,8 @@ bool var::input(const var& prompt, const int nchars)
 			var_str += char1;
 
 			// quit if got the desired number of characters
-			if (var_str.length() >= nchars)
+			//nchars cannot be negative at this point
+			if (var_str.length() >= uint(nchars))
 				break;
 		}
 		return var_str.length() > 0;
@@ -1283,21 +1284,21 @@ var& var::splicer(const int start1, const int length, const var& newstr)
 
 	// TODO make sure start and length work like REVELATION and HANDLE NEGATIVE LENGTH!
 
-	int start1b;
+	unsigned int start1b;
 	if (start1 > 0)
 	{
 		start1b = start1;
 	}
 	else if (start1 < 0)
 	{
-		start1b = int(var_str.length()) + start1 + 1;
+		start1b = var_str.length() + start1 + 1;
 		if (start1b < 1)
 			start1b = 1;
 	}
 	else
 		start1b = 1;
 
-	int lengthb;
+	unsigned int lengthb;
 	if (length >= 0)
 		lengthb = length;
 	else
@@ -1338,7 +1339,7 @@ var& var::splicer(const int start1, const var& newstr)
 	// proceduremode
 
 	// TODO make sure start and length work like REVELATION and HANDLE NEGATIVE LENGTH!
-	int start1b;
+	uint start1b;
 	if (start1 > 0)
 		start1b = start1;
 	else if (start1 < 0)
@@ -2471,7 +2472,7 @@ var var::at(const int column, const int row) const
 
 var var::getcursor() const
 {
-	THISIS("var var::getcursor() const")
+	//THISIS("var var::getcursor() const")
 
 	return "";
 

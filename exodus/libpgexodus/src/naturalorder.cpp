@@ -149,19 +149,19 @@ void appenddouble2sortstring(const double& double1, std::ostringstream& stringst
                 //set the high bit so that positive numbers appear lexicographically after the negative numbers
                 integer1-=0x8000000000000000LL;
 
-		//make leftmost digit a decimal so it sorts as a number instead of any chance hex a-f
-		//put a 9 which sorts the same as 0 and removes the need for fill/width formatting below
-		integer1=integer1>>4;
-		integer1&=0x9fffffffffffffffLL;
+	//make leftmost digit a decimal so it sorts as a number instead of any chance hex a-f
+	//put a 9 which sorts the same as 0 and removes the need for fill/width formatting below
+	integer1=integer1>>4;
+	integer1&=0x9fffffffffffffffLL;
 
-		//hex output
-		stringstream1.flags(std::ios::right|std::ios::hex);
+	//hex output
+	stringstream1.flags(std::ios::right|std::ios::hex);
 
-		//needed if leftmost digit is zero
-		//stringstream1.fill('0');
-		//stringstream1.width(16);
+	//needed if leftmost digit is zero
+	//stringstream1.fill('0');
+	//stringstream1.width(16);
 
-		stringstream1<<integer1;
+	stringstream1<<integer1;
 }
 
 std::string naturalorder(const std::string& string1)

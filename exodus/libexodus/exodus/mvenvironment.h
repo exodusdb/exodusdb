@@ -56,8 +56,8 @@ extern DLL_PUBLIC std::vector<MvEnvironment*> global_environments;
 
 class LabelledCommon
 {
-      public:
-	virtual ~LabelledCommon() {}
+      //public:
+	//virtual ~LabelledCommon() {}
 };
 
 class DLL_PUBLIC MvEnvironment
