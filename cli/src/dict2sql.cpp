@@ -65,58 +65,144 @@ function main() {
 	if (doall)
 		viewsql ^= "CREATE MATERIALIZED VIEW dict_all AS\n";
 
-	//do one file
+	//do one or many/all files
 	int nfiles=dcount(filenames,FM);
 	for (int filen=1;filen<=nfiles;++filen)
 		onefile(filenames.a(filen),dictid,viewsql);
 
-	//do all files and add exodus
-	if (doall)
-	{
-		//ignore error if doesnt exist
-		if (not var().sqlexec("DROP MATERIALIZED VIEW dict_all"))
-			var().sqlexec("DROP VIEW dict_all");
+	//quit if not doing all files
+	/////////////////////////////
+	if (!doall)
+		return 0;
 
-		viewsql.splicer(-6,6,"");//remove trailing "UNION" word
-		var errmsg;
-		if (verbose)
-			viewsql.output("SQL:");
-		if (var().sqlexec(viewsql,errmsg))
-			printl("dict_all file created");
-		else {
-			if (not verbose)
-				viewsql.outputl("SQL:");
-			errmsg.outputl("Error:");
-		}
+	//create dict_all file
 
-		//extra functions
-		/////////////////
+	//ignore error if doesnt exist
+	if (not var().sqlexec("DROP MATERIALIZED VIEW dict_all"))
+		var().sqlexec("DROP VIEW dict_all");
 
-		var sqltemplate=
-R"V0G0N(
-CREATE OR REPLACE FUNCTION
- $functionname(data text)
- RETURNS text
- AS
- $$
- BEGIN
-  $sqlcode
- END;
- $$
- LANGUAGE 'plpgsql'
- IMMUTABLE
- SECURITY
- DEFINER
- COST 10;
-)V0G0N";
-
-		//exodus_trim
-		var trimsql=R"(return regexp_replace(regexp_replace(data, '^\s+|\s+$', '', 'g'),'\s{2,}',' ','g');)";
-		do_sql("exodus_trim",trimsql,sqltemplate);
-
+	viewsql.splicer(-6,6,"");//remove trailing "UNION" word
+	var errmsg;
+	if (verbose)
+		viewsql.output("SQL:");
+	if (var().sqlexec(viewsql,errmsg))
+		printl("dict_all file created");
+	else {
+		if (not verbose)
+			viewsql.outputl("SQL:");
+		errmsg.outputl("Error:");
 	}
 
+	//create exodus pgsql functions
+
+	var sqltemplate=
+R"V0G0N(
+CREATE OR REPLACE FUNCTION
+$functionname_and_args
+RETURNS text
+AS
+$$
+BEGIN
+$sqlcode
+END;
+$$
+LANGUAGE 'plpgsql'
+IMMUTABLE
+SECURITY
+DEFINER
+COST 10;
+)V0G0N";
+
+	//exodus_trim
+	var trimsql=R"(return regexp_replace(regexp_replace(data, '^\s+|\s+$', '', 'g'),'\s{2,}',' ','g');)";
+	do_sql("exodus_trim(data text)",trimsql,sqltemplate);
+
+	//exodus_field_remove
+	var removesql=
+R"V0G0N(
+DECLARE
+ charn int;
+ nchars int;
+ currfieldn int;
+ ans text;
+
+BEGIN
+
+ if fieldno<=0 then
+  if fieldno=0 then
+   return '';
+  end if;
+  return data;
+ end if;
+
+ ans := '';
+ currfieldn :=1;
+ nchars := length(data);
+ for charn in 1..nchars loop
+
+  if substr(data,charn,1) = sep then
+
+   currfieldn=currfieldn+1;
+
+   if currfieldn=fieldno then
+    ans := substr(data,1,charn-1);
+
+   elseif currfieldn>fieldno then
+    if ans<>'' then
+     ans := ans || sep || substr(data,charn+1);
+    else
+     ans := substr(data,charn+1);
+    end if;
+    return ans;
+   end if;
+
+  end if;
+
+ end loop;
+
+ -- deleting beyond the number of existing fields
+ if currfieldn<fieldno then
+  return data;
+  end if;
+
+ return ans;
+
+END;
+)V0G0N";
+
+	do_sql("exodus_field_remove(data text, sep text, fieldno int)",removesql,sqltemplate);
+
 	return 0;
+}
+
+subroutine do_sql(in functionname_and_args, in sql, in sqltemplate) {
+
+	functionname_and_args.outputl();
+
+	var functionsql=sqltemplate;
+
+	functionsql.swapper("$functionname_and_args",functionname_and_args);
+
+	functionsql.swapper("$sqlcode",sql);
+
+	if (verbose)
+		functionsql.outputl();
+
+	var errmsg;
+	var().sqlexec(functionsql,errmsg);
+
+	if (errmsg) {
+		if (not verbose) {
+			//functionsql.outputl();
+			int nlines=count(functionsql,"\n");
+			for (int linen=1;linen<=nlines;++linen) {
+				printl(linen-2+2,". ", field(functionsql,"\n",linen) );
+			}
+			outputl();
+		}
+		errmsg.outputl();
+	}
+	return;
 }
 
 subroutine onefile(in dictfilename, in reqdictid, io viewsql) {
@@ -169,7 +255,7 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 	}
 	var sql=sourcecode.substr(pos+8);
 
-	printl(dictfilename, " ",dictid);
+	//printl(dictfilename, " ",dictid, " > sql");
 
 	//should take everything up to the end ??
 	//so pgsql comments like /* */ are respected ??
@@ -283,7 +369,7 @@ $RETVAR :=
 
 	var sqltemplate=
 R"V0G0N(CREATE OR REPLACE FUNCTION
- $functionname(key text, data text)
+ $functionname_and_args
  RETURNS text
  AS
  $$
@@ -302,38 +388,8 @@ $sqlcode
  )V0G0N";
 
 	//set the function name
-	var functionname=dictfilename^"_"^dictid;
+	do_sql(dictfilename^"_"^dictid^"(key text, data text)",sql,sqltemplate);
 
-	do_sql(functionname,sql,sqltemplate);
-
-}
-
-subroutine do_sql(in functionname, in sql, in sqltemplate) {
-
-	var functionsql=sqltemplate;
-
-	functionsql.swapper("$functionname",functionname);
-
-	functionsql.swapper("$sqlcode",sql);
-
-	if (verbose)
-		functionsql.outputl();
-
-	var errmsg;
-	var().sqlexec(functionsql,errmsg);
-
-	if (errmsg) {
-		if (not verbose) {
-			//functionsql.outputl();
-			int nlines=count(functionsql,"\n");
-			for (int linen=1;linen<=nlines;++linen) {
-				printl(linen-2+2,". ", field(functionsql,"\n",linen) );
-			}
-			outputl();
-		}
-		errmsg.outputl();
-	}
-	return;
 }
 
 programexit()

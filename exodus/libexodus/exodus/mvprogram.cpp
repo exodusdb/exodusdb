@@ -24,19 +24,34 @@ ExodusProgramBase::~ExodusProgramBase(){};
 
 bool ExodusProgramBase::select(const var& sortselectclause)
 {
+
+	//stage 1
+	/////////
+
+	//indicate there are no calculated fields
 	CURSOR.r(10,"");
 
+	//perform the select (stage 1 of possibly two stages)
+	//any fields requiring calculation that cannot be done by the database
+	//will be put skipped and put aside in CURSOR.r(10) for stage 2
 	if (!CURSOR.select(sortselectclause))
 		return false;
 
-	//secondary sort/select on fields that could be calculated by the database
-
-	//any calculated fields pending secondary sort/select are stuffed in a(10)
-	var calc_fields=CURSOR.a(10).raise();
+	//we are done if there are no calculated fields.
+	var calc_fields=CURSOR.a(10);
 	if (!calc_fields)
 		return true;
 
+	//stage 2
+	/////////
+
+	//secondary sort/select on fields that could not be calculated by the database
+
+	//clear the list of calculated fields
 	CURSOR.r(10,"");
+
+	//vms to fms etc in calculated fields
+	calc_fields.raiser();
 
 	//ONLY TEST MATERIALS FOR NOW
 	//if (!calc_fields.ucase().index("MATERIALS"))
@@ -242,7 +257,7 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 
 		CURSOR.sqlexec(insertsql);
 
-		//limit number of records returned
+		//option to limit number of records returned
 		++recn;
 		if (maxnrecs && recn>maxnrecs) {
 			CURSOR.clearselect();

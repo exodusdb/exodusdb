@@ -111,7 +111,17 @@ function main() {
                         while (ucase(reply)[1] eq "Y" and true) {
 
                                 if (write(newrecord,file,key)) {
-                                        printl(filename^" written "^key);
+                                        printl(filename^" "^key ^ " > db");
+
+                                        if (filename.substr(1,5)=="dict_"
+					    and newrecord.a(1) eq "S"
+					    and newrecord.a(8).index("/" "*pgsql")
+					   ) {
+                                        	var oscmd="dict2sql " ^ filename ^ " " ^ key;
+                                        	//oscmd.outputl("oscmd=");
+                                        	osshell(oscmd);
+                                        }
+
                                         osdelete(temposfilename);
                                         break;
                                 }

@@ -2131,6 +2131,10 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 
 				// add the join
 				var join_part1 = "\n  ";
+				//main file is on the left
+				//secondary file is on the right
+				//normally we want all records on the left (main file) and any secondary file records that exist ... LEFT JOIN
+				//if joining to calculated field file then we want only records that exist in the calculated fields file ... RIGHT JOIN (could be INNER JOIN)
 				join_part1 ^= calculated?"RIGHT":"LEFT";
 				join_part1 ^= " JOIN\n   " ^ xlatetargetfilename ^ " ON ";
 				// var join_part2=xlatekeyexpression ^ "::text = " ^
@@ -3091,6 +3095,31 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 	whereclause.swapper("\n AND true", "");
 	whereclause.swapper("true\n AND ", "");
 
+	//save any active selection in a temporary table and RIGHT JOIN to it to avoid complete selection of primary file
+	if (this->hasnext())
+	{
+		//create a temporary sql table to hold the preselected keys
+		var temptablename="PRESELECT_TEMP_CURSOR_" ^ this->a(1);
+		var createtablesql = "DROP TABLE IF EXISTS " ^ temptablename ^ ";\n";
+		createtablesql ^= "CREATE TEMPORARY TABLE " ^ temptablename ^ "\n";
+		createtablesql ^= " (KEY TEXT)\n";
+		var errmsg;
+		if (! this->sqlexec(createtablesql,errmsg))
+		{
+			throw MVDBException(errmsg);
+		}
+
+		//readnext the keys into a temporary table
+		var key;
+		while (this->readnext(key))
+		{
+			//std::cout<<key<<std::endl;
+			this->sqlexec("INSERT INTO " ^ temptablename ^ "(KEY) VALUES('" ^ key ^"')");
+		}
+
+		joins.inserter(1,1,"INNER JOIN "^temptablename^" ON "^temptablename^".key = "^actualfilename^".key");
+	}
+
 	// assemble the full sql select statement:
 
 	//DECLARE - cursor
@@ -3106,6 +3135,9 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 
 	//FROM - filename and any specially related files
 	sql ^= " \nFROM\n " ^ actualfilename;
+
+
+	//JOIN - (1)?
 	if (joins.a(1))
 		sql ^= " " ^ joins.a(1).convert(VM, "");
 
