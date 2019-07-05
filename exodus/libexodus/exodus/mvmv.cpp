@@ -214,6 +214,9 @@ var& var::fieldstorer(const var& sepchar0, const int fieldnx, const int nfieldsx
 	THISISSTRING()
 	ISSTRING(sepchar0)
 
+	//changes to var_str invalidate all flags
+	var_typ = VARTYP_STR;
+
 	std::string sepchar = sepchar0.var_str;
 	if (sepchar == "")
 	{
@@ -1099,13 +1102,15 @@ var& var::remover(int fieldno, int valueno, int subvalueno)
 	THISIS("var& var::remover(int fieldno,int valueno,int subvalueno)")
 	THISISSTRING()
 
+	//changes to var_str invalidate all flags
+	var_typ = VARTYP_STR;
+
 	// return "" if replacing 0,0,0
 	if (fieldno == 0 && valueno == 0 && subvalueno == 0)
 	{
 		// functionmode return var("");//var(var1);
 		// proceduremode
 		var_str = "";
-		var_typ = VARTYP_STR;
 		return *this;
 	}
 
@@ -1291,13 +1296,16 @@ var& var::r(int fieldno, int valueno, int subvalueno, const var& replacement)
 	THISISSTRING()
 	ISSTRING(replacement)
 
+	//changes to var_str invalidate all flags
+	var_typ = VARTYP_STR;
+
 	// return whole thing if replace 0,0,0
 	if (fieldno == 0 && valueno == 0 && subvalueno == 0)
 	{
 		// functionmode return var(replacement);
 		// proceduremode
 		var_str = replacement.var_str;
-		var_typ = VARTYP_STR;
+		//var_typ = VARTYP_STR;
 		return *this;
 	}
 
@@ -1512,6 +1520,9 @@ var& var::inserter(const int fieldno, const int valueno, const int subvalueno, c
 	       "var& insertion)")
 	THISISSTRING()
 	ISSTRING(insertion)
+
+	//changes to var_str invalidate all flags
+	var_typ = VARTYP_STR;
 
 	// 0,0,0 is like 1,0,0
 	if (fieldno == 0 && valueno == 0 && subvalueno == 0)
@@ -1734,13 +1745,14 @@ var& var::substrer(const int startindex1, const int length)
 	THISIS("var& var::substrer(const int startindex1,const int length) const")
 	THISISSTRING()
 
+	//changes to var_str invalidate all flags
+	var_typ = VARTYP_STR;
+
 	// return "" for ""
 	int max = (int)var_str.length();
 	if (max == 0)
 	{
 		var_str = "";
-		var_typ = VARTYP_INTSTR;
-		var_int = 0;
 		return *this;
 	}
 
@@ -1752,8 +1764,6 @@ var& var::substrer(const int startindex1, const int length)
 		if (length == 0)
 		{
 			var_str = "";
-			var_typ = VARTYP_INTSTR;
-			var_int = 0;
 			return *this;
 		}
 
@@ -1763,16 +1773,12 @@ var& var::substrer(const int startindex1, const int length)
 			if (start == 0)
 			{
 				var_str = "";
-				var_typ = VARTYP_INTSTR;
-				var_int = 0;
 				return *this;
 			}
 			start = max + start + 1;
 			if (start < 1)
 			{
 				var_str = "";
-				var_typ = VARTYP_INTSTR;
-				var_int = 0;
 				return *this;
 			}
 		}
@@ -1790,7 +1796,6 @@ var& var::substrer(const int startindex1, const int length)
 			result += var_str[ii - 1];
 
 		var_str = result;
-		var_typ = VARTYP_STR;
 		return *this;
 	}
 
@@ -1808,8 +1813,6 @@ var& var::substrer(const int startindex1, const int length)
 	else if (start > max)
 	{
 		var_str = "";
-		var_typ = VARTYP_INTSTR;
-		var_int = 0;
 		return *this;
 	}
 	int stop = start + length;
@@ -1818,7 +1821,6 @@ var& var::substrer(const int startindex1, const int length)
 
 	// TODO use erase for speed instead of copying whole string
 	var_str = var_str.substr(start - 1, stop - start);
-	var_typ = VARTYP_STR;
 
 	return *this;
 }

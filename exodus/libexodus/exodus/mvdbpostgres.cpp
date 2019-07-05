@@ -843,6 +843,9 @@ bool var::read(const var& filehandle, const var& key)
 	ISSTRING(filehandle)
 	ISSTRING(key)
 
+	//amending var_str invalidates all flags
+	var_typ = VARTYP_STR;
+
 	// asking to read DOS file! do osread using key as osfilename!
 	if (filehandle == "DOS")
 	{
@@ -876,7 +879,7 @@ bool var::read(const var& filehandle, const var& key)
 		if (!ok)
 			return "";
 
-		(*this) = "";
+		var_str = "";
 		var keyn;
 		int ntuples = PQntuples(pgresult);
 		for (int tuplen = 0; tuplen < ntuples; tuplen++)
@@ -1609,7 +1612,7 @@ void var::clearcache() const
 
 	int connid = this->getconnectionid_ordefault();
 	if (!connid)
-		throw MVDBException("getconnectionid() failed");
+		throw MVDBException("getconnectionid() failed in clearcache");
 	mv_connections_cache.clearrecordcache(connid);
 	return;
 }
