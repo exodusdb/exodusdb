@@ -117,60 +117,14 @@ COST 10;
 	var trimsql=R"(return regexp_replace(regexp_replace(data, '^\s+|\s+$', '', 'g'),'\s{2,}',' ','g');)";
 	do_sql("exodus_trim(data text)",trimsql,sqltemplate);
 
+	//exodus_field_replace
+	do_sql("exodus_field_replace(data text, sep text, fieldno int, replacement text)",field_replace_sql,sqltemplate);
+
 	//exodus_field_remove
-	var removesql=
-R"V0G0N(
-DECLARE
- charn int;
- nchars int;
- currfieldn int;
- ans text;
+	do_sql("exodus_field_remove(data text, sep text, fieldno int)",field_remove_sql,sqltemplate);
 
-BEGIN
-
- if fieldno<=0 then
-  if fieldno=0 then
-   return '';
-  end if;
-  return data;
- end if;
-
- ans := '';
- currfieldn :=1;
- nchars := length(data);
- for charn in 1..nchars loop
-
-  if substr(data,charn,1) = sep then
-
-   currfieldn=currfieldn+1;
-
-   if currfieldn=fieldno then
-    ans := substr(data,1,charn-1);
-
-   elseif currfieldn>fieldno then
-    if ans<>'' then
-     ans := ans || sep || substr(data,charn+1);
-    else
-     ans := substr(data,charn+1);
-    end if;
-    return ans;
-   end if;
-
-  end if;
-
- end loop;
-
- -- deleting beyond the number of existing fields
- if currfieldn<fieldno then
-  return data;
-  end if;
-
- return ans;
-
-END;
-)V0G0N";
-
-	do_sql("exodus_field_remove(data text, sep text, fieldno int)",removesql,sqltemplate);
+	//exodus_split
+	do_sql("exodus_split(data text)",split_sql,sqltemplate);
 
 	return 0;
 }
@@ -390,6 +344,183 @@ $sqlcode
 	//set the function name
 	do_sql(dictfilename^"_"^dictid^"(key text, data text)",sql,sqltemplate);
 
-}
+}//onedictid
+
+//exodus_field_remove
+var field_remove_sql=
+R"V0G0N(
+DECLARE
+ charn int;
+ nchars int;
+ currfieldn int;
+ ans text;
+
+BEGIN
+
+ -- SIMILAR CODE IN FIELD_REMOVE AND FIELD_REPLACE
+
+ if fieldno<=0 then
+  if fieldno=0 then
+   return '';
+  end if;
+  return data;
+ end if;
+
+ ans := '';
+ currfieldn :=1;
+ nchars := length(data);
+ for charn in 1..nchars loop
+
+  continue when substr(data,charn,1) <> sep;
+
+  --if substr(data,charn,1) = sep then
+
+   currfieldn=currfieldn+1;
+
+  if currfieldn=fieldno then
+   ans := substr(data,1,charn-1);
+
+  elseif currfieldn>fieldno then
+   if ans<>'' then
+    ans := ans || sep || substr(data,charn+1);
+   else
+    ans := substr(data,charn+1);
+   end if;
+   return ans;
+  end if;
+
+  --end if;
+
+ end loop;
+
+ -- deleting beyond the number of existing fields
+ if currfieldn<fieldno then
+  return data;
+  end if;
+
+ return ans;
+
+END;
+)V0G0N";
+
+//exodus_field_replace
+var field_replace_sql=
+R"V0G0N(
+DECLARE
+ charn int;
+ nchars int;
+ currfieldn int;
+ ans text;
+
+BEGIN
+
+ -- SIMILAR CODE IN FIELD_REMOVE AND FIELD_REPLACE
+
+ if fieldno<=0 then
+  if fieldno=0 then
+   return replacement;
+  end if;
+  if data='' then
+   return replacement;
+  else
+   return data || sep || replacement;
+  end if;
+
+ end if;
+
+ ans := '';
+ currfieldn :=1;
+ nchars := length(data);
+ for charn in 1..nchars loop
+
+  continue when substr(data,charn,1) <> sep;
+  --if substr(data,charn,1) = sep then
+
+  currfieldn=currfieldn+1;
+
+  if currfieldn=fieldno then
+   ans := substr(data,1,charn-1);
+
+  elseif currfieldn>fieldno then
+   if ans<>'' then
+    ans := ans || sep || replacement || sep || substr(data,charn+1);
+   else
+    ans := replacement || sep || substr(data,charn+1);
+   end if;
+   return ans;
+  end if;
+
+  --end if;
+
+ end loop;
+
+ -- deleting beyond the number of existing fields
+ if currfieldn<fieldno then
+   if replacement<>'' then
+    data := data || repeat(sep,fieldno-currfieldn)|| replacement;
+   end if;
+  return data;
+  end if;
+
+ if replacement<>'' then
+  ans := ans || sep || replacement;
+  end if;
+
+ return ans;
+
+END;
+)V0G0N";
+
+//exodus_split
+var split_sql=
+R"V0G0N(
+DECLARE
+ inputx text;
+ temp text;
+ numlen int;
+ numx text;
+ unitx text;
+ nn int;
+ tt int;
+ char1 char(1);
+BEGIN
+   inputx:=data;
+   inputx:=translate(inputx,' ','');
+   temp:=inputx;
+   char1:=substring(temp,1,1);
+   if char1='-' then
+    temp=substring(temp,2);
+   end if;
+   temp:=translate(temp,'123456789.,','           ');
+
+   numlen=length(temp)-length(trim(leading from temp));
+   if char1='-' then
+    numlen := numlen+1;
+    end if;
+   numx:=substring(inputx,1,numlen);
+
+   if numx='-' then
+    numx:='';
+   end if;
+
+   -- unused (function arg output var)
+   unitx=substring(inputx,numlen+1,99);
+
+   -- convert to decimal format
+   -- remove all , '.' besides last
+   numx=translate(numx, ',' , '.');
+   nn=exodus_count(numx,'.');
+   for ii in 1..nn-1 loop
+    tt=strpos(numx,'.');
+    if tt<>0 then
+     numx:=substring(numx,1,tt-1) || substring(numx,tt+1);
+    end if;
+   end loop;
+
+   return numx || ' ' || unitx;
+
+END;
+
+)V0G0N";
 
 programexit()
