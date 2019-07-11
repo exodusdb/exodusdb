@@ -762,13 +762,21 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump utf8_allo4.txt -C
 		data.osbread(tempfile,offset2=2,2);
 		data.oconv("HEX").outputl("test reading from middle of utf8 byte sequence test=");
 		//assert(data.osbread(tempfile,offset2=3,2) eq "");
-stop();
+
 		//test reading in C/binary mode (not UTF8)
 		assert(osopen(tempfilename5,tempfile,"C"));
-		assert(data.osbread(tempfile,offset2=0,1) eq greek2[1]);
-		assert(data.osbread(tempfile,offset2=1,1) eq greek2[2]);
-		assert(data.osbread(tempfile,offset2=2,1) eq greek2[3]);
-		assert(data.osbread(tempfile,offset2=3,1) eq greek2[4]);
+		//assert(data.osbread(tempfile,offset2=0,1) eq greek2[1]);
+		//assert(data.osbread(tempfile,offset2=1,1) eq greek2[2]);
+		//assert(data.osbread(tempfile,offset2=2,1) eq greek2[3]);
+		//assert(data.osbread(tempfile,offset2=3,1) eq greek2[4]);
+		data.osbread(tempfile,offset2=0,1);
+		assert(data eq greek2[1]);
+		data.osbread(tempfile,offset2=1,1);
+		assert(data eq greek2[2]);
+		data.osbread(tempfile,offset2=2,1);
+		assert(data eq greek2[3]);
+		data.osbread(tempfile,offset2=3,1);
+		assert(data eq greek2[4]);
 
 		//verify utf-8 bytes
 		if (nbinarychars eq 256) {
@@ -1192,6 +1200,7 @@ stop();
 		assert(conn3.createfile(table3));
 		assert(not table2.open(table2,conn3));
 		assert(not table3.open(table3,conn2));
+
 		assert(table2.open(table2,conn2));
 		assert(table3.open(table3,conn3));
 		assert(write( "2.1111", table2, "2.111"));
@@ -1200,6 +1209,11 @@ stop();
 		assert(write( "3.2222", table3, "3.222"));
 		assert(write( "2.3333", table2, "2.333"));
 		assert(write( "3.3333", table3, "3.333"));
+
+		var tt;
+		assert(! read( tt, table3, "2.111"));
+		assert(! read( tt, table2, "3.111"));
+
 		assert(conn2.disconnect());
 		assert(conn3.disconnect());
 	}

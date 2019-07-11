@@ -190,10 +190,6 @@ var var::field(const var& substrx, const int fieldnx, const int nfieldsx) const
 var var::fieldstore(const var& sepchar, const int fieldnx, const int nfieldsx,
 		    const var& replacementx) const&
 {
-	THISIS("var var::fieldstore(const var& sepchar,const int fieldnx,const int nfieldsx, const "
-	       "var& replacementx) const")
-	THISISDEFINED()
-
 	var newmv = *this;
 	return newmv.fieldstorer(sepchar, fieldnx, nfieldsx, replacementx);
 }
@@ -211,11 +207,8 @@ var& var::fieldstorer(const var& sepchar0, const int fieldnx, const int nfieldsx
 {
 	THISIS("var& var::fieldstorer(const var& sepchar0,const int fieldnx,const int nfieldsx, "
 	       "const var& replacementx)")
-	THISISSTRING()
+	THISISSTRINGMUTATOR()
 	ISSTRING(sepchar0)
-
-	//changes to var_str invalidate all flags
-	var_typ = VARTYP_STR;
 
 	std::string sepchar = sepchar0.var_str;
 	if (sepchar == "")
@@ -380,6 +373,7 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 		//}
 		// nextstart_pos++;
 		// past end of field?
+		int comp;
 		if (nextstart_pos >= end_pos)
 		{
 			nextstart_pos = end_pos;
@@ -398,11 +392,14 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 
 			// AL Ascending Left Justified
 			case '\x01':
-				if (var_str.substr(start_pos, nextstart_pos - start_pos) >= target)
+				//if (var_str.substr(start_pos, nextstart_pos - start_pos) >= target)
+				comp=var::localeAwareCompare(var_str.substr(start_pos, nextstart_pos - start_pos),target);
+				if (comp==1)
 				{
 					setting = valuen2;
-					if (var_str.substr(start_pos, nextstart_pos - start_pos) ==
-					    target)
+					//if (var_str.substr(start_pos, nextstart_pos - start_pos) ==
+					//    target)
+					if (comp==0)
 						return true;
 					else
 						// arev error strangeness? empty is not greater than
@@ -492,10 +489,13 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 			//it is regardless of order even ""? 				if
 			// (!targetlen&&nextstart_pos==start_pos) break;
 
-			if (var_str.substr(start_pos, nextstart_pos - start_pos) >= target)
+			//if (var_str.substr(start_pos, nextstart_pos - start_pos) >= target)
+			comp=var::localeAwareCompare(var_str.substr(start_pos, nextstart_pos - start_pos),target);
+			if (comp==1)
 			{
 				setting = valuen2;
-				if (var_str.substr(start_pos, nextstart_pos - start_pos) == target)
+				//if (var_str.substr(start_pos, nextstart_pos - start_pos) == target)
+				if (comp==0)
 					return true;
 				else
 					return false;
@@ -796,10 +796,6 @@ bool var::locate(const var& target) const
 bool var::locateby(const var& ordercode, const var& target, var& setting, const int fieldno,
 		   const int valueno /*=0*/) const
 {
-	THISIS("bool var::locateby(const var& ordercode, const var& target, var& setting, const "
-	       "int fieldno, const int valueno/*=0*/)const")
-	ISSTRING(ordercode)
-
 	return locateby(ordercode.toString().c_str(), target, setting, fieldno, valueno);
 }
 
@@ -807,9 +803,6 @@ bool var::locateby(const var& ordercode, const var& target, var& setting, const 
 // this version caters for the rare syntax where the order is given as a variable
 bool var::locateby(const var& ordercode, const var& target, var& setting) const
 {
-	THISIS("bool var::locateby(const var& ordercode, const var& target, var& setting) const")
-	ISSTRING(ordercode)
-
 	return locateby(ordercode.toString().c_str(), target, setting);
 }
 
@@ -952,15 +945,6 @@ var var::operator()(int fieldno, int valueno, int subvalueno) const
 	return a(fieldno, valueno, subvalueno);
 }
 
-/*
-var& var::operator()(int fieldno, int valueno, int subvalueno)
-{
-	std::cout << "var&" << std::endl;
-	//return extract(fieldno, valueno, subvalueno);
-	return (*this);
-}
-*/
-
 var var::extract(const int argfieldn, const int argvaluen, const int argsubvaluen) const
 {
 	return a(argfieldn, argvaluen, argsubvaluen);
@@ -1088,11 +1072,7 @@ var var::a(const int argfieldn, const int argvaluen, const int argsubvaluen) con
 // var var::erase(const int fieldno,const int valueno,const int subvalueno) const
 var var::remove(const int fieldno, const int valueno, const int subvalueno) const
 {
-	THISIS("var var::remove(const int fieldno,const int valueno,const int subvalueno) const")
-	THISISSTRING()
-
 	var newmv = *this;
-	// return newmv.eraser(fieldno,valueno,subvalueno);
 	return newmv.remover(fieldno, valueno, subvalueno);
 }
 
@@ -1100,10 +1080,7 @@ var var::remove(const int fieldno, const int valueno, const int subvalueno) cons
 var& var::remover(int fieldno, int valueno, int subvalueno)
 {
 	THISIS("var& var::remover(int fieldno,int valueno,int subvalueno)")
-	THISISSTRING()
-
-	//changes to var_str invalidate all flags
-	var_typ = VARTYP_STR;
+	THISISSTRINGMUTATOR()
 
 	// return "" if replacing 0,0,0
 	if (fieldno == 0 && valueno == 0 && subvalueno == 0)
@@ -1250,54 +1227,34 @@ var& var::remover(int fieldno, int valueno, int subvalueno)
 var var::pickreplace(const int fieldno, const int valueno, const int subvalueno,
 		     const var& replacement) const
 {
-	THISIS("var var::pickreplace(const int fieldno,const int valueno,const int "
-	       "subvalueno,const var& replacement) const")
-	THISISSTRING()
-
 	return var(*this).r(fieldno, valueno, subvalueno, replacement);
 }
 
 var var::pickreplace(const int fieldno, const int valueno, const var& replacement) const
 {
-	THISIS("var var::pickreplace(const int fieldno,const int valueno,const var& replacement) "
-	       "const")
-	THISISSTRING()
-
 	return var(*this).r(fieldno, valueno, 0, replacement);
 }
 
 var var::pickreplace(const int fieldno, const var& replacement) const
 {
-	THISIS("var var::pickreplace(const int fieldno,const var& replacement) const")
-	THISISSTRING()
-
 	return var(*this).r(fieldno, 0, 0, replacement);
 }
 
 var& var::r(const int fieldno, const int valueno, const var& replacement)
 {
-	THISIS("var var::r(const int fieldno,const int valueno,const var& replacement")
-	THISISSTRING()
-
 	return r(fieldno, valueno, 0, replacement);
 }
 
 var& var::r(const int fieldno, const var& replacement)
 {
-	THISIS("var var::r(const int fieldno,const var& replacement)")
-	THISISSTRING()
-
 	return r(fieldno, 0, 0, replacement);
 }
 
 var& var::r(int fieldno, int valueno, int subvalueno, const var& replacement)
 {
 	THISIS("var& var::r(int fieldno,int valueno,int subvalueno,const var& replacement)")
-	THISISSTRING()
+	THISISSTRINGMUTATOR()
 	ISSTRING(replacement)
-
-	//changes to var_str invalidate all flags
-	var_typ = VARTYP_STR;
 
 	// return whole thing if replace 0,0,0
 	if (fieldno == 0 && valueno == 0 && subvalueno == 0)
@@ -1305,7 +1262,6 @@ var& var::r(int fieldno, int valueno, int subvalueno, const var& replacement)
 		// functionmode return var(replacement);
 		// proceduremode
 		var_str = replacement.var_str;
-		//var_typ = VARTYP_STR;
 		return *this;
 	}
 
@@ -1462,10 +1418,6 @@ var& var::r(int fieldno, int valueno, int subvalueno, const var& replacement)
 var var::insert(const int fieldno, const int valueno, const int subvalueno,
 		const var& insertion) const&
 {
-	THISIS("var var::insert(const int fieldno,const int valueno,const int subvalueno,const "
-	       "var& insertion) const")
-	THISISSTRING()
-
 	var newmv = var(*this).inserter(fieldno, valueno, subvalueno, insertion);
 	return newmv;
 }
@@ -1518,11 +1470,8 @@ var& var::inserter(const int fieldno, const int valueno, const int subvalueno, c
 {
 	THISIS("var& var::inserter(const int fieldno,const int valueno,const int subvalueno,const "
 	       "var& insertion)")
-	THISISSTRING()
+	THISISSTRINGMUTATOR()
 	ISSTRING(insertion)
-
-	//changes to var_str invalidate all flags
-	var_typ = VARTYP_STR;
 
 	// 0,0,0 is like 1,0,0
 	if (fieldno == 0 && valueno == 0 && subvalueno == 0)
@@ -1694,15 +1643,12 @@ var& var::inserter(const int fieldno, const int valueno, const int subvalueno, c
 	return *this;
 }
 
-////////
+/////////
 // SUBSTR
-////////
+/////////
 
 var var::substr(const int startindex1) const&
 {
-	THISIS("var var::substr(const int startindex1) const")
-	THISISSTRING()
-
 	return var(*this).substrer(startindex1);
 }
 
@@ -1716,9 +1662,6 @@ var& var::substr(const int startindex1) &&
 // var.s(start,length) substring
 var var::substr(const int startindex1, const int length) const&
 {
-	THISIS("var var::substr(const int startindex1,const int length) const")
-	THISISSTRING()
-
 	return var(*this).substrer(startindex1, length);
 }
 
@@ -1731,9 +1674,6 @@ var& var::substr(const int startindex1, const int length) &&
 // in-place
 var& var::substrer(const int startindex1)
 {
-	THISIS("var& var::substrer(const int startindex1) const")
-	THISISSTRING()
-
 	// TODO look at using erase to speed up
 	return substrer(startindex1, (int)var_str.length());
 }
@@ -1742,11 +1682,8 @@ var& var::substrer(const int startindex1)
 // var.s(start,length) substring
 var& var::substrer(const int startindex1, const int length)
 {
-	THISIS("var& var::substrer(const int startindex1,const int length) const")
-	THISISSTRING()
-
-	//changes to var_str invalidate all flags
-	var_typ = VARTYP_STR;
+	THISIS("var& var::substrer(const int startindex1,const int length)")
+	THISISSTRINGMUTATOR()
 
 	// return "" for ""
 	int max = (int)var_str.length();

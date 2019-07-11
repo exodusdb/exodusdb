@@ -146,9 +146,7 @@ var::var(const char* cstr1)
     : var_str(cstr1),
       var_typ(VARTYP_STR)
 {
-
-	// not a pointer anymore for speed
-	// priv=new pimpl;
+	//std::cout << "ctor char* :" <<var_str << std::endl;
 
 	// protect against null pointer
 	// probably already crashed from var_str initialiser above
@@ -157,11 +155,6 @@ var::var(const char* cstr1)
 		// THISIS("var::var(const char* cstr1)")
 		throw MVInvalidPointer("Null pointer in var(const char*)");
 	}
-
-	//std::cout << "ctor char* :" <<var_str << std::endl;
-
-	// var_str=cstr1;
-	// var_typ=VARTYP_STR;
 }
 
 // constructor for std::string

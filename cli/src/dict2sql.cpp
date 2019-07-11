@@ -99,7 +99,7 @@ function main() {
 R"V0G0N(
 CREATE OR REPLACE FUNCTION
 $functionname_and_args
-RETURNS text
+RETURNS $return_type
 AS
 $$
 BEGIN
@@ -115,27 +115,32 @@ COST 10;
 
 	//exodus_trim
 	var trimsql=R"(return regexp_replace(regexp_replace(data, '^\s+|\s+$', '', 'g'),'\s{2,}',' ','g');)";
-	do_sql("exodus_trim(data text)",trimsql,sqltemplate);
+	do_sql("exodus_trim(data text)","text",trimsql,sqltemplate);
 
 	//exodus_field_replace
-	do_sql("exodus_field_replace(data text, sep text, fieldno int, replacement text)",field_replace_sql,sqltemplate);
+	do_sql("exodus_field_replace(data text, sep text, fieldno int, replacement text)","text",field_replace_sql,sqltemplate);
 
 	//exodus_field_remove
-	do_sql("exodus_field_remove(data text, sep text, fieldno int)",field_remove_sql,sqltemplate);
+	do_sql("exodus_field_remove(data text, sep text, fieldno int)","text",field_remove_sql,sqltemplate);
 
 	//exodus_split
-	do_sql("exodus_split(data text)",split_sql,sqltemplate);
+	do_sql("exodus_split(data text)","text",split_sql,sqltemplate);
+
+	//exodus_unique
+	//https://github.com/JDBurnZ/postgresql-anyarray/blob/master/stable/anyarray_uniq.sql
+	do_sql("exodus_unique(mvstring text, sepchar text)","text",unique_sql,sqltemplate);
 
 	return 0;
 }
 
-subroutine do_sql(in functionname_and_args, in sql, in sqltemplate) {
+subroutine do_sql(in functionname_and_args, in returntype, in sql, in sqltemplate) {
 
 	functionname_and_args.outputl();
 
 	var functionsql=sqltemplate;
 
 	functionsql.swapper("$functionname_and_args",functionname_and_args);
+	functionsql.swapper("$return_type",returntype);
 
 	functionsql.swapper("$sqlcode",sql);
 
@@ -290,9 +295,11 @@ $RETVAR :=
 			if (source_key_expr.isnum())
 				source_key_expr="split_part($2,chr(30),"^source_key_expr^")";
 
-			//target file field number or expression
-			var target_expr=line.field(" ",6);
-			if (target_expr.isnum())
+			//target file field number or expression (omit optional ; on the end)
+			var target_expr=line.field(" ",6).field(";",1);
+			if (target_expr==0)
+				target_expr=target_filename^".data";
+			else if (target_expr.isnum())
 				target_expr="split_part("^target_filename^".data,chr(30),"^target_expr^")";
 
 			//line=targetvariablename^" := ";
@@ -317,6 +324,14 @@ $RETVAR :=
 		}
 	}
 
+	sql.replacer("\\bRM\\b","chr(31)");
+	sql.replacer("\\bFM\\b","chr(30)");
+	sql.replacer("\\bVM\\b","chr(29)");
+	sql.replacer("\\bSM\\b","chr(28)");
+	sql.replacer("\\bSVM\\b","chr(28)");
+	sql.replacer("\\bTM\\b","chr(27)");
+	sql.replacer("\\bSTM\\b","chr(26)");
+
 	//convert to text
 	sql.trimmerf(VM).trimmerb(VM);
 	sql.converter(VM,"\n");
@@ -324,7 +339,7 @@ $RETVAR :=
 	var sqltemplate=
 R"V0G0N(CREATE OR REPLACE FUNCTION
  $functionname_and_args
- RETURNS text
+ RETURNS $return_type
  AS
  $$
   DECLARE
@@ -342,7 +357,7 @@ $sqlcode
  )V0G0N";
 
 	//set the function name
-	do_sql(dictfilename^"_"^dictid^"(key text, data text)",sql,sqltemplate);
+	do_sql(dictfilename^"_"^dictid^"(key text, data text)","text",sql,sqltemplate);
 
 }//onedictid
 
@@ -521,6 +536,42 @@ BEGIN
 
 END;
 
+)V0G0N";
+
+//exodus_unique
+var unique_sql=
+R"V0G0N(
+DECLARE
+	-- The variable used to track iteration over "with_array".
+	loop_offset integer;
+
+	with_array text[];
+
+	-- The array to be returned by this function.
+	return_array text[] := '{}';
+
+	value text;
+
+BEGIN
+	return 'x';
+	IF length(mvstring)=0 THEN
+		return '';
+	END IF;
+
+	with_array := string_to_array(mvstring,sepchar);
+
+	-- Iterate over each element in "concat_array".
+	FOR loop_offset IN ARRAY_LOWER(with_array, 1)..ARRAY_UPPER(with_array, 1) LOOP
+		value := with_array[loop_offset];
+		IF length(value)>0 THEN
+			IF not return_array @> array[value] THEN
+				return_array = ARRAY_APPEND(return_array, value);
+			END IF;
+		END IF;
+	END LOOP;
+
+RETURN array_to_string(return_array,'|','');
+END;
 )V0G0N";
 
 programexit()

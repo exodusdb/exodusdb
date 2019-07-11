@@ -1022,6 +1022,10 @@ class DLL_PUBLIC var
 	const char* data() const;
 	bool isnum() const;
 
+	//static member for speed on std strings
+	static int localeAwareCompare(const std::string& str1, const std::string& str2);
+	//int localeAwareCompare(const std::string& str2) const;
+
 	// STRING MUTATORS
 	//////////////////
 
@@ -1523,8 +1527,7 @@ class DLL_PUBLIC var
 	const std::string to_path_string() const;
 	const std::string to_cmd_string() const;
 
-	int localeAwareCompare(const std::string& str1, const std::string& str2) const;
-	var& localeAwareChangeCase(const int lowerupper);
+	//var& localeAwareChangeCase(const int lowerupper);
 
 	std::fstream* osopenx(const var& osfilename, const var& locale) const;
 

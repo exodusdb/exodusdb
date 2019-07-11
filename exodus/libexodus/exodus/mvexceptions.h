@@ -40,9 +40,13 @@ THE SOFTWARE.
 // be copied var undefinedassign=undefinedassign=11; risk it? to enable speed since copy constuction
 // is so frequent var xyz=xyz="xxx"; Unhandled exception at 0x0065892c in service.exe: 0xC0000005:
 // Access violation writing location 0xcccccccc. other words ccould be ISCONSTRUCTED or ISALIVE
+#ifndef EXO_NOCHECKDEFINED
 #define ISDEFINED(VARNAME)                                                                         \
 	if (VARNAME.var_typ & VARTYP_MASK)                                                         \
 		throw MVUndefined(var(#VARNAME) ^ " in " ^ var(functionname));
+#else
+#define ISDEFINED(VARNAME) {}
+#endif
 
 // includes isdefined
 #define ISASSIGNED(VARNAME)                                                                        \
@@ -81,6 +85,11 @@ THE SOFTWARE.
 	THISISDEFINED()                                                                            \
 	if (!this->var_typ)                                                                        \
 		throw MVUnassigned("var in " ^ var(functionname));
+
+// includes isdefined directly and checks assigned if not string
+#define THISISSTRINGMUTATOR()                                                                      \
+	THISISSTRING()                                                                             \
+	this->var_typ=VARTYP_STR;//reset all flags
 
 // includes isdefined directly and checks assigned if not string
 #define THISISSTRING()                                                                             \

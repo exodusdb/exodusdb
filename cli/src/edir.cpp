@@ -67,7 +67,10 @@ function main() {
         var temposfilename=filename^ "~" ^ key;
         var invalidfilechars="\"\'\u00A3$%^&*(){}[]:;#<>?,./\\|";
         temposfilename.lcaser().converter(invalidfilechars,str("-",len(invalidfilechars)));
-        temposfilename^=".tmp";
+        if (filename.substr(1,5)=="dict_" and fieldno)
+	        temposfilename^=".sql";
+        else
+        	temposfilename^=".tmp";
         oswrite(text,temposfilename);
 
         //record file update timedate

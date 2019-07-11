@@ -62,22 +62,34 @@ bool desynced_with_stdio = false;
 namespace exodus
 {
 
-int var::localeAwareCompare(const std::string& str1, const std::string& str2) const
+int var::localeAwareCompare(const std::string& str1, const std::string& str2)
 {
 	// https://www.boost.org/doc/libs/1_70_0/libs/locale/doc/html/collation.html
 	// eg ensure lower case sorts before uppercase (despite "A" \x41 is less than "a" \x61)
 	init_boost_locale1();
 
-// Primary – ignore accents and character case, comparing base letters only. For example "facade"
-// and "Façade" are the same. Secondary – ignore character case but consider accents. "facade" and
-// "façade" are different but "Façade" and "façade" are the same. Tertiary – consider both case and
-// accents: "Façade" and "façade" are different. Ignore punctuation. Quaternary – consider all case,
-// accents, and punctuation. The words must be identical in terms of Unicode representation.
-// Identical – as quaternary, but compare code points as well.
+        // Level
+        // 0 = primary – ignore accents and character case, comparing base letters only. For example "facade"
+        // and "Façade" are the same.
+        // 1 = secondary – ignore character case but consider accents. "facade" and
+        // "façade" are different but "Façade" and "façade" are the same.
+        // 3 = tertiary – consider both case and
+        // accents: "Façade" and "façade" are different. Ignore punctuation.
+        // 4 = quaternary – consider all case,
+        // accents, and punctuation. The words must be identical in terms of Unicode representation.
+        // 5 = identical – as quaternary, but compare code points as well.
+        //#define COMP_LEVEL identical
+
 #define COMP_LEVEL identical
 
-	return std::use_facet<boost::locale::collator<char>>(tls_boost_locale1)
+	int result=std::use_facet<boost::locale::collator<char>>(tls_boost_locale1)
 	    .compare(boost::locale::collator_base::COMP_LEVEL, str1, str2);
+
+	//var(str1).outputl("str1=");
+	//var(str2).outputl("str2=");
+	//var(result).outputl("comp=");
+
+	return result;
 }
 
 var var::version() const { return var(__DATE__).iconv("D").oconv("D") ^ " " ^ var(__TIME__); }
@@ -92,7 +104,9 @@ bool var::eof() const
 
 bool var::hasinput()
 {
+	//declare
 	bool haskey(void);
+
 	return haskey();
 }
 
@@ -105,6 +119,8 @@ bool var::input(const var& prompt, const int nchars)
 
 	// TODO implement nchars including -1
 
+	var_typ = VARTYP_STR;
+
 	if (prompt.length())
 	{
 		prompt.output();
@@ -115,7 +131,6 @@ bool var::input(const var& prompt, const int nchars)
 	{
 
 		var_str = "";
-		var_typ = VARTYP_STR;
 
 		while (true)
 		{
@@ -133,7 +148,6 @@ bool var::input(const var& prompt, const int nchars)
 	{
 
 		var_str = "";
-		var_typ = VARTYP_STR;
 
 		while (true)
 		{
@@ -622,7 +636,7 @@ var& var::trimf(const char* trimchar) &&
 var& var::trimmerf(const char* trimchar)
 {
 	THISIS("var& var::trimmerf(const char* trimchar)")
-	THISISSTRING()
+	THISISSTRINGMUTATOR()
 
 	std::string::size_type start_pos;
 	start_pos = var_str.find_first_not_of(trimchar);
@@ -635,9 +649,6 @@ var& var::trimmerf(const char* trimchar)
 
 	// return var(var_str.substr(start_pos));
 	var_str.erase(0, start_pos);
-
-	// clear numeric flags in case changed from/to numeric
-	var_typ &= VARTYP_NOTNUMFLAGS;
 
 	return *this;
 }
@@ -661,7 +672,7 @@ var& var::trimb(const char* trimchar) &&
 var& var::trimmerb(const char* trimchar)
 {
 	THISIS("var& var::trimmerb(const char* trimchar)")
-	THISISSTRING()
+	THISISSTRINGMUTATOR()
 
 	std::string::size_type end_pos;
 	end_pos = var_str.find_last_not_of(trimchar);
@@ -674,9 +685,6 @@ var& var::trimmerb(const char* trimchar)
 
 	// return var(var_str.substr(0,end_pos+1));
 	var_str.erase(end_pos + 1);
-
-	// clear numeric flags in case changed from/to numeric
-	var_typ &= VARTYP_NOTNUMFLAGS;
 
 	return *this;
 }
@@ -704,7 +712,7 @@ var& var::trimmer(const char* trimchar)
 	// http://www.boost.org/doc/libs/1_39_0/doc/html/string_algo/reference.html
 
 	THISIS("var& var::trimmer(const char* trimchar)")
-	THISISSTRING()
+	THISISSTRINGMUTATOR()
 
 	// find the first non blank
 	std::string::size_type start_pos;
@@ -728,10 +736,6 @@ var& var::trimmer(const char* trimchar)
 
 	// erase trailing spaces
 	var_str.erase(end_pos + 1);
-
-	// for speed and safety do this once, regardless of any trimming actually done
-	// clear numeric flags in case changed from/to numeric
-	var_typ &= VARTYP_NOTNUMFLAGS;
 
 	// find the starting position of any embedded spaces
 	start_pos = std::string::npos;
@@ -762,8 +766,6 @@ var& var::trimmer(const char* trimchar)
 // invert() - inverts lower 8 bits of UTF8 codepoints (not bytes)
 var var::invert() const&
 {
-	THISIS("var& var::invert()")
-	THISISSTRING()
 	var tt = *this;
 	tt.inverter();
 	return tt;
@@ -779,14 +781,11 @@ var& var::invert() &&
 var& var::inverter()
 {
 	THISIS("var& var::inverter()")
-	THISISSTRING()
+	THISISSTRINGMUTATOR()
 
 	// xor each unicode code point, with the bits we want to toggle ... ie the bottom 8
 	// since we will keep inversion within the same 256 byte pages of unicode codepoints
 	// TODO invert directly in the UTF8 bytes - requires some cleverness
-
-	// clear numeric flags in case changed from/to numeric
-	var_typ &= VARTYP_NOTNUMFLAGS;
 
 	// convert to char32.t string - four bytes per code point
 	std::u32string u32string1 = to_u32string();
@@ -819,14 +818,8 @@ var& var::ucase() &&
 var& var::ucaser()
 {
 	THISIS("var& var::ucaser()")
+	//THISISSTRINGMUTATOR()
 	THISISSTRING()
-
-	// changing case should not really require this
-	// var_typ=VARTYP_STR;
-
-	// cannot chaneg to/from numeric
-	// clear numeric flags in case changed from/to numeric
-	// var_typ&=VARTYP_NOTNUMFLAGS;
 
 	// optimise for ASCII
 	// try ASCII uppercase to start with for speed
@@ -877,11 +870,8 @@ var& var::lcase() &&
 var& var::lcaser()
 {
 	THISIS("var& var::lcaser()")
+	//THISISSTRINGMUTATOR()
 	THISISSTRING()
-
-	// cannot change to/from numeric
-	// clear numeric flags in case changed from/to numeric
-	// var_typ&=VARTYP_NOTNUMFLAGS;
 
 	// return localeAwareChangeCase(1);
 
@@ -923,6 +913,7 @@ var& var::tcase() &&
 var& var::tcaser()
 {
 	THISIS("var& var::tcaser()")
+	//THISISSTRINGMUTATOR()
 	THISISSTRING()
 
 	init_boost_locale1();
@@ -963,6 +954,7 @@ var& var::fcase() &&
 var& var::fcaser()
 {
 	THISIS("var& var::fcaser()")
+	//THISISSTRINGMUTATOR()
 	THISISSTRING()
 
 	init_boost_locale1();
@@ -1013,6 +1005,7 @@ var& var::normalize() &&
 var& var::normalizer()
 {
 	THISIS("var& var::normalizer()")
+	//THISISSTRINGMUTATOR()
 	THISISSTRING()
 
 	// optimise for ASCII which needs no normalisation
@@ -1059,7 +1052,7 @@ var var::unique() const
 		{
 			if (not(result.locateusing(sepchar, bit)))
 			{
-				if (delimiter)
+				//if (delimiter)
 					result ^= bit ^ sepchar;
 			}
 		}
@@ -1067,7 +1060,9 @@ var var::unique() const
 			break;
 	} // loop;
 	//result.splicer(-1, 1, "");
-	result.var_str.pop_back();
+	if (not result.var_str.empty())
+		result.var_str.pop_back();
+
 	return result;
 }
 
@@ -1133,9 +1128,6 @@ var var::textchr(const int utf_codepoint) const
 // quote() - wrap with double quotes
 var var::quote() const&
 {
-	THISIS("var var::quote() const")
-	THISISSTRING()
-
 	return var(*this).quoter();
 }
 
@@ -1149,10 +1141,7 @@ var& var::quote() &&
 var& var::quoter()
 {
 	THISIS("var& var::quoter()")
-	THISISSTRING()
-
-	// clear numeric flags in case changed from numeric
-	var_typ &= VARTYP_NOTNUMFLAGS;
+	THISISSTRINGMUTATOR()
 
 	// NB this is std::string "replace" not var field replace
 	var_str.replace(0, 0, "\"");
@@ -1163,9 +1152,6 @@ var& var::quoter()
 // squoter() - wrap with single quotes
 var var::squote() const&
 {
-	THISIS("var var::squote() const")
-	THISISSTRING()
-
 	return var(*this).squoter();
 }
 
@@ -1179,10 +1165,7 @@ var& var::squote() &&
 var& var::squoter()
 {
 	THISIS("var& var::squoter()")
-	THISISSTRING()
-
-	// clear numeric flags in case changed from numeric
-	var_typ &= VARTYP_NOTNUMFLAGS;
+	THISISSTRINGMUTATOR()
 
 	// NB this is std::string "replace" not var field replace
 	var_str.replace(0, 0, "'");
@@ -1193,9 +1176,6 @@ var& var::squoter()
 //unquote() - remove outer double or single quotes
 var var::unquote() const&
 {
-	THISIS("var var::unquote() const")
-	THISISSTRING()
-
 	return var(*this).unquoter();
 }
 
@@ -1209,10 +1189,7 @@ var& var::unquote() &&
 var& var::unquoter()
 {
 	THISIS("var& var::unquoter()")
-	THISISSTRING()
-
-	// clear numeric flags in case changed to numeric
-	var_typ &= VARTYP_NOTNUMFLAGS;
+	THISISSTRINGMUTATOR()
 
 	// removes MATCHING beginning and terminating " or ' characters
 	// also removes a SINGLE " or ' on the grounds that you probably want to eliminate all such
@@ -1244,9 +1221,6 @@ var& var::unquoter()
 //splice() remove/replace/insert part of a string with another string
 var var::splice(const int start1, const int length, const var& newstr) const&
 {
-	THISIS("var var::splice(const int start1,const int length,const var& newstr) const")
-	THISISSTRING()
-
 	return var(*this).splicer(start1, length, newstr);
 }
 
@@ -1259,9 +1233,6 @@ var& var::splice(const int start1, const int length, const var& newstr) &&
 // splice() remove/replace/insert part of a string (up to the end) with another string
 var var::splice(const int start1, const var& newstr) const&
 {
-	THISIS("var var::splice(const int start1,const var& newstr) const")
-	THISISSTRING()
-
 	return var(*this).splicer(start1, newstr);
 }
 
@@ -1275,12 +1246,8 @@ var& var::splice(const int start1, const var& newstr) &&
 var& var::splicer(const int start1, const int length, const var& newstr)
 {
 	THISIS("var& var::splicer(const int start1,const int length,const var& newstr)")
-	THISISSTRING()
+	THISISSTRINGMUTATOR()
 	ISSTRING(newstr)
-
-	// prepare a new var
-	// functionmode var newmv=var(var_str);
-	// proceduremode
 
 	// TODO make sure start and length work like REVELATION and HANDLE NEGATIVE LENGTH!
 
@@ -1316,9 +1283,6 @@ var& var::splicer(const int start1, const int length, const var& newstr)
 		}
 	}
 
-	// clear numeric flags in case changed from/to numeric
-	var_typ &= VARTYP_NOTNUMFLAGS;
-
 	if (start1b > var_str.length())
 		var_str += newstr.var_str;
 	else
@@ -1331,12 +1295,8 @@ var& var::splicer(const int start1, const int length, const var& newstr)
 var& var::splicer(const int start1, const var& newstr)
 {
 	THISIS("var& var::splicer(const int start1, const var& newstr)")
-	THISISSTRING()
+	THISISSTRINGMUTATOR()
 	ISSTRING(newstr)
-
-	// prepare a new var
-	// functionmode var newmv=var(var_str);
-	// proceduremode
 
 	// TODO make sure start and length work like REVELATION and HANDLE NEGATIVE LENGTH!
 	uint start1b;
@@ -1350,9 +1310,6 @@ var& var::splicer(const int start1, const var& newstr)
 	}
 	else
 		start1b = 1;
-
-	// clear numeric flags in case changed from/to numeric
-	var_typ &= VARTYP_NOTNUMFLAGS;
 
 	if (start1b > var_str.length())
 		var_str += newstr.var_str;
@@ -1459,9 +1416,6 @@ var var::space() const
 //crop() - remove superfluous FM, VM etc.
 var var::crop() const&
 {
-	THISIS("var var::crop() const")
-	THISISSTRING()
-
 	return var(*this).cropper();
 }
 
@@ -1475,7 +1429,7 @@ var& var::crop() &&
 var& var::cropper()
 {
 	THISIS("var& var::cropper()")
-	THISISSTRING()
+	THISISSTRINGMUTATOR()
 
 	std::string newstr = "";
 
@@ -1517,9 +1471,6 @@ var& var::cropper()
 		newstr.pop_back();
 	}
 
-	// clear numeric flags in case changed from/to numeric
-	var_typ &= VARTYP_NOTNUMFLAGS;
-
 	var_str = newstr;
 	// swap(var_str,newstr);
 
@@ -1529,9 +1480,6 @@ var& var::cropper()
 // lower() drops FM to VM, VM to SM etc.
 var var::lower() const&
 {
-	THISIS("var var::lower() const")
-	THISISSTRING()
-
 	return var(*this).lowerer();
 }
 
@@ -1557,9 +1505,6 @@ var& var::lowerer()
 // raise() lifts VM to FM, SM to VM etc.
 var var::raise() const&
 {
-	THISIS("var var::raise() const")
-	THISISSTRING()
-
 	return var(*this).raiser();
 }
 
@@ -1634,12 +1579,9 @@ template <class T> void converter_helper(T& var_str, const T& oldchars, const T&
 var& var::converter(const var& oldchars, const var& newchars)
 {
 	THISIS("var& var::converter(const var& oldchars,const var& newchars)")
-	THISISSTRING()
+	THISISSTRINGMUTATOR()
 	ISSTRING(oldchars)
 	ISSTRING(newchars)
-
-	// clear numeric flags in case changed from/to numeric
-	var_typ &= VARTYP_NOTNUMFLAGS;
 
 	// all ASCII -> bytewise conversion
 	if (is_ascii(oldchars.var_str) && is_ascii(newchars.var_str))
@@ -1664,46 +1606,6 @@ var& var::converter(const var& oldchars, const var& newchars)
 	}
 	return *this;
 }
-
-/*
-var& var::textconverter(const var& oldchars,const var& newchars)
-{
-	THISIS("var& var::converter(const var& oldchars,const var& newchars)")
-	THISISSTRING()
-	ISSTRING(oldchars)
-	ISSTRING(newchars)
-
-	std::string::size_type pos=std::string::npos;
-
-	//clear numeric flags in case changed from/to numeric
-	var_typ&=VARTYP_NOTNUMFLAGS;
-
-	while (true)
-	{
-		//locate (backwards) any of the from characters
-		//because we might be removing characters
-		pos=var_str.find_last_of(oldchars.var_str,pos);
-
-		if (pos==std::string::npos)
-			break;
-
-		//find which from character we have found
-		int fromcharn=int(oldchars.var_str.find(var_str[pos]));
-
-		if (fromcharn<int(newchars.var_str.length()))
-			var_str.replace(pos,1,newchars.var_str.substr(fromcharn,1));
-		else
-			var_str.erase(pos,1);
-
-		if (pos==0)
-			break;
-		pos--;
-	}
-
-	return *this;
-
-}
-*/
 
 // numeric is one of four regular expressions or zero length string
 //^$			zero length string
@@ -1901,14 +1803,14 @@ const var& var::output() const { return put(std::cout); }
 
 const var& var::outputl() const
 {
-	put(std::cout);
+	this->put(std::cout);
 	std::cout << std::endl;
 	return *this;
 }
 
 const var& var::outputt() const
 {
-	put(std::cout);
+	this->put(std::cout);
 	std::cout << '\t';
 	return *this;
 }
@@ -1916,13 +1818,13 @@ const var& var::outputt() const
 const var& var::output(const var& str) const
 {
 	str.put(std::cout);
-	return put(std::cout);
+	return this->put(std::cout);
 }
 
 const var& var::outputl(const var& str) const
 {
 	str.put(std::cout);
-	put(std::cout);
+	this->put(std::cout);
 	std::cout << std::endl;
 	return *this;
 }
@@ -1932,7 +1834,7 @@ const var& var::outputt(const var& str) const
 	std::cout << "\t";
 	str.put(std::cout);
 	std::cout << "\t";
-	put(std::cout);
+	this->put(std::cout);
 	return *this;
 }
 
@@ -1940,7 +1842,7 @@ const var& var::errput() const { return put(std::cerr); }
 
 const var& var::errputl() const
 {
-	put(std::cerr);
+	this->put(std::cerr);
 	std::cerr << std::endl;
 	return *this;
 }
@@ -1948,13 +1850,13 @@ const var& var::errputl() const
 const var& var::errput(const var& str) const
 {
 	str.put(std::cerr);
-	return put(std::cerr);
+	return this->put(std::cerr);
 }
 
 const var& var::errputl(const var& str) const
 {
 	str.put(std::cerr);
-	put(std::cerr);
+	this->put(std::cerr);
 	std::cerr << std::endl;
 	return *this;
 }
@@ -1963,14 +1865,14 @@ const var& var::errputl(const var& str) const
 // 3>xyz.log captures nothing on windows
 const var& var::logput() const
 {
-	put(std::clog);
+	this->put(std::clog);
 	std::clog.flush();
 	return *this;
 }
 
 const var& var::logputl() const
 {
-	put(std::clog);
+	this->put(std::clog);
 	std::clog << std::endl;
 	return *this;
 }
@@ -1978,13 +1880,13 @@ const var& var::logputl() const
 const var& var::logput(const var& str) const
 {
 	str.put(std::clog);
-	return put(std::clog);
+	return this->put(std::clog);
 }
 
 const var& var::logputl(const var& str) const
 {
 	str.put(std::clog);
-	put(std::clog);
+	this->put(std::clog);
 	std::clog << std::endl;
 	return *this;
 }

@@ -56,7 +56,7 @@ THE SOFTWARE.
 
 #ifndef DEBUG
 #define TRACING 1
-//# define TRACING 5
+//#define TRACING 5
 #else
 #define TRACING 2
 #endif
@@ -133,7 +133,7 @@ bool getdbtrace()
 #define DEBUG_LOG_SQL1                                                                             \
 	if (GETDBTRACE)                                                                            \
 	{                                                                                          \
-		sql.swap("$1", "'" ^ var(paramValues[0]).squote()).logputl("SQL1:");               \
+		sql.swap("$1", var(paramValues[0]).squote()).logputl("SQL1:");               \
 	}
 //#else
 //#define DEBUG_LOG_SQL
@@ -639,7 +639,7 @@ bool var::disconnect()
 	THISISDEFINED()
 
 #if TRACING >= 3
-	exodus::errputl("ERROR: mvdbpostgres disconnect() Closing connection");
+	var("ERROR: mvdbpostgres disconnect() Closing connection").errputl();
 #endif
 
 	int* default_connid = tss_pgconnids.get();
@@ -684,104 +684,102 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/)
 	ISSTRING(filename)
 
 	// asking to open DOS file! ok can osread/oswrite later!
-	if (filename != "DOS")
-	{
+	if (filename == "DOS")
+		return true;
 
-		std::string filename2 = filename.normalize().lcase().convert(".", "_").toString();
+	std::string filename2 = filename.a(1).normalize().lcase().convert(".", "_").toString();
 
 /*
-		//$ parameter array
-		const char* paramValues[1];
-		int paramLengths[1];
-		// int		paramFormats[1];
+	//$ parameter array
+	const char* paramValues[1];
+	int paramLengths[1];
+	// int		paramFormats[1];
 
-		// filename.outputl("filename=");
-		//$1=table_name
-		paramValues[0] = filename2.c_str();
-		paramLengths[0] = int(filename2.length());
-		// paramFormats[0] = 1;//binary
+	// filename.outputl("filename=");
+	//$1=table_name
+	paramValues[0] = filename2.c_str();
+	paramLengths[0] = int(filename2.length());
+	// paramFormats[0] = 1;//binary
 
-		// avoid any errors because ANY errors while a transaction is in progress cause
-		// failure of the whole transaction
-		// TODO should perhaps prepare pg parameters for repeated speed
-		var sql = "SELECT table_name FROM information_schema.tables WHERE "
-			  "table_schema='public' and table_name=$1";
+	// avoid any errors because ANY errors while a transaction is in progress cause
+	// failure of the whole transaction
+	// TODO should perhaps prepare pg parameters for repeated speed
+	var sql = "SELECT table_name FROM information_schema.tables WHERE "
+		  "table_schema='public' and table_name=$1";
 
-		PGconn* thread_pgconn = (PGconn*)connection.connection();
-		if (!thread_pgconn)
-		{
-			this->setlasterror("db connection not opened");
-			return false;
-		}
+	PGconn* thread_pgconn = (PGconn*)connection.connection();
+	if (!thread_pgconn)
+	{
+		this->setlasterror("db connection not opened");
+		return false;
+	}
 
-		DEBUG_LOG_SQL1
-		PGresult* pgresult = PQexecParams(thread_pgconn,
-						  // TODO: parameterise filename
-						  sql.toString().c_str(), 1, // one param
-						  NULL, // let the backend deduce param type
-						  paramValues, paramLengths,
-						  0,  // text arguments
-						  0); // text results
-		// paramFormats,
-		// 1);	  // ask for binary results
+	DEBUG_LOG_SQL1
+	PGresult* pgresult = PQexecParams(thread_pgconn,
+					  // TODO: parameterise filename
+					  sql.toString().c_str(), 1, // one param
+					  NULL, // let the backend deduce param type
+					  paramValues, paramLengths,
+					  0,  // text arguments
+					  0); // text results
+	// paramFormats,
+	// 1);	  // ask for binary results
 
-		Resultclearer clearer(pgresult);
+	Resultclearer clearer(pgresult);
 
-		if (PQresultStatus(pgresult) != PGRES_TUPLES_OK)
-		{
-			var errmsg = "ERROR: mvdbpostgres 1 open(" ^ filename.quote() ^
-				     ") failed\n" ^ var(PQerrorMessage(thread_pgconn));
-			//			PQclear(pgresult);
-			this->setlasterror(errmsg);
+	if (PQresultStatus(pgresult) != PGRES_TUPLES_OK)
+	{
+		var errmsg = "ERROR: mvdbpostgres 1 open(" ^ filename.quote() ^
+			     ") failed\n" ^ var(PQerrorMessage(thread_pgconn));
+		//			PQclear(pgresult);
+		this->setlasterror(errmsg);
 #if TRACING >= 1
-			var(errmsg).errputl();
+		var(errmsg).errputl();
 #endif
-			return false;
-		}
+		return false;
+	}
 
-		// file (table) doesnt exist
-		if (PQntuples(pgresult) < 1)
-		{
-			var errmsg = "ERROR: mvdbpostgres 2 open(" ^ filename.quote() ^
-				     ") table does not exist. failed\n" ^
-				     var(PQerrorMessage(thread_pgconn));
-			//			PQclear(pgresult);
-			this->setlasterror(errmsg);
-			return false;
-		}
+	// file (table) doesnt exist
+	if (PQntuples(pgresult) < 1)
+	{
+		var errmsg = "ERROR: mvdbpostgres 2 open(" ^ filename.quote() ^
+			     ") table does not exist. failed\n" ^
+			     var(PQerrorMessage(thread_pgconn));
+		//			PQclear(pgresult);
+		this->setlasterror(errmsg);
+		return false;
+	}
 
-		if (PQntuples(pgresult) > 1)
-		{
-			var errmsg =
-			    "ERROR: mvdbpostgres 3 open() SELECT returned more than one record";
-			//			PQclear(pgresult);
-			this->setlasterror(errmsg);
+	if (PQntuples(pgresult) > 1)
+	{
+		var errmsg =
+		    "ERROR: mvdbpostgres 3 open() SELECT returned more than one record";
+		//			PQclear(pgresult);
+		this->setlasterror(errmsg);
 #if TRACING >= 1
-			errmsg.errputl();
+		errmsg.errputl();
 #endif
-			return false;
-		}
+		return false;
+	}
 */
+// *
+	//check filename2 is a valid table or view etc.
+	var sql="select '" ^ filename2 ^ "'::regclass";
+	if (! connection.sqlexec(sql))
+	{
+		var errmsg = "ERROR: mvdbpostgres 2 open(" ^ filename.quote() ^
+			     ") table does not exist.";
+		this->setlasterror(errmsg);
+		return false;
+	}
+// */
+	this->setlasterror();
 
-		//check filename2 is a valid table or view etc.
-		var sql="select '" ^ filename2 ^ "'::regclass";
-		if (! this->sqlexec(sql))
-		{
-			var errmsg = "ERROR: mvdbpostgres 2 open(" ^ filename.quote() ^
-				     ") table does not exist.";
-			this->setlasterror(errmsg);
-			return false;
-		}
+	// save the filename and connection no
+	// memorise the current connection for this file var
+	(*this) = filename2 ^ FM ^ connection.getconnectionid();
 
-		this->setlasterror();
-
-		// save the filename and connection no
-		// memorise the current connection for this file var
-		(*this) = filename2 ^ FM ^ connection.getconnectionid();
-
-		// outputl("opened filehandle");
-
-	} // of not DOS
+	// outputl("opened filehandle");
 
 	return true;
 }
@@ -797,8 +795,6 @@ void var::close()
 
 bool var::readv(const var& filehandle, const var& key, const int fieldno)
 {
-	// THISIS("bool var::readv(const var& filehandle, const var& key, const int fieldno)")
-
 	if (!read(filehandle, key))
 		return false;
 
@@ -808,10 +804,7 @@ bool var::readv(const var& filehandle, const var& key, const int fieldno)
 
 bool var::reado(const var& filehandle, const var& key)
 {
-	// THISIS("bool var::reado(const var& filehandle, const var& key, const int fieldno)")
-
 	// check cache first, and return any cached record
-	// virtually identical code in read and write
 	int connid = filehandle.getconnectionid_ordefault();
 	if (!connid)
 		throw MVDBException("getconnectionid() failed");
@@ -820,7 +813,10 @@ bool var::reado(const var& filehandle, const var& key)
 	if (!cachedrecord.empty())
 	{
 		// key.outputl("cache read " ^ filehandle.a(1) ^ "=");
-		(*this) = cachedrecord;
+		//(*this) = cachedrecord;
+		var_str = cachedrecord;
+		var_typ = VARTYP_STR;
+
 		this->setlasterror();
 		return true;
 	}
@@ -829,8 +825,9 @@ bool var::reado(const var& filehandle, const var& key)
 	if (!read(filehandle, key))
 		return false;
 
-	// save in cache only when allowing read from cache
-	// so that ordinary reads dont cause caching for safety
+	// save in cache only when allowing read from cache ie only in reado
+	// and NOT in read() or write()
+	// so that ordinary reads dont cause caching - for safety
 	mv_connections_cache.writerecord(connid, filehandle.a(1).var_str, key.var_str, var_str);
 
 	return true;
@@ -2674,7 +2671,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 			word1 = getword(remaining, ucword);
 
 			// can negate before (and after) dictionary word
-			// eg WITH NO INVOICE_NO
+			// eg WITH NOT/NO INVOICE_NO or WITH INVOICE_NO NOT
 			if (ucword == "NOT" || ucword == "NO")
 			{
 				negative = !negative;
@@ -2710,6 +2707,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 			// word1=getword(remaining, true);
 			word1 = getword(remaining, ucword);
 
+			// can negate before (and after) dictionary word
+			// eg WITH NOT/NO INVOICE_NO or WITH INVOICE_NO NOT
 			if (ucword == "NOT" || ucword == "NO")
 			{
 				negative = !negative;
@@ -2717,6 +2716,9 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 				// remove NOT/NO and acquire any values
 				word1 = getword(remaining, ucword);
 			}
+
+			if (ucword=="@ID")
+				std::cout << "@ID";
 
 			// between x and y
 			/////////////////
@@ -2886,6 +2888,12 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 				word1.splicer(-1, 0, postfix);
 				word1.splicer(2, 0, prefix);
 
+				//only ops <> and != are supported when using the regular expression operator (starting/ending/containing)
+				if (op == "<>")
+					negative=!negative;
+				else if (op != "=" and op != "")
+					throw MVDBException("SELECT ... WITH " ^ op ^ " " ^ word1 ^ " is not supported. " ^ prefix.quote() ^ " " ^ postfix.quote());
+
 				// use regular expression operator
 				op = "~";
 				ucword = word1;
@@ -3016,10 +3024,23 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 
 			//if selecting a mv array then convert right hand side to array
 			//(can only handle = operator at the moment)
-			if (dictexpression_isarray && (op == "=" or op == "!="))
+			if (dictexpression_isarray && (op == "=" or op == "<>"))
 			{
-				op = "&&";//overlap
-				value = "'{" ^ value.convert("'","\"") ^ "}'";
+				if (op == "<>")
+				{
+					negative=!negative;
+					op = "=";
+				}
+
+				if (value == "''")
+				{
+					value = "'{}'";
+				}
+				else
+				{
+					op = "&&";//overlap
+					value = "'{" ^ value.convert("'","\"") ^ "}'";
+				}
 			}
 
 			//negate
@@ -3587,6 +3608,10 @@ bool var::hasnext() const
 
 		return true;
 	}
+
+	//TODO avoid this trip to the database somehow?
+	if (!this->cursorexists())
+		return false;
 
 	PGconn* pgconn = (PGconn*)this->connection();
 	if (pgconn == NULL)

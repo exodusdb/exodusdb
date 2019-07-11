@@ -432,7 +432,6 @@ function main()
 		var fileext=srcfilename.field2(".",-1).lcase();
 		if (src_extensions.locateusing(" ",fileext)) {
 			filebase=srcfilename.splice(-len(fileext)-1,"");
-
 			//skip non-compilable files
 		} else if (noncompilable_extensions.locateusing(" ",fileext)) {
 			//errputln(srcfilename^" "^fileext^" is not compilable");
@@ -468,10 +467,12 @@ function main()
 	                                break;
 	                        }
 	                }
+			var fileext=srcfilename.field2(".",-1).lcase();
+			filebase=srcfilename.splice(-len(fileext)-1,"");
 	        }
 		//get file text
 		if (verbose)
-			print("sourcefilename=");
+			printl("sourcefilename=",srcfilename);
 		else if (not silent)
 			printl(srcfilename);
 
@@ -597,6 +598,9 @@ function main()
 							++level;
 					}
 					funcargsdecl.substrer(1,charn-1);
+
+					//replace comment outs like /*arg1*/ with arg1
+					funcargsdecl.replacer("/" "\\*","").replacer("\\*" "/","");
 
 					//work out the function arguments without declaratives
 					//to be inserted in the calling brackets.

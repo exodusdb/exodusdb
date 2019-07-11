@@ -1,3 +1,3 @@
 #../add first so that recoded commons like ???.h are used in preference to arev generated versions
-export CPLUS_INCLUDE_PATH=../add:../sys:../gen:../fin:../agy:../job:../tim:../med:../test
+CPLUS_INCLUDE_PATH=../add:../sys:../gen:../fin:../agy:../job:../tim:../med:../test
 PATH=$PATH:~/bin

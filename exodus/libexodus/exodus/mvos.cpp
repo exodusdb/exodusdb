@@ -428,7 +428,7 @@ var& var::oconv_MR(const char* conversionchar)
 		return (*this);
 
 	// in case changes to/from numeric
-	var_typ &= VARTYP_NOTNUMFLAGS;
+	var_typ = VARTYP_STR;
 
 	// form of unicode specific regular expressions
 	// http://www.regular-expressions.info/unicode.html
@@ -877,12 +877,9 @@ var& var::swap(const var& what, const var& with) &&
 var& var::swapper(const var& what, const var& with)
 {
 	THISIS("var& var::swapper(const var& what, const var& with)")
-	THISISSTRING()
+	THISISSTRINGMUTATOR()
 	ISSTRING(what)
 	ISSTRING(with)
-
-	// in case changes to/from numeric
-	var_typ &= VARTYP_NOTNUMFLAGS;
 
 	// nothing to do if oldstr is ""
 	if (what.var_str.empty())
@@ -922,13 +919,10 @@ var& var::replacer(const var& regexstr, const var& replacementstr, const var& op
 {
 	THISIS("var& var::replacer(const var& regexstr, const var& replacementstr, const var& "
 	       "options)")
-	THISISSTRING()
+	THISISSTRINGMUTATOR()
 	ISSTRING(regexstr)
 	ISSTRING(replacementstr)
 	ISSTRING(options)
-
-	// in case changes to/from numeric
-	var_typ &= VARTYP_NOTNUMFLAGS;
 
 	// http://www.boost.org/doc/libs/1_38_0/libs/regex/doc/html/boost_regex/syntax/basic_syntax.html
 
@@ -1030,7 +1024,10 @@ bool var::ossetenv(const var& envvarname) const
 #endif
 }
 
-var var::suspend() const { return this->osshell(); }
+var var::suspend() const
+{
+	return this->osshell();
+}
 
 var var::osshell() const
 {
@@ -1104,9 +1101,6 @@ var var::osshellwrite(const var& writestr) const
 
 void var::osflush() const
 {
-	// THISIS("void var::osflush() const")
-
-	// std::cout<<"var::osflush ignored - not implemented yet"<<std::endl;
 	return;
 }
 
@@ -1254,10 +1248,7 @@ WINDOWS-1258
 
 bool var::osread(const var& osfilename, const var& codepage)
 {
-	THISIS("bool var::osread(const var& osfilename, const var& codepage="
-	       ")")
-	// will be checked by nested osread
-	// THISISDEFINED()
+	THISIS("bool var::osread(const var& osfilename, const var& codepage")
 	ISSTRING(osfilename)
 	return osread(osfilename.to_path_string().c_str(), codepage);
 }
@@ -1265,8 +1256,7 @@ bool var::osread(const var& osfilename, const var& codepage)
 bool var::osread(const char* osfilename, const var& codepage)
 {
 
-	THISIS("bool var::osread(const var& osfilename, const var& codepage="
-	       ")")
+	THISIS("bool var::osread(const char* osfilename, const var& codepage")
 	THISISDEFINED()
 
 	// osread returns empty string in any case
