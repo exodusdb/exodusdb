@@ -205,6 +205,43 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 	var sourcecode=dictrec.a(8);
 	var ismv=dictrec.a(4)[1]=="M";
 
+	//auto generate pgsql code for ..._XREF dict records (full text)
+	if (sourcecode.substr(1,11)=="CALL XREF({") {
+
+		//remove any existing pgsql
+		var pos=index(sourcecode,"/" "*pgsql");
+		if (pos)
+			sourcecode=sourcecode.substr(1,pos-1);
+
+		var fulltext_dictid=field(field(sourcecode,"{",2),"}",1);
+
+		//replace all punctuation and delimiters with spaces
+		var chars=field(sourcecode.trim("\\"),"\\",2);
+		chars.swapper("FF","");
+		chars.swapper("FE","");
+		chars.swapper("FD","");
+		chars.swapper("FC","");
+		chars.swapper("FB","");
+		chars.swapper("FA","");
+		chars="\\\\035\\036" ^ iconv(chars,"HEX");
+		chars.swapper("'","''");
+		chars^="\\\\032";//STM
+		chars^="\\\\033";//TM
+		chars^="\\\\034";//SVM
+		chars^="\\\\037";//RM
+		sourcecode.r(1,-1,"/" "*pgsql");
+		sourcecode.r(1,-1,"ans:=translate(" ^
+			dictfilename.convert(".","_")^"_"^fulltext_dictid^"(key,data)"^
+			",'"^chars^"'" ^ ",repeat(' ',"^
+		(len(chars)+20)^"));");
+		sourcecode.r(1,-1,"*" "/");
+		dictrec.r(8,sourcecode);
+
+		//write the sql to the dictionary record so the availablily of pgsql is visible to var::selectx
+		dictrec.write(dictfile,dictid);
+
+            	}
+
 	//remove anything before sql code
 	var pos=index(sourcecode,"/" "*pgsql");
 	if (!pos) {
@@ -553,7 +590,6 @@ DECLARE
 	value text;
 
 BEGIN
-	return 'x';
 	IF length(mvstring)=0 THEN
 		return '';
 	END IF;
@@ -570,7 +606,7 @@ BEGIN
 		END IF;
 	END LOOP;
 
-RETURN array_to_string(return_array,'|','');
+RETURN array_to_string(return_array,sepchar,'');
 END;
 )V0G0N";
 

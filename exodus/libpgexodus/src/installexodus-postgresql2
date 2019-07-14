@@ -54,5 +54,13 @@ CREATE OR REPLACE FUNCTION exodus_extract_number(text, int4, int4, int4) RETURNS
 CREATE OR REPLACE FUNCTION exodus_count(text, text) RETURNS integer AS 'pgexodus', 'exodus_count' LANGUAGE C IMMUTABLE STRICT;
 -- CREATE OR REPLACE FUNCTION exodus_extract_bytea(text, int4, int4, int4) RETURNS bytea AS 'pgexodus', 'exodus_extract_bytea' LANGUAGE C IMMUTABLE;
 -- CREATE OR REPLACE FUNCTION exodus_call(text, text, text, text, text, int4, int4) RETURNS text AS 'pgexodus', 'exodus_call' LANGUAGE C IMMUTABLE;
+ALTER FUNCTION public.exodus_count(text, text) OWNER TO exodus;
+ALTER FUNCTION public.exodus_extract_date(text, integer, integer, integer) OWNER TO exodus;
+ALTER FUNCTION public.exodus_extract_datetime(text, integer, integer, integer) OWNER TO exodus;
+ALTER FUNCTION public.exodus_extract_number(text, integer, integer, integer) OWNER TO exodus;
+ALTER FUNCTION public.exodus_extract_sort(text, integer, integer, integer) OWNER TO exodus;
+ALTER FUNCTION public.exodus_extract_text(text, integer, integer, integer) OWNER TO exodus;
+ALTER FUNCTION public.exodus_extract_text2(text, integer, integer, integer) OWNER TO exodus;
+ALTER FUNCTION public.exodus_extract_time(text, integer, integer, integer) OWNER TO exodus;
 \q
 EOF2

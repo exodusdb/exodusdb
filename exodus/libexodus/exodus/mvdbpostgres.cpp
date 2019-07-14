@@ -2199,14 +2199,22 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 		return "";
 	}
 
+	if (fieldname.substr(-5).ucase() == "_XREF")
+	{
+		//sqlexpression = "to_tsvector('english'," ^ sqlexpression ^ ")";
+		//attempt to ensure numbers are indexed too
+		// but it prevents matching similar words
+		sqlexpression = "to_tsvector('simple'," ^ sqlexpression ^ ")";
+		//sqlexpression = "string_to_array(" ^ sqlexpression ^ ",chr(29),'')";
+
 	// unnest multivalued fields into multiple output rows
-	if (ismv1)
+	} else if (ismv1)
 	{
 
 		ismv = true;
 
 		// var from="string_to_array(" ^ sqlexpression ^ ",'" ^ VM ^ "'";
-		sqlexpression = "string_to_array(" ^ sqlexpression ^ ", chr(29)";
+		sqlexpression = "string_to_array(" ^ sqlexpression ^ ", chr(29),''";
 
 		// Note 3rd argument '' means convert empty multivalues to NULL in the array
 		// otherwise conversion to float will fail
@@ -2696,6 +2704,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 			var dictid = word1;
 
 			var dictexpression_isarray=dictexpression.index("string_to_array(");
+			var dictexpression_isxref=dictexpression.index("to_tsvector(");
 
 			// add the dictid expression
 			//if (dictexpression.index("exodus_call"))
@@ -2726,6 +2735,14 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 			if (ucword == "BETWEEN")
 			{
 
+				//prevent BETWEEN being used on multivalued and XREX fields
+				if (dictexpression_isarray || dictexpression_isxref)
+				{
+					throw MVDBException(
+					    sortselectclause ^
+					    "BETWEEN not currently supported for XREF");
+				}
+
 				// get and append first value
 				word1 = getword(remaining, ucword);
 
@@ -2742,6 +2759,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 				if (!valuechars.index(word1[1]) || !valuechars.index(word2[1]))
 				{
 					throw MVDBException(
+					    sortselectclause ^
 					    "BETWEEN must be followed by two values (from/to), but "
 					    "found 'BETWEEN " ^
 					    dictid ^ " " ^ word1 ^ " AND " ^ word2 ^ "'");
@@ -2852,6 +2870,14 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 				ucword=word1.ucase();
 			}
 
+			//select WITH ..._XREF uses postgres full text searching
+			//which has its own prefix and postfix rules. see below
+			if (dictexpression_isxref)
+			{
+				prefix=="";
+				postfix="";
+			}
+
 			/*implement using posix regular string matching
 			~ 	Matches regular expression, case sensitive 	'thomas' ~
 			'.*thomas.*'
@@ -2952,9 +2978,30 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 			// multiple values
 			if (value.index(FM))
 			{
-				value.swapper(FM_, ", ");
+				//in full text query on multiple words,
+				//we implement that words all are required
+				//all values and words separated by spaced are used as "word stems"
+				//NB ":*" means "ending in" to postgres tsquery. see:
+				//https://www.postgresql.org/docs/10/datatype-textsearch.html
+				//"lexemes in a tsquery can be labeled with * to specify prefix matching:"
+				if (dictexpression_isxref)
+				{
 
-				if (dictexpression_isarray)
+					//quoted values
+					value.swapper("'" _FM_ "'", ":*|");
+
+					//unquoted numbers
+					value.swapper(FM_, ":*&");
+
+				//ordinary query values
+				} else
+					value.swapper(FM_, ", ");
+
+				if (dictexpression_isxref)
+				{
+					//done below
+				}
+				else if (dictexpression_isarray)
 				{
 					//lhs is an array ("multivalues" in postgres)
 					//dont convert rhs to in() or any()
@@ -2973,6 +3020,21 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 				{
 					value = "ANY(ARRAY[" ^ value ^ "])";
 				}
+			}
+
+			//full text searching
+			if (dictexpression_isxref)
+			{
+				//see note on isxref in "multiple values" section above
+				op = "@@";
+
+				//use spaces to indicate search words
+				value.swapper(" ",":*&");
+
+				//last value needs postfix :* appending before closing quote
+				value.splicer(-1,0,":*");
+
+				value = "to_tsquery(" ^ value ^ ")";
 			}
 
 			// testing for "" may become testing for null
@@ -3939,7 +4001,7 @@ bool var::createindex(const var& fieldname, const var& dictfile) const
 
 	// create postgres index
 	sql = "CREATE INDEX index__" ^ filename ^ "__" ^ fieldname ^ " ON " ^ filename;
-	if (ismv)
+	if (ismv || fieldname.substr(-5) == "_xref")
 		sql ^= " USING GIN";
 	sql ^= " (";
 	sql ^= dictexpression;
