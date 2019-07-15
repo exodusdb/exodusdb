@@ -601,6 +601,7 @@ var& var::trimmerf(const var& trimchar)
 	return trimmerf(trimchar.var_str.c_str());
 }
 
+// trimb - trim backward trailing chars
 var var::trimb(const var& trimchar) const&
 {
 	THISIS("var var::trimb(const var& trimchar) const")
@@ -609,6 +610,13 @@ var var::trimb(const var& trimchar) const&
 	return trimb(trimchar.var_str.c_str());
 }
 
+// on temporary
+var& var::trimb(const var& trimchar) &&
+{
+	return this->trimmerb(trimchar);
+}
+
+//in place
 var& var::trimmerb(const var& trimchar)
 {
 	THISIS("var& var::trimmerb(const var& trimchar)")

@@ -2204,7 +2204,11 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 		//sqlexpression = "to_tsvector('english'," ^ sqlexpression ^ ")";
 		//attempt to ensure numbers are indexed too
 		// but it prevents matching similar words
-		sqlexpression = "to_tsvector('simple'," ^ sqlexpression ^ ")";
+		//use "english" dictionary for stemming (or "simple" dictionary for none)
+		// MUST use the SAME in both to_tsvector AND to_tsquery
+		//https://www.postgresql.org/docs/10/textsearch-dictionaries.html
+		//sqlexpression = "to_tsvector('simple'," ^ sqlexpression ^ ")";
+		sqlexpression = "to_tsvector('english'," ^ sqlexpression ^ ")";
 		//sqlexpression = "string_to_array(" ^ sqlexpression ^ ",chr(29),'')";
 
 	// unnest multivalued fields into multiple output rows
@@ -2874,7 +2878,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 			//which has its own prefix and postfix rules. see below
 			if (dictexpression_isxref)
 			{
-				prefix=="";
+				prefix="";
 				postfix="";
 			}
 
@@ -3031,10 +3035,15 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 				//use spaces to indicate search words
 				value.swapper(" ",":*&");
 
-				//last value needs postfix :* appending before closing quote
+				//append postfix :* to every search word
+				value.swapper("&",":*&");
 				value.splicer(-1,0,":*");
 
-				value = "to_tsquery(" ^ value ^ ")";
+				//use "english" dictionary for stemming (or "simple" dictionary for none)
+				// MUST use the SAME in both to_tsvector AND to_tsquery
+				//https://www.postgresql.org/docs/10/textsearch-dictionaries.html
+				//value = "to_tsquery('simple'," ^ value ^ ")";
+				value = "to_tsquery('english'," ^ value ^ ")";
 			}
 
 			// testing for "" may become testing for null
@@ -3188,6 +3197,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 		var temptablename="PRESELECT_TEMP_CURSOR_" ^ this->a(1);
 		var createtablesql = "DROP TABLE IF EXISTS " ^ temptablename ^ ";\n";
 		createtablesql ^= "CREATE TEMPORARY TABLE " ^ temptablename ^ "\n";
+		//createtablesql ^= "CREATE TABLE " ^ temptablename ^ "\n";
 		createtablesql ^= " (KEY TEXT)\n";
 		var errmsg;
 		if (! this->sqlexec(createtablesql,errmsg))
@@ -3751,7 +3761,13 @@ bool var::readnext(var& key, var& valueno)
 
 				// makelist provides one block of keys and nothing in the lists file
 				if (listid == "%MAKELIST%")
+				{
+					this->r(3,"");
+					this->r(4,"");
+					this->r(5,"");
+					this->r(6,"");
 					return false;
+				}
 
 				var lists = *this;
 				if (!lists.open("LISTS"))

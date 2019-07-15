@@ -290,10 +290,10 @@ class VARTYP
 	};
 
 	// logical comparison
-	bool operator==(const uint rhs) const { return flags_ == rhs; };
-	bool operator!=(const uint rhs) const { return flags_ != rhs; };
-	bool operator==(const VARTYP rhs) const { return flags_ == rhs.flags_; };
-	bool operator!=(const VARTYP rhs) const { return flags_ != rhs.flags_; };
+	ND bool operator==(const uint rhs) const { return flags_ == rhs; };
+	ND bool operator!=(const uint rhs) const { return flags_ != rhs; };
+	ND bool operator==(const VARTYP rhs) const { return flags_ == rhs.flags_; };
+	ND bool operator!=(const VARTYP rhs) const { return flags_ != rhs.flags_; };
 
 	// bitwise accessors
 	VARTYP operator&(const uint rhs) const { return uint(flags_ & rhs); };
@@ -390,7 +390,8 @@ inline const VARTYP VARTYP_NANSTR_DBCONN = VARTYP_NANSTR | VARTYP_DBCONN;
 #endif
 
 // class var
-class DLL_PUBLIC var
+//"final" to prevent inheritance because var has a destructor which is non-virtual to save space and time
+class DLL_PUBLIC var final
 {
 
       public:
@@ -419,10 +420,7 @@ class DLL_PUBLIC var
 	// move assigment
 	var& operator=(const var&& var1) noexcept;
 
-      public:
-	// destructor to (NOT VIRTUAL to save space since not expected to be a base class)
-	// protected to prevent deriving from var since wish to save space and not provide virtual
-	// destructor http://www.gotw.ca/publications/mill18.htm virtual ~var();
+	//WARNING: non-virtual destructor - so cannot create derived classes
 	~var();
 
 	// O
@@ -612,12 +610,13 @@ class DLL_PUBLIC var
 	//////////////
 
 	// extract a character first=1 last=-1 etc
+	var operator[](const int charno) const;
+
 	/* sadly this all works EXCEPT that var[99].anymethod doesnt work
 	so would have to implement all var methods on the proxy object
 	var_brackets_proxy operator[](int charno) const&;
 	var operator[](int charno) &&;
 	*/
-	var operator[](const int charno) const;
 
 	// UNARY OPERATORS
 	/////////////////
@@ -1160,7 +1159,7 @@ class DLL_PUBLIC var
 	// this is something like std::string::find_first_of but doesnt return the delimiter found
 	var substr(const int startindex, const var& delimiterchars, int& endindex) const;
 
-	// a weird one. was named "remove" in pick. notably used in nlist to print parallel columns
+	// v4 - like v3. was named "remove" in pick. notably used in nlist to print parallel columns
 	// of mixed combinations of multivalues/subvalues and text marks
 	// correctly lined up mv to mv, sv to sv, tm to tm even when particular columns were missing
 	// some vm/sm/tm
@@ -1540,65 +1539,65 @@ class DLL_PUBLIC var
 
 }; // of class "var"
 
-DLL_PUBLIC bool MVeq(const var& var1, const var& var2);
-DLL_PUBLIC bool MVlt(const var& var1, const var& var2);
+DLL_PUBLIC ND bool MVeq(const var& var1, const var& var2);
+DLL_PUBLIC ND bool MVlt(const var& var1, const var& var2);
 
-DLL_PUBLIC bool MVlt(const var& var1, const int int2);
-DLL_PUBLIC bool MVlt(const int int1, const var& var2);
+DLL_PUBLIC ND bool MVlt(const var& var1, const int int2);
+DLL_PUBLIC ND bool MVlt(const int int1, const var& var2);
 
 //== and !=
-DLL_PUBLIC bool operator==(const var& var1, const var& var2);
-DLL_PUBLIC bool operator==(const var& var1, const char* char2);
-DLL_PUBLIC bool operator==(const var& var1, const int int2);
-DLL_PUBLIC bool operator==(const var& var1, const double double2);
-DLL_PUBLIC bool operator==(const var& var1, const bool bool2);
-DLL_PUBLIC bool operator==(const char* char1, const var& var2);
-DLL_PUBLIC bool operator==(const int int1, const var& var2);
-DLL_PUBLIC bool operator==(const double double1, const var& var2);
-DLL_PUBLIC bool operator==(const bool bool1, const var& var2);
+DLL_PUBLIC ND bool operator==(const var& var1, const var& var2);
+DLL_PUBLIC ND bool operator==(const var& var1, const char* char2);
+DLL_PUBLIC ND bool operator==(const var& var1, const int int2);
+DLL_PUBLIC ND bool operator==(const var& var1, const double double2);
+DLL_PUBLIC ND bool operator==(const var& var1, const bool bool2);
+DLL_PUBLIC ND bool operator==(const char* char1, const var& var2);
+DLL_PUBLIC ND bool operator==(const int int1, const var& var2);
+DLL_PUBLIC ND bool operator==(const double double1, const var& var2);
+DLL_PUBLIC ND bool operator==(const bool bool1, const var& var2);
 
-DLL_PUBLIC bool operator!=(const var& var1, const var& var2);
-DLL_PUBLIC bool operator!=(const var& var1, const char* char2);
-DLL_PUBLIC bool operator!=(const var& var1, const int int2);
-DLL_PUBLIC bool operator!=(const var& var1, const double double2);
-DLL_PUBLIC bool operator!=(const var& var1, const bool bool2);
-DLL_PUBLIC bool operator!=(const char* char1, const var& var2);
-DLL_PUBLIC bool operator!=(const int int1, const var& var2);
-DLL_PUBLIC bool operator!=(const double double1, const var& var2);
-DLL_PUBLIC bool operator!=(const bool bool1, const var& var2);
+DLL_PUBLIC ND bool operator!=(const var& var1, const var& var2);
+DLL_PUBLIC ND bool operator!=(const var& var1, const char* char2);
+DLL_PUBLIC ND bool operator!=(const var& var1, const int int2);
+DLL_PUBLIC ND bool operator!=(const var& var1, const double double2);
+DLL_PUBLIC ND bool operator!=(const var& var1, const bool bool2);
+DLL_PUBLIC ND bool operator!=(const char* char1, const var& var2);
+DLL_PUBLIC ND bool operator!=(const int int1, const var& var2);
+DLL_PUBLIC ND bool operator!=(const double double1, const var& var2);
+DLL_PUBLIC ND bool operator!=(const bool bool1, const var& var2);
 
 //< <= > >=
-DLL_PUBLIC bool operator<(const var& var1, const var& var2);
-DLL_PUBLIC bool operator<(const var& var1, const char* char2);
-DLL_PUBLIC bool operator<(const var& var1, const int int2);
-DLL_PUBLIC bool operator<(const var& var1, const double double2);
-DLL_PUBLIC bool operator<(const char* char1, const var& var2);
-DLL_PUBLIC bool operator<(const int int1, const var& var2);
-DLL_PUBLIC bool operator<(const double double1, const var& var2);
+DLL_PUBLIC ND bool operator<(const var& var1, const var& var2);
+DLL_PUBLIC ND bool operator<(const var& var1, const char* char2);
+DLL_PUBLIC ND bool operator<(const var& var1, const int int2);
+DLL_PUBLIC ND bool operator<(const var& var1, const double double2);
+DLL_PUBLIC ND bool operator<(const char* char1, const var& var2);
+DLL_PUBLIC ND bool operator<(const int int1, const var& var2);
+DLL_PUBLIC ND bool operator<(const double double1, const var& var2);
 
-DLL_PUBLIC bool operator>=(const var& var1, const var& var2);
-DLL_PUBLIC bool operator>=(const var& var1, const char* char2);
-DLL_PUBLIC bool operator>=(const var& var1, const int int2);
-DLL_PUBLIC bool operator>=(const var& var1, const double double2);
-DLL_PUBLIC bool operator>=(const char* char1, const var& var2);
-DLL_PUBLIC bool operator>=(const int int1, const var& var2);
-DLL_PUBLIC bool operator>=(const double double1, const var& var2);
+DLL_PUBLIC ND bool operator>=(const var& var1, const var& var2);
+DLL_PUBLIC ND bool operator>=(const var& var1, const char* char2);
+DLL_PUBLIC ND bool operator>=(const var& var1, const int int2);
+DLL_PUBLIC ND bool operator>=(const var& var1, const double double2);
+DLL_PUBLIC ND bool operator>=(const char* char1, const var& var2);
+DLL_PUBLIC ND bool operator>=(const int int1, const var& var2);
+DLL_PUBLIC ND bool operator>=(const double double1, const var& var2);
 
-DLL_PUBLIC bool operator>(const var& var1, const var& var2);
-DLL_PUBLIC bool operator>(const var& var1, const char* char2);
-DLL_PUBLIC bool operator>(const var& var1, const int int2);
-DLL_PUBLIC bool operator>(const var& var1, const double double2);
-DLL_PUBLIC bool operator>(const char* char1, const var& var2);
-DLL_PUBLIC bool operator>(const int int1, const var& var2);
-DLL_PUBLIC bool operator>(const double double1, const var& var2);
+DLL_PUBLIC ND bool operator>(const var& var1, const var& var2);
+DLL_PUBLIC ND bool operator>(const var& var1, const char* char2);
+DLL_PUBLIC ND bool operator>(const var& var1, const int int2);
+DLL_PUBLIC ND bool operator>(const var& var1, const double double2);
+DLL_PUBLIC ND bool operator>(const char* char1, const var& var2);
+DLL_PUBLIC ND bool operator>(const int int1, const var& var2);
+DLL_PUBLIC ND bool operator>(const double double1, const var& var2);
 
-DLL_PUBLIC bool operator<=(const var& var1, const var& var2);
-DLL_PUBLIC bool operator<=(const var& var1, const char* char2);
-DLL_PUBLIC bool operator<=(const var& var1, const int int2);
-DLL_PUBLIC bool operator<=(const var& var1, const double double2);
-DLL_PUBLIC bool operator<=(const char* char1, const var& var2);
-DLL_PUBLIC bool operator<=(const int int1, const var& var2);
-DLL_PUBLIC bool operator<=(const double double1, const var& var2);
+DLL_PUBLIC ND bool operator<=(const var& var1, const var& var2);
+DLL_PUBLIC ND bool operator<=(const var& var1, const char* char2);
+DLL_PUBLIC ND bool operator<=(const var& var1, const int int2);
+DLL_PUBLIC ND bool operator<=(const var& var1, const double double2);
+DLL_PUBLIC ND bool operator<=(const char* char1, const var& var2);
+DLL_PUBLIC ND bool operator<=(const int int1, const var& var2);
+DLL_PUBLIC ND bool operator<=(const double double1, const var& var2);
 
 //+var
 DLL_PUBLIC var operator+(const var& var1);
@@ -1607,7 +1606,7 @@ DLL_PUBLIC var operator+(const var& var1);
 DLL_PUBLIC var operator-(const var& var1);
 
 //! var
-DLL_PUBLIC bool operator!(const var& var1);
+DLL_PUBLIC ND bool operator!(const var& var1);
 
 DLL_PUBLIC var MVadd(const var& var1, const var& var2);
 

@@ -210,8 +210,9 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 
 		//remove any existing pgsql
 		var pos=index(sourcecode,"/" "*pgsql");
-		if (pos)
-			sourcecode=sourcecode.substr(1,pos-1);
+		if (pos) {
+			sourcecode=sourcecode.substr(1,pos-1).trimb(VM);
+		}
 
 		var fulltext_dictid=field(field(sourcecode,"{",2),"}",1);
 
@@ -223,17 +224,19 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 		chars.swapper("FC","");
 		chars.swapper("FB","");
 		chars.swapper("FA","");
-		chars="\\\\035\\036" ^ iconv(chars,"HEX");
+		chars="\\x1D\\x1E" ^ iconv(chars,"HEX");
 		chars.swapper("'","''");
-		chars^="\\\\032";//STM
-		chars^="\\\\033";//TM
-		chars^="\\\\034";//SVM
-		chars^="\\\\037";//RM
+		chars^="\\x1A";//STM
+		chars^="\\x1B";//TM
+		chars^="\\x1C";//SVM
+		chars^="\\x1F";//RM
 		sourcecode.r(1,-1,"/" "*pgsql");
-		sourcecode.r(1,-1,"ans:=translate(" ^
+		//note postgres string prefix E'...'
+		// E is required to enable \xFF hex decoding
+		sourcecode.r(1,-1,"ans:=upper(translate(" ^
 			dictfilename.convert(".","_")^"_"^fulltext_dictid^"(key,data)"^
-			",'"^chars^"'" ^ ",repeat(' ',"^
-		(len(chars)+20)^"));");
+			",E'"^chars^"'" ^ ",repeat(' ',"^
+		(len(chars)+20)^")));");
 		sourcecode.r(1,-1,"*" "/");
 		dictrec.r(8,sourcecode);
 

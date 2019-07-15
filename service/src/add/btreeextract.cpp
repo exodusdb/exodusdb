@@ -24,31 +24,43 @@ function main(in cmd, in filename, in dictfile, out hits) {
 	//defeat compiler warning of unused
 	if (false) print(dictfile);
 
-	//do successive selects each one reducing the list
+	//XREF should be able to do it all in one go
 	var fieldname = cmd.a(1, 1);
 	var parts = cmd.a(1, 2);
-	var nparts = parts.count("&") + 1;
-	for (var partn = 1; partn <= nparts; ++partn) {
-		var part = parts.field("&", partn);
-		var selectcmd = "SELECT " ^ filename ^ " WITH " ^ fieldname ^ " " ^ quote(part) ^ " (S)";
-		//call safeselect(select);
+	if (fieldname.substr(-4)=="XREF") {
+		//XREF sql is implemented as STARTING
+		parts.converter("]","");
+		var selectcmd = "SELECT " ^ filename ^ " WITH " ^ fieldname ^ " " ^ quote(parts) ^ " (S)";
 		select(selectcmd);
-		///BREAK;
-		if (not LISTACTIVE) break;;
 
-	};//partn;
+	//otherwise do successive selects each one reducing the list
+	} else {
+		var nparts = parts.count("&") + 1;
+		//parts.outputl("parts=");
+		for (var partn = 1; partn <= nparts; ++partn) {
+			var part = parts.field("&", partn);
+			var selectcmd = "SELECT " ^ filename ^ " WITH " ^ fieldname ^ " " ^ quote(part) ^ " (S)";
+			//selectcmd.outputl("selectcmd=");
+			//call safeselect(select);
+			select(selectcmd);
+			///BREAK;
+			if (not LISTACTIVE) break;;
+
+		};//partn;
+	}
 
 	//turn the select list into a string of fields
 	if (LISTACTIVE) {
-		hits = VM;
+		hits = "";
 nextrec:
 		var key;
 		if (readnext(key)) {
 			if (hits.length() + key.length() < 65500) {
-				hits ^= VM ^ key;
+				hits ^= key ^ VM;
 				goto nextrec;
 			}
 		}
+		hits.splicer(-1,1,"");
 	}
 
 	clearselect();

@@ -292,11 +292,20 @@ bool ExodusProgramBase::deletelist(const var& listname)
 	return CURSOR.deletelist(listname.field(" ", 1));
 }
 
-void ExodusProgramBase::clearselect() { CURSOR.clearselect(); }
+void ExodusProgramBase::clearselect()
+{
+	CURSOR.clearselect();
+}
 
-bool ExodusProgramBase::hasnext() { return CURSOR.hasnext(); }
+bool ExodusProgramBase::hasnext()
+{
+	return CURSOR.hasnext();
+}
 
-bool ExodusProgramBase::readnext(var& key) { return CURSOR.readnext(key); }
+bool ExodusProgramBase::readnext(var& key)
+{
+	return CURSOR.readnext(key);
+}
 
 bool ExodusProgramBase::readnext(var& key, var& valueno) { return CURSOR.readnext(key, valueno); }
 
