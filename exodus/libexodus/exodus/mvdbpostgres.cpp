@@ -2218,14 +2218,12 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 		ismv = true;
 
 		// var from="string_to_array(" ^ sqlexpression ^ ",'" ^ VM ^ "'";
-		sqlexpression = "string_to_array(" ^ sqlexpression ^ ", chr(29),''";
+		sqlexpression = "string_to_array(" ^ sqlexpression ^ ", chr(29),'')";
 
 		// Note 3rd argument '' means convert empty multivalues to NULL in the array
 		// otherwise conversion to float will fail
 		if (isnumeric)
-			sqlexpression ^= ",'')::float8[]";
-		else
-			sqlexpression ^= ")";
+			sqlexpression ^= "::float8[]";
 
 		if (forsort)
 		{
@@ -3179,8 +3177,11 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 	//	}
 
 	// disambiguate from any INNER JOIN key
-	actualfieldnames.swapper("key", actualfilename ^ ".key");
-	actualfieldnames.swapper("data", actualfilename ^ ".data");
+	//actualfieldnames.outputl("actualfieldnames=");
+	//actualfieldnames.swapper("key", actualfilename ^ ".key");
+	//actualfieldnames.swapper("data", actualfilename ^ ".data");
+	actualfieldnames.replacer("\\bkey\\b", actualfilename ^ ".key");
+	actualfieldnames.replacer("\\bdata\\b", actualfilename ^ ".data");
 
 	// DISTINCT has special fieldnames
 	if (distinctfieldnames)
@@ -3949,14 +3950,15 @@ bool var::readnextrecord(var& record, var& key, var& valueno)
 	return true;
 }
 
-bool var::createindex(const var& fieldname, const var& dictfile) const
+bool var::createindex(const var& fieldname0, const var& dictfile) const
 {
 	THISIS("bool var::createindex(const var& fieldname, const var& dictfile) const")
 	THISISSTRING()
-	ISSTRING(fieldname)
+	ISSTRING(fieldname0)
 	ISSTRING(dictfile)
 
 	var filename = (*this).a(1);
+	var fieldname = fieldname0.convert(".","_");
 
 	// actual dictfile to use is either given or defaults to that of the filename
 	var actualdictfile;
@@ -4026,21 +4028,24 @@ bool var::createindex(const var& fieldname, const var& dictfile) const
 	return this->sqlexec(sql);
 }
 
-bool var::deleteindex(const var& fieldname) const
+bool var::deleteindex(const var& fieldname0) const
 {
 	THISIS("bool var::deleteindex(const var& fieldname) const")
 	THISISSTRING()
-	ISSTRING(fieldname)
+	ISSTRING(fieldname0)
+
+	var filename = (*this).a(1);
+	var fieldname = fieldname0.convert(".","_");
 
 	// delete the index field (actually only present on calculated field indexes so ignore
 	// result) deleting the index field automatically deletes the index
 	var index_fieldname = "index_" ^ fieldname;
-	if (var().sqlexec("alter table " ^ this->a(1) ^ " drop " ^ index_fieldname))
+	if (var().sqlexec("alter table " ^ filename ^ " drop " ^ index_fieldname))
 		return true;
 
 	// delete the index
 	// var filename=*this;
-	var sql = "drop index index__" ^ this->a(1) ^ "__" ^ fieldname;
+	var sql = "drop index index__" ^ filename ^ "__" ^ fieldname;
 	return this->sqlexec(sql);
 }
 
@@ -4128,12 +4133,16 @@ bool var::cursorexists() const
 	return ok;
 }
 
-var var::listindexes(const var& filename, const var& fieldname) const
+var var::listindexes(const var& filename0, const var& fieldname0) const
 {
 	THISIS("var var::listindexes(const var& filename) const")
 	// could allow undefined usage since *this isnt used?
 	THISISDEFINED()
-	ISSTRING(filename)
+	ISSTRING(filename0)
+	ISSTRING(fieldname0)
+
+	var filename = filename0.a(1);
+	var fieldname = fieldname0.convert(".","_");
 
 	// TODO for some reason doesnt return the exodus index_file__fieldname records
 	// perhaps you have to be connected with sufficient postgres rights

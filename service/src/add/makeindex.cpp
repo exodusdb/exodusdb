@@ -2,13 +2,15 @@
 libraryinit()
 
 function main() {
-	var filename=field(SENTENCE," ",2);
-	var fieldname=field(SENTENCE," ",3);
-	var indextype=field(SENTENCE," ",4);
-	if (indextype)
+	var filename=field(COMMAND," ",2);
+	var fieldname=field(COMMAND," ",3);
+	var indextype=field(COMMAND," ",4);
+	if (indextype and indextype ne "BTREE")
 		fieldname^="_"^indextype;
 	var file;
-	return osshell("createindex " ^ filename ^ " " ^ fieldname ^ " " ^ indextype ^ " " ^ OPTIONS);
+	var cmd="createindex " ^ filename ^ " " ^ fieldname ^ " " ^ OPTIONS.convert("()","{}");
+	cmd.outputl("cmd=");
+	return osshell(cmd);
 }
 
 libraryexit()

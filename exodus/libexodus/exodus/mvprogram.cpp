@@ -144,7 +144,7 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 		//var("").outputl();
 
 		//debug
-		if (calc_fields_file)
+		if (calc_fields_file && dictid != "AUTHORISED")
 		{
 			var key=dictfilename^"*"^dictid;
 			var rec=sortselectclause^FM^op^FM^value^FM^value2;
