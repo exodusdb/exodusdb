@@ -1137,40 +1137,39 @@ var ExodusProgramBase::calculate(const var& dictid)
 	// get the dictionary record so we know how to extract the correct field or call the right
 	// library
 	bool newlibfunc;
-	bool indictmd = false;
-	if (cache_dictid_ != dictid)
+	bool indictvoc = false;
+	if (cache_dictid_ != (DICT.a(1) ^ " " ^ dictid))
 	{
 		newlibfunc = true;
 		if (not DICT)
-			throw MVException("calculate(" ^ dictid ^
+			throw MVException("ExodusProgramBase::calculate(" ^ dictid ^
 					  ") DICT file variable has not been set");
 		if (not cache_dictrec_.reado(DICT, dictid))
 		{
 			// try lower case
 			if (not cache_dictrec_.reado(DICT, dictid.lcase()))
 			{
-
 				// try dict_voc
-				var dictmd; // TODO implement DICTMD to avoid opening
-				if (not dictmd.open("dict_voc"))
+				var dictvoc; // TODO implement mv.DICTVOC to avoid opening
+				if (not dictvoc.open("dict_voc"))
 				{
-				baddict:
-					throw MVException("calculate(" ^ dictid ^
+baddict:
+					throw MVException("ExodusProgramBase::calculate(" ^ dictid ^
 							  ") dictionary record not in DICT " ^
-							  DICT.quote());
+							  DICT.a(1).quote() ^ " nor in DICT_VOC");
 				}
-				if (not cache_dictrec_.reado(dictmd, dictid))
+				if (not cache_dictrec_.reado(dictvoc, dictid))
 				{
 					// try lower case
-					if (not cache_dictrec_.reado(dictmd, dictid.lcase()))
+					if (not cache_dictrec_.reado(dictvoc, dictid.lcase()))
 					{
 						goto baddict;
 					}
 				}
-				indictmd = true;
+				indictvoc = true;
 			}
 		}
-		cache_dictid_ = dictid;
+		cache_dictid_ = DICT.a(1) ^ " " ^ dictid;
 	}
 	else
 		newlibfunc = false;
@@ -1214,7 +1213,7 @@ var ExodusProgramBase::calculate(const var& dictid)
 		{
 
 			std::string str_libname;
-			if (indictmd)
+			if (indictvoc)
 				str_libname = "dict_voc";
 			else
 				str_libname = DICT.a(1).lcase().convert(".", "_").toString();
@@ -1241,7 +1240,7 @@ var ExodusProgramBase::calculate(const var& dictid)
 				    ("exodusprogrambasecreatedelete_" ^ dictid.lcase()).toString();
 				if (!dict_exodusfunctorbase_->initsmf(str_libname.c_str(),
 								      str_funcname.c_str()))
-					throw MVException("calculate() Cannot find Library " ^
+					throw MVException("ExodusProgramBase::calculate() Cannot find Library " ^
 							  str_libname ^ ", or function " ^
 							  dictid.lcase() ^ " is not present");
 			}
@@ -1277,7 +1276,7 @@ var ExodusProgramBase::calculate(const var& dictid)
 		return ANS;
 	}
 
-	throw MVException("calculate(" ^ dictid ^ ") " ^ DICT ^ " Invalid dictionary type " ^
+	throw MVException("ExodusProgramBase::calculate(" ^ dictid ^ ") " ^ DICT ^ " Invalid dictionary type " ^
 			  dicttype.quote());
 	return "";
 }

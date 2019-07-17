@@ -60,6 +60,7 @@ function main() {
 
         //convert to text format
         text.swapper("\\","\\\\");
+        text.swapper("\r","\\r");
         text.swapper("\n","\\n");
         text.swapper(sepchar,"\n");
 
@@ -98,6 +99,7 @@ function main() {
 
                 //convert to record format
                 text2.swapper("\n",sepchar);
+                text2.swapper("\\r","\r");
                 text2.swapper("\\n","\n");
                 text2.swapper("\\\\","\\");
 
