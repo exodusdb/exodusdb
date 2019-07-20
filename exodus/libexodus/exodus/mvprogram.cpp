@@ -182,7 +182,7 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 
 		bool ok=true;
 
-		var insertsql=baseinsertsql ^ ID.squote() ^ ",";
+		var insertsql=baseinsertsql ^ ID.swapper("'","''").squote() ^ ",";
 
 		for (int fieldn=1;fieldn<=nfields;++fieldn) {
 

@@ -1967,7 +1967,10 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 			// '*',2)::integer from filename
 			if (isdate)
 				sqlexpression =
-				    "date '1967-12-31' + " ^ sqlexpression ^ "::integer";
+				    //"date('1967-12-31') + " ^ sqlexpression ^ "::integer";
+				    // cannot seem to use + on dates in indexes
+				    //therefore
+				    "exodus_extract_date(" ^ sqlexpression ^ ",0,0,0)";
 
 			return sqlexpression;
 		}
@@ -2315,7 +2318,7 @@ var getword(var& remainingwords, var& ucword)
 	//value chars are " ' 0-9 . + -
 	if (joinvalues && valuechars.index(word1[1]))
 	{
-		word1 = SQ ^ word1.unquote() ^ SQ;
+		word1 = SQ ^ word1.unquote().swap("'","''") ^ SQ;
 
 		var nextword = remainingwords.field(" ", 1);
 
@@ -3211,7 +3214,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 		while (this->readnext(key))
 		{
 			//std::cout<<key<<std::endl;
-			this->sqlexec("INSERT INTO " ^ temptablename ^ "(KEY) VALUES('" ^ key ^"')");
+			this->sqlexec("INSERT INTO " ^ temptablename ^ "(KEY) VALUES('" ^ key.swap("'","''") ^"')");
 		}
 
 		joins.inserter(1,1,"INNER JOIN "^temptablename^" ON "^temptablename^".key = "^actualfilename^".key");
