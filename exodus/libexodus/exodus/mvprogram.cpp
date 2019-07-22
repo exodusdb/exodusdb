@@ -41,7 +41,7 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 	var calc_fields=CURSOR.a(10);
 	if (!calc_fields)
 		return true;
-
+//calc_fields.oswrite("calc_fields");
 	//stage 2
 	/////////
 
@@ -115,13 +115,18 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 		var opno;
 		if (! op)
 			opno=0;
-		else if (not var("= <> > < >= <= ~ ~* !~ !~* >< >!<").locateusing(" ", op, opno))
+		else if (not var("= <> > < >= <= ~ ~* !~ !~* >< >!< in not_in !! !").locateusing(" ", op.convert(" ","_"), opno))
 			throw MVException(op.quote() ^ " unknown op in sql select");
 		opnos(fieldn)=opno;
 
 		//values
-
 		var value=calc_fields.a(3,fieldn).unquote();
+		if (op=="in" and value[1]=="(" and value[-1]==")") {
+			value.splicer(1,1,"").splicer(-1,1,"");
+			value.swapper("', '",VM);
+			value.trimmerb().trimmerf().unquoter();
+			//value.convert(VM,"]").outputl("value=");
+		}
 		if (dictid.substr(-4,4)=="DATE")
 			value=iconv(value,"D");
 		values(fieldn)=value;
@@ -230,6 +235,18 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 				case 12:
 					ok = ! (value < values(fieldn) || value > values2(fieldn));
 					break;
+				case 13:
+					ok = values(fieldn).locate(value);
+					break;
+				case 14:
+					ok = ! values(fieldn).locate(value);
+					break;
+				case 15:
+					ok = value;
+					break;
+				case 16:
+					ok = !value;
+					break;
 			}
 			if (!ok) {
 				//debug
@@ -266,7 +283,7 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 
 	}
 
-	sortselectclause2.outputl();
+	sortselectclause2.outputl("stage2=");
 
 	return CURSOR.select(sortselectclause2);
 

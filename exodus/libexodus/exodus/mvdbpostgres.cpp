@@ -1901,7 +1901,7 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 							    fieldname.quote() ^ " from " ^
 							    actualdictfile.convert(FM, "^")
 								.quote() ^
-							    " or dict_voc");
+							    " or \"dict_voc\"");
 							//					exodus::errputl("ERROR:
 							// mvdbpostgres getdictexpression() cannot
 							// read " ^ fieldname.quote() ^ " from " ^
@@ -2031,13 +2031,17 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 		}
 
 		// simple join
-		else if (functionx.substr(1, 11).ucase() == "@ANS=XLATE(")
+		else if (! ismv1 && functionx.substr(1, 11).ucase() == "@ANS=XLATE(")
 		{
 			functionx = functionx.a(1, 1);
 
 			functionx.splicer(1, 11, "");
-			// allow for <1,@mv> in arg3 by removing comma
+
+			// allow for <1,@mv> in arg3 by replacing comma with |
 			functionx.swapper(",@mv", "|@mv");
+
+			//allow for field(@id,'*',x) in arg2 by replacing commas with |
+			functionx.swapper(",'*',", "|'*'|");
 
 			// arg1 filename
 			var xlatetargetfilename = functionx.field(",", 1).trim().convert(".", "_");
@@ -2047,7 +2051,7 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 			var xlatefromfieldname = functionx.field(",", 2).trim();
 
 			// arg3 target field number/name
-			var xlatetargetfieldname = functionx.field(",", 3).trim();
+			var xlatetargetfieldname = functionx.field(",", 3).trim().unquoter();
 
 			// arg4 mode X or C
 			var xlatemode = functionx.field(",", 4).trim().convert("'\" )", "");
@@ -2079,23 +2083,33 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 					//	throw MVDBException("getdictexpression() DICT" ^
 					// xlatetargetfilename ^ " file cannot be opened"); var
 					// ismv;
+					var xlatetargetdictfilename="dict_"^xlatetargetfilename;
+					var xlatetargetdictfile;
+					if (! xlatetargetdictfile.open(xlatetargetdictfilename))
+						throw MVDBException(xlatetargetdictfilename ^ " cannot be opened for " ^ functionx);
 					sqlexpression = getdictexpression(
-					    filename, xlatetargetfilename, xlatetargetfilename,
-					    xlatetargetfilename, xlatetargetfieldname, joins, unnests,
+					    filename, xlatetargetfilename, xlatetargetdictfilename,
+					    xlatetargetdictfile, xlatetargetfieldname, joins, unnests,
 					    selects, ismv, forsort);
 				}
 
 				// determine the join details
 				var xlatekeyexpression;
-				if (xlatefromfieldname.substr(1, 8).ucase() == "@RECORD<")
+				//xlatefromfieldname.outputl("xlatefromfieldname=");
+				if (xlatefromfieldname.trim().substr(1, 8).lcase() == "@record<")
 				{
-					// xlatekeyexpression="exodus_extract_bytea(";
 					xlatekeyexpression = "exodus_extract_text(";
 					xlatekeyexpression ^= filename ^ ".data";
 					xlatekeyexpression ^= ", " ^ xlatefromfieldname.substr(9);
 					xlatekeyexpression.splicer(-1, 1, "");
 					xlatekeyexpression ^=
 					    var(", 0").str(3 - xlatekeyexpression.count(',')) ^ ")";
+				}
+				else if (xlatefromfieldname.trim().substr(1, 10).lcase() == "field(@id|")
+				{
+					xlatekeyexpression = "split_part(";
+					xlatekeyexpression ^= filename ^ ".key,'*',";
+					xlatekeyexpression ^= xlatefromfieldname.field("|",3).field(")",1) ^ ")";
 				}
 				// TODO				if
 				// (xlatefromfieldname.substr(1,8)=="FIELD(@ID)
@@ -2123,6 +2137,15 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 							dictrec.a(8).quote()).errputl();
 #endif
 					return "";
+				}
+
+				//if the xlate key expression is calculated then
+				//indicate that the whole dictid expression is calculated
+				//and do not do any join
+				if (xlatekeyexpression.index("exodus_call"))
+				{
+					sqlexpression="exodus_call(";
+					return sqlexpression;
 				}
 
 				fromjoin = true;
@@ -2479,7 +2502,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 
 	//prepare to save calculated fields that cannot be calculated by postgresql for secondary processing
 	var calc_fields="";
-	var ncalc_fields=0;
+	//var ncalc_fields=0;
 	this->r(10,"");
 
 	// sortselect clause can be a filehandle in which case we extract the filename from field1
@@ -2641,8 +2664,11 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 			if (dictexpression.index("exodus_call"))
 			//if (dictexpression == "true")
 			{
-				++ncalc_fields;
-				calc_fields.r(1,ncalc_fields,dictid);
+				if (! calc_fields.a(1).locate(dictid))
+				{
+					//++ncalc_fields;
+					calc_fields.r(1,-1,dictid);
+				}
 				continue;
 			}
 
@@ -2731,13 +2757,14 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 				word1 = getword(remaining, ucword);
 			}
 
-			if (ucword=="@ID")
-				std::cout << "@ID";
+			//if (ucword=="@ID")
+			//	std::cout << "@ID";
 
 			// between x and y
+			// from x to y
 			/////////////////
 
-			if (ucword == "BETWEEN")
+			if (ucword == "BETWEEN" || ucword == "FROM")
 			{
 
 				//prevent BETWEEN being used on multivalued and XREX fields
@@ -2745,7 +2772,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 				{
 					throw MVDBException(
 					    sortselectclause ^
-					    "BETWEEN not currently supported for XREF");
+					    "BETWEEN x AND y/FROM x TO y ... is not currently supported for XREF");
 				}
 
 				// get and append first value
@@ -2755,7 +2782,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 				var word2 = getword(remaining, xx);
 
 				// discard any optional intermediate "AND"
-				if (word2.ucase() == "AND")
+				if (word2.ucase() == "AND" || word2.ucase() == "TO")
 				{
 					word2 = getword(remaining, xx);
 				}
@@ -2765,16 +2792,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 				{
 					throw MVDBException(
 					    sortselectclause ^
-					    "BETWEEN must be followed by two values (from/to), but "
-					    "found 'BETWEEN " ^
-					    dictid ^ " " ^ word1 ^ " AND " ^ word2 ^ "'");
-				}
-
-				// no filtering on calculated items
-				if (dictexpression.index("exodus_call"))
-				//if (dictexpression == "true")
-				{
-					continue;
+					    "BETWEEN x AND y/FROM x TO y must be followed by two values (x AND/TO y)");
 				}
 
 				if (usingnaturalorder)
@@ -2789,11 +2807,22 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 				{
 					var opid=negative?">!<":"><";
 
-					++ncalc_fields;
-					calc_fields.r(1,ncalc_fields,dictid);
-					calc_fields.r(2,ncalc_fields,opid);
-					calc_fields.r(3,ncalc_fields,word1);
-					calc_fields.r(4,ncalc_fields,word2);
+					//almost identical code for exodus_call above/below
+					var calc_fieldn;
+					if (! calc_fields.locate(dictid,calc_fieldn,1))
+					{
+						//++ncalc_fields;
+						calc_fields.r(1,calc_fieldn,dictid);
+					}
+
+					//prevent WITH XXX appearing twice in the same sort/select clause
+					//unless and until implementeda
+					if (calc_fields.a(2,calc_fieldn))
+						throw MVDBException("WITH " ^ dictid ^ " must not appear twice in " ^ sortselectclause.quote());
+
+					calc_fields.r(2,calc_fieldn,opid);
+					calc_fields.r(3,calc_fieldn,word1);
+					calc_fields.r(4,calc_fieldn,word2);
 
 					whereclause ^= " true";
 					continue;
@@ -2804,7 +2833,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 				if (negative)
 					whereclause ^= " not ";
 
-				whereclause ^= " BETWEEN " ^ word1 ^ " AND " ^ word2;
+				if (whereclause)
+					whereclause ^= " BETWEEN " ^ word1 ^ " AND " ^ word2;
 
 				continue;
 			}
@@ -2837,16 +2867,16 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 
 			// 1) Acquire operator - or empty if not present
 
-			// convert neosys relational operators to standard relational operators (NOT
-			// is an alias of NE)
+			// convert PICK/AREV relational operators to standard SQL relational operators
+			// IS/ISNT/NOT -> EQ/NE/NE
 			var aliasno;
-			if (var("EQ NE NOT GT LT GE LE").locateusing(" ", ucword, aliasno))
+			if (var("IS EQ NE NOT ISNT GT LT GE LE").locateusing(" ", ucword, aliasno))
 			{
-				word1 = var("= <> <> > < >= <=").field(" ", aliasno);
+				word1 = var("= = <> <> <> > < >= <=").field(" ", aliasno);
 				ucword = word1;
 			}
 
-			// capture operator
+			// capture operator is any
 			var op = "";
 			if (var("= <> > < >= <= ~ ~* !~ !~*").locateusing(" ", ucword, aliasno))
 			{
@@ -2856,7 +2886,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 				word1 = getword(remaining, ucword);
 			}
 
-			//values like "[xxx" "xxx]" and "[xxx]" -> ENDING, STARTING, CONTAINING
+			//determine Pick/AREV values like "[xxx" "xxx]" and "[xxx]"
 			if (word1[1] == "'")
 			{
 				if (word1[2] == "[")
@@ -2948,6 +2978,52 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 
 			var value = word1;
 
+			// no filtering in database on calculated items
+			//save then for secondary filtering
+			if (dictexpression.index("exodus_call"))
+			//if (dictexpression == "true")
+			{
+				//no op or value means test for Pick/AREV true (zero and '' are false)
+				if (op == "" && value == "")
+					op="!!";
+
+				//missing op presumed to be =
+				else if (op == "")
+					op="=";
+
+				// invert comparison if "without" or "not" for calculated fields
+				if (negative &&
+				    var("= <> > < >= <= ~ ~* !~ !~* !! !").locateusing(" ", op, aliasno))
+				{
+					// op.outputl("op entered:");
+					negative = false;
+					op = var("<> = <= >= < > !~ !~* ~ ~* ! !!").field(" ", aliasno);
+					// op.outputl("op reversed:");
+				}
+
+				//++ncalc_fields;
+				//calc_fields.r(1,ncalc_fields,dictid);
+				//calc_fields.r(2,ncalc_fields,op);
+				//calc_fields.r(3,ncalc_fields,value);
+
+				//almost identical code for exodus_call above/below
+				var calc_fieldn;
+				if (! calc_fields.locate(dictid,calc_fieldn,1))
+				{
+					//++ncalc_fields;
+					calc_fields.r(1,calc_fieldn,dictid);
+				}
+				if (calc_fields.a(2,calc_fieldn))
+					throw MVDBException("WITH " ^ dictid ^ " must not appear twice in " ^ sortselectclause.quote());
+				calc_fields.r(2,calc_fieldn,op);
+				calc_fields.r(3,calc_fieldn,value);
+
+				//place holder to be removed before issuing actual sql command
+				whereclause ^= " true";
+
+				continue;
+			}
+
 			// missing op and value mean NOT '' or NOT 0 or NOT NULL
 			// WITH CLIENT_TYPE
 			if (op == "" && value == "")
@@ -3000,6 +3076,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 
 				//ordinary query values
 				} else
+					//WARNING ", " is swapped in mvprogram.cpp ::select()
+					//so change there if changed here
 					value.swapper(FM_, ", ");
 
 				if (dictexpression_isxref)
@@ -3066,32 +3144,6 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 				{
 					value = "'0'";
 				}
-			}
-
-			// no filtering in database on calculated items
-			//save then for secondary filtering
-			if (dictexpression.index("exodus_call"))
-			//if (dictexpression == "true")
-			{
-				// invert comparison if "without" or "not" for calculated fields
-				if (negative &&
-				    var("= <> > < >= <= ~ ~* !~ !~*").locateusing(" ", op, aliasno))
-				{
-					// op.outputl("op entered:");
-					negative = false;
-					op = var("<> = <= >= < > !~ !~* ~ ~*").field(" ", aliasno);
-					// op.outputl("op reversed:");
-				}
-
-				++ncalc_fields;
-				calc_fields.r(1,ncalc_fields,dictid);
-				calc_fields.r(2,ncalc_fields,op);
-				calc_fields.r(3,ncalc_fields,value);
-
-				//place holder to be removed before issuing actual sql command
-				whereclause ^= " true";
-
-				continue;
 			}
 
 			//if selecting a mv array then convert right hand side to array
@@ -3217,7 +3269,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 			this->sqlexec("INSERT INTO " ^ temptablename ^ "(KEY) VALUES('" ^ key.swap("'","''") ^"')");
 		}
 
-		joins.inserter(1,1,"INNER JOIN "^temptablename^" ON "^temptablename^".key = "^actualfilename^".key");
+		joins.inserter(1,1,"\n INNER JOIN "^temptablename^" ON "^temptablename^".key = "^actualfilename^".key");
 	}
 
 	// assemble the full sql select statement:
@@ -3261,6 +3313,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 		sql ^= " " ^ joins.a(2).convert(VM, "");
 
 	//WHERE - excludes calculated fields if doing stage 1 of a two stage sort/select
+	//TODO when doing stage2, skip "WITH/WITHOUT xxx" of stage1 fields
 	if (whereclause)
 		sql ^= " \nWHERE \n" ^ whereclause;
 
@@ -3290,7 +3343,6 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 		var errmsg;
 		if (!this->sqlexec(sql, errmsg))
 		{
-
 
 			if (errmsg)
 				errmsg.outputl("::selectx: " ^ sql ^ "\n" ^ errmsg);

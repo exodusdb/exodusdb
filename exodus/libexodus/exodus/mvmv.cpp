@@ -62,8 +62,11 @@ var dim::split(const var& str1)
 	THISIS("var dim::split(const var& var1)")
 	ISSTRING(str1)
 
-	// automatically dimension to the size of the string
-	this->redim(str1.count(FM_) + 1);
+	// maybe dimension to the size of the string
+	// do NOT redimension always since pick/arev matread/matparse do not
+	// and we may get VNA accessing array elements if too few.
+	if (! this->initialised_ || this->ncols_ != 1)
+		this->redim(str1.count(FM_) + 1);
 
 	// empty string just fills array with empty string
 	if (str1.length() == 0)
@@ -105,7 +108,6 @@ var dim::split(const var& str1)
 	}
 	else
 	{
-
 		++fieldno;
 		// fill any remaining array elements with empty string
 		for (; fieldno <= (this->nrows_); ++fieldno)
