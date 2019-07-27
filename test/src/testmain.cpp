@@ -260,6 +260,16 @@ function main()
         sort.locateusing(FM,"c",sortn);
         assert(sortn==4);
 
+	//pick/arev bool and equality checks on doubles ignore less than 0.0001
+	//but comparison operators work exactly (to max binary precision?)
+	var v0_0001=0.0001;
+	var v0_00001=0.00001;
+	var v0_00002=0.00002;
+	assert(v0_0001 or 0);
+	assert(not(v0_00001 or 0));
+	assert(v0_00001==v0_00002);
+	assert(v0_00001<v0_00002);
+
 	var d1=1.2;
 	d1++;
 	assert(d1==2.2);
@@ -276,7 +286,7 @@ function main()
 	d1+=1;
 	assert(d1==2.2);
 	d1+=1.1;
-	assert(d1!=3.3);//very slightly different due to binary representation of 1.2+1+1.1
+	assert(d1==3.3);
 	assert(d1.toString()==3.3);//strange that this compiles and works
 
 	i1=1;

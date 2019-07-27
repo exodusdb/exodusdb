@@ -12,6 +12,7 @@ function main() {
 	// dict2sql {filename {dictid}} {V}
 
 	// 1. Creates pgsql functions to calculate columns given data and key
+	//    for each dictitem in each dictfile
 	//
 	// functions like "dict_filename_DICT_ID(key,data)" returns text
 	// /df
@@ -130,6 +131,12 @@ COST 10;
 	//https://github.com/JDBurnZ/postgresql-anyarray/blob/master/stable/anyarray_uniq.sql
 	do_sql("exodus_unique(mvstring text, sepchar text)","text",unique_sql,sqltemplate);
 
+	//exodus_locate
+	do_sql("exodus_locate(substr text, searchstr text, sepchar text default VM)","int",locate_sql,sqltemplate);
+
+	//exodus_isnum
+	do_sql("exodus_isnum(instring text)","bool",isnum_sql,sqltemplate);
+
 	return 0;
 }
 
@@ -143,6 +150,14 @@ subroutine do_sql(in functionname_and_args, in returntype, in sql, in sqltemplat
 	functionsql.swapper("$return_type",returntype);
 
 	functionsql.swapper("$sqlcode",sql);
+
+	functionsql.replacer("\\bRM\\b","chr(31)");
+	functionsql.replacer("\\bFM\\b","chr(30)");
+	functionsql.replacer("\\bVM\\b","chr(29)");
+	functionsql.replacer("\\bSM\\b","chr(28)");
+	functionsql.replacer("\\bSVM\\b","chr(28)");
+	functionsql.replacer("\\bTM\\b","chr(27)");
+	functionsql.replacer("\\bSTM\\b","chr(26)");
 
 	if (verbose)
 		functionsql.outputl();
@@ -293,8 +308,8 @@ $RETVAR := array_to_string
  ''
 );
 )V0G0N";
-		else
-			xlatetemplate=
+	else
+		xlatetemplate=
 R"V0G0N(
 $RETVAR :=
   $TARGET_EXPR
@@ -316,6 +331,8 @@ $RETVAR :=
 	// fromfn and tofn can be functions
 	// "from" expression has access to source file data in variable $2 (argument 2)
 	// "to" expression has access to target file data eg invoices.data
+	//      and '' means whole record eg invoices.data
+	//	and "0" means key (which is not useful)
 	int nlines=dcount(sql,VM);
 	for (int ln=1;ln<=nlines;++ln) {
 		var line=sql.a(1,ln).trim();
@@ -328,16 +345,18 @@ $RETVAR :=
 
 			//target file name eg jobs
 			var target_filename=line.field(" ",4);
+			var source_key_expr=line.field(" ",5);
+			var target_expr=line.field(" ",6).field(";",1);
 
 			//source file field number or expression for key to target file
-			var source_key_expr=line.field(" ",5);
 			//if key field numeric then extract from source file date
 			if (source_key_expr.isnum())
 				source_key_expr="split_part($2,chr(30),"^source_key_expr^")";
 
 			//target file field number or expression (omit optional ; on the end)
-			var target_expr=line.field(" ",6).field(";",1);
 			if (target_expr==0)
+				target_expr=target_filename^".key";
+			else if (target_expr=="''")
 				target_expr=target_filename^".data";
 			else if (target_expr.isnum())
 				target_expr="split_part("^target_filename^".data,chr(30),"^target_expr^")";
@@ -612,5 +631,65 @@ BEGIN
 RETURN array_to_string(return_array,sepchar,'');
 END;
 )V0G0N";
+
+
+
+
+//exodus_locate
+var locate_sql=
+R"V0G0N(
+DECLARE
+ searchstrarray text [];
+ nfields int;
+ fieldn int;
+BEGIN
+
+ -- empty target "finds" field zero
+ if searchstr='' then
+  return 0;
+ end if;
+
+ nfields := exodus_count(searchstr,sepchar)+1;
+ searchstrarray := string_to_array(searchstr,sepchar);
+
+ for fieldn in 1..nfields loop
+ if searchstrarray[fieldn]=substr then
+   return fieldn;
+  end if;
+
+ end loop;
+
+ -- zero indicates not found
+ -- (instead of normal locate which returns one after the last element)
+ return 0;
+
+END;
+)V0G0N";
+
+
+//exodus_isnum
+var isnum_sql=
+R"V0G0N(
+DECLARE
+ tt text;
+BEGIN
+
+ if position(' ' in $1)::bool then
+  return FALSE;
+ end if;
+
+ -- note that Pick/Arev's '', is numeric unlike pgsql
+ if $1='' then
+  return TRUE;
+ end if;
+
+tt = $1::NUMERIC;
+ RETURN TRUE;
+EXCEPTION WHEN others THEN
+ RETURN FALSE;
+
+END;
+)V0G0N";
+
 
 programexit()

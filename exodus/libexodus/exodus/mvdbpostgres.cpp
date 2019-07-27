@@ -1864,7 +1864,7 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 	if (calculated) {
 		fieldname.splicer(-1,1,"");
 		//create a pseudo look up ... except that SELECT_TEMP_CURSOR_n has the fields stored in sql columns and not in the usual data column
-		calculated="@ANS=XLATE(\"SELECT_TEMP_CURSOR_" ^ this->a(1) ^ "\",@ID," ^ fieldname ^ "_calc,\"X\")";
+		calculated="@ANS=XLATE(\"SELECT_STAGE2_CURSOR_" ^ this->a(1) ^ "\",@ID," ^ fieldname ^ "_calc,\"X\")";
 	}
 
 	// given a file and dictionary id
@@ -2767,8 +2767,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 			if (ucword == "BETWEEN" || ucword == "FROM")
 			{
 
-				//prevent BETWEEN being used on multivalued and XREX fields
-				if (dictexpression_isarray || dictexpression_isxref)
+				//prevent BETWEEN being used on fields
+				if (dictexpression_isxref)
 				{
 					throw MVDBException(
 					    sortselectclause ^
@@ -2825,6 +2825,18 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 					calc_fields.r(4,calc_fieldn,word2);
 
 					whereclause ^= " true";
+					continue;
+				}
+
+				//select numrange(100,150,'[]')  @> any(string_to_array('1,2,150',',','')::numeric[]);
+				if (dictexpression_isarray)
+				{
+					if (true)
+					{
+						whereclause ^= " numrange(" ^ word1 ^ "," ^ word2 ^ ",'[]') ";
+						whereclause ^= " @> ";
+						whereclause ^= " any( " ^ dictexpression ^ "::numeric[])";
+					}
 					continue;
 				}
 
@@ -3252,8 +3264,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 		//create a temporary sql table to hold the preselected keys
 		var temptablename="PRESELECT_TEMP_CURSOR_" ^ this->a(1);
 		var createtablesql = "DROP TABLE IF EXISTS " ^ temptablename ^ ";\n";
-		createtablesql ^= "CREATE TEMPORARY TABLE " ^ temptablename ^ "\n";
-		//createtablesql ^= "CREATE TABLE " ^ temptablename ^ "\n";
+		//createtablesql ^= "CREATE TEMPORARY TABLE " ^ temptablename ^ "\n";
+		createtablesql ^= "CREATE TABLE " ^ temptablename ^ "\n";
 		createtablesql ^= " (KEY TEXT)\n";
 		var errmsg;
 		if (! this->sqlexec(createtablesql,errmsg))
@@ -3388,7 +3400,7 @@ void var::clearselect()
 
 	/// if readnext through string
 	//3/4/5/6 setup in makelist. cleared in clearselect
-	if (this->a(3) == "%MAKELIST%")
+	//if (this->a(3) == "%MAKELIST%")
 	{
 		this->r(6,"");
 		this->r(5,"");

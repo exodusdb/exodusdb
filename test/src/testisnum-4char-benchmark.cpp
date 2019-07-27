@@ -380,6 +380,9 @@ function main()
 	assert(!var("-x").isnum());
 	assert(!var(".x").isnum());
 	assert(!var("9x").isnum());
+	assert(!var(" 0").isnum());
+	assert(!var("0 ").isnum());
+	assert(!var(" ").isnum());
 
 	//various hand coded positives
 

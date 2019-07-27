@@ -944,7 +944,7 @@ tryagain:
 
 #endif
 
-// almost identical between MVeq and MVlt except where noted
+// almost identical between MVeq and MVlt except where noted (and doubles compare only to 0.0001 accuracy)
 DLL_PUBLIC bool MVeq(const var& lhs, const var& rhs)
 {
 	THISIS("bool MVeq(const var& lhs,const var& rhs)")
@@ -1023,8 +1023,11 @@ DLL_PUBLIC bool MVeq(const var& lhs, const var& rhs)
 			// different from MVlt
 			return (lhs.var_dbl == rhs.var_int);
 		else
-			// different from MVlt
-			return (lhs.var_dbl == rhs.var_dbl);
+		{
+			// different from MVlt (DOUBLES ONLY COMPARE TO ACCURACY 0.0001)
+			//return (lhs.var_dbl == rhs.var_dbl);
+			return (std::abs(lhs.var_dbl-rhs.var_dbl)<0.0001);
+		}
 	}
 
 	// 3. either non-numerical strings

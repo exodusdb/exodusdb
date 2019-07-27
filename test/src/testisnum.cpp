@@ -21,6 +21,7 @@ function main()
 		//	50% xxxxxx
 		{
 		//0
+		assert( var("").isnum());
 		assert( var("11111").isnum());
 		assert( var("2").isnum());
 		assert( var("00000876229").isnum());
@@ -37,7 +38,6 @@ function main()
 		assert( var("222").isnum());
 		assert( var("222").isnum());
 
-		assert( var("-11111").isnum());
 		assert( var("-0000000000").isnum());
 		assert( var("-2").isnum());
 		assert( var("-222").isnum());
@@ -122,6 +122,9 @@ function main()
 		assert(!var("\n").isnum());
 
 		assert(!var("x").isnum());
+		assert(!var(" ").isnum());
+		assert(!var(" 0").isnum());
+		assert(!var("0 ").isnum());
 		assert(!var("+x").isnum());
 		assert(!var("-x").isnum());
 		assert(!var(".x").isnum());

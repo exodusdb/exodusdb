@@ -41,7 +41,7 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 	var calc_fields=CURSOR.a(10);
 	if (!calc_fields)
 		return true;
-//calc_fields.oswrite("calc_fields");
+calc_fields.oswrite("calc_fields");
 	//stage 2
 	/////////
 
@@ -69,13 +69,14 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 	calc_fields_file.open("calc_fields");
 
 	//prepare to create a temporary sql table
-	//DROP TABLE IF EXISTS SELECT_TEMP;
-	//CREATE TABLE SELECT_TEMP(
+	//DROP TABLE IF EXISTS SELECT_STAGE2;
+	//CREATE TABLE SELECT_STAGE2(
 	// KEY TEXT PRIMARY KEY,
 	// EXECUTIVE_CODE TEXT)
-	var temptablename="SELECT_TEMP_CURSOR_" ^ CURSOR.a(1);
+	var temptablename="SELECT_STAGE2_CURSOR_" ^ CURSOR.a(1);
 	var createtablesql = "DROP TABLE IF EXISTS " ^ temptablename ^ ";\n";
-	createtablesql ^= "CREATE TEMPORARY TABLE " ^ temptablename ^ "(\n";
+	//createtablesql ^= "CREATE TEMPORARY TABLE " ^ temptablename ^ "(\n";
+	createtablesql ^= "CREATE TABLE " ^ temptablename ^ "(\n";
 	createtablesql ^= " KEY TEXT PRIMARY KEY,\n";
 
 	//prepare to insert sql records
@@ -91,8 +92,8 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 	int nfields=calc_fields.a(1).dcount(VM);
 	dim dictids(nfields);
 	dim opnos(nfields);
-	dim values(nfields);
-	dim values2(nfields);
+	dim reqvalues(nfields);
+	dim reqvalues2(nfields);
 	for (int fieldn=1;fieldn<=nfields;++fieldn) {
 
 		//dictids
@@ -119,7 +120,7 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 			throw MVException(op.quote() ^ " unknown op in sql select");
 		opnos(fieldn)=opno;
 
-		//values
+		//reqvalues
 		var value=calc_fields.a(3,fieldn).unquote();
 		if (op=="in" and value[1]=="(" and value[-1]==")") {
 			value.splicer(1,1,"").splicer(-1,1,"");
@@ -129,12 +130,12 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 		}
 		if (dictid.substr(-4,4)=="DATE")
 			value=iconv(value,"D");
-		values(fieldn)=value;
+		reqvalues(fieldn)=value;
 
 		var value2=calc_fields.a(4,fieldn).unquote();
 		if (dictid.substr(-4,4)=="DATE")
 			value2=iconv(value2,"D");
-		values2(fieldn)=value2;
+		reqvalues2(fieldn)=value2;
 
 		//sql temp table column
 		createtablesql ^= " " ^ sqlcolid ^ " TEXT,";
@@ -200,46 +201,46 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 				case 0:
 					break;
 				case 1:
-					ok = value == values(fieldn);
+					ok = value == reqvalues(fieldn);
 					break;
 				case 2:
-					ok = value != values(fieldn);
+					ok = value != reqvalues(fieldn);
 					break;
 				case 3:
-					ok = value > values(fieldn);
+					ok = value > reqvalues(fieldn);
 					break;
 				case 4:
-					ok = value < values(fieldn);
+					ok = value < reqvalues(fieldn);
 					break;
 				case 5:
-					ok = value >= values(fieldn);
+					ok = value >= reqvalues(fieldn);
 					break;
 				case 6:
-					ok = value <= values(fieldn);
+					ok = value <= reqvalues(fieldn);
 					break;
 				case 7:
-					ok = value.match(values(fieldn));
+					ok = value.match(reqvalues(fieldn));
 					break;
 				case 8:
-					ok = value.match(values(fieldn),"i");
+					ok = value.match(reqvalues(fieldn),"i");
 					break;
 				case 9:
-					ok = ! (value.match(values(fieldn)));
+					ok = ! (value.match(reqvalues(fieldn)));
 					break;
 				case 10:
-					ok = ! (value.match(values(fieldn),"i"));
+					ok = ! (value.match(reqvalues(fieldn),"i"));
 					break;
 				case 11:
-					ok = ! (value >= values(fieldn) && value <= values2(fieldn));
+					ok = (value >= reqvalues(fieldn) && value <= reqvalues2(fieldn));
 					break;
 				case 12:
-					ok = ! (value < values(fieldn) || value > values2(fieldn));
+					ok = (value < reqvalues(fieldn) || value > reqvalues2(fieldn));
 					break;
 				case 13:
-					ok = values(fieldn).locate(value);
+					ok = reqvalues(fieldn).locate(value);
 					break;
 				case 14:
-					ok = ! values(fieldn).locate(value);
+					ok = ! reqvalues(fieldn).locate(value);
 					break;
 				case 15:
 					ok = value;
@@ -266,7 +267,7 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 			continue;
 		}
 
-		//ID.outputl("passed ");
+		//ID.outputl("stage1 ok ");
 
 		insertsql.splicer(-1,1,")");
 
@@ -285,7 +286,9 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 
 	sortselectclause2.outputl("stage2=");
 
-	return CURSOR.select(sortselectclause2);
+	bool result=CURSOR.select(sortselectclause2);
+var(CURSOR.hasnext()).outputl("hasnext=");
+	return result;
 
 }
 

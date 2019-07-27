@@ -4,6 +4,7 @@ libraryinit()
 //#include <pushselect.h>
 //#include <safeselect.h>
 //#include <popselect.h>
+#define maxstrsize 1048576
 
 function main(in cmd, in filename, in dictfile, out hits) {
 
@@ -55,7 +56,7 @@ function main(in cmd, in filename, in dictfile, out hits) {
 nextrec:
 		var key;
 		if (readnext(key)) {
-			if (hits.length() + key.length() < 65500) {
+			if (hits.length() + key.length() < maxstrsize - 30) {
 				hits ^= key ^ VM;
 				goto nextrec;
 			}

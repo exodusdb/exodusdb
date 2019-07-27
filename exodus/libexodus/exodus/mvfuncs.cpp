@@ -390,7 +390,11 @@ bool var::toBool() const
 		// TODO should we consider very small numbers to be the same as zero?
 		if (var_typ & VARTYP_DBL)
 			//return (bool)(var_dbl != 0);
-			return std::abs(var_dbl)>=0.00000000001;
+			//return std::abs(var_dbl)>=0.00000000001;
+			//AREV print (0.00001 or 0)    ... prints 0 (bool)
+			//AREV print (0.00005=0.00006) ... prints 0 (==)
+			//AREV print (0.00005<0.00006) ... prints 1 (<)
+			return std::abs(var_dbl)>=0.0001;
 
 		if (!(var_typ))
 		{
