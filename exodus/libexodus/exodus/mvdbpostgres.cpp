@@ -2244,7 +2244,10 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 		ismv = true;
 
 		// var from="string_to_array(" ^ sqlexpression ^ ",'" ^ VM ^ "'";
-		sqlexpression = "string_to_array(" ^ sqlexpression ^ ", chr(29),'')";
+		if (sqlexpression.substr(1,20)=="exodus_extract_date(" || sqlexpression.substr(1,20)=="exodus_extract_time(")
+			sqlexpression.splicer(20,0,"_array");
+		else
+			sqlexpression = "string_to_array(" ^ sqlexpression ^ ", chr(29),'')";
 
 		// Note 3rd argument '' means convert empty multivalues to NULL in the array
 		// otherwise conversion to float will fail
@@ -2734,7 +2737,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 			var usingnaturalorder = dictexpression.index("exodus_extract_sort");
 			var dictid = word1;
 
-			var dictexpression_isarray=dictexpression.index("string_to_array(");
+			//var dictexpression_isarray=dictexpression.index("string_to_array(");
+			var dictexpression_isarray=dictexpression.index("_array(");
 			var dictexpression_isxref=dictexpression.index("to_tsvector(");
 
 			// add the dictid expression
@@ -2827,16 +2831,28 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 					whereclause ^= " true";
 					continue;
 				}
-
 				//select numrange(100,150,'[]')  @> any(string_to_array('1,2,150',',','')::numeric[]);
 				if (dictexpression_isarray)
 				{
-					if (true)
+					var date_time_numeric;
+					if (dictexpression.index("date_array("))
 					{
-						whereclause ^= " numrange(" ^ word1 ^ "," ^ word2 ^ ",'[]') ";
-						whereclause ^= " @> ";
-						whereclause ^= " any( " ^ dictexpression ^ "::numeric[])";
+						whereclause ^= " daterange(";
+						date_time_numeric = "date";
 					}
+					else if (dictexpression.index("time_array("))
+					{
+						whereclause ^= " tsrange(";
+						date_time_numeric = "time";
+					}
+					else
+					{
+						whereclause ^= " numrange(";
+						date_time_numeric = "numeric";
+					}
+					whereclause ^= word1 ^ "," ^ word2 ^ ",'[]') ";
+					whereclause ^= " @> ";
+					whereclause ^= " any( " ^ dictexpression ^ "::" ^ date_time_numeric ^ "[])";
 					continue;
 				}
 

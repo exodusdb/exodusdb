@@ -200,52 +200,52 @@ calc_fields.oswrite("calc_fields");
 			switch (int(opnos(fieldn))) {
 				case 0:
 					break;
-				case 1:
+				case 1: // =
 					ok = value == reqvalues(fieldn);
 					break;
-				case 2:
+				case 2: // <>
 					ok = value != reqvalues(fieldn);
 					break;
-				case 3:
+				case 3: // >
 					ok = value > reqvalues(fieldn);
 					break;
-				case 4:
+				case 4: // <
 					ok = value < reqvalues(fieldn);
 					break;
-				case 5:
+				case 5: // >=
 					ok = value >= reqvalues(fieldn);
 					break;
-				case 6:
+				case 6: // <=
 					ok = value <= reqvalues(fieldn);
 					break;
-				case 7:
+				case 7: // ~ regex
 					ok = value.match(reqvalues(fieldn));
 					break;
-				case 8:
+				case 8: // ~* regex case insensitive
 					ok = value.match(reqvalues(fieldn),"i");
 					break;
-				case 9:
+				case 9: // !~ not regex
 					ok = ! (value.match(reqvalues(fieldn)));
 					break;
-				case 10:
+				case 10: // !~* not regex case insensitive
 					ok = ! (value.match(reqvalues(fieldn),"i"));
 					break;
-				case 11:
+				case 11: // between x and y, from x to 
 					ok = (value >= reqvalues(fieldn) && value <= reqvalues2(fieldn));
 					break;
-				case 12:
+				case 12: // not between x and y, not from x to y
 					ok = (value < reqvalues(fieldn) || value > reqvalues2(fieldn));
 					break;
-				case 13:
+				case 13: // in list
 					ok = reqvalues(fieldn).locate(value);
 					break;
-				case 14:
+				case 14: // not in list
 					ok = ! reqvalues(fieldn).locate(value);
 					break;
-				case 15:
+				case 15: // is true (not "" 0 "0" "00" "0.0" etc).
 					ok = value;
 					break;
-				case 16:
+				case 16: // is false (isnt true)
 					ok = !value;
 					break;
 			}
@@ -287,7 +287,7 @@ calc_fields.oswrite("calc_fields");
 	sortselectclause2.outputl("stage2=");
 
 	bool result=CURSOR.select(sortselectclause2);
-var(CURSOR.hasnext()).outputl("hasnext=");
+
 	return result;
 
 }

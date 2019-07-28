@@ -114,28 +114,37 @@ DEFINER
 COST 10;
 )V0G0N";
 
-	//exodus_trim
+	//exodus_trim (leading, trailing and excess inner spaces)
 	var trimsql=R"(return regexp_replace(regexp_replace(data, '^\s+|\s+$', '', 'g'),'\s{2,}',' ','g');)";
 	do_sql("exodus_trim(data text)","text",trimsql,sqltemplate);
 
-	//exodus_field_replace
+	//exodus_field_replace (a field)
 	do_sql("exodus_field_replace(data text, sep text, fieldno int, replacement text)","text",field_replace_sql,sqltemplate);
 
-	//exodus_field_remove
+	//exodus_field_remove (a field)
 	do_sql("exodus_field_remove(data text, sep text, fieldno int)","text",field_remove_sql,sqltemplate);
 
-	//exodus_split
+	//exodus_split 123.45USD -> 123.45
 	do_sql("exodus_split(data text)","text",split_sql,sqltemplate);
 
-	//exodus_unique
+	//exodus_unique (fields)
 	//https://github.com/JDBurnZ/postgresql-anyarray/blob/master/stable/anyarray_uniq.sql
 	do_sql("exodus_unique(mvstring text, sepchar text)","text",unique_sql,sqltemplate);
 
-	//exodus_locate
+	//exodus_locate -> int
 	do_sql("exodus_locate(substr text, searchstr text, sepchar text default VM)","int",locate_sql,sqltemplate);
 
-	//exodus_isnum
+	//exodus_isnum -> bool
 	do_sql("exodus_isnum(instring text)","bool",isnum_sql,sqltemplate);
+
+	//exodus_date -> int (today's date as a number according to PICK/AREV)
+	do_sql("exodus_date()","int",exodus_date_sql,sqltemplate);
+
+	//exodus_extract_date_array -> date[]
+	do_sql("exodus_extract_date_array(data text, fn int, vn int, sn int)","date[]",exodus_extract_date_array_sql,sqltemplate);
+
+	//exodus_extract_time_array -> time[]
+	do_sql("exodus_extract_time_array(data text, fn int, vn int, sn int)","time[]",exodus_extract_time_array_sql,sqltemplate);
 
 	return 0;
 }
@@ -667,7 +676,7 @@ END;
 )V0G0N";
 
 
-//exodus_isnum
+//exodus_isnum -> bool
 var isnum_sql=
 R"V0G0N(
 DECLARE
@@ -688,6 +697,59 @@ tt = $1::NUMERIC;
 EXCEPTION WHEN others THEN
  RETURN FALSE;
 
+END;
+)V0G0N";
+
+//exodus_date -> int
+var exodus_date_sql=
+R"V0G0N(
+ return current_date-'1968-1-1'::date;
+)V0G0N";
+
+
+//exodus_extract_date_array -> date[]
+//almost identical code in exodus_extract_time_array
+var exodus_extract_date_array_sql=
+R"V0G0N(
+DECLARE
+ dates text := exodus_extract_text(data,fn,vn,sn);
+ date text;
+ ndates int := exodus_count(dates,VM)+(dates!='')::int;
+ date_array date[];
+BEGIN
+ for daten in 1..ndates loop
+  date := split_part(dates,VM,daten);
+  if date = '' then
+   date_array[daten] := NULL;
+  else
+   date_array[daten] := '1967/12/31'::date + date::int;
+  end if;
+ end loop;
+ return date_array;
+END;
+)V0G0N";
+
+
+//exodus_extract_time_array -> time[]
+//almost identical code in exodus_extract_date_array
+var exodus_extract_time_array_sql=
+R"V0G0N(
+DECLARE
+ times text := exodus_extract_text(data,fn,vn,sn);
+ timex text;
+ ntimes int := exodus_count(times,VM)+(times!='')::int;
+ time_array time[];
+BEGIN
+ for timen in 1..ntimes loop
+  timex := split_part(times,VM,timen);
+  if timex = '' then
+   time_array[timen] := NULL;
+  else
+   timex := timex || ' seconds';
+   time_array[timen] := '00:00'::time + timex::interval;
+  end if;
+ end loop;
+ return time_array;
 END;
 )V0G0N";
 
