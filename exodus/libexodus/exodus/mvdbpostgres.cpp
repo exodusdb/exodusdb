@@ -228,19 +228,6 @@ var var::getlasterror() const
 typedef PGresult* PGresultptr;
 static bool getpgresult(const var& sql, PGresultptr& pgresult, PGconn* thread_pgconn);
 
-bool var::sqlexec(const var& sql) const
-{
-	var errmsg;
-	bool ok = this->sqlexec(sql, errmsg);
-	if (not ok)
-	{
-		this->setlasterror(errmsg);
-		if (errmsg.index("syntax") || GETDBTRACE)
-			errmsg.outputl();
-	}
-	return ok;
-}
-
 #if defined _MSC_VER //|| defined __CYGWIN__ || defined __MINGW32__
 LONG WINAPI DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS pExcPointers)
 {
@@ -1196,16 +1183,30 @@ bool var::unlockall() const
 	return this->sqlexec("SELECT PG_ADVISORY_UNLOCK_ALL()");
 }
 
-// returns success or failure but no data
-bool var::sqlexec(const var& sqlcmd, var& errmsg) const
+// returns only success or failure
+bool var::sqlexec(const var& sql) const
 {
-	THISIS("bool var::sqlexec(const var& sqlcmd, var& errmsg) const")
+	var response=-1;//no response required
+	bool ok = this->sqlexec(sql, response);
+	if (! ok)
+	{
+		this->setlasterror(response);
+		if (response.index("syntax") || GETDBTRACE)
+			response.outputl();
+	}
+	return ok;
+}
+
+// returns success or failure, and response = data or errmsg (response can be preset to max number of tuples)
+bool var::sqlexec(const var& sqlcmd, var& response) const
+{
+	THISIS("bool var::sqlexec(const var& sqlcmd, var& response) const")
 	ISSTRING(sqlcmd)
 
 	PGconn* thread_pgconn = (PGconn*)this->connection();
 	if (!thread_pgconn)
 	{
-		errmsg = "Error: sqlexec cannot find thread database connection";
+		response = "Error: sqlexec cannot find thread database connection";
 		return false;
 	}
 
@@ -1237,12 +1238,47 @@ bool var::sqlexec(const var& sqlcmd, var& errmsg) const
 		var sqlstate = var(PQresultErrorField(pgresult, PG_DIAG_SQLSTATE));
 		// PQclear(pgresult);//essential
 		// sql state 42P03 = duplicate_cursor
-		errmsg = var(PQerrorMessage(thread_pgconn)) ^ " sqlstate:" ^ sqlstate;
+		response = var(PQerrorMessage(thread_pgconn)) ^ " sqlstate:" ^ sqlstate;
 		return false;
 	}
 
-	errmsg = var(PQntuples(pgresult));
-	// PQclear(pgresult);//essential
+	//errmsg = var(PQntuples(pgresult));
+
+	//quit if no rows/columns provided or no response required (integer<=0)
+	int nrows = PQntuples(pgresult);
+	int ncols = PQnfields(pgresult);
+	if (nrows == 0 or ncols ==0 || (response.assigned() && ((response.var_typ & VARTYP_INT) && response<=0)))
+	{
+		response="";
+		return true;
+	}
+
+	//option to limit number of rows returned
+	if (response.assigned() && response.isnum() && response<nrows)
+		nrows=response;
+
+	response="";
+
+	//first row is the column names
+	for (int coln = 0; coln < ncols; ++coln)
+	{
+		response.var_str.append(PQfname(pgresult, coln));
+		response.var_str.push_back(FM_);
+	}
+	response.var_str.pop_back();
+
+	//output the rows
+	for (int rown = 0; rown < nrows; rown++)
+	{
+		response.var_str.push_back(RM_);
+		for (int coln = 0; coln < ncols; ++coln)
+		{
+			response.var_str.append(PQgetvalue(pgresult, rown, coln));
+			response.var_str.push_back(FM_);
+		}
+		response.var_str.pop_back();
+	}
+
 	return true;
 }
 
@@ -3056,13 +3092,13 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 			// WITH CLIENT_TYPE
 			if (op == "" && value == "")
 			{
-				op = "<>";
-				value = "''";
+				//op = "<>";
+				//value = "''";
+				dictexpression="exodus_tobool("^dictexpression^")";
 			}
-
 			// missing op means =
 			// WITH CLIENT_TYPE "X"
-			if (op == "")
+			else if (op == "")
 				op = "=";
 
 			// missing value means error in sql
@@ -3214,7 +3250,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 	// prefix specified keys into where clause
 	if (keycodes)
 	{
-		if (keycodes.count(FM))
+		//if (keycodes.count(FM))
 		{
 			keycodes = actualfilename ^ ".key IN ( " ^ keycodes.swap(FM, ", ") ^ " )";
 
@@ -3280,8 +3316,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 		//create a temporary sql table to hold the preselected keys
 		var temptablename="PRESELECT_TEMP_CURSOR_" ^ this->a(1);
 		var createtablesql = "DROP TABLE IF EXISTS " ^ temptablename ^ ";\n";
-		//createtablesql ^= "CREATE TEMPORARY TABLE " ^ temptablename ^ "\n";
-		createtablesql ^= "CREATE TABLE " ^ temptablename ^ "\n";
+		createtablesql ^= "CREATE TEMPORARY TABLE " ^ temptablename ^ "\n";
+		//createtablesql ^= "CREATE TABLE " ^ temptablename ^ "\n";
 		createtablesql ^= " (KEY TEXT)\n";
 		var errmsg;
 		if (! this->sqlexec(createtablesql,errmsg))

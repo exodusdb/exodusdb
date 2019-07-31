@@ -9,6 +9,8 @@ var filename="myclients";
 
 function main() {
 
+	//no real need for this especially because a) it does a default connection and b) we are not creating a connection for following db operations
+	//it is here just to remind that we can connect to specific servers and dataabases if desired
 	if (not connect())
                 abort("Cannot connect to database. Please check configuration or run configexodus.");
 
@@ -44,16 +46,16 @@ function main() {
         printl("\nPrepare some dictionary records");
 
         var dictrecs =
-             "code         |F|0|Code         ||||          ||L|8"
-        _FM_ "name         |F|1|Name         ||||          ||T|15"
-        _FM_ "type         |F|2|Type         ||||          ||L|5"
-        _FM_ "date_created |F|3|Date Created ||||D4        ||L|12"
-        _FM_ "time_created |F|4|Time Created ||||MTH       ||L|12"
-        _FM_ "balance      |F|5|Balance      ||||MD20P     ||R|10"
-        _FM_ "timestamp    |F|6|Timestamp    ||||[DATETIME]||L|12"
-        _FM_ "name_and_type|S| |Name and Type||||          ||L|20"
-        _FM_ "name_and_code|S| |Name and Code||||          ||L|20"
-        _FM_ "@crt         |G| |code name type name_and_type balance date_created time_created timestamp";
+             "CODE         |F|0|Code         ||||          ||L|8"
+        _FM_ "NAME         |F|1|Name         ||||          ||T|15"
+        _FM_ "TYPE         |F|2|Type         ||||          ||L|5"
+        _FM_ "DATE_CREATED |F|3|Date Created ||||D4        ||L|12"
+        _FM_ "TIME_CREATED |F|4|Time Created ||||MTH       ||L|12"
+        _FM_ "BALANCE      |F|5|Balance      ||||MD20P     ||R|10"
+        _FM_ "TIMESTAMP    |F|6|Timestamp    ||||[DATETIME]||L|12"
+        _FM_ "NAME_AND_TYPE|S| |Name and Type||||          ||L|20"
+        _FM_ "NAME_AND_CODE|S| |Name and Code||||          ||L|20"
+        _FM_ "@CRT         |G| |CODE NAME TYPE NAME_AND_TYPE BALANCE DATE_CREATED TIME_CREATED TIMESTAMP";
 
         printl("\nWrite the dictionary records to the dictionary");
 
@@ -65,12 +67,11 @@ function main() {
                 var key=field(dictrec, "|", 1);
                 var rec=field(dictrec, "|", 2, 999999);
 
-                printl(key, ": ", rec);
+                printl(oconv(key,"L#14"), ": ", rec);
 
-                key=trim(key);
+    		    rec=trim(rec);
+	       		rec=swap(rec, " |", "|");
 
-                rec=trim(rec);
-                rec=swap(rec, " |", "|");
                 rec=convert(rec, "|", FM);
 
                 write(rec, dictfile, key);
@@ -79,14 +80,14 @@ function main() {
                 var rec2;
                 //key.outputl("key");
                 if (read(rec2,dictfile, key)) {
-                        if (rec2 ne rec) 
+                        if (rec2 ne rec)
                                 printl("record differs?!");
                 } else
                         printl("Cant read ", key, " back");
         }
 
         var rec;
-        if (not read(rec,dictfile,"balance"))
+        if (not read(rec,dictfile,"BALANCE"))
                 printl("Cant read 'balance' record from dictionary");
 
         printl("\nNB 'name_and_type' dictionary item S type calls dict_myclients.cpp library function!");
@@ -173,8 +174,7 @@ subroutine sortselect(in file, in sortselectcmd) {
                         printl(key, " missing from file");
                         continue;
                 }
-                print(key, ": ");
-                printl(convert(record, FM, "|"));
+                printl(key, ": ",convert(record, FM, "|"));
 
         }
 
@@ -182,3 +182,5 @@ subroutine sortselect(in file, in sortselectcmd) {
 }
 
 programexit()
+
+

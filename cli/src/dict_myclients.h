@@ -4,7 +4,7 @@
 
 //a member variable/object to cache a pointer/object for the shared library function
 //ExodusFunctorBase efb_dict_myclients;
-class efb_dict_myclients : private ExodusFunctorBase
+class efb_dict_myclients : public ExodusFunctorBase
 {
 public:
 
@@ -49,7 +49,7 @@ efb_dict_myclients dict_myclients{mv};
 
 //a member variable/object to cache a pointer/object for the shared library function
 //ExodusFunctorBase efb_dict_myclients;
-class efb_dict_myclients : private ExodusFunctorBase
+class efb_dict_myclients : public ExodusFunctorBase
 {
 public:
 

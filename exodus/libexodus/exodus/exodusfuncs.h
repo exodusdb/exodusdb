@@ -419,6 +419,9 @@ DLL_PUBLIC void logputl(Printable... value)
 	var("").logputl();
 }
 
+#define TRACE(EXPRESSION) \
+        var(EXPRESSION).convert(_FM_ _VM_ _SM_,"^]\\").quote().outputl(" " #EXPRESSION "=");
+
 } // namespace exodus
 
 #endif // EXODUSFUNCS_H

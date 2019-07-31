@@ -117,9 +117,9 @@ and therefore causes a non-numeric error if you include a non-numeric value in a
 // complete list of c/c++ keywords is
 // and, and_eq, bitand, bitor, compl, not, not_eq, or, or_eq, xor and xor_eq
 #ifdef _MSC_VER
-#define and&&
+#define and &&
 #define not_eq !=
-#define not!
+#define not !
 #define or ||
 #endif
 
@@ -1309,11 +1309,8 @@ class DLL_PUBLIC var final
 	bool deleteindex(const var& fieldname) const;
 	var listindexes(const var& filename DEFAULTNULL, const var& fieldname DEFAULTNULL) const;
 
-	bool sqlexec(const var& SqlToExecute) const; // this: filename, parm1: SQL to execute
-						     //	bool sqlexec(int connection_id = 0) const;
-	// outdated: 20101203:	bool sqlexec(var& errmsg, int connection_id) const;	// this: SQL
-	// to execute
-	bool sqlexec(const var& sqlcmd, var& errmsg) const;
+	bool sqlexec(const var& sqlcmd) const;
+	bool sqlexec(const var& sqlcmd, var& response) const;
 
 	// bool selftest() const;
 	var version() const;

@@ -15,7 +15,7 @@ so we do this instead
 
 1. create user and database
 2. add pgexodus functions to database
-3. add pgexodus functions to template1 (for all future database creations)
+3. add pgexodus functions to template1 database (for all future database creations)
 */
 
 function main()
@@ -24,16 +24,17 @@ function main()
 	printl("Exodus Copyright (c) 2009 steve.bush@neosys.com");
 	printl("Licence: http://www.opensource.org/licenses/mit-license.php");
 
+
 	//get existing/defaults
 
 	//first from the command
-	var oldconn=field(sentence()," ",2,999999999);
+	var origconfig=field(sentence()," ",2,999999999);
 
 	//second from environment
 	//TODO should be per parameter
 	var temp;
 	if (temp.osgetenv("EXO_CONNECTION"))
-		oldconn^=" "^temp;
+		origconfig^=" "^temp;
 
         //third from config file
 	//should be same logic in mvdbpostgres and configexodus
@@ -49,40 +50,44 @@ function main()
 	else
 		configfilename=osgetenv("HOME")^SLASH^".exodus";
 	if (temp.osread(configfilename))
-		oldconn^=" "^temp;
+		origconfig^=" "^temp;
 
-	//finally from hard-coded
-	oldconn^=" host=127.0.0.1 port=5432 dbname=exodus user=exodus password=somesillysecret connect_timeout=10";
-	oldconn.converter("\x0d\x0a","  ");
+	//fourth from hard-coded
+	origconfig^=" host=127.0.0.1 port=5432 dbname=exodus user=exodus password=somesillysecret connect_timeout=10";
+	origconfig.converter("\x0d\x0a","  ");
+
+
+	/// extract various config options from collected config
 
 	printl("-- Exodus Postgres Configuration ---");
 
         printl(oconv("Input options and connect to postgres","L#40"));
-	var serverconn;
-        var adminconn=input_adminconn(oldconn,serverconn);
-	if (not adminconn)
+	var serverconfig;
+        var adminconfig=input_adminconfig(origconfig,serverconfig);
+	if (not adminconfig)
                 stop("Stopping. Cannot continue without a working connection.");
 
 	var connecttimeout="10";
-        getparam(oldconn,"connect_timeout",connecttimeout);
+        getorigparam(origconfig,"connect_timeout",connecttimeout);
 
+	//default database to create/use
 	//for now exodus a default database to play in with a non-secret password
         var dbusername="exodus";
         var dbname="exodus";
         var dbuserpass="somesillysecret";
 
-	getparam(oldconn,"dbname",dbname);
-	getparam(oldconn,"user",dbusername);
-        getparam(oldconn,"password",dbuserpass);
+	getorigparam(origconfig,"dbname",dbname);
+	getorigparam(origconfig,"user",dbusername);
+        getorigparam(origconfig,"password",dbuserpass);
 
         getinput("New database code",dbname);
         getinput("New user code",dbusername);
         getinput("New user password",dbuserpass);
 
 	//if (SLASH eq "\\")
-	//	configure_via_connection(adminconn, dbname, dbusername, dbuserpass);
+	//	configure_via_connection(adminconfig, dbname, dbusername, dbuserpass);
 	//else
-	//	configure_via_script(adminconn, dbname, dbusername, dbuserpass);
+	//	configure_via_script(adminconfig, dbname, dbusername, dbuserpass);
 
 	//ask to save configuration
 	var saveconfig="Y";
@@ -93,8 +98,8 @@ function main()
 			break;
 
 		oconv("Saving user configuration in .exodus","L#40").output();
-		var userconn=serverconn^" dbname="^dbname^" user="^dbusername^" password="^dbuserpass;
-		if (oswrite(userconn,configfilename)) {
+		var userconfig=serverconfig^" dbname="^dbname^" user="^dbusername^" password="^dbuserpass;
+		if (oswrite(userconfig,configfilename)) {
 			printl("done!");
 			break;
 		}
@@ -107,7 +112,7 @@ function main()
 }
 
 //get the first definition of each parameter
-subroutine getparam(in config, in name, out value)
+subroutine getorigparam(in config, in name, out value)
 {
 	var pos=index(config,name);
 	if (!pos)
@@ -127,15 +132,15 @@ subroutine getinput(in prompt, io data)
                 data=result;
 }
 
-function input_adminconn(in oldconn, out serverconn)
+function input_adminconfig(in origconfig, out serverconfig)
 {
 
         var host="127.0.0.1";
         var port="5432";
         var user="postgres";
-		var adminconn="";
-        getparam(oldconn,"host",host);
-        getparam(oldconn,"port",port);
+		var adminconfig="";
+        getorigparam(origconfig,"host",host);
+        getorigparam(origconfig,"port",port);
 
         do {
 
@@ -148,17 +153,17 @@ function input_adminconn(in oldconn, out serverconn)
                 getinput("Postgres admin user",user);
                 getinput("Postgres admin password",pass);
 
-                adminconn = "host="^host;
-                adminconn^=" port="^port;
-                adminconn^=" user="^user;
+                adminconfig = "host="^host;
+                adminconfig^=" port="^port;
+                adminconfig^=" user="^user;
 
-                adminconn^=" dbname=postgres";
+                adminconfig^=" dbname=postgres";
 
-                printl("\n",adminconn,"\n");
-                adminconn^=" password="^pass;
+                printl("\n",adminconfig,"\n");
+                adminconfig^=" password="^pass;
 
                 print(oconv("Attempting to connect ... ","L#40"));
-                if (connect(adminconn)) {
+                if (connect(adminconfig)) {
                         printl("done!");
                         break;
                 }
@@ -169,10 +174,10 @@ function input_adminconn(in oldconn, out serverconn)
 
         } while (true);
 
-        serverconn="host="^host;
-        serverconn^=" port="^port;
+        serverconfig="host="^host;
+        serverconfig^=" port="^port;
 
-        return adminconn;
+        return adminconfig;
 
 }
 
@@ -239,7 +244,7 @@ function create_db(in dbname, in dbusername)
         return runsomesql(sql);
 }
 
-function configure_via_connection(in adminconn, in dbname, in dbusername, in dbuserpass)
+function configure_via_connection(in adminconfig, in dbname, in dbusername, in dbuserpass)
 {
         print(oconv("Creating new user "^ dbusername^ " ... ","L#40"));
         if (not create_dbuser(dbusername,dbuserpass))
@@ -256,7 +261,7 @@ function configure_via_connection(in adminconn, in dbname, in dbusername, in dbu
 	printl("done!");
 
         print(oconv("Connecting to new database ... ","L#40"));
-	var connstr2=adminconn^" dbname="^dbname;
+	var connstr2=adminconfig^" dbname="^dbname;
 
 	//^" user="^dbusername^" password="^dbuserpass;
         if (not connect(connstr2))
@@ -353,7 +358,7 @@ function configure_via_connection(in adminconn, in dbname, in dbusername, in dbu
 	printl("done!");
 
         print(oconv("Connecting to template1 database ... ","L#40"));
-		var connstr3=adminconn^" dbname=template1";
+		var connstr3=adminconfig^" dbname=template1";
         if (not connect(connstr3))
                 stop("Stopping. Cannot connect to template1 database");
 	printl("done!");
@@ -369,7 +374,7 @@ function configure_via_connection(in adminconn, in dbname, in dbusername, in dbu
 	return true;
 }
 
-//function configure_via_script(in adminconn, in dbname, in dbusername, in dbuserpass) {
+//function configure_via_script(in adminconfig, in dbname, in dbusername, in dbuserpass) {
 //	return true;
 //}
 

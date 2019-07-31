@@ -209,12 +209,12 @@ typedef var& out;
 
 // narrow char* versions of classic pick delimiters
 //_RM_, _RM and RM_ versions (wchar*, char* and wchar respectively)
-#define _RM "\u07FF"
-#define _FM "\u07FE"
-#define _VM "\u07FD"
-#define _SM "\u07FC"
-#define _TM "\u07FB"
-#define _STM "\u07FA"
+#define _RM "\u01FF"
+#define _FM "\u01FE"
+#define _VM "\u01FD"
+#define _SM "\u01FC"
+#define _TM "\u01FB"
+#define _STM "\u01FA"
 
 // aliases for different multivalue implementations
 #define _IM _RM

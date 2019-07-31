@@ -12,6 +12,7 @@ function main() {
 
 	var command=COMMAND.convert(FM," ").lcase();
 
+	var dataonly=command.index(" data ");
 	command.swapper(" data "," ");
 	command.swapper(" dict "," dict_");
 	command.swapper(" dict."," dict_");
@@ -26,10 +27,16 @@ function main() {
 		filename=volname;
 		volname="";
 	}
+
 	var file;
 	//TODO support volume in createfile
-	var oscmd="createfile " ^ filename ^ "{S}";// ^ " " ^ OPTIONS;
-	//oscmd.outputl("oscmd=");
+	var oscmd="createfile " ^ filename ^ " {S}";// ^ " " ^ OPTIONS;
+
+    //create a dict file as well if not creating a dict file and no "data" keyword
+	if (not dataonly and filename.substr(1,5) ne "dict_")
+		osshell("createfile dict_"^filename) ^ " {S}";
+
+	oscmd.outputl("oscmd=");
 	return osshell(oscmd);
 }
 

@@ -8,7 +8,6 @@ function main()
         var silent=index(ucase(OPTIONS),"S");
 
         if (not filenames) {
-        	printl(COMMAND ^ " " ^ OPTIONS);
                 stop("Syntax is createfile filename filename ...\ndict files are named dict_filename");
 	}
         var nfiles=dcount(filenames,FM);

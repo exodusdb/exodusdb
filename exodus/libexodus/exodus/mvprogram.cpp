@@ -41,7 +41,7 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 	var calc_fields=CURSOR.a(10);
 	if (!calc_fields)
 		return true;
-calc_fields.oswrite("calc_fields");
+calc_fields.oswrite("calc_fields=");
 	//stage 2
 	/////////
 
@@ -75,8 +75,8 @@ calc_fields.oswrite("calc_fields");
 	// EXECUTIVE_CODE TEXT)
 	var temptablename="SELECT_STAGE2_CURSOR_" ^ CURSOR.a(1);
 	var createtablesql = "DROP TABLE IF EXISTS " ^ temptablename ^ ";\n";
-	//createtablesql ^= "CREATE TEMPORARY TABLE " ^ temptablename ^ "(\n";
-	createtablesql ^= "CREATE TABLE " ^ temptablename ^ "(\n";
+	createtablesql ^= "CREATE TEMPORARY TABLE " ^ temptablename ^ "(\n";
+	//createtablesql ^= "CREATE TABLE " ^ temptablename ^ "(\n";
 	createtablesql ^= " KEY TEXT PRIMARY KEY,\n";
 
 	//prepare to insert sql records
@@ -177,7 +177,10 @@ calc_fields.oswrite("calc_fields");
 	if (dictfilename.substr(1,5).lcase()!="dict_")
 		dictfilename="dict_"^dictfilename;
 	if (!DICT.open(dictfilename)) {
-		throw MVDBException(dictfilename.quote() ^ " cannot be opened");
+		dictfilename="dict_voc";
+		if (!DICT.open(dictfilename)) {
+			throw MVDBException(dictfilename.quote() ^ " cannot be opened");
+		}
 	}
 
 	int maxnrecs=calc_fields.a(6);

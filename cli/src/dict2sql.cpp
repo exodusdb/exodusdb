@@ -137,6 +137,9 @@ COST 10;
 	//exodus_isnum -> bool
 	do_sql("exodus_isnum(instring text)","bool",isnum_sql,sqltemplate);
 
+	//exodus_tobool -> bool
+	do_sql("exodus_tobool(instring text)","bool",tobool_sql,sqltemplate);
+
 	//exodus_date -> int (today's date as a number according to PICK/AREV)
 	do_sql("exodus_date()","int",exodus_date_sql,sqltemplate);
 
@@ -151,7 +154,7 @@ COST 10;
 
 subroutine do_sql(in functionname_and_args, in returntype, in sql, in sqltemplate) {
 
-	functionname_and_args.outputl();
+	printl(functionname_and_args, " -> ", returntype);
 
 	var functionsql=sqltemplate;
 
@@ -179,7 +182,7 @@ subroutine do_sql(in functionname_and_args, in returntype, in sql, in sqltemplat
 			//functionsql.outputl();
 			int nlines=count(functionsql,"\n");
 			for (int linen=1;linen<=nlines;++linen) {
-				printl(linen-2+2,". ", field(functionsql,"\n",linen) );
+				printl(linen-2+2,". ", field(functionsql,"\n",linen));
 			}
 			outputl();
 		}
@@ -424,8 +427,19 @@ $sqlcode
  COST 10;
  )V0G0N";
 
-	//set the function name
+	//upload pgsql function to postgres
 	do_sql(dictfilename^"_"^dictid^"(key text, data text)","text",sql,sqltemplate);
+
+	// delete calc_fields
+
+	var calc_fields;
+	if (calc_fields.open("calc_fields")) {
+		var key=ucase(dictfilename.substr(6)^"*"^dictid);
+		if (calc_fields.deleterecord(key)) {
+			key.outputl("deleted calc_fields = ");
+		}
+	}
+
 
 }//onedictid
 
@@ -694,6 +708,31 @@ BEGIN
 
 tt = $1::NUMERIC;
  RETURN TRUE;
+EXCEPTION WHEN others THEN
+ RETURN FALSE;
+
+END;
+)V0G0N";
+
+//exodus_tobool -> bool
+var tobool_sql=
+R"V0G0N(
+DECLARE
+ tt text;
+BEGIN
+
+ -- note that Pick/Arev's '', is numeric 0 and false unlike pgsql
+ if $1='' then
+  return FALSE;
+ end if;
+
+ -- any spaces mean false
+ if position(' ' in $1)::bool then
+  return FALSE;
+ end if;
+
+tt = $1::NUMERIC;
+ RETURN tt!=0;
 EXCEPTION WHEN others THEN
  RETURN FALSE;
 
