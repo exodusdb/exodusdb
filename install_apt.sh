@@ -22,15 +22,18 @@ cat /etc/issue
 #==== 1. Building and Installing Exodus ====
 
 ###yum -y install subversion gcc-c++ postgresql-devel
-sudo apt-get -y install subversion g++ postgresql-server-dev-all libboost-all-dev build-essential cmake
+#sudo apt-get -y install subversion g++ postgresql-server-dev-all libboost-all-dev build-essential cmake
+sudo apt-get -y install git g++ postgresql-server-dev-all libboost-all-dev build-essential cmake
 
 cd ~
-svn co https://github.com/exodusdb/exodusdb/trunk/ exodus
+#svn co https://github.com/exodusdb/exodusdb/trunk/ exodus
+git clone https://github.com/exodusdb/exodusdb exodus
 
 cd ~/exodus
 #./configure
 cmake .
 make clean #in case half-built with wrong boost libs
+cmake .
 make
 sudo make install
 
