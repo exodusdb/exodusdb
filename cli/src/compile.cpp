@@ -1049,8 +1049,9 @@ var inclusion=
 		var compileroutput;
 		var startatlineno;
 		if (osread(compileroutput,compileoutputfilename)) {
+			osdelete(compileoutputfilename);
 			if (verbose) {
-			compileroutput.outputl("Compiler output:");
+				compileroutput.outputl("Compiler output:");
 			}
 			//leave for editor
 			//osdelete(compileoutputfilename);

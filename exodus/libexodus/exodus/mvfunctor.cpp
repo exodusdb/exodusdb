@@ -82,6 +82,17 @@ typedef void* library_t;
 // needed for getenv
 #include <stdlib.h>
 
+/* could be used to force lower case library file name
+#include <ctype.h>
+char* stolower(char* s)
+{
+	char* p = s;
+	while (*p = tolower(*p))
+		p++;
+	return s;
+}
+*/
+
 #include <exodus/mvfunctor.h>
 #include <exodus/mvenvironment.h>
 namespace exodus
@@ -256,7 +267,7 @@ bool ExodusFunctorBase::initsgf(const char* newlibraryname, const char* newfunct
 	return true;
 }
 
-// assign
+// assign (case sensitive)
 // arev xxx="functionname"; call @xxx
 ExodusFunctorBase& ExodusFunctorBase::operator=(const char* newlibraryname)
 {

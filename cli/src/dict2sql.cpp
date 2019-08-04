@@ -694,7 +694,7 @@ END;
 var isnum_sql=
 R"V0G0N(
 DECLARE
- tt text;
+ tt numeric;
 BEGIN
 
  if position(' ' in $1)::bool then
@@ -718,7 +718,7 @@ END;
 var tobool_sql=
 R"V0G0N(
 DECLARE
- tt text;
+ tt numeric;
 BEGIN
 
  -- note that Pick/Arev's '', is numeric 0 and false unlike pgsql
@@ -726,15 +726,18 @@ BEGIN
   return FALSE;
  end if;
 
- -- any spaces mean false
+ -- spaces are not numeric in PICLK/AREV therefore are true
  if position(' ' in $1)::bool then
-  return FALSE;
+  return TRUE;
  end if;
 
+-- if numeric then zero is false, and anything else is true
 tt = $1::NUMERIC;
- RETURN tt!=0;
+ RETURN tt<>0;
+
+-- if not numeric (and not empty string) then is true
 EXCEPTION WHEN others THEN
- RETURN FALSE;
+ RETURN TRUE;
 
 END;
 )V0G0N";

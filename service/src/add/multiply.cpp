@@ -9,7 +9,7 @@ function main(in multipliers, in multiplicand, in sep) {
 	}
 	dim output;
 	var nn=output.split(multipliers.convert(sep,FM));
-	for (int ii=1;ii<nn;++ii) {
+	for (int ii=1;ii<=nn;++ii) {
 		//return null if null
 		//return zero if multiplicand is zero
 		if (output(ii)) {

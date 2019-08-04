@@ -75,8 +75,8 @@ calc_fields.oswrite("calc_fields=");
 	// EXECUTIVE_CODE TEXT)
 	var temptablename="SELECT_STAGE2_CURSOR_" ^ CURSOR.a(1);
 	var createtablesql = "DROP TABLE IF EXISTS " ^ temptablename ^ ";\n";
-	createtablesql ^= "CREATE TEMPORARY TABLE " ^ temptablename ^ "(\n";
-	//createtablesql ^= "CREATE TABLE " ^ temptablename ^ "(\n";
+	//createtablesql ^= "CREATE TEMPORARY TABLE " ^ temptablename ^ "(\n";
+	createtablesql ^= "CREATE TABLE " ^ temptablename ^ "(\n";
 	createtablesql ^= " KEY TEXT PRIMARY KEY,\n";
 
 	//prepare to insert sql records
@@ -986,10 +986,10 @@ var ExodusProgramBase::perform(const var& sentence)
 	COMMAND.transfer(savecommand);
 	OPTIONS.transfer(saveoptions);
 	RECUR0.transfer(saverecur0);
-	RECUR0.transfer(saverecur1);
-	RECUR0.transfer(saverecur2);
-	RECUR0.transfer(saverecur3);
-	RECUR0.transfer(saverecur4);
+	RECUR1.transfer(saverecur1);
+	RECUR2.transfer(saverecur2);
+	RECUR3.transfer(saverecur3);
+	RECUR4.transfer(saverecur4);
 
 	SENTENCE = sentence;
 	while (SENTENCE)

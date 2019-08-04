@@ -3316,8 +3316,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 		//create a temporary sql table to hold the preselected keys
 		var temptablename="PRESELECT_TEMP_CURSOR_" ^ this->a(1);
 		var createtablesql = "DROP TABLE IF EXISTS " ^ temptablename ^ ";\n";
-		createtablesql ^= "CREATE TEMPORARY TABLE " ^ temptablename ^ "\n";
-		//createtablesql ^= "CREATE TABLE " ^ temptablename ^ "\n";
+		//createtablesql ^= "CREATE TEMPORARY TABLE " ^ temptablename ^ "\n";
+		createtablesql ^= "CREATE TABLE " ^ temptablename ^ "\n";
 		createtablesql ^= " (KEY TEXT)\n";
 		var errmsg;
 		if (! this->sqlexec(createtablesql,errmsg))
@@ -3444,6 +3444,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 
 void var::clearselect()
 {
+
 	// THISIS("void var::clearselect() const")
 	// THISISSTRING()
 
@@ -3458,7 +3459,7 @@ void var::clearselect()
 		this->r(5,"");
 		this->r(4,"");
 		this->r(3,"");
-		return;
+//		return;
 	}
 
 	var listname = (*this) ^ "_" ^ getprocessn() ^ "_tempx";
@@ -3474,6 +3475,21 @@ void var::clearselect()
 	// clear any select list
 	this->deletelist(listname);
 
+	var errors;
+
+	//delete any temporary sql table created to hold preselected keys
+	//if (this->assigned())
+	//{
+	//	var temptablename="PRESELECT_TEMP_CURSOR_" ^ this->a(1);
+	//	var deletetablesql = "DROP TABLE IF EXISTS " ^ temptablename ^ ";\n";
+	//	if (!this->sqlexec(deletetablesql, errors))
+	//	{
+	//		if (errors)
+	//			errors.outputl("::clearselect " ^ errors);
+	//		return;
+	//	}
+	//}
+
 	var sql = "";
 	// sql^="DECLARE BEGIN ";
 	sql ^= "CLOSE cursor1_";
@@ -3484,7 +3500,6 @@ void var::clearselect()
 
 	//sql.output();
 
-	var errors;
 	if (!this->sqlexec(sql, errors))
 	{
 		if (errors)
