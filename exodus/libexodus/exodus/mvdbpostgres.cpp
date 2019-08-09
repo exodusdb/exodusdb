@@ -3094,6 +3094,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 			{
 				//op = "<>";
 				//value = "''";
+				dictexpression.replacer("^exodus_extract_date\\(","exodus_extract_text\\(");
 				dictexpression="exodus_tobool("^dictexpression^")";
 			}
 			// missing op means =

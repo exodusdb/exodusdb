@@ -11,22 +11,24 @@ programinit()
 #include <lg_common.h>
 #include <ba_common.h>
 #include <ab_common.h>
+#include <pi_common.h>
 
 var xx;
 
 function main() {
 
 	//NB numbers and names MUST match those in the matching common .h files
-        mv.labelledcommon[win_common_no]=new win_common;
-        mv.labelledcommon[gen_common_no]=new gen_common;
-        mv.labelledcommon[fin_common_no]=new fin_common;
-        mv.labelledcommon[agy_common_no]=new agy_common;
-        mv.labelledcommon[bkg_common_no]=new bkg_common;
-        mv.labelledcommon[pp_common_no]=new pp_common;
-        mv.labelledcommon[md_common_no]=new md_common;
-        mv.labelledcommon[lg_common_no]=new lg_common;
-        mv.labelledcommon[ba_common_no]=new ba_common;
-        mv.labelledcommon[ab_common_no]=new ab_common;
+	mv.labelledcommon[win_common_no]=new win_common;
+	mv.labelledcommon[gen_common_no]=new gen_common;
+	mv.labelledcommon[fin_common_no]=new fin_common;
+	mv.labelledcommon[agy_common_no]=new agy_common;
+	mv.labelledcommon[bkg_common_no]=new bkg_common;
+	mv.labelledcommon[pp_common_no]=new pp_common;
+	mv.labelledcommon[md_common_no]=new md_common;
+	mv.labelledcommon[lg_common_no]=new lg_common;
+	mv.labelledcommon[ba_common_no]=new ba_common;
+	mv.labelledcommon[ab_common_no]=new ab_common;
+	mv.labelledcommon[pi_common_no]=new pi_common;
 
 	//cat ~/arev/dic/*.SQL | psql -h 127.0.0.1 -U exodus exodus
 
@@ -43,8 +45,8 @@ function main() {
 	createfile("REQUESTLOG");
 	createfile("SYS_MESSAGES");
 
-        //module
-        APPLICATION="ADAGENCY";
+	//module
+	APPLICATION="ADAGENCY";
 
 	//user
 	USERNAME="exodus";
@@ -91,10 +93,10 @@ function main() {
 	write(rec.r(7,invert("ALSOWINE")),"DEFINITIONS","NEOSYS");
 
 	//kick off with initgeneral or some custom command
-        var cmd=SENTENCE.field(" ",2,9999);
-        if (cmd)
-        	perform(cmd);
-        else {
+	var cmd=SENTENCE.field(" ",2,9999);
+	if (cmd)
+		perform(cmd);
+	else {
 		//batch mode
 		SYSTEM.r(33,1,"1");
 		//user
@@ -104,7 +106,7 @@ function main() {
 		perform("initgeneral LOGIN");
 	}
 
-        return 0;
+	return 0;
 }
 
 programexit()

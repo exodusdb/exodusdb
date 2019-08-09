@@ -1209,7 +1209,7 @@ var& var::unquoter()
 
 	// no change if no length
 	size_t len = var_str.length();
-	if (!len)
+	if (len<2)
 		return *this;
 
 	char char0 = var_str[0];

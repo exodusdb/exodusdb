@@ -1671,7 +1671,10 @@ bool var::oscopy(const var& to_osfilename) const
 	return true;
 }
 
-bool var::osdelete() const { return osdelete(*this); }
+bool var::osdelete() const
+{
+	return osdelete(*this);
+}
 
 // not boost ... only removes files?
 bool var::osdelete(const var& osfilename) const
@@ -1682,10 +1685,6 @@ bool var::osdelete(const var& osfilename) const
 	osfilename.osclose(); // in case this is cached opened file handle
 	return !std::remove(osfilename.to_path_string().c_str());
 }
-
-var var::oslistf(const var& path, const var& spec) const { return oslist(path, spec, 1); }
-
-var var::oslistd(const var& path, const var& spec) const { return oslist(path, spec, 2); }
 
 const std::string var::to_path_string() const
 {
@@ -1877,6 +1876,22 @@ var var::osdir() const
 	};
 }
 
+var var::oslistf(const var& path, const var& spec) const
+{
+	return this->oslist(path, spec, 1);
+}
+
+var var::oslistd(const var& path, const var& spec) const
+{
+	return this->oslist(path, spec, 2);
+}
+
+/*
+*@param	path	A directory or blank for current working directory. If spec if empty then the last part (after any slashes) is used as spec.
+*@param	spec	Optional glob like "*",  "*.*", "*.???" etc. (CASE INSENSITIVE)
+*@param	mode	1=files only, 2=directories only, otherwise both.
+*@returns		List of directory and/or filenames depending on mode. fm separator
+*/
 var var::oslist(const var& path0, const var& spec0, const int mode) const
 {
 	THISIS("var var::oslist(const var& path, const var& spec, const int mode) const")
@@ -1888,19 +1903,18 @@ var var::oslist(const var& path0, const var& spec0, const int mode) const
 
 	// http://www.boost.org/libs/filesystem/example/simple_ls.cpp
 
-	var path;
+	var path=path0.to_path_string();
 	var spec;
 	if (spec0.length())
 	{
-		path = path0;
 		spec = spec0;
 	}
 	// file globbing can and must be passed as tail end of path
 	// perhaps could use <glob.h> in linux instead of regex
 	else
 	{
-		spec = path0.field2(SLASH, -1);
-		path = path0.substr(1, path0.length() - spec.length());
+		spec = path.field2(SLASH, -1);
+		path = path.substr(1, path.length() - spec.length());
 
 		// escape all the regex special characters that are found in the strint
 		// except the * ? which are glob special characters
@@ -1976,11 +1990,11 @@ var var::oslist(const var& path0, const var& spec0, const int mode) const
 		try
 		{
 
+			// skip unwanted items
 			// dir_itr->path().leaf()  changed to dir_itr->leaf() in three places
 			// also is_directory(dir_itr->status()) changed to is_directory(*dir_itr)
 			// to avoid compile errors on boost 1.33
 			// http://www.boost.org/doc/libs/1_33_1/libs/filesystem/doc/index.htm
-			// skip unwanted items
 			if (filter && !std_boost::regex_match(dir_itr->LEAForFILENAME, re))
 				continue;
 

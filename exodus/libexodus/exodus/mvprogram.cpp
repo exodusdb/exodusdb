@@ -287,7 +287,7 @@ calc_fields.oswrite("calc_fields=");
 
 	}
 
-	sortselectclause2.outputl("stage2=");
+	sortselectclause2.outputl("\nstage2=");
 
 	bool result=CURSOR.select(sortselectclause2);
 
@@ -1613,10 +1613,10 @@ var ExodusProgramBase::singular(const var& pluralnoun)
 	return temp;
 }
 
-void ExodusProgramBase::flushindex(const var& filename)
+void ExodusProgramBase::flushindex(const var& /*filename*/)
 {
-	std::cout << "ExodusProgramBase::std::flushindex not implemented yet, " << filename
-		  << std::endl;
+	//std::cout << "ExodusProgramBase::std::flushindex not implemented yet, " << filename
+	//	  << std::endl;
 	return;
 }
 
