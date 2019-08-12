@@ -12,10 +12,12 @@ function main() {
 
 	var command=COMMAND.convert(FM," ").lcase();
 
+	command.swapper(" dict."," dict ");
+	command.swapper(" dict_"," dict ");
 	var dataonly=command.index(" data ");
+	var dictonly=command.index(" dict ");
 	command.swapper(" data "," ");
-	command.swapper(" dict "," dict_");
-	command.swapper(" dict."," dict_");
+	command.swapper(" dict "," ");
 
 	//printl(command);
 
@@ -28,17 +30,27 @@ function main() {
 		volname="";
 	}
 
-	var file;
 	//TODO support volume in createfile
-	var oscmd="createfile " ^ filename ^ " {S}";// ^ " " ^ OPTIONS;
 
-    //create a dict file as well if not creating a dict file and no "data" keyword
-	if (not dataonly and filename.substr(1,5) ne "dict_")
-		osshell("createfile dict_"^filename) ^ " {S}";
+    //dict file
+	if (not dataonly)
+		create("dict_"^filename);
 
-	oscmd.outputl("oscmd=");
-	return osshell(oscmd);
+    //data file
+	if (not dictonly)
+		create(filename);
+
+	return 0;
 }
 
-libraryexit()
+subroutine create(in filename) {
+	var msg=filename;
+	if (createfile(filename))
+		msg^=" created";
+	else
+		msg^=" not created";
+	if (not index(OPTIONS,"S"))
+		printl(msg);
 
+}
+libraryexit()

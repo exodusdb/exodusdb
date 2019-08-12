@@ -116,12 +116,14 @@ class ExodusProgramBase
 	void setprivilege(const var& var1);
 
 	// NB does not return record yet
-	bool lockrecord(const var& filename, const var& file, const var& keyx, const var& recordx,
+	bool lockrecord(const var& filename, var& file, const var& keyx, const var& recordx,
 			const int waitsecs = 0, const bool allowduplicate = false) const;
 	// bool lockrecord(const var& xfilename, const var& xfile, const var& keyx, const var&
 	// recordx, const var& waitsecs, const bool allowduplicate=false) const;
-	bool lockrecord(const var& filename, const var& file, const var& keyx) const;
-	bool unlockrecord(const var& filename, const var& file, const var& key) const;
+	bool lockrecord(const var& filename, var& file, const var& keyx) const;
+	bool unlockrecord(const var& filename, var& file, const var& key) const;
+	//unlock all
+	bool unlockrecord() const;
 
 	var decide(const var& question, const var& options) const;
 	var decide(const var& question, const var& options, var& reply,

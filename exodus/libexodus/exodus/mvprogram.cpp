@@ -41,7 +41,8 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 	var calc_fields=CURSOR.a(10);
 	if (!calc_fields)
 		return true;
-calc_fields.oswrite("calc_fields=");
+	//calc_fields.oswrite("calc_fields=");
+
 	//stage 2
 	/////////
 
@@ -1304,7 +1305,14 @@ baddict:
 	return "";
 }
 
-bool ExodusProgramBase::unlockrecord(const var& filename, const var& file0, const var& key) const
+//unlock all
+bool ExodusProgramBase::unlockrecord() const
+{
+	var xx;
+	return unlockrecord("",xx,"");
+}
+
+bool ExodusProgramBase::unlockrecord(const var& filename, var& file0, const var& key) const
 {
 	var file;
 	if (file0.unassigned())
@@ -1520,13 +1528,13 @@ var ExodusProgramBase::otherdatasetusers(const var& param)
 	}
 }
 
-bool ExodusProgramBase::lockrecord(const var& filename, const var& file, const var& keyx) const
+bool ExodusProgramBase::lockrecord(const var& filename, var& file, const var& keyx) const
 {
 	var record;
 	return (bool)lockrecord(filename, file, keyx, record);
 }
 
-bool ExodusProgramBase::lockrecord(const var& filename, const var& file, const var& keyx,
+bool ExodusProgramBase::lockrecord(const var& filename, var& file, const var& keyx,
 				   const var& recordx, const int waitsecs0,
 				   const bool allowduplicate) const
 {
@@ -1543,6 +1551,15 @@ bool ExodusProgramBase::lockrecord(const var& filename, const var& file, const v
 	// * wait infinite number of seconds
 	// if index(file,'message',1) else de bug
 	int waitsecs = waitsecs0;
+
+	if (file.unassigned())
+	{
+		if (not file.open(filename))
+		{
+			call mssg(filename.quote()^" cannot be opened in LOCKRECORD "^keyx);
+			var().abort();
+		}
+	}
 
 lock:
 	var locked = file.lock(keyx);

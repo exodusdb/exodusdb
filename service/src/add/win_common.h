@@ -4,8 +4,11 @@
 
 commoninit(win,win_common_no)
 
+	//not generated automatically - manually add whatever are required
+	//recompile all consumers unless add on the end
 	var srcfile = "";
 	var srcdict = "";
+	var label = "";
 	var templatex = "";
 	var amvvars = "";
 	var redisplaylist = "";
