@@ -51,15 +51,17 @@ cat > /tmp/exoduspg.input << EOF
 
 psql -U postgres -d template1 << EOF2
 \connect template1
-CREATE OR REPLACE FUNCTION exodus_call(bytea, bytea, bytea, bytea, bytea, int4, int4) RETURNS bytea AS 'pgexodus', 'exodus_call' LANGUAGE C IMMUTABLE;
-CREATE OR REPLACE FUNCTION exodus_extract_bytea(bytea, int4, int4, int4) RETURNS bytea AS 'pgexodus', 'exodus_extract_bytea' LANGUAGE C IMMUTABLE;
-CREATE OR REPLACE FUNCTION exodus_extract_text(bytea, int4, int4, int4) RETURNS text AS 'pgexodus', 'exodus_extract_text' LANGUAGE C IMMUTABLE;
-CREATE OR REPLACE FUNCTION exodus_extract_sort(bytea, int4, int4, int4) RETURNS text AS 'pgexodus', 'exodus_extract_sort' LANGUAGE C IMMUTABLE;
--- Remaining functions are STRICT therefore never get called with NULLS -- also return NULL if passed zero length strings
-CREATE OR REPLACE FUNCTION exodus_extract_text2(bytea, int4, int4, int4) RETURNS text AS 'pgexodus', 'exodus_extract_text2' LANGUAGE C IMMUTABLE STRICT;
-CREATE OR REPLACE FUNCTION exodus_extract_date(bytea, int4, int4, int4) RETURNS date AS 'pgexodus', 'exodus_extract_date' LANGUAGE C IMMUTABLE STRICT;
-CREATE OR REPLACE FUNCTION exodus_extract_time(bytea, int4, int4, int4) RETURNS time AS 'pgexodus', 'exodus_extract_time' LANGUAGE C IMMUTABLE STRICT;
-CREATE OR REPLACE FUNCTION exodus_extract_datetime(bytea, int4, int4, int4) RETURNS timestamp AS 'pgexodus', 'exodus_extract_datetime' LANGUAGE C IMMUTABLE STRICT; 
+
+CREATE OR REPLACE FUNCTION exodus_count(text, text) RETURNS integer AS 'pgexodus', 'exodus_count' LANGUAGE C IMMUTABLE;
+CREATE OR REPLACE FUNCTION exodus_extract_text(text, int4, int4, int4) RETURNS text AS 'pgexodus', 'exodus_extract_text' LANGUAGE C IMMUTABLE;
+CREATE OR REPLACE FUNCTION exodus_extract_sort(text, int4, int4, int4) RETURNS text AS 'pgexodus', 'exodus_extract_sort' LANGUAGE C IMMUTABLE;
+-- Remaining functions are STRICT therefore never get called with NULLS also return NULL if passed zero length strings
+CREATE OR REPLACE FUNCTION exodus_extract_text2(text, int4, int4, int4) RETURNS text AS 'pgexodus', 'exodus_extract_text2' LANGUAGE C IMMUTABLE STRICT;
+CREATE OR REPLACE FUNCTION exodus_extract_date(text, int4, int4, int4) RETURNS date AS 'pgexodus', 'exodus_extract_date' LANGUAGE C IMMUTABLE STRICT;
+CREATE OR REPLACE FUNCTION exodus_extract_time(text, int4, int4, int4) RETURNS time AS 'pgexodus', 'exodus_extract_time' LANGUAGE C IMMUTABLE STRICT;
+CREATE OR REPLACE FUNCTION exodus_extract_datetime(text, int4, int4, int4) RETURNS timestamp AS 'pgexodus', 'exodus_extract_datetime' LANGUAGE C IMMUTABLE STRICT;
+CREATE OR REPLACE FUNCTION exodus_extract_number(text, int4, int4, int4) RETURNS float8 AS 'pgexodus', 'exodus_extract_number' LANGUAGE C IMMUTABLE STRICT;
+
 CREATE ROLE exodus LOGIN
  PASSWORD 'somesillysecret'
  CREATEDB CREATEROLE;
