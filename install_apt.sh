@@ -77,7 +77,7 @@ sudo su postgres -c "/tmp/exoduspg.input"
 rm /tmp/exoduspg.input
 
 #/etc/init.d/postgresql reload
-sudo /etc/init.d/postgresql-$POSTGRESVER reload
+sudo /etc/init.d/postgresql reload
 
 
 #==== 3. Configuring Exodus for Postgres ====
