@@ -21,6 +21,9 @@ cat /etc/issue
 
 #==== 1. Building and Installing Exodus ====
 
+#required in case building on a pristine installation
+sudo apt-get update
+
 ###yum -y install subversion gcc-c++ postgresql-devel
 #sudo apt-get -y install subversion g++ postgresql-server-dev-all libboost-all-dev build-essential cmake
 sudo apt-get -y install git g++ postgresql-server-dev-all libboost-all-dev build-essential cmake
