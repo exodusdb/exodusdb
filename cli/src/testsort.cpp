@@ -67,8 +67,9 @@ function main() {
                 var key=field(dictrec, "|", 1);
                 var rec=field(dictrec, "|", 2, 999999);
 
-                printl(oconv(key,"L#14"), ": ", rec);
+                printl(key, " : ", rec);
 
+    		    key=trim(key);
     		    rec=trim(rec);
 	       		rec=swap(rec, " |", "|");
 
