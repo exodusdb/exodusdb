@@ -82,16 +82,18 @@ function main() {
 	if (not var().sqlexec("DROP MATERIALIZED VIEW dict_all"))
 		var().sqlexec("DROP VIEW dict_all");
 
-	viewsql.splicer(-6,6,"");//remove trailing "UNION" word
-	var errmsg;
-	if (verbose)
-		viewsql.output("SQL:");
-	if (var().sqlexec(viewsql,errmsg))
-		printl("dict_all file created");
-	else {
-		if (not verbose)
-			viewsql.outputl("SQL:");
-		errmsg.outputl("Error:");
+	if (nfiles) {
+		viewsql.splicer(-6,6,"");//remove trailing "UNION" word
+		var errmsg;
+		if (verbose)
+			viewsql.output("SQL:");
+		if (var().sqlexec(viewsql,errmsg))
+			printl("dict_all file created");
+		else {
+			if (not verbose)
+				viewsql.outputl("SQL:");
+			errmsg.outputl("Error:");
+		}
 	}
 
 	//create exodus pgsql functions
