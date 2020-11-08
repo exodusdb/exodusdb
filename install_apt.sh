@@ -80,7 +80,7 @@ rm /tmp/exoduspg.input
 
 #/etc/init.d/postgresql reload
 sudo /etc/init.d/postgresql reload
-
+sleep 5
 
 #==== 3. Configuring Exodus for Postgres ====
 
