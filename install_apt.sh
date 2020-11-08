@@ -90,13 +90,18 @@ password=somesillysecret \
 > ~/.exodus
 
 
-#==== 4. Testing Exodus ====
+#==== 4. Add some postgres utility functions ====
+
+#one of the exodus cli programs
+dict2sql
+
+#==== 5. Testing Exodus ====
 
 cd ~
 testsort
 
 
-#==== 5. Programming with Exodus ====
+#==== 6. Programming with Exodus ====
 
 #you must make some change to hello or actually save it, not just quit
 #edic hello
