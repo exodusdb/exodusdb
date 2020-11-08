@@ -196,6 +196,7 @@ DLL_PUBLIC void osshellwrite(const var& writestr, const var& command)
 DLL_PUBLIC void stop(const var& text) { text.stop(text); }
 
 DLL_PUBLIC void abort(const var& text) { var().abort(text); }
+DLL_PUBLIC void abortall(const var& text) { var().abortall(text); }
 
 // DLL_PUBLIC var perform(const var& command)
 //{

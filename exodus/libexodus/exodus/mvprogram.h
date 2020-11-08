@@ -66,6 +66,7 @@ class ExodusProgramBase
 
 	bool savelist(const var& listname);
 	bool getlist(const var& listname);
+	bool formlist(const var& filename_or_command, const var& keys="", const var fieldno=0);
 	bool makelist(const var& listname, const var& keys);
 	bool deletelist(const var& listname);
 

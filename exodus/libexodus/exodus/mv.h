@@ -1371,6 +1371,7 @@ class DLL_PUBLIC var final
 	bool getlist(const var& listname);
 	bool makelist(const var& listname, const var& keys);
 	bool deletelist(const var& listname) const;
+	bool formlist(const var& keys, const var& fieldno=0);
 
 	bool saveselect(const var& filename);
 

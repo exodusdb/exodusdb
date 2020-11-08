@@ -2,9 +2,7 @@
 message("")
 message("--LIBEXODUS CMAKE INIT --")
 
-##SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
-##SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg")
-##SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wc++17-extensions")
+#use CMakeList.txt options in parent directory
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-undef")
 
 cmake_minimum_required(VERSION 2.8)

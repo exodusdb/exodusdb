@@ -1,11 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-#2014/06/01 exodus doesnt require c++11 but we enable it for
-#removing this to avoid problem linking to filesystem at the moment with c++11
-
-#works using c++14 default on Ubuntu 18.04 so no need for this
-#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
-#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -rdynamic")
+#use CMakeList.txt options in parent directory
 
 message("")
 message("--EXODUS CLI CMAKE INIT --")
@@ -32,6 +27,7 @@ link_directories(${CMAKE_CURRENT_SOURCE_DIR}../../exodus/libexodus/exodus)
 add_executable(compile compile.cpp)
 add_executable(createfile createfile.cpp)
 add_executable(createindex createindex.cpp)
+add_executable(dbgrep dbgrep.cpp)
 add_executable(delete delete.cpp)
 add_executable(clearfile clearfile.cpp)
 add_executable(deletefile deletefile.cpp)
@@ -62,6 +58,7 @@ add_library(number SHARED number.cpp)
 target_link_libraries(compile exodus stdc++fs ${LIBS})
 target_link_libraries(createfile exodus stdc++fs ${LIBS})
 target_link_libraries(createindex exodus stdc++fs ${LIBS})
+target_link_libraries(dbgrep exodus stdc++fs ${LIBS})
 target_link_libraries(delete exodus stdc++fs ${LIBS})
 target_link_libraries(clearfile exodus stdc++fs ${LIBS})
 target_link_libraries(deletefile exodus stdc++fs ${LIBS})
@@ -79,11 +76,12 @@ target_link_libraries(testsort exodus stdc++fs ${LIBS})
 target_link_libraries(configexodus exodus stdc++fs ${LIBS})
 
 
-### 3. INSTALL BIN ###
+### 3. INSTALL BINs ###
 
 install(TARGETS compile
 createfile
 createindex
+dbgrep
 delete
 clearfile
 deletefile
@@ -100,7 +98,7 @@ testsort
 configexodus
  DESTINATION bin)
 
-### 4. INSTALL LIB ###
+### 4. INSTALL LIBs ###
 
 ## CMAKE_PREFIX=/usr/local/
 #install(TARGETS dict_myclients DESTINATION lib)

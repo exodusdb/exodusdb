@@ -5,27 +5,28 @@ function main() {
 
 //init:
 	var reqfile = COMMAND.a(2);
-	var reqkey = COMMAND.a(3);
-	var reqtext = COMMAND.a(4);
+	var reqtext = COMMAND.a(3);
+	var padding = COMMAND.a(4);
 
-	if ( not( reqfile or reqtext) )
-		printl("syntax: <pgsqlfiles> [filename] [key/datatosearch] [datatosearch] [docmd]");
-	// find all dict_files that contain pgsql code
-	// find all files that 
+	if ( not(reqfile or reqtext)) {
+		printl("syntax: dbgrep filename text");
+		printl("        dbgrep - text");
+		//stop();
+	}
 
-
-
-//initfile:
-	// GET ALL FILENAMES
+	// get filenames
 	var filenames = listfiles();
 	var nfiles=filenames.dcount(FM);
 
-//nextfile:
-        for (int filen = 1; filen <= nfiles; ++filen) { // for each file do
+	for (int filen = 1; filen <= nfiles; ++filen) {
 
-		// filter filename
-        	var filename=filenames.a(filen);
-		if (reqfile and reqfile ne "-" and not(filename.index(reqfile.lcase())))
+		var filename=filenames.a(filen);
+
+		if (filename.index("preselect") or filename.index("select_stage2"))
+			continue;
+
+		// filter by reqfilename. "-" means all files
+		if (reqfile and reqfile ne "-" and filename ne reqfile.lcase())
 			continue;
 
 		// OPEN FILE or skip file
@@ -34,38 +35,37 @@ function main() {
 			printl(filename.quote() ^ " file cannot be opened");
 			continue;
 		}
-//fileinit:
 
-//initrec:
-		// SELECT
 		file.select();
 
-//nextrec:
+		var nresults = 1;
 		var key;
 		while (file.readnext(key)) {
 
 			// get record or skip
 			var data;
-			if( not(data.read(file,key)) ) {
-				abort(key.quote()^" is missing from " ^ file.quote());
+			if (not(data.read(file,key)) ) {
+				//abort(key.quote()^" is missing from " ^ file.quote());
 				continue;
 			}
 
-			// case: reqtext not provided OR if reqtext found in data
-			if (reqtext and not(data.lcase().index(reqtext.lcase()))) {
+			if ( reqtext and (not(data.lcase().index(reqtext.lcase())) or not(key.lcase().index(reqtext.lcase())))) {
 				continue;
 			}
 
-			printl(filename," ",key," ",data.substr(1,10));
-//recinit:
-//recexit:
-		//goto nextrec
+			// padding & startpos used to contextualise found reqtext
+			var startpos = data.index(reqtext);
+
+			var leftcontext = data.substr(startpos-padding, padding );
+			var rightcontext = data.substr( startpos+length(reqtext), padding );
+
+			var context =leftcontext^"\033[1;31m"^reqtext^"\033[0m"^rightcontext;
+
+			printl(filename, " : ", key, " :: ",context);
+
 		}
-//fileexit:
-	//goto nextfile
 
-        }
-//exit:
+    }
 
 	return 0;
 

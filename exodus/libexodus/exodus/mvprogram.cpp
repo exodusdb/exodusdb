@@ -306,6 +306,29 @@ bool ExodusProgramBase::getlist(const var& listname)
 	return CURSOR.getlist(listname.field(" ", 1));
 }
 
+bool ExodusProgramBase::formlist(const var& filename_or_command, const var& keys/*=""*/, const var fieldno/*=0*/)
+{
+	//remove any options from the filename or command
+	var filename2=filename_or_command;
+	if (filename2[-1] eq ")") {
+		var options=filename2.field2(" ",-1);
+		filename2.splicer(-options.length(),999999999,"").trimmerb();
+	}
+
+	//optionally get keys from filename or command
+	var keys2 = (keys=="") ? filename2.field(" ",2,999999999) : keys;
+
+	//remove any keys from the filename
+	filename2=filename2.field(" ",1);
+
+	//open the file
+	clearselect();
+	if (not CURSOR.open(filename2))
+		throw MVException(filename2.quote() ^ " file cannot be opened in formlist(" ^keys^")");
+
+	return CURSOR.formlist(keys2, fieldno);
+}
+
 bool ExodusProgramBase::makelist(const var& listname, const var& keys)
 {
 	return CURSOR.makelist(listname.field(" ", 1), keys);

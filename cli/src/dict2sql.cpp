@@ -198,7 +198,7 @@ subroutine onefile(in dictfilename, in reqdictid, io viewsql) {
 
 	if (!open(dictfilename,dictfile)) {
 		call fsmsg();
-		abort();
+		abort("onefile");
 	}
 
 	if (reqdictid)

@@ -3724,6 +3724,36 @@ bool var::getlist(const var& listname)
 	return true;
 }
 
+//TODO make it work for multiple keys or select list
+bool var::formlist(const var& keys, const var& fieldno)
+{
+	THISIS("bool var::formlist(const var& keys, const var& fieldno)")
+	//?allow undefined usage like var xyz=xyz.select();
+	THISISSTRING()
+	ISSTRING(keys)
+	ISNUMERIC(fieldno)
+
+	if (GETDBTRACE)
+		var("DBTRACE: ::formlist(" ^ keys ^ ")").logputl();
+
+	this->clearselect();
+
+	var record;
+    if (not record.read(*this,keys))
+	{
+		keys.outputl("formlist() cannot read " ^ (*this) ^ ", ");
+		return false;
+	}
+
+	//optional field extract
+	if (fieldno)
+		record=record.a(fieldno).converter(VM,FM);
+
+    this->makelist("",record);
+
+	return true;
+}
+
 // MAKELIST would be much better called MAKESELECT
 // since the most common usage is to omit listname in which case the keys will be used to simulate a
 // SELECT statement Making a list can be done simply by writing the keys into the list file without
