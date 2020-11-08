@@ -2,7 +2,7 @@
 libraryinit()
 
 #include <authorised.h>
-#include <validcode2.h>
+//#include <validcode2.h>
 #include <initcompany.h>
 #include <addcent.h>
 #include <changelogsubs.h>
@@ -156,9 +156,9 @@ nextcomp:
 			compcode = allcomps.a(ii);
 			///BREAK;
 			if (not compcode) break;
-			if (validcode2(compcode, "", "", xx, yy)) {
+			//if (validcode2(compcode, "", "", xx, yy)) {
 				compcodes.r(-1, compcode);
-			}
+			//}
 		};//ii;
 	}else{
 		compcodes = allcomps.a(1);
