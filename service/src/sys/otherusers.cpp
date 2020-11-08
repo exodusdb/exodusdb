@@ -1,0 +1,165 @@
+#include <exodus/library.h>
+libraryinit()
+
+#include <rtp57.h>
+
+var databasecode;
+var usercode;//num
+var lockprefix;
+var result;
+var xx;
+var yy;
+var zz;
+
+function main(in databasecode0="", in usercode0="") {
+	//c sys "",""
+
+	//returns the number of other users of NEOSYS
+
+	//global xx,yy,result
+
+	if (SENTENCE.field(" ", 1) == "OTHERUSERS") {
+		databasecode = SENTENCE.field(" ", 2);
+	}else{
+		if (databasecode0.unassigned()) {
+			databasecode = "";
+		}else{
+			databasecode = databasecode0;
+		}
+	}
+	if (usercode0.unassigned()) {
+		usercode = "";
+	}else{
+		usercode = usercode0;
+	}
+
+	var processes = "";
+
+	//curruserlockid.sys134=sysvar('GET',109,134)
+	var curruserlockid = PROCESSNO;
+
+	var returndata = 0;
+	var otherusercodes = "";
+
+	//IF @STATION # '' THEN
+
+	//we are at rev 2.0
+	//IF revRELEASE()>= 2.1 THEN
+	// lockmode=36
+	// unlockmode=37
+	//END ELSE
+	var lockmode = 23;
+	var unlockmode = 24;
+	// END
+
+	if (curruserlockid.isnum()) {
+		lockprefix = "";
+	}else{
+		lockprefix = "U" ^ var("99999").substr(-4,4);
+	}
+
+	//FOR lockno = 1 TO RUNTIME();*SYSE3_NUSERS
+
+	for (var lockno = 1; lockno <= 100; ++lockno) {
+
+		var lockid = lockprefix ^ lockno;
+
+		//skip current user
+		if (lockid == curruserlockid) {
+			goto nextlock;
+		}
+
+		//skip 10,20,100 etc because they appear to be equivalent to
+		// their equivalents without trailing zeroes
+		if ((lockno[-1] == "0") and lockprefix) {
+			goto nextlock;
+		}
+
+		lockid = lockprefix ^ lockno;
+		//IF lockid # SYS134 THEN
+
+		//attempt to lock
+		result = "";
+		xx = "";
+		yy = "";
+		call rtp57(lockmode, "", xx, lockid, "", yy, result);
+
+		//if successful, then unlock
+		if (result) {
+			xx = "";
+			yy = "";
+			call rtp57(unlockmode, "", xx, lockid, "", yy, zz);
+			goto nextlock;
+		}
+
+		//check process records
+
+		//skip processes in wrong database or wrong usercode
+		if (databasecode or usercode) {
+
+			if (processes == "") {
+				if (not(processes.open("PROCESSES", ""))) {
+					processes = 0;
+				}
+			}
+			if (processes) {
+				var processno = lockno - (lockno / 10).floor();
+				var process;
+				if (not(process.read(processes, processno))) {
+					//if no process record then assume no process
+					//and failed lock because another OTHERUSERS is testing the same lock
+					//could really skip further checking since should not be
+					//any higher processes but lock fail on missing process is infrequent
+					//but does happen when with many eg 10+ processes on diff dbs
+					goto nextlock;
+				}
+
+				if (databasecode and process.a(17) ne databasecode) {
+					goto nextlock;
+				}
+
+				if (usercode and process.a(40, 10) ne usercode) {
+					goto nextlock;
+				}
+
+			}
+
+			//end of database or user code provided
+		}
+
+		otherusercodes.r(1, -1, lockid);
+
+		returndata += 1;
+
+nextlock:;
+	};//lockno;
+
+	returndata -= 1;
+	if (returndata < 0) {
+		returndata = 0;
+	}
+
+	if (returndata) {
+		returndata.r(2, otherusercodes);
+		returndata.r(3, curruserlockid);
+	}
+
+	for (var ii = 1; ii <= 9999; ++ii) {
+		usercode = returndata.a(2, ii);
+		///BREAK;
+		if (not usercode) break;
+		usercode = usercode.substr(6,9999);
+		if (not(curruserlockid.isnum())) {
+			usercode -= (usercode / 10).floor();
+		}
+		returndata.r(2, ii, "PROCESS" ^ usercode);
+	};//ii;
+
+	if (SENTENCE.field(" ", 1) == "OTHERUSERS") {
+		call note(returndata.a(1) ^ " other users");
+	}
+
+	return returndata;
+}
+
+libraryexit()

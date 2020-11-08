@@ -1,0 +1,7 @@
+CMake*
+cmake*
+CPack*
+Makefile
+install_manifest.txt
+*libexodus.so*
+pgexodus.so

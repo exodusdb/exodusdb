@@ -1,0 +1,27 @@
+#include <exodus/library.h>
+
+libraryinit(secs)
+//---------------
+function main() {
+	var responsetime = RECORD.a(5);
+	if (responsetime.length()) {
+		ANS = RECORD.a(5) - ID.field("*", 3);
+		if (ANS < 0) {
+			ANS += 86400;
+		}
+	//garbagecollect
+		ANS = (ANS.oconv("MD20P")) + 0;
+	}else{
+	//blank if no response time (crashed)
+		ANS = "";
+	}
+	return ANS;
+}
+libraryexit(secs)
+
+libraryinit(seq)
+//--------------
+function main() {
+	return ID;
+}
+libraryexit(seq)
