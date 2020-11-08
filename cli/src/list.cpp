@@ -422,8 +422,27 @@ function main() {
 	silent = 0;
 
 	if (not(dictvoc.open("dict_voc", ""))) {
-		call fsmsg();
-		var().stop();
+		createfile("dict_voc");
+		if (not(dictvoc.open("dict_voc", ""))) {
+			call fsmsg();
+			var().stop();
+		}
+	}
+
+	if (not(tt.read(dictvoc,"@ID"))) {
+		var("F|0|TABLE_NAME|S|1||||L|20||VARCHAR").converter("|",FM).write(dictvoc,"TABLE_NAME");
+		var("F|0|COLUMN_NAME|S|2||||L|20").converter("|",FM).write(dictvoc,"COLUMN_NAME");
+		var("G||TYPE FMC PART HEADING SM CONV JUST LEN MASTER_FLAG|||||||||||||||||||||||||0").converter("|",FM).write(dictvoc,"@CRT");
+		var("F|0|Ref.|S|0||||T|20").converter("|",FM).write(dictvoc,"@ID");
+		var("F|1|TYPE|S|0||||L|4").converter("|",FM).write(dictvoc,"TYPE");
+		var("F|2|FMC|S|0||||R|3").converter("|",FM).write(dictvoc,"FMC");
+		var("F|5|PART|S|0||||R|2").converter("|",FM).write(dictvoc,"PART");
+		var("F|3|HEADING|S|0||||T|20").converter("|",FM).write(dictvoc,"HEADING");
+		var("F|4|SM|S|0||||L|4").converter("|",FM).write(dictvoc,"SM");
+		var("F|7|CONV|S|0||||L|9").converter("|",FM).write(dictvoc,"CONV");
+		var("F|9|JST|S|0||||L|3").converter("|",FM).write(dictvoc,"JUST");
+		var("F|10|LEN|S|0||||R|3||LENGTH").converter("|",FM).write(dictvoc,"LEN");
+		var("F|28|MST|S|||BYes,||L|4").converter("|",FM).write(dictvoc,"MASTER_FLAG");
 	}
 
 	colname.redim(maxncols);

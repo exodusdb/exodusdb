@@ -52,7 +52,8 @@ function main() {
         _FM_ "DATE_CREATED |F|3|Date Created ||||D4        ||L|12"
         _FM_ "TIME_CREATED |F|4|Time Created ||||MTH       ||L|12"
         _FM_ "BALANCE      |F|5|Balance      ||||MD20P     ||R|10"
-        _FM_ "TIMESTAMP    |F|6|Timestamp    ||||[DATETIME]||L|12"
+        //_FM_ "TIMESTAMP    |F|6|Timestamp    ||||[DATETIME]||L|12"
+        _FM_ "TIMESTAMP    |F|6|Timestamp    ||||          ||R|12"
         _FM_ "NAME_AND_TYPE|S| |Name and Type||||          ||L|20"
         _FM_ "NAME_AND_CODE|S| |Name and Code||||          ||L|20"
         _FM_ "@CRT         |G| |CODE NAME TYPE NAME_AND_TYPE BALANCE DATE_CREATED TIME_CREATED TIMESTAMP";
@@ -64,14 +65,13 @@ function main() {
 
                 var dictrec=extract(dictrecs, recn);
 
-                var key=field(dictrec, "|", 1);
+                var key=trim(field(dictrec, "|", 1));
                 var rec=field(dictrec, "|", 2, 999999);
 
                 printl(key, " : ", rec);
 
-    		    key=trim(key);
-    		    rec=trim(rec);
-	       		rec=swap(rec, " |", "|");
+    		rec=trim(rec);
+	       	rec=swap(rec, " |", "|");
 
                 rec=convert(rec, "|", FM);
 
