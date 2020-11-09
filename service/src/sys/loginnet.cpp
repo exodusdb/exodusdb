@@ -2,9 +2,8 @@
 libraryinit()
 
 #include <authorised.h>
-#include <validcode2.h>
 #include <initcompany.h>
-#include <addcent.h>
+#include <addcent4.h>
 #include <changelogsubs.h>
 
 #include <gen_common.h>
@@ -16,13 +15,14 @@ var taskn;//num
 var xx;
 var menun2;
 var compcodex;
-var yy;
+var msg0;
 var paramrec;
 
 function main(in dataset, in username, io cookie, io msg, io authcompcodes) {
 	//c sys in,in,io,io,io
 
 	//this is a special login routine called from LISTEN2
+	//declare function validcode1
 	#include <general_common.h>
 	#include <common.h>
 	#include <agency_common.h>
@@ -156,9 +156,17 @@ nextcomp:
 			compcode = allcomps.a(ii);
 			///BREAK;
 			if (not compcode) break;
-			if (validcode2(compcode, "", "", xx, yy)) {
+			//if validcode2(compcode,'','',xx,yy) then compcodes<-1>=compcode
+			//if validcode1(compcode,'','',xx,yy) then compcodes<-1>=compcode
+			//dont use general subroutine in system module
+			var companypositive = "";
+			if (not(authorised("COMPANY ACCESS", msg0, ""))) {
+				companypositive = "#";
+			}
+			if (authorised(companypositive ^ "COMPANY ACCESS " ^ (compcode.quote()), msg, "")) {
 				compcodes.r(-1, compcode);
 			}
+
 		};//ii;
 	}else{
 		compcodes = allcomps.a(1);
@@ -198,7 +206,7 @@ nextcomp:
 	if (FILES(0).locateusing(FM,"MARKETS",xx)) {
 		defmarketcode = agy.agp.a(37);
 		maincurrcode = defmarketcode.xlate("MARKETS", 5, "X");
-	}
+		}
 
 	//main currencycode
 	if (maincurrcode.unassigned()) {
@@ -213,12 +221,13 @@ nextcomp:
 	cookie = "m=" ^ menus.convert(VM, ",");
 	cookie ^= "&cc=" ^ compcode;
 	cookie ^= "&nc=" ^ ncompanies;
-	cookie ^= "&pd=" ^ fin.currperiod ^ "/" ^ addcent(fin.curryear, "", "", xx);
+	cookie ^= "&pd=" ^ fin.currperiod ^ "/" ^ addcent4(fin.curryear);
 	cookie ^= "&bc=" ^ fin.basecurrency;
 	cookie ^= "&bf=" ^ BASEFMT;
 	cookie ^= "&mk=" ^ defmarketcode;
 	cookie ^= "&mc=" ^ maincurrcode;
 	cookie ^= "&tz=" ^ SW;
+	cookie ^= "&ms=" ^ 60000;
 
 	//current datasetname
 	var temp = SYSTEM.a(23);
