@@ -18,8 +18,8 @@ libraryinit()
 #include <scrnio.h>
 
 #include <gen_common.h>
-#include <fin_common.h>
-#include <agy_common.h>
+//#include <fin_common.h>
+//#include <agy_common.h>
 #include <win_common.h>
 
 var request2;
@@ -52,8 +52,8 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 	//c sys in,in,in,in,in,in
 
 	#include <general_common.h>
-	#include <common.h>
-	#include <agency_common.h>
+//	#include <common.h>
+//	#include <agency_common.h>
 	//global ii,userencrypt0,passwordexpired,lastlogindate,maxnologindays,validips
 	//global filetime,fileattributes
 
