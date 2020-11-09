@@ -51,8 +51,8 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 	//c sys in,in,in,in,in,in
 
 	#include <general_common.h>
-	//$insert abp,common
-	//$insert bp,agency.common
+//	#include <common.h>
+//	#include <agency_common.h>
 	//global ii,userencrypt0,passwordexpired,lastlogindate,maxnologindays,validips
 	//global filetime,fileattributes
 
