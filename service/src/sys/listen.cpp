@@ -18,13 +18,13 @@ libraryinit()
 #include <listen3.h>
 #include <singular.h>
 #include <systemsubs.h>
-//#include <generalsubs.h>
+#include <generalsubs.h>
 #include <authorised.h>
 #include <flushindex.h>
 #include <rtp57.h>
 
 #include <gen_common.h>
-//#include <fin_common.h>
+#include <fin_common.h>
 #include <win_common.h>
 
 var logfilename;
@@ -209,7 +209,7 @@ function main() {
 	//global all
 
 	//finance?!
-	//#include <common.h>
+	#include <common.h>
 	// $insert bp,agency.common
 
 	//notes
@@ -654,7 +654,6 @@ nextsearch0:
 	//eg TESTMARK/BMTEST (MARKONE/BMDATA runs!!!!) both MASTERBR and MASTTEST dont
 	//on nl1 it will not run the waiting.exe command
 	//solved by removing path before WAITING.EXE above (unknown cause though)
-
 	if (SYSTEM.a(29)) {
 
 		osshell(cmd);
@@ -1771,7 +1770,7 @@ getnextkey:
 			win.datafile = filename;
 			win.srcfile = file;
 
-			//call generalsubs("DEF.SK." ^ readenv);
+			call generalsubs("DEF.SK." ^ readenv);
 
 			keyx = win.isdflt;
 
