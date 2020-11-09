@@ -9,7 +9,6 @@ libraryinit()
 #include <singular.h>
 
 #include <gen_common.h>
-#include <fin_common.h>
 #include <win_common.h>
 
 #include <window.hpp>
@@ -28,13 +27,13 @@ function main(in mode) {
 	//c sys
 
 	#include <general_common.h>
-	#include <common.h>
+	//$insert abp,common
 
 	var users;
 	if (not(users.open("USERS", ""))) {
 		msg = "USERS file is missing";
 		return invalid(msg);
-	}
+		}
 
 	if (mode == "POSTREAD") {
 
@@ -213,7 +212,7 @@ function main(in mode) {
 					//expiry date
 					if (win.orec.a(35)) {
 						RECORD.r(35, win.orec.a(35));
-					}
+						}
 					//password date
 					if (win.orec.a(36)) {
 						RECORD.r(36, win.orec.a(36));
