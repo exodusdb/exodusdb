@@ -3,7 +3,7 @@ libraryinit()
 
 #include <getreccount.h>
 
-#include <agy_common.h>
+//#include <agy_common.h>
 
 var v69;
 var v70;
@@ -15,7 +15,7 @@ var nrecs;//num
 function main(in filenames0, out result) {
 	//c gen in,out
 
-	#include <agency_common.h>
+	//#include <agency_common.h>
 
 	call pushselect(0, v69, v70, v71);
 
