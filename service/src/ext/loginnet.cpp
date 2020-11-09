@@ -19,7 +19,7 @@ var msg0;
 var paramrec;
 
 function main(in dataset, in username, io cookie, io msg, io authcompcodes) {
-	//c sys in,in,io,io,io
+	//c gen in,in,io,io,io
 
 	//this is a special login routine called from LISTEN2
 	//declare function validcode1
@@ -227,7 +227,7 @@ nextcomp:
 	cookie ^= "&mk=" ^ defmarketcode;
 	cookie ^= "&mc=" ^ maincurrcode;
 	cookie ^= "&tz=" ^ SW;
-	cookie ^= "&ms=" ^ 60000;
+	cookie ^= "&ms=60000";
 
 	//current datasetname
 	var temp = SYSTEM.a(23);
