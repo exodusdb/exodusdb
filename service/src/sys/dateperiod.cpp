@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <addcent.h>
+#include <addcent4.h>
 
 var period;//num
 var year;//num
@@ -31,7 +31,7 @@ function main(in type, in input0, in mode, out output) {
 		}else{
 			if (period < 1) {
 				period += 12;
-				year = (addcent(year - 1)).oconv("R(0)#2");
+				year = (addcent4(year - 1)).oconv("R(0)#2");
 			}
 		}
 
@@ -51,7 +51,7 @@ function main(in type, in input0, in mode, out output) {
 		period -= firstmonth - 1;
 		if (period < 1) {
 			period += 12;
-			year = (addcent(year - 1)).oconv("R(0)#2");
+			year = (addcent4(year - 1)).oconv("R(0)#2");
 		}
 		period = ("00" ^ period).substr(-2,2);
 	}

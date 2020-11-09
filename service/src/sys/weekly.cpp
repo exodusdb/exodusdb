@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <addcent.h>
+#include <addcent4.h>
 
 var firstdate;
 var firstdayofweek;//num
@@ -57,7 +57,7 @@ tryyear:
 		firstdateofyear2 = firstdateofyear;
 		//go to previous year if date before start of year
 		if (input < firstdateofyear) {
-			year = (addcent(year) - 1).substr(-2,2);
+			year = (addcent4(year) - 1).substr(-2,2);
 			goto tryyear;
 		}else{
 			year2 = (year + 1).oconv("R(0)#2");
