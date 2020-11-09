@@ -2,13 +2,13 @@
 libraryinit()
 
 #include <authorised.h>
-#include <initcompany.h>
+//#include <initcompany.h>
 #include <addcent4.h>
-#include <changelogsubs.h>
+//#include <changelogsubs.h>
 
 #include <gen_common.h>
-#include <fin_common.h>
-#include <agy_common.h>
+//#include <fin_common.h>
+//#include <agy_common.h>
 
 var menuid;
 var taskn;//num
@@ -24,8 +24,8 @@ function main(in dataset, in username, io cookie, io msg, io authcompcodes) {
 	//this is a special login routine called from LISTEN2
 	//declare function validcode1
 	#include <general_common.h>
-	#include <common.h>
-	#include <agency_common.h>
+//	#include <common.h>
+//	#include <agency_common.h>
 	cookie = "";
 	authcompcodes = "";
 
@@ -189,12 +189,13 @@ nextcomp:
 	}
 
 	gen.company = "";
-	call initcompany(compcode);
+	//call initcompany(compcode);
 
 	var ncompanies = compcodes.count(FM) + 1;
 	authcompcodes = compcodes;
 	authcompcodes.converter(FM, VM);
 
+/*
 	//market
 	//WARNING TODO: check ternary op following;
 	var defmarketcode = gen.company.a(30) ? gen.company.a(30) : agy.agp.a(37);
@@ -213,19 +214,19 @@ nextcomp:
 		maincurrcode = "";
 	}
 	if (maincurrcode == "") {
-		maincurrcode = fin.basecurrency;
+//		maincurrcode = fin.basecurrency;
 	}
-
+*/
 	//prepare session cookie
 
 	cookie = "m=" ^ menus.convert(VM, ",");
 	cookie ^= "&cc=" ^ compcode;
 	cookie ^= "&nc=" ^ ncompanies;
-	cookie ^= "&pd=" ^ fin.currperiod ^ "/" ^ addcent4(fin.curryear);
-	cookie ^= "&bc=" ^ fin.basecurrency;
+//	cookie ^= "&pd=" ^ fin.currperiod ^ "/" ^ addcent4(fin.curryear);
+//	cookie ^= "&bc=" ^ fin.basecurrency;
 	cookie ^= "&bf=" ^ BASEFMT;
-	cookie ^= "&mk=" ^ defmarketcode;
-	cookie ^= "&mc=" ^ maincurrcode;
+//	cookie ^= "&mk=" ^ defmarketcode;
+//	cookie ^= "&mc=" ^ maincurrcode;
 	cookie ^= "&tz=" ^ SW;
 	cookie ^= "&ms=60000";
 
@@ -235,7 +236,7 @@ nextcomp:
 	cookie ^= "&db=" ^ temp;
 
 	//split extras
-	cookie ^= "&sp=" ^ agy.splitextras;
+//	cookie ^= "&sp=" ^ agy.splitextras;
 
 	//form color, font and fontsize
 	cookie ^= "&fc=" ^ SYSTEM.a(46, 5);
@@ -245,19 +246,22 @@ nextcomp:
 	//date format
 	cookie ^= "&df=" ^ gen.company.a(10);
 
+/*
 	//first day of week
 	var tt = agy.lastdayofweek + 1;
 	if (tt > 7) {
 		tt = 1;
 	}
 	cookie ^= "&fd=" ^ tt;
+*/
 
 	//whats new
 
+/*
 	call changelogsubs("WHATSNEW" ^ FM ^ menus);
 	var ans = ANS;
 	cookie ^= "&wn=" ^ ans;
-
+*/
 	//call backupreminder(dataset,msg)
 
 	//osread paramrec from '..\data\':lcase(dataset):'\params2' else return
