@@ -8,7 +8,7 @@ var xx;
 var daten;
 
 function main(in mode, io idate, in usercode, in userx, in marketcode, in market, in agp, out holidaytype, out workdate) {
-	//c tim ,io,,,,,,out,out
+	//c sys ,io,,,,,,out,out
 
 	//returns holidaytype given date,userx,market and global params
 

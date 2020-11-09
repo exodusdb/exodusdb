@@ -18,8 +18,6 @@ libraryinit()
 #include <scrnio.h>
 
 #include <gen_common.h>
-//#include <fin_common.h>
-//#include <agy_common.h>
 #include <win_common.h>
 
 var request2;
@@ -36,6 +34,7 @@ var pattern;
 var ageinsecs;//num
 var ii;//num
 var patchfile;
+var firstblock;
 var bottomline;
 var stopn;
 var locks;
@@ -111,7 +110,8 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			if (not filename) break;
 			if (lockrecord("PROCESSES", processes, "START*" ^ filename)) {
 				if (tt.osread(filename)) {
-					tt.converter("\r\n", FM);
+					tt.swapper("\r\n", FM);
+					tt.converter("\r\n", FM ^ FM);
 					//dont start if there is a database stop command
 					if (not((tt.a(1).lcase() ^ ".end").osfile())) {
 						if (tt.a(5)) {
@@ -212,106 +212,199 @@ restart:
 	} else if (request1 == "PATCHANDRUNONCE") {
 
 		//never patch and run on development systems (therefore can only test elsewhere)
-		//or on test systems which can be patched via dataset.1 if needed
-		//TODO work out a way to ensure both live and test programs are updated
-		if (SYSTEM.a(61) or isdevsys) {
-nopatch:
+		//OFF while developing this feature
+		isdevsys = isdevsys and (var().date() > 19034);
+		//if system<61> or isdevsys then
+		if (isdevsys) {
 			ANS = "";
 			return 0;
 		}
 
-		//1. patchcode=PATCH - cannot be used to patch data (only system)
-		// since it may be picked up by any databases listening process
-		//2. patchcode=databasecode - can be used to patch one database (and system)
-		//3. no way to patch all databases datafiles
-		var patchcode = request2;
+		var live = request2;
 		processes = request3;
 
-		//if patch appears then install it
-		var patchfilename = patchcode ^ ".1";
-		var patchfiledir = patchfilename.osfile();
-		if (not patchfiledir) {
-			goto nopatch;
-		}
+		////////////////////////////////////////////////////////////////////////////
+		//Look for NEOPATCH.1 file in three locations
+		////////////////////////////////////////////////////////////////////////////
+		//The file must have been created after the neosys version date
+		// and after the last patch date if any
+		////////////////////////////////////////////////////////////////////////////
+		//1. DATA\CLIENTX\NEOPATCH.1
+		//               > install in one NEOSYS database
+		//2. DATA\NEOPATCH.1
+		//               > install in all active NEOSYS databases in one installation
+		//3. D:\NEOPATCH.1 or D:\HOSTS\NEOPATCH.1
+		//               > install in all active NEOSYS database and installations
+		var patchcode = "NEOPATCH";
+		var patchdirs = "../DATA/" ^ SYSTEM.a(17) ^ FM ^ "../DATA/" ^ FM ^ "../../";
+		patchdirs.converter("/", OSSLASH);
 
-		//if patching blocked (eg failed to delete last time) then also quit
-		var blockpatchfilename = patchfilename;
-		blockpatchfilename.splicer(-1, 1, "X");
-		if (blockpatchfilename.osfile()) {
-			goto nopatch;
-		}
+		for (var patchn = 1; patchn <= 3; ++patchn) {
 
-		//ensure patch file is complete
-		if (not(patchfile.osopen(patchfilename))) {
-			goto nopatch;
-		}
+			//skip if no patch file or not dated today
+			var patchfilename = patchdirs.a(patchn) ^ patchcode ^ ".1";
+			var patchfileinfo = patchfilename.osfile();
+			if (patchfileinfo.a(2) < var().date()) {
+				goto nextpatch;
+				}
 
-		tt = patchfilename.osfile().a(1) - 18;
-		//osbread tt from patchfile at tt length 18
-		call osbread(tt, patchfile,  tt, 18);
-		if (tt ne ("!" ^ FM ^ "!END!OF!INSTALL!")) {
-			goto nopatch;
-		}
-
-		//installation wide lock on it
-		if (not(lockrecord("", processes, patchfilename))) {
-			goto nopatch;
-		}
-
-		//ensure that we only ever runonce something just loaded from a patch
-		var runoncekey = "$" ^ patchcode ^ ".RUNONCE";
-		DEFINITIONS.deleterecord(runoncekey);
-
-		//indicate patched/may need restart
-		ANS = 1;
-
-		if (not isdevsys) {
-
-			var cmd = "INSTALL " ^ patchcode ^ " " ^ oscwd().substr(1,2) ^ " (IO)";
-			printl(cmd);
-			perform(cmd);
-
-			//17/12/2009
-			//tt='Size:':patchfiledir<1>:' ':patchfiledir<2> '[DATE,4*]':' ':patchfiledir<3> 'MTS'
-			//call sysmsg(cmd:fm:tt)
-
-		}
-
-		//prevent it being installed again
-		(patchfilename ^ "O").osdelete();
-		("CMD /C REN " ^ patchfilename ^ " " ^ patchfilename ^ "O").osshell();
-		patchfilename.osdelete();
-
-		//if cannot delete then put a blocker on it
-		if (patchfilename.osfile()) {
-			var(var().date() ^ FM ^ var().time()).oswrite(blockpatchfilename);
-		}
-
-		//if $PATCH.RUNONCE or $datasetcode.RUNONCE appears in definitions
-		//if the runonce record appears in the definitions then
-		//run it, save it and delete it
-		var runonce;
-		if (runonce.read(DEFINITIONS, runoncekey)) {
-			if (not isdevsys) {
-				perform("RUN DEFINITIONS " ^ runoncekey.substr(2,9999));
+			//open patch file
+			if (not(patchfile.osopen(patchfilename))) {
+				goto nextpatch;
 			}
-			runonce.write(DEFINITIONS, runoncekey ^ "*LAST");
+
+			//ensure patch file is complete
+			var offset = patchfileinfo.a(1) - 18;
+			call osbread(tt, patchfile,  offset, 18);
+			if (tt ne ("!" ^ FM ^ "!END!OF!INSTALL!")) {
+				goto nextpatch;
+			}
+
+			//verify correct file heading and determine patchid from the file
+			call osbread(firstblock, patchfile,  0, 65000);
+			var patchid = firstblock.a(2).substr(6,9999);
+			if (firstblock.a(1) ne "00000DEFINITIONS" or patchid.substr(1,8) ne "INSTALL*") {
+				goto nextpatch;
+			}
+
+			//skip if patchid is older than 30 days
+			//if field(patchid,'*',3) lt date()-30 then
+			// goto nextpatch
+			// end
+
+			//extract DEFINITIONS install key and rec from first block
+			//rec is "00000DEFINITIONS^00033INSTALL*X*19034*35287^...."
+			//remove 00000DEFINITIONS^
+			firstblock.remover(1);
+			//remove 5 byte length field and cut out key+rec
+			var keyandrec = firstblock.substr(6,firstblock.substr(1,5));
+			//remove key
+			var rec = keyandrec.remove(1, 0, 0);
+
+			//installation wide lock on it
+			if (not(lockrecord("", processes, patchid))) {
+				goto nextpatch;
+			}
+
+			//skip if already installed in this database
+			if (xx.read(DEFINITIONS, patchid)) {
+				call unlockrecord("", processes, patchid);
+				goto nextpatch;
+			}
+
+			//prevent from ever running this patch again on this database
+			rec.write(DEFINITIONS, patchid);
+
+			//get current NEOSYS version timestamp
+			var versiondatetime = "";
+			var versionkey = "general/version.dat";
+			versionkey.converter("/", OSSLASH);
+			if (tt.osread(versionkey)) {
+				tt.trimmer();
+				var vdate = tt.field(" ", 2, 3).iconv("D");
+				var vtime = tt.field(" ", 1).iconv("MT");
+				if (vdate and vtime) {
+					versiondatetime = vdate ^ "." ^ vtime.oconv("R(0)#5");
+				}
+			}
+
+			//get patch timestamp
+			var patchdatetime = patchid.field("*", 3);
+
+			//skip patch if older than installation
+			var skipreason = "";
+			var skipemail = "";
+			if (versiondatetime and (patchdatetime < versiondatetime)) {
+				skipreason = "Patch is older than installation version - " ^ oconv(versiondatetime, "[DATETIME,4*]");
+				skipemail = 1;
+			}
+
+			//skip patch if older than last patch
+			var lastpatchid;
+			if (not(lastpatchid.read(DEFINITIONS, "INSTALL*LAST"))) {
+				lastpatchid = "";
+			}
+			if (lastpatchid) {
+				var lastpatchdatetime = lastpatchid.field("*", 3);
+				if (patchdatetime < lastpatchdatetime) {
+					skipreason = "Patch is older than the last patch - " ^ oconv(lastpatchdatetime, "[DATETIME,4*]");
+				}
+			}
+
+			//ensure that we only ever runonce something just loaded from a patch
+			var runoncekey = "$" ^ patchid.field("*", 2) ^ ".RUNONCE";
 			DEFINITIONS.deleterecord(runoncekey);
 
-		}
-		runonce = "";
+			if (not skipemail) {
 
-		//trigger other processes to restart by updating SYSTEM.CFG
-		if (tt.osread("system.cfg")) {
-			var(tt).oswrite("system.cfg");
-		}
+				//list the files and records that were installed
+				var subject = rec.a(1) ^ " - " ^ patchid.field("*", 2) ^ " " ^ oconv(patchid.field("*", 3), "[DATETIME,4*]");
+				var body = subject ^ " " ^ patchfilename ^ FM;
+				if (skipreason) {
+					body.r(-1, FM ^ "NOT PATCHED - " ^ skipreason ^ FM ^ FM);
+				}
+				var nfiles = rec.a(3).count(VM) + 1;
+				for (var filen = 1; filen <= nfiles; ++filen) {
+					body.r(-1, rec.a(3, filen) ^ " " ^ rec.a(4, filen) ^ "  " ^ rec.a(5, filen));
+				};//filen;
 
-		//release
-		call unlockrecord("", processes, patchfilename);
+				//message NEOSYS only
+				call sysmsg(body, "NEOPATCH: " ^ subject, "NEOSYS");
 
-		//indicate patches applied and may need restart
-		ANS = 1;
-		return 0;
+			}
+
+			if (not skipreason) {
+
+				//perform the installation
+				var cmd = "INSTALL " ^ patchcode ^ " " ^ oscwd().substr(1,2) ^ " (IO)";
+				printl(cmd);
+				perform(cmd);
+
+			}
+
+			//record success/failure before any autorun
+			(var().date() ^ "." ^ var().time().oconv("R(0)#5")).writev(DEFINITIONS, patchid, 6);
+
+			skipreason.writev(DEFINITIONS, patchid, 7);
+
+			if (skipreason) {
+				//release
+				call unlockrecord("", processes, patchid);
+				goto nextpatch;
+			}
+
+			//save the last patch info - used to prevent backward patching
+			patchid.write(DEFINITIONS, "INSTALL*LAST");
+
+			//post install runonce if installed
+			//if $PATCH.RUNONCE or $datasetcode.RUNONCE appears in definitions
+			//if the runonce record appears in the definitions then
+			//run it, save it and delete it
+			var runonce;
+			if (runonce.read(DEFINITIONS, runoncekey)) {
+				perform("RUN DEFINITIONS " ^ runoncekey.substr(2,9999));
+				//leave it for inspection
+				//delete definitions,runoncekey
+			}
+
+			//trigger other processes to restart by updating SYSTEM.CFG
+			if (tt.osread("system.cfg")) {
+				var(tt).oswrite("system.cfg");
+			}
+
+			//release
+			call unlockrecord("", processes, patchid);
+
+			//indicate patches applied and may need restart
+			ANS = 1;
+
+			//dont check any other patchdirs
+			return 0;
+
+nextpatch:;
+		};//patchn;
+
+		ANS = "";
 
 	} else if (request1 == "CONVLOG") {
 
@@ -381,7 +474,7 @@ nopatch:
 		bottomline = var(80).space();
 		gosub printbottomline();
 
-	} else if (request1.substr(1,14) == "GETINDEXVALUES") {
+	} else if (request1.substr(1,8) == "GETINDEX") {
 
 		USER1 = "";
 		filename = request2;
@@ -845,7 +938,7 @@ subroutine deleteoldfiles() {
 		//replaced by databasecode.SVR
 		//if filename0='GLOBAL.SVR' then goto deleteit
 
-		if (not(var(".jpg,.png,.gif,.svr").locateusing(",",(filename.substr(-4,4)).lcase(),xx))) {
+		if (not(var(".jpg,.png,.gif,.svr,.cfg").locateusing(",",(filename.substr(-4,4)).lcase(),xx))) {
 
 			//a file ending .4 is a request to delete the .2 and .3 files
 			if (filename.substr(-2,2) == ".4") {

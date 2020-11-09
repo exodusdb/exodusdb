@@ -1,11 +1,19 @@
 #!/bin/bash
 
-set -x
-//set -e
+test -f ../getarev || ( echo must be run in service/src/??? && exit )
 
-for MODULE in sys gen fin agy med job tim
+set -x
+#set -e
+
+MODULE=sys
+	mkdir -p  ../$MODULE
+	cp ~/arev/$MODULE/*.cpp ../$MODULE/
+
+for MODULE in gen fin agy med job tim
 do
 	mkdir -p  ../$MODULE
 	cp ~/arev/$MODULE/*.cpp ~/arev/$MODULE/*.h ../$MODULE/
 #	compile ../$MODULE/*.cpp {S}
 done
+
+set +x

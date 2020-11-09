@@ -3,8 +3,6 @@ libraryinit()
 
 #include <getreccount.h>
 
-//#include <agy_common.h>
-
 var v69;
 var v70;
 var v71;
@@ -13,9 +11,9 @@ var filename;
 var nrecs;//num
 
 function main(in filenames0, out result) {
-	//c gen in,out
+	//c sys in,out
 
-	//#include <agency_common.h>
+	//$insert bp,agency.common
 
 	call pushselect(0, v69, v70, v71);
 
