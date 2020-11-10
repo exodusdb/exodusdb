@@ -4,6 +4,7 @@ programinit()
 #include <win_common.h>
 #include <gen_common.h>
 #include <agy_common.h>
+#include <initcompany.h>
 
 var xx;
 
@@ -28,6 +29,8 @@ function main() {
 	createfile("PROCESSES");
 	createfile("REQUESTLOG");
 	createfile("SYS_MESSAGES");
+	createfile("COMPANIES");
+	createfile("USERS");
 
 	//module
 	APPLICATION="EXODUS";
@@ -75,6 +78,8 @@ function main() {
 		write(agp,"DEFINITIONS","AGENCY.PARAMS");
 	}
 	*/
+
+	call initcompany();
 
 	//neosys pass
 	var rec="";
