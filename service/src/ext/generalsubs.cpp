@@ -36,7 +36,6 @@ var wsmsg;
 function main(in mode0) {
 	//c gen
 	#include <general_common.h>
-	#include <common.h>
 
 	//global tt,nusers,usern,mode
 
