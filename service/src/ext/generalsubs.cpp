@@ -2,19 +2,12 @@
 libraryinit()
 
 #include <generalsubs.h>
-#include <daybooksubs3.h>
-#include <plansubs5.h>
-#include <jobsubs.h>
-#include <timesheetsubs.h>
-#include <prodordersubs.h>
-#include <prodinvsubs.h>
 #include <getsubs.h>
 #include <nextkey.h>
 #include <authorised.h>
 #include <singular.h>
 
 #include <gen_common.h>
-#include <fin_common.h>
 #include <win_common.h>
 
 #include <window.hpp>
@@ -52,66 +45,9 @@ function main(in mode0) {
 
 	mode = mode0;
 
-	//eg create all brands, jobs, accountindex for clients
-	//WINDOWSTUB GENERAL.SUBS CALLSUBS,CLIENTS,CLIENT.SUBS,POSTWRITE
-	if (mode.field(",", 1) == "CALLSUBS") {
-		win.datafile = mode.field(",", 2);
-
-		//generalsubsx is the template for calling all subs with ONE ARG
-		var generalsubsx = mode.field(",", 3);
-		var submode = mode.field(",", 4);
-
-		if (not(win.srcfile.open(win.datafile, ""))) {
-			call fsmsg();
-			return 0;
-		}
-		if (not(DICT.open("dict_" ^ win.datafile))) {
-			call fsmsg();
-			return 0;
-		}
-		printl();
-		printl("GENERAL.SUBS ", mode);
-		if (not LISTACTIVE) {
-			select(win.srcfile);
-		}
-		var recordn = 0;
-nextrecord:
-		if (not(readnext(ID))) {
-			return 0;
-		}
-		if (ID[1] == "%") {
-			goto nextrecord;
-		}
-		recordn += 1;
-		print(var().at(0), var().at(-4), recordn, ". ", ID);
-		if (not(RECORD.read(win.srcfile, ID))) {
-			goto nextrecord;
-		}
-		win.orec = "";
-
-		//c++ variation
-		if (not(VOLUMES)) {
-			generalsubsx.lcaser();
-			generalsubsx.converter(".", "");
-		}
-		generalsubs = generalsubsx;
-
-		//eq call client.subs('POSTWRITE')
-		call generalsubs(submode);
-
-		goto nextrecord;
-
-	} else if (mode == "GETDATASETS") {
+	if (mode == "GETDATASETS") {
 		gosub getdatasets();
 		ANS = datasetparams;
-
-	} else if (mode == "PROTECT") {
-		if (win.is ne win.isorig) {
-			msg = "You cannot change this.";
-			gosub invalid(msg);
-			DATA ^= "" "\r";
-			return 0;
-		}
 
 	} else if (mode == "VAL.DATASET") {
 
@@ -164,44 +100,6 @@ nextrecord:
 		ANS = groupusers;
 		ANS.splicer(1, 1, "");
 
-	} else if (mode == "GETDEPTS") {
-		gosub getdepts();
-		ANS = depts;
-
-	} else if (mode == "F2.DEPARTMENT") {
-		gosub getdepts();
-		if (not(decide("Which department do you want?", depts ^ "", reply))) {
-			return 0;
-		}
-		ANS = depts.a(reply);
-		DATA ^= ANS ^ "\r";
-
-	} else if (mode == "VAL.DEPARTMENT") {
-		if (win.is == "") {
-			return 0;
-		}
-		gosub getdepts();
-		if (not(depts.locateusing(FM,win.is,xx))) {
-			msg = win.is.quote() ^ " IS NOT A VALID DEPARTMENT";
-			return invalid(msg);
-		}
-
-	} else if (mode == "VAL.EXCH.RATE") {
-		if ((win.is.substr(1,2) == "1/") or (win.is[1] == "/")) {
-			tt = win.is.field("/", 2);
-			if (tt and tt.isnum()) {
-				win.is = ((1 / win.is.substr(3,99)).oconv("MD90P")) + 0;
-			}else{
-badexchrate:
-				msg = win.is.quote() ^ " - EXCHANGE RATE MUST BE NUMERIC";
-				return invalid(msg);
-			}
-		}else{
-			if (not(win.is.isnum())) {
-				goto badexchrate;
-			}
-		}
-
 	} else if ((mode.field(".", 1, 2) == "DEF.SK") or (mode.field(".", 1, 2) == "DEF.SK2")) {
 
 		if (not(win.wlocked or RECORD)) {
@@ -209,59 +107,6 @@ badexchrate:
 
 			//special defaults for special files
 			if (mode ne "DEF.SK2") {
-
-				//ratecards
-				if (win.datafile == "RATECARDS") {
-					if (not(ID.field("*", 2))) {
-						ID = ID.fieldstore("*", 2, 1, ("1/1/" ^ var().date().oconv("D2/E").field("/", 3)).iconv("D2/E"));
-						win.isdflt = ID;
-						return 0;
-					}
-				}
-
-				//batches
-				if (win.datafile == "BATCHES") {
-					//t='DEF.BATCH.REF'
-					//call daybook.subs3(t)
-					call daybooksubs3("DEF.BATCH.REF");
-					win.isdflt = ID;
-					return 0;
-				}
-
-				//schedules
-				if ((win.datafile == "PLANS") or (win.datafile == "SCHEDULES")) {
-					call plansubs5("DEF.REF." ^ mode.field(".", 3, 999));
-					win.isdflt = ID;
-					return 0;
-				}
-
-				//jobs
-				if (win.datafile == "JOBS") {
-					call jobsubs("DEF.JOB.NO." ^ mode.field(".", 3, 999));
-					win.isdflt = ID;
-					return 0;
-				}
-
-				//timesheets
-				if (win.datafile == "TIMESHEETS") {
-					call timesheetsubs("DEF.KEY." ^ mode.field(".", 3, 999));
-					win.isdflt = ID;
-					return 0;
-				}
-
-				//production orders
-				if (win.datafile == "PRODUCTION_ORDERS") {
-					call prodordersubs("DEF.ORDER.NO." ^ mode.field(".", 3, 999));
-					win.isdflt = ID;
-					return 0;
-				}
-
-				//production estimates
-				if (win.datafile == "PRODUCTION_INVOICES") {
-					call prodinvsubs("DEF.QUOTE.NO." ^ mode.field(".", 3, 999));
-					win.isdflt = ID;
-					return 0;
-				}
 
 				//documents
 				if (win.datafile == "DOCUMENTS") {
@@ -300,64 +145,6 @@ next:
 			ANS = "";
 		}
 
-	} else if (mode == "DEF.CURRENCY") {
-		if (win.is == "") {
-			win.is = gen.company.a(3);
-			if (gen.company.a(1).ucase().index("Promopub")) {
-				win.is = "AED";
-			}
-		}
-
-	} else if (mode == "VAL.CURRENCY") {
-		if (not(win.is)) {
-			return 0;
-		}
-		if (not(xx.read(gen.currencies, win.is))) {
-			msg = win.is.quote() ^ " - currency code not on file";
-			return invalid(msg);
-		}
-
-	} else if (mode == "DEF.COMPANY") {
-		if (win.is == "") {
-			win.isdflt = fin.currcompany;
-		}
-
-	} else if (mode == "VAL.COMPANY") {
-		if (not(win.is)) {
-			return 0;
-		}
-
-		if (not(authorised("COMPANY ACCESS " ^ (win.is.quote()), msg, ""))) {
-			return invalid(msg);
-		}
-
-		if (not(xx.read(gen.companies, win.is))) {
-			msg = win.is.quote() ^ " - company code not on file";
-			return invalid(msg);
-		}
-
-	} else if (mode.field(".", 1, 2) == "VAL.ALPHANUMERIC") {
-		if (win.is ne win.isorig) {
-
-			//do not validate if already on file
-			//win.ww(win.wi)
-			//if w(wi)<4>=0 then
-			// if not(wlocked) and @record='' and @id='' then
-			//  read record from src.file,is then return
-			//  end
-			// end
-
-			tt = win.is;
-			tt.converter("0123456789" ^ LOWERCASE ^ UPPERCASE, "");
-			//remove allowable non-alphanumeric characters
-			tt.converter(mode.field(".", 3), "");
-			if (tt ne "") {
-				msg = "PLEASE USE ALPHANUMERIC CHARACTERS ONLY|THE " ^ (tt.quote()) ^ " CHARACTERS HAVE BEEN IGNORED";
-				win.is.converter(tt, "");
-				call note(msg);
-			}
-		}
-
 	} else {
 		var().chr(7).output();
 		call mssg(mode.quote() ^ " - invalid mode ignored");
@@ -365,26 +152,6 @@ next:
 	}
 
 	return 0;
-}
-
-subroutine getdepts() {
-	depts = "";
-	nusers = SECURITY.a(1).count(VM) + 1;
-	for (usern = 2; usern <= nusers + 1; ++usern) {
-		var text = SECURITY.a(1, usern);
-		if ((text == "---") or (text == "")) {
-			text = SECURITY.a(1, usern - 1);
-			text.converter("0123456789", "");
-			text.trimmer();
-			if (text and text ne "---") {
-				if (not(depts.locateusing(FM,text,deptn))) {
-					depts.r(-1, text);
-				}
-			}
-		}
-	};//usern;
-
-	return;
 }
 
 subroutine getdatasets() {
