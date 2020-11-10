@@ -24,7 +24,6 @@ libraryinit()
 #include <rtp57.h>
 
 #include <gen_common.h>
-#include <fin_common.h>
 #include <win_common.h>
 
 var logfilename;
@@ -35,6 +34,7 @@ var halt;//num
 var origsentence;
 var processes;
 var reqlog;
+var defaultlockmins;//num
 var datasetcode;
 var live;
 var neopath;
@@ -97,7 +97,7 @@ var s33;
 var charx;
 var buffer;
 var reply;
-var patched;//num
+var patched;
 var dow;
 var logtime;
 var requestdate;
@@ -166,7 +166,8 @@ var storeresponse;
 var fieldno;
 var prewrite;
 var lockkey;
-var lockx;
+var lockrec;
+var lockduration;//num
 var dictrec;
 var datetimefn;
 var olddatetime;
@@ -186,10 +187,8 @@ var timeoutdate;//num
 var srcfile2;
 var newsessionid;
 var state;//num
-var lockrec;
 var masterlockkey;
 var sublockrec;
-var lockduration;//num
 var code;//num
 var nextbfs;
 var handle;
@@ -209,8 +208,24 @@ function main() {
 	//global all
 
 	//finance?!
-	#include <common.h>
-	// $insert bp,agency.common
+	//$insert abp,common
+
+	/*;
+	COMMAND  ARGS                SUCCESS    FAILURE;
+	-------  ----                -------    -------;
+	LOGIN    user,pass,conninfo  userinfo   various reasons;
+	READ     file,key            rec        key doesnt exist;
+	READU    file,key            rec,lockid key already locked by someone else;
+	WRITE    rec,file,key,lockid rec        wrong lockid, or timestamp differs;
+	WRITEU   rec,file,key,lockid (same, but unlocks after writing - rarely used);
+	DELETE   file,key            ok         key currently locked by someone else;
+	SELECT   select statement    data       no recs found;
+	GETINDEX file,field,args     data       no recs found;
+	LOCK     file,key            lockid     key already locked by someone else;
+	RELOCK   file,key,lockid     ok         wrong lockid;
+	UNLOCK   file,key,lockid     ok         wrong lockid;
+	EXECUTE  cmd,args,data       data       command chooses to fail;
+	*/
 
 	//notes
 	//use ABORT or ABORT ALL to terminate EXECUTED programs to clear out program stack
@@ -257,6 +272,10 @@ function main() {
 	if (not(reqlog.open("REQUESTLOG", ""))) {
 		reqlog = "";
 	}
+
+	//lockmins is the number of minutes to retain the lock
+	//default to 5 mins. lock extension is done every 5/1.1 mins by the user interface
+	defaultlockmins = 5;
 
 	datasetcode = SYSTEM.a(17);
 	live = datasetcode.ucase().substr(-4,4) ne "TEST";
@@ -782,29 +801,25 @@ nextsearch0:
 
 	//call monitor approx every minute +/- 10 seconds to avoid checking all the time
 	if ((var().time() - lastmonitortime).abs() > 60 + var(20).rnd() - 10) {
+	//if abs(time()-lastmonitortime)>(0+rnd(20)-10) then
 
 		//monitor updates nagios and optionally checks for upgrades
 		call monitor2();
 		lastmonitortime = var().time();
 
 		//install and run patches
-		patched = 0;
-		//system patches only on live data ... or only test data
-		//to avoid loading programs into test where they are not available to users
-		//PATCH.1 on live or PATCHT.1 on test
-		if (live) {
-			tt = "path";
-		}else{
-			tt = "patcht";
-		}
-		call listen5("PATCHANDRUNONCE", tt, processes);
+		//patched=0
+		//!system patches only on live data ... or only test data
+		//!to avoid loading programs into test where they are not available to users
+		//!PATCH.1 on live or PATCHT.1 on test
+		//if live then tt='path' else tt='patcht'
+		//call listen5('PATCHANDRUNONCE',tt,processes)
+		call listen5("PATCHANDRUNONCE", live, processes);
 		patched = ANS;
 
 		//database specific patches (can load into test)
-		call listen5("PATCHANDRUNONCE", datasetcode, processes);
-		if (ANS) {
-			patched = 1;
-		}
+		//call listen5('PATCHANDRUNONCE',datasetcode,processes)
+		//if @ans then patched=1
 
 		if (patched) {
 			request1 = "RESTART PATCHED";
@@ -964,7 +979,7 @@ readlink1:
 			//for ii=249 to 255
 			// swap hexx(ii) with char(ii) in request
 			// next ii
-			//decode %F9-%FF
+			//decode %FA-%FF
 			call hexcode(3, USER0);
 		//end else
 			//swap 'MEDIA':'.TYPE' with 'JOB_TYPE' in request
@@ -972,8 +987,25 @@ readlink1:
 		}
 
 		//replyfilename=ucase(request<1>)
+		//eg D:\NEOSYS\DATA\DEVDTEST\|3130570.1
+		//eg /var/www/html/neosys2/NEOSYS//data/BASIC/~9979714.1
 		replyfilename = USER0.a(1);
 		USER0.remover(1);
+
+		//php requests that responses are to be written to linux file system files
+		//but if being served by dos/windows then need to reply to dos/win files
+		if (VOLUMES) {
+			//replyfilename could be D:\hosts\test\data\TEST/~7538977.1
+			//tt=index(replyfilename,'/data/',1)
+			replyfilename.converter("/", OSSLASH);
+			//tt=index(replyfilename,'\data\',1)
+			tt = replyfilename.index(OSSLASH "data" OSSLASH);
+			if (tt) {
+				//eg drive() = D:\NEOSYS\NEOSYS\ ...
+				//replyfilename='..\':replyfilename[tt+1,9999]
+				replyfilename = ".." OSSLASH ^ replyfilename.substr(tt + 1,9999);
+			}
+		}
 
 		//lock the replyfilename to prevent other listeners from processing it
 		//unlock locks,'REQUEST*':replyfilename
@@ -1055,6 +1087,7 @@ subroutine requestinit() {
 		tt = 0;
 	}
 	connection = USER0.field(FM, 1, tt);
+
 	USER0 = USER0.field(FM, tt + 1, 999999);
 
 	dataset = USER0.a(1).ucase();
@@ -1458,7 +1491,7 @@ cannotopenlinkfile2:
 					swap char(ii) with HEXX(ii) in logx;
 					next ii;
 				*/
-			//encode %->%25 %00-%0F %18-%1F %F9-%FF
+			//encode %->%25 %00-%0F %18-%1F %FA-%FF
 			call hexcode(1, logx);
 		}
 		gosub writelogx();
@@ -1520,7 +1553,7 @@ cannotopenlinkfile2:
 							next ii;
 						*/
 
-					//encode %->%25 %00-%0F %18-%1F %F9-%FF
+					//encode %->%25 %00-%0F %18-%1F %FA-%FF
 					call hexcode(1, blk);
 					call hexcode(1, USER3);
 
@@ -1645,15 +1678,16 @@ subroutine process() {
 		call listen2(request1, dataset, username, connection, request5);
 
 	//find index values
-	} else if (request1.substr(1,14) == "GETINDEXVALUES") {
+	//case request1[1,14]='GETINDEXVALUES'
+	} else if (request1.substr(1,8) == "GETINDEX") {
 
-		call listen3(request2, "GETINDEXVALUES");
+		//call listen3(request2,'GETINDEXVALUES')
 		call listen5(request1, request2, request3, request4, request5, request6);
 
 	//select some data
 	} else if (request1 == "SELECT") {
 
-		call listen3(request2, request1);
+		//call listen3(request2,request1)
 		call listen5(request1, request2, request3, request4, request5, request6);
 
 	//lock a record
@@ -1769,6 +1803,7 @@ getnextkey:
 			MV = 0;
 			win.datafile = filename;
 			win.srcfile = file;
+			win.isdflt = "";
 
 			call generalsubs("DEF.SK." ^ readenv);
 
@@ -1788,8 +1823,6 @@ getnextkey:
 		sessionid = "";
 		lockkeyx = keyx;
 		if (withlock) {
-			//lockduration is the number of minutes to automatic lock expiry
-			lockmins = request4;
 			USER3 = "";
 
 			masterlock = "";
@@ -2054,7 +2087,7 @@ noupdate:
 		call cropper(USER1);
 
 	} else if (((request1 == "WRITEU") or (request1 == "DELETE")) or (request1 == "WRITE")) {
-
+	//write:
 		filename = request2;
 		keyx = request3;
 		fieldno = request4;
@@ -2121,15 +2154,23 @@ noupdate:
 
 		//make sure that the record is already locked to the user
 		lockkey = filename ^ "*" ^ ID;
-		if (not(lockx.read(locks, lockkey))) {
-			lockx = FM ^ FM ^ FM ^ FM ^ "NO LOCK RECORD";
+		if (not(lockrec.read(locks, lockkey))) {
+			lockrec = FM ^ FM ^ FM ^ FM ^ "NO LOCK RECORD";
 		}
-		if (sessionid ne lockx.a(5)) {
-			//response='Somebody has updated this record.|Your update cannot be applied.':'|The session id does not agree ':quote(lockx<5>)
-			call listen4(12, USER3, lockx.a(5));
+		if (sessionid ne lockrec.a(5)) {
+			//response='Somebody has updated this record.|Your update cannot be applied.':'|The session id does not agree ':quote(lockrec<5>)
+			call listen4(12, USER3, lockrec.a(5));
 			gosub fmtresp();
 			return;
 		}
+
+		//update the lock session time
+		//similar code in lock: and write:
+		gosub getdostime();
+		lockduration = defaultlockmins / (24 * 60);
+		lockrec.r(1, lockduration + dostime);
+		lockrec.r(2, dostime);
+		lockrec.write(locks, lockkey);
 
 		//get a proper lock on the file
 		//possibly not necessary as the locks file entry will prevent other programs
@@ -2238,6 +2279,7 @@ badwrite:
 
 				masterlock = "";
 
+				lockmins = defaultlockmins;
 				gosub lock();
 				if (USER3 ne "OK") {
 					return;
@@ -2457,7 +2499,7 @@ badwrite:
 		//not good method, pass in system?
 		if (var("LIST,SELECTBATCHES").locateusing(",",USER0.a(1),xx)) {
 			USER1 = linkfilename2;
-		}
+			}
 		if (USER0.a(1).substr(1,4) == "VAL.") {
 			USER1 = linkfilename2;
 		}
@@ -2523,13 +2565,14 @@ badwrite:
 		if (printfile.osopen(printfilename)) {
 			printfile.osclose();
 		}
+	/*;
+		case request1='STOPDB';
+			call listen5(request1,request2,install.end,server.end);
 
-	} else if (request1 == "STOPDB") {
-		call listen5(request1, request2, installend, serverend);
-
-	} else if (request1 == "RESTART") {
-		USER1 = "";
-		USER3 = "OK";
+		case request1='RESTART';
+			iodat='';
+			response='OK';
+	*/
 
 	} else if (request1 == "BACKUP") {
 
@@ -2694,11 +2737,9 @@ subroutine lock() {
 	//security check - cannot lock so cannot write or delete
 
 	lockauthorised = 1;
-
-	//lockmins is the number of minutes to retain the lock
-	//default to 5 mins. lock extension is done every 5/1.1 mins by the user interface
-	if ((lockmins.unassigned() or not(lockmins.isnum())) or not(lockmins)) {
-		lockmins = 5;
+	//if unassigned(lockmins) or not(num(lockmins)) or not(lockmins) then
+	if (not(lockmins.isnum()) or not(lockmins)) {
+		lockmins = defaultlockmins;
 	}
 
 	//sessionid which if RELOCKING must match the one on the lock rec
@@ -2817,8 +2858,11 @@ nolock:
 
 	//write the lock in the locks file
 	lockrec = "";
+
+	//similar code in lock: and write:
 	lockrec.r(1, lockduration + dostime);
 	lockrec.r(2, dostime);
+
 	//lockrec<3>=if connection then connection<1,2> else @station
 	if (connection) {
 		lockrec.r(3, connection.a(1, 2));
