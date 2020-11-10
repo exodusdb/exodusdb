@@ -8,7 +8,10 @@ compile ../???/*.cpp {HS}
 
 for MODULE in ext add sys gen fin agy med job tim
 do
-#	cp ~/arev/$MODULE/*.cpp ../$MODULE/
-	echo --------------Compile $MODULE ------------------
-	compile ../$MODULE/*.cpp \($1\)
+        test -d ../$MODULE || continue
+
+#       cp ~/arev/$MODULE/*.cpp ../$MODULE/
+        echo --------------Compile $MODULE ------------------
+        compile ../$MODULE/*.cpp \($1\)
 done
+
