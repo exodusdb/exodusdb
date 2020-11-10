@@ -1,0 +1,286 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Connection Speed Test</title>
+
+    <script type="text/javascript" src="scripts/client.js"></script>
+
+    <script type="text/javascript">
+
+var gnosavelocation=true
+
+function* formfunctions_onload() {
+    if (gusername=='NEOSYS')
+        showhide('customcommandrow',true)
+    return true
+}
+
+function test_run_sync(cmdcode) {
+ 
+ $last_request=$$('last_request')
+ $last_data_sent=$$('last_data_sent')
+ 
+ $last_response=$$('last_response')
+ $last_data_received=$$('last_data_received')
+ 
+ $customcommand=$$('customcommand')
+
+ if (cmdcode=='ALL') {
+    $$('milliseconds_LOOPBACK').innerText=''
+    $$('milliseconds_TEST').innerText=''
+    $$('milliseconds_SELECT').innerText=''
+    $$('count_LOOPBACK').innerText=''
+    $$('count_TEST').innerText=''
+    $$('count_SELECT').innerText=''
+ }
+ 
+ $last_request.innerText=''
+ $last_response.innerText=''
+ $last_data_sent.innerText=''
+ $last_data_received.innerText=''
+
+ neosyssettimeout('yield* test_run("'+cmdcode+'")',1)
+ 
+}
+
+function* test_run(cmdcode) {
+
+ if (cmdcode=='ALL') {
+    check_LOOPBACK.checked && (yield* test_run('LOOPBACK'))
+    check_TEST.checked && (yield* test_run('TEST'))
+    check_SELECT.checked && (yield* test_run('SELECT'))
+    return
+ }
+ 
+ $milliseconds=$$('milliseconds_'+cmdcode)
+ $milliseconds.innerText=''
+
+ $count=$$('count_'+cmdcode)
+ $count.innerText='0'
+ 
+ var n=neosysint(test_getvalue('ntests'))
+ //var cmd=test_getvalue('cmd_element') 
+ if (cmdcode=='CUSTOM')
+    cmd=$customcommand.value
+ else if (cmdcode=='SELECT')
+    cmd='SELECT\rCURRENCIES\rBY CURRENCY_CODE\rCURRENCY_CODE CURRENCY_NAME\rXML'
+ else
+    cmd=cmdcode
+    
+ //timer1=new neosystimer()
+ timer=new Date
+ var minimum=false
+ var maximum=false
+ var totalelapsed=0
+ var n2=n
+ //var all=''
+ var firstpass=true
+ for (var i=0;i<n;i++) {
+
+    $count.innerText=i+1
+    
+    if (cmd=='TEST')
+        db.request=cmd+'\r'+(i+1)
+    else
+        db.request=cmd
+    var dbrequest=db.request
+    var dbdatasent=''
+
+    var before=new Date
+
+    ///////////////////////
+    var responded=yield* db.send(dbdatasent)
+    ///////////////////////
+
+    //fix bug in KEEPALIVE
+    if (db.response=='OK')
+        responded=true
+
+    if (!responded&&stoponerror.checked) {
+
+        //alert(db.response)
+        break
+    }
+
+    var elapsed=new Date()-before
+    totalelapsed+=elapsed
+    //all+=' '+elapsed
+
+    if (firstpass) {
+
+        firstpass=false
+        minimum=elapsed
+        maximum=elapsed
+    }
+    else {
+
+    if (elapsed<minimum)
+        minimum=elapsed
+    if (elapsed>maximum)
+        maximum=elapsed
+    }
+
+    n2=i+1
+  
+ }//i
+ 
+ $last_request.innerText=dbrequest.replace(/\\r/g,'\\r')
+ $last_data_sent.innerText=dbdatasent
+ $last_response.innerText=db.response
+ $last_data_received.innerText=db.data
+
+ if (minimum===false) {
+    $milliseconds.innerHTML='Failed'
+    return
+ }
+ 
+ //calculate and display average milliseconds (numeric otherwise will be cleared)
+ if (n==1)
+  //milliseconds.innerHTML=Math.floor((new Date()-timer)*1000/(n2))/1000
+  $milliseconds.innerHTML=minimum
+ else {
+
+  $milliseconds.innerHTML=
+   minimum
+  //+ '&nbsp;&nbsp;&nbsp;'+Math.floor((new Date()-timer)*1000/(n2)/1000+.5)
+  + '&nbsp;&nbsp;&nbsp;'+Math.floor(totalelapsed/n2+.5)
+  + '&nbsp;&nbsp;&nbsp;'+maximum
+  + '&nbsp;&nbsp;&nbsp;(min avg max)'
+ }
+ 
+ //window.status=timer1.stop()/1000/n+' secs'
+ 
+}
+
+function test_getvalue(id) {
+
+ var value=''
+ var elements=document.getElementsByName(id)
+ for (var ii=elements.length-1;ii>=0;ii--) {
+
+  if (elements[ii].checked) {
+
+   value=elements[ii].value
+   break
+  }
+ }
+ return value
+}
+
+    </script>
+
+</head>
+<body>
+    <div align="center">
+        <h2>
+            Connection Speed Test</h2>
+        <table class="neosysform" border="1" bordercolor="#d0d0d0">
+            <tr>
+                <td>
+                    Number of times to repeat</td>
+                <td>
+                    <input name="ntests" type="radio" value="1" />1<br />
+                    <input name="ntests" type="radio" value="10" checked="checked" />10<br />
+                    <input name="ntests" type="radio" value="100" />100<br />
+                    <input name="ntests" type="radio" value="1000" />1000</td>
+            </tr>
+            <tr>
+                <td>
+                    Tests
+                    <input type="button" value="Run" onclick="test_run_sync('ALL')" /></td>
+                <td>
+                    <table class="neosysform" border="1" width="100%">
+                        <thead>
+                            <tr>
+                                <th style="display: none">
+                                </th>
+                                <th>
+                                    Type</th>
+                                <th>
+                                    Count</th>
+                                <th>
+                                    milliseconds per request</th>
+                            </tr>
+                        </thead>
+                        <tr>
+                            <td style="display: none">
+                                <input type="button" value="Run" onclick="test_run_sync('LOOPBACK')" /></td>
+                            <td>
+                                <input id="check_LOOPBACK" checked type="checkbox" />
+                                Web server loopback</td>
+                            <td id="count_LOOPBACK">
+                            </td>
+                            <td id="milliseconds_LOOPBACK">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="display: none">
+                                <input type="button" value="Run" onclick="test_run_sync('TEST')" /></td>
+                            <td>
+                                <input id="check_TEST" checked type="checkbox" />
+                                NEOSYS server loopback</td>
+                            <td id="count_TEST">
+                            </td>
+                            <td id="milliseconds_TEST">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="display: none">
+                                <input type="button" value="Run" onclick="test_run_sync('SELECT')" /></td>
+                            <td>
+                                <input id="check_SELECT" checked type="checkbox" />
+                                NEOSYS application loopback</td>
+                            <td id="count_SELECT">
+                            </td>
+                            <td id="milliseconds_SELECT">
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr id="customcommandrow" style="display: none" valign="top">
+                <td>
+                    Custom Command
+                    <input type="button" value="Run" onclick="test_run_sync('CUSTOM')" /><br />
+                    <span style="font-size: 0.8em">NEOSYS only</span></td>
+                <td>
+                    <input id="customcommand" value="SELECT\rCURRENCIES\rBY CURRENCY_CODE\rCURRENCY_CODE CURRENCY_NAME\rXML"
+                        size="60" />
+                    <br />
+                    <span id="count_CUSTOM"></span>&nbsp;<span id="milliseconds_CUSTOM"></span>
+                </td>
+            </tr>
+            <tr style="display: none">
+                <td>
+                    Stop on error</td>
+                <td>
+                    <input id="stoponerror" checked="checked" type="checkbox" /></td>
+            </tr>
+            <tr valign="top">
+                <td>
+                    Last Request</td>
+                <td id="last_request">
+                </td>
+            </tr>
+            <tr valign="top">
+                <td>
+                    Last Data Sent</td>
+                <td id="last_data_sent">
+                </td>
+            </tr>
+            <tr valign="top">
+                <td>
+                    Last Response</td>
+                <td id="last_response">
+                </td>
+            </tr>
+            <tr valign="top">
+                <td>
+                    Last Data Received</td>
+                <td id="last_data_received">
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>

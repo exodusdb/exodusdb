@@ -1,0 +1,83 @@
+<html>
+<head>
+<title>NEOSYS Login</title>
+
+    <script type="text/javascript">
+ var isMSIE = typeof ActiveXObject != 'undefined' || ('ActiveXObject' in window)//|| is for MSIE11
+ // /2/ new code but still using showmodaldialog (internet explorer)
+ // /3/ new code using yield and not showmodaldialog (firefox, chrome, safari?)
+ 
+ // /1/ (old MSIE-only code) can be accessed from /2/ and /3/ from Help Menu
+ //     IS NO LONGER INSTALLED OR UPGRADED BUT REMAINS ON OLD INSTALLATIONS
+ // old code switches to /2/ if is MSIE or /1/ if not
+ // /1/ switches to /2/ or /3/ as follows:
+ // /2/ if browser HASNT got yield and HASNT got showmodaldialog method
+ // /3/ if browser HAS got yield - firefox chrome safari?
+ // otherwise is stays as /1/ (MSIE)
+ // window.location.assign((isMSIE?2:1)+'/')
+
+ //new code switches to /2/ if is MSIE or /3/ if not
+ window.location.assign((isMSIE?2:3)+'/')
+ 
+    </script>
+
+</head>
+<body>
+    <!-- copy this to wrongbrowser.htm and top level redirecing default.htm as well -->
+    <div style="text-align: center" id="wrongconfiguration">
+        <div align="center">
+            <table border="1" cellpadding="5" cellspacing="0" style="background-color: #f5fffa">
+                <tr style="vertical-align: top; background-color: #b0e0e6">
+                    <th>
+                        NEOSYS requires
+                    </th>
+                    <th>
+                        You have
+                    </th>
+                </tr>
+                <tr style="vertical-align: top">
+                    <td>
+                        1. Internet Explorer 6+<br />
+                        &nbsp;or Safari 3.1+<br />
+                        &nbsp;or Firefox 3+<br />
+                        &nbsp;or Chrome 8.0+<br />
+                    </td>
+                    <td>
+
+                        <script type="text/javascript">                                document.writeln(navigator.appName)</script>
+
+                        <br />
+
+                        <script type="text/javascript">                                document.writeln(navigator.userAgent)</script>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        2. Scripting enabled
+                    </td>
+                    <td>
+                        <noscript>
+                            <span style="color: Red"><b>Scripting disabled</b></span></noscript>
+
+                        <script type="text/javascript">                                document.write('Scripting enabled')</script>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        3. Cookies enabled
+                    </td>
+                    <td>
+                        <noscript>
+                            <span style="color: Red"><b>Unknown</b></span></noscript>
+
+                        <script type="text/javascript">                                document.writeln((!window.dialogArguments && navigator.cookieEnabled) ? 'Cookies enabled' : '<font color="red"><B>Cookies disabled</B></font>')</script>
+
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
