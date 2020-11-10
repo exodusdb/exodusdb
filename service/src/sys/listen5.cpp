@@ -228,7 +228,7 @@ restart:
 		//OFF while developing this feature
 		isdevsys = isdevsys and (var().date() > 19034);
 		//if system<61> or isdevsys then
-		if (isdevsys) {
+		if (isdevsys or not(VOLUMES)) {
 			ANS = "";
 			return 0;
 		}
@@ -259,7 +259,7 @@ restart:
 			var patchfileinfo = patchfilename.osfile();
 			if (patchfileinfo.a(2) < var().date()) {
 				goto nextpatch;
-				}
+			}
 
 			//open patch file
 			if (not(patchfile.osopen(patchfilename))) {
