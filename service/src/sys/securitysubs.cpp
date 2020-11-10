@@ -5,7 +5,6 @@ libraryinit()
 #include <sortarray.h>
 #include <systemfile.h>
 #include <usersubs.h>
-#include <generalsubs.h>
 #include <securitysubs2.h>
 #include <sysmsg.h>
 #include <sendmail.h>
@@ -771,6 +770,8 @@ function main(in mode) {
 
 			//check all users have names/passwords
 			var usercodes = RECORD.a(1);
+			usercodes.converter(" ", "-");
+			RECORD.r(1, usercodes);
 			var nusers = usercodes.count(VM) + (usercodes ne "");
 			for (usern = 1; usern <= nusers; ++usern) {
 
@@ -1002,7 +1003,7 @@ function main(in mode) {
 					origuserrec = userrec;
 
 					//determine the user department
-					call generalsubs("GETUSERDEPT," ^ userx);
+					call usersubs("GETUSERDEPT," ^ userx);
 					var departmentcode = ANS.trim();
 					var departmentcode2 = departmentcode;
 					departmentcode.converter("0123456789", "");

@@ -15,9 +15,13 @@ libraryinit()
 
 var msg;
 var xx;
-var usern;
+var usern;//num
 var newuser;//num
 var text;
+var usercode;
+var depts;
+var reply;
+var deptn;
 var op;
 var op2;
 var wspos;
@@ -366,6 +370,43 @@ function main(in mode) {
 			}
 		}//loop;
 
+	} else if (mode.field(",", 1) == "GETUSERDEPTX") {
+		//does not popup any errormessage
+		gosub getuserdept2(mode);
+		if (ANS == "") {
+			ANS = "Deleted";
+		}
+
+	} else if (mode.field(",", 1) == "GETUSERDEPT") {
+		gosub getuserdept2(mode);
+		if (ANS == "") {
+			msg = usercode.quote() ^ " - USER DOES NOT EXIST";
+			return invalid(msg);
+		}
+		return 0;
+
+	} else if (mode == "GETDEPTS") {
+		gosub getdepts();
+		ANS = depts;
+
+	} else if (mode == "F2.DEPARTMENT") {
+		gosub getdepts();
+		if (not(decide("Which department do you want?", depts ^ "", reply))) {
+			return 0;
+		}
+		ANS = depts.a(reply);
+		DATA ^= ANS ^ "\r";
+
+	} else if (mode == "VAL.DEPARTMENT") {
+		if (win.is == "") {
+			return 0;
+		}
+		gosub getdepts();
+		if (not(depts.locateusing(FM,win.is,xx))) {
+			msg = win.is.quote() ^ " IS NOT A VALID DEPARTMENT";
+			return invalid(msg);
+		}
+
 	} else {
 		msg = mode.quote() ^ " is invalid in USER.SUBS";
 		return invalid(msg);
@@ -406,6 +447,52 @@ subroutine updatemirror() {
 	var mirrorkey = "%" ^ username ^ "%";
 	mirror.r(1, ID);
 	mirror.write(win.srcfile, mirrorkey);
+	return;
+}
+
+subroutine getuserdept2(in mode) {
+
+	//locate the user in the table
+	usercode = mode.field(",", 2);
+	if (not(SECURITY.a(1).locate(usercode,usern))) {
+		if (usercode == "NEOSYS") {
+			ANS = "NEOSYS";
+			return;
+		}else{
+			ANS = "";
+			return;
+		}
+	}
+
+	//locate divider, or usern+1
+	var nusers1 = SECURITY.a(1).count(VM) + 1;
+	for (usern = 1; usern <= nusers1; ++usern) {
+		///BREAK;
+		if (SECURITY.a(1, usern) == "---") break;
+	};//usern;
+
+	//get the department code
+	ANS = SECURITY.a(1, usern - 1);
+	return;
+}
+
+subroutine getdepts() {
+	depts = "";
+	var nusers2 = SECURITY.a(1).count(VM) + 1;
+	for (usern = 2; usern <= nusers2 + 1; ++usern) {
+		text = SECURITY.a(1, usern);
+		if ((text == "---") or (text == "")) {
+			text = SECURITY.a(1, usern - 1);
+			text.converter("0123456789", "");
+			text.trimmer();
+			if (text and text ne "---") {
+				if (not(depts.locateusing(FM,text,deptn))) {
+					depts.r(-1, text);
+				}
+			}
+		}
+	};//usern;
+
 	return;
 }
 

@@ -34,7 +34,19 @@ var pattern;
 var ageinsecs;//num
 var ii;//num
 var patchfile;
+var offset;
 var firstblock;
+var patchid;
+var keyandrec;
+var rec;
+var versiondatetime;
+var versionkey;
+var patchdatetime;
+var skipreason;
+var skipemail;//num
+var lastpatchid;
+var runoncekey;
+var runonce;
 var bottomline;
 var stopn;
 var locks;
@@ -55,6 +67,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 	//$insert bp,agency.common
 	//global ii,userencrypt0,passwordexpired,lastlogindate,maxnologindays,validips
 	//global filetime,fileattributes
+	//global runonce,runoncekey,lastpatchid,skipemail,skipreason,patchdatetime,versionkey,versiondatetime,rec,keyandrec,patchid,offset
 
 	//TODO share various files with LISTEN to prevent slowing down by opening?
 
@@ -254,7 +267,7 @@ restart:
 			}
 
 			//ensure patch file is complete
-			var offset = patchfileinfo.a(1) - 18;
+			offset = patchfileinfo.a(1) - 18;
 			call osbread(tt, patchfile,  offset, 18);
 			if (tt ne ("!" ^ FM ^ "!END!OF!INSTALL!")) {
 				goto nextpatch;
@@ -262,7 +275,7 @@ restart:
 
 			//verify correct file heading and determine patchid from the file
 			call osbread(firstblock, patchfile,  0, 65000);
-			var patchid = firstblock.a(2).substr(6,9999);
+			patchid = firstblock.a(2).substr(6,9999);
 			if (firstblock.a(1) ne "00000DEFINITIONS" or patchid.substr(1,8) ne "INSTALL*") {
 				goto nextpatch;
 			}
@@ -277,9 +290,9 @@ restart:
 			//remove 00000DEFINITIONS^
 			firstblock.remover(1);
 			//remove 5 byte length field and cut out key+rec
-			var keyandrec = firstblock.substr(6,firstblock.substr(1,5));
+			keyandrec = firstblock.substr(6,firstblock.substr(1,5));
 			//remove key
-			var rec = keyandrec.remove(1, 0, 0);
+			rec = keyandrec.remove(1, 0, 0);
 
 			//installation wide lock on it
 			if (not(lockrecord("", processes, patchid))) {
@@ -296,8 +309,8 @@ restart:
 			rec.write(DEFINITIONS, patchid);
 
 			//get current NEOSYS version timestamp
-			var versiondatetime = "";
-			var versionkey = "general/version.dat";
+			versiondatetime = "";
+			versionkey = "general/version.dat";
 			versionkey.converter("/", OSSLASH);
 			if (tt.osread(versionkey)) {
 				tt.trimmer();
@@ -309,18 +322,17 @@ restart:
 			}
 
 			//get patch timestamp
-			var patchdatetime = patchid.field("*", 3);
+			patchdatetime = patchid.field("*", 3);
 
 			//skip patch if older than installation
-			var skipreason = "";
-			var skipemail = "";
+			skipreason = "";
+			skipemail = "";
 			if (versiondatetime and (patchdatetime < versiondatetime)) {
 				skipreason = "Patch is older than installation version - " ^ oconv(versiondatetime, "[DATETIME,4*]");
 				skipemail = 1;
 			}
 
 			//skip patch if older than last patch
-			var lastpatchid;
 			if (not(lastpatchid.read(DEFINITIONS, "INSTALL*LAST"))) {
 				lastpatchid = "";
 			}
@@ -332,7 +344,7 @@ restart:
 			}
 
 			//ensure that we only ever runonce something just loaded from a patch
-			var runoncekey = "$" ^ patchid.field("*", 2) ^ ".RUNONCE";
+			runoncekey = "$" ^ patchid.field("*", 2) ^ ".RUNONCE";
 			DEFINITIONS.deleterecord(runoncekey);
 
 			if (not skipemail) {
@@ -380,7 +392,6 @@ restart:
 			//if $PATCH.RUNONCE or $datasetcode.RUNONCE appears in definitions
 			//if the runonce record appears in the definitions then
 			//run it, save it and delete it
-			var runonce;
 			if (runonce.read(DEFINITIONS, runoncekey)) {
 				perform("RUN DEFINITIONS " ^ runoncekey.substr(2,9999));
 				//leave it for inspection
