@@ -102,6 +102,8 @@ dict2sql
 :
 : 5. Testing Exodus
 : =================
+: Every database requires a lists file in order to store select lists
+createfile lists
 cd ~
 testsort
 :

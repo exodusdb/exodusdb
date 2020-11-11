@@ -137,8 +137,8 @@ function main()
         assert(len(utftest)==osfile(utftestfilename).a(1));
 
         //check invalif utf8 has no change oswrite/osread round trip
-        oswrite(utftest,utftestfilename^".2");
-        osread(utftest2,utftestfilename^".2");
+        oswrite(utftest,"t_"^utftestfilename);
+        osread(utftest2,"t_"^utftestfilename);
         assert(utftest2=utftest);
 
         //check invalid utf has no change on ucase/lcase round trip
@@ -545,7 +545,7 @@ function main()
 	//if (not deletedb("steve",errmsg))
 	//	errmsg.outputl();
 
-	var testfilename="vm.txt";
+	var testfilename="t_vm.txt";
 	var charout=GreekSmallGamma;//VM;
 	assert(oswrite(charout,testfilename));
 	var offsetx,testfilex;
@@ -608,27 +608,27 @@ function main()
         var cp_allo1{"\xB0\xDB\xDB\xDE"};
 
         //output binary unconverted
-        oswrite(cp_allo1,"cp_allo.txt");
+        oswrite(cp_allo1,"t_cp_allo.txt");
         assert(cp_allo1.oconv("HEX").outputl("cp_allo1=")=="B0DBDBDE");
 
-        //hexdump -C cp_allo.txt
+        //hexdump -C t_cp_allo.txt
         //00000000  b0 db db de
         //00000004
 
         //check that we can read binary back in unconverted
-        var cp_allo2=osread("cp_allo.txt");
+        var cp_allo2=osread("t_cp_allo.txt");
         assert(cp_allo2.oconv("HEX").outputl("cp_allo2=")=="B0DBDBDE");
 
         //read in from binary cyrillic codepage text converting to utf8
         var utf8_allo3;
-        if (not utf8_allo3.osread("cp_allo.txt","ISO-8859-5"))
-                stop("cant read cp_allo.txt with cp ISO-8859-5");
+        if (not utf8_allo3.osread("t_cp_allo.txt","ISO-8859-5"))
+                stop("cant read t_cp_allo.txt with cp ISO-8859-5");
         assert(utf8_allo3.length()==8);
         assert(utf8_allo3.oconv("HEX")=="D090D0BBD0BBD0BE");
         assert(utf8_allo3=="Алло");
 
         //output utf8 convering to ISO-8859-5
-        oswrite(utf8_allo3,"cp_allo4.txt","ISO-8859-5");
+        oswrite(utf8_allo3,"t_cp_allo4.txt","ISO-8859-5");
 /*
 root@exodus:~/exodus/exodus/libexodus/exodus# hexdump cp_allo4.txt -C
 00000000  b0 db db de                                       |....|
@@ -636,11 +636,11 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump cp_allo4.txt -C
 */
         //read back in binary to check that out output did convert from utf to cyrillic
         var cp_allo5;
-        osread(cp_allo5,"cp_allo4.txt");
+        osread(cp_allo5,"t_cp_allo4.txt");
         assert(cp_allo5==cp_allo1);
 
 /*
-root@exodus:~/exodus/exodus/libexodus/exodus# hexdump utf8_allo4.txt -C
+root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 00000000  d0 90 d0 bb d0 bb d0 be                           |........|
 00000008
 */
@@ -735,12 +735,12 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump utf8_allo4.txt -C
 		assert(len(data) eq nbinarychars);
 
 		//check can write characters 1-255 out as bytes using C locale
-		oswrite(data,"x.txt");
-		assert(osfile("x.txt")(1) eq nbinarychars);
+		oswrite(data,"t_x.txt");
+		assert(osfile("t_x.txt")(1) eq nbinarychars);
 
 		//check can read in bytes as characters using C locale
 		var data2;
-		osread(data2,"x.txt");
+		osread(data2,"t_x.txt");
 		assert(data2 eq data);
 	}
 
@@ -755,12 +755,12 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump utf8_allo4.txt -C
 		//assert(greek2[1].seq()==947);
 		//assert(greek2[2].seq()==931);
 
-		//output as utf8 to temp5.txt
-		var tempfilename5="temp5.txt";
+		//output as utf8 to t_temp5.txt
+		var tempfilename5="t_temp5.txt";
 		//greek2.outputl();
 		assert(oswrite(greek2,tempfilename5,"utf8"));
 
-		//open temp5.txt as utf8 for random access
+		//open t_temp5.txt as utf8 for random access
 		var tempfile;
 		assert(osopen(tempfilename5,tempfile,"utf8"));
 
@@ -803,9 +803,9 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump utf8_allo4.txt -C
 		printl("greek utf8 tested ok");
 	}
 
-	assert(oswrite("","temp1234.txt"));
+	assert(oswrite("","t_temp1234.txt"));
 	var offs=2;
-	assert(osbwrite("78","temp1234.txt",offs));
+	assert(osbwrite("78","t_temp1234.txt",offs));
 //	abort("stopping");
 
 	printl("testmain says 'Hello World!'");
@@ -914,7 +914,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump utf8_allo4.txt -C
 	if (SLASH_IS_BACKSLASH) {
 		//show where we are working
 		printl(oscwd("OSCWD="));
-		var greektestfilename="greeksas.txt";
+		var greektestfilename="t_greeksas.txt";
 		//check CANNOT write greek unicode characters using French codepage
 		assert(not Greek_sas.oswrite(greektestfilename,"French"));//CANNOT write
 		//check can write greek unicode characters to Greek codepage
@@ -953,7 +953,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump utf8_allo4.txt -C
 
 	var tempfilename5;
 	var record5;
-	tempfilename5="temp7657.txt";
+	tempfilename5="t_temp7657.txt";
 	assert(oswrite("",tempfilename5));
 	assert(osdelete(tempfilename5));
 
@@ -1014,10 +1014,10 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump utf8_allo4.txt -C
 	unicode^=GreekSmallGamma;
 	unicode^="ABc-123.456";//some LATIN characters and punctuation
 
-	var status2 = oswrite( unicode, "GreekUTF-8File.txt", "utf8");
+	var status2 = oswrite( unicode, "t_GreekUTF-8File.txt", "utf8");
 
-	var status1 = oswrite( unicode, "GreekLocalFile.txt");
-	var status3 = oswrite( unicode, "GreekEnglFile.txt");
+	var status1 = oswrite( unicode, "t_GreekLocalFile.txt");
+	var status3 = oswrite( unicode, "t_GreekEnglFile.txt");
 
 	//test swapping "letters" (i.e. alphabet) with "?"
 	//We expect the question mark to remain as it is,
@@ -1331,7 +1331,9 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump utf8_allo4.txt -C
 //		assert(listindexes("XUSERS") eq "");
 	}
 	//check can select and readnext through the records
-	begintrans();
+	printl("Beginning transaction");
+	assert(begintrans());
+	printl("Begun transaction");
 	if (pluginok) {
 		assert(select("select XUSERS with BIRTHDAY between '1 JAN 2000' and '31 DEC 2003'"));
 		assert(readnext(ID));
@@ -2639,25 +2641,25 @@ while trying to match the argument list '(exodus::var, bool)'
 	committrans();
 #ifdef FILE_IO_CACHED_HANDLES_EXCLUDED
 	{	// test to reproduce cached_handles error
-		var file1( "FILE1.txt");
+		var file1( "t_FILE1.txt");
 		oswrite( "", file1);
 		var off1 = 0;
-		osbwrite( "This text is written to the file 'FILE1.txt'", file1, off1);
+		osbwrite( "This text is written to the file 't_FILE1.txt'", file1, off1);
 
-		var file2( "FILE2.txt");
+		var file2( "t_FILE2.txt");
 		oswrite( "", file2);
 		var off2 = 0;
-		osbwrite( "This text is written to the file 'FILE2.txt'", file2, off2);
+		osbwrite( "This text is written to the file 't_FILE2.txt'", file2, off2);
 
 		var file1x = file1;		// wicked copy of file handle
 		file1x.osclose();		// we could even do: var( file1).osclose();
 
-		var file3( "FILE3.txt");
+		var file3( "t_FILE3.txt");
 		oswrite( "", file3);
 		var off3 = 0;
-		osbwrite( "This text is written to the file 'FILE3.txt'", file3, off3);
+		osbwrite( "This text is written to the file 't_FILE3.txt'", file3, off3);
 
-		osbwrite( "THIS TEXT INTENDED FOR FILE 'FILE1.txt' BUT IT GOES TO 'FILE3.txt'", file1, off1);
+		osbwrite( "THIS TEXT INTENDED FOR FILE 't_FILE1.txt' BUT IT GOES TO 't_FILE3.txt'", file1, off1);
 	}
 #endif
 

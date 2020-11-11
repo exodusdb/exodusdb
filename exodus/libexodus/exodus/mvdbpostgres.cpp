@@ -3597,8 +3597,8 @@ bool var::deletelist(const var& listname) const
 	// open the lists file on the same connection
 	var lists = *this;
 	if (!lists.open("LISTS"))
-		return true;
-	// throw MVDBException("LISTS file cannot be opened");
+		//return true;
+		throw MVDBException("LISTS file cannot be opened");
 
 	// initial block of keys are stored with no suffix (i.e. no *1)
 	lists.deleterecord(listname);
