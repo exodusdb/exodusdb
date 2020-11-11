@@ -2,6 +2,11 @@
 
 SECONDS=0
 
+echo
+echo Installing exodus web service
+echo ==========================
+
+echo
 echo Install apache and php
 echo ======================
 sudo apt install -y apache2 php php-xml
@@ -9,6 +14,7 @@ sudo apt install -y apache2 php php-xml
 sudo a2enmod rewrite
 sudo systemctl restart apache2
 
+echo
 echo Configure an apache site - standard http
 echo ========================================
 cat > /tmp/exodus.conf <<V0G0N
@@ -31,14 +37,14 @@ cat > /tmp/exodus.conf <<V0G0N
 V0G0N
 sudo mv /tmp/exodus.conf /etc/apache2/sites-available/
 
-
+echo
 echo Enable the apache site and disable default
 echo ==========================================
 sudo a2dissite 000-default
 sudo a2ensite exodus
 sudo systemctl restart apache2
 
-
+echo
 echo Configure data permissions
 echo ==========================
 cd ~/exodus/service
@@ -47,8 +53,8 @@ chmod g+rws data
 mkdir -p data/exodus
 chmod o+rw data/exodus
 
-
-echo Compile the server2
+echo
+echo Compile the service
 echo ===================
 echo ignore compile error on sys/server.cpp and various warnings
 cd ~/exodus/service/src
@@ -56,7 +62,8 @@ cd ~/exodus/service/src
 cd sys
 ../compall
 
-echo Finished
-echo ========
+echo
+echo Finished - Exodus is listening on port 80
+echo =========================================
 duration=$SECONDS
 echo "$(($duration / 60)) minutes and $(($duration % 60)) seconds elapsed."
