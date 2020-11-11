@@ -39,9 +39,12 @@ var operator() (in mode0)
  //return CALLMEMBERFUNCTION(*(efb_systemsubs.pobject_),
  //((pExodusProgramBaseMemberFunction) (efb_systemsubs.pmemberfunction_)))
  // (mode);
+ #pragma GCC diagnostic push
+ #pragma GCC diagnostic ignored "-Wcast-function-type"
  return CALLMEMBERFUNCTION(*(this->pobject_),
  ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
   (mode0);
+ #pragma GCC diagnostic pop
 
 }
 

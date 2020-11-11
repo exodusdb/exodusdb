@@ -870,9 +870,11 @@ var inclusion=
 "\r\n //callorreturn CALLMEMBERFUNCTION(*(efb_funcx.pobject_),"
 "\r\n //((pExodusProgramBaseMemberFunction) (efb_funcx.pmemberfunction_)))"
 "\r\n // (mode);"
+"\r\n {before_call}"
 "\r\n return CALLMEMBERFUNCTION(*(this->pobject_),"
 "\r\n ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))"
 "\r\n  (arg1,arg2,arg3);"
+"\r\n {after_call}"
 "\r\n"
 "\r\n}"
 "{additional_funcs}"
@@ -887,6 +889,16 @@ var inclusion=
 					swapper(inclusion,"callorreturn", callorreturn);
 					swapper(inclusion,"{additional_funcs}", add_funcs);
 
+					if (text.index("-Wcast-function-type")) {
+						swapper(inclusion,"{before_call}",
+"#pragma GCC diagnostic push"
+"\r\n #pragma GCC diagnostic ignored \"-Wcast-function-type\"");
+						swapper(inclusion,"{after_call}",
+"#pragma GCC diagnostic pop");
+					} else {
+						swapper(inclusion,"\r\n {before_call}","");
+						swapper(inclusion,"\r\n {after_call}","");
+					}
 					var usepredefinedfunctor=nargs<=EXODUS_FUNCTOR_MAXNARGS;
 					if (useclassmemberfunctions) {
 						if (funcname eq "main")

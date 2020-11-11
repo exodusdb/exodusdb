@@ -9,6 +9,36 @@ var mode;
 
 function main(in mode0) {
 
+	/*
+		-Wcast-function-type - magic word - do not remove
+
+		THE HEADER .H FILE OF THS SUBROUTINE IS USED AS A DUMMY
+		FOR CALLING FUNCTIONS BY VARIABLE FUNCTON NAME
+
+		PICK:
+		FUNCTIONNAME = "SOMEFUNCTION"
+		CALL @FUNCTIONVAR(V1,V2,V3)
+
+		C++:
+		systemsubs = "somefunction";
+		call systemsubs(v1,v2,v3);
+
+		THE CALL IS WRAPPED WITH A G++ DIAGNOSTIC SUPPRESSED
+		TO EVADE COMPILER WARNINGS
+		BECAUSE SYSTEMSUBS ACTUALLY HAS ONLY ONE ARGUMENT
+		WHEREAS THE ACTUAL FUNCTION MAY HAVE ANY NUMBER OF ARGUMENTS
+		RUNTIME HAS NO ISSUE AS LONG AS THE ACTUAL FUNCTION
+		AND CALL HAVE THE SAME FUNCTION SIGNATURE
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-function-type"
+ return CALLMEMBERFUNCTION(*(this->pobject_),
+ ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
+  (mode0);
+}
+#pragma GCC diagnostic pop
+	*/
+
 	//this is a template used for calling all filexxxsubs() routines
 	//they must have ONE in arg
 	return 0;
