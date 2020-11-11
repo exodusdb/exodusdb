@@ -257,7 +257,9 @@ class VARTYP
 	// copy constructor
 	// VARTYP(const VARTYP& rhs) {flags=rhs.flags;std::cout<<"copy ctor "<< rhs.flags <<
 	// std::endl;};
-	VARTYP(const VARTYP& rhs) : flags_(rhs.flags_){};
+	// will be defaulted so no need to define
+	//(if defined then also need to define other constructors)
+	//VARTYP(const VARTYP& rhs) : flags_(rhs.flags_){};
 
 	// default constructor
 	// VARTYP() : flags(0) {};
