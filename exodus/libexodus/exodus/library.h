@@ -72,8 +72,11 @@ Pointers to members have different representations; cannot cast between them
 		else                                                                               \
 		{                                                                                  \
 			pexodusprogrambase = new CLASSNAME##ExodusProgram(mv);                     \
+			_Pragma("GCC diagnostic push")\
+			_Pragma("GCC diagnostic ignored \"-Wcast-function-type\"")\
 			pmemberfunction =                                                          \
 			    (pExodusProgramBaseMemberFunction)&CLASSNAME##ExodusProgram::main;     \
+			_Pragma("GCC diagnostic pop")\
 		}                                                                                  \
 		return;                                                                            \
 	}

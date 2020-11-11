@@ -467,7 +467,10 @@ var ExodusFunctorBase::callsgf()
 #endif
 
 	// call the function via its pointer
+ #pragma GCC diagnostic push
+ #pragma GCC diagnostic ignored "-Wcast-function-type"
 	return ((ExodusDynamic)pfunction_)(*mv_);
+ #pragma GCC diagnostic pop
 	// return;
 }
 

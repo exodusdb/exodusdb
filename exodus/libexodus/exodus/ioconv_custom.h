@@ -42,9 +42,12 @@ class efb_ioconv_custom : public ExodusFunctorBase
 		// return CALLMEMBERFUNCTION(*(efb_ioconv_custom.pobject_),
 		//((pExodusProgramBaseMemberFunction) (efb_ioconv_custom.pmemberfunction_)))
 		// (mode);
+ #pragma GCC diagnostic push
+ #pragma GCC diagnostic ignored "-Wcast-function-type"
 		return CALLMEMBERFUNCTION(*(this->pobject_),
 					  ((pExodusProgramBaseMemberFunction)(
 					      this->pmemberfunction_)))(type, input, mode, output);
+ #pragma GCC diagnostic pop
 	}
 
 	var operator()()
