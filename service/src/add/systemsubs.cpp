@@ -30,13 +30,13 @@ function main(in mode0) {
 		RUNTIME HAS NO ISSUE AS LONG AS THE ACTUAL FUNCTION
 		AND CALL HAVE THE SAME FUNCTION SIGNATURE
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wcast-function-type"
- return CALLMEMBERFUNCTION(*(this->pobject_),
- ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
-  (mode0);
-}
-#pragma GCC diagnostic pop
+//#pragma GCC diagnostic push
+//#pragma GCC diagnostic ignored "-Wcast-function-type"
+// return CALLMEMBERFUNCTION(*(this->pobject_),
+// ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
+//  (mode0);
+//}
+//#pragma GCC diagnostic pop
 	*/
 
 	//this is a template used for calling all filexxxsubs() routines
