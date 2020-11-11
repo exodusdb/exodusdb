@@ -82,7 +82,7 @@ function main(in fromdate, in fromtime, io uptodate, io uptotime) {
 				}
 			} else if (not(minutes)) {
 zero:
-				text.r(-1, "< 1 msec");
+				text.r(-1, "< 1 ms");
 			} else {
 				text.r(-1, "exactly");
 			}

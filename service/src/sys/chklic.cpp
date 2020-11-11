@@ -36,7 +36,12 @@ function main(in mode0, out msg) {
 	//IF they hold a lic that has not expired (with some grace days allowed)
 	//they can also create documents for other periods
 
-	mode = mode0;
+	//mode=mode0
+	if (mode0.unassigned()) {
+		mode = "";
+		}else{
+		mode = mode0;
+	}
 
 		/* REQUESTING AND ENTERING A VERIFICATION CODE with 7 days grace;
 		ADDLIC MEDIA,FINANCE 1/10/2009 31/12/2009 7;

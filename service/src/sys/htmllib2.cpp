@@ -5,6 +5,7 @@ libraryinit()
 
 var params;
 var params2;
+var tagsep;
 
 function main(in mode, io dataio, in params0="", in params20="") {
 	//c sys in,io,"",""
@@ -118,9 +119,15 @@ function main(in mode, io dataio, in params0="", in params20="") {
 					var line = datax.a(ln).trim();
 					if (line[1] == "#") {
 						line.splicer(1, 1, "");
-						var tt1 = line.field(" ", 1);
+						//if colon : present then before colon is the tag name
+						if (line.index(":")) {
+							tagsep = ":";
+						}else{
+							tagsep = " ";
+						}
+						var tt1 = line.field(tagsep, 1);
 						tt1.converter("_", " ");
-						var tt2 = line.field(" ", 2, 9999);
+						var tt2 = line.field(tagsep, 2, 9999);
 						if (tt2[1] == "=") {
 							tt2.splicer(1, 1, "");
 						}

@@ -17,7 +17,7 @@ efb_stop& operator=(const var& newlibraryname) {
 }
 
 //a member function with the right arguments, returning a var or void
-var operator() (in mode, in time, in date, out buffer, out msg)
+var operator() (in mode0, in time, in date, out buffer, out msg)
 {
 
  //first time link to the shared lib and create/cache an object from it
@@ -41,43 +41,43 @@ var operator() (in mode, in time, in date, out buffer, out msg)
  // (mode);
  return CALLMEMBERFUNCTION(*(this->pobject_),
  ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
-  (mode,time,date,buffer,msg);
+  (mode0,time,date,buffer,msg);
 
 }
 
 var operator() () {
- var mode_in;
+ var mode0_in;
  var time_in;
  var date_in;
  var buffer_out;
  var msg_out;
- return operator()(mode_in, time_in, date_in, buffer_out, msg_out);
+ return operator()(mode0_in, time_in, date_in, buffer_out, msg_out);
 }
 
-var operator() (in mode) {
+var operator() (in mode0) {
  var time_in;
  var date_in;
  var buffer_out;
  var msg_out;
- return operator()(mode, time_in, date_in, buffer_out, msg_out);
+ return operator()(mode0, time_in, date_in, buffer_out, msg_out);
 }
 
-var operator() (in mode, in time) {
+var operator() (in mode0, in time) {
  var date_in;
  var buffer_out;
  var msg_out;
- return operator()(mode, time, date_in, buffer_out, msg_out);
+ return operator()(mode0, time, date_in, buffer_out, msg_out);
 }
 
-var operator() (in mode, in time, in date) {
+var operator() (in mode0, in time, in date) {
  var buffer_out;
  var msg_out;
- return operator()(mode, time, date, buffer_out, msg_out);
+ return operator()(mode0, time, date, buffer_out, msg_out);
 }
 
-var operator() (in mode, in time, in date, out buffer) {
+var operator() (in mode0, in time, in date, out buffer) {
  var msg_out;
- return operator()(mode, time, date, buffer, msg_out);
+ return operator()(mode0, time, date, buffer, msg_out);
 }
 
 };

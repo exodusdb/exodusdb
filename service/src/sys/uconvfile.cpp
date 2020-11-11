@@ -9,10 +9,13 @@ var encoding1;
 var encoding2;
 var exe;
 var ii;
+var encoding;
 var errors;
 
 function main(in inputfilename, in encoding1i, in encoding2i, out result, out msg) {
 	//c sys in,in,in,out,out
+
+	//currently only used by convcsv
 
 	//uses the unicode uconv to convert file format
 	//
@@ -79,36 +82,40 @@ function main(in inputfilename, in encoding1i, in encoding2i, out result, out ms
 		msg = "UCONVFILE: Missing encoding2";
 	}
 
-	//invent a temporary filename
-	var tempfilename = inputfilename;
-	tempfilename.splicer(-3, 3, "$CP");
+	if (encoding1 ne encoding) {
 
-	cmd ^= " -f windows=" ^ encoding1 ^ " -t " ^ encoding2;
+		//invent a temporary filename
+		var tempfilename = inputfilename;
+		tempfilename.splicer(-3, 3, "$CP");
 
-	cmd ^= " -o " ^ tempfilename;
-	cmd ^= " " ^ inputfilename;
+		cmd ^= " -f windows=" ^ encoding1 ^ " -t " ^ encoding2;
 
-	//run the conversion command
-	result = shell2(cmd, errors);
-	if (errors) {
-		msg = "UCONVFILE: uconv " ^ errors;
-		return 0;
+		cmd ^= " -o " ^ tempfilename;
+		cmd ^= " " ^ inputfilename;
+
+		//run the conversion command
+		result = shell2(cmd, errors);
+		if (errors) {
+			msg = "UCONVFILE: uconv " ^ errors;
+			return 0;
+		}
+
+		//overwrite the input file with the temporary
+		if (VOLUMES) {
+			cmd = "xcopy " ^ tempfilename ^ " " ^ inputfilename ^ " /y";
+		}else{
+			cmd = "cp " ^ tempfilename ^ " " ^ inputfilename;
+		}
+		result = shell2(cmd, errors);
+		if (errors) {
+			msg = "UCONVFILE: xcopy " ^ errors;
+			return 0;
+		}
+
+		//delete the temporary
+		tempfilename.osdelete();
+
 	}
-
-	//overwrite the input file with the temporary
-	if (VOLUMES) {
-		cmd = "xcopy " ^ tempfilename ^ " " ^ inputfilename ^ " /y";
-	}else{
-		cmd = "cp " ^ tempfilename ^ " " ^ inputfilename;
-	}
-	result = shell2(cmd, errors);
-	if (errors) {
-		msg = "UCONVFILE: xcopy " ^ errors;
-		return 0;
-	}
-
-	//delete the temporary
-	tempfilename.osdelete();
 
 	result = 1;
 

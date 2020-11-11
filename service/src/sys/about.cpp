@@ -3,6 +3,8 @@ libraryinit()
 
 #include <getreccount.h>
 
+#include <gen_common.h>
+
 var interactive;
 var l10;
 var l20;
@@ -13,11 +15,14 @@ var file;
 var nrecs;//num
 var mod;
 var dir;
+var versiondata;
 var ver;
 
 function main() {
 	//c sys
 	//global all
+
+	#include <general_common.h>
 
 	interactive = not(SYSTEM.a(33));
 
@@ -80,7 +85,10 @@ function main() {
 }
 
 subroutine getver() {
-	if (not(ver.osread(dir ^ "\\version.dat"))) {
+	versiondata = "/version.dat";
+	versiondata.converter("/", OSSLASH);
+	//osread ver from dir:'\version.dat' else return;*ver='Not installed'
+	if (not(ver.osread(dir ^ versiondata))) {
 		return;
 	}
 

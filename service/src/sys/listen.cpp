@@ -932,7 +932,7 @@ gotlink:
 			//remove from future candidate files?
 			call ossleep(1000*.1);
 			if (tracing) {
-				printl("CANNOT OPEN ", linkfilename1.quote());
+				printl("CANNOT OPEN RW ", linkfilename1.quote());
 			}
 			goto nextlinkfile;
 		}

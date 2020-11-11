@@ -226,6 +226,9 @@ function main() {
 	showborder = 0;
 	headtabperpage = 1;
 
+	//for safety in case we are called with (PE) options, to avoid hanging
+	//PRINTER OFF;
+
 	if (USERNAME == "NEOSYS") {
 		var(SENTENCE).oswrite("nlist");
 		printl();
@@ -324,11 +327,10 @@ function main() {
 	nblocks = 0;
 	blockn = 0;
 
+	fromdate = var().date();
 	if (LISTACTIVE) {
-		fromdate = "";
-		fromtime = "";
+		fromtime = SYSTEM.a(25);
 	}else{
-		fromdate = var().date();
 		fromtime = ostime();
 	}
 
@@ -395,7 +397,8 @@ function main() {
 
 	sentencex = SENTENCE;
 	DICT = "";
-	maxncols = 128;
+	//maxncols=128
+	maxncols = 100;
 	maxnrecs = "";
 	preselect = 0;
 	keylist = "";
@@ -468,7 +471,12 @@ function main() {
 	///////////
 	ss = "";
 	wordn = 0;
-	onlyauthorised = 0;
+	//onlyauthorised=0
+	tt = " AND WITH AUTHORISED AND ";
+	onlyauthorised = sentencex.index(tt);
+	if (onlyauthorised) {
+		sentencex.swapper(tt, " AND ");
+	}
 
 ///////////
 nextphrase:
@@ -588,6 +596,9 @@ nextkey:
 			gosub getword();
 			if (ss.substr(-4,4) == " AND") {
 				ss.splicer(-4, 4, "");
+			}
+			if (nextword == "AND") {
+				gosub getword();
 			}
 			goto nextphrase;
 		}
@@ -1854,8 +1865,8 @@ x2exit:
 				tx ^= "s";
 			}
 
-			if (fromdate) {
-				tx ^= ", " ^ elapsedtimetext(fromdate, fromtime) ^ ".";
+			if (fromtime) {
+				tx ^= ", " ^ elapsedtimetext(fromdate, fromtime);
 			}
 			if (html) {
 				tx ^= "</p>";
@@ -1872,16 +1883,16 @@ x2exit:
 
 		tx.r(-1, "<script type=\"text/javascript\">" ^ FM);
 		tx ^= "function nwin(key,url,readonly) {";
-		tx ^= "gwindowopenparameters={};";
-		tx ^= "if (readonly) gwindowopenparameters.readonlymode=true;";
-		tx ^= "gwindowopenparameters.key=key;";
-		tx ^= "glogincode=\"" ^ SYSTEM.a(17) ^ "*" ^ USERNAME ^ "*\";";
+		tx ^= FM ^ " gwindowopenparameters={};";
+		tx ^= FM ^ " if (readonly) gwindowopenparameters.readonlymode=true;";
+		tx ^= FM ^ " gwindowopenparameters.key=key;";
+		tx ^= FM ^ " glogincode=\"" ^ SYSTEM.a(17) ^ "*" ^ USERNAME ^ "*\";";
 		//tx:='window.open(url)}'
 		//similar code in NLIST and LEDGER2
-		tx ^= "var vhtm=window.opener.location.toString().split(\"/\");";
-		tx ^= "vhtm[vhtm.length-1]=url;" "\r\n";
-		//tx:='alert(vhtm.join("/"));':crlf
-		tx ^= "window.open(vhtm.join(\"/\"));" "\r\n";
+		tx ^= FM ^ " var vhtm=window.opener.location.toString().split(\"/\");";
+		tx ^= FM ^ " vhtm[vhtm.length-1]=url;";
+		//tx:='alert(vhtm.join("/"));'
+		tx ^= FM ^ " window.open(vhtm.join(\"/\"));";
 		tx ^= "}";
 		tx ^= FM ^ "</script>";
 	}
@@ -2182,7 +2193,7 @@ subroutine printbreaks() {
 			tx ^= "<tr";
 			if (lastblockn) {
 				tx ^= " style=\"cursor:pointer\" onclick=\"toggle(" "\'" "B" ^ lastblockn ^ "\'" ")\"";
-			}
+				}
 			//if detsupp<2 or (nbreaks>1 and leveln>1) then tx:=' style="font-weight:bold"'
 			tx ^= ">";
 		}

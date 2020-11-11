@@ -102,6 +102,28 @@ function main() {
 }
 libraryexit(caseratio)
 
+libraryinit(conv2utf8)
+//--------------------
+#include <conv2utf8.h>
+
+var msg;
+
+function main() {
+	var origrecord = RECORD;
+	var origid = ID;
+	call conv2utf8(msg, RECUR0, "");
+	RECUR1 += 1;
+	print(var().at(0), RECUR1, ". ", RECCOUNT);
+	ANS = msg;
+	if (not ANS) {
+		ANS = RECORD ne origrecord or ID ne origid;
+	}
+	//restore otherwise select will not find it again
+	ID = origid;
+	return ANS;
+}
+libraryexit(conv2utf8)
+
 libraryinit(count)
 //----------------
 function main() {

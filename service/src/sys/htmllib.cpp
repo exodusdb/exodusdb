@@ -6,6 +6,7 @@ libraryinit()
 var params;
 var params2;
 var filler;
+var tagsep;
 
 function main(in mode, io datax, in params0="", in params20="") {
 	//c sys in,io,"",""
@@ -123,11 +124,19 @@ function main(in mode, io datax, in params0="", in params20="") {
 					var line = data2.a(ln).trim();
 					if (line[1] == "#") {
 						line.splicer(1, 1, "");
-						var tt = line.field(" ", 2, 9999);
-						if (tt[1] == "=") {
-							tt.splicer(1, 1, "");
+						//if colon : present then before colon is the tag name
+						if (line.index(":")) {
+							tagsep = ":";
+						}else{
+							tagsep = " ";
 						}
-						data2.r(ln, td ^ line.field(" ", 1) ^ tdx ^ td ^ tt ^ tdx);
+						var tt1 = line.field(tagsep, 1);
+						tt1.converter("_", " ");
+						var tt2 = line.field(tagsep, 2, 9999);
+						if (tt2[1] == "=") {
+							tt2.splicer(1, 1, "");
+						}
+						data2.r(ln, td ^ tt1 ^ ":" ^ tdx ^ td ^ tt2 ^ tdx);
 					}else{
 						data2.r(ln, "<td colspan=2>" ^ line ^ tdx);
 					}
@@ -196,7 +205,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 		} else if (var(agent).index("Windows NT ")) {
 			var tt = var(agent).index("Windows NT ");
 			osname = ((var(agent).substr(tt + 11,9999)).field(";", 1)).field(")", 1);
-			}
+		}
 		if (var(agent).index("WOW64")) {
 			osname ^= "-64";
 		}

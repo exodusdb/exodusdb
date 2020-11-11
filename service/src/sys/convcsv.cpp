@@ -688,7 +688,14 @@ nextvn:
 
 subroutine exit() {
 	outfile.osclose();
-	call uconvfile(outfile, "CODEPAGE", "UTF16", result, errors);
+	//will not do anything unless uconv is available
+	//call uconvfile(outfile,'CODEPAGE','UTF16',result,errors)
+	//we need to convert to UTF-8 since csv files have no way to specify
+	//what codepage the charset is and this can result in failure to open correctly
+	call uconvfile(outfile, "CODEPAGE", "UTF8", result, errors);
+	//ignore errors like "uconv cannot be found" for now
+	//otherwise will have to install cygwin uconv everywhere and add to installations
+	//call msg(errors)
 	SYSTEM.r(34, 1);
 	gosub exit3();
 	return;

@@ -3,12 +3,19 @@ libraryinit()
 
 #include <videorw.h>
 
-function main(in mode, in time, in date, out buffer, out msg) {
+var mode;
+
+function main(in mode0, in time, in date, out buffer, out msg) {
 	//c sys in,in,in,out,out
 
 	var interactive = not(SYSTEM.a(33));
 	if (msg.unassigned()) {
 		msg = "";
+	}
+	if (mode0.unassigned()) {
+		mode = "";
+	}else{
+		mode = mode0;
 	}
 
 	//gosub gettext
@@ -17,7 +24,7 @@ function main(in mode, in time, in date, out buffer, out msg) {
 	var result = "";
 	if (mode) {
 		text.swapper(", ", FM);
-	}else{
+		}else{
 		//SWAP @FM WITH ', ' IN TEXT
 		var msgx = msg;
 		if (msgx) {
