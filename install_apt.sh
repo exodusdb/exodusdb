@@ -1,8 +1,8 @@
 #!/bin/bash
 set -x
 :
-: === Building and Installing Exodus Using apt-get ===
-:
+: 0. Building and Installing Exodus Using apt-get
+: ===============================================
 : you can view/run the latest version of this script directly
 : "wget -O - https://raw.githubusercontent.com/exodusdb/exodusdb/master/install_apt.sh | less"
 : "wget -O - https://raw.githubusercontent.com/exodusdb/exodusdb/master/install_apt.sh | bash"
@@ -112,5 +112,7 @@ testsort
 : hello
 : compile hello
 :
+: 7. Finished
+: ===========
 duration=$SECONDS
 echo "$(($duration / 60)) minutes and $(($duration % 60)) seconds elapsed."
