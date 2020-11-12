@@ -93,7 +93,7 @@ sudo -u postgres psql exodus < sql/dict_processes.sql
 sudo -u postgres psql exodus -c "ALTER TABLE dict_users OWNER to exodus"
 sudo -u postgres psql exodus -c "ALTER TABLE dict_processes OWNER to exodus"
 :
-: Finished - Exodus is listening on port 80
-: =========================================
+: Finished - Exodus should be listening on port 80 and 443
+: ========================================================
 duration=$SECONDS
 : "$(($duration / 60)) minutes and $(($duration % 60)) seconds elapsed."
