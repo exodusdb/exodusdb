@@ -30,6 +30,7 @@ function main() {
 	createfile("REQUESTLOG");
 	createfile("SYS_MESSAGES");
 	createfile("COMPANIES");
+	createfile("MARKETS");
 	createfile("USERS");
 
 	//module
