@@ -56,6 +56,14 @@ cd ~/exodus/service/src
 cd sys
 ../compall
 :
+: Setup database dict_users
+: =========================
+cd ~/exodus/service/src
+sudo -u postgres psql exodus < sql/dict_users.sql
+sudo -u postgres psql exodus < sql/dict_processes.sql
+sudo -u postgres psql exodus -c "ALTER TABLE dict_users OWNER to exodus"
+sudo -u postgres psql exodus -c "ALTER TABLE dict_processes OWNER to exodus"
+:
 : Finished - Exodus is listening on port 80
 : =========================================
 duration=$SECONDS
