@@ -30,7 +30,7 @@ function main() {
 	createfile("REQUESTLOG");
 	createfile("SYS_MESSAGES");
 	createfile("COMPANIES");
-	createfile("MARKETS");
+	createfile("DOCUMENTS");
 	createfile("USERS");
 
 	//module
@@ -59,7 +59,6 @@ function main() {
 		osshell("setfacl -d -m g::rw " ^ databasedir);
 	}
 
-	/*
 	//ensure MARKETS file exists and has at least an ALL markets record
 	if (not open("MARKETS")) {
 		createfile("MARKETS");
@@ -70,6 +69,7 @@ function main() {
 	else
 		write("All Markets","MARKETS","ALL");
 
+	/*
 	var agp="";
 	if (not read(agp,"DEFINITIONS","AGENCY.PARAMS")) {
 		agp=invert("DEVELOPMENT DATABASE");
@@ -104,4 +104,3 @@ function main() {
 }
 
 programexit()
-

@@ -8,8 +8,7 @@ SECONDS=0
 : Install apache and php
 : ======================
 sudo apt install -y apache2 php php-xml
-:sudo git clone https://git.hosts.neosys.com/gits/neosys.net/ /var/www/exodus
-sudo a2enmod rewrite
+sudo a2enmod rewrite ssl
 sudo systemctl restart apache2
 :
 : Configure an apache site - HTTP
