@@ -12,8 +12,8 @@ sudo apt install -y apache2 php php-xml
 sudo a2enmod rewrite
 sudo systemctl restart apache2
 :
-: Configure an apache site - standard http
-: ========================================
+: Configure an apache site - HTTP
+: ===============================
 cat > /tmp/exodus.conf <<V0G0N
 <VirtualHost *:80>
         ServerAdmin webmaster@localhost
@@ -34,10 +34,40 @@ cat > /tmp/exodus.conf <<V0G0N
 V0G0N
 sudo mv /tmp/exodus.conf /etc/apache2/sites-available/
 :
-: Enable the apache site and disable default
-: ==========================================
-sudo a2dissite 000-default
-sudo a2ensite exodus
+: Configure an apache site - HTTPS
+: ================================
+cat > /tmp/exodus-ssl.conf <<V0G0N
+<VirtualHost *:443>
+    ServerAdmin webmaster@localhost
+
+    DocumentRoot /home/ubuntu/exodus/service/www
+
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+    SSLEngine on
+
+    #SSLCertificateFile /etc/letsencrypt/live/hosts.neosys.com/cert.pem
+    #SSLCertificateKeyFile /etc/letsencrypt/live/hosts.neosys.com/privkey.pem
+    #SSLCACertificateFile /etc/letsencrypt/live/hosts.neosys.com/fullchain.pem
+    SSLCertificateFile /etc/ssl/certs/ssl-cert-snakeoil.pem
+    SSLCertificateKeyFile /etc/ssl/private/ssl-cert-snakeoil.key
+
+    <Directory /home/ubuntu/exodus/service/www>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+        DirectoryIndex default.htm
+    </Directory>
+
+</VirtualHost>
+V0G0N
+sudo mv /tmp/exodus-ssl.conf /etc/apache2/sites-available/
+:
+: Enable the apache sites and disable defaults
+: ============================================
+sudo a2dissite 000-default default-ssl.conf
+sudo a2ensite exodus exodus-ssl
 sudo systemctl restart apache2
 :
 : Configure data permissions
