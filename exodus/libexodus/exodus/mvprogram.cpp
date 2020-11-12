@@ -9,14 +9,21 @@
 namespace exodus
 {
 
+ #pragma GCC diagnostic push
+ #pragma GCC diagnostic ignored "-Wuninitialized"
 // constructor with an mvenvironment
 DLL_PUBLIC
 ExodusProgramBase::ExodusProgramBase(MvEnvironment& inmv) : mv(inmv)
+//	,
+//	cache_dictid_(""),
+//	cache_perform_libid_(""),
+//	dict_exodusfunctorbase_(NULL){};
 {
 	cache_dictid_ = "";
 	cache_perform_libid_ = "";
 	dict_exodusfunctorbase_ = NULL;
 }
+#pragma GCC diagnostic pop
 
 // destructor
 DLL_PUBLIC

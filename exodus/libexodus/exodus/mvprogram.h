@@ -21,6 +21,8 @@ class ExodusProgramBase
 
 	DLL_PUBLIC
 	ExodusProgramBase(MvEnvironment& inmv);
+	DLL_PUBLIC
+	ExodusProgramBase(MvEnvironment&& inmv) = delete;
 
 	// doing virtual isnt much use because external functions (which are based on
 	// ExodusProgramBase) need to have complete freedom of arguments to main(...) virtual var
@@ -179,6 +181,10 @@ class ExodusProgramBase
 	mutable var cache_dictid_;
 	mutable var cache_dictrec_;
 	std::unordered_map<std::string, ExodusFunctorBase*> dict_function_cache;
+
+        //cache_dictid_ = "";
+        //cache_perform_libid_ = "";
+        //dict_exodusfunctorbase_ = NULL;
 
 	// used by perform to call libraries WITH NO ARGUMENTS
 	mutable ExodusFunctorBase perform_exodusfunctorbase_;
