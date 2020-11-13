@@ -1,9 +1,15 @@
 #!/bin/bash
 set -x
+set -e
 :
 : Installing exodus web service
 : ==========================
-SECONDS=0
+:
+EXODUS=`pwd`
+test -f $EXODUS/install_www_apt.sh || ( echo Must be run in exodus install dir without path && exit )
+:
+: If installing into /root/exodus then allow cd into /root - but no read access
+[ $EXODUS = /root/exodus ] && chmod o+x /root
 :
 : Install apache and php
 : ======================
@@ -31,6 +37,7 @@ cat > /tmp/exodus.conf <<V0G0N
 
 </VirtualHost>
 V0G0N
+sed -i "s|/home/ubuntu/exodus/|$EXODUS/|g" /tmp/exodus.conf
 sudo mv /tmp/exodus.conf /etc/apache2/sites-available/
 :
 : Configure an apache site - HTTPS
@@ -61,6 +68,7 @@ cat > /tmp/exodus-ssl.conf <<V0G0N
 
 </VirtualHost>
 V0G0N
+sed -i "s|/home/ubuntu/exodus/|$EXODUS/|g" /tmp/exodus-ssl.conf
 sudo mv /tmp/exodus-ssl.conf /etc/apache2/sites-available/
 :
 : Enable the apache sites and disable defaults
@@ -71,7 +79,7 @@ sudo systemctl restart apache2
 :
 : Configure data permissions
 : ==========================
-cd ~/exodus/service
+cd $EXODUS/service
 mkdir -p data
 chmod g+rws data
 mkdir -p data/exodus
@@ -80,20 +88,25 @@ chmod o+rw data/exodus
 : Compile the service
 : ===================
 : ignore compile error on sys/server.cpp and various warnings
-cd ~/exodus/service/src
+cd $EXODUS/service/src
 . config
 cd sys
 ../compall
 :
 : Setup database dict_users
 : =========================
-cd ~/exodus/service/src
-sudo -u postgres psql exodus < sql/dict_users.sql
-sudo -u postgres psql exodus < sql/dict_processes.sql
+cd /tmp
+sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_users.sql
+sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_processes.sql
 sudo -u postgres psql exodus -c "ALTER TABLE dict_users OWNER to exodus"
 sudo -u postgres psql exodus -c "ALTER TABLE dict_processes OWNER to exodus"
 :
-: Finished - Exodus should be listening on port 80 and 443
+: Finished Setup - Apache should be listening on port 80 and 443
 : ========================================================
 duration=$SECONDS
 : "$(($duration / 60)) minutes and $(($duration % 60)) seconds elapsed."
+:
+: To start the service manually
+: =============================
+: cd $EXODUS/service/src
+: server2
