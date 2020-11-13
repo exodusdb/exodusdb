@@ -109,4 +109,5 @@ duration=$SECONDS
 : To start the service manually
 : =============================
 : cd $EXODUS/service/src
+: . config
 : server2
