@@ -1,0 +1,39 @@
+#!/bin/bash
+
+test -d ./www || ( echo must be run in service && exit )
+
+cd ~/exodus/service || exit
+rm neosys.net -rf || exit
+git clone https://git.hosts.neosys.com/gits/neosys.net/ || exit
+
+cd neosys.net || exit
+
+#remove some unnecessary directories completely
+rm 2 -r
+rm 3/{agency,finance,general,jobs,media} -r
+rm -rf .git .vs .vscode
+
+#remove some unnecessary files
+rm .gitignore accounts.htm adagency.htm exodus.conf  favicon.ico neosysSupportgittesting.txt  readme.txt  web.config
+rm 3/accounts.htm 3/adagency.htm
+rm neosys/dll/{upload.dll,upload.dl_}
+
+#rename some directories
+mv 3/neosys 3/exodus
+mv neosys exodus
+
+#rename some files
+mv ./3/exodus/scripts/neosys.js ./3/exodus/scripts/exodus.js
+mv ./exodus/editor/config.js.neosys ./exodus/editor/config.js.exodus
+mv ./exodus/images/theme2/neosys32x25.gif ./exodus/images/theme2/exodus32x25.gif
+mv ./exodus/images/theme2/neosysm.jpg ./exodus/images/theme2/exodusm.jpg
+mv ./exodus/doc/neosysfunctions.htm ./exodus/doc/exodusfunctions.htm
+
+#change neosys to exodus in all text (except neosys.com)
+find ../neosys.net -type f -exec sed -i 's#neosys#exodus#g' {} \;
+find ../neosys.net -type f -exec sed -i 's#exodus.com#neosys.com#g' {} \;
+find ../neosys.net -type f -exec sed -i 's#NEOSYS#EXODUS#g' {} \;
+find ../neosys.net -type f -exec sed -i 's#Copyright EXODUS#Copyright NEOSYS#g' {} \;
+
+cd ~/exodus/service || exit
+rsync -avr neosys.net/* www
