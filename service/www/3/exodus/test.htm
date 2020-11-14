@@ -10,7 +10,7 @@
 var gnosavelocation=true
 
 function* formfunctions_onload() {
-    if (gusername=='NEOSYS')
+    if (gusername=='EXODUS')
         showhide('customcommandrow',true)
     return true
 }
@@ -218,7 +218,7 @@ function test_getvalue(id) {
                                 <input type="button" value="Run" onclick="test_run_sync('TEST')" /></td>
                             <td>
                                 <input id="check_TEST" checked type="checkbox" />
-                                NEOSYS server loopback</td>
+                                EXODUS server loopback</td>
                             <td id="count_TEST">
                             </td>
                             <td id="milliseconds_TEST">
@@ -229,7 +229,7 @@ function test_getvalue(id) {
                                 <input type="button" value="Run" onclick="test_run_sync('SELECT')" /></td>
                             <td>
                                 <input id="check_SELECT" checked type="checkbox" />
-                                NEOSYS application loopback</td>
+                                EXODUS application loopback</td>
                             <td id="count_SELECT">
                             </td>
                             <td id="milliseconds_SELECT">
@@ -242,7 +242,7 @@ function test_getvalue(id) {
                 <td>
                     Custom Command
                     <input type="button" value="Run" onclick="test_run_sync('CUSTOM')" /><br />
-                    <span style="font-size: 0.8em">NEOSYS only</span></td>
+                    <span style="font-size: 0.8em">EXODUS only</span></td>
                 <td>
                     <input id="customcommand" value="SELECT\rCURRENCIES\rBY CURRENCY_CODE\rCURRENCY_CODE CURRENCY_NAME\rXML"
                         size="60" />

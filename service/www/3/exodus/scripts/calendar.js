@@ -823,7 +823,7 @@ Calendar.prototype.formatDate = function() {
 		return "";
 	}
 	
-    //NEOSYS var bits = new Array();
+    //EXODUS var bits = new Array();
     //to avoid custom array methods (properties) crashing the eval further down
     var bits = new Object();
     

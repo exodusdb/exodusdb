@@ -66,7 +66,7 @@ session_start();
 //provides $config['databases'][];
 include_once('../../../../config.php');
 
-//NEOSYS root path should point to the folder containing exodus, exodus.net, data, images etc
+//EXODUS root path should point to the folder containing exodus, exodus.net, data, images etc
 // eg D:\\hosts\\test or /var/www/exodus?
 //$exodusrootpath = $_SERVER['DOCUMENT_ROOT'];
 // __DIR__ = D:\\hosts\\test\\exodus.net\\3\\exodus\\scripts
@@ -85,7 +85,7 @@ if ($gwindows)
 //debug("exodusrootpath : $exodusrootpath");
 
 // /var/www/html/exodus2//data/default.vol
-// D:\hosts\test\exodus.net\3\exodus\scriptsNEOSYS/ADAGENCY.VOL
+// D:\hosts\test\exodus.net\3\exodus\scriptsEXODUS/ADAGENCY.VOL
 $gdatalocation = ($exodusrootpath . 'data' . $gslash);
 
 if (!file_exists($gdatalocation)) {
@@ -258,7 +258,7 @@ if ($token) {
 
 //MUST be sent before anything else
 header("Content-Type:text/xml; charset=utf-8");
-//? like xhttp.asp let client guess encoding because NEOSYS client data might not be in UTF-8 format eg DIO (Dior) in TEST database
+//? like xhttp.asp let client guess encoding because EXODUS client data might not be in UTF-8 format eg DIO (Dior) in TEST database
 //header ("Content-Type:text/xml");
 
 //failure
@@ -408,7 +408,7 @@ function getdatabases($exodusrootpath, $systemcode)
 	//$gdatalocation = $exodusrootpath . "/data/";
 	global $gdatalocation;
 	$volfilename = $gdatalocation . $systemcode . '.vol';
-	//$volfilename=$exodusrootpath . "NEOSYS/" . $systemcode . '.VOL';
+	//$volfilename=$exodusrootpath . "EXODUS/" . $systemcode . '.VOL';
 	debug("volfilename:" . $volfilename);
 	if (!is_file($volfilename)) {
 		$response = "Cannot see vol file $volfilename";

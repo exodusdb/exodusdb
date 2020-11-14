@@ -14,8 +14,8 @@
 //parentElement nonstandard use parentNode
 
 //default location of exodus scripts etc
-if (typeof NEOSYSlocation == 'undefined')
-    NEOSYSlocation = '../exodus/'
+if (typeof EXODUSlocation == 'undefined')
+    EXODUSlocation = '../exodus/'
 
 //define global variables and initialise some of them
 //many global variables are defined throughout the code outside functions ... ususally just preceeding them
@@ -23,7 +23,7 @@ if (typeof NEOSYSlocation == 'undefined')
 //most global variables start with g except some very commonly used ones like fm, vm, sm
 //a more complete set of global variables may be found using a debugger
 
-var gautofitwindow=true
+var gautofitwindow = true
 var gisdialog
 var glocked//mainly required in dbform but used in logout
 
@@ -68,7 +68,7 @@ var gmarketcode
 var gmaincurrcode
 var gdatasetname
 var gtz = [0, 0]
-gtz[0]=new Date().getTimezoneOffset()*-60
+gtz[0] = new Date().getTimezoneOffset() * -60
 
 var gnpendingscripts = 0
 
@@ -100,7 +100,7 @@ var gkeepalivemins = 10
 //check browser capabilities
 
 var gunsupported = ''
-var gswitchingbrowser=false
+var gswitchingbrowser = false
 
 //support "innerText" or fail
 if (typeof document.createElement('div').innerText == 'undefined') {
@@ -130,21 +130,21 @@ if (typeof document.createElement('div').innerText == 'undefined') {
 //define if our source contains function * and yield * statements
 //HARD CODED DEPENDING ON PRESENCE OR NOT OF YIELD STATEMENTS IN SOURCE CODE
 //AND THEREFORE CANNOT BE CHANGED
-/* yield */ var guseyield=true
+/* yield */ var guseyield = true
 // noyield // var guseyield=false
-var gyieldregex=/yield ?\*/g
+var gyieldregex = /yield ?\*/g
 
 //determine if yield * supported by browser (not used anywhere atm)
 var gcan_yield
-try{eval('function * gcan_yield(x){return yield * true;}');gcan_yield=true} catch(e){gcan_yield=false}
+try { eval('function * gcan_yield(x){return yield * true;}'); gcan_yield = true } catch (e) { gcan_yield = false }
 
-var gcan_showmodaldialog=window.showModalDialog
+var gcan_showmodaldialog = window.showModalDialog
 
 //this forces pages going to /2/ to switch to /3/ which might be important for backend generated links to /2/ eg exodus/dblink.htm
 //simulate no modal dialog in firefox as will happen in mid 2015-2016
 //apparently it is not actually blocked in firefox yet (2016) but, without special configuration, user is given annoying options to suppress the popup
 if (gcan_yield)
-    gcan_showmodaldialog=false
+    gcan_showmodaldialog = false
 
 //this code only executes in /2/ ie javascript without yield option
 //cannot continue in non-yielding code if browser does not support showmodaldialog
@@ -155,9 +155,9 @@ if (!guseyield) {
         //switch to exodus/3 if browser hasnt showModalDialog but can yield
         if (gcan_yield) {
 
-            var url=window.location.toString()
-            window.location=url.replace(/\/[12]\//,'/3/')
-            gswitchingbrowser=true
+            var url = window.location.toString()
+            window.location = url.replace(/\/[12]\//, '/3/')
+            gswitchingbrowser = true
             //return // no return in global code
         } else
             gunsupported += ' showModalDialog() or yield'
@@ -179,10 +179,10 @@ function exodus_client_init() {
 
     //check right browser and cookies allowed else switch to login which handled this error
     if (gunsupported && !gswitchingbrowser) {
-        alert('Sorry, your web browser does not support NEOSYS.\nUse Internet Explorer 6+, Safari 3+, Firefox 3+ or Chrome 8.0+\n\nIt doesnt support' + gunsupported)
-        //window.location.assign(NEOSYSlocation+'wrongbrowser.htm')
+        alert('Sorry, your web browser does not support EXODUS.\nUse Internet Explorer 6+, Safari 3+, Firefox 3+ or Chrome 8.0+\n\nIt doesnt support' + gunsupported)
+        //window.location.assign(EXODUSlocation+'wrongbrowser.htm')
         if (typeof glogin == 'undefined') {
-            window.location.assign(NEOSYSlocation + '../default.htm')
+            window.location.assign(EXODUSlocation + '../default.htm')
             return
         }
     }
@@ -199,10 +199,10 @@ function exodus_client_init() {
     }
 
     //polyfill
-    if (typeof console=='undefined')
-        window.console={}
-    if (typeof console.log=='undefined')
-        window.console.log=log
+    if (typeof console == 'undefined')
+        window.console = {}
+    if (typeof console.log == 'undefined')
+        window.console.log = log
 
     //setup function $$() NOT $() since that is used by JQuery
     if (document.getElementsByClassName)
@@ -277,8 +277,7 @@ function exodus_client_init() {
             //window.opener may have been closed and refreshing the page might cause an error
             gDialogArguments = window.opener.dialogArgumentsForChild
         }
-        catch (e)
-      { }
+        catch (e) { }
     }
 
     gisdialog = typeof window.dialogArguments != 'undefined'
@@ -291,7 +290,7 @@ function exodus_client_init() {
     //can extract cookied immediately
     if (!glogincode) glogincode = ''
     if (!glogincode) {
-        glogincode = exodusgetcookie2('logincode','NEOSYSlogincode')
+        glogincode = exodusgetcookie2('logincode', 'EXODUSlogincode')
     }
     if (!gdataset) gdataset = ''
     if (!gdataset) {
@@ -312,7 +311,7 @@ function exodus_client_init() {
     var temp = window.location.toString()
     if (temp.indexOf('?') >= 0) {
         //temp = unescape(temp.slice(temp.indexOf('?') + 1)).split('&')
-        temp = unescape(temp.slice(temp.indexOf('?') + 1)).replace(/\?/g,'&').split('&')
+        temp = unescape(temp.slice(temp.indexOf('?') + 1)).replace(/\?/g, '&').split('&')
         for (i = 0; i < temp.length; i++)
             gparameters[temp[i].split('=')[0]] = temp[i].split('=').slice(1).join('=')
     }
@@ -321,12 +320,12 @@ function exodus_client_init() {
 
     //file access functions
     if (document.protocolcode == 'file') {
-        document.writeln('<scr' + 'ipt type="text/javascript" src="' + NEOSYSlocation + 'scripts/server.js"></scr' + 'ipt>')
+        document.writeln('<scr' + 'ipt type="text/javascript" src="' + EXODUSlocation + 'scripts/server.js"></scr' + 'ipt>')
     }
 
     //style sheet
     //copy any modifications to decide.htm and decide2.htm as well
-    document.writeln('<link id="exodus_global_css" rel="stylesheet" type="text/css" href="' + NEOSYSlocation + 'global.css">')
+    document.writeln('<link id="exodus_global_css" rel="stylesheet" type="text/css" href="' + EXODUSlocation + 'global.css">')
     //be careful to always have private.css even if empty otherwise it is ALWAYS not in cache and
     //requires a server lookup all the time. therefore upgrades will destroy any exodus client's private.css
     //actually it shouldnt be ../ in the login and inital menu screen
@@ -334,18 +333,18 @@ function exodus_client_init() {
     //document.writeln('<link REL="stylesheet" TYPE="text/css" HREF="../private.css">')
 
     //jquery (not used)
-    //document.writeln('<scr' + 'ipt type="text/javascript" id=jquery src="' + NEOSYSlocation + 'scripts/jquery-1.4.4-min.js"></scr' + 'ipt>')
+    //document.writeln('<scr' + 'ipt type="text/javascript" id=jquery src="' + EXODUSlocation + 'scripts/jquery-1.4.4-min.js"></scr' + 'ipt>')
 
     //general functions
     if (!($$('generalfunctions'))) {
-        document.writeln('<scr' + 'ipt type="text/javascript" id=generalfunctions src="' + NEOSYSlocation + 'scripts/exodus.js"></scr' + 'ipt>')
+        document.writeln('<scr' + 'ipt type="text/javascript" id=generalfunctions src="' + EXODUSlocation + 'scripts/exodus.js"></scr' + 'ipt>')
     }
 
     //form functions
     if (typeof gdatafilename != 'undefined' || typeof gdictfilename != 'undefined') {
-        document.writeln('<scr' + 'ipt type="text/javascript" src="' + NEOSYSlocation + 'scripts/db.js"></scr' + 'ipt>')
-        document.writeln('<scr' + 'ipt type="text/javascript" src="' + NEOSYSlocation + 'scripts/gds.js"></scr' + 'ipt>')
-        document.writeln('<scr' + 'ipt type="text/javascript" src="' + NEOSYSlocation + 'scripts/dbform.js"></scr' + 'ipt>')
+        document.writeln('<scr' + 'ipt type="text/javascript" src="' + EXODUSlocation + 'scripts/db.js"></scr' + 'ipt>')
+        document.writeln('<scr' + 'ipt type="text/javascript" src="' + EXODUSlocation + 'scripts/gds.js"></scr' + 'ipt>')
+        document.writeln('<scr' + 'ipt type="text/javascript" src="' + EXODUSlocation + 'scripts/dbform.js"></scr' + 'ipt>')
     }
 
     //if (!window.onload)
@@ -353,16 +352,16 @@ function exodus_client_init() {
     gwindowonload = window.onload
     //window.onload = clientfunctions_windowonload
     window.onload = null
-    addeventlistener(window,'load','clientfunctions_windowonload')
+    addeventlistener(window, 'load', 'clientfunctions_windowonload')
     //addeventlistener(window,'unload','clientfunctions_windowonunload_sync')
 
     //ensure print preview styles are set during print/preview
     //window.onbeforeprint = window_onbeforeprint
-    addeventlistener(window,'beforeprint','window_onbeforeprint')
+    addeventlistener(window, 'beforeprint', 'window_onbeforeprint')
 
     //save location except if logging in
-    if (typeof gnosavelocation == 'undefined' && !window.dialogArguments && NEOSYSlocation != './exodus/') {
-        //if (gdataset) exodussetcookie('','NEOSYS',escape(location),'ll',true)
+    if (typeof gnosavelocation == 'undefined' && !window.dialogArguments && EXODUSlocation != './exodus/') {
+        //if (gdataset) exodussetcookie('','EXODUS',escape(location),'ll',true)
     }
 
     glogging = false
@@ -389,11 +388,11 @@ function* window_onbeforeprint() {
 function* exoduslogout_onclick() {
 
     //cancel any automatic login
-    exodussetcookie('', 'NEOSYS', '', 'a')
+    exodussetcookie('', 'EXODUS', '', 'a')
 
     //decide where to login again
     var newwindowlocation = '../default.htm'
-    var system = exodusgetcookie2('', 'NEOSYSsystem',null)
+    var system = exodusgetcookie2('', 'EXODUSsystem', null)
     if (system && system != 'ADAGENCY')
         newwindowlocation += '??' + system
 
@@ -455,7 +454,7 @@ function* exodussecurity(task) {
 function* sessionkeepalive() {
 
     //last connection
-    var lastconnection = exodusgetcookie2('lc', 'NEOSYSlc', '')
+    var lastconnection = exodusgetcookie2('lc', 'EXODUSlc', '')
     if (lastconnection == 'undefined')
         lastconnection = ''
     lc = lastconnection
@@ -481,7 +480,7 @@ function exodussetexpression(elementsorelementid, attributename, expression) {
 
     //check element exists
     if (!elementsorelementid)
-        return yield* exodusinvalid('missing element in exodussetexpression ' + attributename + ' ' + expression)
+        return yield * exodusinvalid('missing element in exodussetexpression ' + attributename + ' ' + expression)
 
     //elements can be elementnames too
 
@@ -537,18 +536,18 @@ function exodussetexpression(elementsorelementid, attributename, expression) {
 
 }
 
-var gsetexpressioninterval=[]
+var gsetexpressioninterval = []
 function exodussetexpression2(elementids, attributename, expression) {
 
     var elementids2
-    if (typeof elementids=='string')
-        elementids2=elementids.split(',')
+    if (typeof elementids == 'string')
+        elementids2 = elementids.split(',')
     else
-        elementids2=elementids
+        elementids2 = elementids
 
-    var allelements=[]
-    for (var ii=0;ii<elementids2.length;++ii) {
-        var elementid=elementids2[ii]
+    var allelements = []
+    for (var ii = 0; ii < elementids2.length; ++ii) {
+        var elementid = elementids2[ii]
 
         var elements = document.getElementsByName(elementid)
         if (!elements.length) {
@@ -565,7 +564,7 @@ function exodussetexpression2(elementids, attributename, expression) {
                 elements = [elements]
         }
         //rearray to make sure is an array otherwise ie6 $$() seems to return a collection and concat appends all as one element on the end
-        allelements=allelements.concat(rearray(elements))
+        allelements = allelements.concat(rearray(elements))
     }
 
     var style = attributename.slice(0, 6) == 'style:'
@@ -577,15 +576,15 @@ function exodussetexpression2(elementids, attributename, expression) {
 
 function exodussetexpression2b(expressionid, elements, style, attributename, expression) {
 
-    gsetexpressioninterval[expressionid]=exodussetinterval(
+    gsetexpressioninterval[expressionid] = exodussetinterval(
 
         //build a closure containing all the elements to be updated
         //and to be called at intervals
-        function anon_from_exodussetexpression2b(){
+        function anon_from_exodussetexpression2b() {
             //NB LEAVE A SPACE BEFORE THE LEFT BRACKET to prevent converter adding yield * in front of it
             //NB next line in yielding code is a method call and is NOT ONLY a comment
-            exodussetexpression2c (elements, style, attributename, expression)
-            /* yield */ .next()
+            exodussetexpression2c(elements, style, attributename, expression)
+            /* yield */.next()
 
             //In yielding code, the above only creates a generator function which has to be
             //spurred into action by calling its next() method - below
@@ -595,27 +594,27 @@ function exodussetexpression2b(expressionid, elements, style, attributename, exp
             //known as a generator) the window call at intervals would only create a generator
             // and not actually start the function by calling its next() method
         }
-        ,250)//every quarter second
+        , 250)//every quarter second
 }
 
 //this is called at intervals
 function* exodussetexpression2c(elements, style, attributename, expression) {
     //set the attribute expression for all elements
-    var result=yield* exodusevaluate(expression)
+    var result = yield* exodusevaluate(expression)
     //console.log(expression+' is '+result+')
-    if (attributename=='disabled')
-        1==1
+    if (attributename == 'disabled')
+        1 == 1
     for (var ii = 0; ii < elements.length; ii++) {
-        var element=elements[ii]
+        var element = elements[ii]
         if (style)
-            element=element.style
-        element[attributename]=result
+            element = element.style
+        element[attributename] = result
     }
 
 }
 
-function exodusenabledandvisible(element0,allowreadonly) {
-    var element=element0
+function exodusenabledandvisible(element0, allowreadonly) {
+    var element = element0
     if (typeof element == 'string') {
         element = document.getElementsByName(element0)[0]
         if (!element) {
@@ -623,7 +622,7 @@ function exodusenabledandvisible(element0,allowreadonly) {
             if (!element) {
                 element = $$(element0)
                 if (!element) {
-                    systemerror('exodusenabledandvisible() cannot getElementsByName '+element0)
+                    systemerror('exodusenabledandvisible() cannot getElementsByName ' + element0)
                 }
             }
         }
@@ -631,12 +630,12 @@ function exodusenabledandvisible(element0,allowreadonly) {
     if (!allowreadonly && element.getAttribute('exodusreadonly'))
         return false
 
-    if (!element.offsetWidth||element.style.display == 'none')
+    if (!element.offsetWidth || element.style.display == 'none')
         return false
 
     //have to check parents in msie TODO only required for older MSIE?)
     while (isMSIE && element.parentNode && element.parentNode.tagName != 'BODY') {
-        element=element.parentNode
+        element = element.parentNode
         if (element.style.display == 'none')
             return false
         if (element.getAttribute('disabled'))
@@ -654,7 +653,7 @@ function showhide(element, show) {
         element = $$(element)
         if (!element)
             //return yield* exodusinvalid('element ' + elementid + ' does not exist in showhide()')
-            systemerror('showhide("'+elementid+'")', ' window element does not exist')
+            systemerror('showhide("' + elementid + '")', ' window element does not exist')
     }
 
     //recursive
@@ -686,7 +685,7 @@ function setinnerHTML(elementsorid, html) {
     if (typeof elementsorid == 'string') {
         elementsorid = $$(elementsorid)
         if (elementsorid.tagName) {
-            elementsorid.innerHTML=html
+            elementsorid.innerHTML = html
             return
         }
     }
@@ -700,46 +699,46 @@ function blockmodalui_sync() {
 
     //YIELD//console.log('BLOCKING UI')
 
-    blocker=document.createElement('div')
-    blocker.style.width='100%'
-    blocker.style.height='100%'
-    blocker.style.background='rgba(255,255,255,0.25)'//white overlay with only 25% opacity
-    blocker.style.position='fixed'
-    blocker.style.top='0'
-    blocker.style.left='0'
-    blocker.style.zIndex='100'
-    blocker.id='uiblockerdiv'
+    blocker = document.createElement('div')
+    blocker.style.width = '100%'
+    blocker.style.height = '100%'
+    blocker.style.background = 'rgba(255,255,255,0.25)'//white overlay with only 25% opacity
+    blocker.style.position = 'fixed'
+    blocker.style.top = '0'
+    blocker.style.left = '0'
+    blocker.style.zIndex = '100'
+    blocker.id = 'uiblockerdiv'
 
     document.body.insertBefore(blocker, null)
 
     //keep focus off parent window and on child window or exodusdiv
-    blocker.onclick=function uiblockerdiv_onclick(){
+    blocker.onclick = function uiblockerdiv_onclick() {
 
         if ($$('exodusconfirmdiv')) {
-                window.setTimeout('exodus_confirm_function3()',10)
+            window.setTimeout('exodus_confirm_function3()', 10)
             //alert('Please wait for server response')
         }
         else if (gchildwin) {
             var actualwin
             if (gchildwin.lazy) {
-                actualwin=gchildwin.actual
+                actualwin = gchildwin.actual
                 //open a 'please wait' window the first time that they click the blockerdiv or they close the 'please wait' window
-                if (!actualwin||actualwin.closed) {
-                    var dialogstyle=getdialogstyle_sync(dialogstyle)
+                if (!actualwin || actualwin.closed) {
+                    var dialogstyle = getdialogstyle_sync(dialogstyle)
 
                     var question = 'Processing. Please wait.'
                     var defaultbutton = 1
                     var dialogargs = [question, defaultbutton, 'Wait', 'Cancel']
                     //pass the xmlhttprequestobject so it can be aborted if user clicks Cancel
                     if (gchildwin.xhttp)
-                        dialogargs.xhttp=gchildwin.xhttp
+                        dialogargs.xhttp = gchildwin.xhttp
 
                     var dialogstyle
 
                     //cant call exodusshowmodaldialog because that requires a global gcurrentevent variable/generator function
                     //and that global/generator is already in use handling some current event that is yielded for async xmlhttprequest
-                    actualwin=window.open(NEOSYSlocation + 'confirm.htm','',dialogstyle)
-                    gchildwin.actual=actualwin
+                    actualwin = window.open(EXODUSlocation + 'confirm.htm', '', dialogstyle)
+                    gchildwin.actual = actualwin
 
                     if (!actualwin) {
                         alert('Unable to show popup window - please enable popups; disable your popup blocker.')
@@ -747,17 +746,17 @@ function blockmodalui_sync() {
                     }
 
                     //pass arguments and callback/resume function to child window
-                    actualwin.dialogArguments=dialogargs
+                    actualwin.dialogArguments = dialogargs
 
                 }
             } else
-                actualwin=gchildwin
+                actualwin = gchildwin
 
             //focus on child window
-            window.setTimeout(function(){try{actualwin.focus()}catch(e){}},10)
+            window.setTimeout(function () { try { actualwin.focus() } catch (e) { } }, 10)
 
             //also focus on child's child recursively
-            var winuiblocker=actualwin.document.getElementById('uiblockerdiv')
+            var winuiblocker = actualwin.document.getElementById('uiblockerdiv')
             if (winuiblocker)
                 winuiblocker.click()
 
@@ -770,9 +769,9 @@ var gchildwin
 
 function unblockmodalui_sync() {
     //close 'please wait' window if present
-    if (gchildwin&&!gchildwin.closed&&gchildwin.actual&&!gchildwin.actual.closed)
+    if (gchildwin && !gchildwin.closed && gchildwin.actual && !gchildwin.actual.closed)
         gchildwin.actual.close()
-    var blocker=$$('uiblockerdiv')
+    var blocker = $$('uiblockerdiv')
     if (blocker) {
         //YIELD//console.log('UNBLOCKING UI')
         exodusremovenode(blocker)
@@ -784,21 +783,21 @@ function getdialogstyle_sync(dialogstyle) {
 
     var standardstyle = ''
 
-    standardstyle+='Center: yes'
-    standardstyle+=', Help: no'
-    standardstyle+=', Resizable: yes'
-    standardstyle+=', Scroll: yes'
-    standardstyle+=', Status: no'
-    standardstyle+=', scrollbars=1'//mozilla?
+    standardstyle += 'Center: yes'
+    standardstyle += ', Help: no'
+    standardstyle += ', Resizable: yes'
+    standardstyle += ', Scroll: yes'
+    standardstyle += ', Status: no'
+    standardstyle += ', scrollbars=1'//mozilla?
     //standardstyle+=',modal=yes'//no longer supported in chrome
-    standardstyle+=', alwaysRaised=yes'
+    standardstyle += ', alwaysRaised=yes'
 
-    var max=getmaxwindow_sync()
+    var max = getmaxwindow_sync()
 
     //var maxwidth = window.outerWidth//window.innerWidth//screen.availWidth
     //var maxheight = window.outerHeight//window.innerHeight//screen.availHeight
-    var maxwidth=max.width
-    var maxheight=max.height
+    var maxwidth = max.width
+    var maxheight = max.height
 
     //on ie6 seems to minimise
     //maxwidth=0
@@ -806,27 +805,27 @@ function getdialogstyle_sync(dialogstyle) {
     if (!dialogstyle) {
         //var maxwidth=window.screen.availWidth
         //var maxheight=window.screen.availHeight
-        var dialogstyle='DialogHeight:'+maxheight+'px; DialogWidth:'+maxwidth+'px; Center: yes; Help: yes; Resizable: yes; Status: No;'
+        var dialogstyle = 'DialogHeight:' + maxheight + 'px; DialogWidth:' + maxwidth + 'px; Center: yes; Help: yes; Resizable: yes; Status: No;'
         //var dialogstyle='dialogHeight: 400px; dialogWidth: 600px; dialogTop: px; dialogLeft: px; center: Yes; help: Yes; resizable: Yes; status: Yes;'
         dialogstyle = standardstyle
 
         if (maxwidth)
-            dialogstyle+=', DialogWidth:'+maxwidth+'px'
+            dialogstyle += ', DialogWidth:' + maxwidth + 'px'
         if (maxheight)
-            dialogstyle+=', DialogHeight:'+maxheight+'px'
+            dialogstyle += ', DialogHeight:' + maxheight + 'px'
 
         //mozilla
         if (maxwidth)
-            dialogstyle+=', width='+maxwidth
+            dialogstyle += ', width=' + maxwidth
         if (maxheight)
-            dialogstyle+=', height='+maxheight
+            dialogstyle += ', height=' + maxheight
 
-        if (typeof window.screenX!='undefined')
+        if (typeof window.screenX != 'undefined')
             //dialogstyle+=', left='+window.screenX
-            dialogstyle+=', left='+max.left
-        if (typeof window.screenY!='undefined')
+            dialogstyle += ', left=' + max.left
+        if (typeof window.screenY != 'undefined')
             //dialogstyle+=', top='+window.screenY
-            dialogstyle+=', top='+max.top
+            dialogstyle += ', top=' + max.top
 
         //prevents centering in ff3
         //dialogstyle+='; DialogHeight: 100px; DialogWidth: 500px'
@@ -838,7 +837,7 @@ function getdialogstyle_sync(dialogstyle) {
     }
 
     //return with comma AND semicolon separators (MSIE requires semicolon and Firefox/Webkit require commas)
-    dialogstyle=dialogstyle+';'+dialogstyle.replace(/,/g,';')
+    dialogstyle = dialogstyle + ';' + dialogstyle.replace(/,/g, ';')
     return dialogstyle
 }
 
@@ -849,7 +848,7 @@ function* exodusshowmodaldialog(url, arguments, dialogstyle) {
     if (!arguments.gtasks)
         arguments.gtasks = gtasks
 
-    dialogstyle=getdialogstyle_sync(dialogstyle)
+    dialogstyle = getdialogstyle_sync(dialogstyle)
 
     //always send login code
     arguments.logincode = glogincode
@@ -880,16 +879,16 @@ function* exodusshowmodaldialog(url, arguments, dialogstyle) {
             }
 
             //pass arguments and callback/resume function to child window
-            gchildwin.dialogArguments=arguments
+            gchildwin.dialogArguments = arguments
 
             //auto resume if the child window disappears - every poll every n ms
             //this will stop when it goes out of scope when this function terminates
-            window.setTimeout('exodus_autoresume()',100)
+            window.setTimeout('exodus_autoresume()', 100)
 
             //wait here until exodus_autoresume detects that the child window is closed
             // and passes its return value here
-            result=yield* exodus_yield('exodusshowmodaldialog '+url)
-            console.log('exodusshowmodaldialog result is '+result)
+            result = yield* exodus_yield('exodusshowmodaldialog ' + url)
+            console.log('exodusshowmodaldialog result is ' + result)
         }
 
         //Safari doesnt return an error and looks like a Window [x] close unfortunately
@@ -900,7 +899,7 @@ function* exodusshowmodaldialog(url, arguments, dialogstyle) {
 
     }
     catch (e) {
-        console.log('caught error in exodusshowmodaldialog: '+e)
+        console.log('caught error in exodusshowmodaldialog: ' + e)
         //alert('Please enable popups for this site (1)\n\nError:'+(e.description?e.description:e))
         //alert('Please enable popups for this site (1)\n\nError:'+(e.description?e.description:e)+'\n\n'+url+'\n\n'+arguments)
         return
@@ -915,7 +914,7 @@ function* exodus_yield(source) {
 
     blockmodalui_sync()
 
-    logevent('          >> BEFORE YIELD '+source)
+    logevent('          >> BEFORE YIELD ' + source)
     logevent('          ... yielding ... pause this code and resume parent code')
 
     ////////////////////////////////////////////////
@@ -930,7 +929,7 @@ function* exodus_yield(source) {
 
     /* yield */   var result = yield source
 
-    logevent('          << AFTER YIELD '+source)
+    logevent('          << AFTER YIELD ' + source)
 
     return result
 
@@ -943,9 +942,9 @@ function exoduswindowclose(returnvalues) {
     if (window.opener) {
         window.opener.focus()//for MSEDGE
         if (window.opener.exodus_setchildwin_returnvalue) {
-            if (typeof returnvalues=='undefined')
-                returnvalues=''
-            returnvalues.exodusisarray=true
+            if (typeof returnvalues == 'undefined')
+                returnvalues = ''
+            returnvalues.exodusisarray = true
             window.opener.exodus_setchildwin_returnvalue(returnvalues)
         }
     }
@@ -959,45 +958,45 @@ function exodus_setchildwin_returnvalue(returnvalue) {
     //gchildwin_returnvalue=returnvalue
     //shallow copy array to avoid permissions issue when child windows closes in edge
     if (returnvalue.exodusisarray) {
-        gchildwin_returnvalue=[]
-        for (var ii=0;ii<returnvalue.length;++ii) {
+        gchildwin_returnvalue = []
+        for (var ii = 0; ii < returnvalue.length; ++ii) {
             //gchildwin_returnvalue[ii]=returnvalue[ii].toString()
-            gchildwin_returnvalue[ii]=returnvalue[ii]
+            gchildwin_returnvalue[ii] = returnvalue[ii]
         }
     }
     else {
-        gchildwin_returnvalue=returnvalue
+        gchildwin_returnvalue = returnvalue
     }
 }
 
-function exodus_autoresume(){
+function exodus_autoresume() {
 
     //if child window still active then schedule another check later
     if (gchildwin && !gchildwin.closed) {
         //console.log('exodus_autoresume - window still present and not closed')
-        window.setTimeout('exodus_autoresume()',100)
+        window.setTimeout('exodus_autoresume()', 100)
         return
     }
 
-    console.log('NEOSYS_AUTORESUME since gchildwin is closed or missing')
+    console.log('EXODUS_AUTORESUME since gchildwin is closed or missing')
 
     //childwin doesnt exist or has closed
     //get the returnvalue from it or return an empty string
     try {
-        var returnvalue=gchildwin.returnValue
-    } catch (e){
-        gchildwin=false
-        returnvalue=''
+        var returnvalue = gchildwin.returnValue
+    } catch (e) {
+        gchildwin = false
+        returnvalue = ''
     }
 
-//alert('2 gchildwin_returnvalue='+gchildwin_returnvalue)
+    //alert('2 gchildwin_returnvalue='+gchildwin_returnvalue)
     if (gchildwin_returnvalue) {
-        returnvalue=gchildwin_returnvalue
-//        alert('gchildwin_returnvalue='+gchildwin_returnvalue)
-        gchildwin_returnvalue=undefined
+        returnvalue = gchildwin_returnvalue
+        //        alert('gchildwin_returnvalue='+gchildwin_returnvalue)
+        gchildwin_returnvalue = undefined
     }
 
-    exodus_resume(returnvalue,'exodus_autoresume')
+    exodus_resume(returnvalue, 'exodus_autoresume')
 
 }
 
@@ -1006,10 +1005,10 @@ function exodus_autoresume(){
 //1. a child window is closed
 //2. an xmlhttp action completes (ok/error/timeout/abort)
 //3. user clicks various keys while a exodusconfirmdiv is present
-function exodus_resume(value,source){
+function exodus_resume(value, source) {
 
     logevent(' ')
-    logevent('exodus_resume  <in '+value+' from '+source+')')
+    logevent('exodus_resume  <in ' + value + ' from ' + source + ')')
 
     //clear ui and stop resumer before resuming
     //because .next() will run to the next async/ui occurrence in the current event process
@@ -1017,9 +1016,9 @@ function exodus_resume(value,source){
 
     //give the result (value) to the yielded and now resuming code
     //result = yield 'xxxxxxxxxxxxx'
-    var next=exodus_next(value,'exodus_resume from '+source)
+    var next = exodus_next(value, 'exodus_resume from ' + source)
 
-    logevent('exodus_resumed out> '+next.value+') from '+source+')')
+    logevent('exodus_resumed out> ' + next.value + ') from ' + source + ')')
 
     //probably no purpose in returning this since we are not using generator functions to acquire values,
     //only to act as suspended functions until some data they need is acquired asynchronously from exodusdiv, child window, xmlhttp
@@ -1027,9 +1026,9 @@ function exodus_resume(value,source){
 
 }
 
-function exodus_next(value,source) {
+function exodus_next(value, source) {
 
-    logevent('  ==> BEFORE NEXT EVENTHANDLER from '+source+' - value in:'+value+' ===')
+    logevent('  ==> BEFORE NEXT EVENTHANDLER from ' + source + ' - value in:' + value + ' ===')
 
     ///////////////////////////////////////////////////////////////
     //very important code either a) starts a "suspendable" function
@@ -1040,15 +1039,15 @@ function exodus_next(value,source) {
     //"done" means that the function has returned (not yielded)
     //this is because it is a global variable so our exodus_resume function knows what to resume
     if (!gblockevents)
-        form_blockevents(true,source)
+        form_blockevents(true, source)
 
-    var next=geventhandler.next(value)
+    var next = geventhandler.next(value)
 
-    logevent('  <== AFTER NEXT EVENTHANDLER from '+source+' ===')
-    logevent('      done:'+next.done+' value out:'+next.value)
+    logevent('  <== AFTER NEXT EVENTHANDLER from ' + source + ' ===')
+    logevent('      done:' + next.done + ' value out:' + next.value)
 
     if (next.done) {
-        form_blockevents(false,source)
+        form_blockevents(false, source)
         //following should not be necessary since
         //if our event handler does not yield anywhere then it will not be created
         //and if our event handle DOES yield then it will be cleared in exodus_resume
@@ -1061,9 +1060,9 @@ function exodus_next(value,source) {
 function displayresponsedata_sync(request, data) {
     //yield* displayresponsedata(request, data).next()
     //hide function from converter to yield *
-    var temp=window['displayresponsedata'](request,data)
+    var temp = window['displayresponsedata'](request, data)
     if (temp.next)
-        exodusneweventhandler(temp,'displayresponsedata')
+        exodusneweventhandler(temp, 'displayresponsedata')
 }
 
 function* displayresponsedata(request, data) {
@@ -1087,9 +1086,9 @@ function* displayresponsedata(request, data) {
 
 function openwindow_sync(request, data) {
     //LEAVE SPACE AFTER FUNCTION NAME TO PREVENT CONVERSION TO YIELD
-    var result=openwindow (request,data)
+    var result = openwindow(request, data)
     if (result.next) {
-        result=exodusneweventhandler(result,'openwindow_sync '+request).value
+        result = exodusneweventhandler(result, 'openwindow_sync ' + request).value
     }
     return result
 }
@@ -1110,23 +1109,23 @@ function* openwindow(request, data) {
         yield* exodusnote(db.response.slice(3))
 
     if (db.data) {
-        var urls=db.data.split(fm)
+        var urls = db.data.split(fm)
         var result
-        for (ii=0;ii<urls.length;++ii)
-            result=yield* windowopen(urls[ii])
+        for (ii = 0; ii < urls.length; ++ii)
+            result = yield* windowopen(urls[ii])
         return result
     }
 }
 
 function* windowopenkey(url, key) {
     if (!key)
-        key=gvalue
+        key = gvalue
     return yield* windowopen(url, { 'key': key })
 }
 
 function windowopen_sync(url, parameters, style) {
     //LEAVE SPACE AFTER FUNCTION NAME TO PREVENT CONVERSION TO YIELD
-    var result=windowopen (url, parameters, style)
+    var result = windowopen(url, parameters, style)
     if (result.next)
         return result.next()
     return result
@@ -1135,31 +1134,31 @@ function windowopen_sync(url, parameters, style) {
 var gwindowopenparameters
 function* windowopen(url, parameters, style) {
 
-    url=url||''
-    parameters=parameters||''
-    style=style||''
+    url = url || ''
+    parameters = parameters || ''
+    style = style || ''
 
     //url may arrive like ..\DATA\DEVDTEST\~3499268.htm or ../data/DEVDTEST/~3499268.htm
     // and will be converted here to ../../DATA/DEVDTEST/~3499268.htm
     //which browsers will interpret as as the full URL http://hostname/DATA/DEVDTEST/~3499268.htm
-    if (url.replace(/\\/g,'/').toUpperCase().substr(0,8)=='../DATA/')
-        url = '../'+url.replace(/\\/g,'/')
+    if (url.replace(/\\/g, '/').toUpperCase().substr(0, 8) == '../DATA/')
+        url = '../' + url.replace(/\\/g, '/')
 
     //if no style or "tab" parameter, windows opened from dialogs are opened in new maximised windows
-    if (style==''&&gisdialog) {
-        var max=getmaxwindow_sync()
+    if (style == '' && gisdialog) {
+        var max = getmaxwindow_sync()
 
-        style+=';DialogHeight:'+max.height+'px; DialogWidth:'+max.width+'px; Resizable: yes'
+        style += ';DialogHeight:' + max.height + 'px; DialogWidth:' + max.width + 'px; Resizable: yes'
         //mozilla
-        style+=',toolbar=yes,menubar=yes,resizable=yes,scrollbars=yes,status=yes'
-        style+=',width='+max.width
-        style+=',height='+max.height
-        style+=',left='+max.left
-        style+=',top='+max.top
+        style += ',toolbar=yes,menubar=yes,resizable=yes,scrollbars=yes,status=yes'
+        style += ',width=' + max.width
+        style += ',height=' + max.height
+        style += ',left=' + max.left
+        style += ',top=' + max.top
     }
     //"tab" used to force opening in a tab despite being in a dialog (because the dialog is closing)
-    if (style=='tab')
-        style=''
+    if (style == 'tab')
+        style = ''
 
     //switch to normal url from development url which doesnt have data folder (otherwise too many files)
     if (window.location.href.toString().toLowerCase().indexOf('//localhost/exodus7/') >= 0 && url.toLowerCase().slice(0, 8) == '..\\data\\')
@@ -1168,7 +1167,7 @@ function* windowopen(url, parameters, style) {
     //normalise windows style urls with backslashes to slashes.
     //firefox wont normalise window style relative urls like ..\ but will if they are like ../
     // and this may cause problems for any other relative urls in the page like images
-    url=url.replace(/\\/g,'/')
+    url = url.replace(/\\/g, '/')
 
     //these parameters are picked up by the opened window (from its parent) after it opens
     //since no way to pass parameters directly to non modal windows except in the URL
@@ -1177,7 +1176,7 @@ function* windowopen(url, parameters, style) {
     gwindowopenparameters.logincode = glogincode
     try {
 
-        var result = window.open(url,'',style)
+        var result = window.open(url, '', style)
 
         //Safari doesnt return an error and looks like a Window [x] close unfortunately
         if (typeof result == 'undefined' && window.navigator.appVersion.indexOf('Safari') >= 0)
@@ -1294,12 +1293,12 @@ function exodus_set_style(mode, value, value2) {
 
     //var rules = document.styleSheets[0].cssRules||document.styleSheets[0].rules
     var ss = document.getElementById('exodus_global_css');
-    var rules = ss.cssRules||ss.rules
+    var rules = ss.cssRules || ss.rules
     var oldvalue = ''
 
     //screencolor
     if (mode == 'screencolor'
- && rules) {
+        && rules) {
 
         //make everything visible!
         var style = rules[0].style
@@ -1320,7 +1319,7 @@ function exodus_set_style(mode, value, value2) {
             style.backgroundColor = value
         }
         catch (e) {
-            if (e.number == -2146827908) return yield* exodusinvalid(value + ' is not a recognised color')
+            if (e.number == -2146827908) return yield * exodusinvalid(value + ' is not a recognised color')
             return systemerror('exodus_set_style("' + mode + '","' + value + '")', e.number + ' ' + e.description)
         }
     }
@@ -1351,8 +1350,8 @@ function exodus_set_style(mode, value, value2) {
                 style.fontSize = value2
             }
             catch (e) {
-                if (e.number == -2146827908) return yield* exodusinvalid(value + ' is not a recognised font')
-                if (e.number == -2147024809) return yield* exodusinvalid(value2 + ' is not a recognised fontsize')
+                if (e.number == -2146827908) return yield * exodusinvalid(value + ' is not a recognised font')
+                if (e.number == -2147024809) return yield * exodusinvalid(value2 + ' is not a recognised fontsize')
                 return systemerror('exodus_set_style("' + mode + '","' + value + '","' + value2 + '")', e.number + ' ' + e.description)
             }
         }
@@ -1371,7 +1370,7 @@ function* clientfunctions_setstyle() {
 }
 
 function* clientfunctions_getglobals() {
-   gcompanycode = exodusgetcookie2('cc')
+    gcompanycode = exodusgetcookie2('cc')
     gncompanies = exodusgetcookie2('nc')
     gperiod = exodusgetcookie2('pd')
     gbasecurr = exodusgetcookie2('bc')
@@ -1392,15 +1391,15 @@ function* clientfunctions_getglobals() {
     }
     else {
         //gtz = [0, 0]
-        gtz=[new Date().getTimezoneOffset()*-60,0]
+        gtz = [new Date().getTimezoneOffset() * -60, 0]
     }
-    
+
     //support input of numbers like 999,999,999.99 or 999.999.999,99
     //gbasefmt is MDn0, or MCn0, where n=2 or 3 for number of decimals and D/C means , or . for thousand sep
-    if (gbasefmt.substr(0,2)=='MC')
-        gthousands_regex=/\./gi
+    if (gbasefmt.substr(0, 2) == 'MC')
+        gthousands_regex = /\./gi
     else
-        gthousands_regex=/,/gi
+        gthousands_regex = /,/gi
 }
 
 function add_exodus_menubar() {
@@ -1410,16 +1409,16 @@ function add_exodus_menubar() {
     // at the beginning of the body
     // or after the first navbar element
 
-    gexodus_menubar=document.getElementById('exodus_menu')
+    gexodus_menubar = document.getElementById('exodus_menu')
     if (!gexodus_menubar) {
         var span = document.createElement('SPAN')
         span.id = 'exodus_menu'
         var navbar1 = document.getElementsByClassName('navbar')[0];
         if (navbar1)
-            navbar1.parentNode.insertBefore(span,navbar1.nextSibling)
+            navbar1.parentNode.insertBefore(span, navbar1.nextSibling)
         else
             document.body.insertBefore(span, document.body.firstChild)
-        gexodus_menubar=document.getElementById('exodus_menu')
+        gexodus_menubar = document.getElementById('exodus_menu')
     }
 
 }
@@ -1431,12 +1430,12 @@ function* clientfunctions_windowonload() {
     if (document.getElementsByClassName)
         id2classname()
 
-//already done in global script
-//    if (!glogincode)
-//        glogincode = exodusgetcookie2('logincode', 'NEOSYSlogincode', null)
+    //already done in global script
+    //    if (!glogincode)
+    //        glogincode = exodusgetcookie2('logincode', 'EXODUSlogincode', null)
 
     //loginalert('wol'+glogincode)
-//    gdataset = exodusgetcookie2('dataset')
+    //    gdataset = exodusgetcookie2('dataset')
 
     yield* clientfunctions_getglobals()
 
@@ -1446,11 +1445,11 @@ function* clientfunctions_windowonload() {
     //In case previous window didnt successfully unlock its record in onbeforeunload
     //Could be turned off hoping synchronous unlock in window_onunload is sufficiently reliable
     // to avoid need for double unlocking
-    var pending=exodusgetcookie(glogincode,'NEOSYSpending')
-    if (pending){
-        exodussetcookie(glogincode,'NEOSYSpending','')
+    var pending = exodusgetcookie(glogincode, 'EXODUSpending')
+    if (pending) {
+        exodussetcookie(glogincode, 'EXODUSpending', '')
         console.log(pending)
-        db.request=pending
+        db.request = pending
         yield* db.send()
     }
 
@@ -1460,30 +1459,30 @@ function* clientfunctions_windowonload() {
     if (typeof formfunctions_onload == 'function')
         yield* formfunctions_onload()
 
-    if (gautofitwindow&&document.getElementById('autofitwindowelement'))
+    if (gautofitwindow && document.getElementById('autofitwindowelement'))
         exodussettimeout('exodusautofitwindow()', 10)
-        //exodussetinterval('exodusautofitwindow()', 10)
+    //exodussetinterval('exodusautofitwindow()', 10)
 
     add_exodus_menubar()
 
     //add menu, logout and refresh buttons if not a popup, depending on gshowmenu, not /exodus/ location and no navbar elements
-    //if no exodus_menu span (even if no menu, it is a holder for NEOSYS form buttons New/Save etc.)
-    if (!window.dialogArguments && (typeof gshowmenu == 'undefined' || gshowmenu) && NEOSYSlocation != './exodus/' && document.getElementsByClassName('navbar').length == 0) {
+    //if no exodus_menu span (even if no menu, it is a holder for EXODUS form buttons New/Save etc.)
+    if (!window.dialogArguments && (typeof gshowmenu == 'undefined' || gshowmenu) && EXODUSlocation != './exodus/' && document.getElementsByClassName('navbar').length == 0) {
 
         var ctrlalt = isMac ? 'Ctrl' : 'Alt'
 
-	//insert buttons in reverse order
+        //insert buttons in reverse order
 
         //button to refresh (clear cache)
-        if (typeof gshowrefreshcachebutton=='undefined'||gshowrefreshcachebutton) {
+        if (typeof gshowrefreshcachebutton == 'undefined' || gshowrefreshcachebutton) {
             var temp2 = document.createElement('span')
             temp2.innerHTML = menubuttonhtml('refreshcache', grefreshimage, '<u>R</u>efresh', 'Refresh the Cache. ' + ctrlalt + '+R', 'X')
             //document.body.insertBefore(temp2, document.body.firstChild)
             gexodus_menubar.insertBefore(temp2, gexodus_menubar.firstChild)
-            temp2.style.float='left'
+            temp2.style.float = 'left'
             //if no dbform
-            if (typeof gdictfilename=='undefined')
-                addeventlistener(temp2,'click','refreshcache_onclick')
+            if (typeof gdictfilename == 'undefined')
+                addeventlistener(temp2, 'click', 'refreshcache_onclick')
         }
 
         //button to logout
@@ -1491,20 +1490,20 @@ function* clientfunctions_windowonload() {
         temp2.innerHTML = menubuttonhtml('exoduslogout', glogoutimage, 'Lo<u>g</u>out', 'Logout. ' + ctrlalt + '+G', 'G')
         //document.body.insertBefore(temp2, document.body.firstChild)
         gexodus_menubar.insertBefore(temp2, gexodus_menubar.firstChild)
-        temp2.style.float='left'
+        temp2.style.float = 'left'
         if (!gusername) {
             var temp = $$('exoduslogoutbutton')
             temp.innerText = 'Login'
             temp.title = 'Login. Alt+L'
         }
         //if no dbform
-        if (typeof gdictfilename=='undefined')
-            addeventlistener(temp2,'click','exoduslogout_onclick')
+        if (typeof gdictfilename == 'undefined')
+            addeventlistener(temp2, 'click', 'exoduslogout_onclick')
 
         //button for menu
         if (gmenucodes && gmenucodes != 'EXIT2') {
             var menu_span = document.createElement('span')
-            menu_span.style.float='left'
+            menu_span.style.float = 'left'
             menu_span.innerHTML = menubuttonhtml('menu', gmenuimage, '<u>M</u>enu', 'Menu. ' + ctrlalt + '+M', 'M')
             //document.body.insertBefore(menu_span, document.body.firstChild)
             gexodus_menubar.insertBefore(menu_span, gexodus_menubar.firstChild)
@@ -1533,15 +1532,15 @@ function* clientfunctions_windowonload() {
         catch (e) { }
 
     //2nd interation seems to fit better
-    if (gautofitwindow&&document.getElementById('autofitwindowelement'))
+    if (gautofitwindow && document.getElementById('autofitwindowelement'))
         exodussettimeout('exodusautofitwindow()', 100)
 
     //firefox on linux refuses to resize/move immediately
-    if (gautofitwindow&&document.getElementById('autofitwindowelement'))
+    if (gautofitwindow && document.getElementById('autofitwindowelement'))
         exodussettimeout('exodusautofitwindow()', 300)
 
     //2nd interation seems to fit better
-    if (gautofitwindow&&document.getElementById('autofitwindowelement'))
+    if (gautofitwindow && document.getElementById('autofitwindowelement'))
         exodussettimeout('exodusautofitwindow()', 300)
 
     //logout('clientfunctions_windowonload')
@@ -1563,12 +1562,12 @@ function menuonload() {
             return
 
         //enable exodus support menu items
-        //if (gusername=='NEOSYS') {
-            var item1=idocument.getElementById('exodussupportmenuitem1')
-            if (item1) {
-                item1.style.display=''
-                idocument.getElementById('exodussupportmenuitem2').style.display=''
-            }
+        //if (gusername=='EXODUS') {
+        var item1 = idocument.getElementById('exodussupportmenuitem1')
+        if (item1) {
+            item1.style.display = ''
+            idocument.getElementById('exodussupportmenuitem2').style.display = ''
+        }
         //}
 
         menuhtml = idocument.body.innerHTML
@@ -1815,7 +1814,7 @@ function* exodusfilepopup(filename, cols, coln, sortselectionclause, many, filte
         collist += ' ID'
 
     //increased from 1000 since changelog records>1000 and no way to
-    if (typeof maxnrecs=='undefined')
+    if (typeof maxnrecs == 'undefined')
         maxnrecs = 2000
 
     //get the data from the server
@@ -1828,18 +1827,18 @@ function* exodusfilepopup(filename, cols, coln, sortselectionclause, many, filte
 
     //cancel if no records found
     if (db.data.indexOf('<RECORD>') < 0) {
-        var msg='Sorry, no records found'
+        var msg = 'Sorry, no records found'
         if (filtertitle)
             msg += '\nfor ' + filtertitle
-        else if (sortselectionclause.indexOf('WITH COMPANY_CODE')>=0)
-            msg+='\nfor the chosen company'
+        else if (sortselectionclause.indexOf('WITH COMPANY_CODE') >= 0)
+            msg += '\nfor the chosen company'
         yield* exodusinvalid(msg)
         return null
     }
 
     var question
     if (filtertitle)
-        question = 'Which do you want?'+filtertitle
+        question = 'Which do you want?' + filtertitle
 
     return yield* exodusdecide2(question, db.data, cols, coln, '', many)
 
@@ -1864,9 +1863,9 @@ function exodusdblink() {
     if (!gdataset) gdataset = exodusgetcookie2('dataset')
     //gusername = exodusgetcookie2('username')
     gusername = exodusgetcookie2('username') || gusername
-    //alert('xyz2 NEOSYS2/username='+exodusgetcookie2('username'))
+    //alert('xyz2 EXODUS2/username='+exodusgetcookie2('username'))
     //alert(document.cookie)
-    gsystem = exodusgetcookie2('', 'NEOSYSsystem',null) || gsystem
+    gsystem = exodusgetcookie2('', 'EXODUSsystem', null) || gsystem
 
     // alert(gdataset+'*'+gusername+'*'+gsystem)
     this.dataset = gdataset
@@ -1920,7 +1919,7 @@ function exodusdblink() {
     }
     catch (e) {
         alert('Error: While creating Scripting.FileSystemObject\n' + e.number + ' ' + e.description)
-        window.location.assign(NEOSYSlocation + 'securityhowto.htm')
+        window.location.assign(EXODUSlocation + 'securityhowto.htm')
         return
     }
 
@@ -1943,18 +1942,18 @@ function exodusdblink() {
 function* dblogout() {
 
     //remove username etc
-    //exodussetcookie('','NEOSYS',gdataset,'dataset',true)
+    //exodussetcookie('','EXODUS',gdataset,'dataset',true)
 
     //remove last page
-    //exodussetcookie('','NEOSYS','','ll',true)
+    //exodussetcookie('','EXODUS','','ll',true)
 
-    exodussetcookie(glogincode, 'NEOSYS2', '', 'username')
-    //alert('xyz NEOSYS2/username='+exodusgetcookie2('username'))
+    exodussetcookie(glogincode, 'EXODUS2', '', 'username')
+    //alert('xyz EXODUS2/username='+exodusgetcookie2('username'))
 
     //remove settings
     //alert('before clear '+document.cookie)
-    exodussetcookie(glogincode, 'NEOSYS2', '')
-    exodussetcookie(glogincode, 'NEOSYS', '')
+    exodussetcookie(glogincode, 'EXODUS2', '')
+    exodussetcookie(glogincode, 'EXODUS', '')
     //alert('after clear '+document.cookie)
 
 }
@@ -1968,30 +1967,30 @@ function* exodusdblink_login(username, password, dataset, system) {
     if (!dataset && gdataset)
         dataset = gdataset
     if (!dataset)
-        dataset = exodusgetcookie2('dataset', 'NEOSYS', '')
+        dataset = exodusgetcookie2('dataset', 'EXODUS', '')
     if (!system)
-        system = exodusgetcookie2('', 'NEOSYSsystem',null)
+        system = exodusgetcookie2('', 'EXODUSsystem', null)
     var arguments = ['', '', dataset, '', '', '', system]
     var failed = false
 
     //maybe relogging after request to relogin (eg expired session on server)
     if (gusername) {
-        var question='Your session has timed out\nor been lost to another login or another computer or browser\nor the server has been restarted.'
+        var question = 'Your session has timed out\nor been lost to another login or another computer or browser\nor the server has been restarted.'
         //current work is cleared without option to recover if detect login on another computer or browser
-        if (glocked&&gchangesmade)
-            question+='\n\nWarning! Your current work on '+gkey+' will be lost if you quit.'
-        question+='\n\nLogin again?'
-        if (!(yield* exodusyesno(question,1))) {
+        if (glocked && gchangesmade)
+            question += '\n\nWarning! Your current work on ' + gkey + ' will be lost if you quit.'
+        question += '\n\nLogin again?'
+        if (!(yield* exodusyesno(question, 1))) {
 
             //switch to login window
-            exodussettimeout('window.location.assign("../default.htm")',1)
+            exodussettimeout('window.location.assign("../default.htm")', 1)
 
             //try to avoid unlocking on exit
-            glocked=false
+            glocked = false
             setchangesmade(false)
-            gkey=''
-            this.requesting=false
-            db.requesting=false
+            gkey = ''
+            this.requesting = false
+            db.requesting = false
 
             yield* exodusinvalid()
             failed = true
@@ -2003,17 +2002,17 @@ function* exodusdblink_login(username, password, dataset, system) {
 
         }
 
-        arguments[0]=gusername
+        arguments[0] = gusername
     }
 
     while (true) {
 
         arguments[4] = datasets
-        if (!(typeof event != 'undefined' && event && event.shiftKey) && !failed && (exodusgetcookie2('a', 'NEOSYS', '') == 'true' || username)) {
-            arguments[0] = username ? username : exodusgetcookie2('u', 'NEOSYS', '')
-            arguments[1] = password ? password : exodusgetcookie2('p', 'NEOSYS', '')
+        if (!(typeof event != 'undefined' && event && event.shiftKey) && !failed && (exodusgetcookie2('a', 'EXODUS', '') == 'true' || username)) {
+            arguments[0] = username ? username : exodusgetcookie2('u', 'EXODUS', '')
+            arguments[1] = password ? password : exodusgetcookie2('p', 'EXODUS', '')
             arguments[2] = dataset
-            arguments[5] = exodusgetcookie2('a', 'NEOSYS', '')
+            arguments[5] = exodusgetcookie2('a', 'EXODUS', '')
             arguments[6] = system
         }
         else {
@@ -2049,8 +2048,8 @@ function* exodusdblink_login(username, password, dataset, system) {
         //quit if user cancels
         if (!arguments) return 0
 
-        glogincode = (arguments[2] + '*' + arguments[0] + '*').replace(/ /g,'')
-        exodussetcookie('', 'NEOSYSlogincode', glogincode, 'logincode')
+        glogincode = (arguments[2] + '*' + arguments[0] + '*').replace(/ /g, '')
+        exodussetcookie('', 'EXODUSlogincode', glogincode, 'logincode')
 
         logindb.request = 'LOGIN\r' + arguments[0] + '\r' + arguments[1] + '\r' + arguments[2] + '\r' + arguments[3] + '\r\r' + arguments[5]
 
@@ -2058,7 +2057,7 @@ function* exodusdblink_login(username, password, dataset, system) {
             var msg = logindb.response
             if (!msg)
                 msg = 'Invalid username or password'
-            var response=yield* exodusinvalid(msg)
+            var response = yield* exodusinvalid(msg)
             failed = true
         }
         else {
@@ -2084,10 +2083,10 @@ function* exodusdblink_login(username, password, dataset, system) {
                 //temp+='&p='
                 //temp+='&a='
             }
-            exodussetcookie('', 'NEOSYS', temp, '')
+            exodussetcookie('', 'EXODUS', temp, '')
 
             //temporary cookie for menu
-            exodussetcookie(glogincode, 'NEOSYS2', logindb.data)
+            exodussetcookie(glogincode, 'EXODUS2', logindb.data)
 
             yield* clientfunctions_getglobals()
 
@@ -2098,7 +2097,7 @@ function* exodusdblink_login(username, password, dataset, system) {
                 temp += '&password=' + this.password
                 //this.timeout=exodusgetcookie2('timeout')
             }
-            exodussetcookie(glogincode, 'NEOSYS2', temp)
+            exodussetcookie(glogincode, 'EXODUS2', temp)
 
             //quit success
             return 1
@@ -2139,7 +2138,7 @@ function* exodusdblink_send_byhttp_using_forms(data) {
 
         //var params='dialogHeight:100px; dialogWidth:200px; center:Yes; help:No; resizable:No; status:No'
         //params='dialogHeight: 201px; dialogWidth: 201px; dialogTop: px; dialogLeft: px; center: Yes; help: Yes; resizable: Yes; status: Yes;'
-        var reply = yield* exodusshowmodaldialog(NEOSYSlocation + 'rs/default.htm', [this.timeout, this.request, this.data])
+        var reply = yield* exodusshowmodaldialog(EXODUSlocation + 'rs/default.htm', [this.timeout, this.request, this.data])
         if (!reply) {
             this.data = ''
             this.response = ('ERROR: Request to server failed')
@@ -2152,13 +2151,13 @@ function* exodusdblink_send_byhttp_using_forms(data) {
         this.response = reply[1].toString()
         this.data = reply[2].toString()
 
-        var lcresponse=this.response.toLowerCase()
+        var lcresponse = this.response.toLowerCase()
         if (lcresponse.indexOf('Please login') >= 0) {
             //if (lcresponse.indexOf('automatic') >= 0) {
             //    glocked=false
             //    gchangesmade=false
             //}
-            if (!(/**/ yield * this.login())) {
+            if (!(/**/ yield* this.login())) {
                 this.data = ''
                 this.response = ('ERROR: Please login')
                 this.result = ''
@@ -2198,7 +2197,7 @@ function* exodusdblink_send_byhttp_using_xmlhttp(data) {
     var ignoreresult = (typeof this.request == 'string') && (this.request.slice(0, 6) == 'RELOCK' || this.request.slice(0, 9) == 'KEEPALIVE')
     //indicate to refresher when last activity was
     if (ignoreresult)
-        exodussetcookie('', 'NEOSYSlc', new Date(), 'lc')
+        exodussetcookie('', 'EXODUSlc', new Date(), 'lc')
 
     //prevent reuse
     if (this.requesting) {
@@ -2242,7 +2241,7 @@ function* exodusdblink_send_byhttp_using_xmlhttp(data) {
     var remoteprocedurecallfailed = false
     var rpcserverunavailable = false
 
-    var origrequest=this.request
+    var origrequest = this.request
 
     while (!gotresponse) {
 
@@ -2265,7 +2264,7 @@ function* exodusdblink_send_byhttp_using_xmlhttp(data) {
 
         xtext += '<data>' + temp + '</data>'
         xtext += '</root>'
-        //if (gusername=='NEOSYS') alert(xtext)
+        //if (gusername=='EXODUS') alert(xtext)
         /*
         //decide microsoft or moz/netscape
         var moz=false
@@ -2298,44 +2297,44 @@ function* exodusdblink_send_byhttp_using_xmlhttp(data) {
         var xhttp = this.XMLHTTP
         //var servererrormsg='ERROR: Could not communicate with server. Try again later\r\r'
         var servererrormsg = 'Network or server failure. (No response)\r\rPlease try again later\rand/or get technical assistance\r\r'
-        var xhttpaborted=false
+        var xhttpaborted = false
 
         //g because perhaps will be a global variable
-        //var gasynchronous=guseyield && !isMSIE && (gusername=='NEOSYS' || (typeof gdataset != 'undefined' && gdataset.slice(-4) == 'TEST'))
-        var gasynchronous=guseyield && ! (gonunload||gonbeforeunload)
+        //var gasynchronous=guseyield && !isMSIE && (gusername=='EXODUS' || (typeof gdataset != 'undefined' && gdataset.slice(-4) == 'TEST'))
+        var gasynchronous = guseyield && !(gonunload || gonbeforeunload)
         if (gasynchronous) {
 
-            gchildwin={lazy:true}
+            gchildwin = { lazy: true }
             //a reference to xhttp so we can call abort on it if user chooses Cancel in the popup from blockui
-            gchildwin.xhttp=xhttp
+            gchildwin.xhttp = xhttp
 
             //a reference to xhttp so we can call abort on it if user chooses to close the window
-            gxhttp=xhttp
+            gxhttp = xhttp
 
             xhttp.onload = function (e) {
                 if (xhttp.readyState === 4) {
                     if (xhttp.status === 200) {
                         //console.log(xhttp.responseText);
-                        exodus_resume('ok','OK exodusdblink_send_byhttp_using_xmlhttp');
+                        exodus_resume('ok', 'OK exodusdblink_send_byhttp_using_xmlhttp');
                     } else {
                         console.error(xhttp.status + ' ' + xhttp.statusText);
-                        exodus_resume('ok','OK exodusdblink_send_byhttp_using_xmlhttp '+xhttp.statusText);
+                        exodus_resume('ok', 'OK exodusdblink_send_byhttp_using_xmlhttp ' + xhttp.status + ' ' + xhttp.statusText);
                     }
                 }
             };
             xhttp.onerror = function (e) {
-                console.error(xhttp.statusText);
-                exodus_resume('error','ERROR exodusdblink_send_byhttp_using_xmlhttp');
+                console.error(xhttp.status + ' ' + xhttp.statusText);
+                exodus_resume('error', 'ERROR exodusdblink_send_byhttp_using_xmlhttp' + xhttp.status + ' ' + xhttp.statusText);
             };
             xhttp.ontimeout = function () {
                 console.error("The request for " + url + " timed out.");
-                exodus_resume('timeout','TIMEOUT exodusdblink_send_byhttp_using_xmlhttp');
+                exodus_resume('timeout', 'TIMEOUT exodusdblink_send_byhttp_using_xmlhttp');
             };
             xhttp.onabort = function (e) {
                 console.error('XMLHTTPREQEST ABORTED --- ' + xhttp.statusText);
-                xhttpaborted=true
+                xhttpaborted = true
                 if (!gonunload)
-                    exodus_resume('abort','ABORT exodusdblink_send_byhttp_using_xmlhttp');
+                    exodus_resume('abort', 'ABORT exodusdblink_send_byhttp_using_xmlhttp');
             };
         }
 
@@ -2345,7 +2344,7 @@ function* exodusdblink_send_byhttp_using_xmlhttp(data) {
         //send the xmldoc to the server and get the response
         try {
             //false for synchronous (wait for response before continuing to next statement)
-            xhttp.open('POST', NEOSYSlocation + 'scripts/xhttp.asp', async = gasynchronous || ignoreresult )
+            xhttp.open('POST', EXODUSlocation + 'scripts/xhttp.asp', async = gasynchronous || ignoreresult)
             //this was never required but inserted in the hope that it will
             //avoid unknown problems. Perhaps it is not necessary for active pages like .asp.
             xhttp.setRequestHeader("Pragma", "no-cache");
@@ -2387,8 +2386,8 @@ function* exodusdblink_send_byhttp_using_xmlhttp(data) {
         //fails in IE6?
         if (isMSIE)
             try {
-                    xhttp.responseType='msxml-document'
-            } catch (e) {}
+                xhttp.responseType = 'msxml-document'
+            } catch (e) { }
 
         //send
 
@@ -2441,7 +2440,7 @@ function* exodusdblink_send_byhttp_using_xmlhttp(data) {
             //PAUSE HERE until child window closes and our autoresume
             //function calls .next(childwin.returnValue) to put into result
             ///////////////////////////////////////////////////////////////
-            var result = yield* exodus_yield('exodusdblink_send_byhttp_using_xmlhttp : '+thisrequest)
+            var result = yield* exodus_yield('exodusdblink_send_byhttp_using_xmlhttp : ' + thisrequest)
 
             //ignoring result since xhttp contains error codes
             //maybe could process differently
@@ -2474,10 +2473,10 @@ function* exodusdblink_send_byhttp_using_xmlhttp(data) {
                     result = unescape(dbgetnodesvalue(result[0].childNodes))
                 else
                     result = ''
-                    //alert('result '+result+' typeof result'+typeof result)
-                    if (typeof result=='undefined') {
-                        debugger
-                    }
+                //alert('result '+result+' typeof result'+typeof result)
+                if (typeof result == 'undefined') {
+                    debugger
+                }
             }
             else {
                 //iexplorer
@@ -2487,11 +2486,11 @@ function* exodusdblink_send_byhttp_using_xmlhttp(data) {
             }
 
             if (this.response.indexOf('Please login') >= 0) {
-//                var tt=origrequest.slice(0,5)!='LOGIN'?gusername:''
-//                tt=gusername
-//alert(origrequest+' gusername='+tt)
-                tt=''
-                if (!(/**/ yield *this.login(tt))) {
+                //                var tt=origrequest.slice(0,5)!='LOGIN'?gusername:''
+                //                tt=gusername
+                //alert(origrequest+' gusername='+tt)
+                tt = ''
+                if (!(/**/ yield* this.login(tt))) {
                     this.data = ''
                     this.response = ('ERROR: Please login')
                     this.result = ''
@@ -2520,7 +2519,7 @@ function* exodusdblink_send_byhttp_using_xmlhttp(data) {
             }
 
             //aborting/unloading. try to avoid error message in caller
-            if (gonunload||gonbeforeunload||xhttpaborted) {
+            if (gonunload || gonbeforeunload || xhttpaborted) {
                 this.data = ''
                 if (xhttpaborted)
                     this.response = 'Cancelled'
@@ -2534,13 +2533,13 @@ function* exodusdblink_send_byhttp_using_xmlhttp(data) {
             //system failure, retry/abort?
             //Could be failure to convert server response to xml ... check browser debugger console for errors
             //sometimes caused by unusual data encoding in back end from old data entry systems. Latin versus UTF8.
-            var tt=origrequest.split('\r')
-            if (tt[0]=='LOGIN')
+            var tt = origrequest.split('\r')
+            if (tt[0] == 'LOGIN')
                 //remove password from message
-                tt[2]=''
-            var errormsg = 'System failure. Do you want to retry?\r'+tt.join('\r')
+                tt[2] = ''
+            var errormsg = 'System failure. Do you want to retry?\r' + tt.join('\r')
             if (xhttp.responseText.indexOf('ASP 0113') > -1)
-                errormsg += '\n\nThe server failed to get a response from the NEOSYS database engine'
+                errormsg += '\n\nThe server failed to get a response from the EXODUS database engine'
             errormsg += '\n\n' + unescape(striptags(xhttp.responseText))
             console.log(errormsg)
             if (!(confirm(errormsg))) {
@@ -2558,7 +2557,7 @@ function* exodusdblink_send_byhttp_using_xmlhttp(data) {
     }
 
     //indicate to refresher when last activity was
-    exodussetcookie('', 'NEOSYSlc', new Date(), 'lc')
+    exodussetcookie('', 'EXODUSlc', new Date(), 'lc')
 
     ///if (result.split(' ')[0]=='OK' || result==1)
     if (result.split(' ')[0] == 'OK' || result == 1) {
@@ -2591,7 +2590,7 @@ function dbwaiting() {
 
     document.body.style.cursor = 'wait'
     var dialogstyle = 'dialogHeight: 50px; dialogWidth: 200px; dialogTop: px; dialogLeft: px; center: Yes; help: No; resizable: Yes; status: No;'
-    var windowx = ''//window.showModelessDialog(NEOSYSlocation+'wait.htm','',dialogstyle)
+    var windowx = ''//window.showModelessDialog(EXODUSlocation+'wait.htm','',dialogstyle)
     wstatus('Networking, please wait ...')
     return windowx
 }
@@ -2624,7 +2623,7 @@ function exodusfixcookie() {
 function exodussetcookie(loginsessionid, name, value, subkey, permanent) {
 
     if (glogcookie)
-        console.log('NEOSYSSETCOOKIE('+loginsessionid+', '+name+', '+value+', '+subkey+', '+permanent+')')
+        console.log('EXODUSSETCOOKIE(' + loginsessionid + ', ' + name + ', ' + value + ', ' + subkey + ', ' + permanent + ')')
 
     //exodusfixcookie()
 
@@ -2659,7 +2658,7 @@ function exodussetcookie(loginsessionid, name, value, subkey, permanent) {
 
     if (subkey) {
         // crumbs are separated by ampersands
-        var crumbs = exodusgetcookie2('',name,loginsessionid).split('&')
+        var crumbs = exodusgetcookie2('', name, loginsessionid).split('&')
         var emptycrumbn
         for (var i2 = 0; i2 < crumbs.length; i2++) {
             var crumb0 = crumbs[i2].split('=')[0]
@@ -2678,12 +2677,12 @@ function exodussetcookie(loginsessionid, name, value, subkey, permanent) {
     }
     //if (value.indexOf('&&')>=0) xxxxxx
 
-    //document.cookie='NEOSYSsystem=ACCOUNTS'//; expires=Fri 31 Dec 2100 23:59:59 GMT; path=/'
+    //document.cookie='EXODUSsystem=ACCOUNTS'//; expires=Fri 31 Dec 2100 23:59:59 GMT; path=/'
     //value+=';expires=Fri 31 Dec 2000 23:59:59 GMT;'
     var cookie = loginsessionid + name + '=' + escape(value)
     //if (permanent==true)
     if (value.length)
-    //x = 1
+        //x = 1
         cookie += '; expires=Fri, 31 Dec 2100 23:59:59 GMT; SameSite=Strict'
     else
         cookie += '; expires=Fri, 31 Dec 2000 23:59:59 GMT; SameSite=Strict'
@@ -2718,19 +2717,19 @@ function exodussetcookie(loginsessionid, name, value, subkey, permanent) {
     //alert(loginsessionid+name+'\n'+value+'\n'+document.cookie)
     //document.cookie = name + '=' + value+ 'domain='+window.location.host//+'; path=/;'
 
-    //if (name=='NEOSYS2')
+    //if (name=='EXODUS2')
     // alert(cookie+'\r\r'+document.cookie)
 
 }
 
 function exodusgetcookie2(subkey, key, loginsessionid) {
     if (!loginsessionid && loginsessionid !== null)
-        loginsessionid=glogincode
+        loginsessionid = glogincode
     else if (loginsessionid === null)
-        loginsessionid=''
+        loginsessionid = ''
     if (!key)
-        key='NEOSYS2'
-    var result=exodusgetcookie(loginsessionid, key, subkey)
+        key = 'EXODUS2'
+    var result = exodusgetcookie(loginsessionid, key, subkey)
     ///console.log('exodusgetcookie2('+loginsessionid+', '+key+', '+subkey+')='+result)
     return result
 }
@@ -2740,7 +2739,7 @@ function exodusgetcookie2(subkey, key, loginsessionid) {
 function exodusgetcookie(loginsessionid, key, subkey) {
 
     if (glogcookie)
-        var log='exodusgetcookie('+loginsessionid+', '+key+', '+subkey+')'
+        var log = 'exodusgetcookie(' + loginsessionid + ', ' + key + ', ' + subkey + ')'
 
     //var cookie0='GET COOKIE session:'+loginsessionid+' key:'+key+' subkey:'+subkey
     //alert(cookie0)
@@ -2763,9 +2762,9 @@ function exodusgetcookie(loginsessionid, key, subkey) {
             if (typeof subkey == 'undefined' || subkey == '') {
                 //return unescape(cookies[i].split('=')[1])
                 //return unescape(cookies[i].split('=').slice(1).join('='))
-                var cookie=cookies[i].split('=').slice(1).join('=')
+                var cookie = cookies[i].split('=').slice(1).join('=')
                 if (glogcookie)
-                    console.log(log+' = "'+cookie+'"')
+                    console.log(log + ' = "' + cookie + '"')
                 return cookie
             }
 
@@ -2774,17 +2773,17 @@ function exodusgetcookie(loginsessionid, key, subkey) {
             for (var i2 = 0; i2 < crumbs.length; i2++) {
                 if (crumbs[i2].split('=')[0] == subkey) {
                     //return unescape(crumbs[i2].split('=')[1])
-                    var cookie=unescape(crumbs[i2].split('=').slice(1))
+                    var cookie = unescape(crumbs[i2].split('=').slice(1))
                     if (glogcookie)
-                        console.log(log+' = "'+cookie+'"')
+                        console.log(log + ' = "' + cookie + '"')
                     return cookie
                 }
             }
         }
     }
-if (glogcookie)
-    console.log(log+' = ""')
-return ''
+    if (glogcookie)
+        console.log(log + ' = ""')
+    return ''
 }
 
 //from "client.js" may also be copied in some "client.js" less windows
@@ -2797,9 +2796,9 @@ function* exodusdecide(question, data, cols, returncoln, defaultreply, many, inv
     //defaultreply=if returncoln then cell(s) of returncoln otherwise 1 based rown(s)
 
     if (typeof data == 'undefined')
-        data='Yes:No'
+        data = 'Yes:No'
 
-        //the data might be a db request prefixed with '@'
+    //the data might be a db request prefixed with '@'
     if (typeof data == 'string' && data.slice(0, 1) == '@') {
         db.request = data.slice(1)
         if (!(yield* db.send())) {
@@ -2815,11 +2814,11 @@ function* exodusdecide(question, data, cols, returncoln, defaultreply, many, inv
         return yield* exodusinvalid('No records found')
 
     if (typeof data == 'string' && data.slice(0, 8) == '<records')
-        data=exodusxml2obj(data)
+        data = exodusxml2obj(data)
 
     //xml2obj returns records in .group1
     if (data.group1)
-        data=data.group1
+        data = data.group1
 
     if (defaultreply) {
         if (typeof defaultreply == 'string')
@@ -2839,7 +2838,7 @@ function* exodusdecide(question, data, cols, returncoln, defaultreply, many, inv
     if (guseyield)
         var results = yield* exodusconfirm2(dialogargs)
     else
-        var results = yield* exodusshowmodaldialog(NEOSYSlocation + 'decide.htm', dialogargs)
+        var results = yield* exodusshowmodaldialog(EXODUSlocation + 'decide.htm', dialogargs)
     if (typeof results == 'undefined')
         results = ''
 
@@ -2878,11 +2877,11 @@ function* exodusdecide2(question, data, cols, returncoln, defaultreply, many) {
             //if (!returncoln)
             //    returncoln=0
         }
-        var results=yield* exodusdecide(question, data, cols, returncoln, defaultreply, many)
+        var results = yield* exodusdecide(question, data, cols, returncoln, defaultreply, many)
 
         //callers of decide2 expect reply in array
-        if (results && (typeof results=='string' || typeof results=='number'))
-            results=[results]
+        if (results && (typeof results == 'string' || typeof results == 'number'))
+            results = [results]
 
         return results
     }
@@ -2905,14 +2904,14 @@ function* exodusdecide2(question, data, cols, returncoln, defaultreply, many) {
     //abort if no records found
     if (data == '' || data == '<records>\r\n</records>') return yield* exodusinvalid('No records found')
 
-    if (typeof data=='string')
-        data=unescape(data)
+    if (typeof data == 'string')
+        data = unescape(data)
     var dialogargs = exoduscloneobj([question, data, cols, returncoln, defaultreply, many])
     //var dialogstyle='dialogHeight: 400px; dialogWidth: 600px; dialogTop: px; dialogLeft: px; center: Yes; help: Yes; resizable: Yes; status: Yes;'
 
     dialogargs.logincode = glogincode
 
-    var results = yield* exodusshowmodaldialog(NEOSYSlocation + 'decide2.htm', dialogargs)
+    var results = yield* exodusshowmodaldialog(EXODUSlocation + 'decide2.htm', dialogargs)
     if (!results)
         results = ''
 
@@ -2938,8 +2937,8 @@ function* setdropdown2(element, dataobj, colnames, selectedvalues, requiredvalue
     var valuecolname
     var textcolname
 
-    if (typeof colnames=='string' && colnames.indexOf('\r') )
-        colnames=colnames.split('\r')
+    if (typeof colnames == 'string' && colnames.indexOf('\r'))
+        colnames = colnames.split('\r')
 
     if (typeof (colnames) == 'string') {
         textcolname = colnames
@@ -2956,13 +2955,13 @@ function* setdropdown2(element, dataobj, colnames, selectedvalues, requiredvalue
     var records = dataobj.group1
 
     //var options=[]
-    var anyselected=false
+    var anyselected = false
 
     for (var i = 0; i < records.length; i++) {
         var cell = records[i][valuecolname]
         if (typeof (cell) == 'undefined') {
             //yield* exodusinvalid('Error: "' + valuecolname + '" not in data line ' + i + ' for setdropdown2 for "' + element.id + '" (1)')
-            systemerror('Error: "' + valuecolname + '" not in data line ' + i + ' "'+records[i]+'" for setdropdown2 for "' + element.id + '" (1)')
+            systemerror('Error: "' + valuecolname + '" not in data line ' + i + ' "' + records[i] + '" for setdropdown2 for "' + element.id + '" (1)')
             return (0)
         }
 
@@ -3006,10 +3005,10 @@ function* setdropdown2(element, dataobj, colnames, selectedvalues, requiredvalue
 
     }
 
-    if (noautoselection&&!anyselected) {
+    if (noautoselection && !anyselected) {
         var blankoption = document.createElement('option')
         blankoption.value = ''
-        blankoption.innerHTML=''
+        blankoption.innerHTML = ''
         element.insertBefore(blankoption, element.childNodes[0])
     }
 
@@ -3063,7 +3062,7 @@ function checkisdropdown(element) {
     assertelement(element, 'checkisdropdown', 'element')
 
     if (typeof (element) != 'object' || element.tagName != 'SELECT') {
-        yield* exodusinvalid('Error: The target is not a SELECT tag')
+        yield * exodusinvalid('Error: The target is not a SELECT tag')
         return false
     }
     return true
@@ -3144,7 +3143,7 @@ function setdropdown3(element, dropdowndata, colns, selectedvalues, requiredvalu
         for (var i = 0; i < dropdowndata.length; i++) {
             var value = dropdowndata[i][valuecoln]
             if (!value)
-                value=''
+                value = ''
             if (no(requiredvalues) || requiredvalues.exoduslocate(value)) {
 
                 var text = dropdowndata[i][textcoln]
@@ -3173,9 +3172,9 @@ function setdropdown3(element, dropdowndata, colns, selectedvalues, requiredvalu
                 //if (selectedvalues.exoduslocate(option.value)) option.selected=true
                 //if (selectedvalues.exoduslocate(option.text)) option.selected=true
                 if (option.value == selectedvalue || option.text == selectedvalue) {
-                    try{
-                    option.selected = true
-                    } catch (e) {}//error in ie6 sometimes
+                    try {
+                        option.selected = true
+                    } catch (e) { }//error in ie6 sometimes
                     break
                 }
             }
@@ -3246,7 +3245,7 @@ function exodusxml2obj(xmltext) {
                 if (frag[0].slice(0, 1) != '/') {
                     //currentrow[frag[0]]=(new Object).text=frag[1]
                     var cell = new Object
-                    var fragdecoded=HTMLDecode(frag[1]).replace(/%25/g,'%')
+                    var fragdecoded = HTMLDecode(frag[1]).replace(/%25/g, '%')
                     cell.text = fragdecoded
                     currentrow[frag[0]] = cell
                 }
@@ -3320,7 +3319,7 @@ function* exodussetdropdown(element, request, colarray, selectedvalues, noautose
         ////xmltemp.loadXML(db.data)
         yield* setdropdown2(element, dataobj, colarray, selectedvalues, null, noautoselection)
         if (db.data == '' || !dataobj.group1.length)
-            element.setAttribute('exodusdropdown','')
+            element.setAttribute('exodusdropdown', '')
     }
     else {
         yield* exodusinvalid(db.response)
@@ -3383,15 +3382,15 @@ function* exodusconfirm(question, defaultbutton, yesbuttontitle, nobuttontitle, 
 
     console.log(question)
 
-    var istextinput=typeof text != 'undefined' && text !== null
+    var istextinput = typeof text != 'undefined' && text !== null
 
     //use div to avoid opening a new window if possible
-    //if ((!gusername || gusername=='NEOSYS') && guseyield && !istextinput) {
+    //if ((!gusername || gusername=='EXODUS') && guseyield && !istextinput) {
     if (guseyield && !istextinput) {
 
         return yield* exodusconfirm2(question, defaultbutton, yesbuttontitle, nobuttontitle, cancelbuttontitle, text, texthidden, image)
 
-    //use separate window for popup if yield is not available eg internet explorer
+        //use separate window for popup if yield is not available eg internet explorer
     } else {
 
         var dialogargs = [question, defaultbutton, yesbuttontitle, nobuttontitle, cancelbuttontitle, text, texthidden, image]
@@ -3401,7 +3400,7 @@ function* exodusconfirm(question, defaultbutton, yesbuttontitle, nobuttontitle, 
         //:'dialogHeight: 220px; dialogWidth: 500px;'
         //dialogstyle+=' center: Yes; help: No; resizable: No; status: No;'
 
-        var response = yield* exodusshowmodaldialog(NEOSYSlocation + 'confirm.htm', dialogargs, dialogstyle)
+        var response = yield* exodusshowmodaldialog(EXODUSlocation + 'confirm.htm', dialogargs, dialogstyle)
     }
 
     //text input returns a string (may be zero length) or false if clicked cancel
@@ -3446,7 +3445,7 @@ function getancestor(startelement, ancestorTag) {
 
     var ancestor = startelement.parentNode
     //while (ancestor!=null && ancestor.tagName!=ancestorTag)
-    ancestorTag=ancestorTag.toUpperCase()
+    ancestorTag = ancestorTag.toUpperCase()
     while (ancestor != null && ancestorTag.indexOf(ancestor.tagName) == -1) {
         ancestor = ancestor.parentNode
     }
@@ -3479,17 +3478,17 @@ function loadcache() {
     //Error: Permission denied to access property "gcache"
     try {
         //if (window.opener && window.opener.gcache) {
-        if (window.opener && window.opener.gcache && gdataset && window.opener.gdataset==gdataset) {
-            gcache=window.opener.gcache
+        if (window.opener && window.opener.gcache && gdataset && window.opener.gdataset == gdataset) {
+            gcache = window.opener.gcache
             //ensure we can access gcache.values since permission can be denied in MSIE if parent window has been closed
             if (gcache.values)
-                temp=true
+                temp = true
         }
     } catch (e) {
         gcache = null
     }
 
-    if (!gcache){
+    if (!gcache) {
         //create a global variable span to hold the userdata
         gcache = document.createElement('span')
         gcache.values = new Object
@@ -3506,9 +3505,9 @@ function showcache() {
     if (!gcache) return
 
     try {
-    var values = gcache.values
+        var values = gcache.values
     }
-    catch(e) {
+    catch (e) {
         return
     }
 
@@ -3538,9 +3537,9 @@ function trimcache() {
     if (!gcache) return
 
     try {
-    var values = gcache.values
+        var values = gcache.values
     }
-    catch(e) {
+    catch (e) {
         return
     }
 
@@ -3555,7 +3554,7 @@ function trimcache() {
     }
 
     var result = [cachesize, cachen]
-    if (gusername == 'NEOSYS') wstatus('trimcache() cachesize:' + cachesize + ' cacheitems:' + cachen)
+    if (gusername == 'EXODUS') wstatus('trimcache() cachesize:' + cachesize + ' cacheitems:' + cachen)
 
     //delete initial keys until the size is below the desired limit
     //hopefully the initial keys are the oldest
@@ -3593,9 +3592,9 @@ function prunecache(request) {
     if (!gcache) return
 
     try {
-    var values = gcache.values
+        var values = gcache.values
     }
-    catch(e) {
+    catch (e) {
         return
     }
 
@@ -3707,8 +3706,8 @@ function deletecache(request) {
     }
 
     if (gcache.values) {
-        var cacheitem=gcache.values[cachekey(request)]
-        if (typeof cacheitem!='undefined')
+        var cacheitem = gcache.values[cachekey(request)]
+        if (typeof cacheitem != 'undefined')
             delete gcache.values[cachekey(request)]
     } else
         gcache.removeAttribute(cachekey(request))
@@ -3757,7 +3756,7 @@ function clearcache() {
 
 function* sorttable(event, order) {
 
-    event=getevent(event)
+    event = getevent(event)
 
     var colid = event.target.sorttableelementid
 
@@ -3785,7 +3784,7 @@ function* sorttable(event, order) {
     var up2down = false
     try {
 
-        var clickedelement = event.target||event.srcElement
+        var clickedelement = event.target || event.srcElement
 
         //var clickedelement = document.getElementsByName('sortbutton_' + groupno)[0]
 
@@ -3856,7 +3855,7 @@ function* sorttable(event, order) {
         //right justify the rown number assume max 999999
         var temp = rown.toString()
         //temp = exodusspace(6 - temp.length) + temp
-        temp=('000000'+temp).slice(-6)
+        temp = ('000000' + temp).slice(-6)
 
         //save the two column array for sorting
         //need the +temp so that indented fields sort correctly
@@ -3894,7 +3893,7 @@ function* sorttable(event, order) {
     try {
         yield* resetsortimages(groupno)
         clickedelement.src = gimagetheme + 'smallsort' + order + '.gif'
-    } catch (e){}
+    } catch (e) { }
 
     //reorder data and table rows
     var newdatarows = []
@@ -3937,9 +3936,9 @@ function menuhide(element) {
     //gmenucodes FINANCE,SUPPORT,MEDIAANALYSIS,MEDIA,JOBS,TIMESHEETS,HELP
     if (!element.menuok) {
         okmenus = exodusgetcookie2('m')
-        //if (gusername!='NEOSYS')
+        //if (gusername!='EXODUS')
         //    okmenus=okmenus.replace('FINANCE,','')
-        okmenus=okmenus.split(',')
+        okmenus = okmenus.split(',')
     }
 
     if (!element.exodusmenuaccesskeys)
@@ -3989,7 +3988,7 @@ function menuhide(element) {
                     if ((underlineelement = child.getElementsByTagName('U')).length) {
                         var menuaccesskey = underlineelement[0].innerText.exodustrim().slice(0, 1).toUpperCase()
                         var temp = element.exodusmenuaccesskeys[menuaccesskey]
-                        if (gusername == 'NEOSYS' && temp)
+                        if (gusername == 'EXODUS' && temp)
                             //yield* exodusnote('Duplicate menu access key ' + menuaccesskey.exodusquote() + ' for\r' + child.innerText + '\rand\r' + temp.innerText)
                             alert('Duplicate menu access key ' + menuaccesskey.exodusquote() + ' for \r' + child.innerText + ' \rand \r' + temp.innerText)
                         element.exodusmenuaccesskeys[menuaccesskey] = child
@@ -4060,7 +4059,7 @@ function menuonmouseover(event, menuoption) {
     //get the menuoption
     if (!menuoption) {
         menuoption = event.target
-        if (!menuoption||typeof menuoption != 'object')
+        if (!menuoption || typeof menuoption != 'object')
             return
     }
     //click detected on childnode
@@ -4074,7 +4073,7 @@ function menuonmouseover(event, menuoption) {
     var leftoffset
     var topoffset
     if (menuoption.id && (menuoption.id == 'menubutton' || menuoption.tagName == 'BUTTON' || menuoption.id.slice(0, 5) == 'menu_')) {
-//    console.log("menu_onmouseover 5a " + menuoption)
+        //    console.log("menu_onmouseover 5a " + menuoption)
 
         //  leftoffset=menuoption.offsetWidth+menuoption.offsetLeft-4
         //  topoffset=0
@@ -4083,7 +4082,7 @@ function menuonmouseover(event, menuoption) {
         topoffset = menuoption.offsetHeight + menuoption.offsetTop - 1
     }
     else {
-//    console.log("menu_onmouseover 5b " + menuoption)
+        //    console.log("menu_onmouseover 5b " + menuoption)
 
         //make the menu visible just to the right of the menu option
         leftoffset = menu.offsetWidth - menu.clientLeft - 8
@@ -4160,13 +4159,13 @@ function menufocus(menu) {
 
     //focus on the saved element (so that keyboard events get send to menu elements)
     //-1 to allow scripting focus without forming part of normal keyboard tab sequence
-    gmenuelement.tabIndex=-1
+    gmenuelement.tabIndex = -1
     try { gmenuelement.focus() } catch (e) { }
 
 }
 
 function menuonmouseout(event) {
-    event=getevent(event)
+    event = getevent(event)
 
     gnmenus = 0
     gmenutimeout = exodussettimeout('menuclose()', 1000)
@@ -4187,7 +4186,7 @@ function menuclose() {
 
 function menuonkeydown(event, menu, key) {
 
-    event=getevent(event)
+    event = getevent(event)
 
     //usually called as an event with no parameters
     //doesnt seem to work well except called as an event
@@ -4368,9 +4367,9 @@ function menuchangeoption(menu, newmenuoption) {
 
 function menubuttonhtml(id, imagesrc, name, title, accesskey, align) {
 
-    var tagname='span'
+    var tagname = 'span'
     //tagname='div'
-    var tx = '<'+tagname
+    var tx = '<' + tagname
 
     if (id)
         tx += ' id="' + id + 'button' + '"'
@@ -4384,17 +4383,17 @@ function menubuttonhtml(id, imagesrc, name, title, accesskey, align) {
         tx += ' title="' + title + '"'
 
     //there is no float:center?!
-    var style='white-space:nowrap'
+    var style = 'white-space:nowrap'
     if (align == 'center')
         //tx+=' style="float:'+align+'"'
         //tx+=' style="margin:0 auto"'
         //switch off the default from graphicbutton class?
-        style+=';float:none;clear:both;overflow:hidden'
+        style += ';float:none;clear:both;overflow:hidden'
     else if (align)
-        style+=''//';float:' + align
+        style += ''//';float:' + align
     //style=''
     if (style)
-        tx+=' style="' + style + '"'
+        tx += ' style="' + style + '"'
 
     if (accesskey)
         tx += ' accesskey="' + accesskey + '"'
@@ -4420,7 +4419,7 @@ function menubuttonhtml(id, imagesrc, name, title, accesskey, align) {
     tx += ' ' + name
     tx += '</span>'
 
-    tx += '</'+tagname+'>'
+    tx += '</' + tagname + '>'
 
     //create a tiny button to capture the accesskey to prevent it from being used by the browser
     //firefox access key is shift+alt unless reconfigured in about:config
@@ -4450,8 +4449,8 @@ function setgraphicbutton(button, labeltext, src) {
 
 function* refreshcache_onclick() {
     if (clearcache())
-        yield* exodusnote('All NEOSYS data cached in this window has been cleared\rand will be retrieved from the server again as and when required.')
-    // \r\rN.B. NEOSYS forms and scripts will remain cached and may\rbe updated when you close and reopen all browser\rwindows - depending on the cache settings in your browser.')
+        yield* exodusnote('All EXODUS data cached in this window has been cleared\rand will be retrieved from the server again as and when required.')
+    // \r\rN.B. EXODUS forms and scripts will remain cached and may\rbe updated when you close and reopen all browser\rwindows - depending on the cache settings in your browser.')
     else
         yield* exodusnote('Cannot clear cache.')
     return true
@@ -4460,7 +4459,7 @@ function* refreshcache_onclick() {
 function exoduscancelevent(event) {
 
     //should error maybe
-    event=getevent(event)
+    event = getevent(event)
     if (!event) {
         //console.log('exoduscancelevent QUITTING - no event!')
         return false
@@ -4494,9 +4493,9 @@ function getevent(event) {
     //if not passed event then try MSIE's window.event
     if (!event) {
         if (window.event)
-            event=window.event
+            event = window.event
         else
-            event=gevent
+            event = gevent
     }
 
     //if not given, and cannot get event then return empty object (with no target property)
@@ -4505,23 +4504,23 @@ function getevent(event) {
         return {}
 
     //if no target then try MSIE's window.srcElement
-    if (!event.target&&event.srcElement)
-        event.target=event.srcElement
+    if (!event.target && event.srcElement)
+        event.target = event.srcElement
 
     //if cannot find target then return empty object with target property of
     //so if passed an element then element.target is itself. usually the caller is looking for .target
     if (!event.target) {
-        var origevent=event
-        event={}
-        event.target=origevent
+        var origevent = event
+        event = {}
+        event.target = origevent
     }
 
     //defeat Safari 3 bug
-    if (event.target&&event.target.nodeType == 3)
+    if (event.target && event.target.nodeType == 3)
         event.target = event.target.parentNode;
 
     //return event (with .target)
-    gevent=event
+    gevent = event
     return event
 
 }
@@ -4570,56 +4569,56 @@ function id2classname(element) {
 function getmaxwindow_sync() {
 
     //maximum size is the size of the parent window
-    var parentwindow=window.opener
+    var parentwindow = window.opener
     //popups within popups are limited by the original window size not the immediate parent
-    while (parentwindow&&parentwindow.opener)
-        parentwindow=parentwindow.opener
+    while (parentwindow && parentwindow.opener)
+        parentwindow = parentwindow.opener
     //if .opener not supported
     if (!parentwindow) {
-        parentwindow=window.parent
-        while (parentwindow&&parentwindow.parent&&parentwindow!=parentwindow.parent)
-            parentwindow=parentwindow.parent
+        parentwindow = window.parent
+        while (parentwindow && parentwindow.parent && parentwindow != parentwindow.parent)
+            parentwindow = parentwindow.parent
     }
     if (!parentwindow)
-        systemerror('cannot find window.opener or window.parent','exodusautofitwindow')
+        systemerror('cannot find window.opener or window.parent', 'exodusautofitwindow')
 
-/*
-    if (window.opener) {
-//        alert('movetoXY:'+window.opener.screenX+' '+window.opener.screenY+'\rresizetoWH:'+window.opener.outerWidth+' '+window.opener.outerHeight)
-        window.moveTo(window.opener.screenX, window.opener.screenY)
-        window.resizeTo(window.opener.outerWidth, window.opener.outerHeight)
-    }
-*/
-    var max={}
+    /*
+        if (window.opener) {
+    //        alert('movetoXY:'+window.opener.screenX+' '+window.opener.screenY+'\rresizetoWH:'+window.opener.outerWidth+' '+window.opener.outerHeight)
+            window.moveTo(window.opener.screenX, window.opener.screenY)
+            window.resizeTo(window.opener.outerWidth, window.opener.outerHeight)
+        }
+    */
+    var max = {}
     try {
         //internet explorer gives permission denied when uploading files
-        max.width=parentwindow.outerWidth
-        max.height=parentwindow.outerHeight
+        max.width = parentwindow.outerWidth
+        max.height = parentwindow.outerHeight
         //max.height=parentwindow.innerHeight
-        max.left=parentwindow.screenLeft||parentwindow.screenX
-        max.top=parentwindow.screenTop||parentwindow.screenY
+        max.left = parentwindow.screenLeft || parentwindow.screenX
+        max.top = parentwindow.screenTop || parentwindow.screenY
         //max.top=max.top+(parentwindow.outerHeight-parentwindow.innerHeight)
         //alert('getmaxwindow_sync() max='+max.width+' '+max.height+' '+max.left+' '+max.top)
     } catch (e) {
     }
     if (!max.width) {
-        max.width=window.screen.availWidth
-        max.height=window.screen.availHeight
-        max.left=0
-        max.top=0
+        max.width = window.screen.availWidth
+        max.height = window.screen.availHeight
+        max.left = 0
+        max.top = 0
     }
-    max.style=';DialogHeight:'+max.height+'px; DialogWidth:'+max.width+'px;,'
-    max.style+=',width='+max.width
-    max.style+=',height='+max.height
-    max.style+=',left='+max.left//window.screenX
-    max.style+=',top='+max.top//window.screenY
+    max.style = ';DialogHeight:' + max.height + 'px; DialogWidth:' + max.width + 'px;,'
+    max.style += ',width=' + max.width
+    max.style += ',height=' + max.height
+    max.style += ',left=' + max.left//window.screenX
+    max.style += ',top=' + max.top//window.screenY
 
     return max
 }
 
 function exodusautofitwindow() {
 
-    gautofitwindowpending=false
+    gautofitwindowpending = false
 
     var element = $$('autofitwindowelement')
     if (!element)
@@ -4648,7 +4647,7 @@ function exodusautofitwindow() {
         newheight += 80
     }
 
-    var max=getmaxwindow_sync()
+    var max = getmaxwindow_sync()
 
     //constrain to screen size
     if (newwidth > max.width)
@@ -4660,7 +4659,7 @@ function exodusautofitwindow() {
     var newleft = max.left + (max.width - newwidth) / 2
     var newtop = max.top + (max.height - newheight) / 2
 
-console.log('autofitwindow: left:'+newleft+' top:'+newtop+' width:'+newwidth+' height:'+newheight)
+    console.log('autofitwindow: left:' + newleft + ' top:' + newtop + ' width:' + newwidth + ' height:' + newheight)
 
     //yield* debug(window.resizeTo)
     //w3c (but present in IE but doesnt work - so try both)
@@ -4669,7 +4668,7 @@ console.log('autofitwindow: left:'+newleft+' top:'+newtop+' width:'+newwidth+' h
         window.resizeTo(newwidth, newheight)
         window.moveTo(newleft, newtop)
         //ff on linux wont seem to do immediately
-        window.setTimeout('try{window.moveTo('+newleft+', '+newtop+')} catch(e){}',1)
+        window.setTimeout('try{window.moveTo(' + newleft + ', ' + newtop + ')} catch(e){}', 1)
     }
     catch (e) { }
     //msie (and later versions of FF3 but setting doesnt seem to work in 3.03)
@@ -4685,27 +4684,27 @@ console.log('autofitwindow: left:'+newleft+' top:'+newtop+' width:'+newwidth+' h
 }
 
 var gblockevents//stops onclick event at the same time as onfocus event
-function form_blockevents(truefalse,callinfo){
+function form_blockevents(truefalse, callinfo) {
 
-    var callername=''
+    var callername = ''
     if (form_blockevents.caller) {
-        callername=form_blockevents.caller.name
+        callername = form_blockevents.caller.name
     }
 
     if (!gblockevents)
-        gblockevents=0
+        gblockevents = 0
 
     if (truefalse) {
         ++gblockevents
-        logevent('-------->'+gblockevents+'         block '+callername+' '+callinfo)
+        logevent('-------->' + gblockevents + '         block ' + callername + ' ' + callinfo)
 
     } else {
         --gblockevents
-        logevent('         '+gblockevents+'<--------unblock '+callername+' '+callinfo)
+        logevent('         ' + gblockevents + '<--------unblock ' + callername + ' ' + callinfo)
     }
 
-    if (gblockevents<0)
-        gblockevents=0
+    if (gblockevents < 0)
+        gblockevents = 0
 
 }
 
@@ -4724,10 +4723,10 @@ function starteventhandler(eventfunctionname, functionx) {
     //   as the expression to the right of the yield statement
     return function exodus_anon_sync_event_handler(event) {
 
-        event=getevent(event)
+        event = getevent(event)
         //YIELD//console.log('\n--- Event '+event.type+' ---')
 
-        var eventdescription=event.type+' '+event.target.tagName+' id:'+event.target.id+' gblockevents:'+gblockevents
+        var eventdescription = event.type + ' ' + event.target.tagName + ' id:' + event.target.id + ' gblockevents:' + gblockevents
 
         //prevent events like onfocus being followed by onclick while
         //onfocus is yielding to async events like window.open etc
@@ -4739,8 +4738,8 @@ function starteventhandler(eventfunctionname, functionx) {
                 //always call unloadevents
                 //TODO create a new gcurrentevent?
 
-            //special treatment of events while exodusconfirm is up
-            } else if ($$('exodusconfirmdiv')){
+                //special treatment of events while exodusconfirm is up
+            } else if ($$('exodusconfirmdiv')) {
 
                 //allow mouse right click, copy of error message text etc.
                 if (event.type == 'copy')
@@ -4749,38 +4748,38 @@ function starteventhandler(eventfunctionname, functionx) {
                 if (event.type == 'keydown') {
 
                     //allow keyboard Ctrl+c to copy error message text etc.
-                    if (event.ctrlKey && event.which==67)
+                    if (event.ctrlKey && event.which == 67)
                         return true
 
                     var keycode = event.keyCode ? event.keyCode : event.which
                     var keyletter = String.fromCharCode(keycode).toUpperCase()
 
-                    logevent('exodus_anon_sync_event_handler+exodusconfirmdiv ' + event.target.id + ' ctrlKey:' + event.ctrlKey + ' key:' + keycode +' letter:'+keyletter)
+                    logevent('exodus_anon_sync_event_handler+exodusconfirmdiv ' + event.target.id + ' ctrlKey:' + event.ctrlKey + ' key:' + keycode + ' letter:' + keyletter)
 
                     //FIX detection of specific keys on buttons like Y N etc
 
                     //POSITIVE = F9 or Ctrl+Enter or SPACE some initial
-                    if (keycode == 120 || (keycode==13) || (keycode==32) || keyletter == gexodusconfirmletters[1]) {
-                        window.setTimeout('exodus_confirm_function1()',1)
+                    if (keycode == 120 || (keycode == 13) || (keycode == 32) || keyletter == gexodusconfirmletters[1]) {
+                        window.setTimeout('exodus_confirm_function1()', 1)
                         return exoduscancelevent(event)
                     }
 
                     //CANCEL = Esc or some initial
                     else if (keycode == 27 || keyletter == gexodusconfirmletters[3]) {
-                        window.setTimeout('exodus_confirm_function3()',1)
+                        window.setTimeout('exodus_confirm_function3()', 1)
                         return exoduscancelevent(event)
                     }
 
                     //NEGATIVE = F8 or some initial
                     else if (keycode == 119 || keyletter == gexodusconfirmletters[2]) {
-                        window.setTimeout('exodus_confirm_function2()',1)
+                        window.setTimeout('exodus_confirm_function2()', 1)
                         return exoduscancelevent(event)
                     }
                 }
             }
 
-            logevent('!!!SKIPPING event!!! '+ eventdescription + ' because gblockevents is set, and not keydown related to exodusconfirmdiv')
-            
+            logevent('!!!SKIPPING event!!! ' + eventdescription + ' because gblockevents is set, and not keydown related to exodusconfirmdiv')
+
             return exoduscancelevent(event)
 
         }//end of event blocking
@@ -4788,11 +4787,11 @@ function starteventhandler(eventfunctionname, functionx) {
         //events are not blocked - create a new event handler
 
         //make the global generator function (that can yield) and can be resumed by calling .next()
-        var eventhandler=functionx(event)
+        var eventhandler = functionx(event)
         if (!eventhandler) {
-            var msg1='exodus_anon_sync_event_handler '+eventfunctionname+' '+event.target
-            var msg2='cant create functionx '+functionx.name
-            logevent(msg1+' : '+msg2)
+            var msg1 = 'exodus_anon_sync_event_handler ' + eventfunctionname + ' ' + event.target
+            var msg2 = 'cant create functionx ' + functionx.name
+            logevent(msg1 + ' : ' + msg2)
             //systemerror(msg1,msg2)
 
         } else {
@@ -4800,17 +4799,17 @@ function starteventhandler(eventfunctionname, functionx) {
             //start the event, result will be that provided by the FIRST yield
             //we cant run the event to completion if there is more than one yield
             //var next=exodus_next('exodus_anon_sync_event_handler for '+eventdescription)
-            var next=exodusneweventhandler(eventhandler,eventdescription+' in exodus_anon_sync_event_handler')
-            var result=next.value
+            var next = exodusneweventhandler(eventhandler, eventdescription + ' in exodus_anon_sync_event_handler')
+            var result = next.value
 
             //onbeforeunload may return text immediately so return that
             if (result)
-                event.returnValue=result//what exactly does this do?
+                event.returnValue = result//what exactly does this do?
             else
-                result=false
+                result = false
 
-//            logevent('<<<<<<<<<< '+eventdescription + ' NEW EVENT HANDLER in exodus_anon_sync_event_handler')
-//            logevent('           done:'+next.done+ ' result:'+result)
+            //            logevent('<<<<<<<<<< '+eventdescription + ' NEW EVENT HANDLER in exodus_anon_sync_event_handler')
+            //            logevent('           done:'+next.done+ ' result:'+result)
 
             return result
 
@@ -4819,17 +4818,17 @@ function starteventhandler(eventfunctionname, functionx) {
 }
 
 var geventhandler
-var geventn=0
+var geventn = 0
 
-function exodusneweventhandler(eventhandler,location) {
+function exodusneweventhandler(eventhandler, location) {
 
     ++geventn
     logevent(' ')
-    logevent('=== NEW EVENT HANDLER '+geventn+' for '+location+'===')
-    geventhandler=eventhandler
+    logevent('=== NEW EVENT HANDLER ' + geventn + ' for ' + location + '===')
+    geventhandler = eventhandler
 
     //run the generator function to first yield or completion if no yielding
-    var next=exodus_next('','exodusneweventhandler from '+location)
+    var next = exodus_next('', 'exodusneweventhandler from ' + location)
 
     //code will continue immediately here after completion or yielding of the function
     //IF the function yielded to window.open for example
@@ -4840,28 +4839,28 @@ function exodusneweventhandler(eventhandler,location) {
 function addeventlistener(element, eventname, functionx) {
 
     if (!element)
-        systemerror('addeventlistener '+eventname+' '+functionx,'element is missing')
+        systemerror('addeventlistener ' + eventname + ' ' + functionx, 'element is missing')
 
     //logevent('addeventlistener:'+(element.id||element.name||element.tagName||window)+','+eventname+'->'+functionx)
 
     if (typeof functionx == 'string') {
         //element.setAttribute('on'+eventname,functionx+'(event)')
         //return
-        functionxname=functionx
+        functionxname = functionx
         functionx = window[functionx]
         if (!functionx)
-            systemerror('error: in addeventlistener '+ functionxname+' function does not exist')
+            systemerror('error: in addeventlistener ' + functionxname + ' function does not exist')
         if (guseyield)
             functionx = starteventhandler(eventname, functionx)
     }
 
     //normally using bubbling style but focus event doesnt bubble so we use capture style for that
-    var capture=eventname=='focus'
+    var capture = eventname == 'focus'
 
     if (element.addEventListener)
         element.addEventListener(eventname, functionx, capture)//FF/Safari/IE9+
     else if (element.attachEvent)//pre IE9
-    //if cant attachEvent then possibly it isnt a DOM element
+        //if cant attachEvent then possibly it isnt a DOM element
         element.attachEvent('on' + eventname, functionx)
     //else
     //run function in the environment of the element
@@ -4889,31 +4888,31 @@ return attribute
 */
 
 //used anywhere yet?
-function SetAttribute( element, attName, attValue ) {
+function SetAttribute(element, attName, attValue) {
 
-	if ( attValue == null || attValue.length == 0 )
-		element.removeAttribute( attName, 0 ) ;			// 0 : Case Insensitive
-	else
-		element.setAttribute( attName, attValue, 0 ) ;	// 0 : Case Insensitive
+    if (attValue == null || attValue.length == 0)
+        element.removeAttribute(attName, 0);			// 0 : Case Insensitive
+    else
+        element.setAttribute(attName, attValue, 0);	// 0 : Case Insensitive
 }
-function GetAttribute( element, attName, valueIfNull ) {
+function GetAttribute(element, attName, valueIfNull) {
 
-	var oAtt = element.attributes[attName] ;
+    var oAtt = element.attributes[attName];
 
-	if ( oAtt == null || !oAtt.specified )
-		return valueIfNull ? valueIfNull : '' ;
+    if (oAtt == null || !oAtt.specified)
+        return valueIfNull ? valueIfNull : '';
 
-	var oValue = element.getAttribute( attName, 2 ) ;
+    var oValue = element.getAttribute(attName, 2);
 
-	if ( oValue == null )
-		oValue = oAtt.nodeValue ;
+    if (oValue == null)
+        oValue = oAtt.nodeValue;
 
-	return ( oValue == null ? valueIfNull : oValue ) ;
+    return (oValue == null ? valueIfNull : oValue);
 }
 
-function  exodusremoveelementsbyid(id) {
+function exodusremoveelementsbyid(id) {
     while (true) {
-        var tt=document.getElementById(id)
+        var tt = document.getElementById(id)
         if (!tt)
             break
         tt.parentNode.removeChild(tt)
@@ -4925,17 +4924,17 @@ function exodusremovenode(element) {
 }
 
 function HTMLEncode(text) {
-	if ( !text )
-		return ''
+    if (!text)
+        return ''
     //&amp first
-	return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
 
 function HTMLDecode(text) {
-	if ( !text )
-		return ''
+    if (!text)
+        return ''
     //&amp; last
-	return text.replace(/&gt;/g,'>').replace(/&lt;/g,'<').replace(/&amp;/g,'&')
+    return text.replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/&amp;/g, '&')
 }
 
 function exodusint2date(exodusdate) {
@@ -4958,48 +4957,48 @@ function exodusint2date(exodusdate) {
 
 //thin wrapper to handle timeouts with/without yielding code
 //command should be in text format so that functions will have yield * prefixed by converter to yielding code
-function exodussettimeout( command,milliseconds) {
+function exodussettimeout(command, milliseconds) {
     if (glogsettimeout)
-        console.log('exodussetimeout('+command+')')
+        console.log('exodussetimeout(' + command + ')')
     //if (typeof command=='string' && command.slice(0,7)=='yield * ') {
     //    command=command.slice(7).replace(/"/g,"'")
-    if (typeof command=='string' && command.match(gyieldregex)) {
-        command=command.replace(gyieldregex,'').replace(/"/g,"'")
-        return window.setTimeout('exodustimeout_sync("'+command+'")',milliseconds)
+    if (typeof command == 'string' && command.match(gyieldregex)) {
+        command = command.replace(gyieldregex, '').replace(/"/g, "'")
+        return window.setTimeout('exodustimeout_sync("' + command + '")', milliseconds)
     } else
         //eval directly if not prefixed by "yield * '
-        return window.setTimeout(command,milliseconds)
+        return window.setTimeout(command, milliseconds)
 }
 
 //sync function called on timeout in yielding code
 //spins off an async/yielding function
 function exodustimeout_sync(command) {
 
-    logevent('exodustimeout_sync:geventhandler.done:'+geventhandler.done)
+    logevent('exodustimeout_sync:geventhandler.done:' + geventhandler.done)
 
     //if another event handler is already running then defer execution for 100ms
     if (gblockevents) {
-        window.setTimeout('exodustimeout_sync("'+command+'")',100)
+        window.setTimeout('exodustimeout_sync("' + command + '")', 100)
         return
     }
 
     //the async function should run to completion
     // even if it pauses for multiple async operations on the way.
     //command MUST be prefixed with "yield *" and return a generator
-    var generator=eval(command);
-    exodusneweventhandler(generator,'exodustimeout_sync() '+command)//yielding code
+    var generator = eval(command);
+    exodusneweventhandler(generator, 'exodustimeout_sync() ' + command)//yielding code
     //not interested in result
 }
 
 //thin wrapper to handle timeouts with/without yielding code
-function exodussetinterval(command,milliseconds) {
+function exodussetinterval(command, milliseconds) {
     //if (typeof command=='string' && command.slice(0,7)=='yield * ') {
     //    command=command.slice(7).replace(/"/g,"'")
-    if (typeof command=='string' && command.match(gyieldregex)) {
-        command=command.replace(gyieldregex,'').replace(/"/g,"'")
-        return window.setInterval('exodusinterval_sync("'+command+'")',milliseconds)
+    if (typeof command == 'string' && command.match(gyieldregex)) {
+        command = command.replace(gyieldregex, '').replace(/"/g, "'")
+        return window.setInterval('exodusinterval_sync("' + command + '")', milliseconds)
     } else
-        return window.setInterval(command,milliseconds)
+        return window.setInterval(command, milliseconds)
 }
 
 //sync function called at intervals in yielding code
@@ -5016,8 +5015,8 @@ function exodusinterval_sync(command) {
     //We create a new generator object each interval
     //We do not create one generator and call its .next() each interval
     //command MUST be prefixed with "yield *" and return a generator
-    var generator=eval(command);
-    exodusneweventhandler(generator,'exodusinterval_sync() '+command)//yielding code
+    var generator = eval(command);
+    exodusneweventhandler(generator, 'exodusinterval_sync() ' + command)//yielding code
     //not interested in result
 }
 
@@ -5025,45 +5024,45 @@ function systemerror(functionname, e) {
     if (typeof functionname == 'undefined')
         functionname = 'undefined'
     //if error generated by user cancelling a server request then try to ignore the error
-    if (functionname=='Cancelled')
+    if (functionname == 'Cancelled')
         return
     if (typeof e == 'undefined')
         e = ''
-    var msg=e.toString()
+    var msg = e.toString()
     //if (e.name)
     //    msg+='\n'+e.name
     //if (e.message)
     //    msg+='\nError '+e.message
     if (e.fileName)
-        msg+='\nFilename '+e.fileName
+        msg += '\nFilename ' + e.fileName
     if (!e.stack && e.lineNumber)
-        msg+=' Line No. '+e.lineNumber
+        msg += ' Line No. ' + e.lineNumber
     if (!e.stack && e.columnNumber)
-        msg+=' Column No. '+e.columnNumber
+        msg += ' Column No. ' + e.columnNumber
     if (e.stack)
-        msg+='\n'+e.stack
+        msg += '\n' + e.stack
     else {
-        var stack=new Error().stack
+        var stack = new Error().stack
         if (stack)
-            msg+='\n\n'+stack.toString()//.exodusconvert('\n\r','||')
+            msg += '\n\n' + stack.toString()//.exodusconvert('\n\r','||')
         else {
             var caller
             if (arguments && arguments.callee)
-                caller=arguments.callee
+                caller = arguments.callee
             else if (systemerror && systemerror.caller)
-                caller=systemerror.caller
+                caller = systemerror.caller
             if (caller)
-                msg+='\n'
+                msg += '\n'
             while (caller) {
-                msg+='\n'+caller.toString().split('\n')[0]
-                caller=caller.caller
-           }
+                msg += '\n' + caller.toString().split('\n')[0]
+                caller = caller.caller
+            }
         }
     }
     if (!gonunload)
         alert('System Error in ' + functionname + '\n' + msg)
-    //if (gstepping||(!ginitok&&gusername=='NEOSYS')) crashhere2
-    if (gstepping || (gusername == 'NEOSYS') || (gdataset && gdataset.slice(-4) == 'TEST'))
+    //if (gstepping||(!ginitok&&gusername=='EXODUS')) crashhere2
+    if (gstepping || (gusername == 'EXODUS') || (gdataset && gdataset.slice(-4) == 'TEST'))
         exodus_javascript_system_error
 }
 
@@ -5094,8 +5093,8 @@ function $all(elementid, element) {
         */
     }
     else
-    //should this be changed to [elementid] similar to above
-    // or is it supposed to return element it only 1 and array if more than one
+        //should this be changed to [elementid] similar to above
+        // or is it supposed to return element it only 1 and array if more than one
         return element.all(elementid)
 }
 
@@ -5142,7 +5141,7 @@ function setdisabledandhidden(element, truefalse) {
 //cross browser
 function* getcurrentstyle(element) {
     if (window.getComputedStyle)
-        return document.defaultView.getComputedStyle(element,null)
+        return document.defaultView.getComputedStyle(element, null)
     if (element.currentStyle)
         return element.currentStyle
 }
@@ -5150,18 +5149,18 @@ function* getcurrentstyle(element) {
 //firefox innertext doesnt work like internet explorer and webkit (chrome/safari)
 //need BR to show as \n
 function exodus_getinnertext(element) {
-    if (element.tagName=='BR')
+    if (element.tagName == 'BR')
         return '\n'
-    if (typeof element.nodeValue=='string')
+    if (typeof element.nodeValue == 'string')
         return element.nodeValue
-    var nodes=element.childNodes
+    var nodes = element.childNodes
     if (!nodes)
         return ''
-    var text=''
-    for (var noden=0;noden<nodes.length;++noden) {
-    //for (var noden=0;noden<nodes.length;++noden) {
+    var text = ''
+    for (var noden = 0; noden < nodes.length; ++noden) {
+        //for (var noden=0;noden<nodes.length;++noden) {
         //alert(nodes[node].tagName+' '+nodes[node].textContent)
-        text+=exodus_getinnertext(nodes[noden])//recursive
+        text += exodus_getinnertext(nodes[noden])//recursive
         //alert(text)
     }
     return text
@@ -5176,12 +5175,12 @@ function* exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebut
 
     var decide_args//holds popup list args if any
 
-    if (typeof questionx=='object') {
+    if (typeof questionx == 'object') {
 
         //[question, data, cols, returncoln, defaultreply, many, inverted]
-        decide_args=questionx
-        questionx=decide_args[0]
-        var decide_returnmany=decide_args[5]
+        decide_args = questionx
+        questionx = decide_args[0]
+        var decide_returnmany = decide_args[5]
 
         //question
         if (!questionx)
@@ -5191,12 +5190,12 @@ function* exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebut
         //    questionx += '&nbsp;&nbsp;<span style="font-size:66%">(A=All)</span>'
 
     } else
-        var decide_args=undefined
+        var decide_args = undefined
 
-    var nbuttons=0
-    var buttons=[]
+    var nbuttons = 0
+    var buttons = []
 
-    gexodusconfirmletters=[]
+    gexodusconfirmletters = []
 
     //check buttons
     if (positivebuttonx)
@@ -5205,35 +5204,35 @@ function* exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebut
         nbuttons++
     if (cancelbuttonx)
         nbuttons++
-    if (nbuttons==0) {
-        positivebuttonx='<u>Y</u>es'
-        negativebuttonx='<u>N</u>o'
-        cancelbuttonx='<u>C</u>ancel'
-        nbuttons=3
+    if (nbuttons == 0) {
+        positivebuttonx = '<u>Y</u>es'
+        negativebuttonx = '<u>N</u>o'
+        cancelbuttonx = '<u>C</u>ancel'
+        nbuttons = 3
     }
 
     var istextinput = typeof text != 'undefined' && text != null
 
     //create a centralised div with the appropriate buttons or input box
-    var div=document.createElement('div')
-    div.id='exodusconfirmdiv'
-    div.style.zIndex=200
-    div.style.position='fixed'
-    div.style.textAlign='center'
-    div.style.background='lightgrey'
-    div.style.border='1px solid grey'
-    div.style.padding='10px'
-    div.style.boxShadow='0px 0px 7px #666666'
+    var div = document.createElement('div')
+    div.id = 'exodusconfirmdiv'
+    div.style.zIndex = 200
+    div.style.position = 'fixed'
+    div.style.textAlign = 'center'
+    div.style.background = 'lightgrey'
+    div.style.border = '1px solid grey'
+    div.style.padding = '10px'
+    div.style.boxShadow = '0px 0px 7px #666666'
     //div.style.fontSize=25//had no effect
-    div.style.maxHeight=(window.innerHeight-50)+'px'
-    div.style.maxWidth=window.innerWidth+'px'
+    div.style.maxHeight = (window.innerHeight - 50) + 'px'
+    div.style.maxWidth = window.innerWidth + 'px'
     //div.style.maxHeight=(window.outerHeight-50)+'px'
     //div.style.maxWidth=window.outerWidth+'px'
-    div.style.overflow='auto'
+    div.style.overflow = 'auto'
 
     //image
 
-    var html=''
+    var html = ''
     if (!imagesrc && (questionx.indexOf('!') + 1 || questionx.toLowerCase().indexOf('are you sure ') + 1 || questionx.toLowerCase().indexOf('warning') + 1))
         imagesrc = 'warning'
     else if (!imagesrc) {
@@ -5262,16 +5261,16 @@ function* exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebut
         }
         if (!(imagesrc.indexOf('/') + 1 + imagesrc.indexOf('\\') + 1)) {
             imagesrc = gimagetheme + imagesrc
-            if (window.location.href.toString().indexOf('default.htm')>=0)
-                imagesrc=imagesrc.slice(3)
+            if (window.location.href.toString().indexOf('default.htm') >= 0)
+                imagesrc = imagesrc.slice(3)
         }
-        html+='<img src="'+imagesrc+'" alt="" xstyle="display: none" height="32" width="32" />'
+        html += '<img src="' + imagesrc + '" alt="" xstyle="display: none" height="32" width="32" />'
     }
-    var imagehtml=html
+    var imagehtml = html
 
     //question
 
-    var html=''
+    var html = ''
     questionx = questionx.replace(/\r\n/g, '\r')
     questionx = questionx.replace(/\r\r/g, '<p />')
     questionx = questionx.replace(/\r/g, '<br />')
@@ -5284,15 +5283,15 @@ function* exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebut
     var questionhtml = questionx
 
     //buttons
-    var html=''
+    var html = ''
     if (!decide_args) {
-        var nbuttons=0
+        var nbuttons = 0
         if (positivebuttonx)
-            yield* addbutton('positive',1,positivebuttonx,'F9')
+            yield* addbutton('positive', 1, positivebuttonx, 'F9')
         if (negativebuttonx)
-            yield* addbutton('negative',2,negativebuttonx,'F8')
+            yield* addbutton('negative', 2, negativebuttonx, 'F8')
         if (cancelbuttonx)
-            yield* addbutton('cancel',3,cancelbuttonx,'Esc')
+            yield* addbutton('cancel', 3, cancelbuttonx, 'Esc')
 
         //make sure no button is default unless specified
         if (!defaultbuttonn) {
@@ -5304,47 +5303,47 @@ function* exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebut
             }
         }
     }
-    var buttonshtml=html
-    html=''
+    var buttonshtml = html
+    html = ''
 
-    function* addbutton(buttonid,buttonn,buttontext,buttonfunckey) {
+    function* addbutton(buttonid, buttonn, buttontext, buttonfunckey) {
 
         nbuttons++
 
-        html+='<span id="'+buttonid+'button"'
+        html += '<span id="' + buttonid + 'button"'
 
-        html+=' tabindex="0"'
-        html+=' class="graphicbutton"'
+        html += ' tabindex="0"'
+        html += ' class="graphicbutton"'
 
         //mouse events down/up/out/click
-        html+=' onmousedown="this.style.borderStyle=\'inset\'"'
-        html+=' onmouseup="this.style.borderStyle=\'outset\'"'
-        html+=' onmouseout="this.style.borderStyle=\'outset\'"'
-        html+=' onclick="exodus_confirm_function'+buttonn+'()"'
+        html += ' onmousedown="this.style.borderStyle=\'inset\'"'
+        html += ' onmouseup="this.style.borderStyle=\'outset\'"'
+        html += ' onmouseout="this.style.borderStyle=\'outset\'"'
+        html += ' onclick="exodus_confirm_function' + buttonn + '()"'
 
         //letter
-        var letter=buttontext.match(/(<[uU]>)(.)/)
+        var letter = buttontext.match(/(<[uU]>)(.)/)
         if (letter)
-            letter=letter[2]
+            letter = letter[2]
         else if (!istextinput)
-            letter=buttontext.substr(0,1)
+            letter = buttontext.substr(0, 1)
         if (letter) {
-            letter=letter.toUpperCase()
-            html+=' exodusletter="'+letter+'"'
+            letter = letter.toUpperCase()
+            html += ' exodusletter="' + letter + '"'
         }
-        gexodusconfirmletters[buttonn]=letter
+        gexodusconfirmletters[buttonn] = letter
 
         //title
-        html+='title="Press '
+        html += 'title="Press '
         if (letter)
-            html+=letter+' or '
-        html+=buttonfunckey+'"'
+            html += letter + ' or '
+        html += buttonfunckey + '"'
 
         //set the button number
-        html+=' exodusbuttonnumber="'+nbuttons+'"'
-        html+=' exodusyesnocancel="'+(buttonn%3)+'"'
+        html += ' exodusbuttonnumber="' + nbuttons + '"'
+        html += ' exodusyesnocancel="' + (buttonn % 3) + '"'
 
-        html+='>'+buttontext+'</span>'
+        html += '>' + buttontext + '</span>'
 
         //array of visible buttons
         //buttons[buttons.length] = button
@@ -5358,22 +5357,22 @@ function* exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebut
     }//end of addbutton
 
     //template for html framework
-    var html='\
+    var html = '\
             <table cellspacing="1" cellpadding="1">\
             <tr align="left" width="5%">\
                 <td style="vertical-align: middle;padding: 20px">\
-                    '+imagehtml+'\
+                    '+ imagehtml + '\
                 </td>\
                 <td>\
                     <div class="statementclass" id="question1">\
-                    '+questionhtml+'\
+                    '+ questionhtml + '\
                     </div>\
                 </td>\
             </tr>'
 
     //add an empty table for any decide options
     if (decide_args) {
-        html+='\
+        html += '\
             <tr>\
             <td colspan=2 align="center">\
             <table id="decide_table1" xwidth=100% xclass="exodusform" border="1" bordercolor="#d0d0d0" cellspacing="0" xcellpadding="0">\
@@ -5407,7 +5406,7 @@ function* exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebut
 
     //OK/Cancel/Print buttons at the bottom
     else {
-        html+='\
+        html += '\
                 <tr>\
                     <td>\
                         &nbsp;\
@@ -5420,7 +5419,7 @@ function* exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebut
                             <input type="password" size="60" id="textinputhidden" id="textinputhidden" />\
                         </p>\
                         <span id="yesnocancelbuttons">\
-                            '+buttonshtml+'\
+                            '+ buttonshtml + '\
                         </span>\
                     </td>\
                 </tr>\
@@ -5428,7 +5427,7 @@ function* exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebut
     }
 
     //finally create the div body
-    div.innerHTML=html
+    div.innerHTML = html
 
     //insert and centralise the div after it has autosized itself
     document.body.insertBefore(div, null)
@@ -5438,19 +5437,19 @@ function* exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebut
 
         //build rows, or if only one option, then obtain the response
         /////////////////////////////////////////////////////////////
-        var response=decide_onload(decide_args)
+        var response = decide_onload(decide_args)
 
         //return only option
         // quit if false ie failed to load eg no options
-        if (typeof response!='undefined'){
+        if (typeof response != 'undefined') {
             exodusremovenode(div)
             return response
         }
 
     }
 
-    var top = window.innerHeight/2 - div.offsetHeight/2
-    var left = window.innerWidth/2 - div.offsetWidth/2
+    var top = window.innerHeight / 2 - div.offsetHeight / 2
+    var left = window.innerWidth / 2 - div.offsetWidth / 2
     div.style.top = top + 'px'
     div.style.left = left + 'px'
 
@@ -5469,7 +5468,7 @@ function* exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebut
     //2. keyword "yield" causes crash in internet explorer so it will be commented out in /2/ version
     //////////////////////////////////////////////////////////////////////////////////////////////////
 
-    var response=yield* exodus_yield('exodusconfirm2')
+    var response = yield* exodus_yield('exodusconfirm2')
 
     exodusremovenode(div)
 
@@ -5482,7 +5481,7 @@ function* exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebut
     //no response treated same as cancel button (0) or '' if popup list
     if (!response) {
         if (decide_args)
-            response=''
+            response = ''
         else
             response = 0
     }
@@ -5492,25 +5491,25 @@ function* exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebut
 
 //return 1
 function exodus_confirm_function1(event) {
-    return exodus_confirm_function(1,event)
+    return exodus_confirm_function(1, event)
 }
 
 //return 2
 function exodus_confirm_function2(event) {
-    return exodus_confirm_function(2,event)
+    return exodus_confirm_function(2, event)
 }
 
 //return 0
 function exodus_confirm_function3(event) {
-    return exodus_confirm_function(0,event)
+    return exodus_confirm_function(0, event)
 }
 
-function exodus_confirm_function(buttonno,event) {
+function exodus_confirm_function(buttonno, event) {
 
-    console.log('exodus_confirm_function buttonno:'+buttonno)
-    event=getevent(event)
+    console.log('exodus_confirm_function buttonno:' + buttonno)
+    event = getevent(event)
     exoduscancelevent(event)
-    exodus_resume(buttonno,'exodus_confirm_function')
+    exodus_resume(buttonno, 'exodus_confirm_function')
 }
 
 //backpage when popup is up should remove the popup and NOT backpage
@@ -5525,11 +5524,11 @@ function cancel_backpage_event(event) {
         history.back()
         return
     }
-    
+
     //remove the popup and its controlling generator/coroutine
     //exodusremovenode(exodusconfirmdiv)
     //geventhandler = false
-    exodus_resume(false,'cancel_backpage_event')
+    exodus_resume(false, 'cancel_backpage_event')
 
     //make sure there is some history remains
     history.pushState(null, null, window.location.pathname);
@@ -5598,7 +5597,7 @@ function decide_onload(decide_args) {
     //convert numerical column number to colid
     if (typeof decide_returncolid == 'number') {
         var tt = cols[decide_returncolid]
-	//dont convert if column ids are numeric since presumably the returncolid is an id not a columnno
+        //dont convert if column ids are numeric since presumably the returncolid is an id not a columnno
         if (tt && tt[0] && !exodusnum(tt[0]))
             decide_returncolid = tt[0]
     }
@@ -5622,24 +5621,24 @@ function decide_onload(decide_args) {
     oCell.align = 'center'
     if (decide_returnmany)
         var tt = '<button'
-        + ' title="Press A for All"'
-        //+ ' onclick="decide_all_onclick()"'
-        + ' style="font-size:80%"'
-        + '>All</button>'
+            + ' title="Press A for All"'
+            //+ ' onclick="decide_all_onclick()"'
+            + ' style="font-size:80%"'
+            + '>All</button>'
     else
         var tt = '&nbsp;'
     oCell.innerHTML = tt
     oRow.appendChild(oCell)
 
     if (decide_returnmany)
-        oCell.getElementsByTagName('button')[0].onclick=decide_all_onclick
+        oCell.getElementsByTagName('button')[0].onclick = decide_all_onclick
 
     //add a column to show the order of selections
     if (decide_returnmany) {
         var oCell = document.createElement('th')
         oCell.align = 'center'
         if (decide_returnmany)
-        oRow.appendChild(oCell)
+            oRow.appendChild(oCell)
     }
 
     //add other column headings
@@ -5658,7 +5657,7 @@ function decide_onload(decide_args) {
         oCell.innerHTML = title
         oRow.appendChild(oCell)
 
-        if (!cols[ii][3] && cols[ii][2] && ( cols[ii][2] == 'DATE' || cols[ii][2] == 'TIME'))
+        if (!cols[ii][3] && cols[ii][2] && (cols[ii][2] == 'DATE' || cols[ii][2] == 'TIME'))
             cols[ii][3] = 'right'
 
         //check colid is in data
@@ -5679,7 +5678,7 @@ function decide_onload(decide_args) {
 
     var table1body1x = $$('decide_table1body1')
 
-    var optionno=0
+    var optionno = 0
 
     //rows
     var nrows = decide_inverted ? data[cols[0][0]].length : data.length
@@ -5702,7 +5701,7 @@ function decide_onload(decide_args) {
         }
 
         //hide checkboxes on rows with nothing to return
-        var visibilityhidden=''
+        var visibilityhidden = ''
         if (decide_returncolid) {
             if (decide_returnmany)
                 //visibilityhidden = returnvalue ? '' : 'onclick="decide_checkbox_select()"'
@@ -5713,7 +5712,7 @@ function decide_onload(decide_args) {
 
         //create a new row
         var oRow = document.createElement('tr')
-        oRow.setAttribute('decide_row',rown)
+        oRow.setAttribute('decide_row', rown)
 
         table1body1x.appendChild(oRow)
 
@@ -5722,9 +5721,9 @@ function decide_onload(decide_args) {
         oRow.appendChild(oCell)
         //if (decide_returnmany)
 
-        oCell.id='decide_optionno'
-        oCell.name='decide_optionno'
-        oCell.setAttribute('name','decide_optionno')
+        oCell.id = 'decide_optionno'
+        oCell.name = 'decide_optionno'
+        oCell.setAttribute('name', 'decide_optionno')
         if (visibilityhidden) {
             if (decide_returnmany)
                 optionno++
@@ -5732,7 +5731,7 @@ function decide_onload(decide_args) {
         }
         else {
             optionno++
-            oCell.setAttribute('decide_optionno',optionno)
+            oCell.setAttribute('decide_optionno', optionno)
             oCell.innerHTML = optionno + "."
         }
 
@@ -5740,10 +5739,10 @@ function decide_onload(decide_args) {
         var oCellx = document.createElement('td')
         oRow.appendChild(oCellx)
 
-        var event_handler=undefined
+        var event_handler = undefined
         if (decide_returnmany) {
             oCellx.innerHTML = '<input ' + visibilityhidden + ' id="decide_selection" name="decide_selection" type="checkbox" />'
-            event_handler=decide_checkbox_select
+            event_handler = decide_checkbox_select
         }
         else {
             var checked = ''
@@ -5755,33 +5754,33 @@ function decide_onload(decide_args) {
             }
             //oCellx.innerHTML = '<input ' + checked + ' ' + visibilityhidden + ' id=decide_selection name=decide_selection type=radio onmousedown="decide_radio_onmousedown_sync(this)" />'
             oCellx.innerHTML = '<input ' + checked + ' ' + visibilityhidden + ' id="decide_selection" name="decide_selection" type="radio" />'
-            event_handler=decide_radio_select
+            event_handler = decide_radio_select
         }
 
-        var oCellxInput=oCellx.getElementsByTagName('input')[0]
+        var oCellxInput = oCellx.getElementsByTagName('input')[0]
         if (event_handler)
             //oCellxInput.onclick=event_handler
-            oCellxInput.onmousedown=event_handler
+            oCellxInput.onmousedown = event_handler
         //addeventlistener(oCellxInput,'click',event_handler)
-        oCellxInput.setAttribute('decide_optionno',optionno)
+        oCellxInput.setAttribute('decide_optionno', optionno)
 
         if (defaultreply && defaultreply.exoduslocate(returnvalue))
             oCellx.firstChild.checked = true
 
-        oCellx.firstChild.setAttribute('decide_returnvalue',returnvalue)
+        oCellx.firstChild.setAttribute('decide_returnvalue', returnvalue)
 
         var singlereturnvalue
         if (returnvalue) {
-            if (typeof singlereturnvalue=='undefined')
-                singlereturnvalue=returnvalue
+            if (typeof singlereturnvalue == 'undefined')
+                singlereturnvalue = returnvalue
             else
-                singlereturnvalue=false
+                singlereturnvalue = false
         }
 
         //add a column to show the order of selections
         if (decide_returnmany) {
             var oCell = document.createElement('td')
-            oCell.setAttribute('name','decide_rank')
+            oCell.setAttribute('name', 'decide_rank')
             oCell.align = 'center'
             oRow.appendChild(oCell)
         }
@@ -5816,7 +5815,7 @@ function decide_onload(decide_args) {
             //use innerText otherwise things like <> in the data do not show
             //oCell.innerText = value
             //oCell.innerHTML = value.exodusconvert(vm+sm+tm,'   ')
-            value = value.replace(ALLFMre,'<br/>')
+            value = value.replace(ALLFMre, '<br/>')
             oCell.innerHTML = value
 
             //align
@@ -5848,18 +5847,18 @@ function decide_onload(decide_args) {
 
     }
 
-    var okbutton= $$('decide_okbutton')
-    okbutton.onclick=decide_ok_onclick
+    var okbutton = $$('decide_okbutton')
+    okbutton.onclick = decide_ok_onclick
 
-    var cancelbutton= $$('decide_cancelbutton')
-    cancelbutton.onclick=decide_cancel_onclick
+    var cancelbutton = $$('decide_cancelbutton')
+    cancelbutton.onclick = decide_cancel_onclick
 
     //autoselect only one option
     if (singlereturnvalue) {
         if (decide_returnmany)
-            singlereturnvalue=[singlereturnvalue]
+            singlereturnvalue = [singlereturnvalue]
         return singlereturnvalue
-    } else if (typeof singlereturnvalue=='undefined') {
+    } else if (typeof singlereturnvalue == 'undefined') {
         alert('No data, no options available')
         return false
     }
@@ -5869,11 +5868,11 @@ function decide_onload(decide_args) {
     var selections = document.getElementsByName('decide_selection')
 
     //focus on the first checked item or the first rown
-    for (var ii=0;ii<selections.length;++ii)
+    for (var ii = 0; ii < selections.length; ++ii)
         if (selections[ii].checked)
             break
-    if (ii>=selections.length)
-        ii=0
+    if (ii >= selections.length)
+        ii = 0
     //selections[ii].focus()
     client_focuson(selections[ii])
 
@@ -5884,12 +5883,12 @@ function decide_onload(decide_args) {
         history.pushState(null, null, window.location.pathname);
     }
 
-    addeventlistener(exodusconfirmdiv,'keydown',decide_document_onkeydown)
-    addeventlistener(exodusconfirmdiv,'keyup',decide_document_onkeyup)
-    addeventlistener(exodusconfirmdiv,'click',decide_document_onclick)
-    addeventlistener(exodusconfirmdiv,'dblclick',decide_document_ondblclick)
-    addeventlistener(exodusconfirmdiv,'mouseover',decide_document_onmouseover)
-    addeventlistener(exodusconfirmdiv,'mouseout',decide_document_onmouseout)
+    addeventlistener(exodusconfirmdiv, 'keydown', decide_document_onkeydown)
+    addeventlistener(exodusconfirmdiv, 'keyup', decide_document_onkeyup)
+    addeventlistener(exodusconfirmdiv, 'click', decide_document_onclick)
+    addeventlistener(exodusconfirmdiv, 'dblclick', decide_document_ondblclick)
+    addeventlistener(exodusconfirmdiv, 'mouseover', decide_document_onmouseover)
+    addeventlistener(exodusconfirmdiv, 'mouseout', decide_document_onmouseout)
 
     //returning undefined indicates that we need to yield and wait for decide_ok_onclick etc to resume
     //returning false indicates some problem
@@ -5906,11 +5905,11 @@ function decide_onload(decide_args) {
         //have to clear all existing ranking first
         decide_all_clear()
 
-        var lastrank=0
+        var lastrank = 0
         if (truefalse) {
             for (var ii = 0; ii < selections.length; ii++)
                 //selections[ii].checked = truefalse
-                lastrank=decide_checkbox_select(event,selections[ii],truefalse,ii,lastrank)
+                lastrank = decide_checkbox_select(event, selections[ii], truefalse, ii, lastrank)
         }
     }
 
@@ -5918,58 +5917,58 @@ function decide_onload(decide_args) {
         selections = document.getElementsByName('decide_selection')
         ranks = document.getElementsByName('decide_rank')
         for (var ii = 0; ii < selections.length; ii++) {
-            var element=selections[ii]
-            element.checked=false
-            var rowtag=getancestor(element,'tr')
-            rowtag.style.fontWeight='normal'
-            ranks[ii].innerText=''
+            var element = selections[ii]
+            element.checked = false
+            var rowtag = getancestor(element, 'tr')
+            rowtag.style.fontWeight = 'normal'
+            ranks[ii].innerText = ''
         }
     }
 
-    function decide_checkbox_selectone(element,checking,checkrown,ranks,lastrank) {
+    function decide_checkbox_selectone(element, checking, checkrown, ranks, lastrank) {
 
-        element.checked=checking
+        element.checked = checking
 
         //var rowtag=getancestor(element,'tr')
-        rowtag=element.parentNode.parentNode
-        rowtag.style.fontWeight=checking?'bold':'normal'
+        rowtag = element.parentNode.parentNode
+        rowtag.style.fontWeight = checking ? 'bold' : 'normal'
 
         if (checking) {
             lastrank++
-            ranks[checkrown].innerText=lastrank
+            ranks[checkrown].innerText = lastrank
         } else
-            ranks[checkrown].innerText=''
+            ranks[checkrown].innerText = ''
 
         return lastrank
     }
 
-    function decide_checkbox_select(event,element,checking,checkrown,lastrank) {
+    function decide_checkbox_select(event, element, checking, checkrown, lastrank) {
 
-        event=getevent(event)
+        event = getevent(event)
         if (!element)
-            element=event.target
+            element = event.target
 
         //dont click on checkbox since mousedown will have already done the job
-        if (event.type=='click' && event.target.type=='checkbox')
+        if (event.type == 'click' && event.target.type == 'checkbox')
             return false
 
-        var doingall=true
-        if (typeof checkrown=='undefined') {
+        var doingall = true
+        if (typeof checkrown == 'undefined') {
             checking = !element.checked
-            doingall=false
+            doingall = false
         }
 
-        if (typeof checking=='undefined')
+        if (typeof checking == 'undefined')
             checking = !element.checked
 
         //find current rown and level
-        if (typeof checkrown=='undefined') {
-            var indentregex=/^[\. -]*/
+        if (typeof checkrown == 'undefined') {
+            var indentregex = /^[\. -]*/
             var selection2 = document.getElementsByName('decide_selection')
             var level
             for (ii = 0; ii < selection2.length; ii++) {
                 if (selection2[ii] == element) {
-                    checkrown=ii
+                    checkrown = ii
                     level = selection2[ii].parentNode.nextSibling.nextSibling.innerText.match(indentregex)
                     break
                 }
@@ -5982,10 +5981,10 @@ function decide_onload(decide_args) {
         if (checking) {
             //count selections
             if (!doingall) {
-                lastrank=0
-                var checkupto=doingall?checkrown:ranks.length
-                for (var ii=0;ii<checkupto;++ii) {
-                    var rank=Number(ranks[ii].innerText)
+                lastrank = 0
+                var checkupto = doingall ? checkrown : ranks.length
+                for (var ii = 0; ii < checkupto; ++ii) {
+                    var rank = Number(ranks[ii].innerText)
                     if (rank)
                         lastrank++
                 }
@@ -5994,23 +5993,23 @@ function decide_onload(decide_args) {
 
         //unchecking=reduce higher ranks
         else {
-            var removerank=Number(ranks[checkrown].innerText)
-            for (var ii=0;ii<ranks.length;++ii) {
-                var rank=Number(ranks[ii].innerText)
-                if (rank>removerank)
-                    ranks[ii].innerText=rank-1
+            var removerank = Number(ranks[checkrown].innerText)
+            for (var ii = 0; ii < ranks.length; ++ii) {
+                var rank = Number(ranks[ii].innerText)
+                if (rank > removerank)
+                    ranks[ii].innerText = rank - 1
             }
         }
 
-        lastrank=decide_checkbox_selectone(element,checking,checkrown,ranks,lastrank)
+        lastrank = decide_checkbox_selectone(element, checking, checkrown, ranks, lastrank)
 
         //check/uncheck any following lower level rows
         if (!doingall) {
-            for (ii = checkrown+1; ii < selection2.length; ii++) {
+            for (ii = checkrown + 1; ii < selection2.length; ii++) {
                 //quit once get back to the same level
                 if (selection2[ii].parentNode.nextSibling.nextSibling.innerText.match(indentregex) <= level)
                     break
-                lastrank=decide_checkbox_selectone(selection2[ii],checking,ii,ranks,lastrank)
+                lastrank = decide_checkbox_selectone(selection2[ii], checking, ii, ranks, lastrank)
                 //lastrank=decide_checkbox_select(event,selection2[ii],checking,ii,lastrank)
             }
         }
@@ -6025,64 +6024,64 @@ function decide_onload(decide_args) {
             return false
     }
 
-    function decide_radio_select(event,element) {
-        event=getevent(event)
+    function decide_radio_select(event, element) {
+        event = getevent(event)
         if (!element)
-            element=event.target
+            element = event.target
         element.checked = true
         decide_ok_onclick()
         return exoduscancelevent(event)
     }
 
     function decide_document_onmouseover(event) {
-        return decide_document_onmouse(event,'over')
+        return decide_document_onmouse(event, 'over')
     }
 
     function decide_document_onmouseout(event) {
-        return decide_document_onmouse(event,'out')
+        return decide_document_onmouse(event, 'out')
     }
 
-    function decide_document_onmouse(event,mode) {
+    function decide_document_onmouse(event, mode) {
 
-        event=getevent(event)
+        event = getevent(event)
         exoduscancelevent(event)
 
-        var trtag=getancestor(event.target,'tr')
+        var trtag = getancestor(event.target, 'tr')
         if (!trtag)
             return false
         if (!trtag.getAttribute('decide_row'))
             return false
 
-        var element=trtag.getElementsByTagName('input')[0]
+        var element = trtag.getElementsByTagName('input')[0]
         if (!element)
             return
 
-        if (mode=='over') {
-            trtag.setAttribute('mousesave',trtag.style.backgroundColor)
-            trtag.style.backgroundColor='lightgrey'
+        if (mode == 'over') {
+            trtag.setAttribute('mousesave', trtag.style.backgroundColor)
+            trtag.style.backgroundColor = 'lightgrey'
         } else {
-            trtag.style.backgroundColor=trtag.getAttribute('mousesave')
+            trtag.style.backgroundColor = trtag.getAttribute('mousesave')
             trtag.removeAttribute('mousesave')
         }
 
         return
     }
 
-    function decide_document_onclick(event,dblclick) {
-        event=getevent(event)
+    function decide_document_onclick(event, dblclick) {
+        event = getevent(event)
 
-        var trtag=getancestor(event.target,'tr')
+        var trtag = getancestor(event.target, 'tr')
         var element
-        if (!trtag || !(element=trtag.getElementsByTagName('input')[0])) {
-                element=document.getElementsByName('decide_selection')[0]
-                client_focuson(element)
-                return
+        if (!trtag || !(element = trtag.getElementsByTagName('input')[0])) {
+            element = document.getElementsByName('decide_selection')[0]
+            client_focuson(element)
+            return
         }
 
         if (decide_returnmany)
-            decide_checkbox_select(event,element,dblclick)
+            decide_checkbox_select(event, element, dblclick)
         else
-            decide_radio_select(event,element)
+            decide_radio_select(event, element)
 
         client_focuson(element)
 
@@ -6090,12 +6089,12 @@ function decide_onload(decide_args) {
     }
 
     function decide_document_ondblclick(event) {
-        decide_document_onclick(event,true)
+        decide_document_onclick(event, true)
         decide_ok_onclick()
         return exoduscancelevent(event)
     }
 
-    function decide_getreturnvalues(){
+    function decide_getreturnvalues() {
 
         //NB returns row numbers 1 based not 0 based!
         //0 means cancelled
@@ -6105,24 +6104,24 @@ function decide_onload(decide_args) {
         var ranks = document.getElementsByName('decide_rank')
         for (ii = 0; ii < selection2.length; ii++) {
             if (selection2[ii].checked) {
-                var returnvalue=selection2[ii].getAttribute('decide_returnvalue')
+                var returnvalue = selection2[ii].getAttribute('decide_returnvalue')
                 if (!decide_returnmany) {
                     returnvalues = returnvalue
                     break
                 }
 
                 if (returnvalue) {
-                    var rank=Number(ranks[ii].innerText)-1
+                    var rank = Number(ranks[ii].innerText) - 1
                     returnvalues[rank] = returnvalue
                 }
             }
         }
 
         if (!returnvalues.length)
-            returnvalues=''
+            returnvalues = ''
 
         //remove empty array values
-        returnvalues=returnvalues.exodustrim('')
+        returnvalues = returnvalues.exodustrim('')
 
         return returnvalues
 
@@ -6130,16 +6129,16 @@ function decide_onload(decide_args) {
 
     function decide_ok_onclick() {
 
-        var returnvalues=decide_getreturnvalues()
+        var returnvalues = decide_getreturnvalues()
 
         //return exoduswindowclose(returnvalues)
-        exodus_resume(returnvalues,'decide_ok_onclick')
+        exodus_resume(returnvalues, 'decide_ok_onclick')
 
     }
 
     function decide_cancel_onclick() {
         //return exoduswindowclose('')
-        exodus_resume('','decide_ok_onclick')
+        exodus_resume('', 'decide_ok_onclick')
     }
 
     //purely to suppress any automatic checkbox ticking by the browser
@@ -6153,14 +6152,14 @@ function decide_onload(decide_args) {
 
     function decide_document_onkeydown(event) {
 
-        event=getevent(event)
+        event = getevent(event)
 
         if (typeof decide_returnmany == 'undefined')
             decide_returnmany = ''
 
         var keycode = event.keyCode
 
-        console.log('decide_document_onkeydown '+keycode)
+        console.log('decide_document_onkeydown ' + keycode)
 
         //ctrl+Enter or single select
         if (keycode == 13 && event.ctrlKey) {
@@ -6209,17 +6208,17 @@ function decide_onload(decide_args) {
             var optionn = keycode - 48
             if (optionn == 0)
                 optionn = 10
-            for (var rown=0;rown<options.length;++rown) {
-                if (options[rown].getAttribute('decide_optionno')==optionn) {
+            for (var rown = 0; rown < options.length; ++rown) {
+                if (options[rown].getAttribute('decide_optionno') == optionn) {
                     if (!decide_returnmany || selections.length == 1) {
                         //decide_ok_onclick()
-                        decide_radio_select(event,selections[rown])
+                        decide_radio_select(event, selections[rown])
                         break
                     }
                     //selections[rown].checked = !selections[rown].checked
                     //break;
-                    var element=selections[rown]
-                    decide_checkbox_select(event,element)
+                    var element = selections[rown]
+                    decide_checkbox_select(event, element)
                     client_focuson(element)
                     break
                 }
@@ -6228,12 +6227,12 @@ function decide_onload(decide_args) {
         }
 
         //enter or space - check or clear a checkbox and move down (or up if shift)
-        if (decide_returnmany && (keycode == 32 || keycode == 13) ) {
+        if (decide_returnmany && (keycode == 32 || keycode == 13)) {
             decide_checkbox_select(event)
             if (event.shiftKey)
-                keycode=38//fake up
+                keycode = 38//fake up
             else
-                keycode=40//fake down
+                keycode = 40//fake down
         }
 
         var n
@@ -6249,7 +6248,7 @@ function decide_onload(decide_args) {
         n -= 1
 
         //pgup 33/pgdn 34/down 40/up 38/tab 9/backspace 8 keys
-        if (keycode == 33 || keycode == 34 || keycode == 40 || keycode == 38 || keycode == 9 || keycode==8) {
+        if (keycode == 33 || keycode == 34 || keycode == 40 || keycode == 38 || keycode == 9 || keycode == 8) {
 
             var direction
             if (keycode == 34 || keycode == 40 || (keycode == 9 && !event.shiftKey)) direction = 1
@@ -6306,8 +6305,8 @@ function decide_onload(decide_args) {
                     continue
 
                 //scroll to the top or bottom if on the first or last option
-                var newoptionno=newelement.getAttribute('decide_optionno')
-                if (n == 0||newoptionno==1)
+                var newoptionno = newelement.getAttribute('decide_optionno')
+                if (n == 0 || newoptionno == 1)
                     exodusconfirmdiv.scrollTop = 0
                 else if (n == (selections.length - 1))
                     exodusconfirmdiv.scrollTop = exodusconfirmdiv.scrollHeight
@@ -6319,13 +6318,13 @@ function decide_onload(decide_args) {
             newelement.select()
 
             if (keycode == 8 && decide_returnmany) {
-                    decide_checkbox_select(event,newelement)
-                    return exoduscancelevent(event)
+                decide_checkbox_select(event, newelement)
+                return exoduscancelevent(event)
             }
 
             //select new radio button if pressing up/down (but not pgup/pgdn so they can scan multi-page options without changing the currently selected option)
             if (!decide_returnmany && keycode != 33 && keycode != 34)
-                    newelement.checked = true
+                newelement.checked = true
 
             return exoduscancelevent(event)
 
@@ -6356,92 +6355,92 @@ function decide_onload(decide_args) {
 
 } //of decide_onload()
 
-var gsorttable2offset=1//decide
+var gsorttable2offset = 1//decide
 //var gsorttable2offset=0//decide2
 function decide_sorttable2(event) {
 
- //locate the current element
- event=getevent(event)
+    //locate the current element
+    event = getevent(event)
 
- var th=event.target
- if (th.tagName!="TH")
-    return(0)
+    var th = event.target
+    if (th.tagName != "TH")
+        return (0)
 
- var tableelement=th.parentElement.parentElement.parentElement
- var tablerows=tableelement.tBodies[0].getElementsByTagName('tr')
- var coln=th.cellIndex+gsorttable2offset
+    var tableelement = th.parentElement.parentElement.parentElement
+    var tablerows = tableelement.tBodies[0].getElementsByTagName('tr')
+    var coln = th.cellIndex + gsorttable2offset
 
- var reverse=event.target.getAttribute('sorttable2_issorted')
- event.target.setAttribute('sorttable2_issorted',reverse?'':1)
+    var reverse = event.target.getAttribute('sorttable2_issorted')
+    event.target.setAttribute('sorttable2_issorted', reverse ? '' : 1)
 
- var rown=th.parentElement.rowIndex
- var nrows=tablerows.length
- fromrown=0
- uptorown=nrows-1
+    var rown = th.parentElement.rowIndex
+    var nrows = tablerows.length
+    fromrown = 0
+    uptorown = nrows - 1
 
- if (gdateformat == 'M/d/yyyy')
-  var dateformat=[2,0,1]
- else if (gdateformat == 'yyyy/M/d')
-  var dateformat=[0,1,2]
- else //gdateformat = 'd/M/yyyy'
-  var dateformat=[2,1,0]
- var yy=dateformat[0]+1
- var mm=dateformat[1]+1
- var dd=dateformat[2]+1
+    if (gdateformat == 'M/d/yyyy')
+        var dateformat = [2, 0, 1]
+    else if (gdateformat == 'yyyy/M/d')
+        var dateformat = [0, 1, 2]
+    else //gdateformat = 'd/M/yyyy'
+        var dateformat = [2, 1, 0]
+    var yy = dateformat[0] + 1
+    var mm = dateformat[1] + 1
+    var dd = dateformat[2] + 1
 
- var sortdata=[]
- var dateregex=/ ?(\d{4}|\d{1,2})\/ ?(\d{1,2})\/(\d{4}|\d{2})/
- var periodregex=/ ?(\d{1,2})\/(\d{4})/g
- for (var ii=fromrown;ii<=uptorown;++ii){
-  var cell=tablerows[ii].cells[coln]
-  var value=(cell.textContent||cell.innerText||"").toUpperCase()
-  var match
-  while(match=value.match(dateregex)) {
-   //convert dates like n/n/yy or n/n/yyyy to sortable yyyy|mm|dd format
-   value=value.replace(dateregex,('0000'+match[yy]).slice(-4)+'|'+('00'+match[mm]).slice(-2)+'|'+('00'+match[dd]).slice(-2))
-   //console.log(value)
-  }
+    var sortdata = []
+    var dateregex = / ?(\d{4}|\d{1,2})\/ ?(\d{1,2})\/(\d{4}|\d{2})/
+    var periodregex = / ?(\d{1,2})\/(\d{4})/g
+    for (var ii = fromrown; ii <= uptorown; ++ii) {
+        var cell = tablerows[ii].cells[coln]
+        var value = (cell.textContent || cell.innerText || "").toUpperCase()
+        var match
+        while (match = value.match(dateregex)) {
+            //convert dates like n/n/yy or n/n/yyyy to sortable yyyy|mm|dd format
+            value = value.replace(dateregex, ('0000' + match[yy]).slice(-4) + '|' + ('00' + match[mm]).slice(-2) + '|' + ('00' + match[dd]).slice(-2))
+            //console.log(value)
+        }
 
-  value=value.replace(periodregex,'$2|$1')
+        value = value.replace(periodregex, '$2|$1')
 
-  //natural sort
-  value=value.replace(/[-+]?[1234567890.,]+/g,function(x){if (x.slice(0,1)=='-') {y='-';x=x.slice(1)} else y='';return y+('0000000000000000000000'+x).slice(-20)})
-  //value+=('000000000000'+ii).slice(-10)//stable sort
-  //cell.setAttribute('sortvalue',value)
-  sortdata.push([value,ii])
- }
+        //natural sort
+        value = value.replace(/[-+]?[1234567890.,]+/g, function (x) { if (x.slice(0, 1) == '-') { y = '-'; x = x.slice(1) } else y = ''; return y + ('0000000000000000000000' + x).slice(-20) })
+        //value+=('000000000000'+ii).slice(-10)//stable sort
+        //cell.setAttribute('sortvalue',value)
+        sortdata.push([value, ii])
+    }
 
- sortdata.sort(function (a,b){if (a[0]<b[0]) return -1;if (a[0]>b[0]) return 1;return a[1]-b[1]})
- if (reverse)
-  sortdata.reverse()
+    sortdata.sort(function (a, b) { if (a[0] < b[0]) return -1; if (a[0] > b[0]) return 1; return a[1] - b[1] })
+    if (reverse)
+        sortdata.reverse()
 
- //get an array of the tablerows
- var oldrows = []
- for (var oldrown = 0; oldrown < tablerows.length; oldrown++)
-  oldrows[oldrown] = tablerows[oldrown]
+    //get an array of the tablerows
+    var oldrows = []
+    for (var oldrown = 0; oldrown < tablerows.length; oldrown++)
+        oldrows[oldrown] = tablerows[oldrown]
 
- //reorder table rows
- var newdatarows = []
- for (var newrown = 0; newrown < sortdata.length; ++newrown) {
-  var oldrown = sortdata[newrown][1]
-  if (newrown != oldrown)
-   tablerows[newrown].swapNode(oldrows[oldrown])
- }
+    //reorder table rows
+    var newdatarows = []
+    for (var newrown = 0; newrown < sortdata.length; ++newrown) {
+        var oldrown = sortdata[newrown][1]
+        if (newrown != oldrown)
+            tablerows[newrown].swapNode(oldrows[oldrown])
+    }
 
 }//decide_sorttable2
 
 //these functions should be removed after a while if never called
-function login(){
-    if (gusername&&gusername=='NEOSYS')
-        alert(login.caller.name+' called login')
+function login() {
+    if (gusername && gusername == 'EXODUS')
+        alert(login.caller.name + ' called login')
 }
-function log(){
-    //if (gusername&&gusername=='NEOSYS')
+function log() {
+    //if (gusername&&gusername=='EXODUS')
     //    alert(log.caller.name+' called log')
 }
-function logout(){
-    if (gusername&&gusername=='NEOSYS')
-        alert(logout.caller.name+' called logout')
+function logout() {
+    if (gusername && gusername == 'EXODUS')
+        alert(logout.caller.name + ' called logout')
 }
 
 function setdateformat() {
@@ -6457,7 +6456,7 @@ function setdateformat() {
         gdatemonthpos = 1
         gdateyearpos = 2
         gdateformat = 'd/M/yyyy'
-    //american
+        //american
     } else if (dateformat.slice(0, 2) == '01') {
         gdatedaypos = 1
         gdatemonthpos = 0
@@ -6488,8 +6487,8 @@ function DATE(mode, value, params) {
         return ''
 
     if (typeof value == 'undefined') {
-        value=mode
-        mode='OCONV'
+        value = mode
+        mode = 'OCONV'
     }
 
     var result
@@ -6544,7 +6543,7 @@ function DATE(mode, value, params) {
             //TODO doesnt handle other dates in rows very well
             var otherdate = gds.data[otherdateid]
             if (!otherdate)
-                otherdate=gds.data['group'+ggroupno][grecn][otherdateid]
+                otherdate = gds.data['group' + ggroupno][grecn][otherdateid]
             otherdate = otherdate.text
             if (typeof otherdate == 'object')
                 otherdate = otherdate[0]
@@ -6624,7 +6623,7 @@ function DATE(mode, value, params) {
         //}
 
         //limit 1/1/1900 to 31/12/2099
-        if (result<-24835 || result>48213) {
+        if (result < -24835 || result > 48213) {
             gmsg = invaliddatemsg()
             return null
         }
@@ -6661,7 +6660,7 @@ function DATE(mode, value, params) {
                 //cant call async gds.setx while oconv is not async so do it by timeout
                 //cant call setvalue either since that only updates the screen and not gds
                 //yield* gds.setx(otherdateid, grecn, otherdate)
-                exodussettimeout('yield* gds.setx("'+otherdateid+'", '+grecn+', '+otherdate+')',1)
+                exodussettimeout('yield* gds.setx("' + otherdateid + '", ' + grecn + ', ' + otherdate + ')', 1)
             }
 
         }
@@ -6672,7 +6671,7 @@ function DATE(mode, value, params) {
 
         //  if (value=='"') alert(value)
         //if not digits then return unconverted
-	//allow for negative dates before 1968
+        //allow for negative dates before 1968
         if (typeof value == 'string' && !value.match(/^-?\d*$/))
             return value
         //  if (value=='"') alert('x'+value)
@@ -6696,108 +6695,108 @@ function DATE(mode, value, params) {
         switch (params) {
             case 'DOW': {
 
-                    result = ((value - 1) % 7) + 1
-                    break
-                }
+                result = ((value - 1) % 7) + 1
+                break
+            }
             case 'DAYNAME': {
 
-                    result = ((value - 1) % 7) + 1
-                    result = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][result - 1]
-                    break
-                }
+                result = ((value - 1) % 7) + 1
+                result = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][result - 1]
+                break
+            }
             case 'DAYNAME3': {
 
-                    result = ((value - 1) % 7) + 1
-                    result = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][result - 1]
-                    break
-                }
+                result = ((value - 1) % 7) + 1
+                result = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][result - 1]
+                break
+            }
             case 'DOM': {
 
-                    result = result.getUTCDate()
-                    break
-                }
+                result = result.getUTCDate()
+                break
+            }
             case 'MONTH': {
 
-                    result = result.getUTCMonth() + 1
-                    break
-                }
+                result = result.getUTCMonth() + 1
+                break
+            }
             case 'DOM2': {
 
-                    result = ('0'+result.getUTCDate()).slice(-2)
-                    break
-                }
+                result = ('0' + result.getUTCDate()).slice(-2)
+                break
+            }
             case 'MONTH2': {
 
-                    result = ('0'+(result.getUTCMonth() + 1)).slice(-2)
-                    break
-                }
+                result = ('0' + (result.getUTCMonth() + 1)).slice(-2)
+                break
+            }
             case 'YEAR': {
 
-                    result = result.getUTCFullYear()
-                    break
-                }
+                result = result.getUTCFullYear()
+                break
+            }
             case 'YEAR2': {
 
-                    result = parseInt(result.getUTCFullYear().toString().slice(-2), 10)
-                    break
-                }
+                result = parseInt(result.getUTCFullYear().toString().slice(-2), 10)
+                break
+            }
             case 'PERIOD': {
 
-                    //returns the current month/current year eg 1/2000
-                    result = (result.getUTCMonth() + 1) + '/' + result.getUTCFullYear()
-                    break
-                }
+                //returns the current month/current year eg 1/2000
+                result = (result.getUTCMonth() + 1) + '/' + result.getUTCFullYear()
+                break
+            }
             case 'PERIOD2': {
 
-                    //returns the current month/current year eg 1/00
-                    result = (result.getUTCMonth() + 1) + '/' + result.getUTCFullYear().toString().slice(-2)
-                    break
-                }
+                //returns the current month/current year eg 1/00
+                result = (result.getUTCMonth() + 1) + '/' + result.getUTCFullYear().toString().slice(-2)
+                break
+            }
             case 'YEARPERIOD': {
 
-                    //returns the current current year.current month eg 2001.01
-                    result = result.getUTCFullYear() + '.' + ('00' + (result.getUTCMonth() + 1)).slice(-2)
-                    break
-                }
+                //returns the current current year.current month eg 2001.01
+                result = result.getUTCFullYear() + '.' + ('00' + (result.getUTCMonth() + 1)).slice(-2)
+                break
+            }
             case 'MINIMAL': {
 
-                    result2 = []
-                    result2[gdatedaypos] = result.getUTCDate()
-                    result2[gdatemonthpos] = result.getUTCMonth() + 1
-                    result2[gdateyearpos] = result.getUTCFullYear()
-                    result = result2
+                result2 = []
+                result2[gdatedaypos] = result.getUTCDate()
+                result2[gdatemonthpos] = result.getUTCMonth() + 1
+                result2[gdateyearpos] = result.getUTCFullYear()
+                result = result2
 
-                    //trim same year and month
-                    var curryear = (new Date().getFullYear()).toString()
-                    if (result[gdateyearpos] == curryear) {
-                        result[gdateyearpos] = ''
-                        var currmonth = (new Date().getMonth() + 1).toString()
-                        if (result[gdatemonthpos] == currmonth) {
-                            result[gdatemonthpos] = ''
-                        }
+                //trim same year and month
+                var curryear = (new Date().getFullYear()).toString()
+                if (result[gdateyearpos] == curryear) {
+                    result[gdateyearpos] = ''
+                    var currmonth = (new Date().getMonth() + 1).toString()
+                    if (result[gdatemonthpos] == currmonth) {
+                        result[gdatemonthpos] = ''
                     }
-                    result = result.exodusjoin('/').exodustrim('/')
-
-                    //add day of week
-                    var dow = ((value - 1) % 7) + 1
-                    result = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][dow - 1] + ' ' + result
-
-                    break
                 }
-			case 'D': {
-					//alert('"'+result+'"')
-					//result = result.getUTCDate()// + '/' + gmonthnames[result.getUTCMonth() + 1] + '/' + result.getUTCFullYear().toString()
-                    result = result.getUTCDate() + ' ' + gmonthnames[result.getUTCMonth()].substr(0,3).toUpperCase() + ' ' + result.getUTCFullYear();
-					break;
-				}
+                result = result.exodusjoin('/').exodustrim('/')
+
+                //add day of week
+                var dow = ((value - 1) % 7) + 1
+                result = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][dow - 1] + ' ' + result
+
+                break
+            }
+            case 'D': {
+                //alert('"'+result+'"')
+                //result = result.getUTCDate()// + '/' + gmonthnames[result.getUTCMonth() + 1] + '/' + result.getUTCFullYear().toString()
+                result = result.getUTCDate() + ' ' + gmonthnames[result.getUTCMonth()].substr(0, 3).toUpperCase() + ' ' + result.getUTCFullYear();
+                break;
+            }
             default: {
 
-                    result2 = []
-                    result2[gdatedaypos] = result.getUTCDate()
-                    result2[gdatemonthpos] = result.getUTCMonth() + 1
-                    result2[gdateyearpos] = result.getUTCFullYear()
-                    result = result2.join('/')
-                }
+                result2 = []
+                result2[gdatedaypos] = result.getUTCDate()
+                result2[gdatemonthpos] = result.getUTCMonth() + 1
+                result2[gdateyearpos] = result.getUTCFullYear()
+                result = result2.join('/')
+            }
         }
 
     }
@@ -6834,11 +6833,11 @@ function TIME(mode, value, params) {
 
     //blank in .. blank out
     if (value == '')
-      return ''
+        return ''
 
     if (typeof value == 'undefined') {
-        value=mode
-        mode='OCONV'
+        value = mode
+        mode = 'OCONV'
     }
 
     if (mode == 'OCONV') {
@@ -6856,8 +6855,8 @@ function TIME(mode, value, params) {
         //allow 24:00 and 25:00 etc
         var hours = (value / 60 / 60)
         result = ('0' + hours).slice(-2) + ':' + ('0' + mins).slice(-2)
-//        if (params.indexOf('S'))
-//         result+= ':' + ('0' + secs).slice(-2)
+        //        if (params.indexOf('S'))
+        //         result+= ':' + ('0' + secs).slice(-2)
 
         //result+=':'+('0'+secs).slice(-2)
     }
@@ -7006,18 +7005,18 @@ function PERIOD_OF_TIME(mode, value, params) {
 
 var gclient_focuson_element
 function client_focuson(element) {
-    gclient_focuson_element=element
-    window.setTimeout(client_focuson2,1)
+    gclient_focuson_element = element
+    window.setTimeout(client_focuson2, 1)
 }
 
 function client_focuson2(element) {
-    if (gclient_focuson_element&&gclient_focuson_element.focus) {
+    if (gclient_focuson_element && gclient_focuson_element.focus) {
         gclient_focuson_element.focus()
-        gclient_focuson_element=undefined
+        gclient_focuson_element = undefined
     }
 }
 
-function logevent(msg){
+function logevent(msg) {
     if (!console)
         return
     if (glogevents)

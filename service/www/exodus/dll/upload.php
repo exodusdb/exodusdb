@@ -55,7 +55,7 @@ $hostdomain  =$_SERVER  ['HTTP_HOST'];
 $https       =$_SERVER  ['HTTPS'];
 $upload_time =time() - $_SERVER['REQUEST_TIME'];
 
-//=D:/hosts/testimages/TEST/upload/jobs/5400/7.NEOSYS_signature.jpg", referer: https://localhost/3/exodus/upload.htm
+//=D:/hosts/testimages/TEST/upload/jobs/5400/7.EXODUS_signature.jpg", referer: https://localhost/3/exodus/upload.htm
 
 //$target_path = preg_replace('!exodus/dll!','images',$localdir) . "/" . basename( $filename);
 //$target_path = preg_replace('!exodus/dll!','images',$localdir) . "/" . $filename;

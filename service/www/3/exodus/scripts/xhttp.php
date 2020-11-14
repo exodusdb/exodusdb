@@ -5,10 +5,11 @@ ini_set('display_errors', 'Off');
 //php.ini
 //display_errors = off
 
-ignore_user_abort(true);
-
 //enable services to read/write/delete any files we create here without any further configuration
+//instead of doing chmod($linkfilename . '.5', 0775); etc below
 umask(0);
+
+ignore_user_abort(true);
 
 //debug in php like this
 
@@ -56,7 +57,7 @@ $timeout_ms = $defaulttimeoutmins * 60 * 1000;
 
 session_start();
 
-//NEOSYS root path should point to the folder containing exodus, exodus.net, data, images etc
+//EXODUS root path should point to the folder containing exodus, exodus.net, data, images etc
 // eg D:\\hosts\\test or /var/www/exodus?
 //$exodusrootpath = $_SERVER['DOCUMENT_ROOT'];
 // __DIR__ = D:\\hosts\\test\\exodus.net\\3\\exodus\\scripts
@@ -75,7 +76,7 @@ if ($gwindows)
 debug("exodusrootpath : $exodusrootpath");
 
 // /var/www/html/exodus2//data/default.vol
-// D:\hosts\test\exodus.net\3\exodus\scriptsNEOSYS/ADAGENCY.VOL
+// D:\hosts\test\exodus.net\3\exodus\scriptsEXODUS/ADAGENCY.VOL
 $gdatalocation = ($exodusrootpath . 'data' . $gslash);
 
 if (!file_exists($gdatalocation)) {
@@ -280,7 +281,7 @@ while (1) {
 
 	//MUST be sent before anything else
 	header("Content-Type:text/xml; charset=utf-8");
-	//? like xhttp.asp let client guess encoding because NEOSYS client data might not be in UTF-8 format eg DIO (Dior) in TEST database
+	//? like xhttp.asp let client guess encoding because EXODUS client data might not be in UTF-8 format eg DIO (Dior) in TEST database
 	//header ("Content-Type:text/xml");
 
 	//failure
@@ -375,7 +376,7 @@ while (1) {
 			break;
 		}
 		//ensure server can write it for returned data
-		chmod($linkfilename . '.2', 0775);
+		//chmod($linkfilename . '.2', 0775);
 	}
 
 	//more info in request
@@ -422,7 +423,7 @@ while (1) {
 		break;
 	}
 	//ensure server can delete it after renaming/processing it
-	chmod($linkfilename . '.1$', 0775);
+	//chmod($linkfilename . '.1$', 0775);
 
 	//now that everything is in place (request and data files)
 	//rename the request file to end in .1
@@ -457,7 +458,7 @@ while (1) {
 				$gautostartdatabase = false;
 
 				//no autostart
-				$config = ReadAll("{$exodusrootpath}NEOSYS//NET.CFG");
+				$config = ReadAll("{$exodusrootpath}EXODUS//NET.CFG");
 				if (strpos($config, "AUTOSTART=YES") !== false) {
 
 					//extend waiting time to allow database to start (by 30 seconds?)
@@ -467,8 +468,8 @@ while (1) {
 					$connectstring = "$database\r\n$username\r\n\r\n\r\n$system\r\n$linkfilename\r\n";
 
 					//where to write the run request
-					//D:\exodus\NEOSYS\~9337586.RUN
-					$runrequestfilename = $exodusrootpath . "NEOSYS" . $gslash . $linkfilename0 . ".RUN";
+					//D:\exodus\EXODUS\~9337586.RUN
+					$runrequestfilename = $exodusrootpath . "EXODUS" . $gslash . $linkfilename0 . ".RUN";
 
 					if (!WriteAll($runrequestfilename, $connectstring)) {
 						$response = "Could not write $runrequestfilename";
@@ -476,7 +477,7 @@ while (1) {
 					}
 
 
-					//$cmd = "C:\Windows\System32\CMD.EXE /C START NEOSYS.JS /system $system /database $database 2>&1";
+					//$cmd = "C:\Windows\System32\CMD.EXE /C START EXODUS.JS /system $system /database $database 2>&1";
 					//debug($cmd);
 					//$handle = popen($cmd, 'r');
 					//debug("'$handle'; " . gettype($handle) . "\n");
@@ -519,20 +520,20 @@ while (1) {
 		if (connection_aborted()) {
 			debug("connection aborted");
 			//var elapsedseconds = Math.floor((new Date() - timestarted)/10)/100
-			//this.response = 'Error: Client disconnected after ' + elapsedseconds + ' seconds in NEOSYS xhttp.asp ' + linkfilename
+			//this.response = 'Error: Client disconnected after ' + elapsedseconds + ' seconds in EXODUS xhttp.asp ' + linkfilename
 			//exodusoswrite(this.response,linkfilename + '.5',unicode)//just so we can see interrupted requests on the server more easily
 			//dbready(dbwaitingwindow)
 			//this.request = ''
 			//return (0)
 
-			$response = 'Error: Client disconnected after n seconds in NEOSYS xhttp.php ' . $linkfilename . ".5";
+			$response = 'Error: Client disconnected after n seconds in EXODUS xhttp.php ' . $linkfilename . ".5";
 			error_log($response);
 
 			//file_put_contents($linkfilename . '.5', $response);
 			WriteAll($linkfilename . '.5', $response);
 
 			//ensure server can write it for returned data
-			chmod($linkfilename . '.5', 0775);
+			//chmod($linkfilename . '.5', 0775);
 
 			break 2;
 		}
@@ -701,7 +702,7 @@ function getdatabases($exodusrootpath, $systemcode)
 	//$gdatalocation = $exodusrootpath . "/data/";
 	global $gdatalocation;
 	//$volfilename=$gdatalocation . $systemcode . '.vol';
-	$volfilename = $exodusrootpath . "NEOSYS/" . $systemcode . '.VOL';
+	$volfilename = $exodusrootpath . "EXODUS/" . $systemcode . '.VOL';
 	if (!is_file($volfilename)) {
 		$volfilename2 = $exodusrootpath . 'data/default.vol';
 		if (is_file($volfilename2)) {

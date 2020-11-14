@@ -848,7 +848,7 @@ exodusrecord.prototype.writex=function* exodusrecord_writex(withunlock) {
          else {
 
           //check for four ascii zero characters being passed. caused by bug in AREV 2.0
-          //no NEOSYS data should contain char(0). Usually presents as four character zeros.
+          //no EXODUS data should contain char(0). Usually presents as four character zeros.
           //if (temp.charCodeAt(0)==0)
           if (temp.indexOf(String.fromCharCode(0))>=0) {
 

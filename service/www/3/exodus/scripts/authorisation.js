@@ -257,8 +257,8 @@ function* user_val_userid() {
     if (gvalue != '---' && 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.indexOf(gvalue.slice(0, 1)) < 0)
         return yield* exodusinvalid('Username must start with an alphabetic letter A-Z')
 
-    if (gusername.indexOf('NEOSYS') < 0 && gvalue.indexOf('NEOSYS') + 1)
-        return yield* exodusinvalid('User name cannot include "NEOSYS"')
+    if (gusername.indexOf('EXODUS') < 0 && gvalue.indexOf('EXODUS') + 1)
+        return yield* exodusinvalid('User name cannot include "EXODUS"')
 
     //prevent hidden users
     if (gtasks_otheruserids.exoduslocate(gvalue))
@@ -290,7 +290,7 @@ function* user_val_userid() {
         var keys = gvalue.split(' ')
         for (var keyn = 0; keyn < keys.length; keyn++) {
             var key = keys[keyn].exodustrim()
-            if ((key == 'NEOSYS' && gusername != 'NEOSYS') || gtasks_otherkeys.exoduslocate(key))
+            if ((key == 'EXODUS' && gusername != 'EXODUS') || gtasks_otherkeys.exoduslocate(key))
                 return yield* exodusinvalid('You are not authorised to use key ' + key.exodusquote())
             keys[keyn] = key
         }
@@ -315,7 +315,7 @@ function* user_val_userid() {
     function* task_val_lock() {
 
         //prevent change of unauthorised tasks
-        if (gusername!='NEOSYS' && !(yield* task_authorised()))
+        if (gusername!='EXODUS' && !(yield* task_authorised()))
             return false
 
         //prevent addition of existing keys that user does not have

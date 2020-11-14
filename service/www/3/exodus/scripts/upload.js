@@ -436,7 +436,7 @@ function* adddeletebutton(filename) {
 //delete it if no complaints about the funny message
 function* general_postupload() {
 
- alert('general_postload in upload.js\nInform NEOSYS Support')
+ alert('general_postload in upload.js\nInform EXODUS Support')
  if (gparameters.versionno||gparameters.closeafterupload)
   //return window.close()
   return exoduswindowclose()

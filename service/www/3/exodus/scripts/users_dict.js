@@ -15,7 +15,7 @@ function* dict_USERS() {
  var updateallowed=false
 
  di=dict[++din]=dictrec('USER_ID','F',0)
- if (gusername!='NEOSYS')
+ if (gusername!='EXODUS')
   di.defaultvalue='gusername'
  di.invalidcharacters='*'
  if (yield* exodussecurity('AUTHORISATION ACCESS')) {

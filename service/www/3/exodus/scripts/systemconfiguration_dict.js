@@ -83,7 +83,7 @@ function* dict_SYSTEMCONFIGURATION(parameters) {
     di.length = 3;
     di.align = 'left'
     //di.required=true;
-    if (gusername != 'NEOSYS') di.readonly = true
+    if (gusername != 'EXODUS') di.readonly = true
 
     di = dict[++din] = dictrec('BACKUP_REQUIRED', 'F', 60, '', groupn)
     di.checkbox = '1;';

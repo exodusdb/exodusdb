@@ -12,8 +12,8 @@ function* form_postinit() {
             gwhatsnew = 'file:///' + gwhatsnew
         else
             gwhatsnew = '..' + gwhatsnew.slice(gwhatsnew.indexOf('\\data\\'))
-        exodussetcookie(glogincode, 'NEOSYS2', '', 'wn')
-        exodussetcookie(glogincode, 'NEOSYS2', gwhatsnew, 'wn2')
+        exodussetcookie(glogincode, 'EXODUS2', '', 'wn')
+        exodussetcookie(glogincode, 'EXODUS2', gwhatsnew, 'wn2')
         exodussettimeout('yield* windowopen(gwhatsnew)', 1000)
         //yield* windowopen(gwhatsnew)
     }
@@ -63,9 +63,9 @@ function* form_postwrite() {
     gtasks_newpassword = false
 
     //to avoid need full login to get new font/colors
-    exodussetcookie(glogincode, 'NEOSYS2', yield* gds.getx('SCREEN_BODY_COLOR'), 'fc')
-    exodussetcookie(glogincode, 'NEOSYS2', yield* gds.getx('SCREEN_FONT'), 'ff')
-    exodussetcookie(glogincode, 'NEOSYS2', yield* gds.getx('SCREEN_FONT_SIZE'), 'fs')
+    exodussetcookie(glogincode, 'EXODUS2', yield* gds.getx('SCREEN_BODY_COLOR'), 'fc')
+    exodussetcookie(glogincode, 'EXODUS2', yield* gds.getx('SCREEN_FONT'), 'ff')
+    exodussetcookie(glogincode, 'EXODUS2', yield* gds.getx('SCREEN_FONT_SIZE'), 'fs')
 
     return true
 

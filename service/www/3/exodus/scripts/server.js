@@ -103,7 +103,7 @@ function exodusdblink_send_byfile(data) {
     //dbwaitingwindow=dbwaiting()
 
     var cannotfinddatabaseresponse = 'ERROR: SERVER CONFIGURATION ERROR - CANNOT FIND DATABASE ON SERVER'.toUpperCase()
-    var databasestoppedresponse = 'The NEOSYS Service is stopped\r\rPlease try again later or ask your\rtechnical support staff to start it.'
+    var databasestoppedresponse = 'The EXODUS Service is stopped\r\rPlease try again later or ask your\rtechnical support staff to start it.'
     var norequestresponse = 'ERROR: NO REQUEST'.toUpperCase()
     var nodataresponse = 'ERROR: NO DATA'.toUpperCase()
     var invaliddatapathresponse = 'ERROR: INVALID DATA PATH'.toUpperCase()
@@ -148,7 +148,7 @@ function exodusdblink_send_byfile(data) {
             //error if no datasets
             if (datasets.length == 0) {
                 this.data = ''
-                this.response = 'Error: Cannot locate NEOSYS engine or no dataset found'
+                this.response = 'Error: Cannot locate EXODUS engine or no dataset found'
                 dbready(dbwaitingwindow)
                 this.request = ''
                 return (0)
@@ -200,10 +200,10 @@ function exodusdblink_send_byfile(data) {
 
             //save the username, password and dataset for following sessions
             if (this.documentprotocolcode == 'file') {
-                exodussetcookie(glogincode, 'NEOSYS2', 'username', this.username)
-                exodussetcookie(glogincode, 'NEOSYS2', 'password', this.password)
-                exodussetcookie(glogincode, 'NEOSYS2', 'dataset', this.dataset)
-                exodussetcookie('', 'NEOSYSsystem', this.system)
+                exodussetcookie(glogincode, 'EXODUS2', 'username', this.username)
+                exodussetcookie(glogincode, 'EXODUS2', 'password', this.password)
+                exodussetcookie(glogincode, 'EXODUS2', 'dataset', this.dataset)
+                exodussetcookie('', 'EXODUSsystem', this.system)
             }
             else {
                 Session('username') = this.username
@@ -248,7 +248,7 @@ function exodusdblink_send_byfile(data) {
         //var flag_filename = datalocation + datasetdir + 'GLOBAL.SVR'
         var flag_filename = datalocation + datasetdir + this.dataset + '.SVR'
 
-        //nodatabaseconnectionresponse='ERROR: Trying to start the NEOSYS engine - please try again.\\n\\n"'+this.dataset+'"\\n\\n'+flag_filename
+        //nodatabaseconnectionresponse='ERROR: Trying to start the EXODUS engine - please try again.\\n\\n"'+this.dataset+'"\\n\\n'+flag_filename
 
         /*
         //check that engine is active and start if not
@@ -265,7 +265,7 @@ function exodusdblink_send_byfile(data) {
         //fail if no response within x seconds
         if (date1.getTime() > waituntil) {
 
-        this.response = 'Error: Cannot start NEOSYS engine for ' + this.dataset
+        this.response = 'Error: Cannot start EXODUS engine for ' + this.dataset
         dbready(dbwaitingwindow)
         this.request=''
         return(0)
@@ -309,7 +309,7 @@ function exodusdblink_send_byfile(data) {
         //fail if not allowed to start database
         if (!autostartdatabase) {
 
-        this.response='NEOSYS.NET Service not started\rDataset: '+datasetdir.slice(0,-1)
+        this.response='EXODUS.NET Service not started\rDataset: '+datasetdir.slice(0,-1)
         dbready(dbwaitingwindow)
         this.request=''
         return false
@@ -699,7 +699,7 @@ function exodusdblink_startdb() {
     /*
     //kick off exodus
     //cmd=proglocation+'exodus.js /system '+this.system+' /dataset '+this.dataset+' /username '+this.username+' /password '+this.password
-    cmd='AREV.EXE ADAGENCY,NEOSYS /X'
+    cmd='AREV.EXE ADAGENCY,EXODUS /X'
     // cmd='WAITING.EXE AREV.EXE 3 3'
     taskid = this.wscriptshell.Run(cmd)
     Response.Write('error: '+currentdirectory)
@@ -741,7 +741,7 @@ function exodusdblink_startdb() {
             //delete the .$1 connection file
             //try{gfso.DeleteFile(connectfile,1)}catch(e){}
 
-            this.response = 'Error: Cannot start NEOSYS engine for ' + this.dataset
+            this.response = 'Error: Cannot start EXODUS engine for ' + this.dataset
             return 0
         }
 

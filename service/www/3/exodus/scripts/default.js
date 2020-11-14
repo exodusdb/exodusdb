@@ -23,12 +23,12 @@ function* formfunctions_onload() {
     gsystem = ghref[2]
 
     if (!gsystem)
-        gsystem = exodusgetcookie2('', 'NEOSYSsystem',null)
+        gsystem = exodusgetcookie2('', 'EXODUSsystem',null)
     if (!gsystem || gsystem == 'UNDEFINED')
         gsystem = 'ADAGENCY'
     gsystem = gsystem.toUpperCase()
     //save permanent default
-    document.cookie = 'NEOSYSsystem=' + gsystem
+    document.cookie = 'EXODUSsystem=' + gsystem
     
     //+'; path=/'
     //expires=Sun, 31 Dec 2100 23:59:59 GMT'
@@ -78,14 +78,14 @@ function* formfunctions_onload() {
     else {
         //gsystem=ghref[2]
         //if (!gsystem) gsystem='ADAGENCY'
-        datasetcode = exodusgetcookie2('dataset', 'NEOSYS', '')
+        datasetcode = exodusgetcookie2('dataset', 'EXODUS', '')
         //guess/default the datasetcode to the first part of the domain name for the first time or after clearing cookies
         if (!datasetcode)
             datasetcode = window.location.host.toString().split('.')[0].toUpperCase().substr(0,8)
         yield* exodussetdropdown(gdataset_element, "GETDATASETS\r" + gsystem, Array("code", "name"), datasetcode, null)
-        if (startinglocation != 'login' && exodusgetcookie2('a', 'NEOSYS', '') == 'true') {
-            gusername_element.value = exodusgetcookie2('u', 'NEOSYS', '')
-            gpassword_element.value = exodusgetcookie2('p', 'NEOSYS', '')
+        if (startinglocation != 'login' && exodusgetcookie2('a', 'EXODUS', '') == 'true') {
+            gusername_element.value = exodusgetcookie2('u', 'EXODUS', '')
+            gpassword_element.value = exodusgetcookie2('p', 'EXODUS', '')
             if (gusername_element.value && gpassword_element.value) {
                 gautologin_element.checked = true
             }
@@ -95,7 +95,7 @@ function* formfunctions_onload() {
             gpassword_element.value = ''
             gautologin_element.checked = false
         }
-        //if (gautologin_element.checked!=true) exodussetcookie('','NEOSYS','','ll',true)
+        //if (gautologin_element.checked!=true) exodussetcookie('','EXODUS','','ll',true)
     }
 
     gwaitdiv.style.display = "none"
@@ -136,7 +136,7 @@ function* passwordreset_onclick() {
     
     //var args={}
     //args.USER_ID=gusername_element.value
-    //yield* exodusshowmodaldialog(NEOSYSlocation+'passwordreset.htm')
+    //yield* exodusshowmodaldialog(EXODUSlocation+'passwordreset.htm')
     var usercode = gusername_element.value.toUpperCase()
     if (!usercode) {
         exodussettimeout('gusername_element.focus()', 100)
@@ -237,12 +237,12 @@ function* login_onclick() {
         //gdataset and gusername_element is used as the login id. this is the ONLY place that it is set. elsewhere it is copied around
         //if you change this then also change the check in xhttp.asp
         //http standard allows max 20 cookies of 4Kb each. if more are created then the old ones are dropped
-        //2 are used by NEOSYS for global. 1 is used by ASP for session id. Leaving 17 max for logins
+        //2 are used by EXODUS for global. 1 is used by ASP for session id. Leaving 17 max for logins
         //using dataset and username allows multiple logins to differnt databases in the same domain
         //and multiple logins to the same db with different usernames but only one login per username per database
         //also may exist in ABP LEDGER2 on server in reports to generate drill down code
         glogincode = (datasetx + '*' + gusername_element.value + '*').replace(/ /g,'')
-        exodussetcookie('', 'NEOSYSlogincode', glogincode, 'logincode')
+        exodussetcookie('', 'EXODUSlogincode', glogincode, 'logincode')
 
         db.request = 'LOGIN\r' + gusername_element.value + '\r' + gpassword_element.value + '\r' + datasetx + '\r' + authno + '\r' + gsystem + '\r' + gportno + '\rnewpass'
         if (yield* db.send()) {
@@ -271,10 +271,10 @@ function* login_onclick() {
             }
 
             //permanent
-            exodussetcookie('', 'NEOSYS', temp, '', true)
+            exodussetcookie('', 'EXODUS', temp, '', true)
 
             //temporary cookie for menu, gcompany etc
-            exodussetcookie(glogincode, 'NEOSYS2', db.data)
+            exodussetcookie(glogincode, 'EXODUS2', db.data)
 
             //temporary cookie for password
             //gsystem=ghref[2]
@@ -283,11 +283,11 @@ function* login_onclick() {
             var temp = 'dataset=' + datasetx + '&username=' + gusername_element.value + '&system=' + gsystem
             if (document.protocolcode == 'file') temp += '&password=' + gpassword_element.value
 
-            exodussetcookie(glogincode, 'NEOSYS2', temp)
+            exodussetcookie(glogincode, 'EXODUS2', temp)
 
             //save gdataset so that opening page knows what database we are in/get cookies for
             //not really necessary since set above now
-            exodussetcookie('', 'NEOSYSlogincode', glogincode, 'logincode')
+            exodussetcookie('', 'EXODUSlogincode', glogincode, 'logincode')
             //loginalert('default set '+glogincode)
 
             //work out the starting location
@@ -295,15 +295,15 @@ function* login_onclick() {
             if (startinglocation == 'login')
                 startinglocation = ''
             else if (!startinglocation)
-                startinglocation = unescape(exodusgetcookie2('ll', 'NEOSYS', ''))
-            //if (!startinglocation||(window.event&&window.event.shiftKey)) startinglocation=NEOSYSlocation+'users.htm'
+                startinglocation = unescape(exodusgetcookie2('ll', 'EXODUS', ''))
+            //if (!startinglocation||(window.event&&window.event.shiftKey)) startinglocation=EXODUSlocation+'users.htm'
             //TODO MSIE only window.event
             if (!startinglocation || (window.event && window.event.shiftKey)) {
-                startinglocation = NEOSYSlocation
+                startinglocation = EXODUSlocation
                 if (exodusgetcookie2('m').split(',')[0] == 'TIMESHEETS')
                     startinglocation += '../jobs/timesheets.htm'
                 else
-                    startinglocation = NEOSYSlocation + 'users.htm'
+                    startinglocation = EXODUSlocation + 'users.htm'
             }
 
             //open the starting location
@@ -330,7 +330,7 @@ function* login_onclick() {
         //option to relogin with authorisation number
         //otherwise put up error message
         if (db.response.indexOf('This computer is number') >= 0) {
-            var q = db.response.split('|').slice(1, 2) + ' What is the authorisation number?\r(Please contact NEOSYS or your technical support)'
+            var q = db.response.split('|').slice(1, 2) + ' What is the authorisation number?\r(Please contact EXODUS or your technical support)'
             var authno = prompt(q, '')
             if (authno == '' || authno == null) break
         }

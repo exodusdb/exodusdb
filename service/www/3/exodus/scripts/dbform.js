@@ -201,11 +201,11 @@ function* formfunctions_onload() {
     //calendar popup functions
     if (gcalendarscript == 1) {
         var element = document.createElement('script')
-        element.src = NEOSYSlocation + 'scripts/calendar.js'
+        element.src = EXODUSlocation + 'scripts/calendar.js'
         //document.body.insertBefore(element, null)
         //solve htmlfile invalid argument error
         document.body.insertBefore(element, document.body.firstChild)
-        //document.writeln('<SCR'+'IPT src="'+NEOSYSlocation+'scripts/calendar.js" type="text/javascript"></SCR'+'IPT>')
+        //document.writeln('<SCR'+'IPT src="'+EXODUSlocation+'scripts/calendar.js" type="text/javascript"></SCR'+'IPT>')
     }
 
     //greadonlymode=false
@@ -560,7 +560,7 @@ function* formfunctions_onload() {
 
             }
 
-            //allow excess spaces in NEOSYS data using pre-wrap
+            //allow excess spaces in EXODUS data using pre-wrap
             //"Sequences of whitespace are preserved. Lines are broken at newline characters, at <br>, and as necessary to fill line boxes."
             if (element.tagName == 'SPAN' && typeof element.style.whiteSpace != 'undefined') {
                 try {
@@ -820,7 +820,7 @@ function* formfunctions_onload() {
                         if (element.getAttribute('exodusrows'))
                             verticalpercent *= element.getAttribute('exodusrows') / 10
 
-                        //var ockeditor = new CKEDITOR(element.id,'100%',verticalpercent+'%','NEOSYS')
+                        //var ockeditor = new CKEDITOR(element.id,'100%',verticalpercent+'%','EXODUS')
 
                         //http://docs.cksource.com/Talk:CKEditor_3.x/Developers_Guide
                         ockeditor = CKEDITOR.replace(element.id, {
@@ -1591,7 +1591,7 @@ function* formfunctions_onload() {
     }
 
     var temp = document.createElement('div')
-    //temp.innerHTML='<p align=center style="margin-top:5px"><small>Software by <a tabindex="-1" href="http://www.neosys.com">NEOSYS.COM</a></small></p>'
+    //temp.innerHTML='<p align=center style="margin-top:5px"><small>Software by <a tabindex="-1" href="http://www.neosys.com">EXODUS.COM</a></small></p>'
     document.body.insertBefore(temp, null)
 
     //start focused on the first key field
@@ -2057,7 +2057,7 @@ function window_onunload_sync() {
         return
 
     //save gdataset in case we are refreshing and the parent window isnt there to get it from
-    exodussetcookie('', 'NEOSYSlogincode', glogincode, 'logincode')    
+    exodussetcookie('', 'EXODUSlogincode', glogincode, 'logincode')    
 
     //unlock any document before unloading
     //using .next() instead of yield* to call async code
@@ -2066,7 +2066,7 @@ function window_onunload_sync() {
         //Save unlock request for following window to perform hopefully
         //in case following code doesnt successfully unlock its record in onbeforeunload
         var pending=['UNLOCK',gro.filename,gkey,gro.sessionid].join('\r')
-        exodussetcookie(glogincode, 'NEOSYSpending',pending)
+        exodussetcookie(glogincode, 'EXODUSpending',pending)
 
         console.log('trying to unlock '+gkey+' immediately but async request doesnt seem to reach server reliably while unloading')
         //yield* unlockdoc()
@@ -2422,8 +2422,8 @@ Numpad
     }
 
     //F12 is exodus debug key
-    //if (keycode==123/*&&gusername.indexOf('NEOSYS')+1*/)
-    if (keycode == 123 && gusername.indexOf('NEOSYS') + 1) {
+    //if (keycode==123/*&&gusername.indexOf('EXODUS')+1*/)
+    if (keycode == 123 && gusername.indexOf('EXODUS') + 1) {
 
         //plain F12 - toggle stepping2
         if (!event.shiftKey && !event.ctrlKey && !event.altKey) {
@@ -2750,7 +2750,7 @@ Numpad
     if ((ggroupno > 0) && grecn == (rs.length - 1)) {
         if ((keycode == 9 || keycode == 13 || keycode == 40) && !event.shiftKey && !event.ctrlKey && !tablex.getAttribute('noinsertrow')) {
 
-            //down on select handled by browser, not NEOSYS
+            //down on select handled by browser, not EXODUS
             if (keycode == 40 && element.tagName == 'SELECT')
                 return exoduscancelevent(event)
 
@@ -5092,7 +5092,7 @@ function* document_onfocus(event) {
     if (!ginitok)
         return
 
-    exodussetcookie('', 'NEOSYSlogincode', glogincode, 'logincode')
+    exodussetcookie('', 'EXODUSlogincode', glogincode, 'logincode')
     //window.status=new Date()+' '+glogincode
 
     var text = 'document_onfocus' + ' tag:' + event.target.tagName + ' id:' + event.target.id + (gpreviouselement ? ' gpreviouselement:' + gpreviouselement.id : '')
@@ -6439,7 +6439,7 @@ function* setdefault(element, donotupdate) {
     }
 
     //return true if already has a value
-    //var value=gds.getcells(element,grecn)[0].text<A HREF="http://localhost/exodus7/NEOSYS/images/">http://localhost/exodus7/NEOSYS/images/</A>
+    //var value=gds.getcells(element,grecn)[0].text<A HREF="http://localhost/exodus7/EXODUS/images/">http://localhost/exodus7/EXODUS/images/</A>
     var value = getvalue(element)
     if (value)
         return true
@@ -6963,7 +6963,7 @@ function* exodusevaluate(functionorcode, callerfunctionname, arg1name, arg1, thi
 
     if (typeof functionorcode == 'undefined') {
         systemerror('yield* exodusevaluate()', 'The required argument "functionorcode" is missing. Called from\n' + callerfunctionname)
-        if (gstepping || gusername == 'NEOSYS') crashhere
+        if (gstepping || gusername == 'EXODUS') crashhere
         return
     }
 
@@ -6987,9 +6987,9 @@ function* exodusevaluate(functionorcode, callerfunctionname, arg1name, arg1, thi
             return ''
     }
 
-    //if (gstepping||(!ginitok&&gusername=='NEOSYS'))
-    // if (true||gstepping||gusername=='NEOSYS')
-    if (gstepping || gusername == 'NEOSYS' || gusername == 'STEVE')
+    //if (gstepping||(!ginitok&&gusername=='EXODUS'))
+    // if (true||gstepping||gusername=='EXODUS')
+    if (gstepping || gusername == 'EXODUS' || gusername == 'STEVE')
         result=yield* exodusevaluate3(functionorcode, null, arg1name, arg1, thisobject)
     else {
 
@@ -8466,7 +8466,7 @@ function* form_closepopups() {
             calendar_checkInDatePicker.hide()
         }
         catch (e) {
-            if (gusername == 'NEOSYS')
+            if (gusername == 'EXODUS')
                 yield* exodusnote('couldnt drop calendar\n' + e.description)
         }
         calendar_checkInDatePicker = ''
