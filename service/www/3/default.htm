@@ -4,15 +4,15 @@
 
     <script type="text/javascript">
 
-        var NEOSYSlocation = 'neosys/'
+        var NEOSYSlocation = 'exodus/'
         var glogin = true
         var gshowmenu = false
         var gswitchingbrowser=false
 
-        //1. following code will, in neosys/3, switch to neosys (neosys/2 in future) if the browser doesnt support yield - eg MSIE
-        //2. note that client.js in neosys2 will switch to neosys/3 if showmodaldialog is not supported (and yield is supported)
-        // yield //var guseyield=false //activated in neosys/2 - code doesnt use yield
-        /* yield */var guseyield=true  //activated in neosys/3 - code has yield
+        //1. following code will, in exodus/3, switch to exodus (exodus/2 in future) if the browser doesnt support yield - eg MSIE
+        //2. note that client.js in exodus2 will switch to exodus/3 if showmodaldialog is not supported (and yield is supported)
+        // yield //var guseyield=false //activated in exodus/2 - code doesnt use yield
+        /* yield */var guseyield=true  //activated in exodus/3 - code has yield
         if (guseyield) {
                 
             //determine if yield * supported by browser
@@ -31,7 +31,7 @@
 
         }
 
-        //dont include neosys/3 yielding code with function * or yield * until we know the browser can handler them
+        //dont include exodus/3 yielding code with function * or yield * until we know the browser can handler them
         //because the browser will fail and anyway, we are switching to a different url that doesnt require yielding browser
         if (!gswitchingbrowser) {
             document.writeln('<scr' + 'ipt type="text/javascript" src="' + NEOSYSlocation + 'scripts/client.js"></scr' + 'ipt>')
@@ -49,7 +49,7 @@
                 <tr>
                     <td style="vertical-align: middle" rowspan="4">
                         <span style="white-space: nowrap">
-                            <img alt="NEOSYS" src="../neosys/images/theme2/neosysm.jpg" />
+                            <img alt="NEOSYS" src="../exodus/images/theme2/exodusm.jpg" />
                         </span>
                     </td>
                     <td>

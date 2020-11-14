@@ -1,0 +1,341 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+    <script type="text/javascript">
+        var gformfontscale = 1.3
+    </script>
+
+    <script type="text/javascript" src="../exodus/scripts/client.js"></script>
+
+    <script type="text/javascript">
+
+        var gtexttagnames = /^(INPUT)|(TEXTAREA)$/
+
+        var gbuttons = []
+        var gdefaultbutton
+
+        if (typeof window.dialogArguments == 'undefined') {
+            window.dialogArguments = []
+            window.dialogArguments = [, , 'OK', , 'Cancel', 'window.dialogArguments are missing in confirm.htm']
+            //return not in function
+            //window.close()
+            exoduswindowclose()
+        }
+
+        //var dialogargs=[question,defaultbuttonn,positivebutton,negativebutton,cancelbutton]
+        var questionx = window.dialogArguments[0]
+        var defaultbuttonn = window.dialogArguments[1]
+        var positivebuttonx = window.dialogArguments[2]
+        var negativebuttonx = window.dialogArguments[3]
+        var cancelbuttonx = window.dialogArguments[4]
+        var gtext = window.dialogArguments[5]
+        var gtexthidden = window.dialogArguments[6]
+        var gistextinput = typeof gtext != 'undefined' && gtext != null
+        var gimagesrc = window.dialogArguments[7]
+
+        function* window_onunload(event) {
+            //doesnt work unfortunately - at least in firefox 34
+            if (window.opener)
+                window.opener.focus()
+        }
+
+        function* formfunctions_onload() {
+
+            //document.onkeydown=document_onkeydown
+            addeventlistener(document, 'keydown', 'document_onkeydown')
+            //addeventlistener(document,'click','document_onclick')
+            addeventlistener(window, 'unload', 'window_onunload')
+            
+
+            //enable text box
+            if (gistextinput) {
+
+                //switch to hidden text if required
+                if (gtexthidden) {
+                    document.getElementById('textinput').id = 'textinputoriginal'
+                    document.getElementById('textinputhidden').id = 'textinput'
+                }
+
+                document.getElementById('textinput').value = gtext
+
+                if (gtexthidden)
+                    document.getElementById('textinputphidden').style.display = ''
+                else
+                    document.getElementById('textinputp').style.display = ''
+
+            }
+
+            if (!positivebuttonx && !negativebuttonx && !cancelbuttonx) {
+                positivebuttonx = 'Yes'
+                negativebuttonx = 'No'
+                cancelbuttonx = 'Cancel'
+            }
+
+            if (typeof questionx == 'undefined') questionx = 'OK to continue?'
+            questionx = questionx.replace(/\r\n/g, '\r')
+            questionx = questionx.replace(/\r\r/g, '<p class=statementclass>')
+            questionx = questionx.replace(/\r/g, '<br class=statementclass>')
+            questionx = questionx.replace(/\n/g, '<br class=statementclass>')
+            questionx = questionx.replace(FMre, '<br class=statementclass>')
+            questionx = questionx.replace(VMre, '<br class=statementclass>')
+            questionx = questionx.replace(/\|/g, '<br class=statementclass>')
+
+            questionx = document.getElementById('question1').innerHTML = questionx
+
+            function* addbutton(buttonid,buttonn,buttontext,buttonfkey) {
+
+                var button=document.createElement('span')
+
+                button.id=buttonid + 'button'
+
+                button.innerHTML=buttontext
+                button.tabIndex='0'
+                button.className="graphicbutton"
+                button.onmousedown=function(){this.style.borderStyle="inset"}
+                button.onmouseup=function(){this.style.borderStyle="outset"}
+                button.onmouseout=function(){this.style.borderStyle="outset"}
+                button.onclick=function(){closeit(buttonn%3)}
+
+                var letter=buttontext.match(/(<[uU]>)(.)/)
+                if (letter)
+                    letter=letter[2]
+                else if (!gistextinput)
+                    letter=buttontext.substr(0,1)
+                if (letter) {
+                    letter=letter.toUpperCase()
+                    button.setAttribute('exodusletter',letter)
+                }
+                button.title='Press '
+                if (letter)
+                    button.title+=letter+' or '
+                button.title+=buttonfkey
+
+                document.getElementById('yesnocancelbuttons').insertBefore(button,null)
+
+                //array of visible buttons
+                gbuttons[gbuttons.length] = button
+
+                //set the button number
+                button.setAttribute('exodusbuttonnumber',gbuttons.length-1)
+                button.setAttribute('exodusyesnocancel',buttonn%3)
+
+                //set the default button
+                if (gbuttons.length == defaultbuttonn) {
+                    gdefaultbutton = button
+                    window.setTimeout('gdefaultbutton.focus()', 10)
+                }
+
+            }
+
+            if (positivebuttonx)
+                yield* addbutton('positive',1,positivebuttonx,'F9')
+            if (negativebuttonx)
+                yield* addbutton('negative',2,negativebuttonx,'F8')
+            if (cancelbuttonx)
+                yield* addbutton('cancel',3,cancelbuttonx,'Esc')
+
+            //check some buttons exist
+            if (gbuttons.length < 0) {
+                alert('Error: No buttons specified in confirm.htm')
+                closeit('')
+            }
+
+            //make sure no button is default unless specified
+            if (!defaultbuttonn) {
+                if (gistextinput) {
+                    exodussettimeout('focusontext()', 10)
+                }
+                else {
+                    //xxtry{gbuttons[0].blur()}catch(e){}
+                }
+            }
+
+            //image
+            if (!gimagesrc && (questionx.indexOf('!') + 1 || questionx.toLowerCase().indexOf('are you sure ') + 1))
+                gimagesrc = 'warning'
+            else if (!gimagesrc) {
+                if (gbuttons.length == 1)
+                    gimagesrc = 'info'
+                else
+                    gimagesrc = 'question1'
+            }
+            if (gimagesrc) {
+                if (gimagesrc == 'critical') {
+                    gimagesrc = 'xpcritical.gif'
+                    document.body.style.backgroundColor = '#ffdddd'
+                }
+                if (gimagesrc == 'warning') {
+                    gimagesrc = 'xpwarning.gif'
+                    //darker than usual messages to distinguish from the usual buff document background color
+                    document.body.style.backgroundColor = '#ffff99'
+                }
+                if (gimagesrc == 'info') {
+                    gimagesrc = 'xpinfo.gif'
+                    document.body.style.backgroundColor = '#ddffdd'
+                }
+                if (gimagesrc == 'question1') {
+                    gimagesrc = 'xpquestion.gif'
+                    document.body.style.backgroundColor = '#ddddff'
+                }
+                if (!(gimagesrc.indexOf('/') + 1 + gimagesrc.indexOf('\\') + 1)) {
+                    gimagesrc = gimagetheme+gimagesrc
+                    if (window.location.href.toString().indexOf('default.htm')>=0)
+                        imagesrc=imagesrc.slice(3)
+                }
+                var img = document.getElementById('img1')
+                img.src = gimagesrc
+                img.style.display = ''
+            }
+
+            //position the dialog
+            //exodussettimeout('exodusautofitwindow()', 100)
+
+        }
+
+        function focusontext() {
+            document.getElementById('textinput').focus()
+            document.getElementById('textinput').select()
+        }
+
+        function* document_onkeydown(event) {
+
+            event=getevent(event)
+
+            var key = event.keyCode
+            var letter = String.fromCharCode(key).toUpperCase()
+
+            //cursor keys on buttons
+            if (event.target.getAttribute&&event.target.getAttribute('exodusyesnocancel')!='undefined') {
+
+                //left, up means back
+                if (key == 37 || key == 38) {
+                    cursor(event.target, -1)
+                    return
+                }
+
+                //right, down means forwards
+                if (key == 39 || key == 40) {
+                    cursor(event.target, 1)
+                    return
+                }
+
+            }
+
+            //Positive=F9 or
+            if (positivebuttonx) {
+                if (key == 120 || letter == document.getElementById('positivebutton').getAttribute('exodusletter')) {
+                    closeit(1)
+                }
+            }
+
+            //Negative=F8 or
+            if (negativebuttonx) {
+                if (key == 119 || letter == document.getElementById('negativebutton').getAttribute('exodusletter')) {
+                    closeit(2)
+                }
+            }
+
+            //Go Back=Esc or
+            //(allow esc to press positivebutton if there is no negative button (like alert()))
+            if (cancelbuttonx || !negativebuttonx) {
+                if (key == 27 || (cancelbuttonx && letter == document.getElementById('cancelbutton').getAttribute('exodusletter'))) {
+                    closeit(0)
+                }
+            }
+
+            //Enter for text
+            if (key == 13 && gistextinput) {
+                closeit(1)
+            }
+
+            //Enter or space to click on buttons
+            if ((key == 13 || key == 32) && !gistextinput) {
+                var result=event.target.getAttribute('exodusyesnocancel')
+                if (typeof result!='undefined')
+                    closeit(Number(result))
+            }
+
+        }
+
+        function cursor(eventtarget, arg1) {
+            if (eventtarget.className != 'graphicbutton')
+                return
+            var newbuttonn = (Number(eventtarget.getAttribute('exodusbuttonnumber')) + gbuttons.length + arg1) % gbuttons.length
+
+            gbuttons[newbuttonn].focus()
+        }
+
+        function closeit(arg1) {
+
+            var returnvalue
+            if (gistextinput) {
+                if (arg1 == 1)
+                    returnvalue = document.getElementById('textinput').value
+            }
+            else
+                returnvalue = Number(arg1)
+
+            //bit of a hack to cancel server requests
+            if (arg1 == 2 && window.dialogArguments.xhttp) {
+                try {
+                    //dont work for security (anti-popupunders)
+                    //window.opener.focus()
+                    //window.parentWindow.focus()
+                } catch (e){}
+                try {
+                    window.dialogArguments.xhttp.abort()
+                } catch (e){}
+                return false
+            }
+
+            //window.returnValue = returnvalue
+            //exodus_setparentwin_returnvalue(returnvalue)
+            //return window.close()
+            return exoduswindowclose(returnvalue)
+        }
+
+    </script>
+
+    <style type="text/css">
+        .statementclass {
+
+            /*font-size:medium*/
+        }
+    </style>
+    <title>Confirmation</title>
+</head>
+<body>
+    <!-- need both align center to center everything because text-align:center; doesnt work
+    and auto margins to avoid taking full screen width -->
+    <div id="autofitwindowelement" align="center" style="margin-left: auto; margin-right: auto;
+        float: left">
+        <table cellspacing="1" cellpadding="1">
+            <tr>
+                <td style="vertical-align: middle" style="padding: 20px">
+                    <img src="" alt="" style="display: none" id="img1" height="32" width="32" />
+                </td>
+                <td>
+                    <div class="statementclass" id="question1">
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    &nbsp;
+                </td>
+                <td>
+                    <p id="textinputp" style="display: none">
+                        <!-- <input size="60" id="textinput" autocomplete="nope" /> -->
+                        <input size="60" id="textinput" autocomplete="new-password" />
+                    </p>
+                    <p id="textinputphidden" style="display: none">
+                        <input type="password" size="60" id="textinputhidden" id="textinputhidden" autocomplete="new-password" />
+                    </p>
+                    <span id="yesnocancelbuttons"></span>
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>

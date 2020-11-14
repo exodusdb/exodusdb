@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <script type="text/javascript">
+        var gmodule = 'GENERAL'
+        var gdatafilename = 'EMAILUSERS'
+
+        //evade looking for script since is incorporated below
+        dict_EMAILUSERS = ''
+
+    </script>
+    <script type="text/javascript" src='../exodus/scripts/client.js'></script>
+    <script type="text/javascript" src='../general/scripts/general.js'></script>
+    <!-- TODO should not be including agency here in exodus UI files -->
+    <script type="text/javascript" src='../agency/scripts/types.js'></script>
+    <script type="text/javascript">
+        var ggroupidgroupn
+        var guseridgroupn
+        function* dict_EMAILUSERS(parameters) {
+
+            //returns an array representing the client dictionary
+
+            var dict = []//of dictrecs
+            var din = -1
+            groupn = 0
+
+            ++groupn
+            ggroupidgroupn = groupn
+
+            di = dict[++din] = dictrec('TO_GROUP_CODE', 'F', 1, '', groupn)
+            //N=Include Dept Numbers
+            //A=Groups with Active Users only
+            yield* types_dict_departmentcode(di, many = true, 'NA')
+            di.required = true
+            di.unique = true
+
+            di = dict[++din] = dictrec('TO_GROUP_NAME', 'S', '', '', groupn)
+            yield* general_dict_username(di, 'TO_GROUP_CODE')
+
+            ++groupn
+            guseridgroupn = groupn
+
+            di = dict[++din] = dictrec('TO_USER_CODE', 'F', 2, '', groupn)
+            yield* general_dict_usercode(di, many = true, withtask = '', withlocks = '', sselect = 'WITH LIVE_USER_WITH_EMAIL')
+            di.required = true
+            di.unique = true
+
+            di = dict[++din] = dictrec('TO_USER_NAME', 'S', '', '', groupn)
+            yield* general_dict_username(di, 'TO_USER_CODE')
+
+            ++groupn
+            di = dict[++din] = dictrec('CC_USER_CODE', 'F', 3, '', groupn)
+            yield* general_dict_usercode(di, many = true)
+            di.unique = true
+
+            di = dict[++din] = dictrec('CC_USER_NAME', 'S', '', '', groupn)
+            yield* general_dict_username(di, 'CC_USER_CODE')
+
+            di = dict[++din] = dictrec('EMAIL_SUBJECT', 'F', 4)
+            exodus_dict_text(di, 73)
+            di.required = true
+
+            di = dict[++din] = dictrec('EMAIL_MESSAGE', 'F', 5)
+            exodus_dict_text(di, 80, 20)
+            di.required = true
+
+            return dict
+
+        }
+
+        function* form_postinit() {
+
+            gparameters.savebuttonvalue = 'Send'
+
+            return true
+
+        }
+        function* form_prewrite() {
+            return yield* exodusokcancel('Ok to send email ?', 2)
+        }
+        function* form_postwrite() {
+            yield* deleteallrows(ggroupidgroupn)
+            yield* deleteallrows(guseridgroupn)
+            return true
+        }
+    </script>
+    <title>Email Users</title>
+</head>
+<body>
+    <div align="center">
+        <h1 id="head1">
+            Email Users</h1>
+        <table class="exodusform" border="1" bordercolor="#d0d0d0">
+            <tr>
+                <td>
+                    To groups:
+                </td>
+                <td style="vertical-align:middle">
+                    <table>
+                        <tr>
+                            <td>
+                                <input id="TO_GROUP_CODE" />
+                            </td>
+                            <td>
+                                <span id="TO_GROUP_NAME" />
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    To users:
+                </td>
+                <td style="vertical-align:middle">
+                    <table>
+                        <tr>
+                            <td>
+                                <input id="TO_USER_CODE" />
+                            </td>
+                            <td>
+                                <span id="TO_USER_NAME" />
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Subject
+                </td>
+                <td style="vertical-align:middle" style="text-align: left">
+                    <input id="EMAIL_SUBJECT" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Message
+                </td>
+                <td style="vertical-align:middle">
+                    <textarea id="EMAIL_MESSAGE" />
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>

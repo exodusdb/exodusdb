@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Backup</title>
+
+    <script type="text/javascript" src="scripts/client.js"></script>
+
+    <script type="text/javascript" src="../exodus/scripts/exodus.js"></script>
+
+    <script type="text/javascript">
+
+var gnosavelocation=true
+
+function backup_start_sync() {
+    exodussettimeout('yield* backup_start()')
+}
+
+function* backup_start() {
+
+ db.request='BACKUP'
+ if (!(yield* db.send()))
+  return yield* exodusinvalid(db.response)
+ 
+ yield* exodusnote(db.response)
+ 
+}
+
+    </script>
+
+</head>
+<body>
+    <div align="center">
+        <h1>
+            Backup</h1>
+        <br />
+            Important Notice:
+        <br />
+        This "backup" is NOT a full and proper backup of your NEOSYS system.<br />
+        It is an internal consistency check and copy of the NEOSYS database.
+        <br />
+        A full and proper backup of your data will be an automatic daily complete copy of
+        the<br />
+        NEOSYS software and data with periodic off-site storage. All to be setup, monitored,<br />
+        and certified by your own technical support staff.
+        <br />
+        <button onclick="backup_start_sync()">
+            Start Backup</button>
+    </div>
+</body>
+</html>

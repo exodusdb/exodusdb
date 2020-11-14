@@ -1,0 +1,106 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Authorisation File</title>
+    <script type="text/javascript">
+
+        gmodule = 'GENERAL'
+        gdatafilename = 'DEFINITIONS'
+        gdictfilename = 'AUTHORISATION'
+        gupdateonlymode = true
+        gfirstelement = 'USER_ID'
+    </script>
+    <script type="text/javascript" src="scripts/client.js"></script>
+    <script type="text/javascript" src="../exodus/scripts/authorisation.js"></script>
+    <script type="text/javascript" src="../exodus/scripts/authorisation2.js"></script>
+</head>
+<body>
+    <div align="center">
+        <h1>
+            Authorisation File</h1>
+        <h2>
+            Users</h2>
+        <input style="display: none" id="KEY" />
+        <table class="exodusform" border="1" bordercolor="#d0d0d0" width="50%">
+            <thead>
+                <tr>
+                    <td>
+                        User Id:<br />
+                        Expiry:
+                    </td>
+                    <td>
+                        Password<br />
+                        auto-expiry<br />
+                        days:<input id="PASSWORD_AUTOEXPIRY_DAYS" />
+                    </td>
+                    <td>
+                        User Name:<br />
+                        Email Address:<br />
+                        <input id="button_changeemaildomain" title="Change email domain name" class="exodusbutton"
+                            type="button" exodustype="B" tabindex="999" value="Change domain" exodusonclick="yield* authorisation_changeallemaildomains()">
+                    </td>
+                    <td>
+                        Last Login
+                    </td>
+                    <td>
+                        Keys:<br />
+                        Allowed IP Numbers:
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="vertical-align:top">
+                    <td>
+                        <input id="USER_ID" /><br />
+                        <input id="EXPIRY_DATE" />
+                    </td>
+                    <td>
+                        <input id="button_password" exodusgroupno="1" title="Set the password for the user"
+                            exodusonclick="yield* user_setpassword(false,this)" class="exodusbutton" type="button"
+                            exodustype="B" tabindex="999" value="Password" />
+                        <input id="button_tasks" exodusgroupno="1" title="See user's authorised tasks" class="exodusbutton"
+                            type="button" exodustype="B" tabindex="999" value="Tasks" exodusonclick="yield* user_showtasks()" />
+                    </td>
+                    <td>
+                        <input id="USER_NAME" />
+                        <input id="EMAIL_ADDRESS" />
+                    </td>
+                    <td>
+                        <span id="LAST_LOGIN_DATE_TIME"></span>
+                        <span id="LAST_LOGIN_LOCATION"></span>
+                    </td>
+                    <td>
+                        <input id="KEYS" />
+                        <input id="IP_NUMBERS" />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <br />
+        <h2>
+            Tasks</h2>
+        <table class="exodusform" border="1" bordercolor="#d0d0d0" width="50%">
+            <thead>
+                <tr>
+                    <td id="TASK_ID_title">
+                        Task Id
+                    </td>
+                    <td id="LOCKS_title">
+                        Locks
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <input id="TASK_ID" />
+                    </td>
+                    <td>
+                        <input id="LOCKS" />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

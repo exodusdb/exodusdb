@@ -1,0 +1,442 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+    <script type="text/javascript">
+        var gmodule = 'GENERAL'
+        var gdatafilename = 'DEFINITIONS'
+        var gdictfilename = 'SYSTEMCONFIGURATION'
+        var gpreventcreation=true
+        //var gpreventdeletion=false
+    </script>
+
+    <script type="text/javascript" src="../exodus/scripts/client.js"></script>
+    <script type="text/javascript" src="../exodus/scripts/system.js"></script>
+    <script type="text/javascript" src="../exodus/scripts/colors.js"></script>
+
+    <script type="text/javascript" src="../general/scripts/general.js"></script>
+
+    <title>System Configuration File</title>
+</head>
+<body>
+    <div align="center">
+        <h1>
+            System Configuration File</h1>
+        <table class="exodusform" border="1" bordercolor="#d0d0d0">
+            <tr>
+                <td>
+                    Scope
+                    <input id="SCOPE" />
+                    The scope of configuration can be per database, per installation (recommended), or per server.<br />
+                    A NEOSYS installation sometimes has multiple databases, and in a few cases a server
+                    may have multiple NEOSYS installations.<br />
+                    <b>Any item which is configured in more than one scope gets the configuration of the
+                        HIGHER (broader) scope only<br />
+                        so any item configured at a lower (narrower) scope will be IGNORED if the item is also
+                        configured at a higher scope.</b>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <h2>
+                        General</h2>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <table>
+                        <tr>
+                            <td>
+                                Host Name
+                            </td>
+                            <td>
+                                <input id="HOST_NAME" />.hosts.neosys.com
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Notes
+                            </td>
+                            <td>
+                                <input id="NOTES" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                User Timezone
+                            </td>
+                            <td>
+                                <input id="USER_TIMEZONE" />
+                                hours from server TZ
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <h2>
+                        Restrictions</h2>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <table>
+                        <tr>
+                            <td>
+                                Email Domains
+                            </td>
+                            <td>
+                                <input id="EMAIL_DOMAINS" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                IP numbers
+                            </td>
+                            <td>
+                                <input id="IP_NUMBERS" />
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <h2>
+                        System Generated Email</h2>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <table>
+                        <tr>
+                            <td colspan="2">
+                                <table>
+                                    <tr>
+                                        <td>
+                                            Alert Email Addr(s)
+                                        </td>
+                                        <td>
+                                            <input id="BACKUP_EMAIL_ADDRESSES" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Log Email Addr(s)
+                                        </td>
+                                        <td>
+                                            <input id="LOG_EMAIL_ADDRESSES" />
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <table>
+                                    <tr>
+                                        <td>
+                                            Sender Email Address
+                                        </td>
+                                        <td colspan="4">
+                                            <input id="SMTP_SENDER_EMAIL_ADDRESS" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            SMTP Hostname
+                                        </td>
+                                        <td>
+                                            <input id="SMTP_HOST" />
+                                        </td>
+                                        <td rowspan="3">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            SMTP Port
+                                        </td>
+                                        <td>
+                                            <input id="SMTP_PORT" />&nbsp;&nbsp;&nbsp;Timeout Secs.<input id="SMTP_TIMEOUT_SECONDS" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Use SSL
+                                        </td>
+                                        <td>
+                                            <input id="SMTP_USE_SSL" />
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td>
+                                <table>
+                                    <tr>
+                                        <td>
+                                            Authorisation
+                                        </td>
+                                        <td>
+                                            <input id="SMTP_AUTH_TYPE" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Username
+                                        </td>
+                                        <td>
+                                            <input id="SMTP_USERNAME" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Password
+                                        </td>
+                                        <td>
+                                            <input id="SMTP_PASSWORD" />
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <h2>
+                        Browser Addresses</h2>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <table>
+                        <tr>
+                            <td>
+                                Web Address
+                            </td>
+                            <td>
+                                <input id="WEB_ADDRESS" />
+                            </td>
+                            <td>
+                                Description
+                            </td>
+                            <td>
+                                <input id="WEB_ADDRESS_DESCRIPTION" />
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <h2>
+                        Default Style</h2>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <table>
+                <!-- Copied in users.htm, systemconfiguration.htm and companies.htm -->
+                        <tr>
+                            <td>
+                                &nbsp;
+                            </td>
+                            <th>
+                                Font name
+                            </th>
+                            <th>
+                                Font size %
+                            </th>
+                            <th>
+                            </th>
+                            <th>
+                                Body color
+                            </th>
+                            <th>
+                                Heading color
+                            </th>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right">
+                                Screens:
+                            </td>
+                            <td>
+                                <input id="SCREEN_FONT" />
+                            </td>
+                            <td style="text-align: right">
+                                <input id="SCREEN_FONT_SIZE" />
+                            </td>
+                            <td>
+                            </td>
+                            <td>
+                                <input id="SCREEN_BODY_COLOR" />
+                            </td>
+                            <td>
+                                &nbsp;
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right">
+                                Reports:
+                            </td>
+                            <td>
+                                <input id="REPORT_FONT_NAME" />
+                            </td>
+                            <td style="text-align: right">
+                                <input id="REPORT_FONT_SIZE" />
+                            </td>
+                            <td>
+                            </td>
+                            <td>
+                                <input id="REPORT_BODY_COLOR" />
+                            </td>
+                            <td>
+                                <input id="REPORT_HEAD_COLOR" />
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    Add signature image
+                    <input id="ADD_SIGNATURE" />
+                    any "%USERNAME%" or "%USER" code configured in<br />
+                    document footings unless %SIGNATURE%, %NOSIGNATURE% or another image is configured.
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <h2>
+                        Automated Backup</h2>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <table>
+                        <tr>
+                            <td>
+                                Backup Time
+                            </td>
+                            <td>
+                                <input id="BACKUP_TIME_FROM" />-<input id="BACKUP_TIME_UPTO" /> server TZ
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Backup Drive (eg F:)
+                            </td>
+                            <td>
+                                Data:<input id="BACKUP_DATABASE_TO" />
+                                Uploads:<input id="BACKUP_UPLOADS_TO" />
+                                (0 to suppress)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Only on
+                            </td>
+                            <td>
+                                <input id="BACKUP_DAY_OF_WEEK" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Close After Backup</td>
+                            <td>
+                                <input id="CLOSE_AFTER_BACKUP" /></td>
+            </tr>
+        </table>
+        </td> </tr>
+        <tr id="databasesection">
+            <td>
+                <h2>
+                    Databases <small>- Scope: Current Installation Only</small></h2>
+            </td>
+        </tr>
+        <tr id="databasesection">
+            <td>
+                <table>
+                    <tr>
+                        <td>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <td>
+                                            Database Code
+                                        </td>
+                                        <td>
+                                            Number of<br />
+                                            Processes<br />
+                                            Required
+                                        </td>
+                                        <td>
+                                            Automatic<br />
+                                            Backup
+                                        </td>
+                                        <td>
+                                            +Automatic<br />
+                                            Copy to<br />
+                                        </td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <input id="DATABASE_CODE" />
+                                        </td>
+                                        <td>
+                                            <input id="NUMBER_OF_PROCESSES" />
+                                        </td>
+                                        <td>
+                                            <input id="BACKUP_REQUIRED" />
+                                        </td>
+                                        <td>
+                                            <input id="COPY_REQUIRED" />
+                                            <input id="TEST_DATABASE_CODE" />
+                                        </td>
+                                        <td>
+                                            <button id="button_copynow" exodusgroupno="1" exodustype='B' tabindex="999" exodusonclick='yield* sysconfig_copynow()'
+                                                class="exodusbutton" type="button">
+                                                Copy now</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <h2>
+                    Other</h2>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Automatic Upgrade
+                <input id="AUTOMATIC_UPGRADE" /></td>
+        </tr>
+        <tr>
+            <td>
+                TEST databases can start required processes
+                <input id="TESTDB_CAN_START_PROCESSES" /></td>
+        </tr>
+        <tr>
+            <td>
+                Maximum days without login
+                <input id="MAX_NOLOGIN_DAYS" /> Forces password reset. Default is 31 days, 0=No limit</td>
+        </tr>
+        <tr>
+            <td>
+                Monitor Port No.
+                <input id="MONITOR_PORT_NO" /> Default is 4428</td>
+        </tr>
+        </table>
+    </div>
+</body>
+</html>

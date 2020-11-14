@@ -3,9 +3,9 @@
          |-- module1/             your module1 htm files and /scripts
          |-- module2/             your module2 htm files and /scripts
          |-- etc.
-         `-- neosys/              NEOSYS FRAMEWORK htm files and /scripts
+         `-- exodus/              NEOSYS FRAMEWORK htm files and /scripts
 
-    `-- neosys/
+    `-- exodus/
         |-- dll/                 upload.php/upload.dll
         |-- doc/                 NEOSYS FRAMEWORK dev info as htm files
         |-- editor/              ckeditor htm/js web editor

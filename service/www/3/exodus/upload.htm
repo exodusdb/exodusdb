@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+    <script type="text/javascript" src="scripts/client.js"></script>
+
+    <script type="text/javascript" src="scripts/db.js"></script>
+
+    <script type="text/javascript" src="scripts/upload.js"></script>
+
+    <title>Images, Audio, Video, Documents</title>
+</head>
+<body>
+    <div align="center">
+        <h2>
+            Images, Audio, Video, Documents</h2>
+        <button style="display: none" id="button_showupload">
+            Upload</button>
+        <button class="exodusbutton" onclick="window.close()" title="Close window (Esc)">
+            Close</button>
+        <form enctype="multipart/form-data" target="_parent" action="../../exodus/dll/upload.dll" method="post"
+            id="form1">
+            <table id="table_upload" style="display: none">
+                <tr>
+                    <td style="vertical-align: top">
+                        Step 1.<br />
+                        Select file
+                    </td>
+                    <td style="vertical-align: top">
+                        <input size="60" id="filedata" class="exodusbutton" name="filedata" type="file" onchange="previewimage_sync(this)" />
+                        <br />
+                        <span id="audiovisualextensionselement"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Step 2.<br />
+                        Upload file
+                        <br />
+                        (Alt+2)
+                    </td>
+                    <td>
+                        <input id="button_submit" class="exodusbutton" type="button" value="Upload" accesskey="2"
+                            title="Upload (Alt+2)" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span id="thumbnail_size_span"></span>
+                    </td>
+                    <td>
+                        <img id="thumbnail" src="" alt="" /></td>
+                </tr>
+                <tr style="display: none">
+                    <td>
+                        Step 3.
+                    </td>
+                    <td>
+                        <button exodusonclick="yield* loadimages()" class="exodusbutton">
+                            Refresh</button>
+                    </td>
+                </tr>
+            </table>
+            <span style="display: none">
+                <br />
+                Destination URL:
+                <input id="pathdata" name="pathdata" value="" />
+                <br />
+                Destination File:
+                <input id="filename" name="filename" value="" />
+                <br />
+                Response URL:
+                <input id="redirectpage" name="redirectpage" value="" />
+                <br />
+            </span>
+        </form>
+        <div id="images">
+        </div>
+    </div>
+</body>
+</html>

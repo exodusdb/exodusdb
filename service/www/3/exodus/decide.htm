@@ -1,0 +1,692 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+
+    <script type="text/javascript" src="../exodus/scripts/client.js"></script>
+
+    <style type="text/css">
+        td, th {
+            padding:0px 2px;
+        }
+    </style>
+
+    <script type="text/javascript">
+
+        //get the stylesheet
+        //var NEOSYSlocation='../exodus/'
+        //document.writeln('<link REL="stylesheet" TYPE="text/css" HREF="'+NEOSYSlocation+'global.css">')
+
+        //document.onkeydown = document_onkeydown
+        //document.ondblclick = document_ondblclick
+        addeventlistener(document,'keydown','document_onkeydown')
+        addeventlistener(document,'dblclick','document_ondblclick')
+
+        var goriginalstyles = {}
+
+        function* document_ondblclick(event) {
+            event=getevent(event)
+
+            // var col0=row.all['col0']
+            // if (col0.innerText==' '||col0.innerText==''||col0.innerText=='\u00a0') yield* clickrow(row)
+
+            if (event.target.id != 'cancel' && event.target.type == 'checkbox') {
+                event.target.checked = true
+            }
+
+            ok_onclick()
+
+        }
+
+        function* document_onkeydown(event) {
+
+            event=getevent(event)
+
+            if (typeof returnmany == 'undefined')
+                returnmany = ''
+
+            var keycode = event.keyCode
+
+            window.status = keycode
+
+            //ctrl+Enter or single select
+            if (keycode == 13 && event.ctrlKey) {
+                ok_onclick()
+                return exoduscancelevent(event)
+            }
+
+            //F9 is old save
+            if (keycode == 120) {
+                ok_onclick()
+                return exoduscancelevent(event)
+            }
+
+            //Esc is cancel
+            if (keycode == 27) {
+                cancel_onclick()
+                return exoduscancelevent(event)
+            }
+
+            var selections = document.getElementsByName('selection')
+            var options = document.getElementsByName('optionno')
+
+            var element = event.target
+
+            //ctrl+enter and f9 is ok
+            if (keycode == 120 || (keycode == 13 && event.ctrlKey)) {
+                ok_onclick()
+                return
+            }
+
+            //digits 0-9 select options 1-10
+            if (keycode >= 49 && keycode <= 57) {
+
+                var optionn = keycode - 48
+                if (optionn == 0) optionn = 10
+                for (var rown=0;rown<options.length;++rown) {
+                    if (options[rown].getAttribute('optionno')==optionn) {
+                        selections[rown].checked = !selections[rown].checked
+                        if (!returnmany || selections.length == 1)
+                            return ok_onclick()
+                        break;
+                    }
+                }
+                return false
+            }
+
+            //all following refers to many selections 
+            if (!returnmany) {
+                if (keycode == 13) {
+                    ok_onclick()
+                    return exoduscancelevent(event)
+                }
+                return
+            }
+            
+            //enter
+            if (keycode == 13 && !isNaN(n)) {
+
+                element.checked = !element.checked
+
+                checkbox_onclick_sync(element)
+
+                event.returnValue = false
+                keycode = 40
+            }
+
+            //A=all or none
+            if (keycode == 65) {
+                decide_all_onclick()
+            }
+
+            var n
+            if (element.rowIndex)
+                n = element.rowIndex
+            else if (element.parentNode && element.parentNode.rowIndex)
+                n = element.parentNode.rowIndex
+            else if (element.parentNode && element.parentNode.parentNode && element.parentNode.parentNode.rowIndex)
+                n = element.parentNode.parentNode.rowIndex
+            else
+                return
+
+            n -= 1
+
+            //up down arrow or page
+            if (keycode == 33 || keycode == 34 || keycode == 40 || keycode == 38) {
+
+                var direction
+                if (keycode == 34 || keycode == 40) direction = 1
+                if (keycode == 33 || keycode == 38) direction = -1
+                if (keycode == 34) {
+                    if (event.ctrlKey) {
+                        n = selection.lengths - 1
+                    }
+                    else {
+                        if (n == (selections.length - 1)) n = 0
+                        else {
+                            n += 10
+                            if (n >= (selections.length - 1))
+                                n = selections.length - 1
+                        }
+                    }
+                    n--
+                }
+                if (keycode == 33) {
+                    if (event.ctrlKey) {
+                        n = 0
+                    }
+                    else {
+                        if (n == 0)
+                            n = selections.length - 1
+                        else {
+                            n -= 10
+                            if (n <= 0)
+                                n = 0
+                        }
+                    }
+                    n++
+                }
+                var newelement = element
+                while (true) {
+
+                    n += direction
+                    if (n < 0) n = selections.length - 1
+                    if (n >= selections.length) n = 0
+
+                    newelement = selections[n]
+
+                    //skip if no other suitable elements
+                    if (newelement == element)
+                        return
+
+                    //skip if not visible
+                    if (!newelement)
+                        return false//may not be on an element
+                    if (newelement.style.visibility == 'hidden')
+                        continue
+
+                    if (n == 0)
+                        window.scrollTo(0, 0)
+                    if (n == (selections.length - 1))
+                        window.scrollTo(0, 999999)
+                    break
+
+                }
+
+                newelement.focus()
+                newelement.select()
+
+                return false
+
+            }
+
+            //none/delete
+            if (keycode == 46) {
+                for (var ii = 0; ii < selections.length; ii++) selections[ii].checked = false
+            }
+
+        }
+
+        function decide_all_onclick() {
+            selections = document.getElementsByName('selection')
+            var truefalse = !selections[0].checked
+            for (var ii = 0; ii < selections.length; ii++)
+                selections[ii].checked = truefalse
+        }
+
+        function checkbox_onclick_sync(element) {
+
+            var checking = element.checked
+            var selection2 = document.getElementsByName('selection')
+            var found = false
+            var level
+            for (ii = 0; ii < selection2.length; ii++) {
+                if (found) {
+                    //quit once get back to the same level
+                    if (selection2[ii].parentNode.nextSibling.innerText.match(/^[\. -]*/) <= level) break
+                    selection2[ii].checked = checking
+                }
+                else if (selection2[ii] == element) {
+                    level = selection2[ii].parentNode.nextSibling.innerText.match(/^[\. -]*/)
+                    found = true
+                }
+            }
+
+        }
+
+        function radio_onmousedown_sync(element) {
+            element.checked = true
+            ok_onclick()
+        }
+
+        function ok_onclick() {
+
+            //NB returns row numbers 1 based not 0 based!
+            //0 means cancelled
+
+            var returnvalues = []
+            var selection2 = document.getElementsByName('selection')
+            for (ii = 0; ii < selection2.length; ii++) {
+                if (selection2[ii].checked) {
+                    var returnvalue=selection2[ii].getAttribute('returnvalue')
+                    /*
+                    if (returncolid === '') {
+                        returnvalue = ii + 1
+                    }
+                    else {
+                        returnvalue = inverted ? data[returncolid][ii] : data[ii][returncolid]
+                        if (typeof returnvalue == 'object')
+                            returnvalue = returnvalue.text
+                    }
+                    */
+                    if (!returnmany) {
+                        returnvalues = returnvalue
+                        break
+                    }
+
+                    if (returnvalue)
+                        returnvalues[returnvalues.length] = returnvalue
+
+                }
+            }
+
+            //if (typeof returnvalues != 'object' || returnvalues.length) {
+            //    exodus_setparentwin_returnvalue(returnvalues)
+            //}
+            //return window.close()
+            return exoduswindowclose(returnvalues)
+
+        }
+
+        function cancel_onclick() {
+            //window.returnValue = ''
+            //exodus_setparentwin_returnvalue('')
+            //return window.close()
+            return exoduswindowclose('')
+        }
+
+    </script>
+
+</head>
+<body>
+    <!-- need both align center to center everything because text-align:center; doesnt work
+    and auto margins to avoid taking full screen width -->
+    <div id="autofitwindowelement" align="center" style="margin-left: auto; margin-right: auto;
+        float: left">
+        <h2>
+            <span id="question1"></span>
+        </h2>
+        <table id="table1" class="exodusform" border="1" bordercolor="#d0d0d0" cellspacing="0" xcellpadding="0">
+            <thead onclick="sorttable2(event)" style="cursor: pointer">
+                <tr id="table1head1row1">
+                </tr>
+            </thead>
+            <tbody id="table1body1">
+            </tbody>
+        </table>
+        <p>
+            <input id="ok_button" onclick="ok_onclick()" value="OK" type="submit" class="exodusbutton"
+                title="Enter, Ctrl+Enter or F9" />
+            <input id="cancel_button" onclick="cancel_onclick()" value="Cancel" type="button"
+                class="exodusbutton" title="Esc" />
+            <input id="print_button" onclick="window.print()" value="Print" type="button" title="Alt+P"
+                accesskey="P" class="exodusbutton" />
+        </p>
+
+        <script type="text/javascript">
+
+            var data
+
+            function* formfunctions_onload() {
+
+                if (typeof window.dialogArguments == 'undefined')
+                    window.dialogArguments = window.dialogArguments
+                if (typeof window.dialogArguments == 'undefined') window.dialogArguments = []
+
+                //called early to make visible
+                yield* clientfunctions_setstyle()
+
+                //returncolid==='' or undefined means return row number(s)
+
+                var question = window.dialogArguments[0]
+                data = window.dialogArguments[1]
+                var cols = window.dialogArguments[2]
+                returncolid = window.dialogArguments[3]
+                var defaultreply = window.dialogArguments[4]//must be an array with method exoduslocate
+                returnmany = window.dialogArguments[5]
+                inverted = window.dialogArguments[6]
+
+                //question
+                if (!question) question = 'Which do you want?'
+                question = question.replace(/[\|\r\n]/g, '<br />')
+                if (returnmany)
+                    question += '&nbsp;&nbsp;<span style="font-size:66%">(A=All)</span>'
+                $$('question1').innerHTML = question
+
+                //data
+                //[[,,,],[,,,],[,,,]] or
+                //col1.1 vm col1.2 fm col2.1 vm col2.2 etc
+                if (!data && !cols) data = [['Yes'], ['No']]
+                if (data && typeof data == 'string') {
+                    data = data.split(data.indexOf(fm) + 1 ? fm : ':')
+                }
+                for (ii = 0; ii < data.length; ii++) {
+                    if (typeof data[ii] == 'string') {
+                        data[ii] = data[ii].split(data[ii].indexOf(vm) + 1 ? vm : ';')
+                    }
+                    else if (typeof data[ii] == 'number') data[ii] = [data[ii]]
+                }
+
+                //quit if no data
+                if (!data.length) {
+                    alert('No options available')
+                    cancel_onclick()
+                    return null
+                }
+
+                //check some options
+                if (!data.length) {
+                    //cancel_onclick()
+                    alert('No data to select')
+                    //return window.close()
+                    //return exodussettimeout('exoduswindowclose()', 1)
+                    return exoduswindowclose()
+                }
+
+                //columns
+                //[[dictid,title],etc. or
+                //colid vm coltitle fm ... etc one per column
+                if (!cols) {
+                    cols = []
+                    for (var ii = 0; ii < data[0].length; ii++) {
+                        cols[ii] = [ii, '']
+                    }
+                }
+                if (typeof cols == 'string') {
+                    if (cols.indexOf(fm) < 0 && cols.indexOf(vm) < 0) {
+                        cols = cols.replace(/:/g, fm)
+                        cols = cols.replace(/;/g, vm)
+                    }
+                    cols = cols.split(fm)
+                }
+                for (ii = 0; ii < cols.length; ii++) {
+                    if (typeof cols[ii] == 'string') cols[ii] = cols[ii].split(vm)
+                }
+                var ncols = cols.length
+
+                //returncolid
+                if (typeof returncolid == 'undefined') returncolid = ''
+
+                //defaultreply
+
+                //returnmany
+                //returnmany=
+
+                //build the table
+
+                //build the column headings row
+                var firstselection
+
+                //get a handle on the existing heading row
+                var oRow = $$('table1head1row1')
+
+                //add two columns for the check box or radio button column to the column heading
+                var oCell = document.createElement('th')
+                oCell.colSpan = 2
+                oCell.align = 'center'
+                if (returnmany)
+                    tt = '<button'
+                    + ' title="A=All"'
+                    + ' onclick="decide_all_onclick()"'
+                    + ' style="font-size:80%"'
+                    + '>All</button'
+                else
+                    tt = '&nbsp;'
+                oCell.innerHTML = tt
+                oRow.appendChild(oCell)
+
+                //add other column headings
+                for (ii = 0; ii < ncols; ii++) {
+                    var oCell = document.createElement('th')
+                    oCell.style.fontWeight = 'bold'
+                    var title = cols[ii][1]
+                    if (typeof title == 'undefined') {
+                        title = cols[ii][0]
+                        if (!title) title = ''
+                        if (parseInt(title)) title = ''
+                        title = title.replace(/_/gi, ' ')
+                    }
+                    oCell.innerHTML = title
+                    oRow.appendChild(oCell)
+
+                    if (!cols[ii][3] && cols[ii][2] && ( cols[ii][2] == 'DATE' || cols[ii][2] == 'TIME'))
+                        cols[ii][3] = 'right'
+
+                    //check colid is in data
+                    //if ((!inverted&&typeof (data[0][cols[ii][0]])=='undefined')||(inverted&&typeof (data[cols[ii][0]][0])=='undefined'))
+                    if ((!inverted && typeof (data[0][cols[ii][0]]) == 'undefined') || (inverted && typeof (data[cols[ii][0]]) == 'undefined')) {
+                        //  alert(cols[ii])
+                        alert('popup column "' + cols[ii][0] + '" not in popup data in decide.htm')
+                        cancel_onclick()
+                        return null
+                    }
+
+                }
+
+                //column heading row built
+
+                //build the table rows
+                var starttime = new Date
+                var maxsecs = 15
+
+                var table1body1x = $$('table1body1')
+
+                //rows
+                var nrows = inverted ? data[cols[0][0]].length : data.length
+                for (rown = 0; rown < nrows; rown++) {
+
+                    //break if too many rows
+                    if ((new Date() - starttime) > (maxsecs * 1000)) {
+                        if (!(confirm('A large popup window is taking time to prepare.\r\rClick [OK] to wait or [Cancel] to see part.'))) break
+                        starttime = new Date
+                    }
+
+                    if (returncolid === '') {
+                        returnvalue = rown + 1
+                    }
+                    else {
+                        returnvalue = inverted ? data[returncolid][rown] : data[rown][returncolid]
+                        if (typeof returnvalue == 'object')
+                            returnvalue = returnvalue.text
+                    }
+
+                    //hide checkboxes on rows with nothing to return
+                    var visibilityhidden
+                    if (returncolid) {
+                        //var returnvalue = inverted ? data[returncolid][rown] : data[rown][returncolid]
+                        //if (!returncolid)
+                        //    returnvalue = rown + 1
+                        if (returnmany)
+                            visibilityhidden = returnvalue ? '' : 'onclick="checkbox_onclick_sync(this)"'
+                        else
+                            visibilityhidden = returnvalue ? '' : 'style=visibility:hidden'
+                    }
+
+                    //create a new row
+                    var oRow = document.createElement('tr')
+                    table1body1x.appendChild(oRow)
+
+                    //add line number column
+                    var oCell = document.createElement('td')
+                    oRow.appendChild(oCell)
+                    oCell.innerHTML = rown + 1 + "."
+                    oCell.id='optionno'
+                    oCell.name='optionno'
+                    oCell.setAttribute('name','optionno')
+                    oCell.setAttribute('optionno',rown+1)
+                    if (visibilityhidden)
+                        oCell.style.visibility = 'hidden'
+
+                    //add a check box or radio button column
+                    var oCellx = document.createElement('td')
+                    oRow.appendChild(oCellx)
+
+                    if (returnmany) {
+                        oCellx.innerHTML = '<input ' + visibilityhidden + ' id=selection name=selection type="checkbox" />'
+                    }
+                    else {
+                        var checked = ''
+                        if (!firstselection) {
+                            if (!visibilityhidden) {
+                                checked = 'checked=true'
+                                firstselection = oCellx
+                            }
+                        }
+                        oCellx.innerHTML = '<input ' + checked + ' ' + visibilityhidden + ' id=selection name=selection type=radio onmousedown="radio_onmousedown_sync(this)" />'
+                    }
+                    
+                    if (defaultreply && defaultreply.exoduslocate(returnvalue))
+                        oCellx.firstChild.checked = true
+
+                    oCellx.firstChild.setAttribute('returnvalue',returnvalue)
+
+                    //add the data columns for this row
+                    for (coln = 0; coln < ncols; coln++) {
+                        var oCell = document.createElement('td')
+                        oRow.appendChild(oCell)
+
+                        var colinfo = cols[coln]
+
+                        if (inverted) {
+                            value = data[colinfo[0]][rown]
+                        }
+                        else {
+                            value = data[rown][colinfo[0]]
+                        }
+                        if (typeof value == 'undefined')
+                            value = ''
+                        else if (typeof value == 'object')
+                            value = value.text
+
+                        //date conversion
+                        if (colinfo[2] == 'DATE' && exodusnum(value))
+                            value = DATE(value)
+
+                        //time conversion
+                        if (colinfo[2] == 'TIME' && exodusnum(value))
+                            value = TIME(value)
+
+                        //oCell.innerHTML=value
+                        //use innerText otherwise things like <> in the data do not show
+                        oCell.innerText = value
+                        //if (visibilityhidden) oCell.style.fontWeight='bold'
+
+                        if (colinfo[3])
+                            oCell.align = colinfo[3]
+
+                        if (defaultreply) {
+                            if (typeof returncolid === '') {
+                                if (defaultreply.exoduslocate(rown + 1))
+                                    oCellx.firstChild.checked = true
+                            }
+                            else {
+                                //returncolid was being treated as onscreen col preventing proper defaulting
+                                //if (value && coln === returncolid) {
+                                if (value && (colinfo[0] == returncolid || Number(colinfo[0]) == returncolid)) {
+                                    if (defaultreply.exoduslocate(value))
+                                        oCellx.firstChild.checked = true
+                                }
+                            }
+                        }
+
+                    }
+
+                    //table rows built
+
+                    //table built
+
+                }
+
+                //autoselect only one option
+                if (data.length == 1) {
+                    if (returncolid == '') {
+                        var selection2 = document.getElementsByName('selection')
+                        selection2[0].checked = true
+                    }
+                    ok_onclick()
+                    return null
+                }
+
+                //exodussettimeout('exodusautofitwindow()', 10)
+
+                var selections = document.getElementsByName('selection')
+
+                //focus on the first checked item or the first rown
+                for (var ii=0;ii<selections.length;++ii)
+                    if (selections[ii].checked)
+                        break
+                if (ii>=selections.length)
+                    ii=0
+                selections[ii].focus()
+                
+            } //of formfunctions_onload()
+
+    var gsorttable2offset=1//decide
+    //var gsorttable2offset=0//decide2
+    function sorttable2(event) {
+
+     //locate the current element
+     event=getevent(event)
+
+     var th=event.target
+     if (th.tagName!="TH")
+        return(0)
+
+     var tableelement=th.parentElement.parentElement.parentElement
+     var tablerows=tableelement.tBodies[0].getElementsByTagName('tr')
+     var coln=th.cellIndex+gsorttable2offset
+
+     var reverse=event.target.getAttribute('sorttable2_issorted')
+     event.target.setAttribute('sorttable2_issorted',reverse?'':1)
+     
+     var rown=th.parentElement.rowIndex
+     var nrows=tablerows.length
+     fromrown=0
+     uptorown=nrows-1
+
+     if (gdateformat == 'M/d/yyyy')
+      var dateformat=[2,0,1]
+     else if (gdateformat == 'yyyy/M/d')
+      var dateformat=[0,1,2]
+     else //gdateformat = 'd/M/yyyy'
+      var dateformat=[2,1,0]
+     var yy=dateformat[0]+1
+     var mm=dateformat[1]+1
+     var dd=dateformat[2]+1
+
+     var sortdata=[]
+     var dateregex=/ ?(\d{4}|\d{1,2})\/ ?(\d{1,2})\/(\d{4}|\d{2})/
+     var periodregex=/ ?(\d{1,2})\/(\d{4})/g
+     for (var ii=fromrown;ii<=uptorown;++ii){
+      var cell=tablerows[ii].cells[coln]
+      var value=(cell.textContent||cell.innerText||"").toUpperCase()
+      var match
+      while(match=value.match(dateregex)) {
+       //convert dates like n/n/yy or n/n/yyyy to sortable yyyy|mm|dd format
+       value=value.replace(dateregex,('0000'+match[yy]).slice(-4)+'|'+('00'+match[mm]).slice(-2)+'|'+('00'+match[dd]).slice(-2))
+       //console.log(value)
+      }
+
+      value=value.replace(periodregex,'$2|$1')
+
+      //natural sort
+      value=value.replace(/[-+]?[1234567890.,]+/g,function(x){if (x.slice(0,1)=='-') {y='-';x=x.slice(1)} else y='';return y+('0000000000000000000000'+x).slice(-20)})
+      //value+=('000000000000'+ii).slice(-10)//stable sort
+      //cell.setAttribute('sortvalue',value)
+      sortdata.push([value,ii])
+     }
+
+     sortdata.sort(function (a,b){if (a[0]<b[0]) return -1;if (a[0]>b[0]) return 1;return a[1]-b[1]})
+     if (reverse)
+      sortdata.reverse()
+    
+     //get an array of the tablerows
+     var oldrows = []
+     for (var oldrown = 0; oldrown < tablerows.length; oldrown++)
+      oldrows[oldrown] = tablerows[oldrown]
+
+     //reorder table rows
+     var newdatarows = []
+     for (var newrown = 0; newrown < sortdata.length; ++newrown) {
+      var oldrown = sortdata[newrown][1]
+      if (newrown != oldrown)
+       tablerows[newrown].swapNode(oldrows[oldrown])
+     }
+     
+    }//sorttable2
+
+        </script>
+
+    </div>
+</body>
+</html>

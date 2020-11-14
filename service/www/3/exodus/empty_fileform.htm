@@ -1,0 +1,79 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <!-- The following short script must be included first to define a few variables
+    that determine how the form is to be processed.-->
+
+    <script type="text/javascript">
+			
+			/*
+			 The name of the data file on the server must be
+			 specified in the global variable "gdictfilename"
+			*/
+			var gdatafilename='YOURFILENAME'
+			
+			/*
+			 If the name of the exodus dictionary object that defines the
+			 user interface is NOT the same as the filename, it must be
+			 specified in the global variable "gdictfilename"
+			 The actual dictionary object name will be "dict_YOURFILENAME"
+			*/
+			//var gdictfilename='YOURFILENAME'
+			
+    </script>
+
+    <!-- The following exodus script must be included second in order to enable exodus
+    functionality.-->
+
+    <script type="text/javascript" src="../exodus/scripts/client.js"></script>
+
+    <!-- The following script must be written third in order to define in detail the
+    dictionary that causes all the required user interface details for each field on
+    the form. The dictionary for a data form MUST define at a key field with field number
+    zero.-->
+
+    <script type="text/javascript">
+			function* dict_YOURFILENAME() {
+
+			//returns an array representing the client dictionary
+			
+			var dict=[]//of dictrecs
+			var din=-1
+			var di
+			 
+			di=dict[++din]=dictrec('YOURKEYFIELDNAME','F',0)
+			 
+			di=dict[++din]=dictrec('YOURFIRSTFIELDNAME','F',1)
+			  
+			return dict
+			 
+			}
+    </script>
+
+    <title>YOURFILENAME File</title>
+</head>
+<body>
+    <div style="text-align:center">
+        <h1>
+            YOURFILENAME File</h1>
+        <table class="exodusform" border="1" bordercolor="#d0d0d0">
+            <thead>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        Key Field</td>
+                    <td>
+                        <input id="YOURKEYFIELDNAME" /></td>
+                </tr>
+                <tr>
+                    <td>
+                        First Field</td>
+                    <td>
+                        <input id="YOURFIRSTFIELDNAME" /></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

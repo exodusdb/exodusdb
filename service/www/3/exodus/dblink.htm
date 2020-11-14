@@ -1,0 +1,132 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+
+    <script type="text/javascript" src="scripts/client.js"></script>
+
+    <script type="text/javascript">
+
+function* formfunctions_onload() {
+
+ //global pointers to main form data elements
+ grequestelement=$$('requestelement')
+ gdataelement=$$('dataelement')
+ gresultelement=$$('resultelement')
+ gresponseelement=$$('responseelement')
+ 
+ request=window.location.href.toString().split('?').slice(1)
+ if (!(request.join())) {
+
+//  $$('maindiv').style.display=""
+  grequestelement.select()
+  return
+ }
+
+ //prepare for login as much as possible but take existing username if possible
+ gsystem=unescape(request[0])
+ gdataset=unescape(request[1])
+
+ var userx=unescape(request[2])
+ var passx=unescape(request[3])
+ var requestx=unescape(request[4])
+ var datax=unescape(request[5])
+ 
+ //requestx=requestx.replace(/\\u07FE/g,fm)
+ //requestx=requestx.replace(/\\u07FD/g,vm)
+ //datax=datax.replace(/\\u07FE/g,fm)
+ //datax=datax.replace(/\\u07FD/g,vm)
+ requestx=requestx.replace(/\\x1E/g,fm)
+ requestx=requestx.replace(/\\x1D/g,vm)
+ datax=datax.replace(/\\x1E/g,fm)
+ datax=datax.replace(/\\x1D/g,vm)
+
+ if (!userx)
+  userx=''
+ if (!passx)
+  passx=''
+ if (!requestx)
+  requestx=''
+ if (!datax)
+  datax=''
+
+ exodussetcookie('', 'NEOSYSsystem',gsystem)
+
+ if (userx)
+  gusername=userx 
+ glogincode=gdataset+'*'+gusername+'*'
+ 
+ grequestelement.value=requestx
+ 
+ if (datax)
+  gdataelement.value=datax
+
+ yield* send_onclick(immediatemode=true)
+ 
+}
+
+function* send_onclick(immediatemode) {
+
+ db.request=grequestelement.value
+ 
+ var result=yield* db.send(gdataelement.value)
+
+ gresultelement.value=result
+ gdataelement.value=db.data
+ gresponseelement.value=db.response
+ 
+ if (!immediatemode)
+  grequestelement.select()
+ else {
+
+  if (result)
+   yield* exodusnote(db.data)
+  else
+   yield* exodusinvalid(db.response+'\r'+db.data)
+ }
+ 
+}
+
+    </script>
+
+</head>
+<body>
+    <div id="maindiv" style="text-align: center; display: none">
+        <table>
+            <tr>
+                <td>
+                    Request
+                </td>
+                <td>
+                    <input id="requestelement" size="100" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Data
+                </td>
+                <td>
+                    <textarea id="dataelement" rows="5" cols="100"></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Response
+                </td>
+                <td>
+                    <textarea id="responseelement" rows="5" cols="100"></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Result
+                </td>
+                <td>
+                    <input id="resultelement" size="100" />
+                </td>
+            </tr>
+        </table>
+        <input id="send" type="submit" value="Send" exodusonclick="yield* send_onclick()" />
+    </div>
+</body>
+</html>

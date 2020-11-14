@@ -1,0 +1,222 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Upload2</title>
+
+    <script type="text/javascript">
+        gshowmenu = false
+    </script>
+
+    <script type="text/javascript" src="scripts/client.js"></script>
+
+    <script type="text/javascript">
+
+        function uploadGbMbKb_sync(temp) {
+            if (temp >= 1000000000)
+                return uploadround_sync(temp / 1000000000) + 'GB'
+            else if (temp >= 1000000)
+                return uploadround_sync(temp / 1000000) + 'MB'
+            else if (temp >= 1000)
+                return uploadround_sync(temp / 1000) + 'kB'
+            else
+                return temp
+        }
+
+        function uploadround_sync(number) {
+            return Math.floor(number * 10 + 0.5) / 10
+        }
+
+        function* formfunctions_onload() {
+
+            //global pointers to main elements
+            $filename = $$('filename')
+            $filesize = $$('filesize')
+            $averagespeed = $$('averagespeed')
+            $timeelapsed = $$('timeelapsed')
+            $postuploadmessage = $$('postuploadmessage')
+
+            $urlcontents = $$('$urlcontents')
+            //uncomment this to see the full url
+            //$urlcontents.innerText=window.location.href
+
+            //http://localhost/exodus7/NEOSYS/upload2.htm
+            //?sourcefile=testing.png
+            //?FileName=02bp\upload\jobs\27000\27000.22.jpg
+            //&FileSize=30133
+            //&TimeElapsed=00:00:00.000
+            //&filename=02bp\upload\jobs\27000\27000.22.jpg
+            /*
+            //multiple ? get converted to &
+            var params = window.location.href.toString().split('?').slice(1).join('&')
+            var params = unescape(params).split('&')
+
+            //analyse params
+            for (var ii = 0; ii < params.length; ii++) {
+            var param = params[ii].split('=')
+            */
+            //multiple ? get converted to &
+            var params = window.location.href.toString().split('?').slice(1).join('&')
+
+            params=unescape(params)
+            
+            /* example
+            http://127.0.0.1/exodus2/NEOSYS/upload2.htm
+            ?sourcefilename=UMESH_signature.jpg
+            &targetpath=/exodus2/images
+            &autofit=true
+            &remainder=
+            ?FileName=devdtest\upload\vouchers\rec-89-1\1.umesh_signature.jpg
+            &FileSize=2669
+            &TimeElapsed=00:00:00.000
+            &filename=devdtest\upload\vouchers\rec-89-1\1.umesh_signature.jpg
+            */
+            
+            //try fix problem that upload.dll doesnt escape & character in filenames
+            //assumes that we know all parameter names. at least those required and those immediately after them
+            params = params.replace(/&FileName/, '\rFilename')
+            params = params.replace(/&FileSize/, '\rFileSize')
+            params = params.replace(/&TimeElapsed/, '\rTimeElapsed')
+            params = params.replace(/&filename/, '\rfilename')
+            params = params.replace(/&/g, '%26').replace(/\r/g, '&')
+
+            /*example params
+            sourcefilename=NEOSYS_signature.jpg
+                &targetpath=/exodus/images
+                &autofit=true
+                &remainder=,FileName=devdtest\upload\vouchers\rec-67-1\1.exodus_signature.jpg
+                &FileSize=2669
+                &TimeElapsed=00:00:00.000
+                &filename=devdtest\upload\vouchers\rec-67-1\1.exodus_signature.jpg
+            */
+            
+            var params = params.split('&')
+
+            //analyse params
+            for (var ii = 0; ii < params.length; ii++) {
+                var param = unescape(params[ii]).split('=')
+                param[0]=param[0].toLowerCase()
+                
+                if (param[0] == 'sourcefilename') {
+                    //window.opener.returnValue=param[1]
+                }
+                else if (param[0] == 'filename') {
+                    $filename.innerText = param[1]
+                    
+                    //this is used in internet explorer
+                    window.opener.returnValue = param[1]
+                    
+                    //this becomes the return value of the window at least for non-internet explorer browsers
+                    returnValue = param[1]
+                    
+                    //close immediately if successful
+                    //solved MSEDGE problem and faster UI for all browsers
+                    exoduswindowclose(returnValue)
+
+                }
+                else if (param[0] == 'filesize')
+                    var filesizeparam = param[1]
+                else if (param[0] == 'timeelapsed')
+                    $timeelapsed.innerText = param[1]
+                //else if param[0]=='filename'
+                // $filename.innerText=params
+            }
+
+            //show file size in Gb/Mb/Kb
+            $filesize.innerText = uploadGbMbKb_sync(Number(filesizeparam))
+            if (Number(filesizeparam) == 0)
+                gparameters.postuploadmessage = 'FILE NOT UPLOADED PROPERLY - FILE SIZE ZERO'
+            
+            //show upload time
+            var splittime = $timeelapsed.innerText.split(':')
+            timeelapsedsecs = (splittime[0] * 60 * 60) + (splittime[1] * 60) + splittime[2] * 1
+            if (timeelapsedsecs) {
+                var bytespersec = filesizeparam / timeelapsedsecs
+                $averagespeed.innerText = uploadGbMbKb_sync(bytespersec) + '/sec'
+
+                //convert elapsed time to hours, minutes, seconds and milliseconds in English
+                var temp = ''
+                if (Number(splittime[0])) temp += Number(splittime[0]) + ' hour'
+                if (Number(splittime[0]) > 1) temp += 's'
+                if (Number(splittime[1])) temp += ' ' + Number(splittime[1]) + ' minute'
+                if (Number(splittime[1]) > 1) temp += 's'
+                var splitsecs = splittime[2].split('.')
+                if (Number(splitsecs[0])) temp += ' ' + Number(splitsecs[0]) + ' second'
+                if (Number(splitsecs[0]) > 1) temp += 's'
+                if (Number(splitsecs[1])) temp += ' ' + Number(splitsecs[1]) + ' millisecond'
+                if (Number(splitsecs[1]) > 1) temp += 's'
+                $timeelapsed.innerText = temp
+
+            }
+            else {
+                $timeelapsed.innerText = 'Less than 0.5 millisecond'
+                $averagespeed.innerText = 'Too fast to calculate!'
+            }
+
+            if (gparameters.postuploadmessage)
+                $postuploadmessage.innerHTML = '<p style="color:red">' + gparameters.postuploadmessage + '</p>'
+
+            //window.opener.close()
+            
+            // no longer do it like this because it mixes up xmlhttp yield with window open yield in window.opener
+            //  var tempfunction=window.opener.general_postupload
+            //  /**/ yield * tempfunction(param[1])
+            
+            //above doesnt wait
+            //if (gparameters.postuploadmessage)
+            //    postuploadmessage.innerHTML = '<span style="color:red">' + 'Finished Importing' + '</span>'
+
+            //cannot close self without prompting (even though it has an opener for some reason)
+            //but probably dont want to anyway
+            ////window.close()
+            //return exoduswindowclose()
+        }
+    
+    </script>
+
+</head>
+<body>
+    <div id="autofitwindowelement" style="margin-left: auto; margin-right: auto; float: left">
+        <table>
+            <tr>
+                <td>
+                    <h1>
+                        File uploaded</h1>
+                    <span id="urlcontents"></span>
+                    <table class="exodusform" border="1" bordercolor="#d0d0d0">
+                        <tr>
+                            <td>
+                                File name
+                            </td>
+                            <td id="filename">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                File size
+                            </td>
+                            <td id="filesize">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Time elapsed
+                            </td>
+                            <td id="timeelapsed">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Average Speed
+                            </td>
+                            <td id="averagespeed">
+                            </td>
+                        </tr>
+                    </table>
+                    <br />
+                    <span id="postuploadmessage"></span>
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>
