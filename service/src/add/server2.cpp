@@ -25,6 +25,7 @@ function main() {
 	//gen.units="units";
 
 	createfile("VOC");
+	createfile("DICT_DEFINITIONS");
 	createfile("DEFINITIONS");
 	createfile("PROCESSES");
 	createfile("REQUESTLOG");
