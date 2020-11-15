@@ -1,7 +1,12 @@
 #!/bin/bash
-
 set -e
 set -x
+
+: Creates/updates service/www from neosys.net
+:
+: 1. Clones the neosys.net git repo
+: 2. Changes "neosys" to "exodus" and removes some directories from
+: 3. Copies from neosys.net to www
 
 if ! test -d ./www ; then echo must be run in service ; exit ;fi
 
@@ -14,7 +19,8 @@ cd neosys.net || exit
 #remove some unnecessary directories completely
 rm 2 -r
 rm 3/{agency,finance,general,jobs,media} -r
-rm -rf .git .vs .vscode
+rm neosys/editor -r
+rm .git .vs .vscode -rf
 
 #remove some unnecessary files
 rm .gitignore accounts.htm adagency.htm exodus.conf  favicon.ico neosysSupportgittesting.txt  readme.txt  web.config
