@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2010 Neosys
+// Copyright (c) 2010 steve.bush@neosys.com
 //
 #include <algorithm>
 #include <cassert>

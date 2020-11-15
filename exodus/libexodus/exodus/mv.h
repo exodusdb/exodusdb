@@ -1615,7 +1615,7 @@ DLL_PUBLIC var MVmul(const var& var1, const var& var2);
 DLL_PUBLIC var MVdiv(const var& var1, const var& var2);
 
 #ifndef SWIG
-DLL_PUBLIC double neosysmodulus(const double v1, const double v2);
+DLL_PUBLIC double exodusmodulus(const double v1, const double v2);
 #endif
 
 DLL_PUBLIC var MVmod(const var& var1, const var& var2);

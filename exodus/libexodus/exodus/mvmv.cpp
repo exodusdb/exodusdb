@@ -336,7 +336,7 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 	// arev strangeness? locate even if out of order
 	// if this is the PICK standard and needs to be implemented properly it should be
 	// implemented as continue to search to end instead of search twice like this this will
-	// probably be switched off as unnecessary and slow behaviour for neosys applications
+	// probably be switched off as unnecessary and slow behaviour for EXODUS applications
 	if (order)
 	{
 		// THISIS(...)

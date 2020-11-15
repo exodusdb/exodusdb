@@ -541,7 +541,7 @@ var ExodusProgramBase::authorised(const var& task0, var& msg, const var& default
 		msgusername = username;
 	}
 
-	// if username='NEOSYS' or username='STEVE' then call msg(task:'');
+	// if username='EXODUS' or username='STEVE' then call msg(task:'');
 
 	if (task[1] == " ")
 	{
@@ -589,15 +589,15 @@ var ExodusProgramBase::authorised(const var& task0, var& msg, const var& default
 		positive = "";
 
 	//? as first character of task (after positive) means
-	// security is being used as a configuration and user neosys has no special privs
-	var isneosys;
+	// security is being used as a configuration and user EXODUS has no special privs
+	var isadmin;
 	if (task[1] == "?")
 	{
-		isneosys = 0;
+		isadmin = 0;
 		task.splicer(1, 1, "");
 	}
 	else
-		isneosys = username == "NEOSYS";
+		isadmin = username == "EXODUS";
 
 	var deleting = task.substr(1, 8) == "%DELETE%";
 	if (deleting)
@@ -691,7 +691,7 @@ var ExodusProgramBase::authorised(const var& task0, var& msg, const var& default
 					SECURITY.inserter(10, taskn, task);
 					SECURITY.inserter(11, taskn, newlock);
 					gosub writeuserprivs();
-					if (username == "NEOSYS")
+					if (username == "EXODUS")
 					{
 						call note(task ^ "|TASK ADDED");
 					}
@@ -704,7 +704,7 @@ var ExodusProgramBase::authorised(const var& task0, var& msg, const var& default
 	var locks = SECURITY.a(11, taskn);
 	if (locks == "")
 	{
-		if (positive and not isneosys)
+		if (positive and not isadmin)
 		{
 		notallowed:
 			// MSG=capitalise(TASK):'||Sorry, ':capitalise(msgusername):', you are not
@@ -732,7 +732,7 @@ var ExodusProgramBase::authorised(const var& task0, var& msg, const var& default
 	}
 
 	// if index('012',@privilege,1) then goto ok
-	if (isneosys)
+	if (isadmin)
 	{
 		return 1;
 	}
@@ -741,7 +741,7 @@ var ExodusProgramBase::authorised(const var& task0, var& msg, const var& default
 	// surely this is not necessary since users are in already
 	if (not(SECURITY.a(1).locate(username, usern)))
 	{
-		if (username != "NEOSYS" and username != APPLICATION)
+		if (username != "EXODUS" and username != APPLICATION)
 		{
 			gosub readuserprivs();
 			usern = (SECURITY.a(1)).count(VM) + (SECURITY.a(1) != "") + 1;
@@ -1742,7 +1742,7 @@ var ExodusProgramBase::loginnet(const var& dataset, const var& username, var& co
 	var menus;
 	if (!menus.open("ADMENUS"))
 	{
-		if (!menus.open("MENUS") && username != "NEOSYS")
+		if (!menus.open("MENUS") && username != "EXODUS")
 		{
 			msg = "Error: Cannot open MENUS file";
 			return false;
@@ -1750,7 +1750,7 @@ var ExodusProgramBase::loginnet(const var& dataset, const var& username, var& co
 	}
 
 	// return allowable menus
-	if (username == "NEOSYS")
+	if (username == "EXODUS")
 	{
 		menuid = "ADAGENCY";
 	}
@@ -1767,9 +1767,9 @@ var ExodusProgramBase::loginnet(const var& dataset, const var& username, var& co
 	var menu = "";
 	if (!menu.read(menus, menuid))
 	{
-		if (username == "NEOSYS")
+		if (username == "EXODUS")
 		{
-			if (!menu.read(menus, "NEOSYS"))
+			if (!menu.read(menus, "EXODUS"))
 			{
 				menu = FM ^ FM ^ FM ^ FM ^ FM ^
 				       "MEDIA|ADPRODUCTION|ACCS|ANALMENU|TIMESHEETS|FILESMENU|"
@@ -1900,9 +1900,9 @@ var ExodusProgramBase::getuserdept(const var& usercode)
 	var usern;
 	if (!(SECURITY.a(1).locate(usercode, usern)))
 	{
-		if (usercode == "NEOSYS")
+		if (usercode == "EXODUS")
 		{
-			ANS = "NEOSYS";
+			ANS = "EXODUS";
 			return ANS;
 		}
 		else

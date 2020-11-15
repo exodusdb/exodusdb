@@ -97,7 +97,7 @@ client closes its handle.
 #define CONNECTING_STATE 0
 #define READING_STATE 1
 #define WRITING_STATE 2
-// neosys only one instance
+// exodus only one instance
 //#define INSTANCES 4
 #define INSTANCES 1
 #define PIPE_TIMEOUT 5000
@@ -483,8 +483,8 @@ int MVipc(const int environmentn, var& pgconnparams)
 			wprintf(L"MVipc() IN WRITING_STATE\n");
 #endif
 
-			// neosys CLOSE PIPE MESSAGE
-			if (0 == lstrcmp(Pipe[i].chReply, L"NEOSYS_CLOSE_THIS_PIPE"))
+			// EXODUS CLOSE PIPE MESSAGE
+			if (0 == lstrcmp(Pipe[i].chReply, L"EXODUS_CLOSE_THIS_PIPE"))
 			//			 if (0==lstrcmp(Pipe[i].chReply,TEXT(L"")))
 			{
 				return 0;

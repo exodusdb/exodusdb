@@ -1905,7 +1905,7 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 
 	// given a file and dictionary id
 	// returns a postgres sql expression like (texta(filename.data,99,0,0))
-	// using one of the neosys backend functions installed in postgres like textextract,
+	// using one of the exodus backend functions installed in postgres like textextract,
 	// dateextract etc.
 	var dictrec;
 	if (!dictrec.read(actualdictfile, fieldname))
@@ -4690,14 +4690,14 @@ nextdict:
 			if (not dict.a(5)) {
 				expression = "key";
 			}else{
-				//needs pgneosys function not written as yet
+				//needs pgexodus function not written as yet
 				//sql:='text_field(key,"*",':dict<5>:')'
 				//postgres only probably
 				expression = "split_part(key,\'*\'," ^ dict.a(5) ^ ")";
 			}
 		}else{
 			//if dict<7> then
-			//needs pgneosys functions installed in server
+			//needs pgexodus functions installed in server
 			expression = "exodus_extract_text(data," ^ dict.a(2) ^ "," ^ extractvarno ^
 ",0)";
 			//end else

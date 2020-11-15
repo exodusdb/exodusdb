@@ -1455,7 +1455,7 @@ var MVmod(const var& lhs, const var& rhs)
 				     "')");
 
 	double top = (lhs.var_typ & VARTYP_INT) ? double(lhs.var_int) : lhs.var_dbl;
-	return neosysmodulus(top, bottom);
+	return exodusmodulus(top, bottom);
 }
 
 // var^var we reassign the logical xor operator ^ to be string concatenate!!!
@@ -1596,7 +1596,7 @@ std::istream& operator>>(std::istream& istream1, var& var1)
 
 //#endif
 
-inline double neosysmodulus(const double top, const double bottom)
+inline double exodusmodulus(const double top, const double bottom)
 {
 	return top - double(int(top / bottom) * bottom);
 }

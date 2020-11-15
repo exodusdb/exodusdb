@@ -147,8 +147,8 @@ void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsec
 	int totlength = **plength;
 	prequest += sizeof(int);
 
-	// var reply=L"NEOSYS_IPC_ERROR: ";
-	response = "NEOSYS_IPC_ERROR: ";
+	// var reply=L"EXODUS_IPC_ERROR: ";
+	response = "EXODUS_IPC_ERROR: ";
 
 	// check it agrees with the number of bytes read from the pipe and fail if it doesnt
 	if (request_size <= 0)
@@ -304,7 +304,7 @@ void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsec
 				int nresponsebytes = (int)response.length();
 				if (maxresponsechars && nresponsebytes > maxresponsechars)
 				{
-					var reply = var(L"NEOSYS_IPC_ERROR: Response bytes) " ^
+					var reply = var(L"EXODUS_IPC_ERROR: Response bytes) " ^
 							var(nresponsebytes) ^
 							L" too many for ipc buffer bytes " ^
 							var(maxresponsechars)) ^

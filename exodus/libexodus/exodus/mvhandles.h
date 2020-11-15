@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2010 Neosys
+// Copyright (c) 2010 steve.bush@neosys.com
 //
 // Desigion making
 //	1. According to exodus design, file variable stores file name, but cannot store pointer to
