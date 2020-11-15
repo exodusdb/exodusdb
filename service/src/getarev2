@@ -1,0 +1,5 @@
+#!/bin/bash
+
+test -f ./getarev2 || ( echo must be run in service/src/ && exit )
+set -x
+scp -P 19525 -r root@exodus.hosts.neosys.com:/root/arev/{sys,gen,fin,agy,med,job,tim}/ .
