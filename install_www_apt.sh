@@ -146,11 +146,13 @@ sudo systemctl start exodus
 duration=$SECONDS
 : "$(($duration / 60)) minutes and $(($duration % 60)) seconds elapsed."
 :
-: To start the service manually
-: =============================
+: Managing the service
+: ====================
 :
-: sudo systemctl start exodus
+: sudo systemctl {start/stop/restart} exodus
 :  or
 : cd $EXODUS/service/src
 : . config
 : server2
+:
+: tail /var/log/syslog -f
