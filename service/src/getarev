@@ -1,9 +1,9 @@
 #!/bin/bash
 
-test -f ../getarev || ( echo must be run in service/src/??? && exit )
+if ! test -f ../getarev ; then echo must be run in service/src/??? ; exit; fi
 
 set -x
-#set -e
+set -e
 
 MODULE=sys
 	mkdir -p  ../$MODULE

@@ -58,6 +58,8 @@ call ExodusProgram::* )(exodus::in)' to 'exodus::pExodusProgramBaseMemberFunctio
 Pointers to members have different representations; cannot cast between them
 */
 
+_Pragma("GCC diagnostic ignored \"-Wcast-function-type\"")\
+
 #define libraryexit(CLASSNAME)                                                                     \
 	classexit(CLASSNAME) extern "C" DLL_PUBLIC void exodusprogrambasecreatedelete_##CLASSNAME( \
 	    pExodusProgramBase& pexodusprogrambase, MvEnvironment& mv,                             \
@@ -73,7 +75,6 @@ Pointers to members have different representations; cannot cast between them
 		{                                                                                  \
 			pexodusprogrambase = new CLASSNAME##ExodusProgram(mv);                     \
 			_Pragma("GCC diagnostic push")\
-			_Pragma("GCC diagnostic ignored \"-Wcast-function-type\"")\
 			pmemberfunction =                                                          \
 			    (pExodusProgramBaseMemberFunction)&CLASSNAME##ExodusProgram::main;     \
 			_Pragma("GCC diagnostic pop")\
