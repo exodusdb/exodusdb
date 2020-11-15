@@ -70,7 +70,7 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 	//if unassigned(request6in) then requestin='' else request6=request6in
 	var logx = request2;
 
-	var isdevsys = var("neosys.id").osfile();
+	var isdevsys = var("exodus.id").osfile();
 
 	if (request1.a(1) == "VALIDATE") {
 
@@ -124,7 +124,7 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 		invalidlogin ^= "|";
 		invalidlogin ^= "|Don\'t have a username?";
 		invalidlogin ^= "|or not 100% certain what your username is?";
-		invalidlogin ^= "|or not 100% certain what your email address <b>IS IN NEOSYS</b>?";
+		invalidlogin ^= "|or not 100% certain what your email address <b>IS IN EXODUS</b>?";
 		invalidlogin ^= "|<b>&rarr;Contact your manager.<b>||";
 		invalidlogin ^= "</div>";
 		//invalidlogin:='||If you know and have access to the email address of this account'
@@ -144,13 +144,13 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 		var userx = "";
 		var users;
 		if (users.open("USERS", "")) {
-			//NEOSYS may have no user record
+			//EXODUS may have no user record
 			if (not(userx.read(users, username))) {
 				{}
 			}
 		}
 
-		//NB if "NEOSYS" is in Auth File then some user restrictions apply eg password/ips
+		//NB if "EXODUS" is in Auth File then some user restrictions apply eg password/ips
 
 		//check username exists
 		if (not(SECURITY.a(1).locate(username,usern))) {
@@ -354,25 +354,25 @@ invalidip:
 						}
 					}
 
-					//NEOSYS is validated versus DEFINITIONS, IPNOS*NEOSYS
+					//EXODUS is validated versus DEFINITIONS, IPNOS*EXODUS
 					//which is calculated in INIT.GENERAL from GBP $HOSTS.ALLOW
 
-					//prevent NEOSYS from using CONFIGURED fully formed LAN ips
+					//prevent EXODUS from using CONFIGURED fully formed LAN ips
 					//which are deemed to be NAT routers possibly providing WAN access
-					//but NEOSYS should not have unrestricted access from WAN
-					if ((username == "NEOSYS") and not(SYSTEM.a(17).index("DEMO"))) {
+					//but EXODUS should not have unrestricted access from WAN
+					if ((username == "EXODUS") and not(SYSTEM.a(17).index("DEMO"))) {
 						if (ip2 == "192.168") {
-neosyslocalip:
+exoduslocalip:
 							if (validips.locateusing(" ",ipno,xx)) {
 								goto invalidip;
 							}
 						}else{
 							var tt = ipno.field(".", 1);
 							if (tt == "10") {
-								goto neosyslocalip;
+								goto exoduslocalip;
 							}
 							if (tt == "172") {
-								goto neosyslocalip;
+								goto exoduslocalip;
 							}
 						}
 					}
@@ -394,7 +394,7 @@ neosyslocalip:
 					invalidlogin = "Too many login failures - " ^ (username.quote()) ^ " is blocked";
 					if (userx.a(7)) {
 						invalidlogin ^= "|" ^ (username.quote()) ^ " can and must get a new password unless the account is expired";
-						invalidlogin ^= "|by clicking Password Reset on the NEOSYS Login screen";
+						invalidlogin ^= "|by clicking Password Reset on the EXODUS Login screen";
 						invalidlogin ^= "|and entering one of their email addresses as follows:";
 						invalidlogin ^= "|" ^ userx.a(7);
 					}else{
@@ -406,7 +406,7 @@ neosyslocalip:
 
 				}
 
-				if (username ne "NEOSYS") {
+				if (username ne "EXODUS") {
 
 					var passworddate = userx.a(36);
 
@@ -450,7 +450,7 @@ neosyslocalip:
 passwordexpired:
 
 							//some users may be allowed to login rarely without password renewal
-							if (not(authorised("AUTHORISATION PASSWORD NEVER EXPIRES", xx, "NEOSYS", username))) {
+							if (not(authorised("AUTHORISATION PASSWORD NEVER EXPIRES", xx, "EXODUS", username))) {
 								invalidlogin = "Password has expired. Get a new one using Password Reset";
 								goto validateexit;
 							}
@@ -482,7 +482,7 @@ passwordexpired:
 					//
 					//if session number agrees then dont test anything else
 					//this will allow ip number to change due to network proxy etc
-					if (connection.a(1, 5) ne userx.a(39, 5) and username ne "NEOSYS") {
+					if (connection.a(1, 5) ne userx.a(39, 5) and username ne "EXODUS") {
 
 						//the word "automatic" hardcoded in browser to unlock and lose any work
 						var tt = "You have been automatically logged out due to another login as " ^ (username.quote());
@@ -516,9 +516,9 @@ passwordexpired:
 					}
 				}
 
-				//send email to user and IT on first or novel ipno logins (not NEOSYS)
+				//send email to user and IT on first or novel ipno logins (not EXODUS)
 				if (word2 == "LOGIN") {
-					if (username ne "NEOSYS" or isdevsys) {
+					if (username ne "EXODUS" or isdevsys) {
 
 						var ulogins = userx.a(18);
 						if (ulogins.locate("OK",xx)) {
@@ -549,7 +549,7 @@ passwordexpired:
 
 									if (whoistx ne "0") {
 
-										body = "This is an automated email from your NEOSYS database " ^ SYSTEM.a(17, 1);
+										body = "This is an automated email from your EXODUS database " ^ SYSTEM.a(17, 1);
 										body ^= " recording a successful login from the ip number " ^ ipno;
 										body.r(-1, "by " ^ userx.a(1) ^ " (" ^ username ^ ")");
 										//not in the last 100 login ips
@@ -571,7 +571,7 @@ passwordexpired:
 						//no OK means first login
 						}else{
 
-							body = "Welcome to NEOSYS!";
+							body = "Welcome to EXODUS!";
 							//in security.subs and listen2
 							body.r(1, -1, VM ^ "Browser configuration *REQUIRED*");
 							body.r(1, -1, "http://userwiki.neosys.com/index.php/gettingstarted");
@@ -596,10 +596,10 @@ passwordexpired:
 
 			}
 
-		//2. NEOSYS check pass in system.file
-		} else if (username == "NEOSYS") {
+		//2. EXODUS check pass in system.file
+		} else if (username == "EXODUS") {
 
-			//check for (NEOSYS) user and password in revelation system file
+			//check for (EXODUS) user and password in revelation system file
 			var sysrec;
 			if (not(sysrec.read(systemfile(), username))) {
 				goto validateexit;
@@ -611,7 +611,7 @@ passwordexpired:
 				goto validateexit;
 			}
 
-			//NEOSYS valid ipnos calculated in INIT.GENERAL2 see IPNOS*NEOSYS
+			//EXODUS valid ipnos calculated in INIT.GENERAL2 see IPNOS*EXODUS
 			//from GBP, $HOSTS.ALLOW at process startup
 			if (validips.read(DEFINITIONS, "IPNOS*" ^ username)) {
 				//should be removed after medialine is upgraded
@@ -622,7 +622,7 @@ passwordexpired:
 
 			goto checkip;
 
-		//3. not in users file and not NEOSYS
+		//3. not in users file and not EXODUS
 		} else {
 			goto validateexit;
 		}
@@ -775,7 +775,7 @@ validateexit2:
 					//all email addresses not just the one used to get the reset new password
 					var emailaddrs = RECORD.a(7);
 					var ccaddrs = "";
-					var subject = "NEOSYS Password Reset";
+					var subject = "EXODUS Password Reset";
 					body = "";
 					body.r(-1, "Hi! Your new password is " ^ newpassword);
 					body.r(-1, FM ^ "* Your usercode is " ^ ID);
@@ -806,7 +806,7 @@ validateexit2:
 				if (passwordreset) {
 					emailsubject = "Password Reset Failure " ^ password;
 				}else{
-					//Note: "Login Failure" hardcoded in sysmsg not to send to NEOSYS
+					//Note: "Login Failure" hardcoded in sysmsg not to send to EXODUS
 					emailsubject = "Login Failure " ^ username;
 					if (realreason) {
 						emailsubject ^= " - " ^ realreason;
@@ -856,9 +856,9 @@ validateexit2:
 			//gosub getuserstyle
 
 			//switch to users first company if they arent authorised for the current comp
-			//NEOSYS may not have user record
+			//EXODUS may not have user record
 			//perhaps we need to switch back to users last company every request
-			//in which case even neosys could avoid random companies
+			//in which case even exodus could avoid random companies
 			ucomps = userx.a(33);
 			gosub switchcompany();
 
@@ -930,7 +930,7 @@ validateexit2:
 		var users;
 		if (users.open("USERS", "")) {
 
-			//allow for NEOSYS not in users - all others should be but if not then create
+			//allow for EXODUS not in users - all others should be but if not then create
 			if (not(userrec.read(users, username))) {
 				userrec = "";
 			}

@@ -280,7 +280,7 @@ nextcomp:
 		msg ^= ndays ^ " day" ^ var("s").substr(1,ndays ne 1) ^ " ago.";
 		msg ^= "   (" ^ lastbackupdate.oconv("D") ^ ")";
 		msg.swapper("(0", "(");
-		msg.r(-1, "NEOSYS recommends that you \"BACKUP\" your data ");
+		msg.r(-1, "EXODUS recommends that you \"BACKUP\" your data ");
 		msg.r(-1, "regularly to prevent total loss of data due to");
 		msg.r(-1, "power failure, disk damage or other accidents.");
 	}

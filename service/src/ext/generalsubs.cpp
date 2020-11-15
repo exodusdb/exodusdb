@@ -218,8 +218,8 @@ subroutine getuserdept2() {
 	//locate the user in the table
 	usercode = mode.field(",", 2);
 	if (not(SECURITY.a(1).locate(usercode,usern))) {
-		if (usercode == "NEOSYS") {
-			ANS = "NEOSYS";
+		if (usercode == "EXODUS") {
+			ANS = "EXODUS";
 			return;
 		}else{
 			ANS = "";

@@ -87,8 +87,8 @@ function main(in mode) {
 
 	win.valid = 1;
 
-	//no validation for NEOSYS
-	if (curruser.index("NEOSYS")) {
+	//no validation for EXODUS
+	if (curruser.index("EXODUS")) {
 		if ((mode.substr(1,4) == "VAL.") and mode ne "VAL.USER") {
 			return 0;
 		}
@@ -225,10 +225,10 @@ function main(in mode) {
 				return invalid(msg);
 				end;
 
-			if index(is,'NEOSYS',1) and not(index(curruser,'NEOSYS',1)) then goto baduser;
+			if index(is,'EXODUS',1) and not(index(curruser,'EXODUS',1)) then goto baduser;
 			//prevent use of reserved user names
 			read temp from system.file(),is then;
-				if index(curruser,'NEOSYS',1) else;
+				if index(curruser,'EXODUS',1) else;
 	baduser:
 					msg=QUOTE(IS):' - USER NAME IS RESERVED AND CANNOT BE USED';
 					return invalid(msg);
@@ -260,8 +260,8 @@ function main(in mode) {
 				convert ',' to @vm in is.orig2;
 				locate KEYX in is.orig2<1> setting temp else;
 
-					if KEYX='NEOSYS' and not(index(@username,'NEOSYS',1)) then;
-						msg=quote(KEYX):' - YOU CANNOT USE THIS KEY BECAUSE IT|IS "OWNED" BY NEOSYS';
+					if KEYX='EXODUS' and not(index(@username,'EXODUS',1)) then;
+						msg=quote(KEYX):' - YOU CANNOT USE THIS KEY BECAUSE IT|IS "OWNED" BY EXODUS';
 						return invalid(msg);
 						end;
 
@@ -393,7 +393,7 @@ function main(in mode) {
 			if valid else goto def.password;
 
 			//delete key means remove the password
-			if @username='NEOSYS' then;
+			if @username='EXODUS' then;
 				if CHARX=' ' or CHARX=char(0):'S' then;
 					if decide('Do you want to remove the password','',reply) else reply=2;
 					if reply=2 then goto def.password;
@@ -414,7 +414,7 @@ function main(in mode) {
 				read SYSREC from system.file(),userx else;
 					SYSREC='USER';
 					SYSREC<2>=@account;
-					SYSREC<5>='NEOSYS';
+					SYSREC<5>='EXODUS';
 					end;
 				end;
 
@@ -487,9 +487,9 @@ function main(in mode) {
 
 		}
 
-		//if logged in as account then same as logged in as NEOSYS
+		//if logged in as account then same as logged in as EXODUS
 		if (var("012").index(PRIVILEGE)) {
-			curruser = "NEOSYS";
+			curruser = "EXODUS";
 		}else{
 			curruser = USERNAME;
 		}
@@ -562,7 +562,7 @@ function main(in mode) {
 		}
 
 		//hide higher/lower users
-		if (not(curruser.index("NEOSYS"))) {
+		if (not(curruser.index("EXODUS"))) {
 
 			var usercodes = RECORD.a(1);
 			var nusers = usercodes.count(VM) + (usercodes ne "");
@@ -1074,7 +1074,7 @@ function main(in mode) {
 				// end
 
 				//update the central system file if user already exists there
-				//comment this out to prevent change the NEOSYS password
+				//comment this out to prevent change the EXODUS password
 				//if SYSREC and SYSREC ne oSYSREC and user<>@account then
 				// convert \FB\:\FA\:\F9\ to \FE\:\FD\:\FC\ in SYSREC
 				// read temp from system.file(),user then
@@ -1091,7 +1091,7 @@ function main(in mode) {
 		for (usern = 1; usern <= nusers; ++usern) {
 			userx = usercodes.a(1, usern);
 			if (not(userx.index("---"))) {
-				if (userx and not(userx.index("NEOSYS"))) {
+				if (userx and not(userx.index("EXODUS"))) {
 					if (not(RECORD.a(1).locate(userx,temp))) {
 						if (userrec.read(users, userx)) {
 							if (users) {
@@ -1134,7 +1134,7 @@ function main(in mode) {
 				var nn = newusers.count(FM) + 1;
 				for (var ii = 1; ii <= nn; ++ii) {
 
-					if (USERNAME == "NEOSYS") {
+					if (USERNAME == "EXODUS") {
 						replyto = "support@neosys.com";
 					}else{
 						replyto = USERNAME.xlate("USERS", 7, "X");
@@ -1151,10 +1151,10 @@ function main(in mode) {
 						ccaddress ^= "accounts@neosys.com";
 					}
 
-					var subject = "NEOSYS New User " ^ newusers.a(ii, 2) ^ " (" ^ newusers.a(ii, 1) ^ ")";
+					var subject = "EXODUS New User " ^ newusers.a(ii, 2) ^ " (" ^ newusers.a(ii, 1) ^ ")";
 
 					var body = "";
-					body.r(1, -1, "A new NEOSYS user account has been created for you.");
+					body.r(1, -1, "A new EXODUS user account has been created for you.");
 
 					body ^= VM;
 					body.r(1, -1, "User Code: %USERCODE%");
@@ -1460,7 +1460,7 @@ subroutine changepassx() {
 		if (not(sysrec.read(systemfile(), userx))) {
 			sysrec = "USER";
 			sysrec.r(2, APPLICATION);
-			sysrec.r(5, "NEOSYS");
+			sysrec.r(5, "EXODUS");
 		}
 	}
 
@@ -1520,7 +1520,7 @@ subroutine generatepassword() {
 	//////////
 
 		locate curruser in @record<1> setting usern else usern=999;
-		if index(curruser,'NEOSYS',1) then return;
+		if index(curruser,'EXODUS',1) then return;
 		if mv lt usern and not(updatehighergroups) then;
 	badrank:
 			msg='YOU CAN ONLY CHANGE YOURSELF,|';
@@ -1668,7 +1668,7 @@ subroutine newpass3() {
 				if len(newpassword)<5 then;
 					print char(7):
 					call note('Passwords should be at|least 5 characters long');
-					if index(@username,'NEOSYS',1) else goto inp.newpassword1;
+					if index(@username,'EXODUS',1) else goto inp.newpassword1;
 					end;
 	inp.ownpass.2:
 
@@ -1730,7 +1730,7 @@ subroutine makesysrec() {
 		sysrec.r(2, APPLICATION);
 	}
 	if (not(sysrec.a(5))) {
-		sysrec.r(5, "NEOSYS");
+		sysrec.r(5, "EXODUS");
 	}
 	//if SYSREC<last.fn> else SYSREC<last.fn>='xxxxx'
 	if (not(sysrec.a(9))) {
@@ -1786,7 +1786,7 @@ subroutine gueststatus() {
 }
 
 subroutine cleartemp() {
-	//set in postread (setup) for neosys.net
+	//set in postread (setup) for exodus.net
 	//@record
 	//20 start
 	//21 end
@@ -1801,7 +1801,7 @@ subroutine cleartemp() {
 
 subroutine getemailtx() {
 	//dont sysmsg/log new/amend/deleting users @neosys.com unless in testdata or dev
-	if ((userrec.a(7).ucase().index("@NEOSYS.COM") and (SYSTEM.a(17, 1).substr(-4,4) ne "TEST")) and not(var("neosys.id").osfile())) {
+	if ((userrec.a(7).ucase().index("@EXODUS.COM") and (SYSTEM.a(17, 1).substr(-4,4) ne "TEST")) and not(var("exodus.id").osfile())) {
 		return;
 	}
 

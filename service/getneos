@@ -34,7 +34,7 @@ mv ./exodus/doc/neosysfunctions.htm ./exodus/doc/exodusfunctions.htm
 
 #change neosys to exodus in all text (except neosys.com)
 find ../neosys.net -type f -exec sed -i 's#neosys#exodus#g' {} \;
-find ../neosys.net -type f -exec sed -i 's#exodus.com#neosys.com#g' {} \;
+find ../neosys.net -type f -exec sed -i 's#exodus\.com#neosys.com#g' {} \;
 find ../neosys.net -type f -exec sed -i 's#NEOSYS#EXODUS#g' {} \;
 find ../neosys.net -type f -exec sed -i 's#Copyright EXODUS#Copyright NEOSYS#g' {} \;
 

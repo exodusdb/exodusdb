@@ -64,7 +64,7 @@ function main(in mode0, out msg) {
 	var maxdaysgrace = 30;
 	var maxlicencedays = 366;
 	var secidcode = 1090909;
-	var allowneosys = 0;
+	var allowexodus = 0;
 
 	var lickey = "SYSLICX";
 
@@ -102,7 +102,7 @@ function main(in mode0, out msg) {
 	if (mode == "") {
 
 		var cmd = "LIST DEFINITIONS " ^ (lickey.quote()) ^ " LIC_FIELDS";
-		cmd ^= " HEADING " ^ (var("NEOSYS LIC\':\'ENCES as at \'T\'").quote());
+		cmd ^= " HEADING " ^ (var("EXODUS LIC\':\'ENCES as at \'T\'").quote());
 		perform(cmd);
 		stop();
 	}
@@ -128,7 +128,7 @@ function main(in mode0, out msg) {
 
 		//if incomplete command then prompt for verificationcode
 		if (verification == "") {
-			call note("PLEASE GIVE THE FOLLOWING TEXT TO YOUR NEOSYS SUPPORT STAFF" ^ FM ^ FM ^ (lictext.quote()) ^ FM ^ FM ^ "What is the verification code?", "R", verification, "");
+			call note("PLEASE GIVE THE FOLLOWING TEXT TO YOUR EXODUS SUPPORT STAFF" ^ FM ^ FM ^ (lictext.quote()) ^ FM ^ FM ^ "What is the verification code?", "R", verification, "");
 			if (not verification) {
 				msg = "Verification code not entered";
 				return 0;
@@ -153,7 +153,7 @@ function main(in mode0, out msg) {
 
 		msg = "";
 
-		subject = "NEOSYS: Licencing restrictions removed " ^ SYSTEM.a(17) ^ " - " ^ SYSTEM.a(23);
+		subject = "EXODUS: Licencing restrictions removed " ^ SYSTEM.a(17) ^ " - " ^ SYSTEM.a(23);
 		body = lictext;
 		body.r(-1, "Verification: " ^ verification);
 		gosub emailadmin(msg);
@@ -263,7 +263,7 @@ function main(in mode0, out msg) {
 			lictext ^= " " ^ daysgrace;
 			lictext ^= " " ^ computerid;
 			lictext ^= " " ^ cmddatasetid;
-			call note("PLEASE GIVE THE FOLLOWING TEXT TO YOUR NEOSYS SUPPORT STAFF" ^ FM ^ FM ^ (lictext.quote()) ^ FM ^ FM ^ "What is the verification code?", "R", verification, "");
+			call note("PLEASE GIVE THE FOLLOWING TEXT TO YOUR EXODUS SUPPORT STAFF" ^ FM ^ FM ^ (lictext.quote()) ^ FM ^ FM ^ "What is the verification code?", "R", verification, "");
 			if (not verification) {
 				msg = "Verification code not entered";
 				return 0;
@@ -319,7 +319,7 @@ function main(in mode0, out msg) {
 
 		};//modulen;
 
-		subject = "NEOSYS: Licence Added " ^ SYSTEM.a(17) ^ " - " ^ SYSTEM.a(23);
+		subject = "EXODUS: Licence Added " ^ SYSTEM.a(17) ^ " - " ^ SYSTEM.a(23);
 		body = "Licence:     : " ^ SENTENCE.field(" ", 2, 999);
 		body.r(-1, "Verification : " ^ verification);
 		var nlics = licx.a(1).count(VM) + 1;
@@ -355,17 +355,17 @@ function main(in mode0, out msg) {
 		goto ok;
 	}
 
-	//ok if the neosys user
-	if (allowneosys and (USERNAME == "NEOSYS")) {
+	//ok if the exodus user
+	if (allowexodus and (USERNAME == "EXODUS")) {
 		goto ok;
 	}
 
-	//no lic check on neosys development machines
-	if (allowneosys and var("neosys.id").osfile()) {
+	//no lic check on exodus development machines
+	if (allowexodus and var("exodus.id").osfile()) {
 		goto ok;
 	}
 
-	msg = "NEOSYS Lic" "ence: ";
+	msg = "EXODUS Lic" "ence: ";
 
 	if (win.datafile == "SCHEDULES") {
 		datedict = "STOPDATE";
@@ -477,7 +477,7 @@ ok:
 
 	if (not maxfinalexpirydate) {
 		//cannot find any lic (either * or specific)
-		msg = "There is no licence to use the NEOSYS " ^ chkmodulename ^ " module";
+		msg = "There is no licence to use the EXODUS " ^ chkmodulename ^ " module";
 		return 0;
 	}
 
@@ -492,7 +492,7 @@ ok:
 		tt = "period closing";
 	}
 	msg = "The document " ^ tt ^ " " ^ oconv(docdate, "[DATE,4*]") ^ " is not within";
-	msg.r(-1, "the NEOSYS licence period ");
+	msg.r(-1, "the EXODUS licence period ");
 	msg ^= oconv(mincommencedate, "[DATE,4*]") ^ " - ";
 	msg ^= oconv(maxexpirydate, "[DATE,4*]");
 	tt = var().date() - maxexpirydate;

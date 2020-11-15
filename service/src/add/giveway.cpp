@@ -8,7 +8,7 @@ var nowtime;//num
 var longprocesslockno;//num
 
 function main() {
-	if (USERNAME == "xNEOSYS") {
+	if (USERNAME == "xEXODUS") {
 		return 0;
 	}
 	//nb called from esc.to.exit so do not do selects etc which call esc.to.exit

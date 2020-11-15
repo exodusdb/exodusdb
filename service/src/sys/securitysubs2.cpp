@@ -181,13 +181,13 @@ function main(in mode) {
 
 		//ensure certain documents cannot be deleted
 		if (newuserprivs.a(10).locate("PRODUCTION ORDER DELETE",taskn)) {
-			newuserprivs.r(11, taskn, "NEOSYS");
+			newuserprivs.r(11, taskn, "EXODUS");
 		}
 		if (newuserprivs.a(10).locate("PRODUCTION ESTIMATE DELETE",taskn)) {
-			newuserprivs.r(11, taskn, "NEOSYS");
+			newuserprivs.r(11, taskn, "EXODUS");
 		}
 		if (newuserprivs.a(10).locate("JOB DELETE",taskn)) {
-			newuserprivs.r(11, taskn, "NEOSYS");
+			newuserprivs.r(11, taskn, "EXODUS");
 		}
 
 		call log2("*delete any superfluous tasks", logtime);

@@ -72,13 +72,13 @@ function main(in docids0="", in options0="") {
 		options = options0;
 	}
 
-	//used to email NEOSYS if NEOSYS user in list of recipients
-	var sysmsgatneosys = "sysmsg@neosys.com";
+	//used to email EXODUS if EXODUS user in list of recipients
+	var sysmsgatexodus = "sysmsg@neosys.com";
 
-	//used to email if run as NEOSYS unless document's forced email address is set
-	var devatneosys = "dev@neosys.com";
+	//used to email if run as EXODUS unless document's forced email address is set
+	var devatexodus = "dev@neosys.com";
 
-	//logging=@username='NEOSYS'
+	//logging=@username='EXODUS'
 	var logging = 0;
 
 	var suppressemail = options.index("S");
@@ -231,7 +231,7 @@ currdatetime:
 
 		//only run scheduled reports on live data (but do run queued reports)
 		//queued reports have only maxtimes=1 set
-		if (((restrictions ne (FM.str(6) ^ 1)) and not(islivedb)) and not(var("neosys.id").osfile())) {
+		if (((restrictions ne (FM.str(6) ^ 1)) and not(islivedb)) and not(var("exodus.id").osfile())) {
 			if (logging) {
 				printl("scheduled report but not live db");
 			}
@@ -353,21 +353,21 @@ preventsameday:
 	//if on development system they are ALWAYS routed
 	//so this is mainly for testing on client systems
 	forceemail = gen.document.a(30);
-	//if not(forceemail) and @username='NEOSYS' then forceemail=devATneosys
+	//if not(forceemail) and @username='EXODUS' then forceemail=devATexodus
 	//report is always run as the document owning user
 	var runasusercode = gen.document.a(1);
 	var userx;
 	if (not(userx.read(users, runasusercode))) {
-		if (not(runasusercode == "NEOSYS")) {
+		if (not(runasusercode == "EXODUS")) {
 			printl("runas user ", runasusercode, " doesnt exist");
 			goto nextdoc;
 		}
 		userx = "";
 	}
-	//allow running as NEOSYS and emailing to sysmsg@neosys.com
-	if ((userx.a(7) == "") and (runasusercode == "NEOSYS")) {
-		userx = "NEOSYS";
-		userx.r(7, sysmsgatneosys);
+	//allow running as EXODUS and emailing to sysmsg@neosys.com
+	if ((userx.a(7) == "") and (runasusercode == "EXODUS")) {
+		userx = "EXODUS";
+		userx.r(7, sysmsgatexodus);
 	}
 
 	//HAS RECIPIENTS
@@ -397,26 +397,26 @@ preventsameday:
 			//get the user record
 			var usercode = usercodes.a(1, usern);
 			if (not(userx.read(users, usercode))) {
-				if (not(usercode == "NEOSYS")) {
+				if (not(usercode == "EXODUS")) {
 					goto nextuser;
 				}
-				userx = "NEOSYS";
+				userx = "EXODUS";
 			}
 
 			//skip if user has no email address
-			if ((userx.a(7) == "") and (usercode == "NEOSYS")) {
-				userx.r(7, sysmsgatneosys);
+			if ((userx.a(7) == "") and (usercode == "EXODUS")) {
+				userx.r(7, sysmsgatexodus);
 			}
 			useraddress = userx.a(7);
 			if (useraddress) {
 
-				//if running as NEOSYS always add user NEOSYS
+				//if running as EXODUS always add user EXODUS
 				//regardless of holidays - to allow testing on weekends etc
-				//if usercode='NEOSYS' then
-				if ((USERNAME == "NEOSYS") and (usercode == "NEOSYS")) {
+				//if usercode='EXODUS' then
+				if ((USERNAME == "EXODUS") and (usercode == "EXODUS")) {
 					goto adduseraddress;
 
-				//optionally skip people on holiday (even NEOSYS unless running as NEOSYS)
+				//optionally skip people on holiday (even EXODUS unless running as EXODUS)
 				}else{
 
 					marketcode = userx.a(25);
@@ -598,7 +598,7 @@ nextsign:
 		//ANALTIME2 emails everything out and returns 'OK ... ' in response
 		//if dir(printfilename)<1> else goto nextdoc
 
-		var subject = "NEOSYS";
+		var subject = "EXODUS";
 		//if repeatable then include report number to allow filtering
 		if (gen.document.a(27) == "") {
 			subject ^= " " ^ docid;
@@ -773,7 +773,7 @@ subroutine exec2() {
 	if (USER4.index("R18.6")) {
 		var halt = 1;
 		USER4.r(-1, "Corrupt temporary file. Restart Needed.");
-		USER4.r(-1, "NEOSYS.NET TERMINATED");
+		USER4.r(-1, "EXODUS.NET TERMINATED");
 	}
 
 	//convert error message
@@ -788,13 +788,13 @@ subroutine exec2() {
 		USER4 = "";
 	}
 
-	//send errors to neosys
+	//send errors to exodus
 	if (USER4.index("An internal error") or USER4.index("Error:")) {
 		USER4.transfer(USER3);
 		goto sysmsgit;
 	}
 
-	//send errors to neosys
+	//send errors to exodus
 	if ((USER3 == "") or USER3.substr(1,2) ne "OK") {
 		if (not USER3) {
 			USER3 = "No response from " ^ voccmd;

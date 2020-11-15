@@ -1,4 +1,4 @@
-#include <exodus/common.h>
+#include <neosys.common.h>
 commoninit(bkg2,6)
 
 var orderno="";

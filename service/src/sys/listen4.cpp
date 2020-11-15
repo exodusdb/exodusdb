@@ -31,7 +31,7 @@ function main(in msgno, io msg, in params0="") {
 		msg = "Error: No request";
 		return 0;
 	case 5:
-		msg = "Error: NEOSYS.NET Key missing and not READU";
+		msg = "Error: EXODUS.NET Key missing and not READU";
 		return 0;
 	case 6:
 		msg = "Error: Next number was not produced" ^ FM ^ params;
@@ -113,7 +113,7 @@ function main(in msgno, io msg, in params0="") {
 		msg = "Unknown message " ^ (msgno.quote()) ^ " in LISTEN";
 		return 0;
 	case 31:
-		msg.r(-1, "INTERNAL ERROR Closing current NEOSYS server process");
+		msg.r(-1, "INTERNAL ERROR Closing current EXODUS server process");
 		return 0;
 	case 32:
 		msg = "LISTEN:EXECUTE: Module name is missing from request";

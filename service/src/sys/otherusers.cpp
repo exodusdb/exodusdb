@@ -14,7 +14,7 @@ var zz;
 function main(in databasecode0="", in usercode0="") {
 	//c sys "",""
 
-	//returns the number of other users of NEOSYS
+	//returns the number of other users of EXODUS
 
 	//global xx,yy,result
 

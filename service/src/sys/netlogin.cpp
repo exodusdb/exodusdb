@@ -88,7 +88,7 @@ function main(in mode0) {
 	//sleep
 	//if mode='SLEEP' then
 	// call clearscreen(buffer,attribute)
-	// call mssg('This computer workstation has gone to sleep,|please enter your password to wake it up,| or press Esc to exit NEOSYS.','UB':fm:fm:fm:1,buff,'')
+	// call mssg('This computer workstation has gone to sleep,|please enter your password to wake it up,| or press Esc to exit EXODUS.','UB':fm:fm:fm:1,buff,'')
 	// end
 
 	//get the user name
@@ -107,7 +107,7 @@ inpname:
 		//unlock all
 		xx = unlockrecord();
 
-		msg = "NEOSYS SECURITY|What is your name ?| || |Please enter your name,|or press Esc to exit.";
+		msg = "EXODUS SECURITY|What is your name ?| || |Please enter your name,|or press Esc to exit.";
 		show = 1;
 		maxlen = 20;
 		gosub input();
@@ -116,7 +116,7 @@ inpname:
 	//exit the system if name not given
 	if (xdata == "") {
 fail:
-	//  if @username='NEOSYS' then stop
+	//  if @username='EXODUS' then stop
 		perform("OFF");
 		var().logoff();
 	}
@@ -135,7 +135,7 @@ fail:
 	}
 
 	//get the password
-	msg = "NEOSYS SECURITY|What is your PASSWORD ?| || |Please enter your password,|or press Esc to cancel.";
+	msg = "EXODUS SECURITY|What is your PASSWORD ?| || |Please enter your password,|or press Esc to cancel.";
 	show = 0;
 	maxlen = 20;
 	now = ostime();
@@ -248,7 +248,7 @@ okfail:
 
 		nfailures += 1;
 		//print char(7):char(7):char(7):
-		msg = "NEOSYS SECURITY|";
+		msg = "EXODUS SECURITY|";
 
 		msg.r(-1, "Either the name or the password");
 		msg.r(-1, "that you entered is NOT CORRECT.");
@@ -271,7 +271,7 @@ okfail:
 	if (not(sysrec.read(systemfile(), userx))) {
 		sysrec = "";
 	}
-	if (USERNAME == "NEOSYS") {
+	if (USERNAME == "EXODUS") {
 		sysrec.r(4, 0);
 	}
 	//call setprivilegesysrec.a(4));

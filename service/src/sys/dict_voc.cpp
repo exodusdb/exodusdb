@@ -75,9 +75,9 @@ function main() {
 		return 1;
 	}
 	if (ID == "SENDMAIL") {
-		upper.converter("\'NEOSYS.ID\'", "");
+		upper.converter("\'EXODUS.ID\'", "");
 	}
-	if (upper.index("\'NEOSYS.ID\'") and ID ne "INSTALLALLOWHOSTS") {
+	if (upper.index("\'EXODUS.ID\'") and ID ne "INSTALLALLOWHOSTS") {
 		return 1;
 	}
 	return 0;

@@ -82,7 +82,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 	if (runasusercode) {
 		var runasuser;
 		if (not(runasuser.read(users, runasusercode))) {
-			if (not(runasusercode == "NEOSYS")) {
+			if (not(runasusercode == "EXODUS")) {
 				msg = runasusercode.quote() ^ " user doesnt exist";
 				return 0;
 			}
@@ -95,7 +95,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 		var usercode = USERNAME;
 		runasusercode = usercode.xlate("USERS", 5, "");
 
-		//if not a proper user (eg NEOSYS then skip)
+		//if not a proper user (eg EXODUS then skip)
 		if (not runasusercode) {
 			msg = usercode.quote() ^ " can only autorun if specified as the runas user";
 			return 0;
@@ -147,7 +147,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 				var usercode = targetusercodes.a(1, usern);
 				var userx;
 				if (not(userx.read(users, usercode))) {
-					if (not(usercode == "NEOSYS")) {
+					if (not(usercode == "EXODUS")) {
 						msg = usercode.quote() ^ " user doesnt exist";
 						return 0;
 					}

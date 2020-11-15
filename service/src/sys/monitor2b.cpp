@@ -31,7 +31,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 	//windows version at http://users.ugent.be/~bpuype/wget/
 
 	var post = 1;
-	//cleanup=0;*@username<>'NEOSYS'
+	//cleanup=0;*@username<>'EXODUS'
 	var cleanup = mode == "READ";
 	if (mode == "READ") {
 		datax = "";
@@ -74,7 +74,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 
 	//user and pass currently not required for some reason
 	//but leave configured in case they are re-instated on the server
-	var httpuser = "neosysclient";
+	var httpuser = "exodusclient";
 	//Only one way to make a good password Memorable & Randomish"
 	var httppass = "OowtmagpM&R";
 
@@ -153,7 +153,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 		}
 
 		//add basic wget commands
-		var referer = "neosysclient-" ^ SYSTEM.a(17) ^ "-" ^ cidx;
+		var referer = "exodusclient-" ^ SYSTEM.a(17) ^ "-" ^ cidx;
 		if (post) {
 			cmd ^= " --no-cache";
 			if (httpsbug) {

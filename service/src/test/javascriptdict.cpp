@@ -68,7 +68,7 @@ class MARKETS
 //////////////////////////////////////////
 //only var dict=[]//of dictrecs has been commented out or changed
 
-//Copyright (c) 2000-2007 NEOSYS Software Ltd. All Rights Reserved.//**Start Encode**
+//Copyright (c) 2000-2007 EXODUS Software Ltd. All Rights Reserved.//**Start Encode**
 
 function dict_MARKETS()
 {
@@ -89,7 +89,7 @@ function dict_MARKETS()
  di.listfunction="general_list_markets()";
  
  di=dict[++din]=dictrec("MARKET_NAME","F",1);
- neosys_dict_text(di);
+ exodus_dict_text(di);
  di.required=true;
  di.length=30;
 
@@ -97,7 +97,7 @@ function dict_MARKETS()
  general_dict_currencycode(di);
 
  di=dict[++din]=dictrec("DATE_TIME", "F", "6");
- neosys_dict_datetimeupdated(di);
+ exodus_dict_datetimeupdated(di);
 
  di=dict[++din]=dictrec("CURRENCY_NAME","S");
  general_dict_currencyname(di);

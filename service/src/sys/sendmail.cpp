@@ -117,19 +117,19 @@ function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfile
 	}else{
 		toaddress = toaddress0;
 
-		//development systems ALWAYS email hardcoded SB2@NEOSYS.COM in next line
-		if (var("neosys.id").osfile() or not(VOLUMES)) {
+		//development systems ALWAYS email hardcoded SB2@EXODUS.COM in next line
+		if (var("exodus.id").osfile() or not(VOLUMES)) {
 			forcedemailx = "sb2@neosys.com";
-			//toaddress=xlate('USERS','NEOSYS',7,'X')
+			//toaddress=xlate('USERS','EXODUS',7,'X')
 			//if toaddress else toaddress='sb2@neosys.com'
 			goto forcedemail;
 		}
 
-		//testdata and user neosys - always email sysmsg@neosys.com
-		//if system<61> or (@username='NEOSYS' and system<17,1>[-4,4]='TEST') then
+		//testdata and user exodus - always email sysmsg@neosys.com
+		//if system<61> or (@username='EXODUS' and system<17,1>[-4,4]='TEST') then
 
-		//testdata and user neosys - always email sysmsg@neosys.com
-		if (SYSTEM.a(61) and (USERNAME == "NEOSYS")) {
+		//testdata and user exodus - always email sysmsg@neosys.com
+		if (SYSTEM.a(61) and (USERNAME == "EXODUS")) {
 			forcedemailx = "sysmsg@neosys.com";
 
 forcedemail:
@@ -166,12 +166,12 @@ forcedemail:
 		toaddress = toaddress.substr(1,tt - 1);
 	}
 
-	//send mail requires confirmation if user is NEOSYS
-	//CANNOT because backup in neosys.net would be interrupted
+	//send mail requires confirmation if user is EXODUS
+	//CANNOT because backup in exodus.net would be interrupted
 	//declare function decide
-	//if @username='NEOSYS' then
+	//if @username='EXODUS' then
 	// s33=system<33>
-	// q='You are NEOSYS.|Send mail to ':toaddress:'|':subject:'|':body0
+	// q='You are EXODUS.|Send mail to ':toaddress:'|':subject:'|':body0
 	// convert "\r\n" to @fm in q
 	// if decide(q,'',reply) else reply=2
 	// if reply=1 else return
@@ -201,7 +201,7 @@ forcedemail:
 		};//ii;
 	};//filen;
 
-	//default neosys smtp parameters
+	//default exodus smtp parameters
 	if (not(params1.a(1))) {
 		var sysname = SYSTEM.a(57);
 		if (not sysname) {
@@ -296,15 +296,15 @@ forcedemail:
 	//params='/t ':quote(toaddress):' /s ':quote(subject):' /b ':quote(body):' /a ':quote(attachfilename)
 	//if delete then params:=' /d ':delete
 
-	//condition subject start standard with 'NEOSYS: '
-	if (subject.substr(1,8) ne "NEOSYS: ") {
-		if (subject.substr(1,6) == "NEOSYS") {
+	//condition subject start standard with 'EXODUS: '
+	if (subject.substr(1,8) ne "EXODUS: ") {
+		if (subject.substr(1,6) == "EXODUS") {
 			subject = subject.substr(7,9999).trimf();
 		}
 		if (subject.substr(1,7) == "System:") {
 			subject = subject.substr(8,9999).trimf();
 		}
-		subject.splicer(1, 0, "NEOSYS: ");
+		subject.splicer(1, 0, "EXODUS: ");
 	}
 
 	params.r(-1, "toaddress=" ^ (toaddress.quote()));
@@ -322,7 +322,7 @@ forcedemail:
 	}
 	params ^= FM;
 
-	//AREV uses NEOSYS sendmail.js script which uses windows CDO object
+	//AREV uses EXODUS sendmail.js script which uses windows CDO object
 	if (VOLUMES) {
 
 		params.swapper(FM, "\r\n");

@@ -184,7 +184,7 @@
 //equ letterheadoninv to agp<123> 1=no (preprinted) 2=yes else yes
 //equ maxschedulekeysize to agp<124> blank/0=no limit
 //equ createads to agp<125> 1 for 5 years back or negative to indicate nyears back
-//equ exportformat to agp<126> blank for ul/magna, 1 for neosys generic
+//equ exportformat to agp<126> blank for ul/magna, 1 for exodus generic
 //equ default.client.accno to agp<127>
 //equ createadsnotifyuser to agp<128>
 //equ voucherrefpattern to agp<129> not used

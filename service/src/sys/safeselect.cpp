@@ -13,7 +13,7 @@ function main(in selectx) {
 	RECORD.transfer(rr);
 	ID.transfer(id);
 	DICT.transfer(dict);
-	//if @username='NEOSYS' then oswrite selectx on 'SAFESELE'
+	//if @username='EXODUS' then oswrite selectx on 'SAFESELE'
 	//CALL PERF(selectX)
 	call xselect(selectx);
 

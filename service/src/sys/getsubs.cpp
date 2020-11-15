@@ -63,7 +63,7 @@ nextdoc:
 		//call oswrite(nextno,where:'0')
 
 		//build new file name
-		if (USERNAME == "NEOSYS") {
+		if (USERNAME == "EXODUS") {
 			tt = "NEO";
 		}else{
 			tt = "DOC";
@@ -117,9 +117,9 @@ nextdoc:
 				}
 			}
 
-			//always prevent users from editing documents designed by NEOSYS
-			if (RECORD.a(1).index("NEOSYS") and not(USERNAME.index("NEOSYS"))) {
-				call mssg("You cannot modify report designs created by NEOSYS|Use the Copy button to copy them and modify the copy");
+			//always prevent users from editing documents designed by EXODUS
+			if (RECORD.a(1).index("EXODUS") and not(USERNAME.index("EXODUS"))) {
+				call mssg("You cannot modify report designs created by EXODUS|Use the Copy button to copy them and modify the copy");
 				xx = unlockrecord(win.datafile, win.srcfile, ID);
 				win.wlocked = 0;
 			}
@@ -158,13 +158,13 @@ nextdoc:
 		RECORD.r(4, var().time());
 		RECORD.r(7, APPLICATION);
 
-		//update neosys standard (in case doing this on the programming system)
+		//update exodus standard (in case doing this on the programming system)
 		//the programming standard is installed into all clients
 		//on first login after upgrade
 		//this is also done in copygbp perhaps could be removed from there
 		//almost identical code in definition.subs and get.subs (for documents)
 		//field 10 in documents and definitions xxx*analdesign means the same
-		if ((USERNAME == "NEOSYS") and RECORD.a(10)) {
+		if ((USERNAME == "EXODUS") and RECORD.a(10)) {
 			var reports;
 			if (reports.open("REPORTS", "")) {
 				var key = ID;
@@ -190,18 +190,18 @@ nextdoc:
 				}
 			}
 
-			//always prevent users from deleting documents designed by NEOSYS
-			if (RECORD.a(1).index("NEOSYS") and not(USERNAME.index("NEOSYS"))) {
-				msg = "You cannot delete report designs created by NEOSYS";
+			//always prevent users from deleting documents designed by EXODUS
+			if (RECORD.a(1).index("EXODUS") and not(USERNAME.index("EXODUS"))) {
+				msg = "You cannot delete report designs created by EXODUS";
 				return invalid(msg);
 			}
 
 		}
 
-		//update neosys standard (in case doing this on the programming system)
-		//%DELETED% ensures that deleted NEOSYS documents get deleted
+		//update exodus standard (in case doing this on the programming system)
+		//%DELETED% ensures that deleted EXODUS documents get deleted
 		//on upgrading clients
-		if ((USERNAME == "NEOSYS") and RECORD.a(10)) {
+		if ((USERNAME == "EXODUS") and RECORD.a(10)) {
 			var reports;
 			if (reports.open("REPORTS", "")) {
 				var key = ID;

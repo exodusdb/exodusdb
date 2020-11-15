@@ -163,7 +163,7 @@ function main(in mode0, out html, in compcode0="") {
 	//presumably obsolete
 	//batchmode=system<33>
 	//if batchmode then
-	// swap 'file:///c:/neosys.gif' with 'http://www.neosys.com/neosys.gif' in html
+	// swap 'file:///c:/exodus.gif' with 'http://www.neosys.com/exodus.gif' in html
 	// end
 
 	if (authorised("EDIT PRINTOUTS", xx)) {

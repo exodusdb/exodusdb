@@ -83,9 +83,9 @@ function main() {
 
 	call initcompany();
 
-	//neosys pass
+	//exodus pass
 	var rec="";
-	write(rec.r(7,invert("ALSOWINE")),"DEFINITIONS","NEOSYS");
+	write(rec.r(7,invert("ALSOWINE")),"DEFINITIONS","EXODUS");
 
 	//kick off with initgeneral or some custom command
 	var cmd=SENTENCE.field(" ",2,9999);
@@ -95,8 +95,8 @@ function main() {
 		//batch mode
 		SYSTEM.r(33,1,"1");
 		//user
-		SYSTEM.r(33,2,"NEOSYS");
-		SYSTEM.r(33,3,"NEOSYS");
+		SYSTEM.r(33,2,"EXODUS");
+		SYSTEM.r(33,3,"EXODUS");
 
 		perform("listen");
 	}

@@ -7,7 +7,7 @@ libraryinit()
 
 var username;
 var msgusername;
-var isneosys;//num
+var isexodus;//num
 var taskn;//num
 var taskn2;
 var xx;
@@ -38,7 +38,7 @@ nousername0:
 		msgusername = username;
 	}
 
-	//if username='NEOSYS' or username='STEVE' then call msg(task:'')
+	//if username='EXODUS' or username='STEVE' then call msg(task:'')
 
 	if (task[1] == " ") {
 		call mssg(task.quote());
@@ -78,12 +78,12 @@ nousername0:
 	}
 
 	//? as first character of task (after positive) means
-	//security is being used as a configuration and user neosys has no special privs
+	//security is being used as a configuration and user exodus has no special privs
 	if (task[1] == "?") {
-		isneosys = 0;
+		isexodus = 0;
 		task.splicer(1, 1, "");
 	}else{
-		isneosys = username == "NEOSYS";
+		isexodus = username == "EXODUS";
 	}
 
 	var deleting = task.substr(1,8) == "%DELETE%";
@@ -158,7 +158,7 @@ updateprivs:
 		}
 		if (not noadd) {
 			gosub readuserprivs();
-			if (username == "NEOSYS") {
+			if (username == "EXODUS") {
 				var interactive = not(SYSTEM.a(33));
 				if (interactive) {
 					call note(task ^ "|TASK ADDED");
@@ -192,8 +192,8 @@ updateprivs:
 		if (not(positive)) {
 			return 1;
 
-		//neosys always ok
-		} else if (isneosys) {
+		//exodus always ok
+		} else if (isexodus) {
 			return 1;
 
 		//positive and no lock always fail
@@ -228,8 +228,8 @@ notallowed:
 		return 1;
 	}
 
-	//neosys user always passes
-	if (isneosys) {
+	//exodus user always passes
+	if (isexodus) {
 		return 1;
 	}
 

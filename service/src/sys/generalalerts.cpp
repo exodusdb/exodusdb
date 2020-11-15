@@ -8,7 +8,7 @@ function main(in alerttype0, in runasuser, out tasks, out title, out request, ou
 
 	//1) list of all active users
 	//at 7am on the 14th of each month (ie regularly but not everyday)
-	//CREATEALERT CURRUSERS GENERAL CURRUSERS 7:14 NEOSYS (ROS)
+	//CREATEALERT CURRUSERS GENERAL CURRUSERS 7:14 EXODUS (ROS)
 
 	#include <general_common.h>
 

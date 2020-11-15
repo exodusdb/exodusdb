@@ -247,7 +247,7 @@ function main() {
 	//dont do autoruns until 1 or 2 mins after starting (to let other processes start)
 	lastautorun = var().time() + var(60).rnd();
 	//do autorun immediately on dev system
-	if (var("neosys.id").osfile()) {
+	if (var("exodus.id").osfile()) {
 		lastautorun = var().time() - 60;
 	}
 
@@ -280,7 +280,7 @@ function main() {
 	datasetcode = SYSTEM.a(17);
 	live = datasetcode.ucase().substr(-4,4) ne "TEST";
 
-	neopath = "../neosys/";
+	neopath = "../exodus/";
 	neopath.converter("/", OSSLASH);
 	installend = "global.end";
 	serverend = "../../" ^ SYSTEM.a(123).lcase() ^ ".end";
@@ -340,7 +340,7 @@ function main() {
 
 	//intranet=index(origsentence,'INTRANET',1)
 
-	//if @username='NEOSYS.NET' then system<33>=1
+	//if @username='EXODUS.NET' then system<33>=1
 	origbatchmode = SYSTEM.a(33);
 
 	//webpath=field(origsentence,' ',3)
@@ -370,7 +370,7 @@ function main() {
 	//call savescreenorigscrn, origattr);
 	//print @aw<30>:
 
-	//tracing=(@username='NEOSYS' or trim(@station)='SBCP1800')
+	//tracing=(@username='EXODUS' or trim(@station)='SBCP1800')
 	//tracing=(not(index(origsentence,'AUTO',1)))
 
 	//if @username='DEMO' then tracing=0
@@ -384,7 +384,7 @@ function main() {
 	nrequests = SYSTEM.a(35) + 0;
 
 	printl(var("-").str(79));
-	printl("NEOSYS.NET SERVICE ", SYSTEM.a(24), " STARTED ", var().timedate());
+	printl("EXODUS.NET SERVICE ", SYSTEM.a(24), " STARTED ", var().timedate());
 	printl();
 	printl("Station  : ", STATION.oconv("L#25"), "Drive : ", oscwd());
 
@@ -632,7 +632,7 @@ nextsearch0:
 		}
 
 		//run scheduled reports etc except on test data (ie not backed up)
-		//if not(system<61>) or dir("neosys.id") then
+		//if not(system<61>) or dir("exodus.id") then
 		// if system<121> then call syncdata
 		// end
 
@@ -785,7 +785,7 @@ nextsearch0:
 		}
 
 		//"D" = De bug
-		//if charx='D' and @username='NEOSYS' then
+		//if charx='D' and @username='EXODUS' then
 		// DE BUG
 		// end
 
@@ -987,8 +987,8 @@ readlink1:
 		}
 
 		//replyfilename=ucase(request<1>)
-		//eg D:\NEOSYS\DATA\DEVDTEST\|3130570.1
-		//eg /var/www/html/neosys2/NEOSYS//data/BASIC/~9979714.1
+		//eg D:\EXODUS\DATA\DEVDTEST\|3130570.1
+		//eg /var/www/html/exodus2/EXODUS//data/BASIC/~9979714.1
 		replyfilename = USER0.a(1);
 		USER0.remover(1);
 
@@ -1001,7 +1001,7 @@ readlink1:
 			//tt=index(replyfilename,'\data\',1)
 			tt = replyfilename.index(OSSLASH "data" OSSLASH);
 			if (tt) {
-				//eg drive() = D:\NEOSYS\NEOSYS\ ...
+				//eg drive() = D:\EXODUS\EXODUS\ ...
 				//replyfilename='..\':replyfilename[tt+1,9999]
 				replyfilename = ".." OSSLASH ^ replyfilename.substr(tt + 1,9999);
 			}
@@ -1461,7 +1461,7 @@ cannotopenlinkfile2:
 	tt = USER3.ucase();
 	if ((tt.index("R18.6") or tt.index("RTP20 MISSING")) or tt.index("TOO MANY LEVELS OF TCL")) {
 		halt = 1;
-		//response<-1>='INTERNAL ERROR Closing current NEOSYS server process'
+		//response<-1>='INTERNAL ERROR Closing current EXODUS server process'
 		call listen4(1, USER3);
 		call sysmsg(USER3);
 	}
@@ -1788,7 +1788,7 @@ subroutine process() {
 
 			//must provide a key unless locking
 			if (not withlock) {
-				//response='Error: NEOSYS.NET Key missing and not READU'
+				//response='Error: EXODUS.NET Key missing and not READU'
 				call listen4(5, USER3);
 				gosub fmtresp();
 				return;
@@ -2439,7 +2439,7 @@ badwrite:
 	//execute a request
 	} else if (request1 == "EXECUTE") {
 
-		//if @username='NEOSYS' then
+		//if @username='EXODUS' then
 		// oswrite @user0 on 'USER0'
 		// oswrite @user1 on 'USER1'
 		// end
@@ -2525,7 +2525,7 @@ badwrite:
 				call listen4(17, USER4);
 			}
 
-			//send errors to neosys
+			//send errors to exodus
 			if (((USER4 ^ user4x).index("INTERNAL ERROR")) or user4x.index("DAMAGED FILE")) {
 				call sysmsg(USER4);
 			}

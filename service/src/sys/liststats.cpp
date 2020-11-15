@@ -148,10 +148,10 @@ function main() {
 		var tdx = "</TD>" "\r\n";
 		var nbsp = "&nbsp;";
 
-		tx = "<H1 align=center>NEOSYS USAGE STATISTICS</H1>";
+		tx = "<H1 align=center>EXODUS USAGE STATISTICS</H1>";
 		gosub printtx();
 
-		tx = "<table border=1 class=neosystable";
+		tx = "<table border=1 class=exodustable";
 		tx ^= " CELLSPACING=0 CELLPADDING=2 ALIGN=CENTER";
 		tx ^= " STYLE=\"font-size:66%\"";
 		tx ^= ">";

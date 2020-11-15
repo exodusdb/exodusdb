@@ -18,7 +18,7 @@ function main() {
 
 	#include <general_common.h>
 
-	//if @username='NEOSYS' then break on
+	//if @username='EXODUS' then break on
 	//BREAK ON;
 
 	var cmd = "LISTEN " ^ SENTENCE.field(" ", 2, 9999);
@@ -90,7 +90,7 @@ listen:
 	if (USER4.index("R18.6")) {
 		halt = 1;
 		USER4.r(-1, "Corrupt temporary file. Restart Needed.");
-		USER4.r(-1, "NEOSYS.NET TERMINATED");
+		USER4.r(-1, "EXODUS.NET TERMINATED");
 	}
 	if (USER4.ucase().index("NOT ENOUGH MEMORY")) {
 		halt = 1;
@@ -115,7 +115,7 @@ listen:
 		//either BACKUP or BACKUP2 followed by space and drive letter
 		if (PSEUDO.substr(1,6) == "BACKUP") {
 
-			subject = "NEOSYS Backup " ^ dbcode;
+			subject = "EXODUS Backup " ^ dbcode;
 
 			//add drive letter(s)
 			tt = PSEUDO.field(" ", 2).substr(1,2);
@@ -146,7 +146,7 @@ listen:
 			//if tt='' then tt='Success'
 			subject ^= " " ^ tt;
 
-			//add neosys version for info
+			//add exodus version for info
 			//call osread(versionnote,'general\version.dat')
 			//versiondate=iconv(field(trim(versionnote),' ',2,3),'D')
 			//subject:=' Ver: ':versiondate 'D4/J'
@@ -157,7 +157,7 @@ listen:
 
 		}else{
 
-			//subject='NEOSYS Technical Message :'
+			//subject='EXODUS Technical Message :'
 			subject = "";
 			printl(USER4);
 			call sysmsg(USER4);
@@ -195,7 +195,7 @@ listen:
 				var verfilename = "general/version.dat";
 				verfilename.converter("/", OSSLASH);
 				if (ver.osread(verfilename)) {
-					body.r(-1, "NEOSYS Ver:" ^ ver.a(1));
+					body.r(-1, "EXODUS Ver:" ^ ver.a(1));
 				}
 
 				//too slow so ignore it
@@ -216,7 +216,7 @@ listen:
 				//optionally email backup.zip
 				if (((errormsg == "") or (errormsg.substr(1,2) == "OK")) and attachfilename) {
 					var address2 = gen.address.field("/", 2);
-					//remove neosys from the backup.zip recipients
+					//remove exodus from the backup.zip recipients
 					if (address2.locateusing(";","backups@neosys.com",xx)) {
 						address2.converter(";", VM);
 						address2.remover(1, xx);

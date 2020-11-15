@@ -382,7 +382,7 @@ nextdict:
 	}
 	var ncols = coln;
 
-	//if @username='NEOSYS' then oswrite matunparse(dictids) on 'csv'
+	//if @username='EXODUS' then oswrite matunparse(dictids) on 'csv'
 
 	if (selectlist) {
 		call popselect(0, v69, v70, v71);

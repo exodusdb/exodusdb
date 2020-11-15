@@ -66,7 +66,7 @@ subroutine process(in str0, in mode, io wordseps) {
 	} else if (mode == "CAPITALISE") {
 capitalise:
 		string2 = str0;
-		if (string2 == "NEOSYS") {
+		if (string2 == "EXODUS") {
 			return;
 		}
 

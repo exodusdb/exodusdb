@@ -56,8 +56,8 @@ function main(io css, in version="") {
 		css.swapper("%tdcol%", tdcolor);
 	}
 
-	css.swapper("neosysfont,", font);
-	css.swapper("neosyssize", fontsize);
+	css.swapper("exodusfont,", font);
+	css.swapper("exodussize", fontsize);
 
 	var agent = SYSTEM.a(40);
 	if (agent.index("MSIE 7", 1)) {
@@ -78,7 +78,7 @@ return R"V0G0N(
 /*ver2*/
 .BHEAD {display:none}
 .BHEAD2 {}
-body {background-color:#ffffff; font-family:neosysfont,verdana,sans-serif,arial,helvetica; font-size: neosyssize}
+body {background-color:#ffffff; font-family:exodusfont,verdana,sans-serif,arial,helvetica; font-size: exodussize}
 table,span,div,br,p,a,thread,tbody,tfoot,tr,th,td,b,i,u,dl,dt,dd,li,ul,form,font,small,big {font-size:100%}
 a {color:blue;}
 a:visited {color:purple;}
@@ -101,29 +101,29 @@ td.nx {border-top:none;border-bottom:none}
 
 /*collapse needed up to IE7 - cant do border-spacing:0
  also to avoid double borders internally*/
-table.neosystable {
+table.exodustable {
  border-collapse:collapse;
  margin:0px;
  padding:0px;
  border-spacing:0px;}
 
-table.neosystable th {
+table.exodustable th {
  background-color:#ffff80;
  padding:2px;
  border:1px solid #808080;}
 
-table.neosystable > tbody > tr > td {
+table.exodustable > tbody > tr > td {
  background-color:#ffffc0;
  padding:2px;
  border:1px solid #d3d3d3;}
 
-table.neosystable > tbody > tr > td:first-child {
+table.exodustable > tbody > tr > td:first-child {
  border-left:1px solid #808080}
 
-table.neosystable > tbody > tr > td:last-child {
+table.exodustable > tbody > tr > td:last-child {
  border-right:1px solid #808080}
 
-table.neosystable hr {height:0px; border:0px; border-top:1px solid #d3d3d3}
+table.exodustable hr {height:0px; border:0px; border-top:1px solid #d3d3d3}
 
 table.hashtable td {padding:0px; margin:0px; text-align:left; vertical-align:top; border-collapse:collapse; border:0px;}
 
@@ -132,7 +132,7 @@ table.hashtable td {padding:0px; margin:0px; text-align:left; vertical-align:top
 </style>
 
 <style type="text/css" media="print">
-.neosystable {}
+.exodustable {}
 /* #Header, #Footer { display: none !important; } */
 .noprint {display:none}
 </style>
@@ -184,7 +184,7 @@ window.onload=function (){
  if (!window.opener)
   return
  //ctrl+click doesnt provide window.opener
- //glogincode="DEVDTEST*NEOSYS*"
+ //glogincode="DEVDTEST*EXODUS*"
  //gwindowopenparameters={}
  //glogincode=window.opener.glogincode
  //gwindowopenparameters.readonlymode=true
@@ -220,7 +220,7 @@ return R"V0G0N(
 /*ver1*/
 .BHEAD {display:none}
 .BHEAD2 {}
-body {background-color:#ffffff; font-family:neosysfont,verdana,sans-serif,arial,helvetica; font-size: neosyssize}
+body {background-color:#ffffff; font-family:exodusfont,verdana,sans-serif,arial,helvetica; font-size: exodussize}
 table,span,div,br,p,a,thread,tbody,tfoot,tr,th,td,b,i,u,dl,dt,dd,li,ul,form,font,small,big {font-size:100%}
 a {color:blue;}
 a:visited {color:purple;}
@@ -236,13 +236,13 @@ td.nx {border-top:none;border-bottom:none}
 .acenter {text-align:center}
 .nobr {white-space:nowrap;}
 .num {text-align:right;mso-number-format:General}
-.neosystable {background-color:#ffffc0; border-width:2px; border-collapse:collapse; padding:1px}
+.exodustable {background-color:#ffffc0; border-width:2px; border-collapse:collapse; padding:1px}
 .hashtable td {padding:0px; margin:0px; vertical-align:top; border-collapse:collapse; border:0px solid lightgrey;}
 .pagedivider {border-top:1px dashed #808080; border-bottom:0px;}
 </style>
 
 <style type="text/css" media="print">
-.neosystable {}
+.exodustable {}
 .noprint {display:none}
 </style>
 

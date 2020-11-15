@@ -48,12 +48,12 @@ function main(in mode) {
 
 		//get email from userlist
 		//it is in the user file already
-		//if @id ne 'NEOSYS' then @record<7>=userprivs<7,usern>
+		//if @id ne 'EXODUS' then @record<7>=userprivs<7,usern>
 
 		if (win.wlocked and ID ne USERNAME) {
 
-			//only neosys to access neosys
-			if (ID == "NEOSYS") {
+			//only exodus to access exodus
+			if (ID == "EXODUS") {
 				msg = "Not authorised";
 				return invalid(msg);
 			}
@@ -203,8 +203,8 @@ function main(in mode) {
 
 		var olduserprivs = SECURITY;
 
-		//neosys usually not in the users list or shouldnt update security record
-		if (ID == "NEOSYS") {
+		//exodus usually not in the users list or shouldnt update security record
+		if (ID == "EXODUS") {
 			return 0;
 		}
 
@@ -423,7 +423,7 @@ subroutine unlocksec() {
 
 subroutine getusern() {
 	//fail safe only allowed to update existing users
-	if (ID == "NEOSYS") {
+	if (ID == "EXODUS") {
 		//usern remains unassigned to force an error if used later on
 	}else{
 		if (not(SECURITY.a(1).locate(ID,usern))) {
@@ -455,8 +455,8 @@ subroutine getuserdept2(in mode) {
 	//locate the user in the table
 	usercode = mode.field(",", 2);
 	if (not(SECURITY.a(1).locate(usercode,usern))) {
-		if (usercode == "NEOSYS") {
-			ANS = "NEOSYS";
+		if (usercode == "EXODUS") {
+			ANS = "EXODUS";
 			return;
 		}else{
 			ANS = "";

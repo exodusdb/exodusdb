@@ -140,8 +140,8 @@ function main() {
 		return 0;
 	}
 
-	//the monitor command to record neosys process status
-	//TODO get reply with new neosys auth and other info
+	//the monitor command to record exodus process status
+	//TODO get reply with new exodus auth and other info
 	request = "UPDATE";
 
 	//assume cannot have more than one update pending per installation
@@ -420,7 +420,7 @@ nextprocess:
 				if (not dbasesystem) {
 					dbasesystem = APPLICATION;
 				}
-				tt = "start neosys.js /system " ^ dbasesystem ^ " /database " ^ dbasecode;
+				tt = "start exodus.js /system " ^ dbasesystem ^ " /database " ^ dbasecode;
 					//pid:=' /pid ':tt<6>
 					//print @(0):@(-4):time() 'MTS':' ':tt
 				if (first) {
@@ -567,16 +567,16 @@ nextprocess:
 
 									//sendmail - if it fails, there will be an entry in the log
 									toaddresses = bakpars.a(6);
-									//never send reminders to neosys since we will get nagios warnings at 12:00
+									//never send reminders to exodus since we will get nagios warnings at 12:00
 									toaddresses.swapper("backups@neosys.com", "");
 									toaddresses = trim(toaddresses, ";");
 									if (toaddresses) {
 										remindern = (localtime - 21600) % 3600 * reminderhours + 1;
-										subject = "NEOSYS Backup Reminder";
+										subject = "EXODUS Backup Reminder";
 										if (remindern > 1) {
 											subject ^= " (" ^ remindern ^ ")";
 										}
-										body = "It is time to change the NEOSYS backup media (e.g. USB Flash Drive)";
+										body = "It is time to change the EXODUS backup media (e.g. USB Flash Drive)";
 										if (localtime < 43200) {
 											body.r(-1, FM ^ "Please change it " "before 12:00 midday today.");
 										}else{
@@ -658,9 +658,9 @@ nextdbasen:;
 		status0123 = 1;
 	}
 
-	hostdescriptions = "NEOSYS ";
+	hostdescriptions = "EXODUS ";
 
-	//add neosys version for info
+	//add exodus version for info
 	tt = "general/version.dat";
 	tt.converter("/", OSSLASH);
 	call osread(versionnote, tt);
@@ -709,7 +709,7 @@ nextdbasen:;
 				} else if (wgetoutput.ucase().index(" failed: Unknown host.")) {
 					printl("DNS cant resolve upgrade host name");
 				} else {
-					if (not(var("neosys.id").osfile())) {
+					if (not(var("exodus.id").osfile())) {
 						print("upgrade downloading");
 					}
 				}
@@ -802,7 +802,7 @@ gotip:
 	datax = "";
 
 	//host passive check line
-	//currently any neosys update indicates that the host is ok
+	//currently any exodus update indicates that the host is ok
 	if (datax) {
 		datax ^= var().chr(10);
 	}
@@ -812,7 +812,7 @@ gotip:
 	if (datax) {
 		datax ^= var().chr(10);
 	}
-	datax ^= "PROCESS_SERVICE_CHECK_RESULT;" ^ installid ^ ";neosys;" ^ status0123 ^ ";" ^ descriptions;
+	datax ^= "PROCESS_SERVICE_CHECK_RESULT;" ^ installid ^ ";exodus;" ^ status0123 ^ ";" ^ descriptions;
 
 	//request info to be sent to the monitor asynchronously - doesnt wait
 

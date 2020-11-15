@@ -93,7 +93,7 @@ function main() {
 
 		//ensure authorised to login to one or the other database
 		//by ensuring the user is currently logged in to one or other database
-		if ((USERNAME ne "NEOSYS" and copydb ne SYSTEM.a(17)) and todb ne SYSTEM.a(17)) {
+		if ((USERNAME ne "EXODUS" and copydb ne SYSTEM.a(17)) and todb ne SYSTEM.a(17)) {
 			USER4 = "In order to copy database " ^ (copydb.quote()) ^ " to " ^ (todb.quote()) ^ ",";
 			USER4.r(-1, "you must be logged in to database " ^ (copydb.quote()) ^ " or " ^ (todb.quote()));
 			USER4.r(-1, "but you are currently logged in to database " ^ (SYSTEM.a(17).quote()));
@@ -133,7 +133,7 @@ function main() {
 
 		//ensure sender has an email address
 		//not absolutely necessary but provides a return email address
-		if (USERNAME ne "NEOSYS" and not(USERNAME.xlate("USERS", 7, "X"))) {
+		if (USERNAME ne "EXODUS" and not(USERNAME.xlate("USERS", 7, "X"))) {
 			call mssg("You cannot send email because you do not have an email address for replies");
 			stop();
 		}
@@ -237,7 +237,7 @@ function main() {
 		//send the new password to the user
 		var emailaddrs = userrec.a(7);
 		var ccaddrs = "";
-		var subject = "NEOSYS Password Reset";
+		var subject = "EXODUS Password Reset";
 		var body = "User: " ^ ID;
 		body.r(-1, "Your new password is " ^ newpassword);
 		call sendmail(emailaddrs, ccaddrs, subject, body, "", "", xx);
@@ -452,7 +452,7 @@ badsetcodepage:
 			}
 		}
 
-		var select = "SELECT DOCUMENTS BY-DSND NEOSYS_STANDARD BY DESCRIPTION";
+		var select = "SELECT DOCUMENTS BY-DSND EXODUS_STANDARD BY DESCRIPTION";
 
 		var instructions = USER0.a(2);
 		instructions.swapper(VM, "%FD");
@@ -570,7 +570,7 @@ nextrep:
 		var description = doc.a(2);
 		doc.r(2, description ^ " (Copy)");
 
-		//prevent copy from appearing like a neosys standard
+		//prevent copy from appearing like a exodus standard
 		doc.r(10, "");
 
 		doc.r(1, USERNAME);

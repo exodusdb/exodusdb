@@ -10,8 +10,8 @@ function main() {
 	}
 	//use database as better than blank/unknown
 	if (not ANS) {
-		if (ID.field("*", 3) == "NEOSYS") {
-			ANS = "NEOSYS";
+		if (ID.field("*", 3) == "EXODUS") {
+			ANS = "EXODUS";
 		}else{
 			ANS = ID.field("*", 1);
 		}

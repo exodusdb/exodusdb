@@ -4,7 +4,7 @@ libraryinit()
 
 function main(in cmd) {
 	//c sys
-	//if @username='NEOSYS' then oswrite cmd on 'XSELECT.'
+	//if @username='EXODUS' then oswrite cmd on 'XSELECT.'
 	//oswrite cmd on 'XSELECT.'
 	if (SYSTEM.a(33)) {
 		printl();

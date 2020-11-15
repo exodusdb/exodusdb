@@ -35,7 +35,7 @@ function main(in mode, in ipno, out text) {
 		stop();
 	}
 
-	//skip standard LAN or NEOSYS ip no and exit - no delay for these ips
+	//skip standard LAN or EXODUS ip no and exit - no delay for these ips
 	//medialine lan is 100.100.100.* iana "carrier grade NAT"
 	//test in order of frequency installed at clients
 
@@ -64,7 +64,7 @@ function main(in mode, in ipno, out text) {
 		goto returnzero;
 	}
 
-	//skip NEOSYS internet ip numbers and those in system configuration file
+	//skip EXODUS internet ip numbers and those in system configuration file
 	//ZZZ should really detect net ranges like /24 and .*
 	//allowedips=' ':xlate('GBP','$HOSTS.ALLOW','','X'):' '
 	call readhostsallow(allowedips);

@@ -85,10 +85,10 @@ function main(in msg0, in subject0="", in username0="") {
 
 	//get technical emailaddrs to send to
 	//nb if any emailaddrs and neosys.com not in them
-	//then neosys will not receive any message
+	//then exodus will not receive any message
 	var useremail = username.xlate("USERS", 7, "X").lcase();
 	var userfullname = username.xlate("USERS", 1, "X");
-	//if username='NEOSYS' and @username<>'NEOSYS' then
+	//if username='EXODUS' and @username<>'EXODUS' then
 	var emailaddrs = bakpars.a(6);
 	var ccaddrs = "";
 	if (bakpars.a(10)) {
@@ -102,7 +102,7 @@ function main(in msg0, in subject0="", in username0="") {
 	emailaddrs.swapper("backups@neosys.com", "sysmsg@neosys.com");
 
 	//suppress login failure messages
-	if ((APPLICATION ne "ACCOUNTS" and username ne "NEOSYS") and (subjectin.substr(1,13) == "Login Failure")) {
+	if ((APPLICATION ne "ACCOUNTS" and username ne "EXODUS") and (subjectin.substr(1,13) == "Login Failure")) {
 		emailaddrs.swapper("sysmsg@neosys.com", "");
 		emailaddrs = trim(emailaddrs, ";");
 	}
@@ -115,22 +115,22 @@ function main(in msg0, in subject0="", in username0="") {
 		subjectin ^= " V2";
 	}
 
-	//username NEOSYS and @username<>NEOSYS means email NEOSYS ONLY!
-	if ((username == "NEOSYS") and USERNAME ne "NEOSYS") {
+	//username EXODUS and @username<>EXODUS means email EXODUS ONLY!
+	if ((username == "EXODUS") and USERNAME ne "EXODUS") {
 		emailaddrs = "sysmsg@neosys.com";
 		//so we know who caused the message
 		username = USERNAME;
 	}
 
-	//sysmsg is not emailed to admins if testdata or user is NEOSYS
-	if ((USERNAME == "NEOSYS") or (SYSTEM.a(17).substr(-4,4) == "TEST")) {
+	//sysmsg is not emailed to admins if testdata or user is EXODUS
+	if ((USERNAME == "EXODUS") or (SYSTEM.a(17).substr(-4,4) == "TEST")) {
 
-		//this is disabled to ensure that all errors caused by NEOSYS support
+		//this is disabled to ensure that all errors caused by EXODUS support
 		//are logged normally
 		//also, User File Amendments currently use sysmsg() and should be reported
-		//to admins even if done by NEOSYS
-		//sysmsg is not emailed to admins if testdata or user is NEOSYS
-		//if @username='NEOSYS' or system<17>[-4,4]='TEST' then
+		//to admins even if done by EXODUS
+		//sysmsg is not emailed to admins if testdata or user is EXODUS
+		//if @username='EXODUS' or system<17>[-4,4]='TEST' then
 
 		//sysmsg is not emailed to admins if testdata
 		//if system<17>[-4,4]='TEST' then
@@ -142,14 +142,14 @@ function main(in msg0, in subject0="", in username0="") {
 		}
 	}
 
-	//if no email addresses then always email neosys
+	//if no email addresses then always email exodus
 	if (emailaddrs == "") {
 		emailaddrs = "sysmsg@neosys.com";
 	}
 
 	//determine subject
-	//subject='NEOSYS System Message: ':datasetcode
-	var subject = "NEOSYS System: " ^ datasetcode;
+	//subject='EXODUS System Message: ':datasetcode
+	var subject = "EXODUS System: " ^ datasetcode;
 	var tt = msg.index("ERROR NO:");
 	if (tt) {
 		subject ^= " " ^ msg.substr(tt,9999).a(1, 1, 1);

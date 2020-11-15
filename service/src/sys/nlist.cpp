@@ -221,7 +221,7 @@ var spaceoptionsize;
 function main() {
 	//
 	//c sys
-	copyright = "Copyright (C) NEOSYS All Rights Reserved";
+	copyright = "Copyright (C) EXODUS All Rights Reserved";
 	copyright = "";
 	showborder = 0;
 	headtabperpage = 1;
@@ -229,7 +229,7 @@ function main() {
 	//for safety in case we are called with (PE) options, to avoid hanging
 	//PRINTER OFF;
 
-	if (USERNAME == "NEOSYS") {
+	if (USERNAME == "EXODUS") {
 		var(SENTENCE).oswrite("nlist");
 		printl();
 		printl(SENTENCE);
@@ -522,7 +522,7 @@ filename:
 		}
 		ss ^= " " ^ word;
 
-		//neosys custom
+		//exodus custom
 
 		if (html) {
 
@@ -1250,7 +1250,7 @@ x1exit:
 				//nth child style column justification in case <col> doesnt work like on FF
 				if (align) {
 					//works per table if the table is assigned a class (.maintable) here
-					style ^= "table.neosystable td:nth-child(" ^ coln2 ^ "){text-align:" ^ align ^ "}" "\r\n";
+					style ^= "table.exodustable td:nth-child(" ^ coln2 ^ "){text-align:" ^ align ^ "}" "\r\n";
 				}
 
 			}else{
@@ -1286,7 +1286,7 @@ x1exit:
 		//tt:=' align="center" '
 		//tt:=' class="maintable"'
 
-		tt ^= "<table class=\"neosystable\"";
+		tt ^= "<table class=\"exodustable\"";
 		//cellspacing is only required up to IE7 (or border-collapse)
 		tt ^= " cellspacing=\"0\"";
 		tt ^= " style=\"font-size:66%";
@@ -2506,12 +2506,12 @@ subroutine emailing() {
 		if (emailsubject) {
 			tt3 = emailsubject;
 		}else{
-			//tt3='NEOSYS: ':field(head<1,1,1>,"'",1)
+			//tt3='EXODUS: ':field(head<1,1,1>,"'",1)
 			tt3 = head.a(1, 1, 1).field("\'", 1);
 			if (tt3.index(">")) {
 				tt3 = field2(tt3, ">", -1);
 			}
-			tt3 = "NEOSYS: " ^ tt3;
+			tt3 = "EXODUS: " ^ tt3;
 		}
 
 		//osclose printfile

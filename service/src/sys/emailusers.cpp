@@ -63,18 +63,18 @@ function main(in mode0, in subject0, in body0, in groupids0, in jobids0, in user
 			stop();
 		}
 
-		subject = "NEOSYS Upgrade: " ^ SYSTEM.a(23);
+		subject = "EXODUS Upgrade: " ^ SYSTEM.a(23);
 		if (SYSTEM.a(17) ne SYSTEM.a(23)) {
 			subject ^= " (" ^ SYSTEM.a(17) ^ ")";
 		}
 
 		body = "";
-		body ^= "The NEOSYS system software has been upgraded.";
+		body ^= "The EXODUS system software has been upgraded.";
 		//body:=vm
 		//body:=vm:'In case of errors, please follow the instructions at'
 		//body:=vm:'http://userwiki.neosys.com/index.php/cache.'
 		body ^= VM;
-		body ^= VM ^ "Please email SUPPORT@NEOSYS.COM for any assistance.";
+		body ^= VM ^ "Please email SUPPORT@EXODUS.COM for any assistance.";
 		//body:=vm
 		//body:=vm:'This is an automated email. You cannot reply to it.'
 		body.converter(VM, var().chr(13));
@@ -111,7 +111,7 @@ function main(in mode0, in subject0, in body0, in groupids0, in jobids0, in user
 	//read fromuser from users,@username else fromuser=''
 	replyto = "";
 	if (options.index("R")) {
-		if (((USERNAME == "NEOSYS") or (USERNAME == "ADAGENCY")) or (USERNAME == "ACCOUNTS")) {
+		if (((USERNAME == "EXODUS") or (USERNAME == "ADAGENCY")) or (USERNAME == "ACCOUNTS")) {
 			replyto = "support@neosys.com";
 		}else{
 			var fromuser = xlate("USERS", USERNAME, "", "X");

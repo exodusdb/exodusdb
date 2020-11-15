@@ -186,7 +186,7 @@ postuploadfail:
 				//if result else
 				//osopen fullsubfolder to xx else if status() ne 2 then
 				if (errors) {
-					if (USERNAME == "NEOSYS") {
+					if (USERNAME == "EXODUS") {
 						msg = fullsubfolder;
 					}else{
 						msg = "(uploadroot)" ^ subfolder;

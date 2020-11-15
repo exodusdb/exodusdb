@@ -108,7 +108,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 	}
 	var logx = request2;
 
-	var isdevsys = var("neosys.id").osfile();
+	var isdevsys = var("exodus.id").osfile();
 
 	if (request1 == "RUNS") {
 
@@ -129,7 +129,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 					if (not((tt.a(1).lcase() ^ ".end").osfile())) {
 						if (tt.a(5)) {
 							//garbagecollect;
-							tt = "CMD /C START NEOSYS.JS /system " ^ tt.a(5) ^ " /database " ^ tt.a(1) ^ " /pid " ^ tt.a(6);
+							tt = "CMD /C START EXODUS.JS /system " ^ tt.a(5) ^ " /database " ^ tt.a(1) ^ " /pid " ^ tt.a(6);
 							printl(var().at(0), var().at(-4), var().time().oconv("MTS"), " ", tt);
 							tt.osshell();
 						}
@@ -239,15 +239,15 @@ restart:
 		////////////////////////////////////////////////////////////////////////////
 		//Look for NEOPATCH.1 file in three locations
 		////////////////////////////////////////////////////////////////////////////
-		//The file must have been created after the neosys version date
+		//The file must have been created after the exodus version date
 		// and after the last patch date if any
 		////////////////////////////////////////////////////////////////////////////
 		//1. DATA\CLIENTX\NEOPATCH.1
-		//               > install in one NEOSYS database
+		//               > install in one EXODUS database
 		//2. DATA\NEOPATCH.1
-		//               > install in all active NEOSYS databases in one installation
+		//               > install in all active EXODUS databases in one installation
 		//3. D:\NEOPATCH.1 or D:\HOSTS\NEOPATCH.1
-		//               > install in all active NEOSYS database and installations
+		//               > install in all active EXODUS database and installations
 		var patchcode = "NEOPATCH";
 		var patchdirs = "../DATA/" ^ SYSTEM.a(17) ^ FM ^ "../DATA/" ^ FM ^ "../../";
 		patchdirs.converter("/", OSSLASH);
@@ -308,7 +308,7 @@ restart:
 			//prevent from ever running this patch again on this database
 			rec.write(DEFINITIONS, patchid);
 
-			//get current NEOSYS version timestamp
+			//get current EXODUS version timestamp
 			versiondatetime = "";
 			versionkey = "general/version.dat";
 			versionkey.converter("/", OSSLASH);
@@ -360,8 +360,8 @@ restart:
 					body.r(-1, rec.a(3, filen) ^ " " ^ rec.a(4, filen) ^ "  " ^ rec.a(5, filen));
 				};//filen;
 
-				//message NEOSYS only
-				call sysmsg(body, "NEOPATCH: " ^ subject, "NEOSYS");
+				//message EXODUS only
+				call sysmsg(body, "NEOPATCH: " ^ subject, "EXODUS");
 
 			}
 
@@ -806,11 +806,11 @@ nextlock:
 				call listen4(20, USER3, otherusersx);
 				var(installend).osdelete();
 			}else{
-				osshell("NET STOP NEOSYSSERVICE");
+				osshell("NET STOP EXODUSSERVICE");
 
 				if (request2.substr(1,7) == "RESTART") {
 					var(installend).osdelete();
-					osshell("NET START NEOSYSSERVICE");
+					osshell("NET START EXODUSSERVICE");
 				}
 
 				USER3 = "OK";
@@ -845,7 +845,7 @@ nextlock:
 		USER3 = USER4;
 		USER3.converter(FM ^ VM, "\r\r");
 
-		call sysmsg(USER3, "NEOSYS Backup");
+		call sysmsg(USER3, "EXODUS Backup");
 
 		if (USER3.ucase().index("SUCCESS")) {
 			USER3.splicer(1, 0, "OK ");

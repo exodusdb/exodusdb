@@ -12,7 +12,7 @@ var userx;
 
 function main() {
 	#include <general_common.h>
-	if (ID == "NEOSYS") {
+	if (ID == "EXODUS") {
 		goto unknown;
 	}
 	if (SECURITY.a(1).locate(USERNAME,usern)) {
@@ -44,7 +44,7 @@ function main() {
 		}
 	}else{
 unknown:
-		ans = USERNAME == "NEOSYS";
+		ans = USERNAME == "EXODUS";
 	}
 	return ans;
 }

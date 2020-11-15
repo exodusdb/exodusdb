@@ -70,7 +70,7 @@ getlogkey:
 	if ((programname ne "SYSMSG" and programname ne "SENDMAIL") and emailaddrs) {
 
 		//determine subject
-		var subject = "NEOSYS Log: " ^ SYSTEM.a(17) ^ " " ^ programname;
+		var subject = "EXODUS Log: " ^ SYSTEM.a(17) ^ " " ^ programname;
 
 		var body = "";
 		body.r(-1, "Date=" ^ var().date().oconv("D") ^ " " ^ time.oconv("MTS") ^ " Local");
