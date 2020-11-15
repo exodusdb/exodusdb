@@ -10,7 +10,7 @@ var mode;
 function main(in mode0) {
 
 	/*
-		-Wcast-function-type - magic word - do not remove
+		-Wcast-function-type - magic word - do not remove or split from previous line
 
 		THE HEADER .H FILE OF THS SUBROUTINE IS USED AS A DUMMY
 		FOR CALLING FUNCTIONS BY VARIABLE FUNCTON NAME
@@ -30,13 +30,6 @@ function main(in mode0) {
 		RUNTIME HAS NO ISSUE AS LONG AS THE ACTUAL FUNCTION
 		AND CALL HAVE THE SAME FUNCTION SIGNATURE
 
-//#pragma GCC diagnostic push
-//#pragma GCC diagnostic ignored "-Wcast-function-type"
-// return CALLMEMBERFUNCTION(*(this->pobject_),
-// ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
-//  (mode0);
-//}
-//#pragma GCC diagnostic pop
 	*/
 
 	//this is a template used for calling all filexxxsubs() routines
