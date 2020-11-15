@@ -7,6 +7,7 @@ function main() {
 	//waiting filepattern seconds milliseconds globalend newfilename newfilepath portno?
 	//eg for a database called devdtest and process 3
 	//waiting ../data/devdtest/*.1 10 10 ../../global.end neos0000.3 ../data/devdtest/ 5700
+	//printl(SENTENCE);
         var filepattern=field(SENTENCE," ",2);
         var waitsecs=field(SENTENCE," ",3);
         var sleepms=field(SENTENCE," ",4);
@@ -20,7 +21,7 @@ function main() {
 
         for (var ii=0;ii<=(1000/sleepms*waitsecs);ii++) {
 
-		//quit if any key pressed
+		//quit if any key pressed (not possible if running as a service)
 		if (var().hasinput())
 			break;
 
