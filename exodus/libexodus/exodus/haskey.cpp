@@ -24,7 +24,11 @@ bool haskey(void)
 	//	struct sigaction sa;
 
 	/* Save stdin terminal attributes */
-	tcgetattr(0, &oldtio);
+        /* Probably not available if running as a service */
+        if (tcgetattr(0, &oldtio)<0)
+                //EBADF - The filedes argument is not a valid file descriptor.
+                //ENOTTY - The filedes is not associated with a terminal.
+              return false;
 
 	/* Make sure we exit cleanly */
 	// memset(&sa, 0, sizeof(struct sigaction));
