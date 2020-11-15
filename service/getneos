@@ -1,6 +1,9 @@
 #!/bin/bash
 
-test -d ./www || ( echo must be run in service && exit )
+set -e
+set -x
+
+if ! test -d ./www ; then echo must be run in service ; exit ;fi
 
 cd ~/exodus/service || exit
 rm neosys.net -rf || exit
