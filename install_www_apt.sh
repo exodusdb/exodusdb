@@ -149,10 +149,12 @@ duration=$SECONDS
 : Managing the service
 : ====================
 :
-: sudo systemctl {start/stop/restart} exodus
+: sudo systemctl {start/stop/restart/status} exodus
 :  or
 : cd $EXODUS/service/src
 : . config
 : server2
 :
 : tail /var/log/syslog -f
+:
+systemctl status exodus
