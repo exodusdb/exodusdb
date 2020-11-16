@@ -45,6 +45,11 @@ sudo mv /tmp/exodus.conf /etc/apache2/sites-available/
 : Configure an apache site - HTTPS
 : ================================
 :
+: Use self signed certificates if exodus cert and key not already present
+:
+sudo test -f /etc/ssl/certs/exodus-cert.pem  || sudo cp /etc/ssl/certs/ssl-cert-snakeoil.pem   /etc/ssl/certs/exodus-cert.pem
+sudo test -f /etc/ssl/private/exodus-key.pem || sudo cp /etc/ssl/private/ssl-cert-snakeoil.key /etc/ssl/private/exodus-key.pem
+:
 cat > /tmp/exodus-ssl.conf <<V0G0N
 <VirtualHost *:443>
     ServerAdmin webmaster@localhost
@@ -59,8 +64,8 @@ cat > /tmp/exodus-ssl.conf <<V0G0N
     #SSLCertificateFile /etc/letsencrypt/live/hosts.neosys.com/cert.pem
     #SSLCertificateKeyFile /etc/letsencrypt/live/hosts.neosys.com/privkey.pem
     #SSLCACertificateFile /etc/letsencrypt/live/hosts.neosys.com/fullchain.pem
-    SSLCertificateFile /etc/ssl/certs/ssl-cert-snakeoil.pem
-    SSLCertificateKeyFile /etc/ssl/private/ssl-cert-snakeoil.key
+    SSLCertificateFile /etc/ssl/certs/exodus-cert.pem
+    SSLCertificateKeyFile /etc/ssl/private/exodus-key.pem
 
     <Directory /home/ubuntu/exodus/service/www>
         Options Indexes FollowSymLinks
