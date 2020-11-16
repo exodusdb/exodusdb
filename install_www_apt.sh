@@ -125,7 +125,7 @@ RestartSec=1
 User=ubuntu
 WorkingDirectory=/home/ubuntu/exodus/service/www
 Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/ubuntu/bin"
-ExecStart=/usr/bin/env /home/ubuntu/bin/server2
+ExecStart=/usr/bin/env /home/ubuntu/bin/server
 #
 [Install]
 WantedBy=multi-user.target
@@ -153,7 +153,7 @@ duration=$SECONDS
 :  or
 : cd $EXODUS/service/src
 : . config
-: server2
+: server
 :
 : tail /var/log/syslog -f
 :

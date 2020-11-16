@@ -5,7 +5,7 @@ set -x
 : Creates/updates service/www from neosys.net
 :
 : 1. Clones the neosys.net git repo
-: 2. Changes "neosys" to "exodus" and removes some directories from
+: 2. Removes some directories and changes "neosys" to "exodus" in neosys.net
 : 3. Copies from neosys.net to www
 
 if ! test -d ./www ; then echo must be run in service ; exit ;fi

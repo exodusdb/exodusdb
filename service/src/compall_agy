@@ -6,7 +6,7 @@
 echo --------------Generate all headers--------------
 compile ../???/*.cpp {HS}
 
-for MODULE in alt exo sys
+for MODULE in sys gen fin agy med job tim
 do
         test -d ../$MODULE || continue
 
