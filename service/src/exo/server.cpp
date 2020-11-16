@@ -34,6 +34,8 @@ function main() {
 	createfile("COMPANIES");
 	createfile("DOCUMENTS");
 	createfile("USERS");
+	createfile("LOCKS");
+	createfile("STATISTICS");
 
 	//module
 	APPLICATION="EXODUS";
