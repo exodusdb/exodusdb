@@ -586,12 +586,14 @@ nextsearch0:
 
 	processno = SYSTEM.a(24);
 
-	print(var().at(0));
 	//print time() '[TIME2,MTS]':
 	//similar in LISTEN and AUTORUN
-	print(var().time().oconv("MTS"), " ", datasetcode, " ", processno, " ", nrequests, " ", memspace(999999).oconv("MD13P"));
-
-	print(" Listening", " ", elapsedtimetext(lastrequestdate, lastrequesttime), " : ", var().at(-4));
+	tt = var().time().oconv("MTS") ^ " " ^ datasetcode ^ " " ^ processno ^ " " ^ nrequests ^ " " ^ memspace(999999).oconv("MD13P") ^ " Listening" " " ^ elapsedtimetext(lastrequestdate, lastrequesttime);
+	if (VOLUMES) {
+		print(var().at(0), tt, " : ", var().at(-4));
+	}else{
+		var(tt).oswrite("process." ^ processno);
+	}
 
 	call unlockrecord("PROCESSES", processes, processno);
 

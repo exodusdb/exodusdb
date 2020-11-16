@@ -130,9 +130,9 @@ Type=simple
 Restart=on-failure
 #Restart=no
 RestartSec=1
-User=ubuntu
+User=%USER
 WorkingDirectory=/home/ubuntu/exodus/service/www
-Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/ubuntu/bin"
+Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:%HOME/bin"
 ExecStart=/usr/bin/env /home/ubuntu/bin/server
 #
 [Install]
@@ -140,12 +140,14 @@ WantedBy=multi-user.target
 V0G0N
 sed -i "s|/home/ubuntu/exodus/|$EXODUS/|g" /tmp/exodus.service
 sed -i "s|/home/ubuntu/bin/|$HOME/bin/|g" /tmp/exodus.service
+sed -i "s|%USER|$USER|g" /tmp/exodus.service
+sed -i "s|%HOME|$HOME|g" /tmp/exodus.service
 sudo mv /tmp/exodus.service /etc/systemd/system/
+sudo systemctl daemon-reload
 :
 : Configure the exodus service to autostart, and start it
 : =======================================================
 :
-sudo systemctl daemon-reload
 sudo systemctl enable exodus
 sudo systemctl start exodus
 :
