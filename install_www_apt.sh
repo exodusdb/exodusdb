@@ -122,7 +122,8 @@ cat > /tmp/exodus.service <<V0G0N
 [Unit]
 Description=Exodus Service
 After=network.target
-StartLimitIntervalSec=0[Service]
+StartLimitIntervalSec=0
+[Service]
 #
 [Service]
 Type=simple
@@ -144,6 +145,7 @@ sudo mv /tmp/exodus.service /etc/systemd/system/
 : Configure the exodus service to autostart, and start it
 : =======================================================
 :
+sudo systemctl daemon-reload
 sudo systemctl enable exodus
 sudo systemctl start exodus
 :
