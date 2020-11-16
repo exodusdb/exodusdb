@@ -29,16 +29,16 @@ function main(in mode, io logtime) {
 
 		//not used anywhere 2017/05/17
 
-		//change the current user (NEOSYS) password to something new
-		//this is in the SYSTEM file' in NEOSYS/NEOSYS
+		//change the current user (EXODUS) password to something new
+		//this is in the SYSTEM file' in EXODUS/EXODUS
 		perform("PASSWORD3");
 
-		//get access to the SYSTEM file here (in NEOSYS/NEOSYS)
-		//also gets acceds to SYSTEM file in NEOSYS2/NEOSYS (as SYSTEM2)
+		//get access to the SYSTEM file here (in EXODUS/EXODUS)
+		//also gets acceds to SYSTEM file in EXODUS2/EXODUS (as SYSTEM2)
 		perform("SETSO");
 
-		//get access to the SYSTEM file in NEOSYS2/NEOSYS (the build directory)
-		//perform 'SETFILE ../NEOSYS2/NEOSYS SYSPROG,SALADS SYSTEM'
+		//get access to the SYSTEM file in EXODUS2/EXODUS (the build directory)
+		//perform 'SETFILE ../EXODUS2/EXODUS SYSPROG,SALADS SYSTEM'
 
 		//copy the local user over to the build directory
 		perform("COPY SYSTEM " ^ USERNAME ^ " (O) TO: (QFILE)");
@@ -52,8 +52,8 @@ function main(in mode, io logtime) {
 		}
 		if (tt < 17203) {
 
-			//to NEOSYS only at the moment
-			var cmd = "CREATEALERT CURRUSERS GENERAL CURRUSERS {} NEOSYS (ROS)";
+			//to EXODUS only at the moment
+			var cmd = "CREATEALERT CURRUSERS GENERAL CURRUSERS {} EXODUS (ROS)";
 
 			//run once on first installation
 			tt = cmd;
@@ -68,9 +68,9 @@ function main(in mode, io logtime) {
 			var().date().write(DEFINITIONS, "INIT*CREATEALERT*CURRUSERS");
 		}
 
-	} else if (mode == "UPDATEIPNOS4NEOSYS") {
+	} else if (mode == "UPDATEIPNOS4EXODUS") {
 
-		call log2("*update NEOSYS-allowed ipnos from GBP file", logtime);
+		call log2("*update EXODUS-allowed ipnos from GBP file", logtime);
 
 		//open 'GBP' to gbp else return
 		//read hosts from gbp,'$HOSTS.ALLOW' else return
@@ -95,21 +95,21 @@ function main(in mode, io logtime) {
 			hosts.splicer(-1, 1, "");
 		}
 
-		//neosys can login from
+		//exodus can login from
 		//1) 127 always
-		//2) NEOSYS office/vpn static ips (hardcoded in each neosys version)
+		//2) EXODUS office/vpn static ips (hardcoded in each exodus version)
 
-		//neosys can also login from System Configuration ip ranges and numbers
+		//exodus can also login from System Configuration ip ranges and numbers
 		//default system configuration ips is standard lan ips "192.168 10 172"
 		//3) standard LAN ips 192.168, 10, 172 RANGES BUT NOT FULLY FORMED IPS
 		//4) Config File Fully formed WAN ips BUT NOT RANGES
 		//5) NB the above 2 rules mean "*" for all is NOT allowed even if present
 
-		//WARNING to disallow NEOSYS login from outside the office via NAT router
+		//WARNING to disallow EXODUS login from outside the office via NAT router
 		//(which makes the connection appear like a LAN access)
 		//you MUST put the FULLY FORMED LAN IP of the router eg 192.168.1.1
 		//in the System Configuration file (even if 192.168 is config for true LAN)
-		//then NEOSYS LOGINS FROM ANY *LISTED FULLY FORMED LAN IPS* WILL BE BLOCKED
+		//then EXODUS LOGINS FROM ANY *LISTED FULLY FORMED LAN IPS* WILL BE BLOCKED
 
 		var configips = SYSTEM.a(39);
 		if (configips == "") {
@@ -132,7 +132,7 @@ function main(in mode, io logtime) {
 			}
 		};//ii;
 
-		//allow neosys login from 127.*, LAN and any config default ips
+		//allow exodus login from 127.*, LAN and any config default ips
 		//although any full 4 part LAN ips in configips will be BLOCKED in LISTEN2
 		//since they are deemed to be inwardly NATTING routers (see LISTEN2)
 		hosts.inserter(1, 1, 1, "127.0.0.1");
@@ -144,7 +144,7 @@ function main(in mode, io logtime) {
 		hosts.converter(SVM, " ");
 		hosts.trimmer();
 
-		hosts.write(DEFINITIONS, "IPNOS*NEOSYS");
+		hosts.write(DEFINITIONS, "IPNOS*EXODUS");
 
 	} else if (mode == "GETENV") {
 
@@ -203,13 +203,13 @@ function main(in mode, io logtime) {
 
 			call log2("*once off call to windows COMPACT command on ..LOGS", logtime);
 
-			if (not(conf.osread("..\\LOGS\\neosys.ini"))) {
+			if (not(conf.osread("..\\LOGS\\exodus.ini"))) {
 				conf = "";
 			}
 			if (not(conf.index("NOTREQ"))) {
 
 				var cmd = "compact /C /S /F ..\\LOGS ..\\LOGS\\*.*";
-				var(cmd ^ " DONE,NOTREQ").oswrite("..\\LOGS\\neosys.ini");
+				var(cmd ^ " DONE,NOTREQ").oswrite("..\\LOGS\\exodus.ini");
 
 				printl(cmd);
 				printl(shell2(cmd, errors));
@@ -335,7 +335,7 @@ nextuser:
 		//email anything unexpected
 		if (not(lastlog.index("Quitting."))) {
 			if (not(lastlog.index("*chain to NET AUTO"))) {
-				call sysmsg("Unexpected last log entry||" ^ lastlog, "Unexpected Log", "NEOSYS");
+				call sysmsg("Unexpected last log entry||" ^ lastlog, "Unexpected Log", "EXODUS");
 			}
 		}
 

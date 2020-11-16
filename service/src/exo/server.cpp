@@ -5,6 +5,7 @@ programinit()
 #include <gen_common.h>
 #include <agy_common.h>
 #include <initcompany.h>
+#include <initgeneral2.h>
 
 var xx;
 
@@ -82,6 +83,15 @@ function main() {
 	*/
 
 	call initcompany();
+
+    //call initgeneral2("CREATEALERTS");
+    call initgeneral2("UPDATEIPNOS4EXODUS");
+    //call initgeneral2("GETENV");
+    call initgeneral2("FIXURLS");
+    call initgeneral2("UPDATEUSERS");
+    call initgeneral2("TRIMREQUESTLOG");
+    //call initgeneral2("LASTLOGWARNING");
+    //call initgeneral2("OSCLEANUP");
 
 	//exodus pass
 	var rec="";
