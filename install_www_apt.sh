@@ -108,9 +108,11 @@ cd sys
 : =========================
 :
 cd /tmp
+sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_voc.sql
 sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_users.sql
 sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_processes.sql
 sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_requestlog.sql
+sudo -u postgres psql exodus -c "ALTER TABLE dict_voc OWNER to exodus"
 sudo -u postgres psql exodus -c "ALTER TABLE dict_users OWNER to exodus"
 sudo -u postgres psql exodus -c "ALTER TABLE dict_processes OWNER to exodus"
 sudo -u postgres psql exodus -c "ALTER TABLE dict_requestlog OWNER to exodus"
