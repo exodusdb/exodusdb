@@ -2475,16 +2475,18 @@ badwrite:
 		//NB response file name for detaching processes
 		//will be obtained from the output file name LISTEN2 RESPOND
 		//this could be improved to work
+		//..\data\DEVDTEST\|5916783.2
+		///root/exodus/service/data/exodus/~3810873.2
 		printfilename = linkfilename2;
-		tt = oscwd();
-		tt.splicer(-7, 7, "");
-		if (printfilename.substr(1,tt.length()) == tt) {
-			printfilename.splicer(1, tt.length(), ".." OSSLASH);
-		}
+
+		//tt=drive()
+		//tt[-7,7]=''
+		//if printfilename[1,len(tt)]=tt then printfilename[1,len(tt)]='..':OSSLASH
 
 		//tt=printfilename[-1,'B.']
-		tt = field2(printfilename, ".", -1);
-		printfilename.splicer(-tt.length(), tt.length(), "htm");
+		//tt=field2(printfilename,'.',-1)
+		//printfilename[-len(tt),len(tt)]='htm'
+		printfilename.splicer(-1, 1, "htm");
 		SYSTEM.r(2, printfilename);
 
 		//provide interruptfilename

@@ -1141,8 +1141,11 @@ function* windowopen(url, parameters, style) {
     //url may arrive like ..\DATA\DEVDTEST\~3499268.htm or ../data/DEVDTEST/~3499268.htm
     // and will be converted here to ../../DATA/DEVDTEST/~3499268.htm
     //which browsers will interpret as as the full URL http://hostname/DATA/DEVDTEST/~3499268.htm
-    if (url.replace(/\\/g, '/').toUpperCase().substr(0, 8) == '../DATA/')
-        url = '../' + url.replace(/\\/g, '/')
+    //if (url.replace(/\\/g, '/').toUpperCase().substr(0, 8) == '../DATA/')
+    //    url = '../' + url.replace(/\\/g, '/')
+
+    // replace backslashes with slashes and anything before /data/ with ../..
+    url = url.replace(/\\/g, '/').replace(/^.*[\/\\]data[\/\\]/,'../../data/')
 
     //if no style or "tab" parameter, windows opened from dialogs are opened in new maximised windows
     if (style == '' && gisdialog) {
