@@ -5,9 +5,10 @@ if ! test -f ../getarev ; then echo must be run in service/src/??? ; exit; fi
 set -x
 set -e
 
+#dont get headers for sys from arev
 MODULE=sys
-	mkdir -p  ../$MODULE
-	cp ~/arev/$MODULE/*.cpp ../$MODULE/
+mkdir -p  ../$MODULE
+cp ~/arev/$MODULE/*.cpp ../$MODULE/
 
 for MODULE in gen fin agy med job tim
 do

@@ -41,6 +41,8 @@ var neopath;
 var installend;
 var serverend;
 var databaseend;
+var atcol0;
+var clreol;
 var allcols;
 var maxstrlen;//num
 var nblocks;//num
@@ -286,6 +288,13 @@ function main() {
 	serverend = "../../" ^ SYSTEM.a(123).lcase() ^ ".end";
 	serverend.converter("/", OSSLASH);
 	databaseend = datasetcode.lcase() ^ ".end";
+	if (VOLUMES) {
+		atcol0 = var().at(0);
+		clreol = var().at(-4);
+	}else{
+		atcol0 = "";
+		clreol = "";
+	}
 
 	if (not(allcols.open("ACCESSIBLE_COLUMNS", ""))) {
 		allcols = "";
@@ -590,7 +599,7 @@ nextsearch0:
 	//similar in LISTEN and AUTORUN
 	tt = var().time().oconv("MTS") ^ " " ^ datasetcode ^ " " ^ processno ^ " " ^ nrequests ^ " " ^ memspace(999999).oconv("MD13P") ^ " Listening" " " ^ elapsedtimetext(lastrequestdate, lastrequesttime);
 	if (VOLUMES) {
-		print(var().at(0), tt, " : ", var().at(-4));
+		print(atcol0, tt, " : ", clreol);
 	}else{
 		var(tt).oswrite("process." ^ processno);
 	}
@@ -1061,7 +1070,7 @@ subroutine requestinit() {
 
 	nrequests += 1;
 
-	print(var().at(0), var().at(-4), var().time().oconv("MTS"), " ");
+	print(atcol0, clreol, var().time().oconv("MTS"), " ");
 
 	//clear out buffers just to be sure
 	//request=''
@@ -2501,7 +2510,7 @@ badwrite:
 		//not good method, pass in system?
 		if (var("LIST,SELECTBATCHES").locateusing(",",USER0.a(1),xx)) {
 			USER1 = linkfilename2;
-			}
+		}
 		if (USER0.a(1).substr(1,4) == "VAL.") {
 			USER1 = linkfilename2;
 		}
@@ -2560,7 +2569,7 @@ badwrite:
 		printfilename = SYSTEM.a(2);
 		//if tracing then
 		// *print ' got it'
-		// print @(0):@(-4):
+		// print atcol0:clreol:
 		// end
 
 		//make sure that the output file is closed
