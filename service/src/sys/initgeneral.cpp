@@ -59,7 +59,7 @@ var yy;
 
 function main() {
 	//
-	//c gen
+	//c sys
 
 	//NB @VOLUMES blank on C++ and used to run slightly differently on C++
 	//eg function called is generalalerts instead of general.alerts
@@ -240,6 +240,12 @@ function main() {
 	//system<131> to monitor https port - default 4428
 	//system<132> to lasterror returnstack
 	//system<133> to modules eg. GENERAL vm FINANCE vm ADAGENCY
+
+	//system<134> financial base.currency
+	//system<135> financial curr.period
+	//system<136> financial curr.year
+	//system<137> agency default market code
+	//system<138> agency last day of week mon-sun 1-7
 
 	call log2("*init.general obtaining exclusive access:", logtime);
 	var verbs;
@@ -1526,8 +1532,6 @@ convcompany:
 	gen.glang = "";
 	gen.gcurrcompany = "";
 	call initcompany(gen.gcurrcompany);
-	//curr.company.codes=gcurr.company
-	//gcurr.company=curr.company
 	SYSTEM.r(37, gen.gcurrcompany);
 
 	call log2("*ensure random key exists", logtime);

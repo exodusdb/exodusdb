@@ -13,6 +13,8 @@
 
     <script type="text/javascript" src='../exodus/scripts/client.js'></script>
 
+    <script type="text/javascript" src='../exodus/scripts/system.js'></script>
+
     <script type="text/javascript" src='../general/scripts/general.js'></script>
 
     <script type="text/javascript">
@@ -50,7 +52,7 @@ function* dict_LISTREQUESTLOG(parameters) {
  groupn=1
 
  di=dict[++din]=dictrec('USER_CODE','F',11,'',groupn)
- yield* general_dict_usercode(di,many=true)
+ yield* system_dict_usercode(di,many=true)
  return dict
  
 }

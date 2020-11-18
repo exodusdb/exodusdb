@@ -10,6 +10,7 @@
 
     </script>
     <script type="text/javascript" src='../exodus/scripts/client.js'></script>
+    <script type="text/javascript" src='../exodus/scripts/system.js'></script>
     <script type="text/javascript" src='../general/scripts/general.js'></script>
     <!-- TODO should not be including agency here in exodus UI files -->
     <script type="text/javascript" src='../agency/scripts/types.js'></script>
@@ -35,26 +36,26 @@
             di.unique = true
 
             di = dict[++din] = dictrec('TO_GROUP_NAME', 'S', '', '', groupn)
-            yield* general_dict_username(di, 'TO_GROUP_CODE')
+            yield* system_dict_username(di, 'TO_GROUP_CODE')
 
             ++groupn
             guseridgroupn = groupn
 
             di = dict[++din] = dictrec('TO_USER_CODE', 'F', 2, '', groupn)
-            yield* general_dict_usercode(di, many = true, withtask = '', withlocks = '', sselect = 'WITH LIVE_USER_WITH_EMAIL')
+            yield* system_dict_usercode(di, many = true, withtask = '', withlocks = '', sselect = 'WITH LIVE_USER_WITH_EMAIL')
             di.required = true
             di.unique = true
 
             di = dict[++din] = dictrec('TO_USER_NAME', 'S', '', '', groupn)
-            yield* general_dict_username(di, 'TO_USER_CODE')
+            yield* system_dict_username(di, 'TO_USER_CODE')
 
             ++groupn
             di = dict[++din] = dictrec('CC_USER_CODE', 'F', 3, '', groupn)
-            yield* general_dict_usercode(di, many = true)
+            yield* system_dict_usercode(di, many = true)
             di.unique = true
 
             di = dict[++din] = dictrec('CC_USER_NAME', 'S', '', '', groupn)
-            yield* general_dict_username(di, 'CC_USER_CODE')
+            yield* system_dict_username(di, 'CC_USER_CODE')
 
             di = dict[++din] = dictrec('EMAIL_SUBJECT', 'F', 4)
             exodus_dict_text(di, 73)

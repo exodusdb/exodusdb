@@ -19,11 +19,11 @@ cd neosys.net || exit
 #remove some unnecessary directories completely
 rm 2 -r
 rm 3/{agency,finance,general,jobs,media} -r
-rm neosys/editor -r
+rm neosys/editor -rf
 rm .git .vs .vscode -rf
 
 #remove some unnecessary files
-rm .gitignore accounts.htm adagency.htm exodus.conf  favicon.ico neosysSupportgittesting.txt  readme.txt  web.config
+rm .gitignore accounts.htm adagency.htm favicon.ico readme.txt  web.config
 rm 3/accounts.htm 3/adagency.htm
 rm neosys/dll/{upload.dll,upload.dl_}
 
@@ -33,7 +33,6 @@ mv neosys exodus
 
 #rename some files
 mv ./3/exodus/scripts/neosys.js ./3/exodus/scripts/exodus.js
-mv ./exodus/editor/config.js.neosys ./exodus/editor/config.js.exodus
 mv ./exodus/images/theme2/neosys32x25.gif ./exodus/images/theme2/exodus32x25.gif
 mv ./exodus/images/theme2/neosysm.jpg ./exodus/images/theme2/exodusm.jpg
 mv ./exodus/doc/neosysfunctions.htm ./exodus/doc/exodusfunctions.htm

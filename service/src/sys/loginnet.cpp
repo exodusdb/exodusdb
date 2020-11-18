@@ -2,13 +2,11 @@
 libraryinit()
 
 #include <authorised.h>
-//#include <initcompany.h>
+#include <initcompany.h>
 #include <addcent4.h>
-//#include <changelogsubs.h>
+#include <changelogsubs.h>
 
 #include <gen_common.h>
-//#include <fin_common.h>
-//#include <agy_common.h>
 
 var menuid;
 var taskn;//num
@@ -19,13 +17,13 @@ var msg0;
 var paramrec;
 
 function main(in dataset, in username, io cookie, io msg, io authcompcodes) {
-	//c gen in,in,io,io,io
+	//c sys in,in,io,io,io
 
 	//this is a special login routine called from LISTEN2
 	//declare function validcode1
 	#include <general_common.h>
-//	#include <common.h>
-//	#include <agency_common.h>
+	//$insert abp,common
+	//$insert bp,agency.common
 	cookie = "";
 	authcompcodes = "";
 
@@ -189,44 +187,54 @@ nextcomp:
 	}
 
 	gen.company = "";
-	//call initcompany(compcode);
+	call initcompany(compcode);
 
 	var ncompanies = compcodes.count(FM) + 1;
 	authcompcodes = compcodes;
 	authcompcodes.converter(FM, VM);
 
-/*
 	//market
+	//defmarketcode=if company<30> then company<30> else agp<37>;*market
 	//WARNING TODO: check ternary op following;
-	var defmarketcode = gen.company.a(30) ? gen.company.a(30) : agy.agp.a(37);
+	var defmarketcode = gen.company.a(30) ? gen.company.a(30) : SYSTEM.a(137);
 	//if unassigned(markets) then markets=''
 	//TODO maybe use the market on the user file?
 	//markets is not open in finance only module
 	//readv maincurrcode from markets,defmarketcode,5 else maincurrcode=''
 	var maincurrcode = "";
 	if (FILES(0).locateusing(FM,"MARKETS",xx)) {
-		defmarketcode = agy.agp.a(37);
+		//defmarketcode=agp<37>
+		defmarketcode = SYSTEM.a(137);
 		maincurrcode = defmarketcode.xlate("MARKETS", 5, "X");
-		}
+	}
 
 	//main currencycode
 	if (maincurrcode.unassigned()) {
 		maincurrcode = "";
 	}
+	//if maincurrcode='' then maincurrcode=base.currency
 	if (maincurrcode == "") {
-//		maincurrcode = fin.basecurrency;
+		maincurrcode = SYSTEM.a(134);
 	}
-*/
+
+	//system<134> financial base.currency
+	//system<135> financial curr.period
+	//system<136> financial curr.year
+	//system<137> agency default market code
+	//system<138> agency last day of week mon-sun 1-7
+
 	//prepare session cookie
 
 	cookie = "m=" ^ menus.convert(VM, ",");
 	cookie ^= "&cc=" ^ compcode;
 	cookie ^= "&nc=" ^ ncompanies;
-//	cookie ^= "&pd=" ^ fin.currperiod ^ "/" ^ addcent4(fin.curryear);
-//	cookie ^= "&bc=" ^ fin.basecurrency;
+	//cookie:='&pd=':currperiod:'/':addcent4(curryear)
+	cookie ^= "&pd=" ^ SYSTEM.a(135) ^ "/" ^ addcent4(SYSTEM.a(136));
+	//cookie:='&bc=':base.currency
+	cookie ^= "&bc=" ^ SYSTEM.a(134);
 	cookie ^= "&bf=" ^ BASEFMT;
-//	cookie ^= "&mk=" ^ defmarketcode;
-//	cookie ^= "&mc=" ^ maincurrcode;
+	cookie ^= "&mk=" ^ defmarketcode;
+	cookie ^= "&mc=" ^ maincurrcode;
 	cookie ^= "&tz=" ^ SW;
 	cookie ^= "&ms=60000";
 
@@ -235,8 +243,9 @@ nextcomp:
 	temp.swapper("&", " and ");
 	cookie ^= "&db=" ^ temp;
 
-	//split extras
-//	cookie ^= "&sp=" ^ agy.splitextras;
+	//split extras (does gui use this? it must always be 1)
+	//cookie:='&sp=':agp<5>
+	cookie ^= "&sp=1";
 
 	//form color, font and fontsize
 	cookie ^= "&fc=" ^ SYSTEM.a(46, 5);
@@ -246,22 +255,20 @@ nextcomp:
 	//date format
 	cookie ^= "&df=" ^ gen.company.a(10);
 
-/*
 	//first day of week
-	var tt = agy.lastdayofweek + 1;
+	//tt=agp<13>+1
+	var tt = SYSTEM.a(138) + 1;
 	if (tt > 7) {
 		tt = 1;
 	}
 	cookie ^= "&fd=" ^ tt;
-*/
 
 	//whats new
 
-/*
 	call changelogsubs("WHATSNEW" ^ FM ^ menus);
 	var ans = ANS;
 	cookie ^= "&wn=" ^ ans;
-*/
+
 	//call backupreminder(dataset,msg)
 
 	//osread paramrec from '..\data\':lcase(dataset):'\params2' else return

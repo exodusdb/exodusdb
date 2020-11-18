@@ -21,7 +21,7 @@ function* dict_USERS() {
  if (yield* exodussecurity('AUTHORISATION ACCESS')) {
 
   updateallowed=gusers_authorisation_update
-  di.popup='yield* general_pop_users()'
+  di.popup='yield* system_pop_users()'
  }
  else {
 

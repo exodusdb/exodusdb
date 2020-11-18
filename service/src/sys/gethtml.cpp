@@ -5,7 +5,6 @@ libraryinit()
 #include <authorised.h>
 
 #include <gen_common.h>
-#include <agy_common.h>
 
 var modex;
 var hascompanies;
@@ -22,7 +21,7 @@ function main(in mode0, out html, in compcode0="") {
 	//c sys in,out,""
 
 	#include <general_common.h>
-	#include <agency_common.h>
+	//$insert bp,agency.common
 	//global lhcompany,modex,tt,hascompanies,compcode
 
 	var mode = mode0;
@@ -99,8 +98,9 @@ function main(in mode0, out html, in compcode0="") {
 
 	var clientmark = lhcompany.a(27).invert();
 	if (hascompanies) {
+		//if clientmark else clientmark=agp<1>
 		if (not clientmark) {
-			clientmark = agy.companyname;
+			clientmark = SYSTEM.a(14);
 		}
 	}
 	html.swapper("%AGENCY%", clientmark);

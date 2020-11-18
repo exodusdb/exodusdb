@@ -75,3 +75,54 @@ function* system_getdatasets(refresh) {
     return gdatasets.length > 0
 }
 
+//users and security
+////////////////////
+
+function* system_dict_usercode(di, many, withtask, haslocks, sselect) {
+    if (!many)
+        many = false
+    if (many && !di.groupno)
+        systemerror(di.name, '"Select Many" requires group>0')
+    if (typeof withtask == 'undefined' || withtask == '')
+        withtask = '' // '""'
+    if (typeof haslocks == 'undefined' || haslocks == '')
+        haslocks = '""'
+    if (typeof sselect == 'undefined' || sselect == '')
+        sselect = '""'
+    if ("'\"".indexOf(sselect.substr(0, 1)) == -1)
+        sselect = '"' + sselect.exodusswap('"', '\\"') + '"'
+    di.popup = 'yield* system_pop_users(' + many + ',"' + withtask + '",' + haslocks + ',' + sselect + ')'
+    di.filename = 'USERS'
+    di.validation = 'yield* system_val_users()'
+    if (many)
+        di.unique = true
+}
+
+function* system_pop_users(many, withtask, haslocks, sselect) {
+    var sortselect = ' AND WITH ID NOT STARTING "%"'
+    //currently available "authorisation groups" supported - easy to add any you like in DICT.USERS
+    //AUTHORISED_JOURNAL_POST
+    //AUTHORISED_TIMESHEET_ADMINISTRATION
+    if (sselect)
+        sortselect += ' AND ' + sselect
+    if (withtask)
+        sortselect += ' AND WITH AUTHORISED_' + withtask.exodusconvert(' ', '_').toUpperCase()
+    //users tend not to have locks and departments/group tend to have locks
+    if (typeof haslocks == 'boolean')
+        sortselect += ' AND WITH KEYS ' + (haslocks ? 'NE' : 'EQ') + ' ""'
+    sortselect = 'BY RANK ' + sortselect.slice(5)
+    var selcol0 = 1
+
+    return yield* exodusfilepopup('USERS', [['USER_NAME', 'User Name'], ['USER_CODE', 'User Code'], ['DEPARTMENT_CODE2', 'Department'], ['EMAIL_ADDRESS', 'Email'], ['LAST_LOGIN_DATETIME', 'Last Login Datetime'], ['LAST_LOGIN_LOCATION', 'Last Login Location']], selcol0, sortselect, many)
+}
+
+function* system_val_users() {
+    return true
+}
+
+function* system_dict_username(di, usercodeid) {
+    if (typeof usercodeid == 'undefined') usercodeid = 'USER_CODE'
+    di.functioncode = 'return yield* this.xlate("' + usercodeid + '", "USERS",1)'
+    di.length = 30
+}
+

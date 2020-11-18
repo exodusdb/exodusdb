@@ -1163,10 +1163,6 @@ function* windowopen(url, parameters, style) {
     if (style == 'tab')
         style = ''
 
-    //switch to normal url from development url which doesnt have data folder (otherwise too many files)
-    if (window.location.href.toString().toLowerCase().indexOf('//localhost/exodus7/') >= 0 && url.toLowerCase().slice(0, 8) == '..\\data\\')
-        url = window.location.href.toString().split('/').slice(0, 3).join('/') + '/exodus/' + url.slice(3)
-
     //normalise windows style urls with backslashes to slashes.
     //firefox wont normalise window style relative urls like ..\ but will if they are like ../
     // and this may cause problems for any other relative urls in the page like images
