@@ -1670,7 +1670,7 @@ subroutine process() {
 	} else if (invaliduser) {
 		USER1 = "";
 		USER3 = invaliduser;
-	//call oswrite(username:fm:password:fm:encrypt0:fm:userprivs,date()[-3,3]:time():'.$$$')
+
 	//if no request then possibly some failure in file sharing
 	} else if (USER0 == "") {
 		USER1 = "";

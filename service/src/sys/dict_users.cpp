@@ -148,10 +148,10 @@ function main() {
 	return "";
 	/*pgsql;
 	if split_part(data,FM,5) = key then;
-		ANS='1';;
+		ANS='1';
 	else;
-		ANS='';;
-	end if;;
+		ANS='';
+	end if;
 	*/
 	return ANS;
 }

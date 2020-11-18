@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <encrypt2.h>
+#include <hashpass.h>
 #include <authorised.h>
 #include <whois.h>
 #include <sysmsg.h>
@@ -139,7 +139,7 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 
 		//encrypt the password and check it
 
-		var encrypt0 = encrypt2(password ^ "");
+		var encrypt0 = hashpass(password);
 
 		var userx = "";
 		var users;

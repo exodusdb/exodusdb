@@ -268,8 +268,7 @@ function main() {
 		USER3 = "OK";
 
 	} else if (mode == "SETCODEPAGE") {
-		var alanguage;
-		if (not(alanguage.open("ALANGUAGE", ""))) {
+		if (not(gen.alanguage.open("ALANGUAGE", ""))) {
 			call fsmsg();
 			stop();
 		}
@@ -293,8 +292,8 @@ function main() {
 			fn = 9;
 setcodepagecase:
 			var recordx;
-			if (not(recordx.read(alanguage, "GENERAL*" ^ codepage))) {
-				if (not(recordx.read(alanguage, "GENERAL"))) {
+			if (not(recordx.read(gen.alanguage, "GENERAL*" ^ codepage))) {
+				if (not(recordx.read(gen.alanguage, "GENERAL"))) {
 					recordx = "";
 				}
 			}
@@ -304,7 +303,7 @@ setcodepagecase:
 			temp.swapper(VM, "%FD");
 			recordx.r(1, fn, temp);
 
-			recordx.write(alanguage, "GENERAL*" ^ codepage);
+			recordx.write(gen.alanguage, "GENERAL*" ^ codepage);
 
 				/*;
 				//check lower=lcase(upper) and vice versa

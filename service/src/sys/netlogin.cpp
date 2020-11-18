@@ -2,6 +2,7 @@
 libraryinit()
 
 #include <secid.h>
+#include <hashpass.h>
 #include <systemfile.h>
 #include <inputbox.h>
 
@@ -205,8 +206,9 @@ fail:
 chknameandpass:
 ///////////////
 	//encrypt the password
-	encryptx = password;
-	gosub makepass();
+	//encryptx=password
+	//gosub makepass
+	encryptx = hashpass(password);
 
 	//check the user name and password
 	ok = 0;
@@ -289,28 +291,27 @@ okfail:
 subroutine input() {
 	call inputbox(msg, maxlen, show, allowablechars, xdata, escx);
 	return;
-}
+	/*;
+	/////////
+	makepass:
+	/////////
+		encryptkey = 1234567;
 
-subroutine makepass() {
-	var encryptkey = 1234567;
+		//pass1
+		loop;
+			while encryptx # '';
+			encryptkey = mod(encryptkey, 390001) * seq(encryptx[1, 1]) + 1;
+			encryptx[1, 1]='';
+			repeat;
 
-	//pass1
-	while (true) {
-		///BREAK;
-		if (not(encryptx ne "")) break;
-		encryptkey = (encryptkey % 390001) * (encryptx[1]).seq() + 1;
-		encryptx.splicer(1, 1, "");
-	}//loop;
+		//pass2
+		loop;
+			encryptx := char(65 + mod(encryptkey, 50));
+			encryptkey = int(encryptkey / 50);
+		while encryptkey repeat;
 
-	//pass2
-	while (true) {
-		encryptx ^= var().chr(65 + (encryptkey % 50));
-		encryptkey = (encryptkey / 50).floor();
-		///BREAK;
-		if (not encryptkey) break;
-	}//loop;
-
-	return;
+		return;
+	*/
 }
 
 subroutine getsec() {

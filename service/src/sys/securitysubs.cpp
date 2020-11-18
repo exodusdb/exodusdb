@@ -9,6 +9,7 @@ libraryinit()
 #include <sysmsg.h>
 #include <sendmail.h>
 #include <reverse.h>
+#include <hashpass.h>
 #include <dedup.h>
 #include <singular.h>
 
@@ -50,7 +51,7 @@ var wsmsg;
 function main(in mode) {
 	//c sys
 	#include <general_common.h>
-	//global sysrec,lastfn,encryptx
+	//global sysrec,lastfn,encryptx,newpassword
 
 	var interactive = not(SYSTEM.a(33));
 
@@ -1464,11 +1465,7 @@ subroutine changepassx() {
 		}
 	}
 
-	//if interactive then
-	// gosub newpass2
-	//end else
 	gosub newpass3();
-	// end
 
 	if (win.valid) {
 		//on screen the password shows as <hidden>
@@ -1476,15 +1473,9 @@ subroutine changepassx() {
 
 		//store the new password and system record
 		var temp = sysrec;
-		//convert \FE\:\FD\:\FC\ TO \FB\:\FA\:\F9\ in temp
 		temp.converter(FM ^ VM ^ SVM, TM ^ STM ^ var().chr(249));
 		win.is.r(1, 1, 2, temp);
 		RECORD.r(4, win.mvx, win.is);
-
-		//if mode='PERSONAL.PASSWORD' else
-		// msg='THE NEW PASSWORD WILL ONLY BECOME EFFECTIVE'
-		// gosub note
-		// end
 
 	}
 	return;
@@ -1500,135 +1491,6 @@ subroutine generatepassword() {
 		newpassword ^= vowels[vowels.length().rnd() + 1];
 	};//ii;
 	return;
-
-	/*;
-	///////////////
-	CHECKAUTHORITY:
-	///////////////
-		STORE.userprivs=userprivs;
-		userprivs=@RECORD;
-		TASK=@RECORD<10,MV>;
-		IF SECURITY(TASK,msg,'') ELSE;
-			MSG='YOU CANNOT CHANGE OR DELETE ITEMS|THAT YOU ARE NOT AUTHORISED TO DO';
-			GOSUB INVALID;
-			END;
-		userprivs=STORE.userprivs;
-		RETURN;
-
-	//////////
-	checkrank:
-	//////////
-
-		locate curruser in @record<1> setting usern else usern=999;
-		if index(curruser,'EXODUS',1) then return;
-		if mv lt usern and not(updatehighergroups) then;
-	badrank:
-			msg='YOU CAN ONLY CHANGE YOURSELF,|';
-			msg:='OR LOWER USERS IN YOUR OWN GROUP';
-			if updatelowergroups then msg:=',|OR USERS IN LOWER GROUPS';
-			return invalid(msg);
-			end;
-
-		//allow/prevent access to lower groups
-		if updatelowergroups else;
-			STARTX=usern+1;
-			number=mv-usern;
-			if amv.action=3 then number-=1;
-			temp=field(@record<1>,vm,STARTX,number);
-			if index(temp,'---',1) then goto badrank;
-			end;
-
-		return;
-
-	///////////////////
-	gethigherlowerkeys:
-	///////////////////
-
-		//get higher keys
-		if usern=1 then;
-			higherkeys='';
-		end else;
-			higherkeys=field(@record<2>,@vm,1,usern-1);
-			convert ',' to vm in higherkeys;
-			end;
-
-		//get own keys
-		ownkeys=field(@record<2>,vm,mv,999);
-		convert ',' to vm in ownkeys;
-
-		//get lower keys
-		lowerkeys=field(@record<2>,vm,mv+1,999);
-		convert ',' to vm in lowerkeys;
-
-		//remove any keys in lower groups if not allowed to update lower groups
-		//feb 97
-		if updatelowergroups else;
-			temp=index(lowerkeys,'---',1);
-			if temp then lowerkeys[temp,9999]='';
-			end;
-
-		//get all locks in use
-		alllocks=@record<11>:vm:origfullrec<11>;
-		convert ',' to vm in alllocks;
-
-		return;
-	*/
-	/*;
-	/////////
-	newpass2:
-	/////////
-		valid=0;
-		newpassword='';
-		last.fn=9;
-		if security('AUTHORISATION INVENT OWN PASSWORDS',msg,'') then;
-			if decide('Do you want a random password ?','Yes|No (use your own)',reply) else return;
-			autopassword=(reply=1);
-		end else;
-			autopassword=1;
-			end;
-
-		if autopassword then;
-	genpass:
-			gosub generatepassword;
-
-			//show the new password
-			question='The new password will be ':quote(newpassword);
-			question:='|Is this password acceptable to you ?';
-			if decide(question,'No - make a different password|Yes - use this one|Cancel',reply) else return;
-			if reply eq 1 then goto genpass;
-			if reply ne 2 then return;
-
-			//get the new password
-	inp.autopassword:
-			get.cursor(v10);
-			call note2('What is the new password ?||<               >|(This is a check that you have|the new password correct)', 'UB', buffer, '');
-			print @(39, @crthigh / 2):
-			newpassword2='';
-			call noecho.msg(newpassword2);
-			call note('', 'DB', buffer, '');
-			put.cursor(v10);
-			buffer = '';
-
-			if newpassword2 else;
-				print char(7):
-				call note('Password has NOT been changed');
-				return;
-				end;
-
-			convert @lower.case to @upper.case in newpassword2;
-			if newpassword2 ne newpassword then;
-				print char(7):
-				reply = 'Y';
-				msg='|The entry of the new password|did not match.||Do you want to re-enter it? [Y/N]|';
-				call mssg(msg,'RC',reply,'');
-				IF reply = 'Y' THEN goto inp.autopassword;
-				print char(7):
-				call note('Password has NOT been changed');
-				return;
-				end;
-			end;
-	*/
-
 }
 
 subroutine newpass3() {
@@ -1647,75 +1509,8 @@ subroutine newpass3() {
 
 	var v12 = 0;
 
-	/*;
-	inp.newpassword:
-		if newpassword = '' THEN;
-	inp.newpassword1:
-			//get the new password
-
-			msg='What is the new password ?|[               ]|(Alphanumeric, 5 char minimum)';
-			maxlen=15;
-			show=0;
-			allowablechars=@lower.case[1,26]:@upper.case[1,26]:'123456789';
-			newpassword='';
-			escx='';
-			call inputbox(msg,maxlen,show,allowablechars,newpassword,escx);
-
-			buffer = '';
-
-			//get the new password again unless the new password is null
-			if newpassword > '' then;
-				if len(newpassword)<5 then;
-					print char(7):
-					call note('Passwords should be at|least 5 characters long');
-					if index(@username,'EXODUS',1) else goto inp.newpassword1;
-					end;
-	inp.ownpass.2:
-
-				msg='Re-enter the new password |[               ]|';
-				maxlen=15;
-				show=0;
-				allowablechars=@lower.case[1,26]:@upper.case[1,26]:'123456789';
-				v13='';
-				escx='';
-				call inputbox(msg,maxlen,show,allowablechars,v13,escx);
-
-				buffer = '';
-
-				IF newpassword=v13 THEN;
-					V12 = 0;
-					GOTO 569;
-					END;
-
-				reply = 'Y';
-				print char(7):
-				msg='|The entry of the new password|did not match.||Do you want to re-enter it? [Y/N]|';
-				call note(msg, 'RC', reply, '');
-				IF reply = 'Y' THEN;
-					V12 = 1;
-					GOTO 569;
-					END;
-				V12 = 0;
-				newpassword  = '';
-				print char(7):
-				call note('The password has NOT been changed');
-				END;
-
-	569
-
-			if newpassword = '' or newpassword = "\x0B" then return;
-			convert @lower.case to @upper.case in newpassword;
-			end;
-
-	590
-		IF v12 THEN;
-			newpassword = '';
-			v13 = '';
-			END;
-		IF V12 THEN;
-			goto inp.newpassword;
-			end;
-	*/
+	gosub makesysrec();
+	return;
 }
 
 subroutine makesysrec() {
@@ -1738,43 +1533,48 @@ subroutine makesysrec() {
 	}
 
 	//store the encrypted new password
-	encryptx = newpassword;
-	gosub makepass();
+	//ENCRYPTX = newpassword
+	//gosub makepass
+	encryptx = hashpass(newpassword);
 	sysrec.r(passwordfn, encryptx);
 
 	encryptx = userx ^ FM ^ sysrec.field(FM, 2, lastfn - 2);
-	gosub makepass();
+	//gosub makepass
+	encryptx = hashpass(encryptx);
 	sysrec.r(lastfn, encryptx);
 
 	encryptx = userx ^ FM ^ sysrec.field(FM, 2, lastfn - 2);
-	gosub makepass();
+	//gosub makepass
+	encryptx = hashpass(encryptx);
 	sysrec.r(lastfn, encryptx);
 
 	win.valid = 1;
 
 	return;
-}
+	/*;
+	/////////
+	makepass:
+	/////////
+		//encryptx = encrypt2(encryptx)
+		//return
 
-subroutine makepass() {
-	var encryptkey = 1234567;
+		encryptkey = 1234567;
 
-	//pass1
-	while (true) {
-		///BREAK;
-		if (not(encryptx ne "")) break;
-		encryptkey = (encryptkey % 390001) * (encryptx[1]).seq() + 1;
-		encryptx.splicer(1, 1, "");
-	}//loop;
+		//pass1
+		loop;
+		while ENCRYPTX # '';
+			encryptkey = mod(encryptkey, 390001) * seq(ENCRYPTX[1, 1]) + 1;
+			ENCRYPTX[1, 1]='';
+			repeat;
 
-	//pass2
-	while (true) {
-		encryptx ^= var().chr(65 + (encryptkey % 50));
-		encryptkey = (encryptkey / 50).floor();
-		///BREAK;
-		if (not encryptkey) break;
-	}//loop;
+		//pass2
+		loop;
+			ENCRYPTX := char(65 + mod(encryptkey, 50));
+			encryptkey = int(encryptkey / 50);
+		while encryptkey repeat;
 
-	return;
+		return;
+	*/
 }
 
 subroutine gueststatus() {

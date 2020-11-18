@@ -303,6 +303,7 @@ function main(in mode) {
 		if ((newuser or resetpassword) and ans) {
 
 			win.is = ID ^ FM ^ ans.a(1);
+			//uses hasspass to encrypt
 			call securitysubs("MAKESYSREC");
 			ans = win.is;
 

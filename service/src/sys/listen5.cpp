@@ -65,7 +65,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 	#include <general_common.h>
 	//$insert abp,common
 	//$insert bp,agency.common
-	//global ii,userencrypt0,passwordexpired,lastlogindate,maxnologindays,validips
+	//global ii,passwordexpired,lastlogindate,maxnologindays,validips
 	//global filetime,fileattributes
 	//global runonce,runoncekey,lastpatchid,skipemail,skipreason,patchdatetime,versionkey,versiondatetime,rec,keyandrec,patchid,offset
 

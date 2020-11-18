@@ -6,7 +6,7 @@ set -x
 : Used after refreshing sys from arev/sys after new ADECOM results
 
 #change neosys to exodus in all text (except neosys.com)
-find sys -type f -exec sed -i 's#neosys#exodus#g' {} \;
-find sys -type f -exec sed -i 's#exodus\.com#neosys.com#g' {} \;
-find sys -type f -exec sed -i 's#NEOSYS#EXODUS#g' {} \;
-find sys -type f -exec sed -i 's#Copyright EXODUS#Copyright NEOSYS#g' {} \;
+find ../sys -type f -exec sed -i 's#neosys#exodus#g' {} \;
+find ../sys -type f -exec sed -i 's#exodus\.com#neosys.com#g' {} \;
+find ../sys -type f -exec sed -i 's#NEOSYS#EXODUS#g' {} \;
+find ../sys -type f -exec sed -i 's#Copyright EXODUS#Copyright NEOSYS#g' {} \;

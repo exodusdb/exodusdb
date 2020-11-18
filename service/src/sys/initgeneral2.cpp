@@ -19,7 +19,7 @@ var usern;
 var lastdate;
 
 function main(in mode, io logtime) {
-	//c gen in,io
+	//c sys in,io
 
 	#include <general_common.h>
 

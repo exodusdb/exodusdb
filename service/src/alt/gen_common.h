@@ -7,7 +7,7 @@ commoninit(gen,gen_common_no)
     var address="";
     var addresses="ADDRESSES";
     var gcurrcompany="";
-    var timesheets="TIMESHEETS";
+    var alanguage;
     var company="";
     var companies="COMPANIES";
     var currency="";

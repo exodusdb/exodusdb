@@ -1,3 +1,4 @@
 #including ../fin for now to compile server_agy.cpp
-export CPLUS_INCLUDE_PATH=../alt:../exo:../sys:../fin
+#export CPLUS_INCLUDE_PATH=../alt:../exo:../sys:../fin
+export CPLUS_INCLUDE_PATH=../alt:../exo:../sys
 PATH=$PATH:~/bin
