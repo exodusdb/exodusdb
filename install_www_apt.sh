@@ -90,6 +90,7 @@ sudo systemctl restart apache2
 : ==========================
 :
 cd $EXODUS/service
+mkdir -p work # server will run here
 mkdir -p data
 chmod g+rws data
 mkdir -p data/exodus
@@ -137,7 +138,7 @@ Type=simple
 Restart=on-failure
 RestartSec=3
 User=%USER
-WorkingDirectory=/home/ubuntu/exodus/service/www
+WorkingDirectory=/home/ubuntu/exodus/service/work
 Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:%HOME/bin"
 ExecStart=/usr/bin/env /home/ubuntu/bin/server
 #
