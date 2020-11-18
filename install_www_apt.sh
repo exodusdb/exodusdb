@@ -128,14 +128,14 @@ cat > /tmp/exodus.service <<V0G0N
 [Unit]
 Description=Exodus Service
 After=network.target
-StartLimitIntervalSec=0
+StartLimitBurst=3
+StartLimitIntervalSec=30
 [Service]
 #
 [Service]
 Type=simple
 Restart=on-failure
-#Restart=no
-RestartSec=1
+RestartSec=3
 User=%USER
 WorkingDirectory=/home/ubuntu/exodus/service/www
 Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:%HOME/bin"
