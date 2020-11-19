@@ -38,6 +38,7 @@ function main() {
 	createfile("USERS");
 	createfile("LOCKS");
 	createfile("STATISTICS");
+	createfile("CHANGELOG");
 
 	SYSTEM.r(33,"X");
 
