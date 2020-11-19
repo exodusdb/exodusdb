@@ -121,6 +121,8 @@ sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_requestlog.sql
 sudo -u postgres psql exodus -c "ALTER TABLE dict_requestlog OWNER to exodus"
 sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_statistics.sql
 sudo -u postgres psql exodus -c "ALTER TABLE dict_statistics OWNER to exodus"
+sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_changelog.sql
+sudo -u postgres psql exodus -c "ALTER TABLE dict_changelog OWNER to exodus"
 :
 : Configure the exodus service
 : ============================
