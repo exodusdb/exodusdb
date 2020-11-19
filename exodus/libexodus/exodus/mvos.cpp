@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include <iostream>
 #include <locale>
 
+//used to convert to and from utf8 in osread and oswrite
 #include <boost/locale.hpp>
 
 // TODO check all error handling
@@ -58,29 +59,6 @@ namespace stdfs = std::experimental::filesystem;
 #define std_boost boost
 #include <boost/regex/config.hpp>
 
-//{{ use boost's utf8 facet for codecvt since it is stable
-#define BOOST_UTF8_BEGIN_NAMESPACE                                                                 \
-	namespace boost                                                                            \
-	{                                                                                          \
-	namespace filesystem                                                                       \
-	{                                                                                          \
-	namespace detail                                                                           \
-	{
-#define BOOST_UTF8_DECL
-#define BOOST_UTF8_END_NAMESPACE                                                                   \
-	}                                                                                          \
-	}                                                                                          \
-	}
-
-#include <boost/detail/utf8_codecvt_facet.hpp>
-// this requires also to link with the library: libboost_filesystem-*.lib
-// For example (for debug under MSVS2008: libboost_filesystem-vc90-mt-gd-1_38.lib
-
-#undef BOOST_UTF8_END_NAMESPACE
-#undef BOOST_UTF8_DECL
-#undef BOOST_UTF8_BEGIN_NAMESPACE
-//}}
-
 #if !defined(BOOST_HAS_ICU) && !defined(BOOST_HASNT_ICU)
 #define BOOST_HAS_ICU
 #endif
@@ -99,8 +77,6 @@ namespace stdfs = std::experimental::filesystem;
 
 #include <boost/thread/tss.hpp>
 
-//#include NullCodecvt.h
-
 //#include <boost/date_time/gregorian/gregorian.hpp>
 // not needed on ubuntu 14.04 x64 c++11 build so comment out - maybe needed on other platforms
 //#include <boost/date_time/posix_time/posix_time.hpp>
@@ -114,9 +90,6 @@ namespace stdfs = std::experimental::filesystem;
 
 // for exodus_once
 #include <boost/thread/once.hpp>
-
-//#include "exodus/NullCodecvt.h"//used to prevent wifstream and wofstream widening/narrowing binary
-// input/output to/from internal char
 
 // traditional Unix file I/O interface declared in <fcntl.h>
 // (under Unix and Linux) or <out.h> (Windows)
@@ -291,30 +264,6 @@ namespace exodus
 //	- if user forgets to call osclose(), the stream remains opened (alive) until
 //		~MvHandlesCache for h_cache closes/deletes all registered objects.
 
-/*ALN:TEST: following class is to investigate its destruction, tests show, that
-	destructor is called on pointer, passed as 2nd parameter to utf8_locale(),
-	from locale::Locimp destructor
-**
-class my_utf8_codecvt_facet: public boost::filesystem::detail::utf8_codecvt_facet
-{
-  public:
-	my_utf8_codecvt_facet()
-	: boost::filesystem::detail::utf8_codecvt_facet()
-	{
-		i++;
-	}
-
-	~my_utf8_codecvt_facet()
-	{
-		--i;
-	}
-  private:
-	static int i;
-};
-
-int my_utf8_codecvt_facet::i = 0;
-*/
-
 std::locale get_locale(const var& locale_name) // throw (MVException)
 {
 	// assume is checked prior to calling since this is an internal exodus function
@@ -323,19 +272,15 @@ std::locale get_locale(const var& locale_name) // throw (MVException)
 
 	if (not locale_name.length() || locale_name == "utf8")
 	{
-		//		typedef char ucs4_t;
 		std::locale old_locale;
-		//		std::locale utf8_locale(old_locale, new
-		// boost::exodus::detail::utf8_codecvt_facet<ucs4_t>);
 
-		// if (boost_utf8_facet.get() == 0)
-		//	boost_utf8_facet.reset(new boost::filesystem::detail::utf8_codecvt_facet());
-		// std::locale utf8_locale(old_locale, boost_utf8_facet.get());
+		//https://exceptionshub.com/read-unicode-utf-8-file-into-wstring.html
+		//wif.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t>));
 
 		std::locale utf8_locale(old_locale,
-					new boost::filesystem::detail::utf8_codecvt_facet());
-		// ALN:TEST:		std::locale utf8_locale(old_locale, new
-		// my_utf8_codecvt_facet());
+					new std::codecvt_utf8<wchar_t>
+		);
+
 		return utf8_locale;
 	}
 	else
@@ -1167,21 +1112,6 @@ std::fstream* var::osopenx(const var& osfilename, const var& locale) const
 
 		pmyfile = new std::fstream;
 
-		// what is the purpose of the following?
-		// to prevent locale conversion if writing narrow string to wide stream or vice
-		// versa imbue BEFORE opening or after flushing
-		// myfile.imbue(std::locale(std::locale::classic(), new NullCodecvt));
-		/*
-				try
-				{
-					pmyfile->imbue(std::locale(locale.toString().c_str()));
-				}
-				catch (...)
-				{
-					throw MVException(locale^" is not supported on this
-		   system");
-				}
-		*/
 		pmyfile->imbue(get_locale(locale));
 
 		// open the file for i/o (fail if the file doesnt exist and do NOT delete any
@@ -1354,11 +1284,6 @@ bool var::oswrite(const var& osfilename, const var& codepage) const
 	       ") const")
 	THISISSTRING()
 	ISSTRING(osfilename)
-
-	// what is the purpose of the following?
-	// to prevent locale conversion if writing narrow string to wide stream or vice versa
-	// imbue BEFORE opening or after flushing
-	// myfile.imbue(std::locale(std::locale::classic(), new NullCodecvt));
 
 	// get a file structure
 	std::ofstream myfile;
