@@ -1120,11 +1120,11 @@ getproxy:
 	//Failure to show all possible tasks would mean difficulty to know
 	//what tasks are available to be locked
 	//in init.xxx files per module
-	if (APPLICATION == "ACCOUNTS") {
-		tt = "GS";
-	}else{
-		tt = "EXODUS";
-	}
+	//if @account='ACCOUNTS' then
+	tt = "GS";
+	//end else
+	// tt='EXODUS'
+	// end
 	if (not(authorised("DATABASE STOP", msg, tt))) {
 		{}
 	}
@@ -1134,12 +1134,20 @@ getproxy:
 	if (not(authorised("DATASET COPY", msg, tt))) {
 		{}
 	}
-	if (not(authorised("%RENAME%" "AUTHORISATION UPDATE KEYS", msg, "AUTHORISATION UPDATE GROUPS"))) {
+	//if security('%RENAME%':'AUTHORISATION UPDATE KEYS',msg,'AUTHORISATION UPDATE GROUPS') else null
+	if (not(authorised("AUTHORISATION UPDATE", msg, tt))) {
 		{}
 	}
 	if (not(authorised("AUTHORISATION UPDATE LOCKS", msg, tt))) {
 		{}
 	}
+	if (not(authorised("AUTHORISATION UPDATE LOWER GROUPS", msg, tt))) {
+		{}
+	}
+	if (not(authorised("AUTHORISATION UPDATE HIGHER GROUPS", msg, tt))) {
+		{}
+	}
+
 	if (tt == "GS") {
 		tt = "LS";
 	}
@@ -1152,32 +1160,25 @@ getproxy:
 	if (not(authorised("SYSTEM CONFIGURATION DELETE", msg, tt))) {
 		{}
 	}
+
 	if (not(authorised("CURRENCY UPDATE DECIMALS", msg, "EXODUS"))) {
 		{}
 	}
-	if (not(authorised("MENU SUPPORT", msg, "SUPPORT MENU ACCESS"))) {
+	if (not(authorised("MENU SUPPORT", msg, "LS"))) {
 		{}
 	}
-	if (not(authorised("%DELETE%" "SUPPORT MENU ACCESS", xx))) {
-		{}
-	}
-	if (not(authorised("%DELETE%" "USE TCL COMMAND KEY F5", xx))) {
-		{}
-	}
+	//if security('%DELETE%':'SUPPORT MENU ACCESS',xx) else null
+	//if security('%DELETE%':'USE TCL COMMAND KEY F5',xx) else null
 	if (not(authorised("UPLOAD CREATE", xx))) {
 		{}
 	}
-	if (not(authorised("REQUESTLOG ACCESS", msg, "MENU SUPPORT"))) {
+	if (not(authorised("REQUESTLOG ACCESS", msg, "LS"))) {
 		{}
 	}
 
-	if (not(authorised("%RENAME%" "AUTHORISATION CREATE USERS", xx, "USER CREATE"))) {
-		{}
-	}
-	if (not(authorised("%RENAME%" "AUTHORISATION DELETE USERS", xx, "USER DELETE"))) {
-		{}
-	}
-	//if security('%UPDATE%':'USER UPDATE',xx,'AUTHORISATION UPDATE') else null
+	//if security('%RENAME%':'AUTHORISATION CREATE USERS',xx,'USER CREATE') else null
+	//if security('%RENAME%':'AUTHORISATION DELETE USERS',xx,'USER DELETE') else null
+	//!if security('%UPDATE%':'USER UPDATE',xx,'AUTHORISATION UPDATE') else null
 	if (not(authorised("USER UPDATE", xx, "AUTHORISATION UPDATE"))) {
 		{}
 	}
@@ -1249,23 +1250,23 @@ getproxy:
 	call log2("*force the F1 key to be general help (Ctrl+F1) instead of context help", logtime);
 	PRIORITYINT.r(1, var().chr(0) ^ ";");
 
-	if (authorised("USE SPECIAL KEYS", msg, "")) {
-		INTCONST.r(4, var().chr(0) ^ var("41").iconv("HEX2"));
-		INTCONST.r(18, var().chr(0) ^ var("1F").iconv("HEX2"));
-		INTCONST.r(26, var().chr(0) ^ var("19").iconv("HEX2"));
-		PRIORITYINT.r(7, var("1F").iconv("HEX2"));
-		MOVEKEYS.r(27, var("14").iconv("HEX2"));
-		MOVEKEYS.r(25, var("05").iconv("HEX2"));
+	//if security('USE SPECIAL KEYS',MSG,'') then
+	INTCONST.r(4, var().chr(0) ^ var("41").iconv("HEX2"));
+	INTCONST.r(18, var().chr(0) ^ var("1F").iconv("HEX2"));
+	INTCONST.r(26, var().chr(0) ^ var("19").iconv("HEX2"));
+	PRIORITYINT.r(7, var("1F").iconv("HEX2"));
+	MOVEKEYS.r(27, var("14").iconv("HEX2"));
+	MOVEKEYS.r(25, var("05").iconv("HEX2"));
 		//break key on
-	}else{
-		INTCONST.r(4, "");
-		INTCONST.r(18, "");
-		INTCONST.r(26, "");
-		PRIORITYINT.r(7, "");
-		MOVEKEYS.r(27, "");
-		MOVEKEYS.r(25, "");
-		//break key off
-	}
+	//end else
+	// @int.const<4>=''
+	// @int.const<18>=''
+	// @int.const<26>=''
+	// @priority.int<7>=''
+	// @move.keys<27>=''
+	// @move.keys<25>=''
+	// *break key off
+	// end
 
 	//call log2('*allow/disallow F5',logtime)
 	//if security('USE TCL COMMAND KEY F5',MSG,'') then

@@ -40,8 +40,8 @@ function* form_postdisplay() {
     if (gkey==gusername) {
         var loginstatus=yield* gds.getall('LOGIN_RESULT')
         loginstatus[0]=''//remove current login OK
-        if (true||!loginstatus.exoduslocate('OK'))
-            gettingstarted.innerHTML='<font color=red><strong>Click HERE for browser configuration *REQUIRED*</strong></font>'
+        //if (true||!loginstatus.exoduslocate('OK'))
+        //    gettingstarted.innerHTML='<font color=red><strong>Click HERE for browser configuration *REQUIRED*</strong></font>'
     }
         
     return true

@@ -1993,3 +1993,58 @@ function exodus_HASHTAGS(type, input, mode) {
     return external
 
 }
+
+function exodus_splitarray(array, mvgroups, n) {
+
+    if (typeof array == 'string') array = array.split(fm)
+
+    //pad empty fields
+    if (typeof n != 'undefined') {
+        for (var i = array.length; i < n; i++) if (typeof array[i] == 'undefined') array[i] = ''
+    }
+
+    for (var groupn = 0; groupn < mvgroups.length; groupn++) {
+
+        var mvs = mvgroups[groupn]
+
+        //split mv fields
+        var maxlength = 1
+        for (var i = 0; i < mvs.length; i++) {
+            var mv1 = mvs[i]
+            if (typeof mv1 == 'object') {
+                mv2 = mv1[1]
+                mv1 = mv1[0]
+            }
+            else mv2 = mv1
+            for (mv = mv1; mv <= mv2; mv++) {
+                if (typeof array[mv] != 'object') {
+                    if (!array[mv])
+                        array[mv] = ['']
+                    else
+                        array[mv] = array[mv].split(vm)
+                    if (array[mv].length > maxlength)
+                        maxlength = array[mv].length
+                }
+            }
+        }
+
+        //second pass to extend the length of all parallel multivalues
+        // to the same number of values
+        for (var i = 0; i < mvs.length; i++) {
+            var mv1 = mvs[i]
+            if (typeof mv1 == 'object') {
+                mv2 = mv1[1]
+                mv1 = mv1[0]
+            }
+            else mv2 = mv1
+            for (mv = mv1; mv <= mv2; mv++) {
+                while (array[mv].length < maxlength) array[mv][array[mv].length] = ''
+            }
+        }
+
+    } //groupn
+
+    return array
+
+}
+

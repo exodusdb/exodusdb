@@ -11,9 +11,6 @@
     </script>
     <script type="text/javascript" src='../exodus/scripts/client.js'></script>
     <script type="text/javascript" src='../exodus/scripts/system.js'></script>
-    <script type="text/javascript" src='../general/scripts/general.js'></script>
-    <!-- TODO should not be including agency here in exodus UI files -->
-    <script type="text/javascript" src='../agency/scripts/types.js'></script>
     <script type="text/javascript">
         var ggroupidgroupn
         var guseridgroupn
@@ -31,7 +28,7 @@
             di = dict[++din] = dictrec('TO_GROUP_CODE', 'F', 1, '', groupn)
             //N=Include Dept Numbers
             //A=Groups with Active Users only
-            yield* types_dict_departmentcode(di, many = true, 'NA')
+            yield* system_dict_departmentcode(di, many = true, 'NA')
             di.required = true
             di.unique = true
 

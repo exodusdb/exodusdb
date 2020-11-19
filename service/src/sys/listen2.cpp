@@ -794,7 +794,7 @@ validateexit2:
 					request5 ^= "\r\n";
 					request5 ^= "<b>Please check your email to get the new password then" "\r\n";
 					//request5:='login as user code ':quote(username):' using the new password.</b>'
-					request5 ^= "login as user code " ^ (username.quote()) ^ " to database " ^ SYSTEM.a(17, 1).quote().oconv(":</b>");
+					request5 ^= "login as user code " ^ (username.quote()) ^ " to database " ^ (SYSTEM.a(17, 1).quote()) ^ "</b>";
 
 				}
 

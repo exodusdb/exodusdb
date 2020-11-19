@@ -15,16 +15,15 @@ function* dict_USERS() {
  var updateallowed=false
 
  di=dict[++din]=dictrec('USER_ID','F',0)
+ di.required=true
  if (gusername!='EXODUS')
   di.defaultvalue='gusername'
  di.invalidcharacters='*'
  if (yield* exodussecurity('AUTHORISATION ACCESS')) {
-
   updateallowed=gusers_authorisation_update
   di.popup='yield* system_pop_users()'
  }
  else {
-
   di.readonly=true
  }
 
@@ -100,8 +99,11 @@ function* dict_USERS() {
  di.checkbox='1;Mon:2;Tue:3;Wed:4;Thu:5;Fri:6;Sat:7;Sun'
 
  di=dict[++din]=dictrec('MARKET_CODE', 'F',25)
- yield* general_dict_marketcode(di)
- 
+ if (typeof general_dict_marketcode !== 'undefined')
+     yield* general_dict_marketcode(di)
+ else {
+     di.filename = 'MARKETS'
+ }
  //as at last login
  di=dict[++din]=dictrec('COMPANY_CODE','F',33)
  

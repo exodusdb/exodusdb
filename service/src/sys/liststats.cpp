@@ -68,7 +68,7 @@ function main() {
 	#include <general_common.h>
 	var interactive = not(SYSTEM.a(33));
 
-	if (not(authorised("STATISTICS ACCESS", msg, "GS"))) {
+	if (not(authorised("STATISTICS ACCESS", msg, "LS"))) {
 		call mssg(msg);
 		stop();
 	}

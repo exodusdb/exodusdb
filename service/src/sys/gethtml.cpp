@@ -382,7 +382,7 @@ nextmodex:
 
 nextprefix:
 ///////////
-	keyx = prefix ^ modex.a(1, 1) ^ ".HTM";
+	keyx = prefix ^ modex.a(1, 1) ^ ".htm";
 
 	if (not(html.read(DEFINITIONS, keyx))) {
 
