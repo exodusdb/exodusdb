@@ -140,7 +140,8 @@ RestartSec=3
 User=%USER
 WorkingDirectory=/home/ubuntu/exodus/service/work
 Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:%HOME/bin"
-ExecStart=/usr/bin/env /home/ubuntu/bin/server
+Environment="EXODUS_STARTED_BY_SYSTEMD=true"
+ExecStart=/home/ubuntu/bin/server
 #
 [Install]
 WantedBy=multi-user.target
