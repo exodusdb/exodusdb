@@ -130,24 +130,24 @@ function main()
 	var utftest,utftest2;
 	var utftestfilename="utf-8-test.txt";
 
-        //osread invalid utf8 should read without change
-        //will be unwritable to database which only accepts utf8 key and data
-        osread(utftest,utftestfilename);
-        utftest.len().outputl("len=");
-        assert(len(utftest)==osfile(utftestfilename).a(1));
+	//osread invalid utf8 should read without change
+	//will be unwritable to database which only accepts utf8 key and data
+	osread(utftest,utftestfilename);
+	utftest.len().outputl("len=");
+	assert(len(utftest)==osfile(utftestfilename).a(1));
 
-        //check invalif utf8 has no change oswrite/osread round trip
-        oswrite(utftest,"t_"^utftestfilename);
-        osread(utftest2,"t_"^utftestfilename);
-        assert(utftest2=utftest);
+	//check invalid utf8 has no change oswrite/osread round trip
+	oswrite(utftest,"t_"^utftestfilename);
+	osread(utftest2,"t_"^utftestfilename);
+	assert(utftest2=utftest);
 
-        //check invalid utf has no change on ucase/lcase round trip
-        assert(lcase(ucase(utftest))==lcase(utftest));
-        assert(ucase(lcase(utftest))==ucase(utftest));
+	//check invalid utf has no change on ucase/lcase round trip
+	assert(lcase(ucase(utftest))==lcase(utftest));
+	assert(ucase(lcase(utftest))==ucase(utftest));
 
-        //check what normalize() does on invalid utf
-        var fixed_utftest=utftest.normalize();
-        assert(fixed_utftest.len()==22400);
+	//check what normalize() does on invalid utf
+	var fixed_utftest=utftest.normalize();
+	assert(fixed_utftest.len()==22400);
 
 	//match returning what it finds
 
@@ -201,30 +201,30 @@ function main()
 	assert(var("Unicode table CJK 1: Chinese 文字- Kanji 漢字- Hanja 漢字(UTF-8)").match(".*文字.*漢 字\\(UTF-8\\)")=="");
 
 	//multibyte sep index
-        var greek5x2="αβγδεαβγδε";
-        assert(greek5x2.index("β")==3);
-        assert(greek5x2.index("β",2)==13);
+	var greek5x2="αβγδεαβγδε";
+	assert(greek5x2.index("β")==3);
+	assert(greek5x2.index("β",2)==13);
 
 	//multibyte sep field
 	var greek5x2f2=field(greek5x2,"β",2);
-        assert(greek5x2f2=="γδεα");
-        assert(greek5x2f2.length()==8);
-        assert(greek5x2f2.oconv("HEX")=="CEB3CEB4CEB5CEB1");
+	assert(greek5x2f2=="γδεα");
+	assert(greek5x2f2.length()==8);
+	assert(greek5x2f2.oconv("HEX")=="CEB3CEB4CEB5CEB1");
 
 	//multibyte sep fieldstore
-        var greekstr2=fieldstore(greek5x2,"β",2,1,"xxx");
-        assert(greekstr2=="αβxxxβγδε");
-        assert(greekstr2.length()==15);
+	var greekstr2=fieldstore(greek5x2,"β",2,1,"xxx");
+	assert(greekstr2=="αβxxxβγδε");
+	assert(greekstr2.length()==15);
 
-        greekstr2=fieldstore(greek5x2,"β",2,1,"1β2β3");
-        assert(greekstr2=="αβ1βγδε");
+	greekstr2=fieldstore(greek5x2,"β",2,1,"1β2β3");
+	assert(greekstr2=="αβ1βγδε");
 
-        greekstr2=fieldstore(greek5x2,"β",2,-1,"1β2β3");
-        assert(greekstr2=="αβ1β2β3βγδε");
+	greekstr2=fieldstore(greek5x2,"β",2,-1,"1β2β3");
+	assert(greekstr2=="αβ1β2β3βγδε");
 
-        var greek5x4="αβγδεαβγδεαβγδεαβγδε";
-        assert(fieldstore(greek5x4,"β",2,3,"ζ")=="αβζβββγδε");
-        assert(fieldstore(greek5x4,"β",2,-3,"ζ")=="αβζβγδε");
+	var greek5x4="αβγδεαβγδεαβγδεαβγδε";
+	assert(fieldstore(greek5x4,"β",2,3,"ζ")=="αβζβββγδε");
+	assert(fieldstore(greek5x4,"β",2,-3,"ζ")=="αβζβγδε");
 
 	//text four byte utf8
 	var chinesechar=textchr(171416);
@@ -245,26 +245,26 @@ function main()
 	assert(oconv(euro,"HEX")=="E282AC");
 
 	//multibyte locate using
-        var setting;
-        assert(greek5x4.locateusing("β","γδεα",setting));
-        assert(setting==2);
+	var setting;
+	assert(greek5x4.locateusing("β","γδεα",setting));
+	assert(setting==2);
 
 	//multivalued conversions performed one after the other
 	//assert(oconv(1234.567,"MD20P" _VM_ "[NUMBER]" _VM_ "[TAGHTML,TD]")=="<TD>1,234.57</TD>");
 	printl(oconv(1234.567,"MD20P" _VM_ "[NUMBER]"));
 	assert(oconv(1234.567,"MD20P" _VM_ "[NUMBER]")=="1,234.57");
 
-        var sort="a" _FM_ "b" _FM_ "d";
-        var sortn;
-        sort.locatebyusing("AL",FM,"b",sortn);
-        assert(sortn==2);
-        sort.locatebyusing("AL",FM,"c",sortn);
-        assert(sortn==3);
+	var sort="a" _FM_ "b" _FM_ "d";
+	var sortn;
+	sort.locatebyusing("AL",FM,"b",sortn);
+	assert(sortn==2);
+	sort.locatebyusing("AL",FM,"c",sortn);
+	assert(sortn==3);
 
-        sort.locateusing(FM,"b",sortn);
-        assert(sortn==2);
-        sort.locateusing(FM,"c",sortn);
-        assert(sortn==4);
+	sort.locateusing(FM,"b",sortn);
+	assert(sortn==2);
+	sort.locateusing(FM,"c",sortn);
+	assert(sortn==4);
 
 	//pick/arev bool and equality checks on doubles ignore less than 0.0001
 	//but comparison operators work exactly (to max binary precision?)
@@ -301,52 +301,52 @@ function main()
 	i1+=1.1;
 	assert(i1==3.1);
 
-        //no args
-        print();
-        printt();
-        printl();
+	//no args
+	print();
+	printt();
+	printl();
 
-        output();
-        outputt();
-        outputl();
+	output();
+	outputt();
+	outputl();
 
-        logput();
-        logputl();
+	logput();
+	logputl();
 
-        errput();
-        errputl();
+	errput();
+	errputl();
 
-        //one arg
+	//one arg
 
-        print(1);
-        printt(2);
-        printl(3);
+	print(1);
+	printt(2);
+	printl(3);
 
-        output(1);
-        outputt(2);
-        outputl(3);
+	output(1);
+	outputt(2);
+	outputl(3);
 
-        logput(1);
-        logputl(2);
+	logput(1);
+	logputl(2);
 
-        errput(1);
-        errputl(2);
+	errput(1);
+	errputl(2);
 
-        //two args
+	//two args
 
-        print("print",1);
-        printt("printt",2);
-        printl("printl",3);
+	print("print",1);
+	printt("printt",2);
+	printl("printl",3);
 
-        output("output",1);
-        outputt("outputt",2);
-        outputl("outputl",3);
+	output("output",1);
+	outputt("outputt",2);
+	outputl("outputl",3);
 
-        logput("logput",1);
-        logputl("logputl",2);
+	logput("logput",1);
+	logputl("logputl",2);
 
-        errput("errput",1);
-        errputl("errputl",2);
+	errput("errput",1);
+	errputl("errputl",2);
 
 	assert(crop(VM ^ FM) eq "");
 	assert(crop("xxx" ^ VM ^ FM) eq "xxx");
@@ -354,136 +354,136 @@ function main()
 	assert(crop("aaa" ^ FM ^ "bbb" ^ FM ^ VM ^ SM ^ SM ^ FM ^ "ddd") eq ("aaa" ^ FM ^ "bbb" ^ FM ^ FM ^ "ddd"));
 	assert(crop("aaa" ^ FM ^ "bbb" ^ FM ^ VM ^ SM ^ SM ^ FM ^ RM ^ "ddd") eq ("aaa" ^ FM ^ "bbb" ^ RM ^ "ddd"));
 
-        assert(crop("aa" _VM_ _FM_ "bb" _FM_)=="aa" _FM_ "bb");
-        assert(crop("aa" _SM_ _VM_ _FM_ "bb" _FM_)=="aa" _FM_ "bb");
-        assert(crop(_FM_ "aa" _VM_ _FM_ "bb" _FM_)==_FM_ "aa" _FM_ "bb");
-        assert(crop(_FM_ "aa" _VM_ _FM_ "bb" _FM_ _VM_)==_FM_ "aa" _FM_ "bb");
-        assert(crop(_FM_ "aa" _VM_ _FM_ _VM_ "bb" _FM_ _VM_)==_FM_ "aa" _FM_ _VM_ "bb");
-        assert(crop(_FM_ "aa" _VM_ _FM_ "bb" _FM_ _RM_)==_FM_ "aa" _FM_ "bb");
-        assert(crop(_FM_ _RM_ "aa" _VM_ _FM_ "bb" _FM_ _RM_)==_RM_ "aa" _FM_ "bb");
+	assert(crop("aa" _VM_ _FM_ "bb" _FM_)=="aa" _FM_ "bb");
+	assert(crop("aa" _SM_ _VM_ _FM_ "bb" _FM_)=="aa" _FM_ "bb");
+	assert(crop(_FM_ "aa" _VM_ _FM_ "bb" _FM_)==_FM_ "aa" _FM_ "bb");
+	assert(crop(_FM_ "aa" _VM_ _FM_ "bb" _FM_ _VM_)==_FM_ "aa" _FM_ "bb");
+	assert(crop(_FM_ "aa" _VM_ _FM_ _VM_ "bb" _FM_ _VM_)==_FM_ "aa" _FM_ _VM_ "bb");
+	assert(crop(_FM_ "aa" _VM_ _FM_ "bb" _FM_ _RM_)==_FM_ "aa" _FM_ "bb");
+	assert(crop(_FM_ _RM_ "aa" _VM_ _FM_ "bb" _FM_ _RM_)==_RM_ "aa" _FM_ "bb");
 
-        var locii;
-        var locxx="1 2 3 10 20 30 100 200 300";
-        var locxd="300 200 100 30 20 10 3 2 1";
-        locxx.converter(" ",VM);
-        locxd.converter(" ",VM);
+	var locii;
+	var locxx="1 2 3 10 20 30 100 200 300";
+	var locxd="300 200 100 30 20 10 3 2 1";
+	locxx.converter(" ",VM);
+	locxd.converter(" ",VM);
 	var ar="AR";
 	var locsep=",";
 
-        assert(locxx.locate(10)==1);
+	assert(locxx.locate(10)==1);
 
-        locxx.locate(30,locii);
-        assert(locii==6);
+	locxx.locate(30,locii);
+	assert(locii==6);
 
-        locxx.locate(31,locii);
-        assert(locii==10);
+	locxx.locate(31,locii);
+	assert(locii==10);
 
-        locxx.locate(30,locii,1);
-        assert(locii==6);
+	locxx.locate(30,locii,1);
+	assert(locii==6);
 
-        locxx.locate(31,locii,1);
-        assert(locii==10);
+	locxx.locate(31,locii,1);
+	assert(locii==10);
 
-        locxx.locate(31,locii,2);
-        assert(locii==1);
+	locxx.locate(31,locii,2);
+	assert(locii==1);
 
-        locxx.locateby(ar,21,locii);
-        assert(locii==6);
+	locxx.locateby(ar,21,locii);
+	assert(locii==6);
 
-        locxx.locateby("AR",21,locii);
-        assert(locii==6);
+	locxx.locateby("AR",21,locii);
+	assert(locii==6);
 
-        locxx.locateby("AL",21,locii);
-        assert(locii==3);
+	locxx.locateby("AL",21,locii);
+	assert(locii==3);
 
-        locxd.locateby("DR",21,locii);
-        assert(locii==5);
+	locxd.locateby("DR",21,locii);
+	assert(locii==5);
 
-        locxd.locateby("DL",21,locii);
-        assert(locii==2);
+	locxd.locateby("DL",21,locii);
+	assert(locii==2);
 
-        locxx.converter(VM,",");
-        locxd.converter(VM,",");
+	locxx.converter(VM,",");
+	locxd.converter(VM,",");
 
-        assert(locxx.locateusing(",",30)==1);
-        assert(locxx.locateusing(",",31)==0);
+	assert(locxx.locateusing(",",30)==1);
+	assert(locxx.locateusing(",",31)==0);
 
-        locxx.locateusing(",",30,locii);
-        assert(locii==6);
+	locxx.locateusing(",",30,locii);
+	assert(locii==6);
 
-        locxx.locateusing(locsep,30,locii);
-        assert(locii==6);
-
-
-        locxx.converter(",",VM);
-        locxd.converter(",",VM);
-
-        assert(locate(10,locxx)==1);
-
-        locate(30,locxx,locii);
-        assert(locii==6);
-
-        locate(31,locxx,locii);
-        assert(locii==10);
-
-        locate(30,locxx,locii,1);
-        assert(locii==6);
-
-        locate(31,locxx,locii,1);
-        assert(locii==10);
-
-        locate(31,locxx,locii,2);
-        assert(locii==1);
-
-        locateby(ar,21,locxx,locii);
-        assert(locii==6);
-
-        locateby("AR",21,locxx,locii);
-        assert(locii==6);
-
-        locateby("AL",21,locxx,locii);
-        assert(locii==3);
-
-        locateby("DR",21,locxd,locii);
-        assert(locii==5);
-
-        locateby("DL",21,locxd,locii);
-        assert(locii==2);
-
-        locxx.converter(VM,",");
-        locxd.converter(VM,",");
-
-        assert(locateusing(",",30,locxx)==1);
-        assert(locateusing(",",31,locxx)==0);
-
-        locateusing(",",30,locxx,locii);
-        assert(locii==6);
-
-        locateusing(locsep,30,locxx,locii);
-        assert(locii==6);
+	locxx.locateusing(locsep,30,locii);
+	assert(locii==6);
 
 
-        var aaa="11"^VM^VM^"13"^VM^FM^"21";
-        var bbb="1011"^VM^VM^"1013";
+	locxx.converter(",",VM);
+	locxd.converter(",",VM);
 
-        assert(aaa.mv(":",bbb).convert(_VM_ _FM_, "]^")=="111011]]131013]^21");
-        assert(aaa.mv("+",bbb).convert(_VM_ _FM_, "]^")=="1022]0]1026]0^21");
-        assert(aaa.mv("-",bbb).convert(_VM_ _FM_, "]^")=="-1000]0]-1000]0^21");
-        assert(aaa.mv("*",bbb).convert(_VM_ _FM_, "]^")=="11121]0]13169]0^0");
+	assert(locate(10,locxx)==1);
 
-        assert(bbb.mv(":",aaa).convert(_VM_ _FM_, "]^")=="101111]]101313]^21");
-        assert(bbb.mv("+",aaa).convert(_VM_ _FM_, "]^")=="1022]0]1026]0^21");
-        assert(bbb.mv("-",aaa).convert(_VM_ _FM_, "]^")=="1000]0]1000]0^-21");
-        assert(bbb.mv("*",aaa).convert(_VM_ _FM_, "]^")=="11121]0]13169]0^0");
+	locate(30,locxx,locii);
+	assert(locii==6);
 
-        aaa="11"  ^VM^VM^"13"  ^VM^FM^"21";
-        bbb="1011"^VM^"0"^VM^"1013"^VM^FM^"2011";
-        printl(aaa.mv("/",bbb).oconv("MD90P").convert(_VM_ _FM_, "]^"));
-        assert(aaa.mv("/",bbb).oconv("MD90P").convert(_VM_ _FM_, "]^")=="0.010880317]0.000000000]0.012833169]0.000000000^0.010442566");
+	locate(31,locxx,locii);
+	assert(locii==10);
 
-        aaa=""^VM^"" ^VM^"0"^VM^"0"^VM;
-        bbb=""^VM^"0"^VM^""^VM^"0"^VM^""^VM^"0"^VM^""^VM^"0";
-        assert(aaa.mv("/",bbb).convert(_VM_ _FM_, "]^")=="0]0]0]0]0]0]0]0");
+	locate(30,locxx,locii,1);
+	assert(locii==6);
+
+	locate(31,locxx,locii,1);
+	assert(locii==10);
+
+	locate(31,locxx,locii,2);
+	assert(locii==1);
+
+	locateby(ar,21,locxx,locii);
+	assert(locii==6);
+
+	locateby("AR",21,locxx,locii);
+	assert(locii==6);
+
+	locateby("AL",21,locxx,locii);
+	assert(locii==3);
+
+	locateby("DR",21,locxd,locii);
+	assert(locii==5);
+
+	locateby("DL",21,locxd,locii);
+	assert(locii==2);
+
+	locxx.converter(VM,",");
+	locxd.converter(VM,",");
+
+	assert(locateusing(",",30,locxx)==1);
+	assert(locateusing(",",31,locxx)==0);
+
+	locateusing(",",30,locxx,locii);
+	assert(locii==6);
+
+	locateusing(locsep,30,locxx,locii);
+	assert(locii==6);
+
+
+	var aaa="11"^VM^VM^"13"^VM^FM^"21";
+	var bbb="1011"^VM^VM^"1013";
+
+	assert(aaa.mv(":",bbb).convert(_VM_ _FM_, "]^")=="111011]]131013]^21");
+	assert(aaa.mv("+",bbb).convert(_VM_ _FM_, "]^")=="1022]0]1026]0^21");
+	assert(aaa.mv("-",bbb).convert(_VM_ _FM_, "]^")=="-1000]0]-1000]0^21");
+	assert(aaa.mv("*",bbb).convert(_VM_ _FM_, "]^")=="11121]0]13169]0^0");
+
+	assert(bbb.mv(":",aaa).convert(_VM_ _FM_, "]^")=="101111]]101313]^21");
+	assert(bbb.mv("+",aaa).convert(_VM_ _FM_, "]^")=="1022]0]1026]0^21");
+	assert(bbb.mv("-",aaa).convert(_VM_ _FM_, "]^")=="1000]0]1000]0^-21");
+	assert(bbb.mv("*",aaa).convert(_VM_ _FM_, "]^")=="11121]0]13169]0^0");
+
+	aaa="11"  ^VM^VM^"13"  ^VM^FM^"21";
+	bbb="1011"^VM^"0"^VM^"1013"^VM^FM^"2011";
+	printl(aaa.mv("/",bbb).oconv("MD90P").convert(_VM_ _FM_, "]^"));
+	assert(aaa.mv("/",bbb).oconv("MD90P").convert(_VM_ _FM_, "]^")=="0.010880317]0.000000000]0.012833169]0.000000000^0.010442566");
+
+	aaa=""^VM^"" ^VM^"0"^VM^"0"^VM;
+	bbb=""^VM^"0"^VM^""^VM^"0"^VM^""^VM^"0"^VM^""^VM^"0";
+	assert(aaa.mv("/",bbb).convert(_VM_ _FM_, "]^")=="0]0]0]0]0]0]0]0");
 
 	//testing .mv(+ - * / :)
 	var m1="1" _VM_ "2" _VM_ _VM_ "4";
@@ -504,40 +504,40 @@ function main()
 	assert(m1.mv("/",m2).convert(VM,"]")=="0.01]0.01]0]0.01");
 
 	//testing inserter
-        var t1="aa";
-        assert(t1.inserter(-1,"xyz").convert(FM^VM,"^]")=="aa^xyz");
-        t1="aa";
-        assert(t1.inserter(0,"xyz").convert(FM^VM,"^]")=="xyz^aa");
-        t1="aa";
-        assert(t1.inserter(1,"xyz").convert(FM^VM,"^]")=="xyz^aa");
-        t1="aa";
-        assert(t1.inserter(2,"xyz").convert(FM^VM,"^]")=="aa^xyz");
-        t1="aa";
-        assert(t1.inserter(3,"xyz").convert(FM^VM,"^]")=="aa^^xyz");
-        t1="aa";
-        assert(t1.inserter(1,1,"xyz").convert(FM^VM,"^]")=="xyz]aa");
-        t1="aa";
-        assert(t1.inserter(2,1,"xyz").convert(FM^VM,"^]")=="aa^xyz");
-        t1="aa";
-        assert(t1.inserter(2,2,"xyz").convert(FM^VM,"^]")=="aa^]xyz");
+	var t1="aa";
+	assert(t1.inserter(-1,"xyz").convert(FM^VM,"^]")=="aa^xyz");
+	t1="aa";
+	assert(t1.inserter(0,"xyz").convert(FM^VM,"^]")=="xyz^aa");
+	t1="aa";
+	assert(t1.inserter(1,"xyz").convert(FM^VM,"^]")=="xyz^aa");
+	t1="aa";
+	assert(t1.inserter(2,"xyz").convert(FM^VM,"^]")=="aa^xyz");
+	t1="aa";
+	assert(t1.inserter(3,"xyz").convert(FM^VM,"^]")=="aa^^xyz");
+	t1="aa";
+	assert(t1.inserter(1,1,"xyz").convert(FM^VM,"^]")=="xyz]aa");
+	t1="aa";
+	assert(t1.inserter(2,1,"xyz").convert(FM^VM,"^]")=="aa^xyz");
+	t1="aa";
+	assert(t1.inserter(2,2,"xyz").convert(FM^VM,"^]")=="aa^]xyz");
 
-        t1="";
-        assert(t1.inserter(-1,"xyz").convert(FM^VM,"^]")=="xyz");
-        t1="";
-        assert(t1.inserter(0,"xyz").convert(FM^VM,"^]")=="xyz");
-        t1="";
-        assert(t1.inserter(1,"xyz").convert(FM^VM,"^]")=="xyz");
-        t1="";
-        assert(t1.inserter(2,"xyz").convert(FM^VM,"^]")=="^xyz");
-        t1="";
-        assert(t1.inserter(3,"xyz").convert(FM^VM,"^]")=="^^xyz");
-        t1="";
-        assert(t1.inserter(1,1,"xyz").convert(FM^VM,"^]")=="xyz");
-        t1="";
-        assert(t1.inserter(2,1,"xyz").convert(FM^VM,"^]")=="^xyz");
-        t1="";
-        assert(t1.inserter(2,2,"xyz").convert(FM^VM,"^]")=="^]xyz");
-        t1="";
+	t1="";
+	assert(t1.inserter(-1,"xyz").convert(FM^VM,"^]")=="xyz");
+	t1="";
+	assert(t1.inserter(0,"xyz").convert(FM^VM,"^]")=="xyz");
+	t1="";
+	assert(t1.inserter(1,"xyz").convert(FM^VM,"^]")=="xyz");
+	t1="";
+	assert(t1.inserter(2,"xyz").convert(FM^VM,"^]")=="^xyz");
+	t1="";
+	assert(t1.inserter(3,"xyz").convert(FM^VM,"^]")=="^^xyz");
+	t1="";
+	assert(t1.inserter(1,1,"xyz").convert(FM^VM,"^]")=="xyz");
+	t1="";
+	assert(t1.inserter(2,1,"xyz").convert(FM^VM,"^]")=="^xyz");
+	t1="";
+	assert(t1.inserter(2,2,"xyz").convert(FM^VM,"^]")=="^]xyz");
+	t1="";
 
 	var errmsg;
 	//if (not createdb("steve",errmsg))
@@ -551,7 +551,7 @@ function main()
 	var offsetx,testfilex;
 	assert(osopen(testfilename,testfilex));
 	var testosread;
-//assert(testosread.osbread(testfilex,offsetx=0,1) eq GreekSmallGamma);
+	//assert(testosread.osbread(testfilex,offsetx=0,1) eq GreekSmallGamma);
 
 
 	//write two greeksmallgammas (4 bytes)
@@ -799,6 +799,18 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 			osread(data,tempfilename5,"C");
 			assert(data eq "\u00ce\u00b3\u00ce\u00a3");
 		}
+
+		//check upper/lower case conversion on UTF8 Greek
+		assert(lcase(GreekCapitalGamma)==GreekSmallGamma);
+		assert(ucase(GreekSmallGamma)==GreekCapitalGamma);
+
+		var greek_alphabet=" Α α, Β β, Γ γ, Δ δ, Ε ε, Ζ ζ, Η η, Θ θ, Ι ι, Κ κ, Λ λ, Μ μ, Ν ν, Ξ ξ, Ο ο, Π π, Ρ ρ, Σ σ/ς, Τ τ, Υ υ, Φ φ, Χ χ, Ψ ψ, and Ω ω.";
+		greek_alphabet.outputl();
+		greek_alphabet.lcase().outputl();
+		greek_alphabet.ucase().outputl();
+		greek_alphabet.oconv("HEX").outputl();
+		assert(greek_alphabet.lcase().ucase().lcase()==greek_alphabet.ucase().lcase());
+		assert(greek_alphabet.oconv("HEX")=="20CE9120CEB12C20CE9220CEB22C20CE9320CEB32C20CE9420CEB42C20CE9520CEB52C20CE9620CEB62C20CE9720CEB72C20CE9820CEB82C20CE9920CEB92C20CE9A20CEBA2C20CE9B20CEBB2C20CE9C20CEBC2C20CE9D20CEBD2C20CE9E20CEBE2C20CE9F20CEBF2C20CEA020CF802C20CEA120CF812C20CEA320CF832FCF822C20CEA420CF842C20CEA520CF852C20CEA620CF862C20CEA720CF872C20CEA820CF882C20616E6420CEA920CF892E");
 
 		printl("greek utf8 tested ok");
 	}

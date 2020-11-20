@@ -190,9 +190,12 @@ THE SOFTWARE.
 // occur in other libraries.
 namespace exodus
 {
-typedef const var& in;
-typedef var& io;
-typedef var& out;
+//typedef const var& in;
+//typedef var& io;
+//typedef var& out;
+using in = const var&;
+using io = var&;
+using out = var&;
 } // namespace exodus
 
 // forcibly redefine "eq" even if already previously defined in some other library like iostream

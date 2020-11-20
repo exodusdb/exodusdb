@@ -4,7 +4,7 @@
 
 h_sources = \
  exodus.h exodusmacros.h mvenvironment.h mv.h mvlibs.h \
- exodusfuncs.h mvexceptions.h mvimpl.h mvutf.h mvipc.h mvconfig.h \
+ exodusfuncs.h mvexceptions.h mvutf.h mvipc.h mvconfig.h \
  mvlink.h mvfunctor.h program.h library.h dict.h mvprogram.h\
  xfunctorf0.h xfunctorf1.h xfunctorf10.h xfunctorf11.h xfunctorf12.h \
  xfunctorf13.h xfunctorf14.h xfunctorf15.h xfunctorf16.h xfunctorf17.h \

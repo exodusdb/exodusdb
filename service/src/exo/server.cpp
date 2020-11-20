@@ -55,6 +55,14 @@ function main() {
 	//process no
 	SYSTEM.r(24,PROCESSNO);
 
+	//batch mode
+	SYSTEM.r(33,1,"1");
+	//user
+	SYSTEM.r(17,"exodus");//database code
+	SYSTEM.r(23,"EXODUS");//database name
+	SYSTEM.r(33,2,"EXODUS");//connection
+	SYSTEM.r(33,3,"EXODUS");
+
 	//f5 key
 	PRIORITYINT.r(2,"x");
 
@@ -114,12 +122,6 @@ function main() {
 	if (cmd)
 		perform(cmd);
 	else {
-		//batch mode
-		SYSTEM.r(33,1,"1");
-		//user
-		SYSTEM.r(33,2,"EXODUS");
-		SYSTEM.r(33,3,"EXODUS");
-
 		perform("listen");
 	}
 

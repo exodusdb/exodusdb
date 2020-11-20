@@ -2008,16 +2008,6 @@ var var::oscwd() const
 
 	return var(currentpath).convert("/", SLASH);
 
-	/*
-		//http://www.boost.org/libs/filesystem/doc/tr2_proposal.html#Class-template-basic_path
-		//boost::filesystem::path full_path(boost::filesystem::current_path());
-		//get the current path as wstring
-		std::string currentpath=boost::filesystem::current_path().string();
-		std::wstring wcurrentpath=std::wstring(currentpath.begin(),currentpath.end());
-	    boost::filesystem::wpath full_path(wcurrentpath);
-
-	    return full_path.string();
-	*/
 }
 
 void var::ossleep(const int milliseconds) const
