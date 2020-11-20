@@ -175,7 +175,7 @@ int MVipc(const int environmentn, var& pgconnparams)
 
 	//"\\\\.\\pipe\\exoduspipexyz"
 	// strings of MS tchars
-	// typedef basic_string<TCHAR> tstring;
+	// using tsring = basic_string<TCHAR>;
 	// wchar_t* exoduspipename="\\\\.\\pipe\\exoduspipexyz";
 	var exoduspipename = L"\\\\.\\pipe\\exodusservice-";
 	exoduspipename ^= getprocessn() ^ "." ^ environmentn;

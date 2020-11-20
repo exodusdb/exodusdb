@@ -62,7 +62,7 @@ THE SOFTWARE.
 
 #define function _save_function_
 
-typedef HINSTANCE library_t;
+using library_t = HINSTANCE;
 //# define dlopen(arg1,arg2) LoadLibrary(arg1)
 #define dlopen(arg1, arg2) LoadLibraryA(arg1)
 #define dlsym(arg1, arg2) GetProcAddress(arg1, arg2)
@@ -71,7 +71,7 @@ typedef HINSTANCE library_t;
 #define EXODUSLIBPREFIX
 #else
 #include <dlfcn.h>
-typedef void* library_t;
+using library_t = void*;
 #define EXODUSLIBPREFIX "~/lib/lib"
 //# define EXODUSLIBPREFIX "./lib"+
 #endif
@@ -460,7 +460,7 @@ var ExodusFunctorBase::callsgf()
 	// have one argument "MvEnvironment". They set their response in ANS.
 	// they are global functions and receive mv environment reference as their one and only
 	// argument.
-	typedef var (*ExodusDynamic)(MvEnvironment & mv);
+	using ExodusDynamic = var (*)(MvEnvironment & mv);
 
 #if TRACING >= 3
 	std::cout << "mvfunctor:callsgf: in>" << libraryname_ << " " << functionname_ << std::endl;
@@ -480,7 +480,7 @@ var ExodusFunctorBase::callsmf()
 	// define a function type (pExodusProgramBaseMemberFunction)
 	// that can call the shared library object member function
 	// with the right arguments and returning a var
-	typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)();
+	//using pExodusProgramBaseMemberFunction = var (ExodusProgramBase::*)();
 
 #if TRACING >= 3
 	std::cout << "mvfunctor:callsmf: in>" << libraryname_ << " " << functionname_ << std::endl;

@@ -270,22 +270,6 @@ void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsec
 
 			try
 			{
-				/*old method where dictionary function was a program object using
-				programinit programexit
-				//define a function that calls the shared library object member
-				function typedef var
-				(ExodusProgramBase::*pExodusProgramBaseMemberFunction)(); var
-				reply=CALLMEMBERFUNCTION(*(exodusfunctorbase.pobject_),
-					((pExodusProgramBaseMemberFunction)
-				(exodusfunctorbase.pmemberfunction_)))
-					();
-					//(filename,dictkey,datakey,data,valueno,subvalueno);
-				response=reply.toString();
-				*/
-
-				// typedef var (*ExodusDynamic)(MvEnvironment& mvx);
-				//((ExodusDynamic)
-				// exodusfunctorbase.pfunction_)(exodusfunctorbase.mv_);
 
 				exodusfunctorbase.mv_->ANS = exodusfunctorbase.callsmf();
 /////////////////////////////

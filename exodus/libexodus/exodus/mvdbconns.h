@@ -51,18 +51,15 @@
 #define UNORDERED_SET_FOR_LOCKTABLE std::map<uint64_t, int>
 #endif
 
-// typedef boost::unordered_set<uint64_t> LockTable;
-// typedef UNORDERED_SET_FOR_LOCKTABLE<uint64_t> LockTable;
-typedef UNORDERED_SET_FOR_LOCKTABLE LockTable;
-// typedef tr1::unordered_set<uint64_t> LockTable;
+using LockTable = UNORDERED_SET_FOR_LOCKTABLE;
 
 namespace exodus
 {
 
-typedef PGconn* CACHED_CONNECTION;
-typedef void (*DELETER_AND_DESTROYER)(CACHED_CONNECTION /*, UNORDERED_SET_FOR_LOCKTABLE * */);
+using CACHED_CONNECTION = PGconn*;
+using DELETER_AND_DESTROYER = void (*)(CACHED_CONNECTION /*, UNORDERED_SET_FOR_LOCKTABLE * */);
 
-typedef std::unordered_map<std::string, std::string> RecordCache;
+using RecordCache = std::unordered_map<std::string, std::string>;
 
 class MvConnectionEntry // used as 'second' in pair, stored in connection map
 {
@@ -93,7 +90,7 @@ class MvConnectionEntry // used as 'second' in pair, stored in connection map
 	RecordCache* precordcache;
 };
 
-typedef std::map<int, MvConnectionEntry> CONN_MAP;
+using CONN_MAP = std::map<int, MvConnectionEntry>;
 
 class MvConnectionsCache
 {

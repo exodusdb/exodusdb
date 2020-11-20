@@ -21,8 +21,8 @@
 namespace exodus
 {
 
-typedef void* CACHED_HANDLE;
-typedef void (*DELETER_AND_DESTROYER)(CACHED_HANDLE);
+using CACHED_HANDLE = void*;
+using DELETER_AND_DESTROYER = void (*)(CACHED_HANDLE);
 
 #define BAD_CACHED_HANDLE ((void*)0)
 #define HANDLE_ENTRY_FREE ((void*)0)

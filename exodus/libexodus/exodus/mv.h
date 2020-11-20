@@ -124,7 +124,7 @@ and therefore causes a non-numeric error if you include a non-numeric value in a
 #endif
 
 // http://www.viva64.com/content/articles/64-bit-development/?f=20_issues_of_porting_C++_code_on_the_64-bit_platform.html
-typedef long long mvint_t;
+using mvint_t = long long;
 
 #define	ND [[nodiscard]]
 

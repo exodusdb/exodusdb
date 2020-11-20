@@ -515,8 +515,8 @@ var& var::oconv_MR(const char* conversionchar)
 // http://www.boost.org/doc/libs/1_38_0/libs/random/random_demo.cpp
 
 // set the generator type to ...
-// typedef boost::minstd_rand random_base_generator_type;
-typedef boost::mt19937 random_base_generator_type;
+// using random_base_generator_type = boost::minstd_rand;
+using random_base_generator_type = boost::mt19937;
 boost::thread_specific_ptr<random_base_generator_type> tss_random_base_generators;
 
 random_base_generator_type* get_random_base_generator()

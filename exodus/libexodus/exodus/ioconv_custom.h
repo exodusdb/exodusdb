@@ -35,7 +35,7 @@ class efb_ioconv_custom : public ExodusFunctorBase
 		// define a function type (pExodusProgramBaseMemberFunction)
 		// that can call the shared library object member function
 		// with the right arguments and returning a var or void
-		typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(in, in, in, out);
+		using pExodusProgramBaseMemberFunction = var (ExodusProgramBase::*)(in, in, in, out);
 
 		// call the shared library object main function with the right args,
 		// returning a var or void

@@ -1311,11 +1311,6 @@ baddict:
 		// return dict_exodusfunctorbase_.calldict();
 		// return ANS;
 
-		// define a function type (pExodusProgramBaseMemberFunction)
-		// that can call the shared library object member function
-		// with the right arguments (none for dicts) and returning a var
-		typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)();
-
 		// call the shared library object main function with the right args (none for
 		// dicts), returning a var std::cout<<"precal"<<std::endl;
 		ANS = CALLMEMBERFUNCTION(*(dict_exodusfunctorbase_->pobject_),

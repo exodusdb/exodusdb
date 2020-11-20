@@ -37,7 +37,7 @@ var getexecpath()
 		// the job here is to convert in a dumb way from win TCHAR to var wchar_t
 
 		// make a string of TCHAR
-		typedef std::basic_string<TCHAR> tstring;
+		using tstring = std::basic_string<TCHAR>;
 		tstring tempstr(filename, bytes);
 		// transfer the TCHARS into a wstring
 		std::wstring wtempstr;

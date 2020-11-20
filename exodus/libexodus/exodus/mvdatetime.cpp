@@ -73,7 +73,7 @@ void ptime2mvdatetime(const boost::posix_time::ptime& ptimex, int& mvdate, int& 
 {
 
 	// http://www.boost.org/doc/html/date_time/examples.html#date_time.examples.local_utc_conversion
-	typedef boost::date_time::c_local_adjustor<boost::posix_time::ptime> local_adj;
+	using local_adj =  boost::date_time::c_local_adjustor<boost::posix_time::ptime>;
 
 	// convert to local timezone of current machine
 	boost::posix_time::ptime localptimex = local_adj::utc_to_local(ptimex);

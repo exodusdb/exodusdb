@@ -1,5 +1,5 @@
 #if defined(_MSC_VER)
-typedef unsigned __int64 uint64_t;
+using uint64_t = unsigned __int64 uint64_t;
 #else
 #include <stdint.h>
 #endif

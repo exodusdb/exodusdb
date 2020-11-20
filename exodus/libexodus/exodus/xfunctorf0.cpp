@@ -46,7 +46,7 @@ ExodusFunctorF0::ExodusFunctorF0(const std::string libname,const std::string fun
 var ExodusFunctorF0::operator() ()
  {
 	checkload();
-	typedef var (*ExodusDynamic)();
+	using ExodusDynamic = var (*)();
 	return  ((ExodusDynamic) pfunction_)();
  }
 

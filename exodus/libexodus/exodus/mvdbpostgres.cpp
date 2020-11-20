@@ -225,7 +225,7 @@ var var::getlasterror() const
 		return "";
 }
 
-typedef PGresult* PGresultptr;
+using PGresultptr = PGresult*;
 static bool getpgresult(const var& sql, PGresultptr& pgresult, PGconn* thread_pgconn);
 
 #if defined _MSC_VER //|| defined __CYGWIN__ || defined __MINGW32__

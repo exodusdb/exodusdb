@@ -101,22 +101,14 @@ class ExodusProgramBase;
 class MvEnvironment;
 
 // pExodusProgramBase - "pointer to exodus program" type
-typedef ExodusProgramBase* pExodusProgramBase;
+using pExodusProgramBase = ExodusProgramBase*;
 
 // pExodusProgramBaseMemberFunction - "pointer to exodus program" member function
-typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)();
-
-/*
-//pExodusProgram - pointer to exodus program type
-class ExodusProgram;
-typedef ExodusProgram* pExodusProgram;
-//pExodusProgramMemberFunction - pointer to exodus program member function
-typedef var (ExodusProgram::*pExodusProgramMemberFunction)();
-*/
+using pExodusProgramBaseMemberFunction = var (ExodusProgramBase::*)();
 
 // ExodusProgramCreateDeleteFunction - pointer to global function that creates and deletes exodus
 // programs
-typedef void (*ExodusProgramBaseCreateDeleteFunction)(pExodusProgramBase&, MvEnvironment&,
+using ExodusProgramBaseCreateDeleteFunction = void (*)(pExodusProgramBase&, MvEnvironment&,
 						      pExodusProgramBaseMemberFunction&);
 
 class DLL_PUBLIC ExodusFunctorBase

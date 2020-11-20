@@ -13,9 +13,9 @@ class ExodusProgramBase
 {
 
       public:
-	typedef const var& in;
-	typedef var& io;
-	typedef var& out;
+	using in = const var&;
+	using io = var&;
+	using out = var&;
 
 #include <exodus/ioconv_custom.h>
 

@@ -183,8 +183,6 @@ class DLL_PUBLIC MvEnvironment
 	var CURSOR = "1";
 
 	// define a type of object that holds many LabelledCommons
-	// typedef std::map<const char*, LabelledCommon> LabelledCommons;
-	// typedef std::map<std::string, boost::any> labelledcommons;
 	LabelledCommon* labelledcommon[99] = {0};
 
 	// used to maintain locks per process eg on ~/tmp/exodus
