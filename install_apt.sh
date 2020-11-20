@@ -32,8 +32,8 @@ sudo apt-get update
 :
 #yum -y install subversion gcc-c++ postgresql-devel
 #sudo apt-get -y install subversion g++ postgresql-server-dev-all libboost-all-dev build-essential cmake
-sudo apt-get -y install git g++ postgresql-server-dev-all build-essential cmake\
- libboost-filesystem-dev libboost-system-dev libboost-regex-dev libboost-thread-dev libboost-locale-dev libboost-chrono-dev libboost-date-time-dev libboost-atomic-dev:
+#sudo apt-get -y install git g++ postgresql-server-dev-all build-essential cmake libboost-filesystem-dev libboost-system-dev libboost-regex-dev libboost-thread-dev libboost-locale-dev libboost-chrono-dev libboost-date-time-dev libboost-atomic-dev
+sudo apt-get -y install git g++ postgresql-server-dev-all build-essential cmake libboost-filesystem-dev libboost-system-dev libboost-regex-dev libboost-locale-dev
 cd ~
 #svn co https://github.com/exodusdb/exodusdb/trunk/ exodus
 git clone https://github.com/exodusdb/exodusdb exodus

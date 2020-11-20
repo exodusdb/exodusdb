@@ -160,6 +160,7 @@ sudo systemctl daemon-reload
 :
 sudo systemctl enable exodus
 sudo systemctl restart exodus
+sleep 2
 :
 : Finished Setup - Apache should be listening on port 80 and 443
 : ==============================================================

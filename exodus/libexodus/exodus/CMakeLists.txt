@@ -39,7 +39,8 @@ message(PostgreSQL_INCLUDEDIR=${PostgreSQL_INCLUDE_DIR})
 #date_time appears to be header only in later boost versions eg 55
 #find_package(Boost REQUIRED COMPONENTS filesystem date_time system regex thread)
 #find_package(Boost REQUIRED COMPONENTS filesystem system regex thread)
-find_package(Boost REQUIRED COMPONENTS system regex thread locale)
+#find_package(Boost REQUIRED COMPONENTS system regex thread locale)
+find_package(Boost REQUIRED COMPONENTS filesystem system regex locale)
 message("BUT LOOKING IN /usr/local/lib and /usr/local/include FIRST!")
 
 set(Boost_USE_STATIC_LIBS        ON)
@@ -88,7 +89,8 @@ message("PostgreSQL_LIBRARY_DIR=${PostgreSQL_LIBRARY_DIR}")
 #NOICU message("ICU_LIBRARIES=${ICU_LIBRARIES}")
 #pq is needed for postgresql client library code
 #dl is needed for dynamic link library code
-target_link_libraries(exodus boost_filesystem -L/usr/local/lib ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} ${PostgreSQL_LIBRARY_DIR} ${ICU_LIBRARIES} pq dl)
+#target_link_libraries(exodus boost_filesystem -L/usr/local/lib ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} ${PostgreSQL_LIBRARY_DIR} ${ICU_LIBRARIES} pq dl)
+target_link_libraries(exodus -L/usr/local/lib ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} ${PostgreSQL_LIBRARY_DIR} ${ICU_LIBRARIES} pq dl)
 
 ### state that the output libexodus should be installed in the default system library
 
