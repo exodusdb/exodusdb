@@ -54,7 +54,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
 #note that displayed path confusingly shows no space or ; between multiple paths if multiple are specified either by space or ;
 message(CMAKE_MODULE_PATH=${CMAKE_MODULE_PATH})
 
-find_package(ICU 4.4 REQUIRED)
+#NOICU find_package(ICU 4.4 REQUIRED)
 
 ### include postgres ###
 
@@ -85,7 +85,7 @@ message("Boost_LIBRARIES=${Boost_LIBRARIES}")
 #postgres libraries seem not to be set but we include -pq directly to solve
 message("PostgreSQL_LIBRARIES=${PostgreSQL_LIBRARIES}")
 message("PostgreSQL_LIBRARY_DIR=${PostgreSQL_LIBRARY_DIR}")
-message("ICU_LIBRARIES=${ICU_LIBRARIES}")
+#NOICU message("ICU_LIBRARIES=${ICU_LIBRARIES}")
 #pq is needed for postgresql client library code
 #dl is needed for dynamic link library code
 target_link_libraries(exodus boost_filesystem -L/usr/local/lib ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} ${PostgreSQL_LIBRARY_DIR} ${ICU_LIBRARIES} pq dl)
