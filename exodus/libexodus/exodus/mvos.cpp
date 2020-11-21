@@ -904,12 +904,6 @@ var& var::replacer(const var& regexstr, const var& replacementstr, const var& op
 	return *this;
 }
 
-// in MVutils.cpp
-//void ptime2mvdatetime(const boost::posix_time::ptime& ptimex, int& mvdate, int& mvtime);
-//WARNING ACTUALLY DEFINED WITH BOOST POSIX TIME BUT IT IS THE SAME
-//void ptime2mvdatetime(const boost::posix_time::ptime& ptimex, int& mvdate, int& mvtime)
-void ptime2mvdatetime(const stdfs::file_time_type& ptimex, int& mvdate, int& mvtime);
-
 bool var::osgetenv(const var& envvarname)
 {
 	THISIS("bool var::osgetenv(const var& envvarname)")
@@ -1686,6 +1680,22 @@ const std::string var::to_cmd_string() const
 	return this->field(" ", 1).to_path_string() + " " + this->field(" ", 2, 999999).toString();
 }
 
+//convert some clock to time_t (for osfile() and osdir()
+template <typename TP>
+std::time_t to_time_t(TP tp)
+{
+    using namespace std::chrono;
+    auto sctp = time_point_cast<system_clock::duration>(tp - TP::clock::now()
+              + system_clock::now());
+    return system_clock::to_time_t(sctp);
+}
+
+// in MVdatetime.cpp
+//void ptime2mvdatetime(const boost::posix_time::ptime& ptimex, int& mvdate, int& mvtime);
+void ptime2mvdatetime(const boost::posix_time::ptime& ptimex, int& mvdate, int& mvtime);
+//WARNING ACTUALLY DEFINED WITH BOOST POSIX TIME BUT IT IS THE SAME
+//void ptime2mvdatetime(const stdfs::file_time_type& ptimex, int& mvdate, int& mvtime);
+
 var var::osfile() const
 {
 	THISIS("var var::osfile() const")
@@ -1704,14 +1714,17 @@ var var::osfile() const
 		if (stdfs::is_directory(pathx))
 			return "";
 
-/*
+		// IDENTICAL CODE IN OSFILE AND OSDIR
+
 		// get last write datetime
-		std::time_t last_write_time =
-		    std::chrono::system_clock::to_time_t(stdfs::last_write_time(pathx));
+//		std::time_t last_write_time = std::chrono::system_clock::to_time_t(stdfs::last_write_time(pathx));
+		stdfs::file_time_type file_time = stdfs::last_write_time(pathx);
+		std::time_t last_write_time = to_time_t(file_time);
+
 		// convert to ptime
 		boost::posix_time::ptime ptimex = boost::posix_time::from_time_t(last_write_time);
-*/
-		stdfs::file_time_type ptimex = stdfs::last_write_time(pathx);
+
+//		stdfs::file_time_type ptimex = stdfs::last_write_time(pathx);
 
 		// convert to mv date and time
 		int mvdate, mvtime;
@@ -1802,20 +1815,24 @@ var var::osdir() const
 		if (!stdfs::is_directory(pathx))
 			return "";
 
-		/*
+		// IDENTICAL CODE IN OSFILE AND OSDIR
+
 		// get last write datetime
-		std::time_t last_write_time =
-		    std::chrono::system_clock::to_time_t(stdfs::last_write_time(pathx));
+//		std::time_t last_write_time = std::chrono::system_clock::to_time_t(stdfs::last_write_time(pathx));
+		stdfs::file_time_type file_time = stdfs::last_write_time(pathx);
+		std::time_t last_write_time = to_time_t(file_time);
+
 		// convert to ptime
 		boost::posix_time::ptime ptimex = boost::posix_time::from_time_t(last_write_time);
-		*/
-                stdfs::file_time_type ptimex = stdfs::last_write_time(pathx);
+
+//		stdfs::file_time_type ptimex = stdfs::last_write_time(pathx);
 
 		// convert to mv date and time
 		int mvdate, mvtime;
 		ptime2mvdatetime(ptimex, mvdate, mvtime);
 
-		return "" ^ FM ^ mvdate ^ FM ^ int(mvtime);
+		return int(stdfs::file_size(pathx)) ^ FM ^ mvdate ^ FM ^ int(mvtime);
+
 	}
 	catch (...)
 	{
