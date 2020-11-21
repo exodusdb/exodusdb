@@ -37,6 +37,7 @@ git clone https://github.com/exodusdb/exodusdb exodus
 cd ~/exodus
 cmake .
 make clean #in case half-built with wrong boost libs
+cmake .
 make
 sudo make install
 :
