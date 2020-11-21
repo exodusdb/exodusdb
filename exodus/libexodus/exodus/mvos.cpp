@@ -42,10 +42,19 @@ THE SOFTWARE.
 // http://www.ibm.com/developerworks/aix/library/au-stdfs/index.html
 // catch(boost::filesystem::filesystem_error e) {
 //#include <boost/filesystem.hpp>
-#include <experimental/filesystem>
-namespace stdfs = std::experimental::filesystem;
+//#include <experimental/filesystem>
+//namespace stdfs = std::experimental::filesystem;
 //#include <filesystem>
 //namespace stdfs = std::filesystem;
+#if __has_include(<filesystem>)
+  #include <filesystem>
+  namespace stdfs = std::filesystem;
+#elif __has_include(<experimental/filesystem>)
+  #include <experimental/filesystem> 
+  namespace stdfs = std::experimental::filesystem;
+#else
+  error "Missing the <filesystem> header."
+#endif
 
 // show c++ version for info
 //#include <boost/preprocessor/stringize.hpp>
