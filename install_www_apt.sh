@@ -45,6 +45,11 @@ sudo mv /tmp/exodus.conf /etc/apache2/sites-available/
 : Configure an apache site - HTTPS
 : ================================
 :
+: Use letsencrypt hosts.neosys.com cert if available
+:
+sudo test -f /etc/letsencrypt/live/hosts.neosys.com/fullchain.pem && sudo ln -sf /etc/letsencrypt/live/hosts.neosys.com/fullchain.pem /etc/ssl/certs/exodus-cert.pem
+sudo test -f /etc/letsencrypt/live/hosts.neosys.com/privkey.pem   && sudo ln -sf /etc/letsencrypt/live/hosts.neosys.com/privkey.pem   /etc/ssl/certs/exodus-key.pem
+:
 : Use self signed certificates if exodus cert and key not already present
 :
 sudo test -f /etc/ssl/certs/exodus-cert.pem  || sudo cp /etc/ssl/certs/ssl-cert-snakeoil.pem   /etc/ssl/certs/exodus-cert.pem
