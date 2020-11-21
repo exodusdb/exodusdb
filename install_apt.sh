@@ -30,7 +30,7 @@ SECONDS=0
 : required in case building on a pristine installation
 sudo apt-get update
 :
-sudo apt-get -y install git g++ postgresql-server-dev-all build-essential cmake libboost-filesystem-dev libboost-system-dev libboost-regex-dev libboost-thread-dev libboost-locale-dev libboost-chrono-dev libboost-date-time-dev libboost-atomic-dev libicu-dev
+sudo apt-get -y install git g++ postgresql-server-dev-all build-essential cmake libboost-dev libboost-system-dev libboost-regex-dev libboost-thread-dev libboost-locale-dev libboost-chrono-dev libboost-date-time-dev libboost-atomic-dev libicu-dev
 cd ~
 git clone https://github.com/exodusdb/exodusdb exodus
 :
