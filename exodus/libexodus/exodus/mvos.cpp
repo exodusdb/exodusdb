@@ -44,6 +44,8 @@ THE SOFTWARE.
 //#include <boost/filesystem.hpp>
 #include <experimental/filesystem>
 namespace stdfs = std::experimental::filesystem;
+//#include <filesystem>
+//namespace stdfs = std::filesystem;
 
 // show c++ version for info
 //#include <boost/preprocessor/stringize.hpp>
@@ -894,7 +896,10 @@ var& var::replacer(const var& regexstr, const var& replacementstr, const var& op
 }
 
 // in MVutils.cpp
-void ptime2mvdatetime(const boost::posix_time::ptime& ptimex, int& mvdate, int& mvtime);
+//void ptime2mvdatetime(const boost::posix_time::ptime& ptimex, int& mvdate, int& mvtime);
+//WARNING ACTUALLY DEFINED WITH BOOST POSIX TIME BUT IT IS THE SAME
+//void ptime2mvdatetime(const boost::posix_time::ptime& ptimex, int& mvdate, int& mvtime)
+void ptime2mvdatetime(const stdfs::file_time_type& ptimex, int& mvdate, int& mvtime);
 
 bool var::osgetenv(const var& envvarname)
 {
@@ -1690,11 +1695,15 @@ var var::osfile() const
 		if (stdfs::is_directory(pathx))
 			return "";
 
+/*
 		// get last write datetime
 		std::time_t last_write_time =
 		    std::chrono::system_clock::to_time_t(stdfs::last_write_time(pathx));
 		// convert to ptime
 		boost::posix_time::ptime ptimex = boost::posix_time::from_time_t(last_write_time);
+*/
+		stdfs::file_time_type ptimex = stdfs::last_write_time(pathx);
+
 		// convert to mv date and time
 		int mvdate, mvtime;
 		ptime2mvdatetime(ptimex, mvdate, mvtime);
@@ -1784,11 +1793,15 @@ var var::osdir() const
 		if (!stdfs::is_directory(pathx))
 			return "";
 
+		/*
 		// get last write datetime
 		std::time_t last_write_time =
 		    std::chrono::system_clock::to_time_t(stdfs::last_write_time(pathx));
 		// convert to ptime
 		boost::posix_time::ptime ptimex = boost::posix_time::from_time_t(last_write_time);
+		*/
+                stdfs::file_time_type ptimex = stdfs::last_write_time(pathx);
+
 		// convert to mv date and time
 		int mvdate, mvtime;
 		ptime2mvdatetime(ptimex, mvdate, mvtime);
@@ -1899,8 +1912,10 @@ var var::oslist(const var& path0, const var& spec0, const int mode) const
 	// stdfs::path full_path(stdfs::initial_path());
 	// initial_path always return the cwd at the time it is first called which is almost useless
 	stdfs::path full_path(stdfs::current_path());
+	//full_path =
+	//    stdfs::system_complete(stdfs::path(path.to_path_string().c_str() COMMAstdfsNATIVE));
 	full_path =
-	    stdfs::system_complete(stdfs::path(path.to_path_string().c_str() COMMAstdfsNATIVE));
+	    stdfs::absolute(stdfs::path(path.to_path_string().c_str()));
 
 	// quit if it isnt a folder
 	if (!stdfs::is_directory(full_path))
