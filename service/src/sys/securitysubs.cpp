@@ -685,19 +685,6 @@ function main(in mode) {
 
 		if (not interactive) {
 
-				/*;
-				//pass possible menus to remote client
-				DATAX='';
-				if @account='ADAGENCY' then filename='ADMENUS' else filename='MENUS';
-				call select2(filename:' USING MENUS','','WITH MENU.TITLE BY MENU.TITLE','MENU.TITLE ID','',DATAX,response,'','','');
-				if response<>'OK' then;
-					transfer response to msg;
-					return invalid(msg);
-					end;
-				convert \FE\:\FD\ to \FD\:\FC\ in DATAX;
-				@record<22>=DATAX;
-				*/
-
 			//group separators act as data in intranet client forcing menu and passwords
 			for (var fn = 1; fn <= 2; ++fn) {
 				var temp = RECORD.a(fn);

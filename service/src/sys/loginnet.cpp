@@ -64,7 +64,10 @@ readmenu:
 	//convert '.' to '_' in oldmenus
 
 	//all menus - not in order
-	var menus = "FINANCE" _VM_ "SUPPORT";
+	var menus = "SUPPORT";
+	if ((APPLICATION == "ACCOUNTS") or (APPLICATION == "ADAGENCY")) {
+		menus.r(1, -1, "FINANCE");
+	}
 
 	if (APPLICATION == "ADAGENCY") {
 
@@ -228,11 +231,17 @@ nextcomp:
 	cookie = "m=" ^ menus.convert(VM, ",");
 	cookie ^= "&cc=" ^ compcode;
 	cookie ^= "&nc=" ^ ncompanies;
+
+	//period/year
 	//cookie:='&pd=':currperiod:'/':addcent4(curryear)
 	cookie ^= "&pd=" ^ SYSTEM.a(135) ^ "/" ^ addcent4(SYSTEM.a(136));
+
 	//cookie:='&bc=':base.currency
 	cookie ^= "&bc=" ^ SYSTEM.a(134);
+
+	//base
 	cookie ^= "&bf=" ^ BASEFMT;
+
 	cookie ^= "&mk=" ^ defmarketcode;
 	cookie ^= "&mc=" ^ maincurrcode;
 	cookie ^= "&tz=" ^ SW;
