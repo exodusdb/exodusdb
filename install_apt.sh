@@ -30,7 +30,8 @@ SECONDS=0
 : required in case building on a pristine installation
 sudo apt-get update
 :
-sudo apt-get -y install git g++ postgresql-server-dev-all build-essential cmake libboost-dev libboost-system-dev libboost-regex-dev libboost-thread-dev libboost-locale-dev libboost-chrono-dev libboost-date-time-dev libboost-atomic-dev
+sudo DEBIAN_FRONTEND=noninteractive \
+apt-get -y install git g++ postgresql-server-dev-all build-essential cmake libboost-dev libboost-system-dev libboost-regex-dev libboost-thread-dev libboost-locale-dev libboost-chrono-dev libboost-date-time-dev libboost-atomic-dev
 cd ~
 git clone https://github.com/exodusdb/exodusdb exodus
 :
@@ -44,7 +45,8 @@ sudo make install
 : 2. Installing Postgres and Configuring it for Exodus
 : ====================================================
 ###yum -y install postgresql-server
-sudo apt-get -y install postgresql postgresql-client
+sudo DEBIAN_FRONTEND=noninteractive \
+apt-get -y install postgresql postgresql-client
 :
 cat > /tmp/exoduspg.input << EOF
 #!/bin/bash
