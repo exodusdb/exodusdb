@@ -1714,22 +1714,26 @@ var var::osfile() const
 		if (stdfs::is_directory(pathx))
 			return "";
 
-		// IDENTICAL CODE IN OSFILE AND OSDIR
+		//not using low level interface
+		//https://stackoverflow.com/questions/21159047/get-the-creation-date-of-file-or-folder-in-c#21159305
+
+		// SIMILAR CODE IN OSFILE AND OSDIR
 
 		// get last write datetime
-//		std::time_t last_write_time = std::chrono::system_clock::to_time_t(stdfs::last_write_time(pathx));
+		//std::time_t last_write_time = std::chrono::system_clock::to_time_t(stdfs::last_write_time(pathx));
 		stdfs::file_time_type file_time = stdfs::last_write_time(pathx);
 		std::time_t last_write_time = to_time_t(file_time);
 
-		// convert to ptime
+		// convert to posix time
 		boost::posix_time::ptime ptimex = boost::posix_time::from_time_t(last_write_time);
+		//stdfs::file_time_type ptimex = stdfs::last_write_time(pathx);
 
-//		stdfs::file_time_type ptimex = stdfs::last_write_time(pathx);
-
-		// convert to mv date and time
+		// convert posix time to mv date and time
+		//TODO Currently returns local date/time. Should it not be UTC?
 		int mvdate, mvtime;
 		ptime2mvdatetime(ptimex, mvdate, mvtime);
 
+		//file_size() is only available for files not directories
 		return int(stdfs::file_size(pathx)) ^ FM ^ mvdate ^ FM ^ int(mvtime);
 	}
 	catch (...)
@@ -1815,20 +1819,26 @@ var var::osdir() const
 		if (!stdfs::is_directory(pathx))
 			return "";
 
+		//not using low level interface
+		//https://stackoverflow.com/questions/21159047/get-the-creation-date-of-file-or-folder-in-c#21159305
+
+		// SIMILAR CODE IN OSFILE AND OSDIR
+
 		// get last write datetime
-//		std::time_t last_write_time = std::chrono::system_clock::to_time_t(stdfs::last_write_time(pathx));
+		//std::time_t last_write_time = std::chrono::system_clock::to_time_t(stdfs::last_write_time(pathx));
 		stdfs::file_time_type file_time = stdfs::last_write_time(pathx);
 		std::time_t last_write_time = to_time_t(file_time);
 
-		// convert to ptime
+		// convert to posix time
 		boost::posix_time::ptime ptimex = boost::posix_time::from_time_t(last_write_time);
+		//stdfs::file_time_type ptimex = stdfs::last_write_time(pathx);
 
-//		stdfs::file_time_type ptimex = stdfs::last_write_time(pathx);
-
-		// convert to mv date and time
+		// convert posix time to mv date and time
 		int mvdate, mvtime;
 		ptime2mvdatetime(ptimex, mvdate, mvtime);
 
+		//file_size() is only available for files not directories
+		//return int(stdfs::file_size(pathx)) ^ FM ^ mvdate ^ FM ^ int(mvtime);
 		return FM ^ mvdate ^ FM ^ int(mvtime);
 
 	}
