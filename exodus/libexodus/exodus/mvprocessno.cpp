@@ -65,10 +65,12 @@ int getprocessno(const char* filename, int* fd)
 {
 	struct flock fl;
 
-	*fd = open(filename, O_RDWR | O_CREAT, 0600);
-	if (*fd == -1)
-		printf("getprocessno file %s doesnt exist\n", filename);
-
+	*fd = open(filename, O_RDWR | O_CREAT, 0666);
+	// *fd = open(filename, O_RDONLY, 0);
+	if (*fd == -1) {
+		printf("exodus getprocessno file '%s' doesnt exist\n", filename);
+		return 0;
+	}
 	// processno starts at 1 not 0
 
 	for (int ii = 1; ii < 1000; ii++)

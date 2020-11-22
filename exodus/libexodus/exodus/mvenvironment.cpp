@@ -90,7 +90,10 @@ bool MvEnvironment::init(const int threadno)
 	if (not this->CRTHIGH)
 		this->CRTHIGH = 25;
 
-	this->PROCESSNO = getprocessno("/tmp/exodus", &processnolockfd);
+//	this->PROCESSNO = getprocessno("/tmp/exodus", &processnolockfd);
+//	this->PROCESSNO = getprocessno(this->EXECPATH.toString().c_str(), &processnolockfd);
+	var tmplockfile = "/tmp/exodus_" ^ var().oscwd().convert("/\\","__");
+	this->PROCESSNO = getprocessno(tmplockfile.toString().c_str(), &processnolockfd);
 
 	this->STATION = var(mvgethostname()).field(L".", 1);
 
