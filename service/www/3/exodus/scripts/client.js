@@ -1511,7 +1511,7 @@ function* clientfunctions_windowonload() {
             var dropdown_menu_span = document.createElement('span')
             dropdown_menu_span.id = 'menux'
             //dropdown_menu_span.style.display = 'none'
-            dropdown_menu_span.innerHTML = '<iframe id=menuframe ie55onload="menuonload()" src="../menu.htm" tabindex=-1 height=1px marginheight=1 marginwidth=1 frameborder=0 scrolling=no></iframe>'
+            dropdown_menu_span.innerHTML = '<iframe id=menuframe src="../menu.htm" tabindex=-1 height=1px marginheight=1 marginwidth=1 frameborder=0 scrolling=no></iframe>'
             var menuelement = $$('menubutton')
             //why insert it into the menu button?
             menuelement.insertBefore(dropdown_menu_span, null)

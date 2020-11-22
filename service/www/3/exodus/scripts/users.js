@@ -10,8 +10,10 @@ function* form_postinit() {
     if (gwhatsnew) {
         if (window.location.href.toString().slice(0, 5) == 'file:')
             gwhatsnew = 'file:///' + gwhatsnew
-        else
-            gwhatsnew = '..' + gwhatsnew.slice(gwhatsnew.indexOf('\\data\\'))
+        else {
+            //gwhatsnew = '..' + gwhatsnew.slice(gwhatsnew.indexOf('\\data\\'))
+            gwhatsnew = '..' + gwhatsnew.slice(gwhatsnew.replace('\\','/').indexOf('/data/'))
+        }
         exodussetcookie(glogincode, 'EXODUS2', '', 'wn')
         exodussetcookie(glogincode, 'EXODUS2', gwhatsnew, 'wn2')
         exodussettimeout('yield* windowopen(gwhatsnew)', 1000)
