@@ -180,6 +180,7 @@ duration=$SECONDS
 :  or
 : cd $EXODUS/service/src
 : . config
+: cd $EXODUS/work
 : server
 :
 : tail /var/log/syslog -f
