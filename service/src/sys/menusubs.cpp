@@ -76,7 +76,7 @@ function main(in mode, io tx, in arg3, io arg4, in arg5) {
 		//if unassigned(id) else props:=' id=':quote(id)
 		//if unassigned(onclick) else props:=' onclick = ':quote(onclick)
 		if (not(arg5.unassigned())) {
-			props ^= " arg5 = " ^ (arg5.quote());
+			props ^= " onclick = " ^ (arg5.quote());
 		}
 
 		//convert _x to <u>x</u> to indicate keyboard shortcut
