@@ -1480,12 +1480,14 @@ fixcompany:
 		}
 	}
 
+	var menu = "";
+
 	call log2("*open accounts system files", logtime);
 	if ((APPLICATION == "ACCOUNTS") or (APPLICATION == "ADAGENCY")) {
 		//call init.acc()
 		//call indirectly to avoid c++ include
 		systemsubs = "INITACC";
-		call systemsubs("");
+		call systemsubs(menu);
 	}
 	if (VOLUMES) {
 		perform("MACRO ACCOUNTS");
@@ -1496,8 +1498,16 @@ fixcompany:
 		//call init.agency()
 		//call indirectly to avoid c++ include
 		systemsubs = "INITAGENCY";
-		call systemsubs("");
+		var agencymenu = "";
+		call systemsubs(agencymenu);
+		menu = agencymenu ^ FM ^ menu;
+		agencymenu = "";
 	}
+
+	call log2("*make/update menu.htm", logtime);
+	//add support and help menus and the closing html
+
+	call initgeneral2("MAKEMENU", logtime, menu);
 
 	call log2("*add number format to company records", logtime);
 	clearselect();

@@ -17,7 +17,7 @@ efb_initgeneral2& operator=(const var& newlibraryname) {
 }
 
 //a member function with the right arguments, returning a var or void
-var operator() (in mode, io logtime)
+var operator() (in mode, io logtime, in menu)
 {
 
  //first time link to the shared lib and create/cache an object from it
@@ -32,7 +32,7 @@ var operator() (in mode, io logtime)
  //define a function type (pExodusProgramBaseMemberFunction)
  //that can call the shared library object member function
  //with the right arguments and returning a var or void
- typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(in,io);
+ typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(in,io,in);
 
  //call the shared library object main function with the right args,
  // returning a var or void
@@ -41,19 +41,26 @@ var operator() (in mode, io logtime)
  // (mode);
  return CALLMEMBERFUNCTION(*(this->pobject_),
  ((pExodusProgramBaseMemberFunction) (this->pmemberfunction_)))
-  (mode,logtime);
+  (mode,logtime,menu);
 
 }
 
 var operator() () {
  var mode_in;
  var logtime_io;
- return operator()(mode_in, logtime_io);
+ var menu_in;
+ return operator()(mode_in, logtime_io, menu_in);
 }
 
 var operator() (in mode) {
  var logtime_io;
- return operator()(mode, logtime_io);
+ var menu_in;
+ return operator()(mode, logtime_io, menu_in);
+}
+
+var operator() (in mode, io logtime) {
+ var menu_in;
+ return operator()(mode, logtime, menu_in);
 }
 
 };

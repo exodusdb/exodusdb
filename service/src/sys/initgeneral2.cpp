@@ -5,6 +5,7 @@ libraryinit()
 #include <readhostsallow.h>
 #include <shell2.h>
 #include <sysmsg.h>
+#include <menusubs.h>
 
 #include <gen_common.h>
 
@@ -17,9 +18,11 @@ var xx;
 var userid;
 var usern;
 var lastdate;
+var menutx;
+var oldmenu;
 
-function main(in mode, io logtime) {
-	//c sys in,io
+function main(in mode, io logtime, in menu) {
+	//c sys in,io,in
 
 	#include <general_common.h>
 
@@ -34,7 +37,7 @@ function main(in mode, io logtime) {
 		perform("PASSWORD3");
 
 		//get access to the SYSTEM file here (in EXODUS/EXODUS)
-		//also gets acceds to SYSTEM file in EXODUS2/EXODUS (as SYSTEM2)
+		//also gets access to SYSTEM file in EXODUS2/EXODUS (as SYSTEM2)
 		perform("SETSO");
 
 		//get access to the SYSTEM file in EXODUS2/EXODUS (the build directory)
@@ -348,6 +351,127 @@ nextuser:
 			for (var tempn = 1; tempn <= ntemps; ++tempn) {
 				("..\\" ^ temps.a(tempn)).osdelete();
 			};//tempn;
+		}
+
+	} else if (mode == "MAKEMENU") {
+
+		call menusubs("INITMENUS", menutx);
+
+		// MODULE MENUS FIRST ON RIGHT SIDE
+		//////////////////////////////////
+		menutx ^= FM ^ menu;
+
+		// SUPPORT MENU
+		//////////////
+
+		call menusubs("ADDMENU", menutx, "_Support");
+
+		var item = "_Authorisation File";
+		var href = "../exodus/authorisation.htm";
+		call menusubs("ADDITEM", menutx, item, href);
+
+		item = "System Con_figuration File";
+		href = "../exodus/systemconfiguration.htm";
+		call menusubs("ADDITEM", menutx, item, href);
+
+		item = "_Backup";
+		href = "../exodus/backup.htm";
+		call menusubs("ADDITEM", menutx, item, href);
+
+		item = "L_og";
+		href = "../exodus/log.htm";
+		call menusubs("ADDITEM", menutx, item, href);
+
+		item = "Re_questLog";
+			//style="display: none"
+			//id="exodussupportmenuitem1"
+		href = "../exodus/requestlog.htm";
+		call menusubs("ADDITEM", menutx, item, href);
+			//<br style="display: none" id="exodussupportmenuitem2" />
+
+		item = "_Usage Statistics";
+		href = "../exodus/usagestatistics.htm";
+		call menusubs("ADDITEM", menutx, item, href);
+
+		call menusubs("ADDSEP", menutx);
+
+		item = "List of Database _Processes";
+		var onclick = "javascript:openwindow_sync(\'EXECUTE|rGENERAL|rLISTPROCESSES\');return false";
+			//backslash
+		onclick.converter("|", var().chr(92));
+		call menusubs("ADDITEM", menutx, item, href, onclick);
+
+		item = "_List of Documents in Use";
+		onclick = "javascript:openwindow_sync(\'EXECUTE|rGENERAL|rLISTLOCKS\');return false";
+			//backslash
+		onclick.converter("|", var().chr(92));
+		call menusubs("ADDITEM", menutx, item, href, onclick);
+
+		item = "_Stop/Restart EXODUS Service";
+		href = "../exodus/stopservice.htm";
+		call menusubs("ADDITEM", menutx, item, href);
+
+		call menusubs("ENDMENU", menutx);
+
+		// HELP MENU
+		///////////
+
+		call menusubs("ADDMENU", menutx, "_Help");
+
+		item = "_What\'s new in EXODUS";
+		href = "javascript:window.location.assign((typeof gusername!=\'undefined\'&&gusername==\'EXODUS\'&&confirm(\'EXODUS only option|n|nChange Log File=OK|nWhats New Report=Cancel\'))?\'../exodus/changelog.htm\':\'../exodus/whatsnew.htm\')";
+			//backslash
+		href.converter("|", var().chr(92));
+		call menusubs("ADDITEM", menutx, item, href);
+
+		item = "_User Details";
+		href = "../exodus/users.htm";
+		call menusubs("ADDITEM", menutx, item, href);
+
+		item = "_Email </u>Users";
+		href = "../exodus/emailusers.htm";
+		call menusubs("ADDITEM", menutx, item, href);
+
+		item = "_Keyboard Shortcuts";
+		href = "../exodus/helpkeyboard.htm";
+		call menusubs("ADDITEM", menutx, item, href);
+
+		item = "Browser _Reset";
+		href = "http://www.neosys.com/ie.htm";
+		call menusubs("ADDITEM", menutx, item, href);
+
+		item = "System Speed _Test";
+		href = "../exodus/test.htm";
+		call menusubs("ADDITEM", menutx, item, href);
+
+		item = "EXODUS _Help Desk";
+		href = "http://www.neosys.com/help";
+		call menusubs("ADDITEM", menutx, item, href);
+
+		item = "_About";
+		onclick = "javascript:displayresponsedata_sync(\'EXECUTE|rGENERAL|rABOUT\');return false";
+			//backslash
+		onclick.converter("|", var().chr(92));
+		call menusubs("ADDITEM", menutx, item, href, onclick);
+
+			//this element at the end determines when the menu is fully loaded
+		menutx ^= FM ^ "<div id=\"menucompleted\"></div>";
+
+		call menusubs("ENDMENU", menutx);
+
+		//<!-- </div> -->
+
+		call menusubs("EXITMENUS", menutx);
+
+		menutx.swapper(FM, "\r\n");
+
+		var menuosfilename = "../data/menu.htm";
+		if (not(oldmenu.osread(menuosfilename))) {
+			oldmenu = "";
+		}
+		if (menutx ne oldmenu) {
+			call log2("Updating " ^ menuosfilename, logtime);
+			var(menutx).oswrite(menuosfilename);
 		}
 
 	} else {

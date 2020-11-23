@@ -1511,7 +1511,7 @@ function* clientfunctions_windowonload() {
             var dropdown_menu_span = document.createElement('span')
             dropdown_menu_span.id = 'menux'
             //dropdown_menu_span.style.display = 'none'
-            dropdown_menu_span.innerHTML = '<iframe id=menuframe src="../menu.htm" tabindex=-1 height=1px marginheight=1 marginwidth=1 frameborder=0 scrolling=no></iframe>'
+            dropdown_menu_span.innerHTML = '<iframe id=menuframe src="../../data/menu.htm" tabindex=-1 height=1px marginheight=1 marginwidth=1 frameborder=0 scrolling=no></iframe>'
             var menuelement = $$('menubutton')
             //why insert it into the menu button?
             menuelement.insertBefore(dropdown_menu_span, null)
@@ -1561,13 +1561,11 @@ function menuonload() {
             return
 
         //enable exodus support menu items
-        //if (gusername=='EXODUS') {
-        var item1 = idocument.getElementById('exodussupportmenuitem1')
-        if (item1) {
-            item1.style.display = ''
-            idocument.getElementById('exodussupportmenuitem2').style.display = ''
+        if (gusername=='EXODUS') {
+            var elements = idocument.getElementsByClassName('exodussupportmenuitem')
+            for (var ii=0;ii<elements.length;++ii)
+                elements[ii].style.display = ''
         }
-        //}
 
         menuhtml = idocument.body.innerHTML
 

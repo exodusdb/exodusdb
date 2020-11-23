@@ -236,6 +236,11 @@ H6
     cursor: pointer;
 }
 
+.menu_hr
+{
+    border:1px dotted lightgrey
+}
+
 .graphicbutton:hover
 {
     border-color: #aaaaaa;
