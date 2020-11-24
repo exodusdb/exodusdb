@@ -40,7 +40,7 @@ function main(in mode) {
 	if (ID == "TAXES") {
 		//call tax.subs(mode)
 		//make definition.subs independent for c++
-		systemsubs = "TAX.SUBS";
+		systemsubs = "taxsubs";
 		call systemsubs(mode);
 		return 0;
 	}
@@ -48,7 +48,7 @@ function main(in mode) {
 	if (ID == "ALL") {
 		//call voucher.type.subs(mode)
 		//make definition.subs independent for c++
-		systemsubs = "VOUCHER.TYPE.SUBS";
+		systemsubs = "vouchertypesubs";
 		call systemsubs(mode);
 		return 0;
 	}
@@ -56,7 +56,7 @@ function main(in mode) {
 	if (ID == "TIMESHEET.PARAMS") {
 		//call timesheetparam.subs(mode)
 		//make definition.subs independent for c++
-		systemsubs = "TIMESHEETPARAM.SUBS";
+		systemsubs = "timesheetparamsubs";
 		call systemsubs(mode);
 		return 0;
 	}

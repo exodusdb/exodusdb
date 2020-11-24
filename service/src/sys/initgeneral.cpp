@@ -1486,7 +1486,7 @@ fixcompany:
 	if ((APPLICATION == "ACCOUNTS") or (APPLICATION == "ADAGENCY")) {
 		//call init.acc()
 		//call indirectly to avoid c++ include
-		systemsubs = "INITACC";
+		systemsubs = "initacc";
 		call systemsubs(menu);
 	}
 	if (VOLUMES) {
@@ -1497,16 +1497,18 @@ fixcompany:
 	if (APPLICATION == "ADAGENCY") {
 		//call init.agency()
 		//call indirectly to avoid c++ include
-		systemsubs = "INITAGENCY";
+		systemsubs = "initagency";
 		var agencymenu = "";
 		call systemsubs(agencymenu);
+		//insert the agency menu media/jobs/timesheets before (to the right)
+		//of the finance menu from above above
 		menu = agencymenu ^ FM ^ menu;
 		agencymenu = "";
 	}
 
 	call log2("*make/update menu.htm", logtime);
-	//add support and help menus and the closing html
-
+	//add support and help menus after (to the left of)
+	//and add the closing html
 	call initgeneral2("MAKEMENU", logtime, menu);
 
 	call log2("*add number format to company records", logtime);
