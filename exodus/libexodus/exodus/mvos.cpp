@@ -1948,8 +1948,31 @@ var var::oslist(const var& path0, const var& spec0, const int mode) const
 	stdfs::path full_path(stdfs::current_path());
 	//full_path =
 	//    stdfs::system_complete(stdfs::path(path.to_path_string().c_str() COMMAstdfsNATIVE));
-	full_path =
-	    stdfs::absolute(stdfs::path(path.to_path_string().c_str()));
+	//full_path =
+	//    stdfs::absolute(stdfs::path(path.to_path_string().c_str()));
+	if (path.length()) {
+		//full_path = stdfs::absolute(stdfs::path(path.to_path_string().c_str()));
+		std::error_code error_code;
+        	full_path = stdfs::absolute(stdfs::path(path.to_path_string().c_str()), error_code);
+		if (error_code) {
+                	std::cerr << "'" << path.to_path_string() << "' path : " << error_code.message() << std::endl;
+			return filelist;
+		}
+		//stdfs::path path1 = stdfs::path(".");
+		//std::clog << "path1='" << path1 << "'" <<std::endl;
+
+		//stdfs::path path_cwd = stdfs::current_path();
+		//std::clog << "path_cwd='" << path_cwd << "'" <<std::endl;
+
+		//stdfs::path pathx = stdfs::path(path.to_path_string().c_str());
+		//stdfs::path pathx = stdfs::current_path();
+		//stdfs::path pathx = stdfs::path(".");
+		//std::clog << "pathx='" << pathx << "'" <<std::endl;
+		//full_path =
+		//    stdfs::absolute(pathx);
+		//std::clog << "pathx='" << pathx << "'" <<std::endl;
+	}
+	//std::clog << "fullpath='" << full_path << "'" <<std::endl;
 
 	// quit if it isnt a folder
 	if (!stdfs::is_directory(full_path))

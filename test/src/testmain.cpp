@@ -2363,6 +2363,23 @@ while trying to match the argument list '(exodus::var, bool)'
 	//assert(oconv(FM ^ "\x0035","HEX4") eq "07FE0035");
 	//assert(oconv(FM,"HEX4") eq "07FE");
 
+	osmkdir("testmain.1");
+	osmkdir("testmain.2");
+
+	if (not SLASH_IS_BACKSLASH) {
+
+		//unordered files and directories
+		assert(oslist("*").convert(FM,"") == osshellread("ls . -AU1").convert("\n\r",""));
+
+		//files (not directories)
+		assert(oslistf("*").convert(FM,"") == osshellread("find . -maxdepth 1 ! -path . ! -type d -printf '%f\n'").convert("\n\r",""));
+
+		//directories (not files)
+		assert(oslistd("*").convert(FM,"") == osshellread("find . -maxdepth 1 ! -path . -type d -printf '%f\n\'").convert("\n\r",""));
+	}
+	osrmdir("testmain.1");
+	osrmdir("testmain.2");
+
 	printl();
 	printl("osdir("^SLASH^")=",osdir(SLASH));
 
