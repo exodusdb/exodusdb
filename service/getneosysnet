@@ -23,9 +23,9 @@ rm neosys/editor -rf
 rm .git .vs .vscode -rf
 
 #remove some unnecessary files
-rm .gitignore accounts.htm adagency.htm favicon.ico readme.txt  web.config
-rm 3/accounts.htm 3/adagency.htm
-rm neosys/dll/{upload.dll,upload.dl_}
+rm -rf .gitignore accounts.htm adagency.htm favicon.ico readme.txt web.config
+rm -rf 3/accounts.htm 3/adagency.htm 3/menu.htm
+rm -rf neosys/dll/{upload.dll,upload.dl_}
 
 #rename some directories
 mv 3/neosys 3/exodus
