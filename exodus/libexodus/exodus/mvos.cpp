@@ -49,9 +49,11 @@ THE SOFTWARE.
 #if __has_include(<filesystem>)
   #include <filesystem>
   namespace stdfs = std::filesystem;
+  #define ABSOLUTE_OR_COMPLETE absolute
 #elif __has_include(<experimental/filesystem>)
   #include <experimental/filesystem> 
   namespace stdfs = std::experimental::filesystem;
+  #define ABSOLUTE_OR_COMPLETE system_complete
 #else
   error "Missing the <filesystem> header."
 #endif
@@ -1933,8 +1935,8 @@ var var::oslist(const var& path0, const var& spec0, const int mode) const
 
 	var filelist = "";
 //#if BOOST_FILESYSTEM_VERSION >= 3 or defined(C17)
-#define LEAForFILENAME path().filename().string()
-#define COMMAstdfsNATIVE
+//#define LEAForFILENAME path().filename().string()
+//#define COMMAstdfsNATIVE
 	//#else
 	//#define LEAForFILENAME leaf()
 	//#define COMMAstdfsNATIVE ,stdfs::native
@@ -1953,9 +1955,10 @@ var var::oslist(const var& path0, const var& spec0, const int mode) const
 	if (path.length()) {
 		//full_path = stdfs::absolute(stdfs::path(path.to_path_string().c_str()));
 		std::error_code error_code;
-        	full_path = stdfs::absolute(stdfs::path(path.to_path_string().c_str()), error_code);
+		stdfs::path pathx = stdfs::path(path.to_path_string().c_str());
+		full_path = stdfs::ABSOLUTE_OR_COMPLETE(pathx, error_code);
 		if (error_code) {
-                	std::cerr << "'" << path.to_path_string() << "' path : " << error_code.message() << std::endl;
+			std::cerr << "'" << path.to_path_string() << "' path : " << error_code.message() << std::endl;
 			return filelist;
 		}
 		//stdfs::path path1 = stdfs::path(".");
@@ -1992,7 +1995,7 @@ var var::oslist(const var& path0, const var& spec0, const int mode) const
 			// also is_directory(dir_itr->status()) changed to is_directory(*dir_itr)
 			// to avoid compile errors on boost 1.33
 			// http://www.boost.org/doc/libs/1_33_1/libs/filesystem/doc/index.htm
-			if (filter && !std_boost::regex_match(dir_itr->LEAForFILENAME, re))
+			if (filter && !std_boost::regex_match(dir_itr->path().filename().string(), re))
 				continue;
 
 			// using .leaf instead of .status provided in boost 1.34 .. but does it
@@ -2000,14 +2003,14 @@ var var::oslist(const var& path0, const var& spec0, const int mode) const
 			if (stdfs::is_directory(*dir_itr))
 			{
 				if (getfolders)
-					filelist ^= FM ^ dir_itr->LEAForFILENAME;
+					filelist ^= FM ^ dir_itr->path().filename().string();
 			}
 			// is_regular is only in boost > 1.34
 			// else if (stdfs::is_regular(dir_itr->status() ) )
 			else // if (stdfs::is_regular(dir_itr->status() ) )
 			{
 				if (getfiles)
-					filelist ^= FM ^ dir_itr->LEAForFILENAME;
+					filelist ^= FM ^ dir_itr->path().filename().string();
 			}
 			// else
 			//{
