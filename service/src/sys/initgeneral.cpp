@@ -1444,6 +1444,10 @@ getproxy:
 	call log2("*get first company for init.acc", logtime);
 	clearselect();
 	select(gen.companies);
+	if (not LISTACTIVE) {
+		call note("WARNING: *** NO COMPANY RECORD ***");
+		gen.company = "";
+	}
 	var anyfixed = -1;
 fixnextcompany:
 	anyfixed += 1;
