@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS DICT_VOC
  key text primary key,
  data text
 );
+ALTER TABLE DICT_VOC OWNER to exodus;
 INSERT INTO DICT_VOC (key,data) values (E'ARENT',E'RLISTNOT');
 INSERT INTO DICT_VOC (key,data) values (E'ISNT',E'RLISTNOT');
 INSERT INTO DICT_VOC (key,data) values (E'ITS',E'RLIST');

@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS DICT_LOCKS
  key text primary key,
  data text
 );
+ALTER TABLE DICT_LOCKS OWNER to exodus;
 INSERT INTO DICT_LOCKS (key,data) values (E'STATION',E'F3StationSL101');
 INSERT INTO DICT_LOCKS (key,data) values (E'SESSION',E'F5SessionSL101');
 INSERT INTO DICT_LOCKS (key,data) values (E'DATETIME_LOCKED',E'F2Date TimeLockedS[DATETIME,4*DOS,MTSDOS]R101');

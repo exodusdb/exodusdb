@@ -34,6 +34,7 @@ cp -a ~/arev/data/DICTREQU.SQL sql/dict_requestlog.sql
 cp -a ~/arev/data/DICTSTAT.SQL sql/dict_statistics.sql
 cp -a ~/arev/data/DICTUSER.SQL sql/dict_users.sql
 cp -a ~/arev/data/DICTVOC.SQL sql/dict_voc.sql
+cp -a ~/arev/data/DICTDEFI.SQL sql/dict_definitions.sql
 :
 : Convert all NEOSYS to EXODUS in sql
 : ===================================

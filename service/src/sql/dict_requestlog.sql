@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS DICT_REQUESTLOG
  key text primary key,
  data text
 );
+ALTER TABLE DICT_REQUESTLOG OWNER to exodus;
 INSERT INTO DICT_REQUESTLOG (key,data) values (E'REQUEST1',E'F11Request1SL101');
 INSERT INTO DICT_REQUESTLOG (key,data) values (E'TIME',E'F0TimeS3MTSR81');
 INSERT INTO DICT_REQUESTLOG (key,data) values (E'RESPONSE',E'F6ResponseST201');

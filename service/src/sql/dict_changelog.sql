@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS DICT_CHANGELOG
  key text primary key,
  data text
 );
+ALTER TABLE DICT_CHANGELOG OWNER to exodus;
 INSERT INTO DICT_CHANGELOG (key,data) values (E'DATE_TIME',E'F4Date_time[DATETIME,4*,MTS]R101');
 INSERT INTO DICT_CHANGELOG (key,data) values (E'DISTRIBUTION',E'F5DistributionM0L1011');
 INSERT INTO DICT_CHANGELOG (key,data) values (E'NUMBER',E'F0No.R101');

@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS DICT_USERS
  key text primary key,
  data text
 );
+ALTER TABLE DICT_USERS OWNER to exodus;
 INSERT INTO DICT_USERS (key,data) values (E'RANK',E'F11RankSR41');
 INSERT INTO DICT_USERS (key,data) values (E'LAST_LOGIN_DATETIME',E'F13Last LoginDate/TimeS[DATETIME,4*,MTS]L151');
 INSERT INTO DICT_USERS (key,data) values (E'USER_CODE',E'F0User CodeS0T301');

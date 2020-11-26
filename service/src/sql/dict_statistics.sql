@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS DICT_STATISTICS
  key text primary key,
  data text
 );
+ALTER TABLE DICT_STATISTICS OWNER to exodus;
 INSERT INTO DICT_STATISTICS (key,data) values (E'SESSION',E'F0SessionS2R101');
 INSERT INTO DICT_STATISTICS (key,data) values (E'DEPARTMENT',E'SDepartmentS@ans=@record<3>*may be missing try to get from user fileif @ans else @ans=xlate(\'USERS\',field(@id,\'*\',3),5,\'X\')*use database as better than blank/unknownif @ans else if field(@id,\'*\',3)=\'EXODUS\' then  @ans=\'EXODUS\' end else  @ans=field(@id,\'*\',1)  end endT200');
 INSERT INTO DICT_STATISTICS (key,data) values (E'USER_BROWSER',E'SUser-BrowserSusercode=field(@id,\'*\',3)@ans=xlate(\'USERS\',usercode,39,\'X\')<1,6>T200');
