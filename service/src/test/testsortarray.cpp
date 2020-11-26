@@ -11,12 +11,12 @@ function main() {
 	array.r(6,	61 ^VM ^62 ^VM ^620 ^VM ^610);
 	array.r(7,	71 ^VM ^72 ^VM ^720 ^VM ^710);
 
-	array.convert(FM,"\n").outputl();
+	array.convert(VM^FM,"]\n").outputl();
 
-	call sortarray(array,3 ^ VM ^ 7 ^ VM ^ 6,"D","R");
+	call sortarray(array,3 ^ VM ^ 7 ^ VM ^ 6,"DR");
 
 	printl("-------------------");
-	array.convert(FM,"\n").outputl();
+	array.convert(VM^FM ,"]\n").outputl();
 
 	return 0;
 }

@@ -1444,10 +1444,6 @@ getproxy:
 	call log2("*get first company for init.acc", logtime);
 	clearselect();
 	select(gen.companies);
-	if (not LISTACTIVE) {
-		gen.company="";
-		call sysmsg("No companies setup yet");
-	}
 	var anyfixed = -1;
 fixnextcompany:
 	anyfixed += 1;

@@ -1,8 +1,0 @@
-#!/bin/bash
-
-set -e
-set -x
-
-if ! test -f ./getarev2 ; then echo must be run in service/src/ ; exit ; fi
-
-scp -P 19525 -r root@exodus.hosts.neosys.com:/root/arev/{sys,gen,fin,agy,med,job,tim}/ .

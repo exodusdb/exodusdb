@@ -1,33 +1,73 @@
 #!/bin/bash
-
-if ! test -f ../getarev ; then echo must be run in service/src/??? ; exit; fi
-
 set -x
 set -e
-
 :
-: function change neosys to exodus in all text - except neosys.com
+: Refreshes the sys source folders from the ~arev folder where the output of ADECOM is placed
 :
-function convneosys2exodus {
-	find ../$MODULE -type f -exec sed -i 's#neosys#exodus#g' {} \;
-	find ../$MODULE -type f -exec sed -i 's#exodus\.com#neosys.com#g' {} \;
-	find ../$MODULE -type f -exec sed -i 's#NEOSYS#EXODUS#g' {} \;
-	find ../$MODULE -type f -exec sed -i 's#Copyright EXODUS#Copyright NEOSYS#g' {} \;
+: Converts EXODUS/exodus to EXODUS/exodus except neosys.com and Copyright NEOSYS
+: Does not delete any files in the target that are no longer present in the source
+: TODO: Delete everything before refreshing from scratch and regenerate all header files
+: rsync -avz -e "ssh -p 19525" --delete "/cygdrive/d/exodus/arev/" root@exodus.neosys.com:/root/arev
+:
+: Check if running in the right directory
+: =======================================
+:
+if ! test -f ./getarev ; then echo must be run in service/src ; exit; fi
+:
+: A function to change all EXODUS/exodus to EXODUS/exodus in all text - except neosys.com
+: =======================================================================================
+:
+function convexodus2exodus {
+	find ./$1 -type f -exec sed -i 's#neosys#exodus#g' {} \;
+	find ./$1 -type f -exec sed -i 's#exodus\.com#neosys.com#g' {} \;
+	find ./$1 -type f -exec sed -i 's#NEOSYS#EXODUS#g' {} \;
+	find ./$1 -type f -exec sed -i 's#Copyright NEOSYS#Copyright NEOSYS#g' {} \;
 }
 :
-: dont get headers for sys from arev
+: Get dictionary SQL from arev
+: ============================
 :
-MODULE=sys
-mkdir -p  ../$MODULE
-cp ~/arev/$MODULE/*.cpp ../$MODULE/
-convneosys2exodus sys
-
-for MODULE in gen fin agy med job tim
+cp -a ~/arev/data/DICTCHAN.SQL sql/dict_changelog.sql
+cp -a ~/arev/data/DICTLOCK.SQL sql/dict_locks.sql
+cp -a ~/arev/data/DICTPROC.SQL sql/dict_processes.sql
+cp -a ~/arev/data/DICTREQU.SQL sql/dict_requestlog.sql
+cp -a ~/arev/data/DICTSTAT.SQL sql/dict_statistics.sql
+cp -a ~/arev/data/DICTUSER.SQL sql/dict_users.sql
+cp -a ~/arev/data/DICTVOC.SQL sql/dict_voc.sql
+:
+: Convert all NEOSYS to EXODUS in sql
+: ===================================
+:
+convexodus2exodus sql
+:
+#: Get all .cpp and .h files from ~/arev/sys
+: Get all .cpp from ~/arev/sys
+: =========================================
+:
+for MODULE in sys
 do
-	mkdir -p  ../$MODULE
-	cp ~/arev/$MODULE/*.cpp ~/arev/$MODULE/*.h ../$MODULE/
-	convneosys2exodus sys $MODULE
+	mkdir -p  ./$MODULE
+	#cp ~/arev/$MODULE/*.cpp ~/arev/$MODULE/*.h ./$MODULE/
+	cp ~/arev/$MODULE/*.cpp ./$MODULE/
+:   Convert all EXODUS to EXODUS
+	convexodus2exodus $MODULE
 #	compile ../$MODULE/*.cpp {S}
 done
-
+:
+: Create any .h headers in ~/inc
+: ==============================
+:
+compile sys {HS}
+:
+: Compile
+: =======
+:
+compile sys
+:
+: Finished
+: ========
+:
+duration=$SECONDS
+: "$(($duration / 60)) minutes and $(($duration % 60)) seconds elapsed."
+:
 set +x

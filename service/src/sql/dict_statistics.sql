@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS DICT_STATISTICS
  data text
 );
 INSERT INTO DICT_STATISTICS (key,data) values (E'SESSION',E'F0SessionS2R101');
-INSERT INTO DICT_STATISTICS (key,data) values (E'DEPARTMENT',E'SDepartmentS@ans=@record<3>*may be missing try to get from user fileif @ans else @ans=xlate(\'USERS\',field(@id,\'*\',3),5,\'X\')*use database as better than blank/unknownif @ans else if field(@id,\'*\',3)=\'NEOSYS\' then  @ans=\'NEOSYS\' end else  @ans=field(@id,\'*\',1)  end endT200');
+INSERT INTO DICT_STATISTICS (key,data) values (E'DEPARTMENT',E'SDepartmentS@ans=@record<3>*may be missing try to get from user fileif @ans else @ans=xlate(\'USERS\',field(@id,\'*\',3),5,\'X\')*use database as better than blank/unknownif @ans else if field(@id,\'*\',3)=\'EXODUS\' then  @ans=\'EXODUS\' end else  @ans=field(@id,\'*\',1)  end endT200');
 INSERT INTO DICT_STATISTICS (key,data) values (E'USER_BROWSER',E'SUser-BrowserSusercode=field(@id,\'*\',3)@ans=xlate(\'USERS\',usercode,39,\'X\')<1,6>T200');
 INSERT INTO DICT_STATISTICS (key,data) values (E'LAST_ACCESS',E'F1Last AccessS[DATETIME,4*,DOS]R101');
 INSERT INTO DICT_STATISTICS (key,data) values (E'@CRT',E'GID-SUPP BY DATE BY HOUR BY LAST_ACCESS_TIME DATE HOUR SESSION DEPARTMENT USER_CODE IP_NO DATABASE REQUESTS LAST_ACCESS_TIME0');

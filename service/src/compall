@@ -1,17 +1,14 @@
 #!/bin/bash
-
-#set -x
-#set -e
-
-echo --------------Generate all headers--------------
-compile ../???/*.cpp {HS}
-
-for MODULE in alt exo sys
-do
-        test -d ../$MODULE || continue
-
-#       cp ~/arev/$MODULE/*.cpp ../$MODULE/
-        echo --------------Compile $MODULE ------------------
-        compile ../$MODULE/*.cpp \($1\)
-done
+set -x
+set -e
+:
+: Generate all headers first
+: ==========================
+:
+compile alt exo sys {HS}
+:
+: Compile
+: =======
+:
+compile alt exo sys
 
