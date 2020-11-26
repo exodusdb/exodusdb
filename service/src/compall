@@ -11,4 +11,11 @@ compile alt exo sys {HS}
 : =======
 :
 compile alt exo sys
-
+:
+: Finished
+: ========
+:
+duration=$SECONDS
+: "$(($duration / 60)) minutes and $(($duration % 60)) seconds elapsed."
+:
+set +x

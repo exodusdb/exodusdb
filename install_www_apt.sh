@@ -16,7 +16,7 @@ test -f $EXODUS/install_www_apt.sh || ( echo Must be run in exodus install dir w
 :
 sudo apt install -y apache2 php php-xml
 sudo a2enmod rewrite ssl
-sudo systemctl restart apache2
+sudo /etc/init.d/apache2 restart
 :
 : Configure an apache site - HTTP
 : ===============================
@@ -89,7 +89,8 @@ sudo mv /tmp/exodus-ssl.conf /etc/apache2/sites-available/
 :
 sudo a2dissite 000-default default-ssl.conf
 sudo a2ensite exodus exodus-ssl
-sudo systemctl restart apache2
+#sudo systemctl restart apache2
+sudo /etc/init.d/apache2 restart
 :
 : Configure data permissions
 : ==========================

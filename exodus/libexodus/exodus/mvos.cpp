@@ -150,7 +150,8 @@ void exodus_once_func()
 	// Centos but not MacOSX if (!setlocale (LC_COLLATE, "en_US.utf8"))
 	if (!setlocale(LC_ALL, "en_US.utf8"))
 	{
-		std::cout << "Cannot setlocale LC_COLLATE to en_US.utf8" << std::endl;
+		if (!setlocale(LC_ALL, "C.UTF-8"))
+			std::cout << "Cannot setlocale LC_COLLATE to en_US.utf8" << std::endl;
 	};
 	// std::cout << std::cout.getloc().name() << std::endl;
 }
