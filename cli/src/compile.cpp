@@ -448,7 +448,6 @@ function main()
 			output(srcfilename);
 			var targetfilename=incdir ^ SLASH ^ srcfilename.field2(SLASH,-1);
 			if (osread(targetfilename) != osread(srcfilename)) {
-debug();
 				if (not srcfilename.oscopy(targetfilename)) {
 					errputl(" Error: Could not copy '" ^ srcfilename ^ "' to '" ^ targetfilename ^"'");
 				} else if (verbose) {
