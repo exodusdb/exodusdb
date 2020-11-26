@@ -48,6 +48,10 @@ sudo make install
 sudo DEBIAN_FRONTEND=noninteractive \
 apt-get -y install postgresql postgresql-client
 :
+#/etc/init.d/postgresql reload
+#sudo /etc/init.d/postgresql reload
+sudo /etc/init.d/postgresql restart
+:
 cat > /tmp/exoduspg.input << EOF
 #!/bin/bash
 
