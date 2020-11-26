@@ -106,9 +106,8 @@ chmod o+rw data/exodus
 :
 : ignore compile error on sys/server.cpp and various warnings
 cd $EXODUS/service/src
-. config
-cd sys
-../compall
+#. config
+./compall
 :
 : Setup database dict_users
 : =========================
