@@ -1583,14 +1583,15 @@ bool var::osrename(const var& newosdir_or_filename) const
 			    newosdir_or_filename.to_path_string().c_str());
 }
 
-bool var::oscopy(const var& to_osfilename) const
+bool var::oscopy(const var& to_osfile_or_dirname) const
 {
-	THISIS("bool var::oscopy(const var& to_osfilename) const")
+	THISIS("bool var::oscopy(const var& to_osfile_or_dirname) const")
 	THISISSTRING()
-	ISSTRING(to_osfilename)
+	ISSTRING(to_osfile_or_dirname)
 
 	stdfs::path frompathx(this->to_path_string().c_str());
-	stdfs::path topathx(to_osfilename.to_path_string().c_str());
+	stdfs::path topathx(to_osfile_or_dirname.to_path_string().c_str());
+	/*
 	try
 	{
 		// will not overwrite so this is redundant
@@ -1604,7 +1605,17 @@ bool var::oscopy(const var& to_osfilename) const
 	{
 		return false;
 	}
-	return true;
+	*/
+	//https://en.cppreference.com/w/cpp/filesystem/copy
+	std::error_code error_code;
+	copy(frompathx,topathx,
+		stdfs::copy_options::overwrite_existing
+		|stdfs::copy_options::recursive
+		|stdfs::copy_options::copy_symlinks,
+		error_code
+	);
+
+	return !error_code;
 }
 
 bool var::osdelete() const

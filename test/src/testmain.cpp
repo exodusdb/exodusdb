@@ -2363,6 +2363,28 @@ while trying to match the argument list '(exodus::var, bool)'
 	//assert(oconv(FM ^ "\x0035","HEX4") eq "07FE0035");
 	//assert(oconv(FM,"HEX4") eq "07FE");
 
+
+	//test copying files forced overwrite)
+    osmkdir("d1/d1");
+    oswrite("f1","d1/f1");
+    oswrite("f2","d1/f2");
+    oscopy("d1/f1","d1/f2");
+    var data;
+    osread(data,"d1/f2");
+    printl(data=="f1");
+
+	//test copying directories (recursive)
+    oswrite("f1","d1/d1/f1");
+    oscopy("d1","d2");
+    osread(data,"d2/d1/f1");
+    assert(data=="f1");
+
+    //cannot copy a directory to a file
+    assert(oscopy("d1","d2/d1/f1")==0);
+
+    osrmdir("d1",true);
+    osrmdir("d2",true);
+
 	osmkdir("testmain.1");
 	osmkdir("testmain.2");
 
