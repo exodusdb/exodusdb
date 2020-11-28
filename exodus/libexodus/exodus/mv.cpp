@@ -1626,21 +1626,13 @@ std::string intToString(int int1)
 	std::ostringstream ss;
 	ss << int1;
 	// debuggFUNCTION&& cout<<"intToString(int "<<int1<<") returns '"<<s<<"'\n";
-#ifdef NARROW_IO
-	return std::string(ss.str().begin(), ss.str().end());
-#else
 	return ss.str();
-#endif
 }
 
 // TODO ensure locale doesnt produce like 123.456,78
 // see 1997 http://www.cantrip.org/locale.html
 std::string dblToString(double double1)
 {
-	// see intToString for choice of ostringstream for implementation
-	// NB plain stringstream causes a memory leak in msvc8 before sp1
-	std::ostringstream ss;
-	ss.precision(10);
 
 	//std::cout << abs(double1) << std::endl;
 	//std::cout << double(0.000'000'001) << std::endl;
@@ -1649,13 +1641,19 @@ std::string dblToString(double double1)
 	if (std::abs(double1)<double(0.000'000'000'1))
 		return "0.0";
 
+	//fixed to precision six
+	//return std::to_string(double1);
+
+	// see intToString for choice of ostringstream for implementation
+	// NB plain stringstream causes a memory leak in msvc8 before sp1
+	std::ostringstream ss;
+	ss.precision(10);
+	ss << std::fixed;
+
 	ss << double1;
+
 	// debuggFUNCTION&& cout<<"dblToString(int "<<double1<<") returns '"<<s<<"'\n";
-#ifdef NARROW_IO
-	return std::string(ss.str().begin(), ss.str().end());
-#else
 	return ss.str();
-#endif
 }
 
 var backtrace();

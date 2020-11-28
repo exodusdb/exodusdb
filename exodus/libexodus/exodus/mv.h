@@ -1190,6 +1190,9 @@ class DLL_PUBLIC var final
 	var iconv(const char* convstr) const;
 	var iconv(const var& convstr) const;
 
+	var from_codepage(const var& codepage) const;
+	var to_codepage(const var& codepage) const;
+
 	// CLASSIC MV STRING FUNCTIONS
 	/////////////////////////////
 
@@ -1424,10 +1427,11 @@ class DLL_PUBLIC var final
 	// OS SHELL/ENVIRONMENT
 	///////////////////////
 
-	var suspend() const;
-	var osshell() const;
-	var osshellread() const;
-	var osshellwrite(const var& writestr) const;
+	bool suspend() const;
+	bool osshell() const;
+	bool osshellread(const var& oscmd);
+	bool osshellwrite(const var& oscmd) const;
+
 	bool osgetenv(const var& name);
 	bool ossetenv(const var& name) const;
 
@@ -1443,8 +1447,10 @@ class DLL_PUBLIC var final
 	void stop(const var& text DEFAULTNULL) const;
 	void abort(const var& text DEFAULTNULL) const;
 	void abortall(const var& text DEFAULTNULL) const;
+
 	var debug() const;
 	var debug(const var&) const;
+
 	var logoff() const;
 
 	// DATA MEMBERS (all private)

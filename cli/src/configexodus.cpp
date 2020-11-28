@@ -321,12 +321,12 @@ function configure_via_connection(in adminconfig, in dbname, in dbusername, in d
 			servicename^="-"^pgversion;
 
 			outputl("Stopping "^servicename^" (to update pgexodus.dll plugin) ...");
-			if (osshell("NET STOP "^servicename))
+			if (not osshell("NET STOP "^servicename))
 			{
 				outputl("Cant stop "^servicename^". Please restart it manually.");
 			} else {
 				outputl("Restarting "^servicename^" ...");
-				if (osshell("NET START "^servicename))
+				if (not osshell("NET START "^servicename))
 					outputl("Cant restart "^servicename^". Please restart it manually");
 			}
 			if (not osdelete(targetfilename))

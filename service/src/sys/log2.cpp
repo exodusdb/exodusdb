@@ -52,12 +52,17 @@ function main(in msg0, io time0) {
 
 	var entry = var().date().oconv("D2-J");
 	entry ^= sep ^ time2.oconv("MTS");
-	entry ^= time2.field(".", 2).oconv("MD20P");
+	//entry ^= time2.field(".", 2).oconv("MD20P");
 	entry ^= sep ^ (time2 - time0).oconv("MD20P");
+
+	//if ((time2 - time0).oconv("MD20P").index("e-"))
+	//	debug();
+
 	//entry:=sep:sep:sep:sep
 	entry ^= sep ^ msg0;
 
-	printl(entry);
+	//printl(entry);
+	logputl(entry);
 
 	entry ^= "\r\n";
 

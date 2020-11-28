@@ -981,12 +981,12 @@ bool var::ossetenv(const var& envvarname) const
 #endif
 }
 
-var var::suspend() const
+bool var::suspend() const
 {
 	return this->osshell();
 }
 
-var var::osshell() const
+bool var::osshell() const
 {
 	THISIS("var var::osshell() const")
 	// will be checked again by toString()
@@ -997,45 +997,46 @@ var var::osshell() const
 	int shellresult = system(this->to_cmd_string().c_str());
 	// breakon();
 
-	return shellresult;
+	return !shellresult;
 }
 
-var var::osshellread() const
+bool var::osshellread(const var& oscmd)
 {
 	THISIS("var var::osshellread() const")
 	// will be checked again by toString()
 	// but put it here so any unassigned error shows in osshell
-	THISISSTRING()
+	ISSTRING(oscmd)
 
-	var output = "";
+    // default is to return empty string in any case
+    var_str = "";
+    var_typ = VARTYP_STR;
 
 	// fflush?
 
 	//"r" means read
-	std::FILE* cmd = popen(this->to_cmd_string().c_str(), "r");
+	std::FILE* pfile = popen(oscmd.to_cmd_string().c_str(), "r");
 	// return a code to indicate program failure. but can this ever happen?
-	if (cmd == NULL)
-		return 1;
+	if (pfile == NULL)
+		return false;
 	// TODO buffer overflow check
-	char cstr1[1024] = {0x0};
-	while (std::fgets(cstr1, sizeof(cstr1), cmd) != NULL)
+	char cstr1[4096] = {0x0};
+	while (std::fgets(cstr1, sizeof(cstr1), pfile) != NULL)
 	{
 		// std::printf("%s\n", result);
 		// cannot trust that standard input is convertable from utf8
 		// output.var_str+=wstringfromUTF8((const UTF8*)result,strlen(result));
-		std::string str1 = cstr1;
-		output.var_str += std::string(str1.begin(), str1.end());
+		//std::string str1 = cstr1;
+		//output.var_str += std::string(str1.begin(), str1.end());
+		//readstr.var_str += std::string(cstr1);
+		this->var_str += cstr1;
 	}
 
-	// we are going to throw away the process termination status
-	// because we are going to return the output text
-	// int result=
-	pclose(cmd);
+	//return true if no error code
+	return !pclose(pfile);
 
-	return output;
 }
 
-var var::osshellwrite(const var& writestr) const
+bool var::osshellwrite(const var& writestr) const
 {
 	THISIS("var var::osshellwrite(const var& writestr) const")
 	// will be checked again by toString()
@@ -1052,8 +1053,8 @@ var var::osshellwrite(const var& writestr) const
 	// decided not to convert slashes here .. may be the wrong decision
 	fputs(writestr.toString().c_str(), cmd);
 
-	// return the process termination status (pity cant do this for read too)
-	return pclose(cmd);
+	// return the process termination status
+	return !pclose(cmd);
 }
 
 void var::osflush() const
@@ -1188,6 +1189,9 @@ WINDOWS-1257
 WINDOWS-1258
 */
 
+// if codepage is provided then exodus converts from the
+// specified codepage (not locale) on input to utf-8 internally
+// otherwise no conversion is performed
 bool var::osread(const var& osfilename, const var& codepage)
 {
 	THISIS("bool var::osread(const var& osfilename, const var& codepage")
@@ -1207,11 +1211,6 @@ bool var::osread(const char* osfilename, const var& codepage)
 
 	// get a file structure
 	std::ifstream myfile;
-
-	// configured to the right locale (locale provides a CodeCvt facet)
-	// imbue BEFORE opening or after flushing
-	// does this really do anything??
-	// myfile.imbue(get_locale(locale));
 
 	// open in binary (and position "at end" to find the file size with tellg)
 	myfile.open(osfilename, std::ios::binary | std::ios::in | std::ios::ate);
@@ -1289,6 +1288,29 @@ bool var::osread(const char* osfilename, const var& codepage)
 	return true;
 }
 
+var var::to_codepage(const var& codepage) const
+{
+	THISIS("bool var::to_codepage(const var& codepage="
+	       ") const")
+	THISISSTRING()
+	ISSTRING(codepage)
+
+	return boost::locale::conv::to_utf<char>(var_str, codepage);
+}
+
+var var::from_codepage(const var& codepage) const
+{
+	THISIS("bool var::from_codepage(const var& codepage="
+	       ") const")
+	THISISSTRING()
+	ISSTRING(codepage)
+
+	return boost::locale::conv::from_utf<char>(var_str, codepage);
+}
+
+// if codepage is provided (not locale) then exodus assumes internally
+// utf-8 and converts all output to the specified codepage
+// otherwise no conversion is performed
 bool var::oswrite(const var& osfilename, const var& codepage) const
 {
 	THISIS("bool var::oswrite(const var& osfilename, const var& codepage="
@@ -1298,7 +1320,6 @@ bool var::oswrite(const var& osfilename, const var& codepage) const
 
 	// get a file structure
 	std::ofstream myfile;
-	// myfile.imbue(get_locale(locale));
 
 	// delete any previous file,
 	myfile.open(osfilename.to_path_string().c_str(),
@@ -1327,6 +1348,9 @@ bool var::osbwrite(const var& osfilevar, const var& offset) const
 {
 	return this->osbwrite(osfilevar, const_cast<var&>(offset));
 }
+
+//NOTE: unlike osread/oswrite which rely on iconv codepages to do any conversion
+//osbread and osbwrite rely on the locale being passed in on the osopen stage
 
 //bool var::osbwrite(const var& osfilevar, var& offset, const bool adjust) const
 bool var::osbwrite(const var& osfilevar, var& offset) const
@@ -1453,10 +1477,14 @@ ssize_t count_excess_UTF8_bytes(std::string& str)
 	return numBytesToTruncate;
 }
 
+//NOTE if the locale is not C then any partial non-utf-8 bytes at the end (due to bytesize
+//not being an exact number of valid utf-8 code units) are trimmed off the return value
+//The new offset is changed to reflect the above and is simply increased by bytesize
+
 //var& var::osbread(const var& osfilevar, var& offset, const int bytesize, const bool adjust)
 bool var::osbread(const var& osfilevar, var& offset, const int bytesize)
 {
-	THISIS("bool var::osbread(const var& osfilevar, const int offset, const int bytesize")
+	THISIS("bool var::osbread(const var& osfilevar, var& offset, const int bytesize")
 	THISISDEFINED()
 	ISNUMERIC(offset)
 
@@ -1652,8 +1680,8 @@ const std::string var::to_path_string() const
 		var lcpart = part.lcase();
 		if (lcpart != part)
 		{
-			part.outputl("WARNING - UPPERCASE OS=");
-			part = lcpart;
+			part.errputl("WARNING - UPPERCASE OS=");
+//			part = lcpart;
 		}
 #endif
 		return part.toString() + " " + part2.toString();
@@ -1671,8 +1699,8 @@ const std::string var::to_path_string() const
 		var lcthis = this->lcase();
 		if (lcthis != (*this))
 		{
-			(*this).outputl("WARNING - UPPERCASE OS=");
-			return lcthis.convert("\\", SLASH).toString();
+			(*this).errputl("WARNING - UPPERCASE OS=");
+//			return lcthis.convert("\\", SLASH).toString();
 		}
 
 		return this->convert("\\", SLASH).toString();

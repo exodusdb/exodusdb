@@ -2,16 +2,14 @@
 
 libraryinit()
 
-function main(in cmd,out errors) {
+function main(in cmd, out errors) {
 
 	//var tempdir=std::experimental::filesystem::temp_directory_path().wstring();
 
 	var tempdir="/tmp/";
 	var tempfilename=tempdir ^ SLASH ^ rnd(99999999) ^ ".tmp";
-	var capturingcmd=cmd^" 2> " ^ tempfilename;
-	//capturingcmd.outputl("capturingcmd=");
-
-	var output=capturingcmd.osshellread();
+	var output;
+	output.osshellread(cmd^" 2> " ^ tempfilename);
 
 	errors=osread(tempfilename);
 	osdelete(tempfilename);

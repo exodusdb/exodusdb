@@ -174,24 +174,26 @@ DLL_PUBLIC var suspend(const var& command) { return command.suspend(); }
 
 // version to get return int (conventionally 0 means success, otherwise error)
 // example: if (osshell(somecommand)) { ...
-DLL_PUBLIC var osshell(const var& command) { return command.osshell(); }
+DLL_PUBLIC bool osshell(const var& command) { return command.osshell(); }
 
 // simple version to write one liner read (declare and assign in one line)
 // example: var xx=osshellread("somecommand");
-DLL_PUBLIC var osshellread(const var& command) { return command.osshellread(); }
+DLL_PUBLIC var osshellread(const var& command)
+{
+	var result;
+	result.osshellread(command);
+	return result;
+}
 
 // versions to be written like a command
 
 // example: osshellread(command,outputresult);
 // for now returns nothing since popen cannot write and tell success
-DLL_PUBLIC void osshellread(var& readstr, const var& command) { readstr = command.osshellread(); }
+DLL_PUBLIC bool osshellread(var& readstr, const var& command) { return readstr.osshellread(command); }
 
 // example: osshellwrite(command,inputforcommand);
 // for now returns nothing since popen cannot write and tell success
-DLL_PUBLIC void osshellwrite(const var& writestr, const var& command)
-{
-	command.osshellwrite(writestr);
-}
+DLL_PUBLIC bool osshellwrite(const var& writestr, const var& command) { return writestr.osshellwrite(command); }
 
 DLL_PUBLIC void stop(const var& text) { text.stop(text); }
 

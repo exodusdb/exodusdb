@@ -41,6 +41,7 @@ var bakpars;
 var vn;
 var datacfg;
 var codepage;
+var xx;
 var os;
 var ver;
 var vern;
@@ -421,9 +422,9 @@ updateversion:
 
 	call log2("*detach merges", logtime);
 	//locate 'MERGES' in @files using fm setting xx then perform 'DETACH MERGES (S)'
-	var xx;
-	if (xx.open("MERGES", "")) {
-		perform("DETACH MERGES (S)");
+	//open 'MERGES' to xx then perform 'DETACH MERGES (S)'
+	if (tt.open("MERGES", "")) {
+		perform("DELETEFILE MERGES (S)");
 	}
 
 	call log2("*get user video table if any", logtime);

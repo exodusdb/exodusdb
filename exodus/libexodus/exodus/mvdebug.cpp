@@ -219,7 +219,8 @@ var backtrace()
 		var debugfilename = objectfilename ^ ".dSYM";
 		var cmd = L"dwarfdump " ^ debugfilename ^ L" --lookup " ^ objectoffset ^
 			  L" |grep \"Line table file: \" 2> /dev/null";
-		var result = cmd.osshellread();
+		//var result = cmd.osshellread();
+		result.osshellread(cmd);
 #ifdef TRACING
 		cmd.outputl("CMD=");
 		result.outputl("RESULT=");
@@ -270,8 +271,9 @@ var backtrace()
 		if (not objfilename.osfile())
 		{
 			// loadable program
-			var temp = "which " ^ objfilename.field2(SLASH, -1);
-			temp = temp.osshellread().field("\n", 1).field("\r", 1);
+			var temp;
+			temp.osshellread("which " ^ objfilename.field2(SLASH, -1));
+			temp=temp.field("\n", 1).field("\r", 1);
 			if (temp)
 				objfilename = temp;
 			else
@@ -285,14 +287,17 @@ var backtrace()
 		var startaddress = objaddress.splice(-3, 3, "000");
 		// var temp="objdump -S --start-address=" ^ startaddress ^ " --stop-address=" ^
 		// objaddress ^ " --disassemble -l " ^ objfilename;
-		var temp = "objdump --start-address=" ^ startaddress ^ " --stop-address=" ^
-			   objaddress ^ " --disassemble -l " ^ objfilename;
+		//var temp = "objdump --start-address=" ^ startaddress ^ " --stop-address=" ^
+		//	   objaddress ^ " --disassemble -l " ^ objfilename;
 #ifdef TRACING
 		temp.errputl("");
 #endif
 
 		////////////////////////
-		temp = temp.osshellread();
+		//temp = temp.osshellread();
+		var temp;
+		temp.osshellread("objdump --start-address=" ^ startaddress ^ " --stop-address=" ^
+               objaddress ^ " --disassemble -l " ^ objfilename);
 		////////////////////////
 
 		temp.converter("\r\n", _FM_ _FM_);

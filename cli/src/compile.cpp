@@ -1098,7 +1098,7 @@ var inclusion=
 		///////////////////
 		if (verbose)
 			printl(compilecmd);
-		if (osshell(compilecmd))
+		if (not osshell(compilecmd))
 			stop();
 
 		//handle compiler output
@@ -1159,7 +1159,7 @@ var inclusion=
 						cmd^=" -manifest "^objfilename^".manifest";
 						cmd^=" -outputresource:"^objfilename^";"^(isprogram?"1":"2");
 						cmd^=" 1> nul >2 nul";
-						if (osshell(cmd)==0)
+						//if (osshell(cmd)==0)
 							osdelete(objfilename^".manifest");
 					}
 				}
