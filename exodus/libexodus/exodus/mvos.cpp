@@ -1678,7 +1678,7 @@ const std::string var::to_path_string() const
 		// in order to allow uppercase, will have to find and remove all uppercase in the
 		// old source code
 		var lcpart = part.lcase();
-		if (lcpart != part)
+		if (lcpart != part && part.substr(-3,3) != ".LK" && part.substr(-3,3) != ".OV")
 		{
 			part.errputl("WARNING - UPPERCASE OS=");
 //			part = lcpart;
@@ -1697,7 +1697,7 @@ const std::string var::to_path_string() const
 		// in order to allow uppercase, will have to find and remove all uppercase in the
 		// old source code
 		var lcthis = this->lcase();
-		if (lcthis != (*this))
+		if (lcthis != (*this) && this->substr(-3,3) != ".LK" && this->substr(-3,3) != ".OV")
 		{
 			(*this).errputl("WARNING - UPPERCASE OS=");
 //			return lcthis.convert("\\", SLASH).toString();

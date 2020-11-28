@@ -871,15 +871,18 @@ bool var::read(const var& filehandle, const var& key)
 			if (!PQgetisnull(pgresult, tuplen, 0))
 			{
 				var key = getresult(pgresult, tuplen, 0);
-				if (this->length() <= 65535)
-				{
-					if (!this->locatebyusing("AR", FM_, key, keyn))
-						this->inserter(keyn, key);
-				}
-				else
-				{
-					this->var_str.push_back(FM_);
-					this->var_str.append(key.var_str);
+				//skip metadata keys starting and ending in % eg "%RECORDS%"
+				if (key[1] != "%" && key[-1] != "%") {
+					if (this->length() <= 65535)
+					{
+						if (!this->locatebyusing("AR", FM_, key, keyn))
+							this->inserter(keyn, key);
+					}
+					else
+					{
+						this->var_str.push_back(FM_);
+						this->var_str.append(key.var_str);
+					}
 				}
 			}
 		}
@@ -4013,6 +4016,13 @@ bool var::readnext(var& key, var& valueno)
 	key = getresult(pgresult, 0, 0);
 	// key.output("key=").len().outputl(" len=");
 
+	//recursive call to skip any meta data with keys starting and ending %
+	//eg keys like "%RECORDS%" (without the quotes)
+	//similar code in readnext() and readnextrecord()
+    if (key[1] == "%" && key[-1] == "%") {
+		return readnext(key, valueno);
+	}
+
 	// vn is second column
 	// record is third column
 	if (PQnfields(pgresult) > 1)
@@ -4094,6 +4104,13 @@ bool var::readnextrecord(var& record, var& key, var& valueno)
 	// key=std::string(data,datalen);
 	key = getresult(pgresult, 0, 0);
 	// TODO return zero if no mv in select because no by mv column
+
+    //recursive call to skip any meta data with keys starting and ending %
+    //eg keys like "%RECORDS%" (without the quotes)
+	//similar code in readnext() and readnextrecord()
+    if (key[1] == "%" && key[-1] == "%") {
+        return readnextrecord(record, key, valueno);
+    }
 
 	// vn is second column
 	// valueno=var((int)ntohl(*(uint32_t*)PQgetvalue(pgresult, 0, 1)));
