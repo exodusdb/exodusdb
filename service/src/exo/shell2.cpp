@@ -8,8 +8,7 @@ function main(in cmd, out errors) {
 
 	var tempdir="/tmp/";
 	var tempfilename=tempdir ^ SLASH ^ rnd(99999999) ^ ".tmp";
-	var output;
-	output.osshellread(cmd^" 2> " ^ tempfilename);
+	var output = osshellread(cmd^" 2> " ^ tempfilename);
 
 	errors=osread(tempfilename);
 	osdelete(tempfilename);
