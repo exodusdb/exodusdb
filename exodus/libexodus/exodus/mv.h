@@ -1745,6 +1745,7 @@ public:
 	void operator=(char char1);
 };
 
+//class dim
 class DLL_PUBLIC dim
 {
 
@@ -1787,6 +1788,7 @@ class DLL_PUBLIC dim
 	// see also var::split
 	// return the number of fields
 	var split(const var& var1);
+	dim& sort(bool reverse = false);
 
 	bool read(const var& filehandle, const var& key);
 

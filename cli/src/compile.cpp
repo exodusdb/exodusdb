@@ -477,9 +477,30 @@ function main()
 
 		//expand directories into subfiles/directories
 		else if (osdir(srcfilename)) {
-			var subdir_items=srcfilename^"/"^oslist(srcfilename^"/" "*");
-			subdir_items.swapper(FM,FM^srcfilename^"/");
-			filenames.inserter(fileno+1,subdir_items);
+
+			var subdirs=oslistd(srcfilename^"/" "*");
+			dim t1;
+			if (subdirs) {
+				t1.split(subdirs);
+				subdirs = t1.sort().join();
+			    subdirs=srcfilename^"/"^subdirs;
+				subdirs.swapper(FM,FM^srcfilename^"/");
+//subdirs.outputl("subdirs=");
+				filenames.inserter(fileno+1,subdirs);
+			}
+
+			var subfiles=oslistf(srcfilename^"/" "*");
+			dim t2;
+			if (subfiles) {
+//subfiles.outputl("subfiles1=");
+				t2.split(subfiles);
+				subfiles = t2.sort().join();
+			    subfiles=srcfilename^"/"^subfiles;
+				subfiles.swapper(FM,FM^srcfilename^"/");
+//subfiles.outputl("subfiles2=");
+				filenames.inserter(fileno+1,subfiles);
+			}
+
 			nfiles=dcount(filenames,FM);
 			continue;
 		}

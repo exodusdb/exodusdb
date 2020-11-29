@@ -26,6 +26,7 @@ THE SOFTWARE.
 #pragma warning(disable : 4530)
 
 #include <cstring> //for strlen strstr
+#include <algorithm> //for dim::sort
 
 #include <exodus/mv.h>
 #include <exodus/mvexceptions.h>
@@ -47,6 +48,7 @@ dim var::split() const
 	THISIS("var var::split() const")
 	THISISSTRING()
 
+	//TODO provide a version that can split on any utf8 character
 	// should use dim's move constructor to place the array directly in place avoiding a slow
 	// deep copy and perhaps even copy/move elision to not even copy the base dim object (which
 	// contains a pointer to an array of vars)
@@ -115,6 +117,21 @@ var dim::split(const var& str1)
 	}
 
 	return nfields;
+}
+
+dim& dim::sort(bool reverse)
+{
+	//THISIS("var dim::sort(bool reverse = false)")
+
+	//note that _data[0] may be empty
+	//std::cout<<nfields<<std::endl;
+	//std::cout<<data_[0]<<std::endl;
+	if (!reverse)
+		std::sort(data_+1, data_+this->nrows_*this->ncols_+1);
+ 	else
+		std::sort(data_+1, data_+this->nrows_*this->ncols_+1, std::greater<var>());
+
+	return *this;
 }
 
 ///////////////////////////////////////////
