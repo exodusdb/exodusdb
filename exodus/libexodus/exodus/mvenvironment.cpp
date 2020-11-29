@@ -51,19 +51,19 @@ std::string mvgethostname();
 MvEnvironment::~MvEnvironment()
 {
 
-	// std::wcout<<L"MvEnvironment: Closing Definitions ... "<<std::flush;
+	// std::wcout<<"MvEnvironment: Closing Definitions ... "<<std::flush;
 	if (this->DEFINITIONS.assigned() && this->DEFINITIONS)
 	{
 		this->DEFINITIONS.close();
 	}
-	// std::wcout<<L"OK"<<std::endl;
+	// std::wcout<<"OK"<<std::endl;
 
-	// std::wcout<<L"MvEnvironment: Disconnecting DB ... "<<std::flush;
+	// std::wcout<<"MvEnvironment: Disconnecting DB ... "<<std::flush;
 	if (this->SESSION.assigned() && this->SESSION)
 	{
 		this->SESSION.close();
 	}
-	// std::wcout<<L"OK"<<std::endl;
+	// std::wcout<<"OK"<<std::endl;
 
 	// a file handle to make unique locks
 	if (processnolockfd != 0)
@@ -74,17 +74,17 @@ MvEnvironment::~MvEnvironment()
 bool MvEnvironment::init(const int threadno)
 {
 
-	// std::wcout<<L"MvEnvironment::init("<<threadno<<L")"<<std::endl;
+	// std::wcout<<"MvEnvironment::init("<<threadno<<")"<<std::endl;
 
 	// per process
-	this->ROLLOUTFILE = L"~" ^ var(threadno) ^ L".$$$";
+	this->ROLLOUTFILE = "~" ^ var(threadno) ^ ".$$$";
 	this->THREADNO = threadno;
 
 	// pretty obsolete nowadays
 	// environment variables may not be available until exported
 	// do set -p to find out exported variables instead of all
-	this->CRTWIDE.osgetenv(L"COLUMNS");
-	this->CRTHIGH.osgetenv(L"LINES");
+	this->CRTWIDE.osgetenv("COLUMNS");
+	this->CRTHIGH.osgetenv("LINES");
 	if (not this->CRTWIDE)
 		this->CRTWIDE = 80;
 	if (not this->CRTHIGH)
@@ -95,7 +95,7 @@ bool MvEnvironment::init(const int threadno)
 	var tmplockfile = "/tmp/exodus_" ^ var().oscwd().convert("/\\","__");
 	this->PROCESSNO = getprocessno(tmplockfile.toString().c_str(), &processnolockfd);
 
-	this->STATION = var(mvgethostname()).field(L".", 1);
+	this->STATION = var(mvgethostname()).field(".", 1);
 
 	return true;
 }

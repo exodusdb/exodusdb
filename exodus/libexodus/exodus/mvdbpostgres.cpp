@@ -1843,7 +1843,7 @@ inline var fileexpression(const var& mainfilename, const var& filename, const va
 	// if (filename == mainfilename)
 	//	return keyordata;
 	// else
-	return filename ^ "." ^ keyordata;
+	return filename.convert(".","_") ^ "." ^ keyordata;
 
 	// if you dont use STRICT in the postgres function declaration/definitions then NULL
 	// parameters do not abort functions
@@ -3355,7 +3355,6 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 
 	//FROM - filename and any specially related files
 	sql ^= " \nFROM\n " ^ actualfilename;
-
 
 	//JOIN - (1)?
 	if (joins.a(1))

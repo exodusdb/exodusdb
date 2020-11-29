@@ -50,6 +50,8 @@ DLL_PUBLIC int exodus_main(int exodus__argc, char* exodus__argv[], MvEnvironment
 DLL_PUBLIC var osgetenv(const var& name = "");
 DLL_PUBLIC bool osgetenv(const var& name, var& value);
 DLL_PUBLIC bool ossetenv(const var& name, const var& value);
+DLL_PUBLIC var ostempdirname();
+DLL_PUBLIC var ostempfilename();
 DLL_PUBLIC bool assigned(const var& var2);
 DLL_PUBLIC bool unassigned(const var& var2);
 DLL_PUBLIC var& transfer(var& fromvar, var& tovar);

@@ -294,7 +294,7 @@ bool ExodusFunctorBase::checkload(std::string newlibraryname, std::string newfun
 		std::cout << "mvfunctor:checkload: ko:" << newlibraryname << std::endl;
 #endif
 
-		throw MVException(L"Unable to load " ^ var(libraryfilename_));
+		throw MVException("Unable to load " ^ var(libraryfilename_));
 		return false;
 	}
 
@@ -306,7 +306,7 @@ bool ExodusFunctorBase::checkload(std::string newlibraryname, std::string newfun
 			  << std::endl;
 #endif
 
-		throw MVException(L"Unable to find function " ^ var(newfunctionname) ^ L" in " ^
+		throw MVException("Unable to find function " ^ var(newfunctionname) ^ " in " ^
 				  var(libraryfilename_));
 		return false;
 	}
@@ -383,8 +383,8 @@ bool ExodusFunctorBase::openlib(std::string newlibraryname)
 		//#endif
 		// std::cerr<<libraryfilename_<<" cannot be found or cannot be opened"<<std::endl;
 		throw MVException(var(libraryfilename_) ^
-				  L" cannot be found or cannot be linked/wrong version. Run with "
-				  L"LD_DEBUG=libs for more info");
+				  " cannot be found or cannot be linked/wrong version. Run with "
+				  "LD_DEBUG=libs for more info");
 		return false;
 	}
 
@@ -418,7 +418,7 @@ bool ExodusFunctorBase::openfunc(std::string newfunctionname)
 	dlerror();
 #endif
 
-	// var(libraryfilename_)^L" "^var(newfunctionname).outputl();
+	// var(libraryfilename_)^" "^var(newfunctionname).outputl();
 
 	// pfunction_ = (void*) dlsym((library_t) plibrary_, newfunctionname.c_str());
 	pfunction_ = (ExodusProgramBaseCreateDeleteFunction)dlsym((library_t)plibrary_,
@@ -439,7 +439,7 @@ bool ExodusFunctorBase::openfunc(std::string newfunctionname)
 
 		// std::cerr<<functionname_<<" function cannot be found in
 		// "<<libraryfilename_<<std::endl;
-		throw MVException(var(functionname_) ^ L" function cannot be found in " ^
+		throw MVException(var(functionname_) ^ " function cannot be found in " ^
 				  var(libraryfilename_));
 		return false;
 	}

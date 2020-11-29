@@ -608,6 +608,10 @@ getvalues:
 	} else if (request1 == "SELECT") {
 
 		var filename0 = request2;
+		if (not(VOLUMES)) {
+	        filename0.converter(".", "_");
+			filename0.swapper("MEDIA_TYPES", "JOB_TYPES");
+		}
 		filename = filename0.field(" ", 1);
 		var sortselect = request3;
 		var dictids = request4;

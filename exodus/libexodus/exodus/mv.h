@@ -1431,6 +1431,8 @@ class DLL_PUBLIC var final
 	bool osshell() const;
 	bool osshellread(const var& oscmd);
 	bool osshellwrite(const var& oscmd) const;
+	var ostempdirname() const;
+	var ostempfilename() const;
 
 	bool osgetenv(const var& name);
 	bool ossetenv(const var& name) const;

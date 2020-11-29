@@ -981,6 +981,17 @@ bool var::ossetenv(const var& envvarname) const
 #endif
 }
 
+var var::ostempdirname() const
+{
+	std::error_code error_code;
+	return std::string(stdfs::temp_directory_path(error_code));
+}
+
+var var::ostempfilename() const
+{
+	return std::string(std::tmpnam(nullptr));
+}
+
 bool var::suspend() const
 {
 	return this->osshell();
@@ -1295,7 +1306,8 @@ var var::to_codepage(const var& codepage) const
 	THISISSTRING()
 	ISSTRING(codepage)
 
-	return boost::locale::conv::to_utf<char>(var_str, codepage);
+	//from utf8 to codepage
+	return boost::locale::conv::from_utf<char>(var_str, codepage);
 }
 
 var var::from_codepage(const var& codepage) const
@@ -1305,7 +1317,8 @@ var var::from_codepage(const var& codepage) const
 	THISISSTRING()
 	ISSTRING(codepage)
 
-	return boost::locale::conv::from_utf<char>(var_str, codepage);
+	//to utf from codepage
+	return boost::locale::conv::to_utf<char>(var_str, codepage);
 }
 
 // if codepage is provided (not locale) then exodus assumes internally

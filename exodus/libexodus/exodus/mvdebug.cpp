@@ -82,7 +82,7 @@ class MyStackWalker : public StackWalker
 			exodus::var filetext;
 			// ALN:NOTE: .osread could itself throw exception and we will have loop :(
 			if (filetext.osread(filename))
-			//			if (filetext.osread(filename, L""))		//
+			//			if (filetext.osread(filename, ""))		//
 			//avoid to read C++ source as UTF8
 			{
 				linetext ^= ": " ^ filetext.field("\x0A", lineno).trimf(" \t");
@@ -162,7 +162,7 @@ var backtrace()
 	return sw.returnlines;
 #elif !defined(HAVE_BACKTRACE)
 	fprintf(stderr, "backtrace() not available\n");
-	return L"";
+	return "";
 #else
 
 	var internaladdresses = "";
@@ -207,8 +207,8 @@ var backtrace()
 #endif
 		// parse one string for object filename and offset
 		var onestring = var(strings[i]).trim();
-		var objectfilename = onestring.field(L" ", 2);
-		var objectoffset = onestring.field(L" ", 3);
+		var objectfilename = onestring.field(" ", 2);
+		var objectoffset = onestring.field(" ", 3);
 
 		// looking for a dwarfdump line like this:
 		// Line table file: 'steve.cpp' line 14, column 0 with start address
@@ -217,8 +217,8 @@ var backtrace()
 
 		// get a dwarfdump line containing source filename and line number
 		var debugfilename = objectfilename ^ ".dSYM";
-		var cmd = L"dwarfdump " ^ debugfilename ^ L" --lookup " ^ objectoffset ^
-			  L" |grep \"Line table file: \" 2> /dev/null";
+		var cmd = "dwarfdump " ^ debugfilename ^ " --lookup " ^ objectoffset ^
+			  " |grep \"Line table file: \" 2> /dev/null";
 		//var result = cmd.osshellread();
 		result.osshellread(cmd);
 #ifdef TRACING
@@ -382,7 +382,7 @@ var backtrace()
 		if (fp == NULL)
 		{
 			fprintf(stderr,"Failed to run command\n" );
-			return L"";
+			return "";
 		}
 
 	#ifdef TRACING
