@@ -511,9 +511,11 @@ convert:
 		// append decimal point
 		part1 ^= (conversion[1] == 'C') ? ',' : '.';
 
-		if (ndecimals > part2len)
+		if (ndecimals == part2len)
+			part1 ^= part2;
+		else if (ndecimals > part2len)
 			part1 ^= part2 ^ std::string(ndecimals - part2len, '0');
-		else if (ndecimals < part2len)
+		else /*if (ndecimals < part2len)*/
 			part1 ^= part2.substr(1,ndecimals);
 	}
 

@@ -1638,6 +1638,7 @@ std::string dblToString(double double1)
 	//std::cout << double(0.000'000'001) << std::endl;
 	//std::cout << (std::abs(double1)<double(0.000'000'001)) << std::endl;
 
+	//treat very small numbers as zero
 	if (std::abs(double1)<double(0.000'000'000'1))
 		return "0.0";
 
@@ -1647,8 +1648,8 @@ std::string dblToString(double double1)
 	// see intToString for choice of ostringstream for implementation
 	// NB plain stringstream causes a memory leak in msvc8 before sp1
 	std::ostringstream ss;
-	ss.precision(10);
-	ss << std::fixed;
+	ss.precision(14);
+	//ss << std::fixed;
 
 	ss << double1;
 

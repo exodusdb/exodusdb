@@ -989,6 +989,8 @@ var var::ostempdirname() const
 
 var var::ostempfilename() const
 {
+	//TODO replace with mkstemp
+	//https://cpp.hotexamples.com/examples/-/-/mkstemp/cpp-mkstemp-function-examples.html
 	return std::string(std::tmpnam(nullptr));
 }
 
