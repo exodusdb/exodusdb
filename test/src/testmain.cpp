@@ -501,6 +501,8 @@ function main()
 	printl();
 	m2.r(1,4,400);
 	m2.convert(VM,"]").outputl("m2=");
+	printl(m1.mv("/",m2).convert(VM,"]"));
+	printl("should be \"0.01]0.01]0]0.01\"");
 	assert(m1.mv("/",m2).convert(VM,"]")=="0.01]0.01]0]0.01");
 
 	//testing inserter
@@ -601,6 +603,16 @@ function main()
 	assert(osread(charin,testfilename));
 	//assert(charin eq charout);
 	assert(osdelete(testfilename));
+
+
+	//check conversion from and to codepages
+	test_codepage("CP437","latin");//win3
+	test_codepage("CP850","latin");//win10
+	test_codepage("CP737","greek");
+	//test_codepage("CP720","arabic");//doesnt exist so use CP1256
+	test_codepage("CP1256","arabic");//720
+	//test_codepage("CP1252","latin");
+	//test_codepage("CP1253","greek");//737
 
 	//check osread/write with and without conversion to codepages
 
@@ -2834,6 +2846,47 @@ function accrest() {
                 inputn(xx,1);
         }
         return 0;
+}
+
+function test_codepage(in codepage, in lang) {
+	printl("---------- ", lang, " ", codepage , " ----------");
+
+	var v256="";
+	for (int ii=0;ii<=255;++ii)
+		v256 ^= chr(ii);
+	oswrite(v256,"t_codep.bin");
+	assert(osfile("t_codep.bin").a(1)==256);
+
+	//convert to utf8
+	var as_utf8a=v256.from_codepage(codepage);
+	assert(as_utf8a != v256);
+	assert(as_utf8a.length() > v256.length());
+
+	//convert back to codepage
+	var as_cp=as_utf8a.to_codepage(codepage);
+	printl(as_cp.length());
+	//assert(as_cp.length()==256);
+
+	//convert to utf8 again
+	var as_utf8b=as_cp.from_codepage(codepage);
+
+	//oswrite(as_utf8a, "t_utf8a." ^ lang);
+	//oswrite(as_cp,   "t_codep." ^ lang);
+	//oswrite(as_utf8b,"t_utf8b." ^ lang);
+
+	//check loop back
+	//(only if loop back does produced 256 bytes)
+	printl(as_utf8a.substr(32));
+	printl("round trip ", as_cp == v256);
+	if (as_cp.length()==256)
+		assert(as_cp == v256);
+
+	//check double trip
+	printl("double trip ", as_utf8a == as_utf8b);
+	printl(as_utf8b.substr(32));
+	assert(as_utf8a == as_utf8b);
+
+	return 0;
 }
 
 programexit()
