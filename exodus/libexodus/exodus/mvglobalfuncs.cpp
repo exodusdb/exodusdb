@@ -562,11 +562,9 @@ DLL_PUBLIC bool disconnect() { return var().disconnect(); }
 
 DLL_PUBLIC bool createdb(const var& dbname) { return dbname.createdb(dbname); }
 
+DLL_PUBLIC bool copydb(const var& from_dbname, const var& to_dbname) { return from_dbname.copydb(from_dbname, to_dbname); }
+
 DLL_PUBLIC bool deletedb(const var& dbname) { return dbname.deletedb(dbname); }
-
-DLL_PUBLIC bool createdb(const var& dbname, var& errmsg) { return dbname.createdb(dbname, errmsg); }
-
-DLL_PUBLIC bool deletedb(const var& dbname, var& errmsg) { return dbname.deletedb(dbname, errmsg); }
 
 DLL_PUBLIC bool createfile(const var& filename)
 {

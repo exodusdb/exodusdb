@@ -182,7 +182,7 @@ function exodus_client_init() {
         alert('Sorry, your web browser does not support EXODUS.\nUse Internet Explorer 6+, Safari 3+, Firefox 3+ or Chrome 8.0+\n\nIt doesnt support' + gunsupported)
         //window.location.assign(EXODUSlocation+'wrongbrowser.htm')
         if (typeof glogin == 'undefined') {
-            window.location.assign(EXODUSlocation + '../default.htm')
+            window.location.assign(EXODUSlocation + '../index.html')
             return
         }
     }
@@ -391,7 +391,7 @@ function* exoduslogout_onclick() {
     exodussetcookie('', 'EXODUS', '', 'a')
 
     //decide where to login again
-    var newwindowlocation = '../default.htm'
+    var newwindowlocation = '../index.html'
     var system = exodusgetcookie2('', 'EXODUSsystem', null)
     if (system && system != 'ADAGENCY')
         newwindowlocation += '??' + system
@@ -857,8 +857,8 @@ function* exodusshowmodaldialog(url, arguments, dialogstyle) {
         //provide an alternative location for the child dialogWindow to get dialogArguments
         //gDialogArguments=window.opener.dialogArgumentsForChild
         //to avoid bug? in firefox where dialogArguments is always set to null when calling a modal dialog immediately on opening firefox
-        //currently only used in default.htm when being used as a modal dialog to do a login on the fly
-        //eg when accessing pages via favourites without going through default.htm first
+        //currently only used in index.html when being used as a modal dialog to do a login on the fly
+        //eg when accessing pages via favourites without going through index.html first
 
         dialogArgumentsForChild = arguments
 
@@ -1980,7 +1980,7 @@ function* exodusdblink_login(username, password, dataset, system) {
         if (!(yield* exodusyesno(question, 1))) {
 
             //switch to login window
-            exodussettimeout('window.location.assign("../default.htm")', 1)
+            exodussettimeout('window.location.assign("../index.html")', 1)
 
             //try to avoid unlocking on exit
             glocked = false
@@ -1992,7 +1992,7 @@ function* exodusdblink_login(username, password, dataset, system) {
             yield* exodusinvalid()
             failed = true
             //pity there is no way to abort script without generating an error
-            //TODO avoid showing error message in catch clause if switching to default.htm
+            //TODO avoid showing error message in catch clause if switching to index.html
             force_an_exit___please_ignore_this_message()
 
             return false
@@ -2037,7 +2037,7 @@ function* exodusdblink_login(username, password, dataset, system) {
 
             arguments[4] = datasets
 
-            url = '../default.htm'
+            url = '../index.html'
             arguments = yield* exodusshowmodaldialog(url, arguments)
 
         }
@@ -2135,7 +2135,7 @@ function* exodusdblink_send_byhttp_using_forms(data) {
 
         //var params='dialogHeight:100px; dialogWidth:200px; center:Yes; help:No; resizable:No; status:No'
         //params='dialogHeight: 201px; dialogWidth: 201px; dialogTop: px; dialogLeft: px; center: Yes; help: Yes; resizable: Yes; status: Yes;'
-        var reply = yield* exodusshowmodaldialog(EXODUSlocation + 'rs/default.htm', [this.timeout, this.request, this.data])
+        var reply = yield* exodusshowmodaldialog(EXODUSlocation + 'rs/index.html', [this.timeout, this.request, this.data])
         if (!reply) {
             this.data = ''
             this.response = ('ERROR: Request to server failed')
@@ -5258,7 +5258,7 @@ function* exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebut
         }
         if (!(imagesrc.indexOf('/') + 1 + imagesrc.indexOf('\\') + 1)) {
             imagesrc = gimagetheme + imagesrc
-            if (window.location.href.toString().indexOf('default.htm') >= 0)
+            if (window.location.href.toString().indexOf('index.html') >= 0)
                 imagesrc = imagesrc.slice(3)
         }
         html += '<img src="' + imagesrc + '" alt="" xstyle="display: none" height="32" width="32" />'

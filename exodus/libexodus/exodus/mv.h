@@ -1301,9 +1301,9 @@ class DLL_PUBLIC var final
 	/////////////////////
 
 	bool createdb(const var& dbname) const;
+	bool copydb(const var& from_dbname, const var& to_dbname) const;
 	bool deletedb(const var& dbname) const;
-	bool createdb(const var& dbname, var& errmsg) const;
-	bool deletedb(const var& dbname, var& errmsg) const;
+
 	bool createfile(const var& filename) const;
 	bool renamefile(const var& filename, const var& newfilename) const;
 	bool deletefile(const var& filename) const;

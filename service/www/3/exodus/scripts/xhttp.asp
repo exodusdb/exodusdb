@@ -236,7 +236,7 @@
         }
         catch (e) { }
 
-        var loginlocation = '../default.htm'
+        var loginlocation = '../index.html'
 
         var result
         

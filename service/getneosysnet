@@ -17,7 +17,7 @@ git clone https://git.hosts.neosys.com/gits/neosys.net/ || exit
 cd neosys.net || exit
 
 #remove some unnecessary directories completely
-rm 2 -r
+rm 2 -rf
 rm 3/{agency,finance,general,jobs,media} -r
 rm neosys/editor -rf
 rm .git .vs .vscode -rf

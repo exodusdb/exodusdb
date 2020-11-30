@@ -233,10 +233,11 @@ DLL_PUBLIC var field2(const var& instring, const var& substrx, const int fieldnx
 // DLL_PUBLIC var iconv(const var& instring, const var& conversion);
 DLL_PUBLIC bool connect(const var& connectionstring DEFAULTNULL);
 DLL_PUBLIC bool disconnect();
+
 DLL_PUBLIC bool createdb(const var& dbname);
+DLL_PUBLIC bool copydb(const var& from_dbname, const var& to_dbname);
 DLL_PUBLIC bool deletedb(const var& dbname);
-DLL_PUBLIC bool createdb(const var& dbname, var& errmsg);
-DLL_PUBLIC bool deletedb(const var& dbname, var& errmsg);
+
 DLL_PUBLIC bool createfile(const var& filename);
 DLL_PUBLIC bool deletefile(const var& filename);
 DLL_PUBLIC bool clearfile(const var& filename);

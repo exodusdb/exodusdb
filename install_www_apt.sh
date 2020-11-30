@@ -101,6 +101,8 @@ mkdir -p data
 chmod g+rws data
 mkdir -p data/exodus
 chmod o+rw data/exodus
+mkdir -p images
+chmod g+rws images
 :
 : Compile the service
 : ===================

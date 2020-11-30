@@ -1704,18 +1704,6 @@ bool var::statustrans() const
 	return (PQtransactionStatus(thread_pgconn) != PQTRANS_IDLE);
 }
 
-bool var::createdb(const var& dbname) const
-{
-	var errmsg;
-	return createdb(dbname, errmsg);
-}
-
-bool var::deletedb(const var& dbname) const
-{
-	var errmsg;
-	return deletedb(dbname, errmsg);
-}
-
 // sample code
 // var().createdb("mynewdb");//create a new database on the current thread-default connection
 // var file;
@@ -1725,28 +1713,33 @@ bool var::deletedb(const var& dbname) const
 // connectionhandle.connect("connection string pars");
 // connectionhandle.createdb("mynewdb");
 
-bool var::createdb(const var& dbname, var& errmsg) const
+bool var::createdb(const var& dbname) const
 {
-	THISIS("bool var::createdb(const var& dbname, var& errmsg)")
-	THISISDEFINED()
-	ISSTRING(dbname)
-
-	// var sql = "CREATE DATABASE "^dbname.convert(". ","__");
-	var sql = "CREATE DATABASE " ^ dbname;
-	sql ^= " WITH ENCODING='UTF8' ";
-	// sql^=" OWNER=exodus";
-
-	// TODO this shouldnt only be for default connection
-	return this->sqlexec(sql, errmsg);
+	return this->copydb(var(""),dbname);
 }
 
-bool var::deletedb(const var& dbname, var& errmsg) const
+bool var::copydb(const var& from_dbname, const var& to_dbname) const
 {
-	THISIS("bool var::deletedb(const var& dbname, var& errmsg)")
+	THISIS("bool var::createdb(const var& from_dbname, const var& to_dbname)")
+	THISISDEFINED()
+	ISSTRING(from_dbname)
+	ISSTRING(to_dbname)
+
+	var sql = "CREATE DATABASE " ^ to_dbname ^ " WITH";
+	sql ^= " ENCODING='UTF8' ";
+	if (from_dbname)
+		sql ^= " TEMPLATE " ^ from_dbname;
+
+	return this->sqlexec(sql);
+}
+
+bool var::deletedb(const var& dbname) const
+{
+	THISIS("bool var::deletedb(const var& dbname)")
 	THISISDEFINED()
 	ISSTRING(dbname)
 
-	return this->sqlexec("DROP DATABASE " ^ dbname, errmsg);
+	return this->sqlexec("DROP DATABASE " ^ dbname);
 }
 
 bool var::createfile(const var& filename) const

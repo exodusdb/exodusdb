@@ -122,7 +122,7 @@ function exodusdblink_send_byfile(data) {
     }
     catch (e) { }
 
-    var loginlocation = '../default.htm'
+    var loginlocation = '../index.html'
 
     // try
     {

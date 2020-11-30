@@ -1187,6 +1187,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	}
 	var dbname2="exodus2b";
 	var dbname3="exodus3b";
+	var dbname4="exodus4b";
 	{
 		var conn1;
 		conn1.connect( "");			// creates new connection with default parameters (connection string)
@@ -1194,6 +1195,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 		//remove any existing test databases
 		conn1.deletedb( dbname2);
 		conn1.deletedb( dbname3);
+		conn1.deletedb( dbname4);
 
 		//verify CANNOT connect to non-existent deleted database2
 		assert(not conn1.connect("dbname="^dbname2));
@@ -1303,12 +1305,24 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 		conn2.disconnect();
 		conn3.disconnect();
 
+		printl("check copy db exodus2b to exodus4b");
+		var conn4;
+		assert(conn4.copydb(dbname2,dbname4));
+		//printl(conn4.getlasterror());
+		assert(conn4.connect( "dbname="^dbname4));
+		printl("check can open table2 on copied database exodus4");
+		var table2b,table3b;
+		assert( table2b.open( "TABLE2",conn4));
+
 		printl("remove any test databases");
 		//connect to exodus first cant delete db if connected to it.
 		var conn1;
 		assert(conn1.connect("dbname=exodus"));
 		assert(conn1.deletedb(dbname2));
 		assert(conn1.deletedb(dbname3));
+		conn4.disconnect();
+		assert(conn1.deletedb(dbname4));
+
 		conn1.disconnect();
 	}
 #endif
