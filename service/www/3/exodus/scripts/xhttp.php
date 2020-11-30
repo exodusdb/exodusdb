@@ -62,17 +62,14 @@ session_start();
 //$exodusrootpath = $_SERVER['DOCUMENT_ROOT'];
 // __DIR__ = D:\\hosts\\test\\exodus.net\\3\\exodus\\scripts
 
-//on linux
-$exodusrootpath = preg_replace('!/[^/]+/3/exodus/scripts!', '/', __DIR__);
-//$exodusrootpath = preg_replace('!/exodus.net/!', '/', $exodusrootpath);
-
-//on windows
-$exodusrootpath = str_replace('3\\exodus\\scripts', '', $exodusrootpath);
-$exodusrootpath = str_replace('\\exodus.net\\', '\\', $exodusrootpath);
-
-if ($gwindows)
+if ($gwindows) {
+	//$exodusrootpath = preg_replace('!/[^/]+/3/exodus/scripts!', '/', __DIR__);
+	$exodusrootpath = str_replace('3\\exodus\\scripts', '', __DIR__);
+	$exodusrootpath = str_replace('\\exodus.net\\', '\\', $exodusrootpath);
 	$exodusrootpath = str_replace('/', '\\', $exodusrootpath);
-
+} else {
+	$exodusrootpath = $_SERVER['DOCUMENT_ROOT'];
+}
 debug("exodusrootpath : $exodusrootpath");
 
 // /var/www/html/exodus2//data/default.vol
