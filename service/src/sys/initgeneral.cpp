@@ -31,8 +31,8 @@ var dbtime;
 var dbdatetimerequired;
 var reply;
 var reply2;
-var colors;
 var tt;//num
+var colors;
 var reportkey;
 var tt2;//num
 var s33;
@@ -583,7 +583,8 @@ nextreport:
 	call log2("*update \"last used date\"", logtime);
 	if (var().date() ne lastdate) {
 		config.r(1, var().date());
-		call oswrite(config, "exodus.cfg");
+		//call OSWRITE(CONFIG,'exodus.cfg')
+		var(config).oswrite("exodus.cfg");
 	}
 
 	call log2("*check for invalid characters in workstation name", logtime);
@@ -692,9 +693,13 @@ nextreport:
 			//remove all punctuation
 			sysname.converter("!\"#$%^&*()_+-=[]{};:@,./<>?", "");
 			SYSTEM.r(57, sysname);
-			call osread(tt, "system.cfg");
+			//call osread(tt,'system.cfg')
+			if (not(tt.osread("system.cfg"))) {
+				tt = "";
+			}
 			tt.r(57, sysname);
-			call oswrite(tt, "system.cfg");
+			//call oswrite(tt,'system.cfg')
+			var(tt).oswrite("system.cfg");
 		}
 	}
 
@@ -1755,7 +1760,8 @@ nextdoc:
 				upgradelog ^= "\r\n";
 			}
 			upgradelog ^= versioninstalled;
-			call oswrite(upgradelog, "UPGRADE.CFG");
+			//call oswrite(upgradelog,'UPGRADE.CFG')
+			var(upgradelog).oswrite("upgrade.cfg");
 
 			//upgrade locally installed SYSOBJ files
 			call log2("*update sysobj $msg $rtp25", logtime);
@@ -1822,7 +1828,8 @@ nextdoc:
 
 			call log2("*indicate success to LOGIN", logtime);
 			if (SYSTEM.a(33, 10)) {
-				call oswrite("OK", SYSTEM.a(33, 10) ^ ".$2");
+				//call oswrite('OK',system<33,10>:'.$2')
+				var("OK").oswrite(SYSTEM.a(33, 10) ^ ".$2");
 			}
 
 			call log2("*chain to NET AUTO (" ^ SYSTEM.a(17) ^ ") INIT.GENERAL Quitting.", logtime);
@@ -1882,7 +1889,8 @@ subroutine failbatch() {
 	//respond to user
 	msg.swapper(FM ^ FM, FM);
 	msg.converter(FM, "|");
-	call oswrite(msg, SYSTEM.a(33, 10) ^ ".$2");
+	//call oswrite(msg,system<33,10>:'.$2')
+	var(msg).oswrite(SYSTEM.a(33, 10) ^ ".$2");
 
 	//and quit
 	perform("OFF");

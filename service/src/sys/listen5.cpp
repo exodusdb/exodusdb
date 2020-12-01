@@ -609,8 +609,8 @@ getvalues:
 
 		var filename0 = request2;
 		if (not(VOLUMES)) {
-	        filename0.converter(".", "_");
-			filename0.swapper("MEDIA_TYPES", "JOB_TYPES");
+			filename0.converter(".", "_");
+			filename0.swapper("MEDIA_TYPE", "JOB_TYPE");
 		}
 		filename = filename0.field(" ", 1);
 		var sortselect = request3;
