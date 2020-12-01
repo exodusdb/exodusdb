@@ -69,6 +69,12 @@ if ($gwindows) {
 	$exodusrootpath = str_replace('/', '\\', $exodusrootpath);
 } else {
 	$exodusrootpath = $_SERVER['DOCUMENT_ROOT'];
+	//$exodusrootpath = str_replace('/www/','',$_SERVER['DOCUMENT_ROOT']);
+	$exodusrootpath = explode('/',$_SERVER['DOCUMENT_ROOT']);
+	array_pop($exodusrootpath);
+	array_pop($exodusrootpath);
+	$exodusrootpath = implode('/',$exodusrootpath);
+	$exodusrootpath .= '/';
 }
 debug("exodusrootpath : $exodusrootpath");
 
@@ -706,13 +712,28 @@ function getdatabases($exodusrootpath, $systemcode)
 			$volfilename = $volfilename2;
 		}
 		else {
-			$response = "Cannot see vol file $volfilename or $volfilename2";
-			return "";
+			$databases = "";
+			$path = $exodusrootpath . 'data/';
+			foreach (new DirectoryIterator($path) as $file) {
+			if ($file->isDot() || !$file->isDir())
+					continue;
+				if ($databases)
+					$databases .= "*";
+				else
+					$databases = "xyz ";
+				$databases .= $file->getFilename() . "," . $file->getFilename();
+			}
+			if (!$databases) {
+				$response = "Cannot see vol file $volfilename or $volfilename2 nor any subdirs";
+				return "";
+			}
 		}
 	}
-	debug("volfilename:" . $volfilename);
-	//$databases=file_get_contents($volfilename);
-	$databases = ReadAll($volfilename);
+	if (!$databases) {
+		debug("volfilename:" . $volfilename);
+		//$databases=file_get_contents($volfilename);
+		$databases = ReadAll($volfilename);
+	}
 	if (!$databases) {
 		$response = "Vol file is empty or cannot be read $volfilename";
 		return "";

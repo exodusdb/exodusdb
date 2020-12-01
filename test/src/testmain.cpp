@@ -1440,6 +1440,7 @@ dict(AGE_IN_YEARS) {
 	--nn;
 	assert(nn.toString() eq "1.1");
 	nn--;
+	printl(nn);
 	assert(nn.toString() eq "0.1");
 	nn+=1.0;
 	assert(nn.toString() eq "1.1");

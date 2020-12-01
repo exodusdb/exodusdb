@@ -49,7 +49,9 @@ function main() {
 	USERNAME="exodus";
 
 	//database
-	var databasecode="exodus";
+	var databasecode=osgetenv("EXO_DBNAME");
+	if (not databasecode)
+		databasecode = "exodus";
 	SYSTEM.r(17,databasecode);
 
 	//process no

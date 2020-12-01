@@ -1638,23 +1638,38 @@ std::string dblToString(double double1)
 	//std::cout << double(0.000'000'001) << std::endl;
 	//std::cout << (std::abs(double1)<double(0.000'000'001)) << std::endl;
 
-	//treat very small numbers as zero
-	if (std::abs(double1)<double(0.000'000'000'1))
-		return "0.0";
-
 	//fixed to precision six
 	//return std::to_string(double1);
 
 	// see intToString for choice of ostringstream for implementation
 	// NB plain stringstream causes a memory leak in msvc8 before sp1
-	std::ostringstream ss;
-	ss.precision(14);
-	//ss << std::fixed;
+	std::ostringstream stringstream1;
+	//if precision is changed, also change testmain
+	//stringstream1.precision(16);
+	//use precision 14 to avoid 1.1-1 = 1.000000000000001
+	stringstream1.precision(14);
 
-	ss << double1;
+	std::string string1;
+	//evade scientific format for small numbers
+	if (std::abs(double1) < double(0.000'1)) {
 
-	// debuggFUNCTION&& cout<<"dblToString(int "<<double1<<") returns '"<<s<<"'\n";
-	return ss.str();
+		//treat very small numbers as zero
+		//if (std::abs(double1)<double(0.000'000'000'1))
+		//if (std::abs(double1)<double(0.000'000'000'000'001))
+		if (std::abs(double1)<double(0.000'000'000'000'1))
+			return "0.0";
+
+	    stringstream1 << std::fixed;
+	    stringstream1 << double1;
+	    string1 = stringstream1.str();
+	    while (string1.back() == '0')
+    	    string1.pop_back();
+
+	} else {
+		stringstream1 << double1;
+		string1 = stringstream1.str();
+	}
+	return string1;
 }
 
 var backtrace();
