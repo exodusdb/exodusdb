@@ -2,7 +2,7 @@
 set -x
 set -e
 :
-: Refreshes the sys source folders from the ~arev folder where the output of ADECOM is placed
+: Refreshes the service/sys source folders from the ~arev folder where the output of ADECOM is placed
 :
 : Converts EXODUS/exodus to EXODUS/exodus except neosys.com and Copyright NEOSYS
 : Does not delete any files in the target that are no longer present in the source
