@@ -1109,33 +1109,34 @@ var inclusion=
 		//compilecmd ^= " 2>&1 | tee " ^ srcfilename ^ ".err~";
 		//no tee on windows so cannot monitor output at the moment until implement popen() call it osopen(cmd)?
 		//similar tie syntax but different order
-		var compileoutputfilename=srcfilename ^ ".~";
+//		var compileoutputfilename=srcfilename ^ ".~";
 		//if (SLASH eq "/")
 		//	compilecmd ^= " 2>&1 | tee " ^ compileoutputfilename.quote();
 		//else
-			compilecmd ^= " > " ^ compileoutputfilename.quote() ^ " 2>&1";
+//			compilecmd ^= " > " ^ compileoutputfilename.quote() ^ " 2>&1";
 
 		//call the compiler
 		///////////////////
 		if (verbose)
 			printl(compilecmd);
-		var compileok=osshell(compilecmd);
+		var compileroutput;
+		var compileok=osshellread(compileroutput,compilecmd);
 		if (not compileok) {
 			ncompilationfailures++;
 		}
 
 		//handle compiler output
-		var compileroutput;
 		var startatlineno;
-		if (osread(compileroutput,compileoutputfilename)) {
+//		if (osread(compileroutput,compileoutputfilename)) {
+		{
 			//if (verbose) {
 			//	compileroutput.outputl("Compiler output:");
 			//}
 			if (compileroutput)
 				// leave for editor
 				compileroutput.outputl();
-			else
-				osdelete(compileoutputfilename);
+//			else
+//				osdelete(compileoutputfilename);
 			//leave for editor
 			//osdelete(compileoutputfilename);
 			var charn=index(compileroutput, ": error:");
