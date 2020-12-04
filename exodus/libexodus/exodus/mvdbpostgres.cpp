@@ -4220,7 +4220,7 @@ bool var::deleteindex(const var& fieldname0) const
 	if (var().sqlexec("alter table " ^ filename ^ " drop " ^ index_fieldname))
 		return true;
 
-	// delete the index
+	// delete the index.
 	// var filename=*this;
 	var sql = "drop index index__" ^ filename ^ "__" ^ fieldname;
 	bool result = this->sqlexec(sql);
