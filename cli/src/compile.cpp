@@ -1236,6 +1236,18 @@ var inclusion=
 					//if (!oscopy(objfilename,outputpathandfile))
 					//	printl("ERROR: Failed to "^cmd);
 
+
+					//save a backlink to the source code
+					var basicfilename = srcfilename.field2(SLASH,-1);
+					var backlinkfilename = outputdir ^ basicfilename;
+					var abs_srcfilename = srcfilename;
+					if (abs_srcfilename[1] != SLASH) {
+					    abs_srcfilename.splicer(1,0,oscwd() ^ SLASH);
+					}
+					if (verbose)
+					    printl("backlink " ^ backlinkfilename ^ " > " ^ abs_srcfilename);
+					oswrite(abs_srcfilename, backlinkfilename);
+
 					//delete any manifest from early versions of compile which didnt have the
 					//MANIFEST:NO option
 					//was try to copy ms manifest so that the program can be run from anywhere?

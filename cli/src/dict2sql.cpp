@@ -262,8 +262,9 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 		sourcecode.r(1,-1,"/" "*pgsql");
 		//note postgres string prefix E'...'
 		// E is required to enable \xFF hex decoding
-		sourcecode.r(1,-1,"ans:=upper(translate(" ^
-			dictfilename.convert(".","_")^"_"^fulltext_dictid^"(key,data)"^
+		//LIMIT TO 1000 characters since postgres index limit is around 2700 BYTES
+		sourcecode.r(1,-1,"ans:=upper(translate(substring(" ^
+			dictfilename.convert(".","_")^"_"^fulltext_dictid^"(key,data),0,1000)"^
 			",E'"^chars^"'" ^ ",repeat(' ',"^
 		(len(chars)+20)^")));");
 		sourcecode.r(1,-1,"*" "/");

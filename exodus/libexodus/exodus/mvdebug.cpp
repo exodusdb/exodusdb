@@ -439,7 +439,7 @@ void SIGINT_handler(int sig)
 		// output("? ");
 		var cmd;
 		// if (!cmd.input("Interrupted. (C)ontinue (E)xit (B)acktrace (A)bort ?"))
-		fprintf(stderr, "Interrupted. (C)ontinue (E)xit (B)acktrace (A)bort ?");
+		fprintf(stderr, "Interrupted. (C)ontinue (E)xit (B)acktrace (D)ebug (A)bort ?");
 		if (!cmd.input())
 			break;
 
@@ -466,6 +466,12 @@ void SIGINT_handler(int sig)
 
 			// duplicated in init and B
 			backtrace().convert(FM, "\n").outputl();
+		}
+		else if (cmd1 == "D")
+		{
+			// duplicated in init and B
+			var pid=getpid();
+			var("gdb -p " ^ pid).osshell();
 		}
 		else if (cmd1 == "A")
 		{

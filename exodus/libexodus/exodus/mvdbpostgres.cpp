@@ -4199,7 +4199,10 @@ bool var::createindex(const var& fieldname0, const var& dictfile) const
 	sql ^= dictexpression;
 	sql ^= ")";
 
-	return this->sqlexec(sql);
+	bool result = this->sqlexec(sql);
+	if (!result)
+		this->getlasterror().errputl();
+	return result;
 }
 
 bool var::deleteindex(const var& fieldname0) const
@@ -4220,7 +4223,10 @@ bool var::deleteindex(const var& fieldname0) const
 	// delete the index
 	// var filename=*this;
 	var sql = "drop index index__" ^ filename ^ "__" ^ fieldname;
-	return this->sqlexec(sql);
+	bool result = this->sqlexec(sql);
+	if (!result)
+		this->getlasterror().errputl();
+	return result;
 }
 
 /*

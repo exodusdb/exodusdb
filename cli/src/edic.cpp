@@ -162,23 +162,35 @@ function main() {
 
         var iscompilable=filename.field2(".",-1)[1].lcase() ne "h";
 
-	//search paths and convert to absolute filename
-	//similar code in edic.cpp and compile.cpp
-	if (not(osfile(filename)) and not(filename.index(SLASH))) {
-		var paths=osgetenv("CPLUS_INCLUDE_PATH").convert(";",":");
-		if (verbose)
-			paths.outputl("paths=");
-		var npaths=dcount(paths,":");
-		for (var pathn=1;pathn<npaths;pathn++) {
-			var filename2=paths.field(":",pathn) ^ "/" ^ filename;
+		//search paths and convert to absolute filename
+		//similar code in edic.cpp and compile.cpp
+		if (not(osfile(filename)) and not(filename.index(SLASH))) {
+			var paths=osgetenv("CPLUS_INCLUDE_PATH").convert(";",":");
 			if (verbose)
-				filename2.outputl("osfilename=");
-			if (osfile(filename2)) {
-				filename=filename2;
-				break;
+				paths.outputl("paths=");
+			var npaths=dcount(paths,":");
+			for (var pathn=1;pathn<npaths;pathn++) {
+				var filename2=paths.field(":",pathn) ^ "/" ^ filename;
+				if (verbose)
+					filename2.outputl("osfilename=");
+				if (osfile(filename2)) {
+					filename=filename2;
+					break;
+				}
 			}
 		}
-	}
+
+		//also look in bin and lib for backlinks to source
+		if (not(osfile(filename)) and not(filename.index(SLASH))) {
+			var filename2=osgetenv("HOME") ^ SLASH ^ "bin" ^ SLASH ^ filename;
+			if (osfile(filename2)) {
+				osread(filename,filename2);
+			} else {
+				var filename2=osgetenv("HOME") ^ SLASH ^ "lib" ^ SLASH ^ filename;
+				if (osfile(filename2))
+					osread(filename,filename2);
+			}
+		}
 
         //make absolute in case EDITOR changes current working directory
         var editcmd=editor;
