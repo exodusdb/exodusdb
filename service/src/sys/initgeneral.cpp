@@ -822,6 +822,7 @@ nextreport:
 				codepage = field2(output, " ", -1);
 			}
 		}else{
+			//en_US.UTF-8
 			call osgetenv("LANG", codepage);
 		}
 
