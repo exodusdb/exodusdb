@@ -391,8 +391,16 @@ subroutine list() {
 subroutine getcurrentversiondatetime() {
 	//get currently installed version date
 	//temp=xlate('DOS','.\general\version.dat',1,'x')
-	var temp = var("./general/version.dat").xlate("DOS", 1, "X");
+	var temp = "./general/version.dat";
 	temp.converter("/", OSSLASH);
+	temp = temp.xlate("DOS", 1, "X");
+	if (not(VOLUMES)) {
+		if (temp == "") {
+			temp = EXECPATH.osfile();
+			//19:05:55  18 NOV 2020
+			temp = temp.a(3).oconv("MTS") ^ " " ^ temp.a(2).oconv("D");
+		}
+	}
 	currentversiondatetime = temp.trim().field(" ", 2, 999).iconv("D");
 	currentversiondatetime ^= "." ^ temp.trim().field(" ", 1).iconv("MT").oconv("R(0)#5");
 	return;
