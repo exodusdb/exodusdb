@@ -431,7 +431,7 @@ void SIGINT_handler(int sig)
 	// separate our prompting onto a new line
 	var("").outputl();
 
-	for (;;)
+	while (true)
 	{
 
 		// printf ("\nInterrupted. (C)ontinue (E)nd (B)acktrace\n");
