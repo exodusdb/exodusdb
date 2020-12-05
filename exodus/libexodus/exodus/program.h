@@ -52,7 +52,7 @@
 		{                                                                                  \
 			if (exceptionx.description.length())                                       \
 				exceptionx.description.outputl();                                  \
-			if (exceptionx.description.isnum())                                        \
+			if (exceptionx.description.isnum() && exceptionx.description)          \
 				exit(exceptionx.description);                                      \
 			else                                                                       \
 				exit(1);                                                           \
