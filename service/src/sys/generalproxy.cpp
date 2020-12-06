@@ -779,6 +779,14 @@ subroutine checkoutputfileexists() {
 			}
 		}
 
+		//convert to http path
+		USER1 = SYSTEM.a(2);
+		var tt = USER1.index(OSSLASH "data" OSSLASH);
+		if (tt) {
+			USER1 = ".." OSSLASH ".." OSSLASH ^ USER1.substr(tt,999999);
+			SYSTEM.r(2, USER1);
+		}
+
 		if (USER4) {
 			USER3 ^= " " ^ USER4;
 		}

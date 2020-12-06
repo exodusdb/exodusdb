@@ -2568,6 +2568,7 @@ badwrite:
 		}
 
 		//get the printfilename in case the print program changed it
+		//multiple files may be passed back in iodat/user1 see proxy checkoutputfileexisits
 		printfilename = SYSTEM.a(2);
 		//if tracing then
 		// *print ' got it'

@@ -181,6 +181,10 @@ postuploadfail:
 				//actually mkdir2 calls md so it is the same thing
 				call shell2("mkdir " ^ fullsubfolder, errors);
 
+				if (not(VOLUMES)) {
+					call shell2("chmod a+rwx -R " ^ fullsubfolder);
+				}
+
 				//check that folder was created
 				//call subdirs(fullsubfolder:char(0),result)
 				//if result else
