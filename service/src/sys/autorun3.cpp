@@ -646,8 +646,8 @@ nextsign:
 
 			//if ucase(printfilename[-4,4])='.XLS' then
 			//locate ucase(field2(printfilename,'.',-1)) in 'XLS,CSV' using ',' setting xx then
-			tt = (field2(printfilename, ".", -1)).ucase();
-			if (tt.index("HTM") and gen.document.a(33) ne "2") {
+			tt = (field2(printfilename, ".", -1)).lcase();
+			if (tt.index("htm") and gen.document.a(33) ne "2") {
 				//insert body from file
 				body = "@" ^ printfilename;
 				subject ^= " in " ^ timetext;
@@ -755,7 +755,7 @@ subroutine exec2() {
 
 	//pass the output file in linkfilename2
 	//not good method, pass in system?
-	if (var("LIST,SELECTBATCHES").locateusing(",",USER0.a(1),xx)) {
+	if (var("LIST,SELECTJOURNALS").locateusing(",",USER0.a(1),xx)) {
 		USER1 = linkfilename2;
 	}
 

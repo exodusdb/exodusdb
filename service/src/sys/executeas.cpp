@@ -19,7 +19,7 @@ function main(in cmd, in username) {
 		origusername = USERNAME;
 		var newusername = username ^ "(" ^ USERNAME ^ ")";
 		USERNAME=(newusername);
-		}
+	}
 
 	///////////
 	execute(cmd);

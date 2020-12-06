@@ -24,7 +24,7 @@ function main(in startmode0, out starttime, out startdate, out startbuffer) {
 	startdate = var().date();
 	starttime = ostime();
 
-	//autostart in batch mode
+	//autostart in system mode
 	if (not(VOLUMES)) {
 		return 1;
 	}

@@ -503,7 +503,13 @@ nextpatch:;
 		}
 		var active = request6;
 
-		if (filename == "BATCHES") {
+		if (not(VOLUMES)) {
+			if (filename == "JOURNALS") {
+				filename = "JOURNALS";
+			}
+		}
+
+		if ((filename == "JOURNALS") or (filename == "JOURNALS")) {
 		}else{
 			gosub fileaccesscheck();
 			if (USER3) {
@@ -515,7 +521,7 @@ nextpatch:;
 		var temp = filename;
 
 		//zzz
-		if (temp == "BATCHES") {
+		if (temp == "JOURNALS") {
 			temp = "JOURNAL";
 		}
 
@@ -878,7 +884,7 @@ subroutine fileaccesscheck() {
 	USER3 = "";
 
 	var securityfilename = filename;
-	if (filename == "BATCHES") {
+	if (filename == "JOURNALS") {
 		securityfilename = "JOURNALS";
 	}
 

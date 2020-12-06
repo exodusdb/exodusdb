@@ -45,7 +45,7 @@ function main(in mode0, in subject0, in body0, in groupids0, in jobids0, in user
 	//evade c++ warning variable not used
 	if (jobids0.unassigned()) {
 		{}
-		}
+	}
 
 	if (SENTENCE.field(" ", 1) == "EMAILUSERS") {
 

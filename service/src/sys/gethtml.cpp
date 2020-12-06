@@ -160,12 +160,6 @@ function main(in mode0, out html, in compcode0="") {
 		html.splicer(-1, 1, "");
 	}//loop;
 
-	//presumably obsolete
-	//batchmode=system<33>
-	//if batchmode then
-	// swap 'file:///c:/exodus.gif' with 'http://www.neosys.com/exodus.gif' in html
-	// end
-
 	if (authorised("EDIT PRINTOUTS", xx)) {
 
 		//button

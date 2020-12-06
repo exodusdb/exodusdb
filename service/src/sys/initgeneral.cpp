@@ -267,7 +267,7 @@ function main() {
 					//maybe a long upgrade process is running
 					call note(msg);
 					if (SYSTEM.a(33)) {
-						gosub failbatch();
+						gosub failsys();
 					}
 					perform("OFF");
 					var().logoff();
@@ -314,7 +314,7 @@ function main() {
 				if (not(interactive)) {
 badversion:
 					USER4 = msg;
-					gosub failbatch();
+					gosub failsys();
 					stop();
 
 				}else{
@@ -510,9 +510,9 @@ nextreport:
 		var nusers = getauthorisation();
 		if (not nusers) {
 
-			call log2("*if batchmode then respond to response file and close", logtime);
+			call log2("*if sysmode then respond to response file and close", logtime);
 			if (SYSTEM.a(33)) {
-				gosub failbatch();
+				gosub failsys();
 				stop();
 			}
 
@@ -532,7 +532,7 @@ nextreport:
 			msg = var("4D4158494D554D20415554484F5249534544204E554D424552204F46205553455253204558434545444544").iconv("HEX2");
 			call note(msg);
 			if (SYSTEM.a(33)) {
-				gosub failbatch();
+				gosub failsys();
 			}
 			perform("OFF");
 			var().logoff();
@@ -1585,7 +1585,7 @@ adddatasetcodename:
 	if (datasetid.a(4)) {
 		if (not(datasetid.a(4).locate(cid(),xx))) {
 			USER4 = var("CANNOT USE THIS DATABASE ON THIS COMPUTER").quote();
-			gosub failbatch();
+			gosub failsys();
 			stop();
 		}
 	}
@@ -1877,7 +1877,7 @@ subroutine getsystem() {
 	return;
 }
 
-subroutine failbatch() {
+subroutine failsys() {
 	msg = USER4;
 
 	tt = "*Authorisation Failure. " ^ msg;

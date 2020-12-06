@@ -827,7 +827,7 @@ function main(in mode) {
 					}
 				}
 
-				//check ALL emails in one batch
+				//check ALL emails in one pass
 				win.is = RECORD.a(7);
 				call usersubs("VAL.EMAIL");
 				if (not(win.valid)) {

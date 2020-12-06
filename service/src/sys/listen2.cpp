@@ -982,11 +982,11 @@ validateexit2:
 
 	} else if (request1 == "RESPOND") {
 
-		//method to allow batch programs to respond and detach before finishing
+		//method to allow sys programs to respond and detach before finishing
 
-		/////////////////////////////////////////////////////////////////////
-		//VERY IMPORTANT TO AVOID LONG RUNNING BATCH PROCESSES FROM TIMING OUT
-		/////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////
+		//VERY IMPORTANT TO AVOID LONG RUNNING SYSTEM PROCESSES FROM TIMING OUT
+		//////////////////////////////////////////////////////////////////////
 		SYSTEM.r(25, "");
 
 		//determine the responsefile name from the printfilename

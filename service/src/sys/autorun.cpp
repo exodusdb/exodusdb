@@ -24,12 +24,12 @@ function main() {
 	if (not(options.index("X"))) {
 		var origuser = USERNAME;
 		var origstation = STATION;
-		var origbatchmode = SYSTEM.a(33);
+		var origsysmode = SYSTEM.a(33);
 
 		execute(sentencex ^ " (X" ^ options);
 
 		//resume being the original user and station
-		SYSTEM.r(33, origbatchmode);
+		SYSTEM.r(33, origsysmode);
 		var connection = "VERSION 3";
 		connection.r(2, origstation);
 		connection.r(3, origstation);

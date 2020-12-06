@@ -58,7 +58,7 @@ var waitfor;//num
 var waitsecs;//num
 var sleepms;//num
 var serverflagfilename;
-var origbatchmode;
+var origsysmode;
 var webpath;
 var voc;
 var inpath;
@@ -69,7 +69,7 @@ var origattr;
 var tracing;//num
 var nrequests;//num
 var timeoutsecs;//num
-var batchmode;
+var sysmode;
 var origprivilege;
 var locks;
 var onactive;//num
@@ -350,7 +350,7 @@ function main() {
 	//intranet=index(origsentence,'INTRANET',1)
 
 	//if @username='EXODUS.NET' then system<33>=1
-	origbatchmode = SYSTEM.a(33);
+	origsysmode = SYSTEM.a(33);
 
 	//webpath=field(origsentence,' ',3)
 	webpath = "";
@@ -406,9 +406,9 @@ function main() {
 	//if timeoutsecs='' then timeoutsecs=20*60;*ie 20 minutes
 
 	//force into server mode - suppress interactive messages
-	batchmode = origbatchmode;
-	if (batchmode == "") {
-		batchmode = SYSTEM.a(33);
+	sysmode = origsysmode;
+	if (sysmode == "") {
+		sysmode = SYSTEM.a(33);
 		SYSTEM.r(33, "1");
 	}
 
@@ -1197,7 +1197,7 @@ subroutine requestinit() {
 	anydata = 0;
 
 	if (request2 == "JOURNALS") {
-		request2 = "BATCHES";
+		request2 = "JOURNALS";
 		if ((request3.count("*") == 3) and (request3[-1] == "*")) {
 			request3.splicer(-1, 1, "");
 		}
@@ -2510,7 +2510,7 @@ badwrite:
 
 		//pass the output file in linkfilename2
 		//not good method, pass in system?
-		if (var("LIST,SELECTBATCHES").locateusing(",",USER0.a(1),xx)) {
+		if (var("LIST,SELECTJOURNALS").locateusing(",",USER0.a(1),xx)) {
 			USER1 = linkfilename2;
 		}
 		if (USER0.a(1).substr(1,4) == "VAL.") {
@@ -2626,7 +2626,7 @@ subroutine exit() {
 	//osdelete inpath:serverflagfilename
 
 	//get into interactive mode
-	//system<33>=origbatchmode
+	//system<33>=origsysmode
 	SYSTEM.r(33, "");
 	//call setprivilegeorigprivilege);
 	if (request1.substr(1,7) == "RESTART") {
@@ -2639,7 +2639,7 @@ subroutine exit() {
 	//break on
 
 	//esc does this
-	if ((origbatchmode or (request1 == "STOPDB")) or halt) {
+	if ((origsysmode or (request1 == "STOPDB")) or halt) {
 		//break off
 		perform("OFF");
 		var().logoff();

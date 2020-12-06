@@ -57,7 +57,7 @@ function main() {
 	//process no
 	SYSTEM.r(24,PROCESSNO);
 
-	//batch mode
+	//system mode
 	SYSTEM.r(33,1,"1");
 	//user
 	SYSTEM.r(17,"exodus");//database code

@@ -383,7 +383,7 @@ function main(in mode0, out msg) {
 		datedict = "DATE";
 		chkmodulename = "JOBS";
 
-	} else if (win.datafile == "BATCHES") {
+	} else if (win.datafile == "JOURNALS") {
 		datedict = "YEAR_PERIOD";
 		chkmodulename = "FINANCE";
 

@@ -133,7 +133,7 @@ function main(in mode) {
 		t10.swapper(VM ^ "UNPOSTING", VM ^ "JOURNAL UNPOST");
 		t10.swapper(VM ^ "POST ", VM ^ "JOURNAL POST ");
 		t10.swapper("DAYBOOK", "JOURNAL");
-		t10.swapper("JOURNAL BATCH", "JOURNAL");
+		t10.swapper("JOURNAL JOURNAL", "JOURNAL");
 		t10.swapper("RATECARDS ", "RATECARD ");
 		t10.swapper("UNITS ", "UNIT ");
 		//swap 'SUPPLIER INVOICE ACCESS' with 'MEDIA ':'SUPPLIER INVOICE ACCESS' in t10
@@ -211,42 +211,42 @@ deletetask:
 			}
 		};//taskn;
 
-		//move menus to users - detect any non-numeric and move to users 37
-		//update users without locking since this will be done really only once
-		//at first startup with the new version of programs
-		//if definitions is cleared and it reconverts then nothing will be done
-		//if userprivs<3,*,1> remains numeric ie date or datetime
-		var convkey = "CONVERTED*MENUS";
-		if (not(xx.read(DEFINITIONS, convkey))) {
-			var users;
-			if (users.open("USERS", "")) {
-				var menuorexpired = newuserprivs.a(3);
-				var tt = menuorexpired;
-				tt.converter("0123456789." ^ VM, "");
-				if (tt) {
-					//go through them one by one in case subvalued in future
-					var nusers = menuorexpired.count(VM) + 1;
-					for (var usern = 1; usern <= nusers; ++usern) {
-						var menux = menuorexpired.a(1, usern, 1);
-						if (not(menux.isnum())) {
+			/*;
+			//move menus to users - detect any non-numeric and move to users 37
+			//update users without locking since this will be done really only once
+			//at first startup with the new version of programs
+			//if definitions is cleared and it reconverts then nothing will be done
+			//if userprivs<3,*,1> remains numeric ie date or datetime
+			convkey='CONVERTED*MENUS';
+			read xx from definitions,convkey else;
+				open 'USERS' to users then;
+					menuorexpired=newuserprivs<3>;
+					tt=menuorexpired;
+					convert '0123456789.':vm to '' in tt;
+					if tt then;
+						//go through them one by one in case subvalued in future
+						nusers=count(menuorexpired,vm)+1;
+						for usern=1 to nusers;
+							menux=menuorexpired<1,usern,1>;
+							if num(menux) else;
 
-							var usercode = newuserprivs.a(1, usern);
-							var userx;
-							if (userx.read(users, usercode)) {
-								if (userx.a(34) == "") {
-									userx.r(34, menux);
-									userx.write(users, usercode);
-								}
-							}
+								usercode=newuserprivs<1,usern>;
+								read user from users,usercode then;
+									if user<34>='' then;
+										user<34>=menux;
+										write user on users,usercode;
+										end;
+									end;
 
-							newuserprivs.r(3, usern, 1, "");
+								newuserprivs<3,usern,1>='';
 
-						}
-					};//usern;
-				}
-				var().date().write(DEFINITIONS, convkey);
-			}
-		}
+								end;
+							next;
+						end;
+					write date() on definitions,convkey;
+					end;
+				end;
+			*/
 
 		if (newuserprivs ne SECURITY) {
 			call log2("*write userprivs back", logtime);
