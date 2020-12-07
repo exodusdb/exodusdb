@@ -1693,7 +1693,7 @@ const std::string var::to_path_string() const
 		// in order to allow uppercase, will have to find and remove all uppercase in the
 		// old source code
 		var lcpart = part.lcase();
-		if (lcpart != part && part.substr(-3,3) != ".LK" && part.substr(-3,3) != ".OV" && part.substr(-9) != "/DATA.CFG")
+		if (lcpart != part && part.substr(-3,3) != ".LK" && part.substr(-3,3) != ".OV" && part.substr(-9) != "/DATA.CFG" && !part.index("./data/"))
 		{
 			part.errputl("WARNING - UPPERCASE OS=");
 //			part = lcpart;

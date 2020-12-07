@@ -179,6 +179,28 @@ subroutine do_sql(in functionname_and_args, in returntype, in sql, in sqltemplat
 	var errmsg;
 	var().sqlexec(functionsql,errmsg);
 
+	//do drop function first if suggested
+	if (errmsg.index("DROP FUNCTION")) {
+
+		var dropsql="drop function " ^ functionname_and_args;
+		if (verbose)
+			dropsql.outputl();
+
+		//drop any index using the previous function
+		//TODO identify file/fields like production_orders_date_time
+		//var filename=functionname_and_args.field("_",2);
+		//var fieldname=functionname_and_args.field("_",3,99).field("(",1);
+		var filename=functionname_and_args.field("_",2,999).field("(",1);
+		var fieldname=filename.convert(LOWERCASE,"").trim("_");
+		filename=filename.convert(UPPERCASE,"").trim("_");
+		filename.deleteindex(fieldname);
+
+		var().sqlexec(dropsql,errmsg);
+		errmsg.outputl();
+
+		var().sqlexec(functionsql,errmsg);
+	}
+
 	if (errmsg) {
 		if (not verbose) {
 			//functionsql.outputl();
@@ -233,6 +255,8 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 	}
 	var sourcecode=dictrec.a(8);
 	var ismv=dictrec.a(4)[1]=="M";
+
+	var dict_returns = dictrec.a(7).substr(1,6)=="[DATE," ? "date" : "text";
 
 	//auto generate pgsql code for ..._XREF dict records (full text)
 	if (sourcecode.substr(1,11)=="CALL XREF({") {
@@ -431,7 +455,7 @@ $sqlcode
  )V0G0N";
 
 	//upload pgsql function to postgres
-	do_sql(dictfilename^"_"^dictid^"(key text, data text)","text",sql,sqltemplate);
+	do_sql(dictfilename^"_"^dictid^"(key text, data text)",dict_returns,sql,sqltemplate);
 
 	// delete calc_fields
 
