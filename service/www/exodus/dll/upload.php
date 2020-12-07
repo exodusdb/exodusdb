@@ -107,6 +107,7 @@ if (! is_dir($target_dir) && ! mkdir($target_dir,0774,true)) {
 if (move_uploaded_file($tmpfilename, $target_path)) {
     //echo "The file ".  basename( $_FILES['filedata']['name'])." has been uploaded";
 	//ob_start();
+	chmod($target_path,0666);
     header('Location: '.$redirect_url,true,302);
     //ob_end_flush();
     //die();
