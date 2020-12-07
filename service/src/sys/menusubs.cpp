@@ -21,7 +21,7 @@ function main(in mode, io tx, in arg3, io arg4, in arg5) {
 
 	} else if (mode == "ADDMENU") {
 
-		#define menu arg3
+		var mainmenu = arg3;
 		if (arg4.unassigned()) {
 			id = "";
 		}else{
@@ -33,17 +33,17 @@ function main(in mode, io tx, in arg3, io arg4, in arg5) {
 
 		//use menu title as menu id
 		if (not id) {
-			id = var(menu).ucase();
+			id = mainmenu.ucase();
 			id.converter("_", "");
 		}
 
 		//convert _x to <u>x</u> to indicate keyboard shortcut
-		var tt = var(menu).index("_");
+		var tt = mainmenu.index("_");
 		if (tt) {
-			var(menu).splicer(tt, 2, "<u>" ^ var(menu)[tt + 1] ^ "</u>");
+			mainmenu.splicer(tt, 2, "<u>" ^ mainmenu[tt + 1] ^ "</u>");
 		}
 
-		tx ^= FM ^ "<a id=\"menu_" ^ id ^ "\">" ^ menu ^ "</a>";
+		tx ^= FM ^ "<a id=\"menu_" ^ id ^ "\">" ^ mainmenu ^ "</a>";
 		tx ^= FM ^ "<div class=\"menu\">";
 
 		id = "";
