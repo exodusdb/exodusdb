@@ -1590,6 +1590,38 @@ lock:
 	var locked = file.lock(keyx);
 	if (locked || (allowduplicate && locked eq ""))
 	{
+
+        //also check that there is no unexpired lock in LOCKS files
+        // on the same connection as file
+        var locks;
+        if (locks.open("LOCKS",file)) {
+
+            var lockfilekey = filename ^ "*" ^ keyx;
+            var lockrec;
+            if (lockrec.read(locks, lockfilekey)) {
+
+                //current dos time
+                //convert to Windows based date/time (ndays since 1/1/1900)
+                //31/12/67 in rev date() format equals 24837 in windows date format
+                var dostime = var().ostime();
+                dostime = 24837 + var().date() + dostime / 24 / 3600;
+
+                //remove lock if expired
+                if (lockrec.a(1) <= dostime) {
+                    locks.deleterecord(lockfilekey);
+                    lockrec = "";
+                }
+
+                //or release any absolute lock
+                //and return indication of lock failure
+                else {
+                    if (locked)
+                        file.unlock(keyx);
+                    return 0;
+                }
+            }
+        }
+
 		return 1;
 	}
 	else
