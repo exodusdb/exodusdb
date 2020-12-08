@@ -1,6 +1,9 @@
 #include <exodus/library.h>
 libraryinit()
 
+var logfilename;
+var logfilelength;//num
+var temposfilename83;
 var logfile;
 var datax;
 var time2;//num
@@ -15,19 +18,27 @@ function main(in msg0, io time0) {
 
 	#define sep " "
 
-	//logfilename=field(FIELD2(@rollout.file,'\',-1),'.',1):'.LOG'
-	var logfilename = ROLLOUTFILE;
-	logfilename.splicer(-3, 3, "log");
-	var logfilelength = logfilename.osfile().a(1);
-	if (not logfilelength) {
-		call oswrite("", logfilename);
-	}
-	var temposfilename83 = logfilename;
-	if (not(logfile.osopen(logfilename))) {
-		return 0;
+	if (VOLUMES) {
+		//logfilename=field(FIELD2(@rollout.file,'\',-1),'.',1):'.LOG'
+		logfilename = ROLLOUTFILE;
+		logfilename.splicer(-3, 3, "log");
+		logfilelength = logfilename.osfile().a(1);
+		if (not logfilelength) {
+			call oswrite("", logfilename);
+		}
+		temposfilename83 = logfilename;
+		if (not(logfile.osopen(logfilename))) {
+			return 0;
+		}
+	}else{
+		logfile = "";
 	}
 
 	if (msg0 == "GETLASTLOG") {
+
+		if (not(VOLUMES)) {
+			return "";
+		}
 
 		//try multiple start points in case hit middle of multibyte character
 		for (var ptr = logfilelength - 1024; ptr <= logfilelength - 1021; ++ptr) {
@@ -50,10 +61,13 @@ function main(in msg0, io time0) {
 		time0 = time2;
 	}
 
-	var entry = var().date().oconv("D2-J");
-	entry ^= sep ^ time2.oconv("MTS");
-	//entry:=field(time2,'.',2) 'MD20P'
-	entry ^= sep ^ (time2 - time0).oconv("MD20P");
+	var entry = "";
+	if (VOLUMES) {
+		entry ^= var().date().oconv("D2-J");
+		entry ^= sep ^ time2.oconv("MTS") ^ sep;
+		//entry:=field(time2,'.',2) 'MD20P'
+	}
+	entry ^= (time2 - time0).oconv("MD20P");
 	//entry:=sep:sep:sep:sep
 	entry ^= sep ^ msg0;
 
@@ -63,8 +77,10 @@ function main(in msg0, io time0) {
 
 	time0 = time2;
 
-	call osbwrite(entry, logfile,  logfilelength);
-	logfile.osclose();
+	if (logfile) {
+		call osbwrite(entry, logfile,  logfilelength);
+		logfile.osclose();
+	}
 
 	return 0;
 }

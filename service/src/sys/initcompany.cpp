@@ -163,13 +163,14 @@ function main(in nextcompanycode) {
 	if (not(ndec.readv(gen.currencies, gen.company.a(3), 3))) {
 		ndec = 2;
 	}
-	BASEFMT = "MC";
-	//LOCATE COMPANY<22> IN '1,000.00,1000.00' using ',' SETTING TEMP THEN MD='MD'
-	if (var("1,000.00|1000.00").locateusing("|",gen.company.a(22),temp)) {
-		BASEFMT = "MD";
+	//default to dot for decimal point
+	BASEFMT = "MD";
+	//optional comma for decimal point
+	if (var("1.000,00|1000,00").locateusing("|",gen.company.a(22),temp)) {
+		BASEFMT = "MC";
 	}
 	BASEFMT ^= ndec ^ "0P";
-	//LOCATE COMPANY<22> IN '1,000.00,1.000,00' using ',' SETTING TEMP THEN MD:=','
+	//optional comma to indicate delimiting of thousands (with comma MD OR dot MC)
 	if (var("1,000.00|1.000,00").locateusing("|",gen.company.a(22),temp)) {
 		BASEFMT ^= ",";
 	}

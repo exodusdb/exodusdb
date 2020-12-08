@@ -83,7 +83,7 @@ lockit:
 
 	var tryn = 1;
 tryagain:
-	if (not(lockrecord("", lockfile, lockkey, "", 0, allowduplicate))) {
+	if (not(lockrecord(lockfilename, lockfile, lockkey, "", 0, allowduplicate))) {
 		var lockholder = (lockfilename ^ "*" ^ lockkey).xlate("LOCKS", 4, "X");
 		if (lockholder == "") {
 			lockholder = "Someone, maybe you,";
