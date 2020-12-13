@@ -2532,7 +2532,7 @@ var var::xlate(const var& filename, const var& fieldno, const char* mode) const
 		// field no 0 returns key
 		response ^= key;
 	}
-
+//response.convert(FM^VM,"^]").outputl("RESPONSE=");
 	return response;
 }
 

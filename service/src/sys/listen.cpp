@@ -557,6 +557,8 @@ nextsearch:
 
 nextsearch0:
 ////////////
+	var().clearcache();
+
 	//restore the program stack
 	//call programstackstack);
 
@@ -2917,10 +2919,12 @@ subroutine lockit() {
 	code = 5;
 	nextbfs = "";
 	handle = file;
+
 	//<AREV>
 	//handle=handle[-1,'B':vm]
 	handle = field2(handle, VM, -1);
 	//</AREV>
+
 	keyorfilename = keyx;
 	fmc = 2;
 	gosub lockit2(code, nextbfs, handle, keyorfilename, fmc, state);
@@ -2936,7 +2940,9 @@ subroutine unlockit() {
 
 subroutine lockit2(in code, in nextbfs, io handle, in keyorfilename, in fmc, io state) {
 
+	//called from lockit and unlockit
 	call rtp57(code, nextbfs, handle, keyorfilename, fmc, xx, state);
+
 	return;
 }
 

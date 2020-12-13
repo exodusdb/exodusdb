@@ -23,7 +23,6 @@ THE SOFTWARE.
 #include <exodus/program.h>
 programinit()
 
-
 function main() {
 
         printl("Exodus Copyright (c) 2009 steve.bush@neosys.com");

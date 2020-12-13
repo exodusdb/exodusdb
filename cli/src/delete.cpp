@@ -1,6 +1,4 @@
-
 #include <exodus/program.h>
-
 programinit()
 
 function main() {
@@ -9,8 +7,6 @@ function main() {
 
         var itemids=remove(COMMAND,1,0,0);
         remover(itemids,1,0,0);
-
-        var silent=index(ucase(OPTIONS),"S");
 
         if (not filename or not itemids)
                 abort("Syntax is 'delete filename itemid ... (S=Silent)'");
@@ -27,19 +23,17 @@ function main() {
 
                 if (itemid=="*") {
                         clearfile(file);
-                        if (not silent)
-                                printl("All records deleted");
+                        printl("All records deleted");
                         stop();
                 }
 
                 if (deleterecord(file,itemid))
                         ++ndeleted;
-                else if (not silent)
+                else
                         printl(quote(itemid)^" does not exist.");
         } while (sep);
 
-        if (not silent)
-                printl(ndeleted^" record(s) deleted.");
+        printl(ndeleted^" record(s) deleted.");
 	return 0;
 }
 

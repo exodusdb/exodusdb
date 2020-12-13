@@ -41,6 +41,7 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 	//perform the select (stage 1 of possibly two stages)
 	//any fields requiring calculation that cannot be done by the database
 	//will be put skipped and put aside in CURSOR.r(10) for stage 2
+
 	if (!CURSOR.select(sortselectclause))
 		return false;
 
@@ -1157,6 +1158,11 @@ var ExodusProgramBase::xlate(const var& filename, const var& key, const var& fie
 		results.r(keyn, keyx.xlate(filename, fieldno_or_name, mode));
 	}
 
+	if (nkeys>1)
+        results.converter(_FM_,_VM_);
+    //else
+    //    sep = _RM_;
+
 	return results;
 }
 
@@ -1594,7 +1600,7 @@ lock:
         //also check that there is no unexpired lock in LOCKS files
         // on the same connection as file
         var locks;
-        if (locks.open("LOCKS",file)) {
+        if (filename.assigned() && locks.open("LOCKS",file)) {
 
             var lockfilekey = filename ^ "*" ^ keyx;
             var lockrec;

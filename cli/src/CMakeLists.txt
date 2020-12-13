@@ -38,7 +38,7 @@ add_executable(dict2sql dict2sql.cpp)
 add_executable(list list.cpp printtx.hpp)
 add_executable(listfiles listfiles.cpp)
 add_executable(listdict listdict.cpp)
-add_executable(listindexes listindexes.cpp)
+add_executable(listindex listindex.cpp)
 add_executable(testsort testsort.cpp)
 add_executable(configexodus configexodus.cpp)
 
@@ -71,7 +71,7 @@ target_link_libraries(exodus-cli exodus stdc++fs ${LIBS})
 target_link_libraries(list exodus stdc++fs ${LIBS})
 target_link_libraries(listfiles exodus stdc++fs ${LIBS})
 target_link_libraries(listdict exodus stdc++fs ${LIBS})
-target_link_libraries(listindexes exodus stdc++fs ${LIBS})
+target_link_libraries(listindex exodus stdc++fs ${LIBS})
 target_link_libraries(testsort exodus stdc++fs ${LIBS})
 target_link_libraries(configexodus exodus stdc++fs ${LIBS})
 
@@ -93,7 +93,7 @@ exodus-cli
 list
 listfiles
 listdict
-listindexes
+listindex
 testsort
 configexodus
  DESTINATION bin)

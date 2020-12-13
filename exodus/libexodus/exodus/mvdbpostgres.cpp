@@ -3090,8 +3090,21 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 			{
 				//op = "<>";
 				//value = "''";
+
+				//remove conversion to date
 				dictexpression.replacer("^exodus_extract_date\\(","exodus_extract_text\\(");
+				dictexpression.replacer("^exodus_extract_datetime\\(","exodus_extract_text\\(");
+
+				//remove conversion to array
+				//eg string_to_array(exodus_extract_text(JOBS.data,6, 0, 0), chr(29),'')
+				if (dictexpression.substr(1,16) == "string_to_array(") {
+					dictexpression.splicer(1,16,"");
+					dictexpression.splicer(-13,"");
+				}
+
+				//currently tobool requires only text input
 				dictexpression="exodus_tobool("^dictexpression^")";
+
 			}
 			// missing op means =
 			// WITH CLIENT_TYPE "X"

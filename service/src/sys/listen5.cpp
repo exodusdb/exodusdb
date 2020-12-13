@@ -454,7 +454,6 @@ nextpatch:;
 		logx.swapper("%3E", "&gt;");
 
 	} else if (request1 == "PROCESSINIT") {
-
 		//put username and database on the bottom line of the screen
 		var username = USERNAME.trim();
 	//username=rnd(1000000)

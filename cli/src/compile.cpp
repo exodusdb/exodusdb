@@ -1,5 +1,4 @@
 #include <exodus/program.h>
-
 programinit()
 
 //.def file is one way on msvc to force library function names to be "undecorated"

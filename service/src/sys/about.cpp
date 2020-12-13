@@ -37,7 +37,7 @@ function main() {
 		l30 = "";
 		colsep = "   ";
 	}
-	text = "Copyright EXODUS Software. All rights reserved.";
+	text = "Copyright NEOSYS Software. All rights reserved.";
 	text ^= FM ^ FM ^ oconv("Module", l20) ^ colsep ^ oconv("Build date", l30);
 	//text:='Year 2000' l10
 

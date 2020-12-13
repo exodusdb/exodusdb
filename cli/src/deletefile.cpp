@@ -5,7 +5,8 @@ function main() {
 
 
         var filenames=COMMAND.field(FM,2,999999);
-        var silent=index(ucase(OPTIONS),"S");
+
+		var result = 0;
 
         if (not filenames)
                 stop("Syntax is deletefile filename filename ...\ndict files are named dict_filename");
@@ -15,16 +16,14 @@ function main() {
 
                 var filename=filenames.a(filen);
                 if (deletefile(filename)) {
-                        if (not silent)
-                                print("Deleted ");
+                        print("Deleted ");
                 } else {
-                        if (not silent)
-                                print("Cannot delete ");
+                        errput("Cannot delete ");
+                        result = 1;
                 }
-                if (not silent)
-                        printl(filename);
+                printl(filename);
         }
-	return 0;
+	return result;
 }
 
 programexit()

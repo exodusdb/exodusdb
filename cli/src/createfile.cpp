@@ -5,7 +5,6 @@ function main()
 {
 
         var filenames=COMMAND.field(FM,2,999999);
-        var silent=index(ucase(OPTIONS),"S");
 
         if (not filenames) {
                 stop("Syntax is createfile filename filename ...\ndict files are named dict_filename");
@@ -16,14 +15,11 @@ function main()
                 var filename=filenames.a(filen);
 
                 if (createfile(filename)) {
-                        if (not silent)
-                                print("Created ");
+                        print("Created ");
                 } else {
-                        if (not silent)
-                                print("Cannot create ");
+                        print("Cannot create ");
                 }
-                if (not silent)
-                        printl(filename);
+                printl(filename);
 
         }
         return 0;

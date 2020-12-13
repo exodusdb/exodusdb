@@ -12,7 +12,7 @@ function* form_postinit() {
             gwhatsnew = 'file:///' + gwhatsnew
         else {
             //gwhatsnew = '..' + gwhatsnew.slice(gwhatsnew.indexOf('\\data\\'))
-            gwhatsnew = '..' + gwhatsnew.slice(gwhatsnew.replace('\\','/').indexOf('/data/'))
+            //gwhatsnew = '..' + gwhatsnew.slice(gwhatsnew.replace('\\','/').indexOf('/data/'))
         }
         exodussetcookie(glogincode, 'EXODUS2', '', 'wn')
         exodussetcookie(glogincode, 'EXODUS2', gwhatsnew, 'wn2')

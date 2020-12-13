@@ -19,7 +19,7 @@ cd neosys.net || exit
 #remove some unnecessary directories completely
 rm 2 -rf
 rm 3/{agency,finance,general,jobs,media} -r
-rm neosys/editor -rf
+#rm neosys/editor -rf
 rm .git .vs .vscode -rf
 
 #remove some unnecessary files

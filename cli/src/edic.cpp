@@ -136,7 +136,8 @@ function main() {
     }
 
     //editor="vi";
-    editor.swapper("nano ", "nano --const --nowrap --autoindent --suspend +$LINENO ");
+    editor.swapper("nano ", "nano --positionlog --const --nowrap --autoindent --suspend +$LINENO ");
+    //editor.swapper("nano ", "nano --positionlog --const --nowrap --autoindent --suspend --speller=compile +$LINENO ");
 
     if (editor.index("nano"))
         printl("http://www.nano-editor.org/dist/v2.1/nano.html");

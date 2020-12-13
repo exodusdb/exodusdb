@@ -705,6 +705,7 @@ function getdatabases($exodusrootpath, $systemcode)
 	//$gdatalocation = $exodusrootpath . "/data/";
 	global $gdatalocation;
 	//$volfilename=$gdatalocation . $systemcode . '.vol';
+	$databases = '';
 	$volfilename = $exodusrootpath . "EXODUS/" . $systemcode . '.VOL';
 	if (!is_file($volfilename)) {
 		$volfilename2 = $exodusrootpath . 'data/default.vol';
@@ -712,7 +713,6 @@ function getdatabases($exodusrootpath, $systemcode)
 			$volfilename = $volfilename2;
 		}
 		else {
-			$databases = "";
 			$path = $exodusrootpath . 'data/';
 			foreach (new DirectoryIterator($path) as $file) {
 			if ($file->isDot() || !$file->isDir())

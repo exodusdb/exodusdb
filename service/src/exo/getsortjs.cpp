@@ -24,7 +24,7 @@ function main(io tx) {
                 t2 = "M/d/yyyy";
         }
 
-        tx.swapper("//gdateformat=\'d/M/yyy\'", "gdateformat=\'" ^ t2 ^ "\'");
+        tx.swapper("gdateformat='d/M/yyyy'", "gdateformat='" ^ t2 ^ "'");
 
         return 0;
 
@@ -34,7 +34,7 @@ function getvogonpoetry() {
 
 return R"V0G0N(
 <script type="text/javascript">
-//gdateformat='d/M/yyyy'
+gdateformat='d/M/yyyy'
 function sorttable(event)
 {
  if (document.body.getAttribute('contenteditable'))

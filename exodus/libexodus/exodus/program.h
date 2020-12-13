@@ -14,11 +14,13 @@
 
 #undef subroutine
 #undef function
-#define subroutine                                                                                 \
-      public:                                                                                      \
+
+#define subroutine                                                                 \
+    public:                                                                        \
 	void
-#define function                                                                                   \
-      public:                                                                                      \
+
+#define function                                                                   \
+    public:                                                                        \
 	var
 
 // a program is just a class with an following
@@ -29,61 +31,62 @@
 // program.h programexit
 // exodusmacros.h libraryexit()
 
-#define programexit()                                                                              \
-	classexit() int main(int exodus__argc, char* exodus__argv[])                               \
-	{                                                                                          \
-		MvEnvironment mv;                                                                  \
-		exodus_main(exodus__argc, exodus__argv, mv);                                       \
-		try                                                                                \
-		{                                                                                  \
-			ExodusProgram exodusprogram1(mv);                                          \
-			return exodusprogram1.main();                                              \
-		}                                                                                  \
-		catch (MVStop exceptionx)                                                          \
-		{                                                                                  \
-			if (exceptionx.description.length())                                       \
+//OPTION I=Ignore causes error exit to be suppressed
+#define programexit()                                                              \
+	classexit() int main(int exodus__argc, char* exodus__argv[])                   \
+	{                                                                              \
+		MvEnvironment mv;                                                          \
+		exodus_main(exodus__argc, exodus__argv, mv);                               \
+		try                                                                        \
+		{                                                                          \
+			ExodusProgram exodusprogram1(mv);                                      \
+			return OPTIONS.index("I") ? 0 : exodusprogram1.main().toInt();         \
+		}                                                                          \
+		catch (MVStop exceptionx)                                                  \
+		{                                                                          \
+			if (exceptionx.description.length())                                   \
 				exceptionx.description.outputl();                                  \
-			if (exceptionx.description.isnum())                                        \
-				exit(exceptionx.description);                                      \
-			else                                                                       \
+			if (exceptionx.description.isnum())                                    \
+				exit(OPTIONS.index("I") ? 0 : exceptionx.description.toInt());     \
+			else                                                                   \
 				exit(0);                                                           \
-		}                                                                                  \
-		catch (MVAbort exceptionx)                                                         \
-		{                                                                                  \
-			if (exceptionx.description.length())                                       \
+		}                                                                          \
+		catch (MVAbort exceptionx)                                                 \
+		{                                                                          \
+			if (exceptionx.description.length())                                   \
 				exceptionx.description.outputl();                                  \
 			if (exceptionx.description.isnum() && exceptionx.description)          \
 				exit(exceptionx.description);                                      \
-			else                                                                       \
-				exit(1);                                                           \
-		}                                                                                  \
-		catch (MVAbortAll exceptionx)                                                      \
-		{                                                                                  \
-			if (exceptionx.description.length())                                       \
+			else                                                                   \
+				exit(OPTIONS.index("I") ? 0 : 1);                                  \
+		}                                                                          \
+		catch (MVAbortAll exceptionx)                                              \
+		{                                                                          \
+			if (exceptionx.description.length())                                   \
 				exceptionx.description.outputl();                                  \
-			if (exceptionx.description.isnum())                                        \
-				exit(exceptionx.description);                                      \
-			else                                                                       \
-				exit(2);                                                           \
-		}                                                                                  \
-		catch (MVException exceptionx)                                                     \
-		{                                                                                  \
-			printl(exceptionx.description, " - Aborting.");                            \
-			printl(exceptionx.stack.convert(FM, "\n"));                                \
-			exit(999);                                                                 \
-		}                                                                                  \
-		return 0;                                                                          \
+			if (exceptionx.description.isnum())                                    \
+				exit(OPTIONS.index("I") ? 0 : exceptionx.description.toInt());     \
+			else                                                                   \
+				exit(OPTIONS.index("I") ? 0 : 2);                                  \
+		}                                                                          \
+		catch (MVException exceptionx)                                             \
+		{                                                                          \
+			printl(exceptionx.description, " - Aborting.");                        \
+			printl(exceptionx.stack.convert(FM, "\n"));                            \
+			exit(OPTIONS.index("I") ? 0 : 999);                                    \
+		}                                                                          \
+		return 0;                                                                  \
 	}
 
 // same as programexit but no try/catch block so can go into a debugger
-#define debugprogramexit()                                                                         \
-	classexit() int main(int exodus__argc, char* exodus__argv[])                               \
-	{                                                                                          \
-		MvEnvironment mv;                                                                  \
-		exodus_main(exodus__argc, exodus__argv, mv);                                       \
-		ExodusProgram exodusprogram1(mv);                                                  \
-		int result = exodusprogram1.main();                                                \
-		print("Debugging. Program finished. Press Enter");                                 \
-		input();                                                                           \
-		return result;                                                                     \
+#define debugprogramexit()                                                         \
+	classexit() int main(int exodus__argc, char* exodus__argv[])                   \
+	{                                                                              \
+		MvEnvironment mv;                                                          \
+		exodus_main(exodus__argc, exodus__argv, mv);                               \
+		ExodusProgram exodusprogram1(mv);                                          \
+		int result = exodusprogram1.main();                                        \
+		print("Debugging. Program finished. Press Enter");                         \
+		input();                                                                   \
+		return result;                                                             \
 	}

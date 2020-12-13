@@ -14,10 +14,10 @@ set -e
 :
 if ! test -f ./getarev ; then echo must be run in service/src ; exit; fi
 :
-: A function to change all EXODUS/exodus to EXODUS/exodus in all text - except neosys.com
-: =======================================================================================
+: A function to change all N_E_OSYS/n_e_osys to EXODUS/exodus in all text - except neosys.com
+: ===========================================================================================
 :
-function convexodus2exodus {
+function conv_n_e_osys2exodus {
 	find ./$1 -type f -exec sed -i 's#neosys#exodus#g' {} \;
 	find ./$1 -type f -exec sed -i 's#exodus\.com#neosys.com#g' {} \;
 	find ./$1 -type f -exec sed -i 's#NEOSYS#EXODUS#g' {} \;
@@ -27,6 +27,7 @@ function convexodus2exodus {
     find ./$1 -type f -exec sed -i 's#batch#journal#g' {} \;
     find ./$1 -type f -exec sed -i 's#BATCHES#JOURNALS#g' {} \;
     find ./$1 -type f -exec sed -i 's#BATCH#JOURNAL#g' {} \;
+    find ./$1 -type f -exec sed -i 's#Batch#Journal#g' {} \;
 }
 :
 : Get dictionary SQL from arev
@@ -44,7 +45,7 @@ cp -a ~/arev/data/DICTDEFI.SQL sql/dict_definitions.sql
 : Convert all NEOSYS to EXODUS in sql
 : ===================================
 :
-convexodus2exodus sql
+conv_n_e_osys2exodus sql
 :
 #: Get all .cpp and .h files from ~/arev/sys
 : Get all .cpp from ~/arev/sys
@@ -55,9 +56,6 @@ do
 	mkdir -p  ./$MODULE
 	#cp ~/arev/$MODULE/*.cpp ~/arev/$MODULE/*.h ./$MODULE/
 	cp ~/arev/$MODULE/*.cpp ./$MODULE/
-:   Convert all EXODUS to EXODUS
-	convexodus2exodus $MODULE
-#	compile ../$MODULE/*.cpp {S}
 done
 :
 : Create any .h headers in ~/inc
