@@ -66,7 +66,7 @@ compile sys {HS}
 : Compile
 : =======
 :
-compile sys
+: compile sys
 :
 : Finished
 : ========
