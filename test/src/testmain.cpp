@@ -838,13 +838,27 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	var xx3="1234.5678";
 	assert(xx3+1==1235.5678);
 
+	assert(oconv("","MD20P")=="");
+	assert(oconv("X","MD20P")=="X");
+	assert(oconv("0","MD20P")=="0.00");
+	assert(oconv("0.0","MD20P")=="0.00");
+	assert(oconv("00.00","MD20P")=="0.00");
+	assert(oconv("000","MD20P")=="0.00");
+
+	assert(oconv("","MD20PZ")=="");
+	assert(oconv("X","MD20PZ")=="X");
+	assert(oconv("0","MD20PZ")=="");
+	assert(oconv("0.0","MD20PZ")=="");
+	assert(oconv("00.00","MD20PZ")=="");
+	assert(oconv("000","MD20PZ")=="");
+
 	assert(oconv(xx3,"MD20P")=="1234.57");
 	assert(oconv(1234.567,"MD20P")=="1234.57");
 	assert(oconv("1234.567","MD20P")=="1234.57");
 
 	assert(oconv("","MD20P")=="");
-	assert(oconv("","MD20PZ")=="0.00");
-	assert(oconv(_VM_ "0" _VM_ _VM_,"MD20PZ")=="0.00" _VM_ "0.00" _VM_ "0.00" _VM_ "0.00");
+	assert(oconv("","MD20PZ")=="");
+	assert(oconv(_VM_ "0" _VM_ _VM_,"MD20PZ")== _VM_ _VM_ _VM_);
 
 	assert(oconv(1234.567,"MC20PZ")=="1234,57");
 

@@ -1878,7 +1878,7 @@ const var& var::errputl(const var& str) const
 const var& var::logput() const
 {
 	this->put(std::clog);
-	std::clog.flush();
+	//std::clog.flush();
 	return *this;
 }
 

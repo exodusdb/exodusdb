@@ -379,11 +379,14 @@ var var::oconv_MD(const char* conversion) const
 
 	// http://www.d3ref.com/index.php?token=basic.masking.function
 
-	// TODO implement nextchar as a pointer to eliminate charn and convlen
+	// TODO consider implementing nextchar as a pointer to eliminate charn and convlen
 
-	// not numeric or plain MD does no conversion
+	// no conversion in the following cases
+	// 1. zero length string
+	// 2. non-numeric string
+	// 3. plain "MD" conversion without any trailing digits
 	size_t convlen = strlen(conversion);
-	if (!isnum() || convlen <= 2)
+	if (((this->var_typ & VARTYP_STR) && !var_str.length()) || !(this->isnum()) || convlen <= 2)
 		return *this;
 
 	// default conversion options
@@ -391,7 +394,7 @@ var var::oconv_MD(const char* conversion) const
 	int movedecs = -1;
 	bool dontmovepoint = false;
 	bool septhousands = false;
-	bool forcezero = false;
+	//bool z_flag = false;
 	char trailer = '\0';
 	char prefixchar = '\0';
 
@@ -457,7 +460,10 @@ var var::oconv_MD(const char* conversion) const
 			break;
 
 		case 'Z':
-			forcezero = true;
+			//Z means return empty string in the case of zero
+			//z_flag = true;
+			if (!(this->toBool()))
+				return "";
 			break;
 
 		default:
@@ -473,9 +479,6 @@ var var::oconv_MD(const char* conversion) const
 	}
 
 convert:
-
-	if (!forcezero && this->length() == 0)
-		return "";
 
 	var newmv = (*this);
 

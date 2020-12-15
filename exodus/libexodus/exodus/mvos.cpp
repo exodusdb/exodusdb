@@ -1072,6 +1072,7 @@ bool var::osshellwrite(const var& writestr) const
 
 void var::osflush() const
 {
+	std::cout << std::flush;
 	return;
 }
 
