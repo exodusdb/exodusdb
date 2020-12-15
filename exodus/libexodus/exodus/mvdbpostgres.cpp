@@ -751,8 +751,21 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/)
 */
 // *
 	//check filename2 is a valid table or view etc.
-	var sql="select '" ^ filename2 ^ "'::regclass";
-	if (! connection.sqlexec(sql))
+	//var sql="select '" ^ filename2 ^ "'::regclass";
+	//if (! connection.sqlexec(sql))
+	var sql = "\
+		SELECT\
+		EXISTS	(\
+    		SELECT 	table_name\
+    		FROM 	information_schema.tables\
+    		WHERE\
+					table_name = '" ^ filename2 ^ "'\
+				)\
+	";
+	var result;
+	connection.sqlexec(sql,result);
+	//result.convert(RM,"|").outputl("result=");
+	if (result[-1] != "t")
 	{
 		var errmsg = "ERROR: mvdbpostgres 2 open(" ^ filename.quote() ^
 			     ") table does not exist.";
@@ -760,6 +773,7 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/)
 		return false;
 	}
 // */
+
 	this->setlasterror();
 
 	// save the filename and connection no
@@ -1257,7 +1271,7 @@ bool var::sqlexec(const var& sqlcmd, var& response) const
 	}
 
 	//option to limit number of rows returned
-	if (response.assigned() && response.isnum() && response<nrows)
+	if (response.assigned() && response.isnum() && response<nrows && response)
 		nrows=response;
 
 	response="";

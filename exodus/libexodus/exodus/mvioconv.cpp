@@ -859,11 +859,14 @@ var var::oconv(const char* conversion) const
 	// empty conversion string - no conversion
 	case '\0':
 		return (*this);
+
+	//default:
+	//	throw MVException("oconv " ^ var(*conversionchar).oconv("HEX").substr(1,6) ^ " not implemented yet ");
 	}
 
 	// TODO implement
 	// std::wcout<<"oconv "<<conversion<< " not implemented yet "<<std::endl;
-	throw MVException("oconv " ^ var(conversion) ^ " not implemented yet ");
+	throw MVException("oconv " ^ var(conversion).substr(1,6) ^ " not implemented yet ");
 
 	// unknown conversions are simply ignored in AREV
 	return *this;

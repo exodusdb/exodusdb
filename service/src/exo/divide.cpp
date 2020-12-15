@@ -2,6 +2,7 @@
 libraryinit()
 
 function main(in numerators, in denominator, in sep) {
+	//*reimplemented because /// not in c++/exodus
 	//c sys
 	//linemark
 	if (numerators == "" or denominator == 1) {
@@ -9,14 +10,13 @@ function main(in numerators, in denominator, in sep) {
 	}
 	dim output;
 	var nn=output.split(numerators.convert(sep,FM));
-	for (int ii=1;ii<nn;++ii) {
+	for (int ii=1;ii<=nn;++ii) {
 		//null or zero elements remain null or zero
 		if (output(ii)) {
 			output(ii)=output(ii)/denominator;
 		}
 	}
-	return output.join().convert(FM,sep);
+	return output.join(sep);
 }
-
 
 libraryexit()

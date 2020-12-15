@@ -2,6 +2,7 @@
 libraryinit()
 
 function main(in multipliers, in multiplicand, in sep) {
+	//*reimplemented because *** operator not in c++/exodus
 	//c sys
 	//linemark
 	if (multipliers == "" or multiplicand == 1) {
@@ -16,7 +17,7 @@ function main(in multipliers, in multiplicand, in sep) {
 			output(ii)=output(ii)*multiplicand;
 		}
 	}
-	return output.join().convert(FM,sep);
+	return output.join(sep);
 }
 
 
