@@ -1,18 +1,33 @@
-#use VERBOSE=1 make to debug
+#use make VERBOSE=1 to debug make
 
 cmake_minimum_required(VERSION 2.8)
 set(CPACK_PACKAGE_CONTACT neo)
 set(CPACK_PACKAGE_VERSION 14.01.1)
 INCLUDE(CPack)
 
+#######################################
+# c++ version 17 or 20 if on Ubuntu 20+
+#######################################
+execute_process(
+        COMMAND         grep "Ubuntu 2" /etc/lsb-release
+        OUTPUT_VARIABLE OUTVAR
+        ERROR_VARIABLE  ERRVAR
+        RESULT_VARIABLE RESVAR
+)
+if(RESVAR EQUAL "0")
+        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a")
+else()
+        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+endif()
+
 ############################################
 # remove -o1 for gdb to debug into libexodus
 ############################################
 #exodus works using c++14 default on Ubuntu 18.04 so no need for this
 #moving to use c++17 features so switching on
-#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -no-pie -g -fprofile-arcs -ftest-coverage")
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -Wall -Wextra -Wno-unknown-pragmas -std=c++17 -no-pie -g -O1 -march=native")
-#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -Wall -Wextra -Wno-unknown-pragmas -std=c++17 -no-pie -g -march=native")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -Wall -Wextra -Wno-unknown-pragmas -no-pie -g -O1 -march=native")
+#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unknown-pragmas -no-pie -g -march=native")
+message("CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")
 
 #allow exodus executable and exodus library
 #cmake_policy(SET CMP0002 OLD)
