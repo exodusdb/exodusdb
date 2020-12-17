@@ -266,15 +266,17 @@ function main()
 	sort.locateusing(FM,"c",sortn);
 	assert(sortn==4);
 
+	//exodus comparisions and conversion to book ignores numbers less than 1e-13
 	//pick/arev bool and equality checks on doubles ignore less than 0.0001
 	//but comparison operators work exactly (to max binary precision?)
-	var v0_0001=0.0001;
-	var v0_00001=0.00001;
-	var v0_00002=0.00002;
-	assert(v0_0001 or 0);
-	assert(not(v0_00001 or 0));
-	assert(v0_00001==v0_00002);
-	assert(v0_00001<v0_00002);
+	var smallestno = 1e-13;
+	var toosmallno = smallestno/10;
+	assert(smallestno);
+	assert(smallestno>0);
+	assert(smallestno!=0);
+	assert(!toosmallno);
+	assert(toosmallno==0);
+	assert(!(toosmallno>0));
 
 	var d1=1.2;
 	d1++;
@@ -300,6 +302,10 @@ function main()
 	assert(i1==2.0);
 	i1+=1.1;
 	assert(i1==3.1);
+
+	printl(1e-14);
+	printl(var(0));
+	assert(1e-14==var(0));
 
 	//no args
 	print();

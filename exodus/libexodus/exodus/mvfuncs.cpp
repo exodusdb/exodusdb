@@ -394,7 +394,7 @@ bool var::toBool() const
 			//AREV print (0.00001 or 0)    ... prints 0 (bool)
 			//AREV print (0.00005=0.00006) ... prints 0 (==)
 			//AREV print (0.00005<0.00006) ... prints 1 (<)
-			return std::abs(var_dbl)>=0.0001;
+			return std::abs(var_dbl)>=SMALLEST_NUMBER;
 
 		if (!(var_typ))
 		{

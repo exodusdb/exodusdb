@@ -953,7 +953,7 @@ DLL_PUBLIC bool MVeq(const var& lhs, const var& rhs)
 
 	// NB empty string is always less than anything except another empty string
 
-	// 1. both empty or identical strings returns eq. one empty results false
+	// 1. BOTH EMPTY or IDENTICAL STRINGS returns TRUE one empty results false
 	if (lhs.var_typ & VARTYP_STR)
 	{
 		if (rhs.var_typ & VARTYP_STR)
@@ -1005,32 +1005,52 @@ DLL_PUBLIC bool MVeq(const var& lhs, const var& rhs)
 		}
 	}
 
-	// 2. both numerical strings
+	// 2. BOTH NUMERIC STRINGS
 	// exact match on decimal numbers is often inaccurate since they are approximations of real
 	// numbers
 	if (lhs.isnum() && rhs.isnum())
 	{
+		//int v int or int v double
 		if (lhs.var_typ & VARTYP_INT)
 		{
+
+			//INT V INT
 			if (rhs.var_typ & VARTYP_INT)
+			{
 				// different from MVlt
 				return (lhs.var_int == rhs.var_int);
+			}
+
+			// INT V DOUBLE
 			else
-				// different from MVlt
-				return (lhs.var_int == rhs.var_dbl);
+			{
+				// different from MVlt (uses absolute)
+				// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
+				//return (lhs.var_int == rhs.var_dbl);
+				return (std::abs(double(lhs.var_int)-rhs.var_dbl) < SMALLEST_NUMBER);
+			}
 		}
+
+		// DOUBLE V INT
 		if (rhs.var_typ & VARTYP_INT)
-			// different from MVlt
-			return (lhs.var_dbl == rhs.var_int);
+		{
+			// different from MVlt (uses absolute)
+			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
+			//return (lhs.var_dbl == rhs.var_int);
+			return (std::abs(lhs.var_dbl-double(rhs.var_int)) < SMALLEST_NUMBER);
+		}
+
+		// DOUBLE V DOUBLE
 		else
 		{
-			// different from MVlt (DOUBLES ONLY COMPARE TO ACCURACY 0.0001)
+			// different from MVlt (uses absolute)
+			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
 			//return (lhs.var_dbl == rhs.var_dbl);
-			return (std::abs(lhs.var_dbl-rhs.var_dbl)<0.0001);
+			return (std::abs(lhs.var_dbl-rhs.var_dbl) < SMALLEST_NUMBER);
 		}
 	}
 
-	// 3. either non-numerical strings
+	// 3. BOTH NON-NUMERIC STRINGS
 	if (!(lhs.var_typ & VARTYP_STR))
 		lhs.createString();
 	if (!(rhs.var_typ & VARTYP_STR))
@@ -1110,14 +1130,21 @@ DLL_PUBLIC bool MVlt(const var& lhs, const var& rhs)
 				return (lhs.var_int < rhs.var_int);
 			else
 				// different from MVeq
-				return (double(lhs.var_int) < rhs.var_dbl);
+				// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
+				//return (double(lhs.var_int) < rhs.var_dbl);
+				return (rhs.var_dbl - double(lhs.var_int)) >= SMALLEST_NUMBER;
+				//return ((rhs.var_dbl - double(lhs.var_int) >= SMALLEST_NUMBER);
 		}
 		if (rhs.var_typ & VARTYP_INT)
 			// different from MVeq
-			return (lhs.var_dbl < rhs.var_int);
+			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
+			//return (lhs.var_dbl < double(rhs.var_int));
+			return (double(rhs.var_int) - lhs.var_dbl) >= SMALLEST_NUMBER;
 		else
 			// different from MVeq
-			return (lhs.var_dbl < rhs.var_dbl);
+			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
+			//return (lhs.var_dbl < rhs.var_dbl);
+			return (rhs.var_dbl - lhs.var_dbl) >= SMALLEST_NUMBER;
 	}
 
 	// 3. either or both non-numerical strings
@@ -1160,7 +1187,10 @@ DLL_PUBLIC bool MVlt(const var& lhs, const int int2)
 
 		if (lhs.var_typ & VARTYP_DBL)
 			// different from MVeq
-			return (lhs.var_dbl < int2);
+			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
+			//return (lhs.var_dbl < int2);
+			return (double(int2) - lhs.var_dbl) >= SMALLEST_NUMBER;
+			//return (double(int2) - lhs.var_dbl) >= SMALLEST_NUMBER;
 	}
 	// go back and try again if can be converted to number
 	while (lhs.isnum());
@@ -1199,9 +1229,12 @@ DLL_PUBLIC bool MVlt(const int int1, const var& rhs)
 		if (rhs.var_typ & VARTYP_INT)
 			// different from MVeq
 			return (int1 < rhs.var_int);
-		if (rhs.var_typ & VARTYP_DBL)
+		if (rhs.var_typ & VARTYP_DBL) {
 			// different from MVeq
-			return (int1 < rhs.var_dbl);
+			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
+			//return (int1 < rhs.var_dbl);
+			return (rhs.var_dbl - double(int1)) >= SMALLEST_NUMBER;
+		}
 	}
 	// go back and try again if can be converted to number
 	while (rhs.isnum());

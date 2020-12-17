@@ -47,6 +47,8 @@ THE SOFTWARE.
 // Using dllimport and dllexport in C++ Classes
 // http://msdn.microsoft.com/en-us/library/81h27t8c(VS.80).aspx
 
+#define SMALLEST_NUMBER 1e-13
+
 #if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
 #ifdef BUILDING_LIBRARY
 #ifdef __GNUC__
@@ -320,8 +322,6 @@ class VARTYP
 // with their correct values otherwise any such var, when used later on, will throw Unassigned
 // Variable Used since its var_typ will be zero
 
-#if 1
-
 #define VTC(VARNAME, VARVALUE) inline const uint VARNAME{VARVALUE};
 
 // throw an exception if used an unassigned variable
@@ -331,12 +331,14 @@ VTC(VARTYP_UNA, 0x0)
 // assigned string - unknown if numeric or not
 VTC(VARTYP_STR, 0x1)
 
-// indicated known non-numeric string
-VTC(VARTYP_NAN, 0x2)
+// following are numeric
+VTC(VARTYP_INT, 0x2)
+VTC(VARTYP_DBL, 0x4)
 
-// all following are numeric
-VTC(VARTYP_INT, 0x4)
-VTC(VARTYP_DBL, 0x8)
+// indicated known non-numeric string
+VTC(VARTYP_NAN, 0x8)
+
+// following are numeric
 VTC(VARTYP_OSFILE, 0x10)
 VTC(VARTYP_DBCONN, 0x20)
 
@@ -355,41 +357,6 @@ VTC(VARTYP_NANSTR_DBCONN, VARTYP_NANSTR | VARTYP_DBCONN)
 // const char mvtypemask=0x80;
 //VTC(VARTYP_MASK, 0x80)
 VTC(VARTYP_MASK, ~(VARTYP_STR | VARTYP_NAN | VARTYP_INT | VARTYP_DBL | VARTYP_OSFILE | VARTYP_OSFILE | VARTYP_DBCONN))
-
-#else
-
-// throw an exception if used an unassigned variable
-//#define VARTYP VARTYP_UNA =0x0;
-inline const VARTYP_UNA = 0x0;
-
-// assigned string - unknown if numeric or not
-inline const VARTYP VARTYP_STR = 0x1;
-
-// indicated known non-numeric string
-inline const VARTYP VARTYP_NAN = 0x2;
-
-// all following are numeric
-inline const VARTYP VARTYP_INT{0x4};
-inline const VARTYP VARTYP_DBL{0x8};
-inline const VARTYP VARTYP_OSFILE{0x10};
-inline const VARTYP VARTYP_DBCONN{0x20};
-
-inline const VARTYP VARTYP_DESTRUCTED{0xFFFFF0};
-
-// const char mvtypemask=0x80;
-inline const VARTYP VARTYP_MASK{0x80};
-
-// flag combinations
-inline const VARTYP VARTYP_INTDBL = VARTYP_INT | VARTYP_DBL;
-inline const VARTYP VARTYP_INTSTR = VARTYP_INT | VARTYP_STR;
-inline const VARTYP VARTYP_DBLSTR = VARTYP_DBL | VARTYP_STR;
-inline const VARTYP VARTYP_NANSTR = VARTYP_NAN | VARTYP_STR;
-inline const VARTYP VARTYP_NOTNUMFLAGS = ~(VARTYP_INT | VARTYP_DBL | VARTYP_NAN);
-
-inline const VARTYP VARTYP_NANSTR_OSFILE = VARTYP_NANSTR | VARTYP_OSFILE;
-inline const VARTYP VARTYP_NANSTR_DBCONN = VARTYP_NANSTR | VARTYP_DBCONN;
-
-#endif
 
 // class var
 //"final" to prevent inheritance because var has a destructor which is non-virtual to save space and time
