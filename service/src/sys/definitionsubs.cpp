@@ -138,7 +138,9 @@ function main(in mode) {
 		if (ID == "SECURITY") {
 
 			if (win.templatex == "USERS") {
-				RECORD = RECORD.invert();
+				if (VOLUMES) {
+					RECORD = RECORD.invert();
+				}
 				return 0;
 			}
 
@@ -418,7 +420,9 @@ preventupdate:
 			}
 
 			//obfuscate the mark
-			RECORD.r(1, RECORD.a(1).invert());
+			if (VOLUMES) {
+				RECORD.r(1, RECORD.a(1).invert());
+			}
 
 		}
 
@@ -686,7 +690,9 @@ subroutine reorderdbs() {
 subroutine postreadfix() {
 	if (ID == "AGENCY.PARAMS") {
 
-		RECORD.r(1, RECORD.a(1).invert());
+		if (VOLUMES) {
+			RECORD.r(1, RECORD.a(1).invert());
+		}
 
 		if (RECORD.a(55) == "") {
 			RECORD.r(55, "Budget");

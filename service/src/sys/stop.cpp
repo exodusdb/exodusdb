@@ -5,8 +5,8 @@ libraryinit()
 
 var mode;
 
-function main(in mode0, in time, in date, out buffer, out msg) {
-	//c sys in,in,in,out,out
+function main(in mode0, in time, in date, io buffer, out msg) {
+	//c sys in,in,in,io,out
 
 	var interactive = not(SYSTEM.a(33));
 	if (msg.unassigned()) {
@@ -18,13 +18,17 @@ function main(in mode0, in time, in date, out buffer, out msg) {
 		mode = mode0;
 	}
 
+	if (time.unassigned() or date.unassigned()) {
+		return 0;
+	}
+
 	//gosub gettext
 	var text = elapsedtimetext(date, time);
 
 	var result = "";
 	if (mode) {
 		text.swapper(", ", FM);
-		}else{
+	}else{
 		//SWAP @FM WITH ', ' IN TEXT
 		var msgx = msg;
 		if (msgx) {

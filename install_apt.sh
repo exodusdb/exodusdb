@@ -39,7 +39,7 @@ cd ~/exodus
 cmake .
 make clean #in case half-built with wrong boost libs
 cmake .
-make
+make -j
 sudo make install
 :
 : 2. Installing Postgres and Configuring it for Exodus

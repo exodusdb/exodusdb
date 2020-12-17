@@ -52,7 +52,10 @@ function main(in nextcompanycode) {
 
 	//clientmark
 	if (gen.company.a(27)) {
-		SYSTEM.r(14, gen.company.a(27).invert());
+		if (VOLUMES) {
+			gen.company.r(27, gen.company.a(27).invert());
+		}
+		SYSTEM.r(14, gen.company.a(27));
 		SYSTEM.r(8, "");
 	}else{
 		SYSTEM.r(14, SYSTEM.a(36));
@@ -168,7 +171,7 @@ function main(in nextcompanycode) {
 	//optional comma for decimal point
 	if (var("1.000,00|1000,00").locateusing("|",gen.company.a(22),temp)) {
 		BASEFMT = "MC";
-	}
+		}
 	BASEFMT ^= ndec ^ "0P";
 	//optional comma to indicate delimiting of thousands (with comma MD OR dot MC)
 	if (var("1,000.00|1.000,00").locateusing("|",gen.company.a(22),temp)) {

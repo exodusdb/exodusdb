@@ -289,7 +289,7 @@ forcedemail:
 		bodyfilename.osclose();
 		body = "@" ^ bodyfilename;
 	}else{
-		body.converter(DQ, "\'");
+		body.converter(DQ, "'");
 		bodyfilename = "";
 	}
 

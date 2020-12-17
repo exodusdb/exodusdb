@@ -1,8 +1,11 @@
 #include <exodus/library.h>
 libraryinit()
 
+#include <getlang.h>
+
 #include <gen_common.h>
 
+var nn;
 var progname;
 var languagecode;
 var langkey;
@@ -33,6 +36,31 @@ function main(in origprogname, in languagecode0, in origdatatype, io languagefil
 		if (not origlanguagecode) {
 			origlanguagecode = gen.gcurrcompany;
 		}
+	}
+
+	if (origlanguagecode.index("*")) {
+
+		var langcode1 = origlanguagecode.field("*", 1);
+		call getlang(origprogname, langcode1, origdatatype, languagefile, lang);
+		var lang1 = lang;
+
+		var langcode2 = origlanguagecode.field("*", 2);
+		call getlang(origprogname, langcode2, origdatatype, languagefile, lang);
+		var lang2 = lang;
+
+		lang = "";
+		var n1 = lang1.count(FM) + 1;
+		var n2 = lang2.count(FM) + 1;
+		if (n1 < n2) {
+			nn = n2;
+		}else{
+			nn = n1;
+		}
+		for (var fn = 1; fn <= nn; ++fn) {
+			lang.r(fn, (lang1.a(fn) ^ " " ^ lang2.a(fn)).trim());
+		};//fn;
+
+		return 0;
 	}
 
 	progname = origprogname;
@@ -72,7 +100,7 @@ exit:
 
 	var custlang;
 	if (custlang.read(DEFINITIONS, "LANGUAGE*" ^ langkey)) {
-		var nn = custlang.count(FM) + 1;
+		nn = custlang.count(FM) + 1;
 		for (var fn = 1; fn <= nn; ++fn) {
 			var tt = custlang.a(fn);
 			if (tt.length()) {
@@ -150,7 +178,7 @@ subroutine getlang3(in origprogname, in datatype, in languagefile, io lang) {
 
 			//strip out English pretext
 			if (lang.index(var().chr(170))) {
-				var nn = lang.count(FM) + 1;
+				nn = lang.count(FM) + 1;
 				for (var ii = 1; ii <= nn; ++ii) {
 					var tt = lang.a(ii).field(var().chr(170), 2);
 					if (tt) {

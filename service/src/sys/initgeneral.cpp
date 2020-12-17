@@ -327,7 +327,7 @@ decideversion:
 						goto badversion;
 					}
 					var msgx = "!WARNING *UNPREDICTABLE* CONSEQUENCES" ^ FM ^ FM ^ "WHAT IS THE PASSWORD?";
-					call inputbox(msgx, 20, 0, "", reply2, 0x1B);
+					call inputbox(msgx, 20, 0, "", reply2, "\x1B");
 					if (reply2 ne "UNPREDICTABLE") {
 						call note("THAT IS NOT THE CORRECT PASSWORD");
 						goto decideversion;
@@ -449,7 +449,7 @@ updateversion:
 	if (temp == "00") {
 		temp = "70";
 	}
-	tt = 0x1B;
+	tt = "\x1B";
 	tt ^= "C";
 	tt ^= temp;
 	AW.r(30, tt);
@@ -588,7 +588,7 @@ nextreport:
 	}
 
 	call log2("*check for invalid characters in workstation name", logtime);
-	if (STATION.index("\'") or STATION.index(DQ)) {
+	if (STATION.index("'") or STATION.index(DQ)) {
 		msg = "WARNING: EXODUS WILL NOT WORK PROPERLY BECAUSE";
 		msg ^= FM ^ "YOUR WORKSTATION NAME (" ^ STATION.trim() ^ ")";
 		msg ^= FM ^ "CONTAINS QUOTATION MARKS. PLEASE ASK YOUR ";
@@ -850,7 +850,7 @@ nextreport:
 	}
 
 	//allpunctuation
-	SYSTEM.r(130, " `~@#$%^&*()_+-=[]{};\\:\"|,./<>?\\|" "\'");
+	SYSTEM.r(130, " `~@#$%^&*()_+-=[]{};\\:\"|,./<>?\\|" "'");
 
 	SYSTEM.r(9, 1);
 
@@ -1464,6 +1464,10 @@ fixnextcompany:
 	if (readnext(companycode)) {
 		if (not(gen.company.read(gen.companies, companycode))) {
 			goto fixnextcompany;
+		}
+
+		if (VOLUMES) {
+			gen.company.r(27, gen.company.a(27).invert());
 		}
 
 		var marketcode = gen.company.a(30);

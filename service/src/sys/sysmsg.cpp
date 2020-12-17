@@ -233,7 +233,7 @@ function main(in msg0, in subject0="", in username0="") {
 		if (USER1) {
 			temp = USER1;
 			temp.swapper("%", "%25");
-			temp.swapper("\'", "%27");
+			temp.swapper("'", "%27");
 			temp.swapper("`", "%60");
 			temp.swapper("^", "%5E");
 			temp.swapper("]", "%5D");

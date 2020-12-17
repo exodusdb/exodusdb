@@ -697,7 +697,7 @@ performreport:
 	} else if (mode == "LISTMARKETS") {
 
 		var cmd = "SORT MARKETS WITH AUTHORISED BY SEQ";
-		cmd ^= " HEADING " ^ (var("List of Markets     \'T\'     Page \'PL\'").quote());
+		cmd ^= " HEADING " ^ (var("List of Markets     'T'     Page 'PL'").quote());
 		perform(cmd);
 
 		gosub checkoutputfileexists();
@@ -809,7 +809,7 @@ subroutine initlog() {
 	var logoptions = USER0.a(5);
 
 	if (logoptions.match("^\\d*/\\d{2}$")) {
-		logyear = addcent4(logoptions.field("/", 2), "", "", xx);
+		logyear = addcent4(logoptions.field("/", 2));
 		logoptions = "";
 	}
 

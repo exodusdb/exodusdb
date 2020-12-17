@@ -17,7 +17,7 @@ function main(in string0) {
 	string1.swapper("<", "&lt;");
 	string1.swapper(">", "&gt;");
 
-	string1.converter(DQ, "\'");
+	string1.converter(DQ, "'");
 	string1.swapper(VM, "\" \"");
 	string1.swapper(FM, "\" \"");
 	return string1.quote();

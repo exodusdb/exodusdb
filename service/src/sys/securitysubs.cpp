@@ -1290,7 +1290,7 @@ function main(in mode) {
 			//cmd:=' PASSWORD_AGE USER_EXPIRY_DATE LAST_BROWSER KEYS'
 			cmd ^= " LAST_LOGIN_AGE PASSWORD_AGE LAST_OS LAST_BROWSER KEYS";
 		}
-		cmd ^= " HEADING " ^ (("LIST OF " ^ mode2 ^ "   \'T\'   Page \'PL\'").quote());
+		cmd ^= " HEADING " ^ (("LIST OF " ^ mode2 ^ "   'T'   Page 'PL'").quote());
 
 		cmd ^= " ID-SUPP DBL-SPC";
 		if (interactive) {

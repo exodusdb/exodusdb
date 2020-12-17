@@ -263,7 +263,7 @@ function main(in sentence0, in select0="", in filters0="") {
 		}else{
 			dict = "DICT ";
 		}
-		perform("SELECT " ^ dict ^ filename ^ " BY FMC WITH FMC BETWEEN 1 AND 9999 AND WITH @ID NOT STARTING \'%\' AND WITH MASTER.FLAG (S)");
+		perform("SELECT " ^ dict ^ filename ^ " BY FMC WITH FMC BETWEEN 1 AND 9999 AND WITH @ID NOT STARTING '%' AND WITH MASTER.FLAG (S)");
 		if (not LISTACTIVE) {
 			gosub exit2();
 			return 0;
@@ -580,10 +580,10 @@ nextvn:
 					}
 				}
 				if (cell == DQ) {
-					cell = "\'\'";
+					cell = "''";
 				}
 				if ((cell[1] ne DQ) or (cell[-1] ne DQ)) {
-					cell.swapper(DQ, "\'\'");
+					cell.swapper(DQ, "''");
 				}
 				if (cell.length() > 255) {
 					cell = cell.substr(1,200) ^ " ...";
@@ -602,7 +602,7 @@ nextvn:
 					if (cell.index(DQ)) {
 						if (fmtxs(coln) == "T") {
 							if ((cell[1] ne DQ) or (cell[-1] ne DQ)) {
-								cell.swapper(DQ, "\'\'");
+								cell.swapper(DQ, "''");
 								cell = cell.quote();
 							}
 						}

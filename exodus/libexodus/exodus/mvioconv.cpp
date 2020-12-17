@@ -466,6 +466,11 @@ var var::oconv_MD(const char* conversion) const
 				return "";
 			break;
 
+		case 'X':
+			//do no conversion
+			return  *this;
+			break;
+
 		default:
 			if (prefixchar == '\0')
 				prefixchar = nextchar;

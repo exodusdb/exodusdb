@@ -205,7 +205,7 @@ nextcomp:
 	//markets is not open in finance only module
 	//readv maincurrcode from markets,defmarketcode,5 else maincurrcode=''
 	var maincurrcode = "";
-	if (FILES(0).locateusing(FM,"MARKETS",xx)) {
+	if (xx.open("MARKETS", "")) {
 		//defmarketcode=agp<37>
 		defmarketcode = SYSTEM.a(137);
 		maincurrcode = defmarketcode.xlate("MARKETS", 5, "X");

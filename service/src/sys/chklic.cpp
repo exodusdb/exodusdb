@@ -102,7 +102,7 @@ function main(in mode0, out msg) {
 	if (mode == "") {
 
 		var cmd = "LIST DEFINITIONS " ^ (lickey.quote()) ^ " LIC_FIELDS";
-		cmd ^= " HEADING " ^ (var("EXODUS LIC\':\'ENCES as at \'T\'").quote());
+		cmd ^= " HEADING " ^ (var("EXODUS LIC':'ENCES as at 'T'").quote());
 		perform(cmd);
 		stop();
 	}

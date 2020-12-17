@@ -274,7 +274,7 @@ subroutine list() {
 	cmd ^= " BY KEYWORDS";
 	cmd ^= " BY NUMBER";
 
-	var headingx = "What\'\'s New in EXODUS";
+	var headingx = "What''s New in EXODUS";
 	gosub getcurrentversiondatetime();
 	if (USER1.a(2)) {
 		//heading:=' version ':data<2> '[DATE,4*]':' -'
@@ -285,7 +285,7 @@ subroutine list() {
 	}
 
 	if (USER1.a(1)) {
-		headingx ^= "\'L\'" ^ USER1.a(1);
+		headingx ^= "'L'" ^ USER1.a(1);
 		headingx.swapper(SVM, ", ");
 		headingx.swapper(VM, ", ");
 	}

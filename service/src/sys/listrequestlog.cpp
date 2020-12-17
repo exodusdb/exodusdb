@@ -28,7 +28,7 @@ function main() {
 
 	var cmd = "SORT REQUESTLOG BY SEQ";
 
-	var title = "Request Log   \'T\'  Page \'PL\'";
+	var title = "Request Log   'T'  Page 'PL'";
 
 	if (not iuptodate) {
 		iuptodate = ifromdate;
@@ -36,10 +36,10 @@ function main() {
 	if (ifromdate) {
 		if (iuptodate == ifromdate) {
 			cmd ^= " %AND% WITH DATE " ^ (ifromdate.oconv("D4").quote());
-			title ^= "\'L\'Filter : " ^ oconv(ifromdate, "[DATE,4*]");
+			title ^= "'L'Filter : " ^ oconv(ifromdate, "[DATE,4*]");
 		}else{
 			cmd ^= " %AND% WITH DATE BETWEEN " ^ (ifromdate.oconv("D4").quote()) ^ " AND " ^ (iuptodate.oconv("D4").quote());
-			title ^= "\'L\'Filter : " ^ oconv(ifromdate, "[DATE,4*]") ^ " - " ^ oconv(iuptodate, "[DATE,4*]");
+			title ^= "'L'Filter : " ^ oconv(ifromdate, "[DATE,4*]") ^ " - " ^ oconv(iuptodate, "[DATE,4*]");
 		}
 	}
 
@@ -53,18 +53,18 @@ function main() {
 		uptotime += 60;
 
 		cmd ^= " %AND% WITH TIME BETWEEN " ^ (fromtime.oconv("MT").quote()) ^ " AND " ^ (uptotime.oconv("MT").quote());
-		title ^= "\'L\'Filter : " ^ fromtime.oconv("MT") ^ " - " ^ uptotime.oconv("MT");
+		title ^= "'L'Filter : " ^ fromtime.oconv("MT") ^ " - " ^ uptotime.oconv("MT");
 	}
 
 	if (containing) {
 
 		var tt = containing.ucase();
 		if (tt.index(DQ)) {
-			if (tt.index("\'")) {
+			if (tt.index("'")) {
 				call mssg("Cannot find text containing single AND double quotes");
 				stop();
 			}else{
-				tt = "\'" ^ tt ^ "\'";
+				tt = "'" ^ tt ^ "'";
 			}
 		}else{
 			tt = tt.quote();
@@ -89,8 +89,8 @@ function main() {
 
 	//cmd:=' HEADING ':quote(title)
 	title = cmd.oconv("T#60");
-	title.swapper(TM, " \'L\' ");
-	title.swapper(DQ, "\'\'");
+	title.swapper(TM, " 'L' ");
+	title.swapper(DQ, "''");
 	cmd ^= " HEADING " ^ (title.quote());
 
 	perform(cmd);

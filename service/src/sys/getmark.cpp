@@ -55,11 +55,7 @@ function main(in mode, in html, io mark) {
 		}
 
 		//client mark
-		//if company<27> then
-		// mark:=invert(company<27>)
-		//end else
 		mark ^= SYSTEM.a(14);
-		// end
 
 		if (html) {
 			if (link) {

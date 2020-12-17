@@ -396,13 +396,13 @@ nextuser:
 		call menusubs("ADDSEP", menutx);
 
 		item = "List of Database _Processes";
-		var onclick = "javascript:openwindow_sync(\'EXECUTE|rGENERAL|rLISTPROCESSES\');return false";
+		var onclick = "javascript:openwindow_sync('EXECUTE|rGENERAL|rLISTPROCESSES');return false";
 			//backslash
 		onclick.converter("|", var().chr(92));
 		call menusubs("ADDITEM", menutx, item, href, onclick);
 
 		item = "_List of Documents in Use";
-		onclick = "javascript:openwindow_sync(\'EXECUTE|rGENERAL|rLISTLOCKS\');return false";
+		onclick = "javascript:openwindow_sync('EXECUTE|rGENERAL|rLISTLOCKS');return false";
 			//backslash
 		onclick.converter("|", var().chr(92));
 		call menusubs("ADDITEM", menutx, item, href, onclick);
@@ -418,8 +418,8 @@ nextuser:
 
 		call menusubs("ADDMENU", menutx, "_Help");
 
-		item = "_What\'s new in EXODUS";
-		href = "javascript:window.location.assign((typeof gusername!=\'undefined\'&&gusername==\'EXODUS\'&&confirm(\'EXODUS only option|n|nChange Log File=OK|nWhats New Report=Cancel\'))?\'../exodus/changelog.htm\':\'../exodus/whatsnew.htm\')";
+		item = "_What's new in EXODUS";
+		href = "javascript:window.location.assign((typeof gusername!='undefined'&&gusername=='EXODUS'&&confirm('EXODUS only option|n|nChange Log File=OK|nWhats New Report=Cancel'))?'../exodus/changelog.htm':'../exodus/whatsnew.htm')";
 			//backslash
 		href.converter("|", var().chr(92));
 		call menusubs("ADDITEM", menutx, item, href);
@@ -449,7 +449,7 @@ nextuser:
 		call menusubs("ADDITEM", menutx, item, href);
 
 		item = "_About";
-		onclick = "javascript:displayresponsedata_sync(\'EXECUTE|rGENERAL|rABOUT\');return false";
+		onclick = "javascript:displayresponsedata_sync('EXECUTE|rGENERAL|rABOUT');return false";
 			//backslash
 		onclick.converter("|", var().chr(92));
 		call menusubs("ADDITEM", menutx, item, href, onclick);

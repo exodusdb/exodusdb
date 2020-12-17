@@ -553,7 +553,7 @@ filename:
 
 		//get any specfic keys
 nextkey:
-		if ((nextword.isnum() or (nextword[1] == "\'")) or (nextword[1] == DQ)) {
+		if ((nextword.isnum() or (nextword[1] == "'")) or (nextword[1] == DQ)) {
 			keylist = 1;
 			ss ^= " " ^ nextword;
 			gosub getword();
@@ -668,11 +668,11 @@ nextkey:
 			//parameters
 			while (true) {
 				///BREAK;
-				if (not(nextword ne "" and (((nextword.isnum() or (nextword[1] == DQ)) or (nextword[1] == "\'"))))) break;
+				if (not(nextword ne "" and (((nextword.isnum() or (nextword[1] == DQ)) or (nextword[1] == "'"))))) break;
 				gosub getword();
 				ss ^= " " ^ word;
 				if (limitx) {
-					if ((DQ ^ "\'").index(word[1])) {
+					if ((DQ ^ "'").index(word[1])) {
 						if (word[1] == word[-1]) {
 							word = word.substr(2,word.length() - 2);
 						}
@@ -771,7 +771,7 @@ nextkey:
 
 		gosub getquotedword2();
 
-		if ((DQ ^ "\'").index(nextword[1])) {
+		if ((DQ ^ "'").index(nextword[1])) {
 			title = word;
 			gosub getquotedword2();
 			value = word;
@@ -813,9 +813,9 @@ nextkey:
 		}
 
 		//any existing doubled single quotes are removed to avoid double doublimg
-		title.swapper("\'\'", "\'");
+		title.swapper("''", "'");
 		//double any single quotes to avoid them being understood as options
-		title.swapper("\'", "\'\'");
+		title.swapper("'", "''");
 
 		headtab.r(hrown, tcoln, title.convert(FM ^ VM, "  "));
 		headtab.r(hrown, tcoln + 1, value);
@@ -828,8 +828,8 @@ nextkey:
 
 		//remove page numbering options from headings
 		if (html) {
-			head.swapper("Page \'P\'", "");
-			head.swapper("Page \'P", "\'");
+			head.swapper("Page 'P'", "");
+			head.swapper("Page 'P", "'");
 		}
 
 	} else if (word == "FOOTING") {
@@ -889,7 +889,7 @@ nextkey:
 
 	} else if (word == "EMAIL_CC") {
 		gosub getword();
-		if ((DQ ^ "\'").index(word[1])) {
+		if ((DQ ^ "'").index(word[1])) {
 			emailcc = word.substr(2,word.length() - 2);
 			nextemailcc = emailcc;
 		}else{
@@ -898,7 +898,7 @@ nextkey:
 
 	} else if (word == "EMAIL_SUBJECT") {
 		gosub getword();
-		if ((DQ ^ "\'").index(word[1])) {
+		if ((DQ ^ "'").index(word[1])) {
 			emailsubject = word.substr(2,word.length() - 2);
 			nextemailsubject = emailsubject;
 		}else{
@@ -1022,11 +1022,11 @@ nextkey:
 							}
 							tcoln = (hcoln - 1) * 2 + 1;
 							headtab.r(hrown, tcoln, coldict(coln).a(3).convert(VM, " ") ^ nbsp ^ ":");
-							headtab.r(hrown, tcoln + 1, "\'B" ^ tt2 ^ "\'");
+							headtab.r(hrown, tcoln + 1, "'B" ^ tt2 ^ "'");
 							hrown += 1;
 						}
 
-						pagebreaks.r(coln, "\'" "B" ^ tt2 ^ "\'");
+						pagebreaks.r(coln, "'" "B" ^ tt2 ^ "'");
 
 					}
 					breakopts.r(1, word);
@@ -1053,7 +1053,7 @@ dictrecexit:;
 			}
 		}
 		call mssg(tt, "RCE", word, word);
-		if (word == 0x1B) {
+		if (word == "\x1B") {
 			stop();
 		}
 		gosub getwordexit();
@@ -1309,7 +1309,7 @@ x1exit:
 		tt.transfer(colhdg);
 
 		//allow for single quotes
-		colhdg.swapper("\'", "\'\'");
+		colhdg.swapper("'", "''");
 
 	}else{
 		while (true) {
@@ -1323,7 +1323,7 @@ x1exit:
 
 	//if head='' then head="Page 'P' ":space(50):" 'T'"
 	if ((head == "") and not(rawtable)) {
-		head = filename ^ var(10).space() ^ " \'T\'";
+		head = filename ^ var(10).space() ^ " 'T'";
 	}
 
 	if (html) {
@@ -1736,7 +1736,7 @@ recexit:
 						tx1 ^= ";display:none";
 					}
 					tx1 ^= DQ;
-					tx1 ^= " onclick=\"toggle(" "\'" "B" ^ blockn ^ "\'" ")\"";
+					tx1 ^= " onclick=\"toggle(" "'" "B" ^ blockn ^ "'" ")\"";
 				}
 			}
 			tx1 ^= ">";
@@ -1765,8 +1765,8 @@ recexit:
 				}
 
 				//colored cells starting with ESC
-				if (tt[1] == 0x1B) {
-					if (tt.substr(1,2) == (0x1B ^ 0x1B)) {
+				if (tt[1] == "\x1B") {
+					if (tt.substr(1,2) == ("\x1B" "\x1B")) {
 						tt = tt.field(" ", 2, 999999);
 						if (tt.length()) {
 							tx1 ^= td ^ "<nobr>" ^ tt ^ "</nobr>" ^ tdx;
@@ -1926,7 +1926,7 @@ subroutine getquotedword() {
 
 subroutine getquotedword2() {
 	gosub getword();
-	if (((DQ ^ "\'").index(word[1])) and (word[1] == word[-1])) {
+	if (((DQ ^ "'").index(word[1])) and (word[1] == word[-1])) {
 		word.splicer(1, 1, "");
 		word.splicer(-1, 1, "");
 	}else{
@@ -2000,7 +2000,7 @@ getword2b:
 	//otherwise scan up to the next space char
 	startcharn = charn;
 	charx = sentencex[charn];
-	if (("\'" ^ DQ).index(charx)) {
+	if (("'" ^ DQ).index(charx)) {
 		searchchar = charx;
 	}else{
 		searchchar = " ";
@@ -2129,7 +2129,7 @@ gotdictvoc:
 	}
 
 	word.swapper("%DQUOTE%", DQ);
-	word.swapper("%SQUOTE%", "\'");
+	word.swapper("%SQUOTE%", "'");
 
 	return;
 }
@@ -2192,7 +2192,7 @@ subroutine printbreaks() {
 			}
 			tx ^= "<tr";
 			if (lastblockn) {
-				tx ^= " style=\"cursor:pointer\" onclick=\"toggle(" "\'" "B" ^ lastblockn ^ "\'" ")\"";
+				tx ^= " style=\"cursor:pointer\" onclick=\"toggle(" "'" "B" ^ lastblockn ^ "'" ")\"";
 				}
 			//if detsupp<2 or (nbreaks>1 and leveln>1) then tx:=' style="font-weight:bold"'
 			tx ^= ">";
@@ -2269,7 +2269,7 @@ subroutine printbreaks() {
 						tt = oconv(tt, oconvx);
 					}
 					//ensure single quotes in data dont screw up the html
-					tt.swapper("\'", "\'\'");
+					tt.swapper("'", "''");
 					//if tt='' and html then tt=nbsp
 
 					//insert the page break data
@@ -2459,7 +2459,7 @@ subroutine newheadreplacements() {
 		dictid = replacements.a(ii);
 		tt = "{" ^ dictid ^ "}";
 		tt2 = calculate(dictid);
-		tt2.swapper("\'", "\'\'");
+		tt2.swapper("'", "''");
 		newhead.swapper(tt, tt2);
 	};//ii;
 	return;
@@ -2470,7 +2470,7 @@ subroutine emailing() {
 		return;
 	}
 
-	if ((DQ ^ "\'").index(emailtoid[1])) {
+	if ((DQ ^ "'").index(emailtoid[1])) {
 		nextemailto = emailtoid.substr(2,emailtoid.length() - 2);
 	}else{
 		nextemailto = calculate(emailtoid);
@@ -2507,7 +2507,7 @@ subroutine emailing() {
 			tt3 = emailsubject;
 		}else{
 			//tt3='EXODUS: ':field(head<1,1,1>,"'",1)
-			tt3 = head.a(1, 1, 1).field("\'", 1);
+			tt3 = head.a(1, 1, 1).field("'", 1);
 			if (tt3.index(">")) {
 				tt3 = field2(tt3, ">", -1);
 			}

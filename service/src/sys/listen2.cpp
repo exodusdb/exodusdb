@@ -122,7 +122,7 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 		invalidlogin ^= "|or password has expired?";
 		invalidlogin ^= "|<b>&rarr;Click Password Reset to get a new password.</b>";
 		invalidlogin ^= "|";
-		invalidlogin ^= "|Don\'t have a username?";
+		invalidlogin ^= "|Don't have a username?";
 		invalidlogin ^= "|or not 100% certain what your username is?";
 		invalidlogin ^= "|or not 100% certain what your email address <b>IS IN EXODUS</b>?";
 		invalidlogin ^= "|<b>&rarr;Contact your manager.<b>||";
@@ -880,7 +880,9 @@ validateexit2:
 				//by not doing 'MD50P'
 				//statistic<1>=(date()+time()/86400) 'MD50P'
 				statistic.r(1, (var().date() + var().time() / 86400).substr(1,12));
-				statistic.r(2, statistic.a(2) + 1);
+				if (word2 ne "RELOCK") {
+					statistic.r(2, statistic.a(2) + 1);
+				}
 				//enable fast stats without cross database user access
 				statistic.r(3, userrec.a(5));
 				statistic.write(statistics, key);

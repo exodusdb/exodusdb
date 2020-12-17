@@ -81,7 +81,7 @@ capitalise:
 			if (inquotes) {
 				inquotes = tt ne inquotes;
 			}else{
-				if (((tt == DQ) and (string2.count(DQ) > 1)) or (((tt == "\'") and (string2.count("\'") > 1)))) {
+				if (((tt == DQ) and (string2.count(DQ) > 1)) or (((tt == "'") and (string2.count("'") > 1)))) {
 					inquotes = tt;
 				}else{
 					if (wordseps.index(tt)) {
@@ -104,9 +104,9 @@ capitalise:
 
 		};//ii;
 
-		string2.swapper("\'S ", "\'s ");
-		if (string2.substr(-2,2) == "\'S") {
-			string2.splicer(-2, 2, "\'s");
+		string2.swapper("'S ", "'s ");
+		if (string2.substr(-2,2) == "'S") {
+			string2.splicer(-2, 2, "'s");
 		}
 
 	} else if (mode.substr(1,5) == "PARSE") {
@@ -125,7 +125,7 @@ capitalise:
 				quoted = "";
 			}else{
 				if (not quoted) {
-					if ((DQ ^ "\'").index(tt)) {
+					if ((DQ ^ "'").index(tt)) {
 						quoted = tt;
 					}else{
 						if (tt == " ") {

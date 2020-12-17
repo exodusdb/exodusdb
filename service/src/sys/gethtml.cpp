@@ -9,7 +9,7 @@ libraryinit()
 var modex;
 var hascompanies;
 var compcode;
-var lhcompany;
+var letterheadcompany;
 var keyx;
 var tt;
 var tdate;
@@ -22,7 +22,7 @@ function main(in mode0, out html, in compcode0="") {
 
 	#include <general_common.h>
 	//$insert bp,agency.common
-	//global lhcompany,modex,tt,hascompanies,compcode
+	//global letterheadcompany,modex,tt,hascompanies,compcode
 
 	var mode = mode0;
 	modex = mode;
@@ -48,11 +48,14 @@ function main(in mode0, out html, in compcode0="") {
 		}
 	}
 
-	lhcompany = "";
+	letterheadcompany = "";
 	if (hascompanies) {
 		if (not(gen.companies.unassigned() or (gen.companies == ""))) {
-			if (not(lhcompany.read(gen.companies, compcode))) {
+			if (not(letterheadcompany.read(gen.companies, compcode))) {
 				{}
+			}
+			if (VOLUMES) {
+				letterheadcompany.r(27, letterheadcompany.a(27).invert());
 			}
 		}
 	}
@@ -96,7 +99,7 @@ function main(in mode0, out html, in compcode0="") {
 
 	//process the HTML, adding various macros
 
-	var clientmark = lhcompany.a(27).invert();
+	var clientmark = letterheadcompany.a(27);
 	if (hascompanies) {
 		//if clientmark else clientmark=agp<1>
 		if (not clientmark) {
@@ -107,10 +110,10 @@ function main(in mode0, out html, in compcode0="") {
 
 	//similar code in GETHTML and GENERALMACROS TODO: use GENERALMACROS instead
 
-	html.swapper("%COMPANY_NAME%", lhcompany.a(1));
-	html.swapper("%TAX_REGISTRATION_NO%", lhcompany.a(21));
-	html.swapper("%TAX_REG_NO%", lhcompany.a(21));
-	html.swapper("%COMPANY_REG_NO%", lhcompany.a(59));
+	html.swapper("%COMPANY_NAME%", letterheadcompany.a(1));
+	html.swapper("%TAX_REGISTRATION_NO%", letterheadcompany.a(21));
+	html.swapper("%TAX_REG_NO%", letterheadcompany.a(21));
+	html.swapper("%COMPANY_REG_NO%", letterheadcompany.a(59));
 
 	var datetime = var().date() ^ "." ^ var().time().oconv("R(0)#5");
 	tt = "L";
@@ -164,14 +167,14 @@ function main(in mode0, out html, in compcode0="") {
 
 		//button
 		var onclick = "javascript:";
-		onclick ^= "if (document.body.getAttribute(\'contentEditable\')) {";
-		onclick ^= " edithtml.innerHTML=\'Edit is Off\';";
-		onclick ^= " window.setTimeout(\'edithtml.innerHTML=\\\'\\\';edithtml.style.display=\\\'none\\\'\',1000);";
-		onclick ^= " document.body.removeAttribute(\'contenteditable\')";
+		onclick ^= "if (document.body.getAttribute('contentEditable')) {";
+		onclick ^= " edithtml.innerHTML='Edit is Off';";
+		onclick ^= " window.setTimeout('edithtml.innerHTML=\\'\\';edithtml.style.display=\\'none\\'',1000);";
+		onclick ^= " document.body.removeAttribute('contenteditable')";
 		onclick ^= "} else {";
-		onclick ^= " edithtml.style.display=\'\';";
-		onclick ^= " edithtml.innerHTML=\'Edit is On\';";
-		onclick ^= " document.body.setAttribute(\'contenteditable\',\'true\')";
+		onclick ^= " edithtml.style.display='';";
+		onclick ^= " edithtml.innerHTML='Edit is On';";
+		onclick ^= " document.body.setAttribute('contenteditable','true')";
 		onclick ^= "}";
 
 		tt = "<button id=edithtml class=\"noprint\"";
@@ -196,7 +199,7 @@ subroutine getcompanyconfig(io html, io mode) {
 
 	var ncols = 0;
 	for (var fn = 61; fn <= 66; ++fn) {
-		tt = lhcompany.a(fn);
+		tt = letterheadcompany.a(fn);
 		if (tt) {
 			//call max(count(tt,vm)+1,ncols,ncols)
 			tt = tt.count(VM) + 1;
@@ -209,12 +212,12 @@ subroutine getcompanyconfig(io html, io mode) {
 		return;
 	}
 
-	var aligns = lhcompany.a(61);
-	var imagetypes = lhcompany.a(62);
-	var texts = lhcompany.a(63);
-	var fontsizes = lhcompany.a(64);
-	var imagecompcodes = lhcompany.a(65);
-	var textcompcodes = lhcompany.a(66);
+	var aligns = letterheadcompany.a(61);
+	var imagetypes = letterheadcompany.a(62);
+	var texts = letterheadcompany.a(63);
+	var fontsizes = letterheadcompany.a(64);
+	var imagecompcodes = letterheadcompany.a(65);
+	var textcompcodes = letterheadcompany.a(66);
 
 	var tab = "";
 
@@ -315,7 +318,7 @@ subroutine getcompanyconfig(io html, io mode) {
 			var relativeimagefilename = "../.." ^ imagepath ^ imagefilename;
 
 			tab.r(-1, "   <img src=" ^ (fullimageurl.quote()) ^ " alt=" ^ (fullimageurl.quote()));
-			var sq = "\'";
+			var sq = "'";
 			tab ^= " onerror=\"this.onerror=null;this.src=" ^ sq ^ relativeimagefilename ^ sq ^ ";\"";
 			tab ^= " style=\"margin:0;border:0\"";
 

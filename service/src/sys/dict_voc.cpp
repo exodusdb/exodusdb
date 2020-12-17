@@ -75,9 +75,9 @@ function main() {
 		return 1;
 	}
 	if (ID == "SENDMAIL") {
-		upper.converter("\'EXODUS.ID\'", "");
+		upper.converter("'EXODUS.ID'", "");
 	}
-	if (upper.index("\'EXODUS.ID\'") and ID ne "INSTALLALLOWHOSTS") {
+	if (upper.index("'EXODUS.ID'") and ID ne "INSTALLALLOWHOSTS") {
 		return 1;
 	}
 	return 0;
@@ -334,12 +334,12 @@ function main() {
 	}
 	var nn = datax.count(FM) + 1;
 	datax.ucaser();
-	datax.converter(DQ, "\'");
+	datax.converter(DQ, "'");
 	ANS = "";
 	for (var fn = 1; fn <= nn; ++fn) {
 		var tx = datax.a(fn).trim();
 
-		if (tx.index("xlate(") and ((tx.index("\',\'C\')") or tx.index("\',\'X\')")))) {
+		if (tx.index("xlate(") and ((tx.index("','C')") or tx.index("','X')")))) {
 		//gosub change2
 			ANS.r(1, -1, tx);
 		}
