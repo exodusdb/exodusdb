@@ -278,6 +278,11 @@ function main()
 	assert(toosmallno==0);
 	assert(!(toosmallno>0));
 
+	assert(var(1e-11).toString() == "0.00000000001");
+	assert(var(1e-12).toString() == "0.000000000001");
+	assert(var(1e-13).toString() == "0.0000000000001");
+	assert(var(1e-14).toString() == "0.0");
+
 	var d1=1.2;
 	d1++;
 	assert(d1==2.2);

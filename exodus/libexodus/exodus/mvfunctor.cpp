@@ -40,7 +40,7 @@ THE SOFTWARE.
 // as member functions which require special coding to be called from global functions
 
 //#define TRACING 0
-#define TRACING 3
+#define TRACING 1
 
 #include <iostream>
 
@@ -212,7 +212,7 @@ bool ExodusFunctorBase::initsmf(const char* newlibraryname, const char* newfunct
 {
 
 #if TRACING >= 4
-	std::cout << std::endl << "mvfunctor:initsmf: === in === " << newlibraryname << std::endl;
+	std::cout << "mvfunctor:initsmf: === in === " << newlibraryname << std::endl;
 #endif
 
 	if (newlibraryname != libraryname_ && !openlib(newlibraryname))
@@ -257,7 +257,7 @@ bool ExodusFunctorBase::initsmf(const char* newlibraryname, const char* newfunct
 	}
 
 #if TRACING >= 3
-	std::cout << "mvfunctor:initsmf() ok    " << libraryname_ << ", " << functionname_ << " " << pobject_ << "," << pmemberfunction_ << std::endl << std::endl;
+	std::cout << "mvfunctor:initsmf()       " << libraryname_ << ", " << functionname_ << " " << pobject_ << "," << pmemberfunction_ << std::endl;
 #endif
 
 	return true;
@@ -410,7 +410,7 @@ bool ExodusFunctorBase::openlib(std::string newlibraryname)
 	libraryname_ = newlibraryname;
 
 #if TRACING >= 3
-	std::cout << "mvfunctor:dlopen()        " << libraryname_ << " " << plibrary_ << std::endl;
+	std::cout << "mvfunctor:dlopen()        " << libraryname_ << ", " << plibrary_ << std::endl;
 #endif
 
 	return true;
