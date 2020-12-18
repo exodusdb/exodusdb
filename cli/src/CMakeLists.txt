@@ -1,3 +1,5 @@
+project(exodus)
+
 cmake_minimum_required(VERSION 2.8)
 
 #use CMakeList.txt options in parent directory
@@ -9,7 +11,20 @@ include_directories(
 	../../exodus/libexodus
 )
 
-project(exodus)
+#######################################
+# c++ version 17 or 20 if on Ubuntu 20+
+#######################################
+execute_process(
+        COMMAND         grep "Ubuntu 2" /etc/lsb-release
+        OUTPUT_VARIABLE OUTVAR
+        ERROR_VARIABLE  ERRVAR
+        RESULT_VARIABLE RESVAR
+)
+if(RESVAR EQUAL "0")
+        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a")
+else()
+        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+endif()
 
 link_directories(${CMAKE_CURRENT_SOURCE_DIR}../../exodus/libexodus/exodus)
 
@@ -55,7 +70,7 @@ add_library(number SHARED number.cpp)
 
 #dl is needed for dynamic link library code
 
-target_link_libraries(compile exodus stdc++fs ${LIBS})
+target_link_libraries(compile exodus stdc++fs pthread ${LIBS})
 target_link_libraries(createfile exodus stdc++fs ${LIBS})
 target_link_libraries(createindex exodus stdc++fs ${LIBS})
 target_link_libraries(dbgrep exodus stdc++fs ${LIBS})

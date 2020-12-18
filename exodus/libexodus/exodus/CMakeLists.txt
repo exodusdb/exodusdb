@@ -2,8 +2,25 @@
 message("")
 message("--LIBEXODUS CMAKE INIT --")
 
+project(libexodus)
+
 #use CMakeList.txt options in parent directory
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-undef")
+
+#######################################
+# c++ version 17 or 20 if on Ubuntu 20+
+#######################################
+execute_process(
+        COMMAND         grep "Ubuntu 2" /etc/lsb-release
+        OUTPUT_VARIABLE OUTVAR
+        ERROR_VARIABLE  ERRVAR
+        RESULT_VARIABLE RESVAR
+)
+if(RESVAR EQUAL "0")
+        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a")
+else()
+        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+endif()
 
 cmake_minimum_required(VERSION 2.8)
 

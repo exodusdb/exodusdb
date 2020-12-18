@@ -3,6 +3,7 @@ message("--LIBPGEXODUS CMAKE INIT--")
 
 cmake_minimum_required(VERSION 2.8)
 
+project(libpgexodus)
 
 # CONFIGURE PostgreSQL
 
