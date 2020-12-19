@@ -3268,7 +3268,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 
 	if (calc_fields && orwith)
 	{
-		throw MVDBException("OR not allowed with sort/select calculated fields");
+//		throw MVDBException("OR not allowed with sort/select calculated fields");
 	}
 
 	// prefix specified keys into where clause

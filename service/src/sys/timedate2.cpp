@@ -12,8 +12,8 @@ var x4;
 var x5;
 var x6;
 
-function main(in localdate0="", in localtime0="") {
-	//c sys "",""
+function main(in localdate0, in localtime0) {
+	//c sys
 
 	//caserevised*
 	#include <general_common.h>

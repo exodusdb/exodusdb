@@ -1553,7 +1553,17 @@ function make_include_dir(in incdir)
 
 subroutine limit_threads(int maxn_threads) {
 
-	if (vecOfThreads.size() > uint(maxn_threads)) {
+	//count the number of joinable (active) threads
+	int njoinable = 0;
+	for (std::thread & th : vecOfThreads)
+	{
+		// If thread Object is Joinable then Join that thread.
+		if (th.joinable())
+			njoinable++;
+	}
+
+	//if (vecOfThreads.size() > uint(maxn_threads)) {
+	if (njoinable >= uint(maxn_threads)) {
 		for (std::thread & th : vecOfThreads)
 		{
 			// If thread Object is Joinable then Join that thread.

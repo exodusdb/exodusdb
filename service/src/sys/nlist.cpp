@@ -522,6 +522,10 @@ filename:
 		}
 		ss ^= " " ^ word;
 
+		if (xx.read(DICT, "AUTHORISED")) {
+			onlyauthorised = 1;
+		}
+
 		//exodus custom
 
 		if (html) {
@@ -2193,7 +2197,7 @@ subroutine printbreaks() {
 			tx ^= "<tr";
 			if (lastblockn) {
 				tx ^= " style=\"cursor:pointer\" onclick=\"toggle(" "'" "B" ^ lastblockn ^ "'" ")\"";
-				}
+			}
 			//if detsupp<2 or (nbreaks>1 and leveln>1) then tx:=' style="font-weight:bold"'
 			tx ^= ">";
 		}
