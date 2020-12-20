@@ -2173,7 +2173,7 @@ function* document_onkeypress(event) {
 var gonkeydown
 function* document_onkeydown(event) {
 
-    //document_onkeydown also occurs in non-form windows not using dbform.js - like decide.htm/decide2.htm/confirm.htm/default.js etc
+    //document_onkeydown also occurs in non-form windows not using dbform.js - like confirm.htm/default.js etc
 
     //prevent keys while child window is open or rapid concurrent keydown events
     if (gonkeydown || $$('uiblockerdiv')) {

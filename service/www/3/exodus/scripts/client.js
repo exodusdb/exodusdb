@@ -324,7 +324,6 @@ function exodus_client_init() {
     }
 
     //style sheet
-    //copy any modifications to decide.htm and decide2.htm as well
     document.writeln('<link id="exodus_global_css" rel="stylesheet" type="text/css" href="' + EXODUSlocation + 'global.css">')
     //be careful to always have private.css even if empty otherwise it is ALWAYS not in cache and
     //requires a server lookup all the time. therefore upgrades will destroy any exodus client's private.css
@@ -1279,7 +1278,6 @@ function* exoduswarning(msg) {
     return yield* exodusnote(msg, 'warning')
 }
 
-//duplicated in client.js, decide.htm and decide2.htm
 function exodus_set_style(mode, value, value2) {
 
     if (value.toUpperCase() == 'DEFAULT') value = ''
@@ -2732,7 +2730,6 @@ function exodusgetcookie2(subkey, key, loginsessionid) {
 }
 
 // Retrieve the value of the cookie with the specified name
-//duplicated in client.js, decide.htm and decide2.htm
 function exodusgetcookie(loginsessionid, key, subkey) {
 
     if (glogcookie)
@@ -2832,10 +2829,8 @@ function* exodusdecide(question, data, cols, returncoln, defaultreply, many, inv
     //var dialogstyle='dialogHeight: 400px; dialogWidth: 600px; dialogTop: px; dialogLeft: px; center: Yes; help: Yes; resizable: Yes; status: Yes;'
 
     //if (guseyield && gdataset.slice(-4)=='TEST')
-    if (guseyield)
-        var results = yield* exodusconfirm2(dialogargs)
-    else
-        var results = yield* exodusshowmodaldialog(EXODUSlocation + 'decide.htm', dialogargs)
+    //if (guseyield)
+    var results = yield* exodusconfirm2(dialogargs)
     if (typeof results == 'undefined')
         results = ''
 
@@ -2882,37 +2877,6 @@ function* exodusdecide2(question, data, cols, returncoln, defaultreply, many) {
 
         return results
     }
-
-    //called from yield* exodusfilepopup() and a few other places
-
-    //data is xml string
-    //cols is array of [title,dictid]
-
-    //the data might be a db request prefixed with '@'
-    if (typeof data == 'string' && data.slice(0, 1) == '@') {
-        db.request = data.slice(1)
-        if (!(yield* db.send())) {
-            yield* exodusinvalid(db.response)
-            return null
-        }
-        data = db.data
-
-    }
-    //abort if no records found
-    if (data == '' || data == '<records>\r\n</records>') return yield* exodusinvalid('No records found')
-
-    if (typeof data == 'string')
-        data = unescape(data)
-    var dialogargs = exoduscloneobj([question, data, cols, returncoln, defaultreply, many])
-    //var dialogstyle='dialogHeight: 400px; dialogWidth: 600px; dialogTop: px; dialogLeft: px; center: Yes; help: Yes; resizable: Yes; status: Yes;'
-
-    dialogargs.logincode = glogincode
-
-    var results = yield* exodusshowmodaldialog(EXODUSlocation + 'decide2.htm', dialogargs)
-    if (!results)
-        results = ''
-
-    return rearray(results)
 
 }
 
@@ -3224,7 +3188,6 @@ function addoption(element, value, text) {
 
 }
 
-//pls keep this routine synchronised in decide2.htm and scripts/client.js
 function exodusxml2obj(xmltext) {
 
     var dataobj = new Object
@@ -3251,51 +3214,6 @@ function exodusxml2obj(xmltext) {
     }
 
     return dataobj
-
-}
-
-
-//NOT USED ANYWHERE
-//copy any modifications to decide2.htm as well
-function exodusobj2xml(obj) {
-
-    var cr = String.fromCharCode(13)
-    var xml = '<record>' + cr
-    for (var propname in obj) {
-        if (propname.slice(0, 5) == 'group') {
-
-            xml += '<' + propname + '>' + cr
-
-            var group = obj[propname]
-            for (var rown = 0; rown < group.length; rown++) {
-                xml += '<' + 'row' + rown + '>' + cr
-                var row = group[rown]
-                for (var propname2 in row) {
-                    //     if (row[propname2].element)
-                    {
-                        xml += '[' + row[propname2].element.id + ']'
-                        xml += '<' + propname2 + '>'
-                        xml += row[propname2].text
-                        xml += '</' + propname2 + '>' + cr
-                    }
-                }
-                xml += '</' + 'row' + rown + '>' + cr
-            }
-
-            xml += '</' + propname + '>' + cr
-        }
-        else {
-            if (obj[propname].element) {
-                xml += '[' + obj[propname].element.id + ']'
-                xml += '<' + propname + '>'
-                xml += obj[propname].text
-                xml += '</' + propname + '>' + cr
-            }
-        }
-    }
-
-    xml += '</record>'
-    return xml
 
 }
 
@@ -3391,11 +3309,19 @@ function* exodusconfirm(question, defaultbutton, yesbuttontitle, nobuttontitle, 
     } else {
 
         var dialogargs = [question, defaultbutton, yesbuttontitle, nobuttontitle, cancelbuttontitle, text, texthidden, image]
-        var dialogstyle
+
+        //var dialogstyle
         //dialogstyle=(question.indexOf('\r')>=2)
         //?'dialogHeight: 300px; dialogWidth: 600px;'
         //:'dialogHeight: 220px; dialogWidth: 500px;'
         //dialogstyle+=' center: Yes; help: No; resizable: No; status: No;'
+
+        var newwidth = 600
+        var newheight = 300
+        var max=getmaxwindow_sync()
+        var newleft = 0 + (max.width - newwidth) / 2
+        var newtop = 0 + (max.height - newheight) / 2
+        var dialogstyle = 'top='+newtop+', left='+newleft+', width='+newwidth+', height='+newheight
 
         var response = yield* exodusshowmodaldialog(EXODUSlocation + 'confirm.htm', dialogargs, dialogstyle)
     }
@@ -4579,13 +4505,6 @@ function getmaxwindow_sync() {
     if (!parentwindow)
         systemerror('cannot find window.opener or window.parent', 'exodusautofitwindow')
 
-    /*
-        if (window.opener) {
-    //        alert('movetoXY:'+window.opener.screenX+' '+window.opener.screenY+'\rresizetoWH:'+window.opener.outerWidth+' '+window.opener.outerHeight)
-            window.moveTo(window.opener.screenX, window.opener.screenY)
-            window.resizeTo(window.opener.outerWidth, window.opener.outerHeight)
-        }
-    */
     var max = {}
     try {
         //internet explorer gives permission denied when uploading files
@@ -5661,7 +5580,7 @@ function decide_onload(decide_args) {
         //if ((!inverted&&typeof (data[0][cols[ii][0]])=='undefined')||(inverted&&typeof (data[cols[ii][0]][0])=='undefined'))
         if ((!decide_inverted && typeof (data[0][cols[ii][0]]) == 'undefined') || (decide_inverted && typeof (data[cols[ii][0]]) == 'undefined')) {
             //  alert(cols[ii])
-            alert('popup column "' + cols[ii][0] + '" not in popup data in decide.htm')
+            alert('popup column "' + cols[ii][0] + '" not in popup data in decide_onload')
             return false
         }
 
@@ -6843,7 +6762,6 @@ function TIME(mode, value, params) {
         //DATE_TIME uses gtz
         //value=Number(value)+gtz[0]
 
-        //also in decide.htm
         var secs = value % 60
         value -= secs
         var mins = (value / 60) % 60

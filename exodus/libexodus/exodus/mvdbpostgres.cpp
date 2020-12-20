@@ -1768,12 +1768,14 @@ bool var::createfile(const var& filename) const
 	// behavior is ON COMMIT DELETE ROWS. However, the default behavior in PostgreSQL is ON
 	// COMMIT PRESERVE ROWS. The ON COMMIT DROP option does not exist in SQL.
 
+	std::string filename2 = filename.a(1).normalize().lcase().convert(".", "_").toString();
+
 	var sql = "CREATE";
 	// if (options.ucase().index("TEMPORARY")) sql ^= " TEMPORARY";
 	// sql ^= " TABLE " ^ filename.convert(".","_");
 	if (filename.substr(-5, 5) == "_temp")
 		sql ^= " TEMP ";
-	sql ^= " TABLE " ^ filename;
+	sql ^= " TABLE " ^ filename2;
 	// sql ^= " (key bytea primary key, data bytea)";
 	sql ^= " (key text primary key, data text)";
 

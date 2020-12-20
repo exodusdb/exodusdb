@@ -86,7 +86,7 @@ add_library(exodus SHARED
 # mvutf.cpp
 # ConvertUTF.c
 # mvlocale.cpp
- mv.cpp mvmv.cpp mvprogram.cpp mvarray.cpp mvdatetime.cpp mvdebug.cpp
+ mv.cpp mvmv.cpp mvprogram.cpp mvarray.cpp mvdatetime.cpp mvdebug.cpp mviter.cpp
  mvfuncs.cpp mvioconv.cpp
  mvdbpostgres.cpp mvenvironment.cpp mvglobalfuncs.cpp
  mvos.cpp mvunicode.cpp mvposix.cpp mvfunctor.cpp mvbrackets.cpp

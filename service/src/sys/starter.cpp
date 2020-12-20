@@ -25,9 +25,7 @@ function main(in startmode0, out starttime, out startdate, out startbuffer) {
 	starttime = ostime();
 
 	//autostart in system mode
-	if (not(VOLUMES)) {
-		return 1;
-	}
+	//if @volumes else return 1
 
 	call videorw(0, 0, CRTWIDE - 1, CRTHIGH - 1, "R", startbuffer);
 
@@ -45,8 +43,12 @@ inpreply:
 		}
 
 	}else{
-		if (not(decide(temp ^ "OK to start ?|", "", reply))) {
-			reply = 2;
+		reply = "Y";
+		//IF DECIDE(TEMP:'OK to start ?|','',REPLY) ELSE REPLY=2
+		call note(temp ^ "OK to start ? (Y/n)", "RC", reply);
+		reply = reply[1] == "Y";
+		if (not reply) {
+			printl("Cancelled");
 		}
 	}
 

@@ -477,12 +477,18 @@ void ExodusProgramBase::mssg(const var& msg, const var& options, var& buffer,
 
 	std::cout << msg1;
 
+	var origbuffer = buffer.assigned() ? buffer : "";
+
 	//R=Reply required in buffer
 	if (options.index("R"))
 	{
 		buffer="";
-		if (interactive)
+		if (interactive) {
+			std::cout << " ";
 			buffer.input();
+			if (buffer == "")
+				buffer=origbuffer;
+		}
 		else
 			std::cout << std::endl;
 

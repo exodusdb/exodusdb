@@ -1506,6 +1506,7 @@ class DLL_PUBLIC var final
 	std::fstream* osopenx(const var& osfilename, const var& locale) const;
 
 	friend class dim;
+	friend class var_iter;
 
 	bool THIS_IS_DBCONN() const { return ((this->var_typ & VARTYP_DBCONN) != VARTYP_UNA); }
 	bool THIS_IS_OSFILE() const { return ((this->var_typ & VARTYP_OSFILE) != VARTYP_UNA); }
@@ -1794,6 +1795,40 @@ class DLL_PUBLIC dim
 	bool initialised_;
 
 }; // of class "dim"
+
+class DLL_PUBLIC var_iter
+{
+private:
+
+    var* data;
+    std::string::size_type index = 0;
+    std::string::size_type index2 = std::string::npos;
+    var field;
+
+public:
+
+    //CONSTRUCTOR from a var
+    var_iter(var& v);
+
+    //check iter != iter (i.e. iter != end()
+    bool operator != (var_iter& vi);
+
+    //CONVERSION - conversion to var
+    operator var*();
+
+    //INCREMENT
+    var_iter operator ++ ();
+
+    //allow free function access to internals of var_iter
+    friend var_iter end(var& v);
+
+};
+
+//BEGIN - free function to create an iterator -> begin
+DLL_PUBLIC var_iter begin(var& v);
+
+//END - free function to create an interator -> end
+DLL_PUBLIC var_iter end(var& v);
 
 // must be after class declaration
 

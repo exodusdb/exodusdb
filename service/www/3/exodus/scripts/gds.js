@@ -561,10 +561,6 @@ function* gds_load(exodusrecordobject1) {
     this.data = exodusrecordobject1.data
     /**/ yield * this.bind(this.data, '', 0)
 
-    // alert(exodusobj2xml(gro.revstr))
-    //gstepping=true
-    //yield* exodusbreak('x')
-
     //trigger completion event
     this.loading = false
     this.readystate = 'complete'

@@ -459,6 +459,10 @@ var var::oconv_MD(const char* conversion) const
 			trailer = '-';
 			break;
 
+		case '<':
+			trailer = '<';
+			break;
+
 		case 'Z':
 			//Z means return empty string in the case of zero
 			//z_flag = true;
@@ -527,10 +531,18 @@ convert:
 			part1 ^= part2.substr(1,ndecimals);
 	}
 
-	// trailing minus, DB or CR
+	// trailing minus, DB or CR or wrap negative with "<...>"
 	switch (trailer)
 	{
 	case '\0':
+		break;
+
+	case '<':
+		if (part1[1] == "-")
+		{
+			part1.splicer(1, 1, "<");
+			part1 ^= ">";
+		}
 		break;
 
 	case '-':
