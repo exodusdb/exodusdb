@@ -1151,7 +1151,7 @@ subroutine requestinit() {
 		tt = "<Message ";
 		tt ^= " Date=" ^ xmlquote(datex.oconv("D"));
 		tt ^= " Time=" ^ xmlquote(timex.oconv("MTS"));
-		tt ^= " DateTime=" ^ xmlquote(datex.oconv("DJ-") ^ "T" ^ timex.oconv("MTS") ^ "." ^ timex.field(".", 2));
+		tt ^= " DateTime=" ^ xmlquote(datex.oconv("D") ^ "T" ^ timex.oconv("MTS") ^ "." ^ timex.field(".", 2));
 		tt ^= " User=" ^ xmlquote(username);
 		tt ^= " File=" ^ xmlquote(field2(replyfilename, OSSLASH, -1));
 		//REMOTE_ADDR REMOTE_HOST HTTPS

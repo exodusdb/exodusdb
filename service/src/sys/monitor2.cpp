@@ -665,7 +665,9 @@ nextdbasen:;
 	tt.converter("/", OSSLASH);
 	call osread(versionnote, tt);
 	versiondate = versionnote.trim().field(" ", 2, 3).iconv("D");
-	hostdescriptions ^= "Ver" ^ versiondate.oconv("D2/J") ^ "-" ^ versionnote.field(" ", 1).field(":", 1, 2);
+	tt = versiondate.oconv("D2/");
+	tt = tt.substr(-2,2) ^ "/" ^ tt.substr(1,5);
+	hostdescriptions ^= "Ver" ^ tt ^ "-" ^ versionnote.field(" ", 1).field(":", 1, 2);
 
 	//dont allow upgrades by test databases
 	if (SYSTEM.a(124) and (SYSTEM.a(17).substr(-4,4) ne "TEST")) {
@@ -703,7 +705,11 @@ nextdbasen:;
 				call osread(wgetoutput, tt);
 				if (wgetoutput.ucase().index(" NO NEWER ") or wgetoutput.index("100%")) {
 					upgradefiledir = upgradefilename83.osfile();
-					hostdescriptions ^= " - Upg" ^ upgradefiledir.a(2).oconv("D2/J") ^ "-" ^ upgradefiledir.a(3).oconv("MT");
+					//hostdescriptions:=' - Upg':upgradefiledir<2> 'D2/J':'-':upgradefiledir<3> 'MT'
+					//tt=upgradefiledir<2> 'D2/J'
+					tt = upgradefiledir.a(2).oconv("D2/E");
+					tt = tt.substr(-2,2) ^ "/" ^ tt.substr(1,5);
+					hostdescriptions ^= " - Upg" ^ tt ^ "-" ^ upgradefiledir.a(3).oconv("MT");
 					upgradeready = 1;
 				} else if (wgetoutput.ucase().index(" ERROR 404")) {
 				} else if (wgetoutput.ucase().index(" failed: Unknown host.")) {

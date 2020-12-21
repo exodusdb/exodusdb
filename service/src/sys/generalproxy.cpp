@@ -483,7 +483,8 @@ nextrep:
 				//DO send now to have info in requestlog
 				//report<5>=''
 
-				report.converter(VM, var().chr(255));
+				//convert vm to char(255) in report
+				report.converter(VM, RM);
 				var nn = report.count(FM) + 1;
 				for (var ii = 1; ii <= nn; ++ii) {
 					USER1.r(ii, repn, report.a(ii));
@@ -605,7 +606,8 @@ nextrep:
 		//if index(task,'MEDIADIARY',1) then printopts='X'
 
 		PSEUDO = gen.document.a(6);
-		PSEUDO.converter(var().chr(255), VM);
+		//convert char(255) to vm in @pseudo
+		PSEUDO.converter(RM, VM);
 		PSEUDO = raise(PSEUDO);
 
 		//merge any runtime parameters into the real parameters

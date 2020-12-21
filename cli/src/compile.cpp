@@ -1551,7 +1551,7 @@ function make_include_dir(in incdir)
 	return true;
 }
 
-subroutine limit_threads(int maxn_threads) {
+subroutine limit_threads(const int maxn_threads) {
 
 	//count the number of joinable (active) threads
 	int njoinable = 0;

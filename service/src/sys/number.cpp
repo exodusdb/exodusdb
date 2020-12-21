@@ -126,7 +126,7 @@ function main(in type, in input0, in ndecs0, out output) {
 				if (ndecs == "") {
 					ndecs = numx.field(".", 2).length();
 				}
-
+				//ndecs could be X to mean no conversion at all!
 				fmtx = BASEFMT.substr(1,2) ^ ndecs ^ "0P," ^ zz;
 				if (numx.isnum()) {
 					numx += 0;

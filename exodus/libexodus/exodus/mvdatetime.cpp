@@ -365,10 +365,12 @@ var var::oconv_D(const char* conversion) const
 		switch (*conversionchar)
 		{
 
+		//(E)uropean date - day first
 		case 'E':
 			dayfirst = true;
 			break;
 
+		// Not AREV
 		// DM returns month number
 		// DMA returns full month name
 		case 'M':
@@ -377,6 +379,7 @@ var var::oconv_D(const char* conversion) const
 				return &longmths[ymd.month * 11 - 10];
 			return var(ymd.month);
 
+		// Not AREV
 		// DW returns day of week number number 1-7 Mon-Sun
 		// DWA returns the day of week name
 		case 'W':
@@ -389,6 +392,7 @@ var var::oconv_D(const char* conversion) const
 				return &longdayofweeks[dow * 10 - 10];
 			return dow;
 
+		// Not AREV
 		// DY year (four digits or D2Y works too)
 		// DYn formatted
 		case 'Y':
@@ -401,14 +405,17 @@ var var::oconv_D(const char* conversion) const
 			--conversionchar;
 			break;
 
+		// Not AREV
 		// DD day of month
 		case 'D':
 			return var(ymd.day);
 
+		// Not AREV
 		// DQ returns quarter number
 		case 'Q':
 			return var(int((ymd.month - 1) / 3) + 1);
 
+		// Not AREV
 		// DJ returns day of year
 		case 'J':
 			return int(desired_date.day_of_year());

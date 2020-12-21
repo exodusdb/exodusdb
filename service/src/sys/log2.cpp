@@ -63,7 +63,9 @@ function main(in msg0, io time0) {
 
 	var entry = "";
 	if (VOLUMES) {
-		entry ^= var().date().oconv("D2-J");
+		//entry:=oconv(date(),'D2-J')
+		entry = var().date().oconv("D2-E");
+		entry = entry.substr(-2,2) ^ "-" ^ entry.substr(1,5);
 		entry ^= sep ^ time2.oconv("MTS") ^ sep;
 		//entry:=field(time2,'.',2) 'MD20P'
 	}

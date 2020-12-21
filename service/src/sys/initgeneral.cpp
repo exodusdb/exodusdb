@@ -1795,7 +1795,9 @@ nextdoc:
 				if (not(SYSTEM.a(61))) {
 					var idate = version.field(" ", 2, 4).iconv("D");
 					var itime = version.field(" ", 1).iconv("MT");
-					tt = idate.oconv("D/J") ^ " " ^ itime.oconv("MT");
+					//tt=idate 'D/J':' ':itime 'MT'
+					tt = idate.oconv("D/E");
+					tt = idate.substr(-4,4) ^ "/" ^ tt.substr(1,5) ^ " " ^ itime.oconv("MT");
 					call decide("Email users about upgrade?|(or later on do F5 EMAILUSERS UPGRADE " ^ tt ^ ")", "", reply);
 					if (reply == 1) {
 						perform("EMAILUSERS UPGRADE " ^ tt);

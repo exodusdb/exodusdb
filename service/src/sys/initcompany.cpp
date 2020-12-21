@@ -85,8 +85,7 @@ function main(in nextcompanycode) {
 		DATEFMT = "D2/";
 	} else if (dateformat.substr(1,6) == "01-31-") {
 		DATEFMT = "D2-";
-	} else if (dateformat.substr(-6,6) == "90/01/31") {
-		DATEFMT = "D2J";
+	//CASE DATE.FORMAT[-6,6]='90/01/31';@DATE.FORMAT='D2J'
 
 	//CASE DATE.FORMAT='31/01/2000';@DATE.FORMAT='D2/E'
 	//CASE DATE.FORMAT='31-01-2000';@DATE.FORMAT='D2-E'
@@ -171,7 +170,7 @@ function main(in nextcompanycode) {
 	//optional comma for decimal point
 	if (var("1.000,00|1000,00").locateusing("|",gen.company.a(22),temp)) {
 		BASEFMT = "MC";
-		}
+	}
 	BASEFMT ^= ndec ^ "0P";
 	//optional comma to indicate delimiting of thousands (with comma MD OR dot MC)
 	if (var("1,000.00|1.000,00").locateusing("|",gen.company.a(22),temp)) {

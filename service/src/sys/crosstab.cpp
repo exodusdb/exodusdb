@@ -22,8 +22,8 @@ var rowfn;//num
 var rowfield;
 var totcol;
 var coln;//num
-var coldict;
 var colorder;
+var coldict;
 var datadict;
 var prefixn;//num
 var prefix;
@@ -185,7 +185,9 @@ function main(in filename, in rowfields0, in colfield, in datafield, io table, i
 
 	totcol = colfield == "TOTAL";
 	coln = 1;
-	if (not totcol) {
+	if (totcol) {
+		colorder = "AR";
+	}else{
 		if (not(coldict.read(DICT, colfield))) {
 			if (not(coldict.read(dictvoc, colfield))) {
 				call mssg(colfield.quote() ^ " column field doesnt exist in " ^ filename);
@@ -301,7 +303,7 @@ nextmv:
 			}
 			rowvals.r(rowfn, tt);
 		};//rowfn;
-		}else{
+	}else{
 		rowvals = "Total";
 		nrowvals = 1;
 	}

@@ -402,12 +402,16 @@ function main(in mode0, out msg) {
 		docdate = tt;
 		dateorperiod = 1;
 	} else if (tt.index(".")) {
-		docdate = (tt ^ ".31").iconv("DJ");
+		//docdate=iconv(tt:'.31','DJ')
+		//if docdate else docdate=iconv(tt:'.30','DJ')
+		//if docdate else docdate=iconv(tt:'.28','DJ')
+		tt = tt.field(".", 2) ^ "." ^ tt.field(".", 1);
+		docdate = ("31." ^ tt).iconv("DE");
 		if (not docdate) {
-			docdate = (tt ^ ".30").iconv("DJ");
+			docdate = ("30." ^ tt).iconv("D.E");
 		}
 		if (not docdate) {
-			docdate = (tt ^ ".28").iconv("DJ");
+			docdate = ("28." ^ tt).iconv("D.E");
 		}
 		dateorperiod = 2;
 	} else if (tt.index("/")) {
