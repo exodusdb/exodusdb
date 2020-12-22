@@ -91,7 +91,9 @@ function main(in mode) {
 		//which had blank passwords not allowed in the new system
 		if (SECURITY.a(1).locate("MICHAEL",xx)) {
 			if (newuserprivs.osread("PATSALID.CFG")) {
-				newuserprivs = newuserprivs.invert();
+				if (VOLUMES) {
+					newuserprivs = newuserprivs.invert();
+				}
 			}
 		}
 
@@ -251,7 +253,11 @@ deletetask:
 		if (newuserprivs ne SECURITY) {
 			call log2("*write userprivs back", logtime);
 			SECURITY = newuserprivs;
-			SECURITY.invert().write(DEFINITIONS, "SECURITY");
+			if (VOLUMES) {
+				SECURITY.invert().write(DEFINITIONS, "SECURITY");
+			}else{
+				SECURITY.write(DEFINITIONS, "SECURITY");
+			}
 		}
 
 	}

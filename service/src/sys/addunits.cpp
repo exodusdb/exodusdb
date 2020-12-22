@@ -45,6 +45,7 @@ function main(in a0, io bb, in sep) {
 		for (var bn = 1; bn <= nb; ++bn) {
 			var bnum = split(bb.a(1, bn), bcode);
 			//call msg(na:' ':nb:' ':an:' ':bn:' ':acode:' ':bcode)
+
 			if (bcode == acode) {
 				//garbagecollect;
 				if (bnum.length() or anum.length()) {
@@ -59,11 +60,14 @@ function main(in a0, io bb, in sep) {
 				}else{
 					bb.r(1, bn, acode);
 				}
+				break;
 			}
-		//until bcode=acode
-			///BREAK;
-			if (bcode >= acode) break;
+
+		//could be faster if input was guaranteed to be in order
+		//until bcode>=acode
+
 		};//bn;
+
 		//if bcode<>acode and len(anum) then
 		if (bcode ne acode) {
 			bb.inserter(1, bn, anum ^ acode);

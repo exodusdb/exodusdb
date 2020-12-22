@@ -1,5 +1,6 @@
 #include <thread>
-#include <vector>
+//#include <vector>
+#include <list>
 #include <exodus/program.h>
 programinit()
 
@@ -26,8 +27,9 @@ var generateheadersonly;
 var posix;
 var windows;
 
-var max_nthreads = 1;
-std::vector<std::thread> vecOfThreads;
+var max_nthreads;
+//std::vector<std::thread> vecOfThreads;
+std::list<std::thread> threadlist;
 
 function main()
 {
@@ -49,7 +51,9 @@ function main()
 
 	var ncpus=osshellread("grep ^processor -i /proc/cpuinfo|wc").trim().field(" ",1);
 	if (ncpus)
-		max_nthreads = ncpus;
+		max_nthreads = ncpus*1.5;
+	else
+		max_nthreads = 2;
 	if (verbose)
 		printl("max threads = " , max_nthreads);
 
@@ -1095,7 +1099,8 @@ var inclusion=
 		//WARNING: all parameters must be copyable into the thread ie assigned or defaulted
 		manifest = "";
 		//std::thread thread1 = std::thread(compile,
-		vecOfThreads.push_back(
+		//vecOfThreads.push_back(
+		threadlist.push_back(
 			std::thread(
 				compile,
 				verbose,
@@ -1551,26 +1556,24 @@ function make_include_dir(in incdir)
 	return true;
 }
 
-subroutine limit_threads(const int maxn_threads) {
+subroutine limit_threads(in maxn_threads) {
 
-	//count the number of joinable (active) threads
-	int njoinable = 0;
-	for (std::thread & th : vecOfThreads)
+	//remove terminated threads
+	threadlist.remove_if([] (const std::thread& th){return !th.joinable();});
+
+	//quit if the number of active threads is < maxn_threads
+	if (int(threadlist.size()) <= maxn_threads)
+		return;
+
+	//find an active thread to wait for completion
+	//or, if maxn_threads == 0 then wait on all active threads for completion
+	for (std::thread & th : threadlist)
 	{
-		// If thread Object is Joinable then Join that thread.
-		if (th.joinable())
-			njoinable++;
-	}
-
-	//if (vecOfThreads.size() > uint(maxn_threads)) {
-	if (njoinable >= uint(maxn_threads)) {
-		for (std::thread & th : vecOfThreads)
-		{
-			// If thread Object is Joinable then Join that thread.
-			if (th.joinable())
-				th.join();
+		if (th.joinable()) {
+			th.join();
+			if (maxn_threads)
+				break;
 		}
-		vecOfThreads.clear();
 	}
 }
 

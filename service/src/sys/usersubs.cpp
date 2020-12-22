@@ -170,7 +170,9 @@ function main(in mode) {
 		var resetpassword = mode.field(".", 2) == "RESETPASSWORD";
 
 		if (SECURITY.read(DEFINITIONS, "SECURITY")) {
-			SECURITY = SECURITY.invert();
+			if (VOLUMES) {
+				SECURITY = SECURITY.invert();
+			}
 		}
 
 		if (SECURITY.a(1).locate(ID,usern)) {
@@ -199,7 +201,9 @@ function main(in mode) {
 			call sysmsg(msg);
 			return invalid(msg);
 		}
-		SECURITY = SECURITY.invert();
+		if (VOLUMES) {
+			SECURITY = SECURITY.invert();
+		}
 
 		var olduserprivs = SECURITY;
 
@@ -216,7 +220,7 @@ function main(in mode) {
 					//expiry date
 					if (win.orec.a(35)) {
 						RECORD.r(35, win.orec.a(35));
-						}
+					}
 					//password date
 					if (win.orec.a(36)) {
 						RECORD.r(36, win.orec.a(36));
@@ -320,7 +324,11 @@ function main(in mode) {
 		}
 
 		if ((resetpassword < 2) and SECURITY ne olduserprivs) {
-			SECURITY.invert().write(DEFINITIONS, "SECURITY");
+			if (VOLUMES) {
+				SECURITY.invert().write(DEFINITIONS, "SECURITY");
+			}else{
+				SECURITY.write(DEFINITIONS, "SECURITY");
+			}
 			//no need on user if on userprivs
 			RECORD.r(4, "");
 		}

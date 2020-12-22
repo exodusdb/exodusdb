@@ -267,7 +267,9 @@ subroutine readuserprivs() {
 		if (not(SECURITY.read(DEFINITIONS, "SECURITY"))) {
 			SECURITY = "";
 		}
-		SECURITY = SECURITY.invert();
+		if (VOLUMES) {
+			SECURITY = SECURITY.invert();
+		}
 	}else{
 		SECURITY = "";
 	}
@@ -277,7 +279,11 @@ subroutine readuserprivs() {
 subroutine writeuserprivs() {
 	SECURITY.r(9, "");
 	if (DEFINITIONS.open("DEFINITIONS", "")) {
-		SECURITY.invert().write(DEFINITIONS, "SECURITY");
+		if (VOLUMES) {
+			SECURITY.invert().write(DEFINITIONS, "SECURITY");
+		}else{
+			SECURITY.write(DEFINITIONS, "SECURITY");
+		}
 	}
 	return;
 }

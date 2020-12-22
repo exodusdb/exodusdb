@@ -318,7 +318,9 @@ subroutine getsec() {
 	if (not(SECURITY.read(DEFINITIONS, "SECURITY"))) {
 		SECURITY = "";
 	}
-	SECURITY = SECURITY.invert();
+	if (VOLUMES) {
+		SECURITY = SECURITY.invert();
+	}
 	return;
 }
 

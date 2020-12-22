@@ -2012,6 +2012,22 @@ dict(AGE_IN_YEARS) {
 	assert(var("30/2/2008").iconv("DE") eq "");
 	assert(var("1/31/2008").iconv("DE") eq "");
 
+	assert(oconv(15036, "D")     == "01 MAR 2009");
+	assert(oconv(15036, "D2")    == "01 MAR 09");
+	assert(oconv(15036, "D4")    == "01 MAR 2009");
+
+	assert(oconv(15036, "D/")    == "03/01/2009");
+	assert(oconv(15036, "D2/")   == "03/01/09");
+	assert(oconv(15036, "D*")    == "03*01*2009");
+
+	assert(oconv(15036, "D/E")   == "01/03/2009");
+	assert(oconv(15036, "D2E")   == "01 MAR 09");
+	assert(oconv(15036, "D2/E")  == "01/03/09");
+
+	assert(oconv(15036, "DQ")   == "1");
+	assert(oconv(15036, "DW")   == "7");
+	assert(oconv(15036, "DWA")  == "SUNDAY");
+
 	//select("select test_alphanum with f1 between 20 and 21");
 	printl(oconv(10.1,"MD20"));
 

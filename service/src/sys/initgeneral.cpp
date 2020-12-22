@@ -1113,7 +1113,9 @@ getproxy:
 			}
 		}
 	}
-	SECURITY = SECURITY.invert();
+	if (VOLUMES) {
+		SECURITY = SECURITY.invert();
+	}
 
 	//must be before init.acc, init.agency or any task adding
 	//call security.subs2('FIXUSERPRIVS')
