@@ -47,4 +47,4 @@ find ../neosys.net -type f -exec sed -i 's#NEOSYS#EXODUS#g' {} \;
 find ../neosys.net -type f -exec sed -i 's#Copyright EXODUS#Copyright NEOSYS#g' {} \;
 
 cd ~/exodus/service || exit
-rsync -avr neosys.net/* www
+rsync -avr --delete neosys.net/* www

@@ -71,7 +71,7 @@
             &filename=devdtest\upload\vouchers\rec-89-1\1.umesh_signature.jpg
             */
             
-            //try fix problem that upload.dll doesnt escape & character in filenames
+            //try fix problem that upload.php doesnt escape & character in filenames
             //assumes that we know all parameter names. at least those required and those immediately after them
             params = params.replace(/&FileName/, '\rFilename')
             params = params.replace(/&FileSize/, '\rFileSize')

@@ -1,6 +1,8 @@
 <?php
 
-/* put the following text in .htaccess in the folder where
+/* no longer required since we call upload.php directly now.
+
+put the following text in .htaccess in the folder where
 upload.dll and upload.php are. Then on apache requests to
 upload.dll will be handled by upload.php.
 

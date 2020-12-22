@@ -3,6 +3,8 @@
 
     // Copyright NEOSYS All Rights Reserved.
 
+    //obsolete. replaced by xhttp.php
+
     //keep sessions for 16 hours to try and avoid multiple sessions per user (limit is 24 hours)
     Session.Timeout = 16 * 60
 

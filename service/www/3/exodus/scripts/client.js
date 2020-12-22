@@ -2339,7 +2339,8 @@ function* exodusdblink_send_byhttp_using_xmlhttp(data) {
         //send the xmldoc to the server and get the response
         try {
             //false for synchronous (wait for response before continuing to next statement)
-            xhttp.open('POST', EXODUSlocation + 'scripts/xhttp.asp', async = gasynchronous || ignoreresult)
+            //xhttp.open('POST', EXODUSlocation + 'scripts/xhttp.asp', async = gasynchronous || ignoreresult)
+            xhttp.open('POST', EXODUSlocation + 'scripts/xhttp.php', async = gasynchronous || ignoreresult)
             //this was never required but inserted in the hope that it will
             //avoid unknown problems. Perhaps it is not necessary for active pages like .asp.
             xhttp.setRequestHeader("Pragma", "no-cache");
