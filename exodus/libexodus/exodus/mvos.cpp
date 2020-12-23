@@ -984,14 +984,33 @@ bool var::ossetenv(const var& envvarname) const
 var var::ostempdirname() const
 {
 	std::error_code error_code;
-	return std::string(stdfs::temp_directory_path(error_code));
+	std::string dirname = std::string(stdfs::temp_directory_path(error_code));
+	if (dirname.back() != SLASH_)
+		dirname.push_back(SLASH_);
+	return dirname;
 }
 
+//this will actually create files liek /tmp/~XXXXXX that should be deleted if not used
 var var::ostempfilename() const
 {
 	//TODO replace with mkstemp
 	//https://cpp.hotexamples.com/examples/-/-/mkstemp/cpp-mkstemp-function-examples.html
-	return std::string(std::tmpnam(nullptr));
+	//return std::string(std::tmpnam(nullptr));
+	var tempfilename = this->ostempdirname();
+
+	char* tmp;
+	tmp=new char[strlen(tempfilename.var_str.c_str())+8];
+	strcpy(tmp, tempfilename.var_str.c_str());
+	strcat(tmp, "~XXXXXX");
+	int fd;
+	if((fd=mkstemp(tmp))==-1){
+		delete tmp;
+		//fprintf(stderr, "Failed creating temp file.\n");
+		return "nope";
+	}
+	tempfilename=tmp;
+	delete tmp;
+	return tempfilename;
 }
 
 bool var::suspend() const

@@ -43,6 +43,9 @@ Binary    Hex          Comments
 #include <iostream> //cin and cout
 #include <memory>   //for unique_ptr
 
+#include <mutex>
+#define LOCKIOSTREAM std::lock_guard<std::mutex> guard(global_mutex_threadstream);
+
 #ifndef M_PI
 //#define M_PI 3.14159265358979323846f
 #define M_PI 3.14159265
@@ -61,6 +64,8 @@ bool desynced_with_stdio = false;
 
 namespace exodus
 {
+
+static std::mutex global_mutex_threadstream;
 
 int var::localeAwareCompare(const std::string& str1, const std::string& str2)
 {
@@ -1790,6 +1795,7 @@ bool var::isnum(void) const
 // output
 /////////
 
+//warning put() is not threadsafe whereas output(), errput() and logput() are threadsafe
 const var& var::put(std::ostream& ostream1) const
 {
 	THISIS("const var& var::put(std::ostream& ostream1) const")
@@ -1811,8 +1817,18 @@ const var& var::put(std::ostream& ostream1) const
 	return *this;
 }
 
-const var& var::output() const { return put(std::cout); }
+// output -> cout which is buffered standard output
+///////////////////////////////////////////////////
 
+// output() buffered threadsafe output to standard output
+const var& var::output() const
+{
+	LOCKIOSTREAM
+	return put(std::cout);
+}
+
+// outputl() flushed threadsafe output to standard output
+// adds \n and flushes so is slower than output("\n")
 const var& var::outputl() const
 {
 	this->put(std::cout);
@@ -1820,29 +1836,38 @@ const var& var::outputl() const
 	return *this;
 }
 
+// outputt() buffered threadsafe output to standard output
+// adds \t
 const var& var::outputt() const
 {
+	LOCKIOSTREAM
 	this->put(std::cout);
 	std::cout << '\t';
 	return *this;
 }
 
+// overloaded output() outputs a prefix str
 const var& var::output(const var& str) const
 {
+	LOCKIOSTREAM
 	str.put(std::cout);
 	return this->put(std::cout);
 }
 
+// oveloaded outputl() outputs a prefix str
 const var& var::outputl(const var& str) const
 {
+	LOCKIOSTREAM
 	str.put(std::cout);
 	this->put(std::cout);
 	std::cout << std::endl;
 	return *this;
 }
 
+// overloaded outputt() outputs a prefix str
 const var& var::outputt(const var& str) const
 {
+	LOCKIOSTREAM
 	std::cout << "\t";
 	str.put(std::cout);
 	std::cout << "\t";
@@ -1850,53 +1875,76 @@ const var& var::outputt(const var& str) const
 	return *this;
 }
 
-const var& var::errput() const { return put(std::cerr); }
+// errput -> cerr which is unbuffered standard error
+////////////////////////////////////////////////////
 
+// errput() unbuffered threadsafe output to standard error
+const var& var::errput() const {
+	LOCKIOSTREAM
+	return put(std::cerr);
+}
+
+// errputl() unbuffered threadsafe output to standard error
+// adds "\n"
 const var& var::errputl() const
 {
+	LOCKIOSTREAM
 	this->put(std::cerr);
 	std::cerr << std::endl;
 	return *this;
 }
 
+// overloaded errput outputs a prefix str
 const var& var::errput(const var& str) const
 {
+	LOCKIOSTREAM
 	str.put(std::cerr);
 	return this->put(std::cerr);
 }
 
+// overloaded errputl outputs a prefix str
 const var& var::errputl(const var& str) const
 {
+	LOCKIOSTREAM
 	str.put(std::cerr);
 	this->put(std::cerr);
 	std::cerr << std::endl;
 	return *this;
 }
 
-// clog is unbuffered version of cerr?
-// 3>xyz.log captures nothing on windows
+// logput -> clog which is a buffered version of cerr standard error output
+///////////////////////////////////////////////////////////////////////////
+
+// logput() buffered threadsafe output to standard log
 const var& var::logput() const
 {
+	LOCKIOSTREAM
 	this->put(std::clog);
 	//std::clog.flush();
 	return *this;
 }
 
+// logput() flushed threadsafe output to standard log
 const var& var::logputl() const
 {
+	LOCKIOSTREAM
 	this->put(std::clog);
 	std::clog << std::endl;
 	return *this;
 }
 
+// overloaded logput with a prefix str
 const var& var::logput(const var& str) const
 {
+	LOCKIOSTREAM
 	str.put(std::clog);
 	return this->put(std::clog);
 }
 
+// overloaded logputl with a prefix str
 const var& var::logputl(const var& str) const
 {
+	LOCKIOSTREAM
 	str.put(std::clog);
 	this->put(std::clog);
 	std::clog << std::endl;
@@ -2076,6 +2124,7 @@ var var::logoff() const
 	// THISIS("var var::logoff() const")
 	// THISISSTRING("var.logoff()")
 
+	LOCKIOSTREAM
 	std::cout << "var::logoff not implemented yet " << std::endl;
 	return "";
 }
