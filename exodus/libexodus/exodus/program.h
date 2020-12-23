@@ -25,21 +25,22 @@
 
 // a program is just a class with an following
 // int main() function that creates and calls it
-#define programinit() classinit()
+#define programinit(PROGRAMNAME) classinit(PROGRAMNAME)
 
 // SIMILAR CODE IN
 // program.h programexit
 // exodusmacros.h libraryexit()
 
 //OPTION I=Ignore causes error exit to be suppressed
-#define programexit()                                                              \
-	classexit() int main(int exodus__argc, char* exodus__argv[])                   \
+#define programexit(PROGRAMNAME)                                                   \
+	classexit(PROGRAMNAME)                                                         \
+	int PROGRAMNAME##main(int exodus__argc, char* exodus__argv[])                  \
 	{                                                                              \
 		MvEnvironment mv;                                                          \
 		exodus_main(exodus__argc, exodus__argv, mv);                               \
 		try                                                                        \
 		{                                                                          \
-			ExodusProgram exodusprogram1(mv);                                      \
+			PROGRAMNAME##ExodusProgram exodusprogram1(mv);                         \
 			return OPTIONS.index("I") ? 0 : exodusprogram1.main().toInt();         \
 		}                                                                          \
 		catch (MVStop exceptionx)                                                  \
@@ -79,8 +80,9 @@
 	}
 
 // same as programexit but no try/catch block so can go into a debugger
-#define debugprogramexit()                                                         \
-	classexit() int main(int exodus__argc, char* exodus__argv[])                   \
+#define debugprogramexit(PROGRAMNAME)                                              \
+	classexit(PROGRAMNAME)                                                         \
+    int PROGRAMNAME##main(int exodus__argc, char* exodus__argv[])                  \
 	{                                                                              \
 		MvEnvironment mv;                                                          \
 		exodus_main(exodus__argc, exodus__argv, mv);                               \

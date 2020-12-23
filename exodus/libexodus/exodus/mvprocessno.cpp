@@ -4,6 +4,7 @@
 //#include <errno.h>
 #include <stdio.h>
 #include <string>
+#include <iostream>
 
 namespace exodus
 {
@@ -66,6 +67,7 @@ int getprocessno(const char* filename, int* fd)
 	struct flock fl;
 
 	*fd = open(filename, O_RDWR | O_CREAT, 0666);
+	//*fd = open(filename, O_RDWR | O_CREAT | O_CLOEXEC, 0666);
 	// *fd = open(filename, O_RDONLY, 0);
 	if (*fd == -1) {
 		printf("exodus getprocessno file '%s' doesnt exist\n", filename);
@@ -96,6 +98,7 @@ int getprocessno(const char* filename, int* fd)
 		else
 		{
 
+std::cout << ii << " #############################################################################################################" << std::endl;
 			// printf("Locked was granted for %i\n", ii);
 			// char c=getchar();
 			// DONT close fd otherwise lock will be released.

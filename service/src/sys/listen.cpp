@@ -238,7 +238,7 @@ function main() {
 
 	logfilename = "";
 
-	portno = 5700;
+	portno = PROCESSNO;//5700;
 	if (SYSTEM.a(38)) {
 		portno += SYSTEM.a(38) - 1;
 	}
@@ -395,7 +395,8 @@ function main() {
 	printl(var("-").str(79));
 	printl("EXODUS.NET SERVICE ", SYSTEM.a(24), " STARTED ", var().timedate());
 	printl();
-	printl("Station  : ", STATION.oconv("L#25"), "Drive : ", oscwd());
+	//printl("Station  : ", STATION.oconv("L#25"), "Drive : ", oscwd());
+	printl("Station  : ", STATION.oconv("L#15"), "Process : ", PROCESSNO.oconv("L#5"), " Drive : ", oscwd());
 
 	SYSTEM.r(33, 1);
 

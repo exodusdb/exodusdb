@@ -883,11 +883,11 @@ int exodus_main(int exodus__argc, char* exodus__argv[], MvEnvironment& mv)
 	var().breakon();
 
 	//	tss_environmentns.reset(new int(0));
-	global_environments.resize(6);
+//	global_environments.resize(6);
 	int environmentn = 0;
 	mv.init(environmentn);
 	// mv.DICT.outputl("DICT=");
-	global_environments[environmentn] = &mv;
+//	global_environments[environmentn] = &mv;
 
 	mv.EXECPATH = getexecpath();
 	if (not mv.EXECPATH)

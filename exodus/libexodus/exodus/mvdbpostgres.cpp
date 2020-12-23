@@ -125,14 +125,14 @@ bool getdbtrace()
 }
 
 //#if TRACING >= 5
-#define DEBUG_LOG_SQL                                                                              \
-	if (GETDBTRACE)                                                                            \
-	{                                                                                          \
-		sql.logputl("SQL:");                                                               \
+#define DEBUG_LOG_SQL                                                                \
+	if (GETDBTRACE)                                                                  \
+	{                                                                                \
+		sql.logputl("SQL:");                                                         \
 	}
-#define DEBUG_LOG_SQL1                                                                             \
-	if (GETDBTRACE)                                                                            \
-	{                                                                                          \
+#define DEBUG_LOG_SQL1                                                               \
+	if (GETDBTRACE)                                                                  \
+	{                                                                                \
 		sql.swap("$1", var(paramValues[0]).squote()).logputl("SQL1:");               \
 	}
 //#else
@@ -542,7 +542,7 @@ int var::getconnectionid_ordefault() const
 	// otherwise do a default connect and do setdefaultconnection
 	else
 	{
-		// exodus::outputl("getconnectionid_ordefault didnt find default thread connection
+		//std::cerr << "getconnectionid_ordefault didnt find default thread connection" << std::endl;
 		// id");
 		var conn1;
 		if (conn1.connect())

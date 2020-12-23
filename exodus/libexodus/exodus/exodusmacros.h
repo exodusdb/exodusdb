@@ -55,51 +55,51 @@ THE SOFTWARE.
 // anyway. void main2(int exodus__argc, char *exodus__argv[], MvEnvironment& mv) SIMILAR CODE IN
 // program.h programexit
 // exodusmacros.h libraryexit(
-#define exodusprogram()                                                                            \
-	void main2(MvEnvironment& mv);                                                             \
-	int main(int exodus__argc, char* exodus__argv[])                                           \
-	{                                                                                          \
-		MvEnvironment mv;                                                                  \
-		exodus_main(exodus__argc, exodus__argv, mv);                                       \
-		try                                                                                \
-		{                                                                                  \
-			main2(mv);                                                                 \
-		}                                                                                  \
-		catch (MVStop exceptionx)                                                          \
-		{                                                                                  \
-			if (exceptionx.description.length())                                       \
+#define exodusprogram()                                                            \
+	void main2(MvEnvironment& mv);                                                 \
+	int main(int exodus__argc, char* exodus__argv[])                               \
+	{                                                                              \
+		MvEnvironment mv;                                                          \
+		exodus_main(exodus__argc, exodus__argv, mv);                               \
+		try                                                                        \
+		{                                                                          \
+			main2(mv);                                                             \
+		}                                                                          \
+		catch (MVStop exceptionx)                                                  \
+		{                                                                          \
+			if (exceptionx.description.length())                                   \
 				exceptionx.description.outputl();                                  \
-			if (exceptionx.description.isnum())                                        \
+			if (exceptionx.description.isnum())                                    \
 				exit(exceptionx.description);                                      \
-			else                                                                       \
+			else                                                                   \
 				exit(0);                                                           \
-		}                                                                                  \
-		catch (MVAbort exceptionx)                                                         \
-		{                                                                                  \
-			if (exceptionx.description.length())                                       \
+		}                                                                          \
+		catch (MVAbort exceptionx)                                                 \
+		{                                                                          \
+			if (exceptionx.description.length())                                   \
 				exceptionx.description.outputl();                                  \
-			if (exceptionx.description.isnum())                                        \
+			if (exceptionx.description.isnum())                                    \
 				exit(exceptionx.description);                                      \
-			else                                                                       \
+			else                                                                   \
 				exit(1);                                                           \
-		}                                                                                  \
-		catch (MVAbortAll exceptionx)                                                      \
-		{                                                                                  \
-			if (exceptionx.description.length())                                       \
+		}                                                                          \
+		catch (MVAbortAll exceptionx)                                              \
+		{                                                                          \
+			if (exceptionx.description.length())                                   \
 				exceptionx.description.outputl();                                  \
-			if (exceptionx.description.isnum())                                        \
+			if (exceptionx.description.isnum())                                    \
 				exit(exceptionx.description);                                      \
-			else                                                                       \
+			else                                                                   \
 				exit(2);                                                           \
-		}                                                                                  \
-		catch (MVException exceptionx)                                                     \
-		{                                                                                  \
-			printl(exceptionx.description, " - Aborting.");                            \
-			printl(exceptionx.stack.convert(FM, L"\n"));                               \
-			exit(999);                                                                 \
-		}                                                                                  \
-		return 0;                                                                          \
-	}                                                                                          \
+		}                                                                          \
+		catch (MVException exceptionx)                                             \
+		{                                                                          \
+			printl(exceptionx.description, " - Aborting.");                        \
+			printl(exceptionx.stack.convert(FM, L"\n"));                           \
+			exit(999);                                                             \
+		}                                                                          \
+		return 0;                                                                  \
+	}                                                                              \
 	void main2(MvEnvironment& mv)
 
 // allow pseudo pick syntax
@@ -129,7 +129,7 @@ THE SOFTWARE.
 #ifdef __GNUC__
 #define EXODUSMACRO_IMPORTEXPORT EXODUS_EXTERN_C __attribute__((dllexport))
 #else
-#define EXODUSMACRO_IMPORTEXPORT                                                                   \
+#define EXODUSMACRO_IMPORTEXPORT                                                               \
 	EXODUS_EXTERN_C __declspec(                                                                \
 	    dllexport) // Note: actually gcc seems to also support this syntax.
 #endif
@@ -137,7 +137,7 @@ THE SOFTWARE.
 #ifdef __GNUC__
 #define EXODUSMACRO_IMPORTEXPORT __attribute__((dllimport))
 #else
-#define EXODUSMACRO_IMPORTEXPORT                                                                   \
+#define EXODUSMACRO_IMPORTEXPORT                                                               \
 	__declspec(dllimport) // Note: actually gcc seems to also support this syntax.
 #endif
 #endif
@@ -165,18 +165,17 @@ THE SOFTWARE.
 // class init
 // allow multiple named "exodus classes" useful for dictionary item programs where each dict item
 // becomes a separate class with its own "main" entry point
-#define classinit(CLASSNAME)                                                                       \
+#define classinit(CLASSNAME)                                                                   \
 	class CLASSNAME##ExodusProgram : public ExodusProgramBase                                  \
 	{
 
 // class exit
 // insert a constructor function accepting an mvenvironment just before the class exit
 // and then insert the class termination "};"
-#define classexit(CLASSNAME)                                                                       \
-      public:                                                                                      \
+#define classexit(CLASSNAME)                                                                   \
+	public:                                                                                    \
 	CLASSNAME##ExodusProgram(MvEnvironment& mv) : ExodusProgramBase(mv) {}                     \
-	}                                                                                          \
-	;
+	};
 
 #define iscommon(COMMONNAME) ((&COMMONNAME) != NULL)
 

@@ -496,7 +496,7 @@ var& var::operator=(const char* char2)
 var& var::operator=(const std::string& string2)
 {
 
-	THISIS("var& var::operator= (const char* char2)")
+	THISIS("var& var::operator= (const std::string& string2)")
 	// protect against unlikely syntax as follows:
 	// var undefinedassign=undefinedassign=std::string("xxx"";
 	// this causes crash due to bad memory access due to setting string that doesnt exist

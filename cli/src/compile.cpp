@@ -1,6 +1,6 @@
 #include <thread>
-//#include <vector>
 #include <list>
+
 #include <exodus/program.h>
 programinit()
 
@@ -28,7 +28,6 @@ var posix;
 var windows;
 
 var max_nthreads;
-//std::vector<std::thread> vecOfThreads;
 std::list<std::thread> threadlist;
 
 function main()
@@ -144,7 +143,10 @@ function main()
 		//__cplusplus is 201103L
 		//if( __cplusplus >= 201103L )
 			//basicoptions^=" -std=c++11";//gcc 4.7 and later DISABLES gnu extensions
-		basicoptions^=" -std=c++17";//gcc 4.7 and later DISABLES gnu extensions
+		if  (__cplusplus >= 202003L)
+			basicoptions^=" -std=c++2a";//gcc 4.7 and later DISABLES gnu extensions
+		else
+			basicoptions^=" -std=c++17";//gcc 4.7 and later DISABLES gnu extensions
 
 		//http://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#Warning-Options
 		basicoptions^=" -Wall";
@@ -165,7 +167,7 @@ function main()
 		//if (debugging)
 		//	linkoptions=" -lexodus-gd";
 		//else
-			linkoptions=" -lexodus -lstdc++fs";
+			linkoptions=" -lexodus -lstdc++fs -lpthread";
 
 		//always look in header install path eg ~/inc
 		basicoptions^=" -I"^incdir;
@@ -1099,7 +1101,6 @@ var inclusion=
 		//WARNING: all parameters must be copyable into the thread ie assigned or defaulted
 		manifest = "";
 		//std::thread thread1 = std::thread(compile,
-		//vecOfThreads.push_back(
 		threadlist.push_back(
 			std::thread(
 				compile,
