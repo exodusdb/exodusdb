@@ -371,11 +371,11 @@ class DLL_PUBLIC var final
 	var();
 
 	// copy constructor
-	var(const var& var1);
+	var(const var& var1) = default;
 	// var(var var1);
 
 	// move constructor
-	var(const var&& var1) noexcept;
+	var(var&& var1) = default;
 
 	// copy assignment
 	//=var
@@ -383,11 +383,11 @@ class DLL_PUBLIC var final
 	// cant be (const var& var1) because seems to cause a problem with var1=var2 in function
 	// parameters unfortunately causes problem of passing var by value and thereby unnecessary
 	// contruction see also ^= etc
-	var& operator=(const var& var1);
+	var& operator=(const var& var1) = default;
 	// var& operator=(var var1) noexcept;
 
 	// move assigment
-	var& operator=(const var&& var1) noexcept;
+	var& operator=(var&& var1) = default;
 
 	//WARNING: non-virtual destructor - so cannot create derived classes
 	~var();

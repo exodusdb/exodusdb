@@ -750,9 +750,13 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/)
 	}
 */
 // *
+
 	//check filename2 is a valid table or view etc.
 	//var sql="select '" ^ filename2 ^ "'::regclass";
 	//if (! connection.sqlexec(sql))
+
+
+	// 1. look in information_schema.tables
 	var sql = "\
 		SELECT\
 		EXISTS	(\
@@ -765,6 +769,24 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/)
 	var result;
 	connection.sqlexec(sql,result);
 	//result.convert(RM,"|").outputl("result=");
+
+	// 2. look in materialised views
+	// select matviewname from pg_matviews where matviewname = '...';
+	if (result[-1] != "t")
+	{
+		sql = "\
+			SELECT\
+			EXISTS	(\
+	    		SELECT 	matviewname\
+	    		FROM 	pg_matviews\
+	    		WHERE\
+						matviewname = '" ^ filename2 ^ "'\
+					)\
+		";
+		connection.sqlexec(sql,result);
+	}
+
+	//failure if not found
 	if (result[-1] != "t")
 	{
 		var errmsg = "ERROR: mvdbpostgres 2 open(" ^ filename.quote() ^
@@ -4280,7 +4302,9 @@ var var::listfiles() const
 	// from http://www.alberton.info/postgresql_meta_info.html
 
 	var sql = "SELECT table_name FROM information_schema.tables WHERE table_type = 'BASE "
-		  "TABLE' AND table_schema NOT IN ('pg_catalog', 'information_schema'); ";
+		  "TABLE' AND table_schema NOT IN ('pg_catalog', 'information_schema') ";
+
+	sql ^= " UNION SELECT matviewname as table_name from pg_matviews;";
 
 	PGconn* pgconn = (PGconn*)this->connection();
 	if (pgconn == NULL)

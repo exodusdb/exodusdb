@@ -111,6 +111,7 @@ var::var()
 
 }
 
+/* =default
 // copy constructor
 var::var(const var& rhs)
     : var_str(rhs.var_str),
@@ -124,8 +125,9 @@ var::var(const var& rhs)
 
 	  // not a pointer anymore for speed
 	  // priv=new pimpl;
-}
+}*/
 
+/* = default
 // move constructor
 var::var(const var&& rhs) noexcept
     : var_str(std::move(rhs.var_str)),
@@ -138,7 +140,7 @@ var::var(const var&& rhs) noexcept
 	// skip this for speed since temporararies are unlikely to be unassigned
 	// THISIS("var::var(const var&& rhs)")
 	// ISASSIGNED(rhs)
-}
+}*/
 
 // constructor for char*
 // use initializers since cannot fail unless out of memory
@@ -360,6 +362,7 @@ var::operator const char*()
 // cant be (const var& rhs) because seems to cause a problem with var1=var2 in function parameters
 // unfortunately causes problem of passing var by value and thereby unnecessary contruction
 // see also ^= etc
+/* = default
 var& var::operator=(const var& rhs)
 {
 	THISIS("var& var::operator= (const var& rhs)")
@@ -377,30 +380,9 @@ var& var::operator=(const var& rhs)
 	var_typ = rhs.var_typ;
 
 	return *this;
-}
-/* sadly cant use this idiom since it is ambiguous with move constructor
-var& var::operator= (var rhs) noexcept
-{
-//	THISIS("var& var::operator= (var rhs)")
-//	THISISDEFINED()
+}*/
 
-	//copy-and-swap idiom
-	//1. create a temporary copy of the variable to be copied BEFORE even arriving in this
-routine
-	//2. swap this and temporary copy
-	//3. what was this is now in the temp will now be destructed correctly on exit
-	using std::swap;
-	swap(var_str,rhs.var_str);
-	//just grab the rest
-	var_dbl=rhs.var_dbl;
-	var_int=rhs.var_int;
-	var_typ=rhs.var_typ;
-
-	return *this;
-
-}
-*/
-
+/* =default
 // move assignment
 var& var::operator=(const var&& rhs) noexcept
 {
@@ -420,7 +402,7 @@ var& var::operator=(const var&& rhs) noexcept
 	var_typ = rhs.var_typ;
 
 	return *this;
-}
+}*/
 
 //=int
 // The assignment operator should always return a reference to *this.

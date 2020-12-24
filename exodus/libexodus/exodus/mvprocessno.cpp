@@ -98,7 +98,7 @@ int getprocessno(const char* filename, int* fd)
 		else
 		{
 
-std::cout << ii << " #############################################################################################################" << std::endl;
+//std::cout << ii << " #############################################################################################################" << std::endl;
 			// printf("Locked was granted for %i\n", ii);
 			// char c=getchar();
 			// DONT close fd otherwise lock will be released.

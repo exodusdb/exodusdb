@@ -60,7 +60,7 @@ THE SOFTWARE.
 	int main(int exodus__argc, char* exodus__argv[])                               \
 	{                                                                              \
 		MvEnvironment mv;                                                          \
-		exodus_main(exodus__argc, exodus__argv, mv);                               \
+		exodus_main(exodus__argc, exodus__argv, mv, 0);                            \
 		try                                                                        \
 		{                                                                          \
 			main2(mv);                                                             \

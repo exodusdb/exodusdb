@@ -875,7 +875,7 @@ return bytes;
 */
 
 DLL_PUBLIC
-int exodus_main(int exodus__argc, char* exodus__argv[], MvEnvironment& mv)
+int exodus_main(int exodus__argc, char* exodus__argv[], MvEnvironment& mv, int environmentno)
 {
 
 	// signal/interrupt handlers
@@ -884,8 +884,8 @@ int exodus_main(int exodus__argc, char* exodus__argv[], MvEnvironment& mv)
 
 	//	tss_environmentns.reset(new int(0));
 //	global_environments.resize(6);
-	int environmentn = 0;
-	mv.init(environmentn);
+	//int environmentn = 0;
+	mv.init(environmentno);
 	// mv.DICT.outputl("DICT=");
 //	global_environments[environmentn] = &mv;
 

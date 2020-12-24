@@ -34,10 +34,10 @@
 //OPTION I=Ignore causes error exit to be suppressed
 #define programexit(PROGRAMNAME)                                                   \
 	classexit(PROGRAMNAME)                                                         \
-	int PROGRAMNAME##main(int exodus__argc, char* exodus__argv[])                  \
+	int PROGRAMNAME##main2(int exodus__argc, char* exodus__argv[], int threadno)   \
 	{                                                                              \
 		MvEnvironment mv;                                                          \
-		exodus_main(exodus__argc, exodus__argv, mv);                               \
+		exodus_main(exodus__argc, exodus__argv, mv, threadno);                     \
 		try                                                                        \
 		{                                                                          \
 			PROGRAMNAME##ExodusProgram exodusprogram1(mv);                         \
@@ -77,7 +77,11 @@
 			exit(OPTIONS.index("I") ? 0 : 999);                                    \
 		}                                                                          \
 		return 0;                                                                  \
-	}
+	}                                                                              \
+	int PROGRAMNAME##main(int exodus__argc, char* exodus__argv[])                  \
+	{                                                                              \
+		return PROGRAMNAME##main2(exodus__argc, exodus__argv, 0);                  \
+	}                                                                              \
 
 // same as programexit but no try/catch block so can go into a debugger
 #define debugprogramexit(PROGRAMNAME)                                              \
@@ -85,7 +89,7 @@
     int PROGRAMNAME##main(int exodus__argc, char* exodus__argv[])                  \
 	{                                                                              \
 		MvEnvironment mv;                                                          \
-		exodus_main(exodus__argc, exodus__argv, mv);                               \
+		exodus_main(exodus__argc, exodus__argv, mv, 0);                            \
 		ExodusProgram exodusprogram1(mv);                                          \
 		int result = exodusprogram1.main();                                        \
 		print("Debugging. Program finished. Press Enter");                         \

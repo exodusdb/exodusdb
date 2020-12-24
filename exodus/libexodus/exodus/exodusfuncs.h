@@ -45,7 +45,7 @@ THE SOFTWARE.
 namespace exodus
 {
 
-DLL_PUBLIC int exodus_main(int exodus__argc, char* exodus__argv[], MvEnvironment& mv);
+DLL_PUBLIC int exodus_main(int exodus__argc, char* exodus__argv[], MvEnvironment& mv, int environmentno);
 
 DLL_PUBLIC var osgetenv(const var& name = "");
 DLL_PUBLIC bool osgetenv(const var& name, var& value);

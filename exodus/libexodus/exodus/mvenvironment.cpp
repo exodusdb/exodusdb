@@ -28,6 +28,7 @@
 #define MV_NO_NARROW
 
 #include <string>
+#include <thread>
 #define EXO_MVENVIRONMENT_CPP
 #include <exodus/mvenvironment.h>
 
@@ -38,10 +39,10 @@
 namespace exodus
 {
 
-int getprocessno(const char* filename, int* fd);
-bool processno_islocked2(int processno, int* fd);
+//int getprocessno(const char* filename, int* fd);
+//bool processno_islocked2(int processno, int* fd);
 
-void releaseprocess(int* fd);
+//void releaseprocess(int* fd);
 std::string mvgethostname();
 
 // NB do not define default copy constructor and assignment in order to force
@@ -66,8 +67,8 @@ MvEnvironment::~MvEnvironment()
 	// std::wcout<<"OK"<<std::endl;
 
 	// a file handle to make unique locks
-	if (processnolockfd != 0)
-		releaseprocess(&processnolockfd);
+	//if (processnolockfd != 0)
+	//	releaseprocess(&processnolockfd);
 }
 
 // keep in sync both 1) declaration in class and 2) contruction initialisation
@@ -93,18 +94,24 @@ bool MvEnvironment::init(const int threadno)
 //	this->PROCESSNO = getprocessno("/tmp/exodus", &processnolockfd);
 //	this->PROCESSNO = getprocessno(this->EXECPATH.toString().c_str(), &processnolockfd);
 	var tmplockfile = var().ostempdirname() ^ "exodus_" ^ var().oscwd().convert("/\\","__");
-	this->PROCESSNO = getprocessno(tmplockfile.toString().c_str(), &processnolockfd);
 
-	this->PROCESSNO.outputl("PROCESS NO ===================================================== ");
+	//eg thread id = 140737353977344
+	//std::cout<<std::this_thread::get_id()<< std::endl;
+
+	//this->PROCESSNO = getprocessno(tmplockfile.toString().c_str(), &processnolockfd);
+	//this->PROCESSNO = std::this_thread::get_id();
+	this->PROCESSNO = threadno;
+
+//	this->PROCESSNO.outputl("PROCESS NO ===================================================== ");
 
 	this->STATION = var(mvgethostname()).field(".", 1);
 
 	return true;
 }
 
-bool MvEnvironment::processno_islocked(int processno)
-{
-	return processno_islocked2(processno, &processnolockfd);
-}
+//bool MvEnvironment::processno_islocked(int processno)
+//{
+//	return processno_islocked2(processno, &processnolockfd);
+//}
 
 } // namespace exodus

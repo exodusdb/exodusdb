@@ -87,6 +87,7 @@ function main() {
 		var errmsg;
 		if (verbose)
 			viewsql.output("SQL:");
+			viewsql.output("SQL:");
 		if (var().sqlexec(viewsql,errmsg))
 			printl("dict_all file created");
 		else {

@@ -26,6 +26,15 @@ THE SOFTWARE.
 #ifndef MVEXCEPTIONS_H
 #define MVEXCEPTIONS_H 1
 
+/* not using this c++20 feature until established if it requires a runtime overhead or not
+//https://en.cppreference.com/w/cpp/utility/source_location/function_name
+#if defined __has_include
+#  if __has_include (<source_location>)
+#    include <sourcelocation>
+#  endif
+#endif
+*/
+
 // C4530: C++ exception handler used, but unwind semantics are not enabled.
 //#pragma warning (disable: 4530)
 
@@ -41,7 +50,7 @@ THE SOFTWARE.
 // is so frequent var xyz=xyz="xxx"; Unhandled exception at 0x0065892c in service.exe: 0xC0000005:
 // Access violation writing location 0xcccccccc. other words ccould be ISCONSTRUCTED or ISALIVE
 #ifndef EXO_NOCHECKDEFINED
-#define ISDEFINED(VARNAME)                                                                         \
+#define ISDEFINED(VARNAME)                                                                     \
 	if (VARNAME.var_typ & VARTYP_MASK)                                                         \
 		throw MVUndefined(var(#VARNAME) ^ " in " ^ var(functionname));
 #else

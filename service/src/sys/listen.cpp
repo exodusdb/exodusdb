@@ -37,6 +37,7 @@ var reqlog;
 var defaultlockmins;//num
 var datasetcode;
 var live;
+var processno;
 var neopath;
 var installend;
 var serverend;
@@ -88,7 +89,6 @@ var stack;
 var lastrequestdate;
 var lastrequesttime;
 var breaktime;
-var processno;
 var timenow;
 var cmd;
 var linkfilename0;
@@ -238,7 +238,7 @@ function main() {
 
 	logfilename = "";
 
-	portno = PROCESSNO;//5700;
+	portno = 5700;
 	if (SYSTEM.a(38)) {
 		portno += SYSTEM.a(38) - 1;
 	}
@@ -281,6 +281,7 @@ function main() {
 
 	datasetcode = SYSTEM.a(17);
 	live = datasetcode.ucase().substr(-4,4) ne "TEST";
+	processno = SYSTEM.a(24);
 
 	neopath = "../exodus/";
 	neopath.converter("/", OSSLASH);
@@ -395,8 +396,7 @@ function main() {
 	printl(var("-").str(79));
 	printl("EXODUS.NET SERVICE ", SYSTEM.a(24), " STARTED ", var().timedate());
 	printl();
-	//printl("Station  : ", STATION.oconv("L#25"), "Drive : ", oscwd());
-	printl("Station  : ", STATION.oconv("L#15"), "Process : ", PROCESSNO.oconv("L#5"), " Drive : ", oscwd());
+	printl("Station : ", STATION, "  Process : ", processno, "  Dir : ", oscwd());
 
 	SYSTEM.r(33, 1);
 
@@ -595,8 +595,6 @@ nextsearch0:
 	RECORD = "";
 	DICT = "";
 	MV = 0;
-
-	processno = SYSTEM.a(24);
 
 	//print time() '[TIME2,MTS]':
 	//similar in LISTEN and AUTORUN
