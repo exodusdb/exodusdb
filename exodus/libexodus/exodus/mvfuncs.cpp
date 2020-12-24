@@ -132,6 +132,11 @@ bool var::input(const var& prompt, const int nchars)
 		std::cout << std::flush;
 	}
 
+	//declare function
+	int getkey(void);
+
+	//input whatever characters are available into this var a return true if more than none
+	// quit if error or EOF
 	if (nchars < 0)
 	{
 
@@ -139,16 +144,20 @@ bool var::input(const var& prompt, const int nchars)
 
 		while (true)
 		{
-			//int nc;
-			int getkey(void);
-			// quit if error or EOF
-			char char1 = getkey();
+			char char1;
+			{
+				LOCKIOSTREAM
+				char1 = getkey();
+			}
+
 			if (char1 < 0)
 				break;
 			var_str += char1;
 		}
 		return var_str.length() > 0;
 	}
+
+	//input a certain number of characters input this var and return true if more than none
 	else if (nchars > 0)
 	{
 
@@ -156,9 +165,11 @@ bool var::input(const var& prompt, const int nchars)
 
 		while (true)
 		{
-			//int nc;
-			int getkey(void);
-			char char1 = getkey();
+			char char1;
+			{
+				LOCKIOSTREAM
+				char1 = getkey();
+			}
 
 			// try again after a short delay if no key and not enough characters yet
 			if (char1 < 0)
@@ -182,6 +193,7 @@ bool var::input(const var& prompt, const int nchars)
 		return var_str.length() > 0;
 	}
 
+	//ordinary input without mentioning number of characters
 	return this->input();
 }
 
@@ -192,6 +204,8 @@ bool var::input()
 
 	var_str = "";
 	var_typ = VARTYP_STR;
+
+	LOCKIOSTREAM
 
 	// pressing crtl+d indicates eof on unix or ctrl+Z on dos/windows?
 	if (std::cin.eof())
@@ -2139,7 +2153,7 @@ var var::abs() const
 	{
 		if (var_dbl < 0)
 			return -var_dbl;
-		return std::floor(var_dbl);
+		return (*this);
 	}
 	else
 	{
@@ -2148,7 +2162,7 @@ var var::abs() const
 		return var_int;
 	}
 	// cannot get here
-	throw MVException("abs(unknown mvtype=" ^ var(var_typ) ^ ")");
+	throw MVError("abs(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
 var var::mod(const var& divisor) const
@@ -2217,7 +2231,7 @@ var var::mod(const var& divisor) const
 		}
 	}
 	// cannot get here
-	throw MVException("mod(unknown mvtype=" ^ var(var_typ) ^ ")");
+	throw MVError("mod(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
 var var::mod(const int divisor) const
@@ -2248,7 +2262,7 @@ var var::mod(const int divisor) const
 			return var_int % divisor;
 	}
 	// cannot get here
-	throw MVException("mod(unknown mvtype=" ^ var(var_typ) ^ ")");
+	throw MVError("mod(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
 /*
@@ -2268,7 +2282,7 @@ var var::sin() const
 		return std::sin(double(var_int) * M_PI / 180);
 
 	// cannot get here
-	throw MVException("sin(unknown mvtype=" ^ var(var_typ) ^ ")");
+	throw MVError("sin(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
 var var::cos() const
@@ -2283,7 +2297,7 @@ var var::cos() const
 		return std::cos(double(var_int) * M_PI / 180);
 
 	// cannot get here
-	throw MVException("cos(unknown mvtype=" ^ var(var_typ) ^ ")");
+	throw MVError("cos(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
 var var::tan() const
@@ -2298,7 +2312,7 @@ var var::tan() const
 		return std::tan(double(var_int) * M_PI / 180);
 
 	// cannot get here
-	throw MVException("tan(unknown mvtype=" ^ var(var_typ) ^ ")");
+	throw MVError("tan(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
 var var::atan() const
@@ -2313,7 +2327,7 @@ var var::atan() const
 		return std::atan(double(var_int)) / M_PI * 180;
 
 	// cannot get here
-	throw MVException("atan(unknown mvtype=" ^ var(var_typ) ^ ")");
+	throw MVError("atan(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
 var var::loge() const
@@ -2328,7 +2342,7 @@ var var::loge() const
 		return std::log(double(var_int));
 
 	// cannot get here
-	throw MVException("loge(unknown mvtype=" ^ var(var_typ) ^ ")");
+	throw MVError("loge(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
 var var::sqrt() const
@@ -2343,7 +2357,7 @@ var var::sqrt() const
 	//	if (var_typ & VARTYP_INT)
 	return std::sqrt(double(var_int));
 
-	throw MVException("sqrt(unknown mvtype=" ^ var(var_typ) ^ ")");
+	throw MVError("sqrt(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
 var var::pwr(const var& exponent) const
@@ -2359,7 +2373,7 @@ var var::pwr(const var& exponent) const
 		return std::pow(double(var_int), exponent.toDouble());
 
 	// cannot get here
-	throw MVException("pow(unknown mvtype=" ^ var(var_typ) ^ ")");
+	throw MVError("pow(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
 var var::exp() const
@@ -2374,7 +2388,7 @@ var var::exp() const
 		return std::exp(double(var_int));
 
 	// cannot get here
-	throw MVException("exp(unknown mvtype=" ^ var(var_typ) ^ ")");
+	throw MVError("exp(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
 var var::at(const int column) const

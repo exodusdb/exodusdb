@@ -878,7 +878,7 @@ bool var::read(const var& filehandle, const var& key)
 	{
 		var errmsg = "read(...) filename not specified, probably not opened.";
 		this->setlasterror(errmsg);
-		throw MVException(errmsg);
+		throw MVError(errmsg);
 		return false;
 	}
 
@@ -977,7 +977,7 @@ bool var::read(const var& filehandle, const var& key)
 		;
 		// PQclear(pgresult);
 		this->setlasterror(errmsg);
-		throw MVException(errmsg);
+		throw MVError(errmsg);
 		// return false;
 	}
 
@@ -1101,7 +1101,7 @@ var var::lock(const var& key) const
 			     var(PQntuples(pgresult));
 		// PQclear(pgresult);//DO THIS OR SUFFER MEMORY LEAK
 		errmsg.errputl();
-		// throw MVException(msg);
+		// throw MVError(msg);
 		return false;
 	}
 
@@ -1191,7 +1191,7 @@ bool var::unlock(const var& key) const
 			     var(PQntuples(pgresult));
 		// PQclear(pgresult);//DO THIS OR SUFFER MEMORY LEAK
 		errmsg.errputl();
-		// throw MVException(msg);
+		// throw MVError(msg);
 		return false;
 	}
 
@@ -1848,7 +1848,7 @@ inline void tosqldate(var &datestr, const var &dateformat)
 	if (idate)
 		datestr = idate.oconv("DJ");
 	else
-		throw MVException(datestr ^ " cannot be recognised as a date");
+		throw MVError(datestr ^ " cannot be recognised as a date");
 }
 */
 
@@ -4165,7 +4165,7 @@ bool var::readnextrecord(var& record, var& key, var& valueno)
 		PQclear(pgresult);
 		var errmsg = "readnextrecord() must follow selectrecord(), not select()";
 		this->setlasterror(errmsg);
-		throw MVException(errmsg);
+		throw MVError(errmsg);
 		// return false;
 	}
 	record = getresult(pgresult, 0, 2);

@@ -93,6 +93,11 @@ char* stolower(char* s)
 }
 */
 
+// probably no need for LOCKDLCACHE since we have a separate cache per mvenvironment
+#include <mutex>
+#define LOCKDLCACHE std::lock_guard<std::mutex> guard(global_mutex_lockdlcache);
+static std::mutex global_mutex_lockdlcache;
+
 #include <exodus/mvfunctor.h>
 #include <exodus/mvenvironment.h>
 namespace exodus
@@ -308,7 +313,7 @@ bool ExodusFunctorBase::checkload(std::string newlibraryname, std::string newfun
 		std::cout << "mvfunctor:checkload: ko:" << newlibraryname << std::endl;
 #endif
 
-		throw MVException("Unable to load " ^ var(libraryfilename_));
+		throw MVError("Unable to load " ^ var(libraryfilename_));
 		return false;
 	}
 
@@ -320,7 +325,7 @@ bool ExodusFunctorBase::checkload(std::string newlibraryname, std::string newfun
 			  << std::endl;
 #endif
 
-		throw MVException("Unable to find function " ^ var(newfunctionname) ^ " in " ^
+		throw MVError("Unable to find function " ^ var(newfunctionname) ^ " in " ^
 				  var(libraryfilename_));
 		return false;
 	}
@@ -349,14 +354,20 @@ bool ExodusFunctorBase::openlib(std::string newlibraryname)
 #ifdef dlerror
 	dlerror();
 #endif
-	//look for library in cache
-        auto cacheentry = mv_->dlopen_cache.find(newlibraryname);
-        if (cacheentry != mv_->dlopen_cache.end())
+
 	{
-		//std::cout << "using dlopen cache for " << newlibraryname << std::endl;
-		plibrary_=mv_->dlopen_cache.at(newlibraryname);
-		libraryname_ = newlibraryname;
-		return true;
+		//no need for this?
+		LOCKDLCACHE
+
+		//look for library in cache
+		auto cacheentry = mv_->dlopen_cache.find(newlibraryname);
+		if (cacheentry != mv_->dlopen_cache.end())
+		{
+			//std::cout << "using dlopen cache for " << newlibraryname << std::endl;
+			plibrary_=mv_->dlopen_cache.at(newlibraryname);
+			libraryname_ = newlibraryname;
+			return true;
+		}
 	}
 
 	//look for lib file in ~/lib/libXXXXXX.so
@@ -398,14 +409,19 @@ bool ExodusFunctorBase::openlib(std::string newlibraryname)
 		std::cerr << "mvfunctor:openlib: <<< ko <<< " << libraryfilename_ << std::endl;
 #endif
 		// std::cerr<<libraryfilename_<<" cannot be found or cannot be opened"<<std::endl;
-		throw MVException(var(libraryfilename_) ^
-				  " cannot be found or cannot be linked/wrong version. Run with "
-				  "LD_DEBUG=libs for more info");
+		throw MVError(var(libraryfilename_) ^
+				  " does not exist or cannot be found. (or cannot be linked/wrong version. Run with "
+				  "LD_DEBUG=libs for more info)");
 		return false;
 	}
 
 	//cache the dlopen result
-	mv_->dlopen_cache[newlibraryname] = plibrary_;
+	{
+		//no need for this?
+		LOCKDLCACHE
+
+		mv_->dlopen_cache[newlibraryname] = plibrary_;
+	}
 
 	libraryname_ = newlibraryname;
 
@@ -454,7 +470,7 @@ bool ExodusFunctorBase::openfunc(std::string newfunctionname)
 
 		// std::cerr<<functionname_<<" function cannot be found in
 		// "<<libraryfilename_<<std::endl;
-		throw MVException(var(functionname_) ^ " function cannot be found in " ^
+		throw MVError(var(functionname_) ^ " function cannot be found in " ^
 				  var(libraryfilename_));
 		return false;
 	}

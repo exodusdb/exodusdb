@@ -1689,37 +1689,32 @@ std::string dblToString(double double1)
 
 var backtrace();
 
-MVException::MVException(const var& description_) : description(description_)
+MVError::MVError(const var& description_) : description(description_)
 {
 	// capture the stack at point of creation ie when thrown
 	stack = backtrace();
+	((description.assigned() ? description : "") ^ "\n" ^ stack.convert(FM, "\n") ^ "\n").put(std::cerr);
 }
 
-MVUnassigned ::MVUnassigned(const var& var1) : MVException("MVUnassigned:" ^ var1) {}
-MVDivideByZero ::MVDivideByZero(const var& var1) : MVException("MVDivideByZero:" ^ var1) {}
-MVNonNumeric ::MVNonNumeric(const var& var1) : MVException("MVNonNumeric:" ^ var1) {}
-MVIntOverflow ::MVIntOverflow(const var& var1) : MVException("MVIntOverflow:" ^ var1) {}
-MVIntUnderflow ::MVIntUnderflow(const var& var1) : MVException("MVIntUnderflow:" ^ var1) {}
-MVUndefined ::MVUndefined(const var& var1) : MVException("MVUndefined:" ^ var1) {}
-MVOutOfMemory ::MVOutOfMemory(const var& var1) : MVException("MVOutOfMemory:" ^ var1) {}
-MVInvalidPointer ::MVInvalidPointer(const var& var1) : MVException("MVInvalidPointer:" ^ var1) {}
-MVDBException ::MVDBException(const var& var1) : MVException("MVDBException:" ^ var1) {}
-MVNotImplemented ::MVNotImplemented(const var& var1) : MVException("MVNotImplemented:" ^ var1) {}
-MVDebug ::MVDebug(const var& var1) : MVException("MVDebug" ^ var1) {}
-// MVStop		::MVStop		(const var& var1)	: MVException("MVStop:"
-// ^ var1 	){}
-// MVAbort		::MVAbort		(const var& var1)	: MVException("MVAbort"
-// ^ var1	){} MVAbortAll		::MVAbortAll		(const var& var1)	:
-// MVException("MVAbortAl"				^ var1	){}
+MVUnassigned ::MVUnassigned(const var& var1) : MVError("MVUnassigned:" ^ var1) {}
+MVDivideByZero ::MVDivideByZero(const var& var1) : MVError("MVDivideByZero:" ^ var1) {}
+MVNonNumeric ::MVNonNumeric(const var& var1) : MVError("MVNonNumeric:" ^ var1) {}
+MVIntOverflow ::MVIntOverflow(const var& var1) : MVError("MVIntOverflow:" ^ var1) {}
+MVIntUnderflow ::MVIntUnderflow(const var& var1) : MVError("MVIntUnderflow:" ^ var1) {}
+MVUndefined ::MVUndefined(const var& var1) : MVError("MVUndefined:" ^ var1) {}
+MVOutOfMemory ::MVOutOfMemory(const var& var1) : MVError("MVOutOfMemory:" ^ var1) {}
+MVInvalidPointer ::MVInvalidPointer(const var& var1) : MVError("MVInvalidPointer:" ^ var1) {}
+MVDBException ::MVDBException(const var& var1) : MVError("MVDBException:" ^ var1) {}
+MVNotImplemented ::MVNotImplemented(const var& var1) : MVError("MVNotImplemented:" ^ var1) {}
+MVDebug ::MVDebug(const var& var1) : MVError("MVDebug" ^ var1) {}
 MVStop ::MVStop(const var& var1) : description(var1) {}
-MVAbort ::MVAbort(const var& var1) : MVException(var1) {}
-MVAbortAll ::MVAbortAll(const var& var1) : MVException(var1) {}
-
-MVArrayDimensionedZero ::MVArrayDimensionedZero() : MVException("MVArrayDimensionedZero:") {}
+MVAbort ::MVAbort(const var& var1) : description(var1) {}
+MVAbortAll ::MVAbortAll(const var& var1) : description(var1) {}
+MVArrayDimensionedZero ::MVArrayDimensionedZero() : MVError("MVArrayDimensionedZero:") {}
 MVArrayIndexOutOfBounds ::MVArrayIndexOutOfBounds(const var& var1)
-    : MVException("MVArrayIndexOutOfBounds:" ^ var1)
+    : MVError("MVArrayIndexOutOfBounds:" ^ var1)
 {
 }
-MVArrayNotDimensioned ::MVArrayNotDimensioned() : MVException("MVArrayNotDimensioned") {}
+MVArrayNotDimensioned ::MVArrayNotDimensioned() : MVError("MVArrayNotDimensioned") {}
 
 } // namespace exodus

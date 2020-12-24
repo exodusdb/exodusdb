@@ -176,7 +176,7 @@ var backtrace()
 	0   libexodus-11.5.0.dylib              0x000000010000c313 _ZN6exodus9backtraceEv + 99
 	Backtrace 1: 0x10001ec51
 	1   libexodus-11.5.0.dylib              0x000000010001ec51
-	_ZN6exodus11MVExceptionC2ERKNS_3varE + 129 Backtrace 2: 0x10001f314 2 libexodus-11.5.0.dylib
+	_ZN6exodus11MVErrorC2ERKNS_3varE + 129 Backtrace 2: 0x10001f314 2 libexodus-11.5.0.dylib
 	0x000000010001f314 _ZN6exodus12MVUnassignedC2ERKNS_3varE + 52 Backtrace 3: 0x10000e193 3
 	libexodus-11.5.0.dylib              0x000000010000e193 _ZNK6exodus3var3putERSo + 243
 	Backtrace 4: 0x10000e322

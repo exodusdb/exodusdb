@@ -278,7 +278,7 @@ namespace exodus
 //	- if user forgets to call osclose(), the stream remains opened (alive) until
 //		~MvHandlesCache for h_cache closes/deletes all registered objects.
 
-std::locale get_locale(const var& locale_name) // throw (MVException)
+std::locale get_locale(const var& locale_name) // throw (MVError)
 {
 	// assume is checked prior to calling since this is an internal exodus function
 	// THISIS("std::locale get_locale(const var& locale_name)")
@@ -315,7 +315,7 @@ std::locale get_locale(const var& locale_name) // throw (MVException)
 		}
 		catch (std::runtime_error& re)
 		{
-			throw MVException("get_locale cannot create locale for " ^ locale_name);
+			throw MVError("get_locale cannot create locale for " ^ locale_name);
 		}
 	}
 }
@@ -543,7 +543,7 @@ random_base_generator_type* get_random_base_generator()
 		tss_random_base_generators.reset(new random_base_generator_type);
 		threads_random_base_generator = tss_random_base_generators.get();
 		if (!threads_random_base_generator)
-			throw MVException("Could not create random number generator");
+			throw MVError("Could not create random number generator");
 
 		// seed to the os clock (secs since unix epoch)
 		// Caveat: std::time(0) is not a very good truly-random seed.
@@ -734,7 +734,7 @@ var var::match(const var& matchstr, const var& options) const
 	}
 	catch (std_boost::regex_error& e)
 	{
-		throw MVException(var(e.what()).quote() ^ " is an invalid regular expression");
+		throw MVError(var(e.what()).quote() ^ " is an invalid regular expression");
 	}
 
 	/*
@@ -893,7 +893,7 @@ var& var::replacer(const var& regexstr, const var& replacementstr, const var& op
 	}
 	catch (std_boost::regex_error& e)
 	{
-		throw MVException(var(e.what()).quote() ^ " is an invalid regular expression");
+		throw MVError(var(e.what()).quote() ^ " is an invalid regular expression");
 	}
 
 	// return regex_match(var_str, expression);

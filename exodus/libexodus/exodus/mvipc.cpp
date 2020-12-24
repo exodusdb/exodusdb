@@ -301,7 +301,7 @@ void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsec
 
 				return;
 			}
-			catch (MVException mve)
+			catch (MVError mve)
 			{
 				var reply = response ^ "ERROR: Calling " ^ str_libname ^ ", " ^
 					    str_funcname ^ L". ERROR: " ^ mve.description;

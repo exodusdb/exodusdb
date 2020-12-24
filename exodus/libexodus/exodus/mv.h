@@ -1958,21 +1958,39 @@ var DLL_PUBLIC getexecpath();
 
 // mv exceptions
 
-// MVStop is similar to MVException
-// but doesnt get stack since stop() is called commonly and normally
+// MVStop is similar to MVError
+// but doesnt get stack since stop() is called normally
 class DLL_PUBLIC MVStop
 {
-      public:
+	public:
 	explicit MVStop(const var& var1 DEFAULTNULL);
+	var description;
+};
+
+// MVAbort is similar to MVError
+// but doesnt get stack since abort() is called normally
+class DLL_PUBLIC MVAbort
+{
+	public:
+	explicit MVAbort(const var& var1 DEFAULTNULL);
+	var description;
+};
+
+// MVAbortAll is similar to MVError
+// but doesnt get stack since abortall() is called normally
+class DLL_PUBLIC MVAbortAll
+{
+	public:
+	explicit MVAbortAll(const var& var1 DEFAULTNULL);
 	var description;
 };
 
 // provide a public base exception for all other exceptions so exodus programmers can catch mv
 // exceptions generally
-class DLL_PUBLIC MVException
+class DLL_PUBLIC MVError
 {
-      public:
-	explicit MVException(const var& description);
+	public:
+	explicit MVError(const var& description);
 	var description;
 	var stack;
 };
@@ -1980,23 +1998,23 @@ class DLL_PUBLIC MVException
 // clang-format off
 
 //individual exceptions are made public so exodus programmers can catch specific errors or even stop/abort/debug if they want
-class DLL_PUBLIC MVDivideByZero		: public MVException {public: explicit MVDivideByZero         (const var& var1    );};
-class DLL_PUBLIC MVNonNumeric		: public MVException {public: explicit MVNonNumeric           (const var& var1    );};
-class DLL_PUBLIC MVIntOverflow		: public MVException {public: explicit MVIntOverflow          (const var& var1    );};
-class DLL_PUBLIC MVIntUnderflow		: public MVException {public: explicit MVIntUnderflow         (const var& var1    );};
-class DLL_PUBLIC MVOutOfMemory		: public MVException {public: explicit MVOutOfMemory          (const var& var1    );};
-class DLL_PUBLIC MVUnassigned		: public MVException {public: explicit MVUnassigned           (const var& var1    );};
-class DLL_PUBLIC MVUndefined		: public MVException {public: explicit MVUndefined            (const var& var1    );};
-class DLL_PUBLIC MVInvalidPointer	: public MVException {public: explicit MVInvalidPointer       (const var& var1    );};
-class DLL_PUBLIC MVDBException		: public MVException {public: explicit MVDBException          (const var& var1    );};
-class DLL_PUBLIC MVNotImplemented	: public MVException {public: explicit MVNotImplemented       (const var& var1    );};
-class DLL_PUBLIC MVDebug		: public MVException {public: explicit MVDebug                (const var& var1 DEFAULTNULL);};
-//class DLL_PUBLIC MVStop                 : public MVException {public: explicit MVStop                 (const var& var1 DEFAULTNULL);};
-class DLL_PUBLIC MVAbort		: public MVException {public: explicit MVAbort                (const var& var1 DEFAULTNULL);};
-class DLL_PUBLIC MVAbortAll		: public MVException {public: explicit MVAbortAll             (const var& var1 DEFAULTNULL);};
-class DLL_PUBLIC MVArrayDimensionedZero	: public MVException {public: explicit MVArrayDimensionedZero (                   );};
-class DLL_PUBLIC MVArrayIndexOutOfBounds: public MVException {public: explicit MVArrayIndexOutOfBounds(const var& var1    );};
-class DLL_PUBLIC MVArrayNotDimensioned	: public MVException {public: explicit MVArrayNotDimensioned  (                   );};
+class DLL_PUBLIC MVDivideByZero		: public MVError {public: explicit MVDivideByZero         (const var& var1    );};
+class DLL_PUBLIC MVNonNumeric		: public MVError {public: explicit MVNonNumeric           (const var& var1    );};
+class DLL_PUBLIC MVIntOverflow		: public MVError {public: explicit MVIntOverflow          (const var& var1    );};
+class DLL_PUBLIC MVIntUnderflow		: public MVError {public: explicit MVIntUnderflow         (const var& var1    );};
+class DLL_PUBLIC MVOutOfMemory		: public MVError {public: explicit MVOutOfMemory          (const var& var1    );};
+class DLL_PUBLIC MVUnassigned		: public MVError {public: explicit MVUnassigned           (const var& var1    );};
+class DLL_PUBLIC MVUndefined		: public MVError {public: explicit MVUndefined            (const var& var1    );};
+class DLL_PUBLIC MVInvalidPointer	: public MVError {public: explicit MVInvalidPointer       (const var& var1    );};
+class DLL_PUBLIC MVDBException		: public MVError {public: explicit MVDBException          (const var& var1    );};
+class DLL_PUBLIC MVNotImplemented	: public MVError {public: explicit MVNotImplemented       (const var& var1    );};
+class DLL_PUBLIC MVDebug			: public MVError {public: explicit MVDebug                (const var& var1 DEFAULTNULL);};
+//class DLL_PUBLIC MVStop			: public MVError {public: explicit MVStop                 (const var& var1 DEFAULTNULL);};
+//class DLL_PUBLIC MVAbort			: public MVError {public: explicit MVAbort                (const var& var1 DEFAULTNULL);};
+//class DLL_PUBLIC MVAbortAll		: public MVError {public: explicit MVAbortAll             (const var& var1 DEFAULTNULL);};
+class DLL_PUBLIC MVArrayDimensionedZero	: public MVError {public: explicit MVArrayDimensionedZero (                   );};
+class DLL_PUBLIC MVArrayIndexOutOfBounds: public MVError {public: explicit MVArrayIndexOutOfBounds(const var& var1    );};
+class DLL_PUBLIC MVArrayNotDimensioned	: public MVError {public: explicit MVArrayNotDimensioned  (                   );};
 
 // clang-format on
 

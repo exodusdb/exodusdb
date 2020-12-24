@@ -477,7 +477,7 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 				break;
 
 			default:
-				throw MVException("locateat() invalid mode " ^ var(order));
+				throw MVError("locateat() invalid mode " ^ var(order));
 			}
 		}
 
@@ -572,7 +572,7 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 			break;
 
 		default:
-			throw MVException("locateat() invalid order" ^ var(order));
+			throw MVError("locateat() invalid order" ^ var(order));
 		}
 		// skip over any sep character
 		start_pos = nextstart_pos + usingchar_len;
@@ -601,7 +601,7 @@ inline bool locatex(const std::string& var_str, const std::string& target, const
 		const char* ordercodes = "ALARDLDR";
 		const char* orderindex = strstr(ordercodes, ordercode);
 		if (orderindex == NULL)
-			throw MVException("locateby('" ^ var(ordercode) ^ "') is invalid");
+			throw MVError("locateby('" ^ var(ordercode) ^ "') is invalid");
 
 		// convert the memory address to the char position within the codes
 		ordermode = int(orderindex - ordercodes);

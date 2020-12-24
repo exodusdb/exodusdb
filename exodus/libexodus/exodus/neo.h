@@ -60,38 +60,50 @@ functions are analogous to dlopen, dlsym, and dlclose in the POSIX standard API.
 	//dynamic execution via function table (not implemented yet)
 	//will throw if not found
 	var().call("myfunction")
-	
+	
+
+
 	//dynamic execution
 	//will throw if not found
 	var().call("mydll","myfunction")
-	
+	
+
+
 	//dynamic linking with caching
 	//will throw if not found
 	var myfunction;
 	myfunction.call("mydll","myfunction")
 	myfunction.call()
-	
+	
+
+
 	//error checking loading
 	var myfunction;
 	if (!myfunction.load("mydll"))
 	{
-	throw MVException("cannot load mydll");
+	throw MVError("cannot load mydll");
 	}
-	
+	
+
+
 	//error checking linking not implemented yet
 	var myfunction;
 	if (!myfunction.link("myfunction"))
 	{
-	throw MVException("cannot link  myfunction");
+	throw MVError("cannot link  myfunction");
 	}
-	
+	
+
+
 	//error checking loading and linking in one step
 	var myfunction;
 	if (!myfunction.link("mydll","myfunction"))
 	{
-	throw MVException("cannot link mydll, myfunction");
+	throw MVError("cannot link mydll, myfunction");
 	}
-	
+	
+
+
 */
 
 // warning C4190: 'XXX' has C-linkage specified, but returns UDT 'YYY' which is incompatible with C

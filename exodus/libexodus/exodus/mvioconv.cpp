@@ -135,7 +135,7 @@ var var::iconv(const char* convstr) const
 				case 'D':
 				case 'C':
 
-					throw MVException(
+					throw MVError(
 					    "iconv MD and MC are not implemented yet");
 					//							output
 					//^= part.iconv_MD(convstr);
@@ -221,7 +221,7 @@ var var::iconv(const char* convstr) const
 	// access to mv environment required to call external subroutines
 	case '[':
 
-		throw MVException("Custom conversions like (" ^ var(convstr) ^
+		throw MVError("Custom conversions like (" ^ var(convstr) ^
 				  ") must be called like a function iconv(input,conversion) not "
 				  "like a method, input.iconv(conversion)");
 		break;
@@ -233,7 +233,7 @@ var var::iconv(const char* convstr) const
 
 	// TODO implement
 	// std::wcout<<"iconv "<<convstr<< " not implemented yet "<<std::endl;
-	throw MVException("iconv " ^ var(convstr) ^ " not implemented yet ");
+	throw MVError("iconv " ^ var(convstr) ^ " not implemented yet ");
 
 	return *this;
 }
@@ -871,7 +871,7 @@ var var::oconv(const char* conversion) const
 	// custom conversion should not be called via ::oconv
 	case '[':
 
-		throw MVException("Custom conversions like (" ^ var(conversion) ^
+		throw MVError("Custom conversions like (" ^ var(conversion) ^
 				  ") must be called like a function oconv(input,conversion) not "
 				  "like a method, input.oconv(conversion)");
 		break;
@@ -881,12 +881,12 @@ var var::oconv(const char* conversion) const
 		return (*this);
 
 	//default:
-	//	throw MVException("oconv " ^ var(*conversionchar).oconv("HEX").substr(1,6) ^ " not implemented yet ");
+	//	throw MVError("oconv " ^ var(*conversionchar).oconv("HEX").substr(1,6) ^ " not implemented yet ");
 	}
 
 	// TODO implement
 	// std::wcout<<"oconv "<<conversion<< " not implemented yet "<<std::endl;
-	throw MVException("oconv " ^ var(conversion).substr(1,6) ^ " not implemented yet ");
+	throw MVError("oconv " ^ var(conversion).substr(1,6) ^ " not implemented yet ");
 
 	// unknown conversions are simply ignored in AREV
 	return *this;

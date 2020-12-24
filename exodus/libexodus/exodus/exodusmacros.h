@@ -92,7 +92,7 @@ THE SOFTWARE.
 			else                                                                   \
 				exit(2);                                                           \
 		}                                                                          \
-		catch (MVException exceptionx)                                             \
+		catch (MVError exceptionx)                                                 \
 		{                                                                          \
 			printl(exceptionx.description, " - Aborting.");                        \
 			printl(exceptionx.stack.convert(FM, L"\n"));                           \

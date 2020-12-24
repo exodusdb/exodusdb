@@ -126,7 +126,7 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 		if (! op)
 			opno=0;
 		else if (not var("= <> > < >= <= ~ ~* !~ !~* >< >!< in not_in !! !").locateusing(" ", op.convert(" ","_"), opno))
-			throw MVException(op.quote() ^ " unknown op in sql select");
+			throw MVError(op.quote() ^ " unknown op in sql select");
 		opnos(fieldn)=opno;
 
 		//reqvalues
@@ -332,7 +332,7 @@ bool ExodusProgramBase::formlist(const var& filename_or_command, const var& keys
 	//open the file
 	clearselect();
 	if (not CURSOR.open(filename2))
-		throw MVException(filename2.quote() ^ " file cannot be opened in formlist(" ^keys^")");
+		throw MVError(filename2.quote() ^ " file cannot be opened in formlist(" ^keys^")");
 
 	return CURSOR.formlist(keys2, fieldno);
 }
@@ -1057,7 +1057,7 @@ var ExodusProgramBase::perform(const var& sentence)
 		{
 			USER4 ^= "perform() Cannot find shared library \"" ^ str_libname ^
 				 "\", or \"libraryexit()\" is not present in it.";
-			// throw MVException(USER4);
+			// throw MVError(USER4);
 			// return "";
 			break;
 		}
@@ -1208,7 +1208,7 @@ var ExodusProgramBase::calculate(const var& dictid)
 	{
 		newlibfunc = true;
 		if (not DICT)
-			throw MVException("ExodusProgramBase::calculate(" ^ dictid ^
+			throw MVError("ExodusProgramBase::calculate(" ^ dictid ^
 					  ") DICT file variable has not been set");
 		if (not cache_dictrec_.reado(DICT, dictid))
 		{
@@ -1220,7 +1220,7 @@ var ExodusProgramBase::calculate(const var& dictid)
 				if (not dictvoc.open("dict_voc"))
 				{
 baddict:
-					throw MVException("ExodusProgramBase::calculate(" ^ dictid ^
+					throw MVError("ExodusProgramBase::calculate(" ^ dictid ^
 							  ") dictionary record not in DICT " ^
 							  DICT.a(1).quote() ^ " nor in DICT_VOC");
 				}
@@ -1306,7 +1306,7 @@ baddict:
 				    ("exodusprogrambasecreatedelete_" ^ dictid.lcase()).toString();
 				if (!dict_exodusfunctorbase_->initsmf(str_libname.c_str(),
 								      str_funcname.c_str()))
-					throw MVException("ExodusProgramBase::calculate() Cannot find Library " ^
+					throw MVError("ExodusProgramBase::calculate() Cannot find Library " ^
 							  str_libname ^ ", or function " ^
 							  dictid.lcase() ^ " is not present");
 			}
@@ -1337,7 +1337,7 @@ baddict:
 		return ANS;
 	}
 
-	throw MVException("ExodusProgramBase::calculate(" ^ dictid ^ ") " ^ DICT ^ " Invalid dictionary type " ^
+	throw MVError("ExodusProgramBase::calculate(" ^ dictid ^ ") " ^ DICT ^ " Invalid dictionary type " ^
 			  dicttype.quote());
 	return "";
 }
