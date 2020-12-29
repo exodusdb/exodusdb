@@ -76,7 +76,7 @@ function main(in mode0) {
 	ok = 0;
 	if (not(SYSTEM.a(15))) {
 		if (SECURITY.a(1).locate("MASTER",usern)) {
-			if (SECURITY.a(4, usern, 2).field(TM, 7) == "") {
+			if (SECURITY.a(4, usern, 2).field(TM, 7) eq "") {
 				SYSTEM.r(22, 1000000);
 				userx = "MASTER";
 				SYSTEM.r(15, 1);
@@ -94,7 +94,7 @@ function main(in mode0) {
 
 	//get the user name
 inpname:
-	if (mode == "SLEEP") {
+	if (mode eq "SLEEP") {
 		xdata = USERNAME;
 	}else{
 
@@ -115,7 +115,7 @@ inpname:
 	}
 
 	//exit the system if name not given
-	if (xdata == "") {
+	if (xdata eq "") {
 fail:
 	//  if @username='EXODUS' then stop
 		perform("OFF");
@@ -129,7 +129,7 @@ fail:
 	//check the user name and password
 	ok = 0;
 	if (SECURITY.a(1).locate(userx,usern)) {
-		if (SECURITY.a(4, usern, 2).field(TM, 7) == "") {
+		if (SECURITY.a(4, usern, 2).field(TM, 7) eq "") {
 			ok = 1;
 			goto okfail;
 		}
@@ -142,7 +142,7 @@ fail:
 	now = ostime();
 	gosub input();
 
-	if (escx == "0") {
+	if (escx eq "0") {
 		//magic method entry of password (pressing enter on blank then entering pass)
 		//defeats the password entry speed check
 		speed = 0;
@@ -152,7 +152,7 @@ fail:
 	}
 	//call note(speed)
 
-	if (xdata == "") {
+	if (xdata eq "") {
 		if (mode ne "SLEEP") {
 			goto inpname;
 		}
@@ -166,9 +166,9 @@ fail:
 	password = xdata;
 
 	//long distance override
-	if (xdata == "?") {
+	if (xdata eq "?") {
 
-		if (not(userx == lockx.substr(1,userx.length()))) {
+		if (not(userx eq lockx.substr(1,userx.length()))) {
 			lockx = userx ^ " " ^ var(1000000).rnd();
 			if (SECURITY.a(1).locate(userx,usern)) {
 				lockx ^= " " ^ SECURITY.a(4, usern, 2).field(TM, 7).oconv("HEX2");
@@ -180,13 +180,13 @@ fail:
 		var keyx = "";
 		call mssg("The lock is " ^ (lockx.quote()) ^ "|What is the key ?", "RC", keyx, "");
 
-		ok = keyx == secid(lockx, "1000" "100");
+		ok = keyx eq secid(lockx, "1000" "100");
 		if (ok) {
 			goto okfail;
 		}
 
 		//allowed in but no access to authorisation screen
-		ok = keyx == secid(lockx, 132456);
+		ok = keyx eq secid(lockx, 132456);
 		if (ok) {
 			SYSTEM.r(21, "1");
 			goto okfail;
@@ -213,7 +213,7 @@ chknameandpass:
 	//check the user name and password
 	ok = 0;
 	if (SECURITY.a(1).locate(userx,usern)) {
-		if (SECURITY.a(4, usern, 2).field(TM, 7) == encryptx) {
+		if (SECURITY.a(4, usern, 2).field(TM, 7) eq encryptx) {
 			ok = 1;
 		}else{
 		}
@@ -230,7 +230,7 @@ chknameandpass:
 	if (not ok) {
 		var sysrec;
 		if (sysrec.read(systemfile(), userx)) {
-			if ((sysrec.a(7) == encryptx) and (((speed < 2) or (mode == "SLEEP")))) {
+			if (sysrec.a(7) eq encryptx and ((speed lt 2 or mode eq "SLEEP"))) {
 				ok = 1;
 			}
 		}
@@ -256,12 +256,12 @@ okfail:
 		msg.r(-1, "that you entered is NOT CORRECT.");
 		msg.r(-1, "(maybe you made a typing error)|");
 
-		if (nfailures < nallowable) {
+		if (nfailures lt nallowable) {
 			msg.r(-1, "PLEASE TRY AGAIN.|");
 		}
 		call mssg(msg);
 
-		if (nfailures < nallowable) {
+		if (nfailures lt nallowable) {
 			goto inpname;
 		}
 		goto fail;
@@ -273,7 +273,7 @@ okfail:
 	if (not(sysrec.read(systemfile(), userx))) {
 		sysrec = "";
 	}
-	if (USERNAME == "EXODUS") {
+	if (USERNAME eq "EXODUS") {
 		sysrec.r(4, 0);
 	}
 	//call setprivilegesysrec.a(4));

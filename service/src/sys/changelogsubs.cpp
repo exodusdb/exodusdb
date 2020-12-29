@@ -51,7 +51,7 @@ function main(in mode0) {
 		return 0;
 	}
 
-	if (mode.a(1) == "SELECTANDLIST") {
+	if (mode.a(1) eq "SELECTANDLIST") {
 
 		//change to the user selected company
 		//merely to get the right letterhead
@@ -71,7 +71,7 @@ function main(in mode0) {
 		gosub list();
 
 	//called from LOGIN.NET. not UI. UI calls SELECTANDLIST
-	} else if (mode.a(1) == "WHATSNEW") {
+	} else if (mode.a(1) eq "WHATSNEW") {
 
 		var menucodes = mode.a(2);
 		mode = mode.a(1);
@@ -104,7 +104,7 @@ function main(in mode0) {
 
 			//fix a problem where people were missing most changes
 			//due to sv being represented as : eg user:support:technical
-			if (mode.a(3) and (mode.a(3) < 14773)) {
+			if (mode.a(3) and mode.a(3) lt 14773) {
 				mode.r(3, 14153);
 			}
 
@@ -122,7 +122,7 @@ function main(in mode0) {
 		gosub getcurrentversiondatetime();
 
 		//nothing to see if seen matches (or after?) currentversiondate
-		if (mode.a(3) >= currentversiondatetime) {
+		if (mode.a(3) ge currentversiondatetime) {
 			ANS = "";
 			return 0;
 		}
@@ -186,15 +186,15 @@ function main(in mode0) {
 		ANS = SYSTEM.a(2);
 
 	//actually this is GETINSTALLEDVERSION DATES!
-	} else if (mode == "GETVERSIONDATES") {
+	} else if (mode eq "GETVERSIONDATES") {
 
 		gosub getversiondates();
 
-	} else if (mode.a(1) == "SELECT") {
+	} else if (mode.a(1) eq "SELECT") {
 
 		gosub select0();
 
-	} else if (mode.a(1) == "LIST") {
+	} else if (mode.a(1) eq "LIST") {
 
 		gosub list();
 
@@ -219,7 +219,7 @@ subroutine select0() {
 		tt = USER1;
 		tt.converter(FM, VM);
 		if (not(tt.locateby("AR",mode.a(3),versionn))) {
-			if (versionn > 1) {
+			if (versionn gt 1) {
 				mode.r(3, USER1.a(versionn - 1));
 			}
 		}
@@ -395,7 +395,7 @@ subroutine getcurrentversiondatetime() {
 	temp.converter("/", OSSLASH);
 	temp = temp.xlate("DOS", 1, "X");
 	if (not(VOLUMES)) {
-		if (temp == "") {
+		if (temp eq "") {
 			temp = EXECPATH.osfile();
 			//19:05:55  18 NOV 2020
 			temp = temp.a(3).oconv("MTS") ^ " " ^ temp.a(2).oconv("D");

@@ -41,7 +41,7 @@ function main(in mode) {
 		}
 	}
 
-	if (mode == "DEF.DOCUMENT.NO") {
+	if (mode eq "DEF.DOCUMENT.NO") {
 
 		//lock source of document numbers
 		printl("*lock source of document numbers");
@@ -63,7 +63,7 @@ nextdoc:
 		//call oswrite(nextno,where:'0')
 
 		//build new file name
-		if (USERNAME == "EXODUS") {
+		if (USERNAME eq "EXODUS") {
 			tt = "NEO";
 		}else{
 			tt = "DOC";
@@ -88,7 +88,7 @@ nextdoc:
 
 		xx = unlockrecord("DOCUMENTS", gen.documents, "0");
 
-	} else if (mode == "POSTREAD") {
+	} else if (mode eq "POSTREAD") {
 
 		if (not RECORD) {
 			return 0;
@@ -128,14 +128,14 @@ nextdoc:
 
 		RECORD.r(101, raise(RECORD.a(6)));
 
-		if (RECORD.a(8) == "") {
+		if (RECORD.a(8) eq "") {
 			RECORD.r(8, RECORD.a(3) ^ "." ^ RECORD.a(4).oconv("R(0)#5"));
 		}
 
-	} else if (mode == "PREWRITE") {
+	} else if (mode eq "PREWRITE") {
 
 		//check if allowed to create
-		if (win.orec == "") {
+		if (win.orec eq "") {
 			task = RECORD.a(5);
 			gosub gettaskprefix();
 			if (taskprefix) {
@@ -151,7 +151,7 @@ nextdoc:
 		RECORD.r(6, lower(RECORD.field(FM, 101, 9999)));
 		RECORD = RECORD.field(FM, 1, 100);
 
-		if (RECORD.a(1) == "") {
+		if (RECORD.a(1) eq "") {
 			RECORD.r(1, USERNAME);
 		}
 		RECORD.r(3, var().date());
@@ -164,7 +164,7 @@ nextdoc:
 		//this is also done in copygbp perhaps could be removed from there
 		//almost identical code in definition.subs and get.subs (for documents)
 		//field 10 in documents and definitions xxx*analdesign means the same
-		if ((USERNAME == "EXODUS") and RECORD.a(10)) {
+		if (USERNAME eq "EXODUS" and RECORD.a(10)) {
 			var reports;
 			if (reports.open("REPORTS", "")) {
 				var key = ID;
@@ -173,9 +173,9 @@ nextdoc:
 			}
 		}
 
-	} else if (mode == "POSTWRITE") {
+	} else if (mode eq "POSTWRITE") {
 
-	} else if (mode == "PREDELETE") {
+	} else if (mode eq "PREDELETE") {
 
 		task = win.orec.a(5);
 		gosub gettaskprefix();
@@ -201,7 +201,7 @@ nextdoc:
 		//update exodus standard (in case doing this on the programming system)
 		//%DELETED% ensures that deleted EXODUS documents get deleted
 		//on upgrading clients
-		if ((USERNAME == "EXODUS") and RECORD.a(10)) {
+		if (USERNAME eq "EXODUS" and RECORD.a(10)) {
 			var reports;
 			if (reports.open("REPORTS", "")) {
 				var key = ID;
@@ -214,7 +214,7 @@ nextdoc:
 			}
 		}
 
-	} else if (mode == "POSTDELETE") {
+	} else if (mode eq "POSTDELETE") {
 
 	} else {
 		call mssg(mode.quote() ^ " is invalid in GET.SUBS");
@@ -228,11 +228,11 @@ nextdoc:
 subroutine gettaskprefix() {
 	taskprefix = "";
 	task = task.field(" ", 1);
-	if (task == "ANAL") {
+	if (task eq "ANAL") {
 		taskprefix = "BILLING REPORT";
-	} else if (task == "BALANCES") {
+	} else if (task eq "BALANCES") {
 		taskprefix = "FINANCIAL REPORT";
-	} else if (task == "ANALSCH") {
+	} else if (task eq "ANALSCH") {
 		taskprefix = "BILLING REPORT";
 	} else {
 		taskprefix = "";

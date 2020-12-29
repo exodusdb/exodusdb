@@ -110,7 +110,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 
 	var isdevsys = var("exodus.id").osfile();
 
-	if (request1 == "RUNS") {
+	if (request1 eq "RUNS") {
 
 		//db start commands
 		//initdir '*.RUN'
@@ -140,7 +140,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 			}
 		};//filen;
 
-	} else if (request1 == "DELETEOLDFILES2") {
+	} else if (request1 eq "DELETEOLDFILES2") {
 
 		inpath = request3;
 		tt = "\\/";
@@ -153,7 +153,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 		call listen5("DELETEOLDFILES", "vdm*.tmp", "./", 60);
 		call listen5("DELETEOLDFILES", "*.$$*", "./", 60);
 
-	} else if (request1 == "DELETEOLDFILES") {
+	} else if (request1 eq "DELETEOLDFILES") {
 
 		pattern = request2;
 		inpath = request3;
@@ -163,13 +163,13 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 		if (not ageinsecs) {
 			ageinsecs = SYSTEM.a(28);
 		}
-		if (ageinsecs == "") {
+		if (ageinsecs eq "") {
 			ageinsecs = 60 * 60;
 		}
 
 		gosub deleteoldfiles();
 
-	} else if (request1 == "CHECKRESTART") {
+	} else if (request1 eq "CHECKRESTART") {
 
 		//check for corruption in system record
 		//if index(system,char(0),1) then
@@ -222,11 +222,11 @@ restart:
 		ANS = "";
 		return 0;
 
-	} else if (request1 == "PATCHANDRUNONCE") {
+	} else if (request1 eq "PATCHANDRUNONCE") {
 
 		//never patch and run on development systems (therefore can only test elsewhere)
 		//OFF while developing this feature
-		isdevsys = isdevsys and (var().date() > 19034);
+		isdevsys = isdevsys and var().date() gt 19034;
 		//if system<61> or isdevsys then
 		if (isdevsys or not(VOLUMES)) {
 			ANS = "";
@@ -257,7 +257,7 @@ restart:
 			//skip if no patch file or not dated today
 			var patchfilename = patchdirs.a(patchn) ^ patchcode ^ ".1";
 			var patchfileinfo = patchfilename.osfile();
-			if (patchfileinfo.a(2) < var().date()) {
+			if (patchfileinfo.a(2) lt var().date()) {
 				goto nextpatch;
 			}
 
@@ -327,7 +327,7 @@ restart:
 			//skip patch if older than installation
 			skipreason = "";
 			skipemail = "";
-			if (versiondatetime and (patchdatetime < versiondatetime)) {
+			if (versiondatetime and patchdatetime lt versiondatetime) {
 				skipreason = "Patch is older than installation version - " ^ oconv(versiondatetime, "[DATETIME,4*]");
 				skipemail = 1;
 			}
@@ -338,7 +338,7 @@ restart:
 			}
 			if (lastpatchid) {
 				var lastpatchdatetime = lastpatchid.field("*", 3);
-				if (patchdatetime < lastpatchdatetime) {
+				if (patchdatetime lt lastpatchdatetime) {
 					skipreason = "Patch is older than the last patch - " ^ oconv(lastpatchdatetime, "[DATETIME,4*]");
 				}
 			}
@@ -417,7 +417,7 @@ nextpatch:;
 
 		ANS = "";
 
-	} else if (request1 == "CONVLOG") {
+	} else if (request1 eq "CONVLOG") {
 
 		//assumes at least 0-31 and 128-255 encoded like $hh
 
@@ -453,7 +453,7 @@ nextpatch:;
 		logx.swapper("%3C", "&lt;");
 		logx.swapper("%3E", "&gt;");
 
-	} else if (request1 == "PROCESSINIT") {
+	} else if (request1 eq "PROCESSINIT") {
 		//put username and database on the bottom line of the screen
 		var username = USERNAME.trim();
 	//username=rnd(1000000)
@@ -480,11 +480,11 @@ nextpatch:;
 		bottomline = (s17 ^ " " ^ SYSTEM.a(24)).oconv("L#40") ^ username.oconv("R#40");
 		gosub printbottomline();
 
-	} else if (request1 == "PROCESSEXIT") {
+	} else if (request1 eq "PROCESSEXIT") {
 		bottomline = var(80).space();
 		gosub printbottomline();
 
-	} else if (request1.substr(1,8) == "GETINDEX") {
+	} else if (request1.substr(1,8) eq "GETINDEX") {
 
 		USER1 = "";
 		filename = request2;
@@ -503,12 +503,12 @@ nextpatch:;
 		var active = request6;
 
 		if (not(VOLUMES)) {
-			if (filename == "JOURNALS") {
+			if (filename eq "JOURNALS") {
 				filename = "JOURNALS";
 			}
 		}
 
-		if ((filename == "JOURNALS") or (filename == "JOURNALS")) {
+		if (filename eq "JOURNALS" or filename eq "JOURNALS") {
 		}else{
 			gosub fileaccesscheck();
 			if (USER3) {
@@ -520,7 +520,7 @@ nextpatch:;
 		var temp = filename;
 
 		//zzz
-		if (temp == "JOURNALS") {
+		if (temp eq "JOURNALS") {
 			temp = "JOURNAL";
 		}
 
@@ -532,7 +532,7 @@ nextpatch:;
 getvalues:
 		call collectixvals(filename, fieldname, prefix);
 		PSEUDO.transfer(USER1);
-		if (USER1[1] == FM) {
+		if (USER1[1] eq FM) {
 			USER1.splicer(1, 1, "");
 		}
 		USER3 = "OK";
@@ -578,7 +578,7 @@ getvalues:
 			};//ii;
 
 			//show inactive if none are active
-			if ((USER1 == "") and active) {
+			if (USER1 eq "" and active) {
 				active = "";
 				goto getvalues;
 			}
@@ -610,7 +610,7 @@ getvalues:
 		}
 
 	//also called from financeproxy to return voucher details for popup
-	} else if (request1 == "SELECT") {
+	} else if (request1 eq "SELECT") {
 
 		var filename0 = request2;
 		if (not(VOLUMES)) {
@@ -661,7 +661,7 @@ getvalues:
 			//response='OK'
 		}
 
-	} else if (request1 == "LISTLOCKS") {
+	} else if (request1 eq "LISTLOCKS") {
 
 		gosub getdostime();
 
@@ -696,7 +696,7 @@ nextlock:
 		if (readnext(lockid)) {
 			var lockx;
 			if (lockx.read(locks, lockid)) {
-				if (lockx.a(1) < dostime) {
+				if (lockx.a(1) lt dostime) {
 					goto nextlock;
 				}
 				nlocks += 1;
@@ -714,7 +714,7 @@ nextlock:
 		var maxlines = 20;
 		if (not tracing) {
 			nn = maxlines;
-			if (nn > maxlines) {
+			if (nn gt maxlines) {
 				nn = maxlines;
 			}
 			printl("+------Active-------+");
@@ -724,7 +724,7 @@ nextlock:
 		}
 		for (ii = 1; ii <= nn; ++ii) {
 			///BREAK;
-			if (tracing and (nn > 20)) break;
+			if (tracing and nn gt 20) break;
 			var row = select2data.a(ii);
 			if (not tracing) {
 				print("|");
@@ -749,7 +749,7 @@ nextlock:
 		select2data = "";
 		var select2response = "";
 
-	} else if (request1 == "UNLOCKLONGPROCESS") {
+	} else if (request1 eq "UNLOCKLONGPROCESS") {
 
 		//IF revRELEASE()>= 2.1 THEN
 		// lockmode=36
@@ -771,7 +771,7 @@ nextlock:
 			SYSTEM.r(48, "");
 		}
 
-	} else if (request1 == "STOPDB") {
+	} else if (request1 eq "STOPDB") {
 
 		#define installend request3
 		#define serverend request4
@@ -803,7 +803,7 @@ nextlock:
 			var timex = var().time();
 			while (true) {
 				///BREAK;
-				if (not(otherusers().a(1) and ((var().time() - timex).abs() < 30))) break;
+				if (not(otherusers().a(1) and ((var().time() - timex).abs() lt 30))) break;
 				call ossleep(1000*1);
 			}//loop;
 
@@ -817,7 +817,7 @@ nextlock:
 			}else{
 				osshell("NET STOP EXODUSSERVICE");
 
-				if (request2.substr(1,7) == "RESTART") {
+				if (request2.substr(1,7) eq "RESTART") {
 					var(installend).osdelete();
 					osshell("NET START EXODUSSERVICE");
 				}
@@ -830,7 +830,7 @@ nextlock:
 			}
 		}
 
-	} else if (request1 == "BACKUP") {
+	} else if (request1 eq "BACKUP") {
 
 		//similar code in LISTEN and LISTEN2
 
@@ -844,7 +844,7 @@ nextlock:
 		//if backup has already responded to user
 		//then quit and indicate to calling program that a backup has been done
 		//user will be emailed
-		if (SYSTEM.a(2) == "") {
+		if (SYSTEM.a(2) eq "") {
 			PSEUDO = "BACKUP2 " ^ bakpars.a(7);
 			if (USER4) {
 				stop();
@@ -883,7 +883,7 @@ subroutine fileaccesscheck() {
 	USER3 = "";
 
 	var securityfilename = filename;
-	if (filename == "JOURNALS") {
+	if (filename eq "JOURNALS") {
 		securityfilename = "JOURNALS";
 	}
 
@@ -913,7 +913,7 @@ subroutine fileaccesscheck() {
 }
 
 subroutine printbottomline() {
-	if (CRTHIGH > 24) {
+	if (CRTHIGH gt 24) {
 		yy = CRTHIGH - 1;
 	}else{
 		yy = CRTHIGH;
@@ -929,7 +929,7 @@ subroutine deleteoldfiles() {
 	var filespec = (inpath ^ pattern).lcase();
 
 	//failsafe - only allow delete .* in data folder
-	if (filespec.substr(-2,2) == ".*") {
+	if (filespec.substr(-2,2) eq ".*") {
 		var tdir = "/data/";
 		tdir.converter("/", OSSLASH);
 		if (not(filespec.index(tdir))) {
@@ -961,7 +961,7 @@ subroutine deleteoldfiles() {
 		if (not(var(".jpg,.png,.gif,.svr,.cfg").locateusing(",",(filename.substr(-4,4)).lcase(),xx))) {
 
 			//a file ending .4 is a request to delete the .2 and .3 files
-			if (filename.substr(-2,2) == ".4") {
+			if (filename.substr(-2,2) eq ".4") {
 				filename.osdelete();
 				filename.splicer(-1, 1, "2");
 				filename.osdelete();
@@ -969,14 +969,14 @@ subroutine deleteoldfiles() {
 				filename.osdelete();
 
 			}else{
-				if (filename.substr(-4,4) == ".TMP") {
+				if (filename.substr(-4,4) eq ".TMP") {
 					goto deleteit;
 				}
 				//and delete it if older than the cut off time
 				//and has a file extension (ie leave PARAMS and PARAMS2)
 				fileattributes = filename.osfile();
 				filetime = fileattributes.a(2) * 24 * 60 * 60 + fileattributes.a(3);
-				if (((filename.substr(-4,4)).index(".")) and (filetime <= deletetime)) {
+				if (((filename.substr(-4,4)).index(".")) and filetime le deletetime) {
 deleteit:
 					filename.osdelete();
 				}else{

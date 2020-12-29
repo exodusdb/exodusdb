@@ -1583,14 +1583,21 @@ DLL_PUBLIC var operator^(var&& lhs, const double double2) { return lhs^=double2;
 //#if defined __MINGW32__
 // allow use of cout<<var
 DLL_PUBLIC
-std::ostream& operator<<(std::ostream& ostream1, const var& var1)
+std::ostream& operator<<(std::ostream& ostream1, var var1)
 {
-	THISIS("std::ostream& operator<< (std::ostream& ostream1, const var& var1)")
+	THISIS("std::ostream& operator<< (std::ostream& ostream1, var var1)")
 	ISSTRING(var1)
+
+	//replace various unprintable field marks with unusual ASCII characters
+    //std::string str = "\x1A\x1B\x1C\x1D\x1E\x1F";
+    for (auto& c : var1.var_str) {
+        if (c <= 0x1F && c >= 0x1A)
+            c = "|[\\]^~"[c - 0x1A];
+    }
 
 	// use toString() to avoid creating a constructor which logs here recursively
 	// should this use a ut16/32 -> UTF8 code facet? or convert to UTF8 and output to ostream?
-	ostream1 << var1.toString();
+	ostream1 << var1.var_str;
 	return ostream1;
 }
 

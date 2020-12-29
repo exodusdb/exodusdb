@@ -178,12 +178,12 @@ function main(in filename, in rowfields0, in colfield, in datafield, io table, i
 			}
 		}
 		rowfieldismv(rowfn) = rowdict(rowfn).a(4) ne "S";
-		if ((rowfieldismv(rowfn) and not(prefixmvfn)) and (rowdict(rowfn).a(1) == "F")) {
+		if ((rowfieldismv(rowfn) and not(prefixmvfn)) and rowdict(rowfn).a(1) eq "F") {
 			prefixmvfn = rowdict(rowfn).a(2);
 		}
 	};//rowfn;
 
-	totcol = colfield == "TOTAL";
+	totcol = colfield eq "TOTAL";
 	coln = 1;
 	if (totcol) {
 		colorder = "AR";
@@ -195,7 +195,7 @@ function main(in filename, in rowfields0, in colfield, in datafield, io table, i
 			}
 		}
 
-		if (coldict.a(9) == "R") {
+		if (coldict.a(9) eq "R") {
 			colorder = "AR";
 		}else{
 			colorder = "AL";
@@ -254,7 +254,7 @@ nextmv:
 ///////
 		//if prefixes else goto nextrecord
 		MV += 1;
-		if (MV > nmvs) {
+		if (MV gt nmvs) {
 			goto nextrecord;
 		}
 	}else{
@@ -280,7 +280,7 @@ nextmv:
 		}
 	}
 
-	if (datafield.length() == 0) {
+	if (datafield.length() eq 0) {
 		datavals = 1;
 	} else if (datafield.match("^\\d*$")) {
 		datavals = RECORD.a(datafield);
@@ -294,11 +294,11 @@ nextmv:
 		for (rowfn = 1; rowfn <= nrowfields; ++rowfn) {
 			fieldname = rowfields.a(1, rowfn);
 			tt = calculate(fieldname);
-			if (fieldname == "HOUR") {
+			if (fieldname eq "HOUR") {
 				tt = ("00" ^ tt).substr(-2,2);
 			}
 			nn = tt.count(VM) + (tt ne "");
-			if (nn > nrowvals) {
+			if (nn gt nrowvals) {
 				nrowvals = nn;
 			}
 			rowvals.r(rowfn, tt);
@@ -312,7 +312,7 @@ nextmv:
 		colvals = "Total";
 	}else{
 		colvals = calculate(colfield);
-		if (colfield == "HOUR") {
+		if (colfield eq "HOUR") {
 			colvals = ("00" ^ colvals).substr(-2,2);
 		}
 	}
@@ -336,11 +336,11 @@ nextmv:
 
 		//determine which row to add into
 		if (not(allrowvals.a(1).locateby("AL",rowval,rown))) {
-			if (allrowvals.length() + rowval.length() > 65000) {
+			if (allrowvals.length() + rowval.length() gt 65000) {
 toobig:
 				clearselect();
 				msg = "Crosstab too complex. Please simplify your request.";
-				if (filename == "STATISTICS") {
+				if (filename eq "STATISTICS") {
 					msg.r(-1, "Perhaps choose Columns=Date and dont select Session or IP No.");
 				}
 				call mssg(msg);
@@ -357,12 +357,12 @@ toobig:
 			colval = colvals.a(1, colvaln);
 			if (not(allcolvals.a(1).locateby(colorder,colval,coln))) {
 				ncols += 1;
-				if (allcolvals.length() + colval.length() > 65000) {
+				if (allcolvals.length() + colval.length() gt 65000) {
 					goto toobig;
 				}
 				allcolvals.inserter(1, coln, colval);
 
-				if (table.length() + nrows * 2 > 65000) {
+				if (table.length() + nrows * 2 gt 65000) {
 					goto toobig;
 				}
 
@@ -372,7 +372,7 @@ toobig:
 				};//rownx;
 			}
 
-			if (table.length() + datavals.length() > 6500) {
+			if (table.length() + datavals.length() gt 6500) {
 				goto toobig;
 			}
 
@@ -421,7 +421,7 @@ exit:
 	}
 
 	for (rown = 1; rown <= nrows; ++rown) {
-		if (table.length() + allrowvals.length() > 65000) {
+		if (table.length() + allrowvals.length() gt 65000) {
 			goto toobig;
 		}
 		table.r(rown + 1, 1, allrowvals.a(1, rown));

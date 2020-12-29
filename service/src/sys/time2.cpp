@@ -12,7 +12,7 @@ function main(in type, in input0, in mode0, out output) {
 	//uses @sw to output to or input from "local time"
 	//NO LONGER since requires date to be effective (use [DATETIME])
 
-	if (input0 == "") {
+	if (input0 eq "") {
 		output = "";
 		return 0;
 	}
@@ -22,16 +22,16 @@ function main(in type, in input0, in mode0, out output) {
 		mode = "MT";
 	}
 
-	if (type == "OCONV") {
+	if (type eq "OCONV") {
 
 		if (mode.index("48")) {
 			var modex = mode;
 			modex.swapper("48", "");
-			if (modex == "") {
+			if (modex eq "") {
 				modex = "MTS";
 			}
 			output = oconv(input0, modex);
-			if (input0 >= 86400) {
+			if (input0 ge 86400) {
 				output = output.fieldstore(":", 1, 1, (output.field(":", 1) + 24).oconv("R(0)#2"));
 			}
 		}else{
@@ -50,7 +50,7 @@ function main(in type, in input0, in mode0, out output) {
 		//convert '.' to ':' in output
 
 	//mode eg 48MT etc completely ignored in iconv
-	} else if (type == "ICONV") {
+	} else if (type eq "ICONV") {
 
 		//handle multivalues
 		if (input0.index(VM)) {
@@ -66,7 +66,7 @@ function main(in type, in input0, in mode0, out output) {
 		var input2 = input0;
 		input2.converter(":.", "::");
 		var temp = input2.field(":", 1);
-		if (temp.isnum() and (temp >= 24)) {
+		if (temp.isnum() and temp ge 24) {
 			input2 = input2.fieldstore(":", 1, 1, temp - 24);
 			//output=iconv(input2,'MT')
 			//output=mod(iconv(input2,'MT')-@sw<1>,86400)

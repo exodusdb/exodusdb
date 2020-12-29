@@ -14,8 +14,8 @@ function main(in mode, io line, in params, in filename) {
 
 	//line conversion code below
 	//
-	if (filename == "xxxxxx") {
-		if (mode == "HEAD") {
+	if (filename eq "xxxxxx") {
+		if (mode eq "HEAD") {
 			if (params) {
 			}
 

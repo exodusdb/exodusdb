@@ -87,7 +87,7 @@ function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfile
 	//sendmail is silent
 	errormsg = "";
 
-	if ((SENTENCE.field(" ", 1).ucase() == "SENDMAIL") and toaddress0.unassigned()) {
+	if (SENTENCE.field(" ", 1).ucase() eq "SENDMAIL" and toaddress0.unassigned()) {
 		toaddress = SENTENCE.field(" ", 2);
 		if (not toaddress) {
 			toaddress = "sb2@neosys.com";
@@ -129,7 +129,7 @@ function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfile
 		//if system<61> or (@username='EXODUS' and system<17,1>[-4,4]='TEST') then
 
 		//testdata and user exodus - always email sysmsg@neosys.com
-		if (SYSTEM.a(61) and (USERNAME == "EXODUS")) {
+		if (SYSTEM.a(61) and USERNAME eq "EXODUS") {
 			forcedemailx = "sysmsg@neosys.com";
 
 forcedemail:
@@ -209,10 +209,10 @@ forcedemail:
 		}
 		params1.r(1, sysname ^ "@neosys.com");
 	}
-	if (params1.a(2) == "") {
+	if (params1.a(2) eq "") {
 		params1.r(2, "mailout.neosys.com");
 	}
-	if (params1.a(3) == "") {
+	if (params1.a(3) eq "") {
 		params1.r(3, "2500");
 	}
 
@@ -232,13 +232,13 @@ forcedemail:
 
 	var msgsize = 0;
 
-	if (body[1] == "@") {
+	if (body[1] eq "@") {
 
 		osfilename = body.substr(2,99999);
 		osfilesize = osfilename.osfile().a(1);
 
 		//convert to link if file is too big to email
-		if (osfilesize > maxemailsize) {
+		if (osfilesize gt maxemailsize) {
 			body = "";
 			gosub addlinks2osfilename();
 		}else{
@@ -255,7 +255,7 @@ forcedemail:
 		attachfilename.osclose();
 
 		osfilesize = attachfilename.osfile().a(1);
-		if (osfilesize > maxemailsize) {
+		if (osfilesize gt maxemailsize) {
 			osfilename = attachfilename;
 			gosub addlinks2osfilename();
 			attachfilename = "";
@@ -266,9 +266,9 @@ forcedemail:
 	if (attachfilename) {
 
 		attachfilename.swapper("\\\\", "\\");
-		if (attachfilename.substr(1,2) == "..") {
+		if (attachfilename.substr(1,2) eq "..") {
 			attachfilename.splicer(1, 2, oscwd().field(OSSLASH, 1, oscwd().count(OSSLASH) - 1));
-		} else if (attachfilename.substr(1,2) == ".") {
+		} else if (attachfilename.substr(1,2) eq ".") {
 			attachfilename.splicer(1, 1, oscwd());
 		}
 		msgsize += attachfilename.osfile().a(1);
@@ -298,10 +298,10 @@ forcedemail:
 
 	//condition subject start standard with 'EXODUS: '
 	if (subject.substr(1,8) ne "EXODUS: ") {
-		if (subject.substr(1,6) == "EXODUS") {
+		if (subject.substr(1,6) eq "EXODUS") {
 			subject = subject.substr(7,9999).trimf();
 		}
-		if (subject.substr(1,7) == "System:") {
+		if (subject.substr(1,7) eq "System:") {
 			subject = subject.substr(8,9999).trimf();
 		}
 		subject.splicer(1, 0, "EXODUS: ");
@@ -362,7 +362,7 @@ forcedemail:
 		}
 
 		//mark html formatted messages as such
-		if (body[1] == "@") {
+		if (body[1] eq "@") {
 			tt = "";
 			if (bodyfile.osopen(body.substr(2,999))) {
 				//osbread tt from bodyfile at 0 length 100
@@ -392,10 +392,10 @@ forcedemail:
 		cmd ^= " " ^ toaddress.convert(";", " ");
 
 		//ensure the email body is in a file
-		if (bodyfilename == "") {
+		if (bodyfilename eq "") {
 
 			//body may already be in a file
-			if (body[1] == "@") {
+			if (body[1] eq "@") {
 				bodyfilename = body.substr(2,99999);
 
 			//otherwise generate a random filename and write it
@@ -444,7 +444,7 @@ forcedemail:
 			errormsg.r(-1, params);
 		}
 	}else{
-		if (errormsg == "") {
+		if (errormsg eq "") {
 			if (errors) {
 				errormsg = errors;
 			}else{
@@ -460,7 +460,7 @@ forcedemail:
 
 	errormsg.r(1, errormsg.a(1).trim());
 	//in what situation can it return OK+message ??
-	if (errormsg.a(1) == "OK") {
+	if (errormsg.a(1) eq "OK") {
 		errormsg.remover(1);
 	}else{
 		errormsg = trim(errormsg, FM, "B");
@@ -490,7 +490,7 @@ forcedemail:
 subroutine addlinks2osfilename() {
 	tt = osfilename;
 	tt.converter("\\", "/");
-	if (tt.substr(1,3) == "../") {
+	if (tt.substr(1,3) eq "../") {
 		tt.splicer(1, 3, "");
 	}
 	if (body) {

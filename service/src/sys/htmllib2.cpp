@@ -30,7 +30,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 		params2 = params20;
 	}
 
-	if (mode == "TABLE.MAKE") {
+	if (mode eq "TABLE.MAKE") {
 
 		dataio.trimmer();
 		var tt = " " ^ VM;
@@ -93,12 +93,12 @@ function main(in mode, io dataio, in params0="", in params20="") {
 		dataio.converter(VM, "");
 
 	//fill in the missing cells
-	} else if (mode == "TABLE.FILL") {
+	} else if (mode eq "TABLE.FILL") {
 
 		var filler = "<TD>&nbsp;</TD>";
 		//gosub fill
 
-	} else if (mode == "HASHTABLE") {
+	} else if (mode eq "HASHTABLE") {
 
 		var nv = dataio.count(VM) + 1;
 		for (var vn = 1; vn <= nv; ++vn) {
@@ -113,11 +113,11 @@ function main(in mode, io dataio, in params0="", in params20="") {
 			datax.converter(TM, FM);
 
 			var nlines = datax.count(FM) + 1;
-			if (nlines > 1) {
+			if (nlines gt 1) {
 
 				for (var ln = 1; ln <= nlines; ++ln) {
 					var line = datax.a(ln).trim();
-					if (line[1] == "#") {
+					if (line[1] eq "#") {
 						line.splicer(1, 1, "");
 						//if colon : present then before colon is the tag name
 						if (line.index(":")) {
@@ -128,7 +128,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 						var tt1 = line.field(tagsep, 1);
 						tt1.converter("_", " ");
 						var tt2 = line.field(tagsep, 2, 9999);
-						if (tt2[1] == "=") {
+						if (tt2[1] eq "=") {
 							tt2.splicer(1, 1, "");
 						}
 						datax.r(ln, td ^ tt1 ^ ":" ^ tdx ^ td ^ tt2 ^ tdx);
@@ -147,22 +147,22 @@ function main(in mode, io dataio, in params0="", in params20="") {
 
 		};//vn;
 
-	} else if (mode == "STRIPTAGS") {
+	} else if (mode eq "STRIPTAGS") {
 		while (true) {
 			var tag1 = dataio.index("<");
 			var tag2 = dataio.index(">");
 			///BREAK;
-			if (not(tag1 and (tag1 < tag2))) break;
+			if (not(tag1 and tag1 lt tag2)) break;
 			dataio.splicer(tag1, tag2 - tag1 + 1, "");
 		}//loop;
 
-	} else if (mode == "DECODEHTML") {
+	} else if (mode eq "DECODEHTML") {
 		dataio.swapper("&nbsp;", " ");
 		dataio.swapper("&lt;", "<");
 		dataio.swapper("&gt;", ">");
 		dataio.swapper("&amp;", "&");
 
-	} else if (mode.field(".", 1, 2) == "OCONV.AGENT") {
+	} else if (mode.field(".", 1, 2) eq "OCONV.AGENT") {
 
 		//to check versus DOS BROWSERS.TXT
 		//GET NEW RUN GBP2 CHK.AGENTSTRING
@@ -243,7 +243,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 			}
 			if (tt) {
 				osname = var(agent).substr(tt,9999);
-				if (osname.substr(1,4) == "CPU ") {
+				if (osname.substr(1,4) eq "CPU ") {
 					osname.splicer(1, 3, "iPad");
 				}
 				tt = osname.index(" like ");
@@ -255,7 +255,7 @@ function main(in mode, io dataio, in params0="", in params20="") {
 				osname.swapper(" x86_64", "-64");
 			}
 		}
-		if (osname.substr(-2,2) == ".0") {
+		if (osname.substr(-2,2) eq ".0") {
 			osname.splicer(-2, 2, "");
 		}
 
@@ -332,15 +332,15 @@ function main(in mode, io dataio, in params0="", in params20="") {
 			//browser=trimf(browser)
 
 		}
-		if (browser.substr(-2,2) == ".0") {
+		if (browser.substr(-2,2) eq ".0") {
 			browser.splicer(-2, 2, "");
 		}
 
 		var submode = mode.field(".", 3);
-		if (submode == "OS") {
+		if (submode eq "OS") {
 			agent = osname;
 			return 0;
-		} else if (submode == "BROWSER") {
+		} else if (submode eq "BROWSER") {
 			agent = browser;
 			return 0;
 		}

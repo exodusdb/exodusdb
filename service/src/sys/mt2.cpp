@@ -23,7 +23,7 @@ function main(in type, in in0, in mode, out out0) {
 		}
 	}
 
-	if (type == "ICONV") {
+	if (type eq "ICONV") {
 
 		//convert '.' to ':' in in2
 

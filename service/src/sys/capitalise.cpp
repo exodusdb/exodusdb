@@ -18,7 +18,7 @@ function main(io str0, io mode, io wordseps, io oconv_out) {
 	//also supports oconv (iconv converts everything to uppercase)
 	//str0=type, mode=input, wordseps=mode, oconv_out=output
 
-	if (str0 == "OCONV") {
+	if (str0 eq "OCONV") {
 		str0 = mode;
 		mode = wordseps;
 		gosub process(str0, mode, wordseps);
@@ -26,7 +26,7 @@ function main(io str0, io mode, io wordseps, io oconv_out) {
 		return oconv_out;
 	}
 
-	if (str0 == "ICONV") {
+	if (str0 eq "ICONV") {
 		oconv_out = mode;
 		oconv_out.ucaser();
 		return oconv_out;
@@ -47,7 +47,7 @@ subroutine process(in str0, in mode, io wordseps) {
 		wordseps ^= _RM_ _FM_ _VM_ _SM_ _TM_ _STM_;
 	}
 
-	if (mode == "QUOTE") {
+	if (mode eq "QUOTE") {
 		string2 = str0;
 		if (string2 ne "") {
 			string2.converter(FM ^ VM ^ SVM ^ TM, "    ");
@@ -55,18 +55,18 @@ subroutine process(in str0, in mode, io wordseps) {
 			string2 = string2.quote();
 		}
 
-	} else if (mode == "UPPERCASE") {
+	} else if (mode eq "UPPERCASE") {
 		string2 = str0;
 		string2.ucaser();
 
-	} else if (mode == "LOWERCASE") {
+	} else if (mode eq "LOWERCASE") {
 		string2 = str0;
 		string2.lcaser();
 
-	} else if (mode == "CAPITALISE") {
+	} else if (mode eq "CAPITALISE") {
 capitalise:
 		string2 = str0;
-		if (string2 == "EXODUS") {
+		if (string2 eq "EXODUS") {
 			return;
 		}
 
@@ -81,12 +81,12 @@ capitalise:
 			if (inquotes) {
 				inquotes = tt ne inquotes;
 			}else{
-				if (((tt == DQ) and (string2.count(DQ) > 1)) or (((tt == "'") and (string2.count("'") > 1)))) {
+				if ((tt eq DQ and string2.count(DQ) gt 1) or ((tt eq "'" and string2.count("'") gt 1))) {
 					inquotes = tt;
 				}else{
 					if (wordseps.index(tt)) {
 						cap = 1;
-						if (tt == " ") {
+						if (tt eq " ") {
 							numx = var("1234567890").index(string2[ii + 1]);
 						}
 					}else{
@@ -105,11 +105,11 @@ capitalise:
 		};//ii;
 
 		string2.swapper("'S ", "'s ");
-		if (string2.substr(-2,2) == "'S") {
+		if (string2.substr(-2,2) eq "'S") {
 			string2.splicer(-2, 2, "'s");
 		}
 
-	} else if (mode.substr(1,5) == "PARSE") {
+	} else if (mode.substr(1,5) eq "PARSE") {
 
 		toupper = mode.index("UPPERCASE");
 
@@ -121,14 +121,14 @@ capitalise:
 			tt = string2[ii];
 			///BREAK;
 			if (not(tt ne "")) break;
-			if (tt == quoted) {
+			if (tt eq quoted) {
 				quoted = "";
 			}else{
 				if (not quoted) {
 					if ((DQ ^ "'").index(tt)) {
 						quoted = tt;
 					}else{
-						if (tt == " ") {
+						if (tt eq " ") {
 							tt = FM;
 							string2.splicer(ii, 1, tt);
 						}else{

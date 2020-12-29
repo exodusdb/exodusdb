@@ -78,12 +78,12 @@ function main() {
 	var format = PSEUDO.a(3);
 	var datemode = PSEUDO.a(4);
 
-	html = format == 1;
+	html = format eq 1;
 	var dedup = html;
 
-	if (datemode > 1) {
+	if (datemode gt 1) {
 		var selectcmd = "SELECT STATISTICS WITH DATE ";
-		if (datemode == 2) {
+		if (datemode eq 2) {
 			reqdate = var().date();
 		}else{
 			reqdate = var().date() - 1;
@@ -125,7 +125,7 @@ function main() {
 			var replaced = 0;
 			for (var coln = 1; coln <= nrowfields; ++coln) {
 				///BREAK;
-				if (not(row1.a(1, coln) == row2.a(1, coln))) break;
+				if (not(row1.a(1, coln) eq row2.a(1, coln))) break;
 				replaced = 1;
 				row2.r(1, coln, "-");
 			};//coln;
@@ -160,12 +160,12 @@ function main() {
 
 		for (var coln = 1; coln <= ncols; ++coln) {
 			tx ^= "<col";
-			if (coln > nrowfields) {
+			if (coln gt nrowfields) {
 				tx ^= " align=right";
 			}
 			tx ^= ">";
 			//extra col for user browser
-			if (coln == usercoln) {
+			if (coln eq usercoln) {
 				tx ^= "<col>";
 			}
 		};//coln;
@@ -178,7 +178,7 @@ function main() {
 			}
 			tx ^= th ^ cell ^ thx;
 			//extra col for user browser
-			if (coln == usercoln) {
+			if (coln eq usercoln) {
 				tx ^= th ^ "Browser Last Seen" ^ thx;
 			}
 		};//coln;
@@ -191,17 +191,17 @@ function main() {
 			var rowtx = "";
 			for (var coln = 1; coln <= ncols; ++coln) {
 				var cell = row.a(1, coln);
-				if (dedup and (coln <= nrowfields)) {
+				if (dedup and coln le nrowfields) {
 					if (cell ne "-") {
 						var rowspan = 1;
 						for (var rown2 = rown + 1; rown2 <= nrows; ++rown2) {
 							///BREAK;
-							if (not(output.a(rown2, coln) == "-")) break;
+							if (not(output.a(rown2, coln) eq "-")) break;
 							rowspan += 1;
 						};//rown2;
 
 						var celltd = "<TD";
-						if (rowspan > 1) {
+						if (rowspan gt 1) {
 							celltd ^= " rowspan=" ^ rowspan;
 						}
 						celltd ^= ">";
@@ -211,7 +211,7 @@ function main() {
 						}
 
 						//convert to user name
-						if (coln == usercoln) {
+						if (coln eq usercoln) {
 							userx = xlate("USERS", cell, "", "X");
 							var tt = userx.a(1);
 							if (tt and cell ne tt) {
@@ -222,7 +222,7 @@ function main() {
 						rowtx ^= celltd ^ cell ^ tdx;
 
 						//browser after user
-						if (coln == usercoln) {
+						if (coln eq usercoln) {
 							rowtx ^= celltd;
 							var agent = userx.a(39, 6);
 
@@ -238,13 +238,13 @@ function main() {
 						cell = nbsp;
 					}
 					rowtx ^= td ^ cell ^ tdx;
-					if (coln == usercoln) {
+					if (coln eq usercoln) {
 						rowtx ^= td ^ nbsp ^ tdx;
 					}
 				}
 			};//coln;
 			tx ^= tr ^ rowtx ^ trx;
-			if (tx.length() > 64000) {
+			if (tx.length() gt 64000) {
 				gosub printtx();
 			}
 		};//rown;

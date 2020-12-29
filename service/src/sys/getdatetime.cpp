@@ -20,7 +20,7 @@ function main(out localdate, out localtime, out sysdate, out systime, out utcdat
 		sysdate = var().date();
 		systime = var().time();
 		///BREAK;
-		if (systime >= systime1) break;
+		if (systime ge systime1) break;
 	}//loop;
 
 	//no timezone info
@@ -39,11 +39,11 @@ function main(out localdate, out localtime, out sysdate, out systime, out utcdat
 	tt = SW.a(1);
 	if (tt) {
 		localtime += tt;
-		if (localtime >= 86400) {
+		if (localtime ge 86400) {
 			//assume offset cannot be more than 24 hours!
 			localdate = sysdate + 1;
 			localtime -= 86400;
-		} else if (localtime < 0) {
+		} else if (localtime lt 0) {
 			//assume offset cannot be less than 24 hours!
 			localdate = sysdate - 1;
 			localtime += 86400;
@@ -60,11 +60,11 @@ function main(out localdate, out localtime, out sysdate, out systime, out utcdat
 	tt = SW.a(2);
 	if (tt) {
 		utctime -= tt;
-		if (utctime >= 86400) {
+		if (utctime ge 86400) {
 			//assume tz cannot be more than 24 hours!
 			utcdate = sysdate + 1;
 			utctime -= 86400;
-		} else if (utctime < 0) {
+		} else if (utctime lt 0) {
 			//assume tz cannot be less than 24 hours!
 			utcdate = sysdate - 1;
 			utctime += 86400;
@@ -74,7 +74,7 @@ function main(out localdate, out localtime, out sysdate, out systime, out utcdat
 /////
 exit:
 /////
-	if (SENTENCE == "GETDATETIME") {
+	if (SENTENCE eq "GETDATETIME") {
 		var msg = "";
 		msg.r(-1, "User:   " ^ localdate.oconv("D"));
 		msg ^= " " ^ localtime.oconv("MTH");

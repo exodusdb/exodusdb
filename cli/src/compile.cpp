@@ -45,7 +45,7 @@ function main()
 	silent=index(OPTIONS.ucase(),"S");
 	debugging=not index(OPTIONS.ucase(),"R");//no symbols for backtrace
 	//the backtrace seems to work fine with release mode at least in vs2005
-	optimise=index(OPTIONS.ucase(),"O");//prevents backtrace
+	optimise=count(OPTIONS.ucase(),"O");//prevents backtrace
 	generateheadersonly=index(OPTIONS.ucase(),"H");//prevents backtrace
 
 	var ncpus=osshellread("grep ^processor -i /proc/cpuinfo|wc").trim().field(" ",1);
@@ -60,7 +60,7 @@ function main()
 	var filenames=field(command,FM,2,999999999);
 	var nfiles=dcount(filenames,FM);
 	if (not filenames)
-		abort("Syntax is compile filename ... {options}\nOptions are R=Release (No symbols), O=Optimise (No back trace/debugging), V=Verbose, S=Silent, H=Generate headers only");
+		abort("Syntax is compile filename ... {options}\nOptions are R=Release (No symbols), O/OO/OOO=Optimise (Poor back trace/debugging), V=Verbose, S=Silent, H=Generate headers only");
 
 	//source extensions
 	var src_extensions="cpp cxx cc";
@@ -179,9 +179,11 @@ function main()
 			basicoptions^=" -no-pie -g -rdynamic";
 
 		//optimiser unfortunately prevents backtrace
-		//if (optimise)
-		//	basicoptions^=" -O1";
-		//	basicoptions^=" -O3";
+		//if (optimise) {
+			//basicoptions^=" -O1";
+			//basicoptions^=" -O3";
+			basicoptions^=" -O" ^ optimise;
+		//}
 
 		//how to output to a named file
 		outputoption=" -o ";
@@ -502,7 +504,7 @@ function main()
 				subdirs = t1.sort().join();
 			    subdirs=srcfilename^"/"^subdirs;
 				subdirs.swapper(FM,FM^srcfilename^"/");
-//subdirs.outputl("subdirs=");
+//subdirs.printl("subdirs=");
 				filenames.inserter(fileno+1,subdirs);
 			}
 
@@ -1327,7 +1329,7 @@ function static compile(
 
 						} else {
 							outputpathandfile.output("Warning: ");
-							outputl(" updated while in use. Reload required.");
+							printl(" updated while in use. Reload required.");
 						}
 					}
 
@@ -1480,7 +1482,7 @@ function set_environment() {
 
 	//track first line of batch file which is the compiler configuration line
 	if (verbose)
-		outputl("COMPILER="^script);
+		printl("COMPILER="^script);
 
 	script^="\nset";
 	if (verbose)

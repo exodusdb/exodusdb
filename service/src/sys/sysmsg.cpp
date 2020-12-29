@@ -59,7 +59,7 @@ function main(in msg0, in subject0="", in username0="") {
 		printl("sysmsg: ", subjectin, ", ", username, ", ", msg.a(1, 1).field("|", 1).a(1, 1));
 	}
 
-	if ((msg == "") and subjectin) {
+	if (msg eq "" and subjectin) {
 		msg = subjectin;
 	}
 
@@ -102,7 +102,7 @@ function main(in msg0, in subject0="", in username0="") {
 	emailaddrs.swapper("backups@neosys.com", "sysmsg@neosys.com");
 
 	//suppress login failure messages
-	if ((APPLICATION ne "ACCOUNTS" and username ne "EXODUS") and (subjectin.substr(1,13) == "Login Failure")) {
+	if ((APPLICATION ne "ACCOUNTS" and username ne "EXODUS") and subjectin.substr(1,13) eq "Login Failure") {
 		emailaddrs.swapper("sysmsg@neosys.com", "");
 		emailaddrs = trim(emailaddrs, ";");
 	}
@@ -116,14 +116,14 @@ function main(in msg0, in subject0="", in username0="") {
 	}
 
 	//username EXODUS and @username<>EXODUS means email EXODUS ONLY!
-	if ((username == "EXODUS") and USERNAME ne "EXODUS") {
+	if (username eq "EXODUS" and USERNAME ne "EXODUS") {
 		emailaddrs = "sysmsg@neosys.com";
 		//so we know who caused the message
 		username = USERNAME;
 	}
 
 	//sysmsg is not emailed to admins if testdata or user is EXODUS
-	if ((USERNAME == "EXODUS") or (SYSTEM.a(17).substr(-4,4) == "TEST")) {
+	if (USERNAME eq "EXODUS" or (SYSTEM.a(17).substr(-4,4) eq "test")) {
 
 		//this is disabled to ensure that all errors caused by EXODUS support
 		//are logged normally
@@ -143,7 +143,7 @@ function main(in msg0, in subject0="", in username0="") {
 	}
 
 	//if no email addresses then always email exodus
-	if (emailaddrs == "") {
+	if (emailaddrs eq "") {
 		emailaddrs = "sysmsg@neosys.com";
 	}
 
@@ -158,7 +158,7 @@ function main(in msg0, in subject0="", in username0="") {
 		subject ^= " " ^ subjectin;
 	}
 
-	if (msg.substr(1,2) == "@@") {
+	if (msg.substr(1,2) eq "@@") {
 		body = msg.substr(2,999999);
 
 	}else{
@@ -260,7 +260,7 @@ function main(in msg0, in subject0="", in username0="") {
 	params.r(2, 60);
 	params.r(3, 60);
 	params.r(4, "DOS");
-	params.r(5, "SYSMSG.$RR");
+	params.r(5, "sysmsg.$rr");
 	var exceedmsg = "SYSMSG email suppressed because > 60 in last 60 mins";
 	//call roundrobin('ONEVENT',params,result,errormsg)
 	call roundrobin("ONEVENT", params, result, xx);

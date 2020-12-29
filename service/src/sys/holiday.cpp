@@ -25,14 +25,14 @@ function main(in mode, io idate, in usercode, in userx, in marketcode, in market
 		{}
 	}
 
-	if (mode == "GETTYPE") {
+	if (mode eq "GETTYPE") {
 		gosub getholidaytype(idate, userx, agp, market, holidaytype);
 
-	} else if (mode == "GETWORKDATE") {
+	} else if (mode eq "GETWORKDATE") {
 
 		//skipping forwards or backwards the next number of workdays
 		//eg -2 will change idate to the second workday BEFORE idate
-		if (workdate > 0) {
+		if (workdate gt 0) {
 			direction = 1;
 		}else{
 			direction = -1;
@@ -61,7 +61,7 @@ subroutine getholidaytype(in idate, in userx, in agp, in market, io holidaytype)
 
 	//type 4 is expired
 	//////////////////
-	if (userx.a(35) and (idate >= userx.a(35))) {
+	if (userx.a(35) and idate ge userx.a(35)) {
 		holidaytype = 4;
 		return;
 	}
@@ -118,7 +118,7 @@ subroutine getholidaytype(in idate, in userx, in agp, in market, io holidaytype)
 		{}
 	}
 	var uptodate = uptodates.a(1, daten);
-	if (uptodate and (idate <= uptodates.a(1, daten))) {
+	if (uptodate and idate le uptodates.a(1, daten)) {
 		holidaytype = 3;
 		return;
 	}

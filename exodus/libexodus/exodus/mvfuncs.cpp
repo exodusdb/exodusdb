@@ -34,17 +34,14 @@ Binary    Hex          Comments
 #pragma warning(disable : 4530)
 #endif
 
-#ifndef _MSC_VER
-#include <signal.h>
-#endif
+//#ifndef _MSC_VER
+//#include <signal.h>
+//#endif
 
 #include <cmath>    //for floor
 #include <cstdlib>  //for exit
 #include <iostream> //cin and cout
 #include <memory>   //for unique_ptr
-
-#include <mutex>
-#define LOCKIOSTREAM std::lock_guard<std::mutex> guard(global_mutex_threadstream);
 
 #ifndef M_PI
 //#define M_PI 3.14159265358979323846f
@@ -64,8 +61,6 @@ bool desynced_with_stdio = false;
 
 namespace exodus
 {
-
-static std::mutex global_mutex_threadstream;
 
 int var::localeAwareCompare(const std::string& str1, const std::string& str2)
 {
@@ -146,7 +141,7 @@ bool var::input(const var& prompt, const int nchars)
 		{
 			char char1;
 			{
-				LOCKIOSTREAM
+				//LOCKIOSTREAM
 				char1 = getkey();
 			}
 
@@ -167,7 +162,7 @@ bool var::input(const var& prompt, const int nchars)
 		{
 			char char1;
 			{
-				LOCKIOSTREAM
+				//LOCKIOSTREAM
 				char1 = getkey();
 			}
 
@@ -205,7 +200,7 @@ bool var::input()
 	var_str = "";
 	var_typ = VARTYP_STR;
 
-	LOCKIOSTREAM
+	//LOCKIOSTREAM
 
 	// pressing crtl+d indicates eof on unix or ctrl+Z on dos/windows?
 	if (std::cin.eof())
@@ -1838,13 +1833,14 @@ const var& var::put(std::ostream& ostream1) const
 const var& var::output() const
 {
 	LOCKIOSTREAM
-	return put(std::cout);
+	return this->put(std::cout);
 }
 
 // outputl() flushed threadsafe output to standard output
 // adds \n and flushes so is slower than output("\n")
 const var& var::outputl() const
 {
+	LOCKIOSTREAM
 	this->put(std::cout);
 	std::cout << std::endl;
 	return *this;

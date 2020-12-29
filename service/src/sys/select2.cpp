@@ -104,7 +104,7 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 	}
 
 	//fm termination indicates list of keys and optionally mvnos
-	var givenkeys = sortselect[-1] == FM;
+	var givenkeys = sortselect[-1] eq FM;
 	var givenkeyn = 0;
 
 	if (not useactivelist) {
@@ -139,7 +139,7 @@ nocommon:
 	//filename can be 'filename USING dictfilename'
 
 	var filename0 = filename;
-	if (filename.field(" ", 2) == "USING") {
+	if (filename.field(" ", 2) eq "USING") {
 		dictfilename = filename.field(" ", 3);
 		filename = filename.field(" ", 1);
 	}else{
@@ -193,7 +193,7 @@ nocommon:
 	if (dictids.unassigned()) {
 		dictids = "";
 	}
-	if (dictids == "") {
+	if (dictids eq "") {
 		dictids = "ID";
 	}
 	dictids.trimmer();
@@ -228,10 +228,10 @@ nocommon:
 	if (dictids ne "RECORD") {
 		while (true) {
 			///BREAK;
-			if (not(dictids[-1] == FM)) break;
+			if (not(dictids[-1] eq FM)) break;
 			dictids.splicer(-1, 1, "");
 		}//loop;
-		if (dictids == "") {
+		if (dictids eq "") {
 			dictids = "ID";
 		}
 		ndictids = dictids.count(FM) + 1;
@@ -240,7 +240,7 @@ nocommon:
 			var dictrec;
 			if (not(dictrec.read(DICT, dictid))) {
 				if (not(dictrec.read(dictvoc, dictid))) {
-					if (dictid == "ID") {
+					if (dictid eq "ID") {
 						dictrec = "F,0,No,,,,,,L,15,";
 						dictrec.converter(",", FM);
 					}else{
@@ -258,7 +258,7 @@ nocommon:
 			//if index('DI',dictrec<1>,1) then call dicti2a(dictrec)
 
 			//pick A is revelation F
-			if (dictrec.a(1) == "A") {
+			if (dictrec.a(1) eq "A") {
 				dictrec.r(1, "F");
 				}
 
@@ -310,7 +310,7 @@ nocommon:
 			//only look in selected files otherwise c++ takes too long on some files
 			if (var("COMPANIES,CURRENCIES,UNITS,LEDGERS,JOB_TYPES").locateusing(",",filenamex,xx)) {
 				if (records.read(file, "%RECORDS%")) {
-					if (records.length() < 200) {
+					if (records.length() lt 200) {
 						records.swapper(FM, "\" \"");
 						sortselect.splicer(1, 0, records.quote() ^ " ");
 					}
@@ -326,7 +326,7 @@ nocommon:
 		//handle invalid cmd
 		//R18.1 is normal 'No records found' message
 		if (USER4 and not(USER4.index("R18.1"))) {
-			if (USER4.field(" ", 1) == "W156") {
+			if (USER4.field(" ", 1) eq "W156") {
 				USER4 = USER4.field(" ", 2).quote() ^ " is not in the dictionary.||" ^ cmd ^ " " ^ sortselect;
 			}
 			response = USER4;
@@ -372,7 +372,7 @@ nextrec:
 	}
 
 	//if no more
-	if (ID == "") {
+	if (ID eq "") {
 
 		if (xml and linkfilename2) {
 			var tt = "</records>";
@@ -389,7 +389,7 @@ nextrec:
 		return 0;
 	}
 
-	if (ID[1] == "%") {
+	if (ID[1] eq "%") {
 		goto nextrec;
 	}
 	if (not(RECORD.read(file, ID))) {
@@ -409,13 +409,13 @@ nextrec:
 		var reqvalue = limitvalues.a(1, limitfieldn);
 		var limitcheck = limitchecks.a(1, limitfieldn);
 
-		if (limitcheck == "EQ") {
+		if (limitcheck eq "EQ") {
 			if (value ne reqvalue) {
 				goto nextrec;
 			}
 
-		} else if (limitcheck == "NE") {
-			if (value == reqvalue) {
+		} else if (limitcheck eq "NE") {
+			if (value eq reqvalue) {
 				goto nextrec;
 			}
 
@@ -432,7 +432,7 @@ nextrec:
 
 	recn += 1;
 
-	if (dictids == "RECORD") {
+	if (dictids eq "RECORD") {
 
 		//postread (something similar also in listen/READ)
 		if (haspostread) {
@@ -449,14 +449,14 @@ nextrec:
 			//call trimexcessmarks(iodat)
 
 			//postread can request abort by setting msg or reset>=5
-			if ((win.reset >= 5) or USER4) {
+			if (win.reset ge 5 or USER4) {
 				goto nextrec;
 			}
 
 		}
 
 		//prevent reading passwords postread and postwrite
-		if ((filename == "DEFINITIONS") and (ID == "SECURITY")) {
+		if (filename eq "DEFINITIONS" and ID eq "SECURITY") {
 			RECORD.r(4, "");
 		}
 
@@ -547,7 +547,7 @@ nextrec:
 	//get next if output to file or space for more data
 	//goto nextrec
 	//if xml or len(DATAX)<64000 then goto nextrec
-	if (xml or (datax.length() < maxstrsize - 1530)) {
+	if (xml or (datax.length() lt maxstrsize - 1530)) {
 		goto nextrec;
 	}
 

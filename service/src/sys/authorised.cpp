@@ -30,7 +30,7 @@ nousername0:
 		//this allows for example billing module users to post as finance module users
 		username = USERNAME.field("(", 1);
 		msgusername = USERNAME;
-	} else if (username0 == "") {
+	} else if (username0 eq "") {
 		goto nousername0;
 		{}
 	} else {
@@ -40,7 +40,7 @@ nousername0:
 
 	//if username='EXODUS' or username='STEVE' then call msg(task:'')
 
-	if (task[1] == " ") {
+	if (task[1] eq " ") {
 		call mssg(task.quote());
 	}
 	//Each task may have many "locks", each users may have many "keys"
@@ -60,18 +60,18 @@ nousername0:
 	msg = "";
 	//!*CALL note(' ':TASK)
 
-	if (task.substr(1,2) == "..") {
+	if (task.substr(1,2) eq "..") {
 	// call note(task:'')
 		return 1;
 	}
 
-	var noadd = task[1] == "!";
+	var noadd = task[1] eq "!";
 	if (noadd) {
 		task.splicer(1, 1, "");
 	}
 
 	var positive = task[1];
-	if (positive == "#") {
+	if (positive eq "#") {
 		task.splicer(1, 1, "");
 	}else{
 		positive = "";
@@ -79,22 +79,22 @@ nousername0:
 
 	//? as first character of task (after positive) means
 	//security is being used as a configuration and user exodus has no special privs
-	if (task[1] == "?") {
+	if (task[1] eq "?") {
 		isexodus = 0;
 		task.splicer(1, 1, "");
 	}else{
-		isexodus = username == "EXODUS";
+		isexodus = username eq "EXODUS";
 	}
 
-	var deleting = task.substr(1,8) == "%DELETE%";
+	var deleting = task.substr(1,8) eq "%DELETE%";
 	if (deleting) {
 		task.splicer(1, 8, "");
 	}
-	var updating = task.substr(1,8) == "%UPDATE%";
+	var updating = task.substr(1,8) eq "%UPDATE%";
 	if (updating) {
 		task.splicer(1, 8, "");
 	}
-	var renaming = task.substr(1,8) == "%RENAME%";
+	var renaming = task.substr(1,8) eq "%RENAME%";
 	if (renaming) {
 		task.splicer(1, 8, "");
 	}
@@ -113,7 +113,7 @@ updateprivs:
 			if (SECURITY.a(10).locate(defaultlock,taskn2)) {
 				SECURITY.remover(10, taskn2);
 				SECURITY.remover(11, taskn2);
-				if (taskn2 < taskn) {
+				if (taskn2 lt taskn) {
 					taskn -= 1;
 				}
 			}
@@ -148,7 +148,7 @@ updateprivs:
 		}
 		if (not(noadd)) {
 			//NOADD=((TASK[-1,1]='"') or (len(userprivs)>48000))
-			noadd = (task[-1] == DQ) or (SECURITY.length() > maxstrsize * 2 / 3);
+			noadd = (task[-1] eq DQ) or (SECURITY.length() gt maxstrsize * 2 / 3);
 			//if passed a default lock then add even tasks ending like "XXXXX"
 			if (not(defaultlock.unassigned())) {
 				if (defaultlock) {
@@ -158,14 +158,14 @@ updateprivs:
 		}
 		if (not noadd) {
 			gosub readuserprivs();
-			if (username == "EXODUS") {
+			if (username eq "EXODUS") {
 				var interactive = not(SYSTEM.a(33));
 				if (interactive) {
 					call note(task ^ "|TASK ADDED");
 				}
 			}
 			//if len(userprivs) lt 65000 then
-			if (SECURITY.length() < maxstrsize - 530) {
+			if (SECURITY.length() lt maxstrsize - 530) {
 				if (not(SECURITY.a(10).locateby("AL",task,taskn))) {
 					if (defaultlock.unassigned()) {
 						newlock = "";
@@ -186,7 +186,7 @@ updateprivs:
 
 	//if no locks then pass ok unless positive locking required
 	var locks = SECURITY.a(11, taskn);
-	if (locks == "") {
+	if (locks eq "") {
 
 		//not positive ok
 		if (not(positive)) {
@@ -218,13 +218,13 @@ notallowed:
 	//NB not NOBODY/EVERYBODY
 
 	//special lock NOONE
-	} else if (locks == "NOONE") {
+	} else if (locks eq "NOONE") {
 		{}
 		goto notallowed;
 		{}
 
 	//special lock EVERYONE
-	} else if (locks == "EVERYONE") {
+	} else if (locks eq "EVERYONE") {
 		return 1;
 	}
 

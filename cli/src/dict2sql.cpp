@@ -209,7 +209,7 @@ subroutine do_sql(in functionname_and_args, in returntype, in sql, in sqltemplat
 			for (int linen=1;linen<=nlines;++linen) {
 				printl(linen-2+2,". ", field(functionsql,"\n",linen));
 			}
-			outputl();
+			printl();
 		}
 		errmsg.outputl();
 	}
@@ -218,7 +218,7 @@ subroutine do_sql(in functionname_and_args, in returntype, in sql, in sqltemplat
 
 subroutine onefile(in dictfilename, in reqdictid, io viewsql) {
 
-	if (dictfilename.substr(1,5) ne "dict_")
+	if (dictfilename.substr(1,5) ne "dict_" or dictfilename == "dict_all")
 		return;
 
 	if (!open(dictfilename,dictfile)) {
@@ -378,7 +378,7 @@ $RETVAR :=
 		var line=sql.a(1,ln).trim();
 		if (line.substr(1,2)!="--" && field(line," ",2,2) eq ":= xlate") {
 
-			//line.outputl("xlate=");
+			//line.printl("xlate=");
 
 			//eg ans
 			var targetvariablename=line.field(" ",1);
@@ -388,37 +388,40 @@ $RETVAR :=
 			var source_key_expr=line.field(" ",5);
 			var target_expr=line.field(" ",6).field(";",1);
 
-			//source file field number or expression for key to target file
-			//if key field numeric then extract from source file date
-			if (source_key_expr.isnum())
-				source_key_expr="split_part($2,chr(30),"^source_key_expr^")";
+			if (lcase(var("dict_") ^ target_filename) == dictfilename) {
+				line = "-- Sorry. Cannot XLATE same file due to pgsql bug. " ^ line;
+			} else {
+				//source file field number or expression for key to target file
+				//if key field numeric then extract from source file date
+				if (source_key_expr.isnum())
+					source_key_expr="split_part($2,chr(30),"^source_key_expr^")";
 
-			//target file field number or expression (omit optional ; on the end)
-			if (target_expr==0)
-				target_expr=target_filename^".key";
-			else if (target_expr=="''")
-				target_expr=target_filename^".data";
-			else if (target_expr.isnum())
-				target_expr="split_part("^target_filename^".data,chr(30),"^target_expr^")";
+				//target file field number or expression (omit optional ; on the end)
+				if (target_expr==0)
+					target_expr=target_filename^".key";
+				else if (target_expr=="''")
+					target_expr=target_filename^".data";
+				else if (target_expr.isnum())
+					target_expr="split_part("^target_filename^".data,chr(30),"^target_expr^")";
 
-			//line=targetvariablename^" := ";
-			//if (ismv) {
-			//	line^="array_to_string"
-			//	"("
-			//	" array"
-			// " ("
-			// " select ";
-			//}
-			//line^=target_expression;
-			//line^="\n FROM "^target_filename;
-			//line^="\n WHERE "^target_filename^".key="^source_key_expression^";";
-			line=xlatetemplate;
-			line.swapper("$RETVAR",targetvariablename);
-			line.swapper("$TARGETFILE",target_filename);
-			line.swapper("$SOURCEKEY_EXPR",source_key_expr);
-			line.swapper("$TARGET_EXPR",target_expr);
-			//line.outputl("sql=");
-
+				//line=targetvariablename^" := ";
+				//if (ismv) {
+				//	line^="array_to_string"
+				//	"("
+				//	" array"
+				// " ("
+				// " select ";
+				//}
+				//line^=target_expression;
+				//line^="\n FROM "^target_filename;
+				//line^="\n WHERE "^target_filename^".key="^source_key_expression^";";
+				line=xlatetemplate;
+				line.swapper("$RETVAR",targetvariablename);
+				line.swapper("$TARGETFILE",target_filename);
+				line.swapper("$SOURCEKEY_EXPR",source_key_expr);
+				line.swapper("$TARGET_EXPR",target_expr);
+				//line.outputl("sql=");
+			}
 			sql.r(1,ln,line);
 		}
 	}

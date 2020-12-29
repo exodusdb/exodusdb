@@ -32,8 +32,8 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 
 	var post = 1;
 	//cleanup=0;*@username<>'EXODUS'
-	var cleanup = mode == "READ";
-	if (mode == "READ") {
+	var cleanup = mode eq "READ";
+	if (mode eq "READ") {
 		datax = "";
 	}
 
@@ -85,7 +85,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 	var sessionid = (var().date().pwr(3) * 7 + 5).substr(9999,-9999);
 	var cidx = cid();
 
-	if (mode == "WRITE") {
+	if (mode eq "WRITE") {
 
 		//baseurl='http://monitor.neosys.com/'
 		//baseurl='https://monitor.hosts.neosys.com:4428/'
@@ -100,7 +100,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 		}
 		baseurl ^= "/";
 
-		if (request == "UPGRADE") {
+		if (request eq "UPGRADE") {
 
 			//only get if newer
 			cmd ^= " -N";
@@ -117,7 +117,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 
 		}
 
-		if (request == "UPDATE") {
+		if (request eq "UPDATE") {
 
 			authurl = SYSTEM.a(55);
 			if (not authurl) {
@@ -222,7 +222,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 		}
 
 		//UPDATE also gets a response
-		if (request == "UPDATE") {
+		if (request eq "UPDATE") {
 			if (post) {
 				cmd ^= " -O " ^ tempfilename2;
 			}else{
@@ -291,7 +291,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			var wgetrcfilename = oscwd() ^ tempfilename ^ ".$RC";
 			var(wgetrc).oswrite(wgetrcfilename);
 
-			if (wgetrcfilename[2] == ":") {
+			if (wgetrcfilename[2] eq ":") {
 				wgetrcfilename.splicer(2, 1, "");
 				wgetrcfilename.splicer(1, 0, "/cygdrive/");
 			}
@@ -333,11 +333,11 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 
 		msg = "";
 
-	} else if (mode == "READ") {
+	} else if (mode eq "READ") {
 
 		var tt = tempfilename2.osfile().a(1);
 		//if tt gt 32000 then
-		if (tt > maxstrsize / 2) {
+		if (tt gt maxstrsize / 2) {
 			datax = "";
 			gosub getlog(logfilename, cleanup, log);
 			msg = "Excessive response (" ^ tt ^ ")" ^ log;
@@ -371,7 +371,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 		text = datax.field(",", 2, 999999);
 		gosub hash(salt, max, hashcode);
 		hashcode = hashcode.substr(9999,-9999);
-		if (not(datax.field(",", 1) == hashcode)) {
+		if (not(datax.field(",", 1) eq hashcode)) {
 			msg = "wrong response";
 badresponse:
 			datax.swapper("<br />", FM);

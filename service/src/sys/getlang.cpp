@@ -21,7 +21,7 @@ function main(in origprogname, in languagecode0, in origdatatype, io languagefil
 	if (languagefile.unassigned()) {
 		languagefile = "";
 	}
-	if (languagefile == "") {
+	if (languagefile eq "") {
 		if (not(languagefile.open("ALANGUAGE", ""))) {
 			return 0;
 		}
@@ -30,7 +30,7 @@ function main(in origprogname, in languagecode0, in origdatatype, io languagefil
 	var origlanguagecode = languagecode0;
 	if (not origlanguagecode) {
 		origlanguagecode = gen.company.a(14);
-		if (origlanguagecode == "ENGLISH") {
+		if (origlanguagecode eq "ENGLISH") {
 			origlanguagecode = "";
 		}
 		if (not origlanguagecode) {
@@ -51,7 +51,7 @@ function main(in origprogname, in languagecode0, in origdatatype, io languagefil
 		lang = "";
 		var n1 = lang1.count(FM) + 1;
 		var n2 = lang2.count(FM) + 1;
-		if (n1 < n2) {
+		if (n1 lt n2) {
 			nn = n2;
 		}else{
 			nn = n1;
@@ -104,7 +104,7 @@ exit:
 		for (var fn = 1; fn <= nn; ++fn) {
 			var tt = custlang.a(fn);
 			if (tt.length()) {
-				if (tt == "\"\"") {
+				if (tt eq "\"\"") {
 					tt = "";
 				}
 				lang.r(fn, custlang.a(fn));
@@ -113,11 +113,11 @@ exit:
 	}
 
 	//force 737 greek codepage characters so indexing is ok etc
-	if (origprogname == "GENERAL") {
+	if (origprogname eq "GENERAL") {
 		call osgetenv("CODEPAGE", codepage);
 
 		//greek
-		if (codepage == "737") {
+		if (codepage eq "737") {
 			if (not(codepage.read(languagefile, "GENERAL*GREEK"))) {
 				codepage = "";
 			}
@@ -126,7 +126,7 @@ getupperlower:
 			lang.r(10, codepage.a(1, 10));
 
 		//central european including poland
-		} else if (codepage == "852") {
+		} else if (codepage eq "852") {
 			if (not(codepage.read(languagefile, "GENERAL*POLISH"))) {
 				codepage = "";
 			}

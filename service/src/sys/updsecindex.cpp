@@ -35,16 +35,16 @@ function main(in mode, in filename, io keys, in fieldnames, in oldvalues, in new
 		return 0;
 	}
 
-	if (mode == "INDEXINGLOCK") {
+	if (mode eq "INDEXINGLOCK") {
 		if (not(lockrecord("!INDEXING", indexingfile, indexingkey, indexingrecord, secstowaitforindexinglock))) {
 			msg = "Central !INDEXING record is in use elsewhere";
 			return 0;
 		}
 
-	} else if (mode == "INDEXINGUNLOCK") {
+	} else if (mode eq "INDEXINGUNLOCK") {
 		call unlockrecord("!INDEXING", indexingfile, indexingkey);
 
-	} else if (((mode == "LOCK") or (mode == "UNLOCK")) or (mode == "UPDATE")) {
+	} else if ((mode eq "LOCK" or mode eq "UNLOCK") or mode eq "UPDATE") {
 
 		var file;
 		if (not(file.open(filename, ""))) {
@@ -64,11 +64,11 @@ function main(in mode, in filename, io keys, in fieldnames, in oldvalues, in new
 		for (var keyn = 1; keyn <= nkeys; ++keyn) {
 			var keyx = keys.a(keyn);
 
-			if (mode == "LOCK") {
+			if (mode eq "LOCK") {
 				if (not(lockrecord(filename, file, keyx, recordx, secstowaitforlock))) {
 
 					//!!!! return only locked keys
-					if (keyn == 1) {
+					if (keyn eq 1) {
 						keys = "";
 					}else{
 						keys = keys.field(FM, 1, keyn - 1);
@@ -78,12 +78,12 @@ function main(in mode, in filename, io keys, in fieldnames, in oldvalues, in new
 					return 0;
 				}
 
-			} else if (mode == "UNLOCK") {
+			} else if (mode eq "UNLOCK") {
 
 				//duplicate code in UPDATE and UNLOCK
 				call unlockrecord(filename, file, keyx);
 
-			} else if (mode == "UPDATE") {
+			} else if (mode eq "UPDATE") {
 
 				var nfields = fieldnames.count(FM) + (fieldnames ne "");
 				for (var fieldn = 1; fieldn <= nfields; ++fieldn) {
@@ -106,7 +106,7 @@ function main(in mode, in filename, io keys, in fieldnames, in oldvalues, in new
 		};//keyn;
 
 		//update
-		if ((mode == "UPDATE") and upd ne "") {
+		if (mode eq "UPDATE" and upd ne "") {
 
 			var fileaccount = filename.xlate("FILES", 3, "X");
 			var filevolume = filename.xlate("FILES", 1, "X");
@@ -119,7 +119,7 @@ function main(in mode, in filename, io keys, in fieldnames, in oldvalues, in new
 				indexingrecord = "0";
 			}
 
-			if (not(indexinglist[-1] == FM)) {
+			if (not(indexinglist[-1] eq FM)) {
 				indexinglist ^= FM;
 			}
 			indexingrecord ^= indexinglist;

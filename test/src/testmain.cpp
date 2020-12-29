@@ -1,5 +1,9 @@
-#include <exodus/program.h>
 #include <cassert>
+#include <iostream>
+#include <sstream>
+#include <string>
+
+#include <exodus/program.h>
 
 programinit()
 
@@ -76,8 +80,27 @@ function main()
 	var().sqlexec("select exodus_extract_time_array(''||chr(29)||'1'||chr(29)||'86400'||chr(29)||'86401'||chr(29)||'43200',0,0,0);",response);
 	assert(response.field(RM,2)=="{NULL,00:00:01,00:00:00,00:00:01,12:00:00}");
 
+	auto size = sizeof(std::string);
+	auto capacity = std::string().capacity();
+	auto small = std::string(capacity, '*');
+	auto big = std::string(capacity + 1, '*');
+
+ 	std::cout << "\nstd:string implementation\n";
+	std::cout << "sizeof  : " << size << std::endl;
+	std::cout << "Capacity: " << capacity << std::endl;
+	std::cout << "Small   : " << small.capacity() << std::endl;
+	std::cout << "Big     : " << big.capacity() << std::endl;
+
+	//test tcase and fcase
 	assert(var("top of the world").tcase()=="Top Of The World");
 	printl(var("top of the world").tcase().fcase());
+
+
+	//check conversion of unprintable field marks to unusual ASCII characters
+  	std::ostringstream stringstr;
+	stringstr << var(RM ^ FM ^ VM ^ SM ^ TM ^ STM);
+	std::cout << stringstr.str() << std::endl;
+	assert(var(stringstr.str()) == "~^]\\[|");
 
 	// test normalization
 
@@ -317,9 +340,9 @@ function main()
 	printt();
 	printl();
 
-	output();
-	outputt();
-	outputl();
+	//output();
+	//outputt();
+	//outputl();
 
 	logput();
 	logputl();
@@ -333,9 +356,9 @@ function main()
 	printt(2);
 	printl(3);
 
-	output(1);
-	outputt(2);
-	outputl(3);
+	//output(1);
+	//outputt(2);
+	//outputl(3);
 
 	logput(1);
 	logputl(2);
@@ -349,9 +372,9 @@ function main()
 	printt("printt",2);
 	printl("printl",3);
 
-	output("output",1);
-	outputt("outputt",2);
-	outputl("outputl",3);
+	//output("output",1);
+	//outputt("outputt",2);
+	//outputl("outputl",3);
 
 	logput("logput",1);
 	logputl("logputl",2);
@@ -1512,7 +1535,7 @@ dict(AGE_IN_YEARS) {
 
 	var xyz;
 	//xyz=xyz;
-	printl("\nTest catching MVexceptions");
+	printl("\nTest catching MVError");
 	try {
 		//runtime errors
 		var x1=x1^=1;
@@ -1521,8 +1544,8 @@ dict(AGE_IN_YEARS) {
 		//var xx=xx.operator++();
 		var xx=xx++;
 	}
-	catch (MVException except) {
-		print(except.description);
+	catch (MVError error) {
+		print(error.description);
 	}
 
 	printl("\nVerify that exodus catches c++ defect at runtime");
@@ -1948,9 +1971,18 @@ dict(AGE_IN_YEARS) {
 	assert( exodus::tan(45).round(8) eq 1);
 	assert( exodus::atan(1).round(6) eq 45);
 
-	assert( exodus::abs(30.0) eq 30);
-	assert( exodus::abs(-30.0) eq 30);
-	assert( exodus::pwr(10,3) eq 1000);
+	assert( exodus::abs(0)    eq 0);
+	assert( exodus::abs(30)   eq 30);
+	assert( exodus::abs(30.00) eq 30);
+	assert( exodus::abs(30.10) eq 30.1);
+	assert( exodus::abs(30.90) eq 30.9);
+
+	assert( exodus::abs(-0)    eq 0);
+	assert( exodus::abs(-30)   eq 30);
+	assert( exodus::abs(-30.00) eq 30);
+	assert( exodus::abs(-30.10) eq 30.1);
+	assert( exodus::abs(-30.90) eq 30.9);
+
 	assert( exodus::exp(1).round(9) eq 2.718281828);
 	assert( exodus::loge(1) eq 0);
 	assert( exodus::loge(2.718281828).round(9) eq 1);
@@ -1972,9 +2004,8 @@ dict(AGE_IN_YEARS) {
 	inputn(inpq,5);
 	*/
 
-	//ossetenv("EXO_PORT",5433);
-	//if (not connect("port=5433"))
-	//	stop("Cannot connect!");
+	ossetenv("XYZ","abc");
+	assert(osgetenv("XYZ") == "abc");
 
 	//check floating point modulo
 	assert(mod(2.3,var(1.499)).round(3) eq 0.801);
@@ -2254,8 +2285,8 @@ while trying to match the argument list '(exodus::var, bool)'
 	try {
 		printl(filehandle);
 	}
-	catch (MVException except) {
-		except.description.outputl();
+	catch (MVError error) {
+		error.description.outputl();
 	}
 */
 	assert(oconv(0,"D4") eq "31 DEC 1967");

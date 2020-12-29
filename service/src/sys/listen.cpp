@@ -280,7 +280,7 @@ function main() {
 	defaultlockmins = 5;
 
 	datasetcode = SYSTEM.a(17);
-	live = datasetcode.ucase().substr(-4,4) ne "TEST";
+	live = datasetcode.ucase().substr(-4,4) ne "test";
 	processno = SYSTEM.a(24);
 
 	neopath = "../exodus/";
@@ -330,7 +330,7 @@ function main() {
 	//discover the server name
 	//servername=field(getdrivepath(drive()[1,2])[3,9999],'/',1)
 	servername = "";
-	onserver = (servername == "") or (STATION.trim() == servername);
+	onserver = servername eq "" or STATION.trim() eq servername;
 
 	request1 = "";
 
@@ -408,7 +408,7 @@ function main() {
 
 	//force into server mode - suppress interactive messages
 	sysmode = origsysmode;
-	if (sysmode == "") {
+	if (sysmode eq "") {
 		sysmode = SYSTEM.a(33);
 		SYSTEM.r(33, "1");
 	}
@@ -475,7 +475,7 @@ function main() {
 		logptr -= 6;
 		call osbread(tt, logfile,  logptr, 6);
 		//maybe backup the log pointer to overwrite the closing tag
-		if (tt == "</Log>") {
+		if (tt eq "</Log>") {
 			logptr -= 6;
 		}
 
@@ -634,7 +634,7 @@ nextsearch0:
 	gosub flagserveractive();
 
 	//run autorun, syncdata and clear old files once a minute
-	if ((var().time() - lastautorun > 60) or (var().time() < lastautorun - 600)) {
+	if ((var().time() - lastautorun gt 60) or (var().time() lt lastautorun - 600)) {
 		lastautorun = var().time();
 
 		//call autorun instead of perform to allow output to remain on screen
@@ -752,10 +752,10 @@ nextsearch0:
 		// repeat
 		reply.input("", 1);
 		call mssg("", "DB", buffer, "");
-		if (reply == INTCONST.a(1)) {
+		if (reply eq INTCONST.a(1)) {
 			gosub exit();
 		}
-		if (reply == INTCONST.a(7)) {
+		if (reply eq INTCONST.a(7)) {
 			charx = reply;
 		}
 	}
@@ -767,7 +767,7 @@ nextsearch0:
 	// end
 
 	//f5
-	if (charx == PRIORITYINT.a(2)) {
+	if (charx eq PRIORITYINT.a(2)) {
 		cmd = "";
 		if (not(VOLUMES)) {
 			printl();
@@ -778,14 +778,14 @@ nextsearch0:
 	}
 
 	//f10
-	if (charx == INTCONST.a(7)) {
+	if (charx eq INTCONST.a(7)) {
 		execute("RUNMENU " ^ ENVIRONSET.a(37));
 	}
 
 	if (charx ne "") {
 
 		//"U" = unlock all locks
-		if (charx == "U") {
+		if (charx eq "U") {
 			var().clearfile(locks);
 			//unlock all
 			//if tracing then
@@ -812,7 +812,7 @@ nextsearch0:
 	call getbackpars(bakpars);
 
 	//call monitor approx every minute +/- 10 seconds to avoid checking all the time
-	if ((var().time() - lastmonitortime).abs() > 60 + var(20).rnd() - 10) {
+	if ((var().time() - lastmonitortime).abs() gt 60 + var(20).rnd() - 10) {
 	//if abs(time()-lastmonitortime)>(0+rnd(20)-10) then
 
 		//monitor updates nagios and optionally checks for upgrades
@@ -847,7 +847,7 @@ nextsearch0:
 	//has been moved up so it can run immediately after %newautorun%
 
 	//A forces autorun
-	if (charx == "A") {
+	if (charx eq "A") {
 		lastautorun = "";
 	}
 
@@ -855,7 +855,7 @@ nextsearch0:
 	if (var("Bb").index(charx)) {
 		goto backup;
 	}
-	if ((var().time() >= bakpars.a(3)) and (var().time() <= bakpars.a(4))) {
+	if (var().time() ge bakpars.a(3) and var().time() le bakpars.a(4)) {
 
 		//call log2('LISTEN: Backup time for ':datasetcode,logtime)
 
@@ -868,7 +868,7 @@ nextsearch0:
 		if (bakpars.a(9)) {
 			//call log2('Backup is disabled',logtime)
 
-		} else if (var().date() == bakpars.a(1)) {
+		} else if (var().date() eq bakpars.a(1)) {
 			//call log2('Backup already done today',logtime)
 
 		} else if (bakpars.a(11)) {
@@ -896,7 +896,7 @@ backup:
 			PSEUDO = "BACKUP";
 			//B=BACKUP=backup/copydb/upgrade/quit
 			//b=BACKUP2=backup, send email and resume -ie dont copydb/upgrade/quit
-			if (charx == "b") {
+			if (charx eq "b") {
 				PSEUDO ^= "2";
 			}
 			PSEUDO ^= " " ^ bakpars.a(7) ^ " " ^ bakpars.a(12);
@@ -958,7 +958,7 @@ readlink1:
 		call osbread(USER0, linkfile1,  tt, 256 * 256 - 4);
 
 		//if cannot read it then try again
-		if ((USER0 == "") and (var().time() == timex)) {
+		if (USER0 eq "" and var().time() eq timex) {
 			var().osflush();
 			call ossleep(1000*.1);
 			linkfile1.osclose();
@@ -976,7 +976,7 @@ readlink1:
 		//convert @lower.case to @upper.case in request
 		while (true) {
 			///BREAK;
-			if (not(USER0[-1] == FM)) break;
+			if (not(USER0[-1] eq FM)) break;
 			USER0.splicer(-1, 1, "");
 		}//loop;
 		//swap '%FF' with rm  in request
@@ -1039,7 +1039,7 @@ deleterequest:
 			call ossleep(1000*.1);
 			ntries += 1;
 			//if tracing then print 'COULD NOT DELETE ':linkfile1
-			if (ntries < 100) {
+			if (ntries lt 100) {
 				goto deleterequest;
 			}
 			if (tracing) {
@@ -1089,11 +1089,11 @@ subroutine requestinit() {
 
 	//cut off the initial connection info fields
 	tt = USER0.a(1);
-	if (tt == "VERSION 3") {
+	if (tt eq "VERSION 3") {
 		//nconnectionfields
 		tt = USER0.a(2) - 1;
 		USER0.remover(2);
-	} else if (USER0.a(1) == "VERSION 2") {
+	} else if (USER0.a(1) eq "VERSION 2") {
 		tt = 4;
 	} else {
 		tt = 0;
@@ -1119,13 +1119,13 @@ subroutine requestinit() {
 	request1 = USER0.a(firstrequestfieldn);
 
 	//throw away initial request CACHE
-	if (request1 == "CACHE") {
+	if (request1 eq "CACHE") {
 		USER0.remover(firstrequestfieldn);
 		request1 = USER0.a(firstrequestfieldn);
 	}
 
 	request1.ucaser();
-	if (request1 == "LOGIN") {
+	if (request1 eq "LOGIN") {
 		USER0.r(5, USER0.a(2));
 	}
 	//convert @lower.case to @upper.case in request
@@ -1197,9 +1197,9 @@ subroutine requestinit() {
 
 	anydata = 0;
 
-	if (request2 == "JOURNALS") {
+	if (request2 eq "JOURNALS") {
 		request2 = "JOURNALS";
-		if ((request3.count("*") == 3) and (request3[-1] == "*")) {
+		if (request3.count("*") eq 3 and (request3[-1] eq "*")) {
 			request3.splicer(-1, 1, "");
 		}
 	}
@@ -1231,7 +1231,7 @@ subroutine requestinit() {
 	PRIORITYINT.r(100, linkfilename3);
 
 	linkfile2size = linkfilename2.osfile().a(1);
-	if (linkfile2size > maxstrlen) {
+	if (linkfile2size gt maxstrlen) {
 
 		if (linkfile2.osopen(linkfilename2)) {
 
@@ -1248,7 +1248,7 @@ subroutine requestinit() {
 				if (not(datx(blockn).length())) break;
 
 				//avoid hexcode spanning block end by moving one or two bytes backwards
-				if (blockn > 1) {
+				if (blockn gt 1) {
 					tt = ((datx(blockn - 1)).substr(-2,2)).index("%");
 					if (tt) {
 						datx(blockn - 1) ^= datx(blockn).substr(1,tt);
@@ -1303,7 +1303,7 @@ subroutine requestinit() {
 			};//blockn;
 
 			//check max iodat size <= maxstrlen
-			if (lendata > maxstrlen) {
+			if (lendata gt maxstrlen) {
 				USER1 = "";
 				//response='Error: Maximum record size of ':maxstrlen '[XBYTES]':' exceeded in LISTEN'
 				call listen4(2, USER3, maxstrlen);
@@ -1450,7 +1450,7 @@ cannotopenlinkfile2:
 	//in case any select list left open
 	clearselect();
 
-	if (USER3 == "") {
+	if (USER3 eq "") {
 		call listen4(1, USER3);
 	}
 
@@ -1468,7 +1468,7 @@ cannotopenlinkfile2:
 	//have to call it here as well :(
 	responsetime = ostime();
 	secs = ((responsetime - requesttime).oconv("MD60P")) + 0;
-	if (secs < 0) {
+	if (secs lt 0) {
 		secs += 86400;
 	}
 
@@ -1519,7 +1519,7 @@ cannotopenlinkfile2:
 
 	}
 
-	if (USER1 == "%DIRECTOUTPUT%") {
+	if (USER1 eq "%DIRECTOUTPUT%") {
 
 		logx = USER1;
 		//convert '%' to '%25' in logx
@@ -1651,8 +1651,8 @@ cannotopenlinkfile2:
 		gosub exit();
 	}
 
-	if (USER3 == "OK") {
-		if ((request1 == "STOPDB") or (request1.substr(1,7) == "RESTART")) {
+	if (USER3 eq "OK") {
+		if (request1 eq "STOPDB" or request1.substr(1,7) eq "RESTART") {
 			gosub exit();
 		}
 	}
@@ -1675,37 +1675,37 @@ subroutine process() {
 		USER3 = invaliduser;
 
 	//if no request then possibly some failure in file sharing
-	} else if (USER0 == "") {
+	} else if (USER0 eq "") {
 		USER1 = "";
 		//response='Error: No request'
 		call listen4(4, USER3);
 
 	//empty loopback to test connection (no username or password required)
-	} else if (request1 == "TEST") {
+	} else if (request1 eq "TEST") {
 		//iodat='' if they pass iodat, pass it back
 		USER3 = "OK";
 
 	//get cookies for company, market, menus etc (may fail if no allowed companies)
 	//username and password already validated above
-	} else if (request1 == "LOGIN") {
+	} else if (request1 eq "LOGIN") {
 
 		call listen2(request1, dataset, username, connection, request5);
 
 	//find index values
 	//case request1[1,14]='GETINDEXVALUES'
-	} else if (request1.substr(1,8) == "GETINDEX") {
+	} else if (request1.substr(1,8) eq "GETINDEX") {
 
 		//call listen3(request2,'GETINDEXVALUES')
 		call listen5(request1, request2, request3, request4, request5, request6);
 
 	//select some data
-	} else if (request1 == "SELECT") {
+	} else if (request1 eq "SELECT") {
 
 		//call listen3(request2,request1)
 		call listen5(request1, request2, request3, request4, request5, request6);
 
 	//lock a record
-	} else if ((request1 == "LOCK") or (request1 == "RELOCK")) {
+	} else if (request1 eq "LOCK" or request1 eq "RELOCK") {
 
 		call listen3(request2, request1);
 
@@ -1729,7 +1729,7 @@ subroutine process() {
 		gosub lock();
 		sessionid.transfer(USER1);
 
-	} else if (request1 == "UNLOCK") {
+	} else if (request1 eq "UNLOCK") {
 
 		call listen3(request2, request1);
 
@@ -1740,9 +1740,9 @@ subroutine process() {
 		gosub unlock();
 
 	//read a record
-	} else if (((request1 == "READ") or (request1 == "READO")) or (request1 == "READU")) {
+	} else if ((request1 eq "READ" or request1 eq "READO") or request1 eq "READU") {
 
-		withlock = request1 == "READU";
+		withlock = request1 eq "READU";
 		//updatenotallowed=''
 		USER1 = "";
 		sessionid = "";
@@ -1760,7 +1760,7 @@ subroutine process() {
 		win.registerx="";
 
 		//allow read to unknown files for the time being
-		if (filetitle == "") {
+		if (filetitle eq "") {
 			filetitle = filename;
 		}
 
@@ -1798,7 +1798,7 @@ subroutine process() {
 		}
 
 		autokey = 0;
-		if ((((keyx == "") or (keyx[1] == "*")) or (keyx[-1] == "*")) or keyx.index("**")) {
+		if (((keyx eq "" or (keyx[1] eq "*")) or (keyx[-1] eq "*")) or keyx.index("**")) {
 
 			//must provide a key unless locking
 			if (not withlock) {
@@ -1823,7 +1823,7 @@ getnextkey:
 
 			keyx = win.isdflt;
 
-			if (keyx == "") {
+			if (keyx eq "") {
 				//response='Error: Next number was not produced':fm:msg
 				call listen4(6, USER3, USER4);
 				gosub fmtresp();
@@ -1844,7 +1844,7 @@ getnextkey:
 			gosub lock();
 
 			//if cannot lock then get next key
-			if ((USER3 == "NOT OK") and autokey) {
+			if (USER3 eq "NOT OK" and autokey) {
 				goto getnextkey;
 			}
 
@@ -1887,7 +1887,7 @@ noupdate:
 
 			}
 
-			if (withlock and (sessionid == "")) {
+			if (withlock and sessionid eq "") {
 				//response='Error: CANNOT LOCK RECORD'
 				call listen4(7, USER3);
 				gosub addlockholder();
@@ -1902,7 +1902,7 @@ noupdate:
 		}else{
 			//if @file.error<1>='100' then
 			//NO FILE ERROR FOR JBASE
-			if (not(FILEERROR) or (FILEERROR.a(1) == "100")) {
+			if (not(FILEERROR) or FILEERROR.a(1) eq "100") {
 
 				//no spaces in new keys
 				//allow in multipart keys on the assumption that they are old keys with spaces
@@ -2009,14 +2009,14 @@ noupdate:
 			//postread can request abort by setting msg or reset>=5
 			//msg with reset<0 results in comment to client
 			//if reset>=5 or msg then
-			if ((win.reset >= 5) or ((USER4 and (win.reset ne -1)))) {
+			if (win.reset ge 5 or ((USER4 and (win.reset ne -1)))) {
 				if (withlock) {
 					gosub unlock();
 					//wlocked=0
 				}
 				//if msg then msg='Error: ':msg
 				USER3 = USER4;
-				if (USER3 == "") {
+				if (USER3 eq "") {
 					USER3 = "ACCESS REFUSED";
 				}
 				USER1 = "";
@@ -2044,7 +2044,7 @@ noupdate:
 
 					//swap 'RECORDKEY ' with '' in response
 					USER3.trimmerb();
-					if (USER3 == "") {
+					if (USER3 eq "") {
 						USER3 = "OK";
 					}
 
@@ -2076,7 +2076,7 @@ noupdate:
 				if (tt) {
 					USER3.splicer(tt, ("SESSIONID " ^ sessionid).length(), "");
 					USER3.trimmerb();
-					if (USER3 == "") {
+					if (USER3 eq "") {
 						USER3 = "OK";
 					}
 				}
@@ -2094,13 +2094,13 @@ noupdate:
 		}
 
 		//prevent reading passwords postread and postwrite
-		if ((filename == "DEFINITIONS") and (keyx == "SECURITY")) {
+		if (filename eq "DEFINITIONS" and keyx eq "SECURITY") {
 			USER1.r(4, "");
 		}
 
 		call cropper(USER1);
 
-	} else if (((request1 == "WRITEU") or (request1 == "DELETE")) or (request1 == "WRITE")) {
+	} else if ((request1 eq "WRITEU" or request1 eq "DELETE") or request1 eq "WRITE") {
 	//write:
 		filename = request2;
 		keyx = request3;
@@ -2116,13 +2116,13 @@ noupdate:
 		win.registerx="";
 
 		//disallow read/write to unknown files for the time being
-		if (filetitle == "") {
+		if (filetitle eq "") {
 			//response=request1:' ':quote(filename):' is not allowed'
 			call listen4(11, USER3, request1 ^ FM ^ filename);
 			return;
 		}
 		//allow read to unknown files for the time being
-		if (filetitle == "") {
+		if (filetitle eq "") {
 			filetitle = filename;
 		}
 
@@ -2149,7 +2149,7 @@ noupdate:
 		//but some code does not know that (eg postread called from postwrite)
 		win.wlocked = sessionid;
 		win.saverec = request1 ne "DELETE";
-		win.deleterec = request1 == "DELETE";
+		win.deleterec = request1 eq "DELETE";
 
 		//trim excess field and value marks
 		call cropper(RECORD);
@@ -2229,10 +2229,10 @@ noupdate:
 		//detect if defined postwrite or postdelete called
 		postroutine = 0;
 
-		if ((request1 == "WRITEU") or (request1 == "WRITE")) {
+		if (request1 eq "WRITEU" or request1 eq "WRITE") {
 
 			//prevent writing an empty record
-			if (RECORD == "") {
+			if (RECORD eq "") {
 emptyrecorderror:
 				//response='Write empty data record is disallowed.'
 				call listen4(14, USER3);
@@ -2309,7 +2309,7 @@ badwrite:
 			call cropper(RECORD);
 
 			//check for empty record again in case updatesubs screwed up
-			if (RECORD == "") {
+			if (RECORD eq "") {
 				goto emptyrecorderror;
 			}
 
@@ -2340,18 +2340,18 @@ badwrite:
 
 			//send back revised data or nothing
 			//NB data is now '' to save space so always send back data unless @record is cleared
-			if (RECORD == USER1) {
+			if (RECORD eq USER1) {
 				USER1 = "";
 			}else{
 				USER1 = RECORD;
 			}
 
 			//prevent reading passwords postread and postwrite
-			if ((filename == "DEFINITIONS") and (keyx == "SECURITY")) {
+			if (filename eq "DEFINITIONS" and keyx eq "SECURITY") {
 				USER1.r(4, "");
 			}
 
-		} else if (request1 == "DELETE") {
+		} else if (request1 eq "DELETE") {
 
 			predelete = triggers.a(1);
 
@@ -2359,7 +2359,7 @@ badwrite:
 			RECORD = win.orec;
 
 			//prevent deleting if record does not exist
-			if (RECORD == "") {
+			if (RECORD eq "") {
 				//response='Cannot delete because ':quote(keyx):' does not exist in the ':quote(filetitle):' file'
 				call listen4(15, USER3, keyx ^ FM ^ filetitle);
 				gosub fmtresp();
@@ -2451,7 +2451,7 @@ badwrite:
 		return;
 
 	//execute a request
-	} else if (request1 == "EXECUTE") {
+	} else if (request1 eq "EXECUTE") {
 
 		//if @username='EXODUS' then
 		// oswrite @user0 on 'USER0'
@@ -2460,7 +2460,7 @@ badwrite:
 
 		//build command from request and check is a valid program
 		voccmd = request2;
-		if (voccmd == "") {
+		if (voccmd eq "") {
 			//response='LISTEN:EXECUTE: Module name is missing from request'
 			call listen4(32, USER3);
 			return;
@@ -2516,7 +2516,7 @@ badwrite:
 		if (var("LIST,SELECTJOURNALS").locateusing(",",USER0.a(1),xx)) {
 			USER1 = linkfilename2;
 		}
-		if (USER0.a(1).substr(1,4) == "VAL.") {
+		if (USER0.a(1).substr(1,4) eq "VAL.") {
 			USER1 = linkfilename2;
 		}
 
@@ -2557,7 +2557,7 @@ badwrite:
 			gosub fmtresp();
 		}
 
-		if (USER3 == "") {
+		if (USER3 eq "") {
 			//response='Error: No OK from ':voccmd:' ':request
 			call listen4(18, USER3, voccmd);
 			gosub fmtresp();
@@ -2591,7 +2591,7 @@ badwrite:
 			response='OK';
 	*/
 
-	} else if (request1 == "BACKUP") {
+	} else if (request1 eq "BACKUP") {
 
 		//trigger additional processes that should fail due to backup lock
 		(inpath ^ serverflagfilename).osdelete();
@@ -2633,7 +2633,7 @@ subroutine exit() {
 	//system<33>=origsysmode
 	SYSTEM.r(33, "");
 	//call setprivilegeorigprivilege);
-	if (request1.substr(1,7) == "RESTART") {
+	if (request1.substr(1,7) eq "RESTART") {
 		USER4 = request1;
 		//return to net which will restart LISTEN
 		stop();
@@ -2643,7 +2643,7 @@ subroutine exit() {
 	//break on
 
 	//esc does this
-	if ((origsysmode or (request1 == "STOPDB")) or halt) {
+	if ((origsysmode or request1 eq "STOPDB") or halt) {
 		//break off
 		perform("OFF");
 		var().logoff();
@@ -2675,7 +2675,7 @@ subroutine fmtresp() {
 	//cannot remove since these may be proper codepage letters
 	USER3.converter("|", FM);
 	USER3.converter(VM, FM);
-	if (USER3[1] == FM) {
+	if (USER3[1] eq FM) {
 		USER3.splicer(1, 1, "");
 	}
 	USER3.swapper(FM, "\r\n");
@@ -2692,7 +2692,7 @@ subroutine gettimeouttime() {
 	timeoutdate = var().date();
 	timeouttime = ostime();
 	timeouttime += timeoutsecs;
-	if (timeouttime > 24 * 60 * 60) {
+	if (timeouttime gt 24 * 60 * 60) {
 		timeoutdate += 1;
 		timeouttime -= 24 * 60 * 60;
 	}
@@ -2762,7 +2762,7 @@ subroutine lock() {
 	//sessionid which if RELOCKING must match the one on the lock rec
 	//otherwise it is assumed that somebody else has taken over the lock
 	//if sessionid is blank then a new session id is created and returned in response
-	if (request1 == "RELOCK") {
+	if (request1 eq "RELOCK") {
 		newsessionid = sessionid;
 	}else{
 		newsessionid = "";
@@ -2777,7 +2777,7 @@ subroutine lock() {
 	}
 
 	USER3 = "";
-	if (request1 == "RELOCK") {
+	if (request1 eq "RELOCK") {
 		gosub lockit();
 	}else{
 		if (lockrecord(filename, file, keyx, xx)) {
@@ -2823,12 +2823,12 @@ subroutine lock() {
 		//unless someone else got the lock because relocking was suspended somehow
 		if (lockrec.a(5) ne newsessionid) {
 
-			if (request1 == "RELOCK") {
+			if (request1 eq "RELOCK") {
 				goto nolock;
 			}
 
 			//fail if other lock has not timed out
-			if (lockrec.a(1) > dostime) {
+			if (lockrec.a(1) gt dostime) {
 				USER3 = "NOT OK";
 				goto lockexit;
 			}
@@ -2843,7 +2843,7 @@ subroutine lock() {
 
 	}else{
 nolock:
-		if (request1 == "RELOCK") {
+		if (request1 eq "RELOCK") {
 			//NB the word "EXPIRED" is a key word used in _formfunctions.htm
 			USER3 = "Error: Your lock expired and/or somebody else updated";
 			goto lockexit;
@@ -2903,7 +2903,7 @@ nolock:
 lockexit:
 
 	//unlock file,keyx
-	if (request1 == "RELOCK") {
+	if (request1 eq "RELOCK") {
 		gosub unlockit();
 	}else{
 		file.unlock( keyx);
@@ -2979,7 +2979,7 @@ subroutine unlock() {
 		lockrec = "";
 	}
 	if (not lockrec) {
-		if (FILEERROR.a(1) == 100) {
+		if (FILEERROR.a(1) eq 100) {
 			//lock is missing but ignore it
 			//because we are unlocking anyway
 			USER3 = "OK";
@@ -2990,11 +2990,11 @@ subroutine unlock() {
 	}
 
 	//check that the current lock agrees with the session id provided
-	if (not(sessionid == lockrec.a(5))) {
+	if (not(sessionid eq lockrec.a(5))) {
 
 		//cannot unlock because the lock belongs to somebody else
 		//response='Error: Cannot unlock - '
-		if (sessionid == "") {
+		if (sessionid eq "") {
 			//response:='missing session id'
 			tt = "missing";
 		}else{

@@ -91,7 +91,7 @@ function main(in docids0="", in options0="") {
 
 	var markets;
 	if (not(markets.open("MARKETS", ""))) {
-		if (not(APPLICATION == "ACCOUNTS")) {
+		if (not(APPLICATION eq "ACCOUNTS")) {
 			call fsmsg();
 		}
 		markets = "";
@@ -145,7 +145,7 @@ nextdoc:
 	//dont process all documents one after the other within one
 	//call of autorun to avoid overloading the subroutine stack cache etc
 	//so docexit doesnt goto nextdoc .. it goes to exit
-	if (ndocsprocessed > 1) {
+	if (ndocsprocessed gt 1) {
 		gosub exit(lockfilename, lockfile, lockkey);
 		return 0;
 	}
@@ -192,14 +192,14 @@ currdatetime:
 	var itime = var().time();
 	var idate = var().date();
 	//handle rare case where passes midnight between time() and date()
-	if (var().time() < itime) {
+	if (var().time() lt itime) {
 		goto currdatetime;
 	}
 	var currdatetime = idate + itime / 86400;
 
 	//skip if scanning all docs and not time to process yet
 	//allow processing individual docs manually despite timing/scheduling
-	if (docids == "") {
+	if (docids eq "") {
 
 		//would be faster to work out nextdatetime once initially - but how to do it?
 		//if not(docids) and currdatetime<nextdatetime then goto nextdoc
@@ -208,7 +208,7 @@ currdatetime:
 
 		//skip if already run in the last 60 minutes. this is an easy way
 		//to avoid reruns but maximum scheduling frequency is hourly
-		if ((currdatetime - lastdatetime).abs() <= 1 / 24) {
+		if ((currdatetime - lastdatetime).abs() le 1 / 24) {
 			goto nextdoc;
 		}
 
@@ -225,7 +225,7 @@ currdatetime:
 		restrictions.converter(",", VM);
 
 		//skip if no restrictions applied yet
-		if (restrictions == "") {
+		if (restrictions eq "") {
 			goto nextdoc;
 		}
 
@@ -245,7 +245,7 @@ currdatetime:
 
 			//if one hour then treat it as a minimum hour
 			if (hours.isnum()) {
-				if (hournow < hours % 24) {
+				if (hournow lt hours % 24) {
 					if (logging) {
 						printl("not yet hour");
 					}
@@ -268,7 +268,7 @@ currdatetime:
 		//if no hourly restrictions then skip if already run today
 		}else{
 preventsameday:
-			if (currdatetime.floor() == lastdatetime.floor()) {
+			if (currdatetime.floor() eq lastdatetime.floor()) {
 				if (logging) {
 					printl("already run today");
 				}
@@ -358,14 +358,14 @@ preventsameday:
 	var runasusercode = gen.document.a(1);
 	var userx;
 	if (not(userx.read(users, runasusercode))) {
-		if (not(runasusercode == "EXODUS")) {
+		if (not(runasusercode eq "EXODUS")) {
 			printl("runas user ", runasusercode, " doesnt exist");
 			goto nextdoc;
 		}
 		userx = "";
 	}
 	//allow running as EXODUS and emailing to sysmsg@neosys.com
-	if ((userx.a(7) == "") and (runasusercode == "EXODUS")) {
+	if (userx.a(7) eq "" and runasusercode eq "EXODUS") {
 		userx = "EXODUS";
 		userx.r(7, sysmsgatexodus);
 	}
@@ -386,7 +386,7 @@ preventsameday:
 
 	var ccaddress = "";
 	var usercodes = gen.document.a(14);
-	if (usercodes == "") {
+	if (usercodes eq "") {
 		toaddress = userx.a(7);
 	}else{
 		toaddress = "";
@@ -397,14 +397,14 @@ preventsameday:
 			//get the user record
 			var usercode = usercodes.a(1, usern);
 			if (not(userx.read(users, usercode))) {
-				if (not(usercode == "EXODUS")) {
+				if (not(usercode eq "EXODUS")) {
 					goto nextuser;
 				}
 				userx = "EXODUS";
 			}
 
 			//skip if user has no email address
-			if ((userx.a(7) == "") and (usercode == "EXODUS")) {
+			if (userx.a(7) eq "" and usercode eq "EXODUS") {
 				userx.r(7, sysmsgatexodus);
 			}
 			useraddress = userx.a(7);
@@ -413,7 +413,7 @@ preventsameday:
 				//if running as EXODUS always add user EXODUS
 				//regardless of holidays - to allow testing on weekends etc
 				//if usercode='EXODUS' then
-				if ((USERNAME == "EXODUS") and (usercode == "EXODUS")) {
+				if (USERNAME eq "EXODUS" and usercode eq "EXODUS") {
 					goto adduseraddress;
 
 				//optionally skip people on holiday (even EXODUS unless running as EXODUS)
@@ -536,7 +536,7 @@ nextuser:;
 
 	//get today's period
 	var runtimeperiod = var().date().oconv("D2/E").substr(4,5);
-	if (runtimeperiod[1] == "0") {
+	if (runtimeperiod[1] eq "0") {
 		runtimeperiod.splicer(1, 1, "");
 	}
 	//should backdate period to maximum open period for all selected companies
@@ -581,7 +581,7 @@ nextsign:
 		var t2 = (USER1.substr(tt + 1,999999)).field("}", 1);
 		USER1.swapper("{" ^ t2 ^ "}", var().date() + t2.substr(6,999999));
 	}
-	if (sign == "-") {
+	if (sign eq "-") {
 		sign = "+";
 		goto nextsign;
 	}
@@ -600,22 +600,22 @@ nextsign:
 
 		var subject = "EXODUS";
 		//if repeatable then include report number to allow filtering
-		if (gen.document.a(27) == "") {
+		if (gen.document.a(27) eq "") {
 			subject ^= " " ^ docid;
 		}
 		subject ^= ": %RESULT%" ^ gen.document.a(2);
 
 		//email it
-		if (USER3.substr(1,2) ne "OK" or (printfilename.osfile().a(1) < 10)) {
+		if (USER3.substr(1,2) ne "OK" or printfilename.osfile().a(1) lt 10) {
 
 			//plain "OK" with no file means nothing to email
-			if (USER3 == "OK") {
+			if (USER3 eq "OK") {
 				goto nextdoc;
 			}
 
 			body = "";
 			body.r(-1, USER3);
-			if (USER3.substr(1,6) == "Error:") {
+			if (USER3.substr(1,6) eq "Error:") {
 				USER3.splicer(1, 6, "Result:");
 			}
 			if (USER3.index("Error")) {
@@ -631,7 +631,7 @@ nextsign:
 			//treat all errors as system errors for now
 			//since autorun doesnt really know a user to send them to
 			//NB programs should return OK+message if no report is required (eg "OK no ads found")
-			if (USER3.substr(1,2) == "OK") {
+			if (USER3.substr(1,2) eq "OK") {
 				USER3 = USER3.substr(3,999999).trimf();
 			}else{
 				call sysmsg(subject ^ FM ^ body);
@@ -732,7 +732,7 @@ subroutine exec2() {
 	printfilename = linkfilename2;
 	tt = oscwd();
 	tt.splicer(-7, 7, "");
-	if (printfilename.substr(1,tt.length()) == tt) {
+	if (printfilename.substr(1,tt.length()) eq tt) {
 		printfilename.splicer(1, tt.length(), "../");
 	}
 	printfilename.converter("/", OSSLASH);
@@ -783,7 +783,7 @@ subroutine exec2() {
 	}
 
 	//no records are not system errors
-	if ((USER3.substr(1,9) == "No record") or (USER3.substr(1,7) == "No item")) {
+	if (USER3.substr(1,9) eq "No record" or USER3.substr(1,7) eq "No item") {
 		USER3.splicer(1, 0, "OK ");
 		USER4 = "";
 	}
@@ -795,7 +795,7 @@ subroutine exec2() {
 	}
 
 	//send errors to exodus
-	if ((USER3 == "") or USER3.substr(1,2) ne "OK") {
+	if (USER3 eq "" or USER3.substr(1,2) ne "OK") {
 		if (not USER3) {
 			USER3 = "No response from " ^ voccmd;
 		}
@@ -812,7 +812,7 @@ sysmsgit:
 		gosub fmtresp();
 	}
 
-	if (USER3 == "") {
+	if (USER3 eq "") {
 		//response='Error: No OK from ':voccmd:' ':request
 		call listen4(18, USER3, voccmd);
 		gosub fmtresp();
@@ -866,7 +866,7 @@ subroutine fmtresp() {
 	//cannot remove since these may be proper codepage letters
 	USER3.converter("|", FM);
 	USER3.converter(VM, FM);
-	if (USER3[1] == FM) {
+	if (USER3[1] eq FM) {
 		USER3.splicer(1, 1, "");
 	}
 	USER3.swapper(FM, "\r\n");

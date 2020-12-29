@@ -68,9 +68,9 @@ function main() {
 
 	USER3 = "OK";
 
-	if (mode == "TEST") {
+	if (mode eq "TEST") {
 
-	} else if (mode == "PERIODTABLE") {
+	} else if (mode eq "PERIODTABLE") {
 
 		var year = USER0.a(2).field("-", 1).field("/", 2);
 		var finyear = USER0.a(3);
@@ -79,7 +79,7 @@ function main() {
 
 		gosub checkoutputfileexists();
 
-	} else if ((mode == "FILEMAN") and (USER0.a(2) == "COPYDB")) {
+	} else if (mode eq "FILEMAN" and USER0.a(2) eq "COPYDB") {
 
 		var copydb = USER0.a(3);
 		if (not(SYSTEM.a(58).locate(copydb,dbn))) {
@@ -121,7 +121,7 @@ function main() {
 			USER3 = "OK " ^ log;
 		}
 
-	} else if (mode == "EMAILUSERS") {
+	} else if (mode eq "EMAILUSERS") {
 
 		var groupids = USER1.a(1);
 		var jobfunctionids = "";
@@ -157,14 +157,14 @@ function main() {
 		}
 		USER1 = "";
 
-	} else if (mode == "VAL.EMAIL") {
+	} else if (mode eq "VAL.EMAIL") {
 		win.is = USER0;
 		call usersubs(mode);
 
 	//case mode[-3,3]='SSH'
 	// call ssh(mode)
 
-	} else if (mode == "PASSWORDRESET") {
+	} else if (mode eq "PASSWORDRESET") {
 
 		if (not(authorised("PASSWORD RESET", USER4))) {
 			call mssg(USER4);
@@ -187,7 +187,7 @@ function main() {
 			usersordefinitions = users;
 			userkey = ID;
 
-			if (emailaddress.ucase() == userx.a(7).ucase()) {
+			if (emailaddress.ucase() eq userx.a(7).ucase()) {
 
 				//signify ok
 				baduseroremail = "";
@@ -242,22 +242,22 @@ function main() {
 		body.r(-1, "Your new password is " ^ newpassword);
 		call sendmail(emailaddrs, ccaddrs, subject, body, "", "", xx);
 
-	} else if (mode == "MAKEUPLOADPATH") {
+	} else if (mode eq "MAKEUPLOADPATH") {
 		call uploadsubs("MAKEUPLOADPATH." ^ USER0.a(2));
 
-	} else if (mode == "POSTUPLOAD") {
+	} else if (mode eq "POSTUPLOAD") {
 		call uploadsubs("POSTUPLOAD");
 
-	} else if (mode == "VERIFYUPLOAD") {
+	} else if (mode eq "VERIFYUPLOAD") {
 		call uploadsubs("VERIFYUPLOAD." ^ USER0.a(2));
 
-	} else if (mode == "OPENUPLOAD") {
+	} else if (mode eq "OPENUPLOAD") {
 		call uploadsubs("OPENUPLOAD." ^ USER0.a(2));
 
-	} else if (mode == "DELETEUPLOAD") {
+	} else if (mode eq "DELETEUPLOAD") {
 		call uploadsubs("DELETEUPLOAD." ^ USER0.a(2));
 
-	} else if (mode == "GETCODEPAGE") {
+	} else if (mode eq "GETCODEPAGE") {
 		USER1 = "";
 		//have to skip char zero it seems to be treated as string terminator
 		//somewhere on the way to the browser (not in revelation)
@@ -267,7 +267,7 @@ function main() {
 		//data='xxx'
 		USER3 = "OK";
 
-	} else if (mode == "SETCODEPAGE") {
+	} else if (mode eq "SETCODEPAGE") {
 		if (not(gen.alanguage.open("ALANGUAGE", ""))) {
 			call fsmsg();
 			stop();
@@ -278,7 +278,7 @@ function main() {
 			goto badsetcodepage;
 		}
 
-		if (USER0.a(2) == "SORTORDER") {
+		if (USER0.a(2) eq "SORTORDER") {
 
 			/* should be inverted but bother since cant get arev only collated ascii;
 				if len(data) ne 254 then;
@@ -288,7 +288,7 @@ function main() {
 				write char(0):data on alanguage,'SORTORDER*':codepage;
 			*/
 
-		} else if (USER0.a(2) == "UPPERCASE") {
+		} else if (USER0.a(2) eq "UPPERCASE") {
 			fn = 9;
 setcodepagecase:
 			var recordx;
@@ -320,7 +320,7 @@ setcodepagecase:
 					next ii;
 				*/
 
-		} else if (USER0.a(2) == "LOWERCASE") {
+		} else if (USER0.a(2) eq "LOWERCASE") {
 			fn = 10;
 			goto setcodepagecase;
 
@@ -332,7 +332,7 @@ badsetcodepage:
 
 		USER3 = "OK";
 
-	} else if (mode == "GETDATASETS") {
+	} else if (mode eq "GETDATASETS") {
 		ANS = "";
 		call generalsubs("GETDATASETS");
 		USER1 = ANS;
@@ -342,13 +342,13 @@ badsetcodepage:
 			USER3 = "Error: No datasets found";
 		}
 
-	} else if (mode == "LISTPROCESSES") {
+	} else if (mode eq "LISTPROCESSES") {
 
 		perform("SORT PROCESSES");
 
 		gosub checkoutputfileexists();
 
-	} else if (mode == "LISTREQUESTLOG") {
+	} else if (mode eq "LISTREQUESTLOG") {
 
 		PSEUDO = USER1;
 		perform("LISTREQUESTLOG");
@@ -356,17 +356,17 @@ badsetcodepage:
 		//printopts='L'
 		gosub checkoutputfileexists();
 
-	} else if (mode == "LISTLOCKS") {
+	} else if (mode eq "LISTLOCKS") {
 
 		perform("SORT LOCKS WITH NO LOCK_EXPIRED");
 
 		gosub checkoutputfileexists();
 
-	} else if (mode == "GETVERSIONDATES") {
+	} else if (mode eq "GETVERSIONDATES") {
 
 		call changelogsubs("GETVERSIONDATES");
 
-	} else if (mode.ucase() == "WHATSNEW") {
+	} else if (mode.ucase() eq "WHATSNEW") {
 
 		call changelogsubs("SELECTANDLIST" ^ FM ^ USER1);
 		if (USER4) {
@@ -377,42 +377,42 @@ badsetcodepage:
 		//printopts='L'
 		gosub checkoutputfileexists();
 
-	} else if (mode == "LISTADDRESSES") {
+	} else if (mode eq "LISTADDRESSES") {
 
 		perform("LISTADDRESSES");
 
 		//printopts='L'
 		gosub checkoutputfileexists();
 
-	} else if (mode == "GETDEPTS") {
+	} else if (mode eq "GETDEPTS") {
 		call usersubs("GETDEPTS");
 		USER1 = ANS;
 		USER3 = "OK";
 
-	} else if (mode == "LISTACTIVITIES") {
+	} else if (mode eq "LISTACTIVITIES") {
 
 		perform("LISTACTIVITIES " ^ USER0.a(2));
 
 		gosub checkoutputfileexists();
 
-	} else if (mode == "ABOUT") {
+	} else if (mode eq "ABOUT") {
 		perform("ABOUT");
 		//transfer @user4 to data
 		//response='OK'
 		USER4.transfer(USER3);
 		USER3.splicer(1, 0, "OK ");
 
-	} else if (mode == "UTIL") {
+	} else if (mode eq "UTIL") {
 		perform("UTIL");
 		USER3 = "OK";
 
-	} else if (mode == "PROG") {
+	} else if (mode eq "PROG") {
 		perform("PROG");
 		USER3 = "OK";
 
 	//LISTAUTH.TASKS = list of tasks LISTTASKS
 	//LISTAUTH.USERS = list of users LISTUSERS
-	} else if (mode.field(".", 1) == "LISTAUTH") {
+	} else if (mode.field(".", 1) eq "LISTAUTH") {
 
 		win.wlocked = 0;
 		win.templatex = "SECURITY";
@@ -429,7 +429,7 @@ badsetcodepage:
 
 		gosub checkoutputfileexists();
 
-	} else if (mode == "READUSERS") {
+	} else if (mode eq "READUSERS") {
 
 		win.templatex = "SECURITY";
 		call securitysubs("SETUP");
@@ -440,7 +440,7 @@ badsetcodepage:
 		USER1 = RECORD;
 		USER3 = "OK";
 
-	} else if (mode == "GETREPORTS") {
+	} else if (mode eq "GETREPORTS") {
 
 		task = USER0.a(2);
 		gosub gettaskprefix();
@@ -483,7 +483,6 @@ nextrep:
 				//DO send now to have info in requestlog
 				//report<5>=''
 
-				//convert vm to char(255) in report
 				report.converter(VM, RM);
 				var nn = report.count(FM) + 1;
 				for (var ii = 1; ii <= nn; ++ii) {
@@ -495,13 +494,13 @@ nextrep:
 	//print repn,data<1>
 			}
 			//if len(data)<65000 then goto nextrep
-			if (USER1.length() < maxstrsize - 530) {
+			if (USER1.length() lt maxstrsize - 530) {
 				goto nextrep;
 			}
 		}
 		USER3 = "OK";
 
-	} else if (mode == "DELETEREPORT") {
+	} else if (mode eq "DELETEREPORT") {
 
 		gosub opendocuments();
 
@@ -527,7 +526,7 @@ nextrep:
 			}
 		};//docn;
 
-	} else if (mode == "UPDATEREPORT") {
+	} else if (mode eq "UPDATEREPORT") {
 
 		gosub opendocuments();
 
@@ -543,7 +542,7 @@ nextrep:
 
 		doc.write(gen.documents, USER0.a(2));
 
-	} else if (mode == "COPYREPORT") {
+	} else if (mode eq "COPYREPORT") {
 
 		gosub opendocuments();
 
@@ -580,7 +579,7 @@ nextrep:
 
 		USER3 = "OK";
 
-	} else if (mode == "GETREPORT") {
+	} else if (mode eq "GETREPORT") {
 
 		//printopts='L'
 		gosub opendocuments();
@@ -606,7 +605,6 @@ nextrep:
 		//if index(task,'MEDIADIARY',1) then printopts='X'
 
 		PSEUDO = gen.document.a(6);
-		//convert char(255) to vm in @pseudo
 		PSEUDO.converter(RM, VM);
 		PSEUDO = raise(PSEUDO);
 
@@ -627,7 +625,7 @@ nextrep:
 		USER1 = PSEUDO;
 
 		//in case we are calling another proxy
-		if (gen.document.a(5, 1).substr(-5,5) == "PROXY") {
+		if (gen.document.a(5, 1).substr(-5,5) eq "PROXY") {
 
 			//run but suppress email
 			//perform 'TEST ':request<2>:' (S)'
@@ -637,7 +635,7 @@ nextrep:
 			//data=@pseudo
 			//override the saved period with a current period
 			var runtimeperiod = var().date().oconv("D2/E").substr(4,5);
-			if (runtimeperiod[1] == "0") {
+			if (runtimeperiod[1] eq "0") {
 				runtimeperiod.splicer(1, 1, "");
 			}
 			USER1.swapper("{RUNTIME_PERIOD}", runtimeperiod);
@@ -656,7 +654,7 @@ performreport:
 
 		}
 
-	} else if (mode == "USAGESTATISTICS") {
+	} else if (mode eq "USAGESTATISTICS") {
 
 		PSEUDO = USER1;
 		perform("LISTSTATS");
@@ -664,7 +662,7 @@ performreport:
 		//printopts='L'
 		gosub checkoutputfileexists();
 
-	} else if (mode == "VIEWLOG") {
+	} else if (mode eq "VIEWLOG") {
 
 		gosub initlog();
 		var datedict = "LOG_DATE";
@@ -696,7 +694,7 @@ performreport:
 		//printopts='L'
 		gosub checkoutputfileexists();
 
-	} else if (mode == "LISTMARKETS") {
+	} else if (mode eq "LISTMARKETS") {
 
 		var cmd = "SORT MARKETS WITH AUTHORISED BY SEQ";
 		cmd ^= " HEADING " ^ (var("List of Markets     'T'     Page 'PL'").quote());
@@ -704,20 +702,20 @@ performreport:
 
 		gosub checkoutputfileexists();
 
-	} else if (mode == "LISTCURRENCIES") {
+	} else if (mode eq "LISTCURRENCIES") {
 
 		perform("LISTCURRENCIES " ^ USER0.a(2));
 
 		gosub checkoutputfileexists();
 
-	} else if (mode == "LISTCOMPANIES") {
+	} else if (mode eq "LISTCOMPANIES") {
 
 		perform("LISTCOMPANIES");
 
 		//printopts='L'
 		gosub checkoutputfileexists();
 
-	} else if (mode.field(".", 1) == "GETTASKS") {
+	} else if (mode.field(".", 1) eq "GETTASKS") {
 
 		call securitysubs("GETTASKS." ^ USER0.a(2) ^ "." ^ USER0.a(3));
 		USER1 = ANS;
@@ -769,12 +767,12 @@ exit:
 }
 
 subroutine checkoutputfileexists() {
-	if (SYSTEM.a(2).osfile().a(1) > 5) {
+	if (SYSTEM.a(2).osfile().a(1) gt 5) {
 		USER1 = SYSTEM.a(2);
 		USER3 = "OK";
 
 		//make pdf available as well
-		if (stationery > 2) {
+		if (stationery gt 2) {
 			call convpdf(stationery, errors);
 			if (errors) {
 				USER4.r(-1, errors);
@@ -795,7 +793,7 @@ subroutine checkoutputfileexists() {
 		USER4 = "";
 	}else{
 		USER3 = USER4;
-		if (USER3 == "") {
+		if (USER3 eq "") {
 			USER3 = "Error: No output file in GENERALPROXY " ^ mode;
 			call sysmsg(USER3);
 		}
@@ -819,7 +817,7 @@ subroutine initlog() {
 	loguptodate = USER1.a(6);
 	logsearch = USER1.a(7);
 
-	if (logoptions == "TODAY") {
+	if (logoptions eq "TODAY") {
 		logfromdate = var().date();
 		loguptodate = logfromdate;
 	}
@@ -859,11 +857,11 @@ subroutine initlog() {
 subroutine gettaskprefix() {
 	taskprefix = "";
 	task = task.field(" ", 1);
-	if (task == "ANAL") {
+	if (task eq "ANAL") {
 		taskprefix = "BILLING REPORT";
-	} else if (task == "BALANCES") {
+	} else if (task eq "BALANCES") {
 		taskprefix = "FINANCIAL REPORT";
-	} else if (task == "ANALSCH") {
+	} else if (task eq "ANALSCH") {
 		taskprefix = "BILLING REPORT";
 	} else {
 		taskprefix = "";

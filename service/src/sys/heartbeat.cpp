@@ -59,7 +59,7 @@ function main(in mode, in status0="") {
 		//but all functions sharing the same mvenvironment will have the same no
 		//determine process number
 
-		if (userlockid.substr(1,5) == "U7906") {
+		if (userlockid.substr(1,5) eq "U7906") {
 			processno = userlockid.substr(6,9999);
 			processno -= (processno / 10).floor();
 
@@ -71,7 +71,7 @@ function main(in mode, in status0="") {
 			if (not(tt.read(DEFINITIONS, "ERROR*PROCESSNO"))) {
 				tt = "";
 			}
-			if (tt.a(1).count(VM) < 10) {
+			if (tt.a(1).count(VM) lt 10) {
 				tt.r(1, -1, processno);
 				tt.write(DEFINITIONS, "ERROR*PROCESSNO");
 				call sysmsg(processno.quote() ^ "Non-numeric processno in HEARTBEAT " ^ userlockid);

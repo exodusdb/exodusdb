@@ -56,7 +56,7 @@ var minreq;
 var nhung;
 var first;//num
 var startit;//num
-var verbs;
+var voc;
 var xx;
 var dbasesystem;
 var nmaint;
@@ -123,7 +123,7 @@ function main() {
 	checkinterval = 180;
 
 	//command mode forces, call mode only every x minutes
-	forced = SENTENCE.field(" ", 1) == "MONITOR2";
+	forced = SENTENCE.field(" ", 1) eq "MONITOR2";
 
 	upgradeready = 0;
 	//only counts web users
@@ -169,7 +169,7 @@ function main() {
 	//only process if current time is > last checktime plus check interval
 	//change to if difference > check interval in case clock is turned back
 	//if forced or currenttime>nextchecktime then
-	if (not(forced or ((currenttime - monitordata.a(1)).abs() > checkinterval / 86400))) {
+	if (not(forced or ((currenttime - monitordata.a(1)).abs() gt checkinterval / 86400))) {
 
 		/////////
 		//goto exit
@@ -231,9 +231,9 @@ nextstatistic:
 			}
 
 			//skip/delete usage records older than x
-			if (RECORD.a(1) < minusagetime) {
+			if (RECORD.a(1) lt minusagetime) {
 				//trim out usage records older than one week
-				if (RECORD.a(1) < delusagetime) {
+				if (RECORD.a(1) lt delusagetime) {
 					statistics.deleterecord(ID);
 
 				}
@@ -274,7 +274,7 @@ nextprocess:
 		}
 
 		//handle special records in processes
-		if (ID[1] == "%") {
+		if (ID[1] eq "%") {
 			goto nextprocess;
 		}
 
@@ -297,7 +297,7 @@ nextprocess:
 		//use hung and maintenance processes if no ok processes
 		//dont use closed and crashed processes because maybe old and obsolete
 		//TODO make sensitive to definitions BACKUP records
-		if ((statusn == 1) or (((backuprequired.a(1, dbasen) == "") and (statusn <= 3)))) {
+		if (statusn eq 1 or ((backuprequired.a(1, dbasen) eq "" and statusn le 3))) {
 
 			//get the bakpars for a specific process
 			call getbackpars(bakpars, RECORD);
@@ -307,7 +307,7 @@ nextprocess:
 
 			//no backups required if database processes are all automatically started
 			//except BASIC which we presume is used to startup and backup data.bak
-			if ((SYSTEM.a(58) == "") and dbasecode ne "BASIC") {
+			if (SYSTEM.a(58) eq "" and dbasecode ne "BASIC") {
 				backuprequired.r(1, dbasen, 0);
 			}
 
@@ -352,7 +352,7 @@ nextprocess:
 		nok = processcount.a(1, dbasen);
 		description = dbasecode;
 		//if nok then description:=' ':nok:':Ok'
-		if (nok > 1) {
+		if (nok gt 1) {
 			description ^= " " ^ nok;
 		}
 
@@ -378,7 +378,7 @@ nextprocess:
 		//not if this is a test database (only those with codes ending in TEST')
 		//unless configured to all it
 		first = 1;
-		if ((((SYSTEM.a(17, 1).substr(-4,4) ne "TEST") or SYSTEM.a(126)) and (nok < minreq)) and (nhung < 5)) {
+		if ((((SYSTEM.a(17, 1).substr(-4,4) ne "test") or SYSTEM.a(126)) and nok lt minreq) and nhung lt 5) {
 			//if locksystem('LOCK',dbasecode) then
 				//unlock immediately to enable startup - which will fail if anyone locks
 				//call locksystem('UNLOCK',dbasecode)
@@ -394,9 +394,9 @@ nextprocess:
 				}
 			}
 			if (startit) {
-				if (verbs.open("VERBS", "")) {
-					if (lockrecord("", verbs, "BACKUP*" ^ dbasecode)) {
-						xx = unlockrecord("", verbs, "BACKUP*" ^ dbasecode);
+				if (voc.open("VOC", "")) {
+					if (lockrecord("", voc, "BACKUP*" ^ dbasecode)) {
+						xx = unlockrecord("", voc, "BACKUP*" ^ dbasecode);
 					}else{
 						startit = 0;
 					}
@@ -407,8 +407,8 @@ nextprocess:
 				//this lock is in INIT.GENERAL and MONITOR2
 				//dont
 			if (startit) {
-				if (lockrecord("VERBS", verbs, "INIT.GENERAL.LOGIN")) {
-					call unlockrecord("VERBS", verbs, "INIT.GENERAL.LOGIN");
+				if (lockrecord("VOC", voc, "INIT.GENERAL.LOGIN")) {
+					call unlockrecord("VOC", voc, "INIT.GENERAL.LOGIN");
 				}else{
 					startit = 0;
 				}
@@ -488,10 +488,10 @@ nextprocess:
 			currentdatetime = (var().date() + var().time() / 86400).oconv("MD50P");
 			tt = currentdatetime - lastbackupdatetime;
 			//allow one day and one hour
-			if (lastbackupdatetime and (tt > 1 + 1 / 24)) {
+			if (lastbackupdatetime and (tt gt 1 + 1 / 24)) {
 				//warning if one day missed and critical if more than one
 				description ^= " not done " ^ tt.oconv("MD10P") ^ " days!";
-				if (paramrec and (tt > 2)) {
+				if (paramrec and tt gt 2) {
 					description ^= "!";
 				}
 			}
@@ -507,7 +507,7 @@ nextprocess:
 
 				//check target exists
 				freespace = diskfreespace(backupdrive);
-				if (freespace == 999999999) {
+				if (freespace eq 999999999) {
 					freespace = 0;
 				}
 				backupdrives.r(2, backupdriven, freespace);
@@ -536,7 +536,7 @@ nextprocess:
 					//similar in MONITOR2 and FILEMAN
 					nextbackupdate = var().date();
 					//add 1 if next backup is tomorrow
-					if (var().time() > backuprequired.a(1, dbasen, 3)) {
+					if (var().time() gt backuprequired.a(1, dbasen, 3)) {
 						nextbackupdate += 1;
 					}
 					dow = ((gen.glang.a(22).field("|", (nextbackupdate - 1) % 7 + 1)).substr(1,8)).ucase();
@@ -552,17 +552,17 @@ nextprocess:
 						freespace += nextbackupfileinfo.a(2);
 
 						//print a warning if havent changed the backup media and not suppressed
-						if (not(bakpars.a(13)) and (nextbackupfileinfo.a(2) == nextbackupdate - 7)) {
+						if (not(bakpars.a(13)) and (nextbackupfileinfo.a(2) eq nextbackupdate - 7)) {
 
 							//email a request to change usb
 							//from 0600 to 1800 and not sent in the last 5.5 hours
 							//usually 0600 1130 1700
 							reminderhours = 5.5;
 							call getdatetime(localdate, localtime, xx, xx2, xx3, xx4);
-							if ((localtime >= 21600) and (localtime <= 64800)) {
+							if (localtime ge 21600 and localtime le 64800) {
 								//only one email per installation
 								call osread(lastnote, "LASTNOTE.CFG");
-								if (lastnote.a(1) ne localdate or (lastnote.a(2) < localtime - 3600 * reminderhours)) {
+								if (lastnote.a(1) ne localdate or (lastnote.a(2) lt localtime - 3600 * reminderhours)) {
 									call oswrite(localdate ^ FM ^ localtime, "LASTNOTE.CFG");
 
 									//sendmail - if it fails, there will be an entry in the log
@@ -573,11 +573,11 @@ nextprocess:
 									if (toaddresses) {
 										remindern = (localtime - 21600) % 3600 * reminderhours + 1;
 										subject = "EXODUS Backup Reminder";
-										if (remindern > 1) {
+										if (remindern gt 1) {
 											subject ^= " (" ^ remindern ^ ")";
 										}
 										body = "It is time to change the EXODUS backup media (e.g. USB Flash Drive)";
-										if (localtime < 43200) {
+										if (localtime lt 43200) {
 											body.r(-1, FM ^ "Please change it " "before 12:00 midday today.");
 										}else{
 											body.r(-1, FM ^ "Please change it " "URGENTLY");
@@ -590,7 +590,7 @@ nextprocess:
 							}
 
 							//warning if they have not changed the usb by noon
-							if (localtime >= var("12:00").iconv("MT")) {
+							if (localtime ge var("12:00").iconv("MT")) {
 								description ^= " Change Backup!";
 							}
 
@@ -635,7 +635,7 @@ nextdbasen:;
 
 			//ensure 10% free space over last backup size
 			//if we know the last backup size (this could fail if a NEW db is added)
-			if ((lastbackupsize > 0) and (freespace < lastbackupsize * 1.1)) {
+			if (lastbackupsize gt 0 and (freespace lt lastbackupsize * 1.1)) {
 				description ^= " only!!";
 			}
 
@@ -651,10 +651,10 @@ nextdbasen:;
 
 	};//backupdriven;
 	//oswrite descriptions on 'DESCRIPS'
-	if (descriptions.index("!!") and (status0123 < 2)) {
+	if (descriptions.index("!!") and status0123 lt 2) {
 		status0123 = 2;
 	}
-	if (descriptions.index("!") and (status0123 < 1)) {
+	if (descriptions.index("!") and status0123 lt 1) {
 		status0123 = 1;
 	}
 
@@ -670,7 +670,7 @@ nextdbasen:;
 	hostdescriptions ^= "Ver" ^ tt ^ "-" ^ versionnote.field(" ", 1).field(":", 1, 2);
 
 	//dont allow upgrades by test databases
-	if (SYSTEM.a(124) and (SYSTEM.a(17).substr(-4,4) ne "TEST")) {
+	if (SYSTEM.a(124) and (SYSTEM.a(17).substr(-4,4) ne "test")) {
 
 		//get upgrade file details
 		upgradefilename83 = SYSTEM.a(112);
@@ -732,7 +732,7 @@ nextdbasen:;
 	for (ii = 1; ii <= 24; ++ii) {
 		for (jj = 1; jj <= 3; ++jj) {
 			usertab(ii, jj) = usertab(ii, jj).count(VM) + (usertab(ii, jj) ne "");
-			if (usertab(ii, jj) > usertab(25, jj)) {
+			if (usertab(ii, jj) gt usertab(25, jj)) {
 				usertab(25, jj) = usertab(ii, jj);
 			}
 		};//jj;
@@ -746,7 +746,7 @@ nextdbasen:;
 		if (tt) {
 			anyusers = 1;
 		}
-		if (ii > 1) {
+		if (ii gt 1) {
 			hostdescriptions ^= "/";
 		}
 		hostdescriptions ^= tt;
@@ -757,7 +757,7 @@ nextdbasen:;
 	hourn = 25;
 	for (ii = 1; ii <= 3; ++ii) {
 		tt = usertab(1, ii);
-		if (ii > 1) {
+		if (ii gt 1) {
 			hostdescriptions ^= "/";
 		}
 		hostdescriptions ^= usertab(hourn, ii);
@@ -780,7 +780,7 @@ nextdbasen:;
 	for (ii = 1; ii <= nn; ++ii) {
 		line = result.a(ii).trim();
 		line.swapper("IPV4 ADDRESS", "IP ADDRESS");
-		if (line.substr(1,10) == "IP ADDRESS") {
+		if (line.substr(1,10) eq "IP ADDRESS") {
 			ips.r(-1, line.field(":", 2).trim().field("(", 1));
 			//only display the first
 			goto gotip;
@@ -795,7 +795,7 @@ gotip:
 		nips = ips.count(",") + 1;
 		//limit to 5 ips, replace middle ones with - to indicate suppressed
 		maxips = 5;
-		if (nips > maxips) {
+		if (nips gt maxips) {
 			ips = ips.fieldstore(",", (maxips / 2).floor(), maxips - nips, "...");
 		}
 		hostdescriptions ^= " - " ^ ips;
@@ -831,7 +831,7 @@ gotip:
 	//TODO put this on a less frequent check since it will only be
 	//updated after the nightly backup usually *unless last hour users are 0/0/0
 	//dont allow upgrades by test databases
-	if (SYSTEM.a(124) and (SYSTEM.a(17).substr(-4,4) ne "TEST")) {
+	if (SYSTEM.a(124) and (SYSTEM.a(17).substr(-4,4) ne "test")) {
 		if (msg) {
 		}else{
 			call monitor2b("WRITE", "UPGRADE", "UPGRADE", installid, msg);
@@ -863,7 +863,7 @@ gotip:
 	//parallel means installations next to each other in the same folder
 	upgflagfile = "../../UPGRADE.$$$";
 	upgflagfile.converter("/", OSSLASH);
-	if ((upgradeready and not(anyusers)) and ((var().time() - upgflagfile.osfile().a(3)).abs() > 60)) {
+	if ((upgradeready and not(anyusers)) and ((var().time() - upgflagfile.osfile().a(3)).abs() gt 60)) {
 		call oswrite("", upgflagfile);
 		//close all other processes, upgrade, close and restart
 		call upgrade("R");

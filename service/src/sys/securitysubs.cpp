@@ -90,20 +90,20 @@ function main(in mode) {
 
 	//no validation for EXODUS
 	if (curruser.index("EXODUS")) {
-		if ((mode.substr(1,4) == "VAL.") and mode ne "VAL.USER") {
+		if (mode.substr(1,4) eq "VAL." and mode ne "VAL.USER") {
 			return 0;
 		}
 	}
 
-	if (mode == "GENERATEPASSWORD") {
+	if (mode eq "GENERATEPASSWORD") {
 		gosub generatepassword();
 		win.is = newpassword;
 
 	//only to allow maintenance mode
-	} else if (mode == "VAL.USER") {
-	} else if (mode == "PERP") {
+	} else if (mode eq "VAL.USER") {
+	} else if (mode eq "PERP") {
 
-	} else if (mode == "MAKESYSREC") {
+	} else if (mode eq "MAKESYSREC") {
 		userx = win.is.a(1);
 		newpassword = win.is.a(2);
 		sysrec = "";
@@ -451,17 +451,17 @@ function main(in mode) {
 		//if mode='PERSONAL.PASSWORD' else data ''
 
 	//called from DEFINITION.SUBS POSTREAD for key SECURITY
-	} else if (mode == "SETUP") {
+	} else if (mode eq "SETUP") {
 
 		//check allowed access
 		if (win.templatex.unassigned()) {
 			win.templatex = "";
 		}
-		if (win.templatex == "SECURITY") {
+		if (win.templatex eq "SECURITY") {
 			filename = "AUTHORISATION";
 			defaultlock = "GS";
 		}else{
-			if (win.templatex == "HOURLYRATES") {
+			if (win.templatex eq "HOURLYRATES") {
 				filename = "HOURLY RATE";
 				updatehighergroups = 1;
 				updatelowergroups = 1;
@@ -480,7 +480,7 @@ function main(in mode) {
 			return 0;
 		}
 
-		if (win.templatex == "SECURITY") {
+		if (win.templatex eq "SECURITY") {
 
 			//check guest status
 			gosub gueststatus();
@@ -549,7 +549,7 @@ function main(in mode) {
 		//@record<9>=curruser
 
 		//don't delete users for hourly rates
-		if (win.templatex == "HOURLYRATES") {
+		if (win.templatex eq "HOURLYRATES") {
 			updatehighergroups = 1;
 			updatelowergroups = 1;
 		}
@@ -562,7 +562,7 @@ function main(in mode) {
 			for (var taskn = ntasks; taskn >= 1; --taskn) {
 				var task = tasks.a(1, taskn);
 				//WARNING TODO: check ternary op following;
-				var temp = (task.substr(1,10) == "DOCUMENT: ") ? "#" : "";
+				var temp = task.substr(1,10) eq "DOCUMENT: " ? "#" : "";
 				if (not(authorised("!" ^ temp ^ task, msg, ""))) {
 					RECORD.remover(10, taskn);
 					RECORD.remover(11, taskn);
@@ -589,7 +589,7 @@ function main(in mode) {
 				startn = usern;
 				while (true) {
 					///BREAK;
-					if (not((startn > 1) and (RECORD.a(2, startn - 1) == ""))) break;
+					if (not(startn gt 1 and (RECORD.a(2, startn - 1) eq ""))) break;
 					startn -= 1;
 				}//loop;
 			}
@@ -601,7 +601,7 @@ function main(in mode) {
 				endn = usern;
 				while (true) {
 					///BREAK;
-					if (not((endn < nusers) and (RECORD.a(1, endn + 1) ne "---"))) break;
+					if (not(endn lt nusers and (RECORD.a(1, endn + 1) ne "---"))) break;
 					endn += 1;
 				}//loop;
 			}
@@ -712,7 +712,7 @@ function main(in mode) {
 		}
 
 	//called as prewrite in noninteractive mode
-	} else if (mode == "SAVE") {
+	} else if (mode eq "SAVE") {
 
 		//get/clear temporary storage
 		startn = RECORD.a(20);
@@ -770,7 +770,7 @@ function main(in mode) {
 			return 0;
 		}
 
-		if (not(interactive) or (win.templatex == "SECURITY")) {
+		if (not(interactive) or win.templatex eq "SECURITY") {
 
 			//check all users have names/passwords
 			var usercodes = RECORD.a(1);
@@ -785,7 +785,7 @@ function main(in mode) {
 					userx = RECORD.a(1, usern);
 
 					newpassword = RECORD.a(4, usern);
-					if (newpassword and (newpassword.length() < 4)) {
+					if (newpassword and newpassword.length() lt 4) {
 						msg = userx.quote() ^ " user password cannot be less than " ^ minpasswordchars;
 						return invalid(msg);
 					}
@@ -834,7 +834,7 @@ function main(in mode) {
 						username = "---";
 						RECORD.r(4, usern, username);
 					}
-					if (not(username.index("---") or (username == "BACKUP"))) {
+					if (not(username.index("---") or username eq "BACKUP")) {
 						if (not(RECORD.a(7, usern))) {
 							//msg=quote(username):'|You must first give a password to this user'
 							msg = username.quote() ^ "|You must give an email or password for this user";
@@ -856,7 +856,7 @@ function main(in mode) {
 			nusers = RECORD.a(1).count(VM) + (RECORD.a(1) ne "");
 			for (usern = 1; usern <= nusers; ++usern) {
 				var temp = RECORD.a(1, usern);
-				if ((temp == "") or temp.index("---")) {
+				if (temp eq "" or temp.index("---")) {
 					RECORD.r(1, usern, "---");
 					RECORD.r(2, usern, "---");
 				}
@@ -1066,7 +1066,7 @@ function main(in mode) {
 						mirror.r(1, userx);
 						mirror.write(users, mirrorkey);
 
-						isnew = origuserrec.a(1) == "";
+						isnew = origuserrec.a(1) eq "";
 						//only warn about new users with emails (ignore creation of groups/testusers)
 						gosub getemailtx();
 
@@ -1111,7 +1111,7 @@ function main(in mode) {
 							gosub getemailtx();
 						}
 						if (temp.read(systemfile(), userx)) {
-							if (temp.a(1) == "USER") {
+							if (temp.a(1) eq "USER") {
 								systemfile().deleterecord(userx);
 
 							}
@@ -1142,7 +1142,7 @@ function main(in mode) {
 				var nn = newusers.count(FM) + 1;
 				for (var ii = 1; ii <= nn; ++ii) {
 
-					if (USERNAME == "EXODUS") {
+					if (USERNAME eq "EXODUS") {
 						replyto = "support@neosys.com";
 					}else{
 						replyto = USERNAME.xlate("USERS", 7, "X");
@@ -1227,7 +1227,7 @@ function main(in mode) {
 
 		}
 
-	} else if (mode == "POSTAPP") {
+	} else if (mode eq "POSTAPP") {
 
 		//also called in postwrite in noninteractive mode
 
@@ -1241,7 +1241,7 @@ function main(in mode) {
 			xx = unlockrecord("", DEFINITIONS, "SECURITY");
 		}
 
-	} else if (mode.field(".", 1) == "LISTAUTH") {
+	} else if (mode.field(".", 1) eq "LISTAUTH") {
 		var temprec = RECORD;
 		temprec.r(4, "");
 
@@ -1251,7 +1251,7 @@ function main(in mode) {
 		for (var ii = nn; ii >= 1; --ii) {
 			var expirydate = expirydates.a(1, ii);
 			if (expirydate) {
-				if (expirydate <= var().date()) {
+				if (expirydate le var().date()) {
 					for (var fn = 1; fn <= 9; ++fn) {
 						var tt = temprec.a(fn);
 						if (tt) {
@@ -1268,8 +1268,8 @@ function main(in mode) {
 		for (var ii = nn; ii >= 2; --ii) {
 			var usercode = usercodes.a(1, ii);
 			if (usercode) {
-				if ((temprec.a(8, ii) == "") or (temprec.a(7, ii) == "")) {
-					if (temprec.a(1, ii - 1) == "") {
+				if (temprec.a(8, ii) eq "" or temprec.a(7, ii) eq "") {
+					if (temprec.a(1, ii - 1) eq "") {
 						for (var fn = 1; fn <= 9; ++fn) {
 							var tt = temprec.a(fn);
 							if (tt) {
@@ -1285,7 +1285,7 @@ function main(in mode) {
 		temprec.r(1, temprec.a(1).swap(VM ^ VM, VM ^ "<hr/>" ^ VM));
 
 		//reverse users so department shows at the top (and higher users at bottom sadly)
-		if (mode.field(".", 2) == "USERS") {
+		if (mode.field(".", 2) eq "USERS") {
 			//trim any multivalued fields with more than nusers multivalues
 			var nusers = temprec.a(1).count(VM) + 1;
 			var nfs = temprec.count(FM) + 1;
@@ -1302,7 +1302,7 @@ function main(in mode) {
 
 		var mode2 = mode.field(".", 2);
 		var cmd = "LIST DEFINITIONS " ^ (tempkey.quote());
-		if (mode2 == "TASKS") {
+		if (mode2 eq "TASKS") {
 			cmd ^= " TASKS LOCKS";
 		}else{
 			//cmd:=' LIMIT USER_EXPIRY_DATE < ':quote(date() 'D4')
@@ -1332,9 +1332,9 @@ function main(in mode) {
 				end;
 			execute 'GET NEW NOHTML PRINTSECURITY';
 	*/
-	} else if (mode.field(".", 1) == "GETTASKS") {
+	} else if (mode.field(".", 1) eq "GETTASKS") {
 
-		var disallowed = mode.field(".", 2) == "NOT";
+		var disallowed = mode.field(".", 2) eq "NOT";
 		var username = mode.field(".", 3);
 
 		var origuser = USERNAME;
@@ -1365,7 +1365,7 @@ function main(in mode) {
 				for (var ii = 1; ii <= 9; ++ii) {
 					var temp = task.field(" ", ii);
 					if (temp) {
-						if (temp == lasttask.field(" ", ii)) {
+						if (temp eq lasttask.field(" ", ii)) {
 							task = task.fieldstore(" ", ii, 1, "%SAME%");
 						}else{
 							temp = "";
@@ -1509,9 +1509,9 @@ subroutine newpass3() {
 	win.valid = 0;
 	lastfn = 9;
 
-	if ((sysrec.a(1) == "USER") or (sysrec == "")) {
+	if (sysrec.a(1) eq "USER" or sysrec eq "") {
 		passwordfn = 7;
-	} else if (sysrec.a(1) == "ACCOUNT") {
+	} else if (sysrec.a(1) eq "ACCOUNT") {
 		passwordfn = 6;
 	} else {
 		call note("W123", "", xx, userx);
@@ -1526,7 +1526,7 @@ subroutine newpass3() {
 
 subroutine makesysrec() {
 	if (not(sysrec.a(1))) {
-		if (passwordfn == 7) {
+		if (passwordfn eq 7) {
 			sysrec.r(1, "USER");
 		}else{
 			sysrec.r(1, "ACCOUNT");
@@ -1612,12 +1612,12 @@ subroutine cleartemp() {
 
 subroutine getemailtx() {
 	//dont sysmsg/log new/amend/deleting users @neosys.com unless in testdata or dev
-	if ((userrec.a(7).ucase().index("@EXODUS.COM") and (SYSTEM.a(17, 1).substr(-4,4) ne "TEST")) and not(var("exodus.id").osfile())) {
+	if ((userrec.a(7).ucase().index("@EXODUS.COM") and (SYSTEM.a(17, 1).substr(-4,4) ne "test")) and not(var("exodus.id").osfile())) {
 		return;
 	}
 
 	//send to email about how to login to new users with email addresses
-	if (userrec.a(7) and (isnew > 0)) {
+	if (userrec.a(7) and isnew gt 0) {
 		newusers.r(-1, userx ^ VM ^ userrec.a(1) ^ VM ^ userrec.a(7) ^ VM ^ userrec.a(5));
 	}
 
@@ -1631,7 +1631,7 @@ subroutine getemailtx() {
 		if (newx ne old) {
 			var was = "was:";
 			//dedup ipnos and keys
-			if (not(isnew) and (((fn == 40) or (fn == 41)))) {
+			if (not(isnew) and ((fn eq 40 or fn eq 41))) {
 				call dedup("", old, newx, " ,");
 				if (newx) {
 					newx = "added " ^ newx;
@@ -1656,20 +1656,20 @@ subroutine getemailtx() {
 
 	if (tx) {
 		emailtx.r(-1, FM ^ var("User Code:").oconv("L#10") ^ userx);
-		if (isnew > 0) {
+		if (isnew gt 0) {
 			emailtx ^= " *CREATED*";
-		} else if (isnew < 0) {
+		} else if (isnew lt 0) {
 			emailtx ^= " *DELETED*";
 		} else {
 			//emailtx:=' *AMENDED*'
 		}
 
 		//always show user name, if different from user code
-		if ((origuserrec.a(1) == userrec.a(1)) and userrec.a(1) ne userx) {
+		if (origuserrec.a(1) eq userrec.a(1) and userrec.a(1) ne userx) {
 			emailtx.r(-1, var("User Name:").oconv("L#10") ^ userrec.a(1));
 		}
 		//always show user group
-		if (origuserrec.a(21) == userrec.a(21)) {
+		if (origuserrec.a(21) eq userrec.a(21)) {
 			emailtx.r(-1, var("Group:").oconv("L#10") ^ userrec.a(21));
 		}
 		emailtx.r(-1, tx);

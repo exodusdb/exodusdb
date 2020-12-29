@@ -71,27 +71,27 @@ function main(in nextcompanycode) {
 	//date format
 	DATEFMT = "D2/E";
 	var dateformat = gen.company.a(10);
-	if (dateformat == "") {
+	if (dateformat eq "") {
 		DATEFMT = "D2/E";
-	} else if (dateformat.substr(1,6) == "31/01/") {
+	} else if (dateformat.substr(1,6) eq "31/01/") {
 		DATEFMT = "D2/E";
-	} else if (dateformat.substr(1,6) == "31-01-") {
+	} else if (dateformat.substr(1,6) eq "31-01-") {
 		DATEFMT = "D2-E";
-	} else if (dateformat == "31 JAN 90") {
+	} else if (dateformat eq "31 JAN 90") {
 		DATEFMT = "D2E";
-	} else if (dateformat == "31 JAN 90.") {
+	} else if (dateformat eq "31 JAN 90.") {
 		DATEFMT = "D2";
-	} else if (dateformat.substr(1,6) == "01/31/") {
+	} else if (dateformat.substr(1,6) eq "01/31/") {
 		DATEFMT = "D2/";
-	} else if (dateformat.substr(1,6) == "01-31-") {
+	} else if (dateformat.substr(1,6) eq "01-31-") {
 		DATEFMT = "D2-";
 	//CASE DATE.FORMAT[-6,6]='90/01/31';@DATE.FORMAT='D2J'
 
 	//CASE DATE.FORMAT='31/01/2000';@DATE.FORMAT='D2/E'
 	//CASE DATE.FORMAT='31-01-2000';@DATE.FORMAT='D2-E'
-	} else if (dateformat == "31 JAN 2000") {
+	} else if (dateformat eq "31 JAN 2000") {
 		DATEFMT = "D2E";
-	} else if (dateformat == "31 JAN 2000.") {
+	} else if (dateformat eq "31 JAN 2000.") {
 		DATEFMT = "D2";
 	//CASE DATE.FORMAT='01/31/2000';@DATE.FORMAT='D2/'
 	//CASE DATE.FORMAT='01-31-2000';@DATE.FORMAT='D2-'
@@ -100,7 +100,7 @@ function main(in nextcompanycode) {
 
 	//in init.company and init.general
 
-	if ((gen.glang == "") or gen.company.a(14) ne oldcompany.a(14)) {
+	if (gen.glang eq "" or gen.company.a(14) ne oldcompany.a(14)) {
 		call getlang("GENERAL", "", "", gen.alanguage, gen.glang);
 		if (gen.glang.a(9)) {
 			UPPERCASE = gen.glang.a(9);
@@ -189,7 +189,7 @@ function main(in nextcompanycode) {
 			firstmonth = 1;
 		}
 		var maxperiod = financialyear.field(",", 2);
-		if (not((maxperiod.match("^\\d*$") and (maxperiod > 0)) and (maxperiod <= 99))) {
+		if (not((maxperiod.match("^\\d*$") and maxperiod gt 0) and maxperiod le 99)) {
 			maxperiod = 12;
 		}
 		gen.company.r(6, "[DATEPERIOD," ^ firstmonth ^ "," ^ maxperiod ^ "]");

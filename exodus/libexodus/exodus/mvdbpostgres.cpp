@@ -671,8 +671,10 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/)
 	ISSTRING(filename)
 
 	// asking to open DOS file! ok can osread/oswrite later!
-	if (filename == "DOS")
+	if (filename == "DOS") {
+		(*this) = filename;
 		return true;
+	}
 
 	std::string filename2 = filename.a(1).normalize().lcase().convert(".", "_").toString();
 
@@ -1820,7 +1822,7 @@ bool var::deletefile(const var& filename) const
 	THISISDEFINED()
 	ISSTRING(filename)
 
-	return this->sqlexec("DROP TABLE " ^ filename);
+	return this->sqlexec("DROP TABLE " ^ filename.a(1) ^ " CASCADE");
 }
 
 bool var::clearfile(const var& filename) const
@@ -1829,7 +1831,7 @@ bool var::clearfile(const var& filename) const
 	THISISDEFINED()
 	ISSTRING(filename)
 
-	return this->sqlexec("DELETE FROM " ^ filename);
+	return this->sqlexec("DELETE FROM " ^ filename.a(1));
 }
 
 inline void unquoter_inline(var& string)

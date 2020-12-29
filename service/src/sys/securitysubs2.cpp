@@ -23,7 +23,7 @@ function main(in mode) {
 
 	#define origfullrec win.registerx(7)
 
-	if (mode == "GETCHANGEDTASKS") {
+	if (mode eq "GETCHANGEDTASKS") {
 
 		var emailtx2 = "";
 
@@ -62,7 +62,7 @@ function main(in mode) {
 
 		ANS = emailtx2;
 
-	} else if (mode == "FIXUSERPRIVS") {
+	} else if (mode eq "FIXUSERPRIVS") {
 
 		//obsolete tasks
 		call authorised("%DELETE%" "CHANGE NETWORK TYPE", xx);
@@ -125,7 +125,7 @@ function main(in mode) {
 		t10.swapper("LEDGER RE-OPEN", "LEDGER REOPEN");
 
 		if (t10.a(1).locate("POSTING",tn)) {
-			if (newuserprivs.a(11, tn) == "") {
+			if (newuserprivs.a(11, tn) eq "") {
 				newuserprivs.r(11, tn, "UA");
 			}
 			t10.r(1, tn, "JOURNAL POST");
@@ -163,7 +163,7 @@ function main(in mode) {
 
 		call log2("*make sure all users have access to company file", logtime);
 		if (newuserprivs.a(10).locate("COMPANY ACCESS",vn)) {
-			if (newuserprivs.a(11, vn) == "AA") {
+			if (newuserprivs.a(11, vn) eq "AA") {
 				newuserprivs.r(11, vn, "");
 			}
 		}
@@ -199,14 +199,14 @@ function main(in mode) {
 		for (taskn = ntasks; taskn >= 1; --taskn) {
 			var lockx = locks.a(1, taskn);
 			var task = tasks.a(1, taskn);
-			if ((lockx == "") and (task[-1] == DQ)) {
+			if (lockx eq "" and (task[-1] eq DQ)) {
 deletetask:
 				newuserprivs.remover(10, taskn);
 				newuserprivs.remover(11, taskn);
 			}else{
 				//delete duplicate tasks
 				if (tasks.a(1).locate(task,taskn2)) {
-					if (taskn2 < taskn) {
+					if (taskn2 lt taskn) {
 						goto deletetask;
 					}
 				}

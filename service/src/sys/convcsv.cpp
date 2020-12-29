@@ -80,7 +80,7 @@ function main(in sentence0, in select0="", in filters0="") {
 	}
 
 	//convert command line to subroutine call
-	if ((SENTENCE.field(" ", 1) == "CONVCSV") and sentence0.unassigned()) {
+	if (SENTENCE.field(" ", 1) eq "CONVCSV" and sentence0.unassigned()) {
 
 		SENTENCE.transfer(sentencex);
 
@@ -127,7 +127,7 @@ function main(in sentence0, in select0="", in filters0="") {
 		sentencex.swapper(" NOCOLHEADER", "");
 	}
 
-	if (filename.substr(1,4) == "DICT") {
+	if (filename.substr(1,4) eq "DICT") {
 		tt = "VOC";
 	}else{
 		tt = filename;
@@ -164,7 +164,7 @@ function main(in sentence0, in select0="", in filters0="") {
 	var exportable = sentencex.field(" ", 3, 9999);
 	if (exportable) {
 		exportable.converter(" ", FM);
-		if (exportable.a(1) == "EXCEPT") {
+		if (exportable.a(1) eq "EXCEPT") {
 			notexportable = exportable.field(FM, 2, 9999);
 			exportable = "";
 		}
@@ -175,7 +175,7 @@ function main(in sentence0, in select0="", in filters0="") {
 		for (var ii = 1; ii <= notexportable.count(FM) + 1; ++ii) {
 			var dictrec;
 			if (dictrec.read(DICT, notexportable.a(ii))) {
-				if (dictrec.a(1) == "G") {
+				if (dictrec.a(1) eq "G") {
 					temp = dictrec.a(3);
 					temp.converter(VM ^ " ", FM ^ FM);
 					notexportable.r(ii, temp);
@@ -189,13 +189,13 @@ function main(in sentence0, in select0="", in filters0="") {
 	if (not exportable) {
 
 		if (exportable.read(DICT, "EXPORTABLE")) {
-			if (exportable.a(1) == "G") {
+			if (exportable.a(1) eq "G") {
 				exportable = exportable.a(3);
 				exportable.converter(VM ^ " ", FM ^ FM);
 			}
 			keyx = exportable.substr(1,exportable.index(FM ^ FM) - 1);
 			nkeys = keyx.count(FM) + 1;
-			if (nkeys > 2) {
+			if (nkeys gt 2) {
 				//call msg('Key field(s) should be followed by a blank line or space in EXPORTABLE')
 				//stop
 				nkeys = 0;
@@ -222,11 +222,11 @@ function main(in sentence0, in select0="", in filters0="") {
 
 	var outfilename = SYSTEM.a(2);
 	//zzz if mvgroupno then outfilename[8,1]=mvgroupno
-	if ((outfilename.substr(-4,4)).lcase() == ".htm") {
+	if ((outfilename.substr(-4,4)).lcase() eq ".htm") {
 		outfilename.splicer(-3, 3, "xls");
 		SYSTEM.r(2, outfilename);
 	}
-	var excel = (outfilename.substr(-3,3)).lcase() == "xls";
+	var excel = (outfilename.substr(-3,3)).lcase() eq "xls";
 
 	outfilename.osdelete();
 	if (outfilename.osfile()) {
@@ -258,7 +258,7 @@ function main(in sentence0, in select0="", in filters0="") {
 		//delete lists,listkey
 
 	}else{
-		if (filename.substr(1,4) == "DICT") {
+		if (filename.substr(1,4) eq "DICT") {
 			dict = "";
 		}else{
 			dict = "DICT ";
@@ -285,11 +285,11 @@ nextdict:
 			goto nextdict;
 		}
 
-		if (dictid[1] == "%") {
+		if (dictid[1] eq "%") {
 			goto nextdict;
 		}
 
-		if (dictid == "LINE_NO") {
+		if (dictid eq "LINE_NO") {
 			coln += 1;
 			dictids(coln) = dictid;
 			headingx.r(coln, "Line No.");
@@ -302,7 +302,7 @@ nextdict:
 				coln += 1;
 			//if dict<2> matches '0N' then
 				var fn = dict.a(2);
-				if (fn > nfields) {
+				if (fn gt nfields) {
 					nfields = fn;
 				}
 
@@ -331,7 +331,7 @@ nextdict:
 				}
 
 				//extract file
-				if (dict.a(11)[1] == "<") {
+				if (dict.a(11)[1] eq "<") {
 					temp = dict.a(11).substr(2,9999).field(">", 1);
 					xfilenames(coln) = temp;
 					if (not(xfiles(coln).open(temp, ""))) {
@@ -340,7 +340,7 @@ nextdict:
 						return 0;
 					}
 					var title = headingx.a(coln);
-					if (title.ucase().substr(-5,5) == " CODE") {
+					if (title.ucase().substr(-5,5) eq " CODE") {
 						title.splicer(-5, 5, "");
 						headingx.r(coln, title);
 					}
@@ -351,11 +351,11 @@ nextdict:
 					var oconvx = dict.a(7);
 
 					//force long date format
-					if (oconvx.index("DATE") or (oconvx[1] == "D")) {
+					if (oconvx.index("DATE") or (oconvx[1] eq "D")) {
 						//if raw then
 						// oconvx='D4/J'
 						//end else
-						if (oconvx == "[SCH.DATES]") {
+						if (oconvx eq "[SCH.DATES]") {
 							oconvx = "";
 						}else{
 							oconvx = DATEFMT;
@@ -364,14 +364,14 @@ nextdict:
 						//end
 
 					//no commas to be added to numbers
-					} else if (oconvx.substr(1,7) == "[NUMBER") {
+					} else if (oconvx.substr(1,7) eq "[NUMBER") {
 						oconvx = "";
 					}
 
 					oconvxs(coln) = oconvx;
 				}
 
-				colgroups(coln) = dict.a(4)[1] == "M";
+				colgroups(coln) = dict.a(4)[1] eq "M";
 				dictids(coln) = dictid;
 				dictrecs(coln) = dict;
 
@@ -440,7 +440,7 @@ nextrec:
 		return 0;
 	}
 
-	if (ID == "") {
+	if (ID eq "") {
 		goto nextrec;
 	}
 	recn += 1;
@@ -498,7 +498,7 @@ nextrec:
 		if (dictid ne "LINE_NO" and dictrecs(coln).a(4) ne "S") {
 			temp = calculate(dictid).count(VM) + 1;
 		}
-		if (temp > maxvn) {
+		if (temp gt maxvn) {
 			maxvn = temp;
 		}
 	};//coln;
@@ -509,7 +509,7 @@ nextrec:
 	for (var coln = 1; coln <= ncols; ++coln) {
 		MV = mvx;
 		dictid = dictids(coln);
-		if (dictid == "LINE_NO") {
+		if (dictid eq "LINE_NO") {
 		}else{
 			var cell = calculate(dictid);
 			if (cell ne "") {
@@ -540,7 +540,7 @@ nextvn:
 		for (var coln = 1; coln <= ncols; ++coln) {
 
 			//choose the right mv
-			if (dictids(coln) == "LINE_NO") {
+			if (dictids(coln) eq "LINE_NO") {
 				rec(coln) = vn;
 			}else{
 				mvx = colgroups(coln);
@@ -553,13 +553,13 @@ nextvn:
 
 			if (cell ne "") {
 
-				if (mvx or (vn == 1)) {
+				if (mvx or vn eq 1) {
 
 					//convert codes to names
 					if (xfilenames(coln) and not(raw)) {
 						var rec2;
 						if (rec2.read(xfiles(coln), cell)) {
-							if (xfilenames(coln) == "BRANDS") {
+							if (xfilenames(coln) eq "BRANDS") {
 								cell = rec2.a(2, 1);
 							}else{
 								cell = rec2.a(1);
@@ -574,18 +574,18 @@ nextvn:
 
 				}
 
-				if (cell[1] == "+") {
+				if (cell[1] eq "+") {
 					if (cell.substr(2,9999).isnum()) {
 						cell.splicer(1, 1, "");
 					}
 				}
-				if (cell == DQ) {
+				if (cell eq DQ) {
 					cell = "''";
 				}
 				if ((cell[1] ne DQ) or (cell[-1] ne DQ)) {
 					cell.swapper(DQ, "''");
 				}
-				if (cell.length() > 255) {
+				if (cell.length() gt 255) {
 					cell = cell.substr(1,200) ^ " ...";
 				}
 				if (fmtxs(coln) ne "R" or not(cell.isnum())) {
@@ -600,7 +600,7 @@ nextvn:
 					}
 
 					if (cell.index(DQ)) {
-						if (fmtxs(coln) == "T") {
+						if (fmtxs(coln) eq "T") {
 							if ((cell[1] ne DQ) or (cell[-1] ne DQ)) {
 								cell.swapper(DQ, "''");
 								cell = cell.quote();
@@ -623,13 +623,13 @@ nextvn:
 		//remove trailing or all tab chars
 		while (true) {
 			///BREAK;
-			if (not(line[-1] == FM)) break;
+			if (not(line[-1] eq FM)) break;
 			line.splicer(-1, 1, "");
 		}//loop;
 
 		//suppress output of empty amv rows
 		if (mvgroupno and nkeys) {
-			if (line.field(FM, nkeys + 2, 9999) == "") {
+			if (line.field(FM, nkeys + 2, 9999) eq "") {
 				line = "";
 			}
 		}
@@ -677,7 +677,7 @@ nextvn:
 
 		}
 
-		if (not(firstmvonly) and (vn < maxvn)) {
+		if (not(firstmvonly) and vn lt maxvn) {
 			goto nextvn;
 		}
 

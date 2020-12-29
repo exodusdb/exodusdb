@@ -40,23 +40,23 @@ function main(in mode, in lockfilename, in lockkey, in lockdesc0, io locklist, i
 
 	var interactive = not(SYSTEM.a(33));
 
-	if (var(0) and (USERNAME == "EXODUS")) {
+	if (var(0) and USERNAME eq "EXODUS") {
 		printl(mode, " ", lockfilename, " ", lockkey, " ", locklist);
 		xx.input();
 	}
 
-	if (mode == "LOCK") {
+	if (mode eq "LOCK") {
 		allowduplicate = 0;
 		goto lockit;
 		{}
-	} else if (mode == "RELOCK") {
+	} else if (mode eq "RELOCK") {
 		allowduplicate = 1;
 		goto lockit;
 		{}
-	} else if (mode == "UNLOCK") {
+	} else if (mode eq "UNLOCK") {
 		gosub unlockit(lockfilename, lockkey, locklist);
 		return 1;
-	} else if (mode == "UNLOCKALL") {
+	} else if (mode eq "UNLOCKALL") {
 		gosub unlockall(locklist, msg);
 		return 1;
 	} else {
@@ -85,7 +85,7 @@ lockit:
 tryagain:
 	if (not(lockrecord(lockfilename, lockfile, lockkey, "", 0, allowduplicate))) {
 		var lockholder = (lockfilename ^ "*" ^ lockkey).xlate("LOCKS", 4, "X");
-		if (lockholder == "") {
+		if (lockholder eq "") {
 			lockholder = "Someone, maybe you,";
 		}
 		//if lockdesc then
@@ -99,12 +99,12 @@ tryagain:
 			}
 		}else{
 			msg = lockholder ^ " is updating|" ^ lockdesc ^ "||PLEASE TRY LATER";
-			if (tryn >= ntries) {
+			if (tryn ge ntries) {
 				return 0;
 			}else{
-				if (tryn == 1) {
+				if (tryn eq 1) {
 					printl(msg, " trying for ", ntries, " secs");
-				} else if (ntries < 1000) {
+				} else if (ntries lt 1000) {
 					print("*");
 				}
 				msg = "";

@@ -47,7 +47,7 @@ function main(in mode0, in subject0, in body0, in groupids0, in jobids0, in user
 		{}
 	}
 
-	if (SENTENCE.field(" ", 1) == "EMAILUSERS") {
+	if (SENTENCE.field(" ", 1) eq "EMAILUSERS") {
 
 		mode = SENTENCE.field(" ", 2);
 		var version = SENTENCE.field(" ", 3, 9999);
@@ -111,7 +111,7 @@ function main(in mode0, in subject0, in body0, in groupids0, in jobids0, in user
 	//read fromuser from users,@username else fromuser=''
 	replyto = "";
 	if (options.index("R")) {
-		if (((USERNAME == "EXODUS") or (USERNAME == "ADAGENCY")) or (USERNAME == "ACCOUNTS")) {
+		if ((USERNAME eq "EXODUS" or USERNAME eq "ADAGENCY") or USERNAME eq "ACCOUNTS") {
 			replyto = "support@neosys.com";
 		}else{
 			var fromuser = xlate("USERS", USERNAME, "", "X");
@@ -156,13 +156,13 @@ nextuser:
 	}
 
 	usern += 1;
-	if (usern > nusers) {
+	if (usern gt nusers) {
 		goto exit;
 	}
 
 	//skip empty users
 	usercode = usercodes.a(1, usern);
-	if (usercode == "") {
+	if (usercode eq "") {
 		goto nextuser;
 	}
 
@@ -173,19 +173,19 @@ nextuser:
 
 	//not expired users
 	expirydate = userx.a(35);
-	if (expirydate and (expirydate <= var().date())) {
+	if (expirydate and expirydate le var().date()) {
 		goto nextuser;
 	}
 
 	//skip users with no email at all
 	//users may have 0 or more email addresses eg xyz@abc.com;123@345.com etc
 	emails = userx.a(7);
-	if (emails == "") {
+	if (emails eq "") {
 		goto nextuser;
 	}
 
 	//always email to self last
-	if ((usercode == USERNAME) and replyto) {
+	if (usercode eq USERNAME and replyto) {
 		goto nextuser;
 	}
 
@@ -236,7 +236,7 @@ nextuser:
 	emails.converter(VM, ";");
 
 	//skip users that have already been emailed before
-	if (emails == "") {
+	if (emails eq "") {
 		goto nextuser;
 	}
 
@@ -249,7 +249,7 @@ nextuser:
 	}
 	currdept = userx.a(5);
 
-	if (toemails == "") {
+	if (toemails eq "") {
 		toemails = emails;
 
 	//sending to users (or groups and users)
@@ -306,7 +306,7 @@ subroutine sendemails(io emaillog) {
 		return;
 	}
 
-	if (ccemails[1] == ";") {
+	if (ccemails[1] eq ";") {
 		ccemails.splicer(1, 1, "");
 	}
 

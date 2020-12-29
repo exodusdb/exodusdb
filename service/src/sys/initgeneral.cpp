@@ -88,7 +88,7 @@ function main() {
 	//gosub getenv
 	call initgeneral2("GETENV", logtime);
 
-	var resetting = PSEUDO == "RESET";
+	var resetting = PSEUDO eq "RESET";
 	var initmode = SENTENCE.field(" ", 2);
 	PSEUDO = "";
 	//equ request to @user0
@@ -249,8 +249,8 @@ function main() {
 	//system<138> agency last day of week mon-sun 1-7
 
 	call log2("*init.general obtaining exclusive access:", logtime);
-	var verbs;
-	if (verbs.open("VERBS", "")) {
+	var voc;
+	if (voc.open("VOC", "")) {
 		//timeout and crash out quickly otherwise might get unlimited processes
 		//this lock is in INIT.GENERAL and MONITOR2 (to avoid starting processes)
 		var initwaitsecs = SYSTEM.a(129);
@@ -259,10 +259,10 @@ function main() {
 		}
 		//also in LOGON.OLD and INIT.GENERAL
 		var lockkey = "INIT.GENERAL.LOGIN";
-		if (not(verbs.lock( lockkey))) {
+		if (not(voc.lock( lockkey))) {
 			//np if own lock
 			if (FILEERROR ne "414") {
-				if (not(lockrecord("VERBS", verbs, "INIT.GENERAL.LOGIN", "", initwaitsecs))) {
+				if (not(lockrecord("VOC", voc, "INIT.GENERAL.LOGIN", "", initwaitsecs))) {
 					msg = "INIT.GENERAL couldnt get exclusive lock. Quitting.";
 					//maybe a long upgrade process is running
 					call note(msg);
@@ -305,9 +305,9 @@ function main() {
 			if (not(dbversion.read(DEFINITIONS, "DBVERSION"))) {
 				goto updateversion;
 			}
-			if (oldmethod and (dbversion.a(1) == 14334.5)) {
+			if (oldmethod and dbversion.a(1) eq 14334.5) {
 			}
-			if (dbversion.a(1) > dbdatetimerequired) {
+			if (dbversion.a(1) gt dbdatetimerequired) {
 				msg = "Software version " ^ dbversion.a(1).oconv("D") ^ " " ^ dbversion.a(1).field(".", 2).oconv("MTS") ^ " is incompatible with" ^ FM ^ "Database version " ^ dbdate ^ " " ^ dbtime;
 				msg = msg.oconv("L#60");
 				//abort since db is advanced
@@ -323,7 +323,7 @@ decideversion:
 					options.r(-1, "Continue");
 					options.r(-1, "Mark database as version " ^ dbdate ^ " " ^ dbtime ^ " and continue");
 					call decide("!" ^ msg ^ "", options, reply);
-					if (reply == 1) {
+					if (reply eq 1) {
 						goto badversion;
 					}
 					var msgx = "!WARNING *UNPREDICTABLE* CONSEQUENCES" ^ FM ^ FM ^ "WHAT IS THE PASSWORD?";
@@ -332,11 +332,11 @@ decideversion:
 						call note("THAT IS NOT THE CORRECT PASSWORD");
 						goto decideversion;
 					}
-					if (reply == 3) {
+					if (reply eq 3) {
 						goto updateversion;
 					}
 				}
-			} else if (dbversion.a(1) < dbdatetimerequired) {
+			} else if (dbversion.a(1) lt dbdatetimerequired) {
 updateversion:
 				dbversion = dbdatetimerequired;
 				dbversion.r(2, dbdate);
@@ -356,7 +356,7 @@ updateversion:
 				rec = "";
 			}
 			///BREAK;
-			if (rec == "") break;
+			if (rec eq "") break;
 			var filename = rec.a(1);
 			var id = rec.a(2);
 			rec = rec.field(FM, 3, 99999);
@@ -399,14 +399,14 @@ updateversion:
 		var volume = volumesx.a(volumen);
 		var tpath = "../" "DATA" "/";
 		tpath.converter("/", OSSLASH);
-		if (volume.substr(1,8) == tpath) {
+		if (volume.substr(1,8) eq tpath) {
 			execute("ATTACH " ^ volume ^ " (S)");
 		}
 	};//volumen;
 
 	if (VOLUMES) {
-		call log2("*perform RUN GBP LOGON.OLD UPGRADEVERBS", logtime);
-		perform("RUN GBP LOGON.OLD UPGRADEVERBS");
+		call log2("*perform RUN GBP LOGON.OLD UPGRADEVOC", logtime);
+		perform("RUN GBP LOGON.OLD UPGRADEVOC");
 	}
 
 	//call log2('*set workstation time to server time',logtime)
@@ -440,13 +440,10 @@ updateversion:
 			//call colortoescold);
 		}
 	}
-	//fix monochrome video problem
-	//TEMP=CHAR(27):'C70'
-	//IF @EW<3>=TEMP AND @EW<6>=TEMP THEN @EW<3>=CHAR(27):'C07'
 
 	call log2("*setup escape sequence for standard color and background", logtime);
 	temp = HW.a(3)[4] ^ HW.a(8)[4];
-	if (temp == "00") {
+	if (temp eq "00") {
 		temp = "70";
 	}
 	tt = "\x1B";
@@ -468,7 +465,7 @@ nextreport:
 					if (file.open(filename, "")) {
 						var keyx = reportkey.field("*", 2);
 						keyx.swapper("%2A", "*");
-						if (recordx.a(1) == "%DELETED%") {
+						if (recordx.a(1) eq "%DELETED%") {
 							var rec;
 							if (rec.read(file, keyx)) {
 								//if rec<1>='EXODUS' then delete file,keyx
@@ -482,7 +479,7 @@ nextreport:
 								oldrecord = "";
 							}
 							//only update documents if changed anything except update timedate
-							if (filename == "DOCUMENTS") {
+							if (filename eq "DOCUMENTS") {
 								oldrecord.r(8, recordx.a(8));
 							}
 							if (recordx ne oldrecord) {
@@ -506,7 +503,7 @@ nextreport:
 	var notherusers = otherusers("").a(1);
 
 	call log2("*check/get authorisation", logtime);
-	if ((SYSTEM.a(4) == "") and not(SYSTEM.a(33))) {
+	if (SYSTEM.a(4) eq "" and not(SYSTEM.a(33))) {
 		var nusers = getauthorisation();
 		if (not nusers) {
 
@@ -528,7 +525,7 @@ nextreport:
 
 		call log2("*check users", logtime);
 		//if nusers lt otherusers('')+1 then
-		if (nusers < notherusers + 1) {
+		if (nusers lt notherusers + 1) {
 			msg = var("4D4158494D554D20415554484F5249534544204E554D424552204F46205553455253204558434545444544").iconv("HEX2");
 			call note(msg);
 			if (SYSTEM.a(33)) {
@@ -663,7 +660,7 @@ nextreport:
 		SYSTEM.r(123, "GLOBAL");
 	}
 	// upgrades yes
-	if (SYSTEM.a(124) == "") {
+	if (SYSTEM.a(124) eq "") {
 		SYSTEM.r(124, 1);
 	}
 	//close after backup yes
@@ -775,7 +772,7 @@ nextreport:
 
 	call log2("*determine upload path", logtime);
 	tt = SYSTEM.a(49);
-	if (tt == "") {
+	if (tt eq "") {
 		//system<49>='..\images\'
 		var imagesdir = "../images/";
 		imagesdir.converter("/", OSSLASH);
@@ -831,7 +828,7 @@ nextreport:
 
 		//used in readcss for output reports and documents
 		//<meta http-equiv="content-type" content="text/html;charset=..." />
-		if (SYSTEM.a(127) == "") {
+		if (SYSTEM.a(127) eq "") {
 			//tt=''
 			//if codepage=720 then tt='windows-1256'
 			//if codepage=737 then tt='windows-1253'
@@ -924,7 +921,7 @@ nextreport:
 	}else{
 		if (VOLUMES) {
 			cpu = shell2("wmic CPU GET NAME", xx);
-			if (cpu.substr(1,2) == _RM_ _FM_) {
+			if (cpu.substr(1,2) eq _RM_ _FM_) {
 				cpu.splicer(1, 2, "");
 				cpu.converter(var().chr(0), "");
 			}
@@ -936,7 +933,7 @@ nextreport:
 			cpu.converter(":", "");
 			cpu.trimmer();
 		}
-		if (cpu[-1] == FM) {
+		if (cpu[-1] eq FM) {
 			cpu.splicer(-1, 1, "");
 		}
 
@@ -955,7 +952,7 @@ nextreport:
 		var nlogical = SYSTEM.a(9);
 		cpu = cpu.a(1).trim() ^ " ";
 		tt = nlogical / nsockets;
-		if (tt > 1) {
+		if (tt gt 1) {
 			cpu ^= nsockets ^ "x" ^ tt;
 		}else{
 			cpu ^= "x" ^ nsockets;
@@ -1000,7 +997,7 @@ nextreport:
 
 	call log2("*check if diskfreespace is sufficient", logtime);
 	//notherusers=otherusers('')+1
-	if (freemb < reqfreemb * notherusers) {
+	if (freemb lt reqfreemb * notherusers) {
 	//if 1 then
 		msg = "THERE IS NOT ENOUGH FREE DISK SPACE AVAILABLE";
 		msg ^= "||EXODUS needs at least " ^ reqfreemb ^ "Mb PER USER|of free space on disk " ^ oscwd().substr(1,2) ^ " but";
@@ -1053,7 +1050,7 @@ nextreport:
 				SYSTEM.r(50, location);
 			}
 			///BREAK;
-			if (not(tt == "")) break;
+			if (not(tt eq "")) break;
 		};//ii;
 	}
 
@@ -1070,7 +1067,7 @@ nextreport:
 	*/
 	if (VOLUMES) {
 		call log2("*find http proxy", logtime);
-		if (SYSTEM.a(56) == "") {
+		if (SYSTEM.a(56) eq "") {
 			var cmd = "proxycfg";
 getproxy:
 			var result = shell2(cmd, errors).lcase();
@@ -1081,7 +1078,7 @@ getproxy:
 				tt = tt.field(";", 1).field(var().chr(13), 1);
 				tt = tt.field(":", 2, 99).trim();
 				tt.swapper("http=", "");
-			} else if (cmd == "proxycfg") {
+			} else if (cmd eq "proxycfg") {
 				cmd = "netsh winhttp import proxy ie";
 				goto getproxy;
 				{}
@@ -1160,7 +1157,7 @@ getproxy:
 		{}
 	}
 
-	if (tt == "GS") {
+	if (tt eq "GS") {
 		tt = "LS";
 	}
 	if (not(authorised("SYSTEM CONFIGURATION CREATE", msg, tt))) {
@@ -1457,12 +1454,15 @@ getproxy:
 	clearselect();
 	select(gen.companies);
 	if (not LISTACTIVE) {
-		call note("WARNING: *** NO COMPANY RECORD ***");
+		//call note('WARNING: *** NO COMPANY RECORD ***')
+		call log2("WARNING: --- NO COMPANY RECORD ---");
 		gen.company = "";
 	}
 	var anyfixed = -1;
 fixnextcompany:
 	anyfixed += 1;
+	gen.gcurrcompany = "";
+	var maxyear = "";
 	if (readnext(companycode)) {
 		if (not(gen.company.read(gen.companies, companycode))) {
 			goto fixnextcompany;
@@ -1470,6 +1470,13 @@ fixnextcompany:
 
 		if (VOLUMES) {
 			gen.company.r(27, gen.company.a(27).invert());
+		}
+
+		//initialise with a recent company
+		tt = gen.company.a(2).field("/", 2);
+		if (tt gt maxyear) {
+			maxyear = tt;
+			gen.gcurrcompany = companycode;
 		}
 
 		var marketcode = gen.company.a(30);
@@ -1503,7 +1510,7 @@ fixcompany:
 	var menu = "";
 
 	call log2("*open accounts system files", logtime);
-	if ((APPLICATION == "ACCOUNTS") or (APPLICATION == "ADAGENCY")) {
+	if (APPLICATION eq "ACCOUNTS" or APPLICATION eq "ADAGENCY") {
 		//call init.acc()
 		//call indirectly to avoid c++ include
 		systemsubs = "initacc";
@@ -1514,7 +1521,7 @@ fixcompany:
 	}
 
 	call log2("*open advertising system files INIT.AGENCY", logtime);
-	if (APPLICATION == "ADAGENCY") {
+	if (APPLICATION eq "ADAGENCY") {
 		//call init.agency()
 		//call indirectly to avoid c++ include
 		systemsubs = "initagency";
@@ -1540,10 +1547,10 @@ convcompany:
 	if (readnext(compcode)) {
 		var tempcompany;
 		if (tempcompany.read(gen.companies, compcode)) {
-			if (tempcompany.a(22) == "") {
+			if (tempcompany.a(22) eq "") {
 				if (not numberformat) {
 					call decide("Which format do you want for numbers ?||(See \"NUMBER FORMAT\" on the company file)", "1.000,00 (dot for thousands)" ^ VM ^ "1,000.00 (comma for thousands)", reply);
-					if (reply == 1) {
+					if (reply eq 1) {
 						numberformat = "1.000,00";
 					}else{
 						numberformat = "1,000.00";
@@ -1563,7 +1570,7 @@ convcompany:
 	//change so that interactive ADAGENCY gets a company code
 	//force acquisition of language
 	gen.glang = "";
-	gen.gcurrcompany = "";
+	//gcurr.company=''
 	call initcompany(gen.gcurrcompany);
 	SYSTEM.r(37, gen.gcurrcompany);
 
@@ -1581,7 +1588,7 @@ adddatasetcodename:
 		datasetid.r(3, SYSTEM.a(17));
 		datasetid.write(DEFINITIONS, "GLOBALDATASETID");
 	}
-	if ((datasetid.a(3) == "") and SYSTEM.a(17)) {
+	if (datasetid.a(3) eq "" and SYSTEM.a(17)) {
 		goto adddatasetcodename;
 	}
 
@@ -1603,10 +1610,10 @@ adddatasetcodename:
 	//suggest change globaldatasetid if changed datasetname or datasetid
 	if (datasetid.a(2) ne SYSTEM.a(23) or datasetid.a(3) ne SYSTEM.a(17)) {
 		//if system<17>[-4,4]<>'TEST' and interactive and @username='EXODUS' then
-		if ((not(SYSTEM.a(61)) and interactive) and (USERNAME == "EXODUS")) {
+		if ((not(SYSTEM.a(61)) and interactive) and USERNAME eq "EXODUS") {
 			if (datasetid.a(1) ne "1EEC633B") {
 				call decide("This database has been copied or|the database name or code has been changed.|Is this going to be a unique new master database?", "Yes - Going to be a new independent database" ^ VM ^ "No - just backing up, renaming or recoding the database", reply, 2);
-				if (reply == 1) {
+				if (reply eq 1) {
 					goto newdatasetid;
 				}
 			}
@@ -1673,7 +1680,7 @@ nextdoc:
 		}
 	}
 
-	if (interactive and (USERNAME == "EXODUS")) {
+	if (interactive and USERNAME eq "EXODUS") {
 		perform("FINDDEADALL");
 	}
 
@@ -1695,7 +1702,7 @@ nextdoc:
 			if (not(codepage.read(DEFINITIONS, "PARAM*CODEPAGE"))) {
 				codepage = "0" ^ FM ^ codepaging.a(2);
 			}
-			if (((codepage.a(2) == "737") and not(codepage.a(1))) and (codepaging.a(3) == "1253")) {
+			if ((codepage.a(2) eq "737" and not(codepage.a(1))) and codepaging.a(3) eq "1253") {
 				perform("CONVGREEK (U)");
 			}
 		}
@@ -1706,11 +1713,11 @@ nextdoc:
 		call log2("*installing authorised hosts", logtime);
 		perform("INSTALLALLOWHOSTS (S)");
 
-		verbs.deleterecord("$FILEMAN");
+		voc.deleterecord("$FILEMAN");
 
 		call log2("*put the admenus program as the system menu file", logtime);
 		//as there is no way to have multiple menus files
-		if (APPLICATION == "ADAGENCY") {
+		if (APPLICATION eq "ADAGENCY") {
 			var setfilecmd = "SETFILE ./ADAGENCY GLOBAL ADMENUS SYS.MENUS";
 			setfilecmd.converter("/", OSSLASH);
 			perform(setfilecmd);
@@ -1801,7 +1808,7 @@ nextdoc:
 					tt = idate.oconv("D/E");
 					tt = idate.substr(-4,4) ^ "/" ^ tt.substr(1,5) ^ " " ^ itime.oconv("MT");
 					call decide("Email users about upgrade?|(or later on do F5 EMAILUSERS UPGRADE " ^ tt ^ ")", "", reply);
-					if (reply == 1) {
+					if (reply eq 1) {
 						perform("EMAILUSERS UPGRADE " ^ tt);
 					}
 					call sysmsg("EXODUS Software Upgrade " ^ tt);
@@ -1819,7 +1826,7 @@ nextdoc:
 	}
 
 	call log2("*stop init.general - releasing exclusive access", logtime);
-	call unlockrecord("VERBS", verbs, "INIT.GENERAL.LOGIN");
+	call unlockrecord("VOC", voc, "INIT.GENERAL.LOGIN");
 
 	if (not resetting) {
 
@@ -1866,7 +1873,7 @@ subroutine getsystem() {
 	var tt3 = systemx.a(46);
 	tt3.converter(VM, "");
 	tt3.swapper("Default", "");
-	if (tt3 == "") {
+	if (tt3 eq "") {
 		systemx.r(46, "");
 	}
 

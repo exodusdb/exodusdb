@@ -27,7 +27,7 @@ function main(in type, in input, in mode, out output) {
 	//and there are 4 weeks per period (which results in 13 periods per year)
 	//weeks per period MUST divide into 52 exactly
 
-	if (input == "") {
+	if (input eq "") {
 		output = "";
 		return 0;
 	}
@@ -41,7 +41,7 @@ function main(in type, in input, in mode, out output) {
 
 	//if oconv then convert internal date to year:period
 	///////////////////////////////////////////////////
-	if (type == "OCONV") {
+	if (type eq "OCONV") {
 		temp = input.oconv("D2-E");
 		year = temp.substr(-2,2);
 		period = temp.substr(4,2);
@@ -56,14 +56,14 @@ tryyear:
 		gosub getfirstdateofyear();
 		firstdateofyear2 = firstdateofyear;
 		//go to previous year if date before start of year
-		if (input < firstdateofyear) {
+		if (input lt firstdateofyear) {
 			year = (addcent4(year) - 1).substr(-2,2);
 			goto tryyear;
 		}else{
 			year2 = (year + 1).oconv("R(0)#2");
 			gosub getfirstdateofyear();
 			//go to next year if date after last date of year
-			if (input > firstdateofyear - 1) {
+			if (input gt firstdateofyear - 1) {
 				year += 1;
 				year = year.oconv("R(0)#2");
 				goto tryyear;
@@ -72,7 +72,7 @@ tryyear:
 
 		dayofyear = input - firstdateofyear2 + 1;
 		period = ((dayofyear - 1) / (7 * weeksperperiod)).floor() + 1;
-		if (period > maxperiod) {
+		if (period gt maxperiod) {
 			period = maxperiod;
 		}
 		output = year ^ ("00" ^ period).substr(-2,2);
@@ -93,7 +93,7 @@ tryyear:
 
 	//get the first date of the next period then subtract 1 day
 	period += 1;
-	if (period > maxperiod) {
+	if (period gt maxperiod) {
 		period -= maxperiod;
 		year += 1;
 		year = year.oconv("R(0)#2");
@@ -109,10 +109,10 @@ tryyear:
 	diff = (output - 1) % 7 + 1 - firstdayofweek;
 
 	if (diff) {
-		if (diff > 3) {
+		if (diff gt 3) {
 			diff -= 7;
 		}
-		if (diff < -3) {
+		if (diff lt -3) {
 			diff += 7;
 		}
 		output -= diff;
@@ -133,10 +133,10 @@ subroutine getfirstdateofyear() {
 	//therefore start of year is 2/7/93
 	firstdayofyear = (firstdateofyear - 1) % 7 + 1;
 	difference = firstdayofyear - firstdayofweek;
-	if (difference > 3) {
+	if (difference gt 3) {
 		difference -= 7;
 	}
-	if (difference < -3) {
+	if (difference lt -3) {
 		difference += 7;
 	}
 	firstdateofyear -= difference;

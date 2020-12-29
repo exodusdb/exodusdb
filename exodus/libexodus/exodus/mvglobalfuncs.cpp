@@ -20,7 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include <cstdlib> //for atexit()
+//#include <cstdlib> //for atexit()
 
 // C4530: C++ exception handler used, but unwind semantics are not enabled.
 #pragma warning(disable : 4530)
@@ -845,12 +845,12 @@ DLL_PUBLIC bool osgetenv(const var& name, var& value) { return value.osgetenv(na
 // like "if set xxx=yyy"
 DLL_PUBLIC bool ossetenv(const var& name, const var& value) { return value.ossetenv(name); }
 
-DLL_PUBLIC
-void exodus_atexit()
-{
-	// done in handle cache destructor now
-	//	var().disconnect();
-}
+//DLL_PUBLIC
+//void exodus_atexit()
+//{
+//	// done in handle cache destructor now
+//	//	var().disconnect();
+//}
 
 /* getting path to current executable
 
@@ -875,7 +875,7 @@ return bytes;
 */
 
 DLL_PUBLIC
-int exodus_main(int exodus__argc, char* exodus__argv[], MvEnvironment& mv, int environmentno)
+int exodus_main(int exodus__argc, const char* exodus__argv[], MvEnvironment& mv, int environmentno)
 {
 
 	// signal/interrupt handlers
@@ -964,7 +964,7 @@ int exodus_main(int exodus__argc, char* exodus__argv[], MvEnvironment& mv, int e
 	// would have to passed in as a function pointer
 	// main2(exodus__argc, exodus__argv);
 
-	atexit(exodus_atexit);
+	//atexit(exodus_atexit);
 
 	return 0;
 }

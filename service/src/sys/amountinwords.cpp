@@ -30,7 +30,7 @@ function main(in amountfmlanguage, in currcode0) {
 
 	comma = "";
 
-	if (SENTENCE.field(" ", 1) == "AMOUNT.IN.WORDS") {
+	if (SENTENCE.field(" ", 1) eq "AMOUNT.IN.WORDS") {
 		sentencex = SENTENCE;
 		SENTENCE = "";
 		printl();
@@ -52,7 +52,7 @@ function main(in amountfmlanguage, in currcode0) {
 	language = amountfmlanguage.a(2);
 
 	amount.converter("-", "");
-	if (amount == "") {
+	if (amount eq "") {
 		return "";
 	}
 	if (not amount) {
@@ -60,7 +60,7 @@ function main(in amountfmlanguage, in currcode0) {
 	}
 	words = "";
 
-	if (language == "FRENCH") {
+	if (language eq "FRENCH") {
 		goto french;
 	}
 
@@ -70,7 +70,7 @@ function main(in amountfmlanguage, in currcode0) {
 	// convert ',' to '' in amount
 	millions = (amount / 1000000).floor();
 
-	if (millions > 0) {
+	if (millions gt 0) {
 		words = amountinwords(millions ^ FM ^ language) ^ " Million";
 	}
 
@@ -99,7 +99,7 @@ function main(in amountfmlanguage, in currcode0) {
 		if (words ne "") {
 			words ^= " and ";
 		}
-		if (unitsx <= 20) {
+		if (unitsx le 20) {
 			words ^= text.a(1, unitsx + 1);
 		}else{
 		//IF UNITSx LE 20 THEN
@@ -113,7 +113,7 @@ function main(in amountfmlanguage, in currcode0) {
 	}
 
 	//if base.currency='MYR' and currcode='MYR' then
-	if (currcode == "MYR") {
+	if (currcode eq "MYR") {
 		words.swapper(" and ", " ");
 		cents = ((amount - amount.floor()) * 100).oconv("MD00P");
 		if (cents) {
@@ -153,7 +153,7 @@ french:
 	millions.splicer(-6, 6, "");
 	if (millions) {
 		words = amountinwords(millions ^ FM ^ language) ^ " million";
-		if (millions > 1) {
+		if (millions gt 1) {
 			words ^= "s";
 		}
 	}
@@ -164,7 +164,7 @@ french:
 		if (words ne "") {
 			words ^= comma ^ " ";
 		}
-		if (thousands > 1) {
+		if (thousands gt 1) {
 			words ^= amountinwords(thousands ^ FM ^ language);
 		}
 		words ^= " mille";
@@ -176,7 +176,7 @@ french:
 		if (words ne "") {
 			words ^= comma ^ " ";
 		}
-		if (hundreds > 1) {
+		if (hundreds gt 1) {
 			words ^= amountinwords(hundreds ^ FM ^ language);
 		}
 		words ^= " cent";
@@ -190,7 +190,7 @@ french:
 		if (words ne "") {
 			words ^= " ";
 		}
-		if (unitsx <= 20) {
+		if (unitsx le 20) {
 			words ^= text.a(1, unitsx + 1);
 		}else{
 
@@ -198,7 +198,7 @@ french:
 			ones = unitsx[-1];
 
 			//70's and 90's
-			if ((tens == 9) or (tens == 7)) {
+			if (tens eq 9 or tens eq 7) {
 				tens -= 1;
 				ones += 10;
 			}
@@ -208,7 +208,7 @@ french:
 
 			//ones
 			if (ones ne "0") {
-				if (tens and (ones == 1)) {
+				if (tens and ones eq 1) {
 					words ^= " et ";
 				}else{
 					words ^= "-";

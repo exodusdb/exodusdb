@@ -76,10 +76,10 @@ function main(out bakpars, in process0=var()) {
 
 	//if bakpars<3>='' then bakpars<3>='2:00'
 	//if bakpars<4>='' then bakpars<4>='2:05'
-	if (minbaktime == "") {
+	if (minbaktime eq "") {
 		bakpars.r(3, "1:00");
 	}
-	if (maxbaktime == "") {
+	if (maxbaktime eq "") {
 		bakpars.r(4, "1:05");
 	}
 	if (not(minbaktime.isnum())) {
@@ -88,22 +88,22 @@ function main(out bakpars, in process0=var()) {
 	if (not(maxbaktime.isnum())) {
 		bakpars.r(4, maxbaktime.iconv("MT"));
 	}
-	if (bakdows == "") {
+	if (bakdows eq "") {
 		bakpars.r(5, "1234567");
 	}
 
 	//fix bug in data entry that allows : and :: to be entered
-	if (bakdisk[1] == ":") {
+	if (bakdisk[1] eq ":") {
 		bakpars.r(7, "");
 	}
-	if (bakdisk2[1] == ":") {
+	if (bakdisk2[1] eq ":") {
 		bakpars.r(12, "");
 	}
 
 	if (not(bakdisk)) {
 		bakpars.r(7, "C:");
 	}
-	if (bakdisk2 == "") {
+	if (bakdisk2 eq "") {
 		bakpars.r(12, bakdisk);
 	}
 
@@ -127,9 +127,9 @@ function main(out bakpars, in process0=var()) {
 	}else{
 
 		//autodetermine if it is "test" data
-		if (baktestdata == "") {
+		if (baktestdata eq "") {
 			var testdata = 1;
-			if (process.a(17).substr(-4,4) == "TEST") {
+			if (process.a(17).substr(-4,4) eq "test") {
 			} else if (process.a(23).ucase().index("TRAINING")) {
 			} else if (process.a(23).ucase().index("TESTING")) {
 			} else {

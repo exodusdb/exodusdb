@@ -58,7 +58,7 @@ function main(in mode) {
 	var virtualroot = "../images/";
 	virtualroot.converter("/", OSSLASH);
 
-	if (mode == "POSTUPLOAD") {
+	if (mode eq "POSTUPLOAD") {
 
 		filename = USER0.a(3);
 		key = USER0.a(4);
@@ -107,7 +107,7 @@ postuploadfail:
 
 		gosub unlockfile();
 
-	} else if (mode.field(".", 1) == "MAKEUPLOADPATH") {
+	} else if (mode.field(".", 1) eq "MAKEUPLOADPATH") {
 
 		if (not(authorised("UPLOAD CREATE", msg, ""))) {
 			return invalid(msg);
@@ -117,7 +117,7 @@ postuploadfail:
 		filename = USER0.a(3);
 		key = USER0.a(4);
 		var ensurenotlocked = USER0.a(5);
-		if (ensurenotlocked == "undefined") {
+		if (ensurenotlocked eq "undefined") {
 			ensurenotlocked = "";
 		}
 		if (filename and ensurenotlocked) {
@@ -131,7 +131,7 @@ postuploadfail:
 		}
 
 		var uploadpath = mode.field(".", 2, 9999).lcase();
-		if (uploadpath == "") {
+		if (uploadpath eq "") {
 			return 0;
 		}
 		var tt = "\\";
@@ -190,7 +190,7 @@ postuploadfail:
 				//if result else
 				//osopen fullsubfolder to xx else if status() ne 2 then
 				if (errors) {
-					if (USERNAME == "EXODUS") {
+					if (USERNAME eq "EXODUS") {
 						msg = fullsubfolder;
 					}else{
 						msg = "(uploadroot)" ^ subfolder;
@@ -203,7 +203,7 @@ postuploadfail:
 			}
 		};//subfoldern;
 
-	} else if (mode.field(".", 1) == "VERIFYUPLOAD") {
+	} else if (mode.field(".", 1) eq "VERIFYUPLOAD") {
 
 		//similar in VERIFY AND DELETEUPLOAD
 		var uploadpath = mode.field(".", 2, 9999).lcase();
@@ -214,12 +214,12 @@ postuploadfail:
 		//initdir uploadroot:uploadpath
 		//if dirlist() else
 		var tt = (shell2("dir " ^ ((uploadroot ^ uploadpath).quote()) ^ " /b", errors)).ucase();
-		if ((tt == "") or tt.index("FILE NOT FOUND")) {
+		if (tt eq "" or tt.index("FILE NOT FOUND")) {
 			msg = "Error: Nothing uploaded in " ^ uploadroot ^ uploadpath;
 			return invalid(msg);
 		}
 
-	} else if (mode.field(".", 1) == "OPENUPLOAD") {
+	} else if (mode.field(".", 1) eq "OPENUPLOAD") {
 
 		USER1 = virtualroot;
 		//data<2>=filenames
@@ -253,7 +253,7 @@ postuploadfail:
 		//why does % come encoded as %25?
 		dirpatt.swapper("%25", "%");
 
-		if (USER0.a(3) == "NEW") {
+		if (USER0.a(3) eq "NEW") {
 			if (oslistf(dirpatt)) {
 				var cmd = "rm " ^ (dirpatt.quote());
 				osshell(cmd);
@@ -304,7 +304,7 @@ postuploadfail:
 		//  end
 		// end
 
-	} else if (mode.field(".", 1) == "DELETEUPLOAD") {
+	} else if (mode.field(".", 1) eq "DELETEUPLOAD") {
 
 		if (not(authorised("UPLOAD DELETE", msg, ""))) {
 			return invalid(msg);
@@ -319,7 +319,7 @@ postuploadfail:
 		//initdir uploadroot:uploadpath
 		//if dirlist() else
 		var tt = (shell2("dir " ^ ((uploadroot ^ uploadpath).quote()) ^ " /b", errors)).ucase();
-		if ((tt == "") or tt.index("FILE NOT FOUND")) {
+		if (tt eq "" or tt.index("FILE NOT FOUND")) {
 			msg = "Error: Nothing uploaded in " ^ uploadroot ^ uploadpath;
 			return invalid(msg);
 		}
@@ -338,7 +338,7 @@ postuploadfail:
 			return invalid(msg);
 		}
 
-	} else if (mode == "IMPORT") {
+	} else if (mode eq "IMPORT") {
 		var uploadpath = RECORD.a(1);
 		var startatrown = RECORD.a(2);
 		var headertype = RECORD.a(3);
@@ -432,7 +432,7 @@ postuploadfail:
 			gosub getline();
 			///BREAK;
 			if (not(not(eof))) break;
-			if (line and (linenox >= startatrown)) {
+			if (line and linenox ge startatrown) {
 
 				//determine cols from first col heading
 				if (not(cols)) {
@@ -456,7 +456,7 @@ postuploadfail:
 				}else{
 
 					//first record, open files and create dictionary
-					if (file == "") {
+					if (file eq "") {
 
 						if (not(file.open(filename, ""))) {
 							call fsmsg();
@@ -594,7 +594,7 @@ subroutine cleanup() {
 
 subroutine getline() {
 
-	if (buff.length() < lengthx) {
+	if (buff.length() lt lengthx) {
 
 addbuff:
 ////////
@@ -618,7 +618,7 @@ addbuff:
 	//skip empty lines
 	while (true) {
 		///BREAK;
-		if (not(buff[1] == "\r")) break;
+		if (not(buff[1] eq "\r")) break;
 		buff.splicer(1, 1, "");
 	}//loop;
 	if (not(buff.length())) {

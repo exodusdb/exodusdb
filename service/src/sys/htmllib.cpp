@@ -36,7 +36,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 		params2 = params20;
 	}
 
-	if (mode == "TABLE.MAKE") {
+	if (mode eq "TABLE.MAKE") {
 		datax.trimmer();
 		var tt = " " ^ VM;
 		while (true) {
@@ -99,11 +99,11 @@ function main(in mode, io datax, in params0="", in params20="") {
 		datax.converter(FM ^ VM, "");
 
 	//fill in the missing cells
-	} else if (mode == "TABLE.FILL") {
+	} else if (mode eq "TABLE.FILL") {
 		filler = "<TD>&nbsp;</TD>";
 		gosub fill(datax);
 
-	} else if (mode == "HASHTABLE") {
+	} else if (mode eq "HASHTABLE") {
 
 		var nv = datax.count(VM) + 1;
 		for (var vn = 1; vn <= nv; ++vn) {
@@ -118,11 +118,11 @@ function main(in mode, io datax, in params0="", in params20="") {
 			data2.converter(TM, FM);
 
 			var nlines = data2.count(FM) + 1;
-			if (nlines > 1) {
+			if (nlines gt 1) {
 
 				for (var ln = 1; ln <= nlines; ++ln) {
 					var line = data2.a(ln).trim();
-					if (line[1] == "#") {
+					if (line[1] eq "#") {
 						line.splicer(1, 1, "");
 						//if colon : present then before colon is the tag name
 						if (line.index(":")) {
@@ -133,7 +133,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 						var tt1 = line.field(tagsep, 1);
 						tt1.converter("_", " ");
 						var tt2 = line.field(tagsep, 2, 9999);
-						if (tt2[1] == "=") {
+						if (tt2[1] eq "=") {
 							tt2.splicer(1, 1, "");
 						}
 						data2.r(ln, td ^ tt1 ^ ":" ^ tdx ^ td ^ tt2 ^ tdx);
@@ -152,22 +152,22 @@ function main(in mode, io datax, in params0="", in params20="") {
 
 		};//vn;
 
-	} else if (mode == "STRIPTAGS") {
+	} else if (mode eq "STRIPTAGS") {
 		while (true) {
 			var tag1 = datax.index("<");
 			var tag2 = datax.index(">");
 			///BREAK;
-			if (not(tag1 and (tag1 < tag2))) break;
+			if (not(tag1 and tag1 lt tag2)) break;
 			datax.splicer(tag1, tag2 - tag1 + 1, "");
 		}//loop;
 
-	} else if (mode == "DECODEHTML") {
+	} else if (mode eq "DECODEHTML") {
 		datax.swapper("&nbsp;", " ");
 		datax.swapper("&lt;", "<");
 		datax.swapper("&gt;", ">");
 		datax.swapper("&amp;", "&");
 
-	} else if (mode.field(".", 1, 2) == "OCONV.AGENT") {
+	} else if (mode.field(".", 1, 2) eq "OCONV.AGENT") {
 
 		//to check versus DOS BROWSERS.TXT
 		//GET NEW RUN GBP2 CHK.AGENTSTRING
@@ -248,7 +248,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 			}
 			if (tt) {
 				osname = var(agent).substr(tt,9999);
-				if (osname.substr(1,4) == "CPU ") {
+				if (osname.substr(1,4) eq "CPU ") {
 					osname.splicer(1, 3, "iPad");
 				}
 				tt = osname.index(" like ");
@@ -260,7 +260,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 				osname.swapper(" x86_64", "-64");
 			}
 		}
-		if (osname.substr(-2,2) == ".0") {
+		if (osname.substr(-2,2) eq ".0") {
 			osname.splicer(-2, 2, "");
 		}
 
@@ -324,15 +324,15 @@ function main(in mode, io datax, in params0="", in params20="") {
 				browser = var(agent).substr(tt,9999).field(";", 1).field(" ", 1).field(")", 1);
 			}
 		}
-		if (browser.substr(-2,2) == ".0") {
+		if (browser.substr(-2,2) eq ".0") {
 			browser.splicer(-2, 2, "");
 		}
 
 		var submode = mode.field(".", 3);
-		if (submode == "OS") {
+		if (submode eq "OS") {
 			agent = osname;
 			return 0;
-		} else if (submode == "BROWSER") {
+		} else if (submode eq "BROWSER") {
 			agent = browser;
 			return 0;
 		}
@@ -367,7 +367,7 @@ subroutine fill(io datax) {
 	var n2 = 0;
 	for (var ii = 1; ii <= nn; ++ii) {
 		var tt = datax.a(ii).count(VM) + 1;
-		if (tt > n2) {
+		if (tt gt n2) {
 			n2 = tt;
 		}
 	};//ii;
@@ -375,7 +375,7 @@ subroutine fill(io datax) {
 		//make sure all columns are filled
 	for (var ii = 1; ii <= nn; ++ii) {
 		for (var i2 = 1; i2 <= n2; ++i2) {
-			if (datax.a(ii, i2) == "") {
+			if (datax.a(ii, i2) eq "") {
 				datax.r(ii, i2, filler);
 			}
 		};//i2;

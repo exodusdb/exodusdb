@@ -114,6 +114,8 @@ and therefore causes a non-numeric error if you include a non-numeric value in a
 #include <string>
 #include <vector>
 
+#include <mutex>
+
 // questionable MS language "extensions" disable some standard C++ keywords ... restore them
 // http://members.ozemail.com.au/~geoffch/samples/programming/msvc/cl/options/z$e.htm
 // complete list of c/c++ keywords is
@@ -180,6 +182,9 @@ namespace exodus
 // the argument for utf16 http://www.unicode.org/notes/tn12/ (utf8/32 cannot handle binary because
 // of illegal byte sequences) win32/java/icu/python is utf16 but situation is not so clear on unix
 // (where char is 32bit) but see http://std.dkuug.dk/JTC1/SC22/WG14/www/docs/n1040.pdf for <uchar.h>
+
+#define LOCKIOSTREAM std::lock_guard<std::mutex> guard(global_mutex_threadstream);
+static std::mutex global_mutex_threadstream;
 
 class dim;
 class var__extractreplace;
@@ -899,7 +904,7 @@ class DLL_PUBLIC var final
 	bool eof() const;
 
 	DLL_PUBLIC friend std::istream& operator>>(std::istream& istream1, var& var1);
-	DLL_PUBLIC friend std::ostream& operator<<(std::ostream& ostream1, const var& var1);
+	DLL_PUBLIC friend std::ostream& operator<<(std::ostream& ostream1, var var1);
 
 	// friend bool operator<<(const var&);
 
@@ -1687,14 +1692,8 @@ DLL_PUBLIC var operator^(var&& var1, const char* char2);
 DLL_PUBLIC var operator^(var&& var1, const int int2);
 DLL_PUBLIC var operator^(var&& var1, const double double2);
 
-// allow use of wcout<<var
-// shouldnt this be disallowed and only output to cout with conversion to utf8 allowed?
-#if defined __MINGW32__
-DLL_PUBLIC std::ostream& operator<<(std::ostream& o, const var& var1);
-#else
-DLL_PUBLIC std::ostream& operator<<(std::ostream& o, const var& var1);
-#endif
-// ostream& operator<< (ostream& o,const var& var1);
+// allow use of wcout<<var (by value since we will convert FM VM SM to ^]\ etc.
+DLL_PUBLIC std::ostream& operator<<(std::ostream& o, var var1);
 
 //#ifdef false //allow use of cin>>var
 // wistream& operator>> (wistream& i,var var1);

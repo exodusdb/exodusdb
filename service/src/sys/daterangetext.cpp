@@ -29,20 +29,20 @@ function main(in d1, in d2, out result, io lang) {
 	tt.r(1, tt.a(1) + 0);
 	tt.r(4, tt.a(4) + 0);
 
-	if (tt.a(3) == tt.a(6)) {
+	if (tt.a(3) eq tt.a(6)) {
 		//dont show both years if same
 		tt.r(3, "");
-		if (tt.a(2) == tt.a(5)) {
+		if (tt.a(2) eq tt.a(5)) {
 			//dont show both months if same year and month
 			tt.r(2, "");
 		}
 	}
 
 	//dont show start and end day of month if complete calendar months
-	if (tt.a(1) == 1) {
+	if (tt.a(1) eq 1) {
 		//calculate end of month of stop date
 		t2 = iconv(t2.oconv("D2/E").field("/", 2, 2), "[DATEPERIOD]");
-		if (tt.a(4) == t2.oconv("D2/E").field("/", 1)) {
+		if (tt.a(4) eq t2.oconv("D2/E").field("/", 1)) {
 			tt.r(1, "");
 			tt.r(4, "");
 		}
@@ -57,13 +57,13 @@ function main(in d1, in d2, out result, io lang) {
 	}
 
 	//eliminate first dom if same dom
-	if (((tt.a(1) == tt.a(4)) and not(tt.a(2))) and not(tt.a(3))) {
+	if ((tt.a(1) eq tt.a(4) and not(tt.a(2))) and not(tt.a(3))) {
 		tt.r(1, "");
 	}
 
 	//add hyphen if still a range
-	if (not(tt.substr(1,3) == (FM ^ FM ^ FM))) {
-		if ((tt.a(2) == "") and (tt.a(3) == "")) {
+	if (not(tt.substr(1,3) eq (FM ^ FM ^ FM))) {
+		if (tt.a(2) eq "" and tt.a(3) eq "") {
 			tt.r(3, tt.a(3) ^ " ^ ");
 		}else{
 			tt.r(3, tt.a(3) ^ " - ");

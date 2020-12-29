@@ -54,7 +54,7 @@ function main(in inputfilename, in encoding1i, in encoding2i, out result, out ms
 	}
 
 	//determine the encoding1
-	if (encoding1 == "CODEPAGE") {
+	if (encoding1 eq "CODEPAGE") {
 		call osgetenv("CODEPAGE", encoding1);
 		var oemcodepages = "437" _VM_ "720" _VM_ "737" _VM_ "775" _VM_ "850" _VM_ "852" _VM_ "855" _VM_ "857" _VM_ "858" _VM_ "862" _VM_ "866" _VM_ "874" _VM_ "932" _VM_ "936" _VM_ "949" _VM_ "950" _VM_ "1258";
 		var wincodepages = "1252" _VM_ "1256" _VM_ "1253" _VM_ "1257" _VM_ "1252" _VM_ "1252" _VM_ "1251" _VM_ "1254" _VM_ "1252" _VM_ "1255" _VM_ "1251" _VM_ "874" _VM_ "932" _VM_ "936" _VM_ "949" _VM_ "950" _VM_ "874";
@@ -69,13 +69,13 @@ function main(in inputfilename, in encoding1i, in encoding2i, out result, out ms
 
 	//dont convert if latin
 	//hopefully to reduce chance of screwups/reduce filesize when latin
-	if (encoding1 == 1252) {
+	if (encoding1 eq 1252) {
 		result = 1;
 		return 0;
 	}
 
 	//determine the encoding2
-	if (encoding2 == "CODEPAGE") {
+	if (encoding2 eq "CODEPAGE") {
 		call osgetenv("CODEPAGE", encoding2);
 	}
 	if (not encoding2) {

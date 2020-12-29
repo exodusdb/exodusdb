@@ -20,7 +20,7 @@ function main(in alerttype0, in runasuser, out tasks, out title, out request, ou
 
 	var mode = "";
 
-	if (alerttype == "CURRUSERS") {
+	if (alerttype eq "CURRUSERS") {
 		tasks = "AUTHORISATION ACCESS";
 		title = "List of Current Users";
 		request = "LISTAUTH.USERS";

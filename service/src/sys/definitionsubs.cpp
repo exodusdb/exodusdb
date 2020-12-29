@@ -37,7 +37,7 @@ function main(in mode) {
 
 	//use agp<> instead of @record<> to assist source code searching for agp<?>
 
-	if (ID == "TAXES") {
+	if (ID eq "TAXES") {
 		//call tax.subs(mode)
 		//make definition.subs independent for c++
 		systemsubs = "taxsubs";
@@ -45,7 +45,7 @@ function main(in mode) {
 		return 0;
 	}
 
-	if (ID == "ALL") {
+	if (ID eq "ALL") {
 		//call voucher.type.subs(mode)
 		//make definition.subs independent for c++
 		systemsubs = "vouchertypesubs";
@@ -53,7 +53,7 @@ function main(in mode) {
 		return 0;
 	}
 
-	if (ID == "TIMESHEET.PARAMS") {
+	if (ID eq "TIMESHEET.PARAMS") {
 		//call timesheetparam.subs(mode)
 		//make definition.subs independent for c++
 		systemsubs = "timesheetparamsubs";
@@ -63,7 +63,7 @@ function main(in mode) {
 
 	var systemcodes = "SYSTEM.CFG,SYSTEM,..\\..\\SYSTEM.CFG";
 
-	if (mode == "PREREAD") {
+	if (mode eq "PREREAD") {
 
 		//system configuration
 		//locate @id in 'SYSTEM.CFG,SYSTEM,..\..\SYSTEM.CFG' using ',' setting xx then
@@ -76,7 +76,7 @@ function main(in mode) {
 			}
 		}
 
-		if (ID == "SECURITY*USERS") {
+		if (ID eq "SECURITY*USERS") {
 			ID = "SECURITY";
 			win.templatex = "USERS";
 			if (not(authorised("USER LIST", msg, "USER ACCESS"))) {
@@ -85,7 +85,7 @@ function main(in mode) {
 			return 0;
 		}
 
-	} else if (mode == "POSTREAD") {
+	} else if (mode eq "POSTREAD") {
 
 		//NB also called from postwrite
 
@@ -105,7 +105,7 @@ function main(in mode) {
 			smtpkey.swapper("SYSTEM", "SMTP");
 
 			// backup rec on definitions
-			if (ID == "SYSTEM") {
+			if (ID eq "SYSTEM") {
 				if (not(backuprec.read(DEFINITIONS, backupkey))) {
 					backuprec = "";
 				}
@@ -135,9 +135,9 @@ function main(in mode) {
 
 		}
 
-		if (ID == "SECURITY") {
+		if (ID eq "SECURITY") {
 
-			if (win.templatex == "USERS") {
+			if (win.templatex eq "USERS") {
 				if (VOLUMES) {
 					RECORD = RECORD.invert();
 				}
@@ -146,7 +146,7 @@ function main(in mode) {
 
 			//template now provided by readenvironment in client
 			//either SECURITY or HOURLYRATES
-			if (win.templatex == "") {
+			if (win.templatex eq "") {
 				win.templatex = "SECURITY";
 			}
 			call securitysubs("SETUP");
@@ -154,7 +154,7 @@ function main(in mode) {
 		}
 
 		//default cheque format
-		if (win.wlocked and (ID.field("*", 1) == "CHEQUEDESIGN")) {
+		if (win.wlocked and ID.field("*", 1) eq "CHEQUEDESIGN") {
 
 			//prevent update
 			if (not(authorised("CHEQUE DESIGN", msg, "UA"))) {
@@ -198,7 +198,7 @@ nochequeformat:
 		//INDEXVALUES*PLANS*EXECUTIVE_CODE
 		//INDEXVALUES*SCHEDULES*EXECUTIVE_CODE
 		//INDEXVALUES*JOBS*EXECUTIVE_CODE
-		if (ID.field("*", 1) == "INDEXVALUES") {
+		if (ID.field("*", 1) eq "INDEXVALUES") {
 
 			//currently only EXECUTIVE from UI
 			//default to authorised ATM
@@ -231,7 +231,7 @@ nochequeformat:
 			//return
 		}
 
-		if (ID.field("*", 2) == "ANALDESIGN") {
+		if (ID.field("*", 2) eq "ANALDESIGN") {
 
 			//check allowed access
 			if (not(authorised("BILLING REPORT ACCESS", msg, ""))) {
@@ -260,7 +260,7 @@ preventupdate:
 			return 0;
 		}
 
-		if (ID == "AGENCY.PARAMS") {
+		if (ID eq "AGENCY.PARAMS") {
 
 			//configuration is locked to EXODUS initially
 			if (not(authorised("AGENCY CONFIGURATION UPDATE", xx, "EXODUS"))) {
@@ -271,14 +271,14 @@ preventupdate:
 
 		gosub postreadfix();
 
-	} else if (mode == "PREWRITE") {
+	} else if (mode eq "PREWRITE") {
 
-		if (ID == "SECURITY") {
+		if (ID eq "SECURITY") {
 
 			//no difference between security update and hourlyrate update now
 			//template='SECURITY'
 			//now there is!
-			if (win.templatex == "") {
+			if (win.templatex eq "") {
 				win.templatex = "SECURITY";
 			}
 
@@ -288,7 +288,7 @@ preventupdate:
 		}
 
 		//save cheque design for exodus
-		if (ID.field("*", 1) == "CHEQUEDESIGN") {
+		if (ID.field("*", 1) eq "CHEQUEDESIGN") {
 
 			//prevent update
 			if (not(authorised("CHEQUE DESIGN", msg, "UA"))) {
@@ -311,7 +311,7 @@ preventupdate:
 				ID.field("*", 2).write(win.srcfile, "CHEQUEDESIGN*DEFAULT");
 
 				//if EXODUS then save the default as EXODUS programs default
-				if (USERNAME == "EXODUS") {
+				if (USERNAME eq "EXODUS") {
 					if (temp.open("ALANGUAGE", "")) {
 						RECORD.write(temp, "VOUCHERS**CHEQUE");
 					}
@@ -335,7 +335,7 @@ preventupdate:
 		//this is also done in copygbp perhaps could be removed from there
 		//almost identical code in definition.subs and get.subs (for documents)
 		//field 10 in documents and definitions xxx*analdesign means the same
-		if (((ID.field("*", 2) == "ANALDESIGN") and (USERNAME == "EXODUS")) and RECORD.a(10)) {
+		if ((ID.field("*", 2) eq "ANALDESIGN" and USERNAME eq "EXODUS") and RECORD.a(10)) {
 			var reports;
 			if (reports.open("REPORTS", "")) {
 				var key = ID;
@@ -345,7 +345,7 @@ preventupdate:
 			}
 		}
 
-		if (ID == "AGENCY.PARAMS") {
+		if (ID eq "AGENCY.PARAMS") {
 
 			//prevent changing "invno by company" after data is entered
 			if (RECORD.a(48) ne win.orec.a(48)) {
@@ -384,17 +384,17 @@ preventupdate:
 			var t49 = field2(RECORD.a(49), VM, -1);
 			var t149 = field2(RECORD.a(149), VM, -1);
 			var t150 = field2(RECORD.a(150), VM, -1);
-			if (t49 and (t49 == t149)) {
+			if (t49 and t49 eq t149) {
 				msg = "Media adjustment no pattern must be different from Media invoice no pattern, or left blank";
 				return invalid(msg);
 			}
 
-			if (t49 and (t49 == t150)) {
+			if (t49 and t49 eq t150) {
 				msg = "Media credit note no pattern must be different from Media invoice no pattern, or left blank";
 				return invalid(msg);
 			}
 
-			if (t149 and (t149 == t150)) {
+			if (t149 and t149 eq t150) {
 				msg = "Media adjustment no pattern must be different from Media credit note no pattern, or left blank";
 				return invalid(msg);
 			}
@@ -409,7 +409,7 @@ preventupdate:
 				return invalid(msg);
 			}
 
-			if (((RECORD.a(146) and (RECORD.a(46) == RECORD.a(146))) or ((RECORD.a(147) and (RECORD.a(46) == RECORD.a(147))))) or ((RECORD.a(147) and (RECORD.a(146) == RECORD.a(147))))) {
+			if (((RECORD.a(146) and RECORD.a(46) eq RECORD.a(146)) or ((RECORD.a(147) and RECORD.a(46) eq RECORD.a(147)))) or ((RECORD.a(147) and RECORD.a(146) eq RECORD.a(147)))) {
 				msg = "Media Accounting Voucher type codes must all be different (or left blank)";
 				return invalid(msg);
 			}
@@ -426,7 +426,7 @@ preventupdate:
 
 		}
 
-	} else if (mode == "POSTWRITE") {
+	} else if (mode eq "POSTWRITE") {
 
 		//system configuration
 		if (systemcodes.locateusing(",",ID,xx)) {
@@ -447,12 +447,12 @@ preventupdate:
 			tt = RECORD.a(46);
 			tt.converter(VM, "");
 			tt.swapper("Default", "");
-			if (tt == "") {
+			if (tt eq "") {
 				RECORD.r(46, "");
 			}
 
 			//write backup rec on definitions
-			if (ID == "SYSTEM") {
+			if (ID eq "SYSTEM") {
 
 				//get lastbackupdate in unlikely event that it has changed during update
 				if (not(tt.readv(DEFINITIONS, backupkey, 1))) {
@@ -525,10 +525,10 @@ preventupdate:
 		}
 
 		//have to pass back the inverted, partial record
-		if (ID == "SECURITY") {
+		if (ID eq "SECURITY") {
 
 			//could be HOURLYRATES which has different authorisation
-			if (win.templatex == "") {
+			if (win.templatex eq "") {
 				win.templatex = "SECURITY";
 			}
 
@@ -552,7 +552,7 @@ preventupdate:
 			}
 		}
 
-	} else if (mode == "PREDELETE") {
+	} else if (mode eq "PREDELETE") {
 
 		//system configuration
 		//locate @id in 'SYSTEM.CFG,SYSTEM,..\..\SYSTEM.CFG' using ',' setting xx then
@@ -573,12 +573,12 @@ preventupdate:
 
 		}
 
-		if (ID == "SECURITY") {
+		if (ID eq "SECURITY") {
 			msg = "DELETE SECURITY not allowed in DEFINITION.SUBS";
 			return invalid(msg);
 		}
 
-		if (ID.field("*", 2) == "ANALDESIGN") {
+		if (ID.field("*", 2) eq "ANALDESIGN") {
 
 			//prevent update
 			if (not(authorised("CHEQUE DESIGN", msg, "UA"))) {
@@ -597,7 +597,7 @@ preventupdate:
 		}
 
 		//remove default cheque design
-		if (ID.field("*", 1) == "CHEQUEDESIGN") {
+		if (ID.field("*", 1) eq "CHEQUEDESIGN") {
 			if (RECORD.a(14)) {
 				win.srcfile.deleterecord("CHEQUEDESIGN*DEFAULT");
 
@@ -607,7 +607,7 @@ preventupdate:
 		//update exodus standard (in case doing this on the programming system)
 		//%DELETED% ensures that deleted EXODUS documents get deleted
 		//on upgrading clients
-		if (((ID.field("*", 2) == "ANALDESIGN") and (USERNAME == "EXODUS")) and RECORD.a(10)) {
+		if ((ID.field("*", 2) eq "ANALDESIGN" and USERNAME eq "EXODUS") and RECORD.a(10)) {
 			var reports;
 			if (reports.open("REPORTS", "")) {
 				var key = ID;
@@ -620,9 +620,9 @@ preventupdate:
 			}
 		}
 
-	} else if (mode == "POSTDELETE") {
+	} else if (mode eq "POSTDELETE") {
 
-	} else if (mode == "REORDERDBS") {
+	} else if (mode eq "REORDERDBS") {
 		gosub reorderdbs();
 
 	} else {
@@ -688,62 +688,62 @@ subroutine reorderdbs() {
 }
 
 subroutine postreadfix() {
-	if (ID == "AGENCY.PARAMS") {
+	if (ID eq "AGENCY.PARAMS") {
 
 		if (VOLUMES) {
 			RECORD.r(1, RECORD.a(1).invert());
 		}
 
-		if (RECORD.a(55) == "") {
+		if (RECORD.a(55) eq "") {
 			RECORD.r(55, "Budget");
 		}
-		if (RECORD.a(56) == "") {
+		if (RECORD.a(56) eq "") {
 			RECORD.r(56, "F/cast");
 		}
-		if (RECORD.a(72) == "") {
+		if (RECORD.a(72) eq "") {
 			RECORD.r(72, "Media Plan");
 		}
-		if (RECORD.a(73) == "") {
+		if (RECORD.a(73) eq "") {
 			RECORD.r(73, "Media Schedule");
 		}
-		if (RECORD.a(74) == "") {
+		if (RECORD.a(74) eq "") {
 			RECORD.r(74, "Estimate");
 		}
 
-		if (RECORD.a(49) == "") {
+		if (RECORD.a(49) eq "") {
 			RECORD.r(49, "<NUMBER>");
 		}
-		if (RECORD.a(49, 1, 2) == "") {
+		if (RECORD.a(49, 1, 2) eq "") {
 			RECORD.r(49, 1, 2, "2000.01");
 		}
-		if (RECORD.a(50) == "") {
+		if (RECORD.a(50) eq "") {
 			RECORD.r(50, "<NUMBER>");
 		}
-		if (RECORD.a(50, 1, 2) == "") {
+		if (RECORD.a(50, 1, 2) eq "") {
 			RECORD.r(50, 1, 2, "2000.01");
 		}
 
 		//done in agency.subs getnextid
-		if (RECORD.a(53) == "") {
+		if (RECORD.a(53) eq "") {
 			RECORD.r(53, "<NUMBER>");
 		}
-		if (RECORD.a(63) == "") {
+		if (RECORD.a(63) eq "") {
 			RECORD.r(63, "<NUMBER>");
 		}
-		if (RECORD.a(69) == "") {
+		if (RECORD.a(69) eq "") {
 			RECORD.r(69, "<NUMBER>");
 		}
-		if (RECORD.a(70) == "") {
+		if (RECORD.a(70) eq "") {
 			RECORD.r(70, "<NUMBER>");
 		}
-		if (RECORD.a(71) == "") {
+		if (RECORD.a(71) eq "") {
 			RECORD.r(71, "<NUMBER>");
 		}
 
-		if (RECORD.a(25) == "") {
+		if (RECORD.a(25) eq "") {
 			RECORD.r(25, "ACC<YEAR>");
 		}
-		if (RECORD.a(26) == "") {
+		if (RECORD.a(26) eq "") {
 			RECORD.r(26, "WIP<YEAR>");
 		}
 

@@ -45,7 +45,7 @@ THE SOFTWARE.
 namespace exodus
 {
 
-DLL_PUBLIC int exodus_main(int exodus__argc, char* exodus__argv[], MvEnvironment& mv, int environmentno);
+DLL_PUBLIC int exodus_main(int exodus__argc, const char* exodus__argv[], MvEnvironment& mv, int environmentno);
 
 DLL_PUBLIC var osgetenv(const var& name = "");
 DLL_PUBLIC bool osgetenv(const var& name, var& value);
@@ -349,82 +349,118 @@ DLL_PUBLIC bool locateusing(const var& usingchar, const var& target, const var& 
 DLL_PUBLIC var sum(const var& instring, const var& sepchar);
 DLL_PUBLIC var sum(const var& instring);
 
-//print()
+// std::cout
+////////////
+
+// print()
 template<typename... Printable>
 DLL_PUBLIC void print(Printable... value)
 {
-	(var(value).output(), ...);
+	LOCKIOSTREAM
+	//(var(value).output(), ...);
+	((std::cout << value), ...);
 }
 
-//printl()
+// printl()
 template<typename... Printable>
 DLL_PUBLIC void printl(Printable... value)
 {
-	(var(value).output(), ...);
-	var("").outputl();
+	LOCKIOSTREAM
+	//(var(value).output(), ...);
+	//var("").outputl();
+	((std::cout << value), ...);
+	std::cout << std::endl;
 }
 
-//printt()
+// printt()
 template<typename... Printable>
 DLL_PUBLIC void printt(Printable... value)
 {
-	(var(value).outputt(), ...);
+	LOCKIOSTREAM
+	//(var(value).outputt(), ...);
+	((std::cout << value << "\t"), ...);
 }
 
-//output same as print()
+/* dont include this because "output" should not convert unprintable field marks to unusual ASCII
+
+// output alias of print()
 template<typename... Printable>
 DLL_PUBLIC void output(Printable... value)
 {
-	(var(value).output(), ...);
+	LOCKIOSTREAM
+	//(var(value).output(), ...);
+	((std::cout << value), ...);
 }
 
-//outputl() same as printl()
+// outputl() alias of printl()
 template<typename... Printable>
 DLL_PUBLIC void outputl(Printable... value)
 {
-	(var(value).output(), ...);
-	var("").outputl();
+	LOCKIOSTREAM
+	//(var(value).output(), ...);
+	//var("").outputl();
+	((std::cout << value), ...);
+	std::cout << std::endl;
 }
 
-//outputt() same as printt()
+// outputt() alias of printt()
 template<typename... Printable>
 DLL_PUBLIC void outputt(Printable... value)
 {
-	(var(value).outputt(), ...);
+	LOCKIOSTREAM
+	//(var(value).outputt(), ...);
+	((std::cout << value << "\t"), ...);
 }
+*/
 
-//errput()
+// std::cerr
+////////////
+
+// errput()
 template<typename... Printable>
 DLL_PUBLIC void errput(Printable... value)
 {
-	(var(value).errput(), ...);
+	LOCKIOSTREAM
+	//(var(value).errput(), ...);
+	((std::cerr << value), ...);
 }
 
-//errputl()
+// errputl()
 template<typename... Printable>
 DLL_PUBLIC void errputl(Printable... value)
 {
-	(var(value).errput(), ...);
-	var("").errputl();
+	LOCKIOSTREAM
+	//(var(value).errput(), ...);
+	//var("").errputl();
+	((std::cerr << value), ...);
+	std::cerr << std::endl;
 }
 
-//logput()
+// std::clog
+////////////
+
+// logput()
 template<typename... Printable>
 DLL_PUBLIC void logput(Printable... value)
 {
-	(var(value).logput(), ...);
+	LOCKIOSTREAM
+	//(var(value).logput(), ...);
+	((std::clog << value), ...);
 }
 
-//logputl()
+// logputl()
 template<typename... Printable>
 DLL_PUBLIC void logputl(Printable... value)
 {
-	(var(value).logput(), ...);
-	var("").logputl();
+	LOCKIOSTREAM
+	//(var(value).logput(), ...);
+	//var("").logputl();
+	((std::clog << value), ...);
+	std::clog << std::endl;
 }
 
 #define TRACE(EXPRESSION) \
-        var(EXPRESSION).convert(_FM_ _VM_ _SM_,"^]\\").quote().outputl(" " #EXPRESSION "=");
+        var(EXPRESSION).convert(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_,"_^]\[/").quote().outputl(" " #EXPRESSION "=");
 
 } // namespace exodus
 

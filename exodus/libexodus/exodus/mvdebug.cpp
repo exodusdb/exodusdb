@@ -496,6 +496,12 @@ void var::breakoff() const
 void var::breakon() const
 {
 	signal(SIGINT, SIGINT_handler); /* this line will redirect ctrl+c signal*/
+
+	//turn off text input and output signals to prevent breaking out into gdb debugger
+	//http://curiousthing.org/sigttin-sigttou-deep-dive-linux
+    //signal(SIGTTIN, SIG_IGN);
+    //signal(SIGTTOU, SIG_IGN);
+
 }
 
 } // namespace exodus

@@ -4,7 +4,7 @@ libraryinit()
 function main(in type, in inx, in mode, out outx) {
 	//c sys in,in,in,out
 
-	if (inx == "") {
+	if (inx eq "") {
 		outx = "";
 		return 0;
 	}
@@ -21,7 +21,7 @@ function main(in type, in inx, in mode, out outx) {
 	var timemode = mode.field(",", 2);
 
 	var status = 0;
-	if (type == "OCONV") {
+	if (type eq "OCONV") {
 
 		var in1 = inx.field(".", 1);
 		var in2 = inx.field(".", 2);
@@ -51,19 +51,19 @@ function main(in type, in inx, in mode, out outx) {
 			in2 = (in2 + SW.a(1) + .5).floor();
 			var in2orig = in2;
 			in2 = in2 % 86400;
-			if (in2 < in2orig) {
+			if (in2 lt in2orig) {
 				in1 += 1;
-			} else if (in2 > in2orig) {
+			} else if (in2 gt in2orig) {
 				in1 -= 1;
 			}
 		}
 
 		//use MT since date and time are now local
-		if (timemode == "") {
+		if (timemode eq "") {
 			timemode = "MT";
 
 		//numeric means just convert to local date time numeric ddddd.ttttt
-		} else if (timemode == "NUMERIC") {
+		} else if (timemode eq "NUMERIC") {
 			if (dostime) {
 				outx = (in1 + in2 / 86400).oconv("MD50P");
 			}else{
@@ -74,7 +74,7 @@ function main(in type, in inx, in mode, out outx) {
 
 		outx = oconv(in1, datemode) ^ " " ^ oconv(in2, timemode);
 
-	} else if (type == "ICONV") {
+	} else if (type eq "ICONV") {
 		outx = inx;
 		var odate = inx.field(" ", 1);
 		var otime = inx.field(" ", 2);

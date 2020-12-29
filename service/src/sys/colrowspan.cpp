@@ -35,7 +35,7 @@ function main(io colhdg, in thproperties, in nobase0) {
 	var nrows = 1;
 	for (var coln = 1; coln <= ncols2; ++coln) {
 		var tt = colhdg.a(coln).count(VM) + 1;
-		if (tt > nrows) {
+		if (tt gt nrows) {
 			nrows = tt;
 		}
 	};//coln;
@@ -47,7 +47,7 @@ function main(io colhdg, in thproperties, in nobase0) {
 		for (var coln = 1; coln <= ncols2; ++coln) {
 
 			var tt = colhdg.a(coln, rown);
-			if (tt == nocell) {
+			if (tt eq nocell) {
 				goto nextcoln;
 			}
 
@@ -65,13 +65,13 @@ function main(io colhdg, in thproperties, in nobase0) {
 				var coln2 = coln + colspan;
 				var t3 = colhdg.a(coln2, rown);
 				///BREAK;
-				if (not(((coln2 <= ncols2) and (t3 == tt)) and t3 ne nocell)) break;
+				if (not((coln2 le ncols2 and t3 eq tt) and t3 ne nocell)) break;
 				colspan += 1;
 				colhdg.r(coln2, rown, nocell);
 			}//loop;
 
 			//if usecols else t:=coldict(coln)<14>
-			if (colspan > 1) {
+			if (colspan gt 1) {
 				t2 ^= " colspan=" ^ colspan ^ " align=center";
 
 			}else{
@@ -81,12 +81,12 @@ function main(io colhdg, in thproperties, in nobase0) {
 					var rown2 = rown + rowspan;
 					var t3 = colhdg.a(coln, rown2);
 					///BREAK;
-					if (not(((rown2 <= nrows) and (((t3 == tt) or (t3 == "")))) and t3 ne nocell)) break;
+					if (not((rown2 le nrows and ((t3 eq tt or t3 eq ""))) and t3 ne nocell)) break;
 					rowspan += 1;
 					colhdg.r(coln, rown2, nocell);
 				}//loop;
 
-				if (rowspan > 1) {
+				if (rowspan gt 1) {
 					t2 ^= " rowspan=" ^ rowspan;
 				}
 			}

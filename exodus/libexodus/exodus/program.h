@@ -34,7 +34,7 @@
 //OPTION I=Ignore causes error exit to be suppressed
 #define programexit(PROGRAMNAME)                                                   \
 	classexit(PROGRAMNAME)                                                         \
-	int PROGRAMNAME##main2(int exodus__argc, char* exodus__argv[], int threadno)   \
+	int PROGRAMNAME##main2(int exodus__argc, const char* exodus__argv[], int threadno)   \
 	{                                                                              \
 		MvEnvironment mv;                                                          \
 		exodus_main(exodus__argc, exodus__argv, mv, threadno);                     \
@@ -78,7 +78,7 @@
 		}*/                                                                        \
 		return 0;                                                                  \
 	}                                                                              \
-	int PROGRAMNAME##main(int exodus__argc, char* exodus__argv[])                  \
+	int PROGRAMNAME##main(int exodus__argc, const char* exodus__argv[])            \
 	{                                                                              \
 		return PROGRAMNAME##main2(exodus__argc, exodus__argv, 0);                  \
 	}

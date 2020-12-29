@@ -95,11 +95,11 @@ function main(in mode0, out msg) {
 	}
 	datasetid = datasetid.a(1);
 
-	if (SENTENCE.field(" ", 1) == "CHKLIC") {
+	if (SENTENCE.field(" ", 1) eq "CHKLIC") {
 		mode = SENTENCE.field(" ", 2);
 	}
 
-	if (mode == "") {
+	if (mode eq "") {
 
 		var cmd = "LIST DEFINITIONS " ^ (lickey.quote()) ^ " LIC_FIELDS";
 		cmd ^= " HEADING " ^ (var("EXODUS LIC':'ENCES as at 'T'").quote());
@@ -107,12 +107,12 @@ function main(in mode0, out msg) {
 		stop();
 	}
 
-	if (mode == "TEST") {
+	if (mode eq "TEST") {
 		perform("CHKLIC2");
 		stop();
 	}
 
-	if (mode == "DELETE") {
+	if (mode eq "DELETE") {
 
 		if (not licxpresent) {
 			call mssg("NO LICENCES ARE INSTALLED - CANNOT DELETE");
@@ -127,7 +127,7 @@ function main(in mode0, out msg) {
 		var verification = sentencex.field(" ", 2);
 
 		//if incomplete command then prompt for verificationcode
-		if (verification == "") {
+		if (verification eq "") {
 			call note("PLEASE GIVE THE FOLLOWING TEXT TO YOUR EXODUS SUPPORT STAFF" ^ FM ^ FM ^ (lictext.quote()) ^ FM ^ FM ^ "What is the verification code?", "R", verification, "");
 			if (not verification) {
 				msg = "Verification code not entered";
@@ -160,7 +160,7 @@ function main(in mode0, out msg) {
 
 		return 0;
 
-	} else if (mode == "ADD") {
+	} else if (mode eq "ADD") {
 
 		var sentencex = SENTENCE.field("(", 1);
 		var options = SENTENCE.field("(", 2);
@@ -179,7 +179,7 @@ function main(in mode0, out msg) {
 			return 0;
 		}
 
-		if ((((modulenames == "") or (fromdate == "")) or (uptodate == "")) or (daysgrace == "")) {
+		if (((modulenames eq "" or fromdate eq "") or uptodate eq "") or daysgrace eq "") {
 			msg = "";
 			gosub syntax(msg);
 			return 0;
@@ -220,7 +220,7 @@ function main(in mode0, out msg) {
 		}
 
 		//check fromdate<uptodate
-		if (ifromdate >= iuptodate) {
+		if (ifromdate ge iuptodate) {
 			msg = "fromdate must be before uptodate";
 			gosub syntax(msg);
 			return 0;
@@ -234,27 +234,27 @@ function main(in mode0, out msg) {
 		}
 
 		//limit days grace
-		if (daysgrace > maxdaysgrace) {
+		if (daysgrace gt maxdaysgrace) {
 			msg = "the number of days grace is limited to " ^ maxdaysgrace;
 			return 0;
 		}
 
 		//limit the size of future licences, but not historical
 		var nfuturedays = iuptodate - var().date();
-		if (ifromdate > var().date()) {
+		if (ifromdate gt var().date()) {
 			nfuturedays -= ifromdate - var().date();
 		}
-		if (nfuturedays > maxlicencedays) {
+		if (nfuturedays gt maxlicencedays) {
 			msg = "the maximum licence period in the future is " ^ maxlicencedays ^ " days";
 			return 0;
 		}
 
 		//if incomplete command then prompt for verificationcode
-		if (((computerid == "") or (cmddatasetid == "")) or (verification == "")) {
-			if (computerid == "") {
+		if ((computerid eq "" or cmddatasetid eq "") or verification eq "") {
+			if (computerid eq "") {
 				computerid = cid();
 			}
-			if (cmddatasetid == "") {
+			if (cmddatasetid eq "") {
 				cmddatasetid = datasetid;
 			}
 			lictext = modulenames;
@@ -356,7 +356,7 @@ function main(in mode0, out msg) {
 	}
 
 	//ok if the exodus user
-	if (allowexodus and (USERNAME == "EXODUS")) {
+	if (allowexodus and USERNAME eq "EXODUS") {
 		goto ok;
 	}
 
@@ -367,27 +367,27 @@ function main(in mode0, out msg) {
 
 	msg = "EXODUS Lic" "ence: ";
 
-	if (win.datafile == "SCHEDULES") {
+	if (win.datafile eq "SCHEDULES") {
 		datedict = "STOPDATE";
 		chkmodulename = "MEDIA";
 
-	} else if (win.datafile == "PLANS") {
+	} else if (win.datafile eq "PLANS") {
 		datedict = "PERIOD_TO";
 		chkmodulename = "MEDIA";
 
-	} else if (win.datafile == "JOBS") {
+	} else if (win.datafile eq "JOBS") {
 		datedict = "YEAR_PERIOD";
 		chkmodulename = "JOBS";
 
-	} else if ((win.datafile == "PRODUCTION_INVOICES") or (win.datafile == "PRODUCTION_ORDERS")) {
+	} else if (win.datafile eq "PRODUCTION_INVOICES" or win.datafile eq "PRODUCTION_ORDERS") {
 		datedict = "DATE";
 		chkmodulename = "JOBS";
 
-	} else if (win.datafile == "JOURNALS") {
+	} else if (win.datafile eq "JOURNALS") {
 		datedict = "YEAR_PERIOD";
 		chkmodulename = "FINANCE";
 
-	} else if (win.datafile == "TIMESHEETS") {
+	} else if (win.datafile eq "TIMESHEETS") {
 		datedict = "DATE";
 		chkmodulename = "TIMESHEETS";
 
@@ -439,14 +439,14 @@ function main(in mode0, out msg) {
 		///BREAK;
 		if (not uptodate) break;
 		did = licx.a(4, licn);
-		if ((did == datasetid) and (docdate >= licx.a(2, licn))) {
+		if (did eq datasetid and docdate ge licx.a(2, licn)) {
 			modulename = licx.a(3, licn);
-			if (modulename == "*") {
+			if (modulename eq "*") {
 ok:
 				msg = "";
 				return 0;
 			}
-			if (modulename == chkmodulename) {
+			if (modulename eq chkmodulename) {
 				goto ok;
 			}
 		}
@@ -460,19 +460,19 @@ ok:
 	for (licn = 1; licn <= nlics; ++licn) {
 		modulename = licx.a(3, licn);
 		did = licx.a(4, licn);
-		if ((did == datasetid) and (((modulename == "*") or (modulename == chkmodulename)))) {
+		if (did eq datasetid and ((modulename eq "*" or modulename eq chkmodulename))) {
 
 			var expirydate = licx.a(1, licn);
 			var daysgrace = licx.a(5, licn);
 			var finalexpirydate = expirydate + daysgrace;
 
-			if (finalexpirydate > maxfinalexpirydate) {
+			if (finalexpirydate gt maxfinalexpirydate) {
 				maxexpirydate = expirydate;
 				maxfinalexpirydate = finalexpirydate;
 			}
 
 			var commencedate = licx.a(2, licn);
-			if ((commencedate < mincommencedate) or not(mincommencedate)) {
+			if (commencedate lt mincommencedate or not(mincommencedate)) {
 				mincommencedate = commencedate;
 			}
 
@@ -485,12 +485,12 @@ ok:
 		return 0;
 	}
 
-	if ((var().date() <= maxfinalexpirydate) and (var().date() >= mincommencedate)) {
+	if (var().date() le maxfinalexpirydate and var().date() ge mincommencedate) {
 		msg = "";
 		return 0;
 	}
 
-	if (dateorperiod == 1) {
+	if (dateorperiod eq 1) {
 		tt = "date";
 	}else{
 		tt = "period closing";
@@ -510,7 +510,7 @@ subroutine emailadmin(io msg) {
 	call sendmail("admin@neosys.com", "", subject, body ^ "", "", "", errormsg);
 	call sysmsg(body);
 
-	if (mode == "DELETE") {
+	if (mode eq "DELETE") {
 		msg = "Licencing restrictions removed; and all licences";
 	}else{
 		msg = "Licence added OK.";

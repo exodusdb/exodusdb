@@ -23,7 +23,7 @@ function main(in type, in in0, in mode, out outx) {
 oconvx:
 ///////
 		//nothing in - no conv
-		if (inx.length() == 0) {
+		if (inx.length() eq 0) {
 noconv:
 			outx = inx;
 			return outx;
@@ -38,7 +38,7 @@ noconv:
 		//-1    1999
 		//-2    1998
 		//-3    1997
-		if (inx.isnum() and (inx <= 0)) {
+		if (inx.isnum() and inx le 0) {
 			inx += 2000;
 			}
 
@@ -48,20 +48,20 @@ noconv:
 		}
 
 		//four digit year already - no conv
-		if (inx.length() == 4) {
+		if (inx.length() eq 4) {
 			goto noconv;
 		}
 
 		//two digit year expected
-		if (inx.length() == 2) {
+		if (inx.length() eq 2) {
 			{}
 
 		//pad to two digits 1 -> 01 -> 2001
-		} else if (inx.length() == 1) {
+		} else if (inx.length() eq 1) {
 			inx = "0" ^ inx;
 
 		//more than four digit - no conv
-		} else if (inx.length() > 4) {
+		} else if (inx.length() gt 4) {
 			goto noconv;
 
 		//three digits - use right most two digits
@@ -71,7 +71,7 @@ noconv:
 
 		//00-49 -> 2000 ... 2049
 		//50-99 -> 2050 ... 2099
-		if (inx <= centuryyear) {
+		if (inx le centuryyear) {
 			outx = "20" ^ inx;
 		}else{
 			outx = "19" ^ inx;
@@ -81,7 +81,7 @@ noconv:
 
 	//OCONV
 	///////
-	} else if (type == "OCONV") {
+	} else if (type eq "OCONV") {
 		inx = in0;
 		goto oconvx;
 
@@ -91,14 +91,14 @@ noconv:
 	//////
 
 	//nothing in - no conv
-	if (in0.length() == 0) {
+	if (in0.length() eq 0) {
 		outx = in0;
 		return outx;
 	}
 
 	//return right hand two chars (presumably digits)
 	//pad to at least two zeros
-	if (in0.length() < 2) {
+	if (in0.length() lt 2) {
 		outx = ("00" ^ in0).substr(-2,2);
 	}else{
 		outx = in0.substr(-2,2);

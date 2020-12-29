@@ -25,10 +25,10 @@ function main(in list0, out min, out max) {
 		if (not term) break;
 		bit=list0.substr2(start, term);
 		if (bit.length()) {
-			if (bit < min) {
+			if (bit lt min) {
 				min = bit;
 			}
-			if (bit > max) {
+			if (bit gt max) {
 				max = bit;
 			}
 		}

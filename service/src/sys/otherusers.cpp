@@ -18,7 +18,7 @@ function main(in databasecode0="", in usercode0="") {
 
 	//global xx,yy,result
 
-	if (SENTENCE.field(" ", 1) == "OTHERUSERS") {
+	if (SENTENCE.field(" ", 1) eq "OTHERUSERS") {
 		databasecode = SENTENCE.field(" ", 2);
 	}else{
 		if (databasecode0.unassigned()) {
@@ -65,13 +65,13 @@ function main(in databasecode0="", in usercode0="") {
 		var lockid = lockprefix ^ lockno;
 
 		//skip current user
-		if (lockid == curruserlockid) {
+		if (lockid eq curruserlockid) {
 			goto nextlock;
 		}
 
 		//skip 10,20,100 etc because they appear to be equivalent to
 		// their equivalents without trailing zeroes
-		if ((lockno[-1] == "0") and lockprefix) {
+		if ((lockno[-1] eq "0") and lockprefix) {
 			goto nextlock;
 		}
 
@@ -97,7 +97,7 @@ function main(in databasecode0="", in usercode0="") {
 		//skip processes in wrong database or wrong usercode
 		if (databasecode or usercode) {
 
-			if (processes == "") {
+			if (processes eq "") {
 				if (not(processes.open("PROCESSES", ""))) {
 					processes = 0;
 				}
@@ -135,7 +135,7 @@ nextlock:;
 	};//lockno;
 
 	returndata -= 1;
-	if (returndata < 0) {
+	if (returndata lt 0) {
 		returndata = 0;
 	}
 
@@ -155,7 +155,7 @@ nextlock:;
 		returndata.r(2, ii, "PROCESS" ^ usercode);
 	};//ii;
 
-	if (SENTENCE.field(" ", 1) == "OTHERUSERS") {
+	if (SENTENCE.field(" ", 1) eq "OTHERUSERS") {
 		call note(returndata.a(1) ^ " other users");
 	}
 

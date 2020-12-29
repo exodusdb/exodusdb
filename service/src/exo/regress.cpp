@@ -37,7 +37,7 @@ function main() {
 		} else if (op=="ISNUM") {
 			test=input.isnum();
 		} else {
-			outputl(line);
+			printl(line);
 			stop();
 		}
 		if (test ne output) {

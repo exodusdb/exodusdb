@@ -27,7 +27,7 @@ function main() {
 	USER4 = "";
 	PRIORITYINT.r(100, "");
 	var dbcode = SYSTEM.a(17);
-	if (dbcode == "") {
+	if (dbcode eq "") {
 		dbcode = "DEFAULT";
 	}
 
@@ -52,9 +52,9 @@ listen:
 
 	SYSTEM.r(33, "");
 
-	if (USER4.substr(1,7) == "RESTART") {
+	if (USER4.substr(1,7) eq "RESTART") {
 
-		if (USER4 == "RESTART $LISTEN") {
+		if (USER4 eq "RESTART $LISTEN") {
 			SYSTEM.r(100, 3, "");
 			SYSTEM.r(33, s33);
 			goto listen;
@@ -65,7 +65,7 @@ listen:
 
 	}
 
-	if ((USER4 == "") or (USER4 == "TERMINATED OK")) {
+	if (USER4 eq "" or USER4 eq "TERMINATED OK") {
 		stop();
 		////
 	}
@@ -113,7 +113,7 @@ listen:
 		var attachfilename = "";
 
 		//either BACKUP or BACKUP2 followed by space and drive letter
-		if (PSEUDO.substr(1,6) == "BACKUP") {
+		if (PSEUDO.substr(1,6) eq "BACKUP") {
 
 			subject = "EXODUS Backup " ^ dbcode;
 
@@ -178,12 +178,12 @@ listen:
 				}
 				gen.address ^= bakpars.a(10);
 			}
-			if (gen.address == "") {
+			if (gen.address eq "") {
 				if (not(gen.address.readv(DEFINITIONS, "REPLICATION", 12))) {
 					gen.address = "";
 				}
 			}
-			if (gen.address == "") {
+			if (gen.address eq "") {
 				gen.address = "backups@neosys.com";
 			}
 			if (gen.address) {
@@ -214,7 +214,7 @@ listen:
 				}
 
 				//optionally email backup.zip
-				if (((errormsg == "") or (errormsg.substr(1,2) == "OK")) and attachfilename) {
+				if ((errormsg eq "" or errormsg.substr(1,2) eq "OK") and attachfilename) {
 					var address2 = gen.address.field("/", 2);
 					//remove exodus from the backup.zip recipients
 					if (address2.locateusing(";","backups@neosys.com",xx)) {
@@ -233,7 +233,7 @@ listen:
 
 		//terminate after automatic backup in order to allow os filesystem backups
 		//BACKUP2 means dont copydb/upgrade/quit - just resume
-		if (PSEUDO.field(" ", 1) == "BACKUP") {
+		if (PSEUDO.field(" ", 1) eq "BACKUP") {
 
 			//before termination do any copy to testdata etc
 			if (SYSTEM.a(58).locate(dbcode,tt)) {
@@ -281,9 +281,9 @@ listen:
 		var().logoff();
 	}
 
-	if (cmd.field(" ",1) == "LISTEN") {
+	if (cmd.field(" ",1) eq "LISTEN") {
 		//if NET LISTEN LISTEN LISTEN - then terminate if too many errors
-		if (cmd.length() > 100) {
+		if (cmd.length() gt 100) {
 			printl(USER4);
 			perform("OFF");
 		}

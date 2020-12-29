@@ -31,17 +31,17 @@ function main(in localdate0, in localtime0) {
 		temp = "MTH";
 	}
 	temp = oconv(localtime, temp);
-	if (temp[1] == "0") {
+	if (temp[1] eq "0") {
 		temp.splicer(1, 1, "");
 	}
-	if (temp.substr(-2,2) == "AM") {
+	if (temp.substr(-2,2) eq "AM") {
 		temp.splicer(-2, 2, gen.glang.a(16));
 	}
-	if (temp.substr(-2,2) == "PM") {
+	if (temp.substr(-2,2) eq "PM") {
 		temp.splicer(-2, 2, gen.glang.a(17));
 	}
 
-	if (DATEFMT == "") {
+	if (DATEFMT eq "") {
 		DATEFMT = "D/E";
 	}
 	temp.splicer(1, 0, oconv(localdate, "[DATE,*4]") ^ " ");

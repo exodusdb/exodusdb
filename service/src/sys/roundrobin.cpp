@@ -35,7 +35,7 @@ function main(in mode, in params, io result, io msg) {
 	//field 1 = the last minute that was updated
 	//field 2 = 60 multivalues for minutes of the hour
 
-	if (mode == "TEST") {
+	if (mode eq "TEST") {
 
 		//here we have maximum of 6 events per last 6x6 seconds
 		var params2 = "";
@@ -54,11 +54,11 @@ function main(in mode, in params, io result, io msg) {
 			call roundrobin("ONEVENT", params2, result, errormsg);
 		}//loop;
 
-	} else if (mode == "ONEVENT") {
+	} else if (mode eq "ONEVENT") {
 
-		var verbs;
-		if (not(verbs.open("VERBS", ""))) {
-			msg = "ROUNDROBIN: CANNOT OPEN VERBS";
+		var voc;
+		if (not(voc.open("VOC", ""))) {
+			msg = "ROUNDROBIN: CANNOT OPEN VOC";
 			return 0;
 		}
 
@@ -71,8 +71,8 @@ function main(in mode, in params, io result, io msg) {
 		var roundrobinlock = "ROUNDROBIN*" ^ roundrobinfilename ^ "*" ^ roundrobinkey;
 
 		//try to lock for 9 seconds since other locks should be brief
-		if (not(lockrecord("VERBS", verbs, roundrobinlock, "", 9))) {
-			msg = "ROUNDROBIN: CANNOT LOCK VERBS," ^ roundrobinlock;
+		if (not(lockrecord("VOC", voc, roundrobinlock, "", 9))) {
+			msg = "ROUNDROBIN: CANNOT LOCK VOC," ^ roundrobinlock;
 			return 0;
 		}
 
@@ -85,7 +85,7 @@ function main(in mode, in params, io result, io msg) {
 		}
 		if (roundrobin.index(var().chr(0))) {
 			roundrobin.converter(var().chr(0), "");
-			var(var().date() ^ FM ^ var().time()).oswrite("RRR");
+			var(var().date() ^ FM ^ var().time()).oswrite("rrobin");
 		}
 
 		//determine current and last timeperiod
@@ -94,7 +94,7 @@ function main(in mode, in params, io result, io msg) {
 		var lastperiodn = roundrobin.a(1);
 
 		//prevent catch up longer than periodsperwindow (add 2 for safety)
-		if (currentperiodn - lastperiodn > periodsperwindow + 2) {
+		if (currentperiodn - lastperiodn gt periodsperwindow + 2) {
 			lastperiodn = currentperiodn - periodsperwindow - 2;
 		}
 
@@ -110,7 +110,7 @@ function main(in mode, in params, io result, io msg) {
 		roundrobin.r(1, currentperiodn);
 		var currentbreakn = currentperiodn % periodsperwindow + 1;
 
-		if (roundrobin.a(2).sum() < maxeventsperwindow) {
+		if (roundrobin.a(2).sum() lt maxeventsperwindow) {
 
 			result = 1;
 
@@ -132,7 +132,7 @@ function main(in mode, in params, io result, io msg) {
 	//for testing
 	//print lastperiodn,currentperiodn,currentbreakn,result,roundrobin<2>
 
-		call unlockrecord("VERBS", verbs, roundrobinlock);
+		call unlockrecord("VOC", voc, roundrobinlock);
 
 	}
 

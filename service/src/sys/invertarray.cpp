@@ -19,7 +19,7 @@ function main(in input, in force0=(0)) {
 		if (fieldx.length() or force) {
 			var nvs = fieldx.count(VM) + 1;
 			if (force) {
-				if (nvs > maxnvs) {
+				if (nvs gt maxnvs) {
 					maxnvs = nvs;
 				}
 			}else{

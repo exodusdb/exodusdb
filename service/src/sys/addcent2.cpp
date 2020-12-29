@@ -16,7 +16,7 @@ function main(in yymm) {
 	}
 
 	//year 00-90 -> 2000-2090
-	if (yymm.substr(1,2) <= centuryyear) {
+	if (yymm.substr(1,2) le centuryyear) {
 		return "20" ^ yymm;
 	}
 

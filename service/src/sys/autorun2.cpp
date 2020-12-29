@@ -82,7 +82,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 	if (runasusercode) {
 		var runasuser;
 		if (not(runasuser.read(users, runasusercode))) {
-			if (not(runasusercode == "EXODUS")) {
+			if (not(runasusercode eq "EXODUS")) {
 				msg = runasusercode.quote() ^ " user doesnt exist";
 				return 0;
 			}
@@ -105,7 +105,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 
 	//if no targets specified then
 	//send to the "run as" user and all users above in the same group
-	if (targetusercodes == "") {
+	if (targetusercodes eq "") {
 		//allow for targetusers to be passed in document
 		targetusercodes = gen.document.a(14);
 		//runasuser is NOT a target unless there are no recipients
@@ -116,7 +116,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 
 	//auto targeting
 	var initialtargetusercodes = targetusercodes;
-	if (targetusercodes == "{GROUP}") {
+	if (targetusercodes eq "{GROUP}") {
 		var tt = runasusercode;
 		if (SECURITY.a(1).locate(tt,usern)) {
 			while (true) {
@@ -147,7 +147,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 				var usercode = targetusercodes.a(1, usern);
 				var userx;
 				if (not(userx.read(users, usercode))) {
-					if (not(usercode == "EXODUS")) {
+					if (not(usercode eq "EXODUS")) {
 						msg = usercode.quote() ^ " user doesnt exist";
 						return 0;
 					}
@@ -159,7 +159,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 	}
 
 	//if no targets have emails then skip
-	if (initialtargetusercodes and (targetusercodes == "")) {
+	if (initialtargetusercodes and targetusercodes eq "") {
 		msg = "No target users have email addresses";
 		return 0;
 	}
@@ -175,7 +175,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 	gen.document.r(7, APPLICATION);
 	gen.document.r(3, var().date());
 	gen.document.r(4, var().time());
-	if (gen.document.a(12) == "") {
+	if (gen.document.a(12) eq "") {
 		gen.document.r(12, 1);
 	}
 
@@ -200,7 +200,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 
 	//prevent document from being run until the request has been processed
 	//relies on unlock all in listen
-	if (mode == "ASAP") {
+	if (mode eq "ASAP") {
 		if (not(gen.documents.lock( docid))) {
 			{}
 		}

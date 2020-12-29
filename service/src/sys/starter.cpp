@@ -29,14 +29,14 @@ function main(in startmode0, out starttime, out startdate, out startbuffer) {
 
 	call videorw(0, 0, CRTWIDE - 1, CRTHIGH - 1, "R", startbuffer);
 
-	if (startmode == "CONFIRM") {
+	if (startmode eq "CONFIRM") {
 		reply = "";
 inpreply:
 		call note("OK to start?|(Type Yes or No)", "RC", reply, "");
 
-		if (reply == "YES") {
+		if (reply eq "YES") {
 			reply = 1;
-		} else if (reply == "NO") {
+		} else if (reply eq "NO") {
 			reply = 2;
 		} else {
 			goto inpreply;
@@ -46,13 +46,13 @@ inpreply:
 		reply = "Y";
 		//IF DECIDE(TEMP:'OK to start ?|','',REPLY) ELSE REPLY=2
 		call note(temp ^ "OK to start ? (Y/n)", "RC", reply);
-		reply = reply[1] == "Y";
+		reply = reply[1] eq "Y";
 		if (not reply) {
 			printl("Cancelled");
 		}
 	}
 
-	if (reply == 1) {
+	if (reply eq 1) {
 		return 1;
 	}
 	return 0;

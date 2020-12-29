@@ -12,19 +12,19 @@ function main(in type, in in0, in mode, out output) {
 	}
 
 	output = in0;
-	if (output == "") {
+	if (output eq "") {
 		var temp = mode.substr(1,2);
 		temp.ucaser();
-		if ((temp == "TD") or (mode == "TH")) {
+		if (temp eq "TD" or mode eq "TH") {
 			output = "&nbsp;";
 		}
 	}
-	if (output == "") {
+	if (output eq "") {
 		return 0;
 	}
 
-	if (output[1] == "-") {
-		if (mode == "TD") {
+	if (output[1] eq "-") {
+		if (mode eq "TD") {
 			if (var("1234567890").index(output[2])) {
 				output = "<NOBR>" ^ output ^ "</NOBR>";
 			}

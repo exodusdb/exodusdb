@@ -50,7 +50,7 @@ function main(in mode0, out html, in compcode0="") {
 
 	letterheadcompany = "";
 	if (hascompanies) {
-		if (not(gen.companies.unassigned() or (gen.companies == ""))) {
+		if (not(gen.companies.unassigned() or gen.companies eq "")) {
 			if (not(letterheadcompany.read(gen.companies, compcode))) {
 				{}
 			}
@@ -156,7 +156,6 @@ function main(in mode0, out html, in compcode0="") {
 	}
 
 	html.swapper(FM, "\r\n");
-	//html=field(html,char(26),1)
 	while (true) {
 		///BREAK;
 		if (not(html and (var("\r\n").index(html[-1])))) break;
@@ -203,7 +202,7 @@ subroutine getcompanyconfig(io html, io mode) {
 		if (tt) {
 			//call max(count(tt,vm)+1,ncols,ncols)
 			tt = tt.count(VM) + 1;
-			if (tt > ncols) {
+			if (tt gt ncols) {
 				ncols = tt;
 			}
 		}
@@ -264,7 +263,7 @@ subroutine getcompanyconfig(io html, io mode) {
 		//wrap td contents in a div if any styling
 		var divstyle = "";
 		if (align) {
-			if (align == "center") {
+			if (align eq "center") {
 				//there is no FLOAT CENTER
 				divstyle ^= "display:table;margin-left:auto;margin-right:auto;";
 			}else{
@@ -304,7 +303,7 @@ subroutine getcompanyconfig(io html, io mode) {
 
 			//FULL http path to images so EMAIL/OFFICE programs can get images
 			var url = SYSTEM.a(114, 1);
-			if (url[-1] == "/") {
+			if (url[-1] eq "/") {
 				url.splicer(-1, 1, "");
 			}
 

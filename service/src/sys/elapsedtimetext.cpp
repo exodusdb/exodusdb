@@ -25,7 +25,7 @@ function main(in fromdate, in fromtime, io uptodate, io uptotime) {
 
 	//cater for bug where start date isnt known and time has crossed midnight
 	//so the 2nd time is less than the first
-	if (nsecs < 0) {
+	if (nsecs lt 0) {
 		nsecs += 86400;
 		}
 
@@ -65,13 +65,13 @@ function main(in fromdate, in fromtime, io uptodate, io uptotime) {
 			text ^= "s";
 		}
 	}
-	if (not(hours) and (minutes < 5)) {
+	if (not(hours) and minutes lt 5) {
 		if (nsecs) {
-			if (minutes or (nsecs - 10 > 0)) {
+			if (minutes or (nsecs - 10 gt 0)) {
 				nsecs = nsecs.oconv("MD00P");
 			}else{
 				nsecs = (nsecs.oconv("MD40P")) + 0;
-				if (nsecs[1] == ".") {
+				if (nsecs[1] eq ".") {
 					nsecs.splicer(1, 0, "0");
 				}
 			}

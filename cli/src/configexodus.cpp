@@ -319,17 +319,17 @@ function configure_via_connection(in adminconfig, in dbname, in dbusername, in d
 			var servicename=(pgversion<9)?"pgsql":"postgresql";
 			servicename^="-"^pgversion;
 
-			outputl("Stopping "^servicename^" (to update pgexodus.dll plugin) ...");
+			printl("Stopping "^servicename^" (to update pgexodus.dll plugin) ...");
 			if (not osshell("NET STOP "^servicename))
 			{
-				outputl("Cant stop "^servicename^". Please restart it manually.");
+				printl("Cant stop "^servicename^". Please restart it manually.");
 			} else {
-				outputl("Restarting "^servicename^" ...");
+				printl("Restarting "^servicename^" ...");
 				if (not osshell("NET START "^servicename))
-					outputl("Cant restart "^servicename^". Please restart it manually");
+					printl("Cant restart "^servicename^". Please restart it manually");
 			}
 			if (not osdelete(targetfilename))
-					outputl("Cant delete existing pgexodus.dll plugin");
+					printl("Cant delete existing pgexodus.dll plugin");
 		}
 
 		//copy pgexodus.dll plugin into place

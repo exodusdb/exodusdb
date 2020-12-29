@@ -12,7 +12,7 @@ function main(in a0, io bb, in sep) {
 	//BP  ANALSCH vm
 	//GBP NLIST   vm
 
-	if (a0 == "") {
+	if (a0 eq "") {
 		return 0;
 	}
 	//add a to b
@@ -28,7 +28,7 @@ function main(in a0, io bb, in sep) {
 	var aa = a0;
 
 	//work as if vms
-	if (sep == SVM) {
+	if (sep eq SVM) {
 		aa.converter(SVM, VM);
 		bb.converter(SVM, VM);
 	}
@@ -46,12 +46,12 @@ function main(in a0, io bb, in sep) {
 			var bnum = split(bb.a(1, bn), bcode);
 			//call msg(na:' ':nb:' ':an:' ':bn:' ':acode:' ':bcode)
 
-			if (bcode == acode) {
+			if (bcode eq acode) {
 				//garbagecollect;
 				if (bnum.length() or anum.length()) {
 					var ndecs = anum.field(".", 2).length();
 					var bndecs = bnum.field(".", 2).length();
-					if (bndecs > ndecs) {
+					if (bndecs gt ndecs) {
 						ndecs = bndecs;
 					}
 					if (anum.isnum() and bnum.isnum()) {
@@ -76,7 +76,7 @@ function main(in a0, io bb, in sep) {
 	};//an;
 
 	//work as if vms
-	if (sep == SVM) {
+	if (sep eq SVM) {
 		bb.converter(VM, SVM);
 	}
 

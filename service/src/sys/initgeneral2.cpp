@@ -28,7 +28,7 @@ function main(in mode, io logtime, in menu) {
 
 	call log2("*init.general2 " ^ mode.a(1), logtime);
 
-	if (mode == "INSTALLNEWPASS") {
+	if (mode eq "INSTALLNEWPASS") {
 
 		//not used anywhere 2017/05/17
 
@@ -46,14 +46,14 @@ function main(in mode, io logtime, in menu) {
 		//copy the local user over to the build directory
 		perform("COPY SYSTEM " ^ USERNAME ^ " (O) TO: (QFILE)");
 
-	} else if (mode == "CREATEALERTS") {
+	} else if (mode eq "CREATEALERTS") {
 
 		call log2("*createalert currusers", logtime);
 
 		if (not(tt.readv(DEFINITIONS, "INIT*CREATEALERT*CURRUSERS", 1))) {
 			tt = "";
 		}
-		if (tt < 17203) {
+		if (tt lt 17203) {
 
 			//to EXODUS only at the moment
 			var cmd = "CREATEALERT CURRUSERS GENERAL CURRUSERS {} EXODUS (ROS)";
@@ -71,7 +71,7 @@ function main(in mode, io logtime, in menu) {
 			var().date().write(DEFINITIONS, "INIT*CREATEALERT*CURRUSERS");
 		}
 
-	} else if (mode == "UPDATEIPNOS4EXODUS") {
+	} else if (mode eq "UPDATEIPNOS4EXODUS") {
 
 		call log2("*update EXODUS-allowed ipnos from GBP file", logtime);
 
@@ -94,7 +94,7 @@ function main(in mode, io logtime, in menu) {
 
 		//remove any trailing . from 10. etc which is valid syntax for hosts.allow
 		hosts.swapper("." ^ SVM, SVM);
-		if (hosts[-1] == ".") {
+		if (hosts[-1] eq ".") {
 			hosts.splicer(-1, 1, "");
 		}
 
@@ -115,7 +115,7 @@ function main(in mode, io logtime, in menu) {
 		//then EXODUS LOGINS FROM ANY *LISTED FULLY FORMED LAN IPS* WILL BE BLOCKED
 
 		var configips = SYSTEM.a(39);
-		if (configips == "") {
+		if (configips eq "") {
 			configips = "192.168 10 172";
 		}
 		configips.converter(" ", SVM);
@@ -123,10 +123,10 @@ function main(in mode, io logtime, in menu) {
 		nn = configips.count(SVM) + (configips ne "");
 		for (var ii = nn; ii <= 1; ++ii) {
 			var ipno = configips.a(1, 1, ii);
-			if (ipno.field(".", 1) == "10") {
+			if (ipno.field(".", 1) eq "10") {
 				{}
-			} else if (ipno.field(".", 1) == "172") {
-			} else if (ipno.field(".", 1, 2) == "192.168") {
+			} else if (ipno.field(".", 1) eq "172") {
+			} else if (ipno.field(".", 1, 2) eq "192.168") {
 			} else {
 				//delete all WAN (non-LAN) ranges and allow only fully specced WAN ips
 				if (ipno.count(SVM) ne 3) {
@@ -149,7 +149,7 @@ function main(in mode, io logtime, in menu) {
 
 		hosts.write(DEFINITIONS, "IPNOS*EXODUS");
 
-	} else if (mode == "GETENV") {
+	} else if (mode eq "GETENV") {
 
 		call log2("*get environment", logtime);
 
@@ -168,7 +168,7 @@ function main(in mode, io logtime, in menu) {
 			}
 		};//ii;
 
-	} else if (mode == "FIXURLS") {
+	} else if (mode eq "FIXURLS") {
 
 		call log2("*condition the http links", logtime);
 
@@ -199,7 +199,7 @@ function main(in mode, io logtime, in menu) {
 		SYSTEM.r(114, baselinks);
 		SYSTEM.r(115, baselinkdescs);
 
-	} else if (mode == "COMPRESSLOGS") {
+	} else if (mode eq "COMPRESSLOGS") {
 
 		//use WINDOWS COMPACT to save disk space
 		if (VOLUMES) {
@@ -248,7 +248,7 @@ function main(in mode, io logtime, in menu) {
 
 		};//year;
 
-	} else if (mode == "UPDATEUSERS") {
+	} else if (mode eq "UPDATEUSERS") {
 
 		call log2("*add keys and ipnos to users", logtime);
 
@@ -260,7 +260,7 @@ function main(in mode, io logtime, in menu) {
 		select(users);
 nextuser:
 		if (readnext(userid)) {
-			if (userid[1] == "%") {
+			if (userid[1] eq "%") {
 				goto nextuser;
 			}
 			var userx;
@@ -283,7 +283,7 @@ nextuser:
 			goto nextuser;
 		}
 
-	} else if (mode == "TRIMREQUESTLOG") {
+	} else if (mode eq "TRIMREQUESTLOG") {
 
 		call log2("*trim requestlog", logtime);
 
@@ -303,13 +303,13 @@ nextuser:
 		DEFINITIONS.unlock( "TRIMREQUESTLOG");
 
 		//dont run twice on same day
-		if (lastdate == var().date()) {
+		if (lastdate eq var().date()) {
 			return 0;
 		}
 
 		perform("TRIMREQUESTLOG");
 
-	} else if (mode == "REORDERDBS") {
+	} else if (mode eq "REORDERDBS") {
 
 		call log2("*reorder databases", logtime);
 
@@ -321,7 +321,7 @@ nextuser:
 
 		perform("WINDOWSTUB DEFINITION.SUBS REORDERDBS");
 
-	} else if (mode.a(1) == "LASTLOGWARNING") {
+	} else if (mode.a(1) eq "LASTLOGWARNING") {
 
 		var lastlog = mode.field(FM, 2, 999);
 		lastlog = trim(lastlog, FM);
@@ -331,7 +331,7 @@ nextuser:
 			return 0;
 		}
 
-		if (lastlog.index("UPGRADEVERBS")) {
+		if (lastlog.index("UPGRADEVOC")) {
 			return 0;
 		}
 
@@ -342,7 +342,7 @@ nextuser:
 			}
 		}
 
-	} else if (mode == "OSCLEANUP") {
+	} else if (mode eq "OSCLEANUP") {
 		//initdir '..\VDM*.TMP'
 		//temps=dirlist()
 		if (VOLUMES) {
@@ -353,7 +353,7 @@ nextuser:
 			};//tempn;
 		}
 
-	} else if (mode == "MAKEMENU") {
+	} else if (mode eq "MAKEMENU") {
 
 		call menusubs("INITMENUS", menutx);
 

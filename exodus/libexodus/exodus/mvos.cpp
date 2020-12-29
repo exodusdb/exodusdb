@@ -31,6 +31,7 @@ THE SOFTWARE.
 //#include <ostream>
 #include <algorithm> //for count in osrename
 #include <cstdlib>   //for getenv and setenv/putenv
+//#include <stdlib.h>
 #include <fstream>
 #include <iostream>
 #include <locale>
@@ -949,34 +950,46 @@ bool var::osgetenv(const var& envvarname)
 bool var::ossetenv(const var& envvarname) const
 {
 	THISIS("bool var::ossetenv(const var& envvarname) const")
-	THISISDEFINED()
+	THISISSTRING()
 	ISSTRING(envvarname)
 
 //#ifdef _MSC_VER
 #ifndef setenv
+
 	/* on windows this should be used
 	BOOL WINAPI SetEnvironmentVariable(LPCTSTR lpName, LPCTSTR lpValue);
 	*/
 	// var("USING PUTENV").outputl();
 	// is this safe on windows??
 	// https://www.securecoding.cert.org/confluence/display/seccode/POS34-C.+Do+not+call+putenv()+with+a+pointer+to+an+automatic+variable+as+the+argument
-	std::string tempstr = envvarname.toString();
-	tempstr += "=";
-	tempstr += toString();
+	//std::string tempstr = envvarname.toString();
+	//tempstr += "=";
+	//tempstr += toString();
 	// var(tempstr).outputl("temp std:string");
 	// std::cout<<tempstr<<" "<<tempstr.length()<<std::endl;
 
 	// this will NOT work reliably since putenv will NOT COPY the local (i.e. temporary)
 	// variable string
 
+	//var("putenv " ^ var(tempstr) ).outputl();
 	//#pragma warning (disable : 4996)
-	const int result = putenv((char*)(tempstr.c_str()));
+	//const int result = putenv((char*)(tempstr.c_str()));
+    //putenv("EXO_DBNAME=C:\\");
+    //std::cout<<getenv("EXO_DBNAME");
+
+	//char winenv[1024];
+	char* env=(char*) malloc(1024);
+	snprintf(env, 1024, "%s=%s", envvarname.var_str.c_str(), this->var_str.c_str());
+	//std::cout << winenv;
+	int result = putenv(env);
+
 	if (result == 0)
 		return true;
 	else
 		return false;
 
 #else
+	var("setenv " ^ envvarname ^ "=" ^ (*this) ).outputl();
 	return setenv((char*)(envvarname.toString().c_str()), (char*)(toString().c_str()), 1);
 #endif
 }
@@ -1712,12 +1725,14 @@ const std::string var::to_path_string() const
 		// standardise on ALL AND ONLY lower case os file and path names
 		// in order to allow uppercase, will have to find and remove all uppercase in the
 		// old source code
+		/*
 		var lcpart = part.lcase();
 		if (lcpart != part && part.substr(-3,3) != ".LK" && part.substr(-3,3) != ".OV" && part.substr(-9) != "/DATA.CFG" && !part.index("./data/"))
 		{
 			part.errputl("WARNING - UPPERCASE OS=");
 //			part = lcpart;
 		}
+		*/
 #endif
 		return part.toString() + " " + part2.toString();
 	}
@@ -1731,13 +1746,14 @@ const std::string var::to_path_string() const
 		// standardise on ALL AND ONLY lower case os file and path names
 		// in order to allow uppercase, will have to find and remove all uppercase in the
 		// old source code
+		/*
 		var lcthis = this->lcase();
 		if (lcthis != (*this) && this->substr(-3,3) != ".LK" && this->substr(-3,3) != ".OV" && this->substr(-9) != "/DATA.CFG")
 		{
 			(*this).errputl("WARNING - UPPERCASE OS=");
 //			return lcthis.convert("\\", SLASH).toString();
 		}
-
+		*/
 		return this->convert("\\", SLASH).toString();
 #endif
 	}

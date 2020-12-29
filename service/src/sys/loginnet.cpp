@@ -65,11 +65,11 @@ readmenu:
 
 	//all menus - not in order
 	var menus = "SUPPORT";
-	if ((APPLICATION == "ACCOUNTS") or (APPLICATION == "ADAGENCY")) {
+	if (APPLICATION eq "ACCOUNTS" or APPLICATION eq "ADAGENCY") {
 		menus.r(1, -1, "FINANCE");
 	}
 
-	if (APPLICATION == "ADAGENCY") {
+	if (APPLICATION eq "ADAGENCY") {
 
 		menus.r(1, -1, "ANALYSIS");
 
@@ -102,7 +102,7 @@ readmenu:
 			}
 
 			//specifically locked or no legacy menus - only allow if authorised
-			if ((oldmenus == "") or ((menun and SECURITY.a(11, taskn).length()))) {
+			if (oldmenus eq "" or ((menun and SECURITY.a(11, taskn).length()))) {
 				if (not(authorised(menutask, xx))) {
 deleteit:
 					if (menus.locate(menu,menun2)) {
@@ -152,7 +152,7 @@ nextcomp:
 
 	//build a list of authorised companies
 	var compcodes = "";
-	if (APPLICATION == "ADAGENCY") {
+	if (APPLICATION eq "ADAGENCY") {
 		for (var ii = 1; ii <= 9999; ++ii) {
 			compcode = allcomps.a(ii);
 			///BREAK;
@@ -174,7 +174,7 @@ nextcomp:
 	}
 
 	//check there is at least one authorised company
-	if (allcomps and (compcodes == "")) {
+	if (allcomps and compcodes eq "") {
 		msg = "Error: You are not authorised to access any companies";
 		return 0;
 	}
@@ -216,7 +216,7 @@ nextcomp:
 		maincurrcode = "";
 	}
 	//if maincurrcode='' then maincurrcode=base.currency
-	if (maincurrcode == "") {
+	if (maincurrcode eq "") {
 		maincurrcode = SYSTEM.a(134);
 	}
 
@@ -267,7 +267,7 @@ nextcomp:
 	//first day of week
 	//tt=agp<13>+1
 	var tt = SYSTEM.a(138) + 1;
-	if (tt > 7) {
+	if (tt gt 7) {
 		tt = 1;
 	}
 	cookie ^= "&fd=" ^ tt;
@@ -290,7 +290,7 @@ nextcomp:
 
 	//if lastbackupdate and lastbackupdate lt date()-1 then
 	//assume backup on same day (ie after last midnight)
-	if (lastbackupdate and (lastbackupdate < var().date())) {
+	if (lastbackupdate and lastbackupdate lt var().date()) {
 		msg = "The last backup was ";
 		var ndays = var().date() - lastbackupdate;
 		msg ^= ndays ^ " day" ^ var("s").substr(1,ndays ne 1) ^ " ago.";

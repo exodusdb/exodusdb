@@ -17,7 +17,7 @@ function main(in mode, in html, io mark) {
 
 	//NB <small> tags seem to make no difference if they are removed
 	//at least in modern browsers. presumably style:font-size is preferential
-	if (mode == "OWN") {
+	if (mode eq "OWN") {
 
 		if (mark) {
 			mark ^= " ";
@@ -62,7 +62,7 @@ function main(in mode, in html, io mark) {
 				mark ^= "</a>";
 			}
 			//mark:='</small>'
-			if (SYSTEM.a(17).substr(-4,4) == "TEST") {
+			if (SYSTEM.a(17).substr(-4,4) eq "test") {
 				mark = "<span style=\"color:red\">" ^ mark ^ " - " ^ SYSTEM.a(17) ^ "</span>";
 			}
 		}

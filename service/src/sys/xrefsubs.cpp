@@ -38,7 +38,7 @@ function main(in mode, in subfn, in masterfilename, io masterfile, in masterfn, 
 		}
 	}
 
-	if (mode == "BUILD") {
+	if (mode eq "BUILD") {
 
 		//zzz build updates masterfile without locking
 		//so should be run exclusively
@@ -54,7 +54,7 @@ nextbuild:
 			if (not(RECORD.read(win.srcfile, ID))) {
 				goto nextbuild;
 			}
-			if (RECORD.a(subfn) == "") {
+			if (RECORD.a(subfn) eq "") {
 				goto nextbuild;
 			}
 			deleting = 0;
@@ -63,8 +63,8 @@ nextbuild:
 			goto nextbuild;
 		}
 
-	} else if (mode == "PREWRITE") {
-		if (win.orec.a(subfn) == RECORD.a(subfn)) {
+	} else if (mode eq "PREWRITE") {
+		if (win.orec.a(subfn) eq RECORD.a(subfn)) {
 			return 0;
 		}
 		validating = 1;
@@ -78,12 +78,12 @@ nextbuild:
 		deleting = 0;
 		gosub validateupdate(subfn, masterfilename, masterfile, masterfn, locklist);
 
-	} else if (mode == "PREDELETE") {
+	} else if (mode eq "PREDELETE") {
 		validating = 1;
 		deleting = 1;
 		gosub validateupdate(subfn, masterfilename, masterfile, masterfn, locklist);
 
-	} else if (mode == "WRITE") {
+	} else if (mode eq "WRITE") {
 
 		validating = 1;
 
@@ -115,7 +115,7 @@ nextbuild:
 
 		gosub unlockall(locklist);
 
-	} else if (mode == "DELETE") {
+	} else if (mode eq "DELETE") {
 		deleting = 1;
 
 		validating = 1;
@@ -126,8 +126,8 @@ nextbuild:
 
 		gosub unlockall(locklist);
 
-	} else if (mode == "POSTWRITE") {
-		if (win.orec.a(subfn) == RECORD.a(subfn)) {
+	} else if (mode eq "POSTWRITE") {
+		if (win.orec.a(subfn) eq RECORD.a(subfn)) {
 			return 0;
 		}
 		validating = 0;
@@ -138,7 +138,7 @@ nextbuild:
 		deleting = 0;
 		gosub validateupdate(subfn, masterfilename, masterfile, masterfn, locklist);
 
-	} else if (mode == "POSTDELETE") {
+	} else if (mode eq "POSTDELETE") {
 		deleting = 1;
 		validating = 0;
 		gosub validateupdate(subfn, masterfilename, masterfile, masterfn, locklist);
@@ -158,7 +158,7 @@ subroutine validateupdate(in subfn, in masterfilename, in masterfile, in masterf
 	}else{
 		mastercode = RECORD.a(subfn);
 	}
-	if (mastercode == "") {
+	if (mastercode eq "") {
 		return;
 	}
 
