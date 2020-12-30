@@ -1596,8 +1596,10 @@ nextrec:
 	//if interactive then print @AW<30>:@(36,@CRTHIGH/2):
 	if (not(silent) and not(printfilename.unassigned())) {
 		//put.cursor(cursor)
-		if (printfilename) {
+		if (printfilename and (((not(recn % 100)) or not(LISTACTIVE)))) {
+			//first recn will be 2
 			print(var().at(0), var().at(-4), recn, ". ", ID, " ", MV);
+			 osflush();
 		}
 	}
 

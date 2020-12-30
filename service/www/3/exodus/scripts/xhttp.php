@@ -498,6 +498,8 @@ while (1) {
 			$response = 'Error: No response in ' . $gsecondstowaitforreceipt . ' seconds from database server at ' . $linkfilename . '.1';
 			break 2;
 		}
+
+		//php caches the result of is_file() so clear the cache
 		clearstatcache();
 	}
 
@@ -506,6 +508,8 @@ while (1) {
 	$waituntil = time() + $timeout_ms / 1000;
 
 	$nskips = 0;
+	//initially poll every 10ms
+	$sleep_us = 10000;
 	while (!is_file($linkfilename . '.3')) {
 
 		//check for disconnected only once every 2 seconds (50 loops) since sends something client?
@@ -541,11 +545,13 @@ while (1) {
 			break 2;
 		}
 
-		//sleep for 10ms before checking for response again
-		//TODO make it sleep longer the long the delay
-		// so response is fast if the server is fast but saves cpu if not
-		//(after waiting 10 seconds it is pointless to check every 10ms)
-		usleep(50000); //10,000 microseconds = 5 ms
+		//sleep for a while after every failed poll for a response file
+		usleep($sleep_us);
+
+		//every failed poll, increase poll time by 1ms
+		//upto a max poll time of 250ms (after about 15seconds?)
+    	if ($sleep_us < 250000)
+			$sleep_us += 1000;
 
 		//abort if no response within 10? minutes
 		if (time() >= $waituntil) {

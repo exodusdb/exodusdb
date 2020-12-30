@@ -4,7 +4,7 @@ libraryinit(alines)
 //-----------------
 function main() {
 	ANS = RECORD.count("\n") + 1;
-	if (RECORD == "") {
+	if (RECORD eq "") {
 		ANS = 0;
 	}
 	return ANS;
@@ -54,19 +54,19 @@ function main() {
 	if (var("*$").index(ID[1])) {
 		return 0;
 	}
-	if (ID == "DEBUG") {
+	if (ID eq "DEBUG") {
 		return 0;
 	}
-	if (ID == "MSG") {
+	if (ID eq "MSG") {
 		return 0;
 	}
-	if (ID == "RTP25") {
+	if (ID eq "RTP25") {
 		return 0;
 	}
-	if (ID == "TEST") {
+	if (ID eq "TEST") {
 		return 0;
 	}
-	if (ID == "TESTBASIC") {
+	if (ID eq "TESTBASIC") {
 		return 0;
 	}
 	var upper = RECORD;
@@ -74,7 +74,7 @@ function main() {
 	if (upper.index("DEBUG")) {
 		return 1;
 	}
-	if (ID == "SENDMAIL") {
+	if (ID eq "SENDMAIL") {
 		upper.converter("'EXODUS.ID'", "");
 	}
 	if (upper.index("'EXODUS.ID'") and ID ne "INSTALLALLOWHOSTS") {
@@ -93,7 +93,7 @@ function main() {
 	yy.converter(UPPERCASE, "");
 	var uu = RECORD.length() - yy.length();
 	var ll = RECORD.length() - xx.length();
-	if (uu > ll) {
+	if (uu gt ll) {
 		ANS = uu / (ll + 1);
 	}else{
 		ANS = -(ll / (uu + 1));
@@ -185,10 +185,10 @@ function main() {
 	//END
 	var lastreccount = RECCOUNT;
 	if (rec.reado(comparefile, ID)) {
-		if (RECORD == rec) {
+		if (RECORD eq rec) {
 			ANS = "";
 		}else{
-			if (ID[1] == "$") {
+			if (ID[1] eq "$") {
 				var recdatetime = field2(RECORD, FM, -1);
 				recdatetime = recdatetime.field(" ", 2, 9).trim() ^ " " ^ recdatetime.field(" ", 1);
 				recdatetime = recdatetime.iconv("DT");
@@ -198,10 +198,10 @@ function main() {
 				if (not(recdatetime and cmpdatetime)) {
 					goto changed;
 				}
-				if (recdatetime == cmpdatetime) {
+				if (recdatetime eq cmpdatetime) {
 					goto changed;
 				}
-				if (recdatetime > cmpdatetime) {
+				if (recdatetime gt cmpdatetime) {
 					ANS = "REPLACES";
 				}else{
 					ANS = "REPLACED";
@@ -260,7 +260,7 @@ function main() {
 			userx = xlate("USERS", executivecode.field(" ", 1), "", "X");
 		}
 
-		if (userx.a(35) and (var().date() >= userx.a(35))) {
+		if (userx.a(35) and var().date() ge userx.a(35)) {
 		//expired
 			ANS = "";
 		}else{
@@ -298,7 +298,7 @@ function main() {
 		if (ANS) {
 			ans2 = ANS;
 			ans2.ucaser();
-			if (ans2 == ANS) {
+			if (ans2 eq ANS) {
 				ANS = capitalise(ANS);
 				}
 			}else{
@@ -381,7 +381,7 @@ libraryexit(findall)
 libraryinit(iscpp)
 //----------------
 function main() {
-	return RECORD.a(2).substr(1,3) == "*c ";
+	return RECORD.a(2).substr(1,3) eq "*c ";
 }
 libraryexit(iscpp)
 
@@ -511,7 +511,7 @@ function main() {
 	//matparse @record into x
 	for (var ii = 1; ii <= nfields; ++ii) {
 	//if trim(x(i))[1,1]='*' then x(i)=''
-		if (RECORD.a(ii).trim()[1] == "*") {
+		if (RECORD.a(ii).trim()[1] eq "*") {
 			RECORD.r(ii, "");
 		}
 	};//ii;
@@ -529,7 +529,7 @@ libraryinit(nlines)
 //-----------------
 function main() {
 	ANS = RECORD.count(FM) + 1;
-	if (RECORD == "") {
+	if (RECORD eq "") {
 		ANS = 0;
 	}
 	return ANS;
@@ -613,7 +613,7 @@ libraryinit(timedate)
 function main() {
 	#include <general_common.h>
 	var ans = field2(RECORD, FM, -1);
-	if (ans[1] == "V") {
+	if (ans[1] eq "V") {
 		ans = field2(RECORD, FM, -2);
 	}
 	if (not(ans.substr(1,2).match("^\\d{2}$"))) {

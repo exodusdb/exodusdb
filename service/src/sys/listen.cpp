@@ -738,13 +738,17 @@ nextsearch0:
 	//check for esc key to exit
 	//if esc.to.exit() then gosub exit
 
-	charx.input("", -1);
+	if (PROCESSNO==1)
+		charx.input("", -1);
+	else
+		charx="";
 	//charx=ucase(charx[1,1])
 	//charx=charx[1,1]
 
 	//esc
 	if (charx.index(INTCONST.a(1))) {
-		call mssg("You have pressed the [Esc]  key to exit|press again to confirm|", "UB", buffer, "");
+	//if (charx.index("q")) {
+		call mssg(" You have pressed the [Esc]  key to exit|press again to confirm|", "UB", buffer, "");
 		//loop
 		// input reply,-1:
 		//until reply
@@ -753,6 +757,8 @@ nextsearch0:
 		reply.input("", 1);
 		call mssg("", "DB", buffer, "");
 		if (reply eq INTCONST.a(1)) {
+			print(" ");
+		//if (reply eq "q") {
 			gosub exit();
 		}
 		if (reply eq INTCONST.a(7)) {
@@ -1071,7 +1077,12 @@ subroutine requestinit() {
 
 	nrequests += 1;
 
-	print(atcol0, clreol, var().time().oconv("MTS"), " ");
+	print(atcol0, clreol);
+	if (VOLUMES) {
+		print(var().time().oconv("MTS"), " ");
+	}else{
+		print(SYSTEM.a(24), ":", SYSTEM.a(17), " ");
+	}
 
 	//clear out buffers just to be sure
 	//request=''

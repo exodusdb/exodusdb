@@ -53,27 +53,12 @@ bool haskey(void)
 	// while (!end) {
 
 	struct pollfd pfds[1];
-	int ret;
 	//char c;
 
 	/* See if there is data available */
 	pfds[0].fd = 0;
 	pfds[0].events = POLLIN;
-	ret = poll(pfds, 1, 0);
-
-	/* Consume data */
-	bool hasdata;
-	if (ret > 0)
-	{
-		// printf("Data available\n");
-		// read(0, &c, 1);
-		hasdata = true;
-	}
-	else
-	{
-		// printf("Data NOT available\n");
-		hasdata = false;
-	}
+	bool hasdata = poll(pfds, 1, 0) > 0;
 
 	//}
 

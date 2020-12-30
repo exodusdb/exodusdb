@@ -6,7 +6,7 @@ function main() {
 	var responsetime = RECORD.a(5);
 	if (responsetime.length()) {
 		ANS = RECORD.a(5) - ID.field("*", 3);
-		if (ANS < 0) {
+		if (ANS lt 0) {
 			ANS += 86400;
 		}
 	//garbagecollect

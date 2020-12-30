@@ -45,7 +45,14 @@ listen:
 		SYSTEM.r(33, 1);
 	}
 
+	try {
+
 	execute(cmd);
+
+	}
+	catch (MVError mverror) {
+	    USER4 = mverror.description ^ FM ^ mverror.stack;
+	}
 
 	//unlock all
 	var xx = unlockrecord();
@@ -159,7 +166,9 @@ listen:
 
 			//subject='EXODUS Technical Message :'
 			subject = "";
-			printl(USER4);
+			if (VOLUMES) {
+				printl(USER4);
+			}
 			call sysmsg(USER4);
 
 		}

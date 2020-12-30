@@ -993,9 +993,9 @@ nextreport:
 
 	call log2("*get diskfreespace", logtime);
 	var reqfreemb = 10;
-	var freemb = (diskfreespace(oscwd().substr(1,2)) / 1024 / 1024).oconv("MD00");
+	var freemb = (diskfreespace(oscwd()) / 1024 / 1024).oconv("MD00");
 
-	call log2("*check if diskfreespace is sufficient", logtime);
+	call log2("*check if diskfreespace is sufficient " ^ freemb ^ "Mb", logtime);
 	//notherusers=otherusers('')+1
 	if (freemb lt reqfreemb * notherusers) {
 	//if 1 then
@@ -1010,7 +1010,6 @@ nextreport:
 		//stop
 		//if freemb then perform 'OFF'
 	}
-	///
 
 	if (VOLUMES) {
 		call log2("*try to update upload.dll", logtime);

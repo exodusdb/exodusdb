@@ -131,7 +131,8 @@ void addbacktraceline(const var& sourcefilename, const var& lineno, var& returnl
 	var line = filetext.field("\x0A", lineno).trimf(" \t");
 
 	// suppress confusing and unhelpful exodus macros
-	if ((line == "programexit()" || line == "libraryexit()" || line == "classexit()") or
+	//if ((line.substr(1,12) == "programexit(" || line.substr(1,12) == "libraryexit(" || line.substr(1,10) == "classexit(") or
+	if (line.match("^(program|library|class)(init|exit)\\(") or
 	    (line == "}" && sourcefilename.substr(-2, 2) == ".h") or (line == ""))
 		return;
 
@@ -499,8 +500,8 @@ void var::breakon() const
 
 	//turn off text input and output signals to prevent breaking out into gdb debugger
 	//http://curiousthing.org/sigttin-sigttou-deep-dive-linux
-    //signal(SIGTTIN, SIG_IGN);
-    //signal(SIGTTOU, SIG_IGN);
+    signal(SIGTTIN, SIG_IGN);
+    signal(SIGTTOU, SIG_IGN);
 
 }
 

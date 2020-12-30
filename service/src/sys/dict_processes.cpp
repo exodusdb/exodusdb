@@ -93,7 +93,7 @@ function main() {
 	//10 mins
 	var hungtime = 10 * 60 / 86400;
 	var r33 = RECORD.a(33);
-	if (r33 and (dostimenow - RECORD.a(27) > hungtime)) {
+	if (r33 and (dostimenow - RECORD.a(27) gt hungtime)) {
 		ANS = "Hung";
 		return ANS;
 	}

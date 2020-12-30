@@ -104,8 +104,10 @@ bool var::eof() const
 
 bool var::hasinput()
 {
-	//declare
+	//declare in haskey.cpp
 	bool haskey(void);
+
+	LOCKIOSTREAM
 
 	return haskey();
 }
@@ -119,6 +121,8 @@ bool var::input(const var& prompt, const int nchars)
 
 	// TODO implement nchars including -1
 
+	//LOCKIOSTREAM
+
 	var_typ = VARTYP_STR;
 
 	if (prompt.length())
@@ -127,7 +131,7 @@ bool var::input(const var& prompt, const int nchars)
 		std::cout << std::flush;
 	}
 
-	//declare function
+	//declare function in getkey.cpp
 	int getkey(void);
 
 	//input whatever characters are available into this var a return true if more than none
@@ -2398,7 +2402,7 @@ var var::at(const int column) const
 	if (column == 0)
 		// return "\x1b[G";
 		return "\r"; // works on more terminals
-
+return "";
 	// move to column
 	if (column > 0)
 	{
