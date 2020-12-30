@@ -3,6 +3,8 @@ programinit()
 
 function main() {
 
+        breakoff();
+
 	//SENTENCE
 	//waiting filepattern seconds milliseconds globalend newfilename newfilepath portno?
 	//eg for a database called devdtest and process 3

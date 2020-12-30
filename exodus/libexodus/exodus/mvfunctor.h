@@ -75,12 +75,6 @@ That way you can forget the new exodus concept of "library" which is not a tradi
 #ifndef MVFUNCTOR_H
 #define MVFUNCTOR_H
 
-#if defined(_WIN32) || defined(_MSC_VER) || defined(__CYGWIN__) || defined(__MINGW32__)
-#define EXODUSLIBEXT ".dll"
-#else
-#define EXODUSLIBEXT ".so"
-#endif
-
 #include <exodus/mv.h>
 
 // MvEnvironment and ExodusProgramBase are forward declared classes (see below)

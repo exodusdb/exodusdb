@@ -19,7 +19,6 @@
 //#include <CoreFoundation/CFStringEncodingExt.h>
 #endif
 
-//#define MV_NO_NARROW
 #include <exodus/mv.h>
 #include <exodus/mvexceptions.h>
 

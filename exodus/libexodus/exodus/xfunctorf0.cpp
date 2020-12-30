@@ -31,8 +31,6 @@ public:
 
 /// what follows is the cpp file
 
-#define MV_NO_NARROW
-
 #include <exodus/mv.h>
 #include <exodus/xfunctorf0.h>
 #include <string>

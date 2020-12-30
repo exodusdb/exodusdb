@@ -9,6 +9,10 @@ function main() {
 
     var verbose=OPTIONS.ucase().index("V");
 
+	var exo_HOME=osgetenv("EXO_HOME");
+	if (not exo_HOME)
+		exo_HOME=osgetenv("HOME");
+
     var editor=osgetenv("VISUAL");
     var linenopattern="$LINENO ";
     if (not editor)
@@ -181,10 +185,10 @@ function main() {
 			}
 		}
 
-		//also look in bin and lib for backlinks to source
+		//also look in ~/bin and ~/inc for backlinks to source
 		//similar code in edic and compile
 		if (not(osfile(filename)) and not(filename.index(SLASH))) {
-			var headerfilename=osgetenv("HOME") ^ SLASH ^ "inc" ^ SLASH ^ filename;
+			var headerfilename = exo_HOME ^ SLASH ^ "inc" ^ SLASH ^ filename;
 			headerfilename.fieldstorer(".",-1,1,"h");
 			if (verbose)
 				headerfilename.outputl("headerfile=");

@@ -25,8 +25,6 @@ THE SOFTWARE.
 // C4530: C++ exception handler used, but unwind semantics are not enabled.
 #pragma warning(disable : 4530)
 
-#define MV_NO_NARROW
-
 #include <exodus/mv.h>
 #include <exodus/mvenvironment.h>
 
@@ -54,6 +52,9 @@ DLL_PUBLIC var timedate() { return var().timedate(); }
 DLL_PUBLIC void ossleep(const int milliseconds) { var().ossleep(milliseconds); }
 
 DLL_PUBLIC var ostime() { return var().ostime(); }
+
+DLL_PUBLIC void breakon() { return var().breakon(); }
+DLL_PUBLIC void breakoff() { return var().breakoff(); }
 
 // osopen x to y else
 DLL_PUBLIC bool osopen(const var& osfilename, var& osfilevar, const var& locale)
@@ -909,7 +910,7 @@ int exodus_main(int exodus__argc, const char* exodus__argv[], MvEnvironment& mv,
 	EXECPATH2 = mv.EXECPATH;
 
 	mv.SENTENCE = ""; // ALN:TODO: hm, again, char->var-> op=(var)
-	// SB #define MV_NO_NARROW disallows accidental narrow now
+
 	mv.COMMAND = "";
 	mv.OPTIONS = "";
 

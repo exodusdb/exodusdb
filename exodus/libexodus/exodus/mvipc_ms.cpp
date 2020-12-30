@@ -70,9 +70,6 @@ client closes its handle.
 //#include <tchar.h>
 #include <string>
 
-//
-//#define MV_NO_NARROW
-
 #define EXODUS_IPC_EXTERN extern
 #include <exodus/mvipc.h>
 

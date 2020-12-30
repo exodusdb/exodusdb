@@ -62,6 +62,9 @@ DLL_PUBLIC var timedate();
 DLL_PUBLIC void ossleep(const int milliseconds);
 DLL_PUBLIC var ostime();
 
+DLL_PUBLIC void breakon();
+DLL_PUBLIC void breakoff();
+
 DLL_PUBLIC bool osopen(const var& osfilename, var& osfilevar, const var& locale DEFAULTNULL);
 DLL_PUBLIC void osclose(const var& osfilevar);
 

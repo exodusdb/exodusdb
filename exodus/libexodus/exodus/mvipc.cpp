@@ -45,9 +45,6 @@ THE SOFTWARE.
 
 // using namespace boost::interprocess;
 
-//
-//#define MV_NO_NARROW
-
 #define EXODUS_IPC_EXTERN
 #include <exodus/mvipc.h>
 

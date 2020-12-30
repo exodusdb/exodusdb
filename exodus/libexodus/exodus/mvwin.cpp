@@ -5,9 +5,6 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
-// TODO check why this doesnt appear to work here
-#define MV_NO_NARROW
-
 #include <exodus/mv.h>
 
 namespace exodus

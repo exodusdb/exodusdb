@@ -68,6 +68,10 @@ function main()
 	var noncompilable_extensions=" out so o";
 	var default_extension="cpp";
 
+	var exo_HOME=osgetenv("EXO_HOME");
+	if (not exo_HOME)
+		exo_HOME=osgetenv("HOME");
+
 	var compiler;
 	var basicoptions=osgetenv("CPP_OPTIONS");
 	if (basicoptions and verbose)
@@ -80,7 +84,7 @@ function main()
 	var bindir;
 	var libdir;
 	var incdir;
-	var homedir=osgetenv("HOME");
+	//var homedir=osgetenv("HOME");
 
 	var installcmd;
 	var outputoption="";
@@ -105,9 +109,9 @@ function main()
 			printl("Posix environment detected.");
 
 		//target directories
-		bindir=homedir^"/bin";
-		libdir=homedir^"/lib";
-		incdir=homedir^"/inc";
+		bindir=exo_HOME^"/bin";
+		libdir=exo_HOME^"/lib";
+		incdir=exo_HOME^"/inc";
 
 		//target extensions
 		//make it easier for debuggers

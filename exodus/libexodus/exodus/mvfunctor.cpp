@@ -44,8 +44,6 @@ THE SOFTWARE.
 
 #include <iostream>
 
-#define MV_NO_NARROW
-
 // WINDOWS
 
 // portable shared/dynamic library macros
@@ -53,27 +51,33 @@ THE SOFTWARE.
 // http://www.planet-source-code.com/vb/scripts/ShowCode.asp?txtCodeId=746&lngWId=3
 #if defined(_WIN32) || defined(_MSC_VER) || defined(__CYGWIN__) || defined(__MINGW32__)
 
-// windows.h has function defined so temp undefine and restore afterwards
-#define _save_function_ function
-#undef function
+	// windows.h has function defined so save function definition, undefine it for restoring
+	#define _save_function_ function
+	#undef function
 
-#define WIN32_LEAN_AND_MEAN
-#include "windows.h"
+	#define WIN32_LEAN_AND_MEAN
+	#include "windows.h"
 
-#define function _save_function_
+	//restore function definition
+	#define function _save_function_
 
-using library_t = HINSTANCE;
-//# define dlopen(arg1,arg2) LoadLibrary(arg1)
-#define dlopen(arg1, arg2) LoadLibraryA(arg1)
-#define dlsym(arg1, arg2) GetProcAddress(arg1, arg2)
-// note: MS FreeLibrary returns non-zero for success and 0 for failure
-#define dlclose(arg1) FreeLibrary(arg1)
-#define EXODUSLIBPREFIX
+	using library_t = HINSTANCE;
+	//# define dlopen(arg1,arg2) LoadLibrary(arg1)
+	#define dlopen(arg1, arg2) LoadLibraryA(arg1)
+	#define dlsym(arg1, arg2) GetProcAddress(arg1, arg2)
+	// note: MS FreeLibrary returns non-zero for success and 0 for failure
+	#define dlclose(arg1) FreeLibrary(arg1)
+	#define EXODUSLIBPREFIX
+	#define EXODUSLIBEXT ".dll"
+
 #else
-#include <dlfcn.h>
-using library_t = void*;
-#define EXODUSLIBPREFIX "~/lib/lib"
-//# define EXODUSLIBPREFIX "./lib"+
+
+	#include <dlfcn.h>
+	using library_t = void*;
+	#define EXODUSLIBPREFIX "~/lib/lib"
+	//# define EXODUSLIBPREFIX "./lib"+
+	#define EXODUSLIBEXT ".so"
+
 #endif
 
 // needed for strcmp
@@ -373,20 +377,22 @@ bool ExodusFunctorBase::openlib(std::string newlibraryname)
 	//look for lib file in ~/lib/libXXXXXX.so
 	//otherwise just default library libXXXXXX.so
 	libraryfilename_ = EXODUSLIBPREFIX + newlibraryname + EXODUSLIBEXT;
-	if (libraryfilename_[0] == '~')
-#pragma warning(disable : 4996)
+	if (libraryfilename_[0] == '~') {
+		#pragma warning(disable : 4996)
 		// env string is copied into string so following getenv usage is safe
-		libraryfilename_.replace(0, 1, getenv("HOME"));
+		var exo_HOME;
+		if (not exo_HOME.osgetenv("EXO_HOME"))
+			exo_HOME.osgetenv("HOME");
+		libraryfilename_.replace(0, 1, exo_HOME);
+		//var(libraryfilename_).outputl();
+	}
 
 	FILE* file=fopen(libraryfilename_.c_str(), "r");
 	if (file)
-	{
 		fclose(file);
-	}
 	else
-	{
 		libraryfilename_ = "lib" + newlibraryname + EXODUSLIBEXT;
-	}
+
 	// var(libraryfilename_).outputl();
 
 	// RTLD_NOW
@@ -395,7 +401,7 @@ bool ExodusFunctorBase::openlib(std::string newlibraryname)
 	// referenced. This behavior may be useful for applications that need to know as soon as an
 	// object is loaded that all symbols referenced during execution are available.
 	// RTLD_LAZY|RTLD_LOCAL may be a better option
-	plibrary_ = (void*)dlopen(libraryfilename_.c_str(), RTLD_NOW);
+	plibrary_ = (void*) dlopen(libraryfilename_.c_str(), RTLD_NOW);
 
 #ifdef dlerror
 	const char* dlsym_error = dlerror();

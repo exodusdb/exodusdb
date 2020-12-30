@@ -129,8 +129,6 @@ extern char** environ;
 #define pclose _pclose
 #endif
 
-#define MV_NO_NARROW
-
 #include <exodus/mv.h>
 //#include <exodus/mvutf.h>
 #include <exodus/mvexceptions.h>
@@ -934,9 +932,10 @@ bool var::osgetenv(const var& envvarname)
 		return true;
 	}
 
-#pragma warning(disable : 4996)
+	//TIP if you cant seem to osgetenv vars set in bash, then ensure you set them in bash with "export"
+
+	#pragma warning(disable : 4996)
 	const char* cvalue = std::getenv(envvarname.var_str.c_str());
-	//if you cant get env vars set in bash, then ensure you set them with export
 	if (cvalue == 0)
 	{
 		var_str = "";

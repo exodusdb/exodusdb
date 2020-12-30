@@ -32,8 +32,6 @@ THE SOFTWARE.
 #include <limits>
 #include <sstream>
 
-#define MV_NO_NARROW
-
 #define EXO_MV_CPP // indicates globals are to be defined (omit extern keyword)
 #include <exodus/mv.h>
 //#include <exodus/mvutf.h>

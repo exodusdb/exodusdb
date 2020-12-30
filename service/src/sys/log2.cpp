@@ -69,7 +69,8 @@ function main(in msg0, io time0) {
 		entry ^= sep ^ time2.oconv("MTS") ^ sep;
 		//entry:=field(time2,'.',2) 'MD20P'
 	}
-	entry ^= SYSTEM.a(24) ^ ":" ^ SYSTEM.a(17) ^ " " ^ (time2 - time0).oconv("MD20P");
+	//similar in listen and log2
+	entry ^= SYSTEM.a(24) ^ ": " ^ (time2 - time0).oconv("MD20P");
 	//entry:=sep:sep:sep:sep
 	entry ^= sep ^ msg0;
 

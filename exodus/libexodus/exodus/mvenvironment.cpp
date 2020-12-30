@@ -25,8 +25,6 @@
 #pragma warning(disable : 4530)
 #endif
 
-#define MV_NO_NARROW
-
 #include <string>
 #include <thread>
 #define EXO_MVENVIRONMENT_CPP

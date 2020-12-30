@@ -90,7 +90,6 @@ THE SOFTWARE.
 #include <libpq-fe.h> //in postgres/include
 
 //#include <arpa/inet.h>//for ntohl()
-#define MV_NO_NARROW
 
 #include "MurmurHash2_64.h" // it has included in mvdbconns.h (uint64_t defined)
 

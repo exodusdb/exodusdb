@@ -258,8 +258,6 @@ function main() {
 
 	halt = 0;
 
-	// perform 'ADDMFS SHADOW.MFS FILEORDER.COMMON'
-
 	#define request USER0
 	#define iodat USER1
 	#define response USER3
@@ -327,8 +325,6 @@ function main() {
 	//init:
 	/////
 
-	//discover the server name
-	//servername=field(getdrivepath(drive()[1,2])[3,9999],'/',1)
 	servername = "";
 	onserver = servername eq "" or STATION.trim() eq servername;
 
@@ -338,7 +334,6 @@ function main() {
 	waitfor = 1;
 	waitsecs = 10;
 
-	//if not on "local" drive C,D or E then longer sleep to save network traffic
 	if (onserver) {
 		sleepms = 10;
 	}else{
@@ -348,9 +343,6 @@ function main() {
 	//make up a serverflagfilename
 	serverflagfilename = datasetcode ^ ".svr";
 
-	//intranet=index(origsentence,'INTRANET',1)
-
-	//if @username='EXODUS.NET' then system<33>=1
 	origsysmode = SYSTEM.a(33);
 
 	//webpath=field(origsentence,' ',3)
@@ -388,13 +380,13 @@ function main() {
 	tracing = 1;
 
 	//ensure unique sorttempfile
-	//if sysvar('SET',192,102,'R':('0000':system<24>)[-5,5]:'.SFX') else null
-	//call sysvar_192_102"SET", "R" ^ ("0000" ^ SYSTEM.a(24)).substr(-5,5) ^ ".SFX");
+	//if sysvar('SET',192,102,'R':('0000':processno)[-5,5]:'.SFX') else null
+	//call sysvar_192_102"SET", "R" ^ ("0000" ^ processno).substr(-5,5) ^ ".SFX");
 
 	nrequests = SYSTEM.a(35) + 0;
 
 	printl(var("-").str(79));
-	printl("EXODUS.NET SERVICE ", SYSTEM.a(24), " STARTED ", var().timedate());
+	printl("EXODUS.NET SERVICE ", processno, " STARTED ", var().timedate());
 	printl();
 	printl("Station : ", STATION, "  Process : ", processno, "  Dir : ", oscwd());
 
@@ -457,7 +449,7 @@ function main() {
 		}
 	}
 
-	logfilename = logpath ^ "/" ^ datex.substr(-2,2) ^ datex.substr(1,2) ^ datex.substr(4,2) ^ ("00" ^ SYSTEM.a(24)).substr(-2,2);
+	logfilename = logpath ^ "/" ^ datex.substr(-2,2) ^ datex.substr(1,2) ^ datex.substr(4,2) ^ ("00" ^ processno).substr(-2,2);
 	logfilename ^= ".xml";
 	logfilename.converter("/", OSSLASH);
 
@@ -699,7 +691,7 @@ nextsearch0:
 
 	//place a lock to indicate processing
 	//should really retry in case blocked by other processes checking it
-	//call rtp57(syslock, '', '', trim(@station):system<24>, '', '', '')
+	//call rtp57(syslock, '', '', trim(@station):processno, '', '', '')
 	call lockrecord("PROCESSES", processes, processno, "", 999999);
 
 	//pause forever while any quiet time process (eg hourly backup) is working
@@ -738,16 +730,13 @@ nextsearch0:
 	//check for esc key to exit
 	//if esc.to.exit() then gosub exit
 
-	if (PROCESSNO==1)
-		charx.input("", -1);
-	else
-		charx="";
+	charx.input("", -1);
 	//charx=ucase(charx[1,1])
 	//charx=charx[1,1]
 
 	//esc
 	if (charx.index(INTCONST.a(1))) {
-	//if (charx.index("q")) {
+		//leading space to avoid chars after ESC pressed being ANSI control sequences
 		call mssg(" You have pressed the [Esc]  key to exit|press again to confirm|", "UB", buffer, "");
 		//loop
 		// input reply,-1:
@@ -757,8 +746,8 @@ nextsearch0:
 		reply.input("", 1);
 		call mssg("", "DB", buffer, "");
 		if (reply eq INTCONST.a(1)) {
+			//space to defeat ANSI controls
 			print(" ");
-		//if (reply eq "q") {
 			gosub exit();
 		}
 		if (reply eq INTCONST.a(7)) {
@@ -1081,7 +1070,8 @@ subroutine requestinit() {
 	if (VOLUMES) {
 		print(var().time().oconv("MTS"), " ");
 	}else{
-		print(SYSTEM.a(24), ":", SYSTEM.a(17), " ");
+		//similar in listen and log2
+		print(processno, ": ");
 	}
 
 	//clear out buffers just to be sure
