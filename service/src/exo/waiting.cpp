@@ -1,40 +1,49 @@
-#include <exodus/program.h>
-programinit()
+#include <exodus/library.h>
+libraryinit()
 
 function main() {
 
-        breakoff();
+	breakoff();
 
 	//SENTENCE
 	//waiting filepattern seconds milliseconds globalend newfilename newfilepath portno?
 	//eg for a database called devdtest and process 3
 	//waiting ../data/devdtest/*.1 10 10 ../../global.end neos0000.3 ../data/devdtest/ 5700
 	//printl(SENTENCE);
-        var filepattern=field(SENTENCE," ",2);
-        var waitsecs=field(SENTENCE," ",3);
-        var sleepms=field(SENTENCE," ",4);
-        var globalendfilename=field(SENTENCE," ",5);
-        var databaseendfilename="global.end";
-        var newfilename=field(SENTENCE," ",7) ^ field(SENTENCE," ",6);
+	var filepattern=field(SENTENCE," ",2);
+	var waitsecs=field(SENTENCE," ",3);
+	var sleepms=field(SENTENCE," ",4);
+	var globalendfilename=field(SENTENCE," ",5);
+	var databaseendfilename="global.end";
+	var newfilename=field(SENTENCE," ",7) ^ field(SENTENCE," ",6);
 
-        //printl("Waiting for file ", filename);
-        //printl("New file will be ",newfilename);
+	//printl("Waiting for file ", filename);
+	//printl("New file will be ",newfilename);
 	//printl();
 
-        for (var ii=0;ii<=(1000/sleepms*waitsecs);ii++) {
+	var starttime = ostime();
+	do {
+
+		//limit remaining seconds to 0-10
+		//var elapsedsecs = (ostime() - starttime) * 86400;
+		//var remainingsecs = mod(waitsecs - elapsedsecs,11);
+		var remainingsecs = 1;
+
+		//oswait doesnt support file pattern yet
+		var().oswait(remainingsecs*1000, field(filepattern, "*", 1));
 
 		//quit if any key pressed (not possible if running as a service)
 		if (var().hasinput())
 			break;
 
 		//look for required file
-                var filenames=oslist(filepattern);
+		var filenames=oslist(filepattern);
 
-                if (filenames) {
+		if (filenames) {
 
 			//if not renaming then quit
-                	if (!newfilename)
-                        	break;
+			if (!newfilename)
+				break;
 
 			//delete any existing newfilename in case left from some crash
 			if (osfile(newfilename)) {
@@ -45,39 +54,40 @@ function main() {
 			//if renaming then rename and quit, or process loop if cannot rename
 
 			//rename and quit
-	                var oldfilename=filepattern.fieldstore(SLASH,-1,1,filenames.a(1));
-	                if (osrename(oldfilename,newfilename)) {
-	                        //printl("File renamed from ",oldfilename, " to ", newfilename);
-	                        //var x;
-	                        //x.input();
-	                        break;
+			var oldfilename=filepattern.fieldstore(SLASH,-1,1,filenames.a(1));
+			if (osrename(oldfilename,newfilename)) {
+				//printl("File renamed from ",oldfilename, " to ", newfilename);
+				//var x;
+				//x.input();
+				break;
 			}
 
 			printl("File not renamed from ",oldfilename, " to ", newfilename);
-	                //printl("Get Last Error reports %d\n", GetLastError ());
+			//printl("Get Last Error reports %d\n", GetLastError ());
 
 		}
 
-                //quit if database.END exists
-                if (databaseendfilename) {
-                        if (osfile(databaseendfilename)) {
-                                printl("Found file ", databaseendfilename);
-                                break;
-                        }
+		//quit if database.END exists
+		if (databaseendfilename) {
+			if (osfile(databaseendfilename)) {
+				printl("Found file ", databaseendfilename);
+				break;
+			}
 		}
 
-                //quit if GLOBAL.END exists
-                if (osfile(globalendfilename)) {
-                        printl("Found file ", globalendfilename);
-                        break;
+		//quit if GLOBAL.END exists
+		if (osfile(globalendfilename)) {
+			printl("Found file ", globalendfilename);
+			break;
 		}
 
-                ossleep(sleepms);
+		ossleep(sleepms);
 
-	}//next
+	} while(true);
 
-        return 0;
+	breakon();
+
+	return 0;
 }
 
-programexit()
-
+libraryexit()

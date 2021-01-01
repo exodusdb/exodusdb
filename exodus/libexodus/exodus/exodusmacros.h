@@ -208,20 +208,20 @@ namespace exodus
 
 // narrow char* versions of classic pick delimiters
 //_RM_, _RM and RM_ versions (wchar*, char* and wchar respectively)
-#define _RM "\u01FF"
-#define _FM "\u01FE"
-#define _VM "\u01FD"
-#define _SM "\u01FC"
-#define _TM "\u01FB"
-#define _STM "\u01FA"
+//#define _RM "\u01FF"
+//#define _FM "\u01FE"
+//#define _VM "\u01FD"
+//#define _SM "\u01FC"
+//#define _TM "\u01FB"
+//#define _STM "\u01FA"
 
 // aliases for different multivalue implementations
-#define _IM _RM
-#define _AM _FM
-#define _SVM _SM
+//#define _IM _RM
+//#define _AM _FM
+//#define _SVM _SM
 
-#define _DQ "\""
-#define _SQ "\'"
+//#define _DQ "\""
+//#define _SQ "\'"
 
 #define ID mv.ID
 #define RECORD mv.RECORD

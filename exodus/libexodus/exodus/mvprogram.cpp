@@ -1055,7 +1055,7 @@ var ExodusProgramBase::perform(const var& sentence)
 							true // forcenew each perform/execute
 							))
 		{
-			USER4 ^= "perform() Cannot find shared library \"" ^ str_libname ^
+			USER4 ^= "perform() Cannot find shared library \"" + str_libname +
 				 "\", or \"libraryexit()\" is not present in it.";
 			// throw MVError(USER4);
 			// return "";
@@ -1306,9 +1306,9 @@ baddict:
 				    ("exodusprogrambasecreatedelete_" ^ dictid.lcase()).toString();
 				if (!dict_exodusfunctorbase_->initsmf(str_libname.c_str(),
 								      str_funcname.c_str()))
-					throw MVError("ExodusProgramBase::calculate() Cannot find Library " ^
-							  str_libname ^ ", or function " ^
-							  dictid.lcase() ^ " is not present");
+					throw MVError("ExodusProgramBase::calculate() Cannot find Library " +
+							  str_libname + ", or function " +
+							  dictid.lcase() + " is not present");
 			}
 		}
 

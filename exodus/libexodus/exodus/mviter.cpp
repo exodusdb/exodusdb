@@ -2,23 +2,29 @@
 
 namespace exodus {
 
-    //CONSTRUCTOR from a var
-    var_iter::var_iter(var& v) : data(&v) {};
+    //CONSTRUCTOR from a var (ie begin())
+    var_iter::var_iter(const var& v) : data(&v) {
+	};
 
     //check iter != iter (i.e. iter != end()
-    bool var_iter::operator != (var_iter& vi) {
-        return index != vi.index;
+    bool var_iter::operator != ([[maybe_unused]] var_iter& vi) {
+		//no need to use vi since the end is always string::npos;
+        return this->index != std::string::npos;
     }
 
     //CONVERSION - conversion to var
     var_iter::operator var*() {
 
         //find the end of the field if not already known
-        if (index2 == std::string::npos)
+        if (index2 == std::string::npos) {
             index2 = data->var_str.find(FM_, index);
+		}
 
         //extract the field
-        field = data->var_str.substr(index, index2);
+		if (index2 == std::string::npos)
+	        field = data->var_str.substr(index);
+		else
+	        field = data->var_str.substr(index, index2 - index);
 
         return &field;
     }
@@ -34,8 +40,15 @@ namespace exodus {
         index = index2;
 
         //skip over any FM character
-        if (index !=std::string::npos && data->var_str[index] == FM_)
+        if (index !=std::string::npos) {
+			//max str size = 9223372036854775807
+			//string npos = 18446744073709551615
+			//we will ignore the fact that we could be processing 
+			//a string of maximum size with a terminating FM
+			//and incrementing would take us past maximum string size
+			//but not beyond "no position" npos.
             index++;
+		}
 
         //indicate that the end of the next field is not yet known
         index2 = std::string::npos;
@@ -44,16 +57,14 @@ namespace exodus {
 
     }
 
-//BEGIN - free function to create an iterator -> begin
-DLL_PUBLIC var_iter begin(var& v) {
-    return var_iter(v);
-}
+    //BEGIN - free function to create an iterator -> begin
+    DLL_PUBLIC var_iter begin(const var& v) {
+        return var_iter(v);
+    }
 
-//END - free function to create an interator -> end
-DLL_PUBLIC var_iter end(var& v) {
-    var_iter vi{v};
-    vi.index = std::string::npos;
-    return vi;
-}
+    //END - free function to create an interator -> end
+    DLL_PUBLIC var_iter end( [[maybe_unused]] const var& v) {
+        return var_iter();
+    }
 
 } //namespace exodus

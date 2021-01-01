@@ -678,7 +678,7 @@ var var::match(const var& matchstr, const var& options) const
 						      replacement_for_regex_special);
 
 		// 1. force to match whole string
-		var matchstr3 = "^" ^ matchstr2 ^ "$";
+		var matchstr3 = "^" + matchstr2 + "$";
 
 		// 2. * matches zero or more characters like .* in regex
 		matchstr3.swapper("*", ".*");
@@ -1287,6 +1287,7 @@ bool var::osread(const char* osfilename, const var& codepage)
 	{
 		// emergency memory - will be deleted at } - useful if OOM
 		std::unique_ptr<char[]> emergencymemory(new char[16384]);
+		//std::unique_ptr emergencymemory(new char[16384]);
 
 		// resize the string to receive the whole file
 		var_str.resize(bytesize);
@@ -1577,6 +1578,7 @@ bool var::osbread(const var& osfilevar, var& offset, const int bytesize)
 	// get a memory block to read into
 	// boost::scoped_array<char> memblock(new char [bytesize]);
 	std::unique_ptr<char[]> memblock(new char[bytesize]);
+	//std::unique_ptr memblock(new char[bytesize]);
 	if (memblock == 0)
 		throw MVOutOfMemory("Could not obtain " ^ var(int(bytesize * sizeof(char))) ^
 				    " bytes of memory to read " ^ osfilevar);

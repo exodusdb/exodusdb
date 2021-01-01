@@ -764,7 +764,7 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/)
     		SELECT 	table_name\
     		FROM 	information_schema.tables\
     		WHERE\
-					table_name = '" ^ filename2 ^ "'\
+					table_name = '" + filename2 + "'\
 				)\
 	";
 	var result;
@@ -781,7 +781,7 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/)
 	    		SELECT 	matviewname\
 	    		FROM 	pg_matviews\
 	    		WHERE\
-						matviewname = '" ^ filename2 ^ "'\
+						matviewname = '" + filename2 + "'\
 					)\
 		";
 		connection.sqlexec(sql,result);
@@ -1798,7 +1798,7 @@ bool var::createfile(const var& filename) const
 	// sql ^= " TABLE " ^ filename.convert(".","_");
 	if (filename.substr(-5, 5) == "_temp")
 		sql ^= " TEMP ";
-	sql ^= " TABLE " ^ filename2;
+	sql ^= " TABLE " + filename2;
 	// sql ^= " (key bytea primary key, data bytea)";
 	sql ^= " (key text primary key, data text)";
 

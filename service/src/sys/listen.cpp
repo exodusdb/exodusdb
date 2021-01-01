@@ -677,8 +677,10 @@ nextsearch0:
 	//eg TESTMARK/BMTEST (MARKONE/BMDATA runs!!!!) both MASTERBR and MASTTEST dont
 	//on nl1 it will not run the waiting.exe command
 	//solved by removing path before WAITING.EXE above (unknown cause though)
-	if (SYSTEM.a(29)) {
+	if (not(VOLUMES)) {
+		perform(cmd);
 
+	} else if (SYSTEM.a(29)) {
 		osshell(cmd);
 
 	}else{

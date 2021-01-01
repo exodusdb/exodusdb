@@ -99,7 +99,8 @@ char* stolower(char* s)
 
 // probably no need for LOCKDLCACHE since we have a separate cache per mvenvironment
 #include <mutex>
-#define LOCKDLCACHE std::lock_guard<std::mutex> guard(global_mutex_lockdlcache);
+//#define LOCKDLCACHE std::lock_guard<std::mutex> guard(global_mutex_lockdlcache);
+#define LOCKDLCACHE std::lock_guard guard(global_mutex_lockdlcache);
 static std::mutex global_mutex_lockdlcache;
 
 #include <exodus/mvfunctor.h>

@@ -10,6 +10,21 @@ programinit()
 function main()
 {
 
+	//test accessing var as a range of fields separated by FM
+	{
+		var fields = "a1" _FM_ "b2" _FM_ "c3";
+		var fieldn=0;
+		for (var field : fields) {
+			fieldn++;
+			if (fieldn==1)
+				assert(field=="a1");
+			else if (fieldn==2)
+				assert(field=="b2");
+			if (fieldn==3)
+				assert(field=="c3");
+		}
+	}
+
 	/* UBUNTU locale-gen
 	locale-gen de_DE.UTF-8
 	locale-gen en_GB.UTF-8
@@ -323,7 +338,12 @@ function main()
 	assert(d1==2.2);
 	d1+=1.1;
 	assert(d1==3.3);
-	assert(d1.toString()==3.3);//strange that this compiles and works
+
+	//exodus accidentally equipped std:string with most of the attributes of a var (this could be viewed as a good thing)
+	// the feature was removed by using "hidden friends" ie placing all global friend operator functions inside the body of the var class
+	//
+	//assert(d1.toString()==3.3);//strange that this compiles and works (no longer after switching to "hidden friends" in exodus mv.h
+	//printl(std::string("1.1")+3.3);//strange this compiles! we have equipped std:string with the ability to convert to numeric for addition with a double!
 
 	i1=1;
 	i1+=1;

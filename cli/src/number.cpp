@@ -1,18 +1,18 @@
 #include <exodus/library.h>
 libraryinit()
 
-//var fmtx;
-//var input1;//num
-//var delim;//num
-//var output1;
-
-function main(in type, in input0, in ndecs0, out output) {
-	//c sys in,in,in,out
-
 var fmtx;
 var input1;//num
 var delim;//num
 var output1;
+
+function main(in type, in input0, in ndecs0, out output) {
+	//c xxx in,in,in,out
+
+	//WARNING IF YOU CHANGE THIS THEN ADECOM GOES TO MODULE xxx and libexodus
+	////////////////////////////////////////////////////////////////////////
+	//where exodus/service/src/getarev will copy
+	//~/arev/xxx/number.cpp to ~/exodus/cli/src
 
 	var ndecs = ndecs0;
 	var input = input0;
@@ -24,13 +24,13 @@ var output1;
 		zz = "Z";
 	}
 
-	if (type == "ICONV") {
+	if (type eq "ICONV") {
 		var reciprocal = 0;
-		if (input[1] == "/") {
+		if (input[1] eq "/") {
 			reciprocal = 1;
 			input.splicer(1, 1, "");
-		}else{
-			if (input.substr(1,2) == "1/") {
+			}else{
+			if (input.substr(1,2) eq "1/") {
 				reciprocal = 1;
 				input.splicer(1, 2, "");
 			}
@@ -39,7 +39,7 @@ var output1;
 		output = input.trim();
 
 		//first get into a revelation number with dots not commas
-		if (BASEFMT.substr(1,2) == "MC") {
+		if (BASEFMT.substr(1,2) eq "MC") {
 			output.converter(",", ".");
 		}else{
 			output.converter(",", "");
@@ -47,13 +47,13 @@ var output1;
 	//nb [NUMBER,X] means no decimal place conversion to be done
 		//if ndecs is given then convert to that number of decimals
 		// if ndecs starts with a digit then use {NDECS} (use 2 if {NDECS}=null)
-		if (ndecs == "") {
+		if (ndecs eq "") {
 			if (DICT) {
 				ndecs = calculate("NDECS");
 			}else{
 				ndecs = BASEFMT[3];
 			}
-			if (ndecs == "") {
+			if (ndecs eq "") {
 				ndecs = 2;
 			}
 			if (not(ndecs.match("^\\d$"))) {
@@ -61,10 +61,10 @@ var output1;
 			//FMTX='MD':NDECS:'0P'
 			//OUTPUT=OUTPUT FMTX
 		}
-		if ((ndecs == "*") or (ndecs == "X")) {
+		if (ndecs eq "*" or ndecs eq "X") {
 			ndecs = output.field(".", 2).length();
 		}
-		if (ndecs == "BASE") {
+		if (ndecs eq "BASE") {
 			fmtx = "MD" ^ BASEFMT[3] ^ "0P";
 		}else{
 			fmtx = "MD" ^ ndecs ^ "0P";
@@ -95,13 +95,13 @@ var output1;
 		input1=input.substr2(posn, delim);
 
 		var perc = input1[-1];
-		if (perc == "%") {
+		if (perc eq "%") {
 			input1.splicer(-1, 1, "");
 		}else{
 			perc = "";
 		}
 		var plus = input1[1];
-		if (plus == "+") {
+		if (plus eq "+") {
 			input1.splicer(1, 1, "");
 		}else{
 			plus = "";
@@ -125,13 +125,13 @@ var output1;
 			var unitx = input1.substr(numlen + 1,99);
 			var numx = input1.substr(1,numlen);
 
-			if (ndecs == "BASE") {
+			if (ndecs eq "BASE") {
 				output1 = oconv(numx, BASEFMT ^ zz) ^ unitx;
 			}else{
-				if (ndecs == "") {
+				if (ndecs eq "") {
 					ndecs = numx.field(".", 2).length();
 				}
-
+				//ndecs could be X to mean no conversion at all!
 				fmtx = BASEFMT.substr(1,2) ^ ndecs ^ "0P," ^ zz;
 				if (numx.isnum()) {
 					numx += 0;
@@ -151,7 +151,8 @@ var output1;
 
 		///BREAK;
 		if (not delim) break;
-		output ^= var().chr(256 - delim);
+		//output:=char(256-delim)
+		output ^= var().chr(RM.seq() + 1 - delim);
 	}//loop;
 
 	return 0;

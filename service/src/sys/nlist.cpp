@@ -221,7 +221,7 @@ var spaceoptionsize;
 function main() {
 	//
 	//c sys
-	copyright = "Copyright (C) EXODUS All Rights Reserved";
+	copyright = "Copyright NEOSYS All Rights Reserved";
 	copyright = "";
 	showborder = 0;
 	headtabperpage = 1;

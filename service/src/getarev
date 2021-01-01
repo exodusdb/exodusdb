@@ -21,7 +21,7 @@ function conv_n_e_osys2exodus {
 	find ./$1 -type f -exec sed -i 's#neosys#exodus#g' {} \;
 	find ./$1 -type f -exec sed -i 's#exodus\.com#neosys.com#g' {} \;
 	find ./$1 -type f -exec sed -i 's#NEOSYS#EXODUS#g' {} \;
-	find ./$1 -type f -exec sed -i 's#Copyright NEOSYS#Copyright NEOSYS#g' {} \;
+	find ./$1 -type f -exec sed -i 's#Copyright EXODUS#Copyright NEOSYS#g' {} \;
 
     find ./$1 -type f -exec sed -i 's#batches#journals#g' {} \;
     find ./$1 -type f -exec sed -i 's#batch#journal#g' {} \;
@@ -51,12 +51,21 @@ conv_n_e_osys2exodus sql
 : Get all .cpp from ~/arev/sys
 : =========================================
 :
+: All NEOSYS converted to EXODUS already in ADECOM
+:
 for MODULE in sys
 do
 	mkdir -p  ./$MODULE
 	#cp ~/arev/$MODULE/*.cpp ~/arev/$MODULE/*.h ./$MODULE/
 	cp ~/arev/$MODULE/*.cpp ./$MODULE/
 done
+:
+:
+: Special transfer of number.cpp into exodus/cli/src
+: ==================================================
+:
+	cp ~/arev/xxx/number.cpp ~/exodus/cli/src
+:
 :
 : Create any .h headers in ~/inc
 : ==============================
