@@ -21,16 +21,35 @@ function main() {
 	//printl("New file will be ",newfilename);
 	//printl();
 
+	var n=0;
+	var oswaitsecs = 1;
+
 	var starttime = ostime();
 	do {
 
+		if (TERMINATE_requested)
+			return 0;
+
 		//limit remaining seconds to 0-10
-		//var elapsedsecs = (ostime() - starttime) * 86400;
-		//var remainingsecs = mod(waitsecs - elapsedsecs,11);
-		var remainingsecs = 1;
+		var elapsedsecs = (ostime() - starttime);
+		if (elapsedsecs<0)
+			break;
+		var remainingsecs = waitsecs - elapsedsecs;
+		if (remainingsecs<1)
+			break;
+
+		//start at one second and double every timeout
+		//reason is because events sometimes dont get reported
+		//so we need to check for actual files present
+		//at least in test where only one process is running
+		oswaitsecs = oswaitsecs + oswaitsecs;
+		//but no more than remaining secs
+		if (oswaitsecs>remainingsecs)
+			oswaitsecs = remainingsecs;
 
 		//oswait doesnt support file pattern yet
-		var().oswait(remainingsecs*1000, field(filepattern, "*", 1));
+		//printl(++n , " ", oswaitsecs," ", remainingsecs);
+		var().oswait(oswaitsecs*1000, field(filepattern, "*", 1));
 
 		//quit if any key pressed (not possible if running as a service)
 		if (var().hasinput())

@@ -10,7 +10,7 @@ compile alt exo sys {HS}
 : Compile
 : =======
 :
-compile alt exo sys
+compile alt exo sys {S}
 :
 : Finished
 : ========

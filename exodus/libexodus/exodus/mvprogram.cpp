@@ -469,7 +469,10 @@ void ExodusProgramBase::mssg(const var& msg, const var& options, var& buffer,
 {
 
 	var interactive = !SYSTEM.a(33);
-	var msg1 = msg.convert("|" ^ FM ^ VM ^ SM, "\n\n\n\n").trim("\n");
+	//we must pass the message unmodified into USER4 below
+	//e.g. to pass ACCOUNTLIST back to client with FM/VM etc
+	//var msg1 = msg.convert("|" ^ FM ^ VM ^ SM, "\n\n\n\n").trim("\n");
+	var msg1 = msg;
 
 	//swap %1, %2 etc with params
 	for (var ii=1;ii<=9;++ii)

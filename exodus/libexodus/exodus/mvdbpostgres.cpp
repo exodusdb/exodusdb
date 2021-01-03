@@ -394,13 +394,16 @@ bool var::connect(const var& conninfo)
 	// failed to connect so return false
 	if (PQstatus(pgconn) != CONNECTION_OK)
 	{
-#if TRACING >= 3
+		//if (GETDBTRACE)
+		conninfo2.errputl("connection string=");
+
+//#if TRACING >= 3
 		var("ERROR: mvdbpostgres connect() Connection to database failed: " ^
 				var(PQerrorMessage(pgconn))).errputl();
 		// if (not conninfo2)
 		var("ERROR: mvdbpostgres connect() Postgres connection configuration "
 				"missing or incorrect. Please login.").errputl();
-#endif
+//#endif
 
 		// required even if connect fails according to docs
 		PQfinish(pgconn);
@@ -451,7 +454,8 @@ bool var::connect(const var& conninfo)
 	// but this does
 	// this turns off the notice when creating tables with a primary key
 	// DEBUG5, DEBUG4, DEBUG3, DEBUG2, DEBUG1, LOG, NOTICE, WARNING, ERROR, FATAL, and PANIC
-	this->sqlexec(var("SET client_min_messages = ") ^ (GETDBTRACE ? "LOG" : "WARNING"));
+	//this->sqlexec(var("SET client_min_messages = ") ^ (GETDBTRACE ? "LOG" : "WARNING"));
+	this->sqlexec(var("SET client_min_messages = ") ^ (GETDBTRACE ? "LOG" : "NOTICE"));
 
 	return true;
 }
@@ -2298,14 +2302,8 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 
 	if (fieldname.substr(-5).ucase() == "_XREF")
 	{
+		sqlexpression = "to_tsvector('simple'," ^ sqlexpression ^ ")";
 		//sqlexpression = "to_tsvector('english'," ^ sqlexpression ^ ")";
-		//attempt to ensure numbers are indexed too
-		// but it prevents matching similar words
-		//use "english" dictionary for stemming (or "simple" dictionary for none)
-		// MUST use the SAME in both to_tsvector AND to_tsquery
-		//https://www.postgresql.org/docs/10/textsearch-dictionaries.html
-		//sqlexpression = "to_tsvector('simple'," ^ sqlexpression ^ ")";
-		sqlexpression = "to_tsvector('english'," ^ sqlexpression ^ ")";
 		//sqlexpression = "string_to_array(" ^ sqlexpression ^ ",chr(29),'')";
 
 	// unnest multivalued fields into multiple output rows
@@ -3231,11 +3229,21 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 				value.swapper("&",":*&");
 				value.splicer(-1,0,":*");
 
+				//use "simple" dictionary (ie none) to allow searching for words starting with 'a'
 				//use "english" dictionary for stemming (or "simple" dictionary for none)
 				// MUST use the SAME in both to_tsvector AND to_tsquery
 				//https://www.postgresql.org/docs/10/textsearch-dictionaries.html
-				//value = "to_tsquery('simple'," ^ value ^ ")";
-				value = "to_tsquery('english'," ^ value ^ ")";
+				value = "to_tsquery('simple'," ^ value ^ ")";
+				//value = "to_tsquery('english'," ^ value ^ ")";
+
+				/* creating a "none" stop list?
+				printf "" > /usr/share/postgresql/10/tsearch_data/none.stop
+				CREATE TEXT SEARCH DICTIONARY public.simple_dict (
+				    TEMPLATE = pg_catalog.simple,
+				    STOPWORDS = none
+				);
+				in psql default_text_search_config(pgcatalog.simple_dict)
+				*/
 			}
 
 			// testing for "" may become testing for null

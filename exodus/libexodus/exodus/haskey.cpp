@@ -8,6 +8,8 @@
 #include <termios.h>
 #include <unistd.h>
 
+//derived from https://stackoverflow.com/questions/3962263/how-to-check-if-a-key-was-pressed-in-linux
+
 namespace exodus
 {
 
@@ -24,11 +26,12 @@ bool haskey(void)
 	//	struct sigaction sa;
 
 	/* Save stdin terminal attributes */
-        /* Probably not available if running as a service */
-        if (tcgetattr(0, &oldtio)<0)
-                //EBADF - The filedes argument is not a valid file descriptor.
-                //ENOTTY - The filedes is not associated with a terminal.
-              return false;
+	/* Probably not available if running as a service */
+	if (tcgetattr(0, &oldtio)<0) {
+		//EBADF - The filedes argument is not a valid file descriptor.
+		//ENOTTY - The filedes is not associated with a terminal.
+		return false;
+	}
 
 	/* Make sure we exit cleanly */
 	// memset(&sa, 0, sizeof(struct sigaction));
@@ -44,7 +47,11 @@ bool haskey(void)
 	// sa.sa_handler = SIG_IGN;
 	// sigaction(SIGTTOU, &sa, NULL);
 
-	/* Set non-canonical no-echo for stdin */
+	/* Set stdin mode
+	a) non-canonical (i.e. characterwise not linewise input)
+	b) no-echo
+	https://man7.org/linux/man-pages/man3/termios.3.html
+	*/
 	tcgetattr(0, &curtio);
 	curtio.c_lflag &= ~(ICANON | ECHO);
 	tcsetattr(0, TCSANOW, &curtio);

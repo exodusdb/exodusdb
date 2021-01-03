@@ -1290,20 +1290,21 @@ DLL_PUBLIC bool operator<=(const double double1, const var& rhs) { return !MVlt(
 */
 
 //+var
-DLL_PUBLIC var operator+(const var& var1)
+//DLL_PUBLIC var operator+(const var& var1)
+var MVplus(const var& var1)
 {
 	THISIS("var operator+(const var& var1)")
 	ISDEFINED(var1)
 
 	do
 	{
-		// int
-		if (var1.var_typ & VARTYP_INT)
-			return var1.var_int;
-
 		// dbl
 		if (var1.var_typ & VARTYP_DBL)
 			return var1.var_dbl;
+
+		// int
+		if (var1.var_typ & VARTYP_INT)
+			return var1.var_int;
 
 		// unassigned
 		if (!var1.var_typ)
@@ -1322,20 +1323,21 @@ DLL_PUBLIC var operator+(const var& var1)
 }
 
 //-var (identical to +var above except for two additional - signs)
-DLL_PUBLIC var operator-(const var& var1)
+//DLL_PUBLIC var operator-(const var& var1)
+var MVminus(const var& var1)
 {
 	THISIS("var operator-(const var& var1)")
 	ISDEFINED(var1)
 
 	do
 	{
-		// int
-		if (var1.var_typ & VARTYP_INT)
-			return -var1.var_int;
-
 		// dbl
 		if (var1.var_typ & VARTYP_DBL)
 			return -var1.var_dbl;
+
+		// int
+		if (var1.var_typ & VARTYP_INT)
+			return -var1.var_int;
 
 		// unassigned
 		if (!var1.var_typ)
@@ -1354,7 +1356,8 @@ DLL_PUBLIC var operator-(const var& var1)
 }
 
 //! var
-bool operator!(const var& var1)
+//DLL_PUBLIC bool operator!(const var& var1)
+bool MVnot(const var& var1)
 {
 	THISIS("bool operator!(const var& var1)")
 	ISASSIGNED(var1)
@@ -1368,7 +1371,7 @@ bool operator!(const var& var1)
 
 var MVadd(const var& lhs, const var& rhs)
 {
-	THISIS("var MVadd(const var& lhs,const var& rhs)")
+	THISIS("var operator+(const var& lhs,const var& rhs)")
 	ISNUMERIC(lhs)
 	ISNUMERIC(rhs)
 
@@ -1385,7 +1388,7 @@ var MVadd(const var& lhs, const var& rhs)
 
 var MVsub(const var& lhs, const var& rhs)
 {
-	THISIS("var MVsub(const var& lhs,const var& rhs)")
+	THISIS("var operator-(const var& lhs,const var& rhs)")
 	ISNUMERIC(lhs)
 	ISNUMERIC(rhs)
 
@@ -1402,7 +1405,7 @@ var MVsub(const var& lhs, const var& rhs)
 
 var MVmul(const var& lhs, const var& rhs)
 {
-	THISIS("var MVmul(const var& lhs,const var& rhs)")
+	THISIS("var operator*(const var& lhs,const var& rhs)")
 	ISNUMERIC(lhs)
 	ISNUMERIC(rhs)
 
@@ -1419,7 +1422,7 @@ var MVmul(const var& lhs, const var& rhs)
 
 var MVdiv(const var& lhs, const var& rhs)
 {
-	THISIS("var MVdiv(const var& lhs,const var& rhs)")
+	THISIS("var operator/(const var& lhs,const var& rhs)")
 	ISNUMERIC(lhs)
 	ISNUMERIC(rhs)
 
@@ -1436,7 +1439,7 @@ var MVdiv(const var& lhs, const var& rhs)
 
 var MVmod(const var& lhs, const var& rhs)
 {
-	THISIS("var MVmod(const var& lhs,const var& rhs)")
+	THISIS("var operator%(const var& lhs,const var& rhs)")
 	ISNUMERIC(lhs)
 	ISNUMERIC(rhs)
 
@@ -1463,7 +1466,7 @@ var MVmod(const var& lhs, const var& rhs)
 // is now reserved for ADDITION
 var MVcat(const var& lhs, const var& rhs)
 {
-	THISIS("var MVcat(const var& lhs,const var& rhs)")
+	THISIS("var operator^(const var& lhs,const var& rhs)")
 	ISSTRING(lhs)
 	ISSTRING(rhs)
 
@@ -1571,14 +1574,16 @@ DLL_PUBLIC var operator^(var&& lhs, const double double2) { return lhs^=double2;
 
 //#if defined __MINGW32__
 // allow use of cout<<var
-DLL_PUBLIC
+//pass by value (make a copy) because we are going to convert FM to ^ etc
+//TODO provide a version that works on temporaries?
+//DLL_PUBLIC
 std::ostream& operator<<(std::ostream& ostream1, var var1)
 {
 	THISIS("std::ostream& operator<< (std::ostream& ostream1, var var1)")
 	ISSTRING(var1)
 
 	//replace various unprintable field marks with unusual ASCII characters
-    //std::string str = "\x1A\x1B\x1C\x1D\x1E\x1F";
+    std::string str = "\x1A\x1B\x1C\x1D\x1E\x1F";
     for (auto& c : var1.var_str) {
         if (c <= 0x1F && c >= 0x1A)
             c = "|[\\]^~"[c - 0x1A];

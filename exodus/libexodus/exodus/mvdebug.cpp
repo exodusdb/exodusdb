@@ -419,6 +419,14 @@ var backtrace()
 #endif
 }
 
+//service managers like systemd will send a polite SIGTERM signal
+//and wait for say 90 seconds before sending a kill signal
+void SIGTERM_handler(int)
+{
+	TERMINATE_requested = true;
+}
+
+//signals are received by one thread at random
 void SIGINT_handler(int sig)
 {
 	// ignore more of this signal
@@ -494,9 +502,12 @@ void var::breakoff() const
 	signal(SIGINT, SIG_IGN);
 }
 
+//called in exodus_main to initialise signals
 void var::breakon() const
 {
 	signal(SIGINT, SIGINT_handler); /* this line will redirect ctrl+c signal*/
+
+	signal(SIGTERM, SIGTERM_handler); /* this line will redirect polite request to TERMINATE signal*/
 
 	//turn off text input and output signals to prevent breaking out into gdb debugger
 	//http://curiousthing.org/sigttin-sigttou-deep-dive-linux
