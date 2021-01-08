@@ -134,7 +134,7 @@ class ExodusProgramBase
 
 	void savescreen(var& origscrn, var& origattr) const;
 	// void ostime(var& ostimenow) const;
-	int keypressed(int delayusecs = 0) const;
+	var keypressed(int milliseconds = 0) const;
 	bool esctoexit() const;
 
 	//	bool oswritex(const var& str, const var& filename) const;

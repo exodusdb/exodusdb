@@ -256,26 +256,8 @@ var::operator const char*() const
 var::operator int() const
 {
 	THISIS("var::operator int() const")
-	THISISDEFINED()
-
-	do
-	{
-		// prioritise int since conversion to int perhaps more likely to be an int already
-		if (var_typ & VARTYP_INT)
-			return (int)var_int;
-		if (var_typ & VARTYP_DBL)
-			return int(var_dbl);
-		if (var_typ & VARTYP_NAN)
-			throw MVNonNumeric("int(" ^ substr(1, 20) ^ ")");
-		if (!(var_typ))
-		{
-			THISISASSIGNED()
-			throw MVUnassigned("int(var)");
-		}
-	} while (isnum()); // must be string - try to convert to numeric and go round again
-
-	THISISNUMERIC()
-	throw MVNonNumeric("int(" ^ substr(1, 20) ^ ")");
+	THISISINTEGER()
+	return (int)var_int;
 }
 
 #else
@@ -287,7 +269,7 @@ var::operator int&() const
 	// problems) PROBABLY WILL! since we are returning a non const reference which allows
 	// callers to set the int directly then clear any decimal and string cache flags which would
 	// be invalid after setting the int alone
-	var_typ = VARTYP_INT;
+	//var_typ |= VARTYP_INT;
 	return (int&)var_int;
 }
 var::operator double&() const
@@ -297,7 +279,7 @@ var::operator double&() const
 	// since we are returning a non const reference which allows callers to set the dbl directly
 	// then clear any int and string cache flags which would be invalid after setting the dbl
 	// alone
-	var_typ = VARTYP_DBL;
+	//var_typ |= VARTYP_DBL;
 	return (double&)var_dbl;
 }
 #endif
@@ -988,45 +970,57 @@ DLL_PUBLIC bool MVeq(const var& lhs, const var& rhs)
 	// 2. BOTH NUMERIC STRINGS
 	// exact match on decimal numbers is often inaccurate since they are approximations of real
 	// numbers
+	// match on decimal in preference to int
 	if (lhs.isnum() && rhs.isnum())
 	{
-		//int v int or int v double
-		if (lhs.var_typ & VARTYP_INT)
+		//if (lhs.var_typ & VARTYP_INT)
+		if (lhs.var_typ & VARTYP_DBL)
 		{
 
-			//INT V INT
-			if (rhs.var_typ & VARTYP_INT)
+			//DOUBLE v DOUBLE
+			//if (rhs.var_typ & VARTYP_INT)
+			if (rhs.var_typ & VARTYP_DBL)
 			{
 				// different from MVlt
-				return (lhs.var_int == rhs.var_int);
+
+				//return (lhs.var_intd == rhs.var_intd);
+
+				// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
+				return (std::abs(lhs.var_dbl - rhs.var_dbl) < SMALLEST_NUMBER);
 			}
 
-			// INT V DOUBLE
+			//DOUBLE V INT
 			else
 			{
 				// different from MVlt (uses absolute)
 				// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
+
 				//return (lhs.var_int == rhs.var_dbl);
-				return (std::abs(double(lhs.var_int)-rhs.var_dbl) < SMALLEST_NUMBER);
+				return (std::abs(lhs.var_dbl - double(rhs.var_int)) < SMALLEST_NUMBER);
 			}
 		}
 
-		// DOUBLE V INT
-		if (rhs.var_typ & VARTYP_INT)
+		//INT v DOUBLE
+		//if (rhs.var_typ & VARTYP_INTd)
+		if (rhs.var_typ & VARTYP_DBL)
 		{
 			// different from MVlt (uses absolute)
 			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
+
 			//return (lhs.var_dbl == rhs.var_int);
-			return (std::abs(lhs.var_dbl-double(rhs.var_int)) < SMALLEST_NUMBER);
+			return (std::abs(double(lhs.var_int) - rhs.var_dbl) < SMALLEST_NUMBER);
 		}
 
-		// DOUBLE V DOUBLE
+		//INT v INT
 		else
 		{
 			// different from MVlt (uses absolute)
+
 			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
 			//return (lhs.var_dbl == rhs.var_dbl);
-			return (std::abs(lhs.var_dbl-rhs.var_dbl) < SMALLEST_NUMBER);
+			//return (std::abs(lhs.var_dbl-rhs.var_dbl) < SMALLEST_NUMBER);
+
+			return (lhs.var_int == rhs.var_int);
 		}
 	}
 
@@ -1711,6 +1705,7 @@ MVDebug ::MVDebug(const var& var1) : MVError("MVDebug" ^ var1) {}
 MVStop ::MVStop(const var& var1) : description(var1) {}
 MVAbort ::MVAbort(const var& var1) : description(var1) {}
 MVAbortAll ::MVAbortAll(const var& var1) : description(var1) {}
+MVLogoff ::MVLogoff(const var& var1) : description(var1) {}
 MVArrayDimensionedZero ::MVArrayDimensionedZero() : MVError("MVArrayDimensionedZero:") {}
 MVArrayIndexOutOfBounds ::MVArrayIndexOutOfBounds(const var& var1)
     : MVError("MVArrayIndexOutOfBounds:" ^ var1)

@@ -397,8 +397,11 @@ function main() {
 
 	sentencex = SENTENCE;
 	DICT = "";
-	//maxncols=128
-	maxncols = 100;
+	if (VOLUMES) {
+		maxncols = 100;
+	}else{
+		maxncols = 256;
+	}
 	maxnrecs = "";
 	preselect = 0;
 	keylist = "";
@@ -420,8 +423,11 @@ function main() {
 	silent = 0;
 
 	if (not(dictvoc.open("dict_voc", ""))) {
-		call fsmsg();
-		stop();
+		perform("MAKEFILE dict_voc");
+		if (not(dictvoc.open("dict_voc", ""))) {
+			call fsmsg();
+			stop();
+		}
 	}
 
 	colname.redim(maxncols);
@@ -1053,12 +1059,15 @@ dictrecexit:;
 			if (VOLUMES) {
 				tt ^= "|Please correct the word by retyping it|or pressing [F4] to edit it.|Press [Esc] to re-start.|";
 			}else{
-				tt ^= " Replace with? (Enter to cancel):";
+				tt ^= " Replace with? (Esc Enter to cancel):";
 			}
 		}
-		call mssg(tt, "RCE", word, word);
+		call mssg(tt, "RE", word, word);
 		if (word eq "\x1B") {
 			stop();
+		}
+		if (VOLUMES) {
+			word.ucaser();
 		}
 		gosub getwordexit();
 		goto phraseinit;
@@ -1596,6 +1605,9 @@ nextrec:
 	//if interactive then print @AW<30>:@(36,@CRTHIGH/2):
 	if (not(silent) and not(printfilename.unassigned())) {
 		//put.cursor(cursor)
+		if (recn le 2) {
+			printl();
+		}
 		if (printfilename and (((not(recn % 100)) or not(LISTACTIVE)))) {
 			//first recn will be 2
 			print(var().at(0), var().at(-4), recn, ". ", ID, " ", MV);

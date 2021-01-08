@@ -329,6 +329,7 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 	if (ismv)
 		xlatetemplate=
 R"V0G0N(
+-- $COMMENT
 $RETVAR := array_to_string
 (
  array
@@ -350,6 +351,7 @@ $RETVAR := array_to_string
 	else
 		xlatetemplate=
 R"V0G0N(
+ --$COMMENT
 $RETVAR :=
   $TARGET_EXPR
   FROM $TARGETFILE
@@ -386,9 +388,17 @@ $RETVAR :=
 			var target_filename=line.field(" ",4);
 			var source_key_expr=line.field(" ",5);
 			var target_expr=line.field(" ",6).field(";",1);
-
-			if (lcase(var("dict_") ^ target_filename) == dictfilename) {
-				line = "-- Sorry. Cannot XLATE same file due to pgsql bug. " ^ line;
+//TRACE(dictid)
+//TRACE(reqdictid)
+			//allow xlate job in jobs_text because it is for dict_production_orders section
+			//if (lcase(var("dict_") ^ target_filename) == dictfilename) {
+			//	errputl("> ", dictfilename, " ", dictid.quote(), " possible bad xlate");
+			//}
+			//allowing xlate jobs in dict_jobs text since it is used for other files
+			if (lcase(var("dict_") ^ target_filename) eq dictfilename
+				 && not(target_filename.lcase() == "jobs" && dictid.lcase() == "text")
+			) {
+				line = " -- Sorry. In " ^ target_filename ^ ", " ^ dictid  ^ " you cannot xlate to same file due to pgsql bug.\n -- " ^ line;
 			} else {
 				//source file field number or expression for key to target file
 				//if key field numeric then extract from source file date
@@ -414,7 +424,9 @@ $RETVAR :=
 				//line^=target_expression;
 				//line^="\n FROM "^target_filename;
 				//line^="\n WHERE "^target_filename^".key="^source_key_expression^";";
+				var origline = line;
 				line=xlatetemplate;
+				line.swapper("$COMMENT",origline);
 				line.swapper("$RETVAR",targetvariablename);
 				line.swapper("$TARGETFILE",target_filename);
 				line.swapper("$SOURCEKEY_EXPR",source_key_expr);
@@ -659,17 +671,21 @@ DECLARE
 
 	with_array text[];
 
-	-- The array to be returned by this function.
+	-- Working array to be returned as text
 	return_array text[] := '{}';
 
 	value text;
 
 BEGIN
-	IF length(mvstring)=0 THEN
+	IF length(mvstring)=0 or mvstring is NULL THEN
 		return '';
 	END IF;
 
 	with_array := string_to_array(mvstring,sepchar);
+
+	IF ARRAY_LOWER(with_array, 1) = 0 THEN
+		return '';
+	END IF;
 
 	-- Iterate over each element in "concat_array".
 	FOR loop_offset IN ARRAY_LOWER(with_array, 1)..ARRAY_UPPER(with_array, 1) LOOP

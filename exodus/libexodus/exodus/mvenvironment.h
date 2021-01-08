@@ -140,12 +140,12 @@ class DLL_PUBLIC MvEnvironment
 	// TODO Should not be global otherwise cannot multithread MvEnvironment
 	var LOWERCASE = LOWERCASE_;
 	var UPPERCASE = UPPERCASE_;
-	// var INTERNALCHARS = "x12\x13\x14\x15\x16\x17";
+	// var INTERNALCHARS = "\x1A\x1B\x1C\x1D\x1E\x1F";
 	// var EXTERNALCHARS = _STM_ _TM_ _SM_ _VM_ _FM_ _RM_;
 
 	var TCLSTACK = "";
-	// INTCONST=keyboard constants 1:esc 2:f5 7:f10
-	var INTCONST = "\x1b" _FM_ "{f5?}" _FM_ _FM_ _FM_ _FM_ _FM_ "{f10?}";
+	// INTCONST=keyboard constants 1:ESC 2:f5 7:f10
+	var INTCONST = "\x1B" _FM_ "{f5?}" _FM_ _FM_ _FM_ _FM_ _FM_ "{f10?}";
 	var PRIORITYINT = "";
 	int COL1 = 0;
 	int COL2 = 0;

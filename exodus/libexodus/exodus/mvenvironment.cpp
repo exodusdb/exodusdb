@@ -91,7 +91,7 @@ bool MvEnvironment::init(const int threadno)
 
 //	this->PROCESSNO = getprocessno("/tmp/exodus", &processnolockfd);
 //	this->PROCESSNO = getprocessno(this->EXECPATH.toString().c_str(), &processnolockfd);
-	var tmplockfile = var().ostempdirname() ^ "exodus_" ^ var().oscwd().convert("/\\","__");
+//	var tmplockfile = var().ostempdirname() ^ "exodus_" ^ var().oscwd().convert("/\\","__");
 
 	//eg thread id = 140737353977344
 	//std::cout<<std::this_thread::get_id()<< std::endl;

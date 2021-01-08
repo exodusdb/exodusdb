@@ -1,26 +1,15 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include <poll.h>
-#include <signal.h>
-#include <sys/ioctl.h>
 #include <termios.h>
 #include <unistd.h>
 
 //derived from https://stackoverflow.com/questions/3962263/how-to-check-if-a-key-was-pressed-in-linux
 
+//similar code in haskey.cpp and mvwait.cpp
+
 namespace exodus
 {
 
-// static sig_atomic_t end = 0;
-
-// static void sighandler(int signo)
-//{
-//	end = 1;
-//}
-
-bool haskey(void)
+bool haskey(int milliseconds = 0)
 {
 	struct termios oldtio, curtio;
 	//	struct sigaction sa;
@@ -65,9 +54,7 @@ bool haskey(void)
 	/* See if there is data available */
 	pfds[0].fd = 0;
 	pfds[0].events = POLLIN;
-	bool hasdata = poll(pfds, 1, 0) > 0;
-
-	//}
+	bool hasdata = poll(pfds, 1, milliseconds) > 0;
 
 	/* restore terminal attributes */
 	tcsetattr(0, TCSANOW, &oldtio);
@@ -75,4 +62,4 @@ bool haskey(void)
 	return hasdata;
 }
 
-} // namespace exodus
+} // namespace

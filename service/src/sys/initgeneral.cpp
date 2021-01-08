@@ -25,6 +25,7 @@ libraryinit()
 var lastlog;
 var logtime;
 var msg;
+var pidfilename;
 var pidrec;
 var dbdate;
 var dbtime;
@@ -73,7 +74,7 @@ function main() {
 	//!WARNING decide() returns REPLY number instead of VALUE when not interactive
 
 	//ensure cursor on the left
-	print(var().at(0));
+	//print @(0):
 
 	call log2("GETLASTLOG", lastlog);
 
@@ -282,9 +283,18 @@ function main() {
 	if (not(SYSTEM.a(54))) {
 		SYSTEM.r(54, SYSTEM.a(33));
 	}
-	var pidfilename = SYSTEM.a(54, 5) ^ ".pid";
+	if (VOLUMES) {
+		pidfilename = SYSTEM.a(54, 5) ^ ".pid";
+	}else{
+		pidfilename = "/run/neo/neo@" ^ SYSTEM.a(17);
+		if (SYSTEM.a(17).substr(-4,4) eq "test") {
+			pidfilename.swapper("neo@", "tst@");
+			pidfilename.swapper("_test", "");
+			pidfilename ^= ".pid";
+		}
+	}
 	call osread(pidrec, pidfilename);
-	pidfilename.osdelete();
+	//osdelete pidfilename
 	if (pidrec) {
 		SYSTEM.r(54, 5, pidrec.a(1));
 	}

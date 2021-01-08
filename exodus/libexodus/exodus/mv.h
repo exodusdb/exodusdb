@@ -1075,7 +1075,7 @@ public:
 	// STANDARD INPUT
 	/////////////////
 
-	bool hasinput();
+	bool hasinput(int milliseconds = 0);
 	bool input();
 	bool input(const var& prompt, const int nchars = 0);
 	bool eof() const;
@@ -2128,7 +2128,8 @@ DLL_PUBLIC exodus::var SENTENCE="";
 //#endif
 DLL_PUBLIC inline exodus::var EXECPATH2 = "";
 
-DLL_PUBLIC inline bool TERMINATE_requested = false;
+DLL_PUBLIC inline bool TERMINATE_req = false;
+DLL_PUBLIC inline bool RELOAD_req = false;
 
 //void DLL_PUBLIC output(const var& var1);
 //void DLL_PUBLIC outputl(const var& var1 DEFAULTNULL);
@@ -2179,6 +2180,15 @@ class DLL_PUBLIC MVAbortAll
 {
 	public:
 	explicit MVAbortAll(const var& var1 DEFAULTNULL);
+	var description;
+};
+
+// MVLogoff is similar to MVError
+// but doesnt get stack since abortall() is called normally
+class DLL_PUBLIC MVLogoff
+{
+	public:
+	explicit MVLogoff(const var& var1 DEFAULTNULL);
 	var description;
 };
 

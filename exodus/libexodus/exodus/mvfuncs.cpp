@@ -38,7 +38,7 @@ Binary    Hex          Comments
 //#include <signal.h>
 //#endif
 
-#include <cmath>    //for floor
+//#include <cmath>    //for floor
 #include <cstdlib>  //for exit
 #include <iostream> //cin and cout
 #include <memory>   //for unique_ptr
@@ -102,14 +102,14 @@ bool var::eof() const
 	return (std::cin.eof());
 }
 
-bool var::hasinput()
+bool var::hasinput(int milliseconds)
 {
 	//declare in haskey.cpp
-	bool haskey(void);
+	bool haskey(int milliseconds);
 
 	LOCKIOSTREAM
 
-	return haskey();
+	return haskey(milliseconds);
 }
 
 // for nchars, use int instead of var to trigger error at point of calling not here
@@ -306,32 +306,33 @@ var& var::unassigned(const var& defaultvalue)
 var var::integer() const
 {
 	THISIS("var var::integer() const")
-	THISISNUMERIC()
+	THISISINTEGER()
+/*
+	//pick integer means floor()
+	//-1.0=-1
+	//-0.9=-1
+	//-0.5=-1
+	//-0.1=-1
+	// 0  =0
+	// 0.1=0
+	// 0.5=0
+	// 0.9=0
+	// 1.0=1
 
-	/*pick integer means floor()
-	-1.0=-1
-	-0.9=-1
-	-0.5=-1
-	-0.1=-1
-	 0  =0
-	 0.1=0
-	 0.5=0
-	 0.9=0
-	 1.0=1
-	*/
-
-	// prefer int
-	if (var_typ & VARTYP_INT)
-		return var_int;
 
 	// floor
 	var_int = std::floor(var_dbl);
 	var_typ |= VARTYP_INT;
+*/
 	return var_int;
 }
 
 // integer and floor are the same
-var var::floor() const { return this->integer(); }
+var var::floor() const {
+	THISIS("var var::floor() const")
+	THISISINTEGER()
+	 return var_int;
+}
 
 var var::round(const int ndecimals) const
 {
@@ -429,28 +430,25 @@ bool var::toBool() const
 int var::toInt() const
 {
 	THISIS("int var::toInt() const")
-	THISISNUMERIC()
+	THISISINTEGER()
 
-	// loss of precision if var_int is long long
-	return (var_typ & VARTYP_INT) ? int(var_int) : int(var_dbl);
+	return var_int;
 }
 
 int var::toLong() const
 {
 	THISIS("int var::toLong() const")
-	THISISNUMERIC()
+	THISISINTEGER()
 
-	// loss of precision if var_int is long long
-	return (var_typ & VARTYP_INT) ? long(var_int) : long(var_dbl);
+	return var_int;
 }
 
 double var::toDouble() const
 {
 	THISIS("double var::toDouble() const")
-	THISISNUMERIC()
+	THISISDECIMAL()
 
-	// return double by preference
-	return (var_typ & VARTYP_DBL) ? double(var_dbl) : double(var_int);
+	return var_dbl;
 }
 
 // mainly called in ISSTRING when not already a string

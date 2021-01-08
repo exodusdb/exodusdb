@@ -485,20 +485,37 @@ void ExodusProgramBase::mssg(const var& msg, const var& options, var& buffer,
 	//R=Reply required in buffer
 	if (options.index("R"))
 	{
-		buffer="";
 		if (interactive) {
+
+			//one space after the prompt
 			std::cout << " ";
+
+			//input
+			buffer="";
 			buffer.input();
+
+			//default
 			if (buffer == "")
 				buffer=origbuffer;
-		}
-		else
-			std::cout << std::endl;
 
-		if (buffer=="" && options.index("E"))
-			buffer=0x1B;//esc
+			//escape anywhere in the input returned as a single ESC character
+	        //or empty input with ESC option means ESC
+			if (options.index("E") and (buffer == "" or buffer.index("\x1B")))
+				buffer="\x1B";//esc
+		}
+		else {
+
+			//input=output if not interactive
+			buffer = origbuffer;
+
+			//flush output
+			std::cout << std::endl;
+		}
+
+		//force upper case
 		if (options.index("C"))
 			buffer.ucaser();
+
 		return;
 	}
 
@@ -1096,6 +1113,14 @@ var ExodusProgramBase::perform(const var& sentence)
 			// and abort multiple levels of perform?
 			ANS = "";
 		}
+		//dont catch MVLogoff in perform/execute. leave it for mvprogram top level exit
+		//catch (const MVLogoff& e)
+		//{
+		//	// similar to stop for the time being
+		//	// maybe it should set some error flag/messages
+		//	// and abort multiple levels of perform?
+		//	ANS = "";
+		//}
 
 		// chain is a kind of optional follow controlled by the library function
 		// to perform another function after the first
@@ -1487,63 +1512,28 @@ void ExodusProgramBase::savescreen(var& origscrn, var& origattr) const
 	}
 }
 
-// NO STANDARD C/C++ way to test for key pressed or chars in input buffer!
-// SEE http://c-faq.com/osdep/kbhit.txt (but 1996) for info
-// Checks keyboard buffer (stdin) and returns key
-// pressed, or -1 for no key pressed
-int ExodusProgramBase::keypressed(int delayusecs) const
+var ExodusProgramBase::keypressed(int milliseconds) const
 {
-	/* will not compile on mingw because unlike cygwin
-	 * mingw is close to windows and windows select only works on sockets
-	 * should be easy to reimplement in another way
-	 *char keypressed;
-	 struct timeval waittime;
-	 int nummv.charsmv.read;
-	 struct fdmv.set mask;
-	 FDmv.SET(0, &mask);
-
-	 waittime.tvmv.sec = 0;
-	 waittime.tvmv.usec = delayusecs;
-	 if (select (1, &mask, 0, 0, &waittime))
-	 {
-	 nummv.charsmv.read = read (0, &keypressed, 1);
-	 if (nummv.charsmv.read == 1)
-	 {
-	 cin.putback(keypressed);
-	 return keypressed;
-	 }
-	 }
-	 */
-	return 0;
-
-	// evade warning: unused parameter
-	if (delayusecs)
-	{
-	}
+	return var().hasinput(milliseconds);
 }
 
 bool ExodusProgramBase::esctoexit() const
 {
-	char keypress = keypressed();
-	if (keypress != 0x1B)
-	{
-		//		cin.putback(keypress);
+	if (not keypressed())
 		return false;
-	}
 
-	std::cout << "Paused. Press Enter to resume or Ctrl+C to cancel:" << std::endl;
+	//std::cout << "Press Esc again to cancel or any other key to continue " << std::endl;
+	std::cout << "Paused. Continue? (Y/n) ";
+	std::cout << std::flush;
 
-	while (true)
-	{
-		keypress = keypressed(1000000);
-		if (keypress == 0x1B)
-			return true;
-	}
+	//wait for ever
+	var key;
+	key.input();
 
-	//	keypress=cin.peek();
-	//	if (keypress==0x1B) return true;
+	//key.outputl("key=");
+	//key.oconv("HEX").outputl("key=");
 
-	return false;
+	return key[-1].ucase() == "N";
 }
 
 var ExodusProgramBase::otherusers(const var& param)
@@ -1606,12 +1596,15 @@ lock:
 	if (locked || (allowduplicate && locked eq ""))
 	{
 
-        //also check that there is no unexpired lock in LOCKS files
+		// fail if unexpired persistent lock exists in LOCKS file
         // on the same connection as file
-        var locks;
-        if (filename.assigned() && locks.open("LOCKS",file)) {
 
-            var lockfilekey = filename ^ "*" ^ keyx;
+        var locks;
+        if (locks.open("LOCKS",file)) {
+
+			var filename_for_locks = (filename.assigned() && filename) ? filename : file.a(1);
+            var lockfilekey = filename_for_locks ^ "*" ^ keyx;
+
             var lockrec;
             if (lockrec.read(locks, lockfilekey)) {
 

@@ -26,6 +26,8 @@ THE SOFTWARE.
 #ifndef MVEXCEPTIONS_H
 #define MVEXCEPTIONS_H 1
 
+#include <cmath>    //for floor
+
 /* not using this c++20 feature until established if it requires a runtime overhead or not
 //https://en.cppreference.com/w/cpp/utility/source_location/function_name
 #if defined __has_include
@@ -136,7 +138,7 @@ THE SOFTWARE.
 				   this->substr(1, 20).quote());                                   \
 	if (!(var_typ & VARTYP_INT))                                                               \
 	{                                                                                          \
-		var_int = mvint_t(var_dbl);                                                        \
+		var_int = std::floor(var_dbl);                                                        \
 		var_typ |= VARTYP_INT;                                                             \
 	}
 

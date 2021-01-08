@@ -2,8 +2,9 @@
 libraryinit()
 
 function main() {
-	printl("Goodbye");
-	exit(0);
+	//printl("Goodbye");
+	//exit(0);
+	throw MVLogoff("Logoff");
 	return 0;
 }
 

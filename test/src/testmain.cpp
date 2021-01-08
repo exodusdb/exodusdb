@@ -1,14 +1,69 @@
 #include <cassert>
-#include <iostream>
 #include <sstream>
-#include <string>
 
 #include <exodus/program.h>
+
+// TESTING
+
+// if it runs ok with no static assertion failures
+// 1. compile testmain && testmain
+
+// then test no changes in output with the following
+// 2. compile testmain && testmain > t_testmain 2> /dev/null && diff testmain.out t_testmain
+
+// DEVELOPING
+
+// any variable output (including dates/times/random numbers) must use errput (not print or output)
+//
+// if you add to or change the output in any way then update the expected output file
+//
+// testmain 1> testmain.out
 
 programinit()
 
 function main()
 {
+
+	//output time and date to stderr
+	errputl("Using Exodus library version:" ^ var().version());
+	date().oconv("D").errputl("Date is:");
+	time().oconv("MTS").errputl("Time is:");
+
+	//14:30:46 04 JAN 2021
+	assert(timedate().match("\\d{2}:\\d{2}:\\d{2} \\d{2} [A-Z]{3} \\d{4}"));
+
+	printl("----------------------------------------------");
+
+    var v=123.456;
+    assert(int(v) != v);
+    assert(int(v) == 123);
+    assert(double(v) == v);
+    assert(double(v) == 123.456);
+    assert(floor(v) != v);
+    assert(floor(v) == int(v));
+
+    v="123.456";
+    assert(int(v) != v);
+    assert(int(v) == 123);
+    assert(double(v) == v);
+    assert(double(v) == 123.456);
+    assert(floor(v) != v);
+    assert(floor(v) == int(v));
+
+    v=123456;
+    v=v/1000;
+    assert(int(v) != v);
+    assert(int(v) == 123);
+    assert(double(v) == v);
+    assert(double(v) == 123.456);
+    assert(floor(v) != v);
+    assert(floor(v) == int(v));
+
+	double d=1234.567;
+	assert(var(d)=="1234.567");
+	assert(var(-d)=="-1234.567");
+	assert(int(var(d))==1234);
+	assert(int(var(-d))==-1235);
 
 	//test accessing var as a range of fields separated by FM
 	{
@@ -74,9 +129,6 @@ function main()
 	var LatinCapitalI           ="I";
 
 	var GermanEszet             ="ß";//"\u00DF";//German
-
-	printl("----------------------------------------------");
-	printl("Using Exodus library version:"^var().version());
 
 	printl("sizeof");
 	printl("int:      ",(int)sizeof(int));
@@ -170,7 +222,8 @@ function main()
 
 	//osread invalid utf8 should read without change
 	//will be unwritable to database which only accepts utf8 key and data
-	osread(utftest,utftestfilename);
+	if (not osread(utftest,utftestfilename))
+		abort("testmain must be run in ~/exodus/test/src to have access to " ^ utftestfilename);
 	utftest.len().outputl("len=");
 	assert(len(utftest)==osfile(utftestfilename).a(1));
 
@@ -1821,9 +1874,6 @@ dict(AGE_IN_YEARS) {
 	assert(str1.trimmer(" ","FB") eq "xxx  xxx");
 	assert(str1 ne str0);
 
-
-	assert(timedate().outputl("timedate()=") ne "");
-
 	dim a9;
 	var a10;
 	assert(split("xx"^FM^"bb",a9) eq 2);
@@ -2522,7 +2572,7 @@ while trying to match the argument list '(exodus::var, bool)'
 	osrmdir("testmain.2");
 
 	printl();
-	printl("osdir("^SLASH^")=",osdir(SLASH));
+	assert(osdir(SLASH).match(_FM_ "\\d{5}" _FM_ "\\d{1,5}"));
 
 	//root directories
 
@@ -2612,10 +2662,6 @@ while trying to match the argument list '(exodus::var, bool)'
 	var y;
 	x="0";
 	y=date();
-	date().oconv("D").outputl("Date is:");
-	time().oconv("MTS").outputl("Time is:");
-	timedate().outputl("Time and Date is:");
-	//assert( not (x > y) );
 
 	assert(var(1000).oconv("MD20P,") eq "1,000.00");
 
@@ -2912,8 +2958,8 @@ while trying to match the argument list '(exodus::var, bool)'
 		assert(itime.oconv("MTS").iconv("MTS") eq itime);
 	}
 	var stopped=ostime();
-	printl(stopped-started," seconds");
-	printl("testmain finished ok and exiting ...");
+	errputl(stopped-started," seconds");
+	printl("testmain finished ok and exiting OK");
 
 	return 0;
 }

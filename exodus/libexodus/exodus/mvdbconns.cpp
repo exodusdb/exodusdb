@@ -105,6 +105,7 @@ MvConnectionsCache::~MvConnectionsCache()
 	for (ix = conntbl.begin(); ix != conntbl.end(); ix++)
 	{
 		//		del((CACHED_CONNECTION) ix->second.connection);
+				del((CACHED_CONNECTION) ix->second.connection);
 		delete ix->second.plock_table;
 		delete ix->second.precordcache;
 	}

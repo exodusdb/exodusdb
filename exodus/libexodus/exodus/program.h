@@ -34,49 +34,60 @@
 //OPTION I=Ignore causes error exit to be suppressed
 #define programexit(PROGRAMNAME)                                                   \
 	classexit(PROGRAMNAME)                                                         \
-	int PROGRAMNAME##main2(int exodus__argc, const char* exodus__argv[], int threadno)   \
+	int PROGRAMNAME##main2(int exodus__argc, const char* exodus__argv[], int threadno) \
 	{                                                                              \
 		MvEnvironment mv;                                                          \
 		exodus_main(exodus__argc, exodus__argv, mv, threadno);                     \
+		int result = 0;                                                            \
 		try                                                                        \
 		{                                                                          \
 			PROGRAMNAME##ExodusProgram exodusprogram1(mv);                         \
-			return OPTIONS.index("I") ? 0 : exodusprogram1.main().toInt();         \
+			result = exodusprogram1.main().toInt();                                \
 		}                                                                          \
 		catch (MVStop exceptionx)                                                  \
 		{                                                                          \
 			if (exceptionx.description.length())                                   \
 				exceptionx.description.outputl();                                  \
 			if (exceptionx.description.isnum())                                    \
-				exit(OPTIONS.index("I") ? 0 : exceptionx.description.toInt());     \
-			else                                                                   \
-				exit(0);                                                           \
+				result = exceptionx.description.toInt();                           \
 		}                                                                          \
 		catch (MVAbort exceptionx)                                                 \
 		{                                                                          \
 			if (exceptionx.description.length())                                   \
 				exceptionx.description.outputl();                                  \
 			if (exceptionx.description.isnum() && exceptionx.description)          \
-				exit(exceptionx.description);                                      \
+				result = exceptionx.description;                                   \
 			else                                                                   \
-				exit(OPTIONS.index("I") ? 0 : 1);                                  \
+				result = 1;                                                        \
 		}                                                                          \
 		catch (MVAbortAll exceptionx)                                              \
 		{                                                                          \
 			if (exceptionx.description.length())                                   \
 				exceptionx.description.outputl();                                  \
 			if (exceptionx.description.isnum())                                    \
-				exit(OPTIONS.index("I") ? 0 : exceptionx.description.toInt());     \
+				result = exceptionx.description.toInt();                           \
 			else                                                                   \
-				exit(OPTIONS.index("I") ? 0 : 2);                                  \
+				result = 2;                                                        \
+		}                                                                          \
+		catch (MVLogoff exceptionx)                                                \
+		{                                                                          \
+			if (exceptionx.description.length())                                   \
+				exceptionx.description.outputl();                                  \
+			if (exceptionx.description.isnum())                                    \
+				result = exceptionx.description.toInt();                           \
 		}                                                                          \
 		/*catch (MVError exceptionx)                                               \
 		{                                                                          \
 			printl(exceptionx.description, " - Aborting.");                        \
 			printl(exceptionx.stack.convert(FM, "\n"));                            \
-			exit(OPTIONS.index("I") ? 0 : 999);                                    \
+			result = OPTIONS.index("I") ? 0 : 999;                                 \
 		}*/                                                                        \
-		return 0;                                                                  \
+		/*TODO disconnect ALL connections of this thread*/                         \
+		var("PROCESSES").deleterecord(PROCESSNO);                                  \
+		disconnect();                                                              \
+		if (OPTIONS.index("I"))                                                    \
+			result = 0;                                                            \
+		return result;                                                             \
 	}                                                                              \
 	int PROGRAMNAME##main(int exodus__argc, const char* exodus__argv[])            \
 	{                                                                              \

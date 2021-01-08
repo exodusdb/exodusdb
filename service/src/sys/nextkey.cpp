@@ -45,7 +45,7 @@ function main(in mode, in previous0="") {
 	//lock the source of numbers
 	var buffer = "";
 lockit:
-	if (not(lockrecord("", keyfile, seqkey))) {
+	if (not(lockrecord(keyfilename, keyfile, seqkey))) {
 		var temp = keyfilename;
 		if (temp[-1] eq "S") {
 			temp.splicer(1, 1, "");
@@ -118,7 +118,7 @@ checkrec:
 					}
 					notok = 2;
 				}
-				if (lockrecord("", actfile, keyx)) {
+				if (lockrecord(actfilename, actfile, keyx)) {
 					notok = 0;
 				}
 			}
@@ -129,10 +129,10 @@ checkrec:
 			goto checkrec;
 		}
 
-		var xx = unlockrecord("", actfile, keyx);
+		var xx = unlockrecord(actfilename, actfile, keyx);
 	}
 
-	var xx = unlockrecord("", keyfile, seqkey);
+	var xx = unlockrecord(keyfilename, keyfile, seqkey);
 
 	ANS = keyx;
 	return keyx;

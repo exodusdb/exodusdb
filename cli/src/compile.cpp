@@ -1,6 +1,8 @@
 #include <thread>
 #include <list>
 
+static inline int ncompilationfailures;
+
 #include <exodus/program.h>
 programinit()
 
@@ -441,7 +443,7 @@ function main()
 	if (libdir[-1]!=SLASH)
 		libdir ^= SLASH;
 
-	var ncompilationfailures=0;
+	//var ncompilationfailures=0;
 	for (var fileno=1; fileno<=nfiles; ++fileno) {
 
 		var text="";
@@ -1125,7 +1127,7 @@ var inclusion=
 				compileoptions,
 				outputoption,
 				linkoptions,
-				ncompilationfailures,
+				//ncompilationfailures,
 				isprogram,
 				installcmd,
 				manifest
@@ -1158,7 +1160,7 @@ function static compile(
 	in compileoptions,
 	in outputoption,
 	in linkoptions,
-	in ncompilationfailures0,
+	//in ncompilationfailures0,
 	in isprogram,
 	in installcmd,
 	in manifest
@@ -1181,7 +1183,7 @@ function static compile(
 		}
 #endif
 
-		var ncompilationfailures = ncompilationfailures0;
+		//var ncompilationfailures = ncompilationfailures0;
 		var objfilename = objfilename0;
 
 		if (verbose) {

@@ -47,7 +47,7 @@ function main() {
 	*/
 
 	var fromdate = RECORD.a(27).floor() - 24873;
-	var fromtime = RECORD.a(27).field(".", 2) / 86400;
+	var fromtime = ("." ^ RECORD.a(27).field(".", 2)) * 86400;
 	return elapsedtimetext(fromdate, fromtime, uptodate, uptotime);
 }
 libraryexit(last_updated2)

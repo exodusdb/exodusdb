@@ -59,6 +59,13 @@ listen:
 
 	SYSTEM.r(33, "");
 
+	//trim off uninteresting back trace into listen
+	//leave for now in case of errors in listen while converting to exodus
+	//tt=index(@user4,fm:'listen.cpp',1)
+	//if tt then
+	// @user4[tt,99999]=''
+	// end
+
 	if (USER4.substr(1,7) eq "RESTART") {
 
 		if (USER4 eq "RESTART $LISTEN") {

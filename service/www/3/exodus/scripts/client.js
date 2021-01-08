@@ -732,11 +732,19 @@ function blockmodalui_sync() {
                     if (gchildwin.xhttp)
                         dialogargs.xhttp = gchildwin.xhttp
 
-                    var dialogstyle
+                    //var dialogstyle
+			        var newwidth = 200
+			        var newheight = 120
+			        var max=getmaxwindow_sync()
+			        var newleft = 0 + (max.width - newwidth) / 2
+			        var newtop = 0 + (max.height - newheight) / 2
+			        var dialogstyle = 'top='+newtop+', left='+newleft+', width='+newwidth+', height='+newheight
+					dialogstyle +', menubar=no, scrollbars=no, status=no, titlebar=no, toolbar=no'
+					//alert(dialogstyle)
 
                     //cant call exodusshowmodaldialog because that requires a global gcurrentevent variable/generator function
                     //and that global/generator is already in use handling some current event that is yielded for async xmlhttprequest
-                    actualwin = window.open(EXODUSlocation + 'confirm.htm', '', dialogstyle)
+                    actualwin = window.open(EXODUSlocation + 'confirm.htm', 'noautofit', dialogstyle)
                     gchildwin.actual = actualwin
 
                     if (!actualwin) {

@@ -27,7 +27,7 @@ function main() {
 	var starttime = ostime();
 	do {
 
-		if (TERMINATE_requested)
+		if (TERMINATE_req || RELOAD_req)
 			return 0;
 
 		//limit remaining seconds to 0-10

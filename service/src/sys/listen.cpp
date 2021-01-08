@@ -550,7 +550,7 @@ nextsearch:
 
 nextsearch0:
 ////////////
-	if (TERMINATE_requested) {printl("TERMINATE requested for PROCESSNO " ^ PROCESSNO);return 0;}
+	if (TERMINATE_req or RELOAD_req) {printl("Closing PROCESSNO " ^ PROCESSNO);return 0;}
 	var().clearcache();
 
 	//restore the program stack

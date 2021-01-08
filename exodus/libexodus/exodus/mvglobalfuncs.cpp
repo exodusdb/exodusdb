@@ -846,35 +846,6 @@ DLL_PUBLIC bool osgetenv(const var& name, var& value) { return value.osgetenv(na
 // like "if set xxx=yyy"
 DLL_PUBLIC bool ossetenv(const var& name, const var& value) { return value.ossetenv(name); }
 
-//DLL_PUBLIC
-//void exodus_atexit()
-//{
-//	// done in handle cache destructor now
-//	//	var().disconnect();
-//}
-
-/* getting path to current executable
-
-from http://stackoverflow.com/questions/143174/c-c-how-to-obtain-the-full-path-of-current-directory
-
-Windows:
-
-int bytes = GetModuleFileName(NULL, pBuf, len);
-if(bytes == 0)
-	return -1;
-else
-	return bytes;
-
-Linux but not macosx apparently:
-
-char szTmp[32];
-sprintf(szTmp, "/proc/%d/exe", getpid());
-int bytes = MIN(readlink(szTmp, pBuf, len), len - 1);
-if(bytes >= 0)
-	pBuf[bytes] = '\0';
-return bytes;
-*/
-
 DLL_PUBLIC
 int exodus_main(int exodus__argc, const char* exodus__argv[], MvEnvironment& mv, int environmentno)
 {
@@ -906,7 +877,7 @@ int exodus_main(int exodus__argc, const char* exodus__argv[], MvEnvironment& mv,
 	//	if (SLASH=="\\")
 	//		EXECPATH.converter("/","\\");
 	//}
-	// leave a copy where backtrace can get at it
+	// leave a global copy where backtrace can get at it
 	EXECPATH2 = mv.EXECPATH;
 
 	mv.SENTENCE = ""; // ALN:TODO: hm, again, char->var-> op=(var)
@@ -969,5 +940,34 @@ int exodus_main(int exodus__argc, const char* exodus__argv[], MvEnvironment& mv,
 
 	return 0;
 }
+
+//DLL_PUBLIC
+//void exodus_atexit()
+//{
+//	// done in handle cache destructor now
+//	//	var().disconnect();
+//}
+
+/* getting path to current executable
+
+from http://stackoverflow.com/questions/143174/c-c-how-to-obtain-the-full-path-of-current-directory
+
+Windows:
+
+int bytes = GetModuleFileName(NULL, pBuf, len);
+if(bytes == 0)
+	return -1;
+else
+	return bytes;
+
+Linux but not macosx apparently:
+
+char szTmp[32];
+sprintf(szTmp, "/proc/%d/exe", getpid());
+int bytes = MIN(readlink(szTmp, pBuf, len), len - 1);
+if(bytes >= 0)
+	pBuf[bytes] = '\0';
+return bytes;
+*/
 
 } // namespace exodus

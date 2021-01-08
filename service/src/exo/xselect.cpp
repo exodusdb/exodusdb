@@ -12,7 +12,7 @@ function main(in cmd) {
 	}
 	select(cmd);
 	if (SYSTEM.a(33)) {
-		print("done");
+		printl("done");
 	}
 	return 0;
 

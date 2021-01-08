@@ -15,17 +15,17 @@ function main()
 //	this code fragment tests UTF8 coding/decoding by reading utf8.html and writing its copy ...
 	var utf8_html = "utf8.html";
 	var buf;
-	buf.osread( "utf8.html");				// read with built in UTF8 conversion wstringfromUTF8()
-	buf.oswrite( "utf8copy.html");			// write with built in UTF8 conversion
-	buf.osread( "utf8.html", "utf8");		// read with boost_utf8-facet
-	buf.oswrite( "utf8utf8.html", "utf8");	// write with boost_utf8_facet
-	printl( "Check that 'utf8.html', 'utf8copy.html', 'utf8utf8.html' in working directory - identical");
+	buf.osread( "t_utf8.html");				// read with built in UTF8 conversion wstringfromUTF8()
+	buf.oswrite( "t_utf8copy.html");			// write with built in UTF8 conversion
+	buf.osread( "t_utf8.html", "utf8");		// read with boost_utf8-facet
+	buf.oswrite( "t_utf8utf8.html", "utf8");	// write with boost_utf8_facet
+	printl( "Check that 't_utf8.html', 't_utf8copy.html', 't_utf8utf8.html' in working directory - identical");
 	printl( "Press Enter to continue ...");
 	char c = getchar();
 
 	// and chinese page
-	buf.osread( "calblur8.html", "utf8");
-	buf.oswrite( "calblur8utf8.html", "utf8");
+	buf.osread( "t_calblur8.html", "utf8");
+	buf.oswrite( "t_calblur8utf8.html", "utf8");
 	printl( "Check that 'calblur8.html' and 'calblur8utf8.html' in working directory - identical");
 	printl( "Press Enter to continue ...");
 	c = getchar();
@@ -34,9 +34,9 @@ function main()
 //  this code fragment tests locale specific characters IO with narrow files (1 char = 1 byte codepages)
 	var EN_RU_UA_txt1 = "[English language][Русский язык][Українська мова]\n";
 	var EN_RU_UA_txt2;
-	var EN_RU_UA_file = "test_EN_RU_UA.txt";
+	var EN_RU_UA_file = "t_test_EN_RU_UA.txt";
 //	oswrite( EN_RU_UA_txt1, EN_RU_UA_file, 1058);
-	oswrite( EN_RU_UA_txt1, EN_RU_UA_file, "Ukrainian_Ukraine.1251");
+	oswrite( EN_RU_UA_txt1, EN_RU_UA_file, "t_Ukrainian_Ukraine.1251");
 	EN_RU_UA_file.osclose();
 	EN_RU_UA_txt2.osread( EN_RU_UA_file, "Ukrainian_Ukraine.1251");
 	EN_RU_UA_txt1.outputl( "Written   text:");
@@ -48,7 +48,7 @@ function main()
 //  Do it again, dynamically changing locale to Greek
 	var EN_GREEK_txt1 = L"[Greek character \\u03A3][\u03A3]\n";
 	var EN_GREEK_txt2;
-	var EN_GREEK_file = "test_EN_GREEK.txt";
+	var EN_GREEK_file = "t_test_EN_GREEK.txt";
 	oswrite( EN_GREEK_txt1, EN_GREEK_file, "Greek_Greece.1253");
 	EN_GREEK_file.osclose();
 	EN_GREEK_txt2.osread( EN_GREEK_file, "Greek_Greece.1253");
@@ -65,7 +65,7 @@ function main()
 //  this code fragment tests locale specific characters IO with UTF8 files
 	var MIXTURE_txt1 = "[English][Русский][Українська][Greek Char:\\u03A3][\u03A3]\n";
 	var MIXTURE_txt2;
-	var MIXTURE_file = "test_MIXTURE.txt";
+	var MIXTURE_file = "t_test_MIXTURE.txt";
 	oswrite( MIXTURE_txt1, MIXTURE_file, "utf8");
 	MIXTURE_file.osclose();
 	MIXTURE_txt2.osread( MIXTURE_file, "utf8");
@@ -106,7 +106,7 @@ function main()
 	BUF_30_23.outputl( "BUF_30_23=");
 
 	// Lets test osbwrite() with position update and UTF8
-	var OUTPUT_file = "test_OUTPUT_UTF8.txt";
+	var OUTPUT_file = "t_test_OUTPUT_UTF8.txt";
 	oswrite( "", OUTPUT_file, "utf8");
 	position = 5;
 	assert( osbwrite( L"1234567890", OUTPUT_file, position));
@@ -118,7 +118,7 @@ function main()
 	assert( osbwrite( L"XYZ", OUTPUT_file, position));
 
 	// Lets test osbwrite() with position update and default locale (1251)
-	OUTPUT_file = "test_OUTPUT_1251.txt";
+	OUTPUT_file = "t_test_OUTPUT_1251.txt";
 	oswrite( "", OUTPUT_file, "");
 	position = 5;
 	assert( osbwrite( L"1234567890", OUTPUT_file, position));
@@ -177,7 +177,7 @@ programexit()
 //	assert( test == testback);
 //
 ///* this is about greek character:
-//	var tempfilename5 = "tempfilename5W.txt";
+//	var tempfilename5 = "t_tempfilename5W.txt";
 //	var record5;
 //	 var Greek =L"This is string with character \\u038A: '\u038A'\n"
 //				L"And this one is character \\u0393: '\u0393'";
@@ -191,21 +191,21 @@ programexit()
 //	 assert(osread(record5,tempfilename5));
 //	 assert(record5.oconv("HEX2") eq "000000003738");
 //*/
-//	var tempfilename5 = "tempfilename5.txt";
+//	var tempfilename5 = "t_tempfilename5.txt";
 //	oswrite("",tempfilename5);
 //	 assert( osbwrite("78",tempfilename5,2));
 //	 osclose(tempfilename5);
 //	 osdelete(tempfilename5);
 //
-//	tempfilename5 = "tempfilename6.txt";
+//	tempfilename5 = "t_tempfilename6.txt";
 //	oswrite("",tempfilename5);
 //	assert(osbwrite("This is written from 10th byte", tempfilename5, 10));
 //
-//	tempfilename5 = "tempfilename7.txt";
+//	tempfilename5 = "t_tempfilename7.txt";
 //	oswrite("",tempfilename5);
 //	assert(osbwrite("This is written from 0th byte", tempfilename5, 0));
 //
-//	tempfilename5 = "tempfilename8.txt";
+//	tempfilename5 = "t_tempfilename8.txt";
 //	oswrite("",tempfilename5);
 //	assert(osbwrite("Just to test dynamically grown handle cache table", tempfilename5, 0));
 //

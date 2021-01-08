@@ -105,9 +105,13 @@ namespace exodus
 // bool startipc();
 
 // Deleter function to close connection and connection cache object
+// this is also called in the destructor of MVConnectionsCache
+// MAKE POSTGRES CONNECTIONS ARE CLOSED PROPERLY OTHERWISE MIGHT RUN OUT OF CONNECTIONS!!!
+// TODO so make sure that we dont use exit(n) anywhere in the programs!
 static void connection_DELETER_AND_DESTROYER(CACHED_CONNECTION con_)
 {
 	PGconn* pgp = (PGconn*)con_;
+	//var("========================== deleting connection ==============================").errputl();
 	PQfinish(pgp); // AFAIK, it destroys the object by pointer
 		       //	delete pgp;
 }
@@ -176,27 +180,46 @@ std::string getresult(PGresult* pgresult, int rown, int coln)
 // 'xxx' 123 .123 +123 -123
 static const var valuechars("\"'.0123456789-+");
 
-class Resultclearer
+class Scoped_PGresult
 {
 
 	// Save pgresultptr in this class and to guarantee that it will be PQClear'ed on function
-	// exit Resultclearer clearer(pgresult);
+	// exit Scoped_PGresult clearer(pgresult);
 
-      public:
-	Resultclearer(PGresult* pgresult) : pgresult_(pgresult)
+	// owns the PGresult object on the stack
+	PGresult* pgresult_ = nullptr;
+
+public:
+
+	//default constructor
+	Scoped_PGresult() = default;
+
+	// constructor from a PGresult*
+	Scoped_PGresult(PGresult* pgresult) : pgresult_(pgresult)
 	{
 		// var("Got pgresult ... ").output();
 	}
 
-	~Resultclearer()
+	// assignment from a PGresult*
+	void operator= (PGresult* pgresult)
+	{
+		pgresult_ = pgresult;
+		// var("Got pgresult ... ").output();
+	}
+
+	// implicit conversion to a PGresult*
+	operator PGresult*() const {
+		return pgresult_;
+	};
+
+	// destructor calls PQClear
+	~Scoped_PGresult()
 	{
 		// var("Cleared pgresult").outputl();
 		if (pgresult_ != nullptr)
 			PQclear(pgresult_);
 	}
 
-      private:
-	PGresult* pgresult_ = nullptr;
 };
 
 void var::setlasterror(const var& msg) const
@@ -224,8 +247,9 @@ var var::getlasterror() const
 		return "";
 }
 
-using PGresultptr = PGresult*;
-static bool getpgresult(const var& sql, PGresultptr& pgresult, PGconn* thread_pgconn);
+//using PGresultptr = PGresult*;
+//static bool getpgresult(const var& sql, PGresultptr& pgresult, PGconn* thread_pgconn);
+static bool getpgresult(const var& sql, Scoped_PGresult& pgresult, PGconn* thread_pgconn);
 
 #if defined _MSC_VER //|| defined __CYGWIN__ || defined __MINGW32__
 LONG WINAPI DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS pExcPointers)
@@ -379,9 +403,11 @@ bool var::connect(const var& conninfo)
 			return false;
 		};
 #else
+		//connect
 		pgconn = PQconnectdb(conninfo2.toString().c_str());
 #endif
 
+		//connected ok
 		if (PQstatus(pgconn) == CONNECTION_OK || conninfo2)
 			break;
 
@@ -424,7 +450,7 @@ bool var::connect(const var& conninfo)
 	var("var::connect() Connection to database succeeded.").logputl();
 #endif
 
-	// save a new connection handle
+	// cache the new connection handle
 	int conn_no = mv_connections_cache.add_connection(pgconn);
 	(*this) = conninfo ^ FM ^ conn_no;
 
@@ -717,7 +743,7 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/)
 	// paramFormats,
 	// 1);	  // ask for binary results
 
-	Resultclearer clearer(pgresult);
+	Scoped_PGresult clearer(pgresult);
 
 	if (PQresultStatus(pgresult) != PGRES_TUPLES_OK)
 	{
@@ -883,7 +909,7 @@ bool var::read(const var& filehandle, const var& key)
 	{
 		var errmsg = "read(...) filename not specified, probably not opened.";
 		this->setlasterror(errmsg);
-		throw MVError(errmsg);
+		throw MVDBException(errmsg);
 		return false;
 	}
 
@@ -896,10 +922,14 @@ bool var::read(const var& filehandle, const var& key)
 		if (pgconn == NULL)
 			return "";
 
-		PGresultptr pgresult;
-		bool ok = getpgresult(sql, pgresult, pgconn);
+		//PGresultptr pgresult;
+		//bool ok = getpgresult(sql, pgresult, pgconn);
+		//Scoped_PGresult clearer(pgresult);
 
-		Resultclearer clearer(pgresult);
+		//PGresultptr pgresult;
+		Scoped_PGresult pgresult;
+		bool ok = getpgresult(sql, pgresult, pgconn);
+		//Scoped_PGresult clearer(pgresult);
 
 		if (!ok)
 			return "";
@@ -958,17 +988,18 @@ bool var::read(const var& filehandle, const var& key)
 	var sql = "SELECT data FROM " ^ filehandle.a(1).convert(".", "_") ^ " WHERE key = $1";
 
 	DEBUG_LOG_SQL1
-	PGresult* pgresult = PQexecParams(thread_pgconn,
+	//PGresult* pgresult = PQexecParams(thread_pgconn,
+	Scoped_PGresult pgresult(PQexecParams(thread_pgconn,
 					  // TODO: parameterise filename
 					  sql.toString().c_str(), 1, /* one param */
 					  NULL, /* let the backend deduce param type */
 					  paramValues, paramLengths,
 					  0,  // text arguments
-					  0); // text results
+					  0)); // text results
 	// paramFormats,
 	// 1);	  /* ask for binary results */
 
-	Resultclearer clearer(pgresult);
+	//Scoped_PGresult clearer(pgresult);
 
 	if (PQresultStatus(pgresult) != PGRES_TUPLES_OK)
 	{
@@ -982,7 +1013,7 @@ bool var::read(const var& filehandle, const var& key)
 		;
 		// PQclear(pgresult);
 		this->setlasterror(errmsg);
-		throw MVError(errmsg);
+		throw MVDBException(errmsg);
 		// return false;
 	}
 
@@ -1089,14 +1120,14 @@ var var::lock(const var& key) const
 	if (GETDBTRACE)
 		(var(sql) ^ " " ^ fileandkey).logputl("SQL:");
 
-	PGresult* pgresult =
-	    PQexecParams(thread_pgconn,
+	//PGresult* pgresult =
+	Scoped_PGresult pgresult(PQexecParams(thread_pgconn,
 			 // TODO: parameterise filename
 			 sql, 1, /* one param */
 			 NULL,   /* let the backend deduce param type */
-			 paramValues, paramLengths, paramFormats, 1); /* ask for binary pgresults */
+			 paramValues, paramLengths, paramFormats, 1)); /* ask for binary pgresults */
 
-	Resultclearer clearer(pgresult);
+	//Scoped_PGresult clearer(pgresult);
 
 	if (PQresultStatus(pgresult) != PGRES_TUPLES_OK || PQntuples(pgresult) != 1)
 	{
@@ -1106,7 +1137,7 @@ var var::lock(const var& key) const
 			     var(PQntuples(pgresult));
 		// PQclear(pgresult);//DO THIS OR SUFFER MEMORY LEAK
 		errmsg.errputl();
-		// throw MVError(msg);
+		// throw MVDBException(msg);
 		return false;
 	}
 
@@ -1179,14 +1210,14 @@ bool var::unlock(const var& key) const
 	if (GETDBTRACE)
 		(var(sql) ^ " " ^ fileandkey).logputl("SQL:");
 
-	PGresult* pgresult =
-	    PQexecParams(thread_pgconn,
+	//PGresult* pgresult =
+	Scoped_PGresult pgresult(PQexecParams(thread_pgconn,
 			 // TODO: parameterise filename
 			 sql, 1, /* one param */
 			 NULL,   /* let the backend deduce param type */
-			 paramValues, paramLengths, paramFormats, 1); /* ask for binary results */
+			 paramValues, paramLengths, paramFormats, 1)); /* ask for binary results */
 
-	Resultclearer clearer(pgresult);
+	//Scoped_PGresult clearer(pgresult);
 
 	if (PQresultStatus(pgresult) != PGRES_TUPLES_OK || PQntuples(pgresult) != 1)
 	{
@@ -1196,7 +1227,7 @@ bool var::unlock(const var& key) const
 			     var(PQntuples(pgresult));
 		// PQclear(pgresult);//DO THIS OR SUFFER MEMORY LEAK
 		errmsg.errputl();
-		// throw MVError(msg);
+		// throw MVDBException(msg);
 		return false;
 	}
 
@@ -1271,9 +1302,10 @@ bool var::sqlexec(const var& sqlcmd, var& response) const
 	// NB PQexec cannot be told to return binary results
 	// but it can execute multiple commands
 	// whereas PQexecParams is the opposite
-	PGresult* pgresult = PQexec(thread_pgconn, sqlcmd.toString().c_str());
+	//PGresult* pgresult = PQexec(thread_pgconn, sqlcmd.toString().c_str());
+	Scoped_PGresult pgresult = PQexec(thread_pgconn, sqlcmd.toString().c_str());
 
-	Resultclearer clearer(pgresult);
+	//Scoped_PGresult clearer(pgresult);
 
 	if (PQresultStatus(pgresult) != PGRES_COMMAND_OK &&
 	    PQresultStatus(pgresult) != PGRES_TUPLES_OK)
@@ -1409,6 +1441,7 @@ bool var::write(const var& filehandle, const var& key) const
 		return false;
 
 	DEBUG_LOG_SQL1
+	/*
 	PGresult* pgresult = PQexecParams(thread_pgconn,
 					  // TODO: parameterise filename
 					  sql.toString().c_str(),
@@ -1419,18 +1452,30 @@ bool var::write(const var& filehandle, const var& key) const
 					  0); // text results
 	// paramFormats,
 	// 1);				// ask for binary results
-	Resultclearer clearer(pgresult);
+	Scoped_PGresult clearer(pgresult);
+	*/
+	Scoped_PGresult pgresult = PQexecParams(thread_pgconn,
+					  // TODO: parameterise filename
+					  sql.toString().c_str(),
+					  2,    // two params (key and data)
+					  NULL, // let the backend deduce param type
+					  paramValues, paramLengths,
+					  0,  // text arguments
+					  0); // text results
+	// paramFormats,
+	// 1);				// ask for binary results
+	//Scoped_PGresult clearer(pgresult);
 
 	if (PQresultStatus(pgresult) != PGRES_COMMAND_OK)
 	{
-#if TRACING >= 1
-		var("ERROR: mvdbpostgres write(" ^ filehandle.convert(_FM_, "^") ^
+		var errmsg = var("ERROR: mvdbpostgres write(" ^ filehandle.convert(_FM_, "^") ^
 				", " ^ key ^ ") failed: PQresultStatus=" ^
 				var(PQresultStatus(pgresult)) ^ " " ^
-				var(PQerrorMessage(thread_pgconn))).errputl();
-#endif
+				var(PQerrorMessage(thread_pgconn)));
+		//errmsg.errputl();
 		// PQclear(pgresult);
-		return false;
+		throw MVDBException(errmsg);
+		//return false;
 	}
 
 	// if not updated 1 then fail
@@ -1487,7 +1532,7 @@ bool var::updaterecord(const var& filehandle, const var& key) const
 		return false;
 
 	DEBUG_LOG_SQL1
-	PGresult* pgresult = PQexecParams(thread_pgconn,
+	Scoped_PGresult pgresult = PQexecParams(thread_pgconn,
 					  // TODO: parameterise filename
 					  sql.toString().c_str(),
 					  2,    // two params (key and data)
@@ -1497,7 +1542,7 @@ bool var::updaterecord(const var& filehandle, const var& key) const
 					  0); // text results
 	// paramFormats,	// bytea
 	// 1);				// ask for binary results
-	Resultclearer clearer(pgresult);
+	//Scoped_PGresult clearer(pgresult);
 
 	if (PQresultStatus(pgresult) != PGRES_COMMAND_OK)
 	{
@@ -1571,7 +1616,7 @@ bool var::insertrecord(const var& filehandle, const var& key) const
 		return false;
 
 	DEBUG_LOG_SQL1
-	PGresult* pgresult = PQexecParams(thread_pgconn,
+	Scoped_PGresult pgresult = PQexecParams(thread_pgconn,
 					  // TODO: parameterise filename
 					  sql.toString().c_str(),
 					  2,    // two params (key and data)
@@ -1581,7 +1626,7 @@ bool var::insertrecord(const var& filehandle, const var& key) const
 					  0); // text results
 	// paramFormats,	// bytea
 	// 1);				// ask for binary results
-	Resultclearer clearer(pgresult);
+	//Scoped_PGresult clearer(pgresult);
 
 	if (PQresultStatus(pgresult) != PGRES_COMMAND_OK)
 	{
@@ -1639,14 +1684,14 @@ bool var::deleterecord(const var& key) const
 		return false;
 
 	DEBUG_LOG_SQL1
-	PGresult* pgresult = PQexecParams(thread_pgconn, sql.toString().c_str(), 1, /* two param */
+	Scoped_PGresult pgresult = PQexecParams(thread_pgconn, sql.toString().c_str(), 1, /* two param */
 					  NULL, /* let the backend deduce param type */
 					  paramValues, paramLengths,
 					  0,  // text arguments
 					  0); // text results
 	// paramFormats,
 	// 1);	  /* ask for binary results */
-	Resultclearer clearer(pgresult);
+	//Scoped_PGresult clearer(pgresult);
 
 	if (PQresultStatus(pgresult) != PGRES_COMMAND_OK)
 	{
@@ -1853,7 +1898,7 @@ inline void tosqldate(var &datestr, const var &dateformat)
 	if (idate)
 		datestr = idate.oconv("DJ");
 	else
-		throw MVError(datestr ^ " cannot be recognised as a date");
+		throw MVDBException(datestr ^ " cannot be recognised as a date");
 }
 */
 
@@ -3140,8 +3185,11 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 				}
 
 				//currently tobool requires only text input
-				dictexpression="exodus_tobool("^dictexpression^")";
-
+				//TODO some way to detect DATE SYMBOLIC FIELDS and not hack special dict words!
+				if (dictexpression.index("FULLY_"))
+					dictexpression ^= " is not null";
+				else
+					dictexpression="exodus_tobool("^dictexpression^")";
 			}
 			// missing op means =
 			// WITH CLIENT_TYPE "X"
@@ -3571,7 +3619,7 @@ void var::clearselect()
 // bool readnextx(const std::string& cursor, PGresultptr& pgresult)
 // NB caller MUST ALWAYS do PQclear(pgresult) even bool false
 // called by readnext/readnextrecord (and perhaps hasnext/select to implement LISTACTIVE)
-bool readnextx(const var& cursor, PGresultptr& pgresult, PGconn* pgconn, bool forwards)
+bool readnextx(const var& cursor, Scoped_PGresult& pgresult, PGconn* pgconn, bool forwards)
 {
 	var sql;
 	if (forwards)
@@ -3744,7 +3792,7 @@ bool var::getlist(const var& listname)
 	ISSTRING(listname)
 
 	if (GETDBTRACE)
-		var("DBTRACE: ::savelist(" ^ listname ^ ")").logputl();
+		var("DBTRACE: ::getlist(" ^ listname ^ ")").logputl();
 
 	//int recn = 0;
 	var key;
@@ -3913,10 +3961,11 @@ bool var::hasnext() const
 		return false;
 	}
 
-	PGresultptr pgresult;
+	//PGresultptr pgresult;
+	Scoped_PGresult pgresult;
 	bool ok = readnextx(*this, pgresult, pgconn, /*forwards=*/true);
 
-	Resultclearer clearer(pgresult);
+	//Scoped_PGresult clearer(pgresult);
 
 	if (!ok)
 	{
@@ -3928,11 +3977,12 @@ bool var::hasnext() const
 	// now restore the cursor back one
 	/////////////////////////////////
 
-	PGresultptr pgresult2;
+	//PGresultptr pgresult2;
+	Scoped_PGresult pgresult2;
 	//ok =
 	readnextx(*this, pgresult2, pgconn, /*forwards=*/false);
 
-	Resultclearer clearer2(pgresult2);
+	//Scoped_PGresult clearer2(pgresult2);
 
 	// Note that moving backwards on the first record fails because it returns no rows since it
 	// moves the cursor to point ONE BEFORE the first row if (!ok) { 	return true;
@@ -4025,10 +4075,11 @@ bool var::readnext(var& key, var& valueno)
 		return false;
 	}
 
-	PGresultptr pgresult;
+	//PGresultptr pgresult;
+	Scoped_PGresult pgresult;
 	bool ok = readnextx(*this, pgresult, pgconn, /*forwards=*/true);
 
-	Resultclearer clearer(pgresult);
+	//Scoped_PGresult clearer(pgresult);
 
 	//__asm__("int3");
 
@@ -4134,10 +4185,11 @@ bool var::readnextrecord(var& record, var& key, var& valueno)
 	if (pgconn == NULL)
 		return "";
 
-	PGresultptr pgresult;
+	//PGresultptr pgresult;
+	Scoped_PGresult pgresult;
 	bool ok = readnextx(*this, pgresult, pgconn, /*forwards=*/true);
 
-	Resultclearer clearer(pgresult);
+	//Scoped_PGresult clearer(pgresult);
 
 	if (!ok)
 	{
@@ -4174,7 +4226,7 @@ bool var::readnextrecord(var& record, var& key, var& valueno)
 		PQclear(pgresult);
 		var errmsg = "readnextrecord() must follow selectrecord(), not select()";
 		this->setlasterror(errmsg);
-		throw MVError(errmsg);
+		throw MVDBException(errmsg);
 		// return false;
 	}
 	record = getresult(pgresult, 0, 2);
@@ -4319,10 +4371,11 @@ var var::listfiles() const
 	if (pgconn == NULL)
 		return "";
 
-	PGresultptr pgresult;
+	//PGresultptr pgresult;
+	Scoped_PGresult pgresult;
 	bool ok = getpgresult(sql, pgresult, pgconn);
 
-	Resultclearer clearer(pgresult);
+	///Scoped_PGresult clearer(pgresult);
 
 	if (!ok)
 		return "";
@@ -4359,10 +4412,11 @@ bool var::cursorexists() const
 	if (pgconn == NULL)
 		return "";
 
-	PGresultptr pgresult;
+	//PGresultptr pgresult;
+	Scoped_PGresult pgresult;
 	bool ok = getpgresult(sql, pgresult, pgconn);
 
-	Resultclearer clearer(pgresult);
+	//Scoped_PGresult clearer(pgresult);
 
 	if (!ok)
 		return false;
@@ -4408,10 +4462,11 @@ var var::listindexes(const var& filename0, const var& fieldname0) const
 		return "";
 
 	// execute command or return empty string
-	PGresultptr pgresult;
+	//PGresultptr pgresult;
+	Scoped_PGresult pgresult;
 	bool ok = getpgresult(sql, pgresult, pgconn);
 
-	Resultclearer clearer(pgresult);
+	//Scoped_PGresult clearer(pgresult);
 
 	if (!ok)
 		return "";
@@ -4470,10 +4525,11 @@ var var::reccount(const var& filename) const
 		return "";
 
 	// execute command or return empty string
-	PGresultptr pgresult;
+	//PGresultptr pgresult;
+	Scoped_PGresult pgresult;
 	bool ok = getpgresult(sql, pgresult, pgconn);
 
-	Resultclearer clearer(pgresult);
+	//Scoped_PGresult clearer(pgresult);
 
 	if (!ok)
 		return "";
@@ -4513,10 +4569,11 @@ var var::flushindex(const var& filename) const
 		return "";
 
 	// execute command or return empty string
-	PGresultptr pgresult;
+	//PGresultptr pgresult;
+	Scoped_PGresult pgresult;
 	bool ok = getpgresult(sql, pgresult, pgconn);
 
-	Resultclearer clearer(pgresult);
+	//Scoped_PGresult clearer(pgresult);
 
 	if (!ok)
 		return "";
@@ -4538,7 +4595,8 @@ var var::flushindex(const var& filename) const
 // returns 1 for success
 // returns 0 for failure
 // WARNING in either case caller MUST PQclear(pgresult)
-static bool getpgresult(const var& sql, PGresultptr& pgresult, PGconn* thread_pgconn)
+//static bool getpgresult(const var& sql, PGresultptr& pgresult, PGconn* thread_pgconn)
+static bool getpgresult(const var& sql, Scoped_PGresult& pgresult, PGconn* thread_pgconn)
 {
 	DEBUG_LOG_SQL
 
@@ -4567,7 +4625,7 @@ static bool getpgresult(const var& sql, PGresultptr& pgresult, PGconn* thread_pg
 	// 1);	  /* ask for binary results */
 
 	// NO! pgresult is returned to caller to extract any data AND call PQclear(pgresult)
-	// Resultclearer clearer(pgresult);
+	// Scoped_PGresult clearer(pgresult);
 
 	if (!pgresult)
 	{

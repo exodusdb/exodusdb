@@ -1,15 +1,13 @@
-#include <errno.h>
-#include <poll.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/inotify.h>
-#include <termios.h>
 #include <unistd.h>
+#include <termios.h>
+#include <sys/inotify.h>
+#include <poll.h>
 
 #include <exodus/mv.h>
 #include <exodus/mvexceptions.h>
-
 #include <exodus/cargs.h>
+
+//similar code in haskey.cpp and mvwait.cpp
 
 namespace exodus {
 
@@ -184,9 +182,6 @@ var wait_main(const int argc, const char* argv[], const int wait_time_ms)
 
 	nfds = 1;
 
-#define FIXTERMIO 1
-#ifdef FIXTERMIO
-
 	//do this before preparing the polling array
 	//otherwise will fail with "too many inotify_init1"
 
@@ -200,50 +195,49 @@ var wait_main(const int argc, const char* argv[], const int wait_time_ms)
 //		return false;
 	} else {
 		nfds = 2;
+
+		//Make sure we exit cleanly
+		// memset(&sa, 0, sizeof(struct sigaction));
+		// sa.sa_handler = sighandler;
+		// sigaction(SIGINT, &sa, NULL);
+		// sigaction(SIGQUIT, &sa, NULL);
+		// sigaction(SIGTERM, &sa, NULL);
+
+		//This is needed to be able to tcsetattr() after a hangup (Ctrl-C)
+		//see tcsetattr() on POSIX
+
+		// memset(&sa, 0, sizeof(struct sigaction));
+		// sa.sa_handler = SIG_IGN;
+		// sigaction(SIGTTOU, &sa, NULL);
+
+		// Set stdin mode
+		// a) non-canonical (i.e. characterwise not linewise input)
+		// b) no-echo
+		// https://man7.org/linux/man-pages/man3/termios.3.html
+		//
+		tcgetattr(0, &curtio);
+		curtio.c_lflag &= ~(ICANON | ECHO);
+		tcsetattr(0, TCSANOW, &curtio);
+
 	}
 
-	//Make sure we exit cleanly
-	// memset(&sa, 0, sizeof(struct sigaction));
-	// sa.sa_handler = sighandler;
-	// sigaction(SIGINT, &sa, NULL);
-	// sigaction(SIGQUIT, &sa, NULL);
-	// sigaction(SIGTERM, &sa, NULL);
-
-	//This is needed to be able to tcsetattr() after a hangup (Ctrl-C)
-	//see tcsetattr() on POSIX
-
-	// memset(&sa, 0, sizeof(struct sigaction));
-	// sa.sa_handler = SIG_IGN;
-	// sigaction(SIGTTOU, &sa, NULL);
-
-	// Set stdin mode
-	// a) non-canonical (i.e. characterwise not linewise input)
-	// b) no-echo
-	// https://man7.org/linux/man-pages/man3/termios.3.html
-	//
-	tcgetattr(0, &curtio);
-	curtio.c_lflag &= ~(ICANON | ECHO);
-	tcsetattr(0, TCSANOW, &curtio);
-#endif
-
-	// Wait for events and/or terminal input
-	// printf("Listening for events.\n");
-	var events = "";
-
 	/* Prepare for polling */
-	//nfds = 2;
 
 	/* Inotify input */
 	fds[0].fd = inotify_fd;
 	fds[0].events = POLLIN;
 
-	/* Console input */
+	// console input only if terminal available
 	if (nfds == 2) {
 		fds[1].fd = STDIN_FILENO;
 		fds[1].events = POLLIN;
 	}
 
-	do {
+	// Wait for events and/or terminal input
+	// printf("Listening for events.\n");
+	var events = "";
+
+	for (;;) {
 
 		//poll events and input until timeout or crash
 		poll_num = poll(fds, nfds, wait_time_ms);
@@ -256,7 +250,7 @@ var wait_main(const int argc, const char* argv[], const int wait_time_ms)
 
 		if (poll_num > 0) {
 
-			//events occurred
+			//inotify events occurred
 			if (fds[0].revents & POLLIN) {
 
 				/* Inotify events are available */
@@ -282,7 +276,7 @@ var wait_main(const int argc, const char* argv[], const int wait_time_ms)
 			break;
 		}
 
-	} while (false);
+	}
 
 	//printf("Listening for events stopped.\n");
 
@@ -294,22 +288,18 @@ var wait_main(const int argc, const char* argv[], const int wait_time_ms)
 		}
 	}
 
-	/* Close inotify file descriptor */
+	// Close inotify file descriptor
 	close(inotify_fd);
 
 	free(wd);
 
-	//exit(EXIT_SUCCESS);
-	//events.outputl("oswait events=");
-
-#ifdef FIXTERMIO
-
+	// restore terminal attributes (probably linewise input and echo)
 	if (nfds == 2) {
-		// restore terminal attributes (probably linewise input and echo)
 		tcsetattr(0, TCSANOW, &oldtio);
 	}
 
-#endif
+	//exit(EXIT_SUCCESS);
+	//events.outputl("oswait events=");
 
 	return events;
 }

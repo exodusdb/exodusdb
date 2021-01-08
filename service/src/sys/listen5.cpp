@@ -470,7 +470,7 @@ nextpatch:;
 				if (s23.locate("TRAINING",xx)) {
 					username ^= "*";
 				}else{
-					if (s17.index("TEST")) {
+					if (s17.index("test")) {
 						username ^= "*";
 					}
 				}

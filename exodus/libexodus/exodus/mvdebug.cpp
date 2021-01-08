@@ -423,7 +423,15 @@ var backtrace()
 //and wait for say 90 seconds before sending a kill signal
 void SIGTERM_handler(int)
 {
-	TERMINATE_requested = true;
+	fprintf(stderr,"=== SIGTERM received ===\n");
+	TERMINATE_req = true;
+}
+
+//restart
+void SIGHUP_handler(int)
+{
+	fprintf(stderr,"=== SIGHUP received ===\n");
+	RELOAD_req = true;
 }
 
 //signals are received by one thread at random
@@ -505,9 +513,10 @@ void var::breakoff() const
 //called in exodus_main to initialise signals
 void var::breakon() const
 {
-	signal(SIGINT, SIGINT_handler); /* this line will redirect ctrl+c signal*/
-
-	signal(SIGTERM, SIGTERM_handler); /* this line will redirect polite request to TERMINATE signal*/
+	signal(SIGINT, SIGINT_handler);   // Ctrl+C from termio
+	signal(SIGTERM, SIGTERM_handler); // a polite request to TERMINATE
+									  // probably followed by SIGABORT after some delay
+	signal(SIGHUP, SIGHUP_handler);   // a request to reload
 
 	//turn off text input and output signals to prevent breaking out into gdb debugger
 	//http://curiousthing.org/sigttin-sigttou-deep-dive-linux
