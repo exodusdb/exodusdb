@@ -45,7 +45,9 @@ listen:
 		SYSTEM.r(33, 1);
 	}
 
-	try {
+	if (osgetenv("EXO_DEBUG"))
+	 execute(cmd);
+	else try {
 
 	execute(cmd);
 
@@ -73,6 +75,9 @@ listen:
 			SYSTEM.r(33, s33);
 			goto listen;
 		}
+
+		RELOAD_req = true;
+		printl("Reloading PROCESS ", SYSTEM.a(24));
 
 		stop();
 		////

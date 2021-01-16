@@ -2326,7 +2326,7 @@ badwrite:
 				call systemsubs(triggers.a(6));
 				//in case it changes @record?
 				if (not(RECORD.read(win.srcfile, keyx))) {
-					{}
+					RECORD = "";
 				}
 			}else{
 				RECORD.write(win.srcfile, keyx);

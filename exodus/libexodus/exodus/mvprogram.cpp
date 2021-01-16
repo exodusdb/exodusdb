@@ -83,7 +83,8 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 	// KEY TEXT PRIMARY KEY,
 	// EXECUTIVE_CODE TEXT)
 	var temptablename="SELECT_STAGE2_CURSOR_" ^ CURSOR.a(1);
-	var createtablesql = "DROP TABLE IF EXISTS " ^ temptablename ^ ";\n";
+	var createtablesql = "";
+	createtablesql ^= "DROP TABLE IF EXISTS " ^ temptablename ^ ";\n";
 	//createtablesql ^= "CREATE TEMPORARY TABLE " ^ temptablename ^ "(\n";
 	createtablesql ^= "CREATE TABLE " ^ temptablename ^ "(\n";
 	createtablesql ^= " KEY TEXT PRIMARY KEY,\n";
@@ -196,10 +197,11 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 	int recn=0;
 
 //nextrecord:
-	while(CURSOR.readnextrecord(RECORD,ID,MV)) {
+	while(CURSOR.readnext(RECORD,ID,MV)) {
 
 		bool ok=true;
 
+		//var id2 = MV ? (ID ^ "*" ^ MV) : ID;
 		var insertsql=baseinsertsql ^ ID.swapper("'","''").squote() ^ ",";
 
 		for (int fieldn=1;fieldn<=nfields;++fieldn) {
@@ -296,7 +298,7 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 
 	}
 
-	sortselectclause2.outputl("\nstage2=");
+	sortselectclause2.errputl("\nstage2=");
 
 	bool result=CURSOR.select(sortselectclause2);
 
@@ -362,16 +364,14 @@ bool ExodusProgramBase::readnext(var& key)
 	return CURSOR.readnext(key);
 }
 
-bool ExodusProgramBase::readnext(var& key, var& valueno) { return CURSOR.readnext(key, valueno); }
-
-bool ExodusProgramBase::selectrecord(const var& sortselectclause)
+bool ExodusProgramBase::readnext(var& key, var& valueno)
 {
-	return CURSOR.selectrecord(sortselectclause);
+	return CURSOR.readnext(key, valueno);
 }
 
-bool ExodusProgramBase::readnextrecord(var& record, var& key)
+bool ExodusProgramBase::readnext(var& record, var& key, var& valueno)
 {
-	return CURSOR.readnextrecord(record, key);
+	return CURSOR.readnext(record, key, valueno);
 }
 
 bool ExodusProgramBase::pushselect([[maybe_unused]] const var& v1, var& v2, [[maybe_unused]] var& v3, [[maybe_unused]] var& v4)
@@ -477,6 +477,8 @@ void ExodusProgramBase::mssg(const var& msg, const var& options, var& buffer,
 	//swap %1, %2 etc with params
 	for (var ii=1;ii<=9;++ii)
 		msg1.swapper("%"^ii,params.a(ii));
+
+	msg1.converter(_FM_ _VM_ "|","\n\n\n").trimmer("\n");
 
 	std::cout << msg1;
 
@@ -1204,6 +1206,13 @@ var ExodusProgramBase::calculate(const var& dictid, const var& dictfile, const v
 				 const var& record, const var& mvno)
 {
 
+	//dictid @ID/@id is hard coded to return ID
+	//to avoid incessant lookup in main file dictionary and then defaulting to dict_voc
+	//sadly this means that @ID cannot be customised per file
+	//possibly amend the read cache to cache the dict_voc version for the main file
+	//if (dictid == "@ID" || dictid == "@id")
+	//	return ID;
+
 	// TODO how is it possible to exchange when the variable is const?
 
 	DICT.exchange(dictfile);
@@ -1262,8 +1271,19 @@ baddict:
 				}
 				indictvoc = true;
 			}
+			// cache whichever dict record was found
+			// regardless of file xxxxxxxx/voc and upper/lower case key
+			// as if it was found in the initial file,key requested
+			// this will save repeated drill down searching on every access.
+			cache_dictrec_.r(16,indictvoc);
+			cache_dictrec_.writeo(DICT,dictid);
 		}
 		cache_dictid_ = DICT.a(1) ^ " " ^ dictid;
+
+		//detect from the cached record if it came from dict_voc
+		//so we can choose the libdict_voc if so
+		indictvoc=cache_dictrec_.a(16);
+
 	}
 	else
 		newlibfunc = false;
@@ -1479,8 +1499,7 @@ var ExodusProgramBase::decide(const var& questionx, const var& optionsx, var& re
 		return options.a(reply);
 	}
 
-	question.converter(VM ^ "|", FM ^ FM);
-	question.swapper(FM, var().chr(13) ^ var().chr(10));
+	question.converter(VM ^ "|", "\n\n").trimmer("\n");
 	std::cout << question << std::endl;
 
 	//	var noptions = options.count(FM) + (options != "");

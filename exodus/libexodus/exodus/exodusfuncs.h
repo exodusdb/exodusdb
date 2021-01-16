@@ -275,8 +275,7 @@ DLL_PUBLIC bool insertrecord(const var& record, const var& filehandle, const var
 // DLL_PUBLIC void clearselect();
 // DLL_PUBLIC bool readnext(var& key);
 // DLL_PUBLIC bool readnext(var& key, var& valueno);
-// DLL_PUBLIC bool selectrecord(const var& sortselectclause DEFAULTNULL);
-// DLL_PUBLIC bool readnextrecord(var& record, var& key);
+// DLL_PUBLIC bool readnext(var& record, var& key, var& value);
 
 DLL_PUBLIC var xlate(const var& filename, const var& key, const var& fieldno, const char* mode);
 DLL_PUBLIC var xlate(const var& filename, const var& key, const var& fieldno, const var& mode);

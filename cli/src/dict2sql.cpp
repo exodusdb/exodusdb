@@ -302,8 +302,11 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 	//remove anything before sql code
 	var pos=index(sourcecode,"/" "*pgsql");
 	if (!pos) {
+		if (index(sourcecode,"/" "*psql"))
+			abort(quote(dictfilename)^" "^quote(dictid)^" 'psql' must be 'pgsql'");
 		if (reqdictid)
-			stop(quote(dictfilename)^" "^quote(dictid)^" does not have any pgsql section");
+			abort(quote(dictfilename)^" "^quote(dictid)^" does not have any pgsql section");
+
 		return;
 	}
 	var sql=sourcecode.substr(pos+8);

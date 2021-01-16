@@ -57,14 +57,13 @@ class ExodusProgramBase
 
 	// work on CURSOR
 	bool select(const var& sortselectclause DEFAULTNULL);
-	void clearselect();
 	bool hasnext();
 	bool readnext(var& key);
 	bool readnext(var& key, var& valueno);
-	bool selectrecord(const var& sortselectclause DEFAULTNULL);
-	bool readnextrecord(var& record, var& key);
+	bool readnext(var& record, var& key, var& valueno);
 	bool pushselect(const var& v1, var& v2, var& v3, var& v4);
 	bool popselect(const var& v1, var& v2, var& v3, var& v4);
+	void clearselect();
 
 	bool savelist(const var& listname);
 	bool getlist(const var& listname);

@@ -8,9 +8,17 @@
 namespace exodus
 {
 
-var getprocessn() { return var((int)getpid()); }
+var getprocessn()
+{
+	return var((int)getpid());
+}
 
-var getexecpath() { return ""; }
+var getexecpath()
+{
+	var osenv;
+	osenv.osgetenv("_");
+	return osenv;
+}
 
 } // namespace exodus
 

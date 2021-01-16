@@ -9,8 +9,8 @@ function main() {
 	var padding = COMMAND.a(4);
 
 	if ( not(reqfile or reqtext)) {
-		printl("syntax: dbgrep filename text");
-		printl("        dbgrep - text");
+		errputl("syntax: dbgrep filename text");
+		errputl("        dbgrep - text");
 		//stop();
 	}
 
@@ -32,7 +32,7 @@ function main() {
 		// OPEN FILE or skip file
 		var file;
 		if (not(file.open(filename))) {
-			printl(filename.quote() ^ " file cannot be opened");
+			errputl(filename.quote() ^ " file cannot be opened");
 			continue;
 		}
 
@@ -61,7 +61,7 @@ function main() {
 
 			var context =leftcontext^"\033[1;31m"^reqtext^"\033[0m"^rightcontext;
 
-			printl(filename, " : ", key, " :: ",context);
+			var(filename ^ " : " ^ key ^ " :: " ^ context).outputl();
 
 		}
 

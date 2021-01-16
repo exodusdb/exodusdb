@@ -9,7 +9,7 @@ function main() {
 		fieldname^="_"^indextype;
 	var file;
 	var cmd="createindex " ^ filename ^ " " ^ fieldname ^ " " ^ OPTIONS.convert("()","{}");
-	cmd.outputl("cmd=");
+	//cmd.outputl("cmd=");
 	return osshell(cmd);
 }
 

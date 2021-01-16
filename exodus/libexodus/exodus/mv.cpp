@@ -1687,7 +1687,7 @@ var backtrace();
 MVError::MVError(const var& description_) : description(description_)
 {
 	// capture the stack at point of creation ie when thrown
-	stack = backtrace();
+	this->stack = backtrace();
 	((description.assigned() ? description : "") ^ "\n" ^ stack.convert(FM, "\n") ^ "\n").put(std::cerr);
 }
 

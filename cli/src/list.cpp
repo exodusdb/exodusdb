@@ -1431,13 +1431,13 @@ nextdict:
 		//preselect if sselect is by any mv fields since that ignores maxnrecs
 		if (not(LISTACTIVE)) {
 			if (preselect) {
-				call xselect(ss.field(" ", 1, 3) ^ " (S)");
+				call xselect(ss.field(" ", 1, 3) ^ " (SR)");
 			}
 			maxnrecs = "";
 		}
 
 		//call mssg('Selecting records, please wait.||(Press Esc or F10 to interrupt)','UB',buffer,'')
-		call xselect(ss ^ " (S)");
+		call xselect(ss ^ " (SR)");
 		//call mssg('','DB',buffer,'')
 
 		if (not LISTACTIVE) {
@@ -1457,7 +1457,8 @@ nextdict:
 
 	}else{
 		if (not LISTACTIVE) {
-			select(srcfile);
+			//select(srcfile);
+			select("SELECT " ^ srcfile ^ " (SR)");
 		}
 	}
 	recn = "";
@@ -1494,8 +1495,9 @@ nextrec:
 	FILEERRORMODE = 1;
 	FILEERROR = "";
 
-	if (not(readnext(ID, MV))) {
-		FILEERRORMODE = 0;
+	//if (not(readnext(ID, MV))) {
+	if (not(readnext(RECORD, ID, MV))) {
+    		FILEERRORMODE = 0;
 		if (STATUS) {
 			tx = "*** Fatal Error " ^ FILEERROR.a(1) ^ " reading record " ^ ID ^ " ***";
 			gosub printtx();
@@ -1530,7 +1532,11 @@ nextrec:
 	}
 	lastid = ID;
 
-	if (not(RECORD.reado(srcfile, ID))) {
+	//if (not(RECORD.reado(srcfile, ID))) {
+	//	goto nextrec;
+	//}
+	//RECORD.errputl("RECORD=");
+    if (not(RECORD.length()) and not(RECORD.read(srcfile, ID))) {
 		goto nextrec;
 	}
 
@@ -2063,6 +2069,8 @@ subroutine getwordexit() {
 	if (DICT eq "") {
 		goto dictvoc;
 	}
+	if (not(html) and word.substr(-5,5) == "_LINK")
+		word.splicer(-5,5,"");
 	if (dictrec.reado(DICT, word)) {
 maindict:
 		if (dictrec.a(1) eq "G") {
@@ -2092,6 +2100,7 @@ gotdictvoc:
 			if (dictrec.reado(dictvoc, word.ucase())) {
 				goto gotdictvoc;
 			}
+			dictrec = "";
 		}
 	}
 	dictrec.converter("|", VM);

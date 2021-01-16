@@ -170,25 +170,29 @@ subroutine getlang3(in origprogname, in datatype, in languagefile, io lang) {
 		langkey = langkey.fieldstore("*", 3, 1, datatype);
 	}
 	//CALL MSG(T)
-	if (lang.read(languagefile, langkey)) {
-		//convert to FM if not a format record
-		//IF orig.progname<>'SORTORDER' and LANG<8>='' then
-		if (origprogname ne "SORTORDER" and lang.a(1).count(VM)) {
-			lang = raise(lang.a(1));
-
-			//strip out English pretext
-			if (lang.index(var().chr(170))) {
-				nn = lang.count(FM) + 1;
-				for (var ii = 1; ii <= nn; ++ii) {
-					var tt = lang.a(ii).field(var().chr(170), 2);
-					if (tt) {
-						lang.r(ii, tt);
-					}
-				};//ii;
-			}
-
-		}
+	if (not(lang.read(languagefile, langkey))) {
+		lang = "";
+		return;
 	}
+
+	//convert to FM if not a format record
+	//IF orig.progname<>'SORTORDER' and LANG<8>='' then
+	if (origprogname ne "SORTORDER" and lang.a(1).count(VM)) {
+		lang = raise(lang.a(1));
+
+		//strip out English pretext
+		if (lang.index(var().chr(170))) {
+			nn = lang.count(FM) + 1;
+			for (var ii = 1; ii <= nn; ++ii) {
+				var tt = lang.a(ii).field(var().chr(170), 2);
+				if (tt) {
+					lang.r(ii, tt);
+				}
+			};//ii;
+		}
+
+	}
+
 	return;
 }
 

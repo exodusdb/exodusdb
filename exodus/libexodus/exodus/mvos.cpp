@@ -912,12 +912,12 @@ bool var::osgetenv(const var& envvarname)
 	THISISDEFINED()
 	ISSTRING(envvarname)
 
-	var_typ = VARTYP_STR;
-
 	// return whole environment if blank envvarname
 	if (envvarname.var_str.length() == 0)
 	{
-		var_str = "xxx";
+
+		var_typ = VARTYP_STR;
+		var_str = "";
 
 		int i = 1;
 		char* s = *environ;
@@ -938,6 +938,7 @@ bool var::osgetenv(const var& envvarname)
 	const char* cvalue = std::getenv(envvarname.var_str.c_str());
 	if (cvalue == 0)
 	{
+		var_typ = VARTYP_STR;
 		var_str = "";
 		return false;
 	}

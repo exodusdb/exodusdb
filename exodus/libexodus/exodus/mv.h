@@ -1502,14 +1502,21 @@ public:
 	bool unlock(const var& key) const;
 	bool unlockall() const;
 
+	// db file i/o
 	bool read(const var& filehandle, const var& key);
-	bool reado(const var& filehandle, const var& key);
-	bool readv(const var& filehandle, const var& key, const int fieldno);
 	bool write(const var& filehandle, const var& key) const;
-	bool writev(const var& filehandle, const var& key, const int fieldno) const;
 	bool deleterecord(const var& key) const;
 	bool updaterecord(const var& filehandle, const var& key) const;
 	bool insertrecord(const var& filehandle, const var& key) const;
+
+	// specific db field i/o
+	bool readv(const var& filehandle, const var& key, const int fieldno);
+	bool writev(const var& filehandle, const var& key, const int fieldno) const;
+
+	// cached db file i/o
+	bool reado(const var& filehandle, const var& key);
+	bool writeo(const var& filehandle, const var& key) const;
+	bool deleteo(const var& key) const;
 
 	// MvEnvironment function now to allow access to RECORD ID DICT etc. and call external
 	// functions
@@ -1524,6 +1531,11 @@ public:
 	bool select(const var& sortselectclause DEFAULTNULL);
 	void clearselect();
 
+	ND bool hasnext() const;
+	bool readnext(var& key);
+	bool readnext(var& key, var& valueno);
+	bool readnext(var& record, var& key, var& valueno);
+
 	bool savelist(const var& listname);
 	bool getlist(const var& listname);
 	bool makelist(const var& listname, const var& keys);
@@ -1531,14 +1543,6 @@ public:
 	bool formlist(const var& keys, const var& fieldno=0);
 
 	bool saveselect(const var& filename);
-
-	ND bool hasnext() const;
-	bool readnext(var& key);
-	bool readnext(var& key, var& valueno);
-
-	bool selectrecord(const var& sortselectclause DEFAULTNULL);
-	bool readnextrecord(var& record, var& key);
-	bool readnextrecord(var& record, var& key, var& valueno);
 
 	// OS FILE SYSTEM
 	/////////////////
@@ -2072,7 +2076,7 @@ inline const var PLATFORM_ = "x86";
 //	DLL_PUBLIC int DBTRACE=false;
 //#endif
 
-DLL_PUBLIC inline int DBTRACE = false;
+[[maybe_unused]] static inline int DBTRACE;
 
 // following are all not thread safe since they are at global scope and not const
 // perhaps they should be moved on to MvEnvironment mv

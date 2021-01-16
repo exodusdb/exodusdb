@@ -1494,6 +1494,7 @@ fixnextcompany:
 			if (markets.open("MARKETS", "")) {
 				var market;
 				if (not(market.read(markets, marketcode))) {
+					market = "";
 					msg = marketcode.quote() ^ " is missing from company " ^ companycode;
 					call note(msg);
 					goto fixcompany;

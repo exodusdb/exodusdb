@@ -99,9 +99,9 @@ char* stolower(char* s)
 
 // probably no need for LOCKDLCACHE since we have a separate cache per mvenvironment
 #include <mutex>
+static std::mutex global_mutex_lockdlcache;
 //#define LOCKDLCACHE std::lock_guard<std::mutex> guard(global_mutex_lockdlcache);
 #define LOCKDLCACHE std::lock_guard guard(global_mutex_lockdlcache);
-static std::mutex global_mutex_lockdlcache;
 
 #include <exodus/mvfunctor.h>
 #include <exodus/mvenvironment.h>
@@ -477,8 +477,8 @@ bool ExodusFunctorBase::openfunc(std::string newfunctionname)
 
 		// std::cerr<<functionname_<<" function cannot be found in
 		// "<<libraryfilename_<<std::endl;
-		throw MVError(var(functionname_) ^ " function cannot be found in " ^
-				  var(libraryfilename_));
+		throw MVError(var(functionname_).quote() ^ " function cannot be found in lib " ^
+				  var(libraryfilename_).quote());
 		return false;
 	}
 

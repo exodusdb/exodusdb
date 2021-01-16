@@ -74,7 +74,9 @@ function main(in msg0, io time0) {
 	//entry:=sep:sep:sep:sep
 	entry ^= sep ^ msg0;
 
-	printl(entry);
+	if (VOLUMES) {
+		printl(entry);
+	}
 
 	entry ^= "\r\n";
 

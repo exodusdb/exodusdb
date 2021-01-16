@@ -109,6 +109,7 @@ var limitx;
 var lastword;
 var title;
 var value;
+var rec;
 var tcoln;//num
 var nn;
 var ii;//num
@@ -633,12 +634,12 @@ nextkey:
 		if (limitx) {
 			limits.r(1, nlimits, word);
 			if (not(dictrec.reado(DICT, word))) {
-				call mssg(word ^ " is not a valid dictionary item");
+				call mssg(word.quote() ^ " is not a valid dictionary item (1)");
 				stop();
 			}
 			tt = dictrec.a(4).field(".", 1);
 			if (tt[1] ne "M") {
-				call mssg(word ^ " limit must be a multivalued dict item");
+				call mssg(word.quote() ^ " limit must be a multivalued dict item");
 				stop();
 			}
 			limits.r(4, nlimits, tt);
@@ -798,9 +799,9 @@ nextkey:
 			tt = word.substr(2,word.length() - 2);
 			replacements.r(-1, tt);
 			nreplacements += 1;
-			if (not(tt.reado(DICT, tt))) {
-				if (not(tt.reado(dictvoc, tt))) {
-					call mssg(tt ^ " is not a valid dictionary item");
+			if (not(rec.reado(DICT, tt))) {
+				if (not(rec.reado(dictvoc, tt))) {
+					call mssg(tt.quote() ^ " is not a valid dictionary item (2)");
 					stop();
 				}
 			}
@@ -1441,13 +1442,13 @@ nextdict:
 		//preselect if sselect is by any mv fields since that ignores maxnrecs
 		if (not(LISTACTIVE)) {
 			if (preselect) {
-				call xselect(ss.field(" ", 1, 3) ^ " (S)");
+				call xselect(ss.field(" ", 1, 3) ^ " (SR)");
 			}
 			maxnrecs = "";
 		}
 
 		//call mssg('Selecting records, please wait.||(Press Esc or F10 to interrupt)','UB',buffer,'')
-		call xselect(ss ^ " (S)");
+		call xselect(ss ^ " (SR)");
 		//call mssg('','DB',buffer,'')
 
 		if (not LISTACTIVE) {
@@ -1467,7 +1468,11 @@ nextdict:
 
 	}else{
 		if (not LISTACTIVE) {
-			select(srcfile);
+			if (VOLUMES) {
+				select(srcfile);
+			}else{
+				call xselect("SELECT " ^ filename ^ " (SR)");
+			}
 		}
 	}
 	recn = "";
@@ -1540,8 +1545,11 @@ nextrec:
 	}
 	lastid = ID;
 
-	if (not(RECORD.reado(srcfile, ID))) {
-		goto nextrec;
+	//if c++ the select (R) option might have provided RECORD already
+	if (not RECORD) {
+		if (not(RECORD.reado(srcfile, ID))) {
+			goto nextrec;
+		}
 	}
 
 	if (onlyauthorised) {
@@ -2111,6 +2119,7 @@ gotdictvoc:
 			if (dictrec.reado(dictvoc, word.ucase())) {
 				goto gotdictvoc;
 			}
+			dictrec = "";
 		}
 	}
 	dictrec.converter("|", VM);

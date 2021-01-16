@@ -47,61 +47,6 @@ THE SOFTWARE.
 // #define eq ==
 //(regrettably eq is defined in global namespace in some libraries)
 
-// capture global SENTENCE in wrapper function exodus_main
-// main calls main2 so that opening { is required after exodusprogram() macro
-// TODO get exodus_main to call main2 directly - need to pass it a function pointer
-// sadly, passing argc argv causes gcc and -Wall -Wextra to give "warning: unused parameter
-// �exodus__argc�" so dont pass them ... they are included in mv SENTENCE/COMMAND/OPTION somehow
-// anyway. void main2(int exodus__argc, char *exodus__argv[], MvEnvironment& mv) SIMILAR CODE IN
-// program.h programexit
-// exodusmacros.h libraryexit(
-#define exodusprogram()                                                            \
-	void main2(MvEnvironment& mv);                                                 \
-	int main(int exodus__argc, char* exodus__argv[])                               \
-	{                                                                              \
-		MvEnvironment mv;                                                          \
-		exodus_main(exodus__argc, exodus__argv, mv, 0);                            \
-		try                                                                        \
-		{                                                                          \
-			main2(mv);                                                             \
-		}                                                                          \
-		catch (MVStop exceptionx)                                                  \
-		{                                                                          \
-			if (exceptionx.description.length())                                   \
-				exceptionx.description.outputl();                                  \
-			if (exceptionx.description.isnum())                                    \
-				exit(exceptionx.description);                                      \
-			else                                                                   \
-				exit(0);                                                           \
-		}                                                                          \
-		catch (MVAbort exceptionx)                                                 \
-		{                                                                          \
-			if (exceptionx.description.length())                                   \
-				exceptionx.description.outputl();                                  \
-			if (exceptionx.description.isnum())                                    \
-				exit(exceptionx.description);                                      \
-			else                                                                   \
-				exit(1);                                                           \
-		}                                                                          \
-		catch (MVAbortAll exceptionx)                                              \
-		{                                                                          \
-			if (exceptionx.description.length())                                   \
-				exceptionx.description.outputl();                                  \
-			if (exceptionx.description.isnum())                                    \
-				exit(exceptionx.description);                                      \
-			else                                                                   \
-				exit(2);                                                           \
-		}                                                                          \
-		catch (MVError exceptionx)                                                 \
-		{                                                                          \
-			printl(exceptionx.description, " - Aborting.");                        \
-			printl(exceptionx.stack.convert(FM, L"\n"));                           \
-			exit(999);                                                             \
-		}                                                                          \
-		return 0;                                                                  \
-	}                                                                              \
-	void main2(MvEnvironment& mv)
-
 // allow pseudo pick syntax
 #define sentence() SENTENCE
 

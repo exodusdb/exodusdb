@@ -90,7 +90,7 @@ function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfile
 	if (SENTENCE.field(" ", 1).ucase() eq "SENDMAIL" and toaddress0.unassigned()) {
 		toaddress = SENTENCE.field(" ", 2);
 		if (not toaddress) {
-			toaddress = "sb2@neosys.com";
+			toaddress = "support@neosys.com";
 		}
 		SENTENCE.transfer(savesentence);
 		call sendmail(toaddress, "", "test email test subject", "test body line 1" "\r" "test body line2", v5, v6, errormsg, v8, params);
@@ -117,11 +117,11 @@ function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfile
 	}else{
 		toaddress = toaddress0;
 
-		//development systems ALWAYS email hardcoded SB2@EXODUS.COM in next line
+		//development systems ALWAYS email hardcoded in next line
 		if (var("exodus.id").osfile() or not(VOLUMES)) {
-			forcedemailx = "sb2@neosys.com";
+			forcedemailx = "dev@neosys.com";
 			//toaddress=xlate('USERS','EXODUS',7,'X')
-			//if toaddress else toaddress='sb2@neosys.com'
+			//if toaddress else toaddress='dev@neosys.com'
 			goto forcedemail;
 		}
 

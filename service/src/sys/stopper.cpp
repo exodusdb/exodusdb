@@ -25,6 +25,8 @@ function main(in mode0, in time, in date, io buffer, out msg) {
 	//gosub gettext
 	var text = elapsedtimetext(date, time);
 
+	printl();
+
 	var result = "";
 	if (mode) {
 		text.swapper(", ", FM);

@@ -202,6 +202,58 @@ function main()
 	deletefile(filename);
 	createfile(filename);
 
+    //check writeo creates a cached record readable by reado but not read
+	{
+		var k1="tempkey";
+
+		//write to cache
+		var xyz="xyz";
+		assert(xyz.writeo(filename,k1));
+
+		//ensure wasnt written to real file
+		assert(not xyz.read(filename,k1));
+		//and ensure failure to read results in unassigned variable
+		//assert(unassigned(xyz));
+		//ensure failure to read results in no change to record
+		TRACE(xyz)
+		assert(xyz == "xyz");
+
+		//read from cache ok
+		assert(xyz.reado(filename,k1));
+
+		//writing empty record to cache is like a deletion
+		xyz="";
+		assert(xyz.writeo(filename,k1));
+		assert(not xyz.reado(filename,k1));
+		//and ensure failure to reado results in unassigned variable
+		//assert(unassigned(xyz));
+		//ensure failure to read results in no change to record
+		TRACE(xyz)
+		assert(xyz == "");
+
+		//writing to real file also clears cache forcing a real reread
+		xyz="abc";
+		assert(xyz.writeo(filename,k1));
+		assert(xyz.reado(filename,k1));
+		xyz="123";
+		assert(xyz.write(filename,k1));
+		assert(xyz.reado(filename,k1));
+		assert(xyz == "123");
+
+		//deleting a record deletes it from both real and cache file
+		assert(deleterecord(filename,k1));
+		assert(not xyz.read(filename,k1));
+		assert(not xyz.reado(filename,k1));
+
+		//writing empty record to cache is like a deletion
+		xyz="";
+		assert(xyz.writeo(filename,k1));
+		//deletion from cache
+		assert(not xyz.reado(filename,k1));
+
+		assert(not xyz.read(filename,k1));
+	}
+
 	//test write decomp can be read by compact and deleted by compact
 	write("temp",filename,decomp_a);
 	assert(read(trec,filename,compact_a));
@@ -226,6 +278,17 @@ function main()
 		abort("testmain must be run in ~/exodus/test/src to have access to " ^ utftestfilename);
 	utftest.len().outputl("len=");
 	assert(len(utftest)==osfile(utftestfilename).a(1));
+
+    //check failure to read a record turns the record variable into unassigned and unusable
+    var rec="abc";
+    assert( not rec.read("dict_voc","LJLKJLKJLKJLKJLKJw"));
+    try
+    {
+        printl(rec.quote());
+    }
+    catch (MVError e) {
+        printl("OK failure to read a record makes the record variable unassigned. For programming safety");
+    }
 
 	//check invalid utf8 has no change oswrite/osread round trip
 	oswrite(utftest,"t_"^utftestfilename);
@@ -1318,8 +1381,12 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 		conn1.deletedb( dbname3);
 		conn1.deletedb( dbname4);
 
-		//verify CANNOT connect to non-existent deleted database2
+		printl("verify CANNOT connect to non-existent deleted database2");
+		printl("=======================================================");
 		assert(not conn1.connect("dbname="^dbname2));
+
+		printl("verify CANNOT connect to non-existent deleted database3");
+		printl("=======================================================");
 		assert(not conn1.connect("dbname="^dbname3));
 
 		conn1.disconnect();
@@ -1391,28 +1458,28 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 
 		conn2.begintrans();
 		printl("select table2");
-		table2.selectrecord();
+		table2.select();
 
 		conn3.begintrans();
 		printl("select table3");
-		table3.selectrecord();
+		table3.select();
 		var record2, id2, record3, id3;
 
-		//if (!table2.readnextrecord( record2, id2))
+		//if (!table2.readnext( record2, id2,MV))
 		//	printl("couldnt readnext table2");
-		//if (!table3.readnextrecord( record3, id3))
+		//if (!table3.readnext( record3, id3,MV))
 		//	printl("couldnt readnext table23");
 
-		assert(table2.readnextrecord( record2, id2) and table3.readnextrecord( record3, id3));
+		assert(table2.readnext( record2, id2, MV) and table3.readnext( record3, id3, MV));
 		assert(record2 eq "2.1111" and id2 eq "2.111" and record3 eq "3.1111" and id3 eq "3.111");
 
-		assert(table2.readnextrecord( record2, id2) and table3.readnextrecord( record3, id3));
+		assert(table2.readnext( record2, id2, MV) and table3.readnext( record3, id3, MV));
 		assert(record2 eq "2.2222" and id2 eq "2.222" and record3 eq "3.2222" and id3 eq "3.222");
 
-		assert(table2.readnextrecord( record2, id2) and table3.readnextrecord( record3, id3));
+		assert(table2.readnext( record2, id2, MV) and table3.readnext( record3, id3, MV));
 		assert(record2 eq "2.3333" and id2 eq "2.333" and record3 eq "3.3333" and id3 eq "3.333");
 
-		assert(not table2.readnextrecord( record2, id2) and not table3.readnextrecord( record3, id3));
+		assert(not table2.readnext( record2, id2, MV) and not table3.readnext( record3, id3, MV));
 
 /* rather slow to check so skip
 		printl("check CANNOT delete databases while a connection is open");
@@ -1502,13 +1569,13 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 		assert(not readnext(ID));//check no more
 	}
 //test function dictionaries
-//	if (not selectrecord("SELECT XUSERS WITH AGE_IN_DAYS GE 0 AND WITH AGE_IN_YEARS GE 0"))
+//	if (not select("SELECT XUSERS WITH AGE_IN_DAYS GE 0 AND WITH AGE_IN_YEARS GE 0"))
 //	if (not select("SELECT XUSERS"))
-	if (not selectrecord("SELECT XUSERS"))
+	if (not select("SELECT XUSERS (R)"))
 		assert(false and var("Failed to Select XUSERS!"));
 
 	DICT="dict_XUSERS";
-	while (readnextrecord(RECORD,ID))
+	while (readnext(RECORD,ID,MV))
 //	while (readnext(ID))
 	{
 		printl("ID=",ID, " RECORD=",RECORD);
@@ -2829,11 +2896,11 @@ while trying to match the argument list '(exodus::var, bool)'
 	}
 
 //	var("").select("MARKETS","WITH CURRENCY_NAME = '' AND WITH AUTHORISED");
-//	var("").selectrecord("MARKETS","WITH AUTHORISED");
+//	var("").select("MARKETS","WITH AUTHORISED");
 //	var("").select("MY_ADS","WITH AUTHORISED");
 //	ads.select("MY_ADS","BY MARKET_CODE WITH MARKET_CODE 'BAH'");
-//	ads.selectrecord("MY_ADS","BY MARKET_CODE");
-//	var().selectrecord("MY_ADS");
+//	ads.select("MY_ADS","BY MARKET_CODE");
+//	var().select("MY_ADS");
 //	var("").select("SCHEDULES","WITH AUTHORISED");
 //	var("").select("SCHEDULES","");
 	//MvLibs mvlibs;
@@ -2842,8 +2909,8 @@ while trying to match the argument list '(exodus::var, bool)'
 //	cin>>ii;
 	var record;
 	begintrans();
-	if (ads.selectrecord("SELECT MY_ADS")) {
-		while (ii<3&&ads.readnextrecord(record,key))
+	if (ads.select("SELECT MY_ADS")) {
+		while (ii<3&&ads.readnext(record,key,MV))
 		{
 			++ii;
 			if (!(ii%10000))
@@ -2879,10 +2946,11 @@ while trying to match the argument list '(exodus::var, bool)'
 	}
 #endif
 
-    printl();
-    printl("The following section requires data created by testsort.cpp");
     var myclients;
     if (myclients.open("myclients")) {
+
+	    printl();
+    	printl("The following section requires data created by testsort.cpp");
 
         var key;
 

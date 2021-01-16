@@ -131,7 +131,7 @@ bool getdbtrace()
 #define DEBUG_LOG_SQL                                                                \
 	if (GETDBTRACE)                                                                  \
 	{                                                                                \
-		sql.logputl("SQL:");                                                         \
+		sql.logputl("SQL0:");                                                         \
 	}
 #define DEBUG_LOG_SQL1                                                               \
 	if (GETDBTRACE)                                                                  \
@@ -446,9 +446,8 @@ bool var::connect(const var& conninfo)
 #endif
 
 // at this point we have good new connection to database
-#if TRACING >= 3
-	var("var::connect() Connection to database succeeded.").logputl();
-#endif
+	if (GETDBTRACE)
+		var("var::connect() Connection to database succeeded.").logputl();
 
 	// cache the new connection handle
 	int conn_no = mv_connections_cache.add_connection(pgconn);
@@ -654,9 +653,8 @@ bool var::disconnect()
 	THISIS("bool var::disconnect()")
 	THISISDEFINED()
 
-#if TRACING >= 3
-	var("ERROR: mvdbpostgres disconnect() Closing connection").errputl();
-#endif
+	if (GETDBTRACE)
+		var("DBTRACE mvdbpostgres disconnect() Closing connection").logputl();
 
 	int* default_connid = tss_pgconnids.get();
 
@@ -749,7 +747,6 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/)
 	{
 		var errmsg = "ERROR: mvdbpostgres 1 open(" ^ filename.quote() ^
 			     ") failed\n" ^ var(PQerrorMessage(thread_pgconn));
-		//			PQclear(pgresult);
 		this->setlasterror(errmsg);
 #if TRACING >= 1
 		var(errmsg).errputl();
@@ -763,7 +760,6 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/)
 		var errmsg = "ERROR: mvdbpostgres 2 open(" ^ filename.quote() ^
 			     ") table does not exist. failed\n" ^
 			     var(PQerrorMessage(thread_pgconn));
-		//			PQclear(pgresult);
 		this->setlasterror(errmsg);
 		return false;
 	}
@@ -772,7 +768,6 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/)
 	{
 		var errmsg =
 		    "ERROR: mvdbpostgres 3 open() SELECT returned more than one record";
-		//			PQclear(pgresult);
 		this->setlasterror(errmsg);
 #if TRACING >= 1
 		errmsg.errputl();
@@ -849,40 +844,81 @@ void var::close()
 
 bool var::readv(const var& filehandle, const var& key, const int fieldno)
 {
-	if (!read(filehandle, key))
+	THISIS("bool var::readv(const var& filehandle,const var& key,const int fieldno)")
+	THISISDEFINED()
+	ISSTRING(filehandle)
+	ISSTRING(key)
+
+	if (!this->read(filehandle, key))
 		return false;
 
-	var_str = this->a(fieldno).var_str;
+	this->var_str = this->a(fieldno).var_str;
 	return true;
 }
 
 bool var::reado(const var& filehandle, const var& key)
 {
+	THISIS("bool var::reado(const var& filehandle,const var& key)")
+	THISISDEFINED()
+	ISSTRING(filehandle)
+	ISSTRING(key)
+
 	// check cache first, and return any cached record
 	int connid = filehandle.getconnectionid_ordefault();
 	if (!connid)
 		throw MVDBException("getconnectionid() failed");
 	std::string cachedrecord =
-	    mv_connections_cache.readrecord(connid, filehandle.a(1).var_str, key.var_str);
+	    mv_connections_cache.getrecord(connid, filehandle.a(1).var_str, key.var_str);
 	if (!cachedrecord.empty())
 	{
 		// key.outputl("cache read " ^ filehandle.a(1) ^ "=");
 		//(*this) = cachedrecord;
-		var_str = cachedrecord;
-		var_typ = VARTYP_STR;
+		this->var_str = cachedrecord;
+		this->var_typ = VARTYP_STR;
 
 		this->setlasterror();
-		return true;
+		return this->var_str.length() > 0;
 	}
 
 	// ordinary read
-	if (!read(filehandle, key))
-		return false;
+	bool result = this->read(filehandle, key);
 
-	// save in cache only when allowing read from cache ie only in reado
-	// and NOT in read() or write()
-	// so that ordinary reads dont cause caching - for safety
-	mv_connections_cache.writerecord(connid, filehandle.a(1).var_str, key.var_str, var_str);
+	//cache the ordinary read if successful
+	if (result)
+		this->writeo(filehandle, key);
+
+	return result;
+}
+
+bool var::writeo(const var& filehandle, const var& key) const
+{
+	THISIS("bool var::writeo(const var& filehandle,const var& key)")
+	THISISSTRING()
+	ISSTRING(filehandle)
+	ISSTRING(key)
+
+	// update cache
+	// virtually identical code in read and write/update/insert/delete
+	int connid = filehandle.getconnectionid_ordefault();
+	if (!connid)
+		throw MVDBException("getconnectionid() failed");
+	mv_connections_cache.putrecord(connid, filehandle.a(1).var_str, key.var_str, this->var_str);
+
+	return true;
+}
+
+bool var::deleteo(const var& key) const
+{
+	THISIS("bool var::deleteo(const var& key)")
+	THISISSTRING()
+	ISSTRING(key)
+
+	// update cache
+	// virtually identical code in read and write/update/insert/delete
+	int connid = this->getconnectionid_ordefault();
+	if (!connid)
+		throw MVDBException("getconnectionid() failed");
+	mv_connections_cache.delrecord(connid, this->a(1).var_str, key.var_str);
 
 	return true;
 }
@@ -895,13 +931,24 @@ bool var::read(const var& filehandle, const var& key)
 	ISSTRING(key)
 
 	//amending var_str invalidates all flags
-	var_typ = VARTYP_STR;
+	//var_typ = VARTYP_STR;
+	//this->var_typ = VARTYP_UNA;
+	//this->var_str.resize(0);
+
+	// LEAVE RECORD UNTOUCHED UNLESS RECORD IS SUCCESSFULLY READ
+	// initialise the record to unassigned (actually empty string at the moment)
+	// unless record and key are the same variable
+	// in which case allow failure to read to leave the record (key) untouched
+	//if (this != &key) {
+	//	this->var_typ = VARTYP_UNA;
+	//	//this->var_typ = VARTYP_STR;
+	//	this->var_str.resize(0);
+	//}
 
 	// asking to read DOS file! do osread using key as osfilename!
 	if (filehandle == "DOS")
 	{
-		(*this).osread(key); //.convert("\\",SLASH));
-		return true;
+		return this->osread(key); //.convert("\\",SLASH));
 	}
 
 	// asking to read DOS file! do osread using key as osfilename!
@@ -920,7 +967,7 @@ bool var::read(const var& filehandle, const var& key)
 
 		PGconn* pgconn = (PGconn*)filehandle.connection();
 		if (pgconn == NULL)
-			return "";
+			return false;
 
 		//PGresultptr pgresult;
 		//bool ok = getpgresult(sql, pgresult, pgconn);
@@ -932,9 +979,10 @@ bool var::read(const var& filehandle, const var& key)
 		//Scoped_PGresult clearer(pgresult);
 
 		if (!ok)
-			return "";
+			return false;
 
-		var_str = "";
+		*this = "";
+
 		var keyn;
 		int ntuples = PQntuples(pgresult);
 		for (int tuplen = 0; tuplen < ntuples; tuplen++)
@@ -951,12 +999,17 @@ bool var::read(const var& filehandle, const var& key)
 					}
 					else
 					{
-						this->var_str.push_back(FM_);
 						this->var_str.append(key.var_str);
+						this->var_str.push_back(FM_);
 					}
 				}
 			}
 		}
+
+		//remove any trailing FM
+		if (this->var_str.back() == FM_)
+			this->var_str.pop_back();
+
 		this->setlasterror();
 		return true;
 	}
@@ -1011,7 +1064,6 @@ bool var::read(const var& filehandle, const var& key)
 		else
 			errmsg ^= var(PQerrorMessage(thread_pgconn)) ^ " sqlstate:" ^ sqlstate;
 		;
-		// PQclear(pgresult);
 		this->setlasterror(errmsg);
 		throw MVDBException(errmsg);
 		// return false;
@@ -1019,7 +1071,9 @@ bool var::read(const var& filehandle, const var& key)
 
 	if (PQntuples(pgresult) < 1)
 	{
-		// PQclear(pgresult);
+		//leave record (this) untouched if record cannot be read
+		// *this = "";
+
 		this->setlasterror("ERROR: mvdbpostgres read() record does not exist " ^
 				   key.quote());
 		return false;
@@ -1027,7 +1081,6 @@ bool var::read(const var& filehandle, const var& key)
 
 	if (PQntuples(pgresult) > 1)
 	{
-		// PQclear(pgresult);
 		var errmsg = "ERROR: mvdbpostgres read() SELECT returned more than one record";
 		errmsg.errputl();
 		this->setlasterror(errmsg);
@@ -1118,7 +1171,7 @@ var var::lock(const var& key) const
 
 	// DEBUG_LOG_SQL1
 	if (GETDBTRACE)
-		(var(sql) ^ " " ^ fileandkey).logputl("SQL:");
+		(var(sql) ^ " " ^ fileandkey).logputl("SQLL:");
 
 	//PGresult* pgresult =
 	Scoped_PGresult pgresult(PQexecParams(thread_pgconn,
@@ -1135,7 +1188,6 @@ var var::lock(const var& key) const
 			     var(PQerrorMessage(thread_pgconn)) ^ "\n" ^ "PQresultStatus=" ^
 			     var(PQresultStatus(pgresult)) ^ ", PQntuples=" ^
 			     var(PQntuples(pgresult));
-		// PQclear(pgresult);//DO THIS OR SUFFER MEMORY LEAK
 		errmsg.errputl();
 		// throw MVDBException(msg);
 		return false;
@@ -1208,7 +1260,7 @@ bool var::unlock(const var& key) const
 
 	// DEBUG_LOG_SQL
 	if (GETDBTRACE)
-		(var(sql) ^ " " ^ fileandkey).logputl("SQL:");
+		(var(sql) ^ " " ^ fileandkey).logputl("SQLU:");
 
 	//PGresult* pgresult =
 	Scoped_PGresult pgresult(PQexecParams(thread_pgconn,
@@ -1221,19 +1273,14 @@ bool var::unlock(const var& key) const
 
 	if (PQresultStatus(pgresult) != PGRES_TUPLES_OK || PQntuples(pgresult) != 1)
 	{
-		var errmsg = "unlock(" ^ (*this).convert(_FM_, "^") ^ ", " ^ key ^ ")\n" ^
+		var errmsg = "unlock(" ^ this->convert(_FM_, "^") ^ ", " ^ key ^ ")\n" ^
 			     var(PQerrorMessage(thread_pgconn)) ^ "\n" ^ "PQresultStatus=" ^
 			     var(PQresultStatus(pgresult)) ^ ", PQntuples=" ^
 			     var(PQntuples(pgresult));
-		// PQclear(pgresult);//DO THIS OR SUFFER MEMORY LEAK
 		errmsg.errputl();
 		// throw MVDBException(msg);
 		return false;
 	}
-
-	// bool unlockedok= *PQgetvalue(pgresult, 0, 0)!=0;
-
-	// PQclear(pgresult);
 
 	return true;
 }
@@ -1288,8 +1335,8 @@ bool var::sqlexec(const var& sqlcmd, var& response) const
 	// log the sql command
 	if (GETDBTRACE)
 	{
-		//		exodus::logputl("SQL:" ^ *this);
-		var temp("SQL:");
+		//		exodus::logputl("SQLe:" ^ *this);
+		var temp("SQLE:");
 		if (this->assigned())
 			temp ^= this->convert(_FM_, "^") ^ " ";
 		temp ^= sqlcmd;
@@ -1297,7 +1344,6 @@ bool var::sqlexec(const var& sqlcmd, var& response) const
 	}
 
 	// will contain any pgresult IF successful
-	// MUST do PQclear(pgresult) after using it;
 
 	// NB PQexec cannot be told to return binary results
 	// but it can execute multiple commands
@@ -1312,7 +1358,6 @@ bool var::sqlexec(const var& sqlcmd, var& response) const
 	{
 		//int xx = PQresultStatus(pgresult);
 		var sqlstate = var(PQresultErrorField(pgresult, PG_DIAG_SQLSTATE));
-		// PQclear(pgresult);//essential
 		// sql state 42P03 = duplicate_cursor
 		response = var(PQerrorMessage(thread_pgconn)) ^ " sqlstate:" ^ sqlstate;
 		return false;
@@ -1398,6 +1443,9 @@ bool var::write(const var& filehandle, const var& key) const
 	ISSTRING(filehandle)
 	ISSTRING(key)
 
+	// clear any cache
+	filehandle.deleteo(key);
+
 	// asking to write DOS file! do osread!
 	if (filehandle == "DOS")
 	{
@@ -1406,9 +1454,9 @@ bool var::write(const var& filehandle, const var& key) const
 	}
 
 	// std::string key2=key.toString();
-	// std::string data2=(*this).toString();
+	// std::string data2=this->toString();
 	std::string key2 = key.normalize();
-	std::string data2 = (*this).normalize();
+	std::string data2 = this->normalize();
 
 	// a 2 parameter array
 	const char* paramValues[2];
@@ -1473,26 +1521,12 @@ bool var::write(const var& filehandle, const var& key) const
 				var(PQresultStatus(pgresult)) ^ " " ^
 				var(PQerrorMessage(thread_pgconn)));
 		//errmsg.errputl();
-		// PQclear(pgresult);
 		throw MVDBException(errmsg);
 		//return false;
 	}
 
 	// if not updated 1 then fail
-	if (strcmp(PQcmdTuples(pgresult), "1") != 0)
-	{
-		// PQclear(pgresult);
-		return false;
-	}
-
-	// update cache
-	// virtually identical code in read and write/update/insert/delete
-	int connid = filehandle.getconnectionid_ordefault();
-	if (!connid)
-		throw MVDBException("getconnectionid() failed");
-	mv_connections_cache.writerecord(connid, filehandle.a(1).var_str, key.var_str, var_str);
-
-	// PQclear(pgresult);
+	//return strcmp(PQcmdTuples(pgresult), "1") != 0;
 	return true;
 }
 
@@ -1505,10 +1539,13 @@ bool var::updaterecord(const var& filehandle, const var& key) const
 	ISSTRING(filehandle)
 	ISSTRING(key)
 
+	// clear any cache
+	filehandle.deleteo(key);
+
 	// std::string key2=key.toString();
-	// std::string data2=(*this).toString();
+	// std::string data2=this->toString();
 	std::string key2 = key.normalize();
-	std::string data2 = (*this).normalize();
+	std::string data2 = this->normalize();
 
 	// a 2 parameter array
 	const char* paramValues[2];
@@ -1551,7 +1588,6 @@ bool var::updaterecord(const var& filehandle, const var& key) const
 				", " ^ key ^ ") Failed: " ^ var(PQntuples(pgresult)) ^ " " ^
 				var(PQerrorMessage(thread_pgconn))).errputl();
 #endif
-		// PQclear(pgresult);
 		return false;
 	}
 
@@ -1563,18 +1599,9 @@ bool var::updaterecord(const var& filehandle, const var& key) const
 				", " ^ key ^ ") Failed: " ^ var(PQntuples(pgresult)) ^ " " ^
 				var(PQerrorMessage(thread_pgconn))).errputl();
 #endif
-		// PQclear(pgresult);
 		return false;
 	}
 
-	// update cache
-	// virtually identical code in read and write/update/insert/delete
-	int connid = filehandle.getconnectionid_ordefault();
-	if (!connid)
-		throw MVDBException("getconnectionid() failed");
-	mv_connections_cache.writerecord(connid, filehandle.a(1).var_str, key.var_str, var_str);
-
-	// PQclear(pgresult);
 	return true;
 }
 
@@ -1588,10 +1615,13 @@ bool var::insertrecord(const var& filehandle, const var& key) const
 	ISSTRING(filehandle)
 	ISSTRING(key)
 
+	// clear any cache
+	filehandle.deleteo(key);
+
 	// std::string key2=key.toString();
-	// std::string data2=(*this).toString();
+	// std::string data2=this->toString();
 	std::string key2 = key.normalize();
-	std::string data2 = (*this).normalize();
+	std::string data2 = this->normalize();
 
 	// a 2 parameter array
 	const char* paramValues[2];
@@ -1636,25 +1666,15 @@ bool var::insertrecord(const var& filehandle, const var& key) const
 				var(PQntuples(pgresult)) ^ " " ^
 				var(PQerrorMessage(thread_pgconn))).errputl();
 #endif
-		// PQclear(pgresult);
 		return false;
 	}
 
 	// if not updated 1 then fail
 	if (strcmp(PQcmdTuples(pgresult), "1") != 0)
 	{
-		// PQclear(pgresult);
 		return false;
 	}
 
-	// update cache
-	// virtually identical code in read and write/update/insert/delete
-	int connid = filehandle.getconnectionid_ordefault();
-	if (!connid)
-		throw MVDBException("getconnectionid() failed");
-	mv_connections_cache.writerecord(connid, filehandle.a(1).var_str, key.var_str, var_str);
-
-	// PQclear(pgresult);
 	return true;
 }
 
@@ -1663,6 +1683,9 @@ bool var::deleterecord(const var& key) const
 	THISIS("bool var::deleterecord(const var& key) const")
 	THISISSTRING()
 	ISSTRING(key)
+
+	// clear any cache
+	this->deleteo(key);
 
 	// std::string key2=key.toString();
 	std::string key2 = key.normalize();
@@ -1695,36 +1718,27 @@ bool var::deleterecord(const var& key) const
 
 	if (PQresultStatus(pgresult) != PGRES_COMMAND_OK)
 	{
-#if TRACING >= 1
+//#if TRACING >= 1
 		var("ERROR: mvdbpostgres deleterecord(" ^ this->convert(_FM_, "^") ^
 				", " ^ key ^ ") Failed: " ^ var(PQntuples(pgresult)) ^ " " ^
 				var(PQerrorMessage(thread_pgconn))).errputl();
-#endif
-		// PQclear(pgresult);
+//#endif
 		return false;
 	}
 
 	// if not updated 1 then fail
+	bool result;
 	if (strcmp(PQcmdTuples(pgresult), "1") != 0)
 	{
-		// PQclear(pgresult);
 #if TRACING >= 3
 		var("var::deleterecord(" ^ this->convert(_FM_, "^") ^ ", " ^ key ^
 				") failed. Record does not exist").errputl();
 #endif
-		return false;
-	}
+		result = false;
+	} else
+		result = true;
 
-	// PQclear(pgresult);
-
-	// update cache (set to "" for delete)
-	// virtually identical code in read and write/update/insert/delete
-	int connid = this->getconnectionid_ordefault();
-	if (!connid)
-		throw MVDBException("getconnectionid() failed");
-	mv_connections_cache.writerecord(connid, this->a(1).var_str, key.var_str, "");
-
-	return true;
+	return result;
 }
 
 void var::clearcache() const
@@ -1980,11 +1994,14 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 
 	//if doing 2nd pass then calculated fields have been placed in a parallel temporary file
 	//and their column names appended with a colon (:)
-	var calculated=fieldname[-1]==":";
-	if (calculated) {
+	var stage2_calculated=fieldname[-1]==":";
+    var stage2_filename = "SELECT_STAGE2_CURSOR_" ^ this->a(1);
+
+	if (stage2_calculated) {
 		fieldname.splicer(-1,1,"");
 		//create a pseudo look up ... except that SELECT_TEMP_CURSOR_n has the fields stored in sql columns and not in the usual data column
-		calculated="@ANS=XLATE(\"SELECT_STAGE2_CURSOR_" ^ this->a(1) ^ "\",@ID," ^ fieldname ^ "_calc,\"X\")";
+		stage2_calculated="@ANS=XLATE(\"" ^ stage2_filename ^ "\",@ID," ^ fieldname ^ "_calc,\"X\")";
+		stage2_calculated.logputl("stage2_calculated simulation --------------------->");
 	}
 
 	// given a file and dictionary id
@@ -2036,8 +2053,8 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 
 	//create a pseudo look up. to trigger JOIN logic to the table that we stored
 	//Note that SELECT_TEMP has the fields stored in sql columns and not in the usual data column
-	if (calculated) {
-		dictrec.r(8,calculated);
+	if (stage2_calculated) {
+		dictrec.r(8,stage2_calculated);
 	}
 
 	var dicttype = dictrec.a(1);
@@ -2150,8 +2167,14 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 			// return sqlexpression;
 		}
 
-		// simple join
-		else if (! ismv1 && functionx.substr(1, 11).ucase() == "@ANS=XLATE(")
+		//handle below.
+		else if ( stage2_calculated && ismv1) {
+			sqlexpression = stage2_filename ^ "." ^ fieldname ^ "_calc";
+		}
+
+		// simple join or stage2 but not on multivalued
+		// stage2_calculated="@ANS=XLATE(\"SELECT_STAGE2_CURSOR_" ^ this->a(1) ^ "\",@ID," ^ fieldname ^ "_calc,\"X\")";
+		else if ( (!ismv1 || stage2_calculated) && functionx.substr(1, 11).ucase() == "@ANS=XLATE(")
 		{
 			functionx = functionx.a(1, 1);
 
@@ -2191,10 +2214,8 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 							   "data") ^
 					    ", " ^ xlatetargetfieldname ^ ", 0, 0)";
 				}
-				//calculated fields exist as sql columns in a parallel temporary table
-				else if (calculated)
-				{
-					sqlexpression=xlatetargetfilename ^ "." ^ xlatetargetfieldname;
+				else if (stage2_calculated) {
+					sqlexpression = xlatetargetfieldname;
 				}
 				else
 				{
@@ -2208,13 +2229,14 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 					if (! xlatetargetdictfile.open(xlatetargetdictfilename))
 						throw MVDBException(xlatetargetdictfilename ^ " cannot be opened for " ^ functionx);
 					sqlexpression = getdictexpression(
-					    filename, xlatetargetfilename, xlatetargetdictfilename,
-					    xlatetargetdictfile, xlatetargetfieldname, joins, unnests,
-					    selects, ismv, forsort);
+				    	filename, xlatetargetfilename, xlatetargetdictfilename,
+				    	xlatetargetdictfile, xlatetargetfieldname, joins, unnests,
+				    	selects, ismv, forsort
+					);
 				}
 
 				// determine the join details
-				var xlatekeyexpression;
+				var xlatekeyexpression="";
 				//xlatefromfieldname.outputl("xlatefromfieldname=");
 				if (xlatefromfieldname.trim().substr(1, 8).lcase() == "@record<")
 				{
@@ -2259,8 +2281,8 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 					return "";
 				}
 
-				//if the xlate key expression is calculated then
-				//indicate that the whole dictid expression is calculated
+				//if the xlate key expression is stage2_calculated then
+				//indicate that the whole dictid expression is stage2_calculated
 				//and do not do any join
 				if (xlatekeyexpression.index("exodus_call"))
 				{
@@ -2276,12 +2298,13 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 				var joinsectionn = ismv ? 2 : 1;
 
 				// add the join
+				///similar code above/below
 				var join_part1 = "\n  ";
 				//main file is on the left
 				//secondary file is on the right
 				//normally we want all records on the left (main file) and any secondary file records that exist ... LEFT JOIN
-				//if joining to calculated field file then we want only records that exist in the calculated fields file ... RIGHT JOIN (could be INNER JOIN)
-				join_part1 ^= calculated?"RIGHT":"LEFT";
+				//if joining to stage2_calculated field file then we want only records that exist in the stage2_calculated fields file ... RIGHT JOIN (could be INNER JOIN)
+				join_part1 ^= stage2_calculated?"RIGHT":"LEFT";
 				join_part1 ^= " JOIN\n   " ^ xlatetargetfilename ^ " ON ";
 				// var join_part2=xlatekeyexpression ^ "::text = " ^
 				// xlatetargetfilename ^ ".key"; var join_part2=xlatetargetfilename
@@ -2403,6 +2426,15 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 			}
 			else
 			{
+
+				//multivalued prestage2_calculated field
+				if (fieldname0[-1] == ":") {
+					var joinsectionn = 1;
+					var join = "LEFT JOIN " ^ stage2_filename ^ " ON " ^ stage2_filename ^ ".key = " ^ filename ^ ".key";;
+					//if (!joins.a(joinsectionn).index(join))
+					if (!joins.index(join))
+                    	joins.r(joinsectionn, -1, join);
+				}
 
 				// insert with SMs since expression can contain VMs
 				if (!unnests.a(2).locate(fieldname))
@@ -2545,17 +2577,6 @@ bool var::saveselect(const var& filename)
 	return recn > 0;
 }
 
-bool var::selectrecord(const var& sortselectclause)
-{
-	THISIS("bool var::selectrecord(const var& sortselectclause) const")
-	//?allow undefined usage like var xyz=xyz.select();
-	// THISISDEFINED()
-	ISSTRING(sortselectclause)
-
-	// return const_cast<const var&>(*this).selectx("key, mv::integer, data",sortselectclause);
-	return this->selectx("key, mv::integer, data", sortselectclause);
-}
-
 bool var::select(const var& sortselectclause)
 {
 	THISIS("bool var::select(const var& sortselectclause) const")
@@ -2563,10 +2584,14 @@ bool var::select(const var& sortselectclause)
 	THISISDEFINED()
 	ISSTRING(sortselectclause)
 
-	return this->selectx("key, mv::integer", sortselectclause);
+	if (! sortselectclause || sortselectclause.substr(-2,2) == "R)")
+		return this->selectx("key, mv::integer, data", sortselectclause);
+	else
+		return this->selectx("key, mv::integer", sortselectclause);
 }
 
 // currently only called from select, selectrecord and getlist
+// TODO merge into plain select()
 bool var::selectx(const var& fieldnames, const var& sortselectclause)
 {
 	// private - and arguments are left unchecked for speed
@@ -2750,7 +2775,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 				// it use any index on the distinct field so it works on large
 				// indexed files select distinct is really only useful on INDEXED
 				// fields unless the file is small
-				distinctfieldnames = "DISTINCT " ^ distinctexpression;
+				distinctfieldnames = "DISTINCT " ^ ( unnests ? distinctfieldname : distinctexpression);
 			}
 			else
 			{
@@ -3371,7 +3396,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 	if (bykey)
 		orderclause ^= ", " ^ actualfilename ^ ".key";
 
-	//if calculated fields then secondary sort/select is going to use readnextrecord, so add the data column if missing
+	//if calculated fields then secondary sort/select is going to use data column, so add the data column if missing
 	if (calc_fields && actualfieldnames.substr(-6) != ", data")
 		actualfieldnames^=", data";
 
@@ -3393,7 +3418,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 	var listname = "";
 	// see also listname below
 	//	if (this->hasnext()) {
-	//		listname=(*this).a(1) ^ "_" ^ getprocessn() ^ "_tempx";
+	//		listname=this->a(1) ^ "_" ^ getprocessn() ^ "_tempx";
 	//		this->savelist(listname);
 	//		var savelistfilename="savelist_" ^ listname;
 	//		joins ^= " \nINNER JOIN\n " ^ savelistfilename ^ " ON " ^ actualfilename ^
@@ -3459,7 +3484,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 
 	//JOIN - (1)?
 	if (joins.a(1))
-		sql ^= " " ^ joins.a(1).convert(VM, "");
+		sql ^= " " ^ joins.a(1).convert(VM, "\n");
 
 	//UNNEST - mv fields
 	//mv fields get added to the FROM clause like "unnest() as xyz" allowing the use of xyz in WHERE/ORDER BY
@@ -3617,8 +3642,7 @@ void var::clearselect()
 // NB global not member function
 //	To make it var:: privat member -> pollute mv.h with PGresultptr :(
 // bool readnextx(const std::string& cursor, PGresultptr& pgresult)
-// NB caller MUST ALWAYS do PQclear(pgresult) even bool false
-// called by readnext/readnextrecord (and perhaps hasnext/select to implement LISTACTIVE)
+// called by readnext (and perhaps hasnext/select to implement LISTACTIVE)
 bool readnextx(const var& cursor, Scoped_PGresult& pgresult, PGconn* pgconn, bool forwards)
 {
 	var sql;
@@ -3636,7 +3660,6 @@ bool readnextx(const var& cursor, Scoped_PGresult& pgresult, PGconn* pgconn, boo
 	{
 
 		// var errmsg=var(PQresultErrorMessage(pgresult));
-		// PQclear(pgresult);
 		// throw MVDBException(errmsg);
 		// cursor.clearselect();
 		// return false;
@@ -3684,7 +3707,6 @@ bool readnextx(const var& cursor, Scoped_PGresult& pgresult, PGconn* pgconn, boo
 
 	// 1. Do NOT clear the cursor even if forward since we may be testing it
 	// 2. DO NOT clear since the pgresult is needed by the caller
-	// PQclear(pgresult);
 
 	// true = found a new key/record
 	return true;
@@ -4092,8 +4114,6 @@ bool var::readnext(var& key, var& valueno)
 		return false;
 	}
 
-	// MUST call PQclear(pgresult) on all paths below
-
 	/* abortive code to handle unescaping returned hex/escape data	//avoid the need for this by
 	calling pqexecparams flagged for binary
 	//even in the case where there are no parameters and pqexec could be used.
@@ -4108,7 +4128,6 @@ bool var::readnext(var& key, var& valueno)
 	PQgetvalue(pgresult, 0, 0), &to_length); if (*unescaped)
 			key=stringfromUTF8((UTF8*)unescaped, to_length);
 		PQfreemem(unescaped);
-		PQclear(pgresult);
 		return true;
 	}
 */
@@ -4121,7 +4140,7 @@ bool var::readnext(var& key, var& valueno)
 
 	//recursive call to skip any meta data with keys starting and ending %
 	//eg keys like "%RECORDS%" (without the quotes)
-	//similar code in readnext() and readnextrecord()
+	//similar code in readnext()
     if (key[1] == "%" && key[-1] == "%") {
 		return readnext(key, valueno);
 	}
@@ -4133,8 +4152,6 @@ bool var::readnext(var& key, var& valueno)
 		valueno = getresult(pgresult, 0, 1);
 	else
 		valueno = 0;
-
-	// PQclear(pgresult);
 
 	return true;
 
@@ -4156,19 +4173,13 @@ bool var::readnext(var& key, var& valueno)
 #endif
 }
 
-bool var::readnextrecord(var& record, var& key)
-{
-	var valueno = 0;
-	return readnextrecord(record, key, valueno);
-}
-
-bool var::readnextrecord(var& record, var& key, var& valueno)
+bool var::readnext(var& record, var& key, var& valueno)
 {
 
-	//?allow undefined usage like var xyz=xyz.readnextrecord();
+	//?allow undefined usage like var xyz=xyz.readnext();
 	if (var_typ & VARTYP_MASK || !var_typ)
 	{
-		// throw MVUndefined("readnextrecord()");
+		// throw MVUndefined("readnext()");
 		var_str = "";
 		var_typ = VARTYP_STR;
 	}
@@ -4176,7 +4187,7 @@ bool var::readnextrecord(var& record, var& key, var& valueno)
 	// default cursor is ""
 	const_cast<var&>(*this).unassigned("");
 
-	THISIS("bool var::readnextrecord(var& record, var& key) const")
+	THISIS("bool var::readnext(var& record, var& key, var& valueno) const")
 	THISISSTRING()
 	ISDEFINED(key)
 	ISDEFINED(record)
@@ -4200,8 +4211,6 @@ bool var::readnextrecord(var& record, var& key, var& valueno)
 		return false;
 	}
 
-	// MUST call PQclear(pgresult) on all paths below
-
 	// key is first column
 	// char* data = PQgetvalue(pgresult, 0, 0);
 	// int datalen = PQgetlength(pgresult, 0, 0);
@@ -4211,27 +4220,33 @@ bool var::readnextrecord(var& record, var& key, var& valueno)
 
     //recursive call to skip any meta data with keys starting and ending %
     //eg keys like "%RECORDS%" (without the quotes)
-	//similar code in readnext() and readnextrecord()
+	//similar code in readnext()
     if (key[1] == "%" && key[-1] == "%") {
-        return readnextrecord(record, key, valueno);
+        return readnext(record, key, valueno);
     }
 
 	// vn is second column
 	// valueno=var((int)ntohl(*(uint32_t*)PQgetvalue(pgresult, 0, 1)));
-	valueno = getresult(pgresult, 0, 1);
+	// vn is second column
+	// record is third column
+	if (PQnfields(pgresult) > 1)
+		// valueno=var((int)ntohl(*(uint32_t*)PQgetvalue(pgresult, 0, 1)));
+		valueno = getresult(pgresult, 0, 1);
+	else
+		valueno = 0;
 
 	// record is third column
 	if (PQnfields(pgresult) < 3)
 	{
-		PQclear(pgresult);
-		var errmsg = "readnextrecord() must follow selectrecord(), not select()";
-		this->setlasterror(errmsg);
-		throw MVDBException(errmsg);
+		//var errmsg = "readnext() must follow a select() clause with option (R)";
+		//this->setlasterror(errmsg);
+		//throw MVDBException(errmsg);
 		// return false;
+		record = "";
 	}
-	record = getresult(pgresult, 0, 2);
-
-	// PQclear(pgresult);
+	else {
+		record = getresult(pgresult, 0, 2);
+	}
 
 	return true;
 }
@@ -4243,7 +4258,7 @@ bool var::createindex(const var& fieldname0, const var& dictfile) const
 	ISSTRING(fieldname0)
 	ISSTRING(dictfile)
 
-	var filename = (*this).a(1);
+	var filename = this->a(1);
 	var fieldname = fieldname0.convert(".","_");
 
 	// actual dictfile to use is either given or defaults to that of the filename
@@ -4323,7 +4338,7 @@ bool var::deleteindex(const var& fieldname0) const
 	THISISSTRING()
 	ISSTRING(fieldname0)
 
-	var filename = (*this).a(1);
+	var filename = this->a(1);
 	var fieldname = fieldname0.convert(".","_");
 
 	// delete the index field (actually only present on calculated field indexes so ignore
@@ -4388,8 +4403,6 @@ var var::listfiles() const
 			filenames ^= FM ^ getresult(pgresult, filen, 0);
 	}
 	filenames.splicer(1, 1, "");
-
-	// PQclear(pgresult);
 
 	return filenames;
 }
@@ -4471,8 +4484,6 @@ var var::listindexes(const var& filename0, const var& fieldname0) const
 	if (!ok)
 		return "";
 
-	// MUST PQclear(pgresult) below
-
 	var tt;
 	var indexname;
 	var indexnames = "";
@@ -4501,8 +4512,6 @@ var var::listindexes(const var& filename0, const var& fieldname0) const
 		}
 	}
 	// indexnames.splicer(1,1,"");
-
-	// PQclear(pgresult);
 
 	return indexnames;
 }
@@ -4534,16 +4543,12 @@ var var::reccount(const var& filename) const
 	if (!ok)
 		return "";
 
-	// MUST PQclear(pgresult) below
-
 	var reccount = "";
 	if (PQntuples(pgresult) && PQnfields(pgresult) > 0 && !PQgetisnull(pgresult, 0, 0))
 	{
 		// reccount=var((int)ntohl(*(uint32_t*)PQgetvalue(pgresult, 0, 0)));
 		reccount = getresult(pgresult, 0, 0);
 	}
-
-	// PQclear(pgresult);
 
 	return reccount;
 }
@@ -4578,15 +4583,11 @@ var var::flushindex(const var& filename) const
 	if (!ok)
 		return "";
 
-	// MUST PQclear(pgresult) below
-
 	var flushresult = "";
 	if (PQntuples(pgresult))
 	{
 		flushresult = true;
 	}
-
-	// PQclear(pgresult);
 
 	return flushresult;
 }
@@ -4614,7 +4615,6 @@ static bool getpgresult(const var& sql, Scoped_PGresult& pgresult, PGconn* threa
 
 	// PGresult*
 	// will contain any pgresult IF successful
-	// MUST do PQclear(pgresult) after using it;
 	// PGresult* local_result = PQexecParams(thread_pgconn,
 	pgresult = PQexecParams(thread_pgconn, sql.toString().c_str(), 0, /* zero params */
 				NULL, /* let the backend deduce param type */
@@ -4624,8 +4624,7 @@ static bool getpgresult(const var& sql, Scoped_PGresult& pgresult, PGconn* threa
 	// paramFormats,
 	// 1);	  /* ask for binary results */
 
-	// NO! pgresult is returned to caller to extract any data AND call PQclear(pgresult)
-	// Scoped_PGresult clearer(pgresult);
+	// NO! pgresult is returned to caller to extract any data
 
 	if (!pgresult)
 	{
@@ -4633,7 +4632,6 @@ static bool getpgresult(const var& sql, Scoped_PGresult& pgresult, PGconn* threa
 		var("ERROR: mvdbpostgres PQexec command failed, no error code: ").errputl();
 #endif
 
-		// PQclear(pgresult);
 		return false;
 	}
 	else
@@ -4689,12 +4687,10 @@ static bool getpgresult(const var& sql, Scoped_PGresult& pgresult, PGconn* threa
 
 			// this is defaulted above for safety
 			// retcode=0;
-			// PQclear(pgresult);
 			return false;
 		}
 
 		// should never get here
-		// PQclear(pgresult);
 	}
 
 	// should never get here

@@ -10,3 +10,4 @@ neosys.net
 work
 service/data/menu.htm
 *.~
+.gdb_history*

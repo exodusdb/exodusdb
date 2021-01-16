@@ -68,7 +68,7 @@ nextdoc:
 		}else{
 			tt = "DOC";
 		}
-		var temp = tt ^ ("00000" ^ nextno).oconv("R#5");
+		ID = tt ^ ("00000" ^ nextno).oconv("R#5");
 
 		//skip to next file if already exists
 		//osopen lcase(where:temp) to temp2 then
@@ -77,14 +77,13 @@ nextdoc:
 		// end
 
 		//skip if document already exists
+		var temp;
 		if (temp.read(gen.documents, temp)) {
 			goto nextdoc;
 		}
-		if (temp.read(gen.documents, where ^ temp)) {
+		if (temp.read(gen.documents, where ^ ID)) {
 			goto nextdoc;
 		}
-
-		ID = temp;
 
 		xx = unlockrecord("DOCUMENTS", gen.documents, "0");
 

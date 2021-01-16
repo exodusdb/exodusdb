@@ -107,10 +107,11 @@ class MvConnectionsCache
 	CACHED_CONNECTION get_connection(int index) const;
 	UNORDERED_SET_FOR_LOCKTABLE* get_lock_table(int index) const;
 	RecordCache* get_recordcache(int index) const;
-	std::string readrecord(const int connid, const std::string filename,
+	std::string getrecord(const int connid, const std::string filename,
 			       const std::string key) const;
-	void writerecord(const int connid, const std::string filename, const std::string key,
+	void putrecord(const int connid, const std::string filename, const std::string key,
 			 const std::string& record);
+	void delrecord(const int connid, const std::string filename, const std::string key);
 	void clearrecordcache(const int connid);
 
       private:

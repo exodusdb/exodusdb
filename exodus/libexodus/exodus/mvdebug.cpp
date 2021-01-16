@@ -68,9 +68,9 @@ class MyStackWalker : public StackWalker
 		// fprintf(stderr,szText);
 
 		// fprintf(stderr,"fgets:%s", path);
-		exodus::var line = exodus::var(szText).convert("\x0d\x0a", ""); //.outputl("path=");
-		exodus::var filename = line.field(":", 1, 2);  //.outputl("filename=");
-		exodus::var lineno = filename.field2(" ", -1); //.outputl("lineno=");
+		exodus::var line = exodus::var(szText).convert("\x0d\x0a", ""); //.errputl("path=");
+		exodus::var filename = line.field(":", 1, 2);  //.errputl("filename=");
+		exodus::var lineno = filename.field2(" ", -1); //.errputl("lineno=");
 		filename.splicer(-(lineno.length() + 1), 999999, "");
 		lineno.substrer(2, lineno.length() - 2);
 		if (filename.index("stackwalker.cpp") || filename.index("debug.cpp") ||
@@ -89,7 +89,7 @@ class MyStackWalker : public StackWalker
 				if (linetext.index("backtrace("))
 					return;
 			}
-			// outputl(linetext);
+			// errputl(linetext);
 			returnlines ^= exodus::FM ^ linetext;
 		}
 
@@ -109,8 +109,8 @@ void addbacktraceline(const var& sourcefilename, const var& lineno, var& returnl
 {
 
 	//#ifdef TRACING
-	//	sourcefilename.outputl("SOURCEFILENAME=");
-	//	lineno.outputl("LINENO=");
+	//	sourcefilename.errputl("SOURCEFILENAME=");
+	//	lineno.errputl("LINENO=");
 	//#endif
 
 	if (not lineno || not lineno.isnum())
@@ -140,7 +140,7 @@ void addbacktraceline(const var& sourcefilename, const var& lineno, var& returnl
 	line.errputl();
 #endif
 
-	// outputl(linetext);
+	// errputl(linetext);
 	linetext ^= ": " ^ line;
 
 	returnlines ^= FM ^ linetext;
@@ -223,8 +223,8 @@ var backtrace()
 		//var result = cmd.osshellread();
 		result.osshellread(cmd);
 #ifdef TRACING
-		cmd.outputl("CMD=");
-		result.outputl("RESULT=");
+		cmd.errputl("CMD=");
+		result.errputl("RESULT=");
 #endif
 		if (not result)
 			continue;
@@ -371,7 +371,7 @@ var backtrace()
 
 		var oscmd="addr2line -e " ^ binaryfilename.quote() ^ " " ^ internaladdresses;
 	#endif
-		//oscmd.outputl();
+		//oscmd.errputl();
 
 	#ifdef TRACING
 		fprintf(stderr,"EXECPATH = %s\n",EXECPATH2.toString().c_str());
@@ -398,10 +398,10 @@ var backtrace()
 			fprintf(stderr,"fgets:%s", path);
 	#endif
 
-			var path2=var(path).convert("\x0d\x0a","");//.outputl("path=");
-			var sourcefilename=path2.field(":",1);//.outputl("filename=");
+			var path2=var(path).convert("\x0d\x0a","");//.errputl("path=");
+			var sourcefilename=path2.field(":",1);//.errputl("filename=");
 			var lineno=path2.field(":",2).field("
-	",1).field("(",1);//.outputl("lineno=");
+	",1).field("(",1);//.errputl("lineno=");
 
 	#ifdef TRACING
 			sourcefilename.errput("sourcefilename: ");
@@ -443,20 +443,21 @@ void SIGINT_handler(int sig)
 	signal(sig, SIG_IGN);
 
 	// duplicated in init and B
-	// backtrace().convert(FM,"\n").outputl();
+	// backtrace().convert(FM,"\n").errputl();
 
 	// separate our prompting onto a new line
-	var("").outputl();
+	fprintf(stderr, "\n");
 
 	while (true)
 	{
 
 		// printf ("\nInterrupted. (C)ontinue (E)nd (B)acktrace\n");
 
-		// output("? ");
+		// errput("? ");
 		var cmd;
 		// if (!cmd.input("Interrupted. (C)ontinue (E)xit (B)acktrace (A)bort ?"))
 		fprintf(stderr, "Interrupted. (C)ontinue (E)xit (B)acktrace (D)ebug (A)bort ?");
+		fflush(stderr);
 		if (!cmd.input())
 			break;
 
@@ -482,7 +483,7 @@ void SIGINT_handler(int sig)
 		{
 
 			// duplicated in init and B
-			backtrace().convert(FM, "\n").outputl();
+			backtrace().convert(FM, "\n").errputl();
 		}
 		else if (cmd1 == "D")
 		{

@@ -31,7 +31,8 @@
 // program.h programexit
 // exodusmacros.h libraryexit()
 
-//OPTION I=Ignore causes error exit to be suppressed
+//OPTION I=Ignore. Causes error exit to be suppressed
+//OPTION D=Debug. Suppress try/catch exception handling so debuggers can catch errors
 #define programexit(PROGRAMNAME)                                                   \
 	classexit(PROGRAMNAME)                                                         \
 	int PROGRAMNAME##main2(int exodus__argc, const char* exodus__argv[], int threadno) \
@@ -39,49 +40,55 @@
 		MvEnvironment mv;                                                          \
 		exodus_main(exodus__argc, exodus__argv, mv, threadno);                     \
 		int result = 0;                                                            \
-		try                                                                        \
-		{                                                                          \
-			PROGRAMNAME##ExodusProgram exodusprogram1(mv);                         \
+		PROGRAMNAME##ExodusProgram exodusprogram1(mv);                             \
+        if (osgetenv("EXO_DEBUG")) {                                                           \
+			errputl("INIT DEBUGGING PROCESSNO ", PROCESSNO, " " #PROGRAMNAME);               \
 			result = exodusprogram1.main().toInt();                                \
+			errputl("EXIT DEBUGGING PROCESSNO ", PROCESSNO, " " #PROGRAMNAME);               \
+        } else {                                                                   \
+			try                                                                    \
+			{                                                                      \
+				result = exodusprogram1.main().toInt();                            \
+			}                                                                      \
+			catch (MVStop exceptionx)                                              \
+			{                                                                      \
+				if (exceptionx.description.length())                               \
+					exceptionx.description.outputl();                              \
+				if (exceptionx.description.isnum())                                \
+					result = exceptionx.description.toInt();                       \
+			}                                                                      \
+			catch (MVAbort exceptionx)                                             \
+			{                                                                      \
+				if (exceptionx.description.length())                               \
+					exceptionx.description.errputl();                              \
+				if (exceptionx.description.isnum() && exceptionx.description)      \
+					result = exceptionx.description;                               \
+				else                                                               \
+					result = 1;                                                    \
+			}                                                                      \
+			catch (MVAbortAll exceptionx)                                          \
+			{                                                                      \
+				if (exceptionx.description.length())                               \
+					exceptionx.description.errputl();                              \
+				if (exceptionx.description.isnum())                                \
+					result = exceptionx.description.toInt();                       \
+				else                                                               \
+					result = 2;                                                    \
+			}                                                                      \
+			catch (MVLogoff exceptionx)                                            \
+			{                                                                      \
+				if (exceptionx.description.length())                               \
+					exceptionx.description.outputl();                              \
+				if (exceptionx.description.isnum())                                \
+					result = exceptionx.description.toInt();                       \
+			}                                                                      \
+			/*catch (MVError exceptionx)                                           \
+			{                                                                      \
+				errputl(exceptionx.description, " - Aborting.");                   \
+				errputl(exceptionx.stack.convert(FM, "\n"));                       \
+				result = OPTIONS.index("I") ? 0 : 999;                             \
+			}*/                                                                    \
 		}                                                                          \
-		catch (MVStop exceptionx)                                                  \
-		{                                                                          \
-			if (exceptionx.description.length())                                   \
-				exceptionx.description.outputl();                                  \
-			if (exceptionx.description.isnum())                                    \
-				result = exceptionx.description.toInt();                           \
-		}                                                                          \
-		catch (MVAbort exceptionx)                                                 \
-		{                                                                          \
-			if (exceptionx.description.length())                                   \
-				exceptionx.description.outputl();                                  \
-			if (exceptionx.description.isnum() && exceptionx.description)          \
-				result = exceptionx.description;                                   \
-			else                                                                   \
-				result = 1;                                                        \
-		}                                                                          \
-		catch (MVAbortAll exceptionx)                                              \
-		{                                                                          \
-			if (exceptionx.description.length())                                   \
-				exceptionx.description.outputl();                                  \
-			if (exceptionx.description.isnum())                                    \
-				result = exceptionx.description.toInt();                           \
-			else                                                                   \
-				result = 2;                                                        \
-		}                                                                          \
-		catch (MVLogoff exceptionx)                                                \
-		{                                                                          \
-			if (exceptionx.description.length())                                   \
-				exceptionx.description.outputl();                                  \
-			if (exceptionx.description.isnum())                                    \
-				result = exceptionx.description.toInt();                           \
-		}                                                                          \
-		/*catch (MVError exceptionx)                                               \
-		{                                                                          \
-			printl(exceptionx.description, " - Aborting.");                        \
-			printl(exceptionx.stack.convert(FM, "\n"));                            \
-			result = OPTIONS.index("I") ? 0 : 999;                                 \
-		}*/                                                                        \
 		/*TODO disconnect ALL connections of this thread*/                         \
 		var("PROCESSES").deleterecord(PROCESSNO);                                  \
 		disconnect();                                                              \

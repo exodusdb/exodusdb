@@ -4,8 +4,17 @@ programinit()
 function main() {
     //check command syntax
     //edit filename
-    if (dcount(COMMAND,FM)<2)
-        abort("Syntax is 'edic osfilename'");
+	var edic_hist = osgetenv("HOME") ^ "/.edic";
+    if (dcount(COMMAND,FM)<2) {
+		if (osread(COMMAND, edic_hist)) {
+			OPTIONS=COMMAND.a(2);
+			COMMAND = raise(COMMAND.a(1));
+		} else {
+	        abort("Syntax is 'edic osfilename'");
+		}
+	}
+	if (not oswrite(lower(COMMAND) ^ FM ^ OPTIONS, edic_hist))
+		printl("Cannot write to ", edic_hist);
 
     var verbose=OPTIONS.ucase().index("V");
 
@@ -153,6 +162,9 @@ function main() {
     while (filen<nfiles) {
         filen+=1;
         var filename=filenames.a(filen).unquote();
+
+		if (not filename.length())
+			continue;
 
         //split out trailing line number after :
         var startatlineno=field(filename,":",2);

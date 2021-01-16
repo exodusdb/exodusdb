@@ -137,7 +137,7 @@ function main(in msg0, in subject0="", in username0="") {
 		//never email user
 		useremail = "";
 		//never email anybody but steve.bush@neosys.com or sysmsg@neosys.com
-		if (emailaddrs ne "sb2@neosys.com" and emailaddrs ne "steve.bush@neosys.com") {
+		if (emailaddrs ne "dev@neosys.com" and emailaddrs ne "steve.bush@neosys.com") {
 			emailaddrs = "";
 		}
 	}

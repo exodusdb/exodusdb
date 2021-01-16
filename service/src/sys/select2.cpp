@@ -439,7 +439,9 @@ nextrec:
 
 			//simulate window environment for POSTREAD
 			win.orec = RECORD;
-			win.wlocked = 1;
+			//wlocked=1
+			//simulate unlocked read to avoid warning messages like job cannot be updated
+			win.wlocked = 0;
 			USER4 = "";
 			win.reset = 0;
 

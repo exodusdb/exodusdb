@@ -1351,7 +1351,8 @@ var& var::transfer(var& destinationvar)
 {
 	THISIS("var& var::transfer(var& destinationvar)")
 	// transfer even unassigned vars (but not uninitialised ones)
-	THISISDEFINED()
+	//THISISDEFINED()
+	THISISASSIGNED()
 	ISDEFINED(destinationvar)
 
 	destinationvar.var_str.swap(var_str);
@@ -1368,7 +1369,7 @@ var& var::transfer(var& destinationvar)
 var var::clone() const
 {
 	THISIS("var var::clone(var& destinationvar)")
-	// clone even unassigned vars (but not uninitialised ones)
+	// clone even unassigned vars!
 	THISISDEFINED()
 
 	var clone;
@@ -1384,8 +1385,7 @@ var var::clone() const
 const var& var::exchange(const var& var2) const
 {
 	THISIS("var& var::exchange(var& var2)")
-	// exchange even unassigned vars (but not uninitialised ones)
-	THISISDEFINED()
+	THISISASSIGNED()
 	ISDEFINED(var2)
 
 	// intermediary copies of var2
