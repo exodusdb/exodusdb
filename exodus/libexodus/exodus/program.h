@@ -90,7 +90,7 @@
 			}*/                                                                    \
 		}                                                                          \
 		/*TODO disconnect ALL connections of this thread*/                         \
-		var("PROCESSES").deleterecord(PROCESSNO);                                  \
+		/*var("PROCESSES").deleterecord(PROCESSNO);*/                                  \
 		disconnect();                                                              \
 		if (OPTIONS.index("I"))                                                    \
 			result = 0;                                                            \
