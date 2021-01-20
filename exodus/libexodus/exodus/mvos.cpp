@@ -1179,8 +1179,16 @@ std::fstream* var::osopenx(const var& osfilename, const var& locale) const
 			      std::ios::out | std::ios::in | std::ios::binary);
 		if (!(*pmyfile))
 		{
-			delete pmyfile;
-			return 0;
+			//delete pmyfile;
+
+			//try to open read-only
+			pmyfile->open(osfilename.to_path_string().c_str(),
+				      std::ios::in | std::ios::binary);
+			if (!(*pmyfile))
+			{
+				delete pmyfile;
+				return 0;
+			}
 		}
 
 		// cache the file handle (we use the int to store the "file number"
