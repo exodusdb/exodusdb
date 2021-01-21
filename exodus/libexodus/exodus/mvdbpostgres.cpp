@@ -4320,7 +4320,7 @@ bool var::createindex(const var& fieldname0, const var& dictfile) const
 
 	// create postgres index
 	sql = "CREATE INDEX index__" ^ filename ^ "__" ^ fieldname ^ " ON " ^ filename;
-	if (ismv || fieldname.substr(-5) == "_xref")
+	if (ismv || fieldname.substr(-5).lcase() == "_xref")
 		sql ^= " USING GIN";
 	sql ^= " (";
 	sql ^= dictexpression;

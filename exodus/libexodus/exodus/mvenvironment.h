@@ -145,7 +145,8 @@ class DLL_PUBLIC MvEnvironment
 
 	var TCLSTACK = "";
 	// INTCONST=keyboard constants 1:ESC 2:f5 7:f10
-	var INTCONST = "\x1B" _FM_ "{f5?}" _FM_ _FM_ _FM_ _FM_ _FM_ "{f10?}";
+	//var INTCONST = "\x1B" _FM_ "{f5?}" _FM_ _FM_ _FM_ _FM_ _FM_ "{f10?}";
+	var INTCONST = "q" _FM_ "x" _FM_ _FM_ _FM_ _FM_ _FM_ "m";
 	var PRIORITYINT = "";
 	int COL1 = 0;
 	int COL2 = 0;

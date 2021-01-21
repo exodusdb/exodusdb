@@ -81,7 +81,7 @@ function main() {
 				break;
 			}
 
-			printl("File not renamed from ",oldfilename, " to ", newfilename);
+			//printl("File not renamed from ",oldfilename, " to ", newfilename);
 			//printl("Get Last Error reports %d\n", GetLastError ());
 
 		}

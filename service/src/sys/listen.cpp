@@ -212,22 +212,7 @@ function main() {
 	//finance?!
 	//$insert abp,common
 
-	/*;
-	COMMAND  ARGS                SUCCESS    FAILURE;
-	-------  ----                -------    -------;
-	LOGIN    user,pass,conninfo  userinfo   various reasons;
-	READ     file,key            rec        key doesnt exist;
-	READU    file,key            rec,lockid key already locked by someone else;
-	WRITE    rec,file,key,lockid rec        wrong lockid, or timestamp differs;
-	WRITEU   rec,file,key,lockid (same, but unlocks after writing - rarely used);
-	DELETE   file,key            ok         key currently locked by someone else;
-	SELECT   select statement    data       no recs found;
-	GETINDEX file,field,args     data       no recs found;
-	LOCK     file,key            lockid     key already locked by someone else;
-	RELOCK   file,key,lockid     ok         wrong lockid;
-	UNLOCK   file,key,lockid     ok         wrong lockid;
-	EXECUTE  cmd,args,data       data       command chooses to fail;
-	*/
+	//see LISTEN2 for commands
 
 	//notes
 	//use ABORT or ABORT ALL to terminate EXECUTED programs to clear out program stack
@@ -738,9 +723,11 @@ nextsearch0:
 	//charx=charx[1,1]
 
 	//esc
-	if (charx.index(INTCONST.a(1))) {
+	tt = INTCONST.a(1, 1);
+	if (charx.index(tt)) {
 		//leading space to avoid chars after ESC pressed being ANSI control sequences
-		call mssg(" You have pressed the [Esc]  key to exit|press again to confirm|", "UB", buffer, "");
+		tt.swapper(var().chr(27), "Esc");
+		call mssg(" You have pressed the " ^ tt ^ " key to exit|press again to confirm|", "UB", buffer, "");
 		//loop
 		// input reply,-1:
 		//until reply
