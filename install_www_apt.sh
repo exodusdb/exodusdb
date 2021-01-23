@@ -3,7 +3,7 @@ set -x
 set -e
 :
 : Installing exodus web service
-: ==========================
+: =============================
 :
 EXODUS=`pwd`
 test -f $EXODUS/install_www_apt.sh || ( echo Must be run in exodus install dir without path && exit )
