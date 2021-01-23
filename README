@@ -1,12 +1,1 @@
-Assuming that you need to program and use the multivalue database then you need to install PostgreSQL and a C++ compiler.
-
-Linux/Mac
-
-If you install Postgres after Exodus then you will have to run inslibs.sh in Exodus' application folder
-to add Exodus' Postgres plugin (pgexodus) to the Postgres package library folder.
-
-Mac
-
-Postgres binaries are available from postgresql.org
-
-xcode should be installed from the operating system cd's utilities folder.
+A Pick/ multivalue database emulator in C++ and Postgres.
