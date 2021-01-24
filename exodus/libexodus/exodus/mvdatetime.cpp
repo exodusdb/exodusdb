@@ -303,8 +303,10 @@ var var::iconv_D(const char* conversion) const
 	// TODO provide option to control cutover or base relative to current system year
 	// or refuse anything but four digit years
 	if (year <= 99) {
-		if (year > 50)
+		if (year >= 50) {
 			year += 1900;
+			std::cerr << "WARNING: 2 digit year >= 50 being converted to " << year << std::endl;
+		}
 		else
 			year += 2000;
 	}

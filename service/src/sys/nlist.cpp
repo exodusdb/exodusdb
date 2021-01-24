@@ -1449,7 +1449,7 @@ nextdict:
 		}
 
 		//call mssg('Selecting records, please wait.||(Press Esc or F10 to interrupt)','UB',buffer,'')
-		call xselect(ss ^ " (SR)");
+		call xselect(ss ^ " (S)");
 		//call mssg('','DB',buffer,'')
 
 		if (not LISTACTIVE) {

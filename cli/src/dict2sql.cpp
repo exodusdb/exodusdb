@@ -153,6 +153,9 @@ COST 10;
 	//exodus_extract_time_array -> time[]
 	do_sql("exodus_extract_time_array(data text, fn int, vn int, sn int)","time[]",exodus_extract_time_array_sql,sqltemplate);
 
+	//exodus_addcent4 -> text
+	do_sql("exodus_addcent4(data text)","text",exodus_addcent4_sql,sqltemplate);
+
 	return 0;
 }
 
@@ -846,5 +849,22 @@ BEGIN
 END;
 )V0G0N";
 
+//exodus_addcent4 -> text
+var exodus_addcent4_sql=
+R"V0G0N(
+DECLARE
+ year int;
+BEGIN
+ year = $1::NUMERIC;
+ if year < 50 then
+  return '20' || $1;
+ elsif year < 100 then
+  return '19' || $1;
+ end if;
+ return $1;
+EXCEPTION WHEN others THEN
+ RETURN $1;
+END;
+)V0G0N";
 
 programexit()
