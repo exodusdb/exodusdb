@@ -2169,7 +2169,15 @@ dict(AGE_IN_YEARS) {
 	assert(var("JAN/31/2008").iconv("D") eq "14641");
 	assert(var("2008/JAN/31").iconv("DS") eq "14641");
 
+	assert(var("1/1/92").iconv("D/E") eq "8767");
+
+	assert(var("1/1/68").iconv("D/E") eq "1");
+	assert(var("31/12/67").iconv("D/E") eq "0");
+	assert(var("30/12/67").iconv("D/E") eq "-1");
+	assert(var("1/1/1900").iconv("D/E") eq "-24835");
+
 	assert(var("31/1/2008").iconv("DE") eq "14641");
+	assert(var("31/1/2008").iconv("D/E") eq "14641");
 	assert(var("31 1 2008").iconv("DE") eq "14641");
 	assert(var("31-1-2008").iconv("DE") eq "14641");
 	assert(var("31/JAN/2008").iconv("DE") eq "14641");

@@ -1082,9 +1082,10 @@ bool var::read(const var& filehandle, const var& key)
 	if (PQntuples(pgresult) > 1)
 	{
 		var errmsg = "ERROR: mvdbpostgres read() SELECT returned more than one record";
-		errmsg.errputl();
-		this->setlasterror(errmsg);
-		return false;
+		throw MVDBException(errmsg);
+		//errmsg.errputl();
+		//this->setlasterror(errmsg);
+		//return false;
 	}
 
 	*this = getresult(pgresult, 0, 0);
@@ -1188,8 +1189,8 @@ var var::lock(const var& key) const
 			     var(PQerrorMessage(thread_pgconn)) ^ "\n" ^ "PQresultStatus=" ^
 			     var(PQresultStatus(pgresult)) ^ ", PQntuples=" ^
 			     var(PQntuples(pgresult));
-		errmsg.errputl();
-		// throw MVDBException(msg);
+		//errmsg.errputl();
+		throw MVDBException(errmsg);
 		return false;
 	}
 
@@ -1277,8 +1278,8 @@ bool var::unlock(const var& key) const
 			     var(PQerrorMessage(thread_pgconn)) ^ "\n" ^ "PQresultStatus=" ^
 			     var(PQresultStatus(pgresult)) ^ ", PQntuples=" ^
 			     var(PQntuples(pgresult));
-		errmsg.errputl();
-		// throw MVDBException(msg);
+		//errmsg.errputl();
+		throw MVDBException(errmsg);
 		return false;
 	}
 
@@ -1584,9 +1585,11 @@ bool var::updaterecord(const var& filehandle, const var& key) const
 	if (PQresultStatus(pgresult) != PGRES_COMMAND_OK)
 	{
 #if TRACING >= 1
-		var("ERROR: mvdbpostgres update(" ^ filehandle.convert(_FM_, "^") ^
+		var errmsg="ERROR: mvdbpostgres update(" ^ filehandle.convert(_FM_, "^") ^
 				", " ^ key ^ ") Failed: " ^ var(PQntuples(pgresult)) ^ " " ^
-				var(PQerrorMessage(thread_pgconn))).errputl();
+				var(PQerrorMessage(thread_pgconn));
+		//errmsg.errputl();
+		throw MVDBException(errmsg);
 #endif
 		return false;
 	}
@@ -1661,10 +1664,12 @@ bool var::insertrecord(const var& filehandle, const var& key) const
 	if (PQresultStatus(pgresult) != PGRES_COMMAND_OK)
 	{
 #if TRACING >= 3
-		var("ERROR: mvdbpostgres insertrecord(" ^
+		var errmsg="ERROR: mvdbpostgres insertrecord(" ^
 				filehandle.convert(_FM_, "^") ^ ", " ^ key ^ ") Failed: " ^
 				var(PQntuples(pgresult)) ^ " " ^
-				var(PQerrorMessage(thread_pgconn))).errputl();
+				var(PQerrorMessage(thread_pgconn));
+		//errmsg.errputl();
+		throw MVDBException(errmsg);
 #endif
 		return false;
 	}
@@ -1719,9 +1724,11 @@ bool var::deleterecord(const var& key) const
 	if (PQresultStatus(pgresult) != PGRES_COMMAND_OK)
 	{
 //#if TRACING >= 1
-		var("ERROR: mvdbpostgres deleterecord(" ^ this->convert(_FM_, "^") ^
+		var errmsg="ERROR: mvdbpostgres deleterecord(" ^ this->convert(_FM_, "^") ^
 				", " ^ key ^ ") Failed: " ^ var(PQntuples(pgresult)) ^ " " ^
-				var(PQerrorMessage(thread_pgconn))).errputl();
+				var(PQerrorMessage(thread_pgconn));
+		//errmsg.errputl();
+		throw MVDBException(errmsg);
 //#endif
 		return false;
 	}

@@ -147,6 +147,7 @@ var dictid;
 var limitn;//num
 var recn;//num
 var lastid;
+var ok;//num
 var readerr;//num
 var fns;
 var nfns;
@@ -1509,7 +1510,15 @@ nextrec:
 	FILEERRORMODE = 1;
 	FILEERROR = "";
 
-	if (not(readnext(ID, MV))) {
+	ok = 0;
+	if (VOLUMES) {
+		if (readnext(ID, MV)) {
+			ok = 1;
+		}
+	}else{
+		ok=readnext(RECORD,ID,MV);
+	}
+	if (ok) {
 		FILEERRORMODE = 0;
 		if (STATUS) {
 			tx = "*** Fatal Error " ^ FILEERROR.a(1) ^ " reading record " ^ ID ^ " ***";
