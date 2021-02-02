@@ -27,24 +27,24 @@ function main() {
 //		line.outputl();
 		var output=line.field("\t",1);
 		var op=line.field("\t",2);
-		var input=line.field("\t",3);
+		var inputx=line.field("\t",3);
 		var arg1=line.field("\t",4);
 		//op.outputl();
 		var test;
 		//if (op=="LOCATEUSING") {
 		//	//0 1     LOCATEUSING     BCCCB   A               B               -1      -1      -1
-		//	test=locateusing(input.a(,
+		//	test=locateusing(inputx.a(,
 		//}
 		if (op=="OCONV") {
-			test=oconv(input,arg1);
+			test=oconv(inputx,arg1);
 		} else if (op=="ISNUM") {
-			test=input.isnum();
+			test=inputx.isnum();
 		} else {
 			printl(line);
 			stop();
 		}
 		if (test ne output) {
-			printt(ln,op,input.convert(FM^VM^SM,"^]\\"),arg1,output.convert(FM^VM^SM,"^]\\"),test.convert(FM^VM^SM,"^]\\"));
+			printt(ln,op,inputx.convert(FM^VM^SM,"^]\\"),arg1,output.convert(FM^VM^SM,"^]\\"),test.convert(FM^VM^SM,"^]\\"));
 			printl();
 		}
 		if (not delimiter)

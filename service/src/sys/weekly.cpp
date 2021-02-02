@@ -18,7 +18,7 @@ var diff;//num
 var firstdayofyear;//num
 var difference;//num
 
-function main(in type, in input, in mode, out output) {
+function main(in type, in input0, in mode, out output) {
 	//c sys in,in,in,out
 	//global all
 
@@ -27,7 +27,7 @@ function main(in type, in input, in mode, out output) {
 	//and there are 4 weeks per period (which results in 13 periods per year)
 	//weeks per period MUST divide into 52 exactly
 
-	if (input eq "") {
+	if (input0 eq "") {
 		output = "";
 		return 0;
 	}
@@ -42,7 +42,7 @@ function main(in type, in input, in mode, out output) {
 	//if oconv then convert internal date to year:period
 	///////////////////////////////////////////////////
 	if (type eq "OCONV") {
-		temp = input.oconv("D2-E");
+		temp = input0.oconv("D2-E");
 		year = temp.substr(-2,2);
 		period = temp.substr(4,2);
 
@@ -56,21 +56,21 @@ tryyear:
 		gosub getfirstdateofyear();
 		firstdateofyear2 = firstdateofyear;
 		//go to previous year if date before start of year
-		if (input lt firstdateofyear) {
+		if (input0 lt firstdateofyear) {
 			year = (addcent4(year) - 1).substr(-2,2);
 			goto tryyear;
 		}else{
 			year2 = (year + 1).oconv("R(0)#2");
 			gosub getfirstdateofyear();
 			//go to next year if date after last date of year
-			if (input gt firstdateofyear - 1) {
+			if (input0 gt firstdateofyear - 1) {
 				year += 1;
 				year = year.oconv("R(0)#2");
 				goto tryyear;
 			}
 		}
 
-		dayofyear = input - firstdateofyear2 + 1;
+		dayofyear = input0 - firstdateofyear2 + 1;
 		period = ((dayofyear - 1) / (7 * weeksperperiod)).floor() + 1;
 		if (period gt maxperiod) {
 			period = maxperiod;
@@ -83,12 +83,12 @@ tryyear:
 	//if iconv then convert period (MM/YY or YYMM) to internal last date of month
 	////////////////////////////////////////////////////////////////////////////
 	//return the last day of the period (internal format)
-	if (input.index("/")) {
-		period = input.field("/",1);
-		year = input.field("/", 2);
+	if (input0.index("/")) {
+		period = input0.field("/",1);
+		year = input0.field("/", 2);
 	}else{
-		year = input.substr(1,2);
-		period = input.substr(-2,2);
+		year = input0.substr(1,2);
+		period = input0.substr(-2,2);
 	}
 
 	//get the first date of the next period then subtract 1 day

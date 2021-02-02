@@ -4,7 +4,7 @@ libraryinit()
 function main(in yymm) {
 	//c sys in,in,in,out
 
-	#define centuryyear 90
+	#define centuryyear 50
 
 	//linemark
 
@@ -15,12 +15,12 @@ function main(in yymm) {
 		return yymm;
 	}
 
-	//year 00-90 -> 2000-2090
+	//year 00-50 -> 2000-2050
 	if (yymm.substr(1,2) le centuryyear) {
 		return "20" ^ yymm;
 	}
 
-	//year 91-99 -> 1991-1999
+	//year 51-99 -> 1951-1999
 	return "19" ^ yymm;
 }
 

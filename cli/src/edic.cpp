@@ -2,8 +2,9 @@
 programinit()
 
 function main() {
+
+	//default to previous edit/compile - similar code in edic and compile
     //check command syntax
-    //edit filename
 	var edic_hist = osgetenv("HOME") ^ "/.edic";
     if (dcount(COMMAND,FM)<2) {
 		if (osread(COMMAND, edic_hist)) {

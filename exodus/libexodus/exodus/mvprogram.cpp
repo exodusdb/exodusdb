@@ -29,6 +29,11 @@ ExodusProgramBase::ExodusProgramBase(MvEnvironment& inmv) : mv(inmv)
 DLL_PUBLIC
 ExodusProgramBase::~ExodusProgramBase(){};
 
+var ExodusProgramBase::libinfo(const var& command)
+{
+	return var(perform_exodusfunctorbase_.libfilename(command)).osfile();
+}
+
 bool ExodusProgramBase::select(const var& sortselectclause)
 {
 
@@ -42,19 +47,25 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 	//any fields requiring calculation that cannot be done by the database
 	//will be put skipped and put aside in CURSOR.r(10) for stage 2
 
-	if (!CURSOR.select(sortselectclause))
+	//select or fail
+	if (!CURSOR.select(sortselectclause)) {
 		return false;
+		/////////////
+	}
 
-	//we are done if there are no calculated fields.
+	//we are done if there are no calculated fields!
 	var calc_fields=CURSOR.a(10);
-	if (!calc_fields)
+	if (!calc_fields) {
 		return true;
-	//calc_fields.oswrite("calc_fields=");
+		////////////
+	}
 
 	//stage 2
 	/////////
 
 	//secondary sort/select on fields that could not be calculated by the database
+
+	//calc_fields.oswrite("calc_fields=");
 
 	//clear the list of calculated fields
 	CURSOR.r(10,"");
@@ -1051,6 +1062,19 @@ var ExodusProgramBase::perform(const var& sentence)
 	RECUR3.transfer(saverecur3);
 	RECUR4.transfer(saverecur4);
 
+	//a lambda function to restore the environment
+	auto restore_environment = [&](){
+		// restore some environment
+		savesentence.transfer(SENTENCE);
+		savecommand.transfer(COMMAND);
+		saveoptions.transfer(OPTIONS);
+		saverecur0.transfer(RECUR0);
+		saverecur1.transfer(RECUR1);
+		saverecur2.transfer(RECUR2);
+		saverecur3.transfer(RECUR3);
+		saverecur4.transfer(RECUR4);
+	};
+
 	SENTENCE = sentence;
 	while (SENTENCE)
 	{
@@ -1115,6 +1139,15 @@ var ExodusProgramBase::perform(const var& sentence)
 			// and abort multiple levels of perform?
 			ANS = "";
 		}
+		catch (MVError)
+		{
+			//restore environment in case MVError is caught
+			//in caller and the program resumes processing
+			restore_environment();
+
+			throw;
+		}
+
 		//dont catch MVLogoff in perform/execute. leave it for mvprogram top level exit
 		//catch (const MVLogoff& e)
 		//{
@@ -1131,14 +1164,7 @@ var ExodusProgramBase::perform(const var& sentence)
 	}
 
 	// restore some environment
-	savesentence.transfer(SENTENCE);
-	savecommand.transfer(COMMAND);
-	saveoptions.transfer(OPTIONS);
-	saverecur0.transfer(RECUR0);
-	saverecur1.transfer(RECUR1);
-	saverecur2.transfer(RECUR2);
-	saverecur3.transfer(RECUR3);
-	saverecur4.transfer(RECUR4);
+	restore_environment();
 
 	return ANS;
 }
@@ -2012,8 +2038,8 @@ var ExodusProgramBase::oconv(const var& input, const var& conversion)
 			// set the function name
 			ioconv_custom = subconversion.substr(2).field(",", 1).field("]", 1).lcase();
 
-			// wire up the current environment
-			ioconv_custom.mv_ = (&mv);
+			// wire in the current environment
+			ioconv_custom.mv_ = &mv;
 
 			// and call it
 			var output;

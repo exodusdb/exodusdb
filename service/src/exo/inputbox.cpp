@@ -3,7 +3,8 @@ libraryinit()
 
 function main(in msg, in maxlen, in show, in allowablechars, io data, in escx) {
 
-	false && show && allowablechars && escx;
+	//unused parameters
+	false && maxlen, show && allowablechars && escx;
 
 	var prompt=msg;
 	if (!data.assigned())
@@ -11,7 +12,8 @@ function main(in msg, in maxlen, in show, in allowablechars, io data, in escx) {
 	if (data)
 		prompt^=" (default=" ^ data ^ ")";
 	var reply;
-	reply.input(prompt,maxlen);
+	//reply.input(prompt,maxlen);
+	reply.input(prompt);
 	if (reply)
 		data=reply;
 	return 0;

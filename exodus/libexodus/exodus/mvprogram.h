@@ -84,6 +84,7 @@ class ExodusProgramBase
 
 	var capitalise(const var& str0, const var& mode = var(), const var& wordseps = var()) const;
 
+	var libinfo(const var& command);
 	var perform(const var& sentence);
 	void chain(const var& libraryname);
 	var execute(const var& sentence);

@@ -3,7 +3,7 @@ libraryinit()
 
 var force;//num
 
-function main(in input, in force0=(0)) {
+function main(in input0, in force0=(0)) {
 	//c sys in,=(0)
 	if (force0.unassigned()) {
 		force = 0;
@@ -11,11 +11,11 @@ function main(in input, in force0=(0)) {
 		force = force0;
 	}
 	var output = "";
-	var nfs = input.count(FM) + (input ne "");
+	var nfs = input0.count(FM) + (input0 ne "");
 	//for force to work, the first field must have full number of vns
 	var maxnvs = 0;
 	for (var fn = 1; fn <= nfs; ++fn) {
-		var fieldx = input.field(FM, fn);
+		var fieldx = input0.field(FM, fn);
 		if (fieldx.length() or force) {
 			var nvs = fieldx.count(VM) + 1;
 			if (force) {

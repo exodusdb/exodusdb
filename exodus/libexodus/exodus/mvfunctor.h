@@ -207,6 +207,9 @@ class DLL_PUBLIC ExodusFunctorBase
 	// not used if functor is calling global functions in the shared object
 	pExodusProgramBase pobject_;
 	pExodusProgramBaseMemberFunction pmemberfunction_;
+
+	std::string libfilename(std::string libraryname) const;
+
 };
 
 } // namespace exodus

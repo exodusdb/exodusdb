@@ -12,7 +12,7 @@ function main(in question0, in options0, io reply) {
 		printl(ii, ". ", options.a(ii));
 	}
 	var ans;
-	reply.input("Which option?",reply);
+	reply=input("Which option? ");
 	return options.a(reply);
 }
 

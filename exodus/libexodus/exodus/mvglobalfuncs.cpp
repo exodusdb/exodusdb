@@ -232,18 +232,13 @@ DLL_PUBLIC var getprompt() { return var().getprompt(); }
 
 DLL_PUBLIC void setprompt(const var& prompt) { prompt.setprompt(); }
 
-DLL_PUBLIC var input()
-{
-	var temp;
-	temp.input();
-	return temp;
-}
 
-DLL_PUBLIC bool input(var& inputfield) { return inputfield.input(); }
+DLL_PUBLIC var input() { var v; v.input(); return v;}
 
-DLL_PUBLIC bool input(const var& prompt, var& inputfield) { return inputfield.input(prompt); }
+DLL_PUBLIC var input(const var& prompt) { var v; v.input(prompt); return v;}
 
-DLL_PUBLIC bool inputn(var& inputfield, const int nchars) { return inputfield.input("", nchars); }
+DLL_PUBLIC var inputn(const int nchars) { var v; v.inputn(nchars); return v;}
+
 
 DLL_PUBLIC var len(const var& var1) { return var1.len(); }
 

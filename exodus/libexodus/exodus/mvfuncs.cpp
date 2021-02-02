@@ -112,24 +112,69 @@ bool var::hasinput(int milliseconds)
 	return haskey(milliseconds);
 }
 
-// for nchars, use int instead of var to trigger error at point of calling not here
-bool var::input(const var& prompt, const int nchars)
+var& var::input()
 {
-	THISIS("bool var::inputl(const var& prompt, const int nchars")
+	THISIS("bool var::input()")
 	THISISDEFINED()
-	ISSTRING(prompt)
 
-	// TODO implement nchars including -1
+	var_str = "";
+	var_typ = VARTYP_STR;
 
 	//LOCKIOSTREAM
 
+	// pressing crtl+d indicates eof on unix or ctrl+Z on dos/windows?
+	if (!std::cin.eof())
+		std::getline(std::cin, var_str);
+
+	return *this;
+}
+
+// not binary safe because we allow line editing when there is a prompt (even if empty)
+var& var::input(const var& prompt)
+{
+	THISIS("bool var::input(const var& prompt")
+	THISISDEFINED()
+	ISSTRING(prompt)
+
+	//LOCKIOSTREAM
+
+	var default_input=this->assigned() ? (*this) : "";
+
+	var_str = "";
 	var_typ = VARTYP_STR;
 
+	//output any prompt and flush
 	if (prompt.length())
-	{
-		prompt.output();
-		std::cout << std::flush;
+		prompt.output().osflush();
+
+	//windows currently doesnt allow line editing
+	if (SLASH_IS_BACKSLASH) {
+		this->input();
 	}
+
+	//linux terminal input line editing
+	else {
+		//swap double quotes with \"
+		default_input.swapper("\"","\\\"");
+		var cmd="bash -c 'read -i " ^ default_input.quote() ^ " -e EXO_TEMP_READ && printf \"$EXO_TEMP_READ\"'";
+		//cmd.outputl("cmd=");
+		this->osshellread(cmd);
+	}
+
+	return *this;
+}
+
+// for nchars, use int instead of var to trigger error at point of calling not here
+// not binary safe if nchars = 0 because we allow line editing assuming terminal console
+var& var::inputn(const int nchars)
+{
+	THISIS("bool var::inputn(const int nchars")
+	THISISDEFINED()
+
+	//LOCKIOSTREAM
+
+	var_str = "";
+	var_typ = VARTYP_STR;
 
 	//declare function in getkey.cpp
 	int getkey(void);
@@ -139,9 +184,7 @@ bool var::input(const var& prompt, const int nchars)
 	if (nchars < 0)
 	{
 
-		var_str = "";
-
-		while (true)
+		for (;;)
 		{
 			char char1;
 			{
@@ -149,20 +192,19 @@ bool var::input(const var& prompt, const int nchars)
 				char1 = getkey();
 			}
 
+			//quit if no (more) characters available
 			if (char1 < 0)
 				break;
+
 			var_str += char1;
 		}
-		return var_str.length() > 0;
 	}
 
 	//input a certain number of characters input this var and return true if more than none
 	else if (nchars > 0)
 	{
 
-		var_str = "";
-
-		while (true)
+		for (;;)
 		{
 			char char1;
 			{
@@ -171,15 +213,16 @@ bool var::input(const var& prompt, const int nchars)
 			}
 
 			// try again after a short delay if no key and not enough characters yet
+			// TODO implement as poll/epoll/select
 			if (char1 < 0)
 			{
-				this->ossleep(10);
+				this->ossleep(100);
 				continue;
 			}
 
 			// Enter/Return key always returns whatever has been entered so far
-			if (char1 < 0 || char1 == 0x0d)
-				break;
+			//if (char1 < 0 || char1 == 0x0d)
+			//	break;
 
 			// add the character to the output
 			var_str += char1;
@@ -189,32 +232,13 @@ bool var::input(const var& prompt, const int nchars)
 			if (var_str.length() >= uint(nchars))
 				break;
 		}
-		return var_str.length() > 0;
+
+	}
+	else {
+		this->input();
 	}
 
-	//ordinary input without mentioning number of characters
-	return this->input();
-}
-
-bool var::input()
-{
-	THISIS("bool var::inputl()")
-	THISISDEFINED()
-
-	var_str = "";
-	var_typ = VARTYP_STR;
-
-	//LOCKIOSTREAM
-
-	// pressing crtl+d indicates eof on unix or ctrl+Z on dos/windows?
-	if (std::cin.eof())
-		return false;
-
-	std::getline(std::cin, var_str);
-
-	// return true if not at end of file even if input empty string
-	// return var_str.length()>0;
-	return true;
+	return *this;
 }
 
 void var::stop(const var& text) const
@@ -227,8 +251,7 @@ void var::stop(const var& text) const
 }
 
 /*
-//swig for perl wants it on windows!
-void var::win32_abort(const var& text) const
+//swig for perl wants it on windows!void var::win32_abort(const var& text) const
 {
 	abort(text);
 }
@@ -2400,7 +2423,9 @@ var var::at(const int column) const
 	if (column == 0)
 		// return "\x1b[G";
 		return "\r"; // works on more terminals
-return "";
+
+	//return "";
+
 	// move to column
 	if (column > 0)
 	{
@@ -2424,7 +2449,7 @@ return "";
 
 	// clear from cursor to end of line
 	if (column == -4)
-		return "\x1B[K";
+		return "\x1B[0K";
 
 	// clear line and move cursor to column 0
 	if (column == -40)

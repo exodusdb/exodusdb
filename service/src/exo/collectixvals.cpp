@@ -1,10 +1,12 @@
 #include <exodus/library.h>
 libraryinit()
 
-function main(in filename, in dictid, in prefix="", in orderby="") {
+function main(in filename0, in dictid, in prefix="", in orderby="") {
 	//c xxx in,in,"",""
 
 	var lenprefix = prefix.length();
+
+	var filename = filename0.convert(".","_");
 
 	//check file exists
 	var file;

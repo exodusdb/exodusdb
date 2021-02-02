@@ -34,6 +34,11 @@ function main()
 
 	printl("----------------------------------------------");
 
+
+    assert("abc"_var == "abc");
+    assert(12345_var == 12345);
+    assert(1234.567_var == 1234.567);
+
     var v=123.456;
     assert(int(v) != v);
     assert(int(v) == 123);
@@ -471,52 +476,114 @@ function main()
 	printl(var(0));
 	assert(1e-14==var(0));
 
-	//no args
-	print();
-	printt();
 	printl();
+	printl("=== print ===");
 
-	//output();
-	//outputt();
-	//outputl();
+	printl("l");
+	printl();
+	printl("l");
+	printt();
+	printl("l");
+	printl("l");
 
-	logput();
-	logputl();
+	print("p");
+	print("pl");
+	printl();
+	printl("l");
+	printt("t");
+	printl("l");
 
-	errput();
+	print("0", "p");
+	print("0", "pl");
+	printl();
+	printl("0", "l");
+	printt("0", "t");
+	printl("0", "l");
+
+	print("0", "1", "2", "p");
+	print("0", "1", "2", "pl");
+	printl();
+	printl("0", "1", "2", "l");
+	printt("0", "1", "2", "t");
+	printl("0", "1", "2", "l");
+
+	print<'-'>("0", "1", "2", "p");
+	print<'-'>("0", "1", "2", "pl");
+	printl();
+	printl<'-'>("0", "1", "2", "l");
+	printt<'-'>("0", "1", "2", "t");
+	printl<'-'>("0", "1", "2", "l");
+
+	{
+		static char const sep[] = ", ";
+		print<sep>("0", "1", "2", "p");
+		print<sep>("0", "1", "2", "pl");
+		printl();
+		printl<sep>("0", "1", "2", "l");
+		printt<sep>("0", "1", "2", "t");
+		printl<sep>("0", "1", "2", "l");
+	}
+
+	output("0", "1", "2", "p");
+	output("0", "1", "2", "pl");
+	outputl();
+	outputl("0", "1", "2", "l");
+	outputl("0", "1", "2", "l");
+
+	printl();
+	printl("=== errput ===");
+
+	//errput();
+	errputl("l");
 	errputl();
+	errputl("l");
+	errputl("l");
+	errputl("l");
 
-	//one arg
+	errput("p");
+	errput("pl");
+	errputl();
+	errputl("l");
+	errputl("l");
 
-	print(1);
-	printt(2);
-	printl(3);
+	errput("0", "p");
+	errput("0", "pl");
+	errputl();
+	errputl("0", "l");
+	errputl("0", "l");
 
-	//output(1);
-	//outputt(2);
-	//outputl(3);
+	errput("0", "1", "2", "p");
+	errput("0", "1", "2", "pl");
+	errputl();
+	errputl("0", "1", "2", "l");
+	errputl("0", "1", "2", "l");
 
-	logput(1);
-	logputl(2);
+	printl();
+	printl("=== logput ===");
 
-	errput(1);
-	errputl(2);
+	logputl("l");
+	logputl();
+	logputl("l");
+	logputl("l");
+	logputl("l");
 
-	//two args
+	logput("p");
+	logput("pl");
+	logputl();
+	logputl("l");
+	logputl("l");
 
-	print("print",1);
-	printt("printt",2);
-	printl("printl",3);
+	logput("0", "p");
+	logput("0", "pl");
+	logputl();
+	logputl("0", "l");
+	logputl("0", "l");
 
-	//output("output",1);
-	//outputt("outputt",2);
-	//outputl("outputl",3);
-
-	logput("logput",1);
-	logputl("logputl",2);
-
-	errput("errput",1);
-	errputl("errputl",2);
+	logput("0", "1", "2", "p");
+	logput("0", "1", "2", "pl");
+	logputl();
+	logputl("0", "1", "2", "l");
+	logputl("0", "1", "2", "l");
 
 	assert(crop(VM ^ FM) eq "");
 	assert(crop("xxx" ^ VM ^ FM) eq "xxx");
@@ -1578,7 +1645,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	while (readnext(RECORD,ID,MV))
 //	while (readnext(ID))
 	{
-		printl("ID=",ID, " RECORD=",RECORD);
+		printl("ID=" ^ ID ^ " RECORD=" ^ RECORD);
 
 //		continue;
 //following requires dict_XUSERS to be a dictionary library something like
@@ -2922,7 +2989,7 @@ while trying to match the argument list '(exodus::var, bool)'
 		{
 			++ii;
 			if (!(ii%10000))
-				printl(" ",key);
+				printl(" " ^ key);
 			if (record.lcase().index("QWEQWE"))
 				print("?");
 
@@ -3019,7 +3086,7 @@ while trying to match the argument list '(exodus::var, bool)'
 	printl("\nPrint out 1st 256 unicode characters and their hashes");
 	for (var ii=0;ii<256;ii++) {
 		var xx=chr(ii);
-		print(ii,":", xx, " ", xx.hash()," ");
+		print(ii ^ ":" ^ xx ^ " " ^ xx.hash() ^ " ");
 	}
 	printl();
 
@@ -3072,13 +3139,13 @@ function accrest() {
                 swapper(block,IM,EOL);
                 print(block);
 				var xx;
-                inputn(xx,1);
+                inputn(1);
         }
         return 0;
 }
 
 function test_codepage(in codepage, in lang) {
-	printl("---------- ", lang, " ", codepage , " ----------");
+	printl("---------- " ^ lang ^ " " ^ codepage ^ " ----------");
 
 	var v256="";
 	for (int ii=0;ii<=255;++ii)
@@ -3106,12 +3173,12 @@ function test_codepage(in codepage, in lang) {
 	//check loop back
 	//(only if loop back does produced 256 bytes)
 	printl(as_utf8a.substr(32));
-	printl("round trip ", as_cp == v256);
+	printl("round trip " ^ var(as_cp == v256));
 	if (as_cp.length()==256)
 		assert(as_cp == v256);
 
 	//check double trip
-	printl("double trip ", as_utf8a == as_utf8b);
+	printl("double trip "  ^var (as_utf8a == as_utf8b));
 	printl(as_utf8b.substr(32));
 	assert(as_utf8a == as_utf8b);
 

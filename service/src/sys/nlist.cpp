@@ -526,6 +526,7 @@ filename:
 			dictfilename = filename;
 		}
 		if (not(DICT.open("dict_" ^ dictfilename))) {
+			crtx = 1;
 			DICT = dictvoc;
 		}
 		ss ^= " " ^ word;
@@ -1105,7 +1106,7 @@ x1exit:
 	ncols = coln;
 
 	//insert the @id column
-	if (not idsupp) {
+	if (not(idsupp) or not(ncols)) {
 
 		ncols += 1;
 
@@ -1449,7 +1450,7 @@ nextdict:
 		}
 
 		//call mssg('Selecting records, please wait.||(Press Esc or F10 to interrupt)','UB',buffer,'')
-		call xselect(ss ^ " (S)");
+		call xselect(ss ^ " (SR)");
 		//call mssg('','DB',buffer,'')
 
 		if (not LISTACTIVE) {
@@ -1518,7 +1519,7 @@ nextrec:
 	}else{
 		ok=readnext(RECORD,ID,MV);
 	}
-	if (ok) {
+	if (not ok) {
 		FILEERRORMODE = 0;
 		if (STATUS) {
 			tx = "*** Fatal Error " ^ FILEERROR.a(1) ^ " reading record " ^ ID ^ " ***";
@@ -1625,8 +1626,9 @@ nextrec:
 		if (recn le 2) {
 			printl();
 		}
-		if (printfilename and (((not(recn % 100)) or not(LISTACTIVE)))) {
+		if (printfilename and (not(recn % 100))) {
 			//first recn will be 2
+			//similar in recinit and x2exit
 			print(var().at(0), var().at(-4), recn, ". ", ID, " ", MV);
 			 osflush();
 		}
@@ -1866,6 +1868,10 @@ recexit:
 	//////
 x2exit:
 	//////
+
+	//similar in recinit and x2exit
+	print(var().at(0), var().at(-4), recn, ". ");
+	 osflush();
 
 	//print the closing subtotals
 	breakleveln = nbreaks;

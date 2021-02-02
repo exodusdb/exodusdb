@@ -1,14 +1,14 @@
 ----------------------------------------------
 sizeof
-int:      4
-long:     8
-float:    4
+int:       4
+long:      8
+float:     4
 
-string:   32
-long long:8
-double:   8
-char:     1
-var:      56
+string:    32
+long long: 8
+double:    8
+char:      1
+var:       56
 
 std:string implementation
 sizeof  : 32
@@ -17,8 +17,8 @@ Small   : 15
 Big     : 16
 top of the world
 ~^]\[|
- xyz="xyz"
- xyz=""
+TRACE: xyz="xyz"
+TRACE: xyz=""
 len=22781
 "abc"
 文字- Kanji 漢字- Hanja 漢字(UTF
@@ -28,8 +28,34 @@ len=22781
 1e-14
 0
 
-12	3
-print1printt	2	printl3
+=== print ===
+l
+
+l
+ l
+l
+ppl
+l
+t	l
+0 p0 pl
+0 l
+0	t	0 l
+0 1 2 p0 1 2 pl
+0 1 2 l
+0	1	2	t	0 1 2 l
+0-1-2-p0-1-2-pl
+0-1-2-l
+0-1-2-t-0-1-2-l
+0, 1, 2, p0, 1, 2, pl
+0, 1, 2, l
+0, 1, 2, t, 0, 1, 2, l
+012p012pl
+012l
+012l
+
+=== errput ===
+
+=== logput ===
 0.010880317]0.000000000]0.012833169]0.000000000^0.010442566
 m1=1]2]]4
 m2=100]200]300
@@ -84,7 +110,7 @@ test reading from middle of utf8 byte sequence test=CEA3
 20CE9120CEB12C20CE9220CEB22C20CE9320CEB32C20CE9420CEB42C20CE9520CEB52C20CE9620CEB62C20CE9720CEB72C20CE9820CEB82C20CE9920CEB92C20CE9A20CEBA2C20CE9B20CEBB2C20CE9C20CEBC2C20CE9D20CEBD2C20CE9E20CEBE2C20CE9F20CEBF2C20CEA020CF802C20CEA120CF812C20CEA320CF832FCF822C20CEA420CF842C20CEA520CF852C20CEA620CF862C20CEA720CF872C20CEA820CF882C20616E6420CEA920CF892E
 greek utf8 tested ok
 testmain says 'Hello World!'
-Original Locale=en_US.utf8
+Original Locale=C.UTF-8
 123
 Expected:γΓ Actual:γΓ
 Expected:"" Actual:

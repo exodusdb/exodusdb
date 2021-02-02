@@ -35,6 +35,20 @@ std::list<std::thread> threadlist;
 function main()
 {
 
+    //default to previous edit/compile - similar code in edic and compile
+    //check command syntax
+    var edic_hist = osgetenv("HOME") ^ "/.edic";
+    if (dcount(COMMAND,FM)<2) {
+        if (osread(COMMAND, edic_hist)) {
+            OPTIONS=COMMAND.a(2);
+            COMMAND = raise(COMMAND.a(1));
+        } else {
+            abort("Syntax is 'compile osfilename'");
+        }
+    }
+    //if (not oswrite(lower(COMMAND) ^ FM ^ OPTIONS, edic_hist))
+    //    printl("Cannot write to ", edic_hist);
+
 	var command=COMMAND;
 
 	//we use on demand/jit linking using dlopen/dlsym

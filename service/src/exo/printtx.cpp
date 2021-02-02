@@ -132,7 +132,7 @@ function main(io tx, in mode="", in modevalue="") {
 		if (printfilename) {
 			call oswrite("", printfilename);
 			if (not printfile.osopen(printfilename)) {
-				call mssg("SYSTEM ERROR - CANNOT OPEN PRINTFILE " ^ (DQ ^ (printfilename ^ DQ)));
+				call mssg("SYSTEM ERROR - PRINTTX CANNOT OPEN PRINTFILE " ^ (DQ ^ (printfilename ^ DQ)));
 				return 0;
 			}
 		}

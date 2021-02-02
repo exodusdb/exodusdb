@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-    function main(in type, in input, in mode, out output)
+function main(in type, in input, in mode, out output)
 {
 
 	// evade compiler warning

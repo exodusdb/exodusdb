@@ -1,11 +1,11 @@
 #include <exodus/library.h>
 libraryinit()
 
-function main(in input, in max) {
+function main(in input0, in max) {
 
 	//use the max as part of the randomisation so that
 	//it acts as "salt" and slightly different max produce very different results
-	var inputx = max ^ input;
+	var inputx = max ^ input0;
 
 	//insensitive to ascii punctuation and spaces
 	inputx.converter(" ~!\"$%^&*()_+|{}:@<>?#-=\\[];,./" "\'", "");

@@ -257,13 +257,20 @@ var::operator int() const
 {
 	THISIS("var::operator int() const")
 	THISISINTEGER()
-	return (int)var_int;
+	return int(var_int);
+}
+
+var::operator double() const
+{
+	THISIS("var::operator double() const")
+	THISISDECIMAL()
+	return var_dbl;
 }
 
 #else
 var::operator int&() const
 {
-	THISIS("var::operator int&()")
+	THISIS("var::operator mv_int_t&()")
 	THISISINTEGER()
 	// TODO check that converting mvint_t (which is long long) to int doesnt cause any practical
 	// problems) PROBABLY WILL! since we are returning a non const reference which allows
@@ -559,8 +566,8 @@ var& var::operator^=(const std::string& string1)
 
 // not handled by inbuilt conversion of var to long long& on the rhs
 
-#ifndef HASINTREFOP
-#else
+//#ifndef HASINTREFOP
+//#else
 
 // You must *not* make the postfix version return the 'this' object by reference; you have been
 // warned.
@@ -904,7 +911,7 @@ tryagain:
 	throw MVNonNumeric(substr(1, 20) ^ "-= ");
 }
 
-#endif
+//#endif
 
 // almost identical between MVeq and MVlt except where noted (and doubles compare only to 0.0001 accuracy)
 DLL_PUBLIC bool MVeq(const var& lhs, const var& rhs)
@@ -1686,7 +1693,7 @@ var backtrace();
 
 MVError::MVError(const var& description_) : description(description_)
 {
-	// capture the stack at point of creation ie when thrown
+	// capture the stack at point of creation i.e. when thrown
 	this->stack = backtrace();
 	((description.assigned() ? description : "") ^ "\n" ^ stack.convert(FM, "\n") ^ "\n").put(std::cerr);
 }
@@ -1713,4 +1720,18 @@ MVArrayIndexOutOfBounds ::MVArrayIndexOutOfBounds(const var& var1)
 }
 MVArrayNotDimensioned ::MVArrayNotDimensioned() : MVError("MVArrayNotDimensioned") {}
 
+var operator""_var (const char* cstr, std::size_t size)
+{
+    return var(cstr, size);
+}
+
+var operator""_var (unsigned long long int i)
+{
+    return var(int(i));
+}
+
+var operator""_var (long double d)
+{
+    return var(double(d));
+}
 } // namespace exodus

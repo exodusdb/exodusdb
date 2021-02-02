@@ -307,7 +307,7 @@ function configure_via_connection(in adminconfig, in dbname, in dbusername, in d
 		{
 			printl(pglibdir^" does not exist");
 			printl("Cannot locate PostgreSQL lib directory to install plugin");
-			input("PostgreSQL lib dir?",pglibdir);
+			pglibdir=input("PostgreSQL lib dir?");
 			if (not pglibdir)
 				stop();
 		}

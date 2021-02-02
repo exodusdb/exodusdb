@@ -206,6 +206,7 @@ var logid;
 function main() {
 	//
 	//c sys
+
 	#include <general_common.h>
 	//global all
 
@@ -718,11 +719,11 @@ nextsearch0:
 	//check for esc key to exit
 	//if esc.to.exit() then gosub exit
 
-	charx.input("", -1);
+	charx.inputn(-1);
 	//charx=ucase(charx[1,1])
 	//charx=charx[1,1]
 
-	//esc
+	//esc or 'q' on linux
 	tt = INTCONST.a(1, 1);
 	if (charx.index(tt)) {
 		//leading space to avoid chars after ESC pressed being ANSI control sequences
@@ -733,10 +734,10 @@ nextsearch0:
 		//until reply
 		// call ossleep(1000*1)
 		// repeat
-		reply.input("", 1);
+		reply.inputn(1);
 		call mssg("", "DB", buffer, "");
 		if (reply eq INTCONST.a(1)) {
-			//space to defeat ANSI controls
+			//space to defeat ANSI control chars after pressing Esc
 			print(" ");
 			gosub exit();
 		}
@@ -751,15 +752,16 @@ nextsearch0:
 	// gosub exit
 	// end
 
-	//f5
+	//f5 or 'x' on linux
 	if (charx eq PRIORITYINT.a(2)) {
 		cmd = "";
-		if (not(VOLUMES)) {
-			printl();
-			print("Enter command : ");
-			cmd.input();
-		}
+		cmd.input(oscwd() ^ " Command? ");
+		SYSTEM.r(2,"");
+		if (not libinfo(cmd.field(" "))) errputl(cmd.field(" "), " does not exist."); else
+		try {
 		execute(cmd);
+		} catch (MVError e) {errputl(e.description);}
+		osflush();
 	}
 
 	//f10

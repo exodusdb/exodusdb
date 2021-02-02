@@ -111,7 +111,7 @@ inpname:
 		msg = "EXODUS SECURITY|What is your name ?| || |Please enter your name,|or press Esc to exit.";
 		show = 1;
 		maxlen = 20;
-		gosub input();
+		gosub inputx();
 	}
 
 	//exit the system if name not given
@@ -140,7 +140,7 @@ fail:
 	show = 0;
 	maxlen = 20;
 	now = ostime();
-	gosub input();
+	gosub inputx();
 
 	if (escx eq "0") {
 		//magic method entry of password (pressing enter on blank then entering pass)
@@ -288,7 +288,7 @@ okfail:
 	return 0;
 }
 
-subroutine input() {
+subroutine inputx() {
 	call inputbox(msg, maxlen, show, allowablechars, xdata, escx);
 	return;
 	/*;

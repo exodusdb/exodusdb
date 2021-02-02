@@ -533,6 +533,7 @@ filename:
 			dictfilename = filename;
 		}
 		if (not(DICT.open("dict_" ^ dictfilename))) {
+			crtx = 1;
 			DICT = dictvoc;
 		}
 		ss ^= " " ^ word;

@@ -26,7 +26,8 @@ endif()
 #exodus works using c++14 default on Ubuntu 18.04 so no need for this
 #moving to use c++17 features so switching on
 # SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unknown-pragmas -no-pie -g -march=native -O3 -fvisibility=hidden")
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unknown-pragmas -no-pie -g -march=native -O3")
+#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unknown-pragmas -no-pie -g -march=native -O3")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unknown-pragmas -no-pie -g -march=native -O1")
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unknown-pragmas -no-pie -g -march=native")
 message("CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")
 

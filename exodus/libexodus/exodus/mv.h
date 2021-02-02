@@ -379,7 +379,7 @@ public:
 	///////////////
 
 	// default constructor
-	// our default constructor to allow "var v;" syntax to create an unassigned var (mv_type=0)
+	// allow syntax "var v;" to create an "unassigned" var (var_typ is 0)
 	var();
 
 	// copy constructor
@@ -426,6 +426,8 @@ public:
 	// swig java duplicates this with var(std::string&) above
 #if !defined(SWIGJAVA) && !defined(SWIGCSHARP)
 	var(const std::string& str1);
+	//in c++20 but not g++ v9.3
+	//constexpr var(const std::string& str1);
 #endif
 
 	// from bool
@@ -448,9 +450,9 @@ public:
 	var(const double double1) noexcept;
 
 
-	////////////////////
-	// NAMED CONVERSIONS
-	////////////////////
+	///////////////////////
+	// NAMED CONVERSIONS TO
+	///////////////////////
 
 	bool toBool() const;
 
@@ -469,9 +471,9 @@ public:
 	// weird version for perl that outputs "" if undefined
 	std::string toString2() const;
 
-	////////////////////////
-	// AUTOMATIC CONVERSIONS
-	////////////////////////
+	///////////////////////////
+	// AUTOMATIC CONVERSIONS TO
+	///////////////////////////
 
 	// someone recommends not to create more than one automatic converter
 	// to avoid the compiler error "ambiguous conversion"
@@ -493,9 +495,10 @@ public:
 	// and C++ uses bool and int conversion in certain cases to convert to int and bool
 	// therefore have chosen to make both bool and int "const" since they dont make
 	// and changes to the base object.
-#define HASINTREFOP
+//#define HASINTREFOP
 #ifndef HASINTREFOP
 	operator int() const;
+	operator double() const;
 #endif
 
 	// remove because causes "ambiguous" with -short_wchar on linux
@@ -656,8 +659,8 @@ public:
 	void operator-- ();
 	*/
 
-#ifndef HASINTREFOP
-#else
+//#ifndef HASINTREFOP
+//#else
 	// postfix
 	var operator++(int);
 	var operator--(int);
@@ -677,7 +680,7 @@ public:
 	var& operator+=(const var& var1);
 	//-=var
 	var& operator-=(const var& var1);
-#endif
+//#endif
 
 	//////////
 	// FRIENDS
@@ -1076,8 +1079,9 @@ public:
 	/////////////////
 
 	bool hasinput(int milliseconds = 0);
-	bool input();
-	bool input(const var& prompt, const int nchars = 0);
+	var& input();
+	var& input(const var& prompt);
+	var& inputn(const int nchars);
 	bool eof() const;
 
 	friend std::istream& operator>>(std::istream& istream1, var& var1);
@@ -1218,36 +1222,36 @@ public:
 	// SAME ON TEMPORARIES
 	//////////////////////
 
-	var& convert(const var& oldchars, const var& newchars) &&;
-	var& swap(const var& whatstr, const var& withstr) &&;
-	var& replace(const var& regexstr, const var& replacementstr,
+	ND var& convert(const var& oldchars, const var& newchars) &&;
+	ND var& swap(const var& whatstr, const var& withstr) &&;
+	ND var& replace(const var& regexstr, const var& replacementstr,
 		      const var& options DEFAULTNULL) &&;
-	var& splice(const int start1, const int length, const var& str) &&;
-	var& splice(const int start1, const var& str) &&;
-	var& quote() &&;
-	var& squote() &&;
-	var& unquote() &&;
-	var& ucase() &&;     // utf8
-	var& lcase() &&;     // utf8
-	var& tcase() &&;     // utf8
-	var& fcase() &&;     // utf8
-	var& normalize() &&; // utf8
-	var& invert() &&;   // utf8
-	var& trim(const char* trimchar DEFAULTSPACE) &&;
-	var& trimf(const char* trimchar DEFAULTSPACE) &&;
-	var& trimb(const char* trimchar DEFAULTSPACE) &&;
-	var& trim(const var& trimchar) &&;
-	var& trim(const var& trimchar, const var& options) &&;
-	var& trimf(const var& trimchar) &&;
-	var& trimb(const var& trimchar) &&;
-	var& fieldstore(const var& sepchar, const int fieldno, const int nfields,
+	ND var& splice(const int start1, const int length, const var& str) &&;
+	ND var& splice(const int start1, const var& str) &&;
+	ND var& quote() &&;
+	ND var& squote() &&;
+	ND var& unquote() &&;
+	ND var& ucase() &&;     // utf8
+	ND var& lcase() &&;     // utf8
+	ND var& tcase() &&;     // utf8
+	ND var& fcase() &&;     // utf8
+	ND var& normalize() &&; // utf8
+	ND var& invert() &&;   // utf8
+	ND var& trim(const char* trimchar DEFAULTSPACE) &&;
+	ND var& trimf(const char* trimchar DEFAULTSPACE) &&;
+	ND var& trimb(const char* trimchar DEFAULTSPACE) &&;
+	ND var& trim(const var& trimchar) &&;
+	ND var& trim(const var& trimchar, const var& options) &&;
+	ND var& trimf(const var& trimchar) &&;
+	ND var& trimb(const var& trimchar) &&;
+	ND var& fieldstore(const var& sepchar, const int fieldno, const int nfields,
 			 const var& replacement) &&;
-	var& substr(const int startindex) &&;
-	var& substr(const int startindex, const int length) &&;
+	ND var& substr(const int startindex) &&;
+	ND var& substr(const int startindex, const int length) &&;
 
-	var& lower() &&;
-	var& raise() &&;
-	var& crop() &&;
+	ND var& lower() &&;
+	ND var& raise() &&;
+	ND var& crop() &&;
 
 	// SAME BUT NON-MUTATING
 	////////////////////////
@@ -1329,7 +1333,7 @@ public:
 
 	ND var index(const var& substr, const int occurrenceno = 1) const;
 	ND var index2(const var& substr, const int startchar1 = 1) const;
-	ND var field(const var& substrx, const int fieldnx, const int nfieldsx = 1) const;
+	ND var field(const var& substrx, const int fieldnx = 1, const int nfieldsx = 1) const;
 	// version that treats fieldn -1 as the last field, -2 the penultimate field etc. - TODO
 	// should probably make field() do this
 	ND var field2(const var& substrx, const int fieldnx, const int nfieldsx = 1) const;
@@ -2228,6 +2232,11 @@ class DLL_PUBLIC MVArrayIndexOutOfBounds: public MVError {public: explicit MVArr
 class DLL_PUBLIC MVArrayNotDimensioned	: public MVError {public: explicit MVArrayNotDimensioned  (                   );};
 
 // clang-format on
+
+//user defined literals suffix _var
+var operator""_var (const char* cstr, std::size_t size);
+var operator""_var (unsigned long long int i);
+var operator""_var (long double d);
 
 } // namespace exodus
 

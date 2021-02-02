@@ -2037,7 +2037,10 @@ var var::substr2(var& startindex1, var& delimiterno) const
 	ISNUMERIC(startindex1)
 	ISDEFINED(delimiterno)
 
-	std::string::size_type start_pos = startindex1.toInt() - 1;
+	int startindex0 = startindex1.toInt() - 1;
+	std::string::size_type start_pos = (startindex0 >= 0) ? startindex0 : 0;
+
+	var returnable = "";
 
 	// domain check
 	// handle before start of string
@@ -2052,7 +2055,8 @@ var var::substr2(var& startindex1, var& delimiterno) const
 	if (start_pos >= var_str.length())
 	{
 		delimiterno = 0;
-		return "";
+		//return "";
+		return returnable;
 	}
 
 	// find the end of the field (or string)
@@ -2065,7 +2069,9 @@ var var::substr2(var& startindex1, var& delimiterno) const
 		// wont work if string is the maximum string length but that cant occur
 		startindex1 = (int)(var_str.length() + 2);
 		delimiterno = 0;
-		return var(var_str.substr(start_pos, var_str.length() - start_pos));
+		//return var(var_str.substr(start_pos, var_str.length() - start_pos));
+		returnable = var(var_str.substr(start_pos, var_str.length() - start_pos));
+		return returnable;
 	}
 
 	// delimiters returned as numbers FF=1 FE=2, FD=3 etc to F9=7
@@ -2078,7 +2084,9 @@ var var::substr2(var& startindex1, var& delimiterno) const
 	startindex1 = int(end_pos + 2);
 
 	// extract and return the substr as well
-	return var(var_str.substr(start_pos, end_pos - start_pos));
+	//return var(var_str.substr(start_pos, end_pos - start_pos));
+	returnable = var(var_str.substr(start_pos, end_pos - start_pos));
+	return returnable;
 }
 
 //////

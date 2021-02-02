@@ -9,7 +9,7 @@ var year;//num
 var period;//num
 var idate;//num
 
-function main(in type, in input, in mode, out output) {
+function main(in type, in input0, in mode, out output) {
 	//c sys in,in,in,out
 	//global all
 
@@ -18,8 +18,8 @@ function main(in type, in input, in mode, out output) {
 
 	//[WEEKLY2,1,6] year starts january, week starts saturday
 
-	//if no input then no output
-	if (input eq "") {
+	//if no input0 then no output
+	if (input0 eq "") {
 		output = "";
 		return 0;
 	}
@@ -33,7 +33,7 @@ function main(in type, in input, in mode, out output) {
 	///////////////////////////////////////////////////
 	if (type eq "OCONV") {
 		//get the calendar month and year
-		temp = input.oconv("D2/E");
+		temp = input0.oconv("D2/E");
 		year = temp.substr(-2,2);
 		period = temp.substr(4,2);
 
@@ -42,7 +42,7 @@ function main(in type, in input, in mode, out output) {
 
 		//if the date is less than the first day of that period
 		// then put into the previous period
-		if (input lt idate) {
+		if (input0 lt idate) {
 			period -= 1;
 			if (period lt 1) {
 				period = 12;
@@ -60,12 +60,12 @@ function main(in type, in input, in mode, out output) {
 	//if iconv then convert period (MM/YY or YYMM) to internal last date of month
 	////////////////////////////////////////////////////////////////////////////
 	//return the last day of the period (internal format)
-	if (input.index("/")) {
-		period = input.field("/",1);
-		year = input.field("/", 2);
+	if (input0.index("/")) {
+		period = input0.field("/",1);
+		year = input0.field("/", 2);
 	}else{
-		year = input.substr(1,2);
-		period = input.substr(-2,2);
+		year = input0.substr(1,2);
+		period = input0.substr(-2,2);
 	}
 
 	//get the next period

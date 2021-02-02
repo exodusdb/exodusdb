@@ -117,6 +117,7 @@ DLL_PUBLIC void debug();
 DLL_PUBLIC bool setxlocale(const var& locale);
 DLL_PUBLIC var getxlocale();
 
+//replace by templates with variable number of arguments
 //void print(const var& var2);
 //void printl(const var& var2 DEFAULTNULL);
 //void printt(const var& var2 DEFAULTNULL);
@@ -152,10 +153,13 @@ DLL_PUBLIC void setcursor(const var& cursor);
 DLL_PUBLIC var getprompt();
 DLL_PUBLIC void setprompt(const var& prompt);
 
+//DLL_PUBLIC var& input();
+//DLL_PUBLIC var& input(var& intostr);
+//DLL_PUBLIC var& input(const var& prompt, var& intostr);
+//DLL_PUBLIC var& inputn(var& intostr, const int nchars);
 DLL_PUBLIC var input();
-DLL_PUBLIC var input(var& intostr);
-DLL_PUBLIC var input(const var& prompt, var& intostr);
-DLL_PUBLIC var inputn(var& intostr, const int nchars);
+DLL_PUBLIC var input(const var& prompt);
+DLL_PUBLIC var inputn(const int nchars);
 
 DLL_PUBLIC var len(const var& var2);
 DLL_PUBLIC var length(const var& var2);
@@ -354,115 +358,137 @@ DLL_PUBLIC var sum(const var& instring);
 // std::cout
 ////////////
 
-// print()
-template<typename... Printable>
-DLL_PUBLIC void print(Printable... value)
+//use like this
+// 1. print("hi","ho")					// "hi ho"
+// 2. static char const sep[] = ", ";	// "hi, ho"
+//    print<sep>("hi","ho");
+
+// print(...) default sep is " ". does not flush output
+template<auto sep = ' ', typename Printable, typename... Additional>
+DLL_PUBLIC void print(const Printable& value, const Additional&... values)
 {
 	LOCKIOSTREAM
-	//(var(value).output(), ...);
-	((std::cout << value), ...);
+	std::cout << value;
+	((std::cout << sep << values), ...);
 }
 
-// printl()
-template<typename... Printable>
-DLL_PUBLIC void printl(Printable... value)
+// printl() no arguments and prints end of line and flushes output
+DLL_PUBLIC void printl()
 {
 	LOCKIOSTREAM
-	//(var(value).output(), ...);
-	//var("").outputl();
-	((std::cout << value), ...);
 	std::cout << std::endl;
 }
 
-// printt()
-template<typename... Printable>
-DLL_PUBLIC void printt(Printable... value)
+// printl(...) default sep is " ". always prints end of line and flushes output
+template<auto sep = ' ', typename Printable, typename... Additional>
+DLL_PUBLIC void printl(const Printable& value, const Additional&... values)
 {
 	LOCKIOSTREAM
-	//(var(value).outputt(), ...);
-	((std::cout << value << "\t"), ...);
-}
-
-/* dont include this because "output" should not convert unprintable field marks to unusual ASCII
-
-// output alias of print()
-template<typename... Printable>
-DLL_PUBLIC void output(Printable... value)
-{
-	LOCKIOSTREAM
-	//(var(value).output(), ...);
-	((std::cout << value), ...);
-}
-
-// outputl() alias of printl()
-template<typename... Printable>
-DLL_PUBLIC void outputl(Printable... value)
-{
-	LOCKIOSTREAM
-	//(var(value).output(), ...);
-	//var("").outputl();
-	((std::cout << value), ...);
+	std::cout << value;
+	((std::cout << sep << values), ...);
 	std::cout << std::endl;
 }
 
-// outputt() alias of printt()
-template<typename... Printable>
-DLL_PUBLIC void outputt(Printable... value)
+
+// printt() no arguments just prints a sep (default tab). doesnt flush output
+template<auto sep = ' '>
+DLL_PUBLIC void printt()
 {
 	LOCKIOSTREAM
-	//(var(value).outputt(), ...);
-	((std::cout << value << "\t"), ...);
+	std::cout << sep;
 }
-*/
+
+// printt(...) default sep is tab. always adds a sep (tab) on the end. doesnt flush output
+template<auto sep = '\t', typename... Printable>
+DLL_PUBLIC void printt(const Printable&... values)
+{
+	LOCKIOSTREAM
+	((std::cout << values << sep), ...);
+}
+
+
+//output
+////////
+
+// output() binary transparent version of print() with no automatic separators. no flush
+template<typename... Printable>
+DLL_PUBLIC void output(Printable&... value)
+{
+	LOCKIOSTREAM
+	(var(value).output(), ...);
+}
+
+// outputl() binary transparent version of printl() with no automatic separators. no flush
+template<typename... Printable>
+DLL_PUBLIC void outputl(Printable&... value)
+{
+	LOCKIOSTREAM
+	(var(value).output(), ...);
+	var("").outputl();
+}
 
 // std::cerr
 ////////////
 
-// errput()
-template<typename... Printable>
-DLL_PUBLIC void errput(Printable... value)
+// errput(...)
+template<auto sep = ' ', typename Printable, typename... Additional>
+DLL_PUBLIC void errput(const Printable& value, const Additional&... values)
 {
 	LOCKIOSTREAM
-	//(var(value).errput(), ...);
-	((std::cerr << value), ...);
+	std::cerr << value;
+	((std::cerr << sep << values), ...);
 }
 
 // errputl()
-template<typename... Printable>
-DLL_PUBLIC void errputl(Printable... value)
+DLL_PUBLIC void errputl()
 {
 	LOCKIOSTREAM
-	//(var(value).errput(), ...);
-	//var("").errputl();
-	((std::cerr << value), ...);
+	std::cerr << std::endl;
+}
+
+// errputl(...)
+template<auto sep = ' ', typename Printable, typename... Additional>
+DLL_PUBLIC void errputl(const Printable& value, const Additional&... values)
+{
+	LOCKIOSTREAM
+	std::cerr << value;
+	((std::cerr << sep << values), ...);
 	std::cerr << std::endl;
 }
 
 // std::clog
 ////////////
 
-// logput()
-template<typename... Printable>
-DLL_PUBLIC void logput(Printable... value)
+// logput(...)
+template<auto sep = ' ', typename Printable, typename... Additional>
+DLL_PUBLIC void logput(const Printable& value, const Additional&... values)
 {
 	LOCKIOSTREAM
-	//(var(value).logput(), ...);
-	((std::clog << value), ...);
+	//(var(value).output(), ...);
+	std::clog << value;
+	((std::clog << sep << values), ...);
 }
 
 // logputl()
-template<typename... Printable>
-DLL_PUBLIC void logputl(Printable... value)
+DLL_PUBLIC void logputl()
 {
 	LOCKIOSTREAM
-	//(var(value).logput(), ...);
-	//var("").logputl();
-	((std::clog << value), ...);
+	std::clog << std::endl;
+}
+
+// logputl(...)
+template<auto sep = ' ', typename Printable, typename... Additional>
+DLL_PUBLIC void logputl(const Printable& value, const Additional&... values)
+{
+	LOCKIOSTREAM
+	//(var(value).output(), ...);
+	std::clog << value;
+	((std::clog << sep << values), ...);
 	std::clog << std::endl;
 }
 
 #define TRACE(EXPRESSION) \
-        var(EXPRESSION).convert(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_,"_^]\[/").quote().outputl(" " #EXPRESSION "=");
+        var(EXPRESSION).convert(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_,"_^]\[/").quote().outputl("TRACE: " #EXPRESSION "=");
 
 } // namespace exodus
 

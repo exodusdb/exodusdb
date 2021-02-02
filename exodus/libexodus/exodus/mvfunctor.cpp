@@ -182,6 +182,7 @@ bool ExodusFunctorBase::init(const char* newlibraryname, const char* newfunction
 	return true;
 }
 
+// called from every library .h file if _pmemberfunction is NULL
 // atm designed to be called once only the first time an external function is called
 // assuming library and function names and mv are already set
 bool ExodusFunctorBase::init()
@@ -216,7 +217,8 @@ bool ExodusFunctorBase::init()
 	return true;
 }
 
-// used in dict/perform/execute ... can be called repeatably since buffers lib and func
+// called by dict/perform/execute ... can be called repeatably since buffers lib and func
+// perform/execute call with forcenew=true to ensure global variables are unassigned initially
 bool ExodusFunctorBase::initsmf(const char* newlibraryname, const char* newfunctionname,
 				const bool forcenew)
 {
@@ -342,6 +344,26 @@ bool ExodusFunctorBase::checkload(std::string newlibraryname, std::string newfun
 	return true;
 }
 
+std::string ExodusFunctorBase::libfilename(std::string libraryname) const
+{
+
+	//look for lib file in ~/lib/libXXXXXX.so
+	//otherwise just default library libXXXXXX.so
+	var libfilename = EXODUSLIBPREFIX + libraryname + EXODUSLIBEXT;
+	if (libfilename[0] == '~') {
+		#pragma warning(disable : 4996)
+		// env string is copied into string so following getenv usage is safe
+		var exo_HOME;
+		if (not exo_HOME.osgetenv("EXO_HOME"))
+			exo_HOME.osgetenv("HOME");
+		libfilename.replacer(0, 1, exo_HOME);
+		//var(libraryfilename_).outputl();
+	}
+
+	return libfilename;
+
+}
+
 bool ExodusFunctorBase::openlib(std::string newlibraryname)
 {
 
@@ -412,13 +434,11 @@ bool ExodusFunctorBase::openlib(std::string newlibraryname)
 
 	if (plibrary_ == NULL)
 	{
-#if TRACING >= 1
-		std::cerr << "mvfunctor:openlib: <<< ko <<< " << libraryfilename_ << std::endl;
-#endif
+//#if TRACING >= 1
+//		std::cerr << "mvfunctor:openlib: <<< ko <<< " << libraryfilename_ << std::endl;
+//#endif
 		// std::cerr<<libraryfilename_<<" cannot be found or cannot be opened"<<std::endl;
-		throw MVError(var(libraryfilename_) ^
-				  " does not exist or cannot be found. (or cannot be linked/wrong version. Run with "
-				  "LD_DEBUG=libs for more info)");
+		throw MVError(var(libraryfilename_) ^ " does not exist or cannot be found. (or cannot be linked/wrong version. Run with LD_DEBUG=libs for more info)");
 		return false;
 	}
 
@@ -470,10 +490,10 @@ bool ExodusFunctorBase::openfunc(std::string newfunctionname)
 
 	if (pfunction_ == NULL)
 	{
-#if TRACING >= 1
-		std::cout << "mvfunctor:openfunc: <<< ko <<< " << libraryname_ << " " << newfunctionname
-			  << std::endl;
-#endif
+//#if TRACING >= 1
+//		std::cout << "mvfunctor:openfunc: <<< ko <<< " << libraryname_ << " " << newfunctionname
+//			  << std::endl;
+//#endif
 
 		// std::cerr<<functionname_<<" function cannot be found in
 		// "<<libraryfilename_<<std::endl;
@@ -557,8 +577,8 @@ void ExodusFunctorBase::closelib()
 //		std::cout << "mvfunctor:close not required for library : " << libraryname_ << std::endl;
 //#endif
 	}
-	// record this library is no longer connected
-	// libraryname_="";
+	// flag that this library is no longer connected
+	libraryname_="";
 }
 
 // actually this deletes any shared object created by the shared global function
