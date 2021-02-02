@@ -19,7 +19,8 @@ jobs:
 
     # install dependencies
     - name: boost
-      run: sudo apt-get update && sudo apt-get install -yq libboost-all-dev
+      #run: sudo apt-get update && sudo apt-get install -yq libboost-all-dev
+      run: sudo apt-get update && sudo apt-get install -yq libboost-dev libboost-system-dev libboost-regex-dev libboost-thread-dev libboost-locale-dev libboost-chrono-dev libboost-date-time-dev libboost-atomic-dev
 
     # install dependencies
     - name: postgresql
@@ -47,7 +48,7 @@ jobs:
       #working-directory: ${{github.workspace}}
       shell: bash
       # Execute the build.  You can specify a specific target with "--target <NAME>"
-      run: cmake --build . --config $BUILD_TYPE
+      run: cmake -j --build . --config $BUILD_TYPE
       #run: cmake make
 
     - name: Test
