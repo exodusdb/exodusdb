@@ -62,7 +62,7 @@ set_target_properties(exodus-cli PROPERTIES OUTPUT_NAME exodus)
 # lib #
 
 add_library(dict_myclients SHARED dict_myclients.cpp)
-add_library(number SHARED number.cpp)
+#add_library(number SHARED number.cpp)
 
 ### 2. LINK ###
 
@@ -79,7 +79,7 @@ target_link_libraries(deleteindex exodus stdc++fs ${LIBS})
 target_link_libraries(edir exodus stdc++fs ${LIBS})
 target_link_libraries(edic exodus stdc++fs ${LIBS})
 target_link_libraries(dict2sql exodus stdc++fs ${LIBS})
-target_link_libraries(number exodus stdc++fs ${LIBS})
+#target_link_libraries(number exodus stdc++fs ${LIBS})
 target_link_libraries(exodus-cli exodus stdc++fs ${LIBS})
 target_link_libraries(list exodus stdc++fs ${LIBS})
 target_link_libraries(listfiles exodus stdc++fs ${LIBS})
@@ -116,6 +116,7 @@ configexodus
 ## CMAKE_PREFIX=/usr/local/
 #install(TARGETS dict_myclients DESTINATION lib)
 #push it into /usr/lib where it can be found by dlopen
-install(TARGETS dict_myclients number DESTINATION /usr/lib)
+#install(TARGETS dict_myclients number DESTINATION /usr/lib)
+install(TARGETS dict_myclients DESTINATION /usr/lib)
 
 message("--EXODUS CLI CMAKE EXIT --")

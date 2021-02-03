@@ -1666,7 +1666,10 @@ var& var::inserter(const int fieldno, const int valueno, const int subvalueno, c
 
 var var::substr(const int startindex1) const&
 {
-	return var(*this).substrer(startindex1);
+	//return var(*this).substrer(startindex1);
+	var temp = *this;
+	temp.substrer(startindex1);
+	return temp;
 }
 
 // on temporary
@@ -1679,7 +1682,10 @@ var& var::substr(const int startindex1) &&
 // var.s(start,length) substring
 var var::substr(const int startindex1, const int length) const&
 {
-	return var(*this).substrer(startindex1, length);
+	//return var(*this).substrer(startindex1, length);
+	var temp = *this;
+	temp.substrer(startindex1, length);
+	return temp;
 }
 
 // on temporary

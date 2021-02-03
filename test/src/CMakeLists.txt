@@ -24,8 +24,11 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
 file(GLOB files "test_*.cpp")
 foreach(file ${files})
 	string(REGEX REPLACE "(^.*/|\\.[^.]*$)" "" file_without_ext ${file})
+
 	add_executable(${file_without_ext} ${file})
 	target_link_libraries(${file_without_ext} ${PROJECT_LIBS} exodus)
+
+	#setup a classic test i.e. requiring output of "Test passed"
 	add_test(${file_without_ext} ${file_without_ext})
 	set_tests_properties(${file_without_ext}
 		PROPERTIES

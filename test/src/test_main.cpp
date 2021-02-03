@@ -201,6 +201,11 @@ function main()
 	var utftest,utftest2;
 	var utftestfilename="utf-8-test.txt";
 
+	//multivalued conversions performed one after the other
+	//assert(oconv(1234.567,"MD20P" _VM_ "[NUMBER]" _VM_ "[TAGHTML,TD]")=="<TD>1,234.57</TD>");
+	printl(oconv(1234.567,"MD20P" _VM_ "[NUMBER]"));
+	assert(oconv(1234.567,"MD20P" _VM_ "[NUMBER]")=="1,234.57");
+
 	//osread invalid utf8 should read without change
 	//will be unwritable to database which only accepts utf8 key and data
 	if (not osread(utftest,utftestfilename)) {
@@ -327,11 +332,6 @@ function main()
 	var setting;
 	assert(greek5x4.locateusing("β","γδεα",setting));
 	assert(setting==2);
-
-	//multivalued conversions performed one after the other
-	//assert(oconv(1234.567,"MD20P" _VM_ "[NUMBER]" _VM_ "[TAGHTML,TD]")=="<TD>1,234.57</TD>");
-	printl(oconv(1234.567,"MD20P" _VM_ "[NUMBER]"));
-	assert(oconv(1234.567,"MD20P" _VM_ "[NUMBER]")=="1,234.57");
 
 	var sort="a" _FM_ "b" _FM_ "d";
 	var sortn;

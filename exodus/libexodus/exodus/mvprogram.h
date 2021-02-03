@@ -174,7 +174,9 @@ class ExodusProgramBase
 	var elapsedtimetext(const var& fromdate, const var& fromtime);
 	var elapsedtimetext(const var& fromdate, const var& fromtime, var& uptodate, var& uptotime);
 
-      private:
+ private:
+
+	var number(const var& type, const var& input0, const var& ndecs0, var& output);
 	// used by calculate to call dict libraries
 	mutable ExodusFunctorBase* dict_exodusfunctorbase_;
 	// TODO cache many not just one
