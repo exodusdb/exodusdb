@@ -707,12 +707,15 @@ function main()
 	var testfilename="t_vm.txt";
 	var charout=GreekSmallGamma;//VM;
 	assert(oswrite(charout,testfilename));
+	assert(osfile(testfilename).a(1)==2);
 	var offsetx=0;
 	var testfilex;
 	assert(osopen(testfilename,testfilex));
+	TRACE(testfilex);
+	assert(testfilex);
 	var testdata;
 	//assert(testdata.osbread(testfilex,offsetx=0,1) eq GreekSmallGamma);
-
+stop();
 	//write two greeksmallgammas (4 bytes)
 	assert(oswrite(charout^charout,testfilename));
 
