@@ -707,51 +707,54 @@ function main()
 	var testfilename="t_vm.txt";
 	var charout=GreekSmallGamma;//VM;
 	assert(oswrite(charout,testfilename));
-	var offsetx,testfilex;
+	var offsetx=0;
+	var testfilex;
 	assert(osopen(testfilename,testfilex));
-	var testosread;
-	//assert(testosread.osbread(testfilex,offsetx=0,1) eq GreekSmallGamma);
-
+	var testdata;
+	//assert(testdata.osbread(testfilex,offsetx=0,1) eq GreekSmallGamma);
 
 	//write two greeksmallgammas (4 bytes)
-	oswrite(charout^charout,testfilename);
+	assert(oswrite(charout^charout,testfilename));
 
 	//check reading 1 byte results in nothing
-	testosread.osbread(testfilex,offsetx=0,1);
-	assert(testosread.length()==0);
-	assert(testosread.oconv("HEX2")=="");
+	TRACE(testfilex);
+	TRACE(offsetx);
+	//assert(testdata.osbread(testfilex,offsetx=0,1));
+	assert(testdata.osbread(testfilex,offsetx,1));
+	assert(testdata.length()==0);
+	assert(testdata.oconv("HEX2")=="");
 	assert(offsetx==0);
 
 	//check reading 2 bytes results in 1 unicode character (2 bytes)
-	testosread.osbread(testfilex,offsetx=0,2);
-	assert(testosread==charout);
-	assert(testosread.length()==2);
-	assert(testosread.oconv("HEX2")=="CEB3");
+	testdata.osbread(testfilex,offsetx=0,2);
+	assert(testdata==charout);
+	assert(testdata.length()==2);
+	assert(testdata.oconv("HEX2")=="CEB3");
 	assert(offsetx==2);
 
 	//check reading 3 bytes results in 1 unicode character (2 bytes)
 	offsetx=0;
-	testosread.osbread(testfilex,offsetx,3);
-	assert(testosread==charout);
-	assert(testosread.length()==2);
-	assert(testosread.oconv("HEX2")=="CEB3");
+	testdata.osbread(testfilex,offsetx,3);
+	assert(testdata==charout);
+	assert(testdata.length()==2);
+	assert(testdata.oconv("HEX2")=="CEB3");
 	printl(offsetx);
 	assert(offsetx==2);
 
 	//check reading 4 bytes results in 2 unicode characters (4 bytes)
 	offsetx=0;
-	testosread.osbread(testfilex,offsetx,4);
-	assert(testosread==(charout^charout));
-	assert(testosread.length()==4);
-	assert(testosread.oconv("HEX2")=="CEB3CEB3");
+	testdata.osbread(testfilex,offsetx,4);
+	assert(testdata==(charout^charout));
+	assert(testdata.length()==4);
+	assert(testdata.oconv("HEX2")=="CEB3CEB3");
 	assert(offsetx==4);
 
 	//check reading 5 bytes results in 2 unicode characters (4 bytes)
 	offsetx=0;
-	testosread.osbread(testfilex,offsetx,5);
-	assert(testosread==(charout^charout));
-	assert(testosread.length()==4);
-	assert(testosread.oconv("HEX2")=="CEB3CEB3");
+	testdata.osbread(testfilex,offsetx,5);
+	assert(testdata==(charout^charout));
+	assert(testdata.length()==4);
+	assert(testdata.oconv("HEX2")=="CEB3CEB3");
 	assert(offsetx==4);
 
 //	assert(testfilename.osfile().a(1) eq 2);
