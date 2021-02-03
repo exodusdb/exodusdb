@@ -13,8 +13,9 @@ enable_testing()
 message("")
 message("--EXODUS TEST CMAKE INIT --")
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}../../exodus/libexodus)
-link_directories(${CMAKE_CURRENT_SOURCE_DIR}../../exodus/libexodus/exodus)
+include_directories(../../exodus/libexodus)
+#link_directories(${CMAKE_CURRENT_SOURCE_DIR}../../exodus/libexodus/exodus)
+link_directories(../../exodus/libexodus/exodus)
 
 #turn off optimisation since compile time of test_main currently becomes 60 seconds
 #TODO look at breaking test_main main function into many smaller functions
