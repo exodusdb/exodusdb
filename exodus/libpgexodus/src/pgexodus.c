@@ -282,7 +282,7 @@ pgexodus.c:462: warning: 'input' may be used uninitialized in this function
 //extern "C" {
 
 //bool callexodus(const char* serverid, const char* request, const int nrequestbytes, const char* response, int& nresponsebytes);
-bool callexodus(const char* serverid, const char* request, const int nrequestbytes, const char* response, int* nresponsebytes);
+//bool callexodus(const char* serverid, const char* request, const int nrequestbytes, const char* response, int* nresponsebytes);
 
 void extract(char * instring, int inlength, int fieldno, int valueno, int subvalueno, int* outstart, int* outlength);
 
@@ -353,7 +353,7 @@ exodus_call(PG_FUNCTION_ARGS)
 	output = (text*) palloc(VARHDRSZ+nresponsebytes+4);
 	SET_VARSIZE(output,VARHDRSZ+nresponsebytes);
 	PG_RETURN_TEXT_P(output);
-
+/*
 	//calculate length of pipe data
 	//total length
 	int32 nrequestbytes=sizeof(int32);
@@ -526,7 +526,7 @@ exodus_call(PG_FUNCTION_ARGS)
 
 	//elog(WARNING, "exodus_call: returning response");
 	PG_RETURN_TEXT_P(output);
-
+*/
 };
 
 PG_FUNCTION_INFO_V1(exodus_extract_bytea);

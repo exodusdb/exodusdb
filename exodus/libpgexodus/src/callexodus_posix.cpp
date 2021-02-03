@@ -1,3 +1,4 @@
+#if 0
 #include "mvconfig.h"
 #ifdef EXODUS_IPC_POSIX
 
@@ -92,4 +93,7 @@ bool callexodus(const char* serverid, const char* request, const int nrequestbyt
 }// extern "C"
 
 #endif //EXODUS_IPC_POSIX
+
+#endif //0
+
 

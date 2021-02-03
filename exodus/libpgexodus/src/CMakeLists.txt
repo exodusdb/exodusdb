@@ -50,7 +50,8 @@ set (CMAKE_SHARED_LIBRARY_PREFIX "")
 
 add_library(pgexodus SHARED
 
- mvconfig.h callexodus.cpp callexodus_ms.cpp callexodus_posix.cpp
+ mvconfig.h
+ #callexodus.cpp callexodus_ms.cpp callexodus_posix.cpp
  naturalorder.cpp pgnaturalorder.cpp extract.c pgexodus.c
 
 )

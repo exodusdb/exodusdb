@@ -6,10 +6,10 @@
 // TESTING
 
 // if it runs ok with no static assertion failures
-// 1. compile testmain && testmain
+// 1. compile test_main && test_main
 
 // then test no changes in output with the following
-// 2. compile testmain && testmain > t_testmain 2> /dev/null && diff testmain.out t_testmain
+// 2. compile test_main && test_main > t_test_main 2> /dev/null && diff test_main.out t_test_main
 
 // DEVELOPING
 
@@ -17,7 +17,7 @@
 //
 // if you add to or change the output in any way then update the expected output file
 //
-// testmain 1> testmain.out
+// test_main 1> test_main.out
 
 programinit()
 
@@ -201,7 +201,7 @@ function main()
 	//postgres says the following is false ... because one is a single unicode code unit and the other is two combined into one for presentation
 	//SELECT 'á' = 'á';
 
-	var filename="testmain_temp1";
+	var filename="test_main_temp1";
 
 	var trec;
 	deletefile(filename);
@@ -280,7 +280,7 @@ function main()
 	//osread invalid utf8 should read without change
 	//will be unwritable to database which only accepts utf8 key and data
 	if (not osread(utftest,utftestfilename))
-		abort("testmain must be run in ~/exodus/test/src to have access to " ^ utftestfilename);
+		abort("test_main must be run in ~/exodus/test/src to have access to " ^ utftestfilename);
 	utftest.len().outputl("len=");
 	assert(len(utftest)==osfile(utftestfilename).a(1));
 
@@ -922,16 +922,16 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
                 tx^=chr(ii);
 
         //output to binary - check roundtrip
-        oswrite(tx,"testmain.$1");
-        osread(tx2,"testmain.$1");
+        oswrite(tx,"test_main.$1");
+        osread(tx2,"test_main.$1");
         assert(tx2==tx);
 
         //read as codepage
-        //oswrite(tx,"testmain.$1","ISO-8859-5");
-        osread(tx2,"testmain.$1","ISO-8859-5");
+        //oswrite(tx,"test_main.$1","ISO-8859-5");
+        osread(tx2,"test_main.$1","ISO-8859-5");
         //assert(tx2==tx);
 
-	osdelete("testmain.$1");
+	osdelete("test_main.$1");
 
 	//hash
 	var("xyz").hash(1000).outputl("hash(1000) of \"xyz\"=");
@@ -1069,7 +1069,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	assert(osbwrite("78","t_temp1234.txt",offs));
 //	abort("stopping");
 
-	printl("testmain says 'Hello World!'");
+	printl("test_main says 'Hello World!'");
 	//assert(setxlocale("fr_FR.utf8"));
 	//assert(setxlocale(1036));
 	var xx3="1234.5678";
@@ -2696,8 +2696,8 @@ while trying to match the argument list '(exodus::var, bool)'
     osrmdir("d1",true);
     osrmdir("d2",true);
 
-	osmkdir("testmain.1");
-	osmkdir("testmain.2");
+	osmkdir("test_main.1");
+	osmkdir("test_main.2");
 
 	if (not SLASH_IS_BACKSLASH) {
 
@@ -2710,8 +2710,8 @@ while trying to match the argument list '(exodus::var, bool)'
 		//directories (not files)
 		assert(oslistd("*").convert(FM,"") == osshellread("find . -maxdepth 1 ! -path . -type d -printf '%f\n\'").convert("\n\r",""));
 	}
-	osrmdir("testmain.1");
-	osrmdir("testmain.2");
+	osrmdir("test_main.1");
+	osrmdir("test_main.2");
 
 	printl();
 	assert(osdir(SLASH).match(_FM_ "\\d{5}" _FM_ "\\d{1,5}"));
@@ -3102,7 +3102,7 @@ while trying to match the argument list '(exodus::var, bool)'
 	}
 	var stopped=ostime();
 	errputl(stopped-started," seconds");
-	printl("testmain finished ok and exiting OK");
+	printl("test_main finished ok and exiting OK");
 	printl("Test passed");
 
 	return 0;
