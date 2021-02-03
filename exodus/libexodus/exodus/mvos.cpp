@@ -354,7 +354,7 @@ var var::iconv_MT() const
 
 	static std_boost::regex inner_nondigits_regex("\\D+", std_boost::regex_constants::icase);
 
-	var time = var(std_boost::regex_replace(var_str, surrounding_nondigits_regex, ""));
+	var time = var(std_boost::regex_replace(this->var_str, surrounding_nondigits_regex, ""));
 	time = var(std_boost::regex_replace(time.var_str, inner_nondigits_regex, " "));
 
 	int hours = time.field(" ", 1).toInt();
@@ -434,7 +434,7 @@ var& var::oconv_MR(const char* conversionchar)
 	    non_alpha_regex("[\\W\\d]+"),		    // \A non-alphabetic
 	    non_alphanum_regex("\\W+");			    // \W non-alphanumeric
 #else
-#define boost_mvstr var_str
+#define boost_mvstr this->var_str
 #define boost_regex_replace std_boost::u32regex_replace
 	static const std_boost::u32regex digits_regex = boost::make_u32regex("\\d+"); //\d numeric
 	static const std_boost::u32regex alpha_regex =
@@ -458,23 +458,23 @@ var& var::oconv_MR(const char* conversionchar)
 		// MC/N return everything except digits i.e. remove all digits 0123456789
 		case 'N':
 		{
-			// var_str=std_boost::regex_replace(toTstring((*this)),digits_regex, "");
-			var_str = boost_regex_replace(boost_mvstr, digits_regex, "");
+			// this->var_str=std_boost::regex_replace(toTstring((*this)),digits_regex, "");
+			this->var_str = boost_regex_replace(boost_mvstr, digits_regex, "");
 			break;
 		}
 
 		// MC/A return everything except "alphabetic" i.e remove all "alphabetic"
 		case 'A':
 		{
-			// var_str=std_boost::regex_replace(toTstring((*this)),alpha_regex, "");
-			var_str = boost_regex_replace(boost_mvstr, alpha_regex, "");
+			// this->var_str=std_boost::regex_replace(toTstring((*this)),alpha_regex, "");
+			this->var_str = boost_regex_replace(boost_mvstr, alpha_regex, "");
 			break;
 		}
 		// MC/B return everything except "alphanumeric" remove all "alphanumeric"
 		case 'B':
 		{
-			// var_str=std_boost::regex_replace(toTstring((*this)),alphanum_regex, "");
-			var_str = boost_regex_replace(boost_mvstr, alphanum_regex, "");
+			// this->var_str=std_boost::regex_replace(toTstring((*this)),alphanum_regex, "");
+			this->var_str = boost_regex_replace(boost_mvstr, alphanum_regex, "");
 			break;
 		}
 		}
@@ -489,22 +489,22 @@ var& var::oconv_MR(const char* conversionchar)
 	// MCN return only digits i.e. remove all non-digits
 	case 'N':
 	{
-		// var_str=std_boost::regex_replace(toTstring((*this)),non_digits_regex, "");
-		var_str = boost_regex_replace(boost_mvstr, non_digits_regex, "");
+		// this->var_str=std_boost::regex_replace(toTstring((*this)),non_digits_regex, "");
+		this->var_str = boost_regex_replace(boost_mvstr, non_digits_regex, "");
 		break;
 	}
 	// MCA return only "alphabetic" i.e. remove all "non-alphabetic"
 	case 'A':
 	{
-		// var_str=std_boost::regex_replace(toTstring((*this)),non_alpha_regex, "");
-		var_str = boost_regex_replace(boost_mvstr, non_alpha_regex, "");
+		// this->var_str=std_boost::regex_replace(toTstring((*this)),non_alpha_regex, "");
+		this->var_str = boost_regex_replace(boost_mvstr, non_alpha_regex, "");
 		break;
 	}
 	// MCB return only "alphanumeric" i.e. remove all "non-alphanumeric"
 	case 'B':
 	{
-		// var_str=std_boost::regex_replace(toTstring((*this)),non_alphanum_regex, "");
-		var_str = boost_regex_replace(boost_mvstr, non_alphanum_regex, "");
+		// this->var_str=std_boost::regex_replace(toTstring((*this)),non_alphanum_regex, "");
+		this->var_str = boost_regex_replace(boost_mvstr, non_alphanum_regex, "");
 		break;
 	}
 	// MCL to lower case
@@ -601,9 +601,9 @@ void var::initrnd() const
 	else
 	{
 		seed = 1;
-		for (size_t ii = 0; ii < var_str.size(); ii++)
-			seed *= var_str[ii];
-		// seed=MurmurHash64((char*)var_str.data(),int(var_str.length()*sizeof(char)),0);
+		for (size_t ii = 0; ii < this->var_str.size(); ii++)
+			seed *= this->var_str[ii];
+		// seed=MurmurHash64((char*)this->var_str.data(),int(this->var_str.length()*sizeof(char)),0);
 	}
 	// set the new seed
 	// logputl("Seeding random number generator to " ^ (*this));
@@ -739,10 +739,10 @@ var var::match(const var& matchstr, const var& options) const
 	/*
 		//create iterators to matches
 		//https://www.boost.org/doc/libs/1_70_0/libs/regex/doc/html/boost_regex/ref/non_std_strings/icu/unicode_iter.html
-		//auto iter {std_boost::make_u32regex_token_iterator(var_str,regex)};
+		//auto iter {std_boost::make_u32regex_token_iterator(this->var_str,regex)};
 		const int subs[] = {1, 2, 3, 0};
 		boost::u32regex_token_iterator<std::string::const_iterator> iter
-	   {std_boost::make_u32regex_token_iterator(var_str,regex,subs)}; decltype(iter) end {};
+	   {std_boost::make_u32regex_token_iterator(this->var_str,regex,subs)}; decltype(iter) end {};
 
 		//cycle through matches, appending whatever is found to the output
 		std::string found="";
@@ -761,13 +761,13 @@ var var::match(const var& matchstr, const var& options) const
 
 	// https://stackoverflow.com/questions/26320987/what-is-the-difference-between-regex-token-iterator-and-regex-iterator
 	// boost::u32regex_token_iterator<std::string::const_iterator>
-	//	iter {std_boost::make_u32regex_token_iterator(var_str,regex,{0,1,2,3,4,etc or -1})};
+	//	iter {std_boost::make_u32regex_token_iterator(this->var_str,regex,{0,1,2,3,4,etc or -1})};
 	// token_iterator allow you to access none-matching parts of the string for parsing stuff
 	// but doesnt return an iterator with an array of groups
 
 	// construct our iterators:
 	boost::u32regex_iterator<std::string::const_iterator> iter{
-	    std_boost::make_u32regex_iterator(var_str, regex)};
+	    std_boost::make_u32regex_iterator(this->var_str, regex)};
 	decltype(iter) end{};
 	std::for_each(iter, end,
 		      // using declarative functional style "for_each with lambda" instead of old
@@ -792,9 +792,9 @@ var var::match(const var& matchstr, const var& options) const
 
 	/*	std_boost::smatch
 			smatch1;
-		//return u32regex_match(var_str, regex);
+		//return u32regex_match(this->var_str, regex);
 		while (u32regex_search(
-			var_str,
+			this->var_str,
 			smatch1,
 			regex,
 			std_boost::regex_constants::match_default))
@@ -847,11 +847,11 @@ var& var::swapper(const var& what, const var& with)
 	std::string::size_type start_pos = 0;
 	while (true)
 	{
-		start_pos = var_str.find(what.var_str, start_pos);
+		start_pos = this->var_str.find(what.var_str, start_pos);
 		// past of of string?
 		if (start_pos == std::string::npos)
 			return *this;
-		var_str.replace(start_pos, what.var_str.length(), with.var_str);
+		this->var_str.replace(start_pos, what.var_str.length(), with.var_str);
 		start_pos += with.var_str.length();
 	}
 
@@ -895,13 +895,13 @@ var& var::replacer(const var& regexstr, const var& replacementstr, const var& op
 		throw MVError(var(e.what()).quote() ^ " is an invalid regular expression");
 	}
 
-	// return regex_match(var_str, expression);
+	// return regex_match(this->var_str, expression);
 
 	// std::ostringstream outputstring(std::ios::out | std::ios::binary);
 	// std::ostream_iterator<char, char> oiter(outputstring);
-	// std_boost::regex_replace(oiter, var_str.begin(), var_str.end(),regex_regex, with,
+	// std_boost::regex_replace(oiter, this->var_str.begin(), this->var_str.end(),regex_regex, with,
 	// boost::match_default | boost::format_all);
-	var_str = std_boost::u32regex_replace(var_str, regex, replacementstr.var_str);
+	this->var_str = std_boost::u32regex_replace(this->var_str, regex, replacementstr.var_str);
 
 	return *this;
 }
@@ -917,16 +917,16 @@ bool var::osgetenv(const var& envvarname)
 	{
 
 		var_typ = VARTYP_STR;
-		var_str = "";
+		this->var_str = "";
 
 		int i = 1;
 		char* s = *environ;
 		for (; s; i++)
 		{
 			// printf("%s\n", s);
-			// var_str.append(boost::locale::conv::utf_to_utf<wchar_t>(s));
-			var_str.append(s);
-			var_str.append("\n");
+			// this->var_str.append(boost::locale::conv::utf_to_utf<wchar_t>(s));
+			this->var_str.append(s);
+			this->var_str.append("\n");
 			s = *(environ + i);
 		}
 		return true;
@@ -939,7 +939,7 @@ bool var::osgetenv(const var& envvarname)
 	if (cvalue == 0)
 	{
 		var_typ = VARTYP_STR;
-		var_str = "";
+		this->var_str = "";
 		return false;
 	}
 	else
@@ -1053,7 +1053,7 @@ bool var::osshellread(const var& oscmd)
 	ISSTRING(oscmd)
 
     // default is to return empty string in any case
-    var_str = "";
+    this->var_str = "";
     var_typ = VARTYP_STR;
 
 	// fflush?
@@ -1260,7 +1260,7 @@ bool var::osread(const char* osfilename, const var& codepage)
 	THISISDEFINED()
 
 	// osread returns empty string in any case
-	var_str = "";
+	this->var_str = "";
 	var_typ = VARTYP_STR;
 
 	// get a file structure
@@ -1299,7 +1299,7 @@ bool var::osread(const char* osfilename, const var& codepage)
 		//std::unique_ptr emergencymemory(new char[16384]);
 
 		// resize the string to receive the whole file
-		var_str.resize(bytesize);
+		this->var_str.resize(bytesize);
 	}
 	catch (std::bad_alloc& ex)
 	{
@@ -1314,7 +1314,7 @@ bool var::osread(const char* osfilename, const var& codepage)
 	// myfile.read (memblock.get(), (unsigned int) bytesize);
 	//myfile.read(&var_str[0], (unsigned int)bytesize);
 	//c++17 provides non-const access to data() :)
-	myfile.read(var_str.data(), (unsigned int)bytesize);
+	myfile.read(this->var_str.data(), (unsigned int)bytesize);
 
 	bool failed = myfile.fail();
 
@@ -1322,7 +1322,7 @@ bool var::osread(const char* osfilename, const var& codepage)
 	// string 	#pragma warning( disable: 4244 ) warning C4244: '=' : conversion from
 	// 'std::streamoff' to 'unsigned int', possible loss of data
 	bytesize = (unsigned int)myfile.gcount();
-	var_str.resize(bytesize);
+	this->var_str.resize(bytesize);
 	myfile.close();
 
 	// failure can indicate that we didnt get as many characters as requested
@@ -1333,12 +1333,12 @@ bool var::osread(const char* osfilename, const var& codepage)
 
 	// ALN:JFI: actually we could use std::string 'tempstr' in place of 'memblock' by hacking
 	//	.data member and reserve() or resize(), thus avoiding buffer-to-buffer-copying
-	// var_str=std::string(memblock.get(), (unsigned int) bytesize);
+	// this->var_str=std::string(memblock.get(), (unsigned int) bytesize);
 	// SJB Done 20190604
 
 	if (codepage)
-		// var_str=boost::locale::conv::to_utf<char>(var_str,"ISO-8859-5")};
-		var_str = boost::locale::conv::to_utf<char>(var_str, codepage);
+		// this->var_str=boost::locale::conv::to_utf<char>(this->var_str,"ISO-8859-5")};
+		this->var_str = boost::locale::conv::to_utf<char>(this->var_str, codepage);
 
 	return true;
 }
@@ -1351,7 +1351,7 @@ var var::to_codepage(const var& codepage) const
 	ISSTRING(codepage)
 
 	//from utf8 to codepage
-	return boost::locale::conv::from_utf<char>(var_str, codepage);
+	return boost::locale::conv::from_utf<char>(this->var_str, codepage);
 }
 
 var var::from_codepage(const var& codepage) const
@@ -1362,7 +1362,7 @@ var var::from_codepage(const var& codepage) const
 	ISSTRING(codepage)
 
 	//to utf from codepage
-	return boost::locale::conv::to_utf<char>(var_str, codepage);
+	return boost::locale::conv::to_utf<char>(this->var_str, codepage);
 }
 
 // if codepage is provided (not locale) then exodus assumes internally
@@ -1387,12 +1387,12 @@ bool var::oswrite(const var& osfilename, const var& codepage) const
 	// write out the full string or fail
 	if (codepage)
 	{
-		std::string tempstr = boost::locale::conv::from_utf<char>(var_str, codepage);
+		std::string tempstr = boost::locale::conv::from_utf<char>(this->var_str, codepage);
 		myfile.write(tempstr.data(), int(tempstr.length()));
 	}
 	else
 	{
-		myfile.write(var_str.data(), int(var_str.length()));
+		myfile.write(this->var_str.data(), int(this->var_str.length()));
 	}
 	bool failed = myfile.fail();
 	myfile.close();
@@ -1434,7 +1434,7 @@ bool var::osbwrite(const var& osfilevar, var& offset) const
 	    static_cast<long>(offset.var_int)); // avoid warning, see comments to seekg()
 
 	// NB but write length goes by number of wide characters (not bytes)
-	pmyfile->write(var_str.data(), int(var_str.length()));
+	pmyfile->write(this->var_str.data(), int(this->var_str.length()));
 
 	// on windows, fstream will try to convert to current locale codepage so
 	// if you are trying to write an exodus string containing a GREEK CAPITAL GAMMA
@@ -1549,7 +1549,7 @@ bool var::osbread(const var& osfilevar, var& offset, const int bytesize)
 	// ISSTRING(osfilename)
 
 	// default is to return empty string in any case
-	var_str = "";
+	this->var_str = "";
 	var_typ = VARTYP_STR;
 
 	// strange case request to read 0 bytes
@@ -1613,17 +1613,17 @@ bool var::osbread(const var& osfilevar, var& offset, const int bytesize)
 	// characters. int readsize = pmyfile->gcount(); 	#pragma warning( disable: 4244 )
 	// warning C4244: '=' : conversion from 'std::streamoff' to 'unsigned int', possible loss of
 	// data
-	var_str.assign(memblock.get(), (unsigned int)pmyfile->gcount());
+	this->var_str.assign(memblock.get(), (unsigned int)pmyfile->gcount());
 
 	// trim off any excess utf8 bytes if utf8
 	//	var(pmyfile->getloc().name()).outputl(L"loc name=");;
 	if (pmyfile->getloc().name() != "C")
 	{
-		int nextrabytes = count_excess_UTF8_bytes(var_str);
+		int nextrabytes = count_excess_UTF8_bytes(this->var_str);
 		if (nextrabytes)
 		{
 			offset -= nextrabytes;
-			var_str.resize(var_str.length() - nextrabytes);
+			this->var_str.resize(this->var_str.length() - nextrabytes);
 		}
 	}
 

@@ -3,7 +3,7 @@
 
 programinit()
 
-#include <l2.h>
+//#include <l2.h>
 
 function main() {
 
@@ -107,7 +107,7 @@ function main() {
 
 	assert(!(zeros>0));
 	assert(!(zeroi>0));
-	printl(zerod);
+	//printl(zerod);
 	assert(!(zerod>0));
 
 	assert(0<bigs);
@@ -158,6 +158,9 @@ function main() {
 	assert(0==zeroi);
 	assert(0==zerod);
 
+	printl("Test passed");
+
+	return 0;
 }
 
 programexit()

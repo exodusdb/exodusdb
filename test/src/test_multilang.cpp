@@ -12,55 +12,68 @@ programinit()
 
 function main()
 {
-//	this code fragment tests UTF8 coding/decoding by reading utf8.html and writing its copy ...
+	var cmd;
+
+	//	this code fragment tests UTF8 coding/decoding by reading utf8.html and writing its copy ...
 	var utf8_html = "utf8.html";
 	var buf;
-	buf.osread( "t_utf8.html");				// read with built in UTF8 conversion wstringfromUTF8()
+	buf.osread( utf8_html);				// read with built in UTF8 conversion wstringfromUTF8()
 	buf.oswrite( "t_utf8copy.html");			// write with built in UTF8 conversion
-	buf.osread( "t_utf8.html", "utf8");		// read with boost_utf8-facet
+	cmd="diff " ^ utf8_html ^ " t_utf8copy.html";
+	printl(cmd);
+	assert(osshell(cmd));
+
+	buf.osread( utf8_html, "utf8");		// read with boost_utf8-facet
 	buf.oswrite( "t_utf8utf8.html", "utf8");	// write with boost_utf8_facet
-	printl( "Check that 't_utf8.html', 't_utf8copy.html', 't_utf8utf8.html' in working directory - identical");
-	printl( "Press Enter to continue ...");
-	char c = getchar();
+	cmd="diff " ^ utf8_html ^ " t_utf8utf8.html";
+	printl(cmd);
+	assert(osshell(cmd));
 
 	// and chinese page
-	buf.osread( "t_calblur8.html", "utf8");
+	buf.osread( "calblur8.html", "utf8");
 	buf.oswrite( "t_calblur8utf8.html", "utf8");
-	printl( "Check that 'calblur8.html' and 'calblur8utf8.html' in working directory - identical");
-	printl( "Press Enter to continue ...");
-	c = getchar();
-	printl(c);
+	cmd="diff calblur8.html t_calblur8utf8.html";
+	printl(cmd);
+	assert(osshell(cmd));
 
 //  this code fragment tests locale specific characters IO with narrow files (1 char = 1 byte codepages)
-	var EN_RU_UA_txt1 = "[English language][Русский язык][Українська мова]\n";
+	var cyrillic_cp = VOLUMES ? "Ukrainian_Ukraine.1251" : "CP1251";
+	//osshell("locale ru_RU.CP1251 || locale-gen ru_RU.CP1251");
+	//[<D0><F3><F1><F1><EA><E8><E9> <FF><E7><FB><EA>][<D3><EA><F0><E0><BF><ED><F1><FC><EA><E0> <EC><EE><E2><E0>]
+	var EN_RU_UA_cp1251 = "[English language][Русский язык][Українська мова]";
+	var EN_RU_UA_utf8 =   "[English language][Р СѓСЃСЃРєРёР№ СЏР·С‹Рє][РЈРєСЂР°С—РЅСЃСЊРєР° РјРѕРІР°]";
+	assert(EN_RU_UA_cp1251.length() == 49);
+	assert(EN_RU_UA_utf8.length() == 74);
+	assert(EN_RU_UA_cp1251.from_codepage(cyrillic_cp) == EN_RU_UA_utf8);
+	assert(EN_RU_UA_cp1251 == EN_RU_UA_utf8.to_codepage(cyrillic_cp));
+
+	std::cout << ">[English language][Р СѓСЃСЃРєРёР№ СЏР·С‹Рє][РЈРєСЂР°С—РЅСЃСЊРєР° РјРѕРІР°]" << std::endl;
+	EN_RU_UA_cp1251.from_codepage(cyrillic_cp).outputl(">");
+
+	//convert write utf8 with code page
+	var EN_RU_UA_file = "t_EN_RU_UA.txt";
+	oswrite(EN_RU_UA_utf8, EN_RU_UA_file, cyrillic_cp);
+	printl(osfile(EN_RU_UA_file));
+	assert(osfile(EN_RU_UA_file).a(1) == 49);
+
+	//convert write cp1251 WITHOUT code page - will go out unchanged
+	oswrite(EN_RU_UA_cp1251, EN_RU_UA_file);
+	assert(osfile(EN_RU_UA_file).a(1) == 49);
+
+	//read it with code page
 	var EN_RU_UA_txt2;
-	var EN_RU_UA_file = "t_test_EN_RU_UA.txt";
-//	oswrite( EN_RU_UA_txt1, EN_RU_UA_file, 1058);
-	oswrite( EN_RU_UA_txt1, EN_RU_UA_file, "t_Ukrainian_Ukraine.1251");
-	EN_RU_UA_file.osclose();
-	EN_RU_UA_txt2.osread( EN_RU_UA_file, "Ukrainian_Ukraine.1251");
-	EN_RU_UA_txt1.outputl( "Written   text:");
-	EN_RU_UA_txt2.outputl( "Read back text:");
+	osread(EN_RU_UA_txt2, EN_RU_UA_file, cyrillic_cp);
+	assert(EN_RU_UA_txt2 == EN_RU_UA_utf8);
+	EN_RU_UA_txt2.outputl("<");
 
-	printl( "Press Enter to continue ...");
-	c = getchar();
-
-//  Do it again, dynamically changing locale to Greek
-	var EN_GREEK_txt1 = L"[Greek character \\u03A3][\u03A3]\n";
-	var EN_GREEK_txt2;
-	var EN_GREEK_file = "t_test_EN_GREEK.txt";
-	oswrite( EN_GREEK_txt1, EN_GREEK_file, "Greek_Greece.1253");
-	EN_GREEK_file.osclose();
-	EN_GREEK_txt2.osread( EN_GREEK_file, "Greek_Greece.1253");
-	EN_GREEK_txt1.outputl( "Written   text:");
-	EN_GREEK_txt2.outputl( "Read back text:");
-
-	printl( "Press Enter good key to continue ...");
-	c = getchar();
+	//read it WITHOUT code page (it will arrive back as NOT UTF8)
+	osread(EN_RU_UA_txt2, EN_RU_UA_file);
+	assert(EN_RU_UA_txt2 == EN_RU_UA_cp1251);
+	EN_RU_UA_txt2.from_codepage("CP1251").outputl("<");
 
 // Test throwing MvException on wrong locale name
 // Uncomment following line to test
-//	oswrite( EN_GREEK_txt1, EN_GREEK_file, "some_bad_locale");
+//	oswrite( EN_GREEK_utf8, EN_GREEK_file, "some_bad_locale");
 
 //  this code fragment tests locale specific characters IO with UTF8 files
 	var MIXTURE_txt1 = "[English][Русский][Українська][Greek Char:\\u03A3][\u03A3]\n";
@@ -72,8 +85,8 @@ function main()
 	MIXTURE_txt1.outputl( "Written   text:");
 	MIXTURE_txt2.outputl( "Read back text:");
 
-	printl( "Press Enter key to continue ...");
-	c = getchar();
+	//printl( "Press Enter key to continue ...");
+	//c = getchar();
 
 //  this code fragment tests positioning in UTF8 files
 	var BUF_0_9, BUF_9_9, BUF_18_12, BUF_19_12, BUF_20_12, BUF_30_23;
@@ -129,6 +142,10 @@ function main()
 	assert( osbwrite( L"1234567890\n", OUTPUT_file, position));
 	position = 10;
 	assert( osbwrite( L"XYZ", OUTPUT_file, position));
+
+
+	printl("Test passed");
+	
 	return 0;
 }
 

@@ -1416,8 +1416,8 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	 or COMMAND eq "main"
 	 or COMMAND eq "main2"
 	 or COMMAND eq "main2.out"
-	 or COMMAND eq "testmain"
-	 or COMMAND eq "testmain.out"
+	 or COMMAND eq "test_main"
+	 or COMMAND eq "test_main.out"
 	 );
 
 #define MULTIPLE_CONNECTION_CODE_EXCLUDED
@@ -3103,6 +3103,7 @@ while trying to match the argument list '(exodus::var, bool)'
 	var stopped=ostime();
 	errputl(stopped-started," seconds");
 	printl("testmain finished ok and exiting OK");
+	printl("Test passed");
 
 	return 0;
 }

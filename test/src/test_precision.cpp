@@ -100,6 +100,8 @@ function main() {
 
 	}
 
+	printl("Test passed");
+
 	return 0;
 }
 

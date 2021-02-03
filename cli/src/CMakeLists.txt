@@ -7,9 +7,9 @@ cmake_minimum_required(VERSION 2.8)
 message("")
 message("--EXODUS CLI CMAKE INIT --")
 
-include_directories(
-	../../exodus/libexodus
-)
+include_directories(../../exodus/libexodus)
+link_directories(${CMAKE_CURRENT_SOURCE_DIR}../../exodus/libexodus/exodus)
+
 
 #######################################
 # c++ version 17 or 20 if on Ubuntu 20+
@@ -25,8 +25,6 @@ if(RESVAR EQUAL "0")
 else()
         SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 endif()
-
-link_directories(${CMAKE_CURRENT_SOURCE_DIR}../../exodus/libexodus/exodus)
 
 
 ### 1. COMPILE ###

@@ -8,23 +8,25 @@ INCLUDE(CPack)
 #######################################
 # c++ version 17 or 20 if on Ubuntu 20+
 #######################################
-execute_process(
-        COMMAND         grep "Ubuntu 2" /etc/lsb-release
-        OUTPUT_VARIABLE OUTVAR
-        ERROR_VARIABLE  ERRVAR
-        RESULT_VARIABLE RESVAR
-)
-if(RESVAR EQUAL "0")
-        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a")
-else()
-        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
-endif()
+#execute_process(
+#        COMMAND         grep "Ubuntu 2" /etc/lsb-release
+#        OUTPUT_VARIABLE OUTVAR
+#        ERROR_VARIABLE  ERRVAR
+#        RESULT_VARIABLE RESVAR
+#)
+#if(RESVAR EQUAL "0")
+#        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a")
+#else()
+#        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+#endif()
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 ############################################
 # remove -o1 for gdb to debug into libexodus
 ############################################
-#exodus works using c++14 default on Ubuntu 18.04 so no need for this
-#moving to use c++17 features so switching on
 # SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unknown-pragmas -no-pie -g -march=native -O3 -fvisibility=hidden")
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unknown-pragmas -no-pie -g -march=native -O3")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unknown-pragmas -no-pie -g -march=native -O1")
@@ -62,9 +64,13 @@ project(exodus)
 #)
 #message(PostgreSQL_INCLUDEDIR_SERVER=${PostgreSQL_INCLUDEDIR_SERVER})
 
-add_subdirectory( exodus/libexodus/exodus)
-add_subdirectory( exodus/libpgexodus/src)
-add_subdirectory( cli/src)
+include(CTest)
+enable_testing()
+
+add_subdirectory(exodus/libexodus/exodus)
+add_subdirectory(exodus/libpgexodus/src)
+add_subdirectory(cli/src)
+add_subdirectory(test/src)
 
 # uninstall target
 configure_file(
