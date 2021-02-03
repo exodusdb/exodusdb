@@ -203,8 +203,15 @@ function main()
 
 	//osread invalid utf8 should read without change
 	//will be unwritable to database which only accepts utf8 key and data
-	if (not osread(utftest,utftestfilename))
-		abort("test_main must be run in ~/exodus/test/src to have access to " ^ utftestfilename);
+	if (not osread(utftest,utftestfilename)) {
+		var base_path=osgetenv("GITHUB_WORKSPACE");
+		base_path.outputl("GITHUB_WORKSPACE=");
+		if (base_path)
+			oscwd(base_path ^ "/test/src/");
+		if (not osread(utftest,utftestfilename)) {
+			abort("test_main must be run in ~/exodus/test/src to have access to " ^ utftestfilename);
+		}
+	}
 	utftest.len().outputl("len=");
 	assert(len(utftest)==osfile(utftestfilename).a(1));
 
