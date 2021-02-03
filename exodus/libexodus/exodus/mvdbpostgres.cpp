@@ -419,7 +419,8 @@ bool var::connect(const var& conninfo)
 	if (PQstatus(pgconn) != CONNECTION_OK)
 	{
 		//if (GETDBTRACE)
-		conninfo2.errputl("connection string=");
+		//TODO remove password=somesillysecret
+		conninfo2.replace(R"(password\s*=\s*\w*)","password=**********").errputl("connection string=");
 
 //#if TRACING >= 3
 		var("ERROR: mvdbpostgres connect() Connection to database failed: " ^
