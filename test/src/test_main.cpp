@@ -715,7 +715,7 @@ function main()
 	assert(testfilex);
 	var testdata;
 	//assert(testdata.osbread(testfilex,offsetx=0,1) eq GreekSmallGamma);
-stop();
+
 	//write two greeksmallgammas (4 bytes)
 	assert(oswrite(charout^charout,testfilename));
 
