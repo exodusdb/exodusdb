@@ -709,7 +709,7 @@ function main()
 	assert(oswrite(charout,testfilename));
 	assert(osfile(testfilename).a(1)==2);
 	var offsetx=0;
-	var testfilex;
+	var testfilex="";
 	assert(osopen(testfilename,testfilex));
 	TRACE(testfilex);
 	assert(testfilex);
