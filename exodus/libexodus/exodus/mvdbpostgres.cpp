@@ -3946,6 +3946,109 @@ bool var::readnext(var& key, var& valueno)
 	THISIS("bool var::readnext(var& key, var& valueno) const")
 	THISISSTRING()
 
+	var record;
+	return this->readnext(record, key, valueno);
+}
+
+//	PGconn* pgconn = (PGconn*)this->connection();
+//	if (pgconn == NULL)
+//	{
+//		this->clearselect();
+//		return false;
+//	}
+//
+//	Scoped_PGresult pgresult;
+//	bool ok = readnextx(*this, pgresult, pgconn, /*forwards=*/true);
+//
+//	//__asm__("int3");
+//
+//	if (not ok)
+//	{
+//		// end the transaction and quit
+//		// no more
+//		// committrans();
+//		this->clearselect();
+//		return false;
+//	}
+//
+//	/* abortive code to handle unescaping returned hex/escape data	//avoid the need for this by
+//	calling pqexecparams flagged for binary
+//	//even in the case where there are no parameters and pqexec could be used.
+//
+//	//eg 90001 is 9.0.1
+//	int pgserverversion=PQserverVersion(thread_pgconn);
+//	if (pgserverversion>=90001) {
+//		var(pgserverversion).outputl();
+//		//unsigned char *PQunescapeBytea(const unsigned char *from, size_t *to_length);
+//		size_t to_length;
+//		unsigned char* unescaped = PQunescapeBytea((const unsigned char*)
+//	PQgetvalue(pgresult, 0, 0), &to_length); if (*unescaped)
+//			key=stringfromUTF8((UTF8*)unescaped, to_length);
+//		PQfreemem(unescaped);
+//		return true;
+//	}
+//*/
+//	// get the key from the first column
+//	// char* data = PQgetvalue(pgresult, 0, 0);
+//	// int datalen = PQgetlength(pgresult, 0, 0);
+//	// key=std::string(data,datalen);
+//	key = getresult(pgresult, 0, 0);
+//	// key.output("key=").len().outputl(" len=");
+//
+//	//recursive call to skip any meta data with keys starting and ending %
+//	//eg keys like "%RECORDS%" (without the quotes)
+//	//similar code in readnext()
+//    if (key[1] == "%" && key[-1] == "%") {
+//		return this->readnext(key, valueno);
+//	}
+//
+//	// vn is second column
+//	// record is third column
+//	if (PQnfields(pgresult) > 1)
+//		// valueno=var((int)ntohl(*(uint32_t*)PQgetvalue(pgresult, 0, 1)));
+//		valueno = getresult(pgresult, 0, 1);
+//	else
+//		valueno = 0;
+//
+//	return true;
+//}
+
+/*how to access multiple records and fields*/
+#if 0
+	/* first, print out the attribute names */
+	int nFields = PQnfields(pgresult);
+	for (i = 0; i < nFields; i++)
+		wprintf("%-15s", PQfname(pgresult, i));
+	wprintf("\n\n");
+
+	/* next, print out the rows */
+	for (i = 0; i < PQntuples(pgresult); i++)
+	{
+		for (j = 0; j < nFields; j++)
+			wprintf("%-15s", PQgetvalue(pgresult, i, j));
+		wprintf("\n");
+	}
+#endif
+
+bool var::readnext(var& record, var& key, var& valueno)
+{
+
+	//?allow undefined usage like var xyz=xyz.readnext();
+	if (var_typ & VARTYP_MASK || !var_typ)
+	{
+		// throw MVUndefined("readnext()");
+		var_str = "";
+		var_typ = VARTYP_STR;
+	}
+
+	// default cursor is ""
+	const_cast<var&>(*this).unassigned("");
+
+	THISIS("bool var::readnext(var& record, var& key, var& valueno) const")
+	THISISSTRING()
+	ISDEFINED(key)
+	ISDEFINED(record)
+
 	// readnext through string of keys if provided
 	// Note: code similarity between hasnext and readnext
 	var listid = this->a(3);
@@ -4004,105 +4107,6 @@ bool var::readnext(var& key, var& valueno)
 			return true;
 		}
 	}
-
-	PGconn* pgconn = (PGconn*)this->connection();
-	if (pgconn == NULL)
-	{
-		this->clearselect();
-		return false;
-	}
-
-	Scoped_PGresult pgresult;
-	bool ok = readnextx(*this, pgresult, pgconn, /*forwards=*/true);
-
-	//__asm__("int3");
-
-	if (not ok)
-	{
-		// end the transaction and quit
-		// no more
-		// committrans();
-		this->clearselect();
-		return false;
-	}
-
-	/* abortive code to handle unescaping returned hex/escape data	//avoid the need for this by
-	calling pqexecparams flagged for binary
-	//even in the case where there are no parameters and pqexec could be used.
-
-	//eg 90001 is 9.0.1
-	int pgserverversion=PQserverVersion(thread_pgconn);
-	if (pgserverversion>=90001) {
-		var(pgserverversion).outputl();
-		//unsigned char *PQunescapeBytea(const unsigned char *from, size_t *to_length);
-		size_t to_length;
-		unsigned char* unescaped = PQunescapeBytea((const unsigned char*)
-	PQgetvalue(pgresult, 0, 0), &to_length); if (*unescaped)
-			key=stringfromUTF8((UTF8*)unescaped, to_length);
-		PQfreemem(unescaped);
-		return true;
-	}
-*/
-	// get the key from the first column
-	// char* data = PQgetvalue(pgresult, 0, 0);
-	// int datalen = PQgetlength(pgresult, 0, 0);
-	// key=std::string(data,datalen);
-	key = getresult(pgresult, 0, 0);
-	// key.output("key=").len().outputl(" len=");
-
-	//recursive call to skip any meta data with keys starting and ending %
-	//eg keys like "%RECORDS%" (without the quotes)
-	//similar code in readnext()
-    if (key[1] == "%" && key[-1] == "%") {
-		return readnext(key, valueno);
-	}
-
-	// vn is second column
-	// record is third column
-	if (PQnfields(pgresult) > 1)
-		// valueno=var((int)ntohl(*(uint32_t*)PQgetvalue(pgresult, 0, 1)));
-		valueno = getresult(pgresult, 0, 1);
-	else
-		valueno = 0;
-
-	return true;
-
-/*how to access multiple records and fields*/
-#if 0
-	/* first, print out the attribute names */
-	int nFields = PQnfields(pgresult);
-	for (i = 0; i < nFields; i++)
-		wprintf("%-15s", PQfname(pgresult, i));
-	wprintf("\n\n");
-
-	/* next, print out the rows */
-	for (i = 0; i < PQntuples(pgresult); i++)
-	{
-		for (j = 0; j < nFields; j++)
-			wprintf("%-15s", PQgetvalue(pgresult, i, j));
-		wprintf("\n");
-	}
-#endif
-}
-
-bool var::readnext(var& record, var& key, var& valueno)
-{
-
-	//?allow undefined usage like var xyz=xyz.readnext();
-	if (var_typ & VARTYP_MASK || !var_typ)
-	{
-		// throw MVUndefined("readnext()");
-		var_str = "";
-		var_typ = VARTYP_STR;
-	}
-
-	// default cursor is ""
-	const_cast<var&>(*this).unassigned("");
-
-	THISIS("bool var::readnext(var& record, var& key, var& valueno) const")
-	THISISSTRING()
-	ISDEFINED(key)
-	ISDEFINED(record)
 
 	PGconn* pgconn = (PGconn*)this->connection();
 	if (pgconn == NULL)
