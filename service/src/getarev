@@ -1,6 +1,6 @@
 #!/bin/bash
-set -x
-set -e
+set -eux
+
 :
 : Refreshes the service/sys source folders from the ~arev folder where the output of ADECOM is placed
 :
@@ -8,11 +8,16 @@ set -e
 : Does not delete any files in the target that are no longer present in the source
 : TODO: Delete everything before refreshing from scratch and regenerate all header files
 : rsync -avz -e "ssh -p 19525" --delete "/cygdrive/d/exodus/arev/" root@exodus.neosys.com:/root/arev
+
 :
 : Check if running in the right directory
 : =======================================
 :
-if ! test -f ./getarev ; then echo must be run in service/src ; exit; fi
+	if ! test -f ./getarev ; then
+		echo must be run in service/src
+		exit 1
+	fi
+
 :
 : A function to change all N_E_OSYS/n_e_osys to EXODUS/exodus in all text - except neosys.com
 : ===========================================================================================
@@ -29,23 +34,25 @@ function conv_n_e_osys2exodus {
     find ./$1 -type f -exec sed -i 's#BATCH#JOURNAL#g' {} \;
     find ./$1 -type f -exec sed -i 's#Batch#Journal#g' {} \;
 }
+
 :
 : Get dictionary SQL from arev
 : ============================
 :
-cp -a ~/arev/data/DICTCHAN.SQL sql/dict_changelog.sql
-cp -a ~/arev/data/DICTLOCK.SQL sql/dict_locks.sql
-cp -a ~/arev/data/DICTPROC.SQL sql/dict_processes.sql
-cp -a ~/arev/data/DICTREQU.SQL sql/dict_requestlog.sql
-cp -a ~/arev/data/DICTSTAT.SQL sql/dict_statistics.sql
-cp -a ~/arev/data/DICTUSER.SQL sql/dict_users.sql
-cp -a ~/arev/data/DICTVOC.SQL sql/dict_voc.sql
-cp -a ~/arev/data/DICTDEFI.SQL sql/dict_definitions.sql
+	cp -a ~/arev/data/DICTCHAN.SQL sql/dict_changelog.sql
+	cp -a ~/arev/data/DICTLOCK.SQL sql/dict_locks.sql
+	cp -a ~/arev/data/DICTPROC.SQL sql/dict_processes.sql
+	cp -a ~/arev/data/DICTREQU.SQL sql/dict_requestlog.sql
+	cp -a ~/arev/data/DICTSTAT.SQL sql/dict_statistics.sql
+	cp -a ~/arev/data/DICTUSER.SQL sql/dict_users.sql
+	cp -a ~/arev/data/DICTVOC.SQL sql/dict_voc.sql
+	cp -a ~/arev/data/DICTDEFI.SQL sql/dict_definitions.sql
 :
 : Convert all NEOSYS to EXODUS in sql
 : ===================================
 :
-conv_n_e_osys2exodus sql
+	conv_n_e_osys2exodus sql
+
 :
 #: Get all .cpp and .h files from ~/arev/sys
 : Get all .cpp from ~/arev/sys
@@ -53,34 +60,25 @@ conv_n_e_osys2exodus sql
 :
 : All NEOSYS converted to EXODUS already in ADECOM
 :
-for MODULE in sys
-do
-	mkdir -p  ./$MODULE
-	#cp ~/arev/$MODULE/*.cpp ~/arev/$MODULE/*.h ./$MODULE/
-	cp ~/arev/$MODULE/*.cpp ./$MODULE/
-done
-:
-:
-: Special transfer of number.cpp into exodus/cli/src
-: ==================================================
-:
-	cp ~/arev/xxx/number.cpp ~/exodus/cli/src
-:
+	for MODULE in sys
+	do
+		mkdir -p  ./$MODULE
+		#cp ~/arev/$MODULE/*.cpp ~/arev/$MODULE/*.h ./$MODULE/
+		cp ~/arev/$MODULE/*.cpp ./$MODULE/
+	done
+
 :
 : Create any .h headers in ~/inc
 : ==============================
 :
-compile sys {HS}
+	compile sys {HS}
+
 :
-: Compile
-: =======
+: Compile - skipped for now
+: =========================
 :
 : compile sys
+
 :
-: Finished
-: ========
-:
-duration=$SECONDS
-: "$(($duration / 60)) minutes and $(($duration % 60)) seconds elapsed."
-:
-set +x
+: Finished in "$(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds elapsed."
+: ==============================================================
