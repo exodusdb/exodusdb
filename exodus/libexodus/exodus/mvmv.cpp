@@ -879,7 +879,7 @@ bool var::locateby(const char* ordercode, const var& target, var& setting, const
 }
 
 ///////////////////////////////////////////
-// LOCATE BY USING
+// LOCATE BY ... USING ...
 ///////////////////////////////////////////
 
 // this version caters for the rare syntax where the order is given as a variable
