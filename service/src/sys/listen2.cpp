@@ -43,6 +43,24 @@ var fields;
 function main(in request1, in request2, in request3, in request4, io request5, in request6="") {
 	//c sys in,in,in,in,io,""
 
+	/* LISTEN COMMANDS;
+
+	COMMAND  ARGS                SUCCESS    FAILURE;
+	-------  ----                -------    -------;
+	LOGIN    user,pass,conninfo  userinfo   various reasons;
+	READ     file,key            rec        key doesnt exist;
+	READU    file,key            rec,lockid key already locked by someone else;
+	WRITE    rec,file,key,lockid rec        wrong lockid, or timestamp differs;
+	WRITEU   rec,file,key,lockid (same, but unlocks after writing - rarely used);
+	DELETE   file,key            ok         key currently locked by someone else;
+	SELECT   select statement    data       no recs found;
+	GETINDEX file,field,args     data       no recs found;
+	LOCK     file,key            lockid     key already locked by someone else;
+	RELOCK   file,key,lockid     ok         wrong lockid;
+	UNLOCK   file,key,lockid     ok         wrong lockid;
+	EXECUTE  cmd,args,data       data       command chooses to fail;
+	*/
+
 	//handles VALIDATE,BECOMEUSERANDCONNECTION,LOGIN and RESPOND
 
 	#include <general_common.h>

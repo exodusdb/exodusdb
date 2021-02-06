@@ -412,7 +412,7 @@ DLL_PUBLIC void printt(const Printable&... values)
 
 // output() binary transparent version of print() with no automatic separators. no flush
 template<typename... Printable>
-DLL_PUBLIC void output(Printable&... value)
+DLL_PUBLIC void output(const Printable&... value)
 {
 	LOCKIOSTREAM
 	(var(value).output(), ...);
@@ -420,7 +420,7 @@ DLL_PUBLIC void output(Printable&... value)
 
 // outputl() binary transparent version of printl() with no automatic separators. no flush
 template<typename... Printable>
-DLL_PUBLIC void outputl(Printable&... value)
+DLL_PUBLIC void outputl(const Printable&... value)
 {
 	LOCKIOSTREAM
 	(var(value).output(), ...);

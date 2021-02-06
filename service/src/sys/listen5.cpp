@@ -130,7 +130,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 						if (tt.a(5)) {
 							//garbagecollect;
 							tt = "CMD /C START EXODUS.JS /system " ^ tt.a(5) ^ " /database " ^ tt.a(1) ^ " /pid " ^ tt.a(6);
-							printl(var().at(0), var().at(-4), var().time().oconv("MTS"), " ", tt);
+							printl(at(-40) ^ var().time().oconv("MTS"), " ", tt);
 							tt.osshell();
 						}
 						filename.osdelete();
@@ -708,7 +708,7 @@ nextlock:
 		if (tracing) {
 			printl();
 		}else{
-			print(var().at(0, 1));
+			print(at(0, 1));
 		}
 		var nn = select2data.count(FM);
 		var maxlines = 20;

@@ -163,10 +163,12 @@ function main()
 
 
 	//check conversion of unprintable field marks to unusual ASCII characters
+	//except TM which is ESC
   	std::ostringstream stringstr;
 	stringstr << var(RM ^ FM ^ VM ^ SM ^ TM ^ STM);
 	std::cout << stringstr.str() << std::endl;
-	assert(var(stringstr.str()) == "~^]\\[|");
+	//assert(var(stringstr.str()) == "~^]\\[|");
+	assert(var(stringstr.str()) == "~^]\\" "\x1B" "|");
 
 	// test normalization
 
@@ -434,6 +436,9 @@ function main()
 	printt<'-'>("0", "1", "2", "t");
 	printl<'-'>("0", "1", "2", "l");
 
+	print(RM, FM, VM, SM, TM, STM);
+	printl(RM, FM, VM, SM, TM, STM);
+
 	{
 		static char const sep[] = ", ";
 		print<sep>("0", "1", "2", "p");
@@ -444,11 +449,16 @@ function main()
 		printl<sep>("0", "1", "2", "l");
 	}
 
+	output();
+	output(0);
 	output("0", "1", "2", "p");
 	output("0", "1", "2", "pl");
+	output(RM, FM, VM, SM, TM, STM);
 	outputl();
+	outputl(0);
 	outputl("0", "1", "2", "l");
 	outputl("0", "1", "2", "l");
+	outputl(RM, FM, VM, SM, TM, STM);
 
 	printl();
 	printl("=== errput ===");

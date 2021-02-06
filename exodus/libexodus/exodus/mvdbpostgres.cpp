@@ -2869,7 +2869,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 						throw MVDBException("WITH " ^ dictid ^ " must not appear twice in " ^ sortselectclause.quote());
 
 					calc_fields.r(2,calc_fieldn,opid);
-					calc_fields.r(3,calc_fieldn,word1);
+					calc_fields.r(3,calc_fieldn,word1.lowerer());
 					calc_fields.r(4,calc_fieldn,word2);
 
 					whereclause ^= " true";
@@ -3088,7 +3088,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 				if (calc_fields.a(2,calc_fieldn))
 					throw MVDBException("WITH " ^ dictid ^ " must not appear twice in " ^ sortselectclause.quote());
 				calc_fields.r(2,calc_fieldn,op);
-				calc_fields.r(3,calc_fieldn,value);
+				calc_fields.r(3,calc_fieldn,value.unquote().swap("'" _FM_ "'", FM).convert(FM,SM));
 
 				//place holder to be removed before issuing actual sql command
 				whereclause ^= " true";

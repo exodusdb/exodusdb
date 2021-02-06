@@ -54,7 +54,7 @@ nextrec1:
 	}
 
 	recn += 1;
-	print(var().at(0), var().at(-4), recn, ". ", ID);
+	print(at(-40) ^ recn, ". ", ID);
 
 	reqdate = ID.field("*", 2);
 	if (reqdate lt mindate) {
@@ -146,7 +146,7 @@ nextrec2:
 	}
 
 	recn += 1;
-	print(var().at(0), var().at(-4), recn, ". ", ID);
+	print(at(-40) ^ recn, ". ", ID);
 
 	reqdate = ID.field("*", 2);
 

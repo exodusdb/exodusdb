@@ -39,9 +39,9 @@ Binary    Hex          Comments
 //#endif
 
 //#include <cmath>    //for floor
-#include <cstdlib>  //for exit
-#include <iostream> //cin and cout
-#include <memory>   //for unique_ptr
+//#include <cstdlib>  //for exit
+//#include <iostream> //cin and cout
+//#include <memory>   //for unique_ptr
 
 #ifndef M_PI
 //#define M_PI 3.14159265358979323846f
@@ -186,17 +186,17 @@ var& var::inputn(const int nchars)
 
 		for (;;)
 		{
-			char char1;
+			int int1;
 			{
 				//LOCKIOSTREAM
-				char1 = getkey();
+				int1 = getkey();
 			}
 
 			//quit if no (more) characters available
-			if (char1 < 0)
+			if (int1 < 0)
 				break;
 
-			var_str += char1;
+			var_str += int1;
 		}
 	}
 
@@ -206,26 +206,26 @@ var& var::inputn(const int nchars)
 
 		for (;;)
 		{
-			char char1;
+			int int1;
 			{
 				//LOCKIOSTREAM
-				char1 = getkey();
+				int1 = getkey();
 			}
 
 			// try again after a short delay if no key and not enough characters yet
 			// TODO implement as poll/epoll/select
-			if (char1 < 0)
+			if (int1 < 0)
 			{
 				this->ossleep(100);
 				continue;
 			}
 
 			// Enter/Return key always returns whatever has been entered so far
-			//if (char1 < 0 || char1 == 0x0d)
+			//if (int1 < 0 || int1 == 0x0d)
 			//	break;
 
 			// add the character to the output
-			var_str += char1;
+			var_str += int1;
 
 			// quit if got the desired number of characters
 			//nchars cannot be negative at this point

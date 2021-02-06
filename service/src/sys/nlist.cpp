@@ -1629,7 +1629,7 @@ nextrec:
 		if (printfilename and (not(recn % 100))) {
 			//first recn will be 2
 			//similar in recinit and x2exit
-			print(var().at(0), var().at(-4), recn, ". ", ID, " ", MV);
+			print(at(-40) ^ recn, ". ", ID, " ", MV);
 			 osflush();
 		}
 	}
@@ -1870,7 +1870,7 @@ x2exit:
 	//////
 
 	//similar in recinit and x2exit
-	print(var().at(0), var().at(-4), recn, ". ");
+	print(at(-40) ^ recn, ". ");
 	 osflush();
 
 	//print the closing subtotals

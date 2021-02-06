@@ -264,7 +264,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 	//if cleanup else oswrite cmd on tempfilename:'.CMD'
 
 			//run the wget command
-			print(var().at(0), var().at(-4), var().time().oconv("MTS"), " CONTROL ", cmd.substr(1,50), "... ");
+			print(at(-40) ^ var().time().oconv("MTS"), " CONTROL ", cmd.substr(1,50), "... ");
 
 			//garbagecollect;
 			var().osflush();

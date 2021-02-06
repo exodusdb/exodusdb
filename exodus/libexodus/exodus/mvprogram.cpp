@@ -132,8 +132,19 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 
 		//ops
 
-		//turn ops into numbers for speed
+		var value=calc_fields.a(3,fieldn).convert(SM,VM).unquote();
+
 		var op=calc_fields.a(2,fieldn);
+
+		//multivalued selections are not well supported from mvdbpostgresql. handle the obvious cases"
+		if (value.index(VM)) {
+			if (op == "=")
+				op = "in";
+			else if (op == "<>")
+				op = "not_in";
+		}
+
+		//turn ops into numbers for speed
 		var opno;
 		if (! op)
 			opno=0;
@@ -142,7 +153,6 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 		opnos(fieldn)=opno;
 
 		//reqvalues
-		var value=calc_fields.a(3,fieldn).unquote();
 		if (op=="in" and value[1]=="(" and value[-1]==")") {
 			value.splicer(1,1,"").splicer(-1,1,"");
 			value.swapper("', '",VM);

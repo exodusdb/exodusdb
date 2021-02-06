@@ -685,7 +685,8 @@ subroutine exec() {
 
 	//generate a unique random output file
 	while (true) {
-		linkfilename2 = inpath ^ var(10).pwr(15).rnd().str(8).substr(1,8);
+		//linkfilename2=inpath:str(rnd(10^15),8)[1,8]
+		linkfilename2 = inpath ^ ("00000000" ^ var(99999999).rnd()).substr(-8,8);
 		///BREAK;
 		if (not(oslistf(linkfilename2 ^ ".*"))) break;
 	}//loop;

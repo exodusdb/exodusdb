@@ -77,11 +77,10 @@ nextdoc:
 		// end
 
 		//skip if document already exists
-		var temp;
-		if (temp.read(gen.documents, temp)) {
+		if (tt.read(gen.documents, ID)) {
 			goto nextdoc;
 		}
-		if (temp.read(gen.documents, where ^ ID)) {
+		if (tt.read(gen.documents, where ^ ID)) {
 			goto nextdoc;
 		}
 

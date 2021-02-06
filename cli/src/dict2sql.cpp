@@ -261,7 +261,18 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 	var sourcecode=dictrec.a(8);
 	var ismv=dictrec.a(4)[1]=="M";
 
-	var dict_returns = dictrec.a(7).substr(1,6)=="[DATE," ? "date" : "text";
+	//dict returns text, date, integer or float
+	var dict_returns = "text";
+	var conversion = dictrec.a(7);
+	if (conversion.substr(1,6) == "[DATE,")
+		dict_returns = "date";
+	else if (conversion.substr(1,7) == "[NUMBER") {
+		if (conversion[9] == "0")
+			//[NUMBER,0]
+			dict_returns = "integer";
+		else
+			dict_returns = "float";
+	}
 
 	//auto generate pgsql code for ..._XREF dict records (full text)
 	if (sourcecode.substr(1,11)=="CALL XREF({") {

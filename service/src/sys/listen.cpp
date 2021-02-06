@@ -274,8 +274,8 @@ function main() {
 	serverend.converter("/", OSSLASH);
 	databaseend = datasetcode.lcase() ^ ".end";
 	if (VOLUMES) {
-		atcol0 = var().at(0);
-		clreol = var().at(-4);
+		atcol0 = at(0);
+		clreol = at(-4);
 	}else{
 		atcol0 = "";
 		clreol = "";
