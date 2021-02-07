@@ -7,17 +7,18 @@ libraryinit()
 var printopts;
 var pdfcmd;
 
-function main(in printopts0, out errors) {
-	//c sys in,out
+function main(io osfilename, in printopts0, out errors) {
+	//c sys io,in,out
 
-	//gets filename from system<2> and updates system<2> if successful
+	//osfilename in  ../data/xxxxxxxx.htm
+	//osfilename out ../data/xxxxxxxx.pdf (if successful)
 
-		/*install for Ubuntu 18.04;
+		/* Installation of wkhtmltopdf cmd for Ubuntu;
 
-		//doesnt work well
+		//doesnt work well on 18.04 or 20.04
 		sudo apt-get install wkhtmltopdf;
 
-		//or
+		//THIS WORKS
 
 		https://wkhtmltopdf.org/downloads.html;
 
@@ -41,8 +42,6 @@ function main(in printopts0, out errors) {
 
 		*/
 
-	var htmlfilename = SYSTEM.a(2);
-
 	errors = "";
 
 	//X means dont convert
@@ -56,7 +55,7 @@ function main(in printopts0, out errors) {
 	}
 
 	//only convert .htm files
-	if (htmlfilename.lcase().substr(-4,4) ne ".htm") {
+	if (osfilename.lcase().substr(-4,4) ne ".htm") {
 		return 0;
 	}
 
@@ -82,7 +81,7 @@ function main(in printopts0, out errors) {
 	}
 
 	//generate an output filename
-	var pdffilename = htmlfilename;
+	var pdffilename = osfilename;
 	pdffilename.splicer(-3, 3, "pdf");
 
 	//if index(printopts,'F',1) then
@@ -97,7 +96,7 @@ function main(in printopts0, out errors) {
 	//required on 18.04 to access local images
 	pdfcmd ^= " --enable-local-file-access";
 
-	pdfcmd ^= " -q " ^ htmlfilename ^ " " ^ pdffilename;
+	pdfcmd ^= " -q " ^ osfilename ^ " " ^ pdffilename;
 
 	print("convhtml2pdf :");
 	call shell2(pdfcmd, errors);
@@ -107,7 +106,7 @@ function main(in printopts0, out errors) {
 		printl(pdfcmd);
 		printl(errors);
 	}else{
-		SYSTEM.r(2, pdffilename);
+		osfilename = pdffilename;
 	}
 
 	return 0;

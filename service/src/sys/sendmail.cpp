@@ -345,20 +345,20 @@ forcedemail:
 		errorfilename = "";
 
 		//subject
-		cmd ^= " -s " ^ (subject.quote());
+		cmd ^= VM ^ "-s " ^ (subject.quote());
 
 		//from
 		var fromaddress = params1.a(1);
-		cmd ^= " -r " ^ (fromaddress.quote());
+		cmd ^= VM ^ "-r " ^ (fromaddress.quote());
 
 		//optional cc address
 		if (ccaddress) {
-			cmd ^= " -c " ^ (ccaddress.convert(";", ",").quote());
+			cmd ^= VM ^ "-c " ^ (ccaddress.convert(";", ",").quote());
 		}
 
 		//optional attach file
 		if (attachfilename) {
-			cmd ^= " -A " ^ (attachfilename.quote());
+			cmd ^= VM ^ "-A " ^ (attachfilename.quote());
 		}
 
 		//mark html formatted messages as such
@@ -372,24 +372,24 @@ forcedemail:
 			tt = body.substr(1,20);
 		}
 		tt.ucaser();
-		if (tt.index("<!DOCTYPE") or tt.index("<HTML")) {
-			cmd ^= " -a \"Content-Type: text/html\"";
-			cmd ^= " -a \"MIME-Version: 1.0\"";
+		if ((not(attachfilename) and tt.index("<!DOCTYPE")) or tt.index("<HTML")) {
+			cmd ^= VM ^ "-a \"Content-Type: text/html\"";
+			cmd ^= VM ^ "-a \"MIME-Version: 1.0\"";
 		}
 
 		//if there is a specific reply email address then give it
 		if (replyto) {
-			cmd ^= " -a \"Reply-To: " ^ replyto ^ DQ;
+			cmd ^= VM ^ "-a \"Reply-To: " ^ replyto ^ DQ;
 
 		//otherwise request suppression of replies, particularly automatic ones
 		}else{
-			cmd ^= " -a \"X-Auto-Response-Suppress: RN, NRN, OOF\"";
+			cmd ^= VM ^ "-a \"X-Auto-Response-Suppress: RN, NRN, OOF\"";
 			//maybe Precedence: list would have better results
-			cmd ^= " -a \"Precedence: bulk\"";
+			cmd ^= VM ^ "-a \"Precedence: bulk\"";
 		}
 
 		//to address(es) go last
-		cmd ^= " " ^ toaddress.convert(";", " ");
+		cmd ^= VM ^ " " ^ toaddress.convert(";", " ");
 
 		//ensure the email body is in a file
 		if (bodyfilename eq "") {
@@ -406,6 +406,47 @@ forcedemail:
 			}
 
 		}
+
+		//use neomail instead of mail if attachment
+		//because strangely ubuntu mail doesnt support the -A option
+		if (attachfilename) {
+			var headers = "";
+			var nn = cmd.count(VM) + 1;
+			for (var ii = 2; ii <= nn; ++ii) {
+				var line = cmd.a(1, ii);
+				var opt = line.field(" ", 1);
+				var arg = line.field(" ", 2, 9999);
+				if (arg[1] eq DQ) {
+					arg.splicer(1, 1, "");
+					arg.splicer(-1, 1, "");
+				}
+
+				if (opt eq "-r") {
+					headers ^= VM ^ "From:" ^ arg;
+					headers ^= VM ^ "To:" ^ toaddress;
+
+				} else if (opt eq "-s") {
+					headers ^= VM ^ "Subject:" ^ arg;
+
+				} else if (opt eq "-c") {
+					headers ^= VM ^ "cc:" ^ arg;
+
+				} else if (opt eq "-a") {
+					headers ^= VM ^ arg;
+
+				//case opt='-A'
+				}
+			};//ii;
+
+			headers.splicer(1, 1, "");
+			headers.converter("'", "");
+			headers.swapper(VM, "\r\n");
+
+			cmd = "neomail " ^ (toaddress.quote()) ^ " " ^ (attachfilename.quote()) ^ " " "'" ^ headers ^ "'";
+
+		}
+
+		cmd.converter(VM, " ");
 
 		//and pipe the body file into the program as standard input
 		tt = "\\";

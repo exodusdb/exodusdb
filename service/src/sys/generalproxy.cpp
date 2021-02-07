@@ -13,7 +13,7 @@ libraryinit()
 #include <changelogsubs.h>
 #include <safeselect.h>
 #include <getsubs.h>
-#include <convpdf.h>
+#include <proxysubs.h>
 #include <addcent4.h>
 
 #include <gen_common.h>
@@ -37,12 +37,11 @@ var logfromdate;
 var loguptodate;
 var logkey;
 var logsearch;
-var errors;
 
 function main() {
 	//!subroutine general(request,data,response)
 	//c sys
-	//global task
+	//global mode,stationery,task
 
 	#define request USER0
 	#define data USER1
@@ -77,7 +76,7 @@ function main() {
 
 		perform("PERIODTABLE " ^ year ^ " " ^ finyear ^ " (H)");
 
-		gosub checkoutputfileexists();
+		gosub postproc();
 
 	} else if (mode eq "FILEMAN" and USER0.a(2) eq "COPYDB") {
 
@@ -346,7 +345,7 @@ badsetcodepage:
 
 		perform("SORT PROCESSES");
 
-		gosub checkoutputfileexists();
+		gosub postproc();
 
 	} else if (mode eq "LISTREQUESTLOG") {
 
@@ -354,13 +353,13 @@ badsetcodepage:
 		perform("LISTREQUESTLOG");
 
 		//printopts='L'
-		gosub checkoutputfileexists();
+		gosub postproc();
 
 	} else if (mode eq "LISTLOCKS") {
 
 		perform("SORT LOCKS WITH NO LOCK_EXPIRED");
 
-		gosub checkoutputfileexists();
+		gosub postproc();
 
 	} else if (mode eq "GETVERSIONDATES") {
 
@@ -375,14 +374,14 @@ badsetcodepage:
 		}
 
 		//printopts='L'
-		gosub checkoutputfileexists();
+		gosub postproc();
 
 	} else if (mode eq "LISTADDRESSES") {
 
 		perform("LISTADDRESSES");
 
 		//printopts='L'
-		gosub checkoutputfileexists();
+		gosub postproc();
 
 	} else if (mode eq "GETDEPTS") {
 		call usersubs("GETDEPTS");
@@ -393,7 +392,7 @@ badsetcodepage:
 
 		perform("LISTACTIVITIES " ^ USER0.a(2));
 
-		gosub checkoutputfileexists();
+		gosub postproc();
 
 	} else if (mode eq "ABOUT") {
 		perform("ABOUT");
@@ -427,7 +426,7 @@ badsetcodepage:
 		}
 		call securitysubs("POSTAPP");
 
-		gosub checkoutputfileexists();
+		gosub postproc();
 
 	} else if (mode eq "READUSERS") {
 
@@ -649,7 +648,7 @@ performreport:
 			perform(sentencex);
 			if (not USER3) {
 
-				gosub checkoutputfileexists();
+				gosub postproc();
 			}
 
 		}
@@ -660,7 +659,7 @@ performreport:
 		perform("LISTSTATS");
 
 		//printopts='L'
-		gosub checkoutputfileexists();
+		gosub postproc();
 
 	} else if (mode eq "VIEWLOG") {
 
@@ -692,7 +691,7 @@ performreport:
 		perform(cmd);
 
 		//printopts='L'
-		gosub checkoutputfileexists();
+		gosub postproc();
 
 	} else if (mode eq "LISTMARKETS") {
 
@@ -700,20 +699,20 @@ performreport:
 		cmd ^= " HEADING " ^ (var("List of Markets     'T'     Page 'PL'").quote());
 		perform(cmd);
 
-		gosub checkoutputfileexists();
+		gosub postproc();
 
 	} else if (mode eq "LISTCURRENCIES") {
 
 		perform("LISTCURRENCIES " ^ USER0.a(2));
 
-		gosub checkoutputfileexists();
+		gosub postproc();
 
 	} else if (mode eq "LISTCOMPANIES") {
 
 		perform("LISTCOMPANIES");
 
 		//printopts='L'
-		gosub checkoutputfileexists();
+		gosub postproc();
 
 	} else if (mode.field(".", 1) eq "GETTASKS") {
 
@@ -766,39 +765,44 @@ exit:
 	return "";
 }
 
-subroutine checkoutputfileexists() {
-	if (SYSTEM.a(2).osfile().a(1) gt 5) {
-		USER1 = SYSTEM.a(2);
-		USER3 = "OK";
-
-		//make pdf available as well
-		if (stationery gt 2) {
-			call convpdf(stationery, errors);
-			if (errors) {
-				USER4.r(-1, errors);
-			}
-		}
-
-		//convert to http path
-		USER1 = SYSTEM.a(2);
-		var tt = USER1.index(OSSLASH "data" OSSLASH);
-		if (tt) {
-			USER1 = ".." OSSLASH ".." OSSLASH ^ USER1.substr(tt,999999);
-			SYSTEM.r(2, USER1);
-		}
-
-		if (USER4) {
-			USER3 ^= " " ^ USER4;
-		}
-		USER4 = "";
-	}else{
-		USER3 = USER4;
-		if (USER3 eq "") {
-			USER3 = "Error: No output file in GENERALPROXY " ^ mode;
-			call sysmsg(USER3);
-		}
-	}
+subroutine postproc() {
+	call proxysubs("GENERAL", mode, stationery);
 	return;
+
+	/*;
+	//////////////////////
+	checkoutputfileexists:
+	//////////////////////
+		if dir(system<2>)<1> gt 5 then;
+			data=system<2>;
+			response='OK';
+
+			//make pdf available as well
+			if stationery>2 then;
+				call convpdf(stationery,errors);
+				if errors then msg<-1>=errors;
+				end;
+
+			//convert to http path
+			data=system<2>;
+			tt=index(data,OSSLASH:'data':OSSLASH,1);
+			if tt then;
+				data='..':OSSLASH:'..':OSSLASH:data[tt,999999];
+				system<2>=data;
+				end;
+
+			if msg then response:=' ':msg;
+			msg='';
+		end else;
+			response=msg;
+			if response='' then;
+				response='Error: No output file in GENERALPROXY ':mode;
+				call sysmsg(response);
+				end;
+			end;
+		return;
+	*/
+
 }
 
 subroutine initlog() {
