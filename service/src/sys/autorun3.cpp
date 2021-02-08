@@ -99,9 +99,9 @@ function main(in docids0="", in options0="") {
 	}
 
 	var datasetcode = SYSTEM.a(17);
-	if (!datasetcode)
-		errputl("=== missing datasetcode ==============================================");
-
+	if (not datasetcode) {
+		printl("========== DATASETCODE MISSING ==========");
+	}
 	var islivedb = not(SYSTEM.a(61));
 
 	//allow one autorun per database - hopefully this wont overload the server
@@ -655,7 +655,11 @@ nextsign:
 				body = "@" ^ printfilename;
 				subject ^= " in " ^ timetext;
 			}else{
-				attachfilename = oscwd() ^ "/" ^ printfilename;
+				attachfilename = oscwd();
+				if (not(VOLUMES)) {
+					attachfilename ^= OSSLASH;
+				}
+				attachfilename ^= printfilename;
 				body = timetext;
 			}
 

@@ -249,6 +249,9 @@ nextcomp:
 
 	//current datasetname
 	var temp = SYSTEM.a(23);
+	if (not temp) {
+		temp = SYSTEM.a(17);
+	}
 	temp.swapper("&", " and ");
 	cookie ^= "&db=" ^ temp;
 

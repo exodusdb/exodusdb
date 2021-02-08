@@ -12,12 +12,14 @@ function main(io css, in version="") {
 	//<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
 	//<meta http-equiv="x-ua-compatible" content="IE=6" />
 
-	css=getvogonpoetry(version);
-
 	var charset = SYSTEM.a(127);
 	if (charset) {
-		css = "<meta http-equiv=\"content-type\" content=\"text/html;charset=" ^ charset ^ "\" />\n" ^ css;
+		css = "<meta http-equiv=\"content-type\" content=\"text/html;charset=" ^ charset ^ "\" />\n";
+	} else {
+		css = "<!-- no " ^ SYSTEM.a(17) ^ " charset found -->\n";
 	}
+
+	css ^= getvogonpoetry(version);
 
 	//css.converter(FM, "\r\n");
 

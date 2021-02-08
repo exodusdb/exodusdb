@@ -113,7 +113,7 @@ function main() {
 	var origid = ID;
 	call conv2utf8(msg, RECUR0, "");
 	RECUR1 += 1;
-	print(var().at(0), RECUR1, ". ", RECCOUNT);
+	output(at(-40), RECUR1, ". ", RECCOUNT);
 	ANS = msg;
 	if (not ANS) {
 		ANS = RECORD ne origrecord or ID ne origid;

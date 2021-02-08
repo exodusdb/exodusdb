@@ -1149,12 +1149,17 @@ var ExodusProgramBase::perform(const var& sentence)
 			// and abort multiple levels of perform?
 			ANS = "";
 		}
+		//TODO create a second version of this whole try/catch block
+		//that omits catch (MVError) if EXO_DEBUG is set
+		//so that gdb will catch the original error and allow backtracing there
+		//Until then, use gdb "catch throw" as mentioned below.
 		catch (MVError)
 		{
 			//restore environment in case MVError is caught
 			//in caller and the program resumes processing
 			restore_environment();
 
+			//use gdb command "catch throw" to break at error line to get back traces there
 			throw;
 		}
 

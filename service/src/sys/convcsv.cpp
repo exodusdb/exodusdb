@@ -445,7 +445,7 @@ nextrec:
 	}
 	recn += 1;
 
-	print(at(-40) ^ recn, ". ");
+	output(at(-40), recn, ". ");
 
 	//get the record
 	if (not(RECORD.read(file, ID))) {

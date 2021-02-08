@@ -161,6 +161,8 @@ function main()
 	assert(var("top of the world").tcase()=="Top Of The World");
 	printl(var("top of the world").tcase().fcase());
 
+	var value=R"('1')";
+	assert(value.swap("'",R"(\')")=="\\'1\\'");
 
 	//check conversion of unprintable field marks to unusual ASCII characters
 	//except TM which is ESC

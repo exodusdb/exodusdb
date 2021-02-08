@@ -2366,11 +2366,11 @@ var getword(var& remainingwords, var& ucword)
 	var word1 = remainingwords.field(" ", 1);
 	remainingwords = remainingwords.field(" ", 2, 99999);
 
-	// join quoted words together
+	// join words within quote marks into one quoted phrase
 	var char1 = word1[1];
 	if ((char1 == DQ || char1 == SQ))
 	{
-		while (word1[-1] != char1)
+		while (word1[-1] != char1 || word1.length() <= 1)
 		{
 			if (remainingwords.length())
 			{
@@ -3116,6 +3116,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 
 				//currently tobool requires only text input
 				//TODO some way to detect DATE SYMBOLIC FIELDS and not hack special dict words!
+				//doesnt work on multivalued fields - results in:
+				//exodus_tobool(SELECT_STAGE2_CURSOR_19397_37442_012029.TOT_SUPPINV_AMOUNT_BASE_calc, chr(29),)
 				if (dictexpression.index("FULLY_"))
 					dictexpression ^= " is not null";
 				else
@@ -3261,8 +3263,10 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 				}
 				else
 				{
-					op = "&&";//overlap
-					value = "'{" ^ value.convert("'","\"") ^ "}'";
+					op = "&&";//postgres array overlap operator
+					value.swapper("'","\"");
+					//convert to postrgesql array syntax
+					value = "'{" ^ value ^ "}'";
 				}
 			}
 

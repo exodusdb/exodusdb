@@ -363,7 +363,7 @@ DLL_PUBLIC var sum(const var& instring);
 // 2. static char const sep[] = ", ";	// "hi, ho"
 //    print<sep>("hi","ho");
 
-// print(...) default sep is " ". does not flush output
+// print(...) default sep is " ". No flush
 template<auto sep = ' ', typename Printable, typename... Additional>
 DLL_PUBLIC void print(const Printable& value, const Additional&... values)
 {
@@ -372,14 +372,14 @@ DLL_PUBLIC void print(const Printable& value, const Additional&... values)
 	((std::cout << sep << values), ...);
 }
 
-// printl() no arguments and prints end of line and flushes output
+// printl() no arguments and prints end of line.Flush stdout
 DLL_PUBLIC void printl()
 {
 	LOCKIOSTREAM
 	std::cout << std::endl;
 }
 
-// printl(...) default sep is " ". always prints end of line and flushes output
+// printl(...) default sep is " ". always prints end of line. Flush
 template<auto sep = ' ', typename Printable, typename... Additional>
 DLL_PUBLIC void printl(const Printable& value, const Additional&... values)
 {
@@ -390,7 +390,7 @@ DLL_PUBLIC void printl(const Printable& value, const Additional&... values)
 }
 
 
-// printt() no arguments just prints a sep (default tab). doesnt flush output
+// printt() no arguments just prints a sep (default tab). No flush
 template<auto sep = ' '>
 DLL_PUBLIC void printt()
 {
@@ -398,7 +398,7 @@ DLL_PUBLIC void printt()
 	std::cout << sep;
 }
 
-// printt(...) default sep is tab. always adds a sep (tab) on the end. doesnt flush output
+// printt(...) default sep is tab. always adds a sep (tab) on the end. No flush
 template<auto sep = '\t', typename... Printable>
 DLL_PUBLIC void printt(const Printable&... values)
 {
@@ -410,7 +410,7 @@ DLL_PUBLIC void printt(const Printable&... values)
 //output
 ////////
 
-// output() binary transparent version of print() with no automatic separators. no flush
+// output() BINARY TRANSPARENT version of print(). No automatic separators. No flush
 template<typename... Printable>
 DLL_PUBLIC void output(const Printable&... value)
 {
@@ -418,7 +418,7 @@ DLL_PUBLIC void output(const Printable&... value)
 	(var(value).output(), ...);
 }
 
-// outputl() binary transparent version of printl() with no automatic separators. no flush
+// outputl() BINARY TRANSPARENT version of printl(). No automatic separators. No flush
 template<typename... Printable>
 DLL_PUBLIC void outputl(const Printable&... value)
 {
@@ -464,7 +464,6 @@ template<auto sep = ' ', typename Printable, typename... Additional>
 DLL_PUBLIC void logput(const Printable& value, const Additional&... values)
 {
 	LOCKIOSTREAM
-	//(var(value).output(), ...);
 	std::clog << value;
 	((std::clog << sep << values), ...);
 }
@@ -481,7 +480,6 @@ template<auto sep = ' ', typename Printable, typename... Additional>
 DLL_PUBLIC void logputl(const Printable& value, const Additional&... values)
 {
 	LOCKIOSTREAM
-	//(var(value).output(), ...);
 	std::clog << value;
 	((std::clog << sep << values), ...);
 	std::clog << std::endl;

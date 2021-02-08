@@ -266,10 +266,14 @@ forcedemail:
 	if (attachfilename) {
 
 		attachfilename.swapper("\\\\", "\\");
+		var cwd = oscwd();
+		if (not(VOLUMES)) {
+			cwd ^= OSSLASH;
+		}
 		if (attachfilename.substr(1,2) eq "..") {
-			attachfilename.splicer(1, 2, oscwd().field(OSSLASH, 1, oscwd().count(OSSLASH) - 1));
+			attachfilename.splicer(1, 2, cwd.field(OSSLASH, 1, oscwd().count(OSSLASH) - 1));
 		} else if (attachfilename.substr(1,2) eq ".") {
-			attachfilename.splicer(1, 1, oscwd());
+			attachfilename.splicer(1, 1, cwd);
 		}
 		msgsize += attachfilename.osfile().a(1);
 
