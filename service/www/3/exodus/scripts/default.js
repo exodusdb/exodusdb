@@ -381,6 +381,7 @@ function showpassword_sync() {
         gsavedpasswordelement=currpasswordelement
         //<input tabindex="1" type="password" id="passwordelement" size="15" />
         var el=document.createElement('input')
+        el.classList=gsavedpasswordelement.classList
         el.id='passwordelement'
         el.size=gsavedpasswordelement.size
         el.tabIndex=gsavedpasswordelement.tabIndex

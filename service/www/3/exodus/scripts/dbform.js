@@ -359,7 +359,7 @@ function* formfunctions_onload() {
 
                     //build an input item
                     temp += '<input type=' + elementtype + ' id=' + fieldname
-                    temp += ' style="vertical-align:top"'
+                    temp += ' style="vertical-align:middle"'
                     if (element.getAttribute('exodusreadonly'))
                         temp += ' disabled=true'
                     //temp+='<span style="white-space: nowrap"><input type='+elementtype+' id='+element.name
@@ -376,7 +376,7 @@ function* formfunctions_onload() {
 
                     //postfix the option title
                     if (typeof (options[ii][1]) != 'undefined')
-                        temp += '<span style="vertical-align:top; white-space: nowrap">' + options[ii][1] + '</span>'
+                        temp += '<span style="vertical-align:middle; white-space: nowrap">' + options[ii][1] + '</span>'
 
                     //horizontal or vertical
                     //if vertical then add <br /> between options
@@ -1967,7 +1967,7 @@ function* printsendrecord_onclick(event) {
     exoduscancelevent(event)
 
     //work out the print function else return
-    var printfunction = gKeyNodes[0].getAttribute('exodusprintfunction')
+    var printfunction = gKeyNodes && gKeyNodes[0].getAttribute('exodusprintfunction')
     if (!printfunction)
         return
     //printfunction=printfunction.replace(/%KEY%/g,gkeyexternal)
@@ -1992,7 +1992,7 @@ function* listrecord_onclick(event) {
     exoduscancelevent(event)
 
     //work out the print function else return
-    var listfunction = gKeyNodes[0].getAttribute('exoduslistfunction')
+    var listfunction = gKeyNodes && gKeyNodes[0].getAttribute('exoduslistfunction')
     if (!listfunction)
         return
 

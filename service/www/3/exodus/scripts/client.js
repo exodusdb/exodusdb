@@ -732,19 +732,19 @@ function blockmodalui_sync() {
                     if (gchildwin.xhttp)
                         dialogargs.xhttp = gchildwin.xhttp
 
-                    //var dialogstyle
-			        var newwidth = 200
-			        var newheight = 120
-			        var max=getmaxwindow_sync()
-			        var newleft = 0 + (max.width - newwidth) / 2
-			        var newtop = 0 + (max.height - newheight) / 2
-			        var dialogstyle = 'top='+newtop+', left='+newleft+', width='+newwidth+', height='+newheight
-					dialogstyle +', menubar=no, scrollbars=no, status=no, titlebar=no, toolbar=no'
-					//alert(dialogstyle)
+                    //similar code in blockmodalui_sync and exodusconfirm
+                    var dialogstyle
+                    var newwidth = 200
+                    var newheight = 100
+                    var max=getmaxwindow_sync()
+                    var newleft = 0 + (max.width - newwidth) / 2
+                    var newtop = 0 + (max.height - newheight) / 2
+                    var dialogstyle = 'top='+newtop+', left='+newleft+', width='+newwidth+', height='+newheight
+                    //alert(dialogstyle)
 
                     //cant call exodusshowmodaldialog because that requires a global gcurrentevent variable/generator function
                     //and that global/generator is already in use handling some current event that is yielded for async xmlhttprequest
-                    actualwin = window.open(EXODUSlocation + 'confirm.htm', 'noautofit', dialogstyle)
+                    actualwin = window.open(EXODUSlocation + 'confirm.htm', '', dialogstyle)
                     gchildwin.actual = actualwin
 
                     if (!actualwin) {
@@ -3325,12 +3325,15 @@ function* exodusconfirm(question, defaultbutton, yesbuttontitle, nobuttontitle, 
         //:'dialogHeight: 220px; dialogWidth: 500px;'
         //dialogstyle+=' center: Yes; help: No; resizable: No; status: No;'
 
-        var newwidth = 600
-        var newheight = 300
+        //similar code in blockmodalui_sync and exodusconfirm
+        var newwidth = 200
+        var newheight = 150
         var max=getmaxwindow_sync()
         var newleft = 0 + (max.width - newwidth) / 2
         var newtop = 0 + (max.height - newheight) / 2
         var dialogstyle = 'top='+newtop+', left='+newleft+', width='+newwidth+', height='+newheight
+        //sadly has no effect
+        dialogstyle +', menubar=no, scrollbars=no, status=no, titlebar=no, toolbar=no'
 
         var response = yield* exodusshowmodaldialog(EXODUSlocation + 'confirm.htm', dialogargs, dialogstyle)
     }

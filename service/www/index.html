@@ -1,27 +1,30 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
+
 <head>
-<title>EXODUS Login</title>
+    <title>EXODUS Login</title>
 
     <script type="text/javascript">
- var isMSIE = typeof ActiveXObject != 'undefined' || ('ActiveXObject' in window)//|| is for MSIE11
- // /2/ new code but still using showmodaldialog (internet explorer)
- // /3/ new code using yield and not showmodaldialog (firefox, chrome, safari?)
- 
- // /1/ (old MSIE-only code) can be accessed from /2/ and /3/ from Help Menu
- //     IS NO LONGER INSTALLED OR UPGRADED BUT REMAINS ON OLD INSTALLATIONS
- // old code switches to /2/ if is MSIE or /1/ if not
- // /1/ switches to /2/ or /3/ as follows:
- // /2/ if browser HASNT got yield and HASNT got showmodaldialog method
- // /3/ if browser HAS got yield - firefox chrome safari?
- // otherwise is stays as /1/ (MSIE)
- // window.location.assign((isMSIE?2:1)+'/')
+        var isMSIE = typeof ActiveXObject != 'undefined' || ('ActiveXObject' in window)//|| is for MSIE11
+        // /2/ new code but still using showmodaldialog (internet explorer)
+        // /3/ new code using yield and not showmodaldialog (firefox, chrome, safari?)
 
- //new code switches to /2/ if is MSIE or /3/ if not
- window.location.assign((isMSIE?2:3)+'/')
- 
+        // /1/ (old MSIE-only code) can be accessed from /2/ and /3/ from Help Menu
+        //     IS NO LONGER INSTALLED OR UPGRADED BUT REMAINS ON OLD INSTALLATIONS
+        // old code switches to /2/ if is MSIE or /1/ if not
+        // /1/ switches to /2/ or /3/ as follows:
+        // /2/ if browser HASNT got yield and HASNT got showmodaldialog method
+        // /3/ if browser HAS got yield - firefox chrome safari?
+        // otherwise is stays as /1/ (MSIE)
+        // window.location.assign((isMSIE?2:1)+'/')
+
+        //new code switches to /2/ if is MSIE or /3/ if not
+        window.location.assign((isMSIE ? 2 : 3) + '/')
+
     </script>
 
 </head>
+
 <body>
     <!-- copy this to wrongbrowser.htm and top level redirecing default.htm as well -->
     <div style="text-align: center" id="wrongconfiguration">
@@ -44,11 +47,13 @@
                     </td>
                     <td>
 
-                        <script type="text/javascript">                                document.writeln(navigator.appName)</script>
+                        <script
+                            type="text/javascript">                                document.writeln(navigator.appName)</script>
 
                         <br />
 
-                        <script type="text/javascript">                                document.writeln(navigator.userAgent)</script>
+                        <script
+                            type="text/javascript">                                document.writeln(navigator.userAgent)</script>
 
                     </td>
                 </tr>
@@ -60,7 +65,8 @@
                         <noscript>
                             <span style="color: Red"><b>Scripting disabled</b></span></noscript>
 
-                        <script type="text/javascript">                                document.write('Scripting enabled')</script>
+                        <script
+                            type="text/javascript">                                document.write('Scripting enabled')</script>
 
                     </td>
                 </tr>
@@ -72,7 +78,8 @@
                         <noscript>
                             <span style="color: Red"><b>Unknown</b></span></noscript>
 
-                        <script type="text/javascript">                                document.writeln((!window.dialogArguments && navigator.cookieEnabled) ? 'Cookies enabled' : '<font color="red"><B>Cookies disabled</B></font>')</script>
+                        <script
+                            type="text/javascript">                                document.writeln((!window.dialogArguments && navigator.cookieEnabled) ? 'Cookies enabled' : '<font color="red"><B>Cookies disabled</B></font>')</script>
 
                     </td>
                 </tr>
@@ -80,4 +87,5 @@
         </div>
     </div>
 </body>
+
 </html>

@@ -1,32 +1,34 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html lang="en">
+
 <head>
+    <title>EXODUS Login</title>
 
     <script type="text/javascript">
 
         var EXODUSlocation = 'exodus/'
         var glogin = true
         var gshowmenu = false
-        var gswitchingbrowser=false
+        var gswitchingbrowser = false
 
         //1. following code will, in exodus/3, switch to exodus (exodus/2 in future) if the browser doesnt support yield - eg MSIE
         //2. note that client.js in exodus2 will switch to exodus/3 if showmodaldialog is not supported (and yield is supported)
         // yield //var guseyield=false //activated in exodus/2 - code doesnt use yield
-        /* yield */var guseyield=true  //activated in exodus/3 - code has yield
+        /* yield */var guseyield = true  //activated in exodus/3 - code has yield
         if (guseyield) {
-                
+
             //determine if yield * supported by browser
             var gcan_yield
-            try{eval('function * f(x){return yield * true;}');gcan_yield=true} catch(e){gcan_yield=false}
+            try { eval('function * f(x){return yield * true;}'); gcan_yield = true } catch (e) { gcan_yield = false }
 
             //cannot continue in non-yielding code if browser does not support showmodaldialog
             //if (!window.showModalDialog && !guseyield) {
             if (!gcan_yield) {
-                gswitchingbrowser=true
+                gswitchingbrowser = true
                 if (window.showModalDialog) {
-                    var oldurl=window.location.toString()
-                    window.location=oldurl.replace(/\/3\//,'/2/')
-                }                    
+                    var oldurl = window.location.toString()
+                    window.location = oldurl.replace(/\/3\//, '/2/')
+                }
             }
 
         }
@@ -40,12 +42,12 @@
 
     </script>
 
-    <title>EXODUS Login</title>
 </head>
+
 <body>
     <div id="autofitwindowelement" style="margin-left: auto; margin-right: auto; float: left">
         <div id="logindiv" style="display: none">
-            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+            <table>
                 <tr>
                     <td style="vertical-align: middle" rowspan="4">
                         <span style="white-space: nowrap;margin-right:10px">
@@ -53,51 +55,63 @@
                         </span>
                     </td>
                     <td>
-                        <table border="0">
-                            <tr>
-                                <td style="vertical-align: top">
-                                    <b>User Code:</b>
-                                    <br />
-                                    <input tabindex="1" style="text-transform: uppercase" id="usernameelement" size="15" />&nbsp;&nbsp;&nbsp;
-                                </td>
-                                <td style="vertical-align: top">
-                                    <b>Password:</b>
-                                    <br />
-                                    <input tabindex="1" type="password" id="passwordelement" size="15" />&nbsp;&nbsp;&nbsp;
-                                </td>
-                                <td style="vertical-align: top" align="left">
-                                    <b>&nbsp;</b>
-                                    <br />
-                                    <span style="white-space: nowrap">
-                                        <button tabindex="1" id="showpasswordelement" onclick="showpassword_sync()">
-                                            Show Password</button>
-                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>
-                                </td>
-                                <td style="vertical-align: top" align="left">
-                                    <b>&nbsp;</b>
-                                    <br />
-                                    <span style="white-space: nowrap">
-                                        <button tabindex="1" id="loginbutton" type="submit">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <b>User Code:</b>
+                                    </th>
+                                    <th>
+                                        <b>Password:</b>
+                                    </th>
+                                    <th>
+                                    </th>
+                                    <th style="padding-right:2rem">
+                                        <b>Autologin</b>
+                                    </th>
+                                    <th>
+                                        <b>Password</b>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="padding-right:1rem">
+                                        <input tabindex="1" style="text-transform: uppercase;" id="usernameelement"
+                                            class="clsRequired" size="15" />
+                                    </td>
+                                    <td style="padding-right:1rem">
+                                        <input tabindex="1" type="password" id="passwordelement" class="clsRequired"
+                                            size="15" />
+                                    </td>
+                                    <td style="white-space: nowrap;padding-right:1rem">
+                                        <button tabindex="1" id="loginbutton" type="submit" class="exodusbutton" title="Press F9 or Ctrl+Enter">
                                             Login</button>
-                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>
-                                </td>
-                                <td style="vertical-align: top">
-                                    <div>
-                                        Autologin</div>
-                                    <input type="checkbox" tabindex="1" id="autologinelement" />
-                                    &nbsp;&nbsp;&nbsp;
-                                </td>
-                                <td>
-                                    &nbsp;&nbsp;&nbsp;
-                                </td>
-                                <td style="vertical-align: top">
-                                    <div>
-                                        Password</div>
-                                    <button tabindex="1" id="passwordresetbutton">
-                                        Reset</button>
-                                    &nbsp;&nbsp;&nbsp;
-                                </td>
-                            </tr>
+                                    </td>
+                                    <td style="padding-right:1rem;text-align: center;">
+                                        <input type="checkbox" tabindex="1" id="autologinelement" />
+                                    </td>
+                                    <td>
+                                        <button tabindex="1" id="passwordresetbutton" class="exodusbutton">
+                                            Reset</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                    </th>
+                                    <th>
+                                        <button tabindex="1" id="showpasswordelement" onclick="showpassword_sync()"
+                                            class="exodusbutton">
+                                            Show Password</button>
+                                    </th>
+                                    <th>
+                                    </th>
+                                    <th>
+                                    </th>
+                                    <th>
+                                    </th>
+                                </tr>
+                            </tbody>
                         </table>
                     </td>
                 </tr>
@@ -110,7 +124,7 @@
                     <td colspan="3" style="vertical-align: top">
                         <b>Database:</b>
                         <br />
-                        <select id="datasetelement">
+                        <select id="datasetelement" class="clsRequired">
                         </select>
                     </td>
                 </tr>
@@ -124,7 +138,8 @@
                         &nbsp;
                     </td>
                     <td colspan="4">
-                        <span style="white-space: nowrap">Version 2020-11-18  Copyright NEOSYS All rights reserved.</span>
+                        <span style="white-space: nowrap">Version 2020-11-18 Copyright NEOSYS All rights
+                            reserved.</span>
                     </td>
                 </tr>
             </table>
@@ -150,11 +165,13 @@
                         </td>
                         <td>
 
-                            <script type="text/javascript">                                document.writeln(navigator.appName)</script>
+                            <script
+                                type="text/javascript">                                document.writeln(navigator.appName)</script>
 
                             <br />
 
-                            <script type="text/javascript">                                document.writeln(navigator.userAgent)</script>
+                            <script
+                                type="text/javascript">                                document.writeln(navigator.userAgent)</script>
 
                         </td>
                     </tr>
@@ -166,7 +183,8 @@
                             <noscript>
                                 <span style="color: Red"><b>Scripting disabled</b></span></noscript>
 
-                            <script type="text/javascript">                                document.write('Scripting enabled')</script>
+                            <script
+                                type="text/javascript">                                document.write('Scripting enabled')</script>
 
                         </td>
                     </tr>
@@ -178,7 +196,8 @@
                             <noscript>
                                 <span style="color: Red"><b>Unknown</b></span></noscript>
 
-                            <script type="text/javascript">                                document.writeln((!window.dialogArguments && navigator.cookieEnabled) ? 'Cookies enabled' : '<font color="red"><B>Cookies disabled</B></font>')</script>
+                            <script
+                                type="text/javascript">                                document.writeln((!window.dialogArguments && navigator.cookieEnabled) ? 'Cookies enabled' : '<font color="red"><B>Cookies disabled</B></font>')</script>
 
                         </td>
                     </tr>
@@ -189,4 +208,5 @@
             Please wait ...</div>
     </div>
 </body>
+
 </html>

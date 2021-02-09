@@ -238,8 +238,11 @@ administrator@win10b.neosys.com		850
 */
 $gweb_codepage = 'UTF-8';
 $gdatabase_codepage = '';
-if ($database) {
-
+$gdatabase_codepage = 'UTF-8';
+//Only look for codepage on windows.
+//For now at least, assume database is always UTF-8 on linux
+//in order to avoid accidentally using DATA.CFG migrated from windows
+if ($database && $gwindows) {
 	$database_config_filename = $gdatalocation . $databasedir . 'DATA.CFG';
 	$database_config_filename2 = $gdatalocation . 'DATA.CFG';
 	//$database_config=file_get_contents($database_config_filename);

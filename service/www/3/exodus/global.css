@@ -38,6 +38,7 @@ BODY, BUTTON, INPUT, SELECT, TEXTAREA, SPAN, DIV, TD, TH, P, BR, A, SMALL, BIG
     font-family: verdana,sans-serif,arial,helvetica;
     font-size: 8pt;
     min-height: 13px;
+    border: 1px;
 }
 
 /*blue blur on focus*/
@@ -69,20 +70,33 @@ BODY
 
 .exodusbutton
 {
+    
     background-color: #F0F0F0;
-    padding: 0px 0px 0px 0px;
+    padding: 2px 3px;
     font-size: 90%;
+    border-color: #cccccc;
+    border-width: 2px;
+    border-style: outset;
+    border-radius: 0.3rem;
+
+    /*float: left;*/
+/*    font-size: inherit;
+    margin: 2px;
+    cursor: pointer;
+    background-color: #f0f0f0;
+    padding: 4px 2px 5px 2px;
+
+    border-color: #cccccc;
+    border-width: 2px;
+    border-style: outset;
+    border-radius: 0.3rem;
+*/
 }
 
 BUTTON
 {
     cursor: pointer;
     background-color: #F0F0F0;
-}
-
-BUTTON, INPUT, SELECT, TEXTAREA, SPAN
-{
-    margin: 0px;
 }
 
 TH
@@ -251,7 +265,7 @@ H6
 {
     float: left;
     font-size: inherit;
-    background-color: #f0f0f0; /*float:left;*/
+    background-color: #f0f0f0;
     border-color: #cccccc;
     margin: 2px;
     border-width: 2px;
