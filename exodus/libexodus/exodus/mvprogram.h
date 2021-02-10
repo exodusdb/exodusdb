@@ -130,7 +130,7 @@ class ExodusProgramBase
 
 	var decide(const var& question, const var& options) const;
 	var decide(const var& question, const var& options, var& reply,
-		   const int defaultreply = 0) const;
+		   const int defaultreply = 1) const;
 
 	void savescreen(var& origscrn, var& origattr) const;
 	// void ostime(var& ostimenow) const;

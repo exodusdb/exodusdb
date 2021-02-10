@@ -349,15 +349,14 @@ std::string ExodusFunctorBase::libfilename(std::string libraryname) const
 
 	//look for lib file in ~/lib/libXXXXXX.so
 	//otherwise just default library libXXXXXX.so
-	var libfilename = EXODUSLIBPREFIX + libraryname + EXODUSLIBEXT;
+	std::string libfilename = EXODUSLIBPREFIX + libraryname + EXODUSLIBEXT;
 	if (libfilename[0] == '~') {
 		#pragma warning(disable : 4996)
 		// env string is copied into string so following getenv usage is safe
 		var exo_HOME;
 		if (not exo_HOME.osgetenv("EXO_HOME"))
 			exo_HOME.osgetenv("HOME");
-		libfilename.replacer(0, 1, exo_HOME);
-		//var(libraryfilename_).outputl();
+		libfilename.replace(0, 1, exo_HOME);
 	}
 
 	return libfilename;

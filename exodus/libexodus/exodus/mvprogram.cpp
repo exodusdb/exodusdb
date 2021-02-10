@@ -480,6 +480,7 @@ void ExodusProgramBase::note(const var& msg, const var& options, var& buffer,
 {
 	mssg(msg, options, buffer, params);
 }
+
 void ExodusProgramBase::mssg(const var& msg, const var& options) const
 {
 	var buffer = "";
@@ -501,7 +502,7 @@ void ExodusProgramBase::mssg(const var& msg, const var& options, var& buffer,
 
 	msg1.converter(_FM_ _VM_ "|","\n\n\n").trimmer("\n");
 
-	std::cout << msg1;
+	std::cout << msg1 << std::endl;
 
 	var origbuffer = buffer.assigned() ? buffer : "";
 
@@ -511,15 +512,17 @@ void ExodusProgramBase::mssg(const var& msg, const var& options, var& buffer,
 		if (interactive) {
 
 			//one space after the prompt
-			std::cout << " ";
+			//std::cout << " ";
 
-			//input
-			buffer="";
-			buffer.input();
+			if (buffer.unassigned())
+				buffer="";
+
+			//input with empty prompt allows defaulting and editing
+			buffer.input("");
 
 			//default
-			if (buffer == "")
-				buffer=origbuffer;
+			//if (buffer == "")
+			//	buffer=origbuffer;
 
 			//escape anywhere in the input returned as a single ESC character
 	        //or empty input with ESC option means ESC
@@ -1540,7 +1543,7 @@ var ExodusProgramBase::decide(const var& questionx, const var& optionsx, var& re
 		return options.a(reply);
 	}
 
-	question.converter(VM ^ "|", "\n\n").trimmer("\n");
+	question.converter(VM ^ "|" ^ FM, "\n\n\n").trimmer("\n");
 	std::cout << question << std::endl;
 
 	//	var noptions = options.count(FM) + (options != "");

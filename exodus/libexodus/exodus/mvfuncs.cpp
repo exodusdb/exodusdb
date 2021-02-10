@@ -112,6 +112,7 @@ bool var::hasinput(int milliseconds)
 	return haskey(milliseconds);
 }
 
+//binary safe version with little or no editing except backspace and no default
 var& var::input()
 {
 	THISIS("bool var::input()")
@@ -129,7 +130,8 @@ var& var::input()
 	return *this;
 }
 
-// not binary safe because we allow line editing when there is a prompt (even if empty)
+// input with prompt allows default value and editing
+// but is not binary safe because we allow line editing when there is a prompt (even if empty)
 var& var::input(const var& prompt)
 {
 	THISIS("bool var::input(const var& prompt")
