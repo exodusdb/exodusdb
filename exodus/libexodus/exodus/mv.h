@@ -47,7 +47,9 @@ THE SOFTWARE.
 // Using dllimport and dllexport in C++ Classes
 // http://msdn.microsoft.com/en-us/library/81h27t8c(VS.80).aspx
 
-#define SMALLEST_NUMBER 1e-13
+//#define SMALLEST_NUMBER 1e-13
+//0.00000000000023 = sum(1287.89,-1226.54,-61.35,1226.54,-1226.54)
+#define SMALLEST_NUMBER 1e-10
 
 #if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
 #ifdef BUILDING_LIBRARY

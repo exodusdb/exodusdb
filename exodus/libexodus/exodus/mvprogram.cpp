@@ -491,6 +491,10 @@ void ExodusProgramBase::mssg(const var& msg, const var& options, var& buffer,
 {
 
 	var interactive = !SYSTEM.a(33);
+
+	if (interactive)
+		std::cout << var("-").str(40) << std::endl;
+
 	//we must pass the message unmodified into USER4 below
 	//e.g. to pass ACCOUNTLIST back to client with FM/VM etc
 	//var msg1 = msg.convert("|" ^ FM ^ VM ^ SM, "\n\n\n\n").trim("\n");
@@ -518,7 +522,7 @@ void ExodusProgramBase::mssg(const var& msg, const var& options, var& buffer,
 				buffer="";
 
 			//input with empty prompt allows defaulting and editing
-			buffer.input("");
+			buffer.input("? ");
 
 			//default
 			//if (buffer == "")
@@ -1516,53 +1520,83 @@ void ExodusProgramBase::setprivilege(const var& var1)
 var ExodusProgramBase::decide(const var& question, const var& options) const
 {
 	var reply = "";
-	var buffer;
-	return decide(question, options, reply, buffer);
+	return decide(question, options, reply, 1);
 }
 
 var ExodusProgramBase::decide(const var& questionx, const var& optionsx, var& reply,
-			      const int defaultreply) const
+		const int defaultreply) const
 {
 
-	var interactive = !SYSTEM.a(33);
+	// If default reply is 0 then there is no default
+	// and pressing Enter returns "" and reply is set to 0
 
-	var options = optionsx;
+	// question can be multiline
 	var question = questionx;
+	question.converter(STM ^ TM ^ SM ^ VM ^ "|" ^ FM, "\n\n\n\n\n\n");
 
-	options.converter(VM ^ "|", FM ^ FM);
-	if (!interactive)
-	{
-		if (defaultreply)
-		{
-			reply = defaultreply;
-		}
-		else
-		{
-			reply = 1;
-		}
-		return options.a(reply);
-	}
+	var interactive = !SYSTEM.a(33);
+	if (interactive)
+		std::cout << var("-").str(40) << std::endl;
 
-	question.converter(VM ^ "|" ^ FM, "\n\n\n").trimmer("\n");
 	std::cout << question << std::endl;
 
 	//	var noptions = options.count(FM) + (options != "");
+	var options = optionsx;
+	options.converter(VM ^ "|", FM ^ FM);
 	var noptions = options.dcount(FM);
 	for (int optionn = 1; optionn <= noptions; optionn++)
+	{
+		if (optionn == defaultreply)
+			std::cout << "*";
+		else
+			std::cout << " ";
 		std::cout << optionn << ". " << options.a(optionn) << std::endl;
+	}
 
 inp:
-	reply.input();
-	if (reply == "" || reply >= 1 || reply <= noptions)
-	{
-		return reply;
-	}
+	if (defaultreply)
+		std::cout << " Please enter 1 - " << noptions << " or Enter to default or 0 to cancel.";
 	else
+		std::cout << " Please enter 1 - " << noptions << " or Enter to cancel.";
+	std::cout << std::endl;
+
+	reply = "";
+
+	if (interactive)
 	{
-		goto inp;
+		reply.input("? ");
+
+		//entering ESC anywhere in the input causes "no response"
+		if(reply.index("\x1B"))
+			reply = 0;
+
+		//reply must be numeric in range
+		if (!reply.isnum())
+			goto inp;
+
 	}
 
-	return "";
+
+	//no input means use default which might be zero
+	if (reply == "")
+		reply = defaultreply;
+
+	//reply must be integer
+	reply = int(reply);
+
+	//zero or empty response
+	if (!reply)
+		return "";
+
+	//reply must be 0 to noptions
+	if (reply < 0 || reply > noptions) {
+		if (interactive)
+			goto inp;
+		throw MVError(questionx ^ " Default reply must be 0-" ^ noptions);
+	}
+
+	return options.a(reply);
+
 }
 
 void ExodusProgramBase::savescreen(var& origscrn, var& origattr) const

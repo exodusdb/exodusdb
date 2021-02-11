@@ -158,7 +158,7 @@ var& var::input(const var& prompt)
 	else {
 		//swap double quotes with \"
 		default_input.swapper("\"","\\\"");
-		var cmd="bash -c 'read -i " ^ default_input.quote() ^ " -e EXO_TEMP_READ && printf \"$EXO_TEMP_READ\"'";
+		var cmd="bash -c 'read -i " ^ default_input.quote() ^ " -e EXO_TEMP_READ && printf \"%s\" \"$EXO_TEMP_READ\"'";
 		//cmd.outputl("cmd=");
 		this->osshellread(cmd);
 	}
