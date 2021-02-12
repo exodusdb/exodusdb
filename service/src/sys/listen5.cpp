@@ -786,7 +786,7 @@ nextlock:
 			return 0;
 		}
 
-		if (var(installend).osfile() or var(serverend).osfile()) {
+		if (installend.osfile() or serverend.osfile()) {
 			//response='Error: Database already stopped/stopping'
 			call listen4(19, USER3);
 
@@ -813,12 +813,12 @@ nextlock:
 			if (otherusersx) {
 				//response='Error: Could not terminate ':otherusersx<1>:' processes|':otherusersx<2>
 				call listen4(20, USER3, otherusersx);
-				var(installend).osdelete();
+				installend.osdelete();
 			}else{
 				osshell("NET STOP EXODUSSERVICE");
 
 				if (request2.substr(1,7) eq "RESTART") {
-					var(installend).osdelete();
+					installend.osdelete();
 					osshell("NET START EXODUSSERVICE");
 				}
 
@@ -826,7 +826,7 @@ nextlock:
 			}
 
 			if (request2.index("ALL")) {
-				var(serverend).osdelete();
+				serverend.osdelete();
 			}
 		}
 

@@ -183,31 +183,31 @@ function main(in mode, io dataio, in params0="", in params20="") {
 		//similar code in INIT.GENERAL and HTMLLIB
 		//name can be CLIENT OS or SERVER OS
 		var osname = "";
-		if (var(agent).index("NT 10.0")) {
+		if (agent.index("NT 10.0")) {
 			osname = "10";
-		} else if (var(agent).index("NT 6.3")) {
+		} else if (agent.index("NT 6.3")) {
 			osname = "8.1";
-		} else if (var(agent).index("NT 6.2")) {
+		} else if (agent.index("NT 6.2")) {
 			osname = "8";
-		} else if (var(agent).index("NT 6.1")) {
+		} else if (agent.index("NT 6.1")) {
 			osname = "7";
-		} else if (var(agent).index("NT 6.0")) {
+		} else if (agent.index("NT 6.0")) {
 			osname = "Vista/2008";
-		} else if (var(agent).index("NT 5.2")) {
+		} else if (agent.index("NT 5.2")) {
 			osname = "XP-64";
-		} else if (var(agent).index("NT 5.1")) {
+		} else if (agent.index("NT 5.1")) {
 			osname = "XP";
-		} else if (var(agent).index("Windows NT ")) {
-			var tt = var(agent).index("Windows NT ");
-			osname = ((var(agent).substr(tt + 11,9999)).field(";", 1)).field(")", 1);
+		} else if (agent.index("Windows NT ")) {
+			var tt = agent.index("Windows NT ");
+			osname = ((agent.substr(tt + 11,9999)).field(";", 1)).field(")", 1);
 		}
-		if (var(agent).index("WOW64")) {
+		if (agent.index("WOW64")) {
 			osname ^= "-64";
 		}
 		if (osname) {
 			osname = "Win" ^ osname;
 			//add touch if Windows but not Windows Phone
-			if (var(agent).index("Touch")) {
+			if (agent.index("Touch")) {
 				osname ^= " Touch";
 			}
 		}
@@ -215,34 +215,34 @@ function main(in mode, io dataio, in params0="", in params20="") {
 		if (not osname) {
 			var tt = 0;
 			if (not tt) {
-				tt = var(agent).index("Android ");
+				tt = agent.index("Android ");
 			}
 			if (not tt) {
-				tt = var(agent).index("Android");
+				tt = agent.index("Android");
 			}
 			if (not tt) {
-				tt = var(agent).index("iPhone OS");
+				tt = agent.index("iPhone OS");
 			}
 			if (not tt) {
-				tt = var(agent).index("CPU OS");
+				tt = agent.index("CPU OS");
 			}
 			if (not tt) {
-				tt = var(agent).index("Mac OS");
+				tt = agent.index("Mac OS");
 			}
 			if (not tt) {
-				tt = var(agent).index("Windows Phone ");
+				tt = agent.index("Windows Phone ");
 				if (tt) {
-					var(agent).splicer(tt, 13, "WinPhone");
+					agent.splicer(tt, 13, "WinPhone");
 				}
 			}
 			if (not tt) {
-				tt = var(agent).index("Linux");
+				tt = agent.index("Linux");
 			}
 			if (not tt) {
-				tt = var(agent).index("CrOS");
+				tt = agent.index("CrOS");
 			}
 			if (tt) {
-				osname = var(agent).substr(tt,9999);
+				osname = agent.substr(tt,9999);
 				if (osname.substr(1,4) eq "CPU ") {
 					osname.splicer(1, 3, "iPad");
 				}
@@ -261,13 +261,13 @@ function main(in mode, io dataio, in params0="", in params20="") {
 
 		//Trident tells you the actual browser software for MS
 		var browser = "";
-		if (var(agent).index("Trident/7.0")) {
+		if (agent.index("Trident/7.0")) {
 			browser = "11";
-		} else if (var(agent).index("Trident/6.0")) {
+		} else if (agent.index("Trident/6.0")) {
 			browser = "10";
-		} else if (var(agent).index("Trident/5.0")) {
+		} else if (agent.index("Trident/5.0")) {
 			browser = "9";
-		} else if (var(agent).index("Trident/4.0")) {
+		} else if (agent.index("Trident/4.0")) {
 			browser = "8";
 		}
 
@@ -278,15 +278,15 @@ function main(in mode, io dataio, in params0="", in params20="") {
 		//MSIE 7.0  Windows Internet Explorer 7 or IE7 Compatibility View/Browser Mode
 		//MSIE 6.0  Microsoft Internet Explorer 6
 		var iemode = "";
-		if (var(agent).index("MSIE 10.0")) {
+		if (agent.index("MSIE 10.0")) {
 			iemode = "10";
-		} else if (var(agent).index("MSIE 9.0")) {
+		} else if (agent.index("MSIE 9.0")) {
 			iemode = "9";
-		} else if (var(agent).index("MSIE 8.0")) {
+		} else if (agent.index("MSIE 8.0")) {
 			iemode = "8";
-		} else if (var(agent).index("MSIE 7.0")) {
+		} else if (agent.index("MSIE 7.0")) {
 			iemode = "7";
-		} else if (var(agent).index("MSIE 6.0")) {
+		} else if (agent.index("MSIE 6.0")) {
 			iemode = "6";
 		}
 
@@ -303,24 +303,24 @@ function main(in mode, io dataio, in params0="", in params20="") {
 
 		if (not browser) {
 			//tt=index(agent,'Chrome',1)
-			var tt = var(agent).index("Edge");
+			var tt = agent.index("Edge");
 			if (not tt) {
-				tt = var(agent).index("Chrome");
+				tt = agent.index("Chrome");
 			}
 			if (not tt) {
-				tt = var(agent).index("Firefox");
+				tt = agent.index("Firefox");
 			}
 			if (not tt) {
-				tt = var(agent).index("Safari");
+				tt = agent.index("Safari");
 			}
 			if (not tt) {
-				tt = var(agent).index("Opera");
+				tt = agent.index("Opera");
 			}
 			if (not tt) {
-				tt = var(agent).index("Netscape");
+				tt = agent.index("Netscape");
 			}
 			if (tt) {
-				browser = var(agent).substr(tt,9999).field(";", 1).field(" ", 1).field(")", 1);
+				browser = agent.substr(tt,9999).field(";", 1).field(" ", 1).field(")", 1);
 			}
 
 			//browsernames='Edge,Chrome,Firefox,Safari,Opera,Netscape'

@@ -109,7 +109,7 @@ listen:
 	if (USER4.index("R18.6")) {
 		halt = 1;
 		USER4.r(-1, "Corrupt temporary file. Restart Needed.");
-		USER4.r(-1, "EXODUS.NET TERMINATED");
+		USER4.r(-1, "exodus.net TERMINATED");
 	}
 	if (USER4.ucase().index("NOT ENOUGH MEMORY")) {
 		halt = 1;

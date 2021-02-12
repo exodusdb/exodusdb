@@ -10,6 +10,8 @@ var reply;//num
 function main(in startmode0, out starttime, out startdate, out startbuffer) {
 	//c sys in,out,out,out
 
+	var interactive = not(SYSTEM.a(33));
+
 	if (startmode0.unassigned()) {
 		startmode = "";
 	}else{
@@ -28,6 +30,10 @@ function main(in startmode0, out starttime, out startdate, out startbuffer) {
 	//if @volumes else return 1
 
 	call videorw(0, 0, CRTWIDE - 1, CRTHIGH - 1, "R", startbuffer);
+
+	if (not interactive) {
+		return 0;
+	}
 
 	if (startmode eq "CONFIRM") {
 		reply = "";

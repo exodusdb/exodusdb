@@ -14,13 +14,16 @@ function main() {
 	//printl(bigi);
 	//printl(bigd);
 
-	var lits ="0.0000000000001";
+	//var lits ="0.0000000000001";
+	var lits ="0.0000000001";
 	//var liti =1e-14;
-	var litd =1e-13;
+	//var litd =1e-13;
+	var litd =1e-10;
 	//printl(lits);
 	//printl(litd);
 
-	var tinys="0.00000000000001";
+	//var tinys="0.00000000000001";
+	var tinys="0.00000000001";
 	//var tinyi=1e-14;
 	var tinyd=1e-14;
 	//printl(tinys);

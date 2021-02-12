@@ -656,7 +656,7 @@ validateexit2:
 		if (invalidlogin) {
 
 			if (passwordreset) {
-				//"Password Reset Failed" is hardcoded in default.htm
+				//"Password Reset Failed" is hardcoded in index.htm
 
 				text = "Password&nbsp;Reset Failed:" "\r\n";
 				//text:=crlf:'1. ':password:' not known'
@@ -804,7 +804,7 @@ validateexit2:
 					body.swapper(FM, "\r\n");
 					call sendmail(emailaddrs, ccaddrs, subject, body, "", "", xx);
 
-					//"Password Reset" is hardcoded in default.htm
+					//"Password Reset" is hardcoded in index.htm
 					request5 = "Password Reset ok:" "\r\n";
 					request5 ^= "\r\n";
 					request5 ^= "A new password for usercode " ^ (ID.quote()) ^ " for database " ^ (SYSTEM.a(17, 1).quote()) ^ "\r\n";

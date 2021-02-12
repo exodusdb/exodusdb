@@ -39,11 +39,11 @@ CACHED_CONNECTION MvConnectionsCache::get_connection(int index) const
 	return (CACHED_CONNECTION)(iter == conntbl.end() ? 0 : iter->second.connection);
 }
 
-UNORDERED_SET_FOR_LOCKTABLE* MvConnectionsCache::get_lock_table(int index) const
+LockTable* MvConnectionsCache::get_lock_table(int index) const
 {
 	boost::mutex::scoped_lock lock(mvconnections_mutex);
 	CONN_MAP::const_iterator iter = conntbl.find(index);
-	return (UNORDERED_SET_FOR_LOCKTABLE*)(iter == conntbl.end() ? 0 : iter->second.plock_table);
+	return (LockTable*)(iter == conntbl.end() ? 0 : iter->second.plock_table);
 }
 
 RecordCache* MvConnectionsCache::get_recordcache(int index) const

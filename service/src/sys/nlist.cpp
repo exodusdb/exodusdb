@@ -526,7 +526,8 @@ filename:
 			dictfilename = filename;
 		}
 		if (not(DICT.open("dict_" ^ dictfilename))) {
-			crtx = 1;
+			//uncommented so that list dict_clients gives dict.voc columns
+			//crtx=1
 			DICT = dictvoc;
 		}
 		ss ^= " " ^ word;
@@ -1512,6 +1513,7 @@ nextrec:
 	FILEERROR = "";
 
 	ok = 0;
+	RECORD = "";
 	if (VOLUMES) {
 		if (readnext(ID, MV)) {
 			ok = 1;
@@ -1977,6 +1979,8 @@ subroutine getquotedword2() {
 }
 
 subroutine getword() {
+
+	//prevent adecom merging above and below labels
 	{}
 
 getnextword:
@@ -2010,6 +2014,8 @@ getnextword:
 }
 
 subroutine getword2() {
+
+	//prevent adecom merging above and below labels
 	{}
 
 getword2b:

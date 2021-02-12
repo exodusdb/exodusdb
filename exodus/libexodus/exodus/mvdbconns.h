@@ -22,10 +22,12 @@
 
 #include <boost/thread/mutex.hpp>
 #include <libpq-fe.h> //in postgres/include
-#include <map>
+//#include <map>
 #include <unordered_map>
 
 // INtroducing the type for LockTable, it should be unordered set
+
+#if 0
 
 //#define HAVE_TR1
 #ifdef HAVE_CONFIG_H
@@ -48,10 +50,15 @@
 #else
 #define USE_MAP_FOR_UNORDERED
 #include <map>
+
 #define UNORDERED_SET_FOR_LOCKTABLE std::map<uint64_t, int>
 #endif
 
-using LockTable = UNORDERED_SET_FOR_LOCKTABLE;
+#endif
+
+#define USE_MAP_FOR_UNORDERED
+//using LockTable = UNORDERED_SET_FOR_LOCKTABLE;
+using LockTable = std::unordered_map<uint64_t, int>;
 
 namespace exodus
 {
@@ -66,7 +73,7 @@ class MvConnectionEntry // used as 'second' in pair, stored in connection map
       public:
 	// ctors
 	MvConnectionEntry() : flag(0), connection(0), plock_table(0), extra(0), precordcache(0) {}
-	MvConnectionEntry(CACHED_CONNECTION connection_, UNORDERED_SET_FOR_LOCKTABLE* LockTable_,
+	MvConnectionEntry(CACHED_CONNECTION connection_, LockTable* LockTable_,
 			  RecordCache* RecordCache_)
 	    : flag(0), connection(connection_), plock_table(LockTable_), extra(0),
 	      precordcache(RecordCache_)
@@ -90,7 +97,8 @@ class MvConnectionEntry // used as 'second' in pair, stored in connection map
 	RecordCache* precordcache;
 };
 
-using CONN_MAP = std::map<int, MvConnectionEntry>;
+//using CONN_MAP = std::map<int, MvConnectionEntry>;
+using CONN_MAP = std::unordered_map<int, MvConnectionEntry>;
 
 class MvConnectionsCache
 {
@@ -105,7 +113,7 @@ class MvConnectionsCache
 
 	// observers
 	CACHED_CONNECTION get_connection(int index) const;
-	UNORDERED_SET_FOR_LOCKTABLE* get_lock_table(int index) const;
+	LockTable* get_lock_table(int index) const;
 	RecordCache* get_recordcache(int index) const;
 	std::string getrecord(const int connid, const std::string filename,
 			       const std::string key) const;
