@@ -41,23 +41,23 @@
 		exodus_main(exodus__argc, exodus__argv, mv, threadno);                     \
 		int result = 0;                                                            \
 		PROGRAMNAME##ExodusProgram exodusprogram1(mv);                             \
-        if (osgetenv("EXO_DEBUG")) {                                                           \
-			errputl("INIT DEBUGGING PROCESSNO ", PROCESSNO, " " #PROGRAMNAME);               \
+        if (osgetenv("EXO_DEBUG")) {                                               \
+			errputl("INIT DEBUGGING PROCESSNO ", PROCESSNO, " " #PROGRAMNAME);     \
 			result = exodusprogram1.main().toInt();                                \
-			errputl("EXIT DEBUGGING PROCESSNO ", PROCESSNO, " " #PROGRAMNAME);               \
+			errputl("EXIT DEBUGGING PROCESSNO ", PROCESSNO, " " #PROGRAMNAME);     \
         } else {                                                                   \
 			try                                                                    \
 			{                                                                      \
 				result = exodusprogram1.main().toInt();                            \
 			}                                                                      \
-			catch (MVStop exceptionx)                                              \
+			catch (const MVStop& exceptionx)                                       \
 			{                                                                      \
 				if (exceptionx.description.length())                               \
 					exceptionx.description.outputl();                              \
 				if (exceptionx.description.isnum())                                \
 					result = exceptionx.description.toInt();                       \
 			}                                                                      \
-			catch (MVAbort exceptionx)                                             \
+			catch (const MVAbort& exceptionx)                                      \
 			{                                                                      \
 				if (exceptionx.description.length())                               \
 					exceptionx.description.errputl();                              \
@@ -66,7 +66,7 @@
 				else                                                               \
 					result = 1;                                                    \
 			}                                                                      \
-			catch (MVAbortAll exceptionx)                                          \
+			catch (const MVAbortAll& exceptionx)                                   \
 			{                                                                      \
 				if (exceptionx.description.length())                               \
 					exceptionx.description.errputl();                              \
@@ -75,14 +75,14 @@
 				else                                                               \
 					result = 2;                                                    \
 			}                                                                      \
-			catch (MVLogoff exceptionx)                                            \
+			catch (const MVLogoff& exceptionx)                                     \
 			{                                                                      \
 				if (exceptionx.description.length())                               \
 					exceptionx.description.outputl();                              \
 				if (exceptionx.description.isnum())                                \
 					result = exceptionx.description.toInt();                       \
 			}                                                                      \
-			/*catch (MVError exceptionx)                                           \
+			/*catch (const MVError& exceptionx)                                    \
 			{                                                                      \
 				errputl(exceptionx.description, " - Aborting.");                   \
 				errputl(exceptionx.stack.convert(FM, "\n"));                       \
@@ -90,7 +90,7 @@
 			}*/                                                                    \
 		}                                                                          \
 		/*TODO disconnect ALL connections of this thread*/                         \
-		/*var("PROCESSES").deleterecord(PROCESSNO);*/                                  \
+		/*var("PROCESSES").deleterecord(PROCESSNO);*/                              \
 		disconnect();                                                              \
 		if (OPTIONS.index("I"))                                                    \
 			result = 0;                                                            \

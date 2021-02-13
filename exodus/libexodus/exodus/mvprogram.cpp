@@ -1130,12 +1130,12 @@ var ExodusProgramBase::perform(const var& sentence)
 		{
 			ANS = perform_exodusfunctorbase_.callsmf();
 		}
-		catch (const MVUndefined& e)
+		catch (const MVUndefined&)
 		{
 			// if return "" is missing then default ANS to ""
 			ANS = "";
 		}
-		catch (const MVStop& e)
+		catch (const MVStop&)
 		{
 			// stop is normal way of stopping a perform
 			// functions can call it to terminate the whole "program"
@@ -1143,13 +1143,13 @@ var ExodusProgramBase::perform(const var& sentence)
 			// to exit from nested functions
 			ANS = "";
 		}
-		catch (const MVAbort& e)
+		catch (const MVAbort&)
 		{
 			// similar to stop for the time being
 			// maybe it should set some error flag/messages
 			ANS = "";
 		}
-		catch (const MVAbortAll& e)
+		catch (const MVAbortAll&)
 		{
 			// similar to stop for the time being
 			// maybe it should set some error flag/messages
@@ -1160,7 +1160,7 @@ var ExodusProgramBase::perform(const var& sentence)
 		//that omits catch (MVError) if EXO_DEBUG is set
 		//so that gdb will catch the original error and allow backtracing there
 		//Until then, use gdb "catch throw" as mentioned below.
-		catch (MVError)
+		catch (const MVError&)
 		{
 			//restore environment in case MVError is caught
 			//in caller and the program resumes processing

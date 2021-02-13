@@ -1,3 +1,6 @@
 t_*.txt
 t_*.bin
 t_*.html
+
+test_*
+!test_*.cpp
