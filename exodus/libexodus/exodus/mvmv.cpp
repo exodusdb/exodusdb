@@ -2108,16 +2108,24 @@ var var::sum() const
 	var result = 0;
 	var start = 0;
 	var bit, term, xx;
+	int maxdecimals=0;
 	while (true)
 	{
 		// bit=(*this).remove(start, term);
 		bit = (*this).substr2(start, term);
-		if (bit.length())
+		if (bit.length()) {
 			result += bit;
+			int n=bit.index(".");
+			if (n) {
+				n=bit.length()-n;
+				if (n>maxdecimals)
+					maxdecimals=n;
+			}
+		}
 		if (not term)
 			break;
 	}
-	return result;
+	return result.round(maxdecimals);
 }
 
 var var::sum(const var& sepchar) const

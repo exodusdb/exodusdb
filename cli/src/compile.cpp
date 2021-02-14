@@ -163,7 +163,8 @@ function main()
 		//__cplusplus is 201103L
 		//if( __cplusplus >= 201103L )
 			//basicoptions^=" -std=c++11";//gcc 4.7 and later DISABLES gnu extensions
-		if  (__cplusplus >= 202003L)
+		//if  (__cplusplus >= 202003L)
+		if  (__cplusplus >= 201709)
 			basicoptions^=" -std=c++2a";//gcc 4.7 and later DISABLES gnu extensions
 		else
 			basicoptions^=" -std=c++17";//gcc 4.7 and later DISABLES gnu extensions

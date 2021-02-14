@@ -1046,6 +1046,27 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 
 	assert(oconv(1234.567,"MC20PZ")=="1234,57");
 
+	//from https://arev.neosys.com/x/4AEz.html
+	assert(oconv(1234,     "MD0")           == "1234");
+	assert(oconv(1234,     "MD2")           == "12.34");
+	assert(oconv(12,       "MD2")           == ".12");
+	//assert(oconv(12,     "MD2L")          == "0.12");
+	assert(oconv(150000,   "MD24")          == "15.00");
+	assert(oconv(1234,     "MD2$")          == "$12.34");
+	assert(oconv(-1234,    "MD2$")          == "$-12.34");
+	assert(oconv(1234,     "MD2$C")         == "$12.34DR");
+	assert(oconv(1234,     "MD2$D")         == "$12.34CR");
+	assert(oconv(-1234,    "MD2$C")         == "$12.34CR");
+	assert(oconv(-1234,    "MD2$D")         == "$12.34DR");
+	assert(oconv(-1234,    "MD1-")          == "123.4-");
+	//assert(oconv(1234,     "MD2,10*")       == "*****12.34");
+	assert(oconv(500,      "MD0#")          == "#500");
+	//assert(oconv(50,     "MD0[DM]")       == "DM50");
+	//assert(oconv(50,     "MD0[DM ]")      == "DM 50");
+	//assert(oconv(252525, "MC2.[<_>Bfr]S") == "2.525,25 Bfr");
+	assert(oconv(-12345,   "MC1.")          == "-1.234,5");
+	assert(oconv(-12345,   "MC1,")          == "-1.234,5");
+
 	//input();
 	//stop();
 

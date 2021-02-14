@@ -441,6 +441,7 @@ var var::oconv_MD(const char* conversion) const
 			dontmovepoint = true;
 			break;
 
+		case '.':
 		case ',':
 			septhousands = true;
 			break;

@@ -1,6 +1,6 @@
 #use make VERBOSE=1 to debug make
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.1)
 set(CPACK_PACKAGE_CONTACT neo)
 set(CPACK_PACKAGE_VERSION 14.01.1)
 INCLUDE(CPack)
