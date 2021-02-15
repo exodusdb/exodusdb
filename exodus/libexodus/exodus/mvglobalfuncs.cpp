@@ -820,6 +820,8 @@ DLL_PUBLIC var sum(const var& instring) { return instring.sum(); }
 
 DLL_PUBLIC var listfiles() { return var().listfiles(); }
 
+DLL_PUBLIC var reccount(const var& filename_or_handle) { return filename_or_handle.reccount(); }
+
 DLL_PUBLIC var listindexes(const var& filename, const var& fieldname)
 {
 	return var().listindexes(filename, fieldname);

@@ -2104,20 +2104,25 @@ var var::sum() const
 	THISIS("var var::sum()")
 	THISISSTRING()
 
-	// add up all number regardless of separator level (multilevel)
+	// Add up all number regardless of separator level (multilevel)
+	// Limit the number of decimal places in returned value to the max found in the input
+    // assert(sum("2245000900.76" _VM_ "102768099.9" _VM_ "-2347769000.66") == 0);
+
 	var result = 0;
 	var start = 0;
-	var bit, term, xx;
-	int maxdecimals=0;
+	var subfield, term;
+	size_t maxdecimals = 0;
 	while (true)
 	{
-		// bit=(*this).remove(start, term);
-		bit = (*this).substr2(start, term);
-		if (bit.length()) {
-			result += bit;
-			int n=bit.index(".");
+		//this extracts a substring up to any separator charactor STM-RM
+		subfield = (*this).substr2(start, term);
+
+		size_t subfieldsize = subfield.var_str.size();
+		if (subfieldsize) {
+			result += subfield;
+			size_t n=subfield.var_str.find('.');
 			if (n) {
-				n=bit.length()-n;
+				n=subfieldsize-n;
 				if (n>maxdecimals)
 					maxdecimals=n;
 			}

@@ -3,6 +3,12 @@
 
 #include <exodus/program.h>
 
+//experiment with some syntactic sugar
+#define on ,
+#define from ,
+#define to ,
+#define with ,
+
 // TESTING
 
 // if it runs ok with no static assertion failures
@@ -160,6 +166,8 @@ function main()
 	//test tcase and fcase
 	assert(var("top of the world").tcase()=="Top Of The World");
 	printl(var("top of the world").tcase().fcase());
+
+	assert(sum("2245000900.76" _VM_ _FM_ "102768099.9" _VM_ "-2347769000.66" _FM_ ) == 0);
 
 	var value=R"('1')";
 	assert(value.swap("'",R"(\')")=="\\'1\\'");
@@ -2562,10 +2570,6 @@ while trying to match the argument list '(exodus::var, bool)'
 
 //	var().debug();
 //	var xx=xx[1];
-
-//experiment with some syntactic sugar
-#define on ,
-#define from ,
 
 	var temprecord;
 	var tempfilename0="tempfile";

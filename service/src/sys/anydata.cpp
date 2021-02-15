@@ -1,8 +1,6 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <getreccount.h>
-
 var v69;
 var v70;
 var v71;
@@ -49,7 +47,7 @@ subroutine getnrecs() {
 	if (not(file.open(filename, ""))) {
 		return;
 	}
-	nrecs = getreccount(file, "", "");
+	nrecs = file.reccount();
 	if (not nrecs) {
 		select(file);
 		if (readnext(ID)) {

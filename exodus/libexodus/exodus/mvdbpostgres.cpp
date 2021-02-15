@@ -4424,20 +4424,23 @@ var var::listindexes(const var& filename0, const var& fieldname0) const
 	return indexnames;
 }
 
-var var::reccount(const var& filename) const
+var var::reccount(const var& filename0) const
 {
-	THISIS("var var::reccount(const var& filename) const")
+	THISIS("var var::reccount(const var& filename_or_handle_or_null) const")
 	// could allow undefined usage since *this isnt used?
 	THISISDEFINED()
-	ISSTRING(filename)
+	ISSTRING(filename0)
+
+	var filename = filename0 ? filename0 : (*this);
 
 	// vacuum otherwise unreliable
 	this->flushindex(filename);
 
-	var sql = "SELECT reltuples::integer FROM pg_class WHERE relname = '" ^
-		  filename.a(1).lcase() ^ "';";
+	var sql = "SELECT reltuples::integer FROM pg_class WHERE relname = '";
+	sql ^= filename.a(1).lcase();
+	sql ^= "';";
 
-	PGconn* pgconn = (PGconn*)this->connection();
+	PGconn* pgconn = (PGconn*)filename.connection();
 	if (pgconn == NULL)
 		return "";
 
@@ -4453,6 +4456,7 @@ var var::reccount(const var& filename) const
 	{
 		// reccount=var((int)ntohl(*(uint32_t*)PQgetvalue(pgresult, 0, 0)));
 		reccount = getresult(pgresult, 0, 0);
+		reccount += 0;
 	}
 
 	return reccount;

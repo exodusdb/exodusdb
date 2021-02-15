@@ -1,8 +1,6 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <getreccount.h>
-
 #include <gen_common.h>
 
 var interactive;
@@ -103,7 +101,7 @@ subroutine getnrecs() {
 	if (not(file.open(file, ""))) {
 		return;
 	}
-	nrecs = getreccount(file, "", "");
+	nrecs = file.reccount();
 	if (not nrecs) {
 		select(file);
 		if (readnext(ID)) {
