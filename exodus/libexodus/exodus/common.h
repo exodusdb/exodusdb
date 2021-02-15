@@ -22,6 +22,7 @@ class COMMON_NAME##_common : public LabelledCommon                              
       public:
 
 #define commonexit(COMMON_NAME, COMMON_NO)                                                         \
+~COMMON_NAME##_common()=default;                                                                   \
 }                                                                                                  \
 ;                                                                                                  \
 COMMON_NAME##_common&& COMMON_NAME =                                                               \

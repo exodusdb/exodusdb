@@ -32,7 +32,7 @@ function main(in startmode0, out starttime, out startdate, out startbuffer) {
 	call videorw(0, 0, CRTWIDE - 1, CRTHIGH - 1, "R", startbuffer);
 
 	if (not interactive) {
-		return 0;
+		return 1;
 	}
 
 	if (startmode eq "CONFIRM") {

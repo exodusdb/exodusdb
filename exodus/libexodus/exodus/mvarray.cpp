@@ -41,9 +41,14 @@ dim::dim() : nrows_(1), ncols_(1), initialised_(false)
 {
 	// throw MVArrayDimensionedZero();
 	data_ = new var[nrows_ * ncols_ + 1];
+	//std::cout<< "created[] " << data_ << std::endl;
 }
 
-dim::~dim() { delete[] data_; }
+dim::~dim()
+{
+	//std::cout<< "deleted[] " << data_ << std::endl;
+	delete[] data_;
+}
 
 // move contructor
 dim::dim(dim&& sourcedim) noexcept
@@ -60,6 +65,7 @@ dim::dim(int rows, int cols) : nrows_(rows), ncols_(cols), initialised_(true)
 	if (rows == 0 || cols == 0)
 		throw MVArrayDimensionedZero();
 	data_ = new var[rows * cols + 1];
+	//std::cout<< "created[] " << data_ << std::endl;
 }
 
 // dim split is defined in mvmv.cpp
@@ -119,8 +125,10 @@ bool dim::redim(int rows, int cols)
 	// 1. create new data first
 	var* newdata;
 	newdata = new var[rows * cols + 1];
+	//std::cout<< "created[] " << newdata << std::endl;
 
 	// 2. only then delete the old data
+	//std::cout<< "deleted[] " << data_ << std::endl;
 	delete[] data_;
 
 	// 3. and point to the new data

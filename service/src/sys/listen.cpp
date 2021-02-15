@@ -759,7 +759,7 @@ nextsearch0:
 		SYSTEM.r(2,"");
 		if (not libinfo(cmd.field(" "))) errputl(cmd.field(" "), " does not exist."); else
 		try {
-		var username=USERNAME;USERNAME="exodus";
+		var username=USERNAME;USERNAME="EXODUS";
 		execute(cmd);
 		USERNAME=username;
 		} catch (MVError e) {errputl(e.description);}
