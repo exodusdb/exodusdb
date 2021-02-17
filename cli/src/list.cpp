@@ -2312,19 +2312,20 @@ subroutine printbreaks() {
 			}
 
 			if (coldict(coln).a(10)) {
-				//if html else
-				// cell=(cell[1,coldict(coln)<10>])
-				// cell=(cell coldict(coln)<11>)
-				// end
+				if (not(html)) {
+					cell=cell.substr(1,coldict(coln).a(10));
+					cell=oconv(cell,coldict(coln).a(11));
+				} else {
+					tx ^= td0 ^ "<th";
+					if (not usecols) {
+						tx ^= coldict(coln).a(bheadfn);
+					}
+					if (coldict(coln).a(9) eq "R") {
+						tx ^= " style=\"text-align:right\"";
+					}
+					tx ^= ">";
+				}
 
-				tx ^= td0 ^ "<th";
-				if (not usecols) {
-					tx ^= coldict(coln).a(bheadfn);
-				}
-				if (coldict(coln).a(9) eq "R") {
-					tx ^= " style=\"text-align:right\"";
-				}
-				tx ^= ">";
 				tx ^= cell ^ thx;
 				//if len(cell) then if cell<>nbsp then anycell=1
 				if (cell.length()) {

@@ -72,7 +72,8 @@ void MvConnectionsCache::putrecord(const int connid, const std::string filename,
 {
 	auto precordcache = get_recordcache(connid);
 	std::string filenameandkey = filename + "|" + key;
-	(*precordcache)[filenameandkey] = record;
+	//(*precordcache)[filenameandkey] = record;
+	precordcache->insert_or_assign(filenameandkey,record);
 	return;
 }
 
@@ -83,7 +84,9 @@ void MvConnectionsCache::delrecord(const int connid, const std::string filename,
 {
 	auto precordcache = get_recordcache(connid);
 	std::string filenameandkey = filename + "|" + key;
-	(*precordcache)[filenameandkey] = "";
+	//(*precordcache)[filenameandkey] = "";
+	//precordcache->erase(filenameandkey);
+	precordcache->insert_or_assign(filenameandkey,"");
 	return;
 }
 
@@ -103,6 +106,7 @@ void MvConnectionsCache::del_connection(int index)
 		//	CACHED_CONNECTION p /*std::pair<int, void*> p*/ = ;
 		del((CACHED_CONNECTION)iter /*conntbl.find(index)*/->second.connection);
 		delete /*conntbl.find(index)*/ iter->second.plock_table;
+		delete /*conntbl.find(index)*/ iter->second.precordcache;
 		conntbl.erase(index);
 	}
 }

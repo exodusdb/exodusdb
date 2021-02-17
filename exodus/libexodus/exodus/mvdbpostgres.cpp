@@ -2292,7 +2292,9 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 		if (isnumeric)
 			sqlexpression ^= "::float8[]";
 
-		if (forsort)
+		//now do this for all fields including WHERE and ORDER BY
+		//eg SELECT BOOKING_ORDERS WITH YEAR_PERIOD "21.02" AND WITH IS_LATEST AND WITH CLIENT_CODE "MIC" AND WITH @ID NOT "%]" BY ORDER_NO 
+		//if (forsort)
 		{
 
 			// use the fieldname as a sql column name
@@ -2331,7 +2333,7 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 				//multivalued prestage2_calculated field
 				if (fieldname0[-1] == ":") {
 					var joinsectionn = 1;
-					var join = "LEFT JOIN " ^ stage2_filename ^ " ON " ^ stage2_filename ^ ".key = " ^ filename ^ ".key";;
+					var join = "LEFT JOIN " ^ stage2_filename ^ " ON " ^ stage2_filename ^ ".key = " ^ filename ^ ".key";
 					//if (!joins.a(joinsectionn).index(join))
 					if (!joins.index(join))
                     	joins.r(joinsectionn, -1, join);
@@ -3103,7 +3105,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 				//op = "<>";
 				//value = "''";
 
-				//remove conversion to date
+				//remove conversion to date/number etc
+				dictexpression.replacer("^exodus_extract_number\\(","exodus_extract_text\\(");
 				dictexpression.replacer("^exodus_extract_date\\(","exodus_extract_text\\(");
 				dictexpression.replacer("^exodus_extract_datetime\\(","exodus_extract_text\\(");
 

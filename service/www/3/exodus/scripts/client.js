@@ -325,11 +325,6 @@ function exodus_client_init() {
 
     //style sheet
     document.writeln('<link id="exodus_global_css" rel="stylesheet" type="text/css" href="' + EXODUSlocation + 'global.css">')
-    //be careful to always have private.css even if empty otherwise it is ALWAYS not in cache and
-    //requires a server lookup all the time. therefore upgrades will destroy any exodus client's private.css
-    //actually it shouldnt be ../ in the login and inital menu screen
-    //cut out because slows at least modaldialog in ie7
-    //document.writeln('<link REL="stylesheet" TYPE="text/css" HREF="../private.css">')
 
     //jquery (not used)
     //document.writeln('<scr' + 'ipt type="text/javascript" id=jquery src="' + EXODUSlocation + 'scripts/jquery-1.4.4-min.js"></scr' + 'ipt>')
@@ -4319,6 +4314,8 @@ function menubuttonhtml(id, imagesrc, name, title, accesskey, align) {
 
     //there is no float:center?!
     var style = 'white-space:nowrap'
+    if (id == 'menu')
+        style += ';max-width:48px'//stop first button flashing very wide initially
     if (align == 'center')
         //tx+=' style="float:'+align+'"'
         //tx+=' style="margin:0 auto"'

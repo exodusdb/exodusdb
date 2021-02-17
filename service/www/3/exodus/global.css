@@ -12,24 +12,18 @@ TABLE.exodusform
     text-align: left;
 }
 
-/*why needed? it stops custom form colors from prior rule on th
-.exodusform TH
-{
-    margin: 1px;
-    border-collapse: collapse;
-    background-color: #ffffc0;
-    border-color: #d0d0d0;
-    border-width: 1px 1px 1px 1px;
-    border-style:  solid;
-    padding: 1px;
-    text-align: left;
-}
-*/
-
 TABLE
 {
     border-collapse: collapse;
     border-width: 0px;
+}
+
+@media print
+{
+    TABLE.exodusform
+    {
+        display: block;
+    }
 }
 
 BODY, BUTTON, INPUT, SELECT, TEXTAREA, SPAN, DIV, TD, TH, P, BR, A, SMALL, BIG
@@ -41,28 +35,12 @@ BODY, BUTTON, INPUT, SELECT, TEXTAREA, SPAN, DIV, TD, TH, P, BR, A, SMALL, BIG
     border: 1px;
 }
 
-/*blue blur on focus*/
-/*SPAN:focus:not([type="checkbox"]):not([type="radio"]), SELECT:focus:not([type="checkbox"]):not([type="radio"]), INPUT:focus:not([type="checkbox"]):not([type="radio"])
-SPAN:focus:not([type="checkbox"]):not([type="radio"]), SELECT:focus:not([type="checkbox"]):not([type="radio"]), INPUT:focus:not([type="checkbox"]):not([type="radio"])
-{
-    outline: 0px none;
-}
-*/
 BUTTON:focus, SELECT:focus, TEXTAREA:focus, INPUT:focus, SPAN:focus
 {
-    /*box-shadow: 0px 0px 5px #4091ED;*/ /*border-color: #4091ED;*/
     box-shadow: 0px 0px 10px #666666;
-    border-color: #A9A9F5;
+    border-color: #9393f3;
     opacity: 1;
     outline:none;
-}
-
-@media print
-{
-    TABLE.exodusform
-    {
-        display: block;
-    }
 }
 
 BODY
@@ -263,7 +241,6 @@ H6
     border-color: #aaaaaa;
 }
 
-
 .graphicbutton
 {
     float: left;
@@ -276,6 +253,88 @@ H6
     cursor: pointer;
     padding: 4px 2px 5px 2px;
     border-radius: 0.3rem;
+}
+
+:root {
+    --bg-color: #fff;
+    --h-color: #000;
+    --text-color: black;
+    --link-color: #006;
+    --radio-color: rgba(0, 84, 187, 0.596);
+    --border-color: #bbb;
+    --thead-color: #ccc;
+    --tbody-color-odd: #ddd;
+    --tbody-color-even: #eee;
+    --ok-color: #a0ffa0;
+    --fail-color: #ffa0a0;
+    --warning-color: #FF3403;
+}
+
+input[type=radio] {
+    /*how to override radio/checkbox style*/
+    /*https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/radio*/
+    /*Note that the colors are the same for both light and dark mode*/
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border-radius: 50%;
+    width: 14px;
+    height: 14px;
+    border: 1px solid var(--text-color);
+    /*transition: 0.1s all linear;*/
+    margin-right: 2px;
+    /*position: relative;*/
+    /*top: 2px;*/
+    background-color: var(--bg-color);
+    /*transition: 0.1s all linear;*/
+    vertical-align: middle;
+}
+
+input[type=radio]:checked {
+    width: 16px;
+    height: 16px;
+    border: 5px solid var(--radio-color);
+    /*transition: 0.1s all linear;*/
+}
+
+:checked+label {
+    font-weight: bold;
+    color: var(--h-color);
+}
+
+select {
+    font-weight: bold;
+    color: var(--h-color);
+}
+
+input[type=checkbox] {
+    /*how to override radio/checkbox style*/
+    /*https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/radio*/
+    /*Note that the colors are the same for both light and dark mode*/
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 1px solid var(--text-color);
+    /*transition: 0.1s all linear;*/
+    margin-right: 2px;
+    /*position: relative;*/
+    /*top: 2px;*/
+    background-color: var(--bg-color);
+    vertical-align: middle;
+}
+
+input[type=checkbox]:checked {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='22' viewBox='-100 -100 1300 1300'><path d='m7.7,404.6c0,0 115.2,129.7 138.2,182.68l99,0c41.5-126.7 202.7-429.1 340.92-535.1c28.6-36.8-43.3-52-101.35-27.62-87.5,36.7-252.5,317.2-283.3,384.64-43.7,11.5-89.8-73.7-89.84-73.7z'/></svg>");
+}
+
+input:disabled {
+    background-color:lightgrey !important;
+}
+
+input[type="radio"],input[type="checkbox"]{
+    cursor:pointer;
 }
 
 /*must be last*/
