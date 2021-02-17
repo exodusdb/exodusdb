@@ -532,14 +532,14 @@ void ExodusProgramBase::mssg(const var& msg, const var& options, var& buffer,
 	        //or empty input with ESC option means ESC
 			if (options.index("E") and (buffer == "" or buffer.index("\x1B")))
 				buffer="\x1B";//esc
+
+			std::cout << std::endl;
 		}
 		else {
 
 			//input=output if not interactive
 			buffer = origbuffer;
 
-			//flush output
-			std::cout << std::endl;
 		}
 
 		//force upper case
@@ -554,7 +554,7 @@ void ExodusProgramBase::mssg(const var& msg, const var& options, var& buffer,
 		if (USER4.length() > 8000)
 		{
 			var msg2 = "Aborted MSG()>8000";
-			std::cout << msg2;
+			std::cout << msg2 << std::endl;
 			USER4 ^= FM ^ msg2;
 		}
 		else
@@ -563,7 +563,6 @@ void ExodusProgramBase::mssg(const var& msg, const var& options, var& buffer,
 		}
 	}
 
-	std::cout << std::endl;
 }
 
 var ExodusProgramBase::authorised(const var& task0)
