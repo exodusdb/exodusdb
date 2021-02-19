@@ -152,11 +152,11 @@ function main()
 
 		printl("verify CANNOT connect to non-existent deleted database2");
 		printl("=======================================================");
-		assert(not conn1.connect("dbname="^dbname2));
+		assert(not conn1.connect(dbname2));
 
 		printl("verify CANNOT connect to non-existent deleted database3");
 		printl("=======================================================");
-		assert(not conn1.connect("dbname="^dbname3));
+		assert(not conn1.connect(dbname3));
 
 		conn1.disconnect();
 
@@ -189,8 +189,8 @@ function main()
 		var conn2,conn3;
 		var table2="TABLE2";
 		var table3="TABLE3";
-		assert(conn2.connect("dbname="^dbname2));
-		assert(conn3.connect("dbname="^dbname3));
+		assert(conn2.connect(dbname2));
+		assert(conn3.connect(dbname3));
 		assert(not table2.open("TABLE2",conn2));
 		assert(not table3.open("TABLE3",conn3));
 		printl(table2);
@@ -219,11 +219,11 @@ function main()
 	{
 		printl("Go through table2 in exodus2 db and through table3 in exodus3 db");
 		var conn2, conn3;
-		assert(conn2.connect( "dbname="^dbname2));
-		assert(conn3.connect( "dbname="^dbname3));
+		assert(conn2.connect(dbname2));
+		assert(conn3.connect(dbname3));
 		var table2,table3;
-		assert( table2.open( "TABLE2",conn2));
-		assert( table3.open( "TABLE3",conn3));
+		assert( table2.open("TABLE2",conn2));
+		assert( table3.open("TABLE3",conn3));
 
 		conn2.begintrans();
 		printl("select table2");
@@ -266,7 +266,7 @@ function main()
 		var conn4;
 		assert(conn4.copydb(dbname2,dbname4));
 		//printl(conn4.getlasterror());
-		assert(conn4.connect( "dbname="^dbname4));
+		assert(conn4.connect( dbname4));
 		printl("check can open table2 on copied database exodus4");
 		var table2b,table3b;
 		assert( table2b.open( "TABLE2",conn4));
@@ -274,7 +274,7 @@ function main()
 		printl("remove any test databases");
 		//connect to exodus first cant delete db if connected to it.
 		var conn1;
-		assert(conn1.connect("dbname=exodus"));
+		assert(conn1.connect("exodus"));
 		assert(conn1.deletedb(dbname2));
 		assert(conn1.deletedb(dbname3));
 		conn4.disconnect();

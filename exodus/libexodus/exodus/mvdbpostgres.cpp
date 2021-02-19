@@ -380,7 +380,19 @@ bool var::connect(const var& conninfo)
 	THISISDEFINED()
 	ISSTRING(conninfo)
 
-	var conninfo2 = build_conn_info(conninfo);
+	var conninfo2 = conninfo;
+
+	//use *this if conninfo not specified;
+	if (!conninfo2) {
+		if (this->assigned())
+			conninfo2=*this;
+	}
+
+	//add dbname= if missing
+	if (conninfo2 && !conninfo2.index("="))
+		conninfo2 = "dbname=" ^ conninfo2;
+
+	conninfo2 = build_conn_info(conninfo2);
 
 	if (GETDBTRACE)
 		conninfo2.logputl("DBTRACE:");
@@ -450,7 +462,11 @@ bool var::connect(const var& conninfo)
 
 	// cache the new connection handle
 	int conn_no = mv_connections_cache.add_connection(pgconn);
-	(*this) = conninfo ^ FM ^ conn_no;
+	//(*this) = conninfo ^ FM ^ conn_no;
+	if (!this->assigned())
+		(*this) = "";
+	this->r(2,conn_no);
+	this->r(3,conninfo);
 
 	// this->outputl("new connection=");
 
@@ -4434,10 +4450,11 @@ var var::reccount(const var& filename0) const
 	THISISDEFINED()
 	ISSTRING(filename0)
 
-	var filename = filename0 ? filename0 : (*this);
+	var filename = filename0 ?: (*this);
 
 	// vacuum otherwise unreliable
-	this->flushindex(filename);
+	if (!this->statustrans())
+		this->flushindex(filename);
 
 	var sql = "SELECT reltuples::integer FROM pg_class WHERE relname = '";
 	sql ^= filename.a(1).lcase();

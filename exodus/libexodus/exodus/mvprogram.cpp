@@ -555,6 +555,7 @@ void ExodusProgramBase::mssg(const var& msg, const var& options, var& buffer,
 		{
 			var msg2 = "Aborted MSG()>8000";
 			std::cout << msg2 << std::endl;
+			//std::cout << USER4 << std::endl;
 			USER4 ^= FM ^ msg2;
 		}
 		else
@@ -1619,7 +1620,7 @@ bool ExodusProgramBase::esctoexit() const
 		return false;
 
 	//std::cout << "Press Esc again to cancel or any other key to continue " << std::endl;
-	std::cout << "Paused. Continue? (Y/n) ";
+	std::cout << " Paused. Continue? (Y/n) ";
 	std::cout << std::flush;
 
 	//wait for ever
