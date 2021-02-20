@@ -4077,6 +4077,7 @@ bool var::readnext(var& record, var& key, var& valueno)
 	var listid = this->a(3);
 	if (listid)
 	{
+		record = "";
 		while (true)
 		{
 			var keyno = this->a(5);

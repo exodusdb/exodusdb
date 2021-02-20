@@ -2186,6 +2186,13 @@ var var::oscwd() const
 
 }
 
+var var::ospid() const
+{
+	THISIS("var var::ospid() const")
+	return getpid();
+
+}
+
 void var::ossleep(const int milliseconds) const
 {
 	THISIS("void var::ossleep(const int milliseconds) const")

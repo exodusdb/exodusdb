@@ -101,6 +101,7 @@ DLL_PUBLIC bool osrmdir(const var& dirname, const bool evenifnotempty = false);
 DLL_PUBLIC var oscwd();
 DLL_PUBLIC var oscwd(const var& dirname);
 DLL_PUBLIC void osflush();
+DLL_PUBLIC var ospid();
 DLL_PUBLIC var suspend(const var& command);
 DLL_PUBLIC bool osshell(const var& command);
 DLL_PUBLIC var osshellread(const var& command);

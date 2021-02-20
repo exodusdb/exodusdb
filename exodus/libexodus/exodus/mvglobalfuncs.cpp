@@ -165,6 +165,8 @@ DLL_PUBLIC bool osrmdir(const var& dirname, const bool evenifnotempty)
 	return dirname.osrmdir(evenifnotempty);
 }
 
+DLL_PUBLIC var ospid() { return var().ospid(); }
+
 DLL_PUBLIC var oscwd() { return var().oscwd(); }
 
 DLL_PUBLIC var oscwd(const var& dirname) { return dirname.oscwd(dirname); }

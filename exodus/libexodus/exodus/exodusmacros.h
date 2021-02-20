@@ -151,6 +151,13 @@ namespace exodus
 #define le <=
 #define ge >=
 
+//perhaps a little crazy but included last so should not interfer with other heads
+//allow syntax like "read(rec from file)" and "convert(a to b)"
+#define on ,
+#define from ,
+#define with ,
+#define to ,
+
 // narrow char* versions of classic pick delimiters
 //_RM_, _RM and RM_ versions (wchar*, char* and wchar respectively)
 //#define _RM "\u01FF"

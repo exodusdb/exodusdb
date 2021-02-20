@@ -81,6 +81,7 @@ function main() {
 	var temposfilename=filename^ "~" ^ key;
 	var invalidfilechars="\"\'\u00A3$%^&*(){}[]:;#<>?,./\\|";
 	temposfilename.lcaser().converter(invalidfilechars,str("-",len(invalidfilechars)));
+	temposfilename ^= "-pid" ^ ospid();
 	if (filename.substr(1,5)=="dict_" and fieldno)
 		temposfilename^=".sql";
 	else
@@ -90,22 +91,31 @@ function main() {
 	//record file update timedate
 	var fileinfo=osfile(temposfilename);
 	if (not fileinfo)
-		abort("Couldnt write local copy for editing "^temposfilename);
+		abort("Could not write local copy for editing "^temposfilename);
 
 	//fire up the editor
 	var editcmd=editor ^ " " ^ temposfilename.quote();
 	printl(editcmd);
 	osshell(editor ^ " " ^ temposfilename);
 
-	//if the file has been updated
+	//process after editor has been closed
+
 	var fileinfo2=osfile(temposfilename);
-	if (fileinfo2 eq fileinfo) {
-		//file has not been edited
-		osdelete(temposfilename);
-	} else {
-		//file has been edited
+
+	//get edited file info or abort
+	if (not fileinfo2) {
+		abort("Could not read local copy after editing "^temposfilename);
+	}
+
+	//file has been edited
+	else if (fileinfo2 ne fileinfo) {
+
 		var text2;
 		osread(text2,temposfilename);
+
+		if (text2 == "") {
+			abort("Could not read local copy after editing "^temposfilename);
+		}
 
 		//remove trailing lf or cr or crlf
 		trimmerb(text2,"\r\n");
@@ -131,6 +141,7 @@ function main() {
 				if (write(newrecord,file,key)) {
 					printl(filename^" "^key ^ " > db");
 
+					//generate/update database functions if saved a symbolic dictionary record
 					if (filename.substr(1,5)=="dict_"
 					    and newrecord.a(1) eq "S"
 					    and newrecord.a(8).index("/" "*pgsql")
@@ -140,7 +151,6 @@ function main() {
 						osshell(oscmd);
 					}
 
-					osdelete(temposfilename);
 					break;
 				}
 				var temp;
@@ -149,6 +159,10 @@ function main() {
 			}
 		}
 	}
+
+	//clean up any temporary file
+	osdelete(temposfilename);
+
 	return 0;
 }
 

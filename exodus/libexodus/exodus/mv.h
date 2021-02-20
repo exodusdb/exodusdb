@@ -1418,6 +1418,7 @@ public:
 	bool osmkdir() const;
 	bool osrmdir(bool evenifnotempty = false) const;
 	// TODO check for threadsafe
+	ND var ospid() const;
 	ND var oscwd() const;
 	bool oscwd(const var& newpath) const;
 	void osflush() const;

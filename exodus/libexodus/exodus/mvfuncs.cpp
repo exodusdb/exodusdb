@@ -112,7 +112,7 @@ bool var::hasinput(int milliseconds)
 	return haskey(milliseconds);
 }
 
-//binary safe version with little or no editing except backspace and no default
+//binary safe version (except nl/eof?) with little or no editing except backspace and no default
 var& var::input()
 {
 	THISIS("bool var::input()")
@@ -161,6 +161,8 @@ var& var::input(const var& prompt)
 		var cmd="bash -c 'read -i " ^ default_input.quote() ^ " -e EXO_TEMP_READ && printf \"%s\" \"$EXO_TEMP_READ\"'";
 		//cmd.outputl("cmd=");
 		this->osshellread(cmd);
+		if ((*this) == "")
+			std::cout<<std::endl;
 	}
 
 	return *this;
