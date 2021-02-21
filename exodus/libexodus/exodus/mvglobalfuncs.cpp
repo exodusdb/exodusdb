@@ -226,7 +226,7 @@ DLL_PUBLIC var at(const int columnorcode) { return var().at(columnorcode); }
 
 DLL_PUBLIC var at(const var& column, const var& row) { return var().at(column, row); }
 
-DLL_PUBLIC var getcursor() { return var().getcursor(); }
+DLL_PUBLIC var getcursor() { var cursor; cursor.getcursor(); return cursor;}
 
 DLL_PUBLIC void setcursor(const var& cursor) { cursor.setcursor(); }
 

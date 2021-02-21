@@ -915,7 +915,7 @@ public:
 
 	var at(const int columnorcode) const;
 	var at(const int column, const int row) const;
-	var getcursor() const;
+	bool getcursor() const;
 	void setcursor() const;
 	var getprompt() const;
 	void setprompt() const;
