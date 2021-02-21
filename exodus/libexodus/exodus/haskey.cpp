@@ -16,7 +16,7 @@ bool haskey(int milliseconds = 0)
 
 	/* Save stdin terminal attributes */
 	/* Probably not available if running as a service */
-	if (tcgetattr(0, &oldtio)<0) {
+	if (tcgetattr(STDIN_FILENO, &oldtio)<0) {
 		//EBADF - The filedes argument is not a valid file descriptor.
 		//ENOTTY - The filedes is not associated with a terminal.
 		return false;
@@ -41,9 +41,9 @@ bool haskey(int milliseconds = 0)
 	b) no-echo
 	https://man7.org/linux/man-pages/man3/termios.3.html
 	*/
-	tcgetattr(0, &curtio);
+	tcgetattr(STDIN_FILENO, &curtio);
 	curtio.c_lflag &= ~(ICANON | ECHO);
-	tcsetattr(0, TCSANOW, &curtio);
+	tcsetattr(STDIN_FILENO, TCSANOW, &curtio);
 
 	/* main loop */
 	// while (!end) {
@@ -57,7 +57,7 @@ bool haskey(int milliseconds = 0)
 	bool hasdata = poll(pfds, 1, milliseconds) > 0;
 
 	/* restore terminal attributes */
-	tcsetattr(0, TCSANOW, &oldtio);
+	tcsetattr(STDIN_FILENO, TCSANOW, &oldtio);
 
 	return hasdata;
 }

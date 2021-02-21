@@ -1,5 +1,22 @@
 #include <mv.h>
 
+//mv_iter class enables c++ range based programming over a dynamic array
+//
+//uses FM as field separator at the moment
+//
+//Example:
+//
+// for (const var& v : dynstr) {...}
+//
+//Warning: updating the string probably invalidates the iterator! It is a byte pointer into the string.
+//
+//TODO add option a) to specify field separator eg VM, SM and/or b) acquire field number as well
+//as provided by SRP precompiler
+//https://wiki.srpcs.com/display/SRPUtilities/SRP_PreCompiler#SRP_PreCompiler-ForEachLoops
+//For Each Value in MyValues using @STM setting Pos
+//    NewValues<Pos> = Value
+//Next Value
+
 namespace exodus {
 
     //CONSTRUCTOR from a var (ie begin())

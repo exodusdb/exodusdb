@@ -2416,107 +2416,66 @@ var var::exp() const
 	throw MVError("exp(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
-var var::at(const int column) const
+// WARNING/ pick/arev column and row numbering is 0 based but
+// in exodus we move to 1 based numbering to be consistent with
+// c/c++/linux/terminal standards. hopefully not too inconvenient
+
+var var::at(const int columnno) const
 {
-	// THISIS("var var::at(const int column) const")
+	// THISIS("var var::at(const int columnno) const")
 
 	// hard coded for xterm at the moment
 	// http://www.xfree86.org/current/ctlseqs.html
 
-	// move to column 0
-	if (column == 0)
+	// move to columnno 0
+	if (columnno == 0)
 		// return "\x1b[G";
 		return "\r"; // works on more terminals
 
 	//return "";
 
-	// move to column
-	if (column > 0)
+	// move to columnno
+	if (columnno > 0)
 	{
 		std::string tempstr = "\x1B[";
-		tempstr += intToString(column + 1);
+		tempstr += intToString(columnno);
 		tempstr += "G";
 		return tempstr;
 	}
 	// clear the screen and home the cursor
-	if (column == -1)
+	if (columnno == -1)
 		return "\x1B[2J\x1B[H";
 	// return "\x0c";//works on more terminals
 
 	// move the cursor to top left home
-	if (column == -2)
+	if (columnno == -2)
 		return "\x1B[H";
 
 	// clear from cursor to end of screen
-	if (column == -3)
+	if (columnno == -3)
 		return "\x1B[J";
 
 	// clear from cursor to end of line
-	if (column == -4)
+	if (columnno == -4)
 		return "\x1B[0K";
 
-	// clear line and move cursor to column 0
-	if (column == -40)
+	// clear line and move cursor to columnno 0
+	if (columnno == -40)
 		return "\r\x1B[K";
 
 	return "";
 }
 
-var var::at(const int column, const int row) const
+var var::at(const int columnno, const int rowno) const
 {
-	// THISIS("var var::at(const int column,const int row) const")
+	// THISIS("var var::at(const int columnno,const int rowno) const")
 
 	std::string tempstr = "\x1B[";
-	tempstr += intToString(row + 1);
+	tempstr += intToString(rowno);
 	tempstr += ";";
-	tempstr += intToString(column + 1);
+	tempstr += intToString(columnno);
 	tempstr += "H";
 	return tempstr;
-}
-
-var var::getcursor() const
-{
-	//THISIS("var var::getcursor() const")
-
-	return "";
-
-	/* TODO
-
-	//following works EXCEPT displays codes on screen and requires press Enter
-
-	//std::cout<<"var::getcursor() not implemented yet "<<std::endl;
-
-	//http://ascii-table.com/ansi-escape-sequences-vt-100.php
-	//esc 6n = get cursor position - DSR
-	//"\x1b6n" report cursor position as \x1b rown ; coln R
-
-	//turn echo off perhaps glibc/misc/getpass.c __tcgetattr __tcsetattr
-	//...
-
-	//output the magic ansi terminal code
-	var("\x1b[6n").output();
-
-	//this->ossleep(100);
-
-	//read back the response - sadly this HANGS until Enter is pressed
-	std::string tempstr;
-	std::getline(std::cin, tempstr, 'R');
-
-	//convert string to var/string
-	return boost::locale::conv::utf_to_utf<char>(tempstr);
-
-	*/
-}
-
-void var::setcursor() const
-{
-	THISIS("void var::setcursor() const")
-
-	THISISDEFINED()
-
-	// std::cout<<"var::getcursor() not implemented yet "<<std::endl;
-
-	return;
 }
 
 var var::getprompt() const

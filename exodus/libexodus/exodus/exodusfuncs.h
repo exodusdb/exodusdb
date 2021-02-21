@@ -153,6 +153,7 @@ DLL_PUBLIC var getcursor();
 DLL_PUBLIC void setcursor(const var& cursor);
 DLL_PUBLIC var getprompt();
 DLL_PUBLIC void setprompt(const var& prompt);
+DLL_PUBLIC bool echo(const int on_off);
 
 //DLL_PUBLIC var& input();
 //DLL_PUBLIC var& input(var& intostr);

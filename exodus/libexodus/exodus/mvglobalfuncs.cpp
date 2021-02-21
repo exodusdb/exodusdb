@@ -234,6 +234,8 @@ DLL_PUBLIC var getprompt() { return var().getprompt(); }
 
 DLL_PUBLIC void setprompt(const var& prompt) { prompt.setprompt(); }
 
+DLL_PUBLIC bool echo(const int on_off) { return var().echo(on_off);}
+
 
 DLL_PUBLIC var input() { var v; v.input(); return v;}
 

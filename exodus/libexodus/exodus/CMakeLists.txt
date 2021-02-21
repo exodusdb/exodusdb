@@ -93,7 +93,7 @@ add_library(exodus SHARED
 # mvipc.cpp mvipc_boost.cpp mvipc_posix.cpp mvipc_ms.cpp
  MurmurHash2_64.cpp naturalorder.cpp gettimeofday.cpp
  mvhandles.cpp mvdbconns.cpp mvprocessno.cpp
- getkey.cpp haskey.cpp howto.cpp
+ getkey.cpp haskey.cpp echo.cpp cursor.cpp howto.cpp
 )
 
 #set_target_properties(exodus PROPERTIES SOVERSION "${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_VERSION}")

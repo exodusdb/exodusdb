@@ -30,6 +30,21 @@ programinit()
 function main()
 {
 
+	print(at(-1));
+	var cursor=getcursor();
+	//no cursor if no terminal
+	assert(cursor eq "\x1b[1;1H" or cursor eq "");
+
+	//should show 1;1 in top left
+	for (var ii = 0;ii<13;++ii) {
+		print(at(ii,ii));
+		print(getcursor().substr(2));
+	}
+
+	print(at(7,24));
+	cursor=getcursor();
+	assert(cursor eq "\x1b[24;7H" or cursor eq "");
+
 	//output time and date to stderr
 	errputl("Using Exodus library version:" ^ var().version());
 	date().oconv("D").errputl("Date is:");

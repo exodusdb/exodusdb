@@ -928,6 +928,7 @@ public:
 	var& input(const var& prompt);
 	var& inputn(const int nchars);
 	bool eof() const;
+	bool echo(const int on_off) const;
 
 	friend std::istream& operator>>(std::istream& istream1, var& var1);
 

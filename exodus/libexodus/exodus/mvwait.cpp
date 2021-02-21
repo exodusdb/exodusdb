@@ -188,7 +188,7 @@ var wait_main(const int argc, const char* argv[], const int wait_time_ms)
 	// Save stdin terminal attributes
 	// Probably not available if running as a service
 	struct termios oldtio, curtio;
-	if (tcgetattr(0, &oldtio)<0) {
+	if (tcgetattr(STDIN_FILENO, &oldtio)<0) {
 		//EBADF - The filedes argument is not a valid file descriptor.
 		//ENOTTY - The filedes is not associated with a terminal.
 //		var("no std input").outputl();
@@ -215,9 +215,9 @@ var wait_main(const int argc, const char* argv[], const int wait_time_ms)
 		// b) no-echo
 		// https://man7.org/linux/man-pages/man3/termios.3.html
 		//
-		tcgetattr(0, &curtio);
+		tcgetattr(STDIN_FILENO, &curtio);
 		curtio.c_lflag &= ~(ICANON | ECHO);
-		tcsetattr(0, TCSANOW, &curtio);
+		tcsetattr(STDIN_FILENO, TCSANOW, &curtio);
 
 	}
 
@@ -295,7 +295,7 @@ var wait_main(const int argc, const char* argv[], const int wait_time_ms)
 
 	// restore terminal attributes (probably linewise input and echo)
 	if (nfds == 2) {
-		tcsetattr(0, TCSANOW, &oldtio);
+		tcsetattr(STDIN_FILENO, TCSANOW, &oldtio);
 	}
 
 	//exit(EXIT_SUCCESS);
