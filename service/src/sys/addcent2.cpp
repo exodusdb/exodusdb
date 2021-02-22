@@ -4,11 +4,11 @@ libraryinit()
 function main(in yymm) {
 	//c sys in,in,in,out
 
+	//only used in accounting to convert YYMM->YYYYMM
+
 	#define centuryyear 50
 
 	//linemark
-
-	//only used in accounting to convert YYMM->YYYYMM
 
 	//only convert 4 digit YYMM to YYYYMM
 	if (yymm.length() ne 4) {

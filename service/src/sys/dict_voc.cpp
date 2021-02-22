@@ -69,15 +69,17 @@ function main() {
 	if (ID eq "TESTBASIC") {
 		return 0;
 	}
-	var upper = RECORD;
-	upper.ucaser();
-	if (upper.index("DEBUG")) {
+
+	//upper=@record
+	//convert @lower.case to @upper.case in upper
+
+	if (RECORD.index("debug")) {
 		return 1;
 	}
 	if (ID eq "SENDMAIL") {
-		upper.converter("'EXODUS.ID'", "");
+		RECORD.converter("'EXODUS.ID'", "");
 	}
-	if (upper.index("'EXODUS.ID'") and ID ne "INSTALLALLOWHOSTS") {
+	if (RECORD.index("'EXODUS.ID'") and ID ne "INSTALLALLOWHOSTS") {
 		return 1;
 	}
 	return 0;

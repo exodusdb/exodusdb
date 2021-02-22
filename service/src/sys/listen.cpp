@@ -42,8 +42,6 @@ var neopath;
 var installend;
 var serverend;
 var databaseend;
-var atcol0;
-var clreol;
 var allcols;
 var maxstrlen;//num
 var nblocks;//num
@@ -273,13 +271,6 @@ function main() {
 	serverend = "../../" ^ SYSTEM.a(123).lcase() ^ ".end";
 	serverend.converter("/", OSSLASH);
 	databaseend = datasetcode.lcase() ^ ".end";
-	if (VOLUMES) {
-		atcol0 = at(0);
-		clreol = at(-4);
-	}else{
-		atcol0 = "";
-		clreol = "";
-	}
 
 	if (not(allcols.open("ACCESSIBLE_COLUMNS", ""))) {
 		allcols = "";
@@ -579,7 +570,7 @@ nextsearch0:
 	//similar in LISTEN and AUTORUN
 	tt = var().time().oconv("MTS") ^ " " ^ datasetcode ^ " " ^ processno ^ " " ^ nrequests ^ " " ^ memspace(999999).oconv("MD13P") ^ " Listening" " " ^ elapsedtimetext(lastrequestdate, lastrequesttime);
 	if (VOLUMES) {
-		print(atcol0, tt, " : ", clreol);
+		output(at(-40), tt, " : ");
 	}else{
 		var(tt).oswrite("process." ^ processno);
 	}
@@ -1060,9 +1051,8 @@ subroutine requestinit() {
 
 	nrequests += 1;
 
-	print(atcol0, clreol);
 	if (VOLUMES) {
-		print(var().time().oconv("MTS"), " ");
+		output(at(-40), var().time().oconv("MTS"), " ");
 	}else{
 		//similar in listen and log2
 		print(processno, ": ");
@@ -2570,7 +2560,7 @@ badwrite:
 		printfilename = SYSTEM.a(2);
 		//if tracing then
 		// *print ' got it'
-		// print atcol0:clreol:
+		// print @(0):@(-4):
 		// end
 
 		//make sure that the output file is closed

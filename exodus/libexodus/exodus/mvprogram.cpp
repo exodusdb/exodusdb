@@ -2069,6 +2069,11 @@ var ExodusProgramBase::oconv(const var& input0, const var& conversion)
 	// ENSURE synchronised if you change it
 
 	var result = input0;
+
+	//nothing in, nothing out
+	if (result.length() == 0)
+		return result;
+
 	var ptr = 1;
 	var delimiter;
 	do
@@ -2077,8 +2082,16 @@ var ExodusProgramBase::oconv(const var& input0, const var& conversion)
 		// var subconversion=conversion.remove(ptr,delimiter);
 		var subconversion = conversion.substr2(ptr, delimiter);
 
-		// either call custom conversion routines
-		if (subconversion[1] == "[")
+		// EITHER call standard conversion methods
+		if (subconversion[1] != "[")
+		{
+			result = result.oconv(subconversion);
+		}
+
+		else
+		// OR call custom conversion routines
+		// unlike arev, custom routines are reponsible
+		// for processing and returning multiple values
 		{
 
 			// var("*").logput();
@@ -2110,14 +2123,29 @@ var ExodusProgramBase::oconv(const var& input0, const var& conversion)
 				ioconv_custom.mv_ = &mv;
 
 				// and call it
-				call ioconv_custom("OCONV", result, mode, output);
+				//call ioconv_custom("OCONV", result, mode, output);
+
+				//call it once per field (any field mark RM-STM are preserved)
+				var posn = 1;
+				var ifield, ofield, delim;
+				output = "";
+				while (true) {
+
+					ifield=result.substr2(posn, delim);
+
+					call ioconv_custom("OCONV", ifield, mode, ofield);
+
+				    output ^= ofield;
+
+					if (not delim)
+						break;
+
+					output ^= var().chr(RM.seq() + 1 - delim);
+
+				}
+
 			}
 			result = output;
-		}
-		// or call standard conversion methods
-		else
-		{
-			result = result.oconv(subconversion);
 		}
 	} while (delimiter);
 

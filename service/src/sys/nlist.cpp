@@ -526,7 +526,7 @@ filename:
 			dictfilename = filename;
 		}
 		if (not(DICT.open("dict_" ^ dictfilename))) {
-			//uncommented so that list dict_clients gives dict.voc columns
+			//commented so that list dict_clients gives dict.voc columns
 			//crtx=1
 			DICT = dictvoc;
 		}

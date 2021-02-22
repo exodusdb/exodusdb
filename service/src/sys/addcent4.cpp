@@ -5,9 +5,9 @@ var inx;//num
 
 function main(in type, in in0, in mode, out outx) {
 	//c sys in,in,in,out
+	//global inx
 
 	#define centuryyear 50
-	//global inx
 
 	//avoid c++ warning about unused variable
 	if (0) {
