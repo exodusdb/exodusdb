@@ -1368,8 +1368,7 @@ getproxy:
 			lists = "";
 		}
 		if (not(lists.index(workpath))) {
-			var cmd = "MAKEFILE " ^ workpath ^ " LISTS";
-			perform(cmd ^ " (S)");
+			createfile("" ^ workpath ^ " LISTS (S)");
 			if (not(lists.open("LISTS", ""))) {
 				lists = "";
 			}
@@ -1380,7 +1379,7 @@ getproxy:
 
 		call log2("*check lists file exists", logtime);
 		if (not(lists.open("LISTS", ""))) {
-			var().clearfile(lists);
+			clearfile(lists);
 		}
 
 	}
@@ -1439,7 +1438,7 @@ getproxy:
 		//TODO lock/prevent double create with other processes
 		var file;
 		if (not(file.open(filename, ""))) {
-			perform("MAKEFILE REVBOOT " ^ filename ^ " (S)");
+			createfile("REVBOOT " ^ filename ^ " (S)");
 			if (VOLUMES) {
 				perform("CONVGLOBAL REVBOOT GLOBAL " ^ filename ^ " (S)");
 				perform("DELETEFILE DICT." ^ filename ^ " (S)");

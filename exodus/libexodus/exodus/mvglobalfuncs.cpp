@@ -568,32 +568,73 @@ DLL_PUBLIC bool deletedb(const var& dbname) { return dbname.deletedb(dbname); }
 
 DLL_PUBLIC bool createfile(const var& filename)
 {
-	return filename.createfile(filename.field(" ", 1));
+	//exodus doesnt automatically create dict files
+
+	//remove options like (S)
+	var filename2=filename.field("(",1).trim();
+
+	//remove arev volume locations
+	filename2.swapper("DATA ","").swapper("REVBOOT ","").swapper("DATAVOL ","").trimmer();
+
+	return filename.createfile(filename2);
 }
 
-DLL_PUBLIC bool deletefile(const var& filename)
+DLL_PUBLIC bool deletefile(const var& filename_or_handle)
 {
-	return filename.deletefile(filename.field(" ", 1));
+	//remove options like (S)
+	var filename2=filename_or_handle.field("(",1).trim();
+
+	//exodus doesnt automatically create dict files
+	filename2.swapper("DATA ","").trimmer();
+
+	return filename_or_handle.deletefile(filename2);
 }
 
-DLL_PUBLIC bool clearfile(const var& filename)
+DLL_PUBLIC bool clearfile(const var& filename_or_handle)
 {
-	return filename.clearfile(filename.field(" ", 1));
+	//remove options like (S)
+	var filename2=filename_or_handle.field("(",1).trim();
+
+	//exodus doesnt automatically create dict files
+	filename2.swapper("DATA ","").trimmer();
+
+	return filename_or_handle.clearfile(filename2);
 }
 
-DLL_PUBLIC bool renamefile(const var& filename, const var& newfilename)
+DLL_PUBLIC bool renamefile(const var& filename_or_handle, const var& newfilename)
 {
-	return filename.renamefile(filename, newfilename);
+	return filename_or_handle.renamefile(filename_or_handle.a(1), newfilename);
 }
 
-DLL_PUBLIC bool createindex(const var& filename, const var& fieldname, const var& dictfilename)
+DLL_PUBLIC bool createindex(const var& filename_or_handle, const var& fieldname, const var& dictfilename)
 {
-	return filename.createindex(fieldname, dictfilename);
+
+	//virtually identical code in createindex and deleteindex
+	if (filename_or_handle.index(" ")) {
+		var filename2 = filename_or_handle.field(" ", 1);
+		var fieldname2 = filename_or_handle.field(" ", 2);
+		var indextype2 = filename_or_handle.field(" ", 3);
+		if (indextype2 && indextype2 != "BTREE")
+			fieldname2 ^= "_" ^ indextype2;
+		return filename2.createindex(fieldname2, dictfilename);
+	}
+
+	return filename_or_handle.createindex(fieldname, dictfilename);
 }
 
-DLL_PUBLIC bool deleteindex(const var& filename, const var& fieldname)
+DLL_PUBLIC bool deleteindex(const var& filename_or_handle, const var& fieldname)
 {
-	return filename.deleteindex(fieldname);
+	//virtually identical code in createindex and deleteindex
+	if (filename_or_handle.index(" ")) {
+		var filename2 = filename_or_handle.field(" ", 1);
+		var fieldname2 = filename_or_handle.field(" ", 2);
+		var indextype2 = filename_or_handle.field(" ", 3);
+		if (indextype2 && indextype2 != "BTREE")
+			fieldname2 ^= "_" ^ indextype2;
+		return filename2.deleteindex(fieldname2);
+	}
+
+	return filename_or_handle.deleteindex(fieldname);
 }
 
 DLL_PUBLIC bool begintrans() { return var().begintrans(); }

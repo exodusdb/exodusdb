@@ -5,7 +5,6 @@ libraryinit()
 #include <sysmsg.h>
 #include <usersubs.h>
 #include <securitysubs.h>
-#include <sortarray.h>
 #include <singular.h>
 
 #include <gen_common.h>

@@ -6,7 +6,6 @@ libraryinit()
 #include <singular.h>
 #include <authorised.h>
 #include <collectixvals.h>
-#include <sortarray.h>
 #include <htmllib2.h>
 #include <select2.h>
 #include <openfile.h>

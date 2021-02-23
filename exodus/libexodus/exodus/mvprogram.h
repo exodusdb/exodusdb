@@ -170,6 +170,7 @@ class ExodusProgramBase
 	var iconv(const var& input, const var& conversion);
 
 	var invertarray(const var& input, const var& force0=(0));
+	void sortarray(var& array, const var& fns = 0, const var& orderby0 = "");
 
 	var elapsedtimetext(const var& fromdate, const var& fromtime);
 	var elapsedtimetext(const var& fromdate, const var& fromtime, var& uptodate, var& uptotime);

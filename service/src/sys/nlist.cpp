@@ -425,7 +425,7 @@ function main() {
 	silent = 0;
 
 	if (not(dictvoc.open("dict_voc", ""))) {
-		perform("MAKEFILE dict_voc");
+		createfile("dict_voc");
 		if (not(dictvoc.open("dict_voc", ""))) {
 			call fsmsg();
 			stop();

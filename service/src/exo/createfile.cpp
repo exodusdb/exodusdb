@@ -4,9 +4,9 @@ libraryinit()
 function main() {
 
 	//syntax is:
-	//makefile volumename filename
+	//createfile filename dictfilename
 	//or
-	//makefile filename
+	//createfile filename
 
 	//volumename is ignored
 

@@ -2,7 +2,6 @@
 libraryinit()
 
 #include <authorised.h>
-#include <sortarray.h>
 #include <systemfile.h>
 #include <usersubs.h>
 #include <securitysubs2.h>

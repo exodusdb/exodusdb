@@ -248,14 +248,14 @@ DLL_PUBLIC bool copydb(const var& from_dbname, const var& to_dbname);
 DLL_PUBLIC bool deletedb(const var& dbname);
 
 DLL_PUBLIC bool createfile(const var& filename);
-DLL_PUBLIC bool deletefile(const var& filename);
-DLL_PUBLIC bool clearfile(const var& filename);
+DLL_PUBLIC bool deletefile(const var& filename_or_handle);
+DLL_PUBLIC bool clearfile(const var& filename_or_handle);
 DLL_PUBLIC bool renamefile(const var& filename, const var& newfilename);
 DLL_PUBLIC var listfiles();
 DLL_PUBLIC var reccount(const var& filename_or_handle);
-DLL_PUBLIC bool createindex(const var& filename, const var& fieldname,
+DLL_PUBLIC bool createindex(const var& filename_or_handle, const var& fieldname DEFAULTNULL,
 			    const var& dictfilename DEFAULTNULL);
-DLL_PUBLIC bool deleteindex(const var& filename, const var& fieldname);
+DLL_PUBLIC bool deleteindex(const var& filename_or_handle, const var& fieldname DEFAULTNULL);
 DLL_PUBLIC var listindexes(const var& filename DEFAULTNULL, const var& fieldname DEFAULTNULL);
 DLL_PUBLIC bool begintrans();
 DLL_PUBLIC bool rollbacktrans();

@@ -467,14 +467,12 @@ dict(AGE_IN_YEARS) {
 	dictrec.r(3,"Brand Code");
 	if (not dictrec.write("DICT_MY_ADS","BRAND_CODE"))
 		printl("cannot write dict_ads, BRAND_CODE");
-	if (not ads.createindex("BRAND_CODE")) {
-//		printl("Creating MY_ADS BRAND_CODE Index");
-		printl("Index creation failed");
-	}
-	if (not ads.deleteindex("BRAND_CODE")) {
-		printl("Deleting MY_ADS BRAND_CODE Index");
-		printl("Index deletion failed");
-	}
+	//oo style
+	assert(ads.createindex("BRAND_CODE"));
+	assert(ads.deleteindex("BRAND_CODE"));
+	//procedural
+	assert(createindex("ADS BRAND_CODE"));
+	assert(deleteindex("ADS BRAND_CODE"));
 
 //	var("").select("MARKETS","WITH CURRENCY_NAME = '' AND WITH AUTHORISED");
 //	var("").select("MARKETS","WITH AUTHORISED");

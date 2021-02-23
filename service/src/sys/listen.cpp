@@ -766,7 +766,7 @@ nextsearch0:
 
 		//"U" = unlock all locks
 		if (charx eq "U") {
-			var().clearfile(locks);
+			clearfile(locks);
 			//unlock all
 			//if tracing then
 			printl(" ", "ALL LOCKS RELEASED");
