@@ -3504,7 +3504,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 	return true;
 }
 
-void var::clearselect()
+void var::clearselect() const
 {
 
 	// THISIS("void var::clearselect() const")
@@ -3517,10 +3517,10 @@ void var::clearselect()
 	//3/4/5/6 setup in makelist. cleared in clearselect
 	//if (this->a(3) == "%MAKELIST%")
 	{
-		this->r(6,"");
-		this->r(5,"");
-		this->r(4,"");
-		this->r(3,"");
+		const_cast<var&>(*this).r(6,"");
+		const_cast<var&>(*this).r(5,"");
+		const_cast<var&>(*this).r(4,"");
+		const_cast<var&>(*this).r(3,"");
 //		return;
 	}
 
@@ -3946,13 +3946,13 @@ bool var::hasnext() const
 	return true;
 }
 
-bool var::readnext(var& key)
+bool var::readnext(var& key) const
 {
 	var valueno;
-	return readnext(key, valueno);
+	return this->readnext(key, valueno);
 }
 
-bool var::readnext(var& key, var& valueno)
+bool var::readnext(var& key, var& valueno) const
 {
 
 	//?allow undefined usage like var xyz=xyz.readnext();
@@ -4053,7 +4053,7 @@ bool var::readnext(var& key, var& valueno)
 	}
 #endif
 
-bool var::readnext(var& record, var& key, var& valueno)
+bool var::readnext(var& record, var& key, var& valueno) const
 {
 
 	//?allow undefined usage like var xyz=xyz.readnext();
@@ -4092,10 +4092,10 @@ bool var::readnext(var& record, var& key, var& valueno)
 				// makelist provides one block of keys and nothing in the lists file
 				if (listid == "%MAKELIST%")
 				{
-					this->r(3,"");
-					this->r(4,"");
-					this->r(5,"");
-					this->r(6,"");
+					const_cast<var&>(*this).r(3,"");
+					const_cast<var&>(*this).r(4,"");
+					const_cast<var&>(*this).r(5,"");
+					const_cast<var&>(*this).r(6,"");
 					return false;
 				}
 
@@ -4116,14 +4116,14 @@ bool var::readnext(var& record, var& key, var& valueno)
 					return false;
 				}
 
-				this->r(4, listno);
-				this->r(5, 0);
-				this->r(6, block.lowerer());
+				const_cast<var&>(*this).r(4, listno);
+				const_cast<var&>(*this).r(5, 0);
+				const_cast<var&>(*this).r(6, block.lowerer());
 				continue;
 			}
 
 			// bump up the key no pointer
-			this->r(5, keyno);
+			const_cast<var&>(*this).r(5, keyno);
 
 			// extract and return the key (and mv if present)
 			key = key_and_mv.a(1, 1, 1);

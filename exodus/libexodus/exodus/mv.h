@@ -1379,12 +1379,12 @@ public:
 	//////////////////////
 
 	bool select(const var& sortselectclause DEFAULTNULL);
-	void clearselect();
+	void clearselect() const;
 
 	ND bool hasnext() const;
-	bool readnext(var& key);
-	bool readnext(var& key, var& valueno);
-	bool readnext(var& record, var& key, var& valueno);
+	bool readnext(var& key) const;
+	bool readnext(var& key, var& valueno) const;
+	bool readnext(var& record, var& key, var& valueno) const;
 
 	bool savelist(const var& listname);
 	bool getlist(const var& listname);

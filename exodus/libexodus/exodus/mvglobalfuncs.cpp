@@ -682,11 +682,6 @@ DLL_PUBLIC bool writev(const var& record, const var& filehandle, const var& key,
 	return record.writev(filehandle, key, fieldno);
 }
 
-DLL_PUBLIC bool deleterecord(const var& filehandle, const var& key)
-{
-	return filehandle.deleterecord(key);
-}
-
 DLL_PUBLIC bool updaterecord(const var& record, const var& filehandle, const var& key)
 {
 	return record.updaterecord(filehandle, key);

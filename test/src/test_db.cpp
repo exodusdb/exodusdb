@@ -94,6 +94,31 @@ function main()
 		assert(not xyz.read(filename,k1));
 	}
 
+	{
+	    printl("Create a temp file");
+	    var tempfilename="test_deleterecord";
+	    var tempfile=tempfilename;
+	    deletefile(tempfile);
+	    if (createfile(tempfile))
+	        outputl(tempfile);
+	    for (int i=1;i<=10;++i)
+	        write(i on tempfile, i);
+	    tempfile.reccount().outputl("nrecs");
+
+	    printl("Check deleterecord works on a select list");
+	    select(tempfile ^ " with ID ge 5");
+	    deleterecord(tempfile);
+	    assert(tempfile.reccount() == 5);
+
+	    printl("Check deleterecord works command style list of keys");
+	    deleterecord(tempfilename ^ " '1' 2 \"3\"");
+	    assert(tempfile.reccount() == 2);
+
+	    printl("Check deleterecord one key using 2nd parameter works");
+	    deleterecord(tempfilename, "10");
+	    assert(tempfile.reccount() == 1);
+	}
+
     //NFD - Decomposed Normal Form                                                                     │
     //NFC - Compact Normal Form                                                                        │
     var decomp_a="\x61\xCC\x81";//"á";                                                                 │

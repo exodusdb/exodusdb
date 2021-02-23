@@ -29,7 +29,7 @@ function main() {
 		stop();
 	}
 
-	var filename=COMMAND.a(2);
+	var filename=COMMAND.a(2).convert(".","_");
 	var key=COMMAND.a(3);
 	var fieldno=COMMAND.a(4);
 
@@ -142,10 +142,10 @@ function main() {
 					printl(filename^" "^key ^ " > db");
 
 					//generate/update database functions if saved a symbolic dictionary record
-					if (filename.substr(1,5)=="dict_"
-					    and newrecord.a(1) eq "S"
-					    and newrecord.a(8).index("/" "*pgsql")
-					   ) {
+					var x=filename.substr(1,5)=="dict_";
+					var y=newrecord.a(1) eq "S";
+					var z=newrecord.a(8).index("/" "*pgsql");
+					if (filename.substr(1,5)=="dict_" and newrecord.a(1) eq "S" and newrecord.a(8).index("/" "*pgsql") ) {
 						var oscmd="dict2sql " ^ filename ^ " " ^ key;
 						//oscmd.outputl("oscmd=");
 						osshell(oscmd);

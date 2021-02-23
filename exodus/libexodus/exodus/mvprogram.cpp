@@ -395,6 +395,51 @@ bool ExodusProgramBase::readnext(var& record, var& key, var& valueno)
 	return CURSOR.readnext(record, key, valueno);
 }
 
+bool ExodusProgramBase::deleterecord(const var& filename_or_handle_or_command, const var& key)
+{
+	if (filename_or_handle_or_command.index(" ") || key.length()==0) {
+		var command=filename_or_handle_or_command.a(1);
+
+		var filename = command.field(" ", 1);
+
+		//if any keys provided (remove quotes if present)
+		int nwords=command.dcount(" ");
+
+		//find and skip final options like (S)
+		bool silent=false;
+		if (command[-1] == ")" || command[-1] == "}") {
+			silent = command.field2(" ",-1).index("S");
+			nwords--;
+		}
+
+		if (nwords >= 2) {
+			for (int wordn=2;wordn<=nwords;++wordn) {
+				var key=command.field(" ",wordn).unquote();
+				if (filename.deleterecord(key)) {
+					silent || key.quote().outputl("Deleted ");
+				} else {
+					silent || key.quote().errputl("NOT deleted ");
+				}
+			}
+		}
+		//delete keys provided in a select list
+		else {
+			var key;
+			while (CURSOR.readnext(key)) {
+				if (filename.deleterecord(key)) {
+					silent || key.quote().outputl("Deleted ");
+				} else {
+					silent || key.quote().errputl("NOT deleted ");
+				}
+			}
+		}
+		return true;
+	}
+
+	return filename_or_handle_or_command.deleterecord(key);
+	//return filehandle.deleterecord(key);
+}
+
 bool ExodusProgramBase::pushselect([[maybe_unused]] const var& v1, var& v2, [[maybe_unused]] var& v3, [[maybe_unused]] var& v4)
 {
 

@@ -3,19 +3,16 @@ libraryinit()
 
 #include <videorw.h>
 
-var startmode;
 var temp;
 var reply;//num
 
-function main(in startmode0, out starttime, out startdate, out startbuffer) {
-	//c sys in,out,out,out
+function main(io startmode, out starttime, out startdate, out startbuffer) {
+	//c sys io,out,out,out
 
 	var interactive = not(SYSTEM.a(33));
 
-	if (startmode0.unassigned()) {
+	if (startmode.unassigned()) {
 		startmode = "";
-	}else{
-		startmode = startmode0;
 	}
 	if (startmode) {
 		temp = "|" ^ startmode ^ "||";
