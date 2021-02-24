@@ -58,7 +58,7 @@ function main(in filename, in indexid, in texts0, io msg) {
 	foundkeys.converter(VM, FM);
 	var listkey = "SELECTBTREE:" ^ SYSTEM.a(24);
 	foundkeys.write(lists, listkey);
-	getlist(listkey ^ " (S)");
+	getlist("" ^ listkey ^ " (S)");
 	//delete lists,listkey
 
 	return 0;

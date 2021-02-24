@@ -583,7 +583,7 @@ nextkey:
 
 	} else if (word eq "GETLIST") {
 		gosub getword();
-		getlist(word ^ " (S)");
+		getlist("" ^ word ^ " (S)");
 
 	} else if (word eq "AND" or word eq "OR") {
 		ss ^= " " ^ word;
