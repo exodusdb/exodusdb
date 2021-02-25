@@ -535,10 +535,15 @@ void ExodusProgramBase::mssg(const var& msg, const var& options, var& buffer,
 			     const var& params) const
 {
 
-	var interactive = !SYSTEM.a(33);
+	//skip if just "downing" a previous "upped" message
+	if (options.index("D")) {
+		std::cout << std::endl;
+		return;
+	}
 
+	var interactive = !SYSTEM.a(33);
 	if (interactive)
-		std::cout << var("-").str(40) << std::endl;
+		std::cout << var("----------------------------------------") << std::endl;
 
 	//we must pass the message unmodified into USER4 below
 	//e.g. to pass ACCOUNTLIST back to client with FM/VM etc
@@ -1581,7 +1586,7 @@ var ExodusProgramBase::decide(const var& questionx, const var& optionsx, var& re
 
 	var interactive = !SYSTEM.a(33);
 	if (interactive)
-		std::cout << var("-").str(40) << std::endl;
+		std::cout << var("========================================") << std::endl;
 
 	std::cout << question << std::endl;
 

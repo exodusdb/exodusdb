@@ -2035,6 +2035,7 @@ var var::substr(const int startindex1, const var& delimiterchars, int& endindex)
 ////////
 
 // returns the characters up to the next delimiter
+// delimiter returned as numbers RM=1F=1 FM=1E=2, VM=1D=3 SM=1C=4 TM=1B=5 to STM=1A=6 or 0 if not found
 // NOTE startindex1 is 1 based not 0. anything less than 1 is treated as 1
 var var::substr2(var& startindex1, var& delimiterno) const
 {
@@ -2080,7 +2081,7 @@ var var::substr2(var& startindex1, var& delimiterno) const
 		return returnable;
 	}
 
-	// delimiters returned as numbers FF=1 FE=2, FD=3 etc to F9=7
+	// delimiters returned as numbers RM=1F=1 FM=1E=2, VM=1D=3 SM=1C=4 TM=1B=5 to STM=1A=6
 	// delimiterno=int(LASTDELIMITERCHARNOPLUS1-var_str[end_pos]);
 	delimiterno = int(*_RM_) - int(var_str[end_pos]) + 1;
 
@@ -2098,7 +2099,7 @@ var var::substr2(var& startindex1, var& delimiterno) const
 //////
 // SUM
 /////
-
+/*
 var var::sum() const
 {
 	THISIS("var var::sum()")
@@ -2131,6 +2132,53 @@ var var::sum() const
 			break;
 	}
 	return result.round(maxdecimals);
+}*/
+
+var var::sum() const
+{
+	THISIS("var var::sum()")
+	THISISSTRING()
+
+	// Add up all number regardless of separator level (multilevel)
+	// Limit the number of decimal places in returned value to the max found in the input
+    // assert(sum("2245000900.76" _VM_ "102768099.9" _VM_ "-2347769000.66") == 0);
+
+	var result = 0;
+	var start = 0;
+	var subfield;
+	var curr_delim = 7;
+	var next_delim;
+	var returnstr = "";
+	size_t maxdecimals = 0;
+	var runtot = 0;
+	while (true)
+	{
+		//this extracts a substring up to any separator charactor STM-RM
+		subfield = (*this).substr2(start, next_delim);
+
+		size_t subfieldsize = subfield.var_str.size();
+		if (subfieldsize) {
+			result += subfield;
+			size_t n=subfield.var_str.find('.');
+			if (n) {
+				n=subfieldsize-n;
+				if (n>maxdecimals)
+					maxdecimals=n;
+			}
+			runtot=(runtot+subfield).round(maxdecimals);
+		}
+		if (not next_delim) {
+			returnstr ^= runtot;
+			break;
+		} else if (next_delim < curr_delim) {
+			returnstr ^= runtot ^ (_RM_-curr_delim+1);
+			runtot = 0;
+		} else if (next_delim > curr_delim) {
+		}
+		curr_delim = next_delim;
+	}
+	//return result.round(maxdecimals);
+	return returnstr;
 }
 
 var var::sum(const var& sepchar) const

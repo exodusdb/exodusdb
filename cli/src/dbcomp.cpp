@@ -3,7 +3,7 @@ programinit()
 
 function main() {
 
-	printl("compdbs says 'Hello World!'");
+	logputl("compdbs says 'Hello World!'");
 
 	var timestarted=time();
 
@@ -23,7 +23,7 @@ function main() {
 	var filename;
 	var filen=0;
 	while (filename = COMMAND.a(++filen+3)) {
-		print(filename,"");
+		logput(filename,"");
 
 		var file1;
 		if (not file1.open(filename,db1)) {
@@ -31,7 +31,7 @@ function main() {
 			stop();
 		}
 
-		printl(file1.reccount());
+		logputl(file1.reccount());
 
 		var file2;
 		if (not file2.open(filename,db2)) {
@@ -54,7 +54,7 @@ function main() {
 				stop();
 
 			recn++;
-			print(at(-40) ^ recn ^ ".", ID);
+			logput(at(-40) ^ recn ^ ".", ID);
 			//printl("",RECORD.length());
 			if ((recn % 1000) == 1)
 				osflush();
@@ -68,13 +68,33 @@ function main() {
 
 			var rec2;
 			if (not read(rec2, file2, ID)) {
-				printl(" missing from", db2.a(1), filename);
+				printl(ID," missing from", db2.a(1), filename);
 				continue;
 			}
 
 			if (rec2 ne RECORD) {
-				printl(" different.");
-				continue;
+
+				//revert both records to leading zero 0.1, -0.1 instead of old arev .1 and -.1;
+				RECORD.replacer("([\x1A-\x1F]-?)0.","$1.");
+				rec2.replacer("([\x1A-\x1F]-?)0.","$1.");
+
+				//if still different, output
+				if (rec2 ne RECORD) {
+					printl(ID," different.");
+					var nfs=dcount(RECORD,FM);
+					var nfs2=dcount(rec2,FM);
+					if (nfs2 gt nfs)
+						nfs=nfs2;
+					for (var fn=1;fn<=nfs;++fn) {
+						var f1=RECORD.a(fn);
+						var f2=rec2.a(fn);
+						if (f1 ne f2) {
+							printl(fn^"-",f1);
+							printl(fn^"+",f2);
+						}
+					}
+				}
+			continue;
 			}
 		}
 
@@ -82,10 +102,10 @@ function main() {
 
 	//call stopper("",timestarted,datestarted);
 
-	printl();
+	logputl();
 	var seconds = time()-timestarted;
 	while (seconds<0) seconds += 86400;
-	printl("Finished in", int(seconds/60), "minutes and", mod(seconds,60), "seconds.");
+	logputl("Finished in", int(seconds/60), "minutes and", mod(seconds,60), "seconds.");
 
 	return 0;
 }

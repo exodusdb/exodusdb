@@ -282,6 +282,11 @@ function main()
 	//unicode case sensitive NOT finding
 	assert(match("αβγδεΑΒΓΔΕ","(Α).(γδ)","").convert(FM^VM,"^]")=="");
 
+	var r1 = _FM_ "0.123";
+	assert(r1.replace("([\x1A-\x1F]-?)0.","$1.") == _FM_ ".123");
+	var r2 = _STM_ "-0.123";
+    assert(r2.replace("([\x1A-\x1F]-?)0.","$1.") == _STM_ "-.123");
+
 	//replacing unicode style numbers characters using javascript style regex
 	assert(var("Ⅻ").replace(R"(\p{Number})","yes")=="yes");
 	assert(var("⅝").replace(R"(\p{Number})","yes")=="yes");

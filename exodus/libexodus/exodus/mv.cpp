@@ -1528,7 +1528,7 @@ std::ostream& operator<<(std::ostream& ostream1, var var1)
 	//leave ESC as \x1B because it is used to control ANSI terminal control sequences
     std::string str = "\x1A\x1B\x1C\x1D\x1E\x1F";
     for (auto& c : var1.var_str) {
-        if (c <= 0x1F && c >= 0x1A)
+        if (c >= 0x1A && c <= 0x1F)
             c = "|\x1B\\]^~"[c - 0x1A];
     }
 
