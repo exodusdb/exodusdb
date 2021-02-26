@@ -817,7 +817,6 @@ var& var::operator+=(const var& rhs)
 {
 	THISIS("var& var::operator+= (const var& rhs)")
 	THISISDEFINED()
-	ISNUMERIC(rhs)
 
 tryagain:
 
@@ -825,6 +824,7 @@ tryagain:
 	// prefer double
 	if (var_typ & VARTYP_DBL)
 	{
+		ISNUMERIC(rhs)
 		//+= int or dbl from source
 		var_dbl += (rhs.var_typ & VARTYP_INT) ? rhs.var_int : rhs.var_dbl;
 		var_typ = VARTYP_DBL; // reset to one unique type
@@ -834,6 +834,7 @@ tryagain:
 	// int target
 	else if (var_typ & VARTYP_INT)
 	{
+		ISNUMERIC(rhs)
 		// int source
 		if (rhs.var_typ & VARTYP_INT)
 		{
@@ -867,13 +868,13 @@ var& var::operator-=(const var& rhs)
 {
 	THISIS("var& var::operator-= (const var& rhs)")
 	THISISDEFINED()
-	ISNUMERIC(rhs)
 
 tryagain:
 
 	// int target
 	if (var_typ & VARTYP_INT)
 	{
+		ISNUMERIC(rhs)
 		// int source
 		if (rhs.var_typ & VARTYP_INT)
 		{
@@ -890,6 +891,7 @@ tryagain:
 	// dbl target
 	else if (var_typ & VARTYP_DBL)
 	{
+		ISNUMERIC(rhs)
 		//-= int or dbl from source
 		var_dbl -= (rhs.var_typ & VARTYP_INT) ? rhs.var_int : rhs.var_dbl;
 		var_typ = VARTYP_DBL; // reset to one unique type

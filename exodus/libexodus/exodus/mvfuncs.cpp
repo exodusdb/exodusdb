@@ -38,7 +38,7 @@ Binary    Hex          Comments
 //#include <signal.h>
 //#endif
 
-//#include <cmath>    //for floor
+//#include <cmath>    //for abs(double)
 //#include <cstdlib>  //for exit
 //#include <iostream> //cin and cout
 //#include <memory>   //for unique_ptr
@@ -396,6 +396,7 @@ var var::round(const int ndecimals) const
 
 	// scale it up (or down)
 	double scale = pow(10.0, ndecimals);
+
 	result *= scale;
 
 	// round .5 up and -.5 down to nearest integer as per pick financial rounding concept
@@ -409,6 +410,10 @@ var var::round(const int ndecimals) const
 	result = result2 / scale;
 
 	return result;
+	/*
+	//printf("%.2f\n",copysignf(floorf(fabs(d*100) + 0.5d), d)/100);
+	return copysign(std::floor(std::abs(result*scale) + 0.5), result)/scale;
+	*/
 }
 
 bool var::toBool() const

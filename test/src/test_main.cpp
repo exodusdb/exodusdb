@@ -182,7 +182,26 @@ function main()
 	assert(var("top of the world").tcase()=="Top Of The World");
 	printl(var("top of the world").tcase().fcase());
 
-	assert(sum("2245000900.76" _VM_ _FM_ "102768099.9" _VM_ "-2347769000.66" _FM_ ) == 0);
+	//test sum rounds result to no more than the input decimals input
+	printl(sum("2245000900.76" _VM_ "102768099.9" _VM_ "-2347769000.66" _VM_ ));
+	assert(sum("2245000900.76" _VM_ "102768099.9" _VM_ "-2347769000.66" _VM_ ) == 0);
+
+	assert(sumtest("1}2]3}4")          == "3]7");
+	assert(sumtest("1]2^3]4")          == "3^7");
+	assert(sumtest("1}2]3}4^9")        == "3]7^9");
+	assert(sumtest("1}2}3}4}9")        == "19");
+	assert(sumtest("1}2]3}4~9")        == "3]7~9");
+	assert(sumtest("1~2^3]5}6|7")      == "1~2^3]5}13");
+	assert(sumtest("1~2>2>2~3~4}5}6")  == "1~6~3~4}5}6");
+	assert(sumtest("1~2|2|2~3~4}5}6")  == "1~6~3~4}5}6");
+	assert(sumtest("1~2>2|2~3~4}5}6")  == "1~2>4~3~4}5}6");
+
+	assert(sumtest("1~2~3~4~5~6")      == "21");
+	assert(sumtest("1^2^3^4^5^6")      == "21");
+	assert(sumtest("1]2]3]4]5]6")      == "21");
+	assert(sumtest("1}2}3}4}5}6")      == "21");
+	assert(sumtest("1>2>3>4>5>6")      == "21");
+	assert(sumtest("1|2|3|4|5|6")      == "21");
 
 	var value=R"('1')";
 	assert(value.swap("'",R"(\')")=="\\'1\\'");
@@ -1914,6 +1933,15 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	if (osopen(tempfile,tempfile))
 		assert(false and var("non-existent file opened!"));
 
+/*
+	printl(round(var("6000.50")/20,2));
+	assert(round(var("6000.50")/20,2)==300.03);
+	assert(round(var("-6000.50")/20,2)==-300.03);
+	assert(round(var(6000.50d)/20,2)==300.03);
+	assert(round(var(-6000.50d)/20,2)==-300.03);
+	assert(round(var(6000.50f)/20,2)==300.03);
+	assert(round(var(-6000.50f)/20,2)==-300.03);
+*/
 	//math.h seems to have been included in one of the boost or other special headers
 	//in this main.cpp file and that causes confusion between math.h and exodus.h sin() and other functions.
 	//we resolved the issue here by being specific about the namespace
@@ -2710,6 +2738,12 @@ function test_codepage(in codepage, in lang) {
 	assert(as_utf8a == as_utf8b);
 
 	return 0;
+}
+
+//function to conveniently test sum function
+function sumtest(in instr)
+{
+	    return sum(instr.convert("~^]}>|", _RM_ _FM_ _VM_ _SM_ _TM_ _STM_)).convert(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_,"~^]}>|");
 }
 
 programexit()
