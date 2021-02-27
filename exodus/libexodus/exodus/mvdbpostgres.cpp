@@ -1842,6 +1842,9 @@ inline void tosqlstring(var& string1)
 		string1.swapper("'", "''");
 		string1.splicer(1, 1, "'");
 		string1.splicer(-1, 1, "'");
+		//allow searching for text with * characters embedded
+		//otherwise interpreted as glob character?
+		string1.swapper("*","\\*");
 	}
 }
 

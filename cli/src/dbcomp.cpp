@@ -78,19 +78,28 @@ function main() {
 				RECORD.replacer("([\x1A-\x1F]-?)0.","$1.");
 				rec2.replacer("([\x1A-\x1F]-?)0.","$1.");
 
+				//temp suppress ads field 56
+				if (filename == "ads") {
+					RECORD.r(56,rec2.a(56));
+					RECORD.swapper(".000","");
+					rec2.swapper(".000","");
+					RECORD.swapper(".00","");
+					rec2.swapper(".00","");
+				}
+
 				//if still different, output
 				if (rec2 ne RECORD) {
-					printl(ID," different.");
-					var nfs=dcount(RECORD,FM);
-					var nfs2=dcount(rec2,FM);
+					printl(" ", ID, " different.");
+					var nfs=dcount(RECORD, FM);
+					var nfs2=dcount(rec2, FM);
 					if (nfs2 gt nfs)
 						nfs=nfs2;
-					for (var fn=1;fn<=nfs;++fn) {
+					for (var fn=1; fn<=nfs; ++fn) {
 						var f1=RECORD.a(fn);
 						var f2=rec2.a(fn);
 						if (f1 ne f2) {
-							printl(fn^"-",f1);
-							printl(fn^"+",f2);
+							printl(fn ^ "-", f1);
+							printl(fn ^ "+", f2);
 						}
 					}
 				}

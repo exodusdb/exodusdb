@@ -182,11 +182,14 @@ function main()
 	assert(var("top of the world").tcase()=="Top Of The World");
 	printl(var("top of the world").tcase().fcase());
 
+	printl(round(var("6000.50")/20,2));
+	assert(round(var("6000.50")/20,2)==300.03);
+
 	//test sum rounds result to no more than the input decimals input
 	printl(sum("2245000900.76" _VM_ "102768099.9" _VM_ "-2347769000.66" _VM_ ));
 	assert(sum("2245000900.76" _VM_ "102768099.9" _VM_ "-2347769000.66" _VM_ ) == 0);
 
-	assert(sumtest("1}2]3}4")          == "3]7");
+	printl(sumtest("1}2]3}4"));
 	assert(sumtest("1]2^3]4")          == "3^7");
 	assert(sumtest("1}2]3}4^9")        == "3]7^9");
 	assert(sumtest("1}2}3}4}9")        == "19");
@@ -212,7 +215,7 @@ function main()
 	stringstr << var(RM ^ FM ^ VM ^ SM ^ TM ^ STM);
 	std::cout << stringstr.str() << std::endl;
 	//assert(var(stringstr.str()) == "~^]\\[|");
-	assert(var(stringstr.str()) == "~^]\\" "\x1B" "|");
+	assert(var(stringstr.str()) == "~^]}" "\x1B" "|");
 
 	// test normalization
 
@@ -1933,7 +1936,6 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	if (osopen(tempfile,tempfile))
 		assert(false and var("non-existent file opened!"));
 
-/*
 	printl(round(var("6000.50")/20,2));
 	assert(round(var("6000.50")/20,2)==300.03);
 	assert(round(var("-6000.50")/20,2)==-300.03);
@@ -1941,7 +1943,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	assert(round(var(-6000.50d)/20,2)==-300.03);
 	assert(round(var(6000.50f)/20,2)==300.03);
 	assert(round(var(-6000.50f)/20,2)==-300.03);
-*/
+
 	//math.h seems to have been included in one of the boost or other special headers
 	//in this main.cpp file and that causes confusion between math.h and exodus.h sin() and other functions.
 	//we resolved the issue here by being specific about the namespace

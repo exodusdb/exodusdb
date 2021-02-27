@@ -1528,10 +1528,11 @@ std::ostream& operator<<(std::ostream& ostream1, var var1)
 
 	//replace various unprintable field marks with unusual ASCII characters
 	//leave ESC as \x1B because it is used to control ANSI terminal control sequences
-    std::string str = "\x1A\x1B\x1C\x1D\x1E\x1F";
+    //std::string str = "\x1A\x1B\x1C\x1D\x1E\x1F";
+    std::string str = "\x1E\x1D\x1C\x1B\x1A\x1F";//order by frequency of occurrence
     for (auto& c : var1.var_str) {
         if (c >= 0x1A && c <= 0x1F)
-            c = "|\x1B\\]^~"[c - 0x1A];
+            c = "|\x1B}]^~"[c - 0x1A];
     }
 
 	// use toString() to avoid creating a constructor which logs here recursively

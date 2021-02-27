@@ -2105,9 +2105,9 @@ var var::sum() const
 	THISIS("var var::sum()")
 	THISISSTRING()
 
-	// Add up all number regardless of separator level (multilevel)
+	// Add up all numbers regardless of separators or levels (multilevel)
 	// Limit the number of decimal places in returned value to the max found in the input
-    // assert(sum("2245000900.76" _VM_ "102768099.9" _VM_ "-2347769000.66") == 0);
+    // assert(sum("2245000900.76" _FM_ "102768099.9" _VM_ "-2347769000.66") == 0);
 
 	var result = 0;
 	var start = 0;
@@ -2180,12 +2180,12 @@ var var::sum() const
 			//work out maximum decimal places from both sides
 			size_t maxdecimals=0;
 			size_t n=part.var_str.find('.');
-			if (n) {
-				maxdecimals=part.var_str.size()-n;
+			if (n != std::string::npos) {
+				maxdecimals=part.var_str.size() - n - 1;
 			}
 			n=accum.var_str.find('.');
-			if (n) {
-				n=accum.var_str.size()-n;
+			if (n != std::string::npos) {
+				n=accum.var_str.size() - n - 1;
 				if (n>maxdecimals)
 					maxdecimals=n;
 			}

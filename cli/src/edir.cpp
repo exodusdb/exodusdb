@@ -30,7 +30,7 @@ function main() {
 	}
 
 	var filename=COMMAND.a(2).convert(".","_");
-	var key=COMMAND.a(3);
+	var key=COMMAND.a(3).unquote().unquote();//spaces are quoted
 	var fieldno=COMMAND.a(4);
 
 	//connect to the database
@@ -54,6 +54,9 @@ function main() {
 		else
 			origrecord="";
 	}
+
+	if (not origrecord)
+		printl("New record");
 
 	var text=origrecord.a(fieldno);
 	var sepchar;
@@ -79,7 +82,7 @@ function main() {
 
 	//put the text on a temp file in order to edit it
 	var temposfilename=filename^ "~" ^ key;
-	var invalidfilechars="\"\'\u00A3$%^&*(){}[]:;#<>?,./\\|";
+	var invalidfilechars=" \"\'\u00A3$%^&*(){}[]:;#<>?,./\\|";
 	temposfilename.lcaser().converter(invalidfilechars,str("-",len(invalidfilechars)));
 	temposfilename ^= "-pid" ^ ospid();
 	if (filename.substr(1,5)=="dict_" and fieldno)

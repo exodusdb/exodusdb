@@ -38,6 +38,10 @@ Binary    Hex          Comments
 //#include <signal.h>
 //#endif
 
+//#include <cmath>      //for stod()
+//#include <sstream>
+#include <iomanip>    //for setprecision
+
 //#include <cmath>    //for abs(double)
 //#include <cstdlib>  //for exit
 //#include <iostream> //cin and cout
@@ -382,38 +386,67 @@ var var::round(const int ndecimals) const
 	THISIS("var var::round() const")
 	THISISNUMERIC()
 
-	double result;
+	var result;
+
+	double fromdouble;
 	// prefer double
 	if (var_typ & VARTYP_DBL)
-		result = var_dbl;
+		fromdouble = var_dbl;
 	else
 	{
-		if (not ndecimals)
-			return var_int;
+		if (not ndecimals) {
+			//result=*this;
+			result.var_int=var_int;
+			result.var_typ=VARTYP_INT;
+			return result;
+		}
 		// loss of precision if var_int is long long
-		result = int(var_int);
+		fromdouble = int(var_int);
 	}
 
-	// scale it up (or down)
-	double scale = pow(10.0, ndecimals);
+	//unfortunately c+ round(double) does not work well with decimal numbers
+	//because some decimal numbers ending .5 are represented in binary
+	//internally as .499999999999999965234
+	//which will round DOWN not up
+	//
+	//For example 6000.50/5 is 300.025 really but
+	//in binary it is 300.024999999999999
+	//
+	//Therefore we must do manual rounding up where
+	//adding 0.5 closely agrees with the next higher integer
+	//
+	//both pickdb and c++ rounding tie break goes away from zero.
 
-	result *= scale;
+	int scale = std::pow(10.0,ndecimals);
 
-	// round .5 up and -.5 down to nearest integer as per pick financial rounding concept
-	long long int result2;
-	if (result >= 0)
-		result2 = (long long int)(result + 0.5);
-	else
-		result2 = (long long int)(result - 0.5);
+	//cout << fixed << setprecision(20) << val << endl;
 
-	// scale it back down (or back up)
-	result = result2 / scale;
+	double fromdouble2 = fromdouble * scale;
+	//cout << fixed << setprecision(20) << fromdouble2 << endl;
+
+	double ceil2=std::ceil(fromdouble2);
+
+	double diff = (fromdouble2 + 0.5) - ceil2;
+	//cout << diff << endl;
+
+	double out;
+	if (std::abs(diff) < 0.0000001) {
+		if (fromdouble >= 0)
+			out = ceil2/scale;
+		else
+			out = std::floor(fromdouble2)/scale;
+	} else
+		out = std::round(fromdouble2)/scale;
+
+	std::stringstream ss;
+	//cout << fixed << setprecision(ndecimals) << out << endl;
+	ss << std::fixed << std::setprecision(ndecimals) << out;
+
+	result.var_str = ss.str();
+	result.var_typ = VARTYP_STR;
 
 	return result;
-	/*
-	//printf("%.2f\n",copysignf(floorf(fabs(d*100) + 0.5d), d)/100);
-	return copysign(std::floor(std::abs(result*scale) + 0.5), result)/scale;
-	*/
+
 }
 
 bool var::toBool() const

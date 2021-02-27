@@ -950,7 +950,7 @@ public:
 	var clone() const;
 
 	/*no implemented yet
-	var addressof() const;
+	var rawvarmemory() const;
 	void clear();
 	void clearcommon();
 //	var bitand(const var) const;
