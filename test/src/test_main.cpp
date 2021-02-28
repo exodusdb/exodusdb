@@ -189,23 +189,79 @@ function main()
 	printl(sum("2245000900.76" _VM_ "102768099.9" _VM_ "-2347769000.66" _VM_ ));
 	assert(sum("2245000900.76" _VM_ "102768099.9" _VM_ "-2347769000.66" _VM_ ) == 0);
 
-	printl(sumtest("1}2]3}4"));
-	assert(sumtest("1]2^3]4")          == "3^7");
-	assert(sumtest("1}2]3}4^9")        == "3]7^9");
-	assert(sumtest("1}2}3}4}9")        == "19");
-	assert(sumtest("1}2]3}4~9")        == "3]7~9");
-	assert(sumtest("1~2^3]5}6|7")      == "1~2^3]5}13");
-	assert(sumtest("1~2>2>2~3~4}5}6")  == "1~6~3~4}5}6");
-	assert(sumtest("1~2|2|2~3~4}5}6")  == "1~6~3~4}5}6");
-	assert(sumtest("1~2>2|2~3~4}5}6")  == "1~2>4~3~4}5}6");
+	printl(test_sum("1}2]3}4"));
+	assert(test_sum("1]2^3]4")          == "3^7");
+	assert(test_sum("1}2]3}4^9")        == "3]7^9");
+	assert(test_sum("1}2}3}4}9")        == "19");
+	assert(test_sum("1}2]3}4~9")        == "3]7~9");
+	assert(test_sum("1~2^3]5}6|7")      == "1~2^3]5}13");
+	assert(test_sum("1~2>2>2~3~4}5}6")  == "1~6~3~4}5}6");
+	assert(test_sum("1~2|2|2~3~4}5}6")  == "1~6~3~4}5}6");
+	assert(test_sum("1~2>2|2~3~4}5}6")  == "1~2>4~3~4}5}6");
 
-	assert(sumtest("1~2~3~4~5~6")      == "21");
-	assert(sumtest("1^2^3^4^5^6")      == "21");
-	assert(sumtest("1]2]3]4]5]6")      == "21");
-	assert(sumtest("1}2}3}4}5}6")      == "21");
-	assert(sumtest("1>2>3>4>5>6")      == "21");
-	assert(sumtest("1|2|3|4|5|6")      == "21");
+	assert(test_sum("1~2~3~4~5~6")      == "21");//rm
+	assert(test_sum("1^2^3^4^5^6")      == "21");//fm
+	assert(test_sum("1]2]3]4]5]6")      == "21");//vm
+	assert(test_sum("1}2}3}4}5}6")      == "21");//sm
+	assert(test_sum("1>2>3>4>5>6")      == "21");//tm
+	assert(test_sum("1|2|3|4|5|6")      == "21");//stm
 
+	//check max decimal places respected
+	assert(test_sum("1.2345|2|3|4|5|6")			== "21.2345");
+
+	//check trailing zeros are eliminated
+	assert(test_sum("1.2345|2|3|4|5|6|-.2345")	== "21");
+
+	//test strange combinations
+	assert(test_sum("^-1]1")== "^0");
+	assert(test_sum("]^-1]1")== "0^0");
+	assert(test_sum("]7^-1]1")== "7^0");
+	assert(test_sum("]7.10^-1]1")== "7.1^0");
+	assert(test_sum("]7.00^-1]1")== "7^0");
+
+	{
+		assert(var(10.0/3).toString() ==   "3.3333333333333");
+		assert(var(10.0/3*2).toString() == "6.6666666666667");
+		assert(var(10.0/3*3).toString() == "10");
+
+		var x=10;
+		var y=3;
+		var z=3;
+		assert(x/y*z==x);
+		assert(x/y*z==10);
+		assert(x/y*z==10.0);
+		assert(x/y*z=="10");
+		assert(x/y*z=="10.0");
+
+		x=10.0;
+		y=3.0;
+		z=3.0;
+		assert(x/y*z==x);
+		assert(x/y*z==10);
+		assert(x/y*z==10.0);
+		assert(x/y*z=="10");
+		assert(x/y*z=="10.0");
+
+		x="10.0";
+		y="3.0";
+		z="3.0";
+		assert(x/y*z==x);
+		assert(x/y*z==10);
+		assert(x/y*z==10.0);
+		assert(x/y*z=="10");
+		assert(x/y*z=="10.0");
+
+		x="10";
+		y="3";
+		z="3";
+		assert(x/y*z==x);
+		assert(x/y*z==10);
+		assert(x/y*z==10.0);
+		assert(x/y*z=="10");
+		assert(x/y*z=="10.0");
+	}
+
+	//raw strings
 	var value=R"('1')";
 	assert(value.swap("'",R"(\')")=="\\'1\\'");
 
@@ -1116,9 +1172,6 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	//assert(oconv(252525, "MC2.[<_>Bfr]S") == "2.525,25 Bfr");
 	assert(oconv(-12345,   "MC1.")          == "-1.234,5");
 	assert(oconv(-12345,   "MC1,")          == "-1.234,5");
-
-	//input();
-	//stop();
 
 	//SQL tracing
 	//DBTRACE=true;
@@ -2049,7 +2102,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	assert(oconv(15036, "DWA")  == "SUNDAY");
 
 	//select("select test_alphanum with f1 between 20 and 21");
-	printl(oconv(10.1,"MD20"));
+	assert(oconv(10.1,"MD20") == "10.10");
 
 	/*
 	var alphanum1="Flat 10a";
@@ -2743,7 +2796,7 @@ function test_codepage(in codepage, in lang) {
 }
 
 //function to conveniently test sum function
-function sumtest(in instr)
+function test_sum(in instr)
 {
 	    return sum(instr.convert("~^]}>|", _RM_ _FM_ _VM_ _SM_ _TM_ _STM_)).convert(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_,"~^]}>|");
 }

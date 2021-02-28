@@ -2164,45 +2164,74 @@ var var::sum() const
 
 	//std::clog << (*this) << std::endl;
 
+	size_t maxndecimals = 0;//initialise only to avoid warning
 	do {
 
+		//extract the next field and get the nextsep field number 1-6 or 0 if none
 		part=this->substr2(inpos, nextsep);
+
+		//for clarity of error message,
+		//throw any error here instead of leaving it up to the +=
+		if (!part.isnum())
+			throw MVNonNumeric("sum() " ^ part.quote());
 
 		if (flag) {
 
-			//for clarity of error message,
-			//throw any error here instead of leaving it up to the +=
-			if (!part.isnum())
-				throw MVNonNumeric("sum() " ^ part.quote());
-			if (!accum.isnum())
-				throw MVNonNumeric("sum():" ^ accum.quote());
+			//accum = (accum + part).round(maxdecimals);
+			accum += part;
 
-			//work out maximum decimal places from both sides
-			size_t maxdecimals=0;
-			size_t n=part.var_str.find('.');
-			if (n != std::string::npos) {
-				maxdecimals=part.var_str.size() - n - 1;
+			//record maximum decimal places on input
+			size_t pos=part.var_str.find('.');
+			if (pos != std::string::npos) {
+				pos = part.var_str.size() - pos - 1;
+				if (pos > maxndecimals)
+					maxndecimals = pos;
 			}
-			n=accum.var_str.find('.');
-			if (n != std::string::npos) {
-				n=accum.var_str.size() - n - 1;
-				if (n>maxdecimals)
-					maxdecimals=n;
-			}
-
-			accum = (accum + part).round(maxdecimals);
 
 		} else {
+
 			accum = part;
+
+			//record maximum decimal places on input
+			size_t pos=part.var_str.find('.');
+			if (pos != std::string::npos) {
+				maxndecimals = part.var_str.size() - pos - 1;
+			} else
+				maxndecimals = 0;
 		}
 
 		if (nextsep >= min_sep_present) {
 			flag = 1;
+
 		} else {
-			outstr ^= accum;
+
+			ISSTRING(accum)
+			if (accum.var_str.size() > 0) {
+
+				//fix decimal places
+				accum = accum.round(maxndecimals);
+
+				//verify that round returns a string var
+
+				//remove trailing zeros
+				while (accum.var_str.back() == '0')
+	            	accum.var_str.pop_back();
+
+				//remove trailing .
+				if (accum.var_str.back() == '.')
+	            	accum.var_str.pop_back();
+
+				//reinstate a single zero
+				if (accum.var_str.size() == 0)
+					accum.var_str = '0';
+
+				outstr ^= accum;
+			}
+
 			if (nextsep) {
 				outstr ^= var().chr(1 + max_sep - nextsep);
 			}
+
 			flag = 0;
 		}
 
