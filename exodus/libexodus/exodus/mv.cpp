@@ -915,6 +915,20 @@ tryagain:
 
 //#endif
 
+//comparing floating point numbers is a VERY complex matter since c++ double uses BINARY NOT DECIMAL
+//https://www.theregister.com/2006/08/12/floating_point_approximation/
+//https://www.theregister.com/2006/09/20/floating_point_numbers_2/
+//
+//derived from https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon
+inline bool almost_equal(double x, double y, int ulp)
+{
+    // the machine epsilon has to be scaled to the magnitude of the values used
+    // and multiplied by the desired precision in ULPs (units in the last place)
+    return std::fabs(x-y) <= std::numeric_limits<double>::epsilon() * std::fabs(x+y) * ulp
+        // unless the result is subnormal
+        || std::fabs(x-y) < std::numeric_limits<double>::min();
+}
+
 // almost identical between MVeq and MVlt except where noted (and doubles compare only to 0.0001 accuracy)
 DLL_PUBLIC bool MVeq(const var& lhs, const var& rhs)
 {
@@ -1005,7 +1019,8 @@ DLL_PUBLIC bool MVeq(const var& lhs, const var& rhs)
 				// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
 
 				//return (lhs.var_int == rhs.var_dbl);
-				return (std::abs(lhs.var_dbl - double(rhs.var_int)) < SMALLEST_NUMBER);
+				//return (std::abs(lhs.var_dbl - double(rhs.var_int)) < SMALLEST_NUMBER);
+				return almost_equal(lhs.var_dbl, rhs.var_int, 2);
 			}
 		}
 
@@ -1017,7 +1032,8 @@ DLL_PUBLIC bool MVeq(const var& lhs, const var& rhs)
 			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
 
 			//return (lhs.var_dbl == rhs.var_int);
-			return (std::abs(double(lhs.var_int) - rhs.var_dbl) < SMALLEST_NUMBER);
+			//return (std::abs(double(lhs.var_int) - rhs.var_dbl) < SMALLEST_NUMBER);
+			return almost_equal(double(lhs.var_int), rhs.var_dbl, 2);
 		}
 
 		//INT v INT
@@ -1039,6 +1055,7 @@ DLL_PUBLIC bool MVeq(const var& lhs, const var& rhs)
 	if (!(rhs.var_typ & VARTYP_STR))
 		rhs.createString();
 	// different from MVlt
+	//return lhs.localeAwareCompare(lhs.var_str, rhs.var_str) == 0;
 	return lhs.var_str == rhs.var_str;
 }
 

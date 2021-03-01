@@ -75,21 +75,30 @@ function main() {
 			if (rec2 ne RECORD) {
 
 				//revert both records to leading zero 0.1, -0.1 instead of old arev .1 and -.1;
-				RECORD.replacer("([\x1A-\x1F]-?)0.","$1.");
-				rec2.replacer("([\x1A-\x1F]-?)0.","$1.");
+				RECORD.replacer("([\x1A-\x1F]-?)0\\.","$1.");
+				rec2.replacer("([\x1A-\x1F]-?)0\\.","$1.");
+
+				//RECORD is db1 and rec2 is db2
 
 				//temp suppress ads field 56
 				if (filename == "ads") {
 					RECORD.r(56,rec2.a(56));
 					RECORD.swapper(".000","");
 					rec2.swapper(".000","");
-					RECORD.swapper(".00","");
-					rec2.swapper(".00","");
+					RECORD.replacer("\\.00([\x1A-\x1F])","$1");
+					rec2.replacer("\\.00([\x1A-\x1F])","$1");
+				} else if (filename == "brands") {
+					RECORD.r(14,rec2.a(14));
+					RECORD.r(15,rec2.a(15));
 				}
 
 				//if still different, output
+				RECORD.cropper();
+				rec2.cropper();
 				if (rec2 ne RECORD) {
 					printl(" ", ID, " different.");
+					//printl(RECORD);
+					//printl(rec2);
 					var nfs=dcount(RECORD, FM);
 					var nfs2=dcount(rec2, FM);
 					if (nfs2 gt nfs)

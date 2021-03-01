@@ -12,9 +12,9 @@ function main(in msg0, io time0) {
 	//c sys in,io
 
 	var interactive = not(SYSTEM.a(33));
-	if (interactive) {
-		return 0;
-	}
+	//if (interactive) {
+	//	return 0;
+	//}
 
 	#define sep " "
 

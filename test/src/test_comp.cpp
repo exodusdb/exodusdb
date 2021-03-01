@@ -137,9 +137,12 @@ function main() {
 	//assert(liti>0);
 	assert(litd!=0);
 
-	assert(tinys==0);
-	//assert(!(tinyi>0));
-	assert(tinyd==0);
+	bool using_epsilon = true;
+	if (not using_epsilon) {
+		assert(tinys==0);
+		//assert(!(tinyi>0));
+		assert(tinyd==0);
+	}
 
 	assert(zeros==0);
 	assert(zeroi==0);
@@ -153,9 +156,11 @@ function main() {
 	//assert(0<liti);
 	assert(0!=litd);
 
-	assert(0==tinys);
-	//assert(0<tinyi);
-	assert(0==tinyd);
+	if (not using_epsilon) {
+		assert(0==tinys);
+		//assert(0<tinyi);
+		assert(0==tinyd);
+	}
 
 	assert(0==zeros);
 	assert(0==zeroi);

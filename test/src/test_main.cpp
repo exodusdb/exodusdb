@@ -455,6 +455,9 @@ function main()
 	sort.locateusing(FM,"c",sortn);
 	assert(sortn==4);
 
+	/* now using epsilon to judge small numbers and differences see MVeq()
+
+	//no longer applicable
 	//exodus comparisions and conversion to book ignores numbers less than 1e-13
 	//pick/arev bool and equality checks on doubles ignore less than 0.0001
 	//but comparison operators work exactly (to max binary precision?)
@@ -466,8 +469,9 @@ function main()
 	assert(!toosmallno);
 	assert(toosmallno==0);
 	assert(!(toosmallno>0));
-
 	assert(smallestno == SMALLEST_NUMBER);
+	*/
+
 	assert(var(1e-11).toString() == "0.00000000001");
 	assert(var(1e-12).toString() == "0.000000000001");
 	assert(var(1e-13).toString() == "0.0000000000001");
@@ -505,7 +509,7 @@ function main()
 
 	printl(1e-14);
 	printl(var(0));
-	assert(1e-14==var(0));
+	//assert(1e-14==var(0));
 
 	printl();
 	printl("=== print ===");

@@ -1610,7 +1610,7 @@ inp:
 		std::cout << " Please enter 1 - " << noptions << " or Enter to cancel.";
 	std::cout << std::endl;
 
-	reply = "";
+	reply = defaultreply;
 
 	if (interactive)
 	{
