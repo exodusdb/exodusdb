@@ -7,7 +7,7 @@ function main(in cmd, out errors) {
 	//var tempdir=std::experimental::filesystem::temp_directory_path().wstring();
 
 	var tempdir="/tmp/";
-	var tempfilename=tempdir ^ SLASH ^ rnd(99999999) ^ ".tmp";
+	var tempfilename=tempdir ^ OSSLASH ^ rnd(99999999) ^ ".tmp";
 	var output = osshellread(cmd^" 2> " ^ tempfilename);
 
 	errors=osread(tempfilename);

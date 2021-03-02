@@ -47,10 +47,6 @@ THE SOFTWARE.
 // Using dllimport and dllexport in C++ Classes
 // http://msdn.microsoft.com/en-us/library/81h27t8c(VS.80).aspx
 
-//#define SMALLEST_NUMBER 1e-13
-//0.00000000000023 = sum(1287.89,-1226.54,-61.35,1226.54,-1226.54)
-#define SMALLEST_NUMBER 1e-10
-
 #if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
 #ifdef BUILDING_LIBRARY
 #ifdef __GNUC__
@@ -138,6 +134,12 @@ using mvint_t = long long;
 
 namespace exodus
 {
+
+//#define SMALLEST_NUMBER 1e-13
+//0.00000000000023 = sum(1287.89,-1226.54,-61.35,1226.54,-1226.54)
+//#define SMALLEST_NUMBER 1e-10
+//#define SMALLEST_NUMBER 1e-4d//0.0001 for pick/arev compatibility
+constexpr double SMALLEST_NUMBER = 1e-4d;//0.0001 for pick/arev compatibility
 
 // the var versions of the above (without leading or trailing _)
 // are defined AFTER the class declaration of "var"
@@ -706,6 +708,8 @@ public:
 	DLL_PUBLIC ND friend bool MVlt(const int, const var&);
 
 	//== and !=
+	//TODO consider replacing by operator<=> and replacing MVeq and MVlt by MVcmp
+	//or provide more specialisations of MVeq and MVlt
 
 	DLL_PUBLIC friend bool operator==(const var& lhs, const var& rhs) { return MVeq(lhs, rhs); }
 	DLL_PUBLIC friend bool operator==(const var& lhs, const char* char2) { return MVeq(lhs, var(char2)); }
@@ -1748,12 +1752,12 @@ inline const var DQ = _DQ_;
 inline const var SQ = _SQ_;
 
 #if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
-inline const var SLASH = "\\";
-inline const char SLASH_ = '\\';
+inline const var OSSLASH = "\\";
+inline const char OSSLASH_ = '\\';
 #define SLASH_IS_BACKSLASH true
 #else
-inline const var SLASH = "/";
-inline const char SLASH_ = '/';
+inline const var OSSLASH = "/";
+inline const char OSSLASH_ = '/';
 #define SLASH_IS_BACKSLASH false
 #endif
 

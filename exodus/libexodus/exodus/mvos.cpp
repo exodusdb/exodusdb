@@ -325,9 +325,9 @@ bool checknotabsoluterootfolder(std::string dirname)
 	// cwd to top level and delete relative
 	// top level folder has only one slash either at the beginning or, on windows, like x:\ .
 	// NB copy/same code in osrmdir and osrename
-	if ((!SLASH_IS_BACKSLASH && dirname[0] == SLASH_ &&
-	     std::count(dirname.begin(), dirname.end(), SLASH_) < 3) ||
-	    (SLASH_IS_BACKSLASH && (dirname[1] == ':') && (dirname[2] == SLASH_)))
+	if ((!SLASH_IS_BACKSLASH && dirname[0] == OSSLASH_ &&
+	     std::count(dirname.begin(), dirname.end(), OSSLASH_) < 3) ||
+	    (SLASH_IS_BACKSLASH && (dirname[1] == ':') && (dirname[2] == OSSLASH_)))
 	{
 		std::cout
 		    << "Forced removal/renaming of top two level directories by absolute path is "
@@ -998,8 +998,8 @@ var var::ostempdirname() const
 {
 	std::error_code error_code;
 	std::string dirname = std::string(stdfs::temp_directory_path(error_code));
-	if (dirname.back() != SLASH_)
-		dirname.push_back(SLASH_);
+	if (dirname.back() != OSSLASH_)
+		dirname.push_back(OSSLASH_);
 	return dirname;
 }
 
@@ -1726,10 +1726,10 @@ const std::string var::to_path_string() const
 	{
 
 #if defined WIN32 || defined _WIN32
-		var part = this->field(" ", 1).convert("/", SLASH);
+		var part = this->field(" ", 1).convert("/", OSSLASH);
 #else
-		// printf("path=%s\n",this->convert("\\",SLASH).toString().c_str());
-		var part = this->field(" ", 1).convert("\\", SLASH);
+		// printf("path=%s\n",this->convert("\\",OSSLASH).toString().c_str());
+		var part = this->field(" ", 1).convert("\\", OSSLASH);
 
 		// very similar code below
 		// standardise on ALL AND ONLY lower case os file and path names
@@ -1750,7 +1750,7 @@ const std::string var::to_path_string() const
 	{
 
 #if defined WIN32 || defined _WIN32
-		return this->convert("/", SLASH).toString();
+		return this->convert("/", OSSLASH).toString();
 #else
 		// very similar code above
 		// standardise on ALL AND ONLY lower case os file and path names
@@ -1761,10 +1761,10 @@ const std::string var::to_path_string() const
 		if (lcthis != (*this) && this->substr(-3,3) != ".LK" && this->substr(-3,3) != ".OV" && this->substr(-9) != "/DATA.CFG")
 		{
 			(*this).errputl("WARNING - UPPERCASE OS=");
-//			return lcthis.convert("\\", SLASH).toString();
+//			return lcthis.convert("\\", OSSLASH).toString();
 		}
 		*/
-		return this->convert("\\", SLASH).toString();
+		return this->convert("\\", OSSLASH).toString();
 #endif
 	}
 }
@@ -1988,7 +1988,7 @@ var var::oslist(const var& path0, const var& spec0, const int mode) const
 	// perhaps could use <glob.h> in linux instead of regex
 	else
 	{
-		spec = path.field2(SLASH, -1);
+		spec = path.field2(OSSLASH, -1);
 		path = path.substr(1, path.length() - spec.length());
 
 		// escape all the regex special characters that are found in the strint
@@ -2182,13 +2182,13 @@ var var::oscwd() const
 	// std::string currentpath=boost::filesystem::current_path().string();
 	std::string currentpath = stdfs::current_path().string();
 
-	return var(currentpath).convert("/", SLASH);
+	return var(currentpath).convert("/", OSSLASH);
 
 }
 
 var var::ospid() const
 {
-	THISIS("var var::ospid() const")
+	//THISIS("var var::ospid() const")
 	return getpid();
 
 }

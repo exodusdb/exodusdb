@@ -78,7 +78,8 @@ function main()
 
 		assert(!var("xxxxxx").isnum());
 		assert(!var("TABLE1").isnum());
-		assert(!var(SLASH).isnum());
+		assert(!var("/").isnum());
+		assert(!var("\\").isnum());
 		assert(!var("X").isnum());
 		assert(!var("aaa").isnum());
 		assert(!var("FILE.TXT").isnum());

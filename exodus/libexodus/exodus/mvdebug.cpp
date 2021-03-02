@@ -78,7 +78,7 @@ class MyStackWalker : public StackWalker
 			return;
 		if (lineno.isnum() && lineno)
 		{
-			exodus::var linetext = filename.field2(exodus::SLASH, -1) ^ ":" ^ lineno;
+			exodus::var linetext = filename.field2(exodus::OSSLASH, -1) ^ ":" ^ lineno;
 			exodus::var filetext;
 			// ALN:NOTE: .osread could itself throw exception and we will have loop :(
 			if (filetext.osread(filename))
@@ -116,7 +116,7 @@ void addbacktraceline(const var& sourcefilename, const var& lineno, var& returnl
 	if (not lineno || not lineno.isnum())
 		return;
 
-	var linetext = sourcefilename.field2(SLASH, -1) ^ ":" ^ lineno;
+	var linetext = sourcefilename.field2(OSSLASH, -1) ^ ":" ^ lineno;
 
 	// get the source file text
 	var filetext;
@@ -273,7 +273,7 @@ var backtrace()
 		{
 			// loadable program
 			var temp;
-			temp.osshellread("which " ^ objfilename.field2(SLASH, -1));
+			temp.osshellread("which " ^ objfilename.field2(OSSLASH, -1));
 			temp=temp.field("\n", 1).field("\r", 1);
 			if (temp)
 				objfilename = temp;
@@ -328,7 +328,7 @@ var backtrace()
 			var sourcefilename = line.field(":", 1);
 			var lineno = line.field(":", 2).field(" ", 1);
 			addbacktraceline(sourcefilename, lineno, returnlines);
-			// returnlines^=FM^sourcefilename.field2(SLASH,-1) ^ ":" ^ lineno ^ " " ^
+			// returnlines^=FM^sourcefilename.field2(OSSLASH,-1) ^ ":" ^ lineno ^ " " ^
 			// linesource;
 		}
 
@@ -353,7 +353,7 @@ var backtrace()
 		//if (binaryfilename == binaryfilename.convert("/\\:",""))
 		if (not binaryfilename.osdir())
 		{
-			var temp="which " ^ binaryfilename.field2(SLASH,-1);
+			var temp="which " ^ binaryfilename.field2(OSSLASH,-1);
 			temp=temp.osshellread().field("\n",1).field("\r",1);
 			if (temp)
 				binaryfilename=temp;

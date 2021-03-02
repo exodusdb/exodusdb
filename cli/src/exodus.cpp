@@ -34,7 +34,7 @@ function main() {
 	if (verbose)
 		EXECPATH.outputl("Executable:");
 
-        var exodusbinpath=field(EXECPATH,SLASH,1,dcount(EXECPATH,SLASH)-1);
+        var exodusbinpath=field(EXECPATH,OSSLASH,1,dcount(EXECPATH,OSSLASH)-1);
 
 	if (verbose)
 		exodusbinpath.outputl("Path:");
@@ -46,8 +46,8 @@ function main() {
 
 	//non-windows
 	var shell=osgetenv("SHELL");
-        //if (SLASH eq "/" and shell.osgetenv("SHELL")) {
-        if (SLASH eq "/" and shell) {
+        //if (OSSLASH eq "/" and shell.osgetenv("SHELL")) {
+        if (OSSLASH eq "/" and shell) {
 
                 var home=osgetenv("HOME");
                 var path=osgetenv("PATH");
@@ -94,12 +94,12 @@ function main() {
                 osshell(shellcmd);
 
 		//windows
-        } else if (SLASH eq "\\" and shell.osgetenv("ComSpec")) {
+        } else if (OSSLASH eq "\\" and shell.osgetenv("ComSpec")) {
 
                 //set EXO_PATH used by compile to find LIB and INCLUDE paths
                 var exoduspath=exodusbinpath;
-                if (exoduspath.field2(SLASH,-1) eq "bin")
-                        exoduspath=field(exoduspath,SLASH,1,dcount(exoduspath,SLASH)-1);
+                if (exoduspath.field2(OSSLASH,-1) eq "bin")
+                        exoduspath=field(exoduspath,OSSLASH,1,dcount(exoduspath,OSSLASH)-1);
                 if (exoduspath and not ossetenv("EXO_PATH",exoduspath))
                         errput("Couldnt set EXO_PATH environment variable");
 

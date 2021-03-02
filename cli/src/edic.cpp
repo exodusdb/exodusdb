@@ -35,9 +35,9 @@ function main() {
         editor^=" /L:$LINENO $FILENAME";
 
     //look for installed nano
-    //if (SLASH eq "\\" and not index(PLATFORM_,"x64")) {
+    //if (OSSLASH eq "\\" and not index(PLATFORM_,"x64")) {
     var nanopath="";
-    if (SLASH eq "\\") {
+    if (OSSLASH eq "\\") {
 
         //look for nano.exe next to edic.exe
         if (not editor)
@@ -55,7 +55,7 @@ function main() {
 
     //look for nano in release directory during exodus development
     //if (not editor) {
-    if (not editor and SLASH eq "\\") {
+    if (not editor and OSSLASH eq "\\") {
         nanopath="..\\..\\release\\cygwin\\bin\\nano.exe";
         if (nanopath.osfile())
             editor="..\\..\\release\\cygwin\\bin\\nano $LINENO'$FILENAME'";
@@ -72,7 +72,7 @@ function main() {
 
     //otherwise on windows try to locate CYGWIN nano or vi
     var cygwinpath="";
-    if (not editor and SLASH eq "\\") {
+    if (not editor and OSSLASH eq "\\") {
         //from environment variable
         cygwinpath=osgetenv("CYGWIN_BIN");
         //else from current disk
@@ -85,8 +85,8 @@ function main() {
         if (not osdir(cygwinpath))
             cygwinpath="";
 
-        if (cygwinpath and cygwinpath[-1] ne SLASH)
-            cygwinpath^=SLASH;
+        if (cygwinpath and cygwinpath[-1] ne OSSLASH)
+            cygwinpath^=OSSLASH;
         //editor=cygwinpath^"bash --login -i -c \"/bin/";
         editor=cygwinpath;
         if (osfile(cygwinpath^"nano.exe") or osfile("nano.exe")) {
@@ -103,7 +103,7 @@ function main() {
         } else
             editor="";
     }
-    if (SLASH eq "\\") {
+    if (OSSLASH eq "\\") {
         //configure nanorc (on windows)
         //TODO same for non-windows
         //nano on windows looks for nanorc config file as follows (probably merges all found)
@@ -112,18 +112,18 @@ function main() {
         //C:\Documents and Settings\USERNAME\.nanorc  ($HOMEDRIVE$HOMEPATH)
         var nanorcfilename;
         if (cygwinpath) {
-            nanorcfilename=cygwinpath.field(SLASH,1,dcount(cygwinpath,SLASH)-2) ^ SLASH ^ "etc" ^ SLASH ^ "nanorc";
+            nanorcfilename=cygwinpath.field(OSSLASH,1,dcount(cygwinpath,OSSLASH)-2) ^ OSSLASH ^ "etc" ^ OSSLASH ^ "nanorc";
         } else {
             nanorcfilename=osgetenv("HOME");
             if (not nanorcfilename)
                 nanorcfilename=osgetenv("HOMEDRIVE") ^ osgetenv("HOMEPATH");
-            if (nanorcfilename[-1] ne SLASH)
-                nanorcfilename^=SLASH;
+            if (nanorcfilename[-1] ne OSSLASH)
+                nanorcfilename^=OSSLASH;
             nanorcfilename^=".nanorc";
         }
         if (not osfile(nanorcfilename)) {
-            //var nanorctemplatefilename=EXECPATH.field(SLASH,1,dcount(EXECPATH,SLASH)-1) ^ SLASH ^ "nanorc";
-            var nanorctemplatefilename=nanopath.field(SLASH,1,dcount(nanopath,SLASH)-1) ^ SLASH ^ "nanorc";
+            //var nanorctemplatefilename=EXECPATH.field(OSSLASH,1,dcount(EXECPATH,OSSLASH)-1) ^ OSSLASH ^ "nanorc";
+            var nanorctemplatefilename=nanopath.field(OSSLASH,1,dcount(nanopath,OSSLASH)-1) ^ OSSLASH ^ "nanorc";
             if (not osfile(nanorctemplatefilename))
                 nanorctemplatefilename.swapper("release","..\\release");
             //if (not osfile(nanorctemplatefilename))
@@ -142,7 +142,7 @@ function main() {
     }
 
     if (not editor) {
-        if (SLASH eq "/")
+        if (OSSLASH eq "/")
             editor="nano ";
         else
             editor="notepad";
@@ -175,14 +175,14 @@ function main() {
             startatlineno="";
 
         filename.trimmerb(".");
-        if (not index(field2(filename,SLASH,-1),"."))
+        if (not index(field2(filename,OSSLASH,-1),"."))
             filename^=".cpp";
 
         var iscompilable=filename.field2(".",-1)[1].lcase() ne "h";
 
 		//search paths and convert to absolute filename
 		//similar code in edic.cpp and compile.cpp
-		if (not(osfile(filename)) and not(filename.index(SLASH))) {
+		if (not(osfile(filename)) and not(filename.index(OSSLASH))) {
 			var paths=osgetenv("CPLUS_INCLUDE_PATH").convert(";",":");
 			if (verbose)
 				paths.outputl("paths=");
@@ -200,8 +200,8 @@ function main() {
 
 		//also look in ~/bin and ~/inc for backlinks to source
 		//similar code in edic and compile
-		if (not(osfile(filename)) and not(filename.index(SLASH))) {
-			var headerfilename = exo_HOME ^ SLASH ^ "inc" ^ SLASH ^ filename;
+		if (not(osfile(filename)) and not(filename.index(OSSLASH))) {
+			var headerfilename = exo_HOME ^ OSSLASH ^ "inc" ^ OSSLASH ^ filename;
 			headerfilename.fieldstorer(".",-1,1,"h");
 			if (verbose)
 				headerfilename.outputl("headerfile=");
@@ -217,13 +217,13 @@ function main() {
         if (editcmd.index("$ABSOLUTEFILENAME")) {
             editcmd.swapper("$ABSOLUTEFILENAME","$FILENAME");
 
-            filename=oscwd()^SLASH^filename;
+            filename=oscwd()^OSSLASH^filename;
         }
         //prepare a skeleton exodus cpp file
         var newfile=false;
         if (iscompilable and not osfile(filename)) {
 
-            var basefilename=field2(filename,SLASH,-1);
+            var basefilename=field2(filename,OSSLASH,-1);
             basefilename=basefilename.field(".",dcount(basefilename,".")-1);
 
             var progtype;
@@ -305,7 +305,7 @@ function main() {
                 blankfile^="\n";
 
             //convert to DOS format on Windows
-            if (SLASH eq "\\")
+            if (OSSLASH eq "\\")
                 blankfile.swapper("\n","\r\n");
 
             if (not oswrite(blankfile,filename))
@@ -362,7 +362,7 @@ function main() {
             }
 
             //clear the screen (should be cls on win)
-            if (SLASH eq "/")
+            if (OSSLASH eq "/")
                 osshell("clear");
             //else
             //	osshell("cls");
@@ -379,7 +379,7 @@ function main() {
             var compileoutputfilename=filename;
             compileoutputfilename^=".~";
             //var compileoutputfilename=filename ^ ".2";
-            //if (SLASH eq "/")
+            //if (OSSLASH eq "/")
             //   compilecmd ^= " 2>&1 | tee " ^ compileoutputfilename.quote();
             //else
             //    compilecmd ^= " > " ^ compileoutputfilename.quote() ^ " 2>&1";
@@ -399,7 +399,7 @@ function main() {
             var errors;
             if (osread(errors,compileoutputfilename,"utf8")) {
                 osdelete(compileoutputfilename);
-                if (SLASH ne "/")
+                if (OSSLASH ne "/")
                     print(errors);
 
                 startatlineno="";

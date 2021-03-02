@@ -1531,7 +1531,7 @@ void ExodusProgramBase::debug() const
 
 	var reply;
 	std::cout << "debug():";
-	if (SLASH == "/")
+	if (OSSLASH == "/")
 		asm("int $3");
 	// cin>>reply;
 	return;

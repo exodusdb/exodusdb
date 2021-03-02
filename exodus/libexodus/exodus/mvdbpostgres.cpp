@@ -333,9 +333,9 @@ var var::build_conn_info(const var& conninfo) const
 		var configfilename = "";
 		var home = "";
 		if (home.osgetenv("HOME"))
-			configfilename = home ^ SLASH ^ ".exodus";
+			configfilename = home ^ OSSLASH ^ ".exodus";
 		else if (home.osgetenv("USERPROFILE"))
-			configfilename ^= home ^ SLASH ^ "Exodus\\.exodus";
+			configfilename ^= home ^ OSSLASH ^ "Exodus\\.exodus";
 		var configconn = "";
 		if (!configconn.osread(configfilename))
 			configconn.osread(".exodus");
@@ -893,7 +893,7 @@ bool var::read(const var& filehandle, const var& key)
 	// asking to read DOS file! do osread using key as osfilename!
 	if (filehandle == "DOS")
 	{
-		return this->osread(key); //.convert("\\",SLASH));
+		return this->osread(key); //.convert("\\",OSSLASH));
 	}
 
 	// asking to read DOS file! do osread using key as osfilename!
@@ -1377,7 +1377,7 @@ bool var::write(const var& filehandle, const var& key) const
 	// asking to write DOS file! do osread!
 	if (filehandle == "DOS")
 	{
-		this->oswrite(key); //.convert("\\",SLASH));
+		this->oswrite(key); //.convert("\\",OSSLASH));
 		return true;
 	}
 

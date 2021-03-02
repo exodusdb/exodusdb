@@ -430,7 +430,7 @@ var var::round(const int ndecimals) const
 	//cout << diff << endl;
 
 	double out;
-	if (std::abs(diff) < 0.0000001) {
+	if (std::abs(diff) < SMALLEST_NUMBER) {
 		if (fromdouble >= 0)
 			out = ceil2/scale;
 		else
@@ -457,7 +457,7 @@ bool var::toBool() const
 	THISISDEFINED()
 
 	// identical code in void* and bool except returns void* and bool respectively
-	do
+	while (true)
 	{
 		// ints are true except for zero
 		if (var_typ & VARTYP_INT)
@@ -489,7 +489,7 @@ bool var::toBool() const
 		// must be string - try to convert to numeric and do all tests again
 		isnum();
 
-	} while (true);
+	};
 }
 
 int var::toInt() const

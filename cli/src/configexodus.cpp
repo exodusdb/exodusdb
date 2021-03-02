@@ -38,8 +38,8 @@ function main()
         //third from config file
 	//should be same logic in mvdbpostgres and configexodus
 	var configfilename="";
-	if (SLASH eq "\\") {
-		var userprofile_exodusdir=osgetenv("USERPROFILE")^SLASH^"Exodus";
+	if (OSSLASH eq "\\") {
+		var userprofile_exodusdir=osgetenv("USERPROFILE")^OSSLASH^"Exodus";
 		if (not osdir(userprofile_exodusdir)) {
 			if (not(osmkdir(userprofile_exodusdir)))
 				printl("Cannot mkdir ",userprofile_exodusdir," Maybe you dont have sufficient rights");
@@ -47,7 +47,7 @@ function main()
 		configfilename=userprofile_exodusdir^"\\.exodus";
 	}
 	else
-		configfilename=osgetenv("HOME")^SLASH^".exodus";
+		configfilename=osgetenv("HOME")^OSSLASH^".exodus";
 	if (temp.osread(configfilename))
 		origconfig^=" "^temp;
 
@@ -83,7 +83,7 @@ function main()
         getinput("New user code",dbusername);
         getinput("New user password",dbuserpass);
 
-	//if (SLASH eq "\\")
+	//if (OSSLASH eq "\\")
 	//	configure_via_connection(adminconfig, dbname, dbusername, dbuserpass);
 	//else
 	//	configure_via_script(adminconfig, dbname, dbusername, dbuserpass);
@@ -267,15 +267,15 @@ function configure_via_connection(in adminconfig, in dbname, in dbusername, in d
                 stop("Stopping. Cannot connect to new database");
 	printl("done!");
 
-	if (SLASH eq "\\") {
+	if (OSSLASH eq "\\") {
 
 		printl(oconv("Installing pgexodus postgres plugin ... ","L#40"));
 
 		//locate pgexodus dll to install
 		var pgexodusdll="pgexodus.dll";
 		if (not osfile(pgexodusdll)) {
-			var exodusbinpath=field(EXECPATH,SLASH,1,dcount(EXECPATH,SLASH)-1);
-			pgexodusdll=exodusbinpath^SLASH^"pgexodus.dll";
+			var exodusbinpath=field(EXECPATH,OSSLASH,1,dcount(EXECPATH,OSSLASH)-1);
+			pgexodusdll=exodusbinpath^OSSLASH^"pgexodus.dll";
 			if (not osfile(pgexodusdll)) {
 				printl("Cant find pgexodus.dll or "^pgexodusdll);
 				pgexodusdll="";
@@ -297,12 +297,12 @@ function configure_via_connection(in adminconfig, in dbname, in dbusername, in d
 		if (not pglibdir) {
 			pglibdir="\\PROGRA~1\\PostgreSQL\\9.0";
 		}
-		pglibdir.converter("/",SLASH);
+		pglibdir.converter("/",OSSLASH);
 		//exodus oscopy cannot handle old 8.3 file names (boost library issue)
 		pglibdir.swapper("PROGRA~1","Program Files");
 		pglibdir.swapper("PROGRA~2","Program Files (x86)");
 		pglibdir.swapper("POSTGR~1","PostgreSQL");
-		var targetfilename=pglibdir^SLASH^"pgexodus.dll";
+		var targetfilename=pglibdir^OSSLASH^"pgexodus.dll";
 		while (not osdir(pglibdir))
 		{
 			printl(pglibdir^" does not exist");
@@ -333,8 +333,8 @@ function configure_via_connection(in adminconfig, in dbname, in dbusername, in d
 		}
 
 		//copy pgexodus.dll plugin into place
-		//pgexodusdll.converter(SLASH,"/");
-			//targetfilename.converter(SLASH,"/");
+		//pgexodusdll.converter(OSSLASH,"/");
+			//targetfilename.converter(OSSLASH,"/");
 		//targetfile="D:/Program Files/PostgreSQL/8.3/lib/pgexodus.dll";
 		printl(quote(pgexodusdll));
 		printl("-> ",quote(targetfilename));

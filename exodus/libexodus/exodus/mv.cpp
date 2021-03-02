@@ -915,18 +915,49 @@ tryagain:
 
 //#endif
 
+/* more accurate way of comparing two decimals using EPSILON and ulp
+   not using it simply to make better emulation of pick/arev at least initially
+
 //comparing floating point numbers is a VERY complex matter since c++ double uses BINARY NOT DECIMAL
+//
+//https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/
+//
 //https://www.theregister.com/2006/08/12/floating_point_approximation/
 //https://www.theregister.com/2006/09/20/floating_point_numbers_2/
 //
 //derived from https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon
+inline bool almost_equal_not_zero(double x, double y, int ulp)
+{
+	// the machine epsilon has to be scaled to the magnitude of the values used
+	// and multiplied by the desired precision in ULPs (units in the last place)
+	return std::fabs(x-y) <= std::numeric_limits<double>::epsilon() * std::fabs(x+y) * ulp
+		// unless the result is subnormal
+		|| std::fabs(x-y) < std::numeric_limits<double>::min();
+}
+
+inline bool almost_equal(double x, mvint_t y, int ulp)
+{
+	if (y == 0)
+		return (std::abs(x) < SMALLEST_NUMBER);
+	else
+		return almost_equal_not_zero(x, double(y), ulp);
+}
+
 inline bool almost_equal(double x, double y, int ulp)
 {
-    // the machine epsilon has to be scaled to the magnitude of the values used
-    // and multiplied by the desired precision in ULPs (units in the last place)
-    return std::fabs(x-y) <= std::numeric_limits<double>::epsilon() * std::fabs(x+y) * ulp
-        // unless the result is subnormal
-        || std::fabs(x-y) < std::numeric_limits<double>::min();
+	if (y == 0.0)
+		return (std::abs(x) < SMALLEST_NUMBER);
+	else if (x == 0.0)
+		return (std::abs(y) < SMALLEST_NUMBER);
+	else
+		return almost_equal_not_zero(x, y, ulp);
+}
+*/
+
+inline bool almost_equal(double x, double y, int)
+{
+    //crude arev and pick(?) method
+    return (std::abs(x-y) < SMALLEST_NUMBER);
 }
 
 // almost identical between MVeq and MVlt except where noted (and doubles compare only to 0.0001 accuracy)
@@ -1009,7 +1040,8 @@ DLL_PUBLIC bool MVeq(const var& lhs, const var& rhs)
 				//return (lhs.var_intd == rhs.var_intd);
 
 				// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
-				return (std::abs(lhs.var_dbl - rhs.var_dbl) < SMALLEST_NUMBER);
+				//return (std::abs(lhs.var_dbl - rhs.var_dbl) < SMALLEST_NUMBER);
+				return almost_equal(lhs.var_dbl, rhs.var_dbl, 2);
 			}
 
 			//DOUBLE V INT
@@ -1033,7 +1065,9 @@ DLL_PUBLIC bool MVeq(const var& lhs, const var& rhs)
 
 			//return (lhs.var_dbl == rhs.var_int);
 			//return (std::abs(double(lhs.var_int) - rhs.var_dbl) < SMALLEST_NUMBER);
-			return almost_equal(double(lhs.var_int), rhs.var_dbl, 2);
+			//return almost_equal(lhs.var_int, rhs.var_dbl, 2);
+			//put lhs int 2nd argument to invoke the fastest implmentation
+			return almost_equal(rhs.var_dbl, lhs.var_int, 2);
 		}
 
 		//INT v INT
@@ -1624,31 +1658,34 @@ std::string dblToString(double double1)
 	// NB plain stringstream causes a memory leak in msvc8 before sp1
 	std::ostringstream stringstream1;
 	//if precision is changed, also change testmain
+
 	//stringstream1.precision(16);
 	//use precision 14 to avoid 1.1-1 = 1.000000000000001
+	//"1.1" in compiled c++ code is FLOAT NOT DOUBLE (1.1d is DOUBLE);
+	// which does NOT have same accuracy as exodus internal double
 	stringstream1.precision(14);
 
-	std::string string1;
+	std::string str1;
 	//evade scientific format for small numbers
-	if (std::abs(double1) < double(0.000'1)) {
+	if (std::abs(double1) < 0.0001d) {
 
 		//treat very small numbers as zero
 		//if (std::abs(double1)<double(0.000'000'000'1))
 		//if (std::abs(double1)<double(0.000'000'000'000'001))
-		if (std::abs(double1)<double(0.000'000'000'000'1))
+		if (std::abs(double1)<0.000'000'000'000'1d)
 			return "0.0";
-
-	    stringstream1 << std::fixed;
-	    stringstream1 << double1;
-	    string1 = stringstream1.str();
-	    while (string1.back() == '0')
-    	    string1.pop_back();
-
-	} else {
-		stringstream1 << double1;
-		string1 = stringstream1.str();
 	}
-	return string1;
+	//std::clog << double1 << " " << std::log10(double1) << std::endl;
+    stringstream1 << std::fixed;
+	stringstream1.precision(14-std::log10(double1));
+    stringstream1 << double1;
+    str1 = stringstream1.str();
+    while (str1.back() == '0')
+	    str1.pop_back();
+	if (str1.back() == '.')
+		str1.push_back('0');
+
+	return str1;
 }
 
 var backtrace();

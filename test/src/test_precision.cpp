@@ -22,10 +22,11 @@ function main() {
 		//cout << setprecision(16) << fixed << 999999999999999.9 << endl;
 
 		printl("\ntoo decimal points get truncated");
-		var d1 = 0.00005678901234567890;
+		var d1 = 0.00005678901234567890d;
 		var d2 = "0.00005678901234567890";
 		var s1 = d1^"x";
-		var s2 = "0.00005678901235x";
+		//var s2 = "0.00005678901235x";
+		var s2 = "0.000056789012345679x";
 		printl("Raw   : ", d2);
 		printl("Print : ", d1);
 		printl("Result: ", s1);
@@ -33,7 +34,7 @@ function main() {
 		assert(s1 == s2);
 
 		printl("\ntoo many digits of precision get truncated");
-		d1 = 1234567890.00005678;
+		d1 = 1234567890.00005678d;
 		d2 = "1234567890.00005678";
 		s1 = d1 ^ "x";
 		s2 = "1234567890.0001x";
@@ -44,7 +45,7 @@ function main() {
 		assert(s1 == s2);
 
 		printl("\nsmall numbers are ok");
-		d1 = 0.00005678;
+		d1 = 0.00005678d;
 		d2 = "0.00005678";
 		s1 = d1^"x";
 		s2 = "0.00005678x";
@@ -55,7 +56,7 @@ function main() {
 		assert(s1 == s2);
 
 		printl("\nsmallest decimal number");
-		d1=0.0000000000001;
+		d1=0.0000000000001d;
 		d2="0.0000000000001";
 		s1 = d1^"x";
 		s2="0.0000000000001x";
@@ -66,7 +67,7 @@ function main() {
 		assert(s1 == s2);
 
 		printl("\nless than smallest decimal number becomes 0.0");
-		d1=0.000000000000009;
+		d1=0.000000000000009d;
 		d2="0.000000000000009";
 		s1 = d1^"x";
 		s2="0.0x";
@@ -77,7 +78,7 @@ function main() {
 		assert(s1 == s2);
 
 		printl("\ncheck largest number (14x9) works without scientific format");
-		d1= 9999999999999.9;
+		d1= 9999999999999.9d;
 		d2="9999999999999.9";
 		s1=d1^"x";
 		s2="9999999999999.9x";
@@ -88,7 +89,7 @@ function main() {
 		assert(s1 == s2);
 
 		printl("\ncheck excessive number convert to scientific");
-		d1=99999999999999.9;
+		d1=99999999999999.9d;
 		d2="99999999999999.9";
 		s1=d1^"x";
 		s2="1e+14x";

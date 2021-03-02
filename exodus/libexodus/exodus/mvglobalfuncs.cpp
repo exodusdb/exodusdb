@@ -903,15 +903,15 @@ int exodus_main(int exodus__argc, const char* exodus__argv[], MvEnvironment& mv,
 	{
 		if (exodus__argc)
 			mv.EXECPATH = var(exodus__argv[0]);
-		if (not mv.EXECPATH.index(SLASH))
-			mv.EXECPATH.splicer(1, 0, oscwd() ^ SLASH);
+		if (not mv.EXECPATH.index(OSSLASH))
+			mv.EXECPATH.splicer(1, 0, oscwd() ^ OSSLASH);
 	}
 	//"see getting path to current executable" above
 	// or use "which EXECPATH somehow like in mvdebug.cpp
-	// if (not EXECPATH.index(SLASH) && not EXECPATH.index(":"))
+	// if (not EXECPATH.index(OSSLASH) && not EXECPATH.index(":"))
 	//{
-	//	EXECPATH.splicer(0,0,oscwd()^SLASH);
-	//	if (SLASH=="\\")
+	//	EXECPATH.splicer(0,0,oscwd()^OSSLASH);
+	//	if (OSSLASH=="\\")
 	//		EXECPATH.converter("/","\\");
 	//}
 	// leave a global copy where backtrace can get at it
@@ -931,7 +931,7 @@ int exodus_main(int exodus__argc, const char* exodus__argv[], MvEnvironment& mv,
 		var word = var(exodus__argv[ii]);
 		if (ii == 0)
 		{
-			word = word.field2(SLASH, -1);
+			word = word.field2(OSSLASH, -1);
 			// remove trailing ".exe"
 			if (word.lcase().substr(-4) == ".exe")
 				word.splicer(-4, 4, "");

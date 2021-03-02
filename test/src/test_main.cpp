@@ -1989,7 +1989,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	da1="f1" ^VM^ "f1v2s1" ^SM^ "f1v2s2" ^SM^ "f1v2s3" ^VM^ "f1v3" ^FM^ "f2";
 	assert(remover(da1, 1, 2, 2) eq ("f1" ^VM^ "f1v2s1" ^SM^ "f1v2s3" ^VM^ "f1v3" ^FM^ "f2"));
 
-	var tempfile=SLASH^"129834192784";
+	var tempfile=OSSLASH^"129834192784";
 	if (osopen(tempfile,tempfile))
 		assert(false and var("non-existent file opened!"));
 
@@ -2548,15 +2548,15 @@ while trying to match the argument list '(exodus::var, bool)'
 	osrmdir("test_main.2");
 
 	printl();
-	assert(osdir(SLASH).match(_FM_ "\\d{5}" _FM_ "\\d{1,5}"));
+	assert(osdir(OSSLASH).match(_FM_ "\\d{5}" _FM_ "\\d{1,5}"));
 
 	//root directories
 
 	//check one step multilevel subfolder creation (requires boost version > ?)
-	var topdir1=SLASH^"exodus544";
+	var topdir1=OSSLASH^"exodus544";
 	var topdir1b=topdir1^"b";
-	var subdir2=topdir1^SLASH^"abcd";
-	var subdir2b=topdir1b^SLASH^"abcd";
+	var subdir2=topdir1^OSSLASH^"abcd";
+	var subdir2b=topdir1b^OSSLASH^"abcd";
 
 	var tempdir="exotemp746";
 	osrmdir(tempdir,true);
@@ -2609,7 +2609,7 @@ while trying to match the argument list '(exodus::var, bool)'
 	assert(osmkdir(tempdir));
 	assert(osrmdir(tempdir));
 	assert(osmkdir(tempdir));
-	var tempfilename=tempdir^SLASH^"temp1";
+	var tempfilename=tempdir^OSSLASH^"temp1";
 	printl(tempfilename);
 	//printl(str(str1,filesize/len(str1)));
 	assert(oswrite(str(str1,filesize/len(str1)),tempfilename));

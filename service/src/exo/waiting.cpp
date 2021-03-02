@@ -73,7 +73,7 @@ function main() {
 			//if renaming then rename and quit, or process loop if cannot rename
 
 			//rename and quit
-			var oldfilename=filepattern.fieldstore(SLASH,-1,1,filenames.a(1));
+			var oldfilename=filepattern.fieldstore(OSSLASH,-1,1,filenames.a(1));
 			if (osrename(oldfilename,newfilename)) {
 				//printl("File renamed from ",oldfilename, " to ", newfilename);
 				//var x;
