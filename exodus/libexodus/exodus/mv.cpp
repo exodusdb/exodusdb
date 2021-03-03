@@ -1651,6 +1651,8 @@ std::string dblToString(double double1)
 	//std::cout << double(0.000'000'001) << std::endl;
 	//std::cout << (std::abs(double1)<double(0.000'000'001)) << std::endl;
 
+	/*
+
 	//fixed to precision six
 	//return std::to_string(double1);
 
@@ -1661,31 +1663,104 @@ std::string dblToString(double double1)
 
 	//stringstream1.precision(16);
 	//use precision 14 to avoid 1.1-1 = 1.000000000000001
-	//"1.1" in compiled c++ code is FLOAT NOT DOUBLE (1.1d is DOUBLE);
-	// which does NOT have same accuracy as exodus internal double
-	stringstream1.precision(14);
+    stringstream1 << std::fixed;
 
 	std::string str1;
+	double abs_double1 = std::abs(double1);
+
 	//evade scientific format for small numbers
-	if (std::abs(double1) < 0.0001d) {
+	if (abs_double1 < 0.0001d) {
 
 		//treat very small numbers as zero
 		//if (std::abs(double1)<double(0.000'000'000'1))
 		//if (std::abs(double1)<double(0.000'000'000'000'001))
 		if (std::abs(double1)<0.000'000'000'000'1d)
-			return "0.0";
+			return "0";
+
+		stringstream1.precision(14-std::log10(double1));
+		//stringstream1.precision(14);
+
+	} else if (abs_double1>1000000) {
+		stringstream1.precision(14-std::log10(double1));
+		//stringstream1.precision(6);
+
+	} else {
+		//stringstream1.precision(14-std::log10(double1));
+		stringstream1.precision(14);
 	}
+
 	//std::clog << double1 << " " << std::log10(double1) << std::endl;
-    stringstream1 << std::fixed;
-	stringstream1.precision(14-std::log10(double1));
     stringstream1 << double1;
     str1 = stringstream1.str();
     while (str1.back() == '0')
 	    str1.pop_back();
 	if (str1.back() == '.')
-		str1.push_back('0');
+		str1.pop_back();
 
 	return str1;
+	*/
+
+	int minus = double1 < 0 ? 1 : 0;
+
+	std::ostringstream ss;
+
+	//EITHER use precision 14 to avoid 1.1-1 = 1.000000000000001
+	//OR use 15 for which 64-bit IEEE 754 type double guarantees
+	//roundtrip double/text/double for 15 decimal digits
+	ss.precision(15);
+
+	ss << std::scientific << double1;
+
+	std::string s = ss.str();
+
+	std::size_t epos =  s.find('e');
+
+	auto exponent = stoi(s.substr(epos + 1));
+
+	s.erase(epos);
+
+	//exponent 0
+	if (! exponent) {
+
+		//remove trailing zeros and decimal point
+		while (s.back() == '0')
+			s.pop_back();
+		if (s.back() == '.')
+			s.pop_back();
+	}
+
+	//positive exponent
+	else
+	if (exponent > 0) {
+		s.erase(1 + minus,1);
+		int addzeros = exponent - s.size() + 1 - minus;
+		if (addzeros > 0) {
+			s.append(addzeros, '0');
+		} else if (addzeros < 0) {
+			s.insert(exponent + minus + 1, 1, '.');
+
+			//remove trailing zeros and decimal point
+			while (s.back() == '0')
+				s.pop_back();
+			if (s.back() == '.')
+				s.pop_back();
+		}
+
+	//negative exponent
+	} else {
+		s.erase(1 + minus,1);
+		s.insert(0 + minus,size_t(-exponent),'0');
+		s.insert(1 + minus,1,'.');
+
+		//remove trailing zeros and decimal point
+		while (s.back() == '0')
+			s.pop_back();
+		if (s.back() == '.')
+			s.pop_back();
+	}
+
+	return s;
+
 }
 
 var backtrace();

@@ -1,11 +1,46 @@
 #include <limits>
 #include <iomanip>
+#include <format>
 
 #include <exodus/program.h>
 #include <cassert>
 using namespace std;
 
 programinit()
+
+subroutine out() {
+		printl("code  : ", dv2);
+		std::cout << "cout  :  " << std::fixed << std::setprecision(50) << dd1 << std::endl;
+		printl("print : ", dv1);
+		printl("concat: ", sv1);
+		printl("Target: ", sv2);
+}
+
+subroutine test2(const char* cstr1, const std::string str2 = std::string()) {
+	dd1 = stod(cstr1);
+	dv1 = dd1;
+	dv2 = cstr1;
+	sv1 = dv1 ^ "x";
+	sv2 = cstr1;
+	print(cstr1,"->",sv1,"target:",str2);
+	//printf(" printf:  %.17g\n", dd1);
+	print(std::format("{:10g}", dd1);
+	osflush();
+	//gosub out();
+
+	if (str2.size()) {
+		assert(sv1 == str2);
+		printl("","OK");
+	} else
+		printl("UNTESTED");
+}
+
+	double dd1;
+	var dv1;
+	var dv2;
+	var sv1;
+	var sv2;
+
 function main() {
 	printl("\n============================");
 	{
@@ -13,93 +48,183 @@ function main() {
 		printl("\nASSUMING precision(14) in");
 		printl("mv.cpp std::string dblToString(double double1)");
 
-		print("\nMaximum precision is ");
-		cout << numeric_limits<double>::digits10 + 1 << endl;
+		printl("\nMaximum precision (decimal digits) is ");
+		TRACE(numeric_limits<double>::digits10 + 1)
 
-		cout<< "\nsize of double " << sizeof(double) << " size of long double" << sizeof(long double) << endl;
+		cout << "\nsize of double " << sizeof(double) << std::endl;
+		cout <<" size of long double" << sizeof(long double) << endl;
 
 		//cout << setprecision(16) << fixed << 1234567890123456.789012345678901234567890 << endl;
 		//cout << setprecision(16) << fixed << 999999999999999.9 << endl;
 
-		printl("\ntoo decimal points get truncated");
-		var d1 = 0.00005678901234567890d;
-		var d2 = "0.00005678901234567890";
-		var s1 = d1^"x";
-		//var s2 = "0.00005678901235x";
-		var s2 = "0.000056789012345679x";
-		printl("Raw   : ", d2);
-		printl("Print : ", d1);
-		printl("Result: ", s1);
-		printl("Target: ", s2);
-		assert(s1 == s2);
+		printl(var(999999999999999.9d)    ^ "x");
+		assert((var(999999999999999.9d)    ^ "x") == "999999999999999.9x");
+		assert((var(9999999999999999.9d)   ^ "x") == "10000000000000000x");
+		assert((var(99999999999999999.9d)  ^ "x") == "100000000000000000x");
+		assert((var(999999999999999999.9d) ^ "x") == "1000000000000000000x");
+
+		printl("\ntoo many decimal points get ROUNDED");
+		dd1 = 0.00005678901234567890d;
+		dv1 = dd1;
+		dv2 = "0.00005678901234567890d";
+		sv1 = dv1^"x";
+		//var sv2 = "0.00005678901235x";
+		sv2 = "0.0000567890123456789x";
+		gosub out();
+		assert(sv1 == sv2);
 
 		printl("\ntoo many digits of precision get truncated");
-		d1 = 1234567890.00005678d;
-		d2 = "1234567890.00005678";
-		s1 = d1 ^ "x";
-		s2 = "1234567890.0001x";
-		printl("Raw   : ", d2);
-		printl("Print : ", d1);
-		printl("Result: ", s1);
-		printl("Target: ", s2);
-		assert(s1 == s2);
+		dd1 = 1234567890.00005678d;
+		dv1 = dd1;
+		dv2 = "1234567890.00005678d";
+		sv1 = dv1 ^ "x";
+		sv2 = "1234567890.000057x";
+		gosub out();
+		assert(sv1 == sv2);
 
 		printl("\nsmall numbers are ok");
-		d1 = 0.00005678d;
-		d2 = "0.00005678";
-		s1 = d1^"x";
-		s2 = "0.00005678x";
-		printl("Raw   : ", d2);
-		printl("Print : ", d1);
-		printl("Result: ", s1);
-		printl("Target: ", s2);
-		assert(s1 == s2);
+		dd1 = 0.00005678d;
+		dv1 = dd1;
+		dv2 = "0.00005678d";
+		sv1 = dv1^"x";
+		sv2 = "0.00005678x";
+		gosub out();
+		assert(sv1 == sv2);
 
 		printl("\nsmallest decimal number");
-		d1=0.0000000000001d;
-		d2="0.0000000000001";
-		s1 = d1^"x";
-		s2="0.0000000000001x";
-		printl("Raw   : ", d2);
-		printl("Print : ", d1);
-		printl("Result: ", s1);
-		printl("Target: ", s2);
-		assert(s1 == s2);
+		dd1=0.0000000000001d;
+		dv1 = dd1;
+		dv2="0.0000000000001d";
+		sv1 = dv1^"x";
+		sv2="0.0000000000001x";
+		gosub out();
+		assert(sv1 == sv2);
 
+		/*
 		printl("\nless than smallest decimal number becomes 0.0");
-		d1=0.000000000000009d;
-		d2="0.000000000000009";
-		s1 = d1^"x";
-		s2="0.0x";
-		printl("Raw   : ", d2);
-		printl("Print : ", d1);
-		printl("Result: ", s1);
-		printl("Target: ", s2);
-		assert(s1 == s2);
+		dd1=0.000000000000009d;
+		dv1 = dd1;
+		dv2="0.000000000000009d";
+		sv1 = dv1^"x";
+		sv2="0x";
+		gosub out();
+		assert(sv1 == sv2);
+		*/
 
 		printl("\ncheck largest number (14x9) works without scientific format");
-		d1= 9999999999999.9d;
-		d2="9999999999999.9";
-		s1=d1^"x";
-		s2="9999999999999.9x";
-		printl("Raw   : ", d2);
-		printl("Print : ", d1);
-		printl("Result: ", s1);
-		printl("Target: ", s2);
-		assert(s1 == s2);
+		dd1= 9999999999999.9d;
+		dv1 = dd1;
+		dv2="9999999999999.9d";
+		sv1=dv1^"x";
+		sv2="9999999999999.9x";
+		gosub out();
+		assert(sv1 == sv2);
 
-		printl("\ncheck excessive number convert to scientific");
-		d1=99999999999999.9d;
-		d2="99999999999999.9";
-		s1=d1^"x";
-		s2="1e+14x";
-		printl("Raw   : ", d2);
-		printl("Print : ", d1);
-		printl("Result: ", s1);
-		printl("Target: ", s2);
-		assert(s1 == s2);
+		printl("\nVery large numbers");
+		dd1=999999999999999999.9d;
+		dv1 = dd1;
+		dv2="999999999999999999.9d";
+		sv1=dv1^"x";
+		sv2="1000000000000000000x";
+		gosub out();
+		assert(sv1 == sv2);
+
+		printl("\nVery large numbers - lose accuracy");
+		dd1=12345678901234567890123456789.0d;
+		dv1 = dd1;
+		dv2="12345678901234567890123456789.0d";
+		sv1=dv1^"x";
+		sv2="12345678901234570000000000000x";
+		gosub out();
+		assert(sv1 == sv2);
+
+		printl("\ncheck excessive number DONT get converted to scientific");
+		dd1=99999999999999.9d;
+		dv1 = dd1;
+		dv2="99999999999999.9d";
+		sv1=dv1^"x";
+		sv2="99999999999999.91x";
+		gosub out();
+		assert(sv1 == sv2);
+
+        test2("00000000000000000000.00000000000000000000",                   "0x");
+        test2("00000000000000000000.00000000000000000001",                   "0.000000000000000000009999999999999999x");
+        test2("00000000000000000000.00000000000000000012",                   "0.00000000000000000012x");
+        test2("00000000000000000000.00000000000000000123",                   "0.00000000000000000123x");
+        test2("00000000000000000000.00000000000000001234",                   "0.00000000000000001234x");
+        test2("00000000000000000000.00000000000000012345",                   "0.00000000000000012345x");
+        test2("00000000000000000000.00000000000000123456",                   "0.00000000000000123456x");
+        test2("00000000000000000000.00000000000001234567",                   "0.00000000000001234567x");
+        test2("00000000000000000000.00000000000012345678",                   "0.00000000000012345678x");
+        test2("00000000000000000000.00000000000123456789",                   "0.00000000000123456789x");
+        test2("00000000000000000000.00000000001234567890",                   "0.0000000000123456789x");
+        test2("00000000000000000000.00000000012345678901",                   "0.00000000012345678901x");
+        test2("00000000000000000000.00000000123456789012",                   "0.00000000123456789012x");
+        test2("00000000000000000000.00000001234567890123",                   "0.00000001234567890123x");
+        test2("00000000000000000000.00000012345678901234",                   "0.00000012345678901234x");
+        test2("00000000000000000000.00000123456789012345",                   "0.00000123456789012345x");
+        test2("00000000000000000000.00001234567890123456",                   "0.00001234567890123456x");
+
+        test2("00000000000000000000.00012345678901234567",                   "0.0001234567890123457x");
+        test2("00000000000000000000.00123456789012345678",                   "0.001234567890123457x");
+        test2("00000000000000000000.01234567890123456789",                   "0.01234567890123457x");
+        test2("00000000000000000000.12345678901234567890",                   "0.1234567890123457x");
+        test2("00000000000000000001.23456789012345678901",                   "1.234567890123457x");
+        test2("00000000000000000012.34567890123456789010",                  "12.34567890123457x");
+        test2("00000000000000000123.45678901234567890100",                 "123.4567890123457x");
+        test2("00000000000000001234.56789012345678901000",                "1234.567890123457x");
+        test2("00000000000000012345.67890123456789010000",               "12345.67890123457x");
+        test2("00000000000000123456.78901234567890100000",              "123456.7890123457x");
+
+        test2("00000000000001234567.89012345678901000000",             "1234567.890123457x");
+        test2("00000000000012345678.90123456789010000000",            "12345678.90123457x");
+        test2("00000000000123456789.01234567890100000000",           "123456789.0123457x");
+        test2("00000000001234567890.12345678901000000000",          "1234567890.123457x");
+        test2("00000000012345678901.23456789010000000000",         "12345678901.23457x");
+        test2("00000000123456789012.34567890100000000000",        "123456789012.3457x");
+        test2("00000001234567890123.45678901000000000000",       "1234567890123.457x");
+        test2("00000012345678901234.56789010000000000000",      "12345678901234.57x");
+        test2("00000123456789012345.67890100000000000000",     "123456789012345.7x");
+        test2("00001234567890123456.78901000000000000000",    "1234567890123457x");
+        test2("00012345678901234567.89010000000000000000",   "12345678901234570x");
+        test2("00123456789012345678.90100000000000000000",  "123456789012345700x");
+        test2("01234567890123456789.01000000000000000000", "1234567890123457000x");
+        test2("12345678901234567890.10000000000000000000","12345678901234570000x");
 
 	}
+
+	//default is (d)ouble thankfully not (f)loat
+	printl(var(1e-11f));
+	printl(var(1e-11d));
+	printl(var(1e-12f));
+	printl(var(1e-12d));
+	printl(var(1e-13f));
+	printl(var(1e-13d));
+	printl(var(1e-14f));
+	printl(var(1e-14d));
+	//0.000000000009999999960041972
+	//0.000000000009999999999999999
+	//0.0000000000009999999960041972
+	//0.000000000001
+	//0.000000000000099999998245167
+	//0.0000000000001
+	//0.0000000000000099999998245167
+	//0.00000000000001
+
+	assert(var(1e-11) == "0.00000000001");
+	assert(var(1e-12) == "0.000000000001");
+	assert(var(1e-13) == "0.0000000000001");
+	assert(var(1e-14) == "0");//comparing to zero is special (diff less than 0.0001)
+
+	assert(var(1e-11f).toString() == "0.000000000009999999960041972");
+	assert(var(1e-11d).toString() == "0.000000000009999999999999999");
+
+	assert(var(1e-12f).toString() == "0.0000000000009999999960041972");
+	assert(var(1e-12 ).toString() == "0.000000000001");
+	assert(var(1e-13f).toString() == "0.000000000000099999998245167");
+	assert(var(1e-13 ).toString() == "0.0000000000001");
+	assert(var(1e-14f).toString() == "0.0000000000000099999998245167");
+	assert(var(1e-14 ).toString() == "0.00000000000001");
 
 	printl("Test passed");
 

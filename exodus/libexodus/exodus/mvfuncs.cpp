@@ -40,7 +40,7 @@ Binary    Hex          Comments
 
 //#include <cmath>      //for stod()
 //#include <sstream>
-#include <iomanip>    //for setprecision
+//#include <iomanip>    //for setprecision
 
 //#include <cmath>    //for abs(double)
 //#include <cstdlib>  //for exit
@@ -390,10 +390,11 @@ var var::round(const int ndecimals) const
 
 	double fromdouble;
 	// prefer double
-	if (var_typ & VARTYP_DBL)
+	if (var_typ & VARTYP_DBL) {
 		fromdouble = var_dbl;
-	else
-	{
+	}
+	//otherwise use var_int
+	else {
 		if (not ndecimals) {
 			//result=*this;
 			result.var_int=var_int;
@@ -401,7 +402,7 @@ var var::round(const int ndecimals) const
 			return result;
 		}
 		// loss of precision if var_int is long long
-		fromdouble = int(var_int);
+		fromdouble = double(var_int);
 	}
 
 	//unfortunately c+ round(double) does not work well with decimal numbers
@@ -419,28 +420,27 @@ var var::round(const int ndecimals) const
 
 	int scale = std::pow(10.0,ndecimals);
 
-	//cout << fixed << setprecision(20) << val << endl;
+	double scaled_double = fromdouble * scale;
 
-	double fromdouble2 = fromdouble * scale;
-	//cout << fixed << setprecision(20) << fromdouble2 << endl;
+	double ceil2=std::ceil(scaled_double);
 
-	double ceil2=std::ceil(fromdouble2);
+	double diff = (scaled_double + 0.5) - ceil2;
 
-	double diff = (fromdouble2 + 0.5) - ceil2;
-	//cout << diff << endl;
-
-	double out;
+	//if very close to 0.5 mark then round up/down using ceil/floor
+	double rounded_double;
 	if (std::abs(diff) < SMALLEST_NUMBER) {
 		if (fromdouble >= 0)
-			out = ceil2/scale;
+			rounded_double = ceil2/scale;
 		else
-			out = std::floor(fromdouble2)/scale;
-	} else
-		out = std::round(fromdouble2)/scale;
-
+			rounded_double = std::floor(scaled_double)/scale;
+	}
+	//otherwise use standard rounding
+	else {
+		rounded_double = std::round(scaled_double)/scale;
+	}
 	std::stringstream ss;
-	//cout << fixed << setprecision(ndecimals) << out << endl;
-	ss << std::fixed << std::setprecision(ndecimals) << out;
+	ss.precision(ndecimals);
+	ss << std::fixed << rounded_double;
 
 	result.var_str = ss.str();
 	result.var_typ = VARTYP_STR;
@@ -1849,7 +1849,8 @@ bool var::isnum(void) const
 		// "... Recommended Replacements: ANSI UTF-16 strtod"
 		///		std::string result(var_str.begin(),var_str.end());
 		///		var_dbl=atof(result.c_str());
-		var_dbl = strtod(var_str.c_str(), 0);
+		//var_dbl = strtod(var_str.c_str(), 0);
+		var_dbl = std::stod(var_str.c_str(), 0);
 		var_typ = VARTYP_DBLSTR;
 	}
 	else
@@ -1860,7 +1861,8 @@ bool var::isnum(void) const
 		// change from
 		///		std::string result(var_str.begin(),var_str.end());
 		///		var_int=atoi(result.c_str());
-		var_int = strtol(var_str.c_str(), 0, 10);
+		//var_int = strtol(var_str.c_str(), 0, 10);
+		var_int = std::stol(var_str.c_str(), 0, 10);
 		var_typ = VARTYP_INTSTR;
 	}
 	// indicate isNumeric

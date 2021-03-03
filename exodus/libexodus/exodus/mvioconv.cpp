@@ -404,6 +404,7 @@ var var::oconv_MD(const char* conversion) const
 
 	// following up to two digits are ndecimals, or ndecimals and movedecimals
 	// look for a digit
+	//TODO allow A-I to act like 10 to 19 digits
 	if (isdigit(nextchar))
 	{
 
