@@ -2,24 +2,21 @@
 #include <fcntl.h>
 #include <unistd.h>
 //#include <errno.h>
+#include <iostream>
 #include <stdio.h>
 #include <string>
-#include <iostream>
 
-namespace exodus
-{
+namespace exodus {
 
 // here because unistd.h available
-std::string mvgethostname()
-{
+std::string mvgethostname() {
 	char hostname[1024];
 	hostname[1023] = '\0';
 	gethostname(hostname, 1023);
 	return hostname;
 }
 
-bool processno_islocked2(int processno, int* fd)
-{
+bool processno_islocked2(int processno, int* fd) {
 
 	/* Make a non-blocking request to place a write lock
 	on 1 byte at offset processno of testfile */
@@ -31,39 +28,31 @@ bool processno_islocked2(int processno, int* fd)
 	fl.l_len = 1;
 
 	// process cannot be locked, return true to indicate processno is active
-	if (fcntl(*fd, F_SETLK, &fl) == -1)
-	{
+	if (fcntl(*fd, F_SETLK, &fl) == -1) {
 
-		if (errno == EACCES || errno == EAGAIN)
-		{
+		if (errno == EACCES || errno == EAGAIN) {
 			// printf("Already locked by another process\n");
-		}
-		else
-		{
+		} else {
 			/* Handle unexpected error */;
 		}
 		return true;
 
 		// process can be locked, return false to indicate processno is active
-	}
-	else
-	{
+	} else {
 
 		// unlock it immediately
 		fl.l_type = F_UNLCK;
 		fl.l_whence = SEEK_SET;
 		fl.l_start = processno;
 		fl.l_len = 1;
-		if (fcntl(*fd, F_SETLK, &fl) == -1)
-		{
+		if (fcntl(*fd, F_SETLK, &fl) == -1) {
 			/* Handle error */;
 		}
 		return false;
 	}
 }
 
-int getprocessno(const char* filename, int* fd)
-{
+int getprocessno(const char* filename, int* fd) {
 	struct flock fl;
 
 	*fd = open(filename, O_RDWR | O_CREAT, 0666);
@@ -75,8 +64,7 @@ int getprocessno(const char* filename, int* fd)
 	}
 	// processno starts at 1 not 0
 
-	for (int ii = 1; ii < 1000; ii++)
-	{
+	for (int ii = 1; ii < 1000; ii++) {
 
 		/* Make a non-blocking request to place a write lock
 		on 1 byte at offset processno of testfile */
@@ -85,8 +73,7 @@ int getprocessno(const char* filename, int* fd)
 		fl.l_whence = SEEK_SET;
 		fl.l_start = ii;
 		fl.l_len = 1;
-		if (fcntl(*fd, F_SETLK, &fl) == -1)
-		{
+		if (fcntl(*fd, F_SETLK, &fl) == -1) {
 
 			//			if (errno == EACCES || errno == EAGAIN) {
 			//				//printf("Already locked by another
@@ -94,11 +81,9 @@ int getprocessno(const char* filename, int* fd)
 			//        		} else {
 			//				/* Handle unexpected error */;
 			//			}
-		}
-		else
-		{
+		} else {
 
-//std::cout << ii << " #############################################################################################################" << std::endl;
+			//std::cout << ii << " #############################################################################################################" << std::endl;
 			// printf("Locked was granted for %i\n", ii);
 			// char c=getchar();
 			// DONT close fd otherwise lock will be released.
@@ -124,8 +109,7 @@ int getprocessno(const char* filename, int* fd)
 }
 
 // should be called in mvenvironment destructor
-void releaseprocess(int* fd)
-{
+void releaseprocess(int* fd) {
 	close(*fd);
 	*fd = 0;
 }

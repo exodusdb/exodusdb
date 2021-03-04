@@ -14,17 +14,14 @@
 //#define INSIDE_MVDBCONNS_CPP
 #include "mvdbconns.h"
 
-namespace exodus
-{
+namespace exodus {
 
 MvConnectionsCache::MvConnectionsCache(DELETER_AND_DESTROYER del_)
-    // see important NOTE_OSX in header
-    : del(del_), connection_id(0), conntbl(), mvconnections_mutex()
-{
+	// see important NOTE_OSX in header
+	: del(del_), connection_id(0), conntbl(), mvconnections_mutex() {
 }
 
-int MvConnectionsCache::add_connection(CACHED_CONNECTION conn_to_cache)
-{
+int MvConnectionsCache::add_connection(CACHED_CONNECTION conn_to_cache) {
 	boost::mutex::scoped_lock lock(mvconnections_mutex);
 
 	connection_id++;
@@ -32,22 +29,19 @@ int MvConnectionsCache::add_connection(CACHED_CONNECTION conn_to_cache)
 	return connection_id;
 }
 
-CACHED_CONNECTION MvConnectionsCache::get_connection(int index) const
-{
+CACHED_CONNECTION MvConnectionsCache::get_connection(int index) const {
 	boost::mutex::scoped_lock lock(mvconnections_mutex);
 	CONN_MAP::const_iterator iter = conntbl.find(index);
 	return (CACHED_CONNECTION)(iter == conntbl.end() ? 0 : iter->second.connection);
 }
 
-LockTable* MvConnectionsCache::get_lock_table(int index) const
-{
+LockTable* MvConnectionsCache::get_lock_table(int index) const {
 	boost::mutex::scoped_lock lock(mvconnections_mutex);
 	CONN_MAP::const_iterator iter = conntbl.find(index);
 	return (LockTable*)(iter == conntbl.end() ? 0 : iter->second.plock_table);
 }
 
-RecordCache* MvConnectionsCache::get_recordcache(int index) const
-{
+RecordCache* MvConnectionsCache::get_recordcache(int index) const {
 	boost::mutex::scoped_lock lock(mvconnections_mutex);
 	CONN_MAP::const_iterator iter = conntbl.find(index);
 	return (RecordCache*)(iter == conntbl.end() ? 0 : iter->second.precordcache);
@@ -55,8 +49,7 @@ RecordCache* MvConnectionsCache::get_recordcache(int index) const
 
 // pass filename and key by value relying on short string optimisation for performance
 std::string MvConnectionsCache::getrecord(const int connid, const std::string filename,
-					   const std::string key) const
-{
+										  const std::string key) const {
 	auto precordcache = get_recordcache(connid);
 	std::string filenameandkey = filename + "|" + key;
 	auto cacheentry = precordcache->find(filenameandkey);
@@ -68,41 +61,36 @@ std::string MvConnectionsCache::getrecord(const int connid, const std::string fi
 
 // pass filename and key by value relying on short string optimisation for performance
 void MvConnectionsCache::putrecord(const int connid, const std::string filename,
-				     const std::string key, const std::string& record)
-{
+								   const std::string key, const std::string& record) {
 	auto precordcache = get_recordcache(connid);
 	std::string filenameandkey = filename + "|" + key;
 	//(*precordcache)[filenameandkey] = record;
-	precordcache->insert_or_assign(filenameandkey,record);
+	precordcache->insert_or_assign(filenameandkey, record);
 	return;
 }
 
 // delrecord is currently setting record to "" to counter c++ unordered map reputed performance issues
 // pass filename and key by value relying on short string optimisation for performance
 void MvConnectionsCache::delrecord(const int connid, const std::string filename,
-				     const std::string key)
-{
+								   const std::string key) {
 	auto precordcache = get_recordcache(connid);
 	std::string filenameandkey = filename + "|" + key;
 	//(*precordcache)[filenameandkey] = "";
 	//precordcache->erase(filenameandkey);
-	precordcache->insert_or_assign(filenameandkey,"");
+	precordcache->insert_or_assign(filenameandkey, "");
 	return;
 }
 
-void MvConnectionsCache::clearrecordcache(const int connid)
-{
+void MvConnectionsCache::clearrecordcache(const int connid) {
 	auto precordcache = get_recordcache(connid);
 	precordcache->clear();
 	return;
 }
 
-void MvConnectionsCache::del_connection(int index)
-{
+void MvConnectionsCache::del_connection(int index) {
 	boost::mutex::scoped_lock lock(mvconnections_mutex);
 	CONN_MAP::iterator iter = conntbl.find(index);
-	if (iter != conntbl.end())
-	{
+	if (iter != conntbl.end()) {
 		//	CACHED_CONNECTION p /*std::pair<int, void*> p*/ = ;
 		del((CACHED_CONNECTION)iter /*conntbl.find(index)*/->second.connection);
 		delete /*conntbl.find(index)*/ iter->second.plock_table;
@@ -111,16 +99,14 @@ void MvConnectionsCache::del_connection(int index)
 	}
 }
 
-MvConnectionsCache::~MvConnectionsCache()
-{
+MvConnectionsCache::~MvConnectionsCache() {
 	// no need
 	// boost::mutex::scoped_lock lock(mvconnections_mutex);
 
 	CONN_MAP::iterator ix;
-	for (ix = conntbl.begin(); ix != conntbl.end(); ix++)
-	{
+	for (ix = conntbl.begin(); ix != conntbl.end(); ix++) {
 		//		del((CACHED_CONNECTION) ix->second.connection);
-				del((CACHED_CONNECTION) ix->second.connection);
+		del((CACHED_CONNECTION)ix->second.connection);
 		delete ix->second.plock_table;
 		delete ix->second.precordcache;
 	}

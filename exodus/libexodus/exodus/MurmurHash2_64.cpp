@@ -12,8 +12,7 @@
 
 #ifdef MURMUR64_64
 
-uint64_t MurmurHash64A(const void* key, int len, unsigned int seed)
-{
+uint64_t MurmurHash64A(const void* key, int len, unsigned int seed) {
 	const uint64_t m = 0xc6a4a7935bd1e995;
 	const int r = 47;
 
@@ -22,8 +21,7 @@ uint64_t MurmurHash64A(const void* key, int len, unsigned int seed)
 	const uint64_t* data = (const uint64_t*)key;
 	const uint64_t* end = data + (len / 8);
 
-	while (data != end)
-	{
+	while (data != end) {
 		uint64_t k = *data++;
 
 		k *= m;
@@ -36,8 +34,7 @@ uint64_t MurmurHash64A(const void* key, int len, unsigned int seed)
 
 	const unsigned char* data2 = (const unsigned char*)data;
 
-	switch (len & 7)
-	{
+	switch (len & 7) {
 	case 7:
 		h ^= uint64_t(data2[6]) << 48;
 		[[fallthrough]];
@@ -72,8 +69,7 @@ uint64_t MurmurHash64A(const void* key, int len, unsigned int seed)
 
 // 64-bit hash for 32-bit platforms
 
-uint64_t MurmurHash64B(const void* key, int len, unsigned int seed)
-{
+uint64_t MurmurHash64B(const void* key, int len, unsigned int seed) {
 	const unsigned int m = 0x5bd1e995;
 	const int r = 24;
 
@@ -82,8 +78,7 @@ uint64_t MurmurHash64B(const void* key, int len, unsigned int seed)
 
 	const unsigned int* data = (const unsigned int*)key;
 
-	while (len >= 8)
-	{
+	while (len >= 8) {
 		unsigned int k1 = *data++;
 		k1 *= m;
 		k1 ^= k1 >> r;
@@ -101,8 +96,7 @@ uint64_t MurmurHash64B(const void* key, int len, unsigned int seed)
 		len -= 4;
 	}
 
-	if (len >= 4)
-	{
+	if (len >= 4) {
 		unsigned int k1 = *data++;
 		k1 *= m;
 		k1 ^= k1 >> r;
@@ -112,8 +106,7 @@ uint64_t MurmurHash64B(const void* key, int len, unsigned int seed)
 		len -= 4;
 	}
 
-	switch (len)
-	{
+	switch (len) {
 	case 3:
 		h2 ^= ((unsigned char*)data)[2] << 16;
 	case 2:

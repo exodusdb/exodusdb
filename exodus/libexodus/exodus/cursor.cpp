@@ -1,16 +1,15 @@
 #include <stdio.h>
-#include <unistd.h>
 #include <termios.h>
+#include <unistd.h>
 
 #include <exodus/mv.h>
 #include <exodus/mvexceptions.h>
 
 namespace exodus {
 
-bool var::getcursor() const
-{
+bool var::getcursor() const {
 
-    THISIS("bool var::getcursor() const")
+	THISIS("bool var::getcursor() const")
 	THISISDEFINED()
 
 	// returns empty string if fails
@@ -20,7 +19,7 @@ bool var::getcursor() const
 	return false;
 
 	//false if stdin is not a terminal
-    if (!isatty(fileno(stdin))) {
+	if (!isatty(fileno(stdin))) {
 		std::clog << "not a tty" << std::endl;
 		return false;
 	}
@@ -33,34 +32,34 @@ bool var::getcursor() const
 	/////////
 
 	//save the current input config or quit (not terminal)
-    struct termios save;
-    if (tcgetattr(STDIN_FILENO, &save)) {
+	struct termios save;
+	if (tcgetattr(STDIN_FILENO, &save)) {
 		perror("tcgetattr(save) error");
 		return false;
 	}
 	std::clog << "got save" << std::endl;
 
 	//switch input into raw io
-    struct termios raw;
-    cfmakeraw(&raw);
+	struct termios raw;
+	cfmakeraw(&raw);
 	if (tcsetattr(STDIN_FILENO, TCSANOW, &raw) != 0) {
 		perror("tcsetattr(raw) error");
 		return false;
 	}
 
 	//output magic request
-    //char cmd[] = "echo -e '\033[6n'";
-    char cmd[] = "\x1b[6n";
-    int err = ::write(1,cmd,sizeof(cmd));
+	//char cmd[] = "echo -e '\033[6n'";
+	char cmd[] = "\x1b[6n";
+	int err = ::write(1, cmd, sizeof(cmd));
 
 	//failure to write
 	if (false && err) {
 		std::cerr << "Error: " << err << " getcursor could not output" << std::endl;
 		//restore the current input config
-    	tcsetattr(STDIN_FILENO, TCSANOW, &save);
+		tcsetattr(STDIN_FILENO, TCSANOW, &save);
 
 		//restore the current output config
-    	//tcsetattr(STDOUT_FILENO, TCSANOW,&save1);
+		//tcsetattr(STDOUT_FILENO, TCSANOW,&save1);
 
 		return false;
 	}
@@ -69,8 +68,8 @@ bool var::getcursor() const
 	////////
 
 	//input magic response
-    char buf[16];
-    err = ::read (STDIN_FILENO, buf, sizeof(buf));
+	char buf[16];
+	err = ::read(STDIN_FILENO, buf, sizeof(buf));
 
 	//restore the current input config
 	if (tcsetattr(STDIN_FILENO, TCSANOW, &save) != 0) {
@@ -79,7 +78,7 @@ bool var::getcursor() const
 	}
 
 	//restore the current output config
-    //tcsetattr(STDOUT_FILENO, TCSANOW,&save1);
+	//tcsetattr(STDOUT_FILENO, TCSANOW,&save1);
 
 	//failure to read
 	if (false && err) {
@@ -100,15 +99,14 @@ bool var::getcursor() const
 	//x.oconv("HEX").outputl("x=");
 	//y.oconv("HEX").outputl("y=");
 
-	this->var_str=this->at(x, y).var_str;
+	this->var_str = this->at(x, y).var_str;
 
-	std::cout<<var_str<<std::endl;
+	std::cout << var_str << std::endl;
 
 	return true;
 }
 
-void var::setcursor() const
-{
+void var::setcursor() const {
 	THISIS("void var::setcursor() const")
 	THISISSTRING()
 
@@ -117,4 +115,4 @@ void var::setcursor() const
 	return;
 }
 
-} //namespace
+} // namespace exodus

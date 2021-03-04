@@ -28,8 +28,7 @@ THE SOFTWARE.
 #include <exodus/mv.h>
 #include <exodus/mvenvironment.h>
 
-namespace exodus
-{
+namespace exodus {
 
 DLL_PUBLIC bool setxlocale(const var& locale) { return locale.setxlocale(); }
 
@@ -57,8 +56,7 @@ DLL_PUBLIC void breakon() { return var().breakon(); }
 DLL_PUBLIC void breakoff() { return var().breakoff(); }
 
 // osopen x to y else
-DLL_PUBLIC bool osopen(const var& osfilename, var& osfilevar, const var& locale)
-{
+DLL_PUBLIC bool osopen(const var& osfilename, var& osfilevar, const var& locale) {
 	return osfilevar.osopen(osfilename, locale);
 }
 
@@ -71,8 +69,7 @@ DLL_PUBLIC void osclose(const var& osfilevar) { osfilevar.osclose(); }
 // length)
 //var& osbread(var& data, const var& filehandle, var& offset, const int length,
 //	     const bool adjust)
-DLL_PUBLIC bool osbread(var& data, const var& filehandle, var& offset, const int length)
-{
+DLL_PUBLIC bool osbread(var& data, const var& filehandle, var& offset, const int length) {
 	return data.osbread(filehandle, offset, length);
 }
 
@@ -81,36 +78,31 @@ DLL_PUBLIC bool osbread(var& data, const var& filehandle, var& offset, const int
 // filehandle, const int offset, const int length)
 //var& osbread(var& data, const var& filehandle, const var& offset, const int length,
 //	     const bool adjust)
-DLL_PUBLIC bool osbread(var& data, const var& filehandle, const var& offset, const int length)
-{
+DLL_PUBLIC bool osbread(var& data, const var& filehandle, const var& offset, const int length) {
 	return data.osbread(filehandle, const_cast<var&>(offset), length);
 }
 
 //DLL_PUBLIC bool osbwrite(const var& data, const var& filehandle, var& offset,
 //			 const bool adjust = true)
-DLL_PUBLIC bool osbwrite(const var& data, const var& filehandle, var& offset)
-{
+DLL_PUBLIC bool osbwrite(const var& data, const var& filehandle, var& offset) {
 	return data.osbwrite(filehandle, offset);
 }
 
 //DLL_PUBLIC bool osbwrite(const var& data, const var& filehandle, const var& offset,
 //			 const bool adjust)
-DLL_PUBLIC bool osbwrite(const var& data, const var& filehandle, const var& offset)
-{
+DLL_PUBLIC bool osbwrite(const var& data, const var& filehandle, const var& offset) {
 	return data.osbwrite(filehandle, const_cast<var&>(offset));
 }
 
 // two argument version returns success/failure to be used in if statement
 // target variable first to be like "osread x from y else" and "read x from y else"
 // unfortunately different from osgetenv which is the reverse
-DLL_PUBLIC bool osread(var& data, const var& osfilename, const var& codepage)
-{
+DLL_PUBLIC bool osread(var& data, const var& osfilename, const var& codepage) {
 	return data.osread(osfilename, codepage);
 }
 
 // one argument returns the contents directly to be used in assignments
-DLL_PUBLIC var osread(const var& osfilename)
-{
+DLL_PUBLIC var osread(const var& osfilename) {
 	var data;
 	if (data.osread(osfilename))
 		return data;
@@ -119,8 +111,7 @@ DLL_PUBLIC var osread(const var& osfilename)
 }
 
 // oswrite x on y else
-DLL_PUBLIC bool oswrite(const var& data, const var& osfilename, const var& codepage = "")
-{
+DLL_PUBLIC bool oswrite(const var& data, const var& osfilename, const var& codepage = "") {
 	return data.oswrite(osfilename, codepage);
 }
 
@@ -128,29 +119,24 @@ DLL_PUBLIC bool oswrite(const var& data, const var& osfilename, const var& codep
 DLL_PUBLIC bool osdelete(const var& osfilename) { return osfilename.osdelete(); }
 
 // if osrename x to y else
-DLL_PUBLIC bool osrename(const var& oldosdir_or_filename, const var& newosdir_or_filename)
-{
+DLL_PUBLIC bool osrename(const var& oldosdir_or_filename, const var& newosdir_or_filename) {
 	return oldosdir_or_filename.osrename(newosdir_or_filename);
 }
 
 // oscopy x to y
-DLL_PUBLIC bool oscopy(const var& fromosfilename, const var& to_osfilename)
-{
+DLL_PUBLIC bool oscopy(const var& fromosfilename, const var& to_osfilename) {
 	return fromosfilename.oscopy(to_osfilename);
 }
 
-DLL_PUBLIC var oslist(const var& path, const var& wildcard, const int mode)
-{
+DLL_PUBLIC var oslist(const var& path, const var& wildcard, const int mode) {
 	return var().oslist(path, wildcard, mode);
 }
 
-DLL_PUBLIC var oslistf(const var& path, const var& wildcard)
-{
+DLL_PUBLIC var oslistf(const var& path, const var& wildcard) {
 	return var().oslistf(path, wildcard);
 }
 
-DLL_PUBLIC var oslistd(const var& path, const var& wildcard)
-{
+DLL_PUBLIC var oslistd(const var& path, const var& wildcard) {
 	return var().oslistd(path, wildcard);
 }
 
@@ -160,8 +146,7 @@ DLL_PUBLIC var osdir(const var& dirname) { return dirname.osdir(); }
 
 DLL_PUBLIC bool osmkdir(const var& dirname) { return dirname.osmkdir(); }
 
-DLL_PUBLIC bool osrmdir(const var& dirname, const bool evenifnotempty)
-{
+DLL_PUBLIC bool osrmdir(const var& dirname, const bool evenifnotempty) {
 	return dirname.osrmdir(evenifnotempty);
 }
 
@@ -181,8 +166,7 @@ DLL_PUBLIC bool osshell(const var& command) { return command.osshell(); }
 
 // simple version to write one liner read (declare and assign in one line)
 // example: var xx=osshellread("somecommand");
-DLL_PUBLIC var osshellread(const var& command)
-{
+DLL_PUBLIC var osshellread(const var& command) {
 	var result;
 	result.osshellread(command);
 	return result;
@@ -226,7 +210,11 @@ DLL_PUBLIC var at(const int columnorcode) { return var().at(columnorcode); }
 
 DLL_PUBLIC var at(const var& column, const var& row) { return var().at(column, row); }
 
-DLL_PUBLIC var getcursor() { var cursor; cursor.getcursor(); return cursor;}
+DLL_PUBLIC var getcursor() {
+	var cursor;
+	cursor.getcursor();
+	return cursor;
+}
 
 DLL_PUBLIC void setcursor(const var& cursor) { cursor.setcursor(); }
 
@@ -234,50 +222,54 @@ DLL_PUBLIC var getprompt() { return var().getprompt(); }
 
 DLL_PUBLIC void setprompt(const var& prompt) { prompt.setprompt(); }
 
-DLL_PUBLIC bool echo(const int on_off) { return var().echo(on_off);}
+DLL_PUBLIC bool echo(const int on_off) { return var().echo(on_off); }
 
+DLL_PUBLIC var input() {
+	var v;
+	v.input();
+	return v;
+}
 
-DLL_PUBLIC var input() { var v; v.input(); return v;}
+DLL_PUBLIC var input(const var& prompt) {
+	var v;
+	v.input(prompt);
+	return v;
+}
 
-DLL_PUBLIC var input(const var& prompt) { var v; v.input(prompt); return v;}
-
-DLL_PUBLIC var inputn(const int nchars) { var v; v.inputn(nchars); return v;}
-
+DLL_PUBLIC var inputn(const int nchars) {
+	var v;
+	v.inputn(nchars);
+	return v;
+}
 
 DLL_PUBLIC var len(const var& var1) { return var1.len(); }
 
 DLL_PUBLIC var length(const var& var1) { return var1.length(); }
 
-DLL_PUBLIC var& converter(var& instring, const var& oldchars, const var& newchars)
-{
+DLL_PUBLIC var& converter(var& instring, const var& oldchars, const var& newchars) {
 	return instring.converter(oldchars, newchars);
 }
 
-DLL_PUBLIC var convert(const var& instring, const var& oldchars, const var& newchars)
-{
+DLL_PUBLIC var convert(const var& instring, const var& oldchars, const var& newchars) {
 	return instring.convert(oldchars, newchars);
 }
 
-DLL_PUBLIC var& swapper(var& instring, const var& from, const var& to)
-{
+DLL_PUBLIC var& swapper(var& instring, const var& from, const var& to) {
 	return instring.swapper(from, to);
 }
 
-DLL_PUBLIC var swap(const var& instring, const var& from, const var& to)
-{
+DLL_PUBLIC var swap(const var& instring, const var& from, const var& to) {
 	var newstring = instring;
 	return newstring.swap(from, to);
 }
 
 DLL_PUBLIC var& replacer(var& instring, const var& regexstr, const var& replacementstr,
-			 const var& options = "")
-{
+						 const var& options = "") {
 	return instring.replacer(regexstr, replacementstr, options);
 }
 
 DLL_PUBLIC var replace(const var& instring, const var& regexstr, const var& replacementstr,
-		       const var& options = "")
-{
+					   const var& options = "") {
 	var newstring = instring;
 	return newstring.replacer(regexstr, replacementstr, options);
 }
@@ -316,13 +308,11 @@ DLL_PUBLIC var& raiser(var& instring) { return instring.raiser(); }
 
 DLL_PUBLIC var raise(const var& instring) { return instring.raise(); }
 
-DLL_PUBLIC var& splicer(var& instring, const int start1, const int length, const var& str)
-{
+DLL_PUBLIC var& splicer(var& instring, const int start1, const int length, const var& str) {
 	return instring.splicer(start1, length, str);
 }
 
-DLL_PUBLIC var splice(const var& instring, const int start1, const int length, const var& str)
-{
+DLL_PUBLIC var splice(const var& instring, const int start1, const int length, const var& str) {
 	return instring.splice(start1, length, str);
 }
 
@@ -335,14 +325,12 @@ DLL_PUBLIC var& unquoter(var& instring) { return instring.unquoter(); }
 DLL_PUBLIC var unquote(const var& instring) { return instring.unquote(); }
 
 DLL_PUBLIC var& fieldstorer(var& instring, const var& sepchar, const int fieldno, const int nfields,
-			    const var& replacement)
-{
+							const var& replacement) {
 	return instring.fieldstorer(sepchar, fieldno, nfields, replacement);
 }
 
 DLL_PUBLIC var fieldstore(const var& instring, const var& sepchar, const int fieldno,
-			  const int nfields, const var& replacement)
-{
+						  const int nfields, const var& replacement) {
 	return instring.fieldstore(sepchar, fieldno, nfields, replacement);
 }
 
@@ -350,79 +338,65 @@ DLL_PUBLIC var crop(const var& instring) { return instring.crop(); }
 
 DLL_PUBLIC var cropper(var& instring) { return instring.cropper(); }
 
-DLL_PUBLIC var& trimmer(var& instring, const char* trimchars)
-{
+DLL_PUBLIC var& trimmer(var& instring, const char* trimchars) {
 	return instring.trimmer(trimchars);
 }
 
 DLL_PUBLIC var trim(const var& instring, const char* trimchars) { return instring.trim(trimchars); }
 
-DLL_PUBLIC var& trimmerf(var& instring, const char* trimchars)
-{
+DLL_PUBLIC var& trimmerf(var& instring, const char* trimchars) {
 	return instring.trimmerf(trimchars);
 }
 
-DLL_PUBLIC var trimf(const var& instring, const char* trimchars)
-{
+DLL_PUBLIC var trimf(const var& instring, const char* trimchars) {
 	return instring.trimf(trimchars);
 }
 
-DLL_PUBLIC var& trimmerb(var& instring, const char* trimchars)
-{
+DLL_PUBLIC var& trimmerb(var& instring, const char* trimchars) {
 	return instring.trimmerb(trimchars);
 }
 
-DLL_PUBLIC var trimb(const var& instring, const char* trimchars)
-{
+DLL_PUBLIC var trimb(const var& instring, const char* trimchars) {
 	return instring.trimb(trimchars);
 }
 
 DLL_PUBLIC var& trimmer(var& instring, const var& trimchars) { return instring.trimmer(trimchars); }
 
-DLL_PUBLIC var& trimmer(var& instring, const var& trimchars, const var& options)
-{
+DLL_PUBLIC var& trimmer(var& instring, const var& trimchars, const var& options) {
 	return instring.trimmer(trimchars, options);
 }
 
 DLL_PUBLIC var trim(const var& instring, const var& trimchars) { return instring.trim(trimchars); }
 
-DLL_PUBLIC var trim(const var& instring, const var& trimchars, const var& options)
-{
+DLL_PUBLIC var trim(const var& instring, const var& trimchars, const var& options) {
 	return instring.trim(trimchars, options);
 }
 
-DLL_PUBLIC var& trimmerf(var& instring, const var& trimchars)
-{
+DLL_PUBLIC var& trimmerf(var& instring, const var& trimchars) {
 	return instring.trimmerf(trimchars);
 }
 
-DLL_PUBLIC var trimf(const var& instring, const var& trimchars)
-{
+DLL_PUBLIC var trimf(const var& instring, const var& trimchars) {
 	return instring.trimf(trimchars);
 }
 
-DLL_PUBLIC var& trimmerb(var& instring, const var& trimchars)
-{
+DLL_PUBLIC var& trimmerb(var& instring, const var& trimchars) {
 	return instring.trimmerb(trimchars);
 }
 
-DLL_PUBLIC var trimb(const var& instring, const var& trimchars)
-{
+DLL_PUBLIC var trimb(const var& instring, const var& trimchars) {
 	return instring.trimb(trimchars);
 }
 
-DLL_PUBLIC bool matread(dim& dimrecord, const var& filehandle, const var& key)
-{
+DLL_PUBLIC bool matread(dim& dimrecord, const var& filehandle, const var& key) {
 	return dimrecord.read(filehandle, key);
 }
 
-DLL_PUBLIC bool matwrite(const dim& dimrecord, const var& filehandle, const var& key)
-{
+DLL_PUBLIC bool matwrite(const dim& dimrecord, const var& filehandle, const var& key) {
 	return dimrecord.write(filehandle, key);
 }
 
-DLL_PUBLIC var split(const var& sourcevar, dim& destinationdim)
-{
+DLL_PUBLIC var split(const var& sourcevar, dim& destinationdim) {
 	return destinationdim.split(sourcevar);
 }
 
@@ -438,8 +412,7 @@ DLL_PUBLIC var textchr(const var& integer) { return var().textchr(integer); }
 
 DLL_PUBLIC var textchr(const int integer) { return var().textchr(integer); }
 
-DLL_PUBLIC var match(const var& instring, const var& matchstr, const var& options)
-{
+DLL_PUBLIC var match(const var& instring, const var& matchstr, const var& options) {
 	return instring.match(matchstr, options);
 }
 
@@ -495,36 +468,30 @@ DLL_PUBLIC var count(const var& instring, const var& substrx) { return instring.
 
 DLL_PUBLIC var substr(const var& instring, const int startx) { return instring.substr(startx); }
 
-DLL_PUBLIC var substr(const var& instring, const int startx, const int length)
-{
+DLL_PUBLIC var substr(const var& instring, const int startx, const int length) {
 	return instring.substr(startx, length);
 }
 
 DLL_PUBLIC var substrer(var& instring, const int startx) { return instring.substrer(startx); }
 
-DLL_PUBLIC var substrer(var& instring, const int startx, const int length)
-{
+DLL_PUBLIC var substrer(var& instring, const int startx, const int length) {
 	return instring.substrer(startx, length);
 }
 
-DLL_PUBLIC var index(const var& instring, const var& substr, const int occurrenceno)
-{
+DLL_PUBLIC var index(const var& instring, const var& substr, const int occurrenceno) {
 	return instring.index(substr, occurrenceno);
 }
 
-DLL_PUBLIC var index2(const var& instring, const var& substr, const int startcharno)
-{
+DLL_PUBLIC var index2(const var& instring, const var& substr, const int startcharno) {
 	return instring.index2(substr, startcharno);
 }
 
-DLL_PUBLIC var field(const var& instring, const var& substrx, const int fieldnx, const int nfieldsx)
-{
+DLL_PUBLIC var field(const var& instring, const var& substrx, const int fieldnx, const int nfieldsx) {
 	return instring.field(substrx, fieldnx, nfieldsx);
 }
 
 DLL_PUBLIC var field2(const var& instring, const var& substrx, const int fieldnx,
-		      const int nfieldsx)
-{
+					  const int nfieldsx) {
 	return instring.field2(substrx, fieldnx, nfieldsx);
 }
 
@@ -550,8 +517,7 @@ DLL_PUBLIC var iconv(const var& instring, const var& conversion)
 }
 */
 
-DLL_PUBLIC bool connect(const var& connectioninfo)
-{
+DLL_PUBLIC bool connect(const var& connectioninfo) {
 	var conn1;
 	if (not conn1.connect(connectioninfo))
 		return false;
@@ -566,48 +532,43 @@ DLL_PUBLIC bool copydb(const var& from_dbname, const var& to_dbname) { return fr
 
 DLL_PUBLIC bool deletedb(const var& dbname) { return dbname.deletedb(dbname); }
 
-DLL_PUBLIC bool createfile(const var& filename)
-{
+DLL_PUBLIC bool createfile(const var& filename) {
 	//exodus doesnt automatically create dict files
 
 	//remove options like (S)
-	var filename2=filename.field("(",1).trim();
+	var filename2 = filename.field("(", 1).trim();
 
 	//remove arev volume locations
-	filename2.swapper("DATA ","").swapper("REVBOOT ","").swapper("DATAVOL ","").trimmer();
+	filename2.swapper("DATA ", "").swapper("REVBOOT ", "").swapper("DATAVOL ", "").trimmer();
 
 	return filename.createfile(filename2);
 }
 
-DLL_PUBLIC bool deletefile(const var& filename_or_handle)
-{
+DLL_PUBLIC bool deletefile(const var& filename_or_handle) {
 	//remove options like (S)
-	var filename2=filename_or_handle.field("(",1).trim();
+	var filename2 = filename_or_handle.field("(", 1).trim();
 
 	//exodus doesnt automatically create dict files
-	filename2.swapper("DATA ","").trimmer();
+	filename2.swapper("DATA ", "").trimmer();
 
 	return filename_or_handle.deletefile(filename2);
 }
 
-DLL_PUBLIC bool clearfile(const var& filename_or_handle)
-{
+DLL_PUBLIC bool clearfile(const var& filename_or_handle) {
 	//remove options like (S)
-	var filename2=filename_or_handle.field("(",1).trim();
+	var filename2 = filename_or_handle.field("(", 1).trim();
 
 	//exodus doesnt automatically create dict files
-	filename2.swapper("DATA ","").trimmer();
+	filename2.swapper("DATA ", "").trimmer();
 
 	return filename_or_handle.clearfile(filename2);
 }
 
-DLL_PUBLIC bool renamefile(const var& filename_or_handle, const var& newfilename)
-{
+DLL_PUBLIC bool renamefile(const var& filename_or_handle, const var& newfilename) {
 	return filename_or_handle.renamefile(filename_or_handle.a(1), newfilename);
 }
 
-DLL_PUBLIC bool createindex(const var& filename_or_handle, const var& fieldname, const var& dictfilename)
-{
+DLL_PUBLIC bool createindex(const var& filename_or_handle, const var& fieldname, const var& dictfilename) {
 
 	//virtually identical code in createindex and deleteindex
 	if (filename_or_handle.index(" ")) {
@@ -622,8 +583,7 @@ DLL_PUBLIC bool createindex(const var& filename_or_handle, const var& fieldname,
 	return filename_or_handle.createindex(fieldname, dictfilename);
 }
 
-DLL_PUBLIC bool deleteindex(const var& filename_or_handle, const var& fieldname)
-{
+DLL_PUBLIC bool deleteindex(const var& filename_or_handle, const var& fieldname) {
 	//virtually identical code in createindex and deleteindex
 	if (filename_or_handle.index(" ")) {
 		var filename2 = filename_or_handle.field(" ", 1);
@@ -651,44 +611,36 @@ DLL_PUBLIC void unlockall() { var().unlockall(); }
 
 DLL_PUBLIC bool open(const var& filename, var& filehandle) { return filehandle.open(filename); }
 
-DLL_PUBLIC bool open(const var& filename)
-{
+DLL_PUBLIC bool open(const var& filename) {
 	var filehandle;
 	return filehandle.open(filename);
 }
 
-DLL_PUBLIC bool read(var& record, const var& filehandle, const var& key)
-{
+DLL_PUBLIC bool read(var& record, const var& filehandle, const var& key) {
 	return record.read(filehandle, key);
 }
 
-DLL_PUBLIC bool reado(var& record, const var& filehandle, const var& key)
-{
+DLL_PUBLIC bool reado(var& record, const var& filehandle, const var& key) {
 	return record.reado(filehandle, key);
 }
 
-DLL_PUBLIC bool readv(var& record, const var& filehandle, const var& key, const var& fieldnumber)
-{
+DLL_PUBLIC bool readv(var& record, const var& filehandle, const var& key, const var& fieldnumber) {
 	return record.readv(filehandle, key, fieldnumber);
 }
 
-DLL_PUBLIC bool write(const var& record, const var& filehandle, const var& key)
-{
+DLL_PUBLIC bool write(const var& record, const var& filehandle, const var& key) {
 	return record.write(filehandle, key);
 }
 
-DLL_PUBLIC bool writev(const var& record, const var& filehandle, const var& key, const int fieldno)
-{
+DLL_PUBLIC bool writev(const var& record, const var& filehandle, const var& key, const int fieldno) {
 	return record.writev(filehandle, key, fieldno);
 }
 
-DLL_PUBLIC bool updaterecord(const var& record, const var& filehandle, const var& key)
-{
+DLL_PUBLIC bool updaterecord(const var& record, const var& filehandle, const var& key) {
 	return record.updaterecord(filehandle, key);
 }
 
-DLL_PUBLIC bool insertrecord(const var& record, const var& filehandle, const var& key)
-{
+DLL_PUBLIC bool insertrecord(const var& record, const var& filehandle, const var& key) {
 	return record.insertrecord(filehandle, key);
 }
 
@@ -705,152 +657,127 @@ DLL_PUBLIC var xlate(const var& filename, const var& key, const var& fieldno, co
 */
 
 // DLL_PUBLIC var remove(const var& fromstr, var& startx, var& delimiterno)
-DLL_PUBLIC var substr2(const var& fromstr, var& startx, var& delimiterno)
-{
+DLL_PUBLIC var substr2(const var& fromstr, var& startx, var& delimiterno) {
 	// return fromstr.remove(startx,delimiterno);
 	return fromstr.substr2(startx, delimiterno);
 }
 
 DLL_PUBLIC var pickreplace(const var& instring, const int fieldno, const int valueno,
-			   const int subvalueno, const var& replacement)
-{
+						   const int subvalueno, const var& replacement) {
 	return instring.pickreplace(fieldno, valueno, subvalueno, replacement);
 }
 
 DLL_PUBLIC var pickreplace(const var& instring, const int fieldno, const int valueno,
-			   const var& replacement)
-{
+						   const var& replacement) {
 	return instring.pickreplace(fieldno, valueno, 0, replacement);
 }
 
-DLL_PUBLIC var pickreplace(const var& instring, const int fieldno, const var& replacement)
-{
+DLL_PUBLIC var pickreplace(const var& instring, const int fieldno, const var& replacement) {
 	return instring.pickreplace(fieldno, 0, 0, replacement);
 }
 
 DLL_PUBLIC var extract(const var& instring, const int fieldno, const int valueno,
-		       const int subvalueno)
-{
+					   const int subvalueno) {
 	return instring.a(fieldno, valueno, subvalueno);
 }
 
 DLL_PUBLIC var insert(const var& instring, const int fieldno, const int valueno,
-		      const int subvalueno, const var& insertion)
-{
+					  const int subvalueno, const var& insertion) {
 	return instring.insert(fieldno, valueno, subvalueno, insertion);
 }
 
 DLL_PUBLIC var insert(const var& instring, const int fieldno, const int valueno,
-		      const var& insertion)
-{
+					  const var& insertion) {
 	return instring.insert(fieldno, valueno, 0, insertion);
 }
 
-DLL_PUBLIC var insert(const var& instring, const int fieldno, const var& insertion)
-{
+DLL_PUBLIC var insert(const var& instring, const int fieldno, const var& insertion) {
 	return instring.insert(fieldno, 0, 0, insertion);
 }
 
 // DLL_PUBLIC var erase(const var& instring, const int fieldno, const int valueno, const int
 // subvalueno)
 DLL_PUBLIC var remove(const var& instring, const int fieldno, const int valueno,
-		      const int subvalueno)
-{
+					  const int subvalueno) {
 	// return instring.erase(fieldno, valueno, subvalueno);
 	return instring.remove(fieldno, valueno, subvalueno);
 }
 
 DLL_PUBLIC var& pickreplacer(var& instring, const int fieldno, const int valueno, const int subvalueno,
-			 const var& replacement)
-{
+							 const var& replacement) {
 	return instring.r(fieldno, valueno, subvalueno, replacement);
 }
 
 DLL_PUBLIC var& pickreplacer(var& instring, const int fieldno, const int valueno,
-			 const var& replacement)
-{
+							 const var& replacement) {
 	return instring.r(fieldno, valueno, 0, replacement);
 }
 
-DLL_PUBLIC var& pickreplacer(var& instring, const int fieldno, const var& replacement)
-{
+DLL_PUBLIC var& pickreplacer(var& instring, const int fieldno, const var& replacement) {
 	return instring.r(fieldno, 0, 0, replacement);
 }
 
 DLL_PUBLIC var& inserter(var& instring, const int fieldno, const int valueno, const int subvalueno,
-			 const var& insertion)
-{
+						 const var& insertion) {
 	return instring.inserter(fieldno, valueno, subvalueno, insertion);
 }
 
-DLL_PUBLIC var& inserter(var& instring, const int fieldno, const int valueno, const var& insertion)
-{
+DLL_PUBLIC var& inserter(var& instring, const int fieldno, const int valueno, const var& insertion) {
 	return instring.inserter(fieldno, valueno, 0, insertion);
 }
 
-DLL_PUBLIC var& inserter(var& instring, const int fieldno, const var& insertion)
-{
+DLL_PUBLIC var& inserter(var& instring, const int fieldno, const var& insertion) {
 	return instring.inserter(fieldno, 0, 0, insertion);
 }
 
 // DLL_PUBLIC var& eraser(var& instring, const int fieldno, const int valueno, const int subvalueno)
-DLL_PUBLIC var& remover(var& instring, const int fieldno, const int valueno, const int subvalueno)
-{
+DLL_PUBLIC var& remover(var& instring, const int fieldno, const int valueno, const int subvalueno) {
 	// return instring.eraser(fieldno, valueno, subvalueno);
 	return instring.remover(fieldno, valueno, subvalueno);
 }
 
 DLL_PUBLIC bool locate(const var& target, const var& instring) { return instring.locate(target); }
 
-DLL_PUBLIC bool locate(const var& target, const var& instring, var& setting)
-{
+DLL_PUBLIC bool locate(const var& target, const var& instring, var& setting) {
 	return instring.locate(target, setting);
 }
 
 DLL_PUBLIC bool locate(const var& target, const var& instring, var& setting, const int fieldno,
-		       const int valueno)
-{
+					   const int valueno) {
 	return instring.locate(target, setting, fieldno, valueno);
 }
 
 DLL_PUBLIC bool locateby(const char* ordercode, const var& target, const var& instring,
-			 var& setting)
-{
+						 var& setting) {
 	return instring.locateby(ordercode, target, setting);
 }
 
 DLL_PUBLIC bool locateby(const char* ordercode, const var& target, const var& instring,
-			 var& setting, const int fieldno, const int valueno)
-{
+						 var& setting, const int fieldno, const int valueno) {
 	return instring.locateby(ordercode, target, setting, fieldno, valueno);
 }
 
-DLL_PUBLIC bool locateby(const var& ordercode, const var& target, const var& instring, var& setting)
-{
+DLL_PUBLIC bool locateby(const var& ordercode, const var& target, const var& instring, var& setting) {
 	return instring.locateby(ordercode, target, setting);
 }
 
 DLL_PUBLIC bool locateby(const var& ordercode, const var& target, const var& instring, var& setting,
-			 const int fieldno, const int valueno)
-{
+						 const int fieldno, const int valueno) {
 	return instring.locateby(ordercode, target, setting, fieldno, valueno);
 }
 
-DLL_PUBLIC bool locateusing(const var& usingchar, const var& target, const var& instring)
-{
+DLL_PUBLIC bool locateusing(const var& usingchar, const var& target, const var& instring) {
 	return instring.locateusing(usingchar, target);
 }
 
 DLL_PUBLIC bool locateusing(const var& usingchar, const var& target, const var& instring,
-			    var& setting)
-{
+							var& setting) {
 	return instring.locateusing(usingchar, target, setting);
 }
 
 DLL_PUBLIC bool locateusing(const var& usingchar, const var& target, const var& instring,
-			    var& setting, const int fieldno, const int valueno,
-			    const int subvalueno)
-{
+							var& setting, const int fieldno, const int valueno,
+							const int subvalueno) {
 	return instring.locateusing(usingchar, target, setting, fieldno, valueno, subvalueno);
 }
 
@@ -862,14 +789,12 @@ DLL_PUBLIC var listfiles() { return var().listfiles(); }
 
 DLL_PUBLIC var reccount(const var& filename_or_handle) { return filename_or_handle.reccount(); }
 
-DLL_PUBLIC var listindexes(const var& filename, const var& fieldname)
-{
+DLL_PUBLIC var listindexes(const var& filename, const var& fieldname) {
 	return var().listindexes(filename, fieldname);
 }
 
 // one argument returns the contents of an envvar (empty name returns the whole environment)
-DLL_PUBLIC var osgetenv(const var& name = "")
-{
+DLL_PUBLIC var osgetenv(const var& name = "") {
 	var temp = "";
 	temp.osgetenv(name);
 	return temp;
@@ -884,23 +809,21 @@ DLL_PUBLIC bool osgetenv(const var& name, var& value) { return value.osgetenv(na
 DLL_PUBLIC bool ossetenv(const var& name, const var& value) { return value.ossetenv(name); }
 
 DLL_PUBLIC
-int exodus_main(int exodus__argc, const char* exodus__argv[], MvEnvironment& mv, int environmentno)
-{
+int exodus_main(int exodus__argc, const char* exodus__argv[], MvEnvironment& mv, int environmentno) {
 
 	// signal/interrupt handlers
 	// install_signals();
 	var().breakon();
 
 	//	tss_environmentns.reset(new int(0));
-//	global_environments.resize(6);
+	//	global_environments.resize(6);
 	//int environmentn = 0;
 	mv.init(environmentno);
 	// mv.DICT.outputl("DICT=");
-//	global_environments[environmentn] = &mv;
+	//	global_environments[environmentn] = &mv;
 
 	mv.EXECPATH = getexecpath();
-	if (not mv.EXECPATH)
-	{
+	if (not mv.EXECPATH) {
 		if (exodus__argc)
 			mv.EXECPATH = var(exodus__argv[0]);
 		if (not mv.EXECPATH.index(OSSLASH))
@@ -926,17 +849,14 @@ int exodus_main(int exodus__argc, const char* exodus__argv[], MvEnvironment& mv,
 	// unless escaped needs to go after various exodus definitions how the MSVCRT tokenizes
 	// arguments http://msdn.microsoft.com/en-us/library/a1y7w461.aspx
 	// http://stackoverflow.com/questions/4094699/how-does-the-windows-command-interpreter-cmd-exe-parse-scripts
-	for (int ii = 0; ii < exodus__argc; ++ii)
-	{
+	for (int ii = 0; ii < exodus__argc; ++ii) {
 		var word = var(exodus__argv[ii]);
-		if (ii == 0)
-		{
+		if (ii == 0) {
 			word = word.field2(OSSLASH, -1);
 			// remove trailing ".exe"
 			if (word.lcase().substr(-4) == ".exe")
 				word.splicer(-4, 4, "");
-		}
-		else
+		} else
 			mv.SENTENCE ^= " ";
 
 		// put back quotes if any spaces
@@ -958,11 +878,9 @@ int exodus_main(int exodus__argc, const char* exodus__argv[], MvEnvironment& mv,
 	// if (mv.OPTIONS)
 	//	mv.COMMAND.splicer(-(len(mv.OPTIONS)+2),len(mv.OPTIONS)+2, "");
 	// var lastchar=mv.COMMAND[-1];
-	if (lastchar == ")")
-	{
+	if (lastchar == ")") {
 		mv.OPTIONS = "(" ^ mv.COMMAND.field2("(", -1);
-	}
-	else if (lastchar == "}")
+	} else if (lastchar == "}")
 		mv.OPTIONS = "{" ^ mv.COMMAND.field2("{", -1);
 	if (mv.OPTIONS)
 		mv.COMMAND.splicer(-(mv.OPTIONS.length()), mv.OPTIONS.length(), "");

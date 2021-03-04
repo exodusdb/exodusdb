@@ -52,32 +52,28 @@ THE SOFTWARE.
 // Simple implementation of an additional output to the console:
 #ifdef _MSC_VER
 #include <exodus/StackWalker.h>
-class MyStackWalker : public StackWalker
-{
-      public:
+class MyStackWalker : public StackWalker {
+  public:
 	exodus::var returnlines = "";
 
 	MyStackWalker() : StackWalker(), returnlines("") {}
 
 	MyStackWalker(DWORD dwProcessId, HANDLE hProcess)
-	    : StackWalker(dwProcessId, hProcess), returnlines("")
-	{
+		: StackWalker(dwProcessId, hProcess), returnlines("") {
 	}
-	virtual void OnOutput(LPCSTR szText)
-	{
+	virtual void OnOutput(LPCSTR szText) {
 		// fprintf(stderr,szText);
 
 		// fprintf(stderr,"fgets:%s", path);
 		exodus::var line = exodus::var(szText).convert("\x0d\x0a", ""); //.errputl("path=");
-		exodus::var filename = line.field(":", 1, 2);  //.errputl("filename=");
-		exodus::var lineno = filename.field2(" ", -1); //.errputl("lineno=");
+		exodus::var filename = line.field(":", 1, 2);					//.errputl("filename=");
+		exodus::var lineno = filename.field2(" ", -1);					//.errputl("lineno=");
 		filename.splicer(-(lineno.length() + 1), 999999, "");
 		lineno.substrer(2, lineno.length() - 2);
 		if (filename.index("stackwalker.cpp") || filename.index("debug.cpp") ||
-		    filename.index("crtexe.c"))
+			filename.index("crtexe.c"))
 			return;
-		if (lineno.isnum() && lineno)
-		{
+		if (lineno.isnum() && lineno) {
 			exodus::var linetext = filename.field2(exodus::OSSLASH, -1) ^ ":" ^ lineno;
 			exodus::var filetext;
 			// ALN:NOTE: .osread could itself throw exception and we will have loop :(
@@ -102,11 +98,9 @@ class MyStackWalker : public StackWalker
 #define NOBACKTRACE
 #endif
 
-namespace exodus
-{
+namespace exodus {
 
-void addbacktraceline(const var& sourcefilename, const var& lineno, var& returnlines)
-{
+void addbacktraceline(const var& sourcefilename, const var& lineno, var& returnlines) {
 
 	//#ifdef TRACING
 	//	sourcefilename.errputl("SOURCEFILENAME=");
@@ -120,8 +114,7 @@ void addbacktraceline(const var& sourcefilename, const var& lineno, var& returnl
 
 	// get the source file text
 	var filetext;
-	if (filetext.osread(sourcefilename))
-	{
+	if (filetext.osread(sourcefilename)) {
 	}
 
 	// change DOS/WIN and MAC line ends to lf only
@@ -133,7 +126,7 @@ void addbacktraceline(const var& sourcefilename, const var& lineno, var& returnl
 	// suppress confusing and unhelpful exodus macros
 	//if ((line.substr(1,12) == "programexit(" || line.substr(1,12) == "libraryexit(" || line.substr(1,10) == "classexit(") or
 	if (line.match("^(program|library|class)(init|exit)\\(") or
-	    (line == "}" && sourcefilename.substr(-2, 2) == ".h") or (line == ""))
+		(line == "}" && sourcefilename.substr(-2, 2) == ".h") or (line == ""))
 		return;
 
 #ifdef TRACING
@@ -149,8 +142,7 @@ void addbacktraceline(const var& sourcefilename, const var& lineno, var& returnl
 }
 
 // http://www.delorie.com/gnu/docs/glibc/libc_665.html
-var backtrace()
-{
+var backtrace() {
 
 	var returnlines = "";
 	//var("backtrace()").errputl();
@@ -197,8 +189,7 @@ var backtrace()
 	char** strings = backtrace_symbols(addresses, size);
 	// fprintf(stderr,"Stack frames: %d\n", size);
 
-	for (int i = 0; i < size; i++)
-	{
+	for (int i = 0; i < size; i++) {
 
 #ifdef TRACING
 		// each string is like:
@@ -219,7 +210,7 @@ var backtrace()
 		// get a dwarfdump line containing source filename and line number
 		var debugfilename = objectfilename ^ ".dSYM";
 		var cmd = "dwarfdump " ^ debugfilename ^ " --lookup " ^ objectoffset ^
-			  " |grep \"Line table file: \" 2> /dev/null";
+				  " |grep \"Line table file: \" 2> /dev/null";
 		//var result = cmd.osshellread();
 		result.osshellread(cmd);
 #ifdef TRACING
@@ -246,8 +237,7 @@ var backtrace()
 	int size = ::backtrace(addresses, BACKTRACE_MAXADDRESSES);
 	char** strings = backtrace_symbols(addresses, size);
 
-	for (int ii = 0; ii < size; ii++)
-	{
+	for (int ii = 0; ii < size; ii++) {
 
 #ifdef TRACING
 		fprintf(stderr, "Backtrace %d: %p \"%s\"\n", ii, addresses[ii], strings[ii]);
@@ -269,12 +259,11 @@ var backtrace()
 #endif
 
 		// if (objfilename == objfilename.convert("/\\:",""))
-		if (not objfilename.osfile())
-		{
+		if (not objfilename.osfile()) {
 			// loadable program
 			var temp;
 			temp.osshellread("which " ^ objfilename.field2(OSSLASH, -1));
-			temp=temp.field("\n", 1).field("\r", 1);
+			temp = temp.field("\n", 1).field("\r", 1);
 			if (temp)
 				objfilename = temp;
 			else
@@ -298,7 +287,7 @@ var backtrace()
 		//temp = temp.osshellread();
 		var temp;
 		temp.osshellread("objdump --start-address=" ^ startaddress ^ " --stop-address=" ^
-               objaddress ^ " --disassemble -l " ^ objfilename);
+						 objaddress ^ " --disassemble -l " ^ objfilename);
 		////////////////////////
 
 		temp.converter("\r\n", _FM_ _FM_);
@@ -308,10 +297,8 @@ var backtrace()
 		var nn2 = temp.dcount(FM);
 		var line = "";
 		var linesource = "";
-		for (var ii2 = 1; ii2 < nn2; ++ii2)
-		{
-			if (temp.a(ii2).index(".cpp"))
-			{
+		for (var ii2 = 1; ii2 < nn2; ++ii2) {
+			if (temp.a(ii2).index(".cpp")) {
 				line = temp.a(ii2);
 				linesource = temp.a(ii2 + 1);
 			}
@@ -323,8 +310,7 @@ var backtrace()
 #endif
 
 		// append the source line text and number to the output
-		if (line)
-		{
+		if (line) {
 			var sourcefilename = line.field(":", 1);
 			var lineno = line.field(":", 2).field(" ", 1);
 			addbacktraceline(sourcefilename, lineno, returnlines);
@@ -421,22 +407,19 @@ var backtrace()
 
 //service managers like systemd will send a polite SIGTERM signal
 //and wait for say 90 seconds before sending a kill signal
-void SIGTERM_handler(int)
-{
-	fprintf(stderr,"=== SIGTERM received ===\n");
+void SIGTERM_handler(int) {
+	fprintf(stderr, "=== SIGTERM received ===\n");
 	TERMINATE_req = true;
 }
 
 //restart
-void SIGHUP_handler(int)
-{
-	fprintf(stderr,"=== SIGHUP received ===\n");
+void SIGHUP_handler(int) {
+	fprintf(stderr, "=== SIGHUP received ===\n");
 	RELOAD_req = true;
 }
 
 //signals are received by one thread at random
-void SIGINT_handler(int sig)
-{
+void SIGINT_handler(int sig) {
 	// ignore more of this signal
 	// var().breakoff()
 	// faster/safer
@@ -448,8 +431,7 @@ void SIGINT_handler(int sig)
 	// separate our prompting onto a new line
 	fprintf(stderr, "\n");
 
-	while (true)
-	{
+	while (true) {
 
 		// printf ("\nInterrupted. (C)ontinue (E)nd (B)acktrace\n");
 
@@ -465,34 +447,25 @@ void SIGINT_handler(int sig)
 		var cmd1 = var(cmd[1]).ucase();
 
 		// continue
-		if (cmd1 == "C")
-		{
+		if (cmd1 == "C") {
 			break;
 
 			// exit ... unfortunately to the caller at the moment.
 			// TODO flag to caller(s) to exit
-		}
-		else if (cmd1 == "E")
-		{
+		} else if (cmd1 == "E") {
 
 			// var().abort("Aborted. User interrupt");
 			fprintf(stderr, "Aborted. User interrupt\n");
 			exit(1);
-		}
-		else if (cmd1 == "B")
-		{
+		} else if (cmd1 == "B") {
 
 			// duplicated in init and B
 			backtrace().convert(FM, "\n").errputl();
-		}
-		else if (cmd1 == "D")
-		{
+		} else if (cmd1 == "D") {
 			// duplicated in init and B
-			var pid=getpid();
+			var pid = getpid();
 			var("gdb -p " ^ pid).osshell();
-		}
-		else if (cmd1 == "A")
-		{
+		} else if (cmd1 == "A") {
 			// fprintf(stderr,"To continue from here in GDB: \"signal 0\"\n");
 			raise(SIGABRT);
 			// breakpoint();
@@ -505,25 +478,22 @@ void SIGINT_handler(int sig)
 	signal(SIGINT, SIGINT_handler);
 }
 
-void var::breakoff() const
-{
+void var::breakoff() const {
 	// ignore more of this signal
 	signal(SIGINT, SIG_IGN);
 }
 
 //called in exodus_main to initialise signals
-void var::breakon() const
-{
-	signal(SIGINT, SIGINT_handler);   // Ctrl+C from termio
+void var::breakon() const {
+	signal(SIGINT, SIGINT_handler);	  // Ctrl+C from termio
 	signal(SIGTERM, SIGTERM_handler); // a polite request to TERMINATE
 									  // probably followed by SIGABORT after some delay
-	signal(SIGHUP, SIGHUP_handler);   // a request to reload
+	signal(SIGHUP, SIGHUP_handler);	  // a request to reload
 
 	//turn off text input and output signals to prevent breaking out into gdb debugger
 	//http://curiousthing.org/sigttin-sigttou-deep-dive-linux
-    signal(SIGTTIN, SIG_IGN);
-    signal(SIGTTOU, SIG_IGN);
-
+	signal(SIGTTIN, SIG_IGN);
+	signal(SIGTTOU, SIG_IGN);
 }
 
 } // namespace exodus

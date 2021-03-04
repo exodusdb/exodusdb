@@ -4,8 +4,7 @@
 
 #include <cassert>
 
-namespace exodus
-{
+namespace exodus {
 
 // select exodus_extract_text(data,1,0,0), exodus_extract_sort(data,1,0,0)
 // from test_alphanum order by exodus_extract_sort(data,1,0,0)
@@ -150,8 +149,7 @@ A1-2	<	A01-10	multi-level number sort
 
 */
 
-void appenddouble2sortstring(const double& double1, std::ostringstream& stringstream1)
-{
+void appenddouble2sortstring(const double& double1, std::ostringstream& stringstream1) {
 	assert(sizeof(double) == sizeof(long long int));
 
 	// view the double as an 64 bit integer
@@ -181,8 +179,7 @@ void appenddouble2sortstring(const double& double1, std::ostringstream& stringst
 	stringstream1 << integer1;
 }
 
-std::string naturalorder(const std::string& string1)
-{
+std::string naturalorder(const std::string& string1) {
 
 	// using goto here to break out of multiple embedded loops
 	// since c/c++ break/continue is unable to do this
@@ -205,8 +202,7 @@ naturalorderbegin:
 	std::string::const_iterator iterbegin = iter;
 
 	// skip white space
-	for (;;)
-	{
+	for (;;) {
 		if (iter == iterend)
 			goto naturalorderexit;
 		if (!isspace(*iter))
@@ -216,24 +212,19 @@ naturalorderbegin:
 
 	// determine positive or negative and skip one leading + or -
 	int sign;
-	if (*iter == '-')
-	{
+	if (*iter == '-') {
 		sign = -1;
 		++iter;
-	}
-	else if (*iter == '+')
-	{
+	} else if (*iter == '+') {
 		sign = 1;
 		++iter;
-	}
-	else
+	} else
 		sign = 1;
 
 	// get integer part
 	val = 0.0;
 	power = 1.0; // here in case there is no fractional part
-	for (;;)
-	{
+	for (;;) {
 		if (iter == iterend)
 			goto naturalorderexit;
 		if (!isdigit(*iter))
@@ -249,8 +240,7 @@ naturalorderbegin:
 
 	// continue appending digits to the integer but recording progressive division by 10 for
 	// each one
-	for (;;)
-	{
+	for (;;) {
 		if (iter == iterend)
 			goto naturalorderexit;
 		if (!isdigit(*iter))
@@ -263,8 +253,7 @@ naturalorderbegin:
 
 naturalorderexit:
 
-	if (hasdigit)
-	{
+	if (hasdigit) {
 		// leading zero to ensure that numbers sort in the usual sequence
 		//(since the 16 character representation is hex with letters)
 		// do this in the 16 digit
@@ -272,9 +261,7 @@ naturalorderexit:
 
 		// append the 16 hex digit lexical sortable representation of the number
 		appenddouble2sortstring(sign * val / power, ostringstream1);
-	}
-	else
-	{
+	} else {
 		// copy any characters that looked like they might be a number but in the end were
 		// not
 		while (iterbegin != iter)
@@ -282,8 +269,7 @@ naturalorderexit:
 	}
 
 	// append any trailing non-numerical data
-	while (iter != iterend)
-	{
+	while (iter != iterend) {
 
 		// go back and possibly output another number
 		// NB - and . are NOT candidates to go back. this prevent strange effect like A-10 <
@@ -291,13 +277,11 @@ naturalorderexit:
 		// check low digits first since they are much commoner in practice as the starting
 		// digit of numbers
 		const char* ptr = (strchr("1234567890 \"'+", *iter));
-		if (ptr != 0)
-		{
+		if (ptr != 0) {
 
 			// also allow . - (or digits) after single or double quote to be considered
 			// as a number.
-			if (*ptr == '"' || *ptr == '\'')
-			{
+			if (*ptr == '"' || *ptr == '\'') {
 				ostringstream1 << *iter++;
 				if (iter == iterend)
 					break;

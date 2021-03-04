@@ -21,13 +21,11 @@
 #define TRACING 2
 #endif
 
-namespace exodus
-{
+namespace exodus {
 
 void respondToRequests(boost::interprocess::message_queue& request_queue,
-		       boost::interprocess::message_queue& response_queue,
-		       ExodusFunctorBase& exodusfunctorbase)
-{
+					   boost::interprocess::message_queue& response_queue,
+					   ExodusFunctorBase& exodusfunctorbase) {
 
 	std::size_t request_size;
 	unsigned int priority;
@@ -37,18 +35,15 @@ void respondToRequests(boost::interprocess::message_queue& request_queue,
 	// int nresponsebytes;
 	std::string response;
 
-	while (true)
-	{
+	while (true) {
 
 		// get a request
-		try
-		{
+		try {
 			request_queue.receive(&chRequest, BUFSIZE, request_size, priority);
 		}
 
 		// handle failure to get a request
-		catch (boost::interprocess::interprocess_exception& ex)
-		{
+		catch (boost::interprocess::interprocess_exception& ex) {
 			std::cerr << "mvipc: failed to receive " << ex.what() << std::endl;
 			continue;
 		}
@@ -56,21 +51,19 @@ void respondToRequests(boost::interprocess::message_queue& request_queue,
 // log
 #if TRACING >= 3
 		wprintf(L"---------------------------------\nMVipc() read  %d bytes from pipe\n",
-			request_size);
+				request_size);
 #endif
 
 		// determine a response
 		getResponseToRequest(chRequest, request_size, 0, response, exodusfunctorbase);
 
 		// send a response
-		try
-		{
+		try {
 			response_queue.send(response.data(), response.length(), 0);
 		}
 
 		// handle failure to send response
-		catch (boost::interprocess::interprocess_exception& ex)
-		{
+		catch (boost::interprocess::interprocess_exception& ex) {
 			std::cerr << "mvipc: failed send " << ex.what() << std::endl;
 			continue;
 		}
@@ -82,32 +75,24 @@ void respondToRequests(boost::interprocess::message_queue& request_queue,
 	}
 }
 
-void closeipcqueues(const std::string& requestqueuename, const std::string& responsequeuename)
-{
+void closeipcqueues(const std::string& requestqueuename, const std::string& responsequeuename) {
 	// close the request queue
-	try
-	{
+	try {
 		boost::interprocess::message_queue::remove(requestqueuename.c_str());
-	}
-	catch (boost::interprocess::interprocess_exception& ex)
-	{
+	} catch (boost::interprocess::interprocess_exception& ex) {
 		std::cerr << "cannot close " << requestqueuename << " " << ex.what() << std::endl;
 	}
 
 	// close the response queue
-	try
-	{
+	try {
 		boost::interprocess::message_queue::remove(responsequeuename.c_str());
-	}
-	catch (boost::interprocess::interprocess_exception& ex)
-	{
+	} catch (boost::interprocess::interprocess_exception& ex) {
 		std::cerr << "cannot close " << responsequeuename << " " << ex.what() << std::endl;
 	}
 }
 
 // this function is started as a thread by startipc()
-int MVipc(const int environmentn, var& pgconnparams)
-{
+int MVipc(const int environmentn, var& pgconnparams) {
 
 	// TODO prevent or handle SELECT in dictionary functions
 
@@ -115,8 +100,7 @@ int MVipc(const int environmentn, var& pgconnparams)
 	tss_ipcstarted.reset(new bool(true));
 
 	// clone the postgres connection because the parent thread is running a select with it
-	if (!var().connect(pgconnparams))
-	{
+	if (!var().connect(pgconnparams)) {
 		throw var(L"MVipc Cannot connect additional thread to postgres");
 		return false;
 	}
@@ -131,8 +115,7 @@ int MVipc(const int environmentn, var& pgconnparams)
 	//*COPY in mvipc_posix.cpp mvipc_boost.cpp mvipc_win.cpp
 	MvEnvironment standalone_mv;
 	MvEnvironment* mv = global_environments[environmentn];
-	if (not mv)
-	{
+	if (not mv) {
 #if TRACING >= 2
 		std::clog << "MVipc() Using a standalone MvEnvironment" << std::endl;
 #endif
@@ -155,30 +138,28 @@ int MVipc(const int environmentn, var& pgconnparams)
 
 	closeipcqueues(requestqueuename, responsequeuename);
 
-	try
-	{
+	try {
 		// open request queue
 		boost::interprocess::message_queue request_queue(
-		    boost::interprocess::open_or_create // only create
-		    ,
-		    requestqueuename.c_str() // name
-		    ,
-		    100 // max message number
-		    ,
-		    BUFSIZ // max message size
+			boost::interprocess::open_or_create // only create
+			,
+			requestqueuename.c_str() // name
+			,
+			100 // max message number
+			,
+			BUFSIZ // max message size
 		);
 
-		try
-		{
+		try {
 			// open response queue
 			boost::interprocess::message_queue response_queue(
-			    boost::interprocess::open_or_create // only create
-			    ,
-			    responsequeuename.c_str() // name
-			    ,
-			    100 // max message number
-			    ,
-			    BUFSIZ // max message size
+				boost::interprocess::open_or_create // only create
+				,
+				responsequeuename.c_str() // name
+				,
+				100 // max message number
+				,
+				BUFSIZ // max message size
 			);
 
 			// indicate to waiting/paused parent thread that the pipe is open
@@ -201,19 +182,15 @@ int MVipc(const int environmentn, var& pgconnparams)
 			respondToRequests(request_queue, response_queue, exodusfunctorbase);
 
 			std::clog << "finished responding to queue " << requestqueuename
-				  << std::endl;
-		}
-		catch (boost::interprocess::interprocess_exception& ex)
-		{
+					  << std::endl;
+		} catch (boost::interprocess::interprocess_exception& ex) {
 			global_ipccondition.notify_one();
 			std::cerr << "cannot open " << responsequeuename << " " << ex.what()
-				  << std::endl;
+					  << std::endl;
 			closeipcqueues(requestqueuename, responsequeuename);
 			return 0;
 		}
-	}
-	catch (boost::interprocess::interprocess_exception& ex)
-	{
+	} catch (boost::interprocess::interprocess_exception& ex) {
 		global_ipccondition.notify_one();
 		std::cerr << "cannot open " << requestqueuename << " " << ex.what() << std::endl;
 		closeipcqueues(requestqueuename, responsequeuename);

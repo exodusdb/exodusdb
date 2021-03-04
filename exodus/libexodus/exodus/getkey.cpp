@@ -1,10 +1,10 @@
 // https://stackoverflow.com/questions/14322430/how-to-do-console-input-like-in-the-top-linux-command
 
-#include <fcntl.h>      //fcntl()
-#include <stdio.h>      //fileno(), stdin
+#include <fcntl.h>		//fcntl()
+#include <stdio.h>		//fileno(), stdin
 #include <sys/select.h> //select()
-#include <termios.h>    //termios
-#include <unistd.h>     //read()
+#include <termios.h>	//termios
+#include <unistd.h>		//read()
 //#include <sys/ioctl.h>
 //#include <sys/time.h>
 //#include <sys/types.h>
@@ -16,12 +16,10 @@
 // it turns ECHO off and turns ECHO ON afterwards
 //
 
-namespace exodus
-{
+namespace exodus {
 
-int getkey(void)
-{
-	char ch=0;
+int getkey(void) {
+	char ch = 0;
 	int error;
 	struct termios oldAttr, newAttr;
 	int oldFlags;
@@ -33,11 +31,11 @@ int getkey(void)
 	newAttr = oldAttr;
 	oldFlags = fcntl(fd, F_GETFL, 0);
 
-	newAttr.c_iflag = 0;	/* input mode */
-	newAttr.c_oflag = 0;	/* output mode */
+	newAttr.c_iflag = 0;		/* input mode */
+	newAttr.c_oflag = 0;		/* output mode */
 	newAttr.c_lflag &= ~ICANON; /* line settings */
-	newAttr.c_cc[VMIN] = 1;     /* minimum chars to wait for */
-	newAttr.c_cc[VTIME] = 1;    /* minimum wait time */
+	newAttr.c_cc[VMIN] = 1;		/* minimum chars to wait for */
+	newAttr.c_cc[VTIME] = 1;	/* minimum wait time */
 
 	// Set stdin to nonblocking, noncanonical input
 	fcntl(fd, F_SETFL, O_NONBLOCK);

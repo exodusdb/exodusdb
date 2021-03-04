@@ -27,24 +27,24 @@ THE SOFTWARE.
 
 const char* shortmths = "JAN\0FEB\0MAR\0APR\0MAY\0JUN\0JUL\0AUG\0SEP\0OCT\0NOV\0DEC\0";
 const char* longmths = "\0JANUARY\0  "
-		       "\0FEBRUARY\0 "
-		       "\0MARCH\0    "
-		       "\0APRIL\0    "
-		       "\0MAY\0      "
-		       "\0JUNE\0     "
-		       "\0JULY\0     "
-		       "\0AUGUST\0   "
-		       "\0SEPTEMBER\0"
-		       "\0OCTOBER\0  "
-		       "\0NOVEMBER\0 "
-		       "\0DECEMBER\0 ";
+					   "\0FEBRUARY\0 "
+					   "\0MARCH\0    "
+					   "\0APRIL\0    "
+					   "\0MAY\0      "
+					   "\0JUNE\0     "
+					   "\0JULY\0     "
+					   "\0AUGUST\0   "
+					   "\0SEPTEMBER\0"
+					   "\0OCTOBER\0  "
+					   "\0NOVEMBER\0 "
+					   "\0DECEMBER\0 ";
 const char* longdayofweeks = "MONDAY\0   "
-			     "TUESDAY\0  "
-			     "WEDNESDAY\0"
-			     "THURSDAY\0 "
-			     "FRIDAY\0   "
-			     "SATURDAY\0 "
-			     "SUNDAY\0   ";
+							 "TUESDAY\0  "
+							 "WEDNESDAY\0"
+							 "THURSDAY\0 "
+							 "FRIDAY\0   "
+							 "SATURDAY\0 "
+							 "SUNDAY\0   ";
 
 #include "boost/date_time/c_local_time_adjustor.hpp"
 #include "boost/date_time/gregorian/gregorian.hpp"
@@ -64,14 +64,12 @@ static boost::gregorian::date pick_epoch_date = boost::gregorian::date(1967, 12,
 #include <exodus/mv.h>
 #include <exodus/mvexceptions.h>
 
-namespace exodus
-{
+namespace exodus {
 
-void ptime2mvdatetime(const boost::posix_time::ptime& ptimex, int& mvdate, int& mvtime)
-{
+void ptime2mvdatetime(const boost::posix_time::ptime& ptimex, int& mvdate, int& mvtime) {
 
 	// http://www.boost.org/doc/html/date_time/examples.html#date_time.examples.local_utc_conversion
-	using local_adj =  boost::date_time::c_local_adjustor<boost::posix_time::ptime>;
+	using local_adj = boost::date_time::c_local_adjustor<boost::posix_time::ptime>;
 
 	// convert to local timezone of current machine
 	boost::posix_time::ptime localptimex = local_adj::utc_to_local(ptimex);
@@ -89,8 +87,7 @@ void ptime2mvdatetime(const boost::posix_time::ptime& ptimex, int& mvdate, int& 
 	return;
 }
 
-var var::date() const
-{
+var var::date() const {
 	// returns number of days since the pick date epoch 31/12/1967
 
 	// http://www.boost.org/doc/html/date_time/examples.html#date_time.examples.days_alive
@@ -99,17 +96,15 @@ var var::date() const
 	return int((today - pick_epoch_date).days());
 }
 
-var var::time() const
-{
+var var::time() const {
 	// returns number of whole seconds since midnight
 	boost::posix_time::time_duration localtimeofdaynow =
-	    boost::posix_time::second_clock::local_time().time_of_day();
+		boost::posix_time::second_clock::local_time().time_of_day();
 	return int(localtimeofdaynow.hours() * 3600 + localtimeofdaynow.minutes() * 60 +
-		   localtimeofdaynow.seconds());
+			   localtimeofdaynow.seconds());
 }
 
-var var::timedate() const
-{
+var var::timedate() const {
 	// output the current "HH:MM:SS  DD MMM YYYY" without quotes but note the double space
 
 	// TODO make this rely on a single timestamp instead of time and date
@@ -117,8 +112,7 @@ var var::timedate() const
 	return time().oconv_MT("S") ^ " " ^ date().oconv_D("D");
 }
 
-var var::ostime() const
-{
+var var::ostime() const {
 	// return decimal seconds since midnight up to micro or nano second accuracy
 
 	boost::posix_time::ptime localtimenow = boost::posix_time::microsec_clock::local_time();
@@ -162,8 +156,7 @@ int var::keypressed(int delayusecs) const
 }
 */
 
-var var::iconv_D(const char* conversion) const
-{
+var var::iconv_D(const char* conversion) const {
 
 	// should perhaps ONLY implement only ISO8601 which is in xml
 	// yyyy-mm-ddTHH:MM:SS.SSS
@@ -178,11 +171,9 @@ var var::iconv_D(const char* conversion) const
 		return *this;
 	++conversionchar;
 
-	while (*conversionchar)
-	{
+	while (*conversionchar) {
 
-		switch (*conversionchar)
-		{
+		switch (*conversionchar) {
 		case 'E':
 			dayfirst = true;
 			break;
@@ -200,11 +191,9 @@ var var::iconv_D(const char* conversion) const
 	int month = 0;
 
 	const char* iter = var_str.c_str();
-	while (*iter != '\0')
-	{
+	while (*iter != '\0') {
 
-		if (isdigit(*iter))
-		{
+		if (isdigit(*iter)) {
 
 			partn++;
 
@@ -214,27 +203,22 @@ var var::iconv_D(const char* conversion) const
 
 			parts[partn] = 0;
 
-			do
-			{
+			do {
 				parts[partn] = (parts[partn] * 10) + ((*iter++) - '0');
 			} while (isdigit(*iter));
 
 			continue;
 		}
 
-		else if (::isalpha(*iter))
-		{
+		else if (::isalpha(*iter)) {
 			std::string word;
-			do
-			{
+			do {
 				word.push_back(toupper(*iter++));
 			} while (::isalpha(*iter));
 
 			// determine the month or return "" to indicate failure
-			for (int ii = 0; ii < 12 * 4; ii += 4)
-			{
-				if (strcmp((char*)(shortmths + ii), word.c_str()) == 0)
-				{
+			for (int ii = 0; ii < 12 * 4; ii += 4) {
+				if (strcmp((char*)(shortmths + ii), word.c_str()) == 0) {
 					month = ii / 4 + 1;
 					break;
 				}
@@ -254,44 +238,32 @@ var var::iconv_D(const char* conversion) const
 
 	int day;
 	int year;
-	if (month != 0)
-	{
+	if (month != 0) {
 		// fail if day or year missing
 		if (partn < 1)
 			return "";
 
-		if (yearfirst)
-		{
+		if (yearfirst) {
 			year = parts[0];
 			day = parts[1];
-		}
-		else
-		{
+		} else {
 			year = parts[1];
 			day = parts[0];
 		}
-	}
-	else
-	{
+	} else {
 		// fail if missing three parts for year, month and day
 		if (partn < 2)
 			return "";
 
-		if (yearfirst)
-		{
+		if (yearfirst) {
 			year = parts[0];
 			month = parts[1];
 			day = parts[2];
-		}
-		else
-		{
-			if (dayfirst)
-			{
+		} else {
+			if (dayfirst) {
 				day = parts[0];
 				month = parts[1];
-			}
-			else
-			{
+			} else {
 				month = parts[0];
 				day = parts[1];
 			}
@@ -306,24 +278,19 @@ var var::iconv_D(const char* conversion) const
 		if (year >= 50) {
 			year += 1900;
 			std::cerr << "WARNING: 2 digit year >= 50 being converted to " << year << std::endl;
-		}
-		else
+		} else
 			year += 2000;
 	}
 
-	try
-	{
+	try {
 		boost::gregorian::date thisdate(year, month, day);
 		return int((thisdate - pick_epoch_date).days());
-	}
-	catch (...)
-	{
+	} catch (...) {
 		return "";
 	}
 }
 
-var var::oconv_D(const char* conversion) const
-{
+var var::oconv_D(const char* conversion) const {
 
 	// by this time it is known to be a number and not an empty string
 
@@ -332,7 +299,7 @@ var var::oconv_D(const char* conversion) const
 	// get a ymd object for the desired date
 	// http://www.boost.org/doc/libs/1_39_0/doc/html/date_time/gregorian.html#date_time.gregorian.date_class
 	boost::gregorian::date desired_date =
-	    pick_epoch_date + boost::gregorian::days((*this).floor().toInt());
+		pick_epoch_date + boost::gregorian::days((*this).floor().toInt());
 	boost::gregorian::date::ymd_type ymd = desired_date.year_month_day();
 	// boost::gregorian::date::ymd_type
 	// ymd=boost::gregorian::gregorian_calendar::from_day_number(1000u/*+PICK_UNIX_DAY_OFFSET*/);
@@ -354,20 +321,17 @@ var var::oconv_D(const char* conversion) const
 	// DY means year only unless followed by a separator character
 	bool yearonly = (*conversionchar) == 'Y';
 
-	while (*conversionchar)
-	{
+	while (*conversionchar) {
 
 		// digits anywhere indicate size of year
-		if ((*conversionchar) <= '9' && (*conversionchar) >= '0')
-		{
+		if ((*conversionchar) <= '9' && (*conversionchar) >= '0') {
 			yeardigits = (*conversionchar) - '0';
 			++conversionchar;
 			continue;
 		}
 
 		int dow;
-		switch (*conversionchar)
-		{
+		switch (*conversionchar) {
 
 		//(E)uropean date - day first
 		case 'E':
@@ -456,8 +420,7 @@ var var::oconv_D(const char* conversion) const
 		yearstring.erase(0, yearstringerase);
 
 	// year first
-	if (yearfirst)
-	{
+	if (yearfirst) {
 		ss.width(yeardigits);
 		// ss << ymd.year;
 		// above doesnt cut down number of characters
@@ -470,36 +433,30 @@ var var::oconv_D(const char* conversion) const
 	// day first
 	if (alphamonth && not yearfirst)
 		dayfirst = true;
-	if (dayfirst)
-	{
+	if (dayfirst) {
 		ss.width(2);
 		ss << ymd.day;
 		ss << sepchar;
 	}
 
 	// month
-	if (alphamonth)
-	{
+	if (alphamonth) {
 		// ss.width(3);
 		ss << &shortmths[ymd.month * 4 - 4];
-	}
-	else
-	{
+	} else {
 		ss.width(2);
 		ss << int(ymd.month);
 	}
 
 	// day last
-	if (!dayfirst)
-	{
+	if (!dayfirst) {
 		ss << sepchar;
 		ss.width(2);
 		ss << ymd.day;
 	}
 
 	// year last
-	if (!yearfirst && yeardigits)
-	{
+	if (!yearfirst && yeardigits) {
 		ss << sepchar;
 		// ss << ymd.year;
 		// above doesnt cut down number of characters
@@ -510,8 +467,7 @@ var var::oconv_D(const char* conversion) const
 	return ss.str();
 }
 
-var var::oconv_MT(const char* conversion) const
-{
+var var::oconv_MT(const char* conversion) const {
 	// conversion points to the character AFTER MT - which may be \0
 	// MT, MTH, MTS, MTx, MTHx, MTSx MTHS MTHSx where x is a sep char
 
@@ -532,46 +488,37 @@ var var::oconv_MT(const char* conversion) const
 	int timesecs;
 
 	// guess 1st option is most often zero/ie most conversions are MT only and short circuit
-	if (!(*conversionchar))
-	{
+	if (!(*conversionchar)) {
 		timesecs = round();
 
 		// interpret conversion characters
-	}
-	else
-	{
+	} else {
 
 		// first may be an 2 to indicate input is integer or decimal hours
 		// if so, convert by *3600 to seconds
-		if (*conversionchar == '2')
-		{
+		if (*conversionchar == '2') {
 			++conversionchar;
 			timesecs = (3600 * (*this)).round();
 
 			// if not, just get the seconds
-		}
-		else
-		{
+		} else {
 			timesecs = round();
 		}
 
 		// first may be a U to indicate unlimited hours
-		if (*conversionchar == 'U')
-		{
+		if (*conversionchar == 'U') {
 			++conversionchar;
 			unlimited = true;
 		}
 
 		// next may be an H to indicate AM/PM
-		if (*conversionchar == 'H')
-		{
+		if (*conversionchar == 'H') {
 			++conversionchar;
 			twelvehour = true;
 		}
 
 		// next may be an S to show seconds
-		if (*conversionchar == 'S')
-		{
+		if (*conversionchar == 'S') {
 			++conversionchar;
 			showsecs = true;
 		}
@@ -584,22 +531,18 @@ var var::oconv_MT(const char* conversion) const
 				}
 		*/
 		// first of remaining characters is the separator. remainder are ignored
-		if (*conversionchar)
-		{
+		if (*conversionchar) {
 			sepchar = *conversionchar;
 		}
 	}
 
 	// standardise times <0 and >=86400 to one day ie 0-85399 seconds
 	var negative;
-	if (unlimited)
-	{
+	if (unlimited) {
 		negative = timesecs < 0;
 		if (negative)
 			timesecs = -timesecs;
-	}
-	else
-	{
+	} else {
 		timesecs = timesecs % 86400;
 		if (timesecs < 0)
 			timesecs += 86400;
@@ -610,12 +553,10 @@ var var::oconv_MT(const char* conversion) const
 	int secs = timesecs % 60;
 
 	bool am = false;
-	if (twelvehour)
-	{
+	if (twelvehour) {
 		if (hours >= 13)
 			hours -= 12;
-		else if (hours < 12)
-		{
+		else if (hours < 12) {
 			am = true;
 			// zero hour is 12am in 12 hour clock
 			if (!hours)
@@ -627,8 +568,7 @@ var var::oconv_MT(const char* conversion) const
 
 	// two digit hours
 	var newmv;
-	if (unlimited)
-	{
+	if (unlimited) {
 		if (negative)
 			newmv = "-";
 		else
@@ -636,8 +576,7 @@ var var::oconv_MT(const char* conversion) const
 		if (hours < 10)
 			newmv ^= "0";
 		newmv ^= hours;
-	}
-	else
+	} else
 		newmv = ("00" ^ var(hours)).substr(-2);
 
 	// separator
@@ -646,8 +585,7 @@ var var::oconv_MT(const char* conversion) const
 	// two digit minutes
 	newmv ^= ("00" ^ var(mins)).substr(-2);
 
-	if (showsecs)
-	{
+	if (showsecs) {
 
 		// separator
 		newmv ^= sepchar;
@@ -657,8 +595,7 @@ var var::oconv_MT(const char* conversion) const
 	}
 
 	// AM/PM
-	if (twelvehour)
-	{
+	if (twelvehour) {
 		if (am)
 			newmv ^= "AM";
 		else

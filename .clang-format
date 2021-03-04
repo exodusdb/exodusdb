@@ -1,8 +1,8 @@
 Language:        Cpp
-ColumnLimit:     100
-BreakBeforeBraces: Allman
-IndentWidth:     8
+ColumnLimit:     0
+BreakBeforeBraces: Attach
+IndentWidth:     4
 Standard:        Cpp11
-TabWidth:        8
+TabWidth:        4
 UseTab:          Always
 PointerAlignment: Left

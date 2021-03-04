@@ -1,16 +1,18 @@
 #include <exodus/mvprogram.h>
-#include <exodus/exodusmacros.h> //coding style is like application programming eg USERNAME not mv.USERNAME
+
+//allows and *requires* coding style like exodus application programming
+// e.g. must use USERNAME not mv.USERNAME
+#include <exodus/exodusmacros.h>
 
 // putting various member functions into all exodus programs allows access to the mv environment
 // variable which is also available in all exodus programs.
 
 //#include <unordered_map>
 
-namespace exodus
-{
+namespace exodus {
 
- #pragma GCC diagnostic push
- #pragma GCC diagnostic ignored "-Wuninitialized"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuninitialized"
 // constructor with an mvenvironment
 DLL_PUBLIC
 ExodusProgramBase::ExodusProgramBase(MvEnvironment& inmv) : mv(inmv)
@@ -29,19 +31,17 @@ ExodusProgramBase::ExodusProgramBase(MvEnvironment& inmv) : mv(inmv)
 DLL_PUBLIC
 ExodusProgramBase::~ExodusProgramBase(){};
 
-var ExodusProgramBase::libinfo(const var& command)
-{
+var ExodusProgramBase::libinfo(const var& command) {
 	return var(perform_exodusfunctorbase_.libfilename(command)).osfile();
 }
 
-bool ExodusProgramBase::select(const var& sortselectclause)
-{
+bool ExodusProgramBase::select(const var& sortselectclause) {
 
 	//stage 1
 	/////////
 
 	//indicate there are no calculated fields
-	CURSOR.r(10,"");
+	CURSOR.r(10, "");
 
 	//perform the select (stage 1 of possibly two stages)
 	//any fields requiring calculation that cannot be done by the database
@@ -54,7 +54,7 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 	}
 
 	//we are done if there are no calculated fields!
-	var calc_fields=CURSOR.a(10);
+	var calc_fields = CURSOR.a(10);
 	if (!calc_fields) {
 		return true;
 		////////////
@@ -68,7 +68,7 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 	//calc_fields.oswrite("calc_fields=");
 
 	//clear the list of calculated fields
-	CURSOR.r(10,"");
+	CURSOR.r(10, "");
 
 	//vms to fms etc in calculated fields
 	calc_fields.raiser();
@@ -80,12 +80,12 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 	//debug
 	//calc_fields.convert(FM^VM^SM,"   ").outputl("calc=");
 
-	var sortselectclause2=sortselectclause;
+	var sortselectclause2 = sortselectclause;
 
-	var dictfilename=calc_fields.a(5,1);
+	var dictfilename = calc_fields.a(5, 1);
 
 	//debugging
-	var calc_fields_file="";
+	var calc_fields_file = "";
 	calc_fields_file.open("calc_fields");
 
 	//prepare to create a temporary sql table
@@ -93,7 +93,7 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 	//CREATE TABLE SELECT_STAGE2(
 	// KEY TEXT PRIMARY KEY,
 	// EXECUTIVE_CODE TEXT)
-	var temptablename="SELECT_STAGE2_CURSOR_" ^ CURSOR.a(1);
+	var temptablename = "SELECT_STAGE2_CURSOR_" ^ CURSOR.a(1);
 	var createtablesql = "";
 	createtablesql ^= "DROP TABLE IF EXISTS " ^ temptablename ^ ";\n";
 	//createtablesql ^= "CREATE TEMPORARY TABLE " ^ temptablename ^ "(\n";
@@ -110,31 +110,31 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 	//UPLOADS=''
 	//AUTHORISED<>''
 	//DEADLINE<='10/6/2019'
-	int nfields=calc_fields.a(1).dcount(VM);
+	int nfields = calc_fields.a(1).dcount(VM);
 	dim dictids(nfields);
 	dim opnos(nfields);
 	dim reqvalues(nfields);
 	dim reqvalues2(nfields);
-	for (int fieldn=1;fieldn<=nfields;++fieldn) {
+	for (int fieldn = 1; fieldn <= nfields; ++fieldn) {
 
 		//dictids
 
-		var dictid=calc_fields.a(1,fieldn);
+		var dictid = calc_fields.a(1, fieldn);
 
 		//add colons to the end of every calculated field in the sselect clause
 		//so that 2nd stage select knows that these fields are available in the
 		//temporary parallel file
-		sortselectclause2.replacer("\\b" ^ dictid ^ "\\b",dictid ^ ":");
+		sortselectclause2.replacer("\\b" ^ dictid ^ "\\b", dictid ^ ":");
 
-		dictid.converter(".","_");
-		dictids(fieldn)=dictid;
-		var sqlcolid=dictid^"_calc";
+		dictid.converter(".", "_");
+		dictids(fieldn) = dictid;
+		var sqlcolid = dictid ^ "_calc";
 
 		//ops
 
-		var value=calc_fields.a(3,fieldn).convert(SM,VM).unquote();
+		var value = calc_fields.a(3, fieldn).convert(SM, VM).unquote();
 
-		var op=calc_fields.a(2,fieldn);
+		var op = calc_fields.a(2, fieldn);
 
 		//multivalued selections are not well supported from mvdbpostgresql. handle the obvious cases"
 		if (value.index(VM)) {
@@ -146,27 +146,27 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 
 		//turn ops into numbers for speed
 		var opno;
-		if (! op)
-			opno=0;
-		else if (not var("= <> > < >= <= ~ ~* !~ !~* >< >!< in not_in !! !").locateusing(" ", op.convert(" ","_"), opno))
+		if (!op)
+			opno = 0;
+		else if (not var("= <> > < >= <= ~ ~* !~ !~* >< >!< in not_in !! !").locateusing(" ", op.convert(" ", "_"), opno))
 			throw MVError(op.quote() ^ " unknown op in sql select");
-		opnos(fieldn)=opno;
+		opnos(fieldn) = opno;
 
 		//reqvalues
-		if (op=="in" and value[1]=="(" and value[-1]==")") {
-			value.splicer(1,1,"").splicer(-1,1,"");
-			value.swapper("', '",VM);
+		if (op == "in" and value[1] == "(" and value[-1] == ")") {
+			value.splicer(1, 1, "").splicer(-1, 1, "");
+			value.swapper("', '", VM);
 			value.trimmerb().trimmerf().unquoter();
 			//value.convert(VM,"]").outputl("value=");
 		}
-		if (dictid.substr(-4,4)=="DATE")
-			value=iconv(value,"D");
-		reqvalues(fieldn)=value;
+		if (dictid.substr(-4, 4) == "DATE")
+			value = iconv(value, "D");
+		reqvalues(fieldn) = value;
 
-		var value2=calc_fields.a(4,fieldn).unquote();
-		if (dictid.substr(-4,4)=="DATE")
-			value2=iconv(value2,"D");
-		reqvalues2(fieldn)=value2;
+		var value2 = calc_fields.a(4, fieldn).unquote();
+		if (dictid.substr(-4, 4) == "DATE")
+			value2 = iconv(value2, "D");
+		reqvalues2(fieldn) = value2;
 
 		//sql temp table column
 		createtablesql ^= " " ^ sqlcolid ^ " TEXT,";
@@ -181,108 +181,106 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 		//var("").outputl();
 
 		//debug
-		if (calc_fields_file && dictid != "AUTHORISED")
-		{
-			var key=dictfilename^"*"^dictid;
-			var rec=sortselectclause^FM^op^FM^value^FM^value2;
-			rec.write(calc_fields_file,key);
+		if (calc_fields_file && dictid != "AUTHORISED") {
+			var key = dictfilename ^ "*" ^ dictid;
+			var rec = sortselectclause ^ FM ^ op ^ FM ^ value ^ FM ^ value2;
+			rec.write(calc_fields_file, key);
 			key.outputl("written to calc_fields ");
 		}
 	}
 
 	if (baseinsertsql[-1] == ",") {
 
-		baseinsertsql.splicer(-1,1,")");
+		baseinsertsql.splicer(-1, 1, ")");
 		baseinsertsql ^= " VALUES (";
 
-		createtablesql.splicer(-1,1,")");
+		createtablesql.splicer(-1, 1, ")");
 		//createtablesql.outputl();
 
 		//create the temporary table
 		CURSOR.sqlexec(createtablesql);
-	}
-	else
-		baseinsertsql="";
+	} else
+		baseinsertsql = "";
 
 	//open the dictionary
-	if (dictfilename.substr(1,5).lcase()!="dict_")
-		dictfilename="dict_"^dictfilename;
+	if (dictfilename.substr(1, 5).lcase() != "dict_")
+		dictfilename = "dict_" ^ dictfilename;
 	if (!DICT.open(dictfilename)) {
-		dictfilename="dict_voc";
+		dictfilename = "dict_voc";
 		if (!DICT.open(dictfilename)) {
 			throw MVDBException(dictfilename.quote() ^ " cannot be opened");
 		}
 	}
 
-	int maxnrecs=calc_fields.a(6);
-	int recn=0;
+	int maxnrecs = calc_fields.a(6);
+	int recn = 0;
 
-//nextrecord:
-	while(CURSOR.readnext(RECORD,ID,MV)) {
+	//nextrecord:
+	while (CURSOR.readnext(RECORD, ID, MV)) {
 
-		bool ok=true;
+		bool ok = true;
 
 		//var id2 = MV ? (ID ^ "*" ^ MV) : ID;
-		var insertsql=baseinsertsql ^ ID.swapper("'","''").squote() ^ ",";
+		var insertsql = baseinsertsql ^ ID.swapper("'", "''").squote() ^ ",";
 
-		for (int fieldn=1;fieldn<=nfields;++fieldn) {
+		for (int fieldn = 1; fieldn <= nfields; ++fieldn) {
 
-			var value=calculate(dictids(fieldn));
+			var value = calculate(dictids(fieldn));
 
 			//debug
 			//value.outputl(dictids(fieldn) ^ " value=");
 
 			switch (int(opnos(fieldn))) {
-				case 0:
-					break;
-				case 1: // =
-					ok = value == reqvalues(fieldn);
-					break;
-				case 2: // <>
-					ok = value != reqvalues(fieldn);
-					break;
-				case 3: // >
-					ok = value > reqvalues(fieldn);
-					break;
-				case 4: // <
-					ok = value < reqvalues(fieldn);
-					break;
-				case 5: // >=
-					ok = value >= reqvalues(fieldn);
-					break;
-				case 6: // <=
-					ok = value <= reqvalues(fieldn);
-					break;
-				case 7: // ~ regex
-					ok = value.match(reqvalues(fieldn));
-					break;
-				case 8: // ~* regex case insensitive
-					ok = value.match(reqvalues(fieldn),"i");
-					break;
-				case 9: // !~ not regex
-					ok = ! (value.match(reqvalues(fieldn)));
-					break;
-				case 10: // !~* not regex case insensitive
-					ok = ! (value.match(reqvalues(fieldn),"i"));
-					break;
-				case 11: // between x and y, from x to 
-					ok = (value >= reqvalues(fieldn) && value <= reqvalues2(fieldn));
-					break;
-				case 12: // not between x and y, not from x to y
-					ok = (value < reqvalues(fieldn) || value > reqvalues2(fieldn));
-					break;
-				case 13: // in list
-					ok = reqvalues(fieldn).locate(value);
-					break;
-				case 14: // not in list
-					ok = ! reqvalues(fieldn).locate(value);
-					break;
-				case 15: // is true (not "" 0 "0" "00" "0.0" etc).
-					ok = value;
-					break;
-				case 16: // is false (isnt true)
-					ok = !value;
-					break;
+			case 0:
+				break;
+			case 1: // =
+				ok = value == reqvalues(fieldn);
+				break;
+			case 2: // <>
+				ok = value != reqvalues(fieldn);
+				break;
+			case 3: // >
+				ok = value > reqvalues(fieldn);
+				break;
+			case 4: // <
+				ok = value < reqvalues(fieldn);
+				break;
+			case 5: // >=
+				ok = value >= reqvalues(fieldn);
+				break;
+			case 6: // <=
+				ok = value <= reqvalues(fieldn);
+				break;
+			case 7: // ~ regex
+				ok = value.match(reqvalues(fieldn));
+				break;
+			case 8: // ~* regex case insensitive
+				ok = value.match(reqvalues(fieldn), "i");
+				break;
+			case 9: // !~ not regex
+				ok = !(value.match(reqvalues(fieldn)));
+				break;
+			case 10: // !~* not regex case insensitive
+				ok = !(value.match(reqvalues(fieldn), "i"));
+				break;
+			case 11: // between x and y, from x to
+				ok = (value >= reqvalues(fieldn) && value <= reqvalues2(fieldn));
+				break;
+			case 12: // not between x and y, not from x to y
+				ok = (value < reqvalues(fieldn) || value > reqvalues2(fieldn));
+				break;
+			case 13: // in list
+				ok = reqvalues(fieldn).locate(value);
+				break;
+			case 14: // not in list
+				ok = !reqvalues(fieldn).locate(value);
+				break;
+			case 15: // is true (not "" 0 "0" "00" "0.0" etc).
+				ok = value;
+				break;
+			case 16: // is false (isnt true)
+				ok = !value;
+				break;
 			}
 			if (!ok) {
 				//debug
@@ -291,9 +289,8 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 			}
 
 			//VALUES (41472, 'Practical PostgreSQL', 1212, 4);
-			value.swapper("'","''").squoter();
+			value.swapper("'", "''").squoter();
 			insertsql ^= " " ^ value ^ ",";
-
 		}
 
 		//skip if failed to match
@@ -304,7 +301,7 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 
 		//ID.outputl("stage1 ok ");
 
-		insertsql.splicer(-1,1,")");
+		insertsql.splicer(-1, 1, ")");
 
 		//insertsql.outputl();
 
@@ -312,109 +309,96 @@ bool ExodusProgramBase::select(const var& sortselectclause)
 
 		//option to limit number of records returned
 		++recn;
-		if (maxnrecs && recn>maxnrecs) {
+		if (maxnrecs && recn > maxnrecs) {
 			CURSOR.clearselect();
 			//break;
 		}
-
 	}
 
 	sortselectclause2.errputl("\nstage2=");
 
-	bool result=CURSOR.select(sortselectclause2);
+	bool result = CURSOR.select(sortselectclause2);
 
 	return result;
-
 }
 
-bool ExodusProgramBase::savelist(const var& listname)
-{
+bool ExodusProgramBase::savelist(const var& listname) {
 	return CURSOR.savelist(listname.field(" ", 1));
 }
 
-bool ExodusProgramBase::getlist(const var& listname)
-{
+bool ExodusProgramBase::getlist(const var& listname) {
 	return CURSOR.getlist(listname.field(" ", 1));
 }
 
-bool ExodusProgramBase::formlist(const var& filename_or_command, const var& keys/*=""*/, const var fieldno/*=0*/)
-{
+bool ExodusProgramBase::formlist(const var& filename_or_command, const var& keys /*=""*/, const var fieldno /*=0*/) {
 	//remove any options from the filename or command
-	var filename2=filename_or_command;
+	var filename2 = filename_or_command;
 	if (filename2[-1] eq ")") {
-		var options=filename2.field2(" ",-1);
-		filename2.splicer(-options.length(),999999999,"").trimmerb();
+		var options = filename2.field2(" ", -1);
+		filename2.splicer(-options.length(), 999999999, "").trimmerb();
 	}
 
 	//optionally get keys from filename or command
-	var keys2 = (keys=="") ? filename2.field(" ",2,999999999) : keys;
+	var keys2 = (keys == "") ? filename2.field(" ", 2, 999999999) : keys;
 
 	//remove any keys from the filename
-	filename2=filename2.field(" ",1);
+	filename2 = filename2.field(" ", 1);
 
 	//open the file
 	clearselect();
 	if (not CURSOR.open(filename2))
-		throw MVError(filename2.quote() ^ " file cannot be opened in formlist(" ^keys^")");
+		throw MVError(filename2.quote() ^ " file cannot be opened in formlist(" ^ keys ^ ")");
 
 	return CURSOR.formlist(keys2, fieldno);
 }
 
-bool ExodusProgramBase::makelist(const var& listname, const var& keys)
-{
+bool ExodusProgramBase::makelist(const var& listname, const var& keys) {
 	return CURSOR.makelist(listname.field(" ", 1), keys);
 }
 
-bool ExodusProgramBase::deletelist(const var& listname)
-{
+bool ExodusProgramBase::deletelist(const var& listname) {
 	return CURSOR.deletelist(listname.field(" ", 1));
 }
 
-void ExodusProgramBase::clearselect()
-{
+void ExodusProgramBase::clearselect() {
 	CURSOR.clearselect();
 }
 
-bool ExodusProgramBase::hasnext()
-{
+bool ExodusProgramBase::hasnext() {
 	return CURSOR.hasnext();
 }
 
-bool ExodusProgramBase::readnext(var& key)
-{
+bool ExodusProgramBase::readnext(var& key) {
 	return CURSOR.readnext(key);
 }
 
-bool ExodusProgramBase::readnext(var& key, var& valueno)
-{
+bool ExodusProgramBase::readnext(var& key, var& valueno) {
 	return CURSOR.readnext(key, valueno);
 }
 
-bool ExodusProgramBase::readnext(var& record, var& key, var& valueno)
-{
+bool ExodusProgramBase::readnext(var& record, var& key, var& valueno) {
 	return CURSOR.readnext(record, key, valueno);
 }
 
-bool ExodusProgramBase::deleterecord(const var& filename_or_handle_or_command, const var& key)
-{
-	if (filename_or_handle_or_command.index(" ") || key.length()==0) {
-		var command=filename_or_handle_or_command.a(1);
+bool ExodusProgramBase::deleterecord(const var& filename_or_handle_or_command, const var& key) {
+	if (filename_or_handle_or_command.index(" ") || key.length() == 0) {
+		var command = filename_or_handle_or_command.a(1);
 
 		var filename = command.field(" ", 1);
 
 		//if any keys provided (remove quotes if present)
-		int nwords=command.dcount(" ");
+		int nwords = command.dcount(" ");
 
 		//find and skip final options like (S)
-		bool silent=false;
+		bool silent = false;
 		if (command[-1] == ")" || command[-1] == "}") {
-			silent = command.field2(" ",-1).index("S");
+			silent = command.field2(" ", -1).index("S");
 			nwords--;
 		}
 
 		if (nwords >= 2) {
-			for (int wordn=2;wordn<=nwords;++wordn) {
-				var key=command.field(" ",wordn).unquote();
+			for (int wordn = 2; wordn <= nwords; ++wordn) {
+				var key = command.field(" ", wordn).unquote();
 				if (filename.deleterecord(key)) {
 					silent || key.quote().outputl("Deleted ");
 				} else {
@@ -440,8 +424,7 @@ bool ExodusProgramBase::deleterecord(const var& filename_or_handle_or_command, c
 	//return filehandle.deleterecord(key);
 }
 
-bool ExodusProgramBase::pushselect([[maybe_unused]] const var& v1, var& v2, [[maybe_unused]] var& v3, [[maybe_unused]] var& v4)
-{
+bool ExodusProgramBase::pushselect([[maybe_unused]] const var& v1, var& v2, [[maybe_unused]] var& v3, [[maybe_unused]] var& v4) {
 
 	// CURSOR.quote().outputl("CURSOR=");
 	// CURSOR++;
@@ -476,8 +459,7 @@ bool ExodusProgramBase::pushselect([[maybe_unused]] const var& v1, var& v2, [[ma
 	*/
 }
 
-bool ExodusProgramBase::popselect([[maybe_unused]] const var& v1, var& v2, [[maybe_unused]] var& v3, [[maybe_unused]] var& v4)
-{
+bool ExodusProgramBase::popselect([[maybe_unused]] const var& v1, var& v2, [[maybe_unused]] var& v3, [[maybe_unused]] var& v4) {
 	// CURSOR.quote().outputl("CURSOR=");
 	// CURSOR--;
 	v2.transfer(CURSOR);
@@ -515,25 +497,21 @@ bool ExodusProgramBase::popselect([[maybe_unused]] const var& v1, var& v2, [[may
 	*/
 }
 
-void ExodusProgramBase::note(const var& msg, const var& options) const
-{
+void ExodusProgramBase::note(const var& msg, const var& options) const {
 	var buffer = "";
 	mssg(msg, options, buffer);
 }
 void ExodusProgramBase::note(const var& msg, const var& options, var& buffer,
-			     const var& params) const
-{
+							 const var& params) const {
 	mssg(msg, options, buffer, params);
 }
 
-void ExodusProgramBase::mssg(const var& msg, const var& options) const
-{
+void ExodusProgramBase::mssg(const var& msg, const var& options) const {
 	var buffer = "";
 	mssg(msg, options, buffer);
 }
 void ExodusProgramBase::mssg(const var& msg, const var& options, var& buffer,
-			     const var& params) const
-{
+							 const var& params) const {
 
 	//skip if just "downing" a previous "upped" message
 	if (options.index("D")) {
@@ -551,25 +529,24 @@ void ExodusProgramBase::mssg(const var& msg, const var& options, var& buffer,
 	var msg1 = msg;
 
 	//swap %1, %2 etc with params
-	for (var ii=1;ii<=9;++ii)
-		msg1.swapper("%"^ii,params.a(ii));
+	for (var ii = 1; ii <= 9; ++ii)
+		msg1.swapper("%" ^ ii, params.a(ii));
 
-	msg1.converter(_FM_ _VM_ "|","\n\n\n").trimmer("\n");
+	msg1.converter(_FM_ _VM_ "|", "\n\n\n").trimmer("\n");
 
 	std::cout << msg1 << std::endl;
 
 	var origbuffer = buffer.assigned() ? buffer : "";
 
 	//R=Reply required in buffer
-	if (options.index("R"))
-	{
+	if (options.index("R")) {
 		if (interactive) {
 
 			//one space after the prompt
 			//std::cout << " ";
 
 			if (buffer.unassigned())
-				buffer="";
+				buffer = "";
 
 			//input with empty prompt allows defaulting and editing
 			buffer.input("? ");
@@ -579,17 +556,15 @@ void ExodusProgramBase::mssg(const var& msg, const var& options, var& buffer,
 			//	buffer=origbuffer;
 
 			//escape anywhere in the input returned as a single ESC character
-	        //or empty input with ESC option means ESC
+			//or empty input with ESC option means ESC
 			if (options.index("E") and (buffer == "" or buffer.index("\x1B")))
-				buffer="\x1B";//esc
+				buffer = "\x1B"; //esc
 
 			std::cout << std::endl;
-		}
-		else {
+		} else {
 
 			//input=output if not interactive
 			buffer = origbuffer;
-
 		}
 
 		//force upper case
@@ -599,32 +574,25 @@ void ExodusProgramBase::mssg(const var& msg, const var& options, var& buffer,
 		return;
 	}
 
-	if (!options.index("U"))
-	{
-		if (USER4.length() > 8000)
-		{
+	if (!options.index("U")) {
+		if (USER4.length() > 8000) {
 			var msg2 = "Aborted MSG()>8000";
 			std::cout << msg2 << std::endl;
 			//std::cout << USER4 << std::endl;
 			USER4 ^= FM ^ msg2;
-		}
-		else
-		{
+		} else {
 			USER4.r(-1, msg1);
 		}
 	}
-
 }
 
-var ExodusProgramBase::authorised(const var& task0)
-{
+var ExodusProgramBase::authorised(const var& task0) {
 	var msg;
 	return authorised(task0, msg);
 }
 
 var ExodusProgramBase::authorised(const var& task0, var& msg, const var& defaultlock,
-				  const var& username0)
-{
+								  const var& username0) {
 
 	var username;
 	var msgusername;
@@ -634,31 +602,26 @@ var ExodusProgramBase::authorised(const var& task0, var& msg, const var& default
 	var usern;
 
 	var task = task0;
-	if (username0.unassigned() or username0 eq "")
-	{
+	if (username0.unassigned() or username0 eq "") {
 		// allow for username like FINANCE(STEVE)
 		// so security is done like FINANCE but record is kept of actual user
 		// this allows for example billing module users to post as finance module users
 		username = USERNAME.field("(", 1);
 		msgusername = USERNAME;
-	}
-	else
-	{
+	} else {
 		username = username0;
 		msgusername = username;
 	}
 
 	// if username='EXODUS' or username='STEVE' then call msg(task:'');
 
-	if (task[1] == " ")
-	{
+	if (task[1] == " ") {
 		call mssg(DQ ^ (task0 ^ DQ));
 	}
 	// Each task may have many "locks", each users may have many "keys"
 	// A user must have keys to all the locks in order to pass
 
-	if (not task)
-	{
+	if (not task) {
 		return 1;
 	}
 
@@ -672,20 +635,17 @@ var ExodusProgramBase::authorised(const var& task0, var& msg, const var& default
 	msg = "";
 	// **CALL note(' ':TASK)
 
-	if (task.substr(1, 2) == "..")
-	{
+	if (task.substr(1, 2) == "..") {
 		// call note(task:'')
 		return 1;
 	}
 
 	var noadd = task[1] == "!";
-	if (noadd)
-	{
+	if (noadd) {
 		task.splicer(1, 1, "");
 	}
 	// if noadd else NOADD=((TASK[-1,1]='"') and (len(userprivs)<10000))
-	if (not noadd)
-	{
+	if (not noadd) {
 		var lenuserprivs = SECURITY.length();
 		noadd = task[-1] == DQ or lenuserprivs > 48000;
 	}
@@ -698,35 +658,28 @@ var ExodusProgramBase::authorised(const var& task0, var& msg, const var& default
 	//? as first character of task (after positive) means
 	// security is being used as a configuration and user EXODUS has no special privs
 	var isadmin;
-	if (task[1] == "?")
-	{
+	if (task[1] == "?") {
 		isadmin = 0;
 		task.splicer(1, 1, "");
-	}
-	else
+	} else
 		isadmin = username == "EXODUS";
 
 	var deleting = task.substr(1, 8) == "%DELETE%";
-	if (deleting)
-	{
+	if (deleting) {
 		task.splicer(1, 8, "");
 	}
 	var updating = task.substr(1, 8) == "%UPDATE%";
-	if (updating)
-	{
+	if (updating) {
 		task.splicer(1, 8, "");
 	}
 	var renaming = task.substr(1, 8) == "%RENAME%";
-	if (renaming)
-	{
+	if (renaming) {
 		task.splicer(1, 8, "");
 	}
 
 	// find the task
-	if (SECURITY.a(10).locate(task, taskn))
-	{
-		if (deleting)
-		{
+	if (SECURITY.a(10).locate(task, taskn)) {
+		if (deleting) {
 			// SECURITY.eraser(10, taskn);
 			// SECURITY.eraser(11, taskn);
 			SECURITY.remover(10, taskn);
@@ -734,72 +687,55 @@ var ExodusProgramBase::authorised(const var& task0, var& msg, const var& default
 		updateprivs:
 			gosub writeuserprivs();
 			return 1;
-		}
-		else if (renaming)
-		{
+		} else if (renaming) {
 			// delete any existing rename target task
-			if (SECURITY.a(10).locate(defaultlock, taskn2))
-			{
+			if (SECURITY.a(10).locate(defaultlock, taskn2)) {
 				// SECURITY.eraser(10, taskn2);
 				// SECURITY.eraser(11, taskn2);
 				SECURITY.remover(10, taskn2);
 				SECURITY.remover(11, taskn2);
-				if (taskn2 < taskn)
-				{
+				if (taskn2 < taskn) {
 					taskn -= 1;
 				}
 			}
 			SECURITY.r(10, taskn, defaultlock);
-			if (renaming)
-			{
+			if (renaming) {
 				call note(task ^ "|TASK RENAMED|" ^ defaultlock);
 			}
 			goto updateprivs;
-		}
-		else if (updating)
-		{
+		} else if (updating) {
 			var tt = defaultlock;
-			if (SECURITY.a(10).locate(defaultlock, taskn2))
-			{
+			if (SECURITY.a(10).locate(defaultlock, taskn2)) {
 				tt = SECURITY.a(11, taskn2);
 			}
 			SECURITY.r(11, taskn, tt);
 			goto updateprivs;
 		}
-	}
-	else
-	{
-		if (deleting)
-		{
+	} else {
+		if (deleting) {
 			return 1;
 		}
-		if (renaming)
-		{
+		if (renaming) {
 			// if the task to be renamed doesnt exist just add the target task
 			call authorised(defaultlock, msg);
 			return 1;
 		}
-		if (not noadd)
-		{
+		if (not noadd) {
 			gosub readuserprivs();
 			// if (SECURITY.length() < 65000) {
-			if (true)
-			{
+			if (true) {
 				var x = var();
-				if (not(SECURITY.a(10).locateby("A", task, taskn)))
-				{
+				if (not(SECURITY.a(10).locateby("A", task, taskn))) {
 					var newlock = defaultlock;
 					// get locks on default task if present otherwise new locks
 					// are none
-					if (newlock and SECURITY.a(10).locate(newlock))
-					{
+					if (newlock and SECURITY.a(10).locate(newlock)) {
 						newlock = SECURITY.a(11, xx);
 					}
 					SECURITY.inserter(10, taskn, task);
 					SECURITY.inserter(11, taskn, newlock);
 					gosub writeuserprivs();
-					if (username == "EXODUS")
-					{
+					if (username == "EXODUS") {
 						call note(task ^ "|TASK ADDED");
 					}
 				}
@@ -809,10 +745,8 @@ var ExodusProgramBase::authorised(const var& task0, var& msg, const var& default
 
 	// if no locks then pass ok unless positive locking required
 	var locks = SECURITY.a(11, taskn);
-	if (locks == "")
-	{
-		if (positive and not isadmin)
-		{
+	if (locks == "") {
+		if (positive and not isadmin) {
 		notallowed:
 			// MSG=capitalise(TASK):'||Sorry, ':capitalise(msgusername):', you are not
 			// authorised to do this.|'
@@ -822,46 +756,36 @@ var ExodusProgramBase::authorised(const var& task0, var& msg, const var& default
 				msg = "Sorry, " ^ capitalise(msgusername) ^ ", you are";
 
 			msg ^= " not";
-			if (positive)
-			{
+			if (positive) {
 				msg ^= " specifically";
 			}
 			msg ^= " authorised to do||" ^ capitalise(task);
 
 			return 0;
-		}
-		else
+		} else
 			return 1;
-	}
-	else if (locks == "NOONE")
-	{
+	} else if (locks == "NOONE") {
 		goto notallowed;
 	}
 
 	// if index('012',@privilege,1) then goto ok
-	if (isadmin)
-	{
+	if (isadmin) {
 		return 1;
 	}
 
 	// find the user (add to bottom if not found)
 	// surely this is not necessary since users are in already
-	if (not(SECURITY.a(1).locate(username, usern)))
-	{
-		if (username != "EXODUS" and username != APPLICATION)
-		{
+	if (not(SECURITY.a(1).locate(username, usern))) {
+		if (username != "EXODUS" and username != APPLICATION) {
 			gosub readuserprivs();
 			usern = (SECURITY.a(1)).count(VM) + (SECURITY.a(1) != "") + 1;
-			if (SECURITY.length() < 65000)
-			{
+			if (SECURITY.length() < 65000) {
 				var users;
-				if (not(users.open("USERS")))
-				{
+				if (not(users.open("USERS"))) {
 					goto notallowed;
 				}
 				var USER;
-				if (not(USER.read(users, username)))
-				{
+				if (not(USER.read(users, username))) {
 					goto notallowed;
 				}
 				SECURITY.inserter(1, usern, username);
@@ -876,8 +800,7 @@ var ExodusProgramBase::authorised(const var& task0, var& msg, const var& default
 	// following users up to first blank line also have the same keys
 	var keys = SECURITY.a(2).field(VM, usern, 999);
 	var temp = keys.index("---", 1);
-	if (temp)
-	{
+	if (temp) {
 		keys.splicer(temp - 1, 999, "");
 	}
 	// convert ',' to vm in keys
@@ -887,15 +810,12 @@ var ExodusProgramBase::authorised(const var& task0, var& msg, const var& default
 	// NLOCKS=COUNT(LOCKS,vm)+1
 	var nlocks = locks.count(" ") + 1;
 
-	for (var lockn = 1; lockn <= nlocks; ++lockn)
-	{
+	for (var lockn = 1; lockn <= nlocks; ++lockn) {
 		// LOCKx=FIELD(LOCKS,vm,LOCKN)
 		var lockx = locks.field(" ", lockn);
-		if (keys.locateusing(" ", lockx))
-		{
+		if (keys.locateusing(" ", lockx)) {
 			// call note(task:' ok')
-		}
-		else
+		} else
 			// MSG=capitalise(TASK):'||Sorry, ':capitalise(msgusername):', you are not
 			// authorised to do this.|' MSG='Sorry, ':capitalise(msgusername):', you are
 			// not authorised to do||':capitalise(task)
@@ -909,32 +829,26 @@ var ExodusProgramBase::authorised(const var& task0, var& msg, const var& default
 	return 1;
 }
 
-void ExodusProgramBase::readuserprivs() const
-{
-	if (not DEFINITIONS or not(SECURITY.read(DEFINITIONS, "SECURITY")))
-	{
+void ExodusProgramBase::readuserprivs() const {
+	if (not DEFINITIONS or not(SECURITY.read(DEFINITIONS, "SECURITY"))) {
 		SECURITY = "";
 	}
 	return;
 }
 
-void ExodusProgramBase::writeuserprivs() const
-{
+void ExodusProgramBase::writeuserprivs() const {
 	SECURITY.r(9, "");
-	if (DEFINITIONS)
-	{
+	if (DEFINITIONS) {
 		SECURITY.write(DEFINITIONS, "SECURITY");
 	}
 	return;
 }
 
-var ExodusProgramBase::capitalise(const var& str0, const var& mode0, const var& wordseps0) const
-{
+var ExodusProgramBase::capitalise(const var& str0, const var& mode0, const var& wordseps0) const {
 
 	var string2;
 
-	if (mode0.unassigned() || mode0 == "CAPITALISE")
-	{
+	if (mode0.unassigned() || mode0 == "CAPITALISE") {
 		string2 = str0;
 		// convert @upper.case to @lower.case in string2
 		int nn = string2.length();
@@ -947,41 +861,28 @@ var ExodusProgramBase::capitalise(const var& str0, const var& mode0, const var& 
 			wordseps = " .()&_" _RM_ _FM_ _VM_ _SM_ _TM_ _STM_;
 		else
 			wordseps = wordseps0;
-		for (int ii = 1; ii <= nn; ii++)
-		{
+		for (int ii = 1; ii <= nn; ii++) {
 			var tt = string2.substr(ii, 1);
 
-			if (inquotes)
-			{
+			if (inquotes) {
 				inquotes = tt != inquotes;
-			}
-			else
-			{
+			} else {
 				if (tt == DQ && (string2.count(DQ) > 1 || tt == "\'") &&
-				    string2.count("\'") > 1)
-				{
+					string2.count("\'") > 1) {
 					inquotes = tt;
-				}
-				else
-				{
-					if (wordseps.index(tt, 1))
-					{
+				} else {
+					if (wordseps.index(tt, 1)) {
 						cap = 1;
 						if (tt == " ")
 							numx = var("1234567890")
-								   .index(string2.substr(ii + 1, 1),
-									  1);
-					}
-					else
-					{
-						if (cap || numx)
-						{
+									   .index(string2.substr(ii + 1, 1),
+											  1);
+					} else {
+						if (cap || numx) {
 							tt.converter(LOWERCASE, UPPERCASE);
 							string2.splicer(ii, 1, tt);
 							cap = 0;
-						}
-						else
-						{
+						} else {
 							tt.converter(UPPERCASE, LOWERCASE);
 							string2.splicer(ii, 1, tt);
 						}
@@ -994,29 +895,20 @@ var ExodusProgramBase::capitalise(const var& str0, const var& mode0, const var& 
 		string2.swapper("\'S ", "\'s ");
 		if (string2.substr(-2, 2) == "\'S")
 			string2.splicer(-2, 2, "\'s");
-	}
-	else if (mode0 == "QUOTE")
-	{
+	} else if (mode0 == "QUOTE") {
 		string2 = str0;
-		if (string2 != "")
-		{
+		if (string2 != "") {
 			string2.converter(FM ^ VM ^ SVM ^ TM, "    ");
 			string2.swapper(" ", "\" \"");
 			string2 = string2.quote();
 		}
-	}
-	else if (mode0 == "UPPERCASE")
-	{
+	} else if (mode0 == "UPPERCASE") {
 		string2 = str0;
 		string2.converter(LOWERCASE, UPPERCASE);
-	}
-	else if (mode0 == "LOWERCASE")
-	{
+	} else if (mode0 == "LOWERCASE") {
 		string2 = str0;
 		string2.converter(UPPERCASE, LOWERCASE);
-	}
-	else if (mode0.substr(1, 5) == "PARSE")
-	{
+	} else if (mode0.substr(1, 5) == "PARSE") {
 
 		var uppercase = mode0.index("UPPERCASE", 1);
 
@@ -1024,36 +916,24 @@ var ExodusProgramBase::capitalise(const var& str0, const var& mode0, const var& 
 
 		// convert to uppercase
 		var quoted = "";
-		for (int ii = 1; ii <= 99999; ii++)
-		{
+		for (int ii = 1; ii <= 99999; ii++) {
 			var tt = string2.substr(ii, 1);
 			// BREAK;
 			if (!(tt != ""))
 				break;
 			;
-			if (tt == quoted)
-			{
+			if (tt == quoted) {
 				quoted = "";
-			}
-			else
-			{
-				if (!quoted)
-				{
-					if ((DQ ^ "\'").index(tt, 1))
-					{
+			} else {
+				if (!quoted) {
+					if ((DQ ^ "\'").index(tt, 1)) {
 						quoted = tt;
-					}
-					else
-					{
-						if (tt == " ")
-						{
+					} else {
+						if (tt == " ") {
 							tt = FM;
 							string2.splicer(ii, 1, tt);
-						}
-						else
-						{
-							if (uppercase)
-							{
+						} else {
+							if (uppercase) {
 								tt.converter(LOWERCASE, UPPERCASE);
 								string2.splicer(ii, 1, tt);
 							}
@@ -1063,8 +943,7 @@ var ExodusProgramBase::capitalise(const var& str0, const var& mode0, const var& 
 			}
 		}; // ii;
 
-		if (mode0.index("TRIM", 1))
-		{
+		if (mode0.index("TRIM", 1)) {
 			string2.converter(" " _FM_, _FM_ " ");
 			string2 = string2.trim();
 			string2.converter(" " _FM_, _FM_ " ");
@@ -1074,8 +953,7 @@ var ExodusProgramBase::capitalise(const var& str0, const var& mode0, const var& 
 	return string2;
 }
 
-var ExodusProgramBase::execute(const var& sentence)
-{
+var ExodusProgramBase::execute(const var& sentence) {
 
 	var v1, v2, v3, v4;
 	pushselect(v1, v2, v3, v4);
@@ -1089,14 +967,12 @@ var ExodusProgramBase::execute(const var& sentence)
 	return result;
 }
 
-void ExodusProgramBase::chain(const var& libraryname)
-{
+void ExodusProgramBase::chain(const var& libraryname) {
 	CHAIN = libraryname;
 	var().stop();
 }
 
-var ExodusProgramBase::perform(const var& sentence)
-{
+var ExodusProgramBase::perform(const var& sentence) {
 	// THISIS("var ExodusProgramBase::perform(const var& sentence)")
 	// ISSTRING(sentence)
 
@@ -1130,7 +1006,7 @@ var ExodusProgramBase::perform(const var& sentence)
 	RECUR4.transfer(saverecur4);
 
 	//a lambda function to restore the environment
-	auto restore_environment = [&](){
+	auto restore_environment = [&]() {
 		// restore some environment
 		savesentence.transfer(SENTENCE);
 		savecommand.transfer(COMMAND);
@@ -1143,19 +1019,16 @@ var ExodusProgramBase::perform(const var& sentence)
 	};
 
 	SENTENCE = sentence;
-	while (SENTENCE)
-	{
+	while (SENTENCE) {
 
 		// set new perform environment
 		COMMAND = SENTENCE;
 		OPTIONS = "";
 		// similar code in exodus_main() and mvprogram.cpp:perform()
 		var lastchar = COMMAND[-1];
-		if (lastchar == ")")
-		{
+		if (lastchar == ")") {
 			OPTIONS = "(" ^ COMMAND.field2("(", -1);
-		}
-		else if (lastchar == "}")
+		} else if (lastchar == "}")
 			OPTIONS = "{" ^ COMMAND.field2("{", -1);
 		if (OPTIONS)
 			COMMAND.splicer(-(OPTIONS.length()), OPTIONS.length(), "");
@@ -1164,43 +1037,33 @@ var ExodusProgramBase::perform(const var& sentence)
 		var libid = SENTENCE.field(" ", 1).lcase();
 		std::string str_libname = libid.toString();
 		if (!perform_exodusfunctorbase_.initsmf(str_libname.c_str(),
-							"exodusprogrambasecreatedelete_",
-							true // forcenew each perform/execute
-							))
-		{
+												"exodusprogrambasecreatedelete_",
+												true // forcenew each perform/execute
+												)) {
 			USER4 ^= "perform() Cannot find shared library \"" + str_libname +
-				 "\", or \"libraryexit()\" is not present in it.";
+					 "\", or \"libraryexit()\" is not present in it.";
 			// throw MVError(USER4);
 			// return "";
 			break;
 		}
 
 		// call the shared library exodus object's main function
-		try
-		{
+		try {
 			ANS = perform_exodusfunctorbase_.callsmf();
-		}
-		catch (const MVUndefined&)
-		{
+		} catch (const MVUndefined&) {
 			// if return "" is missing then default ANS to ""
 			ANS = "";
-		}
-		catch (const MVStop&)
-		{
+		} catch (const MVStop&) {
 			// stop is normal way of stopping a perform
 			// functions can call it to terminate the whole "program"
 			// without needing to setup chains of returns
 			// to exit from nested functions
 			ANS = "";
-		}
-		catch (const MVAbort&)
-		{
+		} catch (const MVAbort&) {
 			// similar to stop for the time being
 			// maybe it should set some error flag/messages
 			ANS = "";
-		}
-		catch (const MVAbortAll&)
-		{
+		} catch (const MVAbortAll&) {
 			// similar to stop for the time being
 			// maybe it should set some error flag/messages
 			// and abort multiple levels of perform?
@@ -1210,8 +1073,7 @@ var ExodusProgramBase::perform(const var& sentence)
 		//that omits catch (MVError) if EXO_DEBUG is set
 		//so that gdb will catch the original error and allow backtracing there
 		//Until then, use gdb "catch throw" as mentioned below.
-		catch (const MVError&)
-		{
+		catch (const MVError&) {
 			//restore environment in case MVError is caught
 			//in caller and the program resumes processing
 			restore_environment();
@@ -1242,8 +1104,7 @@ var ExodusProgramBase::perform(const var& sentence)
 }
 
 var ExodusProgramBase::xlate(const var& filename, const var& key, const var& fieldno_or_name,
-			     const var& mode)
-{
+							 const var& mode) {
 
 	// TODO implement additional MV argument
 
@@ -1251,14 +1112,12 @@ var ExodusProgramBase::xlate(const var& filename, const var& key, const var& fie
 	var results = "";
 	var nkeys = key.dcount(VM);
 
-	for (var keyn = 1; keyn <= nkeys; ++keyn)
-	{
+	for (var keyn = 1; keyn <= nkeys; ++keyn) {
 
 		var keyx = key.a(1, keyn);
 
 		// handle non-numeric field_no ie dictionary field/column name
-		if (not fieldno_or_name.isnum())
-		{
+		if (not fieldno_or_name.isnum()) {
 
 			// get the whole record
 			var record = keyx.xlate(filename, "", mode);
@@ -1266,22 +1125,20 @@ var ExodusProgramBase::xlate(const var& filename, const var& key, const var& fie
 			// TODO what if key is multivalued?
 
 			// handle record not found and mode C
-			if (mode == "C" && record == keyx)
-			{
+			if (mode == "C" && record == keyx) {
 				results.r(keyn, key);
 				continue;
 			}
 
 			// handle record not found and mode X
-			if (not record.length())
-			{
+			if (not record.length()) {
 				results.r(keyn, "");
 				continue;
 			}
 
 			// use calculate()
 			var result =
-			    calculate(fieldno_or_name, "dict_" ^ filename.a(1), keyx, record);
+				calculate(fieldno_or_name, "dict_" ^ filename.a(1), keyx, record);
 			if (nkeys > 1)
 				result.lowerer();
 			results.r(keyn, result);
@@ -1292,17 +1149,16 @@ var ExodusProgramBase::xlate(const var& filename, const var& key, const var& fie
 		results.r(keyn, keyx.xlate(filename, fieldno_or_name, mode));
 	}
 
-	if (nkeys>1)
-        results.converter(_FM_,_VM_);
-    //else
-    //    sep = _RM_;
+	if (nkeys > 1)
+		results.converter(_FM_, _VM_);
+	//else
+	//    sep = _RM_;
 
 	return results;
 }
 
 var ExodusProgramBase::calculate(const var& dictid, const var& dictfile, const var& id,
-				 const var& record, const var& mvno)
-{
+								 const var& record, const var& mvno) {
 
 	//dictid @ID/@id is hard coded to return ID
 	//to avoid incessant lookup in main file dictionary and then defaulting to dict_voc
@@ -1328,8 +1184,7 @@ var ExodusProgramBase::calculate(const var& dictid, const var& dictfile, const v
 	return result;
 }
 
-var ExodusProgramBase::calculate(const var& dictid)
-{
+var ExodusProgramBase::calculate(const var& dictid) {
 	// THISIS("var ExodusProgramBase::calculate(const var& dictid)")
 	// ISSTRING(dictid)
 
@@ -1339,31 +1194,25 @@ var ExodusProgramBase::calculate(const var& dictid)
 	// library
 	bool newlibfunc;
 	bool indictvoc = false;
-	if (cache_dictid_ != (DICT.a(1) ^ " " ^ dictid))
-	{
+	if (cache_dictid_ != (DICT.a(1) ^ " " ^ dictid)) {
 		newlibfunc = true;
 		if (not DICT)
 			throw MVError("ExodusProgramBase::calculate(" ^ dictid ^
-					  ") DICT file variable has not been set");
-		if (not cache_dictrec_.reado(DICT, dictid))
-		{
+						  ") DICT file variable has not been set");
+		if (not cache_dictrec_.reado(DICT, dictid)) {
 			// try lower case
-			if (not cache_dictrec_.reado(DICT, dictid.lcase()))
-			{
+			if (not cache_dictrec_.reado(DICT, dictid.lcase())) {
 				// try dict_voc
 				var dictvoc; // TODO implement mv.DICTVOC to avoid opening
-				if (not dictvoc.open("dict_voc"))
-				{
-baddict:
+				if (not dictvoc.open("dict_voc")) {
+				baddict:
 					throw MVError("ExodusProgramBase::calculate(" ^ dictid ^
-							  ") dictionary record not in DICT " ^
-							  DICT.a(1).quote() ^ " nor in DICT_VOC");
+								  ") dictionary record not in DICT " ^
+								  DICT.a(1).quote() ^ " nor in DICT_VOC");
 				}
-				if (not cache_dictrec_.reado(dictvoc, dictid))
-				{
+				if (not cache_dictrec_.reado(dictvoc, dictid)) {
 					// try lower case
-					if (not cache_dictrec_.reado(dictvoc, dictid.lcase()))
-					{
+					if (not cache_dictrec_.reado(dictvoc, dictid.lcase())) {
 						goto baddict;
 					}
 				}
@@ -1373,25 +1222,23 @@ baddict:
 			// regardless of file xxxxxxxx/voc and upper/lower case key
 			// as if it was found in the initial file,key requested
 			// this will save repeated drill down searching on every access.
-			cache_dictrec_.r(16,indictvoc);
-			cache_dictrec_.writeo(DICT,dictid);
+			cache_dictrec_.r(16, indictvoc);
+			cache_dictrec_.writeo(DICT, dictid);
 		}
 		cache_dictid_ = DICT.a(1) ^ " " ^ dictid;
 
 		//detect from the cached record if it came from dict_voc
 		//so we can choose the libdict_voc if so
-		indictvoc=cache_dictrec_.a(16);
+		indictvoc = cache_dictrec_.a(16);
 
-	}
-	else
+	} else
 		newlibfunc = false;
 
 	var dicttype = cache_dictrec_(1);
 	bool ismv = cache_dictrec_(4)[1] == "M";
 
 	// F type dictionaries
-	if (dicttype == "F")
-	{
+	if (dicttype == "F") {
 
 		// check field number is numeric
 		var fieldno = cache_dictrec_(2);
@@ -1399,30 +1246,24 @@ baddict:
 			return "";
 
 		// field no > 0
-		if (fieldno)
-		{
+		if (fieldno) {
 			if (ismv)
 				return RECORD(fieldno, MV);
 			else
 				return RECORD(fieldno);
 
 			// field no 0
-		}
-		else
-		{
+		} else {
 			var keypart = cache_dictrec_(5);
 			if (keypart && keypart.isnum())
 				return ID.field("*", keypart);
 			else
 				return ID;
 		}
-	}
-	else if (dicttype == "S")
-	{
+	} else if (dicttype == "S") {
 		// TODO deduplicate various exodusfunctorbase code spread around calculate mvipc*
 		// etc
-		if (newlibfunc)
-		{
+		if (newlibfunc) {
 
 			std::string str_libname;
 			if (indictvoc)
@@ -1439,8 +1280,7 @@ baddict:
 			//}
 
 			// if not in cache then create new one
-			if (!dict_exodusfunctorbase_)
-			{
+			if (!dict_exodusfunctorbase_) {
 				// var(cachekey).outputl("cachekey=");
 				dict_exodusfunctorbase_ = new ExodusFunctorBase;
 				dict_function_cache[cachekey] = dict_exodusfunctorbase_;
@@ -1449,19 +1289,18 @@ baddict:
 				dict_exodusfunctorbase_->mv_ = (&mv);
 
 				std::string str_funcname =
-				    ("exodusprogrambasecreatedelete_" ^ dictid.lcase()).toString();
+					("exodusprogrambasecreatedelete_" ^ dictid.lcase()).toString();
 				if (!dict_exodusfunctorbase_->initsmf(str_libname.c_str(),
-								      str_funcname.c_str()))
+													  str_funcname.c_str()))
 					throw MVError("ExodusProgramBase::calculate() Cannot find Library " +
-							  str_libname + ", or function " +
-							  dictid.lcase() + " is not present");
+								  str_libname + ", or function " +
+								  dictid.lcase() + " is not present");
 			}
 		}
 
 		// for single valued fields, inform the called routine that MV is 0
 		int savedMV;
-		if (!ismv)
-		{
+		if (!ismv) {
 			savedMV = MV;
 			MV = 0;
 		}
@@ -1472,8 +1311,8 @@ baddict:
 		// call the shared library object main function with the right args (none for
 		// dicts), returning a var std::cout<<"precal"<<std::endl;
 		ANS = CALLMEMBERFUNCTION(*(dict_exodusfunctorbase_->pobject_),
-					 ((pExodusProgramBaseMemberFunction)(
-					     dict_exodusfunctorbase_->pmemberfunction_)))();
+								 ((pExodusProgramBaseMemberFunction)(
+									 dict_exodusfunctorbase_->pmemberfunction_)))();
 		// std::cout<<"postcal"<<std::endl;
 
 		// restore the MV if necessary
@@ -1484,27 +1323,24 @@ baddict:
 	}
 
 	throw MVError("ExodusProgramBase::calculate(" ^ dictid ^ ") " ^ DICT ^ " Invalid dictionary type " ^
-			  dicttype.quote());
+				  dicttype.quote());
 	return "";
 }
 
 //unlock all
-bool ExodusProgramBase::unlockrecord() const
-{
+bool ExodusProgramBase::unlockrecord() const {
 	var xx;
-	return unlockrecord("",xx,"");
+	return unlockrecord("", xx, "");
 }
 
-bool ExodusProgramBase::unlockrecord(const var& filename, var& file0, const var& key) const
-{
+bool ExodusProgramBase::unlockrecord(const var& filename, var& file0, const var& key) const {
 	var file;
 	if (file0.unassigned())
 		file = "";
 	else
 		file = file0;
 
-	if (file == "")
-	{
+	if (file == "") {
 		var().unlockall();
 		return 1;
 	}
@@ -1520,14 +1356,12 @@ bool ExodusProgramBase::unlockrecord(const var& filename, var& file0, const var&
 	return 1;
 
 	// evade warning: unused parameter
-	if (filename)
-	{
+	if (filename) {
 	}
 	return 1;
 }
 
-void ExodusProgramBase::debug() const
-{
+void ExodusProgramBase::debug() const {
 
 	var reply;
 	std::cout << "debug():";
@@ -1537,14 +1371,12 @@ void ExodusProgramBase::debug() const
 	return;
 }
 
-bool ExodusProgramBase::fsmsg(const var& msg) const
-{
+bool ExodusProgramBase::fsmsg(const var& msg) const {
 	mssg(msg ^ var().getlasterror());
 	return false;
 }
 
-var ExodusProgramBase::sysvar(const var& var1, const var& var2, const var& var3, const var& var4)
-{
+var ExodusProgramBase::sysvar(const var& var1, const var& var2, const var& var3, const var& var4) {
 
 	std::cout << "sysvar() do nothing:";
 	//	var reply;
@@ -1552,13 +1384,11 @@ var ExodusProgramBase::sysvar(const var& var1, const var& var2, const var& var3,
 	return "";
 
 	// evade warning: unused parameter
-	if (var1 || var2 || var3 || var4)
-	{
+	if (var1 || var2 || var3 || var4) {
 	}
 }
 
-void ExodusProgramBase::setprivilege(const var& var1)
-{
+void ExodusProgramBase::setprivilege(const var& var1) {
 
 	PRIVILEGE = var1;
 	std::cout << "setprivilege(" << var1 << ") do nothing" << std::endl;
@@ -1567,15 +1397,13 @@ void ExodusProgramBase::setprivilege(const var& var1)
 	return;
 }
 
-var ExodusProgramBase::decide(const var& question, const var& options) const
-{
+var ExodusProgramBase::decide(const var& question, const var& options) const {
 	var reply = "";
 	return decide(question, options, reply, 1);
 }
 
 var ExodusProgramBase::decide(const var& questionx, const var& optionsx, var& reply,
-		const int defaultreply) const
-{
+							  const int defaultreply) const {
 
 	// If default reply is 0 then there is no default
 	// and pressing Enter returns "" and reply is set to 0
@@ -1594,8 +1422,7 @@ var ExodusProgramBase::decide(const var& questionx, const var& optionsx, var& re
 	var options = optionsx;
 	options.converter(VM ^ "|", FM ^ FM);
 	var noptions = options.dcount(FM);
-	for (int optionn = 1; optionn <= noptions; optionn++)
-	{
+	for (int optionn = 1; optionn <= noptions; optionn++) {
 		if (optionn == defaultreply)
 			std::cout << "*";
 		else
@@ -1612,20 +1439,17 @@ inp:
 
 	reply = defaultreply;
 
-	if (interactive)
-	{
+	if (interactive) {
 		reply.input("? ");
 
 		//entering ESC anywhere in the input causes "no response"
-		if(reply.index("\x1B"))
+		if (reply.index("\x1B"))
 			reply = 0;
 
 		//reply must be numeric in range
 		if (!reply.isnum())
 			goto inp;
-
 	}
-
 
 	//no input means use default which might be zero
 	if (reply == "")
@@ -1646,26 +1470,21 @@ inp:
 	}
 
 	return options.a(reply);
-
 }
 
-void ExodusProgramBase::savescreen(var& origscrn, var& origattr) const
-{
+void ExodusProgramBase::savescreen(var& origscrn, var& origattr) const {
 	std::cout << "ExodusProgramBase::savescreen not implemented" << std::endl;
 
 	// evade warning: unused parameter
-	if (origscrn || origattr)
-	{
+	if (origscrn || origattr) {
 	}
 }
 
-var ExodusProgramBase::keypressed(int milliseconds) const
-{
+var ExodusProgramBase::keypressed(int milliseconds) const {
 	return var().hasinput(milliseconds);
 }
 
-bool ExodusProgramBase::esctoexit() const
-{
+bool ExodusProgramBase::esctoexit() const {
 	if (not keypressed())
 		return false;
 
@@ -1683,38 +1502,32 @@ bool ExodusProgramBase::esctoexit() const
 	return key[-1].ucase() == "N";
 }
 
-var ExodusProgramBase::otherusers(const var& param)
-{
+var ExodusProgramBase::otherusers(const var& param) {
 	std::cout << "ExodusProgramBase::otherusers not implemented yet";
 	return var("");
 
 	// evade warning: unused parameter
-	if (param)
-	{
+	if (param) {
 	}
 }
 
-var ExodusProgramBase::otherdatasetusers(const var& param)
-{
+var ExodusProgramBase::otherdatasetusers(const var& param) {
 	std::cout << "ExodusProgramBase::otherdatausers not implemented yet";
 	return var("");
 
 	// evade warning: unused parameter
-	if (param)
-	{
+	if (param) {
 	}
 }
 
-bool ExodusProgramBase::lockrecord(const var& filename, var& file, const var& keyx) const
-{
+bool ExodusProgramBase::lockrecord(const var& filename, var& file, const var& keyx) const {
 	var record;
 	return (bool)lockrecord(filename, file, keyx, record);
 }
 
 bool ExodusProgramBase::lockrecord(const var& filename, var& file, const var& keyx,
-				   const var& recordx, const int waitsecs0,
-				   const bool allowduplicate) const
-{
+								   const var& recordx, const int waitsecs0,
+								   const bool allowduplicate) const {
 
 	// linemark
 	// common /shadow.mfs/
@@ -1729,60 +1542,54 @@ bool ExodusProgramBase::lockrecord(const var& filename, var& file, const var& ke
 	// if index(file,'message',1) else de bug
 	int waitsecs = waitsecs0;
 
-	if (file.unassigned())
-	{
-		if (not file.open(filename))
-		{
-			call mssg(filename.quote()^" cannot be opened in LOCKRECORD "^keyx);
+	if (file.unassigned()) {
+		if (not file.open(filename)) {
+			call mssg(filename.quote() ^ " cannot be opened in LOCKRECORD " ^ keyx);
 			var().abort();
 		}
 	}
 
 lock:
 	var locked = file.lock(keyx);
-	if (locked || (allowduplicate && locked eq ""))
-	{
+	if (locked || (allowduplicate && locked eq "")) {
 
 		// fail if unexpired persistent lock exists in LOCKS file
-        // on the same connection as file
+		// on the same connection as file
 
-        var locks;
-        if (locks.open("LOCKS",file)) {
+		var locks;
+		if (locks.open("LOCKS", file)) {
 
 			var filename_for_locks = (filename.assigned() && filename) ? filename : file.a(1);
-            var lockfilekey = filename_for_locks ^ "*" ^ keyx;
+			var lockfilekey = filename_for_locks ^ "*" ^ keyx;
 
-            var lockrec;
-            if (lockrec.read(locks, lockfilekey)) {
+			var lockrec;
+			if (lockrec.read(locks, lockfilekey)) {
 
-                //current dos time
-                //convert to Windows based date/time (ndays since 1/1/1900)
-                //31/12/67 in rev date() format equals 24837 in windows date format
-                var dostime = var().ostime();
-                dostime = 24837 + var().date() + dostime / 24 / 3600;
+				//current dos time
+				//convert to Windows based date/time (ndays since 1/1/1900)
+				//31/12/67 in rev date() format equals 24837 in windows date format
+				var dostime = var().ostime();
+				dostime = 24837 + var().date() + dostime / 24 / 3600;
 
-                //remove lock if expired
-                if (lockrec.a(1) <= dostime) {
-                    locks.deleterecord(lockfilekey);
-                    lockrec = "";
-                }
+				//remove lock if expired
+				if (lockrec.a(1) <= dostime) {
+					locks.deleterecord(lockfilekey);
+					lockrec = "";
+				}
 
-                //or release any absolute lock
-                //and return indication of lock failure
-                else {
-                    if (locked)
-                        file.unlock(keyx);
-                    return 0;
-                }
-            }
-        }
+				//or release any absolute lock
+				//and return indication of lock failure
+				else {
+					if (locked)
+						file.unlock(keyx);
+					return 0;
+				}
+			}
+		}
 
 		return 1;
-	}
-	else
-	{
-		if (waitsecs)
-		{
+	} else {
+		if (waitsecs) {
 			var().ossleep(1000);
 			waitsecs -= 1;
 			goto lock;
@@ -1796,43 +1603,29 @@ lock:
 	return true;
 }
 
-var ExodusProgramBase::singular(const var& pluralnoun)
-{
+var ExodusProgramBase::singular(const var& pluralnoun) {
 
 	var temp = pluralnoun;
 
-	if (temp.substr(-2, 2) == "ES")
-	{
+	if (temp.substr(-2, 2) == "ES") {
 
 		// companies=company
-		if (temp.substr(-3, 3) == "IES")
-		{
+		if (temp.substr(-3, 3) == "IES") {
 			temp.splicer(-3, 3, "Y");
 
 			// addresses=address
-		}
-		else if (temp.substr(-4, 4) == "SSES")
-		{
+		} else if (temp.substr(-4, 4) == "SSES") {
 			temp.splicer(-2, 2, "");
-		}
-		else if (temp.substr(-4, 4) == "SHES")
-		{
+		} else if (temp.substr(-4, 4) == "SHES") {
 			temp.splicer(-2, 2, "");
-		}
-		else if (temp.substr(-4, 4) == "CHES")
-		{
+		} else if (temp.substr(-4, 4) == "CHES") {
 			temp.splicer(-2, 2, "");
-		}
-		else if (1)
-		{
+		} else if (1) {
 			temp.splicer(-1, 1, "");
 		}
-	}
-	else
-	{
+	} else {
 
-		if (temp[-1] == "S")
-		{
+		if (temp[-1] == "S") {
 			// analysis, dos
 			if (temp.substr(-2, 2) != "IS" && temp.substr(-2, 2) != "OS")
 				temp.splicer(-1, 1, "");
@@ -1842,22 +1635,19 @@ var ExodusProgramBase::singular(const var& pluralnoun)
 	return temp;
 }
 
-void ExodusProgramBase::flushindex(const var& /*filename*/)
-{
+void ExodusProgramBase::flushindex(const var& /*filename*/) {
 	//std::cout << "ExodusProgramBase::std::flushindex not implemented yet, " << filename
 	//	  << std::endl;
 	return;
 }
 
-var ExodusProgramBase::encrypt2(const var& encrypt0) const
-{
+var ExodusProgramBase::encrypt2(const var& encrypt0) const {
 
 	var encrypt = encrypt0;
 	var encryptkey = 1234567;
 
 	// pass1
-	while (true)
-	{
+	while (true) {
 		// BREAK;
 		if (!(encrypt != ""))
 			break;
@@ -1867,8 +1657,7 @@ var ExodusProgramBase::encrypt2(const var& encrypt0) const
 	} // loop;
 
 	// pass2
-	while (true)
-	{
+	while (true) {
 		encrypt ^= var().chr(65 + (encryptkey % 50));
 		encryptkey = (encryptkey / 50).floor();
 		// BREAK;
@@ -1880,18 +1669,14 @@ var ExodusProgramBase::encrypt2(const var& encrypt0) const
 	return encrypt;
 }
 
-var ExodusProgramBase::xmlquote(const var& string0) const
-{
+var ExodusProgramBase::xmlquote(const var& string0) const {
 
 	var string1;
 
-	if (string0.unassigned())
-	{
+	if (string0.unassigned()) {
 		// de bug
 		string1 = "UNASSIGNED";
-	}
-	else
-	{
+	} else {
 		string1 = string0;
 	}
 
@@ -1906,12 +1691,10 @@ var ExodusProgramBase::xmlquote(const var& string0) const
 	return string1.quote();
 }
 
-var ExodusProgramBase::loginnet(const var& dataset, const var& username, var& cookie, var& msg)
-{
+var ExodusProgramBase::loginnet(const var& dataset, const var& username, var& cookie, var& msg) {
 
 	// evade warning: unused parameter
-	if (false && dataset)
-	{
+	if (false && dataset) {
 	}
 
 	var menuid;
@@ -1922,24 +1705,18 @@ var ExodusProgramBase::loginnet(const var& dataset, const var& username, var& co
 	// this is a custom login routine called from listen2
 	cookie = "";
 	var menus;
-	if (!menus.open("ADMENUS"))
-	{
-		if (!menus.open("MENUS") && username != "EXODUS")
-		{
+	if (!menus.open("ADMENUS")) {
+		if (!menus.open("MENUS") && username != "EXODUS") {
 			msg = "Error: Cannot open MENUS file";
 			return false;
 		}
 	}
 
 	// return allowable menus
-	if (username == "EXODUS")
-	{
+	if (username == "EXODUS") {
 		menuid = "ADAGENCY";
-	}
-	else
-	{
-		if (!(SECURITY.a(1).locate(username, usern)))
-		{
+	} else {
+		if (!(SECURITY.a(1).locate(username, usern))) {
 			msg = "Error: " ^ username.quote() ^ " user is missing";
 			return false;
 		}
@@ -1947,29 +1724,24 @@ var ExodusProgramBase::loginnet(const var& dataset, const var& username, var& co
 	}
 
 	var menu = "";
-	if (!menu.read(menus, menuid))
-	{
-		if (username == "EXODUS")
-		{
-			if (!menu.read(menus, "EXODUS"))
-			{
+	if (!menu.read(menus, menuid)) {
+		if (username == "EXODUS") {
+			if (!menu.read(menus, "EXODUS")) {
 				menu = FM ^ FM ^ FM ^ FM ^ FM ^
-				       "MEDIA|ADPRODUCTION|ACCS|ANALMENU|TIMESHEETS|FILESMENU|"
-				       "GENERAL|EXIT2";
+					   "MEDIA|ADPRODUCTION|ACCS|ANALMENU|TIMESHEETS|FILESMENU|"
+					   "GENERAL|EXIT2";
 				menu = menu.converter("|", VM);
 			}
 		}
 	}
-	if (!menu)
-	{
+	if (!menu) {
 		msg = "Error: " ^ menuid.quote() ^ " menu is missing";
 		return false;
 	}
 
 	var menucodes = menu.a(6) ^ VM ^ "HELP";
 	// remove local support menu
-	if (!authorised("SUPPORT MENU ACCESS", msg, "LS"))
-	{
+	if (!authorised("SUPPORT MENU ACCESS", msg, "LS")) {
 		if (menucodes.a(1).locate("GENERA", menun))
 			// menucodes.eraser(1, menun, 0);
 			menucodes.remover(1, menun, 0);
@@ -2054,41 +1826,32 @@ var ExodusProgramBase::loginnet(const var& dataset, const var& username, var& co
 	 */
 }
 
-var ExodusProgramBase::AT(const int code) const
-{
+var ExodusProgramBase::AT(const int code) const {
 	// should depend on terminal type
 	return var().at(code);
 }
 
-var ExodusProgramBase::AT(const int x, const int y) const
-{
+var ExodusProgramBase::AT(const int x, const int y) const {
 	// should depend on terminal type
 	return var().at(x, y);
 }
 
-var ExodusProgramBase::handlefilename(const var& handle)
-{
+var ExodusProgramBase::handlefilename(const var& handle) {
 	return handle.a(1);
 }
 
-var ExodusProgramBase::memspace([[maybe_unused]] const var& requiredmemory)
-{
+var ExodusProgramBase::memspace([[maybe_unused]] const var& requiredmemory) {
 	return 999999999;
 }
 
-var ExodusProgramBase::getuserdept(const var& usercode)
-{
+var ExodusProgramBase::getuserdept(const var& usercode) {
 	// locate the user in the list of users
 	var usern;
-	if (!(SECURITY.a(1).locate(usercode, usern)))
-	{
-		if (usercode == "EXODUS")
-		{
+	if (!(SECURITY.a(1).locate(usercode, usern))) {
+		if (usercode == "EXODUS") {
 			ANS = "EXODUS";
 			return ANS;
-		}
-		else
-		{
+		} else {
 			ANS = "";
 			return ANS;
 		}
@@ -2097,8 +1860,7 @@ var ExodusProgramBase::getuserdept(const var& usercode)
 	// locate divider, or usern+1
 	var nusers = (SECURITY.a(1)).count(VM) + 1;
 	var usernx;
-	for (usernx = 1; usernx <= nusers; usernx++)
-	{
+	for (usernx = 1; usernx <= nusers; usernx++) {
 		// BREAK;
 		if (SECURITY.a(1, usernx) == "---")
 			break;
@@ -2111,8 +1873,7 @@ var ExodusProgramBase::getuserdept(const var& usercode)
 	return ANS;
 }
 
-var ExodusProgramBase::oconv(const var& input0, const var& conversion)
-{
+var ExodusProgramBase::oconv(const var& input0, const var& conversion) {
 
 	// call user conversion routine
 	// almost identical code in var::oconv and var::iconv
@@ -2127,15 +1888,13 @@ var ExodusProgramBase::oconv(const var& input0, const var& conversion)
 
 	var ptr = 1;
 	var delimiter;
-	do
-	{
+	do {
 
 		// var subconversion=conversion.remove(ptr,delimiter);
 		var subconversion = conversion.substr2(ptr, delimiter);
 
 		// EITHER call standard conversion methods
-		if (subconversion[1] != "[")
-		{
+		if (subconversion[1] != "[") {
 			result = result.oconv(subconversion);
 		}
 
@@ -2157,13 +1916,13 @@ var ExodusProgramBase::oconv(const var& input0, const var& conversion)
 			//remove brackets
 			subconversion.substrer(2);
 			if (subconversion[-1] == "]")
-				subconversion.splicer(-1,1,"");
+				subconversion.splicer(-1, 1, "");
 
 			//determine the function name
 			var functionname = subconversion.field(",").lcase();
 
 			// extract any params
-			var mode = subconversion.substr(functionname.length()+2);
+			var mode = subconversion.substr(functionname.length() + 2);
 
 			var output;
 
@@ -2188,19 +1947,17 @@ var ExodusProgramBase::oconv(const var& input0, const var& conversion)
 				output = "";
 				while (true) {
 
-					ifield=result.substr2(posn, delim);
+					ifield = result.substr2(posn, delim);
 
 					call ioconv_custom("OCONV", ifield, mode, ofield);
 
-				    output ^= ofield;
+					output ^= ofield;
 
 					if (not delim)
 						break;
 
 					output ^= var().chr(RM.seq() + 1 - delim);
-
 				}
-
 			}
 			result = output;
 		}
@@ -2209,8 +1966,7 @@ var ExodusProgramBase::oconv(const var& input0, const var& conversion)
 	return result;
 }
 
-var ExodusProgramBase::iconv(const var& input, const var& conversion)
-{
+var ExodusProgramBase::iconv(const var& input, const var& conversion) {
 
 	// call user conversion routine
 	// almost identical code in var::oconv and var::iconv
@@ -2219,15 +1975,13 @@ var ExodusProgramBase::iconv(const var& input, const var& conversion)
 	var result = input;
 	var ptr = 1;
 	var delimiter;
-	do
-	{
+	do {
 
 		// var subconversion=conversion.remove(ptr,delimiter);
 		var subconversion = conversion.substr2(ptr, delimiter);
 
 		// either call custom conversion routines
-		if (subconversion[1] == "[")
-		{
+		if (subconversion[1] == "[") {
 
 			// extract any params
 			var mode = subconversion.field(",", 2, 9999).field("]", 1);
@@ -2244,9 +1998,7 @@ var ExodusProgramBase::iconv(const var& input, const var& conversion)
 			result = output;
 
 			// or call standard conversion methods
-		}
-		else
-		{
+		} else {
 			result = result.iconv(subconversion);
 		}
 	} while (delimiter);
@@ -2254,44 +2006,42 @@ var ExodusProgramBase::iconv(const var& input, const var& conversion)
 	return result;
 }
 
-var ExodusProgramBase::invertarray(const var& input, const var& force0/*=0*/)
-{
-        //c sys in,=(0)
+var ExodusProgramBase::invertarray(const var& input, const var& force0 /*=0*/) {
+	//c sys in,=(0)
 
-	var force=force0.unassigned() ? var(0) : force0;
+	var force = force0.unassigned() ? var(0) : force0;
 
-        var output = "";
-        var nfs = input.count(FM) + (input ne "");
-        //for force to work, the first field must have full number of vns
-        var maxnvs = 0;
-        for (var fn = 1; fn <= nfs; ++fn) {
-                var fieldx = input.field(FM, fn);
-                if (fieldx.length() or force) {
-                        var nvs = fieldx.count(VM) + 1;
-                        if (force) {
-                                if (nvs > maxnvs) {
-                                        maxnvs = nvs;
-                                }
-                        }else{
-                                maxnvs = nvs;
-                        }
-                        for (var vn = 1; vn <= maxnvs; ++vn) {
-                                var cell = fieldx.field(VM, vn);
-                                if (cell.length() or force) {
-                                        output.r(vn, fn, cell);
-                                }
-                        };//vn;
-                }
-        };//fn;
+	var output = "";
+	var nfs = input.count(FM) + (input ne "");
+	//for force to work, the first field must have full number of vns
+	var maxnvs = 0;
+	for (var fn = 1; fn <= nfs; ++fn) {
+		var fieldx = input.field(FM, fn);
+		if (fieldx.length() or force) {
+			var nvs = fieldx.count(VM) + 1;
+			if (force) {
+				if (nvs > maxnvs) {
+					maxnvs = nvs;
+				}
+			} else {
+				maxnvs = nvs;
+			}
+			for (var vn = 1; vn <= maxnvs; ++vn) {
+				var cell = fieldx.field(VM, vn);
+				if (cell.length() or force) {
+					output.r(vn, fn, cell);
+				}
+			}; //vn;
+		}
+	}; //fn;
 
-        return output;
+	return output;
 }
 
 //automatic upto date/time
-var ExodusProgramBase::elapsedtimetext(const var& fromdate, const var& fromtime)
-{
-	var uptodate,uptotime;
-	return elapsedtimetext(fromdate,fromtime,uptodate,uptotime);
+var ExodusProgramBase::elapsedtimetext(const var& fromdate, const var& fromtime) {
+	var uptodate, uptotime;
+	return elapsedtimetext(fromdate, fromtime, uptodate, uptotime);
 }
 
 //given from and to
@@ -2321,7 +2071,7 @@ var ExodusProgramBase::elapsedtimetext(const var& fromdate, const var& fromtime,
 	//so the 2nd time is less than the first
 	if (nsecs < 0) {
 		nsecs += 86400;
-		}
+	}
 
 	var weeks = (nsecs / 604800).floor();
 	nsecs -= weeks * 604800;
@@ -2363,7 +2113,7 @@ var ExodusProgramBase::elapsedtimetext(const var& fromdate, const var& fromtime,
 		if (nsecs) {
 			if (minutes or (nsecs - 10 > 0)) {
 				nsecs = nsecs.oconv("MD00P");
-			}else{
+			} else {
 				nsecs = (nsecs.oconv("MD40P")) + 0;
 				if (nsecs[1] == ".") {
 					nsecs.splicer(1, 0, "0");
@@ -2375,12 +2125,12 @@ var ExodusProgramBase::elapsedtimetext(const var& fromdate, const var& fromtime,
 					text ^= "s";
 				}
 			} else if (not(minutes)) {
-zero:
+			zero:
 				text.r(-1, "< 1 msec");
 			} else {
 				text.r(-1, "exactly");
 			}
-		}else{
+		} else {
 			if (not(minutes)) {
 				goto zero;
 			}
@@ -2396,7 +2146,7 @@ zero:
 }
 
 var ExodusProgramBase::number(const var& type, const var& input0, const var& ndecs0, var& output) {
-//function main(in type, in input0, in ndecs0, out output) {
+	//function main(in type, in input0, in ndecs0, out output) {
 	//c xxx in,in,in,out
 
 	//WARNING IF YOU CHANGE THIS THEN ADECOM GOES TO MODULE xxx and libexodus
@@ -2405,8 +2155,8 @@ var ExodusProgramBase::number(const var& type, const var& input0, const var& nde
 	//~/arev/xxx/number.cpp to ~/exodus/cli/src
 
 	var fmtx;
-	var input1;//num
-	var delim;//num
+	var input1; //num
+	var delim;	//num
 	var output1;
 
 	var ndecs = ndecs0;
@@ -2424,8 +2174,8 @@ var ExodusProgramBase::number(const var& type, const var& input0, const var& nde
 		if (input[1] eq "/") {
 			reciprocal = 1;
 			input.splicer(1, 1, "");
-			}else{
-			if (input.substr(1,2) eq "1/") {
+		} else {
+			if (input.substr(1, 2) eq "1/") {
 				reciprocal = 1;
 				input.splicer(1, 2, "");
 			}
@@ -2434,18 +2184,18 @@ var ExodusProgramBase::number(const var& type, const var& input0, const var& nde
 		output = input.trim();
 
 		//first get into a revelation number with dots not commas
-		if (BASEFMT.substr(1,2) eq "MC") {
+		if (BASEFMT.substr(1, 2) eq "MC") {
 			output.converter(",", ".");
-		}else{
+		} else {
 			output.converter(",", "");
 		}
-	//nb [NUMBER,X] means no decimal place conversion to be done
+		//nb [NUMBER,X] means no decimal place conversion to be done
 		//if ndecs is given then convert to that number of decimals
 		// if ndecs starts with a digit then use {NDECS} (use 2 if {NDECS}=null)
 		if (ndecs eq "") {
 			if (DICT) {
 				ndecs = calculate("NDECS");
-			}else{
+			} else {
 				ndecs = BASEFMT[3];
 			}
 			if (ndecs eq "") {
@@ -2461,7 +2211,7 @@ var ExodusProgramBase::number(const var& type, const var& input0, const var& nde
 		}
 		if (ndecs eq "BASE") {
 			fmtx = "MD" ^ BASEFMT[3] ^ "0P";
-		}else{
+		} else {
 			fmtx = "MD" ^ ndecs ^ "0P";
 		}
 		output = oconv(output, fmtx);
@@ -2470,7 +2220,7 @@ var ExodusProgramBase::number(const var& type, const var& input0, const var& nde
 			if (reciprocal and output) {
 				output = ((1 / output).oconv("MD90P")) + 0;
 			}
-		}else{
+		} else {
 			STATUS = 2;
 		}
 
@@ -2487,18 +2237,18 @@ var ExodusProgramBase::number(const var& type, const var& input0, const var& nde
 
 	var posn = 1;
 	while (true) {
-		input1=input.substr2(posn, delim);
+		input1 = input.substr2(posn, delim);
 
 		var perc = input1[-1];
 		if (perc eq "%") {
 			input1.splicer(-1, 1, "");
-		}else{
+		} else {
 			perc = "";
 		}
 		var plus = input1[1];
 		if (plus eq "+") {
 			input1.splicer(1, 1, "");
-		}else{
+		} else {
 			plus = "";
 		}
 
@@ -2517,22 +2267,21 @@ var ExodusProgramBase::number(const var& type, const var& input0, const var& nde
 			var temp = input1;
 			temp.converter("0123456789-.", "            ");
 			var numlen = input1.length() - temp.trimf().length();
-			var unitx = input1.substr(numlen + 1,99);
-			var numx = input1.substr(1,numlen);
+			var unitx = input1.substr(numlen + 1, 99);
+			var numx = input1.substr(1, numlen);
 
 			if (ndecs eq "BASE") {
 				output1 = oconv(numx, BASEFMT ^ zz) ^ unitx;
-			}else{
+			} else {
 				if (ndecs eq "") {
 					ndecs = numx.field(".", 2).length();
 				}
 				//ndecs could be X to mean no conversion at all!
-				fmtx = BASEFMT.substr(1,2) ^ ndecs ^ "0P," ^ zz;
+				fmtx = BASEFMT.substr(1, 2) ^ ndecs ^ "0P," ^ zz;
 				if (numx.isnum()) {
 					numx += 0;
 				}
 				output1 = oconv(numx, fmtx) ^ unitx;
-
 			}
 
 			if (output1.length()) {
@@ -2545,16 +2294,17 @@ var ExodusProgramBase::number(const var& type, const var& input0, const var& nde
 		}
 
 		///BREAK;
-		if (not delim) break;
+		if (not delim)
+			break;
 		//output:=char(256-delim)
 		output ^= var().chr(RM.seq() + 1 - delim);
-	}//loop;
+	} //loop;
 
 	return 0;
 }
 
 void ExodusProgramBase::sortarray(var& array, const var& fns, const var& orderby0) {
-//function main(io array, in fns=0, in orderby0="") {
+	//function main(io array, in fns=0, in orderby0="") {
 	//c sys io,0,""
 
 	//sorts one or more parallel mved fields in a record
@@ -2575,7 +2325,7 @@ void ExodusProgramBase::sortarray(var& array, const var& fns, const var& orderby
 
 	if (orderby0.unassigned()) {
 		orderby = "AL";
-	}else{
+	} else {
 		orderby = orderby0;
 	}
 
@@ -2590,8 +2340,9 @@ void ExodusProgramBase::sortarray(var& array, const var& fns, const var& orderby
 	var nv = unsorted.count(VM) + (unsorted ne "");
 	for (var vn = 1; vn <= nv; ++vn) {
 		var value = unsorted.a(1, vn);
-		if (not(sorted.locateby(orderby,value,newvn))) {
-			{}
+		if (not(sorted.locateby(orderby, value, newvn))) {
+			{
+			}
 		}
 		sorted.inserter(1, newvn, value);
 
@@ -2600,9 +2351,9 @@ void ExodusProgramBase::sortarray(var& array, const var& fns, const var& orderby
 			fn = fns.a(1, fnn);
 			var othervalue = array.a(fn, vn);
 			newarray.inserter(fn, newvn, othervalue);
-		};//fnn;
+		}; //fnn;
 
-	};//vn;
+	}; //vn;
 
 	array.r(sortfn, sorted);
 
@@ -2610,7 +2361,7 @@ void ExodusProgramBase::sortarray(var& array, const var& fns, const var& orderby
 	for (var fnn = 2; fnn <= nfns; ++fnn) {
 		fn = fns.a(1, fnn);
 		array.r(fn, newarray.a(fn));
-	};//fnn;
+	}; //fnn;
 
 	return;
 }

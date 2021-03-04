@@ -65,29 +65,25 @@ boost::thread_specific_ptr<int> tss_environmentns;
 
 // for mingw
 
-namespace exodus
-{
+namespace exodus {
 
 // defined in MVdbPostgres
 extern boost::thread_specific_ptr<PGconn> tss_pgconns;
 extern boost::thread_specific_ptr<var> tss_pgconnparams;
 extern boost::thread_specific_ptr<bool> tss_ipcstarted;
 
-int getenvironmentn()
-{
+int getenvironmentn() {
 	if (!tss_environmentns.get())
 		return 0;
 	return *tss_environmentns.get();
 }
 
-void setenvironmentn(const int environmentn)
-{
+void setenvironmentn(const int environmentn) {
 	tss_environmentns.reset(new int(environmentn));
 	return;
 }
 
-bool startipc()
-{
+bool startipc() {
 
 	// flag that ipc is started in this thread
 	tss_ipcstarted.reset(new bool(true));
@@ -123,8 +119,7 @@ bool startipc()
 }
 
 void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsechars,
-			  std::string& response, ExodusFunctorBase& exodusfunctorbase)
-{
+						  std::string& response, ExodusFunctorBase& exodusfunctorbase) {
 
 	// TODO make independent of int size and byte ordering
 	// otherwise we are restricted to accessing servers
@@ -148,8 +143,7 @@ void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsec
 	response = "EXODUS_IPC_ERROR: ";
 
 	// check it agrees with the number of bytes read from the pipe and fail if it doesnt
-	if (request_size <= 0)
-	{
+	if (request_size <= 0) {
 		response = "";
 #if TRACING >= 2
 		// std::wclog<<L"*";
@@ -158,24 +152,20 @@ void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsec
 	}
 
 	// TODO resolve warning: comparison between signed and unsigned integer expressions
-	else if (totlength != int(request_size))
-	{
+	else if (totlength != int(request_size)) {
 		var reply = response ^ L" Only " ^ int(request_size) ^ L" bytes read. Should be " ^
-			    totlength;
+					totlength;
 		std::cerr << reply << std::endl;
 		response = reply.toString();
 		return;
 	}
 
-	else if (!exodusfunctorbase.mv_)
-	{
+	else if (!exodusfunctorbase.mv_) {
 		var reply = response ^ L" MvEnvironment is not initialised";
 		std::cerr << reply << std::endl;
 		response = reply.toString();
 		return;
-	}
-	else
-	{
+	} else {
 #if TRACING >= 2
 		std::wclog << L".";
 #endif
@@ -257,16 +247,13 @@ void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsec
 		/////////////////////////////////////////////////////////////////////////////
 		{
 			var reply = response ^ L"Cannot find Library " ^ str_libname ^
-				    L", or function " ^ str_funcname ^ L" is not present";
+						L", or function " ^ str_funcname ^ L" is not present";
 			std::cerr << reply << std::endl;
 			response = reply.toString();
 			return;
-		}
-		else
-		{
+		} else {
 
-			try
-			{
+			try {
 
 				exodusfunctorbase.mv_->ANS = exodusfunctorbase.callsmf();
 /////////////////////////////
@@ -283,33 +270,28 @@ void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsec
 
 				// optionally limit the number of bytes of the reply sent
 				int nresponsebytes = (int)response.length();
-				if (maxresponsechars && nresponsebytes > maxresponsechars)
-				{
+				if (maxresponsechars && nresponsebytes > maxresponsechars) {
 					var reply = var(L"EXODUS_IPC_ERROR: Response bytes) " ^
-							var(nresponsebytes) ^
-							L" too many for ipc buffer bytes " ^
-							var(maxresponsechars)) ^
-						    " while calling " ^ str_libname ^ ", " ^
-						    str_funcname;
+									var(nresponsebytes) ^
+									L" too many for ipc buffer bytes " ^
+									var(maxresponsechars)) ^
+								" while calling " ^ str_libname ^ ", " ^
+								str_funcname;
 					std::cerr << reply << std::endl;
 					response = reply.toString();
 					return;
 				}
 
 				return;
-			}
-			catch (MVError mve)
-			{
+			} catch (MVError mve) {
 				var reply = response ^ "ERROR: Calling " ^ str_libname ^ ", " ^
-					    str_funcname ^ L". ERROR: " ^ mve.description;
+							str_funcname ^ L". ERROR: " ^ mve.description;
 				std::cerr << reply << std::endl;
 				response = reply.toString();
 				return;
-			}
-			catch (...)
-			{
+			} catch (...) {
 				var reply = response ^ "ERROR: Calling " ^ str_libname ^ ", " ^
-					    str_funcname;
+							str_funcname;
 				std::cerr << reply << std::endl;
 				response = reply.toString();
 				return;

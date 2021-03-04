@@ -9,8 +9,7 @@
 
 void __stdcall GetSystemTimeAsFileTime(FILETIME*);
 
-void gettimeofday(struct timeval* p, void* tz /* IGNORED */)
-{
+void gettimeofday(struct timeval* p, void* tz /* IGNORED */) {
 	union {
 		long long ns100; /*time since 1 Jan 1601 in 100ns units */
 		FILETIME ft;

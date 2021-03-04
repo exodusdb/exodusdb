@@ -1,13 +1,12 @@
-#include <unistd.h>
 #include <termios.h>
+#include <unistd.h>
 
 #include <mv.h>
 
 namespace exodus {
 
 //echo on=1 off=0
-bool var::echo(const int on_off) const
-{
+bool var::echo(const int on_off) const {
 
 	// Probably not available if running as a service or in a pipe
 	struct termios curtio;
@@ -33,4 +32,4 @@ bool var::echo(const int on_off) const
 	return true;
 }
 
-}//namespace
+} // namespace exodus

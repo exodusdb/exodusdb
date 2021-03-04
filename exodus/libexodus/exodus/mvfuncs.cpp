@@ -63,31 +63,29 @@ bool desynced_with_stdio = false;
 
 // TODO check that all string increase operations dont crash the system
 
-namespace exodus
-{
+namespace exodus {
 
-int var::localeAwareCompare(const std::string& str1, const std::string& str2)
-{
+int var::localeAwareCompare(const std::string& str1, const std::string& str2) {
 	// https://www.boost.org/doc/libs/1_70_0/libs/locale/doc/html/collation.html
 	// eg ensure lower case sorts before uppercase (despite "A" \x41 is less than "a" \x61)
 	init_boost_locale1();
 
-        // Level
-        // 0 = primary – ignore accents and character case, comparing base letters only. For example "facade"
-        // and "Façade" are the same.
-        // 1 = secondary – ignore character case but consider accents. "facade" and
-        // "façade" are different but "Façade" and "façade" are the same.
-        // 3 = tertiary – consider both case and
-        // accents: "Façade" and "façade" are different. Ignore punctuation.
-        // 4 = quaternary – consider all case,
-        // accents, and punctuation. The words must be identical in terms of Unicode representation.
-        // 5 = identical – as quaternary, but compare code points as well.
-        //#define COMP_LEVEL identical
+	// Level
+	// 0 = primary – ignore accents and character case, comparing base letters only. For example "facade"
+	// and "Façade" are the same.
+	// 1 = secondary – ignore character case but consider accents. "facade" and
+	// "façade" are different but "Façade" and "façade" are the same.
+	// 3 = tertiary – consider both case and
+	// accents: "Façade" and "façade" are different. Ignore punctuation.
+	// 4 = quaternary – consider all case,
+	// accents, and punctuation. The words must be identical in terms of Unicode representation.
+	// 5 = identical – as quaternary, but compare code points as well.
+	//#define COMP_LEVEL identical
 
 #define COMP_LEVEL identical
 
-	int result=std::use_facet<boost::locale::collator<char>>(tls_boost_locale1)
-	    .compare(boost::locale::collator_base::COMP_LEVEL, str1, str2);
+	int result = std::use_facet<boost::locale::collator<char>>(tls_boost_locale1)
+					 .compare(boost::locale::collator_base::COMP_LEVEL, str1, str2);
 
 	//var(str1).outputl("str1=");
 	//var(str2).outputl("str2=");
@@ -98,16 +96,14 @@ int var::localeAwareCompare(const std::string& str1, const std::string& str2)
 
 var var::version() const { return var(__DATE__).iconv("D").oconv("D") ^ " " ^ var(__TIME__); }
 
-bool var::eof() const
-{
+bool var::eof() const {
 	// THISIS("bool var::eof() const")
 	// THISISDEFINED()
 
 	return (std::cin.eof());
 }
 
-bool var::hasinput(int milliseconds)
-{
+bool var::hasinput(int milliseconds) {
 	//declare in haskey.cpp
 	bool haskey(int milliseconds);
 
@@ -117,8 +113,7 @@ bool var::hasinput(int milliseconds)
 }
 
 //binary safe version (except nl/eof?) with little or no editing except backspace and no default
-var& var::input()
-{
+var& var::input() {
 	THISIS("bool var::input()")
 	THISISDEFINED()
 
@@ -136,15 +131,14 @@ var& var::input()
 
 // input with prompt allows default value and editing
 // but is not binary safe because we allow line editing when there is a prompt (even if empty)
-var& var::input(const var& prompt)
-{
+var& var::input(const var& prompt) {
 	THISIS("bool var::input(const var& prompt")
 	THISISDEFINED()
 	ISSTRING(prompt)
 
 	//LOCKIOSTREAM
 
-	var default_input=this->assigned() ? (*this) : "";
+	var default_input = this->assigned() ? (*this) : "";
 
 	this->var_str.clear();
 	this->var_typ = VARTYP_STR;
@@ -161,12 +155,12 @@ var& var::input(const var& prompt)
 	//linux terminal input line editing
 	else {
 		//swap double quotes with \"
-		default_input.swapper("\"","\\\"");
-		var cmd="bash -c 'read -i " ^ default_input.quote() ^ " -e EXO_TEMP_READ && printf \"%s\" \"$EXO_TEMP_READ\"'";
+		default_input.swapper("\"", "\\\"");
+		var cmd = "bash -c 'read -i " ^ default_input.quote() ^ " -e EXO_TEMP_READ && printf \"%s\" \"$EXO_TEMP_READ\"'";
 		//cmd.outputl("cmd=");
 		this->osshellread(cmd);
 		if ((*this) == "")
-			std::cout<<std::endl;
+			std::cout << std::endl;
 	}
 
 	return *this;
@@ -174,8 +168,7 @@ var& var::input(const var& prompt)
 
 // for nchars, use int instead of var to trigger error at point of calling not here
 // not binary safe if nchars = 0 because we allow line editing assuming terminal console
-var& var::inputn(const int nchars)
-{
+var& var::inputn(const int nchars) {
 	THISIS("bool var::inputn(const int nchars")
 	THISISDEFINED()
 
@@ -189,11 +182,9 @@ var& var::inputn(const int nchars)
 
 	//input whatever characters are available into this var a return true if more than none
 	// quit if error or EOF
-	if (nchars < 0)
-	{
+	if (nchars < 0) {
 
-		for (;;)
-		{
+		for (;;) {
 			int int1;
 			{
 				//LOCKIOSTREAM
@@ -209,11 +200,9 @@ var& var::inputn(const int nchars)
 	}
 
 	//input a certain number of characters input this var and return true if more than none
-	else if (nchars > 0)
-	{
+	else if (nchars > 0) {
 
-		for (;;)
-		{
+		for (;;) {
 			int int1;
 			{
 				//LOCKIOSTREAM
@@ -222,8 +211,7 @@ var& var::inputn(const int nchars)
 
 			// try again after a short delay if no key and not enough characters yet
 			// TODO implement as poll/epoll/select
-			if (int1 < 0)
-			{
+			if (int1 < 0) {
 				this->ossleep(100);
 				continue;
 			}
@@ -241,16 +229,14 @@ var& var::inputn(const int nchars)
 				break;
 		}
 
-	}
-	else {
+	} else {
 		this->input();
 	}
 
 	return *this;
 }
 
-void var::stop(const var& text) const
-{
+void var::stop(const var& text) const {
 	THISIS("void var::stop(const var& text) const")
 	ISSTRING(text)
 
@@ -265,8 +251,7 @@ void var::stop(const var& text) const
 }
 */
 
-void var::abort(const var& text) const
-{
+void var::abort(const var& text) const {
 	THISIS("void var::abort(const var& text) const")
 	ISSTRING(text)
 
@@ -274,8 +259,7 @@ void var::abort(const var& text) const
 	throw MVAbort(text);
 }
 
-void var::abortall(const var& text) const
-{
+void var::abortall(const var& text) const {
 	THISIS("void var::abortall(const var& text) const")
 	ISSTRING(text)
 
@@ -283,8 +267,7 @@ void var::abortall(const var& text) const
 	throw MVAbort(text);
 }
 
-bool var::assigned() const
-{
+bool var::assigned() const {
 	// THISIS("bool var::assigned() const")
 
 	// treat undefined as unassigned
@@ -298,8 +281,7 @@ bool var::assigned() const
 	return var_typ != VARTYP_UNA;
 }
 
-bool var::unassigned() const
-{
+bool var::unassigned() const {
 	// see explanation above in assigned
 	// THISIS("bool var::unassigned() const")
 	// THISISDEFINED()
@@ -310,8 +292,7 @@ bool var::unassigned() const
 	return !var_typ;
 }
 
-var& var::unassigned(const var& defaultvalue)
-{
+var& var::unassigned(const var& defaultvalue) {
 
 	// see explanation above in assigned
 	// THISISDEFINED()
@@ -322,8 +303,7 @@ var& var::unassigned(const var& defaultvalue)
 	//?allow undefined usage like var xyz=xyz.readnext();
 	// if (var_typ & VARTYP_MASK)
 
-	if (this->unassigned())
-	{
+	if (this->unassigned()) {
 		// throw MVUndefined("unassigned( ^ defaultvalue ^")");
 		// var_str="";
 		// var_typ=VARTYP_STR;
@@ -334,11 +314,10 @@ var& var::unassigned(const var& defaultvalue)
 
 // pick int() is actually the same as floor. using integer() instead of int() because int is a
 // reserved word in c/c++ for int datatype
-var var::integer() const
-{
+var var::integer() const {
 	THISIS("var var::integer() const")
 	THISISINTEGER()
-/*
+	/*
 	//pick integer means floor()
 	//-1.0=-1
 	//-0.9=-1
@@ -362,11 +341,10 @@ var var::integer() const
 var var::floor() const {
 	THISIS("var var::floor() const")
 	THISISINTEGER()
-	 return var_int;
+	return var_int;
 }
 
-var var::round(const int ndecimals) const
-{
+var var::round(const int ndecimals) const {
 	/*pick round rounds positive .5 up to 1 and negative .5 down to -1 etc
 	-1.0=-1
 	-0.9=-1
@@ -397,8 +375,8 @@ var var::round(const int ndecimals) const
 	else {
 		if (not ndecimals) {
 			//result=*this;
-			result.var_int=var_int;
-			result.var_typ=VARTYP_INT;
+			result.var_int = var_int;
+			result.var_typ = VARTYP_INT;
 			return result;
 		}
 		// loss of precision if var_int is long long
@@ -418,11 +396,11 @@ var var::round(const int ndecimals) const
 	//
 	//both pickdb and c++ rounding tie break goes away from zero.
 
-	int scale = std::pow(10.0,ndecimals);
+	int scale = std::pow(10.0, ndecimals);
 
 	double scaled_double = fromdouble * scale;
 
-	double ceil2=std::ceil(scaled_double);
+	double ceil2 = std::ceil(scaled_double);
 
 	double diff = (scaled_double + 0.5) - ceil2;
 
@@ -430,13 +408,13 @@ var var::round(const int ndecimals) const
 	double rounded_double;
 	if (std::abs(diff) < SMALLEST_NUMBER) {
 		if (fromdouble >= 0)
-			rounded_double = ceil2/scale;
+			rounded_double = ceil2 / scale;
 		else
-			rounded_double = std::floor(scaled_double)/scale;
+			rounded_double = std::floor(scaled_double) / scale;
 	}
 	//otherwise use standard rounding
 	else {
-		rounded_double = std::round(scaled_double)/scale;
+		rounded_double = std::round(scaled_double) / scale;
 	}
 	std::stringstream ss;
 	ss.precision(ndecimals);
@@ -446,19 +424,16 @@ var var::round(const int ndecimals) const
 	result.var_typ = VARTYP_STR;
 
 	return result;
-
 }
 
-bool var::toBool() const
-{
+bool var::toBool() const {
 	THISIS("bool var::toBool() const")
 	// could be skipped for speed assuming that people will not write unusual "var x=f(x)" type
 	// syntax as follows: var xx=xx?11:22;
 	THISISDEFINED()
 
 	// identical code in void* and bool except returns void* and bool respectively
-	while (true)
-	{
+	while (true) {
 		// ints are true except for zero
 		if (var_typ & VARTYP_INT)
 			return (bool)(var_int != 0);
@@ -478,38 +453,33 @@ bool var::toBool() const
 			//AREV print (0.00001 or 0)    ... prints 0 (bool)
 			//AREV print (0.00005=0.00006) ... prints 0 (==)
 			//AREV print (0.00005<0.00006) ... prints 1 (<)
-			return std::abs(var_dbl)>=SMALLEST_NUMBER;
+			return std::abs(var_dbl) >= SMALLEST_NUMBER;
 
-		if (!(var_typ))
-		{
+		if (!(var_typ)) {
 			THISISASSIGNED()
 			throw MVUnassigned("toBool()");
 		}
 
 		// must be string - try to convert to numeric and do all tests again
 		isnum();
-
 	};
 }
 
-int var::toInt() const
-{
+int var::toInt() const {
 	THISIS("int var::toInt() const")
 	THISISINTEGER()
 
 	return var_int;
 }
 
-int var::toLong() const
-{
+int var::toLong() const {
 	THISIS("int var::toLong() const")
 	THISISINTEGER()
 
 	return var_int;
 }
 
-double var::toDouble() const
-{
+double var::toDouble() const {
 	THISIS("double var::toDouble() const")
 	THISISDECIMAL()
 
@@ -517,8 +487,7 @@ double var::toDouble() const
 }
 
 // mainly called in ISSTRING when not already a string
-void var::createString() const
-{
+void var::createString() const {
 	// THISIS("void var::createString() const")
 	// TODO ensure ISDEFINED is called everywhere in advance
 	// to avoid wasting time doing multiple calls to ISDEFINED
@@ -526,24 +495,21 @@ void var::createString() const
 
 	// dbl - create string from dbl
 	// prefer double
-	if (var_typ & VARTYP_DBL)
-	{
+	if (var_typ & VARTYP_DBL) {
 		var_str = dblToString(var_dbl);
 		var_typ |= VARTYP_STR;
 		return;
 	}
 
 	// int - create string from int
-	if (var_typ & VARTYP_INT)
-	{
+	if (var_typ & VARTYP_INT) {
 		// loss of precision if var_int is long long
 		var_str = intToString(int(var_int));
 		var_typ |= VARTYP_STR;
 		return;
 	}
 	// already a string (unlikely since only called when not a string)
-	if (var_typ & VARTYP_STR)
-	{
+	if (var_typ & VARTYP_STR) {
 		return;
 	}
 
@@ -553,16 +519,14 @@ void var::createString() const
 }
 
 // DLL_PUBLIC
-std::string var::toString() const
-{
+std::string var::toString() const {
 	THISIS("std::string var::toString() const")
 	THISISSTRING()
 
 	return var_str;
 }
 
-var var::length() const
-{
+var var::length() const {
 	THISIS("var var::length() const")
 	THISISSTRING()
 
@@ -570,16 +534,14 @@ var var::length() const
 }
 
 // synonym for length for compatibility with pick's len()
-var var::len() const
-{
+var var::len() const {
 	THISIS("var var::len() const")
 	THISISSTRING()
 
 	return int(var_str.length());
 }
 
-const char* var::data() const
-{
+const char* var::data() const {
 	THISIS("const char* var::data() const")
 	THISISSTRING()
 
@@ -587,8 +549,7 @@ const char* var::data() const
 }
 
 DLL_PUBLIC
-std::u32string var::to_u32string() const
-{
+std::u32string var::to_u32string() const {
 	// for speed, dont validate
 	// THISIS("std::u32string var::to_u32string() const")
 	// THISISSTRING()
@@ -602,8 +563,7 @@ std::u32string var::to_u32string() const
 }
 
 DLL_PUBLIC
-void var::from_u32string(std::u32string u32_source) const
-{
+void var::from_u32string(std::u32string u32_source) const {
 	// for speed, dont validate
 	// THISIS("void var::from_u32tring() const")
 	// THISISDEFINED()
@@ -612,74 +572,58 @@ void var::from_u32string(std::u32string u32_source) const
 	var_str = boost::locale::conv::utf_to_utf<char>(u32_source);
 }
 
-var var::trim(const var& trimchar) const&
-{
+var var::trim(const var& trimchar) const& {
 	THISIS("var var::trim(const var& trimchar) const")
 	ISSTRING(trimchar)
 
 	return trim(trimchar.var_str.c_str());
 }
 
-var var::trim(const var& trimchar, const var& options) const&
-{
+var var::trim(const var& trimchar, const var& options) const& {
 	THISIS("var var::trim(const var& trimchar, const var& options) const")
 	ISSTRING(trimchar)
 	ISSTRING(options)
 
-	if (options == "F")
-	{
+	if (options == "F") {
 		return trimf(trimchar.var_str.c_str());
-	}
-	else if (options == "B")
-	{
+	} else if (options == "B") {
 		return trimb(trimchar.var_str.c_str());
-	}
-	else if (options == "FB")
-	{
+	} else if (options == "FB") {
 		return trimf(trimchar.var_str.c_str()).trimb(trimchar.var_str.c_str());
 	}
 	return trim(trimchar.var_str.c_str());
 }
 
-var& var::trimmer(const var& trimchar)
-{
+var& var::trimmer(const var& trimchar) {
 	THISIS("var& var::trimmer(const var& trimchar)")
 	ISSTRING(trimchar)
 
 	return trimmer(trimchar.var_str.c_str());
 }
 
-var& var::trimmer(const var& trimchar, const var& options)
-{
+var& var::trimmer(const var& trimchar, const var& options) {
 	THISIS("var var::trimmer(const var& trimchar, const var& options) const")
 	ISSTRING(trimchar)
 	ISSTRING(options)
 
-	if (options == "F")
-	{
+	if (options == "F") {
 		return trimmerf(trimchar.var_str.c_str());
-	}
-	else if (options == "B")
-	{
+	} else if (options == "B") {
 		return trimmerb(trimchar.var_str.c_str());
-	}
-	else if (options == "FB")
-	{
+	} else if (options == "FB") {
 		return trimmerf(trimchar.var_str.c_str()).trimmerb(trimchar.var_str.c_str());
 	}
 	return trimmer(trimchar.var_str.c_str());
 }
 
-var var::trimf(const var& trimchar) const&
-{
+var var::trimf(const var& trimchar) const& {
 	THISIS("var var::trimf(const var& trimchar) const")
 	ISSTRING(trimchar)
 
 	return trimf(trimchar.var_str.c_str());
 }
 
-var& var::trimmerf(const var& trimchar)
-{
+var& var::trimmerf(const var& trimchar) {
 	THISIS("var& var::trimmerf(const var& trimchar)")
 	ISSTRING(trimchar)
 
@@ -687,8 +631,7 @@ var& var::trimmerf(const var& trimchar)
 }
 
 // trimb - trim backward trailing chars
-var var::trimb(const var& trimchar) const&
-{
+var var::trimb(const var& trimchar) const& {
 	THISIS("var var::trimb(const var& trimchar) const")
 	ISSTRING(trimchar)
 
@@ -696,14 +639,12 @@ var var::trimb(const var& trimchar) const&
 }
 
 // on temporary
-var& var::trimb(const var& trimchar) &&
-{
+var& var::trimb(const var& trimchar) && {
 	return this->trimmerb(trimchar);
 }
 
 //in place
-var& var::trimmerb(const var& trimchar)
-{
+var& var::trimmerb(const var& trimchar) {
 	THISIS("var& var::trimmerb(const var& trimchar)")
 	ISSTRING(trimchar)
 
@@ -711,8 +652,7 @@ var& var::trimmerb(const var& trimchar)
 }
 
 //trimf() - trim leading spaces/character
-var var::trimf(const char* trimchar) const&
-{
+var var::trimf(const char* trimchar) const& {
 	THISIS("var var::trimf(const char* trimchar) const")
 	THISISSTRING()
 
@@ -720,22 +660,19 @@ var var::trimf(const char* trimchar) const&
 }
 
 // on temporary
-var& var::trimf(const char* trimchar) &&
-{
+var& var::trimf(const char* trimchar) && {
 	return this->trimmerf(trimchar);
 }
 
 // in-place
-var& var::trimmerf(const char* trimchar)
-{
+var& var::trimmerf(const char* trimchar) {
 	THISIS("var& var::trimmerf(const char* trimchar)")
 	THISISSTRINGMUTATOR()
 
 	std::string::size_type start_pos;
 	start_pos = var_str.find_first_not_of(trimchar);
 
-	if (start_pos == std::string::npos)
-	{
+	if (start_pos == std::string::npos) {
 		// *this = "";
 		this->var_str.clear();
 		this->var_typ = VARTYP_STR;
@@ -749,8 +686,7 @@ var& var::trimmerf(const char* trimchar)
 }
 
 // trimb() - trim backward (trailing) spaces/character
-var var::trimb(const char* trimchar) const&
-{
+var var::trimb(const char* trimchar) const& {
 	THISIS("var var::trimb(const char* trimchar) const")
 	THISISSTRING()
 
@@ -758,22 +694,19 @@ var var::trimb(const char* trimchar) const&
 }
 
 // on temporary
-var& var::trimb(const char* trimchar) &&
-{
+var& var::trimb(const char* trimchar) && {
 	return this->trimmerb(trimchar);
 }
 
 // in-place
-var& var::trimmerb(const char* trimchar)
-{
+var& var::trimmerb(const char* trimchar) {
 	THISIS("var& var::trimmerb(const char* trimchar)")
 	THISISSTRINGMUTATOR()
 
 	std::string::size_type end_pos;
 	end_pos = var_str.find_last_not_of(trimchar);
 
-	if (end_pos == std::string::npos)
-	{
+	if (end_pos == std::string::npos) {
 		// *this = "";
 		this->var_str.clear();
 		this->var_typ = VARTYP_STR;
@@ -787,8 +720,7 @@ var& var::trimmerb(const char* trimchar)
 }
 
 //trim() - remove leading, trailing and excess internal spaces/character
-var var::trim(const char* trimchar) const&
-{
+var var::trim(const char* trimchar) const& {
 	THISIS("var var::trim(const char* trimchar) const&")
 	THISISSTRING()
 
@@ -796,14 +728,12 @@ var var::trim(const char* trimchar) const&
 }
 
 // on temporary
-var& var::trim(const char* trimchar) &&
-{
+var& var::trim(const char* trimchar) && {
 	return this->trimmer(trimchar);
 }
 
 // in-place
-var& var::trimmer(const char* trimchar)
-{
+var& var::trimmer(const char* trimchar) {
 
 	// reimplement with boost string trim_if algorithm
 	// http://www.boost.org/doc/libs/1_39_0/doc/html/string_algo/reference.html
@@ -816,8 +746,7 @@ var& var::trimmer(const char* trimchar)
 	start_pos = var_str.find_first_not_of(trimchar);
 
 	// if all blanks return empty string
-	if (start_pos == std::string::npos)
-	{
+	if (start_pos == std::string::npos) {
 		// *this = "";
 		this->var_str.clear();
 		this->var_typ = VARTYP_STR;
@@ -838,8 +767,7 @@ var& var::trimmer(const char* trimchar)
 
 	// find the starting position of any embedded spaces
 	start_pos = std::string::npos;
-	while (true)
-	{
+	while (true) {
 		// find a space
 		start_pos = var_str.find_last_of(trimchar, start_pos);
 
@@ -851,8 +779,7 @@ var& var::trimmer(const char* trimchar)
 		end_pos = var_str.find_last_not_of(trimchar, start_pos - 1);
 
 		// if first non space character is not one before the space
-		if (end_pos < start_pos - 1)
-		{
+		if (end_pos < start_pos - 1) {
 			var_str.erase(end_pos + 1, start_pos - end_pos - 1);
 		}
 		if (end_pos <= 0)
@@ -863,22 +790,19 @@ var& var::trimmer(const char* trimchar)
 }
 
 // invert() - inverts lower 8 bits of UTF8 codepoints (not bytes)
-var var::invert() const&
-{
+var var::invert() const& {
 	var tt = *this;
 	tt.inverter();
 	return tt;
 }
 
 // on temporary
-var& var::invert() &&
-{
+var& var::invert() && {
 	return this->inverter();
 }
 
 // in-place
-var& var::inverter()
-{
+var& var::inverter() {
 	THISIS("var& var::inverter()")
 	THISISSTRINGMUTATOR()
 
@@ -902,20 +826,17 @@ var& var::inverter()
 }
 
 // ucase() - upper case
-var var::ucase() const&
-{
+var var::ucase() const& {
 	return var(*this).ucaser();
 }
 
 // on temporary
-var& var::ucase() &&
-{
+var& var::ucase() && {
 	return this->ucaser();
 }
 
 // in-place
-var& var::ucaser()
-{
+var& var::ucaser() {
 	THISIS("var& var::ucaser()")
 	//THISISSTRINGMUTATOR()
 	THISISSTRING()
@@ -924,9 +845,8 @@ var& var::ucaser()
 	// try ASCII uppercase to start with for speed
 	// this may not be correct for all locales. eg Turkish I i İ ı mixing Latin and Turkish
 	// letters.
-	bool allASCII=false;
-	for (char& c : var_str)
-	{
+	bool allASCII = false;
+	for (char& c : var_str) {
 		allASCII = (c & ~0x7f) == 0;
 		if (!allASCII)
 			break;
@@ -954,20 +874,17 @@ var& var::ucaser()
 }
 
 // lcase() - lower case
-var var::lcase() const&
-{
+var var::lcase() const& {
 	return var(*this).lcaser();
 }
 
 // on temporary
-var& var::lcase() &&
-{
+var& var::lcase() && {
 	return this->lcaser();
 }
 
 // in-place
-var& var::lcaser()
-{
+var& var::lcaser() {
 	THISIS("var& var::lcaser()")
 	//THISISSTRINGMUTATOR()
 	THISISSTRING()
@@ -978,9 +895,8 @@ var& var::lcaser()
 	// try ASCII uppercase to start with for speed
 	// this may not be correct for all locales. eg Turkish I i İ ı mixing Latin and Turkish
 	// letters.
-	bool allASCII=false;
-	for (char& c : var_str)
-	{
+	bool allASCII = false;
+	for (char& c : var_str) {
 		allASCII = (c & ~0x7f) == 0;
 		if (!allASCII)
 			break;
@@ -997,20 +913,17 @@ var& var::lcaser()
 }
 
 // tcase() - title case
-var var::tcase() const&
-{
+var var::tcase() const& {
 	return var(*this).tcaser();
 }
 
 // on temporary
-var& var::tcase() &&
-{
+var& var::tcase() && {
 	return this->tcaser();
 }
 
 // in-place
-var& var::tcaser()
-{
+var& var::tcaser() {
 	THISIS("var& var::tcaser()")
 	//THISISSTRINGMUTATOR()
 	THISISSTRING()
@@ -1038,20 +951,17 @@ var& var::tcaser()
 //  coté (highly regarded)
 //  côte (coast)
 //  côté (side)
-var var::fcase() const&
-{
+var var::fcase() const& {
 	return var(*this).fcaser();
 }
 
 // on temporary
-var& var::fcase() &&
-{
+var& var::fcase() && {
 	return this->fcaser();
 }
 
 // in-place
-var& var::fcaser()
-{
+var& var::fcaser() {
 	THISIS("var& var::fcaser()")
 	//THISISSTRINGMUTATOR()
 	THISISSTRING()
@@ -1063,14 +973,12 @@ var& var::fcaser()
 	return *this;
 }
 
-inline bool is_ascii(const std::string& string1)
-{
+inline bool is_ascii(const std::string& string1) {
 	// optimise for ASCII
 	// try ASCII uppercase to start with for speed
 	// this may not be correct for all locales. eg Turkish I i İ ı mixing Latin and Turkish
 	// letters.
-	for (const char& c : string1)
-	{
+	for (const char& c : string1) {
 		if ((c & ~0x7f) != 0)
 			return false;
 	}
@@ -1089,20 +997,17 @@ inline bool is_ascii(const std::string& string1)
 // not
 // have any unassigned characters is normalized under one version of Unicode,
 // it must remain normalized under all future versions of Unicode."
-var var::normalize() const&
-{
+var var::normalize() const& {
 	return var(*this).normalizer();
 }
 
 // on temporary
-var& var::normalize() &&
-{
+var& var::normalize() && {
 	return this->normalizer();
 }
 
 // in-place
-var& var::normalizer()
-{
+var& var::normalizer() {
 	THISIS("var& var::normalizer()")
 	//THISISSTRINGMUTATOR()
 	THISISSTRING()
@@ -1123,8 +1028,7 @@ var& var::normalizer()
 	return *this;
 }
 
-var var::unique() const
-{
+var var::unique() const {
 	THISIS("var var::unique()")
 	THISISSTRING()
 
@@ -1134,10 +1038,9 @@ var var::unique() const
 	var bit;
 	var delimiter;
 	var sepchar = VM;
-	int RMseq_plus1=RM.seq()+1;
+	int RMseq_plus1 = RM.seq() + 1;
 	// bool founddelimiter = false;
-	while (true)
-	{
+	while (true) {
 
 		// bit=this->remove(start, delimiter);
 		bit = this->substr2(start, delimiter);
@@ -1147,12 +1050,10 @@ var var::unique() const
 			// sepchar=RM_-int(delimiter)+1;
 			sepchar = var().chr(RMseq_plus1 - delimiter);
 
-		if (bit.length())
-		{
-			if (not(result.locateusing(sepchar, bit)))
-			{
+		if (bit.length()) {
+			if (not(result.locateusing(sepchar, bit))) {
 				//if (delimiter)
-					result ^= bit ^ sepchar;
+				result ^= bit ^ sepchar;
 			}
 		}
 		if (not delimiter)
@@ -1166,8 +1067,7 @@ var var::unique() const
 }
 
 // BINARY - 1st byte
-var var::seq() const
-{
+var var::seq() const {
 	THISIS("var var::seq() const")
 	THISISSTRING()
 
@@ -1182,8 +1082,7 @@ var var::seq() const
 }
 
 // UTF8 - 1st UTF code point
-var var::textseq() const
-{
+var var::textseq() const {
 	THISIS("var var::textseq() const")
 	THISISSTRING()
 	/*
@@ -1210,8 +1109,7 @@ var var::chr(const int charno) const { return char(charno % 256); }
 // returns unicode 1-4 byte sequences (in utf8)
 // returns empty string for some invalid unicode points like 0xD800 to 0xDFFF which is reserved for
 // UTF16 0x110000 ... is invalid too
-var var::textchr(const int utf_codepoint) const
-{
+var var::textchr(const int utf_codepoint) const {
 	// doesnt use *this at all (do we need a version that does?)
 
 	// return var((char) int1);
@@ -1225,20 +1123,17 @@ var var::textchr(const int utf_codepoint) const
 }
 
 // quote() - wrap with double quotes
-var var::quote() const&
-{
+var var::quote() const& {
 	return var(*this).quoter();
 }
 
 // on temporary
-var& var::quote() &&
-{
+var& var::quote() && {
 	return this->quoter();
 }
 
 // in-place
-var& var::quoter()
-{
+var& var::quoter() {
 	THISIS("var& var::quoter()")
 	THISISSTRINGMUTATOR()
 
@@ -1249,20 +1144,17 @@ var& var::quoter()
 }
 
 // squoter() - wrap with single quotes
-var var::squote() const&
-{
+var var::squote() const& {
 	return var(*this).squoter();
 }
 
 // on temporary
-var& var::squote() &&
-{
+var& var::squote() && {
 	return this->squoter();
 }
 
 // in-place
-var& var::squoter()
-{
+var& var::squoter() {
 	THISIS("var& var::squoter()")
 	THISISSTRINGMUTATOR()
 
@@ -1273,20 +1165,17 @@ var& var::squoter()
 }
 
 //unquote() - remove outer double or single quotes
-var var::unquote() const&
-{
+var var::unquote() const& {
 	return var(*this).unquoter();
 }
 
 // on temporary
-var& var::unquote() &&
-{
+var& var::unquote() && {
 	return this->unquoter();
 }
 
 // in-place
-var& var::unquoter()
-{
+var& var::unquoter() {
 	THISIS("var& var::unquoter()")
 	THISISSTRINGMUTATOR()
 
@@ -1296,7 +1185,7 @@ var& var::unquoter()
 
 	// no change if no length
 	size_t len = var_str.length();
-	if (len<2)
+	if (len < 2)
 		return *this;
 
 	char char0 = var_str[0];
@@ -1318,32 +1207,27 @@ var& var::unquoter()
 }
 
 //splice() remove/replace/insert part of a string with another string
-var var::splice(const int start1, const int length, const var& newstr) const&
-{
+var var::splice(const int start1, const int length, const var& newstr) const& {
 	return var(*this).splicer(start1, length, newstr);
 }
 
 // on temporary
-var& var::splice(const int start1, const int length, const var& newstr) &&
-{
+var& var::splice(const int start1, const int length, const var& newstr) && {
 	return this->splicer(start1, length, newstr);
 }
 
 // splice() remove/replace/insert part of a string (up to the end) with another string
-var var::splice(const int start1, const var& newstr) const&
-{
+var var::splice(const int start1, const var& newstr) const& {
 	return var(*this).splicer(start1, newstr);
 }
 
 // on temporary
-var& var::splice(const int start1, const var& newstr) &&
-{
+var& var::splice(const int start1, const var& newstr) && {
 	return this->splicer(start1, newstr);
 }
 
 // in-place
-var& var::splicer(const int start1, const int length, const var& newstr)
-{
+var& var::splicer(const int start1, const int length, const var& newstr) {
 	THISIS("var& var::splicer(const int start1,const int length,const var& newstr)")
 	THISISSTRINGMUTATOR()
 	ISSTRING(newstr)
@@ -1351,32 +1235,24 @@ var& var::splicer(const int start1, const int length, const var& newstr)
 	// TODO make sure start and length work like REVELATION and HANDLE NEGATIVE LENGTH!
 
 	unsigned int start1b;
-	if (start1 > 0)
-	{
+	if (start1 > 0) {
 		start1b = start1;
-	}
-	else if (start1 < 0)
-	{
+	} else if (start1 < 0) {
 		start1b = var_str.length() + start1 + 1;
 		if (start1b < 1)
 			start1b = 1;
-	}
-	else
+	} else
 		start1b = 1;
 
 	unsigned int lengthb;
 	if (length >= 0)
 		lengthb = length;
-	else
-	{
+	else {
 		// cannot go before start of string
-		if ((start1b + length) <= 0)
-		{
+		if ((start1b + length) <= 0) {
 			start1b = 1;
 			lengthb = start1b;
-		}
-		else
-		{
+		} else {
 			start1b += length + 1;
 			lengthb = -length;
 		}
@@ -1391,8 +1267,7 @@ var& var::splicer(const int start1, const int length, const var& newstr)
 }
 
 // in-place
-var& var::splicer(const int start1, const var& newstr)
-{
+var& var::splicer(const int start1, const var& newstr) {
 	THISIS("var& var::splicer(const int start1, const var& newstr)")
 	THISISSTRINGMUTATOR()
 	ISSTRING(newstr)
@@ -1401,13 +1276,11 @@ var& var::splicer(const int start1, const var& newstr)
 	uint start1b;
 	if (start1 > 0)
 		start1b = start1;
-	else if (start1 < 0)
-	{
+	else if (start1 < 0) {
 		start1b = int(var_str.length()) + start1 + 1;
 		if (start1b < 1)
 			start1b = 1;
-	}
-	else
+	} else
 		start1b = 1;
 
 	if (start1b > var_str.length())
@@ -1418,8 +1291,7 @@ var& var::splicer(const int start1, const var& newstr)
 	return *this;
 }
 
-var& var::transfer(var& destinationvar)
-{
+var& var::transfer(var& destinationvar) {
 	THISIS("var& var::transfer(var& destinationvar)")
 	// transfer even unassigned vars (but not uninitialised ones)
 	//THISISDEFINED()
@@ -1437,8 +1309,7 @@ var& var::transfer(var& destinationvar)
 	return destinationvar;
 }
 
-var var::clone() const
-{
+var var::clone() const {
 	THISIS("var var::clone(var& destinationvar)")
 	// clone even unassigned vars!
 	THISISDEFINED()
@@ -1453,8 +1324,7 @@ var var::clone() const
 }
 
 // kind of const needed in calculatex
-const var& var::exchange(const var& var2) const
-{
+const var& var::exchange(const var& var2) const {
 	THISIS("var& var::exchange(var& var2)")
 	THISISASSIGNED()
 	ISDEFINED(var2)
@@ -1480,8 +1350,7 @@ const var& var::exchange(const var& var2) const
 	return var2;
 }
 
-var var::str(const int num) const
-{
+var var::str(const int num) const {
 	THISIS("var var::str(const int num) const")
 	THISISSTRING()
 
@@ -1499,8 +1368,7 @@ var var::str(const int num) const
 	return newstr;
 }
 
-var var::space() const
-{
+var var::space() const {
 	THISIS("var var::space() const")
 	THISISNUMERIC()
 
@@ -1513,20 +1381,17 @@ var var::space() const
 }
 
 //crop() - remove superfluous FM, VM etc.
-var var::crop() const&
-{
+var var::crop() const& {
 	return var(*this).cropper();
 }
 
 // on temporary
-var& var::crop() &&
-{
+var& var::crop() && {
 	return this->cropper();
 }
 
 // in-place
-var& var::cropper()
-{
+var& var::cropper() {
 	THISIS("var& var::cropper()")
 	THISISSTRINGMUTATOR()
 
@@ -1535,15 +1400,13 @@ var& var::cropper()
 	std::string::iterator iter = var_str.begin();
 	std::string::iterator iterend = var_str.end();
 
-	while (iter != iterend)
-	{
+	while (iter != iterend) {
 
 		char charx = (*iter);
 		++iter;
 
 		// simply append ordinary characters
-		if (charx < STM_ || charx > RM_)
-		{
+		if (charx < STM_ || charx > RM_) {
 			newstr.push_back(charx);
 			continue;
 		}
@@ -1551,8 +1414,7 @@ var& var::cropper()
 		// found a separator
 
 		// remove any lower separators from the end of the string
-		while (!newstr.empty())
-		{
+		while (!newstr.empty()) {
 			char lastchar = newstr.back();
 			if (lastchar >= STM_ && lastchar < charx)
 				newstr.pop_back();
@@ -1565,8 +1427,7 @@ var& var::cropper()
 	}
 
 	// remove any trailing separators
-	while (!newstr.empty() && newstr.back() >= STM_ && newstr.back() <= RM_)
-	{
+	while (!newstr.empty() && newstr.back() >= STM_ && newstr.back() <= RM_) {
 		newstr.pop_back();
 	}
 
@@ -1577,20 +1438,17 @@ var& var::cropper()
 }
 
 // lower() drops FM to VM, VM to SM etc.
-var var::lower() const&
-{
+var var::lower() const& {
 	return var(*this).lowerer();
 }
 
 // on temporary
-var& var::lower() &&
-{
+var& var::lower() && {
 	return this->lowerer();
 }
 
 // in-place
-var& var::lowerer()
-{
+var& var::lowerer() {
 	THISIS("var& var::lowerer()")
 	THISISSTRING()
 
@@ -1602,20 +1460,17 @@ var& var::lowerer()
 }
 
 // raise() lifts VM to FM, SM to VM etc.
-var var::raise() const&
-{
+var var::raise() const& {
 	return var(*this).raiser();
 }
 
 // on temporary
-var& var::raise() &&
-{
+var& var::raise() && {
 	return this->raiser();
 }
 
 // in-place
-var& var::raiser()
-{
+var& var::raiser() {
 	THISIS("var& var::raiser()")
 	THISISSTRING()
 
@@ -1628,8 +1483,7 @@ var& var::raiser()
 
 // convert() - replaces one by one in string, a list of characters with another list of characters
 // if the target list is shorter than the source list of characters then characters are deleted
-var var::convert(const var& oldchars, const var& newchars) const&
-{
+var var::convert(const var& oldchars, const var& newchars) const& {
 	THISIS("var var::convert(const var& oldchars,const var& newchars) const")
 	THISISSTRING()
 
@@ -1639,17 +1493,15 @@ var var::convert(const var& oldchars, const var& newchars) const&
 }
 
 // on temporary
-var& var::convert(const var& oldchars, const var& newchars) &&
-{
+var& var::convert(const var& oldchars, const var& newchars) && {
 	return this->converter(oldchars, newchars);
 }
 
-template <class T> void converter_helper(T& var_str, const T& oldchars, const T& newchars)
-{
+template <class T>
+void converter_helper(T& var_str, const T& oldchars, const T& newchars) {
 	typename T::size_type pos = T::npos;
 
-	while (true)
-	{
+	while (true) {
 		// locate (backwards) any of the from characters
 		// because we might be removing characters
 		// and it is faster to remove last character first
@@ -1675,22 +1527,18 @@ template <class T> void converter_helper(T& var_str, const T& oldchars, const T&
 }
 
 // in-place
-var& var::converter(const var& oldchars, const var& newchars)
-{
+var& var::converter(const var& oldchars, const var& newchars) {
 	THISIS("var& var::converter(const var& oldchars,const var& newchars)")
 	THISISSTRINGMUTATOR()
 	ISSTRING(oldchars)
 	ISSTRING(newchars)
 
 	// all ASCII -> bytewise conversion
-	if (is_ascii(oldchars.var_str) && is_ascii(newchars.var_str))
-	{
+	if (is_ascii(oldchars.var_str) && is_ascii(newchars.var_str)) {
 		converter_helper(var_str, oldchars.var_str, newchars.var_str);
 
 		// any non-ASCI -> convert to wide before conversion, then back again
-	}
-	else
-	{
+	} else {
 
 		// convert everything to from UTF8 to wide string
 		std::u32string u32_var_str = this->to_u32string();
@@ -1724,8 +1572,7 @@ var& var::converter(const var& oldchars, const var& newchars)
 // 3. digits (0-9) must occur 1 or more times (but see rule 0.)
 // 4. all characters mean non-numeric
 
-bool var::isnum(void) const
-{
+bool var::isnum(void) const {
 	THISIS("bool var::isnum(void) const")
 	// TODO make isnum private and ensure ISDEFINED is checked before all calls to isnum
 	// to save the probably double check here
@@ -1760,8 +1607,7 @@ bool var::isnum(void) const
 	// Example, natural names for DB tables are CUSTOMERS1 and REPORT2009, but not 1CUSTOMER and
 	// 2009REPORT
 	//	for (int ii=(int)var_str.length()-1;ii>=0;--ii)
-	for (int ii = 0; ii < (int)var_str.length(); ii++)
-	{
+	for (int ii = 0; ii < (int)var_str.length(); ii++) {
 		char cc = var_str[ii];
 		// + 2B		- 2D
 		// . 2E		number 30-39
@@ -1770,14 +1616,10 @@ bool var::isnum(void) const
 			var_typ = VARTYP_NANSTR;
 			return false;
 		}
-		if (cc >= '0')
-		{
+		if (cc >= '0') {
 			digit = true;
-		}
-		else
-		{
-			switch (cc)
-			{
+		} else {
+			switch (cc) {
 			case '.':
 				if (point) // 2nd point - is non-numeric
 				{
@@ -1791,8 +1633,7 @@ bool var::isnum(void) const
 			case '+':
 				// non-numeric if +/- is not the first character or is the only
 				// character
-				if (ii)
-				{
+				if (ii) {
 					var_typ = VARTYP_NANSTR;
 					return false;
 				}
@@ -1818,8 +1659,7 @@ bool var::isnum(void) const
 
 	// perhaps slightly unusual cases here
 	// zero length string and strings like + - . +. -.
-	if (!digit)
-	{
+	if (!digit) {
 		// must be at least one digit unless zero length string
 		if (var_str.length())
 		// goto nan;
@@ -1835,8 +1675,7 @@ bool var::isnum(void) const
 	}
 
 	// get and save the number as int or double
-	if (point)
-	{
+	if (point) {
 		// var_dbl=_wtof(var_str.c_str());
 		// var_dbl=_wtof(var_str.c_str());
 		// TODO optimise with code based on the following idea?
@@ -1858,9 +1697,7 @@ bool var::isnum(void) const
 		//var_dbl = strtod(var_str.c_str(), 0);
 		var_dbl = std::stod(var_str.c_str(), 0);
 		var_typ = VARTYP_DBLSTR;
-	}
-	else
-	{
+	} else {
 		// var_int=_wtoi(var_str.c_str());
 		// TODO optimise
 
@@ -1880,16 +1717,14 @@ bool var::isnum(void) const
 /////////
 
 //warning put() is not threadsafe whereas output(), errput() and logput() are threadsafe
-const var& var::put(std::ostream& ostream1) const
-{
+const var& var::put(std::ostream& ostream1) const {
 	THISIS("const var& var::put(std::ostream& ostream1) const")
 	THISISSTRING()
 
 	// prevent output to cout suppressing output to cout (by non-exodus routines)
 	// http://gcc.gnu.org/ml/gcc-bugs/2006-05/msg01196.html
 	// TODO optimise by calling once instead of every call to output()
-	if (!desynced_with_stdio)
-	{
+	if (!desynced_with_stdio) {
 		std::ios::sync_with_stdio(false);
 		desynced_with_stdio = true;
 	}
@@ -1905,16 +1740,14 @@ const var& var::put(std::ostream& ostream1) const
 ///////////////////////////////////////////////////
 
 // output() buffered threadsafe output to standard output
-const var& var::output() const
-{
+const var& var::output() const {
 	LOCKIOSTREAM
 	return this->put(std::cout);
 }
 
 // outputl() flushed threadsafe output to standard output
 // adds \n and flushes so is slower than output("\n")
-const var& var::outputl() const
-{
+const var& var::outputl() const {
 	LOCKIOSTREAM
 	this->put(std::cout);
 	std::cout << std::endl;
@@ -1923,8 +1756,7 @@ const var& var::outputl() const
 
 // outputt() buffered threadsafe output to standard output
 // adds \t
-const var& var::outputt() const
-{
+const var& var::outputt() const {
 	LOCKIOSTREAM
 	this->put(std::cout);
 	std::cout << '\t';
@@ -1932,16 +1764,14 @@ const var& var::outputt() const
 }
 
 // overloaded output() outputs a prefix str
-const var& var::output(const var& str) const
-{
+const var& var::output(const var& str) const {
 	LOCKIOSTREAM
 	str.put(std::cout);
 	return this->put(std::cout);
 }
 
 // oveloaded outputl() outputs a prefix str
-const var& var::outputl(const var& str) const
-{
+const var& var::outputl(const var& str) const {
 	LOCKIOSTREAM
 	str.put(std::cout);
 	this->put(std::cout);
@@ -1950,8 +1780,7 @@ const var& var::outputl(const var& str) const
 }
 
 // overloaded outputt() outputs a prefix str
-const var& var::outputt(const var& str) const
-{
+const var& var::outputt(const var& str) const {
 	LOCKIOSTREAM
 	std::cout << "\t";
 	str.put(std::cout);
@@ -1971,8 +1800,7 @@ const var& var::errput() const {
 
 // errputl() unbuffered threadsafe output to standard error
 // adds "\n"
-const var& var::errputl() const
-{
+const var& var::errputl() const {
 	LOCKIOSTREAM
 	this->put(std::cerr);
 	std::cerr << std::endl;
@@ -1980,16 +1808,14 @@ const var& var::errputl() const
 }
 
 // overloaded errput outputs a prefix str
-const var& var::errput(const var& str) const
-{
+const var& var::errput(const var& str) const {
 	LOCKIOSTREAM
 	str.put(std::cerr);
 	return this->put(std::cerr);
 }
 
 // overloaded errputl outputs a prefix str
-const var& var::errputl(const var& str) const
-{
+const var& var::errputl(const var& str) const {
 	LOCKIOSTREAM
 	str.put(std::cerr);
 	this->put(std::cerr);
@@ -2001,8 +1827,7 @@ const var& var::errputl(const var& str) const
 ///////////////////////////////////////////////////////////////////////////
 
 // logput() buffered threadsafe output to standard log
-const var& var::logput() const
-{
+const var& var::logput() const {
 	LOCKIOSTREAM
 	this->put(std::clog);
 	//std::clog.flush();
@@ -2010,8 +1835,7 @@ const var& var::logput() const
 }
 
 // logput() flushed threadsafe output to standard log
-const var& var::logputl() const
-{
+const var& var::logputl() const {
 	LOCKIOSTREAM
 	this->put(std::clog);
 	std::clog << std::endl;
@@ -2019,16 +1843,14 @@ const var& var::logputl() const
 }
 
 // overloaded logput with a prefix str
-const var& var::logput(const var& str) const
-{
+const var& var::logput(const var& str) const {
 	LOCKIOSTREAM
 	str.put(std::clog);
 	return this->put(std::clog);
 }
 
 // overloaded logputl with a prefix str
-const var& var::logputl(const var& str) const
-{
+const var& var::logputl(const var& str) const {
 	LOCKIOSTREAM
 	str.put(std::clog);
 	this->put(std::clog);
@@ -2040,8 +1862,7 @@ const var& var::logputl(const var& str) const
 // DCOUNT
 ////////
 // TODO make a char and char version for speed
-var var::dcount(const var& substrx) const
-{
+var var::dcount(const var& substrx) const {
 	THISIS("var var::dcount(const var& substrx) const")
 	THISISSTRING()
 	ISSTRING(substrx)
@@ -2056,8 +1877,7 @@ var var::dcount(const var& substrx) const
 // COUNT
 ///////
 
-var var::count(const var& substrx) const
-{
+var var::count(const var& substrx) const {
 	THISIS("var var::count(const var& substrx) const")
 	THISISSTRING()
 	ISSTRING(substrx)
@@ -2070,8 +1890,7 @@ var var::count(const var& substrx) const
 	// find the starting position of the field or return ""
 	std::string::size_type start_pos = 0;
 	int fieldno = 0;
-	while (true)
-	{
+	while (true) {
 		start_pos = var_str.find(substrx.var_str, start_pos);
 		// past of of string?
 		if (start_pos == std::string::npos)
@@ -2082,16 +1901,14 @@ var var::count(const var& substrx) const
 	}
 }
 
-var var::count(const char charx) const
-{
+var var::count(const char charx) const {
 	THISIS("var var::count(const char charx) const")
 	THISISSTRING()
 
 	// find the starting position of the field or return ""
 	std::string::size_type start_pos = 0;
 	int fieldno = 0;
-	while (true)
-	{
+	while (true) {
 		start_pos = var_str.find_first_of(charx, start_pos);
 		// past of of string?
 		if (start_pos == std::string::npos)
@@ -2101,8 +1918,7 @@ var var::count(const char charx) const
 	}
 }
 
-var var::index2(const var& substrx, const int startchar1) const
-{
+var var::index2(const var& substrx, const int startchar1) const {
 	THISIS("var var::index2(const var& substrx,const int startchar1) const")
 	THISISSTRING()
 	ISSTRING(substrx)
@@ -2121,8 +1937,7 @@ var var::index2(const var& substrx, const int startchar1) const
 	return var((int)start_pos + 1);
 }
 
-var var::index(const var& substrx, const int occurrenceno) const
-{
+var var::index(const var& substrx, const int occurrenceno) const {
 	THISIS("var var::index(const var& substrx,const int occurrenceno) const")
 	THISISSTRING()
 	ISSTRING(substrx)
@@ -2136,8 +1951,7 @@ var var::index(const var& substrx, const int occurrenceno) const
 	// negative and 0th occurrence mean the first
 	int countdown = occurrenceno >= 1 ? occurrenceno : 1;
 
-	for (;;)
-	{
+	for (;;) {
 
 		// find the starting position of the field or return ""
 		start_pos = var_str.find(substrx.var_str, start_pos);
@@ -2161,11 +1975,11 @@ var var::index(const var& substrx, const int occurrenceno) const
 	return 0;
 }
 
-var var::debug() const
-{
+var var::debug() const {
 	// THISIS("var var::debug() const")
 
-	std::cout << "var::debug()" << std::endl << std::flush;
+	std::cout << "var::debug()" << std::endl
+			  << std::flush;
 	//"good way to break into the debugger by causing a seg fault"
 	// *(int *)0 = 0;
 	// throw var("Debug Statement");
@@ -2173,8 +1987,7 @@ var var::debug() const
 #ifdef raise
 	raise(SIGTRAP);
 #else
-	for (var ii = 0; ii < 3; ii++)
-	{
+	for (var ii = 0; ii < 3; ii++) {
 		__asm__("int3");
 	}
 #endif
@@ -2183,11 +1996,11 @@ var var::debug() const
 	return "";
 }
 
-var var::debug(const var& var1) const
-{
+var var::debug(const var& var1) const {
 	// THISIS("var var::debug(const var& var1) const")
 
-	std::cout << "var::debug()" << std::endl << std::flush;
+	std::cout << "var::debug()" << std::endl
+			  << std::flush;
 // good way to break into the debugger by causing a seg fault
 #ifdef _MSC_VER
 	// throw var("Debug Statement");
@@ -2199,13 +2012,11 @@ var var::debug(const var& var1) const
 	return "";
 
 	// evade warning: unused parameter var1
-	if (var1)
-	{
+	if (var1) {
 	};
 }
 
-var var::logoff() const
-{
+var var::logoff() const {
 	// THISIS("var var::logoff() const")
 	// THISISSTRING("var.logoff()")
 
@@ -2214,20 +2025,16 @@ var var::logoff() const
 	return "";
 }
 
-var var::abs() const
-{
+var var::abs() const {
 	THISIS("var var::abs() const")
 	THISISNUMERIC()
 
 	// prefer double
-	if (var_typ & VARTYP_DBL)
-	{
+	if (var_typ & VARTYP_DBL) {
 		if (var_dbl < 0)
 			return -var_dbl;
 		return (*this);
-	}
-	else
-	{
+	} else {
 		if (var_int < 0)
 			return -var_int;
 		return var_int;
@@ -2236,8 +2043,7 @@ var var::abs() const
 	throw MVError("abs(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
-var var::mod(const var& divisor) const
-{
+var var::mod(const var& divisor) const {
 	THISIS("var var::mod(const var& divisor) const")
 	THISISNUMERIC()
 	ISNUMERIC(divisor)
@@ -2247,54 +2053,45 @@ var var::mod(const var& divisor) const
 	// dividend
 
 	// prefer double dividend
-	if (var_typ & VARTYP_DBL)
-	{
+	if (var_typ & VARTYP_DBL) {
 		// prefer double divisor
-		if (divisor.var_typ & VARTYP_DBL)
-		{
+		if (divisor.var_typ & VARTYP_DBL) {
 			// return fmod(double(var_int),divisor.var_dbl);
 			if ((var_dbl < 0 && divisor.var_dbl >= 0) ||
-			    (divisor.var_dbl < 0 && var_dbl >= 0))
+				(divisor.var_dbl < 0 && var_dbl >= 0))
 				// multivalue version of mod
 				return fmod(var_dbl, divisor.var_dbl) + divisor.var_dbl;
 			else
 				return fmod(var_dbl, divisor.var_dbl);
-		}
-		else
-		{
+		} else {
 			divisor.var_dbl = double(divisor.var_int);
 			// following would cache the double value but is it worth it?
 			// divisor.var_typ=divisor.var_typ & VARTYP_DBL;
 
 			if ((var_dbl < 0 && divisor.var_int >= 0) ||
-			    (divisor.var_int < 0 && var_dbl >= 0))
+				(divisor.var_int < 0 && var_dbl >= 0))
 				// multivalue version of mod
 				return fmod(var_dbl, divisor.var_dbl) + divisor.var_dbl;
 			else
 				return fmod(var_dbl, divisor.var_dbl);
 		}
-	}
-	else
-	{
+	} else {
 		// prefer double divisor
-		if (divisor.var_typ & VARTYP_DBL)
-		{
+		if (divisor.var_typ & VARTYP_DBL) {
 
 			var_dbl = double(var_int);
 			// following would cache the double value but is it worth it?
 			// var_typ=var_typ & VARTYP_DBL;
 
 			if ((var_int < 0 && divisor.var_dbl >= 0) ||
-			    (divisor.var_dbl < 0 && var_int >= 0))
+				(divisor.var_dbl < 0 && var_int >= 0))
 				// multivalue version of mod
 				return fmod(var_dbl, divisor.var_dbl) + divisor.var_dbl;
 			else
 				return fmod(var_dbl, divisor.var_dbl);
-		}
-		else
-		{
+		} else {
 			if ((var_int < 0 && divisor.var_int >= 0) ||
-			    (divisor.var_int < 0 && var_int >= 0))
+				(divisor.var_int < 0 && var_int >= 0))
 				// multivalue version of mod
 				return (var_int % divisor.var_int) + divisor.var_int;
 			else
@@ -2305,27 +2102,21 @@ var var::mod(const var& divisor) const
 	throw MVError("mod(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
-var var::mod(const int divisor) const
-{
+var var::mod(const int divisor) const {
 	THISIS("var var::mod(const int divisor) const")
 	THISISNUMERIC()
 
 	// see ::mod(const var& divisor) for comments about c++11 % operator
 
 	// prefer double dividend
-	if (var_typ & VARTYP_DBL)
-	{
-		if ((var_dbl < 0 && divisor >= 0) || (divisor < 0 && var_dbl >= 0))
-		{
+	if (var_typ & VARTYP_DBL) {
+		if ((var_dbl < 0 && divisor >= 0) || (divisor < 0 && var_dbl >= 0)) {
 			// multivalue version of mod
 			double divisor2 = double(divisor);
 			return fmod(var_dbl, divisor2) + divisor2;
-		}
-		else
+		} else
 			return fmod(var_dbl, double(divisor));
-	}
-	else
-	{
+	} else {
 		if ((var_int < 0 && divisor >= 0) || (divisor < 0 && var_int >= 0))
 			// multivalue version of mod
 			return (var_int % divisor) + divisor;
@@ -2341,8 +2132,7 @@ var var::mod(const int divisor) const
 	var loge() const;
 */
 
-var var::sin() const
-{
+var var::sin() const {
 	THISIS("var var::sin() const")
 	THISISNUMERIC()
 
@@ -2356,8 +2146,7 @@ var var::sin() const
 	throw MVError("sin(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
-var var::cos() const
-{
+var var::cos() const {
 	THISIS("var var::cos() const")
 	THISISNUMERIC()
 
@@ -2371,8 +2160,7 @@ var var::cos() const
 	throw MVError("cos(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
-var var::tan() const
-{
+var var::tan() const {
 	THISIS("var var::tan() const")
 	THISISNUMERIC()
 
@@ -2386,8 +2174,7 @@ var var::tan() const
 	throw MVError("tan(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
-var var::atan() const
-{
+var var::atan() const {
 	THISIS("var var::atan() const")
 	THISISNUMERIC()
 
@@ -2401,8 +2188,7 @@ var var::atan() const
 	throw MVError("atan(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
-var var::loge() const
-{
+var var::loge() const {
 	THISIS("var var::loge() const")
 	THISISNUMERIC()
 
@@ -2416,8 +2202,7 @@ var var::loge() const
 	throw MVError("loge(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
-var var::sqrt() const
-{
+var var::sqrt() const {
 	THISIS("var var::sqrt() const")
 	THISISNUMERIC()
 
@@ -2431,8 +2216,7 @@ var var::sqrt() const
 	throw MVError("sqrt(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
-var var::pwr(const var& exponent) const
-{
+var var::pwr(const var& exponent) const {
 	THISIS("var var::pwr(const var& exponent) const")
 	THISISNUMERIC()
 	ISNUMERIC(exponent)
@@ -2447,8 +2231,7 @@ var var::pwr(const var& exponent) const
 	throw MVError("pow(unknown mvtype=" ^ var(var_typ) ^ ")");
 }
 
-var var::exp() const
-{
+var var::exp() const {
 	THISIS("var var::exp() const")
 	THISISNUMERIC()
 
@@ -2466,8 +2249,7 @@ var var::exp() const
 // in exodus we move to 1 based numbering to be consistent with
 // c/c++/linux/terminal standards. hopefully not too inconvenient
 
-var var::at(const int columnno) const
-{
+var var::at(const int columnno) const {
 	// THISIS("var var::at(const int columnno) const")
 
 	// hard coded for xterm at the moment
@@ -2481,8 +2263,7 @@ var var::at(const int columnno) const
 	//return "";
 
 	// move to columnno
-	if (columnno > 0)
-	{
+	if (columnno > 0) {
 		std::string tempstr = "\x1B[";
 		tempstr += intToString(columnno);
 		tempstr += "G";
@@ -2512,8 +2293,7 @@ var var::at(const int columnno) const
 	return "";
 }
 
-var var::at(const int columnno, const int rowno) const
-{
+var var::at(const int columnno, const int rowno) const {
 	// THISIS("var var::at(const int columnno,const int rowno) const")
 
 	std::string tempstr = "\x1B[";
@@ -2524,8 +2304,7 @@ var var::at(const int columnno, const int rowno) const
 	return tempstr;
 }
 
-var var::getprompt() const
-{
+var var::getprompt() const {
 	THISIS("var var::getprompt() const")
 	THISISDEFINED()
 
@@ -2533,8 +2312,7 @@ var var::getprompt() const
 	return "";
 }
 
-void var::setprompt() const
-{
+void var::setprompt() const {
 	THISIS("void var::setprompt() const")
 	THISISDEFINED()
 
@@ -2542,8 +2320,7 @@ void var::setprompt() const
 	return;
 }
 
-var var::xlate(const var& filename, const var& fieldno, const var& mode) const
-{
+var var::xlate(const var& filename, const var& fieldno, const var& mode) const {
 	THISIS("var var::xlate(const var& filename,const var& fieldno, const var& mode) const")
 	ISSTRING(mode)
 
@@ -2553,8 +2330,7 @@ var var::xlate(const var& filename, const var& fieldno, const var& mode) const
 // TODO provide a version with int fieldno to handle the most frequent case
 // although may also support dictid (of target file) instead of fieldno
 
-var var::xlate(const var& filename, const var& fieldno, const char* mode) const
-{
+var var::xlate(const var& filename, const var& fieldno, const char* mode) const {
 	THISIS("var var::xlate(const var& filename,const var& fieldno, const char* mode) const")
 	THISISSTRING()
 	ISSTRING(filename)
@@ -2579,8 +2355,7 @@ var var::xlate(const var& filename, const var& fieldno, const char* mode) const
 
 	var response = "";
 	var nmv = (*this).dcount(_VM_);
-	for (var vn = 1; vn <= nmv; ++vn)
-	{
+	for (var vn = 1; vn <= nmv; ++vn) {
 
 		if (vn > 1)
 			response ^= sep;
@@ -2588,8 +2363,7 @@ var var::xlate(const var& filename, const var& fieldno, const char* mode) const
 		// read the record
 		var key = (*this).a(1, vn);
 		var record;
-		if (!record.reado(file, key))
-		{
+		if (!record.reado(file, key)) {
 			// if record doesnt exist then "", or original key if mode is "C"
 
 			// no record and mode C returns the key
@@ -2603,8 +2377,7 @@ var var::xlate(const var& filename, const var& fieldno, const char* mode) const
 		}
 
 		// extract the field or field 0 means return the whole record
-		if (fieldno)
-		{
+		if (fieldno) {
 
 			// numeric fieldno not zero return field
 			// if (fieldno.isnum())
@@ -2618,8 +2391,7 @@ var var::xlate(const var& filename, const var& fieldno, const char* mode) const
 		}
 
 		// fieldno "" returns whole record
-		if (!fieldno.length())
-		{
+		if (!fieldno.length()) {
 			response ^= record;
 			continue;
 		}
@@ -2627,7 +2399,7 @@ var var::xlate(const var& filename, const var& fieldno, const char* mode) const
 		// field no 0 returns key
 		response ^= key;
 	}
-//response.convert(FM^VM,"^]").outputl("RESPONSE=");
+	//response.convert(FM^VM,"^]").outputl("RESPONSE=");
 	return response;
 }
 

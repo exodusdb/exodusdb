@@ -6,17 +6,15 @@
 
 //similar code in haskey.cpp and mvwait.cpp
 
-namespace exodus
-{
+namespace exodus {
 
-bool haskey(int milliseconds = 0)
-{
+bool haskey(int milliseconds = 0) {
 	struct termios oldtio, curtio;
 	//	struct sigaction sa;
 
 	/* Save stdin terminal attributes */
 	/* Probably not available if running as a service */
-	if (tcgetattr(STDIN_FILENO, &oldtio)<0) {
+	if (tcgetattr(STDIN_FILENO, &oldtio) < 0) {
 		//EBADF - The filedes argument is not a valid file descriptor.
 		//ENOTTY - The filedes is not associated with a terminal.
 		return false;
@@ -62,4 +60,4 @@ bool haskey(int milliseconds = 0)
 	return hasdata;
 }
 
-} // namespace
+} // namespace exodus

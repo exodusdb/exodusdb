@@ -31,8 +31,7 @@ THE SOFTWARE.
 // one based two dimensional array but (0,0) is a separate element set or got if either or both
 // index is zero
 
-namespace exodus
-{
+namespace exodus {
 
 // was declared private to prevent it being called but somehow still "dim xyz();" still compiles
 // although with a warning now public to allow usage in class variables
@@ -44,15 +43,13 @@ dim::dim() : nrows_(1), ncols_(1), initialised_(false)
 	//std::cout<< "created[] " << data_ << std::endl;
 }
 
-dim::~dim()
-{
+dim::~dim() {
 	//std::cout<< "deleted[] " << data_ << std::endl;
 	delete[] data_;
 }
 
 // move contructor
-dim::dim(dim&& sourcedim) noexcept
-{
+dim::dim(dim&& sourcedim) noexcept {
 	nrows_ = sourcedim.nrows_;
 	ncols_ = sourcedim.ncols_;
 	initialised_ = sourcedim.ncols_;
@@ -71,8 +68,7 @@ dim::dim(int rows, int cols) : nrows_(rows), ncols_(cols), initialised_(true)
 // dim split is defined in mvmv.cpp
 // var dim::split(const var& str1)
 
-bool dim::read(const var& filehandle, const var& key)
-{
+bool dim::read(const var& filehandle, const var& key) {
 	THISIS("bool dim::matread(const var& filehandle, const var& key)")
 	ISSTRING(filehandle)
 	ISSTRING(key)
@@ -94,8 +90,7 @@ bool dim::read(const var& filehandle, const var& key)
 	return true;
 }
 
-bool dim::write(const var& filehandle, const var& key) const
-{
+bool dim::write(const var& filehandle, const var& key) const {
 	THISIS("bool dim::matwrite(const var& filehandle, const var& key) const")
 	ISSTRING(filehandle)
 	ISSTRING(key)
@@ -104,8 +99,7 @@ bool dim::write(const var& filehandle, const var& key) const
 	return temprecord.write(filehandle, key);
 }
 
-bool dim::redim(int rows, int cols)
-{
+bool dim::redim(int rows, int cols) {
 
 	if (rows == 0 || cols == 0)
 		throw MVArrayDimensionedZero();
@@ -143,8 +137,7 @@ bool dim::redim(int rows, int cols)
 
 // the same () function is called regardless of being on LHS or RHS
 // second version is IDENTICAL except for lack of const (used only on "const dim")
-var& dim::operator()(int rowno, int colno)
-{
+var& dim::operator()(int rowno, int colno) {
 
 	// check bounds
 	if (rowno > nrows_)
@@ -158,8 +151,7 @@ var& dim::operator()(int rowno, int colno)
 	return data_[ncols_ * (rowno - 1) + colno];
 }
 
-var& dim::operator()(int rowno, int colno) const
-{
+var& dim::operator()(int rowno, int colno) const {
 
 	// check bounds
 	if (rowno > nrows_ || rowno < 0)
@@ -167,16 +159,14 @@ var& dim::operator()(int rowno, int colno) const
 	if (colno > ncols_ || colno < 0)
 		throw MVArrayIndexOutOfBounds("col:" ^ var(colno) ^ " > " ^ ncols_);
 
-	if (rowno == 0 || colno == 0)
-	{
+	if (rowno == 0 || colno == 0) {
 		return (data_)[0];
 	}
 
 	return data_[ncols_ * (rowno - 1) + colno];
 }
 
-dim& dim::init(const var& sourcevar)
-{
+dim& dim::init(const var& sourcevar) {
 	if (!initialised_)
 		throw MVArrayNotDimensioned();
 	int arraysize = nrows_ * ncols_ + 1;
@@ -185,8 +175,7 @@ dim& dim::init(const var& sourcevar)
 	return *this;
 }
 
-dim& dim::operator=(const dim& sourcedim)
-{
+dim& dim::operator=(const dim& sourcedim) {
 	// cannot copy an undimensioned array
 	if (!sourcedim.initialised_)
 		throw MVArrayNotDimensioned();
@@ -199,32 +188,28 @@ dim& dim::operator=(const dim& sourcedim)
 	return *this;
 }
 
-dim& dim::operator=(const var& sourcevar)
-{
+dim& dim::operator=(const var& sourcevar) {
 	if (!initialised_)
 		throw MVArrayNotDimensioned();
 	init(sourcevar);
 	return *this;
 }
 
-dim& dim::operator=(const int sourceint)
-{
+dim& dim::operator=(const int sourceint) {
 	if (!initialised_)
 		throw MVArrayNotDimensioned();
 	init(sourceint);
 	return *this;
 }
 
-dim& dim::operator=(const double sourcedbl)
-{
+dim& dim::operator=(const double sourcedbl) {
 	if (!initialised_)
 		throw MVArrayNotDimensioned();
 	init(sourcedbl);
 	return *this;
 }
 
-var dim::join(const var& sepchar) const
-{
+var dim::join(const var& sepchar) const {
 	if (!initialised_)
 		throw MVArrayNotDimensioned();
 	int arraysize = nrows_ * ncols_;
@@ -233,8 +218,7 @@ var dim::join(const var& sepchar) const
 
 	// find last element with any data
 	int nn;
-	for (nn = arraysize; nn > 0; --nn)
-	{
+	for (nn = arraysize; nn > 0; --nn) {
 		if (data_[nn].assigned() && data_[nn].length())
 			break;
 	}
@@ -250,24 +234,19 @@ var dim::join(const var& sepchar) const
 		return output;
 
 	//when sepchar is one byte (usual case), use push_back for speed
-	if (sepchar.length()==1)
-	{
-		char sepbyte=*sepchar[1].data();
+	if (sepchar.length() == 1) {
+		char sepbyte = *sepchar[1].data();
 
 		// append any additional elements
-		for (int ii = 2; ii <= nn; ++ii)
-		{
+		for (int ii = 2; ii <= nn; ++ii) {
 			output.var_str.push_back(sepbyte);
 			output ^= data_[ii];
 		}
-	}
-	else
-	{
-		std::string sepstring=sepchar;
+	} else {
+		std::string sepstring = sepchar;
 
 		// append any additional elements
-		for (int ii = 2; ii <= nn; ++ii)
-		{
+		for (int ii = 2; ii <= nn; ++ii) {
 			output.var_str += sepstring;
 			output ^= data_[ii];
 		}

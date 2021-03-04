@@ -31,12 +31,10 @@ using namespace std;
 #define TRACING 3
 #endif
 //#define TRACING 5
-namespace exodus
-{
+namespace exodus {
 
 void respondToRequests(int sock, const std::string& socketpath,
-		       ExodusFunctorBase& exodusfunctorbase)
-{
+					   ExodusFunctorBase& exodusfunctorbase) {
 
 	// unsigned int priority;
 	socklen_t fromlen;
@@ -46,13 +44,12 @@ void respondToRequests(int sock, const std::string& socketpath,
 	// int nresponsebytes;
 	std::string response;
 
-	while (true)
-	{
+	while (true) {
 
 // log
 #if TRACING >= 3
 		wprintf(L"---------------------------------\nMVipc: accepting on socket %d\n",
-			sock);
+				sock);
 #endif
 
 		/*server waits for a connection*/
@@ -60,10 +57,9 @@ void respondToRequests(int sock, const std::string& socketpath,
 		fromlen = sizeof(from);
 		listen(sock, 1);
 		int sock2;
-		if ((sock2 = accept(sock, (struct sockaddr*)&from, &fromlen)) < 0)
-		{
+		if ((sock2 = accept(sock, (struct sockaddr*)&from, &fromlen)) < 0) {
 			std::cout << "mvipc: error " << errno << " " << strerror(errno)
-				  << " accepting socket " << socketpath << std::endl;
+					  << " accepting socket " << socketpath << std::endl;
 			continue;
 		}
 		/*
@@ -110,22 +106,21 @@ void respondToRequests(int sock, const std::string& socketpath,
 // log
 #if TRACING >= 3
 		wprintf(L"---------------------------------\nMVipc: reading upto %d bytes from "
-			L"data socket\n",
-			sizeof(chRequest));
+				L"data socket\n",
+				sizeof(chRequest));
 #endif
 
 		int nn;
-		if ((nn = read(sock2, chRequest, sizeof(chRequest))) < 0)
-		{
+		if ((nn = read(sock2, chRequest, sizeof(chRequest))) < 0) {
 			std::cout << "mvipc: error " << errno << " " << strerror(errno)
-				  << " reading data from socket " << socketpath << std::endl;
+					  << " reading data from socket " << socketpath << std::endl;
 			continue;
 		}
 
 // log
 #if TRACING >= 3
 		wprintf(L"---------------------------------\nMVipc() read  %d bytes from socket\n",
-			nn);
+				nn);
 #endif
 
 		// determine a response
@@ -134,15 +129,14 @@ void respondToRequests(int sock, const std::string& socketpath,
 // log
 #if TRACING >= 3
 		wprintf(L"---------------------------------\nMVipc() writing response %d bytes to "
-			L"socket\n",
-			response.size());
+				L"socket\n",
+				response.size());
 #endif
 
 		// send a response
-		if (write(sock2, response.c_str(), response.size()) < 0)
-		{
+		if (write(sock2, response.c_str(), response.size()) < 0) {
 			std::cout << "mvipc: error" << errno << " " << strerror(errno)
-				  << " writing socket " << socketpath << std::endl;
+					  << " writing socket " << socketpath << std::endl;
 			continue;
 		}
 
@@ -155,23 +149,20 @@ void respondToRequests(int sock, const std::string& socketpath,
 	}
 }
 
-void closeipcqueues(int sock, std::string& socketpath)
-{
+void closeipcqueues(int sock, std::string& socketpath) {
 	if (sock)
 		close(sock);
 	unlink(socketpath.c_str());
 }
 
 // this function is started as a thread by startipc()
-int MVipc(const int environmentn, var& pgconnparams)
-{
+int MVipc(const int environmentn, var& pgconnparams) {
 
 	// flag to connect NOT to be recursive and open yet another ipc thread
 	tss_ipcstarted.reset(new bool(true));
 
 	// clone the postgres connection because the parent thread is running a select with it
-	if (!var().connect(pgconnparams))
-	{
+	if (!var().connect(pgconnparams)) {
 		throw var(L"MVipc Cannot connect additional thread to postgres");
 		return false;
 	}
@@ -186,8 +177,7 @@ int MVipc(const int environmentn, var& pgconnparams)
 	//*COPY in mvipc_posix.cpp mvipc_boost.cpp mvipc_win.cpp
 	MvEnvironment standalone_mv;
 	MvEnvironment* mv = global_environments[environmentn];
-	if (not mv)
-	{
+	if (not mv) {
 #if TRACING >= 2
 		std::clog << "MVipc() Using a standalone MvEnvironment" << std::endl;
 #endif
@@ -219,12 +209,11 @@ int MVipc(const int environmentn, var& pgconnparams)
 	strncpy(addr.sun_path, socketpath.c_str(), sizeof(addr.sun_path));
 	addr.sun_family = AF_UNIX;
 	if (bind(sock, (struct sockaddr*)&addr, strlen(addr.sun_path) + sizeof(addr.sun_family)) <
-	    0)
-	{
+		0) {
 		boost::mutex::scoped_lock lock(global_ipcmutex);
 		global_ipccondition.notify_one();
 		std::cout << "cannot open " << socketpath << " " << errno << " " << strerror(errno)
-			  << std::endl;
+				  << std::endl;
 		closeipcqueues(sock, socketpath);
 		return 0;
 	}

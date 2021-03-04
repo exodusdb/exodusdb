@@ -1,11 +1,11 @@
-#include <unistd.h>
-#include <termios.h>
-#include <sys/inotify.h>
 #include <poll.h>
+#include <sys/inotify.h>
+#include <termios.h>
+#include <unistd.h>
 
+#include <exodus/cargs.h>
 #include <exodus/mv.h>
 #include <exodus/mvexceptions.h>
-#include <exodus/cargs.h>
 
 //similar code in haskey.cpp and mvwait.cpp
 
@@ -18,26 +18,25 @@ namespace exodus {
   Entry 0 of wd and argv is unused. */
 
 //return true if any relevent events
-var handle_events(int inotify_fd, int *wd, const int argc, const char* argv[])
-{
-   /* Some systems cannot read integer variables if they are not
+var handle_events(int inotify_fd, int* wd, const int argc, const char* argv[]) {
+	/* Some systems cannot read integer variables if they are not
       properly aligned. On other systems, incorrect alignment may
       decrease performance. Hence, the buffer used for reading from
       the inotify file descriptor should have the same alignment as
       struct inotify_event. */
 
-   char buf[4096]
-       __attribute__ ((aligned(__alignof__(struct inotify_event))));
-   const struct inotify_event *event;
-   int i;
-   ssize_t len;
-   char *ptr;
+	char buf[4096]
+		__attribute__((aligned(__alignof__(struct inotify_event))));
+	const struct inotify_event* event;
+	int i;
+	ssize_t len;
+	char* ptr;
 
 	//printf("Handling events\n");
 
 	///Loop while events can be read from inotify file descriptor.
-	int eventn=0;
-	var events="";
+	int eventn = 0;
+	var events = "";
 	do {
 
 		// Read some events
@@ -56,59 +55,59 @@ var handle_events(int inotify_fd, int *wd, const int argc, const char* argv[])
 		//printf("Loop over all events in the buffer\n");
 		for (ptr = buf; ptr < buf + len;
 
-			ptr += sizeof(struct inotify_event) + event->len) {
+			 ptr += sizeof(struct inotify_event) + event->len) {
 
 			eventn++;
 
-			event = (const struct inotify_event *) ptr;
+			event = (const struct inotify_event*)ptr;
 
 			//printf("Print event type\n");
 			if (event->mask & IN_OPEN)
-				events.r(1,"IN_OPEN");
+				events.r(1, "IN_OPEN");
 			else if (event->mask & IN_CLOSE_WRITE)
-            	events.r(1,eventn,"IN_CLOSE_WRITE");
+				events.r(1, eventn, "IN_CLOSE_WRITE");
 			else if (event->mask & IN_ACCESS)
-				events.r(1,eventn,"IN_ACCESS");//Data was read from file.");
+				events.r(1, eventn, "IN_ACCESS"); //Data was read from file.");
 			else if (event->mask & IN_MODIFY)
-				events.r(1,eventn,"IN_MODIFY");//Data was written to file.");
+				events.r(1, eventn, "IN_MODIFY"); //Data was written to file.");
 			else if (event->mask & IN_ATTRIB)
-				events.r(1,eventn,"IN_ATTRIB");//File attributes changed.");
+				events.r(1, eventn, "IN_ATTRIB"); //File attributes changed.");
 			else if (event->mask & IN_CLOSE)
-				events.r(1,eventn,"IN_CLOSE");//File was closed (read or write).");
+				events.r(1, eventn, "IN_CLOSE"); //File was closed (read or write).");
 			else if (event->mask & IN_MOVED_FROM)
-			    events.r(1,eventn,"IN_MOVED_FROM");//File was moved away from watched directory.");
+				events.r(1, eventn, "IN_MOVED_FROM"); //File was moved away from watched directory.");
 			else if (event->mask & IN_MOVED_TO)
-			    events.r(1,eventn,"IN_MOVED_TO");//File was moved into watched directory.");
+				events.r(1, eventn, "IN_MOVED_TO"); //File was moved into watched directory.");
 			else if (event->mask & IN_MOVE)
-			    events.r(1,eventn,"IN_MOVE");//File was moved (in or out of directory).");
+				events.r(1, eventn, "IN_MOVE"); //File was moved (in or out of directory).");
 			else if (event->mask & IN_CREATE)
-			    events.r(1,eventn,"IN_CREATE");//A file was created in the directory.");
+				events.r(1, eventn, "IN_CREATE"); //A file was created in the directory.");
 			else if (event->mask & IN_DELETE)
-			    events.r(1,eventn,"IN_DELETE");//A file was deleted from the directory.");
+				events.r(1, eventn, "IN_DELETE"); //A file was deleted from the directory.");
 			else if (event->mask & IN_DELETE_SELF)
-			    events.r(1,eventn,"IN_DELETE_SELF");//Directory or file under observation was deleted.");
+				events.r(1, eventn, "IN_DELETE_SELF"); //Directory or file under observation was deleted.");
 			else if (event->mask & IN_MOVE_SELF)
-			    events.r(1,eventn,"IN_MOVE_SELF");//Directory or file under observation was moved.");
+				events.r(1, eventn, "IN_MOVE_SELF"); //Directory or file under observation was moved.");
 			else
 				continue;
 
 			// The name of the watched directory
 			for (i = 1; i < argc; ++i) {
 				if (wd[i] == event->wd) {
-					events.r(2,eventn, argv[i]);
+					events.r(2, eventn, argv[i]);
 					break;
 				}
 			}
 
-           // The name of the file
-           if (event->len)
-               events.r(3,eventn, event->name);
+			// The name of the file
+			if (event->len)
+				events.r(3, eventn, event->name);
 
-           //The type of filesystem object
-           if (event->mask & IN_ISDIR)
-               events.r(4,eventn,"d");
-           else
-               events.r(4,eventn,"f");
+			//The type of filesystem object
+			if (event->mask & IN_ISDIR)
+				events.r(4, eventn, "d");
+			else
+				events.r(4, eventn, "f");
 		}
 
 		//if (events)
@@ -126,13 +125,12 @@ var handle_events(int inotify_fd, int *wd, const int argc, const char* argv[])
 //
 //returns a list of events in those directories
 //or "1" if a key was pressed
-var wait_main(const int argc, const char* argv[], const int wait_time_ms)
-{
+var wait_main(const int argc, const char* argv[], const int wait_time_ms) {
 
 	//c style declaration at top
 	//char buf;
 	int inotify_fd, i, poll_num;
-	int *wd;
+	int* wd;
 	nfds_t nfds;
 	struct pollfd fds[2];
 
@@ -166,18 +164,16 @@ var wait_main(const int argc, const char* argv[], const int wait_time_ms)
 		//Mark directories and files watch
 		//int inotify_rm_watch(int fd, int wd);
 		wd[i] = inotify_add_watch(inotify_fd, argv[i],
-			//IN_OPEN | IN_CLOSE
-			IN_CLOSE_WRITE | IN_MOVED_FROM | IN_MOVED_TO
-			| IN_MOVE | IN_DELETE_SELF | IN_MOVE_SELF
-			//IN_ALL_EVENTS
-			);
+								  //IN_OPEN | IN_CLOSE
+								  IN_CLOSE_WRITE | IN_MOVED_FROM | IN_MOVED_TO | IN_MOVE | IN_DELETE_SELF | IN_MOVE_SELF
+								  //IN_ALL_EVENTS
+		);
 		// or crash
 		if (wd[i] == -1) {
 			fprintf(stderr, "Cannot watch '%s'\n", argv[i]);
 			perror("mvwait: inotify_add_watch");
 			exit(EXIT_FAILURE);
 		}
-
 	}
 
 	nfds = 1;
@@ -188,11 +184,11 @@ var wait_main(const int argc, const char* argv[], const int wait_time_ms)
 	// Save stdin terminal attributes
 	// Probably not available if running as a service
 	struct termios oldtio, curtio;
-	if (tcgetattr(STDIN_FILENO, &oldtio)<0) {
+	if (tcgetattr(STDIN_FILENO, &oldtio) < 0) {
 		//EBADF - The filedes argument is not a valid file descriptor.
 		//ENOTTY - The filedes is not associated with a terminal.
-//		var("no std input").outputl();
-//		return false;
+		//		var("no std input").outputl();
+		//		return false;
 	} else {
 		nfds = 2;
 
@@ -218,7 +214,6 @@ var wait_main(const int argc, const char* argv[], const int wait_time_ms)
 		tcgetattr(STDIN_FILENO, &curtio);
 		curtio.c_lflag &= ~(ICANON | ECHO);
 		tcsetattr(STDIN_FILENO, TCSANOW, &curtio);
-
 	}
 
 	/* Prepare for polling */
@@ -243,7 +238,7 @@ var wait_main(const int argc, const char* argv[], const int wait_time_ms)
 		poll_num = poll(fds, nfds, wait_time_ms);
 		if (poll_num == -1) {
 			if (errno == EINTR)
-			   continue;
+				continue;
 			perror("mvwait: poll");
 			exit(EXIT_FAILURE);
 		}
@@ -255,7 +250,7 @@ var wait_main(const int argc, const char* argv[], const int wait_time_ms)
 
 				/* Inotify events are available */
 				//quit if any relevent events
-				if (events=handle_events(inotify_fd, wd, argc, argv))
+				if (events = handle_events(inotify_fd, wd, argc, argv))
 					break;
 			}
 
@@ -270,19 +265,18 @@ var wait_main(const int argc, const char* argv[], const int wait_time_ms)
 				break;
 			}
 
-		//timeout
+			//timeout
 		} else if (poll_num == 0) {
 			//printf("Timeout listening for events.\n");
 			break;
 		}
-
 	}
 
 	//printf("Listening for events stopped.\n");
 
 	//remove watches or crash (is this necessary since we close the fd next)
 	for (i = 1; i < argc; i++) {
-		if (inotify_rm_watch(inotify_fd, wd[i])<0) {
+		if (inotify_rm_watch(inotify_fd, wd[i]) < 0) {
 			perror("mvwait: inotify_rm_watch");
 			exit(EXIT_FAILURE);
 		}
@@ -304,19 +298,17 @@ var wait_main(const int argc, const char* argv[], const int wait_time_ms)
 	return events;
 }
 
-var var::oswait(const int milliseconds,const var& directory) const
-{
-    THISIS("void var::oswait(const int milliseconds, const var directory) const")
-    // doesnt use *this - should syntax be changed to setcwd? and getcwd()?
-    //THISISDEFINED() // not needed if *this not used
+var var::oswait(const int milliseconds, const var& directory) const {
+	THISIS("void var::oswait(const int milliseconds, const var directory) const")
+	// doesnt use *this - should syntax be changed to setcwd? and getcwd()?
+	//THISISDEFINED() // not needed if *this not used
 	ISSTRING(directory)
 
 	Cargs cargs(FM ^ directory);
 
-//	var("oswait ").outputl(directory);
+	//	var("oswait ").outputl(directory);
 
-	return wait_main(cargs.argc(),cargs.argv(), milliseconds);
-
+	return wait_main(cargs.argc(), cargs.argv(), milliseconds);
 }
 
-}//namespace
+} // namespace exodus

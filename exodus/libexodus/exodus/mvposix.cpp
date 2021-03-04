@@ -5,16 +5,13 @@
 
 #include <exodus/mv.h>
 
-namespace exodus
-{
+namespace exodus {
 
-var getprocessn()
-{
+var getprocessn() {
 	return var((int)getpid());
 }
 
-var getexecpath()
-{
+var getexecpath() {
 	var osenv;
 	osenv.osgetenv("_");
 	return osenv;

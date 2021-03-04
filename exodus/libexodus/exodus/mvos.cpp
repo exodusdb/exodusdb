@@ -30,7 +30,7 @@ THE SOFTWARE.
 //#include <istream>
 //#include <ostream>
 #include <algorithm> //for count in osrename
-#include <cstdlib>   //for getenv and setenv/putenv
+#include <cstdlib>	 //for getenv and setenv/putenv
 //#include <stdlib.h>
 #include <fstream>
 #include <iostream>
@@ -48,15 +48,15 @@ THE SOFTWARE.
 //#include <filesystem>
 //namespace stdfs = std::filesystem;
 #if __has_include(<filesystem>)
-  #include <filesystem>
-  namespace stdfs = std::filesystem;
-  #define ABSOLUTE_OR_COMPLETE absolute
+#include <filesystem>
+namespace stdfs = std::filesystem;
+#define ABSOLUTE_OR_COMPLETE absolute
 #elif __has_include(<experimental/filesystem>)
-  #include <experimental/filesystem> 
-  namespace stdfs = std::experimental::filesystem;
-  #define ABSOLUTE_OR_COMPLETE system_complete
+#include <experimental/filesystem>
+namespace stdfs = std::experimental::filesystem;
+#define ABSOLUTE_OR_COMPLETE system_complete
 #else
-  error "Missing the <filesystem> header."
+error "Missing the <filesystem> header."
 #endif
 
 // show c++ version for info
@@ -137,8 +137,7 @@ extern char** environ;
 
 boost::once_flag exodus_once_flag = BOOST_ONCE_INIT;
 
-void exodus_once_func()
-{
+void exodus_once_func() {
 	// so wcscoll() sorts a<B etc instead of character number wise where B<a
 	// wcscoll currently only used on non-pc/non-mac ... see var::localeAwareCompare
 	// so has no effect on those platform for < <= etc
@@ -147,8 +146,7 @@ void exodus_once_func()
 	//.begin() .end() and we want to be able to control conversion more accurately than an
 	// automatic conversion en_US is missing from Ubuntu. en_IN is available on Ubuntu and
 	// Centos but not MacOSX if (!setlocale (LC_COLLATE, "en_US.utf8"))
-	if (!setlocale(LC_ALL, "en_US.utf8"))
-	{
+	if (!setlocale(LC_ALL, "en_US.utf8")) {
 		if (!setlocale(LC_ALL, "C.UTF-8"))
 			std::cout << "Cannot setlocale LC_COLLATE to en_US.utf8" << std::endl;
 	};
@@ -257,15 +255,13 @@ en_ZW.iso88591
 en_ZW.utf8
 */
 
-class ExodusOnce
-{
-      public:
+class ExodusOnce {
+  public:
 	ExodusOnce() { boost::call_once(&exodus_once_func, exodus_once_flag); }
 };
 static ExodusOnce exodus_once_static;
 
-namespace exodus
-{
+namespace exodus {
 
 // this object caches fstream * pointers, to avoid multiple reopening files
 // extern MvHandlesCache mv_handles_cache;
@@ -283,56 +279,44 @@ std::locale get_locale(const var& locale_name) // throw (MVError)
 	// THISIS("std::locale get_locale(const var& locale_name)")
 	// ISSTRING(locale_name)
 
-	if (not locale_name.length() || locale_name == "utf8")
-	{
+	if (not locale_name.length() || locale_name == "utf8") {
 		std::locale old_locale;
 
 		//https://exceptionshub.com/read-unicode-utf-8-file-into-wstring.html
 		//wif.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t>));
 
 		std::locale utf8_locale(old_locale,
-					new std::codecvt_utf8<wchar_t>
-		);
+								new std::codecvt_utf8<wchar_t>);
 
 		return utf8_locale;
-	}
-	else
-	{
-		try
-		{
-			if (locale_name.length())
-			{
+	} else {
+		try {
+			if (locale_name.length()) {
 				std::locale mylocale(locale_name.toString().c_str());
 				return mylocale;
-			}
-			else
-			{
+			} else {
 				// dont trust default locale since on osx 10.5.6 it fails!
 				std::locale mylocale("C");
 				return mylocale;
 			}
-		}
-		catch (std::runtime_error& re)
-		{
+		} catch (std::runtime_error& re) {
 			throw MVError("get_locale cannot create locale for " ^ locale_name);
 		}
 	}
 }
 
-bool checknotabsoluterootfolder(std::string dirname)
-{
+bool checknotabsoluterootfolder(std::string dirname) {
 	// safety - will not rename/remove top level folders
 	// cwd to top level and delete relative
 	// top level folder has only one slash either at the beginning or, on windows, like x:\ .
 	// NB copy/same code in osrmdir and osrename
 	if ((!SLASH_IS_BACKSLASH && dirname[0] == OSSLASH_ &&
-	     std::count(dirname.begin(), dirname.end(), OSSLASH_) < 3) ||
-	    (SLASH_IS_BACKSLASH && (dirname[1] == ':') && (dirname[2] == OSSLASH_)))
-	{
+		 std::count(dirname.begin(), dirname.end(), OSSLASH_) < 3) ||
+		(SLASH_IS_BACKSLASH && (dirname[1] == ':') && (dirname[2] == OSSLASH_))) {
 		std::cout
-		    << "Forced removal/renaming of top two level directories by absolute path is "
-		       "not supported for safety but you can use cwd() and relative path."
-		    << dirname << std::endl;
+			<< "Forced removal/renaming of top two level directories by absolute path is "
+			   "not supported for safety but you can use cwd() and relative path."
+			<< dirname << std::endl;
 		return false;
 	}
 	return true;
@@ -341,8 +325,7 @@ bool checknotabsoluterootfolder(std::string dirname)
 // ICONV_MT can be moved back to mvioconv.cpp if it stops using regular expressions
 // regular expressions for ICONV_MT
 // var var::iconv_MT(const char* conversion) const
-var var::iconv_MT() const
-{
+var var::iconv_MT() const {
 	// ignore everything else and just get first three groups of digits "99 99 99"
 	// remove leading and trailing non-digits and replace internal strings of non-digits with
 	// single space
@@ -350,7 +333,7 @@ var var::iconv_MT() const
 	// var time=(*this).swap("^\\D+|\\D+$", "", "r").swap("\\D+", " ", "r");
 
 	static std_boost::regex surrounding_nondigits_regex("^\\D+|\\D+$",
-							    std_boost::regex_constants::icase);
+														std_boost::regex_constants::icase);
 
 	static std_boost::regex inner_nondigits_regex("\\D+", std_boost::regex_constants::icase);
 
@@ -377,8 +360,7 @@ var var::iconv_MT() const
 
 // OCONV_MR can be moved back to mvioconv.cpp if it stops using regular expressions
 // regular expressions for ICONV_MC
-var& var::oconv_MR(const char* conversionchar)
-{
+var& var::oconv_MR(const char* conversionchar) {
 	// conversionchar arrives pointing to 3rd character (eg A in MCA)
 
 	// abort if no 3rd char
@@ -428,51 +410,46 @@ var& var::oconv_MR(const char* conversionchar)
 #define boost_mvstr toTstring((*this))
 #define boost_regex_replace std_boost::regex_replace
 	static const std_boost::regex digits_regex("\\d+"), // \d numeric
-	    alpha_regex("[^\\W\\d]+"),			    // \a alphabetic
-	    alphanum_regex("\\w+"),			    // \w alphanumeric
-	    non_digits_regex("[^\\d]+"),		    // \D non-numeric
-	    non_alpha_regex("[\\W\\d]+"),		    // \A non-alphabetic
-	    non_alphanum_regex("\\W+");			    // \W non-alphanumeric
+		alpha_regex("[^\\W\\d]+"),						// \a alphabetic
+		alphanum_regex("\\w+"),							// \w alphanumeric
+		non_digits_regex("[^\\d]+"),					// \D non-numeric
+		non_alpha_regex("[\\W\\d]+"),					// \A non-alphabetic
+		non_alphanum_regex("\\W+");						// \W non-alphanumeric
 #else
 #define boost_mvstr this->var_str
 #define boost_regex_replace std_boost::u32regex_replace
 	static const std_boost::u32regex digits_regex = boost::make_u32regex("\\d+"); //\d numeric
 	static const std_boost::u32regex alpha_regex =
-	    boost::make_u32regex("[^\\W\\d]+"); // \a alphabetic
+		boost::make_u32regex("[^\\W\\d]+"); // \a alphabetic
 	static const std_boost::u32regex alphanum_regex =
-	    boost::make_u32regex("\\w+"); // \w alphanumeric
+		boost::make_u32regex("\\w+"); // \w alphanumeric
 	static const std_boost::u32regex non_digits_regex =
-	    boost::make_u32regex("[^\\d]+"); // \D non-numeric
+		boost::make_u32regex("[^\\d]+"); // \D non-numeric
 	static const std_boost::u32regex non_alpha_regex =
-	    boost::make_u32regex("[\\W\\d]+"); // \A non-alphabetic
+		boost::make_u32regex("[\\W\\d]+"); // \A non-alphabetic
 	static const std_boost::u32regex non_alphanum_regex =
-	    boost::make_u32regex("\\W+"); // \W non-alphanumeric
+		boost::make_u32regex("\\W+"); // \W non-alphanumeric
 #endif
 
 	// negate if /
-	if (*conversionchar == '/')
-	{
+	if (*conversionchar == '/') {
 		++conversionchar;
-		switch (*conversionchar)
-		{
+		switch (*conversionchar) {
 		// MC/N return everything except digits i.e. remove all digits 0123456789
-		case 'N':
-		{
+		case 'N': {
 			// this->var_str=std_boost::regex_replace(toTstring((*this)),digits_regex, "");
 			this->var_str = boost_regex_replace(boost_mvstr, digits_regex, "");
 			break;
 		}
 
 		// MC/A return everything except "alphabetic" i.e remove all "alphabetic"
-		case 'A':
-		{
+		case 'A': {
 			// this->var_str=std_boost::regex_replace(toTstring((*this)),alpha_regex, "");
 			this->var_str = boost_regex_replace(boost_mvstr, alpha_regex, "");
 			break;
 		}
 		// MC/B return everything except "alphanumeric" remove all "alphanumeric"
-		case 'B':
-		{
+		case 'B': {
 			// this->var_str=std_boost::regex_replace(toTstring((*this)),alphanum_regex, "");
 			this->var_str = boost_regex_replace(boost_mvstr, alphanum_regex, "");
 			break;
@@ -484,38 +461,32 @@ var& var::oconv_MR(const char* conversionchar)
 	// http://www.boost.org/doc/libs/1_37_0/libs/regex/doc/html/boost_regex/ref/regex_replace.html
 	// std_boost::regex_replace
 
-	switch (*conversionchar)
-	{
+	switch (*conversionchar) {
 	// MCN return only digits i.e. remove all non-digits
-	case 'N':
-	{
+	case 'N': {
 		// this->var_str=std_boost::regex_replace(toTstring((*this)),non_digits_regex, "");
 		this->var_str = boost_regex_replace(boost_mvstr, non_digits_regex, "");
 		break;
 	}
 	// MCA return only "alphabetic" i.e. remove all "non-alphabetic"
-	case 'A':
-	{
+	case 'A': {
 		// this->var_str=std_boost::regex_replace(toTstring((*this)),non_alpha_regex, "");
 		this->var_str = boost_regex_replace(boost_mvstr, non_alpha_regex, "");
 		break;
 	}
 	// MCB return only "alphanumeric" i.e. remove all "non-alphanumeric"
-	case 'B':
-	{
+	case 'B': {
 		// this->var_str=std_boost::regex_replace(toTstring((*this)),non_alphanum_regex, "");
 		this->var_str = boost_regex_replace(boost_mvstr, non_alphanum_regex, "");
 		break;
 	}
 	// MCL to lower case
-	case 'L':
-	{
+	case 'L': {
 		lcaser();
 		break;
 	}
 	// MCU to upper case
-	case 'U':
-	{
+	case 'U': {
 		ucaser();
 		break;
 	}
@@ -532,13 +503,11 @@ var& var::oconv_MR(const char* conversionchar)
 using random_base_generator_type = boost::mt19937;
 boost::thread_specific_ptr<random_base_generator_type> tss_random_base_generators;
 
-random_base_generator_type* get_random_base_generator()
-{
+random_base_generator_type* get_random_base_generator() {
 	// get/init the base generator
 	random_base_generator_type* threads_random_base_generator =
-	    tss_random_base_generators.get();
-	if (!threads_random_base_generator)
-	{
+		tss_random_base_generators.get();
+	if (!threads_random_base_generator) {
 		tss_random_base_generators.reset(new random_base_generator_type);
 		threads_random_base_generator = tss_random_base_generators.get();
 		if (!threads_random_base_generator)
@@ -552,14 +521,13 @@ random_base_generator_type* get_random_base_generator()
 		//		(*threads_random_base_generator).seed(static_cast<unsigned
 		// int>(std::time(0)+2375472354));
 		(*threads_random_base_generator)
-		    .seed(static_cast<unsigned int>(std::time(0) + 2075472354));
+			.seed(static_cast<unsigned int>(std::time(0) + 2075472354));
 		//(*thread_base_generator).seed(static_cast<unsigned int>(var().ostime().toInt()));
 	}
 	return threads_random_base_generator;
 }
 
-var var::rnd() const
-{
+var var::rnd() const {
 	THISIS("var var::rnd() const")
 	THISISNUMERIC()
 
@@ -576,14 +544,13 @@ var var::rnd() const
 
 	// use the base generator and the range to create a specific generator
 	boost::variate_generator<random_base_generator_type&, boost::uniform_int<>> uni(
-	    *threads_random_base_generator, uni_dist);
+		*threads_random_base_generator, uni_dist);
 
 	// generate a pseudo random number
 	return uni();
 }
 
-void var::initrnd() const
-{
+void var::initrnd() const {
 	THISIS("void var::initrnd(const var& seed) const")
 	THISISDEFINED()
 
@@ -592,14 +559,11 @@ void var::initrnd() const
 
 	// seed from number
 	uint64_t seed;
-	if (this->isnum())
-	{
+	if (this->isnum()) {
 		seed = this->toLong();
 
 		// seed from string
-	}
-	else
-	{
+	} else {
 		seed = 1;
 		for (size_t ii = 0; ii < this->var_str.size(); ii++)
 			seed *= this->var_str[ii];
@@ -612,8 +576,7 @@ void var::initrnd() const
 	(*threads_random_base_generator).seed(static_cast<uint64_t>(seed));
 }
 
-int get_regex_syntax_flags(const var& options)
-{
+int get_regex_syntax_flags(const var& options) {
 	// determine options from string
 
 	// default
@@ -649,8 +612,7 @@ int get_regex_syntax_flags(const var& options)
 }
 
 // should be in mvfuncs.cpp - here really because boost regex is included here for file matching
-var var::match(const var& matchstr, const var& options) const
-{
+var var::match(const var& matchstr, const var& options) const {
 	// VISUALISE REGULAR EXPRESSIONS GRAPHICALLY!
 	// https:www.debuggex.com
 
@@ -662,8 +624,7 @@ var var::match(const var& matchstr, const var& options) const
 	// *.* or *.???
 	// *abcde
 	// abcde*
-	if (options.index("w"))
-	{
+	if (options.index("w")) {
 
 		// rules of glob - converting glob to regex
 
@@ -675,7 +636,7 @@ var var::match(const var& matchstr, const var& options) const
 		const std_boost::regex regex_special_chars{R"raw([.^$|()\[\]{}+\\])raw"};
 		const std::string replacement_for_regex_special = R"raw(\\$&)raw";
 		std::string matchstr2 = regex_replace(matchstr.var_str, regex_special_chars,
-						      replacement_for_regex_special);
+											  replacement_for_regex_special);
 
 		// 1. force to match whole string
 		var matchstr3 = "^" + matchstr2 + "$";
@@ -727,12 +688,9 @@ var var::match(const var& matchstr, const var& options) const
 	// https://www.boost.org/doc/libs/1_34_1/libs/regex/doc/icu_strings.html
 
 	std_boost::u32regex regex;
-	try
-	{
+	try {
 		regex = boost::make_u32regex(matchstr.var_str, get_regex_syntax_flags(options));
-	}
-	catch (std_boost::regex_error& e)
-	{
+	} catch (std_boost::regex_error& e) {
 		throw MVError(var(e.what()).quote() ^ " is an invalid regular expression");
 	}
 
@@ -767,23 +725,22 @@ var var::match(const var& matchstr, const var& options) const
 
 	// construct our iterators:
 	boost::u32regex_iterator<std::string::const_iterator> iter{
-	    std_boost::make_u32regex_iterator(this->var_str, regex)};
+		std_boost::make_u32regex_iterator(this->var_str, regex)};
 	decltype(iter) end{};
 	std::for_each(iter, end,
-		      // using declarative functional style "for_each with lambda" instead of old
-		      // fashioned "while (iter!=end)" loop
-		      [&found](auto what) {
-			      for (int groupn = 0; uint(groupn) <= what.size(); ++groupn)
-			      {
-				      // std::cout<< what[0] << std::endl;
-				      found.append(what[groupn]);
-				      found.push_back(VM_);
-			      }
-			      if (!found.empty())
-				      while (found.back() == VM_)
-					      found.pop_back();
-			      found.push_back(FM_);
-		      });
+				  // using declarative functional style "for_each with lambda" instead of old
+				  // fashioned "while (iter!=end)" loop
+				  [&found](auto what) {
+					  for (int groupn = 0; uint(groupn) <= what.size(); ++groupn) {
+						  // std::cout<< what[0] << std::endl;
+						  found.append(what[groupn]);
+						  found.push_back(VM_);
+					  }
+					  if (!found.empty())
+						  while (found.back() == VM_)
+							  found.pop_back();
+					  found.push_back(FM_);
+				  });
 
 	if (!found.empty())
 		found.pop_back();
@@ -819,21 +776,18 @@ var var::match(const var& matchstr, const var& options) const
 }
 
 // simple case sensitive substr replacement
-var var::swap(const var& what, const var& with) const&
-{
+var var::swap(const var& what, const var& with) const& {
 	var newmv = *this;
 	return newmv.swapper(what, with);
 }
 
 // on temporaries
-var& var::swap(const var& what, const var& with) &&
-{
+var& var::swap(const var& what, const var& with) && {
 	return this->swapper(what, with);
 }
 
 // in-place
-var& var::swapper(const var& what, const var& with)
-{
+var& var::swapper(const var& what, const var& with) {
 	THISIS("var& var::swapper(const var& what, const var& with)")
 	THISISSTRINGMUTATOR()
 	ISSTRING(what)
@@ -845,8 +799,7 @@ var& var::swapper(const var& what, const var& with)
 
 	// find the starting position of the field or return
 	std::string::size_type start_pos = 0;
-	while (true)
-	{
+	while (true) {
 		start_pos = this->var_str.find(what.var_str, start_pos);
 		// past of of string?
 		if (start_pos == std::string::npos)
@@ -860,23 +813,20 @@ var& var::swapper(const var& what, const var& with)
 
 //regex based string replacement
 // only here really because boost regex is included here for file matching
-var var::replace(const var& regexstr, const var& replacementstr, const var& options) const&
-{
+var var::replace(const var& regexstr, const var& replacementstr, const var& options) const& {
 	var newmv = *this;
 	return newmv.replacer(regexstr, replacementstr, options);
 }
 
 // on temporary
-var& var::replace(const var& regexstr, const var& replacementstr, const var& options) &&
-{
+var& var::replace(const var& regexstr, const var& replacementstr, const var& options) && {
 	return this->replacer(regexstr, replacementstr, options);
 }
 
 // in-place
-var& var::replacer(const var& regexstr, const var& replacementstr, const var& options)
-{
+var& var::replacer(const var& regexstr, const var& replacementstr, const var& options) {
 	THISIS("var& var::replacer(const var& regexstr, const var& replacementstr, const var& "
-	       "options)")
+		   "options)")
 	THISISSTRINGMUTATOR()
 	ISSTRING(regexstr)
 	ISSTRING(replacementstr)
@@ -886,12 +836,9 @@ var& var::replacer(const var& regexstr, const var& replacementstr, const var& op
 
 	// TODO automatic caching of regular expressions or new exodus datatype to handle them
 	std_boost::u32regex regex;
-	try
-	{
+	try {
 		regex = boost::make_u32regex(regexstr.var_str, get_regex_syntax_flags(options));
-	}
-	catch (std_boost::regex_error& e)
-	{
+	} catch (std_boost::regex_error& e) {
 		throw MVError(var(e.what()).quote() ^ " is an invalid regular expression");
 	}
 
@@ -906,23 +853,20 @@ var& var::replacer(const var& regexstr, const var& replacementstr, const var& op
 	return *this;
 }
 
-bool var::osgetenv(const var& envvarname)
-{
+bool var::osgetenv(const var& envvarname) {
 	THISIS("bool var::osgetenv(const var& envvarname)")
 	THISISDEFINED()
 	ISSTRING(envvarname)
 
 	// return whole environment if blank envvarname
-	if (envvarname.var_str.length() == 0)
-	{
+	if (envvarname.var_str.length() == 0) {
 
 		this->var_str.clear();
 		var_typ = VARTYP_STR;
 
 		int i = 1;
 		char* s = *environ;
-		for (; s; i++)
-		{
+		for (; s; i++) {
 			// printf("%s\n", s);
 			// this->var_str.append(boost::locale::conv::utf_to_utf<wchar_t>(s));
 			this->var_str.append(s);
@@ -934,21 +878,18 @@ bool var::osgetenv(const var& envvarname)
 
 	//TIP if you cant seem to osgetenv vars set in bash, then ensure you set them in bash with "export"
 
-	#pragma warning(disable : 4996)
+#pragma warning(disable : 4996)
 	const char* cvalue = std::getenv(envvarname.var_str.c_str());
-	if (cvalue == 0)
-	{
+	if (cvalue == 0) {
 		this->var_str.clear();
 		var_typ = VARTYP_STR;
 		return false;
-	}
-	else
+	} else
 		*this = var(cvalue);
 	return true;
 }
 
-bool var::ossetenv(const var& envvarname) const
-{
+bool var::ossetenv(const var& envvarname) const {
 	THISIS("bool var::ossetenv(const var& envvarname) const")
 	THISISSTRING()
 	ISSTRING(envvarname)
@@ -974,11 +915,11 @@ bool var::ossetenv(const var& envvarname) const
 	//var("putenv " ^ var(tempstr) ).outputl();
 	//#pragma warning (disable : 4996)
 	//const int result = putenv((char*)(tempstr.c_str()));
-    //putenv("EXO_DBNAME=C:\\");
-    //std::cout<<getenv("EXO_DBNAME");
+	//putenv("EXO_DBNAME=C:\\");
+	//std::cout<<getenv("EXO_DBNAME");
 
 	//char winenv[1024];
-	char* env=(char*) malloc(1024);
+	char* env = (char*)malloc(1024);
 	snprintf(env, 1024, "%s=%s", envvarname.var_str.c_str(), this->var_str.c_str());
 	//std::cout << winenv;
 	int result = putenv(env);
@@ -989,13 +930,12 @@ bool var::ossetenv(const var& envvarname) const
 		return false;
 
 #else
-	var("setenv " ^ envvarname ^ "=" ^ (*this) ).outputl();
+	var("setenv " ^ envvarname ^ "=" ^ (*this)).outputl();
 	return setenv((char*)(envvarname.toString().c_str()), (char*)(toString().c_str()), 1);
 #endif
 }
 
-var var::ostempdirname() const
-{
+var var::ostempdirname() const {
 	std::error_code error_code;
 	std::string dirname = std::string(stdfs::temp_directory_path(error_code));
 	if (dirname.back() != OSSLASH_)
@@ -1004,35 +944,32 @@ var var::ostempdirname() const
 }
 
 //this will actually create files liek /tmp/~XXXXXX that should be deleted if not used
-var var::ostempfilename() const
-{
+var var::ostempfilename() const {
 	//TODO replace with mkstemp
 	//https://cpp.hotexamples.com/examples/-/-/mkstemp/cpp-mkstemp-function-examples.html
 	//return std::string(std::tmpnam(nullptr));
 	var tempfilename = this->ostempdirname();
 
 	char* tmp;
-	tmp=new char[strlen(tempfilename.var_str.c_str())+8];
+	tmp = new char[strlen(tempfilename.var_str.c_str()) + 8];
 	strcpy(tmp, tempfilename.var_str.c_str());
 	strcat(tmp, "~XXXXXX");
 	int fd;
-	if((fd=mkstemp(tmp))==-1){
+	if ((fd = mkstemp(tmp)) == -1) {
 		delete tmp;
 		//fprintf(stderr, "Failed creating temp file.\n");
 		return "nope";
 	}
-	tempfilename=tmp;
+	tempfilename = tmp;
 	delete tmp;
 	return tempfilename;
 }
 
-bool var::suspend() const
-{
+bool var::suspend() const {
 	return this->osshell();
 }
 
-bool var::osshell() const
-{
+bool var::osshell() const {
 	THISIS("var var::osshell() const")
 	// will be checked again by toString()
 	// but put it here so any unassigned error shows in osshell
@@ -1045,16 +982,15 @@ bool var::osshell() const
 	return !shellresult;
 }
 
-bool var::osshellread(const var& oscmd)
-{
+bool var::osshellread(const var& oscmd) {
 	THISIS("var var::osshellread() const")
 	// will be checked again by toString()
 	// but put it here so any unassigned error shows in osshell
 	ISSTRING(oscmd)
 
-    // default is to return empty string in any case
-    this->var_str.clear();
-    var_typ = VARTYP_STR;
+	// default is to return empty string in any case
+	this->var_str.clear();
+	var_typ = VARTYP_STR;
 
 	// fflush?
 
@@ -1065,8 +1001,7 @@ bool var::osshellread(const var& oscmd)
 		return false;
 	// TODO buffer overflow check
 	char cstr1[4096] = {0x0};
-	while (std::fgets(cstr1, sizeof(cstr1), pfile) != NULL)
-	{
+	while (std::fgets(cstr1, sizeof(cstr1), pfile) != NULL) {
 		// std::printf("%s\n", result);
 		// cannot trust that standard input is convertable from utf8
 		// output.var_str+=wstringfromUTF8((const UTF8*)result,strlen(result));
@@ -1078,11 +1013,9 @@ bool var::osshellread(const var& oscmd)
 
 	//return true if no error code
 	return !pclose(pfile);
-
 }
 
-bool var::osshellwrite(const var& writestr) const
-{
+bool var::osshellwrite(const var& writestr) const {
 	THISIS("var var::osshellwrite(const var& writestr) const")
 	// will be checked again by toString()
 	// but put it here so any unassigned error shows in osshell
@@ -1102,14 +1035,12 @@ bool var::osshellwrite(const var& writestr) const
 	return !pclose(cmd);
 }
 
-void var::osflush() const
-{
+void var::osflush() const {
 	std::cout << std::flush;
 	return;
 }
 
-bool var::osopen() const
-{
+bool var::osopen() const {
 	THISIS("bool var::osopen()")
 	THISISSTRING()
 
@@ -1121,8 +1052,7 @@ bool var::osopen() const
 	return this->osopenx(*this, "") != 0;
 }
 
-bool var::osopen(const var& osfilename, const var& locale) const
-{
+bool var::osopen(const var& osfilename, const var& locale) const {
 	THISIS("bool var::osopen(const var& osfilename, const var& locale)")
 	THISISDEFINED()
 	ISSTRING(osfilename)
@@ -1137,18 +1067,16 @@ bool var::osopen(const var& osfilename, const var& locale) const
 
 static void del_fstream(void* handle) { delete (std::fstream*)handle; }
 
-std::fstream* var::osopenx(const var& osfilename, const var& locale) const
-{
+std::fstream* var::osopenx(const var& osfilename, const var& locale) const {
 
 	// IDENTICAL code in osbread and osbwrite
 	// Try to get the cached file handle. the usual case is that you osopen a file before doing
 	// osbwrite/osbread Using fstream instead of ofstream so that we can mix reads and writes on
 	// the same filehandle
 	std::fstream* pmyfile = 0;
-	if (THIS_IS_OSFILE())
-	{
+	if (THIS_IS_OSFILE()) {
 		pmyfile =
-		    (std::fstream*)mv_handles_cache.get_handle((int)this->var_int, this->var_str);
+			(std::fstream*)mv_handles_cache.get_handle((int)this->var_int, this->var_str);
 		if (pmyfile == 0) // nonvalid handle
 		{
 			var_int = 0;
@@ -1160,8 +1088,7 @@ std::fstream* var::osopenx(const var& osfilename, const var& locale) const
 	// if the file has NOT already been opened then open it now with the current default locale
 	// and add it to the cache. but normally the filehandle will have been previously opened
 	// with osopen and perhaps a specific locale.
-	if (pmyfile == 0)
-	{
+	if (pmyfile == 0) {
 
 		// delay checking until necessary
 		THISIS("bool var::osopenx(const var& osfilename, const var& locale)")
@@ -1176,16 +1103,14 @@ std::fstream* var::osopenx(const var& osfilename, const var& locale) const
 		// existing file) binary and in/out to allow reading and writing from same file
 		// handle
 		pmyfile->open(osfilename.to_path_string().c_str(),
-			      std::ios::out | std::ios::in | std::ios::binary);
-		if (!(*pmyfile))
-		{
+					  std::ios::out | std::ios::in | std::ios::binary);
+		if (!(*pmyfile)) {
 			//delete pmyfile;
 
 			//try to open read-only
 			pmyfile->open(osfilename.to_path_string().c_str(),
-				      std::ios::in | std::ios::binary);
-			if (!(*pmyfile))
-			{
+						  std::ios::in | std::ios::binary);
+			if (!(*pmyfile)) {
 				delete pmyfile;
 				return 0;
 			}
@@ -1195,7 +1120,7 @@ std::fstream* var::osopenx(const var& osfilename, const var& locale) const
 		// and NAN to prevent isnum trashing mvint in the possible case that the osfilename
 		// is an integer can addhandle fail?
 		this->var_int =
-		    mv_handles_cache.add_handle(pmyfile, del_fstream, osfilename.var_str);
+			mv_handles_cache.add_handle(pmyfile, del_fstream, osfilename.var_str);
 		this->var_typ = VARTYP_NANSTR_OSFILE;
 		this->var_str = osfilename.var_str;
 	}
@@ -1246,15 +1171,13 @@ WINDOWS-1258
 // if codepage is provided then exodus converts from the
 // specified codepage (not locale) on input to utf-8 internally
 // otherwise no conversion is performed
-bool var::osread(const var& osfilename, const var& codepage)
-{
+bool var::osread(const var& osfilename, const var& codepage) {
 	THISIS("bool var::osread(const var& osfilename, const var& codepage")
 	ISSTRING(osfilename)
 	return osread(osfilename.to_path_string().c_str(), codepage);
 }
 
-bool var::osread(const char* osfilename, const var& codepage)
-{
+bool var::osread(const char* osfilename, const var& codepage) {
 
 	THISIS("bool var::osread(const char* osfilename, const var& codepage")
 	THISISDEFINED()
@@ -1281,8 +1204,7 @@ bool var::osread(const char* osfilename, const var& codepage)
 	bytesize = (unsigned int)myfile.tellg();
 
 	// if empty file then done ok
-	if (bytesize == 0)
-	{
+	if (bytesize == 0) {
 		myfile.close();
 		return true;
 	}
@@ -1292,19 +1214,16 @@ bool var::osread(const char* osfilename, const var& codepage)
 	// boost::scoped_array<char> memblock(new char [bytesize]);
 	// std::unique_ptr<char[]> memblock(new char[bytesize]);
 	// if (memblock==0)
-	try
-	{
+	try {
 		// emergency memory - will be deleted at } - useful if OOM
 		std::unique_ptr<char[]> emergencymemory(new char[16384]);
 		//std::unique_ptr emergencymemory(new char[16384]);
 
 		// resize the string to receive the whole file
 		this->var_str.resize(bytesize);
-	}
-	catch (std::bad_alloc& ex)
-	{
+	} catch (std::bad_alloc& ex) {
 		throw MVOutOfMemory("Could not obtain " ^ var(int(bytesize * sizeof(char))) ^
-				    " bytes of memory to read " ^ var(osfilename));
+							" bytes of memory to read " ^ var(osfilename));
 		// myfile.close();
 		// return false;
 	}
@@ -1326,8 +1245,7 @@ bool var::osread(const char* osfilename, const var& codepage)
 	myfile.close();
 
 	// failure can indicate that we didnt get as many characters as requested
-	if (failed && !bytesize)
-	{
+	if (failed && !bytesize) {
 		return false;
 	}
 
@@ -1343,10 +1261,9 @@ bool var::osread(const char* osfilename, const var& codepage)
 	return true;
 }
 
-var var::to_codepage(const var& codepage) const
-{
+var var::to_codepage(const var& codepage) const {
 	THISIS("bool var::to_codepage(const var& codepage="
-	       ") const")
+		   ") const")
 	THISISSTRING()
 	ISSTRING(codepage)
 
@@ -1354,10 +1271,9 @@ var var::to_codepage(const var& codepage) const
 	return boost::locale::conv::from_utf<char>(this->var_str, codepage);
 }
 
-var var::from_codepage(const var& codepage) const
-{
+var var::from_codepage(const var& codepage) const {
 	THISIS("bool var::from_codepage(const var& codepage="
-	       ") const")
+		   ") const")
 	THISISSTRING()
 	ISSTRING(codepage)
 
@@ -1368,10 +1284,9 @@ var var::from_codepage(const var& codepage) const
 // if codepage is provided (not locale) then exodus assumes internally
 // utf-8 and converts all output to the specified codepage
 // otherwise no conversion is performed
-bool var::oswrite(const var& osfilename, const var& codepage) const
-{
+bool var::oswrite(const var& osfilename, const var& codepage) const {
 	THISIS("bool var::oswrite(const var& osfilename, const var& codepage="
-	       ") const")
+		   ") const")
 	THISISSTRING()
 	ISSTRING(osfilename)
 
@@ -1380,18 +1295,15 @@ bool var::oswrite(const var& osfilename, const var& codepage) const
 
 	// delete any previous file,
 	myfile.open(osfilename.to_path_string().c_str(),
-		    std::ios::trunc | std::ios::out | std::ios::binary);
+				std::ios::trunc | std::ios::out | std::ios::binary);
 	if (!myfile)
 		return false;
 
 	// write out the full string or fail
-	if (codepage)
-	{
+	if (codepage) {
 		std::string tempstr = boost::locale::conv::from_utf<char>(this->var_str, codepage);
 		myfile.write(tempstr.data(), int(tempstr.length()));
-	}
-	else
-	{
+	} else {
 		myfile.write(this->var_str.data(), int(this->var_str.length()));
 	}
 	bool failed = myfile.fail();
@@ -1401,8 +1313,7 @@ bool var::oswrite(const var& osfilename, const var& codepage) const
 
 // a version that accepts a const offset ie ignores return value
 //bool var::osbwrite(const var& osfilevar, const var& offset, const bool adjust) const
-bool var::osbwrite(const var& osfilevar, const var& offset) const
-{
+bool var::osbwrite(const var& osfilevar, const var& offset) const {
 	return this->osbwrite(osfilevar, const_cast<var&>(offset));
 }
 
@@ -1410,12 +1321,11 @@ bool var::osbwrite(const var& osfilevar, const var& offset) const
 //osbread and osbwrite rely on the locale being passed in on the osopen stage
 
 //bool var::osbwrite(const var& osfilevar, var& offset, const bool adjust) const
-bool var::osbwrite(const var& osfilevar, var& offset) const
-{
+bool var::osbwrite(const var& osfilevar, var& offset) const {
 	// osfilehandle is just the filename but buffers the "file number" in the mvint too
 
 	THISIS("bool var::osbwrite(const var& osfilevar, var& offset) "
-	       "const")
+		   "const")
 	THISISSTRING()
 	// test the following only if necessary in osopenx
 	// ISSTRING(osfilename)
@@ -1431,7 +1341,7 @@ bool var::osbwrite(const var& osfilevar, var& offset) const
 	// myfile.seekp (offset*sizeof(char));
 	// offset should be in bytes except for fixed multibyte code pages like UTF16 and UTF32
 	pmyfile->seekp(
-	    static_cast<long>(offset.var_int)); // avoid warning, see comments to seekg()
+		static_cast<long>(offset.var_int)); // avoid warning, see comments to seekg()
 
 	// NB but write length goes by number of wide characters (not bytes)
 	pmyfile->write(this->var_str.data(), int(this->var_str.length()));
@@ -1440,8 +1350,7 @@ bool var::osbwrite(const var& osfilevar, var& offset) const
 	// if you are trying to write an exodus string containing a GREEK CAPITAL GAMMA
 	// unicode \x0393 and current codepage is *NOT* CP1253 (Greek)
 	// then c++ wiofstream cannot convert \x0393 to a single byte (in CP1253)
-	if (pmyfile->fail())
-	{
+	if (pmyfile->fail()) {
 		// saved in cache, DO NOT CLOSE!
 		// myfile.close();
 		return false;
@@ -1462,27 +1371,23 @@ bool var::osbwrite(const var& osfilevar, var& offset) const
 // a version that ignores output of offset
 //var& var::osbread(const var& osfilevar, const var& offset, const int bytesize,
 //		  const bool adjust)
-bool var::osbread(const var& osfilevar, const var& offset, const int bytesize)
-{
+bool var::osbread(const var& osfilevar, const var& offset, const int bytesize) {
 	// var offset_nonconst;
 	// if (offset.assigned())
 	//	offset_nonconst=offset;
 	return this->osbread(osfilevar, const_cast<var&>(offset), bytesize);
 }
 
-ssize_t count_excess_UTF8_bytes(std::string& str)
-{
+ssize_t count_excess_UTF8_bytes(std::string& str) {
 
 	// Scans backward from the end of string.
 	const char* cptr = &str.back();
 	int num = 1;
 	int numBytesToTruncate = 0;
 
-	for (int i = 0; 6 > i; ++i)
-	{
+	for (int i = 0; 6 > i; ++i) {
 		numBytesToTruncate += 1;
-		if ((*cptr & 0x80) == 0x80)
-		{
+		if ((*cptr & 0x80) == 0x80) {
 			// If char bit starts with 1xxxxxxx
 			// It's a part of unicode character!
 			// Find the first byte in the unicode character!
@@ -1491,38 +1396,30 @@ ssize_t count_excess_UTF8_bytes(std::string& str)
 			// if ((*cptr & 0xF8) == 0xF8) { if (num == 5) { return 0; } break; }
 
 			// If char binary is 11110000, it means it's a 4 bytes long unicode.
-			if ((*cptr & 0xF0) == 0xF0)
-			{
-				if (num == 4)
-				{
+			if ((*cptr & 0xF0) == 0xF0) {
+				if (num == 4) {
 					return 0;
 				}
 				break;
 			}
 
 			// If char binary is 11100000, it means it's a 3 bytes long unicode.
-			if ((*cptr & 0xE0) == 0xE0)
-			{
-				if (num == 3)
-				{
+			if ((*cptr & 0xE0) == 0xE0) {
+				if (num == 3) {
 					return 0;
 				}
 				break;
 			}
 
-			if ((*cptr & 0xC0) == 0xC0)
-			{
-				if (num == 2)
-				{
+			if ((*cptr & 0xC0) == 0xC0) {
+				if (num == 2) {
 					return 0;
 				}
 				break;
 			}
 
 			num += 1;
-		}
-		else
-		{
+		} else {
 			// If char bit does not start with 1, nothing to truncate!
 			return 0;
 		}
@@ -1539,8 +1436,7 @@ ssize_t count_excess_UTF8_bytes(std::string& str)
 //The new offset is changed to reflect the above and is simply increased by bytesize
 
 //var& var::osbread(const var& osfilevar, var& offset, const int bytesize, const bool adjust)
-bool var::osbread(const var& osfilevar, var& offset, const int bytesize)
-{
+bool var::osbread(const var& osfilevar, var& offset, const int bytesize) {
 	THISIS("bool var::osbread(const var& osfilevar, var& offset, const int bytesize")
 	THISISDEFINED()
 	ISNUMERIC(offset)
@@ -1590,15 +1486,14 @@ bool var::osbread(const var& osfilevar, var& offset, const int bytesize)
 	//std::unique_ptr memblock(new char[bytesize]);
 	if (memblock == 0)
 		throw MVOutOfMemory("Could not obtain " ^ var(int(bytesize * sizeof(char))) ^
-				    " bytes of memory to read " ^ osfilevar);
+							" bytes of memory to read " ^ osfilevar);
 	// return *this;
 
 	// read the data (converting characters on the fly)
 	pmyfile->read(memblock.get(), bytesize);
 
 	// bool failed = pmyfile.fail();
-	if (pmyfile->fail())
-	{
+	if (pmyfile->fail()) {
 		pmyfile->clear();
 		pmyfile->seekg(0, std::ios::end);
 	}
@@ -1617,11 +1512,9 @@ bool var::osbread(const var& osfilevar, var& offset, const int bytesize)
 
 	// trim off any excess utf8 bytes if utf8
 	//	var(pmyfile->getloc().name()).outputl(L"loc name=");;
-	if (pmyfile->getloc().name() != "C")
-	{
+	if (pmyfile->getloc().name() != "C") {
 		int nextrabytes = count_excess_UTF8_bytes(this->var_str);
-		if (nextrabytes)
-		{
+		if (nextrabytes) {
 			offset -= nextrabytes;
 			this->var_str.resize(this->var_str.length() - nextrabytes);
 		}
@@ -1630,12 +1523,10 @@ bool var::osbread(const var& osfilevar, var& offset, const int bytesize)
 	return true;
 }
 
-void var::osclose() const
-{
+void var::osclose() const {
 	// THISIS("void var::osclose() const")
 	// THISISSTRING()
-	if (THIS_IS_OSFILE())
-	{
+	if (THIS_IS_OSFILE()) {
 		mv_handles_cache.del_handle((int)var_int);
 		var_int = 0L;
 		var_typ ^= VARTYP_OSFILE | VARTYP_INT; // only STR bit should remains
@@ -1643,8 +1534,7 @@ void var::osclose() const
 	// in all other cases, the files should be closed.
 }
 
-bool var::osrename(const var& newosdir_or_filename) const
-{
+bool var::osrename(const var& newosdir_or_filename) const {
 	THISIS("bool var::osrename(const var& newosdir_or_filename) const")
 	THISISSTRING()
 	ISSTRING(newosdir_or_filename)
@@ -1654,8 +1544,7 @@ bool var::osrename(const var& newosdir_or_filename) const
 	std::ifstream myfile;
 	// binary?
 	myfile.open(newosdir_or_filename.to_path_string().c_str(), std::ios::binary);
-	if (myfile)
-	{
+	if (myfile) {
 		// RELEASE
 		myfile.close();
 		return false;
@@ -1666,11 +1555,10 @@ bool var::osrename(const var& newosdir_or_filename) const
 		return false;
 
 	return !std::rename(this->to_path_string().c_str(),
-			    newosdir_or_filename.to_path_string().c_str());
+						newosdir_or_filename.to_path_string().c_str());
 }
 
-bool var::oscopy(const var& to_osfile_or_dirname) const
-{
+bool var::oscopy(const var& to_osfile_or_dirname) const {
 	THISIS("bool var::oscopy(const var& to_osfile_or_dirname) const")
 	THISISSTRING()
 	ISSTRING(to_osfile_or_dirname)
@@ -1694,24 +1582,19 @@ bool var::oscopy(const var& to_osfile_or_dirname) const
 	*/
 	//https://en.cppreference.com/w/cpp/filesystem/copy
 	std::error_code error_code;
-	copy(frompathx,topathx,
-		stdfs::copy_options::overwrite_existing
-		|stdfs::copy_options::recursive
-		|stdfs::copy_options::copy_symlinks,
-		error_code
-	);
+	copy(frompathx, topathx,
+		 stdfs::copy_options::overwrite_existing | stdfs::copy_options::recursive | stdfs::copy_options::copy_symlinks,
+		 error_code);
 
 	return !error_code;
 }
 
-bool var::osdelete() const
-{
+bool var::osdelete() const {
 	return osdelete(*this);
 }
 
 // not boost ... only removes files?
-bool var::osdelete(const var& osfilename) const
-{
+bool var::osdelete(const var& osfilename) const {
 	THISIS("bool var::osdelete(const var& osfilename) const")
 	THISISDEFINED()
 	ISSTRING(osfilename)
@@ -1719,11 +1602,9 @@ bool var::osdelete(const var& osfilename) const
 	return !std::remove(osfilename.to_path_string().c_str());
 }
 
-const std::string var::to_path_string() const
-{
+const std::string var::to_path_string() const {
 	var part2 = this->field(" ", 2, 999999);
-	if (part2.length())
-	{
+	if (part2.length()) {
 
 #if defined WIN32 || defined _WIN32
 		var part = this->field(" ", 1).convert("/", OSSLASH);
@@ -1745,9 +1626,7 @@ const std::string var::to_path_string() const
 		*/
 #endif
 		return part.toString() + " " + part2.toString();
-	}
-	else
-	{
+	} else {
 
 #if defined WIN32 || defined _WIN32
 		return this->convert("/", OSSLASH).toString();
@@ -1769,8 +1648,7 @@ const std::string var::to_path_string() const
 	}
 }
 
-const std::string var::to_cmd_string() const
-{
+const std::string var::to_cmd_string() const {
 
 	// while converting from DOS convert all backslashes in first word to forward slashes on
 	// linux or leave as if exodus on windows
@@ -1785,12 +1663,10 @@ const std::string var::to_cmd_string() const
 
 //convert some clock to time_t (for osfile() and osdir()
 template <typename TP>
-std::time_t to_time_t(TP tp)
-{
-    using namespace std::chrono;
-    auto sctp = time_point_cast<system_clock::duration>(tp - TP::clock::now()
-              + system_clock::now());
-    return system_clock::to_time_t(sctp);
+std::time_t to_time_t(TP tp) {
+	using namespace std::chrono;
+	auto sctp = time_point_cast<system_clock::duration>(tp - TP::clock::now() + system_clock::now());
+	return system_clock::to_time_t(sctp);
 }
 
 // in MVdatetime.cpp
@@ -1799,14 +1675,12 @@ void ptime2mvdatetime(const boost::posix_time::ptime& ptimex, int& mvdate, int& 
 //WARNING ACTUALLY DEFINED WITH BOOST POSIX TIME BUT IT IS THE SAME
 //void ptime2mvdatetime(const stdfs::file_time_type& ptimex, int& mvdate, int& mvtime);
 
-var var::osfile() const
-{
+var var::osfile() const {
 	THISIS("var var::osfile() const")
 	THISISSTRING()
 
 	// get a handle and return "" if doesnt exist or isnt a regular file
-	try
-	{
+	try {
 		// boost 1.33 throws an error with files containing ~ or $ chars but 1.38 doesnt
 		stdfs::path pathx(this->to_path_string().c_str());
 
@@ -1838,20 +1712,16 @@ var var::osfile() const
 
 		//file_size() is only available for files not directories
 		return int(stdfs::file_size(pathx)) ^ FM ^ mvdate ^ FM ^ int(mvtime);
-	}
-	catch (...)
-	{
+	} catch (...) {
 		return "";
 	};
 }
 
-bool var::osmkdir() const
-{
+bool var::osmkdir() const {
 	THISIS("bool var::osmkdir() const")
 	THISISSTRING()
 
-	try
-	{
+	try {
 
 		// boost 1.33 throws an error with files containing ~ or $ chars but 1.38 doesnt
 		stdfs::path pathx(this->to_path_string().c_str());
@@ -1859,22 +1729,18 @@ bool var::osmkdir() const
 		if (stdfs::exists(pathx))
 			return false;
 		stdfs::create_directories(pathx);
-	}
-	catch (...)
-	{
+	} catch (...) {
 		return false;
 	}
 	return true;
 }
 
-bool var::osrmdir(bool evenifnotempty) const
-{
+bool var::osrmdir(bool evenifnotempty) const {
 	THISIS("bool var::osrmdir(bool evenifnotempty) const")
 	THISISSTRING()
 
 	// get a handle and return "" if doesnt exist or is NOT a directory
-	try
-	{
+	try {
 
 		// boost 1.33 throws an error with files containing ~ or $ chars but 1.38 doesnt
 		stdfs::path pathx(this->to_path_string().c_str());
@@ -1884,35 +1750,29 @@ bool var::osrmdir(bool evenifnotempty) const
 		if (!stdfs::is_directory(pathx))
 			return false;
 
-		if (evenifnotempty)
-		{
+		if (evenifnotempty) {
 
 			// safety
 			if (!checknotabsoluterootfolder(toString()))
 				return false;
 
 			stdfs::remove_all(pathx);
-		}
-		else
+		} else
 			stdfs::remove(pathx);
-	}
-	catch (...)
-	{
+	} catch (...) {
 		return false;
 	}
 
 	return true;
 }
 
-var var::osdir() const
-{
+var var::osdir() const {
 	THISIS("var var::osdir() const")
 	THISISSTRING()
 
 	// get a handle and return "" if doesnt exist or is NOT a directory
 	// stdfs::wpath pathx(toTstring((*this)).c_str());
-	try
-	{
+	try {
 
 		// boost 1.33 throws an error with files containing ~ or $ chars but 1.38 doesnt
 		stdfs::path pathx(this->to_path_string().c_str());
@@ -1944,20 +1804,16 @@ var var::osdir() const
 		//return int(stdfs::file_size(pathx)) ^ FM ^ mvdate ^ FM ^ int(mvtime);
 		return FM ^ mvdate ^ FM ^ int(mvtime);
 
-	}
-	catch (...)
-	{
+	} catch (...) {
 		return "";
 	};
 }
 
-var var::oslistf(const var& path, const var& spec) const
-{
+var var::oslistf(const var& path, const var& spec) const {
 	return this->oslist(path, spec, 1);
 }
 
-var var::oslistd(const var& path, const var& spec) const
-{
+var var::oslistd(const var& path, const var& spec) const {
 	return this->oslist(path, spec, 2);
 }
 
@@ -1967,8 +1823,7 @@ var var::oslistd(const var& path, const var& spec) const
 *@param	mode	1=files only, 2=directories only, otherwise both.
 *@returns		List of directory and/or filenames depending on mode. fm separator
 */
-var var::oslist(const var& path0, const var& spec0, const int mode) const
-{
+var var::oslist(const var& path0, const var& spec0, const int mode) const {
 	THISIS("var var::oslist(const var& path, const var& spec, const int mode) const")
 	THISISDEFINED()
 	ISSTRING(path0)
@@ -1978,16 +1833,14 @@ var var::oslist(const var& path0, const var& spec0, const int mode) const
 
 	// http://www.boost.org/libs/filesystem/example/simple_ls.cpp
 
-	var path=path0.to_path_string();
+	var path = path0.to_path_string();
 	var spec;
-	if (spec0.length())
-	{
+	if (spec0.length()) {
 		spec = spec0;
 	}
 	// file globbing can and must be passed as tail end of path
 	// perhaps could use <glob.h> in linux instead of regex
-	else
-	{
+	else {
 		spec = path.field2(OSSLASH, -1);
 		path = path.substr(1, path.length() - spec.length());
 
@@ -2010,19 +1863,15 @@ var var::oslist(const var& path0, const var& spec0, const int mode) const
 	bool filter = false;
 	// std_boost::regex re;
 	std_boost::regex re;
-	if (spec)
-	{
-		try
-		{
+	if (spec) {
+		try {
 			// Set up the regular expression for case-insensitivity
 			// re.assign(toTstring(spec).c_str(), std_boost::regex_constants::icase);
 			re.assign(spec.toString().c_str(), std_boost::regex_constants::icase);
 			filter = true;
-		}
-		catch (std_boost::regex_error& e)
-		{
+		} catch (std_boost::regex_error& e) {
 			std::cout << spec.var_str << " is not a valid regular expression: \""
-				  << e.what() << "\"" << std::endl;
+					  << e.what() << "\"" << std::endl;
 			return "";
 		}
 	}
@@ -2035,9 +1884,9 @@ var var::oslist(const var& path0, const var& spec0, const int mode) const
 		getfiles = false;
 
 	var filelist = "";
-//#if BOOST_FILESYSTEM_VERSION >= 3 or defined(C17)
-//#define LEAForFILENAME path().filename().string()
-//#define COMMAstdfsNATIVE
+	//#if BOOST_FILESYSTEM_VERSION >= 3 or defined(C17)
+	//#define LEAForFILENAME path().filename().string()
+	//#define COMMAstdfsNATIVE
 	//#else
 	//#define LEAForFILENAME leaf()
 	//#define COMMAstdfsNATIVE ,stdfs::native
@@ -2086,10 +1935,8 @@ var var::oslist(const var& path0, const var& spec0, const int mode) const
 	// stdfs::wdirectory_iterator end_iter;
 	// for (stdfs::wdirectory_iterator dir_itr(full_path );
 	stdfs::directory_iterator end_iter;
-	for (stdfs::directory_iterator dir_itr(full_path); dir_itr != end_iter; ++dir_itr)
-	{
-		try
-		{
+	for (stdfs::directory_iterator dir_itr(full_path); dir_itr != end_iter; ++dir_itr) {
+		try {
 
 			// skip unwanted items
 			// dir_itr->path().leaf()  changed to dir_itr->leaf() in three places
@@ -2101,8 +1948,7 @@ var var::oslist(const var& path0, const var& spec0, const int mode) const
 
 			// using .leaf instead of .status provided in boost 1.34 .. but does it
 			// work/efficiently if (stdfs::is_directory(dir_itr->status() ) )
-			if (stdfs::is_directory(*dir_itr))
-			{
+			if (stdfs::is_directory(*dir_itr)) {
 				if (getfolders)
 					filelist ^= FM ^ dir_itr->path().filename().string();
 			}
@@ -2118,13 +1964,10 @@ var var::oslist(const var& path0, const var& spec0, const int mode) const
 			//  //++other_count;
 			//  //std::cout << dir_itr->path().leaf() << " [other]\n";
 			//}
-		}
-		catch (const std::exception& ex)
-		{
+		} catch (const std::exception& ex) {
 			// evade warning: unused variable
 			if (false)
-				if (ex.what())
-				{
+				if (ex.what()) {
 				};
 
 			//++err_count;
@@ -2140,8 +1983,7 @@ var var::oslist(const var& path0, const var& spec0, const int mode) const
 	return filelist;
 }
 
-bool var::oscwd(const var& newpath) const
-{
+bool var::oscwd(const var& newpath) const {
 	THISIS("var var::oscwd(const var& newpath) const")
 	// doesnt use *this - should syntax be changed to setcwd? and getcwd()?
 	THISISDEFINED() // not needed if *this not used
@@ -2154,12 +1996,9 @@ bool var::oscwd(const var& newpath) const
 
 	// return oscwd();
 
-	try
-	{
+	try {
 		stdfs::current_path(newpath.toString());
-	}
-	catch (...)
-	{
+	} catch (...) {
 		// filesystem error: cannot set current path: No such file or directory
 		// ignore all errors
 		return false;
@@ -2168,8 +2007,7 @@ bool var::oscwd(const var& newpath) const
 	return true;
 }
 
-var var::oscwd() const
-{
+var var::oscwd() const {
 	THISIS("var var::oscwd() const")
 	// doesnt use *this - should syntax be changed to ossetcwd? and osgetcwd()?
 	THISISDEFINED() // not needed if *this not used
@@ -2183,18 +2021,14 @@ var var::oscwd() const
 	std::string currentpath = stdfs::current_path().string();
 
 	return var(currentpath).convert("/", OSSLASH);
-
 }
 
-var var::ospid() const
-{
+var var::ospid() const {
 	//THISIS("var var::ospid() const")
 	return getpid();
-
 }
 
-void var::ossleep(const int milliseconds) const
-{
+void var::ossleep(const int milliseconds) const {
 	THISIS("void var::ossleep(const int milliseconds) const")
 	// doesnt use *this - should syntax be changed to setcwd? and getcwd()?
 	THISISDEFINED() // not needed if *this not used

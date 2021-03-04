@@ -34,8 +34,7 @@
 //(stick to throwing MVError with a suitable error message)
 //#include <exodus/mvexceptions.h>
 
-namespace exodus
-{
+namespace exodus {
 
 //int getprocessno(const char* filename, int* fd);
 //bool processno_islocked2(int processno, int* fd);
@@ -47,19 +46,16 @@ std::string mvgethostname();
 // derived classes to implement them since they are defined in the class header
 
 // destructor
-MvEnvironment::~MvEnvironment()
-{
+MvEnvironment::~MvEnvironment() {
 
 	// std::wcout<<"MvEnvironment: Closing Definitions ... "<<std::flush;
-	if (this->DEFINITIONS.assigned() && this->DEFINITIONS)
-	{
+	if (this->DEFINITIONS.assigned() && this->DEFINITIONS) {
 		this->DEFINITIONS.close();
 	}
 	// std::wcout<<"OK"<<std::endl;
 
 	// std::wcout<<"MvEnvironment: Disconnecting DB ... "<<std::flush;
-	if (this->SESSION.assigned() && this->SESSION)
-	{
+	if (this->SESSION.assigned() && this->SESSION) {
 		this->SESSION.close();
 	}
 	// std::wcout<<"OK"<<std::endl;
@@ -70,8 +66,7 @@ MvEnvironment::~MvEnvironment()
 }
 
 // keep in sync both 1) declaration in class and 2) contruction initialisation
-bool MvEnvironment::init(const int threadno)
-{
+bool MvEnvironment::init(const int threadno) {
 
 	// std::wcout<<"MvEnvironment::init("<<threadno<<")"<<std::endl;
 
@@ -89,9 +84,9 @@ bool MvEnvironment::init(const int threadno)
 	if (not this->CRTHIGH)
 		this->CRTHIGH = 25;
 
-//	this->PROCESSNO = getprocessno("/tmp/exodus", &processnolockfd);
-//	this->PROCESSNO = getprocessno(this->EXECPATH.toString().c_str(), &processnolockfd);
-//	var tmplockfile = var().ostempdirname() ^ "exodus_" ^ var().oscwd().convert("/\\","__");
+	//	this->PROCESSNO = getprocessno("/tmp/exodus", &processnolockfd);
+	//	this->PROCESSNO = getprocessno(this->EXECPATH.toString().c_str(), &processnolockfd);
+	//	var tmplockfile = var().ostempdirname() ^ "exodus_" ^ var().oscwd().convert("/\\","__");
 
 	//eg thread id = 140737353977344
 	//std::cout<<std::this_thread::get_id()<< std::endl;
@@ -100,7 +95,7 @@ bool MvEnvironment::init(const int threadno)
 	//this->PROCESSNO = std::this_thread::get_id();
 	this->PROCESSNO = threadno;
 
-//	this->PROCESSNO.outputl("PROCESS NO ===================================================== ");
+	//	this->PROCESSNO.outputl("PROCESS NO ===================================================== ");
 
 	this->STATION = var(mvgethostname()).field(".", 1);
 

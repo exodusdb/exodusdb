@@ -22,11 +22,9 @@
 #include <exodus/mv.h>
 #include <exodus/mvexceptions.h>
 
-namespace exodus
-{
+namespace exodus {
 
-bool var::setxlocale() const
-{
+bool var::setxlocale() const {
 
 #if defined(_MSC_VER) && defined(UNICODE)
 
@@ -63,8 +61,7 @@ bool var::setxlocale() const
 #endif
 }
 
-var& var::getxlocale()
-{
+var& var::getxlocale() {
 #if defined(_MSC_VER) && defined(UNICODE)
 	*this = (int)GetThreadLocale();
 	return *this;

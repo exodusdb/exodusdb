@@ -7,17 +7,14 @@
 
 #include <exodus/mv.h>
 
-namespace exodus
-{
+namespace exodus {
 
-var getprocessn()
-{
+var getprocessn() {
 	// DWORD WINAPI
 	return var((int)GetCurrentProcessId());
 }
 
-var getexecpath()
-{
+var getexecpath() {
 	// this might not convert windows characters to exodus characters properly but
 	// if compiled with unicode options it is probably ok since TCHAR will be wide
 
@@ -27,8 +24,7 @@ var getexecpath()
 	int bytes = GetModuleFileName(NULL, filename, nSize);
 	if (bytes == 0)
 		return L"";
-	else
-	{
+	else {
 		// move to a standardised global function to allow usage
 		// by other win functions?
 		// the job here is to convert in a dumb way from win TCHAR to var wchar_t
