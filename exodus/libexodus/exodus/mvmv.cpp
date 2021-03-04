@@ -230,7 +230,9 @@ var& var::fieldstorer(const var& sepchar0, const int fieldnx, const int nfieldsx
 	std::string sepchar = sepchar0.var_str;
 	if (sepchar == "")
 	{
-		*this = "";
+		// *this = "";
+		this->var_str.clear();
+		this->var_typ = VARTYP_STR;
 		return *this;
 	}
 
@@ -1104,7 +1106,8 @@ var& var::remover(int fieldno, int valueno, int subvalueno)
 	{
 		// functionmode return var("");//var(var1);
 		// proceduremode
-		var_str = "";
+		this->var_str.clear();
+		this->var_typ = VARTYP_STR;
 		return *this;
 	}
 
@@ -1712,7 +1715,7 @@ var& var::substrer(const int startindex1, const int length)
 	int max = (int)var_str.length();
 	if (max == 0)
 	{
-		var_str = "";
+		this->var_str.clear();
 		return *this;
 	}
 
@@ -1723,7 +1726,7 @@ var& var::substrer(const int startindex1, const int length)
 	{
 		if (length == 0)
 		{
-			var_str = "";
+			this->var_str.clear();
 			return *this;
 		}
 
@@ -1732,13 +1735,13 @@ var& var::substrer(const int startindex1, const int length)
 		{
 			if (start == 0)
 			{
-				var_str = "";
+				this->var_str.clear();
 				return *this;
 			}
 			start = max + start + 1;
 			if (start < 1)
 			{
-				var_str = "";
+				this->var_str.clear();
 				return *this;
 			}
 		}
@@ -1751,7 +1754,7 @@ var& var::substrer(const int startindex1, const int length)
 		if (stop < 1)
 			stop = 1;
 
-		std::string result = "";
+		std::string result;
 		for (int ii = start; ii >= stop; ii--)
 			result += var_str[ii - 1];
 
@@ -1772,7 +1775,7 @@ var& var::substrer(const int startindex1, const int length)
 	}
 	else if (start > max)
 	{
-		var_str = "";
+		this->var_str.clear();
 		return *this;
 	}
 	int stop = start + length;

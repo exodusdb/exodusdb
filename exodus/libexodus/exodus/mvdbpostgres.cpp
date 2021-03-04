@@ -920,7 +920,9 @@ bool var::read(const var& filehandle, const var& key)
 		if (!ok)
 			return false;
 
-		*this = "";
+		// *this = "";
+		this->var_str.clear();
+		this->var_typ = VARTYP_STR;
 
 		var keyn;
 		int ntuples = PQntuples(pgresult);
@@ -1842,9 +1844,6 @@ inline void tosqlstring(var& string1)
 		string1.swapper("'", "''");
 		string1.splicer(1, 1, "'");
 		string1.splicer(-1, 1, "'");
-		//allow searching for text with * characters embedded
-		//otherwise interpreted as glob character?
-		string1.swapper("*","\\*");
 	}
 }
 
@@ -2521,8 +2520,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 	if (var_typ & VARTYP_MASK)
 	{
 		// throw MVUndefined("selectx()");
-		var_str = "";
-		var_typ = VARTYP_STR;
+		this->var_str.clear();
+		this->var_typ = VARTYP_STR;
 	}
 
 	// fieldnames.outputl("fieldnames=");
@@ -2533,8 +2532,8 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 	{
 		if (!var_typ)
 		{
-			var_str = "";
-			var_typ = VARTYP_STR;
+			this->var_str.clear();
+			this->var_typ = VARTYP_STR;
 		}
 		else
 			this->createString();
@@ -3168,6 +3167,13 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause)
 
 			// notword.outputl("notword=");
 			// ucword.outputl("ucword=");
+
+			//allow searching for text with * characters embedded
+			//otherwise interpreted as glob character?
+			if (dictexpression_isxref)
+			{
+				value.swapper("*","\\*");
+			}
 
 			// multiple values
 			if (value.index(FM))
@@ -3962,8 +3968,8 @@ bool var::readnext(var& key, var& valueno) const
 	if (var_typ & VARTYP_MASK)
 	{
 		// throw MVUndefined("readnext()");
-		var_str = "";
-		var_typ = VARTYP_STR;
+		this->var_str.clear();
+		this->var_typ = VARTYP_STR;
 	}
 
 	// default cursor is ""
@@ -4063,8 +4069,8 @@ bool var::readnext(var& record, var& key, var& valueno) const
 	if (var_typ & VARTYP_MASK || !var_typ)
 	{
 		// throw MVUndefined("readnext()");
-		var_str = "";
-		var_typ = VARTYP_STR;
+		this->var_str.clear();
+		this->var_typ = VARTYP_STR;
 	}
 
 	// default cursor is ""

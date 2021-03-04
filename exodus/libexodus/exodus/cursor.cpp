@@ -14,7 +14,7 @@ bool var::getcursor() const
 	THISISDEFINED()
 
 	// returns empty string if fails
-	this->var_str = "";
+	this->var_str.clear();
 	this->var_typ = VARTYP_STR;
 
 	return false;

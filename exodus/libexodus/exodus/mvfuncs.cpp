@@ -122,8 +122,8 @@ var& var::input()
 	THISIS("bool var::input()")
 	THISISDEFINED()
 
-	var_str = "";
-	var_typ = VARTYP_STR;
+	this->var_str.clear();
+	this->var_typ = VARTYP_STR;
 
 	//LOCKIOSTREAM
 
@@ -146,8 +146,8 @@ var& var::input(const var& prompt)
 
 	var default_input=this->assigned() ? (*this) : "";
 
-	var_str = "";
-	var_typ = VARTYP_STR;
+	this->var_str.clear();
+	this->var_typ = VARTYP_STR;
 
 	//output any prompt and flush
 	if (prompt.length())
@@ -181,8 +181,8 @@ var& var::inputn(const int nchars)
 
 	//LOCKIOSTREAM
 
-	var_str = "";
-	var_typ = VARTYP_STR;
+	this->var_str.clear();
+	this->var_typ = VARTYP_STR;
 
 	//declare function in getkey.cpp
 	int getkey(void);
@@ -736,7 +736,9 @@ var& var::trimmerf(const char* trimchar)
 
 	if (start_pos == std::string::npos)
 	{
-		*this = "";
+		// *this = "";
+		this->var_str.clear();
+		this->var_typ = VARTYP_STR;
 		return *this;
 	}
 
@@ -772,7 +774,9 @@ var& var::trimmerb(const char* trimchar)
 
 	if (end_pos == std::string::npos)
 	{
-		*this = "";
+		// *this = "";
+		this->var_str.clear();
+		this->var_typ = VARTYP_STR;
 		return *this;
 	}
 
@@ -814,7 +818,9 @@ var& var::trimmer(const char* trimchar)
 	// if all blanks return empty string
 	if (start_pos == std::string::npos)
 	{
-		*this = "";
+		// *this = "";
+		this->var_str.clear();
+		this->var_typ = VARTYP_STR;
 		return *this;
 	}
 
@@ -1425,8 +1431,8 @@ var& var::transfer(var& destinationvar)
 	destinationvar.var_int = var_int;
 	destinationvar.var_dbl = var_dbl;
 
-	var_str = "";
-	var_typ = VARTYP_STR;
+	this->var_str.clear();
+	this->var_typ = VARTYP_STR;
 
 	return destinationvar;
 }
@@ -1524,7 +1530,7 @@ var& var::cropper()
 	THISIS("var& var::cropper()")
 	THISISSTRINGMUTATOR()
 
-	std::string newstr = "";
+	std::string newstr;
 
 	std::string::iterator iter = var_str.begin();
 	std::string::iterator iterend = var_str.end();

@@ -1704,16 +1704,69 @@ std::string dblToString(double double1)
 
 	std::ostringstream ss;
 
-	//EITHER use precision 14 to avoid 1.1-1 = 1.000000000000001
-	//OR use 15 for which 64-bit IEEE 754 type double guarantees
+	//EITHER use 15 for which 64-bit IEEE 754 type double guarantees
 	//roundtrip double/text/double for 15 decimal digits
+	//
+	//OR use precision 14 to avoid 1.1-1 = 1.000000000000001
+	//but this will only reduce errors after a single calculation
+	//since errors are cumulative (random walk)
+	//
+	// Note that scientific precision "15" gives us
+	// 16 total digits "1.234567890123456e+00"
+	//
+
+	//if not fixed precision then precision is relative to first digit, not decimal point
+	//therefore very small numbers can have 15 digits of precision eg.
+	//0.000000000000000000001234567890123456
+
+	//use digits10 +1 if not using auto formatting (scientific for large/small numbers)
+
+	//there appears to be little or no speed difference between always going via scientific format
+	//and default method which only goes via scientific format for very large or small numbers
+//#define ALWAYS_SCIENTIFIC
+#ifdef ALWAYS_SCIENTIFIC
+	//use digits10 if using scientific because we automatically get one additional on the left
 	ss.precision(15);
+	ss << std::scientific;
+#else
+	//use digits10 +1 if not using auto formatting (scientific for large/small numbers)
+	ss.precision(16);
+#endif
 
-	ss << std::scientific << double1;
-
+	ss << double1;
 	std::string s = ss.str();
 
 	std::size_t epos =  s.find('e');
+
+	////////////////////////////////////////////
+	//if not scientific format then return as is
+	////////////////////////////////////////////
+#ifndef ALWAYS_SCIENTIFIC
+	if (epos == std::string::npos)
+		return s;
+#endif
+
+	// Algorithm
+	//
+	// Output in C++ scientific format to required precision
+	// then modify that string into normal format as follows:
+	//
+	// 1. remove the trailing "e+99" exponent
+	// 2. add zeroes to the front or back of the number if exponent is not 00
+	// 3. move the decimal point to the correct position.
+	// 4. remove any trailing 0's and decimal point
+	//
+	// eg
+	//
+	//  1.230000000000000e+00   ->  1.23
+	// -1.230000000000000e+00   -> -1.23
+	//  1.230000000000000e+01   ->  12.3
+	//  1.230000000000000e-01   ->  0.0123
+	//  1.230000000000000e+04   ->  12300
+	//  1.230000000000000e-04   ->  0.000123
+
+	//NOTE for small numbers we should use precision
+	//depending on how small the number is
 
 	auto exponent = stoi(s.substr(epos + 1));
 
@@ -1732,14 +1785,29 @@ std::string dblToString(double double1)
 	//positive exponent
 	else
 	if (exponent > 0) {
+
+		//remove decimal point
 		s.erase(1 + minus,1);
-		int addzeros = exponent - s.size() + 1 - minus;
+
+		//determine how many zeros need appending if any
+		int addzeros = exponent - s.size() + 1 + minus;
+
+		//debugging
+		//std::cout << ss.str() << " " << s << " " << exponent << " " << s.size() << " " << addzeros << std::endl;
+
+		//either append sufficient zeros
 		if (addzeros > 0) {
 			s.append(addzeros, '0');
-		} else if (addzeros < 0) {
+
+		}
+
+		//or insert decimal point within existing matissa
+		else if (addzeros < 0) {
+
+			//insert decimal point
 			s.insert(exponent + minus + 1, 1, '.');
 
-			//remove trailing zeros and decimal point
+			//superfluous trailing zeros and decimal point
 			while (s.back() == '0')
 				s.pop_back();
 			if (s.back() == '.')
@@ -1748,8 +1816,14 @@ std::string dblToString(double double1)
 
 	//negative exponent
 	} else {
+
+		//remove decimal point
 		s.erase(1 + minus,1);
-		s.insert(0 + minus,size_t(-exponent),'0');
+
+		//prefix sufficient zeros
+		s.insert(0 + minus, -exponent, '0');
+
+		//insert decimal point
 		s.insert(1 + minus,1,'.');
 
 		//remove trailing zeros and decimal point

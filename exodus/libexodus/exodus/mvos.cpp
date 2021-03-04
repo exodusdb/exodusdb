@@ -916,8 +916,8 @@ bool var::osgetenv(const var& envvarname)
 	if (envvarname.var_str.length() == 0)
 	{
 
+		this->var_str.clear();
 		var_typ = VARTYP_STR;
-		this->var_str = "";
 
 		int i = 1;
 		char* s = *environ;
@@ -938,8 +938,8 @@ bool var::osgetenv(const var& envvarname)
 	const char* cvalue = std::getenv(envvarname.var_str.c_str());
 	if (cvalue == 0)
 	{
+		this->var_str.clear();
 		var_typ = VARTYP_STR;
-		this->var_str = "";
 		return false;
 	}
 	else
@@ -1053,7 +1053,7 @@ bool var::osshellread(const var& oscmd)
 	ISSTRING(oscmd)
 
     // default is to return empty string in any case
-    this->var_str = "";
+    this->var_str.clear();
     var_typ = VARTYP_STR;
 
 	// fflush?
@@ -1260,7 +1260,7 @@ bool var::osread(const char* osfilename, const var& codepage)
 	THISISDEFINED()
 
 	// osread returns empty string in any case
-	this->var_str = "";
+	this->var_str.clear();
 	var_typ = VARTYP_STR;
 
 	// get a file structure
@@ -1549,7 +1549,7 @@ bool var::osbread(const var& osfilevar, var& offset, const int bytesize)
 	// ISSTRING(osfilename)
 
 	// default is to return empty string in any case
-	this->var_str = "";
+	this->var_str.clear();
 	var_typ = VARTYP_STR;
 
 	// strange case request to read 0 bytes
