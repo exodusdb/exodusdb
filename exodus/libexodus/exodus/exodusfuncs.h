@@ -42,8 +42,7 @@ THE SOFTWARE.
 #endif
 
 // add global function type syntax to the exodus users
-namespace exodus
-{
+namespace exodus {
 
 DLL_PUBLIC int exodus_main(int exodus__argc, const char* exodus__argv[], MvEnvironment& mv, int environmentno);
 
@@ -90,8 +89,7 @@ DLL_PUBLIC bool osdelete(const var& osfilename);
 DLL_PUBLIC bool osrename(const var& oldosdir_or_filename, const var& newosdir_or_filename);
 DLL_PUBLIC bool oscopy(const var& fromosdir_or_filename, const var& newosdir_or_filename);
 
-DLL_PUBLIC var oslist(const var& path DEFAULTDOT, const var& wildcard DEFAULTNULL,
-		      const int mode = 0);
+DLL_PUBLIC var oslist(const var& path DEFAULTDOT, const var& wildcard DEFAULTNULL, const int mode = 0);
 DLL_PUBLIC var oslistf(const var& path DEFAULTDOT, const var& wildcard DEFAULTNULL);
 DLL_PUBLIC var oslistd(const var& path DEFAULTDOT, const var& wildcard DEFAULTNULL);
 DLL_PUBLIC var osfile(const var& filename);
@@ -108,7 +106,7 @@ DLL_PUBLIC var osshellread(const var& command);
 DLL_PUBLIC bool osshellread(var& readstr, const var& command);
 DLL_PUBLIC bool osshellwrite(const var& writestr, const var& command);
 DLL_PUBLIC void stop(const var& text DEFAULTNULL);
-DLL_PUBLIC void abort(const var& text DEFAULTNULL); // dont confuse with abort() which is standard c/c++
+DLL_PUBLIC void abort(const var& text DEFAULTNULL);	 // dont confuse with abort() which is standard c/c++
 DLL_PUBLIC void abortall(const var& text DEFAULTNULL);
 DLL_PUBLIC var execute(const var& command);
 // DLL_PUBLIC var chain(const var& command);
@@ -169,10 +167,8 @@ DLL_PUBLIC var& converter(var& instring, const var& oldchars, const var& newchar
 DLL_PUBLIC var convert(const var& instring, const var& oldchars, const var& newchars);
 DLL_PUBLIC var& swapper(var& instring, const var& oldstr, const var& newstr);
 DLL_PUBLIC var swap(const var& instring, const var& oldstr, const var& newstr);
-DLL_PUBLIC var& replacer(var& instring, const var& oldstr, const var& newstr,
-			 const var& options DEFAULTNULL);
-DLL_PUBLIC var replace(const var& instring, const var& oldstr, const var& newstr,
-		       const var& options DEFAULTNULL);
+DLL_PUBLIC var& replacer(var& instring, const var& oldstr, const var& newstr, const var& options DEFAULTNULL);
+DLL_PUBLIC var replace(const var& instring, const var& oldstr, const var& newstr, const var& options DEFAULTNULL);
 DLL_PUBLIC var& ucaser(var& instring);
 DLL_PUBLIC var ucase(const var& instring);
 DLL_PUBLIC var& lcaser(var& instring);
@@ -194,10 +190,8 @@ DLL_PUBLIC var& quoter(var& instring);
 DLL_PUBLIC var quote(const var& instring);
 DLL_PUBLIC var& unquoter(var& instring);
 DLL_PUBLIC var unquote(const var& instring);
-DLL_PUBLIC var& fieldstorer(var& instring, const var& sepchar, const int fieldno, const int nfields,
-			    const var& replacement);
-DLL_PUBLIC var fieldstore(const var& instring, const var& sepchar, const int fieldno,
-			  const int nfields, const var& replacement);
+DLL_PUBLIC var& fieldstorer(var& instring, const var& sepchar, const int fieldno, const int nfields, const var& replacement);
+DLL_PUBLIC var fieldstore(const var& instring, const var& sepchar, const int fieldno, const int nfields, const var& replacement);
 DLL_PUBLIC var& trimmer(var& instring, const char* trimchars DEFAULTSPACE);
 DLL_PUBLIC var& trimmer(var& instring, const var& trimchars, const var& options);
 DLL_PUBLIC var trim(const var& instring, const char* trimchars DEFAULTSPACE);
@@ -231,10 +225,8 @@ DLL_PUBLIC var substrer(var& instring, const int startx);
 DLL_PUBLIC var substrer(var& instring, const int startx, const int length);
 DLL_PUBLIC var index(const var& instring, const var& substr, const int occurrenceno = 1);
 DLL_PUBLIC var index2(const var& instring, const var& substr, const int startcharno = 1);
-DLL_PUBLIC var field(const var& instring, const var& substrx, const int fieldnx,
-		     const int nfieldsx = 1);
-DLL_PUBLIC var field2(const var& instring, const var& substrx, const int fieldnx,
-		      const int nfieldsx = 1);
+DLL_PUBLIC var field(const var& instring, const var& substrx, const int fieldnx, const int nfieldsx = 1);
+DLL_PUBLIC var field2(const var& instring, const var& substrx, const int fieldnx, const int nfieldsx = 1);
 // moved to mvprogram to allow custom conversions like "[DATE]"
 // DLL_PUBLIC var oconv(const var& instring, const char* conversion);
 // DLL_PUBLIC var oconv(const var& instring, const var& conversion);
@@ -253,8 +245,7 @@ DLL_PUBLIC bool clearfile(const var& filename_or_handle);
 DLL_PUBLIC bool renamefile(const var& filename, const var& newfilename);
 DLL_PUBLIC var listfiles();
 DLL_PUBLIC var reccount(const var& filename_or_handle);
-DLL_PUBLIC bool createindex(const var& filename_or_handle, const var& fieldname DEFAULTNULL,
-			    const var& dictfilename DEFAULTNULL);
+DLL_PUBLIC bool createindex(const var& filename_or_handle, const var& fieldname DEFAULTNULL, const var& dictfilename DEFAULTNULL);
 DLL_PUBLIC bool deleteindex(const var& filename_or_handle, const var& fieldname DEFAULTNULL);
 DLL_PUBLIC var listindexes(const var& filename DEFAULTNULL, const var& fieldname DEFAULTNULL);
 DLL_PUBLIC bool begintrans();
@@ -292,41 +283,31 @@ DLL_PUBLIC var split(const var& sourcevar, dim& destinationdim);
 DLL_PUBLIC dim split(const var& sourcevar);
 DLL_PUBLIC var join(const dim& sourcedim);
 
-DLL_PUBLIC var pickreplace(const var& instring, const int fieldno, const int valueno,
-			   const int subvalueno, const var& replacement);
-DLL_PUBLIC var pickreplace(const var& instring, const int fieldno, const int valueno,
-			   const var& replacement);
+DLL_PUBLIC var pickreplace(const var& instring, const int fieldno, const int valueno, const int subvalueno, const var& replacement);
+DLL_PUBLIC var pickreplace(const var& instring, const int fieldno, const int valueno, const var& replacement);
 DLL_PUBLIC var pickreplace(const var& instring, const int fieldno, const var& replacement);
 
-DLL_PUBLIC var extract(const var& instring, const int fieldno = 0, const int valueno = 0,
-		       const int subvalueno = 0);
+DLL_PUBLIC var extract(const var& instring, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0);
 
-DLL_PUBLIC var insert(const var& instring, const int fieldno, const int valueno,
-		      const int subvalueno, const var& insertion);
-DLL_PUBLIC var insert(const var& instring, const int fieldno, const int valueno,
-		      const var& insertion);
+DLL_PUBLIC var insert(const var& instring, const int fieldno, const int valueno, const int subvalueno, const var& insertion);
+DLL_PUBLIC var insert(const var& instring, const int fieldno, const int valueno, const var& insertion);
 DLL_PUBLIC var insert(const var& instring, const int fieldno, const var& insertion);
 
 // DLL_PUBLIC var erase(const var& instring, const int fieldno, const int valueno=0, const int
 // subvalueno=0);
-DLL_PUBLIC var remove(const var& instring, const int fieldno, const int valueno = 0,
-		      const int subvalueno = 0);
+DLL_PUBLIC var remove(const var& instring, const int fieldno, const int valueno = 0, const int subvalueno = 0);
 
-DLL_PUBLIC var& pickreplacer(var& instring, const int fieldno, const int valueno, const int subvalueno,
-			 const var& replacement);
-DLL_PUBLIC var& pickreplacer(var& instring, const int fieldno, const int valueno,
-			 const var& replacement);
+DLL_PUBLIC var& pickreplacer(var& instring, const int fieldno, const int valueno, const int subvalueno, const var& replacement);
+DLL_PUBLIC var& pickreplacer(var& instring, const int fieldno, const int valueno, const var& replacement);
 DLL_PUBLIC var& pickreplacer(var& instring, const int fieldno, const var& replacement);
 
-DLL_PUBLIC var& inserter(var& instring, const int fieldno, const int valueno, const int subvalueno,
-			 const var& insertion);
+DLL_PUBLIC var& inserter(var& instring, const int fieldno, const int valueno, const int subvalueno, const var& insertion);
 DLL_PUBLIC var& inserter(var& instring, const int fieldno, const int valueno, const var& insertion);
 DLL_PUBLIC var& inserter(var& instring, const int fieldno, const var& insertion);
 
 // DLL_PUBLIC var& eraser(var& instring, const int fieldno, const int valueno=0, const int
 // subvalueno=0);
-DLL_PUBLIC var& remover(var& instring, const int fieldno, const int valueno = 0,
-			const int subvalueno = 0);
+DLL_PUBLIC var& remover(var& instring, const int fieldno, const int valueno = 0, const int subvalueno = 0);
 
 // locate & locateby without fieldno or valueno arguments uses character VM as separator character
 // locate & locateby with fieldno=0 uses character FM
@@ -335,25 +316,17 @@ DLL_PUBLIC var& remover(var& instring, const int fieldno, const int valueno = 0,
 
 DLL_PUBLIC bool locate(const var& target, const var& instring);
 DLL_PUBLIC bool locate(const var& target, const var& instring, var& setting);
-DLL_PUBLIC bool locate(const var& target, const var& instring, var& setting, const int fieldno,
-		       const int valueno = 0);
+DLL_PUBLIC bool locate(const var& target, const var& instring, var& setting, const int fieldno, const int valueno = 0);
 
-DLL_PUBLIC bool locateby(const char* ordercode, const var& target, const var& instring,
-			 var& setting);
-DLL_PUBLIC bool locateby(const char* ordercode, const var& target, const var& instring,
-			 var& setting, const int fieldno, const int valueno = 0);
+DLL_PUBLIC bool locateby(const char* ordercode, const var& target, const var& instring, var& setting);
+DLL_PUBLIC bool locateby(const char* ordercode, const var& target, const var& instring, var& setting, const int fieldno, const int valueno = 0);
 
-DLL_PUBLIC bool locateby(const var& ordercode, const var& target, const var& instring,
-			 var& setting);
-DLL_PUBLIC bool locateby(const var& ordercode, const var& target, const var& instring, var& setting,
-			 const int fieldno, const int valueno = 0);
+DLL_PUBLIC bool locateby(const var& ordercode, const var& target, const var& instring, var& setting);
+DLL_PUBLIC bool locateby(const var& ordercode, const var& target, const var& instring, var& setting, const int fieldno, const int valueno = 0);
 
 DLL_PUBLIC bool locateusing(const var& usingchar, const var& target, const var& instring);
-DLL_PUBLIC bool locateusing(const var& usingchar, const var& target, const var& instring,
-			    var& setting);
-DLL_PUBLIC bool locateusing(const var& usingchar, const var& target, const var& instring,
-			    var& setting, const int fieldno, const int valueno = 0,
-			    const int subvalueno = 0);
+DLL_PUBLIC bool locateusing(const var& usingchar, const var& target, const var& instring, var& setting);
+DLL_PUBLIC bool locateusing(const var& usingchar, const var& target, const var& instring, var& setting, const int fieldno, const int valueno = 0, const int subvalueno = 0);
 
 DLL_PUBLIC var sum(const var& instring, const var& sepchar);
 DLL_PUBLIC var sum(const var& instring);
@@ -367,66 +340,54 @@ DLL_PUBLIC var sum(const var& instring);
 //    print<sep>("hi","ho");
 
 // print(...) default sep is " ". No flush
-template<auto sep = ' ', typename Printable, typename... Additional>
-DLL_PUBLIC void print(const Printable& value, const Additional&... values)
-{
+template <auto sep = ' ', typename Printable, typename... Additional>
+DLL_PUBLIC void print(const Printable& value, const Additional&... values) {
 	LOCKIOSTREAM
 	std::cout << value;
 	((std::cout << sep << values), ...);
 }
 
 // printl() no arguments and prints end of line.Flush stdout
-DLL_PUBLIC void printl()
-{
+DLL_PUBLIC void printl() {
 	LOCKIOSTREAM
 	std::cout << std::endl;
 }
 
 // printl(...) default sep is " ". always prints end of line. Flush
-template<auto sep = ' ', typename Printable, typename... Additional>
-DLL_PUBLIC void printl(const Printable& value, const Additional&... values)
-{
+template <auto sep = ' ', typename Printable, typename... Additional>
+DLL_PUBLIC void printl(const Printable& value, const Additional&... values) {
 	LOCKIOSTREAM
 	std::cout << value;
 	((std::cout << sep << values), ...);
 	std::cout << std::endl;
 }
 
-
 // printt() no arguments just prints a sep (default tab). No flush
-template<auto sep = ' '>
-DLL_PUBLIC void printt()
-{
+template <auto sep = ' '>
+DLL_PUBLIC void printt() {
 	LOCKIOSTREAM
 	std::cout << sep;
 }
 
 // printt(...) default sep is tab. always adds a sep (tab) on the end. No flush
-template<auto sep = '\t', typename... Printable>
-DLL_PUBLIC void printt(const Printable&... values)
-{
-	LOCKIOSTREAM
-	((std::cout << values << sep), ...);
+template <auto sep = '\t', typename... Printable>
+DLL_PUBLIC void printt(const Printable&... values) {
+	LOCKIOSTREAM((std::cout << values << sep), ...);
 }
-
 
 //output
 ////////
 
 // output() BINARY TRANSPARENT version of print(). No automatic separators. No flush
-template<typename... Printable>
-DLL_PUBLIC void output(const Printable&... value)
-{
-	LOCKIOSTREAM
-	(var(value).output(), ...);
+template <typename... Printable>
+DLL_PUBLIC void output(const Printable&... value) {
+	LOCKIOSTREAM(var(value).output(), ...);
 }
 
 // outputl() BINARY TRANSPARENT version of printl(). No automatic separators. No flush
-template<typename... Printable>
-DLL_PUBLIC void outputl(const Printable&... value)
-{
-	LOCKIOSTREAM
-	(var(value).output(), ...);
+template <typename... Printable>
+DLL_PUBLIC void outputl(const Printable&... value) {
+	LOCKIOSTREAM(var(value).output(), ...);
 	var("").outputl();
 }
 
@@ -434,25 +395,22 @@ DLL_PUBLIC void outputl(const Printable&... value)
 ////////////
 
 // errput(...)
-template<auto sep = ' ', typename Printable, typename... Additional>
-DLL_PUBLIC void errput(const Printable& value, const Additional&... values)
-{
+template <auto sep = ' ', typename Printable, typename... Additional>
+DLL_PUBLIC void errput(const Printable& value, const Additional&... values) {
 	LOCKIOSTREAM
 	std::cerr << value;
 	((std::cerr << sep << values), ...);
 }
 
 // errputl()
-DLL_PUBLIC void errputl()
-{
+DLL_PUBLIC void errputl() {
 	LOCKIOSTREAM
 	std::cerr << std::endl;
 }
 
 // errputl(...)
-template<auto sep = ' ', typename Printable, typename... Additional>
-DLL_PUBLIC void errputl(const Printable& value, const Additional&... values)
-{
+template <auto sep = ' ', typename Printable, typename... Additional>
+DLL_PUBLIC void errputl(const Printable& value, const Additional&... values) {
 	LOCKIOSTREAM
 	std::cerr << value;
 	((std::cerr << sep << values), ...);
@@ -463,25 +421,22 @@ DLL_PUBLIC void errputl(const Printable& value, const Additional&... values)
 ////////////
 
 // logput(...)
-template<auto sep = ' ', typename Printable, typename... Additional>
-DLL_PUBLIC void logput(const Printable& value, const Additional&... values)
-{
+template <auto sep = ' ', typename Printable, typename... Additional>
+DLL_PUBLIC void logput(const Printable& value, const Additional&... values) {
 	LOCKIOSTREAM
 	std::clog << value;
 	((std::clog << sep << values), ...);
 }
 
 // logputl()
-DLL_PUBLIC void logputl()
-{
+DLL_PUBLIC void logputl() {
 	LOCKIOSTREAM
 	std::clog << std::endl;
 }
 
 // logputl(...)
-template<auto sep = ' ', typename Printable, typename... Additional>
-DLL_PUBLIC void logputl(const Printable& value, const Additional&... values)
-{
+template <auto sep = ' ', typename Printable, typename... Additional>
+DLL_PUBLIC void logputl(const Printable& value, const Additional&... values) {
 	LOCKIOSTREAM
 	std::clog << value;
 	((std::clog << sep << values), ...);
@@ -489,8 +444,8 @@ DLL_PUBLIC void logputl(const Printable& value, const Additional&... values)
 }
 
 #define TRACE(EXPRESSION) \
-        var(EXPRESSION).convert(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_,"_^]\[/").quote().outputl("TRACE: " #EXPRESSION "=");
+	var(EXPRESSION).convert(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_, "_^]\[/").quote().outputl("TRACE: " #EXPRESSION "=");
 
-} // namespace exodus
+}  // namespace exodus
 
-#endif // EXODUSFUNCS_H
+#endif	// EXODUSFUNCS_H

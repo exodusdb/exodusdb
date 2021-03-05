@@ -20,8 +20,8 @@
 #ifndef MVDBCONNS_H
 #define MVDBCONNS_H
 
+#include <libpq-fe.h>  //in postgres/include
 #include <boost/thread/mutex.hpp>
-#include <libpq-fe.h> //in postgres/include
 //#include <map>
 #include <unordered_map>
 
@@ -60,24 +60,21 @@
 //using LockTable = UNORDERED_SET_FOR_LOCKTABLE;
 using LockTable = std::unordered_map<uint64_t, int>;
 
-namespace exodus
-{
+namespace exodus {
 
 using CACHED_CONNECTION = PGconn*;
 using DELETER_AND_DESTROYER = void (*)(CACHED_CONNECTION /*, UNORDERED_SET_FOR_LOCKTABLE * */);
 
 using RecordCache = std::unordered_map<std::string, std::string>;
 
-class MvConnectionEntry // used as 'second' in pair, stored in connection map
+class MvConnectionEntry	 // used as 'second' in pair, stored in connection map
 {
-      public:
+   public:
 	// ctors
-	MvConnectionEntry() : flag(0), connection(0), plock_table(0), extra(0), precordcache(0) {}
-	MvConnectionEntry(CACHED_CONNECTION connection_, LockTable* LockTable_,
-			  RecordCache* RecordCache_)
-	    : flag(0), connection(connection_), plock_table(LockTable_), extra(0),
-	      precordcache(RecordCache_)
-	{
+	MvConnectionEntry()
+		: flag(0), connection(0), plock_table(0), extra(0), precordcache(0) {}
+	MvConnectionEntry(CACHED_CONNECTION connection_, LockTable* LockTable_, RecordCache* RecordCache_)
+		: flag(0), connection(connection_), plock_table(LockTable_), extra(0), precordcache(RecordCache_) {
 	}
 
 	// 1=entry is in use
@@ -100,9 +97,8 @@ class MvConnectionEntry // used as 'second' in pair, stored in connection map
 //using CONN_MAP = std::map<int, MvConnectionEntry>;
 using CONN_MAP = std::unordered_map<int, MvConnectionEntry>;
 
-class MvConnectionsCache
-{
-      public:
+class MvConnectionsCache {
+   public:
 	// ctors/dctors
 	MvConnectionsCache(DELETER_AND_DESTROYER del_);
 	virtual ~MvConnectionsCache();
@@ -115,14 +111,12 @@ class MvConnectionsCache
 	CACHED_CONNECTION get_connection(int index) const;
 	LockTable* get_lock_table(int index) const;
 	RecordCache* get_recordcache(int index) const;
-	std::string getrecord(const int connid, const std::string filename,
-			       const std::string key) const;
-	void putrecord(const int connid, const std::string filename, const std::string key,
-			 const std::string& record);
+	std::string getrecord(const int connid, const std::string filename, const std::string key) const;
+	void putrecord(const int connid, const std::string filename, const std::string key, const std::string& record);
 	void delrecord(const int connid, const std::string filename, const std::string key);
 	void clearrecordcache(const int connid);
 
-      private:
+   private:
 	// function to close pg connection?
 	DELETER_AND_DESTROYER del;
 
@@ -136,5 +130,5 @@ class MvConnectionsCache
 	mutable boost::mutex mvconnections_mutex;
 };
 
-} // namespace exodus
-#endif // MVDBCONNS_H
+}  // namespace exodus
+#endif	// MVDBCONNS_H

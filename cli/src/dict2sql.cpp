@@ -1,7 +1,7 @@
 #include <exodus/program.h>
 programinit()
 
-var verbose;
+	var verbose;
 var dictfilename;
 var dictfile;
 var dictrec;
@@ -47,29 +47,27 @@ function main() {
 
 	//TODO work on more than the default db connection
 
-	var filenames=COMMAND.a(2).lcase();
-	var dictid=COMMAND.a(3);
-	verbose=index(OPTIONS,'V');
+	var filenames = COMMAND.a(2).lcase();
+	var dictid = COMMAND.a(3);
+	verbose = index(OPTIONS, 'V');
 	var doall = true;
 
-	if (filenames)
-	{
+	if (filenames) {
 		doall = false;
-		if (filenames.substr(1,5) ne "dict_")
-			filenames.splicer(1,0,"dict_");
-	}
-	else
-		filenames=var().listfiles();
+		if (filenames.substr(1, 5) ne "dict_")
+			filenames.splicer(1, 0, "dict_");
+	} else
+		filenames = var().listfiles();
 
 	//create global view of all dicts in "dict_all"
-	var viewsql="";
+	var viewsql = "";
 	if (doall)
 		viewsql ^= "CREATE MATERIALIZED VIEW dict_all AS\n";
 
 	//do one or many/all files
-	int nfiles=dcount(filenames,FM);
-	for (int filen=1;filen<=nfiles;++filen)
-		onefile(filenames.a(filen),dictid,viewsql);
+	int nfiles = dcount(filenames, FM);
+	for (int filen = 1; filen <= nfiles; ++filen)
+		onefile(filenames.a(filen), dictid, viewsql);
 
 	//quit if not doing all files
 	/////////////////////////////
@@ -85,11 +83,11 @@ function main() {
 		var().sqlexec("DROP VIEW dict_all");
 
 	if (nfiles) {
-		viewsql.splicer(-6,6,"");//remove trailing "UNION" word
+		viewsql.splicer(-6, 6, "");	 //remove trailing "UNION" word
 		var errmsg;
 		if (verbose)
 			viewsql.output("SQL:");
-		if (var().sqlexec(viewsql,errmsg))
+		if (var().sqlexec(viewsql, errmsg))
 			printl("dict_all file created");
 		else {
 			if (not verbose)
@@ -100,8 +98,8 @@ function main() {
 
 	//create exodus pgsql functions
 
-	var sqltemplate=
-R"V0G0N(
+	var sqltemplate =
+		R"V0G0N(
 CREATE OR REPLACE FUNCTION
 $functionname_and_args
 RETURNS $return_type
@@ -119,42 +117,42 @@ COST 10;
 )V0G0N";
 
 	//exodus_trim (leading, trailing and excess inner spaces)
-	var trimsql=R"(return regexp_replace(regexp_replace(data, '^\s+|\s+$', '', 'g'),'\s{2,}',' ','g');)";
-	do_sql("exodus_trim(data text)","text",trimsql,sqltemplate);
+	var trimsql = R"(return regexp_replace(regexp_replace(data, '^\s+|\s+$', '', 'g'),'\s{2,}',' ','g');)";
+	do_sql("exodus_trim(data text)", "text", trimsql, sqltemplate);
 
 	//exodus_field_replace (a field)
-	do_sql("exodus_field_replace(data text, sep text, fieldno int, replacement text)","text",field_replace_sql,sqltemplate);
+	do_sql("exodus_field_replace(data text, sep text, fieldno int, replacement text)", "text", field_replace_sql, sqltemplate);
 
 	//exodus_field_remove (a field)
-	do_sql("exodus_field_remove(data text, sep text, fieldno int)","text",field_remove_sql,sqltemplate);
+	do_sql("exodus_field_remove(data text, sep text, fieldno int)", "text", field_remove_sql, sqltemplate);
 
 	//exodus_split 123.45USD -> 123.45
-	do_sql("exodus_split(data text)","text",split_sql,sqltemplate);
+	do_sql("exodus_split(data text)", "text", split_sql, sqltemplate);
 
 	//exodus_unique (fields)
 	//https://github.com/JDBurnZ/postgresql-anyarray/blob/master/stable/anyarray_uniq.sql
-	do_sql("exodus_unique(mvstring text, sepchar text)","text",unique_sql,sqltemplate);
+	do_sql("exodus_unique(mvstring text, sepchar text)", "text", unique_sql, sqltemplate);
 
 	//exodus_locate -> int
-	do_sql("exodus_locate(substr text, searchstr text, sepchar text default VM)","int",locate_sql,sqltemplate);
+	do_sql("exodus_locate(substr text, searchstr text, sepchar text default VM)", "int", locate_sql, sqltemplate);
 
 	//exodus_isnum -> bool
-	do_sql("exodus_isnum(instring text)","bool",isnum_sql,sqltemplate);
+	do_sql("exodus_isnum(instring text)", "bool", isnum_sql, sqltemplate);
 
 	//exodus_tobool -> bool
-	do_sql("exodus_tobool(instring text)","bool",tobool_sql,sqltemplate);
+	do_sql("exodus_tobool(instring text)", "bool", tobool_sql, sqltemplate);
 
 	//exodus_date -> int (today's date as a number according to PICK/AREV)
-	do_sql("exodus_date()","int",exodus_date_sql,sqltemplate);
+	do_sql("exodus_date()", "int", exodus_date_sql, sqltemplate);
 
 	//exodus_extract_date_array -> date[]
-	do_sql("exodus_extract_date_array(data text, fn int, vn int, sn int)","date[]",exodus_extract_date_array_sql,sqltemplate);
+	do_sql("exodus_extract_date_array(data text, fn int, vn int, sn int)", "date[]", exodus_extract_date_array_sql, sqltemplate);
 
 	//exodus_extract_time_array -> time[]
-	do_sql("exodus_extract_time_array(data text, fn int, vn int, sn int)","time[]",exodus_extract_time_array_sql,sqltemplate);
+	do_sql("exodus_extract_time_array(data text, fn int, vn int, sn int)", "time[]", exodus_extract_time_array_sql, sqltemplate);
 
 	//exodus_addcent4 -> text
-	do_sql("exodus_addcent4(data text)","text",exodus_addcent4_sql,sqltemplate);
+	do_sql("exodus_addcent4(data text)", "text", exodus_addcent4_sql, sqltemplate);
 
 	return 0;
 }
@@ -163,31 +161,31 @@ subroutine do_sql(in functionname_and_args, in returntype, in sql, in sqltemplat
 
 	printl(functionname_and_args, " -> ", returntype);
 
-	var functionsql=sqltemplate;
+	var functionsql = sqltemplate;
 
-	functionsql.swapper("$functionname_and_args",functionname_and_args);
-	functionsql.swapper("$return_type",returntype);
+	functionsql.swapper("$functionname_and_args", functionname_and_args);
+	functionsql.swapper("$return_type", returntype);
 
-	functionsql.swapper("$sqlcode",sql);
+	functionsql.swapper("$sqlcode", sql);
 
-	functionsql.replacer("\\bRM\\b","chr(31)");
-	functionsql.replacer("\\bFM\\b","chr(30)");
-	functionsql.replacer("\\bVM\\b","chr(29)");
-	functionsql.replacer("\\bSM\\b","chr(28)");
-	functionsql.replacer("\\bSVM\\b","chr(28)");
-	functionsql.replacer("\\bTM\\b","chr(27)");
-	functionsql.replacer("\\bSTM\\b","chr(26)");
+	functionsql.replacer("\\bRM\\b", "chr(31)");
+	functionsql.replacer("\\bFM\\b", "chr(30)");
+	functionsql.replacer("\\bVM\\b", "chr(29)");
+	functionsql.replacer("\\bSM\\b", "chr(28)");
+	functionsql.replacer("\\bSVM\\b", "chr(28)");
+	functionsql.replacer("\\bTM\\b", "chr(27)");
+	functionsql.replacer("\\bSTM\\b", "chr(26)");
 
 	if (verbose)
 		functionsql.outputl();
 
 	var errmsg;
-	var().sqlexec(functionsql,errmsg);
+	var().sqlexec(functionsql, errmsg);
 
 	//do drop function first if suggested
 	if (errmsg.index("DROP FUNCTION")) {
 
-		var dropsql="drop function " ^ functionname_and_args;
+		var dropsql = "drop function " ^ functionname_and_args;
 		if (verbose)
 			dropsql.outputl();
 
@@ -195,23 +193,23 @@ subroutine do_sql(in functionname_and_args, in returntype, in sql, in sqltemplat
 		//TODO identify file/fields like production_orders_date_time
 		//var filename=functionname_and_args.field("_",2);
 		//var fieldname=functionname_and_args.field("_",3,99).field("(",1);
-		var filename=functionname_and_args.field("_",2,999).field("(",1);
-		var fieldname=filename.convert(LOWERCASE,"").trim("_");
-		filename=filename.convert(UPPERCASE,"").trim("_");
+		var filename = functionname_and_args.field("_", 2, 999).field("(", 1);
+		var fieldname = filename.convert(LOWERCASE, "").trim("_");
+		filename = filename.convert(UPPERCASE, "").trim("_");
 		filename.deleteindex(fieldname);
 
-		var().sqlexec(dropsql,errmsg);
+		var().sqlexec(dropsql, errmsg);
 		errmsg.outputl();
 
-		var().sqlexec(functionsql,errmsg);
+		var().sqlexec(functionsql, errmsg);
 	}
 
 	if (errmsg) {
 		if (not verbose) {
 			//functionsql.outputl();
-			int nlines=count(functionsql,"\n");
-			for (int linen=1;linen<=nlines;++linen) {
-				printl(linen-2+2,". ", field(functionsql,"\n",linen));
+			int nlines = count(functionsql, "\n");
+			for (int linen = 1; linen <= nlines; ++linen) {
+				printl(linen - 2 + 2, ". ", field(functionsql, "\n", linen));
 			}
 			printl();
 		}
@@ -222,16 +220,16 @@ subroutine do_sql(in functionname_and_args, in returntype, in sql, in sqltemplat
 
 subroutine onefile(in dictfilename, in reqdictid, io viewsql) {
 
-	if (dictfilename.substr(1,5) ne "dict_" or dictfilename == "dict_all")
+	if (dictfilename.substr(1, 5) ne "dict_" or dictfilename == "dict_all")
 		return;
 
-	if (!open(dictfilename,dictfile)) {
+	if (!open(dictfilename, dictfile)) {
 		call fsmsg();
 		abort("onefile");
 	}
 
 	if (reqdictid)
-		makelist("",reqdictid);
+		makelist("", reqdictid);
 	else
 		select(dictfilename);
 
@@ -253,20 +251,20 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 
 	//get the dict source code
 	var dictrec;
-	if (not dictrec.read(dictfile,dictid)) {
+	if (not dictrec.read(dictfile, dictid)) {
 		dictid.ucaser();
-		if (!dictrec.read(dictfile,dictid))
-			stop(quote(dictid)^" cannot be read in "^quote(dictfilename));
+		if (!dictrec.read(dictfile, dictid))
+			stop(quote(dictid) ^ " cannot be read in " ^ quote(dictfilename));
 	}
-	var sourcecode=dictrec.a(8);
-	var ismv=dictrec.a(4)[1]=="M";
+	var sourcecode = dictrec.a(8);
+	var ismv = dictrec.a(4)[1] == "M";
 
 	//dict returns text, date, integer or float
 	var dict_returns = "text";
 	var conversion = dictrec.a(7);
-	if (conversion.substr(1,6) == "[DATE,")
+	if (conversion.substr(1, 6) == "[DATE,")
 		dict_returns = "date";
-	else if (conversion.substr(1,7) == "[NUMBER") {
+	else if (conversion.substr(1, 7) == "[NUMBER") {
 		if (conversion[9] == "0")
 			//[NUMBER,0]
 			dict_returns = "integer";
@@ -275,57 +273,63 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 	}
 
 	//auto generate pgsql code for ..._XREF dict records (full text)
-	if (sourcecode.substr(1,11)=="CALL XREF({") {
+	if (sourcecode.substr(1, 11) == "CALL XREF({") {
 
 		//remove any existing pgsql
-		var pos=index(sourcecode,"/" "*pgsql");
+		var pos = index(sourcecode,
+						"/"
+						"*pgsql");
 		if (pos) {
-			sourcecode=sourcecode.substr(1,pos-1).trimb(VM);
+			sourcecode = sourcecode.substr(1, pos - 1).trimb(VM);
 		}
 
-		var fulltext_dictid=field(field(sourcecode,"{",2),"}",1);
+		var fulltext_dictid = field(field(sourcecode, "{", 2), "}", 1);
 
 		//replace all punctuation and delimiters with spaces
-		var chars=field(sourcecode.trim("\\"),"\\",2);
-		chars.swapper("FF","");
-		chars.swapper("FE","");
-		chars.swapper("FD","");
-		chars.swapper("FC","");
-		chars.swapper("FB","");
-		chars.swapper("FA","");
-		chars="\\x1D\\x1E" ^ iconv(chars,"HEX");
-		chars.swapper("'","''");
-		chars^="\\x1A";//STM
-		chars^="\\x1B";//TM
-		chars^="\\x1C";//SVM
-		chars^="\\x1F";//RM
-		sourcecode.r(1,-1,"/" "*pgsql");
+		var chars = field(sourcecode.trim("\\"), "\\", 2);
+		chars.swapper("FF", "");
+		chars.swapper("FE", "");
+		chars.swapper("FD", "");
+		chars.swapper("FC", "");
+		chars.swapper("FB", "");
+		chars.swapper("FA", "");
+		chars = "\\x1D\\x1E" ^ iconv(chars, "HEX");
+		chars.swapper("'", "''");
+		chars ^= "\\x1A";  //STM
+		chars ^= "\\x1B";  //TM
+		chars ^= "\\x1C";  //SVM
+		chars ^= "\\x1F";  //RM
+		sourcecode.r(1, -1,
+					 "/"
+					 "*pgsql");
 		//note postgres string prefix E'...'
 		// E is required to enable \xFF hex decoding
 		//LIMIT TO 1000 characters since postgres index limit is around 2700 BYTES
-		sourcecode.r(1,-1,"ans:=upper(translate(substring(" ^
-			dictfilename.convert(".","_")^"_"^fulltext_dictid^"(key,data),0,1000)"^
-			",E'"^chars^"'" ^ ",repeat(' ',"^
-		(len(chars)+20)^")));");
-		sourcecode.r(1,-1,"*" "/");
-		dictrec.r(8,sourcecode);
+		sourcecode.r(1, -1, "ans:=upper(translate(substring(" ^ dictfilename.convert(".", "_") ^ "_" ^ fulltext_dictid ^ "(key,data),0,1000)" ^ ",E'" ^ chars ^ "'" ^ ",repeat(' '," ^ (len(chars) + 20) ^ ")));");
+		sourcecode.r(1, -1,
+					 "*"
+					 "/");
+		dictrec.r(8, sourcecode);
 
 		//write the sql to the dictionary record so the availablily of pgsql is visible to var::selectx
-		dictrec.write(dictfile,dictid);
-
-            	}
+		dictrec.write(dictfile, dictid);
+	}
 
 	//remove anything before sql code
-	var pos=index(sourcecode,"/" "*pgsql");
+	var pos = index(sourcecode,
+					"/"
+					"*pgsql");
 	if (!pos) {
-		if (index(sourcecode,"/" "*psql"))
-			abort(quote(dictfilename)^" "^quote(dictid)^" 'psql' must be 'pgsql'");
+		if (index(sourcecode,
+				  "/"
+				  "*psql"))
+			abort(quote(dictfilename) ^ " " ^ quote(dictid) ^ " 'psql' must be 'pgsql'");
 		if (reqdictid)
-			abort(quote(dictfilename)^" "^quote(dictid)^" does not have any pgsql section");
+			abort(quote(dictfilename) ^ " " ^ quote(dictid) ^ " does not have any pgsql section");
 
 		return;
 	}
-	var sql=sourcecode.substr(pos+8);
+	var sql = sourcecode.substr(pos + 8);
 
 	//printl(dictfilename, " ",dictid, " > sql");
 
@@ -333,21 +337,24 @@ subroutine onedictid(in dictfilename, io dictid, in reqdictid) {
 	//so pgsql comments like /* */ are respected ??
 	//remove anything after sql code
 	//find the LAST * /  pair and remove everything after it
-	var lastpos=0;
-	for (int ii=1;;++ii) {
+	var lastpos = 0;
+	for (int ii = 1;; ++ii) {
 		//find the ii'th * / terminator
-		pos=index(sql,"*" "/",ii);
+		pos = index(sql,
+					"*"
+					"/",
+					ii);
 		if (!pos)
 			break;
-		lastpos=pos;
+		lastpos = pos;
 	}
 	if (lastpos)
-		sql.splicer(lastpos-1,"");
+		sql.splicer(lastpos - 1, "");
 
 	var xlatetemplate;
 	if (ismv)
-		xlatetemplate=
-R"V0G0N(
+		xlatetemplate =
+			R"V0G0N(
 -- $COMMENT
 $RETVAR := array_to_string
 (
@@ -368,8 +375,8 @@ $RETVAR := array_to_string
 );
 )V0G0N";
 	else
-		xlatetemplate=
-R"V0G0N(
+		xlatetemplate =
+			R"V0G0N(
  --$COMMENT
 $RETVAR :=
   $TARGET_EXPR
@@ -393,44 +400,42 @@ $RETVAR :=
 	// "to" expression has access to target file data eg invoices.data
 	//      and '' means whole record eg invoices.data
 	//	and "0" means key (which is not useful)
-	int nlines=dcount(sql,VM);
-	for (int ln=1;ln<=nlines;++ln) {
-		var line=sql.a(1,ln).trim();
-		if (line.substr(1,2)!="--" && field(line," ",2,2) eq ":= xlate") {
+	int nlines = dcount(sql, VM);
+	for (int ln = 1; ln <= nlines; ++ln) {
+		var line = sql.a(1, ln).trim();
+		if (line.substr(1, 2) != "--" && field(line, " ", 2, 2) eq ":= xlate") {
 
 			//line.printl("xlate=");
 
 			//eg ans
-			var targetvariablename=line.field(" ",1);
+			var targetvariablename = line.field(" ", 1);
 
 			//target file name eg jobs
-			var target_filename=line.field(" ",4);
-			var source_key_expr=line.field(" ",5);
-			var target_expr=line.field(" ",6).field(";",1);
-//TRACE(dictid)
-//TRACE(reqdictid)
+			var target_filename = line.field(" ", 4);
+			var source_key_expr = line.field(" ", 5);
+			var target_expr = line.field(" ", 6).field(";", 1);
+			//TRACE(dictid)
+			//TRACE(reqdictid)
 			//allow xlate job in jobs_text because it is for dict_production_orders section
 			//if (lcase(var("dict_") ^ target_filename) == dictfilename) {
 			//	errputl("> ", dictfilename, " ", dictid.quote(), " possible bad xlate");
 			//}
 			//allowing xlate jobs in dict_jobs text since it is used for other files
-			if (lcase(var("dict_") ^ target_filename) eq dictfilename
-				 && not(target_filename.lcase() == "jobs" && dictid.lcase() == "text")
-			) {
-				line = " -- Sorry. In " ^ target_filename ^ ", " ^ dictid  ^ " you cannot xlate to same file due to pgsql bug.\n -- " ^ line;
+			if (lcase(var("dict_") ^ target_filename) eq dictfilename && not(target_filename.lcase() == "jobs" && dictid.lcase() == "text")) {
+				line = " -- Sorry. In " ^ target_filename ^ ", " ^ dictid ^ " you cannot xlate to same file due to pgsql bug.\n -- " ^ line;
 			} else {
 				//source file field number or expression for key to target file
 				//if key field numeric then extract from source file date
 				if (source_key_expr.isnum())
-					source_key_expr="split_part($2,chr(30),"^source_key_expr^")";
+					source_key_expr = "split_part($2,chr(30)," ^ source_key_expr ^ ")";
 
 				//target file field number or expression (omit optional ; on the end)
-				if (target_expr==0)
-					target_expr=target_filename^".key";
-				else if (target_expr=="''")
-					target_expr=target_filename^".data";
+				if (target_expr == 0)
+					target_expr = target_filename ^ ".key";
+				else if (target_expr == "''")
+					target_expr = target_filename ^ ".data";
 				else if (target_expr.isnum())
-					target_expr="split_part("^target_filename^".data,chr(30),"^target_expr^")";
+					target_expr = "split_part(" ^ target_filename ^ ".data,chr(30)," ^ target_expr ^ ")";
 
 				//line=targetvariablename^" := ";
 				//if (ismv) {
@@ -444,32 +449,32 @@ $RETVAR :=
 				//line^="\n FROM "^target_filename;
 				//line^="\n WHERE "^target_filename^".key="^source_key_expression^";";
 				var origline = line;
-				line=xlatetemplate;
-				line.swapper("$COMMENT",origline);
-				line.swapper("$RETVAR",targetvariablename);
-				line.swapper("$TARGETFILE",target_filename);
-				line.swapper("$SOURCEKEY_EXPR",source_key_expr);
-				line.swapper("$TARGET_EXPR",target_expr);
+				line = xlatetemplate;
+				line.swapper("$COMMENT", origline);
+				line.swapper("$RETVAR", targetvariablename);
+				line.swapper("$TARGETFILE", target_filename);
+				line.swapper("$SOURCEKEY_EXPR", source_key_expr);
+				line.swapper("$TARGET_EXPR", target_expr);
 				//line.outputl("sql=");
 			}
-			sql.r(1,ln,line);
+			sql.r(1, ln, line);
 		}
 	}
 
-	sql.replacer("\\bRM\\b","chr(31)");
-	sql.replacer("\\bFM\\b","chr(30)");
-	sql.replacer("\\bVM\\b","chr(29)");
-	sql.replacer("\\bSM\\b","chr(28)");
-	sql.replacer("\\bSVM\\b","chr(28)");
-	sql.replacer("\\bTM\\b","chr(27)");
-	sql.replacer("\\bSTM\\b","chr(26)");
+	sql.replacer("\\bRM\\b", "chr(31)");
+	sql.replacer("\\bFM\\b", "chr(30)");
+	sql.replacer("\\bVM\\b", "chr(29)");
+	sql.replacer("\\bSM\\b", "chr(28)");
+	sql.replacer("\\bSVM\\b", "chr(28)");
+	sql.replacer("\\bTM\\b", "chr(27)");
+	sql.replacer("\\bSTM\\b", "chr(26)");
 
 	//convert to text
 	sql.trimmerf(VM).trimmerb(VM);
-	sql.converter(VM,"\n");
+	sql.converter(VM, "\n");
 
-	var sqltemplate=
-R"V0G0N(CREATE OR REPLACE FUNCTION
+	var sqltemplate =
+		R"V0G0N(CREATE OR REPLACE FUNCTION
  $functionname_and_args
  RETURNS $return_type
  AS
@@ -489,24 +494,23 @@ $sqlcode
  )V0G0N";
 
 	//upload pgsql function to postgres
-	do_sql(dictfilename^"_"^dictid^"(key text, data text)",dict_returns,sql,sqltemplate);
+	do_sql(dictfilename ^ "_" ^ dictid ^ "(key text, data text)", dict_returns, sql, sqltemplate);
 
 	// delete calc_fields
 
 	var calc_fields;
 	if (calc_fields.open("calc_fields")) {
-		var key=ucase(dictfilename.substr(6)^"*"^dictid);
+		var key = ucase(dictfilename.substr(6) ^ "*" ^ dictid);
 		if (calc_fields.deleterecord(key)) {
 			key.outputl("deleted calc_fields = ");
 		}
 	}
 
-
-}//onedictid
+}  //onedictid
 
 //exodus_field_remove
-var field_remove_sql=
-R"V0G0N(
+var field_remove_sql =
+	R"V0G0N(
 DECLARE
  charn int;
  nchars int;
@@ -562,8 +566,8 @@ END;
 )V0G0N";
 
 //exodus_field_replace
-var field_replace_sql=
-R"V0G0N(
+var field_replace_sql =
+	R"V0G0N(
 DECLARE
  charn int;
  nchars int;
@@ -630,8 +634,8 @@ END;
 )V0G0N";
 
 //exodus_split
-var split_sql=
-R"V0G0N(
+var split_sql =
+	R"V0G0N(
 DECLARE
  inputx text;
  temp text;
@@ -682,8 +686,8 @@ END;
 )V0G0N";
 
 //exodus_unique
-var unique_sql=
-R"V0G0N(
+var unique_sql =
+	R"V0G0N(
 DECLARE
 	-- The variable used to track iteration over "with_array".
 	loop_offset integer;
@@ -720,12 +724,9 @@ RETURN array_to_string(return_array,sepchar,'');
 END;
 )V0G0N";
 
-
-
-
 //exodus_locate
-var locate_sql=
-R"V0G0N(
+var locate_sql =
+	R"V0G0N(
 DECLARE
  searchstrarray text [];
  nfields int;
@@ -754,10 +755,9 @@ BEGIN
 END;
 )V0G0N";
 
-
 //exodus_isnum -> bool
-var isnum_sql=
-R"V0G0N(
+var isnum_sql =
+	R"V0G0N(
 DECLARE
  tt numeric;
 BEGIN
@@ -780,8 +780,8 @@ END;
 )V0G0N";
 
 //exodus_tobool -> bool
-var tobool_sql=
-R"V0G0N(
+var tobool_sql =
+	R"V0G0N(
 DECLARE
  tt numeric;
 BEGIN
@@ -808,16 +808,15 @@ END;
 )V0G0N";
 
 //exodus_date -> int
-var exodus_date_sql=
-R"V0G0N(
+var exodus_date_sql =
+	R"V0G0N(
  return current_date-'1968-1-1'::date;
 )V0G0N";
 
-
 //exodus_extract_date_array -> date[]
 //almost identical code in exodus_extract_time_array
-var exodus_extract_date_array_sql=
-R"V0G0N(
+var exodus_extract_date_array_sql =
+	R"V0G0N(
 DECLARE
  dates text := exodus_extract_text(data,fn,vn,sn);
  date text;
@@ -836,11 +835,10 @@ BEGIN
 END;
 )V0G0N";
 
-
 //exodus_extract_time_array -> time[]
 //almost identical code in exodus_extract_date_array
-var exodus_extract_time_array_sql=
-R"V0G0N(
+var exodus_extract_time_array_sql =
+	R"V0G0N(
 DECLARE
  times text := exodus_extract_text(data,fn,vn,sn);
  timex text;
@@ -861,8 +859,8 @@ END;
 )V0G0N";
 
 //exodus_addcent4 -> text
-var exodus_addcent4_sql=
-R"V0G0N(
+var exodus_addcent4_sql =
+	R"V0G0N(
 DECLARE
  year int;
 BEGIN

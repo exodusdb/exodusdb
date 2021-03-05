@@ -1,7 +1,6 @@
 #include <exodus/exodus.h>
 
-class printtext
-{
+class printtext {
 
 	var printptr;
 	//var tx;
@@ -25,11 +24,10 @@ class printtext
 	var newpagetag;
 	var style;
 
-public:
-
+   public:
 	var html;
 
-	void init(){}
+	void init() {}
 
 	void printnext(io bodyln, io pagen) {
 		bodyln = 999;
@@ -38,8 +36,8 @@ public:
 	}
 
 	void setheadfoot(in newhead, in newfoot) {
-		head=newhead;
-		foot=newfoot;
+		head = newhead;
+		foot = newfoot;
 	}
 
 	void close() {
@@ -65,22 +63,22 @@ public:
 			//if no printfilename assume command mode and make an output file name
 			printfilename = SYSTEM.a(2);
 			if (html.unassigned()) {
-				html = printfilename.substr(-4,4) eq ".htm";
+				html = printfilename.substr(-4, 4) eq ".htm";
 			}
 
 			var ownprintfile = 0;
 			if (printfilename == "") {
 				printfilename = (var(999999999).rnd()).substr(-8, 8);
 				if (html)
-					printfilename^=".htm";
+					printfilename ^= ".htm";
 				else
-					printfilename^=".txt";
+					printfilename ^= ".txt";
 				SYSTEM.r(2, printfilename);
 				ownprintfile = 1;
 			}
 
 			//change the file extension to htm
-			if (html and printfilename.substr(-4,4) not_eq ".htm") {
+			if (html and printfilename.substr(-4, 4) not_eq ".htm") {
 
 				printfilename.osclose();
 				printfilename.osdelete();
@@ -95,7 +93,7 @@ public:
 			}
 
 			//open printout file
-/*
+			/*
 			oswrite("", printfilename);
 			if (!printfilename.osopen()) {
 				stop("SYSTEM ERROR - CANNOT OPEN PRINTFILE " ^ printfilename.quote());
@@ -129,14 +127,13 @@ public:
 			if (foot.unassigned())
 				foot = "";
 
-			gosub getheadfoot(head,foot,nbodylns);
-
+			gosub getheadfoot(head, foot, nbodylns);
 		}
 
 		//if tx[-1,1] ne char(12) then tx:=fm
 		//tx ^= FM;
 
-		var ntxlns = tx.count(FM)+1;
+		var ntxlns = tx.count(FM) + 1;
 		bodyln += ntxlns;
 
 		if (bodyln == ntxlns or bodyln > nbodylns or newpage) {
@@ -196,8 +193,7 @@ public:
 		return;
 	}
 
-private:
-
+   private:
 	void printtx2(io tx) {
 		if (html) {
 			if (not printptr) {
@@ -222,7 +218,7 @@ private:
 		tx.swapper(FM, "\n");
 		//osbwritex(tx, printfilename, printfilename, printptr);
 		//tx.osbwrite(printfilename,printptr);
-		printptr=99;
+		printptr = 99;
 		printl(tx);
 
 		tx = "";
@@ -232,49 +228,51 @@ private:
 	}
 
 	void gethtml(in mode, io letterhead, in companycode) {
-		letterhead="";
+		letterhead = "";
 		return;
 
 		//prevent "warning unused" until properly implemented
-		if (mode or companycode){};
+		if (mode or companycode) {
+		};
 	}
 
 	void readcss(io css) {
-		if (osread(css,"default.css"))
+		if (osread(css, "default.css"))
 			return;
-css=""
-"<style type=\"text/css\">\n"
-"body {background-color:#ffffff; font-family:neosysfont,trebuchet ms,arial,helvetica,sans serif; font-size: neosyssize}\n"
-"table,span,div,br,p,a,thread,tbody,tfoot,tr,th,td,b,i,u,dl,dt,dd,li,ul,form,font,small,big {font-size:100%}\n"
-"a {color:blue;}\n"
-"a:visited {color:purple;}\n"
-"a:hover {color:red;}\n"
-"tt {font-family:courier new,courier;font-size:8px;}\n"
-"th {background-color:#ffff80;}\n"
-"thead {display:table-header-group}\n"
-"td.nb {border-bottom:none}\n"
-"td.nt {border-top:none}\n"
-"td.nx {border-top:none;border-bottom:none}\n"
-".maintable {background-color:#ffffc0; border-width:2px; border-collapse:separate; padding:1px}\n"
-"</style>\n"
-"\n"
-"<style type=\"text/css\" media=\"print\">\n"
-".maintable {border-collapse:collapse;border-color:#bbbbbb}\n"
-"td {border-color:#bbbbbb;border-width:1px}\n"
-"th {border-color:#bbbbbb;border-width:1px}\n"
-"</style>\n";
+		css =
+			""
+			"<style type=\"text/css\">\n"
+			"body {background-color:#ffffff; font-family:neosysfont,trebuchet ms,arial,helvetica,sans serif; font-size: neosyssize}\n"
+			"table,span,div,br,p,a,thread,tbody,tfoot,tr,th,td,b,i,u,dl,dt,dd,li,ul,form,font,small,big {font-size:100%}\n"
+			"a {color:blue;}\n"
+			"a:visited {color:purple;}\n"
+			"a:hover {color:red;}\n"
+			"tt {font-family:courier new,courier;font-size:8px;}\n"
+			"th {background-color:#ffff80;}\n"
+			"thead {display:table-header-group}\n"
+			"td.nb {border-bottom:none}\n"
+			"td.nt {border-top:none}\n"
+			"td.nx {border-top:none;border-bottom:none}\n"
+			".maintable {background-color:#ffffc0; border-width:2px; border-collapse:separate; padding:1px}\n"
+			"</style>\n"
+			"\n"
+			"<style type=\"text/css\" media=\"print\">\n"
+			".maintable {border-collapse:collapse;border-color:#bbbbbb}\n"
+			"td {border-color:#bbbbbb;border-width:1px}\n"
+			"th {border-color:#bbbbbb;border-width:1px}\n"
+			"</style>\n";
 	}
 
 	void getmark(in mode, in html, io printtxmark) {
 		if (mode or html)
-			printtxmark="";
+			printtxmark = "";
 		else
-			printtxmark="";
+			printtxmark = "";
 		return;
 	}
 
 	void convoptions(io temp) {
-		temp.swapper(SQ^SQ, "^%^");
+		temp.swapper(SQ ^ SQ, "^%^");
 
 		//convert options
 		//loop while index(temp,"L'",1) do swap "L'" with "'":fm in temp repeat
@@ -313,13 +311,13 @@ css=""
 						newoptions ^= "<br />";
 				} else if (optionchar == "S") {
 					var spaceoptionsize = "";
-					while (optionchars.substr(ii + 1, 1).match("\\d","r")) {
+					while (optionchars.substr(ii + 1, 1).match("\\d", "r")) {
 						spaceoptionsize ^= optionchars.substr(ii + 1, 1);
 						ii += 1;
 					}
 					newoptions ^= spaceoptionsize.space();
 				}
-			};//ii;
+			};	//ii;
 			//temp[optioncharn,-len(optionchars)-2]=newoptions
 			temp.splicer(optioncharn - optionchars.length() - 1, optionchars.length() + 2, newoptions);
 		}
@@ -361,7 +359,6 @@ css=""
 		nbodylns = 999999;
 
 		return;
-
 	}
 
 } printer1;

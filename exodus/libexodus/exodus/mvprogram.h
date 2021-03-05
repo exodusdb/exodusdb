@@ -6,13 +6,11 @@
 
 #include <unordered_map>
 
-namespace exodus
-{
+namespace exodus {
 
-class ExodusProgramBase
-{
+class ExodusProgramBase {
 
-      public:
+   public:
 	using in = const var&;
 	using io = var&;
 	using out = var&;
@@ -64,11 +62,11 @@ class ExodusProgramBase
 	bool pushselect(const var& v1, var& v2, var& v3, var& v4);
 	bool popselect(const var& v1, var& v2, var& v3, var& v4);
 	void clearselect();
-    bool deleterecord(const var& filename_or_handle_or_command, const var& key DEFAULTNULL);
+	bool deleterecord(const var& filename_or_handle_or_command, const var& key DEFAULTNULL);
 
 	bool savelist(const var& listname);
 	bool getlist(const var& listname);
-	bool formlist(const var& filename_or_command, const var& keys="", const var fieldno=0);
+	bool formlist(const var& filename_or_command, const var& keys = "", const var fieldno = 0);
 	bool makelist(const var& listname, const var& keys);
 	bool deletelist(const var& listname);
 
@@ -77,8 +75,7 @@ class ExodusProgramBase
 	void mssg(const var& msg, const var& options = "") const;
 	void mssg(const var& msg, const var& options, var& buffer, const var& params = "") const;
 
-	var authorised(const var& task0, var& msg, const var& defaultlock = "",
-		       const var& username0 = "");
+	var authorised(const var& task0, var& msg, const var& defaultlock = "", const var& username0 = "");
 	var authorised(const var& task0);
 	void readuserprivs() const;
 	void writeuserprivs() const;
@@ -93,8 +90,7 @@ class ExodusProgramBase
 	// given dictid reads dictrec from DICT file and extracts from RECORD/ID or calls library
 	// called dict+DICT function dictid not const so we can mess with the library?
 	var calculate(const var& dictid);
-	var calculate(const var& dictid, const var& dictfile, const var& id, const var& record,
-		      const var& mv = 0);
+	var calculate(const var& dictid, const var& dictfile, const var& id, const var& record, const var& mv = 0);
 
 	var xlate(const var& filename, const var& key, const var& fieldno_or_name, const var& mode);
 	// moved to exodusprogrambase
@@ -115,13 +111,12 @@ class ExodusProgramBase
 
 	void debug() const;
 	bool fsmsg(
-	    const var& msg = "") const; // always returns false so can be used like return fsmsg();
+		const var& msg = "") const;	 // always returns false so can be used like return fsmsg();
 	var sysvar(const var& var1, const var& var2, const var& mv3, const var& mv4);
 	void setprivilege(const var& var1);
 
 	// NB does not return record yet
-	bool lockrecord(const var& filename, var& file, const var& keyx, const var& recordx,
-			const int waitsecs = 0, const bool allowduplicate = false) const;
+	bool lockrecord(const var& filename, var& file, const var& keyx, const var& recordx, const int waitsecs = 0, const bool allowduplicate = false) const;
 	// bool lockrecord(const var& xfilename, const var& xfile, const var& keyx, const var&
 	// recordx, const var& waitsecs, const bool allowduplicate=false) const;
 	bool lockrecord(const var& filename, var& file, const var& keyx) const;
@@ -130,8 +125,7 @@ class ExodusProgramBase
 	bool unlockrecord() const;
 
 	var decide(const var& question, const var& options) const;
-	var decide(const var& question, const var& options, var& reply,
-		   const int defaultreply = 1) const;
+	var decide(const var& question, const var& options, var& reply, const int defaultreply = 1) const;
 
 	void savescreen(var& origscrn, var& origattr) const;
 	// void ostime(var& ostimenow) const;
@@ -170,14 +164,13 @@ class ExodusProgramBase
 	var oconv(const var& input, const var& conversion);
 	var iconv(const var& input, const var& conversion);
 
-	var invertarray(const var& input, const var& force0=(0));
+	var invertarray(const var& input, const var& force0 = (0));
 	void sortarray(var& array, const var& fns = 0, const var& orderby0 = "");
 
 	var elapsedtimetext(const var& fromdate, const var& fromtime);
 	var elapsedtimetext(const var& fromdate, const var& fromtime, var& uptodate, var& uptotime);
 
- private:
-
+   private:
 	var number(const var& type, const var& input0, const var& ndecs0, var& output);
 	// used by calculate to call dict libraries
 	mutable ExodusFunctorBase* dict_exodusfunctorbase_;
@@ -186,9 +179,9 @@ class ExodusProgramBase
 	mutable var cache_dictrec_;
 	std::unordered_map<std::string, ExodusFunctorBase*> dict_function_cache;
 
-        //cache_dictid_ = "";
-        //cache_perform_libid_ = "";
-        //dict_exodusfunctorbase_ = NULL;
+	//cache_dictid_ = "";
+	//cache_perform_libid_ = "";
+	//dict_exodusfunctorbase_ = NULL;
 
 	// used by perform to call libraries WITH NO ARGUMENTS
 	mutable ExodusFunctorBase perform_exodusfunctorbase_;
@@ -196,5 +189,5 @@ class ExodusProgramBase
 	mutable var cache_perform_libid_;
 };
 
-} // namespace exodus
-#endif // MVPROGRAM_H
+}  // namespace exodus
+#endif	// MVPROGRAM_H

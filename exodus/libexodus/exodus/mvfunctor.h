@@ -34,8 +34,8 @@ This header file is generated AUTOMATICALLY by the command "compile lib1"
 To use the function all we have to do is include the lib1.h file. The library
 binary is automatically loaded the first time that the function is called.
 
-#include "lib1.h"
 #include <exodus/exodus.h>
+#include "lib1.h"
 exodusprogram(){
  subr3("xyz");
 }
@@ -87,8 +87,7 @@ That way you can forget the new exodus concept of "library" which is not a tradi
 // http://www.parashift.com/c++-faq-lite/pointers-to-members.html#faq-33.6
 #define CALLMEMBERFUNCTION(object, ptrToMember) ((object).*(ptrToMember))
 
-namespace exodus
-{
+namespace exodus {
 // using namespace exodus;
 
 class ExodusProgramBase;
@@ -102,13 +101,11 @@ using pExodusProgramBaseMemberFunction = var (ExodusProgramBase::*)();
 
 // ExodusProgramCreateDeleteFunction - pointer to global function that creates and deletes exodus
 // programs
-using ExodusProgramBaseCreateDeleteFunction = void (*)(pExodusProgramBase&, MvEnvironment&,
-						      pExodusProgramBaseMemberFunction&);
+using ExodusProgramBaseCreateDeleteFunction = void (*)(pExodusProgramBase&, MvEnvironment&, pExodusProgramBaseMemberFunction&);
 
-class DLL_PUBLIC ExodusFunctorBase
-{
+class DLL_PUBLIC ExodusFunctorBase {
 
-      public:
+   public:
 	ExodusFunctorBase();
 
 	// constructor to provide everything immediately
@@ -151,7 +148,7 @@ class DLL_PUBLIC ExodusFunctorBase
 	//(having said that ... posix dlsym returns a void* for the address of the function!)
 	// void* pfunction_;
 
-      public:
+   public:
 	// for call or die (smf)
 	bool init(const char* libraryname, const char* functionname, MvEnvironment& mv);
 
@@ -161,8 +158,7 @@ class DLL_PUBLIC ExodusFunctorBase
 	// for dict/perform/execute (external shared member functions)
 	// forcenew used by perform/execute to delete and create new object each time
 	// so that global variables start out unassigned each time performed/executed
-	bool initsmf(const char* libraryname, const char* functionname,
-		     const bool forcenew = false);
+	bool initsmf(const char* libraryname, const char* functionname, const bool forcenew = false);
 
 	// external shared global functions (not member functions)
 	bool initsgf(const char* libraryname, const char* functionname);
@@ -170,15 +166,15 @@ class DLL_PUBLIC ExodusFunctorBase
 	// TODO move to private
 	void closelib();
 
-      private:
+   private:
 	bool openlib(std::string libraryname);
 	bool openfunc(std::string functionname);
 	void closefunc();
 
-      protected:
+   protected:
 	bool checkload(std::string libraryname, std::string functionname);
 
-      public:
+   public:
 	// only public for rather hacked mvipc getResponseToRequest()
 	mutable MvEnvironment* mv_;
 
@@ -186,7 +182,7 @@ class DLL_PUBLIC ExodusFunctorBase
 	// records the library opened so we can close and reopen new libraries automatically
 	std::string libraryname_;
 
-      private:
+   private:
 	// normally something like
 	// exodusprogrambasecreatedelete_
 	// or exodusprogrambasecreatedelete_{dictid}
@@ -198,20 +194,19 @@ class DLL_PUBLIC ExodusFunctorBase
 	// pointer to the shared library file
 	void* plibrary_;
 
-      protected:
+   protected:
 	// functioname_ is used to open a dl shared function to this point
 	ExodusProgramBaseCreateDeleteFunction pfunction_;
 
-      public:
+   public:
 	// holds the
 	// not used if functor is calling global functions in the shared object
 	pExodusProgramBase pobject_;
 	pExodusProgramBaseMemberFunction pmemberfunction_;
 
 	std::string libfilename(std::string libraryname) const;
-
 };
 
-} // namespace exodus
+}  // namespace exodus
 
-#endif // MVFUNCTOR_H
+#endif	// MVFUNCTOR_H

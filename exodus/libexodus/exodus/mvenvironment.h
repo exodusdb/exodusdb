@@ -25,8 +25,8 @@ THE SOFTWARE.
 
 #undef eq
 #include <iostream>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 #define eq ==
 
 #include <exodus/mv.h>
@@ -36,8 +36,7 @@ THE SOFTWARE.
 //#include <map>
 //#include <boost/any.hpp>
 
-namespace exodus
-{
+namespace exodus {
 
 // to avoid gcc 4 "warning: type attributes are honored only at type definition"
 // dont declare DLL_PUBLIC on forward declarations
@@ -56,15 +55,13 @@ extern DLL_PUBLIC std::vector<MvEnvironment*> global_environments;
 #endif
 */
 
-class LabelledCommon
-{
-    public:
+class LabelledCommon {
+   public:
 	virtual ~LabelledCommon(){};
 };
 
-class DLL_PUBLIC MvEnvironment
-{
-      public:
+class DLL_PUBLIC MvEnvironment {
+   public:
 	virtual ~MvEnvironment();
 
 	bool init(const int threadno);
@@ -119,7 +116,7 @@ class DLL_PUBLIC MvEnvironment
 	// temporary application globals
 	var USER0 = "";
 	var USER1 = "";
-	var USER2 = ""; // was base currency format
+	var USER2 = "";	 // was base currency format
 	var USER3 = "";
 	var USER4 = "";
 
@@ -131,8 +128,8 @@ class DLL_PUBLIC MvEnvironment
 	var RECUR4 = "";
 
 	// i18n/l10n - basic internationalisation/localisation
-	var DATEFMT = "D/E";    // international date format
-	var BASEFMT = "MD20P,"; // base currency format
+	var DATEFMT = "D/E";	 // international date format
+	var BASEFMT = "MD20P,";	 // base currency format
 	var SW = "";
 
 	// encoding globals
@@ -193,9 +190,8 @@ class DLL_PUBLIC MvEnvironment
 	int processnolockfd = 0;
 
 	std::unordered_map<std::string, void*> dlopen_cache;
-
 };
 
-} // namespace exodus
+}  // namespace exodus
 
 #endif /*MVENVIRONMENT_H*/

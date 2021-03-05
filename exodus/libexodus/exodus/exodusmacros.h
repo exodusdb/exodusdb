@@ -74,16 +74,16 @@ THE SOFTWARE.
 #ifdef __GNUC__
 #define EXODUSMACRO_IMPORTEXPORT EXODUS_EXTERN_C __attribute__((dllexport))
 #else
-#define EXODUSMACRO_IMPORTEXPORT                                                               \
-	EXODUS_EXTERN_C __declspec(                                                                \
-	    dllexport) // Note: actually gcc seems to also support this syntax.
+#define EXODUSMACRO_IMPORTEXPORT \
+	EXODUS_EXTERN_C __declspec(  \
+		dllexport)	// Note: actually gcc seems to also support this syntax.
 #endif
 #else
 #ifdef __GNUC__
 #define EXODUSMACRO_IMPORTEXPORT __attribute__((dllimport))
 #else
-#define EXODUSMACRO_IMPORTEXPORT                                                               \
-	__declspec(dllimport) // Note: actually gcc seems to also support this syntax.
+#define EXODUSMACRO_IMPORTEXPORT \
+	__declspec(dllimport)  // Note: actually gcc seems to also support this syntax.
 #endif
 #endif
 #else
@@ -110,17 +110,17 @@ THE SOFTWARE.
 // class init
 // allow multiple named "exodus classes" useful for dictionary item programs where each dict item
 // becomes a separate class with its own "main" entry point
-#define classinit(CLASSNAME)                                                                   \
-	class CLASSNAME##ExodusProgram : public ExodusProgramBase                                  \
-	{
+#define classinit(CLASSNAME) \
+	class CLASSNAME##ExodusProgram : public ExodusProgramBase {
 
 // class exit
 // insert a constructor function accepting an mvenvironment just before the class exit
 // and then insert the class termination "};"
-#define classexit(CLASSNAME)                                                                   \
-	public:                                                                                    \
-	CLASSNAME##ExodusProgram(MvEnvironment& mv) : ExodusProgramBase(mv) {}                     \
-	};
+#define classexit(CLASSNAME)                                               \
+   public:                                                                 \
+	CLASSNAME##ExodusProgram(MvEnvironment& mv) : ExodusProgramBase(mv) {} \
+	}                                                                      \
+	;
 
 #define iscommon(COMMONNAME) ((&COMMONNAME) != NULL)
 
@@ -132,12 +132,11 @@ THE SOFTWARE.
 // abc=xyz(100,200);//wont compile
 // Can be declared in exodus namespace which is useful since "in" and "out" could easily
 // occur in other libraries.
-namespace exodus
-{
-	using in = const var&;
-	using io = var&;
-	using out = var&;
-} // namespace exodus
+namespace exodus {
+using in = const var&;
+using io = var&;
+using out = var&;
+}  // namespace exodus
 
 // forcibly redefine "eq" even if already previously defined in some other library like iostream
 // to generate a compilation error so that the issue can be corrected (see heading) and the "eq"
@@ -260,4 +259,4 @@ namespace exodus
 #define PROCESSNO mv.PROCESSNO
 #define CURSOR mv.CURSOR
 
-#endif // EXODUSMACROS_H
+#endif	// EXODUSMACROS_H

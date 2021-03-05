@@ -52,13 +52,13 @@ THE SOFTWARE.
 #ifdef __GNUC__
 #define DLL_PUBLIC __attribute__((dllexport))
 #else
-#define DLL_PUBLIC __declspec(dllexport) // Note: actually gcc seems to also support this syntax.
+#define DLL_PUBLIC __declspec(dllexport)  // Note: actually gcc seems to also support this syntax.
 #endif
 #else
 #ifdef __GNUC__
 #define DLL_PUBLIC __attribute__((dllimport))
 #else
-#define DLL_PUBLIC __declspec(dllimport) // Note: actually gcc seems to also support this syntax.
+#define DLL_PUBLIC __declspec(dllimport)  // Note: actually gcc seems to also support this syntax.
 #endif
 #endif
 #define DLL_LOCAL
@@ -130,16 +130,15 @@ and therefore causes a non-numeric error if you include a non-numeric value in a
 // http://www.viva64.com/content/articles/64-bit-development/?f=20_issues_of_porting_C++_code_on_the_64-bit_platform.html
 using mvint_t = long long;
 
-#define	ND [[nodiscard]]
+#define ND [[nodiscard]]
 
-namespace exodus
-{
+namespace exodus {
 
 //#define SMALLEST_NUMBER 1e-13
 //0.00000000000023 = sum(1287.89,-1226.54,-61.35,1226.54,-1226.54)
 //#define SMALLEST_NUMBER 1e-10
 //#define SMALLEST_NUMBER 1e-4d//0.0001 for pick/arev compatibility
-constexpr double SMALLEST_NUMBER = 1e-4d;//0.0001 for pick/arev compatibility
+constexpr double SMALLEST_NUMBER = 1e-4d;  //0.0001 for pick/arev compatibility
 
 // the var versions of the above (without leading or trailing _)
 // are defined AFTER the class declaration of "var"
@@ -154,12 +153,12 @@ constexpr double SMALLEST_NUMBER = 1e-4d;//0.0001 for pick/arev compatibility
 
 // leading and trailing _ char* versions of classic pick delimiters
 // also in ADECOM
-#define _RM_ "\x1F"  // Record Mark
-#define _FM_ "\x1E"  // Field Mark
-#define _VM_ "\x1D"  // Value Mark
-#define _SM_ "\x1C"  // Subvalue Mark
-#define _TM_ "\x1B"  // Text Mark
-#define _STM_ "\x1A" // Subtext Mark
+#define _RM_ "\x1F"	  // Record Mark
+#define _FM_ "\x1E"	  // Field Mark
+#define _VM_ "\x1D"	  // Value Mark
+#define _SM_ "\x1C"	  // Subvalue Mark
+#define _TM_ "\x1B"	  // Text Mark
+#define _STM_ "\x1A"  // Subtext Mark
 
 // aliases for different implementations of multivalue
 #define _IM_ _RM_
@@ -170,12 +169,12 @@ constexpr double SMALLEST_NUMBER = 1e-4d;//0.0001 for pick/arev compatibility
 #define _SQ_ "\'"
 
 // trailing _ char versions of classic pick delimiters
-#define RM_ '\x1F'  // Record Mark
-#define FM_ '\x1E'  // Field Mark
-#define VM_ '\x1D'  // Value Mark
-#define SM_ '\x1C'  // Subvalue Mark
-#define TM_ '\x1B'  // Text Mark
-#define STM_ '\x1A' // Subtext Mark
+#define RM_ '\x1F'	 // Record Mark
+#define FM_ '\x1E'	 // Field Mark
+#define VM_ '\x1D'	 // Value Mark
+#define SM_ '\x1C'	 // Subvalue Mark
+#define TM_ '\x1B'	 // Text Mark
+#define STM_ '\x1A'	 // Subtext Mark
 
 // aliases for different implementations of multivalue
 #define IM_ RM_
@@ -260,14 +259,14 @@ although convention recommends making the temporary inside the function).
 
 class var_brackets_proxy;
 
-class VARTYP
-{
-      public:
+class VARTYP {
+   public:
 	// constructors from uint and it
 	// VARTYP(uint rhs) {flags=rhs;std::cout<<"uint32 ctor "<< rhs << std::endl;};
 	// VARTYP(int rhs) {flags=rhs;std::cout<<"int ctor "<< rhs << std::endl;if (rhs==9999) throw
 	// "kjhkjhkkjh";};
-	VARTYP(uint rhs) : flags_(rhs){};
+	VARTYP(uint rhs)
+		: flags_(rhs){};
 
 	// copy constructor
 	// VARTYP(const VARTYP& rhs) {flags=rhs.flags;std::cout<<"copy ctor "<< rhs.flags <<
@@ -283,25 +282,21 @@ class VARTYP
 	// VARTYP() flags(0) {};
 
 	// assign
-	VARTYP& operator=(const uint newflags)
-	{
+	VARTYP& operator=(const uint newflags) {
 		flags_ = newflags;
 		return *this;
 	};
 
 	// bitwise mutators
-	VARTYP& operator^=(const uint rhs)
-	{
+	VARTYP& operator^=(const uint rhs) {
 		flags_ ^= rhs;
 		return *this;
 	};
-	VARTYP& operator|=(const uint rhs)
-	{
+	VARTYP& operator|=(const uint rhs) {
 		flags_ |= rhs;
 		return *this;
 	};
-	VARTYP& operator&=(const uint rhs)
-	{
+	VARTYP& operator&=(const uint rhs) {
 		flags_ &= rhs;
 		return *this;
 	};
@@ -373,11 +368,9 @@ VTC(VARTYP_MASK, ~(VARTYP_STR | VARTYP_NAN | VARTYP_INT | VARTYP_DBL | VARTYP_OS
 
 // class var
 //"final" to prevent inheritance because var has a destructor which is non-virtual to save space and time
-class DLL_PUBLIC var final
-{
+class DLL_PUBLIC var final {
 
-public:
-
+   public:
 	///////////////
 	// CONSTRUCTORS
 	///////////////
@@ -452,7 +445,6 @@ public:
 	// from double
 	//
 	var(const double double1) noexcept;
-
 
 	///////////////////////
 	// NAMED CONVERSIONS TO
@@ -663,8 +655,8 @@ public:
 	void operator-- ();
 	*/
 
-//#ifndef HASINTREFOP
-//#else
+	//#ifndef HASINTREFOP
+	//#else
 	// postfix
 	var operator++(int);
 	var operator--(int);
@@ -684,7 +676,7 @@ public:
 	var& operator+=(const var& var1);
 	//-=var
 	var& operator-=(const var& var1);
-//#endif
+	//#endif
 
 	//////////
 	// FRIENDS
@@ -728,7 +720,7 @@ public:
 	DLL_PUBLIC friend bool operator!=(const var& lhs, const bool bool2) { return !MVeq(lhs, var(bool2)); }
 	DLL_PUBLIC friend bool operator!=(const char* char1, const var& rhs) { return !MVeq(rhs, var(char1)); }
 	DLL_PUBLIC friend bool operator!=(const int int1, const var& rhs) { return !MVeq(rhs, var(int1)); }
-	DLL_PUBLIC friend bool operator!=(const double double1, const var& rhs) {return !MVeq(rhs, var(double1)); }
+	DLL_PUBLIC friend bool operator!=(const double double1, const var& rhs) { return !MVeq(rhs, var(double1)); }
 	DLL_PUBLIC friend bool operator!=(const bool bool1, const var& rhs) { return !MVeq(rhs, var(bool1)); }
 
 	//< V<= > >=
@@ -746,7 +738,7 @@ public:
 	DLL_PUBLIC friend bool operator>=(const var& lhs, const double double2) { return !MVlt(lhs, var(double2)); }
 	DLL_PUBLIC friend bool operator>=(const char* char1, const var& rhs) { return !MVlt(var(char1), rhs); }
 	DLL_PUBLIC friend bool operator>=(const int int1, const var& rhs) { return !MVlt(int1, rhs); }
-	DLL_PUBLIC friend bool operator>=(const double double1, const var& rhs) {return !MVlt(var(double1), rhs); }
+	DLL_PUBLIC friend bool operator>=(const double double1, const var& rhs) { return !MVlt(var(double1), rhs); }
 
 	DLL_PUBLIC friend bool operator>(const var& lhs, const var& rhs) { return MVlt(rhs, lhs); }
 	DLL_PUBLIC friend bool operator>(const var& lhs, const char* char2) { return MVlt(var(char2), lhs); }
@@ -798,10 +790,10 @@ public:
 	DLL_PUBLIC friend var operator-(const double double1, const var& rhs) { return MVsub(var(double1), rhs); }
 	//DLL_PUBLIC friend var operator-(const bool bool1, const var& rhs) { return MVsub(var(bool1), rhs); }
 	//rvalues
-	DLL_PUBLIC friend var operator-(var&& lhs, const var& rhs) { return lhs-=rhs; }
-	DLL_PUBLIC friend var operator-(var&& lhs, const char* char2) { return lhs-=char2; }
-	DLL_PUBLIC friend var operator-(var&& lhs, const int int2) { return lhs-=int2; }
-	DLL_PUBLIC friend var operator-(var&& lhs, const double double2) { return lhs-=double2; }
+	DLL_PUBLIC friend var operator-(var&& lhs, const var& rhs) { return lhs -= rhs; }
+	DLL_PUBLIC friend var operator-(var&& lhs, const char* char2) { return lhs -= char2; }
+	DLL_PUBLIC friend var operator-(var&& lhs, const int int2) { return lhs -= int2; }
+	DLL_PUBLIC friend var operator-(var&& lhs, const double double2) { return lhs -= double2; }
 
 	//MULTIPLY
 	DLL_PUBLIC friend var operator*(const var& lhs, const var& rhs) { return MVmul(lhs, rhs); }
@@ -856,15 +848,15 @@ public:
 	DLL_PUBLIC friend var operator^(const int int1, const var& rhs) { return MVcat(var(int1), rhs); }
 	DLL_PUBLIC friend var operator^(const double double1, const var& rhs) { return MVcat(var(double1), rhs); }
 	//rvalues
-	DLL_PUBLIC friend var operator^(var&& lhs, const var& rhs) { return lhs^=rhs; }
-	DLL_PUBLIC friend var operator^(var&& lhs, const char* char2) { return lhs^=char2; }
-	DLL_PUBLIC friend var operator^(var&& lhs, const int int2) { return lhs^=int2; }
-	DLL_PUBLIC friend var operator^(var&& lhs, const double double2) { return lhs^=double2; }
+	DLL_PUBLIC friend var operator^(var&& lhs, const var& rhs) { return lhs ^= rhs; }
+	DLL_PUBLIC friend var operator^(var&& lhs, const char* char2) { return lhs ^= char2; }
+	DLL_PUBLIC friend var operator^(var&& lhs, const int int2) { return lhs ^= int2; }
+	DLL_PUBLIC friend var operator^(var&& lhs, const double double2) { return lhs ^= double2; }
 
 	// unary operators +var -var !var
-	DLL_PUBLIC friend var operator+(const var& var1) {return MVplus(var1); }
-	DLL_PUBLIC friend var operator-(const var& var1) {return MVminus(var1); }
-	DLL_PUBLIC friend bool operator!(const var& var1) {return MVnot(var1); }
+	DLL_PUBLIC friend var operator+(const var& var1) { return MVplus(var1); }
+	DLL_PUBLIC friend var operator-(const var& var1) { return MVminus(var1); }
+	DLL_PUBLIC friend bool operator!(const var& var1) { return MVnot(var1); }
 
 	// OS TIME/DATE
 	///////////////
@@ -1000,12 +992,12 @@ public:
 	//	var chr() const;
 	// version 1 chr - only char 0 - 255 returned in a single byte
 	// bytes 128-255 are not valid utf-8 so cannot be written to database/postgres
-	var chr(const int num) const; // ASCII
+	var chr(const int num) const;  // ASCII
 	// version 2 textchr - returns utf8 byte sequences for all unicode code points
 	// not uint so to get utf codepoints > 2^63 must provide negative ints
 	// not providing implicit constructor from var to uint due to getting ambigious conversions
 	// since int and uint are parallel priority in c++ implicit conversions
-	var textchr(const int num) const; // UTF8
+	var textchr(const int num) const;  // UTF8
 	var str(const int num) const;
 	var space() const;
 
@@ -1014,8 +1006,8 @@ public:
 
 	// bool match(const var& matchstr,const var& options DEFAULTNULL) const;
 	var match(const var& matchstr, const var& options DEFAULTNULL) const;
-	var seq() const;     // ASCII
-	var textseq() const; // TEXT
+	var seq() const;	  // ASCII
+	var textseq() const;  // TEXT
 	var dcount(const var& substrx) const;
 	var count(const var& substrx) const;
 #ifndef SWIGPERL
@@ -1040,19 +1032,18 @@ public:
 
 	var& converter(const var& oldchars, const var& newchars);
 	var& swapper(const var& whatstr, const var& withstr);
-	var& replacer(const var& regexstr, const var& replacementstr,
-		      const var& options DEFAULTNULL);
+	var& replacer(const var& regexstr, const var& replacementstr, const var& options DEFAULTNULL);
 	var& splicer(const int start1, const int length, const var& str);
 	var& splicer(const int start1, const var& str);
 	var& quoter();
 	var& squoter();
 	var& unquoter();
-	var& ucaser();     // utf8
-	var& lcaser();     // utf8
-	var& tcaser();     // utf8
-	var& fcaser();     // utf8
-	var& normalizer(); // utf8
-	var& inverter();   // utf8
+	var& ucaser();		// utf8
+	var& lcaser();		// utf8
+	var& tcaser();		// utf8
+	var& fcaser();		// utf8
+	var& normalizer();	// utf8
+	var& inverter();	// utf8
 	var& trimmer(const char* trimchar DEFAULTSPACE);
 	var& trimmerf(const char* trimchar DEFAULTSPACE);
 	var& trimmerb(const char* trimchar DEFAULTSPACE);
@@ -1060,8 +1051,7 @@ public:
 	var& trimmer(const var& trimchar, const var& options);
 	var& trimmerf(const var& trimchar);
 	var& trimmerb(const var& trimchar);
-	var& fieldstorer(const var& sepchar, const int fieldno, const int nfields,
-			 const var& replacement);
+	var& fieldstorer(const var& sepchar, const int fieldno, const int nfields, const var& replacement);
 	var& substrer(const int startindex);
 	var& substrer(const int startindex, const int length);
 
@@ -1074,19 +1064,18 @@ public:
 
 	ND var& convert(const var& oldchars, const var& newchars) &&;
 	ND var& swap(const var& whatstr, const var& withstr) &&;
-	ND var& replace(const var& regexstr, const var& replacementstr,
-		      const var& options DEFAULTNULL) &&;
+	ND var& replace(const var& regexstr, const var& replacementstr, const var& options DEFAULTNULL) &&;
 	ND var& splice(const int start1, const int length, const var& str) &&;
 	ND var& splice(const int start1, const var& str) &&;
 	ND var& quote() &&;
 	ND var& squote() &&;
 	ND var& unquote() &&;
-	ND var& ucase() &&;     // utf8
-	ND var& lcase() &&;     // utf8
-	ND var& tcase() &&;     // utf8
-	ND var& fcase() &&;     // utf8
-	ND var& normalize() &&; // utf8
-	ND var& invert() &&;   // utf8
+	ND var& ucase() &&;		 // utf8
+	ND var& lcase() &&;		 // utf8
+	ND var& tcase() &&;		 // utf8
+	ND var& fcase() &&;		 // utf8
+	ND var& normalize() &&;	 // utf8
+	ND var& invert() &&;	 // utf8
 	ND var& trim(const char* trimchar DEFAULTSPACE) &&;
 	ND var& trimf(const char* trimchar DEFAULTSPACE) &&;
 	ND var& trimb(const char* trimchar DEFAULTSPACE) &&;
@@ -1094,8 +1083,7 @@ public:
 	ND var& trim(const var& trimchar, const var& options) &&;
 	ND var& trimf(const var& trimchar) &&;
 	ND var& trimb(const var& trimchar) &&;
-	ND var& fieldstore(const var& sepchar, const int fieldno, const int nfields,
-			 const var& replacement) &&;
+	ND var& fieldstore(const var& sepchar, const int fieldno, const int nfields, const var& replacement) &&;
 	ND var& substr(const int startindex) &&;
 	ND var& substr(const int startindex, const int length) &&;
 
@@ -1110,19 +1098,18 @@ public:
 
 	ND var convert(const var& oldchars, const var& newchars) const&;
 	ND var swap(const var& whatstr, const var& withstr) const&;
-	ND var replace(const var& regexstr, const var& replacementstr,
-		    const var& options DEFAULTNULL) const&;
+	ND var replace(const var& regexstr, const var& replacementstr, const var& options DEFAULTNULL) const&;
 	ND var splice(const int start1, const int length, const var& str) const&;
 	ND var splice(const int start1, const var& str) const&;
 	ND var quote() const&;
 	ND var squote() const&;
 	ND var unquote() const&;
-	ND var ucase() const&;	// utf8
-	ND var lcase() const&;	// utf8
-	ND var tcase() const&;	// utf8
-	ND var fcase() const&;	// utf8
+	ND var ucase() const&;		// utf8
+	ND var lcase() const&;		// utf8
+	ND var tcase() const&;		// utf8
+	ND var fcase() const&;		// utf8
 	ND var normalize() const&;	// utf8
-	ND var invert() const&;	// utf8
+	ND var invert() const&;		// utf8
 	ND var trim(const char* trimchar DEFAULTSPACE) const&;
 	ND var trimf(const char* trimchar DEFAULTSPACE) const&;
 	ND var trimb(const char* trimchar DEFAULTSPACE) const&;
@@ -1130,8 +1117,7 @@ public:
 	ND var trim(const var& trimchar, const var& options) const&;
 	ND var trimf(const var& trimchar) const&;
 	ND var trimb(const var& trimchar) const&;
-	ND var fieldstore(const var& sepchar, const int fieldno, const int nfields,
-		       const var& replacement) const&;
+	ND var fieldstore(const var& sepchar, const int fieldno, const int nfields, const var& replacement) const&;
 
 	ND var lower() const&;
 	ND var raise() const&;
@@ -1206,14 +1192,12 @@ public:
 	// something better it was called replace() in pick/arev but we are now using "replace()" to
 	// change substrings using regex (similar to the old pick swap function) its mutator function
 	// is .r()
-	ND var pickreplace(const int fieldno, const int valueno, const int subvalueno,
-			const var& replacement) const;
+	ND var pickreplace(const int fieldno, const int valueno, const int subvalueno, const var& replacement) const;
 	ND var pickreplace(const int fieldno, const int valueno, const var& replacement) const;
 	ND var pickreplace(const int fieldno, const var& replacement) const;
 
 	// cf mutator inserter()
-	ND var insert(const int fieldno, const int valueno, const int subvalueno,
-		   const var& insertion) const&;
+	ND var insert(const int fieldno, const int valueno, const int subvalueno, const var& insertion) const&;
 	ND var insert(const int fieldno, const int valueno, const var& insertion) const&;
 	ND var insert(const int fieldno, const var& insertion) const&;
 
@@ -1232,8 +1216,7 @@ public:
 	// SAME AS ABOVE ON TEMPORARIES
 	///////////////////////////////
 
-	var& insert(const int fieldno, const int valueno, const int subvalueno,
-		   const var& insertion) &&;
+	var& insert(const int fieldno, const int valueno, const int subvalueno, const var& insertion) &&;
 	var& insert(const int fieldno, const int valueno, const var& insertion) &&;
 	var& insert(const int fieldno, const var& insertion) &&;
 
@@ -1263,8 +1246,7 @@ public:
 	var& r(const int fieldno, const int valueno, const var& replacement);
 	var& r(const int fieldno, const var& replacement);
 
-	var& inserter(const int fieldno, const int valueno, const int subvalueno,
-		      const var& insertion);
+	var& inserter(const int fieldno, const int valueno, const int subvalueno, const var& insertion);
 	var& inserter(const int fieldno, const int valueno, const var& insertion);
 	var& inserter(const int fieldno, const var& insertion);
 
@@ -1280,28 +1262,21 @@ public:
 	// locate(fieldno, valueno, subvalueno,target,setting,by DEFAULTNULL)
 	ND bool locate(const var& target) const;
 	bool locate(const var& target, var& setting) const;
-	bool locate(const var& target, var& setting, const int fieldno,
-		    const int valueno = 0) const;
+	bool locate(const var& target, var& setting, const int fieldno, const int valueno = 0) const;
 
-	bool locateusing(const var& usingchar, const var& target, var& setting,
-			 const int fieldno = 0, const int valueno = 0,
-			 const int subvalueno = 0) const;
+	bool locateusing(const var& usingchar, const var& target, var& setting, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0) const;
 	bool locateusing(const var& usingchar, const var& target) const;
 
 	// locateby without fieldno or valueno arguments uses character VM
 	bool locateby(const char* ordercode, const var& target, var& setting) const;
 	bool locateby(const var& ordercode, const var& target, var& setting) const;
 	// locateby with fieldno=0 uses character FM
-	bool locateby(const char* ordercode, const var& target, var& setting, const int fieldno,
-		      const int valueno = 0) const;
-	bool locateby(const var& ordercode, const var& target, var& setting, const int fieldno,
-		      const int valueno = 0) const;
+	bool locateby(const char* ordercode, const var& target, var& setting, const int fieldno, const int valueno = 0) const;
+	bool locateby(const var& ordercode, const var& target, var& setting, const int fieldno, const int valueno = 0) const;
 
 	// locatebyusing
-	bool locatebyusing(const char* ordercode, const char* usingchar, const var& target,
-			   var& setting, const int fieldno = 0, const int valueno = 0) const;
-	bool locatebyusing(const var& ordercode, const var& usingchar, const var& target,
-			   var& setting, const int fieldno = 0, const int valueno = 0) const;
+	bool locatebyusing(const char* ordercode, const char* usingchar, const var& target, var& setting, const int fieldno = 0, const int valueno = 0) const;
+	bool locatebyusing(const var& ordercode, const var& usingchar, const var& target, var& setting, const int fieldno = 0, const int valueno = 0) const;
 
 	// DATABASE MANAGEMENT
 	/////////////////////
@@ -1394,7 +1369,7 @@ public:
 	bool getlist(const var& listname);
 	bool makelist(const var& listname, const var& keys);
 	bool deletelist(const var& listname) const;
-	bool formlist(const var& keys, const var& fieldno=0);
+	bool formlist(const var& keys, const var& fieldno = 0);
 
 	bool saveselect(const var& filename);
 
@@ -1414,8 +1389,7 @@ public:
 	bool osdelete(const var& osfilename) const;
 	bool osrename(const var& newosdir_or_filename) const;
 	bool oscopy(const var& to_osfilename) const;
-	ND var oslist(const var& path DEFAULTDOT, const var& wildcard DEFAULTNULL,
-		   const int mode = 0) const;
+	ND var oslist(const var& path DEFAULTDOT, const var& wildcard DEFAULTNULL, const int mode = 0) const;
 	ND var oslistf(const var& path DEFAULTDOT, const var& wildcard DEFAULTNULL) const;
 	ND var oslistd(const var& path DEFAULTDOT, const var& wildcard DEFAULTNULL) const;
 	ND var osfile() const;
@@ -1469,18 +1443,17 @@ public:
 	// DATA MEMBERS (all private)
 	//////////////
 
-private:
-
-	// 1. not using pimpl idiom in order to maximise performance
-	// 2. all mutable because asking for a string can create it from an integer and vice versa
-	// 3. warning C4251: xxx needs to have dll-interface to be used by clients of class yyy
-	#ifdef _MSC_VER
-	#pragma warning(disable : 4251)
-	#endif
+   private:
+// 1. not using pimpl idiom in order to maximise performance
+// 2. all mutable because asking for a string can create it from an integer and vice versa
+// 3. warning C4251: xxx needs to have dll-interface to be used by clients of class yyy
+#ifdef _MSC_VER
+#pragma warning(disable : 4251)
+#endif
 	mutable std::string var_str;
-	#ifdef _MSC_VER
-	#pragma warning(4 : 4251)
-	#endif
+#ifdef _MSC_VER
+#pragma warning(4 : 4251)
+#endif
 	mutable mvint_t var_int;
 	mutable double var_dbl;
 	// initialise type last
@@ -1489,8 +1462,7 @@ private:
 	// PRIVATE MEMBER FUNCTIONS
 	//////////////////////////
 
-private:
-
+   private:
 	void createString() const;
 
 	void setlasterror(const var& msg) const;
@@ -1516,10 +1488,7 @@ private:
 
 	var build_conn_info(const var& conninfo) const;
 
-	var getdictexpression(const var& mainfilename, const var& filename, const var& dictfilename,
-			      const var& dictfile, const var& fieldname, var& joins, var& froms,
-			      var& selects, var& ismv,
-			      bool forsort_or_select_or_index = false) const;
+	var getdictexpression(const var& mainfilename, const var& filename, const var& dictfilename, const var& dictfile, const var& fieldname, var& joins, var& froms, var& selects, var& ismv, bool forsort_or_select_or_index = false) const;
 
 	// TODO check if can speed up by returning reference to converted self like MC
 	// left/right justification
@@ -1565,7 +1534,7 @@ private:
 	// bool THIS_IS_DBCONN() const	{ return this->var_typ & VARTYP_DBCONN; }
 	// bool THIS_IS_OSFILE() const	{ return this->var_typ & VARTYP_OSFILE; }
 
-}; // of class "var"
+};	// of class "var"
 
 // NB we should probably NEVER add operator^(var& var1, bool)
 // this is a trick to avoid a problem that exodus concat operator
@@ -1611,39 +1580,35 @@ DLL_PUBLIC ND var MVmod(const var& var1, const var& var2);
 DLL_PUBLIC ND var MVcat(const var& var1, const var& var2);
 
 //class var_iter
-class DLL_PUBLIC var_iter
-{
+class DLL_PUBLIC var_iter {
 
-    const var* data;
-    std::string::size_type index = 0;
-    std::string::size_type index2 = std::string::npos;
-    var field;
+	const var* data;
+	std::string::size_type index = 0;
+	std::string::size_type index2 = std::string::npos;
+	var field;
 
-public:
+   public:
+	//default constructor
+	var_iter() = default;
 
-    //default constructor
-    var_iter() = default;
+	//construct from var
+	var_iter(const var& v);
 
-    //construct from var
-    var_iter(const var& v);
+	//check iter != iter (i.e. iter != string::npos)
+	bool operator!=(var_iter& vi);
 
-    //check iter != iter (i.e. iter != string::npos)
-    bool operator != (var_iter& vi);
+	//dereference iter
+	operator var*();
 
-    //dereference iter
-    operator var*();
-
-    //iter++
-    var_iter operator++ ();
-
+	//iter++
+	var_iter operator++();
 };
 
 //class var_brackets_proxy
-class DLL_PUBLIC var_brackets_proxy
-{
-public:
+class DLL_PUBLIC var_brackets_proxy {
+   public:
 	std::string& str1;
-	mutable	int charindex1;
+	mutable int charindex1;
 
 	//implicit conversion to var
 	operator var() const;
@@ -1653,10 +1618,9 @@ public:
 };
 
 //class dim
-class DLL_PUBLIC dim
-{
+class DLL_PUBLIC dim {
 
-      public:
+   public:
 	dim(int nrows, int ncols = 1);
 
 	bool redim(int nrows, int ncols = 1);
@@ -1708,7 +1672,7 @@ class DLL_PUBLIC dim
 	// move constructor
 	dim(dim&& sourcedim) noexcept;
 
-      private:
+   private:
 	// Disable copy constructor (why? to stop inefficient copies?)
 	// Copy constructor
 	dim(const dim& sourcedim);
@@ -1733,7 +1697,7 @@ class DLL_PUBLIC dim
 	var* data_;
 	bool initialised_;
 
-}; // of class "dim"
+};	// of class "dim"
 
 // must be after class declaration
 
@@ -1868,45 +1832,40 @@ var DLL_PUBLIC getexecpath();
 
 // MVStop is similar to MVError
 // but doesnt get stack since stop() is called normally
-class DLL_PUBLIC MVStop
-{
-	public:
+class DLL_PUBLIC MVStop {
+   public:
 	explicit MVStop(const var& var1 DEFAULTNULL);
 	var description;
 };
 
 // MVAbort is similar to MVError
 // but doesnt get stack since abort() is called normally
-class DLL_PUBLIC MVAbort
-{
-	public:
+class DLL_PUBLIC MVAbort {
+   public:
 	explicit MVAbort(const var& var1 DEFAULTNULL);
 	var description;
 };
 
 // MVAbortAll is similar to MVError
 // but doesnt get stack since abortall() is called normally
-class DLL_PUBLIC MVAbortAll
-{
-	public:
+class DLL_PUBLIC MVAbortAll {
+   public:
 	explicit MVAbortAll(const var& var1 DEFAULTNULL);
 	var description;
 };
 
 // MVLogoff is similar to MVError
 // but doesnt get stack since abortall() is called normally
-class DLL_PUBLIC MVLogoff
-{
-	public:
+class DLL_PUBLIC MVLogoff {
+   public:
 	explicit MVLogoff(const var& var1 DEFAULTNULL);
 	var description;
 };
 
 // provide a public base exception for all other exceptions so exodus programmers can catch mv
 // exceptions generally
-class DLL_PUBLIC MVError
-{
-	public:
+class DLL_PUBLIC MVError {
+   public:
 	explicit MVError(const var& description);
 	var description;
 	var stack;
@@ -1936,12 +1895,12 @@ class DLL_PUBLIC MVArrayNotDimensioned	: public MVError {public: explicit MVArra
 // clang-format on
 
 //user defined literals suffix _var
-var operator""_var (const char* cstr, std::size_t size);
-var operator""_var (unsigned long long int i);
-var operator""_var (long double d);
+var operator""_var(const char* cstr, std::size_t size);
+var operator""_var(unsigned long long int i);
+var operator""_var(long double d);
 
-} // namespace exodus
+}  // namespace exodus
 
 //#include <exodus/mvlibs.h>
 
-#endif // MV_H
+#endif	// MV_H

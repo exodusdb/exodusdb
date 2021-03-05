@@ -1,9 +1,9 @@
 #ifndef CARGS_H
 #define CARGS_H 1
 
-#include <vector>
 #include <list>
 #include <string>
+#include <vector>
 
 #include <exodus/mv.h>
 
@@ -13,38 +13,36 @@ namespace exodus {
 //that will autodestruct when out of scope and not leak memory
 class Cargs {
 
-    //a place to store primitive c style strings
+	//a place to store primitive c style strings
 	//until object destruction
-    std::list<std::string> strings;
+	std::list<std::string> strings;
 
 	//a vector of char to represent char* argv[]
-    std::vector<char*> argv_;
+	std::vector<char*> argv_;
 
-public:
-
+   public:
 	//constructor from var
 	Cargs(const var& command) {
-	    //printl(command);
-	    for (var word : command) {
-	        //printl(word);
-	        argv_.push_back(strings.emplace_back(std::string(word ^ "\x00")).data());
-	    }
-	    //last arg must be nullptr
-	    argv_.push_back(nullptr);
+		//printl(command);
+		for (var word : command) {
+			//printl(word);
+			argv_.push_back(strings.emplace_back(std::string(word ^ "\x00")).data());
+		}
+		//last arg must be nullptr
+		argv_.push_back(nullptr);
 	}
 
 	//return argc as int
 	int argc() {
-	    return argv_.size()-1;
+		return argv_.size() - 1;
 	}
 
 	//return argv_ as char*[]
 	const char** argv() {
-	    return (const char**) argv_.data();
+		return (const char**)argv_.data();
 	}
-
 };
 
-}//namespace
+}  // namespace exodus
 
 #endif

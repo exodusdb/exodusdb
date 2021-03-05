@@ -3,39 +3,39 @@ programinit()
 
 #define EXO_NOHTML
 #ifdef EXO_NOHTML
-	#define xselect select
-	#define timedate2 timedate
+#define xselect select
+#define timedate2 timedate
 #else
-#include <colrowspan.h>
-#include <getsortjs.h>
-#include <getmark.h>
-#include <convcss.h>
-#include <htmllib2.h>
-#include <xselect.h>
 #include <addunits.h>
-#include <elapsedtimetext.h>
-#include <sendmail.h>
-#include <gethtml.h>
-#include <getcss.h>
+#include <colrowspan.h>
+#include <convcss.h>
 #include <docmods.h>
+#include <elapsedtimetext.h>
+#include <getcss.h>
+#include <gethtml.h>
+#include <getmark.h>
+#include <getsortjs.h>
+#include <htmllib2.h>
+#include <sendmail.h>
 #include <timedate2.h>
+#include <xselect.h>
 #endif
 
 #include "printtx.hpp"
 
-//#include <gen_common.h>
+	//#include <gen_common.h>
 
-var copyright;
-var showborder;//num
-var headtabperpage;//num
+	var copyright;
+var showborder;		 //num
+var headtabperpage;	 //num
 var ulchar;
-var nblocks;//num
-var blockn;//num
+var nblocks;  //num
+var blockn;	  //num
 var fromdate;
 var fromtime;
-var usecols;//num
+var usecols;  //num
 var decimalchar;
-var html;//num
+var html;  //num
 var td0;
 var nbsp;
 var td;
@@ -44,27 +44,27 @@ var th;
 var thx;
 var tr;
 var trx;
-var tt;//num
+var tt;	 //num
 var tdz;
 var thcolor;
 var tdcolor;
 var reportfont;
-var printptr;//num
-var cssver;//num
+var printptr;  //num
+var cssver;	   //num
 var sentencex;
-var maxncols;//num
+var maxncols;  //num
 var maxnrecs;
-var preselect;//num
-var keylist;//num
-var crtx;//num
-var idsupp;//num
-var dblspc;//num
-var detsupp;//num
-var gtotsupp;//num
-var gtotreq;//num
-var nobase;//num
-var rawtable;//num
-var silent;//num
+var preselect;	//num
+var keylist;	//num
+var crtx;		//num
+var idsupp;		//num
+var dblspc;		//num
+var detsupp;	//num
+var gtotsupp;	//num
+var gtotreq;	//num
+var nobase;		//num
+var rawtable;	//num
+var silent;		//num
 var dictvoc;
 dim colname;
 dim coldict;
@@ -73,26 +73,26 @@ dim pcol;
 dim ccol;
 dim scol;
 dim icol;
-var bheadfn;//num
-var coln;//num
+var bheadfn;  //num
+var coln;	  //num
 var head;
 var foot2;
-var nbreaks;//num
+var nbreaks;  //num
 var breakcolns;
 var breakopts;
 var pagebreaks;
 var headtab;
-var hrown;//num
-var hcoln;//num
+var hrown;	//num
+var hcoln;	//num
 var replacements;
-var nreplacements;//num
-var topmargin;//num
-var totalflag;//num
-var breakonflag;//num
-var anytotals;//num
-var multirowcolhdg;//num
+var nreplacements;	 //num
+var topmargin;		 //num
+var totalflag;		 //num
+var breakonflag;	 //num
+var anytotals;		 //num
+var multirowcolhdg;	 //num
 var limits;
-var nlimits;//num
+var nlimits;  //num
 var ignorewords;
 var emailtoid;
 var emailccid;
@@ -104,7 +104,7 @@ var nextemailto;
 var nextemailcc;
 var nextemailsubject;
 var ss;
-var wordn;//num
+var wordn;	//num
 var word;
 var filename;
 var dictfilename;
@@ -116,14 +116,14 @@ var limitx;
 var lastword;
 var title;
 var value;
-var tcoln;//num
+var tcoln;	//num
 var nn;
-var ii;//num
+var ii;	 //num
 var tt2;
 var charx;
-var charn;//num
-var ncols;//num
-var breakn;//num
+var charn;	 //num
+var ncols;	 //num
+var breakn;	 //num
 var underline;
 var colul;
 var bar;
@@ -136,8 +136,8 @@ dim oldbreakvalue;
 var colhdg;
 var coltags;
 var style;
-var coln2;//num
-var vmcount;//num
+var coln2;	  //num
+var vmcount;  //num
 var thproperties;
 var align;
 var clientmark;
@@ -150,79 +150,79 @@ var v69;
 var v70;
 var v71;
 var dictid;
-var limitn;//num
-var recn;//num
+var limitn;	 //num
+var recn;	 //num
 var lastid;
-var readerr;//num
+var readerr;  //num
 var fns;
 var nfns;
-var nmvs;//num
-var fnn;//num
+var nmvs;  //num
+var fnn;   //num
 var fn;
 var limitvals;
 var mvx;
 var newhead;
 var printfilename;
-var breakleveln;//num
-var leveln;//num
-var previousmarklevel;//num
-var newmarklevel;//num
+var breakleveln;		//num
+var leveln;				//num
+var previousmarklevel;	//num
+var newmarklevel;		//num
 var str1;
 var str2;
 var str3;
 var tx1;
 var oconvx;
-var bodyln;//num
+var bodyln;	 //num
 var bottomline;
-var lastrecord;//num
+var lastrecord;	 //num
 var printfile;
 var storewordn;
 var storecharn;
 var storeword;
 var storedictrec;
-var startcharn;//num
+var startcharn;	 //num
 var searchchar;
 var letterhead;
-var wordexpanded;//num
+var wordexpanded;  //num
 var breakcoln;
 var storetx;
-var anycell;//num
+var anycell;  //num
 var lastblockn;
 var underline2;
-var cell;//num
+var cell;  //num
 var colbreakn;
 var bottomline2;
-var char1;//num
-var char2;//num
+var char1;	//num
+var char2;	//num
 var char3;
 var body;
 var tt3;
 var xxerrmsg;
-var ownprintfile;//num
+var ownprintfile;  //num
 var ptx_filenamelen;
 var ptx_random;
 var pagelns;
-var realpagen;//num
-var pagen;//num
-var newpage;//num
+var realpagen;	//num
+var pagen;		//num
+var newpage;	//num
 var rfmt;
 var foot;
-var ntxlns;//num
-var nbodylns;//num
+var ntxlns;	   //num
+var nbodylns;  //num
 var ptx_temp;
 var headx;
 var newpagetag;
 var ptx_css;
-var stylennx;//num
+var stylennx;  //num
 var htmltitle;
 var head_or_foot;
 var footx;
 var head1;
-var optioncharn;//num
+var optioncharn;  //num
 var optionchars;
 var optionchar;
 var newoptions;
-var printtx_ii;//num
+var printtx_ii;	 //num
 var spaceoptionsize;
 
 function main() {
@@ -237,12 +237,12 @@ function main() {
 		var(SENTENCE).oswrite("NLIST");
 	}
 
-//	#include <general_common.h>
+	//	#include <general_common.h>
 	//global all
 	//for printtx
 	//global html,head,foot,cssver,htmltitle,topmargin,bottomline,tx
 
-	#define interactive not(SYSTEM.a(33))
+#define interactive not(SYSTEM.a(33))
 	ulchar = "-";
 
 	//NLIST keywords and aliases. blank keyword means throwaway word
@@ -332,7 +332,7 @@ function main() {
 	if (LISTACTIVE) {
 		fromdate = "";
 		fromtime = "";
-	}else{
+	} else {
 		fromdate = var().date();
 		fromtime = ostime();
 	}
@@ -342,7 +342,7 @@ function main() {
 
 	if (BASEFMT[2] eq "C") {
 		decimalchar = ",";
-	}else{
+	} else {
 		decimalchar = ".";
 	}
 
@@ -353,9 +353,9 @@ function main() {
 		}
 		html = 1;
 
-	//if not arev then dont force html or force output to file
-	}else{
-		html = SYSTEM.a(2).lcase().substr(-3,3) eq "htm";
+		//if not arev then dont force html or force output to file
+	} else {
+		html = SYSTEM.a(2).lcase().substr(-3, 3) eq "htm";
 	}
 
 	if (html) {
@@ -371,7 +371,7 @@ function main() {
 		tt = SYSTEM.a(2);
 		tt.swapper(".txt", ".htm");
 		SYSTEM.r(2, tt);
-	}else{
+	} else {
 		td0 = "";
 		td = "";
 		tdx = " ";
@@ -429,20 +429,20 @@ function main() {
 		}
 	}
 
-	if (not(tt.read(dictvoc,"@ID"))) {
-		var("F|0|TABLE_NAME|S|1||||L|20||VARCHAR").converter("|",FM).write(dictvoc,"TABLE_NAME");
-		var("F|0|COLUMN_NAME|S|2||||L|20").converter("|",FM).write(dictvoc,"COLUMN_NAME");
-		var("G||TYPE FMC PART HEADING SM CONV JUST LEN MASTER_FLAG|||||||||||||||||||||||||0").converter("|",FM).write(dictvoc,"@CRT");
-		var("F|0|Ref.|S|0||||T|20").converter("|",FM).write(dictvoc,"@ID");
-		var("F|1|TYPE|S|0||||L|4").converter("|",FM).write(dictvoc,"TYPE");
-		var("F|2|FMC|S|0||||R|3").converter("|",FM).write(dictvoc,"FMC");
-		var("F|5|PART|S|0||||R|2").converter("|",FM).write(dictvoc,"PART");
-		var("F|3|HEADING|S|0||||T|20").converter("|",FM).write(dictvoc,"HEADING");
-		var("F|4|SM|S|0||||L|4").converter("|",FM).write(dictvoc,"SM");
-		var("F|7|CONV|S|0||||L|9").converter("|",FM).write(dictvoc,"CONV");
-		var("F|9|JST|S|0||||L|3").converter("|",FM).write(dictvoc,"JUST");
-		var("F|10|LEN|S|0||||R|3||LENGTH").converter("|",FM).write(dictvoc,"LEN");
-		var("F|28|MST|S|||BYes,||L|4").converter("|",FM).write(dictvoc,"MASTER_FLAG");
+	if (not(tt.read(dictvoc, "@ID"))) {
+		var("F|0|TABLE_NAME|S|1||||L|20||VARCHAR").converter("|", FM).write(dictvoc, "TABLE_NAME");
+		var("F|0|COLUMN_NAME|S|2||||L|20").converter("|", FM).write(dictvoc, "COLUMN_NAME");
+		var("G||TYPE FMC PART HEADING SM CONV JUST LEN MASTER_FLAG|||||||||||||||||||||||||0").converter("|", FM).write(dictvoc, "@CRT");
+		var("F|0|Ref.|S|0||||T|20").converter("|", FM).write(dictvoc, "@ID");
+		var("F|1|TYPE|S|0||||L|4").converter("|", FM).write(dictvoc, "TYPE");
+		var("F|2|FMC|S|0||||R|3").converter("|", FM).write(dictvoc, "FMC");
+		var("F|5|PART|S|0||||R|2").converter("|", FM).write(dictvoc, "PART");
+		var("F|3|HEADING|S|0||||T|20").converter("|", FM).write(dictvoc, "HEADING");
+		var("F|4|SM|S|0||||L|4").converter("|", FM).write(dictvoc, "SM");
+		var("F|7|CONV|S|0||||L|9").converter("|", FM).write(dictvoc, "CONV");
+		var("F|9|JST|S|0||||L|3").converter("|", FM).write(dictvoc, "JUST");
+		var("F|10|LEN|S|0||||R|3||LENGTH").converter("|", FM).write(dictvoc, "LEN");
+		var("F|28|MST|S|||BYes,||L|4").converter("|", FM).write(dictvoc, "MASTER_FLAG");
 	}
 
 	colname.redim(maxncols);
@@ -495,7 +495,7 @@ function main() {
 
 ///////////
 nextphrase:
-///////////
+	///////////
 
 	gosub getword();
 	if (word eq "") {
@@ -503,8 +503,8 @@ nextphrase:
 	}
 
 phraseinit:
-///////////
-	if (word.substr(1,4) eq "SORT" or word.substr(1,5) eq "NSORT") {
+	///////////
+	if (word.substr(1, 4) eq "SORT" or word.substr(1, 5) eq "NSORT") {
 		ss ^= "SSELECT";
 
 filename:
@@ -527,9 +527,9 @@ filename:
 			gosub getword();
 			filename = "DICT." ^ word;
 		}
-		if (filename.substr(1,5) eq "DICT.") {
+		if (filename.substr(1, 5) eq "DICT.") {
 			dictfilename = "VOC";
-		}else{
+		} else {
 			dictfilename = filename;
 		}
 		if (not(DICT.open("dict_" ^ dictfilename))) {
@@ -543,20 +543,19 @@ filename:
 
 		if (html) {
 
-			if (var("PLANS,SCHEDULES,ADS,BOOKING_ORDERS,VEHICLES,RATECARDS").locateusing(",",filename,xx)) {
+			if (var("PLANS,SCHEDULES,ADS,BOOKING_ORDERS,VEHICLES,RATECARDS").locateusing(",", filename, xx)) {
 				printtxmark = "Media Management";
 			}
 
-			if (var("JOBS,PRODUCTION_ORDERS,PRODUCTION_INVOICES").locateusing(",",filename,xx)) {
+			if (var("JOBS,PRODUCTION_ORDERS,PRODUCTION_INVOICES").locateusing(",", filename, xx)) {
 				printtxmark = "Production Management";
 			}
 
-			if (var("CHARTS,RECURRING").locateusing(",",filename,xx)) {
+			if (var("CHARTS,RECURRING").locateusing(",", filename, xx)) {
 				printtxmark = "Financial";
 			}
-
 		}
-	/*;
+		/*;
 			//get any specfic keys
 			loop;
 			while num(nextword) or nextword[1,1]="'" or nextword[1,1]='"';
@@ -579,7 +578,7 @@ nextkey:
 			}
 		}
 
-	} else if ((word.substr(1,4) eq "LIST" or word.substr(1,5) eq "NLIST") or word eq "XLIST") {
+	} else if ((word.substr(1, 4) eq "LIST" or word.substr(1, 5) eq "NLIST") or word eq "XLIST") {
 		ss ^= "SELECT";
 		goto filename;
 		{}
@@ -639,15 +638,15 @@ nextkey:
 		}
 
 		//negate next comparision
-		if (var("NOT,NE,<>").locateusing(",",nextword,xx)) {
+		if (var("NOT,NE,<>").locateusing(",", nextword, xx)) {
 			nextword = "NOT";
 			gosub getword();
 			ss ^= " " ^ word;
 		}
 
 		//comparision
-		if (var("MATCH,EQ,,NE,GT,LT,GE,LE,<,>,<=,>=,=,[],[,]").locateusing(",",nextword,xx)) {
-	//only EQ works at the moment
+		if (var("MATCH,EQ,,NE,GT,LT,GE,LE,<,>,<=,>=,=,[],[,]").locateusing(",", nextword, xx)) {
+			//only EQ works at the moment
 			gosub getword();
 			ss ^= " " ^ word;
 			if (limitx) {
@@ -667,18 +666,19 @@ nextkey:
 			gosub getword();
 			ss ^= " " ^ word;
 
-		}else{
+		} else {
 
 			//parameters
 			while (true) {
 				///BREAK;
-				if (not(nextword ne "" and (((nextword.isnum() or (nextword[1] eq DQ)) or (nextword[1] eq "'"))))) break;
+				if (not(nextword ne "" and (((nextword.isnum() or (nextword[1] eq DQ)) or (nextword[1] eq "'")))))
+					break;
 				gosub getword();
 				ss ^= " " ^ word;
 				if (limitx) {
 					if ((DQ ^ "'").index(word[1])) {
 						if (word[1] eq word[-1]) {
-							word = word.substr(2,word.length() - 2);
+							word = word.substr(2, word.length() - 2);
 						}
 					}
 					if (word eq "") {
@@ -687,8 +687,7 @@ nextkey:
 					limits.r(3, nlimits, -1, word);
 				}
 				{}
-			}//loop;
-
+			}  //loop;
 		}
 
 	} else if (word eq "BREAK-ON") {
@@ -706,23 +705,23 @@ nextkey:
 	} else if (word eq "NO-BASE") {
 		nobase = 1;
 
-	//"DET-SUPP"
+		//"DET-SUPP"
 	} else if (word eq "DS" or word eq "DET-SUPP") {
 		detsupp = 1;
 
-	//"DET-SUPP"
+		//"DET-SUPP"
 	} else if (word eq "DS2" or word eq "DET-SUPP2") {
 		detsupp = 2;
 
-	//"GTOT-SUPP"
+		//"GTOT-SUPP"
 	} else if (word eq "GTS" or word eq "GTOT-SUPP") {
 		gtotsupp = 1;
 
-	//"MULTIROW-COLHDG"
+		//"MULTIROW-COLHDG"
 	} else if (word eq "DS" or word eq "MULTIROW-COLHDG") {
 		multirowcolhdg = 1;
 
-	//case dictrec
+		//case dictrec
 
 	} else if (word eq "TOTAL") {
 		totalflag = 1;
@@ -788,7 +787,7 @@ nextkey:
 
 		//automatic labelling with dictionary title
 		if (word[1] eq "{") {
-			tt = word.substr(2,word.length() - 2);
+			tt = word.substr(2, word.length() - 2);
 			replacements.r(-1, tt);
 			nreplacements += 1;
 			if (not(tt.reado(DICT, tt))) {
@@ -806,12 +805,13 @@ nextkey:
 		//find the next empty row
 		while (true) {
 			///BREAK;
-			if (not(headtab.a(hrown, tcoln) or (headtab.a(hrown, tcoln + 1)))) break;
+			if (not(headtab.a(hrown, tcoln) or (headtab.a(hrown, tcoln + 1))))
+				break;
 			hrown += 1;
-		}//loop;
+		}  //loop;
 
 		//prevent trailing colon folding onto following line
-		if (title.substr(-2,2) eq " :") {
+		if (title.substr(-2, 2) eq " :") {
 			title.splicer(-2, 2, "&nbsp;:");
 		}
 
@@ -822,7 +822,7 @@ nextkey:
 
 		headtab.r(hrown, tcoln, title.convert(FM ^ VM, "  "));
 		headtab.r(hrown, tcoln + 1, value);
-				hrown += 1;
+		hrown += 1;
 
 	} else if (word eq "HEADING" and dictrec.a(3) ne "HEADING") {
 
@@ -839,7 +839,7 @@ nextkey:
 		gosub getquotedword();
 		foot2 ^= word;
 
-	//justlen
+		//justlen
 	} else if (word eq "JL" or word eq "JUSTLEN") {
 		if (not coln) {
 			call mssg("JUSTLEN/JL must follow a column name");
@@ -849,11 +849,11 @@ nextkey:
 		if (not(coldict(coln).unassigned())) {
 			gosub getquotedword();
 			coldict(coln).r(9, word[1]);
-			coldict(coln).r(10, word.substr(3,9999));
+			coldict(coln).r(10, word.substr(3, 9999));
 			coldict(coln).r(11, word);
 		}
 
-	//colhead
+		//colhead
 	} else if (word eq "CH" or word eq "COLHEAD") {
 		if (not coln) {
 			call mssg("COLHEAD/CH must follow a column name");
@@ -893,18 +893,18 @@ nextkey:
 	} else if (word eq "EMAIL_CC") {
 		gosub getword();
 		if ((DQ ^ "'").index(word[1])) {
-			emailcc = word.substr(2,word.length() - 2);
+			emailcc = word.substr(2, word.length() - 2);
 			nextemailcc = emailcc;
-		}else{
+		} else {
 			emailccid = word;
 		}
 
 	} else if (word eq "EMAIL_SUBJECT") {
 		gosub getword();
 		if ((DQ ^ "'").index(word[1])) {
-			emailsubject = word.substr(2,word.length() - 2);
+			emailsubject = word.substr(2, word.length() - 2);
 			nextemailsubject = emailsubject;
-		}else{
+		} else {
 			emailsubjectid = word;
 		}
 
@@ -920,7 +920,7 @@ nextkey:
 
 			//suppress untotalled columns if doing detsupp2
 			if (detsupp eq 2 and (not(totalflag or breakonflag))) {
-				if (var("JL,JUSTLEN,CH,COLHEAD,OC,OCONV").locateusing(",",nextword,xx)) {
+				if (var("JL,JUSTLEN,CH,COLHEAD,OC,OCONV").locateusing(",", nextword, xx)) {
 					gosub getword();
 					gosub getword();
 				}
@@ -937,7 +937,7 @@ nextkey:
 				if (dictrec.a(10) and tt.length() gt dictrec.a(10)) {
 					dictrec.r(10, tt.length());
 				}
-			};//ii;
+			};	//ii;
 
 			dictrec.r(bheadfn, "");
 
@@ -947,7 +947,7 @@ nextkey:
 					//if detsupp then tt:=' style="display:none"'
 					if (detsupp) {
 						tt = " class=\"BHEAD\"";
-					}else{
+					} else {
 						tt = " class=\"BHEAD2\"";
 					}
 					dictrec.r(bheadfn, tt);
@@ -959,7 +959,7 @@ nextkey:
 				totalflag = 0;
 				dictrec.r(12, 1);
 				anytotals = 1;
-			}else{
+			} else {
 				dictrec.r(12, 0);
 			}
 
@@ -1006,9 +1006,10 @@ nextkey:
 						for (tt = 1; tt <= 9999; ++tt) {
 							charx = word[tt];
 							///BREAK;
-							if (not(charx.length() and var("0123456789,").index(charx))) break;
+							if (not(charx.length() and var("0123456789,").index(charx)))
+								break;
 							tt2 ^= charx;
-						};//tt;
+						};	//tt;
 
 						//build table heading table if rown/column givem
 						if (tt2) {
@@ -1029,13 +1030,14 @@ nextkey:
 							hrown += 1;
 						}
 
-						pagebreaks.r(coln, "'" "B" ^ tt2 ^ "'");
-
+						pagebreaks.r(coln,
+									 "'"
+									 "B" ^
+										 tt2 ^ "'");
 					}
 					breakopts.r(1, word);
 				}
 			}
-
 		}
 
 dictrecexit:;
@@ -1051,7 +1053,7 @@ dictrecexit:;
 		if (interactive) {
 			if (VOLUMES) {
 				tt ^= "|Please correct the word by retyping it|or pressing [F4] to edit it.|Press [Esc] to re-start.|";
-			}else{
+			} else {
 				tt ^= " Replace with? (Esc, Enter to cancel):";
 			}
 		}
@@ -1061,7 +1063,6 @@ dictrecexit:;
 		}
 		gosub getwordexit();
 		goto phraseinit;
-
 	}
 
 	///////////
@@ -1101,18 +1102,24 @@ x1exit:
 		for (coln = ncols; coln >= 2; --coln) {
 			coldict(coln) = coldict(coln - 1);
 			colname(coln) = colname(coln - 1);
-		};//coln;
+		};	//coln;
 
 		//set column 1
-		colname(1) = "@" "ID";
-		if (not(coldict(1).reado(DICT, "@" "ID"))) {
-			if (not(coldict(1).reado(dictvoc, "@" "ID"))) {
+		colname(1) =
+			"@"
+			"ID";
+		if (not(coldict(1).reado(DICT,
+								 "@"
+								 "ID"))) {
+			if (not(coldict(1).reado(dictvoc,
+									 "@"
+									 "ID"))) {
 				coldict(1) = "F" ^ FM ^ FM ^ "Ref" ^ FM ^ FM ^ FM ^ FM ^ FM ^ FM ^ "L" ^ FM ^ 15;
 			}
 		}
 		if (html) {
 			tt = "";
-		}else{
+		} else {
 			tt = coldict(1).a(9) ^ "#" ^ coldict(1).a(10);
 		}
 		coldict(1).r(11, tt);
@@ -1120,7 +1127,7 @@ x1exit:
 		//increment the list of breaking columns by one as well
 		for (breakn = 1; breakn <= nbreaks; ++breakn) {
 			breakcolns.r(breakn, breakcolns.a(breakn) + 1);
-		};//breakn;
+		};	//breakn;
 
 		//and the page break colns
 		//for ii=1 to 9999
@@ -1131,7 +1138,6 @@ x1exit:
 		if (pagebreaks) {
 			pagebreaks = "" ^ FM ^ pagebreaks;
 		}
-
 	}
 
 	if (breakcolns[-1] eq FM) {
@@ -1149,13 +1155,13 @@ x1exit:
 			if (coldict(coln).a(10)) {
 				if (coldict(coln).a(12)) {
 					tt = ulchar;
-				}else{
+				} else {
 					tt = " ";
 				}
 				underline ^= tt.str(coldict(coln).a(10)) ^ " ";
 				colul ^= ulchar.str(coldict(coln).a(10)) ^ " ";
 			}
-		};//coln;
+		};	//coln;
 		bar = ulchar.str(colul.length() - 1);
 	}
 
@@ -1175,10 +1181,10 @@ x1exit:
 	breakvalue.redim(maxncols);
 	oldbreakvalue.redim(maxncols);
 
-	breakvalue="";
-	oldbreakvalue="";
-	breakcount="";
-	breaktotal="";
+	breakvalue = "";
+	oldbreakvalue = "";
+	breakcount = "";
+	breaktotal = "";
 
 	//build the column headings
 	colhdg = "";
@@ -1234,7 +1240,7 @@ x1exit:
 					// *http://www.w3.org/TR/html401/struct/tables.html#adef-align-TD
 					// coltags:=' align="char" char="':decimalchar:'"'
 					//end else
-						//coltags:=' align="right"'
+					//coltags:=' align="right"'
 					align = "right";
 					coltags ^= " style=\"text-align:right\"";
 					// end
@@ -1253,19 +1259,26 @@ x1exit:
 				//nth child style column justification in case <col> doesnt work like on FF
 				if (align) {
 					//works per table if the table is assigned a class (.maintable) here
-					style ^= "table.exodustable td:nth-child(" ^ coln2 ^ "){text-align:" ^ align ^ "}" "\r\n";
+					style ^= "table.exodustable td:nth-child(" ^ coln2 ^ "){text-align:" ^ align ^
+							 "}"
+							 "\r\n";
 				}
 
-			}else{
+			} else {
 				for (ii = 1; ii <= 9; ++ii) {
 					colhdg.r(ii, colhdg.a(ii) ^ oconv(coldict(coln).a(3, ii), coldict(coln).a(11)) ^ " ");
-				};//ii;
+				};	//ii;
 			}
 		}
-	};//coln;
+	};	//coln;
 
 	if (style) {
-		style = "<style type=\"text/css\">" "\r\n" ^ style ^ "</style>" "\r\n";
+		style =
+			"<style type=\"text/css\">"
+			"\r\n" ^
+			style ^
+			"</style>"
+			"\r\n";
 	}
 
 	//convert to html with colspan/rowspan where necessary and (Base) as currcode
@@ -1315,12 +1328,13 @@ x1exit:
 		//allow for single quotes
 		colhdg.swapper("'", "''");
 #endif
-	}else{
+	} else {
 		while (true) {
 			///BREAK;
-			if (not(colhdg and ((" " ^ FM).index(colhdg[-1])))) break;
+			if (not(colhdg and ((" " ^ FM).index(colhdg[-1]))))
+				break;
 			colhdg.splicer(-1, 1, "");
-		}//loop;
+		}  //loop;
 	}
 
 	//heading options
@@ -1341,7 +1355,7 @@ x1exit:
 		//supertable to ensure any heading is as wide as the body of the report
 		if (showborder) {
 			head.r(-1, "<table{%20}border=1{%20}style=\"border-width:3px\"{%20}cellpadding=0{%20}cellspacing=0{%20}align=center><tr><td>");
-		}else{
+		} else {
 			//head:='<table{%20}cellpadding=0{%20}cellspacing=0{%20}align=center><tr><td>'
 			head.r(-1, "<table{%20}align=center><tr><td>");
 		}
@@ -1358,23 +1372,33 @@ x1exit:
 		headtabcols = (headtabcols ^ VM).str(8);
 		headtabcols.splicer(-1, 1, "");
 
-		tt ^= "<colgroup>" "\r\n" ^ headtabcols.swap(VM, "\r\n") ^ "</colgroup>";
+		tt ^=
+			"<colgroup>"
+			"\r\n" ^
+			headtabcols.swap(VM, "\r\n") ^ "</colgroup>";
 #ifndef EXO_NOHTML
 		//style columns where '<col>' not supported.
 		call convcss(mode, "headtab0", headtabcols, headtabstyle);
 		style ^= "\r\n" ^ headtabstyle;
 		//tt[1,0]=headtabstyle:crlf
 
-		tt ^= "<colgroup>" "\r\n" ^ headtabcols.swap(VM, "\r\n") ^ "</colgroup>";
+		tt ^=
+			"<colgroup>"
+			"\r\n" ^
+			headtabcols.swap(VM, "\r\n") ^ "</colgroup>";
 
 		//tt:=crlf:'</THEAD>':crlf:'<TBODY>'
-		tt ^= "\r\n" "<TBODY>";
+		tt ^=
+			"\r\n"
+			"<TBODY>";
 		call htmllib2("TABLE.MAKE", headtab, tt, "");
 #endif
-		headtab.swapper("</TR>", "</TR>" "\r\n");
+		headtab.swapper("</TR>",
+						"</TR>"
+						"\r\n");
 		if (headtabperpage) {
 			colhdg.swapper(posttheadmark, tr ^ td0 ^ "<th style=\"background-color:white\" colspan=" ^ ncols ^ ">" ^ headtab ^ thx ^ trx);
-		}else{
+		} else {
 			headtab.swapper(posttheadmark, "");
 			head ^= FM ^ headtab ^ FM;
 		}
@@ -1414,12 +1438,12 @@ nextdict:
 				if (dictrec.a(4).field(".", 1) eq limits.a(4, limitn)) {
 					tt = dictrec.a(2);
 					if (tt) {
-						if (not(limits.a(5, limitn).locateusing(SVM,tt,xx))) {
+						if (not(limits.a(5, limitn).locateusing(SVM, tt, xx))) {
 							limits.r(5, limitn, -1, dictrec.a(2));
 						}
 					}
 				}
-			};//limitn;
+			};	//limitn;
 			goto nextdict;
 		}
 		call popselect(0, v69, v70, v71);
@@ -1457,7 +1481,7 @@ nextdict:
 			goto x2bexit;
 		}
 
-	}else{
+	} else {
 		if (not LISTACTIVE) {
 			//select(srcfile);
 			select("SELECT " ^ srcfile ^ " (SR)");
@@ -1474,7 +1498,7 @@ nextdict:
 
 ////////
 nextrec:
-////////
+	////////
 	if (esctoexit()) {
 		tx = "";
 		if (html) {
@@ -1499,7 +1523,7 @@ nextrec:
 
 	//if (not(readnext(ID, MV))) {
 	if (not(readnext(RECORD, ID, MV))) {
-    		FILEERRORMODE = 0;
+		FILEERRORMODE = 0;
 		if (STATUS) {
 			tx = "*** Fatal Error " ^ FILEERROR.a(1) ^ " reading record " ^ ID ^ " ***";
 			gosub printtx();
@@ -1538,7 +1562,7 @@ nextrec:
 	//	goto nextrec;
 	//}
 	//RECORD.errputl("RECORD=");
-    if (not(RECORD.length()) and not(RECORD.read(srcfile, ID))) {
+	if (not(RECORD.length()) and not(RECORD.read(srcfile, ID))) {
 		goto nextrec;
 	}
 
@@ -1562,7 +1586,7 @@ nextrec:
 						nmvs = tt;
 					}
 				}
-			};//fnn;
+			};	//fnn;
 
 			limitvals = calculate(limits.a(1, limitn));
 			for (mvx = nmvs; mvx >= 1; --mvx) {
@@ -1571,14 +1595,13 @@ nextrec:
 					tt = "\"\"";
 				}
 				//locate tt in (limits<3,limitn>)<1,1> using sm setting xx else
-				if (not(limits.a(3, limitn).locateusing(SVM,tt,xx))) {
+				if (not(limits.a(3, limitn).locateusing(SVM, tt, xx))) {
 					for (fnn = 1; fnn <= nfns; ++fnn) {
 						RECORD.remover(fns.a(1, 1, fnn), mvx);
-					};//fnn;
+					};	//fnn;
 				}
-			};//mvx;
-		};//limitn;
-
+			};	//mvx;
+		};		//limitn;
 	}
 
 	recn += 1;
@@ -1607,13 +1630,13 @@ nextrec:
 	//get the data from the record into an array of columns
 
 	for (coln = 1; coln <= ncols; ++coln) {
-	//  @mv=0
+		//  @mv=0
 
 		if (coldict(coln).a(9) eq "T" and not(html)) {
 
 			mcol(coln) = oconv(calculate(colname(coln)), coldict(coln).a(11));
 
-		}else{
+		} else {
 
 			mcol(coln) = calculate(colname(coln));
 
@@ -1630,7 +1653,7 @@ nextrec:
 		pcol(coln) = 1;
 		ccol(coln) = 7;
 		scol(coln) = mcol(coln);
-	};//coln;
+	};	//coln;
 
 	//break subtotals
 	//detect most major level to break
@@ -1638,36 +1661,37 @@ nextrec:
 		//print breaks will not actually print before the first record
 		// but it needs to set the various break values
 		breakleveln = nbreaks;
-	}else{
+	} else {
 		for (leveln = nbreaks; leveln >= 1; --leveln) {
 			coln = breakcolns.a(leveln);
 			///BREAK;
-			if (scol(coln) ne breakvalue(coln)) break;
-		};//leveln;
+			if (scol(coln) ne breakvalue(coln))
+				break;
+		};	//leveln;
 		breakleveln = leveln;
 	}
 
 	gosub printbreaks();
 
-	oldbreakvalue=breakvalue;
+	oldbreakvalue = breakvalue;
 
 	previousmarklevel = 0;
 
 ////////
 recexit:
-////////
+	////////
 
 	//remove appropriate value from multi-valued column(s)
 	newmarklevel = 0;
 	for (coln = 1; coln <= ncols; ++coln) {
 		if (ccol(coln) ge previousmarklevel) {
-			icol(coln)=mcol(coln).substr2(pcol(coln), ccol(coln));
+			icol(coln) = mcol(coln).substr2(pcol(coln), ccol(coln));
 			scol(coln) = icol(coln);
 		}
 		if (ccol(coln) gt newmarklevel) {
 			newmarklevel = ccol(coln);
 		}
-	};//coln;
+	};	//coln;
 
 	//break totals - add at the bottom level (1)
 	for (coln = 1; coln <= ncols; ++coln) {
@@ -1679,10 +1703,10 @@ recexit:
 					//breaktotal(coln,1)+=i.col(coln)
 					call addunits(icol(coln), breaktotal(coln, 1), VM);
 #endif
-				}else{
+				} else {
 					if (breaktotal(coln, 1).isnum() and icol(coln).isnum()) {
 						breaktotal(coln, 1) += icol(coln);
-					}else{
+					} else {
 						if (colname(coln) eq "DATEGRID") {
 							str1 = icol(coln);
 							str2 = breaktotal(coln, 1);
@@ -1695,7 +1719,7 @@ recexit:
 			breakcount(1) += 1;
 			icol(coln) = "";
 		}
-	};//coln;
+	};	//coln;
 
 	if (detsupp lt 2) {
 
@@ -1710,7 +1734,7 @@ recexit:
 		tx1 = "";
 		if (html) {
 
-				/*;
+			/*;
 				//sadly cannot indicate border on tr element
 				begin case;
 				case new.mark.level;
@@ -1743,7 +1767,13 @@ recexit:
 						tx1 ^= ";display:none";
 					}
 					tx1 ^= DQ;
-					tx1 ^= " onclick=\"toggle(" "'" "B" ^ blockn ^ "'" ")\"";
+					tx1 ^=
+						" onclick=\"toggle("
+						"'"
+						"B" ^
+						blockn ^
+						"'"
+						")\"";
 				}
 			}
 			tx1 ^= ">";
@@ -1755,7 +1785,7 @@ recexit:
 				tt = oconv(tt, oconvx);
 				if (html) {
 					if (tt[1] eq "-") {
-						if (oconvx.substr(1,7) eq "[NUMBER") {
+						if (oconvx.substr(1, 7) eq "[NUMBER") {
 							tt = "<nobr>" ^ tt ^ "</nobr>";
 						}
 					}
@@ -1767,44 +1797,44 @@ recexit:
 				}
 				if (tt eq "") {
 					//tt=nbsp
-				}else{
+				} else {
 					tt.swapper("\r\n", "<br />");
 				}
 
 				//colored cells starting with ESC
 				if (tt[1] eq "\x1B") {
-					if (tt.substr(1,2) eq ("\x1B" "\x1B")) {
+					if (tt.substr(1, 2) eq("\x1B"
+										   "\x1B")) {
 						tt = tt.field(" ", 2, 999999);
 						if (tt.length()) {
 							tx1 ^= td ^ "<nobr>" ^ tt ^ "</nobr>" ^ tdx;
-						}else{
+						} else {
 							//tx1:=td:nbsp:tdx
 							tx1 ^= td ^ tdx;
 						}
-					}else{
+					} else {
 						//tx1:=td0:'<td bgcolor=':field(tt,' ',1)[2,9999]:'>'
 						//TODO do with class? to save document space?
-						tx1 ^= td0 ^ "<td style=\"background-color:" ^ tt.field(" ", 1).substr(2,9999) ^ "\">";
+						tx1 ^= td0 ^ "<td style=\"background-color:" ^ tt.field(" ", 1).substr(2, 9999) ^ "\">";
 						tt = tt.field(" ", 2, 999999);
 						if (tt.length()) {
 							tx1 ^= tt ^ tdx;
-						}else{
+						} else {
 							//tx1:=nbsp:tdx
 							tx1 ^= tdx;
 						}
 					}
 
-				}else{
+				} else {
 					if (tt.length()) {
 						tx1 ^= tdz ^ tt ^ tdx;
-					}else{
+					} else {
 						//tx1:=tdz:nbsp:tdx
 						tx1 ^= tdz ^ tdx;
 					}
 				}
-
 			}
-		};//coln;
+		};	//coln;
 
 		//swap '<td' with '<th' in tx1
 		//swap '<\td' with '<\th' in tx1
@@ -1821,7 +1851,7 @@ recexit:
 		if (newmarklevel) {
 			for (coln = 1; coln <= ncols; ++coln) {
 				scol(coln) = "";
-			};//coln;
+			};	//coln;
 			previousmarklevel = newmarklevel;
 			goto recexit;
 		}
@@ -1830,7 +1860,6 @@ recexit:
 		if (dblspc) {
 			gosub printtx();
 		}
-
 	}
 
 	goto nextrec;
@@ -1865,7 +1894,7 @@ x2exit:
 			if (html) {
 				tx ^= "<p style=\"text-align:center\">";
 			}
-	//records
+			//records
 			tt = recn + 0;
 			tx ^= tt ^ " record";
 			if (recn ne 1) {
@@ -1879,7 +1908,6 @@ x2exit:
 				tx ^= "</p>";
 			}
 		}
-
 	}
 
 	if (html) {
@@ -1897,9 +1925,13 @@ x2exit:
 		//tx:='window.open(url)}'
 		//similar code in NLIST and LEDGER2
 		tx ^= "var vhtm=window.opener.location.toString().split(\"/\");";
-		tx ^= "vhtm[vhtm.length-1]=url;" "\r\n";
+		tx ^=
+			"vhtm[vhtm.length-1]=url;"
+			"\r\n";
 		//tx:='alert(vhtm.join("/"));':crlf
-		tx ^= "window.open(vhtm.join(\"/\"));" "\r\n";
+		tx ^=
+			"window.open(vhtm.join(\"/\"));"
+			"\r\n";
 		tx ^= "}";
 		tx ^= FM ^ "</script>";
 	}
@@ -1936,7 +1968,7 @@ subroutine getquotedword2() {
 	if (((DQ ^ "'").index(word[1])) and (word[1] eq word[-1])) {
 		word.splicer(1, 1, "");
 		word.splicer(-1, 1, "");
-	}else{
+	} else {
 		call mssg(lastword ^ " must be followed by a quoted phrase");
 	}
 	return;
@@ -1946,18 +1978,18 @@ subroutine getword() {
 	{}
 
 getnextword:
-////////////
+	////////////
 	gosub getword2();
 
 	if (word.length()) {
-		if (ignorewords.a(1).locate(word,xx)) {
+		if (ignorewords.a(1).locate(word, xx)) {
 			goto getnextword;
 		}
 	}
 
 	if (word eq "") {
 		nextword = "";
-	}else{
+	} else {
 		storewordn = wordn;
 		storecharn = charn;
 		storeword = word;
@@ -1996,12 +2028,13 @@ getword2b:
 	//skip spaces
 	while (true) {
 		///BREAK;
-		if (not(sentencex[charn] eq " ")) break;
+		if (not(sentencex[charn] eq " "))
+			break;
 		charn += 1;
 		if (charn gt sentencex.length()) {
 			return;
 		}
-	}//loop;
+	}  //loop;
 
 	//if next word starts with " or ' then scan for the same closing
 	//otherwise scan up to the next space char
@@ -2009,7 +2042,7 @@ getword2b:
 	charx = sentencex[charn];
 	if (("'" ^ DQ).index(charx)) {
 		searchchar = charx;
-	}else{
+	} else {
 		searchchar = " ";
 	}
 	word ^= charx;
@@ -2020,17 +2053,18 @@ getword2b:
 		charn += 1;
 		charx = sentencex[charn];
 		///BREAK;
-		if (not(charx ne "" and charx ne searchchar)) break;
+		if (not(charx ne "" and charx ne searchchar))
+			break;
 		word ^= charx;
-	}//loop;
+	}  //loop;
 
 	//if scanned for " or ' then add it to the word
 	if (searchchar ne " ") {
 		word ^= searchchar;
 		charn += 1;
 
-	//otherwise
-	}else{
+		//otherwise
+	} else {
 		word.ucaser();
 		word = word.trimb().trimf();
 	}
@@ -2071,8 +2105,8 @@ subroutine getwordexit() {
 	if (DICT eq "") {
 		goto dictvoc;
 	}
-	if (not(html) and word.substr(-5,5) == "_LINK")
-		word.splicer(-5,5,"");
+	if (not(html) and word.substr(-5, 5) == "_LINK")
+		word.splicer(-5, 5, "");
 	if (dictrec.reado(DICT, word)) {
 maindict:
 		if (dictrec.a(1) eq "G") {
@@ -2084,7 +2118,7 @@ maindict:
 			wordexpanded = 1;
 			return;
 		}
-	}else{
+	} else {
 		if (dictrec.reado(DICT, word.ucase())) {
 			goto maindict;
 		}
@@ -2098,7 +2132,7 @@ gotdictvoc:
 				}
 				dictrec = "";
 			}
-		}else{
+		} else {
 			if (dictrec.reado(dictvoc, word.ucase())) {
 				goto gotdictvoc;
 			}
@@ -2178,12 +2212,12 @@ subroutine printbreaks() {
 			if (leveln gt 1 and not(html)) {
 				tx ^= underline ^ FM;
 			}
-		}else{
+		} else {
 			if (not html) {
 				//underline2=if breakleveln>=nbreaks then bar else underline
 				//WARNING TODO: check ternary op following;
 				underline2 = leveln eq 1 ? underline : bar;
-				if (not((tx.substr(-2,2)).index(ulchar))) {
+				if (not((tx.substr(-2, 2)).index(ulchar))) {
 					if (tx[-1] ne FM) {
 						tx ^= FM;
 					}
@@ -2202,7 +2236,13 @@ subroutine printbreaks() {
 			}
 			tx ^= "<tr";
 			if (lastblockn) {
-				tx ^= " style=\"cursor:pointer\" onclick=\"toggle(" "'" "B" ^ lastblockn ^ "'" ")\"";
+				tx ^=
+					" style=\"cursor:pointer\" onclick=\"toggle("
+					"'"
+					"B" ^
+					lastblockn ^
+					"'"
+					")\"";
 			}
 			//if detsupp<2 or (nbreaks>1 and leveln>1) then tx:=' style="font-weight:bold"'
 			tx ^= ">";
@@ -2222,10 +2262,10 @@ subroutine printbreaks() {
 							//breaktotal(coln,leveln+1)+=cell
 							call addunits(cell, breaktotal(coln, leveln + 1), VM);
 #endif
-						}else{
+						} else {
 							if (((breaktotal(coln, leveln + 1)).isnum()) and cell.isnum()) {
 								breaktotal(coln, leveln + 1) += cell;
-							}else{
+							} else {
 								str1 = cell;
 								str2 = breaktotal(coln, leveln + 1);
 								gosub addstr();
@@ -2252,7 +2292,7 @@ subroutine printbreaks() {
 				//and clear it
 				breaktotal(coln, leveln) = "";
 
-			//break column
+				//break column
 			} else if (coln eq breakcoln) {
 
 				//print the old break value
@@ -2287,7 +2327,6 @@ subroutine printbreaks() {
 					//insert the page break data
 					//swap "'B'" with tt in newhead
 					newhead.swapper(pagebreaks.a(coln), tt);
-
 				}
 
 				if (detsupp lt 2 and not(anytotals)) {
@@ -2295,26 +2334,25 @@ subroutine printbreaks() {
 					cell = "";
 				}
 
-			//other columns are blank
+				//other columns are blank
 			} else {
 				cell = "";
 
 				//if 1 or detsupp<2 then
-					//cell=oldbreakvalue(coln)
+				//cell=oldbreakvalue(coln)
 				cell = oconv(oldbreakvalue(coln), coldict(coln).a(7));
-				if (breakcolns.locateusing(FM,coln,colbreakn)) {
+				if (breakcolns.locateusing(FM, coln, colbreakn)) {
 					if (colbreakn lt leveln) {
 						cell = "Total";
 					}
 				}
 				// end
-
 			}
 
 			if (coldict(coln).a(10)) {
 				if (not(html)) {
-					cell=cell.substr(1,coldict(coln).a(10));
-					cell=oconv(cell,coldict(coln).a(11));
+					cell = cell.substr(1, coldict(coln).a(10));
+					cell = oconv(cell, coldict(coln).a(11));
 				} else {
 					tx ^= td0 ^ "<th";
 					if (not usecols) {
@@ -2333,16 +2371,16 @@ subroutine printbreaks() {
 				}
 			}
 
-		};//coln;
+		};	//coln;
 
-	//breakrowexit:
+		//breakrowexit:
 		if (html) {
 			tx ^= "</tr>";
 		}
 
 		if (detsupp lt 2) {
 			//if leveln>1 and not(html) then tx:=fm:underline
-		}else{
+		} else {
 			if (not html) {
 				tx ^= FM ^ underline2;
 			}
@@ -2354,7 +2392,7 @@ subroutine printbreaks() {
 			tx = storetx;
 		}
 
-	};//leveln;
+	};	//leveln;
 
 	//force new page and new heading
 	//if newhead and detsupp<2 then
@@ -2396,14 +2434,12 @@ subroutine printbreaks() {
 
 			//close supertable
 			tx.r(-1, "</td></tr></table>");
-
 		}
 		if (tx) {
 
 			gosub printtx();
-
 		}
-	}else{
+	} else {
 		tx = "";
 	}
 
@@ -2433,7 +2469,7 @@ subroutine addstr() {
 			char2 = str3[ii];
 			if (char2 eq " ") {
 				str3.splicer(ii, 1, char1);
-			}else{
+			} else {
 				//if num(char1) else char1=1
 				//if num(char2) else char2=1
 				if (char1.isnum() and char2.isnum()) {
@@ -2441,13 +2477,13 @@ subroutine addstr() {
 					if (char3 gt 9) {
 						char3 = "*";
 					}
-				}else{
+				} else {
 					char3 = char1;
 				}
 				str3.splicer(ii, 1, char3);
 			}
 		}
-	};//ii;
+	};	//ii;
 
 	return;
 }
@@ -2461,7 +2497,7 @@ subroutine newheadreplacements() {
 		tt2 = calculate(dictid);
 		tt2.swapper("'", "''");
 		newhead.swapper(tt, tt2);
-	};//ii;
+	};	//ii;
 	return;
 }
 
@@ -2471,8 +2507,8 @@ subroutine emailing() {
 	}
 
 	if ((DQ ^ "'").index(emailtoid[1])) {
-		nextemailto = emailtoid.substr(2,emailtoid.length() - 2);
-	}else{
+		nextemailto = emailtoid.substr(2, emailtoid.length() - 2);
+	} else {
 		nextemailto = calculate(emailtoid);
 	}
 	if (emailccid) {
@@ -2505,7 +2541,7 @@ subroutine emailing() {
 
 		if (emailsubject) {
 			tt3 = emailsubject;
-		}else{
+		} else {
 			//tt3='EXODUS: ':field(head<1,1,1>,"'",1)
 			tt3 = head.a(1, 1, 1).field("'", 1);
 			if (tt3.index(">")) {
@@ -2528,7 +2564,6 @@ subroutine emailing() {
 		// call msg(quote(system<2>):' failed to reopen')
 		// stop
 		// end
-
 	}
 
 	emailto = nextemailto;
@@ -2539,4 +2574,3 @@ subroutine emailing() {
 }
 
 programexit()
-

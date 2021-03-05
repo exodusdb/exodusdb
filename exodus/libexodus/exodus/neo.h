@@ -110,18 +110,18 @@ functions are analogous to dlopen, dlsym, and dlclose in the POSIX standard API.
 #pragma warning(disable : 4190)
 
 // this is not needed since it is automatically generated if missing
-BOOL APIENTRY DllMain(HANDLE hModule, DWORD dwReason, LPVOID lpReserved) { return TRUE; };
+BOOL APIENTRY DllMain(HANDLE hModule, DWORD dwReason, LPVOID lpReserved) {
+	return TRUE;
+};
 
-extern "C"
-{
+extern "C" {
 
-#define function(funcname)                                                                         \
-	exodus::var __declspec(dllexport) funcname(exodus::MvEnvironment& env)                     \
-	{
+#define function(funcname) \
+	exodus::var __declspec(dllexport) funcname(exodus::MvEnvironment& env) {
 
 #define functionexit }
 
 #define libraryexit }
 
 #endif EXODUS_POSIX
-#endif // EXO_H
+#endif	// EXO_H

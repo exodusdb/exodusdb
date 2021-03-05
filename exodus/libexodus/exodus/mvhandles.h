@@ -18,8 +18,7 @@
 #include <string>
 #include <vector>
 
-namespace exodus
-{
+namespace exodus {
 
 using CACHED_HANDLE = void*;
 using DELETER_AND_DESTROYER = void (*)(CACHED_HANDLE);
@@ -27,21 +26,18 @@ using DELETER_AND_DESTROYER = void (*)(CACHED_HANDLE);
 #define BAD_CACHED_HANDLE ((void*)0)
 #define HANDLE_ENTRY_FREE ((void*)0)
 
-class MvHandleEntry
-{
-      public:
+class MvHandleEntry {
+   public:
 	MvHandleEntry();
-	DELETER_AND_DESTROYER deleter; // =0 means that slot is empty
+	DELETER_AND_DESTROYER deleter;	// =0 means that slot is empty
 	CACHED_HANDLE handle;
 	std::string extra;
 };
 
-class MvHandlesCache
-{
-      public:
+class MvHandlesCache {
+   public:
 	MvHandlesCache();
-	int add_handle(CACHED_HANDLE handle_to_opened_file, DELETER_AND_DESTROYER del,
-		       std::string name);
+	int add_handle(CACHED_HANDLE handle_to_opened_file, DELETER_AND_DESTROYER del, std::string name);
 	// MvHandleEntry & operator [] (int idx)
 	//{
 	//	return conntbl[ idx];
@@ -50,14 +46,14 @@ class MvHandlesCache
 	void del_handle(int index);
 	virtual ~MvHandlesCache();
 
-      private:
+   private:
 	std::vector<MvHandleEntry> conntbl;
 };
 
 #ifndef INSIDE_MVHANDLES_CPP
 extern
-#endif				     // INSIDE_MVHANDLES_CPP
-    MvHandlesCache mv_handles_cache; // global table (intended usage: mvos.cpp and mvdbpostgres.cpp)
+#endif								  // INSIDE_MVHANDLES_CPP
+	MvHandlesCache mv_handles_cache;  // global table (intended usage: mvos.cpp and mvdbpostgres.cpp)
 
-} // namespace exodus
-#endif // MVHANDLES_H
+}  // namespace exodus
+#endif	// MVHANDLES_H

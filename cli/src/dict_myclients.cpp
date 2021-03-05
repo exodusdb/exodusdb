@@ -9,16 +9,15 @@ dict(name_and_type) {
 #include <exodus/library.h>
 
 libraryinit(name_and_type)
-function main() {
-	ANS=RECORD(1) ^ " (" ^ RECORD(2) ^ ")";
-	return ANS;//.outputl("ANS=");
+	function main() {
+	ANS = RECORD(1) ^ " (" ^ RECORD(2) ^ ")";
+	return ANS;	 //.outputl("ANS=");
 }
 libraryexit(name_and_type)
 
-libraryinit(name_and_code)
-function main() {
-	ANS=RECORD(1) ^ " (" ^ ID ^ ")";
-	return ANS;//.outputl("ANS=");
+	libraryinit(name_and_code)
+		function main() {
+	ANS = RECORD(1) ^ " (" ^ ID ^ ")";
+	return ANS;	 //.outputl("ANS=");
 }
 libraryexit(name_and_code)
-

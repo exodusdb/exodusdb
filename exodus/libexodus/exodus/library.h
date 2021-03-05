@@ -16,11 +16,11 @@
 // and are redefined without DLLEXPORT here
 #undef subroutine
 #undef function
-#define subroutine                                                                                 \
-      public:                                                                                      \
+#define subroutine \
+   public:         \
 	void
-#define function                                                                                   \
-      public:                                                                                      \
+#define function \
+   public:       \
 	var
 
 // a library section is just a class plus a global exported function that allows the class
@@ -58,28 +58,24 @@ call ExodusProgram::* )(exodus::in)' to 'exodus::pExodusProgramBaseMemberFunctio
 Pointers to members have different representations; cannot cast between them
 */
 
-_Pragma("GCC diagnostic ignored \"-Wcast-function-type\"")\
+_Pragma("GCC diagnostic ignored \"-Wcast-function-type\"")
 
-#define libraryexit(CLASSNAME)                                                                     \
+#define libraryexit(CLASSNAME)                                                                 \
 	classexit(CLASSNAME) extern "C" DLL_PUBLIC void exodusprogrambasecreatedelete_##CLASSNAME( \
-	    pExodusProgramBase& pexodusprogrambase, MvEnvironment& mv,                             \
-	    pExodusProgramBaseMemberFunction& pmemberfunction)                                     \
-	{                                                                                          \
-		if (pexodusprogrambase)                                                            \
-		{                                                                                  \
-			delete pexodusprogrambase;                                                 \
-			pexodusprogrambase = NULL;                                                 \
-			pmemberfunction = NULL;                                                    \
-		}                                                                                  \
-		else                                                                               \
-		{                                                                                  \
-			pexodusprogrambase = new CLASSNAME##ExodusProgram(mv);                     \
-			_Pragma("GCC diagnostic push")\
-			pmemberfunction =                                                          \
-			    (pExodusProgramBaseMemberFunction)&CLASSNAME##ExodusProgram::main;     \
-			_Pragma("GCC diagnostic pop")\
-		}                                                                                  \
-		return;                                                                            \
+		pExodusProgramBase& pexodusprogrambase, MvEnvironment& mv,                             \
+		pExodusProgramBaseMemberFunction& pmemberfunction) {                                   \
+		if (pexodusprogrambase) {                                                              \
+			delete pexodusprogrambase;                                                         \
+			pexodusprogrambase = NULL;                                                         \
+			pmemberfunction = NULL;                                                            \
+		} else {                                                                               \
+			pexodusprogrambase = new CLASSNAME##ExodusProgram(mv);                             \
+			_Pragma("GCC diagnostic push")                                                     \
+				pmemberfunction =                                                              \
+					(pExodusProgramBaseMemberFunction)&CLASSNAME##ExodusProgram::main;         \
+			_Pragma("GCC diagnostic pop")                                                      \
+		}                                                                                      \
+		return;                                                                                \
 	}
-// purpose of the above is to either return a new exodusprogram object
-// and a pointer to its main function - or to delete an exodusprogram object
+	// purpose of the above is to either return a new exodusprogram object
+	// and a pointer to its main function - or to delete an exodusprogram object

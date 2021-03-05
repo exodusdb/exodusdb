@@ -9,7 +9,7 @@
 
 #include <boost/locale.hpp>
 
-#include <libpq-fe.h> //in postgres/include
+#include <libpq-fe.h>  //in postgres/include
 
 #include <exodus/mv.h>
 
@@ -19,8 +19,7 @@
 
 //#include <exodus/mvutf.h>
 
-namespace exodus
-{
+namespace exodus {
 
 // defined in MVdbPostgres
 extern boost::thread_specific_ptr<PGconn> tss_pgconns;
@@ -31,8 +30,7 @@ EXODUS_IPC_EXTERN boost::mutex global_ipcmutex;
 EXODUS_IPC_EXTERN boost::condition global_ipccondition;
 
 // definition here prevents this header from being included in more than one file
-inline std::wstring fromutf8(const char* start, const int length)
-{
+inline std::wstring fromutf8(const char* start, const int length) {
 	// return wstringfromUTF8((UTF8*)(start), length);
 	return boost::locale::conv::utf_to_utf<wchar_t>(start, start + length);
 }
@@ -40,9 +38,8 @@ inline std::wstring fromutf8(const char* start, const int length)
 // this function is started as a thread by startipc()
 int MVipc(const int environmentn, var& pgconnparams);
 
-void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsechars,
-			  std::string& response, ExodusFunctorBase& exodusfunctorbase);
+void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsechars, std::string& response, ExodusFunctorBase& exodusfunctorbase);
 
-} // namespace exodus
+}  // namespace exodus
 
-#endif // MVIPC_H
+#endif	// MVIPC_H
