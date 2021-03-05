@@ -15,7 +15,8 @@ namespace exodus {
 #pragma GCC diagnostic ignored "-Wuninitialized"
 // constructor with an mvenvironment
 DLL_PUBLIC
-ExodusProgramBase::ExodusProgramBase(MvEnvironment& inmv) : mv(inmv)
+ExodusProgramBase::ExodusProgramBase(MvEnvironment& inmv)
+	: mv(inmv)
 //	,
 //	cache_dictid_(""),
 //	cache_perform_libid_(""),
@@ -231,56 +232,56 @@ bool ExodusProgramBase::select(const var& sortselectclause) {
 			//value.outputl(dictids(fieldn) ^ " value=");
 
 			switch (int(opnos(fieldn))) {
-			case 0:
-				break;
-			case 1: // =
-				ok = value == reqvalues(fieldn);
-				break;
-			case 2: // <>
-				ok = value != reqvalues(fieldn);
-				break;
-			case 3: // >
-				ok = value > reqvalues(fieldn);
-				break;
-			case 4: // <
-				ok = value < reqvalues(fieldn);
-				break;
-			case 5: // >=
-				ok = value >= reqvalues(fieldn);
-				break;
-			case 6: // <=
-				ok = value <= reqvalues(fieldn);
-				break;
-			case 7: // ~ regex
-				ok = value.match(reqvalues(fieldn));
-				break;
-			case 8: // ~* regex case insensitive
-				ok = value.match(reqvalues(fieldn), "i");
-				break;
-			case 9: // !~ not regex
-				ok = !(value.match(reqvalues(fieldn)));
-				break;
-			case 10: // !~* not regex case insensitive
-				ok = !(value.match(reqvalues(fieldn), "i"));
-				break;
-			case 11: // between x and y, from x to
-				ok = (value >= reqvalues(fieldn) && value <= reqvalues2(fieldn));
-				break;
-			case 12: // not between x and y, not from x to y
-				ok = (value < reqvalues(fieldn) || value > reqvalues2(fieldn));
-				break;
-			case 13: // in list
-				ok = reqvalues(fieldn).locate(value);
-				break;
-			case 14: // not in list
-				ok = !reqvalues(fieldn).locate(value);
-				break;
-			case 15: // is true (not "" 0 "0" "00" "0.0" etc).
-				ok = value;
-				break;
-			case 16: // is false (isnt true)
-				ok = !value;
-				break;
+				case 0:
+					break;
+				case 1:	 // =
+					ok = value == reqvalues(fieldn);
+					break;
+				case 2:	 // <>
+					ok = value != reqvalues(fieldn);
+					break;
+				case 3:	 // >
+					ok = value > reqvalues(fieldn);
+					break;
+				case 4:	 // <
+					ok = value < reqvalues(fieldn);
+					break;
+				case 5:	 // >=
+					ok = value >= reqvalues(fieldn);
+					break;
+				case 6:	 // <=
+					ok = value <= reqvalues(fieldn);
+					break;
+				case 7:	 // ~ regex
+					ok = value.match(reqvalues(fieldn));
+					break;
+				case 8:	 // ~* regex case insensitive
+					ok = value.match(reqvalues(fieldn), "i");
+					break;
+				case 9:	 // !~ not regex
+					ok = !(value.match(reqvalues(fieldn)));
+					break;
+				case 10:  // !~* not regex case insensitive
+					ok = !(value.match(reqvalues(fieldn), "i"));
+					break;
+				case 11:  // between x and y, from x to
+					ok = (value >= reqvalues(fieldn) && value <= reqvalues2(fieldn));
+					break;
+				case 12:  // not between x and y, not from x to y
+					ok = (value < reqvalues(fieldn) || value > reqvalues2(fieldn));
+					break;
+				case 13:  // in list
+					ok = reqvalues(fieldn).locate(value);
+					break;
+				case 14:  // not in list
+					ok = !reqvalues(fieldn).locate(value);
+					break;
+				case 15:  // is true (not "" 0 "0" "00" "0.0" etc).
+					ok = value;
+					break;
+				case 16:  // is false (isnt true)
+					ok = !value;
+					break;
 			}
 			if (!ok) {
 				//debug
@@ -501,8 +502,7 @@ void ExodusProgramBase::note(const var& msg, const var& options) const {
 	var buffer = "";
 	mssg(msg, options, buffer);
 }
-void ExodusProgramBase::note(const var& msg, const var& options, var& buffer,
-							 const var& params) const {
+void ExodusProgramBase::note(const var& msg, const var& options, var& buffer, const var& params) const {
 	mssg(msg, options, buffer, params);
 }
 
@@ -510,8 +510,7 @@ void ExodusProgramBase::mssg(const var& msg, const var& options) const {
 	var buffer = "";
 	mssg(msg, options, buffer);
 }
-void ExodusProgramBase::mssg(const var& msg, const var& options, var& buffer,
-							 const var& params) const {
+void ExodusProgramBase::mssg(const var& msg, const var& options, var& buffer, const var& params) const {
 
 	//skip if just "downing" a previous "upped" message
 	if (options.index("D")) {
@@ -558,7 +557,7 @@ void ExodusProgramBase::mssg(const var& msg, const var& options, var& buffer,
 			//escape anywhere in the input returned as a single ESC character
 			//or empty input with ESC option means ESC
 			if (options.index("E") and (buffer == "" or buffer.index("\x1B")))
-				buffer = "\x1B"; //esc
+				buffer = "\x1B";  //esc
 
 			std::cout << std::endl;
 		} else {
@@ -591,12 +590,11 @@ var ExodusProgramBase::authorised(const var& task0) {
 	return authorised(task0, msg);
 }
 
-var ExodusProgramBase::authorised(const var& task0, var& msg, const var& defaultlock,
-								  const var& username0) {
+var ExodusProgramBase::authorised(const var& task0, var& msg, const var& defaultlock, const var& username0) {
 
 	var username;
 	var msgusername;
-	var taskn; // num
+	var taskn;	// num
 	var taskn2;
 	var xx;
 	var usern;
@@ -684,7 +682,7 @@ var ExodusProgramBase::authorised(const var& task0, var& msg, const var& default
 			// SECURITY.eraser(11, taskn);
 			SECURITY.remover(10, taskn);
 			SECURITY.remover(11, taskn);
-		updateprivs:
+updateprivs:
 			gosub writeuserprivs();
 			return 1;
 		} else if (renaming) {
@@ -747,7 +745,7 @@ var ExodusProgramBase::authorised(const var& task0, var& msg, const var& default
 	var locks = SECURITY.a(11, taskn);
 	if (locks == "") {
 		if (positive and not isadmin) {
-		notallowed:
+notallowed:
 			// MSG=capitalise(TASK):'||Sorry, ':capitalise(msgusername):', you are not
 			// authorised to do this.|'
 			if (msgusername != USERNAME)
@@ -822,7 +820,7 @@ var ExodusProgramBase::authorised(const var& task0, var& msg, const var& default
 			// call note(task:' ko')
 			// RETURN 0
 			goto notallowed;
-	}; // lockn;
+	};	// lockn;
 
 	// ok:
 	// CALL STATUP(2,3,TASK)
@@ -890,7 +888,7 @@ var ExodusProgramBase::capitalise(const var& str0, const var& mode0, const var& 
 				}
 			}
 
-		}; // ii;
+		};	// ii;
 
 		string2.swapper("\'S ", "\'s ");
 		if (string2.substr(-2, 2) == "\'S")
@@ -941,7 +939,7 @@ var ExodusProgramBase::capitalise(const var& str0, const var& mode0, const var& 
 					}
 				}
 			}
-		}; // ii;
+		};	// ii;
 
 		if (mode0.index("TRIM", 1)) {
 			string2.converter(" " _FM_, _FM_ " ");
@@ -1038,7 +1036,7 @@ var ExodusProgramBase::perform(const var& sentence) {
 		std::string str_libname = libid.toString();
 		if (!perform_exodusfunctorbase_.initsmf(str_libname.c_str(),
 												"exodusprogrambasecreatedelete_",
-												true // forcenew each perform/execute
+												true  // forcenew each perform/execute
 												)) {
 			USER4 ^= "perform() Cannot find shared library \"" + str_libname +
 					 "\", or \"libraryexit()\" is not present in it.";
@@ -1103,8 +1101,7 @@ var ExodusProgramBase::perform(const var& sentence) {
 	return ANS;
 }
 
-var ExodusProgramBase::xlate(const var& filename, const var& key, const var& fieldno_or_name,
-							 const var& mode) {
+var ExodusProgramBase::xlate(const var& filename, const var& key, const var& fieldno_or_name, const var& mode) {
 
 	// TODO implement additional MV argument
 
@@ -1157,8 +1154,7 @@ var ExodusProgramBase::xlate(const var& filename, const var& key, const var& fie
 	return results;
 }
 
-var ExodusProgramBase::calculate(const var& dictid, const var& dictfile, const var& id,
-								 const var& record, const var& mvno) {
+var ExodusProgramBase::calculate(const var& dictid, const var& dictfile, const var& id, const var& record, const var& mvno) {
 
 	//dictid @ID/@id is hard coded to return ID
 	//to avoid incessant lookup in main file dictionary and then defaulting to dict_voc
@@ -1203,9 +1199,9 @@ var ExodusProgramBase::calculate(const var& dictid) {
 			// try lower case
 			if (not cache_dictrec_.reado(DICT, dictid.lcase())) {
 				// try dict_voc
-				var dictvoc; // TODO implement mv.DICTVOC to avoid opening
+				var dictvoc;  // TODO implement mv.DICTVOC to avoid opening
 				if (not dictvoc.open("dict_voc")) {
-				baddict:
+baddict:
 					throw MVError("ExodusProgramBase::calculate(" ^ dictid ^
 								  ") dictionary record not in DICT " ^
 								  DICT.a(1).quote() ^ " nor in DICT_VOC");
@@ -1402,8 +1398,7 @@ var ExodusProgramBase::decide(const var& question, const var& options) const {
 	return decide(question, options, reply, 1);
 }
 
-var ExodusProgramBase::decide(const var& questionx, const var& optionsx, var& reply,
-							  const int defaultreply) const {
+var ExodusProgramBase::decide(const var& questionx, const var& optionsx, var& reply, const int defaultreply) const {
 
 	// If default reply is 0 then there is no default
 	// and pressing Enter returns "" and reply is set to 0
@@ -1525,9 +1520,7 @@ bool ExodusProgramBase::lockrecord(const var& filename, var& file, const var& ke
 	return (bool)lockrecord(filename, file, keyx, record);
 }
 
-bool ExodusProgramBase::lockrecord(const var& filename, var& file, const var& keyx,
-								   const var& recordx, const int waitsecs0,
-								   const bool allowduplicate) const {
+bool ExodusProgramBase::lockrecord(const var& filename, var& file, const var& keyx, const var& recordx, const int waitsecs0, const bool allowduplicate) const {
 
 	// linemark
 	// common /shadow.mfs/
@@ -1654,7 +1647,7 @@ var ExodusProgramBase::encrypt2(const var& encrypt0) const {
 		;
 		encryptkey = (encryptkey % 390001) * (var(encrypt[1])).seq() + 1;
 		encrypt.splicer(1, 1, "");
-	} // loop;
+	}  // loop;
 
 	// pass2
 	while (true) {
@@ -1664,7 +1657,7 @@ var ExodusProgramBase::encrypt2(const var& encrypt0) const {
 		if (!encryptkey)
 			break;
 		;
-	} // loop;
+	}  // loop;
 
 	return encrypt;
 }
@@ -1865,7 +1858,7 @@ var ExodusProgramBase::getuserdept(const var& usercode) {
 		if (SECURITY.a(1, usernx) == "---")
 			break;
 		;
-	}; // usern;
+	};	// usern;
 
 	// get the department code
 	ANS = SECURITY.a(1, usernx - 1);
@@ -2031,9 +2024,9 @@ var ExodusProgramBase::invertarray(const var& input, const var& force0 /*=0*/) {
 				if (cell.length() or force) {
 					output.r(vn, fn, cell);
 				}
-			}; //vn;
+			};	//vn;
 		}
-	}; //fn;
+	};	//fn;
 
 	return output;
 }
@@ -2125,7 +2118,7 @@ var ExodusProgramBase::elapsedtimetext(const var& fromdate, const var& fromtime,
 					text ^= "s";
 				}
 			} else if (not(minutes)) {
-			zero:
+zero:
 				text.r(-1, "< 1 msec");
 			} else {
 				text.r(-1, "exactly");
@@ -2155,8 +2148,8 @@ var ExodusProgramBase::number(const var& type, const var& input0, const var& nde
 	//~/arev/xxx/number.cpp to ~/exodus/cli/src
 
 	var fmtx;
-	var input1; //num
-	var delim;	//num
+	var input1;	 //num
+	var delim;	 //num
 	var output1;
 
 	var ndecs = ndecs0;
@@ -2298,7 +2291,7 @@ var ExodusProgramBase::number(const var& type, const var& input0, const var& nde
 			break;
 		//output:=char(256-delim)
 		output ^= var().chr(RM.seq() + 1 - delim);
-	} //loop;
+	}  //loop;
 
 	return 0;
 }
@@ -2351,9 +2344,9 @@ void ExodusProgramBase::sortarray(var& array, const var& fns, const var& orderby
 			fn = fns.a(1, fnn);
 			var othervalue = array.a(fn, vn);
 			newarray.inserter(fn, newvn, othervalue);
-		}; //fnn;
+		};	//fnn;
 
-	}; //vn;
+	};	//vn;
 
 	array.r(sortfn, sorted);
 
@@ -2361,9 +2354,9 @@ void ExodusProgramBase::sortarray(var& array, const var& fns, const var& orderby
 	for (var fnn = 2; fnn <= nfns; ++fnn) {
 		fn = fns.a(1, fnn);
 		array.r(fn, newarray.a(fn));
-	} //fnn;
+	}  //fnn;
 
 	return;
 }
 
-} // namespace exodus
+}  // namespace exodus

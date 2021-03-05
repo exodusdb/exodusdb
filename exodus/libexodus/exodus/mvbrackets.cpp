@@ -39,4 +39,4 @@ void var_brackets_proxy::operator=(char char1) {
 	return;
 }
 
-} //namespace exodus
+}  //namespace exodus

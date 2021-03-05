@@ -35,7 +35,8 @@ namespace exodus {
 
 // was declared private to prevent it being called but somehow still "dim xyz();" still compiles
 // although with a warning now public to allow usage in class variables
-dim::dim() : nrows_(1), ncols_(1), initialised_(false)
+dim::dim()
+	: nrows_(1), ncols_(1), initialised_(false)
 // data_ <--initialized below (after the 'if/throw' statement)
 {
 	// throw MVArrayDimensionedZero();
@@ -56,7 +57,8 @@ dim::dim(dim&& sourcedim) noexcept {
 	data_ = sourcedim.data_;
 }
 
-dim::dim(int rows, int cols) : nrows_(rows), ncols_(cols), initialised_(true)
+dim::dim(int rows, int cols)
+	: nrows_(rows), ncols_(cols), initialised_(true)
 // data_ <--initialized below (after the 'if/throw' statement)
 {
 	if (rows == 0 || cols == 0)
@@ -255,4 +257,4 @@ var dim::join(const var& sepchar) const {
 	return output;
 }
 
-} // namespace exodus
+}  // namespace exodus

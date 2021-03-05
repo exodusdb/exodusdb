@@ -2,8 +2,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 //#include <errno.h>
-#include <iostream>
 #include <stdio.h>
+#include <iostream>
 #include <string>
 
 namespace exodus {
@@ -114,4 +114,4 @@ void releaseprocess(int* fd) {
 	*fd = 0;
 }
 
-} // namespace exodus
+}  // namespace exodus

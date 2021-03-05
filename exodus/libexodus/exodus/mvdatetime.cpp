@@ -26,25 +26,27 @@ THE SOFTWARE.
 #define PICK_UNIX_DAY_OFFSET -732
 
 const char* shortmths = "JAN\0FEB\0MAR\0APR\0MAY\0JUN\0JUL\0AUG\0SEP\0OCT\0NOV\0DEC\0";
-const char* longmths = "\0JANUARY\0  "
-					   "\0FEBRUARY\0 "
-					   "\0MARCH\0    "
-					   "\0APRIL\0    "
-					   "\0MAY\0      "
-					   "\0JUNE\0     "
-					   "\0JULY\0     "
-					   "\0AUGUST\0   "
-					   "\0SEPTEMBER\0"
-					   "\0OCTOBER\0  "
-					   "\0NOVEMBER\0 "
-					   "\0DECEMBER\0 ";
-const char* longdayofweeks = "MONDAY\0   "
-							 "TUESDAY\0  "
-							 "WEDNESDAY\0"
-							 "THURSDAY\0 "
-							 "FRIDAY\0   "
-							 "SATURDAY\0 "
-							 "SUNDAY\0   ";
+const char* longmths =
+	"\0JANUARY\0  "
+	"\0FEBRUARY\0 "
+	"\0MARCH\0    "
+	"\0APRIL\0    "
+	"\0MAY\0      "
+	"\0JUNE\0     "
+	"\0JULY\0     "
+	"\0AUGUST\0   "
+	"\0SEPTEMBER\0"
+	"\0OCTOBER\0  "
+	"\0NOVEMBER\0 "
+	"\0DECEMBER\0 ";
+const char* longdayofweeks =
+	"MONDAY\0   "
+	"TUESDAY\0  "
+	"WEDNESDAY\0"
+	"THURSDAY\0 "
+	"FRIDAY\0   "
+	"SATURDAY\0 "
+	"SUNDAY\0   ";
 
 #include "boost/date_time/c_local_time_adjustor.hpp"
 #include "boost/date_time/gregorian/gregorian.hpp"
@@ -81,7 +83,7 @@ void ptime2mvdatetime(const boost::posix_time::ptime& ptimex, int& mvdate, int& 
 	// convert to local date
 	boost::gregorian::date filedate = localptimex.date();
 	// convert to mv days since 31/12/1967
-	boost::gregorian::date dayzero(1967, 12, 31); // an arbitrary date
+	boost::gregorian::date dayzero(1967, 12, 31);  // an arbitrary date
 	mvdate = (filedate - dayzero).days();
 
 	return;
@@ -174,12 +176,12 @@ var var::iconv_D(const char* conversion) const {
 	while (*conversionchar) {
 
 		switch (*conversionchar) {
-		case 'E':
-			dayfirst = true;
-			break;
-		case 'S':
-			yearfirst = true;
-			break;
+			case 'E':
+				dayfirst = true;
+				break;
+			case 'S':
+				yearfirst = true;
+				break;
 		}
 		++conversionchar;
 	}
@@ -333,76 +335,76 @@ var var::oconv_D(const char* conversion) const {
 		int dow;
 		switch (*conversionchar) {
 
-		//(E)uropean date - day first
-		case 'E':
-			dayfirst = true;
-			break;
+			//(E)uropean date - day first
+			case 'E':
+				dayfirst = true;
+				break;
 
-		// Not AREV
-		// DM returns month number
-		// DMA returns full month name
-		case 'M':
-			++conversionchar;
-			if (*conversionchar == 'A')
-				return &longmths[ymd.month * 11 - 10];
-			return var(ymd.month);
+			// Not AREV
+			// DM returns month number
+			// DMA returns full month name
+			case 'M':
+				++conversionchar;
+				if (*conversionchar == 'A')
+					return &longmths[ymd.month * 11 - 10];
+				return var(ymd.month);
 
-		// Not AREV
-		// DW returns day of week number number 1-7 Mon-Sun
-		// DWA returns the day of week name
-		case 'W':
-			// calculate directly from pick date (construction of date above is wasted
-			// time) there appears to be only a name of day of week accessor in boost
-			// date and no number of day of accessor
-			dow = (((*this).floor() - 1) % 7) + 1;
-			++conversionchar;
-			if (*conversionchar == 'A')
-				return &longdayofweeks[dow * 10 - 10];
-			return dow;
+			// Not AREV
+			// DW returns day of week number number 1-7 Mon-Sun
+			// DWA returns the day of week name
+			case 'W':
+				// calculate directly from pick date (construction of date above is wasted
+				// time) there appears to be only a name of day of week accessor in boost
+				// date and no number of day of accessor
+				dow = (((*this).floor() - 1) % 7) + 1;
+				++conversionchar;
+				if (*conversionchar == 'A')
+					return &longdayofweeks[dow * 10 - 10];
+				return dow;
 
-		// Not AREV
-		// DY year (four digits or D2Y works too)
-		// DYn formatted
-		case 'Y':
-			yearfirst = true;
-			// yearonly=true;
-			// allow trailing digit as well to control ndigits
-			++conversionchar;
-			if ((*conversionchar) <= '9' && (*conversionchar) >= '0')
-				yeardigits = (*conversionchar) - '0';
-			--conversionchar;
-			break;
+			// Not AREV
+			// DY year (four digits or D2Y works too)
+			// DYn formatted
+			case 'Y':
+				yearfirst = true;
+				// yearonly=true;
+				// allow trailing digit as well to control ndigits
+				++conversionchar;
+				if ((*conversionchar) <= '9' && (*conversionchar) >= '0')
+					yeardigits = (*conversionchar) - '0';
+				--conversionchar;
+				break;
 
-		// Not AREV
-		// DD day of month
-		case 'D':
-			return var(ymd.day);
+			// Not AREV
+			// DD day of month
+			case 'D':
+				return var(ymd.day);
 
-		// Not AREV
-		// DQ returns quarter number
-		case 'Q':
-			return var(int((ymd.month - 1) / 3) + 1);
+			// Not AREV
+			// DQ returns quarter number
+			case 'Q':
+				return var(int((ymd.month - 1) / 3) + 1);
 
-		// Not AREV
-		// DJ returns day of year
-		case 'J':
-			return int(desired_date.day_of_year());
+			// Not AREV
+			// DJ returns day of year
+			case 'J':
+				return int(desired_date.day_of_year());
 
-		// iso year format - at the beginning
-		case 'S':
-			// alphamonth=false;
-			yearfirst = true;
-			break;
+			// iso year format - at the beginning
+			case 'S':
+				// alphamonth=false;
+				yearfirst = true;
+				break;
 
-		// DL LAST day of month
-		case 'L':
-			return var(desired_date.end_of_month().day());
+			// DL LAST day of month
+			case 'L':
+				return var(desired_date.end_of_month().day());
 
-		default:
-			sepchar = *conversionchar;
-			yearonly = false;
-			alphamonth = false;
-			break;
+			default:
+				sepchar = *conversionchar;
+				yearonly = false;
+				alphamonth = false;
+				break;
 		}
 		++conversionchar;
 	}
@@ -480,7 +482,7 @@ var var::oconv_MT(const char* conversion) const {
 
 	// defaults
 	bool twelvehour = false;
-	bool unlimited = false; // incompatible with twelvehour
+	bool unlimited = false;	 // incompatible with twelvehour
 	bool showsecs = false;
 	// bool decimalhours = false;
 	char sepchar = ':';
@@ -605,6 +607,6 @@ var var::oconv_MT(const char* conversion) const {
 	return newmv;
 }
 
-} // namespace exodus
+}  // namespace exodus
 
 #endif

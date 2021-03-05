@@ -115,4 +115,4 @@ void var::setcursor() const {
 	return;
 }
 
-} // namespace exodus
+}  // namespace exodus

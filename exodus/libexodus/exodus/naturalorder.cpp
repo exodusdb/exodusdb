@@ -223,7 +223,7 @@ naturalorderbegin:
 
 	// get integer part
 	val = 0.0;
-	power = 1.0; // here in case there is no fractional part
+	power = 1.0;  // here in case there is no fractional part
 	for (;;) {
 		if (iter == iterend)
 			goto naturalorderexit;
@@ -299,4 +299,4 @@ naturalorderexit:
 	return ostringstream1.str();
 }
 
-} // namespace exodus
+}  // namespace exodus

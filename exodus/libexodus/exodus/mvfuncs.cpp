@@ -94,7 +94,9 @@ int var::localeAwareCompare(const std::string& str1, const std::string& str2) {
 	return result;
 }
 
-var var::version() const { return var(__DATE__).iconv("D").oconv("D") ^ " " ^ var(__TIME__); }
+var var::version() const {
+	return var(__DATE__).iconv("D").oconv("D") ^ " " ^ var(__TIME__);
+}
 
 bool var::eof() const {
 	// THISIS("bool var::eof() const")
@@ -1058,7 +1060,7 @@ var var::unique() const {
 		}
 		if (not delimiter)
 			break;
-	} // loop;
+	}  // loop;
 	//result.splicer(-1, 1, "");
 	if (not result.var_str.empty())
 		result.var_str.pop_back();
@@ -1104,7 +1106,9 @@ var var::textseq() const {
 
 // only returns BINARY bytes 0-255 (128-255) cannot be stored in the database unless with other
 // bytes making up UTF8
-var var::chr(const int charno) const { return char(charno % 256); }
+var var::chr(const int charno) const {
+	return char(charno % 256);
+}
 
 // returns unicode 1-4 byte sequences (in utf8)
 // returns empty string for some invalid unicode points like 0xD800 to 0xDFFF which is reserved for
@@ -1611,7 +1615,7 @@ bool var::isnum(void) const {
 		char cc = var_str[ii];
 		// + 2B		- 2D
 		// . 2E		number 30-39
-		if (cc > '9') // for sure not a number
+		if (cc > '9')  // for sure not a number
 		{
 			var_typ = VARTYP_NANSTR;
 			return false;
@@ -1620,29 +1624,29 @@ bool var::isnum(void) const {
 			digit = true;
 		} else {
 			switch (cc) {
-			case '.':
-				if (point) // 2nd point - is non-numeric
-				{
+				case '.':
+					if (point)	// 2nd point - is non-numeric
+					{
+						var_typ = VARTYP_NANSTR;
+						return false;
+					}
+					point = true;
+					break;
+
+				case '-':
+				case '+':
+					// non-numeric if +/- is not the first character or is the only
+					// character
+					if (ii) {
+						var_typ = VARTYP_NANSTR;
+						return false;
+					}
+					break;
+
+				// any other character mean non-numeric
+				default:
 					var_typ = VARTYP_NANSTR;
 					return false;
-				}
-				point = true;
-				break;
-
-			case '-':
-			case '+':
-				// non-numeric if +/- is not the first character or is the only
-				// character
-				if (ii) {
-					var_typ = VARTYP_NANSTR;
-					return false;
-				}
-				break;
-
-			// any other character mean non-numeric
-			default:
-				var_typ = VARTYP_NANSTR;
-				return false;
 			}
 		}
 	}
@@ -2258,7 +2262,7 @@ var var::at(const int columnno) const {
 	// move to columnno 0
 	if (columnno == 0)
 		// return "\x1b[G";
-		return "\r"; // works on more terminals
+		return "\r";  // works on more terminals
 
 	//return "";
 
@@ -2403,4 +2407,4 @@ var var::xlate(const var& filename, const var& fieldno, const char* mode) const 
 	return response;
 }
 
-} // namespace exodus
+}  // namespace exodus

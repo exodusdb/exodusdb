@@ -29,8 +29,8 @@ THE SOFTWARE.
 
 //#include <istream>
 //#include <ostream>
-#include <algorithm> //for count in osrename
-#include <cstdlib>	 //for getenv and setenv/putenv
+#include <algorithm>  //for count in osrename
+#include <cstdlib>	  //for getenv and setenv/putenv
 //#include <stdlib.h>
 #include <fstream>
 #include <iostream>
@@ -256,7 +256,7 @@ en_ZW.utf8
 */
 
 class ExodusOnce {
-  public:
+   public:
 	ExodusOnce() { boost::call_once(&exodus_once_func, exodus_once_flag); }
 };
 static ExodusOnce exodus_once_static;
@@ -273,7 +273,7 @@ namespace exodus {
 //	- if user forgets to call osclose(), the stream remains opened (alive) until
 //		~MvHandlesCache for h_cache closes/deletes all registered objects.
 
-std::locale get_locale(const var& locale_name) // throw (MVError)
+std::locale get_locale(const var& locale_name)	// throw (MVError)
 {
 	// assume is checked prior to calling since this is an internal exodus function
 	// THISIS("std::locale get_locale(const var& locale_name)")
@@ -409,51 +409,51 @@ var& var::oconv_MR(const char* conversionchar) {
 #ifndef BOOST_HAS_ICU
 #define boost_mvstr toTstring((*this))
 #define boost_regex_replace std_boost::regex_replace
-	static const std_boost::regex digits_regex("\\d+"), // \d numeric
-		alpha_regex("[^\\W\\d]+"),						// \a alphabetic
-		alphanum_regex("\\w+"),							// \w alphanumeric
-		non_digits_regex("[^\\d]+"),					// \D non-numeric
-		non_alpha_regex("[\\W\\d]+"),					// \A non-alphabetic
-		non_alphanum_regex("\\W+");						// \W non-alphanumeric
+	static const std_boost::regex digits_regex("\\d+"),	 // \d numeric
+		alpha_regex("[^\\W\\d]+"),						 // \a alphabetic
+		alphanum_regex("\\w+"),							 // \w alphanumeric
+		non_digits_regex("[^\\d]+"),					 // \D non-numeric
+		non_alpha_regex("[\\W\\d]+"),					 // \A non-alphabetic
+		non_alphanum_regex("\\W+");						 // \W non-alphanumeric
 #else
 #define boost_mvstr this->var_str
 #define boost_regex_replace std_boost::u32regex_replace
-	static const std_boost::u32regex digits_regex = boost::make_u32regex("\\d+"); //\d numeric
+	static const std_boost::u32regex digits_regex = boost::make_u32regex("\\d+");  //\d numeric
 	static const std_boost::u32regex alpha_regex =
-		boost::make_u32regex("[^\\W\\d]+"); // \a alphabetic
+		boost::make_u32regex("[^\\W\\d]+");	 // \a alphabetic
 	static const std_boost::u32regex alphanum_regex =
-		boost::make_u32regex("\\w+"); // \w alphanumeric
+		boost::make_u32regex("\\w+");  // \w alphanumeric
 	static const std_boost::u32regex non_digits_regex =
-		boost::make_u32regex("[^\\d]+"); // \D non-numeric
+		boost::make_u32regex("[^\\d]+");  // \D non-numeric
 	static const std_boost::u32regex non_alpha_regex =
-		boost::make_u32regex("[\\W\\d]+"); // \A non-alphabetic
+		boost::make_u32regex("[\\W\\d]+");	// \A non-alphabetic
 	static const std_boost::u32regex non_alphanum_regex =
-		boost::make_u32regex("\\W+"); // \W non-alphanumeric
+		boost::make_u32regex("\\W+");  // \W non-alphanumeric
 #endif
 
 	// negate if /
 	if (*conversionchar == '/') {
 		++conversionchar;
 		switch (*conversionchar) {
-		// MC/N return everything except digits i.e. remove all digits 0123456789
-		case 'N': {
-			// this->var_str=std_boost::regex_replace(toTstring((*this)),digits_regex, "");
-			this->var_str = boost_regex_replace(boost_mvstr, digits_regex, "");
-			break;
-		}
+			// MC/N return everything except digits i.e. remove all digits 0123456789
+			case 'N': {
+				// this->var_str=std_boost::regex_replace(toTstring((*this)),digits_regex, "");
+				this->var_str = boost_regex_replace(boost_mvstr, digits_regex, "");
+				break;
+			}
 
-		// MC/A return everything except "alphabetic" i.e remove all "alphabetic"
-		case 'A': {
-			// this->var_str=std_boost::regex_replace(toTstring((*this)),alpha_regex, "");
-			this->var_str = boost_regex_replace(boost_mvstr, alpha_regex, "");
-			break;
-		}
-		// MC/B return everything except "alphanumeric" remove all "alphanumeric"
-		case 'B': {
-			// this->var_str=std_boost::regex_replace(toTstring((*this)),alphanum_regex, "");
-			this->var_str = boost_regex_replace(boost_mvstr, alphanum_regex, "");
-			break;
-		}
+			// MC/A return everything except "alphabetic" i.e remove all "alphabetic"
+			case 'A': {
+				// this->var_str=std_boost::regex_replace(toTstring((*this)),alpha_regex, "");
+				this->var_str = boost_regex_replace(boost_mvstr, alpha_regex, "");
+				break;
+			}
+			// MC/B return everything except "alphanumeric" remove all "alphanumeric"
+			case 'B': {
+				// this->var_str=std_boost::regex_replace(toTstring((*this)),alphanum_regex, "");
+				this->var_str = boost_regex_replace(boost_mvstr, alphanum_regex, "");
+				break;
+			}
 		}
 		return *this;
 	}
@@ -462,34 +462,34 @@ var& var::oconv_MR(const char* conversionchar) {
 	// std_boost::regex_replace
 
 	switch (*conversionchar) {
-	// MCN return only digits i.e. remove all non-digits
-	case 'N': {
-		// this->var_str=std_boost::regex_replace(toTstring((*this)),non_digits_regex, "");
-		this->var_str = boost_regex_replace(boost_mvstr, non_digits_regex, "");
-		break;
-	}
-	// MCA return only "alphabetic" i.e. remove all "non-alphabetic"
-	case 'A': {
-		// this->var_str=std_boost::regex_replace(toTstring((*this)),non_alpha_regex, "");
-		this->var_str = boost_regex_replace(boost_mvstr, non_alpha_regex, "");
-		break;
-	}
-	// MCB return only "alphanumeric" i.e. remove all "non-alphanumeric"
-	case 'B': {
-		// this->var_str=std_boost::regex_replace(toTstring((*this)),non_alphanum_regex, "");
-		this->var_str = boost_regex_replace(boost_mvstr, non_alphanum_regex, "");
-		break;
-	}
-	// MCL to lower case
-	case 'L': {
-		lcaser();
-		break;
-	}
-	// MCU to upper case
-	case 'U': {
-		ucaser();
-		break;
-	}
+		// MCN return only digits i.e. remove all non-digits
+		case 'N': {
+			// this->var_str=std_boost::regex_replace(toTstring((*this)),non_digits_regex, "");
+			this->var_str = boost_regex_replace(boost_mvstr, non_digits_regex, "");
+			break;
+		}
+		// MCA return only "alphabetic" i.e. remove all "non-alphabetic"
+		case 'A': {
+			// this->var_str=std_boost::regex_replace(toTstring((*this)),non_alpha_regex, "");
+			this->var_str = boost_regex_replace(boost_mvstr, non_alpha_regex, "");
+			break;
+		}
+		// MCB return only "alphanumeric" i.e. remove all "non-alphanumeric"
+		case 'B': {
+			// this->var_str=std_boost::regex_replace(toTstring((*this)),non_alphanum_regex, "");
+			this->var_str = boost_regex_replace(boost_mvstr, non_alphanum_regex, "");
+			break;
+		}
+		// MCL to lower case
+		case 'L': {
+			lcaser();
+			break;
+		}
+		// MCU to upper case
+		case 'U': {
+			ucaser();
+			break;
+		}
 	}
 
 	return *this;
@@ -825,8 +825,9 @@ var& var::replace(const var& regexstr, const var& replacementstr, const var& opt
 
 // in-place
 var& var::replacer(const var& regexstr, const var& replacementstr, const var& options) {
-	THISIS("var& var::replacer(const var& regexstr, const var& replacementstr, const var& "
-		   "options)")
+	THISIS(
+		"var& var::replacer(const var& regexstr, const var& replacementstr, const var& "
+		"options)")
 	THISISSTRINGMUTATOR()
 	ISSTRING(regexstr)
 	ISSTRING(replacementstr)
@@ -1065,7 +1066,9 @@ bool var::osopen(const var& osfilename, const var& locale) const {
 	return this->osopenx(osfilename, locale) != 0;
 }
 
-static void del_fstream(void* handle) { delete (std::fstream*)handle; }
+static void del_fstream(void* handle) {
+	delete (std::fstream*)handle;
+}
 
 std::fstream* var::osopenx(const var& osfilename, const var& locale) const {
 
@@ -1077,11 +1080,11 @@ std::fstream* var::osopenx(const var& osfilename, const var& locale) const {
 	if (THIS_IS_OSFILE()) {
 		pmyfile =
 			(std::fstream*)mv_handles_cache.get_handle((int)this->var_int, this->var_str);
-		if (pmyfile == 0) // nonvalid handle
+		if (pmyfile == 0)  // nonvalid handle
 		{
 			var_int = 0;
 			//			var_typ ^= VARTYP_OSFILE;	// clear bit
-			var_typ ^= VARTYP_OSFILE | VARTYP_INT; // only STR bit should remains
+			var_typ ^= VARTYP_OSFILE | VARTYP_INT;	// only STR bit should remains
 		}
 	}
 
@@ -1262,8 +1265,9 @@ bool var::osread(const char* osfilename, const var& codepage) {
 }
 
 var var::to_codepage(const var& codepage) const {
-	THISIS("bool var::to_codepage(const var& codepage="
-		   ") const")
+	THISIS(
+		"bool var::to_codepage(const var& codepage="
+		") const")
 	THISISSTRING()
 	ISSTRING(codepage)
 
@@ -1272,8 +1276,9 @@ var var::to_codepage(const var& codepage) const {
 }
 
 var var::from_codepage(const var& codepage) const {
-	THISIS("bool var::from_codepage(const var& codepage="
-		   ") const")
+	THISIS(
+		"bool var::from_codepage(const var& codepage="
+		") const")
 	THISISSTRING()
 	ISSTRING(codepage)
 
@@ -1285,8 +1290,9 @@ var var::from_codepage(const var& codepage) const {
 // utf-8 and converts all output to the specified codepage
 // otherwise no conversion is performed
 bool var::oswrite(const var& osfilename, const var& codepage) const {
-	THISIS("bool var::oswrite(const var& osfilename, const var& codepage="
-		   ") const")
+	THISIS(
+		"bool var::oswrite(const var& osfilename, const var& codepage="
+		") const")
 	THISISSTRING()
 	ISSTRING(osfilename)
 
@@ -1324,8 +1330,9 @@ bool var::osbwrite(const var& osfilevar, const var& offset) const {
 bool var::osbwrite(const var& osfilevar, var& offset) const {
 	// osfilehandle is just the filename but buffers the "file number" in the mvint too
 
-	THISIS("bool var::osbwrite(const var& osfilevar, var& offset) "
-		   "const")
+	THISIS(
+		"bool var::osbwrite(const var& osfilevar, var& offset) "
+		"const")
 	THISISSTRING()
 	// test the following only if necessary in osopenx
 	// ISSTRING(osfilename)
@@ -1341,7 +1348,7 @@ bool var::osbwrite(const var& osfilevar, var& offset) const {
 	// myfile.seekp (offset*sizeof(char));
 	// offset should be in bytes except for fixed multibyte code pages like UTF16 and UTF32
 	pmyfile->seekp(
-		static_cast<long>(offset.var_int)); // avoid warning, see comments to seekg()
+		static_cast<long>(offset.var_int));	 // avoid warning, see comments to seekg()
 
 	// NB but write length goes by number of wide characters (not bytes)
 	pmyfile->write(this->var_str.data(), int(this->var_str.length()));
@@ -1426,7 +1433,7 @@ ssize_t count_excess_UTF8_bytes(std::string& str) {
 
 		cptr -= 1;
 
-	} // next char
+	}  // next char
 
 	return numBytesToTruncate;
 }
@@ -1529,7 +1536,7 @@ void var::osclose() const {
 	if (THIS_IS_OSFILE()) {
 		mv_handles_cache.del_handle((int)var_int);
 		var_int = 0L;
-		var_typ ^= VARTYP_OSFILE | VARTYP_INT; // only STR bit should remains
+		var_typ ^= VARTYP_OSFILE | VARTYP_INT;	// only STR bit should remains
 	}
 	// in all other cases, the files should be closed.
 }
@@ -1598,7 +1605,7 @@ bool var::osdelete(const var& osfilename) const {
 	THISIS("bool var::osdelete(const var& osfilename) const")
 	THISISDEFINED()
 	ISSTRING(osfilename)
-	osfilename.osclose(); // in case this is cached opened file handle
+	osfilename.osclose();  // in case this is cached opened file handle
 	return !std::remove(osfilename.to_path_string().c_str());
 }
 
@@ -1954,7 +1961,7 @@ var var::oslist(const var& path0, const var& spec0, const int mode) const {
 			}
 			// is_regular is only in boost > 1.34
 			// else if (stdfs::is_regular(dir_itr->status() ) )
-			else // if (stdfs::is_regular(dir_itr->status() ) )
+			else  // if (stdfs::is_regular(dir_itr->status() ) )
 			{
 				if (getfiles)
 					filelist ^= FM ^ dir_itr->path().filename().string();
@@ -1986,7 +1993,7 @@ var var::oslist(const var& path0, const var& spec0, const int mode) const {
 bool var::oscwd(const var& newpath) const {
 	THISIS("var var::oscwd(const var& newpath) const")
 	// doesnt use *this - should syntax be changed to setcwd? and getcwd()?
-	THISISDEFINED() // not needed if *this not used
+	THISISDEFINED()	 // not needed if *this not used
 	ISSTRING(newpath)
 
 	// http://www.boost.org/doc/libs/1_38_0/libs/filesystem/doc/reference.html#Attribute-functions
@@ -2010,7 +2017,7 @@ bool var::oscwd(const var& newpath) const {
 var var::oscwd() const {
 	THISIS("var var::oscwd() const")
 	// doesnt use *this - should syntax be changed to ossetcwd? and osgetcwd()?
-	THISISDEFINED() // not needed if *this not used
+	THISISDEFINED()	 // not needed if *this not used
 
 	// TODO consider using complete() or system_complete()
 	//"[Note: When portable behavior is required, use complete(). When operating system
@@ -2031,7 +2038,7 @@ var var::ospid() const {
 void var::ossleep(const int milliseconds) const {
 	THISIS("void var::ossleep(const int milliseconds) const")
 	// doesnt use *this - should syntax be changed to setcwd? and getcwd()?
-	THISISDEFINED() // not needed if *this not used
+	THISISDEFINED()	 // not needed if *this not used
 
 	boost::xtime xt;
 	boost::xtime_get(&xt, boost::TIME_UTC_);
@@ -2042,4 +2049,4 @@ void var::ossleep(const int milliseconds) const {
 	//	Sleep(1000*milliseconds);
 }
 
-} // namespace exodus
+}  // namespace exodus

@@ -107,4 +107,4 @@ bool MvEnvironment::init(const int threadno) {
 //	return processno_islocked2(processno, &processnolockfd);
 //}
 
-} // namespace exodus
+}  // namespace exodus

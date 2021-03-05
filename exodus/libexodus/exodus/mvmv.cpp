@@ -23,8 +23,8 @@ THE SOFTWARE.
 // C4530: C++ exception handler used, but unwind semantics are not enabled.
 #pragma warning(disable : 4530)
 
-#include <algorithm> //for dim::sort
-#include <cstring>	 //for strlen strstr
+#include <algorithm>  //for dim::sort
+#include <cstring>	  //for strlen strstr
 
 #include <exodus/mv.h>
 #include <exodus/mvexceptions.h>
@@ -189,23 +189,21 @@ var var::field(const var& substrx, const int fieldnx, const int nfieldsx) const 
 
 // FIELDSTORE(x,y,z)
 // var.fieldstore(substr,fieldno,nfields,replacement)
-var var::fieldstore(const var& sepchar, const int fieldnx, const int nfieldsx,
-					const var& replacementx) const& {
+var var::fieldstore(const var& sepchar, const int fieldnx, const int nfieldsx, const var& replacementx) const& {
 	var newmv = *this;
 	return newmv.fieldstorer(sepchar, fieldnx, nfieldsx, replacementx);
 }
 
 // on temporary
-var& var::fieldstore(const var& sepchar, const int fieldnx, const int nfieldsx,
-					 const var& replacementx) && {
+var& var::fieldstore(const var& sepchar, const int fieldnx, const int nfieldsx, const var& replacementx) && {
 	return this->fieldstorer(sepchar, fieldnx, nfieldsx, replacementx);
 }
 
 // in-place
-var& var::fieldstorer(const var& sepchar0, const int fieldnx, const int nfieldsx,
-					  const var& replacementx) {
-	THISIS("var& var::fieldstorer(const var& sepchar0,const int fieldnx,const int nfieldsx, "
-		   "const var& replacementx)")
+var& var::fieldstorer(const var& sepchar0, const int fieldnx, const int nfieldsx, const var& replacementx) {
+	THISIS(
+		"var& var::fieldstorer(const var& sepchar0,const int fieldnx,const int nfieldsx, "
+		"const var& replacementx)")
 	THISISSTRINGMUTATOR()
 	ISSTRING(sepchar0)
 
@@ -303,8 +301,7 @@ var& var::fieldstorer(const var& sepchar0, const int fieldnx, const int nfieldsx
 ///////////////////////////////////////////
 
 // hardcore string locate function given a section of a string and all parameters
-inline bool locateat(const std::string& var_str, const std::string& target, size_t start_pos,
-					 size_t end_pos, const char order, const std::string& usingchar, var& setting) {
+inline bool locateat(const std::string& var_str, const std::string& target, size_t start_pos, size_t end_pos, const char order, const std::string& usingchar, var& setting) {
 	// private - assume everything is defined/assigned correctly
 
 	//
@@ -358,81 +355,81 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 		if (nextstart_pos >= end_pos) {
 			nextstart_pos = end_pos;
 			switch (order) {
-			// No order
-			case '\x00':
-				if (var_str.substr(start_pos, end_pos - start_pos) == target) {
-					setting = valuen2;
-					return true;
-				}
-				setting = valuen2 + 1;
-				return false;
-				break;
-
-			// AL Ascending Left Justified
-			case '\x01':
-				//if (var_str.substr(start_pos, nextstart_pos - start_pos) >= target)
-				comp = var::localeAwareCompare(var_str.substr(start_pos, nextstart_pos - start_pos), target);
-				if (comp == 1) {
-					setting = valuen2;
-					//if (var_str.substr(start_pos, nextstart_pos - start_pos) ==
-					//    target)
-					if (comp == 0)
+				// No order
+				case '\x00':
+					if (var_str.substr(start_pos, end_pos - start_pos) == target) {
+						setting = valuen2;
 						return true;
-					else
-						// arev error strangeness? empty is not greater than
-						// any target except empty
-						//						if
-						//(start_pos==end_pos) setting+=1;
-						return false;
-				}
-				setting = valuen2 + 1;
-				return false;
-				break;
+					}
+					setting = valuen2 + 1;
+					return false;
+					break;
 
-			// AR Ascending Right Justified
-			case '\x02':
-				value = var_str.substr(start_pos, nextstart_pos - start_pos);
-				if (value >= target2) {
-					setting = valuen2;
-					if (value == target2)
-						return true;
-					else
-						return false;
-				}
-				setting = valuen2 + 1;
-				return false;
-				break;
+				// AL Ascending Left Justified
+				case '\x01':
+					//if (var_str.substr(start_pos, nextstart_pos - start_pos) >= target)
+					comp = var::localeAwareCompare(var_str.substr(start_pos, nextstart_pos - start_pos), target);
+					if (comp == 1) {
+						setting = valuen2;
+						//if (var_str.substr(start_pos, nextstart_pos - start_pos) ==
+						//    target)
+						if (comp == 0)
+							return true;
+						else
+							// arev error strangeness? empty is not greater than
+							// any target except empty
+							//						if
+							//(start_pos==end_pos) setting+=1;
+							return false;
+					}
+					setting = valuen2 + 1;
+					return false;
+					break;
 
-			// DL Descending Left Justified
-			case '\x03':
-				if (var_str.substr(start_pos, nextstart_pos - start_pos) <= target) {
-					setting = valuen2;
-					if (var_str.substr(start_pos, nextstart_pos - start_pos) ==
-						target)
-						return true;
-					else
-						return false;
-				}
-				setting = valuen2 + 1;
-				return false;
-				break;
+				// AR Ascending Right Justified
+				case '\x02':
+					value = var_str.substr(start_pos, nextstart_pos - start_pos);
+					if (value >= target2) {
+						setting = valuen2;
+						if (value == target2)
+							return true;
+						else
+							return false;
+					}
+					setting = valuen2 + 1;
+					return false;
+					break;
 
-			// DR Descending Right Justified
-			case '\x04':
-				value = var_str.substr(start_pos, nextstart_pos - start_pos);
-				if (value <= target2) {
-					setting = valuen2;
-					if (value == target2)
-						return true;
-					else
-						return false;
-				}
-				setting = valuen2 + 1;
-				return false;
-				break;
+				// DL Descending Left Justified
+				case '\x03':
+					if (var_str.substr(start_pos, nextstart_pos - start_pos) <= target) {
+						setting = valuen2;
+						if (var_str.substr(start_pos, nextstart_pos - start_pos) ==
+							target)
+							return true;
+						else
+							return false;
+					}
+					setting = valuen2 + 1;
+					return false;
+					break;
 
-			default:
-				throw MVError("locateat() invalid mode " ^ var(order));
+				// DR Descending Right Justified
+				case '\x04':
+					value = var_str.substr(start_pos, nextstart_pos - start_pos);
+					if (value <= target2) {
+						setting = valuen2;
+						if (value == target2)
+							return true;
+						else
+							return false;
+					}
+					setting = valuen2 + 1;
+					return false;
+					break;
+
+				default:
+					throw MVError("locateat() invalid mode " ^ var(order));
 			}
 		}
 
@@ -443,84 +440,84 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 		// if (var_str.substr(start_pos,nextstart_pos-start_pos)==target)
 		//(int) is to avoid warning of unsigned integer
 		switch (order) {
-		// No order
-		case '\x00':
-			if (var_str.substr(start_pos, targetlen) == target) {
-				bool x = (int)(nextstart_pos - start_pos) <= targetlen;
-				if (x) {
-					setting = valuen2;
-					return true;
+			// No order
+			case '\x00':
+				if (var_str.substr(start_pos, targetlen) == target) {
+					bool x = (int)(nextstart_pos - start_pos) <= targetlen;
+					if (x) {
+						setting = valuen2;
+						return true;
+					}
 				}
-			}
-			break;
+				break;
 
-		// AL Ascending Left Justified
-		case '\x01':
-			//				//arev strangeness? to locate a field whereever
-			//it is regardless of order even ""? 				if
-			// (!targetlen&&nextstart_pos==start_pos) break;
+			// AL Ascending Left Justified
+			case '\x01':
+				//				//arev strangeness? to locate a field whereever
+				//it is regardless of order even ""? 				if
+				// (!targetlen&&nextstart_pos==start_pos) break;
 
-			//if (var_str.substr(start_pos, nextstart_pos - start_pos) >= target)
-			comp = var::localeAwareCompare(var_str.substr(start_pos, nextstart_pos - start_pos), target);
-			if (comp == 1) {
-				setting = valuen2;
-				//if (var_str.substr(start_pos, nextstart_pos - start_pos) == target)
-				if (comp == 0)
-					return true;
-				else
-					return false;
-			}
-			break;
+				//if (var_str.substr(start_pos, nextstart_pos - start_pos) >= target)
+				comp = var::localeAwareCompare(var_str.substr(start_pos, nextstart_pos - start_pos), target);
+				if (comp == 1) {
+					setting = valuen2;
+					//if (var_str.substr(start_pos, nextstart_pos - start_pos) == target)
+					if (comp == 0)
+						return true;
+					else
+						return false;
+				}
+				break;
 
-		// DL Descending Left Justified
-		case '\x02':
-			//				//arev strangeness? to locate a field whereever
-			//it is regardless of order even ""? 				if
-			// (!targetlen&&nextstart_pos==start_pos) break;
+			// DL Descending Left Justified
+			case '\x02':
+				//				//arev strangeness? to locate a field whereever
+				//it is regardless of order even ""? 				if
+				// (!targetlen&&nextstart_pos==start_pos) break;
 
-			value = var_str.substr(start_pos, nextstart_pos - start_pos);
-			if (value >= target2) {
-				setting = valuen2;
-				if (value == target2)
-					return true;
-				else
-					return false;
-			}
-			break;
+				value = var_str.substr(start_pos, nextstart_pos - start_pos);
+				if (value >= target2) {
+					setting = valuen2;
+					if (value == target2)
+						return true;
+					else
+						return false;
+				}
+				break;
 
-		// AR Ascending Right Justified
-		case '\x03':
-			//				//arev strangeness? to locate a field whereever
-			//it is regardless of order even ""? 				if
-			// (!targetlen&&nextstart_pos==start_pos) break;
+			// AR Ascending Right Justified
+			case '\x03':
+				//				//arev strangeness? to locate a field whereever
+				//it is regardless of order even ""? 				if
+				// (!targetlen&&nextstart_pos==start_pos) break;
 
-			if (var_str.substr(start_pos, nextstart_pos - start_pos) <= target) {
-				setting = valuen2;
-				if (var_str.substr(start_pos, nextstart_pos - start_pos) == target)
-					return true;
-				else
-					return false;
-			}
-			break;
+				if (var_str.substr(start_pos, nextstart_pos - start_pos) <= target) {
+					setting = valuen2;
+					if (var_str.substr(start_pos, nextstart_pos - start_pos) == target)
+						return true;
+					else
+						return false;
+				}
+				break;
 
-		// DR Descending Right Justified
-		case '\x04':
-			//				//arev strangeness? to locate a field whereever
-			//it is regardless of order even ""? 				if
-			// (!targetlen&&nextstart_pos==start_pos) break;
+			// DR Descending Right Justified
+			case '\x04':
+				//				//arev strangeness? to locate a field whereever
+				//it is regardless of order even ""? 				if
+				// (!targetlen&&nextstart_pos==start_pos) break;
 
-			value = var_str.substr(start_pos, nextstart_pos - start_pos);
-			if (value <= target2) {
-				setting = valuen2;
-				if (value == target2)
-					return true;
-				else
-					return false;
-			}
-			break;
+				value = var_str.substr(start_pos, nextstart_pos - start_pos);
+				if (value <= target2) {
+					setting = valuen2;
+					if (value == target2)
+						return true;
+					else
+						return false;
+				}
+				break;
 
-		default:
-			throw MVError("locateat() invalid order" ^ var(order));
+			default:
+				throw MVError("locateat() invalid order" ^ var(order));
 		}
 		// skip over any sep character
 		start_pos = nextstart_pos + usingchar_len;
@@ -529,9 +526,7 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 }
 
 // locate within extraction
-inline bool locatex(const std::string& var_str, const std::string& target, const char* ordercode,
-					const std::string& usingchar, var& setting, int fieldno, int valueno,
-					const int subvalueno) {
+inline bool locatex(const std::string& var_str, const std::string& target, const char* ordercode, const std::string& usingchar, var& setting, int fieldno, int valueno, const int subvalueno) {
 	// private - assume everything is defined/assigned correctly
 
 	// any negatives at all returns ""
@@ -693,8 +688,9 @@ inline bool locatex(const std::string& var_str, const std::string& target, const
 
 // default locate using VM
 bool var::locate(const var& target, var& setting) const {
-	THISIS("bool var::locate(const var& target, var& setting, const int fieldno/*=0*/,const "
-		   "int valueno/*=0*/) const")
+	THISIS(
+		"bool var::locate(const var& target, var& setting, const int fieldno/*=0*/,const "
+		"int valueno/*=0*/) const")
 	THISISSTRING()
 	ISSTRING(target)
 	ISDEFINED(setting)
@@ -703,8 +699,9 @@ bool var::locate(const var& target, var& setting) const {
 }
 
 bool var::locate(const var& target, var& setting, const int fieldno, const int valueno /*=0*/) const {
-	THISIS("bool var::locate(const var& target, var& setting, const int fieldno/*=0*/,const "
-		   "int valueno/*=0*/) const")
+	THISIS(
+		"bool var::locate(const var& target, var& setting, const int fieldno/*=0*/,const "
+		"int valueno/*=0*/) const")
 	THISISSTRING()
 	ISSTRING(target)
 	ISDEFINED(setting)
@@ -738,8 +735,7 @@ bool var::locate(const var& target) const {
 ///////////////////////////////////////////
 
 // this version caters for the rare syntax where the order is given as a variable
-bool var::locateby(const var& ordercode, const var& target, var& setting, const int fieldno,
-				   const int valueno /*=0*/) const {
+bool var::locateby(const var& ordercode, const var& target, var& setting, const int fieldno, const int valueno /*=0*/) const {
 	return locateby(ordercode.toString().c_str(), target, setting, fieldno, valueno);
 }
 
@@ -772,10 +768,10 @@ bool var::locateby(const char* ordercode, const var& target, var& setting) const
 
 // specialised const char version of ordercode for speed of usual syntax where ordermode is given as
 // string it avoids the conversion from string to var and back again
-bool var::locateby(const char* ordercode, const var& target, var& setting, const int fieldno,
-				   const int valueno /*=0*/) const {
-	THISIS("bool var::locateby(const char* ordercode, const var& target, var& setting, const "
-		   "int fieldno, const int valueno/*=0*/) const")
+bool var::locateby(const char* ordercode, const var& target, var& setting, const int fieldno, const int valueno /*=0*/) const {
+	THISIS(
+		"bool var::locateby(const char* ordercode, const var& target, var& setting, const "
+		"int fieldno, const int valueno/*=0*/) const")
 	THISISSTRING()
 	ISSTRING(target)
 	ISDEFINED(setting)
@@ -807,10 +803,10 @@ bool var::locateby(const char* ordercode, const var& target, var& setting, const
 ///////////////////////////////////////////
 
 // this version caters for the rare syntax where the order is given as a variable
-bool var::locatebyusing(const var& ordercode, const var& usingchar, const var& target, var& setting,
-						const int fieldno /*=0*/, const int valueno /*=0*/) const {
-	THISIS("bool var::locatebyusing(const var& ordercode, const var& usingchar, const var& "
-		   "target, var& setting, const int fieldno//*=0*//, const int valueno//*=0*//)const")
+bool var::locatebyusing(const var& ordercode, const var& usingchar, const var& target, var& setting, const int fieldno /*=0*/, const int valueno /*=0*/) const {
+	THISIS(
+		"bool var::locatebyusing(const var& ordercode, const var& usingchar, const var& "
+		"target, var& setting, const int fieldno//*=0*//, const int valueno//*=0*//)const")
 	ISSTRING(ordercode)
 	ISSTRING(usingchar)
 	ISSTRING(target)
@@ -823,10 +819,10 @@ bool var::locatebyusing(const var& ordercode, const var& usingchar, const var& t
 
 // specialised const char version of ordercode for speed of usual syntax where ordermode is given as
 // string it avoids the conversion from string to var and back again
-bool var::locatebyusing(const char* ordercode, const char* usingchar, const var& target,
-						var& setting, const int fieldno /*=0*/, const int valueno /*=0*/) const {
-	THISIS("bool var::locatebyusing(const char* ordercode, const char* usingchar, const var& "
-		   "target, var& setting, const int fieldno//*=0*//, const int valueno//*=0*//) const")
+bool var::locatebyusing(const char* ordercode, const char* usingchar, const var& target, var& setting, const int fieldno /*=0*/, const int valueno /*=0*/) const {
+	THISIS(
+		"bool var::locatebyusing(const char* ordercode, const char* usingchar, const var& "
+		"target, var& setting, const int fieldno//*=0*//, const int valueno//*=0*//) const")
 	THISISSTRING()
 	ISSTRING(target)
 	ISDEFINED(setting)
@@ -858,11 +854,10 @@ bool var::locateusing(const var& usingchar, const var& target) const {
 	return locatex(var_str, target.var_str, "", usingchar.var_str, setting, 0, 0, 0);
 }
 
-bool var::locateusing(const var& usingchar, const var& target, var& setting,
-					  const int fieldno /*=0*/, const int valueno /*=0*/,
-					  const int subvalueno /*=0*/) const {
-	THISIS("bool var::locateusing(const var& usingchar, const var& target, var& setting, const "
-		   "int fieldno/*=0*/, const int valueno/*=0*/, const int subvalueno/*=0*/) const")
+bool var::locateusing(const var& usingchar, const var& target, var& setting, const int fieldno /*=0*/, const int valueno /*=0*/, const int subvalueno /*=0*/) const {
+	THISIS(
+		"bool var::locateusing(const var& usingchar, const var& target, var& setting, const "
+		"int fieldno/*=0*/, const int valueno/*=0*/, const int subvalueno/*=0*/) const")
 	THISISSTRING()
 	ISSTRING(target)
 	ISSTRING(usingchar)
@@ -888,8 +883,9 @@ var var::extract(const int argfieldn, const int argvaluen, const int argsubvalue
 // extract int int int
 // NB declared with value=0 and subvalue=0
 var var::a(const int argfieldn, const int argvaluen, const int argsubvaluen) const {
-	THISIS("var var::extract(const int argfieldn, const int argvaluen, const int argsubvaluen) "
-		   "const")
+	THISIS(
+		"var var::extract(const int argfieldn, const int argvaluen, const int argsubvaluen) "
+		"const")
 	THISISSTRING()
 
 	// any negatives at all returns ""
@@ -1129,8 +1125,7 @@ var& var::remover(int fieldno, int valueno, int subvalueno) {
 // PICKREPLACE int int int var
 ///////////////////////////////////////////
 
-var var::pickreplace(const int fieldno, const int valueno, const int subvalueno,
-					 const var& replacement) const {
+var var::pickreplace(const int fieldno, const int valueno, const int subvalueno, const var& replacement) const {
 	return var(*this).r(fieldno, valueno, subvalueno, replacement);
 }
 
@@ -1289,8 +1284,7 @@ var& var::r(int fieldno, int valueno, int subvalueno, const var& replacement) {
 // INSERT int int int var
 ///////////////////////////////////////////
 
-var var::insert(const int fieldno, const int valueno, const int subvalueno,
-				const var& insertion) const& {
+var var::insert(const int fieldno, const int valueno, const int subvalueno, const var& insertion) const& {
 	var newmv = var(*this).inserter(fieldno, valueno, subvalueno, insertion);
 	return newmv;
 }
@@ -1306,8 +1300,7 @@ var var::insert(const int fieldno, const var& insertion) const& {
 }
 
 // on temporary
-var& var::insert(const int fieldno, const int valueno, const int subvalueno,
-				 const var& insertion) && {
+var& var::insert(const int fieldno, const int valueno, const int subvalueno, const var& insertion) && {
 	return this->inserter(fieldno, valueno, subvalueno, insertion);
 }
 
@@ -1333,8 +1326,9 @@ var& var::inserter(const int fieldno, const var& insertion) {
 
 //in-place - given everything
 var& var::inserter(const int fieldno, const int valueno, const int subvalueno, const var& insertion) {
-	THISIS("var& var::inserter(const int fieldno,const int valueno,const int subvalueno,const "
-		   "var& insertion)")
+	THISIS(
+		"var& var::inserter(const int fieldno,const int valueno,const int subvalueno,const "
+		"var& insertion)")
 	THISISSTRINGMUTATOR()
 	ISSTRING(insertion)
 
@@ -1641,7 +1635,7 @@ var var::operator[](const int charno) const {
 
 	// if index is now 0 or positive then return the character
 	if (charno2 >= 0)
-		return var_str[charno2]; // no need for -1 here
+		return var_str[charno2];  // no need for -1 here
 
 	// otherwise so negative as to point before beginning of string
 	// and rule is to return the first character in that case
@@ -1682,60 +1676,60 @@ var var::mv(const char* opcode, const var& var2) const {
 
 		// find the end of a value in var1 (this)
 		if (sepchar1 <= sepchar2) {
-		getnextp1:
+getnextp1:
 			p1b = this->var_str.find_first_of(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_, p1a);
 			if (p1b == std::string::npos) {
 				sepchar1 = RM_ + 1;
 			} else {
 				sepchar1 = this->var_str[p1b];
 			}
-			mv1 = var(this->var_str.substr(p1a, p1b - p1a)); //.outputl("mv1=");
+			mv1 = var(this->var_str.substr(p1a, p1b - p1a));  //.outputl("mv1=");
 			p1a = p1b;
 		}
 
 		// find the end of a value in var1 (this)
 		if (sepchar2 <= sepchar1_prior) {
-		getnextp2:
+getnextp2:
 			p2b = var2.var_str.find_first_of(_RM_ _FM_ _VM_ _SM_ _TM_ _STM_, p2a);
 			if (p2b == std::string::npos) {
 				sepchar2 = RM_ + 1;
 			} else {
 				sepchar2 = var2.var_str[p2b];
 			}
-			mv2 = var(var2.var_str.substr(p2a, p2b - p2a)); //.outputl("mv2=");
+			mv2 = var(var2.var_str.substr(p2a, p2b - p2a));	 //.outputl("mv2=");
 			p2a = p2b;
 		}
 
 		switch (opcode[0]) {
 
-		case '+':
-			outstr ^= mv1 + mv2;
-			break;
+			case '+':
+				outstr ^= mv1 + mv2;
+				break;
 
-		case '-':
-			outstr ^= mv1 - mv2;
-			break;
+			case '-':
+				outstr ^= mv1 - mv2;
+				break;
 
-		case '*':
-			outstr ^= mv1 * mv2;
-			break;
+			case '*':
+				outstr ^= mv1 * mv2;
+				break;
 
-		case '/':
-			// if mv is anything except empty or zero
-			// OR if mv is empty and mv2 is not empty or zero
-			// may trigger non-numeric or div-by-zero errors
-			// 1. if both empty then result is empty
-			// 2. empty or zero, divided by zero, is empty or zero
-			if (mv1)
-				mv1 = mv1 / mv2;
-			else
-				mv1 = 0;
-			outstr ^= mv1;
-			break;
+			case '/':
+				// if mv is anything except empty or zero
+				// OR if mv is empty and mv2 is not empty or zero
+				// may trigger non-numeric or div-by-zero errors
+				// 1. if both empty then result is empty
+				// 2. empty or zero, divided by zero, is empty or zero
+				if (mv1)
+					mv1 = mv1 / mv2;
+				else
+					mv1 = 0;
+				outstr ^= mv1;
+				break;
 
-		case ':':
-			outstr ^= mv1 ^ mv2;
-			break;
+			case ':':
+				outstr ^= mv1 ^ mv2;
+				break;
 		}
 
 		if (sepchar1 == sepchar2) {
@@ -1922,12 +1916,12 @@ var var::sum() const {
 	// Limit the number of decimal places in returned value to the max found in the input
 	// assert(sum("2245000900.76" _VM_ "102768099.9" _VM_ "-2347769000.66") == 0);
 
-	var part;	 //num
-	var nextsep; //num
-	var accum;	 //num
+	var part;	  //num
+	var nextsep;  //num
+	var accum;	  //num
 
-	var min_sep = STM.seq(); //26
-	var max_sep = RM.seq();	 //31
+	var min_sep = STM.seq();  //26
+	var max_sep = RM.seq();	  //31
 
 	var min_sep_present;
 	for (min_sep_present = min_sep; min_sep_present <= max_sep; ++min_sep_present) {
@@ -1944,7 +1938,7 @@ var var::sum() const {
 
 	//std::clog << (*this) << std::endl;
 
-	size_t maxndecimals = 0; //initialise only to avoid warning
+	size_t maxndecimals = 0;  //initialise only to avoid warning
 	do {
 
 		//extract the next field and get the nextsep field number 1-6 or 0 if none
@@ -2043,4 +2037,4 @@ var var::sum(const var& sepchar) const {
 	return result;
 }
 
-} // namespace exodus
+}  // namespace exodus

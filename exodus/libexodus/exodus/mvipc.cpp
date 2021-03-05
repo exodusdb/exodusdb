@@ -35,7 +35,7 @@ THE SOFTWARE.
 #include <string>
 
 //#include <postgresql/libpq-fe.h>//in postgres/include
-#include <libpq-fe.h> //in postgres/include
+#include <libpq-fe.h>  //in postgres/include
 
 #include <boost/bind.hpp>
 #include <boost/thread.hpp>
@@ -118,8 +118,7 @@ bool startipc() {
 	return true;
 }
 
-void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsechars,
-						  std::string& response, ExodusFunctorBase& exodusfunctorbase) {
+void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsechars, std::string& response, ExodusFunctorBase& exodusfunctorbase) {
 
 	// TODO make independent of int size and byte ordering
 	// otherwise we are restricted to accessing servers
@@ -303,4 +302,4 @@ void getResponseToRequest(char* chRequest, size_t request_size, int maxresponsec
 	return;
 }
 
-} // namespace exodus
+}  // namespace exodus

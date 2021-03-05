@@ -3,7 +3,7 @@
 //
 #include <algorithm>
 #include <cassert>
-#define INSIDE_MVHANDLES_CPP // global obj in "mvhandles.h"
+#define INSIDE_MVHANDLES_CPP  // global obj in "mvhandles.h"
 #include "mvhandles.h"
 
 #include <boost/thread/mutex.hpp>
@@ -13,12 +13,13 @@ boost::mutex mvhandles_mutex;
 
 namespace exodus {
 
-MvHandleEntry::MvHandleEntry() : deleter((DELETER_AND_DESTROYER)0), handle(0) {}
+MvHandleEntry::MvHandleEntry()
+	: deleter((DELETER_AND_DESTROYER)0), handle(0) {}
 
-MvHandlesCache::MvHandlesCache() : conntbl(HANDLES_CACHE_SIZE) {}
+MvHandlesCache::MvHandlesCache()
+	: conntbl(HANDLES_CACHE_SIZE) {}
 
-int MvHandlesCache::add_handle(CACHED_HANDLE handle_to_cache, DELETER_AND_DESTROYER del,
-							   std::string name) {
+int MvHandlesCache::add_handle(CACHED_HANDLE handle_to_cache, DELETER_AND_DESTROYER del, std::string name) {
 	assert(del);
 	boost::mutex::scoped_lock lock(mvhandles_mutex);
 
@@ -28,7 +29,7 @@ int MvHandlesCache::add_handle(CACHED_HANDLE handle_to_cache, DELETER_AND_DESTRO
 			break;
 
 	if (ix == (int)conntbl.size())
-		conntbl.resize(ix * 2); // double the table size
+		conntbl.resize(ix * 2);	 // double the table size
 
 	conntbl[ix].deleter = del;
 	conntbl[ix].handle = handle_to_cache;
@@ -50,7 +51,7 @@ void MvHandlesCache::del_handle(int index) {
 		conntbl[index].deleter(conntbl[index].handle);
 		//conntbl[index].handle;
 	}
-	conntbl[index].deleter = 0; //	HANDLE_ENTRY_FREE
+	conntbl[index].deleter = 0;	 //	HANDLE_ENTRY_FREE
 }
 
 MvHandlesCache::~MvHandlesCache() {
@@ -63,8 +64,8 @@ MvHandlesCache::~MvHandlesCache() {
 		if (conntbl[ix].deleter != HANDLE_ENTRY_FREE) {
 			// do not call 'del_handle(ix)' here because of deadlock
 			conntbl[ix].deleter(conntbl[ix].handle);
-			conntbl[ix].deleter = 0; //	HANDLE_ENTRY_FREE
+			conntbl[ix].deleter = 0;  //	HANDLE_ENTRY_FREE
 		}
 }
 
-} // namespace exodus
+}  // namespace exodus

@@ -42,6 +42,6 @@ var getexecpath() {
 	}
 }
 
-} // namespace exodus
+}  // namespace exodus
 
 #endif

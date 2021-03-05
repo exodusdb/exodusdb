@@ -1,10 +1,10 @@
 // https://stackoverflow.com/questions/14322430/how-to-do-console-input-like-in-the-top-linux-command
 
-#include <fcntl.h>		//fcntl()
-#include <stdio.h>		//fileno(), stdin
-#include <sys/select.h> //select()
-#include <termios.h>	//termios
-#include <unistd.h>		//read()
+#include <fcntl.h>		 //fcntl()
+#include <stdio.h>		 //fileno(), stdin
+#include <sys/select.h>	 //select()
+#include <termios.h>	 //termios
+#include <unistd.h>		 //read()
 //#include <sys/ioctl.h>
 //#include <sys/time.h>
 //#include <sys/types.h>
@@ -42,11 +42,11 @@ int getkey(void) {
 	error = tcsetattr(fd, TCSANOW, &newAttr);
 
 	tv.tv_sec = 0;
-	tv.tv_usec = 10000; // small 0.01 msec delay
+	tv.tv_usec = 10000;	 // small 0.01 msec delay
 	select(1, NULL, NULL, NULL, &tv);
 
 	if (error == 0)
-		error = (read(fd, &ch, 1) != 1); // get char from stdin
+		error = (read(fd, &ch, 1) != 1);  // get char from stdin
 
 	// Restore original settings
 	error |= tcsetattr(fd, TCSANOW, &oldAttr);
@@ -73,4 +73,4 @@ int main()
 }
 */
 
-} // namespace exodus
+}  // namespace exodus

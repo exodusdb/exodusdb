@@ -20,7 +20,8 @@
 namespace exodus {
 
 //CONSTRUCTOR from a var (ie begin())
-var_iter::var_iter(const var& v) : data(&v){};
+var_iter::var_iter(const var& v)
+	: data(&v){};
 
 //check iter != iter (i.e. iter != end()
 bool var_iter::operator!=([[maybe_unused]] var_iter& vi) {
@@ -82,4 +83,4 @@ DLL_PUBLIC var_iter end([[maybe_unused]] const var& v) {
 	return var_iter();
 }
 
-} //namespace exodus
+}  //namespace exodus

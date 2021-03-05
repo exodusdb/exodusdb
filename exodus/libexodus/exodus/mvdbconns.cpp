@@ -48,8 +48,7 @@ RecordCache* MvConnectionsCache::get_recordcache(int index) const {
 }
 
 // pass filename and key by value relying on short string optimisation for performance
-std::string MvConnectionsCache::getrecord(const int connid, const std::string filename,
-										  const std::string key) const {
+std::string MvConnectionsCache::getrecord(const int connid, const std::string filename, const std::string key) const {
 	auto precordcache = get_recordcache(connid);
 	std::string filenameandkey = filename + "|" + key;
 	auto cacheentry = precordcache->find(filenameandkey);
@@ -60,8 +59,7 @@ std::string MvConnectionsCache::getrecord(const int connid, const std::string fi
 }
 
 // pass filename and key by value relying on short string optimisation for performance
-void MvConnectionsCache::putrecord(const int connid, const std::string filename,
-								   const std::string key, const std::string& record) {
+void MvConnectionsCache::putrecord(const int connid, const std::string filename, const std::string key, const std::string& record) {
 	auto precordcache = get_recordcache(connid);
 	std::string filenameandkey = filename + "|" + key;
 	//(*precordcache)[filenameandkey] = record;
@@ -71,8 +69,7 @@ void MvConnectionsCache::putrecord(const int connid, const std::string filename,
 
 // delrecord is currently setting record to "" to counter c++ unordered map reputed performance issues
 // pass filename and key by value relying on short string optimisation for performance
-void MvConnectionsCache::delrecord(const int connid, const std::string filename,
-								   const std::string key) {
+void MvConnectionsCache::delrecord(const int connid, const std::string filename, const std::string key) {
 	auto precordcache = get_recordcache(connid);
 	std::string filenameandkey = filename + "|" + key;
 	//(*precordcache)[filenameandkey] = "";
@@ -116,4 +113,4 @@ MvConnectionsCache::~MvConnectionsCache() {
 	// lock.unlock();
 }
 
-} // namespace exodus
+}  // namespace exodus

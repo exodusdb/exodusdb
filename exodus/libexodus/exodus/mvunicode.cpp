@@ -72,4 +72,4 @@ var& var::getxlocale() {
 #endif
 }
 
-} // namespace exodus
+}  // namespace exodus

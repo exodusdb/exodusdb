@@ -30,9 +30,9 @@ THE SOFTWARE.
 #ifdef _POSIX_SOURCE
 #include "config.h"
 
+#include <stdio.h>
 #include <cstdlib>
 #include <iostream>
-#include <stdio.h>
 #include <string>
 // defined in config.h but config.h created by ./configure (automake tools not cmake)
 //#ifdef HAVE_BACKTRACE
@@ -53,10 +53,11 @@ THE SOFTWARE.
 #ifdef _MSC_VER
 #include <exodus/StackWalker.h>
 class MyStackWalker : public StackWalker {
-  public:
+   public:
 	exodus::var returnlines = "";
 
-	MyStackWalker() : StackWalker(), returnlines("") {}
+	MyStackWalker()
+		: StackWalker(), returnlines("") {}
 
 	MyStackWalker(DWORD dwProcessId, HANDLE hProcess)
 		: StackWalker(dwProcessId, hProcess), returnlines("") {
@@ -65,9 +66,9 @@ class MyStackWalker : public StackWalker {
 		// fprintf(stderr,szText);
 
 		// fprintf(stderr,"fgets:%s", path);
-		exodus::var line = exodus::var(szText).convert("\x0d\x0a", ""); //.errputl("path=");
-		exodus::var filename = line.field(":", 1, 2);					//.errputl("filename=");
-		exodus::var lineno = filename.field2(" ", -1);					//.errputl("lineno=");
+		exodus::var line = exodus::var(szText).convert("\x0d\x0a", "");	 //.errputl("path=");
+		exodus::var filename = line.field(":", 1, 2);					 //.errputl("filename=");
+		exodus::var lineno = filename.field2(" ", -1);					 //.errputl("lineno=");
 		filename.splicer(-(lineno.length() + 1), 999999, "");
 		lineno.substrer(2, lineno.length() - 2);
 		if (filename.index("stackwalker.cpp") || filename.index("debug.cpp") ||
@@ -485,10 +486,10 @@ void var::breakoff() const {
 
 //called in exodus_main to initialise signals
 void var::breakon() const {
-	signal(SIGINT, SIGINT_handler);	  // Ctrl+C from termio
-	signal(SIGTERM, SIGTERM_handler); // a polite request to TERMINATE
-									  // probably followed by SIGABORT after some delay
-	signal(SIGHUP, SIGHUP_handler);	  // a request to reload
+	signal(SIGINT, SIGINT_handler);	   // Ctrl+C from termio
+	signal(SIGTERM, SIGTERM_handler);  // a polite request to TERMINATE
+									   // probably followed by SIGABORT after some delay
+	signal(SIGHUP, SIGHUP_handler);	   // a request to reload
 
 	//turn off text input and output signals to prevent breaking out into gdb debugger
 	//http://curiousthing.org/sigttin-sigttou-deep-dive-linux
@@ -496,4 +497,4 @@ void var::breakon() const {
 	signal(SIGTTOU, SIG_IGN);
 }
 
-} // namespace exodus
+}  // namespace exodus

@@ -17,6 +17,6 @@ var getexecpath() {
 	return osenv;
 }
 
-} // namespace exodus
+}  // namespace exodus
 
 #endif

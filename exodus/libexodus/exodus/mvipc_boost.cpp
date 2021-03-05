@@ -141,25 +141,25 @@ int MVipc(const int environmentn, var& pgconnparams) {
 	try {
 		// open request queue
 		boost::interprocess::message_queue request_queue(
-			boost::interprocess::open_or_create // only create
+			boost::interprocess::open_or_create	 // only create
 			,
-			requestqueuename.c_str() // name
+			requestqueuename.c_str()  // name
 			,
-			100 // max message number
+			100	 // max message number
 			,
-			BUFSIZ // max message size
+			BUFSIZ	// max message size
 		);
 
 		try {
 			// open response queue
 			boost::interprocess::message_queue response_queue(
-				boost::interprocess::open_or_create // only create
+				boost::interprocess::open_or_create	 // only create
 				,
-				responsequeuename.c_str() // name
+				responsequeuename.c_str()  // name
 				,
-				100 // max message number
+				100	 // max message number
 				,
-				BUFSIZ // max message size
+				BUFSIZ	// max message size
 			);
 
 			// indicate to waiting/paused parent thread that the pipe is open
@@ -201,6 +201,6 @@ int MVipc(const int environmentn, var& pgconnparams) {
 	return 1;
 }
 
-} // namespace exodus
+}  // namespace exodus
 
-#endif // not windows
+#endif	// not windows

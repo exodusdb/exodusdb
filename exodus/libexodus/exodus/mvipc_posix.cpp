@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/socket.h>
-#include <sys/stat.h> //for umask
+#include <sys/stat.h>  //for umask
 #include <sys/types.h>
 #include <sys/un.h>
 
@@ -33,8 +33,7 @@ using namespace std;
 //#define TRACING 5
 namespace exodus {
 
-void respondToRequests(int sock, const std::string& socketpath,
-					   ExodusFunctorBase& exodusfunctorbase) {
+void respondToRequests(int sock, const std::string& socketpath, ExodusFunctorBase& exodusfunctorbase) {
 
 	// unsigned int priority;
 	socklen_t fromlen;
@@ -105,9 +104,10 @@ void respondToRequests(int sock, const std::string& socketpath,
 
 // log
 #if TRACING >= 3
-		wprintf(L"---------------------------------\nMVipc: reading upto %d bytes from "
-				L"data socket\n",
-				sizeof(chRequest));
+		wprintf(
+			L"---------------------------------\nMVipc: reading upto %d bytes from "
+			L"data socket\n",
+			sizeof(chRequest));
 #endif
 
 		int nn;
@@ -128,9 +128,10 @@ void respondToRequests(int sock, const std::string& socketpath,
 
 // log
 #if TRACING >= 3
-		wprintf(L"---------------------------------\nMVipc() writing response %d bytes to "
-				L"socket\n",
-				response.size());
+		wprintf(
+			L"---------------------------------\nMVipc() writing response %d bytes to "
+			L"socket\n",
+			response.size());
 #endif
 
 		// send a response
@@ -251,6 +252,6 @@ int MVipc(const int environmentn, var& pgconnparams) {
 	return 1;
 }
 
-} // namespace exodus
+}  // namespace exodus
 
-#endif // EXODUS_IPC_POSIX
+#endif	// EXODUS_IPC_POSIX

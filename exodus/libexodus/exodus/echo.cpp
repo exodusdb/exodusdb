@@ -32,4 +32,4 @@ bool var::echo(const int on_off) const {
 	return true;
 }
 
-} // namespace exodus
+}  // namespace exodus

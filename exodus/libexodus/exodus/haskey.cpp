@@ -60,4 +60,4 @@ bool haskey(int milliseconds = 0) {
 	return hasdata;
 }
 
-} // namespace exodus
+}  // namespace exodus

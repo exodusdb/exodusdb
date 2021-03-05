@@ -61,7 +61,7 @@ THE SOFTWARE.
 #define TRACING 2
 #endif
 
-#if defined _MSC_VER // || defined __CYGWIN__ || defined __MINGW32__
+#if defined _MSC_VER  // || defined __CYGWIN__ || defined __MINGW32__
 #define WIN32_LEAN_AND_MEAN
 #include <DelayImp.h>
 #include <windows.h>
@@ -79,7 +79,7 @@ THE SOFTWARE.
 // C4530: C++ exception handler used, but unwind semantics are not enabled.
 #pragma warning(disable : 4530)
 
-#include <cstring> //for strcmp strlen
+#include <cstring>	//for strcmp strlen
 #include <iostream>
 
 #include <boost/thread/tss.hpp>
@@ -87,14 +87,14 @@ THE SOFTWARE.
 
 // see exports.txt for all PQ functions
 //#include <postgresql/libpq-fe.h>//in postgres/include
-#include <libpq-fe.h> //in postgres/include
+#include <libpq-fe.h>  //in postgres/include
 
 //#include <arpa/inet.h>//for ntohl()
 
-#include "MurmurHash2_64.h" // it has included in mvdbconns.h (uint64_t defined)
+#include "MurmurHash2_64.h"	 // it has included in mvdbconns.h (uint64_t defined)
 
 #include <exodus/mv.h>
-#include <exodus/mvdbconns.h> // placed as last include, causes boost header compiler errors
+#include <exodus/mvdbconns.h>  // placed as last include, causes boost header compiler errors
 //#include <exodus/mvenvironment.h>
 //#include <exodus/mvutf.h>
 #include <exodus/mvexceptions.h>
@@ -110,8 +110,8 @@ namespace exodus {
 static void connection_DELETER_AND_DESTROYER(CACHED_CONNECTION con_) {
 	PGconn* pgp = (PGconn*)con_;
 	//var("========================== deleting connection ==============================").errputl();
-	PQfinish(pgp); // AFAIK, it destroys the object by pointer
-				   //	delete pgp;
+	PQfinish(pgp);	// AFAIK, it destroys the object by pointer
+					//	delete pgp;
 }
 static MvConnectionsCache mv_connections_cache(connection_DELETER_AND_DESTROYER);
 
@@ -182,12 +182,13 @@ class Scoped_PGresult {
 	// owns the PGresult object on the stack
 	PGresult* pgresult_ = nullptr;
 
-  public:
+   public:
 	//default constructor
 	Scoped_PGresult() = default;
 
 	// constructor from a PGresult*
-	Scoped_PGresult(PGresult* pgresult) : pgresult_(pgresult) {
+	Scoped_PGresult(PGresult* pgresult)
+		: pgresult_(pgresult) {
 		// var("Got pgresult ... ").output();
 	}
 
@@ -224,7 +225,9 @@ void var::setlasterror(const var& msg) const {
 	tss_pglasterror.reset(new var(msg));
 }
 
-void var::setlasterror() const { tss_pglasterror.reset(); }
+void var::setlasterror() const {
+	tss_pglasterror.reset();
+}
 
 var var::getlasterror() const {
 	if (tss_pglasterror.get())
@@ -235,7 +238,7 @@ var var::getlasterror() const {
 
 static bool getpgresult(const var& sql, Scoped_PGresult& pgresult, PGconn* thread_pgconn);
 
-#if defined _MSC_VER //|| defined __CYGWIN__ || defined __MINGW32__
+#if defined _MSC_VER  //|| defined __CYGWIN__ || defined __MINGW32__
 LONG WINAPI DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS pExcPointers) {
 	LONG lDisposition = EXCEPTION_EXECUTE_HANDLER;
 
@@ -243,10 +246,10 @@ LONG WINAPI DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS pExcPointers) {
 		PDelayLoadInfo(pExcPointers->ExceptionRecord->ExceptionInformation[0]);
 
 	switch (pExcPointers->ExceptionRecord->ExceptionCode) {
-	case VcppException(ERROR_SEVERITY_ERROR, ERROR_MOD_NOT_FOUND):
-		printf("mvdbpostgres: %s was not found\n", pDelayLoadInfo->szDll);
-		break;
-		/*
+		case VcppException(ERROR_SEVERITY_ERROR, ERROR_MOD_NOT_FOUND):
+			printf("mvdbpostgres: %s was not found\n", pDelayLoadInfo->szDll);
+			break;
+			/*
 		   case VcppException(ERROR_SEVERITY_ERROR, ERROR_PROC_NOT_FOUND):
 			  if (pdli->dlp.fImportByName) {
 					  printf("Function %s was not found in %sn",
@@ -257,11 +260,11 @@ LONG WINAPI DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS pExcPointers) {
 			  }
 			  break;
 		*/
-	default:
-		// Exception is not related to delay loading
-		printf("Unknown problem %s\n", pDelayLoadInfo->szDll);
-		lDisposition = EXCEPTION_CONTINUE_SEARCH;
-		break;
+		default:
+			// Exception is not related to delay loading
+			printf("Unknown problem %s\n", pDelayLoadInfo->szDll);
+			lDisposition = EXCEPTION_CONTINUE_SEARCH;
+			break;
 	}
 
 	return (lDisposition);
@@ -285,8 +288,9 @@ bool msvc_PQconnectdb(PGconn** pgconn, const std::string& conninfo) {
 #endif
 
 // the idea is for exodus to have access to one standard database without secret password
-static var defaultconninfo = "host=127.0.0.1 port=5432 dbname=exodus user=exodus "
-							 "password=somesillysecret connect_timeout=10";
+static var defaultconninfo =
+	"host=127.0.0.1 port=5432 dbname=exodus user=exodus "
+	"password=somesillysecret connect_timeout=10";
 
 var var::build_conn_info(const var& conninfo) const {
 	// priority is
@@ -376,7 +380,7 @@ bool var::connect(const var& conninfo) {
 
 	PGconn* pgconn;
 	for (;;) {
-#if defined _MSC_VER //|| defined __CYGWIN__ || defined __MINGW32__
+#if defined _MSC_VER  //|| defined __CYGWIN__ || defined __MINGW32__
 		if (not msvc_PQconnectdb(&pgconn, conninfo2.toString())) {
 #if TRACING >= 1
 			var libname = "libpq.dl";
@@ -682,14 +686,16 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 	//if (! connection.sqlexec(sql))
 
 	// 1. look in information_schema.tables
-	var sql = "\
+	var sql =
+		"\
 		SELECT\
 		EXISTS	(\
     		SELECT 	table_name\
     		FROM 	information_schema.tables\
     		WHERE\
 					table_name = '" +
-			  filename2 + "'\
+		filename2 +
+		"'\
 				)\
 	";
 	var result;
@@ -699,14 +705,16 @@ bool var::open(const var& filename, const var& connection /*DEFAULTNULL*/) {
 	// 2. look in materialised views
 	// select matviewname from pg_matviews where matviewname = '...';
 	if (result[-1] != "t") {
-		sql = "\
+		sql =
+			"\
 			SELECT\
 			EXISTS	(\
 	    		SELECT 	matviewname\
 	    		FROM 	pg_matviews\
 	    		WHERE\
 						matviewname = '" +
-			  filename2 + "'\
+			filename2 +
+			"'\
 					)\
 		";
 		connection.sqlexec(sql, result);
@@ -839,7 +847,7 @@ bool var::read(const var& filehandle, const var& key) {
 
 	// asking to read DOS file! do osread using key as osfilename!
 	if (filehandle == "DOS") {
-		return this->osread(key); //.convert("\\",OSSLASH));
+		return this->osread(key);  //.convert("\\",OSSLASH));
 	}
 
 	// asking to read DOS file! do osread using key as osfilename!
@@ -926,8 +934,8 @@ bool var::read(const var& filehandle, const var& key) {
 											sql.toString().c_str(), 1, /* one param */
 											NULL,					   /* let the backend deduce param type */
 											paramValues, paramLengths,
-											0,	// text arguments
-											0); // text results
+											0,	 // text arguments
+											0);	 // text results
 	// paramFormats,
 	// 1);	  /* ask for binary results */
 
@@ -1032,7 +1040,7 @@ var var::lock(const var& key) const {
 	//$1=advisory_lock
 	paramValues[0] = (char*)&hash64;
 	paramLengths[0] = sizeof(uint64_t);
-	paramFormats[0] = 1; // binary
+	paramFormats[0] = 1;  // binary
 
 	const char* sql = "SELECT PG_TRY_ADVISORY_LOCK($1)";
 
@@ -1166,7 +1174,7 @@ bool var::unlockall() const {
 
 // returns only success or failure
 bool var::sqlexec(const var& sql) const {
-	var response = -1; //no response required
+	var response = -1;	//no response required
 	bool ok = this->sqlexec(sql, response);
 	if (!ok) {
 		this->setlasterror(response);
@@ -1292,7 +1300,7 @@ bool var::write(const var& filehandle, const var& key) const {
 
 	// asking to write DOS file! do osread!
 	if (filehandle == "DOS") {
-		this->oswrite(key); //.convert("\\",OSSLASH));
+		this->oswrite(key);	 //.convert("\\",OSSLASH));
 		return true;
 	}
 
@@ -1335,11 +1343,11 @@ bool var::write(const var& filehandle, const var& key) const {
 	Scoped_PGresult pgresult = PQexecParams(thread_pgconn,
 											// TODO: parameterise filename
 											sql.toString().c_str(),
-											2,	  // two params (key and data)
-											NULL, // let the backend deduce param type
+											2,	   // two params (key and data)
+											NULL,  // let the backend deduce param type
 											paramValues, paramLengths,
-											0,	// text arguments
-											0); // text results
+											0,	 // text arguments
+											0);	 // text results
 	// paramFormats,
 	// 1);				// ask for binary results
 
@@ -1399,11 +1407,11 @@ bool var::updaterecord(const var& filehandle, const var& key) const {
 	Scoped_PGresult pgresult = PQexecParams(thread_pgconn,
 											// TODO: parameterise filename
 											sql.toString().c_str(),
-											2,	  // two params (key and data)
-											NULL, // let the backend deduce param type
+											2,	   // two params (key and data)
+											NULL,  // let the backend deduce param type
 											paramValues, paramLengths,
-											0,	// text arguments
-											0); // text results
+											0,	 // text arguments
+											0);	 // text results
 	// paramFormats,	// bytea
 	// 1);				// ask for binary results
 
@@ -1475,11 +1483,11 @@ bool var::insertrecord(const var& filehandle, const var& key) const {
 	Scoped_PGresult pgresult = PQexecParams(thread_pgconn,
 											// TODO: parameterise filename
 											sql.toString().c_str(),
-											2,	  // two params (key and data)
-											NULL, // let the backend deduce param type
+											2,	   // two params (key and data)
+											NULL,  // let the backend deduce param type
 											paramValues, paramLengths,
-											0,	// text arguments
-											0); // text results
+											0,	 // text arguments
+											0);	 // text results
 	// paramFormats,	// bytea
 	// 1);				// ask for binary results
 
@@ -1534,8 +1542,8 @@ bool var::deleterecord(const var& key) const {
 	Scoped_PGresult pgresult = PQexecParams(thread_pgconn, sql.toString().c_str(), 1, /* two param */
 											NULL,									  /* let the backend deduce param type */
 											paramValues, paramLengths,
-											0,	// text arguments
-											0); // text results
+											0,	 // text arguments
+											0);	 // text results
 	// paramFormats,
 	// 1);	  /* ask for binary results */
 
@@ -1756,9 +1764,7 @@ inline var fileexpression(const var& mainfilename, const var& filename, const va
 	// "coalesce(" ^ expression ^", ''::text)";
 }
 
-var var::getdictexpression(const var& mainfilename, const var& filename, const var& dictfilename,
-						   const var& dictfile, const var& fieldname0, var& joins, var& unnests,
-						   var& selects, var& ismv, bool forsort) const {
+var var::getdictexpression(const var& mainfilename, const var& filename, const var& dictfilename, const var& dictfile, const var& fieldname0, var& joins, var& unnests, var& selects, var& ismv, bool forsort) const {
 
 	ismv = false;
 
@@ -2110,9 +2116,9 @@ var var::getdictexpression(const var& mainfilename, const var& filename, const v
 		// handle it. this is also perhaps SLOW since it has to copy the whole RECORD and ID
 		// etc to exodus via IPC for every call!
 		else {
-		exodus_call:
+exodus_call:
 			sqlexpression = "'" ^ fieldname ^ "'";
-			int environmentn = 1; // getenvironmentn()
+			int environmentn = 1;  // getenvironmentn()
 			// sqlexpression="exodus_call('exodusservice-" ^ getprocessn() ^ "." ^
 			// environmentn ^ "'::bytea, '" ^ dictfilename.lcase() ^ "'::bytea, '" ^
 			// fieldname.lcase() ^ "'::bytea, "^ filename ^ ".key, " ^ filename ^
@@ -2386,7 +2392,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 	var ismv = false;
 
 	var maxnrecs = "";
-	var xx; // throwaway return value
+	var xx;	 // throwaway return value
 
 	//prepare to save calculated fields that cannot be calculated by postgresql for secondary processing
 	var calc_fields = "";
@@ -2594,7 +2600,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 
 			// process the dictionary id
 			var forsort =
-				false; // because indexes are NOT created sortable (exodus_sort()
+				false;	// because indexes are NOT created sortable (exodus_sort()
 			var dictexpression =
 				getdictexpression(actualfilename, actualfilename, dictfilename,
 								  dictfile, word1, joins, unnests, selects, ismv, forsort);
@@ -3038,7 +3044,7 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 				if (value == "''") {
 					value = "'{}'";
 				} else {
-					op = "&&"; //postgres array overlap operator
+					op = "&&";	//postgres array overlap operator
 					value.swapper("'", "\"");
 					//convert to postrgesql array syntax
 					value = "'{" ^ value ^ "}'";
@@ -3052,9 +3058,9 @@ bool var::selectx(const var& fieldnames, const var& sortselectclause) {
 			whereclause ^= " " ^ dictexpression ^ " " ^ op ^ " " ^ value;
 			// whereclause.outputl("whereclause=");
 
-		} //with/without
+		}  //with/without
 
-	} // getword loop
+	}  // getword loop
 
 	if (calc_fields && orwith) {
 		//		throw MVDBException("OR not allowed with sort/select calculated fields");
@@ -3918,8 +3924,8 @@ bool var::createindex(const var& fieldname0, const var& dictfile) const {
 	// create index ads__brand_code on ads (exodus_extract_text(data,3,0,0));
 
 	// throws if cannot find dict file or record
-	var joins = "";	  // throw away - cant index on joined fields at the moment
-	var unnests = ""; // throw away - cant index on multi-valued fields at the moment
+	var joins = "";	   // throw away - cant index on joined fields at the moment
+	var unnests = "";  // throw away - cant index on multi-valued fields at the moment
 	var selects = "";
 	var ismv;
 	var forsort = false;
@@ -4020,8 +4026,9 @@ var var::listfiles() const {
 
 	// from http://www.alberton.info/postgresql_meta_info.html
 
-	var sql = "SELECT table_name FROM information_schema.tables WHERE table_type = 'BASE "
-			  "TABLE' AND table_schema NOT IN ('pg_catalog', 'information_schema') ";
+	var sql =
+		"SELECT table_name FROM information_schema.tables WHERE table_type = 'BASE "
+		"TABLE' AND table_schema NOT IN ('pg_catalog', 'information_schema') ";
 
 	sql ^= " UNION SELECT matviewname as table_name from pg_matviews;";
 
@@ -4089,20 +4096,22 @@ var var::listindexes(const var& filename0, const var& fieldname0) const {
 
 	// TODO for some reason doesnt return the exodus index_file__fieldname records
 	// perhaps you have to be connected with sufficient postgres rights
-	var sql = "SELECT relname"
-			  " FROM pg_class"
-			  " WHERE oid IN ("
-			  " SELECT indexrelid"
-			  " FROM pg_index, pg_class"
-			  " WHERE";
+	var sql =
+		"SELECT relname"
+		" FROM pg_class"
+		" WHERE oid IN ("
+		" SELECT indexrelid"
+		" FROM pg_index, pg_class"
+		" WHERE";
 	if (filename)
 		sql ^= " relname = '" ^ filename.lcase() ^ "' AND ";
 	// if (fieldname)
 	//	sql^=" ???relname = '" ^ fieldname.lcase() ^  "' AND ";
-	sql ^= " pg_class.oid=pg_index.indrelid"
-		   " AND indisunique != 't'"
-		   " AND indisprimary != 't'"
-		   ");";
+	sql ^=
+		" pg_class.oid=pg_index.indrelid"
+		" AND indisunique != 't'"
+		" AND indisprimary != 't'"
+		");";
 
 	PGconn* pgconn = (PGconn*)this->connection();
 	if (pgconn == NULL)
@@ -4181,8 +4190,9 @@ var var::reccount(const var& filename0) const {
 }
 
 var var::flushindex(const var& filename) const {
-	THISIS("var var::flushindex(const var& filename="
-		   ") const")
+	THISIS(
+		"var var::flushindex(const var& filename="
+		") const")
 	// could allow undefined usage since *this isnt used?
 	THISISDEFINED()
 	ISSTRING(filename)
@@ -4238,8 +4248,8 @@ static bool getpgresult(const var& sql, Scoped_PGresult& pgresult, PGconn* threa
 	pgresult = PQexecParams(thread_pgconn, sql.toString().c_str(), 0, /* zero params */
 							NULL,									  /* let the backend deduce param type */
 							paramValues, paramLengths,
-							0,	// text arguments
-							0); // text results
+							0,	 // text arguments
+							0);	 // text results
 	// paramFormats,
 	// 1);	  /* ask for binary results */
 
@@ -4253,55 +4263,55 @@ static bool getpgresult(const var& sql, Scoped_PGresult& pgresult, PGconn* threa
 		return false;
 	} else {
 		switch (PQresultStatus(pgresult)) {
-		case PGRES_COMMAND_OK:
+			case PGRES_COMMAND_OK:
 #if TRACING >= 3
-			const char* str_res;
-			str_res = PQcmdTuples(pgresult);
-			if (strlen(str_res) > 0) {
-				var("Command executed OK, " ^ var(str_res) ^ " rows.").logputl();
-			} else {
-				var("Command executed OK, 0 rows.").logputl();
-			}
+				const char* str_res;
+				str_res = PQcmdTuples(pgresult);
+				if (strlen(str_res) > 0) {
+					var("Command executed OK, " ^ var(str_res) ^ " rows.").logputl();
+				} else {
+					var("Command executed OK, 0 rows.").logputl();
+				}
 #endif
 
-			return true;
+				return true;
 
-		case PGRES_TUPLES_OK:
+			case PGRES_TUPLES_OK:
 
 #if TRACING >= 3
-			var(sql ^ "\nSelect executed OK, " ^ var(PQntuples(pgresult)) ^
-				" rows found.")
-				.logputl();
+				var(sql ^ "\nSelect executed OK, " ^ var(PQntuples(pgresult)) ^
+					" rows found.")
+					.logputl();
 #endif
 
-			return PQntuples(pgresult) > 0;
+				return PQntuples(pgresult) > 0;
 
-		case PGRES_NONFATAL_ERROR:
+			case PGRES_NONFATAL_ERROR:
 
-			//#if TRACING >= 1
-			var("ERROR: mvdbpostgres SQL non-fatal error code " ^
-				var(PQresStatus(PQresultStatus(pgresult))) ^ ", " ^
-				var(PQresultErrorMessage(pgresult)))
-				.errputl();
-			//#endif
-
-			return true;
-
-		default:
-
-			//#if TRACING >= 1
-			if (sql.field(" ", 1) != "FETCH") {
-				var("ERROR: mvdbpostgres pqexec " ^ var(sql)).errputl();
-				var("ERROR: mvdbpostgres pqexec " ^
-					var(PQresStatus(PQresultStatus(pgresult))) ^ ": " ^
+				//#if TRACING >= 1
+				var("ERROR: mvdbpostgres SQL non-fatal error code " ^
+					var(PQresStatus(PQresultStatus(pgresult))) ^ ", " ^
 					var(PQresultErrorMessage(pgresult)))
 					.errputl();
-			}
-			//#endif
+				//#endif
 
-			// this is defaulted above for safety
-			// retcode=0;
-			return false;
+				return true;
+
+			default:
+
+				//#if TRACING >= 1
+				if (sql.field(" ", 1) != "FETCH") {
+					var("ERROR: mvdbpostgres pqexec " ^ var(sql)).errputl();
+					var("ERROR: mvdbpostgres pqexec " ^
+						var(PQresStatus(PQresultStatus(pgresult))) ^ ": " ^
+						var(PQresultErrorMessage(pgresult)))
+						.errputl();
+				}
+				//#endif
+
+				// this is defaulted above for safety
+				// retcode=0;
+				return false;
 		}
 
 		// should never get here
@@ -4544,4 +4554,4 @@ sqlfilename ^ ".key"; sql2 ^= crlf ^ ";";
 
 */
 
-} // namespace exodus
+}  // namespace exodus

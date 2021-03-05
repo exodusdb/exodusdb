@@ -112,30 +112,25 @@ namespace exodus {
 // default constructor.  probably followed by .init(libname,funcname,mv)
 ExodusFunctorBase::ExodusFunctorBase()
 	// TODO optimise by only initialise one and detect usage on that only
-	: mv_(NULL), libraryname_(""), functionname_(""), plibrary_(NULL), pfunction_(NULL),
-	  pobject_(NULL), pmemberfunction_(NULL) {
+	: mv_(NULL), libraryname_(""), functionname_(""), plibrary_(NULL), pfunction_(NULL), pobject_(NULL), pmemberfunction_(NULL) {
 	pobject_ = 0;
 };
 
 // constructor to provide everything immediately
-ExodusFunctorBase::ExodusFunctorBase(const std::string libname, const std::string funcname,
-									 MvEnvironment& mv)
-	: mv_(&mv), libraryname_(libname), functionname_(funcname), plibrary_(NULL), pfunction_(NULL),
-	  pobject_(NULL), pmemberfunction_(NULL) {
+ExodusFunctorBase::ExodusFunctorBase(const std::string libname, const std::string funcname, MvEnvironment& mv)
+	: mv_(&mv), libraryname_(libname), functionname_(funcname), plibrary_(NULL), pfunction_(NULL), pobject_(NULL), pmemberfunction_(NULL) {
 	pobject_ = 0;
 }
 
 // constructor to provide library name and function immediately
 ExodusFunctorBase::ExodusFunctorBase(const std::string libname, const std::string funcname)
-	: mv_(NULL), libraryname_(libname), functionname_(funcname), plibrary_(NULL), pfunction_(NULL),
-	  pobject_(NULL), pmemberfunction_(NULL) {
+	: mv_(NULL), libraryname_(libname), functionname_(funcname), plibrary_(NULL), pfunction_(NULL), pobject_(NULL), pmemberfunction_(NULL) {
 	pobject_ = 0;
 }
 
 // constructor to provide environment immediately. probably followed by .init(libname,funcname)
 ExodusFunctorBase::ExodusFunctorBase(MvEnvironment& mv)
-	: mv_(&mv), libraryname_(""), functionname_(""), plibrary_(NULL), pfunction_(NULL),
-	  pobject_(NULL), pmemberfunction_(NULL) {
+	: mv_(&mv), libraryname_(""), functionname_(""), plibrary_(NULL), pfunction_(NULL), pobject_(NULL), pmemberfunction_(NULL) {
 	pobject_ = 0;
 }
 
@@ -145,8 +140,7 @@ ExodusFunctorBase::~ExodusFunctorBase() {
 }
 
 // atm designed to be called once only the first time an external function is called
-bool ExodusFunctorBase::init(const char* newlibraryname, const char* newfunctionname,
-							 MvEnvironment& mv) {
+bool ExodusFunctorBase::init(const char* newlibraryname, const char* newfunctionname, MvEnvironment& mv) {
 #if TRACING >= 4
 	std::cout << "mvfunctor:init(lib,func)  " << libraryname_ << ", " << functionname_ << std::endl;
 #endif
@@ -211,8 +205,7 @@ bool ExodusFunctorBase::init() {
 
 // called by dict/perform/execute ... can be called repeatably since buffers lib and func
 // perform/execute call with forcenew=true to ensure global variables are unassigned initially
-bool ExodusFunctorBase::initsmf(const char* newlibraryname, const char* newfunctionname,
-								const bool forcenew) {
+bool ExodusFunctorBase::initsmf(const char* newlibraryname, const char* newfunctionname, const bool forcenew) {
 
 #if TRACING >= 4
 	std::cout << "mvfunctor:initsmf: === in === " << newlibraryname << std::endl;
@@ -571,4 +564,4 @@ void ExodusFunctorBase::closefunc() {
 	// functionname_="";
 }
 
-} // namespace exodus
+}  // namespace exodus

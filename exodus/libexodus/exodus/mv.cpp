@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include <limits>
 #include <sstream>
 
-#define EXO_MV_CPP // indicates globals are to be defined (omit extern keyword)
+#define EXO_MV_CPP	// indicates globals are to be defined (omit extern keyword)
 #include <exodus/mv.h>
 //#include <exodus/mvutf.h>
 #include <exodus/mvexceptions.h>
@@ -381,7 +381,7 @@ var& var::operator=(const int int1) {
 	// THISISDEFINED()
 
 	var_int = int1;
-	var_typ = VARTYP_INT; // reset to one unique type
+	var_typ = VARTYP_INT;  // reset to one unique type
 
 	return *this;
 }
@@ -396,7 +396,7 @@ var& var::operator=(const double double1) {
 	// THISISDEFINED()
 
 	var_dbl = double1;
-	var_typ = VARTYP_DBL; // reset to one unique type
+	var_typ = VARTYP_DBL;  // reset to one unique type
 
 	return *this;
 }
@@ -410,12 +410,12 @@ var& var::operator=(const char char2) {
 	// var undefinedassign=undefinedassign=L'X';
 	// this causes crash due to bad memory access due to setting string that doesnt exist
 	// slows down all string settings so consider NOT CHECKING in production code
-	THISISDEFINED() // ALN:TODO: this definition kind of misleading, try to find
-					// ALN:TODO: or change name to something like: THISISNOTDEAD :)
-					// ALN:TODO: argumentation: var with mvtyp=0 is NOT defined
+	THISISDEFINED()	 // ALN:TODO: this definition kind of misleading, try to find
+	// ALN:TODO: or change name to something like: THISISNOTDEAD :)
+	// ALN:TODO: argumentation: var with mvtyp=0 is NOT defined
 
 	var_str = char2;
-	var_typ = VARTYP_STR; // reset to one unique type
+	var_typ = VARTYP_STR;  // reset to one unique type
 
 	return *this;
 }
@@ -431,7 +431,7 @@ var& var::operator=(const char* char2) {
 	THISISDEFINED()
 
 	var_str = char2;
-	var_typ = VARTYP_STR; // reset to one unique type
+	var_typ = VARTYP_STR;  // reset to one unique type
 
 	return *this;
 }
@@ -447,7 +447,7 @@ var& var::operator=(const std::string& string2) {
 	// slows down all string settings so consider NOT CHECKING in production code
 	THISISDEFINED()
 	var_str = string2;
-	var_typ = VARTYP_STR; // reset to one unique type
+	var_typ = VARTYP_STR;  // reset to one unique type
 
 	return *this;
 }
@@ -462,7 +462,7 @@ var& var::operator^=(const var& rhs) {
 
 	// tack it onto our string
 	var_str += rhs.var_str;
-	var_typ = VARTYP_STR; // reset to one unique type
+	var_typ = VARTYP_STR;  // reset to one unique type
 
 	return *this;
 }
@@ -475,7 +475,7 @@ var& var::operator^=(const int int1) {
 
 	// var_str+=var(int1).var_str;
 	var_str += intToString(int1);
-	var_typ = VARTYP_STR; // reset to one unique type
+	var_typ = VARTYP_STR;  // reset to one unique type
 
 	return *this;
 }
@@ -488,7 +488,7 @@ var& var::operator^=(const double double1) {
 
 	// var_str+=var(int1).var_str;
 	var_str += dblToString(double1);
-	var_typ = VARTYP_STR; // reset to one unique type
+	var_typ = VARTYP_STR;  // reset to one unique type
 
 	return *this;
 }
@@ -501,7 +501,7 @@ var& var::operator^=(const char char1) {
 
 	// var_str+=var(int1).var_str;
 	var_str += char1;
-	var_typ = VARTYP_STR; // reset to one unique type
+	var_typ = VARTYP_STR;  // reset to one unique type
 
 	return *this;
 }
@@ -515,7 +515,7 @@ var& var::operator^=(const char* char1) {
 	// var_str+=var(int1).var_str;
 	// var_str+=std::string(char1);
 	var_str += char1;
-	var_typ = VARTYP_STR; // reset to one unique type
+	var_typ = VARTYP_STR;  // reset to one unique type
 
 	return *this;
 }
@@ -528,7 +528,7 @@ var& var::operator^=(const std::string& string1) {
 
 	// var_str+=var(int1).var_str;
 	var_str += string1;
-	var_typ = VARTYP_STR; // reset to one unique type
+	var_typ = VARTYP_STR;  // reset to one unique type
 
 	return *this;
 }
@@ -554,10 +554,10 @@ tryagain:
 		if (var_int == std::numeric_limits<mvint_t>::max())
 			throw MVIntOverflow("operator++");
 		var_int++;
-		var_typ = VARTYP_INT; // reset to one unique type
+		var_typ = VARTYP_INT;  // reset to one unique type
 	} else if (var_typ & VARTYP_DBL) {
 		var_dbl++;
-		var_typ = VARTYP_DBL; // reset to one unique type
+		var_typ = VARTYP_DBL;  // reset to one unique type
 	} else if (var_typ & VARTYP_STR) {
 		// try to convert to numeric
 		if (isnum())
@@ -583,10 +583,10 @@ tryagain:
 	// prefer int since -- nearly always on integers
 	if (var_typ & VARTYP_INT) {
 		var_int--;
-		var_typ = VARTYP_INT; // reset to one unique type
+		var_typ = VARTYP_INT;  // reset to one unique type
 	} else if (var_typ & VARTYP_DBL) {
 		var_dbl--;
-		var_typ = VARTYP_DBL; // reset to one unique type
+		var_typ = VARTYP_DBL;  // reset to one unique type
 	} else if (var_typ & VARTYP_STR) {
 		// try to convert to numeric
 		if (isnum())
@@ -614,10 +614,10 @@ tryagain:
 		if (var_int == std::numeric_limits<mvint_t>::max())
 			throw MVIntOverflow("operator++");
 		var_int++;
-		var_typ = VARTYP_INT; // reset to one unique type
+		var_typ = VARTYP_INT;  // reset to one unique type
 	} else if (var_typ & VARTYP_DBL) {
 		var_dbl++;
-		var_typ = VARTYP_DBL; // reset to one unique type
+		var_typ = VARTYP_DBL;  // reset to one unique type
 	} else if (var_typ & VARTYP_STR) {
 		// try to convert to numeric
 		if (isnum())
@@ -643,10 +643,10 @@ tryagain:
 	// prefer int since -- nearly always on integers
 	if (var_typ & VARTYP_INT) {
 		var_int--;
-		var_typ = VARTYP_INT; // reset to one unique type
+		var_typ = VARTYP_INT;  // reset to one unique type
 	} else if (var_typ & VARTYP_DBL) {
 		var_dbl--;
-		var_typ = VARTYP_DBL; // reset to one unique type
+		var_typ = VARTYP_DBL;  // reset to one unique type
 	} else if (var_typ & VARTYP_STR) {
 		// try to convert to numeric
 		if (isnum())
@@ -674,14 +674,14 @@ tryagain:
 	if (var_typ & VARTYP_DBL) {
 		//+= int or dbl from source
 		var_dbl += int1;
-		var_typ = VARTYP_DBL; // reset to one unique type
+		var_typ = VARTYP_DBL;  // reset to one unique type
 		return *this;
 	}
 
 	// int target
 	else if (var_typ & VARTYP_INT) {
 		var_int += int1;
-		var_typ = VARTYP_INT; // reset to one unique type
+		var_typ = VARTYP_INT;  // reset to one unique type
 		return *this;
 	}
 
@@ -711,14 +711,14 @@ tryagain:
 	// prefer double
 	if (var_typ & VARTYP_DBL) {
 		var_dbl -= int1;
-		var_typ = VARTYP_DBL; // reset to one unique type
+		var_typ = VARTYP_DBL;  // reset to one unique type
 		return *this;
 	}
 
 	// int target
 	else if (var_typ & VARTYP_INT) {
 		var_int -= int1;
-		var_typ = VARTYP_INT; // reset to one unique type
+		var_typ = VARTYP_INT;  // reset to one unique type
 		return *this;
 	}
 
@@ -754,7 +754,7 @@ tryagain:
 		ISNUMERIC(rhs)
 		//+= int or dbl from source
 		var_dbl += (rhs.var_typ & VARTYP_INT) ? rhs.var_int : rhs.var_dbl;
-		var_typ = VARTYP_DBL; // reset to one unique type
+		var_typ = VARTYP_DBL;  // reset to one unique type
 		return *this;
 	}
 
@@ -764,12 +764,12 @@ tryagain:
 		// int source
 		if (rhs.var_typ & VARTYP_INT) {
 			var_int += rhs.var_int;
-			var_typ = VARTYP_INT; // reset to one unique type
+			var_typ = VARTYP_INT;  // reset to one unique type
 			return *this;
 		}
 		// dbl source, convert target to dbl
 		var_dbl = var_int + rhs.var_dbl;
-		var_typ = VARTYP_DBL; // reset to one unique type
+		var_typ = VARTYP_DBL;  // reset to one unique type
 		return *this;
 	}
 
@@ -801,12 +801,12 @@ tryagain:
 		// int source
 		if (rhs.var_typ & VARTYP_INT) {
 			var_int -= rhs.var_int;
-			var_typ = VARTYP_INT; // reset to one unique type
+			var_typ = VARTYP_INT;  // reset to one unique type
 			return *this;
 		}
 		// dbl source, convert target to dbl
 		var_dbl = var_int - rhs.var_dbl;
-		var_typ = VARTYP_DBL; // reset to one unique type
+		var_typ = VARTYP_DBL;  // reset to one unique type
 		return *this;
 	}
 
@@ -815,7 +815,7 @@ tryagain:
 		ISNUMERIC(rhs)
 		//-= int or dbl from source
 		var_dbl -= (rhs.var_typ & VARTYP_INT) ? rhs.var_int : rhs.var_dbl;
-		var_typ = VARTYP_DBL; // reset to one unique type
+		var_typ = VARTYP_DBL;  // reset to one unique type
 		return *this;
 	}
 
@@ -1245,8 +1245,8 @@ var MVadd(const var& lhs, const var& rhs) {
 
 	if (lhs.var_typ & VARTYP_INT)
 		if (rhs.var_typ & VARTYP_INT)
-			return lhs.var_int + rhs.var_int; // only this returns an int, the following
-											  // both return doubles
+			return lhs.var_int + rhs.var_int;  // only this returns an int, the following
+											   // both return doubles
 		else
 			return lhs.var_int +
 				   ((rhs.var_typ & VARTYP_INT) ? rhs.var_int : rhs.var_dbl);
@@ -1261,8 +1261,8 @@ var MVsub(const var& lhs, const var& rhs) {
 
 	if (lhs.var_typ & VARTYP_INT)
 		if (rhs.var_typ & VARTYP_INT)
-			return lhs.var_int - rhs.var_int; // only this returns an int, the following
-											  // both return doubles
+			return lhs.var_int - rhs.var_int;  // only this returns an int, the following
+											   // both return doubles
 		else
 			return lhs.var_int -
 				   ((rhs.var_typ & VARTYP_INT) ? rhs.var_int : rhs.var_dbl);
@@ -1277,8 +1277,8 @@ var MVmul(const var& lhs, const var& rhs) {
 
 	if (lhs.var_typ & VARTYP_INT)
 		if (rhs.var_typ & VARTYP_INT)
-			return lhs.var_int * rhs.var_int; // only this returns an int, the following
-											  // both return doubles
+			return lhs.var_int * rhs.var_int;  // only this returns an int, the following
+											   // both return doubles
 		else
 			return lhs.var_int *
 				   ((rhs.var_typ & VARTYP_INT) ? rhs.var_int : rhs.var_dbl);
@@ -1446,7 +1446,7 @@ std::ostream& operator<<(std::ostream& ostream1, var var1) {
 	//replace various unprintable field marks with unusual ASCII characters
 	//leave ESC as \x1B because it is used to control ANSI terminal control sequences
 	//std::string str = "\x1A\x1B\x1C\x1D\x1E\x1F";
-	std::string str = "\x1E\x1D\x1C\x1B\x1A\x1F"; //order by frequency of occurrence
+	std::string str = "\x1E\x1D\x1C\x1B\x1A\x1F";  //order by frequency of occurrence
 	for (auto& c : var1.var_str) {
 		if (c >= 0x1A && c <= 0x1F)
 			c = "|\x1B}]^~"[c - 0x1A];
@@ -1699,32 +1699,50 @@ std::string dblToString(double double1) {
 
 var backtrace();
 
-MVError::MVError(const var& description_) : description(description_) {
+MVError::MVError(const var& description_)
+	: description(description_) {
 	// capture the stack at point of creation i.e. when thrown
 	this->stack = backtrace();
 	((description.assigned() ? description : "") ^ "\n" ^ stack.convert(FM, "\n") ^ "\n").put(std::cerr);
 }
 
-MVUnassigned ::MVUnassigned(const var& var1) : MVError("MVUnassigned:" ^ var1) {}
-MVDivideByZero ::MVDivideByZero(const var& var1) : MVError("MVDivideByZero:" ^ var1) {}
-MVNonNumeric ::MVNonNumeric(const var& var1) : MVError("MVNonNumeric:" ^ var1) {}
-MVIntOverflow ::MVIntOverflow(const var& var1) : MVError("MVIntOverflow:" ^ var1) {}
-MVIntUnderflow ::MVIntUnderflow(const var& var1) : MVError("MVIntUnderflow:" ^ var1) {}
-MVUndefined ::MVUndefined(const var& var1) : MVError("MVUndefined:" ^ var1) {}
-MVOutOfMemory ::MVOutOfMemory(const var& var1) : MVError("MVOutOfMemory:" ^ var1) {}
-MVInvalidPointer ::MVInvalidPointer(const var& var1) : MVError("MVInvalidPointer:" ^ var1) {}
-MVDBException ::MVDBException(const var& var1) : MVError("MVDBException:" ^ var1) {}
-MVNotImplemented ::MVNotImplemented(const var& var1) : MVError("MVNotImplemented:" ^ var1) {}
-MVDebug ::MVDebug(const var& var1) : MVError("MVDebug" ^ var1) {}
-MVStop ::MVStop(const var& var1) : description(var1) {}
-MVAbort ::MVAbort(const var& var1) : description(var1) {}
-MVAbortAll ::MVAbortAll(const var& var1) : description(var1) {}
-MVLogoff ::MVLogoff(const var& var1) : description(var1) {}
-MVArrayDimensionedZero ::MVArrayDimensionedZero() : MVError("MVArrayDimensionedZero:") {}
+MVUnassigned ::MVUnassigned(const var& var1)
+	: MVError("MVUnassigned:" ^ var1) {}
+MVDivideByZero ::MVDivideByZero(const var& var1)
+	: MVError("MVDivideByZero:" ^ var1) {}
+MVNonNumeric ::MVNonNumeric(const var& var1)
+	: MVError("MVNonNumeric:" ^ var1) {}
+MVIntOverflow ::MVIntOverflow(const var& var1)
+	: MVError("MVIntOverflow:" ^ var1) {}
+MVIntUnderflow ::MVIntUnderflow(const var& var1)
+	: MVError("MVIntUnderflow:" ^ var1) {}
+MVUndefined ::MVUndefined(const var& var1)
+	: MVError("MVUndefined:" ^ var1) {}
+MVOutOfMemory ::MVOutOfMemory(const var& var1)
+	: MVError("MVOutOfMemory:" ^ var1) {}
+MVInvalidPointer ::MVInvalidPointer(const var& var1)
+	: MVError("MVInvalidPointer:" ^ var1) {}
+MVDBException ::MVDBException(const var& var1)
+	: MVError("MVDBException:" ^ var1) {}
+MVNotImplemented ::MVNotImplemented(const var& var1)
+	: MVError("MVNotImplemented:" ^ var1) {}
+MVDebug ::MVDebug(const var& var1)
+	: MVError("MVDebug" ^ var1) {}
+MVStop ::MVStop(const var& var1)
+	: description(var1) {}
+MVAbort ::MVAbort(const var& var1)
+	: description(var1) {}
+MVAbortAll ::MVAbortAll(const var& var1)
+	: description(var1) {}
+MVLogoff ::MVLogoff(const var& var1)
+	: description(var1) {}
+MVArrayDimensionedZero ::MVArrayDimensionedZero()
+	: MVError("MVArrayDimensionedZero:") {}
 MVArrayIndexOutOfBounds ::MVArrayIndexOutOfBounds(const var& var1)
 	: MVError("MVArrayIndexOutOfBounds:" ^ var1) {
 }
-MVArrayNotDimensioned ::MVArrayNotDimensioned() : MVError("MVArrayNotDimensioned") {}
+MVArrayNotDimensioned ::MVArrayNotDimensioned()
+	: MVError("MVArrayNotDimensioned") {}
 
 var operator""_var(const char* cstr, std::size_t size) {
 	return var(cstr, size);
@@ -1737,4 +1755,4 @@ var operator""_var(unsigned long long int i) {
 var operator""_var(long double d) {
 	return var(double(d));
 }
-} // namespace exodus
+}  // namespace exodus

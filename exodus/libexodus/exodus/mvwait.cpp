@@ -67,27 +67,27 @@ var handle_events(int inotify_fd, int* wd, const int argc, const char* argv[]) {
 			else if (event->mask & IN_CLOSE_WRITE)
 				events.r(1, eventn, "IN_CLOSE_WRITE");
 			else if (event->mask & IN_ACCESS)
-				events.r(1, eventn, "IN_ACCESS"); //Data was read from file.");
+				events.r(1, eventn, "IN_ACCESS");  //Data was read from file.");
 			else if (event->mask & IN_MODIFY)
-				events.r(1, eventn, "IN_MODIFY"); //Data was written to file.");
+				events.r(1, eventn, "IN_MODIFY");  //Data was written to file.");
 			else if (event->mask & IN_ATTRIB)
-				events.r(1, eventn, "IN_ATTRIB"); //File attributes changed.");
+				events.r(1, eventn, "IN_ATTRIB");  //File attributes changed.");
 			else if (event->mask & IN_CLOSE)
-				events.r(1, eventn, "IN_CLOSE"); //File was closed (read or write).");
+				events.r(1, eventn, "IN_CLOSE");  //File was closed (read or write).");
 			else if (event->mask & IN_MOVED_FROM)
-				events.r(1, eventn, "IN_MOVED_FROM"); //File was moved away from watched directory.");
+				events.r(1, eventn, "IN_MOVED_FROM");  //File was moved away from watched directory.");
 			else if (event->mask & IN_MOVED_TO)
-				events.r(1, eventn, "IN_MOVED_TO"); //File was moved into watched directory.");
+				events.r(1, eventn, "IN_MOVED_TO");	 //File was moved into watched directory.");
 			else if (event->mask & IN_MOVE)
-				events.r(1, eventn, "IN_MOVE"); //File was moved (in or out of directory).");
+				events.r(1, eventn, "IN_MOVE");	 //File was moved (in or out of directory).");
 			else if (event->mask & IN_CREATE)
-				events.r(1, eventn, "IN_CREATE"); //A file was created in the directory.");
+				events.r(1, eventn, "IN_CREATE");  //A file was created in the directory.");
 			else if (event->mask & IN_DELETE)
-				events.r(1, eventn, "IN_DELETE"); //A file was deleted from the directory.");
+				events.r(1, eventn, "IN_DELETE");  //A file was deleted from the directory.");
 			else if (event->mask & IN_DELETE_SELF)
-				events.r(1, eventn, "IN_DELETE_SELF"); //Directory or file under observation was deleted.");
+				events.r(1, eventn, "IN_DELETE_SELF");	//Directory or file under observation was deleted.");
 			else if (event->mask & IN_MOVE_SELF)
-				events.r(1, eventn, "IN_MOVE_SELF"); //Directory or file under observation was moved.");
+				events.r(1, eventn, "IN_MOVE_SELF");  //Directory or file under observation was moved.");
 			else
 				continue;
 
@@ -311,4 +311,4 @@ var var::oswait(const int milliseconds, const var& directory) const {
 	return wait_main(cargs.argc(), cargs.argv(), milliseconds);
 }
 
-} // namespace exodus
+}  // namespace exodus
