@@ -2361,7 +2361,7 @@ void ExodusProgramBase::sortarray(var& array, const var& fns, const var& orderby
 	for (var fnn = 2; fnn <= nfns; ++fnn) {
 		fn = fns.a(1, fnn);
 		array.r(fn, newarray.a(fn));
-	}; //fnn;
+	} //fnn;
 
 	return;
 }
