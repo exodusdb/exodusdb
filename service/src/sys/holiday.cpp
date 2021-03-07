@@ -34,7 +34,7 @@ function main(in mode, io idate, in usercode, in userx, in marketcode, in market
 		//eg -2 will change idate to the second workday BEFORE idate
 		if (workdate gt 0) {
 			direction = 1;
-		}else{
+		} else {
 			direction = -1;
 		}
 
@@ -102,7 +102,7 @@ subroutine getholidaytype(in idate, in userx, in agp, in market, io holidaytype)
 	//if holidays else
 	// holidays=
 	// end
-	if (holidays.a(1).locate(idate,xx)) {
+	if (holidays.a(1).locate(idate, xx)) {
 		holidaytype = 2;
 		return;
 	}
@@ -114,7 +114,7 @@ subroutine getholidaytype(in idate, in userx, in agp, in market, io holidaytype)
 	var fromdates = userx.a(22);
 	var uptodates = userx.a(23);
 	//from dates must be in reverse sorted order
-	if (not(fromdates.a(1).locateby("DR",idate,daten))) {
+	if (not(fromdates.a(1).locateby("DR", idate, daten))) {
 		{}
 	}
 	var uptodate = uptodates.a(1, daten);

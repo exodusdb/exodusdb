@@ -109,12 +109,12 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 		if (passwordreset) {
 			var tt = SECURITY.ucase();
 			//password is email address when resetting
-			if (tt.a(7).locate(password.ucase(),usern)) {
+			if (tt.a(7).locate(password.ucase(), usern)) {
 				//only if email address occurs more than once
 				tt = tt.a(7);
 				tt.r(1, usern, "");
 				tt.converter("; ", VM);
-				if (not(tt.locate(password.ucase(),xx))) {
+				if (not(tt.locate(password.ucase(), xx))) {
 					username = SECURITY.a(1, usern);
 				}
 			}
@@ -171,7 +171,7 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 		//NB if "EXODUS" is in Auth File then some user restrictions apply eg password/ips
 
 		//check username exists
-		if (not(SECURITY.a(1).locate(username,usern))) {
+		if (not(SECURITY.a(1).locate(username, usern))) {
 			usern = 0;
 		}
 
@@ -193,8 +193,8 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 				for (var failn = 1; failn <= 999999; ++failn) {
 					var tt = userx.a(18, failn);
 					///BREAK;
-					if (not(tt ne "" and tt.substr(1,2) ne "OK")) break;
-				};//failn;
+					if (not(tt ne "" and tt.substr(1, 2) ne "OK")) break;
+				} //failn;
 				//do normal authorisation to show type of failure - but fail even if ok
 				//if failn>=maxnfails then
 				// goto validateexit
@@ -244,7 +244,7 @@ passfail:
 				{}
 
 			//password is correct
-			}else{
+			} else {
 
 	//passok:
 
@@ -263,7 +263,7 @@ passfail:
 				//+ in user ipnos means add to group user ip ranges
 				if (validips.index("+")) {
 					validips.transfer(addvalidips);
-				}else{
+				} else {
 					addvalidips = "";
 				}
 
@@ -276,7 +276,7 @@ passfail:
 					for (ii = usern + 1; ii <= nn; ++ii) {
 						///BREAK;
 						if (not(SECURITY.a(1, ii + 1) ne "---")) break;
-					};//ii;
+					} //ii;
 					validips = SECURITY.a(6, ii);
 
 					//+ in group ipnos means add to system config ip ranges
@@ -328,9 +328,9 @@ passfail:
 					//2. otherwise add allowable connection from 127.* always
 					//3. trailing space indicates defaults and wild cards expanded
 					//   and can use cache
-					if (validips.locateusing(" ","*",xx)) {
+					if (validips.locateusing(" ", "*", xx)) {
 						validips = " ";
-					}else{
+					} else {
 						validips ^= " 127 ";
 					}
 
@@ -359,10 +359,10 @@ checkip:
 					//look for 192.168 first since most common
 					//then full ip number, then first bit (eg 10), then 1.2.3 last
 					var ip2 = ipno.field(".", 1, 2);
-					if (not(validips.locateusing(" ",ip2,xx))) {
-						if (not(validips.locateusing(" ",ipno,xx))) {
-							if (not(validips.locateusing(" ",ipno.field(".", 1),xx))) {
-								if (not(validips.locateusing(" ",ipno.field(".", 1, 3),xx))) {
+					if (not(validips.locateusing(" ", ip2, xx))) {
+						if (not(validips.locateusing(" ", ipno, xx))) {
+							if (not(validips.locateusing(" ", ipno.field(".", 1), xx))) {
+								if (not(validips.locateusing(" ", ipno.field(".", 1, 3), xx))) {
 invalidip:
 									invalidlogin = username ^ " is not authorised to login from this location (IP Number: " ^ ipno ^ ")";
 									invalidlogin ^= "|Allowed:" ^ (validips.quote());
@@ -381,10 +381,10 @@ invalidip:
 					if (username eq "EXODUS" and not(SYSTEM.a(17).index("DEMO"))) {
 						if (ip2 eq "192.168") {
 exoduslocalip:
-							if (validips.locateusing(" ",ipno,xx)) {
+							if (validips.locateusing(" ", ipno, xx)) {
 								goto invalidip;
 							}
-						}else{
+						} else {
 							var tt = ipno.field(".", 1);
 							if (tt eq "10") {
 								goto exoduslocalip;
@@ -396,7 +396,7 @@ exoduslocalip:
 					}
 
 				//ip not checked because no ip restrictions
-				}else{
+				} else {
 				}
 
 				//even if all login checks are ok, fail if too many successive failures
@@ -415,7 +415,7 @@ exoduslocalip:
 						invalidlogin ^= "|by clicking Password Reset on the EXODUS Login screen";
 						invalidlogin ^= "|and entering one of their email addresses as follows:";
 						invalidlogin ^= "|" ^ userx.a(7);
-					}else{
+					} else {
 						invalidlogin ^= "|and has no email address assigned. An administrator must provide a new password for the user";
 					}
 
@@ -539,7 +539,7 @@ passwordexpired:
 					if (username ne "EXODUS" or isdevsys) {
 
 						var ulogins = userx.a(18);
-						if (ulogins.locate("OK",xx)) {
+						if (ulogins.locate("OK", xx)) {
 
 							//if ipno unrestricted
 							if (validips eq " " or isdevsys) {
@@ -555,7 +555,7 @@ passwordexpired:
 									}
 									///BREAK;
 									if (not isnewipnet) break;
-								};//ii;
+								} //ii;
 
 								//email if login unrestricted and on new non-lan ipno
 								//locate ipno in uipnos setting xx else
@@ -587,7 +587,7 @@ passwordexpired:
 							}
 
 						//no OK means first login
-						}else{
+						} else {
 
 							body = "Welcome to EXODUS!";
 							//in security.subs and listen2
@@ -634,7 +634,7 @@ passwordexpired:
 			if (validips.read(DEFINITIONS, "IPNOS*" ^ username)) {
 				//should be removed after medialine is upgraded
 				validips.converter(SVM, " ");
-			}else{
+			} else {
 				validips = "127 192.168 10 172";
 			}
 
@@ -663,7 +663,7 @@ validateexit2:
 				//text:=crlf:'2. no email known for ':username
 				text ^= "\r\n" ^ password ^ " and " ^ username ^ " are both unrecognised";
 				text ^= "\r\n" " Database: " ^ SYSTEM.a(17);
-			}else{
+			} else {
 				text = invalidlogin;
 
 				if (failn gt maxnfails) {
@@ -713,7 +713,7 @@ validateexit2:
 					}
 
 				//username does not exist
-				}else{
+				} else {
 					text.swapper(" and/or password", "");
 					usersordefinitions = DEFINITIONS;
 					userkey = "BADUSER*" ^ username;
@@ -751,7 +751,7 @@ validateexit2:
 					RECORD.inserter(18, 1, tt);
 
 				//user log is updated in user.subs
-				}else{
+				} else {
 
 					ID = username;
 
@@ -823,7 +823,7 @@ validateexit2:
 			if (passwordreset lt 2) {
 				if (passwordreset) {
 					emailsubject = "Password Reset Failure " ^ password;
-				}else{
+				} else {
 					//Note: "Login Failure" hardcoded in sysmsg not to send to EXODUS
 					emailsubject = "Login Failure " ^ username;
 					if (realreason) {
@@ -847,7 +847,7 @@ validateexit2:
 							if (lastuserid ne lastuser.a(1)) {
 								USER4 ^= " (" ^ lastuserid ^ ")";
 							}
-						}else{
+						} else {
 							USER4 ^= lastuserid;
 						}
 						USER4 ^= " on " ^ oconv(lastuser.a(13), "[DATETIME,4*,MTS]") ^ ")";
@@ -868,7 +868,7 @@ validateexit2:
 			}
 
 		//validated OK
-		}else{
+		} else {
 
 			//done in becomeuser now
 			//gosub getuserstyle
@@ -897,7 +897,7 @@ validateexit2:
 				//to avoid garbagecollect delay required to avoid MD conversion bug
 				//by not doing 'MD50P'
 				//statistic<1>=(date()+time()/86400) 'MD50P'
-				statistic.r(1, (var().date() + var().time() / 86400).substr(1,12));
+				statistic.r(1, (var().date() + var().time() / 86400).substr(1, 12));
 				if (word2 ne "RELOCK") {
 					statistic.r(2, statistic.a(2) + 1);
 				}
@@ -1110,7 +1110,7 @@ subroutine becomeuserandconnection(in request2, in request4) {
 							if (not(authorised("USER UPDATE " ^ (fieldname.field(" ", ii).quote()), xx))) {
 								tt2 = "";
 							}
-						};//ii;
+						} //ii;
 					}
 				}
 
@@ -1126,7 +1126,7 @@ subroutine becomeuserandconnection(in request2, in request4) {
 				} else {
 					runstyles.r(1, vn, tt2);
 				}
-			};//vn;
+			} //vn;
 			SYSTEM.r(46, runstyles);
 			//system<10,1>=userrec<1>
 			//system<10,2>=userrec<7>
@@ -1147,7 +1147,7 @@ subroutine addwhoistx() {
 }
 
 subroutine switchcompany() {
-	if (not(ucomps.locate(gen.gcurrcompany,xx))) {
+	if (not(ucomps.locate(gen.gcurrcompany, xx))) {
 		var tc = ucomps.a(1, 1);
 		if (xx.read(gen.companies, tc)) {
 			call initcompany(tc);

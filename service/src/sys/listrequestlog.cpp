@@ -37,7 +37,7 @@ function main() {
 		if (iuptodate eq ifromdate) {
 			cmd ^= " %AND% WITH DATE " ^ (ifromdate.oconv("D4").quote());
 			title ^= "'L'Filter : " ^ oconv(ifromdate, "[DATE,4*]");
-		}else{
+		} else {
 			cmd ^= " %AND% WITH DATE BETWEEN " ^ (ifromdate.oconv("D4").quote()) ^ " AND " ^ (iuptodate.oconv("D4").quote());
 			title ^= "'L'Filter : " ^ oconv(ifromdate, "[DATE,4*]") ^ " - " ^ oconv(iuptodate, "[DATE,4*]");
 		}
@@ -63,10 +63,10 @@ function main() {
 			if (tt.index("'")) {
 				call mssg("Cannot find text containing single AND double quotes");
 				stop();
-			}else{
+			} else {
 				tt = "'" ^ tt ^ "'";
 			}
-		}else{
+		} else {
 			tt = tt.quote();
 		}
 

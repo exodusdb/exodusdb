@@ -25,12 +25,12 @@ function main(in mode, in lockfilename, in lockkey, in lockdesc0, io locklist, i
 	}
 	if (ntries0.unassigned()) {
 		ntries = 100;
-	}else{
+	} else {
 		ntries = ntries0;
 	}
 	if (lockdesc0.unassigned()) {
 		lockdesc = "";
-	}else{
+	} else {
 		lockdesc = lockdesc0;
 		}
 	if (not ntries) {
@@ -70,7 +70,7 @@ lockit:
 ///////
 
 	lockitem = lockfilename ^ lockitemsep ^ lockkey;
-	if (locklist.locateusing(FM,lockitem,lockn)) {
+	if (locklist.locateusing(FM, lockitem, lockn)) {
 		//msg=quote(lockitem):' already locked'
 		return 1;
 	}
@@ -94,14 +94,14 @@ tryagain:
 			call note(lockholder ^ " is using the " ^ lockdesc, "T1", xx, "");
 			if (esctoexit()) {
 				return 0;
-			}else{
+			} else {
 				goto tryagain;
 			}
-		}else{
+		} else {
 			msg = lockholder ^ " is updating|" ^ lockdesc ^ "||PLEASE TRY LATER";
 			if (tryn ge ntries) {
 				return 0;
-			}else{
+			} else {
 				if (tryn eq 1) {
 					printl(msg, " trying for ", ntries, " secs");
 				} else if (ntries lt 1000) {
@@ -140,7 +140,7 @@ subroutine unlockit(in lockfilename, in lockkey, io locklist) {
 		xx = unlockrecord("", lockfile, lockkey);
 	}
 
-	if (locklist.locateusing(FM,lockfilename ^ "*" ^ lockkey,lockn)) {
+	if (locklist.locateusing(FM, lockfilename ^ "*" ^ lockkey, lockn)) {
 		locklist.remover(lockn);
 	}
 
@@ -167,7 +167,7 @@ subroutine unlockall(io locklist, io msg) {
 		if (lockfile ne "") {
 			xx = unlockrecord("", lockfile, lockkeyx);
 		}
-	};//lockn;
+	} //lockn;
 
 	locklist = "";
 

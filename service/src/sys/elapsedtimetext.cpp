@@ -69,7 +69,7 @@ function main(in fromdate, in fromtime, io uptodate, io uptotime) {
 		if (nsecs) {
 			if (minutes or (nsecs - 10 gt 0)) {
 				nsecs = nsecs.oconv("MD00P");
-			}else{
+			} else {
 				//nsecs=(nsecs 'MD40P')+0
 				nsecs = (nsecs.oconv("MD30P")) + 0;
 				if (nsecs[1] eq ".") {
@@ -87,7 +87,7 @@ zero:
 			} else {
 				text.r(-1, "exactly");
 			}
-		}else{
+		} else {
 			if (not(minutes)) {
 				goto zero;
 			}

@@ -38,7 +38,7 @@ function main(in mode0, in subject0, in body0, in groupids0, in jobids0, in user
 
 	if (mode.unassigned()) {
 		var mod = "";
-	}else{
+	} else {
 		mode = mode0;
 	}
 
@@ -57,7 +57,7 @@ function main(in mode0, in subject0, in body0, in groupids0, in jobids0, in user
 			var msg = mode.quote() ^ " is invalid in EMAILUSERS";
 			if (interactive) {
 				call mssg(msg);
-			}else{
+			} else {
 				call sysmsg(msg);
 			}
 			stop();
@@ -113,7 +113,7 @@ function main(in mode0, in subject0, in body0, in groupids0, in jobids0, in user
 	if (options.index("R")) {
 		if ((USERNAME eq "EXODUS" or USERNAME eq "ADAGENCY") or USERNAME eq "ACCOUNTS") {
 			replyto = "support@neosys.com";
-		}else{
+		} else {
 			var fromuser = xlate("USERS", USERNAME, "", "X");
 			replyto = fromuser.a(7);
 			var fromline = "From " ^ fromuser.a(1);
@@ -191,7 +191,7 @@ nextuser:
 
 	ok = 0;
 	if (not(ok) and userids) {
-		if (userids.locate(usercode,xx)) {
+		if (userids.locate(usercode, xx)) {
 			ok = 1;
 		}
 		if (not(ok) and not(groupids)) {
@@ -208,10 +208,10 @@ nextuser:
 				ok = userx.a(5).index(groupids.a(1, groupn));
 				///BREAK;
 				if (not(not(ok))) break;
-			};//groupn;
-		}else{
+			} //groupn;
+		} else {
 			//exact groups
-			if (groupids.locate(userx.a(21),xx)) {
+			if (groupids.locate(userx.a(21), xx)) {
 				ok = 1;
 			}
 		}
@@ -227,12 +227,12 @@ nextuser:
 	nn = emails.count(VM) + (emails ne "");
 	for (var ii = nn; ii >= 1; --ii) {
 		var email = emails.a(1, ii);
-		if (alreadyemailed.locate(email,xx)) {
+		if (alreadyemailed.locate(email, xx)) {
 			emails.remover(1, ii);
-			}else{
+			} else {
 			alreadyemailed ^= VM ^ email;
 		}
-	};//ii;
+	} //ii;
 	emails.converter(VM, ";");
 
 	//skip users that have already been emailed before
@@ -314,7 +314,7 @@ subroutine sendemails(io emaillog) {
 
 	if (errormsg and errormsg ne "OK") {
 		emaillog ^= VM ^ errormsg;
-	}else{
+	} else {
 		nsent += 1;
 	}
 

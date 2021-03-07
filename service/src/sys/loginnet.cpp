@@ -47,7 +47,7 @@ readmenu:
 					if (not(oldmenus.readv(menufile, menuid, 6))) {
 						{}
 					}
-				}else{
+				} else {
 					if (menufile.open("MENUS", "")) {
 						goto readmenu;
 					}
@@ -97,7 +97,7 @@ readmenu:
 		var menu = menus.a(1, menun).ucase();
 		if (menu) {
 			var menutask = "MENU " ^ menu;
-			if (not(SECURITY.a(10).locate(menutask,taskn))) {
+			if (not(SECURITY.a(10).locate(menutask, taskn))) {
 				taskn = 0;
 			}
 
@@ -105,21 +105,21 @@ readmenu:
 			if (oldmenus eq "" or ((menun and SECURITY.a(11, taskn).length()))) {
 				if (not(authorised(menutask, xx))) {
 deleteit:
-					if (menus.locate(menu,menun2)) {
+					if (menus.locate(menu, menun2)) {
 						menus.remover(1, menun2);
 						nmenus -= 1;
 					}
 				}
 
 			//not specifically locked - only allow if in legacy menus
-			}else{
-				if (not(oldmenus.locate(menu,xx))) {
+			} else {
+				if (not(oldmenus.locate(menu, xx))) {
 					goto deleteit;
 				}
 			}
 
 		}
-	};//menun;
+	} //menun;
 
 	//if they have MENU then ANALYSIS=MEDIAANALYSIS
 	if (menus.index("MEDIA")) {
@@ -168,8 +168,8 @@ nextcomp:
 				compcodes.r(-1, compcode);
 			}
 
-		};//ii;
-	}else{
+		} //ii;
+	} else {
 		compcodes = allcomps.a(1);
 	}
 
@@ -296,7 +296,7 @@ nextcomp:
 	if (lastbackupdate and lastbackupdate lt var().date()) {
 		msg = "The last backup was ";
 		var ndays = var().date() - lastbackupdate;
-		msg ^= ndays ^ " day" ^ var("s").substr(1,ndays ne 1) ^ " ago.";
+		msg ^= ndays ^ " day" ^ var("s").substr(1, ndays ne 1) ^ " ago.";
 		msg ^= "   (" ^ lastbackupdate.oconv("D") ^ ")";
 		msg.swapper("(0", "(");
 		msg.r(-1, "EXODUS recommends that you \"BACKUP\" your data ");

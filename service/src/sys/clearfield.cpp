@@ -16,7 +16,7 @@ function main() {
 		options = field2(SENTENCE, "(", -1);
 		SENTENCE.splicer(-options.length() - 1, 9999, "");
 		SENTENCE.trimmerb();
-	}else{
+	} else {
 		options = "";
 	}
 
@@ -86,12 +86,12 @@ tryagain:
 			}
 			if (fn.isnum()) {
 				fns.r(ii, fn);
-			}else{
+			} else {
 				call mssg(SENTENCE ^ "|FIELD NUMBER " ^ fn ^ " IS NOT NUMERIC AND|NOT AN \"F\" DICTIONARY ITEM!?" ^ FM ^ FM ^ syntax);
 				stop();
 			}
 		}
-	};//ii;
+	} //ii;
 
 	if (not LISTACTIVE) {
 		select(file);
@@ -123,7 +123,7 @@ next:
 		var cleartovalue2 = cleartovalue;
 		if (cleartovalue[1] eq "{") {
 			if (cleartovalue[-1] eq "}") {
-				cleartovalue2 = calculate(cleartovalue.substr(2,cleartovalue.length() - 2));
+				cleartovalue2 = calculate(cleartovalue.substr(2, cleartovalue.length() - 2));
 			}
 		}
 
@@ -133,7 +133,7 @@ next:
 				cleared = 1;
 				RECORD.r(fns.a(ii), cleartovalue2);
 			}
-		};//ii;
+		} //ii;
 		if (cleared) {
 			while (true) {
 				///BREAK;
@@ -143,7 +143,7 @@ next:
 			if (RECORD eq "") {
 				file.deleterecord(ID);
 
-			}else{
+			} else {
 				RECORD.write(file, ID);
 			}
 			nindexed += isindexed;

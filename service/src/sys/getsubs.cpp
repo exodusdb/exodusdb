@@ -65,7 +65,7 @@ nextdoc:
 		//build new file name
 		if (USERNAME eq "EXODUS") {
 			tt = "NEO";
-		}else{
+		} else {
 			tt = "DOC";
 		}
 		ID = tt ^ ("00000" ^ nextno).oconv("R#5");

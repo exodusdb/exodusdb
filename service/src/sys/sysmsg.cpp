@@ -42,12 +42,12 @@ function main(in msg0, in subject0="", in username0="") {
 	var msg = msg0;
 	if (subject0.unassigned()) {
 		subjectin = "";
-		}else{
+		} else {
 		subjectin = subject0;
 	}
 	if (username0.unassigned()) {
 		username = "";
-	}else{
+	} else {
 		username = username0;
 	}
 
@@ -68,7 +68,7 @@ function main(in msg0, in subject0="", in username0="") {
 	}
 
 	//remove html tags from message and decode things like &nbsp;
-	if (msg.substr(1,2) ne "@@") {
+	if (msg.substr(1, 2) ne "@@") {
 		call htmllib2("STRIPTAGS", msg);
 		call htmllib2("DECODEHTML", msg);
 	}
@@ -102,7 +102,7 @@ function main(in msg0, in subject0="", in username0="") {
 	emailaddrs.swapper("backups@neosys.com", "sysmsg@neosys.com");
 
 	//suppress login failure messages
-	if ((APPLICATION ne "ACCOUNTS" and username ne "EXODUS") and subjectin.substr(1,13) eq "Login Failure") {
+	if ((APPLICATION ne "ACCOUNTS" and username ne "EXODUS") and subjectin.substr(1, 13) eq "Login Failure") {
 		emailaddrs.swapper("sysmsg@neosys.com", "");
 		emailaddrs = trim(emailaddrs, ";");
 	}
@@ -123,7 +123,7 @@ function main(in msg0, in subject0="", in username0="") {
 	}
 
 	//sysmsg is not emailed to admins if testdata or user is EXODUS
-	if (USERNAME eq "EXODUS" or (SYSTEM.a(17).substr(-4,4) eq "test")) {
+	if (USERNAME eq "EXODUS" or (SYSTEM.a(17).substr(-4, 4) eq "TEST")) {
 
 		//this is disabled to ensure that all errors caused by EXODUS support
 		//are logged normally
@@ -152,16 +152,16 @@ function main(in msg0, in subject0="", in username0="") {
 	var subject = "EXODUS System: " ^ datasetcode;
 	var tt = msg.index("ERROR NO:");
 	if (tt) {
-		subject ^= " " ^ msg.substr(tt,9999).a(1, 1, 1);
+		subject ^= " " ^ msg.substr(tt, 9999).a(1, 1, 1);
 	}
 	if (subjectin) {
 		subject ^= " " ^ subjectin;
 	}
 
-	if (msg.substr(1,2) eq "@@") {
-		body = msg.substr(2,999999);
+	if (msg.substr(1, 2) eq "@@") {
+		body = msg.substr(2, 999999);
 
-	}else{
+	} else {
 		var l9 = "L#9";
 		body = "";
 		//body<-1>='Message=':fm:msg
@@ -190,7 +190,7 @@ function main(in msg0, in subject0="", in username0="") {
 			//if user email is not in the list of people being sent to then
 			if (emailaddrs.lcase().index(useremail)) {
 				//body<-1>='Email:' l9:useremail
-			}else{
+			} else {
 				ccaddrs = useremail;
 			}
 		}
@@ -214,7 +214,7 @@ function main(in msg0, in subject0="", in username0="") {
 		var temp = SYSTEM.a(132);
 		if (temp) {
 			SYSTEM.r(132, "");
-		}else{
+		} else {
 			//call returnstacktemp);
 		}
 		body.r(-1, oconv("Stack:", l9) ^ temp);
@@ -273,7 +273,7 @@ function main(in msg0, in subject0="", in username0="") {
 			call log("SENDMAIL", errormsg);
 		}
 
-	}else{
+	} else {
 	//print 'EXCEEDED'
 		//log excessive sysmsg
 		call log("SYSMSG", exceededmsg);

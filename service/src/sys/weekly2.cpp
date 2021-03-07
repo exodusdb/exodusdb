@@ -34,8 +34,8 @@ function main(in type, in input0, in mode, out output) {
 	if (type eq "OCONV") {
 		//get the calendar month and year
 		temp = input0.oconv("D2/E");
-		year = temp.substr(-2,2);
-		period = temp.substr(4,2);
+		year = temp.substr(-2, 2);
+		period = temp.substr(4, 2);
 
 		//get the first day of the period for that calender month and year
 		gosub getfirstdom();
@@ -63,9 +63,9 @@ function main(in type, in input0, in mode, out output) {
 	if (input0.index("/")) {
 		period = input0.field("/",1);
 		year = input0.field("/", 2);
-	}else{
-		year = input0.substr(1,2);
-		period = input0.substr(-2,2);
+	} else {
+		year = input0.substr(1, 2);
+		period = input0.substr(-2, 2);
 	}
 
 	//get the next period

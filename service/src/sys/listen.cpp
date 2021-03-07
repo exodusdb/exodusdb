@@ -262,7 +262,7 @@ function main() {
 	defaultlockmins = 5;
 
 	datasetcode = SYSTEM.a(17);
-	live = datasetcode.ucase().substr(-4,4) ne "test";
+	live = datasetcode.ucase().substr(-4, 4) ne "TEST";
 	processno = SYSTEM.a(24);
 
 	neopath = "../exodus/";
@@ -284,7 +284,7 @@ function main() {
 		//inblocksize=50000
 		outblocksize = (maxstrlen / 3).floor();
 		nblocks = 4;
-	}else{
+	} else {
 		inblocksize = 1048576;
 		maxstrlen = inblocksize * 4;
 		outblocksize = (maxstrlen / 3).floor();
@@ -295,7 +295,7 @@ function main() {
 	if (VOLUMES) {
 		for (ii = 0; ii <= 255; ++ii) {
 			hexx(ii) = "%" ^ ii.oconv("MX").oconv("R(0)#2");
-		};//ii;
+		} //ii;
 	}
 
 	/////
@@ -313,7 +313,7 @@ function main() {
 
 	if (onserver) {
 		sleepms = 10;
-	}else{
+	} else {
 		sleepms = 100;
 	}
 
@@ -358,7 +358,7 @@ function main() {
 
 	//ensure unique sorttempfile
 	//if sysvar('SET',192,102,'R':('0000':processno)[-5,5]:'.SFX') else null
-	//call sysvar_192_102"SET", "R" ^ ("0000" ^ processno).substr(-5,5) ^ ".SFX");
+	//call sysvar_192_102"SET", "R" ^ ("0000" ^ processno).substr(-5, 5) ^ ".SFX");
 
 	nrequests = SYSTEM.a(35) + 0;
 
@@ -403,7 +403,7 @@ function main() {
 	//open an XML log file
 	datex = var().date().oconv("D.");
 	//if 1 then
-	logpath = ("../logs/" ^ datasetcode ^ "/" ^ datex.substr(-4,4)).lcase();
+	logpath = ("../logs/" ^ datasetcode ^ "/" ^ datex.substr(-4, 4)).lcase();
 	logpath.converter("/", OSSLASH);
 
 	//check/make the dataset folder
@@ -426,7 +426,7 @@ function main() {
 		}
 	}
 
-	logfilename = logpath ^ "/" ^ datex.substr(-2,2) ^ datex.substr(1,2) ^ datex.substr(4,2) ^ ("00" ^ processno).substr(-2,2);
+	logfilename = logpath ^ "/" ^ datex.substr(-2, 2) ^ datex.substr(1, 2) ^ datex.substr(4, 2) ^ ("00" ^ processno).substr(-2, 2);
 	logfilename ^= ".xml";
 	logfilename.converter("/", OSSLASH);
 
@@ -442,13 +442,13 @@ function main() {
 
 		//backup and read the last 6 characters of the log
 		logptr -= 6;
-		call osbread(tt, logfile,  logptr, 6);
+		call osbread(tt, logfile, logptr, 6);
 		//maybe backup the log pointer to overwrite the closing tag
 		if (tt eq "</Log>") {
 			logptr -= 6;
 		}
 
-	}else{
+	} else {
 
 		//initialise xml log file header
 		call oswrite("", logfilename);
@@ -460,7 +460,7 @@ function main() {
 
 			gosub writelogxclose();
 
-		}else{
+		} else {
 		// print 'CANNOT OPEN LOG FILE ':logfilename
 			logfilename = "";
 		}
@@ -482,7 +482,7 @@ nextrequest:
 
 	lastrequestdate = var().date();
 	lastrequesttime = var().time();
-	win.registerx="";
+	win.registerx = "";//dim
 
 	//forcedemail
 	SYSTEM.r(117, "");
@@ -571,7 +571,7 @@ nextsearch0:
 	tt = var().time().oconv("MTS") ^ " " ^ datasetcode ^ " " ^ processno ^ " " ^ nrequests ^ " " ^ memspace(999999).oconv("MD13P") ^ " Listening" " " ^ elapsedtimetext(lastrequestdate, lastrequesttime);
 	if (VOLUMES) {
 		output(at(-40), tt, " : ");
-	}else{
+	} else {
 		var(tt).oswrite("process." ^ processno);
 	}
 
@@ -641,7 +641,7 @@ nextsearch0:
 			linkfilename1 = var(99999999).rnd() ^ ".0";
 		}
 	}
-	linkfilename0 = linkfilename1.substr(inpath.length() + 1,9999);
+	linkfilename0 = linkfilename1.substr(inpath.length() + 1, 9999);
 	cmd ^= " " ^ linkfilename0 ^ " " ^ inpath ^ " " ^ portno;
 	cmd.lcaser();
 	cmd.converter("/", OSSLASH);
@@ -661,7 +661,7 @@ nextsearch0:
 	} else if (SYSTEM.a(29)) {
 		osshell(cmd);
 
-	}else{
+	} else {
 		//print timedate():' ':cmd
 
 		cmd.osshell();
@@ -687,7 +687,7 @@ nextsearch0:
 
 		//flush
 		//osopen linkfilename1 to linkfile1 else
-		// call ossleep(1000*.1)
+		// call ossleep(1000*1/10)
 		// if tracing then print 'CANNOT OPEN ':quote(linkfilename1)
 		// goto nextrequest
 		// end
@@ -922,7 +922,7 @@ gotlink:
 		var().osflush();
 		if (not(linkfile1.osopen(linkfilename1))) {
 			//remove from future candidate files?
-			call ossleep(1000*.1);
+			call ossleep(1000*1 / 10);
 			if (tracing) {
 				printl("CANNOT OPEN RW ", linkfilename1.quote());
 			}
@@ -935,12 +935,12 @@ readlink1:
 		USER0 = "";
 		//osbread request from linkfile1 at 0 length 256*256-4
 		tt = 0;
-		call osbread(USER0, linkfile1,  tt, 256 * 256 - 4);
+		call osbread(USER0, linkfile1, tt, 256 * 256 - 4);
 
 		//if cannot read it then try again
 		if (USER0 eq "" and var().time() eq timex) {
 			var().osflush();
-			call ossleep(1000*.1);
+			call ossleep(1000*1 / 10);
 			linkfile1.osclose();
 			if (not(linkfile1.osopen(linkfilename1))) {
 				{}
@@ -995,7 +995,7 @@ readlink1:
 			if (tt) {
 				//eg drive() = D:\EXODUS\EXODUS\ ...
 				//replyfilename='..\':replyfilename[tt+1,9999]
-				replyfilename = ".." OSSLASH ^ replyfilename.substr(tt + 1,9999);
+				replyfilename = ".." OSSLASH ^ replyfilename.substr(tt + 1, 9999);
 			}
 		}
 
@@ -1016,7 +1016,7 @@ deleterequest:
 		if (linkfilename1.osfile()) {
 			var().osflush();
 			//garbagecollect;
-			call ossleep(1000*.1);
+			call ossleep(1000*1 / 10);
 			ntries += 1;
 			//if tracing then print 'COULD NOT DELETE ':linkfile1
 			if (ntries lt 100) {
@@ -1040,7 +1040,7 @@ deleterequest:
 nextlinkfile:
 		{}
 
-	};//linkfilen;
+	} //linkfilen;
 
 	goto nextsearch;
 
@@ -1053,7 +1053,7 @@ subroutine requestinit() {
 
 	if (VOLUMES) {
 		output(at(-40), var().time().oconv("MTS"), " ");
-	}else{
+	} else {
 		//similar in listen and log2
 		print(processno, ": ");
 	}
@@ -1221,27 +1221,27 @@ subroutine requestinit() {
 		if (linkfile2.osopen(linkfilename2)) {
 
 			//read blocks of iodat
-			datx="";
+			datx = "";//dim
 			inptr = 0;
 			for (blockn = 1; blockn <= nblocks; ++blockn) {
 
 				//osbread datx(blockn) from linkfilename2 at ((blockn-1)*inblocksize) length inblocksize
 				//tt=(blockn-1)*inblocksize
-				call osbread(datx(blockn), linkfile2,  inptr, inblocksize);
+				call osbread(datx(blockn), linkfile2, inptr, inblocksize);
 
 				///BREAK;
 				if (not(datx(blockn).length())) break;
 
 				//avoid hexcode spanning block end by moving one or two bytes backwards
 				if (blockn gt 1) {
-					tt = ((datx(blockn - 1)).substr(-2,2)).index("%");
+					tt = ((datx(blockn - 1)).substr(-2, 2)).index("%");
 					if (tt) {
-						datx(blockn - 1) ^= datx(blockn).substr(1,tt);
+						datx(blockn - 1) ^= datx(blockn).substr(1, tt);
 						datx(blockn).splicer(1, tt, "");
 					}
 				}
 
-			};//blockn;
+			} //blockn;
 
 			//unescape all blocks
 			lendata = 0;
@@ -1285,7 +1285,7 @@ subroutine requestinit() {
 
 				}
 
-			};//blockn;
+			} //blockn;
 
 			//check max iodat size <= maxstrlen
 			if (lendata gt maxstrlen) {
@@ -1295,16 +1295,16 @@ subroutine requestinit() {
 				listenfailure = 1;
 
 			//otherwise join the blocks
-			}else{
+			} else {
 				USER1 = "";
 				for (blockn = 1; blockn <= nblocks; ++blockn) {
 					USER1 ^= datx(blockn);
 					datx(blockn) = "";
-				};//blockn;
+				} //blockn;
 			}
 
 		//cannot open linkfilename2 means no iodat
-		}else{
+		} else {
 cannotopenlinkfile2:
 			listenfailure = 1;
 			USER1 = "";
@@ -1312,20 +1312,20 @@ cannotopenlinkfile2:
 			call listen4(3, USER3, linkfilename2);
 		}
 
-	}else{
+	} else {
 
 		if (not(linkfile2size)) {
 
 			USER1 = "";
 
-		}else{
+		} else {
 
 			if (not(linkfile2.osopen(linkfilename2))) {
 				goto cannotopenlinkfile2;
 			}
 
 			//read whole file upto limit
-			call osbread(USER1, linkfile2,  0, maxstrlen);
+			call osbread(USER1, linkfile2, 0, maxstrlen);
 
 			//unescape
 			//for ii=0 to 255
@@ -1511,16 +1511,16 @@ cannotopenlinkfile2:
 		logx.swapper("%", "%25");
 		gosub writelogx();
 
-	}else{
+	} else {
 
 		call oswrite("", linkfilename2);
 		if (linkfile2.osopen(linkfilename2)) {
 
 			//split into blocks and convert to escape chars
-			datx="";
+			datx = "";//dim
 			ptr = 0;
 			for (blockn = 1; blockn <= nblocks; ++blockn) {
-				blk = USER1.substr(1,outblocksize);
+				blk = USER1.substr(1, outblocksize);
 				USER1.splicer(1, outblocksize, "");
 				///BREAK;
 				if (not(blk.length())) break;
@@ -1564,7 +1564,7 @@ cannotopenlinkfile2:
 				//swap '<' with '%3C' in blk
 				//swap '>' with '%3E' in blk
 
-				call osbwrite(blk, linkfile2,  ptr);
+				call osbwrite(blk, linkfile2, ptr);
 
 				if (logfilename) {
 					blk.transfer(logx);
@@ -1573,11 +1573,11 @@ cannotopenlinkfile2:
 
 				blk = "";
 
-			};//blockn;
+			} //blockn;
 
 			linkfile2.osclose();
 
-		}else{
+		} else {
 
 			//response='ERROR: LISTEN cannot create temp ':linkfilename2
 			call listen4(22, USER3, linkfilename2);
@@ -1637,7 +1637,7 @@ cannotopenlinkfile2:
 	}
 
 	if (USER3 eq "OK") {
-		if (request1 eq "STOPDB" or request1.substr(1,7) eq "RESTART") {
+		if (request1 eq "STOPDB" or request1.substr(1, 7) eq "RESTART") {
 			gosub exit();
 		}
 	}
@@ -1678,7 +1678,7 @@ subroutine process() {
 
 	//find index values
 	//case request1[1,14]='GETINDEXVALUES'
-	} else if (request1.substr(1,8) eq "GETINDEX") {
+	} else if (request1.substr(1, 8) eq "GETINDEX") {
 
 		//call listen3(request2,'GETINDEXVALUES')
 		call listen5(request1, request2, request3, request4, request5, request6);
@@ -1742,7 +1742,7 @@ subroutine process() {
 		postread = triggers.a(3);
 
 		//reduce chance of using old common
-		win.registerx="";
+		win.registerx = "";//dim
 
 		//allow read to unknown files for the time being
 		if (filetitle eq "") {
@@ -1876,7 +1876,7 @@ noupdate:
 				//response='Error: CANNOT LOCK RECORD'
 				call listen4(7, USER3);
 				gosub addlockholder();
-			}else{
+			} else {
 				USER3 = "OK";
 			}
 			if (sessionid) {
@@ -1884,7 +1884,7 @@ noupdate:
 			}
 
 		//record doesnt exist
-		}else{
+		} else {
 			//if @file.error<1>='100' then
 			//NO FILE ERROR FOR JBASE
 			if (not(FILEERROR) or FILEERROR.a(1) eq "100") {
@@ -1923,7 +1923,7 @@ noupdate:
 				call listen4(8, USER3);
 				if (sessionid) {
 					USER3 ^= " SESSIONID " ^ sessionid;
-				}else{
+				} else {
 					if (withlock) {
 						gosub addlockholder();
 					}
@@ -1937,7 +1937,7 @@ noupdate:
 				// response:=' RECORDKEY ':tt
 				// end
 
-			}else{
+			} else {
 				gosub geterrorresponse();
 			}
 		}
@@ -2007,7 +2007,7 @@ noupdate:
 				USER1 = "";
 				gosub fmtresp();
 				//response='Error: ':response
-			}else{
+			} else {
 				USER3 = origresponse;
 				//postread may have provided a record where non-was found
 				//ONLY if it unlocks it as well! otherwise
@@ -2098,7 +2098,7 @@ noupdate:
 		prewrite = triggers.a(1);
 
 		//reduce chance of using old common
-		win.registerx="";
+		win.registerx = "";//dim
 
 		//disallow read/write to unknown files for the time being
 		if (filetitle eq "") {
@@ -2309,7 +2309,7 @@ badwrite:
 				if (not(RECORD.read(win.srcfile, keyx))) {
 					RECORD = "";
 				}
-			}else{
+			} else {
 				RECORD.write(win.srcfile, keyx);
 			}
 
@@ -2327,7 +2327,7 @@ badwrite:
 			//NB data is now '' to save space so always send back data unless @record is cleared
 			if (RECORD eq USER1) {
 				USER1 = "";
-			}else{
+			} else {
 				USER1 = RECORD;
 			}
 
@@ -2403,7 +2403,7 @@ badwrite:
 			//unlock local lock
 			win.srcfile.unlock( keyx);
 
-		}else{
+		} else {
 			gosub properunlk();
 		}
 
@@ -2498,10 +2498,10 @@ badwrite:
 
 		//pass the output file in linkfilename2
 		//not good method, pass in system?
-		if (var("LIST,SELECTJOURNALS").locateusing(",",USER0.a(1),xx)) {
+		if (var("LIST,SELECTJOURNALS").locateusing(",", USER0.a(1), xx)) {
 			USER1 = linkfilename2;
 		}
-		if (USER0.a(1).substr(1,4) eq "VAL.") {
+		if (USER0.a(1).substr(1, 4) eq "VAL.") {
 			USER1 = linkfilename2;
 		}
 
@@ -2618,7 +2618,7 @@ subroutine exit() {
 	//system<33>=origsysmode
 	SYSTEM.r(33, "");
 	//call setprivilegeorigprivilege);
-	if (request1.substr(1,7) eq "RESTART") {
+	if (request1.substr(1, 7) eq "RESTART") {
 		USER4 = request1;
 		//return to net which will restart LISTEN
 		stop();
@@ -2654,7 +2654,7 @@ subroutine fmtresp() {
 	//trim everything after <ESC> (why?)
 	tt = USER3.index("<ESC>");
 	if (tt) {
-		USER3 = USER3.substr(1,tt - 1);
+		USER3 = USER3.substr(1, tt - 1);
 	}
 
 	//cannot remove since these may be proper codepage letters
@@ -2749,11 +2749,11 @@ subroutine lock() {
 	//if sessionid is blank then a new session id is created and returned in response
 	if (request1 eq "RELOCK") {
 		newsessionid = sessionid;
-	}else{
+	} else {
 		newsessionid = "";
 		for (ii = 1; ii <= 8; ++ii) {
 			newsessionid ^= var("01234567890ABDCEF")[var(16).rnd() + 1];
-		};//ii;
+		} //ii;
 	}
 
 	if (not(file.open(filename, ""))) {
@@ -2764,10 +2764,10 @@ subroutine lock() {
 	USER3 = "";
 	if (request1 eq "RELOCK") {
 		gosub lockit();
-	}else{
+	} else {
 		if (lockrecord(filename, file, keyx, xx)) {
 			state = 1;
-		}else{
+		} else {
 			state = 0;
 		}
 	}
@@ -2826,7 +2826,7 @@ subroutine lock() {
 
 		//our own session so must be relocking (to extend timeout)
 
-	}else{
+	} else {
 nolock:
 		if (request1 eq "RELOCK") {
 			//NB the word "EXPIRED" is a key word used in _formfunctions.htm
@@ -2868,7 +2868,7 @@ nolock:
 	//lockrec<3>=if connection then connection<1,2> else @station
 	if (connection) {
 		lockrec.r(3, connection.a(1, 2));
-	}else{
+	} else {
 		lockrec.r(3, STATION);
 	}
 	lockrec.r(4, USERNAME);
@@ -2890,7 +2890,7 @@ lockexit:
 	//unlock file,keyx
 	if (request1 eq "RELOCK") {
 		gosub unlockit();
-	}else{
+	} else {
 		file.unlock( keyx);
 	}
 
@@ -2968,7 +2968,7 @@ subroutine unlock() {
 			//lock is missing but ignore it
 			//because we are unlocking anyway
 			USER3 = "OK";
-		}else{
+		} else {
 			gosub geterrorresponse();
 		}
 		goto unlockexit;
@@ -2982,7 +2982,7 @@ subroutine unlock() {
 		if (sessionid eq "") {
 			//response:='missing session id'
 			tt = "missing";
-		}else{
+		} else {
 			//response:='wrong session id'
 			tt = "wrong";
 		}
@@ -3042,7 +3042,7 @@ subroutine writelogxclose() {
 }
 
 subroutine writelogx2() {
-	call osbwrite(logx, logfile,  logptr);
+	call osbwrite(logx, logfile, logptr);
 	logx = "";
 	return;
 }
@@ -3055,7 +3055,7 @@ subroutine filesecurity() {
 	}
 	if (authorised(filetitle2 ^ " " ^ secmode, msg0, "")) {
 		positive = "";
-	}else{
+	} else {
 		positive = "#";
 	}
 	if (not(authorised(positive ^ filetitle2 ^ " " ^ secmode ^ " " ^ (keyx.quote()), posmsg))) {
@@ -3063,7 +3063,7 @@ subroutine filesecurity() {
 		//!*that they may be allowed to access other records
 		if (positive) {
 			msg0.transfer(USER3);
-		}else{
+		} else {
 			posmsg.transfer(USER3);
 		}
 		ok = 0;
@@ -3098,7 +3098,7 @@ subroutine checkcompany() {
 
 	if (request1.index("READ")) {
 		compcode = calculate("COMPANY_CODE", dictfile, keyx, USER1, 0);
-	}else{
+	} else {
 		//compcode={COMPANY_CODE}
 		//compcode=calculate('COMPANY_CODE')
 		compcode = calculate("COMPANY_CODE", DICT, ID, RECORD, 0);

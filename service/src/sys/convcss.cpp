@@ -47,7 +47,7 @@ function main(in mode, in tableid, in in0, out outx) {
 		outx ^= "table#" ^ tableid ^ " > tbody > tr > td:nth-child(" ^ coln ^ "){text-align:" ^ align ^ otherstyle ^ "}\n";
 		//th
 		outx ^= "table#" ^ tableid ^ " > tbody > tr > th:nth-child(" ^ coln ^ "){text-align:" ^ align ^ otherstyle ^ "}\n";
-	};//coln;
+	} //coln;
 
 	outx ^= "</style>\n";
 

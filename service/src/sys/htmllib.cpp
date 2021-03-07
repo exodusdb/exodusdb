@@ -27,12 +27,12 @@ function main(in mode, io datax, in params0="", in params20="") {
 
 	if (params0.unassigned()) {
 		params = "";
-	}else{
+	} else {
 		params = params0;
 	}
 	if (params20.unassigned()) {
 		params2 = "";
-	}else{
+	} else {
 		params2 = params20;
 	}
 
@@ -127,7 +127,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 						//if colon : present then before colon is the tag name
 						if (line.index(":")) {
 							tagsep = ":";
-						}else{
+						} else {
 							tagsep = " ";
 						}
 						var tt1 = line.field(tagsep, 1);
@@ -137,10 +137,10 @@ function main(in mode, io datax, in params0="", in params20="") {
 							tt2.splicer(1, 1, "");
 						}
 						data2.r(ln, td ^ tt1 ^ ":" ^ tdx ^ td ^ tt2 ^ tdx);
-					}else{
+					} else {
 						data2.r(ln, "<td colspan=2>" ^ line ^ tdx);
 					}
-				};//ln;
+				} //ln;
 
 				data2.swapper(FM, trx ^ tr);
 				data2.splicer(1, 0, "<table class=\"hashtable\">" ^ tr);
@@ -150,7 +150,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 
 			}
 
-		};//vn;
+		} //vn;
 
 	} else if (mode eq "STRIPTAGS") {
 		while (true) {
@@ -204,7 +204,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 			osname = "XP";
 		} else if (agent.index("Windows NT ")) {
 			var tt = agent.index("Windows NT ");
-			osname = ((agent.substr(tt + 11,9999)).field(";", 1)).field(")", 1);
+			osname = ((agent.substr(tt + 11, 9999)).field(";", 1)).field(")", 1);
 		}
 		if (agent.index("WOW64")) {
 			osname ^= "-64";
@@ -247,8 +247,8 @@ function main(in mode, io datax, in params0="", in params20="") {
 				tt = agent.index("CrOS");
 			}
 			if (tt) {
-				osname = agent.substr(tt,9999);
-				if (osname.substr(1,4) eq "CPU ") {
+				osname = agent.substr(tt, 9999);
+				if (osname.substr(1, 4) eq "CPU ") {
 					osname.splicer(1, 3, "iPad");
 				}
 				tt = osname.index(" like ");
@@ -260,7 +260,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 				osname.swapper(" x86_64", "-64");
 			}
 		}
-		if (osname.substr(-2,2) eq ".0") {
+		if (osname.substr(-2, 2) eq ".0") {
 			osname.splicer(-2, 2, "");
 		}
 
@@ -321,10 +321,10 @@ function main(in mode, io datax, in params0="", in params20="") {
 				tt = agent.index("Netscape");
 			}
 			if (tt) {
-				browser = agent.substr(tt,9999).field(";", 1).field(" ", 1).field(")", 1);
+				browser = agent.substr(tt, 9999).field(";", 1).field(" ", 1).field(")", 1);
 			}
 		}
-		if (browser.substr(-2,2) eq ".0") {
+		if (browser.substr(-2, 2) eq ".0") {
 			browser.splicer(-2, 2, "");
 		}
 
@@ -343,7 +343,7 @@ function main(in mode, io datax, in params0="", in params20="") {
 			}
 			if (browser) {
 				osname ^= browser;
-			}else{
+			} else {
 				osname ^= agent;
 			}
 			//tt=osname:'<br>':agent
@@ -370,7 +370,7 @@ subroutine fill(io datax) {
 		if (tt gt n2) {
 			n2 = tt;
 		}
-	};//ii;
+	} //ii;
 
 		//make sure all columns are filled
 	for (var ii = 1; ii <= nn; ++ii) {
@@ -378,8 +378,8 @@ subroutine fill(io datax) {
 			if (datax.a(ii, i2) eq "") {
 				datax.r(ii, i2, filler);
 			}
-		};//i2;
-	};//ii;
+		} //i2;
+	} //ii;
 
 	return;
 }

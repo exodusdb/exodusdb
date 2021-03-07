@@ -103,7 +103,7 @@ function main(in mode, in params, io result, io msg) {
 		//ie clear only on the first time that we arrive in it
 		for (var periodn = lastperiodn + 1; periodn <= currentperiodn; ++periodn) {
 			roundrobin.r(2, periodn % periodsperwindow + 1, "");
-		};//periodn;
+		} //periodn;
 
 		//record the current period as the last period so that in the next call
 		//we can clear skipped periods (but not the current period again)
@@ -117,7 +117,7 @@ function main(in mode, in params, io result, io msg) {
 			//increment the current number of events in the current period
 			roundrobin.r(2, currentbreakn, roundrobin.a(2, currentbreakn) + 1);
 
-		}else{
+		} else {
 			result = 0;
 		}
 

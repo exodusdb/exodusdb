@@ -7,7 +7,7 @@ function main(in input0, in force0=(0)) {
 	//c sys in,=(0)
 	if (force0.unassigned()) {
 		force = 0;
-	}else{
+	} else {
 		force = force0;
 	}
 	var output = "";
@@ -22,7 +22,7 @@ function main(in input0, in force0=(0)) {
 				if (nvs gt maxnvs) {
 					maxnvs = nvs;
 				}
-			}else{
+			} else {
 				maxnvs = nvs;
 			}
 			for (var vn = 1; vn <= maxnvs; ++vn) {
@@ -30,9 +30,9 @@ function main(in input0, in force0=(0)) {
 				if (cell.length() or force) {
 					output.r(vn, fn, cell);
 				}
-			};//vn;
+			} //vn;
 		}
-	};//fn;
+	} //fn;
 
 	return output;
 }

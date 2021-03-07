@@ -60,7 +60,7 @@ nousername0:
 	msg = "";
 	//!*CALL note(' ':TASK)
 
-	if (task.substr(1,2) eq "..") {
+	if (task.substr(1, 2) eq "..") {
 	// call note(task:'')
 		return 1;
 	}
@@ -73,7 +73,7 @@ nousername0:
 	var positive = task[1];
 	if (positive eq "#") {
 		task.splicer(1, 1, "");
-	}else{
+	} else {
 		positive = "";
 	}
 
@@ -82,25 +82,25 @@ nousername0:
 	if (task[1] eq "?") {
 		isexodus = 0;
 		task.splicer(1, 1, "");
-	}else{
+	} else {
 		isexodus = username eq "EXODUS";
 	}
 
-	var deleting = task.substr(1,8) eq "%DELETE%";
+	var deleting = task.substr(1, 8) eq "%DELETE%";
 	if (deleting) {
 		task.splicer(1, 8, "");
 	}
-	var updating = task.substr(1,8) eq "%UPDATE%";
+	var updating = task.substr(1, 8) eq "%UPDATE%";
 	if (updating) {
 		task.splicer(1, 8, "");
 	}
-	var renaming = task.substr(1,8) eq "%RENAME%";
+	var renaming = task.substr(1, 8) eq "%RENAME%";
 	if (renaming) {
 		task.splicer(1, 8, "");
 	}
 
 	//find the task
-	if (SECURITY.a(10).locate(task,taskn)) {
+	if (SECURITY.a(10).locate(task, taskn)) {
 
 		if (deleting) {
 			SECURITY.remover(10, taskn);
@@ -110,7 +110,7 @@ updateprivs:
 			return 1;
 		} else if (renaming) {
 			//delete any existing rename target task
-			if (SECURITY.a(10).locate(defaultlock,taskn2)) {
+			if (SECURITY.a(10).locate(defaultlock, taskn2)) {
 				SECURITY.remover(10, taskn2);
 				SECURITY.remover(11, taskn2);
 				if (taskn2 lt taskn) {
@@ -121,7 +121,7 @@ updateprivs:
 			if (renaming) {
 				//skip warning except for live databases included in startup
 				if (not(SYSTEM.a(61))) {
-					if (SYSTEM.a(58).locate(SYSTEM.a(17),xx)) {
+					if (SYSTEM.a(58).locate(SYSTEM.a(17), xx)) {
 						call note("Task renamed:|Old: " ^ task ^ "|New: " ^ defaultlock);
 					}
 				}
@@ -129,14 +129,14 @@ updateprivs:
 			goto updateprivs;
 		} else if (updating) {
 			var tt = defaultlock;
-			if (SECURITY.a(10).locate(defaultlock,taskn2)) {
+			if (SECURITY.a(10).locate(defaultlock, taskn2)) {
 				tt = SECURITY.a(11, taskn2);
 			}
 			SECURITY.r(11, taskn, tt);
 			goto updateprivs;
 		}
 
-	}else{
+	} else {
 		if (deleting) {
 			return 1;
 		}
@@ -166,13 +166,13 @@ updateprivs:
 			}
 			//if len(userprivs) lt 65000 then
 			if (SECURITY.length() lt maxstrsize - 530) {
-				if (not(SECURITY.a(10).locateby("AL",task,taskn))) {
+				if (not(SECURITY.a(10).locateby("AL", task, taskn))) {
 					if (defaultlock.unassigned()) {
 						newlock = "";
-					}else{
-						if (SECURITY.a(10).locate(defaultlock,xx)) {
+					} else {
+						if (SECURITY.a(10).locate(defaultlock, xx)) {
 							newlock = SECURITY.a(11, xx);
-						}else{
+						} else {
 							newlock = defaultlock;
 						}
 					}
@@ -203,7 +203,7 @@ notallowed:
 			//MSG=capitalise(TASK):'||Sorry ':capitalise(msgusername):', you are not authorised to do this.|'
 			if (msgusername ne USERNAME) {
 				msg = capitalise(msgusername) ^ "is not";
-			}else{
+			} else {
 				msg = "Sorry " ^ capitalise(msgusername) ^ ", you are";
 			}
 			msg ^= " not";
@@ -234,7 +234,7 @@ notallowed:
 	}
 
 	//find the user
-	if (not(SECURITY.a(1).locate(username,usern))) {
+	if (not(SECURITY.a(1).locate(username, usern))) {
 	}
 
 	//user must have all the keys for all the locks on this task
@@ -251,11 +251,11 @@ notallowed:
 
 	for (var lockn = 1; lockn <= nlocks; ++lockn) {
 		var lockx = locks.field(" ", lockn);
-		if (keys.locateusing(" ",lockx,temp)) {
-		}else{
+		if (keys.locateusing(" ", lockx, temp)) {
+		} else {
 			goto notallowed;
 		}
-	};//lockn;
+	} //lockn;
 
 	//OK:
 	return 1;
@@ -270,7 +270,7 @@ subroutine readuserprivs() {
 		if (VOLUMES) {
 			SECURITY = SECURITY.invert();
 		}
-	}else{
+	} else {
 		SECURITY = "";
 	}
 	return;
@@ -281,7 +281,7 @@ subroutine writeuserprivs() {
 	if (DEFINITIONS.open("DEFINITIONS", "")) {
 		if (VOLUMES) {
 			SECURITY.invert().write(DEFINITIONS, "SECURITY");
-		}else{
+		} else {
 			SECURITY.write(DEFINITIONS, "SECURITY");
 		}
 	}

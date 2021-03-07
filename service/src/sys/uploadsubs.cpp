@@ -94,7 +94,7 @@ postuploadfail:
 				goto postuploadfail;
 			}
 			fns.r(ii, fn);
-		};//ii;
+		} //ii;
 
 		ii = rec.a(fns.a(1)).count(VM) + (rec.a(fns.a(1)) ne "");
 		rec.r(fns.a(1), ii, targetfilename);
@@ -137,7 +137,7 @@ postuploadfail:
 		var tt = "\\";
 		uploadpath.converter(tt, OSSLASH);
 
-		if (uploadpath.substr(3,99999).index("..")) {
+		if (uploadpath.substr(3, 99999).index("..")) {
 			msg = uploadpath.quote() ^ " ..  is not allowed";
 			gosub unlockfile();
 			return invalid(msg);
@@ -192,7 +192,7 @@ postuploadfail:
 				if (errors) {
 					if (USERNAME eq "EXODUS") {
 						msg = fullsubfolder;
-					}else{
+					} else {
 						msg = "(uploadroot)" ^ subfolder;
 					}
 					msg ^= " upload folder cannot be created";
@@ -201,7 +201,7 @@ postuploadfail:
 				}
 
 			}
-		};//subfoldern;
+		} //subfoldern;
 
 	} else if (mode.field(".", 1) eq "VERIFYUPLOAD") {
 
@@ -233,7 +233,7 @@ postuploadfail:
 
 		if (virtualfilebase.index(OSSLASH)) {
 			//uploadpath=field(virtualfilebase,OSSLASH,1,count(virtualfilebase,OSSLASH))
-		}else{
+		} else {
 			//uploadpath='*'
 			//virtualfilebase='*'
 		}
@@ -245,7 +245,7 @@ postuploadfail:
 		//if dirpatt[-1,1]<>'.' then dirpatt:='.'
 		dirpatt ^= "*";
 
-		if (dirpatt.substr(3,99999).index("..")) {
+		if (dirpatt.substr(3, 99999).index("..")) {
 			msg = dirpatt.quote() ^ " .. is not allowed";
 			return invalid(msg);
 		}
@@ -279,7 +279,7 @@ postuploadfail:
 				var uploadfilename = uploadfilenames.a(uploadn);
 				uploadfilename = virtualfilebase.fieldstore(OSSLASH, ndeep, 1, uploadfilename);
 				uploadfilenames.r(uploadn, uploadfilename);
-			};//uploadn;
+			} //uploadn;
 			uploadfilenames.converter(FM, VM);
 
 		}
@@ -325,7 +325,7 @@ postuploadfail:
 		}
 
 		tt = uploadroot ^ uploadpath;
-		if (tt.substr(3,99999).index("..")) {
+		if (tt.substr(3, 99999).index("..")) {
 			msg = tt.quote() ^ " .. is not allowed";
 			return invalid(msg);
 		}
@@ -359,7 +359,7 @@ postuploadfail:
 		var validating = RECORD.a(17);
 		osfile = "";
 
-		if (uploadpath.substr(3,99999).index("..")) {
+		if (uploadpath.substr(3, 99999).index("..")) {
 			msg = uploadpath.quote() ^ " .. is not allowed";
 			return invalid(msg);
 		}
@@ -370,7 +370,7 @@ postuploadfail:
 		if (not dictfilename) {
 			dictfilename = filename;
 		}
-		if (dictfilename.substr(1,4) ne "DICT") {
+		if (dictfilename.substr(1, 4) ne "DICT") {
 			dictfilename.splicer(1, 0, "DICT.");
 		}
 		//if keydictid else keydictid='@ID'
@@ -397,7 +397,7 @@ postuploadfail:
 		// goto invalid
 		// end
 
-		temposfilename83 = (SYSTEM.a(24) ^ var(1000000).rnd()).substr(1,8) ^ ".$IM";
+		temposfilename83 = (SYSTEM.a(24) ^ var(1000000).rnd()).substr(1, 8) ^ ".$IM";
 
 		msg = (uploadroot ^ uploadpath).quote() ^ "\r\n";
 		msg = "Uploaded file cannot be found/copied" "\r\n";
@@ -441,11 +441,11 @@ postuploadfail:
 						var tt = line.index("  ");
 						///BREAK;
 						if (not tt) break;
-						cols.r(-1, line.substr(1,tt - 1) ^ VM ^ offset);
+						cols.r(-1, line.substr(1, tt - 1) ^ VM ^ offset);
 						for (ptr = tt; ptr <= 999999; ++ptr) {
 							///BREAK;
 							if (line[ptr + 1] ne " ") break;
-						};//ptr;
+						} //ptr;
 						cols ^= VM ^ ptr;
 						offset += ptr;
 						line.splicer(1, ptr, "");
@@ -453,7 +453,7 @@ postuploadfail:
 					ncols = cols.count(FM) + 1;
 	//oswrite cols on 'cols'
 
-				}else{
+				} else {
 
 					//first record, open files and create dictionary
 					if (file eq "") {
@@ -488,23 +488,23 @@ postuploadfail:
 							var nn = dictid.count("_") + 1;
 							for (ii = 1; ii <= nn; ++ii) {
 								var word = dictid.field("_", ii);
-								if (datewords.locate(word,xx)) {
+								if (datewords.locate(word, xx)) {
 									CONV = "[DATE,4*]";
 									just = "R";
-								}else{
-									if (timewords.locate(word,xx)) {
+								} else {
+									if (timewords.locate(word, xx)) {
 										CONV = "[TIME2,48MTS]";
 										just = "R";
 									}
 								}
-							};//ii;
+							} //ii;
 							cols.r(coln, 4, CONV);
 							dictrec.r(7, CONV);
 							dictrec.r(9, just);
 
 							grec ^= " " ^ dictid;
 							dictrec.write(dictfile, dictid);
-						};//coln;
+						} //coln;
 						("G" ^ FM ^ FM ^ grec).write(dictfile, dictcolprefix);
 
 						if (keyfunction) {
@@ -519,12 +519,12 @@ postuploadfail:
 							tt.write(dictfile, keydictid);
 						}
 
-					}else{
+					} else {
 
 						var rec = "";
 						for (var coln = 1; coln <= ncols; ++coln) {
 							var col = cols.a(coln);
-							var cell = line.substr(col.a(1, 2),col.a(1, 3)).trimb();
+							var cell = line.substr(col.a(1, 2), col.a(1, 3)).trimb();
 							if (cell.length()) {
 								if (col.a(1, 4)) {
 									var cell0 = cell;
@@ -534,7 +534,7 @@ postuploadfail:
 										if (cell.index(":")) {
 											cell = iconv(cell, CONV);
 										}
-									}else{
+									} else {
 										cell = iconv(cell, CONV);
 									}
 									if (not(cell.length())) {
@@ -545,7 +545,7 @@ postuploadfail:
 								}
 							}
 							rec.r(coln + fieldoffset, cell);
-						};//coln;
+						} //coln;
 
 						key = importcode ^ "*" ^ linenox;
 						if (importfilenamefn) {
@@ -598,7 +598,7 @@ subroutine getline() {
 
 addbuff:
 ////////
-		call osbread(temp, osfile,  fileptr, lengthx);
+		call osbread(temp, osfile, fileptr, lengthx);
 		temp.converter("\n\f", "\r\r");
 		buff ^= temp;
 
@@ -649,7 +649,7 @@ subroutine lockfile() {
 		var lockuser = (filename ^ "*" ^ key).xlate("LOCKS", 4, "X");
 		if (lockuser) {
 			msg ^= lockuser;
-		}else{
+		} else {
 			msg ^= "someone else";
 		}
 	}

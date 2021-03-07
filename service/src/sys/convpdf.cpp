@@ -47,7 +47,7 @@ function main(io osfilename, in printopts0, out errors) {
 	//X means dont convert
 	if (printopts0.unassigned()) {
 		printopts = "";
-	}else{
+	} else {
 		printopts = printopts0;
 	}
 	if (printopts.index("X")) {
@@ -55,7 +55,7 @@ function main(io osfilename, in printopts0, out errors) {
 	}
 
 	//only convert .htm files
-	if (osfilename.lcase().substr(-4,4) ne ".htm") {
+	if (osfilename.lcase().substr(-4, 4) ne ".htm") {
 		return 0;
 	}
 
@@ -66,7 +66,7 @@ function main(io osfilename, in printopts0, out errors) {
 		if (exe) {
 			pdfcmd = "c:\\windows\\" ^ pdfcmd ^ exe;
 		}
-	}else{
+	} else {
 		pdfcmd = "/usr/local/bin/wkhtmltopdf";
 		if (not(pdfcmd.osfile())) {
 			pdfcmd = "/usr/bin/wkhtmltopdf";
@@ -105,7 +105,7 @@ function main(io osfilename, in printopts0, out errors) {
 		errors = "html2pdf: " ^ errors;
 		printl(pdfcmd);
 		printl(errors);
-	}else{
+	} else {
 		osfilename = pdffilename;
 	}
 

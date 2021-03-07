@@ -285,9 +285,9 @@ function main() {
 	}
 	if (VOLUMES) {
 		pidfilename = SYSTEM.a(54, 5) ^ ".pid";
-	}else{
+	} else {
 		pidfilename = "/run/neo/neo@" ^ SYSTEM.a(17);
-		if (SYSTEM.a(17).substr(-4,4) eq "test") {
+		if (SYSTEM.a(17).substr(-4, 4) eq "TEST") {
 			pidfilename.swapper("neo@", "tst@");
 			pidfilename.swapper("_test", "");
 			pidfilename ^= ".pid";
@@ -308,14 +308,14 @@ function main() {
 			dbdate = "30 MAR 2007";
 			dbtime = "12:00:00";
 			dbdatetimerequired = dbdate.iconv("D") + dbtime.iconv("MT") / 86400;
-		}else{
+		} else {
 		}
 		if (DEFINITIONS.open("DEFINITIONS", "")) {
 			var dbversion;
 			if (not(dbversion.read(DEFINITIONS, "DBVERSION"))) {
 				goto updateversion;
 			}
-			if (oldmethod and dbversion.a(1) eq 14334.5) {
+			if (oldmethod and dbversion.a(1) eq "14334.5") {
 			}
 			if (dbversion.a(1) gt dbdatetimerequired) {
 				msg = "Software version " ^ dbversion.a(1).oconv("D") ^ " " ^ dbversion.a(1).field(".", 2).oconv("MTS") ^ " is incompatible with" ^ FM ^ "Database version " ^ dbdate ^ " " ^ dbtime;
@@ -327,7 +327,7 @@ badversion:
 					gosub failsys();
 					stop();
 
-				}else{
+				} else {
 decideversion:
 					var options = "Quit (RECOMMENDED)";
 					options.r(-1, "Continue");
@@ -374,7 +374,7 @@ updateversion:
 			if (file.open(filename, "")) {
 				rec.write(file, id);
 			}
-		};//ii;
+		} //ii;
 	}
 
 	//syslock=if revrelease()>=2.1 then 36 else 23
@@ -409,10 +409,10 @@ updateversion:
 		var volume = volumesx.a(volumen);
 		var tpath = "../" "DATA" "/";
 		tpath.converter("/", OSSLASH);
-		if (volume.substr(1,8) eq tpath) {
+		if (volume.substr(1, 8) eq tpath) {
 			execute("ATTACH " ^ volume ^ " (S)");
 		}
-	};//volumen;
+	} //volumen;
 
 	if (VOLUMES) {
 		call log2("*perform RUN GBP LOGON.OLD UPGRADEVOC", logtime);
@@ -483,7 +483,7 @@ nextreport:
 								file.deleterecord(keyx);
 
 							}
-						}else{
+						} else {
 							var oldrecord;
 							if (not(oldrecord.read(file, keyx))) {
 								oldrecord = "";
@@ -748,7 +748,7 @@ nextreport:
 		//if system<118> then
 		// call note('WARNING: User time zone ignored and|Database storing non-GMT/UTC date/time|because current server is not GMT/UTC (is ':system<120>:')')
 		// end
-	}else{
+	} else {
 		SW.r(1, SYSTEM.a(118));
 		//if display time is not server/gmt/utc then adjust offset to server/gmt/utc
 		if (SW.a(1).length()) {
@@ -808,7 +808,7 @@ nextreport:
 
 	call log2("*get codepage as an environment variable", logtime);
 	//will not override entries in SYSTEM.CFG
-	if (not(SYSTEM.a(12).locate("CODEPAGE",vn))) {
+	if (not(SYSTEM.a(12).locate("CODEPAGE", vn))) {
 
 		if (VOLUMES) {
 			tt = "../data/" ^ SYSTEM.a(17) ^ "/data.cfg";
@@ -823,12 +823,12 @@ nextreport:
 			if (datacfg) {
 				datacfg.converter("\r\n", _FM_ _FM_);
 				codepage = datacfg.a(1).trim();
-			}else{
+			} else {
 				var output = shell2("mode CON:", xx);
 				output = trim(output.convert("\r\n", FM ^ FM), FM);
 				codepage = field2(output, " ", -1);
 			}
-		}else{
+		} else {
 			//en_US.UTF-8
 			call osgetenv("LANG", codepage);
 		}
@@ -846,9 +846,9 @@ nextreport:
 			if (codepage.index("UTF-8")) {
 				codepage = "UTF-8";
 			}
-			if (var("UTF-8,720,737").locateusing(",",codepage,tt)) {
+			if (var("UTF-8,720,737").locateusing(",", codepage, tt)) {
 				tt = var("UTF-8,windows-1256,windows-1253").field(",", tt);
-			}else{
+			} else {
 				tt = "windows-1252";
 			}
 			SYSTEM.r(127, tt);
@@ -890,7 +890,7 @@ nextreport:
 		//Windows Server 2003         5.2.3790.1218
 		//Windows Server 2008         6.0.6001 (27.02.2008)
 		var ver2 = ver.field(".", 1, 2);
-		if (var("5.0,5.1,5.2,6.0,6.1,6.2,6.3").locateusing(",",ver2,vern)) {
+		if (var("5.0,5.1,5.2,6.0,6.1,6.2,6.3").locateusing(",", ver2, vern)) {
 			ver2 = var("2000,XP,2003,2008,2008R2,2012,2012R2").field(",", vern);
 			ver = ver.fieldstore(".", 1, -2, "Win" ^ ver2);
 			ver.swapper(".6001", "");
@@ -899,7 +899,7 @@ nextreport:
 		}
 
 	//not Windows
-	}else{
+	} else {
 		//Description:\tUbuntu 18.04.3 LTS\n
 		ver = shell2("lsb_release -d").field(var().chr(9), 2).trim();
 		ver.splicer(-1, 1, "");
@@ -911,14 +911,14 @@ nextreport:
 		var ncpus = (((shell2("lscpu|grep \"CPU(s)\"")).field(":", 2)).field(var().chr(10), 1)).trim();
 		if (nthreads.isnum() and ncpus.isnum()) {
 			SYSTEM.r(9, nthreads * ncpus);
-		}else{
+		} else {
 			SYSTEM.r(9, 1);
 		}
 
 	}
 
 	//save VER
-	if (not(SYSTEM.a(12).locate("VER",tt))) {
+	if (not(SYSTEM.a(12).locate("VER", tt))) {
 		{}
 	}
 	SYSTEM.r(12, tt, "VER");
@@ -928,16 +928,16 @@ nextreport:
 	if (var("wmic.cfg").osfile()) {
 		//grep "model name" /proc/cpuinfo
 		cpu = "Unknown";
-	}else{
+	} else {
 		if (VOLUMES) {
 			cpu = shell2("wmic CPU GET NAME", xx);
-			if (cpu.substr(1,2) eq _RM_ _FM_) {
+			if (cpu.substr(1, 2) eq _RM_ _FM_) {
 				cpu.splicer(1, 2, "");
 				cpu.converter(var().chr(0), "");
 			}
 			cpu.swapper("\r\n", FM);
 			cpu.remover(1);
-		}else{
+		} else {
 			cpu = ((shell2("cat /proc/cpuinfo|grep -i \"model name\"")).field(var().chr(9), 2)).trim();
 			cpu.converter(var().chr(10), FM);
 			cpu.converter(":", "");
@@ -964,7 +964,7 @@ nextreport:
 		tt = nlogical / nsockets;
 		if (tt gt 1) {
 			cpu ^= nsockets ^ "x" ^ tt;
-		}else{
+		} else {
 			cpu ^= "x" ^ nsockets;
 		}
 	}
@@ -1010,7 +1010,7 @@ nextreport:
 	if (freemb lt reqfreemb * notherusers) {
 	//if 1 then
 		msg = "THERE IS NOT ENOUGH FREE DISK SPACE AVAILABLE";
-		msg ^= "||EXODUS needs at least " ^ reqfreemb ^ "Mb PER USER|of free space on disk " ^ oscwd().substr(1,2) ^ " but";
+		msg ^= "||EXODUS needs at least " ^ reqfreemb ^ "Mb PER USER|of free space on disk " ^ oscwd().substr(1, 2) ^ " but";
 		msg ^= "|there is only " ^ freemb ^ "Mb available.";
 		if (notherusers) {
 			msg ^= "||There is/are " ^ notherusers ^ " other users online.";
@@ -1060,7 +1060,7 @@ nextreport:
 			}
 			///BREAK;
 			if (not(tt eq "")) break;
-		};//ii;
+		} //ii;
 	}
 
 	/* using proxycfg;
@@ -1083,7 +1083,7 @@ getproxy:
 			tt = result.index("proxy server(s)");
 			if (tt) {
 				//tt=result[tt,';'][1,char(13)]
-				tt = result.substr(tt,9999);
+				tt = result.substr(tt, 9999);
 				tt = tt.field(";", 1).field(var().chr(13), 1);
 				tt = tt.field(":", 2, 99).trim();
 				tt.swapper("http=", "");
@@ -1218,7 +1218,7 @@ getproxy:
 				userx.writev(users, userx, 1);
 
 			}
-		};//usern;
+		} //usern;
 
 	}
 
@@ -1260,7 +1260,7 @@ getproxy:
 	call log2("*get maintenance user menu if any", logtime);
 	if (xx.open("SCHEDULES", "")) {
 		temp = "ADAGENCY";
-	}else{
+	} else {
 		temp = "EXODUS2";
 	}
 	ENVIRONSET.r(37, temp);
@@ -1449,7 +1449,7 @@ getproxy:
 				call sysmsg(filename.quote() ^ " could not be created by INIT.GENERAL");
 			}
 		}
-	};//ii;
+	} //ii;
 
 	call log2("*perform the autoexec task BEFORE initialising other systems", logtime);
 	if (not exodusid) {
@@ -1561,7 +1561,7 @@ convcompany:
 					call decide("Which format do you want for numbers ?||(See \"NUMBER FORMAT\" on the company file)", "1.000,00 (dot for thousands)" ^ VM ^ "1,000.00 (comma for thousands)", reply);
 					if (reply eq 1) {
 						numberformat = "1.000,00";
-					}else{
+					} else {
 						numberformat = "1,000.00";
 					}
 				}
@@ -1591,7 +1591,7 @@ newdatasetid:
 		datasetid = var().date() ^ "." ^ dostime;
 		datasetid.converter(".", "");
 		datasetid = datasetid.oconv("MX");
-		datasetid = (datasetid ^ datasetid ^ datasetid ^ datasetid).substr(1,8);
+		datasetid = (datasetid ^ datasetid ^ datasetid ^ datasetid).substr(1, 8);
 adddatasetcodename:
 		datasetid.r(2, SYSTEM.a(23));
 		datasetid.r(3, SYSTEM.a(17));
@@ -1605,7 +1605,7 @@ adddatasetcodename:
 	//if @username<>'EXODUS' and datasetid<4> then
 	//lock even to EXODUS to prevent installation where EXODUS pass is known
 	if (datasetid.a(4)) {
-		if (not(datasetid.a(4).locate(cid(),xx))) {
+		if (not(datasetid.a(4).locate(cid(), xx))) {
 			USER4 = var("CANNOT USE THIS DATABASE ON THIS COMPUTER").quote();
 			gosub failsys();
 			stop();
@@ -1694,7 +1694,7 @@ nextdoc:
 	}
 
 	if (VOLUMES) {
-		if (not(VOLUMES.locateusing(FM,"DATAVOL",xx))) {
+		if (not(VOLUMES.locateusing(FM, "DATAVOL", xx))) {
 			//pcperform 'MD DATAVOL'
 			//call mkdir('DATAVOL':char(0),xx)
 			call osmkdir("DATAVOL");
@@ -1809,13 +1809,13 @@ nextdoc:
 			versioninstalled.write(DEFINITIONS, tt2);
 
 			//email users on live systems LISTED IN SYSTEM CONFIGURATION only
-			if (SYSTEM.a(58).locate(SYSTEM.a(17),xx)) {
+			if (SYSTEM.a(58).locate(SYSTEM.a(17), xx)) {
 				if (not(SYSTEM.a(61))) {
 					var idate = version.field(" ", 2, 4).iconv("D");
 					var itime = version.field(" ", 1).iconv("MT");
 					//tt=idate 'D/J':' ':itime 'MT'
 					tt = idate.oconv("D/E");
-					tt = idate.substr(-4,4) ^ "/" ^ tt.substr(1,5) ^ " " ^ itime.oconv("MT");
+					tt = idate.substr(-4, 4) ^ "/" ^ tt.substr(1, 5) ^ " " ^ itime.oconv("MT");
 					call decide("Email users about upgrade?|(or later on do F5 EMAILUSERS UPGRADE " ^ tt ^ ")", "", reply);
 					if (reply eq 1) {
 						perform("EMAILUSERS UPGRADE " ^ tt);
@@ -1850,7 +1850,7 @@ nextdoc:
 			call log2("*if not interactive then start the required process", logtime);
 			//by pressing F5
 
-		}else{
+		} else {
 			//data char(13)
 			//chain 'RUNMENU LISTEN'
 
@@ -1893,7 +1893,7 @@ subroutine getsystem() {
 		if (systemx.a(ii).length()) {
 			SYSTEM.r(ii, systemx.a(ii));
 		}
-	};//ii;
+	} //ii;
 
 	//save config file time so can detect if restart required
 	SYSTEM.r(100, tt2, tt.osfile().a(3));

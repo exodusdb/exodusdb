@@ -24,7 +24,7 @@ function main(in mode, io tx, in arg3, io arg4, in arg5) {
 		var mainmenu = arg3;
 		if (arg4.unassigned()) {
 			id = "";
-		}else{
+		} else {
 			id = arg4;
 		}
 

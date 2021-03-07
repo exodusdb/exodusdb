@@ -85,7 +85,7 @@ function main(in mode, io logtime, in menu) {
 		var nn = hosts.count(FM) + 1;
 		for (var ln = nn; ln >= 1; --ln) {
 			hosts.r(ln, hosts.a(ln).field("#", 1));
-		};//ln;
+		} //ln;
 
 		//remove blank lines and convert fm to sm
 		hosts.converter(FM, " ");
@@ -133,7 +133,7 @@ function main(in mode, io logtime, in menu) {
 					configips.remover(1, 1, ii);
 				}
 			}
-		};//ii;
+		} //ii;
 
 		//allow exodus login from 127.*, LAN and any config default ips
 		//although any full 4 part LAN ips in configips will be BLOCKED in LISTEN2
@@ -161,12 +161,12 @@ function main(in mode, io logtime, in menu) {
 			var enventry = environment.a(ii);
 			if (enventry) {
 				tt = enventry.field("=", 1);
-				if (not(SYSTEM.a(12).locate(tt,vn))) {
+				if (not(SYSTEM.a(12).locate(tt, vn))) {
 					SYSTEM.r(12, vn, tt);
 					SYSTEM.r(13, vn, enventry.field("=", 2, 99999));
 				}
 			}
-		};//ii;
+		} //ii;
 
 	} else if (mode eq "FIXURLS") {
 
@@ -187,7 +187,7 @@ function main(in mode, io logtime, in menu) {
 			tt = baselinks.a(1, linkn);
 			if (tt) {
 				var tt2 = (field2(tt, "/", -1)).lcase();
-				if (tt2.substr(1,4).index(".htm")) {
+				if (tt2.substr(1, 4).index(".htm")) {
 					tt.splicer(-tt2.length(), tt2.length(), "");
 				}
 				if (not(var("\\/").index(tt[-1]))) {
@@ -195,7 +195,7 @@ function main(in mode, io logtime, in menu) {
 				}
 				baselinks.r(1, linkn, tt);
 			}
-		};//linkn;
+		} //linkn;
 		SYSTEM.r(114, baselinks);
 		SYSTEM.r(115, baselinkdescs);
 
@@ -224,7 +224,7 @@ function main(in mode, io logtime, in menu) {
 
 		call log2("*compress logs with gzip", logtime);
 		var dbcode = SYSTEM.a(17);
-		var curryear = var().date().oconv("D").substr(-4,4);
+		var curryear = var().date().oconv("D").substr(-4, 4);
 		var minyear = 2000;
 		for (var year = curryear - 2; year >= minyear; --year) {
 
@@ -246,7 +246,7 @@ function main(in mode, io logtime, in menu) {
 			printl(cmd);
 			call shell2(cmd, xx);
 
-		};//year;
+		} //year;
 
 	} else if (mode eq "UPDATEUSERS") {
 
@@ -268,7 +268,7 @@ nextuser:
 				goto nextuser;
 			}
 			var origuser = userx;
-			if (not(SECURITY.a(1).locate(userid,usern))) {
+			if (not(SECURITY.a(1).locate(userid, usern))) {
 				goto nextuser;
 			}
 			userx.r(40, SECURITY.a(6, usern));
@@ -350,7 +350,7 @@ nextuser:
 			var ntemps = temps.count(FM) + (temps ne "");
 			for (var tempn = 1; tempn <= ntemps; ++tempn) {
 				("..\\" ^ temps.a(tempn)).osdelete();
-			};//tempn;
+			} //tempn;
 		}
 
 	} else if (mode eq "MAKEMENU") {

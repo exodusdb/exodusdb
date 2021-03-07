@@ -10,12 +10,12 @@ function main(in fromquestion0, in uptoquestion0, io ifromdate, io iuptodate) {
 
 	if (fromquestion0.unassigned()) {
 		fromquestion = "";
-	}else{
+	} else {
 		fromquestion = fromquestion0;
 	}
 	if (uptoquestion0.unassigned()) {
 		uptoquestion = "";
-	}else{
+	} else {
 		uptoquestion = uptoquestion0;
 	}
 	if (ifromdate.unassigned()) {
@@ -63,9 +63,9 @@ inpfromdate:
 		} else if (iuptodate eq "TOMORROW") {
 			iuptodate = var().date() + 1;
 		} else if (iuptodate.match("^\\d*D$")) {
-			iuptodate = ifromdate2 + iuptodate.substr(1,iuptodate.length() - 1);
+			iuptodate = ifromdate2 + iuptodate.substr(1, iuptodate.length() - 1);
 		} else if (iuptodate.match("^\\d*W$")) {
-			iuptodate = ifromdate2 + iuptodate.substr(1,iuptodate.length() - 1) * 7;
+			iuptodate = ifromdate2 + iuptodate.substr(1, iuptodate.length() - 1) * 7;
 		}
 	}
 

@@ -17,7 +17,7 @@ function main(in filenames0, out result) {
 
 	if (filenames0) {
 		filenamesx = filenames0;
-	}else{
+	} else {
 		filenamesx = "PLANS" _VM_ "SCHEDULES" _VM_ "JOBS" _VM_ "BALANCES";
 	}
 
@@ -32,7 +32,7 @@ function main(in filenames0, out result) {
 			goto exit;
 		}
 
-	};//filen;
+	} //filen;
 
 	result = 0;
 

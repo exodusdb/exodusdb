@@ -39,7 +39,7 @@ function main(in mode0, out msg) {
 	//mode=mode0
 	if (mode0.unassigned()) {
 		mode = "";
-		}else{
+		} else {
 		mode = mode0;
 	}
 
@@ -196,12 +196,12 @@ function main(in mode0, out msg) {
 			modulename = modulenames.field(",", modulen);
 			///BREAK;
 			if (not modulename) break;
-			if (not(allmodulenames.locate(modulename,xx))) {
+			if (not(allmodulenames.locate(modulename, xx))) {
 				msg = "modulename must be one of the following";
 				msg.r(-1, allmodulenames);
 				return 0;
 			}
-		};//modulen;
+		} //modulen;
 
 		//check fromdate
 		var ifromdate = iconv(fromdate, "[DATE,4*]");
@@ -268,7 +268,7 @@ function main(in mode0, out msg) {
 				msg = "Verification code not entered";
 				return 0;
 			}
-		}else{
+		} else {
 			lictext = sentencex.field(" ", 2, 6);
 		}
 
@@ -303,7 +303,7 @@ function main(in mode0, out msg) {
 
 			//ideally in numerical order by licence "upto" date
 			//checking code does not need it though
-			if (not(licx.a(1).locateby("AR",iuptodate,licn))) {
+			if (not(licx.a(1).locateby("AR", iuptodate, licn))) {
 				{}
 			}
 
@@ -317,7 +317,7 @@ function main(in mode0, out msg) {
 
 			licx.write(DEFINITIONS, lickey);
 
-		};//modulen;
+		} //modulen;
 
 		subject = "EXODUS: Licence Added " ^ SYSTEM.a(17) ^ " - " ^ SYSTEM.a(23);
 		body = "Licence:     : " ^ SENTENCE.field(" ", 2, 999);
@@ -332,7 +332,7 @@ function main(in mode0, out msg) {
 			body ^= " " ^ oconv(licx.a(1, licn), "[DATE,4]") ^ "   ";
 			body ^= " " ^ licx.a(3, licn).oconv("L#15") ^ " ";
 			body ^= "    " ^ licx.a(5, licn);
-		};//licn;
+		} //licn;
 		body ^= FM;
 		body.swapper("/ ", "/0");
 
@@ -430,7 +430,7 @@ function main(in mode0, out msg) {
 
 	//ok if document 1/period/year is in a specifically authorised lic period
 	//skip expired licences
-	if (not(licx.a(1).locateby("AR",docdate,licn))) {
+	if (not(licx.a(1).locateby("AR", docdate, licn))) {
 		{}
 	}
 	//check remaining licences which havent expired
@@ -450,7 +450,7 @@ ok:
 				goto ok;
 			}
 		}
-	};//licn;
+	} //licn;
 
 	//ok if current date is not after last expiry date plus grace days
 	var nlics = licx.a(1).count(VM) + (licx ne "");
@@ -477,7 +477,7 @@ ok:
 			}
 
 		}
-	};//licn;
+	} //licn;
 
 	if (not maxfinalexpirydate) {
 		//cannot find any lic (either * or specific)
@@ -492,7 +492,7 @@ ok:
 
 	if (dateorperiod eq 1) {
 		tt = "date";
-	}else{
+	} else {
 		tt = "period closing";
 	}
 	msg = "The document " ^ tt ^ " " ^ oconv(docdate, "[DATE,4*]") ^ " is not within";
@@ -512,13 +512,13 @@ subroutine emailadmin(io msg) {
 
 	if (mode eq "DELETE") {
 		msg = "Licencing restrictions removed; and all licences";
-	}else{
+	} else {
 		msg = "Licence added OK.";
 	}
 	if (errormsg) {
 		msg.r(-1, " but could NOT email admin@neosys.com" ^ FM ^ FM ^ errormsg);
 		call mssg(msg);
-	}else{
+	} else {
 		call note(msg ^ FM ^ FM ^ "admin@neosys.com has been emailed" ^ FM);
 	}
 	msg = "";

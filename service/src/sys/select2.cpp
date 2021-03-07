@@ -63,22 +63,22 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 	var sortselect = sortselect0;
 	if (dictids0.unassigned()) {
 		dictids = "";
-	}else{
+	} else {
 		dictids = dictids0;
 	}
 	if (options0.unassigned()) {
 		options = "";
-	}else{
+	} else {
 		options = options0;
 	}
 	if (maxnrecs0.unassigned()) {
 		maxnrecs = "";
-	}else{
+	} else {
 		maxnrecs = maxnrecs0;
 	}
 	if (limitfields.unassigned()) {
 		nlimitfields = 0;
-	}else{
+	} else {
 		nlimitfields = limitfields.count(VM) + (limitfields ne "");
 	}
 
@@ -92,7 +92,7 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 		//changed to allow language characters to pass through x80-xF9
 		for (var ii = 249; ii <= 255; ++ii) {
 			hexx(ii - 249) = "%" ^ ii.oconv("MX").oconv("R(0)#2");
-		};//ii;
+		} //ii;
 	}
 
 	#define msg USER4
@@ -124,7 +124,7 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 	if (win.srcfile.unassigned()) {
 nocommon:
 		commonsaved = 0;
-	}else{
+	} else {
 		commonsaved = 1;
 		win.srcfile.transfer(savesrcfile);
 		win.datafile.transfer(savedatafile);
@@ -142,7 +142,7 @@ nocommon:
 	if (filename.field(" ", 2) eq "USING") {
 		dictfilename = filename.field(" ", 3);
 		filename = filename.field(" ", 1);
-	}else{
+	} else {
 		dictfilename = filename;
 	}
 
@@ -167,7 +167,7 @@ nocommon:
 			return 0;
 
 		}
-	}else{
+	} else {
 		datax = "";
 	}
 	var dataptr = 0;
@@ -215,7 +215,7 @@ nocommon:
 
 	if (rawread) {
 		haspostread = "";
-	}else{
+	} else {
 		call listen3(filename, "READ", realfilename, triggers);
 		//postread=triggers<3>
 		haspostread = triggers.a(3) ne "";
@@ -243,7 +243,7 @@ nocommon:
 					if (dictid eq "ID") {
 						dictrec = "F,0,No,,,,,,L,15,";
 						dictrec.converter(",", FM);
-					}else{
+					} else {
 						response = "Error: " ^ (dictid.quote()) ^ " IS MISSING FROM DICT." ^ filename;
 
 						//abort
@@ -265,14 +265,14 @@ nocommon:
 			dictrec = lower(dictrec);
 			dictrecs.r(dictidn, dictrec);
 			oconvsx.r(dictidn, dictrec.a(1, 7));
-		};//dictidn;
+		} //dictidn;
 	}
 
 	var tx = "";
 	if (xml and linkfilename2) {
 		//tx:='<XML id=':quote(lcase(filename)):'>':crlf
 		tx ^= "<records>" "\r\n";
-		call osbwrite(tx, linkfile2,  dataptr);
+		call osbwrite(tx, linkfile2, dataptr);
 	}
 
 	//read xx from @dict,'AUTHORISED' then
@@ -308,7 +308,7 @@ nocommon:
 		//if @list.active or index(' ':sortselect,' BY ',1) or index(sortselect,'WITH AUTHORISED',1) else
 		if (not(LISTACTIVE or ((" " ^ sortselect).index(" BY ")))) {
 			//only look in selected files otherwise c++ takes too long on some files
-			if (var("COMPANIES,CURRENCIES,UNITS,LEDGERS,JOB_TYPES").locateusing(",",filenamex,xx)) {
+			if (var("COMPANIES,CURRENCIES,UNITS,LEDGERS,JOB_TYPES").locateusing(",", filenamex, xx)) {
 				if (records.read(file, "%RECORDS%")) {
 					if (records.length() lt 200) {
 						records.swapper(FM, "\" \"");
@@ -365,7 +365,7 @@ nextrec:
 			ID = ID.a(1, 1);
 		}
 
-	}else{
+	} else {
 		if (not(readnext(ID, MV))) {
 			ID = "";
 		}
@@ -376,7 +376,7 @@ nextrec:
 
 		if (xml and linkfilename2) {
 			var tt = "</records>";
-			call osbwrite(tt, linkfile2,  dataptr);
+			call osbwrite(tt, linkfile2, dataptr);
 		}
 
 		if (linkfilename2) {
@@ -428,7 +428,7 @@ nextrec:
 			return 0;
 
 		}
-	};//limitfieldn;
+	} //limitfieldn;
 
 	recn += 1;
 
@@ -474,7 +474,7 @@ nextrec:
 		row.splicer(1, 0, prefix);
 
 	//dictids ne RECORD
-	}else{
+	} else {
 		row = "";
 
 		for (var dictidn = 1; dictidn <= ndictids; ++dictidn) {
@@ -495,10 +495,10 @@ nextrec:
 				//if cell then deb ug
 				//cell=quote(str(cell,10))
 				row ^= "<" ^ dictid2 ^ ">" ^ cell ^ "</" ^ dictid2 ^ ">" "\r\n";
-			}else{
+			} else {
 				row.r(1, dictidn, cell);
 			}
-		};//dictidn;
+		} //dictidn;
 
 		if (xml) {
 			row = "<RECORD>" "\r\n" ^ row ^ "</RECORD>" "\r\n";
@@ -510,7 +510,7 @@ nextrec:
 			if (not xml) {
 				row.splicer(1, 0, FM);
 			}
-		}else{
+		} else {
 			if (xml) {
 				row.splicer(1, 0, "<records>" "\r\n");
 				//row[1,0]='<XML id=':quote(lcase(filename)):'>':crlf
@@ -525,7 +525,7 @@ nextrec:
 
 		var blockn = 0;
 		while (true) {
-			var rowpart = row.substr(blockn * 16384 + 1,16384);
+			var rowpart = row.substr(blockn * 16384 + 1, 16384);
 			///BREAK;
 			if (not rowpart) break;
 
@@ -533,15 +533,15 @@ nextrec:
 			//changed to allow language characters to pass through x80-xF9
 			for (var ii = 249; ii <= 255; ++ii) {
 				rowpart.swapper(var().chr(ii), hexx(ii - 249));
-			};//ii;
+			} //ii;
 
 			//output converted row part
-			call osbwrite(rowpart, linkfile2,  dataptr);
+			call osbwrite(rowpart, linkfile2, dataptr);
 
 			blockn += 1;
 		}//loop;
 
-	}else{
+	} else {
 		datax ^= row;
 		dataptr += row.length();
 	}

@@ -30,7 +30,7 @@ function main(in msg0, io time0) {
 		if (not(logfile.osopen(logfilename))) {
 			return 0;
 		}
-	}else{
+	} else {
 		logfile = "";
 	}
 
@@ -42,12 +42,12 @@ function main(in msg0, io time0) {
 
 		//try multiple start points in case hit middle of multibyte character
 		for (var ptr = logfilelength - 1024; ptr <= logfilelength - 1021; ++ptr) {
-			call osbread(datax, logfile,  ptr, 1024);
+			call osbread(datax, logfile, ptr, 1024);
 			//if any data then break out of loop
 			if (datax.length()) {
 				ptr = logfilelength;
 			}
-		};//ptr;
+		} //ptr;
 
 		logfile.osclose();
 		datax.converter("\r\n", FM ^ FM);
@@ -65,7 +65,7 @@ function main(in msg0, io time0) {
 	if (VOLUMES) {
 		//entry:=oconv(date(),'D2-J')
 		entry = var().date().oconv("D2-E");
-		entry = entry.substr(-2,2) ^ "-" ^ entry.substr(1,5);
+		entry = entry.substr(-2, 2) ^ "-" ^ entry.substr(1, 5);
 		entry ^= sep ^ time2.oconv("MTS") ^ sep;
 		//entry:=field(time2,'.',2) 'MD20P'
 	}
@@ -83,7 +83,7 @@ function main(in msg0, io time0) {
 	time0 = time2;
 
 	if (logfile) {
-		call osbwrite(entry, logfile,  logfilelength);
+		call osbwrite(entry, logfile, logfilelength);
 		logfile.osclose();
 	}
 

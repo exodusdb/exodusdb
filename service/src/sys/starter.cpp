@@ -14,12 +14,12 @@ function main(in startmode0, out starttime, out startdate, out startbuffer) {
 
 	if (startmode0.unassigned()) {
 		startmode = "";
-	}else{
+	} else {
 		startmode = startmode0;
 	}
 	if (startmode) {
 		temp = "|" ^ startmode ^ "||";
-	}else{
+	} else {
 		temp = "";
 	}
 
@@ -48,7 +48,7 @@ inpreply:
 			goto inpreply;
 		}
 
-	}else{
+	} else {
 		reply = "Y";
 		//IF DECIDE(TEMP:'OK to start ?|','',REPLY) ELSE REPLY=2
 		call note(temp ^ "OK to start ? (Y/n)", "RC", reply);

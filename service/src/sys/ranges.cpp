@@ -31,13 +31,13 @@ function main(io ranges0, in basekey0="", in listid0="") {
 
 	if (basekey0.unassigned()) {
 		basekey = "";
-	}else{
+	} else {
 		basekey = basekey0;
 	}
 
 	if (listid0.unassigned()) {
 		listid = "";
-	}else{
+	} else {
 		listid = listid0;
 	}
 
@@ -66,7 +66,7 @@ function main(io ranges0, in basekey0="", in listid0="") {
 	var allchars = "";
 	for (var ii = 32; ii <= 255; ++ii) {
 		allchars ^= var().chr(ii);
-	};//ii;
+	} //ii;
 	allchars.converter("0123456789-", "");
 
 	for (var ii = nn; ii >= 1; --ii) {
@@ -119,7 +119,7 @@ function main(io ranges0, in basekey0="", in listid0="") {
 				if (basekey and not(prefix)) {
 					key = basekey;
 					key.swapper("%", i2);
-				}else{
+				} else {
 					key = prefix ^ i2;
 				}
 
@@ -130,7 +130,7 @@ function main(io ranges0, in basekey0="", in listid0="") {
 						gosub writelist();
 					}
 
-				}else{
+				} else {
 					//if (len(range)+len(ranges))>65000 then
 					if (range.length() + ranges.length() gt maxstrsize - 530) {
 						//call msg('Range exceeds maximum of 65,000 characters|Please enter a smaller range')
@@ -141,7 +141,7 @@ function main(io ranges0, in basekey0="", in listid0="") {
 					range ^= " " ^ key;
 				}
 
-			};//i2;
+			} //i2;
 
 			if (not listid) {
 				range.splicer(1, 1, "");
@@ -149,7 +149,7 @@ function main(io ranges0, in basekey0="", in listid0="") {
 			}
 
 		//not range
-		}else{
+		} else {
 			if (listid) {
 
 				if (basekey and not(prefix)) {
@@ -172,7 +172,7 @@ makekey:
 		}
 
 	//nextrange:;
-	};//ii;
+	} //ii;
 
 exit:
 /////
@@ -184,11 +184,11 @@ exit:
 				vnos = 1;
 			}
 			gosub writelist();
-		}else{
+		} else {
 			//return '' in vnos if none found (unlikely)
 			var vnos = "";
 		}
-	}else{
+	} else {
 		ranges0 = ranges;
 		ranges0.converter(FM, " ");
 	}

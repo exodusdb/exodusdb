@@ -22,14 +22,14 @@ function main(in mode, io line, in params, in filename) {
 			//...
 			line = line;
 
-		}else{
+		} else {
 
 			//...
 			line = line;
 
 		}
 
-	}else{
+	} else {
 		call mssg(filename ^ " not handled in CONVERTER.CSV");
 		stop();
 	}

@@ -24,7 +24,7 @@ function main(io colhdg, in thproperties, in nobase0) {
 
 	if (nobase0.unassigned()) {
 		nobase = 0;
-	}else{
+	} else {
 		nobase = nobase0;
 	}
 
@@ -38,7 +38,7 @@ function main(io colhdg, in thproperties, in nobase0) {
 		if (tt gt nrows) {
 			nrows = tt;
 		}
-	};//coln;
+	} //coln;
 
 	var thprop = thproperties;
 	var nocell = "%~%";
@@ -74,7 +74,7 @@ function main(io colhdg, in thproperties, in nobase0) {
 			if (colspan gt 1) {
 				t2 ^= " colspan=" ^ colspan ^ " align=center";
 
-			}else{
+			} else {
 
 				//determine any rowspan (duplicate cells below)
 				while (true) {
@@ -97,9 +97,9 @@ function main(io colhdg, in thproperties, in nobase0) {
 			coln += colspan - 1;
 
 nextcoln:;
-		};//coln;
+		} //coln;
 
-	};//rown;
+	} //rown;
 	colhdg.swapper(nocell, "");
 
 	colhdg = invertarray(colhdg);
@@ -114,7 +114,7 @@ nextcoln:;
 	if (t2) {
 		if (nobase) {
 			t2 = "";
-		}else{
+		} else {
 			t2 = "(" ^ t2 ^ ")";
 		}
 		colhdg.swapper("(Base)", t2);

@@ -15,7 +15,7 @@ function main() {
 	if (ID eq "EXODUS") {
 		goto unknown;
 	}
-	if (SECURITY.a(1).locate(USERNAME,usern)) {
+	if (SECURITY.a(1).locate(USERNAME, usern)) {
 		if (authorised("TIMESHEET ADMINISTRATOR")) {
 			ans = 1;
 			return ans;
@@ -23,26 +23,26 @@ function main() {
 	//may not be allowed to access higher users/groups
 		if (usern gt RECORD.a(11)) {
 			ans = authorised("AUTHORISATION UPDATE HIGHER GROUPS");
-		}else{
+		} else {
 
 		//look for the user in the same group as the active user
 			for (var usern2 = usern; usern2 <= 9999; ++usern2) {
 				userx = SECURITY.a(1, usern2);
 				///BREAK;
 				if (not((userx and userx ne "---") and userx ne ID)) break;
-			};//usern2;
+			} //usern2;
 
 		//if found then same group therefore ok
 			if (userx eq ID) {
 				ans = 1;
-			}else{
+			} else {
 
 			//not found therefore possibly not allowed access
 				ans = authorised("AUTHORISATION UPDATE LOWER GROUPS");
 
 			}
 		}
-	}else{
+	} else {
 unknown:
 		ans = USERNAME eq "EXODUS";
 	}
@@ -60,7 +60,7 @@ var xx;
 function main() {
 	if (authorised("JOB UPDATE", msg, xx, ID)) {
 		ANS = 1;
-	}else{
+	} else {
 		ANS = 0;
 	}
 	return ANS;
@@ -76,7 +76,7 @@ var msg;
 function main() {
 	if (authorised("JOURNAL POST", msg, "", ID)) {
 		ANS = 1;
-	}else{
+	} else {
 		ANS = 0;
 	}
 	return ANS;
@@ -92,7 +92,7 @@ var msg;
 function main() {
 	if (authorised("TASK ACCESS", msg, "", ID)) {
 		ANS = 1;
-	}else{
+	} else {
 		ANS = 0;
 	}
 	return ANS;
@@ -109,7 +109,7 @@ var xx;
 function main() {
 	if (authorised("TASK CREATE", msg, xx, ID)) {
 		ANS = 1;
-	}else{
+	} else {
 		ANS = 0;
 	}
 	return ANS;
@@ -125,7 +125,7 @@ var msg;
 function main() {
 	if (authorised("TIMESHEET ADMINISTRATION", msg, "", ID)) {
 		ANS = 1;
-	}else{
+	} else {
 		ANS = 0;
 	}
 	return ANS;
@@ -165,9 +165,9 @@ var usern;
 
 function main() {
 	#include <general_common.h>
-	if (SECURITY.a(1).locate(ID,usern)) {
+	if (SECURITY.a(1).locate(ID, usern)) {
 		ANS = SECURITY.a(2, usern);
-	}else{
+	} else {
 		ANS = "";
 	}
 	return ANS;
@@ -203,10 +203,10 @@ function main() {
 		var expired = RECORD.a(35);
 		if (expired and expired le var().date()) {
 			ANS = 0;
-		}else{
+		} else {
 			ANS = 1;
 		}
-	}else{
+	} else {
 		ANS = "";
 	}
 	return ANS;

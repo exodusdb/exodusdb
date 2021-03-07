@@ -70,7 +70,7 @@ function main(in mode, in ipno, out text) {
 	call readhostsallow(allowedips);
 	allowedips.r(-1, SYSTEM.a(39));
 	allowedips.converter(FM ^ VM ^ "," "\r\n", var(100).space());
-	if (allowedips.locateusing(" ",ipno,xx)) {
+	if (allowedips.locateusing(" ", ipno, xx)) {
 returnzero:
 		text = "0";
 		return 0;

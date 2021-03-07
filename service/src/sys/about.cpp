@@ -29,7 +29,7 @@ function main() {
 		l20 = "L#20";
 		l30 = "L#30";
 		colsep = " ";
-	}else{
+	} else {
 		l10 = "";
 		l20 = "";
 		l30 = "";
@@ -69,7 +69,7 @@ function main() {
 
 	if (interactive) {
 		text ^= FM;
-	}else{
+	} else {
 		text.swapper(FM, "\r\n");
 	}
 

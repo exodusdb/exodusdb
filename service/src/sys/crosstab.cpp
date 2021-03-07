@@ -181,13 +181,13 @@ function main(in filename, in rowfields0, in colfield, in datafield, io table, i
 		if ((rowfieldismv(rowfn) and not(prefixmvfn)) and rowdict(rowfn).a(1) eq "F") {
 			prefixmvfn = rowdict(rowfn).a(2);
 		}
-	};//rowfn;
+	} //rowfn;
 
 	totcol = colfield eq "TOTAL";
 	coln = 1;
 	if (totcol) {
 		colorder = "AR";
-	}else{
+	} else {
 		if (not(coldict.read(DICT, colfield))) {
 			if (not(coldict.read(dictvoc, colfield))) {
 				call mssg(colfield.quote() ^ " column field doesnt exist in " ^ filename);
@@ -197,7 +197,7 @@ function main(in filename, in rowfields0, in colfield, in datafield, io table, i
 
 		if (coldict.a(9) eq "R") {
 			colorder = "AR";
-		}else{
+		} else {
 			colorder = "AL";
 		}
 
@@ -222,7 +222,7 @@ nextprefix:
 		recn = 0;
 		MV = 0;
 
-	}else{
+	} else {
 		if (not LISTACTIVE) {
 			select(file);
 		}
@@ -235,7 +235,7 @@ nextrecord:
 		recn += 1;
 		MV = 0;
 		ID = prefix ^ recn;
-	}else{
+	} else {
 		if (not(readnext(ID, MV))) {
 			goto exit;
 		}
@@ -257,7 +257,7 @@ nextmv:
 		if (MV gt nmvs) {
 			goto nextrecord;
 		}
-	}else{
+	} else {
 		MV = 1;
 		nmvs = 1;
 	}
@@ -265,16 +265,16 @@ nextmv:
 	if (filterdictid) {
 		if (filterdictid.isnum()) {
 			tt = RECORD.a(filterdictid, MV);
-		}else{
+		} else {
 			tt = calculate(filterdictid);
 		}
 		if (filterin) {
-			if (not(filterin.locate(tt,xx))) {
+			if (not(filterin.locate(tt, xx))) {
 				goto nextmv;
 			}
 		}
 		if (filterout) {
-			if (filterout.locate(tt,xx)) {
+			if (filterout.locate(tt, xx)) {
 				goto nextmv;
 			}
 		}
@@ -295,25 +295,25 @@ nextmv:
 			fieldname = rowfields.a(1, rowfn);
 			tt = calculate(fieldname);
 			if (fieldname eq "HOUR") {
-				tt = ("00" ^ tt).substr(-2,2);
+				tt = ("00" ^ tt).substr(-2, 2);
 			}
 			nn = tt.count(VM) + (tt ne "");
 			if (nn gt nrowvals) {
 				nrowvals = nn;
 			}
 			rowvals.r(rowfn, tt);
-		};//rowfn;
-	}else{
+		} //rowfn;
+	} else {
 		rowvals = "Total";
 		nrowvals = 1;
 	}
 
 	if (totcol) {
 		colvals = "Total";
-	}else{
+	} else {
 		colvals = calculate(colfield);
 		if (colfield eq "HOUR") {
-			colvals = ("00" ^ colvals).substr(-2,2);
+			colvals = ("00" ^ colvals).substr(-2, 2);
 		}
 	}
 	ncolvals = colvals.count(VM) + (colvals ne "");
@@ -325,17 +325,17 @@ nextmv:
 			for (rowfn = 1; rowfn <= nrowfields; ++rowfn) {
 				if (rowfieldismv(rowfn)) {
 					tt = rowvals.a(rowfn, rowvaln);
-				}else{
+				} else {
 					tt = rowvals.a(rowfn, 1);
 				}
 				rowval.r(1, 1, rowfn, tt);
-			};//rowfn;
-		}else{
+			} //rowfn;
+		} else {
 			rowval = rowvals;
 		}
 
 		//determine which row to add into
-		if (not(allrowvals.a(1).locateby("AL",rowval,rown))) {
+		if (not(allrowvals.a(1).locateby("AL", rowval, rown))) {
 			if (allrowvals.length() + rowval.length() gt 65000) {
 toobig:
 				clearselect();
@@ -355,7 +355,7 @@ toobig:
 
 			//determine which column to add into
 			colval = colvals.a(1, colvaln);
-			if (not(allcolvals.a(1).locateby(colorder,colval,coln))) {
+			if (not(allcolvals.a(1).locateby(colorder, colval, coln))) {
 				ncols += 1;
 				if (allcolvals.length() + colval.length() gt 65000) {
 					goto toobig;
@@ -369,7 +369,7 @@ toobig:
 				table.inserter(1, 1 + coln, colval);
 				for (rownx = 2; rownx <= nrows + 1; ++rownx) {
 					table.inserter(rownx, 1 + coln, "");
-				};//rownx;
+				} //rownx;
 			}
 
 			if (table.length() + datavals.length() gt 6500) {
@@ -386,9 +386,9 @@ toobig:
 				table.r(rown + 1, ncols + 2, oldval + datavals);
 			}
 
-		};//colvaln;
+		} //colvaln;
 
-	};//rowvaln;
+	} //rowvaln;
 
 	/////////
 	//recexit:
@@ -407,16 +407,16 @@ exit:
 			//ncolvals=count(allcolvals,vm)+1
 			for (coln = 1; coln <= ncols; ++coln) {
 				table.r(1, 1 + coln, oconv(table.a(1, 1 + coln), colconv));
-			};//coln;
+			} //coln;
 		}
 	}
 
 	if (totcol) {
 		table.r(1, 1 + coln, datadict.a(3));
-	}else{
+	} else {
 		for (coln = 1; coln <= ncols; ++coln) {
 			table.r(1, 1 + coln, coldict.a(3) ^ " " ^ table.a(1, 1 + coln));
-		};//coln;
+		} //coln;
 		table.r(1, ncols + 2, "Total " ^ datadict.a(3));
 	}
 
@@ -425,7 +425,7 @@ exit:
 			goto toobig;
 		}
 		table.r(rown + 1, 1, allrowvals.a(1, rown));
-	};//rown;
+	} //rown;
 
 	//format the row title values
 	table.r(1, 1, 1, "");
@@ -438,10 +438,10 @@ exit:
 			//nrows=count(allrowvals,vm)+(allrowvals<>'')
 			for (rown = 1; rown <= nrows; ++rown) {
 				table.r(rown + 1, 1, rowfn, oconv(table.a(rown + 1, 1, rowfn), rowconv));
-			};//rown;
+			} //rown;
 		}
 
-	};//rowfn;
+	} //rowfn;
 
 	//convert sm row keys into columns
 	table.converter(SVM, VM);

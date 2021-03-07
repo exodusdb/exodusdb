@@ -39,7 +39,7 @@ function main(in nextcompanycode) {
 			call mssg("COMPANY " ^ (gen.gcurrcompany.quote()) ^ " IS MISSING - DO NOT PROCEED||USE \"SETTINGS\" TO|CHOOSE ANOTHER COMPANY|");
 			gen.company = gen.gcurrcompany;
 		}
-	}else{
+	} else {
 		gen.company = "";
 		gen.company.r(2, var().date().oconv("D2/E").field("/", 2, 2));
 	}
@@ -57,7 +57,7 @@ function main(in nextcompanycode) {
 		}
 		SYSTEM.r(14, gen.company.a(27));
 		SYSTEM.r(8, "");
-	}else{
+	} else {
 		SYSTEM.r(14, SYSTEM.a(36));
 	}
 
@@ -73,17 +73,17 @@ function main(in nextcompanycode) {
 	var dateformat = gen.company.a(10);
 	if (dateformat eq "") {
 		DATEFMT = "D2/E";
-	} else if (dateformat.substr(1,6) eq "31/01/") {
+	} else if (dateformat.substr(1, 6) eq "31/01/") {
 		DATEFMT = "D2/E";
-	} else if (dateformat.substr(1,6) eq "31-01-") {
+	} else if (dateformat.substr(1, 6) eq "31-01-") {
 		DATEFMT = "D2-E";
 	} else if (dateformat eq "31 JAN 90") {
 		DATEFMT = "D2E";
 	} else if (dateformat eq "31 JAN 90.") {
 		DATEFMT = "D2";
-	} else if (dateformat.substr(1,6) eq "01/31/") {
+	} else if (dateformat.substr(1, 6) eq "01/31/") {
 		DATEFMT = "D2/";
-	} else if (dateformat.substr(1,6) eq "01-31-") {
+	} else if (dateformat.substr(1, 6) eq "01-31-") {
 		DATEFMT = "D2-";
 	//CASE DATE.FORMAT[-6,6]='90/01/31';@DATE.FORMAT='D2J'
 
@@ -168,12 +168,12 @@ function main(in nextcompanycode) {
 	//default to dot for decimal point
 	BASEFMT = "MD";
 	//optional comma for decimal point
-	if (var("1.000,00|1000,00").locateusing("|",gen.company.a(22),temp)) {
+	if (var("1.000,00|1000,00").locateusing("|", gen.company.a(22), temp)) {
 		BASEFMT = "MC";
 	}
 	BASEFMT ^= ndec ^ "0P";
 	//optional comma to indicate delimiting of thousands (with comma MD OR dot MC)
-	if (var("1,000.00|1.000,00").locateusing("|",gen.company.a(22),temp)) {
+	if (var("1,000.00|1.000,00").locateusing("|", gen.company.a(22), temp)) {
 		BASEFMT ^= ",";
 	}
 
@@ -185,7 +185,7 @@ function main(in nextcompanycode) {
 	var financialyear = gen.company.a(6);
 	var firstmonth = financialyear.field(",", 1);
 	if (firstmonth.isnum()) {
-		if (not(var("1,2,3,4,5,6,7,8,9,10,11,12").locateusing(",",firstmonth,temp))) {
+		if (not(var("1,2,3,4,5,6,7,8,9,10,11,12").locateusing(",", firstmonth, temp))) {
 			firstmonth = 1;
 		}
 		var maxperiod = financialyear.field(",", 2);

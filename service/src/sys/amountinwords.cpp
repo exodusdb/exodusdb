@@ -41,7 +41,7 @@ function main(in amountfmlanguage, in currcode0) {
 	amountcurrency = "";
 	if (currcode0.unassigned()) {
 		currcode = "";
-	}else{
+	} else {
 		currcode = currcode0;
 		if (not(amountcurrency.read(gen.currencies, currcode))) {
 			{}
@@ -101,7 +101,7 @@ function main(in amountfmlanguage, in currcode0) {
 		}
 		if (unitsx le 20) {
 			words ^= text.a(1, unitsx + 1);
-		}else{
+		} else {
 		//IF UNITSx LE 20 THEN
 		// WORDS:=TEXT<1,UNITSx+1>
 		//end else
@@ -126,11 +126,11 @@ function main(in amountfmlanguage, in currcode0) {
 		//subunits
 		if (amount.floor() ne amount) {
 			words ^= " and ";
-			words ^= (("." ^ amount.field(".", 2)).oconv("MD" ^ amountcurrency.a(3) ^ "0PZ")).substr(2,9999);
+			words ^= (("." ^ amount.field(".", 2)).oconv("MD" ^ amountcurrency.a(3) ^ "0PZ")).substr(2, 9999);
 			words ^= " " ^ amountcurrency.a(2);
 		}
 
-	}else{
+	} else {
 
 		//subunits
 		if (amount.floor() ne amount) {
@@ -192,7 +192,7 @@ french:
 		}
 		if (unitsx le 20) {
 			words ^= text.a(1, unitsx + 1);
-		}else{
+		} else {
 
 			tens = unitsx[-2];
 			ones = unitsx[-1];
@@ -210,7 +210,7 @@ french:
 			if (ones ne "0") {
 				if (tens and ones eq 1) {
 					words ^= " et ";
-				}else{
+				} else {
 					words ^= "-";
 				}
 				temp = text.a(1, ones + 1);

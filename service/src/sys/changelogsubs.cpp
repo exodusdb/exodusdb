@@ -108,7 +108,7 @@ function main(in mode0) {
 				mode.r(3, 14153);
 			}
 
-		}else{
+		} else {
 
 			//show everything the first time they logon
 			//mode<3>=iconv('1/1/2004','D/E')
@@ -218,7 +218,7 @@ subroutine select0() {
 		//locatebyusing() not available in c++
 		tt = USER1;
 		tt.converter(FM, VM);
-		if (not(tt.locateby("AR",mode.a(3),versionn))) {
+		if (not(tt.locateby("AR", mode.a(3), versionn))) {
 			if (versionn gt 1) {
 				mode.r(3, USER1.a(versionn - 1));
 			}
@@ -280,7 +280,7 @@ subroutine list() {
 		//heading:=' version ':data<2> '[DATE,4*]':' -'
 		call daterangetext(USER1.a(2), currentversiondatetime, tt, gen.glang);
 		headingx ^= " : " ^ tt;
-	}else{
+	} else {
 		headingx ^= " Version : " ^ oconv(currentversiondatetime, "[DATE,4*]");
 	}
 
@@ -416,10 +416,10 @@ subroutine getversiondates() {
 	for (var ii = 1; ii <= nn; ++ii) {
 		idate = versionlog.a(ii, 1).field(" ", 2, 3).iconv("D");
 		//itime=iconv(field(versionlog,' ',1),'MT')
-		if (not(versiondata.locateusing(FM,idate,xx))) {
+		if (not(versiondata.locateusing(FM, idate, xx))) {
 			versiondata.r(-1, idate);
 		}
-	};//ii;
+	} //ii;
 
 	//list of installed versions
 	USER1 = versiondata;

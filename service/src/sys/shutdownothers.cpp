@@ -30,14 +30,14 @@ function main(in mode, in datasetcode, out result) {
 		if (esctoexit()) {
 			ii = 99999;
 		}
-	};//ii;
+	} //ii;
 
 	shutdownfilename.osdelete();
 
 	if (ii ge 120) {
 		result = 0;
 		printl(" Failed");
-	}else{
+	} else {
 		result = 1;
 		printl(" Success");
 	}

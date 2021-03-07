@@ -26,27 +26,27 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 	//default unassigned parameters
 	if (mode0.unassigned()) {
 		mode = "";
-	}else{
+	} else {
 		mode = mode0;
 	}
 	if (data0.unassigned()) {
 		datax = "";
-	}else{
+	} else {
 		datax = data0;
 	}
 	if (runasusercode0.unassigned()) {
 		runasusercode = "";
-		}else{
+		} else {
 		runasusercode = runasusercode0;
 	}
 	if (targetusercodes0.unassigned()) {
 		targetusercodes = "";
-	}else{
+	} else {
 		targetusercodes = targetusercodes0;
 	}
 	if (document0.unassigned()) {
 		gen.document = "";
-	}else{
+	} else {
 		gen.document = document0;
 	}
 	if (docid.unassigned()) {
@@ -54,7 +54,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 	}
 	if (title0) {
 		title = title0;
-	}else{
+	} else {
 		title = gen.document.a(1);
 	}
 
@@ -88,7 +88,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 			}
 			runasuser = "";
 		}
-	}else{
+	} else {
 
 		//run as the bottom user in the current users group
 		//assuming we are going to send it to all members of the group
@@ -118,7 +118,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 	var initialtargetusercodes = targetusercodes;
 	if (targetusercodes eq "{GROUP}") {
 		var tt = runasusercode;
-		if (SECURITY.a(1).locate(tt,usern)) {
+		if (SECURITY.a(1).locate(tt, usern)) {
 			while (true) {
 				var userx;
 				if (userx.read(users, tt)) {
@@ -127,7 +127,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 						var seniorfirst = 1;
 						if (seniorfirst) {
 							targetusercodes.inserter(1, 1, tt);
-						}else{
+						} else {
 							targetusercodes.r(1, -1, tt);
 						}
 					}
@@ -138,7 +138,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 				if (not((usern and tt) and tt ne "---")) break;
 			}//loop;
 		}
-	}else{
+	} else {
 
 		//check all users exist (even if they dont have emails)
 		if (targetusercodes) {
@@ -153,7 +153,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 					}
 					userx = "";
 				}
-			};//usern;
+			} //usern;
 		}
 
 	}
@@ -187,7 +187,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 		if (olddoc.read(gen.documents, docid)) {
 			gen.document.r(13, olddoc.a(13));
 		}
-	}else{
+	} else {
 		var saveid = ID;
 		call getsubs("DEF.DOCUMENT.NO");
 		docid = ID;

@@ -37,28 +37,28 @@ function main(in mode) {
 			var task = newtasks.a(1, taskn);
 			if (task) {
 				var newlock = newlocks.a(1, taskn);
-				if (oldtasks.locate(task,oldtaskn)) {
+				if (oldtasks.locate(task, oldtaskn)) {
 					var oldlock = oldlocks.a(1, oldtaskn);
 					if (newlock ne oldlock) {
 						//changed
 						emailtx2.r(-1, FM ^ "Task : " ^ task ^ " *CHANGED*" ^ FM ^ "Lock : " ^ newlock ^ FM ^ " was : " ^ oldlock);
 					}
-				}else{
+				} else {
 					emailtx2.r(-1, FM ^ "Task : " ^ task ^ " *CREATED*" ^ FM ^ "Lock : " ^ newlock);
 				}
 			}
-		};//taskn;
+		} //taskn;
 
 		ntasks = oldtasks.count(VM) + (oldtasks ne "");
 		for (taskn = 1; taskn <= ntasks; ++taskn) {
 			var task = oldtasks.a(1, taskn);
 			if (task) {
-				if (not(newtasks.locate(task,newtaskn))) {
+				if (not(newtasks.locate(task, newtaskn))) {
 					var oldlock = oldlocks.a(1, taskn);
 					emailtx2.r(-1, FM ^ "Task : " ^ task ^ " *DELETED*" ^ FM ^ "Lock : " ^ oldlock);
 				}
 			}
-		};//taskn;
+		} //taskn;
 
 		ANS = emailtx2;
 
@@ -89,7 +89,7 @@ function main(in mode) {
 
 		//customisation to convert old databases at ptcy/patsalides
 		//which had blank passwords not allowed in the new system
-		if (SECURITY.a(1).locate("MICHAEL",xx)) {
+		if (SECURITY.a(1).locate("MICHAEL", xx)) {
 			if (newuserprivs.osread("PATSALID.CFG")) {
 				if (VOLUMES) {
 					newuserprivs = newuserprivs.invert();
@@ -124,7 +124,7 @@ function main(in mode) {
 		t10.swapper(VM ^ "ANALYSIS ACCESS", VM ^ "BILLING REPORT ACCESS");
 		t10.swapper("LEDGER RE-OPEN", "LEDGER REOPEN");
 
-		if (t10.a(1).locate("POSTING",tn)) {
+		if (t10.a(1).locate("POSTING", tn)) {
 			if (newuserprivs.a(11, tn) eq "") {
 				newuserprivs.r(11, tn, "UA");
 			}
@@ -162,7 +162,7 @@ function main(in mode) {
 		newuserprivs.r(10, t10);
 
 		call log2("*make sure all users have access to company file", logtime);
-		if (newuserprivs.a(10).locate("COMPANY ACCESS",vn)) {
+		if (newuserprivs.a(10).locate("COMPANY ACCESS", vn)) {
 			if (newuserprivs.a(11, vn) eq "AA") {
 				newuserprivs.r(11, vn, "");
 			}
@@ -175,20 +175,20 @@ function main(in mode) {
 			var tt = obsoletetasks.a(ii);
 			///BREAK;
 			if (not tt) break;
-			if (newuserprivs.a(10).locate(tt,taskn)) {
+			if (newuserprivs.a(10).locate(tt, taskn)) {
 				newuserprivs.remover(10, taskn);
 				newuserprivs.remover(11, taskn);
 			}
-		};//ii;
+		} //ii;
 
 		//ensure certain documents cannot be deleted
-		if (newuserprivs.a(10).locate("PRODUCTION ORDER DELETE",taskn)) {
+		if (newuserprivs.a(10).locate("PRODUCTION ORDER DELETE", taskn)) {
 			newuserprivs.r(11, taskn, "EXODUS");
 		}
-		if (newuserprivs.a(10).locate("PRODUCTION ESTIMATE DELETE",taskn)) {
+		if (newuserprivs.a(10).locate("PRODUCTION ESTIMATE DELETE", taskn)) {
 			newuserprivs.r(11, taskn, "EXODUS");
 		}
-		if (newuserprivs.a(10).locate("JOB DELETE",taskn)) {
+		if (newuserprivs.a(10).locate("JOB DELETE", taskn)) {
 			newuserprivs.r(11, taskn, "EXODUS");
 		}
 
@@ -203,15 +203,15 @@ function main(in mode) {
 deletetask:
 				newuserprivs.remover(10, taskn);
 				newuserprivs.remover(11, taskn);
-			}else{
+			} else {
 				//delete duplicate tasks
-				if (tasks.a(1).locate(task,taskn2)) {
+				if (tasks.a(1).locate(task, taskn2)) {
 					if (taskn2 lt taskn) {
 						goto deletetask;
 					}
 				}
 			}
-		};//taskn;
+		} //taskn;
 
 			/*;
 			//move menus to users - detect any non-numeric and move to users 37
@@ -255,7 +255,7 @@ deletetask:
 			SECURITY = newuserprivs;
 			if (VOLUMES) {
 				SECURITY.invert().write(DEFINITIONS, "SECURITY");
-			}else{
+			} else {
 				SECURITY.write(DEFINITIONS, "SECURITY");
 			}
 		}

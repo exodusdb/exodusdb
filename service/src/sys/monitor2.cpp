@@ -201,7 +201,7 @@ function main() {
 	if (msg) {
 		//ignore errors which can include wget not being available
 		//print msg
-	}else{
+	} else {
 		//print data
 		//swap crlf with fm in data
 		//convert crlf to fm:fm in data
@@ -215,7 +215,7 @@ function main() {
 
 	//count users (unique sessionids) in the last hour
 	usertab.redim(25, 3);
-	usertab="";
+	usertab = "";//dim
 	//last 24 hours or back to midnight
 	minusagetime = currenttime - 1;
 	//minusagetime=int(currenttime)
@@ -248,10 +248,10 @@ nextstatistic:
 			hourn = ((currenttime - RECORD.a(1)) * 24).floor() + 1;
 			hourn = (hourn - 1) % 24 + 1;
 			for (ii = 1; ii <= 3; ++ii) {
-				if (not(usertab(hourn, ii).locate(netid(ii),tt))) {
+				if (not(usertab(hourn, ii).locate(netid(ii), tt))) {
 					usertab(hourn, ii).r(1, -1, netid(ii));
 				}
-			};//ii;
+			} //ii;
 
 			goto nextstatistic;
 
@@ -282,12 +282,12 @@ nextprocess:
 		if (not dbasecode) {
 			goto nextprocess;
 		}
-		if (not(dbasecodes.a(1).locate(dbasecode,dbasen))) {
+		if (not(dbasecodes.a(1).locate(dbasecode, dbasen))) {
 			dbasecodes.r(1, dbasen, dbasecode);
 		}
 		dbasesystems.r(1, dbasen, RECORD.a(51));
 		status = calculate("STATUS");
-		if (not(var("OK,Hung,Maintenance,Closed,Crashed").locateusing(",",status.field(" ", 1),statusn))) {
+		if (not(var("OK,Hung,Maintenance,Closed,Crashed").locateusing(",", status.field(" ", 1), statusn))) {
 			//statusn will be 6
 			processcount.r(20, dbasen, status);
 		}
@@ -378,7 +378,7 @@ nextprocess:
 		//not if this is a test database (only those with codes ending in TEST')
 		//unless configured to all it
 		first = 1;
-		if ((((SYSTEM.a(17, 1).substr(-4,4) ne "test") or SYSTEM.a(126)) and nok lt minreq) and nhung lt 5) {
+		if ((((SYSTEM.a(17, 1).substr(-4, 4) ne "TEST") or SYSTEM.a(126)) and nok lt minreq) and nhung lt 5) {
 			//if locksystem('LOCK',dbasecode) then
 				//unlock immediately to enable startup - which will fail if anyone locks
 				//call locksystem('UNLOCK',dbasecode)
@@ -397,7 +397,7 @@ nextprocess:
 				if (voc.open("VOC", "")) {
 					if (lockrecord("", voc, "BACKUP*" ^ dbasecode)) {
 						xx = unlockrecord("", voc, "BACKUP*" ^ dbasecode);
-					}else{
+					} else {
 						startit = 0;
 					}
 				}
@@ -409,7 +409,7 @@ nextprocess:
 			if (startit) {
 				if (lockrecord("VOC", voc, "INIT.GENERAL.LOGIN")) {
 					call unlockrecord("VOC", voc, "INIT.GENERAL.LOGIN");
-				}else{
+				} else {
 					startit = 0;
 				}
 			}
@@ -496,7 +496,7 @@ nextprocess:
 				}
 			}
 
-			if (not(backupdrives.a(1).locate(backupdrive,backupdriven))) {
+			if (not(backupdrives.a(1).locate(backupdrive, backupdriven))) {
 				backupdrives.r(1, backupdriven, backupdrive);
 
 				//ensure something is on the target
@@ -521,14 +521,14 @@ nextprocess:
 						tt = "";
 					}
 					testfile.osdelete();
-				}else{
+				} else {
 					tt = "";
 				}
 
 				if (tt ne testdata) {
 					description ^= " impossible!!";
 
-				}else{
+				} else {
 					//present
 					backupdrives.r(3, backupdriven, 1);
 
@@ -539,7 +539,7 @@ nextprocess:
 					if (var().time() gt backuprequired.a(1, dbasen, 3)) {
 						nextbackupdate += 1;
 					}
-					dow = ((gen.glang.a(22).field("|", (nextbackupdate - 1) % 7 + 1)).substr(1,8)).ucase();
+					dow = ((gen.glang.a(22).field("|", (nextbackupdate - 1) % 7 + 1)).substr(1, 8)).ucase();
 					nextbackupfilename = backupdrive ^ "/data.bak/" ^ (dbasecode ^ "/" ^ dow).lcase() ^ "/backup.zip";
 					nextbackupfilename.converter("/", OSSLASH);
 					nextbackupfileinfo = nextbackupfilename.osfile();
@@ -579,7 +579,7 @@ nextprocess:
 										body = "It is time to change the EXODUS backup media (e.g. USB Flash Drive)";
 										if (localtime lt 43200) {
 											body.r(-1, FM ^ "Please change it " "before 12:00 midday today.");
-										}else{
+										} else {
 											body.r(-1, FM ^ "Please change it " "URGENTLY");
 										}
 										body.swapper(FM, var().chr(13));
@@ -616,7 +616,7 @@ nextprocess:
 		}
 
 nextdbasen:;
-	};//dbasen;
+	} //dbasen;
 
 	//check for free space on backup drive(s)
 	nbackupdrives = backupdrives.a(1).count(VM) + (backupdrives.a(1) ne "");
@@ -635,7 +635,7 @@ nextdbasen:;
 
 			//ensure 10% free space over last backup size
 			//if we know the last backup size (this could fail if a NEW db is added)
-			if (lastbackupsize gt 0 and (freespace lt lastbackupsize * 1.1)) {
+			if (lastbackupsize gt 0 and (freespace lt lastbackupsize * 11 / 10)) {
 				description ^= " only!!";
 			}
 
@@ -649,7 +649,7 @@ nextdbasen:;
 
 		}
 
-	};//backupdriven;
+	} //backupdriven;
 	//oswrite descriptions on 'DESCRIPS'
 	if (descriptions.index("!!") and status0123 lt 2) {
 		status0123 = 2;
@@ -666,11 +666,11 @@ nextdbasen:;
 	call osread(versionnote, tt);
 	versiondate = versionnote.trim().field(" ", 2, 3).iconv("D");
 	tt = versiondate.oconv("D2/");
-	tt = tt.substr(-2,2) ^ "/" ^ tt.substr(1,5);
+	tt = tt.substr(-2, 2) ^ "/" ^ tt.substr(1, 5);
 	hostdescriptions ^= "Ver" ^ tt ^ "-" ^ versionnote.field(" ", 1).field(":", 1, 2);
 
 	//dont allow upgrades by test databases
-	if (SYSTEM.a(124) and (SYSTEM.a(17).substr(-4,4) ne "test")) {
+	if (SYSTEM.a(124) and (SYSTEM.a(17).substr(-4, 4) ne "TEST")) {
 
 		//get upgrade file details
 		upgradefilename83 = SYSTEM.a(112);
@@ -683,7 +683,7 @@ nextdbasen:;
 			upgradefilename83 = shell2("dir " ^ (longupgradefilename.quote()) ^ " /x /l", errors);
 			if (not errors) {
 				upgradefilename83.converter("\r\n", FM);
-				upgradefilename83 = upgradefilename83.a(6).substr(22,999).trim().field(" ", 2);
+				upgradefilename83 = upgradefilename83.a(6).substr(22, 999).trim().field(" ", 2);
 				upgradefiledir = upgradefilename83.osfile();
 				if (upgradefiledir) {
 					SYSTEM.r(112, upgradefilename83);
@@ -708,7 +708,7 @@ nextdbasen:;
 					//hostdescriptions:=' - Upg':upgradefiledir<2> 'D2/J':'-':upgradefiledir<3> 'MT'
 					//tt=upgradefiledir<2> 'D2/J'
 					tt = upgradefiledir.a(2).oconv("D2/E");
-					tt = tt.substr(-2,2) ^ "/" ^ tt.substr(1,5);
+					tt = tt.substr(-2, 2) ^ "/" ^ tt.substr(1, 5);
 					hostdescriptions ^= " - Upg" ^ tt ^ "-" ^ upgradefiledir.a(3).oconv("MT");
 					upgradeready = 1;
 				} else if (wgetoutput.ucase().index(" ERROR 404")) {
@@ -735,8 +735,8 @@ nextdbasen:;
 			if (usertab(ii, jj) gt usertab(25, jj)) {
 				usertab(25, jj) = usertab(ii, jj);
 			}
-		};//jj;
-	};//ii;
+		} //jj;
+	} //ii;
 
 	//list number of users (in last hour)
 	hostdescriptions ^= " - Users:";
@@ -750,7 +750,7 @@ nextdbasen:;
 			hostdescriptions ^= "/";
 		}
 		hostdescriptions ^= tt;
-	};//ii;
+	} //ii;
 
 	//list max number of users
 	hostdescriptions ^= " - Max:";
@@ -761,7 +761,7 @@ nextdbasen:;
 			hostdescriptions ^= "/";
 		}
 		hostdescriptions ^= usertab(hourn, ii);
-	};//ii;
+	} //ii;
 
 	//os description
 	call osgetenv("VER", osver);
@@ -780,12 +780,12 @@ nextdbasen:;
 	for (ii = 1; ii <= nn; ++ii) {
 		line = result.a(ii).trim();
 		line.swapper("IPV4 ADDRESS", "IP ADDRESS");
-		if (line.substr(1,10) eq "IP ADDRESS") {
+		if (line.substr(1, 10) eq "IP ADDRESS") {
 			ips.r(-1, line.field(":", 2).trim().field("(", 1));
 			//only display the first
 			goto gotip;
 		}
-	};//ii;
+	} //ii;
 gotip:
 	if (not ips) {
 		ips = "0.0.0.0";
@@ -831,9 +831,9 @@ gotip:
 	//TODO put this on a less frequent check since it will only be
 	//updated after the nightly backup usually *unless last hour users are 0/0/0
 	//dont allow upgrades by test databases
-	if (SYSTEM.a(124) and (SYSTEM.a(17).substr(-4,4) ne "test")) {
+	if (SYSTEM.a(124) and (SYSTEM.a(17).substr(-4, 4) ne "TEST")) {
 		if (msg) {
-		}else{
+		} else {
 			call monitor2b("WRITE", "UPGRADE", "UPGRADE", installid, msg);
 		}
 	}
@@ -846,7 +846,7 @@ gotip:
 	if (msg) {
 		monitordata.r(1, currenttime.a(1) + 1 / 24);
 		call sysmsg(msg);
-	}else{
+	} else {
 		//register checked at current time
 		monitordata.r(1, currenttime);
 	}

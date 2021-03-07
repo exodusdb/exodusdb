@@ -70,7 +70,7 @@ function main(in mode, in filename, io keys, in fieldnames, in oldvalues, in new
 					//!!!! return only locked keys
 					if (keyn eq 1) {
 						keys = "";
-					}else{
+					} else {
 						keys = keys.field(FM, 1, keyn - 1);
 					}
 
@@ -95,7 +95,7 @@ function main(in mode, in filename, io keys, in fieldnames, in oldvalues, in new
 						cnt += 1;
 					}
 
-				};//fieldn;
+				} //fieldn;
 
 				//duplicate code in UPDATE and UNLOCK
 				call unlockrecord(filename, file, keyx);
@@ -103,7 +103,7 @@ function main(in mode, in filename, io keys, in fieldnames, in oldvalues, in new
 			}
 
 			//random comment to trigger correct adecom to c++ code
-		};//keyn;
+		} //keyn;
 
 		//update
 		if (mode eq "UPDATE" and upd ne "") {

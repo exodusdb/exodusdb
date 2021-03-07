@@ -24,12 +24,12 @@ function main(in inputfilename, in encoding1i, in encoding2i, out result, out ms
 
 	if (encoding1i.unassigned()) {
 		encoding1 = "";
-	}else{
+	} else {
 		encoding1 = encoding1i;
 	}
 	if (encoding2i.unassigned()) {
 		encoding2 = "";
-	}else{
+	} else {
 		encoding2 = encoding2i;
 	}
 	result = 0;
@@ -38,7 +38,7 @@ function main(in inputfilename, in encoding1i, in encoding2i, out result, out ms
 	//look for local or cygwin wget.exe otherwise quit
 	if (oscwd().index(":")) {
 		exe = ".exe";
-	}else{
+	} else {
 		exe = "";
 	}
 	var cmd = "uconv" ^ exe;
@@ -58,7 +58,7 @@ function main(in inputfilename, in encoding1i, in encoding2i, out result, out ms
 		call osgetenv("CODEPAGE", encoding1);
 		var oemcodepages = "437" _VM_ "720" _VM_ "737" _VM_ "775" _VM_ "850" _VM_ "852" _VM_ "855" _VM_ "857" _VM_ "858" _VM_ "862" _VM_ "866" _VM_ "874" _VM_ "932" _VM_ "936" _VM_ "949" _VM_ "950" _VM_ "1258";
 		var wincodepages = "1252" _VM_ "1256" _VM_ "1253" _VM_ "1257" _VM_ "1252" _VM_ "1252" _VM_ "1251" _VM_ "1254" _VM_ "1252" _VM_ "1255" _VM_ "1251" _VM_ "874" _VM_ "932" _VM_ "936" _VM_ "949" _VM_ "950" _VM_ "874";
-		if (oemcodepages.locate(encoding1,ii)) {
+		if (oemcodepages.locate(encoding1, ii)) {
 			encoding1 = wincodepages.a(1, ii);
 		}
 	}
@@ -103,7 +103,7 @@ function main(in inputfilename, in encoding1i, in encoding2i, out result, out ms
 		//overwrite the input file with the temporary
 		if (VOLUMES) {
 			cmd = "xcopy " ^ tempfilename ^ " " ^ inputfilename ^ " /y";
-		}else{
+		} else {
 			cmd = "cp " ^ tempfilename ^ " " ^ inputfilename;
 		}
 		result = shell2(cmd, errors);

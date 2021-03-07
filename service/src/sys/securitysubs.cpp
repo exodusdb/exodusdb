@@ -89,7 +89,7 @@ function main(in mode) {
 
 	//no validation for EXODUS
 	if (curruser.index("EXODUS")) {
-		if (mode.substr(1,4) eq "VAL." and mode ne "VAL.USER") {
+		if (mode.substr(1, 4) eq "VAL." and mode ne "VAL.USER") {
 			return 0;
 		}
 	}
@@ -459,13 +459,13 @@ function main(in mode) {
 		if (win.templatex eq "SECURITY") {
 			filename = "AUTHORISATION";
 			defaultlock = "GS";
-		}else{
+		} else {
 			if (win.templatex eq "HOURLYRATES") {
 				filename = "HOURLY RATE";
 				updatehighergroups = 1;
 				updatelowergroups = 1;
 				defaultlock = "TA";
-			}else{
+			} else {
 				msg = win.templatex.quote() ^ " unknown template in security.subs";
 				return invalid(msg);
 			}
@@ -496,7 +496,7 @@ function main(in mode) {
 		//if logged in as account then same as logged in as EXODUS
 		if (var("012").index(PRIVILEGE)) {
 			curruser = "EXODUS";
-		}else{
+		} else {
 			curruser = USERNAME;
 		}
 
@@ -511,7 +511,7 @@ function main(in mode) {
 			//end else
 			// *wlocked=1 (done in LISTEN)
 			// end
-		}else{
+		} else {
 	//PROTECT:
 			//FOR I=1 TO W.CNT
 			// IF W(I)<18> NE 'P' THEN W(I)<18>='VP'
@@ -561,12 +561,12 @@ function main(in mode) {
 			for (var taskn = ntasks; taskn >= 1; --taskn) {
 				var task = tasks.a(1, taskn);
 				//WARNING TODO: check ternary op following;
-				var temp = task.substr(1,10) eq "DOCUMENT: " ? "#" : "";
+				var temp = task.substr(1, 10) eq "DOCUMENT: " ? "#" : "";
 				if (not(authorised("!" ^ temp ^ task, msg, ""))) {
 					RECORD.remover(10, taskn);
 					RECORD.remover(11, taskn);
 				}
-			};//taskn;
+			} //taskn;
 		}
 
 		//hide higher/lower users
@@ -575,7 +575,7 @@ function main(in mode) {
 			var usercodes = RECORD.a(1);
 			var nusers = usercodes.count(VM) + (usercodes ne "");
 
-			if (not(usercodes.a(1).locate(USERNAME,usern))) {
+			if (not(usercodes.a(1).locate(USERNAME, usern))) {
 				msg = USERNAME ^ " user not in in authorisation file";
 				return invalid(msg);
 				stop();
@@ -584,7 +584,7 @@ function main(in mode) {
 			//hide higher users
 			if (updatehighergroups) {
 				startn = 1;
-			}else{
+			} else {
 				startn = usern;
 				while (true) {
 					///BREAK;
@@ -596,7 +596,7 @@ function main(in mode) {
 			//hide lower users
 			if (updatelowergroups) {
 				endn = nusers;
-			}else{
+			} else {
 				endn = usern;
 				while (true) {
 					///BREAK;
@@ -635,12 +635,12 @@ function main(in mode) {
 						var nkeys = invisiblekeys.count(VM) + 1;
 						for (var keyn = 1; keyn <= nkeys; ++keyn) {
 							var keyx = invisiblekeys.a(1, keyn);
-							if (not(otherkeys.a(1).locate(keyx,xx))) {
-								if (not(visiblekeys.a(1).locate(keyx,xx))) {
+							if (not(otherkeys.a(1).locate(keyx, xx))) {
+								if (not(visiblekeys.a(1).locate(keyx, xx))) {
 									otherkeys ^= VM ^ keyx;
 								}
 							}
-						};//keyn;
+						} //keyn;
 						otherkeys.splicer(1, 1, "");
 						otherkeys.converter(VM, ",");
 					}
@@ -651,9 +651,9 @@ function main(in mode) {
 				//delete higher and lower users if not allowed
 				for (var fn = 1; fn <= 8; ++fn) {
 					RECORD.r(fn, RECORD.a(fn).field(VM, startn, nn));
-				};//fn;
+				} //fn;
 
-			}else{
+			} else {
 				startn = "";
 				endn = "";
 			}
@@ -679,7 +679,7 @@ function main(in mode) {
 					RECORD.r(4, usern, "<hidden>" ^ SVM ^ sysrec2);
 				}
 			}
-		};//usern;
+		} //usern;
 
 		RECORD.r(20, startn);
 		RECORD.r(21, endn);
@@ -697,13 +697,13 @@ function main(in mode) {
 				var temp = RECORD.a(fn);
 				temp.swapper("---", "");
 				RECORD.r(fn, temp);
-			};//fn;
+			} //fn;
 
 			//save orec (after removing stuff) for prewrite
 			if (win.wlocked) {
 				if (VOLUMES) {
 					RECORD.invert().write(DEFINITIONS, "SECURITY.OREC");
-				}else{
+				} else {
 					RECORD.write(DEFINITIONS, "SECURITY.OREC");
 				}
 			}
@@ -728,7 +728,7 @@ function main(in mode) {
 
 			//simulate orec
 			if (win.orec.read(DEFINITIONS, "SECURITY.OREC")) {
-			}else{
+			} else {
 				msg = "SECURITY.OREC is missing from DEFINITIONS";
 				return invalid(msg);
 			}
@@ -789,7 +789,7 @@ function main(in mode) {
 						return invalid(msg);
 					}
 
-					if (not(origfullrec.a(1).locate(userx,ousern))) {
+					if (not(origfullrec.a(1).locate(userx, ousern))) {
 						ousern = 0;
 					}
 
@@ -815,7 +815,7 @@ function main(in mode) {
 							}
 						}
 
-					}else{
+					} else {
 						//recover old password
 						if (ousern) {
 							var oldpassword = origfullrec.a(4, ousern);
@@ -849,7 +849,7 @@ function main(in mode) {
 					return 0;
 				}
 
-			};//usern;
+			} //usern;
 
 			//mark empty users and keys with "---" to assist identification of groups
 			nusers = RECORD.a(1).count(VM) + (RECORD.a(1) ne "");
@@ -859,7 +859,7 @@ function main(in mode) {
 					RECORD.r(1, usern, "---");
 					RECORD.r(2, usern, "---");
 				}
-			};//usern;
+			} //usern;
 
 			//put back any hidden users
 			if (startn) {
@@ -869,7 +869,7 @@ function main(in mode) {
 					var temp = RECORD.a(fn);
 					temp ^= VM.str(nvms - temp.count(VM));
 					RECORD.r(fn, origfullrec.a(fn).fieldstore(VM, startn, -nn, temp));
-				};//fn;
+				} //fn;
 			}
 
 			//put back any hidden tasks
@@ -879,7 +879,7 @@ function main(in mode) {
 			for (var taskn = 1; taskn <= ntasks; ++taskn) {
 				var task = tasks.a(1, taskn);
 				if (task) {
-					if (not(win.orec.a(10).locate(task,newtaskn))) {
+					if (not(win.orec.a(10).locate(task, newtaskn))) {
 						var lockx = locks.a(1, taskn);
 
 						//locate task in @record<10> by 'AL' setting newtaskn else null
@@ -887,14 +887,14 @@ function main(in mode) {
 						//@record=insert(@record,10,newtaskn,0,task)
 						//@record=insert(@record,11,newtaskn,0,LOCKX)
 
-						if (not(RECORD.a(10).locateby("AL",task,newtaskn))) {
+						if (not(RECORD.a(10).locateby("AL", task, newtaskn))) {
 							RECORD.inserter(10, newtaskn, task);
 							RECORD.inserter(11, newtaskn, lockx);
 						}
 
 					}
 				}
-			};//taskn;
+			} //taskn;
 
 		}
 
@@ -929,7 +929,7 @@ function main(in mode) {
 		if (interactive and RECORD) {
 			if (VOLUMES) {
 				RECORD.invert().write(DEFINITIONS, "SECURITY");
-			}else{
+			} else {
 				RECORD.write(DEFINITIONS, "SECURITY");
 			}
 		}
@@ -979,10 +979,10 @@ function main(in mode) {
 				sysrec = RECORD.a(4, usern, 2);
 				//locate user in orec<1> setting ousern then
 				var menuid = "";
-				if (origfullrec.a(1).locate(userx,ousern)) {
+				if (origfullrec.a(1).locate(userx, ousern)) {
 					//oSYSREC=orec<4,ousern,2>
 					var osysrec = origfullrec.a(4, ousern, 2);
-				}else{
+				} else {
 					var osysrec = "";
 
 					//new users look for legacy menu in following (lower rank) users
@@ -995,7 +995,7 @@ function main(in mode) {
 						}
 						///BREAK;
 						if (not(not(menuid))) break;
-					};//usern2;
+					} //usern2;
 
 				}
 
@@ -1090,7 +1090,7 @@ function main(in mode) {
 				// end
 
 			}
-		};//usern;
+		} //usern;
 
 		//delete any deleted users from the system file for direct login
 		usercodes = win.orec.a(1);
@@ -1099,7 +1099,7 @@ function main(in mode) {
 			userx = usercodes.a(1, usern);
 			if (not(userx.index("---"))) {
 				if (userx and not(userx.index("EXODUS"))) {
-					if (not(RECORD.a(1).locate(userx,temp))) {
+					if (not(RECORD.a(1).locate(userx, temp))) {
 						if (userrec.read(users, userx)) {
 							if (users) {
 								users.deleterecord(userx);
@@ -1118,7 +1118,7 @@ function main(in mode) {
 					}
 				}
 			}
-		};//usern;
+		} //usern;
 
 		if (emailtx) {
 			emailtx.splicer(1, 0, "User File Amendments:" ^ FM);
@@ -1143,7 +1143,7 @@ function main(in mode) {
 
 					if (USERNAME eq "EXODUS") {
 						replyto = "support@neosys.com";
-					}else{
+					} else {
 						replyto = USERNAME.xlate("USERS", 7, "X");
 					}
 
@@ -1179,8 +1179,8 @@ function main(in mode) {
 						for (var linkn = 1; linkn <= nlinks; ++linkn) {
 							body.r(1, -1, baselinkdescs.a(1, linkn) ^ " " ^ baselinks.a(1, linkn));
 							//if @account='ACCOUNTS' then body:='?ACCOUNTS'
-						};//linkn;
-					}else{
+						} //linkn;
+					} else {
 						body.r(1, -1, "Please contact your IT support or colleagues");
 					}
 
@@ -1213,7 +1213,7 @@ function main(in mode) {
 						call note(errormsg);
 					}
 
-				};//ii;
+				} //ii;
 			}
 
 			//prepare to write the inverted record in noninteractive mode
@@ -1256,10 +1256,10 @@ function main(in mode) {
 						if (tt) {
 							temprec.r(fn, tt.remove(1, ii, 0));
 						}
-					};//fn;
+					} //fn;
 				}
 			}
-		};//ii;
+		} //ii;
 
 		//remove empty groups
 		var usercodes = temprec.a(1);
@@ -1274,11 +1274,11 @@ function main(in mode) {
 							if (tt) {
 								temprec.r(fn, tt.remove(1, ii, 0));
 							}
-						};//fn;
+						} //fn;
 					}
 				}
 			}
-		};//ii;
+		} //ii;
 
 		//add group marks
 		temprec.r(1, temprec.a(1).swap(VM ^ VM, VM ^ "<hr/>" ^ VM));
@@ -1290,7 +1290,7 @@ function main(in mode) {
 			var nfs = temprec.count(FM) + 1;
 			for (var fn = 1; fn <= nfs; ++fn) {
 				temprec.r(fn, temprec.a(fn).field(VM, 1, nusers));
-			};//fn;
+			} //fn;
 			temprec = invertarray(reverse(invertarray(temprec)));
 		}
 
@@ -1303,7 +1303,7 @@ function main(in mode) {
 		var cmd = "LIST DEFINITIONS " ^ (tempkey.quote());
 		if (mode2 eq "TASKS") {
 			cmd ^= " TASKS LOCKS";
-		}else{
+		} else {
 			//cmd:=' LIMIT USER_EXPIRY_DATE < ':quote(date() 'D4')
 			//cmd:=' REMOVE_EXPIRED_USERS'
 			//cmd:=' ADD_GROUP_MARKS'
@@ -1351,7 +1351,7 @@ function main(in mode) {
 			var task = tasks.a(1, taskn);
 			if (authorised(task, xx)) {
 				ok = 1;
-			}else{
+			} else {
 				ok = 0;
 			}
 			if (disallowed) {
@@ -1366,13 +1366,13 @@ function main(in mode) {
 					if (temp) {
 						if (temp eq lasttask.field(" ", ii)) {
 							task = task.fieldstore(" ", ii, 1, "%SAME%");
-						}else{
+						} else {
 							temp = "";
 						}
 					}
 					///BREAK;
 					if (not temp) break;
-				};//ii;
+				} //ii;
 				task ^= "   ";
 				task.swapper("%SAME% ", "+");
 				task.trimmerb();
@@ -1381,7 +1381,7 @@ function main(in mode) {
 				tasks2 ^= VM ^ task;
 				locks2 ^= VM ^ locks.a(1, taskn);
 			}
-		};//taskn;
+		} //taskn;
 		tasks2.splicer(1, 1, "");
 		locks2.splicer(1, 1, "");
 		//transfer tasks2 to @ans
@@ -1492,14 +1492,14 @@ subroutine changepassx() {
 }
 
 subroutine generatepassword() {
-	var consonants = UPPERCASE.substr(1,26);
+	var consonants = UPPERCASE.substr(1, 26);
 	var vowels = "AEIOUY";
 	consonants.converter(vowels ^ "QX", "");
 	newpassword = "";
 	for (var ii = 1; ii <= minpasswordchars / 2; ++ii) {
 		newpassword ^= consonants[consonants.length().rnd() + 1];
 		newpassword ^= vowels[vowels.length().rnd() + 1];
-	};//ii;
+	} //ii;
 	return;
 }
 
@@ -1527,7 +1527,7 @@ subroutine makesysrec() {
 	if (not(sysrec.a(1))) {
 		if (passwordfn eq 7) {
 			sysrec.r(1, "USER");
-		}else{
+		} else {
 			sysrec.r(1, "ACCOUNT");
 		}
 	}
@@ -1605,13 +1605,13 @@ subroutine cleartemp() {
 	//24 other keys
 	for (var ii = 20; ii <= 24; ++ii) {
 		RECORD.r(ii, "");
-	};//ii;
+	} //ii;
 	return;
 }
 
 subroutine getemailtx() {
 	//dont sysmsg/log new/amend/deleting users @neosys.com unless in testdata or dev
-	if ((userrec.a(7).ucase().index("@EXODUS.COM") and (SYSTEM.a(17, 1).substr(-4,4) ne "test")) and not(var("exodus.id").osfile())) {
+	if ((userrec.a(7).ucase().index("@EXODUS.COM") and (SYSTEM.a(17, 1).substr(-4, 4) ne "TEST")) and not(var("exodus.id").osfile())) {
 		return;
 	}
 
@@ -1651,7 +1651,7 @@ subroutine getemailtx() {
 				}
 			}
 		}
-	};//fieldn;
+	} //fieldn;
 
 	if (tx) {
 		emailtx.r(-1, FM ^ var("User Code:").oconv("L#10") ^ userx);

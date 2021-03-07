@@ -85,7 +85,7 @@ function main() {
 		var selectcmd = "SELECT STATISTICS WITH DATE ";
 		if (datemode eq 2) {
 			reqdate = var().date();
-		}else{
+		} else {
 			reqdate = var().date() - 1;
 		}
 
@@ -105,7 +105,7 @@ function main() {
 	rowfields.converter(SVM, VM);
 
 	//remove col field from row fields because not logical or useful
-	if (rowfields.locate(colfield,vn)) {
+	if (rowfields.locate(colfield, vn)) {
 		rowfields.remover(1, vn);
 	}
 
@@ -128,14 +128,14 @@ function main() {
 				if (not(row1.a(1, coln) eq row2.a(1, coln))) break;
 				replaced = 1;
 				row2.r(1, coln, "-");
-			};//coln;
+			} //coln;
 			if (replaced) {
 				output.r(rown, row2);
 			}
-		};//rown;
+		} //rown;
 	}
 
-	if (not(rowfields.locate("USER_CODE",usercoln))) {
+	if (not(rowfields.locate("USER_CODE", usercoln))) {
 		usercoln = 0;
 	}
 
@@ -168,7 +168,7 @@ function main() {
 			if (coln eq usercoln) {
 				tx ^= "<col>";
 			}
-		};//coln;
+		} //coln;
 
 		tx ^= tr;
 		for (var coln = 1; coln <= ncols; ++coln) {
@@ -181,7 +181,7 @@ function main() {
 			if (coln eq usercoln) {
 				tx ^= th ^ "Browser Last Seen" ^ thx;
 			}
-		};//coln;
+		} //coln;
 		tx ^= trx;
 
 		tx ^= "</thead>";
@@ -198,7 +198,7 @@ function main() {
 							///BREAK;
 							if (not(output.a(rown2, coln) eq "-")) break;
 							rowspan += 1;
-						};//rown2;
+						} //rown2;
 
 						var celltd = "<TD";
 						if (rowspan gt 1) {
@@ -233,7 +233,7 @@ function main() {
 						}
 
 					}
-				}else{
+				} else {
 					if (not(cell.length())) {
 						cell = nbsp;
 					}
@@ -242,17 +242,17 @@ function main() {
 						rowtx ^= td ^ nbsp ^ tdx;
 					}
 				}
-			};//coln;
+			} //coln;
 			tx ^= tr ^ rowtx ^ trx;
 			if (tx.length() gt 64000) {
 				gosub printtx();
 			}
-		};//rown;
+		} //rown;
 		tx ^= "</table>" "\r\n";
 
 		gosub printtx();
 
-	}else{
+	} else {
 
 		SYSTEM.r(3, 1);
 		var sys2 = SYSTEM.a(2);

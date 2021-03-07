@@ -96,7 +96,7 @@ function main(in mode) {
 			}
 			var expirydate = RECORD.a(36) + expirydays;
 			RECORD.r(37, expirydate);
-		}else{
+		} else {
 			//indicate no expiry
 			RECORD.r(37, "");
 		}
@@ -121,7 +121,7 @@ function main(in mode) {
 		if (emaildomains) {
 			//admin *emails* (NOT DOMAINS) are specifically allowed
 			emaildomains ^= " " ^ sysemails;
-		}else{
+		} else {
 			//if no specific domain restrictions then only admin DOMAINS are allowed
 			if (sysemails) {
 
@@ -131,11 +131,11 @@ function main(in mode) {
 					var word = sysemails.field(" ", ii);
 					word = field2(word, "@", -1);
 					//remove smtp. mailout. etc from smtp host domain
-					if (var("smtp,mail,mailout").locateusing(",",word.field(".", 1),xx)) {
+					if (var("smtp,mail,mailout").locateusing(",", word.field(".", 1), xx)) {
 						word = word.field(".", 2, 999);
 					}
 					sysemails = sysemails.fieldstore(" ", ii, 1, word);
-				};//ii;
+				} //ii;
 				emaildomains ^= " " ^ sysemails;
 			}
 		}
@@ -153,14 +153,14 @@ function main(in mode) {
 				var email = emails.field(";", ii);
 				if (email) {
 					var emaildomain = email.field("@", 2);
-					if (not(emaildomains.locateusing(" ",emaildomain,xx))) {
-						if (not(emaildomains.locateusing(" ",email,xx))) {
+					if (not(emaildomains.locateusing(" ", emaildomain, xx))) {
+						if (not(emaildomains.locateusing(" ", email, xx))) {
 							msg = "Neither " ^ (emaildomain.quote()) ^ " nor " ^ (email.quote()) ^ "|is in the list of allowed email domains/addresses";
 							return invalid(msg);
 						}
 					}
 				}
-			};//ii;
+			} //ii;
 		}
 
 	//can be PREWRITE.RESETPASSWORD
@@ -174,12 +174,12 @@ function main(in mode) {
 			}
 		}
 
-		if (SECURITY.a(1).locate(ID,usern)) {
+		if (SECURITY.a(1).locate(ID, usern)) {
 			newuser = 0;
 			if (RECORD.a(4) and RECORD.a(4) ne win.orec.a(4)) {
 				resetpassword = 1;
 			}
-		}else{
+		} else {
 			newuser = 1;
 			resetpassword = 0;
 		}
@@ -187,7 +187,7 @@ function main(in mode) {
 		if (not(lockrecord("DEFINITIONS", DEFINITIONS, "SECURITY", xx, 0))) {
 			if (resetpassword) {
 				resetpassword = 2;
-			}else{
+			} else {
 				msg = "Somebody is updating the Authorisation File now. Please retry later";
 				return invalid(msg);
 			}
@@ -258,7 +258,7 @@ function main(in mode) {
 				return 0;
 			}
 
-			if (not(SECURITY.a(1).locate(userdept,usern))) {
+			if (not(SECURITY.a(1).locate(userdept, usern))) {
 				msg = (userdept ^ " USER GROUP does not exist").quote();
 				gosub invalid(msg);
 				gosub unlocksec();
@@ -268,7 +268,7 @@ function main(in mode) {
 			//insert an empty user
 			for (var fn = 1; fn <= 9; ++fn) {
 				SECURITY.inserter(fn, usern, "");
-			};//fn;
+			} //fn;
 
 			var newusername = RECORD.a(1);
 			var newipnos = RECORD.a(40);
@@ -325,7 +325,7 @@ function main(in mode) {
 		if (resetpassword lt 2 and SECURITY ne olduserprivs) {
 			if (VOLUMES) {
 				SECURITY.invert().write(DEFINITIONS, "SECURITY");
-			}else{
+			} else {
 				SECURITY.write(DEFINITIONS, "SECURITY");
 			}
 			//no need on user if on userprivs
@@ -342,7 +342,7 @@ function main(in mode) {
 
 			if (USERNAME eq APPLICATION) {
 				text = "OK New password sent to " ^ RECORD.a(7);
-			}else{
+			} else {
 				text = "OK New password set by " ^ USERNAME;
 			}
 			RECORD.inserter(18, 1, text);
@@ -410,7 +410,7 @@ function main(in mode) {
 			return 0;
 		}
 		gosub getdepts();
-		if (not(depts.locateusing(FM,win.is,xx))) {
+		if (not(depts.locateusing(FM, win.is, xx))) {
 			msg = win.is.quote() ^ " IS NOT A VALID DEPARTMENT";
 			return invalid(msg);
 		}
@@ -433,8 +433,8 @@ subroutine getusern() {
 	//fail safe only allowed to update existing users
 	if (ID eq "EXODUS") {
 		//usern remains unassigned to force an error if used later on
-	}else{
-		if (not(SECURITY.a(1).locate(ID,usern))) {
+	} else {
+		if (not(SECURITY.a(1).locate(ID, usern))) {
 			msg = ID.quote() ^ " User does not exist";
 			gosub invalid(msg);
 			return;
@@ -462,11 +462,11 @@ subroutine getuserdept2(in mode) {
 
 	//locate the user in the table
 	usercode = mode.field(",", 2);
-	if (not(SECURITY.a(1).locate(usercode,usern))) {
+	if (not(SECURITY.a(1).locate(usercode, usern))) {
 		if (usercode eq "EXODUS") {
 			ANS = "EXODUS";
 			return;
-		}else{
+		} else {
 			ANS = "";
 			return;
 		}
@@ -477,7 +477,7 @@ subroutine getuserdept2(in mode) {
 	for (usern = 1; usern <= nusers1; ++usern) {
 		///BREAK;
 		if (SECURITY.a(1, usern) eq "---") break;
-	};//usern;
+	} //usern;
 
 	//get the department code
 	ANS = SECURITY.a(1, usern - 1);
@@ -494,12 +494,12 @@ subroutine getdepts() {
 			text.converter("0123456789", "");
 			text.trimmer();
 			if (text and text ne "---") {
-				if (not(depts.locateusing(FM,text,deptn))) {
+				if (not(depts.locateusing(FM, text, deptn))) {
 					depts.r(-1, text);
 				}
 			}
 		}
-	};//usern;
+	} //usern;
 
 	return;
 }

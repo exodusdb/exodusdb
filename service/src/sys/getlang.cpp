@@ -53,12 +53,12 @@ function main(in origprogname, in languagecode0, in origdatatype, io languagefil
 		var n2 = lang2.count(FM) + 1;
 		if (n1 lt n2) {
 			nn = n2;
-		}else{
+		} else {
 			nn = n1;
 		}
 		for (var fn = 1; fn <= nn; ++fn) {
 			lang.r(fn, (lang1.a(fn) ^ " " ^ lang2.a(fn)).trim());
-		};//fn;
+		} //fn;
 
 		return 0;
 	}
@@ -109,7 +109,7 @@ exit:
 				}
 				lang.r(fn, custlang.a(fn));
 			}
-		};//fn;
+		} //fn;
 	}
 
 	//force 737 greek codepage characters so indexing is ok etc
@@ -188,7 +188,7 @@ subroutine getlang3(in origprogname, in datatype, in languagefile, io lang) {
 				if (tt) {
 					lang.r(ii, tt);
 				}
-			};//ii;
+			} //ii;
 		}
 
 	}

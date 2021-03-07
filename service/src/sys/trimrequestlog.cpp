@@ -129,7 +129,7 @@ nextrec2:
 		//email results of deletions
 		if (update) {
 			tt = "Deleted";
-		}else{
+		} else {
 			tt = "Deletable";
 		}
 		tx.r(-1, "");
@@ -164,7 +164,7 @@ nextrec2:
 		printl(" deleted");
 		ndeleted += 1;
 		sizedeleted += ID.length() + RECORD.length();
-	}else{
+	} else {
 		printl(" deletable");
 	}
 

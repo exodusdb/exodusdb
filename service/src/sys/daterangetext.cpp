@@ -62,10 +62,10 @@ function main(in d1, in d2, out result, io lang) {
 	}
 
 	//add hyphen if still a range
-	if (not(tt.substr(1,3) eq (FM ^ FM ^ FM))) {
+	if (not(tt.substr(1, 3) eq (FM ^ FM ^ FM))) {
 		if (tt.a(2) eq "" and tt.a(3) eq "") {
 			tt.r(3, tt.a(3) ^ " ^ ");
-		}else{
+		} else {
 			tt.r(3, tt.a(3) ^ " - ");
 		}
 	}

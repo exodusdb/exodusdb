@@ -8,7 +8,7 @@ function main(in string0) {
 	if (string0.unassigned()) {
 		//de bug
 		string1 = "UNASSIGNED";
-	}else{
+	} else {
 		string1 = string0;
 	}
 

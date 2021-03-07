@@ -155,7 +155,7 @@ subroutine validateupdate(in subfn, in masterfilename, in masterfile, in masterf
 
 	if (deleting) {
 		mastercode = win.orec.a(subfn);
-	}else{
+	} else {
 		mastercode = RECORD.a(subfn);
 	}
 	if (mastercode eq "") {
@@ -171,16 +171,16 @@ subroutine validateupdate(in subfn, in masterfilename, in masterfile, in masterf
 			return;
 		}
 
-	}else{
+	} else {
 
 		var masterrecord;
 		if (masterrecord.read(masterfile, mastercode)) {
 			var origmasterrecord = masterrecord;
-			if (masterrecord.a(masterfn).locateby("AL",ID,vn)) {
+			if (masterrecord.a(masterfn).locateby("AL", ID, vn)) {
 				if (deleting) {
 					masterrecord.remover(masterfn, vn);
 				}
-			}else{
+			} else {
 				if (not deleting) {
 					masterrecord.inserter(masterfn, vn, ID);
 				}
@@ -188,7 +188,7 @@ subroutine validateupdate(in subfn, in masterfilename, in masterfile, in masterf
 			if (masterrecord ne origmasterrecord) {
 				masterrecord.write(masterfile, mastercode);
 			}
-		}else{
+		} else {
 		}
 
 	}

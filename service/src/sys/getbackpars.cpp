@@ -16,7 +16,7 @@ function main(out bakpars, in process0=var()) {
 	//optonally get the backpars for a specific process if given
 	if (process0.unassigned()) {
 		process = SYSTEM;
-	}else{
+	} else {
 		process = process0;
 	}
 
@@ -61,7 +61,7 @@ function main(out bakpars, in process0=var()) {
 			if (tt.a(ii).length()) {
 				bakpars.r(ii, tt.a(ii));
 			}
-		};//ii;
+		} //ii;
 	}
 	//osread tt from '..\..\backup.cfg' then
 	var configfilename = "../../backup.cfg";
@@ -71,7 +71,7 @@ function main(out bakpars, in process0=var()) {
 			if (tt.a(ii).length()) {
 				bakpars.r(ii, tt.a(ii));
 			}
-		};//ii;
+		} //ii;
 	}
 
 	//if bakpars<3>='' then bakpars<3>='2:00'
@@ -115,27 +115,27 @@ function main(out bakpars, in process0=var()) {
 		bakpars.r(8, "");
 
 		//decide backup required or not by indicating testdata
-		if (process.a(58).locate(process.a(17),dbn)) {
+		if (process.a(58).locate(process.a(17), dbn)) {
 			tt = process.a(60, dbn);
-		}else{
+		} else {
 			tt = 0;
 		}
 		//test/nonlive data
 		bakpars.r(11, not(tt));
 
 	//otherwise backup depending on backup.cfg etc
-	}else{
+	} else {
 
 		//autodetermine if it is "test" data
 		if (baktestdata eq "") {
 			var testdata = 1;
-			if (process.a(17).substr(-4,4) eq "test") {
+			if (process.a(17).substr(-4, 4) eq "TEST") {
 			} else if (process.a(23).ucase().index("TRAINING")) {
 			} else if (process.a(23).ucase().index("TESTING")) {
 			} else {
 				//not otherwise specified then exclude database if in list of non-live data
 				//none-live could include test data or consolidated copies
-				if (not(bakexcludedatasets.locate(process.a(17),xx))) {
+				if (not(bakexcludedatasets.locate(process.a(17), xx))) {
 					testdata = 0;
 				}
 			}

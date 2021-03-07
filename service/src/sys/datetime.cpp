@@ -30,7 +30,7 @@ function main(in type, in inx, in mode, out outx) {
 		//find all DOS related code by searching GBP for /86400
 		if (datemode.index("DOS")) {
 			datemode.swapper("DOS", "");
-			in1 -= 24873;
+			in1 -= 24837;
 		}
 
 		//DOS time is 0-.99999 means 00:00-24:00
@@ -43,12 +43,12 @@ function main(in type, in inx, in mode, out outx) {
 
 		//fix bug where datetime was set like datetime=(date():'.':time() 'R(0)#5')+0
 		} else if (in2.length() ne 5) {
-			in2 = (in2 ^ "00000").substr(1,5);
+			in2 = (in2 ^ "00000").substr(1, 5);
 		}
 
 		//move time and date into the local date time
 		if (SW.a(1)) {
-			in2 = (in2 + SW.a(1) + .5).floor();
+			in2 = (in2 + SW.a(1) + 0.5).floor();
 			var in2orig = in2;
 			in2 = in2 % 86400;
 			if (in2 lt in2orig) {
@@ -66,7 +66,7 @@ function main(in type, in inx, in mode, out outx) {
 		} else if (timemode eq "NUMERIC") {
 			if (dostime) {
 				outx = (in1 + in2 / 86400).oconv("MD50P");
-			}else{
+			} else {
 				outx = in1 ^ "." ^ in2.oconv("R(0)#5");
 			}
 			return 0;

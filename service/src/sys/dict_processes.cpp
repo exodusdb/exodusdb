@@ -57,7 +57,7 @@ libraryinit(maintenance)
 function main() {
 	if (RECORD.a(33)) {
 		ANS = "";
-	}else{
+	} else {
 		ANS = "Yes";
 	}
 	return ANS;
@@ -99,7 +99,7 @@ function main() {
 	}
 	if (r33) {
 		ANS = "OK";
-	}else{
+	} else {
 		ANS = "Maintenance";
 	}
 	if (RECORD.a(53)) {

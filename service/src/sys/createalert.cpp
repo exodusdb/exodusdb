@@ -58,7 +58,7 @@ function main() {
 			stop();
 		}
 
-	}else{
+	} else {
 		if (not(silent or overwrite)) {
 			var xx;
 			if (xx.read(gen.documents, alertid)) {
@@ -133,7 +133,7 @@ syntax:
 				call mssg(msg);
 				stop();
 			}
-		};//taskn;
+		} //taskn;
 	}
 
 	var docid = alertid;

@@ -34,7 +34,7 @@ function main() {
 		if (ANS.a(1, ii) eq RECORD.a(1, ii)) {
 			ANS.r(1, ii, "");
 		}
-	};//ii;
+	} //ii;
 	return ANS;
 }
 libraryexit(full_name)
@@ -70,7 +70,7 @@ function main() {
 		if (logindate) {
 			ANS.r(1, ii, (var().date() - logindate).oconv("MD00P"));
 		}
-	};//ii;
+	} //ii;
 	return ANS;
 }
 libraryexit(last_login_age)
@@ -106,7 +106,7 @@ function main() {
 		if (passworddate) {
 			ANS.r(1, ii, (var().date() - passworddate).oconv("MD00P"));
 		}
-	};//ii;
+	} //ii;
 	return ANS;
 }
 libraryexit(password_age)
@@ -188,7 +188,7 @@ function main() {
 				usercodes.r(1, usern, "<B>" ^ usercode ^ "</B>");
 			}
 		}
-	};//usern;
+	} //usern;
 	return usercodes;
 }
 libraryexit(user_code_html)
@@ -204,7 +204,7 @@ function main() {
 		if (emails.a(1, usern) eq "") {
 			usercodes.r(1, usern, "");
 		}
-	};//usern;
+	} //usern;
 	return usercodes;
 }
 libraryexit(user_code_with_email)

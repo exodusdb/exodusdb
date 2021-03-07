@@ -67,7 +67,7 @@ function main(in mode) {
 
 		//system configuration
 		//locate @id in 'SYSTEM.CFG,SYSTEM,..\..\SYSTEM.CFG' using ',' setting xx then
-		if (systemcodes.locateusing(",",ID,xx)) {
+		if (systemcodes.locateusing(",", ID, xx)) {
 
 			op = "SYSTEM CONFIGURATION";
 			gosub security2(mode, op);
@@ -91,7 +91,7 @@ function main(in mode) {
 
 		//system configuration
 		//locate @id in 'SYSTEM.CFG,SYSTEM,..\..\SYSTEM.CFG' using ',' setting xx then
-		if (systemcodes.locateusing(",",ID,xx)) {
+		if (systemcodes.locateusing(",", ID, xx)) {
 
 			op = "SYSTEM CONFIGURATION";
 			gosub security2(mode, op);
@@ -115,7 +115,7 @@ function main(in mode) {
 				}
 
 			//get system and backup rec from dos
-			}else{
+			} else {
 				if (not(RECORD.osread(ID.lcase()))) {
 					RECORD = "";
 				}
@@ -171,7 +171,7 @@ function main(in mode) {
 						goto nochequeformat;
 					}
 
-				}else{
+				} else {
 
 nochequeformat:
 					if (not(temp.read(win.srcfile, "CHEQUEDESIGN*ZZZ999"))) {
@@ -220,13 +220,13 @@ nochequeformat:
 			for (var ii = 1; ii <= nn; ++ii) {
 				var val = PSEUDO.a(ii);
 				if (val) {
-					if (not(RECORD.a(1).locateby("AL",val,vn))) {
+					if (not(RECORD.a(1).locateby("AL", val, vn))) {
 						RECORD.inserter(1, vn, val);
 						RECORD.inserter(2, vn, "");
 						//any more in parallel
 					}
 				}
-			};//ii;
+			} //ii;
 
 			//return
 		}
@@ -317,7 +317,7 @@ preventupdate:
 					}
 				}
 
-			}else{
+			} else {
 
 				//remove as default (assume is this account)
 				if (win.orec.a(14)) {
@@ -362,7 +362,7 @@ preventupdate:
 			for (var fn = 100; fn <= 102; ++fn) {
 				var usercode = RECORD.a(fn);
 				if (usercode) {
-					if (not(SECURITY.a(1).locate(usercode,xx))) {
+					if (not(SECURITY.a(1).locate(usercode, xx))) {
 						msg = usercode.quote() ^ " is not a valid financial usercode";
 						return invalid(msg);
 					}
@@ -379,7 +379,7 @@ preventupdate:
 						}
 					}
 				}
-			};//fn;
+			} //fn;
 
 			var t49 = field2(RECORD.a(49), VM, -1);
 			var t149 = field2(RECORD.a(149), VM, -1);
@@ -429,7 +429,7 @@ preventupdate:
 	} else if (mode eq "POSTWRITE") {
 
 		//system configuration
-		if (systemcodes.locateusing(",",ID,xx)) {
+		if (systemcodes.locateusing(",", ID, xx)) {
 
 			//op='SYSTEM CONFIGURATION'
 			//gosub security2
@@ -465,7 +465,7 @@ preventupdate:
 				smtprec.write(DEFINITIONS, smtpkey);
 
 			//write system and backup rec in dos
-			}else{
+			} else {
 				call oswrite(RECORD, ID.lcase());
 				call oswrite(backuprec, backupkey.lcase());
 				call oswrite(smtprec, smtpkey.lcase());
@@ -483,26 +483,26 @@ preventupdate:
 				//TODO replace with checkwritable()
 				drive ^= ":";
 				call osmkdir(drive ^ OSSLASH "data.bak");
-				call shell2("dir " ^ drive.substr(1,2), errors);
+				call shell2("dir " ^ drive.substr(1, 2), errors);
 				if (errors) {
 					call note("Note: Backup Drive " ^ drive ^ " cannot be accessed");
-				}else{
+				} else {
 					//tempfilename=lcase(drive:'\data.bak':'\':rnd(8))
 					var tempfilename = (drive ^ "/data.bak" "/" ^ var(8).rnd()).lcase();
 					if (VOLUMES) {
 						tempfilename ^= ".$$$";
-					}else{
+					} else {
 						tempfilename ^= "./$";
 					}
 					tempfilename.converter("/", OSSLASH);
 					var(var().date()).oswrite(tempfilename);
 					if (tt.osread(tempfilename)) {
 						tempfilename.osdelete();
-					}else{
+					} else {
 						call note("Note: Cannot write to backup drive " ^ drive);
 					}
 				}
-			};//driven;
+			} //driven;
 
 			//create/update ddns configuration if necessary
 			//actually only the ddns.cmd file really need be updated
@@ -545,7 +545,7 @@ preventupdate:
 		//trigger restart if necessary (is this really necessary now)
 		//TODO make it only per database
 		if (USERNAME ne "EXODUS") {
-			if (var("AGENCY.PARAMS,ALL,SECURITY,TAXES,TIMESHEET.PARAMS").locateusing(",",ID,xx)) {
+			if (var("AGENCY.PARAMS,ALL,SECURITY,TAXES,TIMESHEET.PARAMS").locateusing(",", ID, xx)) {
 				//TODO prevent a write from system configuration file
 				call osread(tt, "system.cfg");
 				call oswrite(tt, "system.cfg");
@@ -556,7 +556,7 @@ preventupdate:
 
 		//system configuration
 		//locate @id in 'SYSTEM.CFG,SYSTEM,..\..\SYSTEM.CFG' using ',' setting xx then
-		if (systemcodes.locateusing(",",ID,xx)) {
+		if (systemcodes.locateusing(",", ID, xx)) {
 
 			op = "SYSTEM CONFIGURATION";
 			gosub security2(mode, op);
@@ -663,11 +663,11 @@ subroutine reorderdbs() {
 	for (var dbn = 1; dbn <= ndbs; ++dbn) {
 		var db = dblist.a(1, dbn);
 		var dbcode = db.a(1, 1, 2);
-		if (not(newdbcodes.locate(dbcode,newdbcoden))) {
+		if (not(newdbcodes.locate(dbcode, newdbcoden))) {
 			newdbcodes.r(1, newdbcoden, dbcode);
 		}
 		newdblist.r(1, newdbcoden, db);
-	};//dbn;
+	} //dbn;
 
 	//replace substitution and dblist
 	var newdbdir = dbdir;

@@ -68,7 +68,7 @@ listen:
 	// @user4[tt,99999]=''
 	// end
 
-	if (USER4.substr(1,7) eq "RESTART") {
+	if (USER4.substr(1, 7) eq "RESTART") {
 
 		if (USER4 eq "RESTART $LISTEN") {
 			SYSTEM.r(100, 3, "");
@@ -132,13 +132,13 @@ listen:
 		var attachfilename = "";
 
 		//either BACKUP or BACKUP2 followed by space and drive letter
-		if (PSEUDO.substr(1,6) eq "BACKUP") {
+		if (PSEUDO.substr(1, 6) eq "BACKUP") {
 
 			subject = "EXODUS Backup " ^ dbcode;
 
 			//add drive letter(s)
-			tt = PSEUDO.field(" ", 2).substr(1,2);
-			var tt2 = PSEUDO.field(" ", 3).substr(1,2);
+			tt = PSEUDO.field(" ", 2).substr(1, 2);
+			var tt2 = PSEUDO.field(" ", 3).substr(1, 2);
 			subject ^= " -> " ^ tt;
 			if (tt2 and tt2 ne tt) {
 				subject ^= "/" ^ tt2;
@@ -147,7 +147,7 @@ listen:
 			//note new or changed media
 			tt = USER4.index("Media: ");
 			if (tt) {
-				subject ^= " " ^ (USER4.substr(tt + 7,9999)).a(1);
+				subject ^= " " ^ (USER4.substr(tt + 7, 9999)).a(1);
 			}
 
 			//add success, WARNING or FAILURE
@@ -155,7 +155,7 @@ listen:
 			tt2 = USER4.ucase();
 			if (not(tt2.index("SUCCESS")) or tt2.index("FAIL")) {
 				tt = "FAILURE";
-			}else{
+			} else {
 				if (tt2.index("WARNING")) {
 					tt = "WARNING";
 				}
@@ -174,7 +174,7 @@ listen:
 			var errormsg = USER4;
 			call log(cmd, errormsg ^ "");
 
-		}else{
+		} else {
 
 			//subject='EXODUS Technical Message :'
 			subject = "";
@@ -235,10 +235,10 @@ listen:
 				}
 
 				//optionally email backup.zip
-				if ((errormsg eq "" or errormsg.substr(1,2) eq "OK") and attachfilename) {
+				if ((errormsg eq "" or errormsg.substr(1, 2) eq "OK") and attachfilename) {
 					var address2 = gen.address.field("/", 2);
 					//remove exodus from the backup.zip recipients
-					if (address2.locateusing(";","backups@neosys.com",xx)) {
+					if (address2.locateusing(";", "backups@neosys.com", xx)) {
 						address2.converter(";", VM);
 						address2.remover(1, xx);
 						address2.converter(VM, ";");
@@ -257,7 +257,7 @@ listen:
 		if (PSEUDO.field(" ", 1) eq "BACKUP") {
 
 			//before termination do any copy to testdata etc
-			if (SYSTEM.a(58).locate(dbcode,tt)) {
+			if (SYSTEM.a(58).locate(dbcode, tt)) {
 				if (SYSTEM.a(62, tt)) {
 					perform("COPYDB " ^ dbcode);
 				}

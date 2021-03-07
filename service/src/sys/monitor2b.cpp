@@ -50,7 +50,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 	var cmd = SYSTEM.a(50) ^ "wget" ^ exe;
 	if (cmd.osfile()) {
 		httpsbug = 0;
-	}else{
+	} else {
 		httpsbug = 1;
 		cmd = "wget" ^ exe;
 	}
@@ -82,7 +82,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 	var salt = 3923517;
 	var max = 4752137;
 
-	var sessionid = (var().date().pwr(3) * 7 + 5).substr(9999,-9999);
+	var sessionid = (var().date().pwr(3) * 7 + 5).substr(9999, -9999);
 	var cidx = cid();
 
 	if (mode eq "WRITE") {
@@ -165,7 +165,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			cmd ^= " -t 3";
 			cmd ^= " -T 60";
 			cmd ^= " -b";
-		}else{
+		} else {
 			//wgetrc<-1>='output_document=':tempfilename2
 			if (httpsbug) {
 				wgetrc.r(-1, "check-certificate=off");
@@ -188,7 +188,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			if (post) {
 				cmd ^= " --proxy=on";
 				cmd ^= " --execute http_proxy=" ^ SYSTEM.a(56, 1);
-			}else{
+			} else {
 				wgetrc.r(-1, "use_proxy=on");
 				wgetrc.r(-1, "http_proxy=" ^ SYSTEM.a(56, 1));
 			}
@@ -197,7 +197,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 				if (post) {
 					cmd ^= " --proxy-user=" ^ SYSTEM.a(56, 3);
 					cmd ^= " --proxy-password=" ^ SYSTEM.a(56, 4);
-				}else{
+				} else {
 					wgetrc.r(-1, "proxy_user=" ^ SYSTEM.a(56, 3));
 					wgetrc.r(-1, "proxy_password=" ^ SYSTEM.a(56, 4));
 				}
@@ -211,7 +211,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			if (post) {
 				cmd ^= " --user=" ^ httpuser;
 				cmd ^= " --password=" ^ httppass;
-			}else{
+			} else {
 				wgetrc.r(-1, "user=" ^ httpuser);
 				wgetrc.r(-1, "password=" ^ httppass);
 				}
@@ -225,7 +225,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 		if (request eq "UPDATE") {
 			if (post) {
 				cmd ^= " -O " ^ tempfilename2;
-			}else{
+			} else {
 				wgetrc.r(-1, "output_document=" ^ tempfilename2);
 			}
 		}
@@ -236,7 +236,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			if (params) {
 				if (cmd.index(" -N ")) {
 					params = "?data=" ^ params;
-				}else{
+				} else {
 					var datafilename = tempfilename ^ ".$DA";
 
 					//encodeuri
@@ -264,7 +264,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 	//if cleanup else oswrite cmd on tempfilename:'.CMD'
 
 			//run the wget command
-			output(at(-40), var().time().oconv("MTS"), " CONTROL ", cmd.substr(1,50), "... ");
+			output(at(-40), var().time().oconv("MTS"), " CONTROL ", cmd.substr(1, 50), "... ");
 
 			//garbagecollect;
 			var().osflush();
@@ -282,7 +282,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 				//osdelete datafilename
 			}
 
-		}else{
+		} else {
 
 			//finally add location to get
 			cmd ^= " " ^ ((authurl ^ "?" ^ params).quote());
@@ -347,7 +347,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			if (cleanup) {
 				tempfilename2.osdelete();
 			}
-		}else{
+		} else {
 			datax = "";
 			gosub getlog(logfilename, cleanup, log);
 			msg = "No response file" ^ log;
@@ -370,7 +370,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 		//verify response or abort
 		text = datax.field(",", 2, 999999);
 		gosub hash(salt, max, hashcode);
-		hashcode = hashcode.substr(9999,-9999);
+		hashcode = hashcode.substr(9999, -9999);
 		if (not(datax.field(",", 1) eq hashcode)) {
 			msg = "wrong response";
 badresponse:
@@ -411,7 +411,7 @@ subroutine getlog(in logfilename, in cleanup, out log) {
 		if (log) {
 			log.splicer(1, 0, FM ^ FM);
 		}
-	}else{
+	} else {
 		log = "";
 	}
 	return;
@@ -436,7 +436,7 @@ subroutine hash(in salt, in max, out hashcode) {
 	hashcode = salt;
 	for (var ii = 1; ii <= text.length(); ++ii) {
 		hashcode = (hashcode * (text[ii]).seq()) % max;
-	};//ii;
+	} //ii;
 	return;
 }
 

@@ -97,7 +97,7 @@ function main() {
 	var ll = RECORD.length() - xx.length();
 	if (uu gt ll) {
 		ANS = uu / (ll + 1);
-	}else{
+	} else {
 		ANS = -(ll / (uu + 1));
 	}
 	return ANS;
@@ -137,7 +137,7 @@ libraryinit(c_args)
 //-----------------
 function main() {
 	ANS = RECORD.a(2);
-	if (ANS.substr(1,3) ne "*c ") {
+	if (ANS.substr(1, 3) ne "*c ") {
 		ANS = "";
 	}
 	return ANS;
@@ -189,7 +189,7 @@ function main() {
 	if (rec.reado(comparefile, ID)) {
 		if (RECORD eq rec) {
 			ANS = "";
-		}else{
+		} else {
 			if (ID[1] eq "$") {
 				var recdatetime = field2(RECORD, FM, -1);
 				recdatetime = recdatetime.field(" ", 2, 9).trim() ^ " " ^ recdatetime.field(" ", 1);
@@ -205,15 +205,15 @@ function main() {
 				}
 				if (recdatetime gt cmpdatetime) {
 					ANS = "REPLACES";
-				}else{
+				} else {
 					ANS = "REPLACED";
 				}
-			}else{
+			} else {
 changed:
 				ANS = "CHANGED";
 			}
 		}
-	}else{
+	} else {
 		ANS = "NEW REC";
 	}
 	return ANS;
@@ -246,7 +246,7 @@ function main() {
 	if (executivecode.index("@")) {
 		ANS = executivecode;
 		ANS.converter(" ,", ";;");
-	}else{
+	} else {
 
 	//1) look for user code directly
 		var userx = xlate("USERS", executivecode, "", "X");
@@ -265,7 +265,7 @@ function main() {
 		if (userx.a(35) and var().date() ge userx.a(35)) {
 		//expired
 			ANS = "";
-		}else{
+		} else {
 		//not expired
 			ANS = userx.a(7);
 		}
@@ -294,7 +294,7 @@ function main() {
 	ans2.ucaser();
 	if (ans2 ne ans) {
 		ans.transfer(ANS);
-	}else{
+	} else {
 	//@ans=xlate('USERS','%':ans2:'%',1,'X')
 		ANS = ans2.xlate("USERS", 1, "X");
 		if (ANS) {
@@ -303,7 +303,7 @@ function main() {
 			if (ans2 eq ANS) {
 				ANS = capitalise(ANS);
 				}
-			}else{
+			} else {
 			ans.transfer(ANS);
 			ANS = capitalise(ANS);
 		}
@@ -331,7 +331,7 @@ function main() {
 	if (RECORD.a(1)) {
 		datax = RECORD.a(8);
 		datax.converter(VM, FM);
-	}else{
+	} else {
 		datax = RECORD;
 	}
 	var nn = datax.count(FM) + 1;
@@ -356,7 +356,7 @@ function main() {
 	// @ans<1,-1>=tx
 	// end
 
-	};//fn;
+	} //fn;
 	return ANS;
 	/*;
 	change:
@@ -383,7 +383,7 @@ libraryexit(findall)
 libraryinit(iscpp)
 //----------------
 function main() {
-	return RECORD.a(2).substr(1,3) eq "*c ";
+	return RECORD.a(2).substr(1, 3) eq "*c ";
 }
 libraryexit(iscpp)
 
@@ -438,7 +438,7 @@ function main() {
 		var tt = RECORD;
 		tt.converter(" ", FM);
 		return tt.index(FM ^ "linemark");
-	}else{
+	} else {
 		ANS = 0;
 	}
 	return ANS;
@@ -516,7 +516,7 @@ function main() {
 		if (RECORD.a(ii).trim()[1] eq "*") {
 			RECORD.r(ii, "");
 		}
-	};//ii;
+	} //ii;
 	//@record=matunparse(x)
 	//             call msg('y')
 	//remove blank lines
@@ -560,7 +560,7 @@ libraryinit(program_date)
 //-----------------------
 function main() {
 	var ans = calculate("TIMEDATE");
-	return ans.substr(11,99).iconv("D");
+	return ans.substr(11, 99).iconv("D");
 }
 libraryexit(program_date)
 
@@ -618,9 +618,9 @@ function main() {
 	if (ans[1] eq "V") {
 		ans = field2(RECORD, FM, -2);
 	}
-	if (not(ans.substr(1,2).match("^\\d{2}$"))) {
+	if (not(ans.substr(1, 2).match("^\\d{2}$"))) {
 		ANS = "";
-	}else{
+	} else {
 		ANS = ans;
 		}
 	return ANS;
@@ -647,7 +647,7 @@ libraryinit(version)
 function main() {
 	if (DICT.index("VOC")) {
 		ANS = xlate(RECORD.a(3), "$" ^ RECORD.a(4), "VERSION", "X");
-	}else{
+	} else {
 		ANS = field2(RECORD, FM, -1);
 	//IF @ANS[1,1] = 'V' THEN
 	//  @ANS=@ANS[2,99]

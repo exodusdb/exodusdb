@@ -44,37 +44,37 @@ function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfile
 
 	if (ccaddress0.unassigned()) {
 		ccaddress = "";
-	}else{
+	} else {
 		ccaddress = ccaddress0;
 	}
 	if (subject0.unassigned()) {
 		subject = "";
-	}else{
+	} else {
 		subject = subject0;
 	}
 	if (body0.unassigned()) {
 		body = "";
-	}else{
+	} else {
 		body = body0;
 	}
 	if (attachfilename0.unassigned()) {
 		attachfilename = "";
-	}else{
+	} else {
 		attachfilename = attachfilename0;
 	}
 	if (delete0.unassigned()) {
 		deletex = "";
-	}else{
+	} else {
 		deletex = delete0;
 	}
 	if (replyto0.unassigned()) {
 		replyto = "";
-	}else{
+	} else {
 		replyto = replyto0;
 	}
 	if (params0.unassigned()) {
 		params = "";
-	}else{
+	} else {
 		params = params0;
 	}
 	if (not deletex) {
@@ -102,7 +102,7 @@ function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfile
 			errormsg = (toaddress ^ " " ^ FM ^ errormsg).oconv("T#60");
 			errormsg.converter(TM, FM);
 			call mssg(errormsg);
-		}else{
+		} else {
 			var msg = "STEP 1 OK. Mail for " ^ toaddress ^ " accepted by mail server.";
 			params.converter("\r\n", FM);
 			msg.r(-1, FM ^ "Sent using:" ^ FM ^ params);
@@ -114,7 +114,7 @@ function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfile
 			call note(msg);
 		}
 		stop();
-	}else{
+	} else {
 		toaddress = toaddress0;
 
 		//development systems ALWAYS email hardcoded in next line
@@ -162,8 +162,8 @@ forcedemail:
 		if (ccaddress) {
 			ccaddress ^= ";";
 		}
-		ccaddress ^= toaddress.substr(tt + 2,9999);
-		toaddress = toaddress.substr(1,tt - 1);
+		ccaddress ^= toaddress.substr(tt + 2, 9999);
+		toaddress = toaddress.substr(1, tt - 1);
 	}
 
 	//send mail requires confirmation if user is EXODUS
@@ -198,8 +198,8 @@ forcedemail:
 			if (params2.a(ii)) {
 				params1.r(ii, params2.a(ii));
 			}
-		};//ii;
-	};//filen;
+		} //ii;
+	} //filen;
 
 	//default exodus smtp parameters
 	if (not(params1.a(1))) {
@@ -234,14 +234,14 @@ forcedemail:
 
 	if (body[1] eq "@") {
 
-		osfilename = body.substr(2,99999);
+		osfilename = body.substr(2, 99999);
 		osfilesize = osfilename.osfile().a(1);
 
 		//convert to link if file is too big to email
 		if (osfilesize gt maxemailsize) {
 			body = "";
 			gosub addlinks2osfilename();
-		}else{
+		} else {
 			msgsize += osfilesize;
 		}
 
@@ -270,9 +270,9 @@ forcedemail:
 		if (not(VOLUMES)) {
 			cwd ^= OSSLASH;
 		}
-		if (attachfilename.substr(1,2) eq "..") {
+		if (attachfilename.substr(1, 2) eq "..") {
 			attachfilename.splicer(1, 2, cwd.field(OSSLASH, 1, oscwd().count(OSSLASH) - 1));
-		} else if (attachfilename.substr(1,2) eq ".") {
+		} else if (attachfilename.substr(1, 2) eq ".") {
 			attachfilename.splicer(1, 1, cwd);
 		}
 		msgsize += attachfilename.osfile().a(1);
@@ -285,14 +285,14 @@ forcedemail:
 
 	//if index(body,' ',1) or len(body)>10 or index(body,\0D\,1) or index(body,\0A\,1) then
 	if (body and (body[1] ne "@")) {
-		bodyfilename = var(999999999).rnd().substr(1,7) ^ ".tmp";
+		bodyfilename = var(999999999).rnd().substr(1, 7) ^ ".tmp";
 		//solve stupid outlook joining lines together if > 40 chars
 		//by adding tab on the end of every line
 		body.swapper("\r", "\t\r");
 		call oswrite(body, bodyfilename);
 		bodyfilename.osclose();
 		body = "@" ^ bodyfilename;
-	}else{
+	} else {
 		body.converter(DQ, "'");
 		bodyfilename = "";
 	}
@@ -301,12 +301,12 @@ forcedemail:
 	//if delete then params:=' /d ':delete
 
 	//condition subject start standard with 'EXODUS: '
-	if (subject.substr(1,8) ne "EXODUS: ") {
-		if (subject.substr(1,6) eq "EXODUS") {
-			subject = subject.substr(7,9999).trimf();
+	if (subject.substr(1, 8) ne "EXODUS: ") {
+		if (subject.substr(1, 6) eq "EXODUS") {
+			subject = subject.substr(7, 9999).trimf();
 		}
-		if (subject.substr(1,7) eq "System:") {
-			subject = subject.substr(8,9999).trimf();
+		if (subject.substr(1, 7) eq "System:") {
+			subject = subject.substr(8, 9999).trimf();
 		}
 		subject.splicer(1, 0, "EXODUS: ");
 	}
@@ -330,10 +330,10 @@ forcedemail:
 	if (VOLUMES) {
 
 		params.swapper(FM, "\r\n");
-		paramfilename = var(999999999).rnd().substr(1,7) ^ ".tmp";
+		paramfilename = var(999999999).rnd().substr(1, 7) ^ ".tmp";
 		call oswrite(params, paramfilename);
 
-		errorfilename = var(999999999).rnd().substr(1,7) ^ ".tmp";
+		errorfilename = var(999999999).rnd().substr(1, 7) ^ ".tmp";
 
 		//cmd='START /w'
 		//using CSCRIPT because of difficulty reading errorfilename contents
@@ -341,7 +341,7 @@ forcedemail:
 		cmd ^= " sendmail.js /e " ^ errorfilename ^ " /p " ^ paramfilename;
 
 	//otherwise use standard linux/posix mail program
-	}else{
+	} else {
 
 		cmd = "mail";
 
@@ -368,12 +368,12 @@ forcedemail:
 		//mark html formatted messages as such
 		if (body[1] eq "@") {
 			tt = "";
-			if (bodyfile.osopen(body.substr(2,999))) {
+			if (bodyfile.osopen(body.substr(2, 999))) {
 				//osbread tt from bodyfile at 0 length 100
-				call osbread(tt, bodyfile,  0, 100);
+				call osbread(tt, bodyfile, 0, 100);
 			}
-		}else{
-			tt = body.substr(1,20);
+		} else {
+			tt = body.substr(1, 20);
 		}
 		tt.ucaser();
 		if ((not(attachfilename) and tt.index("<!DOCTYPE")) or tt.index("<HTML")) {
@@ -386,7 +386,7 @@ forcedemail:
 			cmd ^= VM ^ "-a \"Reply-To: " ^ replyto ^ DQ;
 
 		//otherwise request suppression of replies, particularly automatic ones
-		}else{
+		} else {
 			cmd ^= VM ^ "-a \"X-Auto-Response-Suppress: RN, NRN, OOF\"";
 			//maybe Precedence: list would have better results
 			cmd ^= VM ^ "-a \"Precedence: bulk\"";
@@ -400,11 +400,11 @@ forcedemail:
 
 			//body may already be in a file
 			if (body[1] eq "@") {
-				bodyfilename = body.substr(2,99999);
+				bodyfilename = body.substr(2, 99999);
 
 			//otherwise generate a random filename and write it
-			}else{
-				bodyfilename = var(999999999).rnd().substr(1,7) ^ ".tmp";
+			} else {
+				bodyfilename = var(999999999).rnd().substr(1, 7) ^ ".tmp";
 				var(body).oswrite(bodyfilename);
 				bodyfilename.osclose();
 			}
@@ -440,7 +440,7 @@ forcedemail:
 
 				//case opt='-A'
 				}
-			};//ii;
+			} //ii;
 
 			headers.splicer(1, 1, "");
 			headers.converter("'", "");
@@ -479,7 +479,7 @@ forcedemail:
 		errorfilename.osclose();
 		if (errorfile.osopen(errorfilename)) {
 			printl(errorfilename, " ok");
-		}else{
+		} else {
 			printl(errorfilename, " ko");
 		}
 		if (not(errormsg.osread(errorfilename))) {
@@ -488,11 +488,11 @@ forcedemail:
 			//errormsg<-1>=params 'T#60'
 			errormsg.r(-1, params);
 		}
-	}else{
+	} else {
 		if (errormsg eq "") {
 			if (errors) {
 				errormsg = errors;
-			}else{
+			} else {
 				errormsg = "OK";
 			}
 		}
@@ -507,7 +507,7 @@ forcedemail:
 	//in what situation can it return OK+message ??
 	if (errormsg.a(1) eq "OK") {
 		errormsg.remover(1);
-	}else{
+	} else {
 		errormsg = trim(errormsg, FM, "B");
 		errormsg.r(-1, FM ^ "Size:     " ^ oconv(msgsize, "[XBYTES]"));
 		errormsg.r(-1, "From:     " ^ params1.a(1));
@@ -535,7 +535,7 @@ forcedemail:
 subroutine addlinks2osfilename() {
 	tt = osfilename;
 	tt.converter("\\", "/");
-	if (tt.substr(1,3) eq "../") {
+	if (tt.substr(1, 3) eq "../") {
 		tt.splicer(1, 3, "");
 	}
 	if (body) {
@@ -552,7 +552,7 @@ subroutine addlinks2osfilename() {
 			body.r(-1, linkdesc);
 		}
 		body.r(-1, SYSTEM.a(114, linkn) ^ tt);
-	};//linkn;
+	} //linkn;
 	return;
 }
 

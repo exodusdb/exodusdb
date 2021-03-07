@@ -9,7 +9,7 @@ function main(in type, in input0, in mode, out output) {
 
 	if (mode) {
 		var sigfigs = mode;
-	}else{
+	} else {
 		var sigfigs = 3;
 	}
 
@@ -17,15 +17,15 @@ function main(in type, in input0, in mode, out output) {
 		output = input0;
 		if (output lt 1024) {
 			output ^= " bytes";
-		}else{
+		} else {
 			output = output / 1024;
 			if (output lt 1024) {
 				output2 = "KiB";
-			}else{
+			} else {
 				output = output / 1024;
 				if (output lt 1024) {
 					output2 = "MiB";
-				}else{
+				} else {
 					output = output / 1024;
 					output2 = "GiB";
 				}

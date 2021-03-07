@@ -20,16 +20,16 @@ function main(in databasecode0="", in usercode0="") {
 
 	if (SENTENCE.field(" ", 1) eq "OTHERUSERS") {
 		databasecode = SENTENCE.field(" ", 2);
-	}else{
+	} else {
 		if (databasecode0.unassigned()) {
 			databasecode = "";
-		}else{
+		} else {
 			databasecode = databasecode0;
 		}
 	}
 	if (usercode0.unassigned()) {
 		usercode = "";
-	}else{
+	} else {
 		usercode = usercode0;
 	}
 
@@ -54,8 +54,8 @@ function main(in databasecode0="", in usercode0="") {
 
 	if (curruserlockid.isnum()) {
 		lockprefix = "";
-	}else{
-		lockprefix = "U" ^ var("99999").substr(-4,4);
+	} else {
+		lockprefix = "U" ^ var("99999").substr(-4, 4);
 	}
 
 	//FOR lockno = 1 TO RUNTIME();*SYSE3_NUSERS
@@ -132,7 +132,7 @@ function main(in databasecode0="", in usercode0="") {
 		returndata += 1;
 
 nextlock:;
-	};//lockno;
+	} //lockno;
 
 	returndata -= 1;
 	if (returndata lt 0) {
@@ -148,12 +148,12 @@ nextlock:;
 		usercode = returndata.a(2, ii);
 		///BREAK;
 		if (not usercode) break;
-		usercode = usercode.substr(6,9999);
+		usercode = usercode.substr(6, 9999);
 		if (not(curruserlockid.isnum())) {
 			usercode -= (usercode / 10).floor();
 		}
 		returndata.r(2, ii, "PROCESS" ^ usercode);
-	};//ii;
+	} //ii;
 
 	if (SENTENCE.field(" ", 1) eq "OTHERUSERS") {
 		call note(returndata.a(1) ^ " other users");

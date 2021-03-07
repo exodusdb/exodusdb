@@ -12,7 +12,7 @@ function main() {
 	if (not ANS) {
 		if (ID.field("*", 3) eq "EXODUS") {
 			ANS = "EXODUS";
-		}else{
+		} else {
 			ANS = ID.field("*", 1);
 		}
 	}

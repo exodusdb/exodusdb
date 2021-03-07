@@ -27,12 +27,12 @@ function main(in mode0, in dataset0) {
 	interactive = not(SYSTEM.a(33));
 	if (mode0.unassigned()) {
 		mode = "";
-	}else{
+	} else {
 		mode = mode0;
 	}
 	if (dataset0.unassigned()) {
 		dataset = "";
-	}else{
+	} else {
 		dataset = dataset0;
 	}
 	if (mode eq "") {
@@ -77,7 +77,7 @@ checkotherusers:
 		//t=if dataset then ' of dataset ':dataset else ''
 		if (dataset) {
 			tt = " of dataset " ^ dataset;
-		}else{
+		} else {
 			tt = "";
 		}
 
@@ -89,12 +89,12 @@ checkotherusers:
 		//if decide('!There ':(if n=1 then 'is ' else 'are '):n:' other workstation':(if n>1 then 's' else ''):'|using EXODUS ':dataset:' at the moment.||All other users':t:' must exit EXODUS|before you can continue.||':otherusersx:'|',options,reply) else reply=0
 		if (nn eq 1) {
 			t2 = "is ";
-		}else{
+		} else {
 			t2 = "are ";
 		}
 		if (nn gt 1) {
 			t3 = "s";
-		}else{
+		} else {
 			t3 = "";
 		}
 		if (not(decide("!There " ^ t2 ^ nn ^ " other workstation" ^ t3 ^ "|using EXODUS " ^ dataset ^ " at the moment.||All other users" ^ tt ^ " must exit EXODUS|before you can continue.||" ^ otherusersx ^ "|", options, reply))) {
@@ -151,7 +151,7 @@ invalidx:
 		//release exclusive lock
 		xx = unlockrecord("", voc, "BACKUP*");
 
-	}else{
+	} else {
 
 		if (not(lockrecord("", voc, "BACKUP*"))) {
 			goto invalidx;

@@ -63,12 +63,12 @@ function main(in docids0="", in options0="") {
 
 	if (docids0.unassigned()) {
 		docids = "";
-	}else{
+	} else {
 		docids = docids0;
 	}
 	if (options0.unassigned()) {
 		options = "";
-	}else{
+	} else {
 		options = options0;
 	}
 
@@ -131,7 +131,7 @@ function main(in docids0="", in options0="") {
 	if (docids) {
 		docids.swapper(",", FM);
 		docn = 0;
-	}else{
+	} else {
 		select(gen.documents);
 	}
 	var locked = 0;
@@ -159,7 +159,7 @@ nextdoc:
 			gosub exit(lockfilename, lockfile, lockkey);
 			return 0;
 		}
-	}else{
+	} else {
 		if (not(readnext(docid))) {
 			gosub exit(lockfilename, lockfile, lockkey);
 			return 0;
@@ -244,7 +244,7 @@ currdatetime:
 		//hour of day restrictions
 		var hours = restrictions.a(2);
 		if (hours ne "") {
-			var hournow = itime.oconv("MT").substr(1,2) + 0;
+			var hournow = itime.oconv("MT").substr(1, 2) + 0;
 
 			//if one hour then treat it as a minimum hour
 			if (hours.isnum()) {
@@ -253,14 +253,14 @@ currdatetime:
 						printl("not yet hour");
 					}
 					goto nextdoc;
-				}else{
+				} else {
 					//ensure not done already today in a previous hour
 					goto preventsameday;
 				}
 
 			//or specific multiple hours
-			}else{
-				if (not(hours.locate(hournow,xx))) {
+			} else {
+				if (not(hours.locate(hournow, xx))) {
 					if (logging) {
 						printl("wrong hour");
 					}
@@ -269,7 +269,7 @@ currdatetime:
 			}
 
 		//if no hourly restrictions then skip if already run today
-		}else{
+		} else {
 preventsameday:
 			if (currdatetime.floor() eq lastdatetime.floor()) {
 				if (logging) {
@@ -283,7 +283,7 @@ preventsameday:
 
 		//day of month restrictions
 		if (restrictions.a(3)) {
-			if (not(restrictions.a(3).locate(date.field("/", 1) + 0,xx))) {
+			if (not(restrictions.a(3).locate(date.field("/", 1) + 0, xx))) {
 				if (logging) {
 					printl("wrong day of month");
 				}
@@ -293,7 +293,7 @@ preventsameday:
 
 		//month of year restrictions
 		if (restrictions.a(4)) {
-			if (not(restrictions.a(4).locate(date.field("/", 2) + 0,xx))) {
+			if (not(restrictions.a(4).locate(date.field("/", 2) + 0, xx))) {
 				if (logging) {
 					printl("wrong month");
 				}
@@ -303,7 +303,7 @@ preventsameday:
 
 		//day of week restrictions
 		if (restrictions.a(5)) {
-			if (not(restrictions.a(5).locate((idate - 1) % 7 + 1,xx))) {
+			if (not(restrictions.a(5).locate((idate - 1) % 7 + 1, xx))) {
 				if (logging) {
 					printl("wrong day of week");
 				}
@@ -313,7 +313,7 @@ preventsameday:
 
 		//date restrictions
 		if (restrictions.a(6)) {
-			if (not(restrictions.a(6).locate(idate,xx))) {
+			if (not(restrictions.a(6).locate(idate, xx))) {
 				if (logging) {
 					printl("wrong date");
 				}
@@ -348,7 +348,7 @@ preventsameday:
 	if (gen.document.a(27) ne "" and not(gen.document.a(27))) {
 		gen.documents.deleterecord(docid);
 
-	}else{
+	} else {
 		gen.document.write(gen.documents, docid);
 	}
 
@@ -391,7 +391,7 @@ preventsameday:
 	var usercodes = gen.document.a(14);
 	if (usercodes eq "") {
 		toaddress = userx.a(7);
-	}else{
+	} else {
 		toaddress = "";
 		var nusers = usercodes.count(VM) + 1;
 		var backwards = 1;
@@ -420,7 +420,7 @@ preventsameday:
 					goto adduseraddress;
 
 				//optionally skip people on holiday (even EXODUS unless running as EXODUS)
-				}else{
+				} else {
 
 					marketcode = userx.a(25);
 					if (not marketcode) {
@@ -441,7 +441,7 @@ preventsameday:
 adduseraddress:
 						if (backwards) {
 							toaddress.inserter(1, useraddress);
-						}else{
+						} else {
 							toaddress.r(-1, useraddress);
 						}
 					}
@@ -449,7 +449,7 @@ adduseraddress:
 
 			}
 nextuser:;
-		};//usern;
+		} //usern;
 
 		//skip if nobody to email to
 		if (not toaddress) {
@@ -493,7 +493,7 @@ nextuser:;
 			gen.document.write(gen.documents, docid);
 		}
 
-	}else{
+	} else {
 		authtasks = "";
 	}
 
@@ -507,7 +507,7 @@ nextuser:;
 				printl(USER4);
 				goto nextdoc;
 			}
-		};//taskn;
+		} //taskn;
 	}
 
 	//docinit:
@@ -538,7 +538,7 @@ nextuser:;
 	//override the saved period with a current period
 
 	//get today's period
-	var runtimeperiod = var().date().oconv("D2/E").substr(4,5);
+	var runtimeperiod = var().date().oconv("D2/E").substr(4, 5);
 	if (runtimeperiod[1] eq "0") {
 		runtimeperiod.splicer(1, 1, "");
 	}
@@ -570,7 +570,7 @@ nextuser:;
 	var closedperiod = gen.company.a(37);
 	if (closedperiod) {
 		opendate = iconv(closedperiod, gen.company.a(6)) + 1;
-	}else{
+	} else {
 		opendate = 11689;
 	}
 	USER1.swapper("{OPERATIONS_OPEN_DATE}", opendate);
@@ -581,8 +581,8 @@ nextuser:;
 nextsign:
 	tt = USER1.index("{TODAY" ^ sign);
 	if (tt) {
-		var t2 = (USER1.substr(tt + 1,999999)).field("}", 1);
-		USER1.swapper("{" ^ t2 ^ "}", var().date() + t2.substr(6,999999));
+		var t2 = (USER1.substr(tt + 1, 999999)).field("}", 1);
+		USER1.swapper("{" ^ t2 ^ "}", var().date() + t2.substr(6, 999999));
 	}
 	if (sign eq "-") {
 		sign = "+";
@@ -609,7 +609,7 @@ nextsign:
 		subject ^= ": %RESULT%" ^ gen.document.a(2);
 
 		//email it
-		if (USER3.substr(1,2) ne "OK" or printfilename.osfile().a(1) lt 10) {
+		if (USER3.substr(1, 2) ne "OK" or printfilename.osfile().a(1) lt 10) {
 
 			//plain "OK" with no file means nothing to email
 			if (USER3 eq "OK") {
@@ -618,7 +618,7 @@ nextsign:
 
 			body = "";
 			body.r(-1, USER3);
-			if (USER3.substr(1,6) eq "Error:") {
+			if (USER3.substr(1, 6) eq "Error:") {
 				USER3.splicer(1, 6, "Result:");
 			}
 			if (USER3.index("Error")) {
@@ -634,16 +634,16 @@ nextsign:
 			//treat all errors as system errors for now
 			//since autorun doesnt really know a user to send them to
 			//NB programs should return OK+message if no report is required (eg "OK no ads found")
-			if (USER3.substr(1,2) eq "OK") {
-				USER3 = USER3.substr(3,999999).trimf();
-			}else{
+			if (USER3.substr(1, 2) eq "OK") {
+				USER3 = USER3.substr(3, 999999).trimf();
+			} else {
 				call sysmsg(subject ^ FM ^ body);
 				goto nextdoc;
 			}
 
 			attachfilename = "";
 
-		}else{
+		} else {
 
 			var timetext = elapsedtimetext(fromdate, fromtime);
 
@@ -654,7 +654,7 @@ nextsign:
 				//insert body from file
 				body = "@" ^ printfilename;
 				subject ^= " in " ^ timetext;
-			}else{
+			} else {
 				attachfilename = oscwd();
 				if (not(VOLUMES)) {
 					attachfilename ^= OSSLASH;
@@ -693,7 +693,7 @@ subroutine exec() {
 	//generate a unique random output file
 	while (true) {
 		//linkfilename2=inpath:str(rnd(10^15),8)[1,8]
-		linkfilename2 = inpath ^ ("00000000" ^ var(99999999).rnd()).substr(-8,8);
+		linkfilename2 = inpath ^ ("00000000" ^ var(99999999).rnd()).substr(-8, 8);
 		///BREAK;
 		if (not(oslistf(linkfilename2 ^ ".*"))) break;
 	}//loop;
@@ -740,7 +740,7 @@ subroutine exec2() {
 	printfilename = linkfilename2;
 	tt = oscwd();
 	tt.splicer(-7, 7, "");
-	if (printfilename.substr(1,tt.length()) eq tt) {
+	if (printfilename.substr(1, tt.length()) eq tt) {
 		printfilename.splicer(1, tt.length(), "../");
 	}
 	printfilename.converter("/", OSSLASH);
@@ -763,7 +763,7 @@ subroutine exec2() {
 
 	//pass the output file in linkfilename2
 	//not good method, pass in system?
-	if (var("LIST,SELECTJOURNALS").locateusing(",",USER0.a(1),xx)) {
+	if (var("LIST,SELECTJOURNALS").locateusing(",", USER0.a(1), xx)) {
 		USER1 = linkfilename2;
 	}
 
@@ -791,7 +791,7 @@ subroutine exec2() {
 	}
 
 	//no records are not system errors
-	if (USER3.substr(1,9) eq "No record" or USER3.substr(1,7) eq "No item") {
+	if (USER3.substr(1, 9) eq "No record" or USER3.substr(1, 7) eq "No item") {
 		USER3.splicer(1, 0, "OK ");
 		USER4 = "";
 	}
@@ -803,7 +803,7 @@ subroutine exec2() {
 	}
 
 	//send errors to exodus
-	if (USER3 eq "" or USER3.substr(1,2) ne "OK") {
+	if (USER3 eq "" or USER3.substr(1, 2) ne "OK") {
 		if (not USER3) {
 			USER3 = "No response from " ^ voccmd;
 		}
@@ -868,7 +868,7 @@ subroutine fmtresp() {
 	//trim everything after <ESC> (why?)
 	tt = USER3.index("<ESC>");
 	if (tt) {
-		USER3 = USER3.substr(1,tt - 1);
+		USER3 = USER3.substr(1, tt - 1);
 	}
 
 	//cannot remove since these may be proper codepage letters

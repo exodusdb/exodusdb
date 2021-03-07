@@ -26,11 +26,11 @@ function main(in type, in in0, in mode0, out output, in glang) {
 			mode.splicer(2, 1, "4");
 		}
 
-	}else{
+	} else {
 
 		if (DATEFMT) {
 			mode = DATEFMT;
-		}else{
+		} else {
 			mode = "D2/E";
 		}
 
@@ -61,7 +61,7 @@ ok:
 				// output=mth:' ':day:' ':year
 				// end
 
-			}else{
+			} else {
 
 				output = oconv(inx, mode);
 
@@ -73,7 +73,7 @@ ok:
 					output.splicer(4, 1, " ");
 				}
 
-				if (output.substr(4,3).match("^[A-Za-z]{3}$")) {
+				if (output.substr(4, 3).match("^[A-Za-z]{3}$")) {
 					output.splicer(7, 1, "");
 					output.splicer(3, 1, "");
 				}
@@ -84,14 +84,14 @@ ok:
 
 			}
 
-		}else{
+		} else {
 			output = inx;
 		}
 
 	} else if (type eq "ICONV") {
 
 		if (inx.match("^\\d*$") and inx le 31) {
-			inx ^= var().date().oconv("D").substr(4,9);
+			inx ^= var().date().oconv("D").substr(4, 9);
 		}
 
 		output = iconv(inx, mode);

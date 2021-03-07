@@ -576,9 +576,11 @@ void ExodusProgramBase::mssg(const var& msg, const var& options, var& buffer, co
 	if (!options.index("U")) {
 		if (USER4.length() > 8000) {
 			var msg2 = "Aborted MSG()>8000";
-			std::cout << msg2 << std::endl;
-			//std::cout << USER4 << std::endl;
-			USER4 ^= FM ^ msg2;
+			if (not USER4.index(msg2)) {
+				std::cout << msg2 << std::endl;
+				//std::cout << USER4 << std::endl;
+				USER4 ^= FM ^ msg2;
+			}
 		} else {
 			USER4.r(-1, msg1);
 		}

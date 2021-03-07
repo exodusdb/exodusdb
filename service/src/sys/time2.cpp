@@ -18,7 +18,7 @@ function main(in type, in input0, in mode0, out output) {
 	}
 	if (mode0) {
 		mode = mode0;
-	}else{
+	} else {
 		mode = "MT";
 	}
 
@@ -34,7 +34,7 @@ function main(in type, in input0, in mode0, out output) {
 			if (input0 ge 86400) {
 				output = output.fieldstore(":", 1, 1, (output.field(":", 1) + 24).oconv("R(0)#2"));
 			}
-		}else{
+		} else {
 			//modex=mode
 			//swap '48' with '' in modex
 			//if modex='' then modex='MT'
@@ -59,7 +59,7 @@ function main(in type, in input0, in mode0, out output) {
 			for (var ii = 1; ii <= nn; ++ii) {
 				call time2(type, input0.a(1, ii), mode, outputx);
 				output.r(1, ii, outputx);
-			};//ii;
+			} //ii;
 			return 0;
 		}
 
@@ -72,7 +72,7 @@ function main(in type, in input0, in mode0, out output) {
 			//output=mod(iconv(input2,'MT')-@sw<1>,86400)
 			output = input2.iconv("MT") % 86400;
 			output += 86400;
-		}else{
+		} else {
 			//modex=mode
 			//swap '48' with '' in modex
 			//if modex else modex='MT'

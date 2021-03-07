@@ -21,22 +21,22 @@ function main(in programname0, in text0) {
 
 	if (programname0.unassigned()) {
 		programname = "";
-	}else{
+	} else {
 		programname = programname0;
 	}
 	if (text0.unassigned()) {
 		text = "";
-	}else{
+	} else {
 		text = text0;
 	}
 
 	//update the log
 	///////////////
 
-	var year = var().date().oconv("D").substr(-4,4);
+	var year = var().date().oconv("D").substr(-4, 4);
 	if (s33) {
 		xstation = SYSTEM.a(40, 2);
-		}else{
+		} else {
 		xstation = STATION.trim();
 	}
 	time = ostime();

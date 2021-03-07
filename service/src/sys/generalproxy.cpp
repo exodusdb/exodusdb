@@ -81,7 +81,7 @@ function main() {
 	} else if (mode eq "FILEMAN" and USER0.a(2) eq "COPYDB") {
 
 		var copydb = USER0.a(3);
-		if (not(SYSTEM.a(58).locate(copydb,dbn))) {
+		if (not(SYSTEM.a(58).locate(copydb, dbn))) {
 			{}
 		}
 		var todb = SYSTEM.a(63, dbn);
@@ -151,7 +151,7 @@ function main() {
 		if (emailresult) {
 			emailresult.converter(VM ^ FM, "\r\r");
 			USER3 = "OK Email Sent to" "\r" ^ emailresult;
-		}else{
+		} else {
 			call mssg("No users can be found to email,|or some problem with email server");
 		}
 		USER1 = "";
@@ -197,7 +197,7 @@ function main() {
 
 			}
 
-		}else{
+		} else {
 			usersordefinitions = DEFINITIONS;
 			userkey = "BADUSER*" ^ ID;
 			if (not(userrec.read(usersordefinitions, userkey))) {
@@ -262,7 +262,7 @@ function main() {
 		//somewhere on the way to the browser (not in revelation)
 		for (var ii = 1; ii <= 255; ++ii) {
 			USER1 ^= var().chr(ii);
-		};//ii;
+		} //ii;
 		//data='xxx'
 		USER3 = "OK";
 
@@ -337,7 +337,7 @@ badsetcodepage:
 		USER1 = ANS;
 		if (USER1) {
 			USER3 = "OK";
-		}else{
+		} else {
 			USER3 = "Error: No datasets found";
 		}
 
@@ -486,7 +486,7 @@ nextrep:
 				var nn = report.count(FM) + 1;
 				for (var ii = 1; ii <= nn; ++ii) {
 					USER1.r(ii, repn, report.a(ii));
-				};//ii;
+				} //ii;
 
 				USER1.r(9, repn, reportid);
 
@@ -523,7 +523,7 @@ nextrep:
 					}
 				}
 			}
-		};//docn;
+		} //docn;
 
 	} else if (mode eq "UPDATEREPORT") {
 
@@ -613,7 +613,7 @@ nextrep:
 			if (tt) {
 				PSEUDO.r(fn, tt);
 			}
-		};//fn;
+		} //fn;
 		USER1 = "";
 
 		//save runtime params in case saving below for scheduled reruns
@@ -624,7 +624,7 @@ nextrep:
 		USER1 = PSEUDO;
 
 		//in case we are calling another proxy
-		if (gen.document.a(5, 1).substr(-5,5) eq "PROXY") {
+		if (gen.document.a(5, 1).substr(-5, 5) eq "PROXY") {
 
 			//run but suppress email
 			//perform 'TEST ':request<2>:' (S)'
@@ -633,14 +633,14 @@ nextrep:
 			//moved up so parameters show in any emailed error messages
 			//data=@pseudo
 			//override the saved period with a current period
-			var runtimeperiod = var().date().oconv("D2/E").substr(4,5);
+			var runtimeperiod = var().date().oconv("D2/E").substr(4, 5);
 			if (runtimeperiod[1] eq "0") {
 				runtimeperiod.splicer(1, 1, "");
 			}
 			USER1.swapper("{RUNTIME_PERIOD}", runtimeperiod);
 			goto performreport;
 
-		}else{
+		} else {
 
 performreport:
 			USER3 = "";
@@ -672,7 +672,7 @@ performreport:
 		if (logfromdate) {
 			if (loguptodate) {
 				cmd ^= "  xAND WITH LOG_DATE BETWEEN " ^ (logfromdate.oconv("D4").quote()) ^ " AND " ^ (loguptodate.oconv("D4").quote());
-			}else{
+			} else {
 				cmd ^= "  xAND WITH " ^ datedict ^ " >= " ^ (logfromdate.oconv("D4").quote());
 			}
 		}
@@ -835,8 +835,8 @@ subroutine initlog() {
 		if (not tt2) {
 			tt2 = tt;
 		}
-		logyear = tt.oconv("D").substr(-4,4);
-		var logtoyear = tt2.oconv("D").substr(-4,4);
+		logyear = tt.oconv("D").substr(-4, 4);
+		var logtoyear = tt2.oconv("D").substr(-4, 4);
 		if (logyear ne logtoyear) {
 			USER3 = "Dates must be within one calendar year";
 			stop();

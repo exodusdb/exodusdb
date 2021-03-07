@@ -80,21 +80,21 @@ capitalise:
 
 			if (inquotes) {
 				inquotes = tt ne inquotes;
-			}else{
+			} else {
 				if ((tt eq DQ and string2.count(DQ) gt 1) or ((tt eq "'" and string2.count("'") gt 1))) {
 					inquotes = tt;
-				}else{
+				} else {
 					if (wordseps.index(tt)) {
 						cap = 1;
 						if (tt eq " ") {
 							numx = var("1234567890").index(string2[ii + 1]);
 						}
-					}else{
+					} else {
 						if (cap or numx) {
 							tt.ucaser();
 							string2.splicer(ii, 1, tt);
 							cap = 0;
-						}else{
+						} else {
 							tt.lcaser();
 							string2.splicer(ii, 1, tt);
 						}
@@ -102,14 +102,14 @@ capitalise:
 				}
 			}
 
-		};//ii;
+		} //ii;
 
 		string2.swapper("'S ", "'s ");
-		if (string2.substr(-2,2) eq "'S") {
+		if (string2.substr(-2, 2) eq "'S") {
 			string2.splicer(-2, 2, "'s");
 		}
 
-	} else if (mode.substr(1,5) eq "PARSE") {
+	} else if (mode.substr(1, 5) eq "PARSE") {
 
 		toupper = mode.index("UPPERCASE");
 
@@ -123,15 +123,15 @@ capitalise:
 			if (not(tt ne "")) break;
 			if (tt eq quoted) {
 				quoted = "";
-			}else{
+			} else {
 				if (not quoted) {
 					if ((DQ ^ "'").index(tt)) {
 						quoted = tt;
-					}else{
+					} else {
 						if (tt eq " ") {
 							tt = FM;
 							string2.splicer(ii, 1, tt);
-						}else{
+						} else {
 							if (toupper) {
 								tt.ucaser();
 								string2.splicer(ii, 1, tt);
@@ -140,7 +140,7 @@ capitalise:
 					}
 				}
 			}
-		};//ii;
+		} //ii;
 
 		if (mode.index("TRIM")) {
 			string2.converter(" " _FM_, _FM_ " ");

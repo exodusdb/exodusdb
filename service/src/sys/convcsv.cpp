@@ -55,18 +55,18 @@ function main(in sentence0, in select0="", in filters0="") {
 
 	if (sentence0.unassigned()) {
 		sentencex = "";
-	}else{
+	} else {
 		sentencex = sentence0;
 	}
 	if (select0.unassigned()) {
 		selectx = "";
-	}else{
+	} else {
 		selectx = select0;
 		}
 
 	if (nfilters0.unassigned()) {
 		nfilters = 0;
-	}else{
+	} else {
 		filterfields = filters0.a(1);
 		filtervalues = filters0.a(3);
 		nfilters = filterfields.count(FM) + (filterfields ne 0);
@@ -76,7 +76,7 @@ function main(in sentence0, in select0="", in filters0="") {
 		for (var filtern = 1; filtern <= nfilters; ++filtern) {
 			filters(1, filtern) = filterfields.a(1, filtern).convert(SVM, VM);
 			filters(3, filtern) = filtervalues.a(1, filtern).convert(SVM, VM);
-		};//filtern;
+		} //filtern;
 	}
 
 	//convert command line to subroutine call
@@ -85,10 +85,10 @@ function main(in sentence0, in select0="", in filters0="") {
 		SENTENCE.transfer(sentencex);
 
 		//locate and remove SELECT statement from end of command
-		if (sentencex.locateusing(" ","SELECT",temp)) {
+		if (sentencex.locateusing(" ", "SELECT", temp)) {
 			selectx = sentencex.field(" ", temp + 1, 9999);
 			sentencex = sentencex.field(" ", 1, temp - 1);
-		}else{
+		} else {
 			selectx = "";
 		}
 
@@ -127,9 +127,9 @@ function main(in sentence0, in select0="", in filters0="") {
 		sentencex.swapper(" NOCOLHEADER", "");
 	}
 
-	if (filename.substr(1,4) eq "DICT") {
+	if (filename.substr(1, 4) eq "DICT") {
 		tt = "VOC";
-	}else{
+	} else {
 		tt = filename;
 	}
 	if (not(DICT.open("dict_" ^ tt))) {
@@ -156,7 +156,7 @@ function main(in sentence0, in select0="", in filters0="") {
 	var xx;
 	if (xx.read(DICT, "AUTHORISED")) {
 		dicthasauthorised = 1;
-	}else{
+	} else {
 		dicthasauthorised = 0;
 	}
 
@@ -181,7 +181,7 @@ function main(in sentence0, in select0="", in filters0="") {
 					notexportable.r(ii, temp);
 				}
 			}
-		};//ii;
+		} //ii;
 	}
 
 	var listkey = var(1000000).rnd();
@@ -193,14 +193,14 @@ function main(in sentence0, in select0="", in filters0="") {
 				exportable = exportable.a(3);
 				exportable.converter(VM ^ " ", FM ^ FM);
 			}
-			keyx = exportable.substr(1,exportable.index(FM ^ FM) - 1);
+			keyx = exportable.substr(1, exportable.index(FM ^ FM) - 1);
 			nkeys = keyx.count(FM) + 1;
 			if (nkeys gt 2) {
 				//call msg('Key field(s) should be followed by a blank line or space in EXPORTABLE')
 				//stop
 				nkeys = 0;
 			}
-		}else{
+		} else {
 			exportable = "";
 			keyx = "";
 		}
@@ -213,7 +213,7 @@ function main(in sentence0, in select0="", in filters0="") {
 
 	if (mvgroupno) {
 		tt = keyx ^ FM ^ "LINE_NO" ^ FM;
-	}else{
+	} else {
 		tt = "";
 	}
 
@@ -222,11 +222,11 @@ function main(in sentence0, in select0="", in filters0="") {
 
 	var outfilename = SYSTEM.a(2);
 	//zzz if mvgroupno then outfilename[8,1]=mvgroupno
-	if ((outfilename.substr(-4,4)).lcase() eq ".htm") {
+	if ((outfilename.substr(-4, 4)).lcase() eq ".htm") {
 		outfilename.splicer(-3, 3, "xls");
 		SYSTEM.r(2, outfilename);
 	}
-	var excel = (outfilename.substr(-3,3)).lcase() eq "xls";
+	var excel = (outfilename.substr(-3, 3)).lcase() eq "xls";
 
 	outfilename.osdelete();
 	if (outfilename.osfile()) {
@@ -237,12 +237,12 @@ function main(in sentence0, in select0="", in filters0="") {
 	}
 
 	xfilenames.redim(255);
-	xfilenames="";
+	xfilenames = "";//dim
 	oconvxs.redim(255);
 	fmtxs.redim(255);
 	dictrecs.redim(255);
-	oconvxs="";
-	fmtxs="";
+	oconvxs = "";//dim
+	fmtxs = "";//dim
 	xfiles.redim(255);
 	var nfields = 0;
 
@@ -252,15 +252,15 @@ function main(in sentence0, in select0="", in filters0="") {
 	}
 
 	if (exportable) {
-		makelist("",exportable);
+		makelist("", exportable);
 		//write exportable on lists,listkey
 		//perform 'GET-LIST ':listkey:' (S)'
 		//delete lists,listkey
 
-	}else{
-		if (filename.substr(1,4) eq "DICT") {
+	} else {
+		if (filename.substr(1, 4) eq "DICT") {
 			dict = "";
-		}else{
+		} else {
 			dict = "DICT ";
 		}
 		perform("SELECT " ^ dict ^ filename ^ " BY FMC WITH FMC BETWEEN 1 AND 9999 AND WITH @ID NOT STARTING '%' AND WITH MASTER.FLAG (S)");
@@ -273,15 +273,15 @@ function main(in sentence0, in select0="", in filters0="") {
 	dictids.redim(255);
 	colgroups.redim(255);
 
-	dictids="";
-	colgroups="";
+	dictids = "";//dim
+	colgroups = "";//dim
 	var headingx = "";
 	var coln = 0;
 
 nextdict:
 	if (readnext(dictid, MV)) {
 
-		if (notexportable.locateusing(FM,dictid,xx)) {
+		if (notexportable.locateusing(FM, dictid, xx)) {
 			goto nextdict;
 		}
 
@@ -295,7 +295,7 @@ nextdict:
 			headingx.r(coln, "Line No.");
 			fmtxs(coln) = "R";
 			dictrecs(coln) = "";
-		}else{
+		} else {
 			if (dict.read(DICT, dictid)) {
 				//TODO implement JBASE/PICK dict types I/A/D
 				//call dicti2a(dict)
@@ -310,7 +310,7 @@ nextdict:
 
 				if (raw) {
 					headingx.r(coln, dictid);
-				}else{
+				} else {
 
 					//extract title
 					var title = dict.a(3).trim();
@@ -332,7 +332,7 @@ nextdict:
 
 				//extract file
 				if (dict.a(11)[1] eq "<") {
-					temp = dict.a(11).substr(2,9999).field(">", 1);
+					temp = dict.a(11).substr(2, 9999).field(">", 1);
 					xfilenames(coln) = temp;
 					if (not(xfiles(coln).open(temp, ""))) {
 						call mssg(temp.quote() ^ " file cannot be found in dict " ^ (dictid.quote()));
@@ -340,7 +340,7 @@ nextdict:
 						return 0;
 					}
 					var title = headingx.a(coln);
-					if (title.ucase().substr(-5,5) eq " CODE") {
+					if (title.ucase().substr(-5, 5) eq " CODE") {
 						title.splicer(-5, 5, "");
 						headingx.r(coln, title);
 					}
@@ -357,14 +357,14 @@ nextdict:
 						//end else
 						if (oconvx eq "[SCH.DATES]") {
 							oconvx = "";
-						}else{
+						} else {
 							oconvx = DATEFMT;
 							oconvx.converter("2", "4");
 						}
 						//end
 
 					//no commas to be added to numbers
-					} else if (oconvx.substr(1,7) eq "[NUMBER") {
+					} else if (oconvx.substr(1, 7) eq "[NUMBER") {
 						oconvx = "";
 					}
 
@@ -412,7 +412,7 @@ nextdict:
 			call mssg("No records found");
 			return 0;
 		}
-	}else{
+	} else {
 		if (not LISTACTIVE) {
 			select(file);
 		}
@@ -469,7 +469,7 @@ nextrec:
 		if (filters(3, filtern).length()) {
 
 			//if reqvalue then skip if not matching
-			if (not(filters(3, filtern).locate(value,xx))) {
+			if (not(filters(3, filtern).locate(value, xx))) {
 				goto nextrec;
 			}
 
@@ -478,7 +478,7 @@ nextrec:
 			goto nextrec;
 		}
 
-	};//filtern;
+	} //filtern;
 
 	/*;
 		if normalise then;
@@ -497,34 +497,34 @@ nextrec:
 		temp = "";
 		if (dictid ne "LINE_NO" and dictrecs(coln).a(4) ne "S") {
 			temp = calculate(dictid).count(VM) + 1;
+			if (temp gt maxvn) {
+				maxvn = temp;
+			}
 		}
-		if (temp gt maxvn) {
-			maxvn = temp;
-		}
-	};//coln;
+	} //coln;
 	//d ebug
 	//get the data
-	rec="";
+	rec = "";//dim
 	var anydata = 0;
 	for (var coln = 1; coln <= ncols; ++coln) {
 		MV = mvx;
 		dictid = dictids(coln);
 		if (dictid eq "LINE_NO") {
-		}else{
+		} else {
 			var cell = calculate(dictid);
 			if (cell ne "") {
 				rec(coln) = cell;
 				anydata = 1;
 			}
 		}
-	};//coln;
+	} //coln;
 
 	//normalise the data and output to csv file
 	//if rec<>'' then
 	if (anydata) {
 
 		//mat mvrec=mat rec
-		mvrec=rec;
+		mvrec = rec;//dim
 
 		var vn = 0;
 nextvn:
@@ -542,7 +542,7 @@ nextvn:
 			//choose the right mv
 			if (dictids(coln) eq "LINE_NO") {
 				rec(coln) = vn;
-			}else{
+			} else {
 				mvx = colgroups(coln);
 				if (mvx) {
 					rec(coln) = mvrec(coln).a(1, vn);
@@ -561,7 +561,7 @@ nextvn:
 						if (rec2.read(xfiles(coln), cell)) {
 							if (xfilenames(coln) eq "BRANDS") {
 								cell = rec2.a(2, 1);
-							}else{
+							} else {
 								cell = rec2.a(1);
 							}
 						}
@@ -575,7 +575,7 @@ nextvn:
 				}
 
 				if (cell[1] eq "+") {
-					if (cell.substr(2,9999).isnum()) {
+					if (cell.substr(2, 9999).isnum()) {
 						cell.splicer(1, 1, "");
 					}
 				}
@@ -586,7 +586,7 @@ nextvn:
 					cell.swapper(DQ, "''");
 				}
 				if (cell.length() gt 255) {
-					cell = cell.substr(1,200) ^ " ...";
+					cell = cell.substr(1, 200) ^ " ...";
 				}
 				if (fmtxs(coln) ne "R" or not(cell.isnum())) {
 
@@ -606,7 +606,7 @@ nextvn:
 								cell = cell.quote();
 							}
 						}
-					}else{
+					} else {
 						cell = cell.quote();
 					}
 
@@ -616,7 +616,7 @@ nextvn:
 
 			}
 
-		};//coln;
+		} //coln;
 
 		var line = rec.join();
 
@@ -654,12 +654,12 @@ nextvn:
 					//converterparams comes back with info to speed convertion of lines
 					converterparams = line;
 					call convertercsv("HEAD", headingx, converterparams, filename);
-				}else{
+				} else {
 					headingx.converter(FM, var().chr(9));
 					headingx ^= "\r\n";
 				}
 
-				call osbwrite(headingx, outfile,  ptr);
+				call osbwrite(headingx, outfile, ptr);
 
 				headingx = "";
 			}
@@ -668,12 +668,12 @@ nextvn:
 
 			if (hasconverter) {
 				call convertercsv("LINE", line, converterparams, filename);
-			}else{
+			} else {
 				line.swapper(FM, var().chr(9));
 				line ^= "\r\n";
 			}
 
-			call osbwrite(line, outfile,  ptr);
+			call osbwrite(line, outfile, ptr);
 
 		}
 

@@ -43,8 +43,8 @@ function main(in type, in input0, in mode, out output) {
 	///////////////////////////////////////////////////
 	if (type eq "OCONV") {
 		temp = input0.oconv("D2-E");
-		year = temp.substr(-2,2);
-		period = temp.substr(4,2);
+		year = temp.substr(-2, 2);
+		period = temp.substr(4, 2);
 
 		//guess the right financial year from the date
 		year += 1;
@@ -57,9 +57,9 @@ tryyear:
 		firstdateofyear2 = firstdateofyear;
 		//go to previous year if date before start of year
 		if (input0 lt firstdateofyear) {
-			year = (addcent4(year) - 1).substr(-2,2);
+			year = (addcent4(year) - 1).substr(-2, 2);
 			goto tryyear;
-		}else{
+		} else {
 			year2 = (year + 1).oconv("R(0)#2");
 			gosub getfirstdateofyear();
 			//go to next year if date after last date of year
@@ -75,7 +75,7 @@ tryyear:
 		if (period gt maxperiod) {
 			period = maxperiod;
 		}
-		output = year ^ ("00" ^ period).substr(-2,2);
+		output = year ^ ("00" ^ period).substr(-2, 2);
 
 		return 0;
 	}
@@ -86,9 +86,9 @@ tryyear:
 	if (input0.index("/")) {
 		period = input0.field("/",1);
 		year = input0.field("/", 2);
-	}else{
-		year = input0.substr(1,2);
-		period = input0.substr(-2,2);
+	} else {
+		year = input0.substr(1, 2);
+		period = input0.substr(-2, 2);
 	}
 
 	//get the first date of the next period then subtract 1 day

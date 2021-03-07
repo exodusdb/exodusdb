@@ -83,7 +83,7 @@ function main(in mode0, out html, in compcode0="") {
 		gosub getheadhtm(html);
 		if (html) {
 			mode = "DEFINITIONS " ^ keyx;
-		}else{
+		} else {
 			mode = "No letterhead defined";
 		}
 
@@ -119,7 +119,7 @@ function main(in mode0, out html, in compcode0="") {
 	tt = "L";
 	if (hascompanies) {
 		call date("OCONV", datetime, tt, tdate, gen.glang);
-	}else{
+	} else {
 		call date("OCONV", datetime, tt, tdate, "");
 	}
 	html.swapper("%DATE%", tdate);
@@ -151,7 +151,7 @@ function main(in mode0, out html, in compcode0="") {
 				html = keyx.quote() ^ " has mismatched &lt;" ^ tag ^ "&gt; tags";
 				tagn = ntags;
 			}
-		};//tagn;
+		} //tagn;
 
 	}
 
@@ -206,7 +206,7 @@ subroutine getcompanyconfig(io html, io mode) {
 				ncols = tt;
 			}
 		}
-	};//fn;
+	} //fn;
 	if (not ncols) {
 		return;
 	}
@@ -237,7 +237,7 @@ subroutine getcompanyconfig(io html, io mode) {
 		tab ^= " style=\"border-collapse:collapse\"";
 		tab ^= ">";
 		tab.r(-1, " <tr>");
-	}else{
+	} else {
 		tab.r(-1, "<div>");
 	}
 
@@ -266,7 +266,7 @@ subroutine getcompanyconfig(io html, io mode) {
 			if (align eq "center") {
 				//there is no FLOAT CENTER
 				divstyle ^= "display:table;margin-left:auto;margin-right:auto;";
-			}else{
+			} else {
 				divstyle ^= "float:" ^ align ^ ";";
 			}
 		}
@@ -276,7 +276,7 @@ subroutine getcompanyconfig(io html, io mode) {
 		if (divstyle) {
 			div = FM ^ "   <div style=" ^ (divstyle.quote()) ^ ">";
 			divx = FM ^ "   </div>";
-		}else{
+		} else {
 			div = "";
 			divx = "";
 		}
@@ -297,7 +297,7 @@ subroutine getcompanyconfig(io html, io mode) {
 				mode ^= ", Col " ^ coln ^ " image from company " ^ imagecompcode;
 
 			//use this company image and type
-			}else{
+			} else {
 				imagecompcode = compcode;
 			}
 
@@ -353,13 +353,13 @@ subroutine getcompanyconfig(io html, io mode) {
 			tab.r(-1, "  </td>");
 		}
 
-	};//coln;
+	} //coln;
 
 	if (usetable) {
 		tab.r(-1, "");
 		tab.r(-1, " </tr>");
 		tab.r(-1, "</table>");
-	}else{
+	} else {
 		tab.r(-1, "</div>");
 	}
 

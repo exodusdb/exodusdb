@@ -1377,7 +1377,7 @@ var var::space() const {
 	THISISNUMERIC()
 
 	var newstr = "";
-	int nspaces = (*this).round().toInt();
+	int nspaces = this->round().toInt();
 	if (nspaces > 0)
 		newstr.var_str.resize(nspaces, ' ');
 
@@ -2338,7 +2338,9 @@ var var::xlate(const var& filename, const var& fieldno, const char* mode) const 
 	THISIS("var var::xlate(const var& filename,const var& fieldno, const char* mode) const")
 	THISISSTRING()
 	ISSTRING(filename)
-	// until we support fieldnames ISSTRING(fieldno)
+	// fieldnames are supported as mvprogram::xlate
+	// but not here in var::xlate which only supports field numbers since it has no
+	// access to dictionaries
 	ISNUMERIC(fieldno)
 
 	// open the file (skip this for now since sql doesnt need "open"
@@ -2351,21 +2353,19 @@ var var::xlate(const var& filename, const var& fieldno, const char* mode) const 
 	//}
 	file = filename;
 
-	var sep;
-	if (fieldno.length())
-		sep = _VM_;
-	else
-		sep = _RM_;
+	char sep = fieldno.length() ? VM_ : RM_;
 
 	var response = "";
-	var nmv = (*this).dcount(_VM_);
-	for (var vn = 1; vn <= nmv; ++vn) {
+	int nmv = this->dcount(_VM_);
+	for (int vn = 1; vn <= nmv; ++vn) {
 
+		//test every time instead of always appending and removing at the end
+		//because the vast majority of xlate are single valued so it is faster
 		if (vn > 1)
 			response ^= sep;
 
 		// read the record
-		var key = (*this).a(1, vn);
+		var key = this->a(1, vn);
 		var record;
 		if (!record.reado(file, key)) {
 			// if record doesnt exist then "", or original key if mode is "C"
@@ -2374,7 +2374,7 @@ var var::xlate(const var& filename, const var& fieldno, const char* mode) const 
 			// gcc warning: comparison with string literal results in unspecified
 			// behaviour if (mode=="C")
 			if (*mode == *"C")
-				response ^= *this;
+				response ^= key;
 
 			// no record and mode X or anything else returns ""
 			continue;

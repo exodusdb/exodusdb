@@ -332,7 +332,7 @@ function main() {
 	fromdate = var().date();
 	if (LISTACTIVE) {
 		fromtime = SYSTEM.a(25);
-	}else{
+	} else {
 		fromtime = ostime();
 	}
 
@@ -341,7 +341,7 @@ function main() {
 
 	if (BASEFMT[2] eq "C") {
 		decimalchar = ",";
-	}else{
+	} else {
 		decimalchar = ".";
 	}
 
@@ -353,8 +353,8 @@ function main() {
 		html = 1;
 
 	//if not arev then dont force html or force output to file
-	}else{
-		html = SYSTEM.a(2).lcase().substr(-3,3) eq "htm";
+	} else {
+		html = SYSTEM.a(2).lcase().substr(-3, 3) eq "htm";
 	}
 
 	if (html) {
@@ -370,7 +370,7 @@ function main() {
 		tt = SYSTEM.a(2);
 		tt.swapper(".txt", ".htm");
 		SYSTEM.r(2, tt);
-	}else{
+	} else {
 		td0 = "";
 		td = "";
 		tdx = " ";
@@ -401,7 +401,7 @@ function main() {
 	DICT = "";
 	if (VOLUMES) {
 		maxncols = 100;
-	}else{
+	} else {
 		maxncols = 256;
 	}
 	maxnrecs = "";
@@ -497,7 +497,7 @@ nextphrase:
 
 phraseinit:
 ///////////
-	if (word.substr(1,4) eq "SORT" or word.substr(1,5) eq "NSORT") {
+	if (word.substr(1, 4) eq "SORT" or word.substr(1, 5) eq "NSORT") {
 		ss ^= "SSELECT";
 
 filename:
@@ -520,9 +520,9 @@ filename:
 			gosub getword();
 			filename = "DICT." ^ word;
 		}
-		if (filename.substr(1,5) eq "DICT.") {
+		if (filename.substr(1, 5) eq "DICT.") {
 			dictfilename = "VOC";
-		}else{
+		} else {
 			dictfilename = filename;
 		}
 		if (not(DICT.open("dict_" ^ dictfilename))) {
@@ -540,15 +540,15 @@ filename:
 
 		if (html) {
 
-			if (var("PLANS,SCHEDULES,ADS,BOOKING_ORDERS,VEHICLES,RATECARDS").locateusing(",",filename,xx)) {
+			if (var("PLANS,SCHEDULES,ADS,BOOKING_ORDERS,VEHICLES,RATECARDS").locateusing(",", filename, xx)) {
 				printtxmark = "Media Management";
 			}
 
-			if (var("JOBS,PRODUCTION_ORDERS,PRODUCTION_INVOICES").locateusing(",",filename,xx)) {
+			if (var("JOBS,PRODUCTION_ORDERS,PRODUCTION_INVOICES").locateusing(",", filename, xx)) {
 				printtxmark = "Production Management";
 			}
 
-			if (var("CHARTS,RECURRING").locateusing(",",filename,xx)) {
+			if (var("CHARTS,RECURRING").locateusing(",", filename, xx)) {
 				printtxmark = "Financial";
 			}
 
@@ -576,7 +576,7 @@ nextkey:
 			}
 		}
 
-	} else if ((word.substr(1,4) eq "LIST" or word.substr(1,5) eq "NLIST") or word eq "XLIST") {
+	} else if ((word.substr(1, 4) eq "LIST" or word.substr(1, 5) eq "NLIST") or word eq "XLIST") {
 		ss ^= "SELECT";
 		goto filename;
 		{}
@@ -608,7 +608,7 @@ nextkey:
 		if (nextword eq "AUTHORISED") {
 			onlyauthorised = 1;
 			gosub getword();
-			if (ss.substr(-4,4) eq " AND") {
+			if (ss.substr(-4, 4) eq " AND") {
 				ss.splicer(-4, 4, "");
 			}
 			if (nextword eq "AND") {
@@ -649,14 +649,14 @@ nextkey:
 		}
 
 		//negate next comparision
-		if (var("NOT,NE,<>").locateusing(",",nextword,xx)) {
+		if (var("NOT,NE,<>").locateusing(",", nextword, xx)) {
 			nextword = "NOT";
 			gosub getword();
 			ss ^= " " ^ word;
 		}
 
 		//comparision
-		if (var("MATCH,EQ,,NE,GT,LT,GE,LE,<,>,<=,>=,=,[],[,]").locateusing(",",nextword,xx)) {
+		if (var("MATCH,EQ,,NE,GT,LT,GE,LE,<,>,<=,>=,=,[],[,]").locateusing(",", nextword, xx)) {
 	//only EQ works at the moment
 			gosub getword();
 			ss ^= " " ^ word;
@@ -677,7 +677,7 @@ nextkey:
 			gosub getword();
 			ss ^= " " ^ word;
 
-		}else{
+		} else {
 
 			//parameters
 			while (true) {
@@ -688,7 +688,7 @@ nextkey:
 				if (limitx) {
 					if ((DQ ^ "'").index(word[1])) {
 						if (word[1] eq word[-1]) {
-							word = word.substr(2,word.length() - 2);
+							word = word.substr(2, word.length() - 2);
 						}
 					}
 					if (word eq "") {
@@ -799,7 +799,7 @@ nextkey:
 
 		//automatic labelling with dictionary title
 		if (word[1] eq "{") {
-			tt = word.substr(2,word.length() - 2);
+			tt = word.substr(2, word.length() - 2);
 			replacements.r(-1, tt);
 			nreplacements += 1;
 			if (not(rec.reado(DICT, tt))) {
@@ -822,7 +822,7 @@ nextkey:
 		}//loop;
 
 		//prevent trailing colon folding onto following line
-		if (title.substr(-2,2) eq " :") {
+		if (title.substr(-2, 2) eq " :") {
 			title.splicer(-2, 2, "&nbsp;:");
 		}
 
@@ -860,7 +860,7 @@ nextkey:
 		if (not(coldict(coln).unassigned())) {
 			gosub getquotedword();
 			coldict(coln).r(9, word[1]);
-			coldict(coln).r(10, word.substr(3,9999));
+			coldict(coln).r(10, word.substr(3, 9999));
 			coldict(coln).r(11, word);
 		}
 
@@ -904,18 +904,18 @@ nextkey:
 	} else if (word eq "EMAIL_CC") {
 		gosub getword();
 		if ((DQ ^ "'").index(word[1])) {
-			emailcc = word.substr(2,word.length() - 2);
+			emailcc = word.substr(2, word.length() - 2);
 			nextemailcc = emailcc;
-		}else{
+		} else {
 			emailccid = word;
 		}
 
 	} else if (word eq "EMAIL_SUBJECT") {
 		gosub getword();
 		if ((DQ ^ "'").index(word[1])) {
-			emailsubject = word.substr(2,word.length() - 2);
+			emailsubject = word.substr(2, word.length() - 2);
 			nextemailsubject = emailsubject;
-		}else{
+		} else {
 			emailsubjectid = word;
 		}
 
@@ -931,7 +931,7 @@ nextkey:
 
 			//suppress untotalled columns if doing detsupp2
 			if (detsupp eq 2 and (not(totalflag or breakonflag))) {
-				if (var("JL,JUSTLEN,CH,COLHEAD,OC,OCONV").locateusing(",",nextword,xx)) {
+				if (var("JL,JUSTLEN,CH,COLHEAD,OC,OCONV").locateusing(",", nextword, xx)) {
 					gosub getword();
 					gosub getword();
 				}
@@ -948,7 +948,7 @@ nextkey:
 				if (dictrec.a(10) and tt.length() gt dictrec.a(10)) {
 					dictrec.r(10, tt.length());
 				}
-			};//ii;
+			} //ii;
 
 			dictrec.r(bheadfn, "");
 
@@ -958,7 +958,7 @@ nextkey:
 					//if detsupp then tt:=' style="display:none"'
 					if (detsupp) {
 						tt = " class=\"BHEAD\"";
-					}else{
+					} else {
 						tt = " class=\"BHEAD2\"";
 					}
 					dictrec.r(bheadfn, tt);
@@ -970,7 +970,7 @@ nextkey:
 				totalflag = 0;
 				dictrec.r(12, 1);
 				anytotals = 1;
-			}else{
+			} else {
 				dictrec.r(12, 0);
 			}
 
@@ -1019,7 +1019,7 @@ nextkey:
 							///BREAK;
 							if (not(charx.length() and var("0123456789,").index(charx))) break;
 							tt2 ^= charx;
-						};//tt;
+						} //tt;
 
 						//build table heading table if rown/column givem
 						if (tt2) {
@@ -1062,8 +1062,8 @@ dictrecexit:;
 		if (interactive) {
 			if (VOLUMES) {
 				tt ^= "|Please correct the word by retyping it|or pressing [F4] to edit it.|Press [Esc] to re-start.|";
-			}else{
-				tt ^= " Replace with? (Esc Enter to cancel):";
+			} else {
+				tt ^= " Replace with? (Esc, Enter to cancel):";
 			}
 		}
 		call mssg(tt, "RE", word, word);
@@ -1115,7 +1115,7 @@ x1exit:
 		for (coln = ncols; coln >= 2; --coln) {
 			coldict(coln) = coldict(coln - 1);
 			colname(coln) = colname(coln - 1);
-		};//coln;
+		} //coln;
 
 		//set column 1
 		colname(1) = "@" "ID";
@@ -1126,7 +1126,7 @@ x1exit:
 		}
 		if (html) {
 			tt = "";
-		}else{
+		} else {
 			tt = coldict(1).a(9) ^ "#" ^ coldict(1).a(10);
 		}
 		coldict(1).r(11, tt);
@@ -1134,7 +1134,7 @@ x1exit:
 		//increment the list of breaking columns by one as well
 		for (breakn = 1; breakn <= nbreaks; ++breakn) {
 			breakcolns.r(breakn, breakcolns.a(breakn) + 1);
-		};//breakn;
+		} //breakn;
 
 		//and the page break colns
 		//for ii=1 to 9999
@@ -1163,13 +1163,13 @@ x1exit:
 			if (coldict(coln).a(10)) {
 				if (coldict(coln).a(12)) {
 					tt = ulchar;
-				}else{
+				} else {
 					tt = " ";
 				}
 				underline ^= tt.str(coldict(coln).a(10)) ^ " ";
 				colul ^= ulchar.str(coldict(coln).a(10)) ^ " ";
 			}
-		};//coln;
+		} //coln;
 		bar = ulchar.str(colul.length() - 1);
 	}
 
@@ -1189,10 +1189,10 @@ x1exit:
 	breakvalue.redim(maxncols);
 	oldbreakvalue.redim(maxncols);
 
-	breakvalue="";
-	oldbreakvalue="";
-	breakcount="";
-	breaktotal="";
+	breakvalue = "";//dim
+	oldbreakvalue = "";//dim
+	breakcount = "";//dim
+	breaktotal = "";//dim
 
 	//build the column headings
 	colhdg = "";
@@ -1270,13 +1270,13 @@ x1exit:
 					style ^= "table.exodustable td:nth-child(" ^ coln2 ^ "){text-align:" ^ align ^ "}" "\r\n";
 				}
 
-			}else{
+			} else {
 				for (ii = 1; ii <= 9; ++ii) {
 					colhdg.r(ii, colhdg.a(ii) ^ oconv(coldict(coln).a(3, ii), coldict(coln).a(11)) ^ " ");
-				};//ii;
+				} //ii;
 			}
 		}
-	};//coln;
+	} //coln;
 
 	if (style) {
 		style = "<style type=\"text/css\">" "\r\n" ^ style ^ "</style>" "\r\n";
@@ -1328,7 +1328,7 @@ x1exit:
 		//allow for single quotes
 		colhdg.swapper("'", "''");
 
-	}else{
+	} else {
 		while (true) {
 			///BREAK;
 			if (not(colhdg and ((" " ^ FM).index(colhdg[-1])))) break;
@@ -1354,7 +1354,7 @@ x1exit:
 		//supertable to ensure any heading is as wide as the body of the report
 		if (showborder) {
 			head.r(-1, "<table{%20}border=1{%20}style=\"border-width:3px\"{%20}cellpadding=0{%20}cellspacing=0{%20}align=center><tr><td>");
-		}else{
+		} else {
 			//head:='<table{%20}cellpadding=0{%20}cellspacing=0{%20}align=center><tr><td>'
 			head.r(-1, "<table{%20}align=center><tr><td>");
 		}
@@ -1386,7 +1386,7 @@ x1exit:
 		headtab.swapper("</TR>", "</TR>" "\r\n");
 		if (headtabperpage) {
 			colhdg.swapper(posttheadmark, tr ^ td0 ^ "<th style=\"background-color:white\" colspan=" ^ ncols ^ ">" ^ headtab ^ thx ^ trx);
-		}else{
+		} else {
 			headtab.swapper(posttheadmark, "");
 			head ^= FM ^ headtab ^ FM;
 		}
@@ -1426,12 +1426,12 @@ nextdict:
 				if (dictrec.a(4).field(".", 1) eq limits.a(4, limitn)) {
 					tt = dictrec.a(2);
 					if (tt) {
-						if (not(limits.a(5, limitn).locateusing(SVM,tt,xx))) {
+						if (not(limits.a(5, limitn).locateusing(SVM, tt, xx))) {
 							limits.r(5, limitn, -1, dictrec.a(2));
 						}
 					}
 				}
-			};//limitn;
+			} //limitn;
 			goto nextdict;
 		}
 		call popselect(0, v69, v70, v71);
@@ -1469,11 +1469,11 @@ nextdict:
 			goto x2bexit;
 		}
 
-	}else{
+	} else {
 		if (not LISTACTIVE) {
 			if (VOLUMES) {
 				select(srcfile);
-			}else{
+			} else {
 				call xselect("SELECT " ^ filename ^ " (SR)");
 			}
 		}
@@ -1518,7 +1518,7 @@ nextrec:
 		if (readnext(ID, MV)) {
 			ok = 1;
 		}
-	}else{
+	} else {
 		ok=readnext(RECORD,ID,MV);
 	}
 	if (not ok) {
@@ -1590,7 +1590,7 @@ nextrec:
 						nmvs = tt;
 					}
 				}
-			};//fnn;
+			} //fnn;
 
 			limitvals = calculate(limits.a(1, limitn));
 			for (mvx = nmvs; mvx >= 1; --mvx) {
@@ -1599,13 +1599,13 @@ nextrec:
 					tt = "\"\"";
 				}
 				//locate tt in (limits<3,limitn>)<1,1> using sm setting xx else
-				if (not(limits.a(3, limitn).locateusing(SVM,tt,xx))) {
+				if (not(limits.a(3, limitn).locateusing(SVM, tt, xx))) {
 					for (fnn = 1; fnn <= nfns; ++fnn) {
 						RECORD.remover(fns.a(1, 1, fnn), mvx);
-					};//fnn;
+					} //fnn;
 				}
-			};//mvx;
-		};//limitn;
+			} //mvx;
+		} //limitn;
 
 	}
 
@@ -1647,7 +1647,7 @@ nextrec:
 
 			mcol(coln) = oconv(calculate(colname(coln)), coldict(coln).a(11));
 
-		}else{
+		} else {
 
 			mcol(coln) = calculate(colname(coln));
 
@@ -1664,7 +1664,7 @@ nextrec:
 		pcol(coln) = 1;
 		ccol(coln) = 7;
 		scol(coln) = mcol(coln);
-	};//coln;
+	} //coln;
 
 	//break subtotals
 	//detect most major level to break
@@ -1672,18 +1672,18 @@ nextrec:
 		//print breaks will not actually print before the first record
 		// but it needs to set the various break values
 		breakleveln = nbreaks;
-	}else{
+	} else {
 		for (leveln = nbreaks; leveln >= 1; --leveln) {
 			coln = breakcolns.a(leveln);
 			///BREAK;
 			if (scol(coln) ne breakvalue(coln)) break;
-		};//leveln;
+		} //leveln;
 		breakleveln = leveln;
 	}
 
 	gosub printbreaks();
 
-	oldbreakvalue=breakvalue;
+	oldbreakvalue = breakvalue;//dim
 
 	previousmarklevel = 0;
 
@@ -1701,7 +1701,7 @@ recexit:
 		if (ccol(coln) gt newmarklevel) {
 			newmarklevel = ccol(coln);
 		}
-	};//coln;
+	} //coln;
 
 	//break totals - add at the bottom level (1)
 	for (coln = 1; coln <= ncols; ++coln) {
@@ -1711,10 +1711,10 @@ recexit:
 				if (html) {
 					//breaktotal(coln,1)+=i.col(coln)
 					call addunits(icol(coln), breaktotal(coln, 1), VM);
-				}else{
+				} else {
 					if (breaktotal(coln, 1).isnum() and icol(coln).isnum()) {
 						breaktotal(coln, 1) += icol(coln);
-					}else{
+					} else {
 						if (colname(coln) eq "DATEGRID") {
 							str1 = icol(coln);
 							str2 = breaktotal(coln, 1);
@@ -1727,7 +1727,7 @@ recexit:
 			breakcount(1) += 1;
 			icol(coln) = "";
 		}
-	};//coln;
+	} //coln;
 
 	if (detsupp lt 2) {
 
@@ -1787,7 +1787,7 @@ recexit:
 				tt = oconv(tt, oconvx);
 				if (html) {
 					if (tt[1] eq "-") {
-						if (oconvx.substr(1,7) eq "[NUMBER") {
+						if (oconvx.substr(1, 7) eq "[NUMBER") {
 							tt = "<nobr>" ^ tt ^ "</nobr>";
 						}
 					}
@@ -1799,44 +1799,44 @@ recexit:
 				}
 				if (tt eq "") {
 					//tt=nbsp
-				}else{
+				} else {
 					tt.swapper("\r\n", "<br />");
 				}
 
 				//colored cells starting with ESC
 				if (tt[1] eq "\x1B") {
-					if (tt.substr(1,2) eq ("\x1B" "\x1B")) {
+					if (tt.substr(1, 2) eq ("\x1B" "\x1B")) {
 						tt = tt.field(" ", 2, 999999);
 						if (tt.length()) {
 							tx1 ^= td ^ "<nobr>" ^ tt ^ "</nobr>" ^ tdx;
-						}else{
+						} else {
 							//tx1:=td:nbsp:tdx
 							tx1 ^= td ^ tdx;
 						}
-					}else{
+					} else {
 						//tx1:=td0:'<td bgcolor=':field(tt,' ',1)[2,9999]:'>'
 						//TODO do with class? to save document space?
-						tx1 ^= td0 ^ "<td style=\"background-color:" ^ tt.field(" ", 1).substr(2,9999) ^ "\">";
+						tx1 ^= td0 ^ "<td style=\"background-color:" ^ tt.field(" ", 1).substr(2, 9999) ^ "\">";
 						tt = tt.field(" ", 2, 999999);
 						if (tt.length()) {
 							tx1 ^= tt ^ tdx;
-						}else{
+						} else {
 							//tx1:=nbsp:tdx
 							tx1 ^= tdx;
 						}
 					}
 
-				}else{
+				} else {
 					if (tt.length()) {
 						tx1 ^= tdz ^ tt ^ tdx;
-					}else{
+					} else {
 						//tx1:=tdz:nbsp:tdx
 						tx1 ^= tdz ^ tdx;
 					}
 				}
 
 			}
-		};//coln;
+		} //coln;
 
 		//swap '<td' with '<th' in tx1
 		//swap '<\td' with '<\th' in tx1
@@ -1853,7 +1853,7 @@ recexit:
 		if (newmarklevel) {
 			for (coln = 1; coln <= ncols; ++coln) {
 				scol(coln) = "";
-			};//coln;
+			} //coln;
 			previousmarklevel = newmarklevel;
 			goto recexit;
 		}
@@ -1972,7 +1972,7 @@ subroutine getquotedword2() {
 	if (((DQ ^ "'").index(word[1])) and (word[1] eq word[-1])) {
 		word.splicer(1, 1, "");
 		word.splicer(-1, 1, "");
-	}else{
+	} else {
 		call mssg(lastword ^ " must be followed by a quoted phrase");
 	}
 	return;
@@ -1988,14 +1988,14 @@ getnextword:
 	gosub getword2();
 
 	if (word.length()) {
-		if (ignorewords.a(1).locate(word,xx)) {
+		if (ignorewords.a(1).locate(word, xx)) {
 			goto getnextword;
 		}
 	}
 
 	if (word eq "") {
 		nextword = "";
-	}else{
+	} else {
 		storewordn = wordn;
 		storecharn = charn;
 		storeword = word;
@@ -2049,7 +2049,7 @@ getword2b:
 	charx = sentencex[charn];
 	if (("'" ^ DQ).index(charx)) {
 		searchchar = charx;
-	}else{
+	} else {
 		searchchar = " ";
 	}
 	word ^= charx;
@@ -2070,7 +2070,7 @@ getword2b:
 		charn += 1;
 
 	//otherwise
-	}else{
+	} else {
 		word.ucaser();
 		word = word.trimb().trimf();
 	}
@@ -2122,7 +2122,7 @@ maindict:
 			wordexpanded = 1;
 			return;
 		}
-	}else{
+	} else {
 		if (dictrec.reado(DICT, word.ucase())) {
 			goto maindict;
 		}
@@ -2136,7 +2136,7 @@ gotdictvoc:
 				}
 				dictrec = "";
 			}
-		}else{
+		} else {
 			if (dictrec.reado(dictvoc, word.ucase())) {
 				goto gotdictvoc;
 			}
@@ -2216,12 +2216,12 @@ subroutine printbreaks() {
 			if (leveln gt 1 and not(html)) {
 				tx ^= underline ^ FM;
 			}
-		}else{
+		} else {
 			if (not html) {
 				//underline2=if breakleveln>=nbreaks then bar else underline
 				//WARNING TODO: check ternary op following;
 				underline2 = leveln eq 1 ? underline : bar;
-				if (not((tx.substr(-2,2)).index(ulchar))) {
+				if (not((tx.substr(-2, 2)).index(ulchar))) {
 					if (tx[-1] ne FM) {
 						tx ^= FM;
 					}
@@ -2258,10 +2258,10 @@ subroutine printbreaks() {
 						if (html) {
 							//breaktotal(coln,leveln+1)+=cell
 							call addunits(cell, breaktotal(coln, leveln + 1), VM);
-						}else{
+						} else {
 							if (((breaktotal(coln, leveln + 1)).isnum()) and cell.isnum()) {
 								breaktotal(coln, leveln + 1) += cell;
-							}else{
+							} else {
 								str1 = cell;
 								str2 = breaktotal(coln, leveln + 1);
 								gosub addstr();
@@ -2338,7 +2338,7 @@ subroutine printbreaks() {
 				//if 1 or detsupp<2 then
 					//cell=oldbreakvalue(coln)
 				cell = oconv(oldbreakvalue(coln), coldict(coln).a(7));
-				if (breakcolns.locateusing(FM,coln,colbreakn)) {
+				if (breakcolns.locateusing(FM, coln, colbreakn)) {
 					if (colbreakn lt leveln) {
 						cell = "Total";
 					}
@@ -2372,7 +2372,7 @@ subroutine printbreaks() {
 				tx ^= cell;
 				if (html) {
 					tx ^= thx;
-				}else{
+				} else {
 					tx ^= " ";
 				}
 				//if len(cell) then if cell<>nbsp then anycell=1
@@ -2381,7 +2381,7 @@ subroutine printbreaks() {
 				}
 			}
 
-		};//coln;
+		} //coln;
 
 	//breakrowexit:
 		if (html) {
@@ -2390,7 +2390,7 @@ subroutine printbreaks() {
 
 		if (detsupp lt 2) {
 			//if leveln>1 and not(html) then tx:=fm:underline
-		}else{
+		} else {
 			if (not html) {
 				tx ^= FM ^ underline2;
 			}
@@ -2402,7 +2402,7 @@ subroutine printbreaks() {
 			tx = storetx;
 		}
 
-	};//leveln;
+	} //leveln;
 
 	//force new page and new heading
 	//if newhead and detsupp<2 then
@@ -2451,7 +2451,7 @@ subroutine printbreaks() {
 			gosub printtx();
 
 		}
-	}else{
+	} else {
 		tx = "";
 	}
 
@@ -2481,7 +2481,7 @@ subroutine addstr() {
 			char2 = str3[ii];
 			if (char2 eq " ") {
 				str3.splicer(ii, 1, char1);
-			}else{
+			} else {
 				//if num(char1) else char1=1
 				//if num(char2) else char2=1
 				if (char1.isnum() and char2.isnum()) {
@@ -2489,13 +2489,13 @@ subroutine addstr() {
 					if (char3 gt 9) {
 						char3 = "*";
 					}
-				}else{
+				} else {
 					char3 = char1;
 				}
 				str3.splicer(ii, 1, char3);
 			}
 		}
-	};//ii;
+	} //ii;
 
 	return;
 }
@@ -2509,7 +2509,7 @@ subroutine newheadreplacements() {
 		tt2 = calculate(dictid);
 		tt2.swapper("'", "''");
 		newhead.swapper(tt, tt2);
-	};//ii;
+	} //ii;
 	return;
 }
 
@@ -2519,8 +2519,8 @@ subroutine emailing() {
 	}
 
 	if ((DQ ^ "'").index(emailtoid[1])) {
-		nextemailto = emailtoid.substr(2,emailtoid.length() - 2);
-	}else{
+		nextemailto = emailtoid.substr(2, emailtoid.length() - 2);
+	} else {
 		nextemailto = calculate(emailtoid);
 	}
 	if (emailccid) {
@@ -2553,7 +2553,7 @@ subroutine emailing() {
 
 		if (emailsubject) {
 			tt3 = emailsubject;
-		}else{
+		} else {
 			//tt3='EXODUS: ':field(head<1,1,1>,"'",1)
 			tt3 = head.a(1, 1, 1).field("'", 1);
 			if (tt3.index(">")) {

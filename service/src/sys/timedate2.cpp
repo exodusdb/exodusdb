@@ -21,7 +21,7 @@ function main(in localdate0, in localtime0) {
 	//use parameters only if both are provided
 	if (localtime0.unassigned()) {
 		call getdatetime(localdate, localtime, x3, x4, x5, x6);
-	}else{
+	} else {
 		localdate = localdate0;
 		localtime = localtime0;
 	}
@@ -34,10 +34,10 @@ function main(in localdate0, in localtime0) {
 	if (temp[1] eq "0") {
 		temp.splicer(1, 1, "");
 	}
-	if (temp.substr(-2,2) eq "AM") {
+	if (temp.substr(-2, 2) eq "AM") {
 		temp.splicer(-2, 2, gen.glang.a(16));
 	}
-	if (temp.substr(-2,2) eq "PM") {
+	if (temp.substr(-2, 2) eq "PM") {
 		temp.splicer(-2, 2, gen.glang.a(17));
 	}
 

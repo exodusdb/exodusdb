@@ -32,7 +32,7 @@ function main(in mode0) {
 
 	if (mode0.unassigned()) {
 		mode = "";
-	}else{
+	} else {
 		mode = mode0;
 	}
 
@@ -75,7 +75,7 @@ function main(in mode0) {
 	// unless already automatically logged in
 	ok = 0;
 	if (not(SYSTEM.a(15))) {
-		if (SECURITY.a(1).locate("MASTER",usern)) {
+		if (SECURITY.a(1).locate("MASTER", usern)) {
 			if (SECURITY.a(4, usern, 2).field(TM, 7) eq "") {
 				SYSTEM.r(22, 1000000);
 				userx = "MASTER";
@@ -96,7 +96,7 @@ function main(in mode0) {
 inpname:
 	if (mode eq "SLEEP") {
 		xdata = USERNAME;
-	}else{
+	} else {
 
 		//unlock all
 		var xx = unlockrecord();
@@ -128,7 +128,7 @@ fail:
 
 	//check the user name and password
 	ok = 0;
-	if (SECURITY.a(1).locate(userx,usern)) {
+	if (SECURITY.a(1).locate(userx, usern)) {
 		if (SECURITY.a(4, usern, 2).field(TM, 7) eq "") {
 			ok = 1;
 			goto okfail;
@@ -146,7 +146,7 @@ fail:
 		//magic method entry of password (pressing enter on blank then entering pass)
 		//defeats the password entry speed check
 		speed = 0;
-	}else{
+	} else {
 		now2 = ostime();
 		speed = now2 - now;
 	}
@@ -168,9 +168,9 @@ fail:
 	//long distance override
 	if (xdata eq "?") {
 
-		if (not(userx eq lockx.substr(1,userx.length()))) {
+		if (not(userx eq lockx.substr(1, userx.length()))) {
 			lockx = userx ^ " " ^ var(1000000).rnd();
-			if (SECURITY.a(1).locate(userx,usern)) {
+			if (SECURITY.a(1).locate(userx, usern)) {
 				lockx ^= " " ^ SECURITY.a(4, usern, 2).field(TM, 7).oconv("HEX2");
 			}
 		}
@@ -212,10 +212,10 @@ chknameandpass:
 
 	//check the user name and password
 	ok = 0;
-	if (SECURITY.a(1).locate(userx,usern)) {
+	if (SECURITY.a(1).locate(userx, usern)) {
 		if (SECURITY.a(4, usern, 2).field(TM, 7) eq encryptx) {
 			ok = 1;
-		}else{
+		} else {
 		}
 	}
 	//failed login not interactive still works

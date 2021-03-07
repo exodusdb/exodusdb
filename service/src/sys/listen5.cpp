@@ -82,27 +82,27 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 	//in the few cases listen2 need to respond to caller, it sets @ans
 	if (request2in.unassigned()) {
 		request2 = "";
-	}else{
+	} else {
 		request2 = request2in;
 	}
 	if (request3in.unassigned()) {
 		request3 = "";
-	}else{
+	} else {
 		request3 = request3in;
 	}
 	if (request4in.unassigned()) {
 		request4 = "";
-	}else{
+	} else {
 		request4 = request4in;
 	}
 	if (request5in.unassigned()) {
 		request5 = "";
-	}else{
+	} else {
 		request5 = request5in;
 	}
 	if (request6in.unassigned()) {
 		request6 = "";
-	}else{
+	} else {
 		request6 = request6in;
 	}
 	var logx = request2;
@@ -137,7 +137,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 				}
 				xx = unlockrecord("", processes, "START*" ^ filename);
 			}
-		};//filen;
+		} //filen;
 
 	} else if (request1 eq "DELETEOLDFILES2") {
 
@@ -195,11 +195,11 @@ restart:
 				if (t3) {
 					ANS = tt;
 					goto restart;
-				}else{
+				} else {
 					SYSTEM.r(100, ii, t2);
 				}
 			}
-		};//ii;
+		} //ii;
 
 		//check for upgrade to LISTEN
 		var gbp;
@@ -213,7 +213,7 @@ restart:
 						goto restart;
 					}
 						//comment to solve c++ decomp problem
-				}else{
+				} else {
 					SYSTEM.r(100, 3, listen);
 				}
 			}
@@ -267,15 +267,15 @@ restart:
 
 			//ensure patch file is complete
 			offset = patchfileinfo.a(1) - 18;
-			call osbread(tt, patchfile,  offset, 18);
+			call osbread(tt, patchfile, offset, 18);
 			if (tt ne ("!" ^ FM ^ "!END!OF!INSTALL!")) {
 				goto nextpatch;
 			}
 
 			//verify correct file heading and determine patchid from the file
-			call osbread(firstblock, patchfile,  0, 65000);
-			patchid = firstblock.a(2).substr(6,9999);
-			if (firstblock.a(1) ne "00000DEFINITIONS" or patchid.substr(1,8) ne "INSTALL*") {
+			call osbread(firstblock, patchfile, 0, 65000);
+			patchid = firstblock.a(2).substr(6, 9999);
+			if (firstblock.a(1) ne "00000DEFINITIONS" or patchid.substr(1, 8) ne "INSTALL*") {
 				goto nextpatch;
 			}
 
@@ -289,7 +289,7 @@ restart:
 			//remove 00000DEFINITIONS^
 			firstblock.remover(1);
 			//remove 5 byte length field and cut out key+rec
-			keyandrec = firstblock.substr(6,firstblock.substr(1,5));
+			keyandrec = firstblock.substr(6, firstblock.substr(1, 5));
 			//remove key
 			rec = keyandrec.remove(1, 0, 0);
 
@@ -357,7 +357,7 @@ restart:
 				var nfiles = rec.a(3).count(VM) + 1;
 				for (var filen = 1; filen <= nfiles; ++filen) {
 					body.r(-1, rec.a(3, filen) ^ " " ^ rec.a(4, filen) ^ "  " ^ rec.a(5, filen));
-				};//filen;
+				} //filen;
 
 				//message EXODUS only
 				call sysmsg(body, "NEOPATCH: " ^ subject, "EXODUS");
@@ -367,7 +367,7 @@ restart:
 			if (not skipreason) {
 
 				//perform the installation
-				var cmd = "INSTALL " ^ patchcode ^ " " ^ oscwd().substr(1,2) ^ " (IO)";
+				var cmd = "INSTALL " ^ patchcode ^ " " ^ oscwd().substr(1, 2) ^ " (IO)";
 				printl(cmd);
 				perform(cmd);
 
@@ -392,7 +392,7 @@ restart:
 			//if the runonce record appears in the definitions then
 			//run it, save it and delete it
 			if (runonce.read(DEFINITIONS, runoncekey)) {
-				perform("RUN DEFINITIONS " ^ runoncekey.substr(2,9999));
+				perform("RUN DEFINITIONS " ^ runoncekey.substr(2, 9999));
 				//leave it for inspection
 				//delete definitions,runoncekey
 			}
@@ -412,7 +412,7 @@ restart:
 			return 0;
 
 nextpatch:;
-		};//patchn;
+		} //patchn;
 
 		ANS = "";
 
@@ -460,15 +460,15 @@ nextpatch:;
 		var s17 = SYSTEM.a(17);
 		s23.converter(" ", FM);
 		//locate 'TEST' in s23 setting xx then username:='*' else
-		if (s23.locate("TESTDATA",xx)) {
+		if (s23.locate("TESTDATA", xx)) {
 			username ^= "*";
-		}else{
-			if (s23.locate("TESTING",xx)) {
+		} else {
+			if (s23.locate("TESTING", xx)) {
 				username ^= "*";
-			}else{
-				if (s23.locate("TRAINING",xx)) {
+			} else {
+				if (s23.locate("TRAINING", xx)) {
 					username ^= "*";
-				}else{
+				} else {
 					if (s17.index("test")) {
 						username ^= "*";
 					}
@@ -483,7 +483,7 @@ nextpatch:;
 		bottomline = var(80).space();
 		gosub printbottomline();
 
-	} else if (request1.substr(1,8) eq "GETINDEX") {
+	} else if (request1.substr(1, 8) eq "GETINDEX") {
 
 		USER1 = "";
 		filename = request2;
@@ -494,7 +494,7 @@ nextpatch:;
 			sortby = "AL";
 		}
 		if (sortby) {
-			if (not(var("AL,AR,DL,DR").locateusing(",",sortby,xx))) {
+			if (not(var("AL,AR,DL,DR").locateusing(",", sortby, xx))) {
 				USER3 = "Invalid sortby " ^ (sortby.quote()) ^ " in LISTEN,GETINDEXVALUES";
 				return 0;
 			}
@@ -508,7 +508,7 @@ nextpatch:;
 		}
 
 		if (filename eq "JOURNALS" or filename eq "JOURNALS") {
-		}else{
+		} else {
 			gosub fileaccesscheck();
 			if (USER3) {
 				return 0;
@@ -561,7 +561,7 @@ getvalues:
 			var nn2 = nn;
 			for (ii = 1; ii <= nn; ++ii) {
 				var execcode = USER1.a(1, ii);
-				if (execstoplist.a(1).locate(execcode,stopn)) {
+				if (execstoplist.a(1).locate(execcode, stopn)) {
 					var reason = execstoplist.a(2, stopn);
 					if (reason) {
 						USER1.remover(1, ii);
@@ -574,7 +574,7 @@ getvalues:
 						nn -= 1;
 					}
 				}
-			};//ii;
+			} //ii;
 
 			//show inactive if none are active
 			if (USER1 eq "" and active) {
@@ -643,7 +643,7 @@ getvalues:
 		//and data passed to SELECT is assumed to be a selectlist
 
 		if (USER1) {
-			makelist("",USER1);
+			makelist("", USER1);
 			sortselect ^= "%SELECTLIST%";
 			USER1 = "";
 		}
@@ -655,7 +655,7 @@ getvalues:
 
 		if (USER4) {
 			USER3 = trim(USER4.a(1), FM);
-		}else{
+		} else {
 			USER1 = "%DIRECTOUTPUT%";
 			//response='OK'
 		}
@@ -706,7 +706,7 @@ nextlock:
 
 		if (tracing) {
 			printl();
-		}else{
+		} else {
 			print(at(0, 1));
 		}
 		var nn = select2data.count(FM);
@@ -739,7 +739,7 @@ nextlock:
 			if (tracing) {
 				printl(" ", row.a(1, 2).oconv("L#19"), " ", row.a(1, 3).oconv("L#19"), " ", row.a(1, 4).oconv("L#19"));
 			}
-		};//ii;
+		} //ii;
 
 		if (not tracing) {
 			printl("+-------------------+");
@@ -789,7 +789,7 @@ nextlock:
 			//response='Error: Database already stopped/stopping'
 			call listen4(19, USER3);
 
-		}else{
+		} else {
 
 			call oswrite("", installend);
 
@@ -813,10 +813,10 @@ nextlock:
 				//response='Error: Could not terminate ':otherusersx<1>:' processes|':otherusersx<2>
 				call listen4(20, USER3, otherusersx);
 				installend.osdelete();
-			}else{
+			} else {
 				osshell("NET STOP EXODUSSERVICE");
 
-				if (request2.substr(1,7) eq "RESTART") {
+				if (request2.substr(1, 7) eq "RESTART") {
 					installend.osdelete();
 					osshell("NET START EXODUSSERVICE");
 				}
@@ -889,7 +889,7 @@ subroutine fileaccesscheck() {
 	//security check
 	//dont check markets and companies because really must have access to some
 	//and eliminates need for clumsy task COMPANY ACCESS PARTIAL task
-	if (not(var("MENUS,ADMENUS").locateusing(",",filename,xx))) {
+	if (not(var("MENUS,ADMENUS").locateusing(",", filename, xx))) {
 		var temp = securityfilename;
 		temp.converter(".", " ");
 		temp = singular(temp);
@@ -914,10 +914,10 @@ subroutine fileaccesscheck() {
 subroutine printbottomline() {
 	if (CRTHIGH gt 24) {
 		yy = CRTHIGH - 1;
-	}else{
+	} else {
 		yy = CRTHIGH;
 	}
-	call scrnio(0, yy, bottomline.substr(1,80), esctoattr(ENVIRONSET.a(21)));
+	call scrnio(0, yy, bottomline.substr(1, 80), esctoattr(ENVIRONSET.a(21)));
 	return;
 }
 
@@ -928,7 +928,7 @@ subroutine deleteoldfiles() {
 	var filespec = (inpath ^ pattern).lcase();
 
 	//failsafe - only allow delete .* in data folder
-	if (filespec.substr(-2,2) eq ".*") {
+	if (filespec.substr(-2, 2) eq ".*") {
 		var tdir = "/data/";
 		tdir.converter("/", OSSLASH);
 		if (not(filespec.index(tdir))) {
@@ -957,28 +957,28 @@ subroutine deleteoldfiles() {
 		//replaced by databasecode.SVR
 		//if filename0='GLOBAL.SVR' then goto deleteit
 
-		if (not(var(".jpg,.png,.gif,.svr,.cfg").locateusing(",",(filename.substr(-4,4)).lcase(),xx))) {
+		if (not(var(".jpg,.png,.gif,.svr,.cfg").locateusing(",", (filename.substr(-4, 4)).lcase(), xx))) {
 
 			//a file ending .4 is a request to delete the .2 and .3 files
-			if (filename.substr(-2,2) eq ".4") {
+			if (filename.substr(-2, 2) eq ".4") {
 				filename.osdelete();
 				filename.splicer(-1, 1, "2");
 				filename.osdelete();
 				filename.splicer(-1, 1, "3");
 				filename.osdelete();
 
-			}else{
-				if (filename.substr(-4,4) eq ".TMP") {
+			} else {
+				if (filename.substr(-4, 4) eq ".TMP") {
 					goto deleteit;
 				}
 				//and delete it if older than the cut off time
 				//and has a file extension (ie leave PARAMS and PARAMS2)
 				fileattributes = filename.osfile();
 				filetime = fileattributes.a(2) * 24 * 60 * 60 + fileattributes.a(3);
-				if (((filename.substr(-4,4)).index(".")) and filetime le deletetime) {
+				if (((filename.substr(-4, 4)).index(".")) and filetime le deletetime) {
 deleteit:
 					filename.osdelete();
-				}else{
+				} else {
 				}
 			}
 

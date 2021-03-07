@@ -14,7 +14,7 @@ function main(in mode0, in time, in date, io buffer, out msg) {
 	}
 	if (mode0.unassigned()) {
 		mode = "";
-	}else{
+	} else {
 		mode = mode0;
 	}
 
@@ -30,7 +30,7 @@ function main(in mode0, in time, in date, io buffer, out msg) {
 	var result = "";
 	if (mode) {
 		text.swapper(", ", FM);
-	}else{
+	} else {
 		//SWAP @FM WITH ', ' IN TEXT
 		var msgx = msg;
 		if (msgx) {

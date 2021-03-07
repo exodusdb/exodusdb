@@ -57,7 +57,7 @@ function main(in a0, io bb, in sep) {
 					if (anum.isnum() and bnum.isnum()) {
 						bb.r(1, bn, (bnum + anum).oconv("MD" ^ ndecs ^ "0P") ^ acode);
 					}
-				}else{
+				} else {
 					bb.r(1, bn, acode);
 				}
 				break;
@@ -66,14 +66,14 @@ function main(in a0, io bb, in sep) {
 		//could be faster if input was guaranteed to be in order
 		//until bcode>=acode
 
-		};//bn;
+		} //bn;
 
 		//if bcode<>acode and len(anum) then
 		if (bcode ne acode) {
 			bb.inserter(1, bn, anum ^ acode);
 		}
 
-	};//an;
+	} //an;
 
 	//work as if vms
 	if (sep eq SVM) {

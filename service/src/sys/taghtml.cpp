@@ -13,7 +13,7 @@ function main(in type, in in0, in mode, out output) {
 
 	output = in0;
 	if (output eq "") {
-		var temp = mode.substr(1,2);
+		var temp = mode.substr(1, 2);
 		temp.ucaser();
 		if (temp eq "TD" or mode eq "TH") {
 			output = "&nbsp;";
@@ -38,11 +38,11 @@ function main(in type, in in0, in mode, out output) {
 		///BREAK;
 		if (not charn) break;
 
-		if (not(var("nbsp,amp,lt,gt,infin").locateusing(",",(output.substr(charn + 1,99999)).field(";", 1),xx))) {
+		if (not(var("nbsp,amp,lt,gt,infin").locateusing(",", (output.substr(charn + 1, 99999)).field(";", 1), xx))) {
 			output.splicer(charn, 1, "&amp;");
 		}
 
-	};//ii;
+	} //ii;
 
 	//swap '<' with '&lt;' in output
 	//swap '>' with '&gt;' in output
