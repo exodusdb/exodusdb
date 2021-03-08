@@ -3934,10 +3934,11 @@ bool var::createindex(const var& fieldname0, const var& dictfile) const {
 	// dictexpression.outputl("dictexp=");stop();
 
 	//mv fields return in unnests, not dictexpression
-	//if (unnests)
-	//{
-	//	dictexpression = unnests.a(3);
-	//}
+	if (unnests)
+	{
+		//dictexpression = unnests.a(3);
+		unnests.convert(FM,"^").outputl("unnests=");
+	}
 
 	var sql;
 
